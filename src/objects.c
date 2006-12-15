@@ -113,7 +113,7 @@ NEARDATA struct objclass objects[] = {
     WEAPON("silver spear", (char *)0,
            1, 1, 0,  2, 36, 40,  6,  8, 0, P,   P_SPEAR, SILVER, HI_SILVER),
     WEAPON("javelin", "throwing spear",
-           0, 1, 0, 10, 20,  3,  6,  6, 0, P,   P_JAVELIN, IRON, HI_METAL),
+           0, 1, 0, 10, 20,  3,  6,  6, 0, P,   P_SPEAR, IRON, HI_METAL),
 
     WEAPON("trident", (char *)0,
            1, 0, 0,  8, 25,  5,  6,  4, 0, P,   P_TRIDENT, IRON, HI_METAL),
