@@ -1317,6 +1317,8 @@ Optional Features:
   --enable-reincarnation  Special Rogue-like levels (default=yes)
   --enable-kops           Keystone Kops (default=yes)
   --enable-seduce         Succubi/incubi seduction (default=yes)
+  --enable-randomized-planes
+                          Shuffling order of Elemental Planes (default=yes)
   --enable-steed          Ability to ride monsters (default=yes)
   --enable-tourist        Tourist class (default=yes)
   --enable-redo           Redo last command (default=yes)
@@ -6489,6 +6491,25 @@ _ACEOF
 # NETHACK_ARG(firearms,[Guns and Bullets],FIREARMS,yes)
 # NETHACK_ARG(eaten-memory,[Remember which monsters have been eaten],
 #  EATEN_MEMORY,yes)
+{ echo "$as_me:$LINENO: checking whether to enable randomized-planes" >&5
+echo $ECHO_N "checking whether to enable randomized-planes... $ECHO_C" >&6; }
+   # Check whether --enable-randomized-planes was given.
+if test "${enable_randomized_planes+set}" = set; then
+  enableval=$enable_randomized_planes;
+else
+  enable_randomized_planes="yes"
+fi
+
+   { echo "$as_me:$LINENO: result: $enable_randomized_planes" >&5
+echo "${ECHO_T}$enable_randomized_planes" >&6; }
+   if test "$enable_randomized_planes" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define RANDOMIZED_PLANES
+_ACEOF
+
+   fi
+
 { echo "$as_me:$LINENO: checking whether to enable steed" >&5
 echo $ECHO_N "checking whether to enable steed... $ECHO_C" >&6; }
    # Check whether --enable-steed was given.

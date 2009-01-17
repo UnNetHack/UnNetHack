@@ -362,7 +362,16 @@ fixup_special()
 		lev = u.uz;
 		lev.dlevel = atoi(r->rname.str);
 	    } else {
+#ifdef RANDOMIZED_PLANES
+		s_level *sp;
+		if (strcmp("random_plane", r->rname.str)==0) {
+			sp = get_next_elemental_plane(&u.uz);
+		} else {
+			sp = find_level(r->rname.str);
+		}
+#else
 		s_level *sp = find_level(r->rname.str);
+#endif
 		lev = sp->dlevel;
 	    }
 	    /* fall into... */

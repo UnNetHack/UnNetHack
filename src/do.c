@@ -968,8 +968,16 @@ boolean at_stairs, falling, portal;
 	if (dunlev(newlevel) > dunlevs_in_dungeon(newlevel))
 		newlevel->dlevel = dunlevs_in_dungeon(newlevel);
 	if (newdungeon && In_endgame(newlevel)) { /* 1st Endgame Level !!! */
-		if (u.uhave.amulet)
+		if (u.uhave.amulet) {
+#ifdef RANDOMIZED_PLANES
+			pline("Well done, mortal!");
+			pline("But now thou must face the final Test...");
+			pline("Prove thyself worthy or perish!");
+		    assign_level(newlevel, get_first_elemental_plane());
+#else
 		    assign_level(newlevel, &earth_level);
+#endif
+		}
 		else return;
 	}
 	new_ledger = ledger_no(newlevel);

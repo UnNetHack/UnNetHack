@@ -466,6 +466,10 @@ E void FDECL(insert_branch, (branch *,BOOLEAN_P));
 E void NDECL(init_dungeons);
 E s_level *FDECL(find_level, (const char *));
 E s_level *FDECL(Is_special, (d_level *));
+#ifdef RANDOMIZED_PLANES
+E s_level *FDECL(get_next_elemental_plane, (d_level *));
+E d_level *NDECL(get_first_elemental_plane);
+#endif
 E branch *FDECL(Is_branchlev, (d_level *));
 E xchar FDECL(ledger_no, (d_level *));
 E xchar NDECL(maxledgerno);

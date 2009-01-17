@@ -320,6 +320,7 @@ NETHACK_ARG(seduce,[Succubi/incubi seduction],SEDUCE,yes)
 # NETHACK_ARG(firearms,[Guns and Bullets],FIREARMS,yes)
 # NETHACK_ARG(eaten-memory,[Remember which monsters have been eaten],
 #  EATEN_MEMORY,yes)
+NETHACK_ARG(randomized-planes,[Shuffling order of Elemental Planes],RANDOMIZED_PLANES,yes)
 NETHACK_ARG(steed,[Ability to ride monsters],STEED,yes)
 # NETHACK_ARG(dwarf,[Dwarf race],DWARF,yes)
 NETHACK_ARG(tourist,[Tourist class],TOURIST,yes)

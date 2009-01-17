@@ -122,6 +122,9 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* Shuffling order of Elemental Planes */
+#undef RANDOMIZED_PLANES
+
 /* Redo last command */
 #undef REDO
 

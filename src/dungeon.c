@@ -54,6 +54,9 @@ STATIC_DCL boolean FDECL(place_level, (int, struct proto_dungeon *));
 STATIC_DCL const char *FDECL(br_string, (int));
 STATIC_DCL void FDECL(print_branch, (winid, int, int, int, BOOLEAN_P, struct lchoice *));
 #endif
+#ifdef RANDOMIZED_PLANES
+STATIC_DCL void NDECL(shuffle_planes);
+#endif
 
 #ifdef DEBUG
 #define DD	dungeons[i]
@@ -220,6 +223,49 @@ find_level(s)
 	    if (!strcmpi(s, curr->proto)) break;
 	return curr;
 }
+
+#ifdef RANDOMIZED_PLANES
+/**
+ * Returns the next plane to go to.
+ *
+ * Returns NULL if on Astral Plane or not in endgame.
+ */
+s_level *
+get_next_elemental_plane(lev)
+d_level *lev;
+{
+	if (!In_endgame(lev)) {
+		pline("get_next_elemental_plane not in Endgame.");
+		return (s_level *)0;
+	}
+
+	s_level *curr = find_level("astral"),
+	        *plane = (s_level *)0;
+	for (curr = sp_levchn; curr; curr = curr->next) {
+	    if (on_level(lev, &(curr->dlevel))) {
+	    	return plane;
+	    }
+	    plane = curr;
+	}
+	return (s_level *)0;
+}
+
+/**
+ * Returns the first elemental plane of the endgame.
+ */
+d_level *
+get_first_elemental_plane()
+{
+	s_level *curr,
+	        *dummy = find_level("dummy");
+	for (curr = find_level("astral"); curr; curr = curr->next) {
+	    if (curr->next == dummy) {
+		return &curr->dlevel;
+	    }
+	}
+	return (d_level *)0;
+}
+#endif
 
 /* Find the branch that links the named dungeon. */
 STATIC_OVL int
@@ -894,10 +940,44 @@ init_dungeons()		/* initialize the "dungeon" structs */
 	       so that it's hidden from <ctrl/O> feedback. */
 	}
 
+#ifdef RANDOMIZED_PLANES
+	shuffle_planes();
+#endif
+
 #ifdef DEBUG
 	dumpit();
 #endif
 }
+
+#ifdef RANDOMIZED_PLANES
+void
+shuffle_planes() /* randomizes order of elemental planes */
+{
+	/* original order */
+	s_level *dummy  = find_level("dummy") ,
+	        *earth  = find_level("earth") ,
+		*air    = find_level("air"),
+		*fire   = find_level("fire"),
+		*water  = find_level("water"),
+		*astral = find_level("astral");
+	s_level *array[] = { water, fire, air, earth };
+	int j, pos;
+	s_level *tmp;
+
+	/* Fisher-Yates shuffle aka Knuth shuffle */
+	for(j = 3; j > 0; j--) { 
+		pos = rn2(j+1); 
+		tmp = array[pos]; array[pos] = array[j]; array[j] = tmp; 
+	}
+
+	/* reorder planes */
+	astral->next = array[3];
+	for(j = 3; j > 0; j--) { 
+		array[j]->next = array[j-1];
+	}
+	array[0]->next = dummy;
+}
+#endif
 
 xchar
 dunlev(lev)	/* return the level number for lev in *this* dungeon */

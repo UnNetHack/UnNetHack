@@ -617,7 +617,11 @@ level_tele()
 			newlevel.dlevel = destlev;
 			if (In_endgame(&newlevel) && !In_endgame(&u.uz)) {
 				Sprintf(buf,
+#ifdef RANDOMIZED_PLANES
+				    "Destination is first elemental plane");
+#else
 				    "Destination is earth level");
+#endif
 				if (!u.uhave.amulet) {
 					struct obj *obj;
 					obj = mksobj(AMULET_OF_YENDOR,
@@ -627,7 +631,11 @@ level_tele()
 						Strcat(buf, " with the amulet");
 					}
 				}
+#ifdef RANDOMIZED_PLANES
+				assign_level(&newlevel, get_first_elemental_plane());
+#else
 				assign_level(&newlevel, &earth_level);
+#endif
 				pline("%s.", buf);
 			}
 			force_dest = TRUE;

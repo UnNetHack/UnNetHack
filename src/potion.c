@@ -761,7 +761,11 @@ peffects(otmp)
 			    const char *riseup ="rise up, through the %s!";
 			    if(ledger_no(&u.uz) == 1) {
 			        You(riseup, ceiling(u.ux,u.uy));
+#ifdef RANDOMIZED_PLANES
+				goto_level(get_first_elemental_plane(), FALSE, FALSE, FALSE);
+#else
 				goto_level(&earth_level, FALSE, FALSE, FALSE);
+#endif
 			    } else {
 			        register int newlev = depth(&u.uz)-1;
 				d_level newlevel;

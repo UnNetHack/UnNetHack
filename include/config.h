@@ -356,8 +356,14 @@ typedef unsigned char	uchar;
  * bugs left here.
  */
 
+#ifndef AUTOCONF
+
+#define RANDOMIZED_PLANES /* Elemental Planes order is randomized - Patric Mueller (4 Jan 2009) */
+
 /*#define GOLDOBJ */	/* Gold is kept on obj chains - Helge Hafting */
 /*#define AUTOPICKUP_EXCEPTIONS */ /* exceptions to autopickup */
+
+#endif /* AUTOCONF */
 
 /* End of Section 5 */
 
