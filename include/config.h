@@ -37,12 +37,16 @@
 
 #include "config1.h"	/* should auto-detect MSDOS, MAC, AMIGA, and WIN32 */
 
+#ifdef AUTOCONF
+# include "autoconf.h"
+#endif
+
 
 /* Windowing systems...
  * Define all of those you want supported in your binary.
  * Some combinations make no sense.  See the installation document.
  */
-#define TTY_GRAPHICS	/* good old tty based graphics */
+/* #define TTY_GRAPHICS */	/* good old tty based graphics */
 /* #define X11_GRAPHICS */	/* X11 interface */
 /* #define QT_GRAPHICS */	/* Qt interface */
 /* #define GNOME_GRAPHICS */	/* Gnome interface */
@@ -167,6 +171,7 @@
  *	compression.
  */
 
+#ifndef AUTOCONF
 #ifdef UNIX
 /* path and file name extension for compression program */
 #define COMPRESS "/usr/bin/compress"	/* Lempel-Ziv compression */
@@ -178,6 +183,7 @@
 
 #ifndef COMPRESS
 # define INTERNAL_COMP	/* control use of NetHack's compression routines */
+#endif
 #endif
 
 /*
@@ -315,6 +321,7 @@ typedef unsigned char	uchar;
  * complexity of the game but also to the size of the load module.
  */
 
+#ifndef AUTOCONF
 /* dungeon features */
 #define SINKS		/* Kitchen sinks - Janet Walz */
 /* dungeon levels */
@@ -333,12 +340,13 @@ typedef unsigned char	uchar;
 # define CLIPPING	/* allow smaller screens -- ERS */
 #endif
 
+#define EXP_ON_BOTL	/* Show experience on bottom line */
+/* #define SCORE_ON_BOTL */	/* added by Gary Erickson (erickson@ucivax) */
+#endif
+
 #ifdef REDO
 # define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
 #endif
-
-#define EXP_ON_BOTL	/* Show experience on bottom line */
-/* #define SCORE_ON_BOTL */	/* added by Gary Erickson (erickson@ucivax) */
 
 /*
  * Section 5:  EXPERIMENTAL STUFF

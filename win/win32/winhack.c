@@ -12,7 +12,7 @@
 #include "mhmain.h"
 #include "mhmap.h"
 
-#ifndef __BORLANDC__
+#if !defined(__BORLANDC__) && !defined(__MINGW32__)
 #include <shlwapi.h>
 #else /* Borland redefines "boolean" in shlwapi.h so just use the little bit we need */
 typedef struct _DLLVERSIONINFO

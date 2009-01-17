@@ -5,7 +5,7 @@
 #ifndef NTCONF_H
 #define NTCONF_H
 
-/* #define SHELL	/* nt use of pcsys routines caused a hang */
+/* #define SHELL */	/* nt use of pcsys routines caused a hang */
 
 #define RANDOM		/* have Berkeley random(3) */
 #define TEXTCOLOR	/* Color text */
@@ -23,13 +23,13 @@
 
 #define SELF_RECOVER		/* Allow the game itself to recover from an aborted game */
 
-#define USER_SOUNDS
+//#define USER_SOUNDS
 /*
  * -----------------------------------------------------------------
  *  The remaining code shouldn't need modification.
  * -----------------------------------------------------------------
  */
-/* #define SHORT_FILENAMES	/* All NT filesystems support long names now */
+/* #define SHORT_FILENAMES */	/* All NT filesystems support long names now */
 
 #ifdef MICRO
 #undef MICRO			/* never define this! */
@@ -49,7 +49,7 @@
 #ifdef MSWIN_GRAPHICS
 #define OPTIONS_USED	"guioptions"
 #else
-#define OPTIONS_USED	"ttyoptions"
+#define OPTIONS_USED	"options"
 #endif
 #define OPTIONS_FILE OPTIONS_USED
 

@@ -133,7 +133,9 @@
  * simply a flag to turn on or off napping for visual effects at run-time.
  */
 
+#ifndef AUTOCONF
 #define TIMED_DELAY	/* enable the `timed_delay' run-time option */
+#endif
 
 # ifdef PCMUSIC
 #define TIMED_DELAY	/* need it anyway */

@@ -835,7 +835,7 @@ cl_eos()			/* free after Robert Viduya */
 
 #include <curses.h>
 
-#ifndef LINUX
+#ifndef HAVE_TPARM
 extern char *tparm();
 #endif
 

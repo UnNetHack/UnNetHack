@@ -132,7 +132,9 @@
  * "extra output" method is used, but not all systems provide access to
  * a fine-grained timer.
  */
+#ifndef AUTOCONF
 /* #define TIMED_DELAY */	/* usleep() */
+#endif
 #endif
 
 /*
@@ -265,14 +267,14 @@
 
 #define HLOCK	"perm"	/* an empty file used for locking purposes */
 
+#include "system.h"
+
 #ifndef REDO
 #define Getchar nhgetch
 #endif
 #define tgetch getchar
 
 #define SHELL		/* do not delete the '!' command */
-
-#include "system.h"
 
 #if defined(POSIX_TYPES) || defined(__GNUC__)
 #include <stdlib.h>

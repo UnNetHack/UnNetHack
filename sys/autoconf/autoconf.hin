@@ -1,0 +1,180 @@
+/* sys/autoconf/autoconf.hin.  Generated from sys/autoconf/configure.ac by autoheader.  */
+
+#ifndef AUTOCONF_H
+#define AUTOCONF_H
+
+/* Exceptions to autopickup (experimental) */
+#undef AUTOPICKUP_EXCEPTIONS
+
+/* A BSD like system */
+#undef BSD
+
+/* Allow smaller screens */
+#undef CLIPPING
+
+/* Compression program */
+#undef COMPRESS
+
+/* Extension of compressed files */
+#undef COMPRESS_EXTENSION
+
+/* Options to pass to the compression program, if any */
+#undef COMPRESS_OPTIONS
+
+/* Unix on win32 */
+#undef CYGWIN32
+
+/* The default windowing system */
+#undef DEFAULT_WINDOW_SYS
+
+/* Data librarian */
+#undef DLB
+
+/* Engraving the E-word repels monsters */
+#undef ELBERETH
+
+/* Show experience on bottom line */
+#undef EXP_ON_BOTL
+
+/* Gold is kept on object chains (experimental) */
+#undef GOLDOBJ
+
+/* Define to 1 if you have the <curses.h> header file. */
+#undef HAVE_CURSES_H
+
+/* Define to 1 if you have the declaration of `strncmpi', and to 0 if you
+   don't. */
+#undef HAVE_DECL_STRNCMPI
+
+/* Define to 1 if you have the declaration of `strnicmp', and to 0 if you
+   don't. */
+#undef HAVE_DECL_STRNICMP
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <termcap.h> header file. */
+#undef HAVE_TERMCAP_H
+
+/* Define this if you have the tparm function in an included lib. */
+#undef HAVE_TPARM
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Use NetHack's compression routines */
+#undef INTERNAL_COMP
+
+/* Keystone Kops */
+#undef KOPS
+
+/* GNU Linux */
+#undef LINUX
+
+/* Use regular expressions */
+#undef MENU_COLOR_REGEX
+
+/* GNU regex is available */
+#undef MENU_COLOR_REGEX_GNU
+
+/* Posix regex is available */
+#undef MENU_COLOR_REGEX_POSIX
+
+/* Microsoft Window's native graphics */
+#undef MSWIN_GRAPHICS
+
+/* No void type available */
+#undef NOVOID
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Redo last command */
+#undef REDO
+
+/* Special Rogue-like levels */
+#undef REINCARNATION
+
+/* Show score on bottom line */
+#undef SCORE_ON_BOTL
+
+/* Succubi/incubi seduction */
+#undef SEDUCE
+
+/* Kitchen sinks */
+#undef SINKS
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Ability to ride monsters */
+#undef STEED
+
+/* Use strncmpi */
+#undef STRNCMPI
+
+/* A System V like system */
+#undef SYSV
+
+/* Using msleep */
+#undef TIMED_DELAY
+
+/* Tourist class */
+#undef TOURIST
+
+/* Console output */
+#undef TTY_GRAPHICS
+
+/* Allow user-defined mapping from messages to sounds) */
+#undef USER_SOUNDS
+
+/* Fancy mazes */
+#undef WALLIFIED_MAZE
+
+/* An MS-Windows system */
+#undef WIN32
+
+/* The person allowed to use the -D option */
+#undef WIZARD
+
+/* X11 graphics */
+#undef X11_GRAPHICS
+
+/* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
+   `char[]'. */
+#undef YYTEXT_POINTER
+
+#endif /* AUTOCONF_H */
