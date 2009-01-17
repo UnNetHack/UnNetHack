@@ -1325,6 +1325,7 @@ Optional Features:
   --enable-redo           Redo last command (default=yes)
   --enable-clipping       Allow smaller screens (default=yes)
   --enable-menu-color     TTY graphics menu color (default=yes)
+  --enable-status-color   TTY graphics status color (default=yes)
   --enable-elbereth       Engraving the E-word repels monsters (default=yes)
   --enable-user-sounds    Allow user-defined mapping from messages to sounds)
                           (default=no)
@@ -6624,6 +6625,25 @@ echo "${ECHO_T}$enable_menu_color" >&6; }
 
 cat >>confdefs.h <<_ACEOF
 #define MENU_COLOR
+_ACEOF
+
+   fi
+
+{ echo "$as_me:$LINENO: checking whether to enable status-color" >&5
+echo $ECHO_N "checking whether to enable status-color... $ECHO_C" >&6; }
+   # Check whether --enable-status-color was given.
+if test "${enable_status_color+set}" = set; then
+  enableval=$enable_status_color;
+else
+  enable_status_color="yes"
+fi
+
+   { echo "$as_me:$LINENO: result: $enable_status_color" >&5
+echo "${ECHO_T}$enable_status_color" >&6; }
+   if test "$enable_status_color" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define STATUS_COLORS
 _ACEOF
 
    fi

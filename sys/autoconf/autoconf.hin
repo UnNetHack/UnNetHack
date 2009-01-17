@@ -146,6 +146,9 @@
 /* Kitchen sinks */
 #undef SINKS
 
+/* TTY graphics status color */
+#undef STATUS_COLORS
+
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 

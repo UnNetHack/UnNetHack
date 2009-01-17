@@ -1960,6 +1960,12 @@ E void FDECL(rloco, (struct obj *));
 E int NDECL(random_teleport_level);
 E boolean FDECL(u_teleport_mon, (struct monst *,BOOLEAN_P));
 
+/* ### termcap.c ### */
+E void FDECL(term_start_color, (int));
+E void NDECL(term_end_color);
+E void FDECL(term_start_attr, (int));
+E void FDECL(term_end_attr, (int));
+
 /* ### tile.c ### */
 #ifdef USE_TILES
 E void FDECL(substitute_tiles, (d_level *));
