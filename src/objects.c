@@ -342,6 +342,7 @@ DRGN_ARMR("orange dragon scale mail", 1, SLEEP_RES,   900, 1, CLR_ORANGE),
 DRGN_ARMR("black dragon scale mail",  1, DISINT_RES, 1200, 1, CLR_BLACK),
 DRGN_ARMR("blue dragon scale mail",   1, SHOCK_RES,   900, 1, CLR_BLUE),
 DRGN_ARMR("green dragon scale mail",  1, POISON_RES,  900, 1, CLR_GREEN),
+DRGN_ARMR("gold dragon scale mail",   1, 0,  900, 1, HI_GOLD),
 DRGN_ARMR("yellow dragon scale mail", 1, ACID_RES,    900, 1, CLR_YELLOW),
 
 /* For now, only dragons leave these. */
@@ -358,6 +359,7 @@ DRGN_ARMR("orange dragon scales", 0, SLEEP_RES,  500, 7, CLR_ORANGE),
 DRGN_ARMR("black dragon scales",  0, DISINT_RES, 700, 7, CLR_BLACK),
 DRGN_ARMR("blue dragon scales",   0, SHOCK_RES,  500, 7, CLR_BLUE),
 DRGN_ARMR("green dragon scales",  0, POISON_RES, 500, 7, CLR_GREEN),
+DRGN_ARMR("gold dragon scales",   0, 0, 500, 7, HI_GOLD),
 DRGN_ARMR("yellow dragon scales", 0, ACID_RES,   500, 7, CLR_YELLOW),
 #undef DRGN_ARMR
 

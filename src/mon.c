@@ -187,6 +187,7 @@ register struct monst *mtmp;
 	    case PM_BLACK_DRAGON:
 	    case PM_BLUE_DRAGON:
 	    case PM_GREEN_DRAGON:
+	    case PM_GOLD_DRAGON:
 	    case PM_YELLOW_DRAGON:
 		/* Make dragon scales.  This assumes that the order of the */
 		/* dragons is the same as the order of the scales.	   */
@@ -1415,6 +1416,7 @@ register struct monst *mtmp;
 {
 	struct permonst *mptr;
 	int tmp;
+	struct obj* otmp;
 
 	if(mtmp->isgd) {
 		/* if we're going to abort the death, it *must* be before
@@ -1429,6 +1431,11 @@ register struct monst *mtmp;
 	if (mtmp == u.usteed)
 		dismount_steed(DISMOUNT_GENERIC);
 #endif
+
+	/* extinguish monster's armor */
+	if ((otmp = which_armor(mtmp, W_ARM)) && 
+		(otmp->otyp==GOLD_DRAGON_SCALE_MAIL || otmp->otyp == GOLD_DRAGON_SCALES) )
+		end_burn(otmp,FALSE);
 
 	mptr = mtmp->data;		/* save this for m_detach() */
 	/* restore chameleon, lycanthropes to true form at death */

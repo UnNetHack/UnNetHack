@@ -245,6 +245,10 @@ struct obj *corpse;
 	/* check iron balls separately--maybe they're not carrying it */
 	if (uball) uball->owornmask = uchain->owornmask = 0;
 
+	/* extinguish armor */
+	if (uarm && (uarm->otyp == GOLD_DRAGON_SCALE_MAIL || uarm->otyp == GOLD_DRAGON_SCALES))
+		end_burn(uarm,FALSE);
+
 	/* dispose of your possessions, usually cursed */
 	if (u.ugrave_arise == (NON_PM - 1)) {
 		struct obj *otmp;
