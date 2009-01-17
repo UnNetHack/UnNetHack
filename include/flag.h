@@ -186,6 +186,9 @@ struct instance_flags {
 #ifdef MENU_COLOR
 	boolean use_menu_color;	/* use color in menus; only if wc_color */
 #endif
+#ifdef WIN_EDGE
+	boolean  win_edge;	/* are the menus aligned left&top */
+#endif
 #ifdef MFLOPPY
 	boolean  checkspace;	/* check disk space before writing files */
 				/* (in iflags to allow restore after moving

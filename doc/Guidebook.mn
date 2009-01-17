@@ -2157,6 +2157,8 @@ Provide more commentary during the game (default on).
 Select which windowing system to use, such as ``tty'' or ``X11''
 (default depends on version).
 Cannot be set with the `O' command.
+.lp win_edge
+Align menus and text windows in tty left instead of right. (default off)
 .hn 2
 Window Port Customization options
 .pg

@@ -2808,6 +2808,10 @@
             ``X11''  (default  depends on version).  Cannot be set with the
             `O' command.
 
+          win_edge
+            Align menus and text windows in tty left instead of right.
+            (default off)
+
           9.5.  Window Port Customization options
 
                Here are explanations of the various options that  are  used

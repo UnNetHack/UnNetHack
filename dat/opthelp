@@ -82,6 +82,9 @@ preload_tiles  control whether tiles get pre-loaded into RAM at the
                start of the game.  Doing so enhances performance
                of the tile graphics, but uses more memory.        [TRUE]
 
+Boolean option if WIN_EDGE was set at compile time (tty interface only):
+win_edge       align menus and text windows left instead of right [FALSE]
+
 Any Boolean option can be negated by prefixing it with a '!' or 'no'.
 
 

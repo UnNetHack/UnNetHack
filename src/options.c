@@ -202,6 +202,11 @@ static struct Bool_Opt
 #else
 	{"use_inverse",   &iflags.wc_inverse, FALSE, SET_IN_GAME},		/*WC*/
 #endif
+#ifdef WIN_EDGE
+	{"win_edge", &iflags.win_edge, FALSE, SET_IN_GAME},
+#else
+	{"win_edge", (boolean *)0, TRUE, SET_IN_FILE},
+#endif
 	{"verbose", &flags.verbose, TRUE, SET_IN_GAME},
 	{"wraptext", &iflags.wc2_wraptext, FALSE, SET_IN_GAME},
 	{(char *)0, (boolean *)0, FALSE, 0}

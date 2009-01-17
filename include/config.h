@@ -378,6 +378,10 @@ typedef unsigned char	uchar;
 
 #endif /* AUTOCONF */
 
+#ifdef TTY_GRAPHICS
+# define WIN_EDGE	/* windows aligned left&top */
+#endif
+
 /* End of Section 5 */
 
 #include "global.h"	/* Define everything else according to choices above */
