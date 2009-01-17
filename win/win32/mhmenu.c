@@ -63,6 +63,10 @@ typedef struct mswin_nethack_menu_window {
 
 extern short glyph2tile[];
 
+#ifdef MENU_COLOR
+extern struct menucoloring *menu_colorings;
+#endif
+
 static WNDPROC wndProcListViewOrig = NULL;
 static WNDPROC editControlWndProc = NULL;
 
@@ -82,6 +86,58 @@ static HWND GetMenuControl(HWND hwnd);
 static void SelectMenuItem(HWND hwndList, PNHMenuWindow data, int item, int count);
 static void reset_menu_count(HWND hwndList, PNHMenuWindow data);
 static BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch);
+
+#ifdef MENU_COLOR
+/* FIXME: nhcolor_to_RGB copied from mhmap.c */
+/* map nethack color to RGB */
+COLORREF nhcolor_to_RGB(int c)
+{
+	switch(c) {
+	case CLR_BLACK:			return RGB(0x55, 0x55, 0x55);
+	case CLR_RED:			return RGB(0xFF, 0x00, 0x00);
+	case CLR_GREEN:			return RGB(0x00, 0x80, 0x00);
+	case CLR_BROWN:			return RGB(0xA5, 0x2A, 0x2A);
+	case CLR_BLUE:			return RGB(0x00, 0x00, 0xFF);
+	case CLR_MAGENTA:		return RGB(0xFF, 0x00, 0xFF);
+	case CLR_CYAN:			return RGB(0x00, 0xFF, 0xFF);
+	case CLR_GRAY:			return RGB(0xC0, 0xC0, 0xC0);
+	case NO_COLOR:			return RGB(0xFF, 0xFF, 0xFF);
+	case CLR_ORANGE:		return RGB(0xFF, 0xA5, 0x00);
+	case CLR_BRIGHT_GREEN:		return RGB(0x00, 0xFF, 0x00);
+	case CLR_YELLOW:		return RGB(0xFF, 0xFF, 0x00);
+	case CLR_BRIGHT_BLUE:		return RGB(0x00, 0xC0, 0xFF);
+	case CLR_BRIGHT_MAGENTA: 	return RGB(0xFF, 0x80, 0xFF);
+	case CLR_BRIGHT_CYAN:		return RGB(0x80, 0xFF, 0xFF);	/* something close to aquamarine */
+	case CLR_WHITE:			return RGB(0xFF, 0xFF, 0xFF);
+	default:			return RGB(0x00, 0x00, 0x00);	/* black */
+	}
+}
+
+
+STATIC_OVL boolean
+get_menu_coloring(str, color, attr)
+char *str;
+int *color, *attr;
+{
+    struct menucoloring *tmpmc;
+    if (iflags.use_menu_color)
+	for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
+# ifdef MENU_COLOR_REGEX
+#  ifdef MENU_COLOR_REGEX_POSIX
+	    if (regexec(&tmpmc->match, str, 0, NULL, 0) == 0) {
+#  else
+	    if (re_search(&tmpmc->match, str, strlen(str), 0, 9999, 0) >= 0) {
+#  endif
+# else
+	    if (pmatch(tmpmc->match, str)) {
+# endif
+		*color = tmpmc->color;
+		*attr = tmpmc->attr;
+		return TRUE;
+	    }
+    return FALSE;
+}
+#endif /* MENU_COLOR */
 
 /*-----------------------------------------------------------------------------*/
 HWND mswin_init_menu_window (int type) {
@@ -767,6 +823,11 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	char *p, *p1;
 	int column;
 
+#ifdef MENU_COLOR
+	int color = NO_COLOR, attr;
+	boolean menucolr = FALSE;
+#endif
+
 	lpdis = (LPDRAWITEMSTRUCT) lParam; 
 
     /* If there are no list box items, skip this message. */
@@ -812,6 +873,15 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		if(item->accelerator!=0) {
 			buf[0] = item->accelerator;
 			buf[1] = '\x0';
+
+#ifdef MENU_COLOR
+			if (iflags.use_menu_color &&
+			    (menucolr = get_menu_coloring(item->str, &color,&attr))) {
+			    /* TODO: use attr too */
+			    if (color != NO_COLOR)
+				SetTextColor(lpdis->hDC, nhcolor_to_RGB(color));
+			}
+#endif
 
 			SetRect( &drawRect, x, lpdis->rcItem.top, lpdis->rcItem.right, lpdis->rcItem.bottom );
 			DrawText(lpdis->hDC, NH_A2W(buf, wbuf, 2), 1, &drawRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);

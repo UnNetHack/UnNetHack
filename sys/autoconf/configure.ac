@@ -1,5 +1,5 @@
-dnl	NETHACK autoconf template
-AC_INIT(NETHACK, 3.4.3, bhaak@gmx.net)
+dnl	UNNETHACK autoconf template
+AC_INIT(UNNETHACK, 3.4.3, bhaak@gmx.net)
 dnl Avoid AC_REVISION() because we check configure into CVS
 dnl and it will cause confusing revision numbers to be included
 dnl in configure if developers forget to check in configure.ac
@@ -328,7 +328,7 @@ NETHACK_ARG(tourist,[Tourist class],TOURIST,yes)
 # NETHACK_ARG(zouthern,[Zoutherner class],ZOUTHERN,no)
 NETHACK_ARG(redo,[Redo last command],REDO,yes)
 NETHACK_ARG(clipping,[Allow smaller screens],CLIPPING,yes)
-#NETHACK_ARG(menu-color,[TTY graphics menu color],MENU_COLOR,yes)
+NETHACK_ARG(menu-color,[TTY graphics menu color],MENU_COLOR,yes)
 NETHACK_ARG(elbereth,[Engraving the E-word repels monsters],ELBERETH,yes)
 # NETHACK_ARG(noartifactwish,[Prevent wishing for special artifacts],
 #  NOARTIFACTWISH,no)

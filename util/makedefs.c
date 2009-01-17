@@ -685,6 +685,13 @@ static const char *build_opts[] = {
 #ifdef MAIL
 		"mail daemon",
 #endif
+#ifdef MENU_COLOR
+# ifdef MENU_COLOR_REGEX
+		"menu colors via regular expressions",
+# else
+		"menu colors via pmatch",
+# endif
+#endif
 #ifdef GNUDOS
 		"MSDOS protected mode",
 #endif

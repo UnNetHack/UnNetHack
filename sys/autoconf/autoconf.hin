@@ -95,6 +95,9 @@
 /* GNU Linux */
 #undef LINUX
 
+/* TTY graphics menu color */
+#undef MENU_COLOR
+
 /* Use regular expressions */
 #undef MENU_COLOR_REGEX
 

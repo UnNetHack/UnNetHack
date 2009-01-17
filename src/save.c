@@ -48,6 +48,10 @@ static long nulls[10];
 #define HUP
 #endif
 
+#ifdef MENU_COLOR
+extern struct menucoloring *menu_colorings;
+#endif
+
 /* need to preserve these during save to avoid accessing freed memory */
 static unsigned ustuck_id = 0, usteed_id = 0;
 
@@ -953,12 +957,34 @@ free_dungeons()
 	return;
 }
 
+#ifdef MENU_COLOR
+void
+free_menu_coloring()
+{
+    struct menucoloring *tmp = menu_colorings;
+
+    while (tmp) {
+	struct menucoloring *tmp2 = tmp->next;
+# ifdef MENU_COLOR_REGEX
+	(void) regfree(&tmp->match);
+# else
+	free(tmp->match);
+# endif
+	free(tmp);
+	tmp = tmp2;
+    }
+}
+#endif /* MENU_COLOR */
+
 void
 freedynamicdata()
 {
 	unload_qtlist();
 	free_invbuf();	/* let_to_name (invent.c) */
 	free_youbuf();	/* You_buf,&c (pline.c) */
+#ifdef MENU_COLOR
+	free_menu_coloring();
+#endif
 	tmp_at(DISP_FREEMEM, 0);	/* temporary display effects */
 #ifdef FREE_ALL_MEMORY
 # define freeobjchn(X)	(saveobjchn(0, X, FREE_SAVE),  X = 0)
