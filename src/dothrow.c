@@ -980,14 +980,17 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 
 		if (Underwater) range = 1;
 
+		boolean obj_destroyed = FALSE;
 		mon = bhit(u.dx, u.dy, range, THROWN_WEAPON,
 			   (int FDECL((*),(MONST_P,OBJ_P)))0,
 			   (int FDECL((*),(OBJ_P,OBJ_P)))0,
-			   obj);
+			   obj, &obj_destroyed);
 
 		/* have to do this after bhit() so u.ux & u.uy are correct */
 		if(Is_airlevel(&u.uz) || Levitation)
 		    hurtle(-u.dx, -u.dy, urange, TRUE);
+
+		if (obj_destroyed) return; /* fixes C343-100 */
 	}
 
 	if (mon) {
@@ -1748,7 +1751,7 @@ struct obj *obj;
 			mon = bhit(u.dx, u.dy, range, THROWN_WEAPON,
 				   (int FDECL((*),(MONST_P,OBJ_P)))0,
 				   (int FDECL((*),(OBJ_P,OBJ_P)))0,
-				   obj);
+				   obj, NULL);
 			if(mon) {
 			    if (ghitm(mon, obj))	/* was it caught? */
 				return 1;
