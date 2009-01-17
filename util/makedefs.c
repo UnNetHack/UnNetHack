@@ -447,6 +447,9 @@ make_version()
 #ifdef SINKS
 			| (1L <<  2)
 #endif
+#ifdef BLACKMARKET
+			| (1L <<  3)
+#endif
 		/* monsters (5..9) */
 #ifdef KOPS
 			| (1L <<  6)
@@ -636,6 +639,9 @@ static const char *build_opts[] = {
 #endif
 #ifdef AUTOPICKUP_EXCEPTIONS
 		"autopickup_exceptions",
+#endif
+#ifdef BLACKMARKET
+		"blackmarket level",
 #endif
 #ifdef TEXTCOLOR
 		"color",

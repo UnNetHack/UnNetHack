@@ -11,6 +11,85 @@ STATIC_DCL boolean FDECL(rloc_pos_ok, (int,int,struct monst *));
 STATIC_DCL void FDECL(mvault_tele, (struct monst *));
 
 /*
+ * Is (x, y) a bad position of mtmp?  If mtmp is NULL, then is (x, y) bad
+ * for an object?
+ *
+ * Caller is responsible for checking (x, y) with isok() if required.
+ *
+ * Returns: -1: Inaccessible, 0: Good pos, 1: Temporally inacessible
+ */
+static int
+badpos(x, y, mtmp, gpflags)
+int x, y;
+struct monst *mtmp;
+unsigned gpflags;
+{
+	int is_badpos = 0, pool;
+	struct permonst *mdat = NULL;
+	boolean ignorewater = ((gpflags & MM_IGNOREWATER) != 0);
+	struct monst *mtmp2;
+
+	/* in many cases, we're trying to create a new monster, which
+	 * can't go on top of the player or any existing monster.
+	 * however, occasionally we are relocating engravings or objects,
+	 * which could be co-located and thus get restricted a bit too much.
+	 * oh well.
+	 */
+	if (mtmp != &youmonst && x == u.ux && y == u.uy
+#ifdef STEED
+			&& (!u.usteed || mtmp != u.usteed)
+#endif
+			)
+	    is_badpos = 1;
+
+	if (mtmp) {
+	    mtmp2 = m_at(x,y);
+
+	    /* Be careful with long worms.  A monster may be placed back in
+	     * its own location.  Normally, if m_at() returns the same monster
+	     * that we're trying to place, the monster is being placed in its
+	     * own location.  However, that is not correct for worm segments,
+	     * because all the segments of the worm return the same m_at().
+	     * Actually we overdo the check a little bit--a worm can't be placed
+	     * in its own location, period.  If we just checked for mtmp->mx
+	     * != x || mtmp->my != y, we'd miss the case where we're called
+	     * to place the worm segment and the worm's head is at x,y.
+	     */
+	    if (mtmp2 && (mtmp2 != mtmp || mtmp->wormno))
+		is_badpos = 1;
+
+	    mdat = mtmp->data;
+	    pool = is_pool(x,y);
+	    if (mdat->mlet == S_EEL && !pool && rn2(13) && !ignorewater)
+		is_badpos = 1;
+
+	    if (pool && !ignorewater) {
+		if (mtmp == &youmonst)
+			return (HLevitation || Flying || Wwalking ||
+				    Swimming || Amphibious) ? is_badpos : -1;
+		else	return (is_flyer(mdat) || is_swimmer(mdat) ||
+				    is_clinger(mdat)) ? is_badpos : -1;
+	    } else if (is_lava(x,y)) {
+		if (mtmp == &youmonst)
+		    return HLevitation ? is_badpos : -1;
+		else
+		    return (is_flyer(mdat) || likes_lava(mdat)) ?
+			    is_badpos : -1;
+	    }
+	    if (passes_walls(mdat) && may_passwall(x,y)) return is_badpos;
+	}
+	if (!ACCESSIBLE(levl[x][y].typ)) {
+		if (!(is_pool(x,y) && ignorewater)) return -1;
+	}
+
+	if (closed_door(x, y) && (!mdat || !amorphous(mdat)))
+	    return mdat && (nohands(mdat) || verysmall(mdat)) ? -1 : 1;
+	if (sobj_at(BOULDER, x, y) && (!mdat || !throws_rocks(mdat)))
+	    return mdat ? -1 : 1;
+	return is_badpos;
+}
+
+/*
  * Is (x,y) a good position of mtmp?  If mtmp is NULL, then is (x,y) good
  * for an object?
  *
@@ -174,6 +253,141 @@ full:
     cc->x = good[i].x;
     cc->y = good[i].y;
     return TRUE;
+}
+
+/*
+ * "entity path to"
+ *
+ * Attempt to find nc good places for the given monster type with the shortest
+ * path to (xx,yy).  Where there is more than one valid set of positions, one
+ * will be chosen at random.  Return the number of positions found.
+ * Warning:  This routine is much slower than enexto and should be used
+ * with caution.
+ */
+
+#define EPATHTO_UNSEEN		0x0
+#define EPATHTO_INACCESSIBLE	0x1
+#define EPATHTO_DONE		0x2
+#define EPATHTO_TAIL(n)		(0x3 + ((n) & 7))
+
+#define EPATHTO_XY(x,y)		(((y) + 1) * COLNO + (x))
+#define EPATHTO_Y(xy)		((xy) / COLNO - 1)
+#define EPATHTO_X(xy)		((xy) % COLNO)
+
+#ifdef DEBUG
+coord epathto_debug_cc[100];
+#endif
+
+int
+epathto(cc, nc, xx, yy, mdat)
+coord *cc;
+int nc;
+register xchar xx, yy;
+struct permonst *mdat;
+{
+    int i, j, dir, ndirs, xy, x, y, r;
+    int path_len, postype;
+    int first_col, last_col;
+    int nd, n;
+    unsigned char *map;
+    static const int dirs[8] =
+      /* N, S, E, W, NW, NE, SE, SW */
+      { -COLNO, COLNO, 1, -1, -COLNO-1, -COLNO+1, COLNO+1, COLNO-1};
+    struct monst fakemon;	/* dummy monster */
+    fakemon.data = mdat;	/* set up for badpos */
+    map = (unsigned char *)alloc(COLNO * (ROWNO + 2));
+    (void) memset((genericptr_t)map, EPATHTO_INACCESSIBLE, COLNO * (ROWNO + 2));
+    for(i = 1; i < COLNO; i++)
+	for(j = 0; j < ROWNO; j++)
+	    map[EPATHTO_XY(i, j)] = EPATHTO_UNSEEN;
+    map[EPATHTO_XY(xx, yy)] = EPATHTO_TAIL(0);
+    if (badpos(xx, yy, &fakemon, 0) == 0) {
+	cc[0].x = xx;
+	cc[0].y = yy;
+	nd = n = 1;
+    }
+    else
+	nd = n = 0;
+    for(path_len = 0; nd < nc; path_len++)
+    {
+	first_col = max(1, xx - path_len);
+	last_col = min(COLNO - 1, xx + path_len);
+	for(j = max(0, yy - path_len); j <= min(ROWNO - 1, yy + path_len); j++)
+	    for(i = first_col; i <= last_col; i++)
+		if (map[EPATHTO_XY(i, j)] == EPATHTO_TAIL(path_len)) {
+		    map[EPATHTO_XY(i, j)] = EPATHTO_DONE;
+		    ndirs = mdat == &mons[PM_GRID_BUG] ? 4 : 8;
+		    for(dir = 0; dir < ndirs; dir++) {
+			xy = EPATHTO_XY(i, j) + dirs[dir];
+			if (map[xy] == EPATHTO_UNSEEN) {
+			    x = EPATHTO_X(xy);
+			    y = EPATHTO_Y(xy);
+			    postype = badpos(x, y, &fakemon, 0);
+			    map[xy] = postype < 0 ? EPATHTO_INACCESSIBLE :
+				    EPATHTO_TAIL(path_len + 1);
+			    if (postype == 0) {
+				if (n < nc)
+				{
+				    cc[n].x = x;
+				    cc[n].y = y;
+				}
+				else if (rn2(n - nd + 1) < nc - nd)
+				{
+				    r = rn2(nc - nd) + nd;
+				    cc[r].x = x;
+				    cc[r].y = y;
+				}
+				++n;
+			    }
+			}
+		    }
+		}
+	if (nd == n)
+	    break;	/* No more positions */
+	else
+	    nd = n;
+    }
+    if (nd > nc)
+	nd = nc;
+#ifdef DEBUG
+    if (cc == epathto_debug_cc)
+    {
+	winid win;
+	int glyph;
+	char row[COLNO+1];
+
+	win = create_nhwindow(NHW_TEXT);
+	putstr(win, 0, "");
+	for (y = 0; y < ROWNO; y++) {
+	    for (x = 1; x < COLNO; x++) {
+		xy = EPATHTO_XY(x, y);
+		if (map[xy] == EPATHTO_INACCESSIBLE) {
+		    glyph = back_to_glyph(x, y);
+		    row[x] = showsyms[glyph_to_cmap(glyph)];
+		}
+		else
+		    row[x] = ' ';
+	    }
+	    for (i = 0; i < nd; i++)
+		if (cc[i].y == y)
+		    row[cc[i].x] = i < 10 ? '0' + i :
+			i < 36 ? 'a' + i - 10 :
+			i < 62 ? 'A' + i - 36 :
+			'?';
+	    /* remove trailing spaces */
+	    for (x = COLNO-1; x >= 1; x--)
+		if (row[x] != ' ') break;
+	    row[x+1] = '\0';
+
+	    putstr(win, 0, &row[1]);
+	}
+	display_nhwindow(win, TRUE);
+	destroy_nhwindow(win);
+    }
+#endif
+
+    free((genericptr_t)map);
+    return nd;
 }
 
 /*
@@ -670,7 +884,11 @@ level_tele()
 	    /* if in Knox and the requested level > 0, stay put.
 	     * we let negative values requests fall into the "heaven" loop.
 	     */
-	    if (Is_knox(&u.uz) && newlev > 0) {
+	    if ((Is_knox(&u.uz)
+#ifdef BLACKMARKET
+		    || Is_blackmarket(&u.uz)
+#endif
+	    ) && newlev > 0) {
 		You(shudder_for_moment);
 		return;
 	    }
@@ -1132,6 +1350,16 @@ int in_sight;
 			seetrap(trap);
 		    }
 		    return 0;
+#ifdef BLACKMARKET
+	      	} else if (mtmp->mtame &&
+			(Is_blackmarket(&trap->dst) || Is_blackmarket(&u.uz))) {
+	          if (in_sight) {
+		     pline("%s seems to shimmer for a moment.",
+		     Monnam(mtmp));
+		     seetrap(trap);
+	          }
+	          return 0;
+#endif /* BLACKMARKET */
 		} else {
 		    assign_level(&tolevel, &trap->dst);
 		    migrate_typ = MIGR_PORTAL;
@@ -1221,7 +1449,11 @@ random_teleport_level()
 	int nlev, max_depth, min_depth,
 	    cur_depth = (int)depth(&u.uz);
 
-	if (!rn2(5) || Is_knox(&u.uz))
+	if (!rn2(5) || Is_knox(&u.uz)
+#ifdef BLACKMARKET
+		|| Is_blackmarket(&u.uz)
+#endif
+		)
 	    return cur_depth;
 
 	/* What I really want to do is as follows:

@@ -50,6 +50,13 @@ A("Excalibur",			LONG_SWORD,
 A("Stormbringer",		RUNESWORD,
 	(SPFX_RESTR|SPFX_ATTK|SPFX_DEFN|SPFX_INTEL|SPFX_DRLI), 0, 0,
 	DRLI(5,2),	DRLI(0,0),	NO_CARY,	0, A_CHAOTIC, NON_PM, NON_PM, 8000L ),
+
+#ifdef BLACKMARKET
+A("Thiefbane",		LONG_SWORD,
+	(SPFX_NOGEN|SPFX_RESTR|SPFX_BEHEAD|SPFX_DCLAS|SPFX_DRLI), 0, S_HUMAN,
+	DRLI(5,1),	NO_DFNS,	NO_CARY,	0, A_CHAOTIC, NON_PM, NON_PM, 1500L ),
+#endif /* BLACKMARKET */
+
 /*
  *	Mjollnir will return to the hand of the wielder when thrown
  *	if the wielder is a Valkyrie wearing Gauntlets of Power.

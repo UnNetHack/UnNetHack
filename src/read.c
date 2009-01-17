@@ -633,7 +633,11 @@ maybe_tame(mtmp, sobj)
 struct monst *mtmp;
 struct obj *sobj;
 {
+#ifdef BLACKMARKET                            
+	if (sobj->cursed || Is_blackmarket(&u.uz)) {
+#else
 	if (sobj->cursed) {
+#endif
 	    setmangry(mtmp);
 	} else {
 	    if (mtmp->isshk)

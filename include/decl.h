@@ -72,6 +72,9 @@ E struct dgn_topology {		/* special dungeon levels for speed */
     xchar	d_mines_dnum, d_quest_dnum;
     d_level	d_qstart_level, d_qlocate_level, d_nemesis_level;
     d_level	d_knox_level;
+#ifdef BLACKMARKET
+    d_level     d_blackmarket_level;
+#endif /* BLACKMARKET */
 } dungeon_topology;
 /* macros for accesing the dungeon levels by their old names */
 #define oracle_level		(dungeon_topology.d_oracle_level)
@@ -104,6 +107,10 @@ E struct dgn_topology {		/* special dungeon levels for speed */
 #define qlocate_level		(dungeon_topology.d_qlocate_level)
 #define nemesis_level		(dungeon_topology.d_nemesis_level)
 #define knox_level		(dungeon_topology.d_knox_level)
+
+#ifdef BLACKMARKET
+#define blackmarket_level	(dungeon_topology.d_blackmarket_level)
+#endif /* BLACKMARKET */
 
 E NEARDATA stairway dnstair, upstair;		/* stairs up and down */
 #define xdnstair	(dnstair.sx)

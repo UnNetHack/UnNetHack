@@ -121,6 +121,9 @@ typedef struct branch {
 #define Is_qlocate(x)		(on_level(x, &qlocate_level))
 #define Is_nemesis(x)		(on_level(x, &nemesis_level))
 #define Is_knox(x)		(on_level(x, &knox_level))
+#ifdef BLACKMARKET
+#define Is_blackmarket(x)       (on_level(x, &blackmarket_level))
+#endif /* BLACKMARKET */
 
 #define In_sokoban(x)		((x)->dnum == sokoban_dnum)
 #define Inhell			In_hell(&u.uz)	/* now gehennom */

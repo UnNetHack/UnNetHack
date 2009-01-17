@@ -15,6 +15,10 @@ extern const struct shclass shtypes[];
 STATIC_DCL void FDECL(mkshobj_at, (const struct shclass *,int,int));
 STATIC_DCL void FDECL(nameshk, (struct monst *,const char * const *));
 STATIC_DCL int  FDECL(shkinit, (const struct shclass *,struct mkroom *));
+#ifdef BLACKMARKET
+STATIC_DCL void FDECL(stock_blkmar, 
+		  (const struct shclass *, struct mkroom *, int));
+#endif /* BLACKMARKET */
 
 static const char * const shkliquors[] = {
     /* Ukraine */
@@ -166,6 +170,23 @@ static const char * const shkgeneral[] = {
     0
 };
 
+#ifdef BLACKMARKET
+static const char *shkblack[] = {
+  "One-eyed Sam", "One-eyed Sam", "One-eyed Sam",
+  "One-eyed Sam", "One-eyed Sam", "One-eyed Sam",
+  "One-eyed Sam", "One-eyed Sam", "One-eyed Sam",
+  "One-eyed Sam", "One-eyed Sam", "One-eyed Sam",
+  "One-eyed Sam", "One-eyed Sam", "One-eyed Sam",
+  "One-eyed Sam", "One-eyed Sam", "One-eyed Sam",
+  "One-eyed Sam", "One-eyed Sam", "One-eyed Sam",
+  "One-eyed Sam", "One-eyed Sam", "One-eyed Sam",
+  "One-eyed Sam", "One-eyed Sam", "One-eyed Sam",
+  "One-eyed Sam", "One-eyed Sam", "One-eyed Sam",
+  "One-eyed Sam", "One-eyed Sam", "One-eyed Sam",
+  0
+};
+#endif /* BLACKMARKET */
+
 /*
  * To add new shop types, all that is necessary is to edit the shtypes[] array.
  * See mkroom.h for the structure definition.  Typically, you'll have to lower
@@ -218,6 +239,10 @@ const struct shclass shtypes[] = {
 	{"lighting store", TOOL_CLASS, 0, D_SHOP,
 	    {{32, -WAX_CANDLE}, {50, -TALLOW_CANDLE},
 	     {5, -BRASS_LANTERN}, {10, -OIL_LAMP}, {3, -MAGIC_LAMP}}, shklight},
+#ifdef BLACKMARKET
+	{"black market", RANDOM_CLASS, 0, D_SHOP,
+	   {{100, RANDOM_CLASS}, {0, 0}, {0, 0}}, shkblack},
+#endif /* BLACKMARKET */
 	{(char *)0, 0, 0, 0, {{0, 0}, {0, 0}, {0, 0}}, 0}
 };
 
@@ -286,6 +311,12 @@ const char * const *nlp;
 	    /* special-case minetown lighting shk */
 	    shname = "Izchak";
 	    shk->female = FALSE;
+#ifdef BLACKMARKET
+	} else if (nlp == shkblack) {
+	    /* special-case black marketeer */
+	    shname = "One-eyed Sam";
+	    shk->female = shk->data->mflags2 & M2_MALE ? FALSE : TRUE;
+#endif /* BLACKMARKET */
 	} else {
 	    /* We want variation from game to game, without needing the save
 	       and restore support which would be necessary for randomization;
@@ -338,6 +369,7 @@ struct mkroom	*sroom;
 {
 	register int sh, sx, sy;
 	struct monst *shk;
+	long shkmoney; /* Temporary placeholder for Shopkeeper's initial capital */
 
 	/* place the shopkeeper in the given room */
 	sh = sroom->fdoor;
@@ -388,8 +420,21 @@ struct mkroom	*sroom;
 	if(MON_AT(sx, sy)) (void) rloc(m_at(sx, sy), FALSE); /* insurance */
 
 	/* now initialize the shopkeeper monster structure */
+	  
+#ifdef BLACKMARKET
+	shk = 0;
+	if (Is_blackmarket(&u.uz)) {
+	  shk = makemon(&mons[PM_BLACK_MARKETEER], sx, sy, NO_MM_FLAGS);
+	}
+	if (!shk) {
+	  if(!(shk = makemon(&mons[PM_SHOPKEEPER], sx, sy, NO_MM_FLAGS)))
+		return(-1);
+	}        
+#else  /* BLACKMARKET */
 	if(!(shk = makemon(&mons[PM_SHOPKEEPER], sx, sy, NO_MM_FLAGS)))
 		return(-1);
+#endif /* BLACKMARKET */
+  
 	shk->isshk = shk->mpeaceful = 1;
 	set_malign(shk);
 	shk->msleeping = 0;
@@ -408,14 +453,54 @@ struct mkroom	*sroom;
 	ESHK(shk)->visitct = 0;
 	ESHK(shk)->following = 0;
 	ESHK(shk)->billct = 0;
-#ifndef GOLDOBJ
-	shk->mgold = 1000L + 30L*(long)rnd(100);	/* initial capital */
-#else
-        mkmonmoney(shk, 1000L + 30L*(long)rnd(100));	/* initial capital */
-#endif
+
+  shkmoney = 1000L + 30L*(long)rnd(100);	/* initial capital */
+  						/* [CWC] Lets not create the money yet until we see if the
+  							 shk is a black marketeer, else we'll have to create
+  						   another money object, if GOLDOBJ is defined */
+
 	if (shp->shknms == shkrings)
 	    (void) mongets(shk, TOUCHSTONE);
 	nameshk(shk, shp->shknms);
+
+#ifdef BLACKMARKET
+	if (Is_blackmarket(&u.uz))
+    shkmoney = 7*shkmoney + rn2(3*shkmoney);
+#endif
+
+#ifndef GOLDOBJ
+	shk->mgold = shkmoney;	
+#else
+  mkmonmoney(shk, shkmoney);
+#endif
+
+#ifdef BLACKMARKET
+	if (Is_blackmarket(&u.uz)) {
+	  register struct obj *otmp;
+/* make sure black marketeer can wield Thiefbane */
+	  shk->data->maligntyp = -1;
+/* black marketeer's equipment */
+	  otmp = mksobj(LONG_SWORD, FALSE, FALSE);
+	  otmp = oname(otmp, artiname(ART_THIEFBANE));
+	  mpickobj(shk, otmp);
+	  if (otmp->spe < 5) otmp->spe += rnd(5);
+	  otmp = mksobj(SHIELD_OF_REFLECTION, FALSE, FALSE);
+	  mpickobj(shk, otmp);
+	  if (otmp->spe < 5) otmp->spe += rnd(5);
+	  otmp = mksobj(GRAY_DRAGON_SCALE_MAIL, FALSE, FALSE);
+	  mpickobj(shk, otmp);
+	  if (otmp->spe < 5) otmp->spe += rnd(5);
+	  otmp = mksobj(SPEED_BOOTS, FALSE, FALSE);
+	  mpickobj(shk, otmp);
+	  if (otmp->spe < 5) otmp->spe += rnd(5);
+	  otmp = mksobj(AMULET_OF_LIFE_SAVING, FALSE, FALSE);
+	  mpickobj(shk, otmp);
+/* wear armor and amulet */
+	  m_dowear(shk, TRUE);
+	  otmp = mksobj(SKELETON_KEY, FALSE, FALSE);
+	  mpickobj(shk, otmp);
+	}
+#endif /* BLACKMARKET */
 
 	return(sh);
 }
@@ -468,6 +553,14 @@ register struct mkroom *sroom;
 	    make_engr_at(m, n, buf, 0L, DUST);
     }
 
+#ifdef BLACKMARKET
+    if (Is_blackmarket(&u.uz)) {
+      stock_blkmar(shp, sroom, sh);
+      level.flags.has_shop = TRUE;
+      return;
+    }
+#endif /* BLACKMARKET */
+
     for(sx = sroom->lx; sx <= sroom->hx; sx++)
 	for(sy = sroom->ly; sy <= sroom->hy; sy++) {
 	    if(sroom->irregular) {
@@ -488,6 +581,112 @@ register struct mkroom *sroom;
 
     level.flags.has_shop = TRUE;
 }
+
+#ifdef BLACKMARKET
+/* stock a newly-created black market with objects */
+static void
+stock_blkmar(shp, sroom, sh)
+const struct shclass *shp;
+register struct mkroom *sroom;
+register int sh;
+{
+    /*
+     * Someday soon we'll dispatch on the shdist field of shclass to do
+     * different placements in this routine. Currently it only supports
+     * shop-style placement (all squares except a row nearest the first
+     * door get objects).
+     */
+    /* [max] removed register int cl,  char buf[bufsz] */
+    int i, sx, sy, first = 0, next = 0, total, partial, typ;
+    struct obj *otmp;
+    int blkmar_gen[NUM_OBJECTS+2];
+    int *clp, *lastclp;
+    int goodcl[12];
+
+    goodcl[ 0] = WEAPON_CLASS;
+    goodcl[ 1] = ARMOR_CLASS;
+    goodcl[ 2] = RING_CLASS;
+    goodcl[ 3] = AMULET_CLASS;
+    goodcl[ 4] = TOOL_CLASS;
+    goodcl[ 5] = FOOD_CLASS;
+    goodcl[ 6] = POTION_CLASS;
+    goodcl[ 7] = SCROLL_CLASS;
+    goodcl[ 8] = SPBOOK_CLASS;
+    goodcl[ 9] = WAND_CLASS;
+    goodcl[10] = GEM_CLASS;
+    goodcl[11] = 0;
+
+    for (i=0; i < NUM_OBJECTS; i++) {
+      blkmar_gen[i] = 0;
+    }
+
+    total = 0;
+    for (clp=goodcl; *clp!=0; clp++)  {
+      lastclp = clp;
+      first = bases[*clp];
+/* this assumes that luckstone & loadstone comes just after the gems */
+      next = (*clp==GEM_CLASS) ? (LOADSTONE+1) : bases[(*clp)+1];
+      total += next-first;
+    }
+    if (total==0)  return;
+
+    if (sroom->hx-sroom->lx<2)  return;
+    clp = goodcl-1;
+    partial = 0;
+    for(sx = sroom->lx+1; sx <= sroom->hx; sx++) {
+      if (sx==sroom->lx+1 ||
+	  ((sx-sroom->lx-2)*total)/(sroom->hx-sroom->lx-1)>partial) {
+	clp++;
+	if (clp>lastclp)  clp = lastclp;
+	first = bases[*clp];
+	next = (*clp==GEM_CLASS) ? (LOADSTONE+1) : bases[(*clp)+1];
+	partial += next-first;
+      }
+
+      for(sy = sroom->ly; sy <= sroom->hy; sy++) {
+	if((sx == sroom->lx && doors[sh].x == sx-1) ||
+	   (sx == sroom->hx && doors[sh].x == sx+1) ||
+	   (sy == sroom->ly && doors[sh].y == sy-1) ||
+	   (sy == sroom->hy && doors[sh].y == sy+1) || (rn2(3)))
+	  continue;
+
+	for (i=0; i<50; i++) {
+	  typ = rn2(next-first) + first;
+
+/* forbidden objects  */
+	  if (typ==AMULET_OF_YENDOR || typ==CANDELABRUM_OF_INVOCATION ||
+	      typ==BELL_OF_OPENING  || typ==SPE_BOOK_OF_THE_DEAD ||
+	      objects[typ].oc_nowish || typ==0)
+	    continue;
+
+	  otmp = mkobj_at(RANDOM_CLASS,sx,sy,TRUE);
+/* generate multiple copies with decreasing probabilities */
+/*        if (rn2(blkmar_gen[typ]+1) && i<49)  continue; */
+
+/*        otmp = mksobj_at(typ, sx, sy, TRUE, TRUE);
+	  blkmar_gen[typ]++;*/
+
+/* prevent wishing abuse */
+	  if (typ==WAN_WISHING) {
+	    otmp->spe = 0;
+	    otmp->recharged = 1;
+	  }
+	  if (typ==MAGIC_LAMP) {
+	    otmp->spe = 0;
+	  }
+
+	  break;
+	}
+	
+      }
+    }
+
+    /*
+     * Special monster placements (if any) should go here: that way,
+     * monsters will sit on top of objects and not the other way around.
+     */
+}
+#endif /* BLACKMARKET */
 
 #endif /* OVLB */
 #ifdef OVL0

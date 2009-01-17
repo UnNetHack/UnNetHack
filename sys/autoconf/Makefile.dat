@@ -287,12 +287,12 @@ options:	../util/makedefs
 
 
 spec_levs: ../util/lev_comp \
-	bigroom.des castle.des \
+	bigroom.des blkmar.des castle.des \
 	endgame.des gehennom.des knox.des \
-	medusa.des \
-	mines.des oracle.des \
+	medusa.des mines.des oracle.des \
 	tower.des yendor.des sokoban.des
 	../util/lev_comp $(srcdir)/bigroom.des
+	../util/lev_comp $(srcdir)/blkmar.des
 	../util/lev_comp $(srcdir)/castle.des
 	../util/lev_comp $(srcdir)/endgame.des
 	../util/lev_comp $(srcdir)/gehennom.des

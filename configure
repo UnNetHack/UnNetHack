@@ -1315,6 +1315,7 @@ Optional Features:
   --enable-sinks          Kitchen sinks (default=yes)
   --enable-wallified-maze Fancy mazes (default=yes)
   --enable-reincarnation  Special Rogue-like levels (default=yes)
+  --enable-blackmarket    Blackmarket (default=yes)
   --enable-kops           Keystone Kops (default=yes)
   --enable-seduce         Succubi/incubi seduction (default=yes)
   --enable-randomized-planes
@@ -6443,7 +6444,25 @@ _ACEOF
 
    fi
 
-# NETHACK_ARG(blackmarket,[Blackmarket],BLACKMARKET,yes)
+{ echo "$as_me:$LINENO: checking whether to enable blackmarket" >&5
+echo $ECHO_N "checking whether to enable blackmarket... $ECHO_C" >&6; }
+   # Check whether --enable-blackmarket was given.
+if test "${enable_blackmarket+set}" = set; then
+  enableval=$enable_blackmarket;
+else
+  enable_blackmarket="yes"
+fi
+
+   { echo "$as_me:$LINENO: result: $enable_blackmarket" >&5
+echo "${ECHO_T}$enable_blackmarket" >&6; }
+   if test "$enable_blackmarket" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define BLACKMARKET
+_ACEOF
+
+   fi
+
 { echo "$as_me:$LINENO: checking whether to enable kops" >&5
 echo $ECHO_N "checking whether to enable kops... $ECHO_C" >&6; }
    # Check whether --enable-kops was given.

@@ -6,6 +6,9 @@
 /* Exceptions to autopickup (experimental) */
 #undef AUTOPICKUP_EXCEPTIONS
 
+/* Blackmarket */
+#undef BLACKMARKET
+
 /* A BSD like system */
 #undef BSD
 
