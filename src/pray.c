@@ -1788,12 +1788,21 @@ const char *
 halu_gname(alignment)
 aligntyp alignment;
 {
+    if (!Hallucination) return align_gname(alignment);
+
+    return rnd_gname(ROLE_RANDOM);
+}
+
+/* select a random god based on role if provided */
+const char *
+rnd_gname(role)
+int role;
+{
     const char *gnam;
     int which;
 
-    if (!Hallucination) return align_gname(alignment);
-
-    which = randrole();
+    /* select random role if valid role supplied */
+    which = (validrole(role)) ? role : randrole();
     switch (rn2(3)) {
      case 0:	gnam = roles[which].lgod; break;
      case 1:	gnam = roles[which].ngod; break;
