@@ -1248,6 +1248,9 @@ rndmonst()
 		if (elemlevel && wrong_elem_type(ptr)) continue;
 		if (uncommon(mndx)) continue;
 		if (Inhell && (ptr->geno & G_NOHELL)) continue;
+#ifdef BLACKMARKET	/* SWD: pets are not allowed in the black market */
+		if (is_domestic(ptr) && Is_blackmarket(&u.uz)) continue;
+#endif
 		ct = (int)(ptr->geno & G_FREQ) + align_shift(ptr);
 		if (ct < 0 || ct > 127)
 		    panic("rndmonst: bad count [#%d: %d]", mndx, ct);
