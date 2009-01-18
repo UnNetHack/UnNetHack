@@ -61,6 +61,10 @@ news       print any news from game administrator on startup      [TRUE]
 Boolean option if MFLOPPY was set at compile time:
 checkspace check free disk space before writing files to disk     [TRUE]
 
+Boolean option if SHOW_BORN was set at compile time:
+showborn   show numbers of created monsters after the number
+           vanquished                                             [FALSE]
+
 Boolean option if EXP_ON_BOTL was set at compile time:
 showexp    display your accumulated experience points             [FALSE]
 

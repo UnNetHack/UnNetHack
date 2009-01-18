@@ -2088,6 +2088,10 @@ Prevent you from (knowingly) attacking your pets (default on).
 Control what parts of the score list you are shown at the end (ex.
 ``scores:5 top scores/4 around my score/own scores'').  Only the first
 letter of each category (`t', `a', or `o') is necessary.
+.lp showborn
+When the game ends, show the number of each monster created
+in the "Vanquished creatures" list, if it differs from the
+number of those monsters killed.
 .lp showexp
 Show your accumulated experience points on bottom line (default off).
 .lp showrace

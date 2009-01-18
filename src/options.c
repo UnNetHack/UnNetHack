@@ -174,6 +174,9 @@ static struct Bool_Opt
 #else
 	{"sanity_check", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+#ifdef SHOW_BORN
+	{"showborn", &iflags.show_born, FALSE, SET_IN_GAME},
+#endif
 #ifdef EXP_ON_BOTL
 	{"showexp", &flags.showexp, FALSE, SET_IN_GAME},
 #else

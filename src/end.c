@@ -39,7 +39,7 @@ STATIC_DCL void FDECL(get_valuables, (struct obj *));
 STATIC_DCL void FDECL(sort_valuables, (struct valuable_data *,int));
 STATIC_DCL void FDECL(artifact_score, (struct obj *,BOOLEAN_P,winid));
 STATIC_DCL void FDECL(savelife, (int));
-STATIC_DCL void FDECL(list_vanquished, (CHAR_P,BOOLEAN_P));
+void FDECL(list_vanquished, (CHAR_P,BOOLEAN_P));  /* showborn patch */
 STATIC_DCL void FDECL(list_genocided, (CHAR_P,BOOLEAN_P));
 STATIC_DCL boolean FDECL(should_query_disclose_option, (int,char *));
 
@@ -979,7 +979,7 @@ int status;
 	nethack_exit(status);
 }
 
-STATIC_OVL void
+void		/* showborn patch */
 list_vanquished(defquery, ask)
 char defquery;
 boolean ask;
@@ -1035,6 +1035,11 @@ boolean ask;
 			else
 			    Sprintf(buf, "%d %s",
 				    nkilled, makeplural(mons[i].mname));
+#ifdef SHOW_BORN
+			if (iflags.show_born && nkilled != mvitals[i].born)
+			    Sprintf(buf + strlen(buf), " (%d created)",
+				    (int) mvitals[i].born);
+#endif
 		    }
 		    putstr(klwin, 0, buf);
 		}
@@ -1071,37 +1076,93 @@ char defquery;
 boolean ask;
 {
     register int i;
-    int ngenocided;
+    int ngenocided=0;
+#ifdef SHOW_EXTINCT
+    int nextincted=0;
+#endif
     char c;
     winid klwin;
     char buf[BUFSZ];
 
+    /* get totals first */
+#ifdef SHOW_EXTINCT
+    for (i = LOW_PM; i < NUMMONS; i++) {
+	if (mvitals[i].mvflags & G_GENOD)
+	    ngenocided++;
+	else if ( (mvitals[i].mvflags & G_GONE) && !(mons[i].geno & G_UNIQ) )
+	    nextincted++;
+    }
+#else
     ngenocided = num_genocides();
+#endif
 
     /* genocided species list */
-    if (ngenocided != 0) {
+    if (ngenocided != 0 
+#ifdef SHOW_EXTINCT
+	|| nextincted != 0
+#endif
+     ) {
+#ifdef SHOW_EXTINCT
+	if (nextincted != 0)
+	    c = ask ?
+	    yn_function("Do you want a list of species genocided or extinct?",
+			ynqchars, defquery) : defquery;
+	else
+#endif
 	c = ask ? yn_function("Do you want a list of species genocided?",
 			      ynqchars, defquery) : defquery;
 	if (c == 'q') done_stopprint++;
 	if (c == 'y') {
 	    klwin = create_nhwindow(NHW_MENU);
-	    putstr(klwin, 0, "Genocided species:");
+#ifdef SHOW_EXTINCT
+	    Sprintf(buf, "Genocided or extinct species:");
+#else
+	    Sprintf(buf, "Genocided species:");
+#endif
+	    putstr(klwin, 0, buf);
 	    putstr(klwin, 0, "");
+#ifdef DUMP_LOG
+	    if (want_dump)  dump("", buf);
+#endif
 
 	    for (i = LOW_PM; i < NUMMONS; i++)
+#ifdef SHOW_EXTINCT
+		if (mvitals[i].mvflags & G_GONE && !(mons[i].geno & G_UNIQ) ){
+#else
 		if (mvitals[i].mvflags & G_GENOD) {
+#endif
 		    if ((mons[i].geno & G_UNIQ) && i != PM_HIGH_PRIEST)
 			Sprintf(buf, "%s%s",
 				!type_is_pname(&mons[i]) ? "" : "the ",
 				mons[i].mname);
 		    else
 			Strcpy(buf, makeplural(mons[i].mname));
+#ifdef SHOW_EXTINCT
+		    if( !(mvitals[i].mvflags & G_GENOD) )
+			Strcat(buf, " (extinct)");
+#endif
 		    putstr(klwin, 0, buf);
 		}
 
 	    putstr(klwin, 0, "");
+#ifdef SHOW_EXTINCT
+	    if (ngenocided>0)  {
+#endif
 	    Sprintf(buf, "%d species genocided.", ngenocided);
 	    putstr(klwin, 0, buf);
+#ifdef DUMP_LOG
+	    if (want_dump) dump("", buf);
+#endif
+#ifdef SHOW_EXTINCT
+	    }
+	    if (nextincted>0) {
+		Sprintf(buf, "%d species extinct.", nextincted);
+		putstr(klwin, 0, buf);
+#ifdef DUMP_LOG
+		if (want_dump) dump("", buf);
+#endif
+	    }
+#endif /* SHOW_EXTINCT */
 
 	    display_nhwindow(klwin, TRUE);
 	    destroy_nhwindow(klwin);

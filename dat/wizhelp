@@ -16,6 +16,7 @@ Debug-Mode Quick Reference:
 #panic == panic test
 #polyself == polymorph self
 #seenv == show seen vectors
+#showkills == show numbers of monsters killed
 #stats == show memory statistics
 #timeout == look at timeout queue
 #vision == show vision array

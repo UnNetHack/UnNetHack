@@ -1334,6 +1334,10 @@ Optional Features:
   --enable-score-on-botl  Show score on bottom line (default=no)
   --enable-realtime-on-botl
                           Show elapsed time on bottom line (default=no)
+  --enable-show-born      Display number of created monsters at the end of
+                          game (default=yes)
+  --enable-show-extinct   Display extinct monsters at the end of game
+                          (default=yes)
   --enable-goldobj        Gold is kept on object chains (experimental)
                           (default=no)
   --enable-autopickup-exceptions
@@ -6758,6 +6762,44 @@ _ACEOF
 # NETHACK_ARG(show-dmg,[Display damage reports],SHOW_DMG,yes)
 # NETHACK_ARG(show-weight,[Display object weight],SHOW_WEIGHT,yes)
 # NETHACK_ARG(other-services,[Shopkeeper services],OTHER_SERVICES,yes)
+{ echo "$as_me:$LINENO: checking whether to enable show-born" >&5
+echo $ECHO_N "checking whether to enable show-born... $ECHO_C" >&6; }
+   # Check whether --enable-show-born was given.
+if test "${enable_show_born+set}" = set; then
+  enableval=$enable_show_born;
+else
+  enable_show_born="yes"
+fi
+
+   { echo "$as_me:$LINENO: result: $enable_show_born" >&5
+echo "${ECHO_T}$enable_show_born" >&6; }
+   if test "$enable_show_born" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define SHOW_BORN
+_ACEOF
+
+   fi
+
+{ echo "$as_me:$LINENO: checking whether to enable show-extinct" >&5
+echo $ECHO_N "checking whether to enable show-extinct... $ECHO_C" >&6; }
+   # Check whether --enable-show-extinct was given.
+if test "${enable_show_extinct+set}" = set; then
+  enableval=$enable_show_extinct;
+else
+  enable_show_extinct="yes"
+fi
+
+   { echo "$as_me:$LINENO: result: $enable_show_extinct" >&5
+echo "${ECHO_T}$enable_show_extinct" >&6; }
+   if test "$enable_show_extinct" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define SHOW_EXTINCT
+_ACEOF
+
+   fi
+
 # NETHACK_ARG(dungeon-growth,[Dungeon growth],DUNGEON_GROWTH,yes)
 #NETHACK_ARG(shout,[Shouting and pet commands (not implemented)],SHOUT,no)
 # NETHACK_ARG(display-layers,[Support transparent tilesets],DISPLAY_LAYERS,yes)

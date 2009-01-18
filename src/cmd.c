@@ -123,6 +123,10 @@ STATIC_PTR int NDECL(wiz_show_seenv);
 STATIC_PTR int NDECL(wiz_show_vision);
 STATIC_PTR int NDECL(wiz_mon_polycontrol);
 STATIC_PTR int NDECL(wiz_show_wmodes);
+STATIC_PTR int NDECL(wiz_showkills);	/* showborn patch */
+#ifdef SHOW_BORN
+extern void FDECL(list_vanquished, (int, BOOLEAN_P)); /* showborn patch */
+#endif /* SHOW_BORN */
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern void FDECL(show_borlandc_stats, (winid));
 #endif
@@ -753,6 +757,13 @@ wiz_show_wmodes()
 	}
 	display_nhwindow(win, TRUE);
 	destroy_nhwindow(win);
+	return 0;
+}
+
+/* #showkills command */
+STATIC_PTR int wiz_showkills()		/* showborn patch */
+{
+	list_vanquished('y', FALSE);
 	return 0;
 }
 
@@ -1519,6 +1530,7 @@ struct ext_func_tab extcmdlist[] = {
 	{(char *)0, (char *)0, donull, TRUE},
 #endif
 	{(char *)0, (char *)0, donull, TRUE},
+	{(char *)0, (char *)0, donull, TRUE}, /* showkills (showborn patch) */
         {(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
@@ -1544,6 +1556,7 @@ static const struct ext_func_tab debug_extcmdlist[] = {
 	{"portdebug", "wizard port debug command", wiz_port_debug, TRUE},
 #endif
 	{"seenv", "show seen vectors", wiz_show_seenv, TRUE},
+	{"showkills", "show list of monsters killed", wiz_showkills, TRUE},
 	{"stats", "show memory statistics", wiz_show_stats, TRUE},
 	{"timeout", "look at timeout queue", wiz_timeout_queue, TRUE},
 	{"vision", "show vision array", wiz_show_vision, TRUE},

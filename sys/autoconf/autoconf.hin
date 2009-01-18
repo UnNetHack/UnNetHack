@@ -146,6 +146,12 @@
 /* Succubi/incubi seduction */
 #undef SEDUCE
 
+/* Display number of created monsters at the end of game */
+#undef SHOW_BORN
+
+/* Display extinct monsters at the end of game */
+#undef SHOW_EXTINCT
+
 /* simple mail dgamelaunch support */
 #undef SIMPLE_MAIL
 
