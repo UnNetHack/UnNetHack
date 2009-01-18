@@ -1338,6 +1338,7 @@ Optional Features:
                           (default=no)
   --enable-autopickup-exceptions
                           Exceptions to autopickup (experimental) (default=no)
+  --enable-simple-mail    simple mail dgamelaunch support (default=no)
   --enable-xlogfile=FILE  More verbose logfile (default=yes, default
                           filename=xlogfile)
   --enable-wizmode=USER   enable wizard mode for the specified user
@@ -6799,7 +6800,25 @@ _ACEOF
    fi
 
 #NETHACK_ARG(qwertz,[QWERTZ keyboard layout support],QWERTZ,yes)
-#NETHACK_ARG(simple-mail,[simple mail dgamelaunch support],SIMPLE_MAIL,no)
+{ echo "$as_me:$LINENO: checking whether to enable simple-mail" >&5
+echo $ECHO_N "checking whether to enable simple-mail... $ECHO_C" >&6; }
+   # Check whether --enable-simple-mail was given.
+if test "${enable_simple_mail+set}" = set; then
+  enableval=$enable_simple_mail;
+else
+  enable_simple_mail="no"
+fi
+
+   { echo "$as_me:$LINENO: result: $enable_simple_mail" >&5
+echo "${ECHO_T}$enable_simple_mail" >&6; }
+   if test "$enable_simple_mail" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define SIMPLE_MAIL
+_ACEOF
+
+   fi
+
 
 #NETHACK_ARG(xlogfile,[More verbose logfile],XLOGFILE,yes)
 { echo "$as_me:$LINENO: checking whether to enable xlogfile" >&5

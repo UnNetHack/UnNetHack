@@ -146,6 +146,9 @@
 /* Succubi/incubi seduction */
 #undef SEDUCE
 
+/* simple mail dgamelaunch support */
+#undef SIMPLE_MAIL
+
 /* Kitchen sinks */
 #undef SINKS
 
