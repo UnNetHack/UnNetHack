@@ -131,6 +131,9 @@
 /* Shuffling order of Elemental Planes */
 #undef RANDOMIZED_PLANES
 
+/* Show elapsed time on bottom line */
+#undef REALTIME_ON_BOTL
+
 /* Redo last command */
 #undef REDO
 
@@ -184,6 +187,9 @@
 
 /* X11 graphics */
 #undef X11_GRAPHICS
+
+/* The name of the xlogfile */
+#undef XLOGFILE
 
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */

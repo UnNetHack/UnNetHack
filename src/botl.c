@@ -398,16 +398,25 @@ bot2()
 		Sprintf(nb = eos(nb), " Exp:%u", u.ulevel);
 
 	if(flags.time)
-	    Sprintf(nb = eos(nb), " T:%ld", moves);
+		Sprintf(nb = eos(nb), " T:%ld", moves);
+
+#ifdef REALTIME_ON_BOTL
+	if(iflags.showrealtime) {
+		time_t currenttime = get_realtime();
+		Sprintf(nb = eos(nb), " %d:%2.2d", currenttime / 3600, 
+		        (currenttime % 3600) / 60);
+	}
+#endif
+
 	if(strcmp(hu_stat[u.uhs], "        "))
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-	     	add_colored_text(hu_stat[u.uhs], newbot2);
+		add_colored_text(hu_stat[u.uhs], newbot2);
 #else
 		Sprintf(nb = eos(nb), " %s", hu_stat[u.uhs]);
 #endif
 	if(Confusion)
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-	     	add_colored_text("Conf", newbot2);
+		add_colored_text("Conf", newbot2);
 #else
 		Strcat(nb = eos(nb), " Conf");
 #endif

@@ -339,7 +339,7 @@ NETHACK_ARG(user-sounds,
   USER_SOUNDS,no)
 NETHACK_ARG(exp-on-botl,[Show experience on bottom line],EXP_ON_BOTL,yes)
 NETHACK_ARG(score-on-botl,[Show score on bottom line],SCORE_ON_BOTL,no)
-#NETHACK_ARG(realtime-on-botl,[Show elapsed time on bottom line],REALTIME_ON_BOTL,no)
+NETHACK_ARG(realtime-on-botl,[Show elapsed time on bottom line],REALTIME_ON_BOTL,no)
 #NETHACK_ARG(borg,[Borg player (only under DOS)],BORG,no)
 # NETHACK_ARG(keep-save,[Keep save files after restore],KEEP_SAVE,no)
 # NETHACK_ARG(charon,[Charon's boat, enables Cerebus (not implemented)],CHARON,no)
@@ -356,20 +356,21 @@ NETHACK_ARG(autopickup-exceptions,[Exceptions to autopickup (experimental)],
 #NETHACK_ARG(simple-mail,[simple mail dgamelaunch support],SIMPLE_MAIL,no)
 
 #NETHACK_ARG(xlogfile,[More verbose logfile],XLOGFILE,yes)
-#AC_MSG_CHECKING([whether to enable xlogfile])
-#AC_ARG_ENABLE([xlogfile], AC_HELP_STRING([--enable-xlogfile=FILE],
-#	[More verbose logfile (default=yes, default filename=xlogfile)]),
-#	if test "$enableval" != no; then enable_xlogfile=yes;
-#	 if test "$enableval" != yes; then xlogfile=$enableval;
-#	 else xlogfile="xlogfile"; fi;
-#	else enable_xlogfile=no; fi,
-#	enable_xlogfile=yes; xlogfile="xlogfile")
-#if test "$enable_xlogfile" != "no" ; then
-#	AC_MSG_RESULT([yes (file $xlogfile)])
-#	AC_DEFINE_UNQUOTED([XLOGFILE], ["$xlogfile"], [The name of the xlogfile])
-#else
-#	AC_MSG_RESULT([no])
-#fi
+AC_MSG_CHECKING([whether to enable xlogfile])
+AC_ARG_ENABLE([xlogfile], AC_HELP_STRING([--enable-xlogfile=FILE],
+	[More verbose logfile (default=yes, default filename=xlogfile)]),
+	if test "$enableval" != no; then enable_xlogfile=yes;
+	 if test "$enableval" != yes; then xlogfile=$enableval;
+	 else xlogfile="xlogfile"; fi;
+	else enable_xlogfile=no; fi,
+	enable_xlogfile=yes; xlogfile="xlogfile")
+if test "$enable_xlogfile" != "no" ; then
+	AC_MSG_RESULT([yes (file $xlogfile)])
+	AC_DEFINE_UNQUOTED([XLOGFILE], ["$xlogfile"], [The name of the xlogfile])
+	AC_SUBST(XLOGFILE,["$xlogfile"])
+else
+	AC_MSG_RESULT([no])
+fi
 
 # NETHACK_ARG(livelog,[Live game progress logfile],LIVELOGFILE,no)
 #AC_MSG_CHECKING([whether to enable live logfile])

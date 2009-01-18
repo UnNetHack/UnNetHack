@@ -305,10 +305,10 @@ install: $(GAME) recover$(EXEEXT) $(CNF_SHARE_DAT) dungeon spec_levs @GUIDEBOOK_
 # set up the game files
 	( $(MAKE) dofiles )
 # set up some additional files
-	touch $(FILE_AREA_VAR)/perm $(FILE_AREA_VAR)/record $(FILE_AREA_VAR)/logfile $(FILE_AREA_VAR)/xlogfile $(FILE_AREA_VAR)/livelog
-	-( cd $(FILE_AREA_VAR) ; $(CHOWN) $(GAMEUID) perm record logfile xlogfile livelog ; \
-			$(CHGRP) $(GAMEGRP) perm record logfile xlogfile livelog ; \
-			chmod $(VARFILEPERM) perm record logfile xlogfile livelog )
+	touch $(FILE_AREA_VAR)/perm $(FILE_AREA_VAR)/record $(FILE_AREA_VAR)/logfile $(FILE_AREA_VAR)/@XLOGFILE@
+	-( cd $(FILE_AREA_VAR) ; $(CHOWN) $(GAMEUID) perm record logfile @XLOGFILE@ ; \
+			$(CHGRP) $(GAMEGRP) perm record logfile @XLOGFILE@ ; \
+			chmod $(VARFILEPERM) perm record logfile @XLOGFILE@ )
 # and a reminder
 	@echo You may also want to reinstall the man pages via the doc Makefile.
 
