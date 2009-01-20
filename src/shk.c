@@ -3994,7 +3994,7 @@ boolean altusage; /* some items have an "alternate" use with different cost */
 		   angry shk surchage) */
 		if (!altusage) tmp = (long) objects[OIL_LAMP].oc_cost;
 		else tmp += tmp / 3L;	/* djinni is being released */
-	} else if(otmp->otyp == MAGIC_MARKER) {		 /* 15 - 30 */
+	} else if(otmp->otyp == MAGIC_MARKER) {		 /* 20 - 80 */
 		/* no way to determine in advance   */
 		/* how many charges will be wasted. */
 		/* so, arbitrarily, one half of the */
