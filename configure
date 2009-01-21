@@ -1327,6 +1327,7 @@ Optional Features:
   --enable-clipping       Allow smaller screens (default=yes)
   --enable-menu-color     TTY graphics menu color (default=yes)
   --enable-status-color   TTY graphics status color (default=yes)
+  --enable-auto-open      Open doors by walking into them (default=yes)
   --enable-elbereth       Engraving the E-word repels monsters (default=yes)
   --enable-user-sounds    Allow user-defined mapping from messages to sounds)
                           (default=no)
@@ -6654,6 +6655,25 @@ echo "${ECHO_T}$enable_status_color" >&6; }
 
 cat >>confdefs.h <<_ACEOF
 #define STATUS_COLORS
+_ACEOF
+
+   fi
+
+{ echo "$as_me:$LINENO: checking whether to enable auto-open" >&5
+echo $ECHO_N "checking whether to enable auto-open... $ECHO_C" >&6; }
+   # Check whether --enable-auto-open was given.
+if test "${enable_auto_open+set}" = set; then
+  enableval=$enable_auto_open;
+else
+  enable_auto_open="yes"
+fi
+
+   { echo "$as_me:$LINENO: result: $enable_auto_open" >&5
+echo "${ECHO_T}$enable_auto_open" >&6; }
+   if test "$enable_auto_open" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define AUTO_OPEN
 _ACEOF
 
    fi

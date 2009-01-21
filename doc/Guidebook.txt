@@ -2164,12 +2164,12 @@
             Automatically dig if you are wielding a digging tool and moving
             into a place that can be dug (default false).
 
+          autoopen
+            Walking into a door attempts to open it (default true).
+
           autopickup
             Automatically pick up things onto which you move (default  on).
             See pickup_types to refine the behavior.
-
-          autoquiver
-            This  option  controls  what  happens  when you attempt the `f'
 
 
           NetHack 3.4                                      December 2, 2003
@@ -2182,6 +2182,8 @@
 
 
 
+          autoquiver
+            This  option  controls  what  happens  when you attempt the `f'
             (fire) command with an empty quiver.  When true,  the  computer
             will  fill your quiver with some suitable weapon.  Note that it
             will not take into account the blessed/cursed status,  enchant-
@@ -2234,8 +2236,6 @@
 
           disclose
             Controls options for disclosing various  information  when  the
-            game ends (defaults to all possibilities being disclosed).  The
-            possibilities are:
 
 
           NetHack 3.4                                      December 2, 2003
@@ -2247,6 +2247,9 @@
           NetHack Guidebook                                              35
 
 
+
+            game ends (defaults to all possibilities being disclosed).  The
+            possibilities are:
 
                  i - disclose your inventory.
                  a - disclose your attributes.
@@ -2299,9 +2302,6 @@
             tal  closed door, iron bars, tree, floor of a room, dark corri-
             dor, lit corridor, stairs up, stairs down,  ladder  up,  ladder
             down,  altar,  grave,  throne,  kitchen sink, fountain, pool or
-            moat, ice, lava, vertical lowered drawbridge,  horizontal  low-
-            ered  drawbridge, vertical raised drawbridge, horizontal raised
-            drawbridge, air, cloud, under water.
 
 
           NetHack 3.4                                      December 2, 2003
@@ -2313,6 +2313,10 @@
           NetHack Guidebook                                              36
 
 
+
+            moat, ice, lava, vertical lowered drawbridge,  horizontal  low-
+            ered  drawbridge, vertical raised drawbridge, horizontal raised
+            drawbridge, air, cloud, under water.
 
             You might want to use `+' for the corners and  T  walls  for  a
             more aesthetic, boxier display.  Note that in the next release,
@@ -2364,10 +2368,6 @@
             that NetHack uses from time to time.  You should  set  this  to
             something  you  find  more appetizing than slime mold.  Apples,
             oranges, pears, bananas, and melons already exist  in  NetHack,
-            so don't use those.
-
-          gender
-            Your  starting  gender (gender:male or gender:female).  You may
 
 
           NetHack 3.4                                      December 2, 2003
@@ -2380,6 +2380,10 @@
 
 
 
+            so don't use those.
+
+          gender
+            Your  starting  gender (gender:male or gender:female).  You may
             specify just the first letter.  Although you can  still  denote
             your  gender  using  the  ``male''  and ``female'' options, the
             ``gender'' option will take precedence.  The default is to ran-
@@ -2429,11 +2433,7 @@
             the `O' command.
 
           menustyle
-            Controls the interface used when you need to choose various ob-
-            jects (in response to the Drop  command,  for  instance).   The
-            value  specified  should be the first letter of one of the fol-
-            lowing:  traditional, combination, partial,  or  full.   Tradi-
-            tional  was  the only interface available for earlier versions;
+            Controls  the  interface  used  when you need to choose various
 
 
           NetHack 3.4                                      December 2, 2003
@@ -2446,6 +2446,10 @@
 
 
 
+            objects (in response to the Drop command, for  instance).   The
+            value  specified  should be the first letter of one of the fol-
+            lowing:  traditional, combination, partial,  or  full.   Tradi-
+            tional  was  the only interface available for earlier versions;
             it consists of a prompt for object class  characters,  followed
             by  an  object-by-object  prompt for all items matching the se-
             lected object class(es).  Combination starts with a prompt  for
@@ -2495,10 +2499,6 @@
             Menu character accelerator to goto the previous menu page.  Im-
             plemented by the Amiga, Gem and tty ports.  Default '<'.
 
-          menu_search
-            Menu  character  accelerator to search for a menu item.  Imple-
-            mented by the Amiga, Gem and X11 ports.  Default ':'.
-
 
 
 
@@ -2511,6 +2511,10 @@
           NetHack Guidebook                                              39
 
 
+
+          menu_search
+            Menu  character  accelerator to search for a menu item.  Imple-
+            mented by the Amiga, Gem and X11 ports.  Default ':'.
 
           menu_select_all
             Menu character accelerator to select all items in a menu.   Im-
@@ -2562,10 +2566,6 @@
             can also set your character's role by appending a dash and  one
             or more letters of the role (that is, by suffixing one of -A -B
             -C -H -K -M -P -Ra -Ro -S -T -V -W).  If -@  is  used  for  the
-            role,  then  a random one will be automatically chosen.  Cannot
-            be set with the `O' command.
-
-
 
 
           NetHack 3.4                                      December 2, 2003
@@ -2577,6 +2577,9 @@
           NetHack Guidebook                                              40
 
 
+
+            role,  then  a random one will be automatically chosen.  Cannot
+            be set with the `O' command.
 
           news
             Read the NetHack news file, if present (default on).  Since the
@@ -2629,9 +2632,6 @@
             Default is all types.  If your copy of the game has the experi-
             mental compile time option AUTOPICKUP_EXCEPTIONS included,  you
             may  be  able  to  use  autopickup_exception configuration file
-            lines to further refine autopickup behavior.
-
-
 
 
           NetHack 3.4                                      December 2, 2003
@@ -2643,6 +2643,8 @@
           NetHack Guidebook                                              41
 
 
+
+            lines to further refine autopickup behavior.
 
           prayconfirm
             Prompt for confirmation before praying (default on).
@@ -2694,15 +2696,8 @@
             necessary.
 
           showborn
-               When the game ends, show the number of each monster created
-               in the "Vanquished creatures" list, if it differs from the
-               number of those monsters killed.
-
-          showexp
-            Show your accumulated experience points on bottom line (default
-            off).
-
-
+            When  the game ends, show the number of each monster created in
+            the "Vanquished creatures" list, if it differs from the  number
 
 
           NetHack 3.4                                      December 2, 2003
@@ -2714,6 +2709,12 @@
           NetHack Guidebook                                              42
 
 
+
+            of those monsters killed.
+
+          showexp
+            Show your accumulated experience points on bottom line (default
+            off).
 
           showrace
             Display yourself as the glyph for your race,  rather  than  the
@@ -2762,13 +2763,7 @@
             only; ``X11'' interface always uses a timer based  delay.   The
             default is on if configured into the program.)
 
-          tombstone
-            Draw a tombstone graphic upon your death (default on).
 
-          toptenwin
-            Put the ending display in a NetHack window instead of on stdout
-            (default off).  Setting this option makes the score list  visi-
-            ble  when  a  windowing version of NetHack is started without a
 
 
           NetHack 3.4                                      December 2, 2003
@@ -2781,6 +2776,13 @@
 
 
 
+          tombstone
+            Draw a tombstone graphic upon your death (default on).
+
+          toptenwin
+            Put the ending display in a NetHack window instead of on stdout
+            (default off).  Setting this option makes the score list  visi-
+            ble  when  a  windowing version of NetHack is started without a
             parent window, but it no longer leaves the  score  list  around
             after game end on a terminal or emulating window.
 
@@ -2814,31 +2816,20 @@
             `O' command.
 
           win_edge
-            Align menus and text windows in tty left instead of right.
-            (default off)
+            Align menus and text windows in tty left instead of right. (de-
+            fault off)
 
           9.5.  Window Port Customization options
 
-               Here are explanations of the various options that  are  used
-          to  customize  and  change  the characteristics of the windowtype
+               Here  are  explanations of the various options that are used
+          to customize and change the  characteristics  of  the  windowtype
           that you have chosen.  Character strings that are too long may be
-          truncated.   Not  all  window  ports will adjust for all settings
-          listed here.  You can safely add any of  these  options  to  your
-          config  file,  and  if the window port is capable of adjusting to
-          suit your preferences, it will attempt to do so. If it  can't  it
-          will  silently  ignore it.  You can find out if an option is sup-
-          ported by the window port that you are currently using by  check-
-          ing  to see if it shows up in the Options list.  Some options are
-          dynamic and can be specified during the game with  the  `O'  com-
-          mand.
-
-          align_message
-            Where  to align or place the message window (top, bottom, left,
-            or right)
-
-          align_status
-            Where to align or place the status window (top,  bottom,  left,
-            or right).
+          truncated.  Not all window ports will  adjust  for  all  settings
+          listed  here.   You  can  safely add any of these options to your
+          config file, and if the window port is capable  of  adjusting  to
+          suit  your  preferences, it will attempt to do so. If it can't it
+          will silently ignore it.  You can find out if an option  is  sup-
+          ported  by  the  window  port  that  you  are  currently using by
 
 
           NetHack 3.4                                      December 2, 2003
@@ -2851,35 +2842,47 @@
 
 
 
+          checking to see if it shows up in the Options list.  Some options
+          are  dynamic  and  can  be specified during the game with the `O'
+          command.
+
+          align_message
+            Where to align or place the message window (top, bottom,  left,
+            or right)
+
+          align_status
+            Where  to  align or place the status window (top, bottom, left,
+            or right).
+
           ascii_map
             NetHack should display an ascii character map if it can.
 
           color
-            NetHack  should display color if it can for different monsters,
+            NetHack should display color if it can for different  monsters,
             objects, and dungeon features
 
           eight_bit_tty
-            NetHack should pass eight-bit character  values  (for  example,
-            specified  with the traps option) straight through to your ter-
+            NetHack  should  pass  eight-bit character values (for example,
+            specified with the traps option) straight through to your  ter-
             minal (default off).
 
           font_map
-            NetHack should use a font by the chosen name for the  map  win-
+            NetHack  should  use a font by the chosen name for the map win-
             dow.
 
           font_menu
-            NetHack  should use a font by the chosen name for menu windows.
+            NetHack should use a font by the chosen name for menu  windows.
 
           font_message
-            NetHack should use a font by the chosen name  for  the  message
+            NetHack  should  use  a font by the chosen name for the message
             window.
 
           font_status
-            NetHack  should  use  a  font by the chosen name for the status
+            NetHack should use a font by the chosen  name  for  the  status
             window.
 
           font_text
-            NetHack should use a font by the chosen name for text  windows.
+            NetHack  should use a font by the chosen name for text windows.
 
           font_size_map
             NetHack should use this size font for the map window.
@@ -2893,18 +2896,6 @@
           font_size_status
             NetHack should use this size font for the status window.
 
-          font_size_text
-            NetHack should use this size font for text windows.
-
-          fullscreen
-            NetHack should try and display on the entire screen rather than
-            in a window.
-
-          hilite_pet
-            Visually distinguish pets from similar animals  (default  off).
-            The  behavior  of  this option depends on the type of windowing
-            you use.  In text windowing, text highlighting or inverse video
-            is  often  used;  with tiles, generally displays a heart symbol
 
 
           NetHack 3.4                                      December 2, 2003
@@ -2917,6 +2908,18 @@
 
 
 
+          font_size_text
+            NetHack should use this size font for text windows.
+
+          fullscreen
+            NetHack should try and display on the entire screen rather than
+            in a window.
+
+          hilite_pet
+            Visually  distinguish  pets from similar animals (default off).
+            The behavior of this option depends on the  type  of  windowing
+            you use.  In text windowing, text highlighting or inverse video
+            is often used; with tiles, generally displays  a  heart  symbol
             near pets.
 
           large_font
@@ -2929,48 +2932,36 @@
             Allow use of the mouse for input and travel.
 
           player_selection
-            NetHack should pop up dialog boxes, or use prompts for  charac-
+            NetHack  should pop up dialog boxes, or use prompts for charac-
             ter selection.
 
           popup_dialog
             NetHack should pop up dialog boxes for input.
 
           preload_tiles
-            NetHack  should preload tiles into memory.  For example, in the
-            protected mode MSDOS version, control whether  tiles  get  pre-
-            loaded  into  RAM  at the start of the game.  Doing so enhances
-            performance of the tile graphics, but uses  more  memory.  (de-
+            NetHack should preload tiles into memory.  For example, in  the
+            protected  mode  MSDOS  version, control whether tiles get pre-
+            loaded into RAM at the start of the game.   Doing  so  enhances
+            performance  of  the  tile graphics, but uses more memory. (de-
             fault on).  Cannot be set with the `O' command.
 
           scroll_amount
-            NetHack  should scroll the display by this number of cells when
+            NetHack should scroll the display by this number of cells  when
             the hero reaches the scroll_margin.
 
           scroll_margin
-            NetHack should scroll the display when the hero  or  cursor  is
+            NetHack  should  scroll  the display when the hero or cursor is
             this number of cells away from the edge of the window.
 
           softkeyboard
-            Display  an  onscreen  keyboard.   Handhelds are most likely to
+            Display an onscreen keyboard.  Handhelds  are  most  likely  to
             support this option.
 
           splash_screen
-            NetHack should display an opening splash screen when it  starts
+            NetHack  should display an opening splash screen when it starts
             up (default yes).
 
-          tiled_map
-            NetHack should display a tiled map if it can.
 
-          tile_file
-            Specify  the  name  of an alternative tile file to override the
-            default.
-
-          tile_height
-            Specify the preferred height of each tile  in  a  tile  capable
-            port.
-
-          tile_width
-            Specify the preferred width of each tile in a tile capable port
 
 
           NetHack 3.4                                      December 2, 2003
@@ -2983,6 +2974,20 @@
 
 
 
+          tiled_map
+            NetHack should display a tiled map if it can.
+
+          tile_file
+            Specify the name of an alternative tile file  to  override  the
+            default.
+
+          tile_height
+            Specify  the  preferred  height  of each tile in a tile capable
+            port.
+
+          tile_width
+            Specify the preferred width of each tile in a tile capable port
+
           use_inverse
             NetHack should display inverse when the game specifies it.
 
@@ -2991,21 +2996,21 @@
             message window.
 
           windowcolors
-            NetHack   should  display  windows  with  the  specified  fore-
+            NetHack  should  display  windows  with  the  specified   fore-
             ground/background colors if it can.
 
           wraptext
-            NetHack port should wrap long lines of text if they  don't  fit
+            NetHack  port  should wrap long lines of text if they don't fit
             in the visible area of the window.
 
           9.6.  Platform-specific Customization options
 
-               Here  are  explanations of options that are used by specific
+               Here are explanations of options that are used  by  specific
           platforms or ports to customize and change the port behavior.
 
           altkeyhandler
-            Select an alternate keystroke handler dll to  load  (Win32  tty
-            NetHack  only).   The  name of the handler is specified without
+            Select  an  alternate  keystroke handler dll to load (Win32 tty
+            NetHack only).  The name of the handler  is  specified  without
             the .dll extension and without any path information.  Cannot be
             set with the `O' command.
 
@@ -3014,8 +3019,8 @@
 
           BIOS
             Use BIOS calls to update the screen display quickly and to read
-            the keyboard (allowing the use of arrow keys to  move)  on  ma-
-            chines  with  an IBM PC compatible BIOS ROM (default off, OS/2,
+            the  keyboard  (allowing  the use of arrow keys to move) on ma-
+            chines with an IBM PC compatible BIOS ROM (default  off,  OS/2,
             PC, and ST NetHack only).
 
           flush
@@ -3023,20 +3028,6 @@
 
           MACgraphics
             (default on, Mac NetHack only).
-
-          page_wait
-            (default on, Mac NetHack only).
-
-          rawio
-            Force raw (non-cbreak) mode for faster output and more  bullet-
-            proof  input  (MS-DOS sometimes treats `^P' as a printer toggle
-            without it) (default off,  OS/2,  PC,  and  ST  NetHack  only).
-            Note:   DEC  Rainbows hang if this is turned on.  Cannot be set
-            with the `O' command.
-
-          soundcard
-            (default on, PC NetHack only).  Cannot be set with the `O' com-
-            mand.
 
 
           NetHack 3.4                                      December 2, 2003
@@ -3049,60 +3040,60 @@
 
 
 
+          page_wait
+            (default on, Mac NetHack only).
+
+          rawio
+            Force  raw (non-cbreak) mode for faster output and more bullet-
+            proof input (MS-DOS sometimes treats `^P' as a  printer  toggle
+            without  it)  (default  off,  OS/2,  PC,  and ST NetHack only).
+            Note:  DEC Rainbows hang if this is turned on.  Cannot  be  set
+            with the `O' command.
+
+          soundcard
+            (default on, PC NetHack only).  Cannot be set with the `O' com-
+            mand.
+
           subkeyvalue
-            (Win32  tty  NetHack  only).  May be used to alter the value of
+            (Win32 tty NetHack only).  May be used to alter  the  value  of
             keystrokes that the operating system returns to NetHack to help
-            compensate  for international keyboard issues.  OPTIONS=subkey-
-            value:171/92 will return 92 to NetHack, if 171  was  originally
-            going  to be returned.  You can use multiple subkeyvalue state-
+            compensate for international keyboard issues.   OPTIONS=subkey-
+            value:171/92  will  return 92 to NetHack, if 171 was originally
+            going to be returned.  You can use multiple subkeyvalue  state-
             ments in the config file if needed.  Cannot be set with the `O'
             command.
 
           video
             Set the video mode used (PC NetHack only).  Values are `autode-
-            tect', `default', or `vga'.   Setting  `vga'  (or  `autodetect'
-            with  vga  hardware  present)  will  cause  the game to display
+            tect',  `default',  or  `vga'.   Setting `vga' (or `autodetect'
+            with vga hardware present)  will  cause  the  game  to  display
             tiles.  Cannot be set with the `O' command.
 
           videocolors
-            Set the color palette for PC systems  using  NO_TERMS  (default
-            4-2-6-1-5-3-15-12-10-14-9-13-11,  (PC NetHack only).  The order
-            of  colors  is  red,  green,  brown,   blue,   magenta,   cyan,
-            bright.white,  bright.red,  bright.green,  yellow, bright.blue,
-            bright.magenta, and bright.cyan.  Cannot be set  with  the  `O'
+            Set  the  color  palette for PC systems using NO_TERMS (default
+            4-2-6-1-5-3-15-12-10-14-9-13-11, (PC NetHack only).  The  order
+            of   colors   is   red,  green,  brown,  blue,  magenta,  cyan,
+            bright.white, bright.red,  bright.green,  yellow,  bright.blue,
+            bright.magenta,  and  bright.cyan.   Cannot be set with the `O'
             command.
 
           videoshades
             Set the intensity level of the three gray scales available (de-
             fault dark normal light, PC NetHack only).  If the game display
-            is  difficult to read, try adjusting these scales; if this does
-            not correct the problem, try !color.  Cannot be  set  with  the
+            is difficult to read, try adjusting these scales; if this  does
+            not  correct  the  problem, try !color.  Cannot be set with the
             `O' command.
 
           9.7.  Configuring autopickup exceptions
 
-               There  is  an  experimental  compile  time option called AU-
-          TOPICKUP_EXCEPTIONS.  If your copy of the  game  was  built  with
-          that  option  defined, you can further refine the behavior of the
-          autopickup option beyond what  is  available  through  the  pick-
+               There is an experimental  compile  time  option  called  AU-
+          TOPICKUP_EXCEPTIONS.   If  your  copy  of the game was built with
+          that option defined, you can further refine the behavior  of  the
+          autopickup  option  beyond  what  is  available through the pick-
           up_types option.
 
-               By  placing autopickup_exception lines in your configuration
-          file, you can define patterns to be  checked  when  the  game  is
-          about to autopickup something.
-
-          autopickup_exception
-            Sets  an  exception  to the pickup_types option.  The autopick-
-            up_exception option should be followed  by  a  string  of  1-80
-            characters  to be used as a pattern to match against the singu-
-            lar form of the description of an object at your location.
-
-               You may use the following special characters in a pattern:
-
-                 *--- matches 0 or more characters.
-                 ?--- matches any single character.
-
-
+               By placing autopickup_exception lines in your  configuration
+          file,  you  can  define  patterns  to be checked when the game is
 
 
           NetHack 3.4                                      December 2, 2003
@@ -3115,7 +3106,20 @@
 
 
 
-               In addition, some characters are treated specially  if  they
+          about to autopickup something.
+
+          autopickup_exception
+            Sets an exception to the pickup_types  option.   The  autopick-
+            up_exception  option  should  be  followed  by a string of 1-80
+            characters to be used as a pattern to match against the  singu-
+            lar form of the description of an object at your location.
+
+               You may use the following special characters in a pattern:
+
+                 *--- matches 0 or more characters.
+                 ?--- matches any single character.
+
+               In  addition,  some characters are treated specially if they
           occur as the first character in the string pattern, specifically:
 
                < - always pickup an object that matches the pattern that follows.
@@ -3130,43 +3134,30 @@
                autopickup_exception=">*corpse"
                autopickup_exception=">* cursed*"
 
-          The  first example above will result in autopickup of any type of
+          The first example above will result in autopickup of any type  of
           arrow.  The second example results in the exclusion of any corpse
-          from  autopickup.   The  last example results in the exclusion of
-          items known to be cursed from autopickup.  A `never pickup'  rule
+          from autopickup.  The last example results in  the  exclusion  of
+          items  known to be cursed from autopickup.  A `never pickup' rule
           takes precedence over an `always pickup' rule if both match.
 
           9.8.  Configuring User Sounds
 
-               Some  platforms allow you to define sound files to be played
-          when a message that matches a user-defined pattern  is  delivered
+               Some platforms allow you to define sound files to be  played
+          when  a  message that matches a user-defined pattern is delivered
           to the message window.  At this time the Qt port and the win32tty
           and win32gui ports support the use of user sounds.
 
-               The following config file entries are  relevant  to  mapping
+               The  following  config  file entries are relevant to mapping
           user sounds to messages:
 
           SOUNDDIR
             The directory that houses the sound files to be played.
 
           SOUND
-            An  entry  that  maps  a sound file to a user-specified message
-            pattern.  Each SOUND entry is broken down  into  the  following
+            An entry that maps a sound file  to  a  user-specified  message
+            pattern.   Each  SOUND  entry is broken down into the following
             parts:
 
-                 MESG       - message window mapping (the only one supported in 3.4).
-                 pattern    - the pattern to match.
-                 sound file - the sound file to play.
-                 volume     - the volume to be set while playing the sound file.
-
-               The  exact  format  for  the  pattern depends on whether the
-          platform is built to use ``regular expressions'' or NetHack's own
-          internal  pattern  matching facility. The ``regular expressions''
-          matching can be much more sophisticated than the internal NetHack
-          pattern  matching, but requires 3rd party libraries on some plat-
-          forms.  There are plenty of references  available  elsewhere  for
-          explaining  ``regular expressions''. You can verify which pattern
-          matching is used by your port with the #version command.
 
 
 
@@ -3181,60 +3172,60 @@
 
 
 
+                 MESG       - message window mapping (the only one supported in 3.4).
+                 pattern    - the pattern to match.
+                 sound file - the sound file to play.
+                 volume     - the volume to be set while playing the sound file.
+
+               The exact format for the  pattern  depends  on  whether  the
+          platform is built to use ``regular expressions'' or NetHack's own
+          internal pattern matching facility. The  ``regular  expressions''
+          matching can be much more sophisticated than the internal NetHack
+          pattern matching, but requires 3rd party libraries on some  plat-
+          forms.   There  are  plenty of references available elsewhere for
+          explaining ``regular expressions''. You can verify which  pattern
+          matching is used by your port with the #version command.
+
                NetHack's internal pattern matching routine uses the follow-
           ing special characters in its pattern matching:
 
                  *--- matches 0 or more characters.
                  ?--- matches any single character.
 
-               Here's  an example of a sound mapping using NetHack's inter-
+               Here's an example of a sound mapping using NetHack's  inter-
           nal pattern matching facility:
 
                    SOUND=MESG "*chime of a cash register*" "gong.wav" 50
 
-          specifies that any message with "chime of a cash  register"  con-
-          tained  in  it  will  trigger the playing of "gong.wav".  You can
+          specifies  that  any message with "chime of a cash register" con-
+          tained in it will trigger the playing  of  "gong.wav".   You  can
           have multiple SOUND entries in your config file.
 
           9.9.  Configuring NetHack for Play by the Blind
 
-               NetHack can be set up to use only standard ASCII  characters
-          for  making  maps of the dungeons. This makes the MS-DOS versions
-          of NetHack completely accessible to  the  blind  who  use  speech
-          and/or  Braille access technologies.  Players will require a good
-          working knowledge of their screen-reader's review  features,  and
-          will  have  to  know  how to navigate horizontally and vertically
-          character by character. They will also find the search  capabili-
-          ties  of their screen-readers to be quite valuable. Be certain to
-          examine this Guidebook before playing so you have  an  idea  what
-          the  screen layout is like. You'll also need to be able to locate
-          the PC cursor. It is always  where  your  character  is  located.
-          Merely  searching for an @-sign will not always find your charac-
+               NetHack  can be set up to use only standard ASCII characters
+          for making maps of the dungeons. This makes the  MS-DOS  versions
+          of  NetHack  completely  accessible  to  the blind who use speech
+          and/or Braille access technologies.  Players will require a  good
+          working  knowledge  of their screen-reader's review features, and
+          will have to know how to  navigate  horizontally  and  vertically
+          character  by character. They will also find the search capabili-
+          ties of their screen-readers to be quite valuable. Be certain  to
+          examine  this  Guidebook  before playing so you have an idea what
+          the screen layout is like. You'll also need to be able to  locate
+          the  PC  cursor.  It  is  always where your character is located.
+          Merely searching for an @-sign will not always find your  charac-
           ter since there are other humanoids represented by the same sign.
-          Your  screen-reader  should  also have a function which gives you
-          the row and column of your  review  cursor  and  the  PC  cursor.
-          These  co-ordinates  are  often useful in giving players a better
+          Your screen-reader should also have a function  which  gives  you
+          the  row  and  column  of  your  review cursor and the PC cursor.
+          These co-ordinates are often useful in giving  players  a  better
           sense of the overall location of items on the screen.
 
-               While it is not difficult for experienced users to edit  the
-          defaults.nh  file  to accomplish this, novices may find this task
-          somewhat daunting.  Included in  all  official  distributions  of
+               While  it is not difficult for experienced users to edit the
+          defaults.nh file to accomplish this, novices may find  this  task
+          somewhat  daunting.   Included  in  all official distributions of
           NetHack is a file called NHAccess.nh.  Replacing defaults.nh with
-          this file will cause the game to run in a  manner  accessible  to
-          the  blind.  After  you have gained some experience with the game
-          and with editing files, you may want to alter settings to  better
-          suit your preferences. Instructions on how to do this are includ-
-          ed in the NHAccess.nh file itself. The most crucial  settings  to
-          make the game accessible are:
-
-          IBMgraphics
-            Disable IBMgraphics by commenting out this option.
-
-          menustyle:traditional
-            This will assist in the interface to speech synthesizers.
-
-          number_pad
-            A  lot  of  speech access programs use the number-pad to review
+          this  file  will  cause the game to run in a manner accessible to
 
 
           NetHack 3.4                                      December 2, 2003
@@ -3247,60 +3238,60 @@
 
 
 
+          the blind. After you have gained some experience  with  the  game
+          and  with editing files, you may want to alter settings to better
+          suit your preferences. Instructions on how to do this are includ-
+          ed  in  the NHAccess.nh file itself. The most crucial settings to
+          make the game accessible are:
+
+          IBMgraphics
+            Disable IBMgraphics by commenting out this option.
+
+          menustyle:traditional
+            This will assist in the interface to speech synthesizers.
+
+          number_pad
+            A lot of speech access programs use the  number-pad  to  review
             the screen.  If this is the case, disable the number_pad option
             and use the traditional Rogue-like commands.
 
           Character graphics
-            Comment  out  all character graphics sets found near the bottom
-            of the defaults.nh file.  Most of these replace  NetHack's  de-
-            fault  representation of the dungeon using standard ASCII char-
-            acters with fancier characters from  extended  character  sets,
+            Comment out all character graphics sets found near  the  bottom
+            of  the  defaults.nh file.  Most of these replace NetHack's de-
+            fault representation of the dungeon using standard ASCII  char-
+            acters  with  fancier  characters from extended character sets,
             and these fancier characters can annoy screen-readers.
 
           10.  Scoring
 
-               NetHack  maintains  a  list  of the top scores or scorers on
+               NetHack maintains a list of the top  scores  or  scorers  on
           your machine, depending on how it is set up.  In the latter case,
-          each  account  on the machine can post only one non-winning score
-          on this list.  If you score higher  than  someone  else  on  this
-          list,  or better your previous score, you will be inserted in the
-          proper place under your current name.  How many scores  are  kept
+          each account on the machine can post only one  non-winning  score
+          on  this  list.   If  you  score higher than someone else on this
+          list, or better your previous score, you will be inserted in  the
+          proper  place  under your current name.  How many scores are kept
           can also be set up when NetHack is compiled.
 
-               Your  score  is  chiefly  based upon how much experience you
+               Your score is chiefly based upon  how  much  experience  you
           gained, how much loot you accumulated, how deep you explored, and
           how the game ended.  If you quit the game, you escape with all of
-          your gold intact.  If, however, you get killed in  the  Mazes  of
+          your  gold  intact.   If, however, you get killed in the Mazes of
           Menace, the guild will only hear about 90% of your gold when your
-          corpse is discovered (adventurers  have  been  known  to  collect
-          finder's  fees).   So, consider whether you want to take one last
-          hit at that monster and possibly live,  or  quit  and  stop  with
-          whatever  you  have.  If you quit, you keep all your gold, but if
+          corpse  is  discovered  (adventurers  have  been known to collect
+          finder's fees).  So, consider whether you want to take  one  last
+          hit  at  that  monster  and  possibly live, or quit and stop with
+          whatever you have.  If you quit, you keep all your gold,  but  if
           you swing and live, you might find more.
 
-               If you just want to see what the current  top  players/games
+               If  you  just want to see what the current top players/games
           list is, you can type nethack -s all on most versions.
 
 
           11.  Explore mode
 
-               NetHack  is  an intricate and difficult game.  Novices might
+               NetHack is an intricate and difficult game.   Novices  might
           falter in fear, aware of their ignorance of the means to survive.
-          Well,  fear  not.   Your  dungeon may come equipped with an ``ex-
-          plore'' or ``discovery'' mode that enables you to keep  old  save
-          files  and  cheat death, at the paltry cost of not getting on the
-          high score list.
-
-               There are two ways of enabling  explore  mode.   One  is  to
-          start the game with the -X switch.  The other is to issue the `X'
-          command while already playing the game.  The  other  benefits  of
-          explore mode are left for the trepid reader to discover.
-
-
-          12.  Credits
-
-               The  original  hack  game  was  modeled on the Berkeley UNIX
-          rogue game.   Large  portions  of  this  paper  were  shamelessly
+          Well,  fear  not.   Your  dungeon  may  come  equipped  with   an
 
 
           NetHack 3.4                                      December 2, 2003
@@ -3313,60 +3304,60 @@
 
 
 
-          cribbed  from  A Guide to the Dungeons of Doom, by Michael C. Toy
-          and Kenneth C. R. C. Arnold.  Small portions  were  adapted  from
+          ``explore''  or  ``discovery''  mode that enables you to keep old
+          save files and cheat death, at the paltry cost of not getting  on
+          the high score list.
+
+               There  are  two  ways  of  enabling explore mode.  One is to
+          start the game with the -X switch.  The other is to issue the `X'
+          command  while  already  playing the game.  The other benefits of
+          explore mode are left for the trepid reader to discover.
+
+
+          12.  Credits
+
+               The original hack game was  modeled  on  the  Berkeley  UNIX
+          rogue  game.   Large  portions  of  this  paper  were shamelessly
+          cribbed from A Guide to the Dungeons of Doom, by Michael  C.  Toy
+          and  Kenneth  C.  R. C. Arnold.  Small portions were adapted from
           Further Exploration of the Dungeons of Doom, by Ken Arromdee.
 
                NetHack is the product of literally dozens of people's work.
-          Main events in the course of the game development  are  described
+          Main  events  in the course of the game development are described
           below:
 
 
-               Jay  Fenlason  wrote the original Hack, with help from Kenny
+               Jay Fenlason wrote the original Hack, with help  from  Kenny
           Woodland, Mike Thome and Jon Payne.
 
                Andries Brouwer did a major re-write, transforming Hack into
-          a  very  different  game, and published (at least) three versions
+          a very different game, and published (at  least)  three  versions
           (1.0.1, 1.0.2, and 1.0.3) for UNIX machines to the Usenet.
 
-               Don G. Kneller ported Hack 1.0.3 to Microsoft C and  MS-DOS,
-          producing  PC  HACK 1.01e, added support for DEC Rainbow graphics
-          in version 1.03g, and went on to produce at least four more  ver-
+               Don  G. Kneller ported Hack 1.0.3 to Microsoft C and MS-DOS,
+          producing PC HACK 1.01e, added support for DEC  Rainbow  graphics
+          in  version 1.03g, and went on to produce at least four more ver-
           sions (3.0, 3.2, 3.51, and 3.6).
 
-               R.  Black  ported  PC  HACK  3.51 to Lattice C and the Atari
+               R. Black ported PC HACK 3.51 to  Lattice  C  and  the  Atari
           520/1040ST, producing ST Hack 1.03.
 
                Mike Stephenson merged these various versions back together,
-          incorporating  many  of  the added features, and produced NetHack
-          1.4.  He then coordinated a cast of thousands  in  enhancing  and
-          debugging  NetHack 1.4 and released NetHack versions 2.2 and 2.3.
+          incorporating many of the added features,  and  produced  NetHack
+          1.4.   He  then  coordinated a cast of thousands in enhancing and
+          debugging NetHack 1.4 and released NetHack versions 2.2 and  2.3.
 
                Later, Mike coordinated a major rewrite of the game, heading
           a team which included Ken Arromdee, Jean-Christophe Collet, Steve
           Creps, Eric Hendrickson, Izchak Miller, John Rupley, Mike Threep-
           oint, and Janet Walz, to produce NetHack 3.0c.
 
-               NetHack  3.0  was  ported  to the Atari by Eric R. Smith, to
-          OS/2 by Timo Hakulinen, and to VMS by David Gentzel.   The  three
+               NetHack 3.0 was ported to the Atari by  Eric  R.  Smith,  to
+          OS/2  by  Timo Hakulinen, and to VMS by David Gentzel.  The three
           of them and Kevin Darcy later joined the main development team to
           produce subsequent revisions of 3.0.
 
-               Olaf Seibert ported NetHack 2.3 and 3.0 to the Amiga.   Norm
-          Meluch,  Stephen  Spackman  and Pierre Martineau designed overlay
-          code for PC NetHack 3.0.  Johnny Lee ported NetHack  3.0  to  the
-          Macintosh.   Along with various other Dungeoneers, they continued
-          to enhance the PC, Macintosh, and Amiga ports through  the  later
-          revisions of 3.0.
 
-               Headed  by  Mike Stephenson and coordinated by Izchak Miller
-          and Janet Walz, the development team which now included  Ken  Ar-
-          romdee,  David  Cohrs,  Jean-Christophe Collet, Kevin Darcy, Matt
-          Day, Timo Hakulinen, Steve Linhart, Dean Luick, Pat Rankin,  Eric
-          Raymond,  and  Eric  Smith  undertook  a radical revision of 3.0.
-          They re-structured the game's design, and re-wrote major parts of
-          the  code.   They added multiple dungeons, a new display, special
-          individual character quests, a new endgame  and  many  other  new
 
 
           NetHack 3.4                                      December 2, 2003
@@ -3379,60 +3370,60 @@
 
 
 
+               Olaf  Seibert ported NetHack 2.3 and 3.0 to the Amiga.  Norm
+          Meluch, Stephen Spackman and Pierre  Martineau  designed  overlay
+          code  for  PC  NetHack 3.0.  Johnny Lee ported NetHack 3.0 to the
+          Macintosh.  Along with various other Dungeoneers, they  continued
+          to  enhance  the PC, Macintosh, and Amiga ports through the later
+          revisions of 3.0.
+
+               Headed by Mike Stephenson and coordinated by  Izchak  Miller
+          and  Janet  Walz, the development team which now included Ken Ar-
+          romdee, David Cohrs, Jean-Christophe Collet,  Kevin  Darcy,  Matt
+          Day,  Timo Hakulinen, Steve Linhart, Dean Luick, Pat Rankin, Eric
+          Raymond, and Eric Smith undertook  a  radical  revision  of  3.0.
+          They re-structured the game's design, and re-wrote major parts of
+          the code.  They added multiple dungeons, a new  display,  special
+          individual  character  quests,  a  new endgame and many other new
           features, and produced NetHack 3.1.
 
-               Ken  Lorber,  Gregg  Wonderly and Greg Olson, with help from
-          Richard Addison, Mike Passaretti,  and  Olaf  Seibert,  developed
+               Ken Lorber, Gregg Wonderly and Greg Olson,  with  help  from
+          Richard  Addison,  Mike  Passaretti,  and Olaf Seibert, developed
           NetHack 3.1 for the Amiga.
 
-               Norm  Meluch and Kevin Smolkowski, with help from Carl Sche-
+               Norm Meluch and Kevin Smolkowski, with help from Carl  Sche-
           lin, Stephen Spackman, Steve VanDevender, and Paul Winner, ported
           NetHack 3.1 to the PC.
 
                Jon W{tte and Hao-yang Wang, with help from Ross Brown, Mike
-          Engber, David Hairston, Michael Hamel, Jonathan  Handler,  Johnny
-          Lee,  Tim  Lennan, Rob Menke, and Andy Swanson, developed NetHack
+          Engber,  David  Hairston, Michael Hamel, Jonathan Handler, Johnny
+          Lee, Tim Lennan, Rob Menke, and Andy Swanson,  developed  NetHack
           3.1 for the Macintosh, porting it for MPW.  Building on their de-
           velopment, Barton House added a Think C port.
 
                Timo Hakulinen ported NetHack 3.1 to OS/2.  Eric Smith port-
-          ed NetHack 3.1 to the Atari.  Pat Rankin, with help  from  Joshua
-          Delahunty,  was  responsible  for the VMS version of NetHack 3.1.
+          ed  NetHack  3.1 to the Atari.  Pat Rankin, with help from Joshua
+          Delahunty, was responsible for the VMS version  of  NetHack  3.1.
           Michael Allison ported NetHack 3.1 to Windows NT.
 
-               Dean Luick, with help from David  Cohrs,  developed  NetHack
-          3.1  for  X11.   Warwick Allison wrote a tiled version of NetHack
-          for the Atari; he later contributed the tiles to the DevTeam  and
+               Dean  Luick,  with  help from David Cohrs, developed NetHack
+          3.1 for X11.  Warwick Allison wrote a tiled  version  of  NetHack
+          for  the Atari; he later contributed the tiles to the DevTeam and
           tile support was then added to other platforms.
 
-               The  3.2 development team, comprised of Michael Allison, Ken
-          Arromdee, David Cohrs, Jessie Collet, Steve Creps,  Kevin  Darcy,
-          Timo  Hakulinen,  Steve  Linhart,  Dean  Luick,  Pat Rankin, Eric
-          Smith, Mike Stephenson, Janet Walz,  and  Paul  Winner,  released
+               The 3.2 development team, comprised of Michael Allison,  Ken
+          Arromdee,  David  Cohrs, Jessie Collet, Steve Creps, Kevin Darcy,
+          Timo Hakulinen, Steve  Linhart,  Dean  Luick,  Pat  Rankin,  Eric
+          Smith,  Mike  Stephenson,  Janet  Walz, and Paul Winner, released
           version 3.2 in April of 1996.
 
                Version 3.2 marked the tenth anniversary of the formation of
-          the development team.  In a testament to their dedication to  the
-          game,  all  thirteen members of the original development team re-
-          mained on the team at the start of work on that release.   During
-          the  interval  between  the  release of 3.1.3 and 3.2, one of the
-          founding members of the development team, Dr. Izchak Miller,  was
-          diagnosed  with cancer and passed away.  That release of the game
-          was dedicated to him by the development and porting teams.
-
-               During the lifespan of NetHack 3.1 and 3.2, several enthusi-
-          asts  of  the  game added their own modifications to the game and
-          made these ``variants'' publicly available:
-
-               Tom Proudfoot and Yuval Oren created  NetHack++,  which  was
-          quickly  renamed NetHack--.  Working independently, Stephen White
-          wrote NetHack Plus.  Tom Proudfoot later merged NetHack Plus  and
-          his own NetHack-- to produce SLASH.  Larry Stewart-Zerba and War-
-          wick Allison improved the spell casting system  with  the  Wizard
-          Patch.   Warwick Allison also ported NetHack to use the Qt inter-
-          face.
-
-
+          the  development team.  In a testament to their dedication to the
+          game, all thirteen members of the original development  team  re-
+          mained  on the team at the start of work on that release.  During
+          the interval between the release of 3.1.3 and  3.2,  one  of  the
+          founding  members of the development team, Dr. Izchak Miller, was
+          diagnosed with cancer and passed away.  That release of the  game
 
 
           NetHack 3.4                                      December 2, 2003
@@ -3445,58 +3436,58 @@
 
 
 
-               Warren Cheung combined SLASH with the Wizard Patch  to  pro-
-          duce  Slash'em,  and with the help of Kevin Hugo, added more fea-
-          tures.  Kevin later joined the DevTeam and incorporated the  best
+          was dedicated to him by the development and porting teams.
+
+               During the lifespan of NetHack 3.1 and 3.2, several enthusi-
+          asts of the game added their own modifications to  the  game  and
+          made these ``variants'' publicly available:
+
+               Tom  Proudfoot  and  Yuval Oren created NetHack++, which was
+          quickly renamed NetHack--.  Working independently, Stephen  White
+          wrote  NetHack Plus.  Tom Proudfoot later merged NetHack Plus and
+          his own NetHack-- to produce SLASH.  Larry Stewart-Zerba and War-
+          wick  Allison  improved  the spell casting system with the Wizard
+          Patch.  Warwick Allison also ported NetHack to use the Qt  inter-
+          face.
+
+               Warren  Cheung  combined SLASH with the Wizard Patch to pro-
+          duce Slash'em, and with the help of Kevin Hugo, added  more  fea-
+          tures.   Kevin later joined the DevTeam and incorporated the best
           of these ideas in NetHack 3.3.
 
                The final update to 3.2 was the bug fix release 3.2.3, which
-          was released simultaneously with 3.3.0 in December 1999  just  in
+          was  released  simultaneously with 3.3.0 in December 1999 just in
           time for the Year 2000.
 
                The 3.3 development team, consisting of Michael Allison, Ken
-          Arromdee, David Cohrs, Jessie Collet, Steve Creps,  Kevin  Darcy,
-          Timo  Hakulinen,  Kevin  Hugo,  Steve  Linhart,  Ken Lorber, Dean
-          Luick, Pat Rankin, Eric Smith, Mike Stephenson, Janet  Walz,  and
-          Paul  Winner, released 3.3.0 in December 1999 and 3.3.1 in August
+          Arromdee,  David  Cohrs, Jessie Collet, Steve Creps, Kevin Darcy,
+          Timo Hakulinen, Kevin  Hugo,  Steve  Linhart,  Ken  Lorber,  Dean
+          Luick,  Pat  Rankin, Eric Smith, Mike Stephenson, Janet Walz, and
+          Paul Winner, released 3.3.0 in December 1999 and 3.3.1 in  August
           of 2000.
 
                Version 3.3 offered many firsts. It was the first version to
-          separate  race and profession. The Elf class was removed in pref-
+          separate race and profession. The Elf class was removed in  pref-
           erence to an elf race, and the races of dwarves, gnomes, and orcs
-          made  their  first  appearance in the game alongside the familiar
-          human race.  Monk and Ranger roles joined Archeologists,  Barbar-
-          ians,   Cavemen,  Healers,  Knights,  Priests,  Rogues,  Samurai,
-          Tourists, Valkyries and of course,  Wizards.   It  was  also  the
-          first  version  to  allow  you to ride a steed, and was the first
-          version to have a publicly available  web-site  listing  all  the
-          bugs  that  had been discovered.  Despite that constantly growing
-          bug list, 3.3 proved stable enough to last for more than  a  year
+          made their first appearance in the game  alongside  the  familiar
+          human  race.  Monk and Ranger roles joined Archeologists, Barbar-
+          ians,  Cavemen,  Healers,  Knights,  Priests,  Rogues,   Samurai,
+          Tourists,  Valkyries  and  of  course,  Wizards.  It was also the
+          first version to allow you to ride a steed,  and  was  the  first
+          version  to  have  a  publicly available web-site listing all the
+          bugs that had been discovered.  Despite that  constantly  growing
+          bug  list,  3.3 proved stable enough to last for more than a year
           and a half.
 
-               The  3.4 development team initially consisted of Michael Al-
-          lison, Ken Arromdee, David Cohrs, Jessie Collet, Kevin Hugo,  Ken
-          Lorber,  Dean Luick, Pat Rankin, Mike Stephenson, Janet Walz, and
-          Paul Winner, with  Warwick Allison joining just  before  the  re-
+               The 3.4 development team initially consisted of Michael  Al-
+          lison,  Ken Arromdee, David Cohrs, Jessie Collet, Kevin Hugo, Ken
+          Lorber, Dean Luick, Pat Rankin, Mike Stephenson, Janet Walz,  and
+          Paul  Winner,  with   Warwick Allison joining just before the re-
           lease of NetHack 3.4.0 in March 2002.
 
-               As  with version 3.3, various people contributed to the game
+               As with version 3.3, various people contributed to the  game
           as a whole as well as supporting ports on the different platforms
           that NetHack runs on:
-
-               Pat Rankin maintained 3.4 for VMS.
-
-               Michael  Allison maintained NetHack 3.4 for the MS-DOS plat-
-          form.  Paul Winner and Yitzhak Sapir provided encouragement.
-
-               Dean Luick, Mark Modrall, and Kevin Hugo maintained and  en-
-          hanced the Macintosh port of 3.4.
-
-               Michael  Allison,  David  Cohrs, Alex Kompel, Dion Nicolaas,
-          and Yitzhak Sapir maintained and enhanced 3.4 for  the  Microsoft
-          Windows platform.  Alex Kompel contributed a new graphical inter-
-          face for the Windows port.  Alex Kompel also contributed  a  Win-
-          dows CE port for 3.4.1.
 
 
 
@@ -3511,39 +3502,39 @@
 
 
 
+               Pat Rankin maintained 3.4 for VMS.
+
+               Michael Allison maintained NetHack 3.4 for the MS-DOS  plat-
+          form.  Paul Winner and Yitzhak Sapir provided encouragement.
+
+               Dean  Luick, Mark Modrall, and Kevin Hugo maintained and en-
+          hanced the Macintosh port of 3.4.
+
+               Michael Allison, David Cohrs, Alex  Kompel,  Dion  Nicolaas,
+          and  Yitzhak  Sapir maintained and enhanced 3.4 for the Microsoft
+          Windows platform.  Alex Kompel contributed a new graphical inter-
+          face  for  the Windows port.  Alex Kompel also contributed a Win-
+          dows CE port for 3.4.1.
+
                Ron Van Iwaarden maintained 3.4 for OS/2.
 
-               Janne  Salmijarvi  and  Teemu Suikki maintained and enhanced
-          the Amiga port of 3.4 after Janne Salmijarvi resurrected  it  for
+               Janne Salmijarvi and Teemu Suikki  maintained  and  enhanced
+          the  Amiga  port of 3.4 after Janne Salmijarvi resurrected it for
           3.3.1.
 
-               Christian  ``Marvin''  Bressler maintained 3.4 for the Atari
+               Christian ``Marvin'' Bressler maintained 3.4 for  the  Atari
           after he resurrected it for 3.3.1.
 
-               There is a NetHack web site  maintained  by  Ken  Lorber  at
+               There  is  a  NetHack  web  site maintained by Ken Lorber at
           http://www.nethack.org/.
 
                     - - - - - - - - - -
 
-               From  time  to  time,  some depraved individual out there in
-          netland sends a particularly intriguing modification to help  out
-          with  the  game.   The Gods of the Dungeon sometimes make note of
-          the names of the worst of these miscreants in this, the  list  of
+               From time to time, some depraved  individual  out  there  in
+          netland  sends a particularly intriguing modification to help out
+          with the game.  The Gods of the Dungeon sometimes  make  note  of
+          the  names  of the worst of these miscreants in this, the list of
           Dungeoneers:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -3615,7 +3606,7 @@
                    Helge Hafting            Mike Gallop
                Irina Rempt-Drijfhout      Mike Passaretti
 
-          Brand  and  product names are trademarks or registered trademarks
+          Brand and product names are trademarks or  registered  trademarks
           of their respective holders.
 
 

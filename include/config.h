@@ -399,6 +399,8 @@ typedef unsigned char	uchar;
 /*#define GOLDOBJ */	/* Gold is kept on obj chains - Helge Hafting */
 /*#define AUTOPICKUP_EXCEPTIONS */ /* exceptions to autopickup */
 
+#define AUTO_OPEN	/* open doors by walking into them - Stefano Busti */
+
 #endif /* AUTOCONF */
 
 #ifdef TTY_GRAPHICS
