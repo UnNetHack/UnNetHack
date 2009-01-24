@@ -2627,11 +2627,11 @@
             overLoaded),  you  will be asked if you want to continue.  (De-
             fault `S').
 
-          pickup_types
-            Specify the object types to be picked up when autopickup is on.
-            Default is all types.  If your copy of the game has the experi-
-            mental compile time option AUTOPICKUP_EXCEPTIONS included,  you
-            may  be  able  to  use  autopickup_exception configuration file
+          pickup_thrown
+            If this boolean option is true and autopickup  is  on,  try  to
+            pick  up  things  that  you threw, even if they aren't in pick-
+            up_types.  Default is on.
+
 
 
           NetHack 3.4                                      December 2, 2003
@@ -2644,6 +2644,11 @@
 
 
 
+          pickup_types
+            Specify the object types to be picked up when autopickup is on.
+            Default is all types.  If your copy of the game has the experi-
+            mental compile time option AUTOPICKUP_EXCEPTIONS included,  you
+            may  be  able  to  use  autopickup_exception configuration file
             lines to further refine autopickup behavior.
 
           prayconfirm
@@ -2693,11 +2698,6 @@
             Control what parts of the score list you are shown at  the  end
             (ex.   ``scores:5  top  scores/4 around my score/own scores'').
             Only the first letter of each category (`t', `a',  or  `o')  is
-            necessary.
-
-          showborn
-            When  the game ends, show the number of each monster created in
-            the "Vanquished creatures" list, if it differs from the  number
 
 
           NetHack 3.4                                      December 2, 2003
@@ -2710,6 +2710,11 @@
 
 
 
+            necessary.
+
+          showborn
+            When  the game ends, show the number of each monster created in
+            the "Vanquished creatures" list, if it differs from the  number
             of those monsters killed.
 
           showexp
@@ -2759,11 +2764,6 @@
           timed_delay
             When  pausing  momentarily for display effect, such as with ex-
             plosions and moving objects, use a timer  rather  than  sending
-            extra  characters to the screen.  (Applies to ``tty'' interface
-            only; ``X11'' interface always uses a timer based  delay.   The
-            default is on if configured into the program.)
-
-
 
 
           NetHack 3.4                                      December 2, 2003
@@ -2775,6 +2775,10 @@
           NetHack Guidebook                                              43
 
 
+
+            extra  characters to the screen.  (Applies to ``tty'' interface
+            only; ``X11'' interface always uses a timer based  delay.   The
+            default is on if configured into the program.)
 
           tombstone
             Draw a tombstone graphic upon your death (default on).
@@ -2826,10 +2830,6 @@
           that you have chosen.  Character strings that are too long may be
           truncated.  Not all window ports will  adjust  for  all  settings
           listed  here.   You  can  safely add any of these options to your
-          config file, and if the window port is capable  of  adjusting  to
-          suit  your  preferences, it will attempt to do so. If it can't it
-          will silently ignore it.  You can find out if an option  is  sup-
-          ported  by  the  window  port  that  you  are  currently using by
 
 
           NetHack 3.4                                      December 2, 2003
@@ -2842,9 +2842,13 @@
 
 
 
-          checking to see if it shows up in the Options list.  Some options
-          are  dynamic  and  can  be specified during the game with the `O'
-          command.
+          config file, and if the window port is capable  of  adjusting  to
+          suit  your  preferences, it will attempt to do so. If it can't it
+          will silently ignore it.  You can find out if an option  is  sup-
+          ported  by the window port that you are currently using by check-
+          ing to see if it shows up in the Options list.  Some options  are
+          dynamic  and  can  be specified during the game with the `O' com-
+          mand.
 
           align_message
             Where to align or place the message window (top, bottom,  left,
@@ -2893,10 +2897,6 @@
           font_size_message
             NetHack should use this size font for the message window.
 
-          font_size_status
-            NetHack should use this size font for the status window.
-
-
 
           NetHack 3.4                                      December 2, 2003
 
@@ -2907,6 +2907,9 @@
           NetHack Guidebook                                              45
 
 
+
+          font_size_status
+            NetHack should use this size font for the status window.
 
           font_size_text
             NetHack should use this size font for text windows.
@@ -2959,9 +2962,6 @@
 
           splash_screen
             NetHack  should display an opening splash screen when it starts
-            up (default yes).
-
-
 
 
           NetHack 3.4                                      December 2, 2003
@@ -2973,6 +2973,8 @@
           NetHack Guidebook                                              46
 
 
+
+            up (default yes).
 
           tiled_map
             NetHack should display a tiled map if it can.
@@ -3026,8 +3028,6 @@
           flush
             (default off, AMIGA NetHack only).
 
-          MACgraphics
-            (default on, Mac NetHack only).
 
 
           NetHack 3.4                                      December 2, 2003
@@ -3039,6 +3039,9 @@
           NetHack Guidebook                                              47
 
 
+
+          MACgraphics
+            (default on, Mac NetHack only).
 
           page_wait
             (default on, Mac NetHack only).
@@ -3092,9 +3095,6 @@
           autopickup  option  beyond  what  is  available through the pick-
           up_types option.
 
-               By placing autopickup_exception lines in your  configuration
-          file,  you  can  define  patterns  to be checked when the game is
-
 
           NetHack 3.4                                      December 2, 2003
 
@@ -3106,6 +3106,8 @@
 
 
 
+               By placing autopickup_exception lines in your  configuration
+          file,  you  can  define  patterns  to be checked when the game is
           about to autopickup something.
 
           autopickup_exception
@@ -3157,8 +3159,6 @@
             An entry that maps a sound file  to  a  user-specified  message
             pattern.   Each  SOUND  entry is broken down into the following
             parts:
-
-
 
 
 

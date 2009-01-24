@@ -867,6 +867,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 	boolean impaired = (Confusion || Stunned || Blind ||
 			   Hallucination || Fumbling);
 
+	obj->was_thrown = TRUE;
 	if ((obj->cursed || obj->greased) && (u.dx || u.dy) && !rn2(7)) {
 	    boolean slipok = TRUE;
 	    if (ammo_and_launcher(obj, uwep))
