@@ -21,6 +21,7 @@ BRANCH:		"The Gnomish Mines" @ (2, 3)
 LEVEL:		"oracle" "O" @ (5, 5)
 LEVALIGN:	neutral
 CHAINBRANCH:	"Sokoban" "oracle" + (1, 0) up
+CHAINBRANCH:	"Town" "oracle" + (2, 2) up
 RNDLEVEL:	"bigrm" "B" @ (10, 3) 40 11
 CHAINBRANCH:	"The Quest" "oracle" + (6, 2) portal
 BRANCH:		"Fort Ludios" @ (18, 4) portal
@@ -109,6 +110,17 @@ RNDLEVEL:		"soko1" "none" @ (1, 0) 4
 RNDLEVEL:		"soko2" "none" @ (2, 0) 7
 RNDLEVEL:		"soko3" "none" @ (3, 0) 7
 RNDLEVEL:		"soko4" "none" @ (4, 0) 9
+
+
+#
+#   The city of Angband
+#
+DUNGEON:	"Town" "A" (5, 0)
+LEVALIGN:       lawful
+ENTRY:		-1
+RNDLEVEL:       "town" "T" @ (1, 0) 2
+LEVELDESC:      town
+
 
 #
 #	The Central Vault of Croesus.

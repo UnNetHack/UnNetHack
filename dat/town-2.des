@@ -1,0 +1,70 @@
+#       
+# Angband-2
+# Copyright (c) 2009 by Patric Mueller
+#
+# NetHack may be freely redistributed.  See license for details.
+#
+LEVEL: "town-2"
+MESSAGE: "You reach the surface.  You hear the sounds of civilization."
+RANDOM_MONSTERS:'@','r'
+ROOM: "ordinary" , lit, random, random, (76,17)
+NAME: "town"
+FOUNTAIN: (55,9)
+FOUNTAIN: (22,8)
+STAIR: random, down
+ENGRAVING: random, mark, "Welcome to the city of Angband!"
+#
+#       The Town Watch.
+#
+MONSTER: '@', "watchman", random, peaceful
+MONSTER: '@', "watchman", random, peaceful
+MONSTER: '@', "watchman", random, peaceful
+MONSTER: '@', "watchman", random, peaceful
+MONSTER: '@', "watch captain", random, peaceful
+MONSTER: '@', "watch captain", random, peaceful
+MONSTER: '@', "watch captain", random, peaceful
+#
+#       Some distracting townspeople
+#
+MONSTER: '@', "mugger", random, hostile
+MONSTER: '@', "mugger", random, hostile
+MONSTER: '@', "mugger", random, hostile
+MONSTER: '@', "mugger", random, hostile
+MONSTER: 'r', "sewer rat", random, hostile
+MONSTER: 'r', "sewer rat", random, hostile
+MONSTER: 'f', "kitten", random, hostile
+#
+#       The Shops
+#
+SUBROOM: "armor shop", lit, (7,5), (7,2), "town"
+CHANCE: 66
+DOOR: false, closed, random, random
+
+SUBROOM: "weapon shop", lit, (28,3), (3,3), "town"
+CHANCE: 66
+DOOR: false, closed, random, random
+
+SUBROOM: "scroll shop", lit, (44,5), (5,2), "town"
+CHANCE: 66
+DOOR: false, closed, random, random
+
+SUBROOM: "wand shop", lit, (62,5), (7,2), "town"
+CHANCE: 66
+DOOR: false, closed, random, random
+
+SUBROOM: "potion shop", lit, (13,11), (5,3), "town"
+CHANCE: 66
+DOOR: false, closed, random, random
+
+SUBROOM: "shop", lit, (31,11), (4,3), "town"
+DOOR: false, closed, random, random
+
+SUBROOM: "ring shop", lit, (46,12), (4,2), "town"
+CHANCE: 66
+DOOR: false, closed, random, random
+#
+# a shop for sale?
+#
+SUBROOM: "ordinary", lit, (60,12), (6,1), "town"
+DOOR: false, closed, north, random
+

@@ -352,7 +352,7 @@ level_range(dgn, base, rand, chain, pd, adjusted_base)
 	}
 
 	if (base < 1 || base > lmax)
-	    panic("level_range: base value out of range");
+	    panic("level_range: base value out of range. base: %d, lmax; %d",base,lmax);
 
 	*adjusted_base = base;
 
@@ -933,6 +933,7 @@ init_dungeons()		/* initialize the "dungeon" structs */
 	sokoban_dnum = dname_to_dnum("Sokoban");
 	mines_dnum = dname_to_dnum("The Gnomish Mines");
 	tower_dnum = dname_to_dnum("Vlad's Tower");
+	mall_dnum = dname_to_dnum("Town");
 /*
 #ifdef BLACKMARKET
 	blackmarket_dnum = dname_to_dnum("The Black Market");
