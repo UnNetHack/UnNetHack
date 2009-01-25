@@ -1442,14 +1442,15 @@ register struct obj *obj;
 }
 
 void
-use_unicorn_horn(obj)
+fix_attributes_and_properties(obj, attr_point)
 struct obj *obj;
+int attr_point; /* number of attribute points per attribute we might fix */
 {
 #define PROP_COUNT 6		/* number of properties we're dealing with */
-#define ATTR_COUNT (A_MAX*3)	/* number of attribute points we might fix */
+	int attr_count = A_MAX*attr_point;	
 	int idx, val, val_limit,
 	    trouble_count, unfixable_trbl, did_prop, did_attr;
-	int trouble_list[PROP_COUNT + ATTR_COUNT];
+	int trouble_list[PROP_COUNT + attr_count];
 
 	if (obj && obj->cursed) {
 	    long lcount = (long) rnd(100);
@@ -1566,7 +1567,7 @@ struct obj *obj;
 		    ABASE(idx) += 1;
 		    did_attr++;
 		} else
-		    panic("use_unicorn_horn: bad trouble? (%d)", idx);
+		    panic("fix_attributes_and_properties: bad trouble? (%d)", idx);
 		break;
 	    }
 	}
@@ -2941,7 +2942,7 @@ doapply()
 		use_figurine(&obj);
 		break;
 	case UNICORN_HORN:
-		use_unicorn_horn(obj);
+		fix_attributes_and_properties(obj, 0);
 		break;
 	case WOODEN_FLUTE:
 	case MAGIC_FLUTE:
