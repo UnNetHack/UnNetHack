@@ -452,6 +452,7 @@ struct mkroom	*sroom;
 	ESHK(shk)->loan = 0L;
 	ESHK(shk)->visitct = 0;
 	ESHK(shk)->following = 0;
+	ESHK(shk)->cheapskate = (rn2(3)==0) ? TRUE : FALSE;
 	ESHK(shk)->billct = 0;
 
   shkmoney = 1000L + 30L*(long)rnd(100);	/* initial capital */

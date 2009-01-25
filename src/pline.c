@@ -7,6 +7,7 @@
 #include "epri.h"
 #ifdef WIZARD
 #include "edog.h"
+#include "eshk.h"
 #endif
 
 #ifdef OVLB
@@ -337,6 +338,12 @@ register struct monst *mtmp;
 				", holding you");
 #ifdef STEED
 	if (mtmp == u.usteed)	  Strcat(info, ", carrying you");
+#endif
+#ifdef WIZARD
+	if (wizard &&
+	    mtmp->isshk && ESHK(mtmp)->cheapskate) {
+		Strcat(info, ", cheapskate");
+	}
 #endif
 
 	/* avoid "Status of the invisible newt ..., invisible" */

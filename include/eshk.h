@@ -26,6 +26,7 @@ struct eshk {
 	schar unused;		/* to force alignment for stupid compilers */
 	boolean following;	/* following customer since he owes us sth */
 	boolean surcharge;	/* angry shk inflates prices */
+	boolean cheapskate;	/* offers less than normal for sold goods */
 	coord shk;		/* usual position shopkeeper */
 	coord shd;		/* position shop door */
 	d_level shoplevel;	/* level (& dungeon) of his shop */
