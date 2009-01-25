@@ -1502,7 +1502,7 @@ int attr_point; /* number of attribute points per attribute we might fix */
 	    /* don't recover strength lost from hunger */
 	    if (idx == A_STR && u.uhs >= WEAK) val_limit--;
 	    /* don't recover more than 3 points worth of any attribute */
-	    if (val_limit > ABASE(idx) + 3) val_limit = ABASE(idx) + 3;
+	    if (val_limit > ABASE(idx) + attr_point) val_limit = ABASE(idx) + attr_point;
 
 	    for (val = ABASE(idx); val < val_limit; val++)
 		attr_trouble(idx);
