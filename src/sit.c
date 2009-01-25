@@ -193,10 +193,12 @@ dosit()
 			take_gold();
 			break;
 		    case 6:
-			if(u.uluck + rn2(5) < 0) {
-			    You_feel("your luck is changing.");
-			    change_luck(1);
-			} else	    makewish();
+			if (u.uluck + rn2(5) < 0) {
+				You_feel("your luck is changing.");
+				change_luck(1);
+			} else {
+				fix_attributes_and_properties((struct obj *)0, 6);
+			}
 			break;
 		    case 7:
 			{
