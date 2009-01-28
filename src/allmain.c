@@ -49,6 +49,7 @@ moveloop()
     monst_init();
     monstr_init();	/* monster strengths */
     objects_init();
+    dragons_init();
 
 #ifdef WIZARD
     if (wizard) add_debug_extended_commands();

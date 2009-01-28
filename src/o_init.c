@@ -9,7 +9,7 @@ STATIC_DCL void FDECL(setgemprobs, (d_level*));
 STATIC_DCL void FDECL(shuffle,(int,int,BOOLEAN_P));
 STATIC_DCL void NDECL(shuffle_all);
 STATIC_DCL boolean FDECL(interesting_to_discover,(int));
-
+STATIC_DCL void FDECL(swap_armor,(int, int, int));
 
 static NEARDATA short disco[NUM_OBJECTS] = DUMMY;
 
@@ -223,6 +223,43 @@ shuffle_all()
 
 	/* shuffle the boots [if they change, update find_skates() below] */
 	shuffle(SPEED_BOOTS, LEVITATION_BOOTS, FALSE);
+
+	/* shuffle dragon scales / scale mails */
+	int j, pos;
+	int num_scales = YELLOW_DRAGON_SCALES - GRAY_DRAGON_SCALES;
+	for (j = num_scales; j >= 0; j--) {
+		pos = rn2(j+1);
+		swap_armor(j, pos, GRAY_DRAGON_SCALES);
+		swap_armor(j, pos, GRAY_DRAGON_SCALE_MAIL);
+	}
+}
+
+/**
+ * Swaps two items of the same armor class.
+ * Currently name, color and price are swapped.
+ */
+void
+swap_armor(old_relative_position, new_relative_position, first)
+int old_relative_position,  /* old position of dragon scales */
+    new_relative_position,  /* new position of dragon scales */
+    first; /* first armor of this armor class */
+{
+	struct objclass tmp;
+
+	int old_pos = old_relative_position + first;
+	int new_pos = new_relative_position + first;
+
+	tmp.oc_name_idx = objects[old_pos].oc_name_idx;
+	tmp.oc_color    = objects[old_pos].oc_color;
+	tmp.oc_cost     = objects[old_pos].oc_cost;
+
+	objects[old_pos].oc_name_idx = objects[new_pos].oc_name_idx;
+	objects[old_pos].oc_color    = objects[new_pos].oc_color;
+	objects[old_pos].oc_cost     = objects[new_pos].oc_cost;
+
+	objects[new_pos].oc_name_idx = tmp.oc_name_idx; 
+	objects[new_pos].oc_color    = tmp.oc_color; 
+	objects[new_pos].oc_cost     = tmp.oc_cost;
 }
 
 /* find the object index for snow boots; used [once] by slippery ice code */
@@ -422,6 +459,31 @@ dodiscovered()				/* free after Robert Viduya */
     destroy_nhwindow(tmpwin);
 
     return 0;
+}
+
+/**
+ * Shuffles the properties of dragons according to the order of the dragons
+ * scales.
+ * Currently name, color are shuffled.
+ */
+void
+dragons_init()
+{
+	/* Number of existing dragons. Assumes order of dragons */
+	int ndragons = YELLOW_DRAGON_SCALES - GRAY_DRAGON_SCALES + 1;
+	struct permonst tmp[ndragons];
+	int i,j;
+	/* record standard order */
+	for (i=0; i < ndragons; i++) {
+		tmp[i].mname  = mons[i+PM_GRAY_DRAGON].mname;
+		tmp[i].mcolor = mons[i+PM_GRAY_DRAGON].mcolor;
+	}
+	/* copy name and color to new positions */
+	for (i=0; i < ndragons; i++) {
+		j = objects[i+GRAY_DRAGON_SCALES].oc_name_idx-GRAY_DRAGON_SCALES;
+		mons[i+PM_GRAY_DRAGON].mname  = tmp[j].mname;
+		mons[i+PM_GRAY_DRAGON].mcolor = tmp[j].mcolor;
+	}
 }
 
 /*o_init.c*/

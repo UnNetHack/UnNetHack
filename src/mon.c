@@ -1433,8 +1433,7 @@ register struct monst *mtmp;
 #endif
 
 	/* extinguish monster's armor */
-	if ((otmp = which_armor(mtmp, W_ARM)) && 
-		(otmp->otyp==GOLD_DRAGON_SCALE_MAIL || otmp->otyp == GOLD_DRAGON_SCALES) )
+	if ((otmp = which_armor(mtmp, W_ARM)) && (Is_gold_dragon_armor(otmp)))
 		end_burn(otmp,FALSE);
 
 	mptr = mtmp->data;		/* save this for m_detach() */
