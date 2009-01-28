@@ -2013,6 +2013,7 @@ boolean from_user;
 	if (strncmpi(bp, "wizard lock", 11)) /* not the "wizard" monster! */
 	if (strncmpi(bp, "ninja-to", 8)) /* not the "ninja" rank */
 	if (strncmpi(bp, "master key", 10)) /* not the "master" rank */
+	if (strncmpi(bp, "Thiefbane", 9)) /* not the "thief" rank */
 	if (strncmpi(bp, "magenta", 7)) /* not the "mage" rank */
 	if (mntmp < LOW_PM && strlen(bp) > 2 &&
 	    (mntmp = name_to_mon(bp)) >= LOW_PM) {
@@ -2692,6 +2693,7 @@ typfnd:
 	/* more wishing abuse: don't allow wishing for certain artifacts */
 	/* and make them pay; charge them for the wish anyway! */
 	if ((is_quest_artifact(otmp) ||
+	     (otmp->oartifact && otmp->oartifact == ART_THIEFBANE) ||
 	     (otmp->oartifact && rn2(nartifact_exist()) > 1))
 #ifdef WIZARD
 	    && !wizard
