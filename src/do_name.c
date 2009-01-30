@@ -909,7 +909,7 @@ static const char * const bogusmons[] = {
 	"hydra", "siren",			/* Greek legend */
 	"killer bunny",				/* Monty Python */
 	"rodent of unusual size",		/* The Princess Bride */
-	"Smokey the bear",	/* "Only you can prevent forest fires!" */
+	"Smokey the bear",			/* "Only you can prevent forest fires!" */
 	"Luggage",				/* Discworld */
 	"Ent",					/* Lord of the Rings */
 	"tangle tree", "nickelpede", "wiggle",	/* Xanth */
@@ -939,9 +939,13 @@ static const char * const bogusmons[] = {
 	"Barney the dinosaur",			/* saccharine kiddy TV */
 	"Morgoth",				/* Angband */
 	"Vorlon",				/* Babylon 5 */
-	"questing beast",		/* King Arthur */
+	"questing beast",			/* King Arthur */
 	"Predator",				/* Movie */
-	"mother-in-law"				/* common pest */
+	"mother-in-law",			/* common pest */
+	/* internet memes */
+	"apostroph golem",
+	"looooooooooooong cat"
+	"Bob the angry flower",
 };
 
 
