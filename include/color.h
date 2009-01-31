@@ -17,7 +17,12 @@
  * exceptions, these are listed below.	Bright black doesn't mean very
  * much, so it is used as the "default" foreground color of the screen.
  */
+
+#ifndef VIDEOSHADES
 #define CLR_BLACK		0
+#else
+# define CLR_BLACK		8
+#endif
 #define CLR_RED			1
 #define CLR_GREEN		2
 #define CLR_BROWN		3 /* on IBM, low-intensity yellow is brown */
@@ -25,7 +30,11 @@
 #define CLR_MAGENTA		5
 #define CLR_CYAN		6
 #define CLR_GRAY		7 /* low-intensity white */
+#ifndef VIDEOSHADES
 #define NO_COLOR		8
+#else
+# define NO_COLOR		0
+#endif
 #define CLR_ORANGE		9
 #define CLR_BRIGHT_GREEN	10
 #define CLR_YELLOW		11
@@ -88,6 +97,10 @@ struct text_color_option {
 	struct color_option color_option;
 	const struct text_color_option *next;
 };
+#endif
+
+#ifndef MSDOS
+extern char ttycolors[CLR_MAX];
 #endif
 
 #endif /* COLOR_H */

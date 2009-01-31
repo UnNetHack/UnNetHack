@@ -203,7 +203,7 @@ const struct symdef def_warnsyms[WARNCOUNT] = {
  *  Default screen symbols with explanations and colors.
  *  Note:  {ibm|dec|mac}_graphics[] arrays also depend on this symbol order.
  */
-const struct symdef defsyms[MAXPCHARS] = {
+struct symdef defsyms[MAXPCHARS] = {
 /* 0*/	{' ', "dark part of a room",C(NO_COLOR)},	/* stone */
 	{'|', "wall",		C(CLR_GRAY)},	/* vwall */
 	{'-', "wall",		C(CLR_GRAY)},	/* hwall */
@@ -231,7 +231,7 @@ const struct symdef defsyms[MAXPCHARS] = {
 	{'<', "ladder up",	C(CLR_BROWN)},	/* upladder */
 	{'>', "ladder down",	C(CLR_BROWN)},	/* dnladder */
 	{'_', "altar",		C(CLR_GRAY)},	/* altar */
-	{'|', "grave",      C(CLR_GRAY)},   /* grave */
+	{'|', "grave",		C(CLR_GRAY)},   /* grave */
 	{'\\', "opulent throne",C(HI_GOLD)},	/* throne */
 #ifdef SINKS
 	{'#', "sink",		C(CLR_GRAY)},	/* sink */

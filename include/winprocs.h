@@ -176,8 +176,9 @@ extern NEARDATA struct window_procs windowprocs;
 
 #define WC2_FULLSCREEN		0x01L	/* 01 display full screen                    */
 #define WC2_SOFTKEYBOARD	0x02L	/* 02 software keyboard                      */
-#define WC2_WRAPTEXT		0x04L	/* 04 wrap long lines of text                */
-					/* 29 free bits */
+#define WC2_WRAPTEXT		0x04L	/* 03 wrap long lines of text                */
+#define WC2_NEWCOLORS		0x08L	/* 04 try to use slashem colors              */
+					/* 28 free bits */
 
 #define ALIGN_LEFT	1
 #define ALIGN_RIGHT	2

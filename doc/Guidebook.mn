@@ -2003,6 +2003,11 @@ If
 .op "-@"
 is used for the role, then a random one will be automatically chosen.
 Cannot be set with the `O' command.
+.lp newcolors
+Set the color palette for tty ports to more beautiful values
+than the original NetHack palette. If black is not shown as dark gray,
+disable this option (default on).
+Cannot be set with the `O' command.
 .lp "news    "
 Read the NetHack news file, if present (default on).
 Since the news is shown at the beginning of the game, there's no point
@@ -2324,6 +2329,10 @@ Set the color palette for PC systems using NO_TERMS
 The order of colors is red, green, brown, blue, magenta, cyan,
 bright.white, bright.red, bright.green, yellow, bright.blue,
 bright.magenta, and bright.cyan.
+Other systems compiled with TTY_GRAPHICS and VIDEOSHADES allow defining 
+three more colors. The order of colors is red, green, brown, blue, 
+magenta, cyan, gray, black, bright.red, bright.green, yellow, 
+bright.blue, bright.magenta, bright.cyan and white.
 Cannot be set with the `O' command.
 .lp videoshades
 Set the intensity level of the three gray scales available

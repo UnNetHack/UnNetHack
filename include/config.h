@@ -405,6 +405,7 @@ typedef unsigned char	uchar;
 
 #ifdef TTY_GRAPHICS
 # define WIN_EDGE	/* windows aligned left&top */
+# define VIDEOSHADES    /* Slash'Em like colors */
 #endif
 
 /* End of Section 5 */

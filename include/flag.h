@@ -279,6 +279,8 @@ struct instance_flags {
 	boolean wc2_fullscreen;		/* run fullscreen */
 	boolean wc2_softkeyboard;	/* use software keyboard */
 	boolean wc2_wraptext;		/* wrap text */
+	boolean wc2_newcolors;		/* try to use slashem like colors including
+					 * dark-gray to represent black object */
 
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
 	boolean	 obsolete;	/* obsolete options can point at this, it isn't used */

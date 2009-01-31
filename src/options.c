@@ -149,6 +149,7 @@ static struct Bool_Opt
 	{"menu_tab_sep", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"mouse_support", &iflags.wc_mouse_support, TRUE, DISP_IN_GAME},	/*WC*/
+	{"newcolors", &iflags.wc2_newcolors, TRUE, SET_IN_FILE},
 #ifdef NEWS
 	{"news", &iflags.news, TRUE, DISP_IN_GAME},
 #else
@@ -354,8 +355,10 @@ static struct Comp_Opt
 #ifdef VIDEOSHADES
 	{ "videocolors", "color mappings for internal screen routines",
 						40, DISP_IN_GAME },
+#ifdef MSDOS
 	{ "videoshades", "gray shades to map to black/gray/white",
 						32, DISP_IN_GAME },
+#endif
 #endif
 #ifdef WIN32CON
 	{"subkeyvalue", "override keystroke value", 7, SET_IN_FILE},
@@ -379,7 +382,7 @@ extern boolean colors_changed;	/* in tos.c */
 
 #ifdef VIDEOSHADES
 extern char *shade[3];		  /* in sys/msdos/video.c */
-extern char ttycolors[CLR_MAX];	  /* in sys/msdos/video.c */
+extern char ttycolors[CLR_MAX];	  /* in sys/msdos/video.c, win/tty/termcap.c */
 #endif
 
 static char def_inv_order[MAXOCLASSES] = {
@@ -2203,6 +2206,7 @@ goodfruit:
 			badoption(opts);
 		return;
 	}
+# ifdef MSDOS
 	/* videoshades:string */
 	fullname = "videoshades";
 	if (match_optname(opts, fullname, 6, TRUE)) {
@@ -2217,6 +2221,7 @@ goodfruit:
 			badoption(opts);
 		return;
 	}
+# endif
 #endif /* VIDEOSHADES */
 #ifdef MSDOS
 # ifdef NO_TERMS
@@ -3448,6 +3453,7 @@ char *buf;
 		Sprintf(buf, "%s", to_be_done);
 #endif
 #ifdef VIDEOSHADES
+# ifdef MSDOS
 	else if (!strcmp(optname, "videoshades"))
 		Sprintf(buf, "%s-%s-%s", shade[0],shade[1],shade[2]);
 	else if (!strcmp(optname, "videocolors"))
@@ -3459,6 +3465,18 @@ char *buf;
 			ttycolors[CLR_YELLOW], ttycolors[CLR_BRIGHT_BLUE],
 			ttycolors[CLR_BRIGHT_MAGENTA],
 			ttycolors[CLR_BRIGHT_CYAN]);
+# else
+	else if (!strcmp(optname, "videocolors"))
+		Sprintf(buf, "%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d",
+			ttycolors[CLR_RED], ttycolors[CLR_GREEN],
+			ttycolors[CLR_BROWN], ttycolors[CLR_BLUE],
+			ttycolors[CLR_MAGENTA], ttycolors[CLR_CYAN], 
+			ttycolors[CLR_GRAY], ttycolors[CLR_BLACK],
+			ttycolors[CLR_ORANGE], ttycolors[CLR_BRIGHT_GREEN],
+			ttycolors[CLR_YELLOW], ttycolors[CLR_BRIGHT_BLUE],
+			ttycolors[CLR_BRIGHT_MAGENTA], 
+			ttycolors[CLR_BRIGHT_CYAN], ttycolors[CLR_WHITE]);
+# endif /* MSDOS */
 #endif /* VIDEOSHADES */
 	else if (!strcmp(optname, "windowtype"))
 		Sprintf(buf, "%s", windowprocs.name);
@@ -3931,6 +3949,7 @@ struct wc_Opt wc_options[] = {
 
 struct wc_Opt wc2_options[] = {
 	{"fullscreen", WC2_FULLSCREEN},
+	{"newcolors", WC2_NEWCOLORS},
 	{"softkeyboard", WC2_SOFTKEYBOARD},
 	{"wraptext", WC2_WRAPTEXT},
 	{(char *)0, 0L}

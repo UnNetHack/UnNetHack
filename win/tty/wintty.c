@@ -50,7 +50,11 @@ struct window_procs tty_procs = {
     WC_MOUSE_SUPPORT|
 #endif
     WC_COLOR|WC_HILITE_PET|WC_INVERSE|WC_EIGHT_BIT_IN,
+#ifdef TERMINFO
+    WC2_NEWCOLORS,
+#else
     0L,
+#endif
     tty_init_nhwindows,
     tty_player_selection,
     tty_askname,

@@ -87,6 +87,116 @@ STATIC_VAR char tgotobuf[20];
 # endif
 #endif /* TERMLIB */
 
+#ifndef MSDOS
+
+STATIC_DCL void NDECL(init_ttycolor);
+
+boolean colorflag = FALSE;			/* colors are initialized */
+char ttycolors[CLR_MAX];
+
+void
+init_ttycolor()
+{
+	if (!colorflag) {
+		ttycolors[CLR_RED]		= CLR_RED;
+		ttycolors[CLR_GREEN]		= CLR_GREEN;
+		ttycolors[CLR_BROWN]		= CLR_BROWN;
+		ttycolors[CLR_BLUE]		= CLR_BLUE;
+		ttycolors[CLR_MAGENTA]		= CLR_MAGENTA;
+		ttycolors[CLR_CYAN]		= CLR_CYAN;
+		ttycolors[CLR_GRAY]		= CLR_GRAY;
+		if (iflags.wc2_newcolors) {
+			ttycolors[CLR_BLACK]	= CLR_BLACK;
+			defsyms[S_corr].color	= CLR_BLACK;
+			defsyms[S_dnstair].color= CLR_WHITE;
+			defsyms[S_upstair].color= CLR_WHITE;
+		} else {
+			ttycolors[CLR_BLACK]	= CLR_BLUE;
+		}
+		ttycolors[CLR_ORANGE]		= CLR_ORANGE;
+		ttycolors[CLR_BRIGHT_GREEN]	= CLR_BRIGHT_GREEN;
+		ttycolors[CLR_YELLOW]		= CLR_YELLOW;
+		ttycolors[CLR_BRIGHT_BLUE]	= CLR_BRIGHT_BLUE;
+		ttycolors[CLR_BRIGHT_MAGENTA]	= CLR_BRIGHT_MAGENTA;
+		ttycolors[CLR_BRIGHT_CYAN]	= CLR_BRIGHT_CYAN;
+		ttycolors[CLR_WHITE]		= CLR_WHITE;
+	}
+}
+
+static int FDECL(convert_uchars,(char *, uchar *, int));
+
+/*
+ * OPTIONS=videocolors:1-2-3-4-5-6-7-8-9-10-11-12-13-14-15
+ * Left to right assignments for:
+ *	red	green	 brown	blue	magenta	cyan	gray	black
+ *	orange	br.green yellow	br.blue	br.mag	br.cyan	white
+ */
+int assign_videocolors(char *colorvals)
+{
+	int i,icolor;
+	uchar *tmpcolor;
+
+	init_ttycolor();
+
+	i = strlen(colorvals);
+	tmpcolor = (uchar *)alloc(i);
+	if (convert_uchars(colorvals,tmpcolor,i) < 0) return FALSE;
+
+	icolor = CLR_RED;
+	for( i = 0; tmpcolor[i] != 0; ++i) {
+	    if (icolor <= CLR_WHITE)
+		ttycolors[icolor++] = tmpcolor[i];
+	}
+
+	colorflag = TRUE;
+	free((genericptr_t)tmpcolor);
+	return 1;
+}
+
+static int
+convert_uchars(bufp,list,size)
+    char *bufp; 	/* current pointer */
+    uchar *list;	/* return list */
+    int size;
+{
+    unsigned int num = 0;
+    int count = 0;
+
+    list[count] = 0;
+
+    while (1) {
+	switch(*bufp) {
+	    case ' ':  case '\0':
+	    case '\t': case '-':
+	    case '\n':
+		if (num) {
+		    list[count++] = num;
+		    list[count] = 0;
+		    num = 0;
+		}
+		if ((count==size) || !*bufp) return count;
+		bufp++;
+		break;
+	    case '#': 
+		if (num) {
+		    list[count++] = num;
+		    list[count] = 0;
+		}
+		return count;
+	    case '0': case '1': case '2': case '3':
+	    case '4': case '5': case '6': case '7':
+	    case '8': case '9':
+		num = num*10 + (*bufp-'0');
+		if (num > 15) return -1;
+		bufp++;
+		break;
+	    default: return -1;
+	}
+    }
+    /*NOTREACHED*/
+}
+#endif /* !MSDOS */
+
 #ifdef OVLB
 
 void
@@ -98,6 +208,15 @@ int *wid, *hgt;
 	register const char *term;
 	register char *tptr;
 	char *tbufptr, *pc;
+#endif
+
+#ifdef TEXTCOLOR
+# ifndef MSDOS
+	init_ttycolor();
+# endif
+#endif
+
+#ifdef TERMLIB
 
 # ifdef VMS
 	term = verify_termcap();
@@ -177,7 +296,7 @@ int *wid, *hgt;
 		    if (i != CLR_BLACK) {
 			hilites[i|BRIGHT] = (char *) alloc(sizeof("\033[1;3%dm"));
 			Sprintf(hilites[i|BRIGHT], "\033[1;3%dm", i);
-			if (i != CLR_GRAY)
+			if (iflags.wc2_newcolors || (i != CLR_GRAY))
 #   ifdef MICRO
 			    if (i == CLR_BLUE) hilites[CLR_BLUE] = hilites[CLR_BLUE|BRIGHT];
 			    else
@@ -444,12 +563,12 @@ tty_ascgraphics_hilite_fixup()
 
     for (c = 0; c < CLR_MAX / 2; c++)
 	if (c != CLR_BLACK) {
-	    hilites[c|BRIGHT] = (char *) alloc(sizeof("\033[1;3%dm"));
-	    Sprintf(hilites[c|BRIGHT], "\033[1;3%dm", c);
-	    if (c != CLR_GRAY) {
-		    hilites[c] = (char *) alloc(sizeof("\033[0;3%dm"));
-		    Sprintf(hilites[c], "\033[0;3%dm", c);
-	    }
+		hilites[c|BRIGHT] = (char *) alloc(sizeof("\033[1;3%dm"));
+		Sprintf(hilites[c|BRIGHT], "\033[1;3%dm", c);
+		if (iflags.wc2_newcolors || (c != CLR_GRAY)) {
+			hilites[c] = (char *) alloc(sizeof("\033[0;3%dm"));
+			Sprintf(hilites[c], "\033[0;3%dm", c);
+		}
 	}
 }
 #endif /* PC9800 */
@@ -840,9 +959,14 @@ extern char *tparm();
 #endif
 
 #  ifdef COLOR_BLACK	/* trust include file */
+#ifndef VIDEOSHADES
 #undef COLOR_BLACK
+#endif
 #  else
 #   ifndef _M_UNIX	/* guess BGR */
+#ifdef VIDEOSHADES
+#define COLOR_BLACK   0
+#endif
 #define COLOR_BLUE    1
 #define COLOR_GREEN   2
 #define COLOR_CYAN    3
@@ -860,7 +984,9 @@ extern char *tparm();
 #define COLOR_WHITE   7
 #   endif
 #  endif
+#ifndef VIDEOSHADES
 #define COLOR_BLACK COLOR_BLUE
+#endif
 
 const int ti_map[8] = {
 	COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
@@ -883,7 +1009,7 @@ init_hilite()
 
 	for (c = 0; c < CLR_MAX / 2; c++) {
 	    scratch = tparm(setf, ti_map[c]);
-	    if (c != CLR_GRAY) {
+	    if (iflags.wc2_newcolors || (c != CLR_GRAY)) {
 		hilites[c] = (char *) alloc(strlen(scratch) + 1);
 		Strcpy(hilites[c], scratch);
 	    }
@@ -894,6 +1020,8 @@ init_hilite()
 	    }
 
 	}
+	if (!iflags.wc2_newcolors)
+		hilites[CLR_BLACK] = hilites[CLR_BLUE];
 }
 
 # else /* UNIX && TERMINFO */
@@ -1049,11 +1177,14 @@ kill_hilite()
 	register int c;
 
 	for (c = 0; c < CLR_MAX / 2; c++) {
-	    if (hilites[c|BRIGHT] == hilites[c])  hilites[c|BRIGHT] = 0;
-	    if (hilites[c] && (hilites[c] != nh_HI))
-		free((genericptr_t) hilites[c]),  hilites[c] = 0;
-	    if (hilites[c|BRIGHT] && (hilites[c|BRIGHT] != nh_HI))
-		free((genericptr_t) hilites[c|BRIGHT]),  hilites[c|BRIGHT] = 0;
+		if ((!iflags.wc2_newcolors) &&
+		    (c == CLR_BLUE || c == CLR_GRAY)) continue;
+
+		if (hilites[c|BRIGHT] == hilites[c])  hilites[c|BRIGHT] = 0;
+		if (hilites[c] && (hilites[c] != nh_HI))
+			free((genericptr_t) hilites[c]),  hilites[c] = 0;
+		if (hilites[c|BRIGHT] && (hilites[c|BRIGHT] != nh_HI))
+			free((genericptr_t) hilites[c|BRIGHT]),  hilites[c|BRIGHT] = 0;
 	}
 # endif
 	return;
@@ -1146,7 +1277,10 @@ void
 term_start_color(color)
 int color;
 {
-	xputs(hilites[color]);
+	if (iflags.wc2_newcolors)
+		xputs(hilites[ttycolors[color]]);
+	else
+		xputs(hilites[color]);
 }
 
 
