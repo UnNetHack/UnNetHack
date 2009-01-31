@@ -61,18 +61,19 @@ extern NEARDATA coord doors[DOORMAX];
 #define LEPREHALL	11	/* leprechaun hall (Tom Proudfoot) */
 #define COCKNEST	12	/* cockatrice nest (Tom Proudfoot) */
 #define ANTHOLE		13	/* ants (Tom Proudfoot) */
-#define SHOPBASE	14	/* everything above this is a shop */
-#define ARMORSHOP	15	/* specific shop defines for level compiler */
-#define SCROLLSHOP	16
-#define POTIONSHOP	17
-#define WEAPONSHOP	18
-#define FOODSHOP	19
-#define RINGSHOP	20
-#define WANDSHOP	21
-#define TOOLSHOP	22
-#define BOOKSHOP	23
-#define UNIQUESHOP	24	/* shops here & above not randomly gen'd. */
-#define CANDLESHOP	24
+#define GARDEN		14	/* nymphs, trees and fountains */
+#define SHOPBASE	15	/* everything above this is a shop */
+#define ARMORSHOP	(SHOPBASE+ 1)	/* specific shop defines for level compiler */
+#define SCROLLSHOP	(SHOPBASE+ 2)
+#define POTIONSHOP	(SHOPBASE+ 3)
+#define WEAPONSHOP	(SHOPBASE+ 4)
+#define FOODSHOP	(SHOPBASE+ 5)
+#define RINGSHOP	(SHOPBASE+ 6)
+#define WANDSHOP	(SHOPBASE+ 7)
+#define TOOLSHOP	(SHOPBASE+ 8)
+#define BOOKSHOP	(SHOPBASE+ 9)
+#define UNIQUESHOP	(SHOPBASE+10)	/* shops here & above not randomly gen'd. */
+#define CANDLESHOP	(UNIQUESHOP)
 #ifdef BLACKMARKET
 #define BLACKSHOP       (UNIQUESHOP+1)
 #define MAXRTYPE        (UNIQUESHOP+1)      /* maximum valid room type */

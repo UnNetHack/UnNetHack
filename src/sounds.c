@@ -87,6 +87,16 @@ dosounds()
 	    }
 	}
     }
+    if (level.flags.has_garden && !rn2(200)) {
+	static const char *garden_msg[4] = {
+		"crickets chirping!",
+		"birds singing!",
+		"grass growing!",
+		"wind in the willows!",
+	};
+	You_hear(garden_msg[rn2(2) + 2 * hallu]);
+	return;
+    }
     if (level.flags.has_swamp && !rn2(200)) {
 	static const char * const swamp_msg[3] = {
 		"hear mosquitoes!",
