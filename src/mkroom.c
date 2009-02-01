@@ -25,6 +25,7 @@ STATIC_DCL coord * FDECL(shrine_pos, (int));
 STATIC_DCL struct permonst * NDECL(morguemon);
 STATIC_DCL struct permonst * NDECL(antholemon);
 STATIC_DCL struct permonst * NDECL(squadmon);
+STATIC_DCL struct permonst * NDECL(armorymon);
 STATIC_DCL void FDECL(save_room, (int,struct mkroom *));
 STATIC_DCL void FDECL(rest_room, (int,struct mkroom *));
 #endif /* OVLB */
@@ -62,6 +63,7 @@ int	roomtype;
 	case TEMPLE:	mktemple(); break;
 	case LEPREHALL:	mkzoo(LEPREHALL); break;
 	case COCKNEST:	mkzoo(COCKNEST); break;
+	case ARMORY:	mkzoo(ARMORY); break;
 	case ANTHOLE:	mkzoo(ANTHOLE); break;
 	default:	impossible("Tried to make a room of type %d.", roomtype);
     }
@@ -106,6 +108,10 @@ mkshop()
 			}
 			if(*ep == 'c' || *ep == 'C'){
 				mkzoo(COCKNEST);
+				return;
+			}
+			if(*ep == 'r' || *ep == 'R'){
+				mkzoo(ARMORY);
 				return;
 			}
 			if(*ep == 'l' || *ep == 'L'){
@@ -299,7 +305,8 @@ struct mkroom *sroom;
 		/* don't place monster on explicitly placed throne */
 		if(type == COURT && IS_THRONE(levl[sx][sy].typ))
 		    continue;
-		mon = makemon(
+               /* armories don't contain as many monsters */
+		if (type != ARMORY || rn2(2)) mon = makemon(
 		    (type == COURT) ? courtmon() :
 		    (type == BARRACKS) ? squadmon() :
 		    (type == MORGUE) ? morguemon() :
@@ -308,9 +315,12 @@ struct mkroom *sroom;
 			 &mons[PM_KILLER_BEE]) :
 		    (type == LEPREHALL) ? &mons[PM_LEPRECHAUN] :
 		    (type == COCKNEST) ? &mons[PM_COCKATRICE] :
+                   (type == ARMORY) ? (rn2(3) ? mkclass(S_RUSTMONST,0) :
+                       &mons[PM_BROWN_PUDDING]) :
 		    (type == ANTHOLE) ? antholemon() :
 		    (struct permonst *) 0,
 		   sx, sy, NO_MM_FLAGS);
+               else mon = ((struct monst *)0);
 		if(mon) {
 			mon->msleeping = 1;
 			if (type==COURT && mon->mpeaceful) {
@@ -361,6 +371,18 @@ struct mkroom *sroom;
 						mkobj(RANDOM_CLASS, FALSE));
 				sobj->owt = weight(sobj);
 			    }
+			}
+			break;
+		    case ARMORY:
+			{
+				struct obj *otmp;
+				if (rn2(2))
+					otmp = mkobj_at(WEAPON_CLASS, sx, sy, FALSE);
+				else
+					otmp = mkobj_at(ARMOR_CLASS, sx, sy, FALSE);
+				otmp->spe = 0;
+				if (is_rustprone(otmp)) otmp->oeroded = rn2(4);
+				else if (is_rottable(otmp)) otmp->oeroded2 = rn2(4);
 			}
 			break;
 		    case ANTHOLE:

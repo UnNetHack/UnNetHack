@@ -1784,6 +1784,9 @@ register boolean newlev;
 		case COCKNEST:
 		    You("enter a disgusting nest!");
 		    break;
+               case ARMORY:
+                   You("enter a dilapidated armory.");
+                   break;
 		case ANTHOLE:
 		    You("enter an anthole!");
 		    break;
