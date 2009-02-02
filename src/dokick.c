@@ -1026,10 +1026,12 @@ dumb:
 		if (martial() || ACURR(A_DEX) >= 16 || rn2(3)) {
 			You("kick at empty space.");
 			if (Blind) feel_location(x,y);
+			return 1;
 		} else {
 			pline("Dumb move!  You strain a muscle.");
 			exercise(A_STR, FALSE);
 			set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
+			return 1;
 		}
 		if ((Is_airlevel(&u.uz) || Levitation) && rn2(2)) {
 		    hurtle(-u.dx, -u.dy, 1, TRUE);
