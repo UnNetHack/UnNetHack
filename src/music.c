@@ -550,7 +550,7 @@ struct obj *instr;
 				close_drawbridge(x,y);
 			    else
 				open_drawbridge(x,y);
-			    return 0;
+			    return 1;
 			}
 	    } else if(flags.soundok) {
 		if (u.uevent.uheard_tune < 1) u.uevent.uheard_tune = 1;
