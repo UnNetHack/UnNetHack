@@ -1699,6 +1699,7 @@ const char *fltxt;
 int how;
 {
 	boolean be_sad = FALSE;		/* true if unseen pet is killed */
+	boolean kenny = (!strcmp(m_monnam(mdef), "Kenny"));
 
 	if ((mdef->wormno ? worm_known(mdef) : cansee(mdef->mx, mdef->my))
 		&& fltxt)
@@ -1716,8 +1717,15 @@ int how;
 	else
 	    mondied(mdef);
 
-	if (be_sad && mdef->mhp <= 0)
-	    You("have a sad feeling for a moment, then it passes.");
+	if (be_sad && mdef->mhp <= 0) {
+		if (kenny || (Hallucination && !rn2(4))) {
+			verbalize("Oh my god, they killed Kenny!");
+			verbalize("You bastards!");
+		} else {
+			You("have a %s feeling for a moment, then it passes.",
+			    (Hallucination ? "plaid" : "sad"));
+		}
+	}
 }
 
 void
