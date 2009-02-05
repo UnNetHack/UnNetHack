@@ -247,7 +247,7 @@ struct obj *corpse;
 	if (uball) uball->owornmask = uchain->owornmask = 0;
 
 	/* extinguish armor */
-	if (uarm && Is_dragon_armor(uarm))
+	if (uarm && Is_gold_dragon_armor(uarm))
 		end_burn(uarm,FALSE);
 
 	/* dispose of your possessions, usually cursed */
