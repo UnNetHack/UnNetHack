@@ -193,7 +193,7 @@ struct obj* tobj;
 	    return TRUE;
 	}
 	/* using a stethoscope on a safe?  You safe-cracker, you. */
-	if (otmp = sobj_at(IRON_SAFE,rx,ry)) {
+	if ((otmp = sobj_at(IRON_SAFE,rx,ry))) {
 		pick_lock(tobj,rx,ry);
 		return TRUE;
 	}

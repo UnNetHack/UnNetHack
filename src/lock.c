@@ -79,8 +79,6 @@ int
 picklock()	/* try to open/close a lock */
 {
 
-	int rn;
-
 	if (xlock.box) {
 	    if(((xlock.box->ox != u.ux) || (xlock.box->oy != u.uy)) &&
 				 (xlock.box->otyp != IRON_SAFE || abs(xlock.box->oy - u.uy) > 1 ||
@@ -293,7 +291,7 @@ int rx,ry;
 
 	/* Very clumsy special case for this, but forcing the player to
 	 * a)pply > just to open a safe, when a)pply . works in all other cases? */
-	if (cc.x == u.ux && cc.y == u.uy || picktyp == STETHOSCOPE) {	/* pick lock on a container */
+	if ((cc.x == u.ux && cc.y == u.uy) || picktyp == STETHOSCOPE) {	/* pick lock on a container */
 	    const char *verb;
 	    boolean it;
 	    int count;

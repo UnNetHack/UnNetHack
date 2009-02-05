@@ -872,6 +872,9 @@ E boolean FDECL(boxlock, (struct obj *,struct obj *));
 E boolean FDECL(doorlock, (struct obj *,int,int));
 E int NDECL(doopen);
 E int NDECL(doclose);
+#ifdef AUTO_OPEN
+E  int FDECL(doopen_indir,(int,int));
+#endif
 
 #ifdef MAC
 /* These declarations are here because the main code calls them. */

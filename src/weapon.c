@@ -832,7 +832,7 @@ int skill;
 	P_NAME(skill));
 }
 
-const static struct skill_range {
+static const struct skill_range {
 	short first, last;
 	const char *name;
 } skill_ranges[] = {
