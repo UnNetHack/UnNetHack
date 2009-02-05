@@ -358,7 +358,7 @@ struct mkroom *sroom;
 			break;
 		    case BARRACKS:
 			if(!rn2(20))	/* the payroll and some loot */
-			    (void) mksobj_at((rn2(3)) ? LARGE_BOX : CHEST,
+			    (void) mksobj_at((rn2(3) || depth(&u.uz) < 16) ? CHEST : IRON_SAFE,
 					     sx, sy, TRUE, FALSE);
 			break;
 		    case COCKNEST:
@@ -399,7 +399,11 @@ struct mkroom *sroom;
 		  (void) somexy(sroom, &mm);
 		  (void) mkgold((long) rn1(50 * level_difficulty(),10), mm.x, mm.y);
 		  /* the royal coffers */
-		  chest = mksobj_at(CHEST, mm.x, mm.y, TRUE, FALSE);
+		  if (depth(&u.uz) > 15) {
+		  	chest = mksobj_at(IRON_SAFE, mm.x, mm.y, TRUE, FALSE);
+		  } else {
+		  	chest = mksobj_at(CHEST, mm.x, mm.y, TRUE, FALSE);
+		  }
 		  chest->spe = 2; /* so it can be found later */
 		  level.flags.has_court = 1;
 		  break;

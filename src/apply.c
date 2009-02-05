@@ -15,7 +15,7 @@ static const char tools_too[] = { ALL_CLASSES, TOOL_CLASS, POTION_CLASS,
 STATIC_DCL int FDECL(use_camera, (struct obj *));
 #endif
 STATIC_DCL int FDECL(use_towel, (struct obj *));
-STATIC_DCL boolean FDECL(its_dead, (int,int,int *));
+STATIC_DCL boolean FDECL(its_dead, (int,int,int *,struct obj*));
 STATIC_DCL int FDECL(use_stethoscope, (struct obj *));
 STATIC_DCL void FDECL(use_whistle, (struct obj *));
 STATIC_DCL void FDECL(use_magic_whistle, (struct obj *));
@@ -159,8 +159,9 @@ use_towel(obj)
 
 /* maybe give a stethoscope message based on floor objects */
 STATIC_OVL boolean
-its_dead(rx, ry, resp)
+its_dead(rx, ry, resp, tobj)
 int rx, ry, *resp;
+struct obj* tobj;
 {
 	struct obj *otmp;
 	struct trap *ttmp;
@@ -191,6 +192,12 @@ int rx, ry, *resp;
 	    }
 	    return TRUE;
 	}
+	/* using a stethoscope on a safe?  You safe-cracker, you. */
+	if (otmp = sobj_at(IRON_SAFE,rx,ry)) {
+		pick_lock(tobj,rx,ry);
+		return TRUE;
+	}
+
 	return FALSE;
 }
 
@@ -249,7 +256,7 @@ use_stethoscope(obj)
 		else if (u.dz < 0 || !can_reach_floor())
 		    You_cant("reach the %s.",
 			(u.dz > 0) ? surface(u.ux,u.uy) : ceiling(u.ux,u.uy));
-		else if (its_dead(u.ux, u.uy, &res))
+		else if (its_dead(u.ux, u.uy, &res, obj))
 		    ;	/* message already given */
 		else if (Is_stronghold(&u.uz))
 		    You_hear("the crackling of hellfire.");
@@ -302,7 +309,7 @@ use_stethoscope(obj)
 		return res;
 	}
 
-	if (!its_dead(rx, ry, &res))
+	if (!its_dead(rx, ry, &res, obj))
 	    You("hear nothing special.");	/* not You_hear()  */
 	return res;
 }
@@ -2830,6 +2837,7 @@ doapply()
 	case SACK:
 	case BAG_OF_HOLDING:
 	case OILSKIN_SACK:
+	case IRON_SAFE:
 		res = use_container(obj, 1);
 		break;
 	case BAG_OF_TRICKS:
@@ -2843,7 +2851,7 @@ doapply()
 	case CREDIT_CARD:
 #endif
 	case SKELETON_KEY:
-		(void) pick_lock(obj);
+		(void) pick_lock(obj,0,0);
 		break;
 	case PICK_AXE:
 	case DWARVISH_MATTOCK:

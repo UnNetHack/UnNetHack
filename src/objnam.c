@@ -2517,7 +2517,7 @@ typfnd:
 			break;
 		case SLIME_MOLD: otmp->spe = ftype;
 			/* Fall through */
-		case SKELETON_KEY: case CHEST: case LARGE_BOX:
+		case SKELETON_KEY: case CHEST: case LARGE_BOX: case IRON_SAFE:
 		case HEAVY_IRON_BALL: case IRON_CHAIN: case STATUE:
 			/* otmp->cobj already done in mksobj() */
 				break;

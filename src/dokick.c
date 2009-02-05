@@ -506,9 +506,13 @@ xchar x, y;
 	if(Is_box(kickobj)) {
 		boolean otrp = kickobj->otrapped;
 
-		if(range < 2) pline("THUD!");
+		if(range < 2) pline("%s",kickobj->otyp == IRON_SAFE ? "CLANG!" : "THUD!");
 
 		container_impact_dmg(kickobj);
+
+		if (kickobj->otyp == IRON_SAFE) { /* can't kick these open or break 'em */
+			return 1;
+		}
 
 		if (kickobj->olocked) {
 		    if (!rn2(5) || (martial() && !rn2(2))) {

@@ -2613,6 +2613,7 @@ xchar x, y;
 	if (Is_container(obj)) {
 	    switch (obj->otyp) {
 	    case ICE_BOX:
+	    case IRON_SAFE:
 		continue;		/* Immune */
 		/*NOTREACHED*/
 		break;

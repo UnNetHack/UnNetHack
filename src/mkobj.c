@@ -145,6 +145,7 @@ struct obj *box;
 
 	switch (box->otyp) {
 	case ICE_BOX:		n = 20; break;
+	case IRON_SAFE:		n = 10; break;
 	case CHEST:		n = 5; break;
 	case LARGE_BOX:		n = 3; break;
 	case SACK:
@@ -481,8 +482,13 @@ boolean artif;
 					otmp->lamplit = 0;
 					blessorcurse(otmp, 2);
 					break;
+		case IRON_SAFE:
+					otmp->olocked = 1;
 		case CHEST:
-		case LARGE_BOX:		otmp->olocked = !!(rn2(5));
+		case LARGE_BOX:		
+					if (otmp->otyp != IRON_SAFE) {
+						otmp->olocked = !!(rn2(5));  /* clumsy tweak */
+					}
 					otmp->otrapped = !(rn2(10));
 		case ICE_BOX:
 		case SACK:

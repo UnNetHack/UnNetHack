@@ -636,7 +636,7 @@ makelevel()
 	register int x, y;
 	struct monst *tmonst;	/* always put a web with a spider */
 	branch *branchp;
-	int room_threshold;
+	int room_threshold, boxtype;
 
 	if(wiz1_level.dlevel == 0) init_dungeons();
 	oinit();	/* assign level dependent obj probabilities */
@@ -823,14 +823,24 @@ skip0:
 		    (void) mkcorpstat(STATUE, (struct monst *)0,
 				      (struct permonst *)0,
 				      somex(croom), somey(croom), TRUE);
-		/* put box/chest inside;
+		/* put box/chest/safe inside;
 		 *  40% chance for at least 1 box, regardless of number
 		 *  of rooms; about 5 - 7.5% for 2 boxes, least likely
 		 *  when few rooms; chance for 3 or more is neglible.
+		 *
+		 *  Safes only show up below level 15 since they're not unlockable.
 		 */
-		if(!rn2(nroom * 5 / 2))
-		    (void) mksobj_at((rn2(3)) ? LARGE_BOX : CHEST,
-				     somex(croom), somey(croom), TRUE, FALSE);
+		if(!rn2(nroom * 5 / 2)) {
+			x = rn2(5);
+			if (!x && depth(&u.uz) > 15) {
+				boxtype = IRON_SAFE;
+			} else if (x > 2) {
+				boxtype = CHEST;
+			} else {
+				boxtype = LARGE_BOX;
+			}
+			(void) mksobj_at(boxtype, somex(croom), somey(croom), TRUE, FALSE);
+		}
 
 		/* maybe make some graffiti */
 		if(!rn2(27 + 3 * abs(depth(&u.uz)))) {
