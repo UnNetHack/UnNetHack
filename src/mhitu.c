@@ -1129,7 +1129,7 @@ dopois:
 		break;
 	    case AD_DRLI:
 		hitmsg(mtmp, mattk);
-		if (uncancelled && !rn2(3) && !Drain_resistance) {
+		if ((uncancelled || mdat == &mons[PM_VLAD_THE_IMPALER]) && !rn2(3) && !Drain_resistance) {
 		    losexp("life drainage");
 		}
 		break;
