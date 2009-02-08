@@ -3270,7 +3270,7 @@ struct trap *ttmp;
 	You("repair the squeaky board.");	/* no madeby_u */
 	deltrap(ttmp);
 	newsym(u.ux + u.dx, u.uy + u.dy);
-	more_experienced(1, 5);
+	more_experienced(1, 1, 5);
 	newexplevel();
 	return 1;
 }

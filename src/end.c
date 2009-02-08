@@ -513,7 +513,7 @@ winid endwin;
 	    value = arti_cost(otmp);	/* zorkmid value */
 	    points = value * 5 / 2;	/* score value */
 	    if (counting) {
-		u.urexp += points;
+		u.urscore += points;
 	    } else {
 		makeknown(otmp->otyp);
 		otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
@@ -722,11 +722,11 @@ die:
 		tmp = 0L;
 	    if (how < PANICKED)
 		tmp -= tmp / 10L;
-	    u.urexp += tmp;
-	    u.urexp += 50L * (long)(deepest - 1);
+	    u.urscore += tmp;
+	    u.urscore += 50L * (long)(deepest - 1);
 	    if (deepest > 20)
-		u.urexp += 1000L * (long)((deepest > 30) ? 10 : deepest - 20);
-	    if (how == ASCENDED) u.urexp *= 2L;
+		u.urscore += 1000L * (long)((deepest > 30) ? 10 : deepest - 20);
+	    if (how == ASCENDED) u.urscore *= 2L;
 	}
 
 	if (bones_ok) {
@@ -802,7 +802,7 @@ die:
 	    for (val = valuables; val->list; val++)
 		for (i = 0; i < val->size; i++)
 		    if (val->list[i].count != 0L)
-			u.urexp += val->list[i].count
+			u.urscore += val->list[i].count
 				  * (long)objects[val->list[i].typ].oc_cost;
 
 	    /* count the points for artifacts */
@@ -817,7 +817,7 @@ die:
 		    if (!done_stopprint)
 			Sprintf(eos(pbuf), " and %s", mon_nam(mtmp));
 		    if (mtmp->mtame)
-			u.urexp += mtmp->mhp;
+			u.urscore += mtmp->mhp;
 		    mtmp = mtmp->nmon;
 		}
 		if (!done_stopprint) putstr(endwin, 0, pbuf);
@@ -829,7 +829,7 @@ die:
 		Sprintf(eos(pbuf), "%s with %ld point%s,",
 			how==ASCENDED ? "went to your reward" :
 					"escaped from the dungeon",
-			u.urexp, plur(u.urexp));
+			u.urscore, plur(u.urscore));
 		putstr(endwin, 0, pbuf);
 	    }
 
@@ -883,7 +883,7 @@ die:
 	    }
 
 	    Sprintf(eos(pbuf), " with %ld point%s,",
-		    u.urexp, plur(u.urexp));
+		    u.urscore, plur(u.urscore));
 	    putstr(endwin, 0, pbuf);
 	}
 

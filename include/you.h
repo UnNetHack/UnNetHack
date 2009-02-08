@@ -342,6 +342,7 @@ struct you {
 	long	umoney0;
 #endif
 	long	uexp, urexp;
+	long	urscore;	/**< the current score */
 	long	ucleansed;	/* to record moves when player was cleansed */
 	long	usleep;		/* sleeping; monstermove you last started */
 	int uinvault;

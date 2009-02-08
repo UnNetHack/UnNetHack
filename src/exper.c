@@ -95,12 +95,16 @@ experience(mtmp, nk)	/* return # of exp points for mtmp after nk killed */
 	return(tmp);
 }
 
+/**
+ * Adds to Experience and Scoring counter
+ */
 void
-more_experienced(exp, rexp)
-	register int exp, rexp;
+more_experienced(exp, score, rexp)
+	register int exp, score, rexp;
 {
 	u.uexp += exp;
 	u.urexp += 4*exp + rexp;
+	u.urscore += 4*score + rexp;
 	if(exp
 #ifdef SCORE_ON_BOTL
 	   || flags.showscore

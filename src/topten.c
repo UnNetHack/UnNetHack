@@ -416,7 +416,7 @@ int how;
 	t0->ver_major = VERSION_MAJOR;
 	t0->ver_minor = VERSION_MINOR;
 	t0->patchlevel = PATCHLEVEL;
-	t0->points = u.urexp;
+	t0->points = u.urscore;
 	t0->deathdnum = u.uz.dnum;
 	t0->deathlev = observable_depth(&u.uz);
 	t0->maxlvl = deepest_lev_reached(TRUE);
