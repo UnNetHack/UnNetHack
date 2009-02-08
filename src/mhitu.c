@@ -1177,6 +1177,26 @@ dopois:
 		  }
 		  break;
 		}
+	    case AD_HEAD:
+		if ((!rn2(40) || youmonst.data->mlet == S_JABBERWOCK) && !mtmp->mcan) {
+			if (!has_head(youmonst.data)) {
+				pline("Somehow, %s misses you wildly.", mon_nam(mtmp));
+				dmg = 0;
+				break;
+			}
+			if (noncorporeal(youmonst.data) || amorphous(youmonst.data)) {
+				pline("%s slices through your %s.",
+						Monnam(mtmp), body_part(NECK));
+				break;
+			} 
+			pline("%s %ss you!", Monnam(mtmp),
+					rn2(2) ? "behead" : "decapitate");
+			if (Upolyd) rehumanize();
+			else done_in_by(mtmp);
+			dmg = 0;
+		} 
+		else hitmsg(mtmp, mattk);
+		break;
 	    case AD_STON:	/* cockatrice */
 		hitmsg(mtmp, mattk);
 		if(!rn2(3)) {

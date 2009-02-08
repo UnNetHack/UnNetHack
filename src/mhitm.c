@@ -680,6 +680,27 @@ mdamagem(magr, mdef, mattk)
 		    break;
 		}
 		goto physical;
+	    case AD_HEAD:
+		if ((!rn2(40) || mdef->data->mlet == S_JABBERWOCK) && !magr->mcan) {
+			Strcpy(buf, Monnam(magr));
+			if (!has_head(mdef->data)) {
+				pline("Somehow, %s misses %s wildly.", buf, mon_nam(mdef));
+				tmp = 0;
+				break;
+			}
+			if (noncorporeal(mdef->data) || amorphous(mdef->data)) {
+				pline("%s slices through %s %s.",
+						buf, s_suffix(mon_nam(mdef)),
+						mbodypart(mdef,NECK));
+				goto physical;
+			}
+			pline("%s %ss %s!", buf,
+					rn2(2) ? "behead" : "decapitate", mon_nam(mdef));
+			mondied(mdef);
+			if (mdef->mhp > 0) return 0;
+			return (MM_DEF_DIED | (grow_up(magr,mdef) ?
+						0 : MM_AGR_DIED));
+		} 
 	    case AD_WERE:
 	    case AD_HEAL:
 	    case AD_PHYS:
