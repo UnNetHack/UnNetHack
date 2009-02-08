@@ -575,6 +575,7 @@ AMULET((char *)0,                 "warped",     0, 0),
 AMULET((char *)0,                 "convex",     0, 0),
 AMULET((char *)0,                 "lunate",     0, 0),
 AMULET((char *)0,                 "spiked",     0, 0),
+AMULET((char *)0,                 "oval",       0, 0),
 AMULET((char *)0,                 "rectangular",0, 0),
 AMULET((char *)0,                 "elliptic",   0, 0),
 OBJECT(OBJ("cheap plastic imitation of the Amulet of Yendor",
@@ -818,10 +819,21 @@ SCROLL("stinking cloud",        "VELOX NEB",            1,  15, 300),
 SCROLL((char *)0,               "FOOBIE BLETCH",        1,   0, 100),
 SCROLL((char *)0,               "TEMOV",                1,   0, 100),
 SCROLL((char *)0,               "GARVEN DEH",           1,   0, 100),
-SCROLL((char *)0,               "READ ME",              1,   0, 100),
+SCROLL((char *)0,               "READ ME",              1,   0, 100), /* Lewis Carroll */
 SCROLL((char *)0,               "ETAOIN SHRDLU",        1,   0, 100),
 SCROLL((char *)0,               "LOREM IPSUM",          1,   0, 100),
-SCROLL((char *)0,               "FNORD",                1,   0, 100),
+SCROLL((char *)0,               "FNORD",                1,   0, 100), /* Illuminati */
+SCROLL((char *)0,               "KO BATE",              1,   0, 100), /* Kurd Lasswitz */
+SCROLL((char *)0,               "ACHAT SHTAYIM SHALOSH",1,   0, 100), /* Uri Geller */
+SCROLL((char *)0,               "ABRA KA DABRA",        1,   0, 100), /* traditional incantation */
+SCROLL((char *)0,               "ASHPD",                1,   0, 100), /* Portal */
+SCROLL((char *)0,               "SODALG",               1,   0, 100), /* Portal */
+SCROLL((char *)0,               "ZLORFIK",              1,   0, 100), /* Zak McKracken */
+SCROLL((char *)0,               "HAPAX LEGOMENON",      1,   0, 100),
+SCROLL((char *)0,               "HZLRC KSTSBD MPFNG",   1,   0, 100),
+SCROLL((char *)0,               "EIRIS SAZUN IDISI",    1,   0, 100), /* Merseburg Incantations */
+SCROLL((char *)0,               "PHOL ENDE WODAN",      1,   0, 100), /* Merseburg Incantations */
+
 	/* these must come last because they have special descriptions */
 #ifdef MAIL
 SCROLL("mail",                  "stamped",          0,   0,   0),
