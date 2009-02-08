@@ -1890,8 +1890,9 @@ cleanup:
 	}
 
 	/* give experience points */
-	tmp = experience(mtmp, (int)mvitals[mndx].died + 1);
-	more_experienced(tmp, 0);
+	int nr_killed = (int)mvitals[mndx].died;
+	tmp = experience(mtmp, nr_killed);
+	more_experienced(tmp, max(tmp/nr_killed,1), 0);
 	newexplevel();		/* will decide if you go up */
 
 	/* adjust alignment points */
