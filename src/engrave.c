@@ -33,6 +33,8 @@ static const char *random_mesg[] = {
 	"You've got mail!", /* AOL */
 #endif
 	"As if!", /* Clueless */
+	"She's watching you!", /* Portal */
+	"The cake is a lie!", /* Portal */
 };
 
 char *
