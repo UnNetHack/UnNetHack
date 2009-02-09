@@ -675,7 +675,14 @@ makelevel()
 	    } else if(In_hell(&u.uz) ||
 		  (rn2(5) && u.uz.dnum == medusa_level.dnum
 			  && depth(&u.uz) > depth(&medusa_level))) {
-		    makemaz("");
+			 /* The vibrating square code is hardcoded into mkmaze --
+			  * rather than fiddle around trying to port it to a 'generalist'
+			  * sort of level, just go ahead and let the VS level be a maze */
+			 if (!Invocation_lev(&u.uz)) {
+		    makemaz("hellfill");
+			 } else {
+				 makemaz("");
+			 }
 		    return;
 	    }
 	}

@@ -88,7 +88,7 @@ static int map_cnt = 0;
 		  map_cnt = 0;
 		  return MAP_ID;
 		}
-<MAPC>[-|}{+ABCISHKPLWTF\\#. 0123456789]*\r?\n	{
+<MAPC>[-|}{+xABCISHKPLWTF\\#. 0123456789]*\r?\n	{
 		  int len = yyleng;
 		  /* convert \r\n to \n */
 		  if (len >= 2 && yytext[len - 2] == '\r') len -= 1;
@@ -136,15 +136,21 @@ IF		return IF_ID;
 THEN		return THEN_ID;
 ELSE		return ELSE_ID;
 ENDIF		return ENDIF_ID;
+EXIT		return EXIT_ID;
 ROOM		return ROOM_ID;
 SUBROOM		return SUBROOM_ID;
 RANDOM_CORRIDORS	return RAND_CORRIDOR_ID;
 CORRIDOR	return CORRIDOR_ID;
+SPILL	  return SPILL_ID;
+TERRAIN		return TERRAIN_ID;
+REPLACE_TERRAIN	return REPLACE_TERRAIN_ID;
 GOLD		return GOLD_ID;
 ENGRAVING	return ENGRAVING_ID;
 NAME		return NAME_ID;
 CHANCE		return CHANCE_ID;
 levregion	return LEV;
+horizontal	{ yylval.i=1; return HORIZ_OR_VERT; }
+vertical	{ yylval.i=2; return HORIZ_OR_VERT; }
 open		{ yylval.i=D_ISOPEN; return DOOR_STATE; }
 closed		{ yylval.i=D_CLOSED; return DOOR_STATE; }
 locked		{ yylval.i=D_LOCKED; return DOOR_STATE; }
@@ -195,6 +201,7 @@ dust		{ yylval.i=DUST; return ENGRAVING_TYPE; }
 engrave		{ yylval.i=ENGRAVE; return ENGRAVING_TYPE; }
 burn		{ yylval.i=BURN; return ENGRAVING_TYPE; }
 mark		{ yylval.i=MARK; return ENGRAVING_TYPE; }
+blood		{ yylval.i=ENGR_BLOOD; return ENGRAVING_TYPE; }
 blessed		{ yylval.i=1; return CURSE_TYPE; }
 uncursed	{ yylval.i=2; return CURSE_TYPE; }
 cursed		{ yylval.i=3; return CURSE_TYPE; }
@@ -205,6 +212,7 @@ nommap		{ yylval.i=NOMMAP; return FLAG_TYPE; }
 arboreal	{ yylval.i=ARBOREAL; return FLAG_TYPE; }	/* KMH */
 shortsighted	{ yylval.i=SHORTSIGHTED; return FLAG_TYPE; }
 \[\ *[0-9]+\%\ *\] { yylval.i = atoi(yytext + 1); return PERCENT; }
+[0-9]+\%	{ yylval.i = atoi(yytext); return SPERCENT; }
 [+\-]?[0-9]+	{ yylval.i=atoi(yytext); return INTEGER; }
 \"[^"]*\"	{ yytext[yyleng-1] = 0; /* Discard the trailing \" */
 		  yylval.map = (char *) alloc(strlen(yytext+1)+1);

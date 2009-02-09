@@ -106,7 +106,7 @@ extern const char *fname;
 }
 
 
-%token	<i> CHAR INTEGER BOOLEAN PERCENT
+%token	<i> CHAR INTEGER BOOLEAN PERCENT SPERCENT
 %token	<i> MESSAGE_ID MAZE_ID LEVEL_ID LEV_INIT_ID GEOMETRY_ID NOMAP_ID
 %token	<i> OBJECT_ID COBJECT_ID MONSTER_ID TRAP_ID DOOR_ID DRAWBRIDGE_ID
 %token	<i> MAZEWALK_ID WALLIFY_ID REGION_ID FILLING
@@ -119,7 +119,8 @@ extern const char *fname;
 %token	<i> ALIGNMENT LEFT_OR_RIGHT CENTER TOP_OR_BOT ALTAR_TYPE UP_OR_DOWN
 %token	<i> SUBROOM_ID NAME_ID FLAGS_ID FLAG_TYPE MON_ATTITUDE MON_ALERTNESS
 %token	<i> MON_APPEARANCE ROOMDOOR_ID IF_ID THEN_ID ELSE_ID ENDIF_ID
-%token	<i> CONTAINED
+%token	<i> CONTAINED SPILL_ID TERRAIN_ID HORIZ_OR_VERT REPLACE_TERRAIN_ID
+%token	<i> EXIT_ID
 %token	<i> ',' ':' '(' ')' '[' ']'
 %token	<map> STRING MAP_ID
 %type	<i> h_justif v_justif trap_name room_type door_state light_state
@@ -246,6 +247,7 @@ levstatement 	: message
 		| fountain_detail
 		| gold_detail
 		| ifstatement
+		| exitstatement
 		| init_reg
 		| ladder_detail
 		| map_definition
@@ -261,12 +263,21 @@ levstatement 	: message
 		| room_def
 		| room_name
 		| sink_detail
+		| terrain_detail
+		| replace_terrain_detail
+		| spill_detail
 		| stair_detail
 		| stair_region
 		| subroom_def
 		| teleprt_region
 		| trap_detail
 		| wallify_detail
+		;
+
+exitstatement	: EXIT_ID
+		  {
+		      add_opcode(&splev, SPO_EXIT, NULL);
+		  }
 		;
 
 ifstatement 	: IF_ID chance
@@ -574,6 +585,8 @@ map_definition	: NOMAP_ID
 		  {
 		     mazepart *tmppart = New(mazepart);
 
+		     tmppart->zaligntyp = 0;
+		     tmppart->keep_region = 1;
 		     tmppart->halign = 1;
 		     tmppart->valign = 1;
 		     tmppart->xsize = 0;
@@ -584,14 +597,27 @@ map_definition	: NOMAP_ID
 		     add_opcode(&splev, SPO_MAP, tmppart);
 
 		  }
-		| map_geometry MAP_ID
+		| map_geometry roomfill MAP_ID
 		  {
 		     mazepart *tmpp = New(mazepart);
 
+		     tmpp->zaligntyp = 1;
+		     tmpp->keep_region = $2;
 		     tmpp->halign = $<i>1 % 10;
 		     tmpp->valign = $<i>1 / 10;
-		     scan_map($2, &splev, tmpp);
-		     Free($2);
+		     scan_map($3, &splev, tmpp);
+		     Free($3);
+		  }
+		| GEOMETRY_ID ':' coordinate roomfill MAP_ID
+		  {
+		     mazepart *tmpp = New(mazepart);
+
+		     tmpp->zaligntyp = 2;
+		     tmpp->keep_region = $4;
+		     tmpp->halign = current_coord.x;
+		     tmpp->valign = current_coord.y;
+		     scan_map($5, &splev, tmpp);
+		     Free($5);
 		  }
 		;
 
@@ -1203,6 +1229,98 @@ pool_detail : POOL_ID ':' coordinate
 
 		     add_opcode(&splev, SPO_POOL, tmppool);
 		  }
+		;
+
+replace_terrain_detail : REPLACE_TERRAIN_ID ':' region ',' CHAR ',' CHAR ',' light_state ',' SPERCENT
+		  {
+		      replaceterrain *tmprepl = New(replaceterrain);
+		      tmprepl->chance = $11;
+		      if (tmprepl->chance < 0) tmprepl->chance = 0;
+		      else if (tmprepl->chance > 100) tmprepl->chance = 100;
+		      tmprepl->x1 = current_region.x1;
+		      tmprepl->y1 = current_region.y1;
+		      tmprepl->x2 = current_region.x2;
+		      tmprepl->y2 = current_region.y2;
+		      tmprepl->fromter = what_map_char((char) $5);
+		      tmprepl->toter = what_map_char((char) $7);
+		      tmprepl->tolit = $9;
+		      add_opcode(&splev, SPO_REPLACETERRAIN, tmprepl);
+		  }
+		;
+
+terrain_detail : TERRAIN_ID chance ':' coordinate ',' CHAR ',' light_state
+		 {
+		     terrain *tmpterrain = New(terrain);
+
+		     tmpterrain->chance = $2;
+		     tmpterrain->areatyp = 0;
+		     tmpterrain->x1 = current_coord.x;
+		     tmpterrain->y1 = current_coord.y;
+		     tmpterrain->x2 = tmpterrain->y2 = -1;
+		     tmpterrain->ter = what_map_char((char) $6);
+		     tmpterrain->tlit = $8;
+
+		     add_opcode(&splev, SPO_TERRAIN, tmpterrain);
+		 }
+	       |
+	         TERRAIN_ID chance ':' coordinate ',' HORIZ_OR_VERT ',' INTEGER ',' CHAR ',' light_state
+		 {
+		     terrain *tmpterrain = New(terrain);
+
+		     tmpterrain->chance = $2;
+		     tmpterrain->areatyp = $<i>6;
+		     tmpterrain->x1 = current_coord.x;
+		     tmpterrain->y1 = current_coord.y;
+		     if (tmpterrain->areatyp == 1) {
+		         tmpterrain->x2 = $8;
+		         tmpterrain->y2 = -1;
+		     } else {
+		         tmpterrain->y2 = $8;
+		         tmpterrain->x2 = -1;
+		     }
+		     tmpterrain->ter = what_map_char((char) $10);
+		     tmpterrain->tlit = $12;
+
+		     add_opcode(&splev, SPO_TERRAIN, tmpterrain);
+		 }
+	       |
+	         TERRAIN_ID chance ':' region ',' FILLING ',' CHAR ',' light_state
+		 {
+		     terrain *tmpterrain = New(terrain);
+
+		     tmpterrain->chance = $2;
+		     tmpterrain->areatyp = 3 + $<i>6;
+		     tmpterrain->x1 = current_region.x1;
+		     tmpterrain->y1 = current_region.y1;
+		     tmpterrain->x2 = current_region.x2;
+		     tmpterrain->y2 = current_region.y2;
+		     tmpterrain->ter = what_map_char((char) $8);
+		     tmpterrain->tlit = $10;
+
+		     add_opcode(&splev, SPO_TERRAIN, tmpterrain);
+		 }
+	       ;
+
+spill_detail : SPILL_ID ':' coordinate ',' CHAR ',' DIRECTION ',' INTEGER ',' light_state
+			{
+				spill* tmpspill = New(spill);
+
+				tmpspill->x = current_coord.x;
+				tmpspill->y = current_coord.y;
+				tmpspill->typ = what_map_char((char) $5);
+				if (tmpspill->typ == INVALID_TYPE) {
+					yyerror("Invalid map character in spill!");
+				}
+				tmpspill->direction = $7;
+				tmpspill->count = $9;
+				if (tmpspill->count < 1) {
+					yyerror("Invalid count in spill!");
+				}
+				tmpspill->lit = $11;
+
+				add_opcode(&splev, SPO_SPILL, tmpspill);
+
+			}
 		;
 
 diggable_detail : NON_DIGGABLE_ID ':' region

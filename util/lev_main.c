@@ -472,6 +472,7 @@ char c;
 		  case 'W'  : return(WATER);
 		  case 'T'	: return (TREE);
 		  case 'F'	: return (IRONBARS);	/* Fe = iron */
+		  case 'x'  : return(MAX_TYPE); /* 'see-through' */
 	    }
 	return(INVALID_TYPE);
 }
@@ -725,6 +726,8 @@ mazepart *pt;
 {
 	int j;
 
+	Write(fd, &(pt->zaligntyp), sizeof(pt->zaligntyp));
+	Write(fd, &(pt->keep_region), sizeof(pt->keep_region));
 	Write(fd, &(pt->halign), sizeof(pt->halign));
 	Write(fd, &(pt->valign), sizeof(pt->valign));
 	Write(fd, &(pt->xsize), sizeof(pt->xsize));
@@ -823,6 +826,7 @@ sp_lev *maze;
 	   _opcode tmpo = maze->opcodes[i];
 	   Write(fd, &(tmpo.opcode), sizeof(tmpo.opcode));
 	   switch (tmpo.opcode) {
+	    case SPO_EXIT:
 	    case SPO_WALLIFY:
 	    case SPO_NULL:
 	      break;
@@ -879,6 +883,15 @@ sp_lev *maze;
 	      break;
 	    case SPO_CORRIDOR:
 	      Write(fd, tmpo.opdat, sizeof(corridor));
+	      break;
+	   case SPO_REPLACETERRAIN:
+	      Write(fd, tmpo.opdat, sizeof(replaceterrain));
+	      break;
+	   case SPO_TERRAIN:
+	      Write(fd, tmpo.opdat, sizeof(terrain));
+	      break;
+	   case SPO_SPILL:
+	      Write(fd, tmpo.opdat, sizeof(spill));
 	      break;
 	    case SPO_LEVREGION:
 	      write_levregion(fd, tmpo.opdat);

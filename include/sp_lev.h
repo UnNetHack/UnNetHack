@@ -67,7 +67,11 @@
 #define SPO_JMP			30 /* opjmp    jump */
 #define SPO_JL			31 /* opjmp    jump if less than */
 #define SPO_JG			32 /* opjmp    jump if greater than */
-#define MAX_SP_OPCODES		33
+#define SPO_SPILL			  33	  /* spill a particular type of terrain into an area */
+#define SPO_TERRAIN		34 /* terrain */
+#define SPO_REPLACETERRAIN	35 /* replaceterrain */
+#define SPO_EXIT		36
+#define MAX_SP_OPCODES		37
 
 
 /* special level coder CPU flags */
@@ -164,6 +168,19 @@ typedef struct {
 	xchar rtype, rlit, rirreg;
 } region;
 
+typedef struct {
+    xchar chance;
+    xchar areatyp;
+    xchar x1,y1,x2,y2;
+    xchar ter, tlit;
+} terrain;
+
+typedef struct {
+    xchar chance;
+    xchar x1,y1,x2,y2;
+    xchar fromter, toter, tolit;
+} replaceterrain;
+
 /* values for rtype are defined in dungeon.h */
 typedef struct {
 	struct { xchar x1, y1, x2, y2; } inarea;
@@ -205,7 +222,9 @@ typedef struct _room {
 } room;
 
 typedef struct {
-	char halign, valign;
+	schar zaligntyp;
+	schar keep_region;
+	schar halign, valign;
 	char xsize, ysize;
 	char **map;
 } mazepart;
@@ -227,5 +246,10 @@ typedef struct {
 	lev_init init_lev;
 	_opcode	 *opcodes;
 } sp_lev;
+
+typedef struct {
+	xchar x, y, direction, count, lit;
+	char typ;
+} spill;
 
 #endif /* SP_LEV_H */

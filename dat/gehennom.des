@@ -5033,3 +5033,101 @@ ENDMAP
 MAZEWALK:(2,2),east
 STAIR:levregion(1,0,79,20),(0,0,0,0),up
 STAIR:levregion(1,0,79,20),(0,0,0,0),down
+
+#	The "fill" level for Gehennom
+#
+#	This level is used to fill out any levels not occupied by
+#	specific levels as defined above.
+#
+MAZE: "hellfill",'L'
+INIT_MAP: '.',' ',true,true,unlit,true
+TELEPORT_REGION:levregion(11,01,59,19),levregion(01,01,02,02)
+NOMAP
+#
+#  always put stairs relatively far apart
+#
+# outer loop
+IF [50%] THEN
+# inner loop
+IF [50%] THEN
+# Option 1: Up Left, Down Right
+STAIR:levregion(01,01,20,20),levregion(40,10,44,12),up
+STAIR:levregion(50,01,70,20),levregion(45,10,49,12),down
+ELSE
+# Option 2: Up Right, Down Left
+STAIR:levregion(50,01,70,20),levregion(45,10,49,12),up
+STAIR:levregion(01,01,20,20),levregion(40,10,44,12),down
+ENDIF
+# outer loop again
+ELSE
+# inner loop 2
+IF [50%] THEN
+# Option 3: Up Center, Down Elsewhere
+STAIR:levregion(30,01,50,20),levregion(38,01,42,20),up
+STAIR:levregion(01,01,70,20),levregion(30,01,50,20),down
+ELSE
+# Option 4: Down Center, Up Elsewhere
+STAIR:levregion(01,01,70,20),levregion(30,01,50,20),up
+STAIR:levregion(30,01,50,20),levregion(38,01,42,20),down
+ENDIF
+# end of outer loop
+ENDIF
+#
+RANDOM_OBJECTS:'(','/','=','+',')','[','?','*','%'
+OBJECT: object[0], random, random
+OBJECT: object[0], random, random
+OBJECT: object[1], random, random
+OBJECT: object[2], random, random
+OBJECT: object[3], random, random
+OBJECT: object[4], random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+#
+RANDOM_MONSTERS:'V','D',' ','&','Z'
+MONSTER:monster[0],random,random,hostile
+MONSTER:monster[0],random,random,hostile
+MONSTER:monster[1],random,random,hostile
+MONSTER:monster[1],random,random,hostile
+MONSTER:monster[2],random,random,hostile
+MONSTER:monster[3],random,random,hostile
+MONSTER:random,random,random,hostile
+MONSTER:'H',random,random,hostile
+# chance of evil critters
+IF [50%] THEN
+MONSTER:'L',random,random,hostile
+ELSE
+MONSTER:random,random,random,hostile
+ENDIF
+IF [66%] THEN
+# could be a snark now, so up the percentage a bit
+MONSTER:'J',random,random,hostile
+ELSE
+MONSTER:random,random,random,hostile
+ENDIF
+# chance of lava spillage?
+IF [75%] THEN
+SPILL: random, 'L', north, 20, lit
+ENDIF
+IF [75%] THEN
+SPILL: random, 'L', south, 20, lit
+ENDIF
+IF [75%] THEN
+SPILL: random, 'L', east, 20, lit
+ENDIF
+IF [75%] THEN
+SPILL: random, 'L', west, 20, lit
+ENDIF
+#
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+#

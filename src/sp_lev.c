@@ -768,6 +768,86 @@ struct mkroom	*croom;
     }
 }
 
+STATIC_OVL void
+spill_terrain(sp, croom)
+spill* sp;
+struct mkroom* croom;
+{
+	schar x,y,nx,ny,qx,qy;
+	int j,k,lastdir,guard;
+	boolean found = FALSE;
+
+	if (sp->typ >= MAX_TYPE) return;
+
+	/* This code assumes that you're going to spill one particular
+	 * type of terrain from a wall into somewhere.
+	 *
+	 * If we were given a specific coordinate, though, it doesn't have
+	 * to start from a wall... */
+	if (sp->x <= -(MAX_REGISTERS+1) || sp->y <= -(MAX_REGISTERS+1)) {
+		for (j = 0;j < 500;j++) {
+			x = sp->x; 
+			y = sp->y;
+			get_location(&x, &y, DRY|WET, croom);
+			nx = x; ny = y;
+			switch (sp->direction) {
+				case W_NORTH: ny++; break;	  /* backwards to make sure we're against a wall */
+				case W_SOUTH: ny--; break;
+				case W_WEST: nx++; break;
+				case W_EAST: nx--; break;
+				default: return; break;
+			}
+			if (!isok(nx,ny)) { continue; }
+			if (IS_WALL(levl[nx][ny].typ)) {	 /* mark it as broken through */
+				levl[nx][ny].typ = sp->typ;
+				levl[nx][ny].lit = sp->lit;
+				found = TRUE; 
+				break; 
+			}
+		}
+	} else {
+		found = TRUE;
+		x = sp->x;
+		y = sp->y;
+		get_location(&x, &y, DRY|WET, croom); /* support random registers too */
+	}
+
+	if (!found) { return; }
+
+	/* gloop! */
+	lastdir = -1; nx = x; ny = y;
+	for (j = sp->count;j > 0;j--) {
+		guard = 0;
+		levl[nx][ny].typ = sp->typ;
+		levl[nx][ny].lit = sp->lit;
+		do {
+			guard++;
+			do {
+				k = rn2(5);
+				qx = nx;qy = ny;
+				if (k > 3) { k = sp->direction; }
+				else { k = 1 << k; }
+				switch(k) {
+					case W_NORTH: qy--; break;
+					case W_SOUTH: qy++; break;
+					case W_WEST: qx--; break;
+					case W_EAST: qx++; break;
+				}
+			} while (!isok(qx,qy));
+		} while ((k == lastdir || levl[qx][qy].typ == sp->typ) && guard < 200);	 
+		/* tend to not make rivers, but pools; and don't redo stuff of the same type! */
+
+		switch(k) {
+			case W_NORTH: ny--; break;
+			case W_SOUTH: ny++; break;
+			case W_WEST: nx--; break;
+			case W_EAST: nx++; break;
+		}
+		lastdir = k;
+	}
+}
+
+
 /*
  * Create a monster in a room.
  */
@@ -1222,6 +1302,99 @@ int		typ;
 
 	levl[x][y].typ = typ;
 }
+
+void
+replace_terrain(terr, croom)
+replaceterrain *terr;
+struct mkroom *croom;
+{
+    schar x, y, x1, y1, x2, y2;
+
+    if (terr->toter >= MAX_TYPE) return;
+
+    x1 = terr->x1;  y1 = terr->y1;
+    get_location(&x1, &y1, DRY|WET, croom);
+
+    x2 = terr->x2;  y2 = terr->y2;
+    get_location(&x2, &y2, DRY|WET, croom);
+
+    for (x = x1; x <= x2; x++)
+	for (y = y1; y <= y2; y++)
+	    if ((levl[x][y].typ == terr->fromter) && (rn2(100) < terr->chance)) {
+	    levl[x][y].typ = terr->toter;
+	    levl[x][y].lit = terr->tolit;
+	}
+}
+
+void
+set_terrain(terr, croom)
+terrain *terr;
+struct mkroom *croom;
+{
+    schar x, y, x1, y1, x2, y2;
+
+    if (terr->ter >= MAX_TYPE) return;
+
+    if (rn2(100) >= terr->chance) return;
+
+    x1 = terr->x1;  y1 = terr->y1;
+    get_location(&x1, &y1, DRY|WET, croom);
+
+    switch (terr->areatyp) {
+    case 0: /* point */
+    default:
+	levl[x1][y1].typ = terr->ter;
+	levl[x1][y1].lit = terr->tlit;
+	/* handle doors and secret doors */
+	if (levl[x1][y1].typ == SDOOR || IS_DOOR(levl[x1][y1].typ)) {
+	    if(levl[x1][y1].typ == SDOOR)
+		levl[x1][y1].doormask = D_CLOSED;
+	    if (x1 && (IS_WALL(levl[x1-1][y1].typ) ||
+				levl[x1-1][y1].horizontal))
+		levl[x1][y1].horizontal = 1;
+	}
+	break;
+    case 1: /* horiz line */
+	for (x = 0; x < (terr->x2); x++) {
+	    levl[x + x1][y1].typ = terr->ter;
+	    levl[x + x1][y1].lit = terr->tlit;
+	}
+	break;
+    case 2: /* vert line */
+	for (y = 0; y < (terr->y2); y++) {
+	    levl[x1][y + y1].typ = terr->ter;
+	    levl[x1][y + y1].lit = terr->tlit;
+	}
+	break;
+    case 3: /* filled rectangle */
+	x2 = terr->x2;  y2 = terr->y2;
+	get_location(&x2, &y2, DRY|WET, croom);
+	for (x = x1; x <= x2; x++) {
+	    for (y = y1; y <= y2; y++) {
+		levl[x][y].typ = terr->ter;
+		levl[x][y].lit = terr->tlit;
+	    }
+	}
+	break;
+    case 4: /* rectangle */
+	x2 = terr->x2;  y2 = terr->y2;
+	get_location(&x2, &y2, DRY|WET, croom);
+	for (x = x1; x <= x2; x++) {
+	    levl[x][y1].typ = terr->ter;
+	    levl[x][y1].lit = terr->tlit;
+	    levl[x][y2].typ = terr->ter;
+	    levl[x][y2].lit = terr->tlit;
+	}
+	for (y = y1; y <= y2; y++) {
+	    levl[x1][y].typ = terr->ter;
+	    levl[x1][y].lit = terr->tlit;
+	    levl[x2][y].typ = terr->ter;
+	    levl[x2][y].lit = terr->tlit;
+	}
+	break;
+    }
+}
+
 
 /*
  * Search for a door in a room on a specified wall.
@@ -1812,6 +1985,7 @@ sp_lev *lvl;
 
 	switch (opcode) {
 	case SPO_NULL:
+	case SPO_EXIT:
 	case SPO_WALLIFY:
 	    break;
 	case SPO_MESSAGE:
@@ -1953,10 +2127,24 @@ sp_lev *lvl;
 	    opdat = alloc(sizeof(opjmp));
 	    Fread(opdat, 1, sizeof(opjmp), fd);
 	    break;
+	case SPO_REPLACETERRAIN:
+	    opdat = alloc(sizeof(replaceterrain));
+	    Fread(opdat, 1, sizeof(replaceterrain), fd);
+	    break;
+	case SPO_TERRAIN:
+	    opdat = alloc(sizeof(terrain));
+	    Fread(opdat, 1, sizeof(terrain), fd);
+	    break;
+	case SPO_SPILL:
+	    opdat = alloc(sizeof(spill));
+	    Fread(opdat, 1, sizeof(spill), fd);
+	    break;
 	case SPO_MAP:
 	    /*tmpmazepart = ((mazepart *) opdat = alloc(sizeof(mazepart)));*/
 	    opdat = alloc(sizeof(mazepart));
 	    tmpmazepart = (mazepart *) opdat;
+	    Fread((genericptr_t) &tmpmazepart->zaligntyp, 1, sizeof(tmpmazepart->zaligntyp), fd);
+	    Fread((genericptr_t) &tmpmazepart->keep_region, 1, sizeof(tmpmazepart->keep_region), fd);
 	    Fread((genericptr_t) &tmpmazepart->halign, 1, sizeof(tmpmazepart->halign), fd);
 	    Fread((genericptr_t) &tmpmazepart->valign, 1, sizeof(tmpmazepart->valign), fd);
 	    Fread((genericptr_t) &tmpmazepart->xsize, 1, sizeof(tmpmazepart->xsize), fd);
@@ -2005,6 +2193,7 @@ sp_lev *lvl;
         case SPO_JL:
         case SPO_JG:
         case SPO_NULL:
+	case SPO_EXIT:
 	case SPO_MESSAGE:
 	case SPO_DOOR:
 	case SPO_STAIR:
@@ -2026,6 +2215,9 @@ sp_lev *lvl;
 	case SPO_NON_PASSWALL:
 	case SPO_ROOM_DOOR:
 	case SPO_WALLIFY:
+	case SPO_TERRAIN:
+	case SPO_REPLACETERRAIN:
+	case SPO_SPILL:
 	    /* nothing extra to free here */
 	    break;
 	case SPO_SUBROOM:
@@ -2111,6 +2303,9 @@ sp_lev *lvl;
     sink *tmpsink;
     pool *tmppool;
     corridor *tmpcorridor;
+    terrain *tmpterrain;
+    replaceterrain *tmpreplaceterrain;
+	 spill* tmpspill;
     room *tmproom, *tmpsubroom;
     room_door *tmproomdoor;
     struct mkroom *croom,
@@ -2125,6 +2320,8 @@ sp_lev *lvl;
 
     int     xi, dir;
     int     tmpi;
+
+    xchar tmpxstart, tmpystart, tmpxsize, tmpysize;
 
     struct trap *badtrap;
     boolean has_bounds = FALSE;
@@ -2175,6 +2372,9 @@ sp_lev *lvl;
 
 	switch (opcode) {
         case SPO_NULL:
+	    break;
+	case SPO_EXIT:
+	    exit_script = TRUE;
 	    break;
 	case SPO_MESSAGE:
 	    if (opdat) {
@@ -2308,6 +2508,18 @@ sp_lev *lvl;
 	case SPO_CORRIDOR:
 	    tmpcorridor = (corridor *) opdat;
 	    create_corridor(tmpcorridor);
+	    break;
+	case SPO_TERRAIN:
+	    tmpterrain = (terrain *) opdat;
+	    set_terrain(tmpterrain, croom);
+	    break;
+	case SPO_REPLACETERRAIN:
+	    tmpreplaceterrain = (replaceterrain *) opdat;
+	    replace_terrain(tmpreplaceterrain, croom);
+	    break;
+	case SPO_SPILL:
+	    tmpspill = (spill*) opdat;
+	    spill_terrain(tmpspill, croom);
 	    break;
 	case SPO_LEVREGION:
 	    tmplregion = (lev_region *) opdat;
@@ -2555,10 +2767,19 @@ sp_lev *lvl;
 	case SPO_MAP:
 	    tmproom = tmpsubroom = (room *)0;
 	    tmpmazepart = (mazepart *) opdat;
+
+	    tmpxsize = xsize; tmpysize = ysize;
+	    tmpxstart = xstart; tmpystart = ystart;
+
 	    halign = tmpmazepart->halign;
 	    valign = tmpmazepart->valign;
 	    xsize = tmpmazepart->xsize;
 	    ysize = tmpmazepart->ysize;
+	    switch (tmpmazepart->zaligntyp) {
+	    default:
+	    case 0:
+		break;
+	    case 1:
 	    switch((int) halign) {
 	    case LEFT:	    xstart = 3;					break;
 	    case H_LEFT:    xstart = 2+((x_maze_max-2-xsize)/4);	break;
@@ -2573,6 +2794,13 @@ sp_lev *lvl;
 	    }
 	    if (!(xstart % 2)) xstart++;
 	    if (!(ystart % 2)) ystart++;
+		break;
+	    case 2:
+		get_location(&halign, &valign, DRY|WET, croom);
+		xstart = halign;
+		ystart = valign;
+		break;
+	    }
 	    if ((ystart < 0) || (ystart + ysize > ROWNO)) {
 		/* try to move the start a bit */
 		ystart += (ystart > 0) ? -2 : 2;
@@ -2590,6 +2818,8 @@ sp_lev *lvl;
 		/* Load the map */
 		for(y = ystart; y < ystart+ysize; y++)
 		    for(x = xstart; x < xstart+xsize; x++) {
+			if (tmpmazepart->map[y-ystart][x-xstart] >= MAX_TYPE)
+			    continue;
 			levl[x][y].typ = tmpmazepart->map[y-ystart][x-xstart];
 			levl[x][y].lit = FALSE;
 			/* clear out levl: load_common_data may set them */
@@ -2624,6 +2854,13 @@ sp_lev *lvl;
 		if (lvl->init_lev.init_present && lvl->init_lev.joined)
 		    remove_rooms(xstart, ystart, xstart+xsize, ystart+ysize);
 	    }
+
+	    if (!tmpmazepart->keep_region) {
+		/* should use a stack for this stuff... */
+		xstart = tmpxstart; ystart = tmpystart;
+		xsize = tmpxsize; ysize = tmpysize;
+	    }
+
 	    break;
 	default:
 	    panic("sp_level_coder: Unknown opcode %i", opcode);
