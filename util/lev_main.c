@@ -83,25 +83,25 @@ int FDECL(get_object_id, (char *,CHAR_P));
 boolean FDECL(check_monster_char, (CHAR_P));
 boolean FDECL(check_object_char, (CHAR_P));
 char FDECL(what_map_char, (CHAR_P));
-void FDECL(scan_map, (char *));
-void NDECL(wallify_map);
-boolean NDECL(check_subrooms);
-void FDECL(check_coord, (int,int,const char *));
-void NDECL(store_part);
-void NDECL(store_room);
-boolean FDECL(write_level_file, (char *,splev *,specialmaze *));
-void FDECL(free_rooms, (splev *));
+void FDECL(scan_map, (char *, sp_lev *, mazepart *));
+boolean FDECL(check_subrooms, (sp_lev *));
+boolean FDECL(write_level_file, (char *,sp_lev *));
 
 extern void NDECL(monst_init);
 extern void NDECL(objects_init);
 extern void NDECL(decl_init);
 
-static boolean FDECL(write_common_data, (int,int,lev_init *,long));
-static boolean FDECL(write_monsters, (int,char *,monster ***));
-static boolean FDECL(write_objects, (int,char *,object ***));
-static boolean FDECL(write_engravings, (int,char *,engraving ***));
-static boolean FDECL(write_maze, (int,specialmaze *));
-static boolean FDECL(write_rooms, (int,splev *));
+void FDECL(add_opcode, (sp_lev *, int, genericptr_t));
+genericptr_t FDECL(get_last_opcode_data1, (sp_lev *, int));
+genericptr_t FDECL(get_last_opcode_data2, (sp_lev *, int,int));
+
+static boolean FDECL(write_common_data, (int,sp_lev *));
+static boolean FDECL(write_monster, (int,monster *));
+static boolean FDECL(write_object, (int,object *));
+static boolean FDECL(write_engraving, (int,engraving *));
+static boolean FDECL(write_maze, (int,sp_lev *));
+static boolean FDECL(write_room, (int,room *));
+static boolean FDECL(write_mazepart, (int, mazepart *));
 static void NDECL(init_obj_classes);
 
 static struct {
@@ -178,37 +178,6 @@ int want_warnings = 0;
 /* Flex 2.3 bug work around; not needed for 2.3.6 or later */
 int yy_more_len = 0;
 #endif
-
-extern char tmpmessage[];
-extern altar *tmpaltar[];
-extern lad *tmplad[];
-extern stair *tmpstair[];
-extern digpos *tmpdig[];
-extern digpos *tmppass[];
-extern char *tmpmap[];
-extern region *tmpreg[];
-extern lev_region *tmplreg[];
-extern door *tmpdoor[];
-extern room_door *tmprdoor[];
-extern trap *tmptrap[];
-extern monster *tmpmonst[];
-extern object *tmpobj[];
-extern drawbridge *tmpdb[];
-extern walk *tmpwalk[];
-extern gold *tmpgold[];
-extern fountain *tmpfountain[];
-extern sink *tmpsink[];
-extern pool *tmppool[];
-extern engraving *tmpengraving[];
-extern mazepart *tmppart[];
-extern room *tmproom[];
-
-extern int n_olist, n_mlist, n_plist;
-
-extern unsigned int nlreg, nreg, ndoor, ntrap, nmons, nobj;
-extern unsigned int ndb, nwalk, npart, ndig, npass, nlad, nstair;
-extern unsigned int naltar, ncorridor, nrooms, ngold, nengraving;
-extern unsigned int nfountain, npool, nsink;
 
 extern unsigned int max_x_map, max_y_map;
 
@@ -507,19 +476,77 @@ char c;
 	return(INVALID_TYPE);
 }
 
+void
+add_opcode(sp, opc, dat)
+sp_lev *sp;
+int opc;
+genericptr_t dat;
+{
+   long nop = sp->init_lev.n_opcodes;
+   _opcode *tmp;
+
+   if ((opc < 0) || (opc >= MAX_SP_OPCODES))
+     yyerror("Unknown opcode");
+
+   tmp = (_opcode *)alloc(sizeof(_opcode)*(nop+1));
+   if (sp->opcodes && nop) {
+       (void) memcpy(tmp, sp->opcodes, sizeof(_opcode)*nop);
+       free(sp->opcodes);
+   } else if (!tmp)
+       yyerror("Couldn't alloc opcode space");
+
+   sp->opcodes = tmp;
+
+   sp->opcodes[nop].opcode = opc;
+   sp->opcodes[nop].opdat = dat;
+
+   sp->init_lev.n_opcodes++;
+}
+
+genericptr_t
+get_last_opcode_data1(sp, opc1)
+sp_lev *sp;
+int opc1;
+{
+   return get_last_opcode_data2(sp, opc1,opc1);
+}
+
+genericptr_t
+get_last_opcode_data2(sp, opc1,opc2)
+sp_lev *sp;
+int opc1,opc2;
+{
+   long nop = sp->init_lev.n_opcodes;
+   int i;
+
+   if (nop < 1)
+     yyerror("No opcodes yet?!");
+
+   for (i = nop-1; i >= 0; i--)
+     if ((sp->opcodes[i].opcode == opc1) ||
+	 (sp->opcodes[i].opcode == opc2)) {
+	return sp->opcodes[i].opdat;
+     }
+
+   return NULL;
+}
+
 /*
  * Yep! LEX gives us the map in a raw mode.
  * Just analyze it here.
  */
 void
-scan_map(map)
+scan_map(map, sp, mpart)
 char *map;
+sp_lev *sp;
+mazepart *mpart;
 {
 	register int i, len;
 	register char *s1, *s2;
 	int max_len = 0;
 	int max_hig = 0;
 	char msg[256];
+	char *tmpmap[ROWNO];
 
 	/* First, strip out digits 0-9 (line numbering) */
 	for (s1 = s2 = map; *s1; s1++)
@@ -578,422 +605,65 @@ char *map;
 	    yyerror(msg);
 	}
 
-	tmppart[npart]->xsize = max_len;
-	tmppart[npart]->ysize = max_hig;
-	tmppart[npart]->map = (char **) alloc(max_hig*sizeof(char *));
-	for(i = 0; i< max_hig; i++)
-	    tmppart[npart]->map[i] = tmpmap[i];
-}
+	mpart->xsize = max_len;
+	mpart->ysize = max_hig;
+	mpart->map = (char **) alloc(max_hig*sizeof(char *));
 
-/*
- *	If we have drawn a map without walls, this allows us to
- *	auto-magically wallify it.
- */
-#define Map_point(x,y) *(tmppart[npart]->map[y] + x)
+	for (i=0; i<max_hig; i++)
+	    mpart->map[i] = tmpmap[i];
 
-void
-wallify_map()
-{
-	unsigned int x, y, xx, yy, lo_xx, lo_yy, hi_xx, hi_yy;
-
-	for (y = 0; y <= max_y_map; y++) {
-	    SpinCursor(3);
-	    lo_yy = (y > 0) ? y - 1 : 0;
-	    hi_yy = (y < max_y_map) ? y + 1 : max_y_map;
-	    for (x = 0; x <= max_x_map; x++) {
-		if (Map_point(x,y) != STONE) continue;
-		lo_xx = (x > 0) ? x - 1 : 0;
-		hi_xx = (x < max_x_map) ? x + 1 : max_x_map;
-		for (yy = lo_yy; yy <= hi_yy; yy++)
-		    for (xx = lo_xx; xx <= hi_xx; xx++)
-			if (IS_ROOM(Map_point(xx,yy)) ||
-				Map_point(xx,yy) == CROSSWALL) {
-			    Map_point(x,y) = (yy != y) ? HWALL : VWALL;
-			    yy = hi_yy;		/* end `yy' loop */
-			    break;		/* end `xx' loop */
-			}
-	    }
-	}
+	add_opcode(sp, SPO_MAP, mpart);
 }
 
 /*
  * We need to check the subrooms apartenance to an existing room.
  */
 boolean
-check_subrooms()
+check_subrooms(sp)
+sp_lev *sp;
 {
-	unsigned i, j, n_subrooms;
+	int i, j;
 	boolean	found, ok = TRUE;
-	char	*last_parent, msg[256];
+	char	msg[256];
 
-	for (i = 0; i < nrooms; i++)
-	    if (tmproom[i]->parent) {
+	for (i = 0; i < sp->init_lev.n_opcodes; i++)
+	    if (sp->opcodes[i].opcode == SPO_SUBROOM) {
+		room *subrm = (room *) sp->opcodes[i].opdat;
 		found = FALSE;
-		for(j = 0; j < nrooms; j++)
-		    if (tmproom[j]->name &&
-			    !strcmp(tmproom[i]->parent, tmproom[j]->name)) {
-			found = TRUE;
-			break;
+		for (j = 0; j < sp->init_lev.n_opcodes; j++)
+		    if (sp->opcodes[j].opcode == SPO_ROOM) {
+			room *parrm = (room *) sp->opcodes[j].opdat;
+			if (parrm->name.str && !strcmp(subrm->parent.str, parrm->name.str)) {
+			    found = TRUE;
+			    break;
+			}
 		    }
 		if (!found) {
 		    Sprintf(msg,
 			    "Subroom error : parent room '%s' not found!",
-			    tmproom[i]->parent);
+			    subrm->parent.str);
 		    yyerror(msg);
 		    ok = FALSE;
-		}
-	    }
-
-	msg[0] = '\0';
-	last_parent = msg;
-	for (i = 0; i < nrooms; i++)
-	    if (tmproom[i]->parent) {
-		n_subrooms = 0;
-		for(j = i; j < nrooms; j++) {
-/*
- *	This is by no means perfect, but should cut down the duplicate error
- *	messages by over 90%.  The only problem will be when either subrooms
- *	are mixed in the level definition (not likely but possible) or rooms
- *	have subrooms that have subrooms.
- */
-		    if (!strcmp(tmproom[i]->parent, last_parent)) continue;
-		    if (tmproom[j]->parent &&
-			    !strcmp(tmproom[i]->parent, tmproom[j]->parent)) {
-			n_subrooms++;
-			if(n_subrooms > MAX_SUBROOMS) {
-
-			    Sprintf(msg,
-	      "Subroom error: too many subrooms attached to parent room '%s'!",
-				    tmproom[i]->parent);
-			    yyerror(msg);
-			    last_parent = tmproom[i]->parent;
-			    ok = FALSE;
-			    break;
-			}
-		    }
 		}
 	    }
 	return ok;
 }
 
 /*
- * Check that coordinates (x,y) are roomlike locations.
- * Print warning "str" if they aren't.
- */
-void
-check_coord(x, y, str)
-int x, y;
-const char *str;
-{
-    char ebuf[60];
-
-    if (x >= 0 && y >= 0 && x <= (int)max_x_map && y <= (int)max_y_map &&
-	(IS_ROCK(tmpmap[y][x]) || IS_DOOR(tmpmap[y][x]))) {
-	Sprintf(ebuf, "%s placed in wall at (%02d,%02d)?!", str, x, y);
-	yywarning(ebuf);
-    }
-}
-
-/*
- * Here we want to store the maze part we just got.
- */
-void
-store_part()
-{
-	register unsigned i;
-
-	/* Ok, We got the whole part, now we store it. */
-
-	/* The Regions */
-
-	if ((tmppart[npart]->nreg = nreg) != 0) {
-		tmppart[npart]->regions = NewTab(region, nreg);
-		for(i=0;i<nreg;i++)
-		    tmppart[npart]->regions[i] = tmpreg[i];
-	}
-	nreg = 0;
-
-	/* The Level Regions */
-
-	if ((tmppart[npart]->nlreg = nlreg) != 0) {
-		tmppart[npart]->lregions = NewTab(lev_region, nlreg);
-		for(i=0;i<nlreg;i++)
-		    tmppart[npart]->lregions[i] = tmplreg[i];
-	}
-	nlreg = 0;
-
-	/* the doors */
-
-	if ((tmppart[npart]->ndoor = ndoor) != 0) {
-		tmppart[npart]->doors = NewTab(door, ndoor);
-		for(i=0;i<ndoor;i++)
-		    tmppart[npart]->doors[i] = tmpdoor[i];
-	}
-	ndoor = 0;
-
-	/* the drawbridges */
-
-	if ((tmppart[npart]->ndrawbridge = ndb) != 0) {
-		tmppart[npart]->drawbridges = NewTab(drawbridge, ndb);
-		for(i=0;i<ndb;i++)
-		    tmppart[npart]->drawbridges[i] = tmpdb[i];
-	}
-	ndb = 0;
-
-	/* The walkmaze directives */
-
-	if ((tmppart[npart]->nwalk = nwalk) != 0) {
-		tmppart[npart]->walks = NewTab(walk, nwalk);
-		for(i=0;i<nwalk;i++)
-		    tmppart[npart]->walks[i] = tmpwalk[i];
-	}
-	nwalk = 0;
-
-	/* The non_diggable directives */
-
-	if ((tmppart[npart]->ndig = ndig) != 0) {
-		tmppart[npart]->digs = NewTab(digpos, ndig);
-		for(i=0;i<ndig;i++)
-		    tmppart[npart]->digs[i] = tmpdig[i];
-	}
-	ndig = 0;
-
-	/* The non_passwall directives */
-
-	if ((tmppart[npart]->npass = npass) != 0) {
-		tmppart[npart]->passs = NewTab(digpos, npass);
-		for(i=0;i<npass;i++)
-		    tmppart[npart]->passs[i] = tmppass[i];
-	}
-	npass = 0;
-
-	/* The ladders */
-
-	if ((tmppart[npart]->nlad = nlad) != 0) {
-		tmppart[npart]->lads = NewTab(lad, nlad);
-		for(i=0;i<nlad;i++)
-		    tmppart[npart]->lads[i] = tmplad[i];
-	}
-	nlad = 0;
-
-	/* The stairs */
-
-	if ((tmppart[npart]->nstair = nstair) != 0) {
-		tmppart[npart]->stairs = NewTab(stair, nstair);
-		for(i=0;i<nstair;i++)
-		    tmppart[npart]->stairs[i] = tmpstair[i];
-	}
-	nstair = 0;
-
-	/* The altars */
-	if ((tmppart[npart]->naltar = naltar) != 0) {
-		tmppart[npart]->altars = NewTab(altar, naltar);
-		for(i=0;i<naltar;i++)
-		    tmppart[npart]->altars[i] = tmpaltar[i];
-	}
-	naltar = 0;
-
-	/* The fountains */
-
-	if ((tmppart[npart]->nfountain = nfountain) != 0) {
-		tmppart[npart]->fountains = NewTab(fountain, nfountain);
-		for(i=0;i<nfountain;i++)
-		    tmppart[npart]->fountains[i] = tmpfountain[i];
-	}
-	nfountain = 0;
-
-	/* the traps */
-
-	if ((tmppart[npart]->ntrap = ntrap) != 0) {
-		tmppart[npart]->traps = NewTab(trap, ntrap);
-		for(i=0;i<ntrap;i++)
-		    tmppart[npart]->traps[i] = tmptrap[i];
-	}
-	ntrap = 0;
-
-	/* the monsters */
-
-	if ((tmppart[npart]->nmonster = nmons) != 0) {
-		tmppart[npart]->monsters = NewTab(monster, nmons);
-		for(i=0;i<nmons;i++)
-		    tmppart[npart]->monsters[i] = tmpmonst[i];
-	} else
-		tmppart[npart]->monsters = 0;
-	nmons = 0;
-
-	/* the objects */
-
-	if ((tmppart[npart]->nobject = nobj) != 0) {
-		tmppart[npart]->objects = NewTab(object, nobj);
-		for(i=0;i<nobj;i++)
-		    tmppart[npart]->objects[i] = tmpobj[i];
-	} else
-		tmppart[npart]->objects = 0;
-	nobj = 0;
-
-	/* The gold piles */
-
-	if ((tmppart[npart]->ngold = ngold) != 0) {
-		tmppart[npart]->golds = NewTab(gold, ngold);
-		for(i=0;i<ngold;i++)
-		    tmppart[npart]->golds[i] = tmpgold[i];
-	}
-	ngold = 0;
-
-	/* The engravings */
-
-	if ((tmppart[npart]->nengraving = nengraving) != 0) {
-		tmppart[npart]->engravings = NewTab(engraving, nengraving);
-		for(i=0;i<nengraving;i++)
-		    tmppart[npart]->engravings[i] = tmpengraving[i];
-	} else
-		tmppart[npart]->engravings = 0;
-	nengraving = 0;
-
-	npart++;
-	n_plist = n_mlist = n_olist = 0;
-}
-
-/*
- * Here we want to store the room part we just got.
- */
-void
-store_room()
-{
-	register unsigned i;
-
-	/* Ok, We got the whole room, now we store it. */
-
-	/* the doors */
-
-	if ((tmproom[nrooms]->ndoor = ndoor) != 0) {
-		tmproom[nrooms]->doors = NewTab(room_door, ndoor);
-		for(i=0;i<ndoor;i++)
-		    tmproom[nrooms]->doors[i] = tmprdoor[i];
-	}
-	ndoor = 0;
-
-	/* The stairs */
-
-	if ((tmproom[nrooms]->nstair = nstair) != 0) {
-		tmproom[nrooms]->stairs = NewTab(stair, nstair);
-		for(i=0;i<nstair;i++)
-		    tmproom[nrooms]->stairs[i] = tmpstair[i];
-	}
-	nstair = 0;
-
-	/* The altars */
-	if ((tmproom[nrooms]->naltar = naltar) != 0) {
-		tmproom[nrooms]->altars = NewTab(altar, naltar);
-		for(i=0;i<naltar;i++)
-		    tmproom[nrooms]->altars[i] = tmpaltar[i];
-	}
-	naltar = 0;
-
-	/* The fountains */
-
-	if ((tmproom[nrooms]->nfountain = nfountain) != 0) {
-		tmproom[nrooms]->fountains = NewTab(fountain, nfountain);
-		for(i=0;i<nfountain;i++)
-		    tmproom[nrooms]->fountains[i] = tmpfountain[i];
-	}
-	nfountain = 0;
-
-	/* The sinks */
-
-	if ((tmproom[nrooms]->nsink = nsink) != 0) {
-		tmproom[nrooms]->sinks = NewTab(sink, nsink);
-		for(i=0;i<nsink;i++)
-		    tmproom[nrooms]->sinks[i] = tmpsink[i];
-	}
-	nsink = 0;
-
-	/* The pools */
-
-	if ((tmproom[nrooms]->npool = npool) != 0) {
-		tmproom[nrooms]->pools = NewTab(pool, npool);
-		for(i=0;i<npool;i++)
-		    tmproom[nrooms]->pools[i] = tmppool[i];
-	}
-	npool = 0;
-
-	/* the traps */
-
-	if ((tmproom[nrooms]->ntrap = ntrap) != 0) {
-		tmproom[nrooms]->traps = NewTab(trap, ntrap);
-		for(i=0;i<ntrap;i++)
-		    tmproom[nrooms]->traps[i] = tmptrap[i];
-	}
-	ntrap = 0;
-
-	/* the monsters */
-
-	if ((tmproom[nrooms]->nmonster = nmons) != 0) {
-		tmproom[nrooms]->monsters = NewTab(monster, nmons);
-		for(i=0;i<nmons;i++)
-		    tmproom[nrooms]->monsters[i] = tmpmonst[i];
-	} else
-		tmproom[nrooms]->monsters = 0;
-	nmons = 0;
-
-	/* the objects */
-
-	if ((tmproom[nrooms]->nobject = nobj) != 0) {
-		tmproom[nrooms]->objects = NewTab(object, nobj);
-		for(i=0;i<nobj;i++)
-		    tmproom[nrooms]->objects[i] = tmpobj[i];
-	} else
-		tmproom[nrooms]->objects = 0;
-	nobj = 0;
-
-	/* The gold piles */
-
-	if ((tmproom[nrooms]->ngold = ngold) != 0) {
-		tmproom[nrooms]->golds = NewTab(gold, ngold);
-		for(i=0;i<ngold;i++)
-		    tmproom[nrooms]->golds[i] = tmpgold[i];
-	}
-	ngold = 0;
-
-	/* The engravings */
-
-	if ((tmproom[nrooms]->nengraving = nengraving) != 0) {
-		tmproom[nrooms]->engravings = NewTab(engraving, nengraving);
-		for(i=0;i<nengraving;i++)
-		    tmproom[nrooms]->engravings[i] = tmpengraving[i];
-	} else
-		tmproom[nrooms]->engravings = 0;
-	nengraving = 0;
-
-	nrooms++;
-}
-
-/*
  * Output some info common to all special levels.
  */
 static boolean
-write_common_data(fd, typ, init, flgs)
-int fd, typ;
-lev_init *init;
-long flgs;
+write_common_data(fd, lvl)
+int fd;
+sp_lev *lvl;
 {
-	char c;
-	uchar len;
 	static struct version_info version_data = {
 			VERSION_NUMBER, VERSION_FEATURES,
 			VERSION_SANITY1, VERSION_SANITY2
 	};
 
 	Write(fd, &version_data, sizeof version_data);
-	c = typ;
-	Write(fd, &c, sizeof(c));	/* 1 byte header */
-	Write(fd, init, sizeof(lev_init));
-	Write(fd, &flgs, sizeof flgs);
-
-	len = (uchar) strlen(tmpmessage);
-	Write(fd, &len, sizeof len);
-	if (len) Write(fd, tmpmessage, (int) len);
-	tmpmessage[0] = '\0';
+	Write(fd, &lvl->init_lev, sizeof(lev_init));
 	return TRUE;
 }
 
@@ -1001,39 +671,26 @@ long flgs;
  * Output monster info, which needs string fixups, then release memory.
  */
 static boolean
-write_monsters(fd, nmonster_p, monsters_p)
+write_monster(fd, m)
 int fd;
-char *nmonster_p;
-monster ***monsters_p;
+monster *m;
 {
-	monster *m;
 	char *name, *appr;
-	int j, n = (int)*nmonster_p;
 
-	Write(fd, nmonster_p, sizeof *nmonster_p);
-	for (j = 0; j < n; j++) {
-	    m = (*monsters_p)[j];
-	    name = m->name.str;
-	    appr = m->appear_as.str;
-	    m->name.str = m->appear_as.str = 0;
-	    m->name.len = name ? strlen(name) : 0;
-	    m->appear_as.len = appr ? strlen(appr) : 0;
-	    Write(fd, m, sizeof *m);
-	    if (name) {
-		Write(fd, name, m->name.len);
-		Free(name);
-	    }
-	    if (appr) {
-		Write(fd, appr, m->appear_as.len);
-		Free(appr);
-	    }
-	    Free(m);
+        name = m->name.str;
+        appr = m->appear_as.str;
+	m->name.str = m->appear_as.str = 0;
+	m->name.len = name ? strlen(name) : 0;
+	m->appear_as.len = appr ? strlen(appr) : 0;
+	Write(fd, m, sizeof *m);
+	if (name) {
+	    Write(fd, name, m->name.len);
+	    Free(name);
 	}
-	if (*monsters_p) {
-	    Free(*monsters_p);
-	    *monsters_p = 0;
+	if (appr) {
+	    Write(fd, appr, m->appear_as.len);
+	    Free(appr);
 	}
-	*nmonster_p = 0;
 	return TRUE;
 }
 
@@ -1041,33 +698,46 @@ monster ***monsters_p;
  * Output object info, which needs string fixup, then release memory.
  */
 static boolean
-write_objects(fd, nobject_p, objects_p)
+write_object(fd, o)
 int fd;
-char *nobject_p;
-object ***objects_p;
+object *o;
 {
-	object *o;
 	char *name;
-	int j, n = (int)*nobject_p;
 
-	Write(fd, nobject_p, sizeof *nobject_p);
-	for (j = 0; j < n; j++) {
-	    o = (*objects_p)[j];
-	    name = o->name.str;
-	    o->name.str = 0;	/* reset in case `len' is narrower */
-	    o->name.len = name ? strlen(name) : 0;
-	    Write(fd, o, sizeof *o);
-	    if (name) {
-		Write(fd, name, o->name.len);
-		Free(name);
+	name = o->name.str;
+	o->name.str = 0;	/* reset in case `len' is narrower */
+	o->name.len = name ? strlen(name) : 0;
+	Write(fd, o, sizeof *o);
+	if (name) {
+	    Write(fd, name, o->name.len);
+	    Free(name);
+	}
+	return TRUE;
+}
+
+/*
+ * Output mazepart info, and release memory.
+ */
+static boolean
+write_mazepart(fd, pt)
+int fd;
+mazepart *pt;
+{
+	int j;
+
+	Write(fd, &(pt->halign), sizeof(pt->halign));
+	Write(fd, &(pt->valign), sizeof(pt->valign));
+	Write(fd, &(pt->xsize), sizeof(pt->xsize));
+	Write(fd, &(pt->ysize), sizeof(pt->ysize));
+	if ((pt->xsize > 0) && (pt->ysize > 0)) {
+	    for (j=0;j<pt->ysize;j++) {
+		if(pt->xsize > 1 || pt->ysize > 1)
+		    Write(fd, pt->map[j], pt->xsize * (signed)(sizeof *pt->map[j]));
+		Free(pt->map[j]);
 	    }
-	    Free(o);
+	    Free(pt->map);
 	}
-	if (*objects_p) {
-	    Free(*objects_p);
-	    *objects_p = 0;
-	}
-	*nobject_p = 0;
+
 	return TRUE;
 }
 
@@ -1075,43 +745,187 @@ object ***objects_p;
  * Output engraving info, which needs string fixup, then release memory.
  */
 static boolean
-write_engravings(fd, nengraving_p, engravings_p)
+write_engraving(fd, e)
 int fd;
-char *nengraving_p;
-engraving ***engravings_p;
+engraving *e;
 {
-	engraving *e;
 	char *engr;
-	int j, n = (int)*nengraving_p;
-
-	Write(fd, nengraving_p, sizeof *nengraving_p);
-	for (j = 0; j < n; j++) {
-	    e = (*engravings_p)[j];
-	    engr = e->engr.str;
-	    e->engr.str = 0;	/* reset in case `len' is narrower */
-	    e->engr.len = strlen(engr);
-	    Write(fd, e, sizeof *e);
-	    Write(fd, engr, e->engr.len);
-	    Free(engr);
-	    Free(e);
-	}
-	if (*engravings_p) {
-	    Free(*engravings_p);
-	    *engravings_p = 0;
-	}
-	*nengraving_p = 0;
+	engr = e->engr.str;
+	e->engr.str = 0;	/* reset in case `len' is narrower */
+	e->engr.len = strlen(engr);
+	Write(fd, e, sizeof *e);
+	Write(fd, engr, e->engr.len);
+	Free(engr);
 	return TRUE;
 }
 
 /*
- * Open and write maze or rooms file, based on which pointer is non-null.
+ * Output room into, which needs string fixup, then release memory.
+ */
+static boolean
+write_room(fd, pt)
+int fd;
+room *pt;
+{
+	char *name, *parent;
+
+        name = pt->name.str;
+        parent = pt->parent.str;
+        pt->name.str = pt->parent.str = 0;
+        pt->name.len = name ? strlen(name) : 0;
+        pt->parent.len = parent ? strlen(parent) : 0;
+        Write(fd, pt, sizeof *pt);
+        if (name) {
+	    Write(fd, name, pt->name.len);
+	    Free(name);
+	}
+        if (parent) {
+	    Write(fd, parent, pt->parent.len);
+	    Free(parent);
+	}
+
+	return TRUE;
+}
+
+static boolean
+write_levregion(fd, pt)
+int fd;
+lev_region *pt;
+{
+	char *rname;
+        rname = pt->rname.str;
+        pt->rname.str = 0;
+        pt->rname.len = rname ? strlen(rname) : 0;
+        Write(fd, pt, sizeof *pt);
+        if (rname) {
+	   Write(fd, rname, pt->rname.len);
+	   Free(rname);
+	}
+	return TRUE;
+}
+
+/*
+ * Here we write the sp_lev structure in the specified file (fd).
+ * Also, we have to free the memory allocated via alloc().
+ */
+static boolean
+write_maze(fd, maze)
+int fd;
+sp_lev *maze;
+{
+        int i;
+        uchar len;
+
+        if (!write_common_data(fd, maze))
+            return FALSE;
+
+        for (i=0;i<maze->init_lev.n_opcodes;i++) {
+	   _opcode tmpo = maze->opcodes[i];
+	   Write(fd, &(tmpo.opcode), sizeof(tmpo.opcode));
+	   switch (tmpo.opcode) {
+	    case SPO_WALLIFY:
+	    case SPO_NULL:
+	      break;
+	    case SPO_MESSAGE:
+	    case SPO_RANDOM_OBJECTS:
+	    case SPO_RANDOM_MONSTERS:
+	    case SPO_RANDOM_PLACES:
+	      len = (uchar) strlen((char *)tmpo.opdat);
+	      Write(fd, &len, sizeof len);
+	      if (len) Write(fd, tmpo.opdat, (int) len);
+	      break;
+	    case SPO_MONSTER:
+	      write_monster(fd, tmpo.opdat);
+	      break;
+	    case SPO_OBJECT:
+	      write_object(fd, tmpo.opdat);
+	      break;
+	    case SPO_ENGRAVING:
+	      write_engraving(fd, tmpo.opdat);
+	      break;
+	    case SPO_ROOM:
+	    case SPO_SUBROOM:
+	      write_room(fd, tmpo.opdat);
+	      break;
+	    case SPO_ROOM_DOOR:
+	      Write(fd, tmpo.opdat, sizeof(room_door));
+	      break;
+	    case SPO_DOOR:
+	      Write(fd, tmpo.opdat, sizeof(door));
+	      break;
+	    case SPO_STAIR:
+	      Write(fd, tmpo.opdat, sizeof(stair));
+	      break;
+	    case SPO_LADDER:
+	      Write(fd, tmpo.opdat, sizeof(lad));
+	      break;
+	    case SPO_ALTAR:
+	      Write(fd, tmpo.opdat, sizeof(altar));
+	      break;
+	    case SPO_FOUNTAIN:
+	      Write(fd, tmpo.opdat, sizeof(fountain));
+	      break;
+	    case SPO_SINK:
+	      Write(fd, tmpo.opdat, sizeof(sink));
+	      break;
+	    case SPO_POOL:
+	      Write(fd, tmpo.opdat, sizeof(pool));
+	      break;
+	    case SPO_TRAP:
+	      Write(fd, tmpo.opdat, sizeof(trap));
+	      break;
+	    case SPO_GOLD:
+	      Write(fd, tmpo.opdat, sizeof(gold));
+	      break;
+	    case SPO_CORRIDOR:
+	      Write(fd, tmpo.opdat, sizeof(corridor));
+	      break;
+	    case SPO_LEVREGION:
+	      write_levregion(fd, tmpo.opdat);
+	      break;
+	    case SPO_DRAWBRIDGE:
+	      Write(fd, tmpo.opdat, sizeof(drawbridge));
+	      break;
+	    case SPO_MAZEWALK:
+	      Write(fd, tmpo.opdat, sizeof(walk));
+	      break;
+	    case SPO_NON_DIGGABLE:
+	    case SPO_NON_PASSWALL:
+	      Write(fd, tmpo.opdat, sizeof(digpos));
+	      break;
+	    case SPO_REGION:
+	      Write(fd, tmpo.opdat, sizeof(region));
+	      break;
+	    case SPO_CMP:
+	      Write(fd, tmpo.opdat, sizeof(opcmp));
+	      break;
+	    case SPO_JMP:
+	    case SPO_JL:
+	    case SPO_JG:
+	      Write(fd, tmpo.opdat, sizeof(opjmp));
+	      break;
+	    case SPO_MAP:
+	      write_mazepart(fd, tmpo.opdat);
+	      break;
+	    default:
+	      panic("unknown sp_lev opcode (%i)", tmpo.opcode);
+	   }
+	   Free(tmpo.opdat);
+	}
+        /* clear the struct for next user */
+        (void) memset((genericptr_t) &maze->init_lev, 0, sizeof maze->init_lev);
+
+	return TRUE;
+}
+
+/*
+ * Open and write special level file.
  * Return TRUE on success, FALSE on failure.
  */
 boolean
-write_level_file(filename, room_level, maze_level)
+write_level_file(filename, lvl)
 char *filename;
-splev *room_level;
-specialmaze *maze_level;
+sp_lev *lvl;
 {
 	int fout;
 	char lbuf[60];
@@ -1123,426 +937,17 @@ specialmaze *maze_level;
 	Strcat(lbuf, filename);
 	Strcat(lbuf, LEV_EXT);
 
-#if defined(MAC) && (defined(__SC__) || defined(__MRC__))
-	fout = open(lbuf, O_WRONLY|O_CREAT|O_BINARY);
-#else
 	fout = open(lbuf, O_WRONLY|O_CREAT|O_BINARY, OMASK);
-#endif
 	if (fout < 0) return FALSE;
 
-	if (room_level) {
-	    if (!write_rooms(fout, room_level))
-		return FALSE;
-	} else if (maze_level) {
-	    if (!write_maze(fout, maze_level))
-		return FALSE;
-	} else
-	    panic("write_level_file");
+        if (!lvl) panic("write_level_file");
+
+        if (!write_maze(fout, lvl))
+          return FALSE;
 
 	(void) close(fout);
+
 	return TRUE;
-}
-
-/*
- * Here we write the structure of the maze in the specified file (fd).
- * Also, we have to free the memory allocated via alloc().
- */
-static boolean
-write_maze(fd, maze)
-int fd;
-specialmaze *maze;
-{
-	short i,j;
-	mazepart *pt;
-
-	if (!write_common_data(fd, SP_LEV_MAZE, &(maze->init_lev), maze->flags))
-	    return FALSE;
-
-	Write(fd, &(maze->filling), sizeof(maze->filling));
-	Write(fd, &(maze->numpart), sizeof(maze->numpart));
-					 /* Number of parts */
-	for(i=0;i<maze->numpart;i++) {
-	    pt = maze->parts[i];
-
-	    /* First, write the map */
-
-	    Write(fd, &(pt->halign), sizeof(pt->halign));
-	    Write(fd, &(pt->valign), sizeof(pt->valign));
-	    Write(fd, &(pt->xsize), sizeof(pt->xsize));
-	    Write(fd, &(pt->ysize), sizeof(pt->ysize));
-	    for(j=0;j<pt->ysize;j++) {
-		if(!maze->init_lev.init_present ||
-		   pt->xsize > 1 || pt->ysize > 1) {
-#if !defined(_MSC_VER) && !defined(__BORLANDC__)
-			Write(fd, pt->map[j], pt->xsize * sizeof *pt->map[j]);
-#else
-			/*
-			 * On MSVC and Borland C compilers the Write macro above caused:
-			 * warning '!=' : signed/unsigned mismatch
-			 */
-			unsigned reslt, sz = pt->xsize * sizeof *pt->map[j];
-			reslt = write(fd, (genericptr_t)(pt->map[j]), sz);
-			if (reslt != sz) return FALSE;
-#endif
-		}
-		Free(pt->map[j]);
-	    }
-	    Free(pt->map);
-
-	    /* level region stuff */
-	    Write(fd, &pt->nlreg, sizeof pt->nlreg);
-	    for (j = 0; j < pt->nlreg; j++) {
-		lev_region *l = pt->lregions[j];
-		char *rname = l->rname.str;
-		l->rname.str = 0;	/* reset in case `len' is narrower */
-		l->rname.len = rname ? strlen(rname) : 0;
-		Write(fd, l, sizeof *l);
-		if (rname) {
-		    Write(fd, rname, l->rname.len);
-		    Free(rname);
-		}
-		Free(l);
-	    }
-	    if (pt->nlreg > 0)
-		Free(pt->lregions);
-
-	    /* The random registers */
-	    Write(fd, &(pt->nrobjects), sizeof(pt->nrobjects));
-	    if(pt->nrobjects) {
-		    Write(fd, pt->robjects, pt->nrobjects);
-		    Free(pt->robjects);
-	    }
-	    Write(fd, &(pt->nloc), sizeof(pt->nloc));
-	    if(pt->nloc) {
-		    Write(fd, pt->rloc_x, pt->nloc);
-		    Write(fd, pt->rloc_y, pt->nloc);
-		    Free(pt->rloc_x);
-		    Free(pt->rloc_y);
-	    }
-	    Write(fd, &(pt->nrmonst), sizeof(pt->nrmonst));
-	    if(pt->nrmonst) {
-		    Write(fd, pt->rmonst, pt->nrmonst);
-		    Free(pt->rmonst);
-	    }
-
-	    /* subrooms */
-	    Write(fd, &(pt->nreg), sizeof(pt->nreg));
-	    for(j=0;j<pt->nreg;j++) {
-		    Write(fd, pt->regions[j], sizeof(region));
-		    Free(pt->regions[j]);
-	    }
-	    if(pt->nreg > 0)
-		    Free(pt->regions);
-
-	    /* the doors */
-	    Write(fd, &(pt->ndoor), sizeof(pt->ndoor));
-	    for(j=0;j<pt->ndoor;j++) {
-		    Write(fd, pt->doors[j], sizeof(door));
-		    Free(pt->doors[j]);
-	    }
-	    if (pt->ndoor > 0)
-		    Free(pt->doors);
-
-	    /* The drawbridges */
-	    Write(fd, &(pt->ndrawbridge), sizeof(pt->ndrawbridge));
-	    for(j=0;j<pt->ndrawbridge;j++) {
-		    Write(fd, pt->drawbridges[j], sizeof(drawbridge));
-		    Free(pt->drawbridges[j]);
-	    }
-	    if(pt->ndrawbridge > 0)
-		    Free(pt->drawbridges);
-
-	    /* The mazewalk directives */
-	    Write(fd, &(pt->nwalk), sizeof(pt->nwalk));
-	    for(j=0; j<pt->nwalk; j++) {
-		    Write(fd, pt->walks[j], sizeof(walk));
-		    Free(pt->walks[j]);
-	    }
-	    if (pt->nwalk > 0)
-		    Free(pt->walks);
-
-	    /* The non_diggable directives */
-	    Write(fd, &(pt->ndig), sizeof(pt->ndig));
-	    for(j=0;j<pt->ndig;j++) {
-		    Write(fd, pt->digs[j], sizeof(digpos));
-		    Free(pt->digs[j]);
-	    }
-	    if (pt->ndig > 0)
-		    Free(pt->digs);
-
-	    /* The non_passwall directives */
-	    Write(fd, &(pt->npass), sizeof(pt->npass));
-	    for(j=0;j<pt->npass;j++) {
-		    Write(fd, pt->passs[j], sizeof(digpos));
-		    Free(pt->passs[j]);
-	    }
-	    if (pt->npass > 0)
-		    Free(pt->passs);
-
-	    /* The ladders */
-	    Write(fd, &(pt->nlad), sizeof(pt->nlad));
-	    for(j=0;j<pt->nlad;j++) {
-		    Write(fd, pt->lads[j], sizeof(lad));
-		    Free(pt->lads[j]);
-	    }
-	    if (pt->nlad > 0)
-		    Free(pt->lads);
-
-	    /* The stairs */
-	    Write(fd, &(pt->nstair), sizeof(pt->nstair));
-	    for(j=0;j<pt->nstair;j++) {
-		    Write(fd, pt->stairs[j], sizeof(stair));
-		    Free(pt->stairs[j]);
-	    }
-	    if (pt->nstair > 0)
-		    Free(pt->stairs);
-
-	    /* The altars */
-	    Write(fd, &(pt->naltar), sizeof(pt->naltar));
-	    for(j=0;j<pt->naltar;j++) {
-		    Write(fd, pt->altars[j], sizeof(altar));
-		    Free(pt->altars[j]);
-	    }
-	    if (pt->naltar > 0)
-		    Free(pt->altars);
-
-	    /* The fountains */
-	    Write(fd, &(pt->nfountain), sizeof(pt->nfountain));
-	    for(j=0;j<pt->nfountain;j++) {
-		Write(fd, pt->fountains[j], sizeof(fountain));
-		Free(pt->fountains[j]);
-	    }
-	    if (pt->nfountain > 0)
-		    Free(pt->fountains);
-
-	    /* The traps */
-	    Write(fd, &(pt->ntrap), sizeof(pt->ntrap));
-	    for(j=0;j<pt->ntrap;j++) {
-		    Write(fd, pt->traps[j], sizeof(trap));
-		    Free(pt->traps[j]);
-	    }
-	    if (pt->ntrap)
-		    Free(pt->traps);
-
-	    /* The monsters */
-	    if (!write_monsters(fd, &pt->nmonster, &pt->monsters))
-		    return FALSE;
-
-	    /* The objects */
-	    if (!write_objects(fd, &pt->nobject, &pt->objects))
-		    return FALSE;
-
-	    /* The gold piles */
-	    Write(fd, &(pt->ngold), sizeof(pt->ngold));
-	    for(j=0;j<pt->ngold;j++) {
-		    Write(fd, pt->golds[j], sizeof(gold));
-		    Free(pt->golds[j]);
-	    }
-	    if (pt->ngold > 0)
-		    Free(pt->golds);
-
-	    /* The engravings */
-	    if (!write_engravings(fd, &pt->nengraving, &pt->engravings))
-		    return FALSE;
-
-	    Free(pt);
-	}
-
-	Free(maze->parts);
-	maze->parts = (mazepart **)0;
-	maze->numpart = 0;
-	return TRUE;
-}
-
-/*
- * Here we write the structure of the room level in the specified file (fd).
- */
-static boolean
-write_rooms(fd, lev)
-int fd;
-splev *lev;
-{
-	short i,j, size;
-	room *pt;
-
-	if (!write_common_data(fd, SP_LEV_ROOMS, &(lev->init_lev), lev->flags))
-		return FALSE;
-
-	/* Random registers */
-
-	Write(fd, &lev->nrobjects, sizeof(lev->nrobjects));
-	if (lev->nrobjects)
-		Write(fd, lev->robjects, lev->nrobjects);
-	Write(fd, &lev->nrmonst, sizeof(lev->nrmonst));
-	if (lev->nrmonst)
-		Write(fd, lev->rmonst, lev->nrmonst);
-
-	Write(fd, &(lev->nroom), sizeof(lev->nroom));
-							/* Number of rooms */
-	for(i=0;i<lev->nroom;i++) {
-		pt = lev->rooms[i];
-
-		/* Room characteristics */
-
-		size = (short) (pt->name ? strlen(pt->name) : 0);
-		Write(fd, &size, sizeof(size));
-		if (size)
-			Write(fd, pt->name, size);
-
-		size = (short) (pt->parent ? strlen(pt->parent) : 0);
-		Write(fd, &size, sizeof(size));
-		if (size)
-			Write(fd, pt->parent, size);
-
-		Write(fd, &(pt->x), sizeof(pt->x));
-		Write(fd, &(pt->y), sizeof(pt->y));
-		Write(fd, &(pt->w), sizeof(pt->w));
-		Write(fd, &(pt->h), sizeof(pt->h));
-		Write(fd, &(pt->xalign), sizeof(pt->xalign));
-		Write(fd, &(pt->yalign), sizeof(pt->yalign));
-		Write(fd, &(pt->rtype), sizeof(pt->rtype));
-		Write(fd, &(pt->chance), sizeof(pt->chance));
-		Write(fd, &(pt->rlit), sizeof(pt->rlit));
-		Write(fd, &(pt->filled), sizeof(pt->filled));
-
-		/* the doors */
-		Write(fd, &(pt->ndoor), sizeof(pt->ndoor));
-		for(j=0;j<pt->ndoor;j++)
-			Write(fd, pt->doors[j], sizeof(room_door));
-
-		/* The stairs */
-		Write(fd, &(pt->nstair), sizeof(pt->nstair));
-		for(j=0;j<pt->nstair;j++)
-			Write(fd, pt->stairs[j], sizeof(stair));
-
-		/* The altars */
-		Write(fd, &(pt->naltar), sizeof(pt->naltar));
-		for(j=0;j<pt->naltar;j++)
-			Write(fd, pt->altars[j], sizeof(altar));
-
-		/* The fountains */
-		Write(fd, &(pt->nfountain), sizeof(pt->nfountain));
-		for(j=0;j<pt->nfountain;j++)
-			Write(fd, pt->fountains[j], sizeof(fountain));
-
-		/* The sinks */
-		Write(fd, &(pt->nsink), sizeof(pt->nsink));
-		for(j=0;j<pt->nsink;j++)
-			Write(fd, pt->sinks[j], sizeof(sink));
-
-		/* The pools */
-		Write(fd, &(pt->npool), sizeof(pt->npool));
-		for(j=0;j<pt->npool;j++)
-			Write(fd, pt->pools[j], sizeof(pool));
-
-		/* The traps */
-		Write(fd, &(pt->ntrap), sizeof(pt->ntrap));
-		for(j=0;j<pt->ntrap;j++)
-			Write(fd, pt->traps[j], sizeof(trap));
-
-		/* The monsters */
-		if (!write_monsters(fd, &pt->nmonster, &pt->monsters))
-			return FALSE;
-
-		/* The objects */
-		if (!write_objects(fd, &pt->nobject, &pt->objects))
-			return FALSE;
-
-		/* The gold piles */
-		Write(fd, &(pt->ngold), sizeof(pt->ngold));
-		for(j=0;j<pt->ngold;j++)
-			Write(fd, pt->golds[j], sizeof(gold));
-
-		/* The engravings */
-		if (!write_engravings(fd, &pt->nengraving, &pt->engravings))
-			return FALSE;
-
-	}
-
-	/* The corridors */
-	Write(fd, &lev->ncorr, sizeof(lev->ncorr));
-	for (i=0; i < lev->ncorr; i++)
-		Write(fd, lev->corrs[i], sizeof(corridor));
-	return TRUE;
-}
-
-/*
- * Release memory allocated to a rooms-style special level; maze-style
- * levels have the fields freed as they're written; monsters, objects, and
- * engravings are freed as written for both styles, so not handled here.
- */
-void
-free_rooms(lev)
-splev *lev;
-{
-	room *r;
-	int j, n = lev->nroom;
-
-	while(n--) {
-		r = lev->rooms[n];
-		Free(r->name);
-		Free(r->parent);
-		if ((j = r->ndoor) != 0) {
-			while(j--)
-				Free(r->doors[j]);
-			Free(r->doors);
-		}
-		if ((j = r->nstair) != 0) {
-			while(j--)
-				Free(r->stairs[j]);
-			Free(r->stairs);
-		}
-		if ((j = r->naltar) != 0) {
-			while (j--)
-				Free(r->altars[j]);
-			Free(r->altars);
-		}
-		if ((j = r->nfountain) != 0) {
-			while(j--)
-				Free(r->fountains[j]);
-			Free(r->fountains);
-		}
-		if ((j = r->nsink) != 0) {
-			while(j--)
-				Free(r->sinks[j]);
-			Free(r->sinks);
-		}
-		if ((j = r->npool) != 0) {
-			while(j--)
-				Free(r->pools[j]);
-			Free(r->pools);
-		}
-		if ((j = r->ntrap) != 0) {
-			while (j--)
-				Free(r->traps[j]);
-			Free(r->traps);
-		}
-		if ((j = r->ngold) != 0) {
-			while(j--)
-				Free(r->golds[j]);
-			Free(r->golds);
-		}
-		Free(r);
-		lev->rooms[n] = (room *)0;
-	}
-	Free(lev->rooms);
-	lev->rooms = (room **)0;
-	lev->nroom = 0;
-
-	for (j = 0; j < lev->ncorr; j++) {
-		Free(lev->corrs[j]);
-		lev->corrs[j] = (corridor *)0;
-	}
-	Free(lev->corrs);
-	lev->corrs = (corridor **)0;
-	lev->ncorr = 0;
-
-	Free(lev->robjects);
-	lev->robjects = (char *)0;
-	lev->nrobjects = 0;
-	Free(lev->rmonst);
-	lev->rmonst = (char *)0;
-	lev->nrmonst = 0;
 }
 
 #ifdef STRICT_REF_DEF

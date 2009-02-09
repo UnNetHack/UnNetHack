@@ -10,6 +10,7 @@
 extern char *lev_message;
 extern lev_region *lregions;
 extern int num_lregions;
+extern char SpLev_Map[COLNO][ROWNO];
 
 STATIC_DCL boolean FDECL(iswall,(int,int));
 STATIC_DCL boolean FDECL(iswall_or_stone,(int,int));
@@ -692,6 +693,7 @@ int x,y;
 		    levl[x][y].typ = ROOM;
 #endif
 		    levl[x][y].flags = 0;
+		    SpLev_Map[x][y] = 1;
 		}
 		q = 0;
 		for (a = 0; a < 4; a++)
@@ -706,7 +708,9 @@ int x,y;
 #else
 			levl[x][y].typ = ROOM;
 #endif
+			SpLev_Map[x][y] = 1;
 			move(&x, &y, dir);
+			SpLev_Map[x][y] = 1;
 			pos++;
 			if (pos > CELLS)
 				panic("Overflow in walkfrom");
@@ -732,6 +736,7 @@ int x,y;
 	    levl[x][y].typ = ROOM;
 #endif
 	    levl[x][y].flags = 0;
+	    SpLev_Map[x][y] = 1;
 	}
 
 	while(1) {
@@ -746,7 +751,9 @@ int x,y;
 #else
 		levl[x][y].typ = ROOM;
 #endif
+		SpLev_Map[x][y] = 1;
 		move(&x,&y,dir);
+		SpLev_Map[x][y] = 1;
 		walkfrom(x,y);
 	}
 }

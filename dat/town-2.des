@@ -38,33 +38,33 @@ MONSTER: 'f', "kitten", random, hostile
 #
 SUBROOM: "armor shop", lit, (7,5), (7,2), "town"
 CHANCE: 66
-DOOR: false, closed, random, random
+ROOMDOOR: false, closed, random, random
 
 SUBROOM: "weapon shop", lit, (28,3), (3,3), "town"
 CHANCE: 66
-DOOR: false, closed, random, random
+ROOMDOOR: false, closed, random, random
 
 SUBROOM: "scroll shop", lit, (44,5), (5,2), "town"
 CHANCE: 66
-DOOR: false, closed, random, random
+ROOMDOOR: false, closed, random, random
 
 SUBROOM: "wand shop", lit, (62,5), (7,2), "town"
 CHANCE: 66
-DOOR: false, closed, random, random
+ROOMDOOR: false, closed, random, random
 
 SUBROOM: "potion shop", lit, (13,11), (5,3), "town"
 CHANCE: 66
-DOOR: false, closed, random, random
+ROOMDOOR: false, closed, random, random
 
 SUBROOM: "shop", lit, (31,11), (4,3), "town"
-DOOR: false, closed, random, random
+ROOMDOOR: false, closed, random, random
 
 SUBROOM: "ring shop", lit, (46,12), (4,2), "town"
 CHANCE: 66
-DOOR: false, closed, random, random
+ROOMDOOR: false, closed, random, random
 #
 # a shop for sale?
 #
 SUBROOM: "ordinary", lit, (60,12), (6,1), "town"
-DOOR: false, closed, north, random
+ROOMDOOR: false, closed, north, random
 

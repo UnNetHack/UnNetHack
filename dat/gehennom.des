@@ -327,6 +327,11 @@ OBJECT:'`',"boulder",(13,13)
 OBJECT:'`',"boulder",(14,13)
 OBJECT:'`',"boulder",(15,13)
 OBJECT:'`',"boulder",(14,14)
+# Special rooms
+ALTAR:(24,07),noalign,sanctum
+REGION:(22,12,25,16),unlit,"morgue"
+REGION:(32,09,37,12),lit,"shop"
+REGION:(12,00,15,04),lit,"shop"
 # Doors
 DOOR:closed,(23,02)
 DOOR:open,(31,03)
@@ -344,11 +349,6 @@ DOOR:closed,(18,13)
 DOOR:closed,(41,13)
 DOOR:open,(26,14)
 DOOR:closed,(06,15)
-# Special rooms
-ALTAR:(24,07),noalign,sanctum
-REGION:(22,12,25,16),unlit,"morgue"
-REGION:(32,09,37,12),lit,"shop"
-REGION:(12,00,15,04),lit,"shop"
 # Some traps.
 TRAP:"spiked pit", random
 TRAP:"sleep gas", random

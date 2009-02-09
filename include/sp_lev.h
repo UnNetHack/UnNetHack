@@ -27,9 +27,67 @@
 #define SP_LEV_ROOMS	1
 #define SP_LEV_MAZE	2
 
+/* max. # of random registers */
+#define MAX_REGISTERS	10
+
+/* max. # of opcodes per special level */
+#define SPCODER_MAX_RUNTIME	65536
+
+/* Opcodes for creating the level */
+#define SPO_NULL		0
+#define SPO_MESSAGE		1  /* Str_or_Len */
+#define SPO_MONSTER		2  /* monster */
+#define SPO_OBJECT		3  /* object */
+#define SPO_ENGRAVING		4  /* engraving */
+#define SPO_ROOM		5  /* room */
+#define SPO_SUBROOM		6  /* room */
+#define SPO_DOOR		7  /* door */
+#define SPO_STAIR		8  /* stair */
+#define SPO_LADDER		9  /* lad */
+#define SPO_ALTAR		10 /* altar */
+#define SPO_FOUNTAIN		11 /* fountain */
+#define SPO_SINK		12 /* sink */
+#define SPO_POOL		13 /* pool */
+#define SPO_TRAP		14 /* trap */
+#define SPO_GOLD		15 /* gold */
+#define SPO_CORRIDOR		16 /* corridor */
+#define SPO_LEVREGION		17 /* lev_region */
+#define SPO_RANDOM_OBJECTS	18 /* Str_or_Len */
+#define SPO_RANDOM_PLACES	19 /* Str_or_Len*2 (x+1, y+1, x+1, y+1,...) */
+#define SPO_RANDOM_MONSTERS	20 /* Str_or_Len */
+#define SPO_DRAWBRIDGE		21 /* drawbridge */
+#define SPO_MAZEWALK		22 /* walk */
+#define SPO_NON_DIGGABLE	23 /* digpos */
+#define SPO_NON_PASSWALL	24 /* digpos */
+#define SPO_WALLIFY		25
+#define SPO_MAP			26 /* mazepart */
+#define SPO_ROOM_DOOR		27 /* room_door */
+#define SPO_REGION		28 /* region */
+#define SPO_CMP			29 /* opcmp    compare */
+#define SPO_JMP			30 /* opjmp    jump */
+#define SPO_JL			31 /* opjmp    jump if less than */
+#define SPO_JG			32 /* opjmp    jump if greater than */
+#define MAX_SP_OPCODES		33
+
+
+/* special level coder CPU flags */
+#define SP_CPUFLAG_LT	1
+#define SP_CPUFLAG_GT	2
+#define SP_CPUFLAG_EQ	4
+#define SP_CPUFLAG_ZERO	8
+
 /*
  * Structures manipulated by the special levels loader & compiler
  */
+
+typedef struct {
+	int cmp_what;
+	int cmp_val;
+} opcmp;
+
+typedef struct {
+	long jmp_target;
+} opjmp;
 
 typedef union str_or_len {
 	char *str;
@@ -41,6 +99,10 @@ typedef struct {
 	char	fg, bg;
 	boolean smoothed, joined;
 	xchar	lit, walled;
+	long	flags;
+	char	levtyp;	/* SP_LEV_xxx */
+	schar	filling;
+	long	n_opcodes;
 } lev_init;
 
 typedef struct {
@@ -134,92 +196,19 @@ typedef struct {
 	xchar x, y;
 } pool;
 
+typedef struct _room {
+	Str_or_Len name;
+	Str_or_Len parent;
+	xchar x, y, w, h;
+	xchar xalign, yalign;
+	xchar rtype, chance, rlit, filled;
+} room;
+
 typedef struct {
 	char halign, valign;
 	char xsize, ysize;
 	char **map;
-	char nrobjects;
-	char *robjects;
-	char nloc;
-	char *rloc_x;
-	char *rloc_y;
-	char nrmonst;
-	char *rmonst;
-	char nreg;
-	region **regions;
-	char nlreg;
-	lev_region **lregions;
-	char ndoor;
-	door **doors;
-	char ntrap;
-	trap **traps;
-	char nmonster;
-	monster **monsters;
-	char nobject;
-	object **objects;
-	char ndrawbridge;
-	drawbridge **drawbridges;
-	char nwalk;
-	walk **walks;
-	char ndig;
-	digpos **digs;
-	char npass;
-	digpos **passs;
-	char nlad;
-	lad **lads;
-	char nstair;
-	stair **stairs;
-	char naltar;
-	altar **altars;
-	char ngold;
-	gold **golds;
-	char nengraving;
-	engraving **engravings;
-	char nfountain;
-	fountain **fountains;
 } mazepart;
-
-typedef struct {
-	long flags;
-	lev_init init_lev;
-	schar filling;
-	char numpart;
-	mazepart **parts;
-} specialmaze;
-
-typedef struct _room {
-	char  *name;
-	char  *parent;
-	xchar x, y, w, h;
-	xchar xalign, yalign;
-	xchar rtype, chance, rlit, filled;
-	char ndoor;
-	room_door **doors;
-	char ntrap;
-	trap **traps;
-	char nmonster;
-	monster **monsters;
-	char nobject;
-	object **objects;
-	char naltar;
-	altar **altars;
-	char nstair;
-	stair **stairs;
-	char ngold;
-	gold **golds;
-	char nengraving;
-	engraving **engravings;
-	char nfountain;
-	fountain **fountains;
-	char nsink;
-	sink **sinks;
-	char npool;
-	pool **pools;
-	/* These three fields are only used when loading the level... */
-	int nsubroom;
-	struct _room *subrooms[MAX_SUBROOMS];
-	struct mkroom *mkr;
-} room;
 
 typedef struct {
 	struct {
@@ -229,18 +218,14 @@ typedef struct {
 	} src, dest;
 } corridor;
 
-/* used only by lev_comp */
 typedef struct {
-	long flags;
+	int opcode;
+	genericptr_t opdat;
+} _opcode;
+
+typedef struct {
 	lev_init init_lev;
-	char nrobjects;
-	char *robjects;
-	char nrmonst;
-	char *rmonst;
-	xchar nroom;
-	room **rooms;
-	xchar ncorr;
-	corridor **corrs;
-} splev;
+	_opcode	 *opcodes;
+} sp_lev;
 
 #endif /* SP_LEV_H */

@@ -39,25 +39,25 @@ MONSTER: 'd', "little dog", random, hostile
 #
 SUBROOM: "armor shop", lit, (10,4), (5,2), "town"
 CHANCE: 66
-DOOR: false, closed, random, random
+ROOMDOOR: false, closed, random, random
 SUBROOM: "shop", lit, (26,4), (6,3), "town"
 CHANCE: 66
-DOOR: false, closed, random, random
+ROOMDOOR: false, closed, random, random
 SUBROOM: "tool shop", lit, (44,2), (3,3), "town"
 CHANCE: 66
-DOOR: false, closed, random, random
+ROOMDOOR: false, closed, random, random
 SUBROOM: "candle shop", lit, (59,6), (2,2), "town"
 CHANCE: 66
-DOOR: false, closed, random, random
+ROOMDOOR: false, closed, random, random
 
 SUBROOM: "shop", lit, (16,12), (3,2), "town"
-DOOR: false, closed, random, random
+ROOMDOOR: false, closed, random, random
 SUBROOM: "weapon shop", lit, (30,13), (3,2), "town"
 CHANCE: 66
-DOOR: false, closed, random, random
+ROOMDOOR: false, closed, random, random
 SUBROOM: "book shop", lit, (48,11), (2,3), "town"
 CHANCE: 66
-DOOR: false, closed, random, random
+ROOMDOOR: false, closed, random, random
 SUBROOM: "food shop", lit, (65,13), (4,2), "town"
 CHANCE: 66
-DOOR: false, closed, random, random
+ROOMDOOR: false, closed, random, random

@@ -123,6 +123,8 @@ STATIC_PTR int NDECL(wiz_show_seenv);
 STATIC_PTR int NDECL(wiz_show_vision);
 STATIC_PTR int NDECL(wiz_mon_polycontrol);
 STATIC_PTR int NDECL(wiz_show_wmodes);
+STATIC_PTR int NDECL(wiz_mazewalkmap);
+extern char SpLev_Map[COLNO][ROWNO];
 STATIC_PTR int NDECL(wiz_showkills);	/* showborn patch */
 #ifdef SHOW_BORN
 extern void FDECL(list_vanquished, (int, BOOLEAN_P)); /* showborn patch */
@@ -1526,6 +1528,7 @@ struct ext_func_tab extcmdlist[] = {
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
+	{(char *)0, (char *)0, donull, TRUE},
 #ifdef PORT_DEBUG
 	{(char *)0, (char *)0, donull, TRUE},
 #endif
@@ -1546,6 +1549,7 @@ struct ext_func_tab extcmdlist[] = {
 static const struct ext_func_tab debug_extcmdlist[] = {
 	{"levelchange", "change experience level", wiz_level_change, TRUE},
 	{"lightsources", "show mobile light sources", wiz_light_sources, TRUE},
+	{"mazewalkmap", "show MAZEWALK paths", wiz_mazewalkmap, TRUE},
 #ifdef DEBUG_MIGRATING_MONS
 	{"migratemons", "migrate n random monsters", wiz_migrate_mons, TRUE},
 #endif
@@ -1709,6 +1713,29 @@ mon_chain(win, src, chain, total_count, total_size)
 	Sprintf(buf, template, src, count, size);
 	putstr(win, 0, buf);
 }
+
+static int
+wiz_mazewalkmap()
+{
+	winid win;
+	int x, y;
+	char row[COLNO+1];
+
+	win = create_nhwindow(NHW_TEXT);
+
+	for (y = 0; y < ROWNO; y++) {
+	    for (x = 0; x < COLNO; x++)
+		row[x] = SpLev_Map[x][y] ? '1' : '.';
+	    if (y == u.uy)
+		row[u.ux] = '@';
+	    row[x] = '\0';
+	    putstr(win, 0, row);
+	}
+	display_nhwindow(win, TRUE);
+	destroy_nhwindow(win);
+	return 0;
+}
+
 
 /*
  * Display memory usage of all monsters and objects on the level.
