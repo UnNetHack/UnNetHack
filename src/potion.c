@@ -1957,7 +1957,7 @@ register struct obj *obj;
 
 	switch (chance) {
 	case 0 : verbalize("I am in your debt.  I will grant one wish!");
-		makewish();
+		makewish(FALSE);
 		mongone(mtmp);
 		break;
 	case 1 : verbalize("Thank you for freeing me!");

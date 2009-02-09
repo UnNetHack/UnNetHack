@@ -2402,7 +2402,7 @@ E boolean FDECL(break_statue, (struct obj *));
 E void FDECL(destroy_item, (int,int));
 E int FDECL(destroy_mitem, (struct monst *,int,int));
 E int FDECL(resist, (struct monst *,CHAR_P,int,int));
-E void NDECL(makewish);
+E void FDECL(makewish, (BOOLEAN_P));
 
 #endif /* !MAKEDEFS_C && !LEV_LEX_C */
 
