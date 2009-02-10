@@ -1752,7 +1752,6 @@ MAP
  - - - -
 ENDMAP
 BRANCH:levregion(1,0,79,20),(0,0,0,0)
-MAZEWALK:(0,2),north
 OBJECT:random,random,(2,4)
 GEOMETRY:half-left,bottom
 MAP
@@ -1803,6 +1802,7 @@ MAP
 ---------
  - - - -
 ENDMAP
+MAZEWALK:(0,2),north
 OBJECT:random,random,(2,2)
 OBJECT:random,random,(6,6)
 STAIR:levregion(1,0,79,20),(0,0,0,0),up
@@ -2216,7 +2216,6 @@ MAP
  - - - - - - - 
 ENDMAP
 BRANCH:levregion(1,0,79,20),(0,0,0,0)
-MAZEWALK:(0,2),east
 TRAP:random,random
 TRAP:random,random
 TRAP:random,random
@@ -2277,6 +2276,7 @@ MAP
 ------.....----
  - - -.....S - 
 ENDMAP
+MAZEWALK:(0,2),east
 TRAP:"trap door",random
 TRAP:"trap door",random
 TRAP:"trap door",random
@@ -2638,7 +2638,6 @@ MAP
  - - - - - - - - 
 ENDMAP
 BRANCH:levregion(1,0,79,20),(0,0,0,0)
-MAZEWALK:(0,2),west
 MONSTER:'&',random,random
 MONSTER:'&',random,random
 MONSTER:'&',random,random
@@ -2666,6 +2665,7 @@ MAP
 --------.--------
  - - - - - - - - 
 ENDMAP
+MAZEWALK:(0,2),west
 MONSTER:'&',random,random
 MONSTER:'&',random,random
 MONSTER:'&',random,random
