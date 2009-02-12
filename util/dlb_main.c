@@ -53,7 +53,7 @@ static char origdir[255]="";
 #define O_BINARY 0
 #endif
 
-#define MAX_DLB_FILES 200	/* max # of files we'll handle */
+#define MAX_DLB_FILES 250	/* max # of files we'll handle */
 #define DLB_VERS 1		/* version of dlb file we will write */
 
 /*
@@ -366,7 +366,7 @@ main(argc, argv)
 		if (nfiles >= MAX_DLB_FILES) {
 		    printf("Too many dlb files!  Stopping at %d.\n",
 								MAX_DLB_FILES);
-		    break;
+		    xexit(EXIT_FAILURE);
 		}
 		ld[nfiles].fname = (char *) alloc(strlen(argv[ap]) + 1);
 		Strcpy(ld[nfiles].fname, argv[ap]);
@@ -386,7 +386,7 @@ main(argc, argv)
 		if (nfiles >= MAX_DLB_FILES) {
 		    printf("Too many dlb files!  Stopping at %d.\n",
 								MAX_DLB_FILES);
-		    break;
+		    xexit(EXIT_FAILURE);
 		}
 		*(eos(buf)-1) = '\0';	/* strip newline */
 		ld[nfiles].fname = (char *) alloc(strlen(buf) + 1);
