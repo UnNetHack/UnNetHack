@@ -1511,7 +1511,7 @@ struct ext_func_tab extcmdlist[] = {
 	{"turn", "turn undead", doturn, TRUE},
 	{"twoweapon", "toggle two-weapon combat", dotwoweapon, FALSE},
 	{"untrap", "untrap something", dountrap, FALSE},
-	{"version", "list compile time options for this version of NetHack",
+	{"version", "list compile time options for this version of UnNetHack",
 		doextversion, TRUE},
 	{"wipe", "wipe off your face", dowipe, FALSE},
 	{"?", "get this list of extended commands", doextlist, TRUE},
