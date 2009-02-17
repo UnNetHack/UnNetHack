@@ -178,6 +178,18 @@ boolean verbose;  /* give message(s) even when you can't see what happened */
 	    if (vis) hit(distant_name(otmp,mshot_xname), mtmp, exclam(damage));
 	    else if (verbose) pline("%s is hit%s", Monnam(mtmp), exclam(damage));
 
+#ifdef WEBB_DISINT
+	    if (touch_disintegrates(mtmp->data) && !mtmp->mcan && mtmp->mhp>6 &&
+		!oresist_disintegration(otmp)){
+		    damage = otmp->owt;
+		    weight_dmg(damage);
+		    mtmp->mhp-=damage;
+		    if(vis)
+			pline("It disintegrates!"); 
+		    obfree(otmp, (struct obj*) 0);
+		    return 1;
+	    }
+#endif
 	    if (otmp->opoisoned && is_poisonable(otmp)) {
 		if (resists_poison(mtmp)) {
 		    if (vis) pline_The("poison doesn't seem to affect %s.",

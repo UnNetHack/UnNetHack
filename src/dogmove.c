@@ -623,6 +623,10 @@ register int after;	/* this is extra fast monster movement */
 			  || mtmp2->data->msound == MS_GUARDIAN
 			  || mtmp2->data->msound == MS_LEADER) &&
 			 mtmp2->mpeaceful && !Conflict) ||
+#ifdef WEBB_DISINT
+			(touch_disintegrates(mtmp2->data) &&
+			 !resists_disint(mtmp)) ||
+#endif
 			   (touch_petrifies(mtmp2->data) &&
 				!resists_ston(mtmp)))
 			continue;

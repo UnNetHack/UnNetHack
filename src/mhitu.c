@@ -1570,9 +1570,98 @@ dopois:
 		    if (drain_item(obj)) {
 			Your("%s less effective.", aobjnam(obj, "seem"));
 		    }
+
 		}
 		break;
-	    default:	dmg = 0;
+#ifdef WEBB_DISINT
+	    case AD_DISN:
+		hitmsg(mtmp, mattk);
+		if (!mtmp->mcan && mtmp->mhp>6) {
+			int mass = 0, touched = 0;
+			struct obj * destroyme = 0;
+			if (Disint_resistance) {
+				break;
+			}
+			if (uarms) {
+				if (!oresist_disintegration(uarms))
+					destroyme = uarms;
+			} else {
+				switch (rn2(10)) { /* where it hits you */
+					case 0: /* head */
+					case 1:
+						if (uarmc && (uarmc->otyp == DWARVISH_CLOAK ||
+						    uarmc->otyp == MUMMY_WRAPPING)) {
+							if (!oresist_disintegration(uarmc)) {
+								destroyme = uarmc;
+							}
+						} else if (uarmh) {
+							if (!oresist_disintegration(uarmh)) {
+								destroyme = uarmh;
+							}
+						} else
+							touched = 1;
+						break;
+					case 2: /* feet */
+						if (uarmf) {
+							if (!oresist_disintegration(uarmf))
+								destroyme = uarmf;
+						} else
+							touched = 1;
+						break;
+					case 3: /* hands (right) */
+					case 4:
+						if (uwep) {
+							if (!oresist_disintegration(uwep)) {
+								struct obj * otmp = uwep; 
+								mass = otmp->owt;
+								u.twoweap = FALSE;
+								uwepgone();
+								useup(otmp);
+								dmg = 0;
+							}
+						} else if (uarmg) {
+							if (!oresist_disintegration(uarmg))
+								destroyme = uarmg;
+						} else
+							touched = 1;
+						break;
+					default: /* main body hit */
+						if (uarmc) {
+							if (!oresist_disintegration(uarmc))
+								destroyme = uarmc;
+						} else if (uarm) {
+							if (!oresist_disintegration(uarm))
+								destroyme = uarm;
+#ifdef TOURIST
+						} else if (uarmu) {
+							if (!oresist_disintegration(uarmu))
+								destroyme = uarmu;
+#endif
+						} else
+							touched = 1;
+						break;
+				} 
+			}
+			if (destroyme) {
+				mass = destroyme->owt;
+				destroy_arm(destroyme);
+				dmg = 0;
+			} else if (touched) {
+				int recip_damage = instadisintegrate(mtmp->data->mname);
+				if (recip_damage) {
+					dmg=0;
+					mtmp->mhp -= recip_damage;
+				}
+			}
+			if (mass) {
+				weight_dmg(mass);
+				mtmp->mhp -= mass;
+			}
+		}
+		break;
+#endif
+     default:
+       dmg = 0;
 			break;
 	}
 	if(u.uhp < 1) done_in_by(mtmp);

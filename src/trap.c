@@ -1657,6 +1657,12 @@ register struct monst *mtmp;
 	boolean trapkilled = FALSE;
 	struct permonst *mptr = mtmp->data;
 	struct obj *otmp;
+#ifdef WEBB_DISINT
+	boolean can_disint =(touch_disintegrates(mtmp->data) && 
+	                     !mtmp->mcan &&
+	                      mtmp->mhp>6 &&
+	                      rn2(20));
+#endif
 
 	if (!trap) {
 	    mtmp->mtrapped = 0;	/* perhaps teleported? */
@@ -1701,6 +1707,9 @@ register struct monst *mtmp;
 	} else {
 	    register int tt = trap->ttyp;
 	    boolean in_sight, tear_web, see_it,
+#ifdef WEBB_DISINT
+	    trap_visible = (trap->tseen && cansee(trap->tx,trap->ty)),
+#endif
 		    inescapable = ((tt == HOLE || tt == PIT) &&
 				   In_sokoban(&u.uz) && !trap->madeby_u);
 	    const char *fallverb;
@@ -1797,6 +1806,22 @@ register struct monst *mtmp;
 			if(mptr->msize > MZ_SMALL &&
 				!amorphous(mptr) && !is_flyer(mptr) &&
 				!is_whirly(mptr) && !unsolid(mptr)) {
+#ifdef WEBB_DISINT
+				if (can_disint){
+					if (in_sight)
+						pline("%s beartrap disintegrates on %s leg!",
+								A_Your[trap->madeby_u], s_suffix(mon_nam(mtmp)));
+					else if (trap_visible)
+						pline("%s beartrap disintegrates!",
+								A_Your[trap->madeby_u]);
+					deltrap(trap);
+					newsym(mtmp->mx,mtmp->my);
+					mtmp->mhp -= rnd(2); /* beartrap weighs 200 */
+				}
+				else {
+#else
+		   {
+#endif
 			    mtmp->mtrapped = 1;
 			    if(in_sight) {
 				pline("%s is caught in %s bear trap!",
@@ -1810,6 +1835,7 @@ register struct monst *mtmp;
 			    }
 			}
 			break;
+		   }
 
 		case SLP_GAS_TRAP:
 		    if (!resists_sleep(mtmp) && !breathless(mptr) &&
@@ -1888,6 +1914,10 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 				mondied(mtmp);
 				if (mtmp->mhp <= 0)
 					trapkilled = TRUE;
+#ifdef WEBB_DISINT
+			} else if (can_disint) {
+				pline("The water vanishes in a green twinkling.");
+#endif
 			} else if (mptr == &mons[PM_GREMLIN] && rn2(3)) {
 				(void)split_mon(mtmp, (struct monst *)0);
 			}
@@ -1963,6 +1993,14 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 				pline("How pitiful.  Isn't that the pits?");
 			    seetrap(trap);
 			}
+#ifdef WEBB_DISINT
+			if (can_disint && tt == SPIKED_PIT){
+				trap->ttyp = PIT;
+				if (trap_visible){
+					pline("Some spikes dinsintegrate.");
+				}
+			}
+#endif
 			mselftouch(mtmp, "Falling, ", FALSE);
 			if (mtmp->mhp <= 0 ||
 				thitm(0, mtmp, (struct obj *)0,
@@ -2009,6 +2047,20 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 		case WEB:
 			/* Monster in a web. */
 			if (webmaker(mptr)) break;
+#ifdef WEBB_DISINT
+			if (can_disint) {
+				if (in_sight) {
+					pline("%s dissolves %s spider web!", Monnam(mtmp),
+							a_your[trap->madeby_u]);
+				} else if (trap_visible) {
+					pline("%s spider web disintegrates in a green twinkling!", 
+							A_Your[trap->madeby_u]);
+				}
+				deltrap(trap);
+				newsym(mtmp->mx, mtmp->my);
+				break;
+			} else
+#endif
 			if (amorphous(mptr) || is_whirly(mptr) || unsolid(mptr)){
 			    if(acidic(mptr) ||
 			       mptr == &mons[PM_GELATINOUS_CUBE] ||
@@ -2203,6 +2255,51 @@ boolean byplayer;
 		xkilled(mon,0);
 	} else monstone(mon);
 }
+
+#ifdef WEBB_DISINT
+int
+instadisintegrate(str)
+const char * str;
+{
+	int result;
+	if (Disint_resistance || !rn2(10))
+		return 0;
+	You("disintegrate!");
+	result = (youmonst.data->cwt);
+	weight_dmg(result);
+	result = min(6, result); 
+	killer_format = KILLED_BY_AN;
+	killer = str;
+	u.ugrave_arise = -3;
+	done(DISINTEGRATED);
+
+	return (result);
+}
+
+int
+minstadisintegrate(mon)
+struct monst *mon;
+{
+  int result = mon->data->cwt;
+  if (resists_disint(mon) || !rn2(20)) return 0;
+  weight_dmg(result); 
+  if (canseemon(mon))
+    pline("%s disintegrates!", Monnam(mon));
+  if (is_rider(mon->data)){
+    if (canseemon(mon)){
+      pline("%s body reintegrates before your %s!",
+          s_suffix(Monnam(mon)),
+          (eyecount(youmonst.data) == 1)?
+          body_part(EYE) : makeplural(body_part(EYE)));
+      mon->mhp = mon->mhpmax;
+    }
+    return result;
+  } else {
+    mondead_helper(mon, AD_DISN);
+    return result;
+  }
+}
+#endif
 
 void
 selftouch(arg)
@@ -3324,6 +3421,12 @@ struct trap *ttmp;
 	int wt;
 	struct obj *otmp;
 	boolean uprob;
+#ifdef WEBB_DISINT
+	boolean udied;
+	boolean can_disint = (touch_disintegrates(mtmp->data) &&
+	                      !mtmp->mcan &&
+	                       mtmp->mhp>6);
+#endif
 
 	/*
 	 * This works when levitating too -- consistent with the ability
@@ -3368,6 +3471,20 @@ struct trap *ttmp;
 	}
 	/* need to do cockatrice check first if sleeping or paralyzed */
 	if (uprob) {
+#ifdef WEBB_DISINT
+		if (can_disint && (!(uarmg) || !oresist_disintegration(uarmg))) {
+			char kbuf[BUFSZ];
+			Sprintf(kbuf, "trying to help %s out of a pit",
+					an(mtmp->data->mname));
+			You("try to grab %s, but...", mon_nam(mtmp));
+			if (uarmg) {
+				destroy_arm(uarmg);
+			} else {
+				if (!instadisintegrate(kbuf))
+					You("cannot get a firm grasp.");
+			}
+		} else
+#endif
 	    You("try to grab %s, but cannot get a firm grasp.",
 		mon_nam(mtmp));
 	    if (mtmp->msleeping) {
@@ -3380,6 +3497,21 @@ struct trap *ttmp;
 	You("reach out your %s and grab %s.",
 	    makeplural(body_part(ARM)), mon_nam(mtmp));
 
+#ifdef WEBB_DISINT
+	if (can_disint) {
+		char kbuf[BUFSZ];
+		Sprintf(kbuf, "trying to help %s out of a pit",
+				an(mtmp->data->mname));
+		if (uarmg) {
+			if (!oresist_disintegration(uarmg)) {
+				destroy_arm(uarmg);
+				udied = (instadisintegrate(kbuf)) ? 1 : 0;
+			}
+		} else
+			udied = (instadisintegrate(kbuf)) ? 1 : 0;
+	}
+#endif
+
 	if (mtmp->msleeping) {
 	    mtmp->msleeping = 0;
 	    pline("%s awakens.", Monnam(mtmp));
@@ -3389,7 +3521,9 @@ struct trap *ttmp;
 	    mtmp->mfrozen = 0;
 	    pline("%s stirs.", Monnam(mtmp));
 	}
-
+#ifdef WEBB_DISINT
+	if (udied) return 1;
+#endif
 	/* is the monster too heavy? */
 	wt = inv_weight() + mtmp->data->cwt;
 	if (!try_lift(mtmp, ttmp, wt, FALSE)) return 1;
@@ -3904,6 +4038,19 @@ boolean nocorpse;
 			dam = dmgval(obj, mon);
 			if (dam < 1) dam = 1;
 		}
+
+#ifdef WEBB_DISINT
+		if (obj && touch_disintegrates(mon->data) &&
+				!mon->mcan && (mon->mhp > 6) && !oresist_disintegration(obj)) {
+			dam = obj->owt;
+			weight_dmg(dam);
+			if (cansee(mon->mx, mon->my))
+				pline("It disintegrates!");
+			dealloc_obj(obj);
+			obj = 0;
+		}
+#endif
+
 		if ((mon->mhp -= dam) <= 0) {
 			int xx = mon->mx;
 			int yy = mon->my;

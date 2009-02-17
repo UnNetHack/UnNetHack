@@ -302,7 +302,17 @@ struct obj {
 #else
 #define is_flimsy(otmp)		(objects[(otmp)->otyp].oc_material <= LEATHER)
 #endif
+#ifdef WEBB_DISINT
+# define oresist_disintegration(obj) \
+		(objects[obj->otyp].oc_oprop == DISINT_RES || \
+		 obj_resists(obj, 5, 50) || is_quest_artifact(obj) )
+# define weight_dmg(i) {  \
+  i = (i<=100)?1:i/100; \
+  i = rnd(i); \
+  if(i > 6) i = 6; \
+}
 
+#endif
 /* helpers, simple enough to be macros */
 #define is_plural(o)	((o)->quan > 1 || \
 			 (o)->oartifact == ART_EYES_OF_THE_OVERWORLD)

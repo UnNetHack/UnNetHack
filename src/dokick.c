@@ -147,6 +147,25 @@ register xchar x, y;
 		/* we only care about kicking attacks here */
 		if (uattk->aatyp != AT_KICK) continue;
 
+#ifdef WEBB_DISINT
+		if (touch_disintegrates(mon->data) && !mon->mcan && mon->mhp>6){
+			if(uarmf) {
+				if(!oresist_disintegration(uarmf)){
+					tmp = uarmf->owt;
+					weight_dmg(tmp);
+					destroy_arm(uarmf);
+					break;
+				}
+			} else {
+				char kbuf[BUFSZ];
+				int dis_dmg;
+				Sprintf(kbuf, "barefootedly kicking %s",
+				        an(mon->data->mname));
+				dis_dmg = instadisintegrate(kbuf);
+				break;
+			}
+		} else
+#endif
 		if (mon->data == &mons[PM_SHADE] &&
 			(!uarmf || !uarmf->blessed)) {
 		    /* doesn't matter whether it would have hit or missed,
@@ -238,6 +257,20 @@ register struct monst *mtmp;
 register struct obj *gold;
 {
 	boolean msg_given = FALSE;
+#ifdef WEBB_DISINT
+	if (touch_disintegrates(mtmp->data) && !mtmp->mcan && mtmp->mhp >6 &&
+# ifdef GOLDOBJ
+	   !oresist_disintegration(gold)
+# else
+			rn2(20)
+# endif
+	) {
+		if(cansee(mtmp->mx, mtmp->my))
+			pline_The("%s %s!", xname(gold), vtense(xname(gold),"disintegrate"));
+		dealloc_obj(gold);
+		return TRUE;
+	}
+#endif
 
 	if(!likes_gold(mtmp->data) && !mtmp->isshk && !mtmp->ispriest
 			&& !is_mercenary(mtmp->data)) {

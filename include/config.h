@@ -382,6 +382,7 @@ typedef unsigned char	uchar;
 #define RANDOMIZED_PLANES /* Elemental Planes order is randomized - Patric Mueller (4 Jan 2009) */
 #define BLACKMARKET	/* Massimo Campostrini (campo@sunthpi3.difi.unipi.it) */
 
+
 #if defined(TTY_GRAPHICS) || defined(MSWIN_GRAPHICS)
 # define MENU_COLOR
 # define MENU_COLOR_REGEX
@@ -407,6 +408,8 @@ typedef unsigned char	uchar;
 # define WIN_EDGE	/* windows aligned left&top */
 # define VIDEOSHADES    /* Slash'Em like colors */
 #endif
+
+#define WEBB_DISINT /* Disintegrator - Nicholas Webb */
 
 /* End of Section 5 */
 

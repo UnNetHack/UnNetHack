@@ -24,6 +24,9 @@ STATIC_DCL int FDECL(gazemm, (struct monst *,struct monst *,struct attack *));
 STATIC_DCL int FDECL(gulpmm, (struct monst *,struct monst *,struct attack *));
 STATIC_DCL int FDECL(explmm, (struct monst *,struct monst *,struct attack *));
 STATIC_DCL int FDECL(mdamagem, (struct monst *,struct monst *,struct attack *));
+#ifdef WEBB_DISINT
+STATIC_DCL int FDECL(defdisintagr, (struct monst *,struct monst *,struct attack *));
+#endif
 STATIC_DCL void FDECL(mswingsm, (struct monst *, struct monst *, struct obj *));
 STATIC_DCL void FDECL(noises,(struct monst *,struct attack *));
 STATIC_DCL void FDECL(missmm,(struct monst *,struct monst *,struct attack *));
@@ -280,8 +283,12 @@ mattackm(magr, mdef)
 		 * have a weapon instead.  This instinct doesn't work for
 		 * players, or under conflict or confusion. 
 		 */
-		if (!magr->mconf && !Conflict && otmp &&
-		    mattk->aatyp != AT_WEAP && touch_petrifies(mdef->data)) {
+		if (!magr->mconf && !Conflict && otmp && (
+#ifdef WEBB_DISINT
+          (touch_disintegrates(mdef->data) &&
+           (mattk->aatyp == AT_WEAP || !(resists_disint(magr))) ) ||
+#endif 
+		    mattk->aatyp != AT_WEAP && touch_petrifies(mdef->data))) {
 		    strike = 0;
 		    break;
 		}
@@ -580,6 +587,139 @@ explmm(magr, mdef, mattk)
 	return result;
 }
 
+#ifdef WEBB_DISINT
+STATIC_OVL int
+defdisintagr(magr, mdef, mattk)
+	register struct monst	*magr, *mdef;
+	register struct attack	*mattk;
+{
+	int tmp=-1; /* -1 a miss,
+	               -MM_AGR_DIED aggre died,
+	               -2 do nothing,
+	              >=0 store as tmp. */
+
+	if (mdef->mhp>6 && !mdef->mcan) {
+		int touched = 0;
+		int mass = 0;
+		struct obj * otch = 0;
+		switch (attk_protection((int)mattk->aatyp)) {
+			/* this is in dire need of optimization */
+			case (W_ARMC|W_ARMG):
+				if (otch = which_armor(magr, W_ARMG)) {
+					if (!oresist_disintegration(otch)) {
+						if (canseemon(magr))
+							pline("%s %s disintegrates!",
+							      s_suffix(Monnam(magr)), distant_name(otch, xname));
+						mass += otch->owt;
+						m_useup(magr,otch);
+						otch = 0;
+						touched = 1;
+					}
+				} else touched = 1;
+				if (otch = which_armor(magr, W_ARMC)) {
+					if (!oresist_disintegration(otch)) {
+						if (canseemon(magr))
+							pline("%s %s disintegrates!",
+							      s_suffix(Monnam(magr)), distant_name(otch, xname));
+						mass += otch->owt;
+						m_useup(magr,otch);
+						touched = 1;
+					}
+				} else touched = 1;
+				if (!(magr->misc_worn_check & W_ARMC) &&
+						(otch = which_armor(magr,W_ARM)) &&
+						(!oresist_disintegration(otch))) {
+					if (canseemon(magr))
+						pline("%s %s disintegrates!",
+						      s_suffix(Monnam(magr)), distant_name(otch, xname));
+					mass += otch->owt;
+					m_useup(magr,otch);
+				} 
+#ifdef TOURIST
+				if (!(magr->misc_worn_check & (W_ARMC|W_ARM)) &&
+						(otch = which_armor(magr,W_ARMU)) &&
+						(!oresist_disintegration(otch))) {
+					if (canseemon(magr))
+						pline("%s %s disintegrates!",
+						      s_suffix(Monnam(magr)), distant_name(otch, xname));
+					mass += otch->owt;
+					m_useup(magr,otch);
+				}
+#endif
+				break;
+			case (W_ARMG):
+				if (otmp) {
+					if (!oresist_disintegration(otmp)) {
+						if (canseemon(magr))
+							pline("%s %s disintegrates!",
+							      s_suffix(Monnam(magr)), distant_name(otmp, xname));
+						mass += otmp->owt;
+						m_useup(magr,otmp);
+						tmp = 0;
+					}
+				} else if (otch = which_armor(magr,W_ARMG)) {
+					if (!oresist_disintegration(otch)) {
+						if (canseemon(magr))
+							pline("%s %s disintegrates!",
+									s_suffix(Monnam(magr)), distant_name(otch, xname));
+						mass += otch->owt;
+						m_useup(magr,otch);
+						touched = 1;
+					}
+				} else touched = 1;
+				break;
+			case (W_ARMH):
+				if (otch = which_armor(magr,W_ARMH)) {
+					if (!oresist_disintegration(otch)) {
+						if (canseemon(magr))
+							pline("%s %s disintegrates!",
+									s_suffix(Monnam(magr)), distant_name(otch, xname));
+						mass += otch->owt;
+						m_useup(magr,otch);
+						touched = 1;
+					}
+				} else touched = 1;
+				break;
+			case (W_ARMF):
+				if (otch = which_armor(magr,W_ARMF)) {
+					if (!oresist_disintegration(otch)) {
+						if (canseemon(magr))
+							pline("%s %s disintegrates!",
+							      s_suffix(Monnam(magr)), distant_name(otch, xname));
+						mass += otch->owt;
+						m_useup(magr,otch);
+						touched = 1;
+					}
+				} else touched = 1;
+				break;
+			case (0L):
+				touched = 1;
+				break;
+			default:
+				break;
+		}
+		if (!touched || resists_disint(magr)) {
+			if (mass)
+				weight_dmg(mass);
+			tmp = mass; 
+		} else {
+			struct obj * lifesave = mlifesaver(magr);
+			mass += magr->data->cwt;
+			weight_dmg(mass);
+			if (mass)
+				mdef->mhp -= mass ;
+			if (vis) pline("%s disintegrates!", Monnam(magr));
+			mondead_helper(magr,mattk->adtyp);
+			if (magr->mhp > 0) return -1;
+			else if (magr->mtame && !vis)
+				You(brief_feeling, "peculiarly sad");
+			return -MM_AGR_DIED;
+		}
+	}
+	return tmp;
+}
+#endif
+
 /*
  *  See comment at top of mattackm(), for return values.
  */
@@ -594,6 +734,22 @@ mdamagem(magr, mdef, mattk)
 	int armpro, num, tmp = d((int)mattk->damn, (int)mattk->damd);
 	boolean cancelled;
 
+#ifdef WEBB_DISINT
+	int def_disintegrated;
+	if (touch_disintegrates(pd) &&
+			(def_disintegrated = defdisintagr(magr, mdef, mattk)) != -2 )
+		switch (def_disintegrated) {
+			case -MM_AGR_DIED:
+				return MM_AGR_DIED;
+				break;
+			case -1:
+				return 0;
+				break;
+			default:
+				tmp = def_disintegrated;
+				break;
+		}
+#endif
 	if (touch_petrifies(pd) && !resists_ston(magr)) {
 	    long protector = attk_protection((int)mattk->aatyp),
 		 wornitems = magr->misc_worn_check;
@@ -1147,6 +1303,46 @@ mdamagem(magr, mdef, mattk)
 		/* there's no msomearmor() function, so just do damage */
 	     /* if (cancelled) break; */
 		break;
+#ifdef WEBB_DISINT
+	    case AD_DISN: /* only hit torso aromor */
+		if (!magr->mcan && magr->mhp > 6) {
+			struct obj * otch = 0;
+			int recip_dam = 0;
+			if (otch = which_armor(mdef, W_ARMS)) {
+				if (oresist_disintegration(otch))
+					otch = 0;
+			} else if (otch = which_armor(mdef, W_ARMC)) {
+				if (oresist_disintegration(otch))
+					otch = 0;
+			} else if (otch = which_armor(mdef, W_ARM)) {
+				if (oresist_disintegration(otch))
+					otch = 0;
+#ifdef TOURIST
+			} else if (otch = which_armor(mdef, W_ARMU)) {
+				if (oresist_disintegration(otch))
+					otch = 0;
+#endif
+			} else {
+				recip_dam = minstadisintegrate(mdef);
+			}
+			if (recip_dam) {
+				tmp = 0;
+			} else if (otch) {
+				recip_dam = otch->owt;
+				weight_dmg(recip_dam);
+				if(canseemon(mdef))
+					pline("%s %s disintegrates!", 
+					      s_suffix(Monnam(mdef)), distant_name(otch, xname));
+				m_useup(mdef,otch);
+				tmp = 0;
+			}
+			magr->mhp -= recip_dam;
+			if (!mdef->mhp)
+				return (MM_DEF_DIED |
+				        (grow_up(magr,mdef) ?  0 : MM_AGR_DIED));
+		}
+		break;
+#endif
 	    default:	tmp = 0;
 			break;
 	}

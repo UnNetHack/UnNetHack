@@ -50,8 +50,11 @@ STATIC_VAR short cham_to_pm[];
 #else
 STATIC_DCL struct obj *FDECL(make_corpse,(struct monst *));
 STATIC_DCL void FDECL(m_detach, (struct monst *, struct permonst *));
+#ifdef WEBB_DISINT
+STATIC_DCL void FDECL(lifesaved_monster, (struct monst *, uchar));
+#else
 STATIC_DCL void FDECL(lifesaved_monster, (struct monst *));
-
+#endif
 /* convert the monster index of an undead to its living counterpart */
 int
 undead_to_corpse(mndx)
@@ -1370,8 +1373,14 @@ struct monst *mon;
 }
 
 STATIC_OVL void
+#ifdef WEBB_DISINT
+lifesaved_monster(mtmp,adtyp)
+struct monst *mtmp;
+uchar adtyp;
+#else
 lifesaved_monster(mtmp)
 struct monst *mtmp;
+#endif
 {
 	struct obj *lifesave = mlifesaver(mtmp);
 
@@ -1386,7 +1395,11 @@ struct monst *mtmp;
 				s_suffix(Monnam(mtmp)));
 			makeknown(AMULET_OF_LIFE_SAVING);
 			if (attacktype(mtmp->data, AT_EXPL)
-			    || attacktype(mtmp->data, AT_BOOM))
+			    || attacktype(mtmp->data, AT_BOOM)
+#ifdef WEBB_DISINT
+             || adtyp == AD_DISN 
+#endif
+             )
 				pline("%s reconstitutes!", Monnam(mtmp));
 			else
 				pline("%s looks much better!", Monnam(mtmp));
@@ -1410,9 +1423,23 @@ struct monst *mtmp;
 	mtmp->mhp = 0;
 }
 
+#ifndef WEBB_DISINT
 void
 mondead(mtmp)
 register struct monst *mtmp;
+#else
+void
+mondead(mtmp)
+register struct monst *mtmp;
+{
+  mondead_helper(mtmp, 0); /* mmm... default parameter values */
+}
+
+void
+mondead_helper(mtmp, adtyp)
+register struct monst * mtmp;
+uchar adtyp; 
+#endif
 {
 	struct permonst *mptr;
 	int tmp;
@@ -1423,7 +1450,11 @@ register struct monst *mtmp;
 		 * the m_detach or there will be relmon problems later */
 		if(!grddead(mtmp)) return;
 	}
+#ifdef WEBB_DISINT
+	lifesaved_monster(mtmp, adtyp);
+#else
 	lifesaved_monster(mtmp);
+#endif
 	if (mtmp->mhp > 0) return;
 
 #ifdef STEED
@@ -1508,7 +1539,11 @@ boolean was_swallowed;			/* digestion */
 	struct permonst *mdat = mon->data;
 	int i, tmp;
 
-	if (mdat == &mons[PM_VLAD_THE_IMPALER] || mdat->mlet == S_LICH) {
+	if (mdat == &mons[PM_VLAD_THE_IMPALER] || mdat->mlet == S_LICH
+#ifdef WEBB_DISINT
+            || mdat == &mons[PM_DISINTEGRATOR]
+#endif 
+       ) {
 	    if (cansee(mon->mx, mon->my) && !was_swallowed)
 		pline("%s body crumbles into dust.", s_suffix(Monnam(mon)));
 	    return FALSE;
@@ -1618,7 +1653,11 @@ register struct monst *mdef;
 	 * put inventory in it, and we have to check for lifesaving before
 	 * making the statue....
 	 */
+#ifdef WEBB_DISINT
+	lifesaved_monster(mdef, AD_STON);
+#else
 	lifesaved_monster(mdef);
+#endif
 	if (mdef->mhp > 0) return;
 
 	mdef->mtrapped = 0;	/* (see m_detach) */
@@ -1712,8 +1751,14 @@ int how;
 	    be_sad = (mdef->mtame != 0);
 
 	/* no corpses if digested or disintegrated */
-	if(how == AD_DGST || how == -AD_RBRE)
-	    mondead(mdef);
+	if (how == AD_DGST || how == -AD_RBRE
+#ifdef WEBB_DISINT
+            || how == AD_DISN)
+		mondead_helper(mdef, how);
+#else
+       )
+		mondead(mdef);
+#endif
 	else
 	    mondied(mdef);
 

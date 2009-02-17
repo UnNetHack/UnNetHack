@@ -1130,6 +1130,9 @@ E void FDECL(replmon, (struct monst *,struct monst *));
 E void FDECL(relmon, (struct monst *));
 E struct obj *FDECL(mlifesaver, (struct monst *));
 E boolean FDECL(corpse_chance,(struct monst *,struct monst *,BOOLEAN_P));
+#ifdef WEBB_DISINT
+E void FDECL(mondead_helper, (struct monst *, uchar));
+#endif
 E void FDECL(mondead, (struct monst *));
 E void FDECL(mondied, (struct monst *));
 E void FDECL(mongone, (struct monst *));
@@ -2034,6 +2037,10 @@ E void FDECL(seetrap, (struct trap *));
 E int FDECL(mintrap, (struct monst *));
 E void FDECL(instapetrify, (const char *));
 E void FDECL(minstapetrify, (struct monst *,BOOLEAN_P));
+#ifdef WEBB_DISINT
+E int FDECL(instadisintegrate, (const char *));
+E int FDECL(minstadisintegrate, (struct monst *));
+#endif
 E void FDECL(selftouch, (const char *));
 E void FDECL(mselftouch, (struct monst *,const char *,BOOLEAN_P));
 E void NDECL(float_up);
