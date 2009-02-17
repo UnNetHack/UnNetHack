@@ -416,8 +416,23 @@ fixup_special()
     }
 
 	/* KMH -- Sokoban levels */
-	if(In_sokoban(&u.uz))
+	if(In_sokoban(&u.uz)) {
 		sokoban_detect();
+
+		/* randomize Sokoban prize */
+		int x,y;
+		for (x = 1; x < COLNO; x++) {
+			for(y = 1; y < ROWNO; y++) {
+				register struct engr *ep = engr_at(x,y);
+				/* Sokoban top levels have no random, burned engravings */
+				if (ep && ep->engr_txt[0] && ep->engr_type == BURN &&
+				    (!strcmp(ep->engr_txt, "Elbereth"))) {
+						mksobj_at((rn2(2)) ? BAG_OF_HOLDING : AMULET_OF_REFLECTION,
+						          x, y, TRUE, FALSE);
+				}
+			}
+		}
+	}
 
     /* Still need to add some stuff to level file */
     if (Is_medusa_level(&u.uz)) {
