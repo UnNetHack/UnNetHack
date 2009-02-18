@@ -656,6 +656,10 @@ register const char *s;
 		     !SPACE_POS(levl[x][y].typ) || occupied(x, y));
 	    inv_pos.x = x;
 	    inv_pos.y = y;
+
+	    /* "'X' never, ever marks the spot" */
+	    if (Role_if(PM_ARCHEOLOGIST))
+		make_engr_at(x, y, "X", 0L, DUST);
 #undef INVPOS_X_MARGIN
 #undef INVPOS_Y_MARGIN
 #undef INVPOS_DISTANCE

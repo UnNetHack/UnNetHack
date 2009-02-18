@@ -352,7 +352,12 @@ dodrink()
 	/* Or are you surrounded by water? */
 	if (Underwater) {
 		if (yn("Drink the water around you?") == 'y') {
+
+			if (Role_if(PM_ARCHEOLOGIST)) {
+				pline("No thank you, fish make love in it!"); /* Indiana Jones 3 */
+			} else {
 		    pline("Do you know what lives in this water!");
+			}
 			return 1;
 		}
 	}
