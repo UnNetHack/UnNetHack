@@ -268,6 +268,9 @@ E NEARDATA struct obj *migrating_objs;
 E NEARDATA struct obj *billobjs;
 E NEARDATA struct obj zeroobj;		/* init'd and defined in decl.c */
 
+#include "engrave.h"
+E struct engr *head_engr;
+
 #include "you.h"
 E NEARDATA struct you u;
 

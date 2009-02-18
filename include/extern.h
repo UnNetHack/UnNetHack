@@ -1029,6 +1029,7 @@ void FDECL(remove_rooms, (int,int,int,int));
 /* ### mkmaze.c ### */
 
 E void FDECL(wallification, (int,int,int,int));
+E void FDECL(wall_extends, (int,int,int,int));
 E void FDECL(walkfrom, (int,int));
 E void FDECL(makemaz, (const char *));
 E void FDECL(mazexy, (coord *));

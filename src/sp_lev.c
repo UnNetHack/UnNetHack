@@ -23,6 +23,9 @@
 
 #include "sp_lev.h"
 #include "rect.h"
+#include "epri.h"
+#include "eshk.h"
+
 
 extern void FDECL(mkmap, (lev_init *));
 
@@ -62,6 +65,8 @@ STATIC_DCL boolean FDECL(create_subroom, (struct mkroom *, XCHAR_P, XCHAR_P,
 #define Fgetc	(schar)dlb_fgetc
 #define Free(ptr)		if(ptr) free((genericptr_t) (ptr))
 
+extern struct engr *head_engr;
+
 extern int min_rx, max_rx, min_ry, max_ry; /* from mkmap.c */
 
 char SpLev_Map[COLNO][ROWNO];
@@ -89,6 +94,237 @@ STATIC_DCL struct mkroom *FDECL(build_room, (room *, struct mkroom *));
 char *lev_message = 0;
 lev_region *lregions = 0;
 int num_lregions = 0;
+
+void
+flip_level(int flp)
+{
+    int x2 = COLNO-1;
+    int y2 = ROWNO-1;
+
+    pline("Rotiere LEVEL um %d", flp);
+
+    int x, y, i;
+
+    struct rm trm;
+
+    struct trap *ttmp;
+    struct obj *otmp;
+    struct monst *mtmp;
+    struct engr *etmp;
+    struct mkroom *sroom;
+
+    /* stairs and ladders */
+    if (flp & 1) {
+	yupstair = y2 - yupstair;
+	ydnstair = y2 - ydnstair;
+	yupladder = y2 - yupladder;
+	ydnladder = y2 - ydnladder;
+    }
+    if (flp & 2) {
+	xupstair = x2 - xupstair;
+	xdnstair = x2 - xdnstair;
+	xupladder = x2 - xupladder;
+	xdnladder = x2 - xdnladder;
+    }
+
+    /* traps */
+    for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap) {
+	if (flp & 1) {
+	    ttmp->ty = y2 - ttmp->ty;
+	    if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {
+		ttmp->launch.y = y2 - ttmp->launch.y;
+		ttmp->launch2.y = y2 - ttmp->launch2.y;
+	    }
+	}
+	if (flp & 2) {
+	    ttmp->tx = x2 - ttmp->tx;
+	    if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {
+		ttmp->launch.x = x2 - ttmp->launch.x;
+		ttmp->launch2.x = x2 - ttmp->launch2.x;
+	    }
+	}
+    }
+
+    /* objects */
+    for (otmp = fobj; otmp; otmp = otmp->nobj) {
+	if (flp & 1)
+	    otmp->oy = y2 - otmp->oy;
+	if (flp & 2)
+	    otmp->ox = x2 - otmp->ox;
+    }
+
+    /* monsters */
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	if (flp & 1) {
+	    mtmp->my = y2 - mtmp->my;
+	    if (mtmp->ispriest)
+		EPRI(mtmp)->shrpos.y = y2 - EPRI(mtmp)->shrpos.y;
+	    else if (mtmp->isshk) {
+		ESHK(mtmp)->shk.y = y2 - ESHK(mtmp)->shk.y;
+		ESHK(mtmp)->shd.y = y2 - ESHK(mtmp)->shd.y;
+	    }
+	}
+	if (flp & 2) {
+	    mtmp->mx = x2 - mtmp->mx;
+	    if (mtmp->ispriest)
+		EPRI(mtmp)->shrpos.x = x2 - EPRI(mtmp)->shrpos.x;
+	    else if (mtmp->isshk) {
+		ESHK(mtmp)->shk.x = x2 - ESHK(mtmp)->shk.x;
+		ESHK(mtmp)->shd.x = x2 - ESHK(mtmp)->shd.x;
+	    }
+	}
+    }
+
+    /* engravings */
+    for (etmp = head_engr; etmp; etmp = etmp->nxt_engr) {
+	if (flp & 1)
+	    etmp->engr_y = y2 - etmp->engr_y;
+	if (flp & 2)
+	    etmp->engr_x = x2 - etmp->engr_x;
+    }
+
+    /* regions */
+    for (i = 0; i < num_lregions; i++) {
+	if (flp & 1) {
+	    lregions[i].inarea.y1 = y2 - lregions[i].inarea.y1;
+	    lregions[i].inarea.y2 = y2 - lregions[i].inarea.y2;
+	    if (lregions[i].inarea.y1 > lregions[i].inarea.y2) {
+		int tmp = lregions[i].inarea.y1;
+		lregions[i].inarea.y1 = lregions[i].inarea.y2;
+		lregions[i].inarea.y2 = tmp;
+	    }
+
+	    lregions[i].delarea.y1 = y2 - lregions[i].delarea.y1;
+	    lregions[i].delarea.y2 = y2 - lregions[i].delarea.y2;
+	    if (lregions[i].delarea.y1 > lregions[i].delarea.y2) {
+		int tmp = lregions[i].delarea.y1;
+		lregions[i].delarea.y1 = lregions[i].delarea.y2;
+		lregions[i].delarea.y2 = tmp;
+	    }
+	}
+	if (flp & 2) {
+	    lregions[i].inarea.x1 = x2 - lregions[i].inarea.x1;
+	    lregions[i].inarea.x2 = x2 - lregions[i].inarea.x2;
+	    if (lregions[i].inarea.x1 > lregions[i].inarea.x2) {
+		int tmp = lregions[i].inarea.x1;
+		lregions[i].inarea.x1 = lregions[i].inarea.x2;
+		lregions[i].inarea.x2 = tmp;
+	    }
+
+	    lregions[i].delarea.x1 = x2 - lregions[i].delarea.x1;
+	    lregions[i].delarea.x2 = x2 - lregions[i].delarea.x2;
+	    if (lregions[i].delarea.x1 > lregions[i].delarea.x2) {
+		int tmp = lregions[i].delarea.x1;
+		lregions[i].delarea.x1 = lregions[i].delarea.x2;
+		lregions[i].delarea.x2 = tmp;
+	    }
+	}
+    }
+
+    /* rooms */
+    for(sroom = &rooms[0]; ; sroom++) {
+	if (sroom->hx < 0) break;
+
+	if (flp & 1) {
+	    sroom->ly = y2 - sroom->ly;
+	    sroom->hy = y2 - sroom->hy;
+	    if (sroom->ly > sroom->hy) {
+		int tmp = sroom->ly;
+		sroom->ly = sroom->hy;
+		sroom->hy = tmp;
+	    }
+	}
+	if (flp & 2) {
+	    sroom->lx = x2 - sroom->lx;
+	    sroom->hx = x2 - sroom->hx;
+	    if (sroom->lx > sroom->hx) {
+		int tmp = sroom->lx;
+		sroom->lx = sroom->hx;
+		sroom->hx = tmp;
+	    }
+	}
+
+	if (sroom->nsubrooms)
+	    for (i = 0; i < sroom->nsubrooms; i++) {
+		struct mkroom *rroom = sroom->sbrooms[i];
+		if (flp & 1) {
+		    rroom->ly = y2 - rroom->ly;
+		    rroom->hy = y2 - rroom->hy;
+		    if (rroom->ly > rroom->hy) {
+			int tmp = rroom->ly;
+			rroom->ly = rroom->hy;
+			rroom->hy = tmp;
+		    }
+		}
+		if (flp & 2) {
+		    rroom->lx = x2 - rroom->lx;
+		    rroom->hx = x2 - rroom->hx;
+		    if (rroom->lx > rroom->hx) {
+			int tmp = rroom->lx;
+			rroom->lx = rroom->hx;
+			rroom->hx = tmp;
+		    }
+		}
+	    }
+    }
+
+    /* doors */
+    for (i = 0; i < doorindex; i++) {
+	if (flp & 1)
+	    doors[i].y = y2 - doors[i].y;
+	if (flp & 2)
+	    doors[i].x = x2 - doors[i].x;
+    }
+
+    /* the map */
+    if (flp & 1) {
+	for (x = 0; x <= x2; x++)
+	    for (y = 0; y <= (y2 / 2); y++) {
+
+		trm = levl[x][y];
+		levl[x][y] = levl[x][y2-y];
+		levl[x][y2-y] = trm;
+
+		otmp = level.objects[x][y];
+		level.objects[x][y] = level.objects[x][y2-y];
+		level.objects[x][y2-y] = otmp;
+
+		mtmp = level.monsters[x][y];
+		level.monsters[x][y] = level.monsters[x][y2-y];
+		level.monsters[x][y2-y] = mtmp;
+	    }
+    }
+    if (flp & 2) {
+	for (x = 0; x <= (x2 / 2); x++)
+	    for (y = 0; y <= y2; y++) {
+
+		trm = levl[x][y];
+		levl[x][y] = levl[x2-x][y];
+		levl[x2-x][y] = trm;
+
+		otmp = level.objects[x][y];
+		level.objects[x][y] = level.objects[x2-x][y];
+		level.objects[x2-x][y] = otmp;
+
+		mtmp = level.monsters[x][y];
+		level.monsters[x][y] = level.monsters[x2-x][y];
+		level.monsters[x2-x][y] = mtmp;
+	    }
+    }
+
+    wall_extends(1, 0, COLNO-1, ROWNO-1);
+}
+
+void
+flip_level_rnd(int flp)
+{
+    int c = 0;
+    if ((flp & 1) && rn2(2)) c |= 1;
+    if ((flp & 2) && rn2(2)) c |= 2;
+    flip_level(c);
+}
+
+
 
 /*
  * Make walls of the area (x1, y1, x2, y2) non diggable/non passwall-able
@@ -2893,6 +3129,8 @@ sp_lev *lvl;
     }
 
     wallification(1, 0, COLNO-1, ROWNO-1);
+
+    flip_level_rnd(3);
 
     count_features();
 

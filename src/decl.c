@@ -137,6 +137,8 @@ NEARDATA struct mkroom rooms[(MAXNROFROOMS+1)*2] = {DUMMY};
 NEARDATA struct mkroom* subrooms = &rooms[MAXNROFROOMS+1];
 struct mkroom *upstairs_room, *dnstairs_room, *sstairs_room;
 
+struct engr *head_engr;
+
 dlevel_t level;		/* level map */
 struct trap *ftrap = (struct trap *)0;
 NEARDATA struct monst youmonst = DUMMY;

@@ -4,9 +4,8 @@
 
 #include "hack.h"
 #include "lev.h"
+#include "decl.h"
 #include <ctype.h>
-
-STATIC_VAR NEARDATA struct engr *head_engr;
 
 #ifdef OVLB
 /* random engravings */
