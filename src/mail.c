@@ -54,6 +54,7 @@ int mustgetmail = -1;
 # ifdef UNIX
 #include <sys/stat.h>
 #include <pwd.h>
+#ifdef LEGACY_CODE
 /* DON'T trust all Unices to declare getpwuid() in <pwd.h> */
 #  if !defined(_BULL_SOURCE) && !defined(__sgi) && !defined(_M_UNIX)
 #   if !defined(SUNOS4) && !(defined(ULTRIX) && defined(__GNUC__))
@@ -65,6 +66,7 @@ extern struct passwd *FDECL(getpwuid,(int));
 #    endif
 #   endif
 #  endif
+#endif /* LEGACY_CODE */
 static struct stat omstat,nmstat;
 static char *mailbox = (char *)0;
 static long laststattime;

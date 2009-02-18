@@ -106,6 +106,7 @@ E long lrand48();
 E void srand48();
 #endif /* BSD || ULTRIX || RANDOM */
 
+#ifdef LEGACY_CODE
 #if !defined(BSD) || defined(ultrix)
 			/* real BSD wants all these to return int */
 # ifndef MICRO
@@ -142,6 +143,7 @@ E void FDECL(perror, (const char *));
 # endif
 #endif
 #endif
+#endif /* LEGACY_CODE */
 #ifndef NeXT
 #ifdef POSIX_TYPES
 E void FDECL(qsort, (genericptr_t,size_t,size_t,
@@ -530,6 +532,7 @@ E genericptr_t FDECL(malloc, (size_t));
 
 /* time functions */
 
+#ifdef LEGACY_CODE
 # ifndef LATTICE
 #  if !(defined(ULTRIX_PROTO) && defined(__GNUC__))
 E struct tm *FDECL(localtime, (const time_t *));
@@ -541,6 +544,7 @@ E time_t FDECL(time, (time_t *));
 # else
 E long FDECL(time, (time_t *));
 # endif /* ULTRIX */
+#endif /* LEGACY_CODE */
 
 #ifdef VMS
 	/* used in makedefs.c, but missing from gcc-vms's <time.h> */
