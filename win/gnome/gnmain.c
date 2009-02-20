@@ -135,7 +135,7 @@ ghack_about_cb(GtkWidget *widget, gpointer data)
     getversionstring(buf);
     strcat( buf1, VERSION_STRING);
     strcat( buf, 
-      _("\nSend comments and bug reports to: nethack-bugs@nethack.org\n"
+      _("\nSend comments and bug reports to: bhaak@gmx.net\n"
       "This game is free software. See License for details."));
     about = gnome_about_new(_("Nethack"), 
 	    buf1, "Copyright (C) 1985-2002 Mike Stephenson",

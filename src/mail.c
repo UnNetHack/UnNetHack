@@ -452,7 +452,7 @@ struct obj *otmp;
     "Only Amiga makes it possible.",
     "CATS have all the answers.",
 #endif
-    "Report bugs to <devteam@nethack.org>.",
+    "Report bugs to <bhaak@gmx.net>.",
     "Invitation: Visit the NetHack web site at http://www.nethack.org!"
     };
 

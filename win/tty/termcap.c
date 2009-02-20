@@ -379,7 +379,7 @@ int *wid, *hgt;
 # endif
 	nh_ND = Tgetstr("nd");
 	if(tgetflag("os"))
-		error("NetHack can't have OS.");
+		error("UnNetHack can't have OS.");
 	if(tgetflag("ul"))
 		ul_hack = TRUE;
 	CE = Tgetstr("ce");
@@ -392,8 +392,8 @@ int *wid, *hgt;
 /* not:		XD = Tgetstr("do"); */
 	if(!(nh_CM = Tgetstr("cm"))) {
 	    if(!UP && !HO)
-		error("NetHack needs CM or UP or HO.");
-	    tty_raw_print("Playing NetHack on terminals without CM is suspect.");
+		error("UnNetHack needs CM or UP or HO.");
+	    tty_raw_print("Playing UnNetHack on terminals without CM is suspect.");
 	    tty_wait_synch();
 	}
 	SO = Tgetstr("so");
@@ -451,7 +451,7 @@ int *wid, *hgt;
 	*wid = CO;
 	*hgt = LI;
 	if (!(CL = Tgetstr("cl")))	/* last thing set */
-		error("NetHack needs CL.");
+		error("UnNetHack needs CL.");
 	if ((int)(tbufptr - tbuf) > (int)(sizeof tbuf))
 		error("TERMCAP entry too big...\n");
 	free((genericptr_t)tptr);
