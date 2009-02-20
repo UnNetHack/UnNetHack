@@ -995,6 +995,19 @@ static const char * const bogusmons[] = {
 	"wereplatypus",
 	"zergling",
 	"hag of bolding",
+	/* from UnNetHack */
+	"apostroph golem", "looooooooooooong cat",
+	"Boxxy",				/* internet memes */
+	"Bob the angry flower",
+	"bohrbug", "mandelbug", "schroedinbug", /* bugs */
+	"Gerbenok",				/* Monty Python killer rabbit */
+	"doenertier",				/* Erkan & Stefan */
+	"Invisible Pink Unicorn",
+	"Flying Spaghetti Monster",		/* deities */
+	"Bluebear", "Professor Abdullah Nightingale"
+	"Qwerty Uiop", "troglotroll",		/* Zamonien */
+	"wolpertinger", "elwedritsche", "skvader",
+	"Nessie", "tatzelwurm", "dahu",		/* european cryptids */
 };
 
 
