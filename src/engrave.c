@@ -44,6 +44,27 @@ static const char *random_mesg[] = {
 	"UY WUZ HERE", /* :] */
 	"I'll be back!", /* Terminator */
 	"That is not dead which can eternal lie.", /* HPL */
+	/* From NAO */
+	"Arooo!  Werewolves of Yendor!", /* gang tag */
+	"Dig for Victory here", /* pun, duh */
+	"Don't go this way",
+	"Gaius Julius Primigenius was here.  Why are you late?", /* pompeii */
+	"Go left --->", "<--- Go right",
+	"Haermund Hardaxe carved these runes", /* viking graffiti */
+	"Here be dragons",
+	"Need a light?  Come visit the Minetown branch of Izchak's Lighting Store!",
+	"Save now, and do your homework!",
+	"Snakes on the Astral Plane - Soon in a dungeon near you!",
+	"There was a hole here.  It's gone now.",
+	"The Vibrating Square",
+	"This is a pit!",
+	"This is not the dungeon you are looking for.",
+	"This square deliberately left blank.",
+	"Warning, Exploding runes!",
+	"Watch out, there's a gnome with a wand of death behind that door!",
+	"X marks the spot",
+	"X <--- You are here.",
+	"You are the one millionth visitor to this place!  Please wait 200 turns for your wand of wishing.",
 	/* From UnNetHack */
 	"She's watching you!", /* Portal */
 	"The cake is a lie!", /* Portal */
