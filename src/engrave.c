@@ -68,6 +68,14 @@ static const char *random_mesg[] = {
 	/* From UnNetHack */
 	"She's watching you!", /* Portal */
 	"The cake is a lie!", /* Portal */
+	"What's the sitch?", /* Kim Possible */
+	"So not the drama.", /* Kim Possible */
+	"Sudden decompression sucks!", /* Space Quest 3 death message */
+	"Thanks for playing UnNetHack.  As usual, you've been a real pantload!" /* Space Quest 4 death message, paraphrased */
+	"Colorless green ideas sleep furiously.", /* Noam Chomsky */
+	"Time flies like an arrow.", /* linguistic humor */
+	"All Your Base Are Belong To Us!", /* Zero Wing */
+	"Numa Numa", /* Internet Meme */
 };
 
 char *
