@@ -32,6 +32,19 @@ static const char *random_mesg[] = {
 	"You've got mail!", /* AOL */
 #endif
 	"As if!", /* Clueless */
+	/* From Slash'Em */
+	/* [Tom] added these */
+	"Y?v?l s??ks!", /* just kidding... */
+	"T?m ?as h?r?",
+	/* Tsanth added these */
+	"Gazortenplatz", /* Tribute to David Fizz */
+	"John 3:16", /* You see this everywhere; why not here? */
+	"....TCELES B HSUP   A magic spell?", /* Final Fantasy I (US) */
+	"Turn around.", /* Various people at various times in history */
+	"UY WUZ HERE", /* :] */
+	"I'll be back!", /* Terminator */
+	"That is not dead which can eternal lie.", /* HPL */
+	/* From UnNetHack */
 	"She's watching you!", /* Portal */
 	"The cake is a lie!", /* Portal */
 };
