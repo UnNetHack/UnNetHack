@@ -178,7 +178,8 @@ HACKCSRC = $(srcdir)/allmain.c $(srcdir)/alloc.c $(srcdir)/apply.c \
 	$(srcdir)/version.c $(srcdir)/vision.c $(srcdir)/weapon.c \
 	$(srcdir)/were.c $(srcdir)/wield.c $(srcdir)/windows.c \
 	$(srcdir)/wizard.c $(srcdir)/worm.c $(srcdir)/worn.c $(srcdir)/write.c \
-	$(srcdir)/zap.c
+	$(srcdir)/zap.c \
+	$(srcdir)/livelog.c
 
 # all operating-system-dependent .c (for dependencies and such)
 SYSCSRC = $(srcdir)/../sys/share/nhlan.c $(srcdir)/../sys/share/ioctl.c \
@@ -241,7 +242,8 @@ HOBJ = $(FIRSTOBJ) allmain.o apply.o artifact.o attrib.o ball.o \
 	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o u_init.o \
 	uhitm.o vault.o vision.o vis_tab.o weapon.o were.o wield.o windows.o \
 	wizard.o worm.o worn.o write.o zap.o \
-	$(RANDOBJ) $(SYSOBJ) $(WINOBJ) version.o
+	$(RANDOBJ) $(SYSOBJ) $(WINOBJ) version.o \
+	livelog.o
 # the .o files from the HACKCSRC, SYSSRC, and WINSRC lists
 
 $(GAME):	$(SYSTEM)
@@ -709,6 +711,7 @@ hack.o: $(srcdir)/hack.c $(HACK_H)
 hacklib.o: $(srcdir)/hacklib.c $(HACK_H)
 invent.o: $(srcdir)/invent.c $(HACK_H)
 light.o: $(srcdir)/light.c $(HACK_H) ../include/lev.h
+livelog.o: $(srcdir)/livelog.c $(HACK_H)
 lock.o: $(srcdir)/lock.c $(HACK_H)
 mail.o: $(srcdir)/mail.c $(HACK_H) ../include/mail.h
 makemon.o: $(srcdir)/makemon.c $(HACK_H) ../include/epri.h ../include/emin.h \

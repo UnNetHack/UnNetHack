@@ -1290,6 +1290,9 @@ dosacrifice()
 
 #ifdef RECORD_ACHIEVE
 		achieve.ascended = 1;
+#ifdef LIVELOGFILE
+		livelog_achieve_update();
+#endif
 #endif
 
 pline("An invisible choir sings, and you are bathed in radiance...");

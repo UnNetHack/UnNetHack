@@ -376,22 +376,23 @@ else
 fi
 
 # NETHACK_ARG(livelog,[Live game progress logfile],LIVELOGFILE,no)
-#AC_MSG_CHECKING([whether to enable live logfile])
-#AC_ARG_ENABLE([livelog], AC_HELP_STRING([--enable-livelog=FILE],
-#	[Live game progress logfile (default=no, default filename=livelog)]),
-#	if test "$enableval" != no; then enable_livelog=yes;
-#	 if test "$enableval" != yes; then livelog=$enableval;
-#	 else livelog="livelog"; fi;
-#	else enable_livelog=no; fi,
-#	enable_livelog=no)
-#if test "$enable_livelog" != "no" ; then
-#	AC_MSG_RESULT([yes (file $livelog)])
-#	AC_DEFINE_UNQUOTED([LIVELOGFILE], ["$livelog"], [The name of the live logfile])
-#
-#	NETHACK_ARG(livelog-shout,[Shoutting into the live game logfile],LIVELOG_SHOUT,no)
-#else
-#	AC_MSG_RESULT([no])
-#fi
+AC_MSG_CHECKING([whether to enable live logfile])
+AC_ARG_ENABLE([livelog], AC_HELP_STRING([--enable-livelog=FILE],
+	[Live game progress logfile (default=no, default filename=livelog)]),
+	if test "$enableval" != no; then enable_livelog=yes;
+	 if test "$enableval" != yes; then livelog=$enableval;
+	 else livelog="livelog"; fi;
+	else enable_livelog=no; fi,
+	enable_livelog=no)
+if test "$enable_livelog" != "no" ; then
+	AC_MSG_RESULT([yes (file $livelog)])
+	AC_DEFINE_UNQUOTED([LIVELOGFILE], ["$livelog"], [The name of the live logfile])
+	AC_SUBST(LIVELOGFILE,["$livelog"])
+
+	NETHACK_ARG(livelog-shout,[Shoutting into the live game logfile],LIVELOG_SHOUT,no)
+else
+	AC_MSG_RESULT([no])
+fi
 
 AC_MSG_CHECKING([whether to enable wizmode])
 AC_ARG_ENABLE([wizmode], AC_HELP_STRING([--enable-wizmode=USER],

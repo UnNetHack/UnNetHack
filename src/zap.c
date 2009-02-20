@@ -4110,6 +4110,9 @@ makewish(magical)
 boolean magical; /**< if wishing for magical items is allowed */
 {
 	char buf[BUFSZ];
+#ifdef LIVELOGFILE
+	char rawbuf[BUFSZ]; // for exact livelog reporting
+#endif
 	struct obj *otmp, nothing;
 	int tries = 0;
 
@@ -4117,6 +4120,9 @@ boolean magical; /**< if wishing for magical items is allowed */
 	if (flags.verbose) You("may wish for an object.");
 retry:
 	getlin("For what do you wish?", buf);
+#ifdef LIVELOGFILE
+	Strcpy(rawbuf, buf);
+#endif
 	if (buf[0] == '\033') buf[0] = 0;
 
 	/* WORKAROUND: Wishing for a random non-magical item is not easily done
@@ -4142,6 +4148,9 @@ retry:
 	} else if (otmp == &nothing) {
 	    /* explicitly wished for "nothing", presumeably attempting
 	       to retain wishless conduct */
+#ifdef LIVELOGFILE
+	    livelog_wish(buf);
+#endif
 	    return;
 	}
 	/* check if wishing for magical objects is allowed */
@@ -4156,6 +4165,11 @@ retry:
 
 	/* KMH, conduct */
 	u.uconduct.wishes++;
+
+	/* Livelog patch */
+#ifdef LIVELOGFILE
+	livelog_wish(rawbuf);
+#endif
 
 	if (otmp != &zeroobj) {
 	    /* The(aobjnam()) is safe since otmp is unidentified -dlc */

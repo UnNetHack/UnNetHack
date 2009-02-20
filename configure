@@ -711,6 +711,7 @@ HAVE_TBL
 GUIDEBOOK
 GUIDEBOOK_TXT
 XLOGFILE
+LIVELOGFILE
 OWNER
 GROUP
 LIBOBJS
@@ -1346,6 +1347,9 @@ Optional Features:
   --enable-simple-mail    simple mail dgamelaunch support (default=no)
   --enable-xlogfile=FILE  More verbose logfile (default=yes, default
                           filename=xlogfile)
+  --enable-livelog=FILE   Live game progress logfile (default=no, default
+                          filename=livelog)
+  --enable-livelog-shout  Shoutting into the live game logfile (default=no)
   --enable-wizmode=USER   enable wizard mode for the specified user
                           (default=wizard)
 
@@ -6911,22 +6915,52 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 # NETHACK_ARG(livelog,[Live game progress logfile],LIVELOGFILE,no)
-#AC_MSG_CHECKING([whether to enable live logfile])
-#AC_ARG_ENABLE([livelog], AC_HELP_STRING([--enable-livelog=FILE],
-#	[Live game progress logfile (default=no, default filename=livelog)]),
-#	if test "$enableval" != no; then enable_livelog=yes;
-#	 if test "$enableval" != yes; then livelog=$enableval;
-#	 else livelog="livelog"; fi;
-#	else enable_livelog=no; fi,
-#	enable_livelog=no)
-#if test "$enable_livelog" != "no" ; then
-#	AC_MSG_RESULT([yes (file $livelog)])
-#	AC_DEFINE_UNQUOTED([LIVELOGFILE], ["$livelog"], [The name of the live logfile])
-#
-#	NETHACK_ARG(livelog-shout,[Shoutting into the live game logfile],LIVELOG_SHOUT,no)
-#else
-#	AC_MSG_RESULT([no])
-#fi
+{ echo "$as_me:$LINENO: checking whether to enable live logfile" >&5
+echo $ECHO_N "checking whether to enable live logfile... $ECHO_C" >&6; }
+# Check whether --enable-livelog was given.
+if test "${enable_livelog+set}" = set; then
+  enableval=$enable_livelog; if test "$enableval" != no; then enable_livelog=yes;
+	 if test "$enableval" != yes; then livelog=$enableval;
+	 else livelog="livelog"; fi;
+	else enable_livelog=no; fi
+else
+  enable_livelog=no
+fi
+
+if test "$enable_livelog" != "no" ; then
+	{ echo "$as_me:$LINENO: result: yes (file $livelog)" >&5
+echo "${ECHO_T}yes (file $livelog)" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define LIVELOGFILE "$livelog"
+_ACEOF
+
+	LIVELOGFILE="$livelog"
+
+
+	{ echo "$as_me:$LINENO: checking whether to enable livelog-shout" >&5
+echo $ECHO_N "checking whether to enable livelog-shout... $ECHO_C" >&6; }
+   # Check whether --enable-livelog-shout was given.
+if test "${enable_livelog_shout+set}" = set; then
+  enableval=$enable_livelog_shout;
+else
+  enable_livelog_shout="no"
+fi
+
+   { echo "$as_me:$LINENO: result: $enable_livelog_shout" >&5
+echo "${ECHO_T}$enable_livelog_shout" >&6; }
+   if test "$enable_livelog_shout" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define LIVELOG_SHOUT
+_ACEOF
+
+   fi
+
+else
+	{ echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
 
 { echo "$as_me:$LINENO: checking whether to enable wizmode" >&5
 echo $ECHO_N "checking whether to enable wizmode... $ECHO_C" >&6; }
@@ -7812,7 +7846,7 @@ HAVE_TBL!$HAVE_TBL$ac_delim
 GUIDEBOOK!$GUIDEBOOK$ac_delim
 GUIDEBOOK_TXT!$GUIDEBOOK_TXT$ac_delim
 XLOGFILE!$XLOGFILE$ac_delim
-OWNER!$OWNER$ac_delim
+LIVELOGFILE!$LIVELOGFILE$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -7854,12 +7888,13 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+OWNER!$OWNER$ac_delim
 GROUP!$GROUP$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 3; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 4; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

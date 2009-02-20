@@ -158,6 +158,9 @@
 /* #define XLOGFILE "xlogfile" */ /* even larger logfile */
 #define NEWS "news"		/* the file containing the latest hack news */
 #define PANICLOG "paniclog"	/* log of panic and impossible events */
+/* #define LIVELOGFILE "livelog" */ /* live game progress log file */
+
+/* #define LIVELOG_SHOUT */
 
 /*
  *	If COMPRESS is defined, it should contain the full path name of your

@@ -98,6 +98,12 @@
 /* GNU Linux */
 #undef LINUX
 
+/* The name of the live logfile */
+#undef LIVELOGFILE
+
+/* Shoutting into the live game logfile */
+#undef LIVELOG_SHOUT
+
 /* TTY graphics menu color */
 #undef MENU_COLOR
 
