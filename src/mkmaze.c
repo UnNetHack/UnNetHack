@@ -438,8 +438,11 @@ fixup_special()
 				/* Sokoban top levels have no random, burned engravings */
 				if (ep && ep->engr_txt[0] && ep->engr_type == BURN &&
 				    (!strcmp(ep->engr_txt, "Elbereth"))) {
-						mksobj_at((rn2(2)) ? BAG_OF_HOLDING : AMULET_OF_REFLECTION,
-						          x, y, TRUE, FALSE);
+						struct obj *otmp = mksobj_at((rn2(2)) ? BAG_OF_HOLDING : AMULET_OF_REFLECTION,
+						                             x, y, TRUE, FALSE);
+#ifdef RECORD_ACHIEVE
+						if (otmp) otmp->record_achieve_special = 1;
+#endif
 				}
 			}
 		}
