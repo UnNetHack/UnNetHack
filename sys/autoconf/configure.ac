@@ -358,59 +358,20 @@ NETHACK_ARG(autopickup-exceptions,[Exceptions to autopickup (experimental)],
 #NETHACK_ARG(qwertz,[QWERTZ keyboard layout support],QWERTZ,yes)
 NETHACK_ARG(simple-mail,[simple mail dgamelaunch support],SIMPLE_MAIL,no)
 
-#NETHACK_ARG(xlogfile,[More verbose logfile],XLOGFILE,yes)
-AC_MSG_CHECKING([whether to enable xlogfile])
-AC_ARG_ENABLE([xlogfile], AC_HELP_STRING([--enable-xlogfile=FILE],
-	[More verbose logfile (default=yes, default filename=xlogfile)]),
-	if test "$enableval" != no; then enable_xlogfile=yes;
-	 if test "$enableval" != yes; then xlogfile=$enableval;
-	 else xlogfile="xlogfile"; fi;
-	else enable_xlogfile=no; fi,
-	enable_xlogfile=yes; xlogfile="xlogfile")
-if test "$enable_xlogfile" != "no" ; then
-	AC_MSG_RESULT([yes (file $xlogfile)])
-	AC_DEFINE_UNQUOTED([XLOGFILE], ["$xlogfile"], [The name of the xlogfile])
-	AC_SUBST(XLOGFILE,["$xlogfile"])
-else
-	AC_MSG_RESULT([no])
-fi
+NETHACK_ARG_WITH_PARAM(xlogfile,[More verbose logfile],XLOGFILE,yes,FILE,[xlogfile])
 
-# NETHACK_ARG(livelog,[Live game progress logfile],LIVELOGFILE,no)
-AC_MSG_CHECKING([whether to enable live logfile])
-AC_ARG_ENABLE([livelog], AC_HELP_STRING([--enable-livelog=FILE],
-	[Live game progress logfile (default=no, default filename=livelog)]),
-	if test "$enableval" != no; then enable_livelog=yes;
-	 if test "$enableval" != yes; then livelog=$enableval;
-	 else livelog="livelog"; fi;
-	else enable_livelog=no; fi,
-	enable_livelog=no)
+NETHACK_ARG_WITH_PARAM(livelog,[Live game progress logfile],LIVELOGFILE,no,FILE,[livelog])
 if test "$enable_livelog" != "no" ; then
-	AC_MSG_RESULT([yes (file $livelog)])
-	AC_DEFINE_UNQUOTED([LIVELOGFILE], ["$livelog"], [The name of the live logfile])
-	AC_SUBST(LIVELOGFILE,["$livelog"])
-
 	NETHACK_ARG(livelog-shout,[Shoutting into the live game logfile],LIVELOG_SHOUT,no)
-else
-	AC_MSG_RESULT([no])
 fi
 
-NETHACK_ARG(dump,[Dumping character stats],DUMP,no)
-NETHACK_ARG_WITH_PARAM(dump-file,[Name of character dump file],DUMP_FN,no,FILE,"/tmp/%s.nh")
-
-AC_MSG_CHECKING([whether to enable wizmode])
-AC_ARG_ENABLE([wizmode], AC_HELP_STRING([--enable-wizmode=USER],
-	[enable wizard mode for the specified user (default=wizard)]),
-	if test "$enableval" != no; then enable_wizmode=yes;
-	 if test "$enableval" != yes; then wizard=$enableval;
-	 else wizard="wizard"; fi;
-	else enable_wizmode=no; fi,
-	enable_wizmode=yes;wizard="wizard")
-if test "$enable_wizmode" != "no" ; then
-	AC_MSG_RESULT([yes (user $wizard)])
-	AC_DEFINE_UNQUOTED([WIZARD], ["$wizard"], [The person allowed to use the -D option])
-else
-	AC_MSG_RESULT([no])
+NETHACK_ARG(dump,[Dumping character stats],DUMP_LOG,yes)
+if test "$enable_dump" != "no" ; then
+	NETHACK_ARG_WITH_PARAM(dump-file,[Name of character dump file],DUMP_FN,no,FILE,"/tmp/%s.nh")
+	NETHACK_ARG_WITH_PARAM(dump-messages,[Number of dumped messages],DUMPMSGS,yes,NUMBER,20)
 fi
+
+NETHACK_ARG_WITH_PARAM(wizmode,[enable wizard mode for the specified user],WIZARD,yes,USER,[wizard])
 
 if test "$CHOWN" != "true"; then
     AC_MSG_CHECKING([for owner of installed files])

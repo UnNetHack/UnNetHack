@@ -411,11 +411,6 @@ typedef unsigned char	uchar;
 
 #endif /* AUTOCONF */
 
-#define DUMP_LOG        /* Dump game end information to a file */
-#define DUMP_FN "/tmp/%n.nh" /* Fixed dumpfile name, if you want
-                                         * to prevent definition by users */
-#define DUMPMSGS 20     /* Number of latest messages in the dump file  */
-
 #ifdef TTY_GRAPHICS
 # define WIN_EDGE	/* windows aligned left&top */
 # define VIDEOSHADES    /* Slash'Em like colors */

@@ -28,10 +28,13 @@ AC_DEFUN([NETHACK_ARG_WITH_PARAM],
          if test "[$enableval]" != yes; then m4_bpatsubst([$1], -, _)=[$enableval];
          else m4_bpatsubst([$1], -, _)=[$6]; fi;
         else [enable_]m4_bpatsubst([$1], -, _)=no; fi,
-        [enable_]m4_bpatsubst([$1], -, _)=no)
+        [enable_]m4_bpatsubst([$1], -, _)=$4;m4_bpatsubst([$1], -, _)=[$6])
    if test "[$enable_]m4_bpatsubst([$1], -, _)" != "no" ; then
       AC_MSG_RESULT([yes (m4_tolower($5) [$]m4_bpatsubst([$1], -, _))])
-      AC_DEFINE_UNQUOTED([$3], "[$]m4_bpatsubst([$1], -, _)", [$2])
+      AC_DEFINE_UNQUOTED([$3],
+       m4_case([NUMBER], $5, [$]m4_bpatsubst([$1], -, _), dnl NUMBER without quotes
+               "[$]m4_bpatsubst([$1], -, _)"),
+       [$2])
       AC_SUBST([$3],["[$]m4_bpatsubst([$1], -, _)"])
    else
       AC_MSG_RESULT([no])

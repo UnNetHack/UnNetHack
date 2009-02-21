@@ -36,11 +36,14 @@
 /* Data librarian */
 #undef DLB
 
-/* Dumping character stats */
-#undef DUMP
+/* Number of dumped messages */
+#undef DUMPMSGS
 
 /* Name of character dump file */
 #undef DUMP_FN
+
+/* Dumping character stats */
+#undef DUMP_LOG
 
 /* Engraving the E-word repels monsters */
 #undef ELBERETH
@@ -104,7 +107,7 @@
 /* GNU Linux */
 #undef LINUX
 
-/* The name of the live logfile */
+/* Live game progress logfile */
 #undef LIVELOGFILE
 
 /* Shoutting into the live game logfile */
@@ -212,7 +215,7 @@
 /* X11 graphics */
 #undef X11_GRAPHICS
 
-/* The name of the xlogfile */
+/* More verbose logfile */
 #undef XLOGFILE
 
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a

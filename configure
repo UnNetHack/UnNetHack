@@ -713,6 +713,7 @@ GUIDEBOOK_TXT
 XLOGFILE
 LIVELOGFILE
 DUMP_FN
+DUMPMSGS
 WIZARD
 OWNER
 GROUP
@@ -1348,15 +1349,18 @@ Optional Features:
                           Exceptions to autopickup (experimental) (default=no)
   --enable-simple-mail    simple mail dgamelaunch support (default=no)
   --enable-xlogfile=FILE  More verbose logfile (default=yes, default
-                          filename=xlogfile)
+                          file=xlogfile)
   --enable-livelog=FILE   Live game progress logfile (default=no, default
-                          filename=livelog)
+                          file=livelog)
   --enable-livelog-shout  Shoutting into the live game logfile (default=no)
-  --enable-dump           Dumping character stats (default=no)
+  --enable-dump           Dumping character stats (default=yes)
   --enable-dump-file=FILE Name of character dump file (default=no, default
                           file="/tmp/%s.nh")
+  --enable-dump-messages=NUMBER
+                          Number of dumped messages (default=yes, default
+                          number=20)
   --enable-wizmode=USER   enable wizard mode for the specified user
-                          (default=yes, default user="wizard")
+                          (default=yes, default user=wizard)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -6891,58 +6895,62 @@ _ACEOF
    fi
 
 
-#NETHACK_ARG(xlogfile,[More verbose logfile],XLOGFILE,yes)
 { echo "$as_me:$LINENO: checking whether to enable xlogfile" >&5
 echo $ECHO_N "checking whether to enable xlogfile... $ECHO_C" >&6; }
-# Check whether --enable-xlogfile was given.
+   # Check whether --enable-xlogfile was given.
 if test "${enable_xlogfile+set}" = set; then
   enableval=$enable_xlogfile; if test "$enableval" != no; then enable_xlogfile=yes;
-	 if test "$enableval" != yes; then xlogfile=$enableval;
-	 else xlogfile="xlogfile"; fi;
-	else enable_xlogfile=no; fi
+         if test "$enableval" != yes; then xlogfile=$enableval;
+         else xlogfile=xlogfile; fi;
+        else enable_xlogfile=no; fi
 else
-  enable_xlogfile=yes; xlogfile="xlogfile"
+  enable_xlogfile=yes;xlogfile=xlogfile
 fi
 
-if test "$enable_xlogfile" != "no" ; then
-	{ echo "$as_me:$LINENO: result: yes (file $xlogfile)" >&5
+   if test "$enable_xlogfile" != "no" ; then
+      { echo "$as_me:$LINENO: result: yes (file $xlogfile)" >&5
 echo "${ECHO_T}yes (file $xlogfile)" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define XLOGFILE "$xlogfile"
+#define XLOGFILE                "$xlogfile"
 _ACEOF
 
-	XLOGFILE="$xlogfile"
+      XLOGFILE="$xlogfile"
 
-else
-	{ echo "$as_me:$LINENO: result: no" >&5
+   else
+      { echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; }
-fi
+   fi
 
-# NETHACK_ARG(livelog,[Live game progress logfile],LIVELOGFILE,no)
-{ echo "$as_me:$LINENO: checking whether to enable live logfile" >&5
-echo $ECHO_N "checking whether to enable live logfile... $ECHO_C" >&6; }
-# Check whether --enable-livelog was given.
+
+{ echo "$as_me:$LINENO: checking whether to enable livelog" >&5
+echo $ECHO_N "checking whether to enable livelog... $ECHO_C" >&6; }
+   # Check whether --enable-livelog was given.
 if test "${enable_livelog+set}" = set; then
   enableval=$enable_livelog; if test "$enableval" != no; then enable_livelog=yes;
-	 if test "$enableval" != yes; then livelog=$enableval;
-	 else livelog="livelog"; fi;
-	else enable_livelog=no; fi
+         if test "$enableval" != yes; then livelog=$enableval;
+         else livelog=livelog; fi;
+        else enable_livelog=no; fi
 else
-  enable_livelog=no
+  enable_livelog=no;livelog=livelog
 fi
 
-if test "$enable_livelog" != "no" ; then
-	{ echo "$as_me:$LINENO: result: yes (file $livelog)" >&5
+   if test "$enable_livelog" != "no" ; then
+      { echo "$as_me:$LINENO: result: yes (file $livelog)" >&5
 echo "${ECHO_T}yes (file $livelog)" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define LIVELOGFILE "$livelog"
+#define LIVELOGFILE                "$livelog"
 _ACEOF
 
-	LIVELOGFILE="$livelog"
+      LIVELOGFILE="$livelog"
 
+   else
+      { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+   fi
 
+if test "$enable_livelog" != "no" ; then
 	{ echo "$as_me:$LINENO: checking whether to enable livelog-shout" >&5
 echo $ECHO_N "checking whether to enable livelog-shout... $ECHO_C" >&6; }
    # Check whether --enable-livelog-shout was given.
@@ -6962,9 +6970,6 @@ _ACEOF
 
    fi
 
-else
-	{ echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
 fi
 
 { echo "$as_me:$LINENO: checking whether to enable dump" >&5
@@ -6973,7 +6978,7 @@ echo $ECHO_N "checking whether to enable dump... $ECHO_C" >&6; }
 if test "${enable_dump+set}" = set; then
   enableval=$enable_dump;
 else
-  enable_dump="no"
+  enable_dump="yes"
 fi
 
    { echo "$as_me:$LINENO: result: $enable_dump" >&5
@@ -6981,12 +6986,13 @@ echo "${ECHO_T}$enable_dump" >&6; }
    if test "$enable_dump" != "no" ; then
 
 cat >>confdefs.h <<_ACEOF
-#define DUMP
+#define DUMP_LOG
 _ACEOF
 
    fi
 
-{ echo "$as_me:$LINENO: checking whether to enable dump file" >&5
+if test "$enable_dump" != "no" ; then
+	{ echo "$as_me:$LINENO: checking whether to enable dump file" >&5
 echo $ECHO_N "checking whether to enable dump file... $ECHO_C" >&6; }
    # Check whether --enable-dump-file was given.
 if test "${enable_dump_file+set}" = set; then
@@ -6995,7 +7001,7 @@ if test "${enable_dump_file+set}" = set; then
          else dump_file="/tmp/%s.nh"; fi;
         else enable_dump_file=no; fi
 else
-  enable_dump_file=no
+  enable_dump_file=no;dump_file="/tmp/%s.nh"
 fi
 
    if test "$enable_dump_file" != "no" ; then
@@ -7003,7 +7009,7 @@ fi
 echo "${ECHO_T}yes (file $dump_file)" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define DUMP_FN "$dump_file"
+#define DUMP_FN                "$dump_file"
 _ACEOF
 
       DUMP_FN="$dump_file"
@@ -7013,6 +7019,34 @@ _ACEOF
 echo "${ECHO_T}no" >&6; }
    fi
 
+	{ echo "$as_me:$LINENO: checking whether to enable dump messages" >&5
+echo $ECHO_N "checking whether to enable dump messages... $ECHO_C" >&6; }
+   # Check whether --enable-dump-messages was given.
+if test "${enable_dump_messages+set}" = set; then
+  enableval=$enable_dump_messages; if test "$enableval" != no; then enable_dump_messages=yes;
+         if test "$enableval" != yes; then dump_messages=$enableval;
+         else dump_messages=20; fi;
+        else enable_dump_messages=no; fi
+else
+  enable_dump_messages=yes;dump_messages=20
+fi
+
+   if test "$enable_dump_messages" != "no" ; then
+      { echo "$as_me:$LINENO: result: yes (number $dump_messages)" >&5
+echo "${ECHO_T}yes (number $dump_messages)" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define DUMPMSGS $dump_messages
+_ACEOF
+
+      DUMPMSGS="$dump_messages"
+
+   else
+      { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+   fi
+
+fi
 
 { echo "$as_me:$LINENO: checking whether to enable wizmode" >&5
 echo $ECHO_N "checking whether to enable wizmode... $ECHO_C" >&6; }
@@ -7020,10 +7054,10 @@ echo $ECHO_N "checking whether to enable wizmode... $ECHO_C" >&6; }
 if test "${enable_wizmode+set}" = set; then
   enableval=$enable_wizmode; if test "$enableval" != no; then enable_wizmode=yes;
          if test "$enableval" != yes; then wizmode=$enableval;
-         else wizmode="wizard"; fi;
+         else wizmode=wizard; fi;
         else enable_wizmode=no; fi
 else
-  enable_wizmode=no
+  enable_wizmode=yes;wizmode=wizard
 fi
 
    if test "$enable_wizmode" != "no" ; then
@@ -7031,7 +7065,7 @@ fi
 echo "${ECHO_T}yes (user $wizmode)" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define WIZARD "$wizmode"
+#define WIZARD                "$wizmode"
 _ACEOF
 
       WIZARD="$wizmode"
@@ -7944,6 +7978,7 @@ ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
 DUMP_FN!$DUMP_FN$ac_delim
+DUMPMSGS!$DUMPMSGS$ac_delim
 WIZARD!$WIZARD$ac_delim
 OWNER!$OWNER$ac_delim
 GROUP!$GROUP$ac_delim
@@ -7951,7 +7986,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 6; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 7; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
