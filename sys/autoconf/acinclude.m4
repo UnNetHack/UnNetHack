@@ -17,6 +17,27 @@ AC_DEFUN([NETHACK_ARG],
    fi
   ])
 
+# NETHACK_ARG_WITH_PARAM([feature], [description], [pre-processor switch],
+#                        [default], [type], [default-value])
+# ------------------------------------------------------------------------
+AC_DEFUN([NETHACK_ARG_WITH_PARAM],
+  [AC_MSG_CHECKING([whether to enable m4_bpatsubst([$1], -, [ ])])
+   AC_ARG_ENABLE([$1], AC_HELP_STRING([--enable-$1=$5],
+        [$2 (default=$4, default m4_tolower($5)=[$6])]),
+        if test "[$enableval]" != no; then [enable_]m4_bpatsubst([$1], -, _)=yes;
+         if test "[$enableval]" != yes; then m4_bpatsubst([$1], -, _)=[$enableval];
+         else m4_bpatsubst([$1], -, _)=[$6]; fi;
+        else [enable_]m4_bpatsubst([$1], -, _)=no; fi,
+        [enable_]m4_bpatsubst([$1], -, _)=no)
+   if test "[$enable_]m4_bpatsubst([$1], -, _)" != "no" ; then
+      AC_MSG_RESULT([yes (m4_tolower($5) [$]m4_bpatsubst([$1], -, _))])
+      AC_DEFINE_UNQUOTED([$3], "[$]m4_bpatsubst([$1], -, _)", [$2])
+      AC_SUBST([$3],["[$]m4_bpatsubst([$1], -, _)"])
+   else
+      AC_MSG_RESULT([no])
+   fi
+  ])
+
 # NETHACK_WIN_ENABLE(win, default, help-text)
 # -------------------------------------------
 AC_DEFUN([NETHACK_WIN_ENABLE],[AC_ARG_ENABLE($1-graphics,

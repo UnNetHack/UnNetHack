@@ -394,6 +394,9 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+NETHACK_ARG(dump,[Dumping character stats],DUMP,no)
+NETHACK_ARG_WITH_PARAM(dump-file,[Name of character dump file],DUMP_FN,no,FILE,"/tmp/%s.nh")
+
 AC_MSG_CHECKING([whether to enable wizmode])
 AC_ARG_ENABLE([wizmode], AC_HELP_STRING([--enable-wizmode=USER],
 	[enable wizard mode for the specified user (default=wizard)]),

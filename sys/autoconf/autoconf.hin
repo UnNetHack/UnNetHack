@@ -36,6 +36,12 @@
 /* Data librarian */
 #undef DLB
 
+/* Dumping character stats */
+#undef DUMP
+
+/* Name of character dump file */
+#undef DUMP_FN
+
 /* Engraving the E-word repels monsters */
 #undef ELBERETH
 
@@ -200,7 +206,7 @@
 /* An MS-Windows system */
 #undef WIN32
 
-/* The person allowed to use the -D option */
+/* enable wizard mode for the specified user */
 #undef WIZARD
 
 /* X11 graphics */
