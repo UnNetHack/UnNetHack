@@ -1447,7 +1447,22 @@ const char *filename;
 
 /* ----------  BEGIN CONFIG FILE HANDLING ----------- */
 
-const char *configfile =
+const char* configfile =
+#ifdef UNIX
+			".unnethackrc";
+#else
+# if defined(MAC) || defined(__BEOS__)
+			"UnNetHack Defaults";
+# else
+#  if defined(MSDOS) || defined(WIN32)
+			"defaults.unh";
+#  else
+			"UnNetHack.cnf";
+#  endif
+# endif
+#endif
+
+const char *oldconfigfile =
 #ifdef UNIX
 			".nethackrc";
 #else
@@ -1520,8 +1535,10 @@ const char *filename;
 	}
 
 #if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
-	if ((fp = fopenp(fqname(configfile, CONFIGPREFIX, 0), "r"))
-								!= (FILE *)0)
+	if ((fp = fopenp(fqname(configfile, CONFIGPREFIX, 0), "r")) != (FILE *)0)
+		return(fp);
+	/* try .nethackrc? */
+	else if ((fp = fopenp(fqname(oldconfigfile, CONFIGPREFIX, 0), "r")) != (FILE *)0)
 		return(fp);
 # ifdef MSDOS
 	else if ((fp = fopenp(fqname(backward_compat_configfile,
@@ -1556,6 +1573,15 @@ const char *filename;
 		Sprintf(tmp_config, "%s/%s", envp, configfile);
 	if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
 		return(fp);
+	else {
+		/* try .nethackrc? */
+		if (!envp)
+			Strcpy(tmp_config, oldconfigfile);
+		else
+			Sprintf(tmp_config, "%s/%s", envp, oldconfigfile);
+		if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
+			return(fp);
+	}
 # if defined(__APPLE__)
 	/* try an alternative */
 	if (envp) {
