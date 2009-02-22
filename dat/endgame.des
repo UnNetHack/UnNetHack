@@ -160,12 +160,12 @@ ENDMAP
 # The up region is where you'll arrive after activating the portal from
 # the preceding level; the exit portal is placed inside the down region.
 #
-# With the planes shuffled, the player may arrive on the right hand
+# Bug: With the planes shuffled, the player may arrive on the right hand
 # side. Probably because it looks to the program like player enters from a
-# "lower" level. Don't naming the second region fixes this. - Patric Mueller
+# "lower" level. - Patric Mueller
 #
 TELEPORT_REGION:levregion(01,00,24,20),levregion(25,00,79,20),up
-TELEPORT_REGION:levregion(56,00,79,20),levregion(01,00,55,20)
+TELEPORT_REGION:levregion(56,00,79,20),levregion(01,00,55,20),down
 PORTAL:levregion(57,01,78,19),(0,0,0,0),"random_plane"
 REGION:(00,00,75,19),lit,"ordinary"
 MONSTER:'E',"air elemental",random,hostile
