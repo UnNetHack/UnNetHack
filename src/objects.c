@@ -829,10 +829,12 @@ SCROLL((char *)0,               "ABRA KA DABRA",        1,   0, 100), /* traditi
 SCROLL((char *)0,               "ASHPD",                1,   0, 100), /* Portal */
 SCROLL((char *)0,               "SODALG",               1,   0, 100), /* Portal */
 SCROLL((char *)0,               "ZLORFIK",              1,   0, 100), /* Zak McKracken */
+SCROLL((char *)0,               "GNIK SISI VLE",        1,   0, 100), /* Zak McKracken */
 SCROLL((char *)0,               "HAPAX LEGOMENON",      1,   0, 100),
 SCROLL((char *)0,               "HZLRC KSTSBD MPFNG",   1,   0, 100),
 SCROLL((char *)0,               "EIRIS SAZUN IDISI",    1,   0, 100), /* Merseburg Incantations */
 SCROLL((char *)0,               "PHOL ENDE WODAN",      1,   0, 100), /* Merseburg Incantations */
+SCROLL((char *)0,               "GHOTI",                1,   0, 100), /* pronounced as 'fish', George Bernard Shaw */
 
 	/* these must come last because they have special descriptions */
 #ifdef MAIL
