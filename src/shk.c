@@ -1397,25 +1397,32 @@ proceed:
 #endif
 		    make_happy_shk(shkp, FALSE);
 		} else {
+#ifdef BLACKMARKET
+			/* Blackmarket shopkeeper are not easily pacified */
+			int peace_offering = (shkp->data == &mons[PM_BLACK_MARKETEER]) ?
+				5000L : 1000L;
+#else
+			int peace_offering = 1000L;
+#endif
 		    /* shopkeeper is angry, but has not been robbed --
 		     * door broken, attacked, etc. */
 		    pline("%s is after your hide, not your money!",
 			  Monnam(shkp));
 #ifndef GOLDOBJ
-		    if(u.ugold < 1000L) {
+		    if(u.ugold < peace_offering) {
 			if (!u.ugold)
 #else
-		    if(umoney < 1000L) {
+		    if(umoney < peace_offering) {
 			if (!umoney)
 #endif
 			    pline(no_money, stashed_gold ? " seem to" : "");
 			else pline(not_enough_money, mhim(shkp));
 			return(1);
 		    }
-		    You("try to appease %s by giving %s 1000 gold pieces.",
+		    You("try to appease %s by giving %s %d gold pieces.",
 			x_monnam(shkp, ARTICLE_THE, "angry", 0, FALSE),
-			mhim(shkp));
-		    pay(1000L,shkp);
+			mhim(shkp), peace_offering);
+		    pay(peace_offering, shkp);
 		    if (strncmp(eshkp->customer, plname, PL_NSIZ) || rn2(3))
 			make_happy_shk(shkp, FALSE);
 		    else
