@@ -101,8 +101,6 @@ flip_level(int flp)
     int x2 = COLNO-1;
     int y2 = ROWNO-1;
 
-    pline("Rotiere LEVEL um %d", flp);
-
     int x, y, i;
 
     struct rm trm;
