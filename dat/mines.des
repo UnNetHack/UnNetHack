@@ -502,7 +502,7 @@ ALTAR:(31,03),align[0],shrine
 
 # "Bustling Town" by Kelly Bailey
 #
-MAZE: "minetn-6",' '
+MAZE: "minetn-6",'-'
 INIT_MAP:'.','-',true,true,lit,true
 GEOMETRY:center,top
 MAP

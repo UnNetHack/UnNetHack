@@ -293,7 +293,7 @@ WALLIFY
 #	and goal levels.
 #
 
-MAZE: "Ran-fila" , ' '
+MAZE: "Ran-fila" , 'T'
 INIT_MAP: '.' , 'T', true, true, random, true
 NOMAP
 #

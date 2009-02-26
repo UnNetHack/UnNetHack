@@ -341,7 +341,7 @@ MONSTER:'E',"stalker",random
 #	and goal levels.
 #
 
-MAZE: "Sam-fila", ' '
+MAZE: "Sam-fila", 'P'
 INIT_MAP: '.' , 'P', true, true, random, true
 NOMAP
 #
