@@ -82,7 +82,7 @@ RNDLEVEL:	"heck-e" "Q" @ (-19,17) 9
 DUNGEON:	"The Gnomish Mines" "M" (8, 2)
 ALIGNMENT:	lawful
 DESCRIPTION:	mazelike
-RNDLEVEL:	"minetn" "T" @ (3, 2) 7
+RNDLEVEL:	"minetn" "T" @ (3, 2) 8
 LEVELDESC:	town
 RNDLEVEL:	"minend" "E" @ (-1, 0) 3
 

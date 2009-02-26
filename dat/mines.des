@@ -45,6 +45,177 @@ TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 
+#
+# A tragic accident has occurred to Frontier Town...
+# 
+# "Orcish Town" - a variant of Frontier Town that has been
+# overrun by orcs.  Note the barricades (iron bars).
+#
+MAZE: "minetn-8",'-'
+INIT_MAP:'.',' ',true,true,random,true
+GEOMETRY:center,center
+MAP
+.....................................
+.----------------F------------------.
+.|.................................|.
+.|.-------------......------------.|.
+.|.|...|...|...|......|..|...|...|.|.
+.F.|...|...|...|......|..|...|...|.|.
+.|.|...|...|...|......|..|...|...|.F.
+.|.|...|...|----......------------.|.
+.|.---------.......................|.
+.|.................................|.
+.|.---------.....--...--...........|.
+.|.|...|...|----.|.....|.---------.|.
+.|.|...|...|...|.|.....|.|..|....|.|.
+.|.|...|...|...|.|.....|.|..|....|.|.
+.|.|...|...|...|.|.....|.|..|....|.|.
+.|.-------------.-------.---------.|.
+.|.................................F.
+.-----------F------------F----------.
+.....................................
+ENDMAP
+
+# Don't let the player fall into his likely death
+TELEPORT_REGION:levregion(01,01,20,19),levregion(20,00,70,19)
+REGION:(00,00,36,16),lit,"ordinary"
+STAIR:levregion(01,03,20,19),(00,00,36,15),up
+STAIR:levregion(61,03,75,19),(00,00,36,15),down
+
+# shame we can't make polluted fountains
+FOUNTAIN:(16,09)
+FOUNTAIN:(25,09)
+
+# the altar's defiled; useful for BUC but not convertable
+ALTAR:(20,13),noalign,shrine
+
+# set up the shop doors; could be broken down
+DOOR:random,(5,8)
+DOOR:random,(9,8)
+DOOR:random,(13,7)
+DOOR:random,(22,5)
+DOOR:random,(27,7)
+DOOR:random,(31,7)
+DOOR:random,(5,10)
+DOOR:random,(9,10)
+DOOR:random,(15,13)
+DOOR:random,(25,13)
+DOOR:random,(31,11)
+
+# knock a few holes in the shop interior walls
+REPLACE_TERRAIN:(07,04,11,06),'|','.',lit,18%
+REPLACE_TERRAIN:(25,04,29,06),'|','.',lit,18%
+REPLACE_TERRAIN:(07,12,11,14),'|','.',lit,18%
+REPLACE_TERRAIN:(28,12,28,14),'|','.',lit,33%
+
+# One spot each in most shops...
+RANDOM_PLACES:(05,04),(09,05),(13,04),(26,04),(31,05),(30,14),(05,14),(10,13),(26,14),(27,13)
+
+# scatter some bodies
+OBJECT:'%',"corpse",(20,12),"aligned priest",0
+OBJECT:'%',"corpse",place[0],"shopkeeper",0
+OBJECT:'%',"corpse",place[1],"shopkeeper",0
+OBJECT:'%',"corpse",place[2],"shopkeeper",0
+OBJECT:'%',"corpse",place[3],"shopkeeper",0
+OBJECT:'%',"corpse",place[4],"shopkeeper",0
+OBJECT:'%',"corpse",random,"watchman",0
+OBJECT:'%',"corpse",random,"watchman",0
+OBJECT:'%',"corpse",random,"watchman",0
+OBJECT:'%',"corpse",random,"watchman",0
+OBJECT:'%',"corpse",random,"watch captain",0
+
+# Rubble!
+OBJECT:'`',"boulder",random
+OBJECT:'`',"boulder",random
+OBJECT:'`',"boulder",random
+OBJECT:'`',"boulder",random
+OBJECT:'`',"boulder",random
+OBJECT:'`',"boulder",random
+OBJECT:'`',"boulder",random
+OBJECT:'`',"boulder",random
+OBJECT:'`',"boulder",random
+OBJECT:'`',"boulder",random
+OBJECT:'`',"boulder",random
+OBJECT:'`',"boulder",random
+OBJECT:'`',"boulder",random
+OBJECT:'*',"rock",random
+OBJECT:'*',"rock",random
+OBJECT:'*',"rock",random
+OBJECT:'*',"rock",random
+OBJECT:'*',"rock",random
+OBJECT:'*',"rock",random
+OBJECT:'*',"rock",random
+OBJECT:'*',"rock",random
+OBJECT:'*',"rock",random
+OBJECT:'*',"rock",random
+OBJECT:'*',"rock",random
+
+# Guarantee 7 candles since we won't have Izchak available
+OBJECT:'(',"wax candle",place[5]
+OBJECT:'(',"wax candle",place[5]
+OBJECT:'(',"tallow candle",place[6]
+OBJECT:'(',"tallow candle",place[6]
+OBJECT:'(',"wax candle",place[4]
+OBJECT:'(',"wax candle",place[9]
+OBJECT:'(',"tallow candle",place[0]
+
+# go ahead and leave a lamp next to one corpse to be suggestive
+# and some empty wands...
+OBJECT:'(',"oil lamp",place[2]
+OBJECT:'/',"striking",place[1],uncursed,0
+OBJECT:'/',"striking",place[3],uncursed,0
+OBJECT:'/',"striking",place[4],uncursed,0
+OBJECT:'/',"magic missile",place[4],uncursed,0
+OBJECT:'/',"magic missile",place[0],uncursed,0
+
+# the Orcish Army
+#
+# We need to specify locations inside the walls
+# for all of these critters since 'random' could
+# put them in our empty 'corridor' around the town
+MONSTER: 'o', "orc-captain", (07,09), hostile
+MONSTER: 'o', "orc-captain", (19,09), hostile
+MONSTER: 'o', "orc-captain", (30,09), hostile
+MONSTER: 'o', "Uruk-hai", (18,04), hostile
+MONSTER: 'o', "Uruk-hai", (19,04), hostile
+MONSTER: 'o', "Uruk-hai", (20,05), hostile
+MONSTER: 'o', "Uruk-hai", (14,09), hostile
+MONSTER: 'o', "Uruk-hai", (25,09), hostile
+MONSTER: 'o', "Mordor orc", (20,04), hostile
+MONSTER: 'o', "Mordor orc", (18,05), hostile
+MONSTER: 'o', "Mordor orc", (19,05), hostile
+MONSTER: 'o', "Mordor orc", (07,02), hostile
+MONSTER: 'o', "Mordor orc", (29,02), hostile
+MONSTER: 'o', "Mordor orc", (07,16), hostile
+MONSTER: 'o', "Mordor orc", (29,16), hostile
+# shamans can be hanging out in/near the temple
+MONSTER: 'o', "orc shaman", (19,11), hostile
+MONSTER: 'o', "orc shaman", (21,11), hostile
+MONSTER: 'o', "orc shaman", (16,12), hostile
+MONSTER: 'o', "orc shaman", (24,12), hostile
+# these are not such a big deal
+# to run into outside the bars
+MONSTER: 'o', "hill orc", random, hostile
+MONSTER: 'o', "hill orc", random, hostile
+MONSTER: 'o', "hill orc", random, hostile
+MONSTER: 'o', "hill orc", random, hostile
+MONSTER: 'o', "hill orc", random, hostile
+MONSTER: 'o', "hill orc", random, hostile
+MONSTER: 'o', "hill orc", random, hostile
+MONSTER: 'o', "hill orc", random, hostile
+MONSTER: 'o', "hill orc", random, hostile
+MONSTER: 'o', "hill orc", random, hostile
+MONSTER: 'o', "hill orc", random, hostile
+MONSTER: 'o', "hill orc", random, hostile
+MONSTER: 'o', "hill orc", random, hostile
+MONSTER: 'o', "goblin", random, hostile
+MONSTER: 'o', "goblin", random, hostile
+MONSTER: 'o', "goblin", random, hostile
+MONSTER: 'o', "goblin", random, hostile
+MONSTER: 'o', "goblin", random, hostile
+MONSTER: 'o', "goblin", random, hostile
+MONSTER: 'o', "goblin", random, hostile
+MONSTER: 'o', "goblin", random, hostile
 
 # Minetown variant 1
 # "Frontier Town"
