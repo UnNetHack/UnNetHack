@@ -309,6 +309,18 @@ giveback:
 		pline_The("water flow seems %ser now.",
 			(obj->spe<0) ? "less" : "great");
 		break;
+	    case RIN_GAIN_INTELLIGENCE:
+		pline("The water seems %ser now.",
+			(obj->spe<0) ? "dimm" : "bright");
+		break;
+	    case RIN_GAIN_WISDOM:
+		pline("The water flow seems %ser now.",
+			(obj->spe<0) ? "dull" : "quick");
+		break;
+	    case RIN_GAIN_DEXTERITY:
+		pline("The water flow seems %ser now.",
+			(obj->spe<0) ? "slow" : "fast");
+		break;
 	    case RIN_INCREASE_ACCURACY:	/* KMH */
 		pline_The("water flow %s the drain.",
 			(obj->spe<0) ? "misses" : "hits");

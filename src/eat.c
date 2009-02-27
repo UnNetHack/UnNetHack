@@ -1537,6 +1537,21 @@ struct obj *otmp;
 		if (adjattrib(A_CON, otmp->spe, -1))
 		    makeknown(typ);
 		break;
+	    case RIN_GAIN_INTELLIGENCE:
+		accessory_has_effect(otmp);
+		if (adjattrib(A_INT, otmp->spe, -1))
+		    makeknown(typ);
+		break;
+	    case RIN_GAIN_WISDOM:
+		accessory_has_effect(otmp);
+		if (adjattrib(A_WIS, otmp->spe, -1))
+		    makeknown(typ);
+		break;
+	    case RIN_GAIN_DEXTERITY:
+		accessory_has_effect(otmp);
+		if (adjattrib(A_DEX, otmp->spe, -1))
+		    makeknown(typ);
+		break;
 	    case RIN_INCREASE_ACCURACY:
 		accessory_has_effect(otmp);
 		u.uhitinc += otmp->spe;
