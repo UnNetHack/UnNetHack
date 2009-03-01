@@ -685,24 +685,32 @@ int how;
 		makeknown(AMULET_OF_LIFE_SAVING);
 		Your("medallion %s!",
 		      !Blind ? "begins to glow" : "feels warm");
-		if (how == CHOKING) You("vomit ...");
+		/* Keep it blessed! */
+		if (uamul && uamul->cursed && (rn2(4)>0)) {
+			pline("But ... the chain on your medallion breaks and it falls to the %s!", surface(u.ux,u.uy));
+			You_hear("homeric laughter!"); /* Hah ha! */
+			/* It already started to work. Too bad you couldn't hold onto it. */
+			useup(uamul);
+		} else {
+			if (how == CHOKING) You("vomit ...");
 #ifdef WEBB_DISINT
-		if (how == DISINTEGRATED) You("reconstitute!");
-		else
+			if (how == DISINTEGRATED) You("reconstitute!");
+			else
 #endif
-		You_feel("much better!", how);
-		pline_The("medallion crumbles to dust!");
-		if (uamul) useup(uamul);
+			You_feel("much better!");
+			pline_The("medallion crumbles to dust!");
+			if (uamul) useup(uamul);
 
-		(void) adjattrib(A_CON, -1, TRUE);
-		if(u.uhpmax <= 0) u.uhpmax = 10;	/* arbitrary */
-		savelife(how);
-		if (how == GENOCIDED)
-			pline("Unfortunately you are still genocided...");
-		else {
-			killer = 0;
-			killer_format = 0;
-			return;
+			(void) adjattrib(A_CON, -1, TRUE);
+			if(u.uhpmax <= 0) u.uhpmax = 10;	/* arbitrary */
+			savelife(how);
+			if (how == GENOCIDED)
+				pline("Unfortunately you are still genocided...");
+			else {
+				killer = 0;
+				killer_format = 0;
+				return;
+			}
 		}
 	}
 	if ((
