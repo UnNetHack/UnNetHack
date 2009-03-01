@@ -128,6 +128,7 @@ char *newbot2;
 	curs(WIN_STATUS, 1, 1);
        	color_option = text_color_of(text, text_colors);
 	start_color_option(color_option);
+	newbot2[CO-1] = '\0'; /* fix statuscolor bleeding bug the easy way */
 	putstr(WIN_STATUS, 0, newbot2);
 	end_color_option(color_option);
 }
