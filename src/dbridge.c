@@ -740,11 +740,11 @@ struct entity *etmp;
 	}
 }
 
-/*
+/**
  * Close the drawbridge located at x,y
+ * @return TRUE when drawbridge got closed, FALSE otherwise
  */
-
-void
+boolean
 close_drawbridge(x,y)
 int x,y;
 {
@@ -753,10 +753,15 @@ int x,y;
 	int x2, y2;
 
 	lev1 = &levl[x][y];
-	if (lev1->typ != DRAWBRIDGE_DOWN) return;
+	if (lev1->typ != DRAWBRIDGE_DOWN) return FALSE;
+	/* Huge monster block the drawbridge */
+	if (m_at(x,y) && hugemonst(m_at(x,y)->data)) {
+		pline("A monster blocks the drawbridge with its weight.");
+		return FALSE;
+	}
 	if (rn2(5)==0) {
 		pline("The mechanism seems to have something stuck in it and won't close.");
-		return;
+		return FALSE;
 	}
 	x2 = x; y2 = y;
 	get_wall_for_db(&x2,&y2);
@@ -794,6 +799,7 @@ int x,y;
 	newsym(x, y);
 	newsym(x2, y2);
 	block_point(x2,y2);	/* vision */
+	return TRUE;
 }
 
 /*

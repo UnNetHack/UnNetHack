@@ -2614,7 +2614,7 @@ register struct monst *mtmp;
 #endif /*OVL0*/
 #ifdef OVL1
 
-/*
+/**
  *  Called for the following distance effects:
  *	when a weapon is thrown (weapon == THROWN_WEAPON)
  *	when an object is kicked (KICKED_WEAPON)
@@ -2634,12 +2634,12 @@ register struct monst *mtmp;
  */
 struct monst *
 bhit(ddx,ddy,range,weapon,fhitm,fhito,obj,obj_destroyed)
-register int ddx,ddy,range;		/* direction and range */
-int weapon;				/* see values in hack.h */
-int FDECL((*fhitm), (MONST_P, OBJ_P)),	/* fns called when mon/obj hit */
+register int ddx,ddy,range;		/**< direction and range */
+int weapon;				/**< see values in hack.h */
+int FDECL((*fhitm), (MONST_P, OBJ_P)),	/**< fns called when mon/obj hit */
     FDECL((*fhito), (OBJ_P, OBJ_P));
-struct obj *obj;			/* object tossed/used */
-boolean *obj_destroyed;			/* has object been deallocated? Pointer to boolean, may be NULL */
+struct obj *obj;			/**< object tossed/used */
+boolean *obj_destroyed;			/**< has object been deallocated? Pointer to boolean, may be NULL */
 {
 	struct monst *mtmp;
 	uchar typ;
@@ -2709,7 +2709,11 @@ boolean *obj_destroyed;			/* has object been deallocated? Pointer to boolean, ma
 			if ((cansee(x,y) || cansee(bhitpos.x, bhitpos.y))
 			    && levl[x][y].typ == DRAWBRIDGE_DOWN)
 			    makeknown(obj->otyp);
-			close_drawbridge(x,y);
+			if (!close_drawbridge(x,y)) {
+				/* stop the ray to prevent creation of a door
+				   in the drawbridge's doorway */
+				return (struct monst *)0;
+			}
 			break;
 		    case WAN_STRIKING:
 		    case SPE_FORCE_BOLT:

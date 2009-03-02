@@ -201,7 +201,7 @@ E boolean FDECL(is_db_wall, (int,int));
 E boolean FDECL(find_drawbridge, (int *,int*));
 E boolean FDECL(create_drawbridge, (int,int,int,BOOLEAN_P));
 E void FDECL(open_drawbridge, (int,int));
-E void FDECL(close_drawbridge, (int,int));
+E boolean FDECL(close_drawbridge, (int,int));
 E void FDECL(destroy_drawbridge, (int,int));
 
 /* ### decl.c ### */
