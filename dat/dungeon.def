@@ -25,6 +25,7 @@ CHAINBRANCH:	"Town" "oracle" + (2, 2) up
 RNDLEVEL:	"bigrm" "B" @ (10, 3) 40 11
 CHAINBRANCH:	"The Quest" "oracle" + (6, 2) portal
 BRANCH:		"Fort Ludios" @ (18, 4) portal
+LEVEL:		"nymph" "N" @ (5, 15) 45
 BRANCH:		"One-eyed Sam's Market" @ (20, 5) portal
 RNDLEVEL:	"medusa" "none" @ (-5, 4) 4
 LEVALIGN:	chaotic
