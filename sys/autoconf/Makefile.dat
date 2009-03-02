@@ -290,7 +290,7 @@ spec_levs: ../util/lev_comp \
 	bigroom.des blkmar.des castle.des \
 	endgame.des gehennom.des knox.des town-?.des \
 	medusa.des \
-	mines.des oracle.des \
+	mines.des nymph.des oracle.des \
 	sokoban.des tower.des yendor.des
 	../util/lev_comp $(srcdir)/bigroom.des
 	../util/lev_comp $(srcdir)/blkmar.des
@@ -299,6 +299,7 @@ spec_levs: ../util/lev_comp \
 	../util/lev_comp $(srcdir)/gehennom.des
 	../util/lev_comp $(srcdir)/knox.des
 	../util/lev_comp $(srcdir)/medusa.des
+	../util/lev_comp $(srcdir)/nymph.des
 	../util/lev_comp $(srcdir)/town-?.des
 	../util/lev_comp $(srcdir)/mines.des
 	../util/lev_comp $(srcdir)/oracle.des
