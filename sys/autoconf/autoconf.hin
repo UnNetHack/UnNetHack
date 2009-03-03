@@ -45,6 +45,9 @@
 /* Dumping character stats */
 #undef DUMP_LOG
 
+/* Dungeon growth */
+#undef DUNGEON_GROWTH
+
 /* Engraving the E-word repels monsters */
 #undef ELBERETH
 

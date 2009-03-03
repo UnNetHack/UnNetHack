@@ -1343,6 +1343,7 @@ Optional Features:
                           game (default=yes)
   --enable-show-extinct   Display extinct monsters at the end of game
                           (default=yes)
+  --enable-dungeon-growth Dungeon growth (default=yes)
   --enable-goldobj        Gold is kept on object chains (experimental)
                           (default=no)
   --enable-autopickup-exceptions
@@ -6833,7 +6834,25 @@ _ACEOF
 
    fi
 
-# NETHACK_ARG(dungeon-growth,[Dungeon growth],DUNGEON_GROWTH,yes)
+{ echo "$as_me:$LINENO: checking whether to enable dungeon-growth" >&5
+echo $ECHO_N "checking whether to enable dungeon-growth... $ECHO_C" >&6; }
+   # Check whether --enable-dungeon-growth was given.
+if test "${enable_dungeon_growth+set}" = set; then
+  enableval=$enable_dungeon_growth;
+else
+  enable_dungeon_growth="yes"
+fi
+
+   { echo "$as_me:$LINENO: result: $enable_dungeon_growth" >&5
+echo "${ECHO_T}$enable_dungeon_growth" >&6; }
+   if test "$enable_dungeon_growth" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define DUNGEON_GROWTH
+_ACEOF
+
+   fi
+
 #NETHACK_ARG(shout,[Shouting and pet commands (not implemented)],SHOUT,no)
 # NETHACK_ARG(display-layers,[Support transparent tilesets],DISPLAY_LAYERS,yes)
 { echo "$as_me:$LINENO: checking whether to enable goldobj" >&5

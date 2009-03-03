@@ -400,6 +400,7 @@ typedef unsigned char	uchar;
 
 #define STATUS_COLORS /* Shachaf & Oren Ben-Kiki */
 
+#define DUNGEON_GROWTH /* Makes the dungeons feel a bit more living - Pasi Kallinen*/
 /*#define GOLDOBJ */	/* Gold is kept on obj chains - Helge Hafting */
 /*#define AUTOPICKUP_EXCEPTIONS */ /* exceptions to autopickup */
 #define DUMP_LOG        /* Dump game end information to a file */

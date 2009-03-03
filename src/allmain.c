@@ -140,7 +140,9 @@ moveloop()
 		    if(Glib) glibr();
 		    nh_timeout();
 		    run_regions();
-
+#ifdef DUNGEON_GROWTH
+		    dgn_growths(TRUE, TRUE);
+#endif
 		    if (u.ublesscnt)  u.ublesscnt--;
 		    if(flags.time && !flags.run)
 			flags.botl = 1;
