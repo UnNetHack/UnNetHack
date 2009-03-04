@@ -6390,6 +6390,28 @@ if test "$HAVE_TBL" != "no" ; then
 fi
 fi
 
+{ echo "$as_me:$LINENO: checking for pseudo random number device" >&5
+echo $ECHO_N "checking for pseudo random number device... $ECHO_C" >&6; }
+if test -r "/dev/urandom"; then
+
+cat >>confdefs.h <<\_ACEOF
+#define DEV_RANDOM "/dev/urandom"
+_ACEOF
+
+	{ echo "$as_me:$LINENO: result: /dev/urandom" >&5
+echo "${ECHO_T}/dev/urandom" >&6; }
+elif test -r "/dev/random"; then
+
+cat >>confdefs.h <<\_ACEOF
+#define DEV_RANDOM "/dev/random"
+_ACEOF
+
+	{ echo "$as_me:$LINENO: result: /dev/random" >&5
+echo "${ECHO_T}/dev/random" >&6; }
+else
+	{ echo "$as_me:$LINENO: result: not found" >&5
+echo "${ECHO_T}not found" >&6; };
+fi
 
 # We use auto for data librarian to avoid breaking the rule that autoconf
 # should use the same defaults as the manual configuration, but all platforms

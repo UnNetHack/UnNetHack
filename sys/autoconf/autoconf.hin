@@ -33,6 +33,9 @@
 /* The default windowing system */
 #undef DEFAULT_WINDOW_SYS
 
+/* Pseudo random number device */
+#undef DEV_RANDOM
+
 /* Data librarian */
 #undef DLB
 

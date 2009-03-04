@@ -297,6 +297,17 @@ if test "$HAVE_TBL" != "no" ; then
 fi
 fi
 
+dnl searching for non blocking random device
+AC_MSG_CHECKING(for pseudo random number device)
+if test -r "/dev/urandom"; then
+	AC_DEFINE(DEV_RANDOM, ["/dev/urandom"], [Pseudo random number device])
+	AC_MSG_RESULT(/dev/urandom)
+elif test -r "/dev/random"; then
+	AC_DEFINE(DEV_RANDOM, ["/dev/random"], [Pseudo random number device])
+	AC_MSG_RESULT(/dev/random)
+else
+	AC_MSG_RESULT(not found);
+fi
 
 dnl  ----- Check for compile-time options
 # We use auto for data librarian to avoid breaking the rule that autoconf
