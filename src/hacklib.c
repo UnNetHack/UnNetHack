@@ -457,6 +457,10 @@ extern struct tm *FDECL(localtime,(time_t *));
 #endif
 static struct tm *NDECL(getlt);
 
+#ifdef USE_MERSENNE_TWISTER
+gsl_rng *rng_state = NULL;
+#endif
+
 void
 setrandom()
 {
@@ -470,6 +474,11 @@ setrandom()
 #else
 	int random_seed=0;
 #endif
+#ifdef USE_MERSENNE_TWISTER
+	if (rng_state != NULL) { gsl_rng_free(rng_state); }
+	rng_state = gsl_rng_alloc(gsl_rng_mt19937);
+	gsl_rng_set(rng_state, (int) (time((time_t *)0)) + random_seed);
+#else
 	/* the types are different enough here that sweeping the different
 	 * routine names into one via #defines is even more confusing
 	 */
@@ -493,6 +502,7 @@ setrandom()
 #  endif
 # endif
 #endif
+#endif /* USE_MERSENNE_TWISTER */
 }
 
 static struct tm *

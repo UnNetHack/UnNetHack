@@ -309,6 +309,12 @@ else
 	AC_MSG_RESULT(not found);
 fi
 
+dnl check for GNU Scientific Library for Mersenne Twister RNG
+dnl http://www.gnu.org/software/gsl/manual/html_node/Autoconf-Macros.html
+AC_CHECK_LIB([gsl],[gsl_blas_dgemm],
+		[LFLAGS="$LDFLAGS -lgsl";
+		 AC_DEFINE(USE_MERSENNE_TWISTER, [], [Using Mersenne Twister as RNG])])
+
 dnl  ----- Check for compile-time options
 # We use auto for data librarian to avoid breaking the rule that autoconf
 # should use the same defaults as the manual configuration, but all platforms

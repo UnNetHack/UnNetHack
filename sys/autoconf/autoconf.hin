@@ -209,6 +209,9 @@
 /* Allow user-defined mapping from messages to sounds) */
 #undef USER_SOUNDS
 
+/* Using Mersenne Twister as RNG */
+#undef USE_MERSENNE_TWISTER
+
 /* Fancy mazes */
 #undef WALLIFIED_MAZE
 

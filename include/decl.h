@@ -446,6 +446,12 @@ E struct realtime_data {
 E int mailckfreq;
 #endif
 
+#ifdef USE_MERSENNE_TWISTER
+#include <gsl/gsl_rng.h>
+E gsl_rng *rngstate;
+#endif
+
+
 #undef E
 
 #endif /* DECL_H */

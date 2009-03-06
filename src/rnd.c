@@ -3,6 +3,11 @@
 
 #include "hack.h"
 
+#ifdef USE_MERSENNE_TWISTER
+extern gsl_rng *rng_state;
+#define RND(x)	(int)(gsl_rng_get(rng_state) % (long)(x))
+
+#else
 /* "Rand()"s definition is determined by [OS]conf.h */
 #if defined(LINT) && defined(UNIX)	/* rand() is long... */
 extern int NDECL(rand);
@@ -15,6 +20,7 @@ extern int NDECL(rand);
 #define RND(x)	(int)((Rand()>>3) % (x))
 # endif
 #endif /* LINT */
+#endif /* USE_MERSENNE_TWISTER */
 
 #ifdef OVL0
 
