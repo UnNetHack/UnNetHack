@@ -148,4 +148,11 @@ int i;
 
 #endif /* OVLB */
 
+int
+rnf(numerator, denominator) /**< @returns (rnf(n,d) < n/d) */
+int numerator, denominator;
+{
+	return rn2(numerator) < numerator;
+}
+
 /*rnd.c*/
