@@ -2754,7 +2754,7 @@ struct obj *obj_list;
 	    }
 }
 
-/* kill all members of genocided species */
+/** kill all members of genocided species */
 void
 kill_genocided_monsters()
 {
@@ -2792,6 +2792,28 @@ kill_genocided_monsters()
 	kill_eggs(invent);
 	kill_eggs(fobj);
 	kill_eggs(level.buriedobjlist);
+}
+
+/**
+ * Kills every member of the specified monster species on the current
+ * level.
+ */
+void
+kill_monster_on_level(mndx)
+int mndx; /**< Monster index number */
+{
+	struct monst *mtmp;
+	struct monst *mtmp2;
+	int tmp_mndx;
+
+	for (mtmp = fmon; mtmp; mtmp = mtmp2) {
+		mtmp2 = mtmp->nmon;
+		if (DEADMONSTER(mtmp)) continue;
+		tmp_mndx = monsndx(mtmp->data);
+		if (mndx == tmp_mndx) {
+			mondead(mtmp);
+		}
+	}
 }
 
 #endif /* OVL2 */

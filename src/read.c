@@ -1006,8 +1006,8 @@ register struct obj	*sobj;
 	case SCR_GENOCIDE:
 		You("have found a scroll of genocide!");
 		known = TRUE;
-		if (sobj->blessed) do_class_genocide();
-		else do_genocide(!sobj->cursed | (2 * !!Confusion));
+		do_genocide(!sobj->cursed | (2 * !!Confusion),
+		            !sobj->blessed);
 		break;
 	case SCR_LIGHT:
 		if(!Blind) known = TRUE;
@@ -1591,8 +1591,10 @@ do_class_genocide()
 #define PLAYER 2
 #define ONTHRONE 4
 void
-do_genocide(how)
+do_genocide(how, only_on_level)
 int how;
+boolean only_on_level; /**< if TRUE only genocide monsters on current level,
+                            not in the complete dungeon */
 /* 0 = no genocide; create monsters (cursed scroll) */
 /* 1 = normal genocide */
 /* 3 = forced genocide of player */
@@ -1603,6 +1605,7 @@ int how;
 	register int mndx;
 	register struct permonst *ptr;
 	const char *which;
+	const char *on_this_level;
 
 	if (how & PLAYER) {
 		mndx = u.umonster;	/* non-polymorphed mon num */
@@ -1662,6 +1665,7 @@ int how;
 	    }
 	}
 
+	on_this_level = only_on_level ? " on this level" : "";
 	which = "all ";
 	if (Hallucination) {
 	    if (Upolyd)
@@ -1678,9 +1682,10 @@ int how;
 	}
 	if (how & REALLY) {
 	    /* setting no-corpse affects wishing and random tin generation */
-	    mvitals[mndx].mvflags |= (G_GENOD | G_NOCORPSE);
-	    pline("Wiped out %s%s.", which,
-		  (*which != 'a') ? buf : makeplural(buf));
+	    if (!only_on_level) { mvitals[mndx].mvflags |= (G_GENOD | G_NOCORPSE); }
+	    pline("Wiped out %s%s%s.", which,
+		  (*which != 'a') ? buf : makeplural(buf),
+		  on_this_level);
 
 	    if (killplayer) {
 		/* might need to wipe out dual role */
@@ -1717,9 +1722,14 @@ int how;
 	    } else if (ptr == youmonst.data) {
 		rehumanize();
 	    }
-	    reset_rndmonst(mndx);
-	    kill_genocided_monsters();
-	    update_inventory();	/* in case identified eggs were affected */
+
+	    if (only_on_level) {
+		    kill_monster_on_level(mndx);
+	    } else {
+		    reset_rndmonst(mndx);
+		    kill_genocided_monsters();
+		    update_inventory();	/* in case identified eggs were affected */
+	    }
 	} else {
 	    int cnt = 0;
 
