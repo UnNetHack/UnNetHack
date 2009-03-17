@@ -1126,17 +1126,32 @@ dosacrifice()
     /* the real current alignment without modifications by a helm of
      * opposite alignment */
     aligntyp real_alignment = u.ualignbase[A_CURRENT];
+    char qbuf[QBUFSZ];
+    char c;
 
     if (!on_altar() || u.uswallow) {
 	You("are not standing on an altar.");
 	return 0;
     }
 
-    if (In_endgame(&u.uz)) {
-	if (!(otmp = getobj(sacrifice_types, "sacrifice"))) return 0;
-    } else {
-	if (!(otmp = floorfood("sacrifice", 1))) return 0;
+    /* Check for corpses or (fake) amulets of yendor on the floor */
+    for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere) {
+	    if (otmp->otyp==CORPSE ||
+		otmp->otyp==AMULET_OF_YENDOR ||
+		otmp->otyp==FAKE_AMULET_OF_YENDOR) {
+		    Sprintf(qbuf, "There %s %s here; %s %s?",
+			    otense(otmp, "are"),
+			    doname(otmp), "sacrifice",
+			    (otmp->quan == 1L) ? "it" : "one");
+		    if ((c = yn_function(qbuf,ynqchars,'n')) == 'y')
+			    break;
+		    else if (c == 'q')
+			    otmp = ((struct obj *) 0);
+	    }
     }
+    if (!otmp)
+	    if (!(otmp = getobj(sacrifice_types, "sacrifice"))) return 0;
+
     /*
       Was based on nutritional value and aging behavior (< 50 moves).
       Sacrificing a food ration got you max luck instantly, making the
