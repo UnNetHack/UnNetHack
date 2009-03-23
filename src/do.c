@@ -591,7 +591,13 @@ register struct obj *obj;
 		    }
 		}
 	    }
-	} else  {
+	} else if (obj->otyp==AMULET_OF_YENDOR &&
+	           (obj->cursed ? rnf(1,2) :
+		    obj->blessed ? rnf(1,16) : rnf(1,4))) {
+		if (!Blind) pline("Right before touching the %s the amulet teleports away!",
+		                  surface(u.ux, u.uy));
+		rloco(obj);
+	} else {
 	    place_object(obj, u.ux, u.uy);
 	    if (obj == uball)
 		drop_ball(u.ux,u.uy);
