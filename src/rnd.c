@@ -152,7 +152,7 @@ int
 rnf(numerator, denominator) /**< @returns (rnf(n,d) < n/d) */
 int numerator, denominator;
 {
-	return rn2(numerator) < numerator;
+	return rn2(denominator) < numerator;
 }
 
 /*rnd.c*/
