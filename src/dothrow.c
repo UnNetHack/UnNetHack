@@ -883,7 +883,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 	    if (slipok) {
 		u.dx = rn2(3)-1;
 		u.dy = rn2(3)-1;
-		if (!u.dx && !u.dy) u.dz = 1;
+		if (!u.dx && !u.dy) u.dz = rnf(1,3) ? -1 : 1;
 		impaired = TRUE;
 	    }
 	}
