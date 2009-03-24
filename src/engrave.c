@@ -76,6 +76,10 @@ static const char *random_mesg[] = {
 	"Time flies like an arrow.", /* linguistic humor */
 	"All Your Base Are Belong To Us!", /* Zero Wing */
 	"Numa Numa", /* Internet Meme */
+	"I want to believe!", /* X-Files */
+	"Trust No One", /* X-Files */
+	"The Truth is Out There", /* X-Files */
+	"Look behind you, a Three-Headed Monkey!", /* Monkey Island */
 };
 
 char *
