@@ -282,6 +282,7 @@ struct instance_flags {
 	boolean wc2_newcolors;		/* try to use slashem like colors including
 					 * dark-gray to represent black object */
 
+	boolean  show_buc;	/* always show BUC status */
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
 	boolean	 obsolete;	/* obsolete options can point at this, it isn't used */
 	/* Items which belong in flags, but are here to allow save compatibility */
