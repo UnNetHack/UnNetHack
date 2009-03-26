@@ -3128,7 +3128,15 @@ sp_lev *lvl;
 
     wallification(1, 0, COLNO-1, ROWNO-1);
 
-    flip_level_rnd(3);
+	if (!Is_astralevel(&u.uz) &&
+	    !Is_blackmarket(&u.uz) &&
+	    !Is_knox(&u.uz) &&
+	    !Is_oracle_level(&u.uz) &&
+	    !Is_minetown_level(&u.uz) &&
+	    !Is_town_level(&u.uz) &&
+	    !In_V_tower(&u.uz)) {
+		flip_level_rnd(3);
+	}
 
     count_features();
 

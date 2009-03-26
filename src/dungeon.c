@@ -688,6 +688,8 @@ struct level_map {
 	{ X_START,	&qstart_level },
 	{ X_LOCATE,	&qlocate_level },
 	{ X_GOAL,	&nemesis_level },
+	{ "minetn",	&minetown_level },
+	{ "town",	&town_level },
 	{ "",		(d_level *)0 }
 };
 
