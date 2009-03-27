@@ -1907,6 +1907,7 @@ boolean prefilled;
 		case COURT:
 		case ZOO:
 		case BEEHIVE:
+		case LEMUREPIT:
 		case MORGUE:
 		case BARRACKS:
 		    fill_zoo(croom);
@@ -1930,6 +1931,9 @@ boolean prefilled;
 		break;
 	    case BEEHIVE:
 		level.flags.has_beehive = TRUE;
+		break;
+	    case LEMUREPIT:
+		level.flags.has_lemurepit = TRUE;
 		break;
 	    case BARRACKS:
 		level.flags.has_barracks = TRUE;

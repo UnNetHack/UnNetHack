@@ -65,6 +65,7 @@ int	roomtype;
 	case COCKNEST:	mkzoo(COCKNEST); break;
 	case ARMORY:	mkzoo(ARMORY); break;
 	case ANTHOLE:	mkzoo(ANTHOLE); break;
+	case LEMUREPIT:	mkzoo(LEMUREPIT); break;
 	default:	impossible("Tried to make a room of type %d.", roomtype);
     }
 }
@@ -92,6 +93,10 @@ mkshop()
 			}
 			if(*ep == 'b' || *ep == 'B'){
 				mkzoo(BEEHIVE);
+				return;
+			}
+			if(*ep == 'p' || *ep == 'P'){
+				mkzoo(LEMUREPIT);
 				return;
 			}
 			if(*ep == 't' || *ep == 'T' || *ep == '\\'){
@@ -313,6 +318,9 @@ struct mkroom *sroom;
 		    (type == BEEHIVE) ?
 			(sx == tx && sy == ty ? &mons[PM_QUEEN_BEE] :
 			 &mons[PM_KILLER_BEE]) :
+		    (type == LEMUREPIT) ?
+		        (!rn2(10) ? &mons[PM_HORNED_DEVIL] :
+		         &mons[PM_LEMURE]) :
 		    (type == LEPREHALL) ? &mons[PM_LEPRECHAUN] :
 		    (type == COCKNEST) ? &mons[PM_COCKATRICE] :
                    (type == ARMORY) ? (rn2(3) ? mkclass(S_RUSTMONST,0) :
@@ -423,6 +431,10 @@ struct mkroom *sroom;
 	      case BEEHIVE:
 		  level.flags.has_beehive = 1;
 		  break;
+	      case LEMUREPIT:
+		  level.flags.has_lemurepit = 1;
+		  break;
+
 	}
 }
 

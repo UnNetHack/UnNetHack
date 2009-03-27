@@ -603,6 +603,7 @@ clear_level_structures()
 	level.flags.has_beehive = 0;
 	level.flags.has_barracks = 0;
 	level.flags.has_temple = 0;
+	level.flags.has_lemurepit = 0;
 	level.flags.has_swamp = 0;
 	level.flags.has_garden = 0;
 	level.flags.noteleport = 0;

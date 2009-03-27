@@ -149,6 +149,7 @@ static struct {
 	{ "zoo",	 ZOO },
 	{ "delphi",	 DELPHI },
 	{ "temple",	 TEMPLE },
+	{ "lemurepit",   LEMUREPIT },
 	{ "anthole",	 ANTHOLE },
 	{ "cocknest",	 COCKNEST },
 	{ "garden",	 GARDEN },
