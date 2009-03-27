@@ -55,15 +55,15 @@ DESCRIPTION:	mazelike
 DESCRIPTION:	hellish
 ALIGNMENT:	noalign
 BRANCH:		"Vlad's Tower" @ (9, 5) up
-LEVEL:		"valley" "V" @ (1, 0)
+RNDLEVEL:	"valley" "V" @ (1, 0) 2
 LEVEL:		"sanctum" "none" @ (-1, 0)
 LEVEL:		"juiblex" "J" @ (4, 4)
-LEVEL:		"baalz" "B" @ (6, 4)
-LEVEL:		"asmodeus" "A" @ (2, 6)
+RNDLEVEL:	"baalz" "B" @ (6, 4) 2
+RNDLEVEL:	"asmod" "A" @ (2, 6) 2
 LEVEL:		"wizard1" "none" @ (11, 6)
 CHAINLEVEL:	"wizard2" "X" "wizard1" + (1, 0)
 CHAINLEVEL:	"wizard3" "Y" "wizard1" + (2, 0)
-LEVEL:		"orcus" "O" @ (10, 6)
+RNDLEVEL:	"orcus" "O" @ (10, 6) 2
 LEVEL:		"fakewiz1" "F" @ (-6,4)
 LEVEL:		"fakewiz2" "G" @ (-6,4)
 
