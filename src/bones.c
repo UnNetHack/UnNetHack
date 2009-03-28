@@ -230,8 +230,10 @@ struct obj *corpse;
 	    mptr = mtmp->data;
 	    if (mtmp->iswiz || mptr == &mons[PM_MEDUSA] ||
 		    mptr->msound == MS_NEMESIS || mptr->msound == MS_LEADER ||
-		    mptr == &mons[PM_VLAD_THE_IMPALER])
+		    mptr == &mons[PM_VLAD_THE_IMPALER] ||
+		    mptr == &mons[PM_CTHULHU]) {
 		mongone(mtmp);
+	    }
 	}
 #ifdef STEED
 	if (u.usteed) dismount_steed(DISMOUNT_BONES);

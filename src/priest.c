@@ -191,7 +191,7 @@ int sx, sy;
 boolean sanctum;   /* is it the seat of the high priest? */
 {
 	struct monst *priest;
-	struct obj *otmp;
+	struct obj *otmp = NULL;
 	int cnt;
 
 	if(MON_AT(sx+1, sy))
@@ -211,11 +211,11 @@ boolean sanctum;   /* is it the seat of the high priest? */
 		priest->msleeping = 0;
 		set_malign(priest); /* mpeaceful may have changed */
 
-		/* now his/her goodies... */
-		if(sanctum && EPRI(priest)->shralign == A_NONE &&
+		/* Cthulhu is Molochs new high priest */
+		/* if(sanctum && EPRI(priest)->shralign == A_NONE &&
 		     on_level(&sanctum_level, &u.uz)) {
 			(void) mongets(priest, AMULET_OF_YENDOR);
-		}
+		} */
 		/* 2 to 4 spellbooks */
 		for (cnt = rn1(3,2); cnt > 0; --cnt) {
 		    (void) mpickobj(priest, mkobj(SPBOOK_CLASS, FALSE));
@@ -341,8 +341,7 @@ register int roomno;
 	if(!temple_occupied(u.urooms0)) {
 	    if(tended) {
 		shrined = has_shrine(priest);
-		sanctum = (priest->data == &mons[PM_HIGH_PRIEST] &&
-			   (Is_sanctum(&u.uz) || In_endgame(&u.uz)));
+		sanctum = (Is_sanctum(&u.uz) || In_endgame(&u.uz));
 		can_speak = (priest->mcanmove && !priest->msleeping &&
 			     flags.soundok);
 		if (can_speak) {

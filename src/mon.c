@@ -1592,6 +1592,18 @@ boolean was_swallowed;			/* digestion */
 	    }
   	}
 
+	/* Cthulhu Deliquesces... */
+	if (mdat == &mons[PM_CTHULHU]) {
+	    if (cansee(mon->mx, mon->my))
+		pline("%s body deliquesces into a cloud of noxious gas!",
+			s_suffix(Monnam(mon)));
+	    else
+		You_hear("hissing and bubbling!");
+	    /* ...into a stinking cloud... */
+	    (void) create_cthulhu_death_cloud(mon->mx, mon->my, 3, 8);
+	    return (FALSE);
+	}
+
 	/* must duplicate this below check in xkilled() since it results in
 	 * creating no objects as well as no corpse
 	 */
