@@ -147,8 +147,8 @@
 #define emits_light(ptr)	(((ptr)->mlet == S_LIGHT || \
 				  (ptr) == &mons[PM_FLAMING_SPHERE] || \
 				  (ptr) == &mons[PM_SHOCKING_SPHERE] || \
-				  (ptr) == &mons[PM_GOLD_DRAGON] || \
-				  (ptr) == &mons[PM_BABY_GOLD_DRAGON] || \
+				  (!strcmp((ptr)->mname, "gold dragon")) || \
+				  (!strcmp((ptr)->mname, "baby gold dragon")) || \
 				  (ptr) == &mons[PM_FIRE_VORTEX]) ? 1 : \
 				 ((ptr) == &mons[PM_FIRE_ELEMENTAL]) ? 1 : 0)
 /*	[note: the light ranges above were reduced to 1 for performance...] */
