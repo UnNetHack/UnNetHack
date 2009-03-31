@@ -680,7 +680,7 @@ int how;
 	killer = kilbuf;
 
 	if (how < PANICKED) u.umortality++;
-	if (Lifesaved && (how <= GENOCIDED)) {
+	if (Lifesaved && (how <= MAX_SURVIVABLE_DEATH)) {
 		pline("But wait...");
 		makeknown(AMULET_OF_LIFE_SAVING);
 		Your("medallion %s!",
@@ -717,10 +717,10 @@ int how;
 #ifdef WIZARD
 			wizard ||
 #endif
-			discover) && (how <= GENOCIDED)) {
+			discover) && (how <= MAX_SURVIVABLE_DEATH)) {
 		if(yn("Die?") == 'y') goto die;
 		pline("OK, so you don't %s.",
-			(how == CHOKING) ? "choke" : "die");
+			(how == CHOKING) ? "choke" : (how == DISINTEGRATED) ? "disintegrate" : "die");
 		if(u.uhpmax <= 0) u.uhpmax = u.ulevel * 8;	/* arbitrary */
 		savelife(how);
 		killer = 0;
