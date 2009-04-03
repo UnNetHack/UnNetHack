@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* UnNetHack 3.5.0 */
+#define GAME_SHORT_NAME	"UNH"
 #define VERSION_MAJOR	3
 #define VERSION_MINOR	5
 /*

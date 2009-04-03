@@ -212,10 +212,11 @@ struct toptenentry *tt;
 	nsb_mung_line(tt->name);
 	nsb_mung_line(tt->death);
 	                   /* Version_ Pts DgnLevs_ Hp___ Died__Born id */
-	(void) fprintf(rfile,"%d %d %d %ld %d %d %d %d %d %d %ld %ld %d ",
+	(void) fprintf(rfile,"%s %d %d %d %ld %d %d %d %d %d %d %ld %ld %d ",
 #else
-	(void) fprintf(rfile,"%d.%d.%d %ld %d %d %d %d %d %d %ld %ld %d ",
+	(void) fprintf(rfile,"%s-%d.%d.%d %ld %d %d %d %d %d %d %ld %ld %d ",
 #endif
+		GAME_SHORT_NAME,
 		tt->ver_major, tt->ver_minor, tt->patchlevel,
 		tt->points, tt->deathdnum, tt->deathlev,
 		tt->maxlvl, tt->hp, tt->maxhp, tt->deaths,
@@ -280,7 +281,7 @@ struct toptenentry *tt;
 
   /* Log all of the data found in the regular logfile */
   (void)fprintf(rfile,
-                "version=%d.%d.%d"
+                "version=%s-%d.%d.%d"
                 SEP "points=%ld"
                 SEP "deathdnum=%d"
                 SEP "deathlev=%d"
@@ -291,6 +292,7 @@ struct toptenentry *tt;
                 SEP "deathdate=%d"
                 SEP "birthdate=%d"
                 SEP "uid=%d",
+		GAME_SHORT_NAME,
                 tt->ver_major, tt->ver_minor, tt->patchlevel,
                 tt->points, tt->deathdnum, tt->deathlev,
                 tt->maxlvl, tt->hp, tt->maxhp, tt->deaths,
