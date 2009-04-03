@@ -835,6 +835,8 @@ SCROLL((char *)0,               "HZLRC KSTSBD MPFNG",   1,   0, 100),
 SCROLL((char *)0,               "EIRIS SAZUN IDISI",    1,   0, 100), /* Merseburg Incantations */
 SCROLL((char *)0,               "PHOL ENDE WODAN",      1,   0, 100), /* Merseburg Incantations */
 SCROLL((char *)0,               "GHOTI",                1,   0, 100), /* pronounced as 'fish', George Bernard Shaw */
+SCROLL((char *)0,               "MAPIRO MAHAMA DIROMAT",1,   0, 100), /* Wizardry */
+SCROLL((char *)0,               "VAS CORP BET MANI",    1,   0, 100), /* Ultima */
 
 	/* these must come last because they have special descriptions */
 #ifdef MAIL
