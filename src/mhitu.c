@@ -1893,6 +1893,37 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 		case AD_DISE:
 		    if (!diseasemu(mtmp->data)) tmp = 0;
 		    break;
+		case AD_DISN:
+		    if(!mtmp->mcan && rn2(2) && u.uswldtim < 2) {
+			tmp = 0;
+			if (Disint_resistance) {
+				shieldeff(u.ux, u.uy);
+				You_feel("mildly tickled.");
+				tmp = 0;
+				break;
+			} else if (uarms) {
+				/* destroy shield; other possessions are safe */
+				(void) destroy_arm(uarms);
+				break;
+			} else if (uarm) {
+				/* destroy suit; if present, cloak goes too */
+				if (uarmc) (void) destroy_arm(uarmc);
+				(void) destroy_arm(uarm);
+				break;
+			}
+			/* no shield or suit, you're dead; wipe out cloak
+			   and/or shirt in case of life-saving or bones */
+			if (uarmc) (void) destroy_arm(uarmc);
+#ifdef TOURIST
+			if (uarmu) (void) destroy_arm(uarmu);
+#endif
+			You("are disintegrated!");
+			tmp = u.uhp;
+			if (Half_physical_damage) tmp *= 2; /* sorry */
+		    } else {
+			tmp = 0;
+		    }
+		    break;
 		default:
 		    tmp = 0;
 		    break;
