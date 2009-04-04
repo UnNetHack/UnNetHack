@@ -250,6 +250,10 @@ static struct Comp_Opt
 						1, SET_IN_GAME },
 	{ "catname",  "the name of your (first) cat (e.g., catname:Tabby)",
 						PL_PSIZ, DISP_IN_GAME },
+#ifdef EXOTIC_PETS
+	{ "crocodilename", "the name of your (first) crocodile (e.g., crocodilename:TickTock)",
+						PL_PSIZ, DISP_IN_GAME },
+#endif
 	{ "disclose", "the kinds of information to disclose at end of game",
 						sizeof(flags.end_disclose) * 2,
 						SET_IN_GAME },
@@ -304,6 +308,10 @@ static struct Comp_Opt
 	{ "menu_select_all", "select all items in a menu", 4, SET_IN_FILE },
 	{ "menu_select_page", "select all items on this page of a menu",
 						4, SET_IN_FILE },
+#ifdef EXOTIC_PETS
+	{ "monkeyname", "the name of your (first) monkey (e.g., monkeyname:Bonzo)",
+						PL_PSIZ, DISP_IN_GAME },
+#endif
 	{ "monsters", "the symbols to use for monsters",
 						MAXMCLASSES, SET_IN_FILE },
 	{ "msghistory", "number of top line messages to save",
@@ -375,6 +383,10 @@ static struct Comp_Opt
 	{ "windowcolors",  "the foreground/background colors of windows",	/*WC*/
 						80, DISP_IN_GAME },
 	{ "windowtype", "windowing system to use", WINTYPELEN, DISP_IN_GAME },
+#ifdef EXOTIC_PETS
+	{ "wolfname", "the name of your (first) wolf (e.g., wolfname:Gnasher)",
+						PL_PSIZ, DISP_IN_GAME },
+#endif
 	{ (char *)0, (char *)0, 0, 0 }
 };
 
@@ -1378,6 +1390,12 @@ boolean tinitial, tfrom_file;
 			case 'F':
 			    preferred_pet = 'c';
 			    break;
+#ifdef EXOTIC_PETS
+			case 'e':	/* exotic */
+			case 'E':
+			    preferred_pet = 'e';
+			    break;
+#endif
 			case 'n':	/* no pet */
 			case 'N':
 			    preferred_pet = 'n';
@@ -1486,6 +1504,32 @@ boolean tinitial, tfrom_file;
 #endif
 	    return;
 	}
+
+#ifdef EXOTIC_PETS
+	fullname = "monkeyname";
+	if (match_optname(opts, fullname, 6, TRUE)) {
+		if (negated) bad_negation(fullname, FALSE);
+		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
+			nmcpy(monkeyname, op, PL_PSIZ);
+		return;
+	}
+
+	fullname = "wolfname";
+	if (match_optname(opts, fullname, 4, TRUE)) {
+		if (negated) bad_negation(fullname, FALSE);
+		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
+			nmcpy(wolfname, op, PL_PSIZ);
+		return;
+	}
+
+	fullname = "crocodilename";
+	if (match_optname(opts, fullname, 9, TRUE)) {
+		if (negated) bad_negation(fullname, FALSE);
+		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
+			nmcpy(crocodilename, op, PL_PSIZ);
+		return;
+	}
+#endif
 
 	fullname = "msghistory";
 	if (match_optname(opts, fullname, 3, TRUE)) {
@@ -3287,6 +3331,10 @@ char *buf;
 			iflags.bouldersym : oc_syms[(int)objects[BOULDER].oc_class]);
 	else if (!strcmp(optname, "catname")) 
 		Sprintf(buf, "%s", catname[0] ? catname : none );
+#ifdef EXOTIC_PETS
+	else if (!strcmp(optname, "crocodilename")) 
+		Sprintf(buf, "%s", crocodilename[0] ? crocodilename : none);
+#endif
 	else if (!strcmp(optname, "disclose")) {
 		for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
 			char topt[2];
@@ -3389,6 +3437,10 @@ char *buf;
 		Sprintf(buf, "%s", to_be_done);
 	else if (!strcmp(optname, "menu_select_page"))
 		Sprintf(buf, "%s", to_be_done);
+#ifdef EXOTIC_PETS
+	else if (!strcmp(optname, "monkeyname")) 
+		Sprintf(buf, "%s", monkeyname[0] ? monkeyname : none);
+#endif
 	else if (!strcmp(optname, "monsters"))
 		Sprintf(buf, "%s", to_be_done);
 	else if (!strcmp(optname, "msghistory"))
@@ -3418,6 +3470,7 @@ char *buf;
 	else if (!strcmp(optname, "pettype")) 
 		Sprintf(buf, "%s", (preferred_pet == 'c') ? "cat" :
 				(preferred_pet == 'd') ? "dog" :
+				(preferred_pet == 'e') ? "exotic" :
 				(preferred_pet == 'n') ? "none" : "random");
 	else if (!strcmp(optname, "pickup_burden"))
 		Sprintf(buf, "%s", burdentype[flags.pickup_burden] );
@@ -3517,6 +3570,10 @@ char *buf;
 			iflags.wc_foregrnd_text    ? iflags.wc_foregrnd_text : defbrief,
 			iflags.wc_backgrnd_text    ? iflags.wc_backgrnd_text : defbrief);
 #ifdef PREFIXES_IN_USE
+#ifdef EXOTIC_PETS
+	else if (!strcmp(optname, "wolfname")) 
+		Sprintf(buf, "%s", wolfname[0] ? wolfname : none);
+#endif
 	else {
 	    for (i = 0; i < PREFIX_COUNT; ++i)
 		if (!strcmp(optname, fqn_prefix_names[i]) && fqn_prefix[i])

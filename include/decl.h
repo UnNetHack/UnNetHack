@@ -212,6 +212,11 @@ E NEARDATA char plname[PL_NSIZ];
 E NEARDATA char dogname[];
 E NEARDATA char catname[];
 E NEARDATA char horsename[];
+#ifdef EXOTIC_PETS
+E NEARDATA char monkeyname[];
+E NEARDATA char wolfname[];
+E NEARDATA char crocodilename[];
+#endif
 E char preferred_pet;
 E const char *occtxt;			/* defined when occupation != NULL */
 E const char *nomovemsg;

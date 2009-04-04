@@ -317,6 +317,8 @@ typedef unsigned char	uchar;
 # endif
 #endif
 
+#define EXOTIC_PETS      /* Rob Ellwood  June 2002 */
+
 /*
  * Section 4:  THE FUN STUFF!!!
  *

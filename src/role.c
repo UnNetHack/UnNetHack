@@ -89,7 +89,7 @@ const struct Role roles[] = {
 	{"Pioneer",     0} },
 	"Anu", "_Ishtar", "Anshar", /* Babylonian */
 	"Cav", "the Caves of the Ancestors", "the Dragon's Lair",
-	PM_CAVEMAN, PM_CAVEWOMAN, PM_LITTLE_DOG,
+	PM_CAVEMAN, PM_CAVEWOMAN, NON_PM,
 	PM_SHAMAN_KARNOV, PM_NEANDERTHAL, PM_CHROMATIC_DRAGON,
 	PM_BUGBEAR, PM_HILL_GIANT, S_HUMANOID, S_GIANT,
 	ART_SCEPTRE_OF_MIGHT,
@@ -260,7 +260,7 @@ const struct Role roles[] = {
 	{"Marksman",      "Markswoman"} },
 	"Mercury", "_Venus", "Mars", /* Roman/planets */
 	"Ran", "Orion's camp", "the cave of the wumpus",
-	PM_RANGER, NON_PM, PM_LITTLE_DOG /* Orion & canis major */,
+	PM_RANGER, NON_PM, NON_PM /* Orion & canis major */,
 	PM_ORION, PM_HUNTER, PM_SCORPIUS,
 	PM_FOREST_CENTAUR, PM_SCORPION, S_CENTAUR, S_SPIDER,
 	ART_LONGBOW_OF_DIANA,
