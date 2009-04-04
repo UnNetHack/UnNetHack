@@ -1620,6 +1620,9 @@ E const char *FDECL(halu_gname, (ALIGNTYP_P));
 E const char *FDECL(rnd_gname, (int));
 E const char *FDECL(align_gtitle, (ALIGNTYP_P));
 E void FDECL(altar_wrath, (int,int));
+#ifdef ASTRAL_ESCAPE
+E int FDECL(invoke_amulet, (struct obj *));
+#endif
 
 
 /* ### priest.c ### */

@@ -417,9 +417,19 @@ typedef unsigned char	uchar;
 # define VIDEOSHADES    /* Slash'Em like colors */
 #endif
 
-#define WEBB_DISINT /* Disintegrator - Nicholas Webb */
-
 /* End of Section 5 */
+
+/*
+ * Section 6:  UNCODITIONAL DEFINES
+ *
+ * These defines must be defined.
+ * They come from patches that have been unconditionally incorporated
+ * into UnNetHack.
+ */
+#define WEBB_DISINT /* Disintegrator - Nicholas Webb */
+#define ASTRAL_ESCAPE /* Allow escape from Astral plane (with the Amulet) - CWC */
+
+/* End of Section 6 */
 
 #include "global.h"	/* Define everything else according to choices above */
 

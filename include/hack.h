@@ -82,15 +82,10 @@
 # define TRICKED	13
 # define QUIT		14
 # define ESCAPED	15
-# define ASCENDED	16
-#else
-#define GENOCIDED	10
-#define MAX_SURVIVABLE_DEATH	10
-#define PANICKED	11
-#define TRICKED		12
-#define QUIT		13
-#define ESCAPED		14
-#define ASCENDED	15
+#ifdef ASTRAL_ESCAPE
+#define DEFIED		16
+#define ASCENDED	17
+#endif
 #endif
 
 #include "align.h"

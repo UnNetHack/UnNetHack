@@ -1279,6 +1279,10 @@ dosacrifice()
     } /* corpse */
 
     if (otmp->otyp == AMULET_OF_YENDOR) {
+#ifdef ASTRAL_ESCAPE
+	/* There's now an atheist option to win the game */
+	u.uconduct.gnostic++;
+#endif
 	if (!Is_astralevel(&u.uz)) {
 	    if (Hallucination)
 		    You_feel("homesick.");
@@ -1326,12 +1330,17 @@ verbalize("In return for thy service, I grant thee the gift of Immortality!");
     } /* real Amulet */
 
     if (otmp->otyp == FAKE_AMULET_OF_YENDOR) {
+#ifdef ASTRAL_ESCAPE
+	u.uconduct.gnostic++;
+#endif
 	    if (flags.soundok)
 		You_hear("a nearby thunderclap.");
 	    if (!otmp->known) {
 		You("realize you have made a %s.",
 		    Hallucination ? "boo-boo" : "mistake");
+		makeknown(otmp->otyp);
 		otmp->known = TRUE;
+		update_inventory();
 		change_luck(-1);
 		return 1;
 	    } else {
@@ -1904,5 +1913,93 @@ int dx,dy;
 
     return FALSE;
 }
+
+#ifdef ASTRAL_ESCAPE
+int
+invoke_amulet(otmp)
+    struct obj *otmp;
+{
+	aligntyp altaralign = a_align(u.ux,u.uy);
+
+	if (!on_altar()) {
+		pline(nothing_happens);
+		return 1;
+	}
+
+	/* Since this is a potentially terminal effect on the game, confirm action */
+	if (yn("Are you sure you want to defy the Gods by invoking the Amulet?") == 'n')
+		return 0;
+
+	if (otmp->otyp == AMULET_OF_YENDOR) {
+		if (!Is_astralevel(&u.uz)) {
+			if (Hallucination)
+				You_feel("homesick.");
+			else
+				You_feel("an urge to return to the surface.");
+			/* trying to #invoke whilst not on Astral plane still annoys your god */
+			if (flags.soundok)
+			You_hear("a nearby thunderclap.");
+			change_luck(-1);
+			adjalign(-10);
+			gods_upset(u.ualign.type);
+			return 1;
+		} else {
+			/* The final Test.	Did you win? */
+			You("invoke %s.", the(xname(otmp)));
+			adjalign(-99);
+			pline("%s is enraged, but the power of %s protects you!",
+			u_gname(), the(xname(otmp)));
+			if(!Blind) You("are surrounded by a shimmering %s sphere!",
+					hcolor((const char *)"golden"));
+			else You_feel("weightless for a moment.");
+			/* No uevent.ascended, as we have spurned ascension */
+			if (u.ualign.type != altaralign) {
+				if (uamul == otmp) Amulet_off();
+				if (carried(otmp)) freeinv(otmp);
+				if (Blind)
+					You_feel("%s fall from your pack!", the(xname(otmp)));
+				else
+					You("see %s fall out of your pack!", the(xname(otmp)));
+				pline("But you can't retrieve it.");
+				if (Hallucination) {
+					You("feel like Dorothy travelling back to Kansas!");
+				} else {
+					You("return home...");
+				}
+				done(ESCAPED);
+			} else {
+				/* stick the proverbial two fingers up at the Gods,
+				* and go home */
+				display_nhwindow(WIN_MESSAGE, FALSE);
+				You("return home with %s...",
+				the(xname(otmp)));
+				done(DEFIED);
+			}
+		}
+	} /* real Amulet */
+	if (otmp->otyp == FAKE_AMULET_OF_YENDOR) {
+		if (flags.soundok)
+			You_hear("a nearby thunderclap.");
+		if (!otmp->known) {
+			You("realize your gambit has failed.");
+			makeknown(otmp->otyp);
+			otmp->known = TRUE;
+			/* since we are willingly defying the Gods, this should cause extreme anger */
+			change_luck(-1);
+			adjalign(-10);
+			gods_upset(u.ualign.type);
+			return 1;
+		} else {
+			/* not very wise, to defy the Gods with a *known* fake */
+			You_feel("foolish!");
+			(void) adjattrib(A_WIS, -1, TRUE);
+			exercise(A_WIS, FALSE);
+			change_luck(-3);
+			adjalign(-12);
+			gods_upset(u.ualign.type);
+		}
+	} /* fake Amulet */
+}
+#endif
 
 /*pray.c*/

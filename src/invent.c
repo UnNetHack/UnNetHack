@@ -940,7 +940,9 @@ register const char *let,*word;
 		     (otmp->oclass == GEM_CLASS && !is_graystone(otmp))))
 		|| (!strcmp(word, "invoke") &&
 		    (!otmp->oartifact && !objects[otyp].oc_unique &&
-		     (otyp != FAKE_AMULET_OF_YENDOR || otmp->known) &&
+#ifdef ASTRAL_ESCAPE
+		     otyp != FAKE_AMULET_OF_YENDOR &&
+#endif
 		     otyp != CRYSTAL_BALL &&	/* #invoke synonym for apply */
 		   /* note: presenting the possibility of invoking non-artifact
 		      mirrors and/or lamps is a simply a cruel deception... */

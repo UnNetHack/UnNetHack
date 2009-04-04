@@ -1210,6 +1210,13 @@ arti_invoke(obj)
     if(!oart || !oart->inv_prop) {
 	if(obj->otyp == CRYSTAL_BALL)
 	    use_crystal_ball(obj);
+#ifdef ASTRAL_ESCAPE
+	else if(obj->otyp == AMULET_OF_YENDOR ||
+	        obj->otyp == FAKE_AMULET_OF_YENDOR)
+			/* The Amulet is not technically an artifact
+			 * in the usual sense... */
+			return invoke_amulet(obj);
+#endif
 	else
 	    pline(nothing_happens);
 	return 1;
