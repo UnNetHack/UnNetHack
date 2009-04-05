@@ -1,4 +1,4 @@
-#	NetHack Makefile.
+#	UnNetHack Makefile.
 #       @configure_input@
 #	SCCS Id: @(#)Makefile.top	3.4	1995/01/05
 
@@ -17,11 +17,11 @@ srcdir=@srcdir@
 # execute things like 'data' and 'rumors')
 # MAKE = make
 
-# make NetHack
+# make UnNetHack
 PREFIX   = @prefix@
 EXEEXT	 = @EXEEXT@
-SCRIPT   = nethack
-GAME     = nethack$(EXEEXT)
+SCRIPT   = unnethack
+GAME     = unnethack$(EXEEXT)
 GAMEUID  = @OWNER@
 GAMEGRP  = @GROUP@
 
@@ -38,14 +38,14 @@ VARDIRPERM  = 0755
 # VARDIR may also appear in unixconf.h as "VAR_PLAYGROUND" else GAMEDIR
 #
 # note that 'make install' believes in creating nice tidy directories for
-# installation, free of debris from previous NetHack versions --
+# installation, free of debris from previous UnNetHack versions --
 # therefore there should not be anything in GAMEDIR that you want to keep
 # (if there is, you'll have to do the installation by hand or modify the
 # instructions)
 # These must agree with the definitions in unixconf.h
 
 # Defs. for non file areas support.
-GAMEDIR  = $(PREFIX)/nethackdir
+GAMEDIR  = $(PREFIX)/unnethackdir
 VARDIR = $(GAMEDIR)
 FILE_AREA_VAR = $(VARDIR)
 FILE_AREA_SAVE = $(VARDIR)/save
@@ -60,9 +60,9 @@ SHELLDIR = $(PREFIX)/bin
 # for inclusion in DLB libraries (ND) and which are (D). Port specific files
 # per discussions in Install.X11 and Install.Qt
 CNF_SHARE_QTND = x11tiles rip.xpm nhsplash.xpm
-CNF_SHARE_X11ND = x11tiles NetHack.ad pet_mark.xbm
-#CNF_SHARE_X11ND = x11tiles NetHack.ad pet_mark.xbm
-# CNF_SHARE_X11ND = x11tiles NetHack.ad pet_mark.xbm rip.xpm
+CNF_SHARE_X11ND = x11tiles UnNetHack.ad pet_mark.xbm
+#CNF_SHARE_X11ND = x11tiles UnNetHack.ad pet_mark.xbm
+# CNF_SHARE_X11ND = x11tiles UnNetHack.ad pet_mark.xbm rip.xpm
 # for Atari/Gem
 CNF_SHARE_GEMND = nh16.img title.img GEM_RSC.RSC rip.img
 # for BeOS
@@ -177,8 +177,8 @@ beostiles: $(GAME)
 	( cd util ; $(MAKE) tile2beos )
 	( cd dat ; $(MAKE) beostiles )
 
-NetHack.ad: $(GAME)
-	( cd dat ; $(MAKE) NetHack.ad )
+UnNetHack.ad: $(GAME)
+	( cd dat ; $(MAKE) UnNetHack.ad )
 
 pet_mark.xbm:
 	( cd dat ; $(MAKE) pet_mark.xbm )
@@ -232,7 +232,7 @@ dofiles:
 		cp $(srcdir)/doc/Guidebook.txt $(FILE_AREA_DOC); \
 	fi
 	cp $(srcdir)/dat/license $(FILE_AREA_DOC)
-#	cp win/Qt/KDE/knethack.kdelnk $(KDEDIR)/share/applnk/Games
+#	cp win/Qt/KDE/kunnethack.kdelnk $(KDEDIR)/share/applnk/Games
 	@HOST_UNIX@-rm -f $(SHELLDIR)/$(SCRIPT)
 	@HOST_UNIX@sed -e 's;/usr/games/lib/nethackdir;$(FILE_AREA_UNSHARE);' \
 	@HOST_UNIX@	-e 's;HACKDIR/nethack;HACKDIR/$(GAME);' \

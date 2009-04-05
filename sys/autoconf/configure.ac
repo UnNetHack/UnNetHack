@@ -1,5 +1,5 @@
 dnl	UNNETHACK autoconf template
-AC_INIT(UNNETHACK, 3.4.3, bhaak@gmx.net)
+AC_INIT(UNNETHACK, 3.5.2, bhaak@gmx.net)
 dnl Avoid AC_REVISION() because we check configure into CVS
 dnl and it will cause confusing revision numbers to be included
 dnl in configure if developers forget to check in configure.ac
@@ -79,14 +79,14 @@ if test $host_os = mingw32; then
     CFLAGS="$CFLAGS -mno-cygwin -isystem /usr/include/mingw"
     LFLAGS="$LDFLAGS -mno-cygwin -L/usr/lib/mingw"
 
-    AC_MSG_CHECKING([for how to build NetHack key dynamic libraries])
+    AC_MSG_CHECKING([for how to build UnNetHack key dynamic libraries])
     if test "$GCC" = yes; then
 	AC_MSG_RESULT([gcc])
 	AC_SUBST(NHKEYDLL_GCC,[])
     else
 	AC_MSG_RESULT([unknown])
 	if test "$enable_tty_graphics" = yes; then
-	    AC_MSG_ERROR([Don't know how to build NetHack key DLLs with $CC])
+	    AC_MSG_ERROR([Don't know how to build UnNetHack key DLLs with $CC])
 	else
 	    AC_MSG_WARN([Can't enable tty graphics (key dynamic libraries)])
 	    NETHACK_AUTO_WIN_DISABLE(tty)

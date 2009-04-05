@@ -104,7 +104,7 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* Use NetHack's compression routines */
+/* Use UnNetHack's compression routines */
 #undef INTERNAL_COMP
 
 /* Keystone Kops */

@@ -1,6 +1,6 @@
-                 Instructions for installing NetHack
+                Instructions for installing UnNetHack
                  on a GNU autoconf supported system
-                ====================================
+                =====================================
 
 1.  If your system is supported by GNU autoconf, then you should just be
     able to change to the top level directory (the one containing the
@@ -13,7 +13,7 @@
 
     Notes:
     
-    * You do _not_ need to have a copy of GNU autoconf to install NetHack.
+    * You do _not_ need to have a copy of GNU autoconf to install UnNetHack.
 
 2.  If you do not like the default set of optional features, then you can
     use the --enable-FEATURE and/or --disable-FEATURE flags to configure

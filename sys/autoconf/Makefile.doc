@@ -1,4 +1,4 @@
-#	NetHack Makefile.
+#	UnNetHack Makefile.
 #       @configure_input@
 #       SCCS Id: @(#)Makefile.doc       3.4     1996/03/23
 
@@ -48,7 +48,7 @@ Guidebook.dvi:	Guidebook.tex
 # Guidebook.dvi:	Guidebook.mn
 #	tbl tmac.n Guidebook.mn | groff -Wall -Tdvi > Guidebook.dvi
 
-GAME    = nethack
+GAME    = unnethack
 MANDIR	= /usr/man/man6
 MANEXT	= 6
 
