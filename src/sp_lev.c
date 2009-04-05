@@ -3138,6 +3138,7 @@ sp_lev *lvl;
 	    !Is_oracle_level(&u.uz) &&
 	    !Is_minetown_level(&u.uz) &&
 	    !Is_town_level(&u.uz) &&
+	    !Is_stronghold(&u.uz) &&
 	    !In_V_tower(&u.uz)) {
 		flip_level_rnd(3);
 	}
