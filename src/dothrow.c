@@ -868,7 +868,15 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 			   Hallucination || Fumbling);
 
 	obj->was_thrown = TRUE;
-	if ((obj->cursed || obj->greased) && (u.dx || u.dy) && !rn2(7)) {
+	/* UnNetHack: The chances of slipping a cursed greased object have been
+	 * separated.
+	 * Additionally, throwing unskilled or restricted now causes slipping to
+	 * make it harder and to discourage role- or race-atypical fighting (and
+	 * because of real life experience in throwing darts ...)
+	 */
+	if (((obj->cursed && rnf(1,7)) ||
+	     (obj->greased && rnf(1,7)) ||
+	     (P_SKILL(weapon_type(obj)) <= P_UNSKILLED && rnf(1,5))) && (u.dx || u.dy)) {
 	    boolean slipok = TRUE;
 	    if (ammo_and_launcher(obj, uwep))
 		pline("%s!", Tobjnam(obj, "misfire"));
