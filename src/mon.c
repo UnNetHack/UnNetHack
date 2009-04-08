@@ -1532,7 +1532,7 @@ uchar adtyp;
 	m_detach(mtmp, mptr);
 }
 
-/* TRUE if corpse might be dropped, magr may die if mon was swallowed */
+/** TRUE if corpse might be dropped, magr may die if mon was swallowed */
 boolean
 corpse_chance(mon, magr, was_swallowed)
 struct monst *mon;
@@ -1592,18 +1592,6 @@ boolean was_swallowed;			/* digestion */
 	    }
   	}
 
-	/* Cthulhu Deliquesces... */
-	if (mdat == &mons[PM_CTHULHU]) {
-	    if (cansee(mon->mx, mon->my))
-		pline("%s body deliquesces into a cloud of noxious gas!",
-			s_suffix(Monnam(mon)));
-	    else
-		You_hear("hissing and bubbling!");
-	    /* ...into a stinking cloud... */
-	    (void) create_cthulhu_death_cloud(mon->mx, mon->my, 3, 8);
-	    return (FALSE);
-	}
-
 	/* must duplicate this below check in xkilled() since it results in
 	 * creating no objects as well as no corpse
 	 */
@@ -1619,7 +1607,26 @@ boolean was_swallowed;			/* digestion */
 		(2 + ((int)(mdat->geno & G_FREQ)<2) + verysmall(mdat))));
 }
 
-/* drop (perhaps) a cadaver and remove monster */
+/** Creates Cthulhu's death message and death cloud. */
+void
+cthulhu_dies(mon)
+struct monst *mon; /**< Cthulhu's struct */
+{
+	/* really dead? */
+	if (mon->mhp <= 0) {
+		/* Cthulhu Deliquesces... */
+		if (cansee(mon->mx, mon->my)) {
+			pline("%s body deliquesces into a cloud of noxious gas!",
+					s_suffix(Monnam(mon)));
+		} else {
+			You_hear("hissing and bubbling!");
+		}
+		/* ...into a stinking cloud... */
+		(void) create_cthulhu_death_cloud(mon->mx, mon->my, 3, 8);
+	}
+}
+
+/** drop (perhaps) a cadaver and remove monster */
 void
 mondied(mdef)
 register struct monst *mdef;
@@ -1632,7 +1639,7 @@ register struct monst *mdef;
 		(void) make_corpse(mdef);
 }
 
-/* monster disappears, not dies */
+/** monster disappears, not dies */
 void
 mongone(mdef)
 register struct monst *mdef;
@@ -1655,7 +1662,7 @@ register struct monst *mdef;
 	m_detach(mdef, mdef->data);
 }
 
-/* drop a statue or rock and remove monster */
+/** drop a statue or rock and remove monster */
 void
 monstone(mdef)
 register struct monst *mdef;
@@ -1777,6 +1784,10 @@ int how;
 	else
 	    mondied(mdef);
 
+	if (mdef->data == &mons[PM_CTHULHU]) {
+		cthulhu_dies(mdef);
+	}
+
 	if (be_sad && mdef->mhp <= 0) {
 		if (kenny || (Hallucination && !rn2(4))) {
 			verbalize("Oh my god, they killed Kenny!");
@@ -1881,6 +1892,10 @@ xkilled(mtmp, dest)
 
 	mdat = mtmp->data; /* note: mondead can change mtmp->data */
 	mndx = monsndx(mdat);
+
+	if (mdat == &mons[PM_CTHULHU]) {
+		cthulhu_dies(mtmp);
+	}
 
 	if (stoned) {
 		stoned = FALSE;
