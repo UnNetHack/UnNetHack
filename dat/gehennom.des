@@ -1161,27 +1161,29 @@ MONSTER[50%]:'P',random,random
 MAZE:"sanctum", ' '
 FLAGS: noteleport,hardfloor,nommap
 GEOMETRY:center,center
+#         1         2         3         4         5         6         7    7
+#123456789012345678901234567890123456789012345678901234567890123456789012345
 MAP
-----------------------------------------------------------------------------
-|             --------------                                               |
-|             |............|             -------                           |
-|       -------............-----         |.....|                           |
-|       |......................|        --.....|            ---------      |
-|    ----......................---------|......----         |.......|      |
-|    |........---------..........|......+.........|     ------+---..|      |
-|  ---........|.......|..........--S----|.........|     |........|..|      |
-|  |..........|.......|.............|   |.........-------..----------      |
-|  |..........|.......|..........----   |..........|....|..|......|        |
-|  |..........|.......|..........|      --.......----+---S---S--..|        |
-|  |..........---------..........|       |.......|.............|..|        |
-|  ---...........................|       -----+-------S---------S---       |
-|    |...........................|          |...| |......|    |....|--     |
-|    ----.....................----          |...---....---  ---......|     |
-|       |.....................|             |..........|    |.....----     |
-|       -------...........-----             --...-------    |.....|        |
-|             |...........|                  |...|          |.....|        |
-|             -------------                  -----          -------        |
-----------------------------------------------------------------------------
+LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
+LLLLLLLLLLLLLL----F----F----LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
+LLLLLLLLLLLLLL|............|LLLLLLLLLLLLL-------LLLLLLLLLLLLLLLLLLLLLLLLLLLL
+LLLLLLLL---F---............---F-LLLLLLLLLF.....FLLLLLLLLLLLLLLLLLLLLLLLLLLLL
+LLLLLLLL|......................|LLLLLLLL--.....|LLLLLLLLLLLL--F---F--LLLLLLL
+LLLLL-F--......................-F-----LL|......----LLLLLLLLL|.......|LLLLLLL
+LLLLL|........---------..........|...|LL|.........|--F----F---+---..FLLLLLLL
+LLL---........|.......|..........--S--LL|.........|.....S........|..|LLLLLLL
+LLLF..........|.......|.............|LLLF.........---S---..-----S----LLLLLLL
+LLL|..........|.......|..........----LLL|..........|....|..|......|LLLLLLLLL
+LLL|..........|.......|..........FLLLLLL--.......----+---S---S--..FLLLLLLLLL
+LLLF..........---------..........|LLLLLLLF.......|.............|..|LLLLLLLLL
+LLL---...........................|LLLLLLL-----+-------S---------S---LLLLLLLL
+LLLLL|...........................FLLLLLLLLLL|...F.F......|....|....|--LLLLLL
+LLLLL-F--.....................----LLLLLLLLLLF...-F-....------S-......FLLLLLL
+LLLLLLLL|.....................|LLLLLLLLLLLLL|..........|LLLL|.....----LLLLLL
+LLLLLLLL---F---...........---F-LLLLLLLLLLLLL--...----F--LLLLF.....|LLLLLLLLL
+LLLLLLLLLLLLLL|...........|LLLLLLLLLLLLLLLLLLF...FLLLLLLLLLL|.....FLLLLLLLLL
+LLLLLLLLLLLLLL----F----F---LLLLLLLLLLLLLLLLLL-----LLLLLLLLLL-------LLLLLLLLL
+LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
 ENDMAP
 REGION:(15,07,21,10),lit,"temple"
 ALTAR:(18,08),noalign,shrine
@@ -1190,8 +1192,10 @@ REGION:(41,06,48,11),unlit,"morgue",filled,true
 NON_DIGGABLE:(00,00,75,19)
 # Invisible barrier separating the left & right halves of the level
 NON_PASSWALL:(37,00,39,19)
+
+DRAWBRIDGE:(38,06),west,closed
+DRAWBRIDGE:(39,06),east,closed
 # Doors
-DOOR:closed,(40,06)
 DOOR:locked,(62,06)
 DOOR:closed,(46,12)
 DOOR:closed,(53,10)
@@ -1271,6 +1275,28 @@ MONSTER:'@',"aligned priest",(11,12),noalign,hostile
 MONSTER:'@',"aligned priest",(15,13),noalign,hostile
 MONSTER:'@',"aligned priest",(17,13),noalign,hostile
 MONSTER:'@',"aligned priest",(21,13),noalign,hostile
+# Cthulhu's followers
+MONSTER:'h',"mind flayer",(17,03),hostile
+OBJECT:'/',"striking",(17,03)
+MONSTER:'h',"mind flayer",(17,15),hostile
+OBJECT:'/',"striking",(17,15)
+# Cthulhu's breakfast for tomorrow
+IF [30%] THEN
+ IF [50%] THEN
+  MONSTER:'@',"barbarian",(49,13)
+ ELSE
+  MONSTER:'@',"samurai",(49,13)
+ ENDIF
+ELSE
+# Cthulhu's didn't like its taste?
+ IF [50%] THEN
+  OBJECT:'%',"corpse",(49,13),"archeologist",0
+ ELSE
+  OBJECT:'%',"corpse",(49,13),"tourist",0
+ ENDIF
+ENDIF
+# poor boy, he got so far
+OBJECT:'"',"cheap plastic imitation of the Amulet of Yendor",(49,13)
 # A few nasties
 MONSTER:'L',random,random
 MONSTER:'L',random,random
