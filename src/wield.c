@@ -797,4 +797,14 @@ register struct obj *obj;
 	obj->owornmask = savewornmask;
 }
 
+/** Unwields all weapons silently. */
+void
+unwield_weapons_silently()
+{
+	setuwep((struct obj *) 0);
+	setuswapwep((struct obj *) 0);
+	setuqwep((struct obj *) 0);
+	u.twoweap = FALSE;
+}
+
 /*wield.c*/

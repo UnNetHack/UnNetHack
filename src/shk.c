@@ -1876,7 +1876,8 @@ struct eshk *eshkp;
 	repo_location.y = oy;
 }
 
-/* called at game exit, after inventory disclosure but before making bones */
+/** Dump inventory to the floor, called at game exit, after inventory disclosure but
+ * before making bones */
 void
 finish_paybill()
 {
@@ -1887,6 +1888,9 @@ finish_paybill()
 #if 0		/* don't bother */
 	if (ox == 0 && oy == 0) impossible("finish_paybill: no location");
 #endif
+	/* Fix for C343-270: If twoweaponing and the swap weapon gets cursed,
+	 * it slips to the ground and we get a warning message. */
+	unwield_weapons_silently();
 	/* normally done by savebones(), but that's too late in this case */
 	unleash_all();
 	/* transfer all of the character's inventory to the shop floor */

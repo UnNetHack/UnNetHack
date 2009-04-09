@@ -2339,6 +2339,7 @@ E int FDECL(chwepon, (struct obj *,int));
 E int FDECL(welded, (struct obj *));
 E void FDECL(weldmsg, (struct obj *));
 E void FDECL(setmnotwielded, (struct monst *,struct obj *));
+E void NDECL(unwield_weapons_silently);
 
 /* ### windows.c ### */
 
