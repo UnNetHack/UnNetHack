@@ -1010,45 +1010,6 @@ boolean at_stairs, falling, portal;
 	assign_level(&new_dlevel, newlevel);
 #endif
 
-	/* If you have the amulet and are trying to get out of Gehennom, going
-	 * up a set of stairs sometimes does some very strange things!
-	 * Biased against law and towards chaos, but not nearly as strongly
-	 * as it used to be (prior to 3.2.0).
-	 * Odds:	    old				    new
-	 *	"up"    L      N      C		"up"    L      N      C
-	 *	 +1   75.0   75.0   75.0	 +1   75.0   75.0   75.0
-	 *	  0    0.0   12.5   25.0	  0    6.25   8.33  12.5
-	 *	 -1    8.33   4.17   0.0	 -1    6.25   8.33  12.5
-	 *	 -2    8.33   4.17   0.0	 -2    6.25   8.33   0.0
-	 *	 -3    8.33   4.17   0.0	 -3    6.25   0.0    0.0
-	 */
-	if (Inhell && up && u.uhave.amulet && !newdungeon && !portal &&
-				(dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz)-3)) {
-		if (!rn2(4)) {
-		    int odds = 3 + (int)u.ualign.type,		/* 2..4 */
-			diff = odds <= 1 ? 0 : rn2(odds);	/* paranoia */
-
-		    if (diff != 0) {
-			assign_rnd_level(newlevel, &u.uz, diff);
-			/* if inside the tower, stay inside */
-			if (was_in_W_tower &&
-			    !On_W_tower_level(newlevel)) diff = 0;
-		    }
-		    if (diff == 0)
-			assign_level(newlevel, &u.uz);
-
-		    new_ledger = ledger_no(newlevel);
-
-		    pline("A mysterious force momentarily surrounds you...");
-		    if (on_level(newlevel, &u.uz)) {
-			(void) safe_teleds(FALSE);
-			(void) next_to_u();
-			return;
-		    } else
-			at_stairs = at_ladder = FALSE;
-		}
-	}
-
 	/* Prevent the player from going past the first quest level unless
 	 * (s)he has been given the go-ahead by the leader.
 	 */

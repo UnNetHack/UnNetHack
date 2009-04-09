@@ -628,9 +628,21 @@ tele()
 	/* don't show trap if "Sorry..." */
 	if (!Blinded) make_blinded(0L,FALSE);
 
-	if ((u.uhave.amulet || On_W_tower_level(&u.uz)) && !rn2(3)) {
-	    You_feel("disoriented for a moment.");
-	    return;
+	if
+#ifdef WIZARD
+	(
+#endif
+	 (u.uhave.amulet || On_W_tower_level(&u.uz)
+#ifdef STEED
+	  || (u.usteed && mon_has_amulet(u.usteed))
+#endif
+	 )
+#ifdef WIZARD
+	 && (!wizard) )
+#endif
+	{
+		You_feel("disoriented for a moment.");
+		return;
 	}
 	if ((Teleport_control && !Stunned)
 #ifdef WIZARD
