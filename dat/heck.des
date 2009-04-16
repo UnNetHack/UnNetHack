@@ -876,131 +876,12 @@ ENDMAP
 NOMAP
 OBJECT:'/',"cold",random
 
-#
-# Night
-#
-
-MAZE:"heck-b-5",' '
-GEOMETRY:center,center
-MAP
-. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-ENDMAP
-BRANCH:levregion(1,0,79,20),(0,0,0,0)
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT[50%]:'*',random,random
-OBJECT[50%]:'*',random,random
-OBJECT[50%]:'*',random,random
-OBJECT[50%]:'*',random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT[50%]:random,random,random
-OBJECT[50%]:random,random,random
-OBJECT[50%]:random,random,random
-OBJECT[50%]:random,random,random
-OBJECT:'`',"boulder",random
-OBJECT:'`',"boulder",random
-OBJECT[50%]:'`',"boulder",random
-OBJECT[50%]:'`',"boulder",random
-OBJECT[50%]:'`',"boulder",random
-OBJECT[50%]:'`',"boulder",random
-OBJECT[50%]:'`',"boulder",random
-OBJECT[50%]:'`',"boulder",random
-OBJECT[50%]:'`',"boulder",random
-OBJECT[50%]:'`',"boulder",random
-OBJECT[50%]:'`',"boulder",random
-MONSTER[50%]:'H',"minotaur",random
-MONSTER[50%]:'H',"minotaur",random
-MONSTER[50%]:random,random,random
-MONSTER[50%]:random,random,random
-MONSTER[50%]:random,random,random
-MONSTER[50%]:random,random,random
-MONSTER[50%]:random,random,random
-MONSTER[50%]:random,random,random
-MONSTER[50%]:random,random,random
-MONSTER[50%]:random,random,random
-MONSTER[50%]:random,random,random
-MONSTER[50%]:random,random,random
-MONSTER[50%]:random,random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-STAIR:random,up
-STAIR:random,down
-
-GEOMETRY:center,center
-MAP
-                        .........................                           
-                        .........................
-                        .........................
-                        .........................
-                        .........................
-                        .........................
-                        .........................
-                        .........................
-                       ...........................
-                        .........................
-                        .........................
-                        .........................
-                        .........................
-                        .........................
-                        .........................
-                        .........................
-                        .........................
-ENDMAP
-MAZEWALK:(23,8),west
-MAZEWALK:(49,8),east
-REGION:(0,0,75,16),lit,"ordinary"
-REGION:(24,0,48,16),unlit,"ordinary"
-STAIR:levregion(1,0,79,20),(0,0,0,0),up
-STAIR:levregion(1,0,79,20),(0,0,0,0),down
 
 #
 # Pool
 #
 
-MAZE:"heck-b-6",random
+MAZE:"heck-b-5",random
 GEOMETRY:half-left,center
 MAP
 .............
@@ -1026,7 +907,7 @@ STAIR:levregion(1,0,79,20),(0,0,12,4),down
 # Teeth
 #
 
-MAZE:"heck-b-7",random
+MAZE:"heck-b-6",random
 GEOMETRY:center,center
 MAP
  - - - - - - - - - - - - - - 
@@ -1065,7 +946,7 @@ GOLD:random,random
 # Voids
 #
 
-MAZE:"heck-b-8",random
+MAZE:"heck-b-7",random
 GEOMETRY:center,center
 MAP
  - - - -
@@ -1242,48 +1123,12 @@ MONSTER:random,random,random
 STAIR:levregion(1,0,79,20),(0,0,0,0),up
 STAIR:levregion(1,0,79,20),(0,0,0,0),down
 
-#
-# Night2
-#
-
-MAZE:"heck-c-3",' '
-INIT_MAP:'.',' ',true,true,lit,false
-# this are not guaranteed to link up; that's okay
-GEOMETRY:left,top
-MAP
-..
-..
-ENDMAP
-BRANCH:levregion(1,0,79,20),(0,0,0,0)
-MAZEWALK:(0,0),east
-GEOMETRY:left,bottom
-MAP
-..
-..
-ENDMAP
-MAZEWALK:(0,0),east
-GEOMETRY:right,top
-MAP
-..
-..
-ENDMAP
-MAZEWALK:(0,0),west
-GEOMETRY:right,bottom
-MAP
-..
-..
-ENDMAP
-MAZEWALK:(0,0),west
-
-NOMAP
-STAIR:levregion(1,0,79,20),(0,0,0,0),up
-STAIR:levregion(1,0,79,20),(0,0,0,0),down
 
 #
 # Pillars2
 #
 
-MAZE:"heck-c-4",random
+MAZE:"heck-c-3",random
 GEOMETRY:center,center
 MAP
 .-.........................-
@@ -1349,7 +1194,7 @@ TRAP:random,random
 # Pits
 #
 
-MAZE:"heck-c-5",random
+MAZE:"heck-c-4",random
 GEOMETRY:left,top
 MAP
 .....
@@ -1455,7 +1300,7 @@ STAIR:levregion(1,11,79,20),(0,0,0,0),down
 # Pods
 #
 
-MAZE:"heck-c-6",random
+MAZE:"heck-c-5",random
 GEOMETRY:half-right,center
 MAP
  - - - - - - - - 
@@ -1527,7 +1372,7 @@ STAIR:levregion(40,0,79,20),(0,0,0,0),down
 # Rooms
 #
 
-MAZE:"heck-c-7",random
+MAZE:"heck-c-6",random
 GEOMETRY:right,center
 MAP
  - - - - - - - 
@@ -1622,7 +1467,7 @@ STAIR:levregion(1,0,79,20),(0,0,0,0),down
 # Rooms2
 #
 
-MAZE:"heck-c-8",random
+MAZE:"heck-c-7",random
 GEOMETRY:center,center
 MAP
 .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
@@ -1781,7 +1626,7 @@ OBJECT:random,random,random
 # Vsplit
 #
 
-MAZE:"heck-c-9",random
+MAZE:"heck-c-8",random
 GEOMETRY:half-left,center
 MAP
 .|...
