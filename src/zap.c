@@ -4142,7 +4142,9 @@ boolean magical; /**< if wishing for magical items is allowed */
 	nothing = zeroobj;  /* lint suppression; only its address matters */
 	if (flags.verbose) You("may wish for an object.");
 retry:
-	getlin("For what do you wish?", buf);
+	do {
+		getlin("For what do you wish?", buf);
+	} while (buf[0] == '\033'); /* prevent accidental cancelling of a wish */
 #ifdef LIVELOGFILE
 	Strcpy(rawbuf, buf);
 #endif
