@@ -1673,7 +1673,7 @@ const int size; /* number of engravings in array */
 		}
 	} while (occupied(sx, sy));
 
-	make_engr_at(sx, sy, engraving, 0L, 10);
+	make_engr_at(sx, sy, engraving, 0L, BURN);
 }
 
 /*
