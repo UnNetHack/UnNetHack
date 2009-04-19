@@ -448,6 +448,8 @@ const char *in_str;
 		{ "grey unicorn",	PM_GRAY_UNICORN },
 		{ "grey ooze",		PM_GRAY_OOZE },
 		{ "gray-elf",		PM_GREY_ELF },
+		{ "mindflayer",         PM_MIND_FLAYER },
+		{ "master mindflayer",  PM_MASTER_MIND_FLAYER },
 	    /* Hyphenated names */
 		{ "ki rin",		PM_KI_RIN },
 		{ "uruk hai",		PM_URUK_HAI },
