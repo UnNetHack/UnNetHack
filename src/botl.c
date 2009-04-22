@@ -20,20 +20,6 @@ STATIC_DCL void NDECL(bot1);
 STATIC_DCL void NDECL(bot2);
 #endif /* OVL0 */
 
-/* MAXCO must hold longest uncompressed status line, and must be larger
- * than COLNO
- *
- * longest practical second status line at the moment is
- *	Astral Plane $:12345 HP:700(700) Pw:111(111) AC:-127 Xp:30/123456789
- *	T:123456 Satiated Conf FoodPois Ill Blind Stun Hallu Overloaded
- * -- or somewhat over 130 characters
- */
-#if COLNO <= 140
-#define MAXCO 160
-#else
-#define MAXCO (COLNO+20)
-#endif
-
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 
 extern const struct percent_color_option *hp_colors;
@@ -115,6 +101,11 @@ char *newbot2;
 
 	if (*text == '\0') return;
 
+	/* don't add anything if it can't be displayed.
+	 * Otherwise the color of invisible text may bleed into
+	 * the statusline. */
+	if (strlen(newbot2) > min(MAXCO, CO)) return;
+
 	if (!iflags.use_status_colors) {
 		Sprintf(nb = eos(newbot2), " %s", text);
                 return;
@@ -128,7 +119,9 @@ char *newbot2;
 	curs(WIN_STATUS, 1, 1);
        	color_option = text_color_of(text, text_colors);
 	start_color_option(color_option);
-	newbot2[CO-1] = '\0'; /* fix statuscolor bleeding bug the easy way */
+	/* Trim the statusline to always have the end color
+	 * to have effect. */
+	newbot2[min(MAXCO, CO)-1] = '\0';
 	putstr(WIN_STATUS, 0, newbot2);
 	end_color_option(color_option);
 }
@@ -350,9 +343,19 @@ char *buf;
 	else if (In_endgame(&u.uz))
 		Sprintf(buf,
 			Is_astralevel(&u.uz) ? "Astral Plane " : "End Game ");
+	else if (Is_blackmarket(&u.uz))
+		Sprintf(buf, "Blackmarket ");
+	else if (Is_town_level(&u.uz))
+		Sprintf(buf, "Town ");
+	else if (Is_minetown_level(&u.uz))
+		Sprintf(buf, "Mine Town:%-2d ", depth(&u.uz));
 	else {
+		char *dgn_name = dungeons[u.uz.dnum].dname;
+		if (!strncmpi(dgn_name, "The ", 4)) { dgn_name += 4; }
 		/* ports with more room may expand this one */
-		Sprintf(buf, "Dlvl:%-2d ", depth(&u.uz));
+		Sprintf(buf, "%s:%-2d ", 
+		        iflags.show_dgn_name ? dgn_name : "Dlvl",
+		        depth(&u.uz));
 		ret = 0;
 	}
 	return ret;
@@ -426,7 +429,7 @@ bot2()
 #ifdef REALTIME_ON_BOTL
 	if(iflags.showrealtime) {
 		time_t currenttime = get_realtime();
-		Sprintf(nb = eos(nb), " %d:%2.2d", currenttime / 3600, 
+		Sprintf(nb = eos(nb), " %ld:%2.2ld", currenttime / 3600, 
 		        (currenttime % 3600) / 60);
 	}
 #endif
