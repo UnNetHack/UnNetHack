@@ -1101,9 +1101,16 @@ int thrown;
 		   && objects[obj->otyp].oc_material == IRON
 		   && mon->mhp > 1 && !thrown && !mon->mcan
 		   /* && !destroyed  -- guaranteed by mhp > 1 */ ) {
-		if (clone_mon(mon, 0, 0)) {
+		struct monst *mtmp2;
+		if (mtmp2 = clone_mon(mon, 0, 0)) {
 			pline("%s divides as you hit it!", Monnam(mon));
 			hittxt = TRUE;
+			/* Prevent pudding farming by halving max HP so there are
+			 * at most 2^(abs(log2(hp)-1)) puddings generated from one
+			 * pudding.
+			 * When max HP is odd, the extra point gets lost. */
+			mtmp2->mhpmax = max(mon->mhpmax / 2, 1);
+			mon->mhpmax   = max(mon->mhpmax / 2, 1);
 		}
 	}
 

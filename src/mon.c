@@ -1919,10 +1919,12 @@ xkilled(mtmp, dest)
 	} else if(x != u.ux || y != u.uy) {
 		/* might be here after swallowed */
 		if (!rn2(6) && !(mvitals[mndx].mvflags & G_NOCORPSE)
+		    /* disable death drop for puddings */
+		    && mdat->mlet != S_PUDDING
 #ifdef KOPS
-					&& mdat->mlet != S_KOP
+		    && mdat->mlet != S_KOP
 #endif
-							) {
+		   ) {
 			int typ;
 
 			otmp = mkobj_at(RANDOM_CLASS, x, y, TRUE);
