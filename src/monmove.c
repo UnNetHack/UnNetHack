@@ -841,6 +841,12 @@ not_special:
 			 (mtoo->mappearance && !mtoo->iswiz) ||
 			 !mtoo->data->mmove)) continue;
 
+		    /* ignore an object if the monster cannot reach it */
+		    if (is_pool(xx, yy) && !is_swimmer(ptr) &&
+			!amphibious(ptr)) continue;
+		    /* ignore sokoban prize */
+		    if (Is_sokoprize(otmp)) continue;
+
 		    if(((likegold && otmp->oclass == COIN_CLASS) ||
 		       (likeobjs && index(practical, otmp->oclass) &&
 			(otmp->otyp != CORPSE || (ptr->mlet == S_NYMPH

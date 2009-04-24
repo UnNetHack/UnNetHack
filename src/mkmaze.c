@@ -431,23 +431,26 @@ fixup_special()
 		sokoban_detect();
 
 		/* randomize Sokoban prize */
-		int x,y;
-		for (x = 1; x < COLNO; x++) {
-			for(y = 1; y < ROWNO; y++) {
-				register struct engr *ep = engr_at(x,y);
+		if (dunlev(&u.uz)==1) {
+			int price=0;
+			register struct engr *ep;
+			for (ep = head_engr; ep; ep = ep->nxt_engr) {
 				/* Sokoban top levels have no random, burned engravings */
 				if (ep && ep->engr_txt[0] && ep->engr_type == BURN &&
 				    (!strcmp(ep->engr_txt, "Elbereth"))) {
-					if (!rn2(3)) {
-						/* Somebody beat you to it */
-						make_engr_at(x, y, "IOU", 0L, MARK);
-					} else {
-						struct obj *otmp = mksobj_at((rn2(2)) ? BAG_OF_HOLDING : AMULET_OF_REFLECTION,
-						                             x, y, TRUE, FALSE);
-#ifdef RECORD_ACHIEVE
-						if (otmp) otmp->record_achieve_special = 1;
-#endif
+					int price_obj = STRANGE_OBJECT;
+					struct obj *otmp;
+					switch (price) {
+						case 0: price_obj = BAG_OF_HOLDING; break;
+						case 1: price_obj = rn2(2) ? CLOAK_OF_MAGIC_RESISTANCE : CLOAK_OF_DISPLACEMENT; break;
+						case 2: price_obj = !rn2(3) ? AMULET_OF_LIFE_SAVING : rn2(2) ? AMULET_OF_ESP : AMULET_OF_REFLECTION; break;
 					}
+					otmp = mksobj_at(price_obj, ep->engr_x, ep->engr_y, TRUE, FALSE);
+					otmp->sokoprize = TRUE;
+					price++;
+#ifdef RECORD_ACHIEVE
+					if (otmp) otmp->record_achieve_special = 1;
+#endif
 				}
 			}
 		}

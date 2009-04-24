@@ -72,6 +72,7 @@ struct obj {
 #define norevive oeroded2
 	Bitfield(oerodeproof,1); /* erodeproof weapon/armor */
 	Bitfield(olocked,1);	/* object is locked */
+#define sokoprize olocked	/* special flag for sokoban prize */
 	Bitfield(obroken,1);	/* lock has been broken */
 	Bitfield(otrapped,1);	/* container is trapped */
 				/* or accidental tripped rolling boulder trap */
@@ -228,6 +229,8 @@ struct obj {
 			 otmp->otyp == IRON_SAFE)
 #define Is_mbag(otmp)	(otmp->otyp == BAG_OF_HOLDING || \
 			 otmp->otyp == BAG_OF_TRICKS)
+
+#define Is_sokoprize(otmp)	((otmp)->sokoprize && !Is_box(otmp))
 
 /* dragon gear */
 #define Is_dragon_scales(obj)	((obj)->otyp >= GRAY_DRAGON_SCALES && \

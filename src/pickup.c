@@ -38,6 +38,7 @@ STATIC_DCL int FDECL(in_or_out_menu, (const char *,struct obj *, BOOLEAN_P, BOOL
 STATIC_DCL int FDECL(container_at, (int, int, BOOLEAN_P));
 STATIC_DCL boolean FDECL(able_to_loot, (int, int));
 STATIC_DCL boolean FDECL(mon_beside, (int, int));
+STATIC_DCL void NDECL(del_sokoprize);
 
 /* define for query_objlist() and autopickup() */
 #define FOLLOW(curr, flags) \
@@ -1363,6 +1364,12 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	prinv(nearload == SLT_ENCUMBER ? moderateloadmsg : (char *) 0,
 	      obj, count);
 	mrg_to_wielded = FALSE;
+
+	if (Is_sokoprize(obj)) {
+	    makeknown(obj->otyp); /* obj is already known */
+	    obj->sokoprize = FALSE; /* reset sokoprize flag */
+	    del_sokoprize();	/* delete other sokoprizes */
+	}
 	return 1;
 }
 
@@ -2417,6 +2424,37 @@ boolean outokay, inokay;
 	free((genericptr_t) pick_list);
     }
     return n;
+}
+
+
+STATIC_OVL void
+del_sokoprize()
+{
+	int x, y, cnt = 0;
+	struct obj *otmp, *onext;
+	/* check objs on floor */
+	for (otmp = fobj; otmp; otmp = onext) {
+		onext = otmp->nobj; /* otmp may be destroyed */
+		if (Is_sokoprize(otmp)) {
+			x = otmp->ox;
+			y = otmp->oy;
+			obj_extract_self(otmp);
+			if (cansee(x, y)) {
+				You("see %s vanishing.", an(xname(otmp)));
+				newsym(x, y);
+			} else cnt++;
+			obfree(otmp, (struct obj *)0);
+		}
+	}
+	if (cnt && flags.soundok) You_hear("something popping.");
+	/* check buried objs... do we need this? */
+	for (otmp = level.buriedobjlist; otmp; otmp = onext) {
+		onext = otmp->nobj; /* otmp may be destroyed */
+		if (Is_sokoprize(otmp)) {
+			obj_extract_self(otmp);
+			obfree(otmp, (struct obj *)0);
+		}
+	}
 }
 
 /*pickup.c*/

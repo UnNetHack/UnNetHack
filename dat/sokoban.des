@@ -527,6 +527,8 @@ DOOR:closed,(17,15)
 REGION:(18,10,22,16),lit,"zoo",filled,true
 #OBJECT:'(',"bag of holding",place[0]
 ENGRAVING:place[0],burn,"Elbereth"
+ENGRAVING:place[1],burn,"Elbereth"
+ENGRAVING:place[2],burn,"Elbereth"
 
 
 MAZE:"soko1-2",' '
@@ -621,6 +623,8 @@ DOOR:closed,(17,14)
 REGION:(18,09,22,15),lit,"zoo",filled,true
 #OBJECT:'"',"amulet of reflection",place[0]
 ENGRAVING:place[0],burn,"Elbereth"
+ENGRAVING:place[1],burn,"Elbereth"
+ENGRAVING:place[2],burn,"Elbereth"
 
 
 # Following Sokoban levels heavily modified for NetHack by Pasi Kallinen
@@ -1716,6 +1720,8 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 #OBJECT:'(',"bag of holding",place[0]
 ENGRAVING:place[0],burn,"Elbereth"
+ENGRAVING:place[1],burn,"Elbereth"
+ENGRAVING:place[2],burn,"Elbereth"
 
 
 MAZE:"soko1-4",' '
@@ -1796,3 +1802,5 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 #OBJECT:'"',"amulet of reflection",place[0]
 ENGRAVING:place[0],burn,"Elbereth"
+ENGRAVING:place[1],burn,"Elbereth"
+ENGRAVING:place[2],burn,"Elbereth"

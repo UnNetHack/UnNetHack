@@ -237,7 +237,9 @@ register struct obj *obj;
 	register char *buf;
 	register int typ = obj->otyp;
 	register struct objclass *ocl = &objects[typ];
-	register int nn = ocl->oc_name_known;
+	register int nn = ocl->oc_name_known ||
+		/* only reveal Sokoban prices when in sight */
+		(Is_sokoprize(obj) && cansee(obj->ox, obj->oy));
 	register const char *actualn = OBJ_NAME(*ocl);
 	register const char *dn = OBJ_DESCR(*ocl);
 	register const char *un = ocl->oc_uname;

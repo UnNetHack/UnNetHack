@@ -288,6 +288,7 @@ int udist;
 		}
 	} else {
 	    if((obj=level.objects[omx][omy]) && !index(nofetch,obj->oclass)
+			&& !Is_sokoprize(obj)
 #ifdef MAIL
 			&& obj->otyp != SCR_MAIL
 #endif
