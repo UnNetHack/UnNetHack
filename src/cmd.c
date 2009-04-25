@@ -950,8 +950,16 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 		Sprintf(buf, "aware of the presence of %s",
 			(flags.warntype & M2_ORC) ? "orcs" :
 			(flags.warntype & M2_DEMON) ? "demons" :
-			something); 
+			(flags.warntype & M2_GIANT) ? "giants" :
+			(flags.warntype & M2_WERE) ? "were creatures" :
+			something);
 		you_are(buf);
+	} else if (Warn_of_mon && uwep) {
+		char *monster_name = get_warned_of_monster(uwep);
+		if (monster_name) {
+			Sprintf(buf, "aware of the presence of %s", monster_name);
+			you_are(buf);
+		}
 	}
 	if (Undead_warning) you_are("warned of undead");
 	if (Searching) you_have("automatic searching");

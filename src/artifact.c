@@ -454,6 +454,19 @@ long wp_mask;
 	    	else EWarning &= ~wp_mask;
 	    }
 	}
+	if (spfx & SPFX_WARN_S) {
+	    if (oart->mtype) {
+	    	if (on) {
+			EWarn_of_mon |= wp_mask;
+	    	} else {
+			EWarn_of_mon &= ~wp_mask;
+		}
+		see_monsters();
+	    } else {
+		if (on) EWarning |= wp_mask;
+	    	else EWarning &= ~wp_mask;
+	    }
+	}
 	if (spfx & SPFX_EREGEN) {
 	    if (on) EEnergy_regeneration |= wp_mask;
 	    else EEnergy_regeneration &= ~wp_mask;
@@ -1490,5 +1503,45 @@ struct obj *otmp;
 }
 
 #endif /* OVLB */
+
+boolean
+MATCH_WARN_OF_MON(mon)
+struct monst *mon;
+{
+	/* warned of S_MONSTER? */
+	if (uwep && uwep->oartifact) {
+		const struct artifact *arti = get_artifact(uwep);
+		if (arti->spfx & SPFX_WARN_S &&
+		    arti->mtype && arti->mtype == mon->data->mlet) {
+			return TRUE;
+		}
+	}
+
+	return (Warn_of_mon && flags.warntype &&
+			(flags.warntype & (mon)->data->mflags2));
+}
+
+/**
+ * Returns the plural name of the monster the player is warned
+ * about with SPFX_WARN_S */
+const char *
+get_warned_of_monster(otmp)
+struct obj *otmp;
+{
+	if (otmp && otmp->oartifact) {
+		const struct artifact *arti = get_artifact(otmp);
+		if (arti->spfx & SPFX_WARN_S && arti->mtype) {
+			switch (arti->mtype) {
+				case S_TROLL: return "trolls"; break;
+				case S_DRAGON: return "dragons"; break;
+				case S_OGRE: return "ogres"; break;
+				case S_JABBERWOCK: return "jabberwocks"; break;
+				default: return something; break;
+			}
+		}
+	}
+
+	return NULL;
+}
 
 /*artifact.c*/

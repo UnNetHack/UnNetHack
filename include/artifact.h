@@ -34,6 +34,7 @@
 #define SPFX_DBONUS 0x1F00000L	/* attack bonus mask */
 #define SPFX_XRAY   0x2000000L	/* gives X-RAY vision to player */
 #define SPFX_REFLECT 0x4000000L /* Reflection */
+#define SPFX_WARN_S 0x8000000L	/* item warns you of danger of S_MONSTER */
 
 
 struct artifact {
