@@ -1477,7 +1477,8 @@ register struct attack *mattk;
 
 	if (is_demon(youmonst.data) && !rn2(13) && !uwep
 		&& u.umonnum != PM_SUCCUBUS && u.umonnum != PM_INCUBUS
-		&& u.umonnum != PM_BALROG) {
+		&& u.umonnum != PM_BALROG
+		&& (!MON_WEP(mdef) || MON_WEP(mdef)->oartifact != ART_DEMONBANE)) {
 	    demonpet();
 	    return(0);
 	}
