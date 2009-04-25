@@ -19,7 +19,7 @@
 #define SPFX_BEHEAD 0x0000400L	/* beheads monsters */
 #define SPFX_HALRES 0x0000800L	/* blocks hallucinations */
 #define SPFX_ESP    0x0001000L	/* ESP (like amulet of ESP) */
-#define SPFX_STLTH  0x0002000L	/* Stealth */
+#define SPFX_DISPL  0x0002000L	/* Displacement */
 #define SPFX_REGEN  0x0004000L	/* Regeneration */
 #define SPFX_EREGEN 0x0008000L	/* Energy Regeneration */
 #define SPFX_HSPDAM 0x0010000L	/* 1/2 spell damage (on player) in combat */

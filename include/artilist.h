@@ -165,7 +165,7 @@ A("The Orb of Detection",	CRYSTAL_BALL,
 	INVIS,		A_LAWFUL, PM_ARCHEOLOGIST, NON_PM, 2500L ),
 
 A("The Heart of Ahriman",	LUCKSTONE,
-	(SPFX_NOGEN|SPFX_RESTR|SPFX_INTEL), SPFX_STLTH, 0,
+	(SPFX_NOGEN|SPFX_RESTR|SPFX_INTEL), (SPFX_DISPL|SPFX_EREGEN), 0,
 	/* this stone does double damage if used as a projectile weapon */
 	PHYS(5,0),	NO_DFNS,	NO_CARY,
 	LEVITATION,	A_NEUTRAL, PM_BARBARIAN, NON_PM, 2500L ),
