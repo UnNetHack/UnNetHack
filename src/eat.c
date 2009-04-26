@@ -767,10 +767,17 @@ register struct permonst *ptr;
 #ifdef DEBUG
 		debugpline("Trying to give telepathy");
 #endif
-		if(!(HTelepat & FROMOUTSIDE) && !BTelepat) {
-			You_feel(Hallucination ?
-			    "in touch with the cosmos." :
-			    "a strange mental acuity.");
+		if(!(HTelepat & FROMOUTSIDE)) {
+			if (!BTelepat) {
+				You_feel(Hallucination ?
+				    "in touch with the cosmos." :
+				    "a strange mental acuity.");
+			} else {
+				You_feel(Hallucination ?
+				    "a strange mental acuity." :
+				    "a dull aching inside your mind.");
+			}
+			
 			HTelepat |= FROMOUTSIDE;
 			/* If blind, make sure monsters show up. */
 			if (Blind) see_monsters();
