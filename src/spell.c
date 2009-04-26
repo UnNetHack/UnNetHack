@@ -1144,7 +1144,9 @@ dump_spells()
 } /* dump_spells */
 #endif
 
-/* Integer square root function without using floating point. */
+/**
+ * Integer square root function without using floating point.
+ */
 STATIC_OVL int
 isqrt(val)
 int val;
@@ -1159,6 +1161,9 @@ int val;
     return rt;
 }
 
+/**
+ * Returns the success rate of the specified spell in percent.
+ */
 STATIC_OVL int
 percent_success(spell)
 int spell;
@@ -1185,12 +1190,13 @@ int spell;
 
 	if (uarmh && is_metallic(uarmh) && uarmh->otyp != HELM_OF_BRILLIANCE)
 		splcaster += uarmhbon;
+	if (uarmh && uarmh->otyp == TINFOIL_HAT)
+		splcaster += uarmhbon;
 	if (uarmg && is_metallic(uarmg)) splcaster += uarmgbon;
 	if (uarmf && is_metallic(uarmf)) splcaster += uarmfbon;
 
 	if (spellid(spell) == urole.spelspec)
 		splcaster += urole.spelsbon;
-
 
 	/* `healing spell' bonus */
 	if (spellid(spell) == SPE_HEALING ||
@@ -1258,6 +1264,7 @@ int spell;
 	 * and no matter how able, learning is always required.
 	 */
 	chance = chance * (20-splcaster) / 15 - splcaster;
+	pline("chance: %d", chance); // REMOVE ME
 
 	/* Clamp to percentile */
 	if (chance > 100) chance = 100;
