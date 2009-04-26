@@ -1106,8 +1106,8 @@ int thrown;
 			pline("%s divides as you hit it!", Monnam(mon));
 			hittxt = TRUE;
 			/* Prevent pudding farming by halving max HP so there are
-			 * at most 2^(abs(log2(hp)-1)) puddings generated from one
-			 * pudding.
+			 * at most 2^(floor(log2(hp)-1)) puddings generated from
+			 * one pudding.
 			 * When max HP is odd, the extra point gets lost. */
 			mtmp2->mhpmax = max(mon->mhpmax / 2, 1);
 			mon->mhpmax   = max(mon->mhpmax / 2, 1);
