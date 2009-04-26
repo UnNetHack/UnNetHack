@@ -1185,7 +1185,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	    otmp->oartifact == ART_TROLLSBANE ||
 	    otmp->oartifact == ART_THIEFBANE ||
 	    otmp->oartifact == ART_OGRESMASHER) {
-		if (dieroll < 4) {
+		if (!mdef->mcan && dieroll < 4) {
 		    if (realizes_damage) {
 			pline("%s %s!", The(distant_name(otmp, xname)), Blind ?
 				"roars deafeningly" : "shines brilliantly");

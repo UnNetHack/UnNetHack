@@ -682,12 +682,15 @@ start_corpse_timeout(body)
 
 	} else if (mons[body->corpsenm].mlet == S_TROLL && !body->norevive) {
 		long age;
-		for (age = 2; age <= TAINT_AGE; age++)
-		    if (!rn2(TROLL_REVIVE_CHANCE)) {	/* troll revives */
-			action = REVIVE_MON;
-			when = age;
-			break;
-		    }
+		struct monst *mtmp = get_mtraits(body, FALSE);
+		if (mtmp && !mtmp->mcan) {
+			for (age = 2; age <= TAINT_AGE; age++)
+				if (!rn2(TROLL_REVIVE_CHANCE)) {	/* troll revives */
+					action = REVIVE_MON;
+					when = age;
+					break;
+				}
+		}
 	}
 	
 	if (body->norevive) body->norevive = 0;
