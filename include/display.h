@@ -25,10 +25,12 @@
  * monsters that are hiding or mimicing other monsters.
  */
 #define tp_sensemon(mon) (	/* The hero can always sense a monster IF:  */\
-    (!mindless(mon->data)) &&	/* 1. the monster has a brain to sense AND  */\
+    (!mindless(mon->data) &&    /* 1. the monster has a brain to sense AND  */\
+     (!which_armor(mon, W_ARMH) || which_armor(mon, W_ARMH)->otyp != TINFOIL_HAT)) && \
       ((Blind && Blind_telepat) ||	/* 2a. hero is blind and telepathic OR	    */\
 				/* 2b. hero is using a telepathy inducing   */\
 				/*	 object and in range		    */\
+				/* FALSE if monster is wearing a tinfoil hat*/\
       (Unblind_telepat &&					      \
 	(distu(mon->mx, mon->my) <= (BOLT_LIM * BOLT_LIM))))		      \
 )

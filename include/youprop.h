@@ -141,9 +141,11 @@
 
 #define HTelepat		u.uprops[TELEPAT].intrinsic
 #define ETelepat		u.uprops[TELEPAT].extrinsic
-#define Blind_telepat		(HTelepat || ETelepat || \
-				 telepathic(youmonst.data))
-#define Unblind_telepat		(ETelepat)
+#define BTelepat		u.uprops[TELEPAT].blocked
+#define Blind_telepat		((HTelepat || ETelepat || \
+				 telepathic(youmonst.data)) \
+                                 && !BTelepat)
+#define Unblind_telepat		(ETelepat & !BTelepat)
 
 #define HWarning		u.uprops[WARNING].intrinsic
 #define EWarning		u.uprops[WARNING].extrinsic

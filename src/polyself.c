@@ -1081,6 +1081,10 @@ domindblast()
 	flags.botl = 1;
 
 	You("concentrate.");
+	if (uarmh && uarmh->otyp == TINFOIL_HAT) {
+		pline("A wave of psychic energy pours out, but it is blocked by %s.", yname(uarmh));
+		return 0;
+	}
 	pline("A wave of psychic energy pours out.");
 	for(mtmp=fmon; mtmp; mtmp = nmon) {
 		int u_sen;
@@ -1093,7 +1097,9 @@ domindblast()
 		if(mtmp->mpeaceful)
 			continue;
 		u_sen = telepathic(mtmp->data) && !mtmp->mcansee;
-		if (u_sen || (telepathic(mtmp->data) && rn2(2)) || !rn2(10)) {
+		if ((u_sen || (telepathic(mtmp->data) && rn2(2)) || !rn2(10)
+			&& (which_armor(mtmp, W_ARMH) &&
+			    which_armor(mtmp, W_ARMH)->otyp != TINFOIL_HAT))) {
 			You("lock in on %s %s.", s_suffix(mon_nam(mtmp)),
 				u_sen ? "telepathy" :
 				telepathic(mtmp->data) ? "latent telepathy" :

@@ -767,7 +767,7 @@ register struct permonst *ptr;
 #ifdef DEBUG
 		debugpline("Trying to give telepathy");
 #endif
-		if(!(HTelepat & FROMOUTSIDE)) {
+		if(!(HTelepat & FROMOUTSIDE) && !BTelepat) {
 			You_feel(Hallucination ?
 			    "in touch with the cosmos." :
 			    "a strange mental acuity.");

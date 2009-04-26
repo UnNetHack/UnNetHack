@@ -36,6 +36,7 @@ const struct worn {
 /* This only allows for one blocking item per property */
 #define w_blocks(o,m) \
 		((o->otyp == MUMMY_WRAPPING && ((m) & W_ARMC)) ? INVIS : \
+		 (o->otyp == TINFOIL_HAT && ((m) & W_ARMH)) ? TELEPAT : \
 		 (o->otyp == CORNUTHAUM && ((m) & W_ARMH) && \
 			!Role_if(PM_WIZARD)) ? CLAIRVOYANT : 0)
 		/* note: monsters don't have clairvoyance, so your role
@@ -71,8 +72,12 @@ long mask;
 			p = objects[oobj->otyp].oc_oprop;
 			u.uprops[p].extrinsic =
 					u.uprops[p].extrinsic & ~wp->w_mask;
-			if ((p = w_blocks(oobj,mask)) != 0)
+			if ((p = w_blocks(oobj,mask)) != 0) {
 			    u.uprops[p].blocked &= ~wp->w_mask;
+			    /* HACK: telepathy-blocking items also block clairvoyance */
+			    if (p == TELEPAT)
+			        u.uprops[CLAIRVOYANT].blocked &= ~wp->w_mask;
+			}
 			if (oobj->oartifact)
 			    set_artifact_intrinsic(oobj, 0, mask);
 		    }
@@ -91,8 +96,12 @@ long mask;
 			    p = objects[obj->otyp].oc_oprop;
 			    u.uprops[p].extrinsic =
 					u.uprops[p].extrinsic | wp->w_mask;
-			    if ((p = w_blocks(obj, mask)) != 0)
+			    if ((p = w_blocks(obj, mask)) != 0) {
 				u.uprops[p].blocked |= wp->w_mask;
+				/* HACK: telepathy-blocking items also block clairvoyance */
+			        if (p == TELEPAT)
+				    u.uprops[CLAIRVOYANT].blocked |= wp->w_mask;
+			    }
 			}
 			if (obj->oartifact)
 			    set_artifact_intrinsic(obj, 1, mask);
@@ -122,8 +131,12 @@ register struct obj *obj;
 		obj->owornmask &= ~wp->w_mask;
 		if (obj->oartifact)
 		    set_artifact_intrinsic(obj, 0, wp->w_mask);
-		if ((p = w_blocks(obj,wp->w_mask)) != 0)
+		if ((p = w_blocks(obj,wp->w_mask)) != 0) {
 		    u.uprops[p].blocked &= ~wp->w_mask;
+		    /* HACK: telepathy-blocking items also block clairvoyance */
+		    if (p == TELEPAT)
+			u.uprops[CLAIRVOYANT].blocked &= ~wp->w_mask;
+		}
 	    }
 	update_inventory();
 }

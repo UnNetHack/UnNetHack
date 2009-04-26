@@ -938,8 +938,9 @@ boolean atme;
 	case SPE_CLAIRVOYANCE:
 		if (!BClairvoyant)
 		    do_vicinity_map();
-		/* at present, only one thing blocks clairvoyance */
-		else if (uarmh && uarmh->otyp == CORNUTHAUM)
+		/* at present, only two things block clairvoyance */
+		else if (uarmh && (uarmh->otyp == CORNUTHAUM
+				|| uarmh->otyp == TINFOIL_HAT))
 		    You("sense a pointy hat on top of your %s.",
 			body_part(HEAD));
 		break;
