@@ -1,5 +1,5 @@
 dnl	UNNETHACK autoconf template
-AC_INIT(UNNETHACK, 3.5.2, bhaak@gmx.net)
+AC_INIT(UNNETHACK, 3.5.1, bhaak@gmx.net)
 dnl Avoid AC_REVISION() because we check configure into CVS
 dnl and it will cause confusing revision numbers to be included
 dnl in configure if developers forget to check in configure.ac
@@ -297,23 +297,25 @@ if test "$HAVE_TBL" != "no" ; then
 fi
 fi
 
-dnl searching for non blocking random device
-AC_MSG_CHECKING(for pseudo random number device)
-if test -r "/dev/urandom"; then
+if test $host_os != mingw32; then
+  dnl searching for non blocking random device
+  AC_MSG_CHECKING(for pseudo random number device)
+  if test -r "/dev/urandom"; then
 	AC_DEFINE(DEV_RANDOM, ["/dev/urandom"], [Pseudo random number device])
 	AC_MSG_RESULT(/dev/urandom)
-elif test -r "/dev/random"; then
+  elif test -r "/dev/random"; then
 	AC_DEFINE(DEV_RANDOM, ["/dev/random"], [Pseudo random number device])
 	AC_MSG_RESULT(/dev/random)
-else
+  else
 	AC_MSG_RESULT(not found);
-fi
+  fi
 
-dnl check for GNU Scientific Library for Mersenne Twister RNG
-dnl http://www.gnu.org/software/gsl/manual/html_node/Autoconf-Macros.html
-AC_CHECK_LIB([gsl],[gsl_blas_dgemm],
+  dnl check for GNU Scientific Library for Mersenne Twister RNG
+  dnl http://www.gnu.org/software/gsl/manual/html_node/Autoconf-Macros.html
+  AC_CHECK_LIB([gsl],[gsl_blas_dgemm],
 		[LFLAGS="$LDFLAGS -lgsl";
 		 AC_DEFINE(USE_MERSENNE_TWISTER, [], [Using Mersenne Twister as RNG])])
+fi
 
 dnl  ----- Check for compile-time options
 # We use auto for data librarian to avoid breaking the rule that autoconf
@@ -346,7 +348,9 @@ NETHACK_ARG(tourist,[Tourist class],TOURIST,yes)
 NETHACK_ARG(redo,[Redo last command],REDO,yes)
 NETHACK_ARG(clipping,[Allow smaller screens],CLIPPING,yes)
 NETHACK_ARG(menu-color,[TTY graphics menu color],MENU_COLOR,yes)
+if test "$enable_tty_graphics" = yes; then
 NETHACK_ARG(status-color,[TTY graphics status color],STATUS_COLORS,yes)
+fi
 NETHACK_ARG(auto-open,[Open doors by walking into them],AUTO_OPEN,yes)
 NETHACK_ARG(elbereth,[Engraving the E-word repels monsters],ELBERETH,yes)
 # NETHACK_ARG(noartifactwish,[Prevent wishing for special artifacts],
