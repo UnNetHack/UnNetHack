@@ -1264,7 +1264,6 @@ int spell;
 	 * and no matter how able, learning is always required.
 	 */
 	chance = chance * (20-splcaster) / 15 - splcaster;
-	pline("chance: %d", chance); // REMOVE ME
 
 	/* Clamp to percentile */
 	if (chance > 100) chance = 100;
