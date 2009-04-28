@@ -879,7 +879,7 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	else you_have("transgressed");
 #ifdef WIZARD
 	if (wizard) {
-		Sprintf(buf, " %d", u.ualign.record);
+		Sprintf(buf, " %d / %ld", u.ualign.record, ALIGNLIM);
 		enl_msg("Your alignment ", "is", "was", buf);
 	}
 #endif
