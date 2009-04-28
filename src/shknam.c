@@ -468,6 +468,9 @@ struct mkroom	*sroom;
 	if (Is_blackmarket(&u.uz))
     shkmoney = 7*shkmoney + rn2(3*shkmoney);
 #endif
+	/* it's a poor town */
+	if (Is_town_level(&u.uz))
+		shkmoney /= 4;
 
 #ifndef GOLDOBJ
 	shk->mgold = shkmoney;	
