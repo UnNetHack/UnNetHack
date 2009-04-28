@@ -137,11 +137,6 @@ static struct Bool_Opt
 #else
 	{"menucolors", (boolean *)0, FALSE, SET_IN_GAME},
 #endif
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-	{"statuscolors", &iflags.use_status_colors, TRUE, SET_IN_GAME},
-#else
-	{"statuscolors", (boolean *)0, TRUE, SET_IN_GAME},
-#endif
 #ifdef WIZARD
 	/* for menu debugging only*/
 	{"menu_tab_sep", &iflags.menu_tab_sep, FALSE, SET_IN_GAME},
@@ -204,6 +199,11 @@ static struct Bool_Opt
 	{"sound", &flags.soundok, TRUE, SET_IN_GAME},
 	{"sparkle", &flags.sparkle, TRUE, SET_IN_GAME},
 	{"standout", &flags.standout, FALSE, SET_IN_GAME},
+#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
+	{"statuscolors", &iflags.use_status_colors, TRUE, SET_IN_GAME},
+#else
+	{"statuscolors", (boolean *)0, TRUE, SET_IN_GAME},
+#endif
 	{"splash_screen",     &iflags.wc_splash_screen, TRUE, DISP_IN_GAME},	/*WC*/
 	{"tiled_map",     &iflags.wc_tiled_map, PREFER_TILED, DISP_IN_GAME},	/*WC*/
 	{"time", &flags.time, FALSE, SET_IN_GAME},
