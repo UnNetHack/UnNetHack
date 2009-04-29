@@ -4,7 +4,7 @@ dnl Avoid AC_REVISION() because we check configure into CVS
 dnl and it will cause confusing revision numbers to be included
 dnl in configure if developers forget to check in configure.ac
 dnl before running bootstrap.sh and checking in configure.
-# $Revision: 1.10 $
+
 AC_CONFIG_SRCDIR(Files)
 AC_SUBST(SRCDIR,[../$srcdir/src])
 AC_CONFIG_AUX_DIR(sys/autoconf)
@@ -92,6 +92,12 @@ if test $host_os = mingw32; then
 	    NETHACK_AUTO_WIN_DISABLE(tty)
 	fi
     fi
+fi
+
+
+dnl Disable GCC warning: "format not a string literal and no format arguments"
+if test "$GCC" = "yes"; then
+	AX_CHECK_COMPILER_FLAGS(-Wno-format-security, CFLAGS="$CFLAGS -Wno-format-security")
 fi
 
 dnl ------ Common subtypes

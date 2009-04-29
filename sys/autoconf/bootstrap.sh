@@ -10,7 +10,7 @@ set -e
 cd $confdir
 # Avoid autoheader creating backup file
 rm -f autoconf.hin
-aclocal
+aclocal -I m4
 # We can't avoid running autotools in multiple directories,
 # but at least we can have only one cache.
 if [ -d autom4te.cache ]; then		# aclocal v1.7 doesn't create cache
