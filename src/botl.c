@@ -104,7 +104,7 @@ char *newbot2;
 	/* don't add anything if it can't be displayed.
 	 * Otherwise the color of invisible text may bleed into
 	 * the statusline. */
-	if (strlen(newbot2) > min(MAXCO, CO)) return;
+	if (strlen(newbot2) >= min(MAXCO, CO)-1) return;
 
 	if (!iflags.use_status_colors) {
 		Sprintf(nb = eos(newbot2), " %s", text);
