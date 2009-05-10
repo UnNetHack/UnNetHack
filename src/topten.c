@@ -150,11 +150,11 @@ FILE *rfile;
 struct toptenentry *tt;
 {
 #ifdef NO_SCAN_BRACK /* Version_ Pts DgnLevs_ Hp___ Died__Born id */
-	static const char fmt[] = "%d %d %d %ld %d %d %d %d %d %d %ld %ld %d%*c";
+	static const char fmt[] = GAME_SHORT_NAME " %d %d %d %ld %d %d %d %d %d %d %ld %ld %d%*c";
 	static const char fmt32[] = "%c%c %s %s%*c";
 	static const char fmt33[] = "%s %s %s %s %s %s%*c";
 #else
-	static const char fmt[] = "%d.%d.%d %ld %d %d %d %d %d %d %ld %ld %d ";
+	static const char fmt[] = GAME_SHORT_NAME "-%d.%d.%d %ld %d %d %d %d %d %d %ld %ld %d ";
 	static const char fmt32[] = "%c%c %[^,],%[^\n]%*c";
 	static const char fmt33[] = "%s %s %s %s %[^,],%[^\n]%*c";
 #endif
