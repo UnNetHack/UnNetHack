@@ -1291,8 +1291,10 @@ dopois:
 		break;
 
 	    case AD_SITM:	/* for now these are the same */
-	    case AD_SEDU:
-		if (is_animal(mtmp->data)) {
+	    case AD_SEDU: {
+		int is_robber = (is_animal(mtmp->data) ||
+				 mtmp->data->mlet == S_HUMAN);
+		if (is_robber) {
 			hitmsg(mtmp, mattk);
 			if (mtmp->mcan) break;
 			/* Continue below */
@@ -1326,9 +1328,9 @@ dopois:
 		  case 0:
 			break;
 		  default:
-			if (!is_animal(mtmp->data) && !tele_restrict(mtmp))
+			if (!is_robber && !tele_restrict(mtmp))
 			    (void) rloc(mtmp, FALSE);
-			if (is_animal(mtmp->data) && *buf) {
+			if (is_robber && *buf) {
 			    if (canseemon(mtmp))
 				pline("%s tries to %s away with %s.",
 				      Monnam(mtmp),
@@ -1339,6 +1341,7 @@ dopois:
 			return 3;
 		}
 		break;
+	    }
 #ifdef SEDUCE
 	    case AD_SSEX:
 		if(could_seduce(mtmp, &youmonst, mattk) == 1

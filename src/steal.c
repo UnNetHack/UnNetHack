@@ -258,7 +258,10 @@ nothing_to_steal:
 	    return(1);	/* let her flee */
 	}
 
-	monkey_business = is_animal(mtmp->data);
+	/* Monkey or mugger robbing you.
+	 * You don't wanna be charmed/seduced by a mugger. */
+	monkey_business = (is_animal(mtmp->data) ||
+			   mtmp->data->mlet == S_HUMAN);
 	if (monkey_business) {
 	    ;	/* skip ring special cases */
 	} else if (Adornment & LEFT_RING) {
