@@ -309,7 +309,7 @@ HELM("dunce cap", "conical hat",
 HELM("dented pot", (char *)0,
 		1, 0,  0,	1, 0, 10,   8, 9, 0, IRON, CLR_BLACK),
 HELM("tinfoil hat", (char *)0,
-		1, 1,  0,	1, 0,  0,   1, 10, 0, METAL, HI_METAL),
+		1, 0,  0,	1, 0,  0,   1, 10, 0, METAL, HI_METAL),
 /* With shuffled appearances... */
 HELM("helmet", "plumed helmet",
 		0, 0,  0,      10, 1, 30,  10, 9, 0, IRON, HI_METAL),
