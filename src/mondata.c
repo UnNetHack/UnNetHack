@@ -439,12 +439,16 @@ const char *in_str;
 
 	slen = strlen(str); /* length possibly needs recomputing */
 
+	/* change grey dragon to gray dragon, otherwise
+	   you'd get the (possibly) shuffled dragon with magic
+	   resistance */
+	if (!strncmpi(str, "grey dragon", 11))
+		*(str + 2) = 'a';
+
     {
 	static const struct alt_spl { const char* name; short pm_val; }
 	    names[] = {
 	    /* Alternate spellings */
-		{ "grey dragon",	PM_GRAY_DRAGON },
-		{ "baby grey dragon",	PM_BABY_GRAY_DRAGON },
 		{ "grey unicorn",	PM_GRAY_UNICORN },
 		{ "grey ooze",		PM_GRAY_OOZE },
 		{ "gray-elf",		PM_GREY_ELF },
