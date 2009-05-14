@@ -956,7 +956,7 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 			something);
 		you_are(buf);
 	} else if (Warn_of_mon && uwep) {
-		char *monster_name = get_warned_of_monster(uwep);
+		const char *monster_name = get_warned_of_monster(uwep);
 		if (monster_name) {
 			Sprintf(buf, "aware of the presence of %s", monster_name);
 			you_are(buf);

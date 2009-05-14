@@ -1988,7 +1988,6 @@ invoke_amulet(otmp)
 			change_luck(-1);
 			adjalign(-10);
 			gods_upset(u.ualign.type);
-			return 1;
 		} else {
 			/* not very wise, to defy the Gods with a *known* fake */
 			You_feel("foolish!");
@@ -1998,7 +1997,9 @@ invoke_amulet(otmp)
 			adjalign(-12);
 			gods_upset(u.ualign.type);
 		}
+		return 1;
 	} /* fake Amulet */
+	return 0;
 }
 #endif
 

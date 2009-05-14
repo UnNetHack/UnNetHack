@@ -293,10 +293,10 @@ struct toptenentry *tt;
                 SEP "hp=%d"
                 SEP "maxhp=%d"
                 SEP "deaths=%d"
-                SEP "deathdate=%d"
-                SEP "birthdate=%d"
+                SEP "deathdate=%ld"
+                SEP "birthdate=%ld"
                 SEP "uid=%d",
-		GAME_SHORT_NAME,
+                GAME_SHORT_NAME,
                 tt->ver_major, tt->ver_minor, tt->patchlevel,
                 tt->points, tt->deathdnum, tt->deathlev,
                 tt->maxlvl, tt->hp, tt->maxhp, tt->deaths,
@@ -308,7 +308,7 @@ struct toptenentry *tt;
                 SEP "gender=%s"
                 SEP "align=%s",
                 tt->plrole, tt->plrace, tt->plgend, tt->plalign);
-   
+
    munge_xlstring(buf, plname, DTHSZ + 1);
   (void)fprintf(rfile, SEP "name=%s", buf);
 
