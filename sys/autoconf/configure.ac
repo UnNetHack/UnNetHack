@@ -354,7 +354,7 @@ NETHACK_ARG(tourist,[Tourist class],TOURIST,yes)
 NETHACK_ARG(redo,[Redo last command],REDO,yes)
 NETHACK_ARG(clipping,[Allow smaller screens],CLIPPING,yes)
 NETHACK_ARG(menu-color,[TTY graphics menu color],MENU_COLOR,yes)
-if test "$enable_tty_graphics" = yes; then
+if test "$enable_tty_graphics" != "no"; then
 NETHACK_ARG(status-color,[TTY graphics status color],STATUS_COLORS,yes)
 fi
 NETHACK_ARG(auto-open,[Open doors by walking into them],AUTO_OPEN,yes)
