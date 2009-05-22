@@ -293,6 +293,9 @@ else
 	AC_DEFINE(TIMED_DELAY, [], [Using msleep])
 fi
 
+dnl ------ Check fcntl for USE_FCNTL
+AC_CHECK_FUNCS(fcntl)
+
 dnl  ----- Check for program needed to build Guidebook
 AC_CHECK_PROG(HAVE_NROFF, nroff, "yes", "no")
 AC_CHECK_PROG(HAVE_TBL, tbl, "yes", "no")
