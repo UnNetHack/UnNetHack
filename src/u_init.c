@@ -711,7 +711,7 @@ u_init()
 		ini_inv(Tourist);
 		if(!rn2(25)) ini_inv(Tinopener);
 		else if(!rn2(25)) ini_inv(Leash);
-		else if(!rn2(25)) ini_inv(Towel);
+		else if(!rn2(25) && !towelday()) ini_inv(Towel);
 		else if(!rn2(25)) ini_inv(Magicmarker);
 		skill_init(Skill_T);
 		break;
@@ -805,6 +805,10 @@ u_init()
 	default:	/* impossible */
 		break;
 	}
+
+	/* Towel Day: In Memoriam Douglas Adams */
+	if (towelday())
+		ini_inv(Towel);
 
 	if (discover)
 		ini_inv(Wishing);

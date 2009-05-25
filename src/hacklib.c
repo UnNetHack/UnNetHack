@@ -37,12 +37,15 @@ NetHack, except that rounddiv may call panic().
 	boolean		fuzzymatch	(const char *,const char *,const char *,boolean)
 	void		setrandom	(void)
 	int		getyear		(void)
+	int		getmonth	(void)
+	int		getmday		(void)
 	char *		yymmdd		(time_t)
 	long		yyyymmdd	(time_t)
 	int		phase_of_the_moon	(void)
 	boolean		friday_13th	(void)
 	int		night		(void)
 	int		midnight	(void)
+	boolean		towelday	(void)
 =*/
 #ifdef LINT
 # define Static		/* pacify lint */
@@ -528,6 +531,20 @@ getyear()
 	return(1900 + getlt()->tm_year);
 }
 
+/** Returns current month (1-12, 1 = January) */
+int
+getmonth()
+{
+	return(1 + getlt()->tm_mon);
+}
+
+/** Returns current day of month (1-31) */
+int
+getmday()
+{
+	return(getlt()->tm_mday);
+}
+
 #if 0
 /* This routine is no longer used since in 2000 it will yield "100mmdd". */
 char *
@@ -631,5 +648,11 @@ midnight()
 	return(getlt()->tm_hour == 0);
 }
 #endif /* OVL2 */
+
+boolean
+towelday()
+{
+	return(boolean)((getmday()==25) && (getmonth()==5));
+}
 
 /*hacklib.c*/
