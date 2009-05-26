@@ -125,6 +125,7 @@ init_ttycolor()
 
 static int FDECL(convert_uchars,(char *, uchar *, int));
 
+#ifdef VIDEOSHADES
 /*
  * OPTIONS=videocolors:1-2-3-4-5-6-7-8-9-10-11-12-13-14-15
  * Left to right assignments for:
@@ -152,6 +153,7 @@ int assign_videocolors(char *colorvals)
 	free((genericptr_t)tmpcolor);
 	return 1;
 }
+#endif
 
 static int
 convert_uchars(bufp,list,size)

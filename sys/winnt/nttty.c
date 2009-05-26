@@ -112,6 +112,7 @@ KEYHANDLERNAME pKeyHandlerName;
 #ifndef CLR_MAX
 #define CLR_MAX 16
 #endif
+boolean colorflag = FALSE;	/* colors are initialized */
 int ttycolors[CLR_MAX];
 # ifdef TEXTCOLOR
 static void NDECL(init_ttycolor);
@@ -621,6 +622,82 @@ init_ttycolor()
 						FOREGROUND_INTENSITY;
 }
 # endif /* TEXTCOLOR */
+
+#ifdef VIDEOSHADES
+static int FDECL(convert_uchars,(char *, uchar *, int));
+
+/*
+ * OPTIONS=videocolors:1-2-3-4-5-6-7-8-9-10-11-12-13-14-15
+ * Left to right assignments for:
+ *	red	green	 brown	blue	magenta	cyan	gray	black
+ *	orange	br.green yellow	br.blue	br.mag	br.cyan	white
+ */
+int assign_videocolors(char *colorvals)
+{
+	int i,icolor;
+	uchar *tmpcolor;
+
+	init_ttycolor();
+
+	i = strlen(colorvals);
+	tmpcolor = (uchar *)alloc(i);
+	if (convert_uchars(colorvals,tmpcolor,i) < 0) return FALSE;
+
+	icolor = CLR_RED;
+	for( i = 0; tmpcolor[i] != 0; ++i) {
+	    if (icolor <= CLR_WHITE)
+		ttycolors[icolor++] = tmpcolor[i];
+	}
+
+	colorflag = TRUE;
+	free((genericptr_t)tmpcolor);
+	return 1;
+}
+
+static int
+convert_uchars(bufp,list,size)
+    char *bufp; 	/* current pointer */
+    uchar *list;	/* return list */
+    int size;
+{
+    unsigned int num = 0;
+    int count = 0;
+
+    list[count] = 0;
+
+    while (1) {
+	switch(*bufp) {
+	    case ' ':  case '\0':
+	    case '\t': case '-':
+	    case '\n':
+		if (num) {
+		    list[count++] = num;
+		    list[count] = 0;
+		    num = 0;
+		}
+		if ((count==size) || !*bufp) return count;
+		bufp++;
+		break;
+	    case '#': 
+		if (num) {
+		    list[count++] = num;
+		    list[count] = 0;
+		}
+		return count;
+	    case '0': case '1': case '2': case '3':
+	    case '4': case '5': case '6': case '7':
+	    case '8': case '9':
+		num = num*10 + (*bufp-'0');
+		if (num > 15) return -1;
+		bufp++;
+		break;
+	    default: return -1;
+	}
+    }
+    /*NOTREACHED*/
+}
+#endif /* !VIDEOSHADES */
+
 
 int
 has_color(int color)
