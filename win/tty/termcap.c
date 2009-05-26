@@ -92,7 +92,7 @@ STATIC_VAR char tgotobuf[20];
 STATIC_DCL void NDECL(init_ttycolor);
 
 boolean colorflag = FALSE;			/* colors are initialized */
-char ttycolors[CLR_MAX];
+int ttycolors[CLR_MAX];
 
 void
 init_ttycolor()
