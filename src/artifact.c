@@ -283,9 +283,10 @@ struct obj *obj;
 #ifdef OVLB
 
 boolean
-restrict_name(otmp, name)  /* returns 1 if name is restricted for otmp->otyp */
+restrict_name(otmp, name, restrict_typ)  /* returns 1 if name is restricted */
 register struct obj *otmp;
 register const char *name;
+register boolean restrict_typ; /* restrict for otmp->otyp? */
 {
 	register const struct artifact *a;
 	register const char *aname;
@@ -298,7 +299,7 @@ register const char *name;
 		   Bug fix:  don't name multiple elven daggers "Sting".
 		 */
 	for (a = artilist+1; a->otyp; a++) {
-	    if (a->otyp != otmp->otyp) continue;
+	    if (restrict_typ && a->otyp != otmp->otyp) continue;
 	    aname = a->name;
 	    if (!strncmpi(aname, "the ", 4)) aname += 4;
 	    if (!strcmp(aname, name))
