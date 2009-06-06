@@ -69,8 +69,8 @@ LEVEL:		"fakewiz2" "G" @ (-6,4)
 
 # Heck extra levels
 RNDLEVEL:	"heck-a" "H" @ (-19,17) 25 7
-RNDLEVEL:	"heck-b" "I" @ (2,17) 50 8
-RNDLEVEL:	"heck-c" "K" @ (-19,17) 75 9
+RNDLEVEL:	"heck-b" "I" @ (2,17) 50 7
+RNDLEVEL:	"heck-c" "K" @ (-19,17) 75 8
 RNDLEVEL:	"heck-d" "L" @ (2,17) 9
 RNDLEVEL:	"heck-e" "M" @ (2,17) 50 9
 RNDLEVEL:	"heck-e" "N" @ (-19,17) 50 9
