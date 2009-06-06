@@ -1357,7 +1357,6 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	    obj = splitobj(obj, count);
 
 	obj = pick_obj(obj);
-	obj->was_thrown = 0;
 
 	if (uwep && uwep == obj) mrg_to_wielded = TRUE;
 	nearload = near_capacity();
