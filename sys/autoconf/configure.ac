@@ -109,7 +109,13 @@ esac
 
 dnl  ----- Check for programs
 AC_PROG_LEX
-AC_PROG_YACC
+if test "$LEX" == ":"; then
+	AC_MSG_ERROR([cannot find flex or lex])
+fi
+AC_CHECK_PROGS(YACC, ['bison -y' byacc yacc])
+if test -z "$YACC"; then
+	AC_MSG_ERROR([cannot find bison, byacc or yacc])
+fi
 AC_CHECK_TOOLS(CHOWN,[chown true])
 AC_CHECK_TOOLS(CHGRP,[chgrp true])
 AC_CHECK_TOOLS(CHMOD,[chmod true])
