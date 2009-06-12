@@ -472,17 +472,22 @@ dragons_init()
 	/* Number of existing dragons. Assumes order of dragons */
 	int ndragons = YELLOW_DRAGON_SCALES - GRAY_DRAGON_SCALES + 1;
 	struct permonst tmp[ndragons];
+	struct permonst baby_tmp[ndragons];
 	int i,j;
 	/* record standard order */
 	for (i=0; i < ndragons; i++) {
 		tmp[i].mname  = mons[i+PM_GRAY_DRAGON].mname;
 		tmp[i].mcolor = mons[i+PM_GRAY_DRAGON].mcolor;
+		baby_tmp[i].mname  = mons[i+PM_BABY_GRAY_DRAGON].mname;
+		baby_tmp[i].mcolor = mons[i+PM_BABY_GRAY_DRAGON].mcolor;
 	}
 	/* copy name and color to new positions */
 	for (i=0; i < ndragons; i++) {
 		j = objects[i+GRAY_DRAGON_SCALES].oc_name_idx-GRAY_DRAGON_SCALES;
 		mons[i+PM_GRAY_DRAGON].mname  = tmp[j].mname;
 		mons[i+PM_GRAY_DRAGON].mcolor = tmp[j].mcolor;
+		mons[i+PM_BABY_GRAY_DRAGON].mname  = baby_tmp[j].mname;
+		mons[i+PM_BABY_GRAY_DRAGON].mcolor = baby_tmp[j].mcolor;
 	}
 }
 
