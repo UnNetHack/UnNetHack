@@ -248,9 +248,7 @@ do_mname()
 	    else {
 #endif
 		pline("This %s creature is called %s and cannot be renamed.",
-		ACURR(A_CHA) > 14 ?
-		(flags.female ? "beautiful" : "handsome") :
-		"ugly",
+		beautiful(),
 		plname);
 		return(0);
 #ifdef STEED

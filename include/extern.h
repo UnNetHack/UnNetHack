@@ -106,6 +106,7 @@ E int NDECL(newhp);
 E schar FDECL(acurr, (int));
 E schar NDECL(acurrstr);
 E void FDECL(adjalign, (int));
+E const char * NDECL(beautiful);
 
 /* ### ball.c ### */
 

@@ -645,14 +645,10 @@ struct obj *obj;
 		    else if (u.uhs >= WEAK)
 			You(look_str, "undernourished");
 		    else You("look as %s as ever.",
-				ACURR(A_CHA) > 14 ?
-				(poly_gender()==1 ? "beautiful" : "handsome") :
-				"ugly");
+				beautiful());
 		} else {
 			You_cant("see your %s %s.",
-				ACURR(A_CHA) > 14 ?
-				(poly_gender()==1 ? "beautiful" : "handsome") :
-				"ugly",
+				beautiful(),
 				body_part(FACE));
 		}
 		return 1;

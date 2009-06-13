@@ -728,4 +728,15 @@ register int n;
 
 #endif /* OVL2 */
 
+/** Returns "beautiful", "handsome" or "ugly"
+ * according to gender and charisma.
+ */
+const char *
+beautiful()
+{
+	return (ACURR(A_CHA) > 14 ?
+		(poly_gender()==1 ? "beautiful" : "handsome") :
+		"ugly");
+}
+
 /*attrib.c*/
