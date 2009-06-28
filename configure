@@ -3568,7 +3568,68 @@ fi
 
 
 if test "$GCC" = "yes"; then
-	AX_CHECK_COMPILER_FLAGS(-Wno-format-security, CFLAGS="$CFLAGS -Wno-format-security")
+	 { $as_echo "$as_me:$LINENO: checking whether C compiler accepts -Wno-format-security" >&5
+$as_echo_n "checking whether C compiler accepts -Wno-format-security... " >&6; }
+if test "${ax_cv_c_flags__Wno_format_security+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+
+      ax_save_FLAGS=$CFLAGS
+      CFLAGS="-Wno-format-security"
+      cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ax_cv_c_flags__Wno_format_security=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ax_cv_c_flags__Wno_format_security=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+      CFLAGS=$ax_save_FLAGS
+fi
+
+eval ax_check_compiler_flags=$ax_cv_c_flags__Wno_format_security
+{ $as_echo "$as_me:$LINENO: result: $ax_check_compiler_flags" >&5
+$as_echo "$ax_check_compiler_flags" >&6; }
+if test "x$ax_check_compiler_flags" = xyes; then
+	CFLAGS="$CFLAGS -Wno-format-security"
+else
+	:
+fi
+
 fi
 
 case $host_os in
