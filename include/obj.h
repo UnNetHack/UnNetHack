@@ -93,7 +93,8 @@ struct obj {
 	Bitfield(in_use,1);	/* for magic items before useup items */
 	Bitfield(bypass,1);	/* mark this as an object to be skipped by bhito() */
 	Bitfield(was_thrown,1);	/* thrown by the hero since last picked up */
-	/* 5 free bits */
+	Bitfield(odrained,1);	/* drained corpse */
+	/* 4 free bits */
 
 	int	corpsenm;	/* type of corpse is mons[corpsenm] */
 #define leashmon  corpsenm	/* gets m_id of attached pet */
@@ -218,6 +219,7 @@ struct obj {
 			 pm_to_cham((obj)->corpsenm) != CHAM_ORDINARY)
 #define mlevelgain(obj) (ofood(obj) && (obj)->corpsenm == PM_WRAITH)
 #define mhealup(obj)	(ofood(obj) && (obj)->corpsenm == PM_NURSE)
+#define drainlevel(corpse) (mons[(corpse)->corpsenm].cnutrit*4/5)
 
 /* Containers */
 #define carried(o)	((o)->where == OBJ_INVENT)

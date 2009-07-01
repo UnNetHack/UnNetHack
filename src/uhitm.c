@@ -1677,6 +1677,20 @@ register struct attack *mattk;
 	    case AD_DRLI:
 		if (!negated && !rn2(3) && !resists_drli(mdef)) {
 			int xtmp = d(2,6);
+			if (mdef->mhp < xtmp) xtmp = mdef->mhp;
+			if (maybe_polyd(is_vampire(youmonst.data), 
+			    Race_if(PM_VAMPIRE)) && mattk->aatyp == AT_BITE &&
+			    has_blood(pd)) {
+				/* For the life of a creature is in the blood
+				   (Lev 17:11) */
+				if (flags.verbose)
+				    You("feed on the lifeblood.");
+				/* [ALI] Biting monsters does not count against
+				   eating conducts. The draining of life is
+				   considered to be primarily a non-physical
+				   effect */
+				lesshungry(xtmp * 6);
+			}
 			pline("%s suddenly seems weaker!", Monnam(mdef));
 			mdef->mhpmax -= xtmp;
 			if ((mdef->mhp -= xtmp) <= 0 || !mdef->m_lev) {
@@ -2208,8 +2222,15 @@ use_weapon:
 			if (i==1 && uwep && (u.umonnum == PM_SUCCUBUS ||
 				u.umonnum == PM_INCUBUS)) goto use_weapon;
 #endif
-		case AT_KICK:
 		case AT_BITE:
+			/* [ALI] Vampires are also smart. They avoid biting
+			   monsters if doing so would be fatal */
+			if ((uwep || (u.twoweap && uswapwep)) &&
+				is_vampire(youmonst.data) &&
+				(is_rider(mon->data) ||
+				 mon->data == &mons[PM_GREEN_SLIME]))
+			    break;
+		case AT_KICK:
 		case AT_STNG:
 		case AT_TUCH:
 		case AT_BUTT:
@@ -2394,6 +2415,10 @@ uchar aatyp;
 	register struct permonst *ptr = mon->data;
 	register int i, tmp;
 
+	if (mhit && aatyp == AT_BITE && is_vampire(youmonst.data)) {
+	    if (bite_monster(mon))
+		return 2;			/* lifesaved */
+	}
 	for(i = 0; ; i++) {
 	    if(i >= NATTK) return(malive | mhit);	/* no passive attacks */
 	    if(ptr->mattk[i].aatyp == AT_NONE) break;	/* try this one */

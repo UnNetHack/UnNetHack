@@ -405,6 +405,7 @@ boolean artif;
 		    otmp = mk_artifact(otmp, (aligntyp)A_NONE);
 		break;
 	case FOOD_CLASS:
+	    otmp->odrained = 0;
 	    otmp->oeaten = 0;
 	    switch(otmp->otyp) {
 	    case CORPSE:

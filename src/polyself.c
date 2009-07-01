@@ -229,7 +229,7 @@ boolean forcecontrol;
 				uarm->otyp >= GRAY_DRAGON_SCALE_MAIL &&
 				uarm->otyp <= YELLOW_DRAGON_SCALES);
 	boolean iswere = (u.ulycn >= LOW_PM || is_were(youmonst.data));
-	boolean isvamp = (youmonst.data->mlet == S_VAMPIRE || u.umonnum == PM_VAMPIRE_BAT);
+	boolean isvamp = (is_vampire(youmonst.data));
 	boolean was_floating = (Levitation || Flying);
 
         if(!Polymorph_control && !forcecontrol && !draconian && !iswere && !isvamp) {
