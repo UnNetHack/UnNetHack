@@ -1678,7 +1678,7 @@ register struct attack *mattk;
 		if (!negated && !rn2(3) && !resists_drli(mdef)) {
 			int xtmp = d(2,6);
 			if (mdef->mhp < xtmp) xtmp = mdef->mhp;
-			if (maybe_polyd(is_vampire(youmonst.data), 
+			if (maybe_polyd(is_vampiric(youmonst.data), 
 			    Race_if(PM_VAMPIRE)) && mattk->aatyp == AT_BITE &&
 			    has_blood(pd)) {
 				/* For the life of a creature is in the blood
@@ -2415,7 +2415,7 @@ uchar aatyp;
 	register struct permonst *ptr = mon->data;
 	register int i, tmp;
 
-	if (mhit && aatyp == AT_BITE && is_vampire(youmonst.data)) {
+	if (mhit && aatyp == AT_BITE && is_vampiric(youmonst.data)) {
 	    if (bite_monster(mon))
 		return 2;			/* lifesaved */
 	}

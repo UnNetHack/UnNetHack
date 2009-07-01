@@ -123,7 +123,7 @@ register struct obj *obj;
 	/* [ALI] (fully) drained food is not presented as an option,
 	 * but partly eaten food is (even though you can't drain it).
 	 */
-	if (is_vampire(youmonst.data))
+	if (is_vampiric(youmonst.data))
 		return (boolean)(obj->otyp == CORPSE &&
 		  has_blood(&mons[obj->corpsenm]) && (!obj->odrained ||
 		  obj->oeaten > drainlevel(obj)));
@@ -416,7 +416,7 @@ eatfood()		/* called each move during eating process */
 		do_reset_eat();
 		return(0);
 	}
-	if (is_vampire(youmonst.data) != victual.piece->odrained) {
+	if (is_vampiric(youmonst.data) != victual.piece->odrained) {
 	    /* Polymorphed while eating/draining */
 	    do_reset_eat();
 	    return(0);
@@ -1335,7 +1335,7 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 	 * Thus happens before the conduct checks intentionally - should it be after?
 	 * Blood is assumed to be meat and flesh.
 	 */
-	if (is_vampire(youmonst.data)) {
+	if (is_vampiric(youmonst.data)) {
 	    /* oeaten is set up by touchfood */
 	    if (otmp->odrained ? otmp->oeaten <= drainlevel(otmp) :
 	      otmp->oeaten < mons[otmp->corpsenm].cnutrit) {
@@ -1432,7 +1432,7 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 	    if (!retcode) consume_oeaten(otmp, 2);	/* oeaten >>= 2 */
 	    if (retcode<2 && otmp->odrained && otmp->oeaten < drainlevel(otmp))
 	        otmp->oeaten = drainlevel(otmp);
-	} else if (!is_vampire(youmonst.data)) {
+	} else if (!is_vampiric(youmonst.data)) {
 	    pline("%s%s %s!",
 		  !uniq ? "This " : !type_is_pname(&mons[mnum]) ? "The " : "",
 		  food_xname(otmp, FALSE),
@@ -2114,7 +2114,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	/* [ALI] Hero polymorphed in the meantime.
 	 */
 	if (otmp == victual.piece &&
-	  is_vampire(youmonst.data) != otmp->odrained)
+	  is_vampiric(youmonst.data) != otmp->odrained)
 	    victual.piece = (struct obj *)0;	/* Can't resume */
 
 	/* [ALI] Blood can coagulate during the interruption

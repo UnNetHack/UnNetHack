@@ -715,7 +715,7 @@ register struct obj *obj;
 	    /* vampires only "eat" very fresh corpses ...
 	     * Assume meat -> blood
 	     */
-	    if (is_vampire(mon->data)) {
+	    if (is_vampiric(mon->data)) {
 	    	return (obj->otyp == CORPSE &&
 		  has_blood(&mons[obj->corpsenm]) && !obj->oeaten &&
 	    	  peek_at_iced_corpse_age(obj) + 5 >= monstermoves) ?

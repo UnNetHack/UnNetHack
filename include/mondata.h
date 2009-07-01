@@ -80,6 +80,9 @@
 #define is_were(ptr)		(((ptr)->mflags2 & M2_WERE) != 0L)
 #define is_vampire(ptr)		((ptr)->mlet == S_VAMPIRE || \
 				 (ptr) == &mons[PM_VAMPIRE_BAT])
+/** feeds on blood */
+#define is_vampiric(ptr)	((is_vampire(ptr)) || \
+				 (ptr) == &mons[PM_VAMPIRE_BAT])
 #define is_elf(ptr)		(((ptr)->mflags2 & M2_ELF) != 0L)
 #define is_dwarf(ptr)		(((ptr)->mflags2 & M2_DWARF) != 0L)
 #define is_gnome(ptr)		(((ptr)->mflags2 & M2_GNOME) != 0L)
