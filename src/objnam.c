@@ -1735,6 +1735,7 @@ struct alt_spellings {
 	{ "kelp", KELP_FROND },
 	{ "eucalyptus", EUCALYPTUS_LEAF },
 	{ "grapple", GRAPPLING_HOOK },
+	{ "helmet of opposite alignment", HELM_OF_OPPOSITE_ALIGNMENT },
 	{ (const char *)0, 0 },
 };
 
