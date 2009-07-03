@@ -2019,9 +2019,12 @@ boolean from_user;
 	 * Find corpse type using "of" (figurine of an orc, tin of orc meat)
 	 * Don't check if it's a wand or spellbook.
 	 * (avoid "wand/finger of death" confusion).
+	 * (ALI "potion of vampire blood" also).
 	 */
 	if (!strstri(bp, "wand ")
 	 && !strstri(bp, "spellbook ")
+	 && !strstri(bp, "potion ")
+	 && !strstri(bp, "potions ")
 	 && !strstri(bp, "finger ")) {
 	    if ((p = strstri(bp, " of ")) != 0
 		&& (mntmp = name_to_mon(p+4)) >= LOW_PM)
@@ -2033,7 +2036,9 @@ boolean from_user;
 	if (strncmpi(bp, "ninja-to", 8)) /* not the "ninja" rank */
 	if (strncmpi(bp, "master key", 10)) /* not the "master" rank */
 	if (strncmpi(bp, "Thiefbane", 9)) /* not the "thief" rank */
+	if (strncmpi(bp, "Ogresmasher", 11)) /* not the "ogre" monster */
 	if (strncmpi(bp, "magenta", 7)) /* not the "mage" rank */
+	if (strncmpi(bp, "vampire blood", 13)) /* not the "vampire" monster */
 	if (mntmp < LOW_PM && strlen(bp) > 2 &&
 	    (mntmp = name_to_mon(bp)) >= LOW_PM) {
 		int mntmptoo, mntmplen;	/* double check for rank title */

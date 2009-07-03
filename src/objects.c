@@ -779,7 +779,6 @@ POTION("acid", "white",                 0, 0,          10, 250, CLR_WHITE),
 POTION("oil", "murky",                  0, 0,          30, 250, CLR_BROWN),
 POTION((char *)0, "muddy",              0, 0,           0,   0, CLR_BROWN),
 POTION((char *)0, "sparkling",          0, 0,           0,   0, CLR_CYAN),
-POTION((char *)0, "blood-red",          0, 0,           0,   0, CLR_RED),
 POTION((char *)0, "luminescent",        0, 0,           0,   0, CLR_WHITE),
 POTION((char *)0, "icy",                0, 0,           0,   0, CLR_BRIGHT_BLUE),
 POTION((char *)0, "chartreuse",         0, 0,           0,   0, CLR_GREEN),
@@ -791,6 +790,8 @@ POTION((char *)0, "mauve",              0, 0,           0,   0, CLR_MAGENTA),
 POTION((char *)0, "indigo",             0, 0,           0,   0, CLR_MAGENTA),
 POTION((char *)0, "silver",             0, 0,           0,   0, HI_SILVER),
 POTION("water", "clear",                0, 0,          92, 100, CLR_CYAN),
+POTION("blood", "blood-red",            0, 0,           0,  50, CLR_RED),
+POTION("vampire blood", "blood-red",    1, 0,           0, 350, CLR_RED),
 #undef POTION
 
 /* scrolls ... */

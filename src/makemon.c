@@ -635,6 +635,14 @@ register struct	monst	*mtmp;
 		mkmonmoney(mtmp, (long) d(level_difficulty(), 30));
 #endif
 		break;
+	    case S_VAMPIRE:
+		if (rn2(2)) {
+		    if ((int) mtmp->m_lev > rn2(30))
+			(void)mongets(mtmp, POT_VAMPIRE_BLOOD);
+		    else
+			(void)mongets(mtmp, POT_BLOOD);
+		}
+		break;
 	    case S_DEMON:
 	    	/* moved here from m_initweap() because these don't
 		   have AT_WEAP so m_initweap() is not called for them */

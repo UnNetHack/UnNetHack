@@ -195,7 +195,8 @@ shuffle_all()
 			int j = last-1;
 
 			if (oclass == POTION_CLASS)
-			    j -= 1;  /* only water has a fixed description */
+			    /* water and following have fixed descriptions */
+			    j = POT_WATER - 1;
 			else if (oclass == AMULET_CLASS ||
 				 oclass == SCROLL_CLASS ||
 				 oclass == SPBOOK_CLASS) {
