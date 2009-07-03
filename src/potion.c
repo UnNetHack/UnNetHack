@@ -945,8 +945,17 @@ peffects(otmp)
 		    } else if (u.ualign.type == A_NEUTRAL)
 			adjalign(-3);
 		    exercise(A_CON, FALSE);
-		    if (!Unchanging && polymon(PM_VAMPIRE))
-			u.mtimedone = 0;	/* "Permament" change */
+		    if (!Unchanging) {
+			int successful_polymorph = FALSE;
+			if (otmp->blessed)
+				successful_polymorph = polymon(PM_VAMPIRE_LORD);
+			else if (otmp->cursed)
+				successful_polymorph = polymon(PM_VAMPIRE_BAT);
+			else
+				successful_polymorph = polymon(PM_VAMPIRE);
+			if (successful_polymorph)
+				u.mtimedone = 0;	/* "Permament" change */
+		    }
 		} else {
 		    violated_vegetarian();
 		    pline("Ugh.  That was vile.");
