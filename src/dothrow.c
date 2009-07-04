@@ -1665,6 +1665,12 @@ boolean from_invent;
 			}
 			/* monster breathing isn't handled... [yet?] */
 			break;
+#ifdef TOURIST
+		case EXPENSIVE_CAMERA: {
+		    create_camera_demon(obj, x, y);
+		    break;
+		}
+#endif
 		case EGG:
 			/* breaking your own eggs is bad luck */
 			if (hero_caused && obj->spe && obj->corpsenm >= LOW_PM)

@@ -1790,7 +1790,7 @@ assign_sym:
 	mtmp->mappearance = appear;
 }
 
-/* release a monster from a bag of tricks */
+/** Release a monster from a bag of tricks */
 void
 bagotricks(bag)
 struct obj *bag;
@@ -1814,6 +1814,23 @@ struct obj *bag;
     }
 }
 
+/** May create a camera demon emerging from camera around position x,y. */
+void
+create_camera_demon(camera,x,y)
+struct obj *camera;
+int x, y;
+{
+	struct monst *mtmp;
+
+	if (!rn2(3) &&
+	    (mtmp = makemon(&mons[PM_HOMUNCULUS],x,y, NO_MM_FLAGS)) != 0) {
+		pline("%s is released!", !canspotmon(mtmp) ?
+				Something : Hallucination ?
+				An(rndmonnam()) : "The picture-painting demon");
+		mtmp->mpeaceful = !camera->cursed;
+		set_malign(mtmp);
+	}
+}
 #endif /* OVLB */
 
 /*makemon.c*/
