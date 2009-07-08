@@ -1790,6 +1790,11 @@ register struct obj *obj;
 	} else if (obj == uball || obj == uchain) {
 		You("must be kidding.");
 		return 0;
+	} else if (obj == current_container &&
+	           objects[obj->otyp].oc_name_known &&
+	           obj->otyp == BAG_OF_HOLDING) {
+		pline("Creating an artificial black hole could ruin your whole day!");
+		return 0;
 	} else if (obj == current_container) {
 		pline("That would be an interesting topological exercise.");
 		return 0;
