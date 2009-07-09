@@ -297,6 +297,22 @@ moveloop()
 	    /* once-per-hero-took-time things go here */
 	    /******************************************/
 
+	    if (u.utrap && u.utraptype == TT_LAVA) {
+		    if (!is_lava(u.ux,u.uy))
+			    u.utrap = 0;
+		    else if (!u.uinvulnerable) {
+			    u.utrap -= 1<<8;
+			    if (u.utrap < 1<<8) {
+				    killer_format = KILLED_BY;
+				    killer = "molten lava";
+				    You("sink below the surface and die.");
+				    done(DISSOLVED);
+			    } else if (!u.umoved) {
+				    Norep("You sink deeper into the lava.");
+				    u.utrap += rnd(4);
+			    }
+		    }
+	    }
 
 	} /* actual time passed */
 
@@ -368,23 +384,6 @@ moveloop()
 	    !In_endgame(&u.uz) && !BClairvoyant &&
 	    !(moves % 15) && !rn2(2))
 		do_vicinity_map();
-
-	if(u.utrap && u.utraptype == TT_LAVA) {
-	    if(!is_lava(u.ux,u.uy))
-		u.utrap = 0;
-	    else if (!u.uinvulnerable) {
-		u.utrap -= 1<<8;
-		if(u.utrap < 1<<8) {
-		    killer_format = KILLED_BY;
-		    killer = "molten lava";
-		    You("sink below the surface and die.");
-		    done(DISSOLVED);
-		} else if(didmove && !u.umoved) {
-		    Norep("You sink deeper into the lava.");
-		    u.utrap += rnd(4);
-		}
-	    }
-	}
 
 #ifdef WIZARD
 	if (iflags.sanity_check)
