@@ -458,19 +458,16 @@ static const char *creator_names[] = {
 	"Pangu", /* Chinese */
 };
 
-#include <sys/time.h>
-
 /** Return the name of the creator deity.
  * The name stays the same for the running game. */
 STATIC_OVL const char *
 creatorname()	
 {
 	static int index = -1;
-	if (index == -1) {
-		int array_len = sizeof(creator_names) / sizeof(creator_names[0]);
-		index = rn2(array_len);
-	
-	}
+
+	if (index == -1)
+		index = rn2(SIZE(creator_names));
+
 	return creator_names[index];
 }
 
