@@ -450,7 +450,7 @@ static const char *creator_names[] = {
 	"Gaia", /* Greek */
 	"Khronos", /* Greek */
 	"Atum", /* Egyptian */
-	"Ptah", /* Egyptian */
+	"Khepri", /* Egyptian */
 	"Kamui", /* Ainu */
 	"Mbombo", /* Bakuba */
 	"Unkulunkulu", /* Zulu */
