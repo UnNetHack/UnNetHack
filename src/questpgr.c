@@ -445,7 +445,10 @@ qt_montype()
 /** The names of creator deities from different cultures. */
 static const char *creator_names[] = {
 	"Marduk", /* Babylonian */
+	"Apsu", /* Babylonian */
+	"Aeon", /* Greek */
 	"Gaia", /* Greek */
+	"Khronos", /* Greek */
 	"Atum", /* Egyptian */
 	"Ptah", /* Egyptian */
 	"Kamui", /* Ainu */
@@ -455,7 +458,11 @@ static const char *creator_names[] = {
 	"Brahma", /* Hindu */
 	"Coatlique", /* Aztec */
 	"Viracocha", /* Inca */
+	"Tepeu", /* Maya */
 	"Pangu", /* Chinese */
+	"Bulaing", /* Australian */
+	"Ahura Mazda", /* Zoroastrian */
+	"Demiourgos", /* Platon */
 };
 
 /** Return the name of the creator deity.
