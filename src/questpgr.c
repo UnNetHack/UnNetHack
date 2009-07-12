@@ -470,11 +470,7 @@ static const char *creator_names[] = {
 STATIC_OVL const char *
 creatorname()	
 {
-	static int index = -1;
-
-	if (index == -1)
-		index = rn2(SIZE(creator_names));
-
+	int index = u.ubirthday % SIZE(creator_names);
 	return creator_names[index];
 }
 
