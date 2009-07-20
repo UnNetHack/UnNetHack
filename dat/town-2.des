@@ -1,4 +1,4 @@
-#       
+#
 # Angband-2
 # Copyright (c) 2009 by Patric Mueller
 #
@@ -7,12 +7,13 @@
 LEVEL: "town-2"
 MESSAGE: "You reach the surface.  You hear the sounds of civilization."
 RANDOM_MONSTERS:'@','r'
-ROOM: "ordinary" , lit, random, random, (76,17)
+ROOM: "ordinary", lit, random, random, (76,17)
 NAME: "town"
 FOUNTAIN: (55,9)
 FOUNTAIN: (22,8)
-STAIR: random, down
-ENGRAVING: random, mark, "Welcome to the city of Angband!"
+RANDOM_PLACES:(4,6),(4,16),(18,2),(25,10),(40,13),(55,4),(58,12),(71,2),(73,15)
+STAIR: place[0], down
+ENGRAVING: place[1], mark, "Welcome to the city of Angband!"
 #
 #       The Town Watch.
 #
