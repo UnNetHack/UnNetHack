@@ -982,6 +982,7 @@ struct monst *mtmp;
 /*#define MUSE_WAN_TELEPORTATION 15*/
 #define MUSE_POT_SLEEPING 16
 #define MUSE_SCR_EARTH 17
+#define MUSE_WAN_CANCELLATION 18
 
 /* Select an offensive item/action for a monster.  Returns TRUE iff one is
  * found.
@@ -1058,6 +1059,11 @@ struct monst *mtmp;
 		if(obj->otyp == WAN_STRIKING && obj->spe > 0) {
 			m.offensive = obj;
 			m.has_offense = MUSE_WAN_STRIKING;
+		}
+		nomore(MUSE_WAN_CANCELLATION);
+		if(obj->otyp == WAN_CANCELLATION && obj->spe > 0) {
+			m.offensive = obj;
+			m.has_offense = MUSE_WAN_CANCELLATION;
 		}
 		nomore(MUSE_POT_PARALYSIS);
 		if(obj->otyp == POT_PARALYSIS && multi >= 0) {
@@ -1333,6 +1339,7 @@ struct monst *mtmp;
 		return (mtmp->mhp <= 0) ? 1 : 2;
 	case MUSE_WAN_TELEPORTATION:
 	case MUSE_WAN_STRIKING:
+	case MUSE_WAN_CANCELLATION:
 		zap_oseen = oseen;
 		mzapmsg(mtmp, otmp, FALSE);
 		otmp->spe--;
