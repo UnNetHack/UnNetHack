@@ -15,6 +15,10 @@ STATIC_DCL long FDECL(itimeout_incr, (long,int));
 STATIC_DCL void NDECL(ghost_from_bottle);
 STATIC_DCL short FDECL(mixtype, (struct obj *,struct obj *));
 
+#ifndef TESTING
+STATIC_DCL int FDECL(dip, (struct obj *,struct obj *));
+#endif
+
 /* force `val' to be within valid range for intrinsic timeout value */
 STATIC_OVL long
 itimeout(val)
@@ -1632,16 +1636,15 @@ register struct obj *obj;
 	return FALSE;
 }
 
+/** User command for dipping objects. */
 int
 dodip()
 {
 	register struct obj *potion, *obj;
-	struct obj *singlepotion;
 	const char *tmp;
 	uchar here;
 	char allowall[2];
-	short mixture;
-	char qbuf[QBUFSZ], Your_buf[BUFSZ];
+	char qbuf[QBUFSZ];
 
 	allowall[0] = ALL_CLASSES; allowall[1] = '\0';
 	if(!(obj = getobj(allowall, "dip")))
@@ -1679,6 +1682,20 @@ dodip()
 		pline("That is a potion bottle, not a Klein bottle!");
 		return 0;
 	}
+
+	return dip(potion, obj);
+}
+
+/** Dip an arbitrary object into a potion. */
+int
+dip(potion, obj)
+struct obj *potion, *obj;
+{
+	struct obj *singlepotion;
+	const char *tmp;
+	short mixture;
+	char Your_buf[BUFSZ];
+
 	potion->in_use = TRUE;		/* assume it will be used up */
 	if(potion->otyp == POT_WATER) {
 		boolean useeit = !Blind;
