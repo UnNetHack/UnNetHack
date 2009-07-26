@@ -1896,7 +1896,9 @@ struct obj *potion, *obj;
 		} else
 			pline_The("potions mix...");
 		/* KMH, balance patch -- acid is particularly unstable */
-		if (obj->cursed || obj->otyp == POT_ACID || !rn2(10)) {
+		if (obj->cursed || obj->otyp == POT_ACID ||
+		    potion->otyp == POT_ACID ||
+		    !rn2(10)) {
 			pline("BOOM!  They explode!");
 			exercise(A_STR, FALSE);
 			if (!breathless(youmonst.data) || haseyes(youmonst.data))
