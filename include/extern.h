@@ -1611,6 +1611,10 @@ E void FDECL(djinni_from_bottle, (struct obj *));
 E struct monst *FDECL(split_mon, (struct monst *,struct monst *));
 E const char *NDECL(bottlename);
 
+#ifdef TESTING
+E int FDECL(dip, (struct obj *,struct obj *));
+#endif
+
 /* ### pray.c ### */
 
 #ifdef USE_TRAMPOLI

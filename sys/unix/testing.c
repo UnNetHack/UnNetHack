@@ -1,10 +1,14 @@
-/*	SCCS Id: @(#)unixmain.c	3.4	1997/01/22	*/
+/*	SCCS Id: @(#)testing.c	3.4	1997/01/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* main.c - Unix NetHack */
+/* testing.c - Unix NetHack */
 
 #include "hack.h"
+
+#ifdef TESTING
+#include <check.h>
+
 #include "dlb.h"
 
 #include <sys/stat.h>
@@ -43,6 +47,56 @@ static void NDECL(wd_message);
 #ifdef WIZARD
 static boolean wiz_error_flag = FALSE;
 #endif
+
+/** Helper function for testing dipping an object into a potion. */
+static void *dip_object_into_potion(int typ_object,
+	int typ_potion,
+	int typ_expected,
+	char *failed_text)
+{
+	struct obj *potion = mksobj(typ_potion, TRUE, FALSE);
+	fail_unless(potion->otyp == typ_potion,
+	  "Creating of potion failed");
+	objects[potion->otyp].oc_name_known = TRUE;
+
+	struct obj *object = mksobj(typ_object, TRUE, FALSE);
+	fail_unless(object->otyp == typ_object,
+	  "Creating of object failed");
+	objects[object->otyp].oc_name_known = TRUE;
+
+	int ret = dip(potion, object);
+	objects[potion->otyp].oc_name_known = TRUE;
+	fail_unless(potion->otyp == typ_expected, failed_text);
+}
+
+START_TEST (test_dipping_potions) {
+
+	dip_object_into_potion(UNICORN_HORN, POT_BLOOD, POT_WATER,
+	  "Dipping a unicorn horn into a potion of blood "
+	  "should create a potion of water");
+
+	dip_object_into_potion(UNICORN_HORN, POT_VAMPIRE_BLOOD, POT_WATER,
+	  "Dipping a unicorn horn into a potion of vampire blood "
+	  "should create a potion of water");
+
+	dip_object_into_potion(AMETHYST, POT_BOOZE, POT_FRUIT_JUICE,
+	  "Dipping an amethyst into a potion of booze "
+	  "should create a potion of fruit juice");
+} END_TEST
+
+/** Creates the test suite for UnNetHack. */
+static Suite *test_suite(void)
+{
+	Suite *s = suite_create("all tests");
+	TCase *tc_core = tcase_create("UnNethack");
+
+	suite_add_tcase (s, tc_core);
+
+	tcase_add_test(tc_core, test_dipping_potions);
+
+	return s;
+}
+
 
 int
 main(argc,argv)
@@ -249,19 +303,16 @@ char *argv[];
 	u_init();
 
 	// moveloop();
-	struct obj *potion = mksobj(POT_BLOOD, TRUE, FALSE);
-	if (potion->otyp != POT_BLOOD) { terminate(EXIT_FAILURE); }
-	objects[potion->otyp].oc_name_known = TRUE;
-	pline("potion of blood: %s\n", xname(potion));
+	int nf;
+	Suite *s = test_suite();
+	SRunner *sr = srunner_create(s);
+	srunner_run_all(sr, CK_VERBOSE);
+	//srunner_run_all(sr, CK_NORMAL);
+	nf = srunner_ntests_failed(sr);
+	srunner_free(sr);
 
-	struct obj *horn = mksobj(UNICORN_HORN, TRUE, FALSE);
-	if (horn->otyp != UNICORN_HORN) { terminate(EXIT_FAILURE); }
-	objects[horn->otyp].oc_name_known = TRUE;
-	pline("unicorn horn: %s\n", xname(horn));
-
-	int ret = dip(potion, horn);
-	if (potion->otyp != POT_WATER) { terminate(EXIT_FAILURE); }
-	pline("ret: %d", potion->otyp);
+	/* TODO: lock file doesn't get cleaned up */
+	exit((nf == 0) ? EXIT_SUCCESS : EXIT_FAILURE);
 
 	exit(EXIT_SUCCESS);
 	/*NOTREACHED*/
@@ -517,4 +568,6 @@ char *name;
 	return;
 }
 
-/*unixmain.c*/
+#endif /* TESTING */
+
+/*testing.c*/
