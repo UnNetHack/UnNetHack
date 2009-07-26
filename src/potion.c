@@ -1453,8 +1453,8 @@ register struct obj *obj;
  *	1111	brown
  */
 
-/* Assumes gain ability is first potion and water is last */
-char alchemy_table1[POT_WATER - POT_GAIN_ABILITY];
+/* Assumes gain ability is first potion and vampire blood is last */
+char alchemy_table1[POT_VAMPIRE_BLOOD - POT_GAIN_ABILITY];
 short alchemy_table2[17];
 
 #define ALCHEMY_WHITE 0
@@ -1541,6 +1541,24 @@ STATIC_OVL short
 mixtype(o1, o2)
 register struct obj *o1, *o2;
 {
+	/* cut down on the number of cases below */
+	if (o1->oclass == POTION_CLASS &&
+	    (o2->otyp == POT_FRUIT_JUICE)) {
+		struct obj *swp;
+
+		swp = o1; o1 = o2; o2 = swp;
+	}
+	switch (o1->otyp) {
+		case POT_FRUIT_JUICE:
+			switch (o2->otyp) {
+				case POT_BLOOD:
+					return POT_BLOOD;
+				case POT_VAMPIRE_BLOOD:
+					return POT_VAMPIRE_BLOOD;
+			}
+			break;
+	}
+
 	if (o1->oclass == POTION_CLASS) {
 		int i1,i2,result;
 
