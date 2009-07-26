@@ -1442,10 +1442,10 @@ register struct obj *obj;
  *	0100	yellow
  *	0101	orange
  *	0110	emerald
- *	0111	brown
+ *	0111	ochre
  *	1000	black
  *	1001	ruby
- *	1010	brilliant blue
+ *	1010	indigo
  *	1011	magenta
  *	1100	golden
  *	1101	amber
@@ -1498,7 +1498,7 @@ alchemy_init()
 			} else if (0==strcmp(potion_desc,"emerald")) {
 				alchemy_table1[i-POT_GAIN_ABILITY]=6;
 				alchemy_table2[6]=i;
-			} else if (0==strcmp(potion_desc,"brown")) {
+			} else if (0==strcmp(potion_desc,"ochre")) {
 				alchemy_table1[i-POT_GAIN_ABILITY]=7;
 				alchemy_table2[7]=i;
 			} else if (0==strcmp(potion_desc,"black")) {
@@ -1522,7 +1522,7 @@ alchemy_init()
 			} else if (0==strcmp(potion_desc,"dark green")) {
 				alchemy_table1[i-POT_GAIN_ABILITY]=14;
 				alchemy_table2[14]=i;
-			} else if (0==strcmp(potion_desc,"ochre")) {
+			} else if (0==strcmp(potion_desc,"brown")) {
 				alchemy_table1[i-POT_GAIN_ABILITY]=15;
 				alchemy_table2[15]=i;
 			} else if (0==strcmp(potion_desc,"silver")) {
