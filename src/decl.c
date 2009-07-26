@@ -230,7 +230,7 @@ char dump_fn[PL_PSIZ] = DUMMY;
 
 NEARDATA struct c_color_names c_color_names = {
 	"black", "amber", "golden",
-	"light blue", "red", "green",
+	"light blue", "red", "orange", "green",
 	"silver", "blue", "purple",
 	"white"
 };
