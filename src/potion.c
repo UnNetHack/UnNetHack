@@ -1636,12 +1636,10 @@ int
 dodip()
 {
 	register struct obj *potion, *obj;
-	struct obj *singlepotion;
 	const char *tmp;
 	uchar here;
 	char allowall[2];
-	short mixture;
-	char qbuf[QBUFSZ], Your_buf[BUFSZ];
+	char qbuf[QBUFSZ];
 
 	allowall[0] = ALL_CLASSES; allowall[1] = '\0';
 	if(!(obj = getobj(allowall, "dip")))
@@ -1679,6 +1677,19 @@ dodip()
 		pline("That is a potion bottle, not a Klein bottle!");
 		return 0;
 	}
+
+	return dip(potion, obj);
+}
+
+int
+dip(potion, obj)
+struct obj *potion, *obj;
+{
+	struct obj *singlepotion;
+	const char *tmp;
+	short mixture;
+	char Your_buf[BUFSZ];
+
 	potion->in_use = TRUE;		/* assume it will be used up */
 	if(potion->otyp == POT_WATER) {
 		boolean useeit = !Blind;
@@ -1971,6 +1982,7 @@ dodip()
 	    return 1;
 	}
 
+	pline("potion->in_use = FALSE");
 	potion->in_use = FALSE;		/* didn't go poof */
 	if ((obj->otyp == UNICORN_HORN || obj->otyp == AMETHYST) &&
 	    (mixture = mixtype(obj, potion)) != 0) {

@@ -67,10 +67,10 @@ pline VA_DECL(const char *, line)
 	  strncpy(msgs[lastmsg], line, BUFSZ);
 	}
 #endif
-	if (!iflags.window_inited) {
+	//if (!iflags.window_inited) {
 	    raw_print(line);
 	    return;
-	}
+	//}
 #ifndef MAC
 	if (no_repeat && !strcmp(line, toplines))
 	    return;
