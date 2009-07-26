@@ -301,15 +301,16 @@ E NEARDATA struct mvitals {
 
 E NEARDATA struct c_color_names {
     const char	*const c_black, *const c_amber, *const c_golden,
-		*const c_light_blue,*const c_red, *const c_green,
-		*const c_silver, *const c_blue, *const c_purple,
-		*const c_white;
+		*const c_light_blue,*const c_red, *const c_orange,
+		*const c_green, *const c_silver, *const c_blue,
+		*const c_purple, *const c_white;
 } c_color_names;
 #define NH_BLACK		c_color_names.c_black
 #define NH_AMBER		c_color_names.c_amber
 #define NH_GOLDEN		c_color_names.c_golden
 #define NH_LIGHT_BLUE		c_color_names.c_light_blue
 #define NH_RED			c_color_names.c_red
+#define NH_ORANGE		c_color_names.c_orange
 #define NH_GREEN		c_color_names.c_green
 #define NH_SILVER		c_color_names.c_silver
 #define NH_BLUE			c_color_names.c_blue

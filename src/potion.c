@@ -13,6 +13,7 @@ static NEARDATA const char beverages[] = { POTION_CLASS, 0 };
 STATIC_DCL long FDECL(itimeout, (long));
 STATIC_DCL long FDECL(itimeout_incr, (long,int));
 STATIC_DCL void NDECL(ghost_from_bottle);
+STATIC_OVL void NDECL(alchemy_init);
 STATIC_DCL short FDECL(mixtype, (struct obj *,struct obj *));
 
 #ifndef TESTING
@@ -1427,104 +1428,198 @@ register struct obj *obj;
 	}
 }
 
+/* new alchemy scheme based on color mixing 
+ * YANI by Graham Cox <aca00gac@shef.ac.uk>
+ * Implemented by Nephi Allred <zindorsky@hotmail.com> on 15 Apr 2003
+ *
+ *	Alchemical tables are based on 4 bits describing dark/light level, yellow, blue and red
+ *
+ *	DYBR
+ *	0000	white
+ *	0001	pink
+ *	0010	sky-blue
+ *	0011	puce
+ *	0100	yellow
+ *	0101	orange
+ *	0110	emerald
+ *	0111	ochre
+ *	1000	black
+ *	1001	ruby
+ *	1010	indigo
+ *	1011	magenta
+ *	1100	golden
+ *	1101	amber
+ *	1110	dark green
+ *	1111	brown
+ */
+
+/* Assumes gain ability is first potion and vampire blood is last */
+char alchemy_table1[POT_VAMPIRE_BLOOD - POT_GAIN_ABILITY];
+short alchemy_table2[17];
+
+#define ALCHEMY_WHITE 0
+#define ALCHEMY_BLACK 8
+#define ALCHEMY_GRAY (alchemy_table2[16])
+#define IS_PRIMARY_COLOR(x)		(((x)&7)==1 || ((x)&7)==2 || ((x)&7)==4)
+#define IS_SECONDARY_COLOR(x)	(((x)&7)==3 || ((x)&7)==5 || ((x)&7)==6)
+#define IS_LIGHT_COLOR(x)		(((x)&8)==0)
+#define IS_DARK_COLOR(x)		((x)&8)
+
+/** Does a one-time set up of alchemical tables. */
+STATIC_OVL void
+alchemy_init()
+{
+	static boolean init = FALSE;
+
+	if (!init) {
+		short i;
+		const char* potion_desc;
+
+		for(i=POT_GAIN_ABILITY; i<=POT_WATER; i++) {
+			potion_desc = OBJ_DESCR(objects[i]);
+			if (0==strcmp(potion_desc,"white")) {
+				alchemy_table1[i-POT_GAIN_ABILITY]=0;
+				alchemy_table2[0]=i;
+			} else if (0==strcmp(potion_desc,"pink")) {
+				alchemy_table1[i-POT_GAIN_ABILITY]=1;
+				alchemy_table2[1]=i;
+			} else if (0==strcmp(potion_desc,"sky blue")) {
+				alchemy_table1[i-POT_GAIN_ABILITY]=2;
+				alchemy_table2[2]=i;
+			} else if (0==strcmp(potion_desc,"puce")) {
+				alchemy_table1[i-POT_GAIN_ABILITY]=3;
+				alchemy_table2[3]=i;
+			} else if (0==strcmp(potion_desc,"yellow")) {
+				alchemy_table1[i-POT_GAIN_ABILITY]=4;
+				alchemy_table2[4]=i;
+			} else if (0==strcmp(potion_desc,"orange")) {
+				alchemy_table1[i-POT_GAIN_ABILITY]=5;
+				alchemy_table2[5]=i;
+			} else if (0==strcmp(potion_desc,"emerald")) {
+				alchemy_table1[i-POT_GAIN_ABILITY]=6;
+				alchemy_table2[6]=i;
+			} else if (0==strcmp(potion_desc,"ochre")) {
+				alchemy_table1[i-POT_GAIN_ABILITY]=7;
+				alchemy_table2[7]=i;
+			} else if (0==strcmp(potion_desc,"black")) {
+				alchemy_table1[i-POT_GAIN_ABILITY]=8;
+				alchemy_table2[8]=i;
+			} else if (0==strcmp(potion_desc,"ruby")) {
+				alchemy_table1[i-POT_GAIN_ABILITY]=9;
+				alchemy_table2[9]=i;
+			} else if (0==strcmp(potion_desc,"indigo")) {
+				alchemy_table1[i-POT_GAIN_ABILITY]=10;
+				alchemy_table2[10]=i;
+			} else if (0==strcmp(potion_desc,"magenta")) {
+				alchemy_table1[i-POT_GAIN_ABILITY]=11;
+				alchemy_table2[11]=i;
+			} else if (0==strcmp(potion_desc,"golden")) {
+				alchemy_table1[i-POT_GAIN_ABILITY]=12;
+				alchemy_table2[12]=i;
+			} else if (0==strcmp(potion_desc,"amber")) {
+				alchemy_table1[i-POT_GAIN_ABILITY]=13;
+				alchemy_table2[13]=i;
+			} else if (0==strcmp(potion_desc,"dark green")) {
+				alchemy_table1[i-POT_GAIN_ABILITY]=14;
+				alchemy_table2[14]=i;
+			} else if (0==strcmp(potion_desc,"brown")) {
+				alchemy_table1[i-POT_GAIN_ABILITY]=15;
+				alchemy_table2[15]=i;
+			} else if (0==strcmp(potion_desc,"silver")) {
+				alchemy_table1[i-POT_GAIN_ABILITY]=-1;
+				alchemy_table2[16]=i;
+			} else {
+				alchemy_table1[i-POT_GAIN_ABILITY]=-1;
+			}
+		}
+		init = TRUE;
+	}
+}
+
+/** Returns the potion type when object o1 is dipped into object o2 */
 STATIC_OVL short
 mixtype(o1, o2)
 register struct obj *o1, *o2;
-/* returns the potion type when o1 is dipped in o2 */
 {
 	/* cut down on the number of cases below */
 	if (o1->oclass == POTION_CLASS &&
-	    (o2->otyp == POT_GAIN_LEVEL ||
-	     o2->otyp == POT_GAIN_ENERGY ||
-	     o2->otyp == POT_HEALING ||
-	     o2->otyp == POT_EXTRA_HEALING ||
-	     o2->otyp == POT_FULL_HEALING ||
-	     o2->otyp == POT_ENLIGHTENMENT ||
-	     o2->otyp == POT_FRUIT_JUICE)) {
+	    (o2->otyp == POT_FRUIT_JUICE)) {
 		struct obj *swp;
 
 		swp = o1; o1 = o2; o2 = swp;
 	}
-
 	switch (o1->otyp) {
-		case POT_HEALING:
-			switch (o2->otyp) {
-			    case POT_SPEED:
-			    case POT_GAIN_LEVEL:
-			    case POT_GAIN_ENERGY:
-				return POT_EXTRA_HEALING;
-			}
-		case POT_EXTRA_HEALING:
-			switch (o2->otyp) {
-			    case POT_GAIN_LEVEL:
-			    case POT_GAIN_ENERGY:
-				return POT_FULL_HEALING;
-			}
-		case POT_FULL_HEALING:
-			switch (o2->otyp) {
-			    case POT_GAIN_LEVEL:
-			    case POT_GAIN_ENERGY:
-				return POT_GAIN_ABILITY;
-			}
-		case UNICORN_HORN:
-			switch (o2->otyp) {
-			    case POT_SICKNESS:
-				return POT_FRUIT_JUICE;
-			    case POT_HALLUCINATION:
-			    case POT_BLINDNESS:
-			    case POT_CONFUSION:
-			    case POT_BLOOD:
-			    case POT_VAMPIRE_BLOOD:
-				return POT_WATER;
-			}
-			break;
-		case AMETHYST:		/* "a-methyst" == "not intoxicated" */
-			if (o2->otyp == POT_BOOZE)
-			    return POT_FRUIT_JUICE;
-			break;
-		case POT_GAIN_LEVEL:
-		case POT_GAIN_ENERGY:
-			switch (o2->otyp) {
-			    case POT_CONFUSION:
-				return (rn2(3) ? POT_BOOZE : POT_ENLIGHTENMENT);
-			    case POT_HEALING:
-				return POT_EXTRA_HEALING;
-			    case POT_EXTRA_HEALING:
-				return POT_FULL_HEALING;
-			    case POT_FULL_HEALING:
-				return POT_GAIN_ABILITY;
-			    case POT_FRUIT_JUICE:
-				return POT_SEE_INVISIBLE;
-			    case POT_BOOZE:
-				return POT_HALLUCINATION;
-			}
-			break;
 		case POT_FRUIT_JUICE:
 			switch (o2->otyp) {
-			    case POT_SICKNESS:
-				return POT_SICKNESS;
-			    case POT_BLOOD:
-				return POT_BLOOD;
-			    case POT_VAMPIRE_BLOOD:
-				return POT_VAMPIRE_BLOOD;
-			    case POT_SPEED:
-				return POT_BOOZE;
-			    case POT_GAIN_LEVEL:
-			    case POT_GAIN_ENERGY:
-				return POT_SEE_INVISIBLE;
+				case POT_BLOOD:
+					return POT_BLOOD;
+				case POT_VAMPIRE_BLOOD:
+					return POT_VAMPIRE_BLOOD;
 			}
 			break;
-		case POT_ENLIGHTENMENT:
-			switch (o2->otyp) {
-			    case POT_LEVITATION:
-				if (rn2(3)) return POT_GAIN_LEVEL;
+	}
+
+	if (o1->oclass == POTION_CLASS) {
+		int i1,i2,result;
+
+		alchemy_init();
+		i1 = alchemy_table1[o1->otyp-POT_GAIN_ABILITY];
+		i2 = alchemy_table1[o2->otyp-POT_GAIN_ABILITY];
+		
+		/* check that both potions are of mixable types */
+		if (i1<0 || i2<0)
+			return 0;
+
+		/* swap for simplified checks */
+		if (i2==ALCHEMY_WHITE || (i2==ALCHEMY_BLACK && i1!=ALCHEMY_WHITE)) {
+			result = i1;
+			i1 = i2;
+			i2 = result;
+		}
+
+		if (i1==ALCHEMY_WHITE && i2==ALCHEMY_BLACK) {
+			return ALCHEMY_GRAY;
+		} else if (	(IS_PRIMARY_COLOR(i1) && IS_PRIMARY_COLOR(i2))
+					|| (IS_SECONDARY_COLOR(i1) && IS_SECONDARY_COLOR(i2)) ) {
+			/* bitwise OR simulates pigment addition */
+			result = i1 | i2;
+			/* adjust light/dark level if necessary */
+			if ((i1^i2)&8) {
+				if (o1->odiluted==o2->odiluted) {
+					/* same dilution level, randomly toggle */
+					result ^= (rn2(2)<<3);
+				} else {
+					/* use dark/light level of undiluted potion */
+					result ^= (o1->odiluted ? i1:i2)&8;
+				}
+			}
+		} else if ((i1==ALCHEMY_WHITE && IS_DARK_COLOR(i2)) ||
+		           (i1==ALCHEMY_BLACK && IS_LIGHT_COLOR(i2))) {
+			/* toggle light/dark bit */
+			result = i2 ^ 8;
+		} else {
+			return 0;
+		}
+		return alchemy_table2[result];
+	} else {
+		switch (o1->otyp) {
+			case UNICORN_HORN:
+				switch (o2->otyp) {
+					case POT_SICKNESS:
+						return POT_FRUIT_JUICE;
+					case POT_HALLUCINATION:
+					case POT_BLINDNESS:
+					case POT_CONFUSION:
+					case POT_BLOOD:
+					case POT_VAMPIRE_BLOOD:
+						return POT_WATER;
+				}
 				break;
-			    case POT_FRUIT_JUICE:
-				return POT_BOOZE;
-			    case POT_BOOZE:
-				return POT_CONFUSION;
-			}
-			break;
+			case AMETHYST:		/* "a-methyst" == "not intoxicated" */
+				if (o2->otyp == POT_BOOZE)
+					return POT_FRUIT_JUICE;
+				break;
+		}
 	}
 
 	return 0;
@@ -1553,7 +1648,8 @@ register struct obj *obj;
 		if (obj->otyp == POT_ACID) {
 			pline("It boils vigorously!");
 			You("are caught in the explosion!");
-			losehp(rnd(10), "elementary chemistry", KILLED_BY);
+			losehp(Acid_resistance ? rnd(5) : rnd(10),
+			       "elementary chemistry", KILLED_BY);
 			makeknown(obj->otyp);
 			update_inventory();
 			return (TRUE);
@@ -1792,16 +1888,25 @@ struct obj *potion, *obj;
 	    return(1);
 	} else if(obj->oclass == POTION_CLASS && obj->otyp != potion->otyp) {
 		/* Mixing potions is dangerous... */
-		pline_The("potions mix...");
+		/* Give a clue to what's going on ... */
+		if(potion->dknown && obj->dknown) {
+			You("mix the %s potion with the %s one ...", 
+				OBJ_DESCR(objects[potion->otyp]),
+				OBJ_DESCR(objects[obj->otyp]));
+		} else
+			pline_The("potions mix...");
 		/* KMH, balance patch -- acid is particularly unstable */
-		if (obj->cursed || obj->otyp == POT_ACID || !rn2(10)) {
+		if (obj->cursed || obj->otyp == POT_ACID ||
+		    potion->otyp == POT_ACID ||
+		    !rn2(10)) {
 			pline("BOOM!  They explode!");
 			exercise(A_STR, FALSE);
 			if (!breathless(youmonst.data) || haseyes(youmonst.data))
 				potionbreathe(obj);
 			useup(obj);
 			useup(potion);
-			losehp(rnd(10), "alchemic blast", KILLED_BY_AN);
+			losehp(Acid_resistance ? rnd(5) : rnd(10),
+			       "alchemic blast", KILLED_BY_AN);
 			return(1);
 		}
 
@@ -1871,6 +1976,14 @@ struct obj *potion, *obj;
 		goto poof;
 	}
 #endif
+	if (potion->otyp == POT_ACID && obj->otyp == CORPSE &&
+	    obj->corpsenm == PM_LICHEN && !Blind) {
+		pline("%s %s %s around the edges.", The(cxname(obj)),
+		      otense(obj, "turn"),
+		      potion->odiluted ? hcolor(NH_ORANGE) : hcolor(NH_RED));
+		potion->in_use = FALSE;	/* didn't go poof */
+		return(1);
+	}
 
 	if(is_poisonable(obj)) {
 	    if(potion->otyp == POT_SICKNESS && !obj->opoisoned) {
