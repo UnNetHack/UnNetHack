@@ -1648,7 +1648,8 @@ register struct obj *obj;
 		if (obj->otyp == POT_ACID) {
 			pline("It boils vigorously!");
 			You("are caught in the explosion!");
-			losehp(rnd(10), "elementary chemistry", KILLED_BY);
+			losehp(Acid_resistance ? rnd(5) : rnd(10),
+			       "elementary chemistry", KILLED_BY);
 			makeknown(obj->otyp);
 			update_inventory();
 			return (TRUE);
@@ -1902,7 +1903,8 @@ struct obj *potion, *obj;
 				potionbreathe(obj);
 			useup(obj);
 			useup(potion);
-			losehp(rnd(10), "alchemic blast", KILLED_BY_AN);
+			losehp(Acid_resistance ? rnd(5) : rnd(10),
+			       "alchemic blast", KILLED_BY_AN);
 			return(1);
 		}
 
