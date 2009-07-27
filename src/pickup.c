@@ -1560,13 +1560,14 @@ lootcont:
 		    pline("Hmmm, it seems to be locked.");
 		    continue;
 		}
-		if (cobj->otyp == BAG_OF_TRICKS) {
+		if (cobj->otyp == BAG_OF_TRICKS && cobj->spe>0) {
 		    int tmp;
 		    You("carefully open the bag...");
-		    pline("It develops a huge set of teeth and bites you!");
+		    pline("It develops a huge set of %s you!", 
+				Hallucination ? "lips and kisses":"teeth and bites");
 		    tmp = rnd(10);
 		    if (Half_physical_damage) tmp = (tmp+1) / 2;
-		    losehp(tmp, "carnivorous bag", KILLED_BY_AN);
+		    losehp(tmp, Hallucination ? "amorous bag":"carnivorous bag", KILLED_BY_AN);
 		    makeknown(BAG_OF_TRICKS);
 		    timepassed = 1;
 		    continue;

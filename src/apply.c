@@ -2839,7 +2839,7 @@ doapply()
 		res = use_container(obj, 1);
 		break;
 	case BAG_OF_TRICKS:
-		bagotricks(obj);
+		res = bagotricks(obj);
 		break;
 	case CAN_OF_GREASE:
 		use_grease(obj);
