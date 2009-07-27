@@ -155,6 +155,9 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* QWERTZ keyboard layout support */
+#undef QWERTZ
+
 /* Shuffling order of Elemental Planes */
 #undef RANDOMIZED_PLANES
 

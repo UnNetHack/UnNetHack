@@ -772,6 +772,7 @@ enable_show_extinct
 enable_dungeon_growth
 enable_goldobj
 enable_autopickup_exceptions
+enable_qwertz
 enable_simple_mail
 enable_xlogfile
 enable_livelog
@@ -1460,6 +1461,7 @@ Optional Features:
                           (default=no)
   --enable-autopickup-exceptions
                           Exceptions to autopickup (experimental) (default=no)
+  --enable-qwertz         QWERTZ keyboard layout support (default=yes)
   --enable-simple-mail    simple mail dgamelaunch support (default=no)
   --enable-xlogfile=FILE  More verbose logfile (default=yes, default
                           file=xlogfile)
@@ -7463,7 +7465,25 @@ _ACEOF
 
    fi
 
-#NETHACK_ARG(qwertz,[QWERTZ keyboard layout support],QWERTZ,yes)
+{ $as_echo "$as_me:$LINENO: checking whether to enable qwertz" >&5
+$as_echo_n "checking whether to enable qwertz... " >&6; }
+   # Check whether --enable-qwertz was given.
+if test "${enable_qwertz+set}" = set; then
+  enableval=$enable_qwertz;
+else
+  enable_qwertz="yes"
+fi
+
+   { $as_echo "$as_me:$LINENO: result: $enable_qwertz" >&5
+$as_echo "$enable_qwertz" >&6; }
+   if test "$enable_qwertz" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define QWERTZ /**/
+_ACEOF
+
+   fi
+
 { $as_echo "$as_me:$LINENO: checking whether to enable simple-mail" >&5
 $as_echo_n "checking whether to enable simple-mail... " >&6; }
    # Check whether --enable-simple-mail was given.

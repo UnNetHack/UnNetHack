@@ -391,7 +391,7 @@ NETHACK_ARG(dungeon-growth,[Dungeon growth],DUNGEON_GROWTH,yes)
 NETHACK_ARG(goldobj,[Gold is kept on object chains (experimental)],GOLDOBJ,no)
 NETHACK_ARG(autopickup-exceptions,[Exceptions to autopickup (experimental)],
   AUTOPICKUP_EXCEPTIONS,no)
-#NETHACK_ARG(qwertz,[QWERTZ keyboard layout support],QWERTZ,yes)
+NETHACK_ARG(qwertz,[QWERTZ keyboard layout support],QWERTZ,yes)
 NETHACK_ARG(simple-mail,[simple mail dgamelaunch support],SIMPLE_MAIL,no)
 
 NETHACK_ARG_WITH_PARAM(xlogfile,[More verbose logfile],XLOGFILE,yes,FILE,[xlogfile])
