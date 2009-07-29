@@ -1009,6 +1009,11 @@ static const char * const bogusmons[] = {
 	"three-headed monkey",			/* Monkey Island */
 	"little green man",			/* modern folklore */
 	"weighted Companion Cube",		/* Portal */
+	"/b/tard",				/* /b/ */
+	"manbearpig",				/* South Park */
+	"ceiling cat", "basement cat",
+	"monorail cat",				/* the Internet is made for cat pix */
+	"rape golem",				/* schnippi */
 };
 
 
