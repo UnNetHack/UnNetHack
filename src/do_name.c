@@ -1062,7 +1062,7 @@ roguename() /* Name of a Rogue player */
 static NEARDATA const char * const hcolors[] = {
 	"ultraviolet", "infrared", "bluish-orange",
 	"reddish-green", "dark white", "light black", "sky blue-pink",
-	"salty", "sweet", "sour", "bitter",
+	"salty", "sweet", "sour", "bitter", "umami",
 	"striped", "spiral", "swirly", "plaid", "checkered", "argyle",
 	"paisley", "blotchy", "guernsey-spotted", "polka-dotted",
 	"square", "round", "triangular",
