@@ -33,7 +33,8 @@ static const char * const shkliquors[] = {
     "Brzeg", "Krnov", "Hradec Kralove",
     /* Schweiz */
     "Leuk", "Brig", "Brienz", "Thun", "Sarnen", "Burglen", "Elm",
-    "Flims", "Vals", "Schuls", "Zum Loch",
+    "Flims", "Vals", "Scuol", 
+    "Chur", "Pagig",
     0
 };
 
