@@ -232,7 +232,7 @@ boolean on, silently;
     int which = (int) objects[obj->otyp].oc_oprop;
 
     unseen = !canseemon(mon);
-	if (Is_gold_dragon_armor(obj)) {
+	if (Is_gold_dragon_armor(obj->otyp)) {
 		if (on)
 			begin_burn(obj,FALSE);
 		else

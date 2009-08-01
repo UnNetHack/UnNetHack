@@ -584,6 +584,13 @@ forget_single_object(obj_id)
 	}
 	undiscover_object(obj_id);	/* after clearing oc_name_known */
 
+	if (Is_dragon_scales(obj_id) &&
+	    objects[Dragon_scales_to_mail(obj_id)].oc_name_known)
+		forget_single_object(Dragon_scales_to_mail(obj_id));
+	else if (Is_dragon_mail(obj_id) &&
+	         objects[Dragon_mail_to_scales(obj_id)].oc_name_known)
+		forget_single_object(Dragon_mail_to_scales(obj_id));
+
 	/* clear & free object names from matching inventory items too? */
 }
 

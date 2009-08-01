@@ -550,7 +550,7 @@ STATIC_PTR
 int
 Armor_on()
 {
-	if (Is_gold_dragon_armor(uarm)) {
+	if (uarm && Is_gold_dragon_armor(uarm->otyp)) {
 		begin_burn(uarm,FALSE);
 		if (!Blind)
 			pline("%s to glow.",Tobjnam(uarm,"begin"));
@@ -561,7 +561,7 @@ Armor_on()
 int
 Armor_off()
 {
-	if (Is_gold_dragon_armor(uarm)) {
+	if (uarm && Is_gold_dragon_armor(uarm->otyp)) {
 		end_burn(uarm,FALSE);
 		if (!Blind)
 			pline("%s glowing.",Tobjnam(uarm,"stop"));
@@ -578,7 +578,7 @@ Armor_off()
 int
 Armor_gone()
 {
-	if (Is_gold_dragon_armor(uarm))
+	if (uarm && Is_gold_dragon_armor(uarm->otyp))
 		end_burn(uarm,FALSE);
 	takeoff_mask &= ~W_ARM;
     setnotworn(uarm);
@@ -1097,10 +1097,9 @@ dotakeoff()
 #endif
 	}
 	if (!armorpieces) {
-	     /* assert( GRAY_DRAGON_SCALES > YELLOW_DRAGON_SCALE_MAIL ); */
 		if (uskin)
 		    pline_The("%s merged with your skin!",
-			      uskin->otyp >= GRAY_DRAGON_SCALES ?
+			      Is_dragon_scales(uskin->otyp) ?
 				"dragon scales are" : "dragon scale mail is");
 		else
 		    pline("Not wearing any armor.%s", (iflags.cmdassist && 

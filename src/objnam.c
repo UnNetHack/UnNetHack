@@ -301,10 +301,8 @@ register struct obj *obj;
 			mons[obj->corpsenm].mname);
 		break;
 	    case ARMOR_CLASS:
-		/* depends on order of the dragon scales objects */
-		if (typ >= GRAY_DRAGON_SCALES && typ <= YELLOW_DRAGON_SCALES) {
-			Sprintf(buf, "set of %s", actualn);
-			break;
+		if (Is_dragon_scales(obj)) {
+			Strcat(buf, "set of ");
 		}
 		if(is_boots(obj) || is_gloves(obj)) Strcpy(buf,"pair of ");
 

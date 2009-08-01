@@ -509,7 +509,8 @@ register char sym;
 {
 	register int ct;
 	for (ct = 1; ct < NUM_OBJECTS; ct++)
-		if (objects[ct].oc_class == sym && !objects[ct].oc_magic)
+		if (objects[ct].oc_class == sym && !objects[ct].oc_magic &&
+		    !Is_dragon_armor(ct))
 			knows_object(ct);
 }
 

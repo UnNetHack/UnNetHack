@@ -250,15 +250,15 @@ int old_relative_position,  /* old position of dragon scales */
 	int old_pos = old_relative_position + first;
 	int new_pos = new_relative_position + first;
 
-	tmp.oc_name_idx = objects[old_pos].oc_name_idx;
+	tmp.oc_descr_idx = objects[old_pos].oc_descr_idx;
 	tmp.oc_color    = objects[old_pos].oc_color;
 	tmp.oc_cost     = objects[old_pos].oc_cost;
 
-	objects[old_pos].oc_name_idx = objects[new_pos].oc_name_idx;
+	objects[old_pos].oc_descr_idx = objects[new_pos].oc_descr_idx;
 	objects[old_pos].oc_color    = objects[new_pos].oc_color;
 	objects[old_pos].oc_cost     = objects[new_pos].oc_cost;
 
-	objects[new_pos].oc_name_idx = tmp.oc_name_idx; 
+	objects[new_pos].oc_descr_idx = tmp.oc_descr_idx; 
 	objects[new_pos].oc_color    = tmp.oc_color; 
 	objects[new_pos].oc_cost     = tmp.oc_cost;
 }
@@ -355,6 +355,11 @@ boolean credit_hero;
 	if (mark_as_known) {
 	    objects[oindx].oc_name_known = 1;
 	    if (credit_hero) exercise(A_WIS, TRUE);
+
+	    if (Is_dragon_scales(oindx))
+		discover_object(Dragon_scales_to_mail(oindx), mark_as_known, FALSE);
+	    else if (Is_dragon_mail(oindx))
+		discover_object(Dragon_mail_to_scales(oindx), mark_as_known, FALSE);
 	}
 	if (moves > 1L) update_inventory();
     }
@@ -381,6 +386,7 @@ register int oindx;
 	/* clear last slot */
 	if (found) disco[dindx-1] = 0;
 	else impossible("named object not in disco");
+
 	update_inventory();
     }
 }
@@ -484,7 +490,7 @@ dragons_init()
 	}
 	/* copy name and color to new positions */
 	for (i=0; i < ndragons; i++) {
-		j = objects[i+GRAY_DRAGON_SCALES].oc_name_idx-GRAY_DRAGON_SCALES;
+		j = objects[i+GRAY_DRAGON_SCALES].oc_descr_idx-GRAY_DRAGON_SCALES;
 		mons[i+PM_GRAY_DRAGON].mname  = tmp[j].mname;
 		mons[i+PM_GRAY_DRAGON].mcolor = tmp[j].mcolor;
 		mons[i+PM_BABY_GRAY_DRAGON].mname  = baby_tmp[j].mname;
