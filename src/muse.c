@@ -1714,9 +1714,9 @@ struct monst *mon;
 	struct obj *m_armr;
 
 	if ((m_armr = which_armor(mon, W_ARM)) != 0) {
-	    if (Is_dragon_scales(m_armr))
+	    if (Is_dragon_scales(m_armr->otyp))
 		return Dragon_scales_to_pm(m_armr);
-	    else if (Is_dragon_mail(m_armr))
+	    else if (Is_dragon_mail(m_armr->otyp))
 		return Dragon_mail_to_pm(m_armr);
 	}
 	return rndmonst();

@@ -710,15 +710,15 @@ OBJECT[50%]:'*',random,random
 OBJECT[50%]:'*',random,random
 OBJECT[50%]:random,random,random
 OBJECT[50%]:random,random,random
-MONSTER:'D',"red dragon",random,asleep
-MONSTER:'D',"red dragon",random,asleep
-MONSTER:'D',"red dragon",random,asleep
-MONSTER:'D',"red dragon",random,asleep
-MONSTER:'D',"red dragon",random,asleep
-MONSTER:'D',"red dragon",random,asleep
-MONSTER:'D',"red dragon",random,asleep
-MONSTER:'D',"red dragon",random,asleep
-MONSTER:'D',"red dragon",random,asleep
+MONSTER:'D',"draken",random,asleep
+MONSTER:'D',"draken",random,asleep
+MONSTER:'D',"draken",random,asleep
+MONSTER:'D',"draken",random,asleep
+MONSTER:'D',"draken",random,asleep
+MONSTER:'D',"draken",random,asleep
+MONSTER:'D',"draken",random,asleep
+MONSTER:'D',"draken",random,asleep
+MONSTER:'D',"draken",random,asleep
 TRAP[50%]:random,random
 TRAP[50%]:random,random
 GOLD:random,random
