@@ -308,8 +308,7 @@ struct obj *obj;
 #ifdef LIVELOGFILE
 		livelog_achieve_update();
 #endif
-	} else if((obj->otyp == AMULET_OF_REFLECTION ||
-	           obj->otyp == BAG_OF_HOLDING) &&
+	} else if(Is_sokoend_level(&u.uz) &&
 	          obj->record_achieve_special) {
 		achieve.finish_sokoban = 1;
 		obj->record_achieve_special = 0;
