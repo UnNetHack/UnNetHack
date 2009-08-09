@@ -86,8 +86,10 @@ register boolean clumsy;
 	if (blessed_foot_damage) dmg += rnd(4);
 	if (uarmf) dmg += uarmf->spe;
 	dmg += u.udaminc;	/* add ring(s) of increase damage */
-	if (dmg > 0)
+	if (dmg > 0) {
 		mon->mhp -= dmg;
+		showdmg(dmg, FALSE);
+	}
 	if (mon->mhp > 0 && martial() && !bigmonst(mon->data) && !rn2(3) &&
 	    mon->mcanmove && mon != u.ustuck && !mon->mtrapped) {
 		/* see if the monster has a place to move into */

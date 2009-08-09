@@ -2479,12 +2479,33 @@ maybe_wail()
     }
 }
 
+/** Print the amount n of damage inflicted.
+ * In contrast to Slash'Em, in UnNetHack the damage is only shown in
+ * Wizard mode.
+ */
+void
+showdmg(n,you)
+int n; /**< amount of damage inflicted */
+boolean you; /**< true, if you are hit */
+{
+#ifdef WIZARD
+	if (iflags.showdmg && wizard && n > 0) {
+		if (you)
+			pline("[%d pts.]", n);
+		else
+			pline("(%d pts.)", n);
+	}
+#endif
+}
+
 void
 losehp(n, knam, k_format)
 register int n;
 register const char *knam;
 boolean k_format;
 {
+	showdmg(n, TRUE);
+
 	if (Upolyd) {
 		u.mh -= n;
 		if (u.mhmax < u.mh) u.mhmax = u.mh;

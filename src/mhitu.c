@@ -2202,6 +2202,7 @@ mdamageu(mtmp, n)	/* mtmp hits you for n points damage */
 register struct monst *mtmp;
 register int n;
 {
+	showdmg(n, TRUE);
 	flags.botl = 1;
 	if (Upolyd) {
 		u.mh -= n;

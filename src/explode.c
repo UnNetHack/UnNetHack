@@ -298,6 +298,8 @@ int expltype;
 				mdam *= 2;
 			mtmp->mhp -= mdam;
 			mtmp->mhp -= (idamres + idamnonres);
+			if (mtmp->mhp > 0)
+				showdmg(mdam + idamres + idamnonres, FALSE);
 		}
 		if (mtmp->mhp <= 0) {
 			/* KMH -- Don't blame the player for pets killing gas spores */
@@ -332,6 +334,7 @@ int expltype;
 		    else
 			u.uhp -= damu;
 		    flags.botl = 1;
+		    showdmg(damu, TRUE);
 		}
 
 		if (u.uhp <= 0 || (Upolyd && u.mh <= 0)) {

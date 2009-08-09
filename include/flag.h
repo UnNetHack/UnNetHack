@@ -235,6 +235,7 @@ struct instance_flags {
 #ifdef SHOW_BORN
 	boolean show_born;	/* show numbers of created monsters */
 #endif
+	boolean showdmg;	/* show damage */
 /*
  * Window capability support.
  */

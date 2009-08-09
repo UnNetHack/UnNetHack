@@ -1191,6 +1191,8 @@ int thrown;
 		}
 	}
 
+	if (!destroyed) showdmg(tmp, FALSE);
+
 	return((boolean)(destroyed ? FALSE : TRUE));
 }
 
@@ -1694,6 +1696,7 @@ register struct attack *mattk;
 			}
 			pline("%s suddenly seems weaker!", Monnam(mdef));
 			mdef->mhpmax -= xtmp;
+			if (xtmp < mdef->mhp) showdmg(xtmp, FALSE);
 			if ((mdef->mhp -= xtmp) <= 0 || !mdef->m_lev) {
 				pline("%s dies!", Monnam(mdef));
 				xkilled(mdef,0);
@@ -1868,6 +1871,8 @@ register struct attack *mattk;
 	    default:	tmp = 0;
 		break;
 	}
+
+	if (tmp < mdef->mhp) showdmg(tmp, FALSE);
 
 	mdef->mstrategy &= ~STRAT_WAITFORU; /* in case player is very fast */
 	if((mdef->mhp -= tmp) < 1) {

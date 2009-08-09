@@ -3409,6 +3409,8 @@ register int dx,dy;
 	    u.ustuck->mhp = 0;
 	if (u.ustuck->mhp < 1)
 	    killed(u.ustuck);
+	else
+	    showdmg(tmp, FALSE);
 	return;
     }
     if(type < 0) newsym(u.ux,u.uy);
@@ -3542,6 +3544,7 @@ register int dx,dy;
 			if (mon_could_move && !mon->mcanmove)	/* ZT_SLEEP */
 			    slept_monst(mon);
 		    }
+		    if (mon->mhp > 0) showdmg(tmp, FALSE);
 		}
 		range -= 2;
 	    } else {
