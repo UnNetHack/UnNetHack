@@ -270,7 +270,7 @@ choke(food)	/* To a full belly all food is bad. (It.) */
 		if(food) {
 			You("choke over your %s.", foodword(food));
 			if (food->oclass == COIN_CLASS) {
-				killer = "a very rich meal";
+				killer = "very rich meal";
 			} else {
 				killer = food_xname(food, FALSE);
 				if (food->otyp == CORPSE &&
