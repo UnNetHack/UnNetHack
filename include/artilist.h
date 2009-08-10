@@ -129,7 +129,7 @@ A("Ogresmasher",		WAR_HAMMER,
 	PHYS(5,0),	NO_DFNS,	NO_CARY,	0, A_NONE, NON_PM, NON_PM, 200L ),
 
 A("Trollsbane",			MORNING_STAR,
-	(SPFX_WARN_S|SPFX_RESTR|SPFX_DCLAS), 0, S_TROLL,
+	(SPFX_WARN_S|SPFX_RESTR|SPFX_DCLAS|SPFX_REGEN), 0, S_TROLL,
 	PHYS(5,0),	NO_DFNS,	NO_CARY,	0, A_NONE, NON_PM, NON_PM, 200L ),
 /*
  *	Two problems:  1) doesn't let trolls regenerate heads,
