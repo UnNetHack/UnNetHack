@@ -1498,7 +1498,8 @@ doputon()
 		Your("%s%s are full, and you're already wearing an amulet and %s.",
 			humanoid(youmonst.data) ? "ring-" : "",
 			makeplural(body_part(FINGER)),
-			ublindf->otyp==LENSES ? "some lenses" : "a blindfold");
+			ublindf->otyp==LENSES ? "some lenses" :
+			ublindf->otyp==TOWEL ? "a towel" : "a blindfold");
 		return(0);
 	}
 	otmp = getobj(accessories, "put on");

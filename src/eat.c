@@ -1379,7 +1379,7 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 
 	if (mnum != PM_ACID_BLOB && !stoneable && rotted > 5L) {
 		boolean cannibal = maybe_cannibal(mnum, FALSE);
-		pline("Ulch - that %s was tainted%s!",
+		pline("Ulch!  That %s was tainted%s!",
 		      mons[mnum].mlet == S_FUNGUS ? "fungoid vegetation" :
 		      !vegetarian(&mons[mnum]) ? "meat" : "protoplasm",
 		      cannibal ? " cannibal" : "");
@@ -2056,7 +2056,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 		    else
 			otmp = splitobj(otmp, 1L);
 		}
-		pline("Ulch - That %s was rustproofed!", xname(otmp));
+		pline("Ulch!  That %s was rustproofed!", xname(otmp));
 		/* The regurgitated object's rustproofing is gone now */
 		otmp->oerodeproof = 0;
 		make_stunned(HStun + rn2(10), TRUE);
