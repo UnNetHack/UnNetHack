@@ -1456,6 +1456,18 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 		  ? "is delicious" : "tastes terrible");
 	}
 
+	if ((amorphous(&mons[mnum]) || slithy(&mons[mnum]) ||
+	     mons[mnum].mlet == S_BLOB) &&
+	    mons[mnum].mlet != S_SNAKE && mons[mnum].mlet != S_NAGA &&
+	    mons[mnum].mlet != S_MIMIC && rnf(1,5)) {
+		pline("Eating this %s corpse makes your %s %s slippery.",
+		      (slithy(&mons[mnum]) && mons[mnum].mlet != S_EEL) ?
+		       "oily" : "slimy",
+		      makeplural(body_part(FINGER)),
+		      Glib ? "even more" : "very");
+		incr_itimeout(&Glib, rnd(15));
+	}
+
 	return(retcode);
 }
 
