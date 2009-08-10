@@ -2347,7 +2347,7 @@ the kami of %H before you return again.
 "%nC has hired the Ninja -- be careful."
 %E
 %Cp Sam 00009
-"If %o is not returned, we will all be ninja."
+"If %o is not returned, we will all be ronin."
 %E
 %Cp Sam 00010
 "Come, join us in celebrating with some sake."
