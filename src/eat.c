@@ -1456,13 +1456,14 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 		  ? "is delicious" : "tastes terrible");
 	}
 
+	/* Eating slimy or oily corpses make your fingers slippery.
+	   Note: Snakes are not slimy. */
 	if ((amorphous(&mons[mnum]) || slithy(&mons[mnum]) ||
 	     mons[mnum].mlet == S_BLOB) &&
 	    mons[mnum].mlet != S_SNAKE && mons[mnum].mlet != S_NAGA &&
 	    mons[mnum].mlet != S_MIMIC && rnf(1,5)) {
 		pline("Eating this %s corpse makes your %s %s slippery.",
-		      (slithy(&mons[mnum]) && mons[mnum].mlet != S_EEL) ?
-		       "oily" : "slimy",
+		      amorphous(&mons[mnum]) ? "glibbery" : "slimy",
 		      makeplural(body_part(FINGER)),
 		      Glib ? "even more" : "very");
 		incr_itimeout(&Glib, rnd(15));
