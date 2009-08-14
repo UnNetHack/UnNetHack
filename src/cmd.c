@@ -881,6 +881,11 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	if (wizard) {
 		Sprintf(buf, " %d / %ld", u.ualign.record, ALIGNLIM);
 		enl_msg("Your alignment ", "is", "was", buf);
+		Sprintf(buf, " %d - %d",
+		        min_monster_difficulty(), max_monster_difficulty());
+		enl_msg("Monster difficulty range ", "is", "was", buf);
+		Sprintf(buf, " %d", level_difficulty());
+		enl_msg("Level difficulty ", "is", "was", buf);
 	}
 #endif
 

@@ -1204,6 +1204,32 @@ register struct permonst *ptr;
     return alshift;
 }
 
+/** Returns the level of the weakest monster to make. */
+int
+min_monster_difficulty()
+{
+	int zlevel = level_difficulty();
+	if (u.uevent.udemigod) {
+		/* all hell breaks loose */
+		return zlevel / 4;
+	} else {
+		return zlevel / 6;
+	}
+}
+
+/** Returns the level of the strongest monster to make. */
+int
+max_monster_difficulty()
+{
+	int zlevel = level_difficulty();
+	if (u.uevent.udemigod) {
+		/* all hell breaks loose */
+		return monstr[PM_DEMOGORGON];
+	} else {
+		return (zlevel + u.ulevel) / 2;
+	}
+}
+
 static NEARDATA struct {
 	int choice_count;
 	char mchoices[SPECIAL_PM];	/* value range is 0..127 */
@@ -1220,7 +1246,7 @@ rndmonst()
 	    return ptr;
 
 	if (rndmonst_state.choice_count < 0) {	/* need to recalculate */
-	    int zlevel, minmlev, maxmlev;
+	    int minmlev, maxmlev;
 	    boolean elemlevel;
 #ifdef REINCARNATION
 	    boolean upper;
@@ -1239,11 +1265,8 @@ rndmonst()
 #endif
 		return (struct permonst *)0;
 	    } /* else `mndx' now ready for use below */
-	    zlevel = level_difficulty();
-	    /* determine the level of the weakest monster to make. */
-	    minmlev = zlevel / 6;
-	    /* determine the level of the strongest monster to make. */
-	    maxmlev = (zlevel + u.ulevel) / 2;
+	    minmlev = min_monster_difficulty();
+	    maxmlev = max_monster_difficulty();
 #ifdef REINCARNATION
 	    upper = Is_rogue_level(&u.uz);
 #endif
