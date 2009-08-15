@@ -134,8 +134,6 @@ STATIC_DCL int mrank_sz;
 STATIC_OVL NEARDATA int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
 #endif /* OVLB */
 
-STATIC_DCL const char *NDECL(rank);
-
 #ifdef OVL1
 
 /* convert experience level (1..30) to rank index (0..8) */
@@ -186,7 +184,7 @@ rank_of(lev, monnum, female)
 }
 
 
-STATIC_OVL const char *
+const char *
 rank()
 {
 	return(rank_of(u.ulevel, Role_switch, flags.female));

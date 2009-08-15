@@ -139,6 +139,10 @@ struct monst {
 	long misc_worn_check;
 	xchar weapon_check;
 
+#ifdef LIVELOG_BONES_KILLER
+	char former_rank[25];	/* for bones' ghost rank in the former life */
+#endif
+
 	uchar mnamelth;		/* length of name (following mxlth) */
 	short mxlth;		/* length of following data */
 	/* in order to prevent alignment problems mextra should

@@ -430,6 +430,8 @@ typedef unsigned char	uchar;
  */
 #define WEBB_DISINT /* Disintegrator - Nicholas Webb */
 #define ASTRAL_ESCAPE /* Allow escape from Astral plane (with the Amulet) - CWC */
+/* #define LIVELOG_BONES_KILLER */ /* Report if a ghost of a former player is
+                                    * killed - Patric Mueller (15 Aug 2009) */
 
 /* End of Section 6 */
 
