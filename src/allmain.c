@@ -13,6 +13,7 @@
 #ifdef POSITIONBAR
 STATIC_DCL void NDECL(do_positionbar);
 #endif
+STATIC_DCL void FDECL(interrupt_multi, (const char *,int,int));
 
 #ifdef OVL0
 
@@ -170,6 +171,7 @@ moveloop()
 				    (wtcap < MOD_ENCUMBER && !(moves%20))) {
 			    flags.botl = 1;
 			    u.mh++;
+			    interrupt_multi("Hit points", u.mh, u.mhmax);
 			}
 		    } else if (u.uhp < u.uhpmax &&
 			 (wtcap < MOD_ENCUMBER || !u.umoved || Regeneration)) {
@@ -186,11 +188,13 @@ moveloop()
 			    u.uhp += heal;
 			    if(u.uhp > u.uhpmax)
 				u.uhp = u.uhpmax;
+			    interrupt_multi("Hit points", u.uhp, u.uhpmax);
 			} else if (Regeneration ||
 			     (u.ulevel <= 9 &&
 			      !(moves % ((MAXULEV+12) / (u.ulevel+2) + 1)))) {
 			    flags.botl = 1;
 			    u.uhp++;
+			    interrupt_multi("Hit points", u.uhp, u.uhpmax);
 			}
 		    }
 
@@ -217,6 +221,7 @@ moveloop()
 			u.uen += rn1((int)(ACURR(A_WIS) + ACURR(A_INT)) / 15 + 1,1);
 			if (u.uen > u.uenmax)  u.uen = u.uenmax;
 			flags.botl = 1;
+			interrupt_multi("Magic energy", u.uen, u.uenmax);
 		    }
 
 		    if(!u.uinvulnerable) {
@@ -683,7 +688,21 @@ get_realtime(void)
 }
 #endif /* REALTIME_ON_BOTL || RECORD_REALTIME */
 
-
 #endif /* OVLB */
+
+/** Interrupt a multiturn action if current_points is equal to max_points. */
+STATIC_DCL
+void
+interrupt_multi(points, current_points, max_points)
+const char *points;
+int current_points;
+int max_points;
+{
+	if (multi > 0 &&
+	    current_points == max_points) {
+		nomul(0);
+		if (flags.verbose) pline("%s restored.", points);
+	}
+}
 
 /*allmain.c*/
