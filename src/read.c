@@ -1783,6 +1783,23 @@ boolean only_on_level; /**< if TRUE only genocide monsters on current level,
 		    } else return;
 		}
 
+#ifdef WIZARD	/* to aid in topology testing; remove pesky monsters */
+		/* copy from do_class_genocide */
+		if (wizard && buf[0] == '*') {
+			register struct monst *mtmp, *mtmp2;
+
+			int gonecnt = 0;
+			for (mtmp = fmon; mtmp; mtmp = mtmp2) {
+				mtmp2 = mtmp->nmon;
+				if (DEADMONSTER(mtmp)) continue;
+				mongone(mtmp);
+				gonecnt++;
+			}
+			pline("Eliminated %d monster%s.", gonecnt, plur(gonecnt));
+			return;
+		}
+#endif
+
 		mndx = name_to_mon(buf);
 		if (mndx == NON_PM || (mvitals[mndx].mvflags & G_GENOD)) {
 			pline("Such creatures %s exist in this world.",
