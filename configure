@@ -642,6 +642,7 @@ LIBOBJS
 GROUP
 OWNER
 WIZARD
+WHEREIS_FILE
 DUMPMSGS
 DUMP_FN
 LIVELOGFILE
@@ -780,6 +781,7 @@ enable_livelog_shout
 enable_dump
 enable_dump_file
 enable_dump_messages
+enable_whereis_file
 enable_wizmode
 with_owner
 with_group
@@ -1474,6 +1476,9 @@ Optional Features:
   --enable-dump-messages=NUMBER
                           Number of dumped messages (default=yes, default
                           number=20)
+  --enable-whereis-file=FILE
+                          Log information about running games (default=no,
+                          default file=%n.whereis)
   --enable-wizmode=USER   enable wizard mode for the specified user
                           (default=yes, default user=wizard)
 
@@ -7656,6 +7661,34 @@ $as_echo "no" >&6; }
    fi
 
 fi
+
+{ $as_echo "$as_me:$LINENO: checking whether to enable whereis file" >&5
+$as_echo_n "checking whether to enable whereis file... " >&6; }
+   # Check whether --enable-whereis-file was given.
+if test "${enable_whereis_file+set}" = set; then
+  enableval=$enable_whereis_file; if test "$enableval" != no; then enable_whereis_file=yes;
+         if test "$enableval" != yes; then whereis_file=$enableval;
+         else whereis_file=%n.whereis; fi;
+        else enable_whereis_file=no; fi
+else
+  enable_whereis_file=no;whereis_file=%n.whereis
+fi
+
+   if test "$enable_whereis_file" != "no" ; then
+      { $as_echo "$as_me:$LINENO: result: yes (file $whereis_file)" >&5
+$as_echo "yes (file $whereis_file)" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define WHEREIS_FILE                "$whereis_file"
+_ACEOF
+
+      WHEREIS_FILE="$whereis_file"
+
+   else
+      { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+   fi
+
 
 { $as_echo "$as_me:$LINENO: checking whether to enable wizmode" >&5
 $as_echo_n "checking whether to enable wizmode... " >&6; }

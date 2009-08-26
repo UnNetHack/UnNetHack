@@ -132,6 +132,10 @@ dosave0()
 	d_level uz_save;
 	char whynot[BUFSZ];
 
+#ifdef WHEREIS_FILE
+	delete_whereis();
+#endif
+
 	if (!SAVEF[0])
 		return 0;
 	fq_save = fqname(SAVEF, SAVEPREFIX, 1);	/* level files take 0 */

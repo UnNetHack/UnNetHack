@@ -207,6 +207,9 @@ E char killer_buf[BUFSZ];
 #ifdef DUMP_LOG
 E char dump_fn[];		/* dumpfile name (dump patch) */
 #endif
+#ifdef WHEREIS_FILE 
+E char whereis_real_path[255];
+#endif
 E const char *configfile;
 E NEARDATA char plname[PL_NSIZ];
 E NEARDATA char dogname[];

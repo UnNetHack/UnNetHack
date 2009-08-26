@@ -412,6 +412,8 @@ typedef unsigned char	uchar;
 
 #define AUTO_OPEN	/* open doors by walking into them - Stefano Busti */
 
+#define WHEREIS_FILE "./whereis/%n.whereis" /* Write out player's current location to player.whereis */
+
 #endif /* AUTOCONF */
 
 #ifdef TTY_GRAPHICS

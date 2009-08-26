@@ -221,6 +221,9 @@
 /* Fancy mazes */
 #undef WALLIFIED_MAZE
 
+/* Log information about running games */
+#undef WHEREIS_FILE
+
 /* An MS-Windows system */
 #undef WIN32
 
