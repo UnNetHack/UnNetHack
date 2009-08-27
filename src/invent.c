@@ -1164,11 +1164,14 @@ register const char *let,*word;
 	    if(cnt == 0) return (struct obj *)0;
 	    if(cnt != otmp->quan) {
 		/* don't split a stack of cursed loadstones */
-		if (otmp->otyp == LOADSTONE && otmp->cursed)
+		if (otmp->otyp == LOADSTONE && otmp->cursed) {
 		    /* kludge for canletgo()'s can't-drop-this message */
 		    otmp->corpsenm = (int) cnt;
-		else
+		} else if (welded(otmp)) {
+			/* don't split a stack of wielded, cursed weapons */
+		} else {
 		    otmp = splitobj(otmp, cnt);
+		}
 	    }
 	}
 	return(otmp);
