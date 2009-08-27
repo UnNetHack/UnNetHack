@@ -655,7 +655,6 @@ int how;
 	boolean bones_ok, have_windows = iflags.window_inited;
 	struct obj *corpse = (struct obj *)0;
 	long umoney;
-	int i;
 
 	if (how == TRICKED) {
 	    if (killer) {
@@ -751,24 +750,26 @@ die:
 		  (flags.female && urole.name.f)?
 		   urole.name.f : urole.name.m);
 	  dump("", pbuf);
-# ifdef DUMPMSGS
-	  if (lastmsg >= 0) {
-		dump ("", "Latest messages");
-		for (i = lastmsg + 1; i < DUMPMSGS; i++) {
-		  if (msgs[i] && strcmp(msgs[i], "") )
-		    dump ("  ", msgs[i]);
-		} 
-		for (i = 0; i <= lastmsg; i++) {
-		  if (msgs[i] && strcmp(msgs[i], "") )
-		    dump ("  ", msgs[i]);
-		} 
-		dump ("","");
-	  }
-#  endif /* DUMPMSGS */
 	  /* D: Add a line for clearance from the screen dump */
 	  dump("", "");
 	  dump_screen();
 	}
+# ifdef DUMPMSGS
+	if (lastmsg >= 0) {
+		int i;
+		dump ("", "Latest messages");
+		for (i = lastmsg + 1; i < DUMPMSGS; i++) {
+		  if (msgs[i] && strcmp(msgs[i], "") )
+		    dump ("  ", msgs[i]);
+		}
+		for (i = 0; i <= lastmsg; i++) {
+		  if (msgs[i] && strcmp(msgs[i], "") )
+		    dump ("  ", msgs[i]);
+		}
+		dump ("","");
+		dump ("","");
+	}
+# endif /* DUMPMSGS */
 #endif /* DUMP_LOG */
 	/* render vision subsystem inoperative */
 	iflags.vision_inited = 0;
