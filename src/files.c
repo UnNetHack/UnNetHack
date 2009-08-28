@@ -617,13 +617,6 @@ int fd;
 void
 set_whereisfile()
 {
-	char *lplname=plname;
-	int i=0;
-	while (lplname[i]) {
-		lplname[i]=(char)tolower(lplname[i]);
-		i++;
-	}
-
 	char *p = (char *) strstr(whereis_file, "%n");
 	if (p) {
 		int new_whereis_len = strlen(whereis_file)+strlen(plname)-2; /* %n */
@@ -631,9 +624,9 @@ set_whereisfile()
 		char *q = new_whereis_fn;
 		strncpy(q, whereis_file, p-whereis_file);
 		q += p-whereis_file;
-		strncpy(q, lplname, strlen(lplname) + 1);
+		strncpy(q, plname, strlen(plname) + 1);
 		regularize(q);
-		q[strlen(lplname)] = '\0';
+		q[strlen(plname)] = '\0';
 		q += strlen(q);
 		p += 2;   /* skip "%n" */
 		strncpy(q, p, strlen(p));
