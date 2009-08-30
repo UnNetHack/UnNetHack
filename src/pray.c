@@ -1123,9 +1123,6 @@ dosacrifice()
     int value = 0;
     int pm;
     aligntyp altaralign = a_align(u.ux,u.uy);
-    /* the real current alignment without modifications by a helm of
-     * opposite alignment */
-    aligntyp real_alignment = u.ualignbase[A_CURRENT];
     char qbuf[QBUFSZ];
     char c;
 
@@ -1296,14 +1293,13 @@ dosacrifice()
 	    if(carried(otmp)) useup(otmp); /* well, it's gone now */
 	    else useupf(otmp, 1L);
 	    You("offer the Amulet of Yendor to %s...", a_gname());
-	    /* Only true believers are rewarded */
-	    if (real_alignment != altaralign) {
+	    if (u.ualign.type != altaralign) {
 		/* And the opposing team picks you up and
 		   carries you off on their shoulders */
 		adjalign(-99);
 		pline("%s accepts your gift, and gains dominion over %s...",
-		      a_gname(), align_gname(real_alignment));
-		pline("%s is enraged...", align_gname(real_alignment));
+		      a_gname(), u_gname());
+		pline("%s is enraged...", u_gname());
 		pline("Fortunately, %s permits you to live...", a_gname());
 		pline("A cloud of %s smoke surrounds you...",
 		      hcolor((const char *)"orange"));
