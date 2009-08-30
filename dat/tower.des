@@ -77,13 +77,25 @@ MONSTER:'&',random,place[1]
 MONSTER:'d',"hell hound pup",place[2]
 MONSTER:'d',"hell hound pup",place[3]
 MONSTER:'d',"winter wolf",place[4]
-CONTAINER:'(',"chest",place[5]
-OBJECT:'"',"amulet of life saving",contained
+IF [50%] THEN
+ CONTAINER:'(',"chest",place[5]
+ELSE
+ CONTAINER:'(',"iron safe",place[5]
+ENDIF
+IF [50%] THEN
+ OBJECT:'"',"amulet of life saving",contained
+ELSE
+ OBJECT:'"',"amulet of change",contained
+ENDIF
 CONTAINER:'(',"chest",place[6]
-OBJECT:'"',"amulet of strangulation",contained
-OBJECT:'[',"water walking boots",place[7]
-OBJECT:'[',"crystal plate mail",place[8]
-OBJECT:'+',"invisibility",place[9]
+IF [50%] THEN
+ OBJECT:'"',"amulet of strangulation",contained
+ELSE
+ OBJECT:'"',"amulet of restful sleep",contained
+ENDIF
+OBJECT[60%]:'[',"water walking boots",place[7]
+OBJECT[60%]:'[',"crystal plate mail",place[8]
+OBJECT[60%]:'+',"invisibility",place[9]
 # Walls in the tower are non diggable
 NON_DIGGABLE:(00,00,14,10)
 
@@ -124,13 +136,13 @@ MONSTER:random,random,random
 MONSTER:random,random,random
 MONSTER:random,random,random
 MONSTER:random,random,random
-OBJECT:')',"long sword",place[0]
+OBJECT[75%]:')',"long sword",place[0]
 TRAP:random,place[0]
-OBJECT:'(',"lock pick",place[1]
+OBJECT[75%]:'(',"lock pick",place[1]
 TRAP:random,place[1]
-OBJECT:'[',"elven cloak",place[2]
+OBJECT[75%]:'[',"elven cloak",place[2]
 TRAP:random,place[2]
-OBJECT:'(',"blindfold",place[3]
+OBJECT[75%]:'(',"blindfold",place[3]
 TRAP:random,place[3]
 # Walls in the tower are non diggable
 NON_DIGGABLE:(00,00,18,12)
