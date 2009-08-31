@@ -768,6 +768,7 @@ enable_user_sounds
 enable_exp_on_botl
 enable_score_on_botl
 enable_realtime_on_botl
+enable_high_score_comparison_by_uid
 enable_show_born
 enable_show_extinct
 enable_dungeon_growth
@@ -1454,6 +1455,9 @@ Optional Features:
   --enable-score-on-botl  Show score on bottom line (default=no)
   --enable-realtime-on-botl
                           Show elapsed time on bottom line (default=no)
+  --enable-high-score-comparison-by-uid
+                          Compare High Score entries by user id instead of
+                          user name (default=no)
   --enable-show-born      Display number of created monsters at the end of
                           game (default=yes)
   --enable-show-extinct   Display extinct monsters at the end of game
@@ -7363,6 +7367,25 @@ $as_echo "$enable_realtime_on_botl" >&6; }
 
 cat >>confdefs.h <<_ACEOF
 #define REALTIME_ON_BOTL /**/
+_ACEOF
+
+   fi
+
+{ $as_echo "$as_me:$LINENO: checking whether to enable high-score-comparison-by-uid" >&5
+$as_echo_n "checking whether to enable high-score-comparison-by-uid... " >&6; }
+   # Check whether --enable-high-score-comparison-by-uid was given.
+if test "${enable_high_score_comparison_by_uid+set}" = set; then
+  enableval=$enable_high_score_comparison_by_uid;
+else
+  enable_high_score_comparison_by_uid="no"
+fi
+
+   { $as_echo "$as_me:$LINENO: result: $enable_high_score_comparison_by_uid" >&5
+$as_echo "$enable_high_score_comparison_by_uid" >&6; }
+   if test "$enable_high_score_comparison_by_uid" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define PERS_IS_UID /**/
 _ACEOF
 
    fi

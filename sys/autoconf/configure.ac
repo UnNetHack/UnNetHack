@@ -377,6 +377,7 @@ NETHACK_ARG(user-sounds,
 NETHACK_ARG(exp-on-botl,[Show experience on bottom line],EXP_ON_BOTL,yes)
 NETHACK_ARG(score-on-botl,[Show score on bottom line],SCORE_ON_BOTL,no)
 NETHACK_ARG(realtime-on-botl,[Show elapsed time on bottom line],REALTIME_ON_BOTL,no)
+NETHACK_ARG(high-score-comparison-by-uid,[Compare High Score entries by user id instead of user name],PERS_IS_UID,no)
 #NETHACK_ARG(borg,[Borg player (only under DOS)],BORG,no)
 # NETHACK_ARG(keep-save,[Keep save files after restore],KEEP_SAVE,no)
 # NETHACK_ARG(charon,[Charon's boat, enables Cerebus (not implemented)],CHARON,no)
