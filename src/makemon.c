@@ -658,6 +658,7 @@ register struct	monst	*mtmp;
 		 *      until Moloch's Sanctum is rearranged */
 		if (ptr == &mons[PM_CTHULHU]) {
 			(void)mongets(mtmp, AMULET_OF_YENDOR);
+			(void)mongets(mtmp, AMULET_OF_REFLECTION);
 			(void)mongets(mtmp, POT_FULL_HEALING);
 		}
 	    default:
