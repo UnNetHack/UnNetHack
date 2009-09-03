@@ -169,4 +169,22 @@ struct monst *mtmp;
 }
 #endif /* LIVELOG_BONES_KILLER */
 
+/** Reports shoplifting */
+void
+livelog_shoplifting(shk_name, shop_name, total)
+const char* shk_name;
+const char* shop_name;
+long total;
+{
+	snprintf(strbuf, STRBUF_LEN,
+		"player=%s:turns=%ld:action=shoplifting:"
+		"shopkeeper=%s:shop=%s:total=%ld\n",
+		plname,
+		moves,
+		shk_name,
+		shop_name,
+		total);
+	livelog_write_string(strbuf);
+}
+
 #endif /* LIVELOGFILE */

@@ -2471,6 +2471,7 @@ E void FDECL(livelog_wish, (char*));
 #ifdef LIVELOG_SHOUT
 E int NDECL(doshout);
 #endif
+E void FDECL(livelog_shoplifting, (const char*, const char*, long));
 #endif
 
 #endif /* !MAKEDEFS_C && !LEV_LEX_C */
