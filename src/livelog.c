@@ -176,9 +176,11 @@ const char* shk_name;
 const char* shop_name;
 long total;
 {
+	/* shopkeeper: Name of the shopkeeper (e.g. Kopasker)
+	   shop:       Name of the shop (e.g. general store)
+	   shoplifted: Merchandise worth this many Zorkmids was stolen */
 	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:action=shoplifting:"
-		"shopkeeper=%s:shop=%s:total=%ld\n",
+		"player=%s:turns=%ld:shopkeeper=%s:shop=%s:shoplifted=%ld\n",
 		plname,
 		moves,
 		shk_name,
