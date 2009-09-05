@@ -657,6 +657,7 @@ CNF_SHARE_DATND
 WINLIB
 WINOBJ
 WINSRC
+WINCURSESLIB
 WINTTYLIB
 EGREP
 GREP
@@ -745,6 +746,7 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_tty_graphics
+enable_curses_graphics
 enable_x11_graphics
 enable_mswin_graphics
 with_compression
@@ -1430,6 +1432,8 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-tty-graphics   use tty-graphics (default=auto)
+  --enable-curses-graphics
+                          use curses interface (default=no)
   --enable-x11-graphics   use x11-graphics (default=no)
   --enable-mswin-graphics use Microsoft Window's native graphics (default=no)
   --enable-data-librarian Data librarian (default=auto)
@@ -2072,6 +2076,16 @@ fi
 
   if test "$enable_tty_graphics" != "no"; then
     nethack_wins="tty $nethack_wins"
+  fi
+# Check whether --enable-curses-graphics was given.
+if test "${enable_curses_graphics+set}" = set; then
+  enableval=$enable_curses_graphics; enable_curses_graphics="$enableval"
+else
+  enable_curses_graphics="no"
+fi
+
+  if test "$enable_curses_graphics" != "no"; then
+    nethack_wins="curses $nethack_wins"
   fi
 # Check whether --enable-x11-graphics was given.
 if test "${enable_x11_graphics+set}" = set; then
@@ -5505,6 +5519,115 @@ fi
 fi
 if test "$enable_tty_graphics" = "no" -a $host_os = mingw32; then
     LFLAGS="$LFLAGS -mwindows"
+fi
+
+
+
+WINCURSESLIB=
+if test "$enable_curses_graphics" != "no"; then
+	# For curses, determine the curses lib
+	CURSES_VARIANTS="ncurses curses"
+	for curseslib in ${CURSES_VARIANTS}; do
+	    as_ac_Lib=`$as_echo "ac_cv_lib_${curseslib}''_tgetent" | $as_tr_sh`
+{ $as_echo "$as_me:$LINENO: checking for tgetent in -l${curseslib}" >&5
+$as_echo_n "checking for tgetent in -l${curseslib}... " >&6; }
+if { as_var=$as_ac_Lib; eval "test \"\${$as_var+set}\" = set"; }; then
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-l${curseslib}  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char tgetent ();
+int
+main ()
+{
+return tgetent ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 $as_test_x conftest$ac_exeext
+       }; then
+  eval "$as_ac_Lib=yes"
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	eval "$as_ac_Lib=no"
+fi
+
+rm -rf conftest.dSYM
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+ac_res=`eval 'as_val=${'$as_ac_Lib'}
+		 $as_echo "$as_val"'`
+	       { $as_echo "$as_me:$LINENO: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+as_val=`eval 'as_val=${'$as_ac_Lib'}
+		 $as_echo "$as_val"'`
+   if test "x$as_val" = x""yes; then
+  WINCURSESLIB="-l${curseslib}"
+	      WINSRC="${WINSRC} \$(WINCURSESSRC)"
+	      WINOBJ="${WINOBJ} \$(WINCURSESOBJ)"
+	      WINLIB="${WINLIB} \$(WINCURSESLIB)"
+
+cat >>confdefs.h <<\_ACEOF
+#define CURSES_GRAPHICS /**/
+_ACEOF
+
+	      break
+fi
+
+	done
+	if test -z "$curseslib"; then
+	    if test "$enable_curses_graphics" = yes; then
+		{ { $as_echo "$as_me:$LINENO: error: Can't find tgetent (needed for curses graphics)" >&5
+$as_echo "$as_me: error: Can't find tgetent (needed for curses graphics)" >&2;}
+   { (exit 1); exit 1; }; }
+	    else
+		{ $as_echo "$as_me:$LINENO: WARNING: Can't enable curses graphics (no tgetent)" >&5
+$as_echo "$as_me: WARNING: Can't enable curses graphics (no tgetent)" >&2;}
+		enable_curses_graphics="no"
+    nethack_wins=`echo $nethack_wins | sed 's/curses //'`
+
+	    fi
+	fi
+
+	OPTIONS_FILE="options"
+	OPTIONS_FILES="options"
 fi
 
 

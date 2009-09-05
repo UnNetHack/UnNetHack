@@ -33,6 +33,13 @@ WINDRES = @WINDRES@
 CFLAGS = -Wall -I../include -I$(srcdir)/../include @CFLAGS@ #-fbounds-check #-fprofile-arcs -ftest-coverage
 LFLAGS = @LFLAGS@ #-fbounds-check
 
+# Compile with PDCurses installed in a separate directory that doesn't
+# conflict with the system curses/ncurses library
+#CFLAGS = -O -I../include -I/usr/local/include/pdcurses
+# Same as above, but for XCurses
+#CFLAGS = -O -DXCURSES -I../include -I/usr/local/include/pdcurses
+
+
 # Only used for the Gnome interface.
 GNOMEINC=`gnome-config gnome --cflags` -I$(srcdir)/../win/gnome
 
@@ -50,6 +57,14 @@ CXX=g++
 WINTTYSRC = $(srcdir)/../win/tty/getline.c $(srcdir)/../win/tty/termcap.c $(srcdir)/../win/tty/topl.c \
 	$(srcdir)/../win/tty/wintty.c 
 WINTTYOBJ = getline.o termcap.o topl.o wintty.o 
+#
+# Files for curses interface
+WINCURSESSRC = ../win/curses/cursmain.c ../win/curses/curswins.c \
+	../win/curses/cursmisc.c ../win/curses/cursdial.c \
+	../win/curses/cursstat.c ../win/curses/cursinit.c \
+	../win/curses/cursmesg.c
+WINCURSESOBJ = cursmain.o curswins.o cursmisc.o cursdial.o cursstat.o \
+	cursinit.o cursmesg.o
 #
 # files for an X11 port
 # (tile.c is included in the defn. for WINCSRC, below)
@@ -106,6 +121,7 @@ WINMSCFLAGS=-I$(srcdir)/../win/win32 -D_WIN32_IE=0x0400
 WINSRC = @WINSRC@
 WINOBJ = @WINOBJ@
 WINTTYLIB = @WINTTYLIB@
+WINCURSESLIB = @WINCURSESLIB@
 WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
 
 # libraries for Qt
@@ -509,6 +525,26 @@ topl.o: $(srcdir)/../win/tty/topl.c $(HACK_H) ../include/tcap.h
 wintty.o: $(srcdir)/../win/tty/wintty.c $(HACK_H) ../include/dlb.h \
 		../include/patchlevel.h ../include/tcap.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/tty/wintty.c
+cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/wincurs.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursmain.c
+curswins.o: ../win/curses/curswins.c $(HACK_H) ../include/func_tab.h \
+		../include/wincurs.h ../win/curses/curswins.h
+	$(CC) $(CFLAGS) -c ../win/curses/curswins.c
+cursmisc.o: ../win/curses/cursmisc.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursmisc.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursmisc.c
+cursdial.o: ../win/curses/cursdial.c $(HACK_H) ../include/func_tab.h \
+		../include/wincurs.h ../win/curses/cursdial.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursdial.c
+cursstat.o: ../win/curses/cursstat.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursstat.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursstat.c
+cursinit.o: ../win/curses/cursinit.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursinit.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursinit.c
+cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursmesg.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursmesg.c
 Window.o: $(srcdir)/../win/X11/Window.c ../include/xwindowp.h \
 		../include/xwindow.h $(CONFIG_H)
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/X11/Window.c

@@ -178,7 +178,10 @@ extern NEARDATA struct window_procs windowprocs;
 #define WC2_SOFTKEYBOARD	0x02L	/* 02 software keyboard                      */
 #define WC2_WRAPTEXT		0x04L	/* 03 wrap long lines of text                */
 #define WC2_NEWCOLORS		0x08L	/* 04 try to use slashem colors              */
-					/* 28 free bits */
+#define WC2_TERM_COLS		0x10L	/* 05 supports setting terminal width        */
+#define WC2_TERM_ROWS		0x20L	/* 06 supports setting terminal height       */
+#define WC2_WINDOWBORDERS	0x40L	/* 07 display borders for NetHack windows    */
+					/* 25 free bits */
 
 #define ALIGN_LEFT	1
 #define ALIGN_RIGHT	2

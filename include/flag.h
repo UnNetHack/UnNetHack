@@ -157,6 +157,7 @@ struct flag {
 
 struct instance_flags {
 	boolean  cbreak;	/* in cbreak mode, rogue format */
+	boolean  cursesgraphics;/* Use portable curses extended characters */
 	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
 	boolean  echo;		/* 1 to echo characters */
 	boolean  IBMgraphics;	/* use IBM extended character set */
@@ -188,6 +189,8 @@ struct instance_flags {
 #endif
 #ifdef TTY_GRAPHICS
 	char prevmsg_window;	/* type of old message window to use */
+#endif
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
 	boolean  extmenu;	/* extended commands use menu interface */
 #endif
 #ifdef MENU_COLOR
@@ -285,6 +288,9 @@ struct instance_flags {
 	boolean wc2_wraptext;		/* wrap text */
 	boolean wc2_newcolors;		/* try to use slashem like colors including
 					 * dark-gray to represent black object */
+	int     wc2_term_cols;		/* terminal width, in characters */
+	int     wc2_term_rows;		/* terminal height, in characters */
+	int     wc2_windowborders;	/* display borders on NetHack windows */
 
 	boolean  show_buc;	/* always show BUC status */
 	boolean  cmdassist;	/* provide detailed assistance for some commands */

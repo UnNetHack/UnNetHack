@@ -314,6 +314,10 @@ struct symdef defsyms[MAXPCHARS] = {
 void NDECL((*ibmgraphics_mode_callback)) = 0;	/* set in tty_start_screen() */
 #endif /* PC9800 */
 
+#ifdef CURSES_GRAPHICS
+void NDECL((*cursesgraphics_mode_callback)) = 0;
+#endif
+
 static uchar ibm_graphics[MAXPCHARS] = {
 /* 0*/	g_FILLER(S_stone),
 	0xb3,	/* S_vwall:	meta-3, vertical rule */
@@ -674,6 +678,9 @@ int gr_set_flag;
  */
 	    iflags.IBMgraphics = TRUE;
 	    iflags.DECgraphics = FALSE;
+#ifdef CURSES_GRAPHICS
+	    iflags.cursesgraphics = FALSE;
+#endif
 	    assign_graphics(ibm_graphics, SIZE(ibm_graphics), MAXPCHARS, 0);
 #ifdef PC9800
 	    if (ibmgraphics_mode_callback) (*ibmgraphics_mode_callback)();
@@ -687,6 +694,9 @@ int gr_set_flag;
  */
 	    iflags.DECgraphics = TRUE;
 	    iflags.IBMgraphics = FALSE;
+#ifdef CURSES_GRAPHICS
+        iflags.cursesgraphics = FALSE;
+#endif
 	    assign_graphics(dec_graphics, SIZE(dec_graphics), MAXPCHARS, 0);
 	    if (decgraphics_mode_callback) (*decgraphics_mode_callback)();
 	    break;
@@ -695,6 +705,12 @@ int gr_set_flag;
 	case MAC_GRAPHICS:
 	    assign_graphics(mac_graphics, SIZE(mac_graphics), MAXPCHARS, 0);
 	    break;
+#endif
+#ifdef CURSES_GRAPHICS
+    case CURS_GRAPHICS:
+	    iflags.IBMgraphics = FALSE;
+	    iflags.DECgraphics = FALSE;
+        break;
 #endif
 	}
     return;
