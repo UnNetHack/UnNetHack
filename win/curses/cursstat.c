@@ -23,7 +23,7 @@ static nhstat prevmpow;
 static nhstat prevac;
 static nhstat prevexp;
 static nhstat prevtime;
-static nhstat prevscore;
+/*static nhstat prevscore;*/
 static nhstat prevhunger;
 static nhstat prevconf;
 static nhstat prevblind;
@@ -854,7 +854,7 @@ void curses_update_stats()
 	        {
                 prevexp.highlight_color = STAT_DOWN_COLOR;
 	        }
-            sprintf(buf, "%d", u.uexp);
+            sprintf(buf, "%ld", u.uexp);
             free(prevexp.txt);
             prevexp.txt = curses_copy_of(buf);
             prevexp.highlight_turns = 3;

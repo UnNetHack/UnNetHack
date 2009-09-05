@@ -3,6 +3,8 @@
 #include "wincurs.h"
 #include "cursinit.h"
 
+#include <ctype.h>
+
 /* Initialization functions for curses interface */
 
 
@@ -454,7 +456,8 @@ void curses_init_nhcolors()
 #ifdef TEXTCOLOR
     if (has_colors())
     {
-#ifdef NCURSES_VERSION
+        pline("curses_init_nhcolors");
+//#ifdef NCURSES_VERSION
         use_default_colors();
         init_pair(1, COLOR_BLACK, -1);
         init_pair(2, COLOR_RED, -1);
@@ -465,7 +468,8 @@ void curses_init_nhcolors()
         init_pair(7, COLOR_CYAN, -1);
         init_pair(8, -1, -1);
         init_pair(9, COLOR_WHITE, -1);
-#else        
+/*
+#else
         init_pair(1, COLOR_BLACK, COLOR_BLACK);
         init_pair(2, COLOR_RED, COLOR_BLACK);
         init_pair(3, COLOR_GREEN, COLOR_BLACK);
@@ -475,6 +479,7 @@ void curses_init_nhcolors()
         init_pair(7, COLOR_CYAN, COLOR_BLACK);
         init_pair(8, COLOR_WHITE, COLOR_BLACK);
 #endif
+*/
         if (can_change_color())
         {
             init_color(COLOR_YELLOW, 500, 300, 0);

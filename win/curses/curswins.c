@@ -432,7 +432,7 @@ static void refresh_map_window()
 {
     int mapwinx, mapwiny, maph, mapw, mapwinw, mapwinh, mapx, mapy;
     WINDOW *map_window = curses_get_nhwin(MAP_WIN);
-    boolean border = curses_window_has_border(MAP_WIN);
+    /*boolean border = curses_window_has_border(MAP_WIN);*/
     
     curses_get_window_xy(MAP_WIN, &mapwinx, &mapwiny);
     curses_get_window_size(MAP_WIN, &mapwinh, &mapwinw);

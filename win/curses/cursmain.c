@@ -76,17 +76,20 @@ init_nhwindows(int* argcp, char** argv)
 */
 void curses_init_nhwindows(int* argcp, char** argv)
 {
+    pline("curses_init_nhwindows 1"); // TODO REMOVE ME
 #ifdef XCURSES
     base_term = Xinitscr(*argcp, argv);
 #else
     base_term = initscr();
 #endif
+    pline("curses_init_nhwindows 2"); // TODO REMOVE ME
 #ifdef TEXTCOLOR
     if (has_colors())
         start_color();
     else
         iflags.use_color = FALSE;
     curses_init_nhcolors();
+    pline("after curses_init_nhcolors"); // TODO REMOVE ME
 #else
     iflags.use_color = FALSE;
 #endif

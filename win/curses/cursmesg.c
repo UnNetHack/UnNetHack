@@ -19,7 +19,7 @@ static int num_messages = 0;
 
 void curses_message_win_puts(const char *message, boolean recursed)
 {
-    int height, width, linespace, count;
+    int height, width, linespace;
     char *tmpstr;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
     boolean border = curses_window_has_border(MESSAGE_WIN);
@@ -332,7 +332,6 @@ static void mesg_add_line(char *mline)
 static nhprev_mesg *get_msg_line(boolean reverse, int mindex)
 {
     int count;
-    char *line;
     nhprev_mesg *current_mesg;
 
     if (reverse)

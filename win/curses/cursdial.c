@@ -392,7 +392,6 @@ int curses_display_nhmenu(winid wid, int how, MENU_ITEM_P **_selected)
     nhmenu_item *menu_item_ptr;
     int num_choices, num_chosen, count;
     WINDOW *win;
-    int curpage = 1;
     MENU_ITEM_P *selected = NULL;
 
 	*_selected = NULL;
@@ -669,8 +668,7 @@ static void menu_determine_pages(nhmenu *menu)
 
 static void menu_win_size(nhmenu *menu)
 {
-    int width, height, maxwidth, maxheight, curentrywidth, lastline,
-     map_height, map_width;
+    int width, height, maxwidth, maxheight, curentrywidth, lastline;
     int maxentrywidth = strlen(menu->prompt);
     int maxheaderwidth = 0;
     nhmenu_item *menu_item_ptr = menu->entries;
@@ -934,7 +932,7 @@ static int menu_get_choices(nhmenu *menu, int how)
 
 static int menu_get_selections(WINDOW *win, nhmenu *menu, int num_choices, int how)
 {
-    int count, curletter;
+    int curletter;
     int curpage = 1;
     int num_selected = 0;
     boolean dismiss = FALSE;
