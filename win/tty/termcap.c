@@ -1309,6 +1309,11 @@ int color;
 	/* hilites[] not used */
 	return iflags.use_color;
 #endif
+#ifdef CURSES_GRAPHICS
+	/* XXX has_color() should be added to windowprocs */
+	if (windowprocs.name != NULL &&
+	    !strcmpi(windowprocs.name, "curses")) return TRUE;
+#endif
 	return hilites[color] != (char *)0;
 }
 
