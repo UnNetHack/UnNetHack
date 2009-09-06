@@ -2,6 +2,7 @@
 #include "hack.h"
 #include "wincurs.h"
 #include "cursstat.h"
+#include "curswins.h"
 
 /* Status window functions for curses interface */
 

@@ -7,6 +7,7 @@
 
 static nethack_window *nhwins = NULL;  /* NetHack window array */
 
+static void refresh_map_window(void);
 
 
 /* Create a window with the specified size and orientation */
@@ -325,6 +326,8 @@ boolean curses_window_has_border(winid wid)
         }
         winptr = winptr->next_window;
     }
+
+    return FALSE;
 }
 
 
@@ -333,7 +336,7 @@ boolean curses_window_has_border(winid wid)
 boolean curses_window_exists(winid wid)
 {
     nethack_window *winptr = nhwins;
- 
+
     while (winptr != NULL)
     {
         if (winptr->nhwin == wid)
@@ -342,7 +345,7 @@ boolean curses_window_exists(winid wid)
         }
         winptr = winptr->next_window;
     }
-    
+
     return FALSE;
 }
 
@@ -361,6 +364,8 @@ int curses_get_window_orientation(winid wid)
         }
         winptr = winptr->next_window;
     }
+
+    return LEFT;
 }
 
 

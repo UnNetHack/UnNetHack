@@ -1,6 +1,8 @@
 #include "curses.h"
 #include "hack.h"
 #include "wincurs.h"
+#include "cursmesg.h"
+#include "curswins.h"
 
 /* Public functions for curses NetHack interface */
 
@@ -76,20 +78,17 @@ init_nhwindows(int* argcp, char** argv)
 */
 void curses_init_nhwindows(int* argcp, char** argv)
 {
-    pline("curses_init_nhwindows 1"); // TODO REMOVE ME
 #ifdef XCURSES
     base_term = Xinitscr(*argcp, argv);
 #else
     base_term = initscr();
 #endif
-    pline("curses_init_nhwindows 2"); // TODO REMOVE ME
 #ifdef TEXTCOLOR
     if (has_colors())
         start_color();
     else
         iflags.use_color = FALSE;
     curses_init_nhcolors();
-    pline("after curses_init_nhcolors"); // TODO REMOVE ME
 #else
     iflags.use_color = FALSE;
 #endif
@@ -434,7 +433,8 @@ print_glyph(window, x, y, glyph)
 */
 void curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph)
 {
-    int ch, color, special;
+    int ch, color;
+    unsigned int special;
     int attr = -1;
 
     /* map glyph to character and color */
@@ -531,6 +531,7 @@ doprev_message()
 int curses_doprev_message()
 {
     curses_prev_mesg();
+    return 0;
 }
 
 /*
@@ -554,7 +555,7 @@ char yn_function(const char *ques, const char *choices, char default)
 */
 char curses_yn_function(const char *question, const char *choices, CHAR_P def)
 {
-    curses_character_input_dialog(question, choices, def);
+    return curses_character_input_dialog(question, choices, def);
 }
 
 /*

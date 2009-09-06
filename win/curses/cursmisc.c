@@ -623,6 +623,7 @@ char *curses_rtrim(char *str)
     for(--s;isspace(*s) && s > str; --s);
     if(s == str) *s = '\0';
     else *(++s) = '\0';
+    return str;
 }
 
 /* Use nethack wall symbols for drawing unless cursesgraphics is

@@ -27,11 +27,4 @@ typedef struct nhpm
     struct nhpm *next_mesg;    /* Pointer to next message */
 } nhprev_mesg;
 
-static void scroll_window(winid wid);
-
-static void mesg_add_line(char *mline);
-
-static nhprev_mesg *get_msg_line(boolean reverse, int mindex);
-
-
 #endif  /* CURSMESG_H */

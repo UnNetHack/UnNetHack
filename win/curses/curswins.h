@@ -50,6 +50,4 @@ typedef struct nhw
     struct nhw *next_window;    /* Pointer to next entry */
 } nethack_window;
 
-static void refresh_map_window(void);
-
 #endif  /* CURSWIN_H */

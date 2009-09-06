@@ -2,6 +2,7 @@
 #include "hack.h"
 #include "wincurs.h"
 #include "cursmesg.h"
+#include "curswins.h"
 
 /* Message window routines for curses interface */
 
@@ -13,7 +14,9 @@ static nhprev_mesg *last_mesg = NULL;
 static int max_messages;
 static int num_messages = 0;
 
-
+static void scroll_window(winid wid);
+static void mesg_add_line(char *mline);
+static nhprev_mesg *get_msg_line(boolean reverse, int mindex);
 
 /* Write a string to the message window.  Attributes set by calling function. */
 
