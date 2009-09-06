@@ -300,6 +300,7 @@ Helmet_on()
 	case DWARVISH_IRON_HELM:
 	case ORCISH_HELM:
 	case HELM_OF_TELEPATHY:
+	case TINFOIL_HAT:
 		break;
 	case HELM_OF_BRILLIANCE:
 		adj_abon(uarmh, uarmh->spe);
@@ -358,6 +359,7 @@ Helmet_off()
 	case ELVEN_LEATHER_HELM:
 	case DWARVISH_IRON_HELM:
 	case ORCISH_HELM:
+	case TINFOIL_HAT:
 	    break;
 	case DUNCE_CAP:
 	    flags.botl = 1;
