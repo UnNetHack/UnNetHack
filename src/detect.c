@@ -799,7 +799,7 @@ struct obj *obj;
 	pline("Too bad you can't see %s.", the(xname(obj)));
 	return;
     }
-    oops = (rnd(obj->blessed ? 10 : 20) > ACURR(A_INT) || obj->cursed);
+    oops = (rnd(obj->blessed ? 13 : 20) > ACURR(A_INT) || obj->cursed);
     if (oops && (obj->spe > 0)) {
 	switch (rnd(obj->oartifact ? 4 : 5)) {
 	case 1 : pline("%s too much to comprehend!", Tobjnam(obj, "are"));
