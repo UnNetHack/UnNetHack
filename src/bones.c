@@ -119,12 +119,53 @@ boolean restore;
 	}
 }
 
+/** Removes objects recursively from a container with a probability of prob1/prob2. */
+STATIC_OVL void
+trim_contents(container, prob1, prob2)
+struct obj *container;
+int prob1;
+int prob2;
+{
+	struct obj *otmp;
+	struct obj *onext;
+	int disappeared=0;
+
+	for (otmp = container; otmp; otmp = onext) {
+		onext = otmp->nobj;
+		if (Has_contents(otmp)) {
+			trim_contents(otmp->cobj, prob1, prob2);
+		}
+		if (rnf(prob1, prob2)) {
+#if defined(DEBUG) && defined(WIZARD)
+			if (wizard)
+				pline("trim_contents: %s just disappeared", doname(otmp));
+#endif
+			obj_extract_self(otmp);
+			obfree(otmp, (struct obj *)0);  /* dealloc_obj() isn't sufficient */
+			disappeared++; /* only counts explicitly obfree'd objects */
+		}
+	}
+#if defined(DEBUG) && defined(WIZARD)
+	if (wizard)
+		pline("trim_contents: %d objects obfree'd", disappeared);
+#endif
+}
+
 STATIC_OVL void
 drop_upon_death(mtmp, cont)
 struct monst *mtmp;
 struct obj *cont;
 {
 	struct obj *otmp;
+	int inventory_count=count_objects(invent);
+
+	/* Removes some objects from player's inventory.
+	 * Tries to keep the number of objects in bones files to
+	 * approximately 50 or less. */
+	if (inventory_count > 50)
+		trim_contents(invent, inventory_count-50, inventory_count);
+	else
+		trim_contents(invent, 1, 5);
 
 	uswapwep = 0; /* ensure curse() won't cause swapwep to drop twice */
 	while ((otmp = invent) != 0) {

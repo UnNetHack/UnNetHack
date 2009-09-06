@@ -1997,6 +1997,25 @@ count_unpaid(list)
     return count;
 }
 
+/**
+ * Returns the number of items within the given list including
+ * contained objects.
+ */
+int
+count_objects(list)
+    struct obj *list;
+{
+    int count = 0;
+
+    while (list) {
+	count++;
+	if (Has_contents(list))
+	    count += count_objects(list->cobj);
+	list = list->nobj;
+    }
+    return count;
+}
+
 /*
  * Returns the number of items with b/u/c/unknown within the given list.  
  * This does NOT include contained objects.
