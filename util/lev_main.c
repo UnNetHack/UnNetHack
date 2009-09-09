@@ -830,6 +830,7 @@ sp_lev *maze;
 	    case SPO_EXIT:
 	    case SPO_WALLIFY:
 	    case SPO_NULL:
+	    case SPO_ENDROOM:
 	      break;
 	    case SPO_MESSAGE:
 	    case SPO_RANDOM_OBJECTS:
@@ -887,6 +888,9 @@ sp_lev *maze;
 	      break;
 	   case SPO_REPLACETERRAIN:
 	      Write(fd, tmpo.opdat, sizeof(replaceterrain));
+	      break;
+	   case SPO_RANDLINE:
+	      Write(fd, tmpo.opdat, sizeof(randline));
 	      break;
 	   case SPO_TERRAIN:
 	      Write(fd, tmpo.opdat, sizeof(terrain));

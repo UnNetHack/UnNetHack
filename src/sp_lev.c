@@ -1590,6 +1590,85 @@ struct mkroom *croom;
 	}
 }
 
+
+void
+put_terr_spot(x,y,ter,lit,thick)
+     schar x,y,ter,lit,thick;
+{
+    int dx, dy;
+
+    if (thick < 1) thick = 1;
+    else if (thick > 10) thick = 10;
+
+    for (dx = x-(thick/2); dx < x+((thick+1)/2); dx++)
+	for (dy = y-(thick/2); dy < y+((thick+1)/2); dy++)
+	    if (!(dx >= COLNO-1 || dx <= 0 || dy <= 0 || dy >= ROWNO-1)) {
+		levl[dx][dy].typ = ter;
+		levl[dx][dy].lit = lit;
+	    }
+}
+
+void
+line_midpoint_core(x1,y1,x2,y2,rough, ter,lit,thick, rec)
+     schar x1,y1,x2,y2,rough,ter,lit,thick,rec;
+{
+    int mx, my;
+    int dx, dy;
+
+    if (rec < 1) {
+	return;
+    }
+
+    if ((x2 == x1) && (y2 == y1)) {
+	put_terr_spot(x1,y1,ter,lit,thick);
+	return;
+    }
+
+    if (rough > max(abs(x2-x1), abs(y2-y1)))
+	rough = max(abs(x2-x1), abs(y2-y1));
+
+    if (rough < 2) {
+	mx = ((x1 + x2) / 2);
+	my = ((y1 + y2) / 2);
+    } else {
+	do {
+	    dx = (rand() % rough) - (rough / 2);
+	    dy = (rand() % rough) - (rough / 2);
+	    mx = ((x1 + x2) / 2) + dx;
+	    my = ((y1 + y2) / 2) + dy;
+	} while ((mx > COLNO-1 || mx < 0 || my < 0 || my > ROWNO-1));
+    }
+
+    put_terr_spot(mx,my,ter,lit,thick);
+
+    rough = (rough * 2) / 3;
+
+    rec--;
+
+    line_midpoint_core(x1,y1,mx,my, rough,ter,lit,thick, rec);
+    line_midpoint_core(mx,my,x2,y2, rough,ter,lit,thick, rec);
+}
+
+void
+line_midpoint(rndline,croom)
+randline *rndline;
+struct mkroom *croom;
+{
+    schar x1,y1,x2,y2,thick;
+
+    x1 = rndline->x1; y1 = rndline->y1;
+    get_location(&x1, &y1, DRY|WET, croom);
+
+    x2 = rndline->x2; y2 = rndline->y2;
+    get_location(&x2, &y2, DRY|WET, croom);
+
+    thick = rndline->thick;
+
+    line_midpoint_core(x1,y1,x2,y2,rndline->roughness, rndline->fg, rndline->lit, thick, 12);
+}
+
+
+
 void
 set_terrain(terr, croom)
 terrain *terr;
@@ -2255,6 +2334,7 @@ sp_lev *lvl;
 	case SPO_NULL:
 	case SPO_EXIT:
 	case SPO_WALLIFY:
+	case SPO_ENDROOM:
 	    break;
 	case SPO_MESSAGE:
 	    Fread((genericptr_t) &n, 1, sizeof(n), fd);
@@ -2403,6 +2483,10 @@ sp_lev *lvl;
 	    opdat = alloc(sizeof(terrain));
 	    Fread(opdat, 1, sizeof(terrain), fd);
 	    break;
+	case SPO_RANDLINE:
+	    opdat = alloc(sizeof(randline));
+	    Fread(opdat, 1, sizeof(randline), fd);
+	    break;
 	case SPO_SPILL:
 	    opdat = alloc(sizeof(spill));
 	    Fread(opdat, 1, sizeof(spill), fd);
@@ -2464,6 +2548,7 @@ sp_lev *lvl;
 	case SPO_EXIT:
 	case SPO_MESSAGE:
 	case SPO_DOOR:
+	case SPO_ENDROOM:
 	case SPO_STAIR:
 	case SPO_LADDER:
 	case SPO_ALTAR:
@@ -2485,6 +2570,7 @@ sp_lev *lvl;
 	case SPO_WALLIFY:
 	case SPO_TERRAIN:
 	case SPO_REPLACETERRAIN:
+	case SPO_RANDLINE:
 	case SPO_SPILL:
 	    /* nothing extra to free here */
 	    break;
@@ -2572,6 +2658,7 @@ sp_lev *lvl;
     pool *tmppool;
     corridor *tmpcorridor;
     terrain *tmpterrain;
+    randline *tmprandline;
     replaceterrain *tmpreplaceterrain;
 	 spill* tmpspill;
     room *tmproom, *tmpsubroom;
@@ -2589,6 +2676,7 @@ sp_lev *lvl;
     int     xi, dir;
     int     tmpi;
     int     allow_flips = 3;
+    int     room_build_fail = 0;
 
     xchar tmpxstart, tmpystart, tmpxsize, tmpysize;
 
@@ -2620,6 +2708,11 @@ sp_lev *lvl;
 		} else {
 		    levl[x][y].typ = lvl->init_lev.filling;
 		}
+	/* ensure the whole level is marked as mapped area */
+	xstart = 1;
+	ystart = 0;
+	xsize = COLNO-1;
+	ysize = ROWNO;
     }
 
     if (lvl->init_lev.flags & NOTELEPORT)   level.flags.noteleport = 1;
@@ -2640,6 +2733,8 @@ sp_lev *lvl;
 	}
 
 	croom = mkrsub ? mkrsub : mkr;
+
+	if (room_build_fail && (opcode != SPO_ENDROOM) && (opcode != SPO_ROOM) && (opcode != SPO_SUBROOM)) goto next_opcode;
 
 	switch (opcode) {
         case SPO_NULL:
@@ -2677,20 +2772,44 @@ sp_lev *lvl;
 		create_engraving(tmpengraving, croom);
 	    break;
 	case SPO_SUBROOM:
-	    tmpsubroom = (room *) opdat;
-	    if (!mkr) {
-		panic("Subroom without a parent room?!");
-	    } else if (!tmpsubroom) panic("Subroom without data?");
-	    croom = build_room(tmpsubroom, mkr);
-	    if (croom) mkrsub = croom;
+	    if (!room_build_fail) {
+		tmpsubroom = (room *) opdat;
+		if (!mkr) {
+		    panic("Subroom without a parent room?!");
+		} else if (!tmpsubroom) panic("Subroom without data?");
+		croom = build_room(tmpsubroom, mkr);
+		if (croom) mkrsub = croom;
+		else room_build_fail++;
+	    } else room_build_fail++; /* room failed to get built, fail subroom too. */
 	    break;
 	case SPO_ROOM:
-	    tmproom = (room *) opdat;
-	    tmpsubroom = (room *)0;
-	    mkrsub = (struct mkroom *)0;
-	    if (!tmproom) panic("Room without data?");
-	    croom = build_room(tmproom, (struct mkroom *)0);
-	    if (croom) mkr = croom;
+	    if (!room_build_fail) {
+		tmproom = (room *) opdat;
+		tmpsubroom = (room *)0;
+		mkrsub = (struct mkroom *)0;
+		if (!tmproom) panic("Room without data?");
+		croom = build_room(tmproom, (struct mkroom *)0);
+		if (croom) mkr = croom;
+		else room_build_fail++;
+	    } else room_build_fail++; /* one room failed alreaedy, fail this one too. */
+	    break;
+	case SPO_ENDROOM:
+	    if (mkrsub) {
+		mkrsub = (struct mkroom *)0; /* get out of subroom */
+	    } else if (mkr) {
+		mkr = (struct mkroom *)0; /* no subroom, get out of top-level room */
+		/* Need to ensure xstart/ystart/xsize/ysize have something sensible,
+		   in case there's some stuff to be created outside the outermost room,
+		   and there's no MAP.
+		 */
+		if(xsize <= 1 && ysize <= 1) {
+		    xstart = 1;
+		    ystart = 0;
+		    xsize = COLNO-1;
+		    ysize = ROWNO;
+		}
+	    }
+	    if (room_build_fail > 0) room_build_fail--;
 	    break;
 	case SPO_DOOR:
 	    croom = &rooms[0];
@@ -2787,6 +2906,10 @@ sp_lev *lvl;
 	case SPO_REPLACETERRAIN:
 	    tmpreplaceterrain = (replaceterrain *) opdat;
 	    replace_terrain(tmpreplaceterrain, croom);
+	    break;
+	case SPO_RANDLINE:
+	    tmprandline = (randline *) opdat;
+	    line_midpoint(tmprandline, croom);
 	    break;
 	case SPO_SPILL:
 	    tmpspill = (spill*) opdat;
@@ -2968,7 +3091,7 @@ sp_lev *lvl;
 	    }
 
 	    walkfrom(x, y);
-	    fill_empty_maze();
+	    if (tmpwalk->stocked) fill_empty_maze();
 	    break;
 	case SPO_NON_DIGGABLE:
 	    tmpdig = (digpos *) opdat;

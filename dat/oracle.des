@@ -7,7 +7,19 @@
 LEVEL: "oracle"
 
 ROOM: "ordinary" , lit, (3,3), (center,center), (11,9)
+{
 NAME: "central"
+
+SUBROOM: "delphi" , lit , (4,3) , (3,3), "central"
+{
+FOUNTAIN: (0, 1)
+FOUNTAIN: (1, 0)
+FOUNTAIN: (1, 2)
+FOUNTAIN: (2, 1)
+MONSTER: '@', "Oracle", (1,1)
+ROOMDOOR: false , nodoor , random, random
+}
+
 OBJECT:'`',"statue",(0,0),"forest centaur",1
 OBJECT:'`',"statue",(0,8),"mountain centaur",1
 OBJECT:'`',"statue",(10,0),"mountain centaur",1
@@ -19,38 +31,42 @@ OBJECT:'`',"statue",(8,4),"plains centaur",1
 MONSTER: random, random, random
 MONSTER: random, random, random
 
-SUBROOM: "delphi" , lit , (4,3) , (3,3), "central"
-FOUNTAIN: (0, 1)
-FOUNTAIN: (1, 0)
-FOUNTAIN: (1, 2)
-FOUNTAIN: (2, 1)
-MONSTER: '@', "Oracle", (1,1)
-ROOMDOOR: false , nodoor , random, random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, up
 OBJECT: random,random,random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, down
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: random, random, random
 MONSTER: random, random, random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random, random, random
 MONSTER: random, random, random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: random, random, random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: random, random, random
+}
 
 RANDOM_CORRIDORS

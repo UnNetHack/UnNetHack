@@ -390,44 +390,56 @@ MONSTER:';',"shark",(58,10),hostile
 LEVEL: "Rog-fila"
 #
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, up
 OBJECT: random,random,random
 MONSTER: 'l', "leprechaun", random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random,random,random
 MONSTER: 'l', "leprechaun", random, hostile
 MONSTER: 'N', "guardian naga", random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 TRAP: random, random
 OBJECT: random,random,random
 MONSTER: 'n', "water nymph", random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, down
 OBJECT: random, random, random
 TRAP: random, random
 TRAP: random, random
 MONSTER: 'l', random, random, hostile
 MONSTER: 'N', "guardian naga", random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random, random, random
 TRAP: random, random
 TRAP: random, random
 MONSTER: 'l', "leprechaun", random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 TRAP: random, random
 MONSTER: 'l', "leprechaun", random, hostile
 MONSTER: 'n', "water nymph", random, hostile
+}
 
 RANDOM_CORRIDORS
 
@@ -437,43 +449,55 @@ RANDOM_CORRIDORS
 LEVEL: "Rog-filb"
 #
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, up
 OBJECT: random,random,random
 MONSTER: 'l', "leprechaun", random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random,random,random
 MONSTER: 'l', "leprechaun", random, hostile
 MONSTER: 'N', "guardian naga", random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 TRAP: random, random
 OBJECT: random,random,random
 MONSTER: 'n', "water nymph", random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, down
 OBJECT: random, random, random
 TRAP: random, random
 TRAP: random, random
 MONSTER: 'l', random, random, hostile
 MONSTER: 'N', "guardian naga", random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random, random, random
 TRAP: random, random
 TRAP: random, random
 MONSTER: 'l', "leprechaun", random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 TRAP: random, random
 MONSTER: 'l', "leprechaun", random, hostile
 MONSTER: 'n', "water nymph", random, hostile
+}
 
 RANDOM_CORRIDORS

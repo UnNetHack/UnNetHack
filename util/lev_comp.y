@@ -86,7 +86,6 @@ static long lev_flags;
 
 unsigned int max_x_map, max_y_map;
 
-static xchar in_room;
 
 extern int fatal_error;
 extern int want_warnings;
@@ -112,20 +111,20 @@ extern const char *fname;
 %token	<i> MAZEWALK_ID WALLIFY_ID REGION_ID FILLING
 %token	<i> RANDOM_OBJECTS_ID RANDOM_MONSTERS_ID RANDOM_PLACES_ID
 %token	<i> ALTAR_ID LADDER_ID STAIR_ID NON_DIGGABLE_ID NON_PASSWALL_ID ROOM_ID
-%token	<i> PORTAL_ID TELEPRT_ID BRANCH_ID LEV CHANCE_ID
+%token	<i> PORTAL_ID TELEPRT_ID BRANCH_ID LEV CHANCE_ID RANDLINE_ID
 %token	<i> CORRIDOR_ID GOLD_ID ENGRAVING_ID FOUNTAIN_ID POOL_ID SINK_ID NONE
 %token	<i> RAND_CORRIDOR_ID DOOR_STATE LIGHT_STATE CURSE_TYPE ENGRAVING_TYPE
 %token	<i> DIRECTION RANDOM_TYPE O_REGISTER M_REGISTER P_REGISTER A_REGISTER
 %token	<i> ALIGNMENT LEFT_OR_RIGHT CENTER TOP_OR_BOT ALTAR_TYPE UP_OR_DOWN
 %token	<i> SUBROOM_ID NAME_ID FLAGS_ID FLAG_TYPE MON_ATTITUDE MON_ALERTNESS
-%token	<i> MON_APPEARANCE ROOMDOOR_ID IF_ID THEN_ID ELSE_ID ENDIF_ID
+%token	<i> MON_APPEARANCE ROOMDOOR_ID IF_ID ELSE_ID
 %token	<i> CONTAINED SPILL_ID TERRAIN_ID HORIZ_OR_VERT REPLACE_TERRAIN_ID
 %token	<i> EXIT_ID
-%token	<i> ',' ':' '(' ')' '[' ']'
+%token	<i> ',' ':' '(' ')' '[' ']' '{' '}'
 %token	<map> STRING MAP_ID
 %type	<i> h_justif v_justif trap_name room_type door_state light_state
 %type	<i> alignment altar_type a_register roomfill filling door_pos
-%type	<i> door_wall walled secret amount chance
+%type	<i> door_wall walled secret amount chance opt_boolean
 %type	<i> engraving_type flags flag_list prefilled lev_region lev_init
 %type	<i> monster monster_c m_register object object_c o_register
 %type	<map> string level_def m_name o_name
@@ -170,7 +169,6 @@ level_def	: MAZE_ID ':' string ',' filling
 			if ((int) strlen($3) > 8)
 			    yyerror("Level names limited to 8 characters.");
 			$$ = $3;
-			in_room = 0;
 			n_plist = n_mlist = n_olist = 0;
 		  }
 		| LEVEL_ID ':' string
@@ -236,6 +234,10 @@ levstatements	: /* nothing */
 		| levstatement levstatements
 		;
 
+roomstatements	: /* nothing */
+		| roomstatement roomstatements
+		;
+
 levstatement 	: message
 		| altar_detail
 		| branch_region
@@ -259,19 +261,35 @@ levstatement 	: message
 		| portal_region
 		| random_corridors
 		| region_detail
-		| room_chance
 		| room_def
+		| room_chance
 		| room_name
 		| sink_detail
 		| terrain_detail
 		| replace_terrain_detail
 		| spill_detail
+		| randline_detail
 		| stair_detail
 		| stair_region
-		| subroom_def
 		| teleprt_region
 		| trap_detail
 		| wallify_detail
+		;
+
+roomstatement	: subroom_def
+		| room_chance
+		| room_name
+		| door_detail
+		| monster_detail
+		| object_detail
+		| trap_detail
+		| altar_detail
+		| fountain_detail
+		| sink_detail
+		| pool_detail
+		| gold_detail
+		| engraving_detail
+		| stair_detail
 		;
 
 exitstatement	: EXIT_ID
@@ -300,7 +318,7 @@ ifstatement 	: IF_ID chance
 		  }
 		;
 
-if_ending	: THEN_ID levstatements ENDIF_ID
+if_ending	: '{' levstatements '}'
 		  {
 		     if (n_if_list > 0) {
 			opjmp *tmpjmp;
@@ -308,7 +326,7 @@ if_ending	: THEN_ID levstatements ENDIF_ID
 			tmpjmp->jmp_target = splev.init_lev.n_opcodes-1;
 		     } else yyerror("IF...THEN ... huh?!");
 		  }
-		| THEN_ID levstatements
+		| '{' levstatements '}'
 		  {
 		     if (n_if_list > 0) {
 			long tmppos = splev.init_lev.n_opcodes;
@@ -323,7 +341,7 @@ if_ending	: THEN_ID levstatements ENDIF_ID
 			if_list[n_if_list++] = tmppos;
 		     } else yyerror("IF...THEN ... huh?!");
 		  }
-		 ELSE_ID levstatements ENDIF_ID
+		 ELSE_ID '{' levstatements '}'
 		  {
 		     if (n_if_list > 0) {
 			opjmp *tmpjmp;
@@ -403,8 +421,10 @@ subroom_def	: SUBROOM_ID ':' room_type ',' light_state ',' subroom_pos ',' room_
 		     tmpr->h = current_size.height;
 
 		     add_opcode(&splev, SPO_SUBROOM, tmpr);
-
-		     in_room = 1;
+		  }
+		  '{' roomstatements '}'
+		  {
+		      add_opcode(&splev, SPO_ENDROOM, NULL);
 		  }
 		;
 
@@ -425,8 +445,10 @@ room_def	: ROOM_ID ':' room_type ',' light_state ',' room_pos ',' room_align ','
 		     tmpr->h = current_size.height;
 
 		     add_opcode(&splev, SPO_ROOM, tmpr);
-
-		     in_room = 1;
+		  }
+		  '{' roomstatements '}'
+		  {
+		      add_opcode(&splev, SPO_ENDROOM, NULL);
 		  }
 		;
 
@@ -998,15 +1020,27 @@ drawbridge_detail: DRAWBRIDGE_ID ':' coordinate ',' DIRECTION ',' door_state
 		   }
 		;
 
-mazewalk_detail : MAZEWALK_ID ':' coordinate ',' DIRECTION
+mazewalk_detail : MAZEWALK_ID ':' coordinate ',' DIRECTION opt_boolean
 		  {
 		      walk *tmpwalk = New(walk);
 
 		      tmpwalk->x = current_coord.x;
 		      tmpwalk->y = current_coord.y;
 		      tmpwalk->dir = $5;
+		      tmpwalk->stocked = $<i>6;
 
 		      add_opcode(&splev, SPO_MAZEWALK, tmpwalk);
+		  }
+		;
+
+/* opt_boolean is the same as roomfill, should consolidate */
+opt_boolean	: /* nothing */
+		  {
+		      $$ = 1;
+		  }
+		| ',' BOOLEAN
+		  {
+		      $$ = $2;
 		  }
 		;
 
@@ -1300,6 +1334,34 @@ terrain_detail : TERRAIN_ID chance ':' coordinate ',' CHAR ',' light_state
 		     add_opcode(&splev, SPO_TERRAIN, tmpterrain);
 		 }
 	       ;
+
+randline_detail : RANDLINE_ID ':' lineends ',' CHAR ',' light_state ',' INTEGER opt_int
+		  {
+		      randline* tmprandline = New(randline);
+
+		      tmprandline->x1 = current_region.x1;
+		      tmprandline->y1 = current_region.y1;
+		      tmprandline->x2 = current_region.x2;
+		      tmprandline->y2 = current_region.y2;
+		      tmprandline->fg = what_map_char((char) $5);
+		      if (tmprandline->fg == INVALID_TYPE) {
+			  yyerror("Invalid map character in randline!");
+		      }
+		      tmprandline->lit = $7;
+		      tmprandline->roughness = $9;
+		      tmprandline->thick = $<i>10;
+		      add_opcode(&splev, SPO_RANDLINE, tmprandline);
+		  }
+
+opt_int		: /* empty */
+		  {
+			$<i>$ = 0;
+		  }
+		| ',' INTEGER
+		  {
+			$<i>$ = $2;
+		  }
+		;
 
 spill_detail : SPILL_ID ':' coordinate ',' CHAR ',' DIRECTION ',' INTEGER ',' light_state
 			{
@@ -1605,6 +1667,18 @@ coord		: '(' INTEGER ',' INTEGER ')'
 		           yyerror("Coordinates out of map range!");
 			current_coord.x = $2;
 			current_coord.y = $4;
+		  }
+		;
+
+lineends	: coordinate ','
+		  {
+			current_region.x1 = current_coord.x;
+			current_region.y1 = current_coord.y;
+		  }
+		  coordinate
+		  {
+			current_region.x2 = current_coord.x;
+			current_region.y2 = current_coord.y;
 		  }
 		;
 

@@ -266,72 +266,96 @@ MONSTER:'W',random,random
 LEVEL: "Pri-fila"
 #
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, up
 OBJECT: random,random,random
 MONSTER: 'Z', "human zombie", random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random,random,random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 OBJECT: random,random,random
 MONSTER: 'Z', "human zombie", random
+}
 
 ROOM: "morgue" , random, random, random, random
+{
 STAIR: random, down
 OBJECT: random, random, random
 TRAP: random, random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'W', "wraith", random
+}
 
 ROOM: "morgue" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
+}
 
 RANDOM_CORRIDORS
 
 LEVEL: "Pri-filb"
 #
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, up
 OBJECT: random,random,random
 MONSTER: 'Z', "human zombie", random
 MONSTER: 'W', "wraith", random
+}
 
 ROOM: "morgue" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random, random, random
 OBJECT: random,random,random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 OBJECT: random,random,random
 MONSTER: 'Z', "human zombie", random
 MONSTER: 'W', "wraith", random
+}
 
 ROOM: "morgue" , random, random, random, random
+{
 STAIR: random, down
 OBJECT: random, random, random
 OBJECT: random, random, random
 TRAP: random, random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'Z', "human zombie", random
 MONSTER: 'W', "wraith", random
+}
 
 ROOM: "morgue" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
+}
 
 RANDOM_CORRIDORS

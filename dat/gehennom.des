@@ -1281,20 +1281,20 @@ OBJECT:'/',"striking",(17,03)
 MONSTER:'h',"mind flayer",(17,15),hostile
 OBJECT:'/',"striking",(17,15)
 # Cthulhu's breakfast for tomorrow
-IF [30%] THEN
- IF [50%] THEN
+IF [30%] {
+ IF [50%] {
   MONSTER:'@',"barbarian",(49,13)
- ELSE
+ } ELSE {
   MONSTER:'@',"samurai",(49,13)
- ENDIF
-ELSE
+ }
+} ELSE {
 # Cthulhu's didn't like its taste?
- IF [50%] THEN
+ IF [50%] {
   OBJECT:'%',"corpse",(49,13),"archeologist",0
- ELSE
+ } ELSE {
   OBJECT:'%',"corpse",(49,13),"tourist",0
- ENDIF
-ENDIF
+ }
+}
 # poor boy, he got so far
 OBJECT:'"',"cheap plastic imitation of the Amulet of Yendor",(49,13)
 # A few nasties
@@ -1317,32 +1317,27 @@ NOMAP
 #
 #  always put stairs relatively far apart
 #
-# outer loop
-IF [50%] THEN
-# inner loop
-IF [50%] THEN
-# Option 1: Up Left, Down Right
-STAIR:levregion(01,01,20,20),levregion(40,10,44,12),up
-STAIR:levregion(50,01,70,20),levregion(45,10,49,12),down
-ELSE
-# Option 2: Up Right, Down Left
-STAIR:levregion(50,01,70,20),levregion(45,10,49,12),up
-STAIR:levregion(01,01,20,20),levregion(40,10,44,12),down
-ENDIF
-# outer loop again
-ELSE
-# inner loop 2
-IF [50%] THEN
-# Option 3: Up Center, Down Elsewhere
-STAIR:levregion(30,01,50,20),levregion(38,01,42,20),up
-STAIR:levregion(01,01,70,20),levregion(30,01,50,20),down
-ELSE
-# Option 4: Down Center, Up Elsewhere
-STAIR:levregion(01,01,70,20),levregion(30,01,50,20),up
-STAIR:levregion(30,01,50,20),levregion(38,01,42,20),down
-ENDIF
-# end of outer loop
-ENDIF
+IF [50%] {
+  IF [50%] {
+    # Option 1: Up Left, Down Right
+    STAIR:levregion(01,01,20,20),levregion(40,10,44,12),up
+    STAIR:levregion(50,01,70,20),levregion(45,10,49,12),down
+  } ELSE {
+    # Option 2: Up Right, Down Left
+    STAIR:levregion(50,01,70,20),levregion(45,10,49,12),up
+    STAIR:levregion(01,01,20,20),levregion(40,10,44,12),down
+  }
+} ELSE {
+  IF [50%] {
+  # Option 3: Up Center, Down Elsewhere
+    STAIR:levregion(30,01,50,20),levregion(38,01,42,20),up
+    STAIR:levregion(01,01,70,20),levregion(30,01,50,20),down
+  } ELSE {
+  # Option 4: Down Center, Up Elsewhere
+    STAIR:levregion(01,01,70,20),levregion(30,01,50,20),up
+    STAIR:levregion(30,01,50,20),levregion(38,01,42,20),down
+  }
+}
 #
 RANDOM_OBJECTS:'(','/','=','+',')','[','?','*','%'
 OBJECT: object[0], random, random
@@ -1364,31 +1359,39 @@ MONSTER:monster[3],random,random,hostile
 MONSTER:random,random,random,hostile
 MONSTER:'H',random,random,hostile
 # chance of evil critters
-IF [50%] THEN
-MONSTER:'L',random,random,hostile
-ELSE
-MONSTER:random,random,random,hostile
-ENDIF
-IF [66%] THEN
+IF [50%] {
+  MONSTER:'L',random,random,hostile
+} ELSE {
+  MONSTER:random,random,random,hostile
+}
+IF [66%] {
 # could be a snark now, so up the percentage a bit
-MONSTER:'J',random,random,hostile
-ELSE
-MONSTER:random,random,random,hostile
-ENDIF
-# chance of lava spillage?
-IF [75%] THEN
-SPILL: random, 'L', north, 20, lit
-ENDIF
-IF [75%] THEN
-SPILL: random, 'L', south, 20, lit
-ENDIF
-IF [75%] THEN
-SPILL: random, 'L', east, 20, lit
-ENDIF
-IF [75%] THEN
-SPILL: random, 'L', west, 20, lit
-ENDIF
-#
+  MONSTER:'J',random,random,hostile
+} ELSE {
+  MONSTER:random,random,random,hostile
+}
+# chance of lava spillage, or maybe lava river?
+IF [50%] {
+	IF [60%] {
+	SPILL: random, 'L', north, 20, lit
+	}
+	IF [60%] {
+	SPILL: random, 'L', south, 20, lit
+	}
+	IF [60%] {
+	SPILL: random, 'L', east, 20, lit
+	}
+	IF [60%] {
+	SPILL: random, 'L', west, 20, lit
+	}
+} ELSE {
+	IF [50%] {
+		RANDLINE: (30,00),(50,19), 'P', lit, 10, 2
+	} ELSE {
+		RANDLINE: (50,00),(30,19), 'P', lit, 10, 2
+	}
+}
+
 TRAP: random, random
 TRAP: random, random
 TRAP: random, random

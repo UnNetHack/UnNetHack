@@ -73,7 +73,9 @@
 #define SPO_TERRAIN		34 /* terrain */
 #define SPO_REPLACETERRAIN	35 /* replaceterrain */
 #define SPO_EXIT		36
-#define MAX_SP_OPCODES		37
+#define SPO_ENDROOM		37
+#define SPO_RANDLINE		38 /* randline */
+#define MAX_SP_OPCODES		39
 
 
 /* special level coder CPU flags */
@@ -85,6 +87,13 @@
 /*
  * Structures manipulated by the special levels loader & compiler
  */
+
+typedef struct {
+    xchar x1,y1,x2,y2;
+    xchar fg, lit;
+    int roughness;
+    xchar thick;
+} randline;
 
 typedef struct {
 	int cmp_what;
@@ -150,7 +159,7 @@ typedef struct {
 } drawbridge;
 
 typedef struct {
-	xchar x, y, dir;
+	xchar x, y, dir, stocked;
 } walk;
 
 typedef struct {
