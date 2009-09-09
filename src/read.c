@@ -1426,6 +1426,8 @@ register struct obj	*sobj;
 		    }
 		    if (dmg) losehp(dmg, "scroll of earth", KILLED_BY_AN);
 		}
+	    } else if (In_endgame(&u.uz)) {
+		You_hear("the %s rumbling below you!", surface(u.ux,u.uy));
 	    }
 	    break;
 	case SCR_PUNISHMENT:
