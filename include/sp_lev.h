@@ -22,6 +22,8 @@
 #define NOMMAP		4
 #define SHORTSIGHTED	8
 #define ARBOREAL	16
+#define NOFLIPX		32
+#define NOFLIPY		64
 
     /* special level types */
 #define SP_LEV_ROOMS	1
