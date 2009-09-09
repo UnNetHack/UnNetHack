@@ -1209,12 +1209,18 @@ boolean at_stairs, falling, portal;
 		    if (newdungeon) {
 			if (Is_stronghold(&u.uz)) {
 			    register xchar x, y;
+			    int trycnt = 0;
 
 			    do {
-				x = (COLNO - 2 - rnd(5));
-				y = rn1(ROWNO - 4, 3);
-			    } while(occupied(x, y) ||
-				    IS_WALL(levl[x][y].typ));
+				do {
+				    x = rn1((updest.hx - updest.lx)+1, updest.lx);
+				    y = rn1((updest.hy - updest.ly)+1, updest.ly);
+				} while ((x < updest.nlx ||
+					  x > updest.nhx) &&
+					 (y < updest.nly ||
+					  y > updest.nhy));
+			    } while ((occupied(x, y) ||
+				      IS_WALL(levl[x][y].typ)) && (trycnt++ < 300));
 			    u_on_newpos(x, y);
 			} else u_on_sstairs();
 		    } else u_on_dnstairs();
