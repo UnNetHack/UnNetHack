@@ -85,7 +85,7 @@ static short on_olist = 0, on_mlist = 0, on_plist = 0;
 static long lev_flags;
 
 unsigned int max_x_map, max_y_map;
-
+int obj_containment = 0;
 
 extern int fatal_error;
 extern int want_warnings;
@@ -119,7 +119,7 @@ extern const char *fname;
 %token	<i> ALIGNMENT LEFT_OR_RIGHT CENTER TOP_OR_BOT ALTAR_TYPE UP_OR_DOWN
 %token	<i> SUBROOM_ID NAME_ID FLAGS_ID FLAG_TYPE MON_ATTITUDE MON_ALERTNESS
 %token	<i> MON_APPEARANCE ROOMDOOR_ID IF_ID ELSE_ID
-%token	<i> CONTAINED SPILL_ID TERRAIN_ID HORIZ_OR_VERT REPLACE_TERRAIN_ID
+%token	<i> SPILL_ID TERRAIN_ID HORIZ_OR_VERT REPLACE_TERRAIN_ID
 %token	<i> EXIT_ID
 %token	<i> ',' ':' '(' ')' '[' ']' '{' '}'
 %token	<map> STRING MAP_ID
@@ -371,6 +371,61 @@ message		: MESSAGE_ID ':' STRING
 		     add_opcode(&splev, SPO_MESSAGE, $3);
 		  }
 		;
+
+cobj_ifstatement : IF_ID chance
+		  {
+		     opcmp *tmpcmp = New(opcmp);
+		     opjmp *tmpjmp = New(opjmp);
+
+		     if (n_if_list >= MAX_NESTED_IFS)
+		       yyerror("Too deeply nested IF-statements!");
+		     tmpcmp->cmp_what = 0;
+		     tmpcmp->cmp_val = (long) $2;
+		     add_opcode(&splev, SPO_CMP, tmpcmp);
+		     tmpjmp->jmp_target = -1;
+		     if_list[n_if_list++] = splev.init_lev.n_opcodes;
+		     add_opcode(&splev, SPO_JG, tmpjmp);
+		  }
+		 cobj_if_ending
+		  {
+		     /* do nothing */
+		  }
+		;
+
+cobj_if_ending	: '{' cobj_statements '}'
+		  {
+		     if (n_if_list > 0) {
+			opjmp *tmpjmp;
+			tmpjmp = (opjmp *) splev.opcodes[if_list[--n_if_list]].opdat;
+			tmpjmp->jmp_target = splev.init_lev.n_opcodes-1;
+		     } else yyerror("IF...THEN ... huh?!");
+		  }
+		| '{' cobj_statements '}'
+		  {
+		     if (n_if_list > 0) {
+			long tmppos = splev.init_lev.n_opcodes;
+			opjmp *tmpjmp = New(opjmp);
+
+			tmpjmp->jmp_target = -1;
+			add_opcode(&splev, SPO_JMP, tmpjmp);
+
+			tmpjmp = (opjmp *) splev.opcodes[if_list[--n_if_list]].opdat;
+			tmpjmp->jmp_target = splev.init_lev.n_opcodes-1;
+
+			if_list[n_if_list++] = tmppos;
+		     } else yyerror("IF...THEN ... huh?!");
+		  }
+		 ELSE_ID '{' cobj_statements '}'
+		  {
+		     if (n_if_list > 0) {
+			opjmp *tmpjmp;
+			tmpjmp = (opjmp *) splev.opcodes[if_list[--n_if_list]].opdat;
+			tmpjmp->jmp_target = splev.init_lev.n_opcodes-1;
+		     } else yyerror("IF...THEN...ELSE ... huh?!");
+		  }
+		;
+
+
 
 random_corridors: RAND_CORRIDOR_ID
 		  {
@@ -835,6 +890,42 @@ monster_info	: ',' string
 		  }
 		;
 
+cobj_statements	: /* nothing */
+		  {
+		  }
+		| cobj_statement cobj_statements
+		;
+
+cobj_statement  : cobj_detail
+		| cobj_ifstatement
+		;
+
+cobj_detail	: OBJECT_ID cobj_desc
+		  {
+		      object *tmpobj =
+			  (object *) get_last_opcode_data1(&splev, SPO_OBJECT);
+		      if (!tmpobj) yyerror("No object defined?!");
+		      tmpobj->containment = (obj_containment ? 1 : 0);
+		  }
+		| COBJECT_ID cobj_desc
+		  {
+		     object *tmpobj =
+		       (object *) get_last_opcode_data1(&splev, SPO_OBJECT);
+		     if (!tmpobj) yyerror("No object defined?!");
+		     tmpobj->containment = 2;
+		     obj_containment++;
+
+			/* 1: is contents of preceeding object with 2 */
+			/* 2: is a container */
+			/* 0: neither */
+		  }
+		 '{' cobj_statements '}'
+		  {
+		      add_opcode(&splev, SPO_POP_CONTAINER, NULL);
+		      obj_containment--;
+		  }
+		;
+
 object_detail	: OBJECT_ID object_desc
 		  {
 		  }
@@ -844,10 +935,44 @@ object_detail	: OBJECT_ID object_desc
 		       (object *) get_last_opcode_data1(&splev, SPO_OBJECT);
 		     if (!tmpobj) yyerror("No object defined?!");
 		     tmpobj->containment = 2;
+		     obj_containment++;
 
 			/* 1: is contents of preceeding object with 2 */
 			/* 2: is a container */
 			/* 0: neither */
+		  }
+		 '{' cobj_statements '}'
+		  {
+		      add_opcode(&splev, SPO_POP_CONTAINER, NULL);
+		      obj_containment--;
+		  }
+		;
+
+cobj_desc	: chance ':' object_c ',' o_name
+		  {
+		     object *tmpobj = New(object);
+
+		     tmpobj->class = $<i>3;
+		     tmpobj->corpsenm = NON_PM;
+		     tmpobj->curse_state = -1;
+		     tmpobj->name.str = 0;
+		     tmpobj->chance = $1;
+		     tmpobj->id = -1;
+		     if ($5) {
+			int token = get_object_id($5, $<i>3);
+			if (token == ERR)
+			  yywarning(
+			    "Illegal object name!  Making random object.");
+			else
+			  tmpobj->id = token;
+			Free($5);
+		     }
+		     add_opcode(&splev, SPO_OBJECT, tmpobj);
+
+		  }
+		  object_infos
+		  {
+		      /* nothing here */
 		  }
 		;
 
@@ -888,17 +1013,6 @@ object_where	: coordinate
 		     tmpobj->containment = 0;
 		     tmpobj->x = current_coord.x;
 		     tmpobj->y = current_coord.y;
-		  }
-		| CONTAINED
-		  {
-		     object *tmpobj =
-		       (object *) get_last_opcode_data1(&splev, SPO_OBJECT);
-
-		     if (!tmpobj) yyerror("No object defined?!");
-		     tmpobj->containment = 1;
-		     /* random coordinate, will be overridden anyway */
-		     tmpobj->x = -MAX_REGISTERS-1;
-		     tmpobj->y = -MAX_REGISTERS-1;
 		  }
 		;
 

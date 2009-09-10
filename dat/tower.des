@@ -80,20 +80,28 @@ MONSTER:'d',"hell hound pup",place[2]
 MONSTER:'d',"hell hound pup",place[3]
 MONSTER:'d',"winter wolf",place[4]
 IF [50%] {
- CONTAINER:'(',"chest",place[5]
+  CONTAINER:'(',"chest",place[5] {
+    IF [50%] {
+      OBJECT:'"',"amulet of life saving"
+    } ELSE {
+      OBJECT:'"',"amulet of change"
+    }
+  }
 } ELSE {
- CONTAINER:'(',"iron safe",place[5]
+  CONTAINER:'(',"iron safe",place[5] {
+    IF [50%] {
+      OBJECT:'"',"amulet of life saving"
+    } ELSE {
+      OBJECT:'"',"amulet of change"
+    }
+  }
 }
-IF [50%] {
- OBJECT:'"',"amulet of life saving",contained
-} ELSE {
- OBJECT:'"',"amulet of change",contained
-}
-CONTAINER:'(',"chest",place[6]
-IF [50%] {
- OBJECT:'"',"amulet of strangulation",contained
-} ELSE {
- OBJECT:'"',"amulet of restful sleep",contained
+CONTAINER:'(',"chest",place[6] {
+  IF [50%] {
+    OBJECT:'"',"amulet of strangulation"
+  } ELSE {
+    OBJECT:'"',"amulet of restful sleep"
+  }
 }
 OBJECT[60%]:'[',"water walking boots",place[7]
 OBJECT[60%]:'[',"crystal plate mail",place[8]

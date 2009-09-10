@@ -34,6 +34,8 @@
 #define LVLINIT_MAZEGRID	2
 #define LVLINIT_MINES		3
 
+/* max. layers of object containment */
+#define MAX_CONTAINMENT 10
 
 /* max. # of random registers */
 #define MAX_REGISTERS	10
@@ -81,7 +83,8 @@
 #define SPO_EXIT		36
 #define SPO_ENDROOM		37
 #define SPO_RANDLINE		38 /* randline */
-#define MAX_SP_OPCODES		39
+#define SPO_POP_CONTAINER	39
+#define MAX_SP_OPCODES		40
 
 
 /* special level coder CPU flags */

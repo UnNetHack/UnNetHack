@@ -665,17 +665,20 @@ MONSTER:'V',"vampire",(69,04)
 MONSTER:'V',"vampire lord",(70,05)
 MONSTER:'V',"vampire lord",(72,06)
 # Some loot...
-CONTAINER:'(',"chest",(71,09)
-OBJECT:'!',random,contained
-#OBJECT:'!',"amnesia",contained
-OBJECT:'?',random,contained
-#OBJECT:'?',"demonology",contained
-CONTAINER:'(',"chest",(72,09)
-OBJECT:'!',"sickness",contained
-OBJECT:'"',"amulet of strangulation",contained
-CONTAINER:'(',"chest",(73,09)
-OBJECT:'!',"blindness",contained
-OBJECT:'?',"create monster",contained
+CONTAINER:'(',"chest",(71,09) {
+  OBJECT:'!',random
+  #OBJECT:'!',"amnesia"
+  OBJECT:'?',random
+  #OBJECT:'?',"demonology"
+}
+CONTAINER:'(',"chest",(72,09) {
+  OBJECT:'!',"sickness"
+  OBJECT:'"',"amulet of strangulation"
+}
+CONTAINER:'(',"chest",(73,09) {
+  OBJECT:'!',"blindness"
+  OBJECT:'?',"create monster"
+}
 # ...and a guardian
 MONSTER:'P',"green slime",(71,08)
 MONSTER:'P',"green slime",(73,08)
