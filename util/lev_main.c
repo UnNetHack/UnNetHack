@@ -174,6 +174,7 @@ static struct {
 const char *fname = "(stdin)";
 int fatal_error = 0;
 int want_warnings = 0;
+int be_verbose = 0;
 
 #ifdef FLEX23_BUG
 /* Flex 2.3 bug work around; not needed for 2.3.6 or later */
@@ -244,6 +245,10 @@ char **argv;
 		    fname = argv[i];
 		    if(!strcmp(fname, "-w")) {
 			want_warnings++;
+			continue;
+		    } else
+		    if(!strcmp(fname, "-v")) {
+			be_verbose++;
 			continue;
 		    }
 		    fin = freopen(fname, "r", stdin);
@@ -960,6 +965,9 @@ sp_lev *lvl;
 	if (fout < 0) return FALSE;
 
         if (!lvl) panic("write_level_file");
+
+	if (be_verbose)
+	    fprintf(stdout, "File: '%s', opcodes: %li\n", lbuf, lvl->init_lev.n_opcodes);
 
         if (!write_maze(fout, lvl))
           return FALSE;
