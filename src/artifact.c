@@ -516,6 +516,9 @@ touch_artifact(obj,mon)
 
     if(!oart) return 1;
 
+    /* [ALI] Thiefbane has a special affinity with shopkeepers */
+    if (mon->isshk && obj->oartifact == ART_THIEFBANE) return 1;
+
     yours = (mon == &youmonst);
     /* all quest artifacts are self-willed; it this ever changes, `badclass'
        will have to be extended to explicitly include quest artifacts */
