@@ -2358,7 +2358,7 @@ sp_lev *lvl;
     long n_opcode = 0;
     long i,j;
     genericptr_t opdat;
-    char n;
+    unsigned char n;
     int size, opcode;
     lev_region  *tmplregion;
     mazepart *tmpmazepart;
@@ -2719,7 +2719,7 @@ sp_lev *lvl;
     boolean prefilled, room_not_needed;
 
     char    n = '\0';
-    char    halign, valign;
+    schar   halign, valign;
 
     int     xi, dir;
     int     tmpi;
