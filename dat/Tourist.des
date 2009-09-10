@@ -8,8 +8,9 @@
 #	Here you meet your (besieged) class leader, Twoflower
 #	and receive your quest assignment.
 #
-MAZE: "Tou-strt",' '
-FLAGS: noteleport,hardfloor
+LEVEL: "Tou-strt"
+FLAGS: noteleport,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 .......}}....---------..-------------------------------------------------...
@@ -136,8 +137,9 @@ TRAP:random,random
 #	further towards your assigned quest.
 #
 
-MAZE: "Tou-loca",' '
-FLAGS: hardfloor
+LEVEL: "Tou-loca"
+FLAGS: hardfloor,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ----------------------------------------------------------------------------
@@ -297,7 +299,9 @@ MONSTER:'s',random,random
 #	been assigned to retrieve.
 #
 
-MAZE: "Tou-goal", ' '
+LEVEL: "Tou-goal"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ----------------------------------------------------------------------------
@@ -458,8 +462,9 @@ WALLIFY
 #	levels as defined above.
 #
 
-MAZE: "Tou-fila" , ' '
-INIT_MAP: '.' , ' ', true, true, random, true
+LEVEL: "Tou-fila"
+FLAGS:mazelevel
+INIT_MAP: mines, '.' , ' ', true, true, random, true
 NOMAP
 #
 STAIR: random, up
@@ -486,8 +491,9 @@ MONSTER: '@', "soldier", random, hostile
 MONSTER: 'H', random, random, hostile
 MONSTER: 'C', random, random, hostile
 
-MAZE: "Tou-filb" , ' '
-INIT_MAP: '.' , ' ', true, true, random, true
+LEVEL: "Tou-filb"
+FLAGS:mazelevel
+INIT_MAP: mines, '.' , ' ', true, true, random, true
 NOMAP
 #
 STAIR: random, up

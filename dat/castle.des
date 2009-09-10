@@ -16,8 +16,9 @@
 # To motivate the player : there are 4 storerooms (armors, weapons, food and
 # gems) and a wand of wishing in one of the 4 towers...
 
-MAZE:"castle-1",random
-FLAGS: noteleport
+LEVEL:"castle-1"
+FLAGS: noteleport,mazelevel
+INIT_MAP:mazegrid,'-'
 GEOMETRY:center,center
 MAP
 }}}}}}}}}.............................................}}}}}}}}}
@@ -245,8 +246,9 @@ REGION:(47,10,47,11),unlit,"ordinary"
 # are a kludge to prevent the walls showing up through the iron bars from
 # outside the castle.
 #
-MAZE:"castle-2",' '
-FLAGS: noteleport
+LEVEL:"castle-2"
+FLAGS: noteleport,mazelevel
+INIT_MAP:mazegrid,'-'
 GEOMETRY: center, center
 #000000000111111111122222222223333333333444444444455555555556666666666777777
 #123456789012345678901234567890123456789012345678901234567890123456789012345
@@ -463,8 +465,9 @@ MONSTER:'C',random,(36,12)
 MONSTER:'C',random,(37,13)
 
 
-MAZE:"castle-3",' '
-FLAGS: noteleport
+LEVEL:"castle-3"
+FLAGS: noteleport,mazelevel
+INIT_MAP:mazegrid,'-'
 GEOMETRY: center, center
 #000000000111111111122222222223333333333444444444455555555556666666666777777
 #123456789012345678901234567890123456789012345678901234567890123456789012345

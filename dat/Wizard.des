@@ -7,8 +7,9 @@
 #	Here you meet your (besieged) class leader, Neferet the Green
 #	and receive your quest assignment.
 #
-MAZE: "Wiz-strt",' '
-FLAGS: noteleport,hardfloor
+LEVEL: "Wiz-strt"
+FLAGS: noteleport,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ............................................................................
@@ -101,8 +102,9 @@ MONSTER: 'B',random,(10,19),hostile
 #	further towards your assigned quest.
 #
 
-MAZE: "Wiz-loca",' '
-FLAGS: hardfloor
+LEVEL: "Wiz-loca"
+FLAGS: hardfloor,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 .............        .......................................................
@@ -225,7 +227,9 @@ MONSTER:'i',random,random,hostile
 #	been assigned to retrieve.
 #
 
-MAZE: "Wiz-goal", ' '
+LEVEL: "Wiz-goal"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
                                                                             

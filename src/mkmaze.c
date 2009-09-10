@@ -356,7 +356,6 @@ fixup_special()
 	u.uinwater = 0;
 	unsetup_waterlevel();
     } else if (Is_waterlevel(&u.uz)) {
-	level.flags.hero_memory = 0;
 	was_waterlevel = TRUE;
 	/* water level is an odd beast - it has to be set up
 	   before calling place_lregions etc. */
@@ -428,8 +427,6 @@ fixup_special()
 
 	/* KMH -- Sokoban levels */
 	if(In_sokoban(&u.uz)) {
-		sokoban_detect();
-
 		/* randomize Sokoban prize */
 		if (dunlev(&u.uz)==1) {
 			int price=0;
@@ -618,7 +615,7 @@ register const char *s;
 #endif
 
 	maze0xy(&mm);
-	walkfrom((int) mm.x, (int) mm.y);
+	walkfrom((int) mm.x, (int) mm.y, 0);
 	/* put a boulder at the maze center */
 	(void) mksobj_at(BOULDER, (int) mm.x, (int) mm.y, TRUE, FALSE);
 
@@ -712,13 +709,20 @@ register const char *s;
  * that is totally safe.
  */
 void
-walkfrom(x,y)
+walkfrom(x,y,typ)
 int x,y;
+schar typ;
 {
 #define CELLS (ROWNO * COLNO) / 4		/* a maze cell is 4 squares */
 	char mazex[CELLS + 1], mazey[CELLS + 1];	/* char's are OK */
 	int q, a, dir, pos;
 	int dirs[4];
+
+#ifndef WALLIFIED_MAZE
+	if (!typ) typ = CORR;
+#else
+	if (!typ) typ = ROOM;
+#endif
 
 	pos = 1;
 	mazex[pos] = (char) x;
@@ -728,11 +732,7 @@ int x,y;
 		y = (int) mazey[pos];
 		if(!IS_DOOR(levl[x][y].typ)) {
 		    /* might still be on edge of MAP, so don't overwrite */
-#ifndef WALLIFIED_MAZE
-		    levl[x][y].typ = CORR;
-#else
-		    levl[x][y].typ = ROOM;
-#endif
+		    levl[x][y].typ = typ;
 		    levl[x][y].flags = 0;
 		    SpLev_Map[x][y] = 1;
 		}
@@ -744,11 +744,7 @@ int x,y;
 		else {
 			dir = dirs[rn2(q)];
 			move(&x, &y, dir);
-#ifndef WALLIFIED_MAZE
-			levl[x][y].typ = CORR;
-#else
-			levl[x][y].typ = ROOM;
-#endif
+			levl[x][y].typ = typ;
 			SpLev_Map[x][y] = 1;
 			move(&x, &y, dir);
 			SpLev_Map[x][y] = 1;
@@ -763,19 +759,22 @@ int x,y;
 #else
 
 void
-walkfrom(x,y)
+walkfrom(x,y,typ)
 int x,y;
+schar typ;
 {
 	register int q,a,dir;
 	int dirs[4];
 
+#ifndef WALLIFIED_MAZE
+	if (!typ) typ = CORR;
+#else
+	if (!typ) typ = ROOM;
+#endif
+
 	if(!IS_DOOR(levl[x][y].typ)) {
 	    /* might still be on edge of MAP, so don't overwrite */
-#ifndef WALLIFIED_MAZE
-	    levl[x][y].typ = CORR;
-#else
-	    levl[x][y].typ = ROOM;
-#endif
+	    levl[x][y].typ = typ;
 	    levl[x][y].flags = 0;
 	    SpLev_Map[x][y] = 1;
 	}
@@ -787,15 +786,11 @@ int x,y;
 		if(!q) return;
 		dir = dirs[rn2(q)];
 		move(&x,&y,dir);
-#ifndef WALLIFIED_MAZE
-		levl[x][y].typ = CORR;
-#else
-		levl[x][y].typ = ROOM;
-#endif
+		levl[x][y].typ = typ;
 		SpLev_Map[x][y] = 1;
 		move(&x,&y,dir);
 		SpLev_Map[x][y] = 1;
-		walkfrom(x,y);
+		walkfrom(x,y, typ);
 	}
 }
 #endif /* MICRO */

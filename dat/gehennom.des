@@ -4,8 +4,9 @@
 # NetHack may be freely redistributed.  See license for details.
 #
 
-MAZE: "valley-1", ' '
-FLAGS: noteleport,hardfloor,nommap
+LEVEL: "valley-1"
+FLAGS: noteleport,hardfloor,nommap,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ----------------------------------------------------------------------------
@@ -153,8 +154,9 @@ MONSTER:'M',random,random
 MONSTER:'M',random,random
 MONSTER:'M',random,random
 #
-MAZE: "valley-2", ' '
-FLAGS: noteleport,hardfloor,nommap
+LEVEL: "valley-2"
+FLAGS: noteleport,hardfloor,nommap,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ----------------------------------------------}}}}--------------------------
@@ -306,9 +308,9 @@ MONSTER[50%]:'M',random,random
 #
 # The Juiblex level
 #
-MAZE:"juiblex",' '
-FLAGS:noteleport,shortsighted
-INIT_MAP:'.','}',true,true,unlit,false
+LEVEL:"juiblex"
+FLAGS:noteleport,shortsighted,mazelevel
+INIT_MAP:mines,'.','}',true,true,unlit,false
 # guarantee at least one open spot to ensure successful stair placement
 GEOMETRY:left,bottom
 MAP
@@ -423,8 +425,9 @@ TRAP:"magic",random
 #
 # The Orcus Level
 #
-MAZE:"orcus-1",random
-FLAGS: noteleport,shortsighted
+LEVEL:"orcus-1"
+FLAGS: noteleport,shortsighted,mazelevel
+INIT_MAP:mazegrid,'-'
 GEOMETRY:right,center
 # A ghost town
 MAP
@@ -563,8 +566,9 @@ MONSTER:random,random,random
 #
 # The New Orcus Level
 #
-MAZE:"orcus-2",random
-FLAGS: noteleport,shortsighted,hardfloor
+LEVEL:"orcus-2"
+FLAGS: noteleport,shortsighted,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # A ghost town
 MAP
@@ -717,8 +721,9 @@ MONSTER[50%]:random,random,random
 #
 # The Asmodeus Level
 #
-MAZE:"asmod-1",random
-FLAGS: noteleport
+LEVEL:"asmod-1"
+FLAGS: noteleport,mazelevel
+INIT_MAP:mazegrid,'-'
 # First part
 GEOMETRY:half-left,center
 MAP
@@ -801,8 +806,9 @@ TRAP:"magic", random
 #
 # The New Asmodeus Level
 #
-MAZE:"asmod-2",random
-FLAGS: noteleport,hardfloor
+LEVEL:"asmod-2"
+FLAGS: noteleport,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
 # First part
 GEOMETRY:half-left,center
 MAP
@@ -983,8 +989,9 @@ OBJECT[50%]:'"',"amulet of strangulation",(65,18),cursed,0
 #
 # The Baalzebub level
 #
-MAZE:"baalz-1",random
-FLAGS: noteleport
+LEVEL:"baalz-1"
+FLAGS: noteleport,mazelevel
+INIT_MAP:mazegrid,'-'
 GEOMETRY:right,center
 MAP
 -------------------------------------------------
@@ -1041,8 +1048,8 @@ MONSTER:'V',random,random
 #
 # The New Baalzebub level
 #
-MAZE:"baalz-2",random
-FLAGS: noteleport,hardfloor
+LEVEL:"baalz-2"
+FLAGS: noteleport,hardfloor,mazelevel
 GEOMETRY:center,center
 MAP
       }}   }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}                  
@@ -1158,8 +1165,9 @@ MONSTER[50%]:'P',random,random
 #
 # The Sanctum Level
 #
-MAZE:"sanctum", ' '
-FLAGS: noteleport,hardfloor,nommap
+LEVEL:"sanctum"
+FLAGS: noteleport,hardfloor,nommap,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 #         1         2         3         4         5         6         7    7
 #123456789012345678901234567890123456789012345678901234567890123456789012345
@@ -1310,8 +1318,9 @@ STAIR:(63,15),up
 #	This level is used to fill out any levels not occupied by
 #	specific levels as defined above.
 #
-MAZE: "hellfill",'L'
-INIT_MAP: '.',' ',true,true,unlit,true
+LEVEL: "hellfill"
+FLAGS:mazelevel
+INIT_MAP: mines,'.',' ',true,true,unlit,true,'L'
 TELEPORT_REGION:levregion(11,01,59,19),levregion(01,01,02,02)
 NOMAP
 #

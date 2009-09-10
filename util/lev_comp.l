@@ -101,10 +101,12 @@ static int map_cnt = 0;
 ^[ \t]*#.*\n		{ line_number++; }
 :		{ colon_line_number = line_number; return ':'; }
 MESSAGE		return MESSAGE_ID;
-MAZE		return MAZE_ID;
 NOMAP		return NOMAP_ID;
 LEVEL		return LEVEL_ID;
 INIT_MAP	return LEV_INIT_ID;
+mazegrid	return MAZE_GRID_ID;
+solidfill	return SOLID_FILL_ID;
+mines		return MINES_ID;
 FLAGS		return FLAGS_ID;
 GEOMETRY	return GEOMETRY_ID;
 ^MAP\r?\n		{ BEGIN(MAPC); line_number++; }
@@ -213,6 +215,9 @@ shortsighted	{ yylval.i=SHORTSIGHTED; return FLAG_TYPE; }
 noflipx		{ yylval.i=NOFLIPX; return FLAG_TYPE; }
 noflipy		{ yylval.i=NOFLIPY; return FLAG_TYPE; }
 noflip		{ yylval.i=(NOFLIPX + NOFLIPY); return FLAG_TYPE; }
+mazelevel	{ yylval.i=MAZELEVEL; return FLAG_TYPE; }
+premapped	{ yylval.i=PREMAPPED; return FLAG_TYPE; }
+shroud		{ yylval.i=SHROUD; return FLAG_TYPE; }
 \[\ *[0-9]+\%\ *\] { yylval.i = atoi(yytext + 1); return PERCENT; }
 [0-9]+\%	{ yylval.i = atoi(yytext); return SPERCENT; }
 [+\-]?[0-9]+	{ yylval.i=atoi(yytext); return INTEGER; }

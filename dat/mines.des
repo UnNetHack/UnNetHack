@@ -9,8 +9,9 @@
 #	This level is used to fill out any levels not occupied by
 #	specific levels as defined below.
 #
-MAZE: "minefill" , ' '
-INIT_MAP: '.' , ' ' , true , true , random , true
+LEVEL: "minefill"
+FLAGS:mazelevel
+INIT_MAP: mines, '.' , ' ' , true , true , random , true
 NOMAP
 #
 STAIR: random, up
@@ -51,8 +52,9 @@ TRAP: random, random
 # "Orcish Town" - a variant of Frontier Town that has been
 # overrun by orcs.  Note the barricades (iron bars).
 #
-MAZE: "minetn-8",'-'
-INIT_MAP:'.',' ',true,true,random,true
+LEVEL: "minetn-8"
+FLAGS:mazelevel
+INIT_MAP:mines,'.',' ',true,true,random,true
 GEOMETRY:center,center
 MAP
 .....................................
@@ -350,88 +352,88 @@ NAME: "town"
 
 SUBROOM: "ordinary", random, (2,0), (2,2), "town"
 {
-ROOMDOOR: false, closed, west, random
+ROOMDOOR: false, closed, west|south, random
 }
 
 SUBROOM: "ordinary", unlit, (5,0), (2,2), "town"
 {
-ROOMDOOR: false, closed, south, random
+ROOMDOOR: false, closed, west|south|east, random
 }
 
 SUBROOM: "ordinary", random, (8,0), (2,2), "town"
 {
-ROOMDOOR: false, closed, east, random
+ROOMDOOR: false, closed, east|south, random
 }
 
 SUBROOM: "ordinary", lit, (16,0), (2,2), "town"
 {
-ROOMDOOR: false, closed, west, random
+ROOMDOOR: false, closed, west|south, random
 }
 
 SUBROOM: "ordinary", unlit, (19,0), (2,2), "town"
 {
-ROOMDOOR: false, closed, south, random
+ROOMDOOR: false, closed, west|south, random
 }
 
 SUBROOM: "ordinary", random, (22,0), (2,2), "town"
 {
-ROOMDOOR: false, locked, south, random
+ROOMDOOR: false, locked, west|south, random
 MONSTER: 'G', "gnome", random
 }
 
 SUBROOM: "ordinary", unlit, (25,0), (2,2), "town"
 {
-ROOMDOOR: false, closed, east, random
+ROOMDOOR: false, closed, east|south|west, random
 }
 
 SUBROOM: "ordinary", lit, (2,5), (2,2), "town"
 {
-ROOMDOOR: false, closed, north, random
-}
-
-SUBROOM: "ordinary", lit, (5,5), (2,2), "town"
-{
-ROOMDOOR: false, closed, south, random
+ROOMDOOR: false, closed, north|south|west, random
 }
 
 SUBROOM: "ordinary", random, (8,5), (2,2), "town"
 {
-ROOMDOOR: false, locked, north, random
+ROOMDOOR: false, locked, north|south|east, random
 MONSTER: 'G', "gnome", random
+}
+
+SUBROOM: "ordinary", lit, (5,5), (2,2), "town"
+{
+ROOMDOOR: false, closed, north|south|east|west, random
 }
 
 SUBROOM: "shop" , lit, (2,10), (4,3), "town"
 {
 CHANCE: 90
-ROOMDOOR: false, closed, west, random
+ROOMDOOR: false, closed, north|south|west, random
 }
 
 SUBROOM: "tool shop", lit, (23,10), (4,3), "town"
 {
 CHANCE: 90
-ROOMDOOR: false, closed, east, random
+ROOMDOOR: false, closed, south|east, random
 }
 
 SUBROOM: "food shop", lit, (24,5), (3,4), "town"
 {
 CHANCE: 90
-ROOMDOOR: false, closed, north, random
+ROOMDOOR: false, closed, north|east, random
 }
 
 SUBROOM: "candle shop", lit, (11,10), (4,3), "town"
 {
-ROOMDOOR: false, closed, east, random
+ROOMDOOR: false, closed, north|south|east, random
 }
 
 SUBROOM: "ordinary", unlit, (7,10), (3,3), "town"
 {
-ROOMDOOR: false, locked, north, random
+ROOMDOOR: false, locked, north|south, random
 MONSTER: 'G', "gnome", random
 }
 
 SUBROOM: "temple", lit, (19,5), (4,4), "town"
 {
-ROOMDOOR: false, closed, north, random
+ROOMDOOR: false, closed, north|west, random
 ALTAR:(02,02),align[0],shrine
 MONSTER: 'G', "gnomish wizard", random
 MONSTER: 'G', "gnomish wizard", random
@@ -439,7 +441,7 @@ MONSTER: 'G', "gnomish wizard", random
 
 SUBROOM: "ordinary", lit, (18,10), (4,3), "town"
 {
-ROOMDOOR: false, locked, west, random
+ROOMDOOR: false, locked, south|west, random
 MONSTER: 'G', "gnome lord", random
 }
 
@@ -737,7 +739,9 @@ RANDOM_CORRIDORS
 
 # "Grotto Town" by Kelly Bailey
 #
-MAZE: "minetn-5",' '
+LEVEL: "minetn-5"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 -----         ---------                                                    
@@ -841,8 +845,9 @@ ALTAR:(31,03),align[0],shrine
 
 # "Bustling Town" by Kelly Bailey
 #
-MAZE: "minetn-6",'-'
-INIT_MAP:'.','-',true,true,lit,true
+LEVEL: "minetn-6"
+FLAGS:mazelevel
+INIT_MAP:mines,'.','-',true,true,lit,true
 GEOMETRY:center,top
 MAP
 .-----................----------------.-
@@ -1074,7 +1079,9 @@ RANDOM_CORRIDORS
 # Mine end level variant 1
 # "Mimic of the Mines"
 #
-MAZE: "minend-1", ' '
+LEVEL: "minend-1"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 #1234567890123456789012345678901234567890123456789012345678901234567890
 MAP
@@ -1186,7 +1193,9 @@ MONSTER:'h',random,random
 # Mine end level variant 2
 # "Gnome King's Wine Cellar"
 #
-MAZE: "minend-2", ' '
+LEVEL: "minend-2"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ---------------------------------------------------------------------------
@@ -1307,8 +1316,9 @@ MONSTER:'h',random,random
 # "Catacombs" by Kelly Bailey
 # Relies on some very specific behavior of MAZEWALK.
 #
-MAZE:"minend-3",'-'
-FLAGS:nommap
+LEVEL:"minend-3"
+FLAGS:nommap,mazelevel
+INIT_MAP:solidfill,'-'
 GEOMETRY:center,bottom
 MAP
  - - - - - - - - - - -- -- - - . - - - - - - - - - -- - - -- - - - - . - - |

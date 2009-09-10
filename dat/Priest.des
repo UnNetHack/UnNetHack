@@ -8,8 +8,9 @@
 #	Here you meet your (besieged) class leader, High Priest
 #	and receive your quest assignment.
 #
-MAZE: "Pri-strt",' '
-FLAGS: noteleport,hardfloor
+LEVEL: "Pri-strt"
+FLAGS: noteleport,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ............................................................................
@@ -104,10 +105,10 @@ MONSTER: 'Z',"human zombie",(01,17)
 #	further towards your assigned quest.
 #
 
-MAZE: "Pri-loca",' '
-FLAGS: hardfloor
+LEVEL: "Pri-loca"
+FLAGS: hardfloor,mazelevel
 # This is a kludge to init the level as a lit field.
-INIT_MAP: '.' , '.' , false , false , lit , false
+INIT_MAP: mines, '.' , '.' , false , false , lit , false
 GEOMETRY:center,center
 MAP
 ........................................
@@ -180,8 +181,9 @@ TRAP:random,random
 #	been assigned to retrieve.
 #
 
-MAZE: "Pri-goal", ' '
-INIT_MAP: 'L' , '.' , false , false , unlit , false
+LEVEL: "Pri-goal"
+FLAGS:mazelevel
+INIT_MAP: mines, 'L' , '.' , false , false , unlit , false
 GEOMETRY:center,center
 MAP
 .L......L.LLL.......LL....

@@ -2,8 +2,8 @@
 # This is the black market
 # Massimo Campostrini (campo@sunthpi3.difi.unipi.it)
 #
-MAZE: "blkmar", ' '
-FLAGS: noteleport, hardfloor
+LEVEL: "blkmar"
+FLAGS: noteleport, hardfloor, mazelevel
 GEOMETRY: center, center
 MAP
 ---------------------------------------------------------------------------

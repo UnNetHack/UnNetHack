@@ -8,8 +8,9 @@
 #	Here you meet your (besieged) class leader, Pelias,
 #	and receive your quest assignment.
 #
-MAZE: "Bar-strt",' '
-FLAGS: noteleport,hardfloor
+LEVEL: "Bar-strt"
+FLAGS: noteleport,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ..................................PP........................................
@@ -98,8 +99,9 @@ MONSTER:'O',"ogre",(42,10),hostile
 #	further towards your assigned quest.
 #
 
-MAZE: "Bar-loca",' '
-FLAGS: hardfloor
+LEVEL: "Bar-loca"
+FLAGS: hardfloor,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ..........PPP.........................................                      
@@ -207,7 +209,9 @@ MONSTER:'T',random,random,hostile
 #	been assigned to retrieve.
 #
 
-MAZE: "Bar-goal", ' '
+LEVEL: "Bar-goal"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
                                                                             
@@ -304,8 +308,9 @@ WALLIFY
 #	and goal levels.
 #
 
-MAZE: "Bar-fila" , ' '
-INIT_MAP: '.' , '.' , true , true , unlit , false
+LEVEL: "Bar-fila"
+FLAGS:mazelevel
+INIT_MAP: mines, '.' , '.' , true , true , unlit , false
 NOMAP
 #
 STAIR: random, up
@@ -330,8 +335,9 @@ MONSTER: 'O', "ogre", random, hostile
 MONSTER: 'O', random, random, hostile
 MONSTER: 'T', "rock troll", random, hostile
 
-MAZE: "Bar-filb" , ' '
-INIT_MAP: '.' , ' ' , true , true , unlit , true
+LEVEL: "Bar-filb"
+FLAGS:mazelevel
+INIT_MAP: mines, '.' , ' ' , true , true , unlit , true
 NOMAP
 #
 STAIR: random, up

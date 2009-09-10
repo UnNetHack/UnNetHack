@@ -17,17 +17,23 @@
 #define MAP_Y_LIM	21
 
     /* Per level flags */
-#define NOTELEPORT	1
-#define HARDFLOOR	2
-#define NOMMAP		4
-#define SHORTSIGHTED	8
-#define ARBOREAL	16
-#define NOFLIPX		32
-#define NOFLIPY		64
+#define NOTELEPORT	0x00000001L
+#define HARDFLOOR	0x00000002L
+#define NOMMAP		0x00000004L
+#define SHORTSIGHTED	0x00000008L
+#define ARBOREAL	0x00000010L
+#define NOFLIPX		0x00000020L
+#define NOFLIPY		0x00000040L
+#define MAZELEVEL	0x00000080L
+#define PREMAPPED	0x00000100L
+#define SHROUD		0x00000200L
 
-    /* special level types */
-#define SP_LEV_ROOMS	1
-#define SP_LEV_MAZE	2
+/* different level layout initializers */
+#define LVLINIT_NONE		0
+#define LVLINIT_SOLIDFILL	1
+#define LVLINIT_MAZEGRID	2
+#define LVLINIT_MINES		3
+
 
 /* max. # of random registers */
 #define MAX_REGISTERS	10
@@ -110,12 +116,11 @@ typedef union str_or_len {
 } Str_or_Len;
 
 typedef struct {
-	boolean init_present, padding;
+	xchar   init_style; /* one of LVLINIT_foo */
 	char	fg, bg;
 	boolean smoothed, joined;
 	xchar	lit, walled;
 	long	flags;
-	char	levtyp;	/* SP_LEV_xxx */
 	schar	filling;
 	long	n_opcodes;
 } lev_init;
@@ -159,7 +164,7 @@ typedef struct {
 } drawbridge;
 
 typedef struct {
-	xchar x, y, dir, stocked;
+	xchar x, y, dir, stocked, typ;
 } walk;
 
 typedef struct {

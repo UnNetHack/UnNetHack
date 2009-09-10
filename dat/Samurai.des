@@ -8,8 +8,9 @@
 #	Here you meet your (besieged) class leader, Lord Sato
 #	and receive your quest assignment.
 #
-MAZE: "Sam-strt",' '
-FLAGS: noteleport,hardfloor
+LEVEL: "Sam-strt"
+FLAGS: noteleport,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ..............................................................PP............
@@ -95,8 +96,9 @@ MONSTER:'E',"stalker",random
 #	further towards your assigned quest.
 #
 
-MAZE: "Sam-loca",' '
-FLAGS: hardfloor
+LEVEL: "Sam-loca"
+FLAGS: hardfloor,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ............................................................................
@@ -239,8 +241,9 @@ MONSTER:'@',"samurai",(34,14),hostile
 #	assigned to retrieve.
 #
 
-MAZE: "Sam-goal", ' '
-FLAGS: noteleport
+LEVEL: "Sam-goal"
+FLAGS: noteleport,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
                                              
@@ -341,8 +344,9 @@ MONSTER:'E',"stalker",random
 #	and goal levels.
 #
 
-MAZE: "Sam-fila", 'P'
-INIT_MAP: '.' , 'P', true, true, random, true
+LEVEL: "Sam-fila"
+FLAGS:mazelevel
+INIT_MAP: mines, '.' , 'P', true, true, random, true
 NOMAP
 #
 STAIR: random, up
@@ -371,7 +375,9 @@ TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 
-MAZE: "Sam-filb", ' '
+LEVEL: "Sam-filb"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 -------------                                  -------------
