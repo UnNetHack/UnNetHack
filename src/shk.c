@@ -423,6 +423,9 @@ register struct monst *shkp;
     if (rlock)  return;
     rlock = TRUE;
 
+    /* allow black marketeer to leave his shop */
+    hot_pursuit(shkp);
+
     /* wake up assistants */
     for (mt = fmon; mt; mt = mt->nmon) {
 	if (DEADMONSTER(mt)) continue;
