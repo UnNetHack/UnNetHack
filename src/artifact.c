@@ -1028,10 +1028,12 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	    return Mb_hit(magr, mdef, otmp, dmgptr, dieroll, vis, hittee);
 	}
 
-	if (!spec_dbon_applies) {
-	    /* since damage bonus didn't apply, nothing more to do;  
-	       no further attacks have side-effects on inventory */
-	    return FALSE;
+	if (otmp->oartifact != ART_THIEFBANE || !youdefend) {
+		if (!spec_dbon_applies) {
+			/* since damage bonus didn't apply, nothing more to do;  
+			   no further attacks have side-effects on inventory */
+			return FALSE;
+		}
 	}
 
 	/* We really want "on a natural 20" but Nethack does it in */
@@ -1082,8 +1084,9 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 			otmp->dknown = TRUE;
 			return TRUE;
 		}
-	    } else if (otmp->oartifact == ART_VORPAL_BLADE &&
-		       (dieroll == 1 || mdef->data->mlet == S_JABBERWOCK)) {
+	    } else if ((otmp->oartifact == ART_VORPAL_BLADE &&
+		        (dieroll == 1 || mdef->data->mlet == S_JABBERWOCK)) ||
+		      (otmp->oartifact == ART_THIEFBANE && dieroll < 3)) {
 		static const char * const behead_msg[2] = {
 		     "%s beheads %s!",
 		     "%s decapitates %s!"
@@ -1091,7 +1094,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 
 		if (youattack && u.uswallow && mdef == u.ustuck)
 			return FALSE;
-		wepdesc = artilist[ART_VORPAL_BLADE].name;
+		wepdesc = artilist[otmp->oartifact].name;
 		if (!youdefend) {
 			if (!has_head(mdef->data) || notonhead || u.uswallow) {
 				if (youattack)
