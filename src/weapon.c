@@ -496,11 +496,19 @@ register struct monst *mtmp;
 
 	/* prefer artifacts to everything else */
 	for(otmp=mtmp->minvent; otmp; otmp = otmp->nobj) {
-		if (otmp->oclass == WEAPON_CLASS
-			&& otmp->oartifact && touch_artifact(otmp,mtmp)
-			&& ((strong && !wearing_shield)
-			    || !objects[otmp->otyp].oc_bimanual))
-		    return otmp;
+		if (otmp->oclass == WEAPON_CLASS &&
+		    otmp->oartifact &&
+		    touch_artifact(otmp,mtmp)) {
+#ifdef BLACKMARKET
+			/* let black marketeer wield their artifact weapon
+			   in any case. */
+			if (mtmp->data == &mons[PM_BLACK_MARKETEER])
+				return otmp;
+#endif
+			if ((strong && !wearing_shield) ||
+			    !objects[otmp->otyp].oc_bimanual)
+				return otmp;
+		}
 	}
 
 	if(is_giant(mtmp->data))	/* giants just love to use clubs */
