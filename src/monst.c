@@ -1923,7 +1923,7 @@ struct permonst _mons2[] = {
 	M3_INFRAVISIBLE, CLR_BLUE),
 #ifdef WEBB_DISINT
     MON("disintegrator", S_RUSTMONST,
-	LVL(18, 8, 0, 20, -3), (G_HELL|G_GENO|G_NOCORPSE),
+	LVL(18, 8, 0, 20, -3), (G_HELL|G_GENO|G_NOCORPSE|1),
 	A(ATTK(AT_CLAW, AD_DISN, 4, 4), /* don't want passive, disintegration
 	                                   has to intercept attacks */
 	  NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
