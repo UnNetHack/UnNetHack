@@ -1528,6 +1528,13 @@ minimal_enlightenment()
 	Sprintf(buf, fmtstr, "alignment", align_str(u.ualign.type));
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
 
+	/* Current position of hero */
+	if (wizard) {
+		Sprintf(buf2, "(%2d,%2d)", u.ux, u.uy);
+		Sprintf(buf, fmtstr, "position", buf2);
+		add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	}
+
 	/* Deity list */
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", FALSE);
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, "Deities", FALSE);
