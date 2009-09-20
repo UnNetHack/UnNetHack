@@ -314,8 +314,7 @@ MONSTER: '@', "watchman", random, peaceful
 MONSTER: '@', "watch captain", random, peaceful
 }
 
-ROOM: "ordinary" , lit, (3,3), (center,center), (31,15)
-#ROOM: "ordinary", random, random, random, random
+ROOM: "ordinary", random, random, random, random
 {
 STAIR: random, up
 }
