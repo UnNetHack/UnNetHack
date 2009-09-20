@@ -1220,7 +1220,8 @@ boolean at_stairs, falling, portal;
 					 (y < updest.nly ||
 					  y > updest.nhy));
 			    } while ((occupied(x, y) ||
-				      IS_WALL(levl[x][y].typ)) && (trycnt++ < 300));
+				      IS_STWALL(levl[x][y].typ)) && (trycnt++ < 1000));
+			    if (trycnt >= 1000) impossible("castle: placement failed to find good position"); /* TODO: change impossible() to warning() */
 			    u_on_newpos(x, y);
 			} else u_on_sstairs();
 		    } else u_on_dnstairs();

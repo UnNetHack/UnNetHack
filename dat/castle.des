@@ -46,7 +46,7 @@ RANDOM_PLACES:(04,02),(58,02),(04,14),(58,14)
 RANDOM_MONSTERS:'L','N','E','H','M','O','R','T','X','Z'
 
 TELEPORT_REGION:levregion(01,00,10,20),(1,1,61,15),down
-TELEPORT_REGION:levregion(69,00,79,20),(1,1,61,15),up
+TELEPORT_REGION:levregion(72,00,79,20),(1,1,61,15),up
 STAIR:levregion(01,00,10,20),(0,0,62,16),up
 FOUNTAIN:(10,08)
 # Doors
