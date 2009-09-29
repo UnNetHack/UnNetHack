@@ -309,6 +309,7 @@ struct obj *obj;
 		livelog_achieve_update();
 #endif
 	} else if(Is_sokoend_level(&u.uz) &&
+	          obj->otyp != CORPSE && /* workaround because of bit reusing */
 	          obj->record_achieve_special) {
 		achieve.finish_sokoban = 1;
 		obj->record_achieve_special = 0;
