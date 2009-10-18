@@ -112,6 +112,7 @@ SPEC_LEVS = asmod-?.lev baalz-?.lev bigrm-*.lev blkmar.lev castle-?.lev fakewiz?
 	oracle.lev orcus-?.lev sanctum.lev soko?-?.lev \
 	hellfill.lev nymph.lev \
 	tower?.lev valley-?.lev wizard?.lev heck-?-?.lev \
+	advcal.lev \
 	astral.lev air.lev earth.lev fire.lev water.lev
 QUEST_LEVS = ???-goal.lev ???-fil?.lev ???-loca.lev ???-strt.lev
 

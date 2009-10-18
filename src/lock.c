@@ -235,6 +235,7 @@ int rx,ry;
 	/* rx and ry are passed only from the use-stethoscope stuff */
 	int picktyp, c, ch;
 	coord cc;
+	int key;
 	struct rm	*door;
 	struct obj	*otmp;
 	char qbuf[QBUFSZ];
@@ -429,6 +430,8 @@ int rx,ry;
 			return(0);
 		    }
 #endif
+		    /* ALI - Artifact doors */
+		    key = artifact_door(cc.x, cc.y);
 
 		    Sprintf(qbuf,"%sock it?",
 			(door->doormask & D_LOCKED) ? "Unl" : "L" );
@@ -452,6 +455,20 @@ int rx,ry;
 		    }
 		    xlock.door = door;
 		    xlock.box = 0;
+
+		    /* ALI - Artifact doors */
+#ifdef ADVENT_CALENDAR
+		    if (key) {
+#else
+		    xlock.key = pick->oartifact;
+		    if (key && xlock.key != key) {
+#endif
+			if (picktyp == SKELETON_KEY) {
+			    Your("key doesn't seem to fit.");
+			    return(0);
+			}
+			else ch = -1;		/* -1 == 0% chance */
+		    }
 	    }
 	}
 	flags.move = 0;
@@ -793,6 +810,7 @@ int x, y;
 	const char *msg = (const char *)0;
 	const char *dustcloud = "A cloud of dust";
 	const char *quickly_dissipates = "quickly dissipates";
+	int key = artifact_door(x, y);		/* ALI - Artifact doors */
 	
 	if (door->typ == SDOOR) {
 	    switch (otmp->otyp) {
@@ -800,8 +818,12 @@ int x, y;
 	    case SPE_KNOCK:
 	    case WAN_STRIKING:
 	    case SPE_FORCE_BOLT:
+		if (key)	/* Artifact doors are revealed only */
+		    cvt_sdoor_to_door(door);
+		else {
 		door->typ = DOOR;
 		door->doormask = D_CLOSED | (door->doormask & D_TRAPPED);
+		}
 		newsym(x,y);
 		if (cansee(x,y)) pline("A door appears in the wall!");
 		if (otmp->otyp == WAN_OPENING || otmp->otyp == SPE_KNOCK)
@@ -849,12 +871,21 @@ int x, y;
 
 	    switch (door->doormask & ~D_TRAPPED) {
 	    case D_CLOSED:
+		if (key)
+		    msg = "The door closes!";
+		else
 		msg = "The door locks!";
 		break;
 	    case D_ISOPEN:
+		if (key)
+		    msg = "The door swings shut!";
+		else
 		msg = "The door swings shut, and locks!";
 		break;
 	    case D_BROKEN:
+		if (key)
+		    msg = "The broken door reassembles!";
+		else
 		msg = "The broken door reassembles and locks!";
 		break;
 	    case D_NODOOR:
@@ -866,19 +897,22 @@ int x, y;
 		break;
 	    }
 	    block_point(x, y);
+	    if (key)
+		door->doormask = D_CLOSED | (door->doormask & D_TRAPPED);
+	    else
 	    door->doormask = D_LOCKED | (door->doormask & D_TRAPPED);
 	    newsym(x,y);
 	    break;
 	case WAN_OPENING:
 	case SPE_KNOCK:
-	    if (door->doormask & D_LOCKED) {
+	    if (!key && door->doormask & D_LOCKED) {
 		msg = "The door unlocks!";
 		door->doormask = D_CLOSED | (door->doormask & D_TRAPPED);
 	    } else res = FALSE;
 	    break;
 	case WAN_STRIKING:
 	case SPE_FORCE_BOLT:
-	    if (door->doormask & (D_LOCKED | D_CLOSED)) {
+	    if (!key && door->doormask & (D_LOCKED | D_CLOSED)) {
 		if (door->doormask & D_TRAPPED) {
 		    if (MON_AT(x, y))
 			(void) mb_trapped(m_at(x,y));
@@ -963,6 +997,34 @@ struct obj *otmp;
 		break;
 	}
 	pline("%s %s!", An(thing), disposition);
+}
+
+/* ALI - Kevin Hugo's artifact doors.
+ * Return the artifact which unlocks the door at (x, y), or
+ * zero if it is an ordinary door.
+ * Note: Not all doors are listed in the doors array (eg., doors
+ * dynamically converted from secret doors). Since only trapped
+ * and artifact doors are needed this isn't a problem. If we ever
+ * implement trapped secret doors we will have to extend this.
+ */
+
+int
+artifact_door(x, y)
+int x, y;
+{
+    int i;
+
+#ifdef ADVENT_CALENDAR
+    /* on the advent calendar level all doors are indestructible */
+    if (Is_advent_calendar(&u.uz)) return A_NONE;
+#endif
+/*
+    for(i = 0; i < doorindex; i++) {
+	if (x == doors[i].x && y == doors[i].y)
+	    return doors[i].arti_key;
+    }
+*/
+    return 0;
 }
 
 #endif /* OVLB */

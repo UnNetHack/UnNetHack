@@ -912,6 +912,21 @@ int mode;
     } else if (IS_DOOR(tmpr->typ)) {
 	if (closed_door(x,y)) {
 	    if (Blind && mode == DO_MOVE) feel_location(x,y);
+	    /* ALI - artifact doors */
+	    if (artifact_door(x, y)) {
+		if (mode == DO_MOVE) {
+		    if (amorphous(youmonst.data))
+			You("try to ooze under the door, but the gap is too small.");
+		    else if (tunnels(youmonst.data) && !needspick(youmonst.data))
+			You("hurt your teeth on the re-enforced door.");
+		    else if (x == u.ux || y == u.uy) {
+			if (Blind || Stunned || ACURR(A_DEX) < 10 || Fumbling) {                            pline("Ouch!  You bump into a heavy door.");
+			    exercise(A_DEX, FALSE);
+			} else pline("That door is closed.");
+		    }
+		}
+		return FALSE;
+	    } else
 	    if (Passes_walls)
 		;	/* do nothing */
 	    else if (can_ooze(&youmonst)) {

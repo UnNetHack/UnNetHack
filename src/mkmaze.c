@@ -519,6 +519,10 @@ fixup_special()
 		    mtmp2 = mtmp->nmon;
 		    if(mtmp->isshk) mongone(mtmp);
 	    }
+#ifdef ADVENT_CALENDAR
+    } else if (Is_advent_calendar(&u.uz)) {
+    	fill_advent_calendar(TRUE);
+#endif
     }
 
     if(lev_message) {
@@ -537,6 +541,71 @@ fixup_special()
 	free((genericptr_t) lregions),  lregions = 0;
     num_lregions = 0;
 }
+
+#ifdef ADVENT_CALENDAR
+void
+fill_advent_calendar(init)
+boolean init;
+{
+    int door_nr=1;
+    char buf[4];
+    int x,y;
+    int in_x,in_y,out_x,out_y;
+
+    for(x = 1; x < COLNO; x++) {
+        for(y = 1; y < ROWNO; y++) {
+            if (door_nr < 25 && isok(x,y) && IS_DOOR(levl[x][y].typ)) {
+                if (y < 10) {
+                    out_x = x; out_y = y+1; in_x = x; in_y = y-1;
+                } else {
+                    out_x = x; out_y = y-1; in_x = x; in_y = y+1;
+                }
+                if (init) {
+                    sprintf(buf, "%d", door_nr);
+                    /* place number in front of the door */
+                    make_engr_at(out_x, out_y, buf, 0L, MARK);
+		    if (door_nr == 24) {
+		    	int object = CANDY_BAR;
+		    	/* Christmas present! */
+		    	switch(rn2(15)) {
+				case  0: object = BAG_OF_HOLDING; break;
+				case  1: object = OILSKIN_SACK; break;
+				case  2: object = FIRE_HORN; break;
+				case  3: object = FROST_HORN; break;
+				case  4: object = MAGIC_FLUTE; break;
+				case  5: object = MAGIC_HARP; break;
+				case  6: object = DRUM_OF_EARTHQUAKE; break;
+				case  7: object = MAGIC_WHISTLE; break;
+				case  8: object = MAGIC_LAMP; break;
+				case  9: object = UNICORN_HORN; break;
+				case 10: object = BAG_OF_TRICKS; break;
+				case 11: object = EXPENSIVE_CAMERA; break;
+				case 12: object = HORN_OF_PLENTY; break;
+				case 13: object = STETHOSCOPE; break;
+				case 14: object = TINNING_KIT; break;
+			}
+		    	mksobj_at(object, in_x, in_y, TRUE, TRUE);
+		    } else if (rn2(4)) {
+		    	mksobj_at((rn2(4)) ? CANDY_BAR : FORTUNE_COOKIE, in_x, in_y, FALSE, FALSE);
+		    } else {
+                    	mkobj_at((rn2(4)) ? RING_CLASS : TOOL_CLASS, in_x, in_y, FALSE);
+		    }
+		}
+		if (levl[x][y].doormask & D_LOCKED && getmonth()==12) {
+		    if (getmday() == 24 && door_nr == 24) {
+		        You_hear("a little bell ringing!");
+		        levl[x][y].doormask = D_CLOSED;
+		    } else if (getmday() == door_nr) {
+			You_hear("a door unlocking!");
+		        levl[x][y].doormask = D_CLOSED;
+		    }
+                }
+	    	door_nr++;
+            }
+        }
+    }
+}
+#endif
 
 void
 makemaz(s)
