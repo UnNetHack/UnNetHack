@@ -1014,6 +1014,9 @@ static const char * const bogusmons[] = {
 	"ceiling cat", "basement cat",
 	"monorail cat",				/* the Internet is made for cat pix */
 	"rape golem",				/* schnippi */
+	"tridude",				/* POWDER */
+	"orcus cosmicus",			/* Radomir Dopieralski */
+	"Greater Hell Beast",			/* Angband */
 };
 
 
