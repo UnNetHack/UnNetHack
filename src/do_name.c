@@ -1023,6 +1023,7 @@ static const char * const bogusmons[] = {
 	"tridude",				/* POWDER */
 	"orcus cosmicus",			/* Radomir Dopieralski */
 	"Greater Hell Beast",			/* Angband */
+	"Vendor of Yizard",			/* Souljazz */
 };
 
 
