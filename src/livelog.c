@@ -211,3 +211,38 @@ long total;
 }
 
 #endif /* LIVELOGFILE */
+
+/** Livelog method for reporting the starting/resuming of a game. */
+void
+livelog_game_started(verb, alignment_sex, race, role)
+const char* verb;
+const char* alignment_sex;
+const char* race;
+const char* role;
+{
+	snprintf(strbuf, STRBUF_LEN,
+		"player=%s:turns=%ld:starttime=%ld:game_action=%s:"
+		"alignment=%s:race=%s:role=%s\n",
+		plname,
+		moves,
+		(long)u.ubirthday,
+		verb,
+		alignment_sex,
+		race,
+		role);
+	livelog_write_string(strbuf);
+}
+
+/** Livelog method for reporting saving, quitting, etc. */
+void
+livelog_game_action(verb)
+const char* verb;
+{
+	snprintf(strbuf, STRBUF_LEN,
+		"player=%s:turns=%ld:starttime=%ld:game_action=%s\n",
+		plname,
+		moves,
+		(long)u.ubirthday,
+		verb);
+	livelog_write_string(strbuf);
+}

@@ -2475,6 +2475,8 @@ E int NDECL(doshout);
 #endif
 E void FDECL(livelog_shoplifting, (const char*, const char*, long));
 #endif
+E void FDECL(livelog_game_started, (const char*, const char*, const char*, const char*));
+E void FDECL(livelog_game_action, (const char*));
 
 #endif /* !MAKEDEFS_C && !LEV_LEX_C */
 
