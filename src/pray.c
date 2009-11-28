@@ -360,7 +360,7 @@ register int trouble;
 			}
 		    }
 		    if (nohands(youmonst.data) || !freehand())
-			impossible("fix_worst_trouble: couldn't cure hands.");
+			warning("fix_worst_trouble: couldn't cure hands.");
 		    break;
 	    case TROUBLE_CURSED_BLINDFOLD:
 		    otmp = ublindf;
@@ -388,7 +388,7 @@ register int trouble;
 		    else if (otmp == uleft) what = leftglow;
 decurse:
 		    if (!otmp) {
-			impossible("fix_worst_trouble: nothing to uncurse.");
+			warning("fix_worst_trouble: nothing to uncurse.");
 			return;
 		    }
 		    uncurse(otmp);
@@ -1011,7 +1011,7 @@ pleased(g_align)
 	    place_object(otmp, u.ux, u.uy);
 	    break;
 	}
-	default:	impossible("Confused deity!");
+	default:	warning("Confused deity!");
 	    break;
 	}
 
@@ -1807,7 +1807,7 @@ aligntyp alignment;
      case A_LAWFUL:	gnam = urole.lgod; break;
      case A_NEUTRAL:	gnam = urole.ngod; break;
      case A_CHAOTIC:	gnam = urole.cgod; break;
-     default:		impossible("unknown alignment.");
+     default:		warning("unknown alignment.");
 			gnam = "someone"; break;
     }
     if (*gnam == '_') ++gnam;

@@ -462,7 +462,7 @@ struct obj *instr;
 	    exercise(A_WIS, FALSE);
 	    break;
 	default:
-	    impossible("What a weird instrument (%d)!", instr->otyp);
+	    warning("What a weird instrument (%d)!", instr->otyp);
 	    break;
 	}
 	return 2;		/* That takes time */

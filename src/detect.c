@@ -414,7 +414,7 @@ int		class;		/* an object class, 0 for all */
     int sym, boulder = 0;
 
     if (class < 0 || class >= MAXOCLASSES) {
-	impossible("object_detect:  illegal class %d", class);
+	warning("object_detect:  illegal class %d", class);
 	class = 0;
     }
 

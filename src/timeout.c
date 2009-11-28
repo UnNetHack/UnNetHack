@@ -554,7 +554,7 @@ long timeout;
 		    break;
 #endif
 		default:
-		    impossible("egg hatched where? (%d)", (int)egg->where);
+		    warning("egg hatched where? (%d)", (int)egg->where);
 		    break;
 	    }
 
@@ -1002,7 +1002,7 @@ long timeout;
 		break;
 
 	    default:
-		impossible("burn_object: unexpeced obj %s", xname(obj));
+		warning("burn_object: unexpeced obj %s", xname(obj));
 		break;
 	}
 	if (need_newsym) newsym(x, y);
@@ -1100,7 +1100,7 @@ begin_burn(obj, already_lit)
 			obj->lamplit = 1;
 			do_timer = FALSE;
 		} else {
-		    impossible("begin burn: unexpected %s", xname(obj));
+		    warning("begin burn: unexpected %s", xname(obj));
 		    turns = obj->age;
 		}
 		break;
@@ -1127,7 +1127,7 @@ begin_burn(obj, already_lit)
 	    if (get_obj_location(obj, &x, &y, CONTAINED_TOO|BURIED_TOO))
 		new_light_source(x, y, radius, LS_OBJECT, (genericptr_t) obj);
 	    else
-		impossible("begin_burn: can't get obj position");
+		warning("begin_burn: can't get obj position");
 	}
 }
 
@@ -1141,7 +1141,7 @@ end_burn(obj, timer_attached)
 	boolean timer_attached;
 {
 	if (!obj->lamplit) {
-	    impossible("end_burn: obj %s not lit", xname(obj));
+	    warning("end_burn: obj %s not lit", xname(obj));
 	    return;
 	}
 
@@ -1155,7 +1155,7 @@ end_burn(obj, timer_attached)
 	    if (obj->where == OBJ_INVENT)
 		update_inventory();
 	} else if (!stop_timer(BURN_OBJECT, (genericptr_t) obj))
-	    impossible("end_burn: obj %s not timed!", xname(obj));
+	    warning("end_burn: obj %s not timed!", xname(obj));
 }
 
 #endif /* OVL1 */
@@ -1171,7 +1171,7 @@ cleanup_burn(arg, expire_time)
 {
     struct obj *obj = (struct obj *)arg;
     if (!obj->lamplit) {
-	impossible("cleanup_burn: obj %s not lit", xname(obj));
+	warning("cleanup_burn: obj %s not lit", xname(obj));
 	return;
     }
 

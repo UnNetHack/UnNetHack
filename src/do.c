@@ -63,7 +63,7 @@ register int rx, ry;
 boolean pushing;
 {
 	if (!otmp || otmp->otyp != BOULDER)
-	    impossible("Not a boulder?");
+	    warning("Not a boulder?");
 	else if (!Is_waterlevel(&u.uz) && (is_pool(rx,ry) || is_lava(rx,ry))) {
 	    boolean lava = is_lava(rx,ry), fills_up;
 	    const char *what = waterbody_name(rx,ry);
@@ -1221,7 +1221,7 @@ boolean at_stairs, falling, portal;
 					  y > updest.nhy));
 			    } while ((occupied(x, y) ||
 				      IS_STWALL(levl[x][y].typ)) && (trycnt++ < 1000));
-			    if (trycnt >= 1000) impossible("castle: placement failed to find good position"); /* TODO: change impossible() to warning() */
+			    if (trycnt >= 1000) warning("castle: placement failed to find good position"); /* TODO: change impossible() to warning() */
 			    u_on_newpos(x, y);
 			} else u_on_sstairs();
 		    } else u_on_dnstairs();

@@ -445,7 +445,7 @@ int how;
 	t0->name[NAMSZ] = '\0';
 	t0->death[0] = '\0';
 	switch (killer_format) {
-		default: impossible("bad killer format?");
+		default: warning("bad killer format?");
 		case KILLED_BY_AN:
 			Strcat(t0->death, killed_by_prefix[how]);
 			(void) strncat(t0->death, an(killer),
@@ -1167,7 +1167,7 @@ classmon(plch, fem)
 	/* this might be from a 3.2.x score for former Elf class */
 	if (!strcmp(plch, "E")) return PM_RANGER;
 
-	impossible("What weird role is this? (%s)", plch);
+	warning("What weird role is this? (%s)", plch);
 	return (PM_HUMAN_MUMMY);
 }
 

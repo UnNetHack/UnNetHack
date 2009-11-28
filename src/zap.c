@@ -337,7 +337,7 @@ struct obj *otmp;
 		}
 		break;
 	default:
-		impossible("What an interesting effect (%d)", otyp);
+		warning("What an interesting effect (%d)", otyp);
 		break;
 	}
 	if(wake) {
@@ -1551,7 +1551,7 @@ struct obj *obj, *otmp;
 	 * for the STONE_TO_FLESH spell.
 	 */
 	if (!(obj->where == OBJ_FLOOR || otmp->otyp == SPE_STONE_TO_FLESH))
-	    impossible("bhito: obj is not floor or Stone To Flesh spell");
+	    warning("bhito: obj is not floor or Stone To Flesh spell");
 
 	if (obj == uball) {
 		res = 0;
@@ -1765,7 +1765,7 @@ smell:
 		newsym(refresh_x, refresh_y);
 		break;
 	default:
-		impossible("What an interesting effect (%d)", otmp->otyp);
+		warning("What an interesting effect (%d)", otmp->otyp);
 		break;
 	}
 	return res;
@@ -2211,7 +2211,7 @@ boolean ordinary;
 		    } while (didmerge);
 		    }
 		    break;
-		default: impossible("object %d used?",obj->otyp);
+		default: warning("object %d used?",obj->otyp);
 		    break;
 	}
 	return(damage);
@@ -2586,7 +2586,7 @@ register struct	obj	*obj;
 		     (otyp == WAN_MAGIC_MISSILE) ? 2 : 6,
 		     u.ux, u.uy, u.dx, u.dy);
 	    else
-		impossible("weffects: unexpected spell or wand");
+		warning("weffects: unexpected spell or wand");
 	    disclose = TRUE;
 	}
 	if (disclose && was_unkn) {
@@ -3663,7 +3663,7 @@ xchar x, y;
 	    do {
 		obj_extract_self(otmp);	/* boulder isn't being pushed */
 		if (!boulder_hits_pool(otmp, x, y, FALSE))
-		    impossible("melt_ice: no pool?");
+		    warning("melt_ice: no pool?");
 		/* try again if there's another boulder and pool didn't fill */
 	    } while (is_pool(x,y) && (otmp = sobj_at(BOULDER, x, y)) != 0);
 	    newsym(x,y);

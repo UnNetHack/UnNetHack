@@ -274,6 +274,21 @@ impossible VA_DECL(const char *, s)
 	VA_END();
 }
 
+void
+warning VA_DECL(const char *, s)
+	char str[BUFSZ];
+	VA_START(s);
+	VA_INIT(s, const char *);
+	{
+	    char pbuf[BUFSZ];
+	    Vsprintf(pbuf,s,VA_ARGS);
+	    paniclog("warning", pbuf);
+	}
+	Vsprintf(str,s,VA_ARGS);
+	pline("Warning: %s\n", str);
+	VA_END();
+}
+
 const char *
 align_str(alignment)
     aligntyp alignment;

@@ -945,7 +945,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 	    case TRAPDOOR:
 		if (!Can_fall_thru(&u.uz)) {
 		    seetrap(trap);	/* normally done in fall_through */
-		    impossible("dotrap: %ss cannot exist on this level.",
+		    warning("dotrap: %ss cannot exist on this level.",
 			       defsyms[trap_to_defsym(ttype)].explanation);
 		    break;		/* don't activate it after all */
 		}
@@ -1189,7 +1189,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 
 	    default:
 		seetrap(trap);
-		impossible("You hit a trap of type %u", trap->ttyp);
+		warning("You hit a trap of type %u", trap->ttyp);
 	}
 }
 
@@ -2209,7 +2209,7 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 		    break;
 
 		default:
-			impossible("Some monster encountered a strange trap of type %d.", tt);
+			warning("Some monster encountered a strange trap of type %d.", tt);
 	    }
 	}
 	if(trapkilled) return 2;
@@ -3778,7 +3778,7 @@ boolean disarm;
 		case  2:
 		case  1:
 		case  0:  msg = "gas cloud blows away";  break;
-		default:  impossible("chest disarm bug");  msg = (char *)0;
+		default:  warning("chest disarm bug");  msg = (char *)0;
 			  break;
 	    }
 	    if (msg) pline("But luckily the %s!", msg);
@@ -3913,7 +3913,7 @@ boolean disarm;
 			make_stunned(HStun + rn1(7, 16),FALSE);
 			(void) make_hallucinated(HHallucination + rn1(5, 16),FALSE,0L);
 			break;
-		default: impossible("bad chest trap");
+		default: warning("bad chest trap");
 			break;
 	    }
 	    bot();			/* to get immediate botl re-display */

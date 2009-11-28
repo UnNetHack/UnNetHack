@@ -2726,7 +2726,7 @@ register struct obj *obj;
 	full_amount = (obj->otyp == CORPSE) ? (long)mons[obj->corpsenm].cnutrit
 					: (long)objects[obj->otyp].oc_nutrition;
 	if (uneaten_amt > full_amount) {
-	    impossible(
+	    warning(
 	  "partly eaten food (%ld) more nutritious than untouched food (%ld)",
 		       uneaten_amt, full_amount);
 	    uneaten_amt = full_amount;

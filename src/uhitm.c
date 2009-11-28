@@ -1527,7 +1527,7 @@ register struct attack *mattk;
 		    if(thick_skinned(mdef->data)) tmp = 0;
 		    if(mdef->data == &mons[PM_SHADE]) {
 			if (!(uarmf && uarmf->blessed)) {
-			    impossible("bad shade attack function flow?");
+			    warning("bad shade attack function flow?");
 			    tmp = 0;
 			} else
 			    tmp = rnd(4); /* bless damage */
@@ -2387,7 +2387,7 @@ use_weapon:
 			break;
 
 		default: /* Strange... */
-			impossible("strange attack of yours (%d)",
+			warning("strange attack of yours (%d)",
 				 mattk->aatyp);
 	    }
 	    if (dhit == -1) {

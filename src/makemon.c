@@ -512,7 +512,7 @@ register struct	monst	*mtmp;
 			case PM_CAPTAIN: mac = -3; break;
 			case PM_WATCHMAN: mac = 3; break;
 			case PM_WATCH_CAPTAIN: mac = -2; break;
-			default: impossible("odd mercenary %d?", monsndx(ptr));
+			default: warning("odd mercenary %d?", monsndx(ptr));
 				mac = 0;
 				break;
 		    }
@@ -1317,7 +1317,7 @@ rndmonst()
 	    if ((ct -= (int)rndmonst_state.mchoices[mndx]) <= 0) break;
 
 	if (mndx == SPECIAL_PM || uncommon(mndx)) {	/* shouldn't happen */
-	    impossible("rndmonst: bad `mndx' [#%d]", mndx);
+	    warning("rndmonst: bad `mndx' [#%d]", mndx);
 	    return (struct permonst *)0;
 	}
 	return &mons[mndx];
@@ -1358,7 +1358,7 @@ int	spc;
 
 	maxmlev = level_difficulty() >> 1;
 	if(class < 1 || class >= MAXMCLASSES) {
-	    impossible("mkclass called with bad class!");
+	    warning("mkclass called with bad class!");
 	    return((struct permonst *) 0);
 	}
 /*	Assumption #1:	monsters of a given class are contiguous in the
@@ -1819,7 +1819,7 @@ bagotricks(bag)
 struct obj *bag;
 {
     if (!bag || bag->otyp != BAG_OF_TRICKS) {
-	impossible("bad bag o' tricks");
+	warning("bad bag o' tricks");
     } else if (bag->spe < 1) {
 		return use_container(bag, 1);
     } else {

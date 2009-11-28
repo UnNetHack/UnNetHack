@@ -1443,7 +1443,7 @@ register struct obj *obj;
 	    }
 	    can = hold_another_object(can, "You make, but cannot pick up, %s.",
 				      doname(can), (const char *)0);
-	} else impossible("Tinning failed.");
+	} else warning("Tinning failed.");
 }
 
 void
@@ -1674,7 +1674,7 @@ long timeout;
 #endif
 
 		default:
-		    impossible("figurine came to life where? (%d)",
+		    warning("figurine came to life where? (%d)",
 				(int)figurine->where);
 		break;
 	    }

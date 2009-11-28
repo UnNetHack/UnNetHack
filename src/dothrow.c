@@ -1241,7 +1241,7 @@ register struct obj   *obj;
 	    case GAUNTLETS_OF_DEXTERITY:
 		break;
 	    default:
-		impossible("Unknown type of gloves (%d)", uarmg->otyp);
+		warning("Unknown type of gloves (%d)", uarmg->otyp);
 		break;
 	    }
 	}
@@ -1745,7 +1745,7 @@ boolean in_view;
 		default: /* glass or crystal wand */
 			if (obj->oclass != WAND_CLASS &&
 			    obj->oclass != RING_CLASS)
-				impossible("breaking odd object?");
+				warning("breaking odd object?");
 		case CRYSTAL_PLATE_MAIL:
 		case LENSES:
 		case MIRROR:

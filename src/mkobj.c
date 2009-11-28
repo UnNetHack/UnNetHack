@@ -627,7 +627,7 @@ boolean artif;
 	case COIN_CLASS:
 		break;	/* do nothing */
 	default:
-		impossible("impossible mkobj %d, sym '%c'.", otmp->otyp,
+		warning("impossible mkobj %d, sym '%c'.", otmp->otyp,
 						objects[otmp->otyp].oc_class);
 		return (struct obj *)0;
 	}
@@ -931,7 +931,7 @@ boolean init;
 	register struct obj *otmp;
 
 	if (objtype != CORPSE && objtype != STATUE)
-	    impossible("making corpstat type %d", objtype);
+	    warning("making corpstat type %d", objtype);
 	if (x == 0 && y == 0) {		/* special case - random placement */
 		otmp = mksobj(objtype, init, FALSE);
 		if (otmp) rloco(otmp);

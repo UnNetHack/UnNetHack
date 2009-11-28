@@ -25,36 +25,31 @@ extern int NDECL(rand);
 #ifdef OVL0
 
 int
-rn2(x)		/* 0 <= rn2(x) < x */
+rn2(x)		/**< 0 <= rn2(x) < x */
 register int x;
 {
-/*#ifdef DEBUG*/
 	if (x <= 0) {
-		impossible("rn2(%d) attempted", x);
+		warning("rn2(%d) attempted", x);
 		return(0);
 	}
 	x = RND(x);
 	return(x);
-/*#else
-	return(RND(x));
-#endif*/
 }
 
 #endif /* OVL0 */
 #ifdef OVLB
 
 int
-rnl(x)		/* 0 <= rnl(x) < x; sometimes subtracting Luck */
-register int x;	/* good luck approaches 0, bad luck approaches (x-1) */
+rnl(x)		/**< 0 <= rnl(x) < x; sometimes subtracting Luck */
+register int x;	/**< good luck approaches 0, bad luck approaches (x-1) */
 {
 	register int i;
 
-#ifdef DEBUG
 	if (x <= 0) {
-		impossible("rnl(%d) attempted", x);
+		warning("rnl(%d) attempted", x);
 		return(0);
 	}
-#endif
+
 	i = RND(x);
 
 	if (Luck && rn2(50 - Luck)) {
@@ -70,36 +65,30 @@ register int x;	/* good luck approaches 0, bad luck approaches (x-1) */
 #ifdef OVL0
 
 int
-rnd(x)		/* 1 <= rnd(x) <= x */
+rnd(x)		/**< 1 <= rnd(x) <= x */
 register int x;
 {
-#ifdef DEBUG
 	if (x <= 0) {
-		impossible("rnd(%d) attempted", x);
+		warning("rnd(%d) attempted", x);
 		return(1);
 	}
 	x = RND(x)+1;
 	return(x);
-#else
-	return(RND(x)+1);
-#endif
 }
 
 #endif /* OVL0 */
 #ifdef OVL1
 
 int
-d(n,x)		/* n <= d(n,x) <= (n*x) */
+d(n,x)		/**< n <= d(n,x) <= (n*x) */
 register int n, x;
 {
 	register int tmp = n;
 
-#ifdef DEBUG
 	if (x < 0 || n < 0 || (x == 0 && n != 0)) {
-		impossible("d(%d,%d) attempted", n, x);
+		warning("d(%d,%d) attempted", n, x);
 		return(1);
 	}
-#endif
 	while(n--) tmp += RND(x);
 	return(tmp); /* Alea iacta est. -- J.C. */
 }

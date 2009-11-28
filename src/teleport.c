@@ -603,7 +603,7 @@ boolean force_it;
 	if (mtmp->mleashed) {
 	    otmp = get_mleash(mtmp);
 	    if (!otmp) {
-		impossible("%s is leashed, without a leash.", Monnam(mtmp));
+		warning("%s is leashed, without a leash.", Monnam(mtmp));
 		goto release_it;
 	    }
 	    if (otmp->cursed && !force_it) {
@@ -1270,7 +1270,7 @@ boolean suppress_impossible;
 
 	/* level either full of monsters or somehow faulty */
 	if (!suppress_impossible)
-		impossible("rloc(): couldn't relocate monster");
+		warning("rloc(): couldn't relocate monster");
 	return FALSE;
 
  found_xy:

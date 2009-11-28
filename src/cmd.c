@@ -371,7 +371,7 @@ extcmd_via_menu()	/* here after # - now show pick-list of possible commands */
 			}
 #ifdef DEBUG
 			if (i >= MAX_EXT_CMD - 2) {
-			    impossible("Exceeded %d extended commands in doextcmd() menu",
+			    warning("Exceeded %d extended commands in doextcmd() menu",
 					MAX_EXT_CMD - 2);
 			    return 0;
 			}
@@ -434,7 +434,7 @@ extcmd_via_menu()	/* here after # - now show pick-list of possible commands */
 		if (matchlevel > (QBUFSZ - 2)) {
 			free((genericptr_t)pick_list);
 #ifdef DEBUG
-			impossible("Too many characters (%d) entered in extcmd_via_menu()",
+			warning("Too many characters (%d) entered in extcmd_via_menu()",
 				matchlevel);
 #endif
 			ret = -1;
@@ -1143,7 +1143,7 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	} else {		/* game ended in character's death */
 	    p = "are dead";
 	    switch (u.umortality) {
-	    case 0:  impossible("dead without dying?");
+	    case 0:  warning("dead without dying?");
 	    case 1:  break;			/* just "are dead" */
 	    default: Sprintf(buf, " (%d%s time!)", u.umortality,
 			     ordin(u.umortality));
@@ -1439,7 +1439,7 @@ int final;
 	} else {		/* game ended in character's death */
 	    p = "are dead";
 	    switch (u.umortality) {
-	    case 0:  impossible("dead without dying?");
+	    case 0:  warning("dead without dying?");
 	    case 1:  break;			/* just "are dead" */
 	    default: Sprintf(buf, " (%d%s time!)", u.umortality,
 			     ordin(u.umortality));
