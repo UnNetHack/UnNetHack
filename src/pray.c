@@ -1221,7 +1221,7 @@ dosacrifice()
 		    if (sgn(u.ualign.type) == sgn(dmon->data->maligntyp))
 			dmon->mpeaceful = TRUE;
 		    You("are terrified, and unable to move.");
-		    nomul(-3);
+		    nomul(-3, "being terrified of a demon");
 		} else pline_The("%s.", demonless_msg);
 	    }
 
@@ -1611,7 +1611,7 @@ dopray()
 	}
     }
 #endif
-    nomul(-3);
+    nomul(-3, "praying");
     nomovemsg = "You finish your prayer.";
     afternmv = prayer_done;
 
@@ -1771,7 +1771,7 @@ doturn()
 		    }
 	    }
 	}
-	nomul(-5);
+	nomul(-5, "trying to turn the monsters");
 	return(1);
 }
 

@@ -392,7 +392,7 @@ register int x,y;
 			et = ep->engr_txt;
 		You("%s: \"%s\".",
 		      (Blind) ? "feel the words" : "read",  et);
-		if(flags.run > 1) nomul(0);
+		if(flags.run > 1) nomul(0, 0);
 	    }
 	}
 }

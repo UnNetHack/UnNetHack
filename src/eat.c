@@ -937,7 +937,7 @@ register int pm;
                     /* A pile of gold can't ride. */
 		    if (u.usteed) dismount_steed(DISMOUNT_FELL);
 #endif
-		    nomul(-tmp);
+		    nomul(-tmp, "pretending to be a pile of gold");
 		    Sprintf(buf, Hallucination ?
 			"You suddenly dread being peeled and mimic %s again!" :
 			"You now prefer mimicking %s again.",
@@ -1312,7 +1312,7 @@ struct obj *obj;
 			   surface(u.ux,u.uy);
 		pline_The("world spins and %s %s.", what, where);
 		flags.soundok = 0;
-		nomul(-rnd(10));
+		nomul(-rnd(10), "unconscious from rotten food");
 		nomovemsg = "You are conscious again.";
 		afternmv = Hear_again;
 		return(1);
@@ -2442,7 +2442,7 @@ is_fainted()
 void
 reset_faint()	/* call when a faint must be prematurely terminated */
 {
-	if(is_fainted()) nomul(0);
+	if(is_fainted()) nomul(0, 0);
 }
 
 #if 0
@@ -2453,7 +2453,7 @@ sync_hunger()
 	if(is_fainted()) {
 
 		flags.soundok = 0;
-		nomul(-10+(u.uhunger/10));
+		nomul(-10+(u.uhunger/10), "fainted from lack of food");
 		nomovemsg = "You regain consciousness.";
 		afternmv = unfaint;
 	}
@@ -2518,7 +2518,7 @@ boolean incr;
 				stop_occupation();
 				You("faint from lack of food.");
 				flags.soundok = 0;
-				nomul(-10+(u.uhunger/10));
+				nomul(-10+(u.uhunger/10), "fainted from lack of food");
 				nomovemsg = "You regain consciousness.";
 				afternmv = unfaint;
 				newhs = FAINTED;
@@ -2712,7 +2712,7 @@ void
 vomit()		/* A good idea from David Neves */
 {
 	make_sick(0L, (char *) 0, TRUE, SICK_VOMITABLE);
-	nomul(-2);
+	nomul(-2, "vomiting");
 }
 
 int

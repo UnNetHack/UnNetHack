@@ -20,6 +20,7 @@ char *catmore = 0;		/* default pager */
 NEARDATA int bases[MAXOCLASSES] = DUMMY;
 
 NEARDATA int multi = 0;
+char multi_txt[BUFSZ] = DUMMY;
 #if 0
 NEARDATA int warnlevel = 0;		/* used by movemon and dochugw */
 #endif
