@@ -1817,10 +1817,7 @@ register struct monst *mtmp;
 					deltrap(trap);
 					newsym(mtmp->mx,mtmp->my);
 					mtmp->mhp -= rnd(2); /* beartrap weighs 200 */
-				}
-				else {
-#else
-		   {
+				} else {
 #endif
 			    mtmp->mtrapped = 1;
 			    if(in_sight) {
@@ -1834,8 +1831,8 @@ register struct monst *mtmp;
 				    You_hear("the roaring of an angry bear!");
 			    }
 			}
-			break;
 		   }
+		   break;
 
 		case SLP_GAS_TRAP:
 		    if (!resists_sleep(mtmp) && !breathless(mptr) &&
