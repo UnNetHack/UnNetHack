@@ -631,7 +631,7 @@ struct obj *obj;
 			pline(Hallucination ?
 			      "Yow!  The mirror stares back!" :
 			      "Yikes!  You've frozen yourself!");
-			nomul(-rnd((MAXULEV+6) - u.ulevel));
+			nomul(-rnd((MAXULEV+6) - u.ulevel), "gazing into a mirror");
 			} else You("stiffen momentarily under your gaze.");
 		    } else if (is_vampire(youmonst.data))
 			You("don't have a reflection.");
@@ -791,7 +791,7 @@ struct obj **optr;
 				break;
 			case 2: /* no explanation; it just happens... */
 				nomovemsg = "";
-				nomul(-rnd(2));
+				nomul(-rnd(2), 0);
 				break;
 		}
 	    }
@@ -1361,7 +1361,7 @@ int magic; /* 0=Physical, otherwise skill level */
 		change_luck(-1);
 
 	    teleds(cc.x, cc.y, TRUE);
-	    nomul(-1);
+	    nomul(-1, "jumping around");
 	    nomovemsg = "";
 	    morehungry(rnd(25));
 	    return 1;
@@ -1443,7 +1443,7 @@ register struct obj *obj;
 	    }
 	    can = hold_another_object(can, "You make, but cannot pick up, %s.",
 				      doname(can), (const char *)0);
-	} else impossible("Tinning failed.");
+	} else warning("Tinning failed.");
 }
 
 void
@@ -1674,7 +1674,7 @@ long timeout;
 #endif
 
 		default:
-		    impossible("figurine came to life where? (%d)",
+		    warning("figurine came to life where? (%d)",
 				(int)figurine->where);
 		break;
 	    }
@@ -2756,7 +2756,7 @@ do_break_wand(obj)
     current_wand = 0;
     if (obj)
 	delobj(obj);
-    nomul(0);
+    nomul(0, 0);
     return 1;
 }
 
@@ -3019,11 +3019,11 @@ doapply()
 		}
 		pline("Sorry, I don't know how to use that.");
 	xit:
-		nomul(0);
+		nomul(0, 0);
 		return 0;
 	}
 	if (res && obj && obj->oartifact) arti_speak(obj);
-	nomul(0);
+	nomul(0, 0);
 	return res;
 }
 

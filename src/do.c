@@ -63,7 +63,7 @@ register int rx, ry;
 boolean pushing;
 {
 	if (!otmp || otmp->otyp != BOULDER)
-	    impossible("Not a boulder?");
+	    warning("Not a boulder?");
 	else if (!Is_waterlevel(&u.uz) && (is_pool(rx,ry) || is_lava(rx,ry))) {
 	    boolean lava = is_lava(rx,ry), fills_up;
 	    const char *what = waterbody_name(rx,ry);
@@ -194,9 +194,17 @@ const char *verb;
 	           (obj->cursed ? rnf(1,2) :
 		    obj->blessed ? rnf(1,16) : rnf(1,4))) {
 		/* prevent recursive call of teleportation through flooreffects */
-		if (!obj->orecursive) {
-			if (cansee(x,y)) pline("Right after touching the %s the amulet teleports away!",
-			  surface(x, y));
+		if (!obj->orecursive &&
+		    distu(x,y) < 9) {
+			if (Blind) {
+				You_hear("%s!",
+				         (Hallucination) ? "nothing special happening" :
+				                           "something teleporting");
+			} else if (cansee(x,y)) {
+				pline("Right after touching the %s the %s teleports away!",
+				      surface(x, y),
+				      (Hallucination) ? "teddy bear" : "amulet");
+			}
 			obj->orecursive = TRUE;
 			rloco(obj);
 			obj->orecursive = FALSE;
@@ -1221,7 +1229,7 @@ boolean at_stairs, falling, portal;
 					  y > updest.nhy));
 			    } while ((occupied(x, y) ||
 				      IS_STWALL(levl[x][y].typ)) && (trycnt++ < 1000));
-			    if (trycnt >= 1000) impossible("castle: placement failed to find good position"); /* TODO: change impossible() to warning() */
+			    if (trycnt >= 1000) warning("castle: placement failed to find good position"); /* TODO: change impossible() to warning() */
 			    u_on_newpos(x, y);
 			} else u_on_sstairs();
 		    } else u_on_dnstairs();

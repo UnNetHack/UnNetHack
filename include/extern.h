@@ -729,7 +729,7 @@ E void FDECL(check_special_room, (BOOLEAN_P));
 E int NDECL(dopickup);
 E void NDECL(lookaround);
 E int NDECL(monster_nearby);
-E void FDECL(nomul, (int));
+E void FDECL(nomul, (int, const char *));
 E void FDECL(unmul, (const char *));
 E void FDECL(showdmg, (int, BOOLEAN_P));
 E void FDECL(losehp, (int,const char *,BOOLEAN_P));
@@ -1579,6 +1579,7 @@ E void VDECL(There, (const char *,...)) PRINTF_F(1,2);
 E void VDECL(verbalize, (const char *,...)) PRINTF_F(1,2);
 E void VDECL(raw_printf, (const char *,...)) PRINTF_F(1,2);
 E void VDECL(impossible, (const char *,...)) PRINTF_F(1,2);
+E void VDECL(warning, (const char *,...)) PRINTF_F(1,2);
 E const char *FDECL(align_str, (ALIGNTYP_P));
 E void FDECL(mstatusline, (struct monst *));
 E void NDECL(ustatusline);
@@ -2006,6 +2007,7 @@ E void FDECL(place_monster, (struct monst *,int,int));
 E boolean FDECL(goodpos, (int,int,struct monst *,unsigned));
 E boolean FDECL(enexto, (coord *,XCHAR_P,XCHAR_P,struct permonst *));
 E boolean FDECL(enexto_core, (coord *,XCHAR_P,XCHAR_P,struct permonst *,unsigned));
+E boolean FDECL(enexto_core_range, (coord *,XCHAR_P,XCHAR_P,struct permonst *,unsigned,int));
 E void FDECL(teleds, (int,int,BOOLEAN_P));
 E boolean FDECL(safe_teleds, (BOOLEAN_P));
 E boolean FDECL(teleport_pet, (struct monst *,BOOLEAN_P));
@@ -2482,6 +2484,8 @@ E int NDECL(doshout);
 #endif
 E void FDECL(livelog_shoplifting, (const char*, const char*, long));
 #endif
+E void FDECL(livelog_game_started, (const char*, const char*, const char*, const char*));
+E void FDECL(livelog_game_action, (const char*));
 
 #endif /* !MAKEDEFS_C && !LEV_LEX_C */
 

@@ -537,7 +537,7 @@ struct mkroom *croom;
 found_it:;
 
 	if (!isok(*x,*y)) {
-	    impossible("get_location:  (%d,%d) out of bounds", *x, *y);
+	    warning("get_location:  (%d,%d) out of bounds", *x, *y);
 	    *x = x_maze_max; *y = y_maze_max;
 	}
 }
@@ -1252,7 +1252,7 @@ struct mkroom	*croom;
 
 		switch (m->appear) {
 		    case M_AP_NOTHING:
-			impossible(
+			warning(
 		"create_monster: mon has an appearance, \"%s\", but no type",
 				m->appear_as.str);
 			break;
@@ -1263,7 +1263,7 @@ struct mkroom	*croom;
 					m->appear_as.str))
 				break;
 			if (i == MAXPCHARS) {
-			    impossible(
+			    warning(
 				"create_monster: can't find feature \"%s\"",
 				m->appear_as.str);
 			} else {
@@ -1278,7 +1278,7 @@ struct mkroom	*croom;
 				!strcmp(OBJ_NAME(objects[i]),m->appear_as.str))
 				break;
 			if (i == NUM_OBJECTS) {
-			    impossible(
+			    warning(
 				"create_monster: can't find object \"%s\"",
 				m->appear_as.str);
 			} else {
@@ -1291,7 +1291,7 @@ struct mkroom	*croom;
 			/* note: mimics don't appear as monsters! */
 			/*	 (but chameleons can :-)	  */
 		    default:
-			impossible(
+			warning(
 		"create_monster: unimplemented mon appear type [%d,\"%s\"]",
 				m->appear, m->appear_as.str);
 			break;
@@ -1401,7 +1401,7 @@ struct mkroom	*croom;
 	    /* contents */
 	    case 1:
 		if (!container_idx) {
-		    impossible("create_object: no container");
+		    warning("create_object: no container");
 		    break;
 		}
 		remove_object(otmp);
@@ -1417,13 +1417,13 @@ struct mkroom	*croom;
 		    }
 		    container_obj[container_idx] = otmp;
 		    container_idx++;
-		} else impossible("create_object: too deeply nested containers.");
+		} else warning("create_object: too deeply nested containers.");
 		/*container = otmp;*/
 		break;
 	    /* nothing */
 	    case 0: break;
 
-	    default: impossible("containment type %d?", (int) o->containment);
+	    default: warning("containment type %d?", (int) o->containment);
 	}
 
 	/* Medusa level special case: statues are petrified monsters, so they
@@ -3035,7 +3035,7 @@ sp_lev *lvl;
 				   !tmpregion->rirreg && !prefilled);
 		if (room_not_needed || nroom >= MAXNROFROOMS) {
 		    if (!room_not_needed)
-			impossible("Too many rooms on new level!");
+			warning("Too many rooms on new level!");
 		    light_region(tmpregion);
 		    goto next_opcode;
 		}

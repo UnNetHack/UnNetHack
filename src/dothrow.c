@@ -608,13 +608,13 @@ hurtle(dx, dy, range, verbose)
      */
     if(Punished && !carried(uball)) {
 	You_feel("a tug from the iron ball.");
-	nomul(0);
+	nomul(0, 0);
 	return;
     } else if (u.utrap) {
 	You("are anchored by the %s.",
 	    u.utraptype == TT_WEB ? "web" : u.utraptype == TT_LAVA ? "lava" :
 		u.utraptype == TT_INFLOOR ? surface(u.ux,u.uy) : "trap");
-	nomul(0);
+	nomul(0, 0);
 	return;
     }
 
@@ -624,7 +624,7 @@ hurtle(dx, dy, range, verbose)
 
     if(!range || (!dx && !dy) || u.ustuck) return; /* paranoia */
 
-    nomul(-range);
+    nomul(-range, "moving through the air");
     if (verbose)
 	You("%s in the opposite direction.", range > 1 ? "hurtle" : "float");
     /* if we're in the midst of shooting multiple projectiles, stop */
@@ -1241,7 +1241,7 @@ register struct obj   *obj;
 	    case GAUNTLETS_OF_DEXTERITY:
 		break;
 	    default:
-		impossible("Unknown type of gloves (%d)", uarmg->otyp);
+		warning("Unknown type of gloves (%d)", uarmg->otyp);
 		break;
 	    }
 	}
@@ -1745,7 +1745,7 @@ boolean in_view;
 		default: /* glass or crystal wand */
 			if (obj->oclass != WAND_CLASS &&
 			    obj->oclass != RING_CLASS)
-				impossible("breaking odd object?");
+				warning("breaking odd object?");
 		case CRYSTAL_PLATE_MAIL:
 		case LENSES:
 		case MIRROR:

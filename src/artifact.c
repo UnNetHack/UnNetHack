@@ -625,7 +625,7 @@ struct monst *mtmp;
 			return !(yours ? Drain_resistance : resists_drli(mtmp));
 		case AD_STON:
 			return !(yours ? Stone_resistance : resists_ston(mtmp));
-		default:	impossible("Weird weapon special attack.");
+		default:	warning("Weird weapon special attack.");
 	    }
 	}
 	return(0);
@@ -694,7 +694,7 @@ xchar m;
 	}
     /* there is one slot per artifact, so we should never reach the
        end without either finding the artifact or an empty slot... */
-    impossible("couldn't discover artifact (%d)", (int)m);
+    warning("couldn't discover artifact (%d)", (int)m);
 }
 
 /* used to decide whether an artifact has been fully identified */
@@ -873,7 +873,7 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
 	    if (Antimagic) {
 		resisted = TRUE;
 	    } else {
-		nomul(-3);
+		nomul(-3, "being scared stiff");
 		nomovemsg = "";
 		if (magr && magr == u.ustuck && sticks(youmonst.data)) {
 		    u.ustuck = (struct monst *)0;
@@ -975,7 +975,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	*dmgptr += spec_dbon(otmp, mdef, *dmgptr);
 
 	if (youattack && youdefend) {
-	    impossible("attacking yourself with weapon?");
+	    warning("attacking yourself with weapon?");
 	    return FALSE;
 	}
 

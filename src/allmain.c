@@ -256,7 +256,7 @@ moveloop()
 				if (occupation)
 				    stop_occupation();
 				else
-				    nomul(0);
+				    nomul(0, 0);
 				if (change == 1) polyself(FALSE);
 				else you_were();
 				change = 0;
@@ -458,7 +458,7 @@ stop_occupation()
 		sync_hunger();
 */
 #ifdef REDO
-		nomul(0);
+		nomul(0, 0);
 		pushch(0);
 #endif
 	}
@@ -582,6 +582,7 @@ boolean new_game;	/* false => restoring an old game */
 {
     char buf[BUFSZ];
     boolean currentgend = Upolyd ? u.mfemale : flags.female;
+    const char *role_name;
 
     /*
      * The "welcome back" message always describes your innate form
@@ -599,13 +600,15 @@ boolean new_game;	/* false => restoring an old game */
 	     currentgend != flags.initgend))
 	Sprintf(eos(buf), " %s", genders[currentgend].adj);
 
+    role_name = (currentgend && urole.name.f) ? urole.name.f : urole.name.m;
     pline(new_game ? "%s %s, welcome to UnNetHack!  You are a%s %s %s."
 		   : "%s %s, the%s %s %s, welcome back to UnNetHack!",
-	  Hello((struct monst *) 0), plname, buf, urace.adj,
-	  (currentgend && urole.name.f) ? urole.name.f : urole.name.m);
+	  Hello((struct monst *) 0), plname, buf, urace.adj, role_name);
 #ifdef LIVELOGFILE
     /* Start live reporting */
 	  livelog_start();
+	  livelog_game_started(new_game ? "started" : "resumed",
+	                       buf, urace.adj, role_name);
 #endif
 }
 
@@ -703,7 +706,7 @@ int max_points;
 {
 	if (multi > 0 &&
 	    current_points == max_points) {
-		nomul(0);
+		nomul(0, 0);
 		if (flags.verbose) pline("%s restored.", points);
 	}
 }

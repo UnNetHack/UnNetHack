@@ -469,7 +469,7 @@ display_warning(mon)
     } else if (MATCH_WARN_OF_MON(mon)) {
 	glyph = mon_to_glyph(mon);
     } else {
-    	impossible("display_warning did not match warning type?");
+    	warning("display_warning did not match warning type?");
         return;
     }
     show_glyph(x, y, glyph);
@@ -1255,13 +1255,13 @@ show_glyph(x,y,glyph)
 	    text = "monster";		offset = glyph;
 	}
 
-	impossible("show_glyph:  bad pos %d %d with glyph %d [%s %d].",
+	warning("show_glyph:  bad pos %d %d with glyph %d [%s %d].",
 						x, y, glyph, text, offset);
 	return;
     }
 
     if (glyph >= MAX_GLYPH) {
-	impossible("show_glyph:  bad glyph %d [max %d] at (%d,%d).",
+	warning("show_glyph:  bad glyph %d [max %d] at (%d,%d).",
 					glyph, MAX_GLYPH, x, y);
 	return;
     }
@@ -1614,7 +1614,7 @@ zapdir_to_glyph(dx, dy, beam_type)
     int beam_type;
 {
     if (beam_type >= NUM_ZAP) {
-	impossible("zapdir_to_glyph:  illegal beam type");
+	warning("zapdir_to_glyph:  illegal beam type");
 	beam_type = 0;
     }
     dx = (dx == dy) ? 2 : (dx && dy) ? 3 : dx ? 1 : 0;

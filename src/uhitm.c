@@ -1527,7 +1527,7 @@ register struct attack *mattk;
 		    if(thick_skinned(mdef->data)) tmp = 0;
 		    if(mdef->data == &mons[PM_SHADE]) {
 			if (!(uarmf && uarmf->blessed)) {
-			    impossible("bad shade attack function flow?");
+			    warning("bad shade attack function flow?");
 			    tmp = 0;
 			} else
 			    tmp = rnd(4); /* bless damage */
@@ -2053,7 +2053,7 @@ register struct attack *mattk;
 				 */
 				You("digest %s.", mon_nam(mdef));
 				if (Slow_digestion) tmp *= 2;
-				nomul(-tmp);
+				nomul(-tmp, "digesting something");
 				nomovemsg = msgbuf;
 			    } else pline("%s", msgbuf);
 			    if (mdef->data == &mons[PM_GREEN_SLIME]) {
@@ -2387,7 +2387,7 @@ use_weapon:
 			break;
 
 		default: /* Strange... */
-			impossible("strange attack of yours (%d)",
+			warning("strange attack of yours (%d)",
 				 mattk->aatyp);
 	    }
 	    if (dhit == -1) {
@@ -2553,7 +2553,7 @@ uchar aatyp;
 			else {
 			    You("are frozen by %s gaze!",
 				  s_suffix(mon_nam(mon)));
-			    nomul((ACURR(A_WIS) > 12 || rn2(4)) ? -tmp : -127);
+			    nomul((ACURR(A_WIS) > 12 || rn2(4)) ? -tmp : -127, "frozen by a monster's gaze");
 			}
 		    } else {
 			pline("%s cannot defend itself.",
@@ -2565,7 +2565,7 @@ uchar aatyp;
 		} else { /* gelatinous cube */
 		    You("are frozen by %s!", mon_nam(mon));
 	    	    nomovemsg = 0;	/* default: "you can move again" */
-		    nomul(-tmp);
+		    nomul(-tmp, "frozen by a monster");
 		    exercise(A_DEX, FALSE);
 		}
 		break;

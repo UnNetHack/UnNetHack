@@ -71,7 +71,7 @@ dosave()
 	clear_nhwindow(WIN_MESSAGE);
 	if(yn("Really save?") == 'n') {
 		clear_nhwindow(WIN_MESSAGE);
-		if(multi > 0) nomul(0);
+		if(multi > 0) nomul(0, 0);
 	} else {
 		clear_nhwindow(WIN_MESSAGE);
 		pline("Saving...");
@@ -79,6 +79,9 @@ dosave()
 		program_state.done_hup = 0;
 #endif
 		if(dosave0()) {
+#ifdef LIVELOGFILE
+			livelog_game_action("saved");
+#endif
 			program_state.something_worth_saving = 0;
 			u.uhp = -1;		/* universal game's over indicator */
 			/* make sure they see the Saving message */

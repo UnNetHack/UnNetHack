@@ -325,7 +325,7 @@ learn()
 	if (Confusion) {		/* became confused while learning */
 	    (void) confused_book(book);
 	    book = 0;			/* no longer studying */
-	    nomul(delay);		/* remaining delay is uninterrupted */
+	    nomul(delay, "reading a book");		/* remaining delay is uninterrupted */
 	    delay = 0;
 	    return(0);
 	}
@@ -372,7 +372,7 @@ learn()
 			break;
 		}
 	}
-	if (i == MAXSPELL) impossible("Too many spells memorized!");
+	if (i == MAXSPELL) warning("Too many spells memorized!");
 
 	if (book->cursed) {	/* maybe a demon cursed it */
 	    if (cursed_book(book)) {
@@ -425,7 +425,7 @@ register struct obj *spellbook;
 			delay = -8 * objects[booktype].oc_delay;
 			break;
 		 default:
-			impossible("Unknown spellbook level %d, book %d;",
+			warning("Unknown spellbook level %d, book %d;",
 				objects[booktype].oc_level, booktype);
 			return 0;
 		}
@@ -463,7 +463,7 @@ register struct obj *spellbook;
 		if (too_hard) {
 		    boolean gone = cursed_book(spellbook);
 
-		    nomul(delay);			/* study time */
+		    nomul(delay, "reading a book");			/* study time */
 		    delay = 0;
 		    if(gone || !rn2(3)) {
 			if (!gone) pline_The("spellbook crumbles to dust!");
@@ -478,7 +478,7 @@ register struct obj *spellbook;
 		    if (!confused_book(spellbook)) {
 			spellbook->in_use = FALSE;
 		    }
-		    nomul(delay);
+		    nomul(delay, "reading a book");
 		    delay = 0;
 		    return(1);
 		}
@@ -607,7 +607,7 @@ int skill;
 	    case P_MATTER_SPELL:
 		return "matter";
 	    default:
-		impossible("Unknown spell skill, %d;", skill);
+		warning("Unknown spell skill, %d;", skill);
 		return "";
 	}
 }
@@ -952,7 +952,7 @@ boolean atme;
 			pline(nothing_happens);
 		break;
 	default:
-		impossible("Unknown spell %d attempted.", spell);
+		warning("Unknown spell %d attempted.", spell);
 		obfree(pseudo, (struct obj *)0);
 		return(0);
 	}
@@ -1293,7 +1293,7 @@ struct obj *obj;
 	        return;
 	    }
 	}
-	impossible("Too many spells memorized!");
+	warning("Too many spells memorized!");
 	return;
 }
 

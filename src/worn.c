@@ -61,7 +61,7 @@ long mask;
 	    for(wp = worn; wp->w_mask; wp++) if(wp->w_mask & mask) {
 		oobj = *(wp->w_obj);
 		if(oobj && !(oobj->owornmask & wp->w_mask))
-			impossible("Setworn: mask = %ld.", wp->w_mask);
+			warning("Setworn: mask = %ld.", wp->w_mask);
 		if(oobj) {
 		    if (u.twoweap && (oobj->owornmask & (W_WEP|W_SWAPWEP)))
 			u.twoweap = 0;

@@ -377,7 +377,7 @@ register int x,y;
 		}
 		break;
 	    default:
-		impossible("%s is written in a very strange way.",
+		warning("%s is written in a very strange way.",
 				Something);
 		sensed = 1;
 	    }
@@ -392,7 +392,7 @@ register int x,y;
 			et = ep->engr_txt;
 		You("%s: \"%s\".",
 		      (Blind) ? "feel the words" : "read",  et);
-		if(flags.run > 1) nomul(0);
+		if(flags.run > 1) nomul(0, 0);
 	    }
 	}
 }
@@ -868,7 +868,7 @@ doengrave()
 		}
 #endif
 	    case ILLOBJ_CLASS:
-		impossible("You're engraving with an illegal object!");
+		warning("You're engraving with an illegal object!");
 		break;
 	}
 
@@ -1225,7 +1225,7 @@ register struct engr *ep;
 			break;
 		    }
 		if (!ept) {
-		    impossible("Error in del_engr?");
+		    warning("Error in del_engr?");
 		    return;
 		}
 	}

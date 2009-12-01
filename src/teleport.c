@@ -188,6 +188,17 @@ register xchar xx, yy;
 struct permonst *mdat;
 unsigned entflags;
 {
+	return enexto_core_range(cc, xx, yy, mdat, entflags, 1);
+}
+
+boolean
+enexto_core_range(cc, xx, yy, mdat, entflags, start_range)
+coord *cc;
+register xchar xx, yy;
+struct permonst *mdat;
+unsigned entflags;
+int start_range; /**< Distance of checked tiles to begin with. Should be >=1. */
+{
 #define MAX_GOOD 15
     coord good[MAX_GOOD], *good_ptr;
     int x, y, range, i;
@@ -203,7 +214,7 @@ unsigned entflags;
     }
     fakemon.data = mdat;	/* set up for goodpos */
     good_ptr = good;
-    range = 1;
+    range = start_range;
     /*
      * Walk around the border of the square with center (xx,yy) and
      * radius range.  Stop when we find at least one valid position.
@@ -540,7 +551,7 @@ boolean allow_drag;
 	newsym(u.ux0,u.uy0);
 	see_monsters();
 	vision_full_recalc = 1;
-	nomul(0);
+	nomul(0, 0);
 	vision_recalc(0);	/* vision before effects */
 	spoteffects(TRUE);
 	invocation_message();
@@ -592,7 +603,7 @@ boolean force_it;
 	if (mtmp->mleashed) {
 	    otmp = get_mleash(mtmp);
 	    if (!otmp) {
-		impossible("%s is leashed, without a leash.", Monnam(mtmp));
+		warning("%s is leashed, without a leash.", Monnam(mtmp));
 		goto release_it;
 	    }
 	    if (otmp->cursed && !force_it) {
@@ -1259,7 +1270,7 @@ boolean suppress_impossible;
 
 	/* level either full of monsters or somehow faulty */
 	if (!suppress_impossible)
-		impossible("rloc(): couldn't relocate monster");
+		warning("rloc(): couldn't relocate monster");
 	return FALSE;
 
  found_xy:
@@ -1514,8 +1525,8 @@ random_teleport_level()
 	return nlev;
 }
 
-/* you teleport a monster (via wand, spell, or poly'd q.mechanic attack);
-   return false iff the attempt fails */
+/** You teleport a monster (via wand, spell, or poly'd q.mechanic attack).
+   returns false iff the attempt fails */
 boolean
 u_teleport_mon(mtmp, give_feedback)
 struct monst *mtmp;
@@ -1532,6 +1543,13 @@ boolean give_feedback;
 		You("are no longer inside %s!", mon_nam(mtmp));
 	    unstuck(mtmp);
 	    (void) rloc(mtmp, FALSE);
+#ifdef BLACKMARKET
+	} else if (mtmp->data == &mons[PM_BLACK_MARKETEER] &&
+	           rn2(13) &&
+		   enexto_core_range(&cc, u.ux, u.uy, mtmp->data,0,
+		                     rnf(1,10) ? 4 : 3)) {
+	    rloc_to(mtmp, cc.x, cc.y);
+#endif
 	} else if (is_rider(mtmp->data) && rn2(13) &&
 		   enexto(&cc, u.ux, u.uy, mtmp->data))
 	    rloc_to(mtmp, cc.x, cc.y);

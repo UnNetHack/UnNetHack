@@ -213,7 +213,7 @@ wildmiss(mtmp, mattk)		/* monster attacked your displaced image */
 	    else
 		pline("%s is fooled by water reflections and misses!",Monnam(mtmp));
 
-	} else impossible("%s attacks you without knowing your location?",
+	} else warning("%s attacks you without knowing your location?",
 		Monnam(mtmp));
 }
 
@@ -235,7 +235,7 @@ boolean message;
 				if(mdat->mattk[i].aatyp == AT_ENGL)
 					break;
 			if (mdat->mattk[i].aatyp != AT_ENGL)
-			      impossible("Swallower has no engulfing attack?");
+			      warning("Swallower has no engulfing attack?");
 			else {
 				if (is_whirly(mdat)) {
 					switch (mdat->mattk[i].adtyp) {
@@ -318,7 +318,7 @@ mattacku(mtmp)
 		 * invisible, or you might be blind....
 		 */
 	
-	if(!ranged) nomul(0);
+	if(!ranged) nomul(0, 0);
 	if(mtmp->mhp <= 0 || (Underwater && !is_swimmer(mtmp->data)))
 	    return(0);
 
@@ -421,7 +421,7 @@ mattacku(mtmp)
 				doname(level.objects[u.ux][u.uy]));
 			    if (obj) obj->spe = save_spe;
 			} else
-			    impossible("hiding under nothing?");
+			    warning("hiding under nothing?");
 		    }
 		    newsym(u.ux,u.uy);
 		}
@@ -1124,7 +1124,7 @@ dopois:
 			if (Blind) You("are frozen!");
 			else You("are frozen by %s!", mon_nam(mtmp));
 			nomovemsg = 0;	/* default: "you can move again" */
-			nomul(-rnd(10));
+			nomul(-rnd(10), "paralyzed by a monster");
 			exercise(A_DEX, FALSE);
 		    }
 		}
@@ -2188,7 +2188,7 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 		    stop_occupation();
 		break;
 #endif
-	    default: impossible("Gaze attack %d?", mattk->adtyp);
+	    default: warning("Gaze attack %d?", mattk->adtyp);
 		break;
 	}
 	return(0);
@@ -2396,7 +2396,7 @@ register struct monst *mon;
 			Blind ? "He" : Monnam(mon), buf, xname(ring));
 		    Ring_gone(uleft);
 		    setworn(ring, LEFT_RING);
-		} else impossible("ring replacement");
+		} else warning("ring replacement");
 		Ring_on(ring);
 		prinv((char *)0, ring, 0L);
 	    }

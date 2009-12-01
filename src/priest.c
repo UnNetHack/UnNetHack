@@ -399,7 +399,7 @@ register int roomno;
 		    set_malign(mtmp);
 		    if(flags.verbose)
 			You("are frightened to death, and unable to move.");
-		    nomul(-3);
+		    nomul(-3, "frightened to death");
 		    nomovemsg = "You regain your composure.";
 	       }
 	   }

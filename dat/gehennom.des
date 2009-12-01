@@ -1269,6 +1269,9 @@ OBJECT:'?',random,random
 OBJECT:'?',random,random
 OBJECT:'?',random,random
 OBJECT:'?',random,random
+# for breaking the drawbridges
+OBJECT:'/',"striking",random
+OBJECT:'/',"striking",random
 # Some monsters.
 MONSTER:'&',"horned devil",(14,12),hostile
 MONSTER:'&',"barbed devil",(18,08),hostile
@@ -1288,9 +1291,7 @@ MONSTER:'@',"aligned priest",(17,13),noalign,hostile
 MONSTER:'@',"aligned priest",(21,13),noalign,hostile
 # Cthulhu's followers
 MONSTER:'h',"mind flayer",(17,03),hostile
-OBJECT:'/',"striking",(17,03)
 MONSTER:'h',"mind flayer",(17,15),hostile
-OBJECT:'/',"striking",(17,15)
 # Cthulhu's breakfast for tomorrow
 IF [30%] {
  IF [50%] {

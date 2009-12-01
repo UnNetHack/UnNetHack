@@ -143,8 +143,14 @@ const char *goal;
 			    hi_x = (pass == 1 && ty == hi_y) ? cx : COLNO - 1;
 			    for (tx = lo_x; tx <= hi_x; tx++) {
 				k = levl[tx][ty].glyph;
+				/* TODO: open doors aren't matched */
+				/* TODO: remebered or seen items aren't matched */
 				if (glyph_is_cmap(k) &&
-					matching[glyph_to_cmap(k)]) {
+					matching[glyph_to_cmap(k)] &&
+					(IS_DRAWBRIDGE(levl[tx][ty].typ) ||
+					 IS_DOOR(levl[tx][ty].typ) ||
+					 IS_FURNITURE(levl[tx][ty].typ))
+				    ) {
 				    cx = tx,  cy = ty;
 				    if (msg_given) {
 					clear_nhwindow(WIN_MESSAGE);
@@ -712,7 +718,10 @@ boolean called;
 	    Strcat(buf, lcase(pbuf));
 	    name_at_start = FALSE;
 	} else if (is_rider(mtmp->data) && 
-		   (distu(mtmp->mx, mtmp->my) > 2)) {
+		   (distu(mtmp->mx, mtmp->my) > 2) &&
+		   !(canseemon(mtmp)) &&
+		   /* for livelog reporting */
+		   !(suppress & SUPPRESS_IT)) {
 		/* prevent the three horsemen to be identified from afar */
 		Strcat(buf, "Rider");
 		name_at_start = FALSE;
@@ -1014,6 +1023,10 @@ static const char * const bogusmons[] = {
 	"ceiling cat", "basement cat",
 	"monorail cat",				/* the Internet is made for cat pix */
 	"rape golem",				/* schnippi */
+	"tridude",				/* POWDER */
+	"orcus cosmicus",			/* Radomir Dopieralski */
+	"Greater Hell Beast",			/* Angband */
+	"Vendor of Yizard",			/* Souljazz */
 };
 
 

@@ -98,11 +98,11 @@ long amount;
     struct obj *ygold = findgold(invent);
 
     if (amount <= 0) {
-	impossible("%s payment in money2mon!", amount ? "negative" : "zero");
+	warning("%s payment in money2mon!", amount ? "negative" : "zero");
 	return 0L;
     }
     if (!ygold || ygold->quan < amount) {
-	impossible("Paying without %s money?", ygold ? "enough" : "");
+	warning("Paying without %s money?", ygold ? "enough" : "");
 	return 0L;
     }
 
@@ -130,11 +130,11 @@ long amount;
     struct obj *mongold = findgold(mon->minvent);
 
     if (amount <= 0) {
-	impossible("%s payment in money2u!", amount ? "negative" : "zero");
+	warning("%s payment in money2u!", amount ? "negative" : "zero");
 	return;
     }
     if (!mongold || mongold->quan < amount) {
-	impossible("%s paying without %s money?", a_monnam(mon),
+	warning("%s paying without %s money?", a_monnam(mon),
 		   mongold ? "enough" : "");
 	return;
     }
@@ -743,7 +743,7 @@ struct obj *obj1, *obj2;
 		if ((bp2 = onbill(obj2, shkp2, TRUE)) != 0) break;
 	}
 
-	if (!bp1 || !bp2) impossible("same_price: object wasn't on any bill!");
+	if (!bp1 || !bp2) warning("same_price: object wasn't on any bill!");
 	else are_mergable = (shkp1 == shkp2 && bp1->price == bp2->price);
 	return are_mergable;
 }
@@ -917,7 +917,7 @@ register struct obj *obj, *merge;
 		bpm = onbill(merge, shkp, FALSE);
 		if(!bpm){
 			/* this used to be a rename */
-			impossible("obfree: not on bill??");
+			warning("obfree: not on bill??");
 			return;
 		} else {
 			/* this was a merger */
@@ -1439,7 +1439,7 @@ proceed:
 		return(1);
 	}
 	if(shkp != resident) {
-		impossible("dopay: not to shopkeeper?");
+		warning("dopay: not to shopkeeper?");
 		if(resident) setpaid(resident);
 		return(0);
 	}        
@@ -1547,7 +1547,7 @@ proceed:
 			   making the partly-used-up code more complicated */
 			if (bp->useup) otmp->quan = bp->bquan;
 		    } else {
-			impossible("Shopkeeper administration out of order.");
+			warning("Shopkeeper administration out of order.");
 			setpaid(shkp);	/* be nice to the player */
 			return 1;
 		    }
@@ -1616,7 +1616,7 @@ boolean itemize;
 		consumed = (which == 0);
 
 	if(!obj->unpaid && !bp->useup){
-		impossible("Paid object on bill??");
+		warning("Paid object on bill??");
 		return PAY_BUY;
 	}
 #ifndef GOLDOBJ
@@ -2008,7 +2008,7 @@ register struct monst *shkp;	/* if angry, impose a surcharge */
 			case 9: /* violet */
 			    i = pseudorand ? AMETHYST : FLUORITE;
 			    break;
-			default: impossible("bad glass gem %d?", obj->otyp);
+			default: warning("bad glass gem %d?", obj->otyp);
 			    i = STRANGE_OBJECT;
 			    break;
 		    }
@@ -2203,7 +2203,7 @@ register struct obj *unp_obj;	/* known to be unpaid */
 	    if ((bp = onbill(unp_obj, shkp, TRUE)) != 0) break;
 
 	/* onbill() gave no message if unexpected problem occurred */
-	if(!bp) impossible("unpaid_cost: object wasn't on any bill!");
+	if(!bp) warning("unpaid_cost: object wasn't on any bill!");
 
 	return bp ? unp_obj->quan * bp->price : 0L;
 }
@@ -2440,19 +2440,19 @@ register struct obj *obj, *otmp;
 	register struct monst *shkp = shop_keeper(*u.ushops);
 
 	if(!shkp || !inhishop(shkp)) {
-		impossible("splitbill: no resident shopkeeper??");
+		warning("splitbill: no resident shopkeeper??");
 		return;
 	}
 	bp = onbill(obj, shkp, FALSE);
 	if(!bp) {
-		impossible("splitbill: not on bill?");
+		warning("splitbill: not on bill?");
 		return;
 	}
 	if(bp->bquan < otmp->quan) {
-		impossible("Negative quantity on bill??");
+		warning("Negative quantity on bill??");
 	}
 	if(bp->bquan == otmp->quan) {
-		impossible("Zero quantity on bill??");
+		warning("Zero quantity on bill??");
 	}
 	bp->bquan -= otmp->quan;
 
@@ -2505,7 +2505,7 @@ register struct monst *shkp;
 #endif
 		return;
 	} else if (obj->unpaid) {
-		impossible("sub_one_frombill: unpaid object not on bill");
+		warning("sub_one_frombill: unpaid object not on bill");
 		obj->unpaid = 0;
 	}
 }
@@ -2886,7 +2886,7 @@ move_on:
 	       "relinquish %s and receive %ld gold piece%s in compensation.%s",
 				    offer, "");
 			    break;
-		 default:   impossible("invalid sell response");
+		 default:   warning("invalid sell response");
 		}
 	}
 }
@@ -2908,7 +2908,7 @@ int mode;		/* 0: deliver count 1: paged */
 
 	shkp = shop_keeper(*u.ushops);
 	if (!shkp || !inhishop(shkp)) {
-	    if (mode != 0) impossible("doinvbill: no shopkeeper?");
+	    if (mode != 0) warning("doinvbill: no shopkeeper?");
 	    return 0;
 	}
 	eshkp = ESHK(shkp);
@@ -2935,7 +2935,7 @@ int mode;		/* 0: deliver count 1: paged */
 		bp < end_bp; bp++) {
 	    obj = bp_to_obj(bp);
 	    if(!obj) {
-		impossible("Bad shopkeeper administration.");
+		warning("Bad shopkeeper administration.");
 		goto quit;
 	    }
 	    if(bp->useup || bp->bquan > obj->quan) {

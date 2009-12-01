@@ -321,7 +321,7 @@ ghost_from_bottle()
 		Hallucination ? rndmonnam() : (const char *)"ghost");
 	if(flags.verbose)
 	    You("are frightened to death, and unable to move.");
-	nomul(-3);
+	nomul(-3, "being frightened to death");
 	nomovemsg = "You regain your composure.";
 }
 
@@ -613,7 +613,7 @@ peffects(otmp)
 		    else
 			Your("%s are frozen to the %s!",
 			     makeplural(body_part(FOOT)), surface(u.ux, u.uy));
-		    nomul(-(rn1(10, 25 - 12*bcsign(otmp))));
+		    nomul(-(rn1(10, 25 - 12*bcsign(otmp))), "frozen by a potion");
 		    nomovemsg = You_can_move_again;
 		    exercise(A_DEX, FALSE);
 		}
@@ -721,15 +721,16 @@ peffects(otmp)
 		    unkn++;
 		} else if (Fixed_abil) {
 		    nothing++;
-		} else {      /* If blessed, increase all; if not, try up to */
-		    int itmp; /* 6 times to find one which can be increased. */
+		} else {      /* If blessed, try very hard to find an ability */
+		              /* that can be increased; if not, try up to     */
+		    int itmp; /* 3 times to find one which can be increased.  */
 		    i = -1;		/* increment to 0 */
-		    for (ii = A_MAX; ii > 0; ii--) {
-			i = (otmp->blessed ? i + 1 : rn2(A_MAX));
+		    for (ii = (otmp->blessed ? 1000 : A_MAX/2); ii > 0; ii--) {
+			i = rn2(A_MAX);
 			/* only give "your X is already as high as it can get"
-			   message on last attempt (except blessed potions) */
-			itmp = (otmp->blessed || ii == 1) ? 0 : -1;
-			if (adjattrib(i, 1, itmp) && !otmp->blessed)
+			   message on last attempt */
+			itmp = (ii == 1) ? 0 : -1;
+			if (adjattrib(i, 1, itmp))
 			    break;
 		    }
 		}
@@ -1283,7 +1284,7 @@ void
 potionbreathe(obj)
 register struct obj *obj;
 {
-	register int i, ii, isdone, kn = 0;
+	register int i, ii, kn = 0;
 
 	switch(obj->otyp) {
 	case POT_RESTORE_ABILITY:
@@ -1300,11 +1301,9 @@ register struct obj *obj;
 		    break;
 		} else {
 		    i = rn2(A_MAX);		/* start at a random point */
-		    for(isdone = ii = 0; !isdone && ii < A_MAX; ii++) {
+		    for(ii = 0; ii < A_MAX; ii++) {
 			if(ABASE(i) < AMAX(i)) {
 			    ABASE(i)++;
-			    /* only first found if not blessed */
-			    isdone = !(obj->blessed);
 			    flags.botl = 1;
 			}
 			if(++i >= A_MAX) i = 0;
@@ -1356,7 +1355,7 @@ register struct obj *obj;
 		kn++;
 		if (!Free_action) {
 		    pline("%s seems to be holding you.", Something);
-		    nomul(-rnd(5));
+		    nomul(-rnd(5), "frozen by a potion");
 		    nomovemsg = You_can_move_again;
 		    exercise(A_DEX, FALSE);
 		} else You("stiffen momentarily.");
@@ -1365,7 +1364,7 @@ register struct obj *obj;
 		kn++;
 		if (!Free_action && !Sleep_resistance) {
 		    You_feel("rather tired.");
-		    nomul(-rnd(5));
+		    nomul(-rnd(5), "sleeping off a magical draught");
 		    nomovemsg = You_can_move_again;
 		    exercise(A_DEX, FALSE);
 		} else You("yawn.");
