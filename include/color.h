@@ -18,7 +18,7 @@
  * much, so it is used as the "default" foreground color of the screen.
  */
 
-#ifndef VIDEOSHADES
+#if !defined(VIDEOSHADES) || defined(WIN32CON)
 #define CLR_BLACK		0
 #else
 # define CLR_BLACK		8
@@ -30,7 +30,7 @@
 #define CLR_MAGENTA		5
 #define CLR_CYAN		6
 #define CLR_GRAY		7 /* low-intensity white */
-#ifndef VIDEOSHADES
+#if !defined(VIDEOSHADES) || defined(WIN32CON)
 #define NO_COLOR		8
 #else
 # define NO_COLOR		0
