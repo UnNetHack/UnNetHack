@@ -210,8 +210,6 @@ long total;
 	livelog_write_string(strbuf);
 }
 
-#endif /* LIVELOGFILE */
-
 /** Livelog method for reporting the starting/resuming of a game. */
 void
 livelog_game_started(verb, alignment_sex, race, role)
@@ -246,3 +244,5 @@ const char* verb;
 		verb);
 	livelog_write_string(strbuf);
 }
+
+#endif /* LIVELOGFILE */
