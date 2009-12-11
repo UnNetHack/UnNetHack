@@ -186,6 +186,7 @@ magic_map_background(x, y, show)
     if (level.flags.hero_memory)
 	lev->glyph = glyph;
     if (show) show_glyph(x,y, glyph);
+    lev->styp = lev->typ;
 }
 
 /*

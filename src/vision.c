@@ -806,6 +806,8 @@ skip:
     /* Set the new min and max pointers. */
     viz_rmin  = next_rmin;
     viz_rmax = next_rmax;
+
+    recalc_mapseen();
 }
 
 

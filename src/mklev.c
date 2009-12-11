@@ -971,6 +971,7 @@ mklev()
 {
 	struct mkroom *croom;
 
+	init_mapseen(&u.uz);
 	if(getbones()) return;
 	in_mklev = TRUE;
 	makelevel();

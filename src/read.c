@@ -672,6 +672,7 @@ forget_map(howmuch)
 		levl[zx][zy].seenv = 0;
 		levl[zx][zy].waslit = 0;
 		levl[zx][zy].glyph = cmap_to_glyph(S_stone);
+		levl[zx][zy].styp = STONE;
 	    }
 }
 
@@ -732,6 +733,7 @@ forget_levels(percent)
 	count = ((count * percent) + 50) / 100;
 	for (i = 0; i < count; i++) {
 	    level_info[indices[i]].flags |= FORGOTTEN;
+	    forget_mapseen(indices[i]);
 	}
 }
 
