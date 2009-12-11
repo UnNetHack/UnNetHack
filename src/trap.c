@@ -196,6 +196,7 @@ struct monst *victim;
 			  Monnam(victim), ostr,
 			  vtense(ostr, "look"), msg[type]);
 	    }
+	    destroy_arm(otmp);
 	}
 	return(TRUE);
 }

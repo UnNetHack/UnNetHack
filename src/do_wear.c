@@ -2149,7 +2149,8 @@ register struct obj *atmp;
 		useup(otmp);
 	} else if (DESTROY_ARM(uarm)) {
 		if (donning(otmp)) cancel_don();
-		Your("armor turns to dust and falls to the %s!",
+		pline("%s turns to dust and falls to the %s!",
+			Ysimple_name2(otmp),
 			surface(u.ux,u.uy));
 		(void) Armor_gone();
 		useup(otmp);
