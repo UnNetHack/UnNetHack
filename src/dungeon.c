@@ -2316,29 +2316,34 @@ int rtype;
 	/* Yuck, redundancy...but shclass.name doesn't cut it as a noun */
 	switch(rtype) {
 		case SHOPBASE:
-			return "general store";
+			return "a general store";
 		case ARMORSHOP:
-			return "armor shop";
+			return "an armor shop";
 		case SCROLLSHOP:
-			return "scroll shop";
+			return "a scroll shop";
 		case POTIONSHOP:
-			return "potion shop";
+			return "a potion shop";
 		case WEAPONSHOP:
-			return "weapon shop";
+			return "a weapon shop";
 		case FOODSHOP:
-			return "delicatessen";
+			return "a delicatessen store";
 		case RINGSHOP:
-			return "jewelers";
+			return "a jewelry store";
 		case WANDSHOP:
-			return "wand shop";
+			return "a wand shop";
 		case BOOKSHOP:
-			return "bookstore";
+			return "a bookstore";
 		case CANDLESHOP:
-			return "lighting shop";
+			return "a lighting shop";
+		case TOOLSHOP:
+			return "a tool shop";
+		case BLACKSHOP:
+			return "the Blackmarket";
 		default:
 			/* In case another patch adds a shop type that doesn't exist,
 			 * do something reasonable like "a shop".
 			 */
+			warning("Unknown shop number: %d", rtype);
 			return "shop";
 	}
 }
@@ -2433,7 +2438,7 @@ boolean printdun;
 			ADDNTOBUF("shop", mptr->feat.nshop)
 		else if (mptr->feat.nshop == 1)
 			Sprintf(eos(buf), "%s%s", COMMA, 
-				an(shop_string(mptr->feat.shoptype)));
+				shop_string(mptr->feat.shoptype));
 
 		/* Temples + non-temple altars get munged into just "altars" */
 		if (!mptr->feat.ntemple || mptr->feat.ntemple != mptr->feat.naltar)
