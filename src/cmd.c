@@ -490,9 +490,26 @@ domonability()
 STATIC_PTR int
 enter_explore_mode()
 {
+#ifdef PARANOID
+	char buf[BUFSZ];
+	int really_xplor = FALSE;
+#endif
 	if(!discover && !wizard) {
 		pline("Beware!  From explore mode there will be no return to normal game.");
+#ifdef PARANOID
+		if (iflags.paranoid_quit) {
+			getlin ("Do you want to enter explore mode? [yes/no]?",buf);
+			(void) lcase (buf);
+			if (!(strcmp (buf, "yes"))) really_xplor = TRUE;
+		} else {
+			if (yn("Do you want to enter explore mode?") == 'y') {
+				really_xplor = TRUE;
+			}
+		}
+		if (really_xplor) {
+#else
 		if (yn("Do you want to enter explore mode?") == 'y') {
+#endif
 			clear_nhwindow(WIN_MESSAGE);
 			You("are now in non-scoring explore mode.");
 			discover = TRUE;

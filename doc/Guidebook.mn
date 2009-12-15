@@ -2040,6 +2040,15 @@ Specify the order to list object types in (default ``")[%?+!=/(*`0_'').
 The value of this option should be a string containing the
 symbols for the various object types.  Any omitted types are filled in
 at the end from the previous order.
+.lp paranoid_hit
+If true, asks you to type the word ``yes'' when hitting any peaceful
+monster, not just the letter ``y''.
+.lp paranoid_quit
+If true, asks you to type the word ``yes'' when quitting or entering
+Explore mode, not just the letter ``y''.
+.lp paranoid_remove
+If true, always show menu with the R and T commands even when there is
+only one item to remove or take off.
 .lp perm_invent
 If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.

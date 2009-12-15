@@ -236,6 +236,11 @@ struct instance_flags {
 	boolean show_born;	/* show numbers of created monsters */
 #endif
 	boolean showdmg;	/* show damage */
+#ifdef PARANOID
+	boolean paranoid_hit;	/* Ask for 'yes' when hitting peacefuls */
+	boolean paranoid_quit;	/* Ask for 'yes' when quitting */
+	boolean paranoid_remove; /* Always show menu for 'T' and 'R' */
+#endif
 /*
  * Window capability support.
  */

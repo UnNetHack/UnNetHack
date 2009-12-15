@@ -2621,6 +2621,18 @@
             Any omitted types are filled in at the end  from  the  previous
             order.
 
+          paranoid_hit
+            If true, asks you to type the word ``yes'' when hitting any
+            peaceful monster, not just the letter ``y''.
+
+          paranoid_quit
+            If true, asks you  to type the word ``yes'' when quitting or
+            entering Explore mode, not just the letter ``y''.
+
+          paranoid_remove
+            If true, always show menu with the R and T commands even when
+            there is only one item to remove or take off.
+
           perm_invent
             If  true,  always  display  your current inventory in a window.
             This only makes sense for windowing system interfaces that  im-

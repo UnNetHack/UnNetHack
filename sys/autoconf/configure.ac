@@ -384,6 +384,7 @@ NETHACK_ARG(high-score-comparison-by-uid,[Compare High Score entries by user id 
 # NETHACK_ARG(show-dmg,[Display damage reports],SHOW_DMG,yes)
 # NETHACK_ARG(show-weight,[Display object weight],SHOW_WEIGHT,yes)
 # NETHACK_ARG(other-services,[Shopkeeper services],OTHER_SERVICES,yes)
+NETHACK_ARG(paranoid,[Require some questions to be answered with 'yes' instead of 'y'],PARANOID,yes)
 NETHACK_ARG(show-born,[Display number of created monsters at the end of game],SHOW_BORN,yes)
 NETHACK_ARG(show-extinct,[Display extinct monsters at the end of game],SHOW_EXTINCT,yes)
 NETHACK_ARG(dungeon-growth,[Dungeon growth],DUNGEON_GROWTH,yes)

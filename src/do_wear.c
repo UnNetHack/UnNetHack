@@ -1109,7 +1109,11 @@ dotakeoff()
 			  "  Use 'R' command to remove accessories." : "");
 		return 0;
 	}
-	if (armorpieces > 1)
+	if (armorpieces > 1
+#ifdef PARANOID
+	    || iflags.paranoid_remove
+#endif
+	    )
 		otmp = getobj(clothes, "take off");
 	if (otmp == 0) return(0);
 	if (!(otmp->owornmask & W_ARMOR)) {
@@ -1159,7 +1163,11 @@ doremring()
 		      "  Use 'T' command to take off armor." : "");
 		return(0);
 	}
-	if (Accessories != 1) otmp = getobj(accessories, "remove");
+	if (Accessories != 1
+#ifdef PARANOID
+	    || iflags.paranoid_remove
+#endif
+	    ) otmp = getobj(accessories, "remove");
 	if(!otmp) return(0);
 	if(!(otmp->owornmask & (W_RING | W_AMUL | W_TOOL))) {
 		You("are not wearing that.");

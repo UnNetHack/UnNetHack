@@ -155,6 +155,9 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* Require some questions to be answered with 'yes' instead of 'y' */
+#undef PARANOID
+
 /* Compare High Score entries by user id instead of user name */
 #undef PERS_IS_UID
 

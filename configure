@@ -769,6 +769,7 @@ enable_exp_on_botl
 enable_score_on_botl
 enable_realtime_on_botl
 enable_high_score_comparison_by_uid
+enable_paranoid
 enable_show_born
 enable_show_extinct
 enable_dungeon_growth
@@ -1458,6 +1459,8 @@ Optional Features:
   --enable-high-score-comparison-by-uid
                           Compare High Score entries by user id instead of
                           user name (default=no)
+  --enable-paranoid       Require some questions to be answered with 'yes'
+                          instead of 'y' (default=yes)
   --enable-show-born      Display number of created monsters at the end of
                           game (default=yes)
   --enable-show-extinct   Display extinct monsters at the end of game
@@ -7396,6 +7399,25 @@ _ACEOF
 # NETHACK_ARG(show-dmg,[Display damage reports],SHOW_DMG,yes)
 # NETHACK_ARG(show-weight,[Display object weight],SHOW_WEIGHT,yes)
 # NETHACK_ARG(other-services,[Shopkeeper services],OTHER_SERVICES,yes)
+{ $as_echo "$as_me:$LINENO: checking whether to enable paranoid" >&5
+$as_echo_n "checking whether to enable paranoid... " >&6; }
+   # Check whether --enable-paranoid was given.
+if test "${enable_paranoid+set}" = set; then
+  enableval=$enable_paranoid;
+else
+  enable_paranoid="yes"
+fi
+
+   { $as_echo "$as_me:$LINENO: result: $enable_paranoid" >&5
+$as_echo "$enable_paranoid" >&6; }
+   if test "$enable_paranoid" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define PARANOID /**/
+_ACEOF
+
+   fi
+
 { $as_echo "$as_me:$LINENO: checking whether to enable show-born" >&5
 $as_echo_n "checking whether to enable show-born... " >&6; }
    # Check whether --enable-show-born was given.
