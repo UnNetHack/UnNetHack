@@ -27,8 +27,8 @@ dnl  ----- Window systems
 nethack_default_win=""
 # Note: Order is important: The last listed enabled port will be the default.
 NETHACK_WIN_ENABLE(tty, auto)
-NETHACK_WIN_ENABLE(x11, no)
-NETHACK_WIN_ENABLE(mswin, no, [use Microsoft Window's native graphics])
+#NETHACK_WIN_ENABLE(x11, no)
+#NETHACK_WIN_ENABLE(mswin, no, [use Microsoft Window's native graphics])
 
 dnl  ----- Figure out a C compiler to use; set @CC@
 AC_PROG_CC

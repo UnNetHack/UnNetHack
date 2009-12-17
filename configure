@@ -745,8 +745,6 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_tty_graphics
-enable_x11_graphics
-enable_mswin_graphics
 with_compression
 enable_data_librarian
 enable_sinks
@@ -1431,8 +1429,6 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-tty-graphics   use tty-graphics (default=auto)
-  --enable-x11-graphics   use x11-graphics (default=no)
-  --enable-mswin-graphics use Microsoft Window's native graphics (default=no)
   --enable-data-librarian Data librarian (default=auto)
   --enable-sinks          Kitchen sinks (default=yes)
   --enable-wallified-maze Fancy mazes (default=yes)
@@ -2076,26 +2072,8 @@ fi
   if test "$enable_tty_graphics" != "no"; then
     nethack_wins="tty $nethack_wins"
   fi
-# Check whether --enable-x11-graphics was given.
-if test "${enable_x11_graphics+set}" = set; then
-  enableval=$enable_x11_graphics; enable_x11_graphics="$enableval"
-else
-  enable_x11_graphics="no"
-fi
-
-  if test "$enable_x11_graphics" != "no"; then
-    nethack_wins="x11 $nethack_wins"
-  fi
-# Check whether --enable-mswin-graphics was given.
-if test "${enable_mswin_graphics+set}" = set; then
-  enableval=$enable_mswin_graphics; enable_mswin_graphics="$enableval"
-else
-  enable_mswin_graphics="no"
-fi
-
-  if test "$enable_mswin_graphics" != "no"; then
-    nethack_wins="mswin $nethack_wins"
-  fi
+#NETHACK_WIN_ENABLE(x11, no)
+#NETHACK_WIN_ENABLE(mswin, no, [use Microsoft Window's native graphics])
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
