@@ -1322,6 +1322,7 @@ register struct obj	*sobj;
 #endif
 	    	 (!In_endgame(&u.uz) || Is_earthlevel(&u.uz))) {
 	    	register int x, y;
+		int boulder_created = 0;
 
 	    	/* Identify the scroll */
 	    	pline_The("%s rumbles %s you!", ceiling(u.ux,u.uy),
@@ -1338,6 +1339,9 @@ register struct obj	*sobj;
 	    	    	if (isok(x, y) && !closed_door(x, y) &&
 	    	    			!IS_ROCK(levl[x][y].typ) &&
 	    	    			!IS_AIR(levl[x][y].typ) &&
+#ifdef BLACKMARKET
+	    	    			!(Is_blackmarket(&u.uz) && rn2(2)) &&
+#endif
 					(x != u.ux || y != u.uy)) {
 			    register struct obj *otmp2;
 			    register struct monst *mtmp;
@@ -1346,6 +1350,7 @@ register struct obj	*sobj;
 	    	    	    otmp2 = mksobj(confused ? ROCK : BOULDER,
 	    	    	    		FALSE, FALSE);
 	    	    	    if (!otmp2) continue;  /* Shouldn't happen */
+	    	    	    boulder_created++;
 	    	    	    otmp2->quan = confused ? rn1(5,2) : 1;
 	    	    	    otmp2->owt = weight(otmp2);
 
@@ -1427,6 +1432,9 @@ register struct obj	*sobj;
 			newsym(u.ux, u.uy);
 		    }
 		    if (dmg) losehp(dmg, "scroll of earth", KILLED_BY_AN);
+		} else {
+			if (boulder_created == 0)
+				pline("But nothing else happens.");
 		}
 	    } else if (In_endgame(&u.uz)) {
 		You_hear("the %s rumbling below you!", surface(u.ux,u.uy));
