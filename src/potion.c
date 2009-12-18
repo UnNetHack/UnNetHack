@@ -1748,22 +1748,14 @@ dodip()
 	here = levl[u.ux][u.uy].typ;
 	/* Is there a fountain to dip into here? */
 	if (IS_FOUNTAIN(here)) {
-#ifdef PARANOID
 		Sprintf(qbuf, "Dip %s into the fountain?", the(xname(obj)));
 		if(yn(qbuf) == 'y') {
-#else
-		if(yn("Dip it into the fountain?") == 'y') {
-#endif
 			dipfountain(obj);
 			return(1);
 		}
 	} else if (is_pool(u.ux,u.uy)) {
 		tmp = waterbody_name(u.ux,u.uy);
-#ifdef PARANOID
 		Sprintf(qbuf, "Dip %s into the %s?", the(xname(obj)), tmp);
-#else
-		Sprintf(qbuf, "Dip it into the %s?", tmp);
-#endif
 		if (yn(qbuf) == 'y') {
 		    if (Levitation) {
 			floating_above(tmp);
@@ -1780,12 +1772,8 @@ dodip()
 		}
 	}
 
-#ifdef PARANOID
 	Sprintf(qbuf, "dip %s into", the(xname(obj)));
 	if(!(potion = getobj(beverages, qbuf)))
-#else
-	if(!(potion = getobj(beverages, "dip into")))
-#endif
 		return(0);
 	if (potion == obj && potion->quan == 1L) {
 		pline("That is a potion bottle, not a Klein bottle!");

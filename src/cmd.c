@@ -490,26 +490,9 @@ domonability()
 STATIC_PTR int
 enter_explore_mode()
 {
-#ifdef PARANOID
-	char buf[BUFSZ];
-	int really_xplor = FALSE;
-#endif
 	if(!discover && !wizard) {
 		pline("Beware!  From explore mode there will be no return to normal game.");
-#ifdef PARANOID
-		if (iflags.paranoid_quit) {
-			getlin ("Do you want to enter explore mode? [yes/no]?",buf);
-			(void) lcase (buf);
-			if (!(strcmp (buf, "yes"))) really_xplor = TRUE;
-		} else {
-			if (yn("Do you want to enter explore mode?") == 'y') {
-				really_xplor = TRUE;
-			}
-		}
-		if (really_xplor) {
-#else
-		if (yn("Do you want to enter explore mode?") == 'y') {
-#endif
+		if (paranoid_yn("Do you want to enter explore mode?", iflags.paranoid_quit) == 'y') {
 			clear_nhwindow(WIN_MESSAGE);
 			You("are now in non-scoring explore mode.");
 			discover = TRUE;
@@ -3051,5 +3034,27 @@ char def;
 	return (*windowprocs.win_yn_function)(qbuf, resp, def);
 }
 #endif
+
+/**
+ * Asks the player a yes/no question if paranoid is true.
+ * @return 'y' or 'n'
+ */
+char
+paranoid_yn(query,paranoid)
+const char *query;
+boolean paranoid;
+{
+	if (paranoid) {
+		char buf[BUFSZ];
+		char query_yesno[2*BUFSZ];
+		/* put [yes/no] between question and question mark? */
+		Sprintf(query_yesno, "%s [yes/no]", query);
+		getlin (query_yesno, buf);
+		(void) lcase (buf);
+		return (!(strcmp (buf, "yes"))) ? 'y' : 'n';
+	} else {
+		return yn(query);
+	}
+}
 
 /*cmd.c*/
