@@ -902,6 +902,16 @@ level_tele()
 		Your("body rematerializes%s.", invent ?
 			", and you gather up all your possessions" : "");
 		return;
+#ifdef WIZARD
+	    } else if (!wizard && newlev > 0) {
+#else
+	    } else if (newlev > 0) {
+#endif
+		/* random teleport for destination level outside of the current dungeon branch */
+		if (newlev > dungeons[u.uz.dnum].depth_start + dunlevs_in_dungeon(&u.uz)) {
+			pline("Oops...");
+			goto random_levtport;
+		}
 	    }
 
 	    /* if in Knox and the requested level > 0, stay put.
