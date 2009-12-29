@@ -962,7 +962,7 @@ struct mkroom *broom;
 		dpos = dd->pos;
 		if (dpos == -1)	/* The position is RANDOM */
 		    dpos = rn2(((dwall & (W_WEST|W_EAST)) ? 2 : 1) ?
-			    (broom->hy - broom->ly) : (broom->hx - broom->lx));
+			    (broom->hy - broom->ly + 1) : (broom->hx - broom->lx + 1));
 
 		/* Convert wall and pos into an absolute coordinate! */
 		wtry = rn2(4);
