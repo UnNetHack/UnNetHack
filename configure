@@ -2074,6 +2074,8 @@ fi
   fi
 #NETHACK_WIN_ENABLE(x11, no)
 #NETHACK_WIN_ENABLE(mswin, no, [use Microsoft Window's native graphics])
+enable_x11_graphics="no"
+enable_mswin_graphics="no"
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
