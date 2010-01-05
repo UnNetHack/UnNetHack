@@ -304,7 +304,7 @@ TRAP:"fire",random
 TRAP:"fire",random
 TRAP:"fire",random
 #  An assortment of fire-appropriate nasties
-MONSTER:'D',"red dragon",random
+MONSTER:'D',"draken",random
 MONSTER:'&',"balrog",random
 MONSTER:'E',"fire elemental",random,hostile
 MONSTER:'E',"fire elemental",random,hostile

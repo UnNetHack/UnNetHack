@@ -429,9 +429,9 @@ MONSTER:'@',"Medusa",place[0]
 MONSTER:';',"kraken",(07,07)
 #
 # the nesting dragon
-MONSTER:'D',"yellow dragon", (05,04), asleep
-MONSTER[50%]:'D',"baby yellow dragon", (04,04), asleep
-MONSTER[25%]:'D',"baby yellow dragon", (04,05), asleep
+MONSTER:'D',"guivre", (05,04), asleep
+MONSTER[50%]:'D',"baby guivre", (04,04), asleep
+MONSTER[25%]:'D',"baby guivre", (04,05), asleep
 OBJECT:'%',"egg", (05,04), random, "yellow dragon", random
 OBJECT[50%]:'%',"egg", (05,04), random, "yellow dragon", random
 OBJECT[25%]:'%',"egg", (05,04), random, "yellow dragon", random
