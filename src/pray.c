@@ -7,7 +7,6 @@
 
 STATIC_PTR int NDECL(prayer_done);
 STATIC_DCL struct obj *NDECL(worst_cursed_item);
-STATIC_DCL int NDECL(in_trouble);
 STATIC_DCL void FDECL(fix_worst_trouble,(int));
 STATIC_DCL void FDECL(angrygods,(ALIGNTYP_P));
 STATIC_DCL void FDECL(at_your_feet, (const char *));
@@ -116,7 +115,7 @@ but that's really hard.
 #define on_shrine()	((levl[u.ux][u.uy].altarmask & AM_SHRINE) != 0)
 #define a_align(x,y)	((aligntyp)Amask2align(levl[x][y].altarmask & AM_MASK))
 
-STATIC_OVL int
+int
 in_trouble()
 {
 	struct obj *otmp;

@@ -239,9 +239,9 @@ HOBJ = $(FIRSTOBJ) allmain.o apply.o artifact.o attrib.o ball.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
 	role.o rumors.o save.o shk.o shknam.o sit.o sounds.o sp_lev.o spell.o \
-	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o u_init.o \
-	uhitm.o vault.o vision.o vis_tab.o weapon.o were.o wield.o windows.o \
-	wizard.o worm.o worn.o write.o zap.o \
+	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o tutorial.o \
+	u_init.o uhitm.o vault.o vision.o vis_tab.o weapon.o were.o wield.o \
+	windows.o wizard.o worm.o worn.o write.o zap.o \
 	$(RANDOBJ) $(SYSOBJ) $(WINOBJ) version.o \
 	livelog.o
 # the .o files from the HACKCSRC, SYSSRC, and WINSRC lists
@@ -779,6 +779,7 @@ timeout.o: $(srcdir)/timeout.c $(HACK_H) ../include/lev.h
 topten.o: $(srcdir)/topten.c $(HACK_H) ../include/dlb.h ../include/patchlevel.h
 track.o: $(srcdir)/track.c $(HACK_H)
 trap.o: $(srcdir)/trap.c $(HACK_H)
+tutorial.o: $(srcdir)/tutorial.c $(HACK_H)
 u_init.o: $(srcdir)/u_init.c $(HACK_H)
 uhitm.o: $(srcdir)/uhitm.c $(HACK_H)
 vault.o: $(srcdir)/vault.c $(HACK_H) ../include/vault.h

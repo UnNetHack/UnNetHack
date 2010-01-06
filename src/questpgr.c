@@ -390,6 +390,25 @@ int how;
 }
 
 void
+qt_com_firstline(msgnum, msgbuf)
+int     msgnum;
+char   *msgbuf;
+{
+	struct qtmsg *qt_msg;
+
+	if (!(qt_msg = msg_in(qt_list.common, msgnum))) {
+		impossible("qt_com_firstline: message %d not found.", msgnum);
+		*msgbuf = 0;
+		return;
+	}
+
+	(void) dlb_fseek(msg_file, qt_msg->offset, SEEK_SET);	
+	(void) dlb_fgets(in_line, 80, msg_file);
+        convert_line();
+        strcpy(msgbuf, out_line);
+}
+
+void
 com_pager(msgnum)
 int	msgnum;
 {
@@ -402,7 +421,7 @@ int	msgnum;
 
 	(void) dlb_fseek(msg_file, qt_msg->offset, SEEK_SET);
 	if (qt_msg->delivery == 'p') deliver_by_pline(qt_msg);
-	else if (msgnum == 1) deliver_by_window(qt_msg, NHW_MENU);
+	else if (qt_msg->delivery == 'm') deliver_by_window(qt_msg, NHW_MENU);
 	else		     deliver_by_window(qt_msg, NHW_TEXT);
 	return;
 }

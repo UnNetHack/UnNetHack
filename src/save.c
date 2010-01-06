@@ -339,6 +339,7 @@ register int fd, mode;
 	if(usteed_id)
 	    bwrite(fd, (genericptr_t) &usteed_id, sizeof usteed_id);
 #endif
+        bwrite(fd, (genericptr_t) pl_tutorial, sizeof pl_tutorial);
 	bwrite(fd, (genericptr_t) pl_character, sizeof pl_character);
 	bwrite(fd, (genericptr_t) pl_fruit, sizeof pl_fruit);
 	bwrite(fd, (genericptr_t) &current_fruit, sizeof current_fruit);

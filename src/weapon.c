@@ -807,6 +807,17 @@ boolean speedy;
 	    && u.weapon_slots >= slots_required(skill)));
 }
 
+/* return true if any skill can be advanced */
+boolean
+can_advance_something()
+{
+    int i;
+    for (i = 0; i < P_NUM_SKILLS; i++)
+        if (can_advance(i, 0))
+            return 1;
+    return 0;
+}
+
 /* return true if this skill could be advanced if more slots were available */
 STATIC_OVL boolean
 could_advance(skill)

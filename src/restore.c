@@ -436,6 +436,7 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	if (u.usteed)
 		mread(fd, (genericptr_t) steedid, sizeof (*steedid));
 #endif
+	mread(fd, (genericptr_t) pl_tutorial, sizeof pl_tutorial);
 	mread(fd, (genericptr_t) pl_character, sizeof pl_character);
 
 	mread(fd, (genericptr_t) pl_fruit, sizeof pl_fruit);
