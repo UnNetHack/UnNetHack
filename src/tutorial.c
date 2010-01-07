@@ -533,7 +533,7 @@ tutorial_redisplay()
   menu_item *s;
   start_menu(tempwin);
   for (i.a_int = QT_T_FIRST; i.a_int <= QT_T_MAX; i.a_int++) {
-    if (pl_tutorial[i.a_int - QT_T_FIRST] == 0) {
+    if (pl_tutorial[i.a_int - QT_T_FIRST] > 0) {
       static char namebuf[80];
       char* name;
       qt_com_firstline(i.a_int, namebuf);
