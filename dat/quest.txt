@@ -3524,8 +3524,8 @@ Go now!  You are banished from this place.
 %Cm - 00201
 Tutorial: WELCOME
 
-Welcome to NetHack! These tutorial messages will help to teach you how
-to play the game. (Use ? for more in-depth help on the game.)
+Welcome to UnNetHack! These tutorial messages will help to teach you
+how to play the game. (Use ? for more in-depth help on the game.)
 
 The screen generally contains (non-tutorial) messages at the top (if
 any), information about your character at the bottom (this will be
@@ -3538,7 +3538,7 @@ represent creatures (which could be friendly or hostile); and most
 punctuation marks represent either dungeon features (such as - and |
 for walls and doors, # for corridors, and . for the floor), or items
 (such as $ for gold). Eventually you'll know the symbols off by heart;
-while you're learning, you can press /n for a reminder of what any
+while you're learning, you can press / for a reminder of what any
 symbol means, or ; to find out what any object on the map is.
 
 Let's start by looking around a bit; close this message with the
@@ -3695,11 +3695,11 @@ that they're on (although your options may be set to show it in a more
 stylish way, to avoid it getting muddled with a wall). A closed door
 is a rather obvious obstacle to any adventurer, but there are several
 ways to deal with one. Probably the most obvious method of getting
-past a door is to try to open it; to do that, stand adjacent to the
-door, press o, and specify the direction that the door is in. Some
-doors are locked; in this case, you'll have to either pick the lock
-(by using the a command to use a lock-picking tool, if you have one),
-or kick the door down using control-D.
+past a door is to try to open it; to do that, just try to walk into it
+or stand adjacent to the door, press o, and specify the direction that
+the door is in. Some doors are locked; in this case, you'll have to
+either pick the lock (by using the a command to use a lock-picking
+tool, if you have one), or kick the door down using control-D.
 
 Open doors are less obviously obstacles, but they still hamper
 movement to some extent, as it's impossible to move diagonally into or
@@ -3721,8 +3721,8 @@ blocking your view. When a square does go out of sight, your character
 won't be able to see it, but your memory of it will continue to be
 displayed on the map; monsters shown on the square will be removed,
 because monsters tend to walk around, but any items or dungeon
-features on the square will continue to be displayed (and you can use
-; to find out what they were, if you've forgotten).
+features on the square will continue to be displayed (and you can
+use ; to find out what they were, if you've forgotten).
 
 Corridors are generally represented by the # symbol (your options may
 be set to use a slightly more artistic representation); the solid rock
@@ -4523,8 +4523,7 @@ Other uses of weapons include using t to throw them at things (darts
 are best used as thrown weapons, daggers are also good for this);
 using a to hit targets two squares away (if you have a long weapon
 like a lance); and using E to scratch into the floor with the weapon
-(note that this damages the weapon). Note that throwing is only
-possible in the 8 compass directions (and up and down).
+(note that this damages the weapon).
 %E
 %Cm - 00302
 Tutorial: ARMOR
@@ -4545,9 +4544,9 @@ a penalty (such as -1). The manufacturer of armor is also relevant;
 elves are good at making armor, and dwarves are even better, but
 orcish armor tends to be rather low in quality.
 
-Note that although anyone can wear armor, it tends to rather get in
-the way of spellcasting; metal armor in particular can mess up magic,
-and shields also make spellcasting rather difficult.
+Note that although anyone can wear armor, it hampers spellcasting;
+metal armor in particular can mess up magic, and shields also make
+spellcasting rather difficult.
 %E
 %Cm - 00303
 Tutorial: FOOD
@@ -4590,8 +4589,7 @@ can change from one game to the next. (You can use the \ command to
 see the label/scroll mappings you've already discovered.) There may be
 magical methods of determining what a given scroll does; in fact, one
 of the spells commonly bound up in scroll form is a magical means of
-determining the properties of an unknown item (such as the spell
-written on a scroll).
+determining the properties of an unknown item.
 
 Magical scrolls are strictly single-use; because the scroll is being
 used to capture a spell, the process of casting the spell also
@@ -4612,7 +4610,7 @@ to be recharged). As wands are designed to cast spells by themselves,
 you need not know magic yourself to be able to use them; just point
 them in the desired direction and fire! You can use the z command to
 'zap' a wand like this, to unleash its magic; note that you can only
-aim in compass directions (and upwards, downwards, and at yourself).
+aim in compass directions, upwards, downwards, and at yourself).
 
 Other things you can do with wands include writing on the floor with
 them (use the E command to do this), and breaking the wand with the a
@@ -4684,7 +4682,7 @@ on the tool. Some tools can be used an unlimited number of times;
 others will wear out, or run out of magic or other supplies. (For
 instance, a lamp can run out of oil after a while.) There may be other
 commands that make sense in relation to tools, based on their shape;
-for instance, some tools are usable as weapons, and so wielding them
+for instance, some tools are usable as weapons, and wielding them
 using w so you can hit monsters with them makes sense. Luckily, it's
 normally obvious what the purpose of a tool is, so you can normally
 guess what will happen when you press a and use it.
@@ -4694,11 +4692,11 @@ Tutorial: CONTAINERS
 
 Containers are a special subset of tools (and likewise, are
 represented with the ( character), that can be used to store items;
-bags, boxes and chests are all generally types of containers. You can
-use containers to carry more than 52 stacks of items around with you,
-by storing in the container; however, the weight of the items inside
-will still be significant, and the weight of the container itself can
-be too.
+bags, boxes, chests and safes are all generally types of containers.
+You can use containers to carry more than 52 stacks of items around
+with you, by storing in the container; however, the weight of the
+items inside will still be significant, and the weight of the
+container itself can be too.
 
 To put items into or take them out of a container in your inventory,
 you can use the a command to use the container (just like with any
@@ -5157,7 +5155,7 @@ their own strengths and weaknesses, which are likely quite different
 from the ones you have in your original form; it may help to
 experiment a bit to see what you can and can't do now. It's entirely
 possible that some things you took for granted, such as the ability to
-open doors, are no longer possible in this form.
+open doors, are not possible in this form.
 
 Some monsters have a special attack or ability; if you do, you'll have
 been told what it was, and you can use the #monster command to use it.
