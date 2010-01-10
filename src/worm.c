@@ -358,7 +358,7 @@ cutworm(worm, x, y, weap)
     while ( (curr->wx != x) || (curr->wy != y) ) {
 	curr = curr->nseg;
 	if (!curr) {
-	    impossible("cutworm: no segment at (%d,%d)", (int) x, (int) y);
+	    warning("cutworm: no segment at (%d,%d)", (int) x, (int) y);
 	    return;
 	}
     }
@@ -614,7 +614,7 @@ place_worm_tail_randomly(worm, x, y)
 /*  if (!wnum) return;  bullet proofing */
 
     if (wnum && (!wtails[wnum] || !wheads[wnum]) ) {
-	impossible("place_worm_tail_randomly: wormno is set without a tail!");
+	warning("place_worm_tail_randomly: wormno is set without a tail!");
 	return;
     }
 
