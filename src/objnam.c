@@ -392,7 +392,14 @@ register struct obj *obj;
 				obj->bknown && (obj->blessed || obj->cursed)) {
 				Strcat(buf, obj->blessed ? "holy " : "unholy ");
 			    }
-			    Strcat(buf, actualn);
+			    /* work around for potion alchemy bug that lets one
+			     * alchemize potions in unused range */
+			    if (actualn) {
+				Strcat(buf, actualn);
+			    } else {
+				warning("inexistant potion %d", obj->otyp);
+				Strcat(buf, "inexistant");
+			    }
 			} else {
 				Strcat(buf, " called ");
 				Strcat(buf, un);
