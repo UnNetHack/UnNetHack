@@ -154,6 +154,7 @@ struct	qtlists {
 #define QT_T_SECONDWIELD    272 /* w more often than twice per 50 turns */
 #define QT_T_LOOK_REMINDER  273 /* no ; within the last 100 turns */
 #define QT_T_FIRE           274 /* t three times in a row */
+#define QT_T_DGN_OVERVIEW   275 /* dungeon #overview and #annotate */
 /* Ambient advice, outside combat */
 #define QT_T_VIEWTUTORIAL   280 /* peaceful, turn >= 10 */
 #define QT_T_CHECK_ITEMS    281 /* peaceful, turn >= 30 */

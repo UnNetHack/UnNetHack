@@ -4246,6 +4246,20 @@ know how to cater to adventurers well). Still, saving keystrokes
 reduces the chance of accidentally throwing the wrong item to quite an
 extent.
 %E
+%Cm - 00275
+Tutorial: DUNGEON OVERVIEW
+
+You've already ventured quite far into the dungeon. You passed several
+dungeon levels by now and it might be hard for you to remember each
+and every level.
+
+Use #overview or press control-O for an overview of the dungeon. The
+list shows specific dungeon features like fountains, sinks and altars
+but also stairs to other branches.
+
+You can also name the current level by using #annotate. The name will
+appear in the dungeon overview next to the dungeon level number.
+%E
 %Cm - 00280
 Tutorial: GETTING HELP
 
