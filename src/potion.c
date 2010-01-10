@@ -1599,7 +1599,12 @@ register struct obj *o1, *o2;
 		} else {
 			return 0;
 		}
-		return alchemy_table2[result];
+		if (OBJ_NAME(objects[alchemy_table2[result]]) == 0) {
+			/* mixed potion doesn't exist in this game */
+			return 0;
+		} else {
+			return alchemy_table2[result];
+		}
 	} else {
 		switch (o1->otyp) {
 			case UNICORN_HORN:
@@ -1941,6 +1946,10 @@ struct obj *potion, *obj;
 		}
 
 		obj->odiluted = (obj->otyp != POT_WATER);
+
+		if (OBJ_NAME(objects[obj->otyp]) == 0) {
+			panic("dipping created an inexistant potion (%d)", obj->otyp);
+		}
 
 		if (obj->otyp == POT_WATER && !Hallucination) {
 			pline_The("mixture bubbles%s.",
