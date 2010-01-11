@@ -144,6 +144,11 @@ unsigned *ospecial;
 	} else
 #endif
 	    obj_color(offset);
+	    /* use inverse video for multiple items */
+	    if (level.objects[x][y] &&
+	        level.objects[x][y]->nexthere) {
+		special |= MG_INVERSE;
+	    }
     } else if ((offset = (glyph - GLYPH_RIDDEN_OFF)) >= 0) {	/* mon ridden */
 	ch = monsyms[(int)mons[offset].mlet];
 #ifdef ROGUE_COLOR
