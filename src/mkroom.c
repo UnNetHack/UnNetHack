@@ -83,6 +83,12 @@ mkshop()
 #ifndef MAC
 		ep = nh_getenv("SHOPTYPE");
 		if(ep){
+			for (i=0; shtypes[i].name; i++) {
+				if (!strcmp(shtypes[i].name, ep) ||
+				    (*ep == def_oc_syms[(int)shtypes[i].symb])) {
+				    goto gottype;
+				}
+			}
 			if(*ep == 'z' || *ep == 'Z'){
 				mkzoo(ZOO);
 				return;
@@ -135,9 +141,6 @@ mkshop()
 				mkswamp();
 				return;
 			}
-			for(i=0; shtypes[i].name; i++)
-				if(*ep == def_oc_syms[(int)shtypes[i].symb])
-				    goto gottype;
 			if(*ep == 'g' || *ep == 'G')
 				i = 0;
 			else
