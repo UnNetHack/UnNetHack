@@ -443,6 +443,19 @@ register struct monst *shkp;
     }
     rlock = FALSE;
 }
+
+/** Makes the black marketeer on the current level angry. */
+void
+set_black_marketeer_angry()
+{
+	struct monst *mtmp;
+	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+		if (mtmp && mtmp->isshk &&
+		    mtmp->data == &mons[PM_BLACK_MARKETEER]) {
+			setmangry(mtmp);
+		}
+	}
+}
 #endif /* BLACKMARKET */
 
 /* x,y is strictly inside shop */

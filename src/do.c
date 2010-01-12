@@ -1452,6 +1452,12 @@ boolean at_stairs, falling, portal;
 		    if (!DEADMONSTER(mtmp) && mtmp->msleeping) mtmp->msleeping = 0;
 	}
 
+#ifdef BLACKMARKET
+	if (Is_blackmarket(&u.uz) && Conflict) {
+		set_black_marketeer_angry();
+	}
+#endif /* BLACKMARKET */
+
 	if (on_level(&u.uz, &astral_level))
 	    final_level();
 	else
