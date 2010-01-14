@@ -796,6 +796,7 @@ E boolean NDECL(friday_13th);
 E boolean NDECL(towelday);
 E int NDECL(night);
 E int NDECL(midnight);
+E boolean NDECL(piday);
 
 /* ### invent.c ### */
 

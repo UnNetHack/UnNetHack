@@ -655,4 +655,10 @@ towelday()
 	return(boolean)((getmday()==25) && (getmonth()==5));
 }
 
+boolean
+piday()
+{
+	return(boolean)((getmonth()==3) && (getmday()==14));
+}
+
 /*hacklib.c*/
