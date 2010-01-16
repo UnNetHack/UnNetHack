@@ -1062,7 +1062,7 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 
 	    if (prot < 0)
 		you_are("ineffectively protected");
-	    else
+	    else if (prot > 0)
 		you_are("protected");
 	}
 	if (Protection_from_shape_changers)
