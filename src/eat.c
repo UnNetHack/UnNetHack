@@ -454,7 +454,7 @@ boolean message;
 		  "eating", food_xname(victual.piece, TRUE));
 
 	if (victual.piece->otyp == CORPSE) {
-		if (!victual.piece->odrained || Race_if(PM_VAMPIRE) && !rn2(5))
+		if (!victual.piece->odrained || (Race_if(PM_VAMPIRE) && !rn2(5)))
 		cpostfx(victual.piece->corpsenm);
 	} else
 		fpostfx(victual.piece);

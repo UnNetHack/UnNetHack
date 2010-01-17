@@ -2207,9 +2207,7 @@ right_side(row, left, right_mark, limits)
     char	  *row_max;	/* right most [used by macro set_max()] */
     int		  lim_max;	/* right most limit of circle */
 
-#ifdef GCC_WARN
     rowp = row_min = row_max = 0;
-#endif
     nrow    = row + step;
     /*
      * Can go deeper if the row is in bounds and the next row is within
@@ -2382,9 +2380,7 @@ left_side(row, left_mark, right, limits)
     char	  *row_min, *row_max;
     int		  lim_min;
 
-#ifdef GCC_WARN
     rowp = row_min = row_max = 0;
-#endif
     nrow    = row+step;
     deeper  = good_row(nrow) && (!limits || (*limits >= *(limits+1)));
     if(!vis_func) {

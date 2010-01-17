@@ -60,7 +60,7 @@ STATIC_DCL void NDECL(shuffle_planes);
 #endif
 
 mapseen *mapseenchn = (struct mapseen *)0;
-STATIC_DCL void FDECL(free_mapseen, (mapseen *));
+/*STATIC_DCL void FDECL(free_mapseen, (mapseen *));*/
 STATIC_DCL mapseen *FDECL(load_mapseen, (int));
 STATIC_DCL void FDECL(save_mapseen, (int, mapseen *));
 STATIC_DCL mapseen *FDECL(find_mapseen, (d_level *));
@@ -1900,7 +1900,7 @@ recbranch_mapseen(source, dest)
 	/* branch not found, so not a real branch. */
 	if (!br) return;
   
-	if (mptr = find_mapseen(source)) {
+	if ((mptr = find_mapseen(source))) {
 		if (mptr->br && br != mptr->br)
 			impossible("Two branches on the same level?");
 		mptr->br = br;
@@ -2115,11 +2115,12 @@ STATIC_OVL boolean
 interest_mapseen(mptr)
 mapseen *mptr;
 {
-	return (on_level(&u.uz, &mptr->lev) || (!mptr->feat.forgot) && (
-		INTEREST(mptr->feat) ||
-		(mptr->custom) || 
-		(mptr->br)
-	));
+	return (on_level(&u.uz, &mptr->lev) ||
+		((!mptr->feat.forgot) &&
+		 (INTEREST(mptr->feat) ||
+		  (mptr->custom) || 
+		  (mptr->br)))
+	);
 }
 
 /* recalculate mapseen for the current level */
@@ -2242,7 +2243,7 @@ dooverview()
 	mapseen *mptr;
 	boolean first;
 	boolean printdun;
-	int lastdun;
+	int lastdun=-1;
 
 	first = TRUE;
 
@@ -2411,7 +2412,7 @@ boolean printdun;
 	/* wizmode prints out proto dungeon names for clarity */
 	if (wizard) {
 		s_level *slev;
-		if (slev = Is_special(&mptr->lev))
+		if ((slev = Is_special(&mptr->lev)))
 			Sprintf(eos(buf), " [%s]", slev->proto);
 	}
 #endif
@@ -2462,7 +2463,7 @@ boolean printdun;
 
 		/* capitalize afterwards */
 		i = strlen(PREFIX);
-		buf[i] = toupper(buf[i]);
+		*buf = highc(*buf);
 
 		putstr(win, 0, buf);
 	}
