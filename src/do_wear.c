@@ -708,7 +708,6 @@ register struct obj *obj;
 
     switch(obj->otyp){
 	case RIN_TELEPORTATION:
-	case RIN_REGENERATION:
 	case RIN_SEARCHING:
 	case RIN_STEALTH:
 	case RIN_HUNGER:
@@ -720,10 +719,19 @@ register struct obj *obj;
 	case RIN_TELEPORT_CONTROL:
 	case RIN_POLYMORPH:
 	case RIN_POLYMORPH_CONTROL:
-	case RIN_FREE_ACTION:                
+	case RIN_FREE_ACTION:
 	case RIN_SLOW_DIGESTION:
 	case RIN_SUSTAIN_ABILITY:
 	case MEAT_RING:
+		break;
+	case RIN_REGENERATION:
+		if (!oldprop && !HRegeneration && !regenerates(youmonst.data)) {
+			if ((uhp() < uhpmax()) &&
+			    !objects[obj->otyp].oc_name_known) {
+				Your("wounds are rapidly healing!");
+				makeknown(RIN_REGENERATION);
+			}
+		}
 		break;
 	case RIN_CONFLICT:
 #ifdef BLACKMARKET
