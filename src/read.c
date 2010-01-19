@@ -802,6 +802,7 @@ struct obj *sobj;
 	}
 }
 
+/** Remove water tile at x,y. */
 STATIC_PTR void
 undo_flood(x, y, roomcnt)
 int x, y;
@@ -837,20 +838,18 @@ genericptr_t poolcnt;
 
 	(*(int *)poolcnt)++;
 
-	if (!((*(int *)poolcnt) && (x == u.ux) && (y == u.uy)))
-	{
+	if (!((*(int *)poolcnt) && (x == u.ux) && (y == u.uy))) {
 		/* Put a pool at x, y */
 		levl[x][y].typ = POOL;
 		del_engr_at(x, y);
 		water_damage(level.objects[x][y], FALSE, TRUE);
 
-		if ((mtmp = m_at(x, y)) != 0)
+		if ((mtmp = m_at(x, y)) != 0) {
 			(void) minliquid(mtmp);
-		else
+		} else {
 			newsym(x,y);
-	}
-	else if ((x == u.ux) && (y == u.uy))
-	{
+		}
+	} else if ((x == u.ux) && (y == u.uy)) {
 		(*(int *)poolcnt)--;
 	}
 
@@ -1218,18 +1217,31 @@ register struct obj	*sobj;
 			int maderoom = 0;
 			do_clear_area(u.ux, u.uy, 4+2*bcsign(sobj),
 					undo_flood, (genericptr_t)&maderoom);
-			if (maderoom)
-			{
+			if (maderoom) {
 				known = TRUE;
 				You("are suddenly very dry!");
 			}
 		} else {
 			int madepool = 0;
 			int stilldry = -1;
+			int x,y,safe_pos=0;
 			if (!sobj->cursed)
 				do_clear_area(u.ux, u.uy, 5, do_flood,
 						(genericptr_t)&madepool);
-			if (!sobj->blessed)
+
+			/* check if there are safe tiles around the player */
+			for (x = u.ux-1; x <= u.ux+1; x++) {
+				for (y = u.uy - 1; y <= u.uy + 1; y++) {
+					if (x != u.ux && y != u.uy &&
+					    goodpos(x, y, &youmonst, 0)) {
+						safe_pos++;
+					}
+				}
+			}
+
+			/* cursed and uncursed might put a water tile on
+			 * player's position */
+			if (!sobj->blessed && safe_pos > 0)
 				do_flood(u.ux, u.uy, (genericptr_t)&stilldry);
 			if (!madepool && stilldry)
 				break;
