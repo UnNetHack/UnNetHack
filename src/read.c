@@ -33,6 +33,8 @@ static void FDECL(forget_single_object, (int));
 static void FDECL(forget, (int));
 static void FDECL(maybe_tame, (struct monst *,struct obj *));
 
+STATIC_PTR void FDECL(do_flood, (int,int,genericptr_t));
+STATIC_PTR void FDECL(undo_flood, (int,int,genericptr_t));
 STATIC_PTR void FDECL(set_lit, (int,int,genericptr_t));
 
 int
@@ -800,6 +802,60 @@ struct obj *sobj;
 	}
 }
 
+STATIC_PTR void
+undo_flood(x, y, roomcnt)
+int x, y;
+genericptr_t roomcnt;
+{
+	if ((levl[x][y].typ != POOL) &&
+	    (levl[x][y].typ != MOAT) &&
+	    (levl[x][y].typ != WATER) &&
+	    (levl[x][y].typ != FOUNTAIN))
+		return;
+
+	(*(int *)roomcnt)++;
+
+	/* Get rid of a pool at x, y */
+	levl[x][y].typ = ROOM;
+	newsym(x,y);
+}
+
+STATIC_PTR void
+do_flood(x, y, poolcnt)
+int x, y;
+genericptr_t poolcnt;
+{
+	register struct monst *mtmp;
+	register struct trap *ttmp;
+
+	if (nexttodoor(x, y) || (rn2(1 + distmin(u.ux, u.uy, x, y))) ||
+	    (sobj_at(BOULDER, x, y)) || (levl[x][y].typ != ROOM))
+		return;
+
+	if ((ttmp = t_at(x, y)) != 0 && !delfloortrap(ttmp))
+		return;
+
+	(*(int *)poolcnt)++;
+
+	if (!((*(int *)poolcnt) && (x == u.ux) && (y == u.uy)))
+	{
+		/* Put a pool at x, y */
+		levl[x][y].typ = POOL;
+		del_engr_at(x, y);
+		water_damage(level.objects[x][y], FALSE, TRUE);
+
+		if ((mtmp = m_at(x, y)) != 0)
+			(void) minliquid(mtmp);
+		else
+			newsym(x,y);
+	}
+	else if ((x == u.ux) && (y == u.uy))
+	{
+		(*(int *)poolcnt)--;
+	}
+
+}
+ 
 int
 seffects(sobj)
 register struct obj	*sobj;
@@ -1156,6 +1212,38 @@ register struct obj	*sobj;
 		    }
 		}
 		break;
+	case SCR_FLOOD:
+		if (confused) {
+			/* remove water from vicinity of player */
+			int maderoom = 0;
+			do_clear_area(u.ux, u.uy, 4+2*bcsign(sobj),
+					undo_flood, (genericptr_t)&maderoom);
+			if (maderoom)
+			{
+				known = TRUE;
+				You("are suddenly very dry!");
+			}
+		} else {
+			int madepool = 0;
+			int stilldry = -1;
+			if (!sobj->cursed)
+				do_clear_area(u.ux, u.uy, 5, do_flood,
+						(genericptr_t)&madepool);
+			if (!sobj->blessed)
+				do_flood(u.ux, u.uy, (genericptr_t)&stilldry);
+			if (!madepool && stilldry)
+				break;
+			if (madepool)
+				pline(Hallucination ?
+						"A totally gnarly wave comes in!" :
+						"A flood surges through the area!" );
+			if (!stilldry && !Wwalking && !Flying && !Levitation)
+				drown();
+			known = TRUE;
+			break;
+		}
+		break;
+
 	case SCR_GENOCIDE:
 		You("have found a scroll of genocide!");
 		known = TRUE;
@@ -1267,6 +1355,7 @@ register struct obj	*sobj;
 		    pline("Unfortunately, you can't grasp the details.");
 		}
 		break;
+#ifdef SCR_AMNESIA
 	case SCR_AMNESIA:
 		known = TRUE;
 		forget(	(!sobj->blessed ? ALL_SPELLS : 0) |
@@ -1281,6 +1370,7 @@ register struct obj	*sobj;
 			pline("Thinking of Maud you forget everything else.");
 		exercise(A_WIS, FALSE);
 		break;
+#endif
 	case SCR_FIRE:
 		/*
 		 * Note: Modifications have been made as of 3.0 to allow for

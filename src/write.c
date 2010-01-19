@@ -26,7 +26,6 @@ register struct obj *otmp;
 	case SCR_GOLD_DETECTION:
 	case SCR_FOOD_DETECTION:
 	case SCR_MAGIC_MAPPING:
-	case SCR_AMNESIA:
 	case SCR_FIRE:
 	case SCR_EARTH:
 		return(8);
@@ -48,6 +47,7 @@ register struct obj *otmp;
 	case SCR_CHARGING:
 		return(16);
 /*		break; */
+	case SCR_FLOOD:
 	case SCR_SCARE_MONSTER:
 	case SCR_STINKING_CLOUD:
 	case SCR_TAMING:
