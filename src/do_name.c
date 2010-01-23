@@ -142,11 +142,14 @@ const char *goal;
 			    lo_x = (pass == 0 && ty == lo_y) ? cx + 1 : 1;
 			    hi_x = (pass == 1 && ty == hi_y) ? cx : COLNO - 1;
 			    for (tx = lo_x; tx <= hi_x; tx++) {
-				k = levl[tx][ty].glyph;
-				/* TODO: open doors aren't matched */
-				/* TODO: remebered or seen items aren't matched */
+				/* look at dungeon feature, not at user-visible glyph */
+				k = back_to_glyph(tx,ty);
+				/* TODO: - open doors are only matched with '-'
+				 *       - magic portal don't match */
+				/* should remembered or seen items be matched? */
 				if (glyph_is_cmap(k) &&
 					matching[glyph_to_cmap(k)] &&
+					levl[tx][ty].seenv && /* only if already seen */
 					(IS_DRAWBRIDGE(levl[tx][ty].typ) ||
 					 IS_DOOR(levl[tx][ty].typ) ||
 					 IS_FURNITURE(levl[tx][ty].typ))
