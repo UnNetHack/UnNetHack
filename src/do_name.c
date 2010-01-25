@@ -144,15 +144,24 @@ const char *goal;
 			    for (tx = lo_x; tx <= hi_x; tx++) {
 				/* look at dungeon feature, not at user-visible glyph */
 				k = back_to_glyph(tx,ty);
-				/* TODO: - open doors are only matched with '-'
-				 *       - magic portal don't match */
+				/* uninteresting background glyph */
+				if (glyph_is_cmap(k) &&
+				    (glyph_to_cmap(k) == S_room ||
+				     glyph_to_cmap(k) == S_corr ||
+				     glyph_to_cmap(k) == S_litcorr)) {
+					/* what the user remembers to be at tx,ty */
+					k = levl[tx][ty].glyph;
+				}
+				/* TODO: - open doors are only matched with '-' */
 				/* should remembered or seen items be matched? */
 				if (glyph_is_cmap(k) &&
 					matching[glyph_to_cmap(k)] &&
 					levl[tx][ty].seenv && /* only if already seen */
-					(IS_DRAWBRIDGE(levl[tx][ty].typ) ||
-					 IS_DOOR(levl[tx][ty].typ) ||
-					 IS_FURNITURE(levl[tx][ty].typ))
+					(!IS_WALL(levl[tx][ty].typ) &&
+					 (levl[tx][ty].typ != SDOOR) &&
+					 glyph_to_cmap(k) != S_room &&
+					 glyph_to_cmap(k) != S_corr &&
+					 glyph_to_cmap(k) != S_litcorr)
 				    ) {
 				    cx = tx,  cy = ty;
 				    if (msg_given) {
