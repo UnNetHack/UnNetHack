@@ -1423,9 +1423,11 @@ register struct obj   *obj;
 	           ((Role_if(PM_ROGUE) &&
 	              mon->data == &mons[PM_MONKEY] &&
 	             (obj->otyp == BANANA || !rn2(2))) ||
+# ifdef TOURIST
 	            (Role_if(PM_TOURIST) && 
 	             (mon->data == &mons[PM_CROCODILE] ||
 	              mon->data == &mons[PM_BABY_CROCODILE])) ||
+# endif
 	            ((Role_if(PM_RANGER) || Role_if(PM_CAVEMAN)) &&
 	              mon->data == &mons[PM_WINTER_WOLF_CUB])))) {
 #else

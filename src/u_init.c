@@ -807,9 +807,11 @@ u_init()
 		break;
 	}
 
+#ifdef TOURIST
 	/* Towel Day: In Memoriam Douglas Adams */
 	if (towelday())
 		ini_inv(Towel);
+#endif
 
 	if (discover)
 		ini_inv(Wishing);

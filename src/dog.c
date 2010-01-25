@@ -48,9 +48,11 @@ pet_type()
 	else if ((Role_if(PM_RANGER) || Role_if(PM_CAVEMAN)) &&
 	         ((preferred_pet == 'e') || (!rn2(3))))
 		return (rn2(4) ? PM_WOLF : PM_WINTER_WOLF_CUB);
+# ifdef TOURIST
 	else if (Role_if(PM_TOURIST) &&
 	          ((preferred_pet == 'e') || (!rn2(3))))
 		return (PM_BABY_CROCODILE);
+# endif
 #endif
 	else
 	    return (rn2(2) ? PM_KITTEN : PM_LITTLE_DOG);
