@@ -1731,6 +1731,7 @@ E boolean FDECL(cant_create, (int *, BOOLEAN_P));
 #ifdef WIZARD
 E boolean NDECL(create_particular);
 #endif
+E void FDECL(drop_boulder_on_player, (BOOLEAN_P, BOOLEAN_P));
 
 /* ### rect.c ### */
 

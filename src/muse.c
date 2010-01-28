@@ -1438,40 +1438,8 @@ struct monst *mtmp;
 		m_useup(mtmp, otmp);
 		/* Attack the player */
 		if (distmin(mmx, mmy, u.ux, u.uy) == 1 && !otmp->cursed) {
-		    int dmg;
-		    struct obj *otmp2;
-
-		    /* Okay, _you_ write this without repeating the code */
-		    otmp2 = mksobj(confused ? ROCK : BOULDER,
-				FALSE, FALSE);
-		    if (!otmp2) goto xxx_noobj;  /* Shouldn't happen */
-		    otmp2->quan = confused ? rn1(5,2) : 1;
-		    otmp2->owt = weight(otmp2);
-		    if (!amorphous(youmonst.data) &&
-			    !Passes_walls &&
-			    !noncorporeal(youmonst.data) &&
-			    !unsolid(youmonst.data)) {
-			You("are hit by %s!", doname(otmp2));
-			dmg = dmgval(otmp2, &youmonst) * otmp2->quan;
-			if (uarmh) {
-			    if(is_metallic(uarmh)) {
-				pline("Fortunately, you are wearing a hard helmet.");
-				if (dmg > 2) dmg = 2;
-			    } else if (flags.verbose) {
-				Your("%s does not protect you.",
-						xname(uarmh));
-			    }
-			}
-		    } else
-			dmg = 0;
-		    if (!flooreffects(otmp2, u.ux, u.uy, "fall")) {
-			place_object(otmp2, u.ux, u.uy);
-			stackobj(otmp2);
-			newsym(u.ux, u.uy);
-		    }
-		    if (dmg) losehp(dmg, "scroll of earth", KILLED_BY_AN);
+		    drop_boulder_on_player(confused, !otmp->cursed);
 		}
-	    xxx_noobj:
 
 		return (mtmp->mhp <= 0) ? 1 : 2;
 	    }
