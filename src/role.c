@@ -523,8 +523,8 @@ const struct Conduct conducts[] = {
 	"pretended to be a nudist"},
 
 {	"zen",		"zen master", 	"blindfolded",	TRUE,
-	"You ","have followed ","followed ","the true path of zen",
-	"left the true path of zen"},
+	"You ","have followed ","followed ","the true Path of Zen",
+	"left the true Path of Zen"},
 
 {	"asceticism",	"ascetic",	"hungry",	TRUE,
 	"You ","have gone ","went ","without food",
@@ -540,7 +540,7 @@ const struct Conduct conducts[] = {
 
 {	"illiteracy", 	"illiterate",	"illiterate",	TRUE,
 	"You ","have been ","were ","illiterate",
-	"have become literate"},
+	"become literate"},
 
 {	"thievery",	"master thief",	"tricky",	TRUE,
 	"You ","have been ","were ","very tricky",
@@ -1575,7 +1575,7 @@ int cdt;
 	case CONDUCT_BLINDFOLDED:
 	    u.uconduct.unblinded++;
 	    if (u.roleplay.blindfolded){
-		pline("The spirit of zen leaves your body.");
+		pline("The Spirit of Zen leaves your body.");
 		makemon(&mons[PM_ZRUTY], u.ux, u.uy, NO_MM_FLAGS);
 		makemon(&mons[PM_SHOCKING_SPHERE], u.ux, u.uy, NO_MM_FLAGS);
 		makemon(&mons[PM_WOOD_NYMPH],u.ux, u.uy, NO_MM_FLAGS);
