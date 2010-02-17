@@ -1207,7 +1207,7 @@ opentin()		/* called during each move whilst opening a tin */
 		      Hallucination ? "Swee'pea" : "Popeye");
 	    lesshungry(600);
 	    gainstr(tin.tin, 0);
-	    /* Eating a tin of spinache breaks foodless-conduct here */
+	    /* Eating a tin of spinach breaks foodless-conduct here */
 	    violated(CONDUCT_FOODLESS);
 	}
 use_me:
