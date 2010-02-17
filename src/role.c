@@ -1576,9 +1576,9 @@ int cdt;
 	    u.uconduct.unblinded++;
 	    if (u.roleplay.blindfolded){
 		pline("The Spirit of Zen leaves your body.");
-		makemon(&mons[PM_ZRUTY], u.ux, u.uy, NO_MM_FLAGS);
-		makemon(&mons[PM_SHOCKING_SPHERE], u.ux, u.uy, NO_MM_FLAGS);
-		makemon(&mons[PM_WOOD_NYMPH],u.ux, u.uy, NO_MM_FLAGS);
+		makemon(mkclass(S_ZOMBIE, 0), u.ux, u.uy, NO_MM_FLAGS); /* Z */
+		makemon(mkclass(S_EYE, 0), u.ux, u.uy, NO_MM_FLAGS);    /* e */
+		makemon(mkclass(S_NYMPH, 0), u.ux, u.uy, NO_MM_FLAGS);  /* n */
 		u.roleplay.blindfolded = FALSE;
 	    }
 	    break;
