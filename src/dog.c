@@ -536,7 +536,8 @@ boolean pets_only;	/* true for ascension or final escape */
 	    mtmp2 = mtmp->nmon;
 	    if (DEADMONSTER(mtmp)) continue;
 	    if (pets_only && !mtmp->mtame) continue;
-	    if (((monnear(mtmp, u.ux, u.uy) && levl_follower(mtmp)) ||
+	    if ((((distmin(mtmp->mx, mtmp->my, u.ux, u.uy) <= 2) 
+					&& levl_follower(mtmp)) ||
 #ifdef STEED
 			(mtmp == u.usteed) ||
 #endif

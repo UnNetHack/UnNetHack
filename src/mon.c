@@ -1496,6 +1496,10 @@ uchar adtyp;
 	tmp = monsndx(mtmp->data);
 	if (mvitals[tmp].died < 255) mvitals[tmp].died++;
 
+	/* killing an artifact-guardian is ordinary robbery */
+	if (is_guardian(mtmp->data))
+		violated(CONDUCT_THIEVERY);
+
 	/* if it's a (possibly polymorphed) quest leader, mark him as dead */
 	if (mtmp->m_id == quest_status.leader_m_id)
 	    quest_status.leader_is_dead = TRUE;
@@ -1847,7 +1851,7 @@ xkilled(mtmp, dest)
 
 
 	/* KMH, conduct */
-	u.uconduct.killer++;
+	violated(CONDUCT_PACIFISM);
 
 	if (dest & 1) {
 	    const char *verb = nonliving(mtmp->data) ? "destroy" : "kill";

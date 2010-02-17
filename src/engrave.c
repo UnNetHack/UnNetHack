@@ -499,8 +499,10 @@ doengrave()
 	char ebuf[BUFSZ];	/* Buffer for initial engraving text */
 	char qbuf[QBUFSZ];	/* Buffer for query text */
 	char post_engr_text[BUFSZ]; /* Text displayed after engraving prompt */
+	const char *eword;	/* What to engrave */
 	const char *everb;	/* Present tense of engraving type */
-	const char *eloc;	/* Where the engraving is (ie dust/floor/...) */
+	const char *eloc; 	/* Where to engrave in the ground */
+	const char *eground;	/* Type of the ground (ie dust/floor/...) */
 	char *sp;		/* Place holder for space count of engr text */
 	int len;		/* # of nonspace chars of new engraving text */
 	int maxelen;		/* Max allowable length of engraving text */
@@ -979,51 +981,61 @@ doengrave()
 	    }
 	}
 
-	eloc = surface(u.ux,u.uy);
+	eword = (u.roleplay.illiterate ? "your name " : "");
+	eground = surface(u.ux,u.uy);
 	switch(type){
 	    default:
-		everb = (oep && !eow ? "add to the weird writing on" :
-				       "write strangely on");
+		everb = (oep && !eow ? "add" : "write");
+		eloc = (oep && !eow ? "to the weird writing on" :
+		    "strangely onto");
 		break;
 	    case DUST:
-		everb = (oep && !eow ? "add to the writing in" :
-				       "write in");
-		eloc = is_ice(u.ux,u.uy) ? "frost" : "dust";
+		everb = (oep && !eow ? "add" : "write");
+		eloc = (oep && !eow ? "to the writing in" : "into");
+		eground = (is_ice(u.ux,u.uy) ? "frost" : "dust");
 		break;
 	    case HEADSTONE:
-		everb = (oep && !eow ? "add to the epitaph on" :
-				       "engrave on");
+		everb = (oep && !eow ? "add" : "engrave");
+		eloc = (oep && !eow ? "to the epitaph on" : "on");
 		break;
 	    case ENGRAVE:
-		everb = (oep && !eow ? "add to the engraving in" :
-				       "engrave in");
+		everb = (oep && !eow ? "add" : "engrave");
+		eloc = (oep && !eow ? "to the engraving in" : "into");
 		break;
 	    case BURN:
-		everb = (oep && !eow ?
-			( is_ice(u.ux,u.uy) ? "add to the text melted into" :
-					      "add to the text burned into") :
-			( is_ice(u.ux,u.uy) ? "melt into" : "burn into"));
+		everb = (oep && !eow ? "add" :
+			( is_ice(u.ux,u.uy) ? "melt" : "burn" ) );
+		eloc = (oep && !eow ? ( is_ice(u.ux,u.uy) ?
+			"to the text melted into" : "to the text burned into" ) :
+			"into");
 		break;
 	    case MARK:
-		everb = (oep && !eow ? "add to the graffiti on" :
-				       "scribble on");
+		everb = (oep && !eow ? "add" : "scribble");
+		eloc = (oep && !eow ? "to the graffiti on" : "onto");
 		break;
 	    case ENGR_BLOOD:
-		everb = (oep && !eow ? "add to the scrawl on" :
-				       "scrawl on");
+		everb = (oep && !eow ? "add" : "scrawl");
+		eloc = (oep && !eow ? "to the scrawl on" : "onto");
 		break;
 	}
 
 	/* Tell adventurer what is going on */
 	if (otmp != &zeroobj)
-	    You("%s the %s with %s.", everb, eloc, doname(otmp));
+	    You("%s %swith %s %s the %s.", everb, eword, doname(otmp),
+		eloc, eground);
 	else
-	    You("%s the %s with your %s.", everb, eloc,
-		makeplural(body_part(FINGER)));
+	    You("%s %swith your %s %s the %s.", everb, eword,
+		makeplural(body_part(FINGER)), eloc, eground);
 
-	/* Prompt for engraving! */
-	Sprintf(qbuf,"What do you want to %s the %s here?", everb, eloc);
-	getlin(qbuf, ebuf);
+	/* Prompt for engraving! (if literate) */
+	if(u.roleplay.illiterate) {
+	    Sprintf(ebuf,"X");
+	}
+	else {
+	    Sprintf(qbuf,"What do you want to %s %s the %s here?", everb,
+		eloc, eground);
+	    getlin(qbuf, ebuf);
+	}
 
 	/* Count the actual # of chars engraved not including spaces */
 	len = strlen(ebuf);
@@ -1043,7 +1055,7 @@ doengrave()
 
 	/* A single `x' is the traditional signature of an illiterate person */
 	if (len != 1 || (!index(ebuf, 'x') && !index(ebuf, 'X')))
-	    u.uconduct.literate++;
+	    violated(CONDUCT_ILLITERACY);
 
 	/* Mix up engraving if surface or state of mind is unsound.
 	   Note: this won't add or remove any spaces. */
@@ -1125,7 +1137,7 @@ doengrave()
 			multi = -(maxelen/10);
 		    } else
 			if (len > 1) otmp->spe -= len >> 1;
-			else otmp->spe -= 1; /* Prevent infinite grafitti */
+			else otmp->spe -= 1; /* Prevent infinite graffiti */
 		}
 		if (multi) nomovemsg = "You finish defacing the dungeon.";
 		break;

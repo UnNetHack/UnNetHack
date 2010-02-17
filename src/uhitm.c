@@ -1763,22 +1763,18 @@ register struct attack *mattk;
 		}
 
 		You("eat %s brain!", s_suffix(mon_nam(mdef)));
-		u.uconduct.food++;
 		if (touch_petrifies(mdef->data) && !Stone_resistance && !Stoned) {
 		    Stoned = 5;
 		    killer_format = KILLED_BY_AN;
 		    delayed_killer = mdef->data->mname;
-#ifdef WEBB_DISINT
-          /*		handled in tohit
-
-                  } else if (touch_disintegrates(mdef->data)) {
-                  tmp += instadisintegrate(mdef->data->mname); */
-#endif
 		}
-		if (!vegan(mdef->data))
-		    u.uconduct.unvegan++;
 		if (!vegetarian(mdef->data))
-		    violated_vegetarian();
+		    violated(CONDUCT_VEGETARIAN);
+		else if (!vegan(mdef->data))
+		    violated(CONDUCT_VEGAN);
+		else
+		    violated(CONDUCT_FOODLESS);
+
 		if (mindless(mdef->data)) {
 		    pline("%s doesn't notice.", Monnam(mdef));
 		    break;
@@ -2021,11 +2017,12 @@ register struct attack *mattk;
 			}
 
 			/* KMH, conduct */
-			u.uconduct.food++;
-			if (!vegan(mdef->data))
-			     u.uconduct.unvegan++;
 			if (!vegetarian(mdef->data))
-			     violated_vegetarian();
+			    violated(CONDUCT_VEGETARIAN);
+			else if (!vegan(mdef->data))
+			    violated(CONDUCT_VEGAN);
+			else
+			    violated(CONDUCT_FOODLESS);
 
 			/* Use up amulet of life saving */
 			if (!!(otmp = mlifesaver(mdef))) m_useup(mdef, otmp);

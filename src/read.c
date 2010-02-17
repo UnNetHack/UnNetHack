@@ -52,8 +52,13 @@ doread()
 	if(scroll->otyp == FORTUNE_COOKIE) {
 	    if(flags.verbose)
 		You("break up the cookie and throw away the pieces.");
-	    outrumor(bcsign(scroll), BY_COOKIE);
-	    if (!Blind) u.uconduct.literate++;
+	    if(u.roleplay.illiterate) {
+		pline("This cookie has a scrap of paper inside.");
+		pline("What a pity that you cannot read!");
+	    } else {
+		outrumor(bcsign(scroll), BY_COOKIE);
+		if (!Blind) violated(CONDUCT_ILLITERACY);
+	    }
 	    useup(scroll);
 	    return(1);
 #ifdef TOURIST
@@ -86,10 +91,15 @@ doread()
 		You_cant("feel any Braille writing.");
 		return 0;
 	    }
-	    u.uconduct.literate++;
-	    if(flags.verbose)
-		pline("It reads:");
-	    Strcpy(buf, shirt_msgs[scroll->o_id % SIZE(shirt_msgs)]);
+	    if (u.roleplay.illiterate) {
+		pline("Unfortunately you cannot read!");
+		return 0;
+	    } else {
+		violated(CONDUCT_ILLITERACY);
+		if(flags.verbose)
+		    pline("It reads:");
+		Strcpy(buf, shirt_msgs[scroll->o_id % SIZE(shirt_msgs)]);
+	    }
 	    erosion = greatest_erosion(scroll);
 	    if (erosion)
 		wipeout_text(buf,
@@ -215,7 +225,10 @@ doread()
 		&& scroll->oclass != SPBOOK_CLASS) {
 	    pline(silly_thing_to, "read");
 	    return(0);
-	} else if (Blind) {
+	} else if (u.roleplay.illiterate && (scroll->otyp != SPE_BOOK_OF_THE_DEAD)) {
+	    pline("Unfortunately you cannot read.");
+	    return(0);
+	} else if (Blind && (scroll->otyp != SPE_BOOK_OF_THE_DEAD)) {
 	    const char *what = 0;
 	    if (scroll->oclass == SPBOOK_CLASS)
 		what = "mystic runes";
@@ -231,7 +244,7 @@ doread()
 	if (scroll->otyp != SPE_BOOK_OF_THE_DEAD &&
 		scroll->otyp != SPE_BLANK_PAPER &&
 		scroll->otyp != SCR_BLANK_PAPER)
-	    u.uconduct.literate++;
+	    violated(CONDUCT_ILLITERACY);
 
 	confused = (Confusion != 0);
 #ifdef MAIL

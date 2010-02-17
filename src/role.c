@@ -502,6 +502,51 @@ const struct Align aligns[] = {
 	{"evil",	"unaligned",	"Una",	0,		A_NONE}
 };
 
+
+/* Table of roleplay-conducts */
+
+const struct Conduct conducts[] = {
+{	"pacifism",	"pacifist", 	"peaceful",	TRUE,
+	"You ","have been ","were ","a pacifist",
+	"pretended to be a pacifist"},
+
+{	"sadism",	"sadist", 	"sadistic",	TRUE,
+	"You ","have been ","were ","a sadist",
+	"pretended to be a sadist"},
+
+{	"atheism", 	"atheist", 	"atheistic",	TRUE,
+	"You ","have been ","were ","an atheist",
+	"pretended to be an atheist"},
+
+{	"nudism", 	"nudist", 	"nude",		TRUE,
+	"You ","have been ","were ","a nudist",
+	"pretended to be a nudist"},
+
+{	"zen",		"zen master", 	"blindfolded",	TRUE,
+	"You ","have followed ","followed ","the true path of zen",
+	"left the true path of zen"},
+
+{	"asceticism",	"ascetic",	"hungry",	TRUE,
+	"You ","have gone ","went ","without food",
+	"pretended to be an ascet"},
+
+{	"vegan",	"vegan",	"vegan",	TRUE,
+	"You ","have followed ","followed ","a strict vegan diet",
+	"pretended to be a vegan"},
+
+{	"vegetarian", 	"vegetarian",	"vegetarian",	TRUE,
+	"You ","have been ","were ","vegetarian",
+	"pretended to be a vegetarian"},
+
+{	"illiteracy", 	"illiterate",	"illiterate",	TRUE,
+	"You ","have been ","were ","illiterate",
+	"have become literate"},
+
+{	"thievery",	"master thief",	"tricky",	TRUE,
+	"You ","have been ","were ","very tricky",
+	"pretended to be a master thief"}
+};
+
 STATIC_DCL char * FDECL(promptsep, (char *, int));
 STATIC_DCL int FDECL(role_gendercount, (int));
 STATIC_DCL int FDECL(race_alignmentcount, (int));
@@ -1438,6 +1483,12 @@ role_init()
 	    	mons[urole.femalenum].mflags3 |= M3_INFRAVISION;
 	}
 
+	/* Fix up initial roleplay flags */
+	if (Role_if(PM_MONK)) 
+	    flags.vegetarian = TRUE;
+	flags.vegan |= flags.ascet;
+	flags.vegetarian |= flags.vegan;
+
 	/* Artifacts are fixed in hack_artifacts() */
 
 	/* Success! */
@@ -1490,6 +1541,160 @@ Goodbye()
 	default:
 	    return ("Goodbye");
 	}
+}
+
+/* A function to break a specific roleplay-conduct */
+void
+violated(cdt)
+int cdt;
+{
+	switch(cdt) {		
+	case CONDUCT_PACIFISM:
+	    u.uconduct.killer++;
+	    if (u.roleplay.pacifist) {
+		You_feel("violent!");
+		if (yn("Do you want to quit?") == 'y') {
+		    killer_format = NO_KILLER_PREFIX;
+		    killer = "quit after an act of violence";
+		    done(QUIT);
+		}
+	    if (u.uconduct.killer >= 10) u.roleplay.pacifist = FALSE;
+	    }
+	    break;
+
+	case CONDUCT_NUDISM:
+	    u.uconduct.armoruses++;
+	    if (u.roleplay.nudist){
+		You("realize you were nude.");
+		makemon(&mons[PM_COBRA],u.ux, u.uy, NO_MM_FLAGS);
+		mksobj_at(APPLE, u.ux, u.uy, FALSE, FALSE);
+		u.roleplay.nudist = FALSE;
+	    }
+	    break;
+
+	case CONDUCT_BLINDFOLDED:
+	    u.uconduct.unblinded++;
+	    if (u.roleplay.blindfolded){
+		pline("The spirit of zen leaves your body.");
+		makemon(&mons[PM_ZRUTY], u.ux, u.uy, NO_MM_FLAGS);
+		makemon(&mons[PM_SHOCKING_SPHERE], u.ux, u.uy, NO_MM_FLAGS);
+		makemon(&mons[PM_WOOD_NYMPH],u.ux, u.uy, NO_MM_FLAGS);
+		u.roleplay.blindfolded = FALSE;
+	    }
+	    break;
+
+	case CONDUCT_VEGETARIAN:	/* replaces violated_vegetarian() */
+	    if (u.roleplay.vegetarian)
+		You_feel("guilty.");
+	    if (Role_if(PM_MONK))
+		adjalign(-1);
+	    u.uconduct.unvegetarian++;
+	    u.uconduct.unvegan++;
+	    u.uconduct.food++;
+	    if (u.uconduct.unvegetarian >= 30) u.roleplay.vegetarian = FALSE;
+	    if (u.uconduct.unvegan >= 20) u.roleplay.vegan = FALSE;
+	    if (u.uconduct.food >= 10) u.roleplay.ascet = FALSE;
+	    break;
+
+	case CONDUCT_VEGAN:
+	    if (u.roleplay.vegan)
+		You_feel("a bit guilty.");
+	    u.uconduct.unvegan++;
+	    u.uconduct.food++;
+	    if (u.uconduct.unvegan >= 20) u.roleplay.vegan = FALSE;
+	    if (u.uconduct.food >= 10) u.roleplay.ascet = FALSE;
+	    break;
+
+	case CONDUCT_FOODLESS:
+	    if (u.roleplay.ascet)
+		You_feel("a little bit guilty.");
+	    u.uconduct.food++;
+	    if (u.uconduct.food >= 10) u.roleplay.ascet = FALSE;
+	    break;
+
+	case CONDUCT_ILLITERACY:
+	    u.uconduct.literate++;
+	    if (u.roleplay.illiterate) {
+		/* should be impossible */
+		pline("Literatally literature for literate illiterates!");
+		exercise(A_WIS, TRUE);		
+		}
+	    break;
+
+	case CONDUCT_THIEVERY:
+	    u.uconduct.robbed++;
+	    if (Role_if(PM_ROGUE))
+		You_feel("like an ordinary robber."); 
+	    break;
+
+	default: 
+	    impossible("violated: unknown conduct");
+
+	}
+	return;
+}
+
+/* a function to check whether a specific conduct has been broken
+ * return FALSE if broken
+*/
+boolean
+successful_cdt(cdt)
+int cdt;
+{
+	if ((cdt == CONDUCT_PACIFISM) && !u.uconduct.killer &&
+			!num_genocides() && (u.uconduct.weaphit<=100)) 
+	    return TRUE;
+	if ((cdt == CONDUCT_SADISM) && !u.uconduct.killer &&
+		 	(num_genocides() || (u.uconduct.weaphit>100)))
+	    return TRUE;
+	if ((cdt == CONDUCT_ATHEISM) && !u.uconduct.gnostic) return TRUE;
+	if ((cdt == CONDUCT_NUDISM) && !u.uconduct.armoruses) return TRUE;
+	if ((cdt == CONDUCT_BLINDFOLDED) && !u.uconduct.unblinded) return TRUE;
+	if ((cdt == CONDUCT_VEGETARIAN) && !u.uconduct.unvegetarian) return TRUE;
+	if ((cdt == CONDUCT_VEGAN) && !u.uconduct.unvegan) return TRUE;
+	if ((cdt == CONDUCT_FOODLESS) && !u.uconduct.food) return TRUE;
+	if ((cdt == CONDUCT_ILLITERACY) && !u.uconduct.literate) return TRUE;
+	if ((cdt == CONDUCT_THIEVERY) && !u.uconduct.robbed) return TRUE;
+
+	return FALSE;
+}
+
+/* a function to check whether a specific conduct *
+ *  was selected at character creation		  */
+boolean
+intended_cdt(cdt)
+int cdt;
+{
+	if ((cdt == CONDUCT_PACIFISM) && flags.pacifist) return TRUE;
+	if ((cdt == CONDUCT_ATHEISM) && flags.atheist) return TRUE;
+	if ((cdt == CONDUCT_NUDISM) && flags.nudist) return TRUE;
+	if ((cdt == CONDUCT_BLINDFOLDED) && flags.blindfolded) return TRUE;
+	if ((cdt == CONDUCT_FOODLESS) && flags.ascet) return TRUE;
+	if ((cdt == CONDUCT_VEGAN) && flags.vegan) return TRUE;
+	if ((cdt == CONDUCT_VEGETARIAN) && flags.vegetarian) return TRUE;
+	if ((cdt == CONDUCT_ILLITERACY) && flags.illiterate) return TRUE;
+
+	return FALSE;
+}
+
+/* a function to check whether it's superflous to list that conduct */ 
+boolean
+superfluous_cdt(cdt)
+int cdt;
+{
+	if ((cdt == CONDUCT_VEGAN) && successful_cdt(CONDUCT_FOODLESS)) return TRUE;
+	if ((cdt == CONDUCT_VEGETARIAN) && successful_cdt(CONDUCT_VEGAN)) return TRUE;
+	if ((cdt == CONDUCT_THIEVERY) && !u.uevent.invoked) return TRUE;
+
+	return FALSE;
+}
+
+/* tell if you failed a selected conduct */ 
+boolean
+failed_cdt(cdt)
+int cdt;
+{
+	return (intended_cdt(cdt) && !successful_cdt(cdt));
 }
 
 /* role.c */

@@ -1125,6 +1125,9 @@ dosacrifice()
     char qbuf[QBUFSZ];
     char c;
 
+    int conduct, cdt;
+    char killerbuf[128];	
+
     if (!on_altar() || u.uswallow) {
 	You("are not standing on an altar.");
 	return 0;
@@ -1319,6 +1322,70 @@ pline("An invisible choir sings, and you are bathed in radiance...");
 verbalize("In return for thy service, I grant thee the gift of Immortality!");
 		You("ascend to the status of Demigod%s...",
 		    flags.female ? "dess" : "");
+
+	/*
+	 * Check if there's a major successful conduct for the highscore.
+	 * If so, look for additional ones and put everything into the
+	 * killer-string.
+	 *
+	 * In the logfile this looks like:
+	 *	 "ascended adjective adjective ... noun"
+	 *
+	 * In the highscore it looks like:
+	 * 	Patito-Mon-Hum-Mal-Cha the nude vegan pacifist
+	 * 	ascended to demigod-hood. 
+	 */
+
+		conduct = FIRST_CONDUCT;
+
+		while (conduct <= LAST_CONDUCT){
+		    if(successful_cdt(conduct) && conducts[conduct].highscore
+					&& !superfluous_cdt(conduct))
+			 break;
+		    conduct++;
+		}
+		
+		if (conduct <= LAST_CONDUCT) {
+
+		    /* we found a conduct */
+
+		    Sprintf(killerbuf, "ascended ");
+
+		    /*
+		     * continue to search with the next following conduct
+		     * and look for additional highscore conducts
+		     */
+
+		    cdt = conduct + 1;
+
+		    while (cdt <= LAST_CONDUCT){ 
+
+			if (successful_cdt(cdt) && conducts[cdt].highscore
+					&& !superfluous_cdt(cdt)) {
+
+			    /*
+			     * we found an additional conduct; now
+			     * add an adjective to the killer-string,
+			     * and continue the search
+			     */
+
+			    Sprintf(eos(killerbuf),"%s ",conducts[cdt].adj);
+
+			}
+
+			cdt++;
+		    }
+
+			/* now finally add the noun */
+
+		    strcat(killerbuf, conducts[conduct].noun);
+
+		    killer_format = NO_KILLER_PREFIX;
+		    killer = killerbuf;
+
+		} else 		/* No conducts found */
+		    killer = 0;
+
 		done(ASCENDED);
 	    }
 	}

@@ -779,6 +779,12 @@ boolean so;
 	    if ((bp = index(linebuf, ')')) != 0)
 		*bp = (t1->deathdnum == astral_level.dnum) ? '\0' : ' ';
 	    second_line = FALSE;
+	} else if (!strncmp("ascended ", t1->death, 9)) {
+	    Strcat(linebuf, "the ");
+	    Strcat(linebuf, t1->death + 9);
+	    Sprintf(eos(linebuf), " ascended to demigod%s-hood",
+		    (t1->plgend[0] == 'F') ? "dess" : "");
+	    second_line = FALSE;
 	} else if (!strncmp("ascended", t1->death, 8)) {
 	    Sprintf(eos(linebuf), "ascended to demigod%s-hood",
 		    (t1->plgend[0] == 'F') ? "dess" : "");
@@ -829,6 +835,7 @@ boolean so;
 	    }
 
 	    /* kludge for "quit while already on Charon's boat" */
+	    /* and "quit after breaking pacifism conduct"	*/
 	    if (!strncmp(t1->death, "quit ", 5))
 		Strcat(linebuf, t1->death + 4);
 	}

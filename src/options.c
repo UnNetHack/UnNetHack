@@ -150,6 +150,14 @@ static struct Bool_Opt
 #else
 	{"news", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+	{"ascet", &flags.ascet, FALSE, DISP_IN_GAME },
+	{"atheist", &flags.atheist, FALSE, DISP_IN_GAME },
+	{"blindfolded", &flags.blindfolded, FALSE, DISP_IN_GAME },
+	{"illiterate", &flags.illiterate, FALSE, DISP_IN_GAME },
+	{"pacifist", &flags.pacifist, FALSE, DISP_IN_GAME },
+	{"nudist", &flags.nudist, FALSE, DISP_IN_GAME },
+	{"vegan", &flags.vegan, FALSE, DISP_IN_GAME }, 
+	{"vegetarian", &flags.vegetarian, FALSE, DISP_IN_GAME }, 
 	{"null", &flags.null, TRUE, SET_IN_GAME},
 #ifdef MAC
 	{"page_wait", &flags.page_wait, TRUE, SET_IN_GAME},

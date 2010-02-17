@@ -148,6 +148,30 @@ struct flag {
 	int	 initalign;	/* starting alignment (index into aligns[])  */
 	int	 randomall;	/* randomly assign everything not specified */
 	int	 pantheon;	/* deity selection for priest character */
+
+	/* --- initial roleplay flags ---
+	 * These flags represent the player's conduct/roleplay
+	 * intention at character creation.
+	 *
+	 * First the player can sets some of these at character
+	 * creation. (via configuration-file, ..)
+	 * Then role_init() may set/prevent certain combinations,
+	 * e.g. Monks get the vegetarian flag, vegans should also be
+	 * vegetarians, ..
+	 * 
+	 * After that the initial flags shouldn't be modified.
+	 * In u_init() the flags can be used to put some
+	 * roleplay-intrinsics into the u structure. Only those
+	 * should be modified during gameplay.
+	 */
+	boolean  ascet;
+	boolean  atheist;
+	boolean  blindfolded;
+	boolean  illiterate;
+	boolean  pacifist;
+	boolean  nudist;
+	boolean  vegan;
+	boolean  vegetarian;
 };
 
 /*
