@@ -80,7 +80,10 @@ register struct obj *pen;
 	boolean by_descr = FALSE;
 	const char *typeword;
 
-	if (nohands(youmonst.data)) {
+	if (u.roleplay.illiterate) {
+	    You("don't know how to write!");
+	    return 0;
+	} else if (nohands(youmonst.data)) {
 	    You("need hands to be able to write!");
 	    return 0;
 	} else if (Glib) {
@@ -156,7 +159,7 @@ found:
 	}
 
 	/* KMH, conduct */
-	u.uconduct.literate++;
+	violated(CONDUCT_ILLITERACY);
 
 	new_obj = mksobj(i, FALSE, FALSE);
 	new_obj->bknown = (paper->bknown && pen->bknown);

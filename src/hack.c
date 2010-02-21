@@ -683,7 +683,7 @@ still_chewing(x,y)
     }
 
     /* Okay, you've chewed through something */
-    u.uconduct.food++;
+    violated(CONDUCT_FOODLESS);
     u.uhunger += rnd(20);
 
     if (boulder) {
@@ -1695,7 +1695,7 @@ domove()
 		    /* you killed your pet by direct action.
 		     * minliquid and mintrap don't know to do this
 		     */
-		    u.uconduct.killer++;
+		    violated(CONDUCT_PACIFISM);
 		    break;
 		default:
 		    pline("that's strange, unknown mintrap result!");

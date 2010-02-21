@@ -1609,22 +1609,38 @@ int final;
 {
 	char buf[BUFSZ];
 	int ngenocided;
+	int cdt;
 
 	/* Create the conduct window */
 	en_win = create_nhwindow(NHW_MENU);
 	putstr(en_win, 0, "Voluntary challenges:");
 	putstr(en_win, 0, "");
 
-	if (!u.uconduct.food)
-	    enl_msg(You_, "have gone", "went", " without food");
-	    /* But beverages are okay */
-	else if (!u.uconduct.unvegan)
-	    you_have_X("followed a strict vegan diet");
-	else if (!u.uconduct.unvegetarian)
-	    you_have_been("vegetarian");
+	/* list all major conducts */
 
-	if (!u.uconduct.gnostic)
-	    you_have_been("an atheist");
+	for(cdt=FIRST_CONDUCT; cdt<=LAST_CONDUCT; cdt++){
+	    if(successful_cdt(cdt)){
+		if (!superfluous_cdt(cdt))
+		    enl_msg(conducts[cdt].prefix, 	/* "You "	*/
+			conducts[cdt].presenttxt,	/* "have been"	*/
+			conducts[cdt].pasttxt,		/* "were"	*/
+			conducts[cdt].suffix);		/* "a pacifist"	*/
+	    } else if(intended_cdt(cdt)){
+		you_have_X(conducts[cdt].failtxt);	/* "pretended to be a pacifist" */
+	    }
+	}
+
+	if (failed_cdt(CONDUCT_PACIFISM) || failed_cdt(CONDUCT_SADISM)){
+	    if (u.uconduct.killer == 0){
+		you_have_never("killed a creature");
+	    } else {
+		Sprintf(buf, "killed %ld creature%s", u.uconduct.killer,
+			plur(u.uconduct.killer));
+		you_have_X(buf);
+	    }
+	}
+
+	/* now list the remaining statistical details */
 
 	if (!u.uconduct.weaphit)
 	    you_have_never("hit with a wielded weapon");
@@ -1634,16 +1650,15 @@ int final;
 		    u.uconduct.weaphit, plur(u.uconduct.weaphit));
 	    you_have_X(buf);
 	}
-#endif
-	if (!u.uconduct.killer)
-	    you_have_been("a pacifist");
 
-	if (!u.uconduct.literate)
-	    you_have_been("illiterate");
-#ifdef WIZARD
-	else if (wizard) {
+	if (wizard && u.uconduct.literate){
 	    Sprintf(buf, "read items or engraved %ld time%s",
 		    u.uconduct.literate, plur(u.uconduct.literate));
+	    you_have_X(buf);
+	}
+	if (wizard && u.uconduct.armoruses) {
+	    Sprintf(buf, "put on armor %ld time%s",
+		  u.uconduct.armoruses, plur(u.uconduct.armoruses));
 	    you_have_X(buf);
 	}
 #endif

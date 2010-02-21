@@ -69,7 +69,35 @@ struct u_conduct {		/* number of times... */
 	long	polyselfs;	/* transformed yourself */
 	long	wishes;		/* used a wish */
 	long	wisharti;	/* wished for an artifact */
+	long	armoruses;	/* put on a piece of armor */
+	long	unblinded;	/* starting non-blindfolded and removing a blindfold */
+	long	robbed;		/* killed an artifact-guardian (like an ordinary robber) */
 				/* genocides already listed at end of game */
+};
+
+/*             --- roleplay intrinsics --- 
+ *
+ * In a lot of situations it makes sense to make special cases for
+ * conduct-characters. Here's the structure to store a character's
+ * abilities/intentions.
+ *
+ * These are allowed to change during gameplay. So e.g. it's possible
+ * to gain/lose the ability to read.
+ *
+ * It also allows to stop giving special treatment to characters which
+ * obviously abandoned a selected conduct. E.g vegetarians stop feeling
+ * guilty after eating a lot of corpses.
+*/
+struct u_roleplay {		/* Your character is a/an ... */
+	boolean ascet;		/* foodless character */
+	boolean atheist;	/* atheist */
+	boolean blindfolded;	/* blindfolded character */
+	boolean illiterate;	/* illiterate character */
+	boolean pacifist;	/* pacifist */
+	boolean sadist;		/* sadist */
+	boolean nudist;		/* nudist */
+	boolean vegan;		/* vegan */
+	boolean vegetarian;	/* vegetarian */
 };
 
 /*** Unified structure containing role information ***/
@@ -227,6 +255,50 @@ struct Align {
 
 extern const struct Align aligns[];	/* table of available alignments */
 
+/*
+ * The following structure contains information about a conduct
+ *   - a name (e.g. for a conduct-menu at character creation)
+ *   - nouns and adjectives for the highscore
+ *   - a flag for 'worth mentioning in the highscore'
+ *   - all strings necessary for show_conduct()
+ */
+/*** Unified structure specifying conduct information ***/
+struct Conduct {
+	const char *name;		/* pacifism/nudism/...	*/
+	const char *noun;		/* pacifist/nudist/...	*/
+	const char *adj;		/* peaceful/nude/...	*/
+
+	boolean highscore;		/* conduct appears in the highscore */
+
+	const char *prefix;		/* "You "	*/
+	const char *presenttxt;		/* "have been "	*/
+	const char *pasttxt;		/* "were "	*/
+	const char *suffix;		/* "a pacifist"	*/
+	const char *failtxt;		/* "pretended to be a pacifist" */
+
+};
+
+extern const struct Conduct conducts[];/* table of available roleplay conducts*/
+
+/*
+ * The following definitions get used to call violated(CONDUCT_XYZ),
+ * and to access the information contained in the conducts[] array.
+*/
+
+#define ROLE_CONDUCTS		10 	/* number of roleplay conducts */
+
+#define FIRST_CONDUCT		0
+#define CONDUCT_PACIFISM	0
+#define CONDUCT_SADISM		1
+#define CONDUCT_ATHEISM 	2
+#define CONDUCT_NUDISM		3
+#define CONDUCT_BLINDFOLDED	4
+#define CONDUCT_FOODLESS	5
+#define CONDUCT_VEGAN		6
+#define CONDUCT_VEGETARIAN	7
+#define CONDUCT_ILLITERACY	8
+#define CONDUCT_THIEVERY	9
+#define LAST_CONDUCT	ROLE_CONDUCTS - 1
 
 /*** Information about the player ***/
 struct you {
@@ -309,6 +381,7 @@ struct you {
 	struct u_event	uevent;		/* certain events have happened */
 	struct u_have	uhave;		/* you're carrying special objects */
 	struct u_conduct uconduct;	/* KMH, conduct */
+	struct u_roleplay roleplay;	/* roleplay intrinsics */
 	struct attribs	acurr,		/* your current attributes (eg. str)*/
 			aexe,		/* for gain/loss via "exercise" */
 			abon,		/* your bonus attributes (eg. str) */
