@@ -164,6 +164,7 @@ static struct {
 	{ "wand shop",	 WANDSHOP },
 	{ "tool shop",	 TOOLSHOP },
 	{ "book shop",	 BOOKSHOP },
+	{ "tin shop",	 TINSHOP },
 	{ "candle shop", CANDLESHOP },
 #ifdef BLACKMARKET
 	{ "black market", BLACKSHOP },

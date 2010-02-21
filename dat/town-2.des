@@ -68,7 +68,7 @@ CHANCE: 66
 ROOMDOOR: false, closed, random, random
 }
 
-SUBROOM: "shop", lit, (31,11), (4,3), "town"
+SUBROOM: "tin shop", lit, (31,11), (4,3), "town"
 {
 ROOMDOOR: false, closed, random, random
 }

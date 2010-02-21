@@ -75,7 +75,8 @@ extern NEARDATA coord doors[DOORMAX];
 #define WANDSHOP	(SHOPBASE+ 7)
 #define TOOLSHOP	(SHOPBASE+ 8)
 #define BOOKSHOP	(SHOPBASE+ 9)
-#define UNIQUESHOP	(SHOPBASE+10)	/* shops here & above not randomly gen'd. */
+#define TINSHOP		(SHOPBASE+10)
+#define UNIQUESHOP	(SHOPBASE+11)	/* shops here & above not randomly gen'd. */
 #define CANDLESHOP	(UNIQUESHOP)
 #ifdef BLACKMARKET
 #define BLACKSHOP       (UNIQUESHOP+1)
