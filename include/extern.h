@@ -1925,6 +1925,7 @@ E char *FDECL(Shk_Your, (char *,struct obj *));
 E void FDECL(stock_room, (int,struct mkroom *));
 E boolean FDECL(saleable, (struct monst *,struct obj *));
 E int FDECL(get_shop_item, (int));
+E void NDECL(shop_selection_init);
 
 /* ### sit.c ### */
 

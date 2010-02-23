@@ -49,7 +49,7 @@ SUBROOM: "weapon shop", lit, (30,13), (3,2), "town"
 CHANCE: 66
 ROOMDOOR: false, closed, random, random
 }
-SUBROOM: "book shop", lit, (48,11), (2,3), "town"
+SUBROOM: "music shop", lit, (48,11), (2,3), "town"
 {
 CHANCE: 66
 ROOMDOOR: false, closed, random, random

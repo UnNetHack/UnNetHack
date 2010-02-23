@@ -2338,6 +2338,10 @@ int rtype;
 			return "a lighting shop";
 		case TOOLSHOP:
 			return "a tool shop";
+		case INSTRUMENTSHOP:
+			return "a music store";
+		case TINSHOP:
+			return "a tin shop";
 		case BLACKSHOP:
 			return "the Blackmarket";
 		default:
