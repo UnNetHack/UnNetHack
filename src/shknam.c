@@ -257,7 +257,11 @@ const struct shclass shtypes[] = {
 	     {10, -WOODEN_HARP	}, { 3, -MAGIC_HARP	},
 	     {10, -BELL		}, {10, -BUGLE		},
 	     {10, -LEATHER_DRUM	}, { 2, -DRUM_OF_EARTHQUAKE},
+#ifdef TOURIST
 	     { 5, -T_SHIRT	}, { 5, -LOCK_PICK	},
+#else
+	     { 5, -TIN_WHISTLE	}, { 5, -LOCK_PICK	},
+#endif
 	     {0, 0}} , shkmusic},
 	/* Shops below this point are "unique".  That is they must all have a
 	 * probability of zero.  They are only created via the special level
