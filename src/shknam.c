@@ -207,6 +207,14 @@ static const char *shkpet[] = {
     0
 };
 
+static const char *shktins[] = {
+    /* Sweden */
+    "Trosa", "Torshalla", "Morgongava", "Uppsala", "Norrkoping",
+    "Nybro", "Alingsas", "Vadstena", "Fagersta", "Skelleftea",
+    "Solleftea", "Ystad", "Avesta", "Sala", "Norrtälje",
+    0
+};
+
 /*
  * To add new shop types, all that is necessary is to edit the shtypes[] array.
  * See mkroom.h for the structure definition.  Typically, you'll have to lower
@@ -256,7 +264,7 @@ const struct shclass shtypes[] = {
 		{{10, -ICE_BOX}, {90, -TIN},
 		/* shopkeeper will pay for corpses, but they aren't generated */
 		/* on the shop floor */
-		{0, -CORPSE}, {0, 0}}, shkfoods},
+		{0, -CORPSE}, {0, 0}}, shktin},
 	{"rare instruments", TOOL_CLASS, 1, D_SHOP, 
 	    {{10, -TIN_WHISTLE	}, { 3, -MAGIC_WHISTLE	},
 	     {10, -WOODEN_FLUTE	}, { 3, -MAGIC_FLUTE	},
