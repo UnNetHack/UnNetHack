@@ -36,7 +36,7 @@ CHANCE: 66
 ROOMDOOR: false, closed, random, random
 }
 
-SUBROOM: "wand shop", lit, (62,5), (7,2), "town"
+SUBROOM: "pet shop", lit, (62,5), (7,2), "town"
 {
 CHANCE: 66
 ROOMDOOR: false, closed, random, random

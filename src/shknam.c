@@ -199,6 +199,14 @@ static const char *shkblack[] = {
 };
 #endif /* BLACKMARKET */
 
+static const char *shkpet[] = {
+    /* Albania */
+    "Elbasan", "Vlore", "Shkoder", "Berat", "Kavaje", "Pogradec",
+    "Sarande", "Peshkopi", "Shijak", "Librazhd", "Tepelene",
+    "Fushe-Kruje", "Rreshen",
+    0
+};
+
 /*
  * To add new shop types, all that is necessary is to edit the shtypes[] array.
  * See mkroom.h for the structure definition.  Typically, you'll have to lower
@@ -216,7 +224,7 @@ static const char *shkblack[] = {
  */
 
 const struct shclass shtypes[] = {
-	{"general store", RANDOM_CLASS, 42,
+	{"general store", RANDOM_CLASS, 41,
 	    D_SHOP, {{100, RANDOM_CLASS}, {0, 0}, {0, 0}}, shkgeneral},
 	{"used armor dealership", ARMOR_CLASS, 14,
 	    D_SHOP, {{90, ARMOR_CLASS}, {10, WEAPON_CLASS}, {0, 0}},
@@ -263,6 +271,13 @@ const struct shclass shtypes[] = {
 	     { 5, -TIN_WHISTLE	}, { 5, -LOCK_PICK	},
 #endif
 	     {0, 0}} , shkmusic},
+	{"pet store", FOOD_CLASS, 1, D_SHOP, {
+#ifdef STEED
+	    {67, -FIGURINE}, {5, -LEASH},{10, -TRIPE_RATION}, {5, -SADDLE},
+#else
+	    {72, -FIGURINE}, {5, -LEASH},{10, -TRIPE_RATION}, 
+#endif
+	    {10, -TIN_WHISTLE}, {3, -MAGIC_WHISTLE}}, shkpet},
 	/* Shops below this point are "unique".  That is they must all have a
 	 * probability of zero.  They are only created via the special level
 	 * loader.
