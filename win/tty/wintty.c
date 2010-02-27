@@ -2563,6 +2563,10 @@ tty_print_glyph(window, x, y, glyph)
 	((special & MG_INVERSE) && iflags.use_inverse)) {
 	term_start_attr(ATR_INVERSE);
 	reverse_on = TRUE;
+	if (color == CLR_BLACK) {
+		/* workaround for black-on-black */
+		term_start_color(CLR_WHITE);
+	}
     }
 
 #if defined(USE_TILES) && defined(MSDOS)
