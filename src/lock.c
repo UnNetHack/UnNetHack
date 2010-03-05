@@ -608,23 +608,18 @@ doopen_indir(x, y)		/* try to open a door in direction u.dx/u.dy */
 	}
 
 	/* door is known to be CLOSED */
-	if (rnl(20) < (ACURRSTR+ACURR(A_DEX)+ACURR(A_CON))/3) {
-	    pline_The("door opens.");
-	    if(door->doormask & D_TRAPPED) {
+	pline_The("door opens.");
+	if(door->doormask & D_TRAPPED) {
 		b_trapped("door", FINGER);
 		door->doormask = D_NODOOR;
 		if (*in_rooms(cc.x, cc.y, SHOPBASE)) add_damage(cc.x, cc.y, 0L);
-	    } else
+	} else
 		door->doormask = D_ISOPEN;
-	    if (Blind)
+	if (Blind)
 		feel_location(cc.x,cc.y);	/* the hero knows she opened it  */
-	    else
+	else
 		newsym(cc.x,cc.y);
-	    unblock_point(cc.x,cc.y);		/* vision: new see through there */
-	} else {
-	    exercise(A_STR, TRUE);
-	    pline_The("door resists!");
-	}
+	unblock_point(cc.x,cc.y);		/* vision: new see through there */
 
 	return(1);
 }
