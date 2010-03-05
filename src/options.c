@@ -72,11 +72,7 @@ static struct Bool_Opt
 	{"checkspace", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"cmdassist", &iflags.cmdassist, TRUE, SET_IN_GAME},
-# if defined(MICRO) || defined(WIN32)
-	{"color",         &iflags.wc_color,TRUE, SET_IN_GAME},		/*WC*/
-# else	/* systems that support multiple terminals, many monochrome */
-	{"color",         &iflags.wc_color, FALSE, SET_IN_GAME},	/*WC*/
-# endif
+	{"color", &iflags.wc_color, TRUE, SET_IN_GAME},		/*WC*/
 	{"confirm",&flags.confirm, TRUE, SET_IN_GAME},
 #if defined(TERMLIB) && !defined(MAC_GRAPHICS_ENV)
 	{"DECgraphics", &iflags.DECgraphics, FALSE, SET_IN_GAME},
@@ -103,7 +99,7 @@ static struct Bool_Opt
 #endif
 	{"fullscreen", &iflags.wc2_fullscreen, FALSE, SET_IN_FILE},
 	{"help", &flags.help, TRUE, SET_IN_GAME},
-	{"hilite_pet",    &iflags.wc_hilite_pet, FALSE, SET_IN_GAME},	/*WC*/
+	{"hilite_pet",    &iflags.wc_hilite_pet, TRUE, SET_IN_GAME},	/*WC*/
 #ifdef ASCIIGRAPH
 	{"IBMgraphics", &iflags.IBMgraphics, FALSE, SET_IN_GAME},
 #else
@@ -116,7 +112,7 @@ static struct Bool_Opt
 #endif
 	{"large_font", &iflags.obsolete, FALSE, SET_IN_FILE},	/* OBSOLETE */
 	{"legacy", &flags.legacy, TRUE, DISP_IN_GAME},
-	{"lit_corridor", &flags.lit_corridor, FALSE, SET_IN_GAME},
+	{"lit_corridor", &flags.lit_corridor, TRUE, SET_IN_GAME},
 	{"lootabc", &iflags.lootabc, FALSE, SET_IN_GAME},
 #ifdef MAC_GRAPHICS_ENV
 	{"Macgraphics", &iflags.MACgraphics, TRUE, SET_IN_GAME},
@@ -193,7 +189,7 @@ static struct Bool_Opt
 #ifdef SHOW_BORN
 	{"showborn", &iflags.show_born, FALSE, SET_IN_GAME},
 #endif
-	{"showbuc", &iflags.show_buc, FALSE, SET_IN_GAME},
+	{"showbuc", &iflags.show_buc, TRUE, SET_IN_GAME},
 	{"showdmg", &iflags.showdmg, FALSE, SET_IN_GAME},
 	{"show_dgn_name", &iflags.show_dgn_name, FALSE, SET_IN_GAME},
 #ifdef EXP_ON_BOTL
@@ -223,7 +219,7 @@ static struct Bool_Opt
 #endif
 	{"splash_screen",     &iflags.wc_splash_screen, TRUE, DISP_IN_GAME},	/*WC*/
 	{"tiled_map",     &iflags.wc_tiled_map, PREFER_TILED, DISP_IN_GAME},	/*WC*/
-	{"time", &flags.time, FALSE, SET_IN_GAME},
+	{"time", &flags.time, TRUE, SET_IN_GAME},
 #ifdef TIMED_DELAY
 	{"timed_delay", &flags.nap, TRUE, SET_IN_GAME},
 #else
@@ -613,7 +609,7 @@ initoptions()
 	(void)memcpy((genericptr_t)flags.inv_order,
 		     (genericptr_t)def_inv_order, sizeof flags.inv_order);
 	flags.pickup_types[0] = '\0';
-	flags.pickup_burden = MOD_ENCUMBER;
+	flags.pickup_burden = SLT_ENCUMBER;
 
 	for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++)
 		flags.end_disclose[i] = DISCLOSE_PROMPT_DEFAULT_NO;
