@@ -1862,7 +1862,7 @@ register struct obj *obj;
 			known = TRUE;
 			You_feel("self-knowledgeable...");
 			display_nhwindow(WIN_MESSAGE, FALSE);
-			enlightenment(FALSE);
+			enlightenment(FALSE, TRUE);
 			pline_The("feeling subsides.");
 			exercise(A_WIS, TRUE);
 			break;

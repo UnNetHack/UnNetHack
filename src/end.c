@@ -45,7 +45,7 @@ extern char msgs[][BUFSZ];
 extern int lastmsg;
 void FDECL(do_vanquished, (int, BOOLEAN_P));
 #endif /* DUMP_LOG */
-STATIC_DCL void FDECL(list_genocided, (int, BOOLEAN_P));
+STATIC_DCL void FDECL(list_genocided, (int, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL boolean FDECL(should_query_disclose_option, (int,char *));
 
 #if defined(__BEOS__) || defined(MICRO) || defined(WIN32) || defined(OS2)
@@ -159,6 +159,20 @@ dump(pre, str)
 #ifdef DUMP_LOG
   if (dump_fp)
     fprintf (dump_fp, "%s%s\n", pre, str);
+#endif /* DUMP_LOG */
+}
+
+/** Dump a title. Strips : from the end of str. */
+void
+dump_title(str)
+char *str;
+{
+#ifdef DUMP_LOG
+	int len = strlen(str);
+	if (str[len-1] == ':') {
+		str[len-1] = '\0';
+	}
+	dump("", str);
 #endif /* DUMP_LOG */
 }
 
@@ -482,10 +496,10 @@ boolean taken;
 	if (!done_stopprint) {
 	    c = ask ? yn_function("Do you want to see your attributes?",
 				  ynqchars, defquery) : defquery;
-	    if (c == 'y')
-		enlightenment(how >= PANICKED ? 1 : 2); /* final */
 	    if (c == 'q') done_stopprint++;
 	}
+	enlightenment(how >= PANICKED ? 1 : 2, (c == 'y')); /* final */
+
 	dump_spells();
 
 	ask = should_query_disclose_option('v', &defquery);
@@ -497,17 +511,16 @@ boolean taken;
 #endif
 
 	ask = should_query_disclose_option('g', &defquery);
-	if (!done_stopprint)
-	    list_genocided(defquery, ask);
+	list_genocided(defquery, ask, !done_stopprint);
 
 	ask = should_query_disclose_option('c', &defquery);
 	if (!done_stopprint) {
 	    c = ask ? yn_function("Do you want to see your conduct?",
 				  ynqchars, defquery) : defquery;
-	    if (c == 'y')
-		show_conduct(how >= PANICKED ? 1 : 2);
-	    if (c == 'q') done_stopprint++;
 	}
+	show_conduct(how >= PANICKED ? 1 : 2, (c == 'y' && !done_stopprint));
+	if (c == 'q') done_stopprint++;
+
 	dump_weapon_skill();
 }
 
@@ -1212,15 +1225,17 @@ boolean ask;
      * includes all dead monsters, not just those killed by the player
      */
     if (ntypes != 0) {
+	Sprintf(buf, "Vanquished creatures:");
 	c = done_stopprint ? 'n': ask ?
 	  yn_function("Do you want an account of creatures vanquished?",
 			      ynqchars, defquery) : defquery;
 	if (c == 'q') done_stopprint++;
 	if (c == 'y') {
 	    klwin = create_nhwindow(NHW_MENU);
-	    putstr_dump(klwin, 0, "Vanquished creatures:");
+	    putstr_dump(klwin, 0, buf);
 	    putstr(klwin, 0, "");
 	}
+	dump_title(buf);
 
 	    /* countdown by monster "toughness" */
 	    for (lev = max_lev; lev >= 0; lev--)
@@ -1254,9 +1269,7 @@ boolean ask;
 #endif
 		    }
 		    if (c == 'y') putstr(klwin, 0, buf);
-#ifdef DUMP_LOG
 		    dump("  ", buf);
-#endif
 		}
 	    /*
 	     * if (Hallucination)
@@ -1291,9 +1304,10 @@ num_genocides()
 }
 
 STATIC_OVL void
-list_genocided(defquery, ask)
+list_genocided(defquery, ask, want_disp)
 int defquery;
 boolean ask;
+int want_disp;
 {
     register int i;
     int ngenocided=0;
@@ -1301,7 +1315,7 @@ boolean ask;
     int nextincted=0;
 #endif
     char c;
-    winid klwin;
+    winid klwin = (winid)NULL;
     char buf[BUFSZ];
 
     /* get totals first */
@@ -1331,15 +1345,17 @@ boolean ask;
 	c = ask ? yn_function("Do you want a list of species genocided?",
 			      ynqchars, defquery) : defquery;
 	if (c == 'q') done_stopprint++;
+#ifdef SHOW_EXTINCT
+	Sprintf(buf, "Genocided or extinct species:");
+#else
+	Sprintf(buf, "Genocided species:");
+#endif
 	if (c == 'y') {
 	    klwin = create_nhwindow(NHW_MENU);
-#ifdef SHOW_EXTINCT
-	    Sprintf(buf, "Genocided or extinct species:");
-#else
-	    Sprintf(buf, "Genocided species:");
-#endif
-	    putstr_dump(klwin, 0, buf);
+	    putstr(klwin, 0, buf);
 	    putstr(klwin, 0, "");
+	}
+	dump_title(buf);
 
 	    for (i = LOW_PM; i < NUMMONS; i++)
 #ifdef SHOW_EXTINCT
@@ -1357,31 +1373,32 @@ boolean ask;
 		    if( !(mvitals[i].mvflags & G_GENOD) )
 			Strcat(buf, " (extinct)");
 #endif
-		    putstr(klwin, 0, buf);
+		    if (klwin) putstr(klwin, 0, buf);
 		    dump("  ", buf);
 		}
 
-	    putstr(klwin, 0, "");
+	    if (klwin) putstr(klwin, 0, "");
 #ifdef SHOW_EXTINCT
 	    if (ngenocided>0) {
 #endif
 	    Sprintf(buf, "%d species genocided.", ngenocided);
-	    putstr(klwin, 0, buf);
+	    if (klwin) putstr(klwin, 0, buf);
 	    dump("  ", buf);
 #ifdef SHOW_EXTINCT
 	    }
 	    if (nextincted>0) {
 	      Sprintf(buf, "%d species extinct.", nextincted);
-	      putstr(klwin, 0, buf);
+	      if (klwin) putstr(klwin, 0, buf);
 	      dump(" ", buf);
 	    }
 #endif /* SHOW_EXTINCT */
 	    dump("", "");
 
-	    display_nhwindow(klwin, TRUE);
-	    destroy_nhwindow(klwin);
+	    if (klwin) {
+		    display_nhwindow(klwin, TRUE);
+		    destroy_nhwindow(klwin);
+	    }
 	}
-    }
 }
 
 /*end.c*/

@@ -133,7 +133,7 @@ STATIC_PTR int NDECL(wiz_mazewalkmap);
 extern char SpLev_Map[COLNO][ROWNO];
 STATIC_PTR int NDECL(wiz_showkills);	/* showborn patch */
 #ifdef SHOW_BORN
-extern void FDECL(list_vanquished, (int, BOOLEAN_P)); /* showborn patch */
+extern void FDECL(list_vanquished, (int, BOOLEAN_P, BOOLEAN_P)); /* showborn patch */
 #endif /* SHOW_BORN */
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern void FDECL(show_borlandc_stats, (winid));
@@ -785,7 +785,7 @@ wiz_show_wmodes()
 /* #showkills command */
 STATIC_PTR int wiz_showkills()		/* showborn patch */
 {
-	list_vanquished('y', FALSE);
+	list_vanquished('y', FALSE, TRUE);
 	return 0;
 }
 
@@ -812,6 +812,7 @@ static const char
 #define you_have_never(badthing) enl_msg(You_,have_never,never,badthing)
 #define you_have_X(something)	enl_msg(You_,have,(const char *)"",something)
 
+static int want_display = FALSE;
 static void
 enlght_line(start, middle, end)
 const char *start, *middle, *end;
@@ -819,7 +820,9 @@ const char *start, *middle, *end;
 	char buf[BUFSZ];
 
 	Sprintf(buf, "%s%s%s.", start, middle, end);
-	putstr(en_win, 0, buf);
+	if (want_display) {
+		putstr(en_win, 0, buf);
+	}
 	dump("  ", buf);
 }
 
@@ -861,15 +864,22 @@ char *outbuf;
 }
 
 void
-enlightenment(final)
+enlightenment(final, want_disp)
 int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
+int want_disp;
 {
 	int ltmp;
 	char buf[BUFSZ];
 
-	en_win = create_nhwindow(NHW_MENU);
-	putstr_dump(en_win, 0, final ? "Final Attributes:" : "Current Attributes:");
-	putstr(en_win, 0, "");
+	want_display = want_disp;
+
+	Sprintf(buf, final ? "Final Attributes:" : "Current Attributes:");
+	if (want_display) {
+		en_win = create_nhwindow(NHW_MENU);
+		putstr(en_win, 0, buf);
+		putstr(en_win, 0, "");
+	}
+	dump_title(buf);
 
 #ifdef ELBERETH
 	if (u.uevent.uhand_of_elbereth) {
@@ -1170,9 +1180,10 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
     }
     dump("", "");
 
+    if (want_display) {
 	display_nhwindow(en_win, TRUE);
 	destroy_nhwindow(en_win);
-	return;
+    }
 }
 
 /*
@@ -1292,7 +1303,7 @@ doattributes()
 	if (!minimal_enlightenment())
 		return 0;
 	if (wizard || discover)
-		enlightenment(0);
+		enlightenment(0, TRUE);
 	return 0;
 }
 
@@ -1302,22 +1313,28 @@ doattributes()
 STATIC_PTR int
 doconduct()
 {
-	show_conduct(0);
+	show_conduct(0, TRUE);
 	return 0;
 }
 
 void
-show_conduct(final)
+show_conduct(final, want_disp)
 int final;
+int want_disp;
 {
 	char buf[BUFSZ];
 	int ngenocided;
 	int cdt;
 
+	want_display = want_disp;
+
 	/* Create the conduct window */
-	en_win = create_nhwindow(NHW_MENU);
-	putstr_dump(en_win, 0, "Voluntary challenges:");
-	putstr(en_win, 0, "");
+	if (want_display) {
+		en_win = create_nhwindow(NHW_MENU);
+		putstr(en_win, 0, "Voluntary challenges:");
+		putstr(en_win, 0, "");
+	}
+	dump("", "Voluntary challenges");
 
 	/* list all major conducts */
 
@@ -1409,8 +1426,10 @@ int final;
 	dump("", "");
 
 	/* Pop up the window and wait for a key */
-	display_nhwindow(en_win, TRUE);
-	destroy_nhwindow(en_win);
+	if (want_display) {
+		display_nhwindow(en_win, TRUE);
+		destroy_nhwindow(en_win);
+	}
 }
 
 #endif /* OVLB */

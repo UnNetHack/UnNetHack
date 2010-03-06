@@ -177,8 +177,8 @@ E void NDECL(add_debug_extended_commands);
 E void FDECL(rhack, (char *));
 E int NDECL(doextlist);
 E int NDECL(extcmd_via_menu);
-E void FDECL(enlightenment, (int));
-E void FDECL(show_conduct, (int));
+E void FDECL(enlightenment, (int,BOOLEAN_P));
+E void FDECL(show_conduct, (int,BOOLEAN_P));
 E int FDECL(xytod, (SCHAR_P,SCHAR_P));
 E void FDECL(dtoxy, (coord *,int));
 E int FDECL(movecmd, (CHAR_P));
@@ -583,6 +583,7 @@ E void VDECL(panic, (const char *,...)) PRINTF_F(1,2);
 E void FDECL(done, (int));
 E void FDECL(container_contents, (struct obj *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(dump, (const char *, const char *));
+E void FDECL(dump_title, (char *));
 #ifdef DUMP_LOG
 E void FDECL(putstr_dump, (winid, int, const char *));
 #endif
