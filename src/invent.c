@@ -1786,9 +1786,7 @@ boolean want_disp;
 	anything any;
 	menu_item *selected;
 
-#ifdef DUMP_LOG
 	if (want_disp) {
-#endif
 	/* overriden by global flag */
 	if (flags.perm_invent) {
 	    win = (lets && *lets) ? local_win : WIN_INVEN;
@@ -1797,11 +1795,8 @@ boolean want_disp;
 		win = local_win = create_nhwindow(NHW_MENU);
 	} else
 	    win = WIN_INVEN;
-
-#ifdef DUMP_LOG
 	}
 	dump("", "Your inventory");
-#endif
 
 	/*
 	Exit early if no inventory -- but keep going if we are doing
@@ -1840,14 +1835,11 @@ boolean want_disp;
 	    ret = '\0';
 	    for (otmp = invent; otmp; otmp = otmp->nobj) {
 		if (otmp->invlet == lets[0]) {
-#ifdef DUMP_LOG
 		  if (want_disp) {
-#endif
 		    ret = message_menu(lets[0],
 			  want_reply ? PICK_ONE : PICK_NONE,
 			  xprname(otmp, (char *)0, lets[0], TRUE, 0L, 0L));
 		    if (out_cnt) *out_cnt = -1L;	/* select all */
-#ifdef DUMP_LOG
 		  }
 		  {
 		    char letbuf[7];
@@ -1855,17 +1847,14 @@ boolean want_disp;
 		    dump(letbuf,
 			 xprname(otmp, (char *)0, lets[0], TRUE, 0L, 0L));
 		  }
-#endif
 		    break;
 		}
 	    }
 	    return ret;
 	}
 
-#ifdef DUMP_LOG
 	if (want_disp)
-#endif
-	start_menu(win);
+		start_menu(win);
 nextclass:
 	classcount = 0;
 	any.a_void = 0;		/* set all bits to zero */

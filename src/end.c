@@ -43,7 +43,6 @@ void FDECL(list_vanquished, (CHAR_P,BOOLEAN_P));
 #ifdef DUMP_LOG
 extern char msgs[][BUFSZ];
 extern int lastmsg;
-extern void NDECL(dump_spells);
 void FDECL(do_vanquished, (int, BOOLEAN_P));
 #endif /* DUMP_LOG */
 STATIC_DCL void FDECL(list_genocided, (int, BOOLEAN_P));
@@ -487,11 +486,7 @@ boolean taken;
 		enlightenment(how >= PANICKED ? 1 : 2); /* final */
 	    if (c == 'q') done_stopprint++;
 	}
-#ifdef DUMP_LOG
-	if (dump_fp) {
-	  dump_spells();
-	}
-#endif
+	dump_spells();
 
 	ask = should_query_disclose_option('v', &defquery);
 #ifdef DUMP_LOG
@@ -513,11 +508,7 @@ boolean taken;
 		show_conduct(how >= PANICKED ? 1 : 2);
 	    if (c == 'q') done_stopprint++;
 	}
-#ifdef DUMP_LOG
-	if (dump_fp) {
-	    dump_weapon_skill();
-	}
-#endif
+	dump_weapon_skill();
 }
 
 /* try to get the player back in a viable state after being killed */
