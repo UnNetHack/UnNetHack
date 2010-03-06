@@ -2193,7 +2193,7 @@ ask_again2:
 		if (cnt) Strcat(pbuf, "m");
 		switch (yn_function(qbuf, pbuf, 'n')) {
 		case ':':
-		    container_contents(current_container, FALSE, FALSE);
+		    container_contents(current_container, FALSE, FALSE, TRUE);
 		    goto ask_again2;
 		case 'y':
 		    if (query_classes(select, &one_by_one, &allflag,

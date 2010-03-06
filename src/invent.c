@@ -19,12 +19,8 @@ STATIC_DCL boolean FDECL(taking_off, (const char *));
 STATIC_DCL boolean FDECL(putting_on, (const char *));
 STATIC_PTR int FDECL(ckunpaid,(struct obj *));
 STATIC_PTR int FDECL(ckvalidcat,(struct obj *));
-#ifdef DUMP_LOG
 static char FDECL(display_pickinv,
-		 (const char *,BOOLEAN_P, long *, BOOLEAN_P, BOOLEAN_P));
-#else
-static char FDECL(display_pickinv, (const char *,BOOLEAN_P, long *));
-#endif /* DUMP_LOG */
+		 (const char *,BOOLEAN_P, long *, BOOLEAN_P));
 #ifdef OVLB
 STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
 STATIC_DCL void NDECL(dounpaid);
@@ -1098,9 +1094,7 @@ register const char *let,*word;
 			allowed_choices = altlets;
 		    ilet = display_pickinv(allowed_choices, TRUE,
 					   allowcnt ? &ctmp : (long *)0
-#ifdef DUMP_LOG
-					   , FALSE, TRUE
-#endif
+					   , TRUE
 					   );
 		    if(!ilet) continue;
 		    if (allowcnt && ctmp >= 0) {
@@ -1776,21 +1770,12 @@ find_unpaid(list, last_found)
  * inventory and return a count as well as a letter. If out_cnt is not null,
  * any count returned from the menu selection is placed here.
  */
-#ifdef DUMP_LOG
 static char
-display_pickinv(lets, want_reply, out_cnt, want_dump, want_disp)
+display_pickinv(lets, want_reply, out_cnt, want_disp)
 register const char *lets;
 boolean want_reply;
 long* out_cnt;
-boolean want_dump;
 boolean want_disp;
-#else
-static char
-display_pickinv(lets, want_reply, out_cnt)
-register const char *lets;
-boolean want_reply;
-long* out_cnt;
-#endif
 {
 	struct obj *otmp;
 	char ilet, ret = '\0';
@@ -1815,7 +1800,7 @@ long* out_cnt;
 
 #ifdef DUMP_LOG
 	}
-	if (want_dump)   dump("", "Your inventory");
+	dump("", "Your inventory");
 #endif
 
 	/*
@@ -1830,23 +1815,17 @@ long* out_cnt;
 	to here is short circuited away.
 	*/
 	if (!invent && !(flags.perm_invent && !lets && !want_reply)) {
-#ifdef DUMP_LOG
 	  if (want_disp) {
-#endif
 #ifndef GOLDOBJ
 	    pline("Not carrying anything%s.", u.ugold ? " except gold" : "");
 #else
 	    pline("Not carrying anything.");
 #endif
-#ifdef DUMP_LOG
 	  }
-	  if (want_dump) {
 #ifdef GOLDOBJ
 	    dump("  ", "Not carrying anything");
 #else
 	    dump("  Not carrying anything", u.ugold ? " except gold." : ".");
-#endif
-	  }
 #endif
 	    return 0;
 	}
@@ -1870,7 +1849,7 @@ long* out_cnt;
 		    if (out_cnt) *out_cnt = -1L;	/* select all */
 #ifdef DUMP_LOG
 		  }
-		  if (want_dump) {
+		  {
 		    char letbuf[7];
 		    sprintf(letbuf, "  %c - ", lets[0]);
 		    dump(letbuf,
@@ -1896,24 +1875,19 @@ nextclass:
 			if (!flags.sortpack || otmp->oclass == *invlet) {
 			    if (flags.sortpack && !classcount) {
 				any.a_void = 0;		/* zero */
-#ifdef DUMP_LOG
-				if (want_dump)
-				    dump("  ", let_to_name(*invlet, FALSE));
+				dump("  ", let_to_name(*invlet, FALSE));
 				if (want_disp)
-#endif
 				add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 				    let_to_name(*invlet, FALSE), MENU_UNSELECTED);
 				classcount++;
 			    }
 			    any.a_char = ilet;
-#ifdef DUMP_LOG
-			    if (want_dump) {
+			    {
 			      char letbuf[7];
 			      sprintf(letbuf, "  %c - ", ilet);
 			      dump(letbuf, doname(otmp));
 			    }
 			    if (want_disp)
-#endif
 			    add_menu(win, obj_to_glyph(otmp),
 					&any, ilet, 0, ATR_NONE, doname(otmp),
 					MENU_UNSELECTED);
@@ -1929,9 +1903,7 @@ nextclass:
 		}
 #endif
 	}
-#ifdef DUMP_LOG
 	if (want_disp) {
-#endif
 	end_menu(win, (char *) 0);
 
 	n = select_menu(win, want_reply ? PICK_ONE : PICK_NONE, &selected);
@@ -1941,10 +1913,8 @@ nextclass:
 	    free((genericptr_t)selected);
 	} else
 	    ret = !n ? '\0' : '\033';	/* cancelled */
-#ifdef DUMP_LOG
 	} /* want_disp */
-	if (want_dump)  dump("", "");
-#endif
+	dump("", "");
 
 	return ret;
 }
@@ -1961,23 +1931,17 @@ display_inventory(lets, want_reply)
 register const char *lets;
 boolean want_reply;
 {
-	return display_pickinv(lets, want_reply, (long *)0
-#ifdef DUMP_LOG
-			       , FALSE , TRUE
-#endif
-	);
+	return display_pickinv(lets, want_reply, (long *)0, TRUE);
 }
 
-#ifdef DUMP_LOG
 /* See display_inventory. This is the same thing WITH dumpfile creation */
 char
 dump_inventory(lets, want_reply, want_disp)
 register const char *lets;
 boolean want_reply, want_disp;
 {
-  return display_pickinv(lets, want_reply, (long *)0, TRUE, want_disp);
+  return display_pickinv(lets, want_reply, (long *)0, want_disp);
 }
-#endif
 
 /*
  * Returns the number of unpaid items within the given list.  This includes

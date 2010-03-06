@@ -581,12 +581,12 @@ E void FDECL(done_in_by, (struct monst *));
 E void VDECL(panic, (const char *,...)) PRINTF_F(1,2);
 #if !defined(MAKEDEFS_C) && !defined(LEV_LEX_C)
 E void FDECL(done, (int));
-E void FDECL(container_contents, (struct obj *,BOOLEAN_P,BOOLEAN_P));
-#ifdef DUMP_LOG
+E void FDECL(container_contents, (struct obj *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(dump, (const char *, const char *));
+#ifdef DUMP_LOG
 E void FDECL(putstr_dump, (winid, int, const char *));
-E void FDECL(do_containerconts, (struct obj *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 #endif
+E void FDECL(dump_containerconts, (struct obj *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(terminate, (int));
 E int NDECL(num_genocides);
 
@@ -837,9 +837,7 @@ E void FDECL(prinv, (const char *,struct obj *,long));
 E char *FDECL(xprname, (struct obj *,const char *,CHAR_P,BOOLEAN_P,long,long));
 E int NDECL(ddoinv);
 E char FDECL(display_inventory, (const char *,BOOLEAN_P));
-#ifdef DUMP_LOG
 E char FDECL(dump_inventory, (const char *,BOOLEAN_P,BOOLEAN_P));
-#endif
 E int FDECL(display_binventory, (int,int,BOOLEAN_P));
 E struct obj *FDECL(display_cinventory,(struct obj *));
 E struct obj *FDECL(display_minventory,(struct monst *,int,char *));

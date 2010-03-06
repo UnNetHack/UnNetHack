@@ -474,7 +474,7 @@ boolean taken;
 			    obj->known = obj->bknown = obj->dknown = obj->rknown = 1;
 			}
 			(void) dump_inventory((char *)0, TRUE, want_disp);
-			do_containerconts(invent, TRUE, TRUE, want_disp);
+			container_contents(invent, TRUE, TRUE, want_disp);
 	    }
 		if (c == 'q')  done_stopprint++;
 	}
@@ -995,9 +995,7 @@ die:
 		    mtmp = mtmp->nmon;
 		}
 		if (!done_stopprint) putstr(endwin, 0, pbuf);
-#ifdef DUMP_LOG
 		dump("", pbuf);
-#endif
 		pbuf[0] = '\0';
 	    } else {
 		if (!done_stopprint) Strcat(pbuf, " ");
@@ -1010,9 +1008,7 @@ die:
 					"escaped from the dungeon"),
 #endif
 			u.urscore, plur(u.urscore));
-#ifdef DUMP_LOG
 	    dump("", pbuf);
-#endif
 	    if (!done_stopprint) {
 		putstr(endwin, 0, pbuf);
 	    }
@@ -1048,9 +1044,7 @@ die:
 				count, plur(count));
 		    }
 		    putstr(endwin, 0, pbuf);
-#ifdef DUMP_LOG
 		    dump("", pbuf);
-#endif
 		}
 	    }
 
@@ -1075,9 +1069,7 @@ die:
 	    Sprintf(eos(pbuf), " with %ld point%s,",
 		    u.urscore, plur(u.urscore));
 	    if (!done_stopprint) putstr(endwin, 0, pbuf);
-#ifdef DUMP_LOG
 	    dump("", pbuf);
-#endif
 	}
 
 	    Sprintf(pbuf, "and %ld piece%s of gold, after %ld move%s.",
@@ -1097,9 +1089,7 @@ die:
 	    putstr(endwin, 0, pbuf);
 	    putstr(endwin, 0, "");
 	}
-#ifdef DUMP_LOG
-	    if (dump_fp) dump("", pbuf);
-#endif
+	dump("", pbuf);
 	if (!done_stopprint)
 	    display_nhwindow(endwin, TRUE);
 	if (endwin != WIN_ERR)
@@ -1124,21 +1114,10 @@ die:
 	terminate(EXIT_SUCCESS);
 }
 
-
 void
-container_contents(list, identified, all_containers)
-struct obj *list;
-boolean identified, all_containers;
-#ifdef DUMP_LOG
-{
-	do_containerconts(list, identified, all_containers, TRUE);
-}
-
-void do_containerconts(list, identified, all_containers, want_disp)
+container_contents(list, identified, all_containers, want_disp)
 struct obj *list;
 boolean identified, all_containers, want_disp;
-#endif
-/* The original container_contents function */
 {
 	register struct obj *box, *obj;
 	char buf[BUFSZ];
@@ -1149,61 +1128,40 @@ boolean identified, all_containers, want_disp;
 		    continue;	/* bag of tricks with charges can't contain anything */
 		} else if (box->cobj) {
 		    winid tmpwin = WIN_ERR;
-#ifdef DUMP_LOG
 		    if (want_disp)
-#endif
-		    tmpwin = create_nhwindow(NHW_MENU);
+			    tmpwin = create_nhwindow(NHW_MENU);
 		    Sprintf(buf, "Contents of %s:", the(xname(box)));
-#ifdef DUMP_LOG
 		    if (want_disp) {
-#endif
-		    putstr(tmpwin, 0, buf);
-		    putstr(tmpwin, 0, "");
-#ifdef DUMP_LOG
+			    putstr(tmpwin, 0, buf);
+			    putstr(tmpwin, 0, "");
 		    }
 		    dump("", buf);
-#endif
 		    for (obj = box->cobj; obj; obj = obj->nobj) {
 			if (identified) {
 			    makeknown(obj->otyp);
 			    obj->known = obj->bknown =
 			    obj->dknown = obj->rknown = 1;
 			}
-#ifdef DUMP_LOG
 			dump("  ", doname(obj));
 			if (want_disp)
-#endif
-			putstr(tmpwin, 0, doname(obj));
+				putstr(tmpwin, 0, doname(obj));
 		    }
-#ifdef DUMP_LOG
 		    dump("","");
 		    if (want_disp) {
-#endif
-		    display_nhwindow(tmpwin, TRUE);
-		    destroy_nhwindow(tmpwin);
-#ifdef DUMP_LOG
+			    display_nhwindow(tmpwin, TRUE);
+			    destroy_nhwindow(tmpwin);
 		    }
 		    if (all_containers) {
-			do_containerconts(box->cobj, identified, TRUE,
+			container_contents(box->cobj, identified, TRUE,
 					  want_disp);
-#else
-		    if (all_containers) {
-			container_contents(box->cobj, identified, TRUE);
-#endif /* DUMP_LOG */
 		    }
 		} else {
-#ifdef DUMP_LOG
 		    if (want_disp) {
-#endif
-		    pline("%s empty.", Tobjnam(box, "are"));
-		    display_nhwindow(WIN_MESSAGE, FALSE);
-#ifdef DUMP_LOG
+			    pline("%s empty.", Tobjnam(box, "are"));
+			    display_nhwindow(WIN_MESSAGE, FALSE);
 		    }
-		    if (dump_fp) {
-		      dump(The(xname(box)), " is empty.");
-		      dump("", "");
-		    }
-#endif
+		    dump(The(xname(box)), " is empty.");
+		    dump("", "");
 		}
 	    }
 	    if (!all_containers)
