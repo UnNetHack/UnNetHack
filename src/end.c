@@ -106,6 +106,15 @@ extern const char * const killed_by_prefix[];	/* from topten.c */
 #ifdef DUMP_LOG
 FILE *dump_fp = (FILE *)0;  /**< file pointer for text dumps */
 FILE *html_dump_fp = (FILE *)0;  /**< file pointer for html dumps */
+/* TODO:
+ * - escape unmasked characters in html
+ * - tables for skills and spells
+ * - menucolors for items?
+ * - move everything into a new dump.c file
+ * - configure options for text/html output
+ * - started/ended date at the top
+ * - DRYing dump_init
+ */
 
 void
 dump_init()
@@ -292,16 +301,6 @@ dump_blockquote_end()
 	dump_text("\n", "");
 	dump_html("</blockquote>\n", "");
 #endif /* DUMP_LOG */
-}
-
-void
-putstr_dump(window, attr, str)
-winid window;
-int attr;
-const char *str;
-{
-	putstr(window, attr, str);
-	dump("", str);
 }
 
 /*ARGSUSED*/
@@ -1353,7 +1352,7 @@ boolean ask;
 	if (c == 'q') done_stopprint++;
 	if (c == 'y') {
 	    klwin = create_nhwindow(NHW_MENU);
-	    putstr_dump(klwin, 0, buf);
+	    putstr(klwin, 0, buf);
 	    putstr(klwin, 0, "");
 	}
 	dump_title(buf);

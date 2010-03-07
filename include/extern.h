@@ -589,9 +589,6 @@ E void FDECL(dump_title, (char *));
 E void NDECL(dump_list_start);
 E void FDECL(dump_list_item, (const char *));
 E void NDECL(dump_list_end);
-#ifdef DUMP_LOG
-E void FDECL(putstr_dump, (winid, int, const char *));
-#endif
 E void FDECL(dump_containerconts, (struct obj *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(terminate, (int));
 E int NDECL(num_genocides);
