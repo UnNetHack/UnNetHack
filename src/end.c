@@ -111,19 +111,18 @@ FILE *html_dump_fp = (FILE *)0;  /**< file pointer for html dumps */
  * - tables for skills and spells
  * - menucolors for items?
  * - move everything into a new dump.c file
- * - configure options for text/html output
  * - started/ended date at the top
- * - DRYing dump_init
  */
 
 void
 dump_init()
 {
   if (dump_fn[0]) {
+    int new_dump_fn_len = strlen(dump_fn)+strlen(plname)+5; /* space for ".html" */
+    char *new_dump_fn = (char *) alloc((unsigned)(new_dump_fn_len+1));
     char *p = (char *) strstr(dump_fn, "%n");
+
     if (p) {
-      int new_dump_fn_len = strlen(dump_fn)+strlen(plname)-2+5; /* %n */
-      char *new_dump_fn = (char *) alloc((unsigned)(new_dump_fn_len+1));
       char *q = new_dump_fn;
       strncpy(q, dump_fn, p-dump_fn);
       q += p-dump_fn;
@@ -134,29 +133,25 @@ dump_init()
       p += 2;	/* skip "%n" */
       strncpy(q, p, strlen(p));
       new_dump_fn[new_dump_fn_len] = '\0';
+    } else {
+      strcpy(new_dump_fn, dump_fn);
+    }
 
-      dump_fp = fopen(new_dump_fn, "w");
-      if (!dump_fp) {
+#ifdef DUMP_TEXT_LOG
+    dump_fp = fopen(new_dump_fn, "w");
+    if (!dump_fp) {
 	pline("Can't open %s for output.", new_dump_fn);
 	pline("Dump file not created.");
-      }
+    }
+#endif
 #ifdef DUMP_HTML_LOG
-      html_dump_fp = fopen(strcat(new_dump_fn, ".html"), "w");
-      if (!html_dump_fp) {
+    html_dump_fp = fopen(strcat(new_dump_fn, ".html"), "w");
+    if (!html_dump_fp) {
 	pline("Can't open %s for output.", new_dump_fn);
 	pline("Html dump file not created.");
-      }
-#endif
-      free(new_dump_fn);
-
-    } else {
-      dump_fp = fopen (dump_fn, "w");
-
-      if (!dump_fp) {
-	pline("Can't open %s for output.", dump_fn);
-	pline("Dump file not created.");
-      }
     }
+#endif
+    if (new_dump_fn) free(new_dump_fn);
   }
 }
 

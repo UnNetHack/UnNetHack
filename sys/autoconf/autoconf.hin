@@ -45,8 +45,14 @@
 /* Name of character dump file */
 #undef DUMP_FN
 
+/* Dump an HTML file */
+#undef DUMP_HTML_LOG
+
 /* Dumping character stats */
 #undef DUMP_LOG
+
+/* Dump a text file */
+#undef DUMP_TEXT_LOG
 
 /* Dungeon growth */
 #undef DUNGEON_GROWTH

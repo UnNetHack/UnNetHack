@@ -781,6 +781,8 @@ enable_livelog_shout
 enable_dump
 enable_dump_file
 enable_dump_messages
+enable_dump_text
+enable_dump_html
 enable_whereis_file
 enable_wizmode
 with_owner
@@ -1479,6 +1481,8 @@ Optional Features:
   --enable-dump-messages=NUMBER
                           Number of dumped messages (default=yes, default
                           number=20)
+  --enable-dump-text      Dump a text file (default=yes)
+  --enable-dump-html      Dump an HTML file (default=no)
   --enable-whereis-file=FILE
                           Log information about running games (default=no,
                           default file=%n.whereis)
@@ -7683,6 +7687,44 @@ _ACEOF
    else
       { $as_echo "$as_me:$LINENO: result: no" >&5
 $as_echo "no" >&6; }
+   fi
+
+	{ $as_echo "$as_me:$LINENO: checking whether to enable dump-text" >&5
+$as_echo_n "checking whether to enable dump-text... " >&6; }
+   # Check whether --enable-dump-text was given.
+if test "${enable_dump_text+set}" = set; then
+  enableval=$enable_dump_text;
+else
+  enable_dump_text="yes"
+fi
+
+   { $as_echo "$as_me:$LINENO: result: $enable_dump_text" >&5
+$as_echo "$enable_dump_text" >&6; }
+   if test "$enable_dump_text" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define DUMP_TEXT_LOG /**/
+_ACEOF
+
+   fi
+
+	{ $as_echo "$as_me:$LINENO: checking whether to enable dump-html" >&5
+$as_echo_n "checking whether to enable dump-html... " >&6; }
+   # Check whether --enable-dump-html was given.
+if test "${enable_dump_html+set}" = set; then
+  enableval=$enable_dump_html;
+else
+  enable_dump_html="no"
+fi
+
+   { $as_echo "$as_me:$LINENO: result: $enable_dump_html" >&5
+$as_echo "$enable_dump_html" >&6; }
+   if test "$enable_dump_html" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define DUMP_HTML_LOG /**/
+_ACEOF
+
    fi
 
 fi

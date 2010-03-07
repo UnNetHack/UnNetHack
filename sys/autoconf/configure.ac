@@ -410,6 +410,8 @@ NETHACK_ARG(dump,[Dumping character stats],DUMP_LOG,yes)
 if test "$enable_dump" != "no" ; then
 	NETHACK_ARG_WITH_PARAM(dump-file,[Name of character dump file],DUMP_FN,no,FILE,"/tmp/%s.nh")
 	NETHACK_ARG_WITH_PARAM(dump-messages,[Number of dumped messages],DUMPMSGS,yes,NUMBER,20)
+	NETHACK_ARG(dump-text,[Dump a text file],DUMP_TEXT_LOG,yes)
+	NETHACK_ARG(dump-html,[Dump an HTML file],DUMP_HTML_LOG,no)
 fi
 
 NETHACK_ARG_WITH_PARAM(whereis-file,[Log information about running games],WHEREIS_FILE,no,FILE,[%n.whereis])
