@@ -1447,7 +1447,8 @@ void dump_screen()
     /* D: botl.c has a closer approximation to the size, but we'll go with
      *    this */
     char buf[300], *ptr;
-    
+
+    dump_html("<pre>\n", "");
     for (y = 0; y < ROWNO; y++) {
 	lastc = 0;
 	ptr = buf;
@@ -1466,6 +1467,7 @@ void dump_screen()
     dump("", ptr);
     bot2str(buf);
     dump("", buf);
+    dump_html("</pre>\n", "");
     dump("", "");
     dump("", "");
 }

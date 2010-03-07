@@ -823,7 +823,7 @@ const char *start, *middle, *end;
 	if (want_display) {
 		putstr(en_win, 0, buf);
 	}
-	dump("  ", buf);
+	dump_list_item(buf);
 }
 
 /* format increased damage or chance to hit */
@@ -880,6 +880,7 @@ int want_disp;
 		putstr(en_win, 0, "");
 	}
 	dump_title(buf);
+	dump_list_start();
 
 #ifdef ELBERETH
 	if (u.uevent.uhand_of_elbereth) {
@@ -1178,6 +1179,7 @@ int want_disp;
 	}
 	if (p) enl_msg(You_, "have been killed ", p, buf);
     }
+    dump_list_end();
     dump("", "");
 
     if (want_display) {
@@ -1329,12 +1331,14 @@ int want_disp;
 	want_display = want_disp;
 
 	/* Create the conduct window */
+	Sprintf(buf, "Voluntary challenges:");
 	if (want_display) {
 		en_win = create_nhwindow(NHW_MENU);
-		putstr(en_win, 0, "Voluntary challenges:");
+		putstr(en_win, 0, buf);
 		putstr(en_win, 0, "");
 	}
-	dump("", "Voluntary challenges");
+	dump_title(buf);
+	dump_list_start();
 
 	/* list all major conducts */
 
@@ -1423,6 +1427,7 @@ int want_disp;
 		enl_msg(You_, "have not wished", "did not wish",
 			" for any artifacts");
 	}
+	dump_list_end();
 	dump("", "");
 
 	/* Pop up the window and wait for a key */

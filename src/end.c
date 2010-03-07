@@ -104,8 +104,8 @@ static NEARDATA const char *ends[] = {		/* "when you..." */
 extern const char * const killed_by_prefix[];	/* from topten.c */
 
 #ifdef DUMP_LOG
-FILE *dump_fp = (FILE *)0;  /* file pointer for dumps */
-/* functions dump_init, dump_exit and dump are from the dump patch */
+FILE *dump_fp = (FILE *)0;  /**< file pointer for text dumps */
+FILE *html_dump_fp = (FILE *)0;  /**< file pointer for html dumps */
 
 void
 dump_init()
@@ -113,7 +113,7 @@ dump_init()
   if (dump_fn[0]) {
     char *p = (char *) strstr(dump_fn, "%n");
     if (p) {
-      int new_dump_fn_len = strlen(dump_fn)+strlen(plname)-2; /* %n */
+      int new_dump_fn_len = strlen(dump_fn)+strlen(plname)-2+5; /* %n */
       char *new_dump_fn = (char *) alloc((unsigned)(new_dump_fn_len+1));
       char *q = new_dump_fn;
       strncpy(q, dump_fn, p-dump_fn);
@@ -131,6 +131,13 @@ dump_init()
 	pline("Can't open %s for output.", new_dump_fn);
 	pline("Dump file not created.");
       }
+#ifdef DUMP_HTML_LOG
+      html_dump_fp = fopen(strcat(new_dump_fn, ".html"), "w");
+      if (!html_dump_fp) {
+	pline("Can't open %s for output.", new_dump_fn);
+	pline("Html dump file not created.");
+      }
+#endif
       free(new_dump_fn);
 
     } else {
@@ -154,12 +161,75 @@ dump_exit()
 
 void
 dump(pre, str)
-     const char *pre, *str;
+const char *pre, *str;
 {
 #ifdef DUMP_LOG
   if (dump_fp)
-    fprintf (dump_fp, "%s%s\n", pre, str);
+    fprintf(dump_fp, "%s%s\n", pre, str);
+  if (html_dump_fp)
+    fprintf(html_dump_fp, "%s%s\n", pre, str);
 #endif /* DUMP_LOG */
+}
+
+/** Outputs a string only into the html dump. */
+void
+dump_html(format, str)
+const char *format, *str;
+{
+#ifdef DUMP_LOG
+  if (html_dump_fp)
+    fprintf(html_dump_fp, format, str);
+#endif /* DUMP_LOG */
+}
+
+/** Outputs a string only into the text dump. */
+void
+dump_text(format, str)
+const char *format, *str;
+{
+#ifdef DUMP_LOG
+  if (dump_fp)
+    fprintf(dump_fp, format, str);
+#endif
+}
+
+/** Dumps one line as is. */
+static void
+dump_line(pre, str)
+const char *pre, *str;
+{
+#ifdef DUMP_LOG
+  if (dump_fp)
+    fprintf(dump_fp, "%s%s\n", pre, str);
+  if (html_dump_fp)
+    fprintf(html_dump_fp, "%s%s<br />\n", pre, str);
+#endif
+}
+
+/** Dumps an object from the inventory. */
+void
+dump_object(c, color, str)
+const char c;
+const int color;
+const char *str;
+{
+#ifdef DUMP_LOG
+  if (dump_fp)
+    fprintf(dump_fp, "  %c - %s\n", c, str);
+  if (html_dump_fp)
+    fprintf(html_dump_fp, "<span class=\"nh_item_letter\">%c</span> - <span class=\"nh%d\">%s</span><br />\n", c, color, str);
+#endif
+}
+
+/** Dumps a secondary title. */
+void
+dump_subtitle(str)
+const char *str;
+{
+#ifdef DUMP_LOG
+  dump_text("  %s\n", str);
+  dump_html("<h3>%s</h3>\n", str);
+#endif
 }
 
 /** Dump a title. Strips : from the end of str. */
@@ -172,7 +242,55 @@ char *str;
 	if (str[len-1] == ':') {
 		str[len-1] = '\0';
 	}
-	dump("", str);
+	if (dump_fp)
+		fprintf(dump_fp, "%s\n", str);
+	if (html_dump_fp)
+		fprintf(html_dump_fp, "<h2>%s</h2>\n", str);
+#endif /* DUMP_LOG */
+}
+/** Starts a list in the dump. */
+void
+dump_list_start()
+{
+#ifdef DUMP_LOG
+	if (html_dump_fp)
+		fprintf(html_dump_fp, "<ul>\n");
+#endif /* DUMP_LOG */
+}
+/** Dumps a list item. */
+void
+dump_list_item(str)
+const char *str;
+{
+#ifdef DUMP_LOG
+	if (dump_fp)
+		fprintf(dump_fp, "  %s\n", str);
+	if (html_dump_fp)
+		fprintf(html_dump_fp, "<li>%s</li>\n", str);
+#endif
+}
+/** Ends a list in the dump. */
+void
+dump_list_end()
+{
+	dump_html("</ul>\n","");
+}
+/** Starts a blockquote in the dump. */
+static void
+dump_blockquote_start()
+{
+#ifdef DUMP_LOG
+	if (html_dump_fp)
+		fprintf(html_dump_fp, "<blockquote>\n");
+#endif
+}
+/** Ends a blockquote in the dump. */
+static void
+dump_blockquote_end()
+{
+#ifdef DUMP_LOG
+	dump_text("\n", "");
+	dump_html("</blockquote>\n", "");
 #endif /* DUMP_LOG */
 }
 
@@ -768,17 +886,18 @@ die:
 # ifdef DUMPMSGS
 	if (lastmsg >= 0) {
 		int i;
-		dump ("", "Latest messages");
+		dump_title("Latest messages");
+		dump_blockquote_start();
 		for (i = lastmsg + 1; i < DUMPMSGS; i++) {
 		  if (msgs[i] && strcmp(msgs[i], "") )
-		    dump ("  ", msgs[i]);
+		    dump_line("  ", msgs[i]);
 		}
 		for (i = 0; i <= lastmsg; i++) {
 		  if (msgs[i] && strcmp(msgs[i], "") )
-		    dump ("  ", msgs[i]);
+		    dump_line("  ", msgs[i]);
 		}
-		dump ("","");
-		dump ("","");
+		dump_blockquote_end();
+		dump("","");
 	}
 # endif /* DUMPMSGS */
 #endif /* DUMP_LOG */
@@ -961,7 +1080,9 @@ die:
 	    putstr(endwin, 0, pbuf);
 	    putstr(endwin, 0, "");
 	}
-	dump("", pbuf);
+	dump_line("","");
+	dump_blockquote_start();
+	dump_line("", pbuf);
 
 #ifdef ASTRAL_ESCAPE
 	if (how == ESCAPED || how == DEFIED || how == ASCENDED) {
@@ -999,7 +1120,7 @@ die:
 		    mtmp = mtmp->nmon;
 		}
 		if (!done_stopprint) putstr(endwin, 0, pbuf);
-		dump("", pbuf);
+		dump_line("", pbuf);
 		pbuf[0] = '\0';
 	    } else {
 		if (!done_stopprint) Strcat(pbuf, " ");
@@ -1012,7 +1133,7 @@ die:
 					"escaped from the dungeon"),
 #endif
 			u.urscore, plur(u.urscore));
-	    dump("", pbuf);
+	    dump_line("", pbuf);
 	    if (!done_stopprint) {
 		putstr(endwin, 0, pbuf);
 	    }
@@ -1048,7 +1169,7 @@ die:
 				count, plur(count));
 		    }
 		    putstr(endwin, 0, pbuf);
-		    dump("", pbuf);
+		    dump_line("", pbuf);
 		}
 	    }
 
@@ -1073,27 +1194,25 @@ die:
 	    Sprintf(eos(pbuf), " with %ld point%s,",
 		    u.urscore, plur(u.urscore));
 	    if (!done_stopprint) putstr(endwin, 0, pbuf);
-	    dump("", pbuf);
+	    dump_line("", pbuf);
 	}
 
 	    Sprintf(pbuf, "and %ld piece%s of gold, after %ld move%s.",
 		    umoney, plur(umoney), moves, plur(moves));
 	if (!done_stopprint)  putstr(endwin, 0, pbuf);
-#ifdef DUMP_LOG
-	if (dump_fp) {
-	  dump("", pbuf);
-	  Sprintf(pbuf, "Killer: %s", killer);
-	  dump("", pbuf);
-	}
-#endif
-	    Sprintf(pbuf,
+	dump_line("", pbuf);
+	Sprintf(pbuf, "Killer: %s", killer);
+	dump_line("", pbuf);
+	Sprintf(pbuf,
 	     "You were level %d with a maximum of %d hit point%s when you %s.",
 		    u.ulevel, u.uhpmax, plur(u.uhpmax), ends[how]);
 	if (!done_stopprint) {
 	    putstr(endwin, 0, pbuf);
 	    putstr(endwin, 0, "");
 	}
-	dump("", pbuf);
+	dump_line("", pbuf);
+	dump_blockquote_end();
+
 	if (!done_stopprint)
 	    display_nhwindow(endwin, TRUE);
 	if (endwin != WIN_ERR)
@@ -1139,17 +1258,19 @@ boolean identified, all_containers, want_disp;
 			    putstr(tmpwin, 0, buf);
 			    putstr(tmpwin, 0, "");
 		    }
-		    dump("", buf);
+		    dump_subtitle(buf);
+		    dump_list_start();
 		    for (obj = box->cobj; obj; obj = obj->nobj) {
 			if (identified) {
 			    makeknown(obj->otyp);
 			    obj->known = obj->bknown =
 			    obj->dknown = obj->rknown = 1;
 			}
-			dump("  ", doname(obj));
+			dump_list_item(doname(obj));
 			if (want_disp)
 				putstr(tmpwin, 0, doname(obj));
 		    }
+		    dump_list_end();
 		    dump("","");
 		    if (want_disp) {
 			    display_nhwindow(tmpwin, TRUE);
@@ -1164,7 +1285,7 @@ boolean identified, all_containers, want_disp;
 			    pline("%s empty.", Tobjnam(box, "are"));
 			    display_nhwindow(WIN_MESSAGE, FALSE);
 		    }
-		    dump(The(xname(box)), " is empty.");
+		    dump_line(The(xname(box)), " is empty.");
 		    dump("", "");
 		}
 	    }
@@ -1236,6 +1357,7 @@ boolean ask;
 	    putstr(klwin, 0, "");
 	}
 	dump_title(buf);
+	dump_list_start();
 
 	    /* countdown by monster "toughness" */
 	    for (lev = max_lev; lev >= 0; lev--)
@@ -1269,8 +1391,9 @@ boolean ask;
 #endif
 		    }
 		    if (c == 'y') putstr(klwin, 0, buf);
-		    dump("  ", buf);
+		    dump_list_item(buf);
 		}
+	    dump_list_end();
 	    /*
 	     * if (Hallucination)
 	     *     putstr(klwin, 0, "and a partridge in a pear tree");
@@ -1279,9 +1402,7 @@ boolean ask;
 		if (c == 'y') putstr(klwin, 0, "");
 		Sprintf(buf, "%ld creatures vanquished.", total_killed);
 		if (c == 'y') putstr(klwin, 0, buf);
-#ifdef DUMP_LOG
-		dump("  ", buf);
-#endif
+		dump_line("  ", buf);
 	    }
 	    if (c == 'y') {
 	    display_nhwindow(klwin, TRUE);
