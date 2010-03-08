@@ -481,6 +481,7 @@ E void FDECL(dump, (const char *, const char *));
 E void NDECL(dump_blockquote_start);
 E void NDECL(dump_blockquote_end);
 E void FDECL(dump_text, (const char *, const char *));
+E void FDECL(dump_header_html, (const char *));
 E void FDECL(dump_html, (const char *, const char *));
 E void NDECL(dump_init);
 E void NDECL(dump_exit);
@@ -808,6 +809,7 @@ E boolean NDECL(towelday);
 E int NDECL(night);
 E int NDECL(midnight);
 E boolean NDECL(piday);
+E char *FDECL(iso8601, (time_t));
 
 /* ### invent.c ### */
 

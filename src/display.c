@@ -1455,7 +1455,6 @@ void dump_screen()
     int color;
     unsigned special;
 
-    dump_html("%s\n", "<head><link rel=\"stylesheet\" type=\"text/css\" href=\"unnethack_dump.css\" /></head>");
     dump_html("<pre class=\"nh_screen\">\n", "");
     for (y = 0; y < ROWNO; y++) {
 	buf[0] = '\0';

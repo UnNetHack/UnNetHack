@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "date.h"
 
 #ifdef DUMP_LOG
 extern char msgs[][BUFSZ];
@@ -60,14 +61,18 @@ dump_init()
     if (new_dump_fn) free(new_dump_fn);
   }
 }
+#endif
 
 void
 dump_exit()
 {
-  if (dump_fp)
-    fclose (dump_fp);
-}
+#ifdef DUMP_LOG
+	if (dump_fp) {
+		dump_html("</body>\n</html>\n","");
+		fclose (dump_fp);
+	}
 #endif
+}
 
 void
 dump(pre, str)
@@ -207,6 +212,23 @@ dump_blockquote_end()
 	dump_text("\n", "");
 	dump_html("</blockquote>\n", "");
 #endif
+}
+
+/** Dumps the HTML header. */
+void
+dump_header_html(title)
+const char *title;
+{
+	dump_html("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n","");
+	dump_html("<html xmlns=\"http://www.w3.org/1999/xhtml\">", "");
+	dump_html("<head>\n", "");
+	dump_html("<title>UnNetHack " VERSION_STRING ": %s</title>\n", title);
+	dump_html("<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />\n", "");
+	dump_html("<meta name=\"generator\" content=\"UnNetHack " VERSION_STRING "\" />\n", "");
+	dump_html("<meta name=\"date\" content=\"%s\" />\n", iso8601(0));
+	dump_html("<link rel=\"stylesheet\" type=\"text/css\" href=\"unnethack_dump.css\" />\n", "");
+	dump_html("</head>\n", "");
+	dump_html("<body>\n", "");
 }
 
 /*dump.c*/

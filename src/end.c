@@ -676,6 +676,7 @@ die:
 		  urace.adj,
 		  (flags.female && urole.name.f)?
 		   urole.name.f : urole.name.m);
+	  dump_header_html(pbuf);
 	  dump("", pbuf);
 	  /* D: Add a line for clearance from the screen dump */
 	  dump("", "");
