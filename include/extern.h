@@ -477,6 +477,23 @@ E void FDECL(assign_rogue_graphics, (BOOLEAN_P));
 
 /* ### dungeon.c ### */
 
+E void FDECL(dump, (const char *, const char *));
+E void NDECL(dump_blockquote_start);
+E void NDECL(dump_blockquote_end);
+E void FDECL(dump_text, (const char *, const char *));
+E void FDECL(dump_html, (const char *, const char *));
+E void NDECL(dump_init);
+E void NDECL(dump_exit);
+E void FDECL(dump_title, (char *));
+E void FDECL(dump_subtitle, (const char *));
+E void FDECL(dump_line, (const char *, const char *));
+E void NDECL(dump_list_start);
+E void FDECL(dump_list_item, (const char *));
+E void NDECL(dump_list_end);
+E void FDECL(dump_containerconts, (struct obj *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
+
+/* ### dungeon.c ### */
+
 E void FDECL(save_dungeon, (int,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(restore_dungeon, (int));
 E void FDECL(insert_branch, (branch *,BOOLEAN_P));
@@ -582,14 +599,6 @@ E void VDECL(panic, (const char *,...)) PRINTF_F(1,2);
 #if !defined(MAKEDEFS_C) && !defined(LEV_LEX_C)
 E void FDECL(done, (int));
 E void FDECL(container_contents, (struct obj *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
-E void FDECL(dump, (const char *, const char *));
-E void FDECL(dump_text, (const char *, const char *));
-E void FDECL(dump_html, (const char *, const char *));
-E void FDECL(dump_title, (char *));
-E void NDECL(dump_list_start);
-E void FDECL(dump_list_item, (const char *));
-E void NDECL(dump_list_end);
-E void FDECL(dump_containerconts, (struct obj *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(terminate, (int));
 E int NDECL(num_genocides);
 

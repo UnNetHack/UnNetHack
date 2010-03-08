@@ -230,7 +230,7 @@ FIRSTOBJ = monst.o objects.o alloc.o
 HOBJ = $(FIRSTOBJ) allmain.o apply.o artifact.o attrib.o ball.o \
 	bones.o botl.o cmd.o dbridge.o decl.o detect.o dig.o display.o dlb.o \
 	do.o do_name.o do_wear.o dog.o dogmove.o dokick.o dothrow.o \
-	drawing.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
+	drawing.o dump.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
 	extralev.o files.o fountain.o hack.o hacklib.o invent.o light.o \
 	lock.o mail.o makemon.o mapglyph.o mcastu.o mhitm.o mhitu.o \
 	minion.o mklev.o mkmap.o \
@@ -698,6 +698,7 @@ dogmove.o: $(srcdir)/dogmove.c $(HACK_H) ../include/mfndpos.h \
 dokick.o: $(srcdir)/dokick.c $(HACK_H) ../include/eshk.h
 dothrow.o: $(srcdir)/dothrow.c $(HACK_H) ../include/edog.h
 drawing.o: $(srcdir)/drawing.c $(HACK_H) ../include/tcap.h
+dump.o: $(srcdir)/dump.c $(HACK_H)
 dungeon.o: $(srcdir)/dungeon.c $(HACK_H) ../include/dlb.h
 eat.o: $(srcdir)/eat.c $(HACK_H)
 end.o: $(srcdir)/end.c $(HACK_H) ../include/eshk.h ../include/dlb.h

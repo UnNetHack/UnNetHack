@@ -103,201 +103,6 @@ static NEARDATA const char *ends[] = {		/* "when you..." */
 
 extern const char * const killed_by_prefix[];	/* from topten.c */
 
-#ifdef DUMP_LOG
-FILE *dump_fp = (FILE *)0;  /**< file pointer for text dumps */
-FILE *html_dump_fp = (FILE *)0;  /**< file pointer for html dumps */
-/* TODO:
- * - escape unmasked characters in html
- * - tables for skills and spells
- * - menucolors for items?
- * - move everything into a new dump.c file
- * - started/ended date at the top
- */
-
-void
-dump_init()
-{
-  if (dump_fn[0]) {
-    int new_dump_fn_len = strlen(dump_fn)+strlen(plname)+5; /* space for ".html" */
-    char *new_dump_fn = (char *) alloc((unsigned)(new_dump_fn_len+1));
-    char *p = (char *) strstr(dump_fn, "%n");
-
-    if (p) {
-      char *q = new_dump_fn;
-      strncpy(q, dump_fn, p-dump_fn);
-      q += p-dump_fn;
-      strncpy(q, plname, strlen(plname) + 1);
-      regularize(q);
-      q[strlen(plname)] = '\0';
-      q += strlen(q);
-      p += 2;	/* skip "%n" */
-      strncpy(q, p, strlen(p));
-      new_dump_fn[new_dump_fn_len] = '\0';
-    } else {
-      strcpy(new_dump_fn, dump_fn);
-    }
-
-#ifdef DUMP_TEXT_LOG
-    dump_fp = fopen(new_dump_fn, "w");
-    if (!dump_fp) {
-	pline("Can't open %s for output.", new_dump_fn);
-	pline("Dump file not created.");
-    }
-#endif
-#ifdef DUMP_HTML_LOG
-    html_dump_fp = fopen(strcat(new_dump_fn, ".html"), "w");
-    if (!html_dump_fp) {
-	pline("Can't open %s for output.", new_dump_fn);
-	pline("Html dump file not created.");
-    }
-#endif
-    if (new_dump_fn) free(new_dump_fn);
-  }
-}
-
-void
-dump_exit()
-{
-  if (dump_fp)
-    fclose (dump_fp);
-}
-#endif /* DUMP_LOG */
-
-void
-dump(pre, str)
-const char *pre, *str;
-{
-#ifdef DUMP_LOG
-  if (dump_fp)
-    fprintf(dump_fp, "%s%s\n", pre, str);
-  if (html_dump_fp)
-    fprintf(html_dump_fp, "%s%s\n", pre, str);
-#endif /* DUMP_LOG */
-}
-
-/** Outputs a string only into the html dump. */
-void
-dump_html(format, str)
-const char *format, *str;
-{
-#ifdef DUMP_LOG
-  if (html_dump_fp)
-    fprintf(html_dump_fp, format, str);
-#endif /* DUMP_LOG */
-}
-
-/** Outputs a string only into the text dump. */
-void
-dump_text(format, str)
-const char *format, *str;
-{
-#ifdef DUMP_LOG
-  if (dump_fp)
-    fprintf(dump_fp, format, str);
-#endif
-}
-
-/** Dumps one line as is. */
-static void
-dump_line(pre, str)
-const char *pre, *str;
-{
-#ifdef DUMP_LOG
-  if (dump_fp)
-    fprintf(dump_fp, "%s%s\n", pre, str);
-  if (html_dump_fp)
-    fprintf(html_dump_fp, "%s%s<br />\n", pre, str);
-#endif
-}
-
-/** Dumps an object from the inventory. */
-void
-dump_object(c, color, str)
-const char c;
-const int color;
-const char *str;
-{
-#ifdef DUMP_LOG
-  if (dump_fp)
-    fprintf(dump_fp, "  %c - %s\n", c, str);
-  if (html_dump_fp)
-    fprintf(html_dump_fp, "<span class=\"nh_item_letter\">%c</span> - <span class=\"nh%d\">%s</span><br />\n", c, color, str);
-#endif
-}
-
-/** Dumps a secondary title. */
-void
-dump_subtitle(str)
-const char *str;
-{
-#ifdef DUMP_LOG
-  dump_text("  %s\n", str);
-  dump_html("<h3>%s</h3>\n", str);
-#endif
-}
-
-/** Dump a title. Strips : from the end of str. */
-void
-dump_title(str)
-char *str;
-{
-#ifdef DUMP_LOG
-	int len = strlen(str);
-	if (str[len-1] == ':') {
-		str[len-1] = '\0';
-	}
-	if (dump_fp)
-		fprintf(dump_fp, "%s\n", str);
-	if (html_dump_fp)
-		fprintf(html_dump_fp, "<h2>%s</h2>\n", str);
-#endif /* DUMP_LOG */
-}
-/** Starts a list in the dump. */
-void
-dump_list_start()
-{
-#ifdef DUMP_LOG
-	if (html_dump_fp)
-		fprintf(html_dump_fp, "<ul>\n");
-#endif /* DUMP_LOG */
-}
-/** Dumps a list item. */
-void
-dump_list_item(str)
-const char *str;
-{
-#ifdef DUMP_LOG
-	if (dump_fp)
-		fprintf(dump_fp, "  %s\n", str);
-	if (html_dump_fp)
-		fprintf(html_dump_fp, "<li>%s</li>\n", str);
-#endif
-}
-/** Ends a list in the dump. */
-void
-dump_list_end()
-{
-	dump_html("</ul>\n","");
-}
-/** Starts a blockquote in the dump. */
-static void
-dump_blockquote_start()
-{
-#ifdef DUMP_LOG
-	if (html_dump_fp)
-		fprintf(html_dump_fp, "<blockquote>\n");
-#endif
-}
-/** Ends a blockquote in the dump. */
-static void
-dump_blockquote_end()
-{
-#ifdef DUMP_LOG
-	dump_text("\n", "");
-	dump_html("</blockquote>\n", "");
-#endif /* DUMP_LOG */
-}
-
 /*ARGSUSED*/
 void
 done1(sig_unused)   /* called as signal() handler, so sent at least one arg */
@@ -753,8 +558,7 @@ winid endwin;
 				OBJ_NAME(objects[otmp->otyp]),
 			value, currency(value), points);
 #ifdef DUMP_LOG
-		if (dump_fp)
-		  dump("", pbuf);
+		dump("", pbuf);
 		if (endwin != WIN_ERR)
 #endif
 		putstr(endwin, 0, pbuf);
@@ -1224,7 +1028,7 @@ die:
 	    topten(how);
 	}
 #ifdef DUMP_LOG
-	if (dump_fp) dump_exit();
+	dump_exit();
 #endif
 
 	if(done_stopprint) { raw_print(""); raw_print(""); }
