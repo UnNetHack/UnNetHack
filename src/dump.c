@@ -15,7 +15,7 @@ void FDECL(do_vanquished, (int, BOOLEAN_P));
 FILE *dump_fp = (FILE *)0;  /**< file pointer for text dumps */
 FILE *html_dump_fp = (FILE *)0;  /**< file pointer for html dumps */
 /* TODO:
- * - escape unmasked characters in html
+ * - escape unmasked characters in html (done for map)
  * - tables for skills and spells
  * - menucolors for items?
  * - started/ended date at the top
@@ -229,6 +229,26 @@ const char *title;
 	dump_html("<link rel=\"stylesheet\" type=\"text/css\" href=\"unnethack_dump.css\" />\n", "");
 	dump_html("</head>\n", "");
 	dump_html("<body>\n", "");
+}
+
+static char html_escape_buf[BUFSZ];
+/** Escape a single character for HTML. */
+char* html_escape_character(const char c) {
+	switch (c) {
+		case '<':
+			return "&lt;";
+		case '>':
+			return "&gt;";
+		case '&':
+			return "&amp;";
+		case '\"':
+			return "&quot;";
+		case '\'':
+			return "&#39;"; /* not &apos; */
+		default:
+			sprintf(html_escape_buf, "%c", c);
+			return html_escape_buf;
+	}
 }
 
 /*dump.c*/
