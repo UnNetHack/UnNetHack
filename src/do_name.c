@@ -1041,6 +1041,8 @@ static const char * const bogusmons[] = {
 	"orcus cosmicus",			/* Radomir Dopieralski */
 	"Greater Hell Beast",			/* Angband */
 	"Vendor of Yizard",			/* Souljazz */
+	"Sigmund", "lernaean hydra", "Ijyb",
+	"Gloorx Vloq", "Blork the orc",		/* Dungeon Crawl Stone Soup */
 };
 
 
