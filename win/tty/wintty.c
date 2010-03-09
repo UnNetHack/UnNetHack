@@ -1190,9 +1190,9 @@ invert_all(window, page_start, page_end, acc)
 }
 
 #ifdef MENU_COLOR
-STATIC_OVL boolean
+boolean
 get_menu_coloring(str, color, attr)
-char *str;
+const char *str;
 int *color, *attr;
 {
     struct menucoloring *tmpmc;

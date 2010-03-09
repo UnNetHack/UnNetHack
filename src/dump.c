@@ -121,18 +121,30 @@ const char *pre, *str;
 #endif
 }
 
+#ifdef MENU_COLOR
+extern boolean get_menu_coloring(const char *str, int *color, int *attr);
+#endif
+
 /** Dumps an object from the inventory. */
 void
-dump_object(c, color, str)
+dump_object(c, str)
 const char c;
-const int color;
 const char *str;
 {
 #ifdef DUMP_LOG
-  if (dump_fp)
-    fprintf(dump_fp, "  %c - %s\n", c, str);
-  if (html_dump_fp)
-    fprintf(html_dump_fp, "<span class=\"nh_item_letter\">%c</span> - <span class=\"nh%d\">%s</span><br />\n", c, color, str);
+	if (dump_fp)
+		fprintf(dump_fp, "  %c - %s\n", c, str);
+	if (html_dump_fp) {
+#ifdef MENU_COLOR
+		int color;
+		int attr;
+		if (iflags.use_menu_color &&
+		    get_menu_coloring(str, &color, &attr)) {
+			fprintf(html_dump_fp, "<span class=\"nh_color_%d\"><span class=\"nh_item_letter\">%c</span> - %s</span><br />\n", color, c, str);
+		} else
+#endif
+		fprintf(html_dump_fp, "<span class=\"nh_item_letter\">%c</span> - %s<br />\n", c, str);
+	}
 #endif
 }
 

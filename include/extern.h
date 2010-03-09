@@ -485,6 +485,7 @@ E void FDECL(dump_header_html, (const char *));
 E void FDECL(dump_html, (const char *, const char *));
 E void NDECL(dump_init);
 E void NDECL(dump_exit);
+E void FDECL(dump_object, (const char, const char *));
 E void FDECL(dump_title, (char *));
 E void FDECL(dump_subtitle, (const char *));
 E void FDECL(dump_line, (const char *, const char *));

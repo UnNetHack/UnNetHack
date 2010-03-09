@@ -1874,7 +1874,7 @@ nextclass:
 			    {
 			      char letbuf[7];
 			      sprintf(letbuf, "  %c - ", ilet);
-			      dump_object(ilet, objects[otmp->otyp].oc_color, doname(otmp));
+			      dump_object(ilet, doname(otmp));
 			    }
 			    if (want_disp)
 			    add_menu(win, obj_to_glyph(otmp),
