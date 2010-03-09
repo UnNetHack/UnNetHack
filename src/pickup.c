@@ -636,31 +636,34 @@ menu_item **pick_list;	/* list of objects and counts to pick up */
 	const char *otypes = flags.pickup_types;
 
 	/* first count the number of eligible items */
-	for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow))
-
-
+	for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow)) {
 #ifndef AUTOPICKUP_EXCEPTIONS
-	    if (!*otypes || index(otypes, curr->oclass) ||
-	        (flags.pickup_thrown && curr->was_thrown))
+	    if ((!*otypes || index(otypes, curr->oclass) ||
+	         (flags.pickup_thrown && curr->was_thrown)) &&
+	        (flags.pickup_dropped || !curr->was_dropped))
 #else
 	    if ((!*otypes || index(otypes, curr->oclass) ||
 	         (flags.pickup_thrown && curr->was_thrown) ||
 		 is_autopickup_exception(curr, TRUE)) &&
-	    	 !is_autopickup_exception(curr, FALSE))
+	        ((flags.pickup_dropped || !curr->was_dropped) &&
+	    	 !is_autopickup_exception(curr, FALSE)))
 #endif
 		n++;
+	}
 
 	if (n) {
 	    *pick_list = pi = (menu_item *) alloc(sizeof(menu_item) * n);
 	    for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow))
 #ifndef AUTOPICKUP_EXCEPTIONS
-		if (!*otypes || index(otypes, curr->oclass) ||
-		    (flags.pickup_thrown && curr->was_thrown)) {
+		if ((!*otypes || index(otypes, curr->oclass) ||
+	             (flags.pickup_thrown && curr->was_thrown)) &&
+	            (flags.pickup_dropped || !curr->was_dropped)) {
 #else
 	    if ((!*otypes || index(otypes, curr->oclass) ||
-		       (flags.pickup_thrown && curr->was_thrown) ||
+		 (flags.pickup_thrown && curr->was_thrown) ||
 		 is_autopickup_exception(curr, TRUE)) &&
-	    	 !is_autopickup_exception(curr, FALSE)) {
+	        ((flags.pickup_dropped || !curr->was_dropped) &&
+	    	 !is_autopickup_exception(curr, FALSE))) {
 #endif
 		    pi[n].item.a_obj = curr;
 		    pi[n].count = curr->quan;

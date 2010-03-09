@@ -351,6 +351,7 @@ struct obj *obj;
 	    panic("addinv: obj not free (%d)", obj->where);
 	obj->no_charge = 0;	/* not meaningful for invent */
 	obj->was_thrown = 0;
+	obj->was_dropped = 0;
 
 	addinv_core1(obj);
 #ifndef GOLDOBJ

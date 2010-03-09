@@ -64,6 +64,7 @@ struct flag {
 #endif
 	boolean  perm_invent;	/* keep full inventories up until dismissed */
 	boolean  pickup;	/* whether you pickup or move and look */
+	boolean  pickup_dropped;	/* don't auto-pickup items you dropped */
 	boolean  pickup_thrown;		/* auto-pickup items you threw */
 
 	boolean  pushweapon;	/* When wielding, push old weapon into second slot */

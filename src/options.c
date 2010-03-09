@@ -166,6 +166,7 @@ static struct Bool_Opt
 	{"paranoid_remove", &iflags.paranoid_remove, FALSE, SET_IN_FILE},
 #endif
 	{"perm_invent", &flags.perm_invent, FALSE, SET_IN_GAME},
+	{"pickup_dropped", &flags.pickup_dropped, FALSE, SET_IN_GAME},
 	{"pickup_thrown", &flags.pickup_thrown, TRUE, SET_IN_GAME},
 	{"popup_dialog",  &iflags.wc_popup_dialog, FALSE, SET_IN_GAME},	/*WC*/
 	{"prayconfirm", &flags.prayconfirm, TRUE, SET_IN_GAME},
@@ -2927,7 +2928,7 @@ doset()
 			!wc2_supported(boolopt[i].name)) continue;
 		    any.a_int = (pass == 0) ? 0 : i + 1;
 		    if (!iflags.menu_tab_sep)
-			Sprintf(buf, "%s%-13s [%s]",
+			Sprintf(buf, "%s%-14s [%s]",
 			    pass == 0 ? "    " : "",
 			    boolopt[i].name, *bool_p ? "true" : "false");
  		    else

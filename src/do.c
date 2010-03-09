@@ -579,6 +579,8 @@ register struct obj *obj;
 		setuswapwep((struct obj *)0);
 	}
 
+	obj->was_dropped = TRUE;
+
 	if (u.uswallow) {
 		/* barrier between you and the floor */
 		if(flags.verbose)
