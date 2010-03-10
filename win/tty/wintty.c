@@ -1579,12 +1579,16 @@ struct WinDesc *cw;
 	}
     }
     if (i == cw->maxrow) {
+	char *msave;
 	tty_curs(BASE_WINDOW, (int)cw->offx + 1,
 		 (cw->type == NHW_TEXT) ? (int) ttyDisplay->rows - 1 : n);
 	cl_end();
+	msave = cw->morestr;
+	cw->morestr = "--End--";
 	dmore(cw, quitchars);
 	if (morc == '\033')
 	    cw->flags |= WIN_CANCELLED;
+	cw->morestr = msave;
     }
 }
 
