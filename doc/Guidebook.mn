@@ -2084,6 +2084,10 @@ compile time option AUTOPICKUP_EXCEPTIONS included, you may be able to use
 configuration file lines to further refine
 .op autopickup
 behavior.
+.lp pilesize
+Allows setting the number of items that trigger the "Things that are here".
+The minimum value allowed is 1, which will tell you about one object
+and will never give you the "Things that are here" list. 
 .lp prayconfirm
 Prompt for confirmation before praying (default on).
 .lp pushweapon

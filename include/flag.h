@@ -325,6 +325,7 @@ struct instance_flags {
 	boolean  travelcmd;	/* allow travel command */
 	boolean  show_dgn_name; /* show dungeon names instead of Dlvl: on bottom line */
 	int	 runmode;	/* update screen display during run moves */
+	int	 pilesize;	/* how many items to list automatically */
 #ifdef AUTOPICKUP_EXCEPTIONS
 	struct autopickup_exception *autopickup_exceptions[2];
 #define AP_LEAVE 0
