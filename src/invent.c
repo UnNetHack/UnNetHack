@@ -2376,7 +2376,7 @@ boolean picked_some;
 #ifdef INVISIBLE_OBJECTS
 	    if (otmp->oinvis && !See_invisible) verb = "feel";
 #endif
-	    You("%s here %s.", verb, doname(otmp));
+	    You("%s here %s.", verb, doname_with_price(otmp));
 	    if (otmp->otyp == CORPSE) feel_cockatrice(otmp, FALSE);
 	} else {
 	    display_nhwindow(WIN_MESSAGE, FALSE);
@@ -2396,7 +2396,7 @@ boolean picked_some;
 			putstr(tmpwin, 0, buf);
 			break;
 		}
-		putstr(tmpwin, 0, doname(otmp));
+		putstr(tmpwin, 0, doname_with_price(otmp));
 	    }
 	    display_nhwindow(tmpwin, TRUE);
 	    destroy_nhwindow(tmpwin);
