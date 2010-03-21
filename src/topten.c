@@ -101,10 +101,6 @@ NEARDATA const char * const killed_by_prefix[] = {
 
 static winid toptenwin = WIN_ERR;
 
-#ifdef RECORD_START_END_TIME
-static time_t deathtime = 0L;
-#endif
-
 STATIC_OVL void
 topten_print(x)
 const char *x;
@@ -332,7 +328,7 @@ struct toptenentry *tt;
 
 #ifdef RECORD_START_END_TIME
   (void)fprintf(rfile, SEP "starttime=%ld", (long)u.ubirthday);
-  (void)fprintf(rfile, SEP "endtime=%ld", (long)deathtime);
+  (void)fprintf(rfile, SEP "endtime=%ld", (long)u.udeathday);
 #endif
 
 #ifdef RECORD_GENDER0
@@ -461,21 +457,7 @@ int how;
 			break;
 	}
 	t0->birthdate = yyyymmdd(u.ubirthday);
-
-#ifdef RECORD_START_END_TIME
-	/* Make sure that deathdate and deathtime refer to the same time; it
-	 * wouldn't be good to have deathtime refer to the day after deathdate. */
-
-#if defined(BSD) && !defined(POSIX_TYPES)
-	(void) time((long *)&deathtime);
-#else
-	(void) time(&deathtime);
-#endif
-
-	t0->deathdate = yyyymmdd(deathtime);
-#else
-	t0->deathdate = yyyymmdd((time_t)0L);
-#endif /* RECORD_START_END_TIME */
+	t0->deathdate = yyyymmdd(u.udeathday);
 
 	t0->tt_next = 0;
 #ifdef UPDATE_RECORD_IN_PLACE

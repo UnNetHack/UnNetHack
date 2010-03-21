@@ -666,6 +666,15 @@ die:
 	program_state.gameover = 1;
 	/* in case of a subsequent panic(), there's no point trying to save */
 	program_state.something_worth_saving = 0;
+
+	/* record time of death */
+#if defined(BSD) && !defined(POSIX_TYPES)
+	(void) time((long *)&u.udeathday);
+#else
+	(void) time(&u.udeathday);
+#endif
+
+
 #ifdef DUMP_LOG
 	/* D: Grab screen dump right here */
 	if (dump_fn[0]) {
@@ -841,6 +850,17 @@ die:
 	done_money = umoney;
 #endif
 
+#define DUMP_DATE_FORMAT "%Y-%m-%d %H:%M:%S"
+	dump_title("Game information");
+	dump_line("  Started: ", get_formatted_time(u.ubirthday, DUMP_DATE_FORMAT));
+	dump_line("  Ended:   ", get_formatted_time(u.udeathday, DUMP_DATE_FORMAT));
+#ifdef RECORD_REALTIME
+	Sprintf(pbuf, "  Play time: %ld:%2.2ld", realtime_data.realtime / 3600, 
+			(realtime_data.realtime % 3600) / 60);
+#endif
+	dump_line(pbuf,"");
+	dump("", "");
+
 	/* clean up unneeded windows */
 	if (have_windows) {
 	    wait_synch();
@@ -879,7 +899,6 @@ die:
 	    putstr(endwin, 0, pbuf);
 	    putstr(endwin, 0, "");
 	}
-	dump_line("","");
 	dump_blockquote_start();
 	dump_line("", pbuf);
 
