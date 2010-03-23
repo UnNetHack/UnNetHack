@@ -1992,7 +1992,7 @@ Allows you to change the way recalled messages are displayed.
 The possible values are:
 .sd
 .si
-s - single message (default, this was the behavior before 3.4.0).
+s - single message
 c - combination, two messages as `single', then as `full'.
 f - full window, oldest message first.
 r - full window, newest message first.
