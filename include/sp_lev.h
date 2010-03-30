@@ -106,8 +106,14 @@
 #define SPO_MON_GENERATION	48
 #define SPO_END_MONINVENT	49
 #define SPO_GRAVE		50
+#define SPO_FRAME_PUSH		51
+#define SPO_FRAME_POP		52
+#define SPO_CALL		53
+#define SPO_RETURN		54
+#define SPO_INITLEVEL		55
+#define SPO_LEVEL_FLAGS		56
 
-#define MAX_SP_OPCODES		51
+#define MAX_SP_OPCODES		57
 
 
 /* MONSTER and OBJECT can take a variable number of parameters,
@@ -177,9 +183,32 @@ struct opvar {
 struct splevstack {
     long depth;
     long depth_alloc;
-    struct opvar *stackdata;
+    struct opvar **stackdata;
 };
 
+
+struct sp_frame {
+    struct sp_frame *next;
+    struct splevstack *stack;
+    long n_opcode;
+};
+
+
+struct sp_coder {
+    struct splevstack *stack;
+    struct sp_frame *frame;
+    int allow_flips;
+    int premapped;
+    struct mkroom *croom;
+    struct mkroom *tmproomlist[MAX_NESTED_ROOMS+1];
+    boolean failed_room[MAX_NESTED_ROOMS+1];
+    int n_subroom;
+    boolean exit_script;
+    int  lvl_is_joined;
+
+    int opcode;  /* current opcode */
+    struct opvar *opdat; /* current push data (req. opcode == SPO_PUSH) */
+};
 
 /* special level coder CPU flags */
 #define SP_CPUFLAG_LT	1
@@ -219,7 +248,6 @@ typedef struct {
 	xchar	lit, walled;
 	long	flags;
 	schar	filling;
-	long	n_opcodes;
 } lev_init;
 
 typedef struct {
@@ -357,18 +385,27 @@ typedef struct {
 } corridor;
 
 typedef struct {
-	int opcode;
-	genericptr_t opdat;
+    int opcode;
+    struct opvar *opdat;
 } _opcode;
 
 typedef struct {
-	lev_init init_lev;
-	_opcode	 *opcodes;
+    _opcode  *opcodes;
+    long     n_opcodes;
 } sp_lev;
 
 typedef struct {
 	xchar x, y, direction, count, lit;
 	char typ;
 } spill;
+
+
+/* only used by lev_comp */
+
+struct lc_funcdefs {
+    struct lc_funcdefs *next;
+    char *name;
+    long addr;
+};
 
 #endif /* SP_LEV_H */

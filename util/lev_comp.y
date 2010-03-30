@@ -63,6 +63,10 @@ extern struct opvar *FDECL(set_opvar_int, (struct opvar *, long));
 extern struct opvar *FDECL(set_opvar_str, (struct opvar *, char *));
 extern void VDECL(add_opvars, (sp_lev *, const char *, ...));
 
+extern struct lc_funcdefs *FDECL(funcdef_new,(long,char *));
+extern void FDECL(funcdef_free_all,(struct lc_funcdefs *));
+extern struct lc_funcdefs *FDECL(funcdef_defined,(struct lc_funcdefs *,char *, int));
+
 static struct reg {
 	int x1, y1;
 	int x2, y2;
@@ -87,7 +91,6 @@ static struct opvar *if_list[MAX_NESTED_IFS];
 static short n_olist = 0, n_mlist = 0, n_plist = 0, n_if_list = 0;
 static short on_olist = 0, on_mlist = 0, on_plist = 0;
 
-static long lev_flags;
 
 unsigned int max_x_map, max_y_map;
 int obj_containment = 0;
@@ -100,6 +103,11 @@ static int switch_case_value[MAX_SWITCH_CASES];
 int n_switch_case_list = 0;
 static struct opvar *switch_break_list[MAX_SWITCH_BREAKS];
 int n_switch_break_list = 0;
+
+
+
+static struct lc_funcdefs *function_definitions = NULL;
+int in_function_definition = 0;
 
 
 extern int fatal_error;
@@ -142,13 +150,15 @@ extern const char *fname;
 %token	<i> PARALYZED_ID STUNNED_ID CONFUSED_ID SEENTRAPS_ID ALL_ID
 %token	<i> MON_GENERATION_ID
 %token	<i> GRAVE_ID
+%token	<i> FUNCTION_ID
 %token	<i> ',' ':' '(' ')' '[' ']' '{' '}'
 %token	<map> STRING MAP_ID
+%token	<map> NQSTRING
 %type	<i> h_justif v_justif trap_name room_type door_state light_state
 %type	<i> alignment altar_type a_register roomfill door_pos
 %type	<i> door_wall walled secret amount chance
 %type	<i> dir_list
-%type	<i> engraving_type flags flag_list prefilled lev_region lev_init
+%type	<i> engraving_type flag_list prefilled lev_region
 %type	<i> monster monster_c m_register object object_c o_register
 %type	<i> comparestmt
 %type	<i> seen_trap_mask
@@ -174,8 +184,6 @@ level		: level_def flags lev_init levstatements
 				"%s : %d errors detected. No output created!\n",
 					fname, fatal_error);
 			} else {
-			        splev.init_lev.init_style = (xchar) $3;
-				splev.init_lev.flags = (long) $2;
 				if (!write_level_file($1, &splev)) {
 				    yyerror("Can't write output file!!");
 				    exit(EXIT_FAILURE);
@@ -192,58 +200,55 @@ level_def	: LEVEL_ID ':' string
 			if ((int) strlen($3) > 8)
 			    yyerror("Level names limited to 8 characters.");
 			n_plist = n_mlist = n_olist = 0;
+			funcdef_free_all(function_definitions); function_definitions = NULL;
+			splev.n_opcodes = 0;
+			splev.opcodes = NULL;
 			$$ = $3;
 		  }
 		;
 
 lev_init	: /* nothing */
 		  {
-			$$ = LVLINIT_NONE;
+		      add_opvars(&splev, "iiiiiiiio", LVLINIT_NONE,0,0,0, 0,0,0,0, SPO_INITLEVEL);
 		  }
 		| LEV_INIT_ID ':' SOLID_FILL_ID ',' CHAR opt_lit_state
 		  {
-		      splev.init_lev.filling = what_map_char((char) $5);
-		      if (splev.init_lev.filling == INVALID_TYPE ||
-			  splev.init_lev.filling >= MAX_TYPE)
-			    yyerror("INIT_MAP: Invalid fill char type.");
-		      splev.init_lev.lit = $6;
-		      $$ = LVLINIT_SOLIDFILL;
+		      char filling = what_map_char((char) $5);
+		      if (filling == INVALID_TYPE || filling >= MAX_TYPE)
+			  yyerror("INIT_MAP: Invalid fill char type.");
+		      add_opvars(&splev, "iiiiiiiio", LVLINIT_SOLIDFILL,filling,0,$6, 0,0,0,0, SPO_INITLEVEL);
 		      max_x_map = COLNO-1;
 		      max_y_map = ROWNO;
 		  }
 		| LEV_INIT_ID ':' MAZE_GRID_ID ',' CHAR
 		  {
-		      splev.init_lev.filling = what_map_char((char) $5);
-		      if (splev.init_lev.filling == INVALID_TYPE ||
-			  splev.init_lev.filling >= MAX_TYPE)
-			    yyerror("INIT_MAP: Invalid fill char type.");
-		      $$ = LVLINIT_MAZEGRID;
+		      char filling = what_map_char((char) $5);
+		      if (filling == INVALID_TYPE || filling >= MAX_TYPE)
+			  yyerror("INIT_MAP: Invalid fill char type.");
+		      add_opvars(&splev, "iiiiiiiio", LVLINIT_MAZEGRID,filling,0,0, 0,0,0,0, SPO_INITLEVEL);
 		      max_x_map = COLNO-1;
 		      max_y_map = ROWNO;
 		  }
 		| LEV_INIT_ID ':' MINES_ID ',' CHAR ',' CHAR ',' BOOLEAN ',' BOOLEAN ',' light_state ',' walled opt_fillchar
 		  {
-			splev.init_lev.fg = what_map_char((char) $5);
-			if (splev.init_lev.fg == INVALID_TYPE ||
-			  splev.init_lev.filling >= MAX_TYPE)
-			    yyerror("INIT_MAP: Invalid foreground type.");
-			splev.init_lev.bg = what_map_char((char) $7);
-			if (splev.init_lev.bg == INVALID_TYPE ||
-			  splev.init_lev.filling >= MAX_TYPE)
-			    yyerror("INIT_MAP: Invalid background type.");
-			splev.init_lev.smoothed = $9;
-			splev.init_lev.joined = $11;
-			if (splev.init_lev.joined &&
-			    splev.init_lev.fg != CORR && splev.init_lev.fg != ROOM)
-			    yyerror("INIT_MAP: Invalid foreground type for joined map.");
-			splev.init_lev.lit = $13;
-			splev.init_lev.walled = $15;
+		      char fg = what_map_char((char) $5);
+		      char bg = what_map_char((char) $7);
+		      int smoothed = $9;
+		      int joined = $11;
+		      int lit = $13;
+		      int walled = $15;
+		      char filling = $<i>16;
+		      if (fg == INVALID_TYPE || fg >= MAX_TYPE)
+			  yyerror("INIT_MAP: Invalid foreground type.");
+		      if (bg == INVALID_TYPE || bg >= MAX_TYPE)
+			  yyerror("INIT_MAP: Invalid background type.");
+		      if (joined && fg != CORR && fg != ROOM)
+			  yyerror("INIT_MAP: Invalid foreground type for joined map.");
 
-			splev.init_lev.filling = $<i>16;
-			if (splev.init_lev.filling == INVALID_TYPE)
-			    yyerror("INIT_MAP: Invalid fill char type.");
+		      if (filling == INVALID_TYPE)
+			  yyerror("INIT_MAP: Invalid fill char type.");
 
-			$$ = LVLINIT_MINES;
+		      add_opvars(&splev, "iiiiiiiio", LVLINIT_MINES,filling,walled,lit, joined,smoothed,bg,fg, SPO_INITLEVEL);
 			max_x_map = COLNO-1;
 			max_y_map = ROWNO;
 		  }
@@ -266,22 +271,21 @@ walled		: BOOLEAN
 
 flags		: /* nothing */
 		  {
-			$$ = 0;
+		      add_opvars(&splev, "io", 0, SPO_LEVEL_FLAGS);
 		  }
 		| FLAGS_ID ':' flag_list
 		  {
-			$$ = lev_flags;
-			lev_flags = 0;	/* clear for next user */
+		      add_opvars(&splev, "io", (long)$<i>3, SPO_LEVEL_FLAGS);
 		  }
 		;
 
 flag_list	: FLAG_TYPE ',' flag_list
 		  {
-			lev_flags |= $1;
+		      $<i>$ = ($<i>1 | $<i>3);
 		  }
 		| FLAG_TYPE
 		  {
-			lev_flags |= $1;
+		      $<i>$ = $<i>1;
 		  }
 		;
 
@@ -305,6 +309,8 @@ levstatement 	: message
 		| loopstatement
 		| ifstatement
 		| exitstatement
+		| function_define
+		| function_call
 		| init_reg
 		| ladder_detail
 		| map_definition
@@ -330,6 +336,50 @@ levstatement 	: message
 		| teleprt_region
 		| trap_detail
 		| wallify_detail
+		;
+
+function_define	: FUNCTION_ID NQSTRING '(' ')'
+		  {
+		      struct opvar *jmp = New(struct opvar);
+		      struct lc_funcdefs *funcdef;
+
+		      if (in_function_definition)
+			  yyerror("Recursively defined functions not allowed.");
+
+		      in_function_definition++;
+
+		      set_opvar_int(jmp, -1);
+		      if_list[n_if_list++] = jmp;
+		      add_opcode(&splev, SPO_PUSH, jmp);
+		      add_opcode(&splev, SPO_JMP, NULL);
+
+		      if (funcdef_defined(function_definitions, $2, 1))
+			  yyerror("Function already defined once.");
+
+		      funcdef = funcdef_new(splev.n_opcodes, $2);
+		      funcdef->next = function_definitions;
+		      function_definitions = funcdef;
+		  }
+		'{' levstatements '}'
+		  {
+		      struct opvar *jmp = if_list[--n_if_list];
+		      add_opvars(&splev, "io", 0, SPO_RETURN);
+		      set_opvar_int(jmp, splev.n_opcodes);
+
+		      in_function_definition--;
+		  }
+		;
+
+function_call	: NQSTRING '(' ')'
+		  {
+		      struct lc_funcdefs *tmpfunc;
+		      tmpfunc = funcdef_defined(function_definitions, $1, 1);
+		      if (tmpfunc) {
+			  add_opvars(&splev, "iio", 0, tmpfunc->addr, SPO_CALL);
+		      } else {
+			  yyerror("No such function defined.");
+		      }
+		  }
 		;
 
 exitstatement	: EXIT_ID
@@ -380,7 +430,7 @@ switchstatement	: SWITCH_ID '[' INTEGER ']'
 		      add_opcode(&splev, SPO_PUSH, endjump);
 		      add_opcode(&splev, SPO_JMP, NULL);
 
-		      set_opvar_int(switch_check_jump, splev.init_lev.n_opcodes);
+		      set_opvar_int(switch_check_jump, splev.n_opcodes);
 
 		      for (i = 0; i < n_switch_case_list; i++) {
 			  add_opvars(&splev, "oio", SPO_COPY, switch_case_value[i], SPO_CMP);
@@ -393,10 +443,10 @@ switchstatement	: SWITCH_ID '[' INTEGER ']'
 			  add_opcode(&splev, SPO_JMP, NULL);
 		      }
 
-		      set_opvar_int(endjump, splev.init_lev.n_opcodes);
+		      set_opvar_int(endjump, splev.n_opcodes);
 
 		      for (i = 0; i < n_switch_break_list; i++) {
-			  set_opvar_int(switch_break_list[i], splev.init_lev.n_opcodes);
+			  set_opvar_int(switch_break_list[i], splev.n_opcodes);
 		      }
 
 		      add_opcode(&splev, SPO_POP, NULL); /* get rid of the value in stack */
@@ -414,7 +464,7 @@ switchcase	: CASE_ID INTEGER ':'
 		  {
 		      if (n_switch_case_list < MAX_SWITCH_CASES) {
 			  struct opvar *tmppush = New(struct opvar);
-			  set_opvar_int(tmppush, splev.init_lev.n_opcodes);
+			  set_opvar_int(tmppush, splev.n_opcodes);
 			  switch_case_value[n_switch_case_list] = $2;
 			  switch_case_list[n_switch_case_list++] = tmppush;
 		      } else yyerror("Too many cases in a switch.");
@@ -429,7 +479,7 @@ switchcase	: CASE_ID INTEGER ':'
 		      if (switch_default_case)
 			  yyerror("Switch default case already used.");
 
-		      set_opvar_int(tmppush, splev.init_lev.n_opcodes);
+		      set_opvar_int(tmppush, splev.n_opcodes);
 		      switch_default_case = tmppush;
 		  }
 		breakstatements
@@ -471,7 +521,7 @@ loopstatement	: LOOP_ID '[' INTEGER ']'
 
 		      add_opvars(&splev, "i", $3);
 
-		      set_opvar_int(tmppush, splev.init_lev.n_opcodes);
+		      set_opvar_int(tmppush, splev.n_opcodes);
 		      if_list[n_if_list++] = tmppush;
 
 		      add_opvars(&splev, "o", SPO_DEC);
@@ -520,7 +570,7 @@ if_ending	: '{' levstatements '}'
 		      if (n_if_list > 0) {
 			  struct opvar *tmppush;
 			  tmppush = (struct opvar *) if_list[--n_if_list];
-			  set_opvar_int(tmppush, splev.init_lev.n_opcodes);
+			  set_opvar_int(tmppush, splev.n_opcodes);
 		      } else yyerror("IF: Huh?!  No start address?");
 		  }
 		| '{' levstatements '}'
@@ -536,7 +586,7 @@ if_ending	: '{' levstatements '}'
 
 			  tmppush2 = (struct opvar *) if_list[--n_if_list];
 
-			  set_opvar_int(tmppush2, splev.init_lev.n_opcodes);
+			  set_opvar_int(tmppush2, splev.n_opcodes);
 			  if_list[n_if_list++] = tmppush;
 		      } else yyerror("IF: Huh?!  No else-part address?");
 		  }
@@ -545,7 +595,7 @@ if_ending	: '{' levstatements '}'
 		      if (n_if_list > 0) {
 			  struct opvar *tmppush;
 			  tmppush = (struct opvar *) if_list[--n_if_list];
-			  set_opvar_int(tmppush, splev.init_lev.n_opcodes);
+			  set_opvar_int(tmppush, splev.n_opcodes);
 		      } else yyerror("IF: Huh?! No end address?");
 		  }
 		;
@@ -590,7 +640,7 @@ cobj_if_ending	: '{' cobj_statements '}'
 		      if (n_if_list > 0) {
 			  struct opvar *tmppush;
 			  tmppush = (struct opvar *) if_list[--n_if_list];
-			  set_opvar_int(tmppush, splev.init_lev.n_opcodes);
+			  set_opvar_int(tmppush, splev.n_opcodes);
 		      } else yyerror("IF: Huh?!  No start address?");
 		  }
 		| '{' cobj_statements '}'
@@ -606,7 +656,7 @@ cobj_if_ending	: '{' cobj_statements '}'
 
 			  tmppush2 = (struct opvar *) if_list[--n_if_list];
 
-			  set_opvar_int(tmppush2, splev.init_lev.n_opcodes);
+			  set_opvar_int(tmppush2, splev.n_opcodes);
 			  if_list[n_if_list++] = tmppush;
 		      } else yyerror("IF: Huh?!  No else-part address?");
 		  }
@@ -615,7 +665,7 @@ cobj_if_ending	: '{' cobj_statements '}'
 		      if (n_if_list > 0) {
 			  struct opvar *tmppush;
 			  tmppush = (struct opvar *) if_list[--n_if_list];
-			  set_opvar_int(tmppush, splev.init_lev.n_opcodes);
+			  set_opvar_int(tmppush, splev.n_opcodes);
 		      } else yyerror("IF: Huh?! No end address?");
 		  }
 		;
@@ -978,7 +1028,7 @@ monster_detail	: MONSTER_ID chance ':' monster_desc
 			  if (n_if_list > 0) {
 			      struct opvar *tmpjmp;
 			      tmpjmp = (struct opvar *) if_list[--n_if_list];
-			      set_opvar_int(tmpjmp, splev.init_lev.n_opcodes);
+			      set_opvar_int(tmpjmp, splev.n_opcodes);
 			  } else yyerror("conditional creation of monster, but no jump point marker.");
 		      }
 		  }
@@ -994,7 +1044,7 @@ monster_detail	: MONSTER_ID chance ':' monster_desc
 			 if (n_if_list > 0) {
 			     struct opvar *tmpjmp;
 			     tmpjmp = (struct opvar *) if_list[--n_if_list];
-			     set_opvar_int(tmpjmp, splev.init_lev.n_opcodes);
+			     set_opvar_int(tmpjmp, splev.n_opcodes);
 			 } else yyerror("conditional creation of monster, but no jump point marker.");
 		     }
 		 }
@@ -1153,7 +1203,7 @@ cobj_detail	: OBJECT_ID chance ':' cobj_desc
 			  if (n_if_list > 0) {
 			      struct opvar *tmpjmp;
 			      tmpjmp = (struct opvar *) if_list[--n_if_list];
-			      set_opvar_int(tmpjmp, splev.init_lev.n_opcodes);
+			      set_opvar_int(tmpjmp, splev.n_opcodes);
 			  } else yyerror("conditional creation of obj, but no jump point marker.");
 		      }
 		  }
@@ -1170,7 +1220,7 @@ cobj_detail	: OBJECT_ID chance ':' cobj_desc
 			  if (n_if_list > 0) {
 			      struct opvar *tmpjmp;
 			      tmpjmp = (struct opvar *) if_list[--n_if_list];
-			      set_opvar_int(tmpjmp, splev.init_lev.n_opcodes);
+			      set_opvar_int(tmpjmp, splev.n_opcodes);
 			  } else yyerror("conditional creation of obj, but no jump point marker.");
 		      }
 		  }
@@ -1183,7 +1233,7 @@ object_detail	: OBJECT_ID chance ':' object_desc
 			  if (n_if_list > 0) {
 			      struct opvar *tmpjmp;
 			      tmpjmp = (struct opvar *) if_list[--n_if_list];
-			      set_opvar_int(tmpjmp, splev.init_lev.n_opcodes);
+			      set_opvar_int(tmpjmp, splev.n_opcodes);
 			  } else yyerror("conditional creation of obj, but no jump point marker.");
 		      }
 		  }
@@ -1200,7 +1250,7 @@ object_detail	: OBJECT_ID chance ':' object_desc
 			 if (n_if_list > 0) {
 			     struct opvar *tmpjmp;
 			     tmpjmp = (struct opvar *) if_list[--n_if_list];
-			     set_opvar_int(tmpjmp, splev.init_lev.n_opcodes);
+			     set_opvar_int(tmpjmp, splev.n_opcodes);
 			 } else yyerror("conditional creation of obj, but no jump point marker.");
 		     }
 		 }
@@ -1338,7 +1388,7 @@ trap_detail	: TRAP_ID chance ':' trap_name ',' coordinate
 			  if (n_if_list > 0) {
 			      struct opvar *tmpjmp;
 			      tmpjmp = (struct opvar *) if_list[--n_if_list];
-			      set_opvar_int(tmpjmp, splev.init_lev.n_opcodes);
+			      set_opvar_int(tmpjmp, splev.n_opcodes);
 			  } else yyerror("conditional creation of trap, but no jump point marker.");
 		      }
 		  }
@@ -1552,7 +1602,7 @@ terrain_detail : TERRAIN_ID chance ':' coordinate ',' CHAR ',' light_state
 			 if (n_if_list > 0) {
 			     struct opvar *tmpjmp;
 			     tmpjmp = (struct opvar *) if_list[--n_if_list];
-			     set_opvar_int(tmpjmp, splev.init_lev.n_opcodes);
+			     set_opvar_int(tmpjmp, splev.n_opcodes);
 			 } else yyerror("conditional terrain modification, but no jump point marker.");
 		     }
 		 }
@@ -1581,7 +1631,7 @@ terrain_detail : TERRAIN_ID chance ':' coordinate ',' CHAR ',' light_state
 			 if (n_if_list > 0) {
 			     struct opvar *tmpjmp;
 			     tmpjmp = (struct opvar *) if_list[--n_if_list];
-			     set_opvar_int(tmpjmp, splev.init_lev.n_opcodes);
+			     set_opvar_int(tmpjmp, splev.n_opcodes);
 			 } else yyerror("conditional terrain modification, but no jump point marker.");
 		     }
 		 }
@@ -1601,7 +1651,7 @@ terrain_detail : TERRAIN_ID chance ':' coordinate ',' CHAR ',' light_state
 			 if (n_if_list > 0) {
 			     struct opvar *tmpjmp;
 			     tmpjmp = (struct opvar *) if_list[--n_if_list];
-			     set_opvar_int(tmpjmp, splev.init_lev.n_opcodes);
+			     set_opvar_int(tmpjmp, splev.n_opcodes);
 			 } else yyerror("conditional terrain modification, but no jump point marker.");
 		     }
 		 }

@@ -156,6 +156,7 @@ SWITCH		return SWITCH_ID;
 CASE		return CASE_ID;
 BREAK		return BREAK_ID;
 DEFAULT		return DEFAULT_ID;
+FUNCTION	return FUNCTION_ID;
 levregion	return LEV;
 quantity	return QUANTITY_ID;
 buried		return BURIED_ID;
@@ -251,6 +252,9 @@ graveyard	{ yylval.i=GRAVEYARD; return FLAG_TYPE; }
 		  yylval.map = (char *) alloc(strlen(yytext+1)+1);
 		  Strcpy(yylval.map, yytext+1); /* Discard the first \" */
 		  return STRING; }
+[a-zA-Z_][a-zA-Z_0-9]*	{ yylval.map = (char *) alloc(strlen(yytext)+1);
+		  Strcpy(yylval.map, yytext);
+		  return NQSTRING; }
 \r?\n		{ line_number++; }
 [ \t]+		;
 '\\.'		{ yylval.i = yytext[2]; return CHAR; }

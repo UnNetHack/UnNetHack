@@ -1711,6 +1711,7 @@ E const char *NDECL(ldrname);
 E boolean FDECL(is_quest_artifact, (struct obj*));
 E void FDECL(com_pager, (int));
 E void FDECL(qt_pager, (int));
+E char *FDECL(string_subst, (char *));
 E void FDECL(qt_com_firstline, (int, char*));
 
 /* ### random.c ### */
