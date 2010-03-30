@@ -36,7 +36,9 @@ NON_DIGGABLE:(00,00,75,19)
 BRANCH:(08,16,08,16),(0,0,0,0)
 #   Throne room, with Croesus on the throne
 REGION:(37,08,46,11),lit,"throne"
-MONSTER:'@',"Croesus",(43,10),hostile
+MONSTER:'@',"Croesus",(43,10),hostile {
+  OBJECT:')',"two-handed sword"
+}
 #   The Vault
 #   Using unfilled morgue for
 #   identification in mkmaze.c

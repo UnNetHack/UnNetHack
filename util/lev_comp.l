@@ -154,6 +154,7 @@ LOOP		return LOOP_ID;
 SWITCH		return SWITCH_ID;
 CASE		return CASE_ID;
 BREAK		return BREAK_ID;
+DEFAULT		return DEFAULT_ID;
 levregion	return LEV;
 quantity	return QUANTITY_ID;
 buried		return BURIED_ID;

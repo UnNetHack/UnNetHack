@@ -401,9 +401,6 @@ register struct monst *mtmp;
 			(void)mongets(mtmp, BULLWHIP);
 			(void)mongets(mtmp, BROADSWORD);
 			break;
-		    case PM_ORCUS:
-			(void)mongets(mtmp, WAN_DEATH); /* the Wand of Orcus */
-			break;
 		    case PM_HORNED_DEVIL:
 			(void)mongets(mtmp, rn2(4) ? TRIDENT : BULLWHIP);
 			break;
@@ -648,9 +645,6 @@ register struct	monst	*mtmp;
 		   have AT_WEAP so m_initweap() is not called for them */
 		if (ptr == &mons[PM_ICE_DEVIL] && !rn2(4)) {
 			(void)mongets(mtmp, SPEAR);
-		} else if (ptr == &mons[PM_ASMODEUS]) {
-			(void)mongets(mtmp, WAN_COLD);
-			(void)mongets(mtmp, WAN_FIRE);
 		}
 		break;
 	    case S_HUMANOID:
@@ -1036,14 +1030,8 @@ register int	mmflags;
 		flags.ghost_count++;
 		if (!(mmflags & MM_NONAME))
 			mtmp = christen_monst(mtmp, rndghostname());
-	} else if (mndx == PM_VLAD_THE_IMPALER) {
-		mitem = CANDELABRUM_OF_INVOCATION;
-	} else if (mndx == PM_CROESUS) {
-		mitem = TWO_HANDED_SWORD;
 	} else if (ptr->msound == MS_NEMESIS) {
 		mitem = BELL_OF_OPENING;
-	} else if (mndx == PM_PESTILENCE) {
-		mitem = POT_SICKNESS;
 	}
 	if (mitem && allow_minvent) (void) mongets(mtmp, mitem);
 

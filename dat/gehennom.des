@@ -524,7 +524,9 @@ OBJECT:random,random,random
 OBJECT:random,random,random
 OBJECT:random,random,random
 # The resident nasty
-MONSTER:'&',"Orcus",(33,15)
+MONSTER:'&',"Orcus",(33,15) {
+  OBJECT:'/',"death"
+}
 # And its preferred companions
 MONSTER:'Z',"human zombie",(32,15)
 MONSTER:' ',"shade",(32,14)
@@ -655,7 +657,9 @@ OBJECT:random,random,random
 OBJECT:random,random,random
 OBJECT[50%]:random,random,random
 # The resident nasty
-MONSTER:'&',"Orcus",(71,04)
+MONSTER:'&',"Orcus",(71,04) {
+  OBJECT:'/',"death"
+}
 # And its preferred companions
 MONSTER:'Z',"human zombie",(69,03)
 MONSTER:' ',"shade",(67,06)
@@ -758,7 +762,10 @@ NON_DIGGABLE:(00,00,20,11)
 # Entire main area
 REGION:(01,01,20,10),unlit,"ordinary"
 # The fellow in residence
-MONSTER:'&',"Asmodeus",(12,07)
+MONSTER:'&',"Asmodeus",(12,07) {
+  OBJECT:'/',"cold"
+  OBJECT:'/',"fire"
+}
 # Some random weapons and armor.
 OBJECT:'[',random,random
 OBJECT:'[',random,random
@@ -879,7 +886,10 @@ REGION:(25,07,29,10),unlit,"lemurepit"
 REGION:(48,03,58,09),lit,"ordinary"
 REGION:(06,15,16,18),lit,"ordinary"
 # The fellow in residence
-MONSTER:'&',"Asmodeus",(11,16)
+MONSTER:'&',"Asmodeus",(11,16) {
+  OBJECT:'/',"cold"
+  OBJECT:'/',"fire"
+}
 # His close friends
 MONSTER:'&',"marilith",(08,16),asleep
 MONSTER:'&',"marilith",(09,17),asleep

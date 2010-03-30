@@ -22,7 +22,9 @@ MAP
 ENDMAP
 LADDER:(11,05),down
 # The lord and his court
-MONSTER:'V',"Vlad the Impaler",(06,05)
+MONSTER:'V',"Vlad the Impaler",(06,05) {
+  OBJECT:'(',"Candelabrum of Invocation"
+}
 MONSTER:'V',random,(03,09)
 MONSTER:'V',random,(07,09)
 MONSTER:'V',random,(11,09)

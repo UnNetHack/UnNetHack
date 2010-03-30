@@ -104,8 +104,9 @@
 #define SPO_JNE			47
 
 #define SPO_MON_GENERATION	48
+#define SPO_END_MONINVENT	49
 
-#define MAX_SP_OPCODES		49
+#define MAX_SP_OPCODES		50
 
 
 /* MONSTER and OBJECT can take a variable number of parameters,
@@ -240,6 +241,7 @@ typedef struct {
 	schar peaceful, asleep;
         short female, invis, cancelled, revived, avenge, fleeing, blinded, paralyzed, stunned, confused;
         long seentraps;
+	short has_invent;
 } monster;
 
 typedef struct {

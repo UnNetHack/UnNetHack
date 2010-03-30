@@ -546,7 +546,9 @@ MONSTER:'@',"aligned priest",(19,09),noalign,hostile
 MONSTER:'@',"aligned priest",(19,10),noalign,hostile
 MONSTER:'A',"Angel",(20,09),noalign,hostile
 MONSTER:'A',"Angel",(20,10),noalign,hostile
-MONSTER:'&',"Pestilence",place[0],hostile
+MONSTER:'&',"Pestilence",place[0],hostile {
+  OBJECT:'!',"sickness"
+}
 # South-central round room
 MONSTER:'@',"aligned priest",(36,12),noalign,hostile
 MONSTER:'@',"aligned priest",(37,12),noalign,hostile
