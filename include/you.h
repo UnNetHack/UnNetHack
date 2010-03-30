@@ -116,11 +116,7 @@ struct Role {
 	      petnum,		/* PM_ of preferred pet (NON_PM == random) */
 	      ldrnum,		/* PM_ of quest leader (questpgr.c) */
 	      guardnum,		/* PM_ of quest guardians (questpgr.c) */
-	      neminum,		/* PM_ of quest nemesis (questpgr.c) */
-	      enemy1num,	/* specific quest enemies (NON_PM == random) */
-	      enemy2num;
-	char  enemy1sym,	/* quest enemies by class (S_) */
-	      enemy2sym;
+	      neminum;		/* PM_ of quest nemesis (questpgr.c) */
 	short questarti;	/* index (ART_) of quest artifact (questpgr.c) */
 
 	/*** Bitmasks ***/

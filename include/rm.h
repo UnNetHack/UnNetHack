@@ -471,6 +471,19 @@ struct levelflags {
 	Bitfield(arboreal, 1);		/* Trees replace rock */
 };
 
+struct mon_gen_tuple {
+    int freq;
+    boolean is_sym;
+    int monid;
+    struct mon_gen_tuple *next;
+};
+
+struct mon_gen_override {
+    int override_chance;
+    int total_mon_freq;
+    struct mon_gen_tuple *gen_chances;
+};
+
 typedef struct
 {
     struct rm		locations[COLNO][ROWNO];
@@ -488,6 +501,7 @@ typedef struct
     struct monst	*monlist;
     struct damage	*damagelist;
     struct levelflags	flags;
+    struct mon_gen_override *mon_gen;
 }
 dlevel_t;
 

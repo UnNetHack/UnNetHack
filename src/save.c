@@ -31,6 +31,7 @@ STATIC_DCL void FDECL(saveobjchn, (int,struct obj *,int));
 STATIC_DCL void FDECL(savemonchn, (int,struct monst *,int));
 STATIC_DCL void FDECL(savetrapchn, (int,struct trap *,int));
 STATIC_DCL void FDECL(savegamestate, (int,int));
+void FDECL(save_mongen_override, (int,struct mon_gen_override *, int));
 #ifdef MFLOPPY
 STATIC_DCL void FDECL(savelev0, (int,XCHAR_P,int));
 STATIC_DCL boolean NDECL(swapout_oldest);
@@ -576,12 +577,15 @@ int mode;
 	saveobjchn(fd, fobj, mode);
 	saveobjchn(fd, level.buriedobjlist, mode);
 	saveobjchn(fd, billobjs, mode);
+	save_mongen_override(fd, level.mon_gen, mode);
 	if (release_data(mode)) {
 	    fmon = 0;
 	    ftrap = 0;
 	    fobj = 0;
 	    level.buriedobjlist = 0;
 	    billobjs = 0;
+	    free(level.mon_gen);
+	    level.mon_gen = NULL;
 	}
 	save_engravings(fd, mode);
 	savedamage(fd, mode);
@@ -869,6 +873,41 @@ register int fd, mode;
 	}
 	if (release_data(mode))
 	    level.damagelist = 0;
+}
+
+void
+save_mongen_override(fd, or, mode)
+register int fd, mode;
+register struct mon_gen_override *or;
+{
+    struct mon_gen_tuple *mt;
+    struct mon_gen_tuple *prev;
+    int marker = 0;
+
+    if (!or) {
+	if (perform_bwrite(mode)) {
+	    marker = 0;
+	    bwrite(fd, (genericptr_t) &marker, sizeof(marker));
+	}
+    } else {
+	if (perform_bwrite(mode)) {
+	    marker = 1;
+	    bwrite(fd, (genericptr_t) &marker, sizeof(marker));
+	    bwrite(fd, (genericptr_t) or, sizeof(struct mon_gen_override));
+	}
+	mt = or->gen_chances;
+	while (mt) {
+	    if (perform_bwrite(mode)) {
+		bwrite(fd, (genericptr_t) mt, sizeof(struct mon_gen_tuple));
+	    }
+	    prev = mt;
+	    mt = mt->next;
+	    if (release_data(mode))
+		free(prev);
+	}
+	if (release_data(mode))
+	    or->gen_chances = NULL;
+    }
 }
 
 STATIC_OVL void

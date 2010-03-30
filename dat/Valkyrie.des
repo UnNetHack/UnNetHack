@@ -11,6 +11,7 @@
 LEVEL: "Val-strt"
 FLAGS: noteleport,hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"fire ant"), (16,'a'), (16,"fire giant"), (4,'H')
 GEOMETRY:center,center
 MAP
 IIIIIIPPPIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
@@ -91,6 +92,7 @@ MONSTER: 'H',"fire giant",(10,16),hostile
 LEVEL: "Val-loca"
 FLAGS: hardfloor,mazelevel
 INIT_MAP: mines, '.' , 'I' , true , true , lit , false
+MON_GENERATION:86%, (64,"fire ant"), (16,'a'), (16,"fire giant"), (4,'H')
 GEOMETRY:center,center
 MAP
 PPPP....                      ....PPPPP.
@@ -177,6 +179,7 @@ MONSTER:'H',random,random,hostile
 LEVEL: "Val-goal"
 FLAGS:mazelevel
 INIT_MAP: mines, '.' , 'L' , true , true , lit , false
+MON_GENERATION:86%, (64,"fire ant"), (16,'a'), (16,"fire giant"), (4,'H')
 GEOMETRY:center,center
 MAP
 .L............................LLLLL
@@ -268,6 +271,7 @@ MONSTER:'H',random,random,hostile
 LEVEL: "Val-fila"
 FLAGS:mazelevel
 INIT_MAP: mines, '.' , 'I' , true , true , lit, false
+MON_GENERATION:86%, (64,"fire ant"), (16,'a'), (16,"fire giant"), (4,'H')
 NOMAP
 #
 STAIR: random, up
@@ -302,6 +306,7 @@ TRAP: random, random
 LEVEL: "Val-filb"
 FLAGS:mazelevel
 INIT_MAP: mines, '.' , 'L' , true , true , lit, false
+MON_GENERATION:86%, (64,"fire ant"), (16,'a'), (16,"fire giant"), (4,'H')
 NOMAP
 #
 STAIR: random, up

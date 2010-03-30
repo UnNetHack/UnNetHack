@@ -11,6 +11,7 @@
 LEVEL: "Ran-strt"
 FLAGS: noteleport,hardfloor,arboreal,mazelevel
 INIT_MAP:mines,'.','.',true,true,lit,false
+MON_GENERATION:86%, (64,"forest centaur"), (16,'C'), (16,"scorpion"), (4,'s')
 GEOMETRY:left,center
 #1234567890123456789012345678901234567890123456789012345678901234567890
 MAP
@@ -104,6 +105,7 @@ MONSTER: 's',"scorpion",random,hostile
 LEVEL: "Ran-loca"
 FLAGS: hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"forest centaur"), (16,'C'), (16,"scorpion"), (4,'s')
 GEOMETRY:center,center
 #1234567890123456789012345678901234567890123456789012345678901234567890
 MAP
@@ -188,6 +190,7 @@ MONSTER:'s',random,random,hostile
 LEVEL: "Ran-goal"
 FLAGS:mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"forest centaur"), (16,'C'), (16,"scorpion"), (4,'s')
 GEOMETRY:center,center
 MAP
                                                                             
@@ -299,6 +302,7 @@ WALLIFY
 LEVEL: "Ran-fila"
 FLAGS:mazelevel
 INIT_MAP: mines, '.' , 'T', true, true, random, true
+MON_GENERATION:86%, (64,"forest centaur"), (16,'C'), (16,"scorpion"), (4,'s')
 NOMAP
 #
 STAIR: random, up
@@ -328,6 +332,7 @@ MONSTER: 's', "scorpion", random, hostile
 LEVEL: "Ran-filb"
 FLAGS:mazelevel
 INIT_MAP: mines, '.' , ' ', true, true, random, true
+MON_GENERATION:86%, (64,"forest centaur"), (16,'C'), (16,"scorpion"), (4,'s')
 NOMAP
 #
 STAIR: random, up

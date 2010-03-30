@@ -190,6 +190,38 @@ boolean ghostly;
 	free((genericptr_t)tmp_dam);
 }
 
+struct mon_gen_override *
+rest_mongen_override(fd)
+register int fd;
+{
+    int marker;
+    struct mon_gen_override *or = NULL;
+    struct mon_gen_tuple *mt = NULL;
+    int next;
+
+    mread(fd, (genericptr_t) &marker, sizeof(marker));
+    if (marker) {
+	or = (struct mon_gen_override *)alloc(sizeof(struct mon_gen_override));
+	mread(fd, (genericptr_t) or, sizeof(*or));
+	if (or->gen_chances) {
+	    or->gen_chances = NULL;
+	    do {
+		mt = (struct mon_gen_tuple *)alloc(sizeof(struct mon_gen_tuple));
+		mread(fd, (genericptr_t) mt, sizeof(*mt));
+		if (mt->next) {
+		    next = 1;
+		} else {
+		    next = 0;
+		}
+		mt->next = or->gen_chances;
+		or->gen_chances = mt;
+	    } while (next);
+	}
+    }
+    return or;
+}
+
+
 STATIC_OVL struct obj *
 restobjchn(fd, ghostly, frozen)
 register int fd;
@@ -852,6 +884,7 @@ boolean ghostly;
 	   routine so that we can check for objects being buried under ice */
 	level.buriedobjlist = restobjchn(fd, ghostly, FALSE);
 	billobjs = restobjchn(fd, ghostly, FALSE);
+	level.mon_gen = rest_mongen_override(fd);
 	rest_engravings(fd);
 
 	/* reset level.monsters for new level */

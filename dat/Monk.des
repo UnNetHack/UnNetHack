@@ -11,6 +11,7 @@
 LEVEL: "Mon-strt"
 FLAGS: noteleport,hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"earth elemental"), (16,'E'), (16,"xorn"), (4,'X')
 GEOMETRY:center,center
 MAP
 ............................................................................
@@ -107,6 +108,7 @@ MONSTER: 'X',"xorn",(01,17)
 LEVEL: "Mon-loca"
 FLAGS:mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"earth elemental"), (16,'E'), (16,"xorn"), (4,'X')
 GEOMETRY:center,center
 #         1         2         3         4         5         6         7 
 #123456789012345678901234567890123456789012345678901234567890123456789012345
@@ -201,6 +203,7 @@ MONSTER: 'X',"xorn",random
 LEVEL: "Mon-goal"
 FLAGS:mazelevel
 INIT_MAP: mines, 'L' , '.' , false , false , unlit , false
+MON_GENERATION:86%, (64,"earth elemental"), (16,'E'), (16,"xorn"), (4,'X')
 GEOMETRY:center,center
 MAP
 .L......L.LLL.......LL....
@@ -275,6 +278,7 @@ MONSTER: 'X',"xorn",random
 #
 
 LEVEL: "Mon-fila"
+MON_GENERATION:86%, (64,"earth elemental"), (16,'E'), (16,"xorn"), (4,'X')
 # Random Monsters
 RANDOM_MONSTERS: 'E', 'X'
 #
@@ -328,6 +332,7 @@ MONSTER: 'E', "earth elemental", random
 RANDOM_CORRIDORS
 
 LEVEL: "Mon-filb"
+MON_GENERATION:86%, (64,"earth elemental"), (16,'E'), (16,"xorn"), (4,'X')
 # Random Monsters
 RANDOM_MONSTERS: 'E', 'X'
 #

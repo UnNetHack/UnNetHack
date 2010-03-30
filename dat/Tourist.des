@@ -11,6 +11,7 @@
 LEVEL: "Tou-strt"
 FLAGS: noteleport,hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"giant spider"), (16,'S'), (16,"forest centaur"), (4,'C')
 GEOMETRY:center,center
 MAP
 .......}}....---------..-------------------------------------------------...
@@ -140,6 +141,7 @@ TRAP:random,random
 LEVEL: "Tou-loca"
 FLAGS: hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"giant spider"), (16,'S'), (16,"forest centaur"), (4,'C')
 GEOMETRY:center,center
 MAP
 ----------------------------------------------------------------------------
@@ -302,6 +304,7 @@ MONSTER:'s',random,random
 LEVEL: "Tou-goal"
 FLAGS:mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"giant spider"), (16,'S'), (16,"forest centaur"), (4,'C')
 GEOMETRY:center,center
 MAP
 ----------------------------------------------------------------------------
@@ -465,6 +468,7 @@ WALLIFY
 LEVEL: "Tou-fila"
 FLAGS:mazelevel
 INIT_MAP: mines, '.' , ' ', true, true, random, true
+MON_GENERATION:86%, (64,"giant spider"), (16,'S'), (16,"forest centaur"), (4,'C')
 NOMAP
 #
 STAIR: random, up
@@ -494,6 +498,7 @@ MONSTER: 'C', random, random, hostile
 LEVEL: "Tou-filb"
 FLAGS:mazelevel
 INIT_MAP: mines, '.' , ' ', true, true, random, true
+MON_GENERATION:86%, (64,"giant spider"), (16,'S'), (16,"forest centaur"), (4,'C')
 NOMAP
 #
 STAIR: random, up

@@ -11,6 +11,7 @@
 LEVEL: "Bar-strt"
 FLAGS: noteleport,hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"ogre"), (16,'O'), (16,"troll"), (4,'T')
 GEOMETRY:center,center
 MAP
 ..................................PP........................................
@@ -102,6 +103,7 @@ MONSTER:'O',"ogre",(42,10),hostile
 LEVEL: "Bar-loca"
 FLAGS: hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"ogre"), (16,'O'), (16,"troll"), (4,'T')
 GEOMETRY:center,center
 MAP
 ..........PPP.........................................                      
@@ -212,6 +214,7 @@ MONSTER:'T',random,random,hostile
 LEVEL: "Bar-goal"
 FLAGS:mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"ogre"), (16,'O'), (16,"troll"), (4,'T')
 GEOMETRY:center,center
 MAP
                                                                             
@@ -311,6 +314,7 @@ WALLIFY
 LEVEL: "Bar-fila"
 FLAGS:mazelevel
 INIT_MAP: mines, '.' , '.' , true , true , unlit , false
+MON_GENERATION:86%, (64,"ogre"), (16,'O'), (16,"troll"), (4,'T')
 NOMAP
 #
 STAIR: random, up
@@ -338,6 +342,7 @@ MONSTER: 'T', "rock troll", random, hostile
 LEVEL: "Bar-filb"
 FLAGS:mazelevel
 INIT_MAP: mines, '.' , ' ' , true , true , unlit , true
+MON_GENERATION:86%, (64,"ogre"), (16,'O'), (16,"troll"), (4,'T')
 NOMAP
 #
 STAIR: random, up

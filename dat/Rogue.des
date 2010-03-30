@@ -10,6 +10,7 @@
 LEVEL: "Rog-strt"
 FLAGS: noteleport, hardfloor, nommap, mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"leprechaun"), (16,'n'), (16,"guardian naga"), (4,'N')
 GEOMETRY:center,center
 #         1         2         3         4         5         6         7
 #123456789012345678901234567890123456789012345678901234567890123456789012345
@@ -177,6 +178,7 @@ MONSTER: ':',"chameleon",random,hostile
 LEVEL: "Rog-loca"
 FLAGS:mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"leprechaun"), (16,'n'), (16,"guardian naga"), (4,'N')
 GEOMETRY:center,center
 #         1         2         3         4         5         6         7
 #123456789012345678901234567890123456789012345678901234567890123456789012345
@@ -281,6 +283,7 @@ MONSTER: ':',"chameleon",random,hostile
 LEVEL: "Rog-goal"
 FLAGS: noteleport,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"leprechaun"), (16,'n'), (16,"guardian naga"), (4,'N')
 GEOMETRY:center,center
 #         1         2         3         4         5         6         7
 #123456789012345678901234567890123456789012345678901234567890123456789012345
@@ -392,6 +395,7 @@ MONSTER:';',"shark",(58,10),hostile
 #	levels as defined above.
 #
 LEVEL: "Rog-fila"
+MON_GENERATION:86%, (64,"leprechaun"), (16,'n'), (16,"guardian naga"), (4,'N')
 #
 ROOM: "ordinary" , random, random, random, random
 {
@@ -451,6 +455,7 @@ RANDOM_CORRIDORS
 # currently a & b are the same.
 #
 LEVEL: "Rog-filb"
+MON_GENERATION:86%, (64,"leprechaun"), (16,'n'), (16,"guardian naga"), (4,'N')
 #
 ROOM: "ordinary" , random, random, random, random
 {

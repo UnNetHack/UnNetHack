@@ -138,6 +138,7 @@ extern const char *fname;
 %token	<i> ERODED_ID TRAPPED_ID RECHARGED_ID INVIS_ID GREASED_ID
 %token	<i> FEMALE_ID CANCELLED_ID REVIVED_ID AVENGE_ID FLEEING_ID BLINDED_ID
 %token	<i> PARALYZED_ID STUNNED_ID CONFUSED_ID SEENTRAPS_ID ALL_ID
+%token	<i> MON_GENERATION_ID
 %token	<i> ',' ':' '(' ')' '[' ']' '{' '}'
 %token	<map> STRING MAP_ID
 %type	<i> h_justif v_justif trap_name room_type door_state light_state
@@ -148,6 +149,7 @@ extern const char *fname;
 %type	<i> monster monster_c m_register object object_c o_register
 %type	<i> comparestmt
 %type	<i> seen_trap_mask
+%type	<i> mon_gen_list
 %type	<map> string level_def m_name o_name
 %type	<corpos> corr_spec
 %start	file
@@ -284,6 +286,7 @@ levstatements	: /* nothing */
 
 levstatement 	: message
 		| altar_detail
+		| mon_generation
 		| branch_region
 		| corridor
 		| diggable_detail
@@ -910,6 +913,45 @@ place_list	: place
 			    yyerror("Location list too long!");
 		  }
 		 ',' place_list
+		;
+
+mon_generation	: MON_GENERATION_ID ':' SPERCENT ',' mon_gen_list
+		  {
+		      long chance = $3;
+		      long total_mons = $5;
+		      if (chance < 0) chance = 0;
+		      else if (chance > 100) chance = 100;
+
+		      if (total_mons < 1) yyerror("Monster generation: zero monsters defined?");
+		      add_opvars(&splev, "iio", chance, total_mons, SPO_MON_GENERATION);
+		  }
+		;
+
+mon_gen_list	: mon_gen_part
+		  {
+		      $$ = 1;
+		  }
+		| mon_gen_part ',' mon_gen_list
+		  {
+		      $$ = 1 + $3;
+		  }
+		;
+
+mon_gen_part	: '(' INTEGER ',' monster ')'
+		  {
+		      int token = $4;
+		      if ($2 < 1) yyerror("Monster generation chances are zero?");
+		      if (token == ERR) yyerror("Monster generation: Invalid monster symbol");
+		      add_opvars(&splev, "iii", token, 1, $2);
+		  }
+		| '(' INTEGER ',' string ')'
+		  {
+		      int token;
+		      if ($2 < 1) yyerror("Monster generation chances are zero?");
+		      token = get_monster_id($4, (char)0);
+		      if (token == ERR) yyerror("Monster generation: Invalid monster name");
+		      add_opvars(&splev, "iii", token, 0, $2);
+		  }
 		;
 
 monster_detail	: MONSTER_ID chance ':' monster_desc

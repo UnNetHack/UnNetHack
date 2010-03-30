@@ -12,6 +12,7 @@ LEVEL: "Kni-strt"
 FLAGS: noteleport,hardfloor,mazelevel
 # This is a kludge to init the level as a lit field.
 INIT_MAP: mines, '.' , '.' , false , false , lit , false
+MON_GENERATION:86%, (64,"quasit"), (16,'i'), (16,"ochre jelly"), (4,'j')
 GEOMETRY:center,center
 MAP
 ..................................................
@@ -108,6 +109,7 @@ MONSTER: 'i',"quasit",(36,00),hostile
 LEVEL: "Kni-loca"
 FLAGS: hardfloor,mazelevel
 INIT_MAP: mines, '.' , 'P' , false , true , lit , false
+MON_GENERATION:86%, (64,"quasit"), (16,'i'), (16,"ochre jelly"), (4,'j')
 GEOMETRY:center,center
 MAP
 ...PPP.........PPPP..............PPPP...
@@ -247,6 +249,7 @@ MONSTER:'j',random,random,hostile
 LEVEL: "Kni-goal"
 FLAGS:mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"quasit"), (16,'i'), (16,"ochre jelly"), (4,'j')
 GEOMETRY:center,center
 MAP
 ....PPPP..PPP..                                                             
@@ -351,6 +354,7 @@ MONSTER:'j',random,random,hostile
 LEVEL: "Kni-fila"
 FLAGS:mazelevel
 INIT_MAP: mines, '.' , 'P' , false , true , lit , false
+MON_GENERATION:86%, (64,"quasit"), (16,'i'), (16,"ochre jelly"), (4,'j')
 NOMAP
 #
 STAIR: random, up
@@ -380,6 +384,7 @@ TRAP: random, random
 LEVEL: "Kni-filb"
 FLAGS:mazelevel
 INIT_MAP: mines, '.' , 'P' , false , true , lit , false
+MON_GENERATION:86%, (64,"quasit"), (16,'i'), (16,"ochre jelly"), (4,'j')
 NOMAP
 #
 STAIR: random, up

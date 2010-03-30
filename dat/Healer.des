@@ -11,6 +11,7 @@
 LEVEL: "Hea-strt"
 FLAGS: noteleport,hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"giant rat"), (16,'r'), (16,"snake"), (4,'Y')
 GEOMETRY:center,center
 MAP
 PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
@@ -112,6 +113,7 @@ LEVEL: "Hea-loca"
 FLAGS: hardfloor,mazelevel
 #
 INIT_MAP: mines, '.' , 'P', true , true , lit , false
+MON_GENERATION:86%, (64,"giant rat"), (16,'r'), (16,"snake"), (4,'Y')
 GEOMETRY:center,center
 MAP
 PPPPPPPPPPPPP.......PPPPPPPPPPP
@@ -212,6 +214,7 @@ LEVEL: "Hea-goal"
 FLAGS:mazelevel
 #
 INIT_MAP: mines, '.' , 'P' , false , true , lit , false
+MON_GENERATION:86%, (64,"giant rat"), (16,'r'), (16,"snake"), (4,'Y')
 GEOMETRY:center,center
 MAP
 .P....................................PP.
@@ -303,6 +306,7 @@ MONSTER: 'S',random,random,hostile
 LEVEL: "Hea-fila"
 FLAGS:mazelevel
 INIT_MAP: mines, '.' , 'P' , false , true , lit , false
+MON_GENERATION:86%, (64,"giant rat"), (16,'r'), (16,"snake"), (4,'Y')
 NOMAP
 #
 STAIR: random, up
@@ -339,6 +343,7 @@ TRAP: random, random
 LEVEL: "Hea-filb"
 FLAGS:mazelevel
 INIT_MAP: mines, '.' , 'P' , false , true , lit , false
+MON_GENERATION:86%, (64,"giant rat"), (16,'r'), (16,"snake"), (4,'Y')
 NOMAP
 #
 STAIR: random, up

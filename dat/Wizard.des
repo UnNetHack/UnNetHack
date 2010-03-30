@@ -10,6 +10,7 @@
 LEVEL: "Wiz-strt"
 FLAGS: noteleport,hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"vampire bat"), (16,'B'), (16,"xorn"), (4,'W')
 GEOMETRY:center,center
 MAP
 ............................................................................
@@ -105,6 +106,7 @@ MONSTER: 'B',random,(10,19),hostile
 LEVEL: "Wiz-loca"
 FLAGS: hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"vampire bat"), (16,'B'), (16,"xorn"), (4,'W')
 GEOMETRY:center,center
 MAP
 .............        .......................................................
@@ -230,6 +232,7 @@ MONSTER:'i',random,random,hostile
 LEVEL: "Wiz-goal"
 FLAGS:mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"vampire bat"), (16,'B'), (16,"xorn"), (4,'W')
 GEOMETRY:center,center
 MAP
                                                                             
@@ -366,6 +369,7 @@ MONSTER:'@',"prisoner",(41,11),peaceful,asleep
 #
 
 LEVEL: "Wiz-fila"
+MON_GENERATION:86%, (64,"vampire bat"), (16,'B'), (16,"xorn"), (4,'W')
 #
 ROOM: "ordinary" , random, random, random, random
 {
@@ -417,6 +421,7 @@ MONSTER: 'B', "vampire bat", random
 RANDOM_CORRIDORS
 
 LEVEL: "Wiz-filb"
+MON_GENERATION:86%, (64,"vampire bat"), (16,'B'), (16,"xorn"), (4,'W')
 #
 ROOM: "ordinary" , random, random, random, random
 {

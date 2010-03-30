@@ -1229,6 +1229,32 @@ max_monster_difficulty()
 	}
 }
 
+
+struct permonst *
+get_override_mon(override)
+struct mon_gen_override *override;
+{
+    int chance, try = 100;
+    struct mon_gen_tuple *mt;
+    int ok;
+    if (!override) return NULL;
+
+    chance = rnd(override->total_mon_freq);
+    do {
+	mt = override->gen_chances;
+	while (mt && ((chance -= mt->freq) > 0)) mt = mt->next;
+	if (mt && (chance <= 0)) {
+	    if (mt->is_sym) {
+		return (mkclass(mt->monid, 0));
+	    } else {
+		if (!(mvitals[mt->monid].mvflags & G_GENOD))
+		    return (&mons[mt->monid]);
+	    }
+	}
+    } while (--try > 0);
+    return NULL;
+}
+
 static NEARDATA struct {
 	int choice_count;
 	char mchoices[SPECIAL_PM];	/* value range is 0..127 */
@@ -1241,7 +1267,9 @@ rndmonst()
 	register struct permonst *ptr;
 	register int mndx, ct;
 
-	if (u.uz.dnum == quest_dnum && rn2(7) && (ptr = qt_montype()) != 0)
+	if (level.mon_gen &&
+	    (rn2(100) < level.mon_gen->override_chance) &&
+	    ((ptr = get_override_mon(level.mon_gen)) != 0))
 	    return ptr;
 
 	if (rndmonst_state.choice_count < 0) {	/* need to recalculate */

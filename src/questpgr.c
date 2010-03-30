@@ -444,23 +444,6 @@ int	msgnum;
 	return;
 }
 
-struct permonst *
-qt_montype()
-{
-	int qpm;
-
-	if (rn2(5)) {
-	    qpm = urole.enemy1num;
-	    if (qpm != NON_PM && rn2(5) && !(mvitals[qpm].mvflags & G_GENOD))
-	    	return (&mons[qpm]);
-	    return (mkclass(urole.enemy1sym, 0));
-	}
-	qpm = urole.enemy2num;
-	if (qpm != NON_PM && rn2(5) && !(mvitals[qpm].mvflags & G_GENOD))
-	    return (&mons[qpm]);
-	return (mkclass(urole.enemy2sym, 0));
-}
-
 /** The names of creator deities from different cultures. */
 static const char *creator_names[] = {
 	"Marduk", /* Babylonian */

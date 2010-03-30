@@ -3057,6 +3057,46 @@ sp_lev *lvl;
               free(tmpobj.name.str);
 	    }
 	    break;
+	case SPO_MON_GENERATION:
+	    {
+		struct opvar freq, n_tuples;
+		struct mon_gen_override *mg;
+		struct mon_gen_tuple *mgtuple;
+
+		if (level.mon_gen) {
+		    impossible("monster generation override already defined.");
+		    break;
+		}
+
+		if (!get_opvar_dat(&stack, &n_tuples, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &freq, SPOVAR_INT)) break;
+
+		mg = (struct mon_gen_override *)alloc(sizeof(struct mon_gen_override));
+		mg->override_chance = freq.vardata.l;
+		mg->total_mon_freq = 0;
+		mg->gen_chances = NULL;
+		while (n_tuples.vardata.l-- > 0) {
+		    struct opvar mfreq, is_sym, mon;
+		    mgtuple = (struct mon_gen_tuple *)alloc(sizeof(struct mon_gen_tuple));
+
+		    if (!get_opvar_dat(&stack, &mfreq, SPOVAR_INT) ||
+			!get_opvar_dat(&stack, &is_sym, SPOVAR_INT) ||
+			!get_opvar_dat(&stack, &mon, SPOVAR_INT)) {
+			panic("oopsie when loading mon_gen chances.");
+		    }
+
+		    mgtuple->freq = mfreq.vardata.l;
+		    mgtuple->is_sym = is_sym.vardata.l;
+		    if (is_sym.vardata.l)
+			mgtuple->monid = def_char_to_monclass(mon.vardata.l);
+		    else mgtuple->monid = mon.vardata.l;
+		    mgtuple->next = mg->gen_chances;
+		    mg->gen_chances = mgtuple;
+		    mg->total_mon_freq += mfreq.vardata.l;
+		}
+		level.mon_gen = mg;
+	    }
+	    break;
 	case SPO_ENGRAVING:
            {
                struct opvar etyp, txt, fy, fx;

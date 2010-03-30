@@ -11,6 +11,7 @@
 LEVEL: "Pri-strt"
 FLAGS: noteleport,hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
 GEOMETRY:center,center
 MAP
 ............................................................................
@@ -109,6 +110,7 @@ LEVEL: "Pri-loca"
 FLAGS: hardfloor,mazelevel
 # This is a kludge to init the level as a lit field.
 INIT_MAP: mines, '.' , '.' , false , false , lit , false
+MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
 GEOMETRY:center,center
 MAP
 ........................................
@@ -184,6 +186,7 @@ TRAP:random,random
 LEVEL: "Pri-goal"
 FLAGS:mazelevel
 INIT_MAP: mines, 'L' , '.' , false , false , unlit , false
+MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
 GEOMETRY:center,center
 MAP
 .L......L.LLL.......LL....
@@ -266,6 +269,7 @@ MONSTER:'W',random,random
 #
 
 LEVEL: "Pri-fila"
+MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
 #
 ROOM: "ordinary" , random, random, random, random
 {
@@ -312,6 +316,7 @@ TRAP: random, random
 RANDOM_CORRIDORS
 
 LEVEL: "Pri-filb"
+MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
 #
 ROOM: "ordinary" , random, random, random, random
 {

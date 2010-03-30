@@ -11,6 +11,7 @@
 LEVEL: "Sam-strt"
 FLAGS: noteleport,hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"wolf"), (16,'d'), (16,"stalker"), (4,'E')
 GEOMETRY:center,center
 MAP
 ..............................................................PP............
@@ -99,6 +100,7 @@ MONSTER:'E',"stalker",random
 LEVEL: "Sam-loca"
 FLAGS: hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"wolf"), (16,'d'), (16,"stalker"), (4,'E')
 GEOMETRY:center,center
 MAP
 ............................................................................
@@ -244,6 +246,7 @@ MONSTER:'@',"samurai",(34,14),hostile
 LEVEL: "Sam-goal"
 FLAGS: noteleport,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"wolf"), (16,'d'), (16,"stalker"), (4,'E')
 GEOMETRY:center,center
 MAP
                                              
@@ -347,6 +350,7 @@ MONSTER:'E',"stalker",random
 LEVEL: "Sam-fila"
 FLAGS:mazelevel
 INIT_MAP: mines, '.' , 'P', true, true, random, true
+MON_GENERATION:86%, (64,"wolf"), (16,'d'), (16,"stalker"), (4,'E')
 NOMAP
 #
 STAIR: random, up
@@ -378,6 +382,7 @@ TRAP: random, random
 LEVEL: "Sam-filb"
 FLAGS:mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"wolf"), (16,'d'), (16,"stalker"), (4,'E')
 GEOMETRY:center,center
 MAP
 -------------                                  -------------
