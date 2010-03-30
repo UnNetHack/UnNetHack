@@ -1036,7 +1036,14 @@ mazewalk_detail : MAZEWALK_ID ':' coordinate ',' DIRECTION
 
 wallify_detail	: WALLIFY_ID
 		  {
-		      add_opcode(&splev, SPO_WALLIFY, NULL);
+		      add_opvars(&splev, "iiiio", -1,-1,-1,-1, SPO_WALLIFY);
+		  }
+		| WALLIFY_ID ':' lev_region
+		  {
+		      add_opvars(&splev, "iiiio",
+				 current_region.x1, current_region.y1,
+				 current_region.x2, current_region.y2,
+				 SPO_WALLIFY);
 		  }
 		;
 
@@ -1578,13 +1585,13 @@ lev_region	: region
 /* This series of if statements is a hack for MSC 5.1.  It seems that its
    tiny little brain cannot compile if these are all one big if statement. */
 			if ($3 <= 0 || $3 >= COLNO)
-				yyerror("Region out of level range!");
+				yyerror("Region out of level range (x1)!");
 			else if ($5 < 0 || $5 >= ROWNO)
-				yyerror("Region out of level range!");
+				yyerror("Region out of level range (y1)!");
 			else if ($7 <= 0 || $7 >= COLNO)
-				yyerror("Region out of level range!");
+				yyerror("Region out of level range (x2)!");
 			else if ($9 < 0 || $9 >= ROWNO)
-				yyerror("Region out of level range!");
+				yyerror("Region out of level range (y2)!");
 			current_region.x1 = $3;
 			current_region.y1 = $5;
 			current_region.x2 = $7;

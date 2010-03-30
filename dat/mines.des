@@ -335,6 +335,7 @@ MONSTER: 'G', "gnome", random
 
 RANDOM_CORRIDORS
 
+WALLIFY:levregion(1,0, 70,20)
 
 # Minetown variant 2
 # "Town Square"

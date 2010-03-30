@@ -2347,17 +2347,18 @@ room *r;
 }
 
 void
-wallify_map()
+wallify_map(x1,y1,x2,y2)
+int x1,y1,x2,y2;
 {
 	int x, y, xx, yy, lo_xx, lo_yy, hi_xx, hi_yy;
 
-	for (y = ystart; y <= ystart+ysize; y++) {
+	for (y = y1; y <= y2; y++) {
 	    lo_yy = (y > 0) ? y - 1 : 0;
-	    hi_yy = (y < ystart+ysize) ? y + 1 : ystart+ysize;
-	    for (x = xstart; x <= xstart+xsize; x++) {
+	    hi_yy = (y < y2) ? y + 1 : y2;
+	    for (x = x1; x <= x2; x++) {
 		if (levl[x][y].typ != STONE) continue;
 		lo_xx = (x > 0) ? x - 1 : 0;
-		hi_xx = (x < xstart+xsize) ? x + 1 : xstart+xsize;
+		hi_xx = (x < x2) ? x + 1 : x2;
 		for (yy = lo_yy; yy <= hi_yy; yy++)
 		    for (xx = lo_xx; xx <= hi_xx; xx++)
 			if (IS_ROOM(levl[xx][yy].typ) ||
@@ -3588,7 +3589,19 @@ sp_lev *lvl;
 	    }
 	    break;
 	case SPO_WALLIFY:
-	    wallify_map();
+	    {
+		struct opvar x1,y1,x2,y2;
+		int dx1,dy1,dx2,dy2;
+		if (!get_opvar_dat(&stack, &y2, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &x2, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &y1, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &x1, SPOVAR_INT)) break;
+		dx1 = (x1.vardata.l < 0) ? xstart : x1.vardata.l;
+		dy1 = (y1.vardata.l < 0) ? ystart : y1.vardata.l;
+		dx2 = (x2.vardata.l < 0) ? xstart+xsize : x2.vardata.l;
+		dy2 = (y2.vardata.l < 0) ? ystart+ysize : y2.vardata.l;
+		wallify_map(dx1, dy1, dx2, dy2);
+	    }
 	    break;
         case SPO_CMP:
 	    {
