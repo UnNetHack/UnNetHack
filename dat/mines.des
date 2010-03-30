@@ -160,13 +160,12 @@ OBJECT:'*',"rock",random
 OBJECT:'*',"rock",random
 
 # Guarantee 7 candles since we won't have Izchak available
-OBJECT:'(',"wax candle",place[5]
-OBJECT:'(',"wax candle",place[5]
-OBJECT:'(',"tallow candle",place[6]
-OBJECT:'(',"tallow candle",place[6]
-OBJECT:'(',"wax candle",place[4]
-OBJECT:'(',"wax candle",place[9]
-OBJECT:'(',"tallow candle",place[0]
+OBJECT:'(',"wax candle",place[0],quantity:2
+OBJECT:'(',"wax candle",place[1],quantity:1
+OBJECT:'(',"wax candle",place[2],quantity:2
+OBJECT:'(',"tallow candle",place[3],quantity:3
+OBJECT:'(',"tallow candle",place[2],quantity:1
+OBJECT:'(',"tallow candle",place[0],quantity:1
 
 # go ahead and leave a lamp next to one corpse to be suggestive
 # and some empty wands...

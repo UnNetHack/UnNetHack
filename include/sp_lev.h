@@ -115,7 +115,8 @@
 #define SP_O_V_CURSE            1
 #define SP_O_V_CORPSENM         2
 #define SP_O_V_NAME             3
-#define SP_O_V_END              4 /* end of variable parameters */
+#define SP_O_V_QUAN		4
+#define SP_O_V_END              5 /* end of variable parameters */
 
 
 /* When creating objects, we need to know whether
@@ -212,6 +213,7 @@ typedef struct {
 	short id, spe;
 	xchar x, y, class, containment;
 	schar curse_state;
+	int   quan;
 } object;
 
 typedef struct {
