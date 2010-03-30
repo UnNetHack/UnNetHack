@@ -10,7 +10,6 @@ RANDOM_MONSTERS:'@','r'
 RANDOM_PLACES:(4,6),(4,16),(18,2),(25,10),(40,13),(55,4),(58,12),(71,2),(73,15)
 ROOM: "ordinary", lit, random, random, (76,17)
 {
-NAME: "town"
 FOUNTAIN: (55,9)
 FOUNTAIN: (22,8)
 STAIR:place[0],down
@@ -18,50 +17,44 @@ ENGRAVING: place[1], mark, "Welcome to the city of Angband!"
 #
 #       The Shops
 #
-SUBROOM: "armor shop", lit, (7,5), (7,2), "town"
-{
-CHANCE: 66
-ROOMDOOR: false, closed, random, random
-}
-
-SUBROOM: "weapon shop", lit, (28,3), (3,3), "town"
-{
-CHANCE: 66
-ROOMDOOR: false, closed, random, random
-}
-
-SUBROOM: "music shop", lit, (44,5), (5,2), "town"
-{
-CHANCE: 66
-ROOMDOOR: false, closed, random, random
-}
-
-SUBROOM: "pet shop", lit, (62,5), (7,2), "town"
-{
-CHANCE: 66
-ROOMDOOR: false, closed, random, random
-}
-
-SUBROOM: "potion shop", lit, (13,11), (5,3), "town"
-{
-CHANCE: 66
-ROOMDOOR: false, closed, random, random
-}
-
-SUBROOM: "tin shop", lit, (31,11), (4,3), "town"
+SUBROOM: "armor shop" [66%], lit, (7,5), (7,2)
 {
 ROOMDOOR: false, closed, random, random
 }
 
-SUBROOM: "ring shop", lit, (46,12), (4,2), "town"
+SUBROOM: "weapon shop" [66%], lit, (28,3), (3,3)
 {
-CHANCE: 66
+ROOMDOOR: false, closed, random, random
+}
+
+SUBROOM: "music shop" [66%], lit, (44,5), (5,2)
+{
+ROOMDOOR: false, closed, random, random
+}
+
+SUBROOM: "pet shop" [66%], lit, (62,5), (7,2)
+{
+ROOMDOOR: false, closed, random, random
+}
+
+SUBROOM: "potion shop" [66%], lit, (13,11), (5,3)
+{
+ROOMDOOR: false, closed, random, random
+}
+
+SUBROOM: "tin shop", lit, (31,11), (4,3)
+{
+ROOMDOOR: false, closed, random, random
+}
+
+SUBROOM: "ring shop" [66%], lit, (46,12), (4,2)
+{
 ROOMDOOR: false, closed, random, random
 }
 #
 # a shop for sale?
 #
-SUBROOM: "ordinary", lit, (60,12), (6,1), "town"
+SUBROOM: "ordinary", lit, (60,12), (6,1)
 {
 ROOMDOOR: false, closed, north, random
 }

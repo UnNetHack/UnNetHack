@@ -208,7 +208,7 @@ title.img:
 check-dlb: @OPTIONS_FILE@
 	@if egrep -s librarian dat/@OPTIONS_FILE@ ; then $(MAKE) dlb ; else true ; fi
 
-dlb:
+dlb: spec_levs
 	( cd util ; $(MAKE) dlb )
 	( cd dat ; ../util/dlb cf nhdat $(SHARE_DATDLB) $(UNSHARE_DATDLB) )
 

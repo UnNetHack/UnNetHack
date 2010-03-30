@@ -12,6 +12,7 @@ EXEEXT = @EXEEXT@
 # UUDECODE=uudecode
 
 VARDAT = data rumors quest.dat oracles options
+LEVCOMP_FLAGS=-v
 
 all:	$(VARDAT) spec_levs quest_levs dungeon
 
@@ -292,37 +293,37 @@ spec_levs: ../util/lev_comp \
 	medusa.des \
 	mines.des nymph.des oracle.des \
 	sokoban.des tower.des yendor.des
-	../util/lev_comp $(srcdir)/bigroom.des
-	../util/lev_comp $(srcdir)/blkmar.des
-	../util/lev_comp $(srcdir)/castle.des
-	../util/lev_comp $(srcdir)/endgame.des
-	../util/lev_comp $(srcdir)/gehennom.des
-	../util/lev_comp $(srcdir)/heck.des
-	../util/lev_comp $(srcdir)/knox.des
-	../util/lev_comp $(srcdir)/medusa.des
-	../util/lev_comp $(srcdir)/nymph.des
-	../util/lev_comp $(srcdir)/town-?.des
-	../util/lev_comp $(srcdir)/mines.des
-	../util/lev_comp $(srcdir)/oracle.des
-	../util/lev_comp $(srcdir)/sokoban.des
-	../util/lev_comp $(srcdir)/tower.des
-	../util/lev_comp $(srcdir)/yendor.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/bigroom.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/blkmar.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/castle.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/endgame.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/gehennom.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/heck.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/knox.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/medusa.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/nymph.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/town-?.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/mines.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/oracle.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/sokoban.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/tower.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/yendor.des
 	touch spec_levs
 
 quest_levs: ../util/lev_comp \
 	Arch.des Barb.des Caveman.des Healer.des Knight.des \
 	Monk.des Priest.des Ranger.des Rogue.des Samurai.des \
 	Tourist.des Valkyrie.des Wizard.des
-	../util/lev_comp $(srcdir)/Arch.des
-	../util/lev_comp $(srcdir)/Barb.des
-	../util/lev_comp $(srcdir)/Caveman.des
-	../util/lev_comp $(srcdir)/Healer.des
-	../util/lev_comp $(srcdir)/Knight.des
-	../util/lev_comp $(srcdir)/Monk.des
-	../util/lev_comp $(srcdir)/Priest.des
-	../util/lev_comp $(srcdir)/Ranger.des
-	../util/lev_comp $(srcdir)/Rogue.des
-	../util/lev_comp $(srcdir)/Samurai.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Arch.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Barb.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Caveman.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Healer.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Knight.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Monk.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Priest.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Ranger.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Rogue.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Samurai.des
 	@if egrep -s tourists options > /dev/null ; then \
 	echo ../util/lev_comp $(srcdir)/Tourist.des ; ../util/lev_comp $(srcdir)/Tourist.des ; \
 	else rm -f Tou-goal.lev Tou-fil?.lev Tou-loca.lev Tou-strt.lev ; fi

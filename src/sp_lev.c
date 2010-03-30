@@ -98,6 +98,129 @@ int num_lregions = 0;
 struct obj *container_obj[MAX_CONTAINMENT];
 int container_idx = 0;
 
+#define SPLEV_STACK_RESERVE 128
+
+void
+splev_stack_init(st)
+     struct splevstack *st;
+{
+    if (st) {
+	st->depth = 0;
+	st->depth_alloc = SPLEV_STACK_RESERVE;
+	st->stackdata = (struct opvar *)alloc(st->depth_alloc * sizeof(struct opvar));
+    }
+}
+
+void
+splev_stack_done(st)
+     struct splevstack *st;
+{
+    if (st) {
+	int i;
+
+	if (st->stackdata && st->depth)
+	    for (i = 0; i < st->depth; i++) {
+		switch (st->stackdata[i].spovartyp) {
+		default:
+		case SPOVAR_NULL:
+		case SPOVAR_INT:
+		    break;
+		case SPOVAR_STRING:
+		    if (st->stackdata[i].vardata.str) free(st->stackdata[i].vardata.str);
+		    break;
+		}
+	    }
+
+	if (st->stackdata) free(st->stackdata);
+	st->stackdata = NULL;
+	st->depth = st->depth_alloc = 0;
+    }
+}
+
+void
+splev_stack_dump(st)
+     struct splevstack *st;
+{
+    if (st) {
+	int i;
+
+	pline("stack dump: depth:%i, allocated:%i\n", st->depth, st->depth_alloc);
+
+	if (st->stackdata && st->depth)
+	    for (i = 0; i < st->depth; i++) {
+		switch (st->stackdata[i].spovartyp) {
+		default:
+		case SPOVAR_NULL: break;
+		case SPOVAR_INT:
+		    pline("INT:%li%s", st->stackdata[i].vardata.l, ((i < st->depth-1) ? ", " : ""));
+		    break;
+		case SPOVAR_STRING:
+		    pline("STR:'%s'%s", st->stackdata[i].vardata.str, ((i < st->depth-1) ? ", " : ""));
+		    break;
+		}
+	    }
+    }
+}
+
+void
+splev_stack_push(st, v)
+     struct splevstack *st;
+     struct opvar v;
+{
+    if (!st) return;
+    if (!st->stackdata) panic("splev_stack_push: no stackdata allocated?");
+
+    if (st->depth >= st->depth_alloc) {
+	struct opvar *tmp = (struct opvar *)alloc((st->depth_alloc + SPLEV_STACK_RESERVE) * sizeof(struct opvar));
+	(void)memcpy(tmp, st->stackdata, st->depth_alloc * sizeof(struct opvar));
+	free(st->stackdata);
+	st->stackdata = tmp;
+	st->depth_alloc += SPLEV_STACK_RESERVE;
+    }
+
+    st->stackdata[st->depth] = v;
+    st->depth++;
+}
+
+struct opvar
+splev_stack_pop(st)
+     struct splevstack *st;
+{
+    if (!st) return;
+    if (!st->stackdata) panic("splev_stack_push: no stackdata allocated?");
+
+    if (st->depth) {
+	st->depth--;
+	return st->stackdata[st->depth];
+    } else impossible("splev_stack_pop: empty stack?");
+    return st->stackdata[0];
+}
+
+boolean
+splev_stack_getdat(st, ov, typ)
+     struct splevstack *st;
+     struct opvar *ov;
+     xchar typ;
+{
+    if (st && ov) {
+	struct opvar tmp = splev_stack_pop(st);
+	if (tmp.spovartyp == typ) {
+	    *ov = tmp;
+	    return TRUE;
+	}
+    }
+    return FALSE;
+}
+
+boolean
+get_opvar_dat(st, ov, typ)
+     struct splevstack *st;
+     struct opvar *ov;
+     xchar typ;
+{
+    return splev_stack_getdat(st, ov, typ);
+}
+
 
 void
 lvlfill_maze_grid(x1,y1,x2,y2,filling)
@@ -1060,7 +1183,6 @@ struct mkroom	*croom;
     schar	x,y;
     coord	tm;
 
-    if (rn2(100) < t->chance) {
 	x = t->x;
 	y = t->y;
 	if (croom)
@@ -1072,7 +1194,6 @@ struct mkroom	*croom;
 	tm.y = y;
 
 	mktrap(t->type, 1, (struct mkroom*) 0, &tm);
-    }
 }
 
 STATIC_OVL void
@@ -1184,7 +1305,6 @@ struct mkroom	*croom;
     struct permonst *pm;
     unsigned g_mvflags;
 
-    if (rn2(100) < m->chance) {
 
 	if (m->class >= 0)
 	    class = (char) def_char_to_monclass((char)m->class);
@@ -1318,7 +1438,6 @@ struct mkroom	*croom;
 	    }
 	}
 
-    }		/* if (rn2(100) < m->chance) */
 }
 
 /*
@@ -1335,7 +1454,6 @@ struct mkroom	*croom;
     char c;
     boolean named;	/* has a name been supplied in level description? */
 
-    if (rn2(100) < o->chance) {
 	named = o->name.str ? TRUE : FALSE;
 
 	x = o->x; y = o->y;
@@ -1396,34 +1514,22 @@ struct mkroom	*croom;
 	if (named)
 	    otmp = oname(otmp, o->name.str);
 
-	switch(o->containment) {
-
-	    /* contents */
-	    case 1:
-		if (!container_idx) {
-		    warning("create_object: no container");
-		    break;
-		}
+	/* contents */
+	if (o->containment & SP_OBJ_CONTENT) {
+	    if (!container_idx) {
+		warning("create_object: no container");
+	    } else {
 		remove_object(otmp);
 		(void) add_to_container(container_obj[container_idx-1], otmp);
-		return;		/* don't stack */
-	    /* container */
-	    case 2:
-		delete_contents(otmp);
-		if (container_idx < MAX_CONTAINMENT) {
-		    if (container_idx) {
-			remove_object(otmp);
-			(void) add_to_container(container_obj[container_idx-1], otmp);
-		    }
-		    container_obj[container_idx] = otmp;
-		    container_idx++;
-		} else warning("create_object: too deeply nested containers.");
-		/*container = otmp;*/
-		break;
-	    /* nothing */
-	    case 0: break;
-
-	    default: warning("containment type %d?", (int) o->containment);
+	    }
+	}
+	/* container */
+	if (o->containment & SP_OBJ_CONTAINER) {
+	    delete_contents(otmp);
+	    if (container_idx < MAX_CONTAINMENT) {
+		container_obj[container_idx] = otmp;
+		container_idx++;
+	    } else impossible("create_object: too deeply nested containers.");
 	}
 
 	/* Medusa level special case: statues are petrified monsters, so they
@@ -1469,7 +1575,6 @@ struct mkroom	*croom;
 
 	stackobj(otmp);
 
-    }		/* if (rn2(100) < o->chance) */
 }
 
 /*
@@ -1723,8 +1828,6 @@ struct mkroom *croom;
     schar x, y, x1, y1, x2, y2;
 
     if (terr->ter >= MAX_TYPE) return;
-
-    if (rn2(100) >= terr->chance) return;
 
     x1 = terr->x1;  y1 = terr->y1;
     get_location(&x1, &y1, DRY|WET, croom);
@@ -2360,8 +2463,6 @@ sp_lev *lvl;
     genericptr_t opdat;
     unsigned char n;
     int size, opcode;
-    lev_region  *tmplregion;
-    mazepart *tmpmazepart;
 
     /* Read the level initialization data */
     Fread((genericptr_t) &lvl->init_lev, 1, sizeof(lev_init), fd);
@@ -2376,190 +2477,35 @@ sp_lev *lvl;
 
 	opdat = NULL;
 
-	switch (opcode) {
-	case SPO_POP_CONTAINER:
-	case SPO_NULL:
-	case SPO_EXIT:
-	case SPO_WALLIFY:
-	case SPO_ENDROOM:
-	    break;
-	case SPO_MESSAGE:
-	    Fread((genericptr_t) &n, 1, sizeof(n), fd);
-	    if (n) {
-		/*		char *msg = ((char *) opdat = alloc(n+1));*/
-		char *msg;
-		opdat = alloc(n+1);
-		Fread(opdat, 1, n, fd);
-		msg = (char *) opdat;
-		msg[n] = '\0';
-	    }
-	    break;
-	case SPO_MONSTER:
-	    opdat = alloc(sizeof(monster));
-	    load_one_monster(fd, opdat);
-	    break;
-	case SPO_OBJECT:
-	    opdat = alloc(sizeof(object));
-	    load_one_object(fd, opdat);
-	    break;
-	case SPO_ENGRAVING:
-	    opdat = alloc(sizeof(engraving));
-	    load_one_engraving(fd, opdat);
-	    break;
-	case SPO_SUBROOM:
-	case SPO_ROOM:
-	    opdat = alloc(sizeof(room));
-	    load_one_room(fd, opdat);
-	    break;
-	case SPO_DOOR:
-	    opdat = alloc(sizeof(door));
-	    Fread(opdat, 1, sizeof(door), fd);
-	    break;
-	case SPO_STAIR:
-	    opdat = alloc(sizeof(stair));
-	    Fread(opdat, 1, sizeof(stair), fd);
-	    break;
-	case SPO_LADDER:
-	    opdat = alloc(sizeof(lad));
-	    Fread(opdat, 1, sizeof(lad), fd);
-	    break;
-	case SPO_ALTAR:
-	    opdat = alloc(sizeof(altar));
-	    Fread(opdat, 1, sizeof(altar), fd);
-	    break;
-	case SPO_FOUNTAIN:
-	    opdat = alloc(sizeof(fountain));
-	    Fread(opdat, 1, sizeof(fountain), fd);
-	    break;
-	case SPO_SINK:
-	    opdat = alloc(sizeof(sink));
-	    Fread(opdat, 1, sizeof(sink), fd);
-	    break;
-	case SPO_POOL:
-	    opdat = alloc(sizeof(pool));
-	    Fread(opdat, 1, sizeof(pool), fd);
-	    break;
-	case SPO_TRAP:
-	    opdat = alloc(sizeof(trap));
-	    Fread(opdat, 1, sizeof(trap), fd);
-	    break;
-	case SPO_GOLD:
-	    opdat = alloc(sizeof(gold));
-	    Fread(opdat, 1, sizeof(gold), fd);
-	    break;
-	case SPO_CORRIDOR:
-	    opdat = alloc(sizeof(corridor));
-	    Fread(opdat, 1, sizeof(corridor), fd);
-	    break;
-	case SPO_LEVREGION:
-	    /*tmplregion = ((lev_region *) opdat = alloc(sizeof(lev_region)));*/
-	    opdat = alloc(sizeof(lev_region));
-	    tmplregion = (lev_region *) opdat;
-	    Fread(opdat, sizeof(lev_region), 1, fd);
-	    if ((size = tmplregion->rname.len) != 0) {
-		tmplregion->rname.str = (char *) alloc((unsigned)size + 1);
-		Fread((genericptr_t) tmplregion->rname.str, size, 1, fd);
-		tmplregion->rname.str[size] = '\0';
-	    } else
-		tmplregion->rname.str = (char *) 0;
-	    break;
-	case SPO_REGION:
-	    opdat = alloc(sizeof(region));
-	    Fread(opdat, 1, sizeof(region), fd);
-	    break;
-	case SPO_RANDOM_OBJECTS:
-	    Fread((genericptr_t) &n, 1, sizeof(n), fd);
-	    if ((n > 0) && (n <= MAX_REGISTERS)) {
-		char *msg;
-		opdat = (genericptr_t) alloc(n+1);
-		Fread(opdat, 1, n, fd);
-		msg = (char *) opdat;
-		msg[n] = '\0';
-	    } else panic("sp_level_loader: rnd_objs idx out-of-bounds (%i)", n);
-	    break;
-	case SPO_RANDOM_PLACES:
-	    Fread((genericptr_t) &n, 1, sizeof(n), fd);
-	    if ((n > 0) && (n <= (2*MAX_REGISTERS))) {
-		char *tmpstr = (char *) alloc(n+1);
-		Fread((genericptr_t) tmpstr, 1, (int) n, fd);
-		tmpstr[n] = '\0';
-		opdat = tmpstr;
-	    } else panic("sp_level_loader: rnd_places idx out-of-bounds (%i)",n);
-	    break;
-	case SPO_RANDOM_MONSTERS:
-	    Fread((genericptr_t) &n, 1, sizeof(n), fd);
-	    if ((n > 0) && (n <= MAX_REGISTERS)) {
-		char *tmpstr = (char *) alloc(n+1);
-		Fread((genericptr_t) tmpstr, 1, (int) n, fd);
-		tmpstr[n] = '\0';
-		opdat = tmpstr;
-	    } else panic("sp_level_loader: rnd_mons idx out-of-bounds (%i)", n);
-	    break;
-	case SPO_DRAWBRIDGE:
-	    opdat = alloc(sizeof(drawbridge));
-	    Fread(opdat, 1, sizeof(drawbridge), fd);
-	    break;
-	case SPO_MAZEWALK:
-	    opdat = alloc(sizeof(walk));
-	    Fread(opdat, 1, sizeof(walk), fd);
-	    break;
-	case SPO_NON_DIGGABLE:
-	case SPO_NON_PASSWALL:
-	    opdat = alloc(sizeof(digpos));
-	    Fread(opdat, 1, sizeof(digpos), fd);
-	    break;
-	case SPO_ROOM_DOOR:
-	    opdat = alloc(sizeof(room_door));
-	    Fread(opdat, 1, sizeof(room_door), fd);
-	    break;
-	case SPO_CMP:
-	    opdat = alloc(sizeof(opcmp));
-	    Fread(opdat, 1, sizeof(opcmp), fd);
-	    break;
-	case SPO_JMP:
-	case SPO_JL:
-	case SPO_JG:
-	    opdat = alloc(sizeof(opjmp));
-	    Fread(opdat, 1, sizeof(opjmp), fd);
-	    break;
-	case SPO_REPLACETERRAIN:
-	    opdat = alloc(sizeof(replaceterrain));
-	    Fread(opdat, 1, sizeof(replaceterrain), fd);
-	    break;
-	case SPO_TERRAIN:
-	    opdat = alloc(sizeof(terrain));
-	    Fread(opdat, 1, sizeof(terrain), fd);
-	    break;
-	case SPO_RANDLINE:
-	    opdat = alloc(sizeof(randline));
-	    Fread(opdat, 1, sizeof(randline), fd);
-	    break;
-	case SPO_SPILL:
-	    opdat = alloc(sizeof(spill));
-	    Fread(opdat, 1, sizeof(spill), fd);
-	    break;
-	case SPO_MAP:
-	    /*tmpmazepart = ((mazepart *) opdat = alloc(sizeof(mazepart)));*/
-	    opdat = alloc(sizeof(mazepart));
-	    tmpmazepart = (mazepart *) opdat;
-	    Fread((genericptr_t) &tmpmazepart->zaligntyp, 1, sizeof(tmpmazepart->zaligntyp), fd);
-	    Fread((genericptr_t) &tmpmazepart->keep_region, 1, sizeof(tmpmazepart->keep_region), fd);
-	    Fread((genericptr_t) &tmpmazepart->halign, 1, sizeof(tmpmazepart->halign), fd);
-	    Fread((genericptr_t) &tmpmazepart->valign, 1, sizeof(tmpmazepart->valign), fd);
-	    Fread((genericptr_t) &tmpmazepart->xsize, 1, sizeof(tmpmazepart->xsize), fd);
-	    Fread((genericptr_t) &tmpmazepart->ysize, 1, sizeof(tmpmazepart->ysize), fd);
-	    if ((tmpmazepart->xsize > 0) && (tmpmazepart->ysize > 0)) {
-		tmpmazepart->map = (char **) alloc(tmpmazepart->ysize*sizeof(char *));
-		for (i=0; i<tmpmazepart->ysize; i++) {
-		    tmpmazepart->map[i] = (char *) alloc(tmpmazepart->xsize);
-		    for (j=0; j<tmpmazepart->xsize; j++) {
-			tmpmazepart->map[i][j] = Fgetc(fd);
-		    }
+	if (opcode < SPO_NULL || opcode >= MAX_SP_OPCODES)
+	    panic("sp_level_loader: impossible opcode %i.", opcode);
+
+	if (opcode == SPO_PUSH) {
+	    struct opvar *ov = (opdat = alloc(sizeof(struct opvar)));
+	    int nsize;
+
+	    ov->spovartyp = SPO_NULL;
+	    ov->vardata.l = 0;
+	    Fread((genericptr_t)&(ov->spovartyp), 1, sizeof(ov->spovartyp), fd);
+
+	    switch (ov->spovartyp) {
+	    case SPOVAR_NULL: break;
+	    case SPOVAR_INT:
+		Fread((genericptr_t)&(ov->vardata.l), 1, sizeof(ov->vardata.l), fd);
+		break;
+	    case SPOVAR_STRING:
+		{
+		    char *opd;
+		    Fread((genericptr_t) &nsize, 1, sizeof(nsize), fd);
+		    opd = (char *)alloc(nsize + 1);
+		    if (nsize) Fread(opd, 1, nsize, fd);
+		    opd[nsize] = 0;
+		    ov->vardata.str = opd;
 		}
+		break;
+	    default:
+		panic("sp_level_loader: unknown opvar type %i", ov->spovartyp);
 	    }
-	    break;
-	default:
-	    panic("sp_level_loader: Unknown opcode %i", opcode);
 	}
 
 	lvl->opcodes[n_opcode].opdat = opdat;
@@ -2586,83 +2532,25 @@ sp_lev *lvl;
 	int opcode = lvl->opcodes[n_opcode].opcode;
 	genericptr_t opdat = lvl->opcodes[n_opcode].opdat;
 
-	switch (opcode) {
-        case SPO_CMP:
-        case SPO_JMP:
-        case SPO_JL:
-        case SPO_JG:
-        case SPO_NULL:
-	case SPO_EXIT:
-	case SPO_POP_CONTAINER:
-	case SPO_MESSAGE:
-	case SPO_DOOR:
-	case SPO_ENDROOM:
-	case SPO_STAIR:
-	case SPO_LADDER:
-	case SPO_ALTAR:
-	case SPO_FOUNTAIN:
-	case SPO_SINK:
-	case SPO_POOL:
-	case SPO_TRAP:
-	case SPO_GOLD:
-	case SPO_CORRIDOR:
-	case SPO_REGION:
-	case SPO_RANDOM_OBJECTS:
-	case SPO_RANDOM_PLACES:
-	case SPO_RANDOM_MONSTERS:
-	case SPO_DRAWBRIDGE:
-	case SPO_MAZEWALK:
-	case SPO_NON_DIGGABLE:
-	case SPO_NON_PASSWALL:
-	case SPO_ROOM_DOOR:
-	case SPO_WALLIFY:
-	case SPO_TERRAIN:
-	case SPO_REPLACETERRAIN:
-	case SPO_RANDLINE:
-	case SPO_SPILL:
-	    /* nothing extra to free here */
-	    break;
-	case SPO_SUBROOM:
-	case SPO_ROOM:
-	    tmproom = (room *) opdat;
-	    if (tmproom) {
-		Free(tmproom->name.str);
-		Free(tmproom->parent.str);
-	    }
-	    break;
-	case SPO_LEVREGION:
-	    /* lev_regions are moved to lregions, and used in mkmaze.c, so
-	       do not free them here! */
-	    break;
-	case SPO_MONSTER:
-	    tmpmons = (monster *) opdat;
-	    if (tmpmons) {
-		Free(tmpmons->name.str);
-		Free(tmpmons->appear_as.str);
-	    }
-	    break;
-	case SPO_OBJECT:
-	    tmpobj = (object *) opdat;
-	    if (tmpobj) Free(tmpobj->name.str);
-	    break;
-	case SPO_ENGRAVING:
-	    tmpengraving = (engraving *) opdat;
-	    if (tmpengraving) Free(tmpengraving->engr.str);
-	    break;
-	case SPO_MAP:
-	    mpart = (mazepart *) opdat;
-	    if (mpart) {
-		int j;
-		if ((mpart->xsize > 0) && (mpart->ysize > 0)) {
-		    for (j=0; j<mpart->ysize; j++)
-			Free(mpart->map[j]);
-		    Free(mpart->map);
+	if (opcode < SPO_NULL || opcode >= MAX_SP_OPCODES)
+	    panic("sp_level_free: unknown opcode %i", opcode);
+
+	if (opcode == SPO_PUSH) {
+	    if (opdat) {
+		struct opvar *push = (struct opvar *)opdat;
+		switch (push->spovartyp) {
+		case SPOVAR_NULL:
+		case SPOVAR_INT:
+		    break;
+		case SPOVAR_STRING:
+		    Free(push->vardata.str);
+		    break;
+		default:
+		    panic("sp_level_free: unknown opvar type %i", push->spovartyp);
 		}
 	    }
-	    break;
-	default:
-	    panic("sp_level_free: Unknown opcode %i", opcode);
 	}
+
 	Free(opdat);
 	n_opcode++;
     } /*while*/
@@ -2670,6 +2558,27 @@ sp_lev *lvl;
     free(lvl->opcodes);
 
     return TRUE;
+}
+
+void
+splev_initlev(linit)
+lev_init *linit;
+{
+    switch (linit->init_style) {
+    default: impossible("Unrecognized level init style."); break;
+    case LVLINIT_NONE: break;
+    case LVLINIT_SOLIDFILL:
+	lvlfill_solid(linit->filling);
+	break;
+    case LVLINIT_MAZEGRID:
+	lvlfill_maze_grid(2,0, x_maze_max,y_maze_max, linit->filling);
+	break;
+    case LVLINIT_MINES:
+	if (linit->lit < 0) linit->lit = rn2(2);
+	if (linit->filling > -1) lvlfill_solid(linit->filling);
+	mkmap(linit);
+	break;
+    }
 }
 
 /* Special level coder, creates the special level from the sp_lev codes.
@@ -2681,45 +2590,21 @@ sp_lev *lvl;
 {
     long n_opcode = 0;
     long exec_opcodes = 0;
+
+    struct mkroom *croom;
+    struct mkroom *tmproomlist[MAX_NESTED_ROOMS+1];
+    boolean failed_room[MAX_NESTED_ROOMS+1];
+    int n_subroom = 1;
+
     boolean exit_script = FALSE;
     int  tmpidx;
     int  cpu_flags = 0;
     char *tmpstr;
-    monster *tmpmons;
-    object *tmpobj;
-    engraving *tmpengraving;
-    door *tmpdoor;
-    stair *tmpstair;
-    stair prevstair;
-    lad *tmplad;
-    altar *tmpaltar;
-    fountain *tmpfountain;
-    trap *tmptrap;
-    gold *tmpgold;
-    lev_region *tmplregion;
-    region *tmpregion;
-    drawbridge *tmpdb;
-    walk *tmpwalk;
-    digpos *tmpdig;
-    mazepart *tmpmazepart;
-    sink *tmpsink;
-    pool *tmppool;
-    corridor *tmpcorridor;
-    terrain *tmpterrain;
-    randline *tmprandline;
-    replaceterrain *tmpreplaceterrain;
-	 spill* tmpspill;
-    room *tmproom, *tmpsubroom;
-    room_door *tmproomdoor;
-    struct mkroom *croom,
-	*mkr = (struct mkroom *)0,
-	*mkrsub = (struct mkroom *)0;
 
     xchar   x, y, typ;
     boolean prefilled, room_not_needed;
 
     char    n = '\0';
-    schar   halign, valign;
 
     int     xi, dir;
     int     tmpi;
@@ -2732,8 +2617,14 @@ sp_lev *lvl;
     boolean has_bounds = FALSE;
     boolean premapped = FALSE;
 
-    prevstair.x = prevstair.y = 0;
-    tmproom = tmpsubroom = (room *) 0;
+    struct splevstack stack;
+
+    splev_stack_init(&stack);
+
+    for (tmpi = 0; tmpi <= MAX_NESTED_ROOMS; tmpi++) {
+	tmproomlist[tmpi] = (struct mkroom *)0;
+	failed_room[tmpi] = FALSE;
+    }
 
     shuffle_alignments();
 
@@ -2744,34 +2635,11 @@ sp_lev *lvl;
 
     level.flags.is_maze_lev = 0;
 
-    switch (lvl->init_lev.init_style) {
-    default: impossible("Unrecognized level init style."); break;
-    case LVLINIT_NONE: break;
-    case LVLINIT_SOLIDFILL:
-	lvlfill_solid(lvl->init_lev.filling);
-	xstart = 1;
-	ystart = 0;
-	xsize = COLNO-1;
-	ysize = ROWNO;
-	break;
-    case LVLINIT_MAZEGRID:
-	lvlfill_maze_grid(2,0, x_maze_max,y_maze_max, lvl->init_lev.filling);
-	xstart = 1;
-	ystart = 0;
-	xsize = COLNO-1;
-	ysize = ROWNO;
-	break;
-    case LVLINIT_MINES:
-	if (lvl->init_lev.lit < 0) lvl->init_lev.lit = rn2(2);
-	if (lvl->init_lev.filling > -1) lvlfill_solid(lvl->init_lev.filling);
-	mkmap(&(lvl->init_lev));
-	xstart = 1;
-	ystart = 0;
-	xsize = COLNO-1;
-	ysize = ROWNO;
-	break;
-    }
-
+    splev_initlev(&(lvl->init_lev));
+    xstart = 1;
+    ystart = 0;
+    xsize = COLNO-1;
+    ysize = ROWNO;
 
     if (lvl->init_lev.flags & NOTELEPORT)   level.flags.noteleport = 1;
     if (lvl->init_lev.flags & HARDFLOOR)    level.flags.hardfloor = 1;
@@ -2793,9 +2661,12 @@ sp_lev *lvl;
 	    exit_script = TRUE;
 	}
 
-	croom = mkrsub ? mkrsub : mkr;
+	if (failed_room[n_subroom-1] &&
+	    opcode != SPO_ENDROOM &&
+	    opcode != SPO_ROOM &&
+	    opcode != SPO_SUBROOM) goto next_opcode;
 
-	if (room_build_fail && (opcode != SPO_ENDROOM) && (opcode != SPO_ROOM) && (opcode != SPO_SUBROOM)) goto next_opcode;
+	croom = tmproomlist[n_subroom-1];
 
 	switch (opcode) {
         case SPO_NULL:
@@ -2809,62 +2680,283 @@ sp_lev *lvl;
 		container_obj[container_idx] = NULL;
 	    }
 	    break;
-	case SPO_MESSAGE:
-	    if (opdat) {
-		char *msg = (char *) opdat;
-		char *levmsg;
-		int old_n = lev_message ? (strlen(lev_message)+1) : 0;
-		n = strlen(msg);
-		levmsg = (char *) alloc(old_n+n+1);
-		if (old_n) levmsg[old_n-1] = '\n';
-		if (lev_message) 
-		    (void) memcpy((genericptr_t)levmsg, (genericptr_t)lev_message, old_n-1);
-		(void) memcpy((genericptr_t)&levmsg[old_n], opdat, n);
-		levmsg[old_n+n] = '\0';
-		Free(lev_message);
-		lev_message = levmsg;
+	case SPO_POP:
+	    {
+	       struct opvar op = splev_stack_pop(&stack);
+	       switch (op.spovartyp) {
+               case SPOVAR_INT:
+		   break;
+               case SPOVAR_STRING:
+		   Free(op.vardata.str);
+		   break;
+               default: break;
+	       }
 	    }
 	    break;
+	case SPO_PUSH:
+	    {
+		struct opvar *tmppush = (struct opvar *)opdat;
+		switch (tmppush->spovartyp) {
+		case SPOVAR_INT:
+		    {
+			struct opvar p;
+			p.spovartyp = tmppush->spovartyp;
+			p.vardata.l = tmppush->vardata.l;
+			splev_stack_push(&stack, p);
+		    }
+		    break;
+		case SPOVAR_STRING:
+		    {
+			struct opvar p;
+			int len = strlen(tmppush->vardata.str);
+			p.spovartyp = tmppush->spovartyp;
+			p.vardata.str = (char *)alloc(len+1);
+			(void)memcpy((genericptr_t)p.vardata.str,
+				     (genericptr_t)tmppush->vardata.str, len);
+			p.vardata.str[len] = '\0';
+			splev_stack_push(&stack, p);
+		    }
+		    break;
+		default: impossible("Unknown push value type (%i)!", tmppush->spovartyp);
+		}
+	    }
+	    break;
+	case SPO_MESSAGE:
+	    {
+	       struct opvar op;
+	       char *msg, *levmsg;
+	       int old_n, n;
+	       if (!get_opvar_dat(&stack, &op, SPOVAR_STRING)) break;
+	       msg = op.vardata.str;
+
+	       old_n = lev_message ? (strlen(lev_message)+1) : 0;
+	       n = strlen(msg);
+
+	       levmsg = (char *) alloc(old_n+n+1);
+	       if (old_n) levmsg[old_n-1] = '\n';
+	       if (lev_message)
+		   (void) memcpy((genericptr_t)levmsg, (genericptr_t)lev_message, old_n-1);
+	       (void) memcpy((genericptr_t)&levmsg[old_n], msg, n);
+	       Free(msg);
+	       levmsg[old_n+n] = '\0';
+	       Free(lev_message);
+	       lev_message = levmsg;
+	   }
+	   break;
 	case SPO_MONSTER:
-	    tmpmons = (monster *) opdat;
-	    if (tmpmons) create_monster(tmpmons, croom);
+	    {
+              int nparams = 0;
+
+              struct opvar varparam;
+              struct opvar id, x, y, class;
+              monster tmpmons;
+
+              tmpmons.peaceful = -1;
+              tmpmons.asleep = -1;
+              tmpmons.name.str = (char *)0;
+              tmpmons.appear = 0;
+              tmpmons.appear_as.str = (char *)0;
+              tmpmons.align = - MAX_REGISTERS - 2;
+
+              if (!get_opvar_dat(&stack, &id, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &class, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &y, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &x, SPOVAR_INT)) break;
+
+	      varparam = splev_stack_pop(&stack);
+
+              while ((nparams++ < (SP_M_V_END+1)) &&
+                     (varparam.spovartyp == SPOVAR_INT) &&
+                     (varparam.vardata.l >= 0) &&
+                     (varparam.vardata.l < SP_M_V_END)) {
+                 struct opvar parm = splev_stack_pop(&stack);
+                 switch (varparam.vardata.l) {
+                  case SP_M_V_NAME:
+		      if ((parm.spovartyp == SPOVAR_STRING) &&
+			  !tmpmons.name.str)
+			  tmpmons.name.str = parm.vardata.str;
+		      break;
+                  case SP_M_V_APPEAR:
+		      if ((parm.spovartyp == SPOVAR_INT) &&
+			  !tmpmons.appear_as.str) {
+			  tmpmons.appear = parm.vardata.l;
+			  parm = splev_stack_pop(&stack);
+			  tmpmons.appear_as.str = parm.vardata.str;
+		      }
+		      break;
+                  case SP_M_V_ASLEEP:
+		      if (parm.spovartyp == SPOVAR_INT)
+			  tmpmons.asleep = parm.vardata.l;
+		      break;
+                  case SP_M_V_ALIGN:
+		      if (parm.spovartyp == SPOVAR_INT)
+			  tmpmons.align = parm.vardata.l;
+		      break;
+                  case SP_M_V_PEACEFUL:
+		      if (parm.spovartyp == SPOVAR_INT)
+			  tmpmons.peaceful = parm.vardata.l;
+		      break;
+                  case SP_M_V_END:
+		      nparams = SP_M_V_END+1;
+		      break;
+                  default:
+		      impossible("MONSTER with unknown variable param type!");
+		      break;
+                 }
+                 if (varparam.vardata.l != SP_M_V_END)
+		     varparam = splev_stack_pop(&stack);
+              }
+
+              tmpmons.id = id.vardata.l;
+              tmpmons.x = x.vardata.l;
+              tmpmons.y = y.vardata.l;
+              tmpmons.class = class.vardata.l;
+
+              create_monster(&tmpmons, croom);
+
+              free(tmpmons.name.str);
+              free(tmpmons.appear_as.str);
+
+	    }
 	    break;
 	case SPO_OBJECT:
-	    tmpobj = (object *) opdat;
-	    if (tmpobj) create_object(tmpobj, croom);
+	    {
+		int nparams = 0;
+
+		struct opvar varparam;
+		struct opvar id, x, y, class, containment;
+
+		object tmpobj;
+
+		tmpobj.spe = -127;
+		tmpobj.curse_state = -1;
+		tmpobj.corpsenm = NON_PM;
+		tmpobj.name.str = (char *)0;
+
+		if (!get_opvar_dat(&stack, &containment, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &id, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &class, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &y, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &x, SPOVAR_INT)) break;
+
+		varparam = splev_stack_pop(&stack);
+
+		while ((nparams++ < (SP_O_V_END+1)) &&
+                     (varparam.spovartyp == SPOVAR_INT) &&
+                     (varparam.vardata.l >= 0) &&
+                     (varparam.vardata.l < SP_O_V_END)) {
+                 struct opvar parm = splev_stack_pop(&stack);
+                 switch (varparam.vardata.l) {
+                  case SP_O_V_NAME:
+                    if ((parm.spovartyp == SPOVAR_STRING) &&
+                        !tmpobj.name.str)
+                      tmpobj.name.str = parm.vardata.str;
+                    break;
+                  case SP_O_V_CORPSENM:
+                    if ((parm.spovartyp == SPOVAR_INT))
+                      tmpobj.corpsenm = parm.vardata.l;
+                    break;
+                  case SP_O_V_CURSE:
+                    if (parm.spovartyp == SPOVAR_INT)
+                      tmpobj.curse_state = parm.vardata.l;
+                    break;
+                  case SP_O_V_SPE:
+                    if (parm.spovartyp == SPOVAR_INT)
+                       tmpobj.spe = parm.vardata.l;
+                    break;
+                  case SP_O_V_END:
+                    nparams = SP_O_V_END+1;
+                    break;
+                  default:
+                    impossible("OBJECT with unknown variable param type!");
+                    break;
+                 }
+                 if (varparam.vardata.l != SP_O_V_END)
+                   varparam = splev_stack_pop(&stack);
+		}
+
+              tmpobj.id = id.vardata.l;
+              tmpobj.x = x.vardata.l;
+              tmpobj.y = y.vardata.l;
+              tmpobj.class = class.vardata.l;
+              tmpobj.containment = containment.vardata.l;
+
+              create_object(&tmpobj, croom);
+
+              free(tmpobj.name.str);
+	    }
 	    break;
 	case SPO_ENGRAVING:
-	    tmpengraving = (engraving *) opdat;
-	    if (tmpengraving)
-		create_engraving(tmpengraving, croom);
+           {
+               struct opvar etyp, txt, fy, fx;
+	       engraving tmpe;
+
+               if (!get_opvar_dat(&stack, &etyp, SPOVAR_INT) ||
+                   !get_opvar_dat(&stack, &txt, SPOVAR_STRING) ||
+                   !get_opvar_dat(&stack, &fy, SPOVAR_INT) ||
+                   !get_opvar_dat(&stack, &fx, SPOVAR_INT)) break;
+
+	       tmpe.x = fx.vardata.l;
+	       tmpe.y = fy.vardata.l;
+	       tmpe.engr.str = txt.vardata.str;
+	       tmpe.etype = etyp.vardata.l;
+
+	       create_engraving(&tmpe, croom);
+           }
 	    break;
 	case SPO_SUBROOM:
-	    if (!room_build_fail) {
-		tmpsubroom = (room *) opdat;
-		if (!mkr) {
-		    panic("Subroom without a parent room?!");
-		} else if (!tmpsubroom) panic("Subroom without data?");
-		croom = build_room(tmpsubroom, mkr);
-		if (croom) mkrsub = croom;
-		else room_build_fail++;
-	    } else room_build_fail++; /* room failed to get built, fail subroom too. */
-	    break;
 	case SPO_ROOM:
-	    if (!room_build_fail) {
-		tmproom = (room *) opdat;
-		tmpsubroom = (room *)0;
-		mkrsub = (struct mkroom *)0;
-		if (!tmproom) panic("Room without data?");
-		croom = build_room(tmproom, (struct mkroom *)0);
-		if (croom) mkr = croom;
-		else room_build_fail++;
-	    } else room_build_fail++; /* one room failed alreaedy, fail this one too. */
-	    break;
+           if (n_subroom > MAX_NESTED_ROOMS)
+	       panic("Too deeply nested rooms?!");
+           else {
+              struct opvar filled, h, w, yalign, xalign,
+                    y, x, rlit, chance, rtype;
+
+              room tmproom;
+              struct mkroom *tmpcr;
+
+              if (!get_opvar_dat(&stack, &h, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &w, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &y, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &x, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &yalign, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &xalign, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &filled, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &rlit, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &chance, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &rtype, SPOVAR_INT)) break;
+
+              if (!failed_room[n_subroom-1]) {
+
+                 tmproom.x = x.vardata.l;
+                 tmproom.y = y.vardata.l;
+                 tmproom.w = w.vardata.l;
+                 tmproom.h = h.vardata.l;
+                 tmproom.xalign = xalign.vardata.l;
+                 tmproom.yalign = yalign.vardata.l;
+                 tmproom.rtype = rtype.vardata.l;
+                 tmproom.chance = chance.vardata.l;
+                 tmproom.rlit = rlit.vardata.l;
+                 tmproom.filled = filled.vardata.l;
+
+                 tmpcr = build_room(&tmproom, croom);
+                 if (tmpcr) {
+                    tmproomlist[n_subroom] = tmpcr;
+                    failed_room[n_subroom] = FALSE;
+                    n_subroom++;
+                    break;
+                 }
+              } /* failed to create parent room, so fail this too */
+           }
+           tmproomlist[n_subroom] = (struct mkroom *)0;
+           failed_room[n_subroom] = TRUE;
+           n_subroom++;
+           break;
 	case SPO_ENDROOM:
-	    if (mkrsub) {
-		mkrsub = (struct mkroom *)0; /* get out of subroom */
-	    } else if (mkr) {
-		mkr = (struct mkroom *)0; /* no subroom, get out of top-level room */
+	    if (n_subroom > 1) {
+		n_subroom--;
+	    } else {
+		/* no subroom, get out of top-level room */
 		/* Need to ensure xstart/ystart/xsize/ysize have something sensible,
 		   in case there's some stuff to be created outside the outermost room,
 		   and there's no MAP.
@@ -2876,460 +2968,825 @@ sp_lev *lvl;
 		    ysize = ROWNO;
 		}
 	    }
-	    if (room_build_fail > 0) room_build_fail--;
 	    break;
 	case SPO_DOOR:
-	    croom = &rooms[0];
+	    {
+              schar x,y;
+              struct opvar msk, fy, fx;
+	      struct mkroom *droom;
+              xchar typ;
 
-	    tmpdoor = (door *) opdat;
-	    x = tmpdoor->x;
-	    y = tmpdoor->y;
-	    typ = tmpdoor->mask == -1 ? rnddoor() : tmpdoor->mask;
+              if (!get_opvar_dat(&stack, &msk, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &fy, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &fx, SPOVAR_INT)) break;
 
-	    get_location(&x, &y, DRY, (struct mkroom *)0);
-	    if (levl[x][y].typ != SDOOR)
-		levl[x][y].typ = DOOR;
-	    else {
-		if(typ < D_CLOSED)
-		    typ = D_CLOSED; /* force it to be closed */
-	    }
-	    levl[x][y].doormask = typ;
+              droom = &rooms[0];
 
-	    /* Now the complicated part, list it with each subroom */
-	    /* The dog move and mail daemon routines use this */
-	    while(croom->hx >= 0 && doorindex < DOORMAX) {
-		if(croom->hx >= x-1 && croom->lx <= x+1 &&
-		   croom->hy >= y-1 && croom->ly <= y+1) {
-		    /* Found it */
-		    add_door(x, y, croom);
-		}
-		croom++;
+              x = fx.vardata.l; y = fy.vardata.l;
+              typ = msk.vardata.l == -1 ? rnddoor() : (xchar)msk.vardata.l;
+
+              get_location(&x, &y, DRY, (struct mkroom *)0);
+              if (levl[x][y].typ != SDOOR)
+                levl[x][y].typ = DOOR;
+              else {
+                 if(typ < D_CLOSED)
+                   typ = D_CLOSED; /* force it to be closed */
+              }
+              levl[x][y].doormask = typ;
+              /*SpLev_Map[x][y] = 1;*/
+
+              /* Now the complicated part, list it with each subroom */
+              /* The dog move and mail daemon routines use this */
+              while(droom->hx >= 0 && doorindex < DOORMAX) {
+                 if(droom->hx >= x-1 && droom->lx <= x+1 &&
+                    droom->hy >= y-1 && droom->ly <= y+1) {
+                    /* Found it */
+                    add_door(x, y, droom);
+                 }
+                 droom++;
+              }
 	    }
 	    break;
 	case SPO_STAIR:
-	    tmpstair = (stair *) opdat;
-	    if (croom) {
-		create_stairs(tmpstair, croom);
-	    } else {
-		xi = 0;
-		do {
-		    x = tmpstair->x;  y = tmpstair->y;
+	    {
+		xchar x,y;
+		struct opvar up, fy, fx;
+		struct trap *badtrap;
+
+		if (!get_opvar_dat(&stack, &up, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &fy, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &fx, SPOVAR_INT)) break;
+
+		if (croom) {
+		    x = fx.vardata.l;
+		    y = fy.vardata.l;
 		    get_location(&x, &y, DRY, croom);
-		} while(prevstair.x && xi++ < 100 &&
-			distmin(x,y,prevstair.x,prevstair.y) <= 8);
-		if ((badtrap = t_at(x,y)) != 0) deltrap(badtrap);
-		mkstairs(x, y, (char)tmpstair->up, croom);
-		prevstair.x = x;
-		prevstair.y = y;
+		    mkstairs(x,y,(char)up.vardata.l, croom);
+		    SpLev_Map[x][y] = 1;
+		} else {
+		    x = fx.vardata.l;
+		    y = fy.vardata.l;
+		    get_location(&x, &y, DRY, croom);
+		    if ((badtrap = t_at(x,y)) != 0) deltrap(badtrap);
+		    mkstairs(x, y, (char)up.vardata.l, croom);
+		    SpLev_Map[x][y] = 1;
+		}
 	    }
 	    break;
 	case SPO_LADDER:
-	    tmplad = (lad *) opdat;
+	    {
+              xchar x,y;
+              struct opvar up, fy, fx;
 
-	    x = tmplad->x;  y = tmplad->y;
-	    get_location(&x, &y, DRY, croom);
+              if (!get_opvar_dat(&stack, &up, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &fy, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &fx, SPOVAR_INT)) break;
 
-	    levl[x][y].typ = LADDER;
-	    if (tmplad->up == 1) {
-		xupladder = x;	yupladder = y;
-		levl[x][y].ladder = LA_UP;
-	    } else {
-		xdnladder = x;	ydnladder = y;
-		levl[x][y].ladder = LA_DOWN;
+              x = fx.vardata.l;
+              y = fy.vardata.l;
+
+              get_location(&x, &y, DRY, croom);
+
+              levl[x][y].typ = LADDER;
+              SpLev_Map[x][y] = 1;
+              if (up.vardata.l) {
+		  xupladder = x; yupladder = y;
+		  levl[x][y].ladder = LA_UP;
+              } else {
+		  xdnladder = x; ydnladder = y;
+		  levl[x][y].ladder = LA_DOWN;
+              }
 	    }
 	    break;
 	case SPO_ALTAR:
-	    tmpaltar = (altar *) opdat;
-	    create_altar(tmpaltar, croom);
+	    {
+	       struct opvar al, shrine, fy, fx;
+	       altar tmpaltar;
+
+              if (!get_opvar_dat(&stack, &al, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &shrine, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &fy, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &fx, SPOVAR_INT)) break;
+
+	      tmpaltar.x = fx.vardata.l;
+	      tmpaltar.y = fy.vardata.l;
+	      tmpaltar.align = al.vardata.l;
+	      tmpaltar.shrine = shrine.vardata.l;
+
+              create_altar(&tmpaltar, croom);
+	    }
 	    break;
 	case SPO_FOUNTAIN:
-	    tmpfountain = (fountain *) opdat;
-	    create_feature(tmpfountain->x, tmpfountain->y, croom, FOUNTAIN);
+	    {
+		struct opvar fy, fx;
+
+		if (!get_opvar_dat(&stack, &fy, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &fx, SPOVAR_INT)) break;
+
+		create_feature(fx.vardata.l, fy.vardata.l, croom, FOUNTAIN);
+	    }
 	    break;
 	case SPO_SINK:
-	    tmpsink = (sink *) opdat;
-	    create_feature(tmpsink->x, tmpsink->y, croom, SINK);
+	    {
+		struct opvar fy, fx;
+		if (!get_opvar_dat(&stack, &fy, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &fx, SPOVAR_INT)) break;
+		create_feature(fx.vardata.l, fy.vardata.l, croom, SINK);
+	    }
 	    break;
 	case SPO_POOL:
-	    tmppool = (pool *) opdat;
-	    create_feature(tmppool->x, tmppool->y, croom, POOL);
+	    {
+		struct opvar fy, fx;
+		if (!get_opvar_dat(&stack, &fy, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &fx, SPOVAR_INT)) break;
+		create_feature(fx.vardata.l, fy.vardata.l, croom, POOL);
+	    }
 	    break;
 	case SPO_TRAP:
-	    tmptrap = (trap *) opdat;
-	    create_trap(tmptrap, croom);
+	    {
+		struct opvar chance, type, fy, fx;
+		trap tmptrap;
+
+		if (!get_opvar_dat(&stack, &type, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &fy, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &fx, SPOVAR_INT)) break;
+
+		tmptrap.x = fx.vardata.l;
+		tmptrap.y = fy.vardata.l;
+		tmptrap.type = type.vardata.l;
+
+		create_trap(&tmptrap, croom);
+	    }
 	    break;
 	case SPO_GOLD:
-	    tmpgold = (gold *) opdat;
-	    create_gold(tmpgold, croom);
+	    {
+		struct opvar fy, fx, amt;
+		gold tmpgold;
+		if (!get_opvar_dat(&stack, &fx, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &fy, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &amt, SPOVAR_INT)) break;
+		tmpgold.x = fx.vardata.l;
+		tmpgold.y = fy.vardata.l;
+		tmpgold.amount = amt.vardata.l;
+		create_gold(&tmpgold, croom);
+	    }
 	    break;
 	case SPO_CORRIDOR:
-	    tmpcorridor = (corridor *) opdat;
-	    create_corridor(tmpcorridor);
+	    {
+		struct opvar deswall, desdoor, desroom,
+		    srcwall, srcdoor, srcroom;
+		corridor tc;
+
+		if (!get_opvar_dat(&stack, &deswall, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &desdoor, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &desroom, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &srcwall, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &srcdoor, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &srcroom, SPOVAR_INT)) break;
+
+		tc.src.room = srcroom.vardata.l;
+		tc.src.door = srcdoor.vardata.l;
+		tc.src.wall = srcwall.vardata.l;
+		tc.dest.room = desroom.vardata.l;
+		tc.dest.door = desdoor.vardata.l;
+		tc.dest.wall = deswall.vardata.l;
+
+		create_corridor(&tc);
+	    }
 	    break;
 	case SPO_TERRAIN:
-	    tmpterrain = (terrain *) opdat;
-	    set_terrain(tmpterrain, croom);
+	    {
+		terrain tmpterrain;
+		struct opvar x1,y1,x2,y2,areatyp,ter,tlit;
+
+		if (!get_opvar_dat(&stack, &tlit, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &ter, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &areatyp, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &y2, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &x2, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &y1, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &x1, SPOVAR_INT)) break;
+
+		tmpterrain.x1 = x1.vardata.l;
+		tmpterrain.y1 = y1.vardata.l;
+		tmpterrain.x2 = x2.vardata.l;
+		tmpterrain.y2 = y2.vardata.l;
+		tmpterrain.areatyp = areatyp.vardata.l;
+		tmpterrain.ter = ter.vardata.l;
+		tmpterrain.tlit = tlit.vardata.l;
+
+		set_terrain(&tmpterrain, croom);
+	    }
 	    break;
 	case SPO_REPLACETERRAIN:
-	    tmpreplaceterrain = (replaceterrain *) opdat;
-	    replace_terrain(tmpreplaceterrain, croom);
+	    {
+		replaceterrain rt;
+		struct opvar x1,y1,x2,y2,from_ter,to_ter,to_lit,chance;
+
+		if (!get_opvar_dat(&stack, &chance, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &to_lit, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &to_ter, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &from_ter, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &y2, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &x2, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &y1, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &x1, SPOVAR_INT)) break;
+
+		rt.chance = chance.vardata.l;
+		rt.tolit = to_lit.vardata.l;
+		rt.toter = to_ter.vardata.l;
+		rt.fromter = from_ter.vardata.l;
+		rt.x1 = x1.vardata.l;
+		rt.y1 = y1.vardata.l;
+		rt.x2 = x2.vardata.l;
+		rt.y2 = y2.vardata.l;
+
+		replace_terrain(&rt, croom);
+	    }
 	    break;
 	case SPO_RANDLINE:
-	    tmprandline = (randline *) opdat;
-	    line_midpoint(tmprandline, croom);
+	    {
+		randline rl;
+		struct opvar x1,y1,x2,y2,fg,lit,roughness,thick;
+		if (!get_opvar_dat(&stack, &thick, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &roughness, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &lit, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &fg, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &y2, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &x2, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &y1, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &x1, SPOVAR_INT)) break;
+
+		rl.thick = thick.vardata.l;
+		rl.roughness = roughness.vardata.l;
+		rl.lit = lit.vardata.l;
+		rl.fg = fg.vardata.l;
+		rl.x1 = x1.vardata.l;
+		rl.y1 = y1.vardata.l;
+		rl.x2 = x2.vardata.l;
+		rl.y2 = y2.vardata.l;
+
+		line_midpoint(&rl, croom);
+	    }
 	    break;
 	case SPO_SPILL:
-	    tmpspill = (spill*) opdat;
-	    spill_terrain(tmpspill, croom);
+	    {
+		spill sp;
+		struct opvar x,y,typ,dir,count,lit;
+		if (!get_opvar_dat(&stack, &lit, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &count, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &dir, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &typ, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &y, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &x, SPOVAR_INT)) break;
+
+		sp.x = x.vardata.l;
+		sp.y = y.vardata.l;
+
+		sp.lit = lit.vardata.l;
+		sp.count = count.vardata.l;
+		sp.direction = dir.vardata.l;
+		sp.typ = typ.vardata.l;
+
+		spill_terrain(&sp, croom);
+	    }
 	    break;
 	case SPO_LEVREGION:
-	    tmplregion = (lev_region *) opdat;
-	    if(!tmplregion->in_islev) {
-		get_location(&tmplregion->inarea.x1, &tmplregion->inarea.y1,
-			     DRY|WET, (struct mkroom *)0);
-		get_location(&tmplregion->inarea.x2, &tmplregion->inarea.y2,
-			     DRY|WET, (struct mkroom *)0);
+	    {
+		struct opvar rname, padding, rtype, del_islev,
+                    dy2, dx2, dy1, dx1, in_islev,
+                    iy2, ix2, iy1, ix1;
+
+		lev_region *tmplregion;
+
+		if (!get_opvar_dat(&stack, &rname, SPOVAR_STRING) ||
+		    !get_opvar_dat(&stack, &padding, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &rtype, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &del_islev, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &dy2, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &dx2, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &dy1, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &dx1, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &in_islev, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &iy2, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &ix2, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &iy1, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &ix1, SPOVAR_INT)) break;
+
+		tmplregion = (lev_region *)alloc(sizeof(lev_region));
+
+		tmplregion->inarea.x1 = ix1.vardata.l;
+		tmplregion->inarea.y1 = iy1.vardata.l;
+		tmplregion->inarea.x2 = ix2.vardata.l;
+		tmplregion->inarea.y2 = iy2.vardata.l;
+
+		tmplregion->delarea.x1 = dx1.vardata.l;
+		tmplregion->delarea.y1 = dy1.vardata.l;
+		tmplregion->delarea.x2 = dx2.vardata.l;
+		tmplregion->delarea.y2 = dy2.vardata.l;
+
+		tmplregion->in_islev = in_islev.vardata.l;
+		tmplregion->del_islev = del_islev.vardata.l;
+		tmplregion->rtype = rtype.vardata.l;
+		tmplregion->padding = padding.vardata.l;
+		tmplregion->rname.str = rname.vardata.str;
+
+		if(!tmplregion->in_islev) {
+		    get_location(&tmplregion->inarea.x1, &tmplregion->inarea.y1,
+				 DRY|WET, (struct mkroom *)0);
+		    get_location(&tmplregion->inarea.x2, &tmplregion->inarea.y2,
+				 DRY|WET, (struct mkroom *)0);
+		}
+
+		if(!tmplregion->del_islev) {
+		    get_location(&tmplregion->delarea.x1, &tmplregion->delarea.y1,
+				 DRY|WET, (struct mkroom *)0);
+		    get_location(&tmplregion->delarea.x2, &tmplregion->delarea.y2,
+				 DRY|WET, (struct mkroom *)0);
+		}
+		if(num_lregions) {
+		    /* realloc the lregion space to add the new one */
+		    lev_region *newl = (lev_region *) alloc(sizeof(lev_region) *
+							    (unsigned)(1+num_lregions));
+		    (void) memcpy((genericptr_t)(newl), (genericptr_t)lregions,
+				  sizeof(lev_region) * num_lregions);
+		    Free(lregions);
+		    num_lregions++;
+		    lregions = newl;
+		} else {
+		    num_lregions = 1;
+		    lregions = (lev_region *) alloc(sizeof(lev_region));
+		}
+		(void) memcpy(&lregions[num_lregions-1], tmplregion, sizeof(lev_region));
 	    }
-	    if(!tmplregion->del_islev) {
-		get_location(&tmplregion->delarea.x1, &tmplregion->delarea.y1,
-			     DRY|WET, (struct mkroom *)0);
-		get_location(&tmplregion->delarea.x2, &tmplregion->delarea.y2,
-			     DRY|WET, (struct mkroom *)0);
-	    }
-	    if(num_lregions) {
-		/* realloc the lregion space to add the new one */
-		lev_region *newl = (lev_region *) alloc(sizeof(lev_region) *
-							(unsigned)(1+num_lregions));
-		(void) memcpy((genericptr_t)(newl), (genericptr_t)lregions,
-			      sizeof(lev_region) * num_lregions);
-		Free(lregions);
-		num_lregions += 1;
-		lregions = newl;
-	    } else {
-		num_lregions = 1;
-		lregions = (lev_region *) alloc(sizeof(lev_region) * (unsigned)1);
-	    }
-	    (void) memcpy(&lregions[num_lregions-1], tmplregion, sizeof(lev_region));
 	    break;
 	case SPO_REGION:
-	    {
-		register struct mkroom *troom;
-	        tmpregion = (region *) opdat;
-		if(tmpregion->rtype > MAXRTYPE) {
-		    tmpregion->rtype -= MAXRTYPE+1;
-		    prefilled = TRUE;
-		} else
-		    prefilled = FALSE;
+           {
+               struct opvar rtype, rlit, rirreg, y2,x2,y1,x1;
+               xchar dx1,dy1,dx2,dy2;
+               register struct mkroom *troom;
+               boolean prefilled, room_not_needed;
 
-		if(tmpregion->rlit < 0)
-		    tmpregion->rlit = (rnd(1+abs(depth(&u.uz))) < 11 && rn2(77))
-			? TRUE : FALSE;
+               if (!get_opvar_dat(&stack, &rirreg, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &rtype, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &rlit, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &y2, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &x2, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &y1, SPOVAR_INT) ||
+                  !get_opvar_dat(&stack, &x1, SPOVAR_INT)) break;
 
-		get_location(&tmpregion->x1, &tmpregion->y1, DRY|WET, (struct mkroom *)0);
-		get_location(&tmpregion->x2, &tmpregion->y2, DRY|WET, (struct mkroom *)0);
+              if(rtype.vardata.l > MAXRTYPE) {
+                 rtype.vardata.l -= MAXRTYPE+1;
+                 prefilled = TRUE;
+              } else
+                prefilled = FALSE;
 
-		/* for an ordinary room, `prefilled' is a flag to force
-		   an actual room to be created (such rooms are used to
-		   control placement of migrating monster arrivals) */
-		room_not_needed = (tmpregion->rtype == OROOM &&
-				   !tmpregion->rirreg && !prefilled);
-		if (room_not_needed || nroom >= MAXNROFROOMS) {
-		    if (!room_not_needed)
-			warning("Too many rooms on new level!");
-		    light_region(tmpregion);
-		    goto next_opcode;
-		}
+              if(rlit.vardata.l < 0)
+		  rlit.vardata.l = (rnd(1+abs(depth(&u.uz))) < 11 && rn2(77))
+		      ? TRUE : FALSE;
 
-		troom = &rooms[nroom];
+              dx1 = x1.vardata.l;
+              dy1 = y1.vardata.l;
+              dx2 = x2.vardata.l;
+              dy2 = y2.vardata.l;
 
-		/* mark rooms that must be filled, but do it later */
-		if (tmpregion->rtype != OROOM)
-		    troom->needfill = (prefilled ? 2 : 1);
+              get_location(&dx1, &dy1, DRY|WET, (struct mkroom *)0);
+              get_location(&dx2, &dy2, DRY|WET, (struct mkroom *)0);
 
-		if(tmpregion->rirreg) {
-		    min_rx = max_rx = tmpregion->x1;
-		    min_ry = max_ry = tmpregion->y1;
-		    flood_fill_rm(tmpregion->x1, tmpregion->y1,
-				  nroom+ROOMOFFSET, tmpregion->rlit, TRUE);
-		    add_room(min_rx, min_ry, max_rx, max_ry,
-			     FALSE, tmpregion->rtype, TRUE);
-		    troom->rlit = tmpregion->rlit;
-		    troom->irregular = TRUE;
-		} else {
-		    add_room(tmpregion->x1, tmpregion->y1,
-			     tmpregion->x2, tmpregion->y2,
-			     tmpregion->rlit, tmpregion->rtype, TRUE);
+              /* for an ordinary room, `prefilled' is a flag to force
+               an actual room to be created (such rooms are used to
+               control placement of migrating monster arrivals) */
+              room_not_needed = (rtype.vardata.l == OROOM &&
+                                 !rirreg.vardata.l && !prefilled);
+              if (room_not_needed || nroom >= MAXNROFROOMS) {
+		  region tmpregion;
+                 if (!room_not_needed)
+                   impossible("Too many rooms on new level!");
+		 tmpregion.rlit = rlit.vardata.l;
+		 tmpregion.x1 = dx1;
+		 tmpregion.y1 = dy1;
+		 tmpregion.x2 = dx2;
+		 tmpregion.y2 = dy2;
+                 light_region(&tmpregion);
+                 goto next_opcode;
+              }
+
+              troom = &rooms[nroom];
+
+              /* mark rooms that must be filled, but do it later */
+              if (rtype.vardata.l != OROOM)
+                troom->needfill = (prefilled ? 2 : 1);
+
+              if(rirreg.vardata.l) {
+                 min_rx = max_rx = dx1;
+                 min_ry = max_ry = dy1;
+                 flood_fill_rm(dx1, dy1, nroom+ROOMOFFSET,
+                               rlit.vardata.l, TRUE);
+                 add_room(min_rx, min_ry, max_rx, max_ry,
+                          FALSE, rtype.vardata.l, TRUE);
+                 troom->rlit = rlit.vardata.l;
+                 troom->irregular = TRUE;
+              } else {
+                 add_room(dx1, dy1, dx2, dy2,
+                          rlit.vardata.l, rtype.vardata.l, TRUE);
 #ifdef SPECIALIZATION
-		    topologize(troom,FALSE);		/* set roomno */
+                  topologize(troom,FALSE);              /* set roomno */
 #else
-		    topologize(troom);			/* set roomno */
+                  topologize(troom);                    /* set roomno */
 #endif
-		}
-		break;
-	    }
+              }
+           }
+	   break;
 	case SPO_RANDOM_OBJECTS:
-	    tmpstr = (char *) opdat;
-	    n_robj = strlen(tmpstr);
-	    if ((n_robj <= 0) || (n_robj > MAX_REGISTERS))
-		panic("sp_level_coder: rnd_objs idx out-of-bounds (%i)", n_robj);
-	    (void) memcpy(robjects, tmpstr, n_robj);
+	    {
+               struct opvar robj;
+	       if (!get_opvar_dat(&stack, &robj, SPOVAR_STRING)) break;
+	       n_robj = strlen(robj.vardata.str);
+	       if ((n_robj <= 0) || (n_robj > MAX_REGISTERS)) {
+		   impossible("sp_level_coder: rnd_objs idx out-of-bounds");
+		   break;
+	       } else
+		   (void) memcpy(robjects, robj.vardata.str, n_robj);
+	       free(robj.vardata.str);
+	    }
 	    sp_lev_shuffle(robjects, (char *)0, n_robj);
 	    break;
 	case SPO_RANDOM_PLACES:
-	    tmpstr = (char *) opdat;
-	    n_rloc = strlen(tmpstr);
-	    if ((n_rloc <= 0) || (n_rloc > 2*MAX_REGISTERS))
-		panic("sp_level_coder: rnd_places idx out-of-bounds (%i)", n_rloc);
-	    n_rloc = n_rloc / 2;
-	    for (tmpidx = 0; tmpidx < n_rloc; tmpidx++) {
-		rloc_x[tmpidx] = (tmpstr[tmpidx*2]-1);
-		rloc_y[tmpidx] = (tmpstr[tmpidx*2+1]-1);
+	    {
+               struct opvar places;
+               int tmpidx;
+
+               if (!get_opvar_dat(&stack, &places, SPOVAR_STRING)) break;
+	       if (strlen(places.vardata.str) % 2) impossible("sp_level_codes: rnd_places?");
+	       n_rloc = (strlen(places.vardata.str) / 2);
+	       if ((n_rloc <= 0) || (n_rloc > 2*MAX_REGISTERS)) {
+		   impossible("sp_level_coder: rnd_places idx out-of-bounds");
+		   break;
+	       } else {
+		   for (tmpidx = 0; tmpidx < n_rloc; tmpidx++) {
+		       rloc_x[tmpidx] = (places.vardata.str[tmpidx*2] - 1);
+		       rloc_y[tmpidx] = (places.vardata.str[tmpidx*2+1] - 1);
+		   }
+	       }
+	       free(places.vardata.str);
 	    }
 	    sp_lev_shuffle(rloc_x, rloc_y, n_rloc);
 	    break;
 	case SPO_RANDOM_MONSTERS:
-	    tmpstr = (char *) opdat;
-	    n_rmon = strlen(tmpstr);
-	    if ((n_rmon <= 0) && (n_rmon > MAX_REGISTERS))
-		panic("sp_level_coder: rnd_mons idx out-of-bounds (%i)", n_rmon);
-	    (void) memcpy(rmonst, tmpstr, n_rmon);
+	    {
+		struct opvar rmon;
+
+		if (!get_opvar_dat(&stack, &rmon, SPOVAR_STRING)) break;
+
+		n_rmon = strlen(rmon.vardata.str);
+		if ((n_rmon <= 0) || (n_rmon > MAX_REGISTERS)) {
+		    impossible("sp_level_coder: rnd_mons idx out-of-bounds");
+		    break;
+		} else
+		    (void) memcpy(rmonst, rmon.vardata.str, n_rmon);
+		free(rmon.vardata.str);
+	    }
 	    sp_lev_shuffle(rmonst, (char *)0, n_rmon);
 	    break;
 	case SPO_DRAWBRIDGE:
-	    tmpdb = (drawbridge *) opdat;
+	    {
+		xchar x,y;
+		struct opvar dir, db_open, fy, fx;
 
-	    x = tmpdb->x;  y = tmpdb->y;
-	    get_location(&x, &y, DRY|WET, croom);
+		if (!get_opvar_dat(&stack, &dir, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &db_open, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &fy, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &fx, SPOVAR_INT)) break;
 
-	    if (!create_drawbridge(x, y, tmpdb->dir, tmpdb->db_open))
-		impossible("Cannot create drawbridge.");
+		x = fx.vardata.l;
+		y = fy.vardata.l;
+		get_location(&x, &y, DRY|WET, croom);
+		if (!create_drawbridge(x, y, dir.vardata.l, db_open.vardata.l))
+		    impossible("Cannot create drawbridge.");
+		SpLev_Map[x][y] = 1;
+	    }
 	    break;
 	case SPO_MAZEWALK:
-	    tmpwalk = (walk *) opdat;
+	    {
+               xchar x,y;
+               struct opvar ftyp, fstocked,fdir, fy, fx;
+               int dir;
 
-	    get_location(&tmpwalk->x, &tmpwalk->y, DRY|WET, (struct mkroom *)0);
+               if (!get_opvar_dat(&stack, &ftyp, SPOVAR_INT) ||
+                   !get_opvar_dat(&stack, &fstocked, SPOVAR_INT) ||
+                   !get_opvar_dat(&stack, &fdir, SPOVAR_INT) ||
+                   !get_opvar_dat(&stack, &fy, SPOVAR_INT) ||
+                   !get_opvar_dat(&stack, &fx, SPOVAR_INT)) break;
 
-	    x = (xchar)tmpwalk->x;  y = (xchar)tmpwalk->y;
-	    dir = tmpwalk->dir;
+              dir = fdir.vardata.l;
+              x = fx.vardata.l;
+              y = fy.vardata.l;
 
-	    if (tmpwalk->typ < 1) {
+              get_location(&x, &y, DRY|WET, croom);
+
+	      if (ftyp.vardata.l < 1) {
 #ifndef WALLIFIED_MAZE
-		tmpwalk->typ = CORR;
+		  ftyp.vardata.l = CORR;
 #else
-		tmpwalk->typ = ROOM;
+		  ftyp.vardata.l = ROOM;
 #endif
+	      }
+
+
+              /* don't use move() - it doesn't use W_NORTH, etc. */
+              switch (dir) {
+                  case W_NORTH: --y; break;
+                  case W_SOUTH: y++; break;
+                  case W_EAST:  x++; break;
+                  case W_WEST:  --x; break;
+                  default:
+                  impossible("sp_level_coder: Bad MAZEWALK direction");
+              }
+
+              if(!IS_DOOR(levl[x][y].typ)) {
+                 levl[x][y].typ = ftyp.vardata.l;
+                 levl[x][y].flags = 0;
+              }
+
+              /*
+               * We must be sure that the parity of the coordinates for
+               * walkfrom() is odd.  But we must also take into account
+               * what direction was chosen.
+               */
+              if(!(x % 2)) {
+                 if (dir == W_EAST)
+                   x++;
+                 else
+                   x--;
+
+                 /* no need for IS_DOOR check; out of map bounds */
+                 levl[x][y].typ = ftyp.vardata.l;
+                 levl[x][y].flags = 0;
+              }
+
+              if (!(y % 2)) {
+                 if (dir == W_SOUTH)
+                   y++;
+                 else
+                   y--;
+              }
+
+              walkfrom(x, y, ftyp.vardata.l);
+              if (fstocked.vardata.l) fill_empty_maze();
 	    }
-
-	    /* don't use move() - it doesn't use W_NORTH, etc. */
-	    switch (dir) {
-	    case W_NORTH: --y; break;
-	    case W_SOUTH: y++; break;
-	    case W_EAST:  x++; break;
-	    case W_WEST:  --x; break;
-	    default: panic("sp_level_coder: bad MAZEWALK direction");
-	    }
-
-	    if(!IS_DOOR(levl[x][y].typ)) {
-		levl[x][y].typ = tmpwalk->typ;
-		levl[x][y].flags = 0;
-	    }
-
-	    /*
-	     * We must be sure that the parity of the coordinates for
-	     * walkfrom() is odd.  But we must also take into account
-	     * what direction was chosen.
-	     */
-	    if(!(x % 2)) {
-		if (dir == W_EAST)
-		    x++;
-		else
-		    x--;
-
-		/* no need for IS_DOOR check; out of map bounds */
-		levl[x][y].typ = tmpwalk->typ;
-		levl[x][y].flags = 0;
-	    }
-
-	    if (!(y % 2)) {
-		if (dir == W_SOUTH)
-		    y++;
-		else
-		    y--;
-	    }
-
-	    walkfrom(x, y, tmpwalk->typ);
-	    if (tmpwalk->stocked) fill_empty_maze();
-	    break;
-	case SPO_NON_DIGGABLE:
-	    tmpdig = (digpos *) opdat;
-
-	    get_location(&tmpdig->x1, &tmpdig->y1, DRY|WET, (struct mkroom *)0);
-	    get_location(&tmpdig->x2, &tmpdig->y2, DRY|WET, (struct mkroom *)0);
-
-	    set_wall_property(tmpdig->x1, tmpdig->y1,
-			      tmpdig->x2, tmpdig->y2, W_NONDIGGABLE);
 	    break;
 	case SPO_NON_PASSWALL:
-	    tmpdig = (digpos *) opdat;
+	case SPO_NON_DIGGABLE:
+           {
+               struct opvar x1,y1,x2,y2;
+               xchar dx1,dy1,dx2,dy2;
+               int wprop = (opcode == SPO_NON_DIGGABLE) ? W_NONDIGGABLE : W_NONPASSWALL;
 
-	    get_location(&tmpdig->x1, &tmpdig->y1, DRY|WET, (struct mkroom *)0);
-	    get_location(&tmpdig->x2, &tmpdig->y2, DRY|WET, (struct mkroom *)0);
+               if (!get_opvar_dat(&stack, &y2, SPOVAR_INT) ||
+                   !get_opvar_dat(&stack, &x2, SPOVAR_INT) ||
+                   !get_opvar_dat(&stack, &y1, SPOVAR_INT) ||
+                   !get_opvar_dat(&stack, &x1, SPOVAR_INT)) break;
 
-	    set_wall_property(tmpdig->x1, tmpdig->y1,
-			      tmpdig->x2, tmpdig->y2, W_NONPASSWALL);
+	       dx1 = x1.vardata.l;
+	       dy1 = y1.vardata.l;
+	       dx2 = x2.vardata.l;
+	       dy2 = y2.vardata.l;
+
+	       get_location(&dx1, &dy1, DRY|WET, (struct mkroom *)0);
+	       get_location(&dx2, &dy2, DRY|WET, (struct mkroom *)0);
+
+	       set_wall_property(dx1, dy1, dx2, dy2, wprop);
+           }
 	    break;
 	case SPO_ROOM_DOOR:
-	    tmproomdoor = (room_door *) opdat;
-	    if (!croom) impossible("Room_door without room?");
-	    create_door(tmproomdoor, croom);
+	    {
+               struct opvar wall, secret, mask, pos;
+	       room_door tmpd;
+
+               if (!get_opvar_dat(&stack, &wall, SPOVAR_INT) ||
+                   !get_opvar_dat(&stack, &secret, SPOVAR_INT) ||
+                   !get_opvar_dat(&stack, &mask, SPOVAR_INT) ||
+                   !get_opvar_dat(&stack, &pos, SPOVAR_INT) ||
+                   !croom) break;
+
+	       tmpd.secret = secret.vardata.l;
+	       tmpd.mask = mask.vardata.l;
+	       tmpd.pos = pos.vardata.l;
+	       tmpd.wall = wall.vardata.l;
+
+	       create_door(&tmpd, croom);
+	    }
 	    break;
 	case SPO_WALLIFY:
 	    wallify_map();
 	    break;
         case SPO_CMP:
 	    {
-		opcmp *tmpcmp = (opcmp *) opdat;
-		int tmpval = 0;
-		if (tmpcmp->cmp_what == 0) tmpval = rn2(100);
-		cpu_flags = 0;
-		if (tmpval < tmpcmp->cmp_val) cpu_flags += SP_CPUFLAG_LT;
-		if (tmpval > tmpcmp->cmp_val) cpu_flags += SP_CPUFLAG_GT;
-		if (tmpval == tmpcmp->cmp_val) cpu_flags += SP_CPUFLAG_EQ;
-		break;
+		struct opvar a = splev_stack_pop(&stack);
+		struct opvar b = splev_stack_pop(&stack);
+		struct opvar c;
+
+		if (a.spovartyp != b.spovartyp) {
+		    impossible("spo_cmp: trying to compare differing datatypes");
+		    break;
+		}
+
+		c.spovartyp = SPOVAR_INT;
+
+		switch (a.spovartyp) {
+		case SPOVAR_INT:
+		    c.vardata.l = (b.vardata.l - a.vardata.l);
+		    break;
+		case SPOVAR_STRING:
+		    c.vardata.l = (long) strcmp(b.vardata.str, a.vardata.str);
+		    break;
+		default:
+		    c.vardata.l = 0;
+		    break;
+		}
+		splev_stack_push(&stack, c);
 	    }
+	    break;
         case SPO_JMP:
 	    {
-		opjmp *tmpjmp = (opjmp *) opdat;
-		if ((tmpjmp->jmp_target >= 0) &&
-		    (tmpjmp->jmp_target < lvl->init_lev.n_opcodes))
-		    n_opcode = tmpjmp->jmp_target;
-		break;
+		struct opvar tmpa;
+		long a;
+		if (!get_opvar_dat(&stack, &tmpa, SPOVAR_INT)) break;
+		a = tmpa.vardata.l;
+		if ((a >= 0) && (a < lvl->init_lev.n_opcodes) &&
+		    (a != n_opcode))
+		    n_opcode = a;
 	    }
+	    break;
         case SPO_JL:
-	    {
-		opjmp *tmpjmp = (opjmp *) opdat;
+           {
+               struct opvar oa, oc;
+               long a,c;
+               if (!get_opvar_dat(&stack, &oa, SPOVAR_INT) ||
+                   !get_opvar_dat(&stack, &oc, SPOVAR_INT)) break;
 
-		if ((cpu_flags & SP_CPUFLAG_LT) &&
-		    (tmpjmp->jmp_target >= 0) &&
-		    (tmpjmp->jmp_target < lvl->init_lev.n_opcodes))
-		    n_opcode = tmpjmp->jmp_target;
-		break;
-	    }
+	       a = oa.vardata.l;
+	       c = oc.vardata.l;
+	       if ((c < 0) && (a >= 0) &&
+		   (a < lvl->init_lev.n_opcodes) &&
+		   (a != n_opcode))
+		   n_opcode = a;
+           }
+	   break;
         case SPO_JG:
+           {
+	       struct opvar oa,oc;
+	       long a,c;
+               if (!get_opvar_dat(&stack, &oa, SPOVAR_INT) ||
+                   !get_opvar_dat(&stack, &oc, SPOVAR_INT)) break;
+              a = oa.vardata.l;
+              c = oc.vardata.l;
+              if ((c > 0) && (a >= 0) &&
+                  (a < lvl->init_lev.n_opcodes) &&
+                  (a != n_opcode))
+                n_opcode = a;
+           }
+	   break;
+        case SPO_JGE:
+           {
+	       struct opvar oa,oc;
+	       long a,c;
+               if (!get_opvar_dat(&stack, &oa, SPOVAR_INT) ||
+                   !get_opvar_dat(&stack, &oc, SPOVAR_INT)) break;
+              a = oa.vardata.l;
+              c = oc.vardata.l;
+              if ((c >= 0) && (a >= 0) &&
+                  (a < lvl->init_lev.n_opcodes) &&
+                  (a != n_opcode))
+                n_opcode = a;
+           }
+	   break;
+	case SPO_RN2:
 	    {
-		opjmp *tmpjmp = (opjmp *) opdat;
-
-		if ((cpu_flags & SP_CPUFLAG_GT) &&
-		    (tmpjmp->jmp_target >= 0) &&
-		    (tmpjmp->jmp_target < lvl->init_lev.n_opcodes))
-		    n_opcode = tmpjmp->jmp_target;
-		break;
+		struct opvar tmpv;
+		struct opvar t;
+		if (!get_opvar_dat(&stack, &tmpv, SPOVAR_INT)) break;
+		t.spovartyp = tmpv.spovartyp;
+		t.vardata.l = (tmpv.vardata.l > 0) ? rn2(tmpv.vardata.l) : 0;
+		splev_stack_push(&stack, t);
 	    }
+         break;
 	case SPO_MAP:
-	    tmproom = tmpsubroom = (room *)0;
-	    tmpmazepart = (mazepart *) opdat;
+	    {
+		mazepart tmpmazepart;
+		struct opvar mpxs, mpys, mpmap, mpva, mpha, mpkeepr, mpzalign;
+		xchar halign, valign;
 
-	    tmpxsize = xsize; tmpysize = ysize;
-	    tmpxstart = xstart; tmpystart = ystart;
+		if (!get_opvar_dat(&stack, &mpxs, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &mpys, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &mpmap, SPOVAR_STRING) ||
+		    !get_opvar_dat(&stack, &mpva, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &mpha, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &mpkeepr, SPOVAR_INT) ||
+		    !get_opvar_dat(&stack, &mpzalign, SPOVAR_INT)) break;
 
-	    halign = tmpmazepart->halign;
-	    valign = tmpmazepart->valign;
-	    xsize = tmpmazepart->xsize;
-	    ysize = tmpmazepart->ysize;
-	    switch (tmpmazepart->zaligntyp) {
-	    default:
-	    case 0:
-		break;
-	    case 1:
-	    switch((int) halign) {
-	    case LEFT:	    xstart = 3;					break;
-	    case H_LEFT:    xstart = 2+((x_maze_max-2-xsize)/4);	break;
-	    case CENTER:    xstart = 2+((x_maze_max-2-xsize)/2);	break;
-	    case H_RIGHT:   xstart = 2+((x_maze_max-2-xsize)*3/4);	break;
-	    case RIGHT:     xstart = x_maze_max-xsize-1;		break;
-	    }
-	    switch((int) valign) {
-	    case TOP:	    ystart = 3;					break;
-	    case CENTER:    ystart = 2+((y_maze_max-2-ysize)/2);	break;
-	    case BOTTOM:    ystart = y_maze_max-ysize-1;		break;
-	    }
-	    if (!(xstart % 2)) xstart++;
-	    if (!(ystart % 2)) ystart++;
-		break;
-	    case 2:
-		get_location(&halign, &valign, DRY|WET, croom);
-		xstart = halign;
-		ystart = valign;
-		break;
-	    }
-	    if ((ystart < 0) || (ystart + ysize > ROWNO)) {
-		/* try to move the start a bit */
-		ystart += (ystart > 0) ? -2 : 2;
-		if(ysize == ROWNO) ystart = 0;
-		if(ystart < 0 || ystart + ysize > ROWNO)
-		    panic("reading special level with ysize too large");
-	    }
+		tmpmazepart.xsize = mpxs.vardata.l;
+		tmpmazepart.ysize = mpys.vardata.l;
+		tmpmazepart.zaligntyp = mpzalign.vardata.l;
+		tmpmazepart.halign = mpha.vardata.l;
+		tmpmazepart.valign = mpva.vardata.l;
 
-	    if (xsize <= 1 && ysize <= 1) {
-		xstart = 1;
-		ystart = 0;
-		xsize = COLNO-1;
-		ysize = ROWNO;
-	    } else {
+		tmpxsize = xsize; tmpysize = ysize;
+		tmpxstart = xstart; tmpystart = ystart;
 
-		/* Load the map */
-		for(y = ystart; y < ystart+ysize; y++)
-		    for(x = xstart; x < xstart+xsize; x++) {
-			if (tmpmazepart->map[y-ystart][x-xstart] >= MAX_TYPE)
-			    continue;
-			levl[x][y].typ = tmpmazepart->map[y-ystart][x-xstart];
-			levl[x][y].lit = FALSE;
-			/* clear out levl: load_common_data may set them */
-			levl[x][y].flags = 0;
-			levl[x][y].horizontal = 0;
-			levl[x][y].roomno = 0;
-			levl[x][y].edge = 0;
-
-
-			/*
-			 *  Set secret doors to closed (why not trapped too?).  Set
-			 *  the horizontal bit.
-			 */
-			if (levl[x][y].typ == SDOOR || IS_DOOR(levl[x][y].typ)) {
-			    if(levl[x][y].typ == SDOOR)
-				levl[x][y].doormask = D_CLOSED;
-			    /*
-			     *  If there is a wall to the left that connects to a
-			     *  (secret) door, then it is horizontal.  This does
-			     *  not allow (secret) doors to be corners of rooms.
-			     */
-			    if (x != xstart && (IS_WALL(levl[x-1][y].typ) ||
-						levl[x-1][y].horizontal))
-				levl[x][y].horizontal = 1;
-			} else if(levl[x][y].typ == HWALL ||
-				  levl[x][y].typ == IRONBARS)
-			    levl[x][y].horizontal = 1;
-			else if(levl[x][y].typ == LAVAPOOL)
-			    levl[x][y].lit = 1;
-			else if(levl[x][y].typ == CROSSWALL)
-			    has_bounds = TRUE;
+		halign = tmpmazepart.halign;
+		valign = tmpmazepart.valign;
+		xsize = tmpmazepart.xsize;
+		ysize = tmpmazepart.ysize;
+		switch (tmpmazepart.zaligntyp) {
+		default:
+		case 0:
+		    break;
+		case 1:
+		    switch((int) halign) {
+		    case LEFT:	    xstart = 3;					break;
+		    case H_LEFT:    xstart = 2+((x_maze_max-2-xsize)/4);	break;
+		    case CENTER:    xstart = 2+((x_maze_max-2-xsize)/2);	break;
+		    case H_RIGHT:   xstart = 2+((x_maze_max-2-xsize)*3/4);	break;
+		    case RIGHT:     xstart = x_maze_max-xsize-1;		break;
 		    }
-		if (lvl->init_lev.joined)
-		    remove_rooms(xstart, ystart, xstart+xsize, ystart+ysize);
-
+		    switch((int) valign) {
+		    case TOP:	    ystart = 3;					break;
+		    case CENTER:    ystart = 2+((y_maze_max-2-ysize)/2);	break;
+		    case BOTTOM:    ystart = y_maze_max-ysize-1;		break;
+		    }
+		    if (!(xstart % 2)) xstart++;
+		    if (!(ystart % 2)) ystart++;
+		    break;
+		case 2:
+		    get_location(&halign, &valign, DRY|WET, croom);
+		    xstart = halign;
+		    ystart = valign;
+		    break;
 	    }
-
-	    if (!tmpmazepart->keep_region) {
-		/* should use a stack for this stuff... */
-		xstart = tmpxstart; ystart = tmpystart;
-		xsize = tmpxsize; ysize = tmpysize;
+		if ((ystart < 0) || (ystart + ysize > ROWNO)) {
+		    /* try to move the start a bit */
+		    ystart += (ystart > 0) ? -2 : 2;
+		    if(ysize == ROWNO) ystart = 0;
+		    if(ystart < 0 || ystart + ysize > ROWNO)
+			panic("reading special level with ysize too large");
 	    }
-
+		if (xsize <= 1 && ysize <= 1) {
+		    xstart = 1;
+		    ystart = 0;
+		    xsize = COLNO-1;
+		    ysize = ROWNO;
+		} else {
+		    /* Load the map */
+		    for(y = ystart; y < ystart+ysize; y++)
+			for(x = xstart; x < xstart+xsize; x++) {
+			    xchar mptyp = (mpmap.vardata.str[(y-ystart) * xsize + (x-xstart)] - 1);
+			    if (mptyp >= MAX_TYPE) continue;
+			    levl[x][y].typ = mptyp;
+			    levl[x][y].lit = FALSE;
+			    /* clear out levl: load_common_data may set them */
+			    levl[x][y].flags = 0;
+			    levl[x][y].horizontal = 0;
+			    levl[x][y].roomno = 0;
+			    levl[x][y].edge = 0;
+			    /*
+			     *  Set secret doors to closed (why not trapped too?).  Set
+			     *  the horizontal bit.
+			     */
+			    if (levl[x][y].typ == SDOOR || IS_DOOR(levl[x][y].typ)) {
+				if(levl[x][y].typ == SDOOR)
+				    levl[x][y].doormask = D_CLOSED;
+				/*
+				 *  If there is a wall to the left that connects to a
+				 *  (secret) door, then it is horizontal.  This does
+				 *  not allow (secret) doors to be corners of rooms.
+				 */
+				if (x != xstart && (IS_WALL(levl[x-1][y].typ) ||
+						    levl[x-1][y].horizontal))
+				    levl[x][y].horizontal = 1;
+			    } else if(levl[x][y].typ == HWALL ||
+				      levl[x][y].typ == IRONBARS)
+				levl[x][y].horizontal = 1;
+			    else if(levl[x][y].typ == LAVAPOOL)
+				levl[x][y].lit = 1;
+			    else if(levl[x][y].typ == CROSSWALL)
+				has_bounds = TRUE;
+			}
+		    if (lvl->init_lev.joined)
+			remove_rooms(xstart, ystart, xstart+xsize, ystart+ysize);
+		}
+		if (!mpkeepr.vardata.l) {
+		    /* FIXME: should use a stack for this stuff... */
+		    xstart = tmpxstart; ystart = tmpystart;
+		    xsize = tmpxsize; ysize = tmpysize;
+		}
+	    }
 	    break;
 	default:
 	    panic("sp_level_coder: Unknown opcode %i", opcode);
 	}
-    next_opcode:
+
+next_opcode:
 	n_opcode++;
     } /*while*/
 
@@ -3377,6 +3834,13 @@ sp_lev *lvl;
     count_features();
 
     if (premapped) sokoban_detect();
+
+    if (stack.depth) {
+	impossible("sp_level_coder: stack has unused data left.");
+	splev_stack_dump(&stack);
+    }
+
+    splev_stack_done(&stack);
 
     return TRUE;
 }

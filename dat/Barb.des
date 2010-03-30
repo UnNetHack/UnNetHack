@@ -246,7 +246,7 @@ STAIR:(36,05),up
 ALTAR:(63,04),noncoaligned,altar
 NON_DIGGABLE:(00,00,75,19)
 # Objects
-OBJECT:'*',"luckstone",(63,04),blessed,0,"The Heart of Ahriman"
+OBJECT:'*',"luckstone",(63,04),blessed,0,NAME:"The Heart of Ahriman"
 OBJECT:random,random,random
 OBJECT:random,random,random
 OBJECT:random,random,random

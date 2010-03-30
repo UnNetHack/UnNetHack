@@ -40,6 +40,9 @@
 /* max. # of random registers */
 #define MAX_REGISTERS	10
 
+/* max. nested depth of subrooms */
+#define MAX_NESTED_ROOMS 5
+
 /* max. # of opcodes per special level */
 #define SPCODER_MAX_RUNTIME	65536
 
@@ -77,14 +80,69 @@
 #define SPO_JMP			30 /* opjmp    jump */
 #define SPO_JL			31 /* opjmp    jump if less than */
 #define SPO_JG			32 /* opjmp    jump if greater than */
-#define SPO_SPILL			  33	  /* spill a particular type of terrain into an area */
-#define SPO_TERRAIN		34 /* terrain */
-#define SPO_REPLACETERRAIN	35 /* replaceterrain */
-#define SPO_EXIT		36
-#define SPO_ENDROOM		37
-#define SPO_RANDLINE		38 /* randline */
-#define SPO_POP_CONTAINER	39
-#define MAX_SP_OPCODES		40
+#define SPO_JGE			33
+#define SPO_SPILL		34	  /* spill a particular type of terrain into an area */
+#define SPO_TERRAIN		35 /* terrain */
+#define SPO_REPLACETERRAIN	36 /* replaceterrain */
+#define SPO_EXIT		37
+#define SPO_ENDROOM		38
+#define SPO_RANDLINE		39 /* randline */
+#define SPO_POP_CONTAINER	40
+
+#define SPO_PUSH		41
+#define SPO_POP			42
+
+#define SPO_RN2			43
+
+#define MAX_SP_OPCODES		44
+
+
+
+/* MONSTER and OBJECT can take a variable number of parameters,
+ * they also pop different # of values from the stack. So,
+ * first we pop a value that tells what the _next_ value will
+ * mean.
+ */
+/* MONSTER */
+#define SP_M_V_PEACEFUL         0
+#define SP_M_V_ALIGN            1
+#define SP_M_V_ASLEEP           2
+#define SP_M_V_APPEAR           3
+#define SP_M_V_NAME             4
+#define SP_M_V_END              5 /* end of variable parameters */
+/* OBJECT */
+#define SP_O_V_SPE              0
+#define SP_O_V_CURSE            1
+#define SP_O_V_CORPSENM         2
+#define SP_O_V_NAME             3
+#define SP_O_V_END              4 /* end of variable parameters */
+
+
+/* When creating objects, we need to know whether
+ * it's a container and/or contents.
+ */
+#define SP_OBJ_CONTENT		0x1
+#define SP_OBJ_CONTAINER	0x2
+
+
+
+#define SPOVAR_NULL	0
+#define SPOVAR_INT	1 /* l */
+#define SPOVAR_STRING	2 /* str */
+
+struct opvar {
+    xchar spovartyp; /* one of SPOVAR_foo */
+    union {
+	char *str;
+	long l;
+    } vardata;
+};
+
+struct splevstack {
+    long depth;
+    long depth_alloc;
+    struct opvar *stackdata;
+};
 
 
 /* special level coder CPU flags */
@@ -137,14 +195,14 @@ typedef struct {
 } room_door;
 
 typedef struct {
-	xchar x, y, chance, type;
+	xchar x, y, type;
 } trap;
 
 typedef struct {
 	Str_or_Len name, appear_as;
 	short id;
 	aligntyp align;
-	xchar x, y, chance, class, appear;
+	xchar x, y, class, appear;
 	schar peaceful, asleep;
 } monster;
 
@@ -152,7 +210,7 @@ typedef struct {
 	Str_or_Len name;
 	int   corpsenm;
 	short id, spe;
-	xchar x, y, chance, class, containment;
+	xchar x, y, class, containment;
 	schar curse_state;
 } object;
 
@@ -188,7 +246,6 @@ typedef struct {
 } region;
 
 typedef struct {
-    xchar chance;
     xchar areatyp;
     xchar x1,y1,x2,y2;
     xchar ter, tlit;

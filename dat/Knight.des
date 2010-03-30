@@ -278,7 +278,7 @@ STAIR:(03,08),up
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Objects
-OBJECT:'(',"mirror",(50,06),blessed,0,"The Magic Mirror of Merlin"
+OBJECT:'(',"mirror",(50,06),blessed,0,NAME:"The Magic Mirror of Merlin"
 OBJECT:random,random,(33,01)
 OBJECT:random,random,(33,02)
 OBJECT:random,random,(33,03)

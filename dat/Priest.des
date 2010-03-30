@@ -204,7 +204,7 @@ REGION:(00,00,25,10),unlit,"ordinary"
 # Stairs
 STAIR:(20,05),up
 # Objects
-OBJECT:'[',"helm of brilliance",place[0],blessed,0,"The Mitre of Holiness"
+OBJECT:'[',"helm of brilliance",place[0],blessed,0,NAME:"The Mitre of Holiness"
 OBJECT:random,random,random
 OBJECT:random,random,random
 OBJECT:random,random,random

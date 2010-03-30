@@ -6,7 +6,6 @@ LEVEL: "nymph"
 RANDOM_MONSTERS: 'n'
 ROOM: "ordinary", unlit, random, random, (12,7)
 {
-NAME: "central"
 TRAP:"board",random
 TRAP:"board",random
 OBJECT:'(',"chest",random

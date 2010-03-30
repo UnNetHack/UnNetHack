@@ -388,7 +388,7 @@ DOOR:random,(51,15)
 DOOR:open,(59,14)
 DOOR:open,(59,17)
 # Objects
-OBJECT:'(',"credit card",(04,01),blessed,0,"The Platinum Yendorian Express Card"
+OBJECT:'(',"credit card",(04,01),blessed,0,NAME:"The Platinum Yendorian Express Card"
 OBJECT:random,random,random
 OBJECT:random,random,random
 OBJECT:random,random,random
