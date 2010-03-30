@@ -46,7 +46,9 @@
 /* max. # of opcodes per special level */
 #define SPCODER_MAX_RUNTIME	65536
 
-/* Opcodes for creating the level */
+/* Opcodes for creating the level
+ * If you change these, also change opcodestr[] in util/lev_main.c
+ */
 #define SPO_NULL		0
 #define SPO_MESSAGE		1  /* Str_or_Len */
 #define SPO_MONSTER		2  /* monster */

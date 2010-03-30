@@ -3809,7 +3809,7 @@ sp_lev *lvl;
 		struct opvar tmpa;
 		long a;
 		if (!get_opvar_dat(&stack, &tmpa, SPOVAR_INT)) break;
-		a = tmpa.vardata.l;
+		a = (tmpa.vardata.l-1);
 		if ((a >= 0) && (a < lvl->init_lev.n_opcodes) &&
 		    (a != n_opcode))
 		    n_opcode = a;
@@ -3822,7 +3822,7 @@ sp_lev *lvl;
                if (!get_opvar_dat(&stack, &oa, SPOVAR_INT) ||
                    !get_opvar_dat(&stack, &oc, SPOVAR_INT)) break;
 
-	       a = oa.vardata.l;
+	       a = (oa.vardata.l-1);
 	       c = oc.vardata.l;
 	       if ((c < 0) && (a >= 0) &&
 		   (a < lvl->init_lev.n_opcodes) &&
@@ -3836,7 +3836,7 @@ sp_lev *lvl;
 	       long a,c;
                if (!get_opvar_dat(&stack, &oa, SPOVAR_INT) ||
                    !get_opvar_dat(&stack, &oc, SPOVAR_INT)) break;
-              a = oa.vardata.l;
+	       a = (oa.vardata.l-1);
               c = oc.vardata.l;
               if ((c > 0) && (a >= 0) &&
                   (a < lvl->init_lev.n_opcodes) &&
@@ -3850,7 +3850,7 @@ sp_lev *lvl;
 	       long a,c;
                if (!get_opvar_dat(&stack, &oa, SPOVAR_INT) ||
                    !get_opvar_dat(&stack, &oc, SPOVAR_INT)) break;
-              a = oa.vardata.l;
+	       a = (oa.vardata.l-1);
               c = oc.vardata.l;
               if ((c >= 0) && (a >= 0) &&
                   (a < lvl->init_lev.n_opcodes) &&
@@ -3864,7 +3864,7 @@ sp_lev *lvl;
 	       long a,c;
                if (!get_opvar_dat(&stack, &oa, SPOVAR_INT) ||
                    !get_opvar_dat(&stack, &oc, SPOVAR_INT)) break;
-              a = oa.vardata.l;
+	       a = (oa.vardata.l-1);
               c = oc.vardata.l;
               if ((c = 0) && (a >= 0) &&
                   (a < lvl->init_lev.n_opcodes) &&
@@ -3878,7 +3878,7 @@ sp_lev *lvl;
 	       long a,c;
                if (!get_opvar_dat(&stack, &oa, SPOVAR_INT) ||
                    !get_opvar_dat(&stack, &oc, SPOVAR_INT)) break;
-              a = oa.vardata.l;
+	       a = (oa.vardata.l-1);
               c = oc.vardata.l;
               if ((c != 0) && (a >= 0) &&
                   (a < lvl->init_lev.n_opcodes) &&
