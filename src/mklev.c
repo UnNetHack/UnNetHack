@@ -593,6 +593,7 @@ clear_level_structures()
 	level.monlist = (struct monst *)0;
 	level.damagelist = (struct damage *)0;
 	level.mon_gen = (struct mon_gen_override *)0;
+	level.sounds = NULL;
 
 	level.flags.nfountains = 0;
 	level.flags.nsinks = 0;

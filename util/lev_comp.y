@@ -151,6 +151,7 @@ extern const char *fname;
 %token	<i> MON_GENERATION_ID
 %token	<i> GRAVE_ID
 %token	<i> FUNCTION_ID
+%token	<i> SOUNDS_ID MSG_OUTPUT_TYPE
 %token	<i> ',' ':' '(' ')' '[' ']' '{' '}'
 %token	<map> STRING MAP_ID
 %token	<map> NQSTRING
@@ -163,6 +164,7 @@ extern const char *fname;
 %type	<i> comparestmt
 %type	<i> seen_trap_mask
 %type	<i> mon_gen_list
+%type	<i> sounds_list
 %type	<i> opt_lit_state
 %type	<map> string level_def m_name o_name
 %type	<corpos> corr_spec
@@ -297,6 +299,7 @@ levstatement 	: message
 		| altar_detail
 		| grave_detail
 		| mon_generation
+		| sounds_detail
 		| branch_region
 		| corridor
 		| diggable_detail
@@ -979,6 +982,31 @@ place_list	: place
 			    yyerror("Location list too long!");
 		  }
 		 ',' place_list
+		;
+
+sounds_detail	: SOUNDS_ID ':' INTEGER ',' sounds_list
+		  {
+		      long chance = $3;
+		      long n_sounds = $5;
+		      if (chance < 0) chance = 0;
+		      add_opvars(&splev, "iio", chance, n_sounds, SPO_LEVEL_SOUNDS);
+		  }
+		;
+
+sounds_list	: lvl_sound_part
+		  {
+		      $$ = 1;
+		  }
+		| lvl_sound_part ',' sounds_list
+		  {
+		      $$ = 1 + $3;
+		  }
+		;
+
+lvl_sound_part	: '(' MSG_OUTPUT_TYPE ',' STRING ')'
+		  {
+		      add_opvars(&splev, "is", $2, $4);
+		  }
 		;
 
 mon_generation	: MON_GENERATION_ID ':' SPERCENT ',' mon_gen_list

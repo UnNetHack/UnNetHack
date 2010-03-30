@@ -112,8 +112,9 @@
 #define SPO_RETURN		54
 #define SPO_INITLEVEL		55
 #define SPO_LEVEL_FLAGS		56
+#define SPO_LEVEL_SOUNDS	57
 
-#define MAX_SP_OPCODES		57
+#define MAX_SP_OPCODES		58
 
 
 /* MONSTER and OBJECT can take a variable number of parameters,

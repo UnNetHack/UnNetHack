@@ -484,6 +484,22 @@ struct mon_gen_override {
     struct mon_gen_tuple *gen_chances;
 };
 
+#define LVLSND_HEARD	0	/* You_hear(msg); */
+#define LVLSND_PLINED	1	/* pline(msg); */
+#define LVLSND_VERBAL	2	/* verbalize(msg); */
+#define LVLSND_FELT	3	/* You_feel(msg); */
+
+struct lvl_sound_bite {
+    int flags; /* LVLSND_foo */
+    char *msg;
+};
+
+struct lvl_sounds {
+    int freq;
+    int n_sounds;
+    struct lvl_sound_bite *sounds;
+};
+
 typedef struct
 {
     struct rm		locations[COLNO][ROWNO];
@@ -502,6 +518,7 @@ typedef struct
     struct damage	*damagelist;
     struct levelflags	flags;
     struct mon_gen_override *mon_gen;
+    struct lvl_sounds	*sounds;
 }
 dlevel_t;
 

@@ -32,6 +32,7 @@ STATIC_DCL void FDECL(savemonchn, (int,struct monst *,int));
 STATIC_DCL void FDECL(savetrapchn, (int,struct trap *,int));
 STATIC_DCL void FDECL(savegamestate, (int,int));
 void FDECL(save_mongen_override, (int,struct mon_gen_override *, int));
+void FDECL(save_lvl_sounds, (int,struct lvl_sounds *, int));
 #ifdef MFLOPPY
 STATIC_DCL void FDECL(savelev0, (int,XCHAR_P,int));
 STATIC_DCL boolean NDECL(swapout_oldest);
@@ -578,6 +579,7 @@ int mode;
 	saveobjchn(fd, level.buriedobjlist, mode);
 	saveobjchn(fd, billobjs, mode);
 	save_mongen_override(fd, level.mon_gen, mode);
+	save_lvl_sounds(fd, level.sounds, mode);
 	if (release_data(mode)) {
 	    fmon = 0;
 	    ftrap = 0;
@@ -586,6 +588,7 @@ int mode;
 	    billobjs = 0;
 	    free(level.mon_gen);
 	    level.mon_gen = NULL;
+	    level.sounds = NULL;
 	}
 	save_engravings(fd, mode);
 	savedamage(fd, mode);
@@ -909,6 +912,45 @@ register struct mon_gen_override *or;
 	    or->gen_chances = NULL;
     }
 }
+
+void
+save_lvl_sounds(fd, or, mode)
+register int fd, mode;
+register struct lvl_sounds *or;
+{
+    struct lvl_sound_bite *mt;
+    int marker = 0;
+    int i;
+    int len;
+
+    if (!or) {
+	if (perform_bwrite(mode)) {
+	    marker = 0;
+	    bwrite(fd, (genericptr_t) &marker, sizeof(marker));
+	}
+    } else {
+	if (perform_bwrite(mode)) {
+	    marker = 1;
+	    bwrite(fd, (genericptr_t) &marker, sizeof(marker));
+	    bwrite(fd, (genericptr_t) or, sizeof(struct lvl_sounds));
+
+	    for (i = 0; i < or->n_sounds; i++) {
+		bwrite(fd, (genericptr_t)&(or->sounds[i].flags), sizeof(or->sounds[i].flags));
+		len = strlen(or->sounds[i].msg)+1;
+		bwrite(fd, (genericptr_t)&len, sizeof(len));
+		bwrite(fd, (genericptr_t)or->sounds[i].msg, len);
+	    }
+	}
+	if (release_data(mode)) {
+	    for (i = 0; i < or->n_sounds; i++)
+		free(or->sounds[i].msg);
+	    free(or->sounds);
+	    or->sounds = NULL;
+	    or->n_sounds = 0;
+	}
+    }
+}
+
 
 STATIC_OVL void
 saveobjchn(fd, otmp, mode)

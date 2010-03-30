@@ -190,6 +190,33 @@ boolean ghostly;
 	free((genericptr_t)tmp_dam);
 }
 
+struct lvl_sounds *
+rest_lvl_sounds(fd)
+register int fd;
+{
+    int marker;
+    struct lvl_sounds *or = NULL;
+    struct lvl_sound_bite *mt = NULL;
+    mread(fd, (genericptr_t) &marker, sizeof(marker));
+    if (marker) {
+	or = (struct lvl_sounds *)alloc(sizeof(struct lvl_sounds));
+	mread(fd, (genericptr_t) or, sizeof(*or));
+	or->sounds = NULL;
+	if (or->n_sounds) {
+	    int i;
+	    int len;
+	    or->sounds = (struct lvl_sound_bite *)alloc(sizeof(struct lvl_sound_bite)*or->n_sounds);
+	    for (i = 0; i < or->n_sounds; i++) {
+		mread(fd, (genericptr_t)&(or->sounds[i].flags), sizeof(or->sounds[i].flags));
+		mread(fd, (genericptr_t)&len, sizeof(len));
+		or->sounds[i].msg = (char *)alloc(len);
+		mread(fd, (genericptr_t)or->sounds[i].msg, len);
+	    }
+	}
+    }
+    return or;
+}
+
 struct mon_gen_override *
 rest_mongen_override(fd)
 register int fd;
@@ -885,6 +912,7 @@ boolean ghostly;
 	level.buriedobjlist = restobjchn(fd, ghostly, FALSE);
 	billobjs = restobjchn(fd, ghostly, FALSE);
 	level.mon_gen = rest_mongen_override(fd);
+	level.sounds = rest_lvl_sounds(fd);
 	rest_engravings(fd);
 
 	/* reset level.monsters for new level */
