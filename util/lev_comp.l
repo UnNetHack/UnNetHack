@@ -239,6 +239,7 @@ noflip		{ yylval.i=(NOFLIPX + NOFLIPY); return FLAG_TYPE; }
 mazelevel	{ yylval.i=MAZELEVEL; return FLAG_TYPE; }
 premapped	{ yylval.i=PREMAPPED; return FLAG_TYPE; }
 shroud		{ yylval.i=SHROUD; return FLAG_TYPE; }
+stormy		{ yylval.i=STORMY; return FLAG_TYPE; }
 \[\ *[0-9]+\%\ *\] { yylval.i = atoi(yytext + 1); return PERCENT; }
 [0-9]+\%	{ yylval.i = atoi(yytext); return SPERCENT; }
 [+\-]?[0-9]+	{ yylval.i=atoi(yytext); return INTEGER; }

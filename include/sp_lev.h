@@ -27,6 +27,7 @@
 #define MAZELEVEL	0x00000080L
 #define PREMAPPED	0x00000100L
 #define SHROUD		0x00000200L
+#define STORMY		0x00000400L
 
 /* different level layout initializers */
 #define LVLINIT_NONE		0

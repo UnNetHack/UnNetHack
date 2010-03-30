@@ -123,7 +123,7 @@ OBJECT:'`',"boulder",random
 
 
 LEVEL:"air"
-FLAGS: noteleport,hardfloor,shortsighted,mazelevel
+FLAGS: noteleport,hardfloor,shortsighted,mazelevel,stormy
 INIT_MAP:solidfill,' '
 # The following messages are somewhat obtuse, to make then
 # equally meaningful if the player can see or not.

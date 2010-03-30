@@ -614,6 +614,7 @@ clear_level_structures()
 	level.flags.arboreal = 0;
 	level.flags.is_maze_lev = 0;
 	level.flags.is_cavernous_lev = 0;
+	level.flags.stormy = 0;
 
 	nroom = 0;
 	rooms[0].hx = -1;

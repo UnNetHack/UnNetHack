@@ -1197,8 +1197,8 @@ do_storms()
     int dirx, diry;
     int count;
 
-    /* no lightning if not the air level or too often, even then */
-    if(!Is_airlevel(&u.uz) || rn2(8))
+    /* no lightning if not stormy level or too often, even then */
+    if(!level.flags.stormy || rn2(8))
 	return;
 
     /* the number of strikes is 8-log2(nstrike) */

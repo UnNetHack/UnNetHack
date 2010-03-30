@@ -465,6 +465,7 @@ struct levelflags {
 	Bitfield(shortsighted,1);	/* monsters are shortsighted */
 	Bitfield(graveyard,1);		/* has_morgue, but remains set */
 	Bitfield(is_maze_lev,1);
+	Bitfield(stormy,1);		/* thunderous clouds */
 
 	Bitfield(is_cavernous_lev,1);
 	Bitfield(arboreal, 1);		/* Trees replace rock */
