@@ -8,8 +8,11 @@
 #	Here you meet your (besieged) class leader, High Priest
 #	and receive your quest assignment.
 #
+# All Priest quest levels are explicitly marked as graveyards
+# so there's less chance for undead corpses.
+#
 LEVEL: "Pri-strt"
-FLAGS: noteleport,hardfloor,mazelevel
+FLAGS: noteleport,hardfloor,mazelevel,graveyard
 INIT_MAP:solidfill,' '
 MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
 GEOMETRY:center,center
@@ -107,7 +110,7 @@ MONSTER: 'Z',"human zombie",(01,17)
 #
 
 LEVEL: "Pri-loca"
-FLAGS: hardfloor,mazelevel
+FLAGS: hardfloor,mazelevel,graveyard
 # This is a kludge to init the level as a lit field.
 INIT_MAP: mines, '.' , '.' , false , false , lit , false
 MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
@@ -184,7 +187,7 @@ TRAP:random,random
 #
 
 LEVEL: "Pri-goal"
-FLAGS:mazelevel
+FLAGS:mazelevel,graveyard
 INIT_MAP: mines, 'L' , '.' , false , false , unlit , false
 MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
 GEOMETRY:center,center
@@ -269,6 +272,7 @@ MONSTER:'W',random,random
 #
 
 LEVEL: "Pri-fila"
+FLAGS:graveyard
 MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
 #
 ROOM: "ordinary" , random, random, random, random
@@ -316,6 +320,7 @@ TRAP: random, random
 RANDOM_CORRIDORS
 
 LEVEL: "Pri-filb"
+FLAGS:graveyard
 MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
 #
 ROOM: "ordinary" , random, random, random, random

@@ -15,9 +15,12 @@
 #
 # To motivate the player : there are 4 storerooms (armors, weapons, food and
 # gems) and a wand of wishing in one of the 4 towers...
+#
+# Castle level explicitly marked as graveyard to prevent getting
+# too many wraith corpses from VotD
 
 LEVEL:"castle-1"
-FLAGS: noteleport,mazelevel
+FLAGS: noteleport,mazelevel,graveyard
 INIT_MAP:mazegrid,'-'
 GEOMETRY:center,center
 MAP
@@ -248,7 +251,7 @@ REGION:(47,10,47,11),unlit,"ordinary"
 # outside the castle.
 #
 LEVEL:"castle-2"
-FLAGS: noteleport,mazelevel
+FLAGS: noteleport,mazelevel,graveyard
 INIT_MAP:mazegrid,'-'
 GEOMETRY: center, center
 #000000000111111111122222222223333333333444444444455555555556666666666777777
@@ -471,7 +474,7 @@ MONSTER:'C',random,(37,13)
 
 
 LEVEL:"castle-3"
-FLAGS: noteleport,mazelevel
+FLAGS: noteleport,mazelevel,graveyard
 INIT_MAP:mazegrid,'-'
 GEOMETRY: center, center
 #000000000111111111122222222223333333333444444444455555555556666666666777777

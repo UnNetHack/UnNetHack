@@ -28,6 +28,7 @@
 #define PREMAPPED	0x00000100L
 #define SHROUD		0x00000200L
 #define STORMY		0x00000400L
+#define GRAVEYARD	0x00000800L
 
 /* different level layout initializers */
 #define LVLINIT_NONE		0

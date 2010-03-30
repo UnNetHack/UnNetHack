@@ -502,11 +502,6 @@ fixup_special()
 		    (void)maketrap(x, y, rn2(3) ? LANDMINE : SPIKED_PIT);
 	    }
 	    }
-    } else if (Role_if(PM_PRIEST) && In_quest(&u.uz)) {
-	/* less chance for undead corpses (lured from lower morgues) */
-	level.flags.graveyard = 1;
-    } else if (Is_stronghold(&u.uz)) {
-	level.flags.graveyard = 1;
     } else if(Is_sanctum(&u.uz)) {
 	croom = search_special(TEMPLE);
 

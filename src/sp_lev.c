@@ -2717,6 +2717,7 @@ sp_lev *lvl;
     if (lvl->init_lev.flags & PREMAPPED)    premapped = TRUE;
     if (lvl->init_lev.flags & SHROUD)       level.flags.hero_memory = 0;
     if (lvl->init_lev.flags & STORMY)       level.flags.stormy = 1;
+    if (lvl->init_lev.flags & GRAVEYARD)    level.flags.graveyard = 1;
 
     while (n_opcode < lvl->init_lev.n_opcodes && !exit_script) {
 	int opcode = lvl->opcodes[n_opcode].opcode;
