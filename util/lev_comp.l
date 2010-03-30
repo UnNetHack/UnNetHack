@@ -149,8 +149,29 @@ GOLD		return GOLD_ID;
 ENGRAVING	return ENGRAVING_ID;
 NAME		return NAME_ID;
 CHANCE		return CHANCE_ID;
+LOOP		return LOOP_ID;
+SWITCH		return SWITCH_ID;
+CASE		return CASE_ID;
+BREAK		return BREAK_ID;
 levregion	return LEV;
 quantity	return QUANTITY_ID;
+buried		return BURIED_ID;
+eroded		return ERODED_ID;
+trapped		return TRAPPED_ID;
+recharged	return RECHARGED_ID;
+invisible	return INVIS_ID;
+greased		return GREASED_ID;
+female		return FEMALE_ID;
+cancelled	return CANCELLED_ID;
+revived		return REVIVED_ID;
+avenge		return AVENGE_ID;
+fleeing		return FLEEING_ID;
+blinded		return BLINDED_ID;
+paralyzed	return PARALYZED_ID;
+stunned		return STUNNED_ID;
+confused	return CONFUSED_ID;
+seen_traps	return SEENTRAPS_ID;
+all		return ALL_ID;
 horizontal	{ yylval.i=1; return HORIZ_OR_VERT; }
 vertical	{ yylval.i=2; return HORIZ_OR_VERT; }
 open		{ yylval.i=D_ISOPEN; return DOOR_STATE; }

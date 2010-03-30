@@ -93,9 +93,13 @@
 #define SPO_POP			42
 
 #define SPO_RN2			43
+#define SPO_DEC			44
+#define SPO_COPY		45
 
-#define MAX_SP_OPCODES		44
+#define SPO_JE			46
+#define SPO_JNE			47
 
+#define MAX_SP_OPCODES		48
 
 
 /* MONSTER and OBJECT can take a variable number of parameters,
@@ -109,14 +113,37 @@
 #define SP_M_V_ASLEEP           2
 #define SP_M_V_APPEAR           3
 #define SP_M_V_NAME             4
-#define SP_M_V_END              5 /* end of variable parameters */
+
+#define SP_M_V_FEMALE		5
+#define SP_M_V_INVIS		6
+#define SP_M_V_CANCELLED	7
+#define SP_M_V_REVIVED		8
+#define SP_M_V_AVENGE		9
+#define SP_M_V_FLEEING		10
+#define SP_M_V_BLINDED		11
+#define SP_M_V_PARALYZED	12
+#define SP_M_V_STUNNED		13
+#define SP_M_V_CONFUSED		14
+#define SP_M_V_SEENTRAPS	15
+
+#define SP_M_V_END              16 /* end of variable parameters */
+
 /* OBJECT */
 #define SP_O_V_SPE              0
 #define SP_O_V_CURSE            1
 #define SP_O_V_CORPSENM         2
 #define SP_O_V_NAME             3
 #define SP_O_V_QUAN		4
-#define SP_O_V_END              5 /* end of variable parameters */
+#define SP_O_V_BURIED		5
+#define SP_O_V_LIT		6
+#define SP_O_V_ERODED		7
+#define SP_O_V_LOCKED		8
+#define SP_O_V_TRAPPED		9
+#define SP_O_V_RECHARGED	10
+#define SP_O_V_INVIS		11
+#define SP_O_V_GREASED		12
+#define SP_O_V_BROKEN		13
+#define SP_O_V_END              14 /* end of variable parameters */
 
 
 /* When creating objects, we need to know whether
@@ -205,6 +232,8 @@ typedef struct {
 	aligntyp align;
 	xchar x, y, class, appear;
 	schar peaceful, asleep;
+        short female, invis, cancelled, revived, avenge, fleeing, blinded, paralyzed, stunned, confused;
+        long seentraps;
 } monster;
 
 typedef struct {
@@ -214,6 +243,9 @@ typedef struct {
 	xchar x, y, class, containment;
 	schar curse_state;
 	int   quan;
+	short buried;
+	short lit;
+        short eroded, locked, trapped, recharged, invis, greased, broken;
 } object;
 
 typedef struct {

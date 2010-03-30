@@ -90,6 +90,16 @@ static long lev_flags;
 unsigned int max_x_map, max_y_map;
 int obj_containment = 0;
 
+int in_switch_statement = 0;
+static struct opvar *switch_case_list[MAX_NESTED_IFS];
+int n_switch_case_list = 0;
+static struct opvar *switch_jump_list[MAX_NESTED_IFS];
+int n_switch_jump_list = 0;
+static struct opvar *switch_break_list[MAX_NESTED_IFS];
+int n_switch_break_list = 0;
+int switch_case_n = 0;
+
+
 extern int fatal_error;
 extern const char *fname;
 
@@ -123,7 +133,11 @@ extern const char *fname;
 %token	<i> MON_APPEARANCE ROOMDOOR_ID IF_ID ELSE_ID
 %token	<i> SPILL_ID TERRAIN_ID HORIZ_OR_VERT REPLACE_TERRAIN_ID
 %token	<i> EXIT_ID
-%token	<i> QUANTITY_ID
+%token	<i> QUANTITY_ID BURIED_ID LOOP_ID
+%token	<i> SWITCH_ID CASE_ID BREAK_ID
+%token	<i> ERODED_ID TRAPPED_ID RECHARGED_ID INVIS_ID GREASED_ID
+%token	<i> FEMALE_ID CANCELLED_ID REVIVED_ID AVENGE_ID FLEEING_ID BLINDED_ID
+%token	<i> PARALYZED_ID STUNNED_ID CONFUSED_ID SEENTRAPS_ID ALL_ID
 %token	<i> ',' ':' '(' ')' '[' ']' '{' '}'
 %token	<map> STRING MAP_ID
 %type	<i> h_justif v_justif trap_name room_type door_state light_state
@@ -133,6 +147,7 @@ extern const char *fname;
 %type	<i> engraving_type flags flag_list prefilled lev_region lev_init
 %type	<i> monster monster_c m_register object object_c o_register
 %type	<i> comparestmt
+%type	<i> seen_trap_mask
 %type	<map> string level_def m_name o_name
 %type	<corpos> corr_spec
 %start	file
@@ -277,6 +292,8 @@ levstatement 	: message
 		| engraving_detail
 		| fountain_detail
 		| gold_detail
+		| switchstatement
+		| loopstatement
 		| ifstatement
 		| exitstatement
 		| init_reg
@@ -319,6 +336,139 @@ comparestmt     : PERCENT
 		      add_opvars(&splev, "ioi", 100, SPO_RN2, $1);
 		      $$ = SPO_JGE; /* TODO: shouldn't this be SPO_JG? */
                   }
+		;
+
+switchstatement	: SWITCH_ID '[' INTEGER ']'
+		  {
+		      if (in_switch_statement > 0)
+			  yyerror("Cannot nest switch-statements.");
+		      in_switch_statement++;
+
+		      switch_case_n = 0;
+
+		      if (n_switch_case_list != 0 || n_switch_break_list != 0)
+			  yyerror("Switch list counter != 0");
+
+		      if ($3 < 1)
+			  yyerror("Switch with fewer than 1 available choices.");
+
+		      add_opvars(&splev, "io", $3, SPO_RN2);
+		  }
+		'{' switchcases '}'
+		  {
+		      while (n_switch_break_list) {
+			  struct opvar *tmppush = switch_break_list[--n_switch_break_list];
+			  set_opvar_int(tmppush, splev.init_lev.n_opcodes-1);
+		      }
+
+		      while (n_switch_case_list) {
+			  struct opvar *tmppush = switch_case_list[--n_switch_case_list];
+			  set_opvar_int(tmppush, splev.init_lev.n_opcodes-1);
+		      }
+
+		      while (n_switch_jump_list) {
+			  struct opvar *tmppush = switch_jump_list[--n_switch_jump_list];
+			  set_opvar_int(tmppush, splev.init_lev.n_opcodes-1);
+		      }
+
+		      add_opcode(&splev, SPO_POP, NULL); /* get rid of the value in stack */
+		      in_switch_statement--;
+		  }
+		;
+
+switchcases	: /* nothing */
+		| switchcase switchcases
+		;
+
+switchcase	: CASE_ID INTEGER ':'
+		  {
+		      struct opvar *tmppush = New(struct opvar);
+		      struct opvar *tmppush2;
+
+		      if (switch_case_n > 0) {
+			  tmppush2 = New(struct opvar);
+			  set_opvar_int(tmppush2, -1);
+			  switch_case_list[n_switch_case_list++] = tmppush2;
+			  add_opcode(&splev, SPO_PUSH, tmppush2);
+			  add_opcode(&splev, SPO_JMP, NULL);
+		      }
+
+		      switch_case_n++;
+
+		      if (n_switch_jump_list) {
+			  struct opvar *tmppush3;
+			  tmppush3 = switch_jump_list[--n_switch_jump_list];
+			  set_opvar_int(tmppush3, splev.init_lev.n_opcodes-1);
+		      }
+
+		      add_opvars(&splev, "oio", SPO_COPY, $2, SPO_CMP);
+		      set_opvar_int(tmppush, -1);
+		      switch_jump_list[n_switch_jump_list++] = tmppush;
+		      add_opcode(&splev, SPO_PUSH, tmppush);
+		      add_opcode(&splev, SPO_JNE, NULL);
+
+		      if (n_switch_case_list) {
+			  struct opvar *tmppush4;
+			  tmppush4 = switch_case_list[--n_switch_case_list];
+			  set_opvar_int(tmppush4, splev.init_lev.n_opcodes-1);
+		      }
+		  }
+		breakstatements
+		  {
+		  }
+		;
+
+breakstatements	: /* nothing */
+		| breakstatement breakstatements
+		;
+
+breakstatement	: BREAK_ID
+		  {
+		      struct opvar *tmppush = New(struct opvar);
+		      set_opvar_int(tmppush, -1);
+		      if (n_switch_break_list >= MAX_NESTED_IFS)
+			  yyerror("Too many BREAKs inside single SWITCH");
+		      switch_break_list[n_switch_break_list++] = tmppush;
+
+		      add_opcode(&splev, SPO_PUSH, tmppush);
+		      add_opcode(&splev, SPO_JMP, NULL);
+		  }
+		| levstatement
+		  {
+		  }
+		;
+
+loopstatement	: LOOP_ID '[' INTEGER ']'
+		  {
+		      struct opvar *tmppush = New(struct opvar);
+
+		      if (n_if_list >= MAX_NESTED_IFS) {
+			  yyerror("IF: Too deeply nested IFs.");
+			  n_if_list = MAX_NESTED_IFS - 1;
+		      }
+
+		      if ($3 < 1)
+			  yyerror("Loop with fewer than 1 repeats.");
+
+		      add_opvars(&splev, "i", $3);
+
+		      set_opvar_int(tmppush, splev.init_lev.n_opcodes-1);
+		      if_list[n_if_list++] = tmppush;
+
+		      add_opvars(&splev, "o", SPO_DEC);
+		  }
+		 '{' levstatements '}'
+		  {
+		      struct opvar *tmppush;
+
+		      add_opvars(&splev, "oio", SPO_COPY, 0, SPO_CMP);
+
+		      tmppush = (struct opvar *) if_list[--n_if_list];
+
+		      add_opcode(&splev, SPO_PUSH, tmppush);
+		      add_opcode(&splev, SPO_JG, NULL);
+		      add_opcode(&splev, SPO_POP, NULL); /* get rid of the count value in stack */
+		  }
 		;
 
 ifstatement 	: IF_ID comparestmt
@@ -809,27 +959,106 @@ monster_infos	: /* nothing */
 monster_info	: ',' string
 		  {
 		      add_opvars(&splev, "si", $2, SP_M_V_NAME);
-		      $<i>$ = 0x01;
+		      $<i>$ = 0x0001;
 		  }
 		| ',' MON_ATTITUDE
 		  {
 		      add_opvars(&splev, "ii", $<i>2, SP_M_V_PEACEFUL);
-		      $<i>$ = 0x02;
+		      $<i>$ = 0x0002;
 		  }
 		| ',' MON_ALERTNESS
 		  {
 		      add_opvars(&splev, "ii", $<i>2, SP_M_V_ASLEEP);
-		      $<i>$ = 0x04;
+		      $<i>$ = 0x0004;
 		  }
 		| ',' alignment
 		  {
 		      add_opvars(&splev, "ii", $<i>2, SP_M_V_ALIGN);
-		      $<i>$ = 0x08;
+		      $<i>$ = 0x0008;
 		  }
 		| ',' MON_APPEARANCE string
 		  {
 		      add_opvars(&splev, "sii", $3, $<i>2, SP_M_V_APPEAR);
-		      $<i>$ = 0x10;
+		      $<i>$ = 0x0010;
+		  }
+		| ',' FEMALE_ID
+		  {
+		      add_opvars(&splev, "ii", 1, SP_M_V_FEMALE);
+		      $<i>$ = 0x0020;
+		  }
+		| ',' INVIS_ID
+		  {
+		      add_opvars(&splev, "ii", 1, SP_M_V_INVIS);
+		      $<i>$ = 0x0040;
+		  }
+		| ',' CANCELLED_ID
+		  {
+		      add_opvars(&splev, "ii", 1, SP_M_V_CANCELLED);
+		      $<i>$ = 0x0080;
+		  }
+		| ',' REVIVED_ID
+		  {
+		      add_opvars(&splev, "ii", 1, SP_M_V_REVIVED);
+		      $<i>$ = 0x0100;
+		  }
+		| ',' AVENGE_ID
+		  {
+		      add_opvars(&splev, "ii", 1, SP_M_V_AVENGE);
+		      $<i>$ = 0x0200;
+		  }
+		| ',' FLEEING_ID ':' INTEGER
+		  {
+		      add_opvars(&splev, "ii", $4, SP_M_V_FLEEING);
+		      $<i>$ = 0x0400;
+		  }
+		| ',' BLINDED_ID ':' INTEGER
+		  {
+		      add_opvars(&splev, "ii", $4, SP_M_V_BLINDED);
+		      $<i>$ = 0x0800;
+		  }
+		| ',' PARALYZED_ID ':' INTEGER
+		  {
+		      add_opvars(&splev, "ii", $4, SP_M_V_PARALYZED);
+		      $<i>$ = 0x1000;
+		  }
+		| ',' STUNNED_ID
+		  {
+		      add_opvars(&splev, "ii", 1, SP_M_V_STUNNED);
+		      $<i>$ = 0x2000;
+		  }
+		| ',' CONFUSED_ID
+		  {
+		      add_opvars(&splev, "ii", 1, SP_M_V_CONFUSED);
+		      $<i>$ = 0x4000;
+		  }
+		| ',' SEENTRAPS_ID ':' seen_trap_mask
+		  {
+		      add_opvars(&splev, "ii", $4, SP_M_V_SEENTRAPS);
+		      $<i>$ = 0x8000;
+		  }
+		;
+
+seen_trap_mask	: STRING
+		  {
+		      int token = get_trap_type($1);
+		      if (token == ERR || token == 0)
+			  yyerror("Unknown trap type!");
+		      $$ = (1L << (token - 1));
+		  }
+		| ALL_ID
+		  {
+		      $$ = (long) ~0;
+		  }
+		| STRING '|' seen_trap_mask
+		  {
+		      int token = get_trap_type($1);
+		      if (token == ERR || token == 0)
+			  yyerror("Unknown trap type!");
+
+		      if ((1L << (token - 1)) & $3)
+			  yyerror("MONSTER seen_traps, same trap listed twice.");
+
+		      $$ = ((1L << (token - 1)) | $3);
 		  }
 		;
 
@@ -951,7 +1180,7 @@ object_infos	: /* nothing */
 object_info	: ',' CURSE_TYPE
 		  {
 		      add_opvars(&splev, "ii", $2, SP_O_V_CURSE);
-		      $<i>$ = 0x01;
+		      $<i>$ = 0x0001;
 		  }
 		| ',' STRING
 		  {
@@ -963,22 +1192,68 @@ object_info	: ',' CURSE_TYPE
 		      }
 		      add_opvars(&splev, "ii", token, SP_O_V_CORPSENM);
 		      Free($2);
-		      $<i>$ = 0x02;
+		      $<i>$ = 0x0002;
 		  }
 		| ',' INTEGER
 		  {
 		      add_opvars(&splev, "ii", $2, SP_O_V_SPE);
-		      $<i>$ = 0x04;
+		      $<i>$ = 0x0004;
 		  }
 		| ',' NAME_ID ':' STRING
 		  {
 		      add_opvars(&splev, "si", $4, SP_O_V_NAME);
-		      $<i>$ = 0x08;
+		      $<i>$ = 0x0008;
 		  }
 		| ',' QUANTITY_ID ':' INTEGER
 		  {
 		      add_opvars(&splev, "ii", $4, SP_O_V_QUAN);
-		      $<i>$ = 0x10;
+		      $<i>$ = 0x0010;
+		  }
+		| ',' BURIED_ID
+		  {
+		      add_opvars(&splev, "ii", 1, SP_O_V_BURIED);
+		      $<i>$ = 0x0020;
+		  }
+		| ',' LIGHT_STATE
+		  {
+		      add_opvars(&splev, "ii", $2, SP_O_V_LIT);
+		      $<i>$ = 0x0040;
+		  }
+		| ',' ERODED_ID ':' INTEGER
+		  {
+		      add_opvars(&splev, "ii", $4, SP_O_V_ERODED);
+		      $<i>$ = 0x0080;
+		  }
+		| ',' DOOR_STATE
+		  {
+		      if ($2 == D_LOCKED) {
+			  add_opvars(&splev, "ii", 1, SP_O_V_LOCKED);
+			  $<i>$ = 0x0100;
+		      } else if ($2 == D_BROKEN) {
+			  add_opvars(&splev, "ii", 1, SP_O_V_BROKEN);
+			  $<i>$ = 0x0200;
+		      } else
+			  yyerror("OBJECT state can only be locked or broken.");
+		  }
+		| ',' TRAPPED_ID
+		  {
+		      add_opvars(&splev, "ii", 1, SP_O_V_TRAPPED);
+		      $<i>$ = 0x0400;
+		  }
+		| ',' RECHARGED_ID ':' INTEGER
+		  {
+		      add_opvars(&splev, "ii", $4, SP_O_V_RECHARGED);
+		      $<i>$ = 0x0800;
+		  }
+		| ',' INVIS_ID
+		  {
+		      add_opvars(&splev, "ii", 1, SP_O_V_INVIS);
+		      $<i>$ = 0x1000;
+		  }
+		| ',' GREASED_ID
+		  {
+		      add_opvars(&splev, "ii", 1, SP_O_V_GREASED);
+		      $<i>$ = 0x2000;
 		  }
 		;
 
