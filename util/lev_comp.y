@@ -141,6 +141,7 @@ extern const char *fname;
 %token	<i> FEMALE_ID CANCELLED_ID REVIVED_ID AVENGE_ID FLEEING_ID BLINDED_ID
 %token	<i> PARALYZED_ID STUNNED_ID CONFUSED_ID SEENTRAPS_ID ALL_ID
 %token	<i> MON_GENERATION_ID
+%token	<i> GRAVE_ID
 %token	<i> ',' ':' '(' ')' '[' ']' '{' '}'
 %token	<map> STRING MAP_ID
 %type	<i> h_justif v_justif trap_name room_type door_state light_state
@@ -290,6 +291,7 @@ levstatements	: /* nothing */
 
 levstatement 	: message
 		| altar_detail
+		| grave_detail
 		| mon_generation
 		| branch_region
 		| corridor
@@ -1688,6 +1690,23 @@ altar_detail	: ALTAR_ID ':' coordinate ',' alignment ',' altar_type
 		  {
 		      add_opvars(&splev, "iiiio", current_coord.x, current_coord.y,
 				 $<i>7, $<i>5, SPO_ALTAR);
+		  }
+		;
+
+grave_detail	: GRAVE_ID ':' coordinate ',' string
+		  {
+		      add_opvars(&splev, "iisio", current_coord.x, current_coord.y,
+				 $5, 2, SPO_GRAVE);
+		  }
+		| GRAVE_ID ':' coordinate ',' RANDOM_TYPE
+		  {
+		      add_opvars(&splev, "iisio", current_coord.x, current_coord.y,
+				 (char *)0, 1, SPO_GRAVE);
+		  }
+		| GRAVE_ID ':' coordinate
+		  {
+		      add_opvars(&splev, "iisio", current_coord.x, current_coord.y,
+				 (char *)0, 0, SPO_GRAVE);
 		  }
 		;
 

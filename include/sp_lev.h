@@ -105,8 +105,9 @@
 
 #define SPO_MON_GENERATION	48
 #define SPO_END_MONINVENT	49
+#define SPO_GRAVE		50
 
-#define MAX_SP_OPCODES		50
+#define MAX_SP_OPCODES		51
 
 
 /* MONSTER and OBJECT can take a variable number of parameters,
