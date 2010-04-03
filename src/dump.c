@@ -39,7 +39,8 @@ dump_init()
       q += strlen(q);
       p += 2;	/* skip "%n" */
       strncpy(q, p, strlen(p));
-      new_dump_fn[new_dump_fn_len] = '\0';
+      q += strlen(p);
+      q[0] = '\0';
     } else {
       strcpy(new_dump_fn, dump_fn);
     }
@@ -68,8 +69,11 @@ dump_exit()
 {
 #ifdef DUMP_LOG
 	if (dump_fp) {
+		fclose(dump_fp);
+	}
+	if (html_dump_fp) {
 		dump_html("</body>\n</html>\n","");
-		fclose (dump_fp);
+		fclose(html_dump_fp);
 	}
 #endif
 }
