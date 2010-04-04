@@ -526,6 +526,9 @@ int trap_type;
 		if(rn2(7))
 		    dosdoor(xx, yy, aroom, rn2(5) ? SDOOR : DOOR);
 		else {
+		    /* inaccessible niches occasionally have iron bars */
+		    if (!rn2(8) && IS_WALL(levl[xx][yy].typ))
+			levl[xx][yy].typ = IRONBARS;
 		    if (!level.flags.noteleport)
 			(void) mksobj_at(SCR_TELEPORTATION,
 					 xx, yy+dy, TRUE, FALSE);
