@@ -51,71 +51,69 @@
 /* Opcodes for creating the level
  * If you change these, also change opcodestr[] in util/lev_main.c
  */
-#define SPO_NULL		0
-#define SPO_MESSAGE		1  /* Str_or_Len */
-#define SPO_MONSTER		2  /* monster */
-#define SPO_OBJECT		3  /* object */
-#define SPO_ENGRAVING		4  /* engraving */
-#define SPO_ROOM		5  /* room */
-#define SPO_SUBROOM		6  /* room */
-#define SPO_DOOR		7  /* door */
-#define SPO_STAIR		8  /* stair */
-#define SPO_LADDER		9  /* lad */
-#define SPO_ALTAR		10 /* altar */
-#define SPO_FOUNTAIN		11 /* fountain */
-#define SPO_SINK		12 /* sink */
-#define SPO_POOL		13 /* pool */
-#define SPO_TRAP		14 /* trap */
-#define SPO_GOLD		15 /* gold */
-#define SPO_CORRIDOR		16 /* corridor */
-#define SPO_LEVREGION		17 /* lev_region */
-#define SPO_RANDOM_OBJECTS	18 /* Str_or_Len */
-#define SPO_RANDOM_PLACES	19 /* Str_or_Len*2 (x+1, y+1, x+1, y+1,...) */
-#define SPO_RANDOM_MONSTERS	20 /* Str_or_Len */
-#define SPO_DRAWBRIDGE		21 /* drawbridge */
-#define SPO_MAZEWALK		22 /* walk */
-#define SPO_NON_DIGGABLE	23 /* digpos */
-#define SPO_NON_PASSWALL	24 /* digpos */
-#define SPO_WALLIFY		25
-#define SPO_MAP			26 /* mazepart */
-#define SPO_ROOM_DOOR		27 /* room_door */
-#define SPO_REGION		28 /* region */
-#define SPO_CMP			29 /* opcmp    compare */
-#define SPO_JMP			30 /* opjmp    jump */
-#define SPO_JL			31 /* opjmp    jump if less than */
-#define SPO_JG			32 /* opjmp    jump if greater than */
-#define SPO_JGE			33
-#define SPO_SPILL		34	  /* spill a particular type of terrain into an area */
-#define SPO_TERRAIN		35 /* terrain */
-#define SPO_REPLACETERRAIN	36 /* replaceterrain */
-#define SPO_EXIT		37
-#define SPO_ENDROOM		38
-#define SPO_RANDLINE		39 /* randline */
-#define SPO_POP_CONTAINER	40
+enum opcode_defs {
+    SPO_NULL = 0,
+    SPO_MESSAGE,
+    SPO_MONSTER,
+    SPO_OBJECT,
+    SPO_ENGRAVING,
+    SPO_ROOM,
+    SPO_SUBROOM,
+    SPO_DOOR,
+    SPO_STAIR,
+    SPO_LADDER,
+    SPO_ALTAR,
+    SPO_FOUNTAIN,
+    SPO_SINK,
+    SPO_POOL,
+    SPO_TRAP,
+    SPO_GOLD,
+    SPO_CORRIDOR,
+    SPO_LEVREGION,
+    SPO_RANDOM_OBJECTS,
+    SPO_RANDOM_PLACES,
+    SPO_RANDOM_MONSTERS,
+    SPO_DRAWBRIDGE,
+    SPO_MAZEWALK,
+    SPO_NON_DIGGABLE,
+    SPO_NON_PASSWALL,
+    SPO_WALLIFY,
+    SPO_MAP,
+    SPO_ROOM_DOOR,
+    SPO_REGION,
+    SPO_CMP,
+    SPO_JMP,
+    SPO_JL,
+    SPO_JLE,
+    SPO_JG,
+    SPO_JGE,
+    SPO_JE,
+    SPO_JNE,
+    SPO_SPILL,
+    SPO_TERRAIN,
+    SPO_REPLACETERRAIN,
+    SPO_EXIT,
+    SPO_ENDROOM,
+    SPO_RANDLINE,
+    SPO_POP_CONTAINER,
+    SPO_PUSH,
+    SPO_POP,
+    SPO_RN2,
+    SPO_DEC,
+    SPO_COPY,
+    SPO_MON_GENERATION,
+    SPO_END_MONINVENT,
+    SPO_GRAVE,
+    SPO_FRAME_PUSH,
+    SPO_FRAME_POP,
+    SPO_CALL,
+    SPO_RETURN,
+    SPO_INITLEVEL,
+    SPO_LEVEL_FLAGS,
+    SPO_LEVEL_SOUNDS,
 
-#define SPO_PUSH		41
-#define SPO_POP			42
-
-#define SPO_RN2			43
-#define SPO_DEC			44
-#define SPO_COPY		45
-
-#define SPO_JE			46
-#define SPO_JNE			47
-
-#define SPO_MON_GENERATION	48
-#define SPO_END_MONINVENT	49
-#define SPO_GRAVE		50
-#define SPO_FRAME_PUSH		51
-#define SPO_FRAME_POP		52
-#define SPO_CALL		53
-#define SPO_RETURN		54
-#define SPO_INITLEVEL		55
-#define SPO_LEVEL_FLAGS		56
-#define SPO_LEVEL_SOUNDS	57
-
-#define MAX_SP_OPCODES		58
-
+    MAX_SP_OPCODES
+};
 
 /* MONSTER and OBJECT can take a variable number of parameters,
  * they also pop different # of values from the stack. So,
@@ -407,6 +405,8 @@ struct lc_funcdefs {
     struct lc_funcdefs *next;
     char *name;
     long addr;
+    sp_lev code;
+    long n_called;
 };
 
 #endif /* SP_LEV_H */

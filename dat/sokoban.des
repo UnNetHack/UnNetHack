@@ -30,6 +30,17 @@
 #     passing a dexterity check).
 #   Bones files are not permitted.
 
+# Each sokoban map should call this.
+FUNCTION soko_loot()
+{
+  # Random objects
+  OBJECT:'%',random,random
+  OBJECT:'%',random,random
+  OBJECT:'%',random,random
+  OBJECT:'%',random,random
+  OBJECT:'=',random,random
+  OBJECT:'/',random,random
+}
 
 ### Bottom (first) level of Sokoban ###
 LEVEL:"soko4-1"
@@ -87,13 +98,7 @@ TRAP:"pit",(07,10)
 OBJECT:'?',"earth",(02,11)
 OBJECT:'?',"earth",(03,11)
 
-# Random objects
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+soko_loot()
 
 
 LEVEL:"soko4-2"
@@ -152,13 +157,7 @@ TRAP:"pit",(06,08)
 OBJECT:'?',"earth",(01,09)
 OBJECT:'?',"earth",(02,09)
 
-# Random objects
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+soko_loot()
 
 
 ### Second level ###
@@ -230,13 +229,7 @@ TRAP:"hole",(24,10)
 TRAP:"hole",(25,10)
 TRAP:"hole",(26,10)
 
-# Random objects
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+soko_loot()
 
 
 LEVEL:"soko3-2"
@@ -299,13 +292,7 @@ TRAP:"hole",(21,10)
 TRAP:"hole",(22,10)
 TRAP:"hole",(23,10)
 
-# Random objects
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+soko_loot()
 
 
 ### Third level ###
@@ -366,13 +353,7 @@ TRAP:"hole",(15,09)
 TRAP:"hole",(16,09)
 TRAP:"hole",(17,09)
 
-# Random objects
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+soko_loot()
 
 
 LEVEL:"soko2-2"
@@ -433,13 +414,7 @@ TRAP:"hole",(15,11)
 TRAP:"hole",(16,11)
 TRAP:"hole",(17,11)
 
-# Random objects
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+soko_loot()
 
 
 ### Top (last) level of Sokoban ###
@@ -518,13 +493,7 @@ TRAP:"hole",(23,01)
 MONSTER:'m',"giant mimic", random, m_object "boulder"
 MONSTER:'m',"giant mimic", random, m_object "boulder"
 
-# Random objects
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+soko_loot()
 
 # Rewards
 DOOR:locked,(23,13)
@@ -615,13 +584,7 @@ TRAP:"hole",(22,01)
 MONSTER:'m',"giant mimic", random, m_object "boulder"
 MONSTER:'m',"giant mimic", random, m_object "boulder"
 
-# Random objects
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+soko_loot()
 
 # Rewards
 DOOR:locked,(23,12)

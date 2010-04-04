@@ -64,6 +64,10 @@ int FDECL(yyoutput, (int));
 void FDECL(init_yyin, (FILE *));
 void FDECL(init_yyout, (FILE *));
 
+void FDECL(include_push, (const char *));
+int NDECL(include_pop);
+
+
 /*
  * This doesn't always get put in lev_comp.h
  * (esp. when using older versions of bison).
@@ -73,6 +77,13 @@ extern YYSTYPE yylval;
 int line_number = 1, colon_line_number = 1;
 static char map[4096];
 static int map_cnt = 0;
+
+int doing_included_file = 0;
+YY_BUFFER_STATE include_stack[5];
+int include_line[5];
+char *include_file[5];
+
+FILE *orig_yyin = NULL;
 
 %}
 %e 1500
@@ -157,6 +168,7 @@ CASE		return CASE_ID;
 BREAK		return BREAK_ID;
 DEFAULT		return DEFAULT_ID;
 FUNCTION	return FUNCTION_ID;
+INCLUDE		return INCLUDE_ID;
 SOUNDS		return SOUNDS_ID;
 hear		{ yylval.i=LVLSND_HEARD;  return MSG_OUTPUT_TYPE; }
 pline		{ yylval.i=LVLSND_PLINED; return MSG_OUTPUT_TYPE; }
@@ -284,12 +296,63 @@ FILE *input_f;
 	else
 #endif
 	    yyin = input_f;
+	    if (!orig_yyin) orig_yyin = yyin;
 }
 /* analogous routine (for completeness) */
 void init_yyout( output_f )
 FILE *output_f;
 {
 	yyout = output_f;
+}
+
+void
+include_push(fname)
+const char *fname;
+{
+  if (doing_included_file >= 5)
+    yyerror("Too deep includes");
+  else {
+    FILE *fin;
+    fin = fopen(fname, "r");
+    if (!fin) {
+       yyerror("Cannot open file for including.");
+    } else {
+       include_stack[doing_included_file] = YY_CURRENT_BUFFER;
+       include_line[doing_included_file] = line_number;
+       include_file[doing_included_file] = strdup(fname);
+       doing_included_file++;
+       yyin = fin;
+       yy_switch_to_buffer(yy_create_buffer(fin, YY_BUF_SIZE));
+       BEGIN(INITIAL);
+       yyparse();
+    }
+  }
+}
+
+int
+include_pop()
+{
+  if (--doing_included_file < 0) {
+    doing_included_file = 0;
+    init_yyin(orig_yyin);
+    yy_switch_to_buffer(yy_create_buffer(orig_yyin, YY_BUF_SIZE));
+  } else {
+    if (include_file[doing_included_file])
+       free(include_file[doing_included_file]);
+    yy_switch_to_buffer(include_stack[doing_included_file]);
+    line_number = include_line[doing_included_file];
+  }
+  return 0;
+}
+
+/*
+ * Stub needed for lex interface.
+ */
+int
+yywrap()
+{
+    if (doing_included_file >= 0) include_pop();
+    return 1;
 }
 
 /*lev_comp.l*/

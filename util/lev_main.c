@@ -93,6 +93,8 @@ struct lc_funcdefs *FDECL(funcdef_new,(long,char *));
 void FDECL(funcdef_free_all,(struct lc_funcdefs *));
 struct lc_funcdefs *FDECL(funcdef_defined,(struct lc_funcdefs *,char *, int));
 
+void FDECL(splev_add_from, (sp_lev *, sp_lev *));
+
 extern void NDECL(monst_init);
 extern void NDECL(objects_init);
 extern void NDECL(decl_init);
@@ -306,15 +308,6 @@ const char *s;
 				fname, colon_line_number, s);
 }
 
-/*
- * Stub needed for lex interface.
- */
-int
-yywrap()
-{
-	return 1;
-}
-
 struct opvar *
 set_opvar_int(ov, val)
 struct opvar *ov;
@@ -398,6 +391,9 @@ funcdef_new(addr, name)
     f->next = NULL;
     f->addr = addr;
     f->name = name;
+    f->n_called = 0;
+    f->code.opcodes = NULL;
+    f->code.n_opcodes = 0;
     return f;
 }
 
@@ -410,6 +406,7 @@ funcdef_free_all(fchain)
     while (tmp) {
 	nxt = tmp->next;
 	Free(tmp->name);
+	/* FIXME: free tmp->code */
 	Free(tmp);
 	tmp = nxt;
     }
@@ -432,6 +429,54 @@ funcdef_defined(f, name, casesense)
     return NULL;
 }
 
+/* basically copied from src/sp_lev.c */
+struct opvar *
+opvar_clone(ov)
+     struct opvar *ov;
+{
+    if (ov) {
+	struct opvar *tmpov = (struct opvar *)alloc(sizeof(struct opvar));
+	if (!tmpov) panic("could not alloc opvar struct");
+	switch (ov->spovartyp) {
+	case SPOVAR_INT:
+	    {
+		tmpov->spovartyp = ov->spovartyp;
+		tmpov->vardata.l = ov->vardata.l;
+	    }
+	    break;
+	case SPOVAR_STRING:
+	    {
+		int len = strlen(ov->vardata.str);
+		tmpov->spovartyp = ov->spovartyp;
+		tmpov->vardata.str = (char *)alloc(len+1);
+		(void)memcpy((genericptr_t)tmpov->vardata.str,
+			     (genericptr_t)ov->vardata.str, len);
+		tmpov->vardata.str[len] = '\0';
+	    }
+	    break;
+	default:
+	    {
+		char buf[BUFSZ];
+		sprintf(buf, "Unknown push value type (%i)!", ov->spovartyp);
+		yyerror(buf);
+	    }
+	}
+	return tmpov;
+    }
+    return NULL;
+}
+
+
+void
+splev_add_from(splev, from_splev)
+     sp_lev *splev;
+     sp_lev *from_splev;
+{
+    int i;
+    if (splev && from_splev)
+	for (i = 0; i < from_splev->n_opcodes; i++)
+	    add_opcode(splev, from_splev->opcodes[i].opcode, opvar_clone(from_splev->opcodes[i].opdat));
+}
 
 
 /*
@@ -844,8 +889,11 @@ sp_lev *maze;
 	    "cmp",
 	    "jmp",
 	    "jl",
+	    "jle",
 	    "jg",
 	    "jge",
+	    "je",
+	    "jne",
 	    "spill",
 	    "terrain",
 	    "replaceterrain",
@@ -858,8 +906,6 @@ sp_lev *maze;
 	    "rn2",
 	    "dec",
 	    "copy",
-	    "je",
-	    "jne",
 	    "mon_generation",
 	    "end_moninvent",
 	    "grave",
@@ -868,7 +914,8 @@ sp_lev *maze;
 	    "call",
 	    "return",
 	    "init_map",
-	    "flags"
+	    "flags",
+	    "sounds"
 	};
 
 	/* don't bother with the header stuff */

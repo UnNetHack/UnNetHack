@@ -2790,6 +2790,13 @@ spo_frame_pop(coder)
     }
 }
 
+long
+sp_code_jmpaddr(curpos, jmpaddr)
+     long curpos, jmpaddr;
+{
+    return (curpos + jmpaddr);
+}
+
 void
 spo_call(coder)
      struct sp_coder *coder;
@@ -2802,7 +2809,7 @@ spo_call(coder)
     if (OV_i(params) < 0) return;
 
     /* push a frame */
-    tmpframe = frame_new(OV_i(addr)-1);
+    tmpframe = frame_new(sp_code_jmpaddr(coder->frame->n_opcode, OV_i(addr)-1));
     tmpframe->next = coder->frame;
     coder->frame = tmpframe;
 
@@ -3294,12 +3301,8 @@ spo_level_sounds(coder)
     mg->n_sounds = OV_i(n_tuples);
     mg->sounds = (struct lvl_sound_bite *)alloc(sizeof(struct lvl_sound_bite) * mg->n_sounds);
 
-    pline("freq=%i, n_sounds=%i", mg->freq, mg->n_sounds);
-
     while (OV_i(n_tuples)-- > 0) {
 	struct opvar *flags, *msg;
-
-	pline("sndbite %i", OV_i(n_tuples));
 
 	if (!OV_pop_s(msg) || !OV_pop_i(flags)) {
 	    panic("oopsie when loading lvl_sound_bite.");
@@ -3307,8 +3310,6 @@ spo_level_sounds(coder)
 
 	mg->sounds[OV_i(n_tuples)].flags = OV_i(flags);
 	mg->sounds[OV_i(n_tuples)].msg = strdup(OV_s(msg));
-
-	pline("(%i,\"%s\")", OV_i(flags), OV_s(msg));
 
 	opvar_free(flags);
 	opvar_free(msg);
@@ -4353,7 +4354,7 @@ spo_jmp(coder, lvl)
     struct opvar *tmpa;
     long a;
     if (!OV_pop_i(tmpa)) return;
-    a = (OV_i(tmpa) - 1);
+    a = sp_code_jmpaddr(coder->frame->n_opcode, (OV_i(tmpa) - 1));
     if ((a >= 0) && (a < lvl->n_opcodes) &&
 	(a != coder->frame->n_opcode))
 	coder->frame->n_opcode = a;
@@ -4370,12 +4371,13 @@ spo_conditional_jump(coder,lvl)
     int test;
     if (!OV_pop_i(oa) || !OV_pop_i(oc)) return;
 
-    a = (OV_i(oa) - 1);
+    a = sp_code_jmpaddr(coder->frame->n_opcode, (OV_i(oa) - 1));
     c = OV_i(oc);
 
     switch (coder->opcode) {
     default: impossible("spo_conditional_jump: illegal opcode"); break;
     case SPO_JL:  test = (c < 0); break;
+    case SPO_JLE: test = (c <= 0); break;
     case SPO_JG:  test = (c > 0); break;
     case SPO_JGE: test = (c >= 0); break;
     case SPO_JE:  test = (c == 0); break;
@@ -4549,6 +4551,7 @@ sp_lev *lvl;
         case SPO_JMP:
 	    spo_jmp(coder, lvl); break;
         case SPO_JL:
+        case SPO_JLE:
         case SPO_JG:
         case SPO_JGE:
         case SPO_JE:
