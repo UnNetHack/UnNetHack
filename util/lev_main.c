@@ -687,8 +687,8 @@ sp_lev *sp;
 {
 	register int i, len;
 	register char *s1, *s2;
-	int max_len = 0;
-	int max_hig = 0;
+	long max_len = 0;
+	long max_hig = 0;
 	char msg[256];
 	char *tmpmap[ROWNO];
 	int dx,dy;
