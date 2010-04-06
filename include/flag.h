@@ -341,6 +341,7 @@ struct instance_flags {
 #ifdef AUTO_OPEN
 	boolean  autoopen;	/* open doors by walking into them */
 #endif
+	boolean  dark_room;	/* show shadows in lit rooms */
 };
 
 /*
