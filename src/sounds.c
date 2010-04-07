@@ -979,7 +979,8 @@ dochat()
 
     /* only ask for directions if there is more or less than one monster
      * around */
-    if (mon_count != 1 && !getdir("Talk to whom? (in what direction)")) {
+    if ((mon_count != 1 || iflags.vanilla_ui_behavior) &&
+        !getdir("Talk to whom? (in what direction)")) {
 	/* decided not to chat */
 	return(0);
     }

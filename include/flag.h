@@ -342,6 +342,7 @@ struct instance_flags {
 	boolean  autoopen;	/* open doors by walking into them */
 #endif
 	boolean  dark_room;	/* show shadows in lit rooms */
+	boolean  vanilla_ui_behavior;	/* fall back to vanilla behavior */
 };
 
 /*

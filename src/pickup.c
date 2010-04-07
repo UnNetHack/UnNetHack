@@ -1552,7 +1552,7 @@ lootcont:
 
 	    if (Is_container(cobj)) {
 		/* don't ask if there is only one lootable object */
-		if (container_count != 1) {
+		if (container_count != 1 || iflags.vanilla_ui_behavior) {
 			Sprintf(qbuf, "There is %s here, loot it?",
 				safe_qbuf("", sizeof("There is  here, loot it?"),
 				     doname(cobj), an(simple_typename(cobj->otyp)),
