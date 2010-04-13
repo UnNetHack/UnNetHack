@@ -7,7 +7,7 @@ int term_rows, term_cols; /* size of underlying terminal */
 
 WINDOW *base_term;    /* underlying terminal window */
 
-WINDOW *mapborderwin;
+WINDOW *mapwin, *mapborderwin;
 
 
 #define TEXTCOLOR   /* Allow color */
@@ -26,6 +26,7 @@ WINDOW *mapborderwin;
 #define MAP_WIN     3
 #define HPOS_WIN    4
 #define MESG_HISTORY_MAX   200
+#define USE_DARKGRAY /* Allow "bright" black; delete if not visible */
 
 
 typedef enum orient_type
@@ -34,7 +35,8 @@ typedef enum orient_type
     UP,
     DOWN,
     RIGHT,
-    LEFT
+    LEFT,
+    UNDEFINED
 } orient;
 
 
@@ -154,6 +156,8 @@ extern void curses_get_window_xy(winid wid, int *x, int *y);
 
 extern void curses_puts(winid wid, int attr, const char *text);
 
+extern void curses_clear_nhwin(winid wid);
+
 
 /* cursmisc.c */
 
@@ -187,8 +191,15 @@ extern void curses_posthousekeeping(void);
 
 extern void curses_view_file(const char *filename, boolean must_exist);
 
-extern char *curses_rtrim(char *str);
+extern void curses_display_splash_window(void);
 
+extern void curses_rtrim(char *str);
+
+extern int curses_get_count(int first_digit);
+
+extern int curses_convert_attr(int attr);
+
+extern int curses_read_attrs(char *attrs);
 
 /* cursdial.c */
 
@@ -237,13 +248,15 @@ extern void curses_init_options(void);
 
 extern void curses_message_win_puts(const char *message, boolean recursed);
 
-extern void curses_more(void);
+extern int curses_more(void);
 
 extern void curses_clear_unhighlight_message_window(void);
 
 extern void curses_last_messages(void);
 
 extern void curses_init_mesg_history(void);
+
+extern void curses_prev_mesg(void);
 
 
 #endif  /* WINCURS_H */

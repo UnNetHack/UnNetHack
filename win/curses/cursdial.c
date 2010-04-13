@@ -7,6 +7,66 @@
 
 /* Dialog windows for curses interface */
 
+
+/* Private declarations */
+
+typedef struct nhmi
+{
+    winid wid;  /* NetHack window id */
+    anything identifier; /* Value returned if item selected */
+    CHAR_P accelerator;  /* Character used to select item from menu */
+    CHAR_P group_accel; /* Group accelerator for menu item, if any */
+    int attr;  /* Text attributes for item */
+    const char *str;  /* Text of menu item */
+    BOOLEAN_P presel; /* Whether menu item should be preselected */
+    boolean selected;   /* Whether item is currently selected */
+    int page_num;   /* Display page number for entry */
+    int line_num;   /* Line number on page where entry begins */
+    int num_lines;  /* Number of lines entry uses on page */
+    struct nhmi *prev_item;    /* Pointer to previous entry */
+    struct nhmi *next_item;    /* Pointer to next entry */
+} nhmenu_item;
+
+typedef struct nhm
+{
+    winid wid;  /* NetHack window id */
+    const char *prompt;  /* Menu prompt text */
+    nhmenu_item *entries;   /* Menu entries */
+    int num_entries;          /* Number of menu entries */
+    int num_pages;            /* Number of display pages for entry */
+    int height;               /* Window height of menu */
+    int width;                /* Window width of menu */
+    struct nhm *prev_menu;    /* Pointer to previous entry */
+    struct nhm *next_menu;    /* Pointer to next entry */
+} nhmenu;
+
+typedef enum menu_op_type
+{
+    SELECT,
+    DESELECT,
+    INVERT
+} menu_op;
+
+static nhmenu *get_menu(winid wid);
+
+static char menu_get_accel(boolean first);
+
+static void menu_determine_pages(nhmenu *menu);
+
+static boolean menu_is_multipage(nhmenu *menu, int width, int height);
+
+static void menu_win_size(nhmenu *menu);
+
+static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num);
+
+static int menu_get_selections(WINDOW *win, nhmenu *menu, int how);
+
+static void menu_select_deselect(WINDOW *win, nhmenu_item *item, menu_op operation);
+
+static int menu_operation(WINDOW *win, nhmenu *menu, menu_op operation,
+ int page_num);
+
+
 static nhmenu *nhmenus = NULL;  /* NetHack menu array */
 
 
@@ -92,7 +152,7 @@ void curses_line_input_dialog(const char *prompt, char *answer, int buffer)
 
 int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_P def)
 {
-    WINDOW *askwin;
+    WINDOW *askwin = NULL;
     int answer, count, maxwidth, map_height, map_width;
     char *linestr;
     char askstr[BUFSZ + QBUFSZ];
@@ -100,12 +160,20 @@ int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_
     int prompt_width = strlen(prompt);
     int prompt_height = 1;
     boolean any_choice = FALSE;
+    boolean accept_count = FALSE;
 
     curses_get_window_size(MAP_WIN, &map_height, &map_width);
     maxwidth = map_width - 2;
     
     if (choices != NULL)
     {
+        for (count = 0; choices[count] != '\0'; count++)
+        {
+            if (choices[count] == '#')   /* Accept a count */
+            {
+                accept_count = TRUE;
+            }
+        }
         choicestr[0] = ' ';
         choicestr[1] = '[';
         for (count = 0; choices[count] != '\0'; count++)
@@ -198,10 +266,26 @@ int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_
             }
             break;
         }
+        
+        if (digit(answer))
+        {
+            if (accept_count)
+            {
+                if (answer != '0')
+                {
+                    yn_number = curses_get_count(answer - '0');
+                }
+                
+                answer = '#';
+                break;
+            }
+        }
+        
         if (any_choice)
         {
             break;
         }
+        
         if (choices != NULL)
         {
             for (count = 0; count < strlen(choices); count++)
@@ -220,6 +304,16 @@ int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_
 
     if (iflags.wc_popup_dialog)
     {
+        /* Kludge to make prompt visible after window is dismissed
+        when inputting a number */
+        if (digit(answer))
+        {
+            linestr = curses_copy_of(askstr);
+            pline("%s", linestr);
+            free(linestr);
+            curs_set(1);
+        }
+        
         curses_destroy_win(askwin);
     }
     else
@@ -390,7 +484,7 @@ int curses_display_nhmenu(winid wid, int how, MENU_ITEM_P **_selected)
 {
     nhmenu *current_menu = get_menu(wid);
     nhmenu_item *menu_item_ptr;
-    int num_choices, num_chosen, count;
+    int num_chosen, count;
     WINDOW *win;
     MENU_ITEM_P *selected = NULL;
 
@@ -418,14 +512,26 @@ int curses_display_nhmenu(winid wid, int how, MENU_ITEM_P **_selected)
 
     menu_win_size(current_menu);
     menu_determine_pages(current_menu);
-    win = curses_create_window(current_menu->width, current_menu->height, RIGHT);
-    num_choices = menu_get_choices(current_menu, how);
-    num_chosen = menu_get_selections(win, current_menu, num_choices, how);
+    
+    /* Display pre and post-game menus centered */
+    if (((moves <= 1) && !invent) || program_state.gameover)
+    {
+        win = curses_create_window(current_menu->width,
+         current_menu->height, CENTER);
+    }
+    else    /* Display during-game menus on the right out of the way */
+    {
+        win = curses_create_window(current_menu->width,
+         current_menu->height, RIGHT);
+    }
+    
+    num_chosen = menu_get_selections(win, current_menu, how);
     curses_destroy_win(win);
     
     if (num_chosen > 0)
     {
-        selected = (MENU_ITEM_P*) malloc(num_chosen * sizeof(MENU_ITEM_P));
+        selected = (MENU_ITEM_P*) malloc(num_chosen *
+         sizeof(MENU_ITEM_P));
         count = 0;
         
         menu_item_ptr = current_menu->entries;
@@ -550,13 +656,17 @@ static char menu_get_accel(boolean first)
     ret = next_letter;
     
     if (((next_letter < 'z') && (next_letter >= 'a')) || ((next_letter < 'Z')
-     && (next_letter >= 'A')))
+     && (next_letter >= 'A')) || ((next_letter < '9') && (next_letter >= '0')))
     {
         next_letter++;
     }
     else if (next_letter == 'z')
     {
         next_letter = 'A';
+    }
+    else if (next_letter == 'Z')
+    {
+        next_letter = '0';
     }
     
     return ret;
@@ -760,7 +870,7 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
     nhmenu_item *menu_item_ptr;
     int count, curletter, entry_cols, start_col, num_lines, footer_x;
     boolean first_accel = TRUE;
-        
+    
     /* Cycle through entries until we are on the correct page */
 
     menu_item_ptr = menu->entries;
@@ -819,9 +929,9 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
                 }
                 menu_item_ptr->accelerator = curletter;
             }
-            curses_toggle_color_attr(win, NONE, ATR_BOLD, ON);
+            curses_toggle_color_attr(win, NONE, A_BOLD, ON);
             mvwaddch(win, menu_item_ptr->line_num + 1, 2, curletter);
-            curses_toggle_color_attr(win, NONE, ATR_BOLD, OFF);
+            curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
             if (menu_item_ptr->selected)
             {
                 curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
@@ -888,49 +998,7 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
 }
 
 
-/* Add valid selections to choices array, and return the number of choices */
-
-static int menu_get_choices(nhmenu *menu, int how)
-{
-    char curletter;
-    int count = 0;
-    int accel_idx = 0;
-    nhmenu_item *menu_item_ptr = menu->entries;
-    
-    if (how == PICK_NONE)
-        return 0;
-
-    while (menu_item_ptr != NULL)
-    {
-        if (menu_item_ptr->identifier.a_void != NULL)
-        {
-            if (menu_item_ptr->accelerator != 0)
-            {
-                curletter = menu_item_ptr->accelerator;
-            }
-            else
-            {
-                if (accel_idx == 0)
-                {
-                    curletter = menu_get_accel(TRUE);
-                }
-                else
-                {
-                    curletter = menu_get_accel(FALSE);
-                }
-                menu_item_ptr->accelerator = curletter;
-            }
-            accel_idx++;
-        }
-        menu_item_ptr = menu_item_ptr->next_item;
-        count++;
-    }
-    return count;
-}
-
-
-
-static int menu_get_selections(WINDOW *win, nhmenu *menu, int num_choices, int how)
+static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
 {
     int curletter;
     int curpage = 1;
@@ -943,6 +1011,16 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int num_choices, int h
     while (!dismiss)
     {
         curletter = getch();
+        
+        if ((how == PICK_NONE) && (menu->num_pages == 1))
+        {
+            if (how==PICK_NONE)
+            {    
+                num_selected = -1;
+                dismiss = TRUE;
+                break;
+            }                
+        }
         
         switch (curletter)
         {
@@ -1001,6 +1079,15 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int num_choices, int h
                 }
                 break;
             }
+            default:
+            {
+                if (how==PICK_NONE)
+                {    
+                    num_selected = -1;
+                    dismiss = TRUE;
+                    break;
+                }                
+            }
         }
         if (how == PICK_ANY)
         {
@@ -1041,17 +1128,13 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int num_choices, int h
         
         menu_item_ptr = menu->entries;
         
-        while ((menu_item_ptr != NULL) && (how != PICK_NONE))
+        while (menu_item_ptr != NULL)
         {
             if (menu_item_ptr->identifier.a_void != NULL)
             {
-                if (curletter == menu_item_ptr->accelerator)
+                if ((curpage == menu_item_ptr->page_num) &&
+                 (curletter == menu_item_ptr->accelerator))
                 {
-                    if (curpage != menu_item_ptr->page_num)
-                    {
-                        curpage = menu_item_ptr->page_num;
-                        menu_display_page(menu, win, curpage);
-                    }
                     menu_select_deselect(win, menu_item_ptr, INVERT);
                     if (how == PICK_ONE)
                     {

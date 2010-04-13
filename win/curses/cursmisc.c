@@ -4,32 +4,120 @@
 #include "cursmisc.h"
 #include "func_tab.h"
 #include "dlb.h"
+#include "patchlevel.h"
 
 #include <ctype.h>
 
 /* Misc. curses interface functions */
 
+/* Private declarations */
+
+#define NETHACK_CURSES      1
+#define SLASHEM_CURSES      2
+#define UNNETHACK_CURSES    3
+
+/* Banners used for an optional ASCII splash screen */
+
+#define NETHACK_SPLASH_A \
+"         _   _        _    _    _               _    "
+
+#define NETHACK_SPLASH_B \
+"        | \\ | |      | |  | |  | |             | |   "
+
+#define NETHACK_SPLASH_C \
+"        |  \\| |  ___ | |_ | |__| |  __ _   ___ | | __"
+
+#define NETHACK_SPLASH_D \
+"        | . ` | / _ \\| __||  __  | / _` | / __|| |/ /"
+
+#define NETHACK_SPLASH_E \
+"        | |\\  ||  __/| |_ | |  | || (_| || (__ |   < "
+
+#define NETHACK_SPLASH_F \
+"        |_| \\_| \\___| \\__||_|  |_| \\__,_| \\___||_|\\_\\"
+
+#define SLASHEM_SPLASH_A \
+"                _____  _              _     _  ______  __  __ "
+
+#define SLASHEM_SPLASH_B \
+"               / ____|| |            | |   ( )|  ____||  \\/  |"
+
+#define SLASHEM_SPLASH_C \
+"              | (___  | |  __ _  ___ | |__  \\|| |__   | \\  / |"
+
+#define SLASHEM_SPLASH_D \
+"               \\___ \\ | | / _` |/ __|| '_ \\   |  __|  | |\\/| |"
+
+#define SLASHEM_SPLASH_E \
+"               ____) || || (_| |\\__ \\| | | |  | |____ | |  | |"
+
+#define SLASHEM_SPLASH_F \
+"              |_____/ |_| \\__,_||___/|_| |_|  |______||_|  |_|"
+
+#define UNNETHACK_SPLASH_A \
+"     _    _         _   _        _    _    _               _"
+
+#define UNNETHACK_SPLASH_B \
+"    | |  | |       | \\ | |      | |  | |  | |             | |"
+
+#define UNNETHACK_SPLASH_C \
+"    | |  | | _ __  |  \\| |  ___ | |_ | |__| |  __ _   ___ | | __"
+
+#define UNNETHACK_SPLASH_D \
+"    | |  | || '_ \\ | . ` | / _ \\| __||  __  | / _` | / __|| |/ /"
+
+#define UNNETHACK_SPLASH_E \
+"    | |__| || | | || |\\  ||  __/| |_ | |  | || (_| || (__ |   <"
+
+#define UNNETHACK_SPLASH_F \
+"     \\____/ |_| |_||_| \\_| \\___| \\__||_|  |_| \\__,_| \\___||_|\\_\\"
+
 static int curs_x = -1;
 static int curs_y = -1;
 static winid curs_win = 0;
+
+/* Macros for Control and Alt keys */
+
+#ifndef M
+# ifndef NHSTDC
+#  define M(c)		(0x80 | (c))
+# else
+#  define M(c)		((c) - 128)
+# endif /* NHSTDC */
+#endif
+#ifndef C
+#define C(c)		(0x1f & (c))
+#endif
 
 
 /* Read a character of input from the user */
 
 int curses_read_char()
 {
-    int ch;
+    int ch, tmpch;
 
     ch = getch();
+    tmpch = ch;
     if (!ch)
     {
         ch = '\033'; /* map NUL to ESC since nethack doesn't expect NUL */
     }
-    
-    if ((ch >= 0x197) && (ch <= 0x1ba)) /* Alt/Meta key handling */
+
+#if defined(ALT_0) && defined(ALT_9)    /* PDCurses, maybe others */    
+    if ((ch >= ALT_0) && (ch <= ALT_9))
     {
-        ch = (ch - 0x140) | 0x80;
+        tmpch = (ch - ALT_0) + '0';
+        ch = M(tmpch);
     }
+#endif
+
+#if defined(ALT_A) && defined(ALT_Z)    /* PDCurses, maybe others */    
+    if ((ch >= ALT_A) && (ch <= ALT_Z))
+    {
+        tmpch = (ch - ALT_A) + 'a';
+        ch = M(tmpch);
+    }
+#endif
 
 #ifdef KEY_RESIZE
     /* Handle resize events via get_nh_event, not this code */
@@ -101,74 +189,77 @@ int curses_read_char()
 void curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
 {
 #ifdef TEXTCOLOR
-    int curses_color, curses_attr;
+    int curses_color;
 
-    switch (attr)
+    /* Map color disabled */
+    if ((!iflags.wc_color) && (win == mapwin))
     {
-        case ATR_NONE:
-        {
-            curses_attr = A_NORMAL;
-            break;
-        }
-        case ATR_ULINE:
-        {
-            curses_attr = A_UNDERLINE;
-            break;
-        }
-        case ATR_BOLD:
-        {
-            curses_attr = A_BOLD;
-            break;
-        }
-        case ATR_BLINK:
-        {
-            curses_attr = A_BLINK;
-            break;
-        }
-        case ATR_INVERSE:
-        {
-            curses_attr = A_REVERSE;
-            break;
-        }
-        default:
-        {
-            curses_attr = A_NORMAL;
-        }
+        return;
     }
+    
+    /* GUI color disabled */
+    if ((!iflags.wc2_guicolor) && (win != mapwin))
+    {
+        return;
+    }
+    
     if (color == 0) /* make black fg visible */
-#ifdef CURSES_VERSION
-        color = 16;
-#else
+    {
+#ifdef USE_DARKGRAY
         color = 8;
+#else
+        if (iflags.use_inverse)
+        {
+            wattron(win, A_REVERSE);
+        }
+        else
+        {
+            color = CLR_BLUE;
+        }
 #endif
+    }
     curses_color = color + 1;
     if (curses_color > 8)
         curses_color -= 8;
     if (onoff == ON)    /* Turn on color/attributes */
     {
-        if ((attr != NONE) && iflags.use_color)
-            wattron(win, curses_attr);
-        if ((color != NONE) && iflags.use_color)
+        if (color != NONE)
         {
-            if ((color > 7) && iflags.use_color)  /* high-intensity color */
+            if (color > 7)
+            {
                 wattron(win, A_BOLD);
-            if (iflags.use_color)
-                wattron(win, COLOR_PAIR(curses_color));
+            }
+            wattron(win, COLOR_PAIR(curses_color));
+        }
+        
+        if (attr != NONE)
+        {
+            wattron(win, attr);
         }
     }
     else                /* Turn off color/attributes */
     {
-        if ((attr != NONE) && iflags.use_color)
-            wattroff(win, curses_attr);
-        if ((color != NONE) && iflags.use_color)
+        if (color != NONE)
         {
-            if ((color > 7) && iflags.use_color)  /* high-intensity color */
+            if (color > 7)
+            {
                 wattroff(win, A_BOLD);
-            if (iflags.use_color)
-                wattroff(win, COLOR_PAIR(curses_color));
+            }
+#ifndef USE_DARKGRAY
+            if ((color == 0) && iflags.use_inverse)
+            {
+                wattroff(win, A_REVERSE);
+            }
+#endif  /* DARKGRAY */
+            wattroff(win, COLOR_PAIR(curses_color));
+        }
+        
+        if (attr != NONE)
+        {
+            wattroff(win, attr);
         }
     }
-#endif
+#endif  /* TEXTCOLOR */
 }
 
 
@@ -220,6 +311,7 @@ winid curses_get_wid(int type)
 		default:
 		{
 			panic("curses_get_wid: unsupported window type");
+			ret = -1;   /* Not reached */
 		}
 	}
 
@@ -500,13 +592,13 @@ int curses_convert_glyph(int ch, int glyph)
         case S_crwall:
             return ACS_PLUS;
         case S_tuwall:
-            return ACS_TTEE;
-        case S_tdwall:
             return ACS_BTEE;
+        case S_tdwall:
+            return ACS_TTEE;
         case S_tlwall:
-            return ACS_LTEE;
-        case S_trwall:
             return ACS_RTEE;
+        case S_trwall:
+            return ACS_LTEE;
         case S_tree:
             return ACS_PLMINUS;
         case S_corr:
@@ -523,7 +615,9 @@ int curses_convert_glyph(int ch, int glyph)
 
 void curses_move_cursor(winid wid, int x, int y)
 {
+#ifndef PDCURSES
     WINDOW *win = curses_get_nhwin(curs_win);
+#endif
 
     if (wid != MAP_WIN)
     {
@@ -553,7 +647,9 @@ void curses_move_cursor(winid wid, int x, int y)
 
 void curses_prehousekeeping()
 {
+#ifndef PDCURSES
     WINDOW *win = curses_get_nhwin(curs_win);
+#endif
 
     if ((curs_x > -1) && (curs_y > -1))
     {
@@ -613,9 +709,123 @@ void curses_view_file(const char *filename, boolean must_exist)
     curses_end_menu(wid, "");
     curses_select_menu(wid, PICK_NONE, &selected);
 }
+/* Display an ASCII splash screen for up to 2 seconds if the
+splash_screen option is set.  The splash screen may be
+dismissed sooner with a keystroke. */
+
+void curses_display_splash_window()
+{
+    winid wid;
+    anything *identifier;
+    menu_item *selected = NULL;
+    int which_variant = NETHACK_CURSES;  /* Default to NetHack */
+    
+    wid = curses_get_wid(NHW_MENU);
+    curses_create_nhmenu(wid);
+    identifier = malloc(sizeof(anything));
+    identifier->a_void = NULL;
+    
+    timeout(2000);  /* Pause for 2 seconds or a key is hit */
+#ifdef DEF_GAME_NAME
+    if (strcmp(DEF_GAME_NAME, "SlashEM") == 0)
+    {
+        which_variant = SLASHEM_CURSES;
+    }
+#endif
+
+#ifdef GAME_SHORT_NAME
+    if (strcmp(GAME_SHORT_NAME, "UNH") == 0)
+    {
+        which_variant = UNNETHACK_CURSES;
+    }
+#endif
+
+    switch (which_variant)
+    {
+        case NETHACK_CURSES:
+        {
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             NETHACK_SPLASH_A, FALSE);
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             NETHACK_SPLASH_B, FALSE);
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             NETHACK_SPLASH_C, FALSE);
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             NETHACK_SPLASH_D, FALSE);
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             NETHACK_SPLASH_E, FALSE);
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             NETHACK_SPLASH_F, FALSE);
+            break;
+        }
+        case SLASHEM_CURSES:
+        {
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             SLASHEM_SPLASH_A, FALSE);
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             SLASHEM_SPLASH_B, FALSE);
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             SLASHEM_SPLASH_C, FALSE);
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             SLASHEM_SPLASH_D, FALSE);
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             SLASHEM_SPLASH_E, FALSE);
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             SLASHEM_SPLASH_F, FALSE);
+            break;
+        }
+        case UNNETHACK_CURSES:
+        {
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             UNNETHACK_SPLASH_A, FALSE);
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             UNNETHACK_SPLASH_B, FALSE);
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             UNNETHACK_SPLASH_C, FALSE);
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             UNNETHACK_SPLASH_D, FALSE);
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             UNNETHACK_SPLASH_E, FALSE);
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+             UNNETHACK_SPLASH_F, FALSE);
+            break;
+        }
+        default:
+        {
+            impossible("which_variant number %d out of range",
+             which_variant);
+        }
+    }
+
+#ifdef COPYRIGHT_BANNER_A
+    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE, "",
+     FALSE);
+    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+     COPYRIGHT_BANNER_A, FALSE);
+#endif
+
+#ifdef COPYRIGHT_BANNER_B
+    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+     COPYRIGHT_BANNER_B, FALSE);
+#endif
+
+#ifdef COPYRIGHT_BANNER_C
+    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+     COPYRIGHT_BANNER_C, FALSE);
+#endif
+
+#ifdef COPYRIGHT_BANNER_D   /* Just in case */
+    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+     COPYRIGHT_BANNER_D, FALSE);
+#endif
+
+    curses_end_menu(wid, "");
+    curses_select_menu(wid, PICK_NONE, &selected);
+    timeout(-1);
+}
 
 
-char *curses_rtrim(char *str)
+void curses_rtrim(char *str)
 {
     char *s;
 
@@ -623,8 +833,122 @@ char *curses_rtrim(char *str)
     for(--s;isspace(*s) && s > str; --s);
     if(s == str) *s = '\0';
     else *(++s) = '\0';
-    return str;
 }
+
+
+/* Read numbers until non-digit is encountered, and return number
+in int form. */
+
+int curses_get_count(int first_digit)
+{
+    long current_count = first_digit;
+    int current_char;
+    
+    current_char = curses_read_char();
+    
+    while (isdigit(current_char))
+    {
+        current_count = (current_count * 10) + (current_char - '0');
+        if (current_count > 32768)  /* Could go higher, but no need */
+        {
+            current_count = 32768;
+        }
+        
+        pline("Count: %ld", current_count);
+        current_char = curses_read_char();
+    }
+    
+    return current_count;
+}
+
+
+/* Convert the given NetHack text attributes into the format curses
+understands, and return that format mask. */
+
+int curses_convert_attr(int attr)
+{
+    int curses_attr;
+    
+    switch (attr)
+    {
+        case ATR_NONE:
+        {
+            curses_attr = A_NORMAL;
+            break;
+        }
+        case ATR_ULINE:
+        {
+            curses_attr = A_UNDERLINE;
+            break;
+        }
+        case ATR_BOLD:
+        {
+            curses_attr = A_BOLD;
+            break;
+        }
+        case ATR_BLINK:
+        {
+            curses_attr = A_BLINK;
+            break;
+        }
+        case ATR_INVERSE:
+        {
+            curses_attr = A_REVERSE;
+            break;
+        }
+        default:
+        {
+            curses_attr = A_NORMAL;
+        }
+    }
+        
+    return curses_attr;
+}
+
+
+/* Map letter attributes to bitmask, and store result in
+iflags.wc2_petattr, setting a default of underlined if no valid
+option is chosen.  Return mask on success, or 0 if not found */
+
+int curses_read_attrs(char *attrs)
+{
+    if (strchr(attrs, 'b') || strchr(attrs, 'B'))
+    {
+	    iflags.wc2_petattr = iflags.wc2_petattr|A_BOLD;
+    }
+    if (strchr(attrs, 'i') || strchr(attrs, 'I'))
+    {
+	    iflags.wc2_petattr = iflags.wc2_petattr|A_REVERSE;
+    }
+    if (strchr(attrs, 'u') || strchr(attrs, 'U'))
+    {
+	    iflags.wc2_petattr = iflags.wc2_petattr|A_UNDERLINE;
+    }
+    if (strchr(attrs, 'k') || strchr(attrs, 'K'))
+    {
+	    iflags.wc2_petattr = iflags.wc2_petattr|A_BLINK;
+    }
+#ifdef A_ITALIC
+    if (strchr(attrs, 't') || strchr(attrs, 'T'))
+    {
+	    iflags.wc2_petattr = iflags.wc2_petattr|A_ITALIC;
+    }
+#endif
+#ifdef A_RIGHTLINE
+    if (strchr(attrs, 'r') || strchr(attrs, 'R'))
+    {
+	    iflags.wc2_petattr = iflags.wc2_petattr|A_RIGHTLINE;
+    }
+#endif
+#ifdef A_LEFTLINE
+    if (strchr(attrs, 'l') || strchr(attrs, 'L'))
+    {
+	    iflags.wc2_petattr = iflags.wc2_petattr|A_LEFTLINE;
+    }
+#endif
+    return iflags.wc2_petattr;
+}
+
 
 /* Use nethack wall symbols for drawing unless cursesgraphics is
 defined, in which case we use the standard curses ones.  Not sure if

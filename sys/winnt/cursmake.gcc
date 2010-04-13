@@ -512,6 +512,9 @@ endif
 	$(subst /,\,if exist $(DOC)/guidebook.txt copy $(DOC)/guidebook.txt $(GAMEDIR)/Guidebook.txt)
 	$(subst /,\,if exist $(DOC)/nethack.txt copy $(DOC)/nethack.txt $(GAMEDIR)/NetHack.txt)
 	$(subst /,\,copy $(NTSYS)/defaults.nh   $(GAMEDIR)/defaults.nh)
+	$(subst /,\,copy $(TTY)/Readme.txt      $(GAMEDIR)/curses-readme.txt)
+	$(subst /,\,copy $(TTY)/Todo.txt      $(GAMEDIR)/curses-todo.txt)
+	$(subst /,\,copy $(TTY)/Bugs.txt      $(GAMEDIR)/curses-bugs.txt)
 	$(subst /,\,echo install done > $@)
 
 #  copy $(NTSYS)/winnt.hlp    $(GAMEDIR)

@@ -2,9 +2,24 @@
 #include "hack.h"
 #include "wincurs.h"
 #include "cursmesg.h"
-#include "curswins.h"
 
 /* Message window routines for curses interface */
+
+/* Private declatations */
+
+typedef struct nhpm
+{
+    char *str;  /* Message text */
+    long turn;  /* Turn number for message */
+    struct nhpm *prev_mesg;    /* Pointer to previous message */
+    struct nhpm *next_mesg;    /* Pointer to next message */
+} nhprev_mesg;
+
+static void scroll_window(winid wid);
+
+static void mesg_add_line(char *mline);
+
+static nhprev_mesg *get_msg_line(boolean reverse, int mindex);
 
 static int turn_lines = 1;
 static int mx = 0;
@@ -14,9 +29,7 @@ static nhprev_mesg *last_mesg = NULL;
 static int max_messages;
 static int num_messages = 0;
 
-static void scroll_window(winid wid);
-static void mesg_add_line(char *mline);
-static nhprev_mesg *get_msg_line(boolean reverse, int mindex);
+
 
 /* Write a string to the message window.  Attributes set by calling function. */
 
@@ -28,6 +41,12 @@ void curses_message_win_puts(const char *message, boolean recursed)
     boolean border = curses_window_has_border(MESSAGE_WIN);
     int message_length = strlen(message);
     int border_space = 0;
+    static long suppress_turn = -1;
+    
+    if (suppress_turn == moves)
+    {
+        return;
+    }
     
     if (!recursed)
     {
@@ -57,7 +76,13 @@ void curses_message_win_puts(const char *message, boolean recursed)
         {
             if (turn_lines == height)
             {
-                curses_more();
+                /* Pause until key is hit - Esc suppresses any further
+                messages that turn */
+                if (curses_more() == '\033')
+                {
+                    suppress_turn = moves;
+                    return;
+                }
             }
             else
             {
@@ -77,7 +102,7 @@ void curses_message_win_puts(const char *message, boolean recursed)
 
     if (height > 1)
     {
-        curses_toggle_color_attr(win, NONE, ATR_BOLD, ON);
+        curses_toggle_color_attr(win, NONE, A_BOLD, ON);
     }
     
     if ((mx == border_space) && ((message_length + 2) > width))
@@ -88,7 +113,7 @@ void curses_message_win_puts(const char *message, boolean recursed)
         free(tmpstr);
         if (height > 1)
         {
-            curses_toggle_color_attr(win, NONE, ATR_BOLD, OFF);
+            curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
         }
         wrefresh(win);
         curses_message_win_puts(curses_str_remainder(message, (width - 2), 1),
@@ -97,16 +122,16 @@ void curses_message_win_puts(const char *message, boolean recursed)
     else
     {
         mvwprintw(win, my, mx, message);
-        curses_toggle_color_attr(win, NONE, ATR_BOLD, OFF);
+        curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
     }
     wrefresh(win);
     mx += message_length + 1;
 }
 
 
-void curses_more()
+int curses_more()
 {
-    int height, width;
+    int height, width, ret;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
     
     curses_get_window_size(MESSAGE_WIN, &height, &width);
@@ -114,7 +139,7 @@ void curses_more()
     mvwprintw(win, my, mx - 1, ">>");
     curses_toggle_color_attr(win, MORECOLOR, NONE, OFF);
     wrefresh(win);
-    wgetch(win);
+    ret = wgetch(win);
     if (height == 1)
     {
         curses_clear_unhighlight_message_window();
@@ -125,6 +150,8 @@ void curses_more()
         scroll_window(MESSAGE_WIN);
         turn_lines = 1;
     }
+    
+    return ret;
 }
 
 
@@ -194,7 +221,7 @@ void curses_last_messages()
         my = 0;
     }
     
-    pline(toplines);
+    pline("%s", toplines);
 }
 
 

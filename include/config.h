@@ -118,6 +118,15 @@
 # define HACKDIR "\\unnethack"
 #endif
 
+#ifdef CURSES_GRAPHICS
+# ifdef TTY_GRAPHICS
+# undef TTY_GRAPHICS
+# endif
+# ifndef DEFAULT_WINDOW_SYS
+#  define DEFAULT_WINDOW_SYS "curses"
+# endif
+#endif
+
 #ifndef DEFAULT_WINDOW_SYS
 # define DEFAULT_WINDOW_SYS "tty"
 #endif
@@ -179,11 +188,11 @@
 #ifndef AUTOCONF
 #ifdef UNIX
 /* path and file name extension for compression program */
-#define COMPRESS "/usr/bin/compress"	/* Lempel-Ziv compression */
-#define COMPRESS_EXTENSION ".Z"		/* compress's extension */
+/* #define COMPRESS "/usr/bin/compress" */	/* Lempel-Ziv compression */
+/* #define COMPRESS_EXTENSION ".Z"	*/	/* compress's extension */
 /* An example of one alternative you might want to use: */
-/* #define COMPRESS "/usr/local/bin/gzip" */	/* FSF gzip compression */
-/* #define COMPRESS_EXTENSION ".gz" */		/* normal gzip extension */
+#define COMPRESS "/bin/gzip"	/* FSF gzip compression */
+#define COMPRESS_EXTENSION ".gz"		/* normal gzip extension */
 #endif
 
 #ifndef COMPRESS

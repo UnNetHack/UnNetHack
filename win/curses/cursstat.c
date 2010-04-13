@@ -2,9 +2,25 @@
 #include "hack.h"
 #include "wincurs.h"
 #include "cursstat.h"
-#include "curswins.h"
 
 /* Status window functions for curses interface */
+
+/* Private declarations */
+
+typedef struct nhs
+{
+    long value;
+    char *txt;
+    aligntyp alignment;
+    boolean display;
+    int highlight_turns;
+    int highlight_color;
+    int x;
+    int y;
+    char *label;
+} nhstat;
+
+static void init_stats(void);
 
 static nhstat prevname;
 static nhstat prevdepth;
@@ -24,7 +40,9 @@ static nhstat prevmpow;
 static nhstat prevac;
 static nhstat prevexp;
 static nhstat prevtime;
-/*static nhstat prevscore;*/
+#ifdef SCORE_ON_BOTL
+static nhstat prevscore;
+#endif
 static nhstat prevhunger;
 static nhstat prevconf;
 static nhstat prevblind;

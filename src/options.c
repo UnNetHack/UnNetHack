@@ -23,6 +23,10 @@ NEARDATA struct instance_flags iflags;	/* provide linkage */
 #define PREFER_TILED FALSE
 #endif
 
+#ifdef CURSES_GRAPHICS
+extern int curses_read_attrs(char *attrs);
+#endif
+
 /*
  *  NOTE:  If you add (or delete) an option, please update the short
  *  options help (option_help()), the long options help (dat/opthelp),
@@ -107,6 +111,7 @@ static struct Bool_Opt
 	{"flush", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"fullscreen", &iflags.wc2_fullscreen, FALSE, SET_IN_FILE},
+	{"guicolor", &iflags.wc2_guicolor, TRUE, SET_IN_GAME},
 	{"help", &flags.help, TRUE, SET_IN_GAME},
 	{"hilite_pet",    &iflags.wc_hilite_pet, FALSE, SET_IN_GAME},	/*WC*/
 #ifdef ASCIIGRAPH
@@ -346,6 +351,7 @@ static struct Comp_Opt
 						15, SET_IN_FILE },
 # endif
 #endif
+	{ "petattr",  "attributes for highlighting pets", 12, SET_IN_FILE },
 	{ "pettype",  "your preferred initial pet type", 4, DISP_IN_GAME },
 	{ "pickup_burden",  "maximum burden picked up before prompt",
 						20, SET_IN_GAME },
@@ -2498,6 +2504,20 @@ goodfruit:
 
 
 	/* WINCAP2
+	 * petattr:string */
+	fullname = "petattr";
+	if (match_optname(opts, fullname, sizeof("petattr")-1, TRUE)) {
+		op = string_for_opt(opts, negated);
+		if (op && !negated) {
+		    iflags.wc2_petattr = curses_read_attrs(op);
+		    if (!curses_read_attrs(op))
+		    	badoption(opts);
+		} else if (negated) bad_negation(fullname, TRUE);
+		return;
+	}
+
+
+	/* WINCAP2
 	 * windowborders:n */
 	fullname = "windowborders";
 	if (match_optname(opts, fullname, sizeof("windowborders")-1, TRUE)) {
@@ -2707,7 +2727,8 @@ goodfruit:
 			}
 			else if ((boolopt[i].addr) == &iflags.use_inverse ||
 					(boolopt[i].addr) == &iflags.showrace ||
-					(boolopt[i].addr) == &iflags.hilite_pet) {
+					(boolopt[i].addr) == &iflags.hilite_pet ||
+					(boolopt[i].addr) == &iflags.wc2_guicolor) {
 			    need_redraw = TRUE;
 			}
 #ifdef CURSES_GRAPHICS
@@ -3645,9 +3666,9 @@ char *buf;
 # endif /* MSDOS */
 #endif /* VIDEOSHADES */
 	else if (!strcmp(optname,"windowborders"))
-		Sprintf(buf, "%s", iflags.wc2_windowborders == 1 ? "1=on" :
-				   iflags.wc2_windowborders == 2 ? "2=off" :
-				   iflags.wc2_windowborders == 3 ? "3=auto" :
+		Sprintf(buf, "%s", iflags.wc2_windowborders == 1     ? "1=on" :
+				   iflags.wc2_windowborders == 2             ? "2=off" :
+				   iflags.wc2_windowborders == 3             ? "3=auto" :
 				   defopt);
 	else if (!strcmp(optname, "windowtype"))
 		Sprintf(buf, "%s", windowprocs.name);
@@ -4130,6 +4151,8 @@ struct wc_Opt wc2_options[] = {
 	{"term_cols", WC2_TERM_COLS},
 	{"term_rows", WC2_TERM_ROWS},
 	{"windowborders", WC2_WINDOWBORDERS},
+	{"petattr", WC2_PETATTR},
+	{"guicolor", WC2_GUICOLOR},
 	{(char *)0, 0L}
 };
 

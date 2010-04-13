@@ -5,9 +5,26 @@
 
 /* Window handling for curses interface */
 
-static nethack_window *nhwins = NULL;  /* NetHack window array */
+/* Private declarations */
+
+typedef struct nhw
+{
+    winid nhwin;  /* NetHack window id */
+    WINDOW *curwin; /* Curses window pointer */
+    int width;  /* Usable width not counting border */
+    int height; /* Usable height not counting border */
+    int x;  /* start of window on terminal (left) */
+    int y;  /* start of window on termial (top) */
+    int orientation;    /* Placement of window relative to map */
+    boolean border; /* Whether window has a visible border */
+    struct nhw *prev_window;    /* Pointer to previous entry */
+    struct nhw *next_window;    /* Pointer to next entry */
+} nethack_window;
 
 static void refresh_map_window(void);
+
+static nethack_window *nhwins = NULL;  /* NetHack window array */
+
 
 
 /* Create a window with the specified size and orientation */
@@ -188,6 +205,7 @@ void curses_add_nhwin(winid wid, int height, int width, int y, int x,
             box(mapborderwin, 0, 0);
         }
         win = newpad(ROWNO, COLNO);
+        mapwin = win;
     }
     new_win->curwin = win;
 }
@@ -326,7 +344,7 @@ boolean curses_window_has_border(winid wid)
         }
         winptr = winptr->next_window;
     }
-
+    
     return FALSE;
 }
 
@@ -336,7 +354,7 @@ boolean curses_window_has_border(winid wid)
 boolean curses_window_exists(winid wid)
 {
     nethack_window *winptr = nhwins;
-
+ 
     while (winptr != NULL)
     {
         if (winptr->nhwin == wid)
@@ -345,7 +363,7 @@ boolean curses_window_exists(winid wid)
         }
         winptr = winptr->next_window;
     }
-
+    
     return FALSE;
 }
 
@@ -364,8 +382,8 @@ int curses_get_window_orientation(winid wid)
         }
         winptr = winptr->next_window;
     }
-
-    return LEFT;
+    
+    return UNDEFINED;   /* Not found */
 }
 
 
@@ -433,11 +451,10 @@ void curses_clear_nhwin(winid wid)
 
 /* Refresh visible portion of map window */
 
-static void refresh_map_window()
+static void refresh_map_window(void)
 {
     int mapwinx, mapwiny, maph, mapw, mapwinw, mapwinh, mapx, mapy;
     WINDOW *map_window = curses_get_nhwin(MAP_WIN);
-    /*boolean border = curses_window_has_border(MAP_WIN);*/
     
     curses_get_window_xy(MAP_WIN, &mapwinx, &mapwiny);
     curses_get_window_size(MAP_WIN, &mapwinh, &mapwinw);

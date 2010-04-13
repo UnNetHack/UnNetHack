@@ -12,9 +12,18 @@
 
 void curses_create_main_windows()
 {
-    int message_x, message_y, status_x, status_y, map_x, map_y;
-    int message_height, message_width, status_height, status_width,
-     map_height, map_width;
+    int message_x = 0;
+    int message_y = 0;
+    int status_x = 0;
+    int status_y = 0;
+    int map_x = 0;
+    int map_y = 0;
+    int message_height = 0;
+    int message_width = 0;
+    int status_height = 0;
+    int status_width = 0;
+    int map_height = 0;
+    int map_width = 0;
     int min_message_height = 1;
     int message_orientation = 0;
     int status_orientation = 0;
@@ -456,8 +465,6 @@ void curses_init_nhcolors()
 #ifdef TEXTCOLOR
     if (has_colors())
     {
-        pline("curses_init_nhcolors");
-#ifdef NCURSES_VERSION
         use_default_colors();
         init_pair(1, COLOR_BLACK, -1);
         init_pair(2, COLOR_RED, -1);
@@ -468,16 +475,7 @@ void curses_init_nhcolors()
         init_pair(7, COLOR_CYAN, -1);
         init_pair(8, -1, -1);
         init_pair(9, COLOR_WHITE, -1);
-#else
-        init_pair(1, COLOR_BLACK, COLOR_BLACK);
-        init_pair(2, COLOR_RED, COLOR_BLACK);
-        init_pair(3, COLOR_GREEN, COLOR_BLACK);
-        init_pair(4, COLOR_YELLOW, COLOR_BLACK);
-        init_pair(5, COLOR_BLUE, COLOR_BLACK);
-        init_pair(6, COLOR_MAGENTA, COLOR_BLACK);
-        init_pair(7, COLOR_CYAN, COLOR_BLACK);
-        init_pair(8, COLOR_WHITE, COLOR_BLACK);
-#endif
+
         if (can_change_color())
         {
             init_color(COLOR_YELLOW, 500, 300, 0);
@@ -762,13 +760,24 @@ int curses_character_dialog(const char** choices, const char *prompt)
 
 void curses_init_options()
 {
-	set_wc_option_mod_status(WC_ALIGN_MESSAGE|WC_ALIGN_STATUS|WC_COLOR|
-	 WC_HILITE_PET|WC_POPUP_DIALOG, SET_IN_GAME);
-	set_wc2_option_mod_status(WC2_TERM_COLS|WC2_TERM_ROWS|
-	 WC2_WINDOWBORDERS, SET_IN_GAME);
-	set_option_mod_status("DECgraphics", SET_IN_FILE);
-	set_option_mod_status("perm_invent", SET_IN_FILE);
-	set_option_mod_status("eight_bit_tty", SET_IN_FILE);
+    set_wc_option_mod_status(WC_ALIGN_MESSAGE|WC_ALIGN_STATUS|WC_COLOR|
+     WC_HILITE_PET|WC_POPUP_DIALOG, SET_IN_GAME);
+
+    set_wc2_option_mod_status(WC2_GUICOLOR, SET_IN_GAME);
+
+    /* Remove a few options that are irrelevant to this windowport */
+    set_option_mod_status("DECgraphics", SET_IN_FILE);
+    set_option_mod_status("perm_invent", SET_IN_FILE);
+    set_option_mod_status("eight_bit_tty", SET_IN_FILE);
+
+    /* Make sure that DECgraphics is not set to true via the config
+    file, as this will cause display issues.  We can't disable it in
+    options.c in case the game is compiled with both tty and curses.*/
+    if (iflags.DECgraphics)
+    {
+        switch_graphics(CURS_GRAPHICS);
+    }
+	
 #ifdef PDCURSES
     /* PDCurses for SDL, win32 and OS/2 has the ability to set the
      terminal size programatically.  If the user does not specify a

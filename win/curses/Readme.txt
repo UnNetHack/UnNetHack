@@ -1,3 +1,7 @@
+The homepage for this project may be found at:
+
+http://nethack-curses.wikia.com/wiki/NetHack_Curses_Interface_Wiki
+
 INTRO
 =====
 
@@ -14,7 +18,8 @@ interface include:
  * Dynamic configurable placement of status and message windows,
  relative to the map
  * Makes better use of larger terminal windows
- * Fancier display (e.g. window borders, optional popup dialogs)
+ * Fancier display (e.g. window borders, optional popup dialogs,
+ splash screen, and better menus)
  * "cursesgraphics" option for fancier line-drawing characters for
  drawing the dungeon - this should work on most terminals/platforms
 
@@ -33,6 +38,11 @@ Windows build instructions: If you are using Mingw32 as your compiler,
 then follow the instructions in sys/winnt/Install.nt with the following
 changes:
 
+ * Patch the NetHack source code with an appropriate Windows patch
+ utility
+ * Download and install SDL and PDCurses-SDL, or download winlibs.zip
+ from the same place you got the curses interface patch, and unzip it
+ into the root NetHack source directory
  * After running nhsetup, manually copy the file cursmake.gcc to the
  src/ subdirectory
  * Instead of typing "mingw32-make -f Makefile.gcc install" you will
@@ -53,7 +63,7 @@ align_message options may be set during the game, so you can experiment
 to see what arraingement looks best to you.
 
 For menus, in addition to the normal configurable keybindings for menu
-navigation descrived in the Guidebook, you can use the right and left
+navigation described in the Guidebook, you can use the right and left
 arrows to to forward or backward one page, respectively, and the home
 and end keys to go to the first and last pages, respectively.
 
@@ -98,19 +108,35 @@ OPTIONS=term_cols:110,term_rows:32
 # allows the code to decide if they should be drawn based on the size
 # of the terminal window.
 OPTIONS=windowborders:3
+#
+# Whether or not to display a fancy ascii-graphics splash screen on
+# startup.
+OPTIONS=splash_screen
+#
+# This controls what text attributes are used to highlight any pets.
+# Any combination of single letters representing each text attribute
+# may be used.  Not all attributes work on all terminals.
+#
+# Attributes may be one or more of: Bold, Inverse, Underline, blinK,
+# iTalic, Rightline, or Leftline.  The default is underline.
+OPTIONS=petattr:u
+#
+# Controls whether color and attributes are used for menu headers,
+# window borders, message text, etc.  This is separate from the color
+# option, which only controls the color of the map itself.
+OPTIONS=guicolor
 
 
 CONTACT
 =======
 
 Please send any bug reports, suggestions, patches, or miscellaneous
-feedback to me (Karl Garrison) at: kgarrison@pobox.com.  Note that as
-of this writing, I only have sporatic Internet access, so I may not get
-back to you right away.
+feedback to me (Karl Garrison) at: kgarrison@pobox.com.
 
 Happy Hacking!
 
 Karl Garrison
-March, 2009
+April, 2010
 
+http://nethack-curses.wikia.com/wiki/NetHack_Curses_Interface_Wiki
 

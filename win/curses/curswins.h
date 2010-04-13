@@ -34,20 +34,4 @@ void curses_puts(winid wid, int attr, const char *text);
 void curses_clear_nhwin(winid wid);
 
 
-/* Private declarations */
-
-typedef struct nhw
-{
-    winid nhwin;  /* NetHack window id */
-    WINDOW *curwin; /* Curses window pointer */
-    int width;  /* Usable width not counting border */
-    int height; /* Usable height not counting border */
-    int x;  /* start of window on terminal (left) */
-    int y;  /* start of window on termial (top) */
-    int orientation;    /* Placement of window relative to map */
-    boolean border; /* Whether window has a visible border */
-    struct nhw *prev_window;    /* Pointer to previous entry */
-    struct nhw *next_window;    /* Pointer to next entry */
-} nethack_window;
-
 #endif  /* CURSWIN_H */

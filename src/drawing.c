@@ -4,7 +4,6 @@
 
 #include "hack.h"
 #include "tcap.h"
-
 /* Relevent header information in rm.h and objclass.h. */
 
 #ifdef C
@@ -679,7 +678,7 @@ int gr_set_flag;
 	    iflags.IBMgraphics = TRUE;
 	    iflags.DECgraphics = FALSE;
 #ifdef CURSES_GRAPHICS
-	    iflags.cursesgraphics = FALSE;
+        iflags.cursesgraphics = FALSE;
 #endif
 	    assign_graphics(ibm_graphics, SIZE(ibm_graphics), MAXPCHARS, 0);
 #ifdef PC9800
@@ -708,6 +707,8 @@ int gr_set_flag;
 #endif
 #ifdef CURSES_GRAPHICS
     case CURS_GRAPHICS:
+	    assign_graphics((uchar *)0, 0, MAXPCHARS, 0);
+        iflags.cursesgraphics = TRUE;
 	    iflags.IBMgraphics = FALSE;
 	    iflags.DECgraphics = FALSE;
         break;
