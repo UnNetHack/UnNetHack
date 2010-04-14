@@ -1677,6 +1677,9 @@ register struct monst *mdef;
 	struct obj *otmp, *obj, *oldminvent;
 	xchar x = mdef->mx, y = mdef->my;
 	boolean wasinside = FALSE;
+#ifndef GOLDOBJ
+	long mgold=0;
+#endif
 
 	/* we have to make the statue before calling mondead, to be able to
 	 * put inventory in it, and we have to check for lifesaving before
@@ -1716,6 +1719,12 @@ register struct monst *mdef;
 			oldminvent = obj;
 		    }
 		}
+	
+#ifndef GOLDOBJ
+		/* fix SC343-8 and C343-94 */
+		mgold = mdef->mgold;
+		mdef->mgold = 0;
+#endif
 		/* defer statue creation until after inventory removal
 		   so that saved monster traits won't retain any stale
 		   item-conferred attributes */
@@ -1727,13 +1736,12 @@ register struct monst *mdef;
 		    (void) add_to_container(otmp, obj);
 		}
 #ifndef GOLDOBJ
-		if (mdef->mgold) {
+		if (mgold) {
 			struct obj *au;
 			au = mksobj(GOLD_PIECE, FALSE, FALSE);
-			au->quan = mdef->mgold;
+			au->quan = mgold;
 			au->owt = weight(au);
 			(void) add_to_container(otmp, au);
-			mdef->mgold = 0;
 		}
 #endif
 		/* Archeologists should not break unique statues */
