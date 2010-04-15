@@ -418,6 +418,7 @@ typedef unsigned char	uchar;
 #define DUMP_LOG        /* Dump game end information to a file */
 /* #define DUMP_FN "/tmp/%n.nh" */      /* Fixed dumpfile name, if you want
                                          * to prevent definition by users */
+#define DUMP_HTML_LOG   /* Dump game end information to a html file */
 #define DUMPMSGS 20     /* Number of latest messages in the dump file  */
 
 #define AUTO_OPEN	/* open doors by walking into them - Stefano Busti */
@@ -444,6 +445,7 @@ typedef unsigned char	uchar;
 #define ASTRAL_ESCAPE /* Allow escape from Astral plane (with the Amulet) - CWC */
 /* #define LIVELOG_BONES_KILLER */ /* Report if a ghost of a former player is
                                     * killed - Patric Mueller (15 Aug 2009) */
+#define ADJSPLIT /* splittable #adjust - Sam Dennis, conditionalized by Jukka Lahtinen */
 
 /* End of Section 6 */
 

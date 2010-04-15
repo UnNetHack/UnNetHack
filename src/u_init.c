@@ -577,6 +577,23 @@ u_init()
 	adjabil(0,1);
 	u.ulevel = u.ulevelmax = 1;
 
+	/*
+	 * u.roleplay should be treated similar to gender and alignment
+	 *   - it gets set at character creation
+	 *   - it's hard to change in-game
+	 *     (e.g. a special NPC could teach literacy somewhere)
+	 * the initialisation has to be in front of food, alignment
+	 * and inventory.
+	 */
+	u.roleplay.ascet	= flags.ascet;
+	u.roleplay.atheist	= flags.atheist;
+	u.roleplay.blindfolded	= flags.blindfolded;
+	u.roleplay.illiterate	= flags.illiterate;
+	u.roleplay.pacifist	= flags.pacifist;
+	u.roleplay.nudist	= flags.nudist;
+	u.roleplay.vegan	= flags.vegan;
+	u.roleplay.vegetarian	= flags.vegetarian;
+
 	init_uhunger();
 	for (i = 0; i <= MAXSPELL; i++) spl_book[i].sp_id = NO_SPELL;
 	u.ublesscnt = 300;			/* no prayers just yet */
@@ -807,9 +824,21 @@ u_init()
 		break;
 	}
 
+#ifdef TOURIST
 	/* Towel Day: In Memoriam Douglas Adams */
 	if (towelday())
 		ini_inv(Towel);
+#endif
+
+	/*** Conduct specific initialisation ***/
+
+	if (u.roleplay.blindfolded) {
+		if(!ublindf) ini_inv(Blindfold);
+	} else {
+		violated(CONDUCT_BLINDFOLDED);
+	}
+	if (u.roleplay.atheist) 
+		u.ugangr++;
 
 	if (discover)
 		ini_inv(Wishing);
@@ -932,7 +961,7 @@ register struct trobj *trop;
 				/* 'useless' items */
 				|| otyp == POT_HALLUCINATION
 				|| otyp == POT_ACID
-				|| otyp == SCR_AMNESIA
+				|| otyp == SCR_FLOOD
 				|| otyp == SCR_FIRE
 				|| otyp == SCR_BLANK_PAPER
 				|| otyp == SPE_BLANK_PAPER
@@ -1020,7 +1049,7 @@ register struct trobj *trop;
 		if (otyp == OIL_LAMP)
 			discover_object(POT_OIL, TRUE, FALSE);
 
-		if(obj->oclass == ARMOR_CLASS){
+		if((obj->oclass == ARMOR_CLASS && !u.roleplay.nudist)){
 			if (is_shield(obj) && !uarms) {
 				setworn(obj, W_ARMS);
 				if (uswapwep) setuswapwep((struct obj *) 0);
@@ -1044,12 +1073,15 @@ register struct trobj *trop;
 			otyp == TIN_OPENER || otyp == FLINT || otyp == ROCK) {
 		    if (is_ammo(obj) || is_missile(obj)) {
 			if (!uquiver) setuqwep(obj);
-		    } else if (!uwep) setuwep(obj);
+		    } else if ((!uwep) && !u.roleplay.pacifist) setuwep(obj);
 		    else if (!uswapwep) setuswapwep(obj);
 		}
 		if (obj->oclass == SPBOOK_CLASS &&
 				obj->otyp != SPE_BLANK_PAPER)
 		    initialspell(obj);
+
+		if ((obj->otyp == BLINDFOLD) && u.roleplay.blindfolded)
+				setworn(obj, W_TOOL);
 
 #if !defined(PYRAMID_BUG) && !defined(MAC)
 		if(--trop->trquan) continue;	/* make a similar object */

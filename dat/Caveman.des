@@ -8,8 +8,10 @@
 #	Here you meet your (besieged) class leader, Shaman Karnov
 #	and receive your quest assignment.
 #
-MAZE: "Cav-strt",' '
-FLAGS: noteleport,hardfloor
+LEVEL: "Cav-strt"
+FLAGS: noteleport,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"tiger"), (16,'S'), (16,"ape"), (4,'f')
 GEOMETRY:center,center
 MAP
                                                                             
@@ -95,8 +97,10 @@ WALLIFY
 #	further towards your assigned quest.
 #
 
-MAZE: "Cav-loca",' '
-FLAGS: hardfloor
+LEVEL: "Cav-loca"
+FLAGS: noteleport,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"tiger"), (16,'S'), (16,"ape"), (4,'f')
 GEOMETRY:center,center
 MAP
                                                                             
@@ -191,7 +195,10 @@ WALLIFY
 #	been assigned to retrieve.
 #
 
-MAZE: "Cav-goal", ' '
+LEVEL: "Cav-goal"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"tiger"), (16,'S'), (16,"ape"), (4,'f')
 GEOMETRY:center,center
 MAP
                                                                             
@@ -222,7 +229,7 @@ STAIR:random,up
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Objects
-OBJECT:')',"mace",(23,10),blessed,0,"The Sceptre of Might"
+OBJECT:')',"mace",(23,10),blessed,0,NAME:"The Sceptre of Might"
 OBJECT:random,random,random
 OBJECT:random,random,random
 OBJECT:random,random,random
@@ -253,8 +260,10 @@ WALLIFY
 #	and goal levels.
 #
 
-MAZE: "Cav-fila" , ' '
-INIT_MAP: '.' , ' ' , true , true , random , true
+LEVEL: "Cav-fila"
+FLAGS: noteleport,hardfloor,mazelevel
+INIT_MAP: mines, '.' , ' ' , true , true , random , true
+MON_GENERATION:86%, (64,"tiger"), (16,'S'), (16,"ape"), (4,'f')
 NOMAP
 #
 STAIR: random, up
@@ -281,8 +290,10 @@ MONSTER: 'h', "bugbear", random, hostile
 MONSTER: 'h', random, random, hostile
 MONSTER: 'H', "hill giant", random, hostile
 
-MAZE: "Cav-filb" , ' '
-INIT_MAP: '.' , ' ' , true , true , random , true
+LEVEL: "Cav-filb"
+FLAGS:mazelevel
+INIT_MAP: mines, '.' , ' ' , true , true , random , true
+MON_GENERATION:86%, (64,"tiger"), (16,'S'), (16,"ape"), (4,'f')
 NOMAP
 #
 STAIR: random, up

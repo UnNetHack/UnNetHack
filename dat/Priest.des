@@ -8,8 +8,13 @@
 #	Here you meet your (besieged) class leader, High Priest
 #	and receive your quest assignment.
 #
-MAZE: "Pri-strt",' '
-FLAGS: noteleport,hardfloor
+# All Priest quest levels are explicitly marked as graveyards
+# so there's less chance for undead corpses.
+#
+LEVEL: "Pri-strt"
+FLAGS: noteleport,hardfloor,mazelevel,graveyard
+INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
 GEOMETRY:center,center
 MAP
 ............................................................................
@@ -104,10 +109,11 @@ MONSTER: 'Z',"human zombie",(01,17)
 #	further towards your assigned quest.
 #
 
-MAZE: "Pri-loca",' '
-FLAGS: hardfloor
+LEVEL: "Pri-loca"
+FLAGS: hardfloor,mazelevel,graveyard
 # This is a kludge to init the level as a lit field.
-INIT_MAP: '.' , '.' , false , false , lit , false
+INIT_MAP: mines, '.' , '.' , false , false , lit , false
+MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
 GEOMETRY:center,center
 MAP
 ........................................
@@ -180,8 +186,10 @@ TRAP:random,random
 #	been assigned to retrieve.
 #
 
-MAZE: "Pri-goal", ' '
-INIT_MAP: 'L' , '.' , false , false , unlit , false
+LEVEL: "Pri-goal"
+FLAGS:mazelevel,graveyard
+INIT_MAP: mines, 'L' , '.' , false , false , unlit , false
+MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
 GEOMETRY:center,center
 MAP
 .L......L.LLL.......LL....
@@ -202,7 +210,7 @@ REGION:(00,00,25,10),unlit,"ordinary"
 # Stairs
 STAIR:(20,05),up
 # Objects
-OBJECT:'[',"helm of brilliance",place[0],blessed,0,"The Mitre of Holiness"
+OBJECT:'[',"helm of brilliance",place[0],blessed,0,NAME:"The Mitre of Holiness"
 OBJECT:random,random,random
 OBJECT:random,random,random
 OBJECT:random,random,random
@@ -264,74 +272,102 @@ MONSTER:'W',random,random
 #
 
 LEVEL: "Pri-fila"
+FLAGS:graveyard
+MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
 #
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, up
 OBJECT: random,random,random
 MONSTER: 'Z', "human zombie", random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random,random,random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 OBJECT: random,random,random
 MONSTER: 'Z', "human zombie", random
+}
 
 ROOM: "morgue" , random, random, random, random
+{
 STAIR: random, down
 OBJECT: random, random, random
 TRAP: random, random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'W', "wraith", random
+}
 
 ROOM: "morgue" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
+}
 
 RANDOM_CORRIDORS
 
 LEVEL: "Pri-filb"
+FLAGS:graveyard
+MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
 #
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, up
 OBJECT: random,random,random
 MONSTER: 'Z', "human zombie", random
 MONSTER: 'W', "wraith", random
+}
 
 ROOM: "morgue" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random, random, random
 OBJECT: random,random,random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 OBJECT: random,random,random
 MONSTER: 'Z', "human zombie", random
 MONSTER: 'W', "wraith", random
+}
 
 ROOM: "morgue" , random, random, random, random
+{
 STAIR: random, down
 OBJECT: random, random, random
 OBJECT: random, random, random
 TRAP: random, random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'Z', "human zombie", random
 MONSTER: 'W', "wraith", random
+}
 
 ROOM: "morgue" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
+}
 
 RANDOM_CORRIDORS

@@ -76,17 +76,14 @@ static struct Bool_Opt
 	{"checkspace", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"cmdassist", &iflags.cmdassist, TRUE, SET_IN_GAME},
-# if defined(MICRO) || defined(WIN32) || defined(CURSES_GRAPHICS)
-	{"color",         &iflags.wc_color,TRUE, SET_IN_GAME},		/*WC*/
-# else	/* systems that support multiple terminals, many monochrome */
-	{"color",         &iflags.wc_color, FALSE, SET_IN_GAME},	/*WC*/
-# endif
+	{"color", &iflags.wc_color, TRUE, SET_IN_GAME},		/*WC*/
 	{"confirm",&flags.confirm, TRUE, SET_IN_GAME},
 #ifdef CURSES_GRAPHICS
 	{"cursesgraphics", &iflags.cursesgraphics, TRUE, SET_IN_GAME},
 #else
 	{"cursesgraphics", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+	{"dark_room", &iflags.dark_room, TRUE, SET_IN_GAME},
 #if defined(TERMLIB) && !defined(MAC_GRAPHICS_ENV)
 	{"DECgraphics", &iflags.DECgraphics, FALSE, SET_IN_GAME},
 #else
@@ -113,7 +110,7 @@ static struct Bool_Opt
 	{"fullscreen", &iflags.wc2_fullscreen, FALSE, SET_IN_FILE},
 	{"guicolor", &iflags.wc2_guicolor, TRUE, SET_IN_GAME},
 	{"help", &flags.help, TRUE, SET_IN_GAME},
-	{"hilite_pet",    &iflags.wc_hilite_pet, FALSE, SET_IN_GAME},	/*WC*/
+	{"hilite_pet",    &iflags.wc_hilite_pet, TRUE, SET_IN_GAME},	/*WC*/
 #ifdef ASCIIGRAPH
 	{"IBMgraphics", &iflags.IBMgraphics, FALSE, SET_IN_GAME},
 #else
@@ -126,7 +123,7 @@ static struct Bool_Opt
 #endif
 	{"large_font", &iflags.obsolete, FALSE, SET_IN_FILE},	/* OBSOLETE */
 	{"legacy", &flags.legacy, TRUE, DISP_IN_GAME},
-	{"lit_corridor", &flags.lit_corridor, FALSE, SET_IN_GAME},
+	{"lit_corridor", &flags.lit_corridor, TRUE, SET_IN_GAME},
 	{"lootabc", &iflags.lootabc, FALSE, SET_IN_GAME},
 #ifdef MAC_GRAPHICS_ENV
 	{"Macgraphics", &iflags.MACgraphics, TRUE, SET_IN_GAME},
@@ -160,13 +157,27 @@ static struct Bool_Opt
 #else
 	{"news", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+	{"conducts_ascet", &flags.ascet, FALSE, SET_IN_FILE },
+	{"conducts_atheist", &flags.atheist, FALSE, SET_IN_FILE },
+	{"conducts_blindfolded", &flags.blindfolded, FALSE, SET_IN_FILE },
+	{"conducts_illiterate", &flags.illiterate, FALSE, SET_IN_FILE },
+	{"conducts_pacifist", &flags.pacifist, FALSE, SET_IN_FILE },
+	{"conducts_nudist", &flags.nudist, FALSE, SET_IN_FILE },
+	{"conducts_vegan", &flags.vegan, FALSE, SET_IN_FILE }, 
+	{"conducts_vegetarian", &flags.vegetarian, FALSE, SET_IN_FILE }, 
 	{"null", &flags.null, TRUE, SET_IN_GAME},
 #ifdef MAC
 	{"page_wait", &flags.page_wait, TRUE, SET_IN_GAME},
 #else
 	{"page_wait", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+#ifdef PARANOID
+	{"paranoid_hit", &iflags.paranoid_hit, FALSE, SET_IN_FILE},
+	{"paranoid_quit", &iflags.paranoid_quit, FALSE, SET_IN_FILE},
+	{"paranoid_remove", &iflags.paranoid_remove, FALSE, SET_IN_FILE},
+#endif
 	{"perm_invent", &flags.perm_invent, FALSE, SET_IN_GAME},
+	{"pickup_dropped", &flags.pickup_dropped, FALSE, SET_IN_GAME},
 	{"pickup_thrown", &flags.pickup_thrown, TRUE, SET_IN_GAME},
 	{"popup_dialog",  &iflags.wc_popup_dialog, FALSE, SET_IN_GAME},	/*WC*/
 	{"prayconfirm", &flags.prayconfirm, TRUE, SET_IN_GAME},
@@ -190,7 +201,7 @@ static struct Bool_Opt
 #ifdef SHOW_BORN
 	{"showborn", &iflags.show_born, FALSE, SET_IN_GAME},
 #endif
-	{"showbuc", &iflags.show_buc, FALSE, SET_IN_GAME},
+	{"showbuc", &iflags.show_buc, TRUE, SET_IN_GAME},
 	{"showdmg", &iflags.showdmg, FALSE, SET_IN_GAME},
 	{"show_dgn_name", &iflags.show_dgn_name, FALSE, SET_IN_GAME},
 #ifdef EXP_ON_BOTL
@@ -212,7 +223,8 @@ static struct Bool_Opt
 	{"sortpack", &flags.sortpack, TRUE, SET_IN_GAME},
 	{"sound", &flags.soundok, TRUE, SET_IN_GAME},
 	{"sparkle", &flags.sparkle, TRUE, SET_IN_GAME},
-	{"standout", &flags.standout, FALSE, SET_IN_GAME},
+	/* not removed for backwards compatibilty */
+	{"standout", &flags.standout, TRUE, SET_IN_FILE}, 
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	{"statuscolors", &iflags.use_status_colors, TRUE, SET_IN_GAME},
 #else
@@ -220,7 +232,7 @@ static struct Bool_Opt
 #endif
 	{"splash_screen",     &iflags.wc_splash_screen, TRUE, DISP_IN_GAME},	/*WC*/
 	{"tiled_map",     &iflags.wc_tiled_map, PREFER_TILED, DISP_IN_GAME},	/*WC*/
-	{"time", &flags.time, FALSE, SET_IN_GAME},
+	{"time", &flags.time, TRUE, SET_IN_GAME},
 #ifdef TIMED_DELAY
 	{"timed_delay", &flags.nap, TRUE, SET_IN_GAME},
 #else
@@ -229,16 +241,13 @@ static struct Bool_Opt
 	{"tombstone",&flags.tombstone, TRUE, SET_IN_GAME},
 	{"toptenwin",&flags.toptenwin, FALSE, SET_IN_GAME},
 	{"travel", &iflags.travelcmd, TRUE, SET_IN_GAME},
-#ifdef WIN32CON
 	{"use_inverse",   &iflags.wc_inverse, TRUE, SET_IN_GAME},		/*WC*/
-#else
-	{"use_inverse",   &iflags.wc_inverse, FALSE, SET_IN_GAME},		/*WC*/
-#endif
 #ifdef WIN_EDGE
 	{"win_edge", &iflags.win_edge, FALSE, SET_IN_GAME},
 #else
 	{"win_edge", (boolean *)0, TRUE, SET_IN_FILE},
 #endif
+	{"vanilla_ui_behavior", &iflags.vanilla_ui_behavior, FALSE, SET_IN_FILE},
 	{"verbose", &flags.verbose, TRUE, SET_IN_GAME},
 	{"wraptext", &iflags.wc2_wraptext, FALSE, SET_IN_GAME},
 	{(char *)0, (boolean *)0, FALSE, 0}
@@ -265,6 +274,9 @@ static struct Comp_Opt
 						1, SET_IN_GAME },
 	{ "catname",  "the name of your (first) cat (e.g., catname:Tabby)",
 						PL_PSIZ, DISP_IN_GAME },
+	{ "conducts", "the kind of conducts you want to adhere to",
+						1, /* not needed */
+						DISP_IN_GAME },
 #ifdef EXOTIC_PETS
 	{ "crocodilename", "the name of your (first) crocodile (e.g., crocodilename:TickTock)",
 						PL_PSIZ, DISP_IN_GAME },
@@ -352,11 +364,18 @@ static struct Comp_Opt
 # endif
 #endif
 	{ "petattr",  "attributes for highlighting pets", 12, SET_IN_FILE },
+#ifdef PARANOID
+	{ "paranoid", "the kind of actions you want to be paranoid about",
+						1, /* not needed */
+						SET_IN_GAME },
+#endif
 	{ "pettype",  "your preferred initial pet type", 4, DISP_IN_GAME },
 	{ "pickup_burden",  "maximum burden picked up before prompt",
 						20, SET_IN_GAME },
 	{ "pickup_types", "types of objects to pick up automatically",
 						MAXOCLASSES, SET_IN_GAME },
+	{ "pilesize", "maximum number of items on floor to list automatically",
+						20, SET_IN_GAME },
 	{ "player_selection", "choose character via dialog or prompts",
 						12, DISP_IN_GAME },
 	{ "race",     "your starting race (e.g., Human, Elf)",
@@ -580,9 +599,10 @@ initoptions()
 	iflags.runmode = RUN_LEAP;
 	iflags.msg_history = 20;
 #ifdef TTY_GRAPHICS
-	iflags.prevmsg_window = 's';
+	iflags.prevmsg_window = 'f';
 #endif
 	iflags.menu_headings = ATR_INVERSE;
+	iflags.pilesize = 5;
 
 	/* Use negative indices to indicate not yet selected */
 	flags.initrole = -1;
@@ -607,7 +627,7 @@ initoptions()
 	(void)memcpy((genericptr_t)flags.inv_order,
 		     (genericptr_t)def_inv_order, sizeof flags.inv_order);
 	flags.pickup_types[0] = '\0';
-	flags.pickup_burden = MOD_ENCUMBER;
+	flags.pickup_burden = SLT_ENCUMBER;
 
 	for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++)
 		flags.end_disclose[i] = DISCLOSE_PROMPT_DEFAULT_NO;
@@ -674,6 +694,11 @@ initoptions()
 	/* result in the player's preferred fruit [better than "\033"].	*/
 	obj_descr[SLIME_MOLD].oc_name = "fruit";
 
+	if (iflags.dark_room && iflags.use_color) {
+		showsyms[S_darkroom]=showsyms[S_room];
+	} else {
+		showsyms[S_darkroom]=showsyms[S_stone];
+	}
 	return;
 }
 
@@ -1320,6 +1345,74 @@ char *str;
     }
 }
 #endif /* MENU_COLOR */
+
+void
+common_prefix_options_parser(fullname, opts, negated)
+const char *fullname;
+char *opts;
+boolean negated;
+{
+	boolean badopt = FALSE;
+	int i;
+	char *op;
+	int fullname_len = strlen(fullname);
+
+	op = string_for_opt(opts, TRUE);
+	if (op && negated) {
+		bad_negation(fullname, TRUE);
+		return;
+	}
+	/* "fullname" without a value means "all"
+	   and negated means "none" */
+	if (!op || !strcmpi(op, "all") || !strcmpi(op, "none")) {
+		if (op && !strcmpi(op, "none")) negated = TRUE;
+		boolean value = negated ? FALSE : TRUE;
+		/* set all boolean options starting with fullname */
+		for (i = 0; boolopt[i].name; i++) {
+			if (!strncmp(boolopt[i].name, fullname, fullname_len)) {
+				*boolopt[i].addr = value;
+			}
+		}
+		return;
+	}
+
+	/* check for "+option1 -option2" */
+	while (*op) {
+		boolean check = FALSE, value = FALSE;
+		register char c;
+		c = *op;
+		if (c == '+') {
+			check = TRUE;
+			value = TRUE;
+		} else if (c == '-' || c == '!') {
+			check = TRUE;
+			value = FALSE;
+		} else if (c == ' ') {
+			/* do nothing */
+			check = FALSE;
+		} else {
+			badopt = TRUE;
+		}
+		op++;
+		if (check) {
+			int i;
+			for (i = 0; boolopt[i].name; i++) {
+				int name_len = strlen(boolopt[i].name)-fullname_len-1;
+				if ((strlen(boolopt[i].name) > fullname_len) &&
+				    /* name starts with fullname */
+				    !strncmp(boolopt[i].name, fullname, fullname_len) &&
+				    boolopt[i].name[fullname_len] == '_' &&
+				    /* name ends with user supplied option name */
+				    !strncmp(boolopt[i].name+fullname_len+1, op, name_len)) {
+					op += name_len;
+					*boolopt[i].addr = value;
+				}
+			}
+		}
+	}
+
+	if (badopt) badoption(opts);
+}
 
 void
 parseoptions(opts, tinitial, tfrom_file)
@@ -2131,6 +2224,18 @@ goodfruit:
 		}
 		return;
 	}
+
+	fullname = "pilesize";
+	if (match_optname(opts, fullname, sizeof("pilesize")-1, TRUE)) {
+		if (negated) {
+			bad_negation(fullname, FALSE);
+			return;
+		} else if (!(op = string_for_opt(opts, FALSE))) return;
+		iflags.pilesize = atoi(op);
+		if (iflags.pilesize < 1) iflags.pilesize = 1;
+		return;
+	}
+
 	/* WINCAP
 	 * player_selection: dialog | prompts */
 	fullname = "player_selection";
@@ -2225,6 +2330,20 @@ goodfruit:
 		if (badopt) badoption(opts);
 		return;
 	}
+
+#ifdef PARANOID
+	fullname = "conducts";
+	if (match_optname(opts, fullname, 8, TRUE)) {
+		common_prefix_options_parser(fullname, opts, negated);
+		return;
+	}
+	/* things the player want an extended yes/no answer to */
+	fullname = "paranoid";
+	if (match_optname(opts, fullname, 8, TRUE)) {
+		common_prefix_options_parser(fullname, opts, negated);
+		return;
+	}
+#endif
 
 	/* scores:5t[op] 5a[round] o[wn] */
 	if (match_optname(opts, "scores", 4, TRUE)) {
@@ -2714,7 +2833,8 @@ goodfruit:
 			    else lan_mail_finish();
 			}
 #endif
-			else if ((boolopt[i].addr) == &flags.lit_corridor) {
+			else if (((boolopt[i].addr) == &flags.lit_corridor) ||
+			         ((boolopt[i].addr) == &iflags.dark_room)) {
 			    /*
 			     * All corridor squares seen via night vision or
 			     * candles & lamps change.  Update them by calling
@@ -2724,6 +2844,7 @@ goodfruit:
 			     */
 			    vision_recalc(2);		/* shut down vision */
 			    vision_full_recalc = 1;	/* delayed recalc */
+			    if (iflags.use_color) need_redraw = TRUE;  /* darkroom refresh */
 			}
 			else if ((boolopt[i].addr) == &iflags.use_inverse ||
 					(boolopt[i].addr) == &iflags.showrace ||
@@ -2914,7 +3035,7 @@ doset()
 			!wc2_supported(boolopt[i].name)) continue;
 		    any.a_int = (pass == 0) ? 0 : i + 1;
 		    if (!iflags.menu_tab_sep)
-			Sprintf(buf, "%s%-13s [%s]",
+			Sprintf(buf, "%s%-14s [%s]",
 			    pass == 0 ? "    " : "",
 			    boolopt[i].name, *bool_p ? "true" : "false");
  		    else
@@ -3034,8 +3155,14 @@ doset()
 	}
 
 	destroy_nhwindow(tmpwin);
-	if (need_redraw)
+	if (need_redraw) {
+	    if (iflags.dark_room && iflags.use_color) {
+		showsyms[S_darkroom]=showsyms[S_room];
+	    } else {
+		showsyms[S_darkroom]=showsyms[S_stone];
+	    }
 	    (void) doredraw();
+	}
 	return 0;
 }
 
@@ -3098,6 +3225,47 @@ boolean setinitial,setfromfile;
 	/* parseoptions will prompt for the list of types */
 	parseoptions(strcpy(buf, "pickup_types"), setinitial, setfromfile);
 	retval = TRUE;
+#ifdef PARANOID
+    } else if (!strcmp("paranoid", optname)) {
+	int pick_cnt, pick_idx, opt_idx;
+	menu_item *paranoid_category_pick = (menu_item *)0;
+
+	static const char *paranoid_names[] = {
+		"hit", "quit", "remove"
+	};
+	#define NUM_PARANOID_OPTIONS SIZE(paranoid_names)
+	static boolean *paranoid_bools[NUM_PARANOID_OPTIONS];
+	paranoid_bools[0] = &iflags.paranoid_hit;
+	paranoid_bools[1] = &iflags.paranoid_quit;
+	paranoid_bools[2] = &iflags.paranoid_remove;
+	int paranoid_settings[NUM_PARANOID_OPTIONS];
+
+	tmpwin = create_nhwindow(NHW_MENU);
+	start_menu(tmpwin);
+	for (i = 0; i < NUM_PARANOID_OPTIONS; i++) {
+		any.a_int = i + 1;
+		add_menu(tmpwin, NO_GLYPH, &any, paranoid_names[i][0], 0,
+		         ATR_NONE, paranoid_names[i],
+		         *paranoid_bools[i] ? MENU_SELECTED : MENU_UNSELECTED);
+		paranoid_settings[i] = 0;
+	}
+	end_menu(tmpwin, "Change which paranoid settings:");
+	if ((pick_cnt = select_menu(tmpwin, PICK_ANY, &paranoid_category_pick)) > 0) {
+		for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
+			opt_idx = paranoid_category_pick[pick_idx].item.a_int - 1;
+			paranoid_settings[opt_idx] = 1;
+		}
+		free((genericptr_t)paranoid_category_pick);
+		paranoid_category_pick = (menu_item *)0;
+	}
+	destroy_nhwindow(tmpwin);
+
+	iflags.paranoid_hit = paranoid_settings[0];
+	iflags.paranoid_quit = paranoid_settings[1];
+	iflags.paranoid_remove = paranoid_settings[2];
+
+	retval = TRUE;
+#endif
     } else if (!strcmp("disclose", optname)) {
 	int pick_cnt, pick_idx, opt_idx;
 	menu_item *disclosure_category_pick = (menu_item *)0;
@@ -3431,6 +3599,16 @@ char *buf;
 			iflags.bouldersym : oc_syms[(int)objects[BOULDER].oc_class]);
 	else if (!strcmp(optname, "catname")) 
 		Sprintf(buf, "%s", catname[0] ? catname : none );
+	else if (!strcmp(optname, "conducts"))
+		Sprintf(buf, "%s%s %s%s %s%s %s%s %s%s %s%s %s%s %s%s",
+			flags.ascet ? "+" : "-", "ascet",
+			flags.atheist ? "+" : "-", "atheist",
+			flags.blindfolded ? "+" : "-", "blindfolded",
+			flags.illiterate ? "+" : "-", "illiterate",
+			flags.nudist ? "+" : "-", "nudist",
+			flags.pacifist ? "+" : "-", "pacifist",
+			flags.vegan ? "+" : "-", "vegan",
+			flags.vegetarian ? "+" : "-", "vegetarian");
 #ifdef EXOTIC_PETS
 	else if (!strcmp(optname, "crocodilename")) 
 		Sprintf(buf, "%s", crocodilename[0] ? crocodilename : none);
@@ -3567,6 +3745,13 @@ char *buf;
 	else if (!strcmp(optname, "palette")) 
 		Sprintf(buf, "%s", get_color_string());
 #endif
+#ifdef PARANOID
+	else if (!strcmp(optname, "paranoid"))
+		Sprintf(buf, "%s%s %s%s %s%s",
+			iflags.paranoid_hit ? "+" : "-", "hit",
+			iflags.paranoid_quit ? "+" : "-", "quit",
+			iflags.paranoid_remove ? "+" : "-", "remove");
+#endif
 	else if (!strcmp(optname, "pettype")) 
 		Sprintf(buf, "%s", (preferred_pet == 'c') ? "cat" :
 				(preferred_pet == 'd') ? "dog" :
@@ -3577,6 +3762,9 @@ char *buf;
 	else if (!strcmp(optname, "pickup_types")) {
 		oc_to_str(flags.pickup_types, ocl);
 		Sprintf(buf, "%s", ocl[0] ? ocl : "all" );
+	     }
+	else if (!strcmp(optname, "pilesize")) {
+		Sprintf(buf, "%u", iflags.pilesize);
 	     }
 	else if (!strcmp(optname, "race"))
 		Sprintf(buf, "%s", rolestring(flags.initrace, races, noun));

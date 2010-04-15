@@ -1965,6 +1965,14 @@ succubus
 	same demon, one who lies with a human for its own purposes,
 	usually to the detriment of the mortals who are unwise in
 	their dealings with them.
+irrational pi*
+	The primary purpose of the DATA statement is to give names to
+	constants; instead of referring to pi as 3.141592653589793 at
+	every appearance, the variable PI can be given that value with
+	a DATA statement and used instead of the longer form of the
+	constant. This also simplifies modifying the program, should
+	the value of pi change.
+		[ FORTRAN manual for Xerox Computers ]
 *iron ball
 *iron chain
 	"You are fettered, " said Scrooge, trembling.  "Tell me why?"

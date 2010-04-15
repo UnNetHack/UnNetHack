@@ -7,8 +7,10 @@
 #	Here you meet your (besieged) class leader, Neferet the Green
 #	and receive your quest assignment.
 #
-MAZE: "Wiz-strt",' '
-FLAGS: noteleport,hardfloor
+LEVEL: "Wiz-strt"
+FLAGS: noteleport,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"vampire bat"), (16,'B'), (16,"xorn"), (4,'W')
 GEOMETRY:center,center
 MAP
 ............................................................................
@@ -101,8 +103,10 @@ MONSTER: 'B',random,(10,19),hostile
 #	further towards your assigned quest.
 #
 
-MAZE: "Wiz-loca",' '
-FLAGS: hardfloor
+LEVEL: "Wiz-loca"
+FLAGS: hardfloor,mazelevel
+INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"vampire bat"), (16,'B'), (16,"xorn"), (4,'W')
 GEOMETRY:center,center
 MAP
 .............        .......................................................
@@ -225,7 +229,10 @@ MONSTER:'i',random,random,hostile
 #	been assigned to retrieve.
 #
 
-MAZE: "Wiz-goal", ' '
+LEVEL: "Wiz-goal"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"vampire bat"), (16,'B'), (16,"xorn"), (4,'W')
 GEOMETRY:center,center
 MAP
                                                                             
@@ -291,7 +298,7 @@ NON_DIGGABLE:(00,00,75,19)
 # The altar.  This is not a shrine.
 ALTAR:(16,11),noncoaligned,altar
 # Objects
-OBJECT:'"',"amulet of ESP",(16,11),blessed,0,"The Eye of the Aethiopica"
+OBJECT:'"',"amulet of ESP",(16,11),blessed,0,NAME:"The Eye of the Aethiopica"
 OBJECT:random,random,random
 OBJECT:random,random,random
 OBJECT:random,random,random
@@ -362,78 +369,104 @@ MONSTER:'@',"prisoner",(41,11),peaceful,asleep
 #
 
 LEVEL: "Wiz-fila"
+MON_GENERATION:86%, (64,"vampire bat"), (16,'B'), (16,"xorn"), (4,'W')
 #
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, up
 OBJECT: random,random,random
 MONSTER: 'i', random, random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random,random,random
 MONSTER: 'i', random, random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 OBJECT: random,random,random
 MONSTER: 'B', "vampire bat", random
 MONSTER: 'B', "vampire bat", random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, down
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'i', random, random, hostile
 MONSTER: 'B', "vampire bat", random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'i', random, random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'B', "vampire bat", random
+}
 
 RANDOM_CORRIDORS
 
 LEVEL: "Wiz-filb"
+MON_GENERATION:86%, (64,"vampire bat"), (16,'B'), (16,"xorn"), (4,'W')
 #
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, up
 OBJECT: random,random,random
 MONSTER: 'X', random, random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random,random,random
 MONSTER: 'i', random, random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 OBJECT: random,random,random
 MONSTER: 'X', random, random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, down
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'i', random, random, hostile
 MONSTER: 'B', "vampire bat", random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'i', random, random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'B', "vampire bat", random
+}
 
 RANDOM_CORRIDORS

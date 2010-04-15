@@ -332,7 +332,7 @@ NEARDATA struct permonst mons[] = {
 	  NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
 	SIZ(10, 10, 0, MS_SILENT, MZ_SMALL), 0, 0,
 	M1_FLY|M1_AMPHIBIOUS|M1_NOLIMBS|M1_NOHEAD|M1_NOTAKE,
-	M2_HOSTILE|M2_NEUTER, M3_INFRAVISIBLE, CLR_BLUE),
+	M2_HOSTILE|M2_NEUTER, M3_INFRAVISIBLE, CLR_BRIGHT_GREEN),
     MON("freezing sphere", S_EYE,
 	LVL(6, 13, 4, 0, 0), (G_NOCORPSE|G_NOHELL|G_GENO|2),
 	A(ATTK(AT_EXPL, AD_COLD, 4, 6),
@@ -1001,7 +1001,7 @@ NEARDATA struct permonst mons[] = {
 	  M1_UNSOLID,
 	M2_HOSTILE|M2_NEUTER, M3_INFRAVISIBLE, CLR_YELLOW),
     MON("anti-matter vortex", S_VORTEX,
-	LVL(15, 18, 0, 30, 0), (G_HELL|G_GENO|G_NOGEN|G_NOCORPSE),
+	LVL(15, 18, 0, 30, 0), (G_HELL|G_GENO|G_NOGEN|G_NOCORPSE|1),
 	A(ATTK(AT_ENGL, AD_DISN, 1,10), NO_ATTK,
 	  NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
 	SIZ(0, 0, 0, MS_SILENT, MZ_HUGE),
@@ -1923,7 +1923,7 @@ struct permonst _mons2[] = {
 	M3_INFRAVISIBLE, CLR_BLUE),
 #ifdef WEBB_DISINT
     MON("disintegrator", S_RUSTMONST,
-	LVL(18, 8, 0, 20, -3), (G_HELL|G_GENO|G_NOCORPSE),
+	LVL(18, 8, 0, 20, -3), (G_HELL|G_GENO|G_NOCORPSE|1),
 	A(ATTK(AT_CLAW, AD_DISN, 4, 4), /* don't want passive, disintegration
 	                                   has to intercept attacks */
 	  NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),

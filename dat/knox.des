@@ -4,8 +4,9 @@
 #	Copyright (c) 2008 by Patric Mueller
 # NetHack may be freely redistributed.  See license for details.
 #
-MAZE:"knox-1",' '
-FLAGS: noteleport
+LEVEL:"knox-1"
+FLAGS: noteleport,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ----------------------------------------------------------------------------
@@ -35,7 +36,9 @@ NON_DIGGABLE:(00,00,75,19)
 BRANCH:(08,16,08,16),(0,0,0,0)
 #   Throne room, with Croesus on the throne
 REGION:(37,08,46,11),lit,"throne"
-MONSTER:'@',"Croesus",(43,10),hostile
+MONSTER:'@',"Croesus",(43,10),hostile {
+  OBJECT:')',"two-handed sword"
+}
 #   The Vault
 #   Using unfilled morgue for
 #   identification in mkmaze.c
@@ -106,8 +109,9 @@ OBJECT:'*',"amethyst",(48,13)
 #
 # "Winterly Fort Ludios" by Patric Mueller <bhaak@gmx.net>
 #
-MAZE:"knox-2",' '
-FLAGS: noteleport,shortsighted
+LEVEL:"knox-2"
+FLAGS: noteleport,shortsighted,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 --------------------}}I-----------------------------------------------------
@@ -211,8 +215,9 @@ OBJECT:'*',"amethyst",(68,11)
 #
 # "Minas Tirith?" by Patric Mueller <bhaak@gmx.net>
 #
-MAZE:"knox-3",' '
-FLAGS: noteleport,shortsighted
+LEVEL:"knox-3"
+FLAGS: noteleport,shortsighted,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ----------------------------------------------------------------------------

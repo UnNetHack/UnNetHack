@@ -25,7 +25,6 @@ STATIC_DCL coord * FDECL(shrine_pos, (int));
 STATIC_DCL struct permonst * NDECL(morguemon);
 STATIC_DCL struct permonst * NDECL(antholemon);
 STATIC_DCL struct permonst * NDECL(squadmon);
-STATIC_DCL struct permonst * NDECL(armorymon);
 STATIC_DCL void FDECL(save_room, (int,struct mkroom *));
 STATIC_DCL void FDECL(rest_room, (int,struct mkroom *));
 #endif /* OVLB */
@@ -83,6 +82,12 @@ mkshop()
 #ifndef MAC
 		ep = nh_getenv("SHOPTYPE");
 		if(ep){
+			for (i=0; shtypes[i].name; i++) {
+				if (!strcmp(shtypes[i].name, ep) ||
+				    (*ep == def_oc_syms[(int)shtypes[i].symb])) {
+				    goto gottype;
+				}
+			}
 			if(*ep == 'z' || *ep == 'Z'){
 				mkzoo(ZOO);
 				return;
@@ -135,9 +140,6 @@ mkshop()
 				mkswamp();
 				return;
 			}
-			for(i=0; shtypes[i].name; i++)
-				if(*ep == def_oc_syms[(int)shtypes[i].symb])
-				    goto gottype;
 			if(*ep == 'g' || *ep == 'G')
 				i = 0;
 			else

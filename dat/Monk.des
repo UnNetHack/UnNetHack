@@ -8,8 +8,10 @@
 #	Here you meet your (besieged) class leader, the Grand Master
 #	and receive your quest assignment.
 #
-MAZE: "Mon-strt",' '
-FLAGS: noteleport,hardfloor
+LEVEL: "Mon-strt"
+FLAGS: noteleport,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"earth elemental"), (16,'E'), (16,"xorn"), (4,'X')
 GEOMETRY:center,center
 MAP
 ............................................................................
@@ -103,7 +105,10 @@ MONSTER: 'X',"xorn",(01,17)
 #	go further towards your assigned quest.
 #
 
-MAZE: "Mon-loca",' '
+LEVEL: "Mon-loca"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"earth elemental"), (16,'E'), (16,"xorn"), (4,'X')
 GEOMETRY:center,center
 #         1         2         3         4         5         6         7 
 #123456789012345678901234567890123456789012345678901234567890123456789012345
@@ -195,8 +200,10 @@ MONSTER: 'X',"xorn",random
 #	been assigned to retrieve.
 #
 
-MAZE: "Mon-goal", ' '
-INIT_MAP: 'L' , '.' , false , false , unlit , false
+LEVEL: "Mon-goal"
+FLAGS:mazelevel
+INIT_MAP: mines, 'L' , '.' , false , false , unlit , false
+MON_GENERATION:86%, (64,"earth elemental"), (16,'E'), (16,"xorn"), (4,'X')
 GEOMETRY:center,center
 MAP
 .L......L.LLL.......LL....
@@ -217,7 +224,7 @@ REGION:(00,00,25,10),unlit,"ordinary"
 # Stairs
 STAIR:(20,05),up
 # Objects
-OBJECT:'(',"lenses",place[0],blessed,0,"The Eyes of the Overworld"
+OBJECT:'(',"lenses",place[0],blessed,0,NAME:"The Eyes of the Overworld"
 OBJECT:random,random,random
 OBJECT:random,random,random
 OBJECT:random,random,random
@@ -271,83 +278,109 @@ MONSTER: 'X',"xorn",random
 #
 
 LEVEL: "Mon-fila"
+MON_GENERATION:86%, (64,"earth elemental"), (16,'E'), (16,"xorn"), (4,'X')
 # Random Monsters
 RANDOM_MONSTERS: 'E', 'X'
 #
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, up
 OBJECT: random,random,random
 MONSTER: 'E', random, random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random,random,random
 MONSTER: 'E', random, random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 OBJECT: random,random,random
 MONSTER: 'X', "xorn", random
 MONSTER: 'E', "earth elemental", random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, down
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'E', random, random, hostile
 MONSTER: 'E', "earth elemental", random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'X', random, random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'E', "earth elemental", random
+}
 
 RANDOM_CORRIDORS
 
 LEVEL: "Mon-filb"
+MON_GENERATION:86%, (64,"earth elemental"), (16,'E'), (16,"xorn"), (4,'X')
 # Random Monsters
 RANDOM_MONSTERS: 'E', 'X'
 #
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, up
 OBJECT: random,random,random
 MONSTER: 'X', random, random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random,random,random
 MONSTER: 'X', random, random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 OBJECT: random,random,random
 MONSTER: 'E', random, random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, down
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'E', random, random, hostile
 MONSTER: 'E', "earth elemental", random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'X', random, random, hostile
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'E', "earth elemental", random
+}
 
 RANDOM_CORRIDORS
 

@@ -27,6 +27,7 @@ E char SAVEP[];
 E NEARDATA int bases[MAXOCLASSES];
 
 E NEARDATA int multi;
+E char multi_txt[BUFSZ];
 #if 0
 E NEARDATA int warnlevel;
 #endif
@@ -148,6 +149,9 @@ E NEARDATA s_level *sp_levchn;
 
 #include "quest.h"
 E struct q_score quest_status;
+
+#include "qtext.h"
+E NEARDATA char pl_tutorial[QT_T_MAX-QT_T_FIRST+1];
 
 E NEARDATA char pl_character[PL_CSIZ];
 E NEARDATA char pl_race;		/* character's race */

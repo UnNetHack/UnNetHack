@@ -156,7 +156,7 @@ int typ;
 	    case MS_LEADER:	return (urole.ldrnum);
 	    case MS_NEMESIS:	return (urole.neminum);
 	    case MS_GUARDIAN:	return (urole.guardnum);
-	    default:		impossible("quest_info(%d)", typ);
+	    default:		warning("quest_info(%d)", typ);
 	}
 	return 0;
 }
@@ -291,10 +291,9 @@ STATIC_OVL void
 convert_line()
 {
 	char *c, *cc;
-	char xbuf[BUFSZ];
 
 	cc = out_line;
-	for (c = xcrypt(in_line, xbuf); *c; c++) {
+	for (c = in_line; *c; c++) {
 
 	    *cc = 0;
 	    switch(*c) {
@@ -358,14 +357,27 @@ convert_line()
 	return;
 }
 
+char *
+string_subst(str)
+     char *str;
+{
+    strncpy(in_line, str, 79);
+    in_line[79] = '\0';
+    convert_line();
+    return out_line;
+}
+
+
 STATIC_OVL void
 deliver_by_pline(qt_msg)
 struct qtmsg *qt_msg;
 {
 	long	size;
+	char xbuf[BUFSZ];
 
 	for (size = 0; size < qt_msg->size; size += (long)strlen(in_line)) {
-	    (void) dlb_fgets(in_line, 80, msg_file);
+	    (void) dlb_fgets(xbuf, 80, msg_file);
+	    (void) xcrypt(xbuf, in_line);
 	    convert_line();
 	    pline(out_line);
 	}
@@ -378,15 +390,36 @@ struct qtmsg *qt_msg;
 int how;
 {
 	long	size;
+	char xbuf[BUFSZ];
 	winid datawin = create_nhwindow(how);
 
 	for (size = 0; size < qt_msg->size; size += (long)strlen(in_line)) {
-	    (void) dlb_fgets(in_line, 80, msg_file);
+	    (void) dlb_fgets(xbuf, 80, msg_file);
+	    (void) xcrypt(xbuf, in_line);
 	    convert_line();
 	    putstr(datawin, 0, out_line);
 	}
 	display_nhwindow(datawin, TRUE);
 	destroy_nhwindow(datawin);
+}
+
+void
+qt_com_firstline(msgnum, msgbuf)
+int     msgnum;
+char   *msgbuf;
+{
+	struct qtmsg *qt_msg;
+
+	if (!(qt_msg = msg_in(qt_list.common, msgnum))) {
+		impossible("qt_com_firstline: message %d not found.", msgnum);
+		*msgbuf = 0;
+		return;
+	}
+
+	(void) dlb_fseek(msg_file, qt_msg->offset, SEEK_SET);	
+	(void) dlb_fgets(in_line, 80, msg_file);
+        convert_line();
+        strcpy(msgbuf, out_line);
 }
 
 void
@@ -396,13 +429,13 @@ int	msgnum;
 	struct qtmsg *qt_msg;
 
 	if (!(qt_msg = msg_in(qt_list.common, msgnum))) {
-		impossible("com_pager: message %d not found.", msgnum);
+		warning("com_pager: message %d not found.", msgnum);
 		return;
 	}
 
 	(void) dlb_fseek(msg_file, qt_msg->offset, SEEK_SET);
 	if (qt_msg->delivery == 'p') deliver_by_pline(qt_msg);
-	else if (msgnum == 1) deliver_by_window(qt_msg, NHW_MENU);
+	else if (qt_msg->delivery == 'm') deliver_by_window(qt_msg, NHW_MENU);
 	else		     deliver_by_window(qt_msg, NHW_TEXT);
 	return;
 }
@@ -414,7 +447,7 @@ int	msgnum;
 	struct qtmsg *qt_msg;
 
 	if (!(qt_msg = msg_in(qt_list.chrole, msgnum))) {
-		impossible("qt_pager: message %d not found.", msgnum);
+		warning("qt_pager: message %d not found.", msgnum);
 		return;
 	}
 
@@ -423,23 +456,6 @@ int	msgnum;
 		deliver_by_pline(qt_msg);
 	else	deliver_by_window(qt_msg, NHW_TEXT);
 	return;
-}
-
-struct permonst *
-qt_montype()
-{
-	int qpm;
-
-	if (rn2(5)) {
-	    qpm = urole.enemy1num;
-	    if (qpm != NON_PM && rn2(5) && !(mvitals[qpm].mvflags & G_GENOD))
-	    	return (&mons[qpm]);
-	    return (mkclass(urole.enemy1sym, 0));
-	}
-	qpm = urole.enemy2num;
-	if (qpm != NON_PM && rn2(5) && !(mvitals[qpm].mvflags & G_GENOD))
-	    return (&mons[qpm]);
-	return (mkclass(urole.enemy2sym, 0));
 }
 
 /** The names of creator deities from different cultures. */

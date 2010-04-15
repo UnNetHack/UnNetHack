@@ -48,8 +48,14 @@
 /* Name of character dump file */
 #undef DUMP_FN
 
+/* Dump an HTML file */
+#undef DUMP_HTML_LOG
+
 /* Dumping character stats */
 #undef DUMP_LOG
+
+/* Dump a text file */
+#undef DUMP_TEXT_LOG
 
 /* Dungeon growth */
 #undef DUNGEON_GROWTH
@@ -157,6 +163,9 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
+
+/* Require some questions to be answered with 'yes' instead of 'y' */
+#undef PARANOID
 
 /* Compare High Score entries by user id instead of user name */
 #undef PERS_IS_UID

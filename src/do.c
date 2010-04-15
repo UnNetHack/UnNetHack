@@ -63,7 +63,7 @@ register int rx, ry;
 boolean pushing;
 {
 	if (!otmp || otmp->otyp != BOULDER)
-	    impossible("Not a boulder?");
+	    warning("Not a boulder?");
 	else if (!Is_waterlevel(&u.uz) && (is_pool(rx,ry) || is_lava(rx,ry))) {
 	    boolean lava = is_lava(rx,ry), fills_up;
 	    const char *what = waterbody_name(rx,ry);
@@ -140,7 +140,7 @@ const char *verb;
 	struct monst *mtmp;
 
 	if (obj->where != OBJ_FREE)
-	    panic("flooreffects: obj not free");
+	    panic("flooreffects: obj not free (%d)", obj->where);
 
 	/* make sure things like water_damage() have no pointers to follow */
 	obj->nobj = obj->nexthere = (struct obj *)0;
@@ -194,9 +194,17 @@ const char *verb;
 	           (obj->cursed ? rnf(1,2) :
 		    obj->blessed ? rnf(1,16) : rnf(1,4))) {
 		/* prevent recursive call of teleportation through flooreffects */
-		if (!obj->orecursive) {
-			if (cansee(x,y)) pline("Right after touching the %s the amulet teleports away!",
-			  surface(x, y));
+		if (!obj->orecursive &&
+		    distu(x,y) < 9) {
+			if (Blind) {
+				You_hear("%s!",
+				         (Hallucination) ? "nothing special happening" :
+				                           "something teleporting");
+			} else if (cansee(x,y)) {
+				pline("Right after touching the %s the %s teleports away!",
+				      surface(x, y),
+				      (Hallucination) ? "teddy bear" : "amulet");
+			}
 			obj->orecursive = TRUE;
 			rloco(obj);
 			obj->orecursive = FALSE;
@@ -570,6 +578,8 @@ register struct obj *obj;
 	if (obj == uswapwep) {
 		setuswapwep((struct obj *)0);
 	}
+
+	obj->was_dropped = TRUE;
 
 	if (u.uswallow) {
 		/* barrier between you and the floor */
@@ -1115,6 +1125,7 @@ boolean at_stairs, falling, portal;
 	keepdogs(FALSE);
 	if (u.uswallow)				/* idem */
 		u.uswldtim = u.uswallow = 0;
+	recalc_mapseen(); /* recalculate map overview before we leave the level */
 	/*
 	 *  We no longer see anything on the level.  Make sure that this
 	 *  follows u.uswallow set to null since uswallow overrides all
@@ -1150,6 +1161,11 @@ boolean at_stairs, falling, portal;
 #ifdef USE_TILES
 	substitute_tiles(newlevel);
 #endif
+	/* record this level transition as a potential seen branch unless using
+	 * some non-standard means of transportation (level teleport).
+	 */
+	if ((at_stairs || falling || portal) && (u.uz.dnum != newlevel->dnum))
+		recbranch_mapseen(&u.uz, newlevel);
 	assign_level(&u.uz0, &u.uz);
 	assign_level(&u.uz, newlevel);
 	assign_level(&u.utolev, newlevel);
@@ -1209,12 +1225,19 @@ boolean at_stairs, falling, portal;
 		    if (newdungeon) {
 			if (Is_stronghold(&u.uz)) {
 			    register xchar x, y;
+			    int trycnt = 0;
 
 			    do {
-				x = (COLNO - 2 - rnd(5));
-				y = rn1(ROWNO - 4, 3);
-			    } while(occupied(x, y) ||
-				    IS_WALL(levl[x][y].typ));
+				do {
+				    x = rn1((updest.hx - updest.lx)+1, updest.lx);
+				    y = rn1((updest.hy - updest.ly)+1, updest.ly);
+				} while ((x < updest.nlx ||
+					  x > updest.nhx) &&
+					 (y < updest.nly ||
+					  y > updest.nhy));
+			    } while ((occupied(x, y) ||
+				      IS_STWALL(levl[x][y].typ)) && (trycnt++ < 1000));
+			    if (trycnt >= 1000) warning("castle: placement failed to find good position"); /* TODO: change impossible() to warning() */
 			    u_on_newpos(x, y);
 			} else u_on_sstairs();
 		    } else u_on_dnstairs();
@@ -1430,6 +1453,12 @@ boolean at_stairs, falling, portal;
 		for(mtmp = fmon; mtmp; mtmp = mtmp->nmon)
 		    if (!DEADMONSTER(mtmp) && mtmp->msleeping) mtmp->msleeping = 0;
 	}
+
+#ifdef BLACKMARKET
+	if (Is_blackmarket(&u.uz) && Conflict) {
+		set_black_marketeer_angry();
+	}
+#endif /* BLACKMARKET */
 
 	if (on_level(&u.uz, &astral_level))
 	    final_level();

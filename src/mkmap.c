@@ -507,7 +507,7 @@ mkmap(init_lev)
 	 * doesn't _have_ to be stone, say, for hell.  so if the player
 	 * defined a maze filler originally, go ahead and backfill the 
 	 * background in with that filler - DSR */
-	if (walled && join) {
+	if (walled && join && (init_lev->filling > -1)) {
 	    level.flags.is_maze_lev = FALSE;
 	    level.flags.is_cavernous_lev = TRUE;
 		 backfill(bg_typ,init_lev->filling);

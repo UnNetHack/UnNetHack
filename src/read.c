@@ -33,6 +33,8 @@ static void FDECL(forget_single_object, (int));
 static void FDECL(forget, (int));
 static void FDECL(maybe_tame, (struct monst *,struct obj *));
 
+STATIC_PTR void FDECL(do_flood, (int,int,genericptr_t));
+STATIC_PTR void FDECL(undo_flood, (int,int,genericptr_t));
 STATIC_PTR void FDECL(set_lit, (int,int,genericptr_t));
 
 int
@@ -50,8 +52,13 @@ doread()
 	if(scroll->otyp == FORTUNE_COOKIE) {
 	    if(flags.verbose)
 		You("break up the cookie and throw away the pieces.");
-	    outrumor(bcsign(scroll), BY_COOKIE);
-	    if (!Blind) u.uconduct.literate++;
+	    if(u.roleplay.illiterate) {
+		pline("This cookie has a scrap of paper inside.");
+		pline("What a pity that you cannot read!");
+	    } else {
+		outrumor(bcsign(scroll), BY_COOKIE);
+		if (!Blind) violated(CONDUCT_ILLITERACY);
+	    }
 	    useup(scroll);
 	    return(1);
 #ifdef TOURIST
@@ -84,10 +91,15 @@ doread()
 		You_cant("feel any Braille writing.");
 		return 0;
 	    }
-	    u.uconduct.literate++;
-	    if(flags.verbose)
-		pline("It reads:");
-	    Strcpy(buf, shirt_msgs[scroll->o_id % SIZE(shirt_msgs)]);
+	    if (u.roleplay.illiterate) {
+		pline("Unfortunately you cannot read!");
+		return 0;
+	    } else {
+		violated(CONDUCT_ILLITERACY);
+		if(flags.verbose)
+		    pline("It reads:");
+		Strcpy(buf, shirt_msgs[scroll->o_id % SIZE(shirt_msgs)]);
+	    }
 	    erosion = greatest_erosion(scroll);
 	    if (erosion)
 		wipeout_text(buf,
@@ -121,9 +133,9 @@ doread()
 					: card_msgs[scroll->o_id % (SIZE(card_msgs)-1)]);
 		}
 		/* Make a credit card number */
-		pline("\"%d0%d %d%d1 0%d%d0\"", ((scroll->o_id % 89)+10), (scroll->o_id % 4),
-				(((scroll->o_id * 499) % 899999) + 100000), (scroll->o_id % 10),
-				(!(scroll->o_id % 3)), ((scroll->o_id * 7) % 10));
+		pline("\"%d0%d %d%d1 0%d%d0\"", (int)((scroll->o_id % 89)+10), (int)(scroll->o_id % 4),
+				(int)(((scroll->o_id * 499) % 899999) + 100000), (int)(scroll->o_id % 10),
+				(int)(!(scroll->o_id % 3)), (int)((scroll->o_id * 7) % 10));
 		u.uconduct.literate++;
 		return 1;
 #endif	/* TOURIST */
@@ -213,7 +225,10 @@ doread()
 		&& scroll->oclass != SPBOOK_CLASS) {
 	    pline(silly_thing_to, "read");
 	    return(0);
-	} else if (Blind) {
+	} else if (u.roleplay.illiterate && (scroll->otyp != SPE_BOOK_OF_THE_DEAD)) {
+	    pline("Unfortunately you cannot read.");
+	    return(0);
+	} else if (Blind && (scroll->otyp != SPE_BOOK_OF_THE_DEAD)) {
 	    const char *what = 0;
 	    if (scroll->oclass == SPBOOK_CLASS)
 		what = "mystic runes";
@@ -229,7 +244,7 @@ doread()
 	if (scroll->otyp != SPE_BOOK_OF_THE_DEAD &&
 		scroll->otyp != SPE_BLANK_PAPER &&
 		scroll->otyp != SCR_BLANK_PAPER)
-	    u.uconduct.literate++;
+	    violated(CONDUCT_ILLITERACY);
 
 	confused = (Confusion != 0);
 #ifdef MAIL
@@ -672,6 +687,7 @@ forget_map(howmuch)
 		levl[zx][zy].seenv = 0;
 		levl[zx][zy].waslit = 0;
 		levl[zx][zy].glyph = cmap_to_glyph(S_stone);
+		levl[zx][zy].styp = STONE;
 	    }
 }
 
@@ -732,6 +748,7 @@ forget_levels(percent)
 	count = ((count * percent) + 50) / 100;
 	for (i = 0; i < count; i++) {
 	    level_info[indices[i]].flags |= FORGOTTEN;
+	    forget_mapseen(indices[i]);
 	}
 }
 
@@ -798,6 +815,59 @@ struct obj *sobj;
 	}
 }
 
+/** Remove water tile at x,y. */
+STATIC_PTR void
+undo_flood(x, y, roomcnt)
+int x, y;
+genericptr_t roomcnt;
+{
+	if ((levl[x][y].typ != POOL) &&
+	    (levl[x][y].typ != MOAT) &&
+	    (levl[x][y].typ != WATER) &&
+	    (levl[x][y].typ != FOUNTAIN))
+		return;
+
+	(*(int *)roomcnt)++;
+
+	/* Get rid of a pool at x, y */
+	levl[x][y].typ = ROOM;
+	newsym(x,y);
+}
+
+STATIC_PTR void
+do_flood(x, y, poolcnt)
+int x, y;
+genericptr_t poolcnt;
+{
+	register struct monst *mtmp;
+	register struct trap *ttmp;
+
+	if (nexttodoor(x, y) || (rn2(1 + distmin(u.ux, u.uy, x, y))) ||
+	    (sobj_at(BOULDER, x, y)) || (levl[x][y].typ != ROOM))
+		return;
+
+	if ((ttmp = t_at(x, y)) != 0 && !delfloortrap(ttmp))
+		return;
+
+	(*(int *)poolcnt)++;
+
+	if (!((*(int *)poolcnt) && (x == u.ux) && (y == u.uy))) {
+		/* Put a pool at x, y */
+		levl[x][y].typ = POOL;
+		del_engr_at(x, y);
+		water_damage(level.objects[x][y], FALSE, TRUE);
+
+		if ((mtmp = m_at(x, y)) != 0) {
+			(void) minliquid(mtmp);
+		} else {
+			newsym(x,y);
+		}
+	} else if ((x == u.ux) && (y == u.uy)) {
+		(*(int *)poolcnt)--;
+	}
+
+}
+ 
 int
 seffects(sobj)
 register struct obj	*sobj;
@@ -1154,6 +1224,51 @@ register struct obj	*sobj;
 		    }
 		}
 		break;
+	case SCR_FLOOD:
+		if (confused) {
+			/* remove water from vicinity of player */
+			int maderoom = 0;
+			do_clear_area(u.ux, u.uy, 4+2*bcsign(sobj),
+					undo_flood, (genericptr_t)&maderoom);
+			if (maderoom) {
+				known = TRUE;
+				You("are suddenly very dry!");
+			}
+		} else {
+			int madepool = 0;
+			int stilldry = -1;
+			int x,y,safe_pos=0;
+			if (!sobj->cursed)
+				do_clear_area(u.ux, u.uy, 5, do_flood,
+						(genericptr_t)&madepool);
+
+			/* check if there are safe tiles around the player */
+			for (x = u.ux-1; x <= u.ux+1; x++) {
+				for (y = u.uy - 1; y <= u.uy + 1; y++) {
+					if (x != u.ux && y != u.uy &&
+					    goodpos(x, y, &youmonst, 0)) {
+						safe_pos++;
+					}
+				}
+			}
+
+			/* cursed and uncursed might put a water tile on
+			 * player's position */
+			if (!sobj->blessed && safe_pos > 0)
+				do_flood(u.ux, u.uy, (genericptr_t)&stilldry);
+			if (!madepool && stilldry)
+				break;
+			if (madepool)
+				pline(Hallucination ?
+						"A totally gnarly wave comes in!" :
+						"A flood surges through the area!" );
+			if (!stilldry && !Wwalking && !Flying && !Levitation)
+				drown();
+			known = TRUE;
+			break;
+		}
+		break;
+
 	case SCR_GENOCIDE:
 		You("have found a scroll of genocide!");
 		known = TRUE;
@@ -1265,6 +1380,7 @@ register struct obj	*sobj;
 		    pline("Unfortunately, you can't grasp the details.");
 		}
 		break;
+#ifdef SCR_AMNESIA
 	case SCR_AMNESIA:
 		known = TRUE;
 		forget(	(!sobj->blessed ? ALL_SPELLS : 0) |
@@ -1279,6 +1395,7 @@ register struct obj	*sobj;
 			pline("Thinking of Maud you forget everything else.");
 		exercise(A_WIS, FALSE);
 		break;
+#endif
 	case SCR_FIRE:
 		/*
 		 * Note: Modifications have been made as of 3.0 to allow for
@@ -1320,6 +1437,7 @@ register struct obj	*sobj;
 #endif
 	    	 (!In_endgame(&u.uz) || Is_earthlevel(&u.uz))) {
 	    	register int x, y;
+		int boulder_created = 0;
 
 	    	/* Identify the scroll */
 	    	pline_The("%s rumbles %s you!", ceiling(u.ux,u.uy),
@@ -1331,101 +1449,27 @@ register struct obj	*sobj;
 	    	/* Loop through the surrounding squares */
 	    	if (!sobj->cursed) for (x = u.ux-1; x <= u.ux+1; x++) {
 	    	    for (y = u.uy-1; y <= u.uy+1; y++) {
-
 	    	    	/* Is this a suitable spot? */
 	    	    	if (isok(x, y) && !closed_door(x, y) &&
 	    	    			!IS_ROCK(levl[x][y].typ) &&
 	    	    			!IS_AIR(levl[x][y].typ) &&
+#ifdef BLACKMARKET
+	    	    			!(Is_blackmarket(&u.uz) && rn2(2)) &&
+#endif
 					(x != u.ux || y != u.uy)) {
-			    register struct obj *otmp2;
-			    register struct monst *mtmp;
-
-	    	    	    /* Make the object(s) */
-	    	    	    otmp2 = mksobj(confused ? ROCK : BOULDER,
-	    	    	    		FALSE, FALSE);
-	    	    	    if (!otmp2) continue;  /* Shouldn't happen */
-	    	    	    otmp2->quan = confused ? rn1(5,2) : 1;
-	    	    	    otmp2->owt = weight(otmp2);
-
-	    	    	    /* Find the monster here (won't be player) */
-	    	    	    mtmp = m_at(x, y);
-	    	    	    if (mtmp && !amorphous(mtmp->data) &&
-	    	    	    		!passes_walls(mtmp->data) &&
-	    	    	    		!noncorporeal(mtmp->data) &&
-	    	    	    		!unsolid(mtmp->data)) {
-				struct obj *helmet = which_armor(mtmp, W_ARMH);
-				int mdmg;
-
-				if (cansee(mtmp->mx, mtmp->my)) {
-				    pline("%s is hit by %s!", Monnam(mtmp),
-	    	    	    			doname(otmp2));
-				    if (mtmp->minvis && !canspotmon(mtmp))
-					map_invisible(mtmp->mx, mtmp->my);
-				}
-	    	    	    	mdmg = dmgval(otmp2, mtmp) * otmp2->quan;
-				if (helmet) {
-				    if(is_metallic(helmet)) {
-					if (canspotmon(mtmp))
-					    pline("Fortunately, %s is wearing a hard helmet.", mon_nam(mtmp));
-					else if (flags.soundok)
-					    You_hear("a clanging sound.");
-					if (mdmg > 2) mdmg = 2;
-				    } else {
-					if (canspotmon(mtmp))
-					    pline("%s's %s does not protect %s.",
-						Monnam(mtmp), xname(helmet),
-						mhim(mtmp));
-				    }
-				}
-	    	    	    	mtmp->mhp -= mdmg;
-	    	    	    	if (mtmp->mhp <= 0)
-	    	    	    	    xkilled(mtmp, 1);
-	    	    	    }
-	    	    	    /* Drop the rock/boulder to the floor */
-	    	    	    if (!flooreffects(otmp2, x, y, "fall")) {
-	    	    	    	place_object(otmp2, x, y);
-	    	    	    	stackobj(otmp2);
-	    	    	    	newsym(x, y);  /* map the rock */
-	    	    	    }
+				boulder_created += drop_boulder_on_monster(x, y, confused, TRUE);
 	    	    	}
 		    }
 		}
 		/* Attack the player */
 		if (!sobj->blessed) {
-		    int dmg;
-		    struct obj *otmp2;
-
-		    /* Okay, _you_ write this without repeating the code */
-		    otmp2 = mksobj(confused ? ROCK : BOULDER,
-				FALSE, FALSE);
-		    if (!otmp2) break;
-		    otmp2->quan = confused ? rn1(5,2) : 1;
-		    otmp2->owt = weight(otmp2);
-		    if (!amorphous(youmonst.data) &&
-				!Passes_walls &&
-				!noncorporeal(youmonst.data) &&
-				!unsolid(youmonst.data)) {
-			You("are hit by %s!", doname(otmp2));
-			dmg = dmgval(otmp2, &youmonst) * otmp2->quan;
-			if (uarmh && !sobj->cursed) {
-			    if(is_metallic(uarmh)) {
-				pline("Fortunately, you are wearing a hard helmet.");
-				if (dmg > 2) dmg = 2;
-			    } else if (flags.verbose) {
-				Your("%s does not protect you.",
-						xname(uarmh));
-			    }
-			}
-		    } else
-			dmg = 0;
-		    /* Must be before the losehp(), for bones files */
-		    if (!flooreffects(otmp2, u.ux, u.uy, "fall")) {
-			place_object(otmp2, u.ux, u.uy);
-			stackobj(otmp2);
-			newsym(u.ux, u.uy);
-		    }
-		    if (dmg) losehp(dmg, "scroll of earth", KILLED_BY_AN);
+		    drop_boulder_on_player(confused, !sobj->cursed);
+		} else {
+			if (boulder_created == 0)
+				pline("But nothing else happens.");
 		}
+	    } else if (In_endgame(&u.uz)) {
+		You_hear("the %s rumbling below you!", surface(u.ux,u.uy));
 	    }
 	    break;
 	case SCR_PUNISHMENT:
@@ -2063,4 +2107,107 @@ create_particular()
 
 #endif /* OVLB */
 
+void
+drop_boulder_on_player(confused, helmet_protects)
+boolean confused;
+boolean helmet_protects; /**< if player is protected by a hard helmet */
+{
+		    int dmg;
+		    struct obj *otmp2;
+		    /* Okay, _you_ write this without repeating the code */
+		    otmp2 = mksobj(confused ? ROCK : BOULDER,
+				FALSE, FALSE);
+		    if (!otmp2) return;
+		    otmp2->quan = confused ? rn1(5,2) : 1;
+		    otmp2->owt = weight(otmp2);
+		    if (!amorphous(youmonst.data) &&
+				!Passes_walls &&
+				!noncorporeal(youmonst.data) &&
+				!unsolid(youmonst.data)) {
+			You("are hit by %s!", doname(otmp2));
+			dmg = dmgval(otmp2, &youmonst) * otmp2->quan;
+			if (uarmh && helmet_protects) {
+			    if(is_metallic(uarmh)) {
+				pline("Fortunately, you are wearing a hard helmet.");
+				if (dmg > 2) dmg = 2;
+			    } else if (flags.verbose) {
+				Your("%s does not protect you.",
+						xname(uarmh));
+			    }
+			}
+		    } else
+			dmg = 0;
+		    /* Must be before the losehp(), for bones files */
+		    if (!flooreffects(otmp2, u.ux, u.uy, "fall")) {
+			place_object(otmp2, u.ux, u.uy);
+			stackobj(otmp2);
+			newsym(u.ux, u.uy);
+		    }
+		    if (dmg) losehp(dmg, "scroll of earth", KILLED_BY_AN);
+}
+
+int
+drop_boulder_on_monster(x, y, confused, by_player)
+int x,y;
+boolean confused;
+boolean by_player; /**< is boulder creation caused by player */
+{
+			    register struct obj *otmp2;
+			    register struct monst *mtmp2;
+
+	    	    	    /* Make the object(s) */
+	    	    	    otmp2 = mksobj(confused ? ROCK : BOULDER,
+	    	    	    		FALSE, FALSE);
+	    	    	    if (!otmp2) return 0;  /* Shouldn't happen */
+	    	    	    otmp2->quan = confused ? rn1(5,2) : 1;
+	    	    	    otmp2->owt = weight(otmp2);
+
+	    	    	    /* Find the monster here (should not be player) */
+	    	    	    mtmp2 = m_at(x, y);
+	    	    	    if (mtmp2 && !amorphous(mtmp2->data) &&
+	    	    	    		!passes_walls(mtmp2->data) &&
+	    	    	    		!noncorporeal(mtmp2->data) &&
+	    	    	    		!unsolid(mtmp2->data)) {
+				struct obj *helmet = which_armor(mtmp2, W_ARMH);
+				int mdmg;
+
+				if (cansee(mtmp2->mx, mtmp2->my)) {
+				    pline("%s is hit by %s!", Monnam(mtmp2),
+	    	    	    			doname(otmp2));
+				    if (mtmp2->minvis && !canspotmon(mtmp2))
+					map_invisible(mtmp2->mx, mtmp2->my);
+				}
+	    	    	    	mdmg = dmgval(otmp2, mtmp2) * otmp2->quan;
+				if (helmet) {
+				    if(is_metallic(helmet)) {
+					if (canspotmon(mtmp2))
+					    pline("Fortunately, %s is wearing a hard helmet.", mon_nam(mtmp2));
+					else if (flags.soundok)
+					    You_hear("a clanging sound.");
+					if (mdmg > 2) mdmg = 2;
+				    } else {
+					if (canspotmon(mtmp2))
+					    pline("%s's %s does not protect %s.",
+						Monnam(mtmp2), xname(helmet),
+						mhim(mtmp2));
+				    }
+				}
+	    	    	    	mtmp2->mhp -= mdmg;
+	    	    	    	if (mtmp2->mhp <= 0) {
+					if (by_player) {
+						xkilled(mtmp2, 1);
+					} else {
+						pline("%s is killed.", Monnam(mtmp2));
+						mondied(mtmp2);
+					}
+				}
+	    	    	    }
+	    	    	    /* Drop the rock/boulder to the floor */
+	    	    	    if (!flooreffects(otmp2, x, y, "fall")) {
+	    	    	    	place_object(otmp2, x, y);
+	    	    	    	stackobj(otmp2);
+	    	    	    	newsym(x, y);  /* map the rock */
+	    	    	    }
+			    return 1;
+}
 /*read.c*/

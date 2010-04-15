@@ -48,9 +48,11 @@ pet_type()
 	else if ((Role_if(PM_RANGER) || Role_if(PM_CAVEMAN)) &&
 	         ((preferred_pet == 'e') || (!rn2(3))))
 		return (rn2(4) ? PM_WOLF : PM_WINTER_WOLF_CUB);
+# ifdef TOURIST
 	else if (Role_if(PM_TOURIST) &&
 	          ((preferred_pet == 'e') || (!rn2(3))))
 		return (PM_BABY_CROCODILE);
+# endif
 #endif
 	else
 	    return (rn2(2) ? PM_KITTEN : PM_LITTLE_DOG);
@@ -166,12 +168,16 @@ makedog()
 		petname = catname;
 
 	/* default pet names */
-	if (!*petname && pettype == PM_LITTLE_DOG) {
-	    /* All of these names were for dogs. */
-	    if(Role_if(PM_CAVEMAN)) petname = "Slasher";   /* The Warrior */
-	    if(Role_if(PM_SAMURAI)) petname = "Hachi";     /* Shibuya Station */
-	    if(Role_if(PM_BARBARIAN)) petname = "Idefix";  /* Obelix */
-	    if(Role_if(PM_RANGER)) petname = "Sirius";     /* Orion's dog */
+	if (!*petname) {
+		if (pettype == PM_LITTLE_DOG) {
+			/* All of these names were for dogs. */
+			if(Role_if(PM_CAVEMAN)) petname = "Slasher";   /* The Warrior */
+			if(Role_if(PM_SAMURAI)) petname = "Hachi";     /* Shibuya Station */
+			if(Role_if(PM_BARBARIAN)) petname = "Idefix";  /* Obelix */
+			if(Role_if(PM_RANGER)) petname = "Sirius";     /* Orion's dog */
+		} else if (pettype == PM_KITTEN) {
+			if (!rn2(100)) petname = "Shiva"; /* RIP 1 Oct 1998 - 6 Sep 2009 */
+		}
 	}
 
 	mtmp = makemon(&mons[pettype], u.ux, u.uy, MM_EDOG);

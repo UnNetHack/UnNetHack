@@ -142,9 +142,28 @@ const char *goal;
 			    lo_x = (pass == 0 && ty == lo_y) ? cx + 1 : 1;
 			    hi_x = (pass == 1 && ty == hi_y) ? cx : COLNO - 1;
 			    for (tx = lo_x; tx <= hi_x; tx++) {
-				k = levl[tx][ty].glyph;
+				/* look at dungeon feature, not at user-visible glyph */
+				k = back_to_glyph(tx,ty);
+				/* uninteresting background glyph */
 				if (glyph_is_cmap(k) &&
-					matching[glyph_to_cmap(k)]) {
+				    (IS_DOOR(levl[tx][ty].typ) || /* monsters mimicking a door */
+				     glyph_to_cmap(k) == S_room ||
+				     glyph_to_cmap(k) == S_corr ||
+				     glyph_to_cmap(k) == S_litcorr)) {
+					/* what the user remembers to be at tx,ty */
+					k = glyph_at(tx, ty);
+				}
+				/* TODO: - open doors are only matched with '-' */
+				/* should remembered or seen items be matched? */
+				if (glyph_is_cmap(k) &&
+					matching[glyph_to_cmap(k)] &&
+					levl[tx][ty].seenv && /* only if already seen */
+					(!IS_WALL(levl[tx][ty].typ) &&
+					 (levl[tx][ty].typ != SDOOR) &&
+					 glyph_to_cmap(k) != S_room &&
+					 glyph_to_cmap(k) != S_corr &&
+					 glyph_to_cmap(k) != S_litcorr)
+				    ) {
 				    cx = tx,  cy = ty;
 				    if (msg_given) {
 					clear_nhwindow(WIN_MESSAGE);
@@ -493,6 +512,7 @@ register struct obj *obj;
 	register char **str1;
 
 	if (!obj->dknown) return; /* probably blind */
+	check_tutorial_message(QT_T_CALLITEM);
 	otemp = *obj;
 	otemp.quan = 1L;
 	otemp.onamelth = 0;
@@ -712,7 +732,10 @@ boolean called;
 	    Strcat(buf, lcase(pbuf));
 	    name_at_start = FALSE;
 	} else if (is_rider(mtmp->data) && 
-		   (distu(mtmp->mx, mtmp->my) > 2)) {
+		   (distu(mtmp->mx, mtmp->my) > 2) &&
+		   !(canseemon(mtmp)) &&
+		   /* for livelog reporting */
+		   !(suppress & SUPPRESS_IT)) {
 		/* prevent the three horsemen to be identified from afar */
 		Strcat(buf, "Rider");
 		name_at_start = FALSE;
@@ -1014,6 +1037,12 @@ static const char * const bogusmons[] = {
 	"ceiling cat", "basement cat",
 	"monorail cat",				/* the Internet is made for cat pix */
 	"rape golem",				/* schnippi */
+	"tridude",				/* POWDER */
+	"orcus cosmicus",			/* Radomir Dopieralski */
+	"Greater Hell Beast",			/* Angband */
+	"Vendor of Yizard",			/* Souljazz */
+	"Sigmund", "lernaean hydra", "Ijyb",
+	"Gloorx Vloq", "Blork the orc",		/* Dungeon Crawl Stone Soup */
 };
 
 

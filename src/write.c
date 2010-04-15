@@ -26,7 +26,6 @@ register struct obj *otmp;
 	case SCR_GOLD_DETECTION:
 	case SCR_FOOD_DETECTION:
 	case SCR_MAGIC_MAPPING:
-	case SCR_AMNESIA:
 	case SCR_FIRE:
 	case SCR_EARTH:
 		return(8);
@@ -48,6 +47,7 @@ register struct obj *otmp;
 	case SCR_CHARGING:
 		return(16);
 /*		break; */
+	case SCR_FLOOD:
 	case SCR_SCARE_MONSTER:
 	case SCR_STINKING_CLOUD:
 	case SCR_TAMING:
@@ -59,7 +59,7 @@ register struct obj *otmp;
 /*		break; */
 	case SCR_BLANK_PAPER:
 	default:
-		impossible("You can't write such a weird scroll!");
+		warning("You can't write such a weird scroll!");
 	}
 	return(1000);
 }
@@ -80,7 +80,10 @@ register struct obj *pen;
 	boolean by_descr = FALSE;
 	const char *typeword;
 
-	if (nohands(youmonst.data)) {
+	if (u.roleplay.illiterate) {
+	    You("don't know how to write!");
+	    return 0;
+	} else if (nohands(youmonst.data)) {
 	    You("need hands to be able to write!");
 	    return 0;
 	} else if (Glib) {
@@ -156,7 +159,7 @@ found:
 	}
 
 	/* KMH, conduct */
-	u.uconduct.literate++;
+	violated(CONDUCT_ILLITERACY);
 
 	new_obj = mksobj(i, FALSE, FALSE);
 	new_obj->bknown = (paper->bknown && pen->bknown);

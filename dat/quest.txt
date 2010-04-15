@@ -3320,7 +3320,7 @@ experienced before, so be prepared!
 #
 #	General
 #
-%Cc - 00001
+%Cm - 00001
 It is written in the Book of %d:
 
     After the Creation, the cruel god Moloch rebelled
@@ -3505,4 +3505,1977 @@ Go now!  You are banished from this place.
  s suffix:	return s_suffix(root);
  S suffix:	return s_suffix(capitalized(root));
  t suffix:	return strip_the_prefix(root);
+%E
+#
+#       TUTORIAL MESSAGES
+#
+#       Wrap these at 70 characters; maximum length is 21 lines.
+#       These may freely spoil any information that's also given in
+#       the Guidebook (including Elbereth in particular), but should
+#       generally not give any other spoilers, unless they're really
+#       obvious or they're necessary to explain what's happened.
+#
+#       TODO: At the moment these assume tty characters are in use;
+#       is there any reasonable way to adapt this for tiles? Also,
+#       assumes character is represented by @ (humans and elves will
+#       be, dwarves/gnomes/orcs might not be depending on the showrace
+#       setting).
+#
+%Cm - 00201
+Tutorial: WELCOME
+
+Welcome to UnNetHack! These tutorial messages will help to teach you
+how to play the game. (Use ? for more in-depth help on the game.)
+
+The screen generally contains (non-tutorial) messages at the top (if
+any), information about your character at the bottom (this will be
+explained later), and a map in between. Each symbol on the screen
+represents something; you are the @ sign (which might be hidden behind
+this message at the moment, but you'll be able to see it most of the
+time), and the screen will show what you can see and what you can
+remember. In general, letters (and a few symbols like ' : ; & and @)
+represent creatures (which could be friendly or hostile); and most
+punctuation marks represent either dungeon features (such as - and |
+for walls and doors, # for corridors, and . for the floor), or items
+(such as $ for gold). Eventually you'll know the symbols off by heart;
+while you're learning, you can press / for a reminder of what any
+symbol means, or ; to find out what any object on the map is.
+
+Let's start by looking around a bit; close this message with the
+spacebar, then press ; so that you can look at nearby objects.
+%E
+# Time for the old numpad vs. vikeys Holy War. There's a separate
+# tutorial message for each.
+%Cm - 00202
+Tutorial: CURSOR MOVEMENT (with the number pad)
+
+In order to specify what you want to look at, you have to be able to
+move the cursor. You may be used to thinking of four directions in
+which an object can move; but NetHack has eleven:
+
+north-west north north-east          upwards
+       7     8     9                    <
+
+           here
+  west 4     .     6 east
+          at self
+
+       1     2     3                    >
+south-west south south-east         downwards
+
+In the case of looking at an object on-screen, we can only look
+sideways, not upwards or downwards, so only bother with the numbers
+for the time being. Use the numbers in order to move the cursor over
+the location to look at; then press the . button to select it. If you
+aren't sure what to look at, look at a monster (a letter on the map).
+%E
+%Cm - 00203
+Tutorial: CURSOR MOVEMENT (with vi-style controls)
+
+In order to specify what you want to look at, you have to be able to
+move the cursor. You may be used to thinking of four directions in
+which an object can move; but NetHack has eleven:
+
+north-west north north-east      upwards     Note: for orthogonal
+       y     k     u                <        movement, hjkl are in a
+                                             row on a QWERTY keyboard;
+           here                              j's descender goes down,
+  west h     .     l east                    k's ascender goes up. The
+          at self                            diagonals are the letters
+                                             diagonally adjacent to h,
+       b     j     n                >        in the corresponding
+south-west south south-east     downwards    directions.
+
+In the case of looking at an object on-screen, you can only look
+sideways, not upwards or downwards, so only bother with the letters
+for the time being. Use the letters in order to move the cursor over
+the location to look at; then press the . button to select it. If you
+aren't sure what to look at, look at a monster (a letter on the map).
+%E
+%Cm - 00210
+Tutorial: PETS
+
+The Mazes of Menace may be a dangerous and hostile place to adventure
+in, but luckily, you don't have to do it alone. You start each game
+with a tame kitten (f), little dog (d), or pony (u); they will follow
+you around the dungeon, and fight monsters with you. Your pet can
+mostly take care of itself; for instance, it will try to feed itself
+with the corpses of enemy monsters to prevent itself becoming hungry,
+and back out of fights it thinks it will lose. Over time, as the pet
+gets more practice, it will get better at combat, and may grow into a
+larger animal; and to start with, your pet may well be better at
+combat than you are; a useful friend for an inexperienced character.
+
+Note that your pet can't follow you everywhere; if you go up or down
+stairs, your pet will only be able to follow if it's next to you at
+the time, and will otherwise become stranded and may go wild. In
+general, if you want to make sure you keep track of your pet, keep it
+close by whenever you can.
+
+If you aren't sure what to do next, use the cursor movement keys to
+walk around, or use ; to look at more things around you.
+%E
+%Cm - 00211
+Tutorial: MONSTERS
+
+That's a hostile monster, one of the huge number of threats facing you
+in the Mazes of Menace. Note that monsters are only displayed onscreen
+if your character can see them; therefore, it can be important to try
+to get the best view of what's ahead that you can, and be especially
+wary in dark corridors!
+
+There are several ways to deal with enemy monsters. Although often you
+can simply run away, that can leave you backed into a corner, and some
+monsters will be able to outrun you; even so, that option is often
+worth considering. More usually, you'll want to kill the monster;
+common methods are fighting it hand-to-hand ('in melee'), using
+missiles, and casting spells.
+
+To attack a monster in melee, simply walk into it, and you'll hit the
+monster with whatever you're holding in your hands. Movement in the
+dungeon is done the same way as moving the cursor; you can even move
+diagonally like this. (Melee should be good enough to beat most early
+monsters, although many characters will have a better method of
+fighting.) Try fighting that monster now!
+%E
+%Cm - 00212
+Tutorial: PEACEFUL MONSTERS AND ALIGNMENT
+
+Not all monsters are out to kill everyone they meet; many monsters will
+have more sense than that. Many monsters can be very dangerous when
+angered; so it's often a good idea to leave peaceful monsters be. If a
+peaceful monster is blocking your way, try waiting a few turns (press
+the . key in order to wait a turn) to see if they move out of the way.
+
+Amongst the factors that determine how a monster will react to you,
+one of the most important is alignment (Lawful, Neutral, or Chaotic);
+monsters which have a similar outlook on life to you are more likely
+to be non-aggressive. You can see your alignment in the status area
+near the bottom of the screen, or by pressing control-X; this also
+lets you know about the connected area of religion (sharing an
+alignment implies sharing a god). Note that although lawful behaviour
+tends to be good, and evil behaviour tends to be chaotic, legal and
+ethical do not always coincide.
+
+One useful form of interaction with certain peaceful and tame monsters
+is to chat to them using #chat; you'll see the outcome of the
+conversation at the top of the screen.
+%E
+# Technically speaking, finding invisible monsters using s is a
+# spoiler; but again, it's relatively obvious.
+%Cm - 00213
+Tutorial: INVISIBLE MONSTERS
+
+It looks like there's something around here you can't see! This might
+be because the monster is invisible, or you might not be able to see
+it for some other reason. Either way, fighting it could be difficult.
+
+Unlike all other letters, the letter I on the map is special; instead
+of indicating a monster you can see right now, it indicates where an
+invisible monster was the last time you determined its location. You
+can fight an I the same way you fight any other monster (e.g. you can
+fight it in melee by walking into it), but the monster might have
+moved since you discovered where it was, in which case your attack
+will miss altogether.
+
+If you think an invisible monster has moved, you can use the F and m
+commands; F followed by a movement direction attacks an adjacent
+square even if there's apparently nothing there, and m followed by a
+movement direction walks onto a square even if you remember a monster
+was there. Searching around you by pressing s may also be helpful;
+it's considerably easier to feel an invisible monster next to you than
+it is to find a secret door or trap.
+%E
+%Cm - 00230
+Tutorial: DOORS AND DOORWAYS
+
+Closed doors are represented by the + character; open doors are by
+default represented by a | or - character, perpendicular to the wall
+that they're on (although your options may be set to show it in a more
+stylish way, to avoid it getting muddled with a wall). A closed door
+is a rather obvious obstacle to any adventurer, but there are several
+ways to deal with one. Probably the most obvious method of getting
+past a door is to try to open it; to do that, just try to walk into it
+or stand adjacent to the door, press o, and specify the direction that
+the door is in. Some doors are locked; in this case, you'll have to
+either pick the lock (by using the a command to use a lock-picking
+tool, if you have one), or kick the door down using control-D.
+
+Open doors are less obviously obstacles, but they still hamper
+movement to some extent, as it's impossible to move diagonally into or
+out of an open doorway; you have to approach it straight. You can also
+close an open door by pressing c when standing adjacent to it; because
+most monsters don't know how to, or physically can't, open doors, this
+can be useful for shutting out monsters.
+%E
+# OK, technically it's a non-Guidebook spoiler to explain that rooms
+# tend to be light and corridors tend to be dark; but I'm willing to
+# give that away as a freebie, because it's obvious.
+%Cm - 00231
+Tutorial: CORRIDORS AND LIGHTING
+
+Up here near the top of the dungeon, the vast majority of rooms are
+going to be well-lit; you can see anything that's on a lit square,
+unless there's a wall or other equally solid object in the way,
+blocking your view. When a square does go out of sight, your character
+won't be able to see it, but your memory of it will continue to be
+displayed on the map; monsters shown on the square will be removed,
+because monsters tend to walk around, but any items or dungeon
+features on the square will continue to be displayed (and you can
+use ; to find out what they were, if you've forgotten).
+
+Corridors are generally represented by the # symbol (your options may
+be set to use a slightly more artistic representation); the solid rock
+that borders them is just displayed with blank space. Corridors are
+generally dark; unless you illuminate them yourself somehow, you'll
+only be able to fully see the squares adjacent to you (as well as any
+lit squares in the distance, if there's no solid object in the way).
+Take extra care in corridors; you might suddenly end up next to a
+monster you couldn't previously see, due to being too far away!
+%E
+# Given the first time the player walks to a location where they could
+# find a secret by searching. The mention of dead-ends is a non-
+# Guidebook
+%Cm - 00232
+Tutorial: SECRET DOORS AND CORRIDORS
+
+Not everything in these dungeons is quite as it seems. Amongst dungeon
+designers, it's a common habit to hide some of the connections between
+one room and the next, and this dungeon is no exception.
+
+A secret door or corridor just looks like normal rock or a normal
+wall, until it's discovered; the usual way to discover one is to
+carefully search the area around it. If you think you're standing
+adjacent to such a secret passage, you can use the s command to start
+looking for it; however, it can take a beginning character quite a lot
+of searching to find anything even if there is something there, so
+it's often necessary to press s several times. (And of course, all
+that searching will be in vain if there is in fact nothing there!)
+Good places to search are in apparent dead-ends, and similar
+situations where it seems likely that there's a way forward, but you
+can't see what it is.
+
+This is a good place to try searching, because there is a door or
+corridor hidden adjacent to your current location; try pressing s
+until you find it, although note that searching takes time.
+%E
+# The guidebook's basically silent on this. So, this is my attempt
+# to describe what happens without spoiling anything too important.
+%Cm - 00233
+Tutorial: WATER
+
+Water (by default represented as a } character, but this is often
+customized to show as something else) is yet another of the hazards
+you may end up facing. Generally speaking, a typical adventurer won't
+be able to cross large bodies of water without magical aid; although
+in some cases, it may be possible to carefully move through a swamp by
+avoiding water squares. Diagonal movement might be helpful here.
+
+Be very careful when moving near water; falling in may cause your
+character severe problems, although it isn't normally instantly fatal
+unless you're so burdened you can't climb back out. It's often a good
+strategy to find an alternative route through this level, if there is
+one.
+%E
+# And it has even less to say about lava...
+%Cm - 00234
+Tutorial: LAVA
+
+Lava, like water, is represented by the } character (or other custom
+character representing liquid); you can use the ; command to tell
+water and lava apart, or (if playing in colour) by looking at the
+colour difference. You need to be even more careful around lava than
+you are around water; few adventurers have the levels of magical
+protection needed to be able to swim through lava safely, so a typo
+near lava could be instantly fatal. Because NetHack is a turn-based
+game, there's no need to react to anything quickly in real-time; so
+take your time over your moves!
+%E
+%Cm - 00235
+Tutorial: STAIRS
+
+The > and < characters represent flights of stairs (going down and up
+respectively); you can climb down stairs in order to go deeper in the
+dungeon. The commands for traversing a flight of stairs are the same
+as the characters representing the stairs themselves; and likewise,
+the same as the keys representing the vertical directions. Note that
+climbing up and down stairs can be difficult if you're holding too
+much equipment; for instance, excess weight may cause you to fall down
+the stairs, taking damage in the process.
+
+If you can't see the stairs that let you move down from any given
+level, try looking underneath items; failing that, bear in mind the
+possibility that there may be a secret door or corridor somewhere
+leading to another part of the current level. (Of course, the dungeon
+isn't infinitely deep; so it's possible you'll find the bottom level,
+which has no downstairs. But that isn't something to worry about just
+now.)
+
+Note that the stairs that go up from level 1 lead out of the dungeon;
+the game will end if you use them.
+%E
+%Cm - 00236
+Tutorial: FOUNTAINS
+
+The { character represents a fountain; it's possible to walk through a
+square with a fountain on, but also to interact with the fountain.
+Most commonly, an adventurer who chooses to use a fountain will either
+want to drink from it, or dip something into it; in either case, this
+is accomplished by standing on the square of the fountain, and using
+one of the following commands:
+
+    q   Drink (quaff) from the fountain
+ #dip   Dip something into the fountain
+
+Note that not all fountains are quite what they seem to be!
+%E
+%Cm - 00237
+Tutorial: THRONES
+
+A backslash character (\) represents an opulent throne. If there's
+nothing else on the same square as the throne, you can sit on it by
+moving onto the same square and using the #sit command; if there are
+items on top of the throne, you'll need to clear them off first, say
+by picking them up and dropping them elsewhere.
+%E
+%Cm - 00238
+Tutorial: KITCHEN SINKS
+
+The # character normally represents a corridor; but inside a room, it
+has a different use, representing a kitchen sink. Sinks don't have
+many obvious uses, although if you feel brave, you could try drinking
+from one by standing on the same square as the sink, and pressing q in
+order to 'quaff' from it.
+%E
+%Cm - 00239
+Tutorial: GRAVES
+
+The lure of a treasure-filled dungeon is great, and as a result there
+tend to be many adventurers seeking their fortune in any given
+dungeon. Even though you're the only person here today, there will
+have been many other adventurers who sought their fortune, and died
+here, in the past; and you just found the grave of one.
+
+Graves are signified by the | symbol inside a room; they don't block
+your movement. If the adventurer in question died very recently, then
+their body and possessions will likely still exist in the same
+location; and quite possibly, so will their ghost, and whatever killed
+them! Otherwise, the corpse, along with some of the possessions, will
+be buried underground, and if you feel like grave-robbing, you'll have
+to dig them up somehow.
+
+Note that it's very common for the possessions of dead adventurers to
+be cursed, so be careful with things that you loot from the dead.
+%E
+# Non-guidebook hints about what sacrifice and prayer actually do.
+%Cm - 00240
+Tutorial: ALTARS
+
+Religion is an important feature of NetHack; although the gods take
+note of your actions all the time, an altar (_) is a good place to go
+to contact them more directly. It's important to know who an altar is
+dedicated to; to do this, stand on the altar and press the : key.
+(Using : will tell you more information about the square you're on.)
+As a reminder: your %G is %d.
+
+One common use of an altar is to sacrifice the corpse of a monster to
+the appropriate deity; to do this, stand on the altar, with a corpse
+in your inventory or on the altar, and use the #offer command. As long
+as your %G is not offended by the sacrifice, this will generally
+have a pleasing effect; sometimes, your %G will give you gifts in
+return for your sacrifices.
+
+Prayer (using #pray) is also more effective when standing on your own
+%G's altar; prayer is used to request help from the gods, usually
+in emergencies. Deities don't like being pestered too much, so try not
+to request divine intervention too often; most of the time, you'll
+want to save your prayers for when you're in mortal danger.
+%E
+%Cm - 00241
+Tutorial: DRAWBRIDGES
+
+That's a drawbridge; while open, you can walk over it, but when shut,
+it will block your path. Drawbridges are basically just really large
+doors; but they tend to have a more complicated mechanism for opening
+and closing. You almost certainly don't want to be anywhere near a
+drawbridge if it gets destroyed!
+%E
+%Cm - 00242
+Tutorial: TRAPS
+
+The ^ symbol represents a trap. Traps can have a variety of effects,
+but generally speaking you want to avoid them; you can look at a trap
+with ; to see what it does (or use ^ and a direction when next to it,
+if it's buried under items and you can't see the ^ as a result). Some
+traps can be dismantled using the #untrap command when adjacent to the
+trap; although scavenging the parts that make up a trap can be useful,
+it's entirely possible that your character will set the trap off by
+mistake when doing so, so be careful and make sure you aren't badly
+injured before you try. The #untrap command can also be used to check
+chests and doors for traps, although not with a perfect success rate.
+
+Walking round a trap is normally the best option; although if it's
+blocking your way and you can't dismantle it, there may be some more
+ingenious way to either avoid its effects, or to prevent it
+functioning correctly when stepped on.
+%E
+%Cm - 00259
+Tutorial: ESCAPING THE DUNGEON
+
+That < is a flight of stairs going upwards (likewise, a > is a flight
+of stairs going downwards); to be precise, those are the stairs you
+used to enter the dungeon. If you go up those stairs (by using the <
+command), you'll walk straight out of the dungeon and end the game.
+
+Leaving the dungeon via the stairs is known as 'escaping'; escaping
+the dungeon is not nearly as bad as death (especially if you get out
+with a lot of treasure!), but it isn't really an ideal end to the
+game, as you haven't achieved the major aim of the game (offering the
+Amulet of Yendor to your god). Of course, if you somehow manage to get
+the Amulet of Yendor, there's nothing wrong with taking it out of the
+dungeon in an attempt to find an altar to your god somewhere on the
+surface, so you can offer the Amulet; the game will continue if you do
+this.
+
+Note that once you've left the dungeon wih a character, either with or
+without the Amulet, it's impossible to re-enter the dungeon; in order
+to play there again, you'll have to start a new game, with a new
+character, if you escape.
+%E
+%Cm - 00260
+Tutorial: FASTER MOVEMENT (with vi-style controls)
+
+Moving around one square at a time is useful for tactical reasons
+during combat; but it can get boring quickly when trying to explore a
+level. Therefore, there are some commands which cause you to continue
+moving in the same general direction until something happens:
+
+    g <direction>
+        Keep moving in the given direction until something interesting
+        happens, or the corridor forks.
+    G <direction> or control-<direction>
+        Keep moving in the given direction until something interesting
+        happens (not including a fork in the corridor).
+    M <direction> or   shift-<direction>
+        Keep moving in the given direction until no further progress
+        is possible (such as bumping into a monster or dead end).
+
+It's up to you to decide how aggressive you want to be in terms of
+automatically repeating moves; note that none of these save you time
+in-game, just your own time playing. Of course, you need not use these
+commands at all; you can just continue moving one square at a time.
+%E
+%Cm - 00261
+Tutorial: FASTER MOVEMENT (with the number pad)
+
+Moving around one square at a time is useful for tactical reasons
+during combat; but it can get boring quickly when trying to explore a
+level. Therefore, there are some commands which cause you to continue
+moving in the same general direction until something happens:
+
+    g <direction> or 5 <direction>
+        Keep moving in the given direction until something interesting
+        happens, or the corridor forks.
+    G <direction>
+        Keep moving in the given direction until something interesting
+        happens (not including a fork in the corridor).
+    M <direction>
+        Keep moving in the given direction until no further progress
+        is possible (such as bumping into a monster or dead end).
+
+It's up to you to decide how aggressive you want to be in terms of
+automatically repeating moves; note that none of these save you time
+in-game, just your own time playing. Of course, you need not use these
+commands at all; you can just continue moving one square at a time.
+%E
+%Cm - 00262
+Tutorial: AUTOMATIC TRAVEL
+
+Moving back to places in the dungeon that you've already explored can
+be a tedious task; luckily, it's possible to automate your movement
+somewhat.
+
+The _ command will prompt you for a location anywhere on the current
+level; it'll then automatically move you along the shortest path you
+know to that location. This doesn't save you any time in-game, but it
+can save a lot of real-life time pressing the keys to move back to the
+known location one at a time.
+
+In addition, you can aim for a particular location by map symbol; for
+instance, you can press _>. to automatically travel to a visible
+downstairs, or __. to automatically travel to an altar. This is
+particularly useful when going back through several already-explored
+levels of the dungeon to reach something higher up.
+
+Travelling will stop automatically if it comes across something
+interesting, such as an engraving or a monster.
+%E
+%Cm - 00263
+Tutorial: DIAGONAL MOVEMENT (with vi-style controls)
+
+It seems that you haven't been moving diagonally much recently; this
+is a reminder about what diagonal movement is all about. Here's the
+cursor movement diagram again, as a reminder:
+
+north-west north north-east      upwards     Note: for orthogonal
+       y     k     u                <        movement, hjkl are in a
+                                             row on a QWERTY keyboard;
+           here                              j's descender goes down,
+  west h     .     l east                    k's ascender goes up. The
+          at self                            diagonals are the letters
+                                             diagonally adjacent to h,
+       b     j     n                >        in the corresponding
+south-west south south-east     downwards    directions.
+
+Moving diagonally can be an important tactic, as it's generally faster
+than moving orthogonally for moving quickly along diagonal corridors;
+you can also use it to move round obstacles such as traps without
+taking any extra time. It's especially important to use diagonal moves
+correctly when trying to outrun a monster.
+%E
+%Cm - 00264
+Tutorial: DIAGONAL MOVEMENT (with the number pad)
+
+It seems that you haven't been moving diagonally much recently; this
+is a reminder about what diagonal movement is all about. Here's the
+cursor movement diagram again, as a reminder:
+
+north-west north north-east      upwards
+       7     8     9                <
+
+           here
+  west 4     .     6 east
+          at self
+
+       1     2     3                >
+south-west south south-east     downwards
+
+Moving diagonally can be an important tactic, as it's generally faster
+than moving orthogonally for moving quickly along diagonal corridors;
+you can also use it to move round obstacles such as traps without
+taking any extra time. It's especially important to use diagonal moves
+correctly when trying to outrun a monster.
+%E
+%Cm - 00265
+Tutorial: REPEATING COMMANDS (with vi-style controls)
+
+Getting bored of pressing s repeatedly to search that square? Not only
+can repeating a command be boring, it can also be dangerous; holding
+down a key, or pressing a button repeatedly without thinking, can both
+lead to you failing to react to a monster that turns up, meaning that
+it can sometimes get several free hits on you before you stop
+repeating and start fighting.
+
+There's a way to automatically repeat commands, however. You can type
+a number before more or less any command to automatically repeat the
+command that many times; for instance, 20s will search around you 20
+times, or until something interesting happens (such as finding what
+you were searching for, or until a monster turns up). This sort of
+mechanized repetition both saves you time, and reduces the chance of
+making a mistake due to distraction.
+
+It's also possible to repeat commands after the fact; pressing
+control-A will repeat whatever you just did, which can be useful when
+repeatedly trying to open a stuck door, for instance. Generally
+speaking, though, control-A is used less than repeat counts.
+%E
+%Cm - 00266
+Tutorial: REPEATING COMMANDS (with the numeric keypad)
+
+Getting bored of pressing s repeatedly to search that square? Not only
+can repeating a command be boring, it can also be dangerous; holding
+down a key, or pressing a button repeatedly without thinking, can both
+lead to you failing to react to a monster that turns up, meaning that
+it can sometimes get several free hits on you before you stop
+repeating and start fighting.
+
+There's a way to automatically repeat commands, however. You can type
+n and a number before more or less any command to automatically repeat
+the command that many times; for instance, n20s will search around you
+20 times, or until something interesting happens (such as finding what
+you were searching for, or until a monster turns up). This sort of
+mechanized repetition both saves you time, and reduces the chance of
+making a mistake due to distraction.
+
+It's also possible to repeat commands after the fact; pressing
+control-A will repeat whatever you just did, which can be useful when
+repeatedly trying to open a stuck door, for instance. Generally
+speaking, though, control-A is used less than repeat counts.
+%E
+%Cm - 00267
+Tutorial: ITEM PROMPTS
+
+You're about to be asked to choose an item; this probably happened
+because you wanted to do something like wear armor or read a scroll,
+and the game needed to know which piece of armor to wear, or which
+scroll to read. Each item in your inventory is given a letter (case
+matters), that you can use to represent the item; so for instance, if
+you wanted to wield a weapon in 'slot' a, you could press a in order
+to choose that weapon. The prompt will let you know which slots
+contain plausible items for the command you selected.
+
+What if you can't remember what's in which slot? There are two more
+options for the prompt: ? will give you a list of all the items that
+the game thinks are likely choices (such as weapons for a wield
+command), and * will give you a list of all the items you have, even
+if it would apparently make no sense. (This lets you try out unusual
+tactics, such as throwing items which aren't normally thrown, or
+wielding things other than weapons.) You can choose the item you want
+to use from the resulting menu.
+
+Sometimes, - is also accepted, meaning no item, or bare hands.
+%E
+%Cm - 00268
+Tutorial: UNEQUIPPING MULTIPLE ITEMS
+
+Sometimes, you need to remove multiple pieces of armor in order to
+get at the armor underneath; for instance, you might have to take off
+your cloak and jacket in order to put on a T-shirt. Likewise, you
+might want to take all your armor off at once so you can drop it to
+save weight, or remove both your rings so you can put two different
+rings on.
+
+The A command allows you to take off armor, remove rings and amulets,
+unwield weapons, empty your quiver, and unready a secondary weapon;
+therefore, if you need to do two or more of those actions at once for
+any reason, using A will often be simpler than typing in each of the
+commands manually. It can also be useful if you forget what the
+command is to perform a particular sort of unequip action.
+%E
+%Cm - 00269
+Tutorial: NAMING MONSTERS
+
+When there are a lot of similar-looking monsters around, it can be
+hard to keep track of what's going on; a lot of messages saying just
+"the jackal" or "the soldier ant" tend not to be particularly
+informative. In such cases, knowing which monster is which can help
+you concentrate on attacking just one monster, rather than spreading
+the damage amongst multiple monsters by mistake. It's good practice to
+give your pet a name, so you can recognise it if you somehow become
+separated from it and it goes wild.
+
+The C command lets you call a monster a particular name; the game's
+messages will from then on use that name to refer to the monster,
+rather than its species. You can't rename monsters that have a name
+already, though, unless it was you who gave them their name in the
+first place.
+%E
+%Cm - 00270
+Tutorial: DROPPING MULTIPLE ITEMS
+
+Dropping commands one at a time with d is tedious, slow, and prone to
+mistakes when you want to drop a lot of items all at once; it also
+takes more game time than is actually needed. The D command works like
+d, except that you can specify more than one item to drop; but no
+matter how many items you're dropping, it only takes one turn.
+
+Note that in a multiple-select menu, you can use . to automatically
+select all options of the menu; combined with the ability to show,
+say, only items with unknown blessed/cursed state, or only items that
+have been picked up in a shop but not paid for, you can quickly select
+entire sets of items you want to get rid of, and drop them. This trick
+works in all multiple-select menus, not just d's. (The other menu
+commands: - deselects all items, \ deselects items on this page, ^
+goes to the first page, ~ inverts all items on this page, | goes to
+the last page, > goes to the next page, < goes to the previous page,
+. selects all items on the menu, , selects all items on the page, a
+number before an item selects that many items from a stack. < > . and
+numbers are probably the only commands that are worth memorizing,
+though.)
+%E
+%Cm - 00271
+Tutorial: QUICK INVENTORY
+
+A quick interface tip: you can use i, rather than I, to show the whole
+inventory at once rather than going via sections. Note that the
+inventory list can get so long that it needs scrolling, unless you
+have an unusually large terminal; you can use < and > to scroll
+through the list, the same way that any other menu works.
+%E
+%Cm - 00272
+Tutorial: SECONDARY WEAPONS
+
+For characters who repeatedly switch between their main weapon and a
+secondary weapon (for instance, switching between a melee weapon and a
+launcher is rather common), there's a shortcut which can save on
+keystrokes and on typos. There's a secondary weapon slot which you can
+put an item in to be able to wield it rapidly; to swap your wielded
+weapon and secondary weapon, press x. (This is how you fill your
+secondary weapon slot in the first place; by wielding a weapon and
+swapping it into the slot.)
+%E
+# The Guidebook doesn't actually mention ; then : (it does mention /
+# then :), but as this is purely interface, I don't consider it a
+# spoiler.
+%Cm - 00273
+Tutorial: LOOKING AT THINGS
+
+You haven't used the ; command to look at anything for ages; try using
+it more often. Knowing what the symbols on the screen mean is rather
+important to be able to play effectively; and even experienced players
+need to check now and again, because some symbols can mean more than
+one thing. (If your terminal shows colours, that can make it easier to
+tell things apart; but even so, some colour/symbol combinations are
+ambiguous; is a brown + a closed door or a brown spellbook, for
+instance?)
+
+Here's a quick tip about using the ; command; once you've placed the
+cursor on whatever you want to look at, you can press : rather than
+pressing . in order to view flavour text about whatever you're looking
+at; normally this will be a quote from literature, to give you a
+better idea of whatever what you're looking at actually is, although
+sometimes it's more of a factual description. Have fun!
+%E
+%Cm - 00274
+Tutorial: THE QUIVER
+
+If you're repeatedly throwing the same thrown weapon, or repeatedly
+firing the same ammunition from a launcher, you can put whatever
+you're throwing in your quiver in order to be able to fire it with
+fewer keystrokes.
+
+The Q command allows you to put an item into your quiver; from then
+on, you can fire it by pressing f, which works identically to throwing
+using t, except that you don't have to specify which item to throw or
+fire; instead, the item chosen is the one in your quiver. (Some
+characters will start out with their quiver already filled.) The
+quiver is simply a convenience option; it doesn't actually do anything
+other than selecting an item to throw each time, as everything in your
+main inventory is readily accessible (backpack manufacturers really
+know how to cater to adventurers well). Still, saving keystrokes
+reduces the chance of accidentally throwing the wrong item to quite an
+extent.
+%E
+%Cm - 00275
+Tutorial: DUNGEON OVERVIEW
+
+You've already ventured quite far into the dungeon. You passed several
+dungeon levels by now and it might be hard for you to remember each
+and every level.
+
+Use #overview or press control-O for an overview of the dungeon. The
+list shows specific dungeon features like fountains, sinks and altars
+but also stairs to other branches.
+
+You can also name the current level by using #annotate. The name will
+appear in the dungeon overview next to the dungeon level number.
+%E
+%Cm - 00280
+Tutorial: GETTING HELP
+
+It can be hard to remember everything that goes on in NetHack;
+luckily, there are several commands that you can use in order to get
+help on how to play.
+
+Most important is probably the ? command, which shows a menu of the
+various help possibilities; for instance, ?b shows a list of all the
+commands in the game, ?d tells you what the various symbols mean (it
+does the same thing as /), and ?e explains what a given key does.
+
+You might also forget the contents of a tutorial message; if so, you
+can use the key combination control-V to look again at any tutorial
+message you've seen this game (although they may make slightly less
+sense out of context). Reviewing tutorials can also be accomplished
+via the help menu, ?.
+
+Note that the tutorial menu can get rather long; if it (or any other
+menu) doesn't fit on your screen, you can use the < and > keys to page
+up and down, or the space key to page through the menu. All menus in
+NetHack use these controls, by the way.
+%E
+%Cm - 00281
+Tutorial: ITEMS
+
+It would be unreasonable to expect you to go through the dungeon with
+no equipment to help, and no treasure to find. Your inventory contains
+items, which you can use to help you through the dungeon; and you can
+find items in the dungeon itself, too. Items are represented by
+punctuation marks:
+
+$ gold         In order to see what items you have at the moment, use
+) weapon       the I command to list a section of your inventory; this
+[ armor        will also show you a tutorial message explaining how to
+%% edible item  use the items in that section (different items can be
+? scroll       used in different ways). As for items in the dungeon,
+/ wand         there are two possible ways to pick them up; if the
+= ring         autopickup option is on, you'll pick up items when you
+! potion       step on them, and if it's off, you'll need to press ,
+( tool         in order to pick up items on that square. You can turn
+" amulet       autopickup on or off by pressing @. (Note that you can
+* rock or gem  have no more than 52 stacks of items in your inventory;
++ spellbook    so be selective about what you leave behind, and what
+` statue       you take with you; gold doesn't take up space, though.)
+%E
+%Cm - 00282
+Tutorial: OBJECTIVE
+
+So, why are you here anyway? Like any adventurer, you might just be
+here for the treasure; there are plenty of coins and gems in the
+dungeon, and you could quite possibly gather them up and retire rich.
+Your score will depend mainly on how much treasure you gather, and how
+many monsters you kill, although other things affect it too.
+
+More importantly, though, there's a rather significant artifact in the
+dungeon; somewhere, probably rather deep down, is the fabled Amulet of
+Yendor, allegedly desired even by the gods. You would almost certainly
+be rewarded greatly, maybe even with immortality, if you could find it
+and offer it to your %G %d.
+
+However, to start with, you should just worry about survival and
+exploration. Staying alive, gathering equipment to make yourself more
+powerful, and practicing combat are all good aims early on; and you'll
+want to explore the dungeon in order to gain an idea of where you want
+to go. Even though you'll eventually want to go for the Amulet, you'll
+need to discover where it is and how to reach it first; so keep your
+aim lower for the time being.
+%E
+%Cm - 00283
+Tutorial: SAVING AND QUITTING
+
+Unlike many other games, in NetHack, death is final; you have to start
+a new game from the start (there's no way to save a game and load the
+save file more than once). However, if you need to take a break, you
+can save the game by pressing S; that will save and end the game. To
+reload a save file, just run NetHack again (and if applicable, specify
+the same name that you specified last time); the game will load, but
+your save file will be deleted.
+
+If you really get fed up of a game, you can use #quit in order to give
+up and end the game; quitting a game will end it permanently, though,
+because there's no way to go back to an earlier state in a game. So
+only do this when you want to abandon the game forever. Quitting does
+give a slightly higher final score than death, though.
+
+You can also effectively quit simply by escaping the dungeon using the
+stairs that you entered by; leaving the dungeon without the Amulet of
+Yendor counts as "escaping", and although you survive with all your
+equipment, and your life, intact, the game will end there, and you'll
+have to start a new one.
+%E
+%Cm - 00284
+Tutorial: REVIEWING MESSAGES
+
+By now, you're likely to have seen many messages appear at the top of
+the screen. That space is used to convey any information that can't
+easily be shown on the map in the middle; for instance, it reveals the
+results of looking at something using the ; command, explains what's
+going on during a fight, and lets you know about things your character
+hears while walking around in the dungeon.
+
+However, sometimes it's possible to play too quickly and miss a
+message. You can press control-P in order to review messages that
+you've heard recently; depending on your options, it might either
+display lots of recent messages, or only the most recent (in which
+case repeating control-P will tell you about older messages).
+
+If you want to do the opposite, and skip large numbers of messages,
+then you can use escape at the --More-- prompt in order to skip the
+remaining messages that turn (they can still be reviewed via
+control-P, however). (In order to go on to the next message at a
+--More-- prompt, use the spacebar or press Return.)
+%E
+%Cm - 00290
+Tutorial: SPELLCASTING
+
+Although so far you've probably been using melee in combat, most
+spellcaster characters won't be good enough at fighting to beat
+everything in melee; against more powerful opponents, a different
+option will be needed. Therefore, it's probably a good time to get
+some practice casting spells.
+
+To cast a spell, use the Z command; you can only cast spells in the
+eight compass directions (and up, down, and at yourself). For this
+combat, "force bolt" is probably a good spell to use; it's easy to
+cast, and can do decent amounts of damage even when used by weak
+spellcasters. Why not try it on a nearby hostile monster?
+
+In order to power a spell, you'll need to use up some of your personal
+magical power; the effort also tends to make you burn food faster.
+Your magical power is listed as Pw near the bottom of the screen; it's
+depleted by casting spells, and fills up again over time. To start
+with, it'll be too low to cast any but the simplest spells, but as
+time goes on, you'll be able to handle more powerful ones. Good luck
+spellcasting!
+%E
+%Cm - 00291
+Tutorial: THROWN WEAPONS
+
+Although fighting monsters in melee is all very well, it helps if you
+can get some hits in before you close in for the kill; a weakened
+monster will die faster, and so will deal less damage to you in the
+process.
+
+You can throw items at a monster using the t command; good weapons to
+throw include darts (which are designed for throwing), and daggers
+(which work just as well thrown as when wielded). Some characters will
+be better with certain weapons than others; you can use #enhance to
+see how skilled you are with various weapons (if a weapon is listed as
+'unskilled', you don't know how to use it yet but can learn with
+practice; if it isn't listed at all, you won't be able to learn to use
+it no matter how much you practice).
+
+Note that even spellcasters can benefit from thrown weapons; because
+your magical power (Pw) can run out quickly if you rely on spells as
+your major method of combat, using darts or daggers as a backup can be
+an important tactic while you're waiting for your magical power to
+recharge.
+%E
+# A bit of tactical advice here as well as than controls advice; but
+# it's easy to forget to rewield a melee weapon, and I feel it's
+# important to let people know that they have to.
+%Cm - 00292
+Tutorial: PROJECTILE WEAPONS
+
+Using bows, crossbows, and slings is slightly more complicated than
+fighting in melee; but the ability to hit monsters from a distance is
+an important one, because it allows you to hit many monsters several
+times before they can hit back, meaning you can kill them faster and
+take less damage as a result. In order to fire a projectile weapon,
+you must wield the weapon (with w), then throw the projectile (using
+t); the combination is recognised as firing the projectile with the
+weapon, rather than throwing it by hand.
+
+As bashing monsters with a bow or sling is unlikely to do much damage,
+it's probably a bad idea to try to use a wielded projectile in melee;
+instead, when the opposing monster has almost caught up to you, use
+your turn to wield a melee weapon (using w) rather than trying to get
+in a final shot.
+
+You can use the #enhance command to see which weapons (including
+projectile weapons) your character is good with ('basic' or better),
+which they need practice to use ('unskilled'), and which they can
+never learn to use effectively (unlisted).
+%E
+# Yes, this /is/ in the Guidebook. And it should be mentioned in any
+# self-respecting NetHack tutorial.
+%Cm - 00293
+Tutorial: ENGRAVING "ELBERETH"
+
+As you go deeper into the dungeon, the monsters get more and more
+dangerous, meaning you'll have to get better at combat yourself; and
+if you aren't careful, you might easily be overwhelmed. However,
+there's a way to give yourself a bit of breathing space when you're
+being swarmed with monsters.
+
+You can write on the floor using a wand or your fingers, using the E
+command (E- writes with your fingers); and there is one word that the
+vast majority of monsters fear, the word "Elbereth". Writing it on the
+ground will therefore cause many monsters to flee from you in terror,
+giving you a breathing space to recover from your wounds.
+
+However, there are several problems with this method, too. For one
+thing, writing in the dust with your fingers is not the most accurate
+method of inscription, so it's possible that one or more of the
+letters will be malformed. Also, engravings tend to get scuffed up a
+lot by movement; fighting from an Elbereth square will almost
+certainly wipe out the engraving and make it ineffective. Finally,
+despite the word's power, some monsters simply aren't scared of it.
+%E
+%Cm - 00294
+Tutorial: MORE ABOUT MELEE
+
+When attacking monsters in melee, you hit them with whatever you're
+wielding in your hands. However, some weapons are going to work better
+than others; it helps to use a weapon your character has had lots of
+practice with.
+
+Your ability scores also have an effect on how effective melee can be.  
+Your Strength (St:) and Dexterity (Dx:) are shown at the bottom of the
+screen; higher ability scores are better, and different abilities
+affect different things. Dexterity is imporant in being able to hit
+enemies; a good dexterity helps you aim better both with melee and
+with thrown and projectile weapons. Strength is also important; it
+helps to be strong to be able to aim a melee weapon accurately in
+combat, and the stronger you are, the more damage you can do with it
+if you connect.
+
+Finally, some weapons will be more powerful than others, especially
+against specific opponents. For instance, you can expect swords to
+generally hurt your enemies more than daggers do. However, note that
+your ability with the weapons in question will be just as important.
+%E
+%Cm - 00300
+Tutorial: GOLD
+
+Every adventurer loves gold; and it can be quite useful even within
+the dungeon itself. Gold is represented by the $ symbol, and takes up
+no space in your inventory (but its weight can still be significant,
+even though coins are quite light); the amount of gold you have is
+constantly displayed near the bottom of the screen, rather than in
+your inventory.
+
+Gold adds to your score at the end of the game; but even within the
+dungeon, it can still be used to buy things. Not every monster is
+hostile, and some will want to trade with you; and gold is the perfect
+medium to trade with. In particular, you may find shops which will buy
+and sell items, in which case you'll want gold to be able to afford
+things; but shopkeepers are not the only monsters who care about how
+rich you are.
+
+You can get information about your financial situation by using the $
+command; normally, this just depends on the gold in your wallet, but
+if you owe, or are owed, money, that information will also be
+available that way.
+%E
+%Cm - 00301
+Tutorial: WEAPONS
+
+With the number of hostile monsters in the dungeon, weapons tend to be
+rather important. Weapons on the map are represented with the ) symbol
+(note that ammunition also counts as a weapon for this purpose).
+
+You can use the w command to hold an object in your hands (or w- to
+hold nothing); by far the most common use of this is to hold a weapon.
+The object in your hands is what you'll use to hit monsters with in
+melee, so it should be something that your character is skilled with
+attacking with; you can use the #enhance command to see which weapons
+your character is good at using ('unskilled' means your character
+doesn't yet know how to use the weapon but can learn; if a weapon
+isn't mentioned, your character will never know how to use it).
+
+Other uses of weapons include using t to throw them at things (darts
+are best used as thrown weapons, daggers are also good for this);
+using a to hit targets two squares away (if you have a long weapon
+like a lance); and using E to scratch into the floor with the weapon
+(note that this damages the weapon).
+%E
+%Cm - 00302
+Tutorial: ARMOR
+
+Armor (represented by the [ character) is a useful method of
+protecting yourself from the blows of your enemies; armor reduces the
+chance that an enemy attack will hit, and may also reduce the damage
+it deals. Your vulnerability to attacks is called your Armor Class
+(AC, shown at the bottom of the screen); an unarmored human has an AC
+of 10, but you'll want to drive it much lower than that.
+
+You can wear armor with W, and take it off again with T; you'll need a
+free hand to be able to wear a shield, and likewise you can't wear two
+pieces of armor that fit on the same part of the body. Some armor is
+magical, and has either a magical bonus (such as +1) to defending you,
+or some other property; armor can also be inferior to normal, and have
+a penalty (such as -1). The manufacturer of armor is also relevant;
+elves are good at making armor, and dwarves are even better, but
+orcish armor tends to be rather low in quality.
+
+Note that although anyone can wear armor, it hampers spellcasting;
+metal armor in particular can mess up magic, and shields also make
+spellcasting rather difficult.
+%E
+%Cm - 00303
+Tutorial: FOOD
+
+The %% character represents an edible item; note that just because you
+can eat something, that doesn't necessarily mean it's a good idea. The
+term 'comestibles' is used to represent food and other things that can
+be eaten. Eating is rather important; a character who doesn't eat for
+too long will become hungry, grow weak, then eventually start fainting
+from hunger and starve to death. (If you're getting hungry, this will
+be shown near the bottom of the screen.) However, try not to eat when
+'satiated'; you can choke to death, as well as starving. You can eat
+things (either in your inventory, or on the floor) with the e
+command. Fresh food tends to be considerably healthier than food
+that's been left to rot; various types of food will spoil over time
+and become dangerous, even if they were safe to eat when they first
+appeared.
+
+Note that killing monsters also often leaves a %% behind, which is the
+monster's corpse. Corpses can be eaten just the same way food can be
+(as they tend to be heavy, eating from the floor is usually the best
+option). Not all are healthy, but some could give you special powers
+when eaten; to some extent, you truly are what you eat.
+%E
+# The existence of ?oID is mentioned in the Guidebook, so I'm
+# mentioning it here too.
+%Cm - 00304
+Tutorial: SCROLLS
+
+Scrolls (?) are magical items that store spells bound up on paper. By
+reading a scroll (using the r command), you can unleash the magic
+within; but it's rather wise to know what a scroll does, first;
+unexpected magical effects can be rather bad for your health. Anyone
+can use a scroll, regardless of if they know any magic or not.
+
+If you don't know what a scroll does, you'll see the scroll's label
+rather than its function; within any given game, scrolls with the same
+label do the same thing, but which label goes on which sort of scroll
+can change from one game to the next. (You can use the \ command to
+see the label/scroll mappings you've already discovered.) There may be
+magical methods of determining what a given scroll does; in fact, one
+of the spells commonly bound up in scroll form is a magical means of
+determining the properties of an unknown item.
+
+Magical scrolls are strictly single-use; because the scroll is being
+used to capture a spell, the process of casting the spell also
+destroys the scroll.
+%E
+# Wand overcharging is, surprisingly, a Guidebook spoiler.
+%Cm - 00305
+Tutorial: WANDS
+
+Wands (/) are magical objects, which are generally designed to cast a
+specific spell (depending on appearance; wand/appearance combinations
+change from game to game). They generally store enough magical energy
+to cast that spell multiple times, but will eventually run out; if
+somehow you discover the amount of energy in a wand, it will be shown
+in the wand's description (e.g. (3:5) means that the wand has been
+recharged 3 times, and can be used 5 more times before it next needs
+to be recharged). As wands are designed to cast spells by themselves,
+you need not know magic yourself to be able to use them; just point
+them in the desired direction and fire! You can use the z command to
+'zap' a wand like this, to unleash its magic; note that you can only
+aim in compass directions, upwards, downwards, and at yourself).
+
+Other things you can do with wands include writing on the floor with
+them (use the E command to do this), and breaking the wand with the a
+command; note that breaking a wand often causes an enormous and rather
+dangerous release of magical energy. Wands also sometimes explode of
+their own accord upon being recharged; the more a wand has been
+recharged, the less likely it is to survive another recharging.
+%E
+%Cm - 00306
+Tutorial: RINGS
+
+Unlike wands, scrolls, and potions, rings (=) are a more permanent
+sort of magical item; instead of being powered from an in-built
+magical source (and therefore running out relatively quickly), most
+are powered from your own body's food supply, causing you to get
+hungry slightly more quickly (although some powerful rings need more
+power than others).
+
+You can put a ring on each ring finger, but only one on each hand; as
+a result, you can wear up to two rings. The put-on command, P, is used
+to put on a ring; you can remove one using R.
+
+Rings generally have an effect either on you, or on those around you;
+note that not all effects are beneficial, and so you should be careful
+when trying on rings whose effects you don't know. (The same way as
+wands, scrolls, and potions work, rings with the same appearance will
+always do the same thing in any given game, but which appearance has
+which effect will differ from game to game.) You can use the \ command
+to see which ring appearances you already know this game; note that
+if you recognise a ring's purpose, your inventory will list it.
+%E
+# Clear = water is a guidebook spoiler, as is holy water's effect on
+# undead.
+%Cm - 00307
+Tutorial: POTIONS
+
+Potions (!) are magic in liquid form; being single-use magical items,
+they work rather similarly to scrolls. You can drink a potion using
+the q ('quaff') command. The main difference from scrolls is that as
+potions are drunk not read, they affect the person who drank them.
+
+Just as with most other magical items, you may not know what a potion
+does upon encountering it; two potions which are the same colour will
+do the same thing in any given game, but which colour of potion has
+which effect will differ from one game to the next. As some potions
+can be very dangerous, be careful when quaffing potions of unknown
+enchantment! Clear potions contain water; although water is normally
+nonmagical, it might also be holy or unholy water, and because all
+three look the same, it might be hard to tell them apart.
+
+Other things you can do with potions include using #dip to dip items
+into them, and using t to throw them at things. (Holy water is rather
+effective as a thrown weapon against undead, for instance; but
+splashing a potion against something normally gives a much weaker
+magical effect than drinking it.)
+%E
+%Cm - 00308
+Tutorial: TOOLS
+
+The term 'tool' is used for a broad range of miscellaneous items,
+shown with the ( symbol. Although mostly nonmagical, some may have
+magical powers; and even the ones that don't are nearly always useful
+in some more mundane way. Magical tools often, but not always, will
+masquerade as a nonmagical tool, but there will often be some method
+of telling the magical tool apart from the ordinary one.
+
+You can use a tool using the a command; what using a tool does depends
+on the tool. Some tools can be used an unlimited number of times;
+others will wear out, or run out of magic or other supplies. (For
+instance, a lamp can run out of oil after a while.) There may be other
+commands that make sense in relation to tools, based on their shape;
+for instance, some tools are usable as weapons, and wielding them
+using w so you can hit monsters with them makes sense. Luckily, it's
+normally obvious what the purpose of a tool is, so you can normally
+guess what will happen when you press a and use it.
+%E
+%Cm - 00309
+Tutorial: CONTAINERS
+
+Containers are a special subset of tools (and likewise, are
+represented with the ( character), that can be used to store items;
+bags, boxes, chests and safes are all generally types of containers.
+You can use containers to carry more than 52 stacks of items around
+with you, by storing in the container; however, the weight of the
+items inside will still be significant, and the weight of the
+container itself can be too.
+
+To put items into or take them out of a container in your inventory,
+you can use the a command to use the container (just like with any
+other tool); if the container is on the floor, you can likewise use
+the #loot command to do the same thing. Boxes and chests are often
+locked or trapped; you could try using a lock-picking tool on them,
+kicking them (using control-D from an adjacent square) in the hope of
+breaking open the lock, or trying to force the lock with your wielded
+weapon using the #force command. If you're afraid of traps, the
+command #untrap can be used to search for traps on the container
+(although this is not guaranteed to succeed), and to try to deactivate
+them if you find them.
+%E
+%Cm - 00310
+Tutorial: AMULETS
+
+Amulets (") are like rings in more or less every respect; they have
+constant magical effects powered from your own body's food supply,
+amulets of the same appearance do the same thing in one game, but may
+differ from game to game, and you put them on and remove them with the
+P and R commands. Amulets are often slightly more powerful than rings,
+though; and you wear them around your neck, rather than on your ring
+fingers. (You can only wear one amulet at a time.)
+
+As usual, not all magical items are guaranteed to be beneficial; so be
+careful trying on amulets you don't recognise.
+%E
+%Cm - 00311
+Tutorial: GEMS AND ROCKS
+
+Gems and rocks (*) are a varied class of items; some are somewhat
+valuable, whereas some are worthless, although they are rarely
+magical. Unlike other classes of items, two gems of the same colour
+are not necessarily the same sort of gem; also, note that even if you
+do find a valuable gem, you're unlikely to be able to sell it for very
+much unless you can prove its identity to the shopkeeper. Like gold,
+valuable gems are useful in increasing your score.
+
+Things you can do with gems and rocks include throwing them (using the
+t command; this works better with non-valuable gems such as ordinary
+rocks), and rubbing things on them using #rub. (Note that rocks do
+more damage as sling ammunition than as thrown weapons.) Mostly,
+though, what gems and rocks you do pick up are likely to be carried
+around rather than used.
+%E
+%Cm - 00312
+Tutorial: STATUES AND BOULDERS
+
+The ` symbol represents stone objects like statues; your options may
+also display boulders using `, although 0 is also a common choice.
+Statues tend to be both useless and rather heavy, so make sure you
+turn autopickup off when walking over them (you can turn autopickup on
+and off using @); however, some statues may not be what they seem.
+
+As opposed to statues, boulders are not only too heavy for almost
+anything to lift (although giants and similarly large creatures have
+been known to use them as weapons), but too large for the average
+character to slip past. Most likely, you'll have to push them out of
+your way, or somehow destroy them, if they block your path; you can
+push a boulder by walking into it (using the usual movement keys), and
+you will try to squeeze past it if you can, and the boulder's movement
+is somehow blocked.
+%E
+%Cm - 00313
+Tutorial: SPELLBOOKS
+
+The + character represents a book, generally a spellbook; this is how
+characters learn spells. Pretty much anyone can try to learn a spell
+by studying a spellbook (use the r command to read a spellbook), using
+some of the book's magic to teach them the spell; but if the spell is
+too difficult to learn, the attempt can backfire in a rather dangerous
+manner. As magic from the book is required, spellbooks will eventually
+run out of it, fading and becoming unreadable in the process; and
+similarly, you will not be able to retain the memory of how to cast a
+spell forever.
+
+Once you learn a spell, you can use the Z command to cast it (or + to
+list the spells you know); some spells are easier to cast than others,
+and unless your character is particularly good with magic, spells will
+have a chance of going wrong when cast. Armor also interferes with
+spellcasting, and spells need a source of power; your magical energy
+(Pw) is shown at the bottom of the screen, and is used to power spells
+(it regenerates over time), and casting spells generally also makes
+you hungrier. Lower-level spells are less powerful, but easier and
+cheaper to cast, so they may be good spells to practice casting with.
+%E
+%Cm - 00317
+Tutorial: CALLING ITEMS
+
+With all the items around with unknown purposes, it can be very useful
+to keep notes on your beliefs about the function of various items. You
+are about to be given the chance to give a name to a certain
+appearance of item (probably because one was destroyed and you saw the
+effects of it); this will replace the appearance from now on, thus
+reminding you of what you wrote.
+
+An example: suppose you saw an orange potion break, and got a glimpse
+of the sort of effects it had; the game might prompt you with "Call an
+orange potion:". This lets you rename orange potions; so, if for
+instance you suspected that the potion was dangerous, you could write
+"dangerous" at the prompt, and "orange potion" would from then on be
+known as "potion called dangerous". As two orange potions always have
+the same effect, you'd know to avoid quaffing those potions in future.
+
+If you have nothing to say about what you think the item in question
+does, you can just leave the prompt blank, to leave the item with its
+old name. (Also, note that you can use #name then n to call items
+yourself, rather than waiting for the game to prompt you.)
+%E
+# Artifacts are only mentioned in the artiwishing-conduct section of
+# the Guidebook, but a quick explanation of what they are will
+# probably be helpful.
+%Cm - 00318
+Tutorial: ARTIFACTS
+
+Some items are one of a kind! Artifacts are items with special powers,
+often crafted long ago with magic that can no longer be duplicated, or
+made by the gods or some similarly powerful beings.
+
+An artifact is identified by its proper name, which cannot be changed;
+it will function perfectly well as the item it was based on (e.g. an
+artifact longsword can do everything a longsword can), but will often
+do other things as well; so for instance, artifact weapons often do
+much more damage than a regular weapon would, and artifact tools
+normally have one or more permanent magical effects.
+
+Some artifacts tend to be rather picky about who uses them, however;
+if you're not the sort of person the artifact wants as its owner, it
+might damage you when you touch it, or even refuse to be used
+altogether. As always, then, it helps to be wary around artifacts of
+unknown function. (Using the / command to ask about the artifact can
+be a useful source of information, though; artifacts are sufficiently
+famous that your character may have heard of them before ever even
+going into the dungeon.)
+%E
+%Cm - 00319
+Tutorial: RANDOM-APPEARANCE ITEMS
+
+A large number of magical items have appearances that vary from game
+to game; although within any one game two items with the same
+appearance (apart from tools, gems and rocks) will have the same
+function, knowledge of what an item does in one game will not help in
+the next. Therefore, one of the goals in each game is to try to
+determine which item does what.
+
+To avoid having to remember this information, you can use the #name
+commands to make notes about the items. If you have an idea of what
+one particular appearance of item does, you can use #name followed by
+n to produce an alternative name for the appearance; e.g. you could
+change "orange potion" to "potion called dangerous" if you decided
+that all orange potions in the game were dangerous.
+
+You might also get information about one particular item; for
+instance, a curse on one orange potion does not mean that all others
+are cursed, but if you found out about it, you'd want to remember.
+Using #name followed by y lets you write on an individual item to make
+notes about it; this will not affect other items which look the same.
+%E
+%Cm - 00320
+Tutorial: LEVELING UP
+
+Your character just gained an experience level! Going up in level
+means you can survive more damage before death, store up more magical
+power to cast spells with, heal faster, and become better at casting
+spells; some races and all classes will also gain various ongoing
+powers as they level up, such as sleep resistance or the ability to
+move faster than normal. Many other things also become better for you
+the more experienced you are.
+
+It's important to keep on killing monsters so that you can continue
+going up in level; as you go deeper, the enemies will get more
+powerful, and you'll likely need the benefits that higher levels bring
+in order to survive in the deeper parts of the dungeon.
+%E
+%Cm - 00321
+Tutorial: RANKS
+
+You just leveled up again; and as a result, your rank has changed;
+you're now have the rank "%r".
+
+Although your rank is mostly irrelevant, a better rank does give you a
+somewhat better professional status; a good rank lets you prove to
+other people in the game that you have what it takes to perform well
+at your chosen job.
+%E
+%Cm - 00322
+Tutorial: ABILITIES
+
+One of your abilities just increased! Demonstrating the use of an
+ability helps increase your abilities, making your character more
+powerful.
+
+There are six abilities, shown at the bottom of the screen:
+
+Strength     (St:) Affects melee combat and carrying capacity.
+Dexterity    (Dx:) Affects your ability to aim at and hit things.
+Constitution (Co:) Affects your ability to survive injury.
+Intelligence (In:) Affects the power of your spells.
+Wisdom       (Wi:) Affects the rate at which you regain magic.
+Charisma     (Ch:) Affects enemy's reactions towards you.
+
+Unlike most other stats, abilities are rather hard to change; either
+you need to continuously exercise the use of the ability to increase
+it, or you need to use some magical means of increasing your abilities
+to higher values. You might also find items that boost one or more of
+your abilities, letting you function better for as long as you're
+using them.
+%E
+%Cm - 00323
+Tutorial: ABILITY ABUSE
+
+One of your abilities (Strength, Dexterity, Constitution,
+Intelligence, Wisdom, or Charisma) just decreased. This happens when
+you abuse your mind or body; it can be the result of unwise actions,
+of not paying attention to training in a particular sort of activity,
+or of actions that monsters or traps tried against you (for instance,
+poison tends to seriously abuse abilities, making them very likely to
+drop). Unless you can find a magical way to restore your abilities,
+you'll need to train in the appropriate area to help to bring your
+abilities back up:
+
+Strength     (St:) Affects melee combat and carrying capacity.
+Dexterity    (Dx:) Affects your ability to aim at and hit things.
+Constitution (Co:) Affects your ability to survive injury.
+Intelligence (In:) Affects the power of your spells.
+Wisdom       (Wi:) Affects the rate at which you regain magic.
+Charisma     (Ch:) Affects enemy's reactions towards you.
+%E
+%Cm - 00324
+Tutorial: GOING DEEPER
+
+Welcome to a deeper level of the dungeon! As you go deeper into the
+dungeon, it becomes deadlier and more dangerous; the monsters will be
+better at fighting, the traps will be nastier, and you'll need to come
+up with ever more ingenious methods to be able to continue onwards.
+
+Note that it's possible to return to previous levels; although most
+levels are generated randomly, levels don't change just because you
+leave them; the layout will stay the same when you return. Monsters
+on a level will stay in stasis while you aren't on the level, meaning
+that you can use stairs to run from a fight; but time on the level
+still passes, so for instance, food will continue to spoil while you
+aren't there. As a result, the main reasons to return to a previous
+level are to continue exploring from elsewhere on that level, to pick
+up items that you left behind, and to run away from problems on deeper
+levels, in favour of healing somewhere that's already been cleared
+out.
+
+The dungeon level (Dlvl:) you're on is shown in the bottom-left corner
+of your screen. (Some levels have names rather than numbers).
+%E
+%Cm - 00325
+Tutorial: HEALTH
+
+Ouch! You just lost some of your health. Your health is measured in
+Hit Points (HP), and is visible at the bottom of the screen; the first
+number counts your current hit points, and the number in parentheses
+is the maximum number of hit points you can have, when you're fully
+healed.
+
+You should be careful to try to conserve your HP, because when you run
+out of them, you die. Luckily, your wounds will slowly heal over time;
+so you can regain your HP simply by avoiding being hit for a while. If
+you end up critically low on HP, you'll probably want to find some way
+to accelerate the healing process; if you find a reliable way to do
+this, make sure you remember what it is, to help you in emergencies.
+
+Your Constitution (Co:) ability is also shown at the bottom of the
+screen; it reflects how naturally good you are at surviving injury. A
+high Constitution will help you to heal faster, and give you more hit
+points to start with; so improving your Constitution is a helpful way
+to survive better.
+%E
+%Cm - 00326
+Tutorial: MAGICAL POWER
+
+It looks like you just used some of your magical power. There are
+several uses for it, although the main use is to cast spells. The
+amount of magical power you have is shown as Pw at the bottom of the
+screen; the first number counts your current power reserves, and the
+number in parentheses shows the maximum amount of power your body can
+store at one time. You regenerate magical power slowly over time;
+nothing particularly bad happens if you run out, but if you don't have
+enough power, you can't cast spells, or perform other actions that
+need you to power them with personal magic.
+
+The amount of power you have depends on your Wisdom ability (shown as
+Wi: at the bottom of the screen); gaining more Wisdom will give you
+more maximum power, and help you regenerate it faster. There's another
+ability relevant to magic; your Intelligence ability (shown as In: at
+the bottom of the screen) also helps regenerate your magical power,
+makes it easier to understand spellbooks you might find, and makes
+your spells more powerful.
+%E
+%Cm - 00327
+Tutorial: ALTERNATIVES TO MAGIC
+
+It seems that your magical power has now run so low that you can't
+cast any more spells, until it regenerates. If your character relies
+on magic, then you could be in trouble.
+
+There are several things you could do here. If there are no monsters
+around, you might want to retreat to an area of the dungeon you've
+already cleared out, to wait for your power to regenerate. You might
+also want to let your pet do the fighting for a while, if you have
+one; although you probably don't want to expose it to too much danger.
+
+Alternatively, you could try some non-magical combat yourself. Even
+spellcasting classes should practice with a weapon so that they can
+fight in melee if they have to; thrown or projectile weapons are also
+very useful for weakening monsters without exposing yourself to danger
+in return. It helps to get some practice with weapons against weaker
+monsters, so that you aren't completely helpless against stronger
+monsters when you run out of magic against them.
+%E
+%Cm - 00328
+Tutorial: USING ARMOR
+
+Your Armor Class (AC) has just decreased; as Armor Class measures how
+vulnerable you are to attacks, this is a good thing. Being better
+armored reduces the chance that monsters will be able to hit you (as
+armor helps to parry attacks); if you manage to get sufficiently well
+armored, your body will be so well covered that the armor will be hard
+to avoid, meaning that even when the attacks do connect, their damage
+will be reduced.
+
+Of course, there are always tradeoffs. One potential problem with
+wearing a lot of metal armor is that it makes spellcasting
+difficult, although this is not a problem unless you intend to cast
+spells. Another potential issue is that the weight of armor can
+encumber you, making you move more slowly and making you more
+vulnerable as a result. Shields take up a hand that you could be using
+to hold a weapon. Finally, there are several magical items that need
+to be worn on parts of your body normally used for armor; so there may
+eventually be a trade-off between armoring yourself well and gaining
+magical benefits. However, especially early on, the value of armor is
+often large enough to outweigh all this.
+%E
+%Cm - 00329
+Tutorial: EXPERIENCE
+
+You just gained some experience! By far, killing monsters is the most
+common way to gain experience, although there are a few weirder
+methods (some experienced NetHack players have completed the game
+without a single kill, although this is incredibly difficult to
+achieve).
+
+Accumulating experience is important, because it will eventually allow
+you to level up, giving you a boost in maximum health and magical
+power, making you better at spellcasting, and gaining you new special
+abilities. As a result, early on in the game you probably want to kill
+more or less everything hostile, for the practice; later on, though,
+some monsters will be better avoided than fought.
+
+Pets can get experience too; it's getting the final blow in that gives
+the experience, so if you're trying to keep a pet, you'll need to
+think carefully about which of you should get the experience from any
+given death.
+%E
+# 'people' here is D&D terminology for player-character races; saying
+# 'humans' would be wrong, because the character might not be human.
+%Cm - 00330
+Tutorial: HUNGER
+
+You're getting hungry; now would be an especially good time to eat
+something. When you're hungry, your hunger status (such as "Hungry",
+"Weak", or "Fainting") will be displayed at the bottom of the screen;
+merely being hungry isn't disastrous, but becoming too hungry can kill
+you easily, either directly by starving to death, or indirectly by
+making you too weak to defend yourself.
+
+Therefore, you'd better try to find something to eat. The corpses of
+monsters are often edible; although many sorts of food spoil over
+time, so fresh corpses are more likely to be healthy. An important
+skill is learning what's safe to eat, and what will kill you.
+
+You can also try eating food from your inventory; you can use I to see
+which "comestibles" you're carrying around. Some sorts of food are
+best saved for when you can't find any monsters around to kill and
+eat; food designed for people to eat is often especially nutritious
+and can get you out of starvation trouble quickly.
+
+Use the e command to eat food, from the floor or your inventory.
+%E
+# The Guidebook doesn't actually say what satiation does; but it's
+# rather easy to find out by experiment
+%Cm - 00331
+Tutorial: SATIATION
+
+There's an opposite problem to hunger; eating too much can make you
+satiated, which can be bad for your health. When satiated, eating yet
+more food could be a bad idea, as there's a limit to how much your
+stomach can hold; you might end up choking to death!
+
+If there are things you really feel you need to eat, you could try
+burning off some of those calories first; several sorts of magic
+(spells, rings, and amulets) power themselves from your body's food
+supplies, so you could try using those. You might also find other
+calorie-burning actions as the game progresses.
+
+Mostly, though, the easiest way to burn off the calories will simply
+be to continue adventuring until you naturally end up hungry again;
+after all, food doesn't last forever.
+%E
+%Cm - 00332
+Tutorial: STATUS
+
+Status effects are effects like confusion or blindness that affect
+your character negatively, making it harder to act correctly. They're
+displayed at the bottom of the screen. Some status effects can kill
+you directly, as you die from illness or food poisoning; others are
+dangerous more indirectly, as they impair your senses or your actions,
+making it considerably easier for monsters to kill you. Therefore,
+it's probably advisable to try to cure the status.
+
+If the status is not fatal in itself, you may be able to cure yourself
+simply by waiting somewhere where there are fewer monsters, trying to
+survive until your body recovers; but this will just make things worse
+in some cases. Your main alternatives are to try to find an item or
+spell that will cure you. Also, although it's too late now, it's often
+possible to avoid the status in the first place; for instance, it's
+advisable not to eat monster corpses that will give you status
+effects (you can find out which these are by experimenting over the
+course of several games). Asking for divine intervention with #pray
+may save your life, too, in the most serious cases; but this should be
+treated as a last resort, as deities dislike being bothered too much.
+%E
+%Cm - 00333
+Tutorial: ENHANCING SKILLS
+
+Practicing a particular area of fighting, weaponry, or magic, will
+allow you to get better in it, to some extent. Your character now has
+enough practice to be able to 'enhance' a skill, becoming better at
+it; to do this, use the #enhance command.
+
+Note that the total amount of skill enhancement you can manage depends
+on your experience level; as a result, if you somehow get enough
+practice to enhance a skill you aren't planning to use, it may be a
+good idea to decide not to enhance that skill, so as to save your
+skill slots for some other skill. Likewise, if there's some skill you
+are planning to use in the future, it may be worth practicing it now,
+so that it's enhanced ready for you to be able to use it.
+
+Only skills listed in the #enhance list are enhanceable at all; most
+characters will have some skills they'll never be able to get good
+at. Similarly, the maximum competence you can gain in a skill (basic,
+skilled, expert, master, grand master) will depend on your class; for
+instance, a competence of 'master' or better can only be achieved in
+martial arts or unarmed combat, and even then, only by some classes.
+%E
+%Cm - 00334
+Tutorial: POLYMORPHED
+
+It seems that you've just turned into a monster! Monsters tend to have
+their own strengths and weaknesses, which are likely quite different
+from the ones you have in your original form; it may help to
+experiment a bit to see what you can and can't do now. It's entirely
+possible that some things you took for granted, such as the ability to
+open doors, are not possible in this form.
+
+Some monsters have a special attack or ability; if you do, you'll have
+been told what it was, and you can use the #monster command to use it.
+Some female monsters can also lay eggs, which you can do with the #sit
+command. If you're stuck in monster form, you may as well try to make
+the most of it!
+%E
+# Wands are shown in-game in the "plausible items" list for engraving;
+# so I think it's not a spoiler to mention that you can engrave with
+# them, although it /is/ a spoiler to mention what happens when you do.
+%Cm - 00335
+Tutorial: ENGRAVINGS
+
+There seems to have been something written on the square you stepped
+on. Although it's rare for writing to survive a long time in a
+dungeon, writing on the floor can be a useful technique to avoid
+getting lost, or to record information; other denizens of the dungeon
+might also be using it to try to communicate with you.
+
+You can write on the floor yourself, too, using the E command. You can
+write in the dust with your fingers using E-, but such writing tends
+to erode incredibly quickly; scratching into the ground with a metal
+weapon or similarly hard object will last longer, but note that this
+will damage the weapon. Some magical wands can be used for writing,
+too.
+%E
+%Cm - 00336
+Tutorial: PRAYER
+
+You seem to be in serious trouble! Sometimes, you end up badly
+injured, starving to death, have both hands welded to a cursed weapon,
+or have some equally serious issue; and in such cases, there's a last
+resort you can try.
+
+As long as you've been careful not to do anything too sacrilegious,
+and have been advancing the cause of your religion (killing hostile
+monsters is generally a good way to do this), calling upon your
+%G (%d) may help.
+
+Prayer is accomplished by the #pray command; although you can't rely
+on divine intervention too often, it can get you out of problematic
+situations reliably, if you don't do it so much that your %G
+becomes annoyed. Care is needed; an annoyed deity can do all sorts of
+drastic things to you! If you do annoy your %G by mistake, or
+you want to please them so you can pray more quickly, you might want
+to find an altar dedicated to them and use #offer to sacrifice a
+recently killed monster; as long as the offer isn't offensive, you
+can gain standing in the eye of your %G this way.
+%E
+%Cm - 00337
+Tutorial: ENCUMBERANCE
+
+One problem that every adventurer seems to face is the problem of
+hauling all that treasure around. Your Strength ability (shown as St:
+at the bottom of the screen) is important in influencing how much you
+can carry (and also has a large effect on the effectiveness of your
+fighting in melee); you generally want to be strong to be able to
+carry a lot of gear. (Constitution (Co:) is also relevant.)
+
+The more you have on you, the more and more burdened you become; if
+you're having trouble carrying your equipment, the bottom of the
+screen will show your encumberance status, ranging from "Burdened"
+through "Stressed", "Strained", and "Overtaxed" up to "Overloaded".
+The more encumbered you are, the slower you'll perform all actions,
+and the more often you'll need to eat; being slower means that the
+movements of monsters will seem faster by comparison, which could be
+rather dangerous for you. As a result, try discarding items to save
+weight; you can come back to them later.
+
+You can use the d command in order to drop an unwanted item; dropping
+several items now is probably a good idea.
+%E
+%Cm - 00338
+Tutorial: CURSES
+
+Some items bear curses, which make them considerably worse; you seem
+to have come across such an item. Curses are generally not incredibly
+bad; mostly they make an object less effective than it would be
+otherwise, although sometimes they have other negative or detrimental
+effects. Cursed equipment also tends not to want to be unequipped; you
+normally need to find some magical method of lifting the curse to be
+able to get rid of it.
+
+There's an opposite to curses, too; an item can be blessed, which will
+make it more beneficial (or in the case of dangerous items, less
+bad). For instance, demons are injured more badly by blessed weapons.
+A blessing or a curse on water is what makes it holy or unholy water,
+respectively.
+
+Your inventory will list a blessing or a curse on any objects for
+which you find out that information; if you know for certain an object
+is neither blessed nor cursed, it'll be marked as "uncursed". There
+won't be a notation at all if you aren't sure, though.
+%E
+%Cm - 00339
+Tutorial: MAIL
+
+You've got mail! If someone sends you a message, a mail daemon will
+turn up and give it to you; it'll appear in the form of a scroll, and
+reading the scroll will allow you to check what the message was. The
+form of the message will depend on where and how you're playing; if
+you're on your own computer, then the scroll will normally be a
+response to the receipt of email, in which case you can read the
+scroll to read the email; but when playing on a public NetHack server,
+the mail will probably be related to your game, sent by someone
+watching. In this case, you can effectively send a reply by pressing
+#, then space, then typing in your message and leaving it on the
+screen for a while; whoever's watching your game (and sent the mail)
+will be able to read the response on your screen.
+
+If you get fed up of being sent mail all the time, you can turn this
+option off, by using O to enter the options screen, and turning off
+the 'mail' option.
+%E
+%Cm - 00340
+Tutorial: SPELLCASTING AND ARMOR
+
+Spellcasting is always a matter of trade-offs; using up magical power,
+and burning calories, are things that cannot be kept up forever, so
+you generally need to think carefully about when to use spells and
+when to use more mundane methods. There's another issue that causes
+problems when spellcasting, though; whether to wear armor.
+
+Metal armor tends to block magic, and shields get in the way of the
+complex hand motions needed to cast a spell properly; as a result,
+wearing metal armor or a shield can really mess up your chances of
+casting spells correctly. You can use + to see your spell failure
+chances, to help you make an informed decision about whether the
+armor is worth it or not. If you're particularly good at magic, it's
+possible that easier spells will be 100% successful despite the
+armor; in this case, you might want to confine yourself to low-level
+spells, and wear the armor for extra protection. Later in the game,
+though, you'll probably want to cast higher-level spells, and may have
+to ditch the armor (or change to non-metallic armor) as a result. If
+you aren't that good at magic, then it may also be worth considering
+just ignoring magic altogether and using whatever armor you can find.
+%E
+%Cm - 00341
+Tutorial: WEAPON CHOICE
+
+The weapon you're currently wielding isn't one that your character is
+particularly good with. Choosing an appropriate weapon can be quite a
+problem, especially if none of the weapons that you've learnt so far
+are particularly effective.
+
+You can use the #enhance command to see which weapons your character
+knows how to use, and which ones you can learn; any skill that's
+listed can be learnt, but you'll never be any good with weapons that
+aren't mentioned. If you do decide to learn a new weapon, make sure
+it's one that it's possible to learn, and then practice it against
+weaker enemies; with a weapon you aren't trained in, you're going to
+find it hard to hit and to deal significant damage, until you've had a
+lot of practice. (It may be worth going higher up in the dungeon to
+find weaker opponents to train against, as a result.)
+
+Alternatively, you could just switch back to a weapon you already know
+how to use; most characters will be able to become highly proficient
+with their starting weapon, over time, so that can be a good choice.
+%E
+%Cm - 00342
+Tutorial: ENGULFED
+
+It seems that you've been swallowed by a monster! Various monsters
+prefer to engulf, swallow, or otherwise absorb their prey whole,
+rather than relying on the usual methods of combat. As a result,
+you're going to have to fight your way out from the inside.
+
+When engulfed, all 8 compass directions count as attacks against the
+monster; so for instance, moving in any direction will melee it. You
+can use spells inside a monster, too (casting in any direction); and
+likewise, zapping wands at it may be a useful way to escape.
+
+Generally speaking, you need to get out before the monster does
+whatever unpleasant things it's planning to do to you; being digested
+is a rather final end to a game, and the insides of most monsters will
+deal damage to you, or injure you some other way. However, you're
+unlikely to have much trouble hitting the monster from here!
+%E
+%Cm - 00359
+Tutorial: DEATH
+
+Every game comes to an end, and unfortunately, this one has ended with
+your character's death. It looks like someone else is going to have to
+retrieve the Amulet.
+
+When you die, your score is calculated, based mostly on the treasure
+you had and the monsters you killed. You're also told what items you
+had, and what your character was like; the information you're shown
+this way can help you to figure out what went wrong. Death in NetHack
+is fatal; you'll need to start again with a new character. Learn from
+your death, and try to do better next time!
+
+If you keep on dying, there's an easier mode you can play in to gain
+some practice, which doesn't count for the high score tables but in
+which death is not fatal, so you can keep on trying things out. To
+enter "explore mode", as it's called, type X whilst playing a game;
+that will convert the game into a non-scoring explore-mode game. Once
+you get the hang of playing, though, go back to normal play for your
+games after that; wins in explore-mode don't count.
+%E
+%Cm - 00360
+Tutorial: SHOPPING
+
+A dungeon may seem a rather strange place to set up a shop, but some
+hardy shopkeepers attempt to make the best of the commercial potential
+that a dungeon has to offer. You can use your money to buy the items
+on offer in the shop; or if you have items that the shopkeeper is
+interested in, you can try selling them.
+
+Apart from the square just inside the door (which doesn't count as
+part of the shop), items in the shop are the shopkeeper's property;
+you can pick them up to examine them, but the shopkeeper will get
+annoyed if you damage them. Once you're holding an item you want to
+buy, you can use the p command to pay for it, and it'll become yours.
+Similarly, you can drop items inside the shop, and if the shopkeeper
+is interested he or she will offer to pay for them (if you decline the
+offer, you can simply pick them back up again).
+
+Note that leaving autopickup on in a shop is generally a bad idea; you
+can use the @ command to turn autopickup on or off. (You don't want to
+end up buying everything in the shop by mistake!)
+%E
+%Cm - 00361
+Tutorial: PURCHASING ITEMS
+
+Well, you're now holding one of the shopkeeper's items! Try not to
+damage it, or you'll have to pay for it. (Of course, if you're
+planning to buy it anyway, you could use it now and pay for it later;
+but paying first is a prudent strategy, as shopkeepers are used to
+having to take their produce back by force.)
+
+There are three commands that you may find useful in relation to
+unpaid items; you can use p to pay for an item, $ to check how much
+money you owe the shopkeeper (or vice versa), and d to drop the item
+if you decide you don't want it after all.
+
+Note that as an alternative to picking up items to find out how much
+they cost, you can use the #chat command while standing on the item,
+to talk to the shopkeeper; this can help to reduce the chance that you
+damage an item that you can't afford to pay for.
+
+Your Charisma ability (shown as Ch: at the bottom of the screen) is
+useful when shopping; a stronger personality and more attractive
+manner can help you to haggle better prices.
+%E
+# Branches and special levels. The three mentioned here (the Mines,
+# Sokoban, and the Oracle) are all mentioned in the Guidebook.
+%Cm - 00362
+Tutorial: THE GNOMISH MINES
+
+It's long been rumoured that the gnomes have built a mine complex
+somewhere in the dungeons; and it looks like you just found it. There
+are several side-branches to the main dungeon, and the mines are the
+first one; although branches are mostly optional, they can be
+rewarding. (What adventurer wouldn't want to explore a working gem
+mine?)
+
+In general, levels only have two sets of stairs (one going up, one
+going down); but the entries to branches are different, having another
+set of stairs that leads to the branch. (The level before the Mines,
+for instance, has some stairs leading to the Mines, and some stairs
+continuing along the main dungeon.) The ends of branches are also
+special; eventually, if you explore right the way to the bottom of the
+mines, you'll hit a dead end which has stairs up but no stairs down.
+Most players do choose to (immediately or eventually) explore side
+branches that they find, though; the riches to be found there are
+often similar or better to those in the main dungeon.
+%E
+%Cm - 00363
+Tutorial: SOKOBAN
+
+Welcome to a dungeon side-branch! Although mostly optional, branches
+of the dungeon can be rewarding to explore, even if they do eventually
+lead to dead ends.
+
+You're now in Sokoban, a rather unusual area of the dungeon full of
+boulder puzzles. The aim here is to push the boulders into the pits or
+holes; that way, you can complete a path leading to the next level.
+It's possible to complete all the puzzles here according to the
+traditional Sokoban rules; however, by taking NetHack physics, and the
+possibility to use magic, into account, you may find certain rather
+more ingenious ways to solve the puzzle. However, players who cheat
+too badly at the puzzles may find themselves having a run of bad luck.
+
+In order to help you solve the puzzles in an informed manner, you'll
+be magically informed of the map on each level of Sokoban, so the aim
+here is mostly to solve the puzzles. Items and monsters do not show up
+until they're in your vision range, though; so exploring the levels
+can still be useful. There's no undoing moves; so think carefully
+before moving any of the boulders!
+%E
+# What the oracle does is not a Guidebook spoiler, but is obvious.
+%Cm - 00364
+Tutorial: THE ORACLE
+
+Welcome to the Oracle! Although most of the levels in NetHack are
+generated at random, some will have predetermined areas, or be unusual
+in various other ways; for instance, the Oracle of Delphi has a
+specially designed room all to herself, from which she makes
+prophecies.
+
+You can chat to the Oracle using the #chat command; she'll be willing
+to give you advice in return for money. The Oracle's consultations are
+full of useful, if potentially obscure, information about the game;
+you can gain a lot of information that way.
+
+There are more 'special levels' deeper in the dungeon; but you'll have
+to figure out how those ones work for yourself.
 %E

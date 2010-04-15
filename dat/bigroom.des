@@ -6,7 +6,9 @@
 # These are the bigroom levels:
 #
 
-MAZE:"bigrm-1",' '
+LEVEL:"bigrm-1"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ---------------------------------------------------------------------------
@@ -36,61 +38,23 @@ STAIR:random,down
 # Non diggable walls
 NON_DIGGABLE:(00,00,74,17)
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+LOOP [15] {
+  OBJECT:random,random,random
+}
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [6] {
+  TRAP:random,random
+}
 # Random monsters.
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
+LOOP [28] {
+  MONSTER:random,random,random
+}
 
 #	Here, just play with the lighting...
 
-MAZE:"bigrm-2",' '
+LEVEL:"bigrm-2"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ---------------------------------------------------------------------------
@@ -128,61 +92,23 @@ STAIR:random,down
 # Non diggable walls
 NON_DIGGABLE:(00,00,74,17)
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+LOOP [15] {
+  OBJECT:random,random,random
+}
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [6] {
+  TRAP:random,random
+}
 # Random monsters.
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
+LOOP [28] {
+  MONSTER:random,random,random
+}
 
 #	Now, let's get fancy...
 
-MAZE:"bigrm-3",' '
+LEVEL:"bigrm-3"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ---------------------------------------------------------------------------
@@ -212,28 +138,13 @@ STAIR:random,down
 # Non diggable walls
 NON_DIGGABLE:(00,00,74,17)
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+LOOP [15] {
+  OBJECT:random,random,random
+}
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [6] {
+  TRAP:random,random
+}
 # Random monsters.
 MONSTER:random,random,(01,01)
 MONSTER:random,random,(13,01)
@@ -263,7 +174,10 @@ MONSTER:random,random,(37,16)
 MONSTER:random,random,(49,16)
 MONSTER:random,random,(61,16)
 MONSTER:random,random,(73,16)
-MAZE:"bigrm-4",' '
+
+LEVEL:"bigrm-4"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 -----------                                                     -----------
@@ -298,61 +212,23 @@ FOUNTAIN:(05,15)
 FOUNTAIN:(69,02)
 FOUNTAIN:(69,15)
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+LOOP [15] {
+  OBJECT:random,random,random
+}
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [6] {
+  TRAP:random,random
+}
 # Random monsters.
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
+LOOP [28] {
+  MONSTER:random,random,random
+}
 
 #	Try an oval room...
 
-MAZE:"bigrm-5",' '
+LEVEL:"bigrm-5"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
                             ------------------                            
@@ -382,64 +258,25 @@ STAIR:random,up
 STAIR:random,down
 # Non diggable walls
 NON_DIGGABLE:(00,00,72,18)
-# Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-# Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-# Random monsters.
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
 
+LOOP [15] {
+  OBJECT:random,random,random
+}
+
+LOOP [6] {
+  TRAP:random,random
+}
+
+LOOP [28] {
+  MONSTER:random,random,random
+}
 
 
 # The Four Circles
 
-MAZE:"bigrm-6",' '
+LEVEL:"bigrm-6"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
      ---------         ---------         ---------         ---------     
@@ -469,63 +306,25 @@ STAIR:random,up
 STAIR:random,down
 # Non diggable walls
 NON_DIGGABLE:(00,00,72,18)
-# Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-# Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-# Random monsters.
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
+
+LOOP [15] {
+  OBJECT:random,random,random
+}
+
+LOOP [6] {
+  TRAP:random,random
+}
+
+LOOP [28] {
+  MONSTER:random,random,random
+}
 
 
 # Let's tilt it a bit
 
-MAZE:"bigrm-7",' '
+LEVEL:"bigrm-7"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
                                                         -----              
@@ -555,63 +354,25 @@ STAIR:random,up
 STAIR:random,down
 # Non diggable walls
 NON_DIGGABLE:(00,00,74,18)
-# Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-# Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-# Random monsters.
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
+
+LOOP [15] {
+  OBJECT:random,random,random
+}
+
+LOOP [6] {
+  TRAP:random,random
+}
+
+LOOP [28] {
+  MONSTER:random,random,random
+}
 
 
 # Two streams
 
-MAZE:"bigrm-8",' '
+LEVEL:"bigrm-8"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
         |------------------------       -------------------------        
@@ -642,63 +403,25 @@ STAIR:random,down
 #
 # Non diggable walls
 NON_DIGGABLE:(00,00,72,18)
-# Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-# Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-# Random monsters.
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
+
+LOOP [15] {
+  OBJECT:random,random,random
+}
+
+LOOP [6] {
+  TRAP:random,random
+}
+
+LOOP [28] {
+  MONSTER:random,random,random
+}
 
 
 # Slanted
 
-MAZE:"bigrm-9",' '
+LEVEL:"bigrm-9"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ----------------------------------------------                             
@@ -728,62 +451,23 @@ STAIR:random,down
 # Non diggable walls
 NON_DIGGABLE:(00,00,74,17)
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-# Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-# Random monsters.
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
+LOOP [15] {
+  OBJECT:random,random,random
+}
+
+LOOP [6] {
+  TRAP:random,random
+}
+
+LOOP [28] {
+  MONSTER:random,random,random
+}
 
 
 # The Eye
 
-MAZE:"bigrm-10",' '
+LEVEL:"bigrm-10"
+FLAGS:mazelevel
 GEOMETRY:center,center
 MAP
 }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
@@ -871,7 +555,8 @@ MONSTER:random,random,random
 
 # Fog Maze
 
-MAZE:"bigrm-11",' '
+LEVEL:"bigrm-11"
+FLAGS:mazelevel
 GEOMETRY:center,center
 MAP
 .......................................................................

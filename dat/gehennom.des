@@ -4,8 +4,9 @@
 # NetHack may be freely redistributed.  See license for details.
 #
 
-MAZE: "valley-1", ' '
-FLAGS: noteleport,hardfloor,nommap
+LEVEL: "valley-1"
+FLAGS: noteleport,hardfloor,nommap,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ----------------------------------------------------------------------------
@@ -153,8 +154,9 @@ MONSTER:'M',random,random
 MONSTER:'M',random,random
 MONSTER:'M',random,random
 #
-MAZE: "valley-2", ' '
-FLAGS: noteleport,hardfloor,nommap
+LEVEL: "valley-2"
+FLAGS: noteleport,hardfloor,nommap,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
 ----------------------------------------------}}}}--------------------------
@@ -306,9 +308,9 @@ MONSTER[50%]:'M',random,random
 #
 # The Juiblex level
 #
-MAZE:"juiblex",' '
-FLAGS:noteleport,shortsighted
-INIT_MAP:'.','}',true,true,unlit,false
+LEVEL:"juiblex"
+FLAGS:noteleport,shortsighted,mazelevel
+INIT_MAP:mines,'.','}',true,true,unlit,false
 # guarantee at least one open spot to ensure successful stair placement
 GEOMETRY:left,bottom
 MAP
@@ -423,8 +425,9 @@ TRAP:"magic",random
 #
 # The Orcus Level
 #
-MAZE:"orcus-1",random
-FLAGS: noteleport,shortsighted
+LEVEL:"orcus-1"
+FLAGS: noteleport,shortsighted,mazelevel
+INIT_MAP:mazegrid,'-'
 GEOMETRY:right,center
 # A ghost town
 MAP
@@ -521,7 +524,9 @@ OBJECT:random,random,random
 OBJECT:random,random,random
 OBJECT:random,random,random
 # The resident nasty
-MONSTER:'&',"Orcus",(33,15)
+MONSTER:'&',"Orcus",(33,15) {
+  OBJECT:'/',"death"
+}
 # And its preferred companions
 MONSTER:'Z',"human zombie",(32,15)
 MONSTER:' ',"shade",(32,14)
@@ -563,8 +568,9 @@ MONSTER:random,random,random
 #
 # The New Orcus Level
 #
-MAZE:"orcus-2",random
-FLAGS: noteleport,shortsighted,hardfloor
+LEVEL:"orcus-2"
+FLAGS: noteleport,shortsighted,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # A ghost town
 MAP
@@ -651,7 +657,9 @@ OBJECT:random,random,random
 OBJECT:random,random,random
 OBJECT[50%]:random,random,random
 # The resident nasty
-MONSTER:'&',"Orcus",(71,04)
+MONSTER:'&',"Orcus",(71,04) {
+  OBJECT:'/',"death"
+}
 # And its preferred companions
 MONSTER:'Z',"human zombie",(69,03)
 MONSTER:' ',"shade",(67,06)
@@ -661,17 +669,20 @@ MONSTER:'V',"vampire",(69,04)
 MONSTER:'V',"vampire lord",(70,05)
 MONSTER:'V',"vampire lord",(72,06)
 # Some loot...
-CONTAINER:'(',"chest",(71,09)
-OBJECT:'!',random,contained
-#OBJECT:'!',"amnesia",contained
-OBJECT:'?',random,contained
-#OBJECT:'?',"demonology",contained
-CONTAINER:'(',"chest",(72,09)
-OBJECT:'!',"sickness",contained
-OBJECT:'"',"amulet of strangulation",contained
-CONTAINER:'(',"chest",(73,09)
-OBJECT:'!',"blindness",contained
-OBJECT:'?',"create monster",contained
+CONTAINER:'(',"chest",(71,09) {
+  OBJECT:'!',random
+  #OBJECT:'!',"amnesia"
+  OBJECT:'?',random
+  #OBJECT:'?',"demonology"
+}
+CONTAINER:'(',"chest",(72,09) {
+  OBJECT:'!',"sickness"
+  OBJECT:'"',"amulet of strangulation"
+}
+CONTAINER:'(',"chest",(73,09) {
+  OBJECT:'!',"blindness"
+  OBJECT:'?',"create monster"
+}
 # ...and a guardian
 MONSTER:'P',"green slime",(71,08)
 MONSTER:'P',"green slime",(73,08)
@@ -717,8 +728,9 @@ MONSTER[50%]:random,random,random
 #
 # The Asmodeus Level
 #
-MAZE:"asmod-1",random
-FLAGS: noteleport
+LEVEL:"asmod-1"
+FLAGS: noteleport,mazelevel
+INIT_MAP:mazegrid,'-'
 # First part
 GEOMETRY:half-left,center
 MAP
@@ -750,7 +762,10 @@ NON_DIGGABLE:(00,00,20,11)
 # Entire main area
 REGION:(01,01,20,10),unlit,"ordinary"
 # The fellow in residence
-MONSTER:'&',"Asmodeus",(12,07)
+MONSTER:'&',"Asmodeus",(12,07) {
+  OBJECT:'/',"cold"
+  OBJECT:'/',"fire"
+}
 # Some random weapons and armor.
 OBJECT:'[',random,random
 OBJECT:'[',random,random
@@ -801,8 +816,9 @@ TRAP:"magic", random
 #
 # The New Asmodeus Level
 #
-MAZE:"asmod-2",random
-FLAGS: noteleport,hardfloor
+LEVEL:"asmod-2"
+FLAGS: noteleport,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
 # First part
 GEOMETRY:half-left,center
 MAP
@@ -870,7 +886,10 @@ REGION:(25,07,29,10),unlit,"lemurepit"
 REGION:(48,03,58,09),lit,"ordinary"
 REGION:(06,15,16,18),lit,"ordinary"
 # The fellow in residence
-MONSTER:'&',"Asmodeus",(11,16)
+MONSTER:'&',"Asmodeus",(11,16) {
+  OBJECT:'/',"cold"
+  OBJECT:'/',"fire"
+}
 # His close friends
 MONSTER:'&',"marilith",(08,16),asleep
 MONSTER:'&',"marilith",(09,17),asleep
@@ -935,9 +954,9 @@ GOLD:500,(38,17)
 GOLD:500,(38,18)
 OBJECT:'"',"amulet of change",(37,16)
 OBJECT:'=',"hunger",(37,18),cursed,0
-OBJECT:'*',"diamond",(38,16),cursed,0,"The Tears of Koth"
-OBJECT:'*',"ruby",(38,17),cursed,0,"The Heart of Cassanova" 
-OBJECT:'*',"emerald",(38,18),cursed,0,"The Eye of Hera"
+OBJECT:'*',"diamond",(38,16),cursed,0,NAME:"The Tears of Koth"
+OBJECT:'*',"ruby",(38,17),cursed,0,NAME:"The Heart of Cassanova" 
+OBJECT:'*',"emerald",(38,18),cursed,0,NAME:"The Eye of Hera"
 MONSTER:'&',random,(38,16)
 MONSTER:'&',random,(38,17)
 MONSTER:'&',random,(38,18)
@@ -983,8 +1002,9 @@ OBJECT[50%]:'"',"amulet of strangulation",(65,18),cursed,0
 #
 # The Baalzebub level
 #
-MAZE:"baalz-1",random
-FLAGS: noteleport
+LEVEL:"baalz-1"
+FLAGS: noteleport,mazelevel
+INIT_MAP:mazegrid,'-'
 GEOMETRY:right,center
 MAP
 -------------------------------------------------
@@ -1041,8 +1061,8 @@ MONSTER:'V',random,random
 #
 # The New Baalzebub level
 #
-MAZE:"baalz-2",random
-FLAGS: noteleport,hardfloor
+LEVEL:"baalz-2"
+FLAGS: noteleport,hardfloor,mazelevel
 GEOMETRY:center,center
 MAP
       }}   }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}                  
@@ -1158,8 +1178,9 @@ MONSTER[50%]:'P',random,random
 #
 # The Sanctum Level
 #
-MAZE:"sanctum", ' '
-FLAGS: noteleport,hardfloor,nommap
+LEVEL:"sanctum"
+FLAGS: noteleport,hardfloor,nommap,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 #         1         2         3         4         5         6         7    7
 #123456789012345678901234567890123456789012345678901234567890123456789012345
@@ -1258,6 +1279,9 @@ OBJECT:'?',random,random
 OBJECT:'?',random,random
 OBJECT:'?',random,random
 OBJECT:'?',random,random
+# for breaking the drawbridges
+OBJECT:'/',"striking",random
+OBJECT:'/',"striking",random
 # Some monsters.
 MONSTER:'&',"horned devil",(14,12),hostile
 MONSTER:'&',"barbed devil",(18,08),hostile
@@ -1277,24 +1301,22 @@ MONSTER:'@',"aligned priest",(17,13),noalign,hostile
 MONSTER:'@',"aligned priest",(21,13),noalign,hostile
 # Cthulhu's followers
 MONSTER:'h',"mind flayer",(17,03),hostile
-OBJECT:'/',"striking",(17,03)
 MONSTER:'h',"mind flayer",(17,15),hostile
-OBJECT:'/',"striking",(17,15)
 # Cthulhu's breakfast for tomorrow
-IF [30%] THEN
- IF [50%] THEN
+IF [30%] {
+ IF [50%] {
   MONSTER:'@',"barbarian",(49,13)
- ELSE
+ } ELSE {
   MONSTER:'@',"samurai",(49,13)
- ENDIF
-ELSE
+ }
+} ELSE {
 # Cthulhu's didn't like its taste?
- IF [50%] THEN
+ IF [50%] {
   OBJECT:'%',"corpse",(49,13),"archeologist",0
- ELSE
+ } ELSE {
   OBJECT:'%',"corpse",(49,13),"tourist",0
- ENDIF
-ENDIF
+ }
+}
 # poor boy, he got so far
 OBJECT:'"',"cheap plastic imitation of the Amulet of Yendor",(49,13)
 # A few nasties
@@ -1310,39 +1332,35 @@ STAIR:(63,15),up
 #	This level is used to fill out any levels not occupied by
 #	specific levels as defined above.
 #
-MAZE: "hellfill",'L'
-INIT_MAP: '.',' ',true,true,unlit,true
+LEVEL: "hellfill"
+FLAGS:mazelevel
+INIT_MAP: mines,'.',' ',true,true,unlit,true,'L'
 TELEPORT_REGION:levregion(11,01,59,19),levregion(01,01,02,02)
 NOMAP
 #
 #  always put stairs relatively far apart
 #
-# outer loop
-IF [50%] THEN
-# inner loop
-IF [50%] THEN
-# Option 1: Up Left, Down Right
-STAIR:levregion(01,01,20,20),levregion(40,10,44,12),up
-STAIR:levregion(50,01,70,20),levregion(45,10,49,12),down
-ELSE
-# Option 2: Up Right, Down Left
-STAIR:levregion(50,01,70,20),levregion(45,10,49,12),up
-STAIR:levregion(01,01,20,20),levregion(40,10,44,12),down
-ENDIF
-# outer loop again
-ELSE
-# inner loop 2
-IF [50%] THEN
-# Option 3: Up Center, Down Elsewhere
-STAIR:levregion(30,01,50,20),levregion(38,01,42,20),up
-STAIR:levregion(01,01,70,20),levregion(30,01,50,20),down
-ELSE
-# Option 4: Down Center, Up Elsewhere
-STAIR:levregion(01,01,70,20),levregion(30,01,50,20),up
-STAIR:levregion(30,01,50,20),levregion(38,01,42,20),down
-ENDIF
-# end of outer loop
-ENDIF
+IF [50%] {
+  IF [50%] {
+    # Option 1: Up Left, Down Right
+    STAIR:levregion(01,01,20,20),levregion(40,10,44,12),up
+    STAIR:levregion(50,01,70,20),levregion(45,10,49,12),down
+  } ELSE {
+    # Option 2: Up Right, Down Left
+    STAIR:levregion(50,01,70,20),levregion(45,10,49,12),up
+    STAIR:levregion(01,01,20,20),levregion(40,10,44,12),down
+  }
+} ELSE {
+  IF [50%] {
+  # Option 3: Up Center, Down Elsewhere
+    STAIR:levregion(30,01,50,20),levregion(38,01,42,20),up
+    STAIR:levregion(01,01,70,20),levregion(30,01,50,20),down
+  } ELSE {
+  # Option 4: Down Center, Up Elsewhere
+    STAIR:levregion(01,01,70,20),levregion(30,01,50,20),up
+    STAIR:levregion(30,01,50,20),levregion(38,01,42,20),down
+  }
+}
 #
 RANDOM_OBJECTS:'(','/','=','+',')','[','?','*','%'
 OBJECT: object[0], random, random
@@ -1364,31 +1382,39 @@ MONSTER:monster[3],random,random,hostile
 MONSTER:random,random,random,hostile
 MONSTER:'H',random,random,hostile
 # chance of evil critters
-IF [50%] THEN
-MONSTER:'L',random,random,hostile
-ELSE
-MONSTER:random,random,random,hostile
-ENDIF
-IF [66%] THEN
+IF [50%] {
+  MONSTER:'L',random,random,hostile
+} ELSE {
+  MONSTER:random,random,random,hostile
+}
+IF [66%] {
 # could be a snark now, so up the percentage a bit
-MONSTER:'J',random,random,hostile
-ELSE
-MONSTER:random,random,random,hostile
-ENDIF
-# chance of lava spillage?
-IF [75%] THEN
-SPILL: random, 'L', north, 20, lit
-ENDIF
-IF [75%] THEN
-SPILL: random, 'L', south, 20, lit
-ENDIF
-IF [75%] THEN
-SPILL: random, 'L', east, 20, lit
-ENDIF
-IF [75%] THEN
-SPILL: random, 'L', west, 20, lit
-ENDIF
-#
+  MONSTER:'J',random,random,hostile
+} ELSE {
+  MONSTER:random,random,random,hostile
+}
+# chance of lava spillage, or maybe lava river?
+IF [50%] {
+	IF [60%] {
+	SPILL: random, 'L', north, 20, lit
+	}
+	IF [60%] {
+	SPILL: random, 'L', south, 20, lit
+	}
+	IF [60%] {
+	SPILL: random, 'L', east, 20, lit
+	}
+	IF [60%] {
+	SPILL: random, 'L', west, 20, lit
+	}
+} ELSE {
+	IF [50%] {
+		RANDLINE: (30,00),(50,19), 'P', lit, 10, 2
+	} ELSE {
+		RANDLINE: (50,00),(30,19), 'P', lit, 10, 2
+	}
+}
+
 TRAP: random, random
 TRAP: random, random
 TRAP: random, random

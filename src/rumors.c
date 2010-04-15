@@ -108,7 +108,7 @@ boolean exclude_cookie;
 			    tidbit = Rand() % false_rumor_size;
 			break;
 		  default:
-			    impossible("strange truth value for rumor");
+			    warning("strange truth value for rumor");
 			return strcpy(rumor_buf, "Oops...");
 		}
 		(void) dlb_fseek(rumors, beginning + tidbit, SEEK_SET);
@@ -124,7 +124,7 @@ boolean exclude_cookie;
 	    } while(count++ < 50 && exclude_cookie && (strstri(rumor_buf, "fortune") || strstri(rumor_buf, "pity")));
 	    (void) dlb_fclose(rumors);
 	    if (count >= 50)
-		impossible("Can't find non-cookie rumor?");
+		warning("Can't find non-cookie rumor?");
 	    else
 		exercise(A_WIS, (adjtruth > 0));
 	} else {

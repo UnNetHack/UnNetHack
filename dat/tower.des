@@ -3,8 +3,9 @@
 # NetHack may be freely redistributed.  See license for details.
 #
 # Upper stage of Vlad's tower
-MAZE:"tower1",' '
-FLAGS: noteleport,hardfloor
+LEVEL:"tower1"
+FLAGS: noteleport,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:half-left,center
 MAP
   --- --- ---  
@@ -21,7 +22,9 @@ MAP
 ENDMAP
 LADDER:(11,05),down
 # The lord and his court
-MONSTER:'V',"Vlad the Impaler",(06,05)
+MONSTER:'V',"Vlad the Impaler",(06,05) {
+  OBJECT:'(',"Candelabrum of Invocation"
+}
 MONSTER:'V',random,(03,09)
 MONSTER:'V',random,(07,09)
 MONSTER:'V',random,(11,09)
@@ -49,8 +52,9 @@ NON_DIGGABLE:(00,00,14,10)
 
 
 # Intermediate stage of Vlad's tower
-MAZE:"tower2",' '
-FLAGS: noteleport,hardfloor
+LEVEL:"tower2"
+FLAGS: noteleport,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:half-left,center
 MAP
   --- --- ---  
@@ -77,22 +81,30 @@ MONSTER:'&',random,place[1]
 MONSTER:'d',"hell hound pup",place[2]
 MONSTER:'d',"hell hound pup",place[3]
 MONSTER:'d',"winter wolf",place[4]
-IF [50%] THEN
- CONTAINER:'(',"chest",place[5]
-ELSE
- CONTAINER:'(',"iron safe",place[5]
-ENDIF
-IF [50%] THEN
- OBJECT:'"',"amulet of life saving",contained
-ELSE
- OBJECT:'"',"amulet of change",contained
-ENDIF
-CONTAINER:'(',"chest",place[6]
-IF [50%] THEN
- OBJECT:'"',"amulet of strangulation",contained
-ELSE
- OBJECT:'"',"amulet of restful sleep",contained
-ENDIF
+IF [50%] {
+  CONTAINER:'(',"chest",place[5] {
+#    IF [50%] {
+      OBJECT:'"',"amulet of life saving"
+#    } ELSE {
+      OBJECT:'"',"amulet of change"
+#    }
+  }
+} ELSE {
+  CONTAINER:'(',"iron safe",place[5] {
+#    IF [50%] {
+      OBJECT:'"',"amulet of life saving"
+#    } ELSE {
+      OBJECT:'"',"amulet of change"
+    }
+#  }
+}
+CONTAINER:'(',"chest",place[6] {
+#  IF [50%] {
+    OBJECT:'"',"amulet of strangulation"
+#  } ELSE {
+    OBJECT:'"',"amulet of restful sleep"
+#  }
+}
 OBJECT[60%]:'[',"water walking boots",place[7]
 OBJECT[60%]:'[',"crystal plate mail",place[8]
 OBJECT[60%]:'+',"invisibility",place[9]
@@ -101,8 +113,9 @@ NON_DIGGABLE:(00,00,14,10)
 
 
 # Bottom most stage of Vlad's tower
-MAZE:"tower3",' '
-FLAGS: noteleport,hardfloor
+LEVEL:"tower3"
+FLAGS: noteleport,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:half-left,center
 MAP
     --- --- ---  

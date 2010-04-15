@@ -400,7 +400,7 @@ struct mail_info *info;
 	    if (info->response_cmd) {	/*(hide extension of the obj name)*/
 		int namelth = info->response_cmd - info->object_nam - 1;
 		if ( namelth <= 0 || namelth >= (int) obj->onamelth )
-		    impossible("mail delivery screwed up");
+		    warning("mail delivery screwed up");
 		else
 		    *(ONAME(obj) + namelth) = '\0';
 		/* Note: renaming object will discard the hidden command. */

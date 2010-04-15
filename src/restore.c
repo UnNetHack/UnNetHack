@@ -190,6 +190,65 @@ boolean ghostly;
 	free((genericptr_t)tmp_dam);
 }
 
+struct lvl_sounds *
+rest_lvl_sounds(fd)
+register int fd;
+{
+    int marker;
+    struct lvl_sounds *or = NULL;
+    struct lvl_sound_bite *mt = NULL;
+    mread(fd, (genericptr_t) &marker, sizeof(marker));
+    if (marker) {
+	or = (struct lvl_sounds *)alloc(sizeof(struct lvl_sounds));
+	mread(fd, (genericptr_t) or, sizeof(*or));
+	or->sounds = NULL;
+	if (or->n_sounds) {
+	    int i;
+	    int len;
+	    or->sounds = (struct lvl_sound_bite *)alloc(sizeof(struct lvl_sound_bite)*or->n_sounds);
+	    for (i = 0; i < or->n_sounds; i++) {
+		mread(fd, (genericptr_t)&(or->sounds[i].flags), sizeof(or->sounds[i].flags));
+		mread(fd, (genericptr_t)&len, sizeof(len));
+		or->sounds[i].msg = (char *)alloc(len);
+		mread(fd, (genericptr_t)or->sounds[i].msg, len);
+	    }
+	}
+    }
+    return or;
+}
+
+struct mon_gen_override *
+rest_mongen_override(fd)
+register int fd;
+{
+    int marker;
+    struct mon_gen_override *or = NULL;
+    struct mon_gen_tuple *mt = NULL;
+    int next;
+
+    mread(fd, (genericptr_t) &marker, sizeof(marker));
+    if (marker) {
+	or = (struct mon_gen_override *)alloc(sizeof(struct mon_gen_override));
+	mread(fd, (genericptr_t) or, sizeof(*or));
+	if (or->gen_chances) {
+	    or->gen_chances = NULL;
+	    do {
+		mt = (struct mon_gen_tuple *)alloc(sizeof(struct mon_gen_tuple));
+		mread(fd, (genericptr_t) mt, sizeof(*mt));
+		if (mt->next) {
+		    next = 1;
+		} else {
+		    next = 0;
+		}
+		mt->next = or->gen_chances;
+		or->gen_chances = mt;
+	    } while (next);
+	}
+    }
+    return or;
+}
+
+
 STATIC_OVL struct obj *
 restobjchn(fd, ghostly, frozen)
 register int fd;
@@ -436,6 +495,7 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	if (u.usteed)
 		mread(fd, (genericptr_t) steedid, sizeof (*steedid));
 #endif
+	mread(fd, (genericptr_t) pl_tutorial, sizeof pl_tutorial);
 	mread(fd, (genericptr_t) pl_character, sizeof pl_character);
 
 	mread(fd, (genericptr_t) pl_fruit, sizeof pl_fruit);
@@ -851,6 +911,8 @@ boolean ghostly;
 	   routine so that we can check for objects being buried under ice */
 	level.buriedobjlist = restobjchn(fd, ghostly, FALSE);
 	billobjs = restobjchn(fd, ghostly, FALSE);
+	level.mon_gen = rest_mongen_override(fd);
+	level.sounds = rest_lvl_sounds(fd);
 	rest_engravings(fd);
 
 	/* reset level.monsters for new level */

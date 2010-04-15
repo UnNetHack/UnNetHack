@@ -401,9 +401,6 @@ register struct monst *mtmp;
 			(void)mongets(mtmp, BULLWHIP);
 			(void)mongets(mtmp, BROADSWORD);
 			break;
-		    case PM_ORCUS:
-			(void)mongets(mtmp, WAN_DEATH); /* the Wand of Orcus */
-			break;
 		    case PM_HORNED_DEVIL:
 			(void)mongets(mtmp, rn2(4) ? TRIDENT : BULLWHIP);
 			break;
@@ -512,7 +509,7 @@ register struct	monst	*mtmp;
 			case PM_CAPTAIN: mac = -3; break;
 			case PM_WATCHMAN: mac = 3; break;
 			case PM_WATCH_CAPTAIN: mac = -2; break;
-			default: impossible("odd mercenary %d?", monsndx(ptr));
+			default: warning("odd mercenary %d?", monsndx(ptr));
 				mac = 0;
 				break;
 		    }
@@ -648,9 +645,6 @@ register struct	monst	*mtmp;
 		   have AT_WEAP so m_initweap() is not called for them */
 		if (ptr == &mons[PM_ICE_DEVIL] && !rn2(4)) {
 			(void)mongets(mtmp, SPEAR);
-		} else if (ptr == &mons[PM_ASMODEUS]) {
-			(void)mongets(mtmp, WAN_COLD);
-			(void)mongets(mtmp, WAN_FIRE);
 		}
 		break;
 	    case S_HUMANOID:
@@ -1036,14 +1030,8 @@ register int	mmflags;
 		flags.ghost_count++;
 		if (!(mmflags & MM_NONAME))
 			mtmp = christen_monst(mtmp, rndghostname());
-	} else if (mndx == PM_VLAD_THE_IMPALER) {
-		mitem = CANDELABRUM_OF_INVOCATION;
-	} else if (mndx == PM_CROESUS) {
-		mitem = TWO_HANDED_SWORD;
 	} else if (ptr->msound == MS_NEMESIS) {
 		mitem = BELL_OF_OPENING;
-	} else if (mndx == PM_PESTILENCE) {
-		mitem = POT_SICKNESS;
 	}
 	if (mitem && allow_minvent) (void) mongets(mtmp, mitem);
 
@@ -1229,6 +1217,32 @@ max_monster_difficulty()
 	}
 }
 
+
+struct permonst *
+get_override_mon(override)
+struct mon_gen_override *override;
+{
+    int chance, try = 100;
+    struct mon_gen_tuple *mt;
+    int ok;
+    if (!override) return NULL;
+
+    chance = rnd(override->total_mon_freq);
+    do {
+	mt = override->gen_chances;
+	while (mt && ((chance -= mt->freq) > 0)) mt = mt->next;
+	if (mt && (chance <= 0)) {
+	    if (mt->is_sym) {
+		return (mkclass(mt->monid, 0));
+	    } else {
+		if (!(mvitals[mt->monid].mvflags & G_GENOD))
+		    return (&mons[mt->monid]);
+	    }
+	}
+    } while (--try > 0);
+    return NULL;
+}
+
 static NEARDATA struct {
 	int choice_count;
 	char mchoices[SPECIAL_PM];	/* value range is 0..127 */
@@ -1241,7 +1255,9 @@ rndmonst()
 	register struct permonst *ptr;
 	register int mndx, ct;
 
-	if (u.uz.dnum == quest_dnum && rn2(7) && (ptr = qt_montype()) != 0)
+	if (level.mon_gen &&
+	    (rn2(100) < level.mon_gen->override_chance) &&
+	    ((ptr = get_override_mon(level.mon_gen)) != 0))
 	    return ptr;
 
 	if (rndmonst_state.choice_count < 0) {	/* need to recalculate */
@@ -1317,7 +1333,7 @@ rndmonst()
 	    if ((ct -= (int)rndmonst_state.mchoices[mndx]) <= 0) break;
 
 	if (mndx == SPECIAL_PM || uncommon(mndx)) {	/* shouldn't happen */
-	    impossible("rndmonst: bad `mndx' [#%d]", mndx);
+	    warning("rndmonst: bad `mndx' [#%d]", mndx);
 	    return (struct permonst *)0;
 	}
 	return &mons[mndx];
@@ -1358,7 +1374,7 @@ int	spc;
 
 	maxmlev = level_difficulty() >> 1;
 	if(class < 1 || class >= MAXMCLASSES) {
-	    impossible("mkclass called with bad class!");
+	    warning("mkclass called with bad class!");
 	    return((struct permonst *) 0);
 	}
 /*	Assumption #1:	monsters of a given class are contiguous in the
@@ -1819,7 +1835,7 @@ bagotricks(bag)
 struct obj *bag;
 {
     if (!bag || bag->otyp != BAG_OF_TRICKS) {
-	impossible("bad bag o' tricks");
+	warning("bad bag o' tricks");
     } else if (bag->spe < 1) {
 		return use_container(bag, 1);
     } else {
@@ -1857,7 +1873,7 @@ struct obj *bag;
 		dropx(bag);
 		break;
 	case 3:
-		nomul(-1*(rnd(4)));
+		nomul(-1*(rnd(4)), "sucked by a bag");
 		if (Hallucination) {
 			You("start climbing into the bag.");
 			nomovemsg = "You give up your attempt to climb into the bag.";
@@ -1897,7 +1913,7 @@ struct obj *bag;
 		}
 		if ((ACURR(A_WIS)<rnd(20) && !bag->blessed) || bag->cursed) {
 			You("are startled into immobility.");
-			nomul(-1*rnd(3));
+			nomul(-1*rnd(3), "startled by a bag");
 			nomovemsg = "You regain your composure.";
 		}
 		break;

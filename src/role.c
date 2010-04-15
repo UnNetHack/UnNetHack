@@ -39,7 +39,6 @@ const struct Role roles[] = {
 	"Arc", "the College of Archeology", "the Tomb of the Toltec Kings",
 	PM_ARCHEOLOGIST, NON_PM, NON_PM,
 	PM_LORD_CARNARVON, PM_STUDENT, PM_MINION_OF_HUHETOTL,
-	NON_PM, PM_HUMAN_MUMMY, S_SNAKE, S_MUMMY,
 	ART_ORB_OF_DETECTION,
 	MH_HUMAN|MH_DWARF|MH_GNOME | ROLE_MALE|ROLE_FEMALE |
 	  ROLE_LAWFUL|ROLE_NEUTRAL,
@@ -65,7 +64,6 @@ const struct Role roles[] = {
 	"Bar", "the Camp of the Duali Tribe", "the Duali Oasis",
 	PM_BARBARIAN, NON_PM, NON_PM,
 	PM_PELIAS, PM_CHIEFTAIN, PM_THOTH_AMON,
-	PM_OGRE, PM_TROLL, S_OGRE, S_TROLL,
 	ART_HEART_OF_AHRIMAN,
 	MH_HUMAN|MH_ORC | ROLE_MALE|ROLE_FEMALE |
 	  ROLE_NEUTRAL|ROLE_CHAOTIC,
@@ -91,7 +89,6 @@ const struct Role roles[] = {
 	"Cav", "the Caves of the Ancestors", "the Dragon's Lair",
 	PM_CAVEMAN, PM_CAVEWOMAN, NON_PM,
 	PM_SHAMAN_KARNOV, PM_NEANDERTHAL, PM_CHROMATIC_DRAGON,
-	PM_BUGBEAR, PM_HILL_GIANT, S_HUMANOID, S_GIANT,
 	ART_SCEPTRE_OF_MIGHT,
 	MH_HUMAN|MH_DWARF|MH_GNOME | ROLE_MALE|ROLE_FEMALE |
 	  ROLE_LAWFUL|ROLE_NEUTRAL,
@@ -117,7 +114,6 @@ const struct Role roles[] = {
 	"Hea", "the Temple of Epidaurus", "the Temple of Coeus",
 	PM_HEALER, NON_PM, NON_PM,
 	PM_HIPPOCRATES, PM_ATTENDANT, PM_CYCLOPS,
-	PM_GIANT_RAT, PM_SNAKE, S_RODENT, S_YETI,
 	ART_STAFF_OF_AESCULAPIUS,
 	MH_HUMAN|MH_GNOME | ROLE_MALE|ROLE_FEMALE | ROLE_NEUTRAL,
 	/* Str Int Wis Dex Con Cha */
@@ -142,7 +138,6 @@ const struct Role roles[] = {
 	"Kni", "Camelot Castle", "the Isle of Glass",
 	PM_KNIGHT, NON_PM, PM_PONY,
 	PM_KING_ARTHUR, PM_PAGE, PM_IXOTH,
-	PM_QUASIT, PM_OCHRE_JELLY, S_IMP, S_JELLY,
 	ART_MAGIC_MIRROR_OF_MERLIN,
 	MH_HUMAN | ROLE_MALE|ROLE_FEMALE | ROLE_LAWFUL,
 	/* Str Int Wis Dex Con Cha */
@@ -168,7 +163,6 @@ const struct Role roles[] = {
 	  "the Monastery of the Earth-Lord",
 	PM_MONK, NON_PM, NON_PM,
 	PM_GRAND_MASTER, PM_ABBOT, PM_MASTER_KAEN,
-	PM_EARTH_ELEMENTAL, PM_XORN, S_ELEMENTAL, S_XORN,
 	ART_EYES_OF_THE_OVERWORLD,
 	MH_HUMAN | ROLE_MALE|ROLE_FEMALE |
 	  ROLE_LAWFUL|ROLE_NEUTRAL|ROLE_CHAOTIC,
@@ -194,7 +188,6 @@ const struct Role roles[] = {
 	"Pri", "the Great Temple", "the Temple of Nalzok",
 	PM_PRIEST, PM_PRIESTESS, NON_PM,
 	PM_ARCH_PRIEST, PM_ACOLYTE, PM_NALZOK,
-	PM_HUMAN_ZOMBIE, PM_WRAITH, S_ZOMBIE, S_WRAITH,
 	ART_MITRE_OF_HOLINESS,
 	MH_HUMAN|MH_ELF | ROLE_MALE|ROLE_FEMALE |
 	  ROLE_LAWFUL|ROLE_NEUTRAL|ROLE_CHAOTIC,
@@ -222,7 +215,6 @@ const struct Role roles[] = {
 	"Rog", "the Thieves' Guild Hall", "the Assassins' Guild Hall",
 	PM_ROGUE, NON_PM, NON_PM,
 	PM_MASTER_OF_THIEVES, PM_THUG, PM_MASTER_ASSASSIN,
-	PM_LEPRECHAUN, PM_GUARDIAN_NAGA, S_NYMPH, S_NAGA,
 	ART_MASTER_KEY_OF_THIEVERY,
 	MH_HUMAN|MH_ORC | ROLE_MALE|ROLE_FEMALE |
 	  ROLE_CHAOTIC,
@@ -262,7 +254,6 @@ const struct Role roles[] = {
 	"Ran", "Orion's camp", "the cave of the wumpus",
 	PM_RANGER, NON_PM, NON_PM /* Orion & canis major */,
 	PM_ORION, PM_HUNTER, PM_SCORPIUS,
-	PM_FOREST_CENTAUR, PM_SCORPION, S_CENTAUR, S_SPIDER,
 	ART_LONGBOW_OF_DIANA,
 	MH_HUMAN|MH_ELF|MH_GNOME|MH_ORC | ROLE_MALE|ROLE_FEMALE |
 	  ROLE_NEUTRAL|ROLE_CHAOTIC,
@@ -288,7 +279,6 @@ const struct Role roles[] = {
 	"Sam", "the Castle of the Taro Clan", "the Shogun's Castle",
 	PM_SAMURAI, NON_PM, PM_LITTLE_DOG,
 	PM_LORD_SATO, PM_ROSHI, PM_ASHIKAGA_TAKAUJI,
-	PM_WOLF, PM_STALKER, S_DOG, S_ELEMENTAL,
 	ART_TSURUGI_OF_MURAMASA,
 	MH_HUMAN | ROLE_MALE|ROLE_FEMALE | ROLE_LAWFUL,
 	/* Str Int Wis Dex Con Cha */
@@ -314,7 +304,6 @@ const struct Role roles[] = {
 	"Tou", "Ankh-Morpork", "the Thieves' Guild Hall",
 	PM_TOURIST, NON_PM, NON_PM,
 	PM_TWOFLOWER, PM_GUIDE, PM_MASTER_OF_THIEVES,
-	PM_GIANT_SPIDER, PM_FOREST_CENTAUR, S_SPIDER, S_CENTAUR,
 	ART_YENDORIAN_EXPRESS_CARD,
 	MH_HUMAN | ROLE_MALE|ROLE_FEMALE | ROLE_NEUTRAL,
 	/* Str Int Wis Dex Con Cha */
@@ -340,7 +329,6 @@ const struct Role roles[] = {
 	"Val", "the Shrine of Destiny", "the cave of Surtur",
 	PM_VALKYRIE, NON_PM, NON_PM /*PM_WINTER_WOLF_CUB*/,
 	PM_NORN, PM_WARRIOR, PM_LORD_SURTUR,
-	PM_FIRE_ANT, PM_FIRE_GIANT, S_ANT, S_GIANT,
 	ART_ORB_OF_FATE,
 	MH_HUMAN|MH_DWARF | ROLE_FEMALE | ROLE_LAWFUL|ROLE_NEUTRAL,
 	/* Str Int Wis Dex Con Cha */
@@ -365,7 +353,6 @@ const struct Role roles[] = {
 	"Wiz", "the Lonely Tower", "the Tower of Darkness",
 	PM_WIZARD, NON_PM, PM_KITTEN,
 	PM_NEFERET_THE_GREEN, PM_APPRENTICE, PM_DARK_ONE,
-	PM_VAMPIRE_BAT, PM_XORN, S_BAT, S_WRAITH,
 	ART_EYE_OF_THE_AETHIOPICA,
 	MH_HUMAN|MH_ELF|MH_GNOME|MH_ORC | ROLE_MALE|ROLE_FEMALE |
 	  ROLE_NEUTRAL|ROLE_CHAOTIC,
@@ -390,7 +377,7 @@ struct Role urole =
 	{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
 	"L", "N", "C", "Xxx", "home", "locate",
 	NON_PM, NON_PM, NON_PM, NON_PM, NON_PM, NON_PM,
-	NON_PM, NON_PM, 0, 0, 0, 0,
+	0, 0,
 	/* Str Int Wis Dex Con Cha */
 	{   7,  7,  7,  7,  7,  7 },
 	{  20, 15, 15, 20, 20, 10 },
@@ -500,6 +487,51 @@ const struct Align aligns[] = {
 	{"balance",	"neutral",	"Neu",	ROLE_NEUTRAL,	A_NEUTRAL},
 	{"chaos",	"chaotic",	"Cha",	ROLE_CHAOTIC,	A_CHAOTIC},
 	{"evil",	"unaligned",	"Una",	0,		A_NONE}
+};
+
+
+/* Table of roleplay-conducts */
+
+const struct Conduct conducts[] = {
+{	"pacifism",	"pacifist", 	"peaceful",	TRUE,
+	"You ","have been ","were ","a pacifist",
+	"pretended to be a pacifist"},
+
+{	"sadism",	"sadist", 	"sadistic",	TRUE,
+	"You ","have been ","were ","a sadist",
+	"pretended to be a sadist"},
+
+{	"atheism", 	"atheist", 	"atheistic",	TRUE,
+	"You ","have been ","were ","an atheist",
+	"pretended to be an atheist"},
+
+{	"nudism", 	"nudist", 	"nude",		TRUE,
+	"You ","have been ","were ","a nudist",
+	"pretended to be a nudist"},
+
+{	"zen",		"zen master", 	"blindfolded",	TRUE,
+	"You ","have followed ","followed ","the true Path of Zen",
+	"left the true Path of Zen"},
+
+{	"asceticism",	"ascetic",	"hungry",	TRUE,
+	"You ","have gone ","went ","without food",
+	"pretended to be an ascet"},
+
+{	"vegan",	"vegan",	"vegan",	TRUE,
+	"You ","have followed ","followed ","a strict vegan diet",
+	"pretended to be a vegan"},
+
+{	"vegetarian", 	"vegetarian",	"vegetarian",	TRUE,
+	"You ","have been ","were ","vegetarian",
+	"pretended to be a vegetarian"},
+
+{	"illiteracy", 	"illiterate",	"illiterate",	TRUE,
+	"You ","have been ","were ","illiterate",
+	"become literate"},
+
+{	"thievery",	"master thief",	"tricky",	TRUE,
+	"You ","have been ","were ","very tricky",
+	"pretended to be a master thief"}
 };
 
 STATIC_DCL char * FDECL(promptsep, (char *, int));
@@ -1233,7 +1265,7 @@ build_plselection_prompt(buf, buflen, rolenum, racenum, gendnum, alignnum)
 char *buf;
 int buflen, rolenum, racenum, gendnum, alignnum;
 {
-	const char *defprompt = "Shall I pick a character for you? [ynq] ";
+	const char *defprompt = "Shall I pick a character for you? [yntq] ";
 	int num_post_attribs = 0;
 	char tmpbuf[BUFSZ];
 	
@@ -1278,7 +1310,7 @@ int buflen, rolenum, racenum, gendnum, alignnum;
 			Strcat(buf, "alignment");
 		}
 	}
-	Strcat(buf, " for you? [ynq] ");
+	Strcat(buf, " for you? [yntq] ");
 	return buf;
 }
 
@@ -1438,6 +1470,12 @@ role_init()
 	    	mons[urole.femalenum].mflags3 |= M3_INFRAVISION;
 	}
 
+	/* Fix up initial roleplay flags */
+	if (Role_if(PM_MONK)) 
+	    flags.vegetarian = TRUE;
+	flags.vegan |= flags.ascet;
+	flags.vegetarian |= flags.vegan;
+
 	/* Artifacts are fixed in hack_artifacts() */
 
 	/* Success! */
@@ -1451,6 +1489,8 @@ struct monst *mtmp;
 	switch (Role_switch) {
 	case PM_KNIGHT:
 	    return ("Salutations"); /* Olde English */
+	case PM_MONK:
+	    return ("Namaste"); /* Sanskrit */
 	case PM_SAMURAI:
 	    return (mtmp && mtmp->data == &mons[PM_SHOPKEEPER] ?
 	    		"Irasshaimase" : "Konnichi wa"); /* Japanese */
@@ -1475,6 +1515,8 @@ Goodbye()
 	switch (Role_switch) {
 	case PM_KNIGHT:
 	    return ("Fare thee well");  /* Olde English */
+	case PM_MONK:
+	    return ("Punardarsanaya");  /* Sanskrit */
 	case PM_SAMURAI:
 	    return ("Sayonara");        /* Japanese */
 #ifdef TOURIST
@@ -1486,6 +1528,160 @@ Goodbye()
 	default:
 	    return ("Goodbye");
 	}
+}
+
+/* A function to break a specific roleplay-conduct */
+void
+violated(cdt)
+int cdt;
+{
+	switch(cdt) {		
+	case CONDUCT_PACIFISM:
+	    u.uconduct.killer++;
+	    if (u.roleplay.pacifist) {
+		You_feel("violent!");
+		if (yn("Do you want to quit?") == 'y') {
+		    killer_format = NO_KILLER_PREFIX;
+		    killer = "quit after an act of violence";
+		    done(QUIT);
+		}
+	    if (u.uconduct.killer >= 10) u.roleplay.pacifist = FALSE;
+	    }
+	    break;
+
+	case CONDUCT_NUDISM:
+	    u.uconduct.armoruses++;
+	    if (u.roleplay.nudist){
+		You("realize you were nude.");
+		makemon(&mons[PM_COBRA],u.ux, u.uy, NO_MM_FLAGS);
+		mksobj_at(APPLE, u.ux, u.uy, FALSE, FALSE);
+		u.roleplay.nudist = FALSE;
+	    }
+	    break;
+
+	case CONDUCT_BLINDFOLDED:
+	    u.uconduct.unblinded++;
+	    if (u.roleplay.blindfolded){
+		pline("The Spirit of Zen leaves your body.");
+		makemon(mkclass(S_ZOMBIE, 0), u.ux, u.uy, NO_MM_FLAGS); /* Z */
+		makemon(mkclass(S_EYE, 0), u.ux, u.uy, NO_MM_FLAGS);    /* e */
+		makemon(mkclass(S_NYMPH, 0), u.ux, u.uy, NO_MM_FLAGS);  /* n */
+		u.roleplay.blindfolded = FALSE;
+	    }
+	    break;
+
+	case CONDUCT_VEGETARIAN:	/* replaces violated_vegetarian() */
+	    if (u.roleplay.vegetarian)
+		You_feel("guilty.");
+	    if (Role_if(PM_MONK))
+		adjalign(-1);
+	    u.uconduct.unvegetarian++;
+	    u.uconduct.unvegan++;
+	    u.uconduct.food++;
+	    if (u.uconduct.unvegetarian >= 30) u.roleplay.vegetarian = FALSE;
+	    if (u.uconduct.unvegan >= 20) u.roleplay.vegan = FALSE;
+	    if (u.uconduct.food >= 10) u.roleplay.ascet = FALSE;
+	    break;
+
+	case CONDUCT_VEGAN:
+	    if (u.roleplay.vegan)
+		You_feel("a bit guilty.");
+	    u.uconduct.unvegan++;
+	    u.uconduct.food++;
+	    if (u.uconduct.unvegan >= 20) u.roleplay.vegan = FALSE;
+	    if (u.uconduct.food >= 10) u.roleplay.ascet = FALSE;
+	    break;
+
+	case CONDUCT_FOODLESS:
+	    if (u.roleplay.ascet)
+		You_feel("a little bit guilty.");
+	    u.uconduct.food++;
+	    if (u.uconduct.food >= 10) u.roleplay.ascet = FALSE;
+	    break;
+
+	case CONDUCT_ILLITERACY:
+	    u.uconduct.literate++;
+	    if (u.roleplay.illiterate) {
+		/* should be impossible */
+		pline("Literatally literature for literate illiterates!");
+		exercise(A_WIS, TRUE);		
+		}
+	    break;
+
+	case CONDUCT_THIEVERY:
+	    u.uconduct.robbed++;
+	    if (Role_if(PM_ROGUE))
+		You_feel("like an ordinary robber."); 
+	    break;
+
+	default: 
+	    impossible("violated: unknown conduct");
+
+	}
+	return;
+}
+
+/* a function to check whether a specific conduct has been broken
+ * return FALSE if broken
+*/
+boolean
+successful_cdt(cdt)
+int cdt;
+{
+	if ((cdt == CONDUCT_PACIFISM) && !u.uconduct.killer &&
+			!num_genocides() && (u.uconduct.weaphit<=100)) 
+	    return TRUE;
+	if ((cdt == CONDUCT_SADISM) && !u.uconduct.killer &&
+		 	(num_genocides() || (u.uconduct.weaphit>100)))
+	    return TRUE;
+	if ((cdt == CONDUCT_ATHEISM) && !u.uconduct.gnostic) return TRUE;
+	if ((cdt == CONDUCT_NUDISM) && !u.uconduct.armoruses) return TRUE;
+	if ((cdt == CONDUCT_BLINDFOLDED) && !u.uconduct.unblinded) return TRUE;
+	if ((cdt == CONDUCT_VEGETARIAN) && !u.uconduct.unvegetarian) return TRUE;
+	if ((cdt == CONDUCT_VEGAN) && !u.uconduct.unvegan) return TRUE;
+	if ((cdt == CONDUCT_FOODLESS) && !u.uconduct.food) return TRUE;
+	if ((cdt == CONDUCT_ILLITERACY) && !u.uconduct.literate) return TRUE;
+	if ((cdt == CONDUCT_THIEVERY) && !u.uconduct.robbed) return TRUE;
+
+	return FALSE;
+}
+
+/* a function to check whether a specific conduct *
+ *  was selected at character creation		  */
+boolean
+intended_cdt(cdt)
+int cdt;
+{
+	if ((cdt == CONDUCT_PACIFISM) && flags.pacifist) return TRUE;
+	if ((cdt == CONDUCT_ATHEISM) && flags.atheist) return TRUE;
+	if ((cdt == CONDUCT_NUDISM) && flags.nudist) return TRUE;
+	if ((cdt == CONDUCT_BLINDFOLDED) && flags.blindfolded) return TRUE;
+	if ((cdt == CONDUCT_FOODLESS) && flags.ascet) return TRUE;
+	if ((cdt == CONDUCT_VEGAN) && flags.vegan) return TRUE;
+	if ((cdt == CONDUCT_VEGETARIAN) && flags.vegetarian) return TRUE;
+	if ((cdt == CONDUCT_ILLITERACY) && flags.illiterate) return TRUE;
+
+	return FALSE;
+}
+
+/* a function to check whether it's superflous to list that conduct */ 
+boolean
+superfluous_cdt(cdt)
+int cdt;
+{
+	if ((cdt == CONDUCT_VEGAN) && successful_cdt(CONDUCT_FOODLESS)) return TRUE;
+	if ((cdt == CONDUCT_VEGETARIAN) && successful_cdt(CONDUCT_VEGAN)) return TRUE;
+	if ((cdt == CONDUCT_THIEVERY) && !u.uevent.invoked) return TRUE;
+
+	return FALSE;
+}
+
+/* tell if you failed a selected conduct */ 
+boolean
+failed_cdt(cdt)
+int cdt;
+{
+	return (intended_cdt(cdt) && !successful_cdt(cdt));
 }
 
 /* role.c */

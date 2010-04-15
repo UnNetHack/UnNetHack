@@ -9,7 +9,7 @@
 /*
  * PATCHLEVEL is updated for each release.
  */
-#define PATCHLEVEL	2
+#define PATCHLEVEL	3
 /*
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
@@ -17,7 +17,7 @@
 #define EDITLEVEL	0
 
 #define COPYRIGHT_BANNER_A \
-"UnNetHack, Copyright 2009"
+"UnNetHack, Copyright 2009-2010"
 
 #define COPYRIGHT_BANNER_B \
 "    Based on NetHack, Copyright 1985-2003 by Stichting Mathematisch"
@@ -34,7 +34,7 @@
  * PP = patch level, ee = edit level, L = literal suffix "L",
  * with all four numbers specified as two hexadecimal digits.
  */
-#define VERSION_COMPATIBILITY 0x03050000L	/* 3.5.0-0 */
+/* #define VERSION_COMPATIBILITY 0x03050000L */	/* 3.5.0-0 */
 
 
 /*****************************************************************************/

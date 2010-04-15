@@ -268,7 +268,7 @@ boolean picked_some;
 
 	/* If there are objects here, take a look. */
 	if (ct) {
-	    if (flags.run) nomul(0);
+	    if (flags.run) nomul(0, 0);
 	    flush_screen(1);
 	    (void) look_here(ct, picked_some);
 	} else {
@@ -441,7 +441,7 @@ int what;		/* should be a long */
 		}
 
 		/* if there's anything here, stop running */
-		if (OBJ_AT(u.ux,u.uy) && flags.run && flags.run != 8 && !flags.nopick) nomul(0);
+		if (OBJ_AT(u.ux,u.uy) && flags.run && flags.run != 8 && !flags.nopick) nomul(0, 0);
 	}
 
 	add_valid_menu_class(0);	/* reset */
@@ -636,31 +636,34 @@ menu_item **pick_list;	/* list of objects and counts to pick up */
 	const char *otypes = flags.pickup_types;
 
 	/* first count the number of eligible items */
-	for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow))
-
-
+	for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow)) {
 #ifndef AUTOPICKUP_EXCEPTIONS
-	    if (!*otypes || index(otypes, curr->oclass) ||
-	        (flags.pickup_thrown && curr->was_thrown))
+	    if ((!*otypes || index(otypes, curr->oclass) ||
+	         (flags.pickup_thrown && curr->was_thrown)) &&
+	        (flags.pickup_dropped || !curr->was_dropped))
 #else
 	    if ((!*otypes || index(otypes, curr->oclass) ||
 	         (flags.pickup_thrown && curr->was_thrown) ||
 		 is_autopickup_exception(curr, TRUE)) &&
-	    	 !is_autopickup_exception(curr, FALSE))
+	        ((flags.pickup_dropped || !curr->was_dropped) &&
+	    	 !is_autopickup_exception(curr, FALSE)))
 #endif
 		n++;
+	}
 
 	if (n) {
 	    *pick_list = pi = (menu_item *) alloc(sizeof(menu_item) * n);
 	    for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow))
 #ifndef AUTOPICKUP_EXCEPTIONS
-		if (!*otypes || index(otypes, curr->oclass) ||
-		    (flags.pickup_thrown && curr->was_thrown)) {
+		if ((!*otypes || index(otypes, curr->oclass) ||
+	             (flags.pickup_thrown && curr->was_thrown)) &&
+	            (flags.pickup_dropped || !curr->was_dropped)) {
 #else
 	    if ((!*otypes || index(otypes, curr->oclass) ||
-		       (flags.pickup_thrown && curr->was_thrown) ||
+		 (flags.pickup_thrown && curr->was_thrown) ||
 		 is_autopickup_exception(curr, TRUE)) &&
-	    	 !is_autopickup_exception(curr, FALSE)) {
+	        ((flags.pickup_dropped || !curr->was_dropped) &&
+	    	 !is_autopickup_exception(curr, FALSE))) {
 #endif
 		    pi[n].item.a_obj = curr;
 		    pi[n].count = curr->quan;
@@ -757,7 +760,7 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 		    add_menu(win, obj_to_glyph(curr), &any,
 			    qflags & USE_INVLET ? curr->invlet : 0,
 			    def_oc_syms[(int)objects[curr->otyp].oc_class],
-			    ATR_NONE, doname(curr), MENU_UNSELECTED);
+			    ATR_NONE, doname_with_price(curr), MENU_UNSELECTED);
 		}
 	    }
 	    pack++;
@@ -1306,7 +1309,7 @@ boolean telekinesis;	/* not picking it up directly by hand */
 		    obj->quan -= count;
 	    }
 	    flags.botl = 1;
-	    if (flags.run) nomul(0);
+	    if (flags.run) nomul(0, 0);
 	    return 1;
 #endif
 	} else if (obj->otyp == CORPSE) {
@@ -1526,6 +1529,7 @@ doloot()	/* loot a container on the floor or loot saddle from mon. */
     char qbuf[BUFSZ];
     int prev_inquiry = 0;
     boolean prev_loot = FALSE;
+    int container_count = 0;
 
     if (check_capacity((char *)0)) {
 	/* "Can't do that while carrying so much stuff." */
@@ -1539,7 +1543,7 @@ doloot()	/* loot a container on the floor or loot saddle from mon. */
 
 lootcont:
 
-    if (container_at(cc.x, cc.y, FALSE)) {
+    if ((container_count = container_at(cc.x, cc.y, TRUE))) {
 	boolean any = FALSE;
 
 	if (!able_to_loot(cc.x, cc.y)) return 0;
@@ -1547,13 +1551,16 @@ lootcont:
 	    nobj = cobj->nexthere;
 
 	    if (Is_container(cobj)) {
-		Sprintf(qbuf, "There is %s here, loot it?",
-			safe_qbuf("", sizeof("There is  here, loot it?"),
-			     doname(cobj), an(simple_typename(cobj->otyp)),
-			     "a container"));
-		c = ynq(qbuf);
-		if (c == 'q') return (timepassed);
-		if (c == 'n') continue;
+		/* don't ask if there is only one lootable object */
+		if (container_count != 1 || iflags.vanilla_ui_behavior) {
+			Sprintf(qbuf, "There is %s here, loot it?",
+				safe_qbuf("", sizeof("There is  here, loot it?"),
+				     doname(cobj), an(simple_typename(cobj->otyp)),
+				     "a container"));
+			c = ynq(qbuf);
+			if (c == 'q') return (timepassed);
+			if (c == 'n') continue;
+		}
 		any = TRUE;
 
 		if (cobj->olocked) {
@@ -2118,7 +2125,7 @@ register int held;
 	    (void) chest_trap(obj, HAND, FALSE);
 	    /* even if the trap fails, you've used up this turn */
 	    if (multi >= 0) {	/* in case we didn't become paralyzed */
-		nomul(-1);
+		nomul(-1, "opening a container");
 		nomovemsg = "";
 	    }
 	    return 1;
@@ -2193,7 +2200,7 @@ ask_again2:
 		if (cnt) Strcat(pbuf, "m");
 		switch (yn_function(qbuf, pbuf, 'n')) {
 		case ':':
-		    container_contents(current_container, FALSE, FALSE);
+		    container_contents(current_container, FALSE, FALSE, TRUE);
 		    goto ask_again2;
 		case 'y':
 		    if (query_classes(select, &one_by_one, &allflag,

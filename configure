@@ -747,8 +747,6 @@ ac_user_opts='
 enable_option_checking
 enable_tty_graphics
 enable_curses_graphics
-enable_x11_graphics
-enable_mswin_graphics
 with_compression
 enable_data_librarian
 enable_sinks
@@ -771,6 +769,7 @@ enable_exp_on_botl
 enable_score_on_botl
 enable_realtime_on_botl
 enable_high_score_comparison_by_uid
+enable_paranoid
 enable_show_born
 enable_show_extinct
 enable_dungeon_growth
@@ -784,6 +783,8 @@ enable_livelog_shout
 enable_dump
 enable_dump_file
 enable_dump_messages
+enable_dump_text
+enable_dump_html
 enable_whereis_file
 enable_wizmode
 with_owner
@@ -1434,8 +1435,6 @@ Optional Features:
   --enable-tty-graphics   use tty-graphics (default=auto)
   --enable-curses-graphics
                           use curses interface (default=no)
-  --enable-x11-graphics   use x11-graphics (default=no)
-  --enable-mswin-graphics use Microsoft Window's native graphics (default=no)
   --enable-data-librarian Data librarian (default=auto)
   --enable-sinks          Kitchen sinks (default=yes)
   --enable-wallified-maze Fancy mazes (default=yes)
@@ -1462,6 +1461,8 @@ Optional Features:
   --enable-high-score-comparison-by-uid
                           Compare High Score entries by user id instead of
                           user name (default=no)
+  --enable-paranoid       Require some questions to be answered with 'yes'
+                          instead of 'y' (default=yes)
   --enable-show-born      Display number of created monsters at the end of
                           game (default=yes)
   --enable-show-extinct   Display extinct monsters at the end of game
@@ -1484,6 +1485,8 @@ Optional Features:
   --enable-dump-messages=NUMBER
                           Number of dumped messages (default=yes, default
                           number=20)
+  --enable-dump-text      Dump a text file (default=yes)
+  --enable-dump-html      Dump an HTML file (default=no)
   --enable-whereis-file=FILE
                           Log information about running games (default=no,
                           default file=%n.whereis)
@@ -2087,26 +2090,10 @@ fi
   if test "$enable_curses_graphics" != "no"; then
     nethack_wins="curses $nethack_wins"
   fi
-# Check whether --enable-x11-graphics was given.
-if test "${enable_x11_graphics+set}" = set; then
-  enableval=$enable_x11_graphics; enable_x11_graphics="$enableval"
-else
-  enable_x11_graphics="no"
-fi
-
-  if test "$enable_x11_graphics" != "no"; then
-    nethack_wins="x11 $nethack_wins"
-  fi
-# Check whether --enable-mswin-graphics was given.
-if test "${enable_mswin_graphics+set}" = set; then
-  enableval=$enable_mswin_graphics; enable_mswin_graphics="$enableval"
-else
-  enable_mswin_graphics="no"
-fi
-
-  if test "$enable_mswin_graphics" != "no"; then
-    nethack_wins="mswin $nethack_wins"
-  fi
+#NETHACK_WIN_ENABLE(x11, no)
+#NETHACK_WIN_ENABLE(mswin, no, [use Microsoft Window's native graphics])
+enable_x11_graphics="no"
+enable_mswin_graphics="no"
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -7519,6 +7506,25 @@ _ACEOF
 # NETHACK_ARG(show-dmg,[Display damage reports],SHOW_DMG,yes)
 # NETHACK_ARG(show-weight,[Display object weight],SHOW_WEIGHT,yes)
 # NETHACK_ARG(other-services,[Shopkeeper services],OTHER_SERVICES,yes)
+{ $as_echo "$as_me:$LINENO: checking whether to enable paranoid" >&5
+$as_echo_n "checking whether to enable paranoid... " >&6; }
+   # Check whether --enable-paranoid was given.
+if test "${enable_paranoid+set}" = set; then
+  enableval=$enable_paranoid;
+else
+  enable_paranoid="yes"
+fi
+
+   { $as_echo "$as_me:$LINENO: result: $enable_paranoid" >&5
+$as_echo "$enable_paranoid" >&6; }
+   if test "$enable_paranoid" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define PARANOID /**/
+_ACEOF
+
+   fi
+
 { $as_echo "$as_me:$LINENO: checking whether to enable show-born" >&5
 $as_echo_n "checking whether to enable show-born... " >&6; }
    # Check whether --enable-show-born was given.
@@ -7804,6 +7810,44 @@ _ACEOF
    else
       { $as_echo "$as_me:$LINENO: result: no" >&5
 $as_echo "no" >&6; }
+   fi
+
+	{ $as_echo "$as_me:$LINENO: checking whether to enable dump-text" >&5
+$as_echo_n "checking whether to enable dump-text... " >&6; }
+   # Check whether --enable-dump-text was given.
+if test "${enable_dump_text+set}" = set; then
+  enableval=$enable_dump_text;
+else
+  enable_dump_text="yes"
+fi
+
+   { $as_echo "$as_me:$LINENO: result: $enable_dump_text" >&5
+$as_echo "$enable_dump_text" >&6; }
+   if test "$enable_dump_text" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define DUMP_TEXT_LOG /**/
+_ACEOF
+
+   fi
+
+	{ $as_echo "$as_me:$LINENO: checking whether to enable dump-html" >&5
+$as_echo_n "checking whether to enable dump-html... " >&6; }
+   # Check whether --enable-dump-html was given.
+if test "${enable_dump_html+set}" = set; then
+  enableval=$enable_dump_html;
+else
+  enable_dump_html="no"
+fi
+
+   { $as_echo "$as_me:$LINENO: result: $enable_dump_html" >&5
+$as_echo "$enable_dump_html" >&6; }
+   if test "$enable_dump_html" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define DUMP_HTML_LOG /**/
+_ACEOF
+
    fi
 
 fi

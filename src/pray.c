@@ -7,7 +7,6 @@
 
 STATIC_PTR int NDECL(prayer_done);
 STATIC_DCL struct obj *NDECL(worst_cursed_item);
-STATIC_DCL int NDECL(in_trouble);
 STATIC_DCL void FDECL(fix_worst_trouble,(int));
 STATIC_DCL void FDECL(angrygods,(ALIGNTYP_P));
 STATIC_DCL void FDECL(at_your_feet, (const char *));
@@ -116,7 +115,7 @@ but that's really hard.
 #define on_shrine()	((levl[u.ux][u.uy].altarmask & AM_SHRINE) != 0)
 #define a_align(x,y)	((aligntyp)Amask2align(levl[x][y].altarmask & AM_MASK))
 
-STATIC_OVL int
+int
 in_trouble()
 {
 	struct obj *otmp;
@@ -360,7 +359,7 @@ register int trouble;
 			}
 		    }
 		    if (nohands(youmonst.data) || !freehand())
-			impossible("fix_worst_trouble: couldn't cure hands.");
+			warning("fix_worst_trouble: couldn't cure hands.");
 		    break;
 	    case TROUBLE_CURSED_BLINDFOLD:
 		    otmp = ublindf;
@@ -388,7 +387,7 @@ register int trouble;
 		    else if (otmp == uleft) what = leftglow;
 decurse:
 		    if (!otmp) {
-			impossible("fix_worst_trouble: nothing to uncurse.");
+			warning("fix_worst_trouble: nothing to uncurse.");
 			return;
 		    }
 		    uncurse(otmp);
@@ -1011,7 +1010,7 @@ pleased(g_align)
 	    place_object(otmp, u.ux, u.uy);
 	    break;
 	}
-	default:	impossible("Confused deity!");
+	default:	warning("Confused deity!");
 	    break;
 	}
 
@@ -1126,6 +1125,9 @@ dosacrifice()
     char qbuf[QBUFSZ];
     char c;
 
+    int conduct, cdt;
+    char killerbuf[128];	
+
     if (!on_altar() || u.uswallow) {
 	You("are not standing on an altar.");
 	return 0;
@@ -1143,7 +1145,7 @@ dosacrifice()
 		    if ((c = yn_function(qbuf,ynqchars,'n')) == 'y')
 			    break;
 		    else if (c == 'q')
-			    otmp = ((struct obj *) 0);
+			    return 0;
 	    }
     }
     if (!otmp)
@@ -1221,7 +1223,7 @@ dosacrifice()
 		    if (sgn(u.ualign.type) == sgn(dmon->data->maligntyp))
 			dmon->mpeaceful = TRUE;
 		    You("are terrified, and unable to move.");
-		    nomul(-3);
+		    nomul(-3, "being terrified of a demon");
 		} else pline_The("%s.", demonless_msg);
 	    }
 
@@ -1320,6 +1322,70 @@ pline("An invisible choir sings, and you are bathed in radiance...");
 verbalize("In return for thy service, I grant thee the gift of Immortality!");
 		You("ascend to the status of Demigod%s...",
 		    flags.female ? "dess" : "");
+
+	/*
+	 * Check if there's a major successful conduct for the highscore.
+	 * If so, look for additional ones and put everything into the
+	 * killer-string.
+	 *
+	 * In the logfile this looks like:
+	 *	 "ascended adjective adjective ... noun"
+	 *
+	 * In the highscore it looks like:
+	 * 	Patito-Mon-Hum-Mal-Cha the nude vegan pacifist
+	 * 	ascended to demigod-hood. 
+	 */
+
+		conduct = FIRST_CONDUCT;
+
+		while (conduct <= LAST_CONDUCT){
+		    if(successful_cdt(conduct) && conducts[conduct].highscore
+					&& !superfluous_cdt(conduct))
+			 break;
+		    conduct++;
+		}
+		
+		if (conduct <= LAST_CONDUCT) {
+
+		    /* we found a conduct */
+
+		    Sprintf(killerbuf, "ascended ");
+
+		    /*
+		     * continue to search with the next following conduct
+		     * and look for additional highscore conducts
+		     */
+
+		    cdt = conduct + 1;
+
+		    while (cdt <= LAST_CONDUCT){ 
+
+			if (successful_cdt(cdt) && conducts[cdt].highscore
+					&& !superfluous_cdt(cdt)) {
+
+			    /*
+			     * we found an additional conduct; now
+			     * add an adjective to the killer-string,
+			     * and continue the search
+			     */
+
+			    Sprintf(eos(killerbuf),"%s ",conducts[cdt].adj);
+
+			}
+
+			cdt++;
+		    }
+
+			/* now finally add the noun */
+
+		    strcat(killerbuf, conducts[conduct].noun);
+
+		    killer_format = NO_KILLER_PREFIX;
+		    killer = killerbuf;
+
+		} else 		/* No conducts found */
+		    killer = 0;
+
 		done(ASCENDED);
 	    }
 	}
@@ -1611,7 +1677,7 @@ dopray()
 	}
     }
 #endif
-    nomul(-3);
+    nomul(-3, "praying");
     nomovemsg = "You finish your prayer.";
     afternmv = prayer_done;
 
@@ -1771,7 +1837,7 @@ doturn()
 		    }
 	    }
 	}
-	nomul(-5);
+	nomul(-5, "trying to turn the monsters");
 	return(1);
 }
 
@@ -1807,7 +1873,7 @@ aligntyp alignment;
      case A_LAWFUL:	gnam = urole.lgod; break;
      case A_NEUTRAL:	gnam = urole.ngod; break;
      case A_CHAOTIC:	gnam = urole.cgod; break;
-     default:		impossible("unknown alignment.");
+     default:		warning("unknown alignment.");
 			gnam = "someone"; break;
     }
     if (*gnam == '_') ++gnam;

@@ -1992,7 +1992,7 @@ Allows you to change the way recalled messages are displayed.
 The possible values are:
 .sd
 .si
-s - single message (default, this was the behavior before 3.4.0).
+s - single message
 c - combination, two messages as `single', then as `full'.
 f - full window, oldest message first.
 r - full window, newest message first.
@@ -2040,6 +2040,15 @@ Specify the order to list object types in (default ``")[%?+!=/(*`0_'').
 The value of this option should be a string containing the
 symbols for the various object types.  Any omitted types are filled in
 at the end from the previous order.
+.lp paranoid_hit
+If true, asks you to type the word ``yes'' when hitting any peaceful
+monster, not just the letter ``y''.
+.lp paranoid_quit
+If true, asks you to type the word ``yes'' when quitting or entering
+Explore mode, not just the letter ``y''.
+.lp paranoid_remove
+If true, always show menu with the R and T commands even when there is
+only one item to remove or take off.
 .lp perm_invent
 If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.
@@ -2053,6 +2062,13 @@ When you pick up an item that would exceed this encumbrance
 level (Unburdened, Burdened, streSsed, straiNed, overTaxed,
 or overLoaded), you will be asked if you want to continue.
 (Default `S').
+.lp pickup_dropped
+If this boolean option is false and
+.op autopickup
+is on, don't pick up things that you have droppped deliberately, even if they
+are in
+.op pickup_types .
+Default is on.
 .lp pickup_thrown
 If this boolean option is true and
 .op autopickup
@@ -2068,6 +2084,10 @@ compile time option AUTOPICKUP_EXCEPTIONS included, you may be able to use
 configuration file lines to further refine
 .op autopickup
 behavior.
+.lp pilesize
+Allows setting the number of items that trigger the "Things that are here".
+The minimum value allowed is 1, which will tell you about one object
+and will never give you the "Things that are here" list. 
 .lp prayconfirm
 Prompt for confirmation before praying (default on).
 .lp pushweapon

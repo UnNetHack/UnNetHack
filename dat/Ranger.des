@@ -8,9 +8,10 @@
 #	Here you meet your (besieged) class leader, Orion,
 #	and receive your quest assignment.
 #
-MAZE: "Ran-strt",'.'
-FLAGS: noteleport,hardfloor,arboreal
-INIT_MAP:'.','.',true,true,lit,false
+LEVEL: "Ran-strt"
+FLAGS: noteleport,hardfloor,arboreal,mazelevel
+INIT_MAP:mines,'.','.',true,true,lit,false
+MON_GENERATION:86%, (64,"forest centaur"), (16,'C'), (16,"scorpion"), (4,'s')
 GEOMETRY:left,center
 #1234567890123456789012345678901234567890123456789012345678901234567890
 MAP
@@ -101,8 +102,10 @@ MONSTER: 's',"scorpion",random,hostile
 #	further towards your assigned quest.
 #
 
-MAZE: "Ran-loca",' '
-FLAGS: hardfloor
+LEVEL: "Ran-loca"
+FLAGS: hardfloor,mazelevel
+INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"forest centaur"), (16,'C'), (16,"scorpion"), (4,'s')
 GEOMETRY:center,center
 #1234567890123456789012345678901234567890123456789012345678901234567890
 MAP
@@ -184,7 +187,10 @@ MONSTER:'s',random,random,hostile
 #	been assigned to retrieve.
 #
 
-MAZE: "Ran-goal", ' '
+LEVEL: "Ran-goal"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"forest centaur"), (16,'C'), (16,"scorpion"), (4,'s')
 GEOMETRY:center,center
 MAP
                                                                             
@@ -215,7 +221,7 @@ STAIR:(19,10),up
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Objects
-OBJECT:')',"bow",(37,10),blessed,0,"The Longbow of Diana"
+OBJECT:')',"bow",(37,10),blessed,0,NAME:"The Longbow of Diana"
 OBJECT:'(',"chest",(37,10)
 OBJECT:random,random,(36,09)
 OBJECT:random,random,(36,10)
@@ -293,8 +299,10 @@ WALLIFY
 #	and goal levels.
 #
 
-MAZE: "Ran-fila" , 'T'
-INIT_MAP: '.' , 'T', true, true, random, true
+LEVEL: "Ran-fila"
+FLAGS:mazelevel
+INIT_MAP: mines, '.' , 'T', true, true, random, true
+MON_GENERATION:86%, (64,"forest centaur"), (16,'C'), (16,"scorpion"), (4,'s')
 NOMAP
 #
 STAIR: random, up
@@ -321,8 +329,10 @@ MONSTER: 'C', "forest centaur", random, hostile
 MONSTER: 'C', random, random, hostile
 MONSTER: 's', "scorpion", random, hostile
 
-MAZE: "Ran-filb" , ' '
-INIT_MAP: '.' , ' ', true, true, random, true
+LEVEL: "Ran-filb"
+FLAGS:mazelevel
+INIT_MAP: mines, '.' , ' ', true, true, random, true
+MON_GENERATION:86%, (64,"forest centaur"), (16,'C'), (16,"scorpion"), (4,'s')
 NOMAP
 #
 STAIR: random, up

@@ -30,10 +30,22 @@
 #     passing a dexterity check).
 #   Bones files are not permitted.
 
+# Each sokoban map should call this.
+FUNCTION soko_loot()
+{
+  # Random objects
+  OBJECT:'%',random,random
+  OBJECT:'%',random,random
+  OBJECT:'%',random,random
+  OBJECT:'%',random,random
+  OBJECT:'=',random,random
+  OBJECT:'/',random,random
+}
 
 ### Bottom (first) level of Sokoban ###
-MAZE:"soko4-1",' '
-FLAGS:noteleport,hardfloor
+LEVEL:"soko4-1"
+FLAGS:noteleport,hardfloor,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 #12345678901234567890123456789012345678901234567890
 MAP
@@ -86,17 +98,12 @@ TRAP:"pit",(07,10)
 OBJECT:'?',"earth",(02,11)
 OBJECT:'?',"earth",(03,11)
 
-# Random objects
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+soko_loot()
 
 
-MAZE:"soko4-2",' '
-FLAGS:noteleport,hardfloor
+LEVEL:"soko4-2"
+FLAGS:noteleport,hardfloor,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 #12345678901234567890123456789012345678901234567890
 MAP
@@ -150,18 +157,13 @@ TRAP:"pit",(06,08)
 OBJECT:'?',"earth",(01,09)
 OBJECT:'?',"earth",(02,09)
 
-# Random objects
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+soko_loot()
 
 
 ### Second level ###
-MAZE:"soko3-1",' '
-FLAGS:noteleport
+LEVEL:"soko3-1"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 #12345678901234567890123456789012345678901234567890
 MAP
@@ -227,17 +229,12 @@ TRAP:"hole",(24,10)
 TRAP:"hole",(25,10)
 TRAP:"hole",(26,10)
 
-# Random objects
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+soko_loot()
 
 
-MAZE:"soko3-2",' '
-FLAGS:noteleport
+LEVEL:"soko3-2"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 #12345678901234567890123456789012345678901234567890
 MAP
@@ -295,18 +292,13 @@ TRAP:"hole",(21,10)
 TRAP:"hole",(22,10)
 TRAP:"hole",(23,10)
 
-# Random objects
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+soko_loot()
 
 
 ### Third level ###
-MAZE:"soko2-1",' '
-FLAGS:noteleport
+LEVEL:"soko2-1"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 #12345678901234567890123456789012345678901234567890
 MAP
@@ -361,17 +353,12 @@ TRAP:"hole",(15,09)
 TRAP:"hole",(16,09)
 TRAP:"hole",(17,09)
 
-# Random objects
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+soko_loot()
 
 
-MAZE:"soko2-2",' '
-FLAGS:noteleport
+LEVEL:"soko2-2"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 #12345678901234567890123456789012345678901234567890
 MAP
@@ -427,18 +414,13 @@ TRAP:"hole",(15,11)
 TRAP:"hole",(16,11)
 TRAP:"hole",(17,11)
 
-# Random objects
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+soko_loot()
 
 
 ### Top (last) level of Sokoban ###
-MAZE:"soko1-1",' '
-FLAGS:noteleport
+LEVEL:"soko1-1"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 #12345678901234567890123456789012345678901234567890
 MAP
@@ -511,13 +493,7 @@ TRAP:"hole",(23,01)
 MONSTER:'m',"giant mimic", random, m_object "boulder"
 MONSTER:'m',"giant mimic", random, m_object "boulder"
 
-# Random objects
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+soko_loot()
 
 # Rewards
 DOOR:locked,(23,13)
@@ -531,8 +507,9 @@ ENGRAVING:place[1],burn,"Elbereth"
 ENGRAVING:place[2],burn,"Elbereth"
 
 
-MAZE:"soko1-2",' '
-FLAGS:noteleport
+LEVEL:"soko1-2"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 #12345678901234567890123456789012345678901234567890
 MAP
@@ -607,13 +584,7 @@ TRAP:"hole",(22,01)
 MONSTER:'m',"giant mimic", random, m_object "boulder"
 MONSTER:'m',"giant mimic", random, m_object "boulder"
 
-# Random objects
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+soko_loot()
 
 # Rewards
 DOOR:locked,(23,12)
@@ -630,8 +601,9 @@ ENGRAVING:place[2],burn,"Elbereth"
 # Following Sokoban levels heavily modified for NetHack by Pasi Kallinen
 # The original authors are listed just before the maps
 #
-MAZE:"soko4-3",' '
-FLAGS:noteleport, hardfloor
+LEVEL:"soko4-3"
+FLAGS:noteleport, hardfloor,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "J Franklin Mentzer <wryter@aol.com>"
 MAP
@@ -683,8 +655,9 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-MAZE:"soko4-4",' '
-FLAGS:noteleport, hardfloor
+LEVEL:"soko4-4"
+FLAGS:noteleport, hardfloor,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "Joseph L Traub"
 MAP
@@ -744,8 +717,9 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-MAZE:"soko4-5",' '
-FLAGS:noteleport, hardfloor
+LEVEL:"soko4-5"
+FLAGS:noteleport, hardfloor,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "Thinking Rabbit"
 MAP
@@ -805,8 +779,9 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-MAZE:"soko4-6",' '
-FLAGS:noteleport, hardfloor
+LEVEL:"soko4-6"
+FLAGS:noteleport, hardfloor,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "Joseph L Traub"
 MAP
@@ -859,8 +834,9 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-MAZE:"soko4-7",' '
-FLAGS:noteleport, hardfloor
+LEVEL:"soko4-7"
+FLAGS:noteleport, hardfloor,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "J Franklin Mentzer <wryter@aol.com>"
 MAP
@@ -957,8 +933,9 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-MAZE:"soko4-8",' '
-FLAGS:noteleport, hardfloor
+LEVEL:"soko4-8"
+FLAGS:noteleport, hardfloor,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "Thinking Rabbit" 
 MAP
@@ -1004,8 +981,9 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-MAZE:"soko4-9",' '
-FLAGS:noteleport, hardfloor
+LEVEL:"soko4-9"
+FLAGS:noteleport, hardfloor,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "Joseph L Traub"
 MAP
@@ -1052,8 +1030,9 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-MAZE:"soko3-3",' '
-FLAGS:noteleport
+LEVEL:"soko3-3"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "Thinking Rabbit" 
 MAP
@@ -1104,8 +1083,9 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-MAZE:"soko3-4",' '
-FLAGS:noteleport
+LEVEL:"soko3-4"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "Thinking Rabbit" 
 MAP
@@ -1165,8 +1145,9 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-MAZE:"soko3-5",' '
-FLAGS:noteleport
+LEVEL:"soko3-5"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "Joseph L Traub"
 MAP
@@ -1221,8 +1202,9 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-MAZE:"soko3-6",' '
-FLAGS:noteleport
+LEVEL:"soko3-6"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "Joseph L Traub"
 MAP
@@ -1290,8 +1272,9 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-MAZE:"soko3-7",' '
-FLAGS:noteleport
+LEVEL:"soko3-7"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "Joseph L Traub" 
 MAP
@@ -1347,8 +1330,9 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-MAZE:"soko2-3",' '
-FLAGS:noteleport
+LEVEL:"soko2-3"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "Thinking Rabbit"
 MAP
@@ -1410,8 +1394,9 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-MAZE:"soko2-4",' '
-FLAGS:noteleport
+LEVEL:"soko2-4"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "Joseph L Traub"
 MAP
@@ -1468,8 +1453,9 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-MAZE:"soko2-5",' '
-FLAGS:noteleport
+LEVEL:"soko2-5"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "Joseph L Traub"
 MAP
@@ -1529,8 +1515,9 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-MAZE:"soko2-6",' '
-FLAGS:noteleport
+LEVEL:"soko2-6"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "Thinking Rabbit"
 MAP
@@ -1593,8 +1580,9 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-MAZE:"soko2-7",' '
-FLAGS:noteleport
+LEVEL:"soko2-7"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "Thinking Rabbit"
 MAP
@@ -1647,8 +1635,9 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-MAZE:"soko1-3",' '
-FLAGS:noteleport
+LEVEL:"soko1-3"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "J Franklin Mentzer <wryter@aol.com>"
 MAP
@@ -1724,8 +1713,9 @@ ENGRAVING:place[1],burn,"Elbereth"
 ENGRAVING:place[2],burn,"Elbereth"
 
 
-MAZE:"soko1-4",' '
-FLAGS:noteleport
+LEVEL:"soko1-4"
+FLAGS:noteleport,mazelevel,premapped
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # "J Franklin Mentzer <wryter@aol.com>"
 MAP

@@ -8,8 +8,10 @@
 #	Here you meet your (besieged) class leader, Hippocrates
 #	and receive your quest assignment.
 #
-MAZE: "Hea-strt",' '
-FLAGS: noteleport,hardfloor
+LEVEL: "Hea-strt"
+FLAGS: noteleport,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"giant rat"), (16,'r'), (16,"snake"), (4,'Y')
 GEOMETRY:center,center
 MAP
 PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
@@ -107,10 +109,11 @@ MONSTER: 'S',random,random,hostile
 #	further towards your assigned quest.
 #
 
-MAZE: "Hea-loca",' '
-FLAGS: hardfloor
+LEVEL: "Hea-loca"
+FLAGS: hardfloor,mazelevel
 #
-INIT_MAP: '.' , 'P', true , true , lit , false
+INIT_MAP: mines, '.' , 'P', true , true , lit , false
+MON_GENERATION:86%, (64,"giant rat"), (16,'r'), (16,"snake"), (4,'Y')
 GEOMETRY:center,center
 MAP
 PPPPPPPPPPPPP.......PPPPPPPPPPP
@@ -207,9 +210,11 @@ MONSTER: 'S',random,random,hostile
 #	been assigned to retrieve.
 #
 
-MAZE: "Hea-goal", 'P'
+LEVEL: "Hea-goal"
+FLAGS:mazelevel
 #
-INIT_MAP: '.' , 'P' , false , true , lit , false
+INIT_MAP: mines, '.' , 'P' , false , true , lit , false
+MON_GENERATION:86%, (64,"giant rat"), (16,'r'), (16,"snake"), (4,'Y')
 GEOMETRY:center,center
 MAP
 .P....................................PP.
@@ -232,7 +237,7 @@ STAIR:(39,10),up
 # Non diggable walls
 NON_DIGGABLE:(00,00,40,11)
 # Objects
-OBJECT:')',"quarterstaff",(20,06),blessed,0,"The Staff of Aesculapius"
+OBJECT:')',"quarterstaff",(20,06),blessed,0,NAME:"The Staff of Aesculapius"
 OBJECT:'/',"lightning",(20,06)
 OBJECT:random,random,random
 OBJECT:random,random,random
@@ -298,8 +303,10 @@ MONSTER: 'S',random,random,hostile
 #	and goal levels.
 #
 
-MAZE: "Hea-fila" , 'P'
-INIT_MAP: '.' , 'P' , false , true , lit , false
+LEVEL: "Hea-fila"
+FLAGS:mazelevel
+INIT_MAP: mines, '.' , 'P' , false , true , lit , false
+MON_GENERATION:86%, (64,"giant rat"), (16,'r'), (16,"snake"), (4,'Y')
 NOMAP
 #
 STAIR: random, up
@@ -333,8 +340,10 @@ TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 
-MAZE: "Hea-filb" , 'P'
-INIT_MAP: '.' , 'P' , false , true , lit , false
+LEVEL: "Hea-filb"
+FLAGS:mazelevel
+INIT_MAP: mines, '.' , 'P' , false , true , lit , false
+MON_GENERATION:86%, (64,"giant rat"), (16,'r'), (16,"snake"), (4,'Y')
 NOMAP
 #
 STAIR: random, up

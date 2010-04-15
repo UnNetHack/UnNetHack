@@ -101,10 +101,6 @@ NEARDATA const char * const killed_by_prefix[] = {
 
 static winid toptenwin = WIN_ERR;
 
-#ifdef RECORD_START_END_TIME
-static time_t deathtime = 0L;
-#endif
-
 STATIC_OVL void
 topten_print(x)
 const char *x;
@@ -332,7 +328,7 @@ struct toptenentry *tt;
 
 #ifdef RECORD_START_END_TIME
   (void)fprintf(rfile, SEP "starttime=%ld", (long)u.ubirthday);
-  (void)fprintf(rfile, SEP "endtime=%ld", (long)deathtime);
+  (void)fprintf(rfile, SEP "endtime=%ld", (long)u.udeathday);
 #endif
 
 #ifdef RECORD_GENDER0
@@ -445,7 +441,7 @@ int how;
 	t0->name[NAMSZ] = '\0';
 	t0->death[0] = '\0';
 	switch (killer_format) {
-		default: impossible("bad killer format?");
+		default: warning("bad killer format?");
 		case KILLED_BY_AN:
 			Strcat(t0->death, killed_by_prefix[how]);
 			(void) strncat(t0->death, an(killer),
@@ -461,21 +457,7 @@ int how;
 			break;
 	}
 	t0->birthdate = yyyymmdd(u.ubirthday);
-
-#ifdef RECORD_START_END_TIME
-	/* Make sure that deathdate and deathtime refer to the same time; it
-	 * wouldn't be good to have deathtime refer to the day after deathdate. */
-
-#if defined(BSD) && !defined(POSIX_TYPES)
-	(void) time((long *)&deathtime);
-#else
-	(void) time(&deathtime);
-#endif
-
-	t0->deathdate = yyyymmdd(deathtime);
-#else
-	t0->deathdate = yyyymmdd((time_t)0L);
-#endif /* RECORD_START_END_TIME */
+	t0->deathdate = yyyymmdd(u.udeathday);
 
 	t0->tt_next = 0;
 #ifdef UPDATE_RECORD_IN_PLACE
@@ -779,6 +761,12 @@ boolean so;
 	    if ((bp = index(linebuf, ')')) != 0)
 		*bp = (t1->deathdnum == astral_level.dnum) ? '\0' : ' ';
 	    second_line = FALSE;
+	} else if (!strncmp("ascended ", t1->death, 9)) {
+	    Strcat(linebuf, "the ");
+	    Strcat(linebuf, t1->death + 9);
+	    Sprintf(eos(linebuf), " ascended to demigod%s-hood",
+		    (t1->plgend[0] == 'F') ? "dess" : "");
+	    second_line = FALSE;
 	} else if (!strncmp("ascended", t1->death, 8)) {
 	    Sprintf(eos(linebuf), "ascended to demigod%s-hood",
 		    (t1->plgend[0] == 'F') ? "dess" : "");
@@ -829,6 +817,7 @@ boolean so;
 	    }
 
 	    /* kludge for "quit while already on Charon's boat" */
+	    /* and "quit after breaking pacifism conduct"	*/
 	    if (!strncmp(t1->death, "quit ", 5))
 		Strcat(linebuf, t1->death + 4);
 	}
@@ -1167,7 +1156,7 @@ classmon(plch, fem)
 	/* this might be from a 3.2.x score for former Elf class */
 	if (!strcmp(plch, "E")) return PM_RANGER;
 
-	impossible("What weird role is this? (%s)", plch);
+	warning("What weird role is this? (%s)", plch);
 	return (PM_HUMAN_MUMMY);
 }
 

@@ -91,9 +91,10 @@ void livelog_achieve_update() {
 	}
 
 	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:achieve=0x%lx:achieve_diff=0x%lx\n",
+		"player=%s:turns=%ld:starttime=%ld:achieve=0x%lx:achieve_diff=0x%lx\n",
 		plname, 
 		moves, 
+		(long)u.ubirthday,
 		achieve_int,
 		achieve_diff);
 	livelog_write_string(strbuf);
@@ -107,10 +108,12 @@ livelog_wish(item)
 char *item;
 {
 	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:wish=%s\n",
+		"player=%s:turns=%ld:starttime=%ld:wish=%s:wish_count=%ld\n",
 		plname,
 		moves,
-		item);
+		(long)u.ubirthday,
+		item,
+		u.uconduct.wishes);
 	livelog_write_string(strbuf);
 }
 
@@ -134,9 +137,10 @@ doshout()
 			*p = ' ';
 
 	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:shout=%s\n",
+		"player=%s:turns=%ld:starttime=%ld:shout=%s\n",
 		plname,
 		moves,
+		(long)u.ubirthday,
 		buf);
 	livelog_write_string(strbuf);
 	
@@ -157,10 +161,11 @@ struct monst *mtmp;
 		/* $player killed the $bones_monst of $bones_killed the former
 		 * $bones_rank on $turns on dungeon level $dlev! */
 		snprintf(strbuf, STRBUF_LEN,
-				"player=%s:turns=%ld:dlev=%d:"
+				"player=%s:turns=%ld:starttime=%ld:dlev=%d:"
 				"bones_killed=%s:bones_rank=%s:bones_monst=%s\n",
 				plname,
 				moves,
+				(long)u.ubirthday,
 				depth(&u.uz),
 				name,
 				mtmp->former_rank,
@@ -174,9 +179,10 @@ struct monst *mtmp;
 		char *n = noit_mon_nam(mtmp);
 		/* $player killed a uniq monster */
 		snprintf(strbuf, STRBUF_LEN,
-				"player=%s:turns=%ld:killed_uniq=%s\n",
+				"player=%s:turns=%ld:starttime=%ld:killed_uniq=%s\n",
 				plname,
 				moves,
+				(long)u.ubirthday,
 				n);
 		livelog_write_string(strbuf);
 	}
@@ -194,12 +200,48 @@ long total;
 	   shop:       Name of the shop (e.g. general store)
 	   shoplifted: Merchandise worth this many Zorkmids was stolen */
 	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:shopkeeper=%s:shop=%s:shoplifted=%ld\n",
+		"player=%s:turns=%ld:starttime=%ld:shopkeeper=%s:shop=%s:shoplifted=%ld\n",
 		plname,
 		moves,
+		(long)u.ubirthday,
 		shk_name,
 		shop_name,
 		total);
+	livelog_write_string(strbuf);
+}
+
+/** Livelog method for reporting the starting/resuming of a game. */
+void
+livelog_game_started(verb, alignment_sex, race, role)
+const char* verb;
+const char* alignment_sex;
+const char* race;
+const char* role;
+{
+	snprintf(strbuf, STRBUF_LEN,
+		"player=%s:turns=%ld:starttime=%ld:game_action=%s:"
+		"alignment=%s:race=%s:role=%s\n",
+		plname,
+		moves,
+		(long)u.ubirthday,
+		verb,
+		alignment_sex,
+		race,
+		role);
+	livelog_write_string(strbuf);
+}
+
+/** Livelog method for reporting saving, quitting, etc. */
+void
+livelog_game_action(verb)
+const char* verb;
+{
+	snprintf(strbuf, STRBUF_LEN,
+		"player=%s:turns=%ld:starttime=%ld:game_action=%s\n",
+		plname,
+		moves,
+		(long)u.ubirthday,
+		verb);
 	livelog_write_string(strbuf);
 }
 

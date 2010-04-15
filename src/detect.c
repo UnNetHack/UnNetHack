@@ -414,7 +414,7 @@ int		class;		/* an object class, 0 for all */
     int sym, boulder = 0;
 
     if (class < 0 || class >= MAXOCLASSES) {
-	impossible("object_detect:  illegal class %d", class);
+	warning("object_detect:  illegal class %d", class);
 	class = 0;
     }
 
@@ -799,7 +799,7 @@ struct obj *obj;
 	pline("Too bad you can't see %s.", the(xname(obj)));
 	return;
     }
-    oops = (rnd(obj->blessed ? 10 : 20) > ACURR(A_INT) || obj->cursed);
+    oops = (rnd(obj->blessed ? 13 : 20) > ACURR(A_INT) || obj->cursed);
     if (oops && (obj->spe > 0)) {
 	switch (rnd(obj->oartifact ? 4 : 5)) {
 	case 1 : pline("%s too much to comprehend!", Tobjnam(obj, "are"));
@@ -863,7 +863,7 @@ struct obj *obj;
 	return;
     }
     You("peer into %s...", the(xname(obj)));
-    nomul(-rnd(10));
+    nomul(-rnd(10), "gazing into a crystal ball");
     nomovemsg = "";
     if (obj->spe <= 0)
 	pline_The("vision is unclear.");
@@ -1193,7 +1193,7 @@ register int aflag;
 			if(rnl(7-fund)) continue;
 			cvt_sdoor_to_door(&levl[x][y]);	/* .typ = DOOR */
 			exercise(A_WIS, TRUE);
-			nomul(0);
+			nomul(0, 0);
 			if (Blind && !aflag)
 			    feel_location(x,y);	/* make sure it shows up */
 			else
@@ -1203,7 +1203,7 @@ register int aflag;
 			levl[x][y].typ = CORR;
 			unblock_point(x,y);	/* vision */
 			exercise(A_WIS, TRUE);
-			nomul(0);
+			nomul(0, 0);
 			newsym(x,y);
 		    } else {
 		/* Be careful not to find anything in an SCORR or SDOOR */
@@ -1248,7 +1248,7 @@ register int aflag;
 			}
 
 			if ((trap = t_at(x,y)) && !trap->tseen && !rnl(8)) {
-			    nomul(0);
+			    nomul(0, 0);
 
 			    if (trap->ttyp == STATUE_TRAP) {
 				if (activate_statue_trap(trap, x, y, FALSE))
@@ -1282,8 +1282,14 @@ sokoban_detect()
 	/* Map the background and boulders */
 	for (x = 1; x < COLNO; x++)
 	    for (y = 0; y < ROWNO; y++) {
-	    	levl[x][y].seenv = SVALL;
-	    	levl[x][y].waslit = TRUE;
+		if (IS_WALL(levl[x][y].typ))
+		    levl[x][y].seenv = SVALL;
+		else if (levl[x][y].typ == SDOOR)
+		    levl[x][y].typ = DOOR;
+		else if (levl[x][y].typ == SCORR)
+		    levl[x][y].typ = CORR;
+
+		levl[x][y].waslit = (levl[x][y].typ != CORR) ? TRUE : levl[x][y].lit;
 	    	map_background(x, y, 1);
 	    	for (obj = level.objects[x][y]; obj; obj = obj->nexthere)
 	    	    if (obj->otyp == BOULDER)

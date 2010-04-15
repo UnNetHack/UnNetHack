@@ -65,7 +65,7 @@ register const char *pref;
 	register int i = (int)strlen(pref);
 
 	if(i > PREFIX) {
-		impossible("PREFIX too short (for %d).", i);
+		warning("PREFIX too short (for %d).", i);
 		return(s);
 	}
 	s -= i;
@@ -344,7 +344,10 @@ register struct obj *obj;
 					break;
 				}
 			}
-			if (!f) impossible("Bad fruit #%d?", obj->spe);
+			if (!f) warning("Bad fruit #%d?", obj->spe);
+			break;
+		} else if (typ == CREAM_PIE && piday()) {
+			Strcpy(buf, "irrational pie");
 			break;
 		}
 
@@ -392,7 +395,14 @@ register struct obj *obj;
 				obj->bknown && (obj->blessed || obj->cursed)) {
 				Strcat(buf, obj->blessed ? "holy " : "unholy ");
 			    }
-			    Strcat(buf, actualn);
+			    /* work around for potion alchemy bug that lets one
+			     * alchemize potions in unused range */
+			    if (actualn) {
+				Strcat(buf, actualn);
+			    } else {
+				warning("inexistant potion %d", obj->otyp);
+				Strcat(buf, "inexistant");
+			    }
 			} else {
 				Strcat(buf, " called ");
 				Strcat(buf, un);
@@ -553,9 +563,10 @@ char *prefix;
 		       is_flammable(obj) ? "fireproof " : "");
 }
 
-char *
-doname(obj)
+static char *
+doname_base(obj, with_price)
 register struct obj *obj;
+boolean with_price;
 {
 	boolean ispoisoned = FALSE;
 	char prefix[PREFIX];
@@ -600,7 +611,7 @@ register struct obj *obj;
 		Strcat(prefix, "cursed ");
 	    else if (obj->blessed)
 		Strcat(prefix, "blessed ");
-	    else if (iflags.show_buc || (!obj->known || !objects[obj->otyp].oc_charged ||
+	    else if (iflags.show_buc || ((!obj->known || !objects[obj->otyp].oc_charged ||
 		      (obj->oclass == ARMOR_CLASS ||
 		       obj->oclass == RING_CLASS))
 		/* For most items with charges or +/-, if you know how many
@@ -618,7 +629,7 @@ register struct obj *obj;
 #endif
 			&& obj->otyp != FAKE_AMULET_OF_YENDOR
 			&& obj->otyp != AMULET_OF_YENDOR
-			&& !Role_if(PM_PRIEST))
+			&& !Role_if(PM_PRIEST)))
 		Strcat(prefix, "uncursed ");
 	}
 
@@ -787,6 +798,11 @@ ring:
 			quotedprice += contained_cost(obj, shkp, 0L, FALSE, TRUE);
 		Sprintf(eos(bp), " (unpaid, %ld %s)",
 			quotedprice, currency(quotedprice));
+	} else if (with_price) {
+		long price = get_cost_of_shop_item(obj);
+		if (price > 0) {
+			Sprintf(eos(bp), " (%ld %s)", price, currency(price));
+		}
 	}
 	if (!strncmp(prefix, "a ", 2) &&
 			index(vowels, *(prefix+2) ? *(prefix+2) : *bp)
@@ -799,6 +815,22 @@ ring:
 	}
 	bp = strprepend(bp, prefix);
 	return(bp);
+}
+
+/** Wrapper function for vanilla behaviour. */
+char *
+doname(obj)
+register struct obj *obj;
+{
+	return doname_base(obj, FALSE);
+}
+
+/** Name of object including price. */
+char *
+doname_with_price(obj)
+register struct obj *obj;
+{
+	return doname_base(obj, TRUE);
 }
 
 #endif /* OVL0 */
@@ -1288,7 +1320,7 @@ const char *oldstr;
 
 	while (*oldstr==' ') oldstr++;
 	if (!oldstr || !*oldstr) {
-		impossible("plural of null?");
+		warning("plural of null?");
 		Strcpy(str, "s");
 		return str;
 	}
@@ -1552,7 +1584,7 @@ const char *oldstr;
 	char *str = nextobuf();
 
 	if (!oldstr || !*oldstr) {
-		impossible("singular of null?");
+		warning("singular of null?");
 		str[0] = 0;
 		return str;
 	}

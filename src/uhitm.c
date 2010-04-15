@@ -201,7 +201,7 @@ struct obj *wep;	/* uwep for attack(), null for kick_monster() */
 		}
 		if (canspotmon(mtmp)) {
 			Sprintf(qbuf, "Really attack %s?", mon_nam(mtmp));
-			if (yn(qbuf) != 'y') {
+			if (paranoid_yn(qbuf, iflags.paranoid_hit) != 'y') {
 				flags.move = 0;
 				return(TRUE);
 			}
@@ -1527,7 +1527,7 @@ register struct attack *mattk;
 		    if(thick_skinned(mdef->data)) tmp = 0;
 		    if(mdef->data == &mons[PM_SHADE]) {
 			if (!(uarmf && uarmf->blessed)) {
-			    impossible("bad shade attack function flow?");
+			    warning("bad shade attack function flow?");
 			    tmp = 0;
 			} else
 			    tmp = rnd(4); /* bless damage */
@@ -1763,22 +1763,18 @@ register struct attack *mattk;
 		}
 
 		You("eat %s brain!", s_suffix(mon_nam(mdef)));
-		u.uconduct.food++;
 		if (touch_petrifies(mdef->data) && !Stone_resistance && !Stoned) {
 		    Stoned = 5;
 		    killer_format = KILLED_BY_AN;
 		    delayed_killer = mdef->data->mname;
-#ifdef WEBB_DISINT
-          /*		handled in tohit
-
-                  } else if (touch_disintegrates(mdef->data)) {
-                  tmp += instadisintegrate(mdef->data->mname); */
-#endif
 		}
-		if (!vegan(mdef->data))
-		    u.uconduct.unvegan++;
 		if (!vegetarian(mdef->data))
-		    violated_vegetarian();
+		    violated(CONDUCT_VEGETARIAN);
+		else if (!vegan(mdef->data))
+		    violated(CONDUCT_VEGAN);
+		else
+		    violated(CONDUCT_FOODLESS);
+
 		if (mindless(mdef->data)) {
 		    pline("%s doesn't notice.", Monnam(mdef));
 		    break;
@@ -2021,11 +2017,12 @@ register struct attack *mattk;
 			}
 
 			/* KMH, conduct */
-			u.uconduct.food++;
-			if (!vegan(mdef->data))
-			     u.uconduct.unvegan++;
 			if (!vegetarian(mdef->data))
-			     violated_vegetarian();
+			    violated(CONDUCT_VEGETARIAN);
+			else if (!vegan(mdef->data))
+			    violated(CONDUCT_VEGAN);
+			else
+			    violated(CONDUCT_FOODLESS);
 
 			/* Use up amulet of life saving */
 			if (!!(otmp = mlifesaver(mdef))) m_useup(mdef, otmp);
@@ -2053,7 +2050,7 @@ register struct attack *mattk;
 				 */
 				You("digest %s.", mon_nam(mdef));
 				if (Slow_digestion) tmp *= 2;
-				nomul(-tmp);
+				nomul(-tmp, "digesting something");
 				nomovemsg = msgbuf;
 			    } else pline("%s", msgbuf);
 			    if (mdef->data == &mons[PM_GREEN_SLIME]) {
@@ -2387,7 +2384,7 @@ use_weapon:
 			break;
 
 		default: /* Strange... */
-			impossible("strange attack of yours (%d)",
+			warning("strange attack of yours (%d)",
 				 mattk->aatyp);
 	    }
 	    if (dhit == -1) {
@@ -2553,7 +2550,7 @@ uchar aatyp;
 			else {
 			    You("are frozen by %s gaze!",
 				  s_suffix(mon_nam(mon)));
-			    nomul((ACURR(A_WIS) > 12 || rn2(4)) ? -tmp : -127);
+			    nomul((ACURR(A_WIS) > 12 || rn2(4)) ? -tmp : -127, "frozen by a monster's gaze");
 			}
 		    } else {
 			pline("%s cannot defend itself.",
@@ -2565,7 +2562,7 @@ uchar aatyp;
 		} else { /* gelatinous cube */
 		    You("are frozen by %s!", mon_nam(mon));
 	    	    nomovemsg = 0;	/* default: "you can move again" */
-		    nomul(-tmp);
+		    nomul(-tmp, "frozen by a monster");
 		    exercise(A_DEX, FALSE);
 		}
 		break;

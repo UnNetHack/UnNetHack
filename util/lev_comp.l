@@ -64,6 +64,10 @@ int FDECL(yyoutput, (int));
 void FDECL(init_yyin, (FILE *));
 void FDECL(init_yyout, (FILE *));
 
+void FDECL(include_push, (const char *));
+int NDECL(include_pop);
+
+
 /*
  * This doesn't always get put in lev_comp.h
  * (esp. when using older versions of bison).
@@ -73,6 +77,13 @@ extern YYSTYPE yylval;
 int line_number = 1, colon_line_number = 1;
 static char map[4096];
 static int map_cnt = 0;
+
+int doing_included_file = 0;
+YY_BUFFER_STATE include_stack[5];
+int include_line[5];
+char *include_file[5];
+
+FILE *orig_yyin = NULL;
 
 %}
 %e 1500
@@ -98,13 +109,15 @@ static int map_cnt = 0;
 		  map[map_cnt - 1] = '\n';
 		  map[map_cnt] = '\0';
 		}
-^#.*\n		{ line_number++; }
+^[ \t]*#.*\n		{ line_number++; }
 :		{ colon_line_number = line_number; return ':'; }
 MESSAGE		return MESSAGE_ID;
-MAZE		return MAZE_ID;
 NOMAP		return NOMAP_ID;
 LEVEL		return LEVEL_ID;
 INIT_MAP	return LEV_INIT_ID;
+mazegrid	return MAZE_GRID_ID;
+solidfill	return SOLID_FILL_ID;
+mines		return MINES_ID;
 FLAGS		return FLAGS_ID;
 GEOMETRY	return GEOMETRY_ID;
 ^MAP\r?\n		{ BEGIN(MAPC); line_number++; }
@@ -133,22 +146,53 @@ POOL		return POOL_ID;
 NON_DIGGABLE	return NON_DIGGABLE_ID;
 NON_PASSWALL	return NON_PASSWALL_ID;
 IF		return IF_ID;
-THEN		return THEN_ID;
 ELSE		return ELSE_ID;
-ENDIF		return ENDIF_ID;
 EXIT		return EXIT_ID;
 ROOM		return ROOM_ID;
 SUBROOM		return SUBROOM_ID;
 RANDOM_CORRIDORS	return RAND_CORRIDOR_ID;
 CORRIDOR	return CORRIDOR_ID;
 SPILL	  return SPILL_ID;
+RANDLINE	return RANDLINE_ID;
 TERRAIN		return TERRAIN_ID;
 REPLACE_TERRAIN	return REPLACE_TERRAIN_ID;
+MON_GENERATION	return MON_GENERATION_ID;
 GOLD		return GOLD_ID;
+GRAVE		return GRAVE_ID;
 ENGRAVING	return ENGRAVING_ID;
 NAME		return NAME_ID;
 CHANCE		return CHANCE_ID;
+LOOP		return LOOP_ID;
+SWITCH		return SWITCH_ID;
+CASE		return CASE_ID;
+BREAK		return BREAK_ID;
+DEFAULT		return DEFAULT_ID;
+FUNCTION	return FUNCTION_ID;
+INCLUDE		return INCLUDE_ID;
+SOUNDS		return SOUNDS_ID;
+hear		{ yylval.i=LVLSND_HEARD;  return MSG_OUTPUT_TYPE; }
+pline		{ yylval.i=LVLSND_PLINED; return MSG_OUTPUT_TYPE; }
+verbal		{ yylval.i=LVLSND_VERBAL; return MSG_OUTPUT_TYPE; }
+feel		{ yylval.i=LVLSND_FELT;   return MSG_OUTPUT_TYPE; }
 levregion	return LEV;
+quantity	return QUANTITY_ID;
+buried		return BURIED_ID;
+eroded		return ERODED_ID;
+trapped		return TRAPPED_ID;
+recharged	return RECHARGED_ID;
+invisible	return INVIS_ID;
+greased		return GREASED_ID;
+female		return FEMALE_ID;
+cancelled	return CANCELLED_ID;
+revived		return REVIVED_ID;
+avenge		return AVENGE_ID;
+fleeing		return FLEEING_ID;
+blinded		return BLINDED_ID;
+paralyzed	return PARALYZED_ID;
+stunned		return STUNNED_ID;
+confused	return CONFUSED_ID;
+seen_traps	return SEENTRAPS_ID;
+all		return ALL_ID;
 horizontal	{ yylval.i=1; return HORIZ_OR_VERT; }
 vertical	{ yylval.i=2; return HORIZ_OR_VERT; }
 open		{ yylval.i=D_ISOPEN; return DOOR_STATE; }
@@ -205,12 +249,19 @@ blood		{ yylval.i=ENGR_BLOOD; return ENGRAVING_TYPE; }
 blessed		{ yylval.i=1; return CURSE_TYPE; }
 uncursed	{ yylval.i=2; return CURSE_TYPE; }
 cursed		{ yylval.i=3; return CURSE_TYPE; }
-contained	{ return CONTAINED; }
 noteleport	{ yylval.i=NOTELEPORT; return FLAG_TYPE; }
 hardfloor	{ yylval.i=HARDFLOOR; return FLAG_TYPE; }
 nommap		{ yylval.i=NOMMAP; return FLAG_TYPE; }
 arboreal	{ yylval.i=ARBOREAL; return FLAG_TYPE; }	/* KMH */
 shortsighted	{ yylval.i=SHORTSIGHTED; return FLAG_TYPE; }
+noflipx		{ yylval.i=NOFLIPX; return FLAG_TYPE; }
+noflipy		{ yylval.i=NOFLIPY; return FLAG_TYPE; }
+noflip		{ yylval.i=(NOFLIPX + NOFLIPY); return FLAG_TYPE; }
+mazelevel	{ yylval.i=MAZELEVEL; return FLAG_TYPE; }
+premapped	{ yylval.i=PREMAPPED; return FLAG_TYPE; }
+shroud		{ yylval.i=SHROUD; return FLAG_TYPE; }
+stormy		{ yylval.i=STORMY; return FLAG_TYPE; }
+graveyard	{ yylval.i=GRAVEYARD; return FLAG_TYPE; }
 \[\ *[0-9]+\%\ *\] { yylval.i = atoi(yytext + 1); return PERCENT; }
 [0-9]+\%	{ yylval.i = atoi(yytext); return SPERCENT; }
 [+\-]?[0-9]+	{ yylval.i=atoi(yytext); return INTEGER; }
@@ -218,6 +269,9 @@ shortsighted	{ yylval.i=SHORTSIGHTED; return FLAG_TYPE; }
 		  yylval.map = (char *) alloc(strlen(yytext+1)+1);
 		  Strcpy(yylval.map, yytext+1); /* Discard the first \" */
 		  return STRING; }
+[a-zA-Z_][a-zA-Z_0-9]*	{ yylval.map = (char *) alloc(strlen(yytext)+1);
+		  Strcpy(yylval.map, yytext);
+		  return NQSTRING; }
 \r?\n		{ line_number++; }
 [ \t]+		;
 '\\.'		{ yylval.i = yytext[2]; return CHAR; }
@@ -242,12 +296,63 @@ FILE *input_f;
 	else
 #endif
 	    yyin = input_f;
+	    if (!orig_yyin) orig_yyin = yyin;
 }
 /* analogous routine (for completeness) */
 void init_yyout( output_f )
 FILE *output_f;
 {
 	yyout = output_f;
+}
+
+void
+include_push(fname)
+const char *fname;
+{
+  if (doing_included_file >= 5)
+    yyerror("Too deep includes");
+  else {
+    FILE *fin;
+    fin = fopen(fname, "r");
+    if (!fin) {
+       yyerror("Cannot open file for including.");
+    } else {
+       include_stack[doing_included_file] = YY_CURRENT_BUFFER;
+       include_line[doing_included_file] = line_number;
+       include_file[doing_included_file] = strdup(fname);
+       doing_included_file++;
+       yyin = fin;
+       yy_switch_to_buffer(yy_create_buffer(fin, YY_BUF_SIZE));
+       BEGIN(INITIAL);
+       yyparse();
+    }
+  }
+}
+
+int
+include_pop()
+{
+  if (--doing_included_file < 0) {
+    doing_included_file = 0;
+    init_yyin(orig_yyin);
+    yy_switch_to_buffer(yy_create_buffer(orig_yyin, YY_BUF_SIZE));
+  } else {
+    if (include_file[doing_included_file])
+       free(include_file[doing_included_file]);
+    yy_switch_to_buffer(include_stack[doing_included_file]);
+    line_number = include_line[doing_included_file];
+  }
+  return 0;
+}
+
+/*
+ * Stub needed for lex interface.
+ */
+int
+yywrap()
+{
+    if (doing_included_file >= 0) include_pop();
+    return 1;
 }
 
 /*lev_comp.l*/

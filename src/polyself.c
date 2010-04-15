@@ -729,7 +729,7 @@ rehumanize()
 	    done(DIED);
 	}
 	if (!uarmg) selftouch("No longer petrify-resistant, you");
-	nomul(0);
+	nomul(0, 0);
 
 	flags.botl = 1;
 	vision_full_recalc = 1;
@@ -756,7 +756,7 @@ dobreathe()
 
 	mattk = attacktype_fordmg(youmonst.data, AT_BREA, AD_ANY);
 	if (!mattk)
-	    impossible("bad breath attack?");	/* mouthwash needed... */
+	    warning("bad breath attack?");	/* mouthwash needed... */
 	else
 	    buzz((int) (20 + mattk->adtyp-1), (int)mattk->damn,
 		u.ux, u.uy, u.dx, u.dy);
@@ -810,7 +810,7 @@ dospinweb()
 				if (u.ustuck->data->mattk[i].aatyp == AT_ENGL)
 					break;
 			if (i == NATTK)
-			       impossible("Swallower has no engulfing attack?");
+			       warning("Swallower has no engulfing attack?");
 			else {
 				char sweep[30];
 
@@ -884,7 +884,7 @@ dospinweb()
 			dotrap(ttmp, 0);
 			return(1);
 		default:
-			impossible("Webbing over trap type %d?", ttmp->ttyp);
+			warning("Webbing over trap type %d?", ttmp->ttyp);
 			return(0);
 		}
 	else if (On_stairs(u.ux, u.uy)) {
@@ -937,7 +937,7 @@ dogaze()
 	    }
 	}
 	if (adtyp != AD_CONF && adtyp != AD_FIRE) {
-	    impossible("gaze attack %d?", adtyp);
+	    warning("gaze attack %d?", adtyp);
 	    return 0;
 	}
 
@@ -1019,7 +1019,7 @@ dogaze()
 			    nomul((u.ulevel > 6 || rn2(4)) ?
 				    -d((int)mtmp->m_lev+1,
 					    (int)mtmp->data->mattk[0].damd)
-				    : -200);
+				    : -200, "frozen by a monster's gaze");
 			    return 1;
 			} else
 			    You("stiffen momentarily under %s gaze.",
@@ -1097,7 +1097,7 @@ domindblast()
 		if(mtmp->mpeaceful)
 			continue;
 		u_sen = telepathic(mtmp->data) && !mtmp->mcansee;
-		if ((u_sen || (telepathic(mtmp->data) && rn2(2)) || !rn2(10)
+		if (u_sen || (telepathic(mtmp->data) && rn2(2)) || (!rn2(10)
 			&& (which_armor(mtmp, W_ARMH) &&
 			    which_armor(mtmp, W_ARMH)->otyp != TINFOIL_HAT))) {
 			You("lock in on %s %s.", s_suffix(mon_nam(mtmp)),

@@ -516,6 +516,9 @@ touch_artifact(obj,mon)
 
     if(!oart) return 1;
 
+    /* [ALI] Thiefbane has a special affinity with shopkeepers */
+    if (mon->isshk && obj->oartifact == ART_THIEFBANE) return 1;
+
     yours = (mon == &youmonst);
     /* all quest artifacts are self-willed; it this ever changes, `badclass'
        will have to be extended to explicitly include quest artifacts */
@@ -622,7 +625,7 @@ struct monst *mtmp;
 			return !(yours ? Drain_resistance : resists_drli(mtmp));
 		case AD_STON:
 			return !(yours ? Stone_resistance : resists_ston(mtmp));
-		default:	impossible("Weird weapon special attack.");
+		default:	warning("Weird weapon special attack.");
 	    }
 	}
 	return(0);
@@ -691,7 +694,7 @@ xchar m;
 	}
     /* there is one slot per artifact, so we should never reach the
        end without either finding the artifact or an empty slot... */
-    impossible("couldn't discover artifact (%d)", (int)m);
+    warning("couldn't discover artifact (%d)", (int)m);
 }
 
 /* used to decide whether an artifact has been fully identified */
@@ -870,7 +873,7 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
 	    if (Antimagic) {
 		resisted = TRUE;
 	    } else {
-		nomul(-3);
+		nomul(-3, "being scared stiff");
 		nomovemsg = "";
 		if (magr && magr == u.ustuck && sticks(youmonst.data)) {
 		    u.ustuck = (struct monst *)0;
@@ -972,7 +975,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	*dmgptr += spec_dbon(otmp, mdef, *dmgptr);
 
 	if (youattack && youdefend) {
-	    impossible("attacking yourself with weapon?");
+	    warning("attacking yourself with weapon?");
 	    return FALSE;
 	}
 
@@ -1025,10 +1028,12 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	    return Mb_hit(magr, mdef, otmp, dmgptr, dieroll, vis, hittee);
 	}
 
-	if (!spec_dbon_applies) {
-	    /* since damage bonus didn't apply, nothing more to do;  
-	       no further attacks have side-effects on inventory */
-	    return FALSE;
+	if (otmp->oartifact != ART_THIEFBANE || !youdefend) {
+		if (!spec_dbon_applies) {
+			/* since damage bonus didn't apply, nothing more to do;  
+			   no further attacks have side-effects on inventory */
+			return FALSE;
+		}
 	}
 
 	/* We really want "on a natural 20" but Nethack does it in */
@@ -1079,8 +1084,9 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 			otmp->dknown = TRUE;
 			return TRUE;
 		}
-	    } else if (otmp->oartifact == ART_VORPAL_BLADE &&
-		       (dieroll == 1 || mdef->data->mlet == S_JABBERWOCK)) {
+	    } else if ((otmp->oartifact == ART_VORPAL_BLADE &&
+		        (dieroll == 1 || mdef->data->mlet == S_JABBERWOCK)) ||
+		      (otmp->oartifact == ART_THIEFBANE && dieroll < 3)) {
 		static const char * const behead_msg[2] = {
 		     "%s beheads %s!",
 		     "%s decapitates %s!"
@@ -1088,7 +1094,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 
 		if (youattack && u.uswallow && mdef == u.ustuck)
 			return FALSE;
-		wepdesc = artilist[ART_VORPAL_BLADE].name;
+		wepdesc = artilist[otmp->oartifact].name;
 		if (!youdefend) {
 			if (!has_head(mdef->data) || notonhead || u.uswallow) {
 				if (youattack)
@@ -1375,7 +1381,7 @@ arti_invoke(obj)
 	    break;
 	  }
 	case ENLIGHTENING:
-	    enlightenment(0);
+	    enlightenment(0, TRUE);
 	    break;
 	case CREATE_AMMO: {
 	    struct obj *otmp = mksobj(ARROW, TRUE, FALSE);

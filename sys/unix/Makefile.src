@@ -345,9 +345,10 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
 	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c rip.c \
 	   rnd.c role.c rumors.c save.c shk.c shknam.c sit.c sounds.c sp_lev.c \
-	   spell.c steal.c steed.c teleport.c timeout.c topten.c track.c trap.c \
-	   u_init.c uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
-	   windows.c wizard.c worm.c worn.c write.c zap.c
+	   spell.c steal.c steed.c teleport.c timeout.c topten.c track.c \
+           trap.c tutorial.c u_init.c uhitm.c vault.c version.c vision.c \
+	   weapon.c were.c wield.c windows.c wizard.c worm.c worn.c write.c \
+           zap.c
 
 # all operating-system-dependent .c (for dependencies and such)
 SYSCSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
@@ -402,9 +403,9 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
 	role.o rumors.o save.o shk.o shknam.o sit.o sounds.o sp_lev.o spell.o \
-	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o u_init.o \
-	uhitm.o vault.o vision.o vis_tab.o weapon.o were.o wield.o windows.o \
-	wizard.o worm.o worn.o write.o zap.o \
+	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o \
+	tutorial.o u_init.o uhitm.o vault.o vision.o vis_tab.o weapon.o \
+	were.o wield.o windows.o wizard.o worm.o worn.o write.o zap.o \
 	$(RANDOBJ) $(SYSOBJ) $(WINOBJ) version.o
 # the .o files from the HACKCSRC, SYSSRC, and WINSRC lists
 
@@ -583,13 +584,13 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/align.h \
 		../include/permonst.h ../include/monattk.h \
 		../include/monflag.h ../include/mondata.h ../include/pm.h \
 		../include/wintype.h ../include/decl.h ../include/quest.h \
-		../include/spell.h ../include/color.h ../include/obj.h \
-		../include/you.h ../include/attrib.h ../include/monst.h \
-		../include/skills.h ../include/onames.h ../include/timeout.h \
-		../include/trap.h ../include/flag.h ../include/rm.h \
-		../include/vision.h ../include/display.h ../include/engrave.h \
-		../include/rect.h ../include/region.h ../include/winprocs.h \
-		../include/wintty.h ../include/trampoli.h
+		../include/qtext.h ../include/spell.h ../include/color.h \
+		../include/obj.h ../include/you.h ../include/attrib.h \
+		../include/monst.h ../include/skills.h ../include/onames.h \
+		../include/timeout.h ../include/trap.h ../include/flag.h \
+		../include/rm.h ../include/vision.h ../include/display.h \
+		../include/engrave.h ../include/rect.h ../include/region.h \
+		../include/winprocs.h ../include/wintty.h ../include/trampoli.h
 	touch $(HACK_H)
 #
 tos.o: ../sys/atari/tos.c $(HACK_H) ../include/tcap.h
@@ -812,8 +813,8 @@ potion.o: potion.c $(HACK_H)
 pray.o: pray.c $(HACK_H) ../include/epri.h
 priest.o: priest.c $(HACK_H) ../include/mfndpos.h ../include/eshk.h \
 		../include/epri.h ../include/emin.h
-quest.o: quest.c $(HACK_H) ../include/qtext.h
-questpgr.o: questpgr.c $(HACK_H) ../include/dlb.h ../include/qtext.h
+quest.o: quest.c $(HACK_H)
+questpgr.o: questpgr.c $(HACK_H) ../include/dlb.h
 read.o: read.c $(HACK_H)
 rect.o: rect.c $(HACK_H)
 region.o: region.c $(HACK_H) ../include/lev.h
@@ -836,6 +837,7 @@ timeout.o: timeout.c $(HACK_H) ../include/lev.h
 topten.o: topten.c $(HACK_H) ../include/dlb.h ../include/patchlevel.h
 track.o: track.c $(HACK_H)
 trap.o: trap.c $(HACK_H)
+tutorial.o: tutorial.c $(HACK_H)
 u_init.o: u_init.c $(HACK_H)
 uhitm.o: uhitm.c $(HACK_H)
 vault.o: vault.c $(HACK_H) ../include/vault.h
@@ -845,7 +847,7 @@ weapon.o: weapon.c $(HACK_H)
 were.o: were.c $(HACK_H)
 wield.o: wield.c $(HACK_H)
 windows.o: windows.c $(HACK_H) ../include/wingem.h ../include/winGnome.h
-wizard.o: wizard.c $(HACK_H) ../include/qtext.h ../include/epri.h
+wizard.o: wizard.c $(HACK_H) ../include/epri.h
 worm.o: worm.c $(HACK_H) ../include/lev.h
 worn.o: worn.c $(HACK_H)
 write.o: write.c $(HACK_H)

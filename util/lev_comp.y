@@ -32,6 +32,8 @@
 #define MAX_OF_TYPE	128
 
 #define MAX_NESTED_IFS	20
+#define MAX_SWITCH_CASES 20
+#define MAX_SWITCH_BREAKS 20
 
 #define New(type)		\
 	(type *) memset((genericptr_t)alloc(sizeof(type)), 0, sizeof(type))
@@ -42,6 +44,8 @@ extern void FDECL(yyerror, (const char *));
 extern void FDECL(yywarning, (const char *));
 extern int NDECL(yylex);
 int NDECL(yyparse);
+ extern void FDECL(include_push, (const char *));
+extern int NDECL(include_pop);
 
 extern int FDECL(get_floor_type, (CHAR_P));
 extern int FDECL(get_room_type, (char *));
@@ -51,90 +55,155 @@ extern int FDECL(get_object_id, (char *,CHAR_P));
 extern boolean FDECL(check_monster_char, (CHAR_P));
 extern boolean FDECL(check_object_char, (CHAR_P));
 extern char FDECL(what_map_char, (CHAR_P));
-extern void FDECL(scan_map, (char *, sp_lev *, mazepart *));
+extern void FDECL(scan_map, (char *, sp_lev *));
 extern void FDECL(add_opcode, (sp_lev *, int, genericptr_t));
 extern genericptr_t FDECL(get_last_opcode_data1, (sp_lev *, int));
 extern genericptr_t FDECL(get_last_opcode_data2, (sp_lev *, int,int));
 extern boolean FDECL(check_subrooms, (sp_lev *));
 extern boolean FDECL(write_level_file, (char *,sp_lev *));
+extern struct opvar *FDECL(set_opvar_int, (struct opvar *, long));
+extern struct opvar *FDECL(set_opvar_str, (struct opvar *, char *));
+extern void VDECL(add_opvars, (sp_lev *, const char *, ...));
 
-static struct reg {
-	int x1, y1;
-	int x2, y2;
-}		current_region;
+extern struct lc_funcdefs *FDECL(funcdef_new,(long,char *));
+extern void FDECL(funcdef_free_all,(struct lc_funcdefs *));
+extern struct lc_funcdefs *FDECL(funcdef_defined,(struct lc_funcdefs *,char *, int));
 
-static struct coord {
-	int x;
-	int y;
-}		current_coord, current_align;
+extern void FDECL(splev_add_from, (sp_lev *, sp_lev *));
 
-static struct size {
-	int height;
-	int width;
-}		current_size;
 
-sp_lev splev;
+struct coord {
+	long x;
+	long y;
+};
+
+sp_lev *splev = NULL;
 
 static char olist[MAX_REGISTERS], mlist[MAX_REGISTERS];
 static struct coord plist[MAX_REGISTERS];
-static long if_list[MAX_NESTED_IFS];
+static struct opvar *if_list[MAX_NESTED_IFS];
 
 static short n_olist = 0, n_mlist = 0, n_plist = 0, n_if_list = 0;
 static short on_olist = 0, on_mlist = 0, on_plist = 0;
 
-static long lev_flags;
 
 unsigned int max_x_map, max_y_map;
+int obj_containment = 0;
 
-static xchar in_room;
+int in_switch_statement = 0;
+static struct opvar *switch_check_jump = NULL;
+static struct opvar *switch_default_case = NULL;
+static struct opvar *switch_case_list[MAX_SWITCH_CASES];
+static long switch_case_value[MAX_SWITCH_CASES];
+int n_switch_case_list = 0;
+static struct opvar *switch_break_list[MAX_SWITCH_BREAKS];
+int n_switch_break_list = 0;
+
+
+
+static struct lc_funcdefs *function_definitions = NULL;
+int in_function_definition = 0;
+sp_lev *function_splev_backup = NULL;
 
 extern int fatal_error;
-extern int want_warnings;
+extern int line_number;
 extern const char *fname;
 
 %}
 
 %union
 {
-	int	i;
+	long	i;
 	char*	map;
 	struct {
-		xchar room;
-		xchar wall;
-		xchar door;
+		long room;
+		long wall;
+		long door;
 	} corpos;
+    struct {
+	long area;
+	long x1;
+	long y1;
+	long x2;
+	long y2;
+    } lregn;
+    struct {
+	long x;
+	long y;
+    } crd;
+    struct {
+	long height;
+	long width;
+    } sze;
 }
 
 
 %token	<i> CHAR INTEGER BOOLEAN PERCENT SPERCENT
-%token	<i> MESSAGE_ID MAZE_ID LEVEL_ID LEV_INIT_ID GEOMETRY_ID NOMAP_ID
+%token	<i> MAZE_GRID_ID SOLID_FILL_ID MINES_ID
+%token	<i> MESSAGE_ID LEVEL_ID LEV_INIT_ID GEOMETRY_ID NOMAP_ID
 %token	<i> OBJECT_ID COBJECT_ID MONSTER_ID TRAP_ID DOOR_ID DRAWBRIDGE_ID
 %token	<i> MAZEWALK_ID WALLIFY_ID REGION_ID FILLING
 %token	<i> RANDOM_OBJECTS_ID RANDOM_MONSTERS_ID RANDOM_PLACES_ID
 %token	<i> ALTAR_ID LADDER_ID STAIR_ID NON_DIGGABLE_ID NON_PASSWALL_ID ROOM_ID
-%token	<i> PORTAL_ID TELEPRT_ID BRANCH_ID LEV CHANCE_ID
+%token	<i> PORTAL_ID TELEPRT_ID BRANCH_ID LEV CHANCE_ID RANDLINE_ID
 %token	<i> CORRIDOR_ID GOLD_ID ENGRAVING_ID FOUNTAIN_ID POOL_ID SINK_ID NONE
 %token	<i> RAND_CORRIDOR_ID DOOR_STATE LIGHT_STATE CURSE_TYPE ENGRAVING_TYPE
 %token	<i> DIRECTION RANDOM_TYPE O_REGISTER M_REGISTER P_REGISTER A_REGISTER
 %token	<i> ALIGNMENT LEFT_OR_RIGHT CENTER TOP_OR_BOT ALTAR_TYPE UP_OR_DOWN
 %token	<i> SUBROOM_ID NAME_ID FLAGS_ID FLAG_TYPE MON_ATTITUDE MON_ALERTNESS
-%token	<i> MON_APPEARANCE ROOMDOOR_ID IF_ID THEN_ID ELSE_ID ENDIF_ID
-%token	<i> CONTAINED SPILL_ID TERRAIN_ID HORIZ_OR_VERT REPLACE_TERRAIN_ID
+%token	<i> MON_APPEARANCE ROOMDOOR_ID IF_ID ELSE_ID
+%token	<i> SPILL_ID TERRAIN_ID HORIZ_OR_VERT REPLACE_TERRAIN_ID
 %token	<i> EXIT_ID
-%token	<i> ',' ':' '(' ')' '[' ']'
+%token	<i> QUANTITY_ID BURIED_ID LOOP_ID
+%token	<i> SWITCH_ID CASE_ID BREAK_ID DEFAULT_ID
+%token	<i> ERODED_ID TRAPPED_ID RECHARGED_ID INVIS_ID GREASED_ID
+%token	<i> FEMALE_ID CANCELLED_ID REVIVED_ID AVENGE_ID FLEEING_ID BLINDED_ID
+%token	<i> PARALYZED_ID STUNNED_ID CONFUSED_ID SEENTRAPS_ID ALL_ID
+%token	<i> MON_GENERATION_ID
+%token	<i> GRAVE_ID
+%token	<i> FUNCTION_ID
+%token	<i> INCLUDE_ID
+%token	<i> SOUNDS_ID MSG_OUTPUT_TYPE
+%token	<i> ',' ':' '(' ')' '[' ']' '{' '}'
 %token	<map> STRING MAP_ID
+%token	<map> NQSTRING
 %type	<i> h_justif v_justif trap_name room_type door_state light_state
-%type	<i> alignment altar_type a_register roomfill filling door_pos
+%type	<i> alignment altar_type a_register roomfill door_pos
 %type	<i> door_wall walled secret amount chance
-%type	<i> engraving_type flags flag_list prefilled lev_region lev_init
+%type	<i> dir_list
+%type	<i> engraving_type flag_list prefilled
 %type	<i> monster monster_c m_register object object_c o_register
+%type	<i> comparestmt
+%type	<i> seen_trap_mask
+%type	<i> mon_gen_list
+%type	<i> sounds_list
+%type	<i> opt_lit_state opt_percent
 %type	<map> string level_def m_name o_name
 %type	<corpos> corr_spec
+%type	<lregn> region lev_region lineends
+%type	<crd> coord coordinate p_register room_pos subroom_pos room_align place
+%type	<sze> room_size
 %start	file
 
 %%
-file		: /* nothing */
-		| levels
+file		: header_stmts
+		| header_stmts levels
+		;
+
+header_stmts	: /* nothing */
+		| header_stmt header_stmts
+		;
+
+header_stmt	: function_define
+		| include_def
+		;
+
+
+include_def	: INCLUDE_ID STRING
+		  {
+		      include_push( $2 );
+		      Free($2);
+		  }
 		;
 
 levels		: level
@@ -148,64 +217,94 @@ level		: level_def flags lev_init levstatements
 				"%s : %d errors detected. No output created!\n",
 					fname, fatal_error);
 			} else {
-			        splev.init_lev.init_present = (boolean) $3;
-				splev.init_lev.flags = (long) $2;
-			        if (check_subrooms(&splev)) {
-				   if (!write_level_file($1, &splev)) {
-					yyerror("Can't write output file!!");
-					exit(EXIT_FAILURE);
-				   }
+				if (!write_level_file($1, splev)) {
+				    yyerror("Can't write output file!!");
+				    exit(EXIT_FAILURE);
 				}
 			}
 			Free($1);
+			Free(splev);
+			splev = NULL;
 		  }
 		;
 
-level_def	: MAZE_ID ':' string ',' filling
+level_def	: LEVEL_ID ':' string
 		  {
-			splev.init_lev.filling = (schar) $5;
-		        splev.init_lev.levtyp = SP_LEV_MAZE;
+		      struct lc_funcdefs *f;
 			if (index($3, '.'))
 			    yyerror("Invalid dot ('.') in level name.");
 			if ((int) strlen($3) > 8)
 			    yyerror("Level names limited to 8 characters.");
-			$$ = $3;
-			in_room = 0;
 			n_plist = n_mlist = n_olist = 0;
-		  }
-		| LEVEL_ID ':' string
-		  {
-			splev.init_lev.levtyp = SP_LEV_ROOMS;
-			if (index($3, '.'))
-			    yyerror("Invalid dot ('.') in level name.");
-			if ((int) strlen($3) > 8)
-			    yyerror("Level names limited to 8 characters.");
+			f = function_definitions;
+			while (f) {
+			    f->n_called = 0;
+			    f = f->next;
+			}
+			splev = (sp_lev *)alloc(sizeof(sp_lev));
+			splev->n_opcodes = 0;
+			splev->opcodes = NULL;
 			$$ = $3;
 		  }
 		;
 
 lev_init	: /* nothing */
 		  {
-			$$ = 0;
+		      add_opvars(splev, "iiiiiiiio", LVLINIT_NONE,0,0,0, 0,0,0,0, SPO_INITLEVEL);
 		  }
-		| LEV_INIT_ID ':' CHAR ',' CHAR ',' BOOLEAN ',' BOOLEAN ',' light_state ',' walled
+		| LEV_INIT_ID ':' SOLID_FILL_ID ',' CHAR opt_lit_state
 		  {
-			splev.init_lev.fg = what_map_char((char) $3);
-			if (splev.init_lev.fg == INVALID_TYPE)
-			    yyerror("Invalid foreground type.");
-			splev.init_lev.bg = what_map_char((char) $5);
-			if (splev.init_lev.bg == INVALID_TYPE)
-			    yyerror("Invalid background type.");
-			splev.init_lev.smoothed = $7;
-			splev.init_lev.joined = $9;
-			if (splev.init_lev.joined &&
-			    splev.init_lev.fg != CORR && splev.init_lev.fg != ROOM)
-			    yyerror("Invalid foreground type for joined map.");
-			splev.init_lev.lit = $11;
-			splev.init_lev.walled = $13;
-			$$ = 1;
+		      long filling = what_map_char((char) $5);
+		      if (filling == INVALID_TYPE || filling >= MAX_TYPE)
+			  yyerror("INIT_MAP: Invalid fill char type.");
+		      add_opvars(splev, "iiiiiiiio", LVLINIT_SOLIDFILL,filling,0,(long)$6, 0,0,0,0, SPO_INITLEVEL);
+		      max_x_map = COLNO-1;
+		      max_y_map = ROWNO;
+		  }
+		| LEV_INIT_ID ':' MAZE_GRID_ID ',' CHAR
+		  {
+		      long filling = what_map_char((char) $5);
+		      if (filling == INVALID_TYPE || filling >= MAX_TYPE)
+			  yyerror("INIT_MAP: Invalid fill char type.");
+		      add_opvars(splev, "iiiiiiiio", LVLINIT_MAZEGRID,filling,0,0, 0,0,0,0, SPO_INITLEVEL);
+		      max_x_map = COLNO-1;
+		      max_y_map = ROWNO;
+		  }
+		| LEV_INIT_ID ':' MINES_ID ',' CHAR ',' CHAR ',' BOOLEAN ',' BOOLEAN ',' light_state ',' walled opt_fillchar
+		  {
+		      long fg = what_map_char((char) $5);
+		      long bg = what_map_char((char) $7);
+		      long smoothed = $9;
+		      long joined = $11;
+		      long lit = $13;
+		      long walled = $15;
+		      long filling = $<i>16;
+		      if (fg == INVALID_TYPE || fg >= MAX_TYPE)
+			  yyerror("INIT_MAP: Invalid foreground type.");
+		      if (bg == INVALID_TYPE || bg >= MAX_TYPE)
+			  yyerror("INIT_MAP: Invalid background type.");
+		      if (joined && fg != CORR && fg != ROOM)
+			  yyerror("INIT_MAP: Invalid foreground type for joined map.");
+
+		      if (filling == INVALID_TYPE)
+			  yyerror("INIT_MAP: Invalid fill char type.");
+
+		      add_opvars(splev, "iiiiiiiio", LVLINIT_MINES,filling,walled,lit, joined,smoothed,bg,fg, SPO_INITLEVEL);
+			max_x_map = COLNO-1;
+			max_y_map = ROWNO;
 		  }
 		;
+
+opt_fillchar	: /* nothing */
+		  {
+		      $<i>$ = -1;
+		  }
+		| ',' CHAR
+		  {
+		      $<i>$ = what_map_char((char) $2);
+		  }
+		;
+
 
 walled		: BOOLEAN
 		| RANDOM_TYPE
@@ -213,22 +312,21 @@ walled		: BOOLEAN
 
 flags		: /* nothing */
 		  {
-			$$ = 0;
+		      add_opvars(splev, "io", 0, SPO_LEVEL_FLAGS);
 		  }
 		| FLAGS_ID ':' flag_list
 		  {
-			$$ = lev_flags;
-			lev_flags = 0;	/* clear for next user */
+		      add_opvars(splev, "io", (long)$<i>3, SPO_LEVEL_FLAGS);
 		  }
 		;
 
 flag_list	: FLAG_TYPE ',' flag_list
 		  {
-			lev_flags |= $1;
+		      $<i>$ = ($<i>1 | $<i>3);
 		  }
 		| FLAG_TYPE
 		  {
-			lev_flags |= $1;
+		      $<i>$ = $<i>1;
 		  }
 		;
 
@@ -238,6 +336,9 @@ levstatements	: /* nothing */
 
 levstatement 	: message
 		| altar_detail
+		| grave_detail
+		| mon_generation
+		| sounds_detail
 		| branch_region
 		| corridor
 		| diggable_detail
@@ -246,8 +347,12 @@ levstatement 	: message
 		| engraving_detail
 		| fountain_detail
 		| gold_detail
+		| switchstatement
+		| loopstatement
 		| ifstatement
 		| exitstatement
+		| function_define
+		| function_call
 		| init_reg
 		| ladder_detail
 		| map_definition
@@ -259,40 +364,263 @@ levstatement 	: message
 		| portal_region
 		| random_corridors
 		| region_detail
-		| room_chance
 		| room_def
+		| subroom_def
+		| room_chance
 		| room_name
 		| sink_detail
 		| terrain_detail
 		| replace_terrain_detail
 		| spill_detail
+		| randline_detail
 		| stair_detail
 		| stair_region
-		| subroom_def
 		| teleprt_region
 		| trap_detail
 		| wallify_detail
 		;
 
-exitstatement	: EXIT_ID
+function_define	: FUNCTION_ID NQSTRING '(' ')'
 		  {
-		      add_opcode(&splev, SPO_EXIT, NULL);
+		      struct lc_funcdefs *funcdef;
+
+		      if (in_function_definition)
+			  yyerror("Recursively defined functions not allowed.");
+
+		      in_function_definition++;
+
+		      if (funcdef_defined(function_definitions, $2, 1))
+			  yyerror("Function already defined once.");
+
+		      funcdef = funcdef_new(-1, $2);
+		      funcdef->next = function_definitions;
+		      function_definitions = funcdef;
+		      function_splev_backup = splev;
+		      splev = &(funcdef->code);
+
+		  }
+		'{' levstatements '}'
+		  {
+		      add_opvars(splev, "io", 0, SPO_RETURN);
+		      splev = function_splev_backup;
+		      in_function_definition--;
 		  }
 		;
 
-ifstatement 	: IF_ID chance
+function_call	: NQSTRING '(' ')'
 		  {
-		     opcmp *tmpcmp = New(opcmp);
-		     opjmp *tmpjmp = New(opjmp);
+		      struct lc_funcdefs *tmpfunc;
+		      tmpfunc = funcdef_defined(function_definitions, $1, 1);
+		      if (tmpfunc) {
+			  long l;
+			  if (!(tmpfunc->n_called)) {
+			      /* we haven't called the function yet, so insert it in the code */
+			      struct opvar *jmp = New(struct opvar);
+			      set_opvar_int(jmp, splev->n_opcodes+1);
+			      add_opcode(splev, SPO_PUSH, jmp);
+			      add_opcode(splev, SPO_JMP, NULL); /* we must jump past it first, then CALL it, due to RETURN. */
 
-		     if (n_if_list >= MAX_NESTED_IFS)
-		       yyerror("Too deeply nested IF-statements!");
-		     tmpcmp->cmp_what = 0;
-		     tmpcmp->cmp_val = (long) $2;
-		     add_opcode(&splev, SPO_CMP, tmpcmp);
-		     tmpjmp->jmp_target = -1;
-		     if_list[n_if_list++] = splev.init_lev.n_opcodes;
-		     add_opcode(&splev, SPO_JG, tmpjmp);
+			      tmpfunc->addr = splev->n_opcodes;
+			      splev_add_from(splev, &(tmpfunc->code));
+			      set_opvar_int(jmp, splev->n_opcodes - jmp->vardata.l);
+			  }
+			  l = tmpfunc->addr - splev->n_opcodes - 2;
+			  add_opvars(splev, "iio", 0, l, SPO_CALL);
+			  tmpfunc->n_called++;
+		      } else {
+			  yyerror("No such function defined.");
+		      }
+		  }
+		;
+
+exitstatement	: EXIT_ID
+		  {
+		      add_opcode(splev, SPO_EXIT, NULL);
+		  }
+		;
+
+opt_percent	: /* nothing */
+		  {
+		      $$ = 100;
+		  }
+		| PERCENT
+		  {
+		      if ($1 < 0 || $1 > 100) yyerror("unexpected percentile chance");
+		      $$ = $1;
+		  }
+		;
+
+comparestmt     : PERCENT
+                  {
+		      /* val > rn2(100) */
+		      add_opvars(splev, "ioi", 100, SPO_RN2, (long)$1);
+		      $$ = SPO_JGE; /* TODO: shouldn't this be SPO_JG? */
+                  }
+		;
+
+switchstatement	: SWITCH_ID '[' INTEGER ']'
+		  {
+		      struct opvar *chkjmp;
+		      if (in_switch_statement > 0)
+			  yyerror("Cannot nest switch-statements.");
+
+		      if ($3 < 1)
+			  yyerror("Switch with fewer than 1 available choices.");
+
+		      in_switch_statement++;
+
+		      n_switch_case_list = 0;
+		      n_switch_break_list = 0;
+		      switch_default_case = NULL;
+
+		      add_opvars(splev, "io", (long)$3, SPO_RN2);
+
+		      chkjmp = New(struct opvar);
+		      set_opvar_int(chkjmp, splev->n_opcodes+1);
+		      switch_check_jump = chkjmp;
+		      add_opcode(splev, SPO_PUSH, chkjmp);
+		      add_opcode(splev, SPO_JMP, NULL);
+		  }
+		'{' switchcases '}'
+		  {
+		      struct opvar *endjump = New(struct opvar);
+		      int i;
+
+		      set_opvar_int(endjump, splev->n_opcodes+1);
+
+		      add_opcode(splev, SPO_PUSH, endjump);
+		      add_opcode(splev, SPO_JMP, NULL);
+
+		      set_opvar_int(switch_check_jump, splev->n_opcodes - switch_check_jump->vardata.l);
+
+		      for (i = 0; i < n_switch_case_list; i++) {
+			  add_opvars(splev, "oio", SPO_COPY, switch_case_value[i], SPO_CMP);
+			  set_opvar_int(switch_case_list[i], switch_case_list[i]->vardata.l - splev->n_opcodes-1);
+			  add_opcode(splev, SPO_PUSH, switch_case_list[i]);
+			  add_opcode(splev, SPO_JE, NULL);
+		      }
+
+		      if (switch_default_case) {
+			  set_opvar_int(switch_default_case, switch_default_case->vardata.l - splev->n_opcodes-1);
+			  add_opcode(splev, SPO_PUSH, switch_default_case);
+			  add_opcode(splev, SPO_JMP, NULL);
+		      }
+
+		      set_opvar_int(endjump, splev->n_opcodes - endjump->vardata.l);
+
+		      for (i = 0; i < n_switch_break_list; i++) {
+			  set_opvar_int(switch_break_list[i], splev->n_opcodes - switch_break_list[i]->vardata.l);
+		      }
+
+		      add_opcode(splev, SPO_POP, NULL); /* get rid of the value in stack */
+		      in_switch_statement--;
+
+
+		  }
+		;
+
+switchcases	: /* nothing */
+		| switchcase switchcases
+		;
+
+switchcase	: CASE_ID INTEGER ':'
+		  {
+		      if (n_switch_case_list < MAX_SWITCH_CASES) {
+			  struct opvar *tmppush = New(struct opvar);
+			  set_opvar_int(tmppush, splev->n_opcodes);
+			  switch_case_value[n_switch_case_list] = $2;
+			  switch_case_list[n_switch_case_list++] = tmppush;
+		      } else yyerror("Too many cases in a switch.");
+		  }
+		breakstatements
+		  {
+		  }
+		| DEFAULT_ID ':'
+		  {
+		      struct opvar *tmppush = New(struct opvar);
+
+		      if (switch_default_case)
+			  yyerror("Switch default case already used.");
+
+		      set_opvar_int(tmppush, splev->n_opcodes);
+		      switch_default_case = tmppush;
+		  }
+		breakstatements
+		  {
+		  }
+		;
+
+breakstatements	: /* nothing */
+		| breakstatement breakstatements
+		;
+
+breakstatement	: BREAK_ID
+		  {
+		      struct opvar *tmppush = New(struct opvar);
+		      set_opvar_int(tmppush, splev->n_opcodes);
+		      if (n_switch_break_list >= MAX_SWITCH_BREAKS)
+			  yyerror("Too many BREAKs inside single SWITCH");
+		      switch_break_list[n_switch_break_list++] = tmppush;
+
+		      add_opcode(splev, SPO_PUSH, tmppush);
+		      add_opcode(splev, SPO_JMP, NULL);
+		  }
+		| levstatement
+		  {
+		  }
+		;
+
+loopstatement	: LOOP_ID '[' INTEGER ']'
+		  {
+		      struct opvar *tmppush = New(struct opvar);
+
+		      if (n_if_list >= MAX_NESTED_IFS) {
+			  yyerror("IF: Too deeply nested IFs.");
+			  n_if_list = MAX_NESTED_IFS - 1;
+		      }
+
+		      if ($3 < 1)
+			  yyerror("Loop with fewer than 1 repeats.");
+
+		      add_opvars(splev, "i", (long)$3);
+
+		      set_opvar_int(tmppush, splev->n_opcodes);
+		      if_list[n_if_list++] = tmppush;
+
+		      add_opvars(splev, "o", SPO_DEC);
+		  }
+		 '{' levstatements '}'
+		  {
+		      struct opvar *tmppush;
+
+		      add_opvars(splev, "oio", SPO_COPY, 0, SPO_CMP);
+
+		      tmppush = (struct opvar *) if_list[--n_if_list];
+		      set_opvar_int(tmppush, tmppush->vardata.l - splev->n_opcodes-1);
+		      add_opcode(splev, SPO_PUSH, tmppush);
+		      add_opcode(splev, SPO_JG, NULL);
+		      add_opcode(splev, SPO_POP, NULL); /* get rid of the count value in stack */
+		  }
+		;
+
+ifstatement 	: IF_ID comparestmt
+		  {
+		      struct opvar *tmppush2 = New(struct opvar);
+
+		      if (n_if_list >= MAX_NESTED_IFS) {
+			  yyerror("IF: Too deeply nested IFs.");
+			  n_if_list = MAX_NESTED_IFS - 1;
+		      }
+
+		      add_opcode(splev, SPO_CMP, NULL);
+
+		      set_opvar_int(tmppush2, splev->n_opcodes+1);
+
+		      if_list[n_if_list++] = tmppush2;
+
+		      add_opcode(splev, SPO_PUSH, tmppush2);
+
+		      add_opcode(splev, $2, NULL);
 		  }
 		 if_ending
 		  {
@@ -300,81 +628,132 @@ ifstatement 	: IF_ID chance
 		  }
 		;
 
-if_ending	: THEN_ID levstatements ENDIF_ID
+if_ending	: '{' levstatements '}'
 		  {
-		     if (n_if_list > 0) {
-			opjmp *tmpjmp;
-			tmpjmp = (opjmp *) splev.opcodes[if_list[--n_if_list]].opdat;
-			tmpjmp->jmp_target = splev.init_lev.n_opcodes-1;
-		     } else yyerror("IF...THEN ... huh?!");
+		      if (n_if_list > 0) {
+			  struct opvar *tmppush;
+			  tmppush = (struct opvar *) if_list[--n_if_list];
+			  set_opvar_int(tmppush, splev->n_opcodes - tmppush->vardata.l);
+		      } else yyerror("IF: Huh?!  No start address?");
 		  }
-		| THEN_ID levstatements
+		| '{' levstatements '}'
 		  {
-		     if (n_if_list > 0) {
-			long tmppos = splev.init_lev.n_opcodes;
-			opjmp *tmpjmp = New(opjmp);
+		      if (n_if_list > 0) {
+			  struct opvar *tmppush = New(struct opvar);
+			  struct opvar *tmppush2;
 
-			tmpjmp->jmp_target = -1;
-			add_opcode(&splev, SPO_JMP, tmpjmp);
+			  set_opvar_int(tmppush, splev->n_opcodes+1);
+			  add_opcode(splev, SPO_PUSH, tmppush);
 
-			tmpjmp = (opjmp *) splev.opcodes[if_list[--n_if_list]].opdat;
-			tmpjmp->jmp_target = splev.init_lev.n_opcodes-1;
+			  add_opcode(splev, SPO_JMP, NULL);
 
-			if_list[n_if_list++] = tmppos;
-		     } else yyerror("IF...THEN ... huh?!");
+			  tmppush2 = (struct opvar *) if_list[--n_if_list];
+
+			  set_opvar_int(tmppush2, splev->n_opcodes - tmppush2->vardata.l);
+			  if_list[n_if_list++] = tmppush;
+		      } else yyerror("IF: Huh?!  No else-part address?");
 		  }
-		 ELSE_ID levstatements ENDIF_ID
+		 ELSE_ID '{' levstatements '}'
 		  {
-		     if (n_if_list > 0) {
-			opjmp *tmpjmp;
-			tmpjmp = (opjmp *) splev.opcodes[if_list[--n_if_list]].opdat;
-			tmpjmp->jmp_target = splev.init_lev.n_opcodes-1;
-		     } else yyerror("IF...THEN...ELSE ... huh?!");
+		      if (n_if_list > 0) {
+			  struct opvar *tmppush;
+			  tmppush = (struct opvar *) if_list[--n_if_list];
+			  set_opvar_int(tmppush, splev->n_opcodes - tmppush->vardata.l);
+		      } else yyerror("IF: Huh?! No end address?");
 		  }
 		;
 
 message		: MESSAGE_ID ':' STRING
 		  {
-		     if (strlen($3) > 254)
-		       yyerror("Message string > 255 characters.");
-
-		     add_opcode(&splev, SPO_MESSAGE, $3);
+		      if (strlen($3) > 254)
+			  yyerror("Message string > 255 characters.");
+		      else {
+			  add_opvars(splev, "so", $3, SPO_MESSAGE);
+		      }
 		  }
 		;
 
+cobj_ifstatement : IF_ID '[' comparestmt ']'
+		  {
+		      struct opvar *tmppush2 = New(struct opvar);
+
+		      if (n_if_list >= MAX_NESTED_IFS) {
+			  yyerror("IF: Too deeply nested IFs.");
+			  n_if_list = MAX_NESTED_IFS - 1;
+		      }
+
+		      add_opcode(splev, SPO_CMP, NULL);
+
+		      set_opvar_int(tmppush2, splev->n_opcodes+1);
+
+		      if_list[n_if_list++] = tmppush2;
+
+		      add_opcode(splev, SPO_PUSH, tmppush2);
+
+		      add_opcode(splev, $3, NULL);
+		  }
+		 cobj_if_ending
+		  {
+		     /* do nothing */
+		  }
+		;
+
+cobj_if_ending	: '{' cobj_statements '}'
+		  {
+		      if (n_if_list > 0) {
+			  struct opvar *tmppush;
+			  tmppush = (struct opvar *) if_list[--n_if_list];
+			  set_opvar_int(tmppush, splev->n_opcodes - tmppush->vardata.l);
+		      } else yyerror("IF: Huh?!  No start address?");
+		  }
+		| '{' cobj_statements '}'
+		  {
+		      if (n_if_list > 0) {
+			  struct opvar *tmppush = New(struct opvar);
+			  struct opvar *tmppush2;
+
+			  set_opvar_int(tmppush, splev->n_opcodes+1);
+			  add_opcode(splev, SPO_PUSH, tmppush);
+
+			  add_opcode(splev, SPO_JMP, NULL);
+
+			  tmppush2 = (struct opvar *) if_list[--n_if_list];
+
+			  set_opvar_int(tmppush2, splev->n_opcodes - tmppush2->vardata.l);
+			  if_list[n_if_list++] = tmppush;
+		      } else yyerror("IF: Huh?!  No else-part address?");
+		  }
+		 ELSE_ID '{' cobj_statements '}'
+		  {
+		      if (n_if_list > 0) {
+			  struct opvar *tmppush;
+			  tmppush = (struct opvar *) if_list[--n_if_list];
+			  set_opvar_int(tmppush, splev->n_opcodes - tmppush->vardata.l);
+		      } else yyerror("IF: Huh?! No end address?");
+		  }
+		;
+
+
+
 random_corridors: RAND_CORRIDOR_ID
 		  {
-		     corridor *tmpcorridor = New(corridor);
-		     tmpcorridor->src.room = -1;
-
-		     add_opcode(&splev, SPO_CORRIDOR, tmpcorridor);
+		      add_opvars(splev, "iiiiiio", -1, -1, -1, -1, -1, -1, SPO_CORRIDOR);
 		  }
 		;
 
 corridor	: CORRIDOR_ID ':' corr_spec ',' corr_spec
 		  {
-		     corridor *tmpcor = New(corridor);
-
-		     tmpcor->src.room = $3.room;
-		     tmpcor->src.wall = $3.wall;
-		     tmpcor->src.door = $3.door;
-		     tmpcor->dest.room = $5.room;
-		     tmpcor->dest.wall = $5.wall;
-		     tmpcor->dest.door = $5.door;
-
-		     add_opcode(&splev, SPO_CORRIDOR, tmpcor);
+		      add_opvars(splev, "iiiiiio",
+				 $3.room, $3.door, $3.wall,
+				 $5.room, $5.door, $5.wall,
+				 SPO_CORRIDOR);
 		  }
 		| CORRIDOR_ID ':' corr_spec ',' INTEGER
 		  {
-		     corridor *tmpcor = New(corridor);
-
-		     tmpcor->src.room = $3.room;
-		     tmpcor->src.wall = $3.wall;
-		     tmpcor->src.door = $3.door;
-		     tmpcor->dest.room = -1;
-		     tmpcor->dest.wall = $5;
-
-		     add_opcode(&splev, SPO_CORRIDOR, tmpcor);
+		      add_opvars(splev, "iiiiiio",
+				 $3.room, $3.door, $3.wall,
+				 -1, -1, (long)$5,
+				 SPO_CORRIDOR);
 		  }
 		;
 
@@ -386,47 +765,36 @@ corr_spec	: '(' INTEGER ',' DIRECTION ',' door_pos ')'
 		  }
 		;
 
-subroom_def	: SUBROOM_ID ':' room_type ',' light_state ',' subroom_pos ',' room_size ',' string roomfill
+room_begin      : room_type opt_percent ',' light_state
+                  {
+		      if (($2 < 100) && ($1 == OROOM))
+			  yyerror("Only typed rooms can have a chance.");
+		      else {
+			  add_opvars(splev, "iii", (long)$1, (long)$2, (long)$4);
+		      }
+                  }
+                ;
+
+subroom_def	: SUBROOM_ID ':' room_begin ',' subroom_pos ',' room_size roomfill
 		  {
-		     room *tmpr = New(room);
-
-		     tmpr->parent.str = $11;
-		     tmpr->name.str = (char *) 0;
-		     tmpr->rtype = $3;
-		     tmpr->rlit = $5;
-		     tmpr->filled = $12;
-		     tmpr->xalign = ERR;
-		     tmpr->yalign = ERR;
-		     tmpr->x = current_coord.x;
-		     tmpr->y = current_coord.y;
-		     tmpr->w = current_size.width;
-		     tmpr->h = current_size.height;
-
-		     add_opcode(&splev, SPO_SUBROOM, tmpr);
-
-		     in_room = 1;
+		      add_opvars(splev, "iiiiiiio", (long)$8, ERR, ERR,
+				 $5.x, $5.y, $7.width, $7.height, SPO_SUBROOM);
+		  }
+		  '{' levstatements '}'
+		  {
+		      add_opcode(splev, SPO_ENDROOM, NULL);
 		  }
 		;
 
-room_def	: ROOM_ID ':' room_type ',' light_state ',' room_pos ',' room_align ',' room_size roomfill
+room_def	: ROOM_ID ':' room_begin ',' room_pos ',' room_align ',' room_size roomfill
 		  {
-		     room *tmpr = New(room);
-
-		     tmpr->name.str = (char *) 0;
-		     tmpr->parent.str = (char *) 0;
-		     tmpr->rtype = $3;
-		     tmpr->rlit = $5;
-		     tmpr->filled = $12;
-		     tmpr->xalign = current_align.x;
-		     tmpr->yalign = current_align.y;
-		     tmpr->x = current_coord.x;
-		     tmpr->y = current_coord.y;
-		     tmpr->w = current_size.width;
-		     tmpr->h = current_size.height;
-
-		     add_opcode(&splev, SPO_ROOM, tmpr);
-
-		     in_room = 1;
+		      add_opvars(splev, "iiiiiiio", (long)$10,
+				 $7.x, $7.y, $5.x, $5.y,
+				 $9.width, $9.height, SPO_ROOM);
+		  }
+		  '{' levstatements '}'
+		  {
+		      add_opcode(splev, SPO_ENDROOM, NULL);
 		  }
 		;
 
@@ -446,13 +814,13 @@ room_pos	: '(' INTEGER ',' INTEGER ')'
 			    $4 < 1 || $4 > 5 ) {
 			    yyerror("Room position should be between 1 & 5!");
 			} else {
-			    current_coord.x = $2;
-			    current_coord.y = $4;
+			    $$.x = $2;
+			    $$.y = $4;
 			}
 		  }
 		| RANDOM_TYPE
 		  {
-			current_coord.x = current_coord.y = ERR;
+			$$.x = $$.y = ERR;
 		  }
 		;
 
@@ -461,67 +829,48 @@ subroom_pos	: '(' INTEGER ',' INTEGER ')'
 			if ( $2 < 0 || $4 < 0) {
 			    yyerror("Invalid subroom position !");
 			} else {
-			    current_coord.x = $2;
-			    current_coord.y = $4;
+			    $$.x = $2;
+			    $$.y = $4;
 			}
 		  }
 		| RANDOM_TYPE
 		  {
-			current_coord.x = current_coord.y = ERR;
+			$$.x = $$.y = ERR;
 		  }
 		;
 
 room_align	: '(' h_justif ',' v_justif ')'
 		  {
-			current_align.x = $2;
-			current_align.y = $4;
+		      $$.x = $2;
+		      $$.y = $4;
 		  }
 		| RANDOM_TYPE
 		  {
-			current_align.x = current_align.y = ERR;
+		      $$.x = $$.y = ERR;
 		  }
 		;
 
 room_size	: '(' INTEGER ',' INTEGER ')'
 		  {
-			current_size.width = $2;
-			current_size.height = $4;
+			$$.width = $2;
+			$$.height = $4;
 		  }
 		| RANDOM_TYPE
 		  {
-			current_size.height = current_size.width = ERR;
+			$$.height = $$.width = ERR;
 		  }
 		;
 
 room_name	: NAME_ID ':' string
 		  {
-		     room *tmpr = (room *) get_last_opcode_data2(&splev, SPO_ROOM, SPO_SUBROOM);
-
-		     if (!tmpr)
-		       yyerror("There's no room to name?!");
-
-		     if (tmpr->name.str)
-		       yyerror("This room already has a name!");
-		     else
-		       tmpr->name.str = $3;
+		      yyerror("NAME for rooms is not used anymore.");
+		      Free($3);
 		  }
 		;
 
 room_chance	: CHANCE_ID ':' INTEGER
 		   {
-		      room *tmpr = (room *) get_last_opcode_data2(&splev, SPO_ROOM, SPO_SUBROOM);
-
-		      if (!tmpr)
-			yyerror("There's no room to assign a chance to?!");
-
-		      if (tmpr->chance)
-			yyerror("This room already assigned a chance!");
-		      else if (tmpr->rtype == OROOM)
-			yyerror("Only typed rooms can have a chance!");
-		      else if ($3 < 1 || $3 > 99)
-			yyerror("The chance is supposed to be percentile.");
-		      else
-			tmpr->chance = $3;
+		       yyerror("CHANCE for rooms is not used anymore.");
 		   }
 		;
 
@@ -531,31 +880,13 @@ door_detail	: ROOMDOOR_ID ':' secret ',' door_state ',' door_wall ',' door_pos
 			if ($7 == ERR && $9 != ERR) {
 		     yyerror("If the door wall is random, so must be its pos!");
 			} else {
-			   room *tmpr = (room *) get_last_opcode_data2(&splev, SPO_ROOM, SPO_SUBROOM);
-			   room_door *rdoor;
-
-			   if (!tmpr)
-			     yyerror("Roomdoor without room?!");
-
-			   rdoor = New(room_door);
-
-			   rdoor->secret = $3;
-			   rdoor->mask = $5;
-			   rdoor->wall = (schar) $7;
-			   rdoor->pos = $9;
-
-			   add_opcode(&splev, SPO_ROOM_DOOR, rdoor);
+			    add_opvars(splev, "iiiio", (long)$9, (long)$5, (long)$3, (long)$7, SPO_ROOM_DOOR);
 			}
 		  }
 		| DOOR_ID ':' door_state ',' coordinate
 		  {
-		     door *tmpdoor = New(door);
-
-		     tmpdoor->x = current_coord.x;
-		     tmpdoor->y = current_coord.y;
-		     tmpdoor->mask = $<i>3;
-
-		     add_opcode(&splev, SPO_DOOR, tmpdoor);
+		      add_opvars(splev, "iiio",
+				 $5.x, $5.y, (long)$<i>3, SPO_DOOR);
 		  }
 		;
 
@@ -563,61 +894,41 @@ secret		: BOOLEAN
 		| RANDOM_TYPE
 		;
 
-door_wall	: DIRECTION
+door_wall	: dir_list
 		| RANDOM_TYPE
+		;
+
+dir_list	: DIRECTION
+		  {
+		      $$ = $1;
+		  }
+		| DIRECTION '|' dir_list
+		  {
+		      $$ = ($1 | $3);
+		  }
 		;
 
 door_pos	: INTEGER
 		| RANDOM_TYPE
 		;
 
-filling		: CHAR
-		  {
-			$$ = get_floor_type((char)$1);
-		  }
-		| RANDOM_TYPE
-		  {
-			$$ = -1;
-		  }
-		;
-
 map_definition	: NOMAP_ID
 		  {
-		     mazepart *tmppart = New(mazepart);
-
-		     tmppart->zaligntyp = 0;
-		     tmppart->keep_region = 1;
-		     tmppart->halign = 1;
-		     tmppart->valign = 1;
-		     tmppart->xsize = 0;
-		     tmppart->ysize = 0;
-		     max_x_map = COLNO-1;
-		     max_y_map = ROWNO;
-
-		     add_opcode(&splev, SPO_MAP, tmppart);
-
+		      add_opvars(splev, "iiiisiio", 0, 1, 1, 1, (char *)0, 0, 0, SPO_MAP);
+		      max_x_map = COLNO-1;
+		      max_y_map = ROWNO;
 		  }
 		| map_geometry roomfill MAP_ID
 		  {
-		     mazepart *tmpp = New(mazepart);
-
-		     tmpp->zaligntyp = 1;
-		     tmpp->keep_region = $2;
-		     tmpp->halign = $<i>1 % 10;
-		     tmpp->valign = $<i>1 / 10;
-		     scan_map($3, &splev, tmpp);
-		     Free($3);
+		      add_opvars(splev, "iiii", 1, (long)$2, (long)($<i>1 % 10), (long)($<i>1 / 10));
+		      scan_map($3, splev);
+		      Free($3);
 		  }
 		| GEOMETRY_ID ':' coordinate roomfill MAP_ID
 		  {
-		     mazepart *tmpp = New(mazepart);
-
-		     tmpp->zaligntyp = 2;
-		     tmpp->keep_region = $4;
-		     tmpp->halign = current_coord.x;
-		     tmpp->valign = current_coord.y;
-		     scan_map($5, &splev, tmpp);
-		     Free($5);
+		      add_opvars(splev, "iiii", 2, (long)$4, $3.x, $3.y);
+		      scan_map($5, splev);
+		      Free($5);
 		  }
 		;
 
@@ -643,7 +954,8 @@ init_reg	: RANDOM_OBJECTS_ID ':' object_list
 		     (void) memcpy((genericptr_t)tmp_olist,
 				   (genericptr_t)olist, n_olist);
 		     tmp_olist[n_olist] = 0;
-		     add_opcode(&splev, SPO_RANDOM_OBJECTS, tmp_olist);
+		     add_opvars(splev, "so", tmp_olist, SPO_RANDOM_OBJECTS);
+
 		     on_olist = n_olist;
 		     n_olist = 0;
 		  }
@@ -659,7 +971,8 @@ init_reg	: RANDOM_OBJECTS_ID ':' object_list
 			tmp_plist[i*2+1] = plist[i].y+1;
 		     }
 		     tmp_plist[n_plist*2] = 0;
-		     add_opcode(&splev, SPO_RANDOM_PLACES, tmp_plist);
+		     add_opvars(splev, "so", tmp_plist, SPO_RANDOM_PLACES);
+
 		     on_plist = n_plist;
 		     n_plist = 0;
 		  }
@@ -671,7 +984,7 @@ init_reg	: RANDOM_OBJECTS_ID ':' object_list
 		     (void) memcpy((genericptr_t)tmp_mlist,
 				   (genericptr_t)mlist, n_mlist);
 		     tmp_mlist[n_mlist] = 0;
-		     add_opcode(&splev, SPO_RANDOM_MONSTERS, tmp_mlist);
+		     add_opvars(splev, "so", tmp_mlist, SPO_RANDOM_MONSTERS);
 		     on_mlist = n_mlist;
 		     n_mlist = 0;
 		  }
@@ -711,456 +1024,564 @@ monster_list	: monster
 
 place_list	: place
 		  {
-			if (n_plist < MAX_REGISTERS)
-			    plist[n_plist++] = current_coord;
-			else
+		      if (n_plist < MAX_REGISTERS) {
+			    plist[n_plist].x = $1.x;
+			    plist[n_plist].y = $1.y;
+			    n_plist++;
+		      } else
 			    yyerror("Location list too long!");
 		  }
 		| place
 		  {
-			if (n_plist < MAX_REGISTERS)
-			    plist[n_plist++] = current_coord;
-			else
+		      if (n_plist < MAX_REGISTERS) {
+			    plist[n_plist].x = $1.x;
+			    plist[n_plist].y = $1.y;
+			    n_plist++;
+		      } else
 			    yyerror("Location list too long!");
 		  }
 		 ',' place_list
 		;
 
-monster_detail	: MONSTER_ID chance ':' monster_c ',' m_name ',' coordinate
+sounds_detail	: SOUNDS_ID ':' INTEGER ',' sounds_list
 		  {
-		     monster *tmpm = New(monster);
-
-		     tmpm->x = current_coord.x;
-		     tmpm->y = current_coord.y;
-		     tmpm->class = $<i>4;
-		     tmpm->peaceful = -1; /* no override */
-		     tmpm->asleep = -1;
-		     tmpm->align = - MAX_REGISTERS - 2;
-		     tmpm->name.str = 0;
-		     tmpm->appear = 0;
-		     tmpm->appear_as.str = 0;
-		     tmpm->chance = $2;
-		     tmpm->id = NON_PM;
-		     if ($6) {
-			int token = get_monster_id($6, (char) $<i>4);
-			if (token == ERR)
-			  yywarning(
-			    "Invalid monster name!  Making random monster.");
-			else
-			  tmpm->id = token;
-			Free($6);
-		     }
-		     add_opcode(&splev, SPO_MONSTER, tmpm);
-
+		      long chance = $3;
+		      long n_sounds = $5;
+		      if (chance < 0) chance = 0;
+		      add_opvars(splev, "iio", chance, n_sounds, SPO_LEVEL_SOUNDS);
 		  }
-		 monster_infos
+		;
+
+sounds_list	: lvl_sound_part
 		  {
-		      /* nothing here */
+		      $$ = 1;
+		  }
+		| lvl_sound_part ',' sounds_list
+		  {
+		      $$ = 1 + $3;
+		  }
+		;
+
+lvl_sound_part	: '(' MSG_OUTPUT_TYPE ',' STRING ')'
+		  {
+		      add_opvars(splev, "is", (long)$2, $4);
+		  }
+		;
+
+mon_generation	: MON_GENERATION_ID ':' SPERCENT ',' mon_gen_list
+		  {
+		      long chance = $3;
+		      long total_mons = $5;
+		      if (chance < 0) chance = 0;
+		      else if (chance > 100) chance = 100;
+
+		      if (total_mons < 1) yyerror("Monster generation: zero monsters defined?");
+		      add_opvars(splev, "iio", chance, total_mons, SPO_MON_GENERATION);
+		  }
+		;
+
+mon_gen_list	: mon_gen_part
+		  {
+		      $$ = 1;
+		  }
+		| mon_gen_part ',' mon_gen_list
+		  {
+		      $$ = 1 + $3;
+		  }
+		;
+
+mon_gen_part	: '(' INTEGER ',' monster ')'
+		  {
+		      long token = $4;
+		      if ($2 < 1) yyerror("Monster generation chances are zero?");
+		      if (token == ERR) yyerror("Monster generation: Invalid monster symbol");
+		      add_opvars(splev, "iii", token, 1, (long)$2);
+		  }
+		| '(' INTEGER ',' string ')'
+		  {
+		      long token;
+		      if ($2 < 1) yyerror("Monster generation chances are zero?");
+		      token = get_monster_id($4, (char)0);
+		      if (token == ERR) yyerror("Monster generation: Invalid monster name");
+		      add_opvars(splev, "iii", token, 0, (long)$2);
+		  }
+		;
+
+monster_detail	: MONSTER_ID chance ':' monster_desc
+		  {
+		      add_opvars(splev, "io", 0, SPO_MONSTER);
+
+		      if ( 1 == $2 ) {
+			  if (n_if_list > 0) {
+			      struct opvar *tmpjmp;
+			      tmpjmp = (struct opvar *) if_list[--n_if_list];
+			      set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
+			  } else yyerror("conditional creation of monster, but no jump point marker.");
+		      }
+		  }
+		| MONSTER_ID chance ':' monster_desc
+		  {
+		      add_opvars(splev, "io", 1, SPO_MONSTER);
+		      $<i>$ = $2;
+		  }
+		'{' cobj_statements '}'
+		 {
+		     add_opvars(splev, "o", SPO_END_MONINVENT);
+		     if ( 1 == $<i>5 ) {
+			 if (n_if_list > 0) {
+			     struct opvar *tmpjmp;
+			     tmpjmp = (struct opvar *) if_list[--n_if_list];
+			     set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
+			 } else yyerror("conditional creation of monster, but no jump point marker.");
+		     }
+		 }
+		;
+
+monster_desc	: monster_c ',' m_name ',' coordinate monster_infos
+		  {
+		      long token = NON_PM;
+		      if ($3) {
+			  token = get_monster_id($3, (char) $<i>1);
+			  if (token == ERR) {
+			      yywarning("Invalid monster name!  Making random monster.");
+			      token = NON_PM;
+			  }
+			  Free($3);
+		      }
+		      add_opvars(splev, "iiii", $5.x, $5.y, (long)$<i>1, token);
 		  }
 		;
 
 monster_infos	: /* nothing */
+		  {
+		      struct opvar *stopit = New(struct opvar);
+		      set_opvar_int(stopit, SP_M_V_END);
+		      add_opcode(splev, SPO_PUSH, stopit);
+		      $<i>$ = 0x00;
+		  }
 		| monster_infos monster_info
+		  {
+		      if (( $<i>1 & $<i>2 ))
+			  yyerror("MONSTER extra info already used.");
+		      $<i>$ = ( $<i>1 | $<i>2 );
+		  }
 		;
 
 monster_info	: ',' string
 		  {
-		     monster *tmpm =
-		       (monster *) get_last_opcode_data1(&splev, SPO_MONSTER);
-		     if (!tmpm) yyerror("No monster defined?!");
-		     tmpm->name.str = $2;
+		      add_opvars(splev, "si", $2, SP_M_V_NAME);
+		      $<i>$ = 0x0001;
 		  }
 		| ',' MON_ATTITUDE
 		  {
-		     monster *tmpm =
-		       (monster *) get_last_opcode_data1(&splev, SPO_MONSTER);
-		     if (!tmpm) yyerror("No monster defined?!");
-		     tmpm->peaceful = $<i>2;
+		      add_opvars(splev, "ii", (long)$<i>2, SP_M_V_PEACEFUL);
+		      $<i>$ = 0x0002;
 		  }
 		| ',' MON_ALERTNESS
 		  {
-		     monster *tmpm =
-		       (monster *) get_last_opcode_data1(&splev, SPO_MONSTER);
-		     if (!tmpm) yyerror("No monster defined?!");
-		     tmpm->asleep = $<i>2;
+		      add_opvars(splev, "ii", (long)$<i>2, SP_M_V_ASLEEP);
+		      $<i>$ = 0x0004;
 		  }
 		| ',' alignment
 		  {
-		     monster *tmpm =
-		       (monster *) get_last_opcode_data1(&splev, SPO_MONSTER);
-		     if (!tmpm) yyerror("No monster defined?!");
-		     tmpm->align = $<i>2;
+		      add_opvars(splev, "ii", (long)$<i>2, SP_M_V_ALIGN);
+		      $<i>$ = 0x0008;
 		  }
 		| ',' MON_APPEARANCE string
 		  {
-		     monster *tmpm =
-		       (monster *) get_last_opcode_data1(&splev, SPO_MONSTER);
-		     if (!tmpm) yyerror("No monster defined?!");
-		     tmpm->appear = $<i>2;
-		     tmpm->appear_as.str = $3;
+		      add_opvars(splev, "sii", $3, (long)$<i>2, SP_M_V_APPEAR);
+		      $<i>$ = 0x0010;
+		  }
+		| ',' FEMALE_ID
+		  {
+		      add_opvars(splev, "ii", 1, SP_M_V_FEMALE);
+		      $<i>$ = 0x0020;
+		  }
+		| ',' INVIS_ID
+		  {
+		      add_opvars(splev, "ii", 1, SP_M_V_INVIS);
+		      $<i>$ = 0x0040;
+		  }
+		| ',' CANCELLED_ID
+		  {
+		      add_opvars(splev, "ii", 1, SP_M_V_CANCELLED);
+		      $<i>$ = 0x0080;
+		  }
+		| ',' REVIVED_ID
+		  {
+		      add_opvars(splev, "ii", 1, SP_M_V_REVIVED);
+		      $<i>$ = 0x0100;
+		  }
+		| ',' AVENGE_ID
+		  {
+		      add_opvars(splev, "ii", 1, SP_M_V_AVENGE);
+		      $<i>$ = 0x0200;
+		  }
+		| ',' FLEEING_ID ':' INTEGER
+		  {
+		      add_opvars(splev, "ii", (long)$4, SP_M_V_FLEEING);
+		      $<i>$ = 0x0400;
+		  }
+		| ',' BLINDED_ID ':' INTEGER
+		  {
+		      add_opvars(splev, "ii", (long)$4, SP_M_V_BLINDED);
+		      $<i>$ = 0x0800;
+		  }
+		| ',' PARALYZED_ID ':' INTEGER
+		  {
+		      add_opvars(splev, "ii", (long)$4, SP_M_V_PARALYZED);
+		      $<i>$ = 0x1000;
+		  }
+		| ',' STUNNED_ID
+		  {
+		      add_opvars(splev, "ii", 1, SP_M_V_STUNNED);
+		      $<i>$ = 0x2000;
+		  }
+		| ',' CONFUSED_ID
+		  {
+		      add_opvars(splev, "ii", 1, SP_M_V_CONFUSED);
+		      $<i>$ = 0x4000;
+		  }
+		| ',' SEENTRAPS_ID ':' seen_trap_mask
+		  {
+		      add_opvars(splev, "ii", (long)$4, SP_M_V_SEENTRAPS);
+		      $<i>$ = 0x8000;
 		  }
 		;
 
-object_detail	: OBJECT_ID object_desc
+seen_trap_mask	: STRING
 		  {
+		      int token = get_trap_type($1);
+		      if (token == ERR || token == 0)
+			  yyerror("Unknown trap type!");
+		      $$ = (1L << (token - 1));
 		  }
-		| COBJECT_ID object_desc
+		| ALL_ID
 		  {
-		     object *tmpobj =
-		       (object *) get_last_opcode_data1(&splev, SPO_OBJECT);
-		     if (!tmpobj) yyerror("No object defined?!");
-		     tmpobj->containment = 2;
+		      $$ = (long) ~0;
+		  }
+		| STRING '|' seen_trap_mask
+		  {
+		      int token = get_trap_type($1);
+		      if (token == ERR || token == 0)
+			  yyerror("Unknown trap type!");
 
-			/* 1: is contents of preceeding object with 2 */
-			/* 2: is a container */
-			/* 0: neither */
+		      if ((1L << (token - 1)) & $3)
+			  yyerror("MONSTER seen_traps, same trap listed twice.");
+
+		      $$ = ((1L << (token - 1)) | $3);
 		  }
 		;
 
-object_desc	: chance ':' object_c ',' o_name
+cobj_statements	: /* nothing */
 		  {
-		     object *tmpobj = New(object);
+		  }
+		| cobj_statement cobj_statements
+		;
 
-		     tmpobj->class = $<i>3;
-		     tmpobj->corpsenm = NON_PM;
-		     tmpobj->curse_state = -1;
-		     tmpobj->name.str = 0;
-		     tmpobj->chance = $1;
-		     tmpobj->id = -1;
-		     if ($5) {
-			int token = get_object_id($5, $<i>3);
-			if (token == ERR)
-			  yywarning(
-			    "Illegal object name!  Making random object.");
-			else
-			  tmpobj->id = token;
-			Free($5);
+cobj_statement  : cobj_detail
+		| cobj_ifstatement
+		;
+
+cobj_detail	: OBJECT_ID chance ':' cobj_desc
+		  {
+		      add_opvars(splev, "io", (long)SP_OBJ_CONTENT, SPO_OBJECT);
+		      if ( 1 == $2 ) {
+			  if (n_if_list > 0) {
+			      struct opvar *tmpjmp;
+			      tmpjmp = (struct opvar *) if_list[--n_if_list];
+			      set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
+			  } else yyerror("conditional creation of obj, but no jump point marker.");
+		      }
+		  }
+		| COBJECT_ID chance ':' cobj_desc
+		  {
+		      add_opvars(splev, "io", (long)(SP_OBJ_CONTENT|SP_OBJ_CONTAINER), SPO_OBJECT);
+		      $<i>$ = $2;
+		  }
+		'{' cobj_statements '}'
+		  {
+		      add_opcode(splev, SPO_POP_CONTAINER, NULL);
+
+		      if ( 1 == $<i>5 ) {
+			  if (n_if_list > 0) {
+			      struct opvar *tmpjmp;
+			      tmpjmp = (struct opvar *) if_list[--n_if_list];
+			      set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
+			  } else yyerror("conditional creation of obj, but no jump point marker.");
+		      }
+		  }
+		;
+
+object_detail	: OBJECT_ID chance ':' object_desc
+		  {
+		      add_opvars(splev, "io", 0, SPO_OBJECT); /* 0 == not container, nor contents of one. */
+		      if ( 1 == $2 ) {
+			  if (n_if_list > 0) {
+			      struct opvar *tmpjmp;
+			      tmpjmp = (struct opvar *) if_list[--n_if_list];
+			      set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
+			  } else yyerror("conditional creation of obj, but no jump point marker.");
+		      }
+		  }
+		| COBJECT_ID chance ':' object_desc
+		  {
+		      add_opvars(splev, "io", (long)SP_OBJ_CONTAINER, SPO_OBJECT);
+		      $<i>$ = $2;
+		  }
+		'{' cobj_statements '}'
+		 {
+		     add_opcode(splev, SPO_POP_CONTAINER, NULL);
+
+		     if ( 1 == $<i>5 ) {
+			 if (n_if_list > 0) {
+			     struct opvar *tmpjmp;
+			     tmpjmp = (struct opvar *) if_list[--n_if_list];
+			     set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
+			 } else yyerror("conditional creation of obj, but no jump point marker.");
 		     }
-		     add_opcode(&splev, SPO_OBJECT, tmpobj);
+		 }
+		;
 
-		  }
-		 ',' object_where object_infos
+cobj_desc	: object_c ',' o_name object_infos
 		  {
-		      /* nothing here */
+		      long token = -1;
+		      if ($3) {
+			  token = get_object_id($3, $<i>1);
+			  if (token == ERR) {
+			      yywarning("Illegal object name!  Making random object.");
+			      token = -1;
+			  }
+			  Free($3);
+		      }
+		      add_opvars(splev, "iiii", -1, -1, (long)$<i>1, token);
 		  }
 		;
 
-object_where	: coordinate
+object_desc	: object_c ',' o_name ',' coordinate object_infos
 		  {
-		     object *tmpobj = (object *)
-		       get_last_opcode_data1(&splev, SPO_OBJECT);
-
-		     if (!tmpobj) yyerror("No object defined?!");
-		     tmpobj->containment = 0;
-		     tmpobj->x = current_coord.x;
-		     tmpobj->y = current_coord.y;
-		  }
-		| CONTAINED
-		  {
-		     object *tmpobj =
-		       (object *) get_last_opcode_data1(&splev, SPO_OBJECT);
-
-		     if (!tmpobj) yyerror("No object defined?!");
-		     tmpobj->containment = 1;
-		     /* random coordinate, will be overridden anyway */
-		     tmpobj->x = -MAX_REGISTERS-1;
-		     tmpobj->y = -MAX_REGISTERS-1;
-		  }
+		      long token = -1;
+		      if ($3) {
+			  token = get_object_id($3, $<i>1);
+			  if (token == ERR) {
+			      yywarning("Illegal object name!  Making random object.");
+			      token = -1;
+			  }
+			  Free($3);
+		      }
+		      add_opvars(splev, "iiii", $5.x, $5.y, (long)$<i>1, token);
+		}
 		;
 
 object_infos	: /* nothing */
 		  {
-		     object *tmpobj =
-		       (object *) get_last_opcode_data1(&splev, SPO_OBJECT);
-
-		     if (!tmpobj) yyerror("No object defined?!");
-		     tmpobj->spe = -127;
-	/* Note below: we're trying to make as many of these optional as
-	 * possible.  We clearly can't make curse_state, enchantment, and
-	 * monster_id _all_ optional, since ",random" would be ambiguous.
-	 * We can't even just make enchantment mandatory, since if we do that
-	 * alone, ",random" requires too much lookahead to parse.
-	 */
+		      struct opvar *stopit = New(struct opvar);
+		      set_opvar_int(stopit, SP_O_V_END);
+		      add_opcode(splev, SPO_PUSH, stopit);
+		      $<i>$ = 0x00;
 		  }
-		| ',' curse_state ',' monster_id ',' enchantment optional_name
+		| object_infos object_info
 		  {
-		  }
-		| ',' curse_state ',' enchantment optional_name
-		  {
-		  }
-		| ',' monster_id ',' enchantment optional_name
-		  {
+		      if (( $<i>1 & $<i>2 ))
+			  yyerror("OBJECT extra info already used.");
+		      $<i>$ = ( $<i>1 | $<i>2 );
 		  }
 		;
 
-curse_state	: RANDOM_TYPE
+object_info	: ',' CURSE_TYPE
 		  {
-		     object *tmpobj =
-		       (object *) get_last_opcode_data1(&splev, SPO_OBJECT);
-		     if (!tmpobj) yyerror("No object defined?!");
-		     tmpobj->curse_state = -1;
-		  }
-		| CURSE_TYPE
-		  {
-		     object *tmpobj =
-		       (object *) get_last_opcode_data1(&splev, SPO_OBJECT);
-		     if (!tmpobj) yyerror("No object defined?!");
-		     tmpobj->curse_state = $1;
-		  }
-		;
-
-monster_id	: STRING
-		  {
-		     object *tmpobj =
-		       (object *) get_last_opcode_data1(&splev, SPO_OBJECT);
-		     int token = get_monster_id($1, (char)0);
-
-		     if (!tmpobj) yyerror("No object defined?!");
-
-		     if (token == ERR)	/* "random" */
-		       tmpobj->corpsenm = NON_PM - 1;
-		     else
-		       tmpobj->corpsenm = token;
-		     Free($1);
-		  }
-		;
-
-enchantment	: RANDOM_TYPE
-		  {
-		     object *tmpobj =
-		       (object *) get_last_opcode_data1(&splev, SPO_OBJECT);
-		     if (!tmpobj) yyerror("No object defined?!");
-		     tmpobj->spe = -127;
-		  }
-		| INTEGER
-		  {
-		     object *tmpobj =
-		       (object *) get_last_opcode_data1(&splev, SPO_OBJECT);
-		     if (!tmpobj) yyerror("No object defined?!");
-		     tmpobj->spe = $1;
-		  }
-		;
-
-optional_name	: /* nothing */
-		| ',' NONE
-		  {
+		      add_opvars(splev, "ii", (long)$2, SP_O_V_CURSE);
+		      $<i>$ = 0x0001;
 		  }
 		| ',' STRING
 		  {
-		     object *tmpobj =
-		       (object *) get_last_opcode_data1(&splev, SPO_OBJECT);
-		     if (!tmpobj) yyerror("No object defined?!");
-		     tmpobj->name.str = $2;
+		      long token = get_monster_id($2, (char)0);
+		      if (token == ERR) {
+			  /* "random" */
+			  yywarning("OBJECT: Are you sure you didn't mean NAME:\"foo\"?");
+			  token = NON_PM - 1;
+		      }
+		      add_opvars(splev, "ii", token, SP_O_V_CORPSENM);
+		      Free($2);
+		      $<i>$ = 0x0002;
+		  }
+		| ',' INTEGER
+		  {
+		      add_opvars(splev, "ii", (long)$2, SP_O_V_SPE);
+		      $<i>$ = 0x0004;
+		  }
+		| ',' NAME_ID ':' STRING
+		  {
+		      add_opvars(splev, "si", $4, SP_O_V_NAME);
+		      $<i>$ = 0x0008;
+		  }
+		| ',' QUANTITY_ID ':' INTEGER
+		  {
+		      add_opvars(splev, "ii", (long)$4, SP_O_V_QUAN);
+		      $<i>$ = 0x0010;
+		  }
+		| ',' BURIED_ID
+		  {
+		      add_opvars(splev, "ii", 1, SP_O_V_BURIED);
+		      $<i>$ = 0x0020;
+		  }
+		| ',' LIGHT_STATE
+		  {
+		      add_opvars(splev, "ii", (long)$2, SP_O_V_LIT);
+		      $<i>$ = 0x0040;
+		  }
+		| ',' ERODED_ID ':' INTEGER
+		  {
+		      add_opvars(splev, "ii", (long)$4, SP_O_V_ERODED);
+		      $<i>$ = 0x0080;
+		  }
+		| ',' DOOR_STATE
+		  {
+		      if ($2 == D_LOCKED) {
+			  add_opvars(splev, "ii", 1, SP_O_V_LOCKED);
+			  $<i>$ = 0x0100;
+		      } else if ($2 == D_BROKEN) {
+			  add_opvars(splev, "ii", 1, SP_O_V_BROKEN);
+			  $<i>$ = 0x0200;
+		      } else
+			  yyerror("OBJECT state can only be locked or broken.");
+		  }
+		| ',' TRAPPED_ID
+		  {
+		      add_opvars(splev, "ii", 1, SP_O_V_TRAPPED);
+		      $<i>$ = 0x0400;
+		  }
+		| ',' RECHARGED_ID ':' INTEGER
+		  {
+		      add_opvars(splev, "ii", (long)$4, SP_O_V_RECHARGED);
+		      $<i>$ = 0x0800;
+		  }
+		| ',' INVIS_ID
+		  {
+		      add_opvars(splev, "ii", 1, SP_O_V_INVIS);
+		      $<i>$ = 0x1000;
+		  }
+		| ',' GREASED_ID
+		  {
+		      add_opvars(splev, "ii", 1, SP_O_V_GREASED);
+		      $<i>$ = 0x2000;
 		  }
 		;
 
 trap_detail	: TRAP_ID chance ':' trap_name ',' coordinate
 		  {
-		     trap *tmptrap = New(trap);
-
-		     tmptrap->x = current_coord.x;
-		     tmptrap->y = current_coord.y;
-		     tmptrap->type = $<i>4;
-		     tmptrap->chance = $2;
-
-		     add_opcode(&splev, SPO_TRAP, tmptrap);
+		      add_opvars(splev, "iiio", $6.x, $6.y, (long)$<i>4, SPO_TRAP);
+		      if ( 1 == $2 ) {
+			  if (n_if_list > 0) {
+			      struct opvar *tmpjmp;
+			      tmpjmp = (struct opvar *) if_list[--n_if_list];
+			      set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
+			  } else yyerror("conditional creation of trap, but no jump point marker.");
+		      }
 		  }
 		;
 
 drawbridge_detail: DRAWBRIDGE_ID ':' coordinate ',' DIRECTION ',' door_state
 		   {
-		        int x, y, dir;
-			drawbridge *tmpdb = New(drawbridge);
+		       long d, state = 0;
+		       /* convert dir from a DIRECTION to a DB_DIR */
+		       d = $5;
+		       switch(d) {
+		       case W_NORTH: d = DB_NORTH; break;
+		       case W_SOUTH: d = DB_SOUTH; break;
+		       case W_EAST:  d = DB_EAST;  break;
+		       case W_WEST:  d = DB_WEST;  break;
+		       default:
+			   yyerror("Invalid drawbridge direction");
+			   break;
+		       }
 
-			x = tmpdb->x = current_coord.x;
-			y = tmpdb->y = current_coord.y;
-			/* convert dir from a DIRECTION to a DB_DIR */
-			dir = $5;
-			switch(dir) {
-			case W_NORTH: dir = DB_NORTH; y--; break;
-			case W_SOUTH: dir = DB_SOUTH; y++; break;
-			case W_EAST:  dir = DB_EAST;  x++; break;
-			case W_WEST:  dir = DB_WEST;  x--; break;
-			default:
-			    yyerror("Invalid drawbridge direction");
-			    break;
-			}
-			tmpdb->dir = dir;
-
-			if ( $<i>7 == D_ISOPEN )
-			    tmpdb->db_open = 1;
-			else if ( $<i>7 == D_CLOSED )
-			    tmpdb->db_open = 0;
-			else
-			    yyerror("A drawbridge can only be open or closed!");
-
-			add_opcode(&splev, SPO_DRAWBRIDGE, tmpdb);
+		       if ( $<i>7 == D_ISOPEN )
+			   state = 1;
+		       else if ( $<i>7 == D_CLOSED )
+			   state = 0;
+		       else
+			   yyerror("A drawbridge can only be open or closed!");
+		       add_opvars(splev, "iiiio", $3.x, $3.y, state, d, SPO_DRAWBRIDGE);
 		   }
 		;
 
 mazewalk_detail : MAZEWALK_ID ':' coordinate ',' DIRECTION
 		  {
-		      walk *tmpwalk = New(walk);
-
-		      tmpwalk->x = current_coord.x;
-		      tmpwalk->y = current_coord.y;
-		      tmpwalk->dir = $5;
-
-		      add_opcode(&splev, SPO_MAZEWALK, tmpwalk);
+		      add_opvars(splev, "iiiiio",
+				 $3.x, $3.y, (long)$5, 1, 0, SPO_MAZEWALK);
+		  }
+		| MAZEWALK_ID ':' coordinate ',' DIRECTION ',' BOOLEAN opt_fillchar
+		  {
+		      add_opvars(splev, "iiiiio",
+				 $3.x, $3.y,
+				 (long)$5, (long)$<i>7, (long)$<i>8, SPO_MAZEWALK);
 		  }
 		;
 
 wallify_detail	: WALLIFY_ID
 		  {
-		      add_opcode(&splev, SPO_WALLIFY, NULL);
+		      add_opvars(splev, "iiiio", -1,-1,-1,-1, SPO_WALLIFY);
+		  }
+		| WALLIFY_ID ':' lev_region
+		  {
+		      add_opvars(splev, "iiiio",
+				 $3.x1, $3.y1, $3.x2, $3.y2, SPO_WALLIFY);
 		  }
 		;
 
 ladder_detail	: LADDER_ID ':' coordinate ',' UP_OR_DOWN
 		  {
-		     lad *tmplad = New(lad);
-
-		     tmplad->x = current_coord.x;
-		     tmplad->y = current_coord.y;
-		     tmplad->up = $<i>5;
-		     add_opcode(&splev, SPO_LADDER, tmplad);
+		      add_opvars(splev, "iiio", $3.x, $3.y, (long)$<i>5, SPO_LADDER);
 		  }
 		;
 
 stair_detail	: STAIR_ID ':' coordinate ',' UP_OR_DOWN
 		  {
-		     stair *tmpstair = New(stair);
-
-		     tmpstair->x = current_coord.x;
-		     tmpstair->y = current_coord.y;
-		     tmpstair->up = $<i>5;
-		     add_opcode(&splev, SPO_STAIR, tmpstair);
+		      add_opvars(splev, "iiio", $3.x, $3.y, (long)$<i>5, SPO_STAIR);
 		  }
 		;
 
-stair_region	: STAIR_ID ':' lev_region
+stair_region	: STAIR_ID ':' lev_region ',' lev_region ',' UP_OR_DOWN
 		  {
-		      lev_region *tmplreg = New(lev_region);
-
-		      tmplreg->in_islev = $3;
-		      tmplreg->inarea.x1 = current_region.x1;
-		      tmplreg->inarea.y1 = current_region.y1;
-		      tmplreg->inarea.x2 = current_region.x2;
-		      tmplreg->inarea.y2 = current_region.y2;
-
-		      add_opcode(&splev, SPO_LEVREGION, tmplreg);
-		  }
-		 ',' lev_region ',' UP_OR_DOWN
-		  {
-		     lev_region *tmplreg = (lev_region *) 
-		       get_last_opcode_data1(&splev, SPO_LEVREGION);
-
-		     if (!tmplreg) yyerror("No lev_region defined?!");
-		     tmplreg->del_islev = $6;
-		     tmplreg->delarea.x1 = current_region.x1;
-		     tmplreg->delarea.y1 = current_region.y1;
-		     tmplreg->delarea.x2 = current_region.x2;
-		     tmplreg->delarea.y2 = current_region.y2;
-		     if($8)
-		       tmplreg->rtype = LR_UPSTAIR;
-		     else
-		       tmplreg->rtype = LR_DOWNSTAIR;
-		     tmplreg->rname.str = 0;
+		      add_opvars(splev, "iiiii iiiii iiso",
+				 $3.x1, $3.y1, $3.x2, $3.y2, $3.area,
+				 $5.x1, $5.y1, $5.x2, $5.y2, $5.area,
+				 (long)(($7) ? LR_UPSTAIR : LR_DOWNSTAIR),
+				 0, (char *)0, SPO_LEVREGION);
 		  }
 		;
 
-portal_region	: PORTAL_ID ':' lev_region
+portal_region	: PORTAL_ID ':' lev_region ',' lev_region ',' string
 		  {
-		     lev_region *tmplreg = New(lev_region);
-
-		     tmplreg->in_islev = $3;
-		     tmplreg->inarea.x1 = current_region.x1;
-		     tmplreg->inarea.y1 = current_region.y1;
-		     tmplreg->inarea.x2 = current_region.x2;
-		     tmplreg->inarea.y2 = current_region.y2;
-
-		     add_opcode(&splev, SPO_LEVREGION, tmplreg);
-		  }
-		 ',' lev_region ',' string
-		  {
-		     lev_region *tmplreg = (lev_region *)
-		       get_last_opcode_data1(&splev, SPO_LEVREGION);
-
-		     if (!tmplreg) yyerror("No lev_region defined?!");
-		     tmplreg->del_islev = $6;
-		     tmplreg->delarea.x1 = current_region.x1;
-		     tmplreg->delarea.y1 = current_region.y1;
-		     tmplreg->delarea.x2 = current_region.x2;
-		     tmplreg->delarea.y2 = current_region.y2;
-		     tmplreg->rtype = LR_PORTAL;
-		     tmplreg->rname.str = $8;
+		      add_opvars(splev, "iiiii iiiii iiso",
+				 $3.x1, $3.y1, $3.x2, $3.y2, $3.area,
+				 $5.x1, $5.y1, $5.x2, $5.y2, $5.area,
+				 LR_PORTAL, 0, $7, SPO_LEVREGION);
 		  }
 		;
 
-teleprt_region	: TELEPRT_ID ':' lev_region
+teleprt_region	: TELEPRT_ID ':' lev_region ',' lev_region teleprt_detail
 		  {
-		     lev_region *tmplreg = New(lev_region);
-
-		     tmplreg->in_islev = $3;
-		     tmplreg->inarea.x1 = current_region.x1;
-		     tmplreg->inarea.y1 = current_region.y1;
-		     tmplreg->inarea.x2 = current_region.x2;
-		     tmplreg->inarea.y2 = current_region.y2;
-
-		     add_opcode(&splev, SPO_LEVREGION, tmplreg);
-		  }
-		 ',' lev_region
-		  {
-		     lev_region *tmplreg = (lev_region *)
-		       get_last_opcode_data1(&splev, SPO_LEVREGION);
-
-		     if (!tmplreg) yyerror("No lev_region defined?!");
-		     tmplreg->del_islev = $6;
-		     tmplreg->delarea.x1 = current_region.x1;
-		     tmplreg->delarea.y1 = current_region.y1;
-		     tmplreg->delarea.x2 = current_region.x2;
-		     tmplreg->delarea.y2 = current_region.y2;
-		  }
-		teleprt_detail
-		  {
-		     lev_region *tmplreg = (lev_region *)
-		       get_last_opcode_data1(&splev, SPO_LEVREGION);
-
-		     if (!tmplreg) yyerror("No lev_region defined?!");
-		     switch($<i>8) {
-		      case -1: tmplreg->rtype = LR_TELE; break;
-		      case 0: tmplreg->rtype = LR_DOWNTELE; break;
-		      case 1: tmplreg->rtype = LR_UPTELE; break;
-		     }
-		     tmplreg->rname.str = 0;
+		      long rtype;
+		      switch($<i>6) {
+		      case -1: rtype = LR_TELE; break;
+		      case  0: rtype = LR_DOWNTELE; break;
+		      case  1: rtype = LR_UPTELE; break;
+		      }
+		      add_opvars(splev, "iiiii iiiii iiso",
+				 $3.x1, $3.y1, $3.x2, $3.y2, $3.area,
+				 $5.x1, $5.y1, $5.x2, $5.y2, $5.area,
+				 rtype, 0, (char *)0, SPO_LEVREGION);
 		  }
 		;
 
-branch_region	: BRANCH_ID ':' lev_region
+branch_region	: BRANCH_ID ':' lev_region ',' lev_region
 		  {
-		     lev_region *tmplreg = New(lev_region);
-
-		     tmplreg->in_islev = $3;
-		     tmplreg->inarea.x1 = current_region.x1;
-		     tmplreg->inarea.y1 = current_region.y1;
-		     tmplreg->inarea.x2 = current_region.x2;
-		     tmplreg->inarea.y2 = current_region.y2;
-
-		     add_opcode(&splev, SPO_LEVREGION, tmplreg);
-		  }
-		 ',' lev_region
-		  {
-		     lev_region *tmplreg = (lev_region *)
-		       get_last_opcode_data1(&splev, SPO_LEVREGION);
-
-		     if (!tmplreg) yyerror("No lev_region defined?!");
-		     tmplreg->del_islev = $6;
-		     tmplreg->delarea.x1 = current_region.x1;
-		     tmplreg->delarea.y1 = current_region.y1;
-		     tmplreg->delarea.x2 = current_region.x2;
-		     tmplreg->delarea.y2 = current_region.y2;
-		     tmplreg->rtype = LR_BRANCH;
-		     tmplreg->rname.str = 0;
+		      add_opvars(splev, "iiiii iiiii iiso",
+				 $3.x1, $3.y1, $3.x2, $3.y2, $3.area,
+				 $5.x1, $5.y1, $5.x2, $5.y2, $5.area,
+				 (long)LR_BRANCH, 0, (char *)0, SPO_LEVREGION);
 		  }
 		;
 
@@ -1174,241 +1595,222 @@ teleprt_detail	: /* empty */
 		  }
 		;
 
-lev_region	: region
-		  {
-			$$ = 0;
-		  }
-		| LEV '(' INTEGER ',' INTEGER ',' INTEGER ',' INTEGER ')'
-		  {
-/* This series of if statements is a hack for MSC 5.1.  It seems that its
-   tiny little brain cannot compile if these are all one big if statement. */
-			if ($3 <= 0 || $3 >= COLNO)
-				yyerror("Region out of level range!");
-			else if ($5 < 0 || $5 >= ROWNO)
-				yyerror("Region out of level range!");
-			else if ($7 <= 0 || $7 >= COLNO)
-				yyerror("Region out of level range!");
-			else if ($9 < 0 || $9 >= ROWNO)
-				yyerror("Region out of level range!");
-			current_region.x1 = $3;
-			current_region.y1 = $5;
-			current_region.x2 = $7;
-			current_region.y2 = $9;
-			$$ = 1;
-		  }
-		;
-
 fountain_detail : FOUNTAIN_ID ':' coordinate
 		  {
-		     fountain *tmpfountain = New(fountain);
-
-		     tmpfountain->x = current_coord.x;
-		     tmpfountain->y = current_coord.y;
-
-		     add_opcode(&splev, SPO_FOUNTAIN, tmpfountain);
+		      add_opvars(splev, "iio", $3.x, $3.y, SPO_FOUNTAIN);
 		  }
 		;
 
 sink_detail : SINK_ID ':' coordinate
 		  {
-		     sink *tmpsink = New(sink);
-
-		     tmpsink->x = current_coord.x;
-		     tmpsink->y = current_coord.y;
-
-		     add_opcode(&splev, SPO_SINK, tmpsink);
+		      add_opvars(splev, "iio", $3.x, $3.y, SPO_SINK);
 		  }
 		;
 
 pool_detail : POOL_ID ':' coordinate
 		  {
-		     pool *tmppool = New(pool);
-
-		     tmppool->x = current_coord.x;
-		     tmppool->y = current_coord.y;
-
-		     add_opcode(&splev, SPO_POOL, tmppool);
+		      add_opvars(splev, "iio", $3.x, $3.y, SPO_POOL);
 		  }
 		;
 
 replace_terrain_detail : REPLACE_TERRAIN_ID ':' region ',' CHAR ',' CHAR ',' light_state ',' SPERCENT
 		  {
-		      replaceterrain *tmprepl = New(replaceterrain);
-		      tmprepl->chance = $11;
-		      if (tmprepl->chance < 0) tmprepl->chance = 0;
-		      else if (tmprepl->chance > 100) tmprepl->chance = 100;
-		      tmprepl->x1 = current_region.x1;
-		      tmprepl->y1 = current_region.y1;
-		      tmprepl->x2 = current_region.x2;
-		      tmprepl->y2 = current_region.y2;
-		      tmprepl->fromter = what_map_char((char) $5);
-		      tmprepl->toter = what_map_char((char) $7);
-		      tmprepl->tolit = $9;
-		      add_opcode(&splev, SPO_REPLACETERRAIN, tmprepl);
+		      long chance, from_ter, to_ter;
+
+		      chance = $11;
+		      if (chance < 0) chance = 0;
+		      else if (chance > 100) chance = 100;
+
+		      from_ter = what_map_char((char) $5);
+		      if (from_ter >= MAX_TYPE) yyerror("Replace terrain: illegal 'from' map char");
+
+		      to_ter = what_map_char((char) $7);
+		      if (to_ter >= MAX_TYPE) yyerror("Replace terrain: illegal 'to' map char");
+
+		      add_opvars(splev, "iiii iiiio",
+				 $3.x1, $3.y1, $3.x2, $3.y2,
+				 from_ter, to_ter, (long)$9, chance, SPO_REPLACETERRAIN);
 		  }
 		;
 
 terrain_detail : TERRAIN_ID chance ':' coordinate ',' CHAR ',' light_state
 		 {
-		     terrain *tmpterrain = New(terrain);
+		     long c;
 
-		     tmpterrain->chance = $2;
-		     tmpterrain->areatyp = 0;
-		     tmpterrain->x1 = current_coord.x;
-		     tmpterrain->y1 = current_coord.y;
-		     tmpterrain->x2 = tmpterrain->y2 = -1;
-		     tmpterrain->ter = what_map_char((char) $6);
-		     tmpterrain->tlit = $8;
+		     c = what_map_char((char) $6);
+		     if (c >= MAX_TYPE) yyerror("Terrain: illegal map char");
 
-		     add_opcode(&splev, SPO_TERRAIN, tmpterrain);
+		     add_opvars(splev, "iiii iiio",
+				$4.x, $4.y, -1, -1,
+				0, c, $8, SPO_TERRAIN);
+
+		     if ( 1 == $2 ) {
+			 if (n_if_list > 0) {
+			     struct opvar *tmpjmp;
+			     tmpjmp = (struct opvar *) if_list[--n_if_list];
+			     set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
+			 } else yyerror("conditional terrain modification, but no jump point marker.");
+		     }
 		 }
 	       |
 	         TERRAIN_ID chance ':' coordinate ',' HORIZ_OR_VERT ',' INTEGER ',' CHAR ',' light_state
 		 {
-		     terrain *tmpterrain = New(terrain);
+		     long areatyp, c, x2,y2;
 
-		     tmpterrain->chance = $2;
-		     tmpterrain->areatyp = $<i>6;
-		     tmpterrain->x1 = current_coord.x;
-		     tmpterrain->y1 = current_coord.y;
-		     if (tmpterrain->areatyp == 1) {
-		         tmpterrain->x2 = $8;
-		         tmpterrain->y2 = -1;
+		     areatyp = $<i>6;
+		     if (areatyp == 1) {
+			 x2 = $8;
+			 y2 = -1;
 		     } else {
-		         tmpterrain->y2 = $8;
-		         tmpterrain->x2 = -1;
+			 x2 = -1;
+			 y2 = $8;
 		     }
-		     tmpterrain->ter = what_map_char((char) $10);
-		     tmpterrain->tlit = $12;
 
-		     add_opcode(&splev, SPO_TERRAIN, tmpterrain);
+		     c = what_map_char((char) $10);
+		     if (c >= MAX_TYPE) yyerror("Terrain: illegal map char");
+
+		     add_opvars(splev, "iiii iiio",
+				$4.x, $4.y, x2, y2,
+				areatyp, c, (long)$12, SPO_TERRAIN);
+
+		     if ( 1 == $2 ) {
+			 if (n_if_list > 0) {
+			     struct opvar *tmpjmp;
+			     tmpjmp = (struct opvar *) if_list[--n_if_list];
+			     set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
+			 } else yyerror("conditional terrain modification, but no jump point marker.");
+		     }
 		 }
 	       |
 	         TERRAIN_ID chance ':' region ',' FILLING ',' CHAR ',' light_state
 		 {
-		     terrain *tmpterrain = New(terrain);
+		     long c;
 
-		     tmpterrain->chance = $2;
-		     tmpterrain->areatyp = 3 + $<i>6;
-		     tmpterrain->x1 = current_region.x1;
-		     tmpterrain->y1 = current_region.y1;
-		     tmpterrain->x2 = current_region.x2;
-		     tmpterrain->y2 = current_region.y2;
-		     tmpterrain->ter = what_map_char((char) $8);
-		     tmpterrain->tlit = $10;
+		     c = what_map_char((char) $8);
+		     if (c >= MAX_TYPE) yyerror("Terrain: illegal map char");
 
-		     add_opcode(&splev, SPO_TERRAIN, tmpterrain);
+		     add_opvars(splev, "iiii iiio",
+				$4.x1, $4.y1, $4.x2, $4.y2,
+				(long)(3 + $<i>6), c, (long)$10, SPO_TERRAIN);
+
+		     if ( 1 == $2 ) {
+			 if (n_if_list > 0) {
+			     struct opvar *tmpjmp;
+			     tmpjmp = (struct opvar *) if_list[--n_if_list];
+			     set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
+			 } else yyerror("conditional terrain modification, but no jump point marker.");
+		     }
 		 }
 	       ;
 
+randline_detail : RANDLINE_ID ':' lineends ',' CHAR ',' light_state ',' INTEGER opt_int
+		  {
+		      long c;
+		      c = what_map_char((char) $5);
+		      if ((c == INVALID_TYPE) || (c >= MAX_TYPE)) yyerror("Terrain: illegal map char");
+		      add_opvars(splev, "iiii iiiio",
+				 $3.x1, $3.y1, $3.x2, $3.y2,
+				 c, (long)$7, (long)$9, (long)$<i>10, SPO_RANDLINE);
+		  }
+
+opt_int		: /* empty */
+		  {
+			$<i>$ = 0;
+		  }
+		| ',' INTEGER
+		  {
+			$<i>$ = $2;
+		  }
+		;
+
 spill_detail : SPILL_ID ':' coordinate ',' CHAR ',' DIRECTION ',' INTEGER ',' light_state
-			{
-				spill* tmpspill = New(spill);
+		{
+		    long c, typ;
 
-				tmpspill->x = current_coord.x;
-				tmpspill->y = current_coord.y;
-				tmpspill->typ = what_map_char((char) $5);
-				if (tmpspill->typ == INVALID_TYPE) {
-					yyerror("Invalid map character in spill!");
-				}
-				tmpspill->direction = $7;
-				tmpspill->count = $9;
-				if (tmpspill->count < 1) {
-					yyerror("Invalid count in spill!");
-				}
-				tmpspill->lit = $11;
+		    typ = what_map_char((char) $5);
+		    if (typ == INVALID_TYPE || typ >= MAX_TYPE) {
+			yyerror("SPILL: Invalid map character!");
+		    }
 
-				add_opcode(&splev, SPO_SPILL, tmpspill);
+		    c = $9;
+		    if (c < 1) yyerror("SPILL: Invalid count!");
 
-			}
+		    add_opvars(splev, "iiiiiio", $3.x, $3.y,
+			       typ, (long)$7, c, (long)$11, SPO_SPILL);
+		}
 		;
 
 diggable_detail : NON_DIGGABLE_ID ':' region
 		  {
-		     digpos *tmpdig = New(digpos);
-
-		     tmpdig->x1 = current_region.x1;
-		     tmpdig->y1 = current_region.y1;
-		     tmpdig->x2 = current_region.x2;
-		     tmpdig->y2 = current_region.y2;
-
-		     add_opcode(&splev, SPO_NON_DIGGABLE, tmpdig);
+		     add_opvars(splev, "iiiio",
+				$3.x1, $3.y1, $3.x2, $3.y2, SPO_NON_DIGGABLE);
 		  }
 		;
 
 passwall_detail : NON_PASSWALL_ID ':' region
 		  {
-		     digpos *tmppass = New(digpos);
-
-		     tmppass->x1 = current_region.x1;
-		     tmppass->y1 = current_region.y1;
-		     tmppass->x2 = current_region.x2;
-		     tmppass->y2 = current_region.y2;
-
-		     add_opcode(&splev, SPO_NON_PASSWALL, tmppass);
+		     add_opvars(splev, "iiiio",
+				$3.x1, $3.y1, $3.x2, $3.y2, SPO_NON_PASSWALL);
 		  }
 		;
 
 region_detail	: REGION_ID ':' region ',' light_state ',' room_type prefilled
 		  {
-		     region *tmpreg = New(region);
+		      long rt, irr;
 
-		     tmpreg->x1 = current_region.x1;
-		     tmpreg->y1 = current_region.y1;
-		     tmpreg->x2 = current_region.x2;
-		     tmpreg->y2 = current_region.y2;
-		     tmpreg->rlit = $<i>5;
-		     tmpreg->rtype = $<i>7;
-		     if ($<i>8 & 1) tmpreg->rtype += MAXRTYPE+1;
-		     tmpreg->rirreg = (($<i>8 & 2) != 0);
-		     if(current_region.x1 > current_region.x2 ||
-			current_region.y1 > current_region.y2)
-		       yyerror("Region start > end!");
-		     if(tmpreg->rtype == VAULT &&
-			(tmpreg->rirreg ||
-			 (tmpreg->x2 - tmpreg->x1 != 1) ||
-			 (tmpreg->y2 - tmpreg->y1 != 1)))
-		       yyerror("Vaults must be exactly 2x2!");
+		      rt = $<i>7;
+		      if (( $<i>8 ) & 1) rt += MAXRTYPE+1;
 
-		     add_opcode(&splev, SPO_REGION, tmpreg);
+		      irr = ((( $<i>8 ) & 2) != 0);
+
+		      if ( $3.x1 > $3.x2 || $3.y1 > $3.y2 )
+			  yyerror("Region start > end!");
+
+		      if (rt == VAULT && (irr ||
+					 ( $3.x2 - $3.x1 != 1) ||
+					 ( $3.y2 - $3.y1 != 1)))
+			 yyerror("Vaults must be exactly 2x2!");
+
+		     add_opvars(splev, "iiii iiio",
+				$3.x1, $3.y1, $3.x2, $3.y2,
+				(long)$<i>5, rt, irr, SPO_REGION);
 		  }
 		;
 
 altar_detail	: ALTAR_ID ':' coordinate ',' alignment ',' altar_type
 		  {
-		     altar *tmpaltar = New(altar);
+		      add_opvars(splev, "iiiio", $3.x, $3.y,
+				 (long)$<i>7, (long)$<i>5, SPO_ALTAR);
+		  }
+		;
 
-		     tmpaltar->x = current_coord.x;
-		     tmpaltar->y = current_coord.y;
-		     tmpaltar->align = $<i>5;
-		     tmpaltar->shrine = $<i>7;
-
-		     add_opcode(&splev, SPO_ALTAR, tmpaltar);
+grave_detail	: GRAVE_ID ':' coordinate ',' string
+		  {
+		      add_opvars(splev, "iisio",
+				 $3.x, $3.y, $5, 2, SPO_GRAVE);
+		  }
+		| GRAVE_ID ':' coordinate ',' RANDOM_TYPE
+		  {
+		      add_opvars(splev, "iisio",
+				 $3.x, $3.y, (char *)0, 1, SPO_GRAVE);
+		  }
+		| GRAVE_ID ':' coordinate
+		  {
+		      add_opvars(splev, "iisio",
+				 $3.x, $3.y, (char *)0, 0, SPO_GRAVE);
 		  }
 		;
 
 gold_detail	: GOLD_ID ':' amount ',' coordinate
 		  {
-		     gold *tmpgold = New(gold);
-
-		     tmpgold->x = current_coord.x;
-		     tmpgold->y = current_coord.y;
-		     tmpgold->amount = $<i>3;
-
-		     add_opcode(&splev, SPO_GOLD, tmpgold);
+		      add_opvars(splev, "iiio", (long)$<i>3, $5.y, $5.x, SPO_GOLD);
 		  }
 		;
 
 engraving_detail: ENGRAVING_ID ':' coordinate ',' engraving_type ',' string
 		  {
-		     engraving *tmpengraving = New(engraving);
-
-		     tmpengraving->x = current_coord.x;
-		     tmpengraving->y = current_coord.y;
-		     tmpengraving->engr.str = $7;
-		     tmpengraving->etype = $<i>5;
-
-		     add_opcode(&splev, SPO_ENGRAVING, tmpengraving);
+		      add_opvars(splev, "iisio",
+				 $3.x, $3.y, $7, (long)$<i>5, SPO_ENGRAVING);
 		  }
 		;
 
@@ -1484,12 +1886,22 @@ coordinate	: coord
 		| p_register
 		| RANDOM_TYPE
 		  {
-			current_coord.x = current_coord.y = -MAX_REGISTERS-1;
+			$$.x = $$.y = -MAX_REGISTERS-1;
 		  }
 		;
 
 door_state	: DOOR_STATE
 		| RANDOM_TYPE
+		;
+
+opt_lit_state	: /* nothing */
+		  {
+		      $<i>$ = 0;
+		  }
+		| ',' light_state
+		  {
+		      $<i>$ = $2;
+		  }
 		;
 
 light_state	: LIGHT_STATE
@@ -1510,34 +1922,37 @@ altar_type	: ALTAR_TYPE
 
 p_register	: P_REGISTER '[' INTEGER ']'
 		  {
-		        if (on_plist == 0)
+		      if (!in_function_definition) {
+			  if (on_plist == 0)
 		                yyerror("No random places defined!");
-			else if ( $3 >= on_plist )
+			  else if ( $3 >= on_plist )
 				yyerror("Register Index overflow!");
-			else
-				current_coord.x = current_coord.y = - $3 - 1;
+		      }
+		      $$.x = $$.y = - $3 - 1;
 		  }
 		;
 
 o_register	: O_REGISTER '[' INTEGER ']'
 		  {
-		        if (on_olist == 0)
+		      if (!in_function_definition) {
+			  if (on_olist == 0)
 		                yyerror("No random objects defined!");
-			else if ( $3 >= on_olist )
+			  else if ( $3 >= on_olist )
 				yyerror("Register Index overflow!");
-			else
-				$<i>$ = - $3 - 1;
+		      }
+		      $<i>$ = - $3 - 1;
 		  }
 		;
 
 m_register	: M_REGISTER '[' INTEGER ']'
 		  {
-		        if (on_mlist == 0)
+		      if (!in_function_definition) {
+			  if (on_mlist == 0)
 		                yyerror("No random monsters defined!");
-			if ( $3 >= on_mlist )
+			  if ( $3 >= on_mlist )
 				yyerror("Register Index overflow!");
-			else
-				$<i>$ = - $3 - 1;
+		      }
+		      $<i>$ = - $3 - 1;
 		  }
 		;
 
@@ -1551,6 +1966,9 @@ a_register	: A_REGISTER '[' INTEGER ']'
 		;
 
 place		: coord
+		  {
+		      $$ = $1;
+		  }
 		;
 
 monster		: CHAR
@@ -1585,13 +2003,23 @@ amount		: INTEGER
 
 chance		: /* empty */
 		  {
-			$$ = 100;	/* default is 100% */
+		      /* by default we just do it, unconditionally. */
+		      $$ = 0;
 		  }
-		| PERCENT
+		| comparestmt
 		  {
-			if ($1 <= 0 || $1 > 100)
-			    yyerror("Expected percentile chance.");
-			$$ = $1;
+		      /* otherwise we generate an IF-statement */
+		      struct opvar *tmppush2 = New(struct opvar);
+		      if (n_if_list >= MAX_NESTED_IFS) {
+			  yyerror("IF: Too deeply nested IFs.");
+			  n_if_list = MAX_NESTED_IFS - 1;
+		      }
+		      add_opcode(splev, SPO_CMP, NULL);
+		      set_opvar_int(tmppush2, splev->n_opcodes+1);
+		      if_list[n_if_list++] = tmppush2;
+		      add_opcode(splev, SPO_PUSH, tmppush2);
+		      add_opcode(splev, $1, NULL);
+		      $$ = 1;
 		  }
 		;
 
@@ -1603,8 +2031,42 @@ coord		: '(' INTEGER ',' INTEGER ')'
 		  {
 		        if ($2 < 0 || $4 < 0 || $2 >= COLNO || $4 >= ROWNO)
 		           yyerror("Coordinates out of map range!");
-			current_coord.x = $2;
-			current_coord.y = $4;
+			$$.x = $2;
+			$$.y = $4;
+		  }
+		;
+
+lineends	: coordinate ',' coordinate
+		  {
+		      $$.x1 = $1.x;
+		      $$.y1 = $1.y;
+		      $$.x2 = $3.x;
+		      $$.y2 = $3.y;
+		      $$.area = 1;
+		  }
+		;
+
+lev_region	: region
+		  {
+			$$ = $1;
+		  }
+		| LEV '(' INTEGER ',' INTEGER ',' INTEGER ',' INTEGER ')'
+		  {
+/* This series of if statements is a hack for MSC 5.1.  It seems that its
+   tiny little brain cannot compile if these are all one big if statement. */
+			if ($3 <= 0 || $3 >= COLNO)
+				yyerror("Region out of level range (x1)!");
+			else if ($5 < 0 || $5 >= ROWNO)
+				yyerror("Region out of level range (y1)!");
+			else if ($7 <= 0 || $7 >= COLNO)
+				yyerror("Region out of level range (x2)!");
+			else if ($9 < 0 || $9 >= ROWNO)
+				yyerror("Region out of level range (y2)!");
+			$$.x1 = $3;
+			$$.y1 = $5;
+			$$.x2 = $7;
+			$$.y2 = $9;
+			$$.area = 1;
 		  }
 		;
 
@@ -1613,19 +2075,21 @@ region		: '(' INTEGER ',' INTEGER ',' INTEGER ',' INTEGER ')'
 /* This series of if statements is a hack for MSC 5.1.  It seems that its
    tiny little brain cannot compile if these are all one big if statement. */
 			if ($2 < 0 || $2 > (int)max_x_map)
-				yyerror("Region out of map range!");
+			  yyerror("Region out of map range (x1)!");
 			else if ($4 < 0 || $4 > (int)max_y_map)
-				yyerror("Region out of map range!");
+			  yyerror("Region out of map range (y1)!");
 			else if ($6 < 0 || $6 > (int)max_x_map)
-				yyerror("Region out of map range!");
+			  yyerror("Region out of map range (x2)!");
 			else if ($8 < 0 || $8 > (int)max_y_map)
-				yyerror("Region out of map range!");
-			current_region.x1 = $2;
-			current_region.y1 = $4;
-			current_region.x2 = $6;
-			current_region.y2 = $8;
+			  yyerror("Region out of map range (y2)!");
+			$$.area = 0;
+			$$.x1 = $2;
+			$$.y1 = $4;
+			$$.x2 = $6;
+			$$.y2 = $8;
 		  }
 		;
+
 
 %%
 

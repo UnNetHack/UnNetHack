@@ -8,8 +8,10 @@
 #	Here you meet your (besieged) class leader, Lord Carnarvon
 #	and receive your quest assignment.
 #
-MAZE: "Arc-strt",' '
-FLAGS: noteleport,hardfloor
+LEVEL: "Arc-strt"
+FLAGS: noteleport,hardfloor,mazelevel
+INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (80,'S'), (16,"human mummy"), (4,'M')
 GEOMETRY:center,center
 MAP
 ............................................................................
@@ -117,8 +119,10 @@ MONSTER: 'S',random,(10,19)
 #	to go further towards your assigned quest.
 #
 
-MAZE: "Arc-loca",' '
-FLAGS: hardfloor
+LEVEL: "Arc-loca"
+FLAGS: hardfloor,mazelevel
+INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (80,'S'), (16,"human mummy"), (4,'M')
 GEOMETRY:center,center
 MAP
 ............................................................................
@@ -265,7 +269,10 @@ MONSTER:'M',random,random
 #	been assigned to retrieve.
 #
 
-MAZE: "Arc-goal", ' '
+LEVEL: "Arc-goal"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (80,'S'), (16,"human mummy"), (4,'M')
 GEOMETRY:center,center
 MAP
                                                                             
@@ -321,7 +328,7 @@ NON_DIGGABLE:(00,00,75,19)
 # The altar of Huhetotl.  Unattended.
 ALTAR:(50,14),chaos,altar
 # Objects
-OBJECT:'(',"crystal ball",(50,14),blessed,5,"The Orb of Detection"
+OBJECT:'(',"crystal ball",(50,14),blessed,5,NAME:"The Orb of Detection"
 OBJECT:random,random,random
 OBJECT:random,random,random
 OBJECT:random,random,random
@@ -384,77 +391,103 @@ MONSTER:'M',random,random
 #
 
 LEVEL: "Arc-fila"
+MON_GENERATION:86%, (80,'S'), (16,"human mummy"), (4,'M')
 #
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, up
 OBJECT: random,random,random
 MONSTER: 'S', random, random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random,random,random
 MONSTER: 'S', random, random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 OBJECT: random,random,random
 MONSTER: 'S', random, random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, down
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'S', random, random
 MONSTER: 'M', "human mummy", random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'S', random, random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'S', random, random
+}
 
 RANDOM_CORRIDORS
 
 LEVEL: "Arc-filb"
+MON_GENERATION:86%, (80,'S'), (16,"human mummy"), (4,'M')
 #
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, up
 OBJECT: random,random,random
 MONSTER: 'M', random, random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random,random,random
 MONSTER: 'M', random, random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 OBJECT: random,random,random
 MONSTER: 'M', random, random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 STAIR: random, down
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'S', random, random
 MONSTER: 'M', "human mummy", random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'S', random, random
+}
 
 ROOM: "ordinary" , random, random, random, random
+{
 OBJECT: random, random, random
 TRAP: random, random
 MONSTER: 'S', random, random
+}
 
 RANDOM_CORRIDORS

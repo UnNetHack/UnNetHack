@@ -526,6 +526,9 @@ int trap_type;
 		if(rn2(7))
 		    dosdoor(xx, yy, aroom, rn2(5) ? SDOOR : DOOR);
 		else {
+		    /* inaccessible niches occasionally have iron bars */
+		    if (!rn2(8) && IS_WALL(levl[xx][yy].typ))
+			levl[xx][yy].typ = IRONBARS;
 		    if (!level.flags.noteleport)
 			(void) mksobj_at(SCR_TELEPORTATION,
 					 xx, yy+dy, TRUE, FALSE);
@@ -592,6 +595,8 @@ clear_level_structures()
 	level.buriedobjlist = (struct obj *)0;
 	level.monlist = (struct monst *)0;
 	level.damagelist = (struct damage *)0;
+	level.mon_gen = (struct mon_gen_override *)0;
+	level.sounds = NULL;
 
 	level.flags.nfountains = 0;
 	level.flags.nsinks = 0;
@@ -614,6 +619,7 @@ clear_level_structures()
 	level.flags.arboreal = 0;
 	level.flags.is_maze_lev = 0;
 	level.flags.is_cavernous_lev = 0;
+	level.flags.stormy = 0;
 
 	nroom = 0;
 	rooms[0].hx = -1;
@@ -971,6 +977,7 @@ mklev()
 {
 	struct mkroom *croom;
 
+	init_mapseen(&u.uz);
 	if(getbones()) return;
 	in_mklev = TRUE;
 	makelevel();
@@ -979,8 +986,8 @@ mklev()
 	place_random_engravings();
 	in_mklev = FALSE;
 	/* has_morgue gets cleared once morgue is entered; graveyard stays
-	   set (graveyard might already be set even when has_morgue is clear
-	   [see fixup_special()], so don't update it unconditionally) */
+	   set (graveyard might already be set even when has_morgue is clear,
+	   so don't update it unconditionally) */
 	if (level.flags.has_morgue)
 	    level.flags.graveyard = 1;
 	if (!level.flags.is_maze_lev) {

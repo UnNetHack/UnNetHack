@@ -58,10 +58,16 @@ long mask;
 	    uskin = obj;
 	 /* assert( !uarm ); */
 	} else {
+	    if (obj && (mask & W_ARMOR)) {	
+		violated(CONDUCT_NUDISM);			
+		/* Restoring a game and naming worn armor uses setworn.  *
+		 * This can unneccessariely increase the conduct-counter *
+		 * (only visible in Wizmode)				 */
+	    }
 	    for(wp = worn; wp->w_mask; wp++) if(wp->w_mask & mask) {
 		oobj = *(wp->w_obj);
 		if(oobj && !(oobj->owornmask & wp->w_mask))
-			impossible("Setworn: mask = %ld.", wp->w_mask);
+			warning("Setworn: mask = %ld.", wp->w_mask);
 		if(oobj) {
 		    if (u.twoweap && (oobj->owornmask & (W_WEP|W_SWAPWEP)))
 			u.twoweap = 0;

@@ -133,7 +133,7 @@ Boots_on()
 			spoteffects(FALSE);
 		}
 		break;
-	default: impossible(unknown_type, c_boots, uarmf->otyp);
+	default: warning(unknown_type, c_boots, uarmf->otyp);
     }
     return 0;
 }
@@ -187,7 +187,7 @@ Boots_off()
 	case JUMPING_BOOTS:
 	case KICKING_BOOTS:
 		break;
-	default: impossible(unknown_type, c_boots, otyp);
+	default: warning(unknown_type, c_boots, otyp);
     }
     cancelled_don = FALSE;
     return 0;
@@ -237,7 +237,7 @@ Cloak_on()
 	case ALCHEMY_SMOCK:
 		EAcid_resistance |= WORN_CLOAK;
   		break;
-	default: impossible(unknown_type, c_cloak, uarmc->otyp);
+	default: warning(unknown_type, c_cloak, uarmc->otyp);
     }
     return 0;
 }
@@ -283,7 +283,7 @@ Cloak_off()
 	case ALCHEMY_SMOCK:
 		EAcid_resistance &= ~WORN_CLOAK;
   		break;
-	default: impossible(unknown_type, c_cloak, otyp);
+	default: warning(unknown_type, c_cloak, otyp);
     }
     return 0;
 }
@@ -300,6 +300,7 @@ Helmet_on()
 	case DWARVISH_IRON_HELM:
 	case ORCISH_HELM:
 	case HELM_OF_TELEPATHY:
+	case TINFOIL_HAT:
 		break;
 	case HELM_OF_BRILLIANCE:
 		adj_abon(uarmh, uarmh->spe);
@@ -341,7 +342,7 @@ Helmet_on()
 		    makeknown(HELM_OF_OPPOSITE_ALIGNMENT);
 		}
 		break;
-	default: impossible(unknown_type, c_helmet, uarmh->otyp);
+	default: warning(unknown_type, c_helmet, uarmh->otyp);
     }
     return 0;
 }
@@ -358,6 +359,7 @@ Helmet_off()
 	case ELVEN_LEATHER_HELM:
 	case DWARVISH_IRON_HELM:
 	case ORCISH_HELM:
+	case TINFOIL_HAT:
 	    break;
 	case DUNCE_CAP:
 	    flags.botl = 1;
@@ -381,7 +383,7 @@ Helmet_off()
 	    u.ublessed = 0; /* lose the other god's protection */
 	    flags.botl = 1;
 	    break;
-	default: impossible(unknown_type, c_helmet, uarmh->otyp);
+	default: warning(unknown_type, c_helmet, uarmh->otyp);
     }
     setworn((struct obj *)0, W_ARMH);
     cancelled_don = FALSE;
@@ -409,7 +411,7 @@ Gloves_on()
 	case GAUNTLETS_OF_DEXTERITY:
 		adj_abon(uarmg, uarmg->spe);
 		break;
-	default: impossible(unknown_type, c_gloves, uarmg->otyp);
+	default: warning(unknown_type, c_gloves, uarmg->otyp);
     }
     return 0;
 }
@@ -436,7 +438,7 @@ Gloves_off()
 	case GAUNTLETS_OF_DEXTERITY:
 	    if (!cancelled_don) adj_abon(uarmg, -uarmg->spe);
 	    break;
-	default: impossible(unknown_type, c_gloves, uarmg->otyp);
+	default: warning(unknown_type, c_gloves, uarmg->otyp);
     }
     setworn((struct obj *)0, W_ARMG);
     cancelled_don = FALSE;
@@ -483,7 +485,7 @@ Shield_on()
 	case LARGE_SHIELD:
 	case SHIELD_OF_REFLECTION:
 		break;
-	default: impossible(unknown_type, c_shield, uarms->otyp);
+	default: warning(unknown_type, c_shield, uarms->otyp);
     }
 */
     return 0;
@@ -503,7 +505,7 @@ Shield_off()
 	case LARGE_SHIELD:
 	case SHIELD_OF_REFLECTION:
 		break;
-	default: impossible(unknown_type, c_shield, uarms->otyp);
+	default: warning(unknown_type, c_shield, uarms->otyp);
     }
 */
     setworn((struct obj *)0, W_ARMS);
@@ -519,7 +521,7 @@ Shirt_on()
 	case HAWAIIAN_SHIRT:
 	case T_SHIRT:
 		break;
-	default: impossible(unknown_type, c_shirt, uarmu->otyp);
+	default: warning(unknown_type, c_shirt, uarmu->otyp);
     }
 */
     return 0;
@@ -534,7 +536,7 @@ Shirt_off()
 	case HAWAIIAN_SHIRT:
 	case T_SHIRT:
 		break;
-	default: impossible(unknown_type, c_shirt, uarmu->otyp);
+	default: warning(unknown_type, c_shirt, uarmu->otyp);
     }
 */
     setworn((struct obj *)0, W_ARMU);
@@ -706,7 +708,6 @@ register struct obj *obj;
 
     switch(obj->otyp){
 	case RIN_TELEPORTATION:
-	case RIN_REGENERATION:
 	case RIN_SEARCHING:
 	case RIN_STEALTH:
 	case RIN_HUNGER:
@@ -715,14 +716,29 @@ register struct obj *obj;
 	case RIN_FIRE_RESISTANCE:
 	case RIN_COLD_RESISTANCE:
 	case RIN_SHOCK_RESISTANCE:
-	case RIN_CONFLICT:
 	case RIN_TELEPORT_CONTROL:
 	case RIN_POLYMORPH:
 	case RIN_POLYMORPH_CONTROL:
-	case RIN_FREE_ACTION:                
+	case RIN_FREE_ACTION:
 	case RIN_SLOW_DIGESTION:
 	case RIN_SUSTAIN_ABILITY:
 	case MEAT_RING:
+		break;
+	case RIN_REGENERATION:
+		if (!oldprop && !HRegeneration && !regenerates(youmonst.data)) {
+			if ((uhp() < uhpmax()) &&
+			    !objects[obj->otyp].oc_name_known) {
+				Your("wounds are rapidly healing!");
+				makeknown(RIN_REGENERATION);
+			}
+		}
+		break;
+	case RIN_CONFLICT:
+#ifdef BLACKMARKET
+		if (Is_blackmarket(&u.uz)) {
+			set_black_marketeer_angry();
+		}
+#endif /* BLACKMARKET */
 		break;
 	case RIN_WARNING:
 		see_monsters();
@@ -815,7 +831,7 @@ boolean gone;
 
     takeoff_mask &= ~mask;
     if(!(u.uprops[objects[obj->otyp].oc_oprop].extrinsic & mask))
-	impossible("Strange... I didn't know you had that ring.");
+	warning("Strange... I didn't know you had that ring.");
     if(gone) setnotworn(obj);
     else setworn((struct obj *)0, obj->owornmask);
 
@@ -973,6 +989,7 @@ register struct obj *otmp;
 {
 	boolean was_blind = Blind, changed = FALSE;
 
+	violated(CONDUCT_BLINDFOLDED);
 	takeoff_mask &= ~W_TOOL;
 	setworn((struct obj *)0, otmp->owornmask);
 	off_msg(otmp);
@@ -1107,7 +1124,7 @@ dotakeoff()
 			  "  Use 'R' command to remove accessories." : "");
 		return 0;
 	}
-	if (armorpieces > 1)
+	if (armorpieces > 1 || iflags.paranoid_remove)
 		otmp = getobj(clothes, "take off");
 	if (otmp == 0) return(0);
 	if (!(otmp->owornmask & W_ARMOR)) {
@@ -1157,7 +1174,8 @@ doremring()
 		      "  Use 'T' command to take off armor." : "");
 		return(0);
 	}
-	if (Accessories != 1) otmp = getobj(accessories, "remove");
+	if (Accessories != 1 || iflags.paranoid_remove)
+		otmp = getobj(accessories, "remove");
 	if(!otmp) return(0);
 	if(!(otmp->owornmask & (W_RING | W_AMUL | W_TOOL))) {
 		You("are not wearing that.");
@@ -1184,7 +1202,7 @@ doremring()
 	} else if (otmp == ublindf) {
 		Blindf_off(otmp);	/* does its own off_msg */
 	} else {
-		impossible("removing strange accessory?");
+		warning("removing strange accessory?");
 	}
 	return(1);
 }
@@ -1213,7 +1231,7 @@ register struct obj *otmp;
 
 	if(cursed(otmp)) return(0);
 	if(delay) {
-		nomul(delay);
+		nomul(delay, "disrobing");
 		if (is_helmet(otmp)) {
 			nomovemsg = "You finish taking off your helmet.";
 			afternmv = Helmet_off;
@@ -1470,7 +1488,7 @@ dowear()
 	setworn(otmp, mask);
 	delay = -objects[otmp->otyp].oc_delay;
 	if(delay){
-		nomul(delay);
+		nomul(delay, "dressing up");
 		if(is_boots(otmp)) afternmv = Boots_on;
 		if(is_helmet(otmp)) afternmv = Helmet_on;
 		if(is_gloves(otmp)) afternmv = Gloves_on;
@@ -1758,7 +1776,7 @@ struct obj *ring;
 int otyp;
 {
     if (ring != uleft && ring != uright) {
-	impossible("stuck_ring: neither left nor right?");
+	warning("stuck_ring: neither left nor right?");
 	return (struct obj *)0;
     }
 
@@ -1893,7 +1911,7 @@ register struct obj *otmp;
 	else if(otmp == uswapwep) takeoff_mask |= W_SWAPWEP;
 	else if(otmp == uquiver) takeoff_mask |= W_QUIVER;
 
-	else impossible("select_off: %s???", doname(otmp));
+	else warning("select_off: %s???", doname(otmp));
 
 	return(0);
 }
@@ -1950,7 +1968,7 @@ do_takeoff()
 	  if(!cursed(otmp)) Ring_off(uright);
 	} else if (taking_off == WORN_BLINDF) {
 	  if (!cursed(ublindf)) Blindf_off(ublindf);
-	} else impossible("do_takeoff: taking off %lx", taking_off);
+	} else warning("do_takeoff: taking off %lx", taking_off);
 
 	return(otmp);
 }
@@ -2026,7 +2044,7 @@ take_off()
 	} else if (taking_off == WORN_BLINDF) {
 	  todelay = 2;
 	} else {
-	  impossible("take_off: taking off %lx", taking_off);
+	  warning("take_off: taking off %lx", taking_off);
 	  return 0;	/* force done */
 	}
 
@@ -2147,7 +2165,8 @@ register struct obj *atmp;
 		useup(otmp);
 	} else if (DESTROY_ARM(uarm)) {
 		if (donning(otmp)) cancel_don();
-		Your("armor turns to dust and falls to the %s!",
+		pline("%s turns to dust and falls to the %s!",
+			Ysimple_name2(otmp),
 			surface(u.ux,u.uy));
 		(void) Armor_gone();
 		useup(otmp);

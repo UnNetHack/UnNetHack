@@ -269,8 +269,23 @@ impossible VA_DECL(const char *, s)
 	    paniclog("impossible", pbuf);
 	}
 	vpline(s,VA_ARGS);
-	pline("Program in disorder - perhaps you'd better #quit.");
+	pline("Program in disorder; you probably should S)ave and restart the process.");
 	program_state.in_impossible = 0;
+	VA_END();
+}
+
+void
+warning VA_DECL(const char *, s)
+	char str[BUFSZ];
+	VA_START(s);
+	VA_INIT(s, const char *);
+	{
+	    char pbuf[BUFSZ];
+	    Vsprintf(pbuf,s,VA_ARGS);
+	    paniclog("warning", pbuf);
+	}
+	Vsprintf(str,s,VA_ARGS);
+	pline("Warning: %s\n", str);
 	VA_END();
 }
 

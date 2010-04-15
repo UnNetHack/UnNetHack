@@ -20,6 +20,7 @@ char *catmore = 0;		/* default pager */
 NEARDATA int bases[MAXOCLASSES] = DUMMY;
 
 NEARDATA int multi = 0;
+char multi_txt[BUFSZ] = DUMMY;
 #if 0
 NEARDATA int warnlevel = 0;		/* used by movemon and dochugw */
 #endif
@@ -42,6 +43,9 @@ struct dgn_topology dungeon_topology = {DUMMY};
 
 #include "quest.h"
 struct q_score	quest_status = DUMMY;
+
+#include "qtext.h"
+NEARDATA char pl_tutorial[QT_T_MAX-QT_T_FIRST+1] = {0};
 
 NEARDATA int smeq[MAXNROFROOMS+1] = DUMMY;
 NEARDATA int doorindex = 0;

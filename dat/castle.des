@@ -15,9 +15,13 @@
 #
 # To motivate the player : there are 4 storerooms (armors, weapons, food and
 # gems) and a wand of wishing in one of the 4 towers...
+#
+# Castle level explicitly marked as graveyard to prevent getting
+# too many wraith corpses from VotD
 
-MAZE:"castle-1",random
-FLAGS: noteleport
+LEVEL:"castle-1"
+FLAGS: noteleport,mazelevel,graveyard
+INIT_MAP:mazegrid,'-'
 GEOMETRY:center,center
 MAP
 }}}}}}}}}.............................................}}}}}}}}}
@@ -45,7 +49,7 @@ RANDOM_PLACES:(04,02),(58,02),(04,14),(58,14)
 RANDOM_MONSTERS:'L','N','E','H','M','O','R','T','X','Z'
 
 TELEPORT_REGION:levregion(01,00,10,20),(1,1,61,15),down
-TELEPORT_REGION:levregion(69,00,79,20),(1,1,61,15),up
+TELEPORT_REGION:levregion(72,00,79,20),(1,1,61,15),up
 STAIR:levregion(01,00,10,20),(0,0,62,16),up
 FOUNTAIN:(10,08)
 # Doors
@@ -130,8 +134,9 @@ OBJECT:object[3],random,(53,11)
 OBJECT:object[3],random,(54,11)
 OBJECT:object[3],random,(55,11)
 # THE WAND OF WISHING in 1 of the 4 towers
-CONTAINER:'(',"chest",place[0]
-OBJECT:'/',"wishing",contained
+CONTAINER:'(',"chest",place[0] {
+  OBJECT:'/',"wishing"
+}
 # Prevent monsters from eating it.  (@'s never eat objects)
 ENGRAVING:place[0],burn,"Elbereth"
 # The treasure of the lord
@@ -245,8 +250,9 @@ REGION:(47,10,47,11),unlit,"ordinary"
 # are a kludge to prevent the walls showing up through the iron bars from
 # outside the castle.
 #
-MAZE:"castle-2",' '
-FLAGS: noteleport
+LEVEL:"castle-2"
+FLAGS: noteleport,mazelevel,graveyard
+INIT_MAP:mazegrid,'-'
 GEOMETRY: center, center
 #000000000111111111122222222223333333333444444444455555555556666666666777777
 #123456789012345678901234567890123456789012345678901234567890123456789012345
@@ -373,30 +379,34 @@ OBJECT:object[1],random,(10,15)
 OBJECT:object[1],random,(11,15)
 
 # treasure room
-CONTAINER:'(',"chest",place[0]
-OBJECT:'/',"wishing",contained
+CONTAINER:'(',"chest",place[0] {
+  OBJECT:'/',"wishing"
+}
 ENGRAVING:place[0],burn,"Elbereth"
 
-CONTAINER:'(',"chest",place[1]
-OBJECT:'?',random,contained
-OBJECT:'?',random,contained
-OBJECT:'+',random,contained
-OBJECT:'*',random,contained
-OBJECT:'*',random,contained
+CONTAINER:'(',"chest",place[1] {
+  OBJECT:'?',random
+  OBJECT:'?',random
+  OBJECT:'+',random
+  OBJECT:'*',random
+  OBJECT:'*',random
+}
 
-CONTAINER:'(',"chest",place[2]
-OBJECT:'/',random,contained
-OBJECT:'"',random,contained
-OBJECT:'*',random,contained
-OBJECT:'*',random,contained
+CONTAINER:'(',"chest",place[2] {
+  OBJECT:'/',random
+  OBJECT:'"',random
+  OBJECT:'*',random
+  OBJECT:'*',random
+}
 
-CONTAINER:'(',"chest",place[3]
-OBJECT:'?',random,contained
-OBJECT:'?',random,contained
-OBJECT:'+',random,contained
-OBJECT:'*',random,contained
-OBJECT:'*',random,contained
-OBJECT:'!',random,contained
+CONTAINER:'(',"chest",place[3] {
+  OBJECT:'?',random
+  OBJECT:'?',random
+  OBJECT:'+',random
+  OBJECT:'*',random
+  OBJECT:'*',random
+  OBJECT:'!',random
+}
 
 OBJECT:'(',"chest",place[4]
 
@@ -463,8 +473,9 @@ MONSTER:'C',random,(36,12)
 MONSTER:'C',random,(37,13)
 
 
-MAZE:"castle-3",' '
-FLAGS: noteleport
+LEVEL:"castle-3"
+FLAGS: noteleport,mazelevel,graveyard
+INIT_MAP:mazegrid,'-'
 GEOMETRY: center, center
 #000000000111111111122222222223333333333444444444455555555556666666666777777
 #123456789012345678901234567890123456789012345678901234567890123456789012345
@@ -611,8 +622,9 @@ MONSTER:'H',"fire giant",(36,03),peaceful
 MONSTER:'j',"ochre jelly",(43,01),asleep
 
 # treasure
-CONTAINER:'(',"chest",place[0]
-OBJECT:'/',"wishing",contained
+CONTAINER:'(',"chest",place[0] {
+  OBJECT:'/',"wishing"
+}
 ENGRAVING:place[0],burn,"Elbereth"
 
 OBJECT:'(',"chest",place[1]
@@ -621,9 +633,9 @@ OBJECT:'(',"chest",place[3]
 OBJECT:'(',"chest",place[4]
 OBJECT:'(',"chest",place[5]
 OBJECT:'(',"chest",place[6]
-CONTAINER:'(',"chest",place[7]
-CONTAINER:'(',"chest",place[8]
-CONTAINER:'(',"chest",place[9]
+CONTAINER:'(',"chest",place[7] { }
+CONTAINER:'(',"chest",place[8] { }
+CONTAINER:'(',"chest",place[9] { }
 
 # the soldiers' equipment; also doubles as a reward for player
 #

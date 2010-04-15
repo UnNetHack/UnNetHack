@@ -19,12 +19,8 @@ STATIC_DCL boolean FDECL(taking_off, (const char *));
 STATIC_DCL boolean FDECL(putting_on, (const char *));
 STATIC_PTR int FDECL(ckunpaid,(struct obj *));
 STATIC_PTR int FDECL(ckvalidcat,(struct obj *));
-#ifdef DUMP_LOG
 static char FDECL(display_pickinv,
-		 (const char *,BOOLEAN_P, long *, BOOLEAN_P, BOOLEAN_P));
-#else
-static char FDECL(display_pickinv, (const char *,BOOLEAN_P, long *));
-#endif /* DUMP_LOG */
+		 (const char *,BOOLEAN_P, long *, BOOLEAN_P));
 #ifdef OVLB
 STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
 STATIC_DCL void NDECL(dounpaid);
@@ -256,7 +252,7 @@ struct obj *obj;
 		flags.botl = 1;
 #endif
 	} else if (obj->otyp == AMULET_OF_YENDOR) {
-		if (u.uhave.amulet) impossible("already have amulet?");
+		if (u.uhave.amulet) warning("already have amulet?");
 		u.uhave.amulet = 1;
 #ifdef RECORD_ACHIEVE
 		achieve.get_amulet = 1;
@@ -265,7 +261,7 @@ struct obj *obj;
 #endif
 #endif
 	} else if (obj->otyp == CANDELABRUM_OF_INVOCATION) {
-		if (u.uhave.menorah) impossible("already have candelabrum?");
+		if (u.uhave.menorah) warning("already have candelabrum?");
 		u.uhave.menorah = 1;
 #ifdef RECORD_ACHIEVE
 		achieve.get_candelabrum = 1;
@@ -274,7 +270,7 @@ struct obj *obj;
 #endif
 #endif
 	} else if (obj->otyp == BELL_OF_OPENING) {
-		if (u.uhave.bell) impossible("already have silver bell?");
+		if (u.uhave.bell) warning("already have silver bell?");
 		u.uhave.bell = 1;
 #ifdef RECORD_ACHIEVE
 		achieve.get_bell = 1;
@@ -283,7 +279,7 @@ struct obj *obj;
 #endif
 #endif
 	} else if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
-		if (u.uhave.book) impossible("already have the book?");
+		if (u.uhave.book) warning("already have the book?");
 		u.uhave.book = 1;
 #ifdef RECORD_ACHIEVE
 		achieve.get_book = 1;
@@ -294,7 +290,7 @@ struct obj *obj;
 	} else if (obj->oartifact) {
 		if (is_quest_artifact(obj)) {
 		    if (u.uhave.questart)
-			impossible("already have quest artifact?");
+			warning("already have quest artifact?");
 		    u.uhave.questart = 1;
 		    artitouch();
 		}
@@ -309,6 +305,7 @@ struct obj *obj;
 		livelog_achieve_update();
 #endif
 	} else if(Is_sokoend_level(&u.uz) &&
+	          obj->otyp != CORPSE && obj->otyp != TIN && /* workaround because of bit reusing */
 	          obj->record_achieve_special) {
 		achieve.finish_sokoban = 1;
 		obj->record_achieve_special = 0;
@@ -351,9 +348,10 @@ struct obj *obj;
 	struct obj *otmp, *prev;
 
 	if (obj->where != OBJ_FREE)
-	    panic("addinv: obj not free");
+	    panic("addinv: obj not free (%d)", obj->where);
 	obj->no_charge = 0;	/* not meaningful for invent */
 	obj->was_thrown = 0;
+	obj->was_dropped = 0;
 
 	addinv_core1(obj);
 #ifndef GOLDOBJ
@@ -545,21 +543,21 @@ struct obj *obj;
 		flags.botl = 1;
 		return;
 	} else if (obj->otyp == AMULET_OF_YENDOR) {
-		if (!u.uhave.amulet) impossible("don't have amulet?");
+		if (!u.uhave.amulet) warning("don't have amulet?");
 		u.uhave.amulet = 0;
 	} else if (obj->otyp == CANDELABRUM_OF_INVOCATION) {
-		if (!u.uhave.menorah) impossible("don't have candelabrum?");
+		if (!u.uhave.menorah) warning("don't have candelabrum?");
 		u.uhave.menorah = 0;
 	} else if (obj->otyp == BELL_OF_OPENING) {
-		if (!u.uhave.bell) impossible("don't have silver bell?");
+		if (!u.uhave.bell) warning("don't have silver bell?");
 		u.uhave.bell = 0;
 	} else if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
-		if (!u.uhave.book) impossible("don't have the book?");
+		if (!u.uhave.book) warning("don't have the book?");
 		u.uhave.book = 0;
 	} else if (obj->oartifact) {
 		if (is_quest_artifact(obj)) {
 		    if (!u.uhave.questart)
-			impossible("don't have quest artifact?");
+			warning("don't have quest artifact?");
 		    u.uhave.questart = 0;
 		}
 		set_artifact_intrinsic(obj, 0, W_ART);
@@ -1097,9 +1095,7 @@ register const char *let,*word;
 			allowed_choices = altlets;
 		    ilet = display_pickinv(allowed_choices, TRUE,
 					   allowcnt ? &ctmp : (long *)0
-#ifdef DUMP_LOG
-					   , FALSE, TRUE
-#endif
+					   , TRUE
 					   );
 		    if(!ilet) continue;
 		    if (allowcnt && ctmp >= 0) {
@@ -1775,34 +1771,23 @@ find_unpaid(list, last_found)
  * inventory and return a count as well as a letter. If out_cnt is not null,
  * any count returned from the menu selection is placed here.
  */
-#ifdef DUMP_LOG
 static char
-display_pickinv(lets, want_reply, out_cnt, want_dump, want_disp)
+display_pickinv(lets, want_reply, out_cnt, want_disp)
 register const char *lets;
 boolean want_reply;
 long* out_cnt;
-boolean want_dump;
 boolean want_disp;
-#else
-static char
-display_pickinv(lets, want_reply, out_cnt)
-register const char *lets;
-boolean want_reply;
-long* out_cnt;
-#endif
 {
 	struct obj *otmp;
-	char ilet, ret;
+	char ilet, ret = '\0';
 	char *invlet = flags.inv_order;
 	int n, classcount;
-	winid win;				/* windows being used */
+	winid win = WIN_ERR;			/* windows being used */
 	static winid local_win = WIN_ERR;	/* window for partial menus */
 	anything any;
 	menu_item *selected;
 
-#ifdef DUMP_LOG
 	if (want_disp) {
-#endif
 	/* overriden by global flag */
 	if (flags.perm_invent) {
 	    win = (lets && *lets) ? local_win : WIN_INVEN;
@@ -1811,11 +1796,8 @@ long* out_cnt;
 		win = local_win = create_nhwindow(NHW_MENU);
 	} else
 	    win = WIN_INVEN;
-
-#ifdef DUMP_LOG
 	}
-	if (want_dump)   dump("", "Your inventory");
-#endif
+	dump_title("Your inventory");
 
 	/*
 	Exit early if no inventory -- but keep going if we are doing
@@ -1829,23 +1811,17 @@ long* out_cnt;
 	to here is short circuited away.
 	*/
 	if (!invent && !(flags.perm_invent && !lets && !want_reply)) {
-#ifdef DUMP_LOG
 	  if (want_disp) {
-#endif
 #ifndef GOLDOBJ
 	    pline("Not carrying anything%s.", u.ugold ? " except gold" : "");
 #else
 	    pline("Not carrying anything.");
 #endif
-#ifdef DUMP_LOG
 	  }
-	  if (want_dump) {
 #ifdef GOLDOBJ
 	    dump("  ", "Not carrying anything");
 #else
 	    dump("  Not carrying anything", u.ugold ? " except gold." : ".");
-#endif
-	  }
 #endif
 	    return 0;
 	}
@@ -1860,32 +1836,26 @@ long* out_cnt;
 	    ret = '\0';
 	    for (otmp = invent; otmp; otmp = otmp->nobj) {
 		if (otmp->invlet == lets[0]) {
-#ifdef DUMP_LOG
 		  if (want_disp) {
-#endif
 		    ret = message_menu(lets[0],
 			  want_reply ? PICK_ONE : PICK_NONE,
 			  xprname(otmp, (char *)0, lets[0], TRUE, 0L, 0L));
 		    if (out_cnt) *out_cnt = -1L;	/* select all */
-#ifdef DUMP_LOG
 		  }
-		  if (want_dump) {
+		  {
 		    char letbuf[7];
 		    sprintf(letbuf, "  %c - ", lets[0]);
-		    dump(letbuf,
+		    dump_object(lets[0],
 			 xprname(otmp, (char *)0, lets[0], TRUE, 0L, 0L));
 		  }
-#endif
 		    break;
 		}
 	    }
 	    return ret;
 	}
 
-#ifdef DUMP_LOG
 	if (want_disp)
-#endif
-	start_menu(win);
+		start_menu(win);
 nextclass:
 	classcount = 0;
 	any.a_void = 0;		/* set all bits to zero */
@@ -1895,24 +1865,19 @@ nextclass:
 			if (!flags.sortpack || otmp->oclass == *invlet) {
 			    if (flags.sortpack && !classcount) {
 				any.a_void = 0;		/* zero */
-#ifdef DUMP_LOG
-				if (want_dump)
-				    dump("  ", let_to_name(*invlet, FALSE));
+				dump_subtitle(let_to_name(*invlet, FALSE));
 				if (want_disp)
-#endif
 				add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 				    let_to_name(*invlet, FALSE), MENU_UNSELECTED);
 				classcount++;
 			    }
 			    any.a_char = ilet;
-#ifdef DUMP_LOG
-			    if (want_dump) {
+			    {
 			      char letbuf[7];
 			      sprintf(letbuf, "  %c - ", ilet);
-			      dump(letbuf, doname(otmp));
+			      dump_object(ilet, doname(otmp));
 			    }
 			    if (want_disp)
-#endif
 			    add_menu(win, obj_to_glyph(otmp),
 					&any, ilet, 0, ATR_NONE, doname(otmp),
 					MENU_UNSELECTED);
@@ -1928,9 +1893,7 @@ nextclass:
 		}
 #endif
 	}
-#ifdef DUMP_LOG
 	if (want_disp) {
-#endif
 	end_menu(win, (char *) 0);
 
 	n = select_menu(win, want_reply ? PICK_ONE : PICK_NONE, &selected);
@@ -1940,10 +1903,8 @@ nextclass:
 	    free((genericptr_t)selected);
 	} else
 	    ret = !n ? '\0' : '\033';	/* cancelled */
-#ifdef DUMP_LOG
 	} /* want_disp */
-	if (want_dump)  dump("", "");
-#endif
+	dump("", "");
 
 	return ret;
 }
@@ -1960,23 +1921,17 @@ display_inventory(lets, want_reply)
 register const char *lets;
 boolean want_reply;
 {
-	return display_pickinv(lets, want_reply, (long *)0
-#ifdef DUMP_LOG
-			       , FALSE , TRUE
-#endif
-	);
+	return display_pickinv(lets, want_reply, (long *)0, TRUE);
 }
 
-#ifdef DUMP_LOG
 /* See display_inventory. This is the same thing WITH dumpfile creation */
 char
 dump_inventory(lets, want_reply, want_disp)
 register const char *lets;
 boolean want_reply, want_disp;
 {
-  return display_pickinv(lets, want_reply, (long *)0, TRUE, want_disp);
+  return display_pickinv(lets, want_reply, (long *)0, want_disp);
 }
-#endif
 
 /*
  * Returns the number of unpaid items within the given list.  This includes
@@ -1992,6 +1947,25 @@ count_unpaid(list)
 	if (list->unpaid) count++;
 	if (Has_contents(list))
 	    count += count_unpaid(list->cobj);
+	list = list->nobj;
+    }
+    return count;
+}
+
+/**
+ * Returns the number of items within the given list including
+ * contained objects.
+ */
+int
+count_objects(list)
+    struct obj *list;
+{
+    int count = 0;
+
+    while (list) {
+	count++;
+	if (Has_contents(list))
+	    count += count_objects(list->cobj);
 	list = list->nobj;
     }
     return count;
@@ -2327,7 +2301,7 @@ boolean picked_some;
 	const char *dfeature = (char *)0;
 	char fbuf[BUFSZ], fbuf2[BUFSZ];
 	winid tmpwin;
-	boolean skip_objects = (obj_cnt >= 5), felt_cockatrice = FALSE;
+	boolean skip_objects = (obj_cnt > iflags.pilesize), felt_cockatrice = FALSE;
 
 	if (u.uswallow && u.ustuck) {
 	    struct monst *mtmp = u.ustuck;
@@ -2402,7 +2376,7 @@ boolean picked_some;
 #ifdef INVISIBLE_OBJECTS
 	    if (otmp->oinvis && !See_invisible) verb = "feel";
 #endif
-	    You("%s here %s.", verb, doname(otmp));
+	    You("%s here %s.", verb, doname_with_price(otmp));
 	    if (otmp->otyp == CORPSE) feel_cockatrice(otmp, FALSE);
 	} else {
 	    display_nhwindow(WIN_MESSAGE, FALSE);
@@ -2422,7 +2396,7 @@ boolean picked_some;
 			putstr(tmpwin, 0, buf);
 			break;
 		}
-		putstr(tmpwin, 0, doname(otmp));
+		putstr(tmpwin, 0, doname_with_price(otmp));
 	    }
 	    display_nhwindow(tmpwin, TRUE);
 	    destroy_nhwindow(tmpwin);
@@ -2817,13 +2791,23 @@ doorganize()	/* inventory organizer by Del Lamb */
 	register char let;
 	char alphabet[52+1], buf[52+1];
 	char qbuf[QBUFSZ];
+#ifdef ADJSPLIT
+	char allowallcnt[3];
+#else
 	char allowall[2];
+#endif
 	const char *adj_type;
 
 	if (!flags.invlet_constant) reassign();
 	/* get a pointer to the object the user wants to organize */
+#ifdef ADJSPLIT
+	allowallcnt[0] = ALLOW_COUNT; allowallcnt[1] = ALL_CLASSES;
+	allowallcnt[2] = '\0';
+	if (!(obj = getobj(allowallcnt,"adjust"))) return(0);
+#else
 	allowall[0] = ALL_CLASSES; allowall[1] = '\0';
 	if (!(obj = getobj(allowall,"adjust"))) return(0);
+#endif
 
 	/* initialize the list with all upper and lower case letters */
 	for (let = 'a', ix = 0;  let <= 'z';) alphabet[ix++] = let++;
@@ -2852,7 +2836,11 @@ doorganize()	/* inventory organizer by Del Lamb */
 		let = yn_function(qbuf, (char *)0, '\0');
 		if(index(quitchars,let)) {
 			pline(Never_mind);
+#ifdef ADJSPLIT
+			goto cleansplit;
+#else
 			return(0);
+#endif
 		}
 		if (let == '@' || !letter(let))
 			pline("Select an inventory slot letter.");
@@ -2861,7 +2849,9 @@ doorganize()	/* inventory organizer by Del Lamb */
 	}
 
 	/* change the inventory and print the resulting item */
+#ifndef ADJSPLIT
 	adj_type = "Moving:";
+#endif
 
 	/*
 	 * don't use freeinv/addinv to avoid double-touching artifacts,
@@ -2869,19 +2859,56 @@ doorganize()	/* inventory organizer by Del Lamb */
 	 */
 	extract_nobj(obj, &invent);
 
+#ifdef ADJSPLIT
+	for (otmp = invent; otmp && otmp->invlet != let;)
+		otmp = otmp->nobj;
+	if (!otmp)
+		adj_type = "Moving:";
+	else if (merged(&otmp,&obj)) {
+#else
 	for (otmp = invent; otmp;)
 		if (merged(&otmp,&obj)) {
+#endif
 			adj_type = "Merging:";
 			obj = otmp;
+#ifndef ADJSPLIT
 			otmp = otmp->nobj;
+#endif
 			extract_nobj(obj, &invent);
 		} else {
+#ifdef ADJSPLIT
+		  struct obj *otmp2;
+		  for (otmp2 = invent; otmp2
+			 && otmp2->invlet != obj->invlet;)
+			otmp2 = otmp2->nobj;
+
+		  if (otmp2) {
+			char oldlet = obj->invlet;
+
+			adj_type = "Displacing:";
+
+			/* Here be a nasty hack; solutions that don't
+			 * require duplication of assigninvlet's code
+			 * here are welcome.
+			 */
+			assigninvlet(obj);
+
+			if (obj->invlet == NOINVSYM) {
+				pline("There's nowhere to put that.");
+				obj->invlet = oldlet;
+				goto cleansplit;
+			}
+		  } else
+#else
 			if (otmp->invlet == let) {
+#endif
 				adj_type = "Swapping:";
 				otmp->invlet = obj->invlet;
 			}
+#ifndef ADJSPLIT
 			otmp = otmp->nobj;
 		}
+#endif
 
 	/* inline addinv (assuming flags.invlet_constant and !merged) */
 	obj->invlet = let;
@@ -2893,6 +2920,14 @@ doorganize()	/* inventory organizer by Del Lamb */
 	prinv(adj_type, obj, 0L);
 	update_inventory();
 	return(0);
+#ifdef ADJSPLIT
+cleansplit:
+	for (otmp = invent; otmp; otmp = otmp->nobj)
+                if (otmp != obj && otmp->invlet == obj->invlet)
+                        merged( &otmp, &obj );
+
+	return 0;
+#endif
 }
 
 /* common to display_minventory and display_cinventory */

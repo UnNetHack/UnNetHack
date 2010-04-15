@@ -31,7 +31,7 @@ struct shclass {
 	struct itp {
 	    int iprob;		/* probability of an item type */
 	    int itype;	/* item type: if >=0 a class, if < 0 a specific item */
-	} iprobs[5];
+	} iprobs[20];
 	const char * const *shknms;	/* list of shopkeeper names for this type */
 };
 
@@ -75,7 +75,10 @@ extern NEARDATA coord doors[DOORMAX];
 #define WANDSHOP	(SHOPBASE+ 7)
 #define TOOLSHOP	(SHOPBASE+ 8)
 #define BOOKSHOP	(SHOPBASE+ 9)
-#define UNIQUESHOP	(SHOPBASE+10)	/* shops here & above not randomly gen'd. */
+#define TINSHOP		(SHOPBASE+10)
+#define INSTRUMENTSHOP	(SHOPBASE+11)
+#define PETSHOP		(SHOPBASE+12)	/* Stephen White */
+#define UNIQUESHOP	(SHOPBASE+13)	/* shops here & above not randomly gen'd. */
 #define CANDLESHOP	(UNIQUESHOP)
 #ifdef BLACKMARKET
 #define BLACKSHOP       (UNIQUESHOP+1)

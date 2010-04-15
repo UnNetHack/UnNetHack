@@ -439,6 +439,7 @@ attrcurse()			/* remove a random INTRINSIC ability */
 	case 10: if (HProtection & INTRINSIC) {
 			HProtection &= ~INTRINSIC;
 			You_feel("vulnerable.");
+			u.ublessed = 0; /* fix for C343-189 */
 			break;
 		}
 	case 11: if (HAggravate_monster & INTRINSIC) {

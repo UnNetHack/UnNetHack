@@ -8,10 +8,11 @@
 #	Here you meet your (besieged) class leader, King Arthur
 #	and receive your quest assignment.
 #
-MAZE: "Kni-strt",'.'
-FLAGS: noteleport,hardfloor
+LEVEL: "Kni-strt"
+FLAGS: noteleport,hardfloor,mazelevel
 # This is a kludge to init the level as a lit field.
-INIT_MAP: '.' , '.' , false , false , lit , false
+INIT_MAP: mines, '.' , '.' , false , false , lit , false
+MON_GENERATION:86%, (64,"quasit"), (16,'i'), (16,"ochre jelly"), (4,'j')
 GEOMETRY:center,center
 MAP
 ..................................................
@@ -105,9 +106,10 @@ MONSTER: 'i',"quasit",(36,00),hostile
 #	further towards your assigned quest.
 #
 
-MAZE: "Kni-loca",' '
-FLAGS: hardfloor
-INIT_MAP: '.' , 'P' , false , true , lit , false
+LEVEL: "Kni-loca"
+FLAGS: hardfloor,mazelevel
+INIT_MAP: mines, '.' , 'P' , false , true , lit , false
+MON_GENERATION:86%, (64,"quasit"), (16,'i'), (16,"ochre jelly"), (4,'j')
 GEOMETRY:center,center
 MAP
 ...PPP.........PPPP..............PPPP...
@@ -244,7 +246,10 @@ MONSTER:'j',random,random,hostile
 #	been assigned to retrieve.
 #
 
-MAZE: "Kni-goal", ' '
+LEVEL: "Kni-goal"
+FLAGS:mazelevel
+INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"quasit"), (16,'i'), (16,"ochre jelly"), (4,'j')
 GEOMETRY:center,center
 MAP
 ....PPPP..PPP..                                                             
@@ -276,7 +281,7 @@ STAIR:(03,08),up
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Objects
-OBJECT:'(',"mirror",(50,06),blessed,0,"The Magic Mirror of Merlin"
+OBJECT:'(',"mirror",(50,06),blessed,0,NAME:"The Magic Mirror of Merlin"
 OBJECT:random,random,(33,01)
 OBJECT:random,random,(33,02)
 OBJECT:random,random,(33,03)
@@ -346,8 +351,10 @@ MONSTER:'j',random,random,hostile
 #	and goal levels.
 #
 
-MAZE: "Kni-fila" , '.'
-INIT_MAP: '.' , 'P' , false , true , lit , false
+LEVEL: "Kni-fila"
+FLAGS:mazelevel
+INIT_MAP: mines, '.' , 'P' , false , true , lit , false
+MON_GENERATION:86%, (64,"quasit"), (16,'i'), (16,"ochre jelly"), (4,'j')
 NOMAP
 #
 STAIR: random, up
@@ -374,8 +381,10 @@ TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 
-MAZE: "Kni-filb" , '.'
-INIT_MAP: '.' , 'P' , false , true , lit , false
+LEVEL: "Kni-filb"
+FLAGS:mazelevel
+INIT_MAP: mines, '.' , 'P' , false , true , lit , false
+MON_GENERATION:86%, (64,"quasit"), (16,'i'), (16,"ochre jelly"), (4,'j')
 NOMAP
 #
 STAIR: random, up

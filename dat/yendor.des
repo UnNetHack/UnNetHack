@@ -5,8 +5,10 @@
 #
 # The top (real) wizard level.
 # Keeping the Moat for old-time's sake
-MAZE:"wizard1",random
-FLAGS:noteleport,hardfloor
+LEVEL:"wizard1"
+# Must have noflipx, due to the morgue-hack (see below).
+FLAGS:noteleport,hardfloor,mazelevel,noflipx
+INIT_MAP:mazegrid,'-'
 GEOMETRY:center,center
 MAP
 ----------------------------.
@@ -89,8 +91,9 @@ OBJECT:'+',random,random
 
 
 # The middle wizard level.
-MAZE:"wizard2",random
-FLAGS:noteleport,hardfloor
+LEVEL:"wizard2"
+FLAGS:noteleport,hardfloor,mazelevel
+INIT_MAP:mazegrid,'-'
 GEOMETRY:center,center
 MAP
 ----------------------------.
@@ -141,8 +144,9 @@ OBJECT:'"',random,(04,06)
 
 # The bottom wizard level.
 # Memorialize the fakewiz setup.
-MAZE:"wizard3",random
-FLAGS:noteleport,hardfloor
+LEVEL:"wizard3"
+FLAGS:noteleport,hardfloor,mazelevel
+INIT_MAP:mazegrid,'-'
 GEOMETRY:center,center
 MAP
 ----------------------------.
@@ -217,7 +221,9 @@ OBJECT:'"',random,(11,07)
 # The former decoy wizard levels.
 # There are two of these, and we need to
 # distinguish between them for the portal.
-MAZE:"fakewiz1",random
+LEVEL:"fakewiz1"
+FLAGS:mazelevel
+INIT_MAP:mazegrid,'-'
 GEOMETRY:center,center
 MAP
 .........
@@ -246,7 +252,9 @@ TRAP:"board",(03,04)
 TRAP:"board",(05,04)
 
 
-MAZE:"fakewiz2",random
+LEVEL:"fakewiz2"
+FLAGS:mazelevel
+INIT_MAP:mazegrid,'-'
 GEOMETRY:center,center
 MAP
 .........

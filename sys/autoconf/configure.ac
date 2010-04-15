@@ -28,8 +28,11 @@ nethack_default_win=""
 # Note: Order is important: The last listed enabled port will be the default.
 NETHACK_WIN_ENABLE(tty, auto)
 NETHACK_WIN_ENABLE(curses, no, [use curses interface])
-NETHACK_WIN_ENABLE(x11, no)
-NETHACK_WIN_ENABLE(mswin, no, [use Microsoft Window's native graphics])
+#NETHACK_WIN_ENABLE(x11, no)
+#NETHACK_WIN_ENABLE(mswin, no, [use Microsoft Window's native graphics])
+dnl deactivate X11 and Win32 tiles version
+enable_x11_graphics="no"
+enable_mswin_graphics="no"
 
 dnl  ----- Figure out a C compiler to use; set @CC@
 AC_PROG_CC
@@ -413,6 +416,7 @@ NETHACK_ARG(high-score-comparison-by-uid,[Compare High Score entries by user id 
 # NETHACK_ARG(show-dmg,[Display damage reports],SHOW_DMG,yes)
 # NETHACK_ARG(show-weight,[Display object weight],SHOW_WEIGHT,yes)
 # NETHACK_ARG(other-services,[Shopkeeper services],OTHER_SERVICES,yes)
+NETHACK_ARG(paranoid,[Require some questions to be answered with 'yes' instead of 'y'],PARANOID,yes)
 NETHACK_ARG(show-born,[Display number of created monsters at the end of game],SHOW_BORN,yes)
 NETHACK_ARG(show-extinct,[Display extinct monsters at the end of game],SHOW_EXTINCT,yes)
 NETHACK_ARG(dungeon-growth,[Dungeon growth],DUNGEON_GROWTH,yes)
@@ -435,6 +439,8 @@ NETHACK_ARG(dump,[Dumping character stats],DUMP_LOG,yes)
 if test "$enable_dump" != "no" ; then
 	NETHACK_ARG_WITH_PARAM(dump-file,[Name of character dump file],DUMP_FN,no,FILE,"/tmp/%s.nh")
 	NETHACK_ARG_WITH_PARAM(dump-messages,[Number of dumped messages],DUMPMSGS,yes,NUMBER,20)
+	NETHACK_ARG(dump-text,[Dump a text file],DUMP_TEXT_LOG,yes)
+	NETHACK_ARG(dump-html,[Dump an HTML file],DUMP_HTML_LOG,no)
 fi
 
 NETHACK_ARG_WITH_PARAM(whereis-file,[Log information about running games],WHEREIS_FILE,no,FILE,[%n.whereis])

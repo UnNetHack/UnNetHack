@@ -9,8 +9,9 @@
 # Players are supposed to sacrifice the Amulet of Yendor on the appropriate
 # shrine.
 
-MAZE:"earth",' '
-FLAGS: noteleport,hardfloor,shortsighted
+LEVEL:"earth"
+FLAGS: noteleport,hardfloor,shortsighted,mazelevel
+INIT_MAP:solidfill,' '
 
 GEOMETRY:center,center
 # The player lands, upon arrival, in the
@@ -121,8 +122,9 @@ MONSTER:'E',"earth elemental",(04,18),hostile
 OBJECT:'`',"boulder",random
 
 
-MAZE:"air",' '
-FLAGS: noteleport,hardfloor,shortsighted
+LEVEL:"air"
+FLAGS: noteleport,hardfloor,shortsighted,mazelevel,stormy
+INIT_MAP:solidfill,' '
 # The following messages are somewhat obtuse, to make then
 # equally meaningful if the player can see or not.
 MESSAGE: "What a strange feeling!"
@@ -227,8 +229,9 @@ MONSTER:'v',"steam vortex",random,hostile
 MONSTER:'v',"steam vortex",random,hostile
 
 
-MAZE:"fire",' '
-FLAGS: noteleport,hardfloor,shortsighted
+LEVEL:"fire"
+FLAGS: noteleport,hardfloor,shortsighted,mazelevel
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # The player lands, upon arrival, in the
 # lower-right.  The location of the
@@ -301,7 +304,7 @@ TRAP:"fire",random
 TRAP:"fire",random
 TRAP:"fire",random
 #  An assortment of fire-appropriate nasties
-MONSTER:'D',"red dragon",random
+MONSTER:'D',"draken",random
 MONSTER:'&',"balrog",random
 MONSTER:'E',"fire elemental",random,hostile
 MONSTER:'E',"fire elemental",random,hostile
@@ -378,8 +381,9 @@ OBJECT:'`',"boulder",random
 OBJECT:'`',"boulder",random
 
 
-MAZE:"water",' '
-FLAGS: noteleport,hardfloor,shortsighted
+LEVEL:"water"
+FLAGS: noteleport,hardfloor,shortsighted,mazelevel,shroud
+INIT_MAP:solidfill,' '
 MESSAGE: "You find yourself suspended in an air bubble surrounded by water."
 GEOMETRY:center,center
 # The player lands upon arrival to an air bubble
@@ -475,8 +479,9 @@ MONSTER:'E',"water elemental",random,hostile
 MONSTER:'E',"water elemental",random,hostile
 
 
-MAZE:"astral",' '
-FLAGS: noteleport,hardfloor,nommap,shortsighted
+LEVEL:"astral"
+FLAGS: noteleport,hardfloor,nommap,shortsighted,mazelevel
+INIT_MAP:solidfill,' '
 MESSAGE: "You arrive on the Astral Plane!"
 MESSAGE: "Here the High Temples of the aligned gods are located."
 MESSAGE: "You sense alarm, hostility, and excitement in the air!"
@@ -541,7 +546,9 @@ MONSTER:'@',"aligned priest",(19,09),noalign,hostile
 MONSTER:'@',"aligned priest",(19,10),noalign,hostile
 MONSTER:'A',"Angel",(20,09),noalign,hostile
 MONSTER:'A',"Angel",(20,10),noalign,hostile
-MONSTER:'&',"Pestilence",place[0],hostile
+MONSTER:'&',"Pestilence",place[0],hostile {
+  OBJECT:'!',"sickness"
+}
 # South-central round room
 MONSTER:'@',"aligned priest",(36,12),noalign,hostile
 MONSTER:'@',"aligned priest",(37,12),noalign,hostile

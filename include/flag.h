@@ -35,6 +35,7 @@ struct flag {
 #define wizard	 flags.debug
 	boolean  end_own;	/* list all own scores */
 	boolean  explore;	/* in exploration mode */
+	boolean  tutorial;      /* in tutorial mode */
 #ifdef OPT_DISPMAP
 	boolean  fast_map;	/* use optimized, less flexible map display */
 #endif
@@ -63,6 +64,7 @@ struct flag {
 #endif
 	boolean  perm_invent;	/* keep full inventories up until dismissed */
 	boolean  pickup;	/* whether you pickup or move and look */
+	boolean  pickup_dropped;	/* don't auto-pickup items you dropped */
 	boolean  pickup_thrown;		/* auto-pickup items you threw */
 
 	boolean  pushweapon;	/* When wielding, push old weapon into second slot */
@@ -147,6 +149,30 @@ struct flag {
 	int	 initalign;	/* starting alignment (index into aligns[])  */
 	int	 randomall;	/* randomly assign everything not specified */
 	int	 pantheon;	/* deity selection for priest character */
+
+	/* --- initial roleplay flags ---
+	 * These flags represent the player's conduct/roleplay
+	 * intention at character creation.
+	 *
+	 * First the player can sets some of these at character
+	 * creation. (via configuration-file, ..)
+	 * Then role_init() may set/prevent certain combinations,
+	 * e.g. Monks get the vegetarian flag, vegans should also be
+	 * vegetarians, ..
+	 * 
+	 * After that the initial flags shouldn't be modified.
+	 * In u_init() the flags can be used to put some
+	 * roleplay-intrinsics into the u structure. Only those
+	 * should be modified during gameplay.
+	 */
+	boolean  ascet;
+	boolean  atheist;
+	boolean  blindfolded;
+	boolean  illiterate;
+	boolean  pacifist;
+	boolean  nudist;
+	boolean  vegan;
+	boolean  vegetarian;
 };
 
 /*
@@ -241,6 +267,10 @@ struct instance_flags {
 	boolean show_born;	/* show numbers of created monsters */
 #endif
 	boolean showdmg;	/* show damage */
+	/* only set when PARANOID is defined */
+	boolean paranoid_hit;	/* Ask for 'yes' when hitting peacefuls */
+	boolean paranoid_quit;	/* Ask for 'yes' when quitting */
+	boolean paranoid_remove; /* Always show menu for 'T' and 'R' */
 /*
  * Window capability support.
  */
@@ -305,6 +335,7 @@ struct instance_flags {
 	boolean  travelcmd;	/* allow travel command */
 	boolean  show_dgn_name; /* show dungeon names instead of Dlvl: on bottom line */
 	int	 runmode;	/* update screen display during run moves */
+	int	 pilesize;	/* how many items to list automatically */
 #ifdef AUTOPICKUP_EXCEPTIONS
 	struct autopickup_exception *autopickup_exceptions[2];
 #define AP_LEAVE 0
@@ -320,6 +351,8 @@ struct instance_flags {
 #ifdef AUTO_OPEN
 	boolean  autoopen;	/* open doors by walking into them */
 #endif
+	boolean  dark_room;	/* show shadows in lit rooms */
+	boolean  vanilla_ui_behavior;	/* fall back to vanilla behavior */
 };
 
 /*
