@@ -45,6 +45,12 @@
 /* Name of character dump file */
 #undef DUMP_FN
 
+/* CSS file should be included in the HTML dump */
+#undef DUMP_HTML_CSS_EMBEDDED
+
+/* Path to the css dump file */
+#undef DUMP_HTML_CSS_FILE
+
 /* Dump an HTML file */
 #undef DUMP_HTML_LOG
 

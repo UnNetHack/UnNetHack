@@ -228,6 +228,26 @@ dump_blockquote_end()
 #endif
 }
 
+static
+void
+dump_html_css_file(const char *filename)
+{
+#ifdef DUMP_HTML_LOG
+	FILE *css = fopen(filename, "r");
+	if (!css) {
+		pline("Can't open %s for input.", filename);
+		pline("CSS file not included.");
+	} else if (css && html_dump_fp) {
+		int c=0;
+		while ((c=fgetc(css))!=EOF) {
+			fputc(c, html_dump_fp);
+		}
+		fclose(css);
+	}
+#endif
+}
+
+
 /** Dumps the HTML header. */
 void
 dump_header_html(title)
@@ -240,7 +260,13 @@ const char *title;
 	dump_html("<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />\n", "");
 	dump_html("<meta name=\"generator\" content=\"UnNetHack " VERSION_STRING "\" />\n", "");
 	dump_html("<meta name=\"date\" content=\"%s\" />\n", iso8601(0));
-	dump_html("<link rel=\"stylesheet\" type=\"text/css\" href=\"unnethack_dump.css\" />\n", "");
+#ifndef DUMP_HTML_CSS_EMBEDDED
+	dump_html("<link rel=\"stylesheet\" type=\"text/css\" href=\"" DUMP_HTML_CSS_FILE "\" />\n", "");
+#else
+	dump_html("<style type=\"text/css\">\n", "");
+	dump_html_css_file(DUMP_HTML_CSS_FILE);
+	dump_html("</style>\n", "");
+#endif
 	dump_html("</head>\n", "");
 	dump_html("<body>\n", "");
 }
