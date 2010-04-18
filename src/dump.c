@@ -16,8 +16,6 @@ FILE *dump_fp = (FILE *)0;  /**< file pointer for text dumps */
 FILE *html_dump_fp = (FILE *)0;  /**< file pointer for html dumps */
 /* TODO:
  * - escape unmasked characters in html (done for map)
- * - tables for skills and spells
- * - menucolors for items?
  * - started/ended date at the top
  */
 
@@ -236,7 +234,7 @@ dump_header_html(title)
 const char *title;
 {
 	dump_html("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n","");
-	dump_html("<html xmlns=\"http://www.w3.org/1999/xhtml\">", "");
+	dump_html("<html xmlns=\"http://www.w3.org/1999/xhtml\">\n", "");
 	dump_html("<head>\n", "");
 	dump_html("<title>UnNetHack " VERSION_STRING ": %s</title>\n", title);
 	dump_html("<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />\n", "");
