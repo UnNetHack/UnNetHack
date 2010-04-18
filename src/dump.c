@@ -260,12 +260,14 @@ const char *title;
 	dump_html("<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />\n", "");
 	dump_html("<meta name=\"generator\" content=\"UnNetHack " VERSION_STRING "\" />\n", "");
 	dump_html("<meta name=\"date\" content=\"%s\" />\n", iso8601(0));
-#ifndef DUMP_HTML_CSS_EMBEDDED
+#ifdef DUMP_HTML_CSS_FILE
+# ifndef DUMP_HTML_CSS_EMBEDDED
 	dump_html("<link rel=\"stylesheet\" type=\"text/css\" href=\"" DUMP_HTML_CSS_FILE "\" />\n", "");
-#else
+# else
 	dump_html("<style type=\"text/css\">\n", "");
 	dump_html_css_file(DUMP_HTML_CSS_FILE);
 	dump_html("</style>\n", "");
+# endif
 #endif
 	dump_html("</head>\n", "");
 	dump_html("<body>\n", "");
