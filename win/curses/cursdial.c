@@ -237,7 +237,9 @@ int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_
 
     while (1)
     {
-        answer = curses_read_char();
+        answer = getch();
+        answer = curses_convert_keys(answer);
+    
         if (answer==KEY_ESC)
         {
             if (choices == NULL)

@@ -201,6 +201,8 @@ extern int curses_convert_attr(int attr);
 
 extern int curses_read_attrs(char *attrs);
 
+extern int curses_convert_keys(int key);
+
 /* cursdial.c */
 
 extern void curses_line_input_dialog(const char *prompt, char *answer, int buffer);

@@ -95,9 +95,28 @@ static winid curs_win = 0;
 int curses_read_char()
 {
     int ch, tmpch;
+    static int esc = 0;
 
     ch = getch();
+
+    if (esc)
+    {
+        ch |= 0x80; /* Meta key support for most terminals */
+        esc = 0;
+        nodelay(stdscr, FALSE);
+        if (ch == ERR)
+        {
+            ch = getch();
+        }
+    }
+    else if (ch == '\033')
+    {
+        nodelay(stdscr, TRUE);
+        esc = 1;
+    }
+
     tmpch = ch;
+
     if (!ch)
     {
         ch = '\033'; /* map NUL to ESC since nethack doesn't expect NUL */
@@ -127,59 +146,7 @@ int curses_read_char()
     }
 #endif
 
-    /* Handle arrow keys */
-    
-    switch (ch)
-    {
-        case KEY_LEFT:
-        {
-            if (iflags.num_pad)
-            {
-                ch = '4';
-            }
-            else
-            {
-                ch = 'h';
-            }
-            break;
-        }
-        case KEY_RIGHT:
-        {
-            if (iflags.num_pad)
-            {
-                ch = '6';
-            }
-            else
-            {
-                ch = 'l';
-            }
-            break;
-        }
-        case KEY_UP:
-        {
-            if (iflags.num_pad)
-            {
-                ch = '8';
-            }
-            else
-            {
-                ch = 'k';
-            }
-            break;
-        }
-        case KEY_DOWN:
-        {
-            if (iflags.num_pad)
-            {
-                ch = '2';
-            }
-            else
-            {
-                ch = 'j';
-            }
-            break;
-        }
-    }
+    ch = curses_convert_keys(ch);
 
     return ch;
 }
@@ -949,6 +916,69 @@ int curses_read_attrs(char *attrs)
     return iflags.wc2_petattr;
 }
 
+
+/* Convert special keys into values that NetHack can understand.
+Currently this is limited to arrow keys, but this may be expanded. */
+
+int curses_convert_keys(int key)
+{
+    int ret = key;
+
+    /* Handle arrow keys */
+    switch (key)
+    {
+        case KEY_LEFT:
+        {
+            if (iflags.num_pad)
+            {
+                ret = '4';
+            }
+            else
+            {
+                ret = 'h';
+            }
+            break;
+        }
+        case KEY_RIGHT:
+        {
+            if (iflags.num_pad)
+            {
+                ret = '6';
+            }
+            else
+            {
+                ret = 'l';
+            }
+            break;
+        }
+        case KEY_UP:
+        {
+            if (iflags.num_pad)
+            {
+                ret = '8';
+            }
+            else
+            {
+                ret = 'k';
+            }
+            break;
+        }
+        case KEY_DOWN:
+        {
+            if (iflags.num_pad)
+            {
+                ret = '2';
+            }
+            else
+            {
+                ret = 'j';
+            }
+            break;
+        }
+    }
+
+    return ret;
+}
 
 /* Use nethack wall symbols for drawing unless cursesgraphics is
 defined, in which case we use the standard curses ones.  Not sure if

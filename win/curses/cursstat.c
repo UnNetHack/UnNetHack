@@ -22,6 +22,8 @@ typedef struct nhs
 
 static void init_stats(void);
 
+static void set_labels(int label_width);
+
 static nhstat prevname;
 static nhstat prevdepth;
 static nhstat prevstr;
@@ -52,6 +54,10 @@ static nhstat prevsick;
 static nhstat prevslime;
 static nhstat prevencumb;
 
+#define COMPACT_LABELS  1
+#define NORMAL_LABELS   2
+#define WIDE_LABELS     3
+
 extern const char *hu_stat[]; /* from eat.c */
 extern const char *enc_stat[]; /* from botl.c */
 
@@ -65,6 +71,7 @@ void curses_update_stats()
     int count, enc, orient, sx_start;
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
     static boolean first = TRUE;
+    static boolean prev_horiz;
     boolean horiz;
     int sx = 0;
     int sy = 0;
@@ -78,12 +85,6 @@ void curses_update_stats()
     
     sx_start = sx;
         
-    if (first)
-    {
-        init_stats();
-        first = FALSE;
-    }
-    
     orient = curses_get_window_orientation(STATUS_WIN);
 
     if ((orient == ALIGN_RIGHT) || (orient == ALIGN_LEFT))
@@ -94,7 +95,28 @@ void curses_update_stats()
     {
         horiz = TRUE;
     }
+    
+    if (first)
+    {
+        init_stats();
+        prev_horiz = !horiz;
+        first = FALSE;
+    }
+    
+    if (prev_horiz != horiz)    /* Status window orientation changed */
+    {
+        if (horiz)
+        {
+            set_labels(NORMAL_LABELS);
+    }
+    else
+    {
+            set_labels(WIDE_LABELS);
+        }
+    }
 
+    prev_horiz = horiz;
+    
     curses_clear_nhwin(STATUS_WIN);
     
     /* Line 1 */
@@ -156,6 +178,14 @@ void curses_update_stats()
         sy++;
     }
     
+    /* Add dungeon name and level if status window is vertical */
+    if (!horiz)
+    {
+        sprintf(buf, "%s", dungeons[u.uz.dnum].dname);
+        mvwaddstr(win, sy, sx, buf);
+        sy += 2;
+    }
+
     /* Strength */
     if (ACURR(A_STR) != prevstr.value)  /* Strength changed */
     {
@@ -443,7 +473,7 @@ void curses_update_stats()
     else
     {
         sx = sx_start;
-        sy++;
+        sy ++;
     }
     
     /* Alignment */
@@ -857,7 +887,14 @@ void curses_update_stats()
         }
         else
         {
+            if (horiz)
+            {
             prevlevel.label = curses_copy_of("Lvl:");
+        }
+            else
+            {
+                prevlevel.label = curses_copy_of("Level:         ");
+            }
         }
     }
 
@@ -905,10 +942,18 @@ void curses_update_stats()
     /* Level */
     if (u.mtimedone)    /* Currently polymorphed - show monster HD */
     {
-        if (strncmp(prevlevel.label, "HD:", 3) != 0)
+        if ((strncmp(prevlevel.label, "HP:", 3) != 0) ||
+         (strncmp(prevlevel.label, "Hit Points:", 11) != 0))
         {
             free(prevlevel.label);
+            if (horiz)
+            {
             prevlevel.label = curses_copy_of("HD:");
+        }
+            else
+            {
+                prevlevel.label = curses_copy_of("Hit Dice:      ");
+            }
         }
         if (mons[u.umonnum].mlevel != prevlevel.value)
         {
@@ -929,7 +974,8 @@ void curses_update_stats()
     }
     else    /* Not polymorphed */
     {
-        if (strncmp(prevlevel.label, "HD:", 3) == 0)
+        if ((strncmp(prevlevel.label, "HD:", 3) != 0) ||
+         (strncmp(prevlevel.label, "Hit Dice:", 9) != 0))
         {
             free(prevlevel.label);
             if (prevexp.display)
@@ -938,7 +984,14 @@ void curses_update_stats()
             }
             else
             {
+                if (horiz)
+                {
                 prevlevel.label = curses_copy_of("Lvl:");
+            }
+                else
+                {
+                    prevlevel.label = curses_copy_of("Level:         ");
+                }
             }
         }
         if (u.ulevel > prevlevel.value)
@@ -1830,7 +1883,7 @@ static void init_stats()
     prevstr.txt = curses_copy_of(buf);
     prevstr.display = TRUE;
     prevstr.highlight_turns = 0;
-    prevstr.label = curses_copy_of("Str:");
+    prevstr.label = NULL;
 
     /* Intelligence */
     sprintf(buf, "%d", ACURR(A_INT));
@@ -1838,7 +1891,7 @@ static void init_stats()
     prevint.txt = curses_copy_of(buf);
     prevint.display = TRUE;
     prevint.highlight_turns = 0;
-    prevint.label = curses_copy_of("Int:");
+    prevint.label = NULL;
 
     /* Wisdom */
     sprintf(buf, "%d", ACURR(A_WIS));
@@ -1846,7 +1899,7 @@ static void init_stats()
     prevwis.txt = curses_copy_of(buf);
     prevwis.display = TRUE;
     prevwis.highlight_turns = 0;
-    prevwis.label = curses_copy_of("Wis:");
+    prevwis.label = NULL;
 
     /* Dexterity */
     sprintf(buf, "%d", ACURR(A_DEX));
@@ -1854,7 +1907,7 @@ static void init_stats()
     prevdex.txt = curses_copy_of(buf);
     prevdex.display = TRUE;
     prevdex.highlight_turns = 0;
-    prevdex.label = curses_copy_of("Dex:");
+    prevdex.label = NULL;
 
     /* Constitution */
     sprintf(buf, "%d", ACURR(A_CON));
@@ -1862,7 +1915,7 @@ static void init_stats()
     prevcon.txt = curses_copy_of(buf);
     prevcon.display = TRUE;
     prevcon.highlight_turns = 0;
-    prevcon.label = curses_copy_of("Con:");
+    prevcon.label = NULL;
 
     /* Charisma */
     sprintf(buf, "%d", ACURR(A_CHA));
@@ -1870,7 +1923,7 @@ static void init_stats()
     prevcha.txt = curses_copy_of(buf);
     prevcha.display = TRUE;
     prevcha.highlight_turns = 0;
-    prevcha.label = curses_copy_of("Cha:");
+    prevcha.label = NULL;
 
     /* Alignment */
     switch (u.ualign.type)
@@ -1911,7 +1964,7 @@ static void init_stats()
     prevdepth.txt = curses_copy_of(buf);
     prevdepth.display = TRUE;
     prevdepth.highlight_turns = 0;
-    prevdepth.label = curses_copy_of("Dlvl:");
+    prevdepth.label = NULL;
     
     /* Gold */
 #ifndef GOLDOBJ
@@ -1924,8 +1977,7 @@ static void init_stats()
     prevau.txt = curses_copy_of(buf);
     prevau.display = TRUE;
     prevau.highlight_turns = 0;
-    sprintf(buf, "%c:", GOLD_SYM);
-    prevau.label = curses_copy_of(buf);
+    prevau.label = NULL;
 
     /* Hit Points */
     if (u.mtimedone)    /* Currently polymorphed - show monster HP */
@@ -1942,7 +1994,7 @@ static void init_stats()
 	}
 	prevhp.display = TRUE;
 	prevhp.highlight_turns = 0;
-    prevhp.label = curses_copy_of("HP:");
+    prevhp.label = NULL;
 
     /* Max Hit Points */
     if (u.mtimedone)    /* Currently polymorphed - show monster HP */
@@ -1967,7 +2019,7 @@ static void init_stats()
     prevpow.txt = curses_copy_of(buf);
 	prevpow.display = TRUE;
 	prevpow.highlight_turns = 0;
-    prevpow.label = curses_copy_of("Pw:");
+    prevpow.label = NULL;
 
     /* Max Power */
     prevmpow.value = u.uenmax;
@@ -1983,7 +2035,7 @@ static void init_stats()
     prevac.txt = curses_copy_of(buf);
 	prevac.display = TRUE;
 	prevac.highlight_turns = 0;
-    prevac.label = curses_copy_of("AC:");
+    prevac.label = NULL;
 
     /* Experience */
 #ifdef EXP_ON_BOTL
@@ -1992,30 +2044,22 @@ static void init_stats()
     prevexp.txt = curses_copy_of(buf);
 	prevexp.display = flags.showexp;
 	prevexp.highlight_turns = 0;
-    prevexp.label = curses_copy_of("Xp:");
+    prevexp.label = NULL;
 #endif
 
     /* Level */
+    prevlevel.label = NULL;
     if (u.mtimedone)    /* Currently polymorphed - show monster HP */
     {
         prevlevel.value = mons[u.umonnum].mlevel;
         sprintf(buf, "%d", mons[u.umonnum].mlevel);
         prevlevel.txt = curses_copy_of(buf);
-        prevlevel.label = curses_copy_of("HD:");
 	}
 	else if (u.ulevel != prevlevel.value)  /* Not polymorphed */
 	{
 	    prevlevel.value = u.ulevel;
         sprintf(buf, "%d", u.ulevel);
         prevlevel.txt = curses_copy_of(buf);
-        if (prevexp.display)
-        {
-            prevlevel.label = curses_copy_of("/");
-        }
-        else
-        {    
-            prevlevel.label = curses_copy_of("Lvl:");
-        }
 	}
 	prevlevel.display = TRUE;
 	prevlevel.highlight_turns = 0;
@@ -2026,7 +2070,7 @@ static void init_stats()
     prevtime.txt = curses_copy_of(buf);
 	prevtime.display = flags.time;
 	prevtime.highlight_turns = 0;
-    prevtime.label = curses_copy_of("T:");
+    prevtime.label = NULL;
 
     /* Score */
 #ifdef SCORE_ON_BOTL
@@ -2035,7 +2079,7 @@ static void init_stats()
     prevscore.txt = curses_copy_of(buf);
 	prevscore.display = flags.showscore;
 	prevscore.highlight_turns = 0;
-    prevscore.label = curses_copy_of("S:");
+    prevscore.label = NULL;
 #endif
 
     /* Hunger */
@@ -2162,3 +2206,297 @@ static void init_stats()
     prevencumb.label = NULL;
 }
 
+/* Set labels based on orientation of status window.  If horizontal,
+we want to compress this info; otherwise we know we have a width of at
+least 26 characters. */
+
+static void set_labels(int label_width)
+{
+    char buf[BUFSZ];
+
+    switch (label_width)
+    {
+        case COMPACT_LABELS:
+        {
+            if (prevstr.label)
+            {
+                free (prevstr.label);
+            }
+            prevstr.label = curses_copy_of("S:");
+            break;
+        }
+        case NORMAL_LABELS:
+        {
+            /* Strength */
+            if (prevstr.label)
+            {
+                free (prevstr.label);
+            }
+            prevstr.label = curses_copy_of("Str:");
+            /* Intelligence */
+            if (prevint.label)
+            {
+                free (prevint.label);
+            }
+            prevint.label = curses_copy_of("Int:");
+
+            /* Wisdom */
+            if (prevwis.label)
+            {
+                free (prevwis.label);
+            }
+            prevwis.label = curses_copy_of("Wis:");
+            
+            /* Dexterity */
+            if (prevdex.label)
+            {
+                free (prevdex.label);
+            }
+            prevdex.label = curses_copy_of("Dex:");
+            
+            /* Constitution */
+            if (prevcon.label)
+            {
+                free (prevcon.label);
+            }
+            prevcon.label = curses_copy_of("Con:");
+            
+            /* Charisma */
+            if (prevcha.label)
+            {
+                free (prevcha.label);
+            }
+            prevcha.label = curses_copy_of("Cha:");
+            
+            /* Alignment */
+            if (prevalign.label)
+            {
+                free (prevalign.label);
+            }
+            prevalign.label = NULL;
+            
+            /* Dungeon level */
+            if (prevdepth.label)
+            {
+                free (prevdepth.label);
+            }
+            prevdepth.label = curses_copy_of("Dlvl:");
+           
+            /* Gold */
+            if (prevau.label)
+            {
+                free (prevau.label);
+            }
+            sprintf(buf, "%c:", GOLD_SYM);
+            prevau.label = curses_copy_of(buf);
+            
+            /* Hit points */
+            if (prevhp.label)
+            {
+                free (prevhp.label);
+            }
+            prevhp.label = curses_copy_of("HP:");
+            
+            /* Power */
+            if (prevpow.label)
+            {
+                free (prevpow.label);
+            }
+            prevpow.label = curses_copy_of("Pw:");
+            
+            /* Armor Class */
+            if (prevac.label)
+            {
+                free (prevac.label);
+            }
+            prevac.label = curses_copy_of("AC:");
+            
+#ifdef EXP_ON_BOTL            
+            /* Experience */
+            if (prevexp.label)
+            {
+                free (prevexp.label);
+            }
+            prevexp.label = curses_copy_of("XP:");
+#endif            
+
+            /* Level */            
+            if (prevlevel.label)
+            {
+                free (prevlevel.label);
+                prevlevel.label = NULL;
+            }
+            if (u.mtimedone)    /* Currently polymorphed - show monster HP */
+            {
+                prevlevel.label = curses_copy_of("HD:");
+        	}
+        	else    /* Not polymorphed */
+        	{
+                if (prevexp.display)
+                {
+                    prevlevel.label = curses_copy_of("/");
+                }
+                else
+                {    
+                    prevlevel.label = curses_copy_of("Lvl:");
+                }
+            }
+            
+            /* Time */
+            if (prevtime.label)
+            {
+                free (prevtime.label);
+            }
+            prevtime.label = curses_copy_of("T:");
+            
+#ifdef SCORE_ON_BOTL
+            /* Score */
+            if (prevscore.label)
+            {
+                free (prevscore.label);
+            }
+            prevscore.label = curses_copy_of("S:");
+#endif
+            break;
+        }
+        case WIDE_LABELS:
+        {
+            /* Strength */
+            if (prevstr.label)
+            {
+                free (prevstr.label);
+            }
+            prevstr.label = curses_copy_of("Strength:      ");
+            
+            /* Intelligence */
+            if (prevint.label)
+            {
+                free (prevint.label);
+            }
+            prevint.label = curses_copy_of("Intelligence:  ");
+            
+            /* Wisdom */
+            if (prevwis.label)
+            {
+                free (prevwis.label);
+            }
+            prevwis.label = curses_copy_of("Wisdom:        ");
+            
+            /* Dexterity */
+            if (prevdex.label)
+            {
+                free (prevdex.label);
+            }
+            prevdex.label = curses_copy_of("Dexterity:     ");
+            
+            /* Constitution */
+            if (prevcon.label)
+            {
+                free (prevcon.label);
+            }
+            prevcon.label = curses_copy_of("Constitution:  ");
+            
+            /* Charisma */
+            if (prevcha.label)
+            {
+                free (prevcha.label);
+            }
+            prevcha.label = curses_copy_of("Charisma:      ");
+            
+            /* Alignment */
+            if (prevalign.label)
+            {
+                free (prevalign.label);
+            }
+            prevalign.label = curses_copy_of("Alignment:     ");
+            
+            /* Dungeon level */
+            if (prevdepth.label)
+            {
+                free (prevdepth.label);
+            }
+            prevdepth.label = curses_copy_of("Dungeon Level: ");
+           
+            /* Gold */
+            if (prevau.label)
+            {
+                free (prevau.label);
+            }
+            prevau.label = curses_copy_of("Gold:          ");
+            
+            /* Hit points */
+            if (prevhp.label)
+            {
+                free (prevhp.label);
+            }
+            prevhp.label = curses_copy_of("Hit Points:    ");
+            
+            /* Power */
+            if (prevpow.label)
+            {
+                free (prevpow.label);
+            }
+            prevpow.label = curses_copy_of("Magic Power:   ");
+            
+            /* Armor Class */
+            if (prevac.label)
+            {
+                free (prevac.label);
+            }
+            prevac.label = curses_copy_of("Armor Class:   ");
+            
+#ifdef EXP_ON_BOTL            
+            /* Experience */
+            if (prevexp.label)
+            {
+                free (prevexp.label);
+            }
+            prevexp.label = curses_copy_of("Experience:   ");
+#endif            
+
+            /* Level */            
+            if (prevlevel.label)
+            {
+                free (prevlevel.label);
+            }
+            if (u.mtimedone)    /* Currently polymorphed - show monster HP */
+            {
+                prevlevel.label = curses_copy_of("Hit Dice:      ");
+        	}
+        	else    /* Not polymorphed */
+        	{
+                if (prevexp.display)
+                {
+                    prevlevel.label = curses_copy_of(" / ");
+                }
+                else
+                {    
+                    prevlevel.label = curses_copy_of("Level:         ");
+                }
+            }
+            
+            /* Time */
+            if (prevtime.label)
+            {
+                free (prevtime.label);
+            }
+            prevtime.label = curses_copy_of("Time:          ");
+            
+#ifdef SCORE_ON_BOTL
+            /* Score */
+            if (prevscore.label)
+            {
+                free (prevscore.label);
+            }
+            prevscore.label = curses_copy_of("Score:         ");
+#endif
+            break;
+        }
+        default:
+        {
+            panic( "set_labels(): Invalid lavel_width %d\n",
+             label_width );
+            break;
+        }
+    }
+}

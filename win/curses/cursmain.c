@@ -645,8 +645,10 @@ delay_output()  -- Causes a visible delay of 50ms in the output.
 */
 void curses_delay_output()
 {
-/*    curses_refresh_nethack_windows();
-    usleep(5000); */
+    timeout(50);
+    curses_refresh_nhwin(MAP_WIN);
+    (void) getch();
+    timeout(-1);
 }
 
 /*

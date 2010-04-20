@@ -43,5 +43,6 @@ int curses_convert_attr(int attr);
 
 int curses_read_attrs(char *attrs);
 
+int curses_convert_keys(int key);
 
 #endif  /* CURSMISC_H */
