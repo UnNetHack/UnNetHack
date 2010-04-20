@@ -47,6 +47,10 @@ typedef enum menu_op_type
     INVERT
 } menu_op;
 
+#ifdef MENU_COLOR
+extern struct menucoloring *menu_colorings;
+#endif
+
 static nhmenu *get_menu(winid wid);
 
 static char menu_get_accel(boolean first);
@@ -66,6 +70,7 @@ static void menu_select_deselect(WINDOW *win, nhmenu_item *item, menu_op operati
 static int menu_operation(WINDOW *win, nhmenu *menu, menu_op operation,
  int page_num);
 
+static boolean get_menu_coloring(char *str, int *color, int *attr);
 
 static nhmenu *nhmenus = NULL;  /* NetHack menu array */
 
@@ -872,6 +877,11 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
     nhmenu_item *menu_item_ptr;
     int count, curletter, entry_cols, start_col, num_lines, footer_x;
     boolean first_accel = TRUE;
+#ifdef MENU_COLOR
+	int color = NO_COLOR;
+	int attr = A_NONE;
+	boolean menu_color = FALSE;
+#endif /* MENU_COLOR */
     
     /* Cycle through entries until we are on the correct page */
 
@@ -946,6 +956,20 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
                 mvwprintw(win, menu_item_ptr->line_num + 1, 3, ") ");
             }
         }
+#ifdef MENU_COLOR
+		if (iflags.use_menu_color && (menu_color = get_menu_coloring
+		 ((char *)menu_item_ptr->str, &color, &attr)))
+		{
+		    if (color != NO_COLOR)
+		    {
+                curses_toggle_color_attr(win, color, NONE, ON);
+		    }
+    		if (attr != A_NONE)
+    		{
+    		    menu_item_ptr->attr = attr;
+    		}
+		}
+#endif /* MENU_COLOR */
         curses_toggle_color_attr(win, NONE, menu_item_ptr->attr, ON);
         entry_cols = menu->width;
         start_col = 1;
@@ -967,6 +991,12 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
                  entry_cols, count + 1));
              }
         }
+#ifdef MENU_COLOR
+	if (menu_color && (color != NO_COLOR))
+    {
+        curses_toggle_color_attr(win, color, NONE, OFF);
+    }
+#endif /* MENU_COLOR */
         curses_toggle_color_attr(win, NONE, menu_item_ptr->attr, OFF);
         menu_item_ptr = menu_item_ptr->next_item;
     }
@@ -1263,3 +1293,32 @@ static int menu_operation(WINDOW *win, nhmenu *menu, menu_op
     
     return current_page;
 }
+
+
+/* This is to get the color of a menu item if the menucolor patch is
+ applied */
+
+#ifdef MENU_COLOR
+static boolean get_menu_coloring(char *str, int *color, int *attr)
+{
+    struct menucoloring *tmpmc;
+    if (iflags.use_menu_color)
+	for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
+# ifdef MENU_COLOR_REGEX
+#  ifdef MENU_COLOR_REGEX_POSIX
+	    if (regexec(&tmpmc->match, str, 0, NULL, 0) == 0) {
+#  else
+	    if (re_search(&tmpmc->match, str, strlen(str), 0, 9999, 0) >= 0) {
+#  endif
+# else
+	    if (pmatch(tmpmc->match, str)) {
+# endif
+		*color = tmpmc->color;
+		*attr = curses_convert_attr(tmpmc->attr);
+		return TRUE;
+	    }
+    return FALSE;
+}
+#endif /* MENU_COLOR */
+
+
