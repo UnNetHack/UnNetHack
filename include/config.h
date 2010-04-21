@@ -395,7 +395,8 @@ typedef unsigned char	uchar;
 #define BLACKMARKET	/* Massimo Campostrini (campo@sunthpi3.difi.unipi.it) */
 
 
-#if defined(TTY_GRAPHICS) || defined(MSWIN_GRAPHICS)
+#if defined(TTY_GRAPHICS) || defined(MSWIN_GRAPHICS) || \
+ defined(CURSES_GRAPHICS)
 # define MENU_COLOR
 # define MENU_COLOR_REGEX
 /*# define MENU_COLOR_REGEX_POSIX */
