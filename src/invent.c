@@ -311,6 +311,7 @@ struct obj *obj;
 		obj->record_achieve_special = 0;
 #ifdef LIVELOGFILE
 		livelog_achieve_update();
+		livelog_generic("sokobanprize", doname(obj));
 #endif
 	}
 #endif /* RECORD_ACHIEVE */
