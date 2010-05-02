@@ -4,6 +4,10 @@
 
 #include "hack.h"
 #include "dlb.h"
+#include "func_tab.h"
+
+#include <termios.h>
+#include <unistd.h>
 
 #include "dummy_graphics.h"
 
@@ -526,7 +530,8 @@ void dummy_add_menu(winid wid, int glyph, const ANY_P * identifier,
 		const char *str, BOOLEAN_P presel)
 {
 	/* Do Nothing */
-	printf("dummy_add_menu(%s, ...)\n", winid2str(wid));
+	printf("dummy_add_menu(%s, %d, %d, %c, %c, %d, %s, %d\n", winid2str(wid),
+	       glyph, (int)identifier, accelerator, group_accel, attr, str, presel);
 }
 
 /*
@@ -668,6 +673,27 @@ void dummy_raw_print_bold(const char *str)
 	printf("dummy_raw_print_bold: *%s*\n", str);
 }
 
+static int dummy_getchar()
+{
+	struct termios termio;
+	struct termios saved_termio;
+
+	/* get terminal settings */
+	tcgetattr(fileno(stdin), &saved_termio);
+	tcgetattr(fileno(stdin), &termio);
+
+	/* put terminal into RAW mode */
+	cfmakeraw(&termio);
+	tcsetattr(fileno(stdin), TCSADRAIN, &termio);
+
+	int ret = getchar();
+
+	/* restore terminal settings */
+	tcsetattr(fileno(stdin), TCSADRAIN, &saved_termio);
+
+	return ret;
+}
+
 /*
 int nhgetch()   -- Returns a single character input from the user.
                 -- In the tty window-port, nhgetch() assumes that tgetch()
@@ -677,7 +703,9 @@ int nhgetch()   -- Returns a single character input from the user.
 int dummy_nhgetch()
 {
 	printf("dummy_nhgetch\n");
-	return getchar();
+	int ret = dummy_getchar();
+	printf("dummy_nhgetch %d %c\n",ret,ret);
+	return ret;
 }
 
 /*
@@ -733,10 +761,8 @@ int dummy_nh_poskey(int *x, int *y, int *mod)
 	return ( 0);
     }
 #endif
-	// TODO
 	printf("dummy_nh_poskey\n");
-	abort();
-	return 'a';
+	return dummy_getchar();
 }
 
 /*
@@ -783,7 +809,9 @@ char dummy_yn_function(const char *question, const char *choices,
 {
 	// TODO
 	printf("dummy_yn_function %s\n", question);
-	return getchar();
+	int ret = dummy_getchar();
+	printf("dummy_yn_function %d %c\n", ret, ret);
+	return ret;
 }
 
 /*
@@ -817,8 +845,22 @@ int get_ext_cmd(void)
 */
 int dummy_get_ext_cmd()
 {
-	// TODO
+	char cmd[255];
+	int i;
+	char *ret;
+
 	printf("dummy_get_ext_cmd\n");
+	ret = fgets(cmd, 256, stdin);
+
+	for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++) {
+		/* Strip newline from end */
+		if (ret[strlen(ret)-1] == '\n') {
+			ret[strlen(ret)-1] = '\0';
+		}
+		if (!strcmpi(ret, extcmdlist[i].ef_txt)) {
+			return i;
+		}
+	}
 	return -1;
 }
 
