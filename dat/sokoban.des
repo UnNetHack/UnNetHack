@@ -43,7 +43,7 @@ FUNCTION soko_loot()
 }
 
 ### Bottom (first) level of Sokoban ###
-LEVEL:"soko4-1"
+LEVEL:"soko3-1"
 FLAGS:noteleport,hardfloor,mazelevel,premapped
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
@@ -101,7 +101,7 @@ OBJECT:'?',"earth",(03,11)
 soko_loot()
 
 
-LEVEL:"soko4-2"
+LEVEL:"soko3-2"
 FLAGS:noteleport,hardfloor,mazelevel,premapped
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
@@ -161,7 +161,7 @@ soko_loot()
 
 
 ### Second level ###
-LEVEL:"soko3-1"
+LEVEL:"soko3-11"
 FLAGS:noteleport,mazelevel,premapped
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
@@ -232,7 +232,7 @@ TRAP:"hole",(26,10)
 soko_loot()
 
 
-LEVEL:"soko3-2"
+LEVEL:"soko3-12"
 FLAGS:noteleport,mazelevel,premapped
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
@@ -601,7 +601,7 @@ ENGRAVING:place[2],burn,"Elbereth"
 # Following Sokoban levels heavily modified for NetHack by Pasi Kallinen
 # The original authors are listed just before the maps
 #
-LEVEL:"soko4-3"
+LEVEL:"soko3-3"
 FLAGS:noteleport, hardfloor,mazelevel,premapped
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
@@ -655,7 +655,7 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-LEVEL:"soko4-4"
+LEVEL:"soko3-4"
 FLAGS:noteleport, hardfloor,mazelevel,premapped
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
@@ -717,7 +717,7 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-LEVEL:"soko4-5"
+LEVEL:"soko3-5"
 FLAGS:noteleport, hardfloor,mazelevel,premapped
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
@@ -779,7 +779,7 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-LEVEL:"soko4-6"
+LEVEL:"soko3-6"
 FLAGS:noteleport, hardfloor,mazelevel,premapped
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
@@ -834,7 +834,7 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-LEVEL:"soko4-7"
+LEVEL:"soko3-7"
 FLAGS:noteleport, hardfloor,mazelevel,premapped
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
@@ -933,7 +933,7 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-LEVEL:"soko4-8"
+LEVEL:"soko3-8"
 FLAGS:noteleport, hardfloor,mazelevel,premapped
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
@@ -981,7 +981,7 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-LEVEL:"soko4-9"
+LEVEL:"soko3-9"
 FLAGS:noteleport, hardfloor,mazelevel,premapped
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
@@ -1030,7 +1030,7 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-LEVEL:"soko3-3"
+LEVEL:"soko3-13"
 FLAGS:noteleport,mazelevel,premapped
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
@@ -1083,7 +1083,7 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-LEVEL:"soko3-4"
+LEVEL:"soko3-14"
 FLAGS:noteleport,mazelevel,premapped
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
@@ -1145,7 +1145,7 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-LEVEL:"soko3-5"
+LEVEL:"soko3-15"
 FLAGS:noteleport,mazelevel,premapped
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
@@ -1202,7 +1202,7 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-LEVEL:"soko3-6"
+LEVEL:"soko3-16"
 FLAGS:noteleport,mazelevel,premapped
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
@@ -1272,7 +1272,7 @@ OBJECT:'=',random,random
 OBJECT:'/',random,random
 
 
-LEVEL:"soko3-7"
+LEVEL:"soko3-10"
 FLAGS:noteleport,mazelevel,premapped
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center

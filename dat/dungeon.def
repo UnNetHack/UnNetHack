@@ -103,14 +103,13 @@ LEVEL:	"x-goal" "none" @ (-1, 0)
 #
 # Sokoban
 #
-DUNGEON:		"Sokoban" "none" (4, 0)
+DUNGEON:		"Sokoban" "none" (3, 0)
 DESCRIPTION:    mazelike
 ALIGNMENT:      neutral
 ENTRY:          -1
 RNDLEVEL:		"soko1" "none" @ (1, 0) 4
 RNDLEVEL:		"soko2" "none" @ (2, 0) 7
-RNDLEVEL:		"soko3" "none" @ (3, 0) 7
-RNDLEVEL:		"soko4" "none" @ (4, 0) 9
+RNDLEVEL:		"soko3" "none" @ (3, 0) 16
 
 
 #
