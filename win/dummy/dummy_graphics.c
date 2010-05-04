@@ -675,23 +675,13 @@ void dummy_raw_print_bold(const char *str)
 
 static int dummy_getchar()
 {
-	struct termios termio;
-	struct termios saved_termio;
+	char input[256];
+	char *rets = NULL;
+	do {
+		rets = fgets(input, sizeof(input), stdin);
+	} while (rets == NULL);
 
-	/* get terminal settings */
-	tcgetattr(fileno(stdin), &saved_termio);
-	tcgetattr(fileno(stdin), &termio);
-
-	/* put terminal into RAW mode */
-	cfmakeraw(&termio);
-	tcsetattr(fileno(stdin), TCSADRAIN, &termio);
-
-	int ret = getchar();
-
-	/* restore terminal settings */
-	tcsetattr(fileno(stdin), TCSADRAIN, &saved_termio);
-
-	return ret;
+	return input[0];
 }
 
 /*
@@ -814,6 +804,14 @@ char dummy_yn_function(const char *question, const char *choices,
 	return ret;
 }
 
+/** Strips newline from end of string. */
+void strip_newline(char *str) {
+	/* Strip newline from end */
+	if (str[strlen(str)-1] == '\n') {
+		str[strlen(str)-1] = '\0';
+	}
+}
+
 /*
 getlin(const char *ques, char *input)
 	    -- Prints ques as a prompt and reads a single line of text,
@@ -828,11 +826,14 @@ void dummy_getlin(const char *question, char *input)
 {
 	printf("dummy_getlin\n");
 	fprintf(stdout, "%s: ", question);
+	fflush(stdout);
 	char *ret = fgets(input, 256, stdin);
 
 	if (ret == NULL) {
 		input[0] = '\033';
 		input[1] = '\0';
+	} else {
+		strip_newline(input);
 	}
 
 }
@@ -853,10 +854,7 @@ int dummy_get_ext_cmd()
 	ret = fgets(cmd, 256, stdin);
 
 	for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++) {
-		/* Strip newline from end */
-		if (ret[strlen(ret)-1] == '\n') {
-			ret[strlen(ret)-1] = '\0';
-		}
+		strip_newline(ret);
 		if (!strcmpi(ret, extcmdlist[i].ef_txt)) {
 			return i;
 		}
