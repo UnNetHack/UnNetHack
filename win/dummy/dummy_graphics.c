@@ -321,7 +321,7 @@ dummy_player_selection()
 void dummy_askname()
 {
 	fprintf(stdout, "What is your name? ");
-	char *ret = fgets(plname, 256, stdin);
+	char *ret = fgets(plname, sizeof(plname), stdin);
 	/* Quit if they want to quit... */
 	if (ret==NULL) {
 		dummy_exit_nhwindows(0);
@@ -851,7 +851,7 @@ int dummy_get_ext_cmd()
 	char *ret;
 
 	printf("dummy_get_ext_cmd\n");
-	ret = fgets(cmd, 256, stdin);
+	ret = fgets(cmd, sizeof(cmd), stdin);
 
 	for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++) {
 		strip_newline(ret);
