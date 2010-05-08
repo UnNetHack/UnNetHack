@@ -2114,8 +2114,11 @@ boolean from_user;
 		*(bp + 2) = 'a';
     }
 
+	//pline("9 %d\n", mntmp);
+	//pline("9 %d %d %d\n", !strcmpi(bp, "scales"), mntmp >= PM_GRAY_DRAGON, mntmp <= PM_YELLOW_DRAGON);
 	/* dragon scales - assumes order of dragons */
-	if(!strcmpi(bp, "scales") &&
+	if ((!strcmpi(bp, "scales") || !strcmpi(bp, "dragon scales")) &&
+			mntmp != NON_PM &&
 			mntmp >= PM_GRAY_DRAGON && mntmp <= PM_YELLOW_DRAGON) {
 		typ = GRAY_DRAGON_SCALES + mntmp - PM_GRAY_DRAGON;
 		mntmp = NON_PM;	/* no monster */
