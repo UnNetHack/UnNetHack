@@ -1371,6 +1371,9 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	    makeknown(obj->otyp); /* obj is already known */
 	    obj->sokoprize = FALSE; /* reset sokoprize flag */
 	    del_sokoprize();	/* delete other sokoprizes */
+	    /* stop picking up other objects to prevent picking up
+	       one of the just deleted other sokoban prizes */
+	    return -1;
 	}
 	return 1;
 }
