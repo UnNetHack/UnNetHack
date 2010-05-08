@@ -6,8 +6,9 @@ require 'logger'
 class UnNetHack
 
 def initialize()
-	ENV["NETHACKOPTIONS"]="windowtype:dummy2"
-	ENV["HACKDIR"]="./build/unnethackdir"
+	ENV["NETHACKOPTIONS"]="windowtype:dummy"
+
+	raise "Environment variable HACKDIR is not set" if not ENV["HACKDIR"]
 
 	@logger = Logger.new "logs/unnethack.log", "daily"
 
