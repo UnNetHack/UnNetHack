@@ -39,6 +39,9 @@
 /* Data librarian */
 #undef DLB
 
+/* Dummy graphics */
+#undef DUMMY_GRAPHICS
+
 /* Number of dumped messages */
 #undef DUMPMSGS
 

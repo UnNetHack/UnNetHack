@@ -26,6 +26,7 @@ dnl  ----- Window systems
 # NETHACK_WIN_ENABLE(proxy, auto)
 nethack_default_win=""
 # Note: Order is important: The last listed enabled port will be the default.
+NETHACK_WIN_ENABLE(dummy, no, [dummy graphics for unit tests])
 NETHACK_WIN_ENABLE(tty, auto)
 #NETHACK_WIN_ENABLE(x11, no)
 #NETHACK_WIN_ENABLE(mswin, no, [use Microsoft Window's native graphics])
@@ -220,6 +221,15 @@ if test "$enable_x11_graphics" != "no"; then
     WINLIB="${WINLIB} ${LIBXAW_LIBS}"
     CNF_SHARE_DATND="${CNF_SHARE_DATND} \$(CNF_SHARE_X11ND)"
     AC_DEFINE(X11_GRAPHICS, [], [X11 graphics])
+
+    OPTIONS_FILE="options"
+    OPTIONS_FILES="options"
+fi
+
+if test "$enable_dummy_graphics" != "no"; then
+    WINSRC="${WINSRC} \$(WINDUMMYSRC)"
+    WINOBJ="${WINOBJ} \$(WINDUMMYOBJ)"
+    AC_DEFINE(DUMMY_GRAPHICS, [], [Dummy graphics])
 
     OPTIONS_FILE="options"
     OPTIONS_FILES="options"

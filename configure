@@ -745,6 +745,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+enable_dummy_graphics
 enable_tty_graphics
 with_compression
 enable_data_librarian
@@ -1433,6 +1434,7 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-dummy-graphics dummy graphics for unit tests (default=no)
   --enable-tty-graphics   use tty-graphics (default=auto)
   --enable-data-librarian Data librarian (default=auto)
   --enable-sinks          Kitchen sinks (default=yes)
@@ -2075,6 +2077,16 @@ done
 # NETHACK_WIN_ENABLE(proxy, auto)
 nethack_default_win=""
 # Note: Order is important: The last listed enabled port will be the default.
+# Check whether --enable-dummy-graphics was given.
+if test "${enable_dummy_graphics+set}" = set; then
+  enableval=$enable_dummy_graphics; enable_dummy_graphics="$enableval"
+else
+  enable_dummy_graphics="no"
+fi
+
+  if test "$enable_dummy_graphics" != "no"; then
+    nethack_wins="dummy $nethack_wins"
+  fi
 # Check whether --enable-tty-graphics was given.
 if test "${enable_tty_graphics+set}" = set; then
   enableval=$enable_tty_graphics; enable_tty_graphics="$enableval"
@@ -5519,6 +5531,19 @@ $as_echo "$as_me: error: Need X Athena Widgets Library for X11 graphics" >&2;}
 
 cat >>confdefs.h <<\_ACEOF
 #define X11_GRAPHICS /**/
+_ACEOF
+
+
+    OPTIONS_FILE="options"
+    OPTIONS_FILES="options"
+fi
+
+if test "$enable_dummy_graphics" != "no"; then
+    WINSRC="${WINSRC} \$(WINDUMMYSRC)"
+    WINOBJ="${WINOBJ} \$(WINDUMMYOBJ)"
+
+cat >>confdefs.h <<\_ACEOF
+#define DUMMY_GRAPHICS /**/
 _ACEOF
 
 
