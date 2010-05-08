@@ -103,6 +103,10 @@ WINMSOBJ = mswproc.o winhack.o mhdlg.o mhaskyn.o mhfont.o mhinput.o mhmain.o \
 	winres.o nhwin.a
 WINMSCFLAGS=-I$(srcdir)/../win/win32 -D_WIN32_IE=0x0400
 
+# files for a line oriented port for unit tests
+WINDUMMYSRC = $(srcdir)/../win/dummy/dummy_graphics.c
+WINDUMMYOBJ = dummy_graphics.o
+
 WINSRC = @WINSRC@
 WINOBJ = @WINOBJ@
 WINTTYLIB = @WINTTYLIB@
@@ -196,7 +200,7 @@ GENCSRC = monstr.c vis_tab.c  #tile.c
 
 # all windowing-system-dependent .c (for dependencies and such)
 WINCSRC = $(WINTTYSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC) \
-	$(WINPROXYSRC) $(WINGLSRC) $(WINMSSRC) tile.c
+	$(WINPROXYSRC) $(WINGLSRC) $(WINMSSRC) $(WINDUMMYSRC) tile.c
 # all windowing-system-dependent .cpp (for dependencies and such)
 WINCXXSRC = $(WINQTSRC) $(WINBESRC)
 
@@ -659,6 +663,8 @@ mhrip.o: $(srcdir)/../win/win32/mhrip.c ../win/win32/winMS.h \
 		../win/win32/resource.h ../win/win32/mhrip.h \
 		../win/win32/mhmsg.h ../win/win32/mhfont.h
 	$(CC) $(CFLAGS) $(WINMSCFLAGS) -c $(srcdir)/../win/win32/mhrip.c
+dummy_graphics.o: $(srcdir)/../win/dummy/dummy_graphics.c $(HACK_H)
+	$(CC) $(CFLAGS) -c $(srcdir)/../win/dummy/dummy_graphics.c
 tile.o: tile.c $(HACK_H)
 qt_win.o: $(srcdir)/../win/Qt/qt_win.cpp $(HACK_H) ../include/func_tab.h \
 		../include/dlb.h ../include/date.h ../include/patchlevel.h \
@@ -698,7 +704,7 @@ dogmove.o: $(srcdir)/dogmove.c $(HACK_H) ../include/mfndpos.h \
 dokick.o: $(srcdir)/dokick.c $(HACK_H) ../include/eshk.h
 dothrow.o: $(srcdir)/dothrow.c $(HACK_H) ../include/edog.h
 drawing.o: $(srcdir)/drawing.c $(HACK_H) ../include/tcap.h
-dump.o: $(srcdir)/dump.c $(HACK_H)
+dump.o: $(srcdir)/dump.c $(HACK_H) ../include/date.h
 dungeon.o: $(srcdir)/dungeon.c $(HACK_H) ../include/dlb.h
 eat.o: $(srcdir)/eat.c $(HACK_H)
 end.o: $(srcdir)/end.c $(HACK_H) ../include/eshk.h ../include/dlb.h
