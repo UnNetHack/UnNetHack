@@ -963,7 +963,7 @@ int enhance_skill(boolean want_dump)
 		any.a_void = 0;
 		if (i == skill_ranges[pass].first) {
 		if (want_dump) {
-		    dump_text("  %s",(char *)skill_ranges[pass].name);
+		    dump_text("  %s\n",(char *)skill_ranges[pass].name);
 		    dump_html("<tr><th>%s</th></tr>\n",(char *)skill_ranges[pass].name);
 		    logged=FALSE;
 		} else
@@ -974,13 +974,13 @@ int enhance_skill(boolean want_dump)
 		    if (P_SKILL(i) > P_UNSKILLED) {
 		 	Sprintf(buf2,"%-*s [%s]",
 			    longest, P_NAME(i),skill_level_name(i, buf));
-			dump_text("    %s",buf2);
+			dump_text("    %s\n",buf2);
 		 	Sprintf(buf2,"<tr><td>%s</td><td>[%s]</td></tr>",
 			    P_NAME(i),skill_level_name(i, buf));
 			dump_html("%s\n",buf2);
 			logged=TRUE;
 		    } else if (i == skill_ranges[pass].last && !logged) {
-			dump_text("    %s","(none)");
+			dump_text("    %s\n","(none)");
 			dump_html("<tr><td>%s</td></tr>\n","(none)");
 		    }
                } else {

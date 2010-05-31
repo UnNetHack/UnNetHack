@@ -1131,7 +1131,7 @@ dump_spells()
 	dump_title("Spells known in the end");
 
 	Sprintf(buf, "%-20s   Level    %-12s Fail", "    Name", "Category");
-	dump_text("  ",buf);
+	dump_text("  %s\n",buf);
 	dump_html("<table class=\"nh_spells\">\n", "");
 	dump_html("<tr><th></th><th>Name</th><th>Level</th><th>Category</th><th>Fail</th></tr>\n", "");
 	for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
@@ -1140,7 +1140,7 @@ dump_spells()
 			spellknow(i) ? " " : "*",
 			spelltypemnemonic(spell_skilltype(spellid(i))),
 			100 - percent_success(i));
-		dump_text("  ", buf);
+		dump_text("  %s\n", buf);
 		Sprintf(buf, "<tr><td class=\"nh_item_letter\">%c</td><td>%s</td><td align=\"right\">%d</td><td>%s</td><td align=\"right\">%d%%</td></tr>\n",
 			spellet(i), spellname(i), spellev(i),
 			spelltypemnemonic(spell_skilltype(spellid(i))),
