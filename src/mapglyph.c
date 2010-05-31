@@ -161,6 +161,11 @@ unsigned *ospecial;
 #endif
 	    mon_color(offset);
 	    special |= MG_RIDDEN;
+	    /* use inverse video for multiple items */
+	    if (level.objects[x][y] &&
+	        level.objects[x][y]->nexthere) {
+		special |= MG_INVERSE;
+	    }
     } else if ((offset = (glyph - GLYPH_BODY_OFF)) >= 0) {	/* a corpse */
 	ch = oc_syms[(int)objects[CORPSE].oc_class];
 #ifdef ROGUE_COLOR
