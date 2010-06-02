@@ -134,6 +134,9 @@
 /* Live game progress logfile */
 #undef LIVELOGFILE
 
+/* Reporting killing of uniques and ghosts of former players */
+#undef LIVELOG_BONES_KILLER
+
 /* Shoutting into the live game logfile */
 #undef LIVELOG_SHOUT
 

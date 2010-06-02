@@ -780,6 +780,7 @@ enable_simple_mail
 enable_xlogfile
 enable_livelog
 enable_livelog_shout
+enable_livelog_killing
 enable_dump
 enable_dump_file
 enable_dump_messages
@@ -1480,6 +1481,9 @@ Optional Features:
   --enable-livelog=FILE   Live game progress logfile (default=no, default
                           file=livelog)
   --enable-livelog-shout  Shoutting into the live game logfile (default=no)
+  --enable-livelog-killing
+                          Reporting killing of uniques and ghosts of former
+                          players (default=no)
   --enable-dump           Dumping character stats (default=yes)
   --enable-dump-file=FILE Name of character dump file (default=no, default
                           file="/tmp/%s.nh")
@@ -7643,6 +7647,25 @@ $as_echo "$enable_livelog_shout" >&6; }
 
 cat >>confdefs.h <<_ACEOF
 #define LIVELOG_SHOUT /**/
+_ACEOF
+
+   fi
+
+	{ $as_echo "$as_me:$LINENO: checking whether to enable livelog-killing" >&5
+$as_echo_n "checking whether to enable livelog-killing... " >&6; }
+   # Check whether --enable-livelog-killing was given.
+if test "${enable_livelog_killing+set}" = set; then
+  enableval=$enable_livelog_killing;
+else
+  enable_livelog_killing="no"
+fi
+
+   { $as_echo "$as_me:$LINENO: result: $enable_livelog_killing" >&5
+$as_echo "$enable_livelog_killing" >&6; }
+   if test "$enable_livelog_killing" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define LIVELOG_BONES_KILLER /**/
 _ACEOF
 
    fi

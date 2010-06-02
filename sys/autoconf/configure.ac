@@ -414,6 +414,7 @@ NETHACK_ARG_WITH_PARAM(xlogfile,[More verbose logfile],XLOGFILE,yes,FILE,[xlogfi
 NETHACK_ARG_WITH_PARAM(livelog,[Live game progress logfile],LIVELOGFILE,no,FILE,[livelog])
 if test "$enable_livelog" != "no" ; then
 	NETHACK_ARG(livelog-shout,[Shoutting into the live game logfile],LIVELOG_SHOUT,no)
+	NETHACK_ARG(livelog-killing,[Reporting killing of uniques and ghosts of former players],LIVELOG_BONES_KILLER,no)
 fi
 
 NETHACK_ARG(dump,[Dumping character stats],DUMP_LOG,yes)
