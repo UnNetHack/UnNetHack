@@ -906,6 +906,8 @@ int want_disp;
 	else you_have("transgressed");
 #ifdef WIZARD
 	if (wizard) {
+		Sprintf(buf, " %d", u.uhunger);
+		enl_msg("Hunger level ", "is", "was", buf);
 		Sprintf(buf, " %d / %ld", u.ualign.record, ALIGNLIM);
 		enl_msg("Your alignment ", "is", "was", buf);
 		Sprintf(buf, " %d - %d",
