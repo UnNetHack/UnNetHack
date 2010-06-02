@@ -2334,7 +2334,8 @@ gethungry()	/* as time goes by - called by moveloop() and domove() */
 	if (u.uinvulnerable) return;	/* you don't feel hungrier */
 
 	if ((!u.usleep || !rn2(10))	/* slow metabolic rate while asleep */
-		&& (carnivorous(youmonst.data) || herbivorous(youmonst.data))
+		&& (carnivorous(youmonst.data) || herbivorous(youmonst.data) ||
+		    is_vampire(youmonst.data))
 		&& !Slow_digestion)
 	    u.uhunger--;		/* ordinary food consumption */
 
