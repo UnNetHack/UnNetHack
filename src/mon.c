@@ -217,6 +217,9 @@ register struct monst *mtmp;
 		goto default_1;
 	    case PM_VAMPIRE:
 	    case PM_VAMPIRE_LORD:
+#if 0	/* DEFERRED */
+	    case PM_VAMPIRE_MAGE:
+#endif
 		/* include mtmp in the mkcorpstat() call */
 		num = undead_to_corpse(mndx);
 		obj = mkcorpstat(CORPSE, mtmp, &mons[num], x, y, TRUE);

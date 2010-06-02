@@ -442,7 +442,7 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	amii_setpens(amii_numcolors);	/* use colors from save file */
 #endif
 	mread(fd, (genericptr_t) &u, sizeof(struct you));
-	set_uasmon();
+	init_uasmon();
 #ifdef CLIPPING
 	cliparound(u.ux, u.uy);
 #endif

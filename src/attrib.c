@@ -565,6 +565,7 @@ int oldlevel, newlevel;
 	case PM_HUMAN:
 	case PM_DWARF:
 	case PM_GNOME:
+	case PM_VAMPIRE:
 	default:                rabil = 0;		break;
 	}
 

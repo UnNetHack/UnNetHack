@@ -79,7 +79,7 @@
 #define is_undead(ptr)		(((ptr)->mflags2 & M2_UNDEAD) != 0L)
 #define is_were(ptr)		(((ptr)->mflags2 & M2_WERE) != 0L)
 #define is_vampire(ptr)		((ptr)->mlet == S_VAMPIRE || \
-				 (ptr) == &mons[PM_VAMPIRE_BAT])
+				 ((ptr)->mflags2 & M2_VAMPIRE) != 0)
 /** feeds on blood */
 #define is_vampiric(ptr)	((is_vampire(ptr)) || \
 				 (ptr) == &mons[PM_VAMPIRE_BAT])

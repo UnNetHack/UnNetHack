@@ -1603,6 +1603,7 @@ E void NDECL(self_invis_message);
 
 /* ### polyself.c ### */
 
+E void NDECL(init_uasmon);
 E void NDECL(set_uasmon);
 E void NDECL(change_sex);
 E void FDECL(polyself, (BOOLEAN_P));

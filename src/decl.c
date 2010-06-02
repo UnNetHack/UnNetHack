@@ -152,6 +152,7 @@ struct engr *head_engr;
 dlevel_t level;		/* level map */
 struct trap *ftrap = (struct trap *)0;
 NEARDATA struct monst youmonst = DUMMY;
+NEARDATA struct permonst upermonst = DUMMY;
 NEARDATA struct flag flags = DUMMY;
 NEARDATA struct instance_flags iflags = DUMMY;
 NEARDATA struct you u = DUMMY;
