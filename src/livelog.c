@@ -172,7 +172,7 @@ struct monst *mtmp;
 		  ) {
 		char *n = noit_mon_nam(mtmp);
 		/* $player killed a uniq monster */
-		livelog_generic("killed_uniq", n)
+		livelog_generic("killed_uniq", n);
 	}
 }
 #endif /* LIVELOG_BONES_KILLER */
