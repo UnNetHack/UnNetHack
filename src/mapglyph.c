@@ -145,7 +145,8 @@ unsigned *ospecial;
 #endif
 	    obj_color(offset);
 	    /* use inverse video for multiple items */
-	    if (level.objects[x][y] &&
+	    if (offset != BOULDER &&
+	        level.objects[x][y] &&
 	        level.objects[x][y]->nexthere) {
 		special |= MG_INVERSE;
 	    }
