@@ -7,7 +7,7 @@ int term_rows, term_cols; /* size of underlying terminal */
 
 WINDOW *base_term;    /* underlying terminal window */
 
-WINDOW *mapwin, *mapborderwin;
+WINDOW *mapwin, *statuswin, *messagewin;
 
 
 #define TEXTCOLOR   /* Allow color */
@@ -17,6 +17,8 @@ WINDOW *mapwin, *mapborderwin;
 #define NONE -1
 #define KEY_ESC 0x1b
 #define DIALOG_BORDER_COLOR CLR_MAGENTA
+#define SCROLLBAR_COLOR CLR_MAGENTA
+#define SCROLLBAR_BACK_COLOR CLR_BLACK
 #define HIGHLIGHT_COLOR CLR_WHITE
 #define MORECOLOR CLR_ORANGE
 #define STAT_UP_COLOR CLR_GREEN
@@ -24,9 +26,16 @@ WINDOW *mapwin, *mapborderwin;
 #define MESSAGE_WIN 1
 #define STATUS_WIN  2
 #define MAP_WIN     3
-#define HPOS_WIN    4
+#define NHWIN_MAX   4
 #define MESG_HISTORY_MAX   200
-#define USE_DARKGRAY /* Allow "bright" black; delete if not visible */
+#if !defined(__APPLE__) || !defined(NCURSES_VERSION)
+# define USE_DARKGRAY /* Allow "bright" black; delete if not visible */
+#endif	/* !__APPLE__ && !PDCURSES */
+#define CURSES_DARK_GRAY    17
+#define MAP_SCROLLBARS
+#ifndef NCURSES_MOUSE_VERSION
+# define NCURSES_MOUSE_VERSION
+#endif
 
 
 typedef enum orient_type
@@ -136,11 +145,15 @@ extern WINDOW *curses_get_nhwin(winid wid);
 extern void curses_add_nhwin(winid wid, int height, int width, int y,
  int x, orient orientation, boolean border);
 
+extern void curses_add_wid(winid wid);
+
 extern void curses_refresh_nhwin(winid wid);
 
 extern void curses_refresh_nethack_windows(void);
 
 extern void curses_del_nhwin(winid wid);
+
+extern void curses_del_wid(winid wid);
 
 extern void curses_putch(winid wid, int x, int y, int ch, int color, int attrs);
 
@@ -157,6 +170,11 @@ extern void curses_get_window_xy(winid wid, int *x, int *y);
 extern void curses_puts(winid wid, int attr, const char *text);
 
 extern void curses_clear_nhwin(winid wid);
+
+extern void curses_draw_map(int sx, int sy, int ex, int ey);
+
+extern boolean curses_map_borders(int *sx, int *sy, int *ex, int *ey,
+ int ux, int uy);
 
 
 /* cursmisc.c */

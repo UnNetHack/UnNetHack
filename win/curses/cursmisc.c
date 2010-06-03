@@ -74,7 +74,6 @@
 
 static int curs_x = -1;
 static int curs_y = -1;
-static winid curs_win = 0;
 
 /* Macros for Control and Alt keys */
 
@@ -95,10 +94,12 @@ static winid curs_win = 0;
 int curses_read_char()
 {
     int ch, tmpch;
+#ifndef PDCURSES
     static int esc = 0;
-
+#endif  /* !PDCURSES */
     ch = getch();
 
+#ifndef PDCURSES
     if (esc)
     {
         ch |= 0x80; /* Meta key support for most terminals */
@@ -114,6 +115,7 @@ int curses_read_char()
         nodelay(stdscr, TRUE);
         esc = 1;
     }
+#endif  /* !PDCURSES */
 
     tmpch = ch;
 
@@ -147,7 +149,7 @@ int curses_read_char()
 #endif
 
     ch = curses_convert_keys(ch);
-
+    
     return ch;
 }
 
@@ -173,26 +175,29 @@ void curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
     if (color == 0) /* make black fg visible */
     {
 #ifdef USE_DARKGRAY
-        color = 8;
-#else
-        if (iflags.use_inverse)
+        if (can_change_color() && (COLORS > 16))
         {
-            wattron(win, A_REVERSE);
+            color = CURSES_DARK_GRAY - 1;
         }
-        else
+        else    /* Use bold for a bright black */
         {
-            color = CLR_BLUE;
+            wattron(win, A_BOLD);
         }
-#endif
+#else        
+        color = CLR_BLUE;
+#endif  /* USE_DARKGRAY */
     }
     curses_color = color + 1;
-    if (curses_color > 8)
-        curses_color -= 8;
+    if (COLORS < 16)
+    {
+        if (curses_color > 8)
+            curses_color -= 8;
+    }
     if (onoff == ON)    /* Turn on color/attributes */
     {
         if (color != NONE)
         {
-            if (color > 7)
+            if ((color > 7) && (COLORS < 16))
             {
                 wattron(win, A_BOLD);
             }
@@ -208,12 +213,18 @@ void curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
     {
         if (color != NONE)
         {
-            if (color > 7)
+            if ((color > 7) && (COLORS < 16))
             {
                 wattroff(win, A_BOLD);
             }
-#ifndef USE_DARKGRAY
-            if ((color == 0) && iflags.use_inverse)
+#ifdef USE_DARKGRAY
+            if ((color == 0) && (!can_change_color() ||
+             (COLORS <= 16)))
+            {
+                wattroff(win, A_BOLD);
+            }
+#else
+            if (iflags.use_inverse)
             {
                 wattroff(win, A_REVERSE);
             }
@@ -526,6 +537,13 @@ int curses_convert_glyph(int ch, int glyph)
 {
     int symbol;
     
+#ifdef REINCARNATION
+    if (Is_rogue_level(&u.uz))
+    {
+        return ch;
+    }
+#endif
+    
     /* Save some processing time by returning if the glyph represents
     an object that we don't have custom characters for */
     if (!glyph_is_cmap(glyph))
@@ -582,8 +600,12 @@ int curses_convert_glyph(int ch, int glyph)
 
 void curses_move_cursor(winid wid, int x, int y)
 {
+    int sx, sy, ex, ey;
+    int xadj = 0;
+    int yadj = 0;
+
 #ifndef PDCURSES
-    WINDOW *win = curses_get_nhwin(curs_win);
+    WINDOW *win = curses_get_nhwin(MAP_WIN);
 #endif
 
     if (wid != MAP_WIN)
@@ -594,19 +616,29 @@ void curses_move_cursor(winid wid, int x, int y)
 #ifdef PDCURSES
     /* PDCurses seems to not handle wmove correctly, so we use move and
     physical screen coordinates instead */
-    curses_get_window_xy(wid, &curs_x, &curs_y);
-    curs_x += x;
-    curs_y += y;
-#else
-    curs_x = x;
-    curs_y = y;
+    curses_get_window_xy(wid, &xadj, &yadj);
 #endif    
-    curs_win = wid;
+    curs_x = x + xadj;
+    curs_y = y + yadj;
+    curses_map_borders(&sx, &sy, &ex, &ey, x, y);
+    
+    if (curses_window_has_border(wid))
+    {
+        curs_x++;
+        curs_y++;
+    }
+        
+    if ((x >= sx) && (x <= ex) &&
+     (y >= sy) && (y <= ey))
+    {
+        curs_x -= sx;
+        curs_y -= sy;
 #ifdef PDCURSES
-    move(curs_y, curs_x);
+        move(curs_y, curs_x);
 #else
-    wmove(win, curs_y, curs_x);
+        wmove(win, curs_y, curs_x);
 #endif
+    }
 }
 
 
@@ -615,8 +647,8 @@ void curses_move_cursor(winid wid, int x, int y)
 void curses_prehousekeeping()
 {
 #ifndef PDCURSES
-    WINDOW *win = curses_get_nhwin(curs_win);
-#endif
+    WINDOW *win = curses_get_nhwin(MAP_WIN);
+#endif  /* PDCURSES */
 
     if ((curs_x > -1) && (curs_y > -1))
     {
@@ -627,8 +659,8 @@ void curses_prehousekeeping()
         move(curs_y, curs_x);
 #else
         wmove(win, curs_y, curs_x);
-#endif
-        curses_refresh_nhwin(curs_win);
+#endif  /* PDCURSES */
+        curses_refresh_nhwin(MAP_WIN);
     }
 }
 
@@ -668,7 +700,7 @@ void curses_view_file(const char *filename, boolean must_exist)
     
     while (dlb_fgets(buf, BUFSZ, fp) != NULL)
     {
-        curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE, buf,
+        curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL, buf,
          FALSE);
     }
     
@@ -711,49 +743,49 @@ void curses_display_splash_window()
     {
         case NETHACK_CURSES:
         {
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              NETHACK_SPLASH_A, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              NETHACK_SPLASH_B, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              NETHACK_SPLASH_C, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              NETHACK_SPLASH_D, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              NETHACK_SPLASH_E, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              NETHACK_SPLASH_F, FALSE);
             break;
         }
         case SLASHEM_CURSES:
         {
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              SLASHEM_SPLASH_A, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              SLASHEM_SPLASH_B, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              SLASHEM_SPLASH_C, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              SLASHEM_SPLASH_D, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              SLASHEM_SPLASH_E, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              SLASHEM_SPLASH_F, FALSE);
             break;
         }
         case UNNETHACK_CURSES:
         {
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              UNNETHACK_SPLASH_A, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              UNNETHACK_SPLASH_B, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              UNNETHACK_SPLASH_C, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              UNNETHACK_SPLASH_D, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              UNNETHACK_SPLASH_E, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              UNNETHACK_SPLASH_F, FALSE);
             break;
         }
@@ -765,24 +797,24 @@ void curses_display_splash_window()
     }
 
 #ifdef COPYRIGHT_BANNER_A
-    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE, "",
+    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL, "",
      FALSE);
-    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
      COPYRIGHT_BANNER_A, FALSE);
 #endif
 
 #ifdef COPYRIGHT_BANNER_B
-    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
      COPYRIGHT_BANNER_B, FALSE);
 #endif
 
 #ifdef COPYRIGHT_BANNER_C
-    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
      COPYRIGHT_BANNER_C, FALSE);
 #endif
 
 #ifdef COPYRIGHT_BANNER_D   /* Just in case */
-    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
      COPYRIGHT_BANNER_D, FALSE);
 #endif
 
@@ -975,30 +1007,89 @@ int curses_convert_keys(int key)
             }
             break;
         }
+#ifdef KEY_A1
+        case KEY_A1:
+        {
+            if (iflags.num_pad)
+            {
+                ret = '7';
+            }
+            else
+            {
+                ret = 'y';
+            }
+            break;
+        }
+#endif  /* KEY_A1 */
+#ifdef KEY_A3
+        case KEY_A3:
+        {
+            if (iflags.num_pad)
+            {
+                ret = '9';
+            }
+            else
+            {
+                ret = 'u';
+            }
+            break;
+        }
+#endif  /* KEY_A3 */
+#ifdef KEY_C1
+        case KEY_C1:
+        {
+            if (iflags.num_pad)
+            {
+                ret = '1';
+            }
+            else
+            {
+                ret = 'b';
+            }
+            break;
+        }
+#endif  /* KEY_C1 */
+#ifdef KEY_C3
+        case KEY_C3:
+        {
+            if (iflags.num_pad)
+            {
+                ret = '3';
+            }
+            else
+            {
+                ret = 'n';
+            }
+            break;
+        }
+#endif  /* KEY_C3 */
+#ifdef KEY_B2
+        case KEY_B2:
+        {
+            if (iflags.num_pad)
+            {
+                ret = '5';
+            }
+            else
+            {
+                ret = 'g';
+            }
+            break;
+        }
+#endif  /* KEY_B2 */
     }
 
     return ret;
 }
 
-/* Use nethack wall symbols for drawing unless cursesgraphics is
-defined, in which case we use the standard curses ones.  Not sure if
-this is desirable behavior since one may prefer regular lines for
-borders but traditional symbols to draw rooms.  Commenting it out for
-now. */
 
-/*
- * void curses_border(WINDOW *win)
- * {
- *     if (iflags.cursesgraphics)
- *     {
- *         box(win, 0, 0);
- *     }
- *     else
- *     {
- *         wborder(win, showsyms[S_vwall], showsyms[S_vwall],
- *          showsyms[S_hwall], showsyms[S_hwall], showsyms[S_tlcorn],
- *          showsyms[S_trcorn], showsyms[S_blcorn], showsyms[S_brcorn]);
- *     }
- * }
- */
+/* This is a kludge for the statuscolors patch which calls tty-specific
+functions, which causes a compiler error if TTY_GRAPHICS is not
+defined.  Adding stub functions to avoid this. */
 
+#if defined(STATUS_COLORS) && !defined(TTY_GRAPHICS)
+extern void term_start_color(int color) {}
+extern void term_start_attr(int attr) {}
+extern void term_end_color() {}
+extern void term_end_attr(int attr) {}
+#endif  /* STATUS_COLORS && !TTY_GRAPGICS */

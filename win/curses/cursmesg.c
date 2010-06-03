@@ -48,12 +48,6 @@ void curses_message_win_puts(const char *message, boolean recursed)
         return;
     }
     
-    if (!recursed)
-    {
-        strcpy(toplines, message);
-        mesg_add_line((char *) message);
-    }
-    
     curses_get_window_size(MESSAGE_WIN, &height, &width);
     if (border)
     {
@@ -70,11 +64,31 @@ void curses_message_win_puts(const char *message, boolean recursed)
     
     linespace = ((width + border_space) - 3) - mx;
     
+    if (strcmp(message, "#") == 0)  /* Extended command in mesg win */
+    {
+        if ((strcmp(toplines, "#") != 0) && (my >= (height - 1 +
+         border_space)) && (height != 1)) /* Bottom of message window */
+        {
+            scroll_window(MESSAGE_WIN);
+            mx = width;
+            my--;
+            strcpy(toplines, message);
+        }
+        
+        return;
+    }
+
+    if (!recursed)
+    {
+        strcpy(toplines, message);
+        mesg_add_line((char *) message);
+    }
+    
     if (linespace < message_length)
     {
         if (my >= (height - 1 + border_space)) /* bottom of message win */
         {
-            if (turn_lines == height)
+            if ((turn_lines > height) || (height == 1))
             {
                 /* Pause until key is hit - Esc suppresses any further
                 messages that turn */
@@ -110,6 +124,10 @@ void curses_message_win_puts(const char *message, boolean recursed)
         tmpstr = curses_break_str(message, (width - 2), 1);
         mvwprintw(win, my, mx, tmpstr);
         mx += strlen(tmpstr);
+        if (strlen(tmpstr) < (width - 2))
+        {
+            mx++;
+        }
         free(tmpstr);
         if (height > 1)
         {
@@ -123,9 +141,9 @@ void curses_message_win_puts(const char *message, boolean recursed)
     {
         mvwprintw(win, my, mx, message);
         curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
+        mx += message_length + 1;
     }
     wrefresh(win);
-    mx += message_length + 1;
 }
 
 
@@ -136,7 +154,7 @@ int curses_more()
     
     curses_get_window_size(MESSAGE_WIN, &height, &width);
     curses_toggle_color_attr(win, MORECOLOR, NONE, ON);
-    mvwprintw(win, my, mx - 1, ">>");
+    mvwprintw(win, my, mx, ">>");
     curses_toggle_color_attr(win, MORECOLOR, NONE, OFF);
     wrefresh(win);
     ret = wgetch(win);
@@ -146,7 +164,7 @@ int curses_more()
     }
     else
     {
-        mvwprintw(win, my, mx - 1, "  ");
+        mvwprintw(win, my, mx, "  ");
         scroll_window(MESSAGE_WIN);
         turn_lines = 1;
     }
@@ -264,10 +282,10 @@ void curses_prev_mesg()
         mesg = get_msg_line(TRUE, count);
         if ((turn != mesg->turn) && (count != 0))
         {
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
              "---", FALSE);
         }
-        curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NONE,
+        curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
          mesg->str, FALSE);
         turn = mesg->turn;
     }

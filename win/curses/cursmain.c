@@ -10,7 +10,7 @@
 struct window_procs curses_procs = {
     "curses",
     WC_ALIGN_MESSAGE|WC_ALIGN_STATUS|WC_COLOR|WC_HILITE_PET|
-    WC_POPUP_DIALOG|WC_SPLASH_SCREEN|WC_INVERSE,
+    WC_POPUP_DIALOG|WC_SPLASH_SCREEN,
     WC2_TERM_COLS|WC2_TERM_ROWS|WC2_WINDOWBORDERS|WC2_PETATTR|
      WC2_GUICOLOR,
     curses_init_nhwindows,
@@ -113,7 +113,11 @@ void curses_init_nhwindows(int* argcp, char** argv)
     meta(stdscr, TRUE);
     curs_set(0);
 #ifdef NCURSES_VERSION
+# ifdef __APPLE__
+ ESCDELAY = 25;
+# else
     set_escdelay(25);
+# endif /* __APPLE__ */
 #endif  /* NCURSES_VERSION */
 #ifdef PDCURSES
 # ifdef DEF_GAME_NAME
@@ -131,12 +135,15 @@ void curses_init_nhwindows(int* argcp, char** argv)
 # endif /* DEF_GAME_NAME */
     PDC_set_title(window_title);
     PDC_set_blink(TRUE);    /* Only if the user asks for it! */
+    timeout(1);
+    (void)getch();
+    timeout(-1);
 #endif  /* PDCURSES */
     getmaxyx(base_term, term_rows, term_cols);
     curses_init_options();
-    if ((term_rows < 18) || (term_cols < 40))
+    if ((term_rows < 15) || (term_cols < 40))
     {
-        panic("Terminal too small.  Must be minumum 40 width and 18 height");
+        panic("Terminal too small.  Must be minumum 40 width and 15 height");
     }
 
     curses_create_main_windows();
@@ -237,8 +244,7 @@ winid curses_create_nhwindow(int type)
     if (curses_is_menu(wid) || curses_is_text(wid))
     {
         curses_start_menu(wid);
-        /* Add to window list just to keep track of the wid */
-        curses_add_nhwin(wid, 0, 0, 0, 0, 0, TRUE);
+        curses_add_wid(wid);
     }
     
     return wid;
@@ -266,16 +272,17 @@ void curses_clear_nhwindow(winid wid)
 void curses_display_nhwindow(winid wid, BOOLEAN_P block)
 {
     menu_item *selected = NULL;
-    WINDOW *win = curses_get_nhwin(wid);
     
-    if ((win != NULL) && (wid == MAP_WIN) && block)
-    {
-        (void) curses_more();
-    }
-    else if (curses_is_menu(wid) || curses_is_text(wid))
+    if (curses_is_menu(wid) || curses_is_text(wid))
     {
         curses_end_menu(wid, "");
         curses_select_menu(wid, PICK_NONE, &selected);
+        return;
+    }
+    
+    if ((wid == MAP_WIN) && (curses_window_exists(MAP_WIN)) && block)
+    {
+        (void) curses_more();
     }
 }
 
@@ -467,6 +474,13 @@ cliparound(x, y)-- Make sure that the user is more-or-less centered on the
 */
 void curses_cliparound(int x, int y)
 {
+    int sx, sy, ex, ey;
+    boolean redraw = curses_map_borders(&sx, &sy, &ex, &ey, x, y);
+    
+    if (redraw)
+    {
+        curses_draw_map(sx, sy, ex, ey);
+    }
 }
 
 /*
@@ -645,10 +659,7 @@ delay_output()  -- Causes a visible delay of 50ms in the output.
 */
 void curses_delay_output()
 {
-    timeout(50);
-    curses_refresh_nhwin(MAP_WIN);
-    (void) getch();
-    timeout(-1);
+    napms(50);
 }
 
 /*

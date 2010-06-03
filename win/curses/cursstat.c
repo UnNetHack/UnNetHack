@@ -43,8 +43,6 @@ static void set_labels(int label_width);
 
 static void set_stat_color(nhstat *stat);
 
-static void highlight_stat(nhstat stat, int onoff);
-
 static void color_stat(nhstat stat, int onoff);
 
 static nhstat prevname;
@@ -91,19 +89,24 @@ override the write and update what needs to be updated ourselves. */
 void curses_update_stats()
 {
     char buf[BUFSZ];
-    int count, enc, orient, sx_start, hp, hpmax;
+    int count, enc, orient, sx_start, hp, hpmax, labels, swidth,
+     sheight;
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
+    static int prev_labels = -1;
     static boolean first = TRUE;
-    static boolean prev_horiz;
     boolean horiz;
     int sx = 0;
     int sy = 0;
     boolean border = curses_window_has_border(STATUS_WIN);
     
+    curses_get_window_size(STATUS_WIN, &sheight, &swidth);
+    
     if (border)
     {
         sx++;
         sy++;
+        swidth++;
+        sheight++;
     }
     
     sx_start = sx;
@@ -122,23 +125,30 @@ void curses_update_stats()
     if (first)
     {
         init_stats();
-        prev_horiz = !horiz;
         first = FALSE;
     }
     
-    if (prev_horiz != horiz)    /* Status window orientation changed */
+    if (horiz)
     {
-        if (horiz)
+        if (term_cols >= 80)
         {
-            set_labels(NORMAL_LABELS);
+            labels = NORMAL_LABELS;
+        }
+        else
+        {
+            labels = COMPACT_LABELS;
+        }
     }
     else
     {
-            set_labels(WIDE_LABELS);
-        }
+        labels = WIDE_LABELS;
     }
-
-    prev_horiz = horiz;
+    
+    if (labels != prev_labels)
+    {
+        set_labels(labels);
+        prev_labels = labels;
+    }
     
     curses_clear_nhwin(STATUS_WIN);
     
@@ -172,6 +182,11 @@ void curses_update_stats()
         prevname.highlight_color = HIGHLIGHT_COLOR;
         free(prevname.txt);
         prevname.txt = curses_copy_of(buf);
+        if ((labels == COMPACT_LABELS) && (u.ulevel > 1))
+        {
+            curses_puts(MESSAGE_WIN, A_NORMAL, "You are now known as");
+            curses_puts(MESSAGE_WIN, A_NORMAL, prevname.txt);
+        }
     }
     
     if (prevname.label != NULL)
@@ -180,13 +195,19 @@ void curses_update_stats()
         sx += strlen(prevname.label);
     }
     
-    color_stat(prevname, ON);
-    mvwaddstr(win, sy, sx, prevname.txt);
-    color_stat(prevname, OFF);
+    if (labels != COMPACT_LABELS)
+    {
+        color_stat(prevname, ON);
+        mvwaddstr(win, sy, sx, prevname.txt);
+        color_stat(prevname, OFF);
+    }
 
     if (horiz)
     {
-        sx += strlen(prevname.txt) + 1;
+        if (labels != COMPACT_LABELS)
+        {
+            sx += strlen(prevname.txt) + 1;
+        }
     }
     else
     {
@@ -605,7 +626,11 @@ void curses_update_stats()
             prevhp.highlight_color = STAT_DOWN_COLOR;
 	    }
         prevhp.value = hp;
-        sprintf(buf, "%d", hp);
+        if (prevhp.value < 0)
+        {
+            prevhp.value = 0;
+        }
+        sprintf(buf, "%ld", prevhp.value);
         free(prevhp.txt);
         prevhp.txt = curses_copy_of(buf);
         prevhp.highlight_turns = 3;
@@ -785,8 +810,15 @@ void curses_update_stats()
         {
             if (horiz)
             {
-            prevlevel.label = curses_copy_of("Lvl:");
-        }
+                if (labels == COMPACT_LABELS)
+                {
+                    prevlevel.label = curses_copy_of("Lv:");
+                }
+                else
+                {
+                    prevlevel.label = curses_copy_of("Lvl:");
+                }
+            }
             else
             {
                 prevlevel.label = curses_copy_of("Level:         ");
@@ -875,8 +907,15 @@ void curses_update_stats()
             {
                 if (horiz)
                 {
-                prevlevel.label = curses_copy_of("Lvl:");
-            }
+                    if (labels == COMPACT_LABELS)
+                    {
+                        prevlevel.label = curses_copy_of("Lv:");
+                    }
+                    else
+                    {
+                        prevlevel.label = curses_copy_of("Lvl:");
+                    }
+                }
                 else
                 {
                     prevlevel.label = curses_copy_of("Level:         ");
@@ -2093,6 +2132,136 @@ static void set_labels(int label_width)
     {
         case COMPACT_LABELS:
         {
+            /* Strength */
+            if (prevstr.label)
+            {
+                free (prevstr.label);
+            }
+            prevstr.label = curses_copy_of("S:");
+            /* Intelligence */
+            if (prevint.label)
+            {
+                free (prevint.label);
+            }
+            prevint.label = curses_copy_of("I:");
+
+            /* Wisdom */
+            if (prevwis.label)
+            {
+                free (prevwis.label);
+            }
+            prevwis.label = curses_copy_of("W:");
+            
+            /* Dexterity */
+            if (prevdex.label)
+            {
+                free (prevdex.label);
+            }
+            prevdex.label = curses_copy_of("D:");
+            
+            /* Constitution */
+            if (prevcon.label)
+            {
+                free (prevcon.label);
+            }
+            prevcon.label = curses_copy_of("C:");
+            
+            /* Charisma */
+            if (prevcha.label)
+            {
+                free (prevcha.label);
+            }
+            prevcha.label = curses_copy_of("Ch:");
+            
+            /* Alignment */
+            if (prevalign.label)
+            {
+                free (prevalign.label);
+            }
+            prevalign.label = NULL;
+            
+            /* Dungeon level */
+            if (prevdepth.label)
+            {
+                free (prevdepth.label);
+            }
+            prevdepth.label = curses_copy_of("Dl:");
+           
+            /* Gold */
+            if (prevau.label)
+            {
+                free (prevau.label);
+            }
+            sprintf(buf, "%c:", GOLD_SYM);
+            prevau.label = curses_copy_of(buf);
+            
+            /* Hit points */
+            if (prevhp.label)
+            {
+                free (prevhp.label);
+            }
+            prevhp.label = curses_copy_of("HP:");
+            
+            /* Power */
+            if (prevpow.label)
+            {
+                free (prevpow.label);
+            }
+            prevpow.label = curses_copy_of("Pw:");
+            
+            /* Armor Class */
+            if (prevac.label)
+            {
+                free (prevac.label);
+            }
+            prevac.label = curses_copy_of("AC:");
+            
+#ifdef EXP_ON_BOTL            
+            /* Experience */
+            if (prevexp.label)
+            {
+                free (prevexp.label);
+            }
+            prevexp.label = curses_copy_of("XP:");
+#endif            
+
+            /* Level */            
+            if (prevlevel.label)
+            {
+                free (prevlevel.label);
+                prevlevel.label = NULL;
+            }
+            if (u.mtimedone)    /* Currently polymorphed - show monster HP */
+            {
+                prevlevel.label = curses_copy_of("HD:");
+        	}
+        	else    /* Not polymorphed */
+        	{
+                if (prevexp.display)
+                {
+                    prevlevel.label = curses_copy_of("/");
+                }
+                else
+                {    
+                    prevlevel.label = curses_copy_of("Lv:");
+                }
+            }
+            
+            /* Time */
+            if (prevtime.label)
+            {
+                free (prevtime.label);
+            }
+            prevtime.label = curses_copy_of("T:");
+            
+#ifdef SCORE_ON_BOTL
+            /* Score */
+            if (prevscore.label)
+            {
+                free (prevscore.label);
+            }
+            prevscore.label = curses_copy_of("S:");
+#endif
             break;
         }
         case NORMAL_LABELS:
@@ -2321,7 +2490,7 @@ static void set_labels(int label_width)
             {
                 free (prevexp.label);
             }
-            prevexp.label = curses_copy_of("Experience:   ");
+            prevexp.label = curses_copy_of("Experience:    ");
 #endif            
 
             /* Level */            

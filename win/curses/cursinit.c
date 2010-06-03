@@ -423,28 +423,18 @@ void curses_create_main_windows()
         curses_del_nhwin(MAP_WIN);
         clear();
     }
-    
+
     curses_add_nhwin(STATUS_WIN, status_height, status_width, status_y,
      status_x, status_orientation, borders);
 
     curses_add_nhwin(MESSAGE_WIN, message_height, message_width, message_y,
      message_x, message_orientation, borders);
 
-    if (borders)
-    {
-        mapborderwin = newwin(map_height + border_space, map_width
-         + border_space, map_y, map_x);
-        wrefresh(mapborderwin);
-        curses_add_nhwin(MAP_WIN, map_height, map_width, map_y + 1, map_x + 1,
-         0, borders);
-    }
-    else
-    {
-        curses_add_nhwin(MAP_WIN, map_height, map_width, map_y, map_x, 0,
-         borders);
-    }
+    curses_add_nhwin(MAP_WIN, map_height, map_width, map_y, map_x, 0,
+     borders);
 
     refresh();
+    
     curses_refresh_nethack_windows();
 
     if (iflags.window_inited)
@@ -474,12 +464,43 @@ void curses_init_nhcolors()
         init_pair(6, COLOR_MAGENTA, -1);
         init_pair(7, COLOR_CYAN, -1);
         init_pair(8, -1, -1);
-        init_pair(9, COLOR_WHITE, -1);
+
+        if (COLORS >= 16)
+        {
+            init_pair(9, COLOR_WHITE, -1);
+            init_pair(10, COLOR_RED + 8, -1);
+            init_pair(11, COLOR_GREEN + 8, -1);
+            init_pair(12, COLOR_YELLOW + 8, -1);
+            init_pair(13, COLOR_BLUE + 8, -1);
+            init_pair(14, COLOR_MAGENTA + 8, -1);
+            init_pair(15, COLOR_CYAN + 8, -1);
+            init_pair(16, COLOR_WHITE + 8, -1);
+        }
 
         if (can_change_color())
         {
             init_color(COLOR_YELLOW, 500, 300, 0);
             init_color(COLOR_WHITE, 600, 600, 600);
+            if (COLORS >= 16)
+            {
+                init_color(COLOR_RED + 8, 1000, 500, 0);
+                init_color(COLOR_GREEN + 8, 0, 1000, 0);
+                init_color(COLOR_YELLOW + 8, 1000, 1000, 0);
+                init_color(COLOR_BLUE + 8, 0, 0, 1000);
+                init_color(COLOR_MAGENTA + 8, 1000, 0, 1000);
+                init_color(COLOR_CYAN + 8, 0, 1000, 1000);
+                init_color(COLOR_WHITE + 8, 1000, 1000, 1000);
+#ifdef USE_DARKGRAY
+                if (COLORS > 16)
+                {
+                    init_color(CURSES_DARK_GRAY, 300, 300, 300);
+                }
+#endif
+            }
+            else
+            {
+                /* Set flag to use bold for bright colors */
+            }
         }
     }
 #endif
@@ -729,18 +750,18 @@ int curses_character_dialog(const char** choices, const char *prompt)
 
         identifier.a_int = (count + 1); /* Must be non-zero */
         curses_add_menu(wid, NO_GLYPH, &identifier, curletter, 0,
-         A_NONE, choices[count], FALSE);
+         A_NORMAL, choices[count], FALSE);
         used_letters[count] = curletter;
     }
 
     /* Random Selection */
     identifier.a_int = ROLE_RANDOM;
-    curses_add_menu(wid, NO_GLYPH, &identifier, '*', 0, A_NONE, "Random",
+    curses_add_menu(wid, NO_GLYPH, &identifier, '*', 0, A_NORMAL, "Random",
      FALSE);    
     
     /* Quit prompt */
     identifier.a_int = ROLE_NONE;
-    curses_add_menu(wid, NO_GLYPH, &identifier, 'q', 0, A_NONE, "Quit",
+    curses_add_menu(wid, NO_GLYPH, &identifier, 'q', 0, A_NORMAL, "Quit",
      FALSE);    
     curses_end_menu(wid, prompt);
     ret = curses_select_menu(wid, PICK_ONE, &selected);
@@ -795,7 +816,24 @@ void curses_init_options()
     
     resize_term(iflags.wc2_term_rows, iflags.wc2_term_cols);
     getmaxyx(base_term, term_rows, term_cols);
-#endif
+    
+    /* This is needed for an odd bug with PDCurses-SDL in Windows */
+# ifdef WIN32
+    switch_graphics(ASCII_GRAPHICS);
+    if (iflags.IBMgraphics)
+    {
+        switch_graphics(IBM_GRAPHICS);
+    }
+    else if (iflags.cursesgraphics)
+    {
+        switch_graphics(CURS_GRAPHICS);
+    }
+    else
+    {
+        switch_graphics(ASCII_GRAPHICS);
+    }
+# endif /* WIN32 */
+#endif  /* PDCURSES */
     if (!iflags.wc2_windowborders)
     {
         iflags.wc2_windowborders = 3; /* Set to auto if not specified */

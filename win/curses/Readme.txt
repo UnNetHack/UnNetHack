@@ -17,39 +17,11 @@ interface include:
  * Dynamic window resizing (e.g. maximizing a terminal window)
  * Dynamic configurable placement of status and message windows,
  relative to the map
- * Makes better use of larger terminal windows
+ * Makes better use of larger and smaller terminal windows
  * Fancier display (e.g. window borders, optional popup dialogs,
  splash screen, and better menus)
  * "cursesgraphics" option for fancier line-drawing characters for
  drawing the dungeon - this should work on most terminals/platforms
-
-
-BUILDING
-========
-
-As of this writing code has been compiled on Linux and Windows.
-
-UNIX/Linux build instructions: Follow the instructions in
-sys/unix/Install.unx.  By default, the Makefile is setup to compile
-against ncurses.  Edit Makefile.src if you wish to compile against a
-different curses library, such as PDCurses for SDL.
-
-Windows build instructions: If you are using Mingw32 as your compiler,
-then follow the instructions in sys/winnt/Install.nt with the following
-changes:
-
- * Patch the NetHack source code with an appropriate Windows patch
- utility
- * Download and install SDL and PDCurses-SDL, or download winlibs.zip
- from the same place you got the curses interface patch, and unzip it
- into the root NetHack source directory
- * After running nhsetup, manually copy the file cursmake.gcc to the
- src/ subdirectory
- * Instead of typing "mingw32-make -f Makefile.gcc install" you will
- type "mingw32-make -f cursmake.gcc install"
-
-If you are using a different compiler, you will have to manually modify
-the appropriate Makefile to include the curses windowport files.
 
 
 GAMEPLAY
@@ -59,8 +31,9 @@ Gameplay should be similar to the tty interface for NetHack; the
 differences are primarily visual.  This windowport supports dymanic
 resizing of the terminal window, so you can play with it to see how it
 looks best to you during a game.  Also, the align_status and
-align_message options may be set during the game, so you can experiment
-to see what arraingement looks best to you.
+align_message options may be set during the game or in the config file
+to place the status and message windows where you like, so you can
+experiment to see what arraingement looks best to you.
 
 For menus, in addition to the normal configurable keybindings for menu
 navigation described in the Guidebook, you can use the right and left
@@ -125,6 +98,52 @@ OPTIONS=petattr:u
 # window borders, message text, etc.  This is separate from the color
 # option, which only controls the color of the map itself.
 OPTIONS=guicolor
+
+
+BUILDING
+========
+
+As of this writing code has been compiled on Linux, Windows and Mac OS
+X.
+
+UNIX/Linux build instructions: Follow the instructions in
+sys/unix/Install.unx.  By default, the Makefile is setup to compile
+against ncurses.  Edit Makefile.src if you wish to compile against a
+different curses library, such as PDCurses for SDL.
+
+Windows build instructions: If you are using Mingw32 as your compiler,
+then follow the instructions in sys/winnt/Install.nt with the following
+changes:
+
+ * Patch the NetHack source code with an appropriate Windows patch
+ utility
+ * Download and install SDL and PDCurses-SDL, or download winlibs.zip
+ from the same place you got the curses interface patch, and unzip it
+ into the root NetHack source directory
+ * Copy curses.h from the PDCurses distribution into the nethack
+ include directory, or get it from the aforementioned winlibs.zip.
+ * Instead of typing "mingw32-make -f Makefile.gcc install" you will
+ type "mingw32-make -f cursmake.gcc install"
+
+If you are using a different compiler, you will have to manually modify
+the appropriate Makefile to include the curses windowport files.
+
+Mac OS X Build instructions: These instructions assume you are using
+PDCurses for SDL.  I have not yet compiled with NCurses on the Mac due
+to a couple of link errors:
+
+ * Install the SDL library via fink or the like.
+ * Download PDCurses from http://pdcurses.sourceforge.net/ unpack it,
+ change to the sdl1 subdirectory, and type "make"
+ * Copy the generated pdcurses.a somewhere where it can be found by the
+ compiler, e.g. /usr/local/lib
+ * Run the following command from the sys/unix directory: sh ./setup.sh
+ * Edit src/Makefile, comment-out the CFLAGS line (152), and uncomment
+ the CFLAGS line for Max OS X above (line 148)
+ * Comment the WINCURSESLIB line for ncurses (line 257), and uncomment
+ the WINCURSESLIB for PDCurses for SDL (line 259)
+ * Follow steps 4 and 7-11 on this page:
+ http://nethack.wikia.com/wiki/Compiling#On_Mac_OS_X
 
 
 CONTACT

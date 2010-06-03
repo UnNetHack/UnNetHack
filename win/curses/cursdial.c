@@ -4,7 +4,6 @@
 #include "cursdial.h"
 #include "func_tab.h"
 
-
 /* Dialog windows for curses interface */
 
 
@@ -18,7 +17,9 @@ typedef struct nhmi
     CHAR_P group_accel; /* Group accelerator for menu item, if any */
     int attr;  /* Text attributes for item */
     const char *str;  /* Text of menu item */
-    BOOLEAN_P presel; /* Whether menu item should be preselected */
+    BOOLEAN_P presel; /* Whether menu     if (iflags.wc_popup_dialog)
+    {
+item should be preselected */
     boolean selected;   /* Whether item is currently selected */
     int page_num;   /* Display page number for entry */
     int line_num;   /* Line number on page where entry begins */
@@ -36,6 +37,7 @@ typedef struct nhm
     int num_pages;            /* Number of display pages for entry */
     int height;               /* Window height of menu */
     int width;                /* Window width of menu */
+    boolean reuse_accels;     /* Non-unique accelerators per page */
     struct nhm *prev_menu;    /* Pointer to previous entry */
     struct nhm *next_menu;    /* Pointer to next entry */
 } nhmenu;
@@ -244,7 +246,7 @@ int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_
     {
         answer = getch();
         answer = curses_convert_keys(answer);
-    
+
         if (answer==KEY_ESC)
         {
             if (choices == NULL)
@@ -337,10 +339,119 @@ int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_
 
 int curses_ext_cmd()
 {
-    /* We should check the value of iflags.extmenu here, but there is
-    currently no non-menu alternative */
+    int count, letter, prompt_width, startx, starty, winx, winy;
+    int messageh, messagew;
+    int ret = -1;
+    char cur_choice[BUFSZ];
+    int matches = 0;
+    WINDOW *extwin = NULL;
 
-    return extcmd_via_menu();
+    if (iflags.extmenu)
+    {
+        return extcmd_via_menu();
+    }
+    
+    if (iflags.wc_popup_dialog) /* Prompt in popup window */
+    {
+        startx = 1;
+        starty = 1;
+        extwin = curses_create_window(25, 1, UP);
+    }
+    else
+    {
+        curses_get_window_xy(MESSAGE_WIN, &winx, &winy);
+        curses_get_window_size(MESSAGE_WIN, &messageh, &messagew);
+        
+        if (curses_window_has_border(MESSAGE_WIN))
+        {
+            winx++;
+            winy++;
+        }
+        
+        winy += messageh - 1;
+        extwin = newwin(1, 25, winy, winx);
+        startx = 0;
+        starty = 0;
+        pline("#");
+    }
+
+    cur_choice[0] = '\0';
+
+    while (1)
+    {
+        wmove(extwin, starty, startx);
+        waddstr(extwin, "# ");
+        wmove(extwin, starty, startx + 2);
+        curses_toggle_color_attr(extwin, NONE, A_UNDERLINE, ON);
+        waddstr(extwin, cur_choice);
+        curses_toggle_color_attr(extwin, NONE, A_UNDERLINE, OFF);
+        wmove(extwin, starty, strlen(cur_choice) + startx + 2);
+        wprintw(extwin, "          ", cur_choice);
+
+        if (matches == 1)
+        {
+            wmove(extwin, starty, strlen(cur_choice) + startx + 2);
+            wprintw(extwin, "%s          ", extcmdlist[ret].ef_txt
+             + strlen(cur_choice));
+        }
+
+        wrefresh(extwin);
+        letter = getch();
+	    prompt_width = strlen(cur_choice);
+        matches = 0;
+
+        if (letter == '\033')
+        {
+            ret = -1;
+            break;
+        }
+
+        if ((letter == '\r') || (letter == '\n'))
+        {
+            break;
+        }
+
+        if ((letter == '\b') || (letter == KEY_BACKSPACE))
+        {
+            if (prompt_width == 0)
+            {
+                ret = -1;
+                break;
+            }
+            else
+            {
+                cur_choice[prompt_width - 1] = '\0';
+                letter = '*';
+                prompt_width--;
+            }
+        }
+        
+        for (count = 0; extcmdlist[count].ef_txt; count++)
+        {
+            if (strlen(extcmdlist[count].ef_txt) > prompt_width)
+            {
+                if (strncmp(cur_choice, extcmdlist[count].ef_txt,
+                 prompt_width) == 0)
+                {
+                    if ((extcmdlist[count].ef_txt[prompt_width] ==
+                     letter) || letter == '*')
+                    {
+                        if ((matches == 0) && (letter != '*'))
+                        {
+                            ret = count;
+                            cur_choice[prompt_width] = letter;
+                            cur_choice[prompt_width + 1] = '\0';
+                        }
+
+                        matches++;
+                    }
+                }
+            }
+	    }
+	}    
+    
+    curses_destroy_win(extwin);
+    return ret;
 }
 
 
@@ -385,6 +496,7 @@ void curses_create_nhmenu(winid wid)
     new_menu->num_pages = 0;
     new_menu->height = 0;
     new_menu->width = 0;
+    new_menu->reuse_accels = FALSE;
     new_menu->next_menu = NULL;
     
     if (nhmenus == NULL)    /* no menus in memory yet */
@@ -549,7 +661,8 @@ int curses_display_nhmenu(winid wid, int how, MENU_ITEM_P **_selected)
             {
                 if (count == num_chosen)
                 {
-                    panic("curses_display_nhmenu: Selected items exceeds expected number");
+                    panic("curses_display_nhmenu: Selected items "
+                     "exceeds expected number");
                 }
                 selected[count].item = menu_item_ptr->identifier;
                 selected[count].count = -1;
@@ -560,7 +673,8 @@ int curses_display_nhmenu(winid wid, int how, MENU_ITEM_P **_selected)
         
         if (count != num_chosen)
         {
-            panic("curses_display_nhmenu: Selected items less than expected number");
+            panic("curses_display_nhmenu: Selected items less than "
+             "expected number");
         }
     }
 
@@ -626,7 +740,10 @@ void curses_del_menu(winid wid)
         tmpmenu = current_menu->next_menu;
         tmpmenu->prev_menu = current_menu->prev_menu;
     }
+    
     free(current_menu);
+    
+    curses_del_wid(wid);
 }
 
 
@@ -644,7 +761,6 @@ static nhmenu *get_menu(winid wid)
         }
         menuptr = menuptr->next_menu;
     }
-    
     
     return NULL;    /* Not found */
 }
@@ -801,6 +917,7 @@ static void menu_win_size(nhmenu *menu)
     
     /* First, determine the width of the longest menu entry */
     while (menu_item_ptr != NULL)
+
     {
         if (menu_item_ptr->identifier.a_void == NULL)
         {
@@ -878,9 +995,9 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
     int count, curletter, entry_cols, start_col, num_lines, footer_x;
     boolean first_accel = TRUE;
 #ifdef MENU_COLOR
-	int color = NO_COLOR;
-	int attr = A_NONE;
-	boolean menu_color = FALSE;
+    int color = NO_COLOR;
+    int attr = A_NORMAL;
+    boolean menu_color = FALSE;
 #endif /* MENU_COLOR */
     
     /* Cycle through entries until we are on the correct page */
@@ -934,6 +1051,10 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
                 {
                     curletter = menu_get_accel(TRUE);
                     first_accel = FALSE;
+                    if (!menu->reuse_accels && (menu->num_pages > 1))
+                    {
+                        menu->reuse_accels = TRUE;
+                    }
                 }
                 else
                 {
@@ -964,7 +1085,7 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
 		    {
                 curses_toggle_color_attr(win, color, NONE, ON);
 		    }
-    		if (attr != A_NONE)
+    		if (attr != A_NORMAL)
     		{
     		    menu_item_ptr->attr = attr;
     		}
@@ -1078,6 +1199,12 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
                     curpage++;
                     menu_display_page(menu, win, curpage);
                 }
+                else if (curletter == ' ')
+                {
+                    num_selected = -1;
+                    dismiss = TRUE;
+                    break;
+                }
                 break;
             }
             case KEY_LEFT:
@@ -1164,9 +1291,14 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
         {
             if (menu_item_ptr->identifier.a_void != NULL)
             {
-                if ((curpage == menu_item_ptr->page_num) &&
-                 (curletter == menu_item_ptr->accelerator))
+                if ((curletter == menu_item_ptr->accelerator) &&
+                 ((curpage == menu_item_ptr->page_num) || !menu->reuse_accels))
                 {
+                    if (curpage != menu_item_ptr->page_num)
+                    {
+                        curpage = menu_item_ptr->page_num;
+                        menu_display_page(menu, win, curpage);
+                    }
                     menu_select_deselect(win, menu_item_ptr, INVERT);
                     if (how == PICK_ONE)
                     {
@@ -1294,7 +1426,6 @@ static int menu_operation(WINDOW *win, nhmenu *menu, menu_op
     return current_page;
 }
 
-
 /* This is to get the color of a menu item if the menucolor patch is
  applied */
 
@@ -1320,5 +1451,4 @@ static boolean get_menu_coloring(char *str, int *color, int *attr)
     return FALSE;
 }
 #endif /* MENU_COLOR */
-
 
