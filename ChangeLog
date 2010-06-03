@@ -1,10 +1,11 @@
 2010-XX-XX  UnNetHack 3.5.3
 	* Conflict makes blackmarket shopkeeper angry
 	* Fully eroded armor gets destroyed
-	* HTML dump
 	* Lowered the needed experience level for the quest
+	* HTML dump
 	* Pi day support
 	* Reduced Sokoban branch by one level
+	* Vampires as player selectable starting race (from Slash'Em)
 
 	* patches:
 	  - Dungeon Map Overview 3 (by Hojita Discordia)
