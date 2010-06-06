@@ -1328,6 +1328,7 @@ register struct obj   *obj;
 	    }
 
 	    if (tmp >= rnd(20)) {
+		int broken = FALSE;
 		if (hmon(mon,obj,1)) {	/* mon still alive */
 		    cutworm(mon, bhitpos.x, bhitpos.y, obj);
 		}
@@ -1341,7 +1342,7 @@ register struct obj   *obj;
 		     * we still don't want anything to survive unconditionally,
 		     * but we need ammo to stay around longer on average.
 		     */
-		    int broken, chance;
+		    int chance;
 		    chance = 3 + greatest_erosion(obj) - obj->spe;
 		    if (chance > 1)
 			broken = rn2(chance);
@@ -1349,8 +1350,9 @@ register struct obj   *obj;
 			broken = !rn2(4);
 		    if (obj->blessed && !rnl(4))
 			broken = 0;
+		}
 
-		    if (broken
+		if (broken
 #ifdef WEBB_DISINT
           || obj_disint
 #endif
@@ -1359,7 +1361,6 @@ register struct obj   *obj;
 			    check_shop_obj(obj, bhitpos.x,bhitpos.y, TRUE);
 			obfree(obj, (struct obj *)0);
 			return 1;
-		    }
 		}
 		passive_obj(mon, obj, (struct attack *)0);
 	    } else {
