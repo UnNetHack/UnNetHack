@@ -2238,6 +2238,11 @@ use_weapon:
 		case AT_STNG:
 		case AT_TUCH:
 		case AT_BUTT:
+			if (i==0 && uwep && (youmonst.data->mlet==S_LICH)) goto use_weapon;
+			if ((uwep || u.twoweap && uswapwep) &&
+				(touch_petrifies(mon->data) ||
+				 mon->data == &mons[PM_MEDUSA]))
+			    break;
 		case AT_TENT:
 			if (i==0 && uwep && (youmonst.data->mlet==S_LICH)) goto use_weapon;
 			if ((dhit = (tmp > rnd(20) || u.uswallow)) != 0) {
