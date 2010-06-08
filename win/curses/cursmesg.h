@@ -16,5 +16,6 @@ void curses_init_mesg_history(void);
 
 void curses_prev_mesg(void);
 
+void curses_count_window(const char *count_text);
 
 #endif  /* CURSMESG_H */

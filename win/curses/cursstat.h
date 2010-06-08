@@ -4,7 +4,7 @@
 
 /* Global declarations */
 
-void curses_update_stats(void);
+void curses_update_stats(boolean redraw);
 
 void curses_decrement_highlight(void);
 

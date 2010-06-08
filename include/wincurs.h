@@ -7,7 +7,9 @@ int term_rows, term_cols; /* size of underlying terminal */
 
 WINDOW *base_term;    /* underlying terminal window */
 
-WINDOW *mapwin, *statuswin, *messagewin;
+WINDOW *mapwin, *statuswin, *messagewin;    /* Main windows */
+
+boolean counting;   /* Count window is active */
 
 
 #define TEXTCOLOR   /* Allow color */
@@ -246,7 +248,7 @@ extern void curses_del_menu(winid wid);
 
 /* cursstat.c */
 
-extern void curses_update_stats(void);
+extern void curses_update_stats(boolean redraw);
 
 extern void curses_decrement_highlight(void);
 
@@ -278,6 +280,7 @@ extern void curses_init_mesg_history(void);
 
 extern void curses_prev_mesg(void);
 
+extern void curses_count_window(const char *count_text);
 
 #endif  /* WINCURS_H */
 

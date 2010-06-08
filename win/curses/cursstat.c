@@ -86,46 +86,52 @@ extern const char *enc_stat[]; /* from botl.c */
 write to the status window, so we know somwthing has changed.  We
 override the write and update what needs to be updated ourselves. */
 
-void curses_update_stats()
+void curses_update_stats(boolean redraw)
 {
     char buf[BUFSZ];
     int count, enc, orient, sx_start, hp, hpmax, labels, swidth,
-     sheight;
+     sheight, sx_end, sy_end;
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
     static int prev_labels = -1;
     static boolean first = TRUE;
-    boolean horiz;
+    static boolean horiz;
     int sx = 0;
     int sy = 0;
     boolean border = curses_window_has_border(STATUS_WIN);
     
     curses_get_window_size(STATUS_WIN, &sheight, &swidth);
-    
+
     if (border)
     {
         sx++;
         sy++;
-        swidth++;
-        sheight++;
+        swidth--;
+        sheight--;
     }
     
+    sx_end = swidth - 1;
+    sy_end = sheight - 1;    
     sx_start = sx;
         
-    orient = curses_get_window_orientation(STATUS_WIN);
-
-    if ((orient == ALIGN_RIGHT) || (orient == ALIGN_LEFT))
-    {
-        horiz = FALSE;
-    }
-    else
-    {
-        horiz = TRUE;
-    }
-    
     if (first)
     {
         init_stats();
         first = FALSE;
+        redraw = TRUE;
+    }
+
+    if (redraw)
+    {
+        orient = curses_get_window_orientation(STATUS_WIN);
+
+        if ((orient == ALIGN_RIGHT) || (orient == ALIGN_LEFT))
+        {
+            horiz = FALSE;
+        }
+        else
+        {
+            horiz = TRUE;
+        }
     }
     
     if (horiz)
@@ -149,7 +155,7 @@ void curses_update_stats()
         set_labels(labels);
         prev_labels = labels;
     }
-    
+
     curses_clear_nhwin(STATUS_WIN);
     
     /* Line 1 */
@@ -161,7 +167,6 @@ void curses_update_stats()
     if (u.mtimedone) {
         char mname[BUFSZ];
         int k = 0;
-
         strcpy(mname, mons[u.umonnum].mname);
         while(mname[k] != 0) {
             if ((k == 0 || (k > 0 && mname[k-1] == ' '))
@@ -208,6 +213,8 @@ void curses_update_stats()
         {
             sx += strlen(prevname.txt) + 1;
         }
+        
+        
     }
     else
     {
@@ -507,7 +514,7 @@ void curses_update_stats()
     color_stat(prevalign, ON);
     mvwaddstr(win, sy, sx, prevalign.txt);
     color_stat(prevalign, OFF);
-    
+
     /* Line 2 */
     
     sx = sx_start;
@@ -1682,7 +1689,7 @@ void curses_decrement_highlight()
     
     if (unhighlight)
     {
-        curses_update_stats();
+        curses_update_stats(FALSE);
     }
 }
 

@@ -350,7 +350,7 @@ void curses_putch(winid wid, int x, int y, int ch, int color, int attr)
 
     if (wid == STATUS_WIN)
     {
-        curses_update_stats();
+        curses_update_stats(FALSE);
     }
 
     if (wid != MAP_WIN)
@@ -466,7 +466,7 @@ void curses_puts(winid wid, int attr, const char *text)
     
     if (wid == STATUS_WIN)
     {
-        curses_update_stats();  /* We will do the write ourselves */
+        curses_update_stats(FALSE);  /* We will do the write ourselves */
         return;
     }
     
@@ -508,7 +508,7 @@ void curses_clear_nhwin(winid wid)
         box(win, 0, 0);
     }
     
-    wrefresh(win);
+//    wrefresh(win);
 }
 
 
