@@ -1,0 +1,142 @@
+2010-XX-XX  UnNetHack 3.5.3
+	* Conflict makes blackmarket shopkeeper angry
+	* Fully eroded armor gets destroyed
+	* Lowered the needed experience level for the quest
+	* HTML dump
+	* Pi day support
+	* Reduced Sokoban branch by one level
+	* Vampires as player selectable starting race (from Slash'Em)
+
+	* patches:
+	  - Dungeon Map Overview 3 (by Hojita Discordia)
+	  - Extended Conducts v2.3 (by Andreas Dorn)
+	  - Paranoid Patch (by various)
+	  - Splittable #adjust Patch (by Sam Dennis and Jukka Lahtinen)
+	  - Tutorial (by Alex Smith)
+
+	* user interface improvements:
+	  - auto-ID of rings of regeneration when hurt
+	  - automatically talk to monsters if only one is next to the player
+	  - multiple items on floor shown in reverse video
+	  - show price of items in shops without #chatting
+
+	* vanilla bug fixes:
+	  - C343-12, C343-94, C343-189, C343-235
+	  - SC343-8, SC343-20
+
+	* added items:
+	  - scroll of flood
+
+	* removed items:
+	  - scroll of amnesia
+
+	* new rooms:
+	  - instrument shop (adapted from NetHack Brass RS)
+	  - pet stores (from Slash'Em)
+	  - tin shops (from Slash'Em)
+
+
+2010-01-10  UnNetHack 3.5.2-1
+	Crash bugfix: Prevent alchemizing not existing potions
+
+
+2009-12-09  UnNetHack 3.5.2
+	* Increased skill levels
+	* Blood-sucking and biting Vampires (from Slash'Em)
+	* New option: showdmg (only in wizmode)
+	* Trollsbane: grants hungerless regeneration
+	* Vorpal Blade: +1d8 special damage
+	* Prevent crash when rn2 <= 0 is called
+	* Vibrating square: messages when player is near
+
+	* new items:
+	  - potion of blood and vampire blood (from Slash'Em)
+
+	* Patches:
+	  - Bag of Tricks Enhancement Patch (by Nephi)
+	  - Breaking a camera may release a picture painting demon (by L)
+	  - Camera Demon (by L)
+	  - Cancellation Patch (by Malcolm Ryan)
+	  - Color alchemy Patch (by Nephi)
+	  - Free Fortune Cookie (by Nephi)
+	  - Litmus Patch (by Dylan O'Donnell)
+	  - Monk specific greeting and goodbye (by Haakon Studebaker)
+	  - Oily corpses (by L)
+	  - Qwertz_layout Patch (by Stanislav Traykov)
+	  - While Helpless (by Pasi Kallinen)
+
+	* vanilla bug fixes:
+	  - C343-55, C343-116, C343-136, C343-211, C343-231
+
+	* user interface improvements:
+	  - Interrupt a multi turn action if hit points or magical energy is restored 
+
+
+2009-06-13  UnNetHack 3.5.1
+	* new levels:
+	  - Fort Ludios levels
+	  - Sokoban levels (by Pasi Kallinen)
+	  - Medusa levels (by Pasi Kallinen)
+	  - Castle levels (by Pasi Kallinen)
+	  - Bigrooms (by Pasi Kallinen)
+	  - Heck² levels (by Kelly Bailey)
+	  - new mine town: Orcish Town (from SporkHack)
+	  - nymph level (from Slash'Em)
+	  - the Blackmarket (by Massimo Campostrini)
+	  - flipped levels patch (by Pasi Kallinen)
+
+	* new rooms:
+	  - garden
+	  - dilapidated armouries (by L)
+
+	* new items:
+	  - iron safes (from SporkHack)
+	  - rings of gain intelligence/wisdom/dexterity (from Slash'Em)
+	  - tinfoil hat (by L)
+
+	* item behaviour changes:
+	  - Amulet of Yendor may teleport away when dropped
+	  - Scrolls of gold detection: confused reading shows a random item class
+	  - Scrolls of genocide kill monster on level (uncursed) or globally (blessed) 
+
+
+	* Patches:
+	  - Astral Escape (via GruntHack from Chi)
+	  - Dump patch (by Jukka Lahtinen)
+	  - Dungeon growths (by Pasi Kallinen)
+	  - Exotic Pets (by Rob Ellwood)
+	  - Extinct and showborn patch (from Jukka Lahtinen)
+	  - Randomized Planes (by Patric Mueller)
+	  - Simple mail (from dgamelaunch)
+	  - xlogfile (by Aardvark Joe)
+
+	* vanilla bug fixes:
+	  - Astral Call Bug (SC343-11, SC343-12)
+	  - C343-8, C343-19, C343-100, C343-179, C343-218, C343-258, C343-259,
+	    C343-268, C343-275, C343-276, C343-298, C343-318, C343-324
+
+	* new monsters:
+	  - Cthulhu (from Slash'Em Lethe)
+	  - anti-matter vortex (from NetHack Brass)
+	  - disintegrator (from Nicholas Webbs biodiversity patch)
+	  - gold dragons (by Nephi)
+	  - snow ants (from Slash'Em)
+	  - vorpal jabberwock (by L)
+
+	* user interface improvements:
+	  - auto open doors (by Stefano Busti)
+	  - menucolors (by Pasi Kallinen)
+	  - pickup thrown objects (by Roderick Schertler)
+	  - status colors (by Shachaf & Oren Ben-Kiki)
+	  - window edge (by Pasi Kallinen)
+
+	* unlimited growing of scores prevented
+	* Bribable demons demand more money (from SporkHack)
+	* Prevent excessive pudding farming by halving max hp of puddings
+	* Choice of Sokoban prize (from NetHack Brass)
+	* Quest nemesis don't respect Elbereth
+	* Unique demons don't respect Elbereth
+	* The Heart of Ahriman gives displacement and energy regeneration 
+	* Throne: no wishes
+	* Towel day support
+	* Death talks in CAPITAL LETTERS

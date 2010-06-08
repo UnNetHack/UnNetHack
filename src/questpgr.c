@@ -409,6 +409,7 @@ int     msgnum;
 char   *msgbuf;
 {
 	struct qtmsg *qt_msg;
+	char xbuf[BUFSZ];
 
 	if (!(qt_msg = msg_in(qt_list.common, msgnum))) {
 		impossible("qt_com_firstline: message %d not found.", msgnum);
@@ -417,7 +418,8 @@ char   *msgbuf;
 	}
 
 	(void) dlb_fseek(msg_file, qt_msg->offset, SEEK_SET);	
-	(void) dlb_fgets(in_line, 80, msg_file);
+	(void) dlb_fgets(xbuf, 80, msg_file);
+	(void) xcrypt(xbuf, in_line);
         convert_line();
         strcpy(msgbuf, out_line);
 }

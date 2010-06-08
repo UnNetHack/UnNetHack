@@ -852,13 +852,15 @@ die:
 
 #define DUMP_DATE_FORMAT "%Y-%m-%d %H:%M:%S"
 	dump_title("Game information");
+	dump_html("<div class=\"nh_game_information\">\n", "");
 	dump_line("  Started: ", get_formatted_time(u.ubirthday, DUMP_DATE_FORMAT));
 	dump_line("  Ended:   ", get_formatted_time(u.udeathday, DUMP_DATE_FORMAT));
 #ifdef RECORD_REALTIME
 	Sprintf(pbuf, "  Play time: %ld:%2.2ld", realtime_data.realtime / 3600, 
 			(realtime_data.realtime % 3600) / 60);
-#endif
 	dump_line(pbuf,"");
+#endif
+	dump_html("</div>\n", "");
 	dump("", "");
 
 	/* clean up unneeded windows */
@@ -899,6 +901,7 @@ die:
 	    putstr(endwin, 0, pbuf);
 	    putstr(endwin, 0, "");
 	}
+	dump_html("<h2>Goodbye</h2>\n", "");
 	dump_blockquote_start();
 	dump_line("", pbuf);
 

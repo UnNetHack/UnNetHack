@@ -543,8 +543,10 @@ register struct monst *mtmp;
 	    {
 	    /* vampire messages are varied by tameness, peacefulness, and time of night */
 		boolean isnight = night();
-		boolean kindred =    (Upolyd && (u.umonnum == PM_VAMPIRE ||
-				       u.umonnum == PM_VAMPIRE_LORD));
+		boolean kindred = maybe_polyd(u.umonnum == PM_VAMPIRE ||
+				    u.umonnum == PM_VAMPIRE_LORD,
+				    /* DEFERRED u.umonnum == PM_VAMPIRE_MAGE, */
+				    Race_if(PM_VAMPIRE));
 		boolean nightchild = (Upolyd && (u.umonnum == PM_WOLF ||
 				       u.umonnum == PM_WINTER_WOLF ||
 	    			       u.umonnum == PM_WINTER_WOLF_CUB));

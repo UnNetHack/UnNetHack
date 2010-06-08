@@ -1992,7 +1992,8 @@ register struct obj *obj;
 		if (!*u.ushops) return 0;
 
 		if (obj->oclass != COIN_CLASS) {
-			cost = (obj == uball || obj == uchain) ? 0L : get_cost(obj, shkp);
+			cost = (obj == uball || obj == uchain) ? 0L :
+			         obj->quan * get_cost(obj, shkp);
 			if (Has_contents(obj)) {
 				cost += contained_cost(obj, shkp, 0L, FALSE, FALSE);
 			}

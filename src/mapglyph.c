@@ -145,7 +145,8 @@ unsigned *ospecial;
 #endif
 	    obj_color(offset);
 	    /* use inverse video for multiple items */
-	    if (level.objects[x][y] &&
+	    if (offset != BOULDER &&
+	        level.objects[x][y] &&
 	        level.objects[x][y]->nexthere) {
 		special |= MG_INVERSE;
 	    }
@@ -170,6 +171,11 @@ unsigned *ospecial;
 #endif
 	    mon_color(offset);
 	    special |= MG_CORPSE;
+	    /* use inverse video for multiple items */
+	    if (level.objects[x][y] &&
+	        level.objects[x][y]->nexthere) {
+		special |= MG_INVERSE;
+	    }
     } else if ((offset = (glyph - GLYPH_DETECT_OFF)) >= 0) {	/* mon detect */
 	ch = monsyms[(int)mons[offset].mlet];
 #ifdef ROGUE_COLOR

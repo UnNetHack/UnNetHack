@@ -41,6 +41,8 @@ NON_DIGGABLE:(00,00,74,17)
 LOOP [15] {
   OBJECT:random,random,random
 }
+OBJECT:'(',"wax candle",random,quantity:2
+
 # Random traps
 LOOP [6] {
   TRAP:random,random
@@ -95,6 +97,7 @@ NON_DIGGABLE:(00,00,74,17)
 LOOP [15] {
   OBJECT:random,random,random
 }
+OBJECT:'(',"tallow candle",random,quantity:2
 # Random traps
 LOOP [6] {
   TRAP:random,random
@@ -141,6 +144,7 @@ NON_DIGGABLE:(00,00,74,17)
 LOOP [15] {
   OBJECT:random,random,random
 }
+OBJECT:'(',"wax candle",random,quantity:2
 # Random traps
 LOOP [6] {
   TRAP:random,random
@@ -215,6 +219,7 @@ FOUNTAIN:(69,15)
 LOOP [15] {
   OBJECT:random,random,random
 }
+OBJECT:'(',"tallow candle",random,quantity:2
 # Random traps
 LOOP [6] {
   TRAP:random,random
@@ -262,6 +267,7 @@ NON_DIGGABLE:(00,00,72,18)
 LOOP [15] {
   OBJECT:random,random,random
 }
+OBJECT:'(',"wax candle",random,quantity:2
 
 LOOP [6] {
   TRAP:random,random
@@ -310,6 +316,7 @@ NON_DIGGABLE:(00,00,72,18)
 LOOP [15] {
   OBJECT:random,random,random
 }
+OBJECT:'(',"tallow candle",random,quantity:2
 
 LOOP [6] {
   TRAP:random,random
@@ -358,6 +365,7 @@ NON_DIGGABLE:(00,00,74,18)
 LOOP [15] {
   OBJECT:random,random,random
 }
+OBJECT:'(',"wax candle",random,quantity:2
 
 LOOP [6] {
   TRAP:random,random
@@ -407,6 +415,7 @@ NON_DIGGABLE:(00,00,72,18)
 LOOP [15] {
   OBJECT:random,random,random
 }
+OBJECT:'(',"tallow candle",random,quantity:2
 
 LOOP [6] {
   TRAP:random,random
@@ -454,6 +463,7 @@ NON_DIGGABLE:(00,00,74,17)
 LOOP [15] {
   OBJECT:random,random,random
 }
+OBJECT:'(',"wax candle",random,quantity:2
 
 LOOP [6] {
   TRAP:random,random
@@ -500,58 +510,18 @@ REGION:(19,06,54,12),lit,"ordinary"
 STAIR:random,up
 STAIR:random,down
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+LOOP [15] {
+  OBJECT:random,random,random
+}
+OBJECT:'(',"tallow candle",random,quantity:2
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [6] {
+  TRAP:random,random
+}
 # Random monsters
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-
+LOOP [28] {
+  MONSTER:random,random,random
+}
 
 # Fog Maze
 
@@ -589,56 +559,17 @@ TELEPORT_REGION:(00,00,70,18),(02,03,68,15),down
 STAIR:(00,00,70,18),(02,03,68,15),up
 STAIR:random,down
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+LOOP [15] {
+  OBJECT:random,random,random
+}
+OBJECT:'(',"wax candle",random,quantity:2
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [6] {
+  TRAP:random,random
+}
 # Random monsters
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
+LOOP [28] {
+  MONSTER:random,random,random
+}
 
 MAZEWALK:(4, 2), south

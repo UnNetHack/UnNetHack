@@ -1603,6 +1603,7 @@ E void NDECL(self_invis_message);
 
 /* ### polyself.c ### */
 
+E void NDECL(init_uasmon);
 E void NDECL(set_uasmon);
 E void NDECL(change_sex);
 E void FDECL(polyself, (BOOLEAN_P));
@@ -2517,6 +2518,7 @@ E void FDECL(livelog_shoplifting, (const char*, const char*, long));
 #endif
 E void FDECL(livelog_game_started, (const char*, const char*, const char*, const char*));
 E void FDECL(livelog_game_action, (const char*));
+E void FDECL(livelog_generic, (const char*, const char*));
 
 #endif /* !MAKEDEFS_C && !LEV_LEX_C */
 

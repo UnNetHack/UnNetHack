@@ -26,8 +26,9 @@ dnl  ----- Window systems
 # NETHACK_WIN_ENABLE(proxy, auto)
 nethack_default_win=""
 # Note: Order is important: The last listed enabled port will be the default.
-NETHACK_WIN_ENABLE(tty, auto)
+NETHACK_WIN_ENABLE(dummy, no, [dummy graphics for unit tests])
 NETHACK_WIN_ENABLE(curses, no, [use curses interface])
+NETHACK_WIN_ENABLE(tty, auto)
 #NETHACK_WIN_ENABLE(x11, no)
 #NETHACK_WIN_ENABLE(mswin, no, [use Microsoft Window's native graphics])
 dnl deactivate X11 and Win32 tiles version
@@ -254,6 +255,15 @@ if test "$enable_x11_graphics" != "no"; then
     OPTIONS_FILES="options"
 fi
 
+if test "$enable_dummy_graphics" != "no"; then
+    WINSRC="${WINSRC} \$(WINDUMMYSRC)"
+    WINOBJ="${WINOBJ} \$(WINDUMMYOBJ)"
+    AC_DEFINE(DUMMY_GRAPHICS, [], [Dummy graphics])
+
+    OPTIONS_FILE="options"
+    OPTIONS_FILES="options"
+fi
+
 if test "$enable_mswin_graphics" != "no"; then
     AC_MINGW32
 
@@ -433,6 +443,7 @@ NETHACK_ARG_WITH_PARAM(xlogfile,[More verbose logfile],XLOGFILE,yes,FILE,[xlogfi
 NETHACK_ARG_WITH_PARAM(livelog,[Live game progress logfile],LIVELOGFILE,no,FILE,[livelog])
 if test "$enable_livelog" != "no" ; then
 	NETHACK_ARG(livelog-shout,[Shoutting into the live game logfile],LIVELOG_SHOUT,no)
+	NETHACK_ARG(livelog-killing,[Reporting killing of uniques and ghosts of former players],LIVELOG_BONES_KILLER,no)
 fi
 
 NETHACK_ARG(dump,[Dumping character stats],DUMP_LOG,yes)
@@ -441,6 +452,10 @@ if test "$enable_dump" != "no" ; then
 	NETHACK_ARG_WITH_PARAM(dump-messages,[Number of dumped messages],DUMPMSGS,yes,NUMBER,20)
 	NETHACK_ARG(dump-text,[Dump a text file],DUMP_TEXT_LOG,yes)
 	NETHACK_ARG(dump-html,[Dump an HTML file],DUMP_HTML_LOG,no)
+	if test "$enable_dump_html" != "no" ; then
+		NETHACK_ARG_WITH_PARAM(dump-html-css-file,[Path to the css dump file],DUMP_HTML_CSS_FILE,yes,FILE,"unnethack_dump.css")
+		NETHACK_ARG(dump-html-css-embedded,[CSS file should be included in the HTML dump],DUMP_HTML_CSS_EMBEDDED,no)
+	fi
 fi
 
 NETHACK_ARG_WITH_PARAM(whereis-file,[Log information about running games],WHEREIS_FILE,no,FILE,[%n.whereis])

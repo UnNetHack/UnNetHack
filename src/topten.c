@@ -626,6 +626,9 @@ int how;
 #endif
 		}
 	}
+#ifdef DUMP_LOG
+	dump("<pre>", "");
+#endif
 	if(rank0 == 0) rank0 = rank1;
 	if(rank0 <= 0) rank0 = rank;
 	if(!done_stopprint) outheader();
@@ -666,6 +669,9 @@ int how;
 	}
 	if(rank0 >= rank) if(!done_stopprint)
 		outentry(0, t0, TRUE);
+#ifdef DUMP_LOG
+	dump("</pre>", "");
+#endif
 #ifdef UPDATE_RECORD_IN_PLACE
 	if (flg) {
 # ifdef TRUNCATE_FILE

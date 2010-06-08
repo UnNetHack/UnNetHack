@@ -42,11 +42,20 @@
 /* Data librarian */
 #undef DLB
 
+/* Dummy graphics */
+#undef DUMMY_GRAPHICS
+
 /* Number of dumped messages */
 #undef DUMPMSGS
 
 /* Name of character dump file */
 #undef DUMP_FN
+
+/* CSS file should be included in the HTML dump */
+#undef DUMP_HTML_CSS_EMBEDDED
+
+/* Path to the css dump file */
+#undef DUMP_HTML_CSS_FILE
 
 /* Dump an HTML file */
 #undef DUMP_HTML_LOG
@@ -127,6 +136,9 @@
 
 /* Live game progress logfile */
 #undef LIVELOGFILE
+
+/* Reporting killing of uniques and ghosts of former players */
+#undef LIVELOG_BONES_KILLER
 
 /* Shoutting into the live game logfile */
 #undef LIVELOG_SHOUT

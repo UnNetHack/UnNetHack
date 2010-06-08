@@ -136,14 +136,8 @@ doshout()
 		if( *p == ':' )
 			*p = ' ';
 
-	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:starttime=%ld:shout=%s\n",
-		plname,
-		moves,
-		(long)u.ubirthday,
-		buf);
-	livelog_write_string(strbuf);
-	
+	livelog_generic("shout", buf);
+
 	return 0;
 }
 
@@ -178,13 +172,7 @@ struct monst *mtmp;
 		  ) {
 		char *n = noit_mon_nam(mtmp);
 		/* $player killed a uniq monster */
-		snprintf(strbuf, STRBUF_LEN,
-				"player=%s:turns=%ld:starttime=%ld:killed_uniq=%s\n",
-				plname,
-				moves,
-				(long)u.ubirthday,
-				n);
-		livelog_write_string(strbuf);
+		livelog_generic("killed_uniq", n);
 	}
 }
 #endif /* LIVELOG_BONES_KILLER */
@@ -242,6 +230,22 @@ const char* verb;
 		moves,
 		(long)u.ubirthday,
 		verb);
+	livelog_write_string(strbuf);
+}
+
+/** Livelog method for reporting generic events with one customizable field. */
+void
+livelog_generic(field, text)
+const char* field;
+const char* text;
+{
+	snprintf(strbuf, STRBUF_LEN,
+		"player=%s:turns=%ld:starttime=%ld:%s=%s\n",
+		plname,
+		moves,
+		(long)u.ubirthday,
+		field,
+		text);
 	livelog_write_string(strbuf);
 }
 

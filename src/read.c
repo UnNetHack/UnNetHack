@@ -1029,7 +1029,20 @@ register struct obj	*sobj;
 			known = TRUE;
 		} else {	/* armor and scroll both cursed */
 		    Your("%s %s.", xname(otmp), otense(otmp, "vibrate"));
-		    if (otmp->spe >= -6) otmp->spe--;
+		    if (otmp->spe >= -6) {
+			otmp->spe--;
+			if (otmp->otyp == HELM_OF_BRILLIANCE) {
+			    ABON(A_INT)--;
+			    ABON(A_WIS)--;
+			    makeknown(otmp->otyp);
+			    flags.botl = 1;
+			}
+			if (otmp->otyp == GAUNTLETS_OF_DEXTERITY) {
+			    ABON(A_DEX)--;
+			    makeknown(otmp->otyp);
+			    flags.botl = 1;
+			}
+		    }
 		    make_stunned(HStun + rn1(10, 10), TRUE);
 		}
 	    }
