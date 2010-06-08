@@ -59,24 +59,28 @@ void
 start_color_option(color_option)
 struct color_option color_option;
 {
+#ifdef TTY_GRAPHICS
 	int i;
 	if (color_option.color != NO_COLOR)
 		term_start_color(color_option.color);
 	for (i = 0; (1 << i) <= color_option.attr_bits; ++i)
 		if (i != ATR_NONE && color_option.attr_bits & (1 << i))
 			term_start_attr(i);
+#endif  /* TTY_GRAPHICS */
 }
 
 void
 end_color_option(color_option)
 struct color_option color_option;
 {
+#ifdef TTY_GRAPHICS
 	int i;
 	if (color_option.color != NO_COLOR)
 		term_end_color();
 	for (i = 0; (1 << i) <= color_option.attr_bits; ++i)
 		if (i != ATR_NONE && color_option.attr_bits & (1 << i))
 			term_end_attr(i);
+#endif  /* TTY_GRAPHICS */
 }
 
 void

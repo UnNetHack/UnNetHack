@@ -27,6 +27,8 @@ dnl  ----- Window systems
 nethack_default_win=""
 # Note: Order is important: The last listed enabled port will be the default.
 NETHACK_WIN_ENABLE(dummy, no, [dummy graphics for unit tests])
+NETHACK_WIN_ENABLE(dummy, no, [dummy graphics for unit tests])
+NETHACK_WIN_ENABLE(curses, no, [use curses interface])
 NETHACK_WIN_ENABLE(tty, auto)
 #NETHACK_WIN_ENABLE(x11, no)
 #NETHACK_WIN_ENABLE(mswin, no, [use Microsoft Window's native graphics])
@@ -184,6 +186,34 @@ if test "$enable_tty_graphics" = "no" -a $host_os = mingw32; then
     LFLAGS="$LFLAGS -mwindows"
 fi
 AC_SUBST(WINTTYLIB)
+
+
+WINCURSESLIB=
+if test "$enable_curses_graphics" != "no"; then
+	# For curses, determine the curses lib
+	CURSES_VARIANTS="ncurses curses"
+	for curseslib in ${CURSES_VARIANTS}; do
+	    AC_CHECK_LIB(${curseslib}, tgetent,
+	      [WINCURSESLIB="-l${curseslib}"
+	      WINSRC="${WINSRC} \$(WINCURSESSRC)"
+	      WINOBJ="${WINOBJ} \$(WINCURSESOBJ)"
+	      WINLIB="${WINLIB} \$(WINCURSESLIB)"
+	      AC_DEFINE(CURSES_GRAPHICS, [], [Curses interface])
+	      break])
+	done
+	if test -z "$curseslib"; then
+	    if test "$enable_curses_graphics" = yes; then
+		AC_MSG_ERROR([Can't find tgetent (needed for curses graphics)])
+	    else
+		AC_MSG_WARN([Can't enable curses graphics (no tgetent)])
+		NETHACK_AUTO_WIN_DISABLE(curses)
+	    fi
+	fi
+
+	OPTIONS_FILE="options"
+	OPTIONS_FILES="options"
+fi
+AC_SUBST(WINCURSESLIB)
 
 dnl if test "$enable_proxy_graphics" != "no"; then
 dnl     if test "$have_libpng" = "no"; then

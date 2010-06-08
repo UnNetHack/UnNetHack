@@ -27,6 +27,9 @@
 /* Options to pass to the compression program, if any */
 #undef COMPRESS_OPTIONS
 
+/* Curses interface */
+#undef CURSES_GRAPHICS
+
 /* Unix on win32 */
 #undef CYGWIN32
 

@@ -19,6 +19,7 @@
 	  - automatically talk to monsters if only one is next to the player
 	  - multiple items on floor shown in reverse video
 	  - show price of items in shops without #chatting
+	  - Curses GUI
 
 	* vanilla bug fixes:
 	  - C343-12, C343-94, C343-189, C343-235
