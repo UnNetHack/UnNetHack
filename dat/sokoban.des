@@ -180,7 +180,7 @@ MAP
 |....|......................|
 -----------------------------
 ENDMAP
-STAIR:(11,02),down
+BRANCH:(11,02,11,02),(0,0,0,0)
 STAIR:(23,04),up
 DOOR:locked,(27,09)
 REGION:(00,00,28,11),lit,"ordinary"
@@ -229,6 +229,9 @@ TRAP:"pit",(24,10)
 TRAP:"pit",(25,10)
 TRAP:"pit",(26,10)
 
+OBJECT:'?',"earth",(03,10)
+OBJECT:'?',"earth",(04,10)
+
 soko_loot()
 
 
@@ -253,7 +256,7 @@ MAP
 ----|..|..|               
     -------               
 ENDMAP
-STAIR:(03,01),down
+BRANCH:(03,01,03,01),(0,0,0,0)
 STAIR:(20,04),up
 DOOR:locked,(24,09)
 REGION:(00,00,25,13),lit,"ordinary"
@@ -291,6 +294,9 @@ TRAP:"pit",(20,10)
 TRAP:"pit",(21,10)
 TRAP:"pit",(22,10)
 TRAP:"pit",(23,10)
+
+OBJECT:'?',"earth",(08,12)
+OBJECT:'?',"earth",(09,12)
 
 soko_loot()
 
@@ -1022,12 +1028,8 @@ TRAP:"pit",(5,9)
 TRAP:"pit",(6,9)
 TRAP:"pit",(7,9)
 TRAP:"pit",(8,9)
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+
+soko_loot()
 
 
 LEVEL:"soko3-13"
@@ -1050,7 +1052,7 @@ MAP
        --...|
         -----
 ENDMAP
-STAIR:(16,7), down
+BRANCH:(16,7,16,7),(0,0,0,0)
 STAIR:(4,3), up
 REGION:(00,00,17,12),lit,"ordinary"
 NON_DIGGABLE:(00,00,17,12)
@@ -1075,12 +1077,11 @@ TRAP:"pit",(6,5)
 TRAP:"pit",(7,5)
 TRAP:"pit",(8,5)
 TRAP:"pit",(9,5)
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+
+OBJECT:'?',"earth",(02,06)
+OBJECT:'?',"earth",(03,06)
+
+soko_loot()
 
 
 LEVEL:"soko3-14"
@@ -1103,7 +1104,7 @@ MAP
 |.........|...|
 ---------------
 ENDMAP
-STAIR:(12,9), down
+BRANCH:(12,9,12,9),(0,0,0,0)
 STAIR:(9,11), up
 REGION:(00,00,19,12),lit,"ordinary"
 NON_DIGGABLE:(00,00,19,12)
@@ -1137,12 +1138,11 @@ TRAP:"pit",(5,11)
 TRAP:"pit",(6,11)
 TRAP:"pit",(7,11)
 TRAP:"pit",(8,11)
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+
+OBJECT:'?',"earth",(02,04)
+OBJECT:'?',"earth",(03,04)
+
+soko_loot()
 
 
 LEVEL:"soko3-15"
@@ -1164,7 +1164,7 @@ MAP
 |.....--.|.....---..|
 ---------------- ----
 ENDMAP
-STAIR:(8,10), down
+BRANCH:(8,10,8,10),(0,0,0,0)
 STAIR:(15,1), up
 REGION:(00,00,21,11),lit,"ordinary"
 NON_DIGGABLE:(00,00,21,11)
@@ -1194,12 +1194,11 @@ TRAP:"pit",(19,8)
 TRAP:"pit",(15,9)
 TRAP:"pit",(16,9)
 TRAP:"pit",(17,9)
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+
+OBJECT:'?',"earth",(18,10)
+OBJECT:'?',"earth",(19,10)
+
+soko_loot()
 
 
 LEVEL:"soko3-16"
@@ -1225,7 +1224,7 @@ MAP
     |.|....|..|...--
     ---------------
 ENDMAP
-STAIR:(8,1), down
+BRANCH:(8,1,8,1),(0,0,0,0)
 STAIR:(10,4), up
 REGION:(00,00,19,15),lit,"ordinary"
 NON_DIGGABLE:(00,00,19,15)
@@ -1264,12 +1263,11 @@ TRAP:"pit",(9,10)
 TRAP:"pit",(10,10)
 TRAP:"pit",(9,11)
 TRAP:"pit",(10,11)
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+
+OBJECT:'?',"earth",(09,12)
+OBJECT:'?',"earth",(10,12)
+
+soko_loot()
 
 
 LEVEL:"soko3-10"
@@ -1292,7 +1290,7 @@ MAP
   ---.----
     ---
 ENDMAP
-STAIR:(5,11), down
+BRANCH:(5,11,5,11),(0,0,0,0)
 STAIR:(15,5), up
 REGION:(00,00,20,12),lit,"ordinary"
 NON_DIGGABLE:(00,00,20,12)
@@ -1322,12 +1320,11 @@ TRAP:"pit",(14,8)
 TRAP:"pit",(15,8)
 TRAP:"pit",(16,8)
 TRAP:"pit",(17,8)
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
+
+OBJECT:'?',"earth",(18,09)
+OBJECT:'?',"earth",(19,09)
+
+soko_loot()
 
 
 LEVEL:"soko2-3"
