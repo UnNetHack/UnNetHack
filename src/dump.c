@@ -138,12 +138,14 @@ const char *str;
 		fprintf(dump_fp, "  %c - %s\n", c, str);
 	if (html_dump_fp) {
 #ifdef MENU_COLOR
+# ifdef TTY_GRAPHICS
 		int color;
 		int attr;
 		if (iflags.use_menu_color &&
 		    get_menu_coloring(str, &color, &attr)) {
 			fprintf(html_dump_fp, "<span class=\"nh_color_%d\"><span class=\"nh_item_letter\">%c</span> - %s</span><br />\n", color, c, str);
 		} else
+# endif
 #endif
 		fprintf(html_dump_fp, "<span class=\"nh_item_letter\">%c</span> - %s<br />\n", c, str);
 	}
