@@ -109,7 +109,6 @@ void curses_init_nhwindows(int* argcp, char** argv)
 #endif
     noecho();
     raw();
-    keypad(stdscr, TRUE);
     meta(stdscr, TRUE);
     curs_set(0);
 #ifdef NCURSES_VERSION
@@ -651,6 +650,7 @@ number_pad(state)
 */
 void curses_number_pad(int state)
 {
+    keypad(stdscr, !state);
 }
 
 /*
