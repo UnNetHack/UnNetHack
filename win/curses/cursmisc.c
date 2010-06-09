@@ -148,6 +148,11 @@ int curses_read_char()
     }
 #endif
 
+    if (counting && !isdigit(ch)) /* Dismiss count window if necissary */
+    {
+        curses_count_window(NULL);
+    }
+
     ch = curses_convert_keys(ch);
     
     return ch;

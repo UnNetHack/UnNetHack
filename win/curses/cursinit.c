@@ -439,7 +439,7 @@ void curses_create_main_windows()
 
     if (iflags.window_inited)
     {
-        curses_update_stats();
+        curses_update_stats(TRUE);
     }
     else
     {
@@ -765,8 +765,15 @@ int curses_character_dialog(const char** choices, const char *prompt)
      FALSE);    
     curses_end_menu(wid, prompt);
     ret = curses_select_menu(wid, PICK_ONE, &selected);
-    ret = (selected->item.a_int);
-
+    if (ret == 1)
+    {
+        ret = (selected->item.a_int);
+    }
+    else    /* Cancelled selection */
+    {
+        ret = ROLE_NONE;
+    }
+    
     if (ret > 0)
     {
         ret--;

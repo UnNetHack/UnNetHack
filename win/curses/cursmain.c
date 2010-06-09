@@ -140,6 +140,7 @@ void curses_init_nhwindows(int* argcp, char** argv)
     timeout(-1);
 #endif  /* PDCURSES */
     getmaxyx(base_term, term_rows, term_cols);
+    counting = FALSE;
     curses_init_options();
     if ((term_rows < 15) || (term_cols < 40))
     {

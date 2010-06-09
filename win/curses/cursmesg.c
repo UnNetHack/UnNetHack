@@ -42,6 +42,12 @@ void curses_message_win_puts(const char *message, boolean recursed)
     int message_length = strlen(message);
     int border_space = 0;
     static long suppress_turn = -1;
+
+    if (strncmp("Count:", message, 6) == 0)
+    {
+        curses_count_window(message);
+        return;
+    }
     
     if (suppress_turn == moves)
     {
@@ -64,7 +70,7 @@ void curses_message_win_puts(const char *message, boolean recursed)
     
     linespace = ((width + border_space) - 3) - mx;
     
-    if (strcmp(message, "#") == 0)  /* Extended command in mesg win */
+    if (strcmp(message, "#") == 0)  /* Extended command or Count: */
     {
         if ((strcmp(toplines, "#") != 0) && (my >= (height - 1 +
          border_space)) && (height != 1)) /* Bottom of message window */
@@ -292,6 +298,73 @@ void curses_prev_mesg()
     
     curses_end_menu(wid, "");
     curses_select_menu(wid, PICK_NONE, &selected);
+}
+
+
+/* Shows Count: in a separate window, or at the bottom of the message
+window, depending on the user's settings */
+
+void curses_count_window(const char *count_text)
+{
+    int startx, starty, winx, winy;
+    int messageh, messagew;
+    static WINDOW *countwin = NULL;
+
+    if ((count_text == NULL) && (countwin != NULL))
+    {
+        curses_destroy_win(countwin);
+        countwin = NULL;
+        counting = FALSE;
+        return;
+    }
+    
+    counting = TRUE;
+
+    if (iflags.wc_popup_dialog) /* Display count in popup window */
+    {
+        startx = 1;
+        starty = 1;
+        
+        if (countwin == NULL)
+        {
+            countwin = curses_create_window(25, 1, UP);
+        }
+    
+    }
+    else /* Display count at bottom of message window */
+    {
+        curses_get_window_xy(MESSAGE_WIN, &winx, &winy);
+        curses_get_window_size(MESSAGE_WIN, &messageh, &messagew);
+        
+        if (curses_window_has_border(MESSAGE_WIN))
+        {
+            winx++;
+            winy++;
+        }
+        
+        winy += messageh - 1;
+        
+        if (countwin == NULL)
+        {
+            pline("#");
+#ifndef PDCURSES
+            countwin = newwin(1, 25, winy, winx);
+#endif  /* !PDCURSES */
+        }
+#ifdef PDCURSES
+        else
+        {
+            curses_destroy_win(countwin);
+        }
+        
+        countwin = newwin(1, 25, winy, winx);
+#endif  /* PDCURSES */
+        startx = 0;
+        starty = 0;
+    }
+    
+    mvwprintw(countwin, starty, startx, "%s", count_text);
+    wrefresh(countwin);
 }
 
 
