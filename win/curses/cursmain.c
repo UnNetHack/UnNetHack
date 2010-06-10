@@ -111,6 +111,7 @@ void curses_init_nhwindows(int* argcp, char** argv)
     raw();
     meta(stdscr, TRUE);
     curs_set(0);
+    keypad(TRUE);
 #ifdef NCURSES_VERSION
 # ifdef __APPLE__
  ESCDELAY = 25;
@@ -650,7 +651,6 @@ number_pad(state)
 */
 void curses_number_pad(int state)
 {
-    keypad(stdscr, !state);
 }
 
 /*
