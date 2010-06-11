@@ -390,8 +390,12 @@ register int x,y;
 			et = buf;
 		} else
 			et = ep->engr_txt;
-		You("%s: \"%s\".",
-		      (Blind) ? "feel the words" : "read",  et);
+		if (u.roleplay.illiterate && strcmp(et, "X")) {
+			pline("But you cannot read.");
+		} else {
+			You("%s: \"%s\".",
+					(Blind) ? "feel the words" : "read",  et);
+		}
 		if(flags.run > 1) nomul(0, 0);
 		if (moves > 5) check_tutorial_message(QT_T_ENGRAVING);
 	    }
@@ -1030,8 +1034,7 @@ doengrave()
 	/* Prompt for engraving! (if literate) */
 	if(u.roleplay.illiterate) {
 	    Sprintf(ebuf,"X");
-	}
-	else {
+	} else {
 	    Sprintf(qbuf,"What do you want to %s %s the %s here?", everb,
 		eloc, eground);
 	    getlin(qbuf, ebuf);
