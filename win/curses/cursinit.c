@@ -845,5 +845,10 @@ void curses_init_options()
     {
         iflags.wc2_windowborders = 3; /* Set to auto if not specified */
     }
+    
+    if (!iflags.wc2_petattr)
+    {
+        iflags.wc2_petattr = A_UNDERLINE;
+    }
 }
 

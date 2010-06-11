@@ -924,47 +924,49 @@ int curses_convert_attr(int attr)
 }
 
 
-/* Map letter attributes to bitmask, and store result in
-iflags.wc2_petattr, setting a default of underlined if no valid
-option is chosen.  Return mask on success, or 0 if not found */
+/* Map letter attributes from a string to bitmask.  Return mask on
+success, or 0 if not found */
 
 int curses_read_attrs(char *attrs)
 {
+    int retattr = 0;
+
     if (strchr(attrs, 'b') || strchr(attrs, 'B'))
     {
-	    iflags.wc2_petattr = iflags.wc2_petattr|A_BOLD;
+	    retattr = retattr|A_BOLD;
     }
     if (strchr(attrs, 'i') || strchr(attrs, 'I'))
     {
-	    iflags.wc2_petattr = iflags.wc2_petattr|A_REVERSE;
+	    retattr = retattr|A_REVERSE;
     }
     if (strchr(attrs, 'u') || strchr(attrs, 'U'))
     {
-	    iflags.wc2_petattr = iflags.wc2_petattr|A_UNDERLINE;
+	    retattr = retattr|A_UNDERLINE;
     }
     if (strchr(attrs, 'k') || strchr(attrs, 'K'))
     {
-	    iflags.wc2_petattr = iflags.wc2_petattr|A_BLINK;
+	    retattr = retattr|A_BLINK;
     }
 #ifdef A_ITALIC
     if (strchr(attrs, 't') || strchr(attrs, 'T'))
     {
-	    iflags.wc2_petattr = iflags.wc2_petattr|A_ITALIC;
+	    retattr = retattr|A_ITALIC;
     }
 #endif
 #ifdef A_RIGHTLINE
     if (strchr(attrs, 'r') || strchr(attrs, 'R'))
     {
-	    iflags.wc2_petattr = iflags.wc2_petattr|A_RIGHTLINE;
+	    retattr = retattr|A_RIGHTLINE;
     }
 #endif
 #ifdef A_LEFTLINE
     if (strchr(attrs, 'l') || strchr(attrs, 'L'))
     {
-	    iflags.wc2_petattr = iflags.wc2_petattr|A_LEFTLINE;
+	    retattr = retattr|A_LEFTLINE;
     }
 #endif
-    return iflags.wc2_petattr;
+
+    return retattr;
 }
 
 
