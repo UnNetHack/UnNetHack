@@ -896,7 +896,8 @@ dodown()
 	}
 	if (!stairs_down && !ladder_down) {
 		if (!(trap = t_at(u.ux,u.uy)) ||
-			(trap->ttyp != TRAPDOOR && trap->ttyp != HOLE && trap->ttyp != PIT)
+			(trap->ttyp != TRAPDOOR && trap->ttyp != HOLE &&
+			 trap->ttyp != PIT && trap->ttyp != SPIKED_PIT)
 			|| !Can_fall_thru(&u.uz) || !trap->tseen) {
 
 			if (flags.autodig && !flags.nopick &&
@@ -929,7 +930,7 @@ dodown()
 	}
 
 	if (trap) {
-		if (trap->ttyp == PIT) {
+		if (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT) {
 			if (u.utrap && (u.utraptype == TT_PIT)) {
 				You("are already in the pit."); /* YAFM needed */
 			} else {
