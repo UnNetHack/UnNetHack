@@ -61,9 +61,20 @@ WINDOW *curses_create_window(int width, int height, orient orientation)
     if ((orientation == UP) || (orientation == DOWN) ||
      (orientation == LEFT))
     {
-        map_border = curses_window_has_border(MAP_WIN);
-        curses_get_window_xy(MAP_WIN, &mapx, &mapy);
-        curses_get_window_size(MAP_WIN, &maph, &mapw);
+        if (invent || (moves > 1))
+        {
+            map_border = curses_window_has_border(MAP_WIN);
+            curses_get_window_xy(MAP_WIN, &mapx, &mapy);
+            curses_get_window_size(MAP_WIN, &maph, &mapw);
+        }
+        else
+        {
+            map_border = TRUE;
+            mapx = 0;
+            mapy = 0;
+            maph = term_rows;
+            mapw = term_cols;
+        }
     }
     
     if (map_border)
@@ -86,13 +97,29 @@ WINDOW *curses_create_window(int width, int height, orient orientation)
         }
         case UP:
         {
-            startx = (mapw / 2) - (width / 2) + mapx + mapb_offset;
+            if (invent || (moves > 1))
+            {
+                startx = (mapw / 2) - (width / 2) + mapx + mapb_offset;
+            }
+            else
+            {
+                startx = 0;
+            }
+            
             starty = mapy + mapb_offset;
             break;
         }
         case DOWN:
         {
-            startx = (mapw / 2) - (width / 2) + mapx + mapb_offset;
+            if (invent || (moves > 1))
+            {
+                startx = (mapw / 2) - (width / 2) + mapx + mapb_offset;
+            }
+            else
+            {
+                startx = 0;
+            }
+            
             starty = height - mapy - 1 - mapb_offset;
             break;
         }
@@ -145,7 +172,7 @@ void curses_refresh_nethack_windows()
     message_window = curses_get_nhwin(MESSAGE_WIN);
     map_window = curses_get_nhwin(MAP_WIN);
     
-    if (!iflags.window_inited)
+    if ((moves <= 1) && !invent)
     {
         /* Main windows not yet displayed; refresh base window instead */
         touchwin(stdscr);

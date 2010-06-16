@@ -169,7 +169,16 @@ int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_
     boolean any_choice = FALSE;
     boolean accept_count = FALSE;
 
-    curses_get_window_size(MAP_WIN, &map_height, &map_width);
+    if (invent || (moves > 1))
+    {
+        curses_get_window_size(MAP_WIN, &map_height, &map_width);
+    }
+    else
+    {
+        map_height = term_rows;
+        map_width = term_cols;
+    }
+    
     maxwidth = map_width - 2;
     
     if (choices != NULL)
@@ -267,7 +276,8 @@ int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_
             }
             break;
         }
-        else if ((answer == '\n') || (answer == '\r'))
+        else if ((answer == '\n') || (answer == '\r') ||
+         (answer == ' '))
         {
             if ((choices != NULL) && (def != '\0'))
             {
@@ -593,6 +603,7 @@ void curses_finalize_nhmenu(winid wid, const char *prompt)
     }
 
     current_menu->num_entries = count;
+
     current_menu->prompt = curses_copy_of(prompt);
 }
 
@@ -1169,7 +1180,14 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
         {
             if (how==PICK_NONE)
             {    
-                num_selected = -1;
+                if (curletter == KEY_ESC)
+                {
+                    num_selected = -1;
+                }
+                else
+                {
+                    num_selected = 0;
+                }
                 dismiss = TRUE;
                 break;
             }                
@@ -1242,7 +1260,7 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
             {
                 if (how==PICK_NONE)
                 {    
-                    num_selected = -1;
+                    num_selected = 0;
                     dismiss = TRUE;
                     break;
                 }                

@@ -13,5 +13,7 @@ int curses_character_dialog(const char** choices, const char *prompt);
 
 void curses_init_options(void);
 
+void curses_display_splash_window(void);
+
 
 #endif  /* CURSINIT_H */
