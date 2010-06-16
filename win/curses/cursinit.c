@@ -654,11 +654,6 @@ void curses_choose_character()
     
     sprintf(choice, "%s%s", choice, tmpchoice);
 
-    if (!iflags.wc_splash_screen)
-    {    
-        clear();
-    }
-    
     /* prevent an unnecessary prompt */
     rigid_role_checks(); 
     
@@ -1093,7 +1088,6 @@ void curses_display_splash_window()
     if ((term_cols < 70) || (term_rows < 20))
     {
         iflags.wc_splash_screen = FALSE;    /* No room for s.s. */
-        return;
     }
     
 #ifdef DEF_GAME_NAME
@@ -1117,56 +1111,59 @@ void curses_display_splash_window()
 
     curses_toggle_color_attr(stdscr, CLR_WHITE, A_NORMAL, ON);
 
-    switch (which_variant)
+    if (iflags.wc_splash_screen)
     {
-        case NETHACK_CURSES:
+        switch (which_variant)
         {
-            mvaddstr(y_start, x_start, NETHACK_SPLASH_A);
-            mvaddstr(y_start + 1, x_start, NETHACK_SPLASH_B);
-            mvaddstr(y_start + 2, x_start, NETHACK_SPLASH_C);
-            mvaddstr(y_start + 3, x_start, NETHACK_SPLASH_D);
-            mvaddstr(y_start + 4, x_start, NETHACK_SPLASH_E);
-            mvaddstr(y_start + 5, x_start, NETHACK_SPLASH_F);
-            y_start += 7;
-            break;
-        }
-        case SLASHEM_CURSES:
-        {
-            mvaddstr(y_start, x_start, SLASHEM_SPLASH_A);
-            mvaddstr(y_start + 1, x_start, SLASHEM_SPLASH_B);
-            mvaddstr(y_start + 2, x_start, SLASHEM_SPLASH_C);
-            mvaddstr(y_start + 3, x_start, SLASHEM_SPLASH_D);
-            mvaddstr(y_start + 4, x_start, SLASHEM_SPLASH_E);
-            mvaddstr(y_start + 5, x_start, SLASHEM_SPLASH_F);
-            y_start += 7;
-            break;
-        }
-        case UNNETHACK_CURSES:
-        {
-            mvaddstr(y_start, x_start, UNNETHACK_SPLASH_A);
-            mvaddstr(y_start + 1, x_start, UNNETHACK_SPLASH_B);
-            mvaddstr(y_start + 2, x_start, UNNETHACK_SPLASH_C);
-            mvaddstr(y_start + 3, x_start, UNNETHACK_SPLASH_D);
-            mvaddstr(y_start + 4, x_start, UNNETHACK_SPLASH_E);
-            mvaddstr(y_start + 5, x_start, UNNETHACK_SPLASH_F);
-            y_start += 7;
-            break;
-        }
-        case SPORKHACK_CURSES:
-            mvaddstr(y_start, x_start, SPORKHACK_SPLASH_A);
-            mvaddstr(y_start + 1, x_start, SPORKHACK_SPLASH_B);
-            mvaddstr(y_start + 2, x_start, SPORKHACK_SPLASH_C);
-            mvaddstr(y_start + 3, x_start, SPORKHACK_SPLASH_D);
-            mvaddstr(y_start + 4, x_start, SPORKHACK_SPLASH_E);
-            mvaddstr(y_start + 5, x_start, SPORKHACK_SPLASH_F);
-            mvaddstr(y_start + 6, x_start, SPORKHACK_SPLASH_G);
-            mvaddstr(y_start + 7, x_start, SPORKHACK_SPLASH_H);
-            y_start += 9;
-            break;
-        default:
-        {
-            impossible("which_variant number %d out of range",
-             which_variant);
+            case NETHACK_CURSES:
+            {
+                mvaddstr(y_start, x_start, NETHACK_SPLASH_A);
+                mvaddstr(y_start + 1, x_start, NETHACK_SPLASH_B);
+                mvaddstr(y_start + 2, x_start, NETHACK_SPLASH_C);
+                mvaddstr(y_start + 3, x_start, NETHACK_SPLASH_D);
+                mvaddstr(y_start + 4, x_start, NETHACK_SPLASH_E);
+                mvaddstr(y_start + 5, x_start, NETHACK_SPLASH_F);
+                y_start += 7;
+                break;
+            }
+            case SLASHEM_CURSES:
+            {
+                mvaddstr(y_start, x_start, SLASHEM_SPLASH_A);
+                mvaddstr(y_start + 1, x_start, SLASHEM_SPLASH_B);
+                mvaddstr(y_start + 2, x_start, SLASHEM_SPLASH_C);
+                mvaddstr(y_start + 3, x_start, SLASHEM_SPLASH_D);
+                mvaddstr(y_start + 4, x_start, SLASHEM_SPLASH_E);
+                mvaddstr(y_start + 5, x_start, SLASHEM_SPLASH_F);
+                y_start += 7;
+                break;
+            }
+            case UNNETHACK_CURSES:
+            {
+                mvaddstr(y_start, x_start, UNNETHACK_SPLASH_A);
+                mvaddstr(y_start + 1, x_start, UNNETHACK_SPLASH_B);
+                mvaddstr(y_start + 2, x_start, UNNETHACK_SPLASH_C);
+                mvaddstr(y_start + 3, x_start, UNNETHACK_SPLASH_D);
+                mvaddstr(y_start + 4, x_start, UNNETHACK_SPLASH_E);
+                mvaddstr(y_start + 5, x_start, UNNETHACK_SPLASH_F);
+                y_start += 7;
+                break;
+            }
+            case SPORKHACK_CURSES:
+                mvaddstr(y_start, x_start, SPORKHACK_SPLASH_A);
+                mvaddstr(y_start + 1, x_start, SPORKHACK_SPLASH_B);
+                mvaddstr(y_start + 2, x_start, SPORKHACK_SPLASH_C);
+                mvaddstr(y_start + 3, x_start, SPORKHACK_SPLASH_D);
+                mvaddstr(y_start + 4, x_start, SPORKHACK_SPLASH_E);
+                mvaddstr(y_start + 5, x_start, SPORKHACK_SPLASH_F);
+                mvaddstr(y_start + 6, x_start, SPORKHACK_SPLASH_G);
+                mvaddstr(y_start + 7, x_start, SPORKHACK_SPLASH_H);
+                y_start += 9;
+                break;
+            default:
+            {
+                impossible("which_variant number %d out of range",
+                 which_variant);
+            }
         }
     }
 
