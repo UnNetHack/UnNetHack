@@ -633,10 +633,10 @@ int curses_display_nhmenu(winid wid, int how, MENU_ITEM_P **_selected)
     }
     
     /* Reset items to unselected to clear out selections from previous
-    invocations of this menu */
+    invocations of this menu, and preselect appropriate items */
     while (menu_item_ptr != NULL)
     {
-        menu_item_ptr->selected = FALSE;
+        menu_item_ptr->selected = menu_item_ptr->presel;
         menu_item_ptr = menu_item_ptr->next_item;
     }
 
