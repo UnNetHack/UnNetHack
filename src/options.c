@@ -179,7 +179,11 @@ static struct Bool_Opt
 	{"perm_invent", &flags.perm_invent, FALSE, SET_IN_GAME},
 	{"pickup_dropped", &flags.pickup_dropped, FALSE, SET_IN_GAME},
 	{"pickup_thrown", &flags.pickup_thrown, TRUE, SET_IN_GAME},
+#ifdef CURSES_GRAPHICS
+	{"popup_dialog",  &iflags.wc_popup_dialog, TRUE, SET_IN_GAME},	/*WC*/
+#else
 	{"popup_dialog",  &iflags.wc_popup_dialog, FALSE, SET_IN_GAME},	/*WC*/
+#endif  /* CURSES_GRAPHICS */
 	{"prayconfirm", &flags.prayconfirm, TRUE, SET_IN_GAME},
 	{"preload_tiles", &iflags.wc_preload_tiles, TRUE, DISP_IN_GAME},	/*WC*/
 	{"pushweapon", &flags.pushweapon, FALSE, SET_IN_GAME},
