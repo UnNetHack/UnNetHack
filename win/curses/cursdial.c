@@ -17,9 +17,7 @@ typedef struct nhmi
     CHAR_P group_accel; /* Group accelerator for menu item, if any */
     int attr;  /* Text attributes for item */
     const char *str;  /* Text of menu item */
-    BOOLEAN_P presel; /* Whether menu     if (iflags.wc_popup_dialog)
-    {
-item should be preselected */
+    BOOLEAN_P presel; /* Whether menu item should be preselected */
     boolean selected;   /* Whether item is currently selected */
     int page_num;   /* Display page number for entry */
     int line_num;   /* Line number on page where entry begins */
@@ -1073,18 +1071,20 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
                 }
                 menu_item_ptr->accelerator = curletter;
             }
-            curses_toggle_color_attr(win, NONE, A_BOLD, ON);
-            mvwaddch(win, menu_item_ptr->line_num + 1, 2, curletter);
-            curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
+
             if (menu_item_ptr->selected)
             {
-                curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
+                curses_toggle_color_attr(win, HIGHLIGHT_COLOR, A_REVERSE, ON);
                 mvwaddch(win, menu_item_ptr->line_num + 1, 1, '<');
+                mvwaddch(win, menu_item_ptr->line_num + 1, 2, curletter);
                 mvwaddch(win, menu_item_ptr->line_num + 1, 3, '>');
-                curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
+                curses_toggle_color_attr(win, HIGHLIGHT_COLOR, A_REVERSE, OFF);
             }
             else
             {
+                curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
+                mvwaddch(win, menu_item_ptr->line_num + 1, 2, curletter);
+                curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
                 mvwprintw(win, menu_item_ptr->line_num + 1, 3, ") ");
             }
         }
@@ -1098,7 +1098,7 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
 		    }
     		if (attr != A_NORMAL)
     		{
-    		    menu_item_ptr->attr = attr;
+    		    menu_item_ptr->attr = menu_item_ptr->attr|attr;
     		}
 		}
 #endif /* MENU_COLOR */
@@ -1359,20 +1359,26 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
 
 static void menu_select_deselect(WINDOW *win, nhmenu_item *item, menu_op operation)
 {
+    int curletter = item->accelerator;
+    
     if ((operation == DESELECT) || (item->selected && (operation ==
      INVERT)))
     {
         item->selected = FALSE;
         mvwaddch(win, item->line_num + 1, 1, ' ');
+        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
+        mvwaddch(win, item->line_num + 1, 2, curletter);
+        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
         mvwaddch(win, item->line_num + 1, 3, ')');
     }
     else
     {
         item->selected = TRUE;
-        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
+        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, A_REVERSE, ON);
         mvwaddch(win, item->line_num + 1, 1, '<');
+        mvwaddch(win, item->line_num + 1, 2, curletter);
         mvwaddch(win, item->line_num + 1, 3, '>');
-        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
+        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, A_REVERSE, OFF);
     }
     
     wrefresh(win);
