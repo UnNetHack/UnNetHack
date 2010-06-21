@@ -1490,7 +1490,7 @@ Optional Features:
                           players (default=no)
   --enable-dump           Dumping character stats (default=yes)
   --enable-dump-file=FILE Name of character dump file (default=no, default
-                          file="/tmp/%s.nh")
+                          file="/tmp/%n.nh")
   --enable-dump-messages=NUMBER
                           Number of dumped messages (default=yes, default
                           number=20)
@@ -7831,10 +7831,10 @@ $as_echo_n "checking whether to enable dump file... " >&6; }
 if test "${enable_dump_file+set}" = set; then
   enableval=$enable_dump_file; if test "$enableval" != no; then enable_dump_file=yes;
          if test "$enableval" != yes; then dump_file=$enableval;
-         else dump_file="/tmp/%s.nh"; fi;
+         else dump_file="/tmp/%n.nh"; fi;
         else enable_dump_file=no; fi
 else
-  enable_dump_file=no;dump_file="/tmp/%s.nh"
+  enable_dump_file=no;dump_file="/tmp/%n.nh"
 fi
 
    if test "$enable_dump_file" != "no" ; then
