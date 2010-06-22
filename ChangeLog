@@ -17,6 +17,7 @@
 	* user interface improvements:
 	  - auto-ID of rings of regeneration when hurt
 	  - automatically talk to monsters if only one is next to the player
+	  - Ctrl-e automatically writes resp. engraves "Elbereth"
 	  - multiple items on floor shown in reverse video
 	  - show price of items in shops without #chatting
 	  - Curses GUI
