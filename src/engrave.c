@@ -1051,7 +1051,7 @@ boolean fingers;
 	if (engraving && otmp == &zeroobj)
 	    You("%s \"%s\" %swith your %s %s the %s.", everb, engraving,
 		eword, makeplural(body_part(FINGER)), eloc, eground);
-	if (engraving && otmp != &zeroobj)
+	else if (engraving && otmp != &zeroobj)
 	    You("%s \"%s\" %swith %s %s the %s.", everb, engraving,
 		eword, doname(otmp), eloc, eground);
 	else if (otmp != &zeroobj)
