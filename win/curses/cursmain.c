@@ -149,11 +149,7 @@ void curses_init_nhwindows(int* argcp, char** argv)
 
     curses_create_main_windows();
     curses_init_mesg_history();
-    
-    if (iflags.wc_splash_screen)
-    {
-        curses_display_splash_window();
-    }
+    curses_display_splash_window();
 }
 
 

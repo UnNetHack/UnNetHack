@@ -211,8 +211,6 @@ extern void curses_posthousekeeping(void);
 
 extern void curses_view_file(const char *filename, boolean must_exist);
 
-extern void curses_display_splash_window(void);
-
 extern void curses_rtrim(char *str);
 
 extern int curses_get_count(int first_digit);
@@ -264,6 +262,8 @@ extern void curses_choose_character(void);
 extern int curses_character_dialog(const char** choices, const char *prompt);
 
 extern void curses_init_options(void);
+
+extern void curses_display_splash_window(void);
 
 
 /* cursmesg.c */

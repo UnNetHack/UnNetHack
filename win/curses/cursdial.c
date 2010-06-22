@@ -17,9 +17,7 @@ typedef struct nhmi
     CHAR_P group_accel; /* Group accelerator for menu item, if any */
     int attr;  /* Text attributes for item */
     const char *str;  /* Text of menu item */
-    BOOLEAN_P presel; /* Whether menu     if (iflags.wc_popup_dialog)
-    {
-item should be preselected */
+    BOOLEAN_P presel; /* Whether menu item should be preselected */
     boolean selected;   /* Whether item is currently selected */
     int page_num;   /* Display page number for entry */
     int line_num;   /* Line number on page where entry begins */
@@ -169,7 +167,16 @@ int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_
     boolean any_choice = FALSE;
     boolean accept_count = FALSE;
 
-    curses_get_window_size(MAP_WIN, &map_height, &map_width);
+    if (invent || (moves > 1))
+    {
+        curses_get_window_size(MAP_WIN, &map_height, &map_width);
+    }
+    else
+    {
+        map_height = term_rows;
+        map_width = term_cols;
+    }
+    
     maxwidth = map_width - 2;
     
     if (choices != NULL)
@@ -267,7 +274,8 @@ int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_
             }
             break;
         }
-        else if ((answer == '\n') || (answer == '\r'))
+        else if ((answer == '\n') || (answer == '\r') ||
+         (answer == ' '))
         {
             if ((choices != NULL) && (def != '\0'))
             {
@@ -593,6 +601,7 @@ void curses_finalize_nhmenu(winid wid, const char *prompt)
     }
 
     current_menu->num_entries = count;
+
     current_menu->prompt = curses_copy_of(prompt);
 }
 
@@ -622,10 +631,10 @@ int curses_display_nhmenu(winid wid, int how, MENU_ITEM_P **_selected)
     }
     
     /* Reset items to unselected to clear out selections from previous
-    invocations of this menu */
+    invocations of this menu, and preselect appropriate items */
     while (menu_item_ptr != NULL)
     {
-        menu_item_ptr->selected = FALSE;
+        menu_item_ptr->selected = menu_item_ptr->presel;
         menu_item_ptr = menu_item_ptr->next_item;
     }
 
@@ -1062,18 +1071,20 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
                 }
                 menu_item_ptr->accelerator = curletter;
             }
-            curses_toggle_color_attr(win, NONE, A_BOLD, ON);
-            mvwaddch(win, menu_item_ptr->line_num + 1, 2, curletter);
-            curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
+
             if (menu_item_ptr->selected)
             {
-                curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
+                curses_toggle_color_attr(win, HIGHLIGHT_COLOR, A_REVERSE, ON);
                 mvwaddch(win, menu_item_ptr->line_num + 1, 1, '<');
+                mvwaddch(win, menu_item_ptr->line_num + 1, 2, curletter);
                 mvwaddch(win, menu_item_ptr->line_num + 1, 3, '>');
-                curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
+                curses_toggle_color_attr(win, HIGHLIGHT_COLOR, A_REVERSE, OFF);
             }
             else
             {
+                curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
+                mvwaddch(win, menu_item_ptr->line_num + 1, 2, curletter);
+                curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
                 mvwprintw(win, menu_item_ptr->line_num + 1, 3, ") ");
             }
         }
@@ -1087,7 +1098,7 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
 		    }
     		if (attr != A_NORMAL)
     		{
-    		    menu_item_ptr->attr = attr;
+    		    menu_item_ptr->attr = menu_item_ptr->attr|attr;
     		}
 		}
 #endif /* MENU_COLOR */
@@ -1169,7 +1180,14 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
         {
             if (how==PICK_NONE)
             {    
-                num_selected = -1;
+                if (curletter == KEY_ESC)
+                {
+                    num_selected = -1;
+                }
+                else
+                {
+                    num_selected = 0;
+                }
                 dismiss = TRUE;
                 break;
             }                
@@ -1242,7 +1260,7 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
             {
                 if (how==PICK_NONE)
                 {    
-                    num_selected = -1;
+                    num_selected = 0;
                     dismiss = TRUE;
                     break;
                 }                
@@ -1291,8 +1309,11 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
         {
             if (menu_item_ptr->identifier.a_void != NULL)
             {
-                if ((curletter == menu_item_ptr->accelerator) &&
-                 ((curpage == menu_item_ptr->page_num) || !menu->reuse_accels))
+                if (((curletter == menu_item_ptr->accelerator) ||
+                 (menu_item_ptr->group_accel && 
+                 (curletter == menu_item_ptr->group_accel))) &&
+                 ((curpage == menu_item_ptr->page_num) ||
+                 !menu->reuse_accels))
                 {
                     if (curpage != menu_item_ptr->page_num)
                     {
@@ -1304,8 +1325,8 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
                     {
                         num_selected = 1;
                         dismiss = TRUE;
+                        break;
                     }
-                    break;
                 }
             }
             menu_item_ptr = menu_item_ptr->next_item;
@@ -1338,20 +1359,26 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
 
 static void menu_select_deselect(WINDOW *win, nhmenu_item *item, menu_op operation)
 {
+    int curletter = item->accelerator;
+    
     if ((operation == DESELECT) || (item->selected && (operation ==
      INVERT)))
     {
         item->selected = FALSE;
         mvwaddch(win, item->line_num + 1, 1, ' ');
+        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
+        mvwaddch(win, item->line_num + 1, 2, curletter);
+        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
         mvwaddch(win, item->line_num + 1, 3, ')');
     }
     else
     {
         item->selected = TRUE;
-        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
+        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, A_REVERSE, ON);
         mvwaddch(win, item->line_num + 1, 1, '<');
+        mvwaddch(win, item->line_num + 1, 2, curletter);
         mvwaddch(win, item->line_num + 1, 3, '>');
-        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
+        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, A_REVERSE, OFF);
     }
     
     wrefresh(win);

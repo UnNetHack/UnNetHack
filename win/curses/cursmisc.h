@@ -33,8 +33,6 @@ void curses_posthousekeeping(void);
 
 void curses_view_file(const char *filename, boolean must_exist);
 
-void curses_display_splash_window(void);
-
 void curses_rtrim(char *str);
 
 int curses_get_count(int first_digit);

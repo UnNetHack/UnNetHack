@@ -4,73 +4,12 @@
 #include "cursmisc.h"
 #include "func_tab.h"
 #include "dlb.h"
-#include "patchlevel.h"
 
 #include <ctype.h>
 
 /* Misc. curses interface functions */
 
 /* Private declarations */
-
-#define NETHACK_CURSES      1
-#define SLASHEM_CURSES      2
-#define UNNETHACK_CURSES    3
-
-/* Banners used for an optional ASCII splash screen */
-
-#define NETHACK_SPLASH_A \
-"         _   _        _    _    _               _    "
-
-#define NETHACK_SPLASH_B \
-"        | \\ | |      | |  | |  | |             | |   "
-
-#define NETHACK_SPLASH_C \
-"        |  \\| |  ___ | |_ | |__| |  __ _   ___ | | __"
-
-#define NETHACK_SPLASH_D \
-"        | . ` | / _ \\| __||  __  | / _` | / __|| |/ /"
-
-#define NETHACK_SPLASH_E \
-"        | |\\  ||  __/| |_ | |  | || (_| || (__ |   < "
-
-#define NETHACK_SPLASH_F \
-"        |_| \\_| \\___| \\__||_|  |_| \\__,_| \\___||_|\\_\\"
-
-#define SLASHEM_SPLASH_A \
-"                _____  _              _     _  ______  __  __ "
-
-#define SLASHEM_SPLASH_B \
-"               / ____|| |            | |   ( )|  ____||  \\/  |"
-
-#define SLASHEM_SPLASH_C \
-"              | (___  | |  __ _  ___ | |__  \\|| |__   | \\  / |"
-
-#define SLASHEM_SPLASH_D \
-"               \\___ \\ | | / _` |/ __|| '_ \\   |  __|  | |\\/| |"
-
-#define SLASHEM_SPLASH_E \
-"               ____) || || (_| |\\__ \\| | | |  | |____ | |  | |"
-
-#define SLASHEM_SPLASH_F \
-"              |_____/ |_| \\__,_||___/|_| |_|  |______||_|  |_|"
-
-#define UNNETHACK_SPLASH_A \
-"     _    _         _   _        _    _    _               _"
-
-#define UNNETHACK_SPLASH_B \
-"    | |  | |       | \\ | |      | |  | |  | |             | |"
-
-#define UNNETHACK_SPLASH_C \
-"    | |  | | _ __  |  \\| |  ___ | |_ | |__| |  __ _   ___ | | __"
-
-#define UNNETHACK_SPLASH_D \
-"    | |  | || '_ \\ | . ` | / _ \\| __||  __  | / _` | / __|| |/ /"
-
-#define UNNETHACK_SPLASH_E \
-"    | |__| || | | || |\\  ||  __/| |_ | |  | || (_| || (__ |   <"
-
-#define UNNETHACK_SPLASH_F \
-"     \\____/ |_| |_||_| \\_| \\___| \\__||_|  |_| \\__,_| \\___||_|\\_\\"
 
 static int curs_x = -1;
 static int curs_y = -1;
@@ -726,120 +665,6 @@ void curses_view_file(const char *filename, boolean must_exist)
     dlb_fclose(fp);
     curses_end_menu(wid, "");
     curses_select_menu(wid, PICK_NONE, &selected);
-}
-/* Display an ASCII splash screen for up to 2 seconds if the
-splash_screen option is set.  The splash screen may be
-dismissed sooner with a keystroke. */
-
-void curses_display_splash_window()
-{
-    winid wid;
-    anything *identifier;
-    menu_item *selected = NULL;
-    int which_variant = NETHACK_CURSES;  /* Default to NetHack */
-    
-    wid = curses_get_wid(NHW_MENU);
-    curses_create_nhmenu(wid);
-    identifier = malloc(sizeof(anything));
-    identifier->a_void = NULL;
-    
-    timeout(2000);  /* Pause for 2 seconds or a key is hit */
-#ifdef DEF_GAME_NAME
-    if (strcmp(DEF_GAME_NAME, "SlashEM") == 0)
-    {
-        which_variant = SLASHEM_CURSES;
-    }
-#endif
-
-#ifdef GAME_SHORT_NAME
-    if (strcmp(GAME_SHORT_NAME, "UNH") == 0)
-    {
-        which_variant = UNNETHACK_CURSES;
-    }
-#endif
-
-    switch (which_variant)
-    {
-        case NETHACK_CURSES:
-        {
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             NETHACK_SPLASH_A, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             NETHACK_SPLASH_B, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             NETHACK_SPLASH_C, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             NETHACK_SPLASH_D, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             NETHACK_SPLASH_E, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             NETHACK_SPLASH_F, FALSE);
-            break;
-        }
-        case SLASHEM_CURSES:
-        {
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             SLASHEM_SPLASH_A, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             SLASHEM_SPLASH_B, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             SLASHEM_SPLASH_C, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             SLASHEM_SPLASH_D, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             SLASHEM_SPLASH_E, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             SLASHEM_SPLASH_F, FALSE);
-            break;
-        }
-        case UNNETHACK_CURSES:
-        {
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             UNNETHACK_SPLASH_A, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             UNNETHACK_SPLASH_B, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             UNNETHACK_SPLASH_C, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             UNNETHACK_SPLASH_D, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             UNNETHACK_SPLASH_E, FALSE);
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-             UNNETHACK_SPLASH_F, FALSE);
-            break;
-        }
-        default:
-        {
-            impossible("which_variant number %d out of range",
-             which_variant);
-        }
-    }
-
-#ifdef COPYRIGHT_BANNER_A
-    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL, "",
-     FALSE);
-    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-     COPYRIGHT_BANNER_A, FALSE);
-#endif
-
-#ifdef COPYRIGHT_BANNER_B
-    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-     COPYRIGHT_BANNER_B, FALSE);
-#endif
-
-#ifdef COPYRIGHT_BANNER_C
-    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-     COPYRIGHT_BANNER_C, FALSE);
-#endif
-
-#ifdef COPYRIGHT_BANNER_D   /* Just in case */
-    curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-     COPYRIGHT_BANNER_D, FALSE);
-#endif
-
-    curses_end_menu(wid, "");
-    curses_select_menu(wid, PICK_NONE, &selected);
-    timeout(-1);
 }
 
 

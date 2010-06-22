@@ -444,6 +444,7 @@ typedef unsigned char	uchar;
 /* #define LIVELOG_BONES_KILLER */ /* Report if a ghost of a former player is
                                     * killed - Patric Mueller (15 Aug 2009) */
 #define ADJSPLIT /* splittable #adjust - Sam Dennis, conditionalized by Jukka Lahtinen */
+#define TUTORIAL_MODE /* Alex Smith */
 
 /* End of Section 6 */
 
