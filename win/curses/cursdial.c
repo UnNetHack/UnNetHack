@@ -405,6 +405,7 @@ int curses_ext_cmd()
 
         wrefresh(extwin);
         letter = getch();
+        letter = curses_convert_keys(letter);
 	    prompt_width = strlen(cur_choice);
         matches = 0;
 
@@ -1187,6 +1188,7 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
                 else
                 {
                     num_selected = 0;
+
                 }
                 dismiss = TRUE;
                 break;
@@ -1219,7 +1221,6 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
                 }
                 else if (curletter == ' ')
                 {
-                    num_selected = -1;
                     dismiss = TRUE;
                     break;
                 }
