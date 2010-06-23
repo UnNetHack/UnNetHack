@@ -1028,6 +1028,7 @@ register const char *let,*word;
 			Sprintf(qbuf, "What do you want to %s? [%s or ?*]",
 				word, buf);
 		}
+		check_tutorial_message(QT_T_CHOOSEITEM);
 #ifdef REDO
 		if (in_doagain)
 		    ilet = readchar();
