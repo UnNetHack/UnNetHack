@@ -312,7 +312,7 @@ void curses_count_window(const char *count_text)
 
     if ((count_text == NULL) && (countwin != NULL))
     {
-        curses_destroy_win(countwin);
+        delwin(countwin);
         countwin = NULL;
         counting = FALSE;
         return;
