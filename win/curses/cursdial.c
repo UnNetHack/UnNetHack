@@ -3,6 +3,7 @@
 #include "wincurs.h"
 #include "cursdial.h"
 #include "func_tab.h"
+#include <ctype.h>
 
 /* Dialog windows for curses interface */
 
@@ -22,6 +23,7 @@ typedef struct nhmi
     int page_num;   /* Display page number for entry */
     int line_num;   /* Line number on page where entry begins */
     int num_lines;  /* Number of lines entry uses on page */
+    int count;      /* Count for selected item */
     struct nhmi *prev_item;    /* Pointer to previous entry */
     struct nhmi *next_item;    /* Pointer to next entry */
 } nhmenu_item;
@@ -291,6 +293,8 @@ int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_
                 if (answer != '0')
                 {
                     yn_number = curses_get_count(answer - '0');
+                    touchwin(askwin);
+                    refresh();
                 }
                 
                 answer = '#';
@@ -330,7 +334,7 @@ int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_
             free(linestr);
             curs_set(1);
         }
-        
+
         curses_destroy_win(askwin);
     }
     else
@@ -338,7 +342,7 @@ int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_
         curses_clear_unhighlight_message_window();
         curs_set(0);
     }
-    
+
     return answer;
 }
 
@@ -553,6 +557,7 @@ void curses_add_nhmenu_item(winid wid, const ANY_P *identifier,
     new_item->page_num = 0;
     new_item->line_num = 0;
     new_item->num_lines = 0;
+    new_item->count = -1;
     new_item->next_item = NULL;
     
     if (current_menu == NULL)
@@ -674,7 +679,7 @@ int curses_display_nhmenu(winid wid, int how, MENU_ITEM_P **_selected)
                      "exceeds expected number");
                 }
                 selected[count].item = menu_item_ptr->identifier;
-                selected[count].count = -1;
+                selected[count].count = menu_item_ptr->count;
                 count++; 
             }
             menu_item_ptr = menu_item_ptr->next_item;
@@ -1165,6 +1170,8 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
 static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
 {
     int curletter;
+    int count = -1;
+    int count_letter = '\0';
     int curpage = 1;
     int num_selected = 0;
     boolean dismiss = FALSE;
@@ -1176,6 +1183,25 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
     {
         curletter = getch();
         
+        if (curletter == '\033')
+        {
+            curletter = curses_convert_keys(curletter);
+        }
+        
+        if (isdigit(curletter))
+        {
+            count = curses_get_count(curletter - '0');
+            touchwin(win);
+            refresh();
+            curletter = getch();
+            
+            if (count > 0)
+            {
+                count_letter = curletter;
+            }
+        }
+        
+
         if ((how == PICK_NONE) && (menu->num_pages == 1))
         {
             if (how==PICK_NONE)
@@ -1187,6 +1213,7 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
                 else
                 {
                     num_selected = 0;
+
                 }
                 dismiss = TRUE;
                 break;
@@ -1219,7 +1246,6 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
                 }
                 else if (curletter == ' ')
                 {
-                    num_selected = -1;
                     dismiss = TRUE;
                     break;
                 }
@@ -1345,6 +1371,13 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
                 if (menu_item_ptr->selected)
                 {
                     num_selected++;
+                    
+                    if (menu_item_ptr->accelerator == count_letter)
+                    {
+                        menu_item_ptr->count = count;
+                        count = 0;
+                        count_letter = '\0';
+                    }
                 }
             }
             menu_item_ptr = menu_item_ptr->next_item;
@@ -1466,6 +1499,7 @@ static boolean get_menu_coloring(char *str, int *color, int *attr)
 #  ifdef MENU_COLOR_REGEX_POSIX
 	    if (regexec(&tmpmc->match, str, 0, NULL, 0) == 0) {
 #  else
+
 	    if (re_search(&tmpmc->match, str, strlen(str), 0, 9999, 0) >= 0) {
 #  endif
 # else

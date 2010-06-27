@@ -14,6 +14,8 @@
 static int curs_x = -1;
 static int curs_y = -1;
 
+static int parse_escape_sequence(void);
+
 /* Macros for Control and Alt keys */
 
 #ifndef M
@@ -33,44 +35,10 @@ static int curs_y = -1;
 int curses_read_char()
 {
     int ch, tmpch;
+    
     ch = getch();
-
-#ifndef PDCURSES
-    if (ch == '\033')   /* Escape, possibly part of an esc sequence */
-    {
-        timeout(10);
-        ch = getch();
-
-        if (ch != ERR) /* Likely an escape sequence */
-        {
-            if (((ch >= 'a') && (ch <= 'z')) ||
-             ((ch >= '0') && (ch <= '9')))
-            {
-                ch |= 0x80; /* Meta key support for most terminals */
-            }
-            else if (ch == 'O') /* Numeric keypad */
-            {
-                ch = getch();
-                if ((ch != ERR) && (ch >= 112) && (ch <= 121))
-                {
-                    ch = ch - 112 + '0';  /* Convert to number */
-                }
-                else
-                {
-                    ch = '\033';    /* Escape */
-                }
-            }
-        }
-        else
-        {
-            ch = '\033';    /* Just an escape character */
-        }
-
-        timeout(-1);
-    }
-#endif  /* !PDCURSES */
-
     tmpch = ch;
+    ch = curses_convert_keys(ch);
 
     if (ch == 0)
     {
@@ -104,9 +72,9 @@ int curses_read_char()
     if (counting && !isdigit(ch)) /* Dismiss count window if necissary */
     {
         curses_count_window(NULL);
+        curses_refresh_nethack_windows();
     }
 
-    ch = curses_convert_keys(ch);
     return ch;
 }
 
@@ -692,13 +660,20 @@ int curses_get_count(int first_digit)
     while (isdigit(current_char))
     {
         current_count = (current_count * 10) + (current_char - '0');
-        if (current_count > 32768)  /* Could go higher, but no need */
+        if (current_count > LARGEST_INT)
         {
-            current_count = 32768;
+            current_count = LARGEST_INT;
         }
         
         pline("Count: %ld", current_count);
         current_char = curses_read_char();
+    }
+    
+    ungetch(current_char);
+    
+    if (current_char == '\033')    /* Cancelled with escape */
+    {
+        current_count = -1;
     }
     
     return current_count;
@@ -783,6 +758,7 @@ int curses_read_attrs(char *attrs)
     {
 	    retattr = retattr|A_RIGHTLINE;
     }
+
 #endif
 #ifdef A_LEFTLINE
     if (strchr(attrs, 'l') || strchr(attrs, 'L'))
@@ -801,6 +777,11 @@ Currently this is limited to arrow keys, but this may be expanded. */
 int curses_convert_keys(int key)
 {
     int ret = key;
+    
+    if (ret == '\033')
+    {
+        ret = parse_escape_sequence();
+    }
 
     /* Handle arrow keys */
     switch (key)
@@ -928,6 +909,46 @@ int curses_convert_keys(int key)
     return ret;
 }
 
+
+static int parse_escape_sequence(void)
+{
+#ifndef PDCURSES
+    int ret;
+
+    timeout(10);
+
+    ret = getch();
+
+    if (ret != ERR) /* Likely an escape sequence */
+    {
+        if (((ret >= 'a') && (ret <= 'z')) ||
+         ((ret >= '0') && (ret <= '9')))
+        {
+            ret |= 0x80; /* Meta key support for most terminals */
+        }
+        else if (ret == 'O') /* Numeric keypad */
+        {
+            ret = getch();
+            if ((ret != ERR) && (ret >= 112) && (ret <= 121))
+            {
+                ret = ret - 112 + '0';  /* Convert to number */
+            }
+            else
+            {
+                ret = '\033';    /* Escape */
+            }
+        }
+    }
+    else
+    {
+        ret = '\033';    /* Just an escape character */
+    }
+
+    timeout(-1);
+
+    return ret;
+#endif  /* !PDCURSES */
+}
 
 /* This is a kludge for the statuscolors patch which calls tty-specific
 functions, which causes a compiler error if TTY_GRAPHICS is not
