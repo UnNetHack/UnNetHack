@@ -72,6 +72,8 @@ static void menu_select_deselect(WINDOW *win, nhmenu_item *item, menu_op operati
 static int menu_operation(WINDOW *win, nhmenu *menu, menu_op operation,
  int page_num);
 
+static void menu_clear_selections(nhmenu *menu);
+
 static boolean get_menu_coloring(char *str, int *color, int *attr);
 
 static nhmenu *nhmenus = NULL;  /* NetHack menu array */
@@ -1346,12 +1348,18 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
                         curpage = menu_item_ptr->page_num;
                         menu_display_page(menu, win, curpage);
                     }
-                    menu_select_deselect(win, menu_item_ptr, INVERT);
+
                     if (how == PICK_ONE)
                     {
+                        menu_clear_selections(menu);
+                        menu_select_deselect(win, menu_item_ptr, SELECT);
                         num_selected = 1;
                         dismiss = TRUE;
                         break;
+                    }
+                    else
+                    {
+                        menu_select_deselect(win, menu_item_ptr, INVERT);
                     }
                 }
             }
@@ -1484,6 +1492,20 @@ static int menu_operation(WINDOW *win, nhmenu *menu, menu_op
     }
     
     return current_page;
+}
+
+
+/* Set all menu items to unselected in menu */
+
+static void menu_clear_selections(nhmenu *menu)
+{
+    nhmenu_item *menu_item_ptr = menu->entries;    
+
+    while (menu_item_ptr != NULL)    
+    {
+        menu_item_ptr->selected = FALSE;
+        menu_item_ptr = menu_item_ptr->next_item;
+    }
 }
 
 /* This is to get the color of a menu item if the menucolor patch is
