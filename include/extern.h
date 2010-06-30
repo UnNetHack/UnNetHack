@@ -494,6 +494,9 @@ E void FDECL(dump_list_item, (const char *));
 E void NDECL(dump_list_end);
 E void FDECL(dump_containerconts, (struct obj *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 E char* FDECL(html_escape_character, (const char));
+#ifdef DUMP_LOG
+E int NDECL(dump_screenshot);
+#endif
 
 /* ### dungeon.c ### */
 

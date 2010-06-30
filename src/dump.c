@@ -68,10 +68,12 @@ dump_exit()
 #ifdef DUMP_LOG
 	if (dump_fp) {
 		fclose(dump_fp);
+		dump_fp = NULL;
 	}
 	if (html_dump_fp) {
 		dump_html("</body>\n</html>\n","");
 		fclose(html_dump_fp);
+		html_dump_fp = NULL;
 	}
 #endif
 }
@@ -294,5 +296,27 @@ char* html_escape_character(const char c) {
 			return html_escape_buf;
 	}
 }
+
+#ifdef DUMP_LOG
+/** Screenshot of the HTML map. */
+int
+dump_screenshot()
+{
+	char screenshot[BUFSZ];
+	Sprintf(screenshot, "/tmp/screenshot_%s_%ld_t%ld.html", plname, u.ubirthday, moves);
+
+	html_dump_fp = fopen(screenshot, "w");
+	if (!html_dump_fp) {
+		pline("Can't open %s for output.", screenshot);
+		pline("Screenshot file not created.");
+	}
+
+	dump_header_html("Screenshot");
+	dump_screen();
+	dump_exit();
+
+	return 0;
+}
+#endif
 
 /*dump.c*/
