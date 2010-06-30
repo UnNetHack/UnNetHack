@@ -522,20 +522,19 @@ void curses_clear_nhwin(winid wid)
 {
     WINDOW *win = curses_get_nhwin(wid);
     boolean border = curses_window_has_border(wid);
-    
-    werase(win);
-    
+
     if (wid == MAP_WIN)
     {
+        clearok(win, TRUE); /* Redraw entire screen when refreshed */
         clear_map();
     }
-    
+
+    werase(win);
+
     if (border)
     {
         box(win, 0, 0);
     }
-    
-//    wrefresh(win);
 }
 
 
