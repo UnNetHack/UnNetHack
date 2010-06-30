@@ -2229,9 +2229,10 @@ use_weapon:
 		case AT_BITE:
 			/* [ALI] Vampires are also smart. They avoid biting
 			   monsters if doing so would be fatal */
-			if ((uwep || (u.twoweap && uswapwep)) &&
-				is_vampire(youmonst.data) &&
+			if (i > 0 && is_vampire(youmonst.data) &&
 				(is_rider(mon->data) ||
+				 touch_petrifies(mon->data) ||
+				 mon->data == &mons[PM_MEDUSA] ||
 				 mon->data == &mons[PM_GREEN_SLIME]))
 			    break;
 		case AT_KICK:
