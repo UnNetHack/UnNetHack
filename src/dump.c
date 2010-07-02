@@ -19,29 +19,35 @@ FILE *html_dump_fp = (FILE *)0;  /**< file pointer for html dumps */
  * - started/ended date at the top
  */
 
+static
+char*
+get_dump_filename()
+{
+  int new_dump_fn_len = strlen(dump_fn)+strlen(plname)+5; /* space for ".html" */
+  char *new_dump_fn = (char *) alloc((unsigned)(new_dump_fn_len+1));
+  char rplname[BUFSZ];
+  /* backwards compatibility, replace %n with %s */
+  char *p = (char *) strstr(dump_fn, "%n");
+  if (p) { *(p+1) = 's'; }
+
+  p = (char *) strstr(dump_fn, "%s");
+
+  if (p) {
+    /* replace %s with player name */
+    strcpy(rplname, plname);
+    regularize(rplname);
+    sprintf(new_dump_fn, dump_fn, plname);
+  } else {
+    strcpy(new_dump_fn, dump_fn);
+  }
+  return new_dump_fn;
+}
+
 void
 dump_init()
 {
   if (dump_fn[0]) {
-    int new_dump_fn_len = strlen(dump_fn)+strlen(plname)+5; /* space for ".html" */
-    char *new_dump_fn = (char *) alloc((unsigned)(new_dump_fn_len+1));
-    char *p = (char *) strstr(dump_fn, "%n");
-
-    if (p) {
-      char *q = new_dump_fn;
-      strncpy(q, dump_fn, p-dump_fn);
-      q += p-dump_fn;
-      strncpy(q, plname, strlen(plname) + 1);
-      regularize(q);
-      q[strlen(plname)] = '\0';
-      q += strlen(q);
-      p += 2;	/* skip "%n" */
-      strncpy(q, p, strlen(p));
-      q += strlen(p);
-      q[0] = '\0';
-    } else {
-      strcpy(new_dump_fn, dump_fn);
-    }
+    char *new_dump_fn = get_dump_filename();
 
 #ifdef DUMP_TEXT_LOG
     dump_fp = fopen(new_dump_fn, "w");
@@ -303,7 +309,9 @@ int
 dump_screenshot()
 {
 	char screenshot[BUFSZ];
-	Sprintf(screenshot, "/tmp/screenshot_%s_%ld_t%ld.html", plname, u.ubirthday, moves);
+	char *filename = get_dump_filename();
+	Sprintf(screenshot, "%s_screenshot_%ld_t%ld.html", filename, u.ubirthday, moves);
+	if (filename) free(filename);
 
 	html_dump_fp = fopen(screenshot, "w");
 	if (!html_dump_fp) {
