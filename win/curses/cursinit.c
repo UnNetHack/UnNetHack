@@ -1068,7 +1068,7 @@ void curses_init_options()
     
     if (!iflags.wc2_petattr)
     {
-        iflags.wc2_petattr = A_UNDERLINE;
+        iflags.wc2_petattr = A_REVERSE;
     }
     else    /* Pet attribute specified, so hilite_pet should be true */
     {
