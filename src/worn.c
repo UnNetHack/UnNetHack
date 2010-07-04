@@ -154,6 +154,8 @@ struct monst *mon;
 	mon->perminvis = 1;
 	if (!mon->invis_blkd) {
 	    mon->minvis = 1;
+	    if (mon->data == &mons[PM_GIANT_TURTLE])
+		unblock_point(mon->mx, mon->my);
 	    newsym(mon->mx, mon->my);		/* make it disappear */
 	    if (mon->wormno) see_wsegs(mon);	/* and any tail too */
 	}

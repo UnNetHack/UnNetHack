@@ -177,9 +177,10 @@ does_block(x,y,lev)
 
     /* Mimics mimicing a door or boulder block light. */
     if ((mon = m_at(x,y)) && (!mon->minvis || See_invisible) &&
+	((mon->data == &mons[PM_GIANT_TURTLE]) ||
 	  ((mon->m_ap_type == M_AP_FURNITURE &&
 	  (mon->mappearance == S_hcdoor || mon->mappearance == S_vcdoor)) ||
-	  (mon->m_ap_type == M_AP_OBJECT && mon->mappearance == BOULDER)))
+	   (mon->m_ap_type == M_AP_OBJECT && mon->mappearance == BOULDER))))
 	return 1;
 
     return 0;

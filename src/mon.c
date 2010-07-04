@@ -55,6 +55,18 @@ STATIC_DCL void FDECL(lifesaved_monster, (struct monst *, uchar));
 #else
 STATIC_DCL void FDECL(lifesaved_monster, (struct monst *));
 #endif
+void
+remove_monster(x,y)
+int x,y;
+{
+    if (level.monsters[x][y] &&
+	(level.monsters[x][y]->data == &mons[PM_GIANT_TURTLE] &&
+	 (!level.monsters[x][y]->minvis || See_invisible)))
+	unblock_point(x,y);
+    level.monsters[x][y] = (struct monst *)0;
+}
+
+
 /* convert the monster index of an undead to its living counterpart */
 int
 undead_to_corpse(mndx)

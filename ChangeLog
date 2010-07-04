@@ -37,6 +37,9 @@
 	  - pet stores (from Slash'Em)
 	  - tin shops (from Slash'Em)
 
+	* new monster:
+	  - giant turtle (blocks vision) (from SporkHack)
+
 
 2010-01-10  UnNetHack 3.5.2-1
 	Crash bugfix: Prevent alchemizing not existing potions
