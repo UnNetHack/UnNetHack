@@ -842,7 +842,7 @@ static boolean menu_is_multipage(nhmenu *menu, int width, int height)
             menu_item_ptr->num_lines = num_lines;
             curline += num_lines;
             menu_item_ptr = menu_item_ptr->next_item;
-            if (curline > height)
+            if (curline > (height - 2))
             {
                 break;
             }
