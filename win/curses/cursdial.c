@@ -842,7 +842,7 @@ static boolean menu_is_multipage(nhmenu *menu, int width, int height)
             menu_item_ptr->num_lines = num_lines;
             curline += num_lines;
             menu_item_ptr = menu_item_ptr->next_item;
-            if (curline > (height - 2))
+            if (curline > height)
             {
                 break;
             }
@@ -1190,7 +1190,7 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
             curletter = curses_convert_keys(curletter);
         }
         
-        if (isdigit(curletter))
+        if (isdigit(curletter) && (how != PICK_NONE))
         {
             count = curses_get_count(curletter - '0');
             touchwin(win);
