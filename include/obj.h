@@ -104,7 +104,7 @@ struct obj {
 #define fromsink  corpsenm	/* a potion from a sink */
 
 #ifdef RECORD_ACHIEVE
-#define record_achieve_special corpsenm
+	xchar record_achieve_special;
 #endif
 
 	unsigned oeaten;	/* nutrition left in food, if partly eaten */
