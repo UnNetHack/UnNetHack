@@ -76,6 +76,8 @@ static void menu_clear_selections(nhmenu *menu);
 
 static boolean get_menu_coloring(char *str, int *color, int *attr);
 
+static int menu_max_height(void);
+
 static nhmenu *nhmenus = NULL;  /* NetHack menu array */
 
 
@@ -842,7 +844,8 @@ static boolean menu_is_multipage(nhmenu *menu, int width, int height)
             menu_item_ptr->num_lines = num_lines;
             curline += num_lines;
             menu_item_ptr = menu_item_ptr->next_item;
-            if (curline > height)
+            if ((curline > height) || ((curline > height -2) &&
+             (height == menu_max_height())))
             {
                 break;
             }
@@ -929,7 +932,7 @@ static void menu_win_size(nhmenu *menu)
         maxwidth = (term_cols / 2); /* Half the screen */
     }
     
-    maxheight = term_rows - 2;
+    maxheight = menu_max_height();
     
     /* First, determine the width of the longest menu entry */
     while (menu_item_ptr != NULL)
@@ -1508,6 +1511,7 @@ static void menu_clear_selections(nhmenu *menu)
     }
 }
 
+
 /* This is to get the color of a menu item if the menucolor patch is
  applied */
 
@@ -1535,3 +1539,10 @@ static boolean get_menu_coloring(char *str, int *color, int *attr)
 }
 #endif /* MENU_COLOR */
 
+
+/* Get the maximum height for a menu */
+
+static int menu_max_height(void)
+{
+    return term_rows - 2;
+}
