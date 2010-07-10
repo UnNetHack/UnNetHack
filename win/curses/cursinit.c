@@ -1044,8 +1044,7 @@ void curses_init_options()
     resize_term(iflags.wc2_term_rows, iflags.wc2_term_cols);
     getmaxyx(base_term, term_rows, term_cols);
     
-    /* This is needed for an odd bug with PDCurses-SDL in Windows */
-# ifdef WIN32
+    /* This is needed for an odd bug with PDCurses-SDL */
     switch_graphics(ASCII_GRAPHICS);
     if (iflags.IBMgraphics)
     {
@@ -1059,7 +1058,6 @@ void curses_init_options()
     {
         switch_graphics(ASCII_GRAPHICS);
     }
-# endif /* WIN32 */
 #endif  /* PDCURSES */
     if (!iflags.wc2_windowborders)
     {
@@ -1074,6 +1072,13 @@ void curses_init_options()
     {
         iflags.hilite_pet = TRUE;
     }
+
+#ifdef NCURSES_MOUSE_VERSION
+    if (iflags.wc_mouse_support)
+    {
+    	mousemask(BUTTON1_CLICKED, NULL);
+    }
+#endif
 }
 
 

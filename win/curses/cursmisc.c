@@ -947,6 +947,8 @@ static int parse_escape_sequence(void)
     timeout(-1);
 
     return ret;
+#else
+    return '\033';
 #endif  /* !PDCURSES */
 }
 
