@@ -903,9 +903,10 @@ level_tele()
 			", and you gather up all your possessions" : "");
 		return;
 #ifdef WIZARD
-	    } else if (!wizard && newlev > 0) {
+	    /* allow only jump beyond the Dungeons of Doom branch */
+	    } else if (!wizard && newlev > 0 && u.uz.dnum != 0) {
 #else
-	    } else if (newlev > 0) {
+	    } else if (newlev > 0 && u.uz.dnum != 0) {
 #endif
 		/* random teleport for destination level outside of the current dungeon branch */
 		if (newlev > dungeons[u.uz.dnum].depth_start + dunlevs_in_dungeon(&u.uz)) {
