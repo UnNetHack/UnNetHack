@@ -910,7 +910,7 @@ level_tele()
 #endif
 		/* random teleport for destination level outside of the current dungeon branch */
 		if (newlev > dungeons[u.uz.dnum].depth_start + dunlevs_in_dungeon(&u.uz)) {
-			pline("Oops...");
+			You_feel("like bouncing off a solid wall!");
 			goto random_levtport;
 		}
 	    }
