@@ -2314,7 +2314,7 @@ boolean			youattack, allow_cancel_kill, self_cancel;
 		flags.botl = 1;	/* potential AC change */
 		find_ac();
 	    }
-	} else {
+	} else if (!(obj && (obj->oartifact == ART_MAGICBANE))) { /* Magicbane doesn't cancel inventory items */
 		/* select one random item to cancel */
 		struct obj *otmp;
 		int count = 0;
