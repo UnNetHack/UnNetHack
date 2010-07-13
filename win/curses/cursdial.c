@@ -1180,6 +1180,7 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
     int curpage = 1;
     int num_selected = 0;
     boolean dismiss = FALSE;
+    char search_key[BUFSZ];
     nhmenu_item *menu_item_ptr = menu->entries;
 
     menu_display_page(menu, win, 1);
@@ -1285,6 +1286,49 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
                     curpage = 1;
                     menu_display_page(menu, win, curpage);
                 }
+                break;
+            }
+            case MENU_SEARCH:
+            {
+                curses_line_input_dialog("Search for:", search_key,
+                 BUFSZ);
+        		
+                refresh();
+                touchwin(win);
+                wrefresh(win);
+                
+        		if (strlen(search_key) == 0)
+        		{
+        		    break;
+        		}
+        		
+                menu_item_ptr = menu->entries;
+
+                while (menu_item_ptr != NULL)
+                {
+                    if ((menu_item_ptr->identifier.a_void != NULL) &&
+                     (strstri(menu_item_ptr->str, search_key)))
+                    {
+                        if (how == PICK_ONE)
+                        {
+                            menu_clear_selections(menu);
+                            menu_select_deselect(win, menu_item_ptr,
+                             SELECT);
+                            num_selected = 1;
+                            dismiss = TRUE;
+                            break;
+                        }
+                        else
+                        {
+                            menu_select_deselect(win, menu_item_ptr,
+                             INVERT);
+                        }
+                    }
+
+                    menu_item_ptr = menu_item_ptr->next_item;
+                }
+
+                menu_item_ptr = menu->entries;
                 break;
             }
             default:
