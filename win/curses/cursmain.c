@@ -588,8 +588,8 @@ int curses_nh_poskey(int *x, int *y, int *mod)
                     *y = event.y;
                     if (curses_window_has_border(MAP_WIN))
                     {
-                        *x--;
-                        *y--;
+                        (*x)--;
+                        (*y)--;
                     }
                     *mod = CLICK_1;
                 }
