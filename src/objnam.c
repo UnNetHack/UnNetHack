@@ -2525,15 +2525,6 @@ typfnd:
 	    )
 	    return((struct obj *)0);
 
-	/* convert magic lamps to regular lamps before lighting them or setting
-	   the charges */
-	if (typ == MAGIC_LAMP
-#ifdef WIZARD
-				&& !wizard
-#endif
-						)
-	    typ = OIL_LAMP;
-
 	if(typ) {
 		otmp = mksobj(typ, TRUE, FALSE);
 	} else {

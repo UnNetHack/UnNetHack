@@ -1381,10 +1381,7 @@ poly_obj(obj, id)
 	switch (otmp->oclass) {
 
 	case TOOL_CLASS:
-	    if (otmp->otyp == MAGIC_LAMP) {
-		otmp->otyp = OIL_LAMP;
-		otmp->age = 1500L;	/* "best" oil lamp possible */
-	    } else if (otmp->otyp == MAGIC_MARKER) {
+	    if (otmp->otyp == MAGIC_MARKER) {
 		otmp->recharged = 1;	/* degraded quality */
 	    }
 	    /* don't care about the recharge count of other tools */
