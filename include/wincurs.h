@@ -35,8 +35,11 @@ boolean counting;   /* Count window is active */
 #endif	/* !__APPLE__ && !PDCURSES */
 #define CURSES_DARK_GRAY    17
 #define MAP_SCROLLBARS
-#ifndef NCURSES_MOUSE_VERSION
-# define NCURSES_MOUSE_VERSION
+#ifdef PDCURSES
+# define getmouse nc_getmouse
+# ifndef NCURSES_MOUSE_VERSION
+#  define NCURSES_MOUSE_VERSION
+# endif
 #endif
 
 
@@ -220,6 +223,8 @@ extern int curses_convert_attr(int attr);
 extern int curses_read_attrs(char *attrs);
 
 extern int curses_convert_keys(int key);
+
+extern int curses_get_mouse(int *mousex, int *mousey, int *mod);
 
 /* cursdial.c */
 

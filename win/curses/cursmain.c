@@ -568,33 +568,12 @@ int nh_poskey(int *x, int *y, int *mod)
 int curses_nh_poskey(int *x, int *y, int *mod)
 {
     int key = curses_nhgetch();
+    
 #ifdef NCURSES_MOUSE_VERSION
-	MEVENT event;
-
     /* Mouse event if mouse_support is true */
     if (key == KEY_MOUSE)
     {
-        key = '\033';   /* NetHack doesn't understand KEY_MOUSE */
-        
-        if (getmouse(&event) == OK)
-        {   /* When the user clicks left mouse button */
-            if(event.bstate & BUTTON1_CLICKED)
-            {
-                /* See if coords are in map window & convert coords */
-                if (wmouse_trafo(mapwin, &event.y, &event.x, TRUE))
-                {
-                    key = 0;    /* Flag mouse click */
-                    *x = event.x;
-                    *y = event.y;
-                    if (curses_window_has_border(MAP_WIN))
-                    {
-                        (*x)--;
-                        (*y)--;
-                    }
-                    *mod = CLICK_1;
-                }
-            }
-        }
+        key = curses_get_mouse(x, y, mod);
     }
 #endif
 

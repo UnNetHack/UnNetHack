@@ -1384,11 +1384,10 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
         {
             if (menu_item_ptr->identifier.a_void != NULL)
             {
-                if (((curletter == menu_item_ptr->accelerator) ||
-                 (menu_item_ptr->group_accel && 
-                 (curletter == menu_item_ptr->group_accel))) &&
+                if (((curletter == menu_item_ptr->accelerator) &&
                  ((curpage == menu_item_ptr->page_num) ||
-                 !menu->reuse_accels))
+                 (!menu->reuse_accels))) || ((menu_item_ptr->group_accel)
+                 && (curletter == menu_item_ptr->group_accel)))
                 {
                     if (curpage != menu_item_ptr->page_num)
                     {
