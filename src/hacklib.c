@@ -513,13 +513,8 @@ setrandom()
 static struct tm *
 getlt()
 {
-	time_t date;
+	time_t date = current_epoch();
 
-#if defined(BSD) && !defined(POSIX_TYPES)
-	(void) time((long *)(&date));
-#else
-	(void) time(&date);
-#endif
 #if (defined(ULTRIX) && !(defined(ULTRIX_PROTO) || defined(NHSTDC))) || (defined(BSD) && !defined(POSIX_TYPES))
 	return(localtime((long *)(&date)));
 #else
@@ -682,6 +677,20 @@ iso8601(date)
 time_t date;
 {
 	return get_formatted_time(date, "%Y-%m-%dT%H:%M:%S%z");
+}
+
+/** Returns epoch time. */
+time_t
+current_epoch()
+{
+	time_t date;
+
+#if defined(BSD) && !defined(POSIX_TYPES)
+	(void) time((long *)(&date));
+#else
+	(void) time(&date);
+#endif
+	return date;
 }
 
 /*hacklib.c*/

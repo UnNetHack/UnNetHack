@@ -817,6 +817,7 @@ E int NDECL(midnight);
 E boolean NDECL(piday);
 E char *FDECL(iso8601, (time_t));
 E char *FDECL(get_formatted_time, (time_t, const char *));
+E time_t NDECL(current_epoch);
 
 /* ### invent.c ### */
 

@@ -91,6 +91,7 @@ char *livelog_prefix() {
 	snprintf(prefixbuf, STRBUF_LEN,
 			"version=%s-%d.%d.%d:"
 			"player=%s:turns=%ld:starttime=%ld:"
+			"currenttime=%ld:"
 			"dnum=%d:dlev=%d:maxlvl=%d:"
 			"hp=%d:maxhp=%d:deaths=%d:"
 #ifdef RECORD_REALTIME
@@ -104,6 +105,7 @@ char *livelog_prefix() {
 			plname,
 			moves,
 			(long)u.ubirthday,
+			(long)current_epoch(),
 			u.uz.dnum, depth(&u.uz), deepest_lev_reached(TRUE),
 			u.uhp, u.uhpmax, u.umortality,
 #ifdef RECORD_REALTIME
