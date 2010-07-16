@@ -5,6 +5,12 @@
 
 #ifdef LIVELOGFILE
 
+#ifdef SHORT_FILENAMES
+#include "patchlev.h"
+#else
+#include "patchlevel.h"
+#endif
+
 /* Encodes the current xlog "achieve" status to an integer */
 long
 encodeachieve(void)
@@ -51,6 +57,7 @@ long last_achieve_int;
 /* Generic buffer for snprintf */
 #define STRBUF_LEN (4096)
 char strbuf[STRBUF_LEN];
+char prefixbuf[STRBUF_LEN];
 
 /* Open the live log file */
 boolean livelog_start() {
@@ -75,6 +82,40 @@ void livelog_write_string(char* buffer) {
 	}
 }
 
+/** Returns
+ role, race, gender
+currenttime
+*/
+static
+char *livelog_prefix() {
+	snprintf(prefixbuf, STRBUF_LEN,
+			"version=%s-%d.%d.%d:"
+			"player=%s:turns=%ld:starttime=%ld:"
+			"dnum=%d:dlev=%d:maxlvl=%d:"
+			"hp=%d:maxhp=%d:deaths=%d:"
+#ifdef RECORD_REALTIME
+			"realtime=%ld:"
+#endif
+			"conduct=0x%lx:"
+			"role=%s:race=%s:"
+			"gender=%s:align=%s:"
+			"gender0=%s:align0=%s",
+			GAME_SHORT_NAME, VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
+			plname,
+			moves,
+			(long)u.ubirthday,
+			u.uz.dnum, depth(&u.uz), deepest_lev_reached(TRUE),
+			u.uhp, u.uhpmax, u.umortality,
+#ifdef RECORD_REALTIME
+			(long)realtime_data.realtime,
+#endif
+			encodeconduct(),
+			urole.filecode, urace.filecode,
+			genders[flags.female].filecode, aligns[1-u.ualign.type].filecode,
+			genders[flags.initgend].filecode, aligns[1-u.ualignbase[A_ORIGINAL]].filecode);
+	return prefixbuf;
+}
+
 /* Writes changes in the achieve structure to the live log.
  * Called from various places in the NetHack source,
  * usually where xlog's achieve is set. */
@@ -91,10 +132,8 @@ void livelog_achieve_update() {
 	}
 
 	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:starttime=%ld:achieve=0x%lx:achieve_diff=0x%lx\n",
-		plname, 
-		moves, 
-		(long)u.ubirthday,
+		"%s:achieve=0x%lx:achieve_diff=0x%lx\n",
+		livelog_prefix(),
 		achieve_int,
 		achieve_diff);
 	livelog_write_string(strbuf);
@@ -108,10 +147,8 @@ livelog_wish(item)
 char *item;
 {
 	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:starttime=%ld:wish=%s:wish_count=%ld\n",
-		plname,
-		moves,
-		(long)u.ubirthday,
+		"%s:wish=%s:wish_count=%ld\n",
+		livelog_prefix(),
 		item,
 		u.uconduct.wishes);
 	livelog_write_string(strbuf);
@@ -155,12 +192,8 @@ struct monst *mtmp;
 		/* $player killed the $bones_monst of $bones_killed the former
 		 * $bones_rank on $turns on dungeon level $dlev! */
 		snprintf(strbuf, STRBUF_LEN,
-				"player=%s:turns=%ld:starttime=%ld:dlev=%d:"
-				"bones_killed=%s:bones_rank=%s:bones_monst=%s\n",
-				plname,
-				moves,
-				(long)u.ubirthday,
-				depth(&u.uz),
+				"%s:bones_killed=%s:bones_rank=%s:bones_monst=%s\n",
+				livelog_prefix(),
 				name,
 				mtmp->former_rank,
 				mtmp->data->mname);
@@ -188,10 +221,8 @@ long total;
 	   shop:       Name of the shop (e.g. general store)
 	   shoplifted: Merchandise worth this many Zorkmids was stolen */
 	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:starttime=%ld:shopkeeper=%s:shop=%s:shoplifted=%ld\n",
-		plname,
-		moves,
-		(long)u.ubirthday,
+		"%s:shopkeeper=%s:shop=%s:shoplifted=%ld\n",
+		livelog_prefix(),
 		shk_name,
 		shop_name,
 		total);
@@ -225,10 +256,8 @@ livelog_game_action(verb)
 const char* verb;
 {
 	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:starttime=%ld:game_action=%s\n",
-		plname,
-		moves,
-		(long)u.ubirthday,
+		"%s:game_action=%s\n",
+		livelog_prefix(),
 		verb);
 	livelog_write_string(strbuf);
 }
@@ -240,10 +269,8 @@ const char* field;
 const char* text;
 {
 	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:starttime=%ld:%s=%s\n",
-		plname,
-		moves,
-		(long)u.ubirthday,
+		"%s:%s=%s\n",
+		livelog_prefix(),
 		field,
 		text);
 	livelog_write_string(strbuf);
