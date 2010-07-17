@@ -240,11 +240,8 @@ const char* race;
 const char* role;
 {
 	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:starttime=%ld:game_action=%s:"
-		"alignment=%s:race=%s:role=%s\n",
-		plname,
-		moves,
-		(long)u.ubirthday,
+		"%s:game_action=%s:character=%s %s %s\n",
+		livelog_prefix(),
 		verb,
 		alignment_sex,
 		race,
