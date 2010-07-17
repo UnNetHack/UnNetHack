@@ -111,6 +111,7 @@ static struct Bool_Opt
 	{"guicolor", &iflags.wc2_guicolor, TRUE, SET_IN_GAME},
 	{"help", &flags.help, TRUE, SET_IN_GAME},
 	{"hilite_pet",    &iflags.wc_hilite_pet, TRUE, SET_IN_GAME},	/*WC*/
+	{"hitpointbar", &flags.hitpointbar, FALSE, SET_IN_GAME},
 #ifdef ASCIIGRAPH
 	{"IBMgraphics", &iflags.IBMgraphics, FALSE, SET_IN_GAME},
 #else
