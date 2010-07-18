@@ -351,10 +351,7 @@ cutworm(worm, x, y, weap)
     int wnum = worm->wormno;
     int cut_chance, new_wnum;
 
-    if (!wnum) {
-	warning("cutworm: worm->wormno was 0");
-	return;
-    }
+    if (!wnum) return; /* no worm */
 
     if (x == worm->mx && y == worm->my) return;		/* hit on head */
 
