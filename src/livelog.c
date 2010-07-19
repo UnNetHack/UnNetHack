@@ -100,7 +100,8 @@ char *livelog_prefix() {
 			"conduct=0x%lx:"
 			"role=%s:race=%s:"
 			"gender=%s:align=%s:"
-			"gender0=%s:align0=%s",
+			"gender0=%s:align0=%s:"
+			"explvl=%d:exp=%ld",
 			GAME_SHORT_NAME, VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
 			plname,
 			moves,
@@ -114,7 +115,8 @@ char *livelog_prefix() {
 			encodeconduct(),
 			urole.filecode, urace.filecode,
 			genders[flags.female].filecode, aligns[1-u.ualign.type].filecode,
-			genders[flags.initgend].filecode, aligns[1-u.ualignbase[A_ORIGINAL]].filecode);
+			genders[flags.initgend].filecode, aligns[1-u.ualignbase[A_ORIGINAL]].filecode,
+			u.ulevel,u.uexp);
 	return prefixbuf;
 }
 
