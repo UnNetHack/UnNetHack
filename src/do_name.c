@@ -147,6 +147,7 @@ const char *goal;
 				/* uninteresting background glyph */
 				if (glyph_is_cmap(k) &&
 				    (IS_DOOR(levl[tx][ty].typ) || /* monsters mimicking a door */
+				     glyph_to_cmap(k) == S_darkroom ||
 				     glyph_to_cmap(k) == S_room ||
 				     glyph_to_cmap(k) == S_corr ||
 				     glyph_to_cmap(k) == S_litcorr)) {
