@@ -275,6 +275,9 @@ bot1()
 #endif
 	char *nb;
 	int i=0,j;
+#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
+	int save_botlx = flags.botlx;
+#endif
 
 	Strcpy(newbot1, "");
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
