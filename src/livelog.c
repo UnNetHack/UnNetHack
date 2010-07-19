@@ -134,7 +134,7 @@ void livelog_achieve_update() {
 	}
 
 	snprintf(strbuf, STRBUF_LEN,
-		"%s:achieve=0x%lx:achieve_diff=0x%lx\n",
+		"%s:type=achievements:achieve=0x%lx:achieve_diff=0x%lx\n",
 		livelog_prefix(),
 		achieve_int,
 		achieve_diff);
@@ -149,7 +149,7 @@ livelog_wish(item)
 char *item;
 {
 	snprintf(strbuf, STRBUF_LEN,
-		"%s:wish=%s:wish_count=%ld\n",
+		"%s:type=wish:wish=%s:wish_count=%ld\n",
 		livelog_prefix(),
 		item,
 		u.uconduct.wishes);
@@ -194,7 +194,7 @@ struct monst *mtmp;
 		/* $player killed the $bones_monst of $bones_killed the former
 		 * $bones_rank on $turns on dungeon level $dlev! */
 		snprintf(strbuf, STRBUF_LEN,
-				"%s:bones_killed=%s:bones_rank=%s:bones_monst=%s\n",
+				"%s:type=bones_killed:bones_killed=%s:bones_rank=%s:bones_monst=%s\n",
 				livelog_prefix(),
 				name,
 				mtmp->former_rank,
@@ -223,7 +223,7 @@ long total;
 	   shop:       Name of the shop (e.g. general store)
 	   shoplifted: Merchandise worth this many Zorkmids was stolen */
 	snprintf(strbuf, STRBUF_LEN,
-		"%s:shopkeeper=%s:shop=%s:shoplifted=%ld\n",
+		"%s:type=shoplifting:shopkeeper=%s:shop=%s:shoplifted=%ld\n",
 		livelog_prefix(),
 		shk_name,
 		shop_name,
@@ -268,8 +268,9 @@ const char* field;
 const char* text;
 {
 	snprintf(strbuf, STRBUF_LEN,
-		"%s:%s=%s\n",
+		"%s:type=%s:%s=%s\n",
 		livelog_prefix(),
+		field,
 		field,
 		text);
 	livelog_write_string(strbuf);
