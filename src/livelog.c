@@ -82,17 +82,15 @@ void livelog_write_string(char* buffer) {
 	}
 }
 
-/** Returns
- role, race, gender
-currenttime
-*/
 static
 char *livelog_prefix() {
+	s_level *lev = Is_special(&u.uz);
 	snprintf(prefixbuf, STRBUF_LEN,
 			"version=%s-%d.%d.%d:"
 			"player=%s:turns=%ld:starttime=%ld:"
 			"currenttime=%ld:"
 			"dnum=%d:dlev=%d:maxlvl=%d:"
+			"dlev_name=%s:"
 			"hp=%d:maxhp=%d:deaths=%d:"
 #ifdef RECORD_REALTIME
 			"realtime=%ld:"
@@ -108,6 +106,7 @@ char *livelog_prefix() {
 			(long)u.ubirthday,
 			(long)current_epoch(),
 			u.uz.dnum, depth(&u.uz), deepest_lev_reached(TRUE),
+			lev ? lev->proto : "", /* proto level name if special level */
 			u.uhp, u.uhpmax, u.umortality,
 #ifdef RECORD_REALTIME
 			(long)realtime_data.realtime,
