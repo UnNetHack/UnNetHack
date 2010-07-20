@@ -567,7 +567,17 @@ int nh_poskey(int *x, int *y, int *mod)
 */
 int curses_nh_poskey(int *x, int *y, int *mod)
 {
-    return curses_nhgetch();
+    int key = curses_nhgetch();
+    
+#ifdef NCURSES_MOUSE_VERSION
+    /* Mouse event if mouse_support is true */
+    if (key == KEY_MOUSE)
+    {
+        key = curses_get_mouse(x, y, mod);
+    }
+#endif
+
+    return key;
 }
 
 /*

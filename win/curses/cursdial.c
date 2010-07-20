@@ -76,6 +76,8 @@ static void menu_clear_selections(nhmenu *menu);
 
 static boolean get_menu_coloring(char *str, int *color, int *attr);
 
+static int menu_max_height(void);
+
 static nhmenu *nhmenus = NULL;  /* NetHack menu array */
 
 
@@ -842,7 +844,8 @@ static boolean menu_is_multipage(nhmenu *menu, int width, int height)
             menu_item_ptr->num_lines = num_lines;
             curline += num_lines;
             menu_item_ptr = menu_item_ptr->next_item;
-            if (curline > height)
+            if ((curline > height) || ((curline > height -2) &&
+             (height == menu_max_height())))
             {
                 break;
             }
@@ -929,7 +932,7 @@ static void menu_win_size(nhmenu *menu)
         maxwidth = (term_cols / 2); /* Half the screen */
     }
     
-    maxheight = term_rows - 2;
+    maxheight = menu_max_height();
     
     /* First, determine the width of the longest menu entry */
     while (menu_item_ptr != NULL)
@@ -1177,6 +1180,7 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
     int curpage = 1;
     int num_selected = 0;
     boolean dismiss = FALSE;
+    char search_key[BUFSZ];
     nhmenu_item *menu_item_ptr = menu->entries;
 
     menu_display_page(menu, win, 1);
@@ -1190,7 +1194,7 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
             curletter = curses_convert_keys(curletter);
         }
         
-        if (isdigit(curletter))
+        if (isdigit(curletter) && (how != PICK_NONE))
         {
             count = curses_get_count(curletter - '0');
             touchwin(win);
@@ -1284,6 +1288,49 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
                 }
                 break;
             }
+            case MENU_SEARCH:
+            {
+                curses_line_input_dialog("Search for:", search_key,
+                 BUFSZ);
+        		
+                refresh();
+                touchwin(win);
+                wrefresh(win);
+                
+        		if (strlen(search_key) == 0)
+        		{
+        		    break;
+        		}
+        		
+                menu_item_ptr = menu->entries;
+
+                while (menu_item_ptr != NULL)
+                {
+                    if ((menu_item_ptr->identifier.a_void != NULL) &&
+                     (strstri(menu_item_ptr->str, search_key)))
+                    {
+                        if (how == PICK_ONE)
+                        {
+                            menu_clear_selections(menu);
+                            menu_select_deselect(win, menu_item_ptr,
+                             SELECT);
+                            num_selected = 1;
+                            dismiss = TRUE;
+                            break;
+                        }
+                        else
+                        {
+                            menu_select_deselect(win, menu_item_ptr,
+                             INVERT);
+                        }
+                    }
+
+                    menu_item_ptr = menu_item_ptr->next_item;
+                }
+
+                menu_item_ptr = menu->entries;
+                break;
+            }
             default:
             {
                 if (how==PICK_NONE)
@@ -1337,11 +1384,10 @@ static int menu_get_selections(WINDOW *win, nhmenu *menu, int how)
         {
             if (menu_item_ptr->identifier.a_void != NULL)
             {
-                if (((curletter == menu_item_ptr->accelerator) ||
-                 (menu_item_ptr->group_accel && 
-                 (curletter == menu_item_ptr->group_accel))) &&
+                if (((curletter == menu_item_ptr->accelerator) &&
                  ((curpage == menu_item_ptr->page_num) ||
-                 !menu->reuse_accels))
+                 (!menu->reuse_accels))) || ((menu_item_ptr->group_accel)
+                 && (curletter == menu_item_ptr->group_accel)))
                 {
                     if (curpage != menu_item_ptr->page_num)
                     {
@@ -1508,6 +1554,7 @@ static void menu_clear_selections(nhmenu *menu)
     }
 }
 
+
 /* This is to get the color of a menu item if the menucolor patch is
  applied */
 
@@ -1535,3 +1582,10 @@ static boolean get_menu_coloring(char *str, int *color, int *attr)
 }
 #endif /* MENU_COLOR */
 
+
+/* Get the maximum height for a menu */
+
+static int menu_max_height(void)
+{
+    return term_rows - 2;
+}
