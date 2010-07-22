@@ -6,6 +6,10 @@
 #include "date.h"
 
 #ifdef DUMP_LOG
+
+# ifdef HAVE_UTIME_H
+#  include <utime.h>
+# endif
 extern char msgs[][BUFSZ];
 extern int lastmsg;
 void FDECL(do_vanquished, (int, BOOLEAN_P));
@@ -13,7 +17,9 @@ void FDECL(do_vanquished, (int, BOOLEAN_P));
 
 #ifdef DUMP_LOG
 FILE *dump_fp = (FILE *)0;  /**< file pointer for text dumps */
+char dump_path[BUFSIZ];
 FILE *html_dump_fp = (FILE *)0;  /**< file pointer for html dumps */
+char html_dump_path[BUFSIZ];
 /* TODO:
  * - escape unmasked characters in html (done for map)
  * - started/ended date at the top
@@ -50,6 +56,7 @@ dump_init()
     char *new_dump_fn = get_dump_filename();
 
 #ifdef DUMP_TEXT_LOG
+    strncpy(dump_path, new_dump_fn, BUFSIZ-1);
     dump_fp = fopen(new_dump_fn, "w");
     if (!dump_fp) {
 	pline("Can't open %s for output.", new_dump_fn);
@@ -57,7 +64,8 @@ dump_init()
     }
 #endif
 #ifdef DUMP_HTML_LOG
-    html_dump_fp = fopen(strcat(new_dump_fn, ".html"), "w");
+    strncpy(html_dump_path, strcat(new_dump_fn, ".html"), BUFSIZ-1);
+    html_dump_fp = fopen(html_dump_path, "w");
     if (!html_dump_fp) {
 	pline("Can't open %s for output.", new_dump_fn);
 	pline("Html dump file not created.");
@@ -68,6 +76,21 @@ dump_init()
 }
 #endif
 
+static void
+adjust_file_timestamp(fpath)
+const char* fpath;
+{
+# ifdef HAVE_UTIME_H
+	if (u.udeathday > 0) {
+		struct utimbuf tv;
+		tv.actime = u.udeathday;
+		tv.modtime = u.udeathday;
+		if (utime(fpath, &tv)) {
+			paniclog("adjust_file_timestamp: utime failed: ", strerror(errno));
+		}
+	}
+# endif
+}
 void
 dump_exit()
 {
@@ -75,11 +98,13 @@ dump_exit()
 	if (dump_fp) {
 		fclose(dump_fp);
 		dump_fp = NULL;
+		adjust_file_timestamp(dump_path);
 	}
 	if (html_dump_fp) {
 		dump_html("</body>\n</html>\n","");
 		fclose(html_dump_fp);
 		html_dump_fp = NULL;
+		adjust_file_timestamp(html_dump_path);
 	}
 #endif
 }
