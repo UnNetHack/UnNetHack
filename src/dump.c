@@ -76,6 +76,8 @@ dump_init()
 }
 #endif
 
+#ifdef DUMP_LOG
+/** Set a file's access and modify time to u.udeathday. */
 static void
 adjust_file_timestamp(fpath)
 const char* fpath;
@@ -91,6 +93,8 @@ const char* fpath;
 	}
 # endif
 }
+#endif
+
 void
 dump_exit()
 {
@@ -263,11 +267,13 @@ dump_blockquote_end()
 #endif
 }
 
+#ifdef DUMP_HTML_CSS_FILE
+# ifdef DUMP_HTML_CSS_EMBEDDED
 static
 void
 dump_html_css_file(const char *filename)
 {
-#ifdef DUMP_HTML_LOG
+#  ifdef DUMP_HTML_LOG
 	FILE *css = fopen(filename, "r");
 	if (!css) {
 		pline("Can't open %s for input.", filename);
@@ -279,8 +285,10 @@ dump_html_css_file(const char *filename)
 		}
 		fclose(css);
 	}
-#endif
+#  endif
 }
+# endif
+#endif
 
 
 /** Dumps the HTML header. */
