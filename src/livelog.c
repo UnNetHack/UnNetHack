@@ -279,4 +279,18 @@ const char* text;
 	livelog_write_string(strbuf);
 }
 
+/** Livelog method for reporting monster genocides. */
+void
+livelog_genocide(genocided_monster, level_wide)
+const char* genocided_monster;
+int level_wide;
+{
+	snprintf(strbuf, STRBUF_LEN,
+		"%s:type=genocide:genocided_monster=%s:dungeon_wide=%s\n",
+		livelog_prefix(),
+		genocided_monster,
+		level_wide ? "no" : "yes");
+	livelog_write_string(strbuf);
+}
+
 #endif /* LIVELOGFILE */

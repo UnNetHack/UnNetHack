@@ -2525,6 +2525,7 @@ E void FDECL(livelog_shoplifting, (const char*, const char*, long));
 E void FDECL(livelog_game_started, (const char*, const char*, const char*, const char*));
 E void FDECL(livelog_game_action, (const char*));
 E void FDECL(livelog_generic, (const char*, const char*));
+E void FDECL(livelog_genocide, (const char*, int));
 
 #endif /* !MAKEDEFS_C && !LEV_LEX_C */
 
