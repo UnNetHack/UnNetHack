@@ -472,12 +472,26 @@ can_twoweapon()
 
 #define NOT_WEAPON(obj) (!is_weptool(obj) && obj->oclass != WEAPON_CLASS)
 	if (!could_twoweap(youmonst.data)) {
-		if (Upolyd)
+		if (cantwield(youmonst.data))
+			pline("Don't be ridiculous!");
+		else if (Upolyd)
 		    You_cant("use two weapons in your current form.");
-		else
-		    pline("%s aren't able to use two weapons at once.",
-			  makeplural((flags.female && urole.name.f) ?
-				     urole.name.f : urole.name.m));
+		else {
+			char buf[BUFSZ];
+			boolean disallowed_by_role = P_MAX_SKILL(P_TWO_WEAPON_COMBAT) < P_BASIC;
+			boolean disallowed_by_race = youmonst.data->mattk[1].aatyp != AT_WEAP;
+			*buf = '\0';
+			if (!disallowed_by_role)
+				Strcpy(buf, disallowed_by_race ? urace.noun : urace.adj);
+			if (disallowed_by_role || !disallowed_by_race) {
+				if (!disallowed_by_role)
+					Strcat(buf, " ");
+				Strcat(buf, (flags.female && urole.name.f) ?
+						urole.name.f : urole.name.m);
+			}
+			pline("%s aren't able to use two weapons at once.",
+					makeplural(upstart(buf)));
+		}
 	} else if (!uwep || !uswapwep)
 		Your("%s%s%s empty.", uwep ? "left " : uswapwep ? "right " : "",
 			body_part(HAND), (!uwep && !uswapwep) ? "s are" : " is");
