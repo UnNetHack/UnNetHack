@@ -42,8 +42,11 @@ init_uasmon()
 	upermonst.mflags3 |= (mons[urace.malenum].mflags3);
 	
 	/* Fix up the attacks */
-	for(i = 0; i < NATTK; i++) {
+	/* crude workaround, needs better general solution */
+	if (Race_if(PM_VAMPIRE)) {
+	  for(i = 0; i < NATTK; i++) {
 	    upermonst.mattk[i] = mons[urace.malenum].mattk[i];
+	  }
 	}
 	
 	set_uasmon();

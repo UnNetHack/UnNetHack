@@ -959,6 +959,10 @@ int enhance_skill(boolean want_dump)
 	  for (pass = 0; pass < SIZE(skill_ranges); pass++)
 	    for (i = skill_ranges[pass].first;
 		 i <= skill_ranges[pass].last; i++) {
+		if (i == P_TWO_WEAPON_COMBAT &&
+			!could_twoweap(youmonst.data)) {
+		    continue;
+		}
 		/* Print headings for skill types */
 		any.a_void = 0;
 		if (i == skill_ranges[pass].first) {
