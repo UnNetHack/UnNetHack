@@ -1,0 +1,54 @@
+
+# /
+/Makefile
+/config.log
+/config.status
+
+# /dat/
+/dat/Makefile
+/dat/*.lev
+/dat/data
+/dat/dungeon.pdf
+/dat/dungeon
+/dat/nhdat
+/dat/options
+/dat/oracles
+/dat/quest.dat
+/dat/quest_levs
+/dat/rumors
+/dat/spec_levs
+
+# /doc/
+/doc/Makefile
+
+# /include/
+/include/autoconf.h
+/include/date.h
+/include/dgn_comp.h
+/include/lev_comp.h
+/include/onames.h
+/include/pm.h
+/include/vis_tab.h
+/include/win32api.h
+
+# /src/
+/src/*.o
+/src/unnethack
+/src/Makefile
+/src/Sysunix
+/src/config.h-t
+/src/hack.h-t
+/src/vis_tab.c
+
+# /util/
+/util/*.o
+/util/Makefile
+/util/dgn_comp
+/util/dgn_lex.c
+/util/dgn_yacc.c
+/util/dlb
+/util/lev_comp
+/util/lev_lex.c
+/util/lev_yacc.c
+/util/makedefs
+/util/recover
