@@ -20,6 +20,7 @@
 
 # /doc/
 /doc/Makefile
+/doc/Guidebook.txt
 
 # /include/
 /include/autoconf.h
@@ -39,6 +40,7 @@
 /src/config.h-t
 /src/hack.h-t
 /src/vis_tab.c
+/src/monstr.c
 
 # /util/
 /util/*.o
