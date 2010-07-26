@@ -1298,6 +1298,7 @@ int want_disp;
 	    putstr(klwin, 0, "");
 	}
 	dump_title(buf);
+	dump_list_start();
 
 	    for (i = LOW_PM; i < NUMMONS; i++)
 #ifdef SHOW_EXTINCT
@@ -1316,8 +1317,9 @@ int want_disp;
 			Strcat(buf, " (extinct)");
 #endif
 		    if (klwin) putstr(klwin, 0, buf);
-		    dump("  ", buf);
+		    dump_list_item(buf);
 		}
+	    dump_list_end();
 
 	    if (klwin) putstr(klwin, 0, "");
 #ifdef SHOW_EXTINCT
@@ -1325,13 +1327,13 @@ int want_disp;
 #endif
 	    Sprintf(buf, "%d species genocided.", ngenocided);
 	    if (klwin) putstr(klwin, 0, buf);
-	    dump("  ", buf);
+	    dump_line("  ", buf);
 #ifdef SHOW_EXTINCT
 	    }
 	    if (nextincted>0) {
 	      Sprintf(buf, "%d species extinct.", nextincted);
 	      if (klwin) putstr(klwin, 0, buf);
-	      dump(" ", buf);
+	      dump_line("  ", buf);
 	    }
 #endif /* SHOW_EXTINCT */
 	    dump("", "");
