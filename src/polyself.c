@@ -60,6 +60,18 @@ set_uasmon()
 					&upermonst : &mons[u.umonnum]), 0);
 }
 
+/** Returns true if the player monster is genocided. */
+boolean
+is_playermon_genocided()
+{
+	return ((mvitals[urole.malenum].mvflags & G_GENOD) ||
+			(urole.femalenum != NON_PM &&
+			(mvitals[urole.femalenum].mvflags & G_GENOD)) ||
+			(mvitals[urace.malenum].mvflags & G_GENOD) ||
+			(urace.femalenum != NON_PM &&
+			(mvitals[urace.femalenum].mvflags & G_GENOD)));
+}
+
 /* make a (new) human out of the player */
 STATIC_OVL void
 polyman(fmt, arg)
@@ -94,12 +106,7 @@ const char *fmt, *arg;
 
 	You(fmt, arg);
 	/* check whether player foolishly genocided self while poly'd */
-	if ((mvitals[urole.malenum].mvflags & G_GENOD) ||
-			(urole.femalenum != NON_PM &&
-			(mvitals[urole.femalenum].mvflags & G_GENOD)) ||
-			(mvitals[urace.malenum].mvflags & G_GENOD) ||
-			(urace.femalenum != NON_PM &&
-			(mvitals[urace.femalenum].mvflags & G_GENOD))) {
+	if (is_playermon_genocided()) {
 	    /* intervening activity might have clobbered genocide info */
 	    killer = delayed_killer;
 	    if (!killer || !strstri(killer, "genocid")) {

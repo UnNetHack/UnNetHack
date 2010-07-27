@@ -1918,6 +1918,7 @@ boolean only_on_level; /**< if TRUE only genocide monsters on current level,
 
 	if (killplayer) {
 		/* might need to wipe out dual role */
+		if (!only_on_level) {
 		if (urole.femalenum != NON_PM && mndx == urole.malenum)
 		    mvitals[urole.femalenum].mvflags |= (G_GENOD | G_NOCORPSE);
 		if (urole.femalenum != NON_PM && mndx == urole.femalenum)
@@ -1926,6 +1927,7 @@ boolean only_on_level; /**< if TRUE only genocide monsters on current level,
 		    mvitals[urace.femalenum].mvflags |= (G_GENOD | G_NOCORPSE);
 		if (urace.femalenum != NON_PM && mndx == urace.femalenum)
 		    mvitals[urace.malenum].mvflags |= (G_GENOD | G_NOCORPSE);
+		}
 
 		u.uhp = -1;
 		if (how & PLAYER) {
