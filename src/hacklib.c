@@ -679,6 +679,23 @@ time_t date;
 	return get_formatted_time(date, "%Y-%m-%dT%H:%M:%S%z");
 }
 
+static char buf_fmt_duration[BUFSZ];
+/** Returns a iso-8601 formatted duration (e.g. PThh:mm:ss). */
+char *
+iso8601_duration(seconds)
+long seconds;
+{
+	/* currently no days, months and years, as the conversion
+	 * is non-trivial */
+	long minutes = seconds / 60;
+	long hours = minutes / 60;
+
+	/* PThh:mm:ss */
+	sprintf(buf_fmt_duration, "PT%02ld:%02ld:%02ld",
+			hours, minutes % 60, seconds % 60);
+	return buf_fmt_duration;
+}
+
 /** Returns epoch time. */
 time_t
 current_epoch()
