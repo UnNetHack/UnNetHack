@@ -9,6 +9,7 @@
 
 # ifdef HAVE_UTIME_H
 #  include <utime.h>
+#  include <errno.h>
 # endif
 extern char msgs[][BUFSZ];
 extern int lastmsg;
