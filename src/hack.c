@@ -2530,8 +2530,17 @@ boolean you; /**< true, if you are hit */
 
 void
 losehp(n, knam, k_format)
-register int n;
-register const char *knam;
+int n;
+const char *knam;
+{
+	losehp_how(n, knam, k_format, DIED);
+}
+
+void
+losehp_how(n, knam, k_format, how)
+int n;
+const char *knam;
+int how;
 boolean k_format;
 {
 	showdmg(n, TRUE);
@@ -2555,7 +2564,7 @@ boolean k_format;
 		killer_format = k_format;
 		killer = knam;		/* the thing that killed you */
 		You("die...");
-		done(DIED);
+		done(how);
 	} else if (n > 0 && u.uhp*10 < u.uhpmax) {
 		maybe_wail();
 	}

@@ -2148,6 +2148,7 @@ int  typ, fatal;
 {
 	int i, plural, kprefix = KILLED_BY_AN;
 	boolean thrown_weapon = (fatal < 0);
+	int how;
 
 	if (thrown_weapon) fatal = -fatal;
 	if(strcmp(string, "blast") && !thrown_weapon) {
@@ -2174,6 +2175,8 @@ int  typ, fatal;
 	    /*[ does this need a plural check too? ]*/
 	    kprefix = KILLED_BY;
 	}
+
+	how = strstri(pname, "poison") ? DIED : POISONING;
 	i = rn2(fatal + 20*thrown_weapon);
 	if(i == 0 && typ != A_CHA) {
 		/* used to be instantly fatal; now just gongs your maxhp for (3d6)/2
@@ -2181,7 +2184,7 @@ int  typ, fatal;
 		pline_The("poison was extremely toxic!");
 		i = d(4,6);
 		u.uhpmax -= i / 2;
-		losehp(i,pname,kprefix);
+		losehp_how(i,pname,kprefix,how);
 	} else if(i <= 5) {
 		/* Check that a stat change was made */
 		if (adjattrib(typ, thrown_weapon ? -1 : -rn1(3,3), 1))
@@ -2195,7 +2198,7 @@ int  typ, fatal;
 		killer_format = kprefix;
 		killer = pname;
 		/* "Poisoned by a poisoned ___" is redundant */
-		done(strstri(pname, "poison") ? DIED : POISONING);
+		done(how);
 	}
 	(void) encumber_msg();
 }
