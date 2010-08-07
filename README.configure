@@ -1,37 +1,25 @@
-== Overview ==
+== Compilation instructions for UnNetHack ==
 
-This patch is a backport of Slash'EMs Autoconf compilation for NetHack.
+Windows user need to install an development environment as detailed in 
+the NetHack-Cygwin-MinGW HOWTO[2].
 
-It has been tested on Linux (tty) and on Windows XP (tty, mswin).
+
+On Linux and MacOSX for a single-user installation (a Linux Debian
+ or Ubuntu system needs the packages gcc, flex, bison, make and
+ libncurses5-dev installed):
+
+ ./configure --prefix=$HOME/unnethack --with-owner=`id -un` --with-group=`id -gn` --enable-wizmode=`id -un` && make && make install
+
+ The game will be started with ~/unnethack/bin/unnethack
+
+
+On Windows for a tty build:
+ ./configure --with-owner=Username --with-group=Usergroup --build=mingw32 --prefix=/opt/unnethack --without-compression --enable-tty-graphics && make && make install
+
 
 Please direct bugs and questions to <bhaak@gmx.net> or post them to the
 NetHack Newsgroup rec.games.roguelike.nethack[1].
 
 
-== Detailed compilation instructions ==
-
-Windows user need to install an development environment as detailed in 
-the NetHack-Cygwin-MinGW HOWTO[2].
-
-1. Download NetHacks source code from http://www.nethack.org/v343/download-src.html
-2. Extract the tar file:
- tar xfz nethack-343-src.tgz
-3. Apply this patch:
- patch -p0 <nethack-autoconf-20090217.patch
-4. Enter the directory:
- cd nethack-3.4.3
-
-5a. On Linux:
- ./configure && make && make install
-
-5b. On Windows for a tty build:
- ./configure --with-owner=Username --with-group=Usergroup --build=mingw32 --prefix=/opt/nethack --without-compression --enable-tty-graphics && make && make install
-
-5c. On Windows for a GUI build:
- ./configure --with-owner=Username --with-group=Usergroup --build=mingw32 --prefix=/opt/nethack --without-compression --disable-tty-graphics --enable-mswin-graphics && make && make install
-
-
 [1] Google Groups URL: http://groups.google.com/group/rec.games.roguelike.nethack
 [2] http://www.crawfords.de/nh-cygwin-mingw-howto/
-
-
