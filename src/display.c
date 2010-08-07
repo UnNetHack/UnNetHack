@@ -607,7 +607,7 @@ feel_location(x, y)
 
 	/* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
 	if (lev->typ == ROOM &&
-		    lev->glyph == cmap_to_glyph(S_room) && !lev->waslit)
+		    lev->glyph == cmap_to_glyph(S_room))
 	    show_glyph(x,y, lev->glyph = cmap_to_glyph(S_darkroom));
 	else if (lev->typ == CORR &&
 		    lev->glyph == cmap_to_glyph(S_litcorr) && !lev->waslit)
