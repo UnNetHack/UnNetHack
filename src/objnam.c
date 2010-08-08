@@ -238,8 +238,11 @@ register struct obj *obj;
 	register int typ = obj->otyp;
 	register struct objclass *ocl = &objects[typ];
 	register int nn = ocl->oc_name_known ||
-		/* only reveal Sokoban prices when in sight */
-		(Is_sokoprize(obj) && cansee(obj->ox, obj->oy));
+		/* only reveal Sokoban prizes when in sight */
+		(Is_sokoprize(obj) &&
+		 (cansee(obj->ox, obj->oy) ||
+		  /* even reveal when Sokoban prize only felt */
+		  (u.ux == obj->ox && u.uy == obj->oy)));
 	register const char *actualn = OBJ_NAME(*ocl);
 	register const char *dn = OBJ_DESCR(*ocl);
 	register const char *un = ocl->oc_uname;
@@ -257,6 +260,8 @@ register struct obj *obj;
 	 */
 	if (!nn && ocl->oc_uses_known && ocl->oc_unique) obj->known = 0;
 	if (!Blind) obj->dknown = TRUE;
+	/* needed, otherwise BoH shows only up as "bag" when blind */
+	if (Is_sokoprize(obj)) obj->dknown = TRUE;
 	if (Role_if(PM_PRIEST)) obj->bknown = TRUE;
 	if (obj_is_pname(obj))
 	    goto nameit;
