@@ -445,6 +445,7 @@ typedef unsigned char	uchar;
                                     * killed - Patric Mueller (15 Aug 2009) */
 #define ADJSPLIT /* splittable #adjust - Sam Dennis, conditionalized by Jukka Lahtinen */
 #define TUTORIAL_MODE /* Alex Smith */
+#define ELBERETH_CONDUCT /* Track the number of times the player engraves Elbereth. - Ray Kulhanek */
 
 /* End of Section 6 */
 
