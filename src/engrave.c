@@ -286,16 +286,18 @@ sengr_at(s, x, y)
 #endif /* ELBERETH */
 
 #ifdef ELBERETH_CONDUCT
-/* Return the number of distinct times Elbereth is engraved at
+/** Return the number of distinct times Elbereth is engraved at
  * the specified location. Case insensitive.  Counts an engraving
  * as being present even if it's still being written: if you're
  * killed while trying to write Elbereth, it still violates the
  * conduct (mainly because it's easier to implement that way).
  */
-unsigned nengr_at(s, x, y)
-	const char *s;
+static
+unsigned
+nengr_at(x, y)
 	xchar x, y;
 {
+	const char *s = "Elbereth";
 	register struct engr *ep = engr_at(x, y);
 	unsigned count = 0;
 	const char *p;
@@ -311,9 +313,7 @@ unsigned nengr_at(s, x, y)
 
 	return count;
 }
-
 #endif /* ELBERETH_CONDUCT */
-
 
 #endif /* OVL0 */
 #ifdef OVL2
@@ -1230,9 +1230,9 @@ boolean fingers;
 
 #ifdef ELBERETH_CONDUCT
 	{
-		unsigned ecount1, ecount0 = nengr_at("Elbereth", u.ux, u.uy);
+		unsigned ecount1, ecount0 = nengr_at(u.ux, u.uy);
 		make_engr_at(u.ux, u.uy, buf, (moves - multi), type);
-		ecount1 = nengr_at("Elbereth", u.ux, u.uy);
+		ecount1 = nengr_at(u.ux, u.uy);
 		if (ecount1 > ecount0)
 			u.uconduct.elbereths += (ecount1 - ecount0);
 	}
