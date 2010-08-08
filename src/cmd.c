@@ -1447,12 +1447,9 @@ int want_disp;
 		Sprintf(buf, "engraved Elbereth %ld time%s",
 			u.uconduct.elbereths, plur(u.uconduct.elbereths));
 		you_have_X(buf);
-	}
-#ifdef WIZARD
-	else if (wizard) {
+	} else {
 		you_have_never("engraved Elbereth");
 	}
-#endif /* WIZARD */
 #endif /* ELBERETH */
 #endif /* ELBERETH_CONDUCT */
 
