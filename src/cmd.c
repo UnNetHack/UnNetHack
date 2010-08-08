@@ -1429,6 +1429,12 @@ int want_disp;
 		    u.uconduct.wishes, (u.uconduct.wishes > 1L) ? "es" : "");
 	    you_have_X(buf);
 
+	    if (u.uconduct.wishmagic) {
+		    Sprintf(buf, "used %ld wish%s for magical items",
+				    u.uconduct.wishmagic, (u.uconduct.wishmagic > 1L) ? "es" : "");
+		    you_have_X(buf);
+	    }
+
 	    if (!u.uconduct.wisharti)
 		enl_msg(You_, "have not wished", "did not wish",
 			" for any artifacts");
