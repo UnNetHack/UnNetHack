@@ -326,7 +326,8 @@ boolean td;	/* td == TRUE : trap door or hole */
 	d_level dtmp;
 	char msgbuf[BUFSZ];
 	const char *dont_fall = 0;
-	register int newlevel = dunlev(&u.uz);
+	int currentlevel = dunlev(&u.uz);
+	int newlevel = currentlevel;
 
 	/* KMH -- You can't escape the Sokoban level traps */
 	if(Blind && Levitation && !In_sokoban(&u.uz)) return;
@@ -374,8 +375,31 @@ boolean td;	/* td == TRUE : trap door or hole */
 	if (Is_stronghold(&u.uz)) {
 	    find_hell(&dtmp);
 	} else {
+		static const char * const falling_down_msgs[] = {
+			"fall down a shaft!",
+			"fall down a deep shaft!",
+			"keep falling down a really deep shaft!",
+			"keep falling down an unbelievable deep shaft!",
+		};
+		/* TODO: Hallucination messages */
+
 	    dtmp.dnum = u.uz.dnum;
 	    dtmp.dlevel = newlevel;
+	    switch (newlevel-currentlevel) {
+	    case 1:
+		    /* no message when falling to the next level */
+		    break;
+	    case 2:
+	    case 3:
+	    case 4:
+	    case 5:
+		    You(falling_down_msgs[newlevel-currentlevel-2]);
+		    break;
+	    default:
+		    You("are falling down an unbelievable deep shaft!");
+		    pline("While falling you wonder how unlikely it is to find such a deep shaft."); /* (1/4)^5 ~= 0.1% */
+		    break;
+	    }
 	}
 	if (!td)
 	    Sprintf(msgbuf, "The hole in the %s above you closes up.",
