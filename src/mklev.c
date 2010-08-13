@@ -320,11 +320,17 @@ boolean nxcor;
 }
 
 void
-makecorridors()
+makecorridors(style)
+int style;
 {
 	int a, b, i;
 	boolean any = TRUE;
 
+	if (style == -1) style = rn2(4);
+
+	switch (style) {
+
+	default: /* vanilla style */
 	for(a = 0; a < nroom-1; a++) {
 		join(a, a+1, FALSE);
 		if(!rn2(50)) break; /* allow some randomness */
@@ -347,6 +353,40 @@ makecorridors()
 		if(b >= a) b += 2;
 		join(a, b, TRUE);
 	    }
+	break;
+	case 1: /* at least one corridor leaves from each room and goes to random room */
+	    if (nroom > 1) {
+		int cnt = 0;
+		for (a = 0; a < nroom; a++) {
+		    do {
+			b = rn2(nroom-1);
+		    } while (((a == b) || (rooms[b].doorct)) && cnt++ < 100);
+		    if (cnt >= 100) {
+			for (b = 0; b < nroom-1; b++)
+			    if (!rooms[b].doorct && (a != b)) break;
+		    }
+		    if (a == b) b++;
+		    join(a, b, FALSE);
+		}
+	    }
+	    break;
+	case 2: /* circular path: room1 -> room2 -> room3 -> ... -> room1  */
+	    if (nroom > 1) {
+		for (a = 0; a < nroom; a++) {
+		    b = (a + 1) % nroom;
+		    join(a, b, FALSE);
+		}
+	    }
+	    break;
+	case 3: /* all roads lead to rome. or to the first room. */
+	    if (nroom > 1) {
+		b = 0;
+		for (a = 1; a < nroom; a++) {
+		    join(a, b, FALSE);
+		}
+	    }
+	    break;
+	}
 }
 
 void
@@ -730,7 +770,7 @@ makelevel()
 #ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) goto skip0;
 #endif
-	makecorridors();
+	makecorridors(0);
 	make_niches();
 
 	/* make a secret treasure vault, not connected to the rest */

@@ -2290,7 +2290,7 @@ corridor	*c;
 	if (c->src.room == -1) {
 	    /*sort_rooms();*/
 		fix_stair_rooms();
-		makecorridors();
+		makecorridors(c->src.door);
 		return;
 	}
 
