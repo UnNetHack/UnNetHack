@@ -272,6 +272,7 @@ struct instance_flags {
 	boolean paranoid_hit;	/* Ask for 'yes' when hitting peacefuls */
 	boolean paranoid_quit;	/* Ask for 'yes' when quitting */
 	boolean paranoid_remove; /* Always show menu for 'T' and 'R' */
+	boolean paranoid_trap; /* Ask for 'yes' before walking into known traps */
 /*
  * Window capability support.
  */

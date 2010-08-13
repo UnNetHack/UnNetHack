@@ -180,6 +180,7 @@ static struct Bool_Opt
 	{"paranoid_hit", &iflags.paranoid_hit, FALSE, SET_IN_FILE},
 	{"paranoid_quit", &iflags.paranoid_quit, FALSE, SET_IN_FILE},
 	{"paranoid_remove", &iflags.paranoid_remove, FALSE, SET_IN_FILE},
+	{"paranoid_trap", &iflags.paranoid_trap, FALSE, SET_IN_FILE},
 #endif
 	{"perm_invent", &flags.perm_invent, FALSE, SET_IN_GAME},
 	{"pickup_dropped", &flags.pickup_dropped, FALSE, SET_IN_GAME},
@@ -3240,13 +3241,14 @@ boolean setinitial,setfromfile;
 	menu_item *paranoid_category_pick = (menu_item *)0;
 
 	static const char *paranoid_names[] = {
-		"hit", "quit", "remove"
+		"hit", "quit", "remove", "trap"
 	};
 	#define NUM_PARANOID_OPTIONS SIZE(paranoid_names)
 	static boolean *paranoid_bools[NUM_PARANOID_OPTIONS];
 	paranoid_bools[0] = &iflags.paranoid_hit;
 	paranoid_bools[1] = &iflags.paranoid_quit;
 	paranoid_bools[2] = &iflags.paranoid_remove;
+	paranoid_bools[3] = &iflags.paranoid_trap;
 	int paranoid_settings[NUM_PARANOID_OPTIONS];
 
 	tmpwin = create_nhwindow(NHW_MENU);
@@ -3272,6 +3274,7 @@ boolean setinitial,setfromfile;
 	iflags.paranoid_hit = paranoid_settings[0];
 	iflags.paranoid_quit = paranoid_settings[1];
 	iflags.paranoid_remove = paranoid_settings[2];
+	iflags.paranoid_trap = paranoid_settings[3];
 
 	retval = TRUE;
 #endif
@@ -3756,10 +3759,11 @@ char *buf;
 #endif
 #ifdef PARANOID
 	else if (!strcmp(optname, "paranoid"))
-		Sprintf(buf, "%s%s %s%s %s%s",
+		Sprintf(buf, "%s%s %s%s %s%s %s%s",
 			iflags.paranoid_hit ? "+" : "-", "hit",
 			iflags.paranoid_quit ? "+" : "-", "quit",
-			iflags.paranoid_remove ? "+" : "-", "remove");
+			iflags.paranoid_remove ? "+" : "-", "remove",
+			iflags.paranoid_trap ? "+" : "-", "trap");
 #endif
 	else if (!strcmp(optname, "pettype")) 
 		Sprintf(buf, "%s", (preferred_pet == 'c') ? "cat" :
