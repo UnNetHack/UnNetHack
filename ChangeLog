@@ -23,6 +23,7 @@
 	  - show price of items in shops without #chatting
 	  - Curses GUI
 	  - visualized HP bar
+	  - New option: paranoid_trap: Asks for confirmation before walking into known traps
 
 	* vanilla bug fixes:
 	  - C343-12, C343-94, C343-189, C343-235
