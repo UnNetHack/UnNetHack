@@ -2119,8 +2119,6 @@ boolean from_user;
 		*(bp + 2) = 'a';
     }
 
-	//pline("9 %d\n", mntmp);
-	//pline("9 %d %d %d\n", !strcmpi(bp, "scales"), mntmp >= PM_GRAY_DRAGON, mntmp <= PM_YELLOW_DRAGON);
 	/* dragon scales - assumes order of dragons */
 	if ((!strcmpi(bp, "scales") || !strcmpi(bp, "dragon scales")) &&
 			mntmp != NON_PM &&

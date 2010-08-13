@@ -514,10 +514,12 @@ enter_explore_mode()
 STATIC_PTR int
 dooverview_or_wiz_where()
 {
+/*
 #ifdef WIZARD
-	//if (wizard) return wiz_where();
-	//else
+	if (wizard) return wiz_where();
+	else
 #endif
+*/
 	dooverview();
 	return 0;
 }

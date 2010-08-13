@@ -4212,7 +4212,7 @@ boolean magical; /**< if wishing for magical items is allowed */
 {
 	char buf[BUFSZ];
 #ifdef LIVELOGFILE
-	char rawbuf[BUFSZ]; // for exact livelog reporting
+	char rawbuf[BUFSZ]; /* for exact livelog reporting */
 #endif
 	struct obj *otmp, nothing;
 	int tries = 0;
