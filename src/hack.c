@@ -1304,7 +1304,7 @@ domove()
 		if (iflags.paranoid_trap &&
 		    ((trap = t_at(x, y)) && trap->tseen)) {
 			char qbuf[BUFSZ];
-			Sprintf(qbuf,"Really %s into that %s?", 
+			Sprintf(qbuf,"Do you really want to %s into that %s?", 
 				locomotion(youmonst.data, "step"),
 				defsyms[trap_to_defsym(trap->ttyp)].explanation);
 			if (yn(qbuf) != 'y') {
