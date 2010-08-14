@@ -121,17 +121,17 @@ REGION:(04,11,06,14),lit,"shop",unfilled
 RANDOM_PLACES:(05,04),(09,05),(13,04),(26,04),(31,05),(30,14),(05,14),(10,13),(26,14),(27,13)
 
 # scatter some bodies
-OBJECT:'%',"corpse",(20,12),"aligned priest",0
-OBJECT:'%',"corpse",place[0],"shopkeeper",0
-OBJECT:'%',"corpse",place[1],"shopkeeper",0
-OBJECT:'%',"corpse",place[2],"shopkeeper",0
-OBJECT:'%',"corpse",place[3],"shopkeeper",0
-OBJECT:'%',"corpse",place[4],"shopkeeper",0
-OBJECT:'%',"corpse",random,"watchman",0
-OBJECT:'%',"corpse",random,"watchman",0
-OBJECT:'%',"corpse",random,"watchman",0
-OBJECT:'%',"corpse",random,"watchman",0
-OBJECT:'%',"corpse",random,"watch captain",0
+OBJECT:'%',"corpse",(20,12),"aligned priest"
+OBJECT:'%',"corpse",place[0],"shopkeeper"
+OBJECT:'%',"corpse",place[1],"shopkeeper"
+OBJECT:'%',"corpse",place[2],"shopkeeper"
+OBJECT:'%',"corpse",place[3],"shopkeeper"
+OBJECT:'%',"corpse",place[4],"shopkeeper"
+OBJECT:'%',"corpse",random,"watchman"
+OBJECT:'%',"corpse",random,"watchman"
+OBJECT:'%',"corpse",random,"watchman"
+OBJECT:'%',"corpse",random,"watchman"
+OBJECT:'%',"corpse",random,"watch captain"
 
 # Rubble!
 OBJECT:'`',"boulder",random

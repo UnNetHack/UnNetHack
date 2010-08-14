@@ -265,7 +265,7 @@ DOOR:locked,(48,15)
 # 
 FOUNTAIN:place[1]
 #
-CONTAINER:'`',"statue",place[2],uncursed,"knight",1,NAME:"Perseus" {
+CONTAINER:'`',"statue",place[2],uncursed,"knight",3,NAME:"Perseus" {
   OBJECT[75%]:'[',"shield of reflection",cursed,+0
   OBJECT[25%]:'[',"levitation boots",+0
   OBJECT[50%]:')',"scimitar",blessed,+2
@@ -394,7 +394,7 @@ NON_DIGGABLE:(01,01,22,14)
 #
 OBJECT:'(',"crystal ball",(07,08)
 #
-CONTAINER:'`',"statue",place[1],uncursed,"knight",1,NAME:"Perseus" {
+CONTAINER:'`',"statue",place[1],uncursed,"knight",3,NAME:"Perseus" {
   OBJECT[75%]:'[',"shield of reflection",cursed,+0
   OBJECT[25%]:'[',"levitation boots",+0
   OBJECT[50%]:')',"scimitar",blessed,+2
