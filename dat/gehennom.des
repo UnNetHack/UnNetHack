@@ -1396,22 +1396,22 @@ IF [66%] {
 # chance of lava spillage, or maybe lava river?
 IF [50%] {
 	IF [60%] {
-	SPILL: random, 'L', north, 20, lit
+	SPILL: random, 'L', north, 20
 	}
 	IF [60%] {
-	SPILL: random, 'L', south, 20, lit
+	SPILL: random, 'L', south, 20
 	}
 	IF [60%] {
-	SPILL: random, 'L', east, 20, lit
+	SPILL: random, 'L', east, 20
 	}
 	IF [60%] {
-	SPILL: random, 'L', west, 20, lit
+	SPILL: random, 'L', west, 20
 	}
 } ELSE {
 	IF [50%] {
-		RANDLINE: (30,00),(50,19), 'P', lit, 10, 2
+		RANDLINE: (30,00),(50,19), 'L', 10, 2
 	} ELSE {
-		RANDLINE: (50,00),(30,19), 'P', lit, 10, 2
+		RANDLINE: (50,00),(30,19), 'L', 10, 2
 	}
 }
 

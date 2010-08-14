@@ -105,10 +105,10 @@ DOOR:random,(25,13)
 DOOR:random,(31,11)
 
 # knock a few holes in the shop interior walls
-REPLACE_TERRAIN:(07,04,11,06),'|','.',lit,18%
-REPLACE_TERRAIN:(25,04,29,06),'|','.',lit,18%
-REPLACE_TERRAIN:(07,12,11,14),'|','.',lit,18%
-REPLACE_TERRAIN:(28,12,28,14),'|','.',lit,33%
+REPLACE_TERRAIN:(07,04,11,06),'|','.',18%
+REPLACE_TERRAIN:(25,04,29,06),'|','.',18%
+REPLACE_TERRAIN:(07,12,11,14),'|','.',18%
+REPLACE_TERRAIN:(28,12,28,14),'|','.',33%
 
 # deserted shops and temple
 REGION:(18,11,22,14),lit,"temple",unfilled
