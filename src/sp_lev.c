@@ -196,6 +196,7 @@ splev_stack_pop(st)
 #define OV_pop_r(x) (x = splev_stack_getdat(coder, SPOVAR_REGION))
 #define OV_pop_s(x) (x = splev_stack_getdat(coder, SPOVAR_STRING))
 #define OV_pop(x)   (x = splev_stack_getdat_any(coder))
+#define OV_pop_typ(x,typ) (x = splev_stack_getdat(coder, typ))
 
 
 struct opvar *
@@ -3702,13 +3703,21 @@ spo_wallwalk(coder)
      struct sp_coder *coder;
 {
     struct opvar *coord, *fgtyp, *bgtyp, *chance;
+    xchar x,y;
 
-    if (!OV_pop_i(bgtyp) ||
-	!OV_pop_i(fgtyp) ||
-	!OV_pop_i(chance) ||
+    if (!OV_pop_i(chance) ||
+	!OV_pop_typ(bgtyp, SPOVAR_MAPCHAR) ||
+	!OV_pop_typ(fgtyp, SPOVAR_MAPCHAR) ||
 	!OV_pop_c(coord)) return;
 
-    wallwalk_right(SP_COORD_X(OV_i(coord)), SP_COORD_Y(OV_i(coord)), OV_i(fgtyp), OV_i(bgtyp), OV_i(chance));
+    x = SP_COORD_X(OV_i(coord));
+    y = SP_COORD_Y(OV_i(coord));
+    get_location(&x, &y, DRY|WET, coder->croom);
+
+    if (OV_i(fgtyp) >= MAX_TYPE) return;
+    if (OV_i(bgtyp) >= MAX_TYPE) return;
+
+    wallwalk_right(x, y, OV_i(fgtyp), OV_i(bgtyp), OV_i(chance));
 
     opvar_free(coord);
     opvar_free(chance);
