@@ -17,7 +17,6 @@
 
 #ifdef OVLB
 STATIC_DCL boolean FDECL(isbig, (struct mkroom *));
-STATIC_DCL struct mkroom * FDECL(pick_room,(BOOLEAN_P));
 STATIC_DCL void NDECL(mkshop), FDECL(mkzoo,(int)), NDECL(mkswamp);
 STATIC_DCL void NDECL(mktemple);
 STATIC_DCL void FDECL(mkgarden, (struct mkroom *));
@@ -65,6 +64,7 @@ int	roomtype;
 	case ARMORY:	mkzoo(ARMORY); break;
 	case ANTHOLE:	mkzoo(ANTHOLE); break;
 	case LEMUREPIT:	mkzoo(LEMUREPIT); break;
+	case POOLROOM:	mkpoolroom(); break;
 	default:	impossible("Tried to make a room of type %d.", roomtype);
     }
 }
@@ -126,6 +126,10 @@ mkshop()
 			}
 			if(*ep == 'l' || *ep == 'L'){
 				mkzoo(LEPREHALL);
+				return;
+			}
+			if(*ep == 'o' || *ep == 'O'){
+				mkpoolroom();
 				return;
 			}
 			if(*ep == '_'){
@@ -201,7 +205,7 @@ gottype:
 	stock_room(i, sroom);
 }
 
-STATIC_OVL struct mkroom *
+struct mkroom *
 pick_room(strict)
 register boolean strict;
 /* pick an unused room, preferably with only one door */

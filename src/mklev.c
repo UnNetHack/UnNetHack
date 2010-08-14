@@ -182,6 +182,7 @@ do_room_or_subroom(croom, lowx, lowy, hix, hiy, lit, rtype, special, is_room)
 		levl[hix+1][lowy-1].typ = TRCORNER;
 		levl[lowx-1][hiy+1].typ = BLCORNER;
 		levl[hix+1][hiy+1].typ = BRCORNER;
+		wallification(lowx-1, lowy-1, hix+1, hiy+1);
 	    } else {	/* a subroom */
 		wallification(lowx-1, lowy-1, hix+1, hiy+1);
 	    }
@@ -223,6 +224,63 @@ boolean special;
 	croom++;
 	croom->hx = -1;
 	nsubroom++;
+}
+
+void
+mk_split_room()
+{
+    NhRect *r1 = rnd_rect();
+    NhRect r2;
+    int area;
+    xchar hx, hy, lx, ly, wid, hei;
+    xchar rlit;
+    struct mkroom *troom;
+
+    if (!r1) return;
+
+    lx = r1->lx;
+    ly = r1->ly;
+
+    wid = rn1(12, 5);
+    hei = rn1(3, 5);
+
+    area = wid*hei;
+    if (!check_room(&lx, &wid, &ly, &hei, FALSE)) return;
+    if (wid < 5 || hei < 5) return;
+
+    r2.lx = lx;
+    r2.ly = ly;
+    r2.hx = lx + wid;
+    r2.hy = ly + hei;
+    split_rects(r1, &r2);
+    smeq[nroom] = nroom;
+    if ((wid > hei) || (wid == hei && rn2(2))) {
+	int adj = (wid/2);
+	rlit = (rnd(1+abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
+	add_room(lx,     ly, lx+adj-1,     ly+hei, rlit, OROOM, FALSE);
+	smeq[nroom] = nroom;
+	rlit = (rnd(1+abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
+	troom = &rooms[nroom];
+	add_room(lx+adj+1, ly, lx+adj+adj, ly+hei, rlit, OROOM, FALSE);
+#ifdef SPECIALIZATION
+	topologize(troom,FALSE);              /* set roomno */
+#else
+	topologize(troom);                    /* set roomno */
+#endif
+    } else {
+	int adj = (hei/2);
+	rlit = (rnd(1+abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
+	add_room(lx, ly,     lx+wid, ly+adj-1,     rlit, OROOM, FALSE);
+	smeq[nroom] = nroom;
+	rlit = (rnd(1+abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
+	troom = &rooms[nroom];
+	add_room(lx, ly+adj+1, lx+wid, ly+adj+adj, rlit, OROOM, FALSE);
+#ifdef SPECIALIZATION
+	topologize(troom,FALSE);              /* set roomno */
+#else
+	topologize(troom);                    /* set roomno */
+#endif
+    }
 }
 
 STATIC_OVL void
@@ -567,8 +625,14 @@ int trap_type;
 		    dosdoor(xx, yy, aroom, rn2(5) ? SDOOR : DOOR);
 		else {
 		    /* inaccessible niches occasionally have iron bars */
-		    if (!rn2(8) && IS_WALL(levl[xx][yy].typ))
+		    if (!rn2(8) && IS_WALL(levl[xx][yy].typ)) {
 			levl[xx][yy].typ = IRONBARS;
+			if (rn2(3))
+			    (void) mkcorpstat(CORPSE,
+					      (struct monst *)0,
+					      mkclass(S_HUMAN, 0),
+					      xx, yy+dy, TRUE);
+		    }
 		    if (!level.flags.noteleport)
 			(void) mksobj_at(SCR_TELEPORTATION,
 					 xx, yy+dy, TRUE, FALSE);
@@ -1011,6 +1075,70 @@ mineralize()
 		}
 	    }
 }
+
+
+void
+wallwalk_right(x,y,fgtyp,bgtyp,chance)
+     xchar x,y;
+     schar fgtyp,bgtyp;
+     int chance;
+{
+    int sx,sy, nx,ny, dir, cnt;
+    schar tmptyp;
+    struct rm *lev;
+    sx = x;
+    sy = y;
+    dir = 1;
+
+    if (!isok(x,y)) return;
+    if (levl[x][y].typ != bgtyp) return;
+
+    do {
+	if (!t_at(x,y) && !bydoor(x,y) && levl[x][y].typ == bgtyp && (chance >= rn2(100))) {
+	    levl[x][y].typ = fgtyp;
+	    if (fgtyp == LAVAPOOL) levl[x][y].lit = 1;
+	}
+	cnt = 0;
+	do {
+	    nx = x;
+	    ny = y;
+	    switch (dir % 4) {
+	    case 0: y--; break;
+	    case 1: x++; break;
+	    case 2: y++; break;
+	    case 3: x--; break;
+	    }
+	    if (isok(x,y)) {
+		tmptyp = levl[x][y].typ;
+		if (tmptyp != bgtyp && tmptyp != fgtyp) {
+		    dir++; x = nx; y = ny; cnt++;
+		} else {
+		    dir = (dir + 3) % 4;
+		}
+	    } else {
+		dir++; x = nx; y = ny; cnt++;
+	    }
+	} while ((nx == x && ny == y) && (cnt < 5));
+    } while ((x != sx) || (y != sy));
+}
+
+
+void
+mkpoolroom()
+{
+    struct mkroom *sroom;
+    schar typ;
+
+    if (!(sroom = pick_room(TRUE))) return;
+
+    if (sroom->hx - sroom->lx < 3 || sroom->hy - sroom->ly < 3) return;
+
+    sroom->rtype = POOLROOM;
+    typ = !rn2(5) ? POOL : LAVAPOOL;
+
+    wallwalk_right(sroom->lx, sroom->ly, typ, ROOM, 96);
+}
+
 
 void
 mklev()

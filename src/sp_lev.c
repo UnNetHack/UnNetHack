@@ -3589,6 +3589,27 @@ spo_altar(coder)
 }
 
 void
+spo_wallwalk(coder)
+     struct sp_coder *coder;
+{
+    struct opvar *y, *x, *fgtyp, *bgtyp, *chance;
+
+    if (!OV_pop_i(bgtyp) ||
+	!OV_pop_i(fgtyp) ||
+	!OV_pop_i(chance) ||
+	!OV_pop_i(y) ||
+	!OV_pop_i(x)) return;
+
+    wallwalk_right(OV_i(x), OV_i(y), OV_i(fgtyp), OV_i(bgtyp), OV_i(chance));
+
+    opvar_free(x);
+    opvar_free(y);
+    opvar_free(chance);
+    opvar_free(fgtyp);
+    opvar_free(bgtyp);
+}
+
+void
 spo_feature(coder)
      struct sp_coder *coder;
 {
@@ -4487,6 +4508,7 @@ sp_lev *lvl;
 	case SPO_SINK:
 	case SPO_POOL:
 	case SPO_FOUNTAIN:       spo_feature(coder);        break;
+	case SPO_WALLWALK:       spo_wallwalk(coder);        break;
 	case SPO_TRAP:           spo_trap(coder);           break;
 	case SPO_GOLD:           spo_gold(coder);           break;
 	case SPO_CORRIDOR:       spo_corridor(coder);       break;
