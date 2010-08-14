@@ -643,6 +643,38 @@ int trap_type;
 	}
 }
 
+/* replaces horiz/vert walls with iron bars,
+   iff there's no door next to the place, and there's space
+   on the other side of the wall */
+void
+make_ironbarwalls(chance)
+     int chance;
+{
+    xchar x,y;
+
+    if (chance < 1) return;
+
+    for (x = 1; x < COLNO-1; x++) {
+	for(y = 1; y < ROWNO-1; y++) {
+	    schar typ = levl[x][y].typ;
+	    if (typ == HWALL) {
+		if ((IS_WALL(levl[x-1][y].typ) || levl[x-1][y].typ == IRONBARS) &&
+		    (IS_WALL(levl[x+1][y].typ) || levl[x+1][y].typ == IRONBARS) &&
+		    SPACE_POS(levl[x][y-1].typ) && SPACE_POS(levl[x][y+1].typ) &&
+		    rn2(100) < chance)
+		    levl[x][y].typ = IRONBARS;
+	    } else if (typ == VWALL) {
+		if ((IS_WALL(levl[x][y-1].typ) || levl[x][y-1].typ == IRONBARS) &&
+		    (IS_WALL(levl[x][y+1].typ) || levl[x][y+1].typ == IRONBARS) &&
+		    SPACE_POS(levl[x-1][y].typ) && SPACE_POS(levl[x+1][y].typ) &&
+		    rn2(100) < chance)
+		    levl[x][y].typ = IRONBARS;
+	    }
+	}
+    }
+}
+
+
 STATIC_OVL void
 make_niches()
 {
@@ -836,6 +868,8 @@ makelevel()
 #endif
 	makecorridors(0);
 	make_niches();
+
+	if (!rn2(5)) make_ironbarwalls(rn2(20) ? rn2(20) : rn2(50));
 
 	/* make a secret treasure vault, not connected to the rest */
 	if(do_vault()) {
