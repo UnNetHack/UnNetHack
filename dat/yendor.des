@@ -46,29 +46,29 @@ NON_PASSWALL:(11,00,21,00)
 NON_PASSWALL:(11,10,27,12)
 NON_PASSWALL:(21,00,27,10)
 # The wizard and his guards
-MONSTER:'@',"Wizard of Yendor",(16,05),asleep
-MONSTER:'d',"hell hound",(15,05)
-MONSTER:'V',"vampire lord",(17,05)
+MONSTER:('@',"Wizard of Yendor"),(16,05),asleep
+MONSTER:('d',"hell hound"),(15,05)
+MONSTER:('V',"vampire lord"),(17,05)
 # The local treasure
 OBJECT:('+',"Book of the Dead"),(16,05)
 # Surrounding terror
-MONSTER:';',"kraken",(14,02)
-MONSTER:';',"giant eel",(17,02)
-MONSTER:';',"kraken",(13,04)
-MONSTER:';',"giant eel",(13,06)
-MONSTER:';',"kraken",(19,04)
-MONSTER:';',"giant eel",(19,06)
-MONSTER:';',"kraken",(15,08)
-MONSTER:';',"giant eel",(17,08)
-MONSTER:';',"piranha",(15,02)
-MONSTER:';',"piranha",(19,08)
+MONSTER:(';',"kraken"),(14,02)
+MONSTER:(';',"giant eel"),(17,02)
+MONSTER:(';',"kraken"),(13,04)
+MONSTER:(';',"giant eel"),(13,06)
+MONSTER:(';',"kraken"),(19,04)
+MONSTER:(';',"giant eel"),(19,06)
+MONSTER:(';',"kraken"),(15,08)
+MONSTER:(';',"giant eel"),(17,08)
+MONSTER:(';',"piranha"),(15,02)
+MONSTER:(';',"piranha"),(19,08)
 # Random monsters
-MONSTER:'D',random,random
-MONSTER:'H',random,random
-MONSTER:'&',random,random
-MONSTER:'&',random,random
-MONSTER:'&',random,random
-MONSTER:'&',random,random
+MONSTER:'D',random
+MONSTER:'H',random
+MONSTER:'&',random
+MONSTER:'&',random
+MONSTER:'&',random
+MONSTER:'&',random
 # And to make things a little harder.
 TRAP:"board",(16,04)
 TRAP:"board",(16,06)
@@ -189,20 +189,20 @@ NON_PASSWALL:(06,00,27,02)
 NON_PASSWALL:(16,02,27,12)
 NON_PASSWALL:(06,12,16,12)
 #
-MONSTER:'L',random,(10,07)
-MONSTER:'V',"vampire lord",(12,07)
+MONSTER:'L',(10,07)
+MONSTER:('V',"vampire lord"),(12,07)
 # Some surrounding horrors
-MONSTER:';',"kraken",(08,05)
-MONSTER:';',"giant eel",(08,08)
-MONSTER:';',"kraken",(14,05)
-MONSTER:';',"giant eel",(14,08)
+MONSTER:(';',"kraken"),(08,05)
+MONSTER:(';',"giant eel"),(08,08)
+MONSTER:(';',"kraken"),(14,05)
+MONSTER:(';',"giant eel"),(14,08)
 # Other monsters
-MONSTER:'L',random,random
-MONSTER:'D',random,random
-MONSTER:'D',random,(26,09)
-MONSTER:'&',random,random
-MONSTER:'&',random,random
-MONSTER:'&',random,random
+MONSTER:'L',random
+MONSTER:'D',random
+MONSTER:'D',(26,09)
+MONSTER:'&',random
+MONSTER:'&',random
+MONSTER:'&',random
 # And to make things a little harder.
 TRAP:"board",(10,07)
 TRAP:"board",(12,07)
@@ -242,9 +242,9 @@ TELEPORT_REGION:levregion(01,00,79,20),(2,2,6,6)
 PORTAL:(4,4,4,4),(0,0,0,0),"wizard3"
 MAZEWALK:(08,05),east
 REGION:(04,03,06,06),unlit,"ordinary",unfilled,true
-MONSTER:'L',random,(04,04)
-MONSTER:'V',"vampire lord",(03,04)
-MONSTER:';',"kraken",(06,06)
+MONSTER:'L',(04,04)
+MONSTER:('V',"vampire lord"),(03,04)
+MONSTER:(';',"kraken"),(06,06)
 # And to make things a little harder.
 TRAP:"board",(04,03)
 TRAP:"board",(04,05)
@@ -272,9 +272,9 @@ BRANCH:levregion(01,00,79,20),(0,0,8,7)
 TELEPORT_REGION:levregion(01,00,79,20),(2,2,6,6)
 MAZEWALK:(08,05),east
 REGION:(04,03,06,06),unlit,"ordinary",unfilled,true
-MONSTER:'L',random,(04,04)
-MONSTER:'V',"vampire lord",(03,04)
-MONSTER:';',"kraken",(06,06)
+MONSTER:'L',(04,04)
+MONSTER:('V',"vampire lord"),(03,04)
+MONSTER:(';',"kraken"),(06,06)
 # And to make things a little harder.
 TRAP:"board",(04,03)
 TRAP:"board",(04,05)

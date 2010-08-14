@@ -64,17 +64,17 @@ DOOR:closed,(52,14)
 # Unattended Altar - unaligned due to conflict - player must align it.
 ALTAR:(28,09),noalign,altar
 # The Grand Master
-MONSTER:'@',"Grand Master",(28,10)
+MONSTER:('@',"Grand Master"),(28,10)
 # No treasure chest!
 # guards for the audience chamber
-MONSTER:'@',"abbot",(32,07)
-MONSTER:'@',"abbot",(32,08)
-MONSTER:'@',"abbot",(32,11)
-MONSTER:'@',"abbot",(32,12)
-MONSTER:'@',"abbot",(33,07)
-MONSTER:'@',"abbot",(33,08)
-MONSTER:'@',"abbot",(33,11)
-MONSTER:'@',"abbot",(33,12)
+MONSTER:('@',"abbot"),(32,07)
+MONSTER:('@',"abbot"),(32,08)
+MONSTER:('@',"abbot"),(32,11)
+MONSTER:('@',"abbot"),(32,12)
+MONSTER:('@',"abbot"),(33,07)
+MONSTER:('@',"abbot"),(33,08)
+MONSTER:('@',"abbot"),(33,11)
+MONSTER:('@',"abbot"),(33,12)
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Random traps
@@ -85,18 +85,18 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Monsters on siege duty.
-MONSTER: 'E',"earth elemental",(37,01)
-MONSTER: 'E',"earth elemental",(37,18)
-MONSTER: 'E',"earth elemental",(03,03)
-MONSTER: 'E',"earth elemental",(65,04)
-MONSTER: 'E',"earth elemental",(12,11)
-MONSTER: 'E',"earth elemental",(60,12)
-MONSTER: 'E',"earth elemental",(14,08)
-MONSTER: 'E',"earth elemental",(55,00)
-MONSTER: 'X',"xorn",(18,18)
-MONSTER: 'X',"xorn",(59,10)
-MONSTER: 'X',"xorn",(13,09)
-MONSTER: 'X',"xorn",(01,17)
+MONSTER: ('E',"earth elemental"),(37,01)
+MONSTER: ('E',"earth elemental"),(37,18)
+MONSTER: ('E',"earth elemental"),(03,03)
+MONSTER: ('E',"earth elemental"),(65,04)
+MONSTER: ('E',"earth elemental"),(12,11)
+MONSTER: ('E',"earth elemental"),(60,12)
+MONSTER: ('E',"earth elemental"),(14,08)
+MONSTER: ('E',"earth elemental"),(55,00)
+MONSTER: ('X',"xorn"),(18,18)
+MONSTER: ('X',"xorn"),(59,10)
+MONSTER: ('X',"xorn"),(13,09)
+MONSTER: ('X',"xorn"),(01,17)
 
 #
 #	The "locate" level for the quest.
@@ -136,7 +136,6 @@ MAP
 ------------------------------------------                    ------
 ENDMAP
 # Random Monsters
-RANDOM_MONSTERS: 'E', 'X'
 # Dungeon Description
 REGION:(00,00,75,20),lit,"ordinary"
 # Stairs
@@ -168,29 +167,29 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
 
 #
 #	The "goal" level for the quest.
@@ -248,31 +247,164 @@ TRAP:"fire",random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'@',"Master Kaen",$place[0] {
+MONSTER:('@',"Master Kaen"),$place[0] {
   OBJECT:')',+4
   OBJECT:'?'
   OBJECT:'?'
   OBJECT:'?'
 }
 ALTAR:$place[0],noalign,altar
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+
+#
+#	The "fill" levels for the quest.
+#
+#	These levels are used to fill out any levels not occupied by specific
+#	levels as defined above. "fila" is the upper filler, between the
+#	start and locate levels, and "filb" the lower between the locate
+#	and goal levels.
+#
+
+LEVEL: "Mon-fila"
+MON_GENERATION:86%, (64,"earth elemental"), (16,'E'), (16,"xorn"), (4,'X')
+# Random Monsters
+#
+ROOM: "ordinary" , random, random, random, random
+{
+STAIR: random, up
+OBJECT: random,random
+MONSTER: 'E', random, hostile
+}
+
+ROOM: "ordinary" , random, random, random, random
+{
+OBJECT: random, random
+OBJECT: random, random
+MONSTER: 'E', random, hostile
+}
+
+ROOM: "ordinary" , random, random, random, random
+{
+OBJECT: random, random
+TRAP: random, random
+OBJECT: random, random
+MONSTER: ('X', "xorn"), random
+MONSTER: ('E', "earth elemental"), random
+}
+
+ROOM: "ordinary" , random, random, random, random
+{
+STAIR: random, down
+OBJECT: random, random
+TRAP: random, random
+MONSTER: 'E', random, hostile
+MONSTER: ('E', "earth elemental"), random
+}
+
+ROOM: "ordinary" , random, random, random, random
+{
+OBJECT: random, random
+OBJECT: random, random
+TRAP: random, random
+MONSTER: 'X', random, hostile
+}
+
+ROOM: "ordinary" , random, random, random, random
+{
+OBJECT: random, random
+TRAP: random, random
+MONSTER: ('E', "earth elemental"), random
+}
+
+RANDOM_CORRIDORS
+
+LEVEL: "Mon-filb"
+MON_GENERATION:86%, (64,"earth elemental"), (16,'E'), (16,"xorn"), (4,'X')
+# Random Monsters
+#
+ROOM: "ordinary" , random, random, random, random
+{
+STAIR: random, up
+OBJECT: random,random
+MONSTER: 'X', random, hostile
+}
+
+ROOM: "ordinary" , random, random, random, random
+{
+OBJECT: random, random
+OBJECT: random, random
+MONSTER: 'X', random, hostile
+}
+
+ROOM: "ordinary" , random, random, random, random
+{
+OBJECT: random, random
+TRAP: random, random
+OBJECT: random, random
+MONSTER: 'E', random, hostile
+}
+
+ROOM: "ordinary" , random, random, random, random
+{
+STAIR: random, down
+OBJECT: random, random
+TRAP: random, random
+MONSTER: 'E', random, hostile
+MONSTER: ('E', "earth elemental"), random
+}
+
+ROOM: "ordinary" , random, random, random, random
+{
+OBJECT: random, random
+OBJECT: random, random
+TRAP: random, random
+MONSTER: 'X', random, hostile
+}
+
+ROOM: "ordinary" , random, random, random, random
+{
+OBJECT: random, random
+TRAP: random, random
+MONSTER: ('E', "earth elemental"), random
+}
+
+RANDOM_CORRIDORS
+
+MONSTER:('E',"earth elemental"),random
+MONSTER:('E',"earth elemental"),random
+MONSTER:('E',"earth elemental"),random
+MONSTER:('E',"earth elemental"),random
+MONSTER:('E',"earth elemental"),random
+MONSTER:('E',"earth elemental"),random
+MONSTER:('E',"earth elemental"),random
+MONSTER:('E',"earth elemental"),random
+MONSTER:('E',"earth elemental"),random
+MONSTER:('X',"xorn"),random
+MONSTER:('X',"xorn"),random
+MONSTER:('X',"xorn"),random
+MONSTER:('X',"xorn"),random
+MONSTER:('X',"xorn"),random
+MONSTER:('X',"xorn"),random
+MONSTER:('X',"xorn"),random
+MONSTER:('X',"xorn"),random
+MONSTER:('X',"xorn"),random
 
 #
 #	The "fill" levels for the quest.
@@ -291,141 +423,6 @@ RANDOM_MONSTERS: 'E', 'X'
 ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, up
-OBJECT: random,random
-MONSTER: 'E', random, random, hostile
-}
-
-ROOM: "ordinary" , random, random, random, random
-{
-OBJECT: random, random
-OBJECT: random, random
-MONSTER: 'E', random, random, hostile
-}
-
-ROOM: "ordinary" , random, random, random, random
-{
-OBJECT: random, random
-TRAP: random, random
-OBJECT: random, random
-MONSTER: 'X', "xorn", random
-MONSTER: 'E', "earth elemental", random
-}
-
-ROOM: "ordinary" , random, random, random, random
-{
-STAIR: random, down
-OBJECT: random, random
-TRAP: random, random
-MONSTER: 'E', random, random, hostile
-MONSTER: 'E', "earth elemental", random
-}
-
-ROOM: "ordinary" , random, random, random, random
-{
-OBJECT: random, random
-OBJECT: random, random
-TRAP: random, random
-MONSTER: 'X', random, random, hostile
-}
-
-ROOM: "ordinary" , random, random, random, random
-{
-OBJECT: random, random
-TRAP: random, random
-MONSTER: 'E', "earth elemental", random
-}
-
-RANDOM_CORRIDORS
-
-LEVEL: "Mon-filb"
-MON_GENERATION:86%, (64,"earth elemental"), (16,'E'), (16,"xorn"), (4,'X')
-# Random Monsters
-RANDOM_MONSTERS: 'E', 'X'
-#
-ROOM: "ordinary" , random, random, random, random
-{
-STAIR: random, up
-OBJECT: random,random
-MONSTER: 'X', random, random, hostile
-}
-
-ROOM: "ordinary" , random, random, random, random
-{
-OBJECT: random, random
-OBJECT: random, random
-MONSTER: 'X', random, random, hostile
-}
-
-ROOM: "ordinary" , random, random, random, random
-{
-OBJECT: random, random
-TRAP: random, random
-OBJECT: random, random
-MONSTER: 'E', random, random, hostile
-}
-
-ROOM: "ordinary" , random, random, random, random
-{
-STAIR: random, down
-OBJECT: random, random
-TRAP: random, random
-MONSTER: 'E', random, random, hostile
-MONSTER: 'E', "earth elemental", random
-}
-
-ROOM: "ordinary" , random, random, random, random
-{
-OBJECT: random, random
-OBJECT: random, random
-TRAP: random, random
-MONSTER: 'X', random, random, hostile
-}
-
-ROOM: "ordinary" , random, random, random, random
-{
-OBJECT: random, random
-TRAP: random, random
-MONSTER: 'E', "earth elemental", random
-}
-
-RANDOM_CORRIDORS
-
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-
-#
-#	The "fill" levels for the quest.
-#
-#	These levels are used to fill out any levels not occupied by specific
-#	levels as defined above. "fila" is the upper filler, between the
-#	start and locate levels, and "filb" the lower between the locate
-#	and goal levels.
-#
-
-LEVEL: "Mon-fila"
-MON_GENERATION:86%, (64,"earth elemental"), (16,'E'), (16,"xorn"), (4,'X')
-# Random Monsters
-RANDOM_MONSTERS: 'E', 'X'
-#
-ROOM: "ordinary" , random, random, random, random
-{
-STAIR: random, up
 OBJECT:random,random
 MONSTER: 'E', random, random, hostile
 }
@@ -442,8 +439,8 @@ ROOM: "ordinary" , random, random, random, random
 OBJECT:random,random
 TRAP: random, random
 OBJECT:random,random
-MONSTER: 'X', "xorn", random
-MONSTER: 'E', "earth elemental", random
+MONSTER:('X',"xorn"), random
+MONSTER:('E',"earth elemental"), random
 }
 
 ROOM: "ordinary" , random, random, random, random
@@ -451,8 +448,8 @@ ROOM: "ordinary" , random, random, random, random
 STAIR: random, down
 OBJECT:random,random
 TRAP: random, random
-MONSTER: 'E', random, random, hostile
-MONSTER: 'E', "earth elemental", random
+MONSTER:'E',random, random, hostile
+MONSTER:('E',"earth elemental"), random
 }
 
 ROOM: "ordinary" , random, random, random, random
@@ -467,7 +464,7 @@ ROOM: "ordinary" , random, random, random, random
 {
 OBJECT:random,random
 TRAP: random, random
-MONSTER: 'E', "earth elemental", random
+MONSTER:('E',"earth elemental"), random
 }
 
 RANDOM_CORRIDORS
@@ -481,14 +478,14 @@ ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, up
 OBJECT:random,random
-MONSTER: 'X', random, random, hostile
+MONSTER:'X',random, random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
 OBJECT:random,random
 OBJECT:random,random
-MONSTER: 'X', random, random, hostile
+MONSTER:'X',random, random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
@@ -496,7 +493,7 @@ ROOM: "ordinary" , random, random, random, random
 OBJECT:random,random
 TRAP: random, random
 OBJECT:random,random
-MONSTER: 'E', random, random, hostile
+MONSTER:'E',random, random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
@@ -504,8 +501,8 @@ ROOM: "ordinary" , random, random, random, random
 STAIR: random, down
 OBJECT:random,random
 TRAP: random, random
-MONSTER: 'E', random, random, hostile
-MONSTER: 'E', "earth elemental", random
+MONSTER:'E',random, random, hostile
+MONSTER:('E',"earth elemental"), random
 }
 
 ROOM: "ordinary" , random, random, random, random
@@ -513,14 +510,14 @@ ROOM: "ordinary" , random, random, random, random
 OBJECT:random,random
 OBJECT:random,random
 TRAP: random, random
-MONSTER: 'X', random, random, hostile
+MONSTER:'X',random, random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
 OBJECT:random,random
 TRAP: random, random
-MONSTER: 'E', "earth elemental", random
+MONSTER:('E',"earth elemental"), random
 }
 
 RANDOM_CORRIDORS

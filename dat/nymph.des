@@ -30,7 +30,7 @@ MONSTER: 'n', random, random, hostile
 MONSTER: 'n', random, random, hostile
 MONSTER: 'n', random, random, hostile
 MONSTER: 'n', random, random, hostile
-MONSTER: 'n', "Aphrodite", random, hostile
+MONSTER:('n',"Aphrodite"), random, hostile
 }
 
 ROOM: "ordinary", random, random, random, random

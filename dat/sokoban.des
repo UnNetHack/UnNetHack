@@ -497,8 +497,8 @@ TRAP:"hole",(21,01)
 TRAP:"hole",(22,01)
 TRAP:"hole",(23,01)
 
-MONSTER:'m',"giant mimic", random, m_object "boulder"
-MONSTER:'m',"giant mimic", random, m_object "boulder"
+MONSTER:('m',"giant mimic"), random, m_object "boulder"
+MONSTER:('m',"giant mimic"), random, m_object "boulder"
 
 soko_loot()
 
@@ -589,8 +589,8 @@ TRAP:"hole",(20,01)
 TRAP:"hole",(21,01)
 TRAP:"hole",(22,01)
 
-MONSTER:'m',"giant mimic", random, m_object "boulder"
-MONSTER:'m',"giant mimic", random, m_object "boulder"
+MONSTER:('m',"giant mimic"), random, m_object "boulder"
+MONSTER:('m',"giant mimic"), random, m_object "boulder"
 
 soko_loot()
 
@@ -1665,8 +1665,8 @@ ENGRAVING:$place[0],burn,"Elbereth"
 ENGRAVING:$place[1],burn,"Elbereth"
 ENGRAVING:$place[2],burn,"Elbereth"
 
-MONSTER:'m',"giant mimic", random, m_object "boulder"
-MONSTER:'m',"giant mimic", random, m_object "boulder"
+MONSTER:('m',"giant mimic"), random, m_object "boulder"
+MONSTER:('m',"giant mimic"), random, m_object "boulder"
 
 LEVEL:"soko1-4"
 FLAGS:noteleport,mazelevel,premapped
@@ -1748,5 +1748,5 @@ ENGRAVING:$place[0],burn,"Elbereth"
 ENGRAVING:$place[1],burn,"Elbereth"
 ENGRAVING:$place[2],burn,"Elbereth"
 
-MONSTER:'m',"giant mimic", random, m_object "boulder"
-MONSTER:'m',"giant mimic", random, m_object "boulder"
+MONSTER:('m',"giant mimic"), random, m_object "boulder"
+MONSTER:('m',"giant mimic"), random, m_object "boulder"

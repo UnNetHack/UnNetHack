@@ -70,7 +70,7 @@ DOOR:locked,(24,14)
 DOOR:closed,(31,14)
 DOOR:locked,(49,14)
 # Lord Carnarvon
-MONSTER:'@',"Lord Carnarvon",(25,10) {
+MONSTER:('@',"Lord Carnarvon"),(25,10) {
   OBJECT:('[',"fedora"),+5
   OBJECT:')',+4
   OBJECT:random
@@ -80,21 +80,21 @@ MONSTER:'@',"Lord Carnarvon",(25,10) {
 # The treasure of Lord Carnarvon
 OBJECT:('(',"chest"),(25,10)
 # student guards for the audience chamber
-MONSTER:'@',"student",(26,09)
-MONSTER:'@',"student",(27,09)
-MONSTER:'@',"student",(28,09)
-MONSTER:'@',"student",(26,10)
-MONSTER:'@',"student",(28,10)
-MONSTER:'@',"student",(26,11)
-MONSTER:'@',"student",(27,11)
-MONSTER:'@',"student",(28,11)
+MONSTER:('@',"student"),(26,09)
+MONSTER:('@',"student"),(27,09)
+MONSTER:('@',"student"),(28,09)
+MONSTER:('@',"student"),(26,10)
+MONSTER:('@',"student"),(28,10)
+MONSTER:('@',"student"),(26,11)
+MONSTER:('@',"student"),(27,11)
+MONSTER:('@',"student"),(28,11)
 # city watch guards in the antechambers
-MONSTER:'@',"watchman",(50,06)
-MONSTER:'@',"watchman",(50,14)
+MONSTER:('@',"watchman"),(50,06)
+MONSTER:('@',"watchman"),(50,14)
 # Eels in the moat
-MONSTER:';',"giant eel",(20,10)
-MONSTER:';',"giant eel",(45,04)
-MONSTER:';',"giant eel",(33,16)
+MONSTER:(';',"giant eel"),(20,10)
+MONSTER:(';',"giant eel"),(45,04)
+MONSTER:(';',"giant eel"),(33,16)
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Random traps
@@ -105,18 +105,18 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Monsters on siege duty.
-MONSTER: 'S',random,(60,09)
-MONSTER: 'M',random,(60,10)
-MONSTER: 'S',random,(60,11)
-MONSTER: 'S',random,(60,12)
-MONSTER: 'M',random,(60,13)
-MONSTER: 'S',random,(61,10)
-MONSTER: 'S',random,(61,11)
-MONSTER: 'S',random,(61,12)
-MONSTER: 'S',random,(30,03)
-MONSTER: 'M',random,(20,17)
-MONSTER: 'S',random,(67,02)
-MONSTER: 'S',random,(10,19)
+MONSTER: 'S',(60,09)
+MONSTER: 'M',(60,10)
+MONSTER: 'S',(60,11)
+MONSTER: 'S',(60,12)
+MONSTER: 'M',(60,13)
+MONSTER: 'S',(61,10)
+MONSTER: 'S',(61,11)
+MONSTER: 'S',(61,12)
+MONSTER: 'S',(30,03)
+MONSTER: 'M',(20,17)
+MONSTER: 'S',(67,02)
+MONSTER: 'S',(10,19)
 
 #
 #	The "locate" level for the quest.
@@ -239,33 +239,33 @@ TRAP:"dart",random
 TRAP:"rolling boulder",(32,10)
 TRAP:"rolling boulder",(40,16)
 # Random monsters.
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'M',random,random
-MONSTER:'M',"human mummy",random
-MONSTER:'M',"human mummy",random
-MONSTER:'M',"human mummy",random
-MONSTER:'M',"human mummy",random
-MONSTER:'M',"human mummy",random
-MONSTER:'M',"human mummy",random
-MONSTER:'M',"human mummy",random
-MONSTER:'M',random,random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'M',random
+MONSTER:('M',"human mummy"),random
+MONSTER:('M',"human mummy"),random
+MONSTER:('M',"human mummy"),random
+MONSTER:('M',"human mummy"),random
+MONSTER:('M',"human mummy"),random
+MONSTER:('M',"human mummy"),random
+MONSTER:('M',"human mummy"),random
+MONSTER:'M',random
 
 #
 #	The "goal" level for the quest.
@@ -358,38 +358,38 @@ TRAP:random,random
 TRAP:random,random
 TRAP:"rolling boulder",(46,14)
 # Random monsters.
-MONSTER:'&',"Minion of Huhetotl",(50,14) {
+MONSTER:('&',"Minion of Huhetotl"),(50,14) {
   OBJECT:random,cursed
   OBJECT:random,cursed
   OBJECT:random,cursed
 }
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'S',random,random
-MONSTER:'M',"human mummy",random
-MONSTER:'M',"human mummy",random
-MONSTER:'M',"human mummy",random
-MONSTER:'M',"human mummy",random
-MONSTER:'M',"human mummy",random
-MONSTER:'M',"human mummy",random
-MONSTER:'M',"human mummy",random
-MONSTER:'M',"human mummy",random
-MONSTER:'M',random,random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:'S',random
+MONSTER:('M',"human mummy"),random
+MONSTER:('M',"human mummy"),random
+MONSTER:('M',"human mummy"),random
+MONSTER:('M',"human mummy"),random
+MONSTER:('M',"human mummy"),random
+MONSTER:('M',"human mummy"),random
+MONSTER:('M',"human mummy"),random
+MONSTER:('M',"human mummy"),random
+MONSTER:'M',random
 
 #
 #	The "fill" levels for the quest.
@@ -407,14 +407,14 @@ ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, up
 OBJECT: random,random
-MONSTER: 'S', random, random
+MONSTER: 'S', random
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
 OBJECT: random, random
 OBJECT: random, random
-MONSTER: 'S', random, random
+MONSTER: 'S', random
 }
 
 ROOM: "ordinary" , random, random, random, random
@@ -422,7 +422,7 @@ ROOM: "ordinary" , random, random, random, random
 OBJECT: random, random
 TRAP: random, random
 OBJECT: random, random
-MONSTER: 'S', random, random
+MONSTER: 'S', random
 }
 
 ROOM: "ordinary" , random, random, random, random
@@ -430,8 +430,8 @@ ROOM: "ordinary" , random, random, random, random
 STAIR: random, down
 OBJECT: random, random
 TRAP: random, random
-MONSTER: 'S', random, random
-MONSTER: 'M', "human mummy", random
+MONSTER: 'S', random
+MONSTER: ('M', "human mummy"), random
 }
 
 ROOM: "ordinary" , random, random, random, random
@@ -439,14 +439,14 @@ ROOM: "ordinary" , random, random, random, random
 OBJECT: random, random
 OBJECT: random, random
 TRAP: random, random
-MONSTER: 'S', random, random
+MONSTER: 'S', random
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
 OBJECT: random, random
 TRAP: random, random
-MONSTER: 'S', random, random
+MONSTER: 'S', random
 }
 
 RANDOM_CORRIDORS
@@ -458,14 +458,14 @@ ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, up
 OBJECT: random,random
-MONSTER: 'M', random, random
+MONSTER: 'M', random
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
 OBJECT: random, random
 OBJECT: random, random
-MONSTER: 'M', random, random
+MONSTER: 'M', random
 }
 
 ROOM: "ordinary" , random, random, random, random
@@ -473,7 +473,7 @@ ROOM: "ordinary" , random, random, random, random
 OBJECT: random, random
 TRAP: random, random
 OBJECT: random,random
-MONSTER: 'M', random, random
+MONSTER: 'M', random
 }
 
 ROOM: "ordinary" , random, random, random, random
@@ -481,8 +481,8 @@ ROOM: "ordinary" , random, random, random, random
 STAIR: random, down
 OBJECT: random, random
 TRAP: random, random
-MONSTER: 'S', random, random
-MONSTER: 'M', "human mummy", random
+MONSTER: 'S', random
+MONSTER: ('M', "human mummy"), random
 }
 
 ROOM: "ordinary" , random, random, random, random
@@ -490,14 +490,14 @@ ROOM: "ordinary" , random, random, random, random
 OBJECT: random, random
 OBJECT: random, random
 TRAP: random, random
-MONSTER: 'S', random, random
+MONSTER: 'S', random
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
 OBJECT: random, random
 TRAP: random, random
-MONSTER: 'S', random, random
+MONSTER: 'S', random
 }
 
 RANDOM_CORRIDORS

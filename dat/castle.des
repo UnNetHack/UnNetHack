@@ -46,9 +46,10 @@ ENDMAP
 # Random registers initialisation
 $object = OBJECT: { '[',')','*','%' }
 $place = { (04,02),(58,02),(04,14),(58,14) }
+$monster = MONSTER:{ 'L','N','E','H','M','O','R','T','X','Z' }
 SHUFFLE: $place
 SHUFFLE: $object
-RANDOM_MONSTERS:'L','N','E','H','M','O','R','T','X','Z'
+SHUFFLE: $monster
 
 TELEPORT_REGION:levregion(01,00,10,20),(1,1,61,15),down
 TELEPORT_REGION:levregion(72,00,79,20),(1,1,61,15),up
@@ -150,66 +151,66 @@ TRAP:"trap door",(48,08)
 TRAP:"trap door",(52,08)
 TRAP:"trap door",(55,08)
 # Soldiers guarding the entry hall
-MONSTER:'@',"soldier",(08,06)
-MONSTER:'@',"soldier",(09,05)
-MONSTER:'@',"soldier",(11,05)
-MONSTER:'@',"soldier",(12,06)
-MONSTER:'@',"soldier",(08,10)
-MONSTER:'@',"soldier",(09,11)
-MONSTER:'@',"soldier",(11,11)
-MONSTER:'@',"soldier",(12,10)
-MONSTER:'@',"lieutenant",(09,08)
+MONSTER:('@',"soldier"),(08,06)
+MONSTER:('@',"soldier"),(09,05)
+MONSTER:('@',"soldier"),(11,05)
+MONSTER:('@',"soldier"),(12,06)
+MONSTER:('@',"soldier"),(08,10)
+MONSTER:('@',"soldier"),(09,11)
+MONSTER:('@',"soldier"),(11,11)
+MONSTER:('@',"soldier"),(12,10)
+MONSTER:('@',"lieutenant"),(09,08)
 # Soldiers guarding the towers
-MONSTER:'@',"soldier",(03,02)
-MONSTER:'@',"soldier",(05,02)
-MONSTER:'@',"soldier",(57,02)
-MONSTER:'@',"soldier",(59,02)
-MONSTER:'@',"soldier",(03,14)
-MONSTER:'@',"soldier",(05,14)
-MONSTER:'@',"soldier",(57,14)
-MONSTER:'@',"soldier",(59,14)
+MONSTER:('@',"soldier"),(03,02)
+MONSTER:('@',"soldier"),(05,02)
+MONSTER:('@',"soldier"),(57,02)
+MONSTER:('@',"soldier"),(59,02)
+MONSTER:('@',"soldier"),(03,14)
+MONSTER:('@',"soldier"),(05,14)
+MONSTER:('@',"soldier"),(57,14)
+MONSTER:('@',"soldier"),(59,14)
 # The four dragons that are guarding the storerooms
-MONSTER:'D',random,(47,05)
-MONSTER:'D',random,(47,06)
-MONSTER:'D',random,(47,10)
-MONSTER:'D',random,(47,11)
+MONSTER:'D',(47,05)
+MONSTER:'D',(47,06)
+MONSTER:'D',(47,10)
+MONSTER:'D',(47,11)
 # Sea monsters in the moat
-MONSTER:';',"giant eel",(05,07)
-MONSTER:';',"giant eel",(05,09)
-MONSTER:';',"giant eel",(57,07)
-MONSTER:';',"giant eel",(57,09)
-MONSTER:';',"shark",(05,00)
-MONSTER:';',"shark",(05,16)
-MONSTER:';',"shark",(57,00)
-MONSTER:';',"shark",(57,16)
+MONSTER:(';',"giant eel"),(05,07)
+MONSTER:(';',"giant eel"),(05,09)
+MONSTER:(';',"giant eel"),(57,07)
+MONSTER:(';',"giant eel"),(57,09)
+MONSTER:(';',"shark"),(05,00)
+MONSTER:(';',"shark"),(05,16)
+MONSTER:(';',"shark"),(57,00)
+MONSTER:(';',"shark"),(57,16)
 # The throne room and the court monsters
-MONSTER:monster[0],random,(27,05)
-MONSTER:monster[1],random,(30,05)
-MONSTER:monster[2],random,(33,05)
-MONSTER:monster[3],random,(36,05)
-MONSTER:monster[4],random,(28,06)
-MONSTER:monster[5],random,(31,06)
-MONSTER:monster[6],random,(34,06)
-MONSTER:monster[7],random,(37,06)
-MONSTER:monster[8],random,(27,07)
-MONSTER:monster[9],random,(30,07)
-MONSTER:monster[0],random,(33,07)
-MONSTER:monster[1],random,(36,07)
-MONSTER:monster[2],random,(28,08)
-MONSTER:monster[3],random,(31,08)
-MONSTER:monster[4],random,(34,08)
-MONSTER:monster[5],random,(27,09)
-MONSTER:monster[6],random,(30,09)
-MONSTER:monster[7],random,(33,09)
-MONSTER:monster[8],random,(36,09)
-MONSTER:monster[9],random,(28,10)
-MONSTER:monster[0],random,(31,10)
-MONSTER:monster[1],random,(34,10)
-MONSTER:monster[2],random,(37,10)
-MONSTER:monster[3],random,(27,11)
-MONSTER:monster[4],random,(30,11)
-MONSTER:monster[5],random,(33,11)
-MONSTER:monster[6],random,(36,11)
+MONSTER:$monster[0],(27,05)
+MONSTER:$monster[1],(30,05)
+MONSTER:$monster[2],(33,05)
+MONSTER:$monster[3],(36,05)
+MONSTER:$monster[4],(28,06)
+MONSTER:$monster[5],(31,06)
+MONSTER:$monster[6],(34,06)
+MONSTER:$monster[7],(37,06)
+MONSTER:$monster[8],(27,07)
+MONSTER:$monster[9],(30,07)
+MONSTER:$monster[0],(33,07)
+MONSTER:$monster[1],(36,07)
+MONSTER:$monster[2],(28,08)
+MONSTER:$monster[3],(31,08)
+MONSTER:$monster[4],(34,08)
+MONSTER:$monster[5],(27,09)
+MONSTER:$monster[6],(30,09)
+MONSTER:$monster[7],(33,09)
+MONSTER:$monster[8],(36,09)
+MONSTER:$monster[9],(28,10)
+MONSTER:$monster[0],(31,10)
+MONSTER:$monster[1],(34,10)
+MONSTER:$monster[2],(37,10)
+MONSTER:$monster[3],(27,11)
+MONSTER:$monster[4],(30,11)
+MONSTER:$monster[5],(33,11)
+MONSTER:$monster[6],(36,11)
 # MazeWalks
 MAZEWALK:(00,10),west
 MAZEWALK:(62,06),east
@@ -284,9 +285,10 @@ ENDMAP
 
 $object = OBJECT: { '[',')' }
 $place = { (09,08),(09,09),(09,10),(52,03),(52,15) }
+$monster = MONSTER:{ 'L','N','E','V','M','O','R','T','X','Z' }
 SHUFFLE: $place
 SHUFFLE: $object
-RANDOM_MONSTERS:'L','N','E','V','M','O','R','T','X','Z'
+SHUFFLE: $monster
 
 TELEPORT_REGION:(64,03,75,20),(07,01,54,17),down
 TELEPORT_REGION:(01,01,07,18),(07,01,75,20),up
@@ -419,62 +421,62 @@ OBJECT:('`',"statue"),(22,07)
 OBJECT:('`',"statue"),(22,11)
 
 # the king (and his adviser[s])
-MONSTER[25%]:'H',"titan",(23,09),hostile,asleep
-MONSTER[50%]:'V',random,(23,09),asleep
-MONSTER:'V',random,(23,09),asleep
+MONSTER[25%]:('H',"titan"),(23,09),hostile,asleep
+MONSTER[50%]:'V',(23,09),asleep
+MONSTER:'V',(23,09),asleep
 
 # monsters in the water around the castle
-MONSTER:';',"shark",random
-MONSTER:';',"shark",random
-MONSTER:';',"shark",random
-MONSTER:';',"jellyfish",random
-MONSTER:';',"jellyfish",random
-MONSTER:';',"jellyfish",random
-MONSTER:';',"giant eel",random
-MONSTER:';',"giant eel",random
-MONSTER:';',"giant eel",random
-MONSTER:';',"electric eel",random
-MONSTER:';',"electric eel",random
-MONSTER:';',"electric eel",random
+MONSTER:(';',"shark"),random
+MONSTER:(';',"shark"),random
+MONSTER:(';',"shark"),random
+MONSTER:(';',"jellyfish"),random
+MONSTER:(';',"jellyfish"),random
+MONSTER:(';',"jellyfish"),random
+MONSTER:(';',"giant eel"),random
+MONSTER:(';',"giant eel"),random
+MONSTER:(';',"giant eel"),random
+MONSTER:(';',"electric eel"),random
+MONSTER:(';',"electric eel"),random
+MONSTER:(';',"electric eel"),random
 
 # monsters in attendance in the throne room
-MONSTER:monster[0],random,(25,04)
-MONSTER:monster[1],random,(27,04)
-MONSTER:monster[2],random,(29,04)
-MONSTER:monster[3],random,(26,05)
-MONSTER:monster[4],random,(28,05)
-MONSTER:monster[5],random,(30,05)
-MONSTER:monster[6],random,(25,06)
-MONSTER:monster[7],random,(27,06)
-MONSTER:monster[8],random,(29,06)
-MONSTER:monster[0],random,(25,14)
-MONSTER:monster[1],random,(27,14)
-MONSTER:monster[2],random,(29,14)
-MONSTER:monster[3],random,(26,13)
-MONSTER:monster[4],random,(28,13)
-MONSTER:monster[5],random,(30,13)
-MONSTER:monster[6],random,(25,12)
-MONSTER:monster[7],random,(27,12)
-MONSTER:monster[8],random,(29,12)
+MONSTER:$monster[0],(25,04)
+MONSTER:$monster[1],(27,04)
+MONSTER:$monster[2],(29,04)
+MONSTER:$monster[3],(26,05)
+MONSTER:$monster[4],(28,05)
+MONSTER:$monster[5],(30,05)
+MONSTER:$monster[6],(25,06)
+MONSTER:$monster[7],(27,06)
+MONSTER:$monster[8],(29,06)
+MONSTER:$monster[0],(25,14)
+MONSTER:$monster[1],(27,14)
+MONSTER:$monster[2],(29,14)
+MONSTER:$monster[3],(26,13)
+MONSTER:$monster[4],(28,13)
+MONSTER:$monster[5],(30,13)
+MONSTER:$monster[6],(25,12)
+MONSTER:$monster[7],(27,12)
+MONSTER:$monster[8],(29,12)
 
 # welcoming committee
-MONSTER:'D',random,(48,06)
-MONSTER:'D',random,(50,05)
-MONSTER:'D',random,(51,13)
-MONSTER:'D',random,(52,14)
+MONSTER:'D',(48,06)
+MONSTER:'D',(50,05)
+MONSTER:'D',(51,13)
+MONSTER:'D',(52,14)
 
 # guardians in the antechamber of the treasure room
-MONSTER:'E',"fire elemental",(14,09)
-MONSTER:'E',"fire elemental",(17,09)
-MONSTER:'v',"fire vortex",(20,09)
-MONSTER:'v',"fire vortex",(18,09)
+MONSTER:('E',"fire elemental"),(14,09)
+MONSTER:('E',"fire elemental"),(17,09)
+MONSTER:('v',"fire vortex"),(20,09)
+MONSTER:('v',"fire vortex"),(18,09)
 
 # sharpshooters in the chambers next to the hallway
-MONSTER:'C',random,(35,06)
-MONSTER:'C',random,(36,04)
-MONSTER:'C',random,(35,11)
-MONSTER:'C',random,(36,12)
-MONSTER:'C',random,(37,13)
+MONSTER:'C',(35,06)
+MONSTER:'C',(36,04)
+MONSTER:'C',(35,11)
+MONSTER:'C',(36,12)
+MONSTER:'C',(37,13)
 
 
 LEVEL:"castle-3"
@@ -507,11 +509,12 @@ LLLLLL.............| - - - - - - - - - - - - - - - - - - - - - - - - |......
 LLLL...............---------------------------------------------------......
 ENDMAP
 
-RANDOM_MONSTERS:'L','L','E','E','R','R','T','T','O','O'
+$monster = MONSTER:{ 'L','L','E','E','R','R','T','T','O','O' }
 $place = { (15,01),(11,01),(09,01),(05,01),
            (03,03),(03,07),
            (05,09),(08,09),(12,09),(15,09) }
 SHUFFLE: $place
+SHUFFLE: $monster
 
 # everything except the inner walls of the maze are non-diggable
 NON_DIGGABLE:(00,00,19,20)
@@ -591,40 +594,40 @@ TRAP:"trap door",(33,05)
 TRAP:"trap door",(41,01)
 
 # lord of the keep
-MONSTER:'T',random,(06,05),asleep
+MONSTER:'T',(06,05),asleep
 
 # monsters in attendance
-MONSTER:monster[0],random,(15,04)
-MONSTER:monster[0],random,(13,04)
-MONSTER:monster[0],random,(11,04)
-MONSTER:monster[1],random,(09,04)
-MONSTER:monster[1],random,(07,04)
-MONSTER:monster[2],random,(15,06)
-MONSTER:monster[2],random,(13,06)
-MONSTER:monster[3],random,(11,06)
-MONSTER:monster[4],random,(09,06)
-MONSTER:monster[5],random,(07,06)
+MONSTER:$monster[0],(15,04)
+MONSTER:$monster[0],(13,04)
+MONSTER:$monster[0],(11,04)
+MONSTER:$monster[1],(09,04)
+MONSTER:$monster[1],(07,04)
+MONSTER:$monster[2],(15,06)
+MONSTER:$monster[2],(13,06)
+MONSTER:$monster[3],(11,06)
+MONSTER:$monster[4],(09,06)
+MONSTER:$monster[5],(07,06)
 
 # monsters behind the bars
-MONSTER:'\'',"iron golem",$place[0]
-MONSTER:'\'',"iron golem",$place[1]
-MONSTER:'\'',"iron golem",$place[2]
-MONSTER:'\'',"iron golem",$place[3]
-MONSTER:'D',random,$place[4]
-MONSTER:'D',random,$place[5]
-MONSTER:'D',random,$place[6]
-MONSTER:'D',random,$place[7]
-MONSTER:'D',random,$place[8]
-MONSTER:'D',random,$place[9]
+MONSTER:('\'',"iron golem"),$place[0]
+MONSTER:('\'',"iron golem"),$place[1]
+MONSTER:('\'',"iron golem"),$place[2]
+MONSTER:('\'',"iron golem"),$place[3]
+MONSTER:'D',$place[4]
+MONSTER:'D',$place[5]
+MONSTER:'D',$place[6]
+MONSTER:'D',$place[7]
+MONSTER:'D',$place[8]
+MONSTER:'D',$place[9]
 
 # the prisoners
-MONSTER:'@',"prisoner",(02,15),peaceful,asleep
-MONSTER:'@',"prisoner",(03,13),peaceful
-MONSTER:'@',"prisoner",(06,13)
-MONSTER:'@',"prisoner",(10,13)
+MONSTER:('@',"prisoner"),(02,15),peaceful,asleep
+MONSTER:('@',"prisoner"),(03,13),peaceful
+MONSTER:('@',"prisoner"),(06,13)
+MONSTER:('@',"prisoner"),(10,13)
 
-MONSTER:'H',"fire giant",(36,03),peaceful
-MONSTER:'j',"ochre jelly",(43,01),asleep
+MONSTER:('H',"fire giant"),(36,03),peaceful
+MONSTER:('j',"ochre jelly"),(43,01),asleep
 
 # treasure
 CONTAINER:('(',"chest"),$place[0] {

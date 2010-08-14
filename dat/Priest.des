@@ -67,7 +67,7 @@ DOOR:closed,(52,14)
 # Unattended Altar - unaligned due to conflict - player must align it.
 ALTAR:(28,09),noalign,altar
 # High Priest
-MONSTER:'@',"Arch Priest",(28,10) {
+MONSTER:('@',"Arch Priest"),(28,10) {
   OBJECT:('[',"robe"),+4
   OBJECT:'?'
   OBJECT:'?'
@@ -79,14 +79,14 @@ MONSTER:'@',"Arch Priest",(28,10) {
 # The treasure of High Priest
 OBJECT:('(',"chest"),(27,10)
 # knight guards for the audience chamber
-MONSTER:'@',"acolyte",(32,07)
-MONSTER:'@',"acolyte",(32,08)
-MONSTER:'@',"acolyte",(32,11)
-MONSTER:'@',"acolyte",(32,12)
-MONSTER:'@',"acolyte",(33,07)
-MONSTER:'@',"acolyte",(33,08)
-MONSTER:'@',"acolyte",(33,11)
-MONSTER:'@',"acolyte",(33,12)
+MONSTER:('@',"acolyte"),(32,07)
+MONSTER:('@',"acolyte"),(32,08)
+MONSTER:('@',"acolyte"),(32,11)
+MONSTER:('@',"acolyte"),(32,12)
+MONSTER:('@',"acolyte"),(33,07)
+MONSTER:('@',"acolyte"),(33,08)
+MONSTER:('@',"acolyte"),(33,11)
+MONSTER:('@',"acolyte"),(33,12)
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Random traps
@@ -97,18 +97,18 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Monsters on siege duty.
-MONSTER: 'Z',"human zombie",(37,01)
-MONSTER: 'Z',"human zombie",(37,18)
-MONSTER: 'Z',"human zombie",(03,03)
-MONSTER: 'Z',"human zombie",(65,04)
-MONSTER: 'Z',"human zombie",(12,11)
-MONSTER: 'Z',"human zombie",(60,12)
-MONSTER: 'Z',"human zombie",(14,08)
-MONSTER: 'Z',"human zombie",(55,00)
-MONSTER: 'Z',"human zombie",(18,18)
-MONSTER: 'Z',"human zombie",(59,10)
-MONSTER: 'Z',"human zombie",(13,09)
-MONSTER: 'Z',"human zombie",(01,17)
+MONSTER: ('Z',"human zombie"),(37,01)
+MONSTER: ('Z',"human zombie"),(37,18)
+MONSTER: ('Z',"human zombie"),(03,03)
+MONSTER: ('Z',"human zombie"),(65,04)
+MONSTER: ('Z',"human zombie"),(12,11)
+MONSTER: ('Z',"human zombie"),(60,12)
+MONSTER: ('Z',"human zombie"),(14,08)
+MONSTER: ('Z',"human zombie"),(55,00)
+MONSTER: ('Z',"human zombie"),(18,18)
+MONSTER: ('Z',"human zombie"),(59,10)
+MONSTER: ('Z',"human zombie"),(13,09)
+MONSTER: ('Z',"human zombie"),(01,17)
 
 #
 #	The "locate" level for the quest.
@@ -147,7 +147,7 @@ REGION:(31,00,39,13),unlit,"morgue"
 REGION:(11,03,29,10),lit,"temple",filled,true
 # The altar inside the temple
 ALTAR:(20,07),noalign,shrine
-MONSTER:'@',"aligned priest",(20,07),noalign,hostile
+MONSTER:('@',"aligned priest"),(20,07),noalign,hostile
 # Doors
 DOOR:locked,(10,06)
 DOOR:locked,(10,07)
@@ -242,37 +242,37 @@ TRAP:"fire",random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'&',"Nalzok",$place[0] {
+MONSTER:('&',"Nalzok"),$place[0] {
   OBJECT:')',+6
   OBJECT:'[',+3
 }
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',random,random
-MONSTER:'Z',random,random
-MONSTER:'W',"wraith",random
-MONSTER:'W',"wraith",random
-MONSTER:'W',"wraith",random
-MONSTER:'W',"wraith",random
-MONSTER:'W',"wraith",random
-MONSTER:'W',"wraith",random
-MONSTER:'W',"wraith",random
-MONSTER:'W',"wraith",random
-MONSTER:'W',random,random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:'Z',random
+MONSTER:'Z',random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:'W',random
 
 #
 #	The "fill" levels for the quest.
@@ -291,7 +291,7 @@ ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, up
 OBJECT: random,random
-MONSTER: 'Z', "human zombie", random
+MONSTER: ('Z', "human zombie"), random
 }
 
 ROOM: "ordinary" , random, random, random, random
@@ -305,7 +305,7 @@ ROOM: "ordinary" , random, random, random, random
 OBJECT: random, random
 TRAP: random, random
 OBJECT: random,random
-MONSTER: 'Z', "human zombie", random
+MONSTER: ('Z', "human zombie"), random
 }
 
 ROOM: "morgue" , random, random, random, random
@@ -320,7 +320,7 @@ ROOM: "ordinary" , random, random, random, random
 OBJECT: random, random
 OBJECT: random, random
 TRAP: random, random
-MONSTER: 'W', "wraith", random
+MONSTER: ('W', "wraith"), random
 }
 
 ROOM: "morgue" , random, random, random, random
@@ -339,8 +339,8 @@ ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, up
 OBJECT: random,random
-MONSTER: 'Z', "human zombie", random
-MONSTER: 'W', "wraith", random
+MONSTER: ('Z', "human zombie"), random
+MONSTER: ('W', "wraith"), random
 }
 
 ROOM: "morgue" , random, random, random, random
@@ -355,8 +355,8 @@ ROOM: "ordinary" , random, random, random, random
 OBJECT: random, random
 TRAP: random, random
 OBJECT: random,random
-MONSTER: 'Z', "human zombie", random
-MONSTER: 'W', "wraith", random
+MONSTER: ('Z', "human zombie"), random
+MONSTER: ('W', "wraith"), random
 }
 
 ROOM: "morgue" , random, random, random, random
@@ -372,8 +372,8 @@ ROOM: "ordinary" , random, random, random, random
 OBJECT: random, random
 OBJECT: random, random
 TRAP: random, random
-MONSTER: 'Z', "human zombie", random
-MONSTER: 'W', "wraith", random
+MONSTER: ('Z', "human zombie"), random
+MONSTER: ('W', "wraith"), random
 }
 
 ROOM: "morgue" , random, random, random, random

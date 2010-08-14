@@ -55,21 +55,21 @@ ROOMDOOR: false, closed, random, random
 #
 #       The Town Watch.
 #
-MONSTER: '@', "watchman", random, peaceful
-MONSTER: '@', "watchman", random, peaceful
-MONSTER: '@', "watchman", random, peaceful
-MONSTER: '@', "watchman", random, peaceful
-MONSTER: '@', "watch captain", random, peaceful
-MONSTER: '@', "watch captain", random, peaceful
-MONSTER: '@', "watch captain", random, peaceful
+MONSTER:('@', "watchman"), random, peaceful
+MONSTER:('@', "watchman"), random, peaceful
+MONSTER:('@', "watchman"), random, peaceful
+MONSTER:('@', "watchman"), random, peaceful
+MONSTER:('@', "watch captain"), random, peaceful
+MONSTER:('@', "watch captain"), random, peaceful
+MONSTER:('@', "watch captain"), random, peaceful
 #
 #       Some distracting townspeople
 #
-MONSTER: '@', "mugger", random, hostile
-MONSTER: '@', "mugger", random, hostile
-MONSTER: '@', "mugger", random, hostile
-MONSTER: '@', "mugger", random, hostile
-MONSTER: 'r', "sewer rat", random, hostile
-MONSTER: 'r', "sewer rat", random, hostile
-MONSTER: 'd', "little dog", random, hostile
+MONSTER:('@', "mugger"), random, hostile
+MONSTER:('@', "mugger"), random, hostile
+MONSTER:('@', "mugger"), random, hostile
+MONSTER:('@', "mugger"), random, hostile
+MONSTER:('r', "sewer rat"), random, hostile
+MONSTER:('r', "sewer rat"), random, hostile
+MONSTER:('d', "little dog"), random, hostile
 }

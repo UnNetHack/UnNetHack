@@ -3011,7 +3011,7 @@ spo_monster(coder)
     int nparams = 0;
 
     struct opvar *varparam;
-    struct opvar *id, *coord, *class, *has_inv;
+    struct opvar *id, *coord, *has_inv;
     monster tmpmons;
 
     tmpmons.peaceful = -1;
@@ -3033,9 +3033,7 @@ spo_monster(coder)
     tmpmons.seentraps = 0;
     tmpmons.has_invent = 0;
 
-    if (!OV_pop_i(has_inv) ||
-	!OV_pop_i(id) ||
-	!OV_pop_i(class)) return;
+    if (!OV_pop_i(has_inv)) return;
 
     if (!OV_pop_i(varparam)) return;
 
@@ -3133,10 +3131,12 @@ spo_monster(coder)
 
     if (!OV_pop_c(coord)) panic("no monster coord?");
 
-    tmpmons.id = OV_i(id);
+    if (!OV_pop_typ(id, SPOVAR_MONST)) panic("no mon type");
+
+    tmpmons.id = SP_MONST_PM(OV_i(id));
+    tmpmons.class = SP_MONST_CLASS(OV_i(id));
     tmpmons.x = SP_COORD_X(OV_i(coord));
     tmpmons.y = SP_COORD_Y(OV_i(coord));
-    tmpmons.class = OV_i(class);
     tmpmons.has_invent = OV_i(has_inv);
 
     create_monster(&tmpmons, coder->croom);
@@ -3146,7 +3146,6 @@ spo_monster(coder)
 
     opvar_free(id);
     opvar_free(coord);
-    opvar_free(class);
     opvar_free(has_inv);
     opvar_free(varparam);
 }

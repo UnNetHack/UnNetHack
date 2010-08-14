@@ -54,21 +54,21 @@ DOOR:locked,(19,06)
 # The temple altar (this will force a priest(ess) to be created)
 ALTAR:(36,02),coaligned,shrine
 # Shaman Karnov
-MONSTER:'@',"Shaman Karnov",(35,02) {
+MONSTER:('@',"Shaman Karnov"),(35,02) {
   OBJECT:'[',+6
   OBJECT:')',+6
 }
 # The treasure of Shaman Karnov
 OBJECT:('(',"chest"),(34,02)
 # neanderthal guards for the audience chamber
-MONSTER:'@',"neanderthal",(20,03)
-MONSTER:'@',"neanderthal",(20,02)
-MONSTER:'@',"neanderthal",(20,01)
-MONSTER:'@',"neanderthal",(21,03)
-MONSTER:'@',"neanderthal",(21,02)
-MONSTER:'@',"neanderthal",(21,01)
-MONSTER:'@',"neanderthal",(22,01)
-MONSTER:'@',"neanderthal",(26,09)
+MONSTER:('@',"neanderthal"),(20,03)
+MONSTER:('@',"neanderthal"),(20,02)
+MONSTER:('@',"neanderthal"),(20,01)
+MONSTER:('@',"neanderthal"),(21,03)
+MONSTER:('@',"neanderthal"),(21,02)
+MONSTER:('@',"neanderthal"),(21,01)
+MONSTER:('@',"neanderthal"),(22,01)
+MONSTER:('@',"neanderthal"),(26,09)
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Random traps
@@ -79,18 +79,18 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Monsters on siege duty (in the outer caves).
-MONSTER: 'h',"bugbear",(47,02),hostile
-MONSTER: 'h',"bugbear",(48,03),hostile
-MONSTER: 'h',"bugbear",(49,04),hostile
-MONSTER: 'h',"bugbear",(67,03),hostile
-MONSTER: 'h',"bugbear",(69,04),hostile
-MONSTER: 'h',"bugbear",(51,13),hostile
-MONSTER: 'h',"bugbear",(53,14),hostile
-MONSTER: 'h',"bugbear",(55,15),hostile
-MONSTER: 'h',"bugbear",(63,10),hostile
-MONSTER: 'h',"bugbear",(65,09),hostile
-MONSTER: 'h',"bugbear",(67,10),hostile
-MONSTER: 'h',"bugbear",(69,11),hostile
+MONSTER:('h',"bugbear"),(47,02),hostile
+MONSTER:('h',"bugbear"),(48,03),hostile
+MONSTER:('h',"bugbear"),(49,04),hostile
+MONSTER:('h',"bugbear"),(67,03),hostile
+MONSTER:('h',"bugbear"),(69,04),hostile
+MONSTER:('h',"bugbear"),(51,13),hostile
+MONSTER:('h',"bugbear"),(53,14),hostile
+MONSTER:('h',"bugbear"),(55,15),hostile
+MONSTER:('h',"bugbear"),(63,10),hostile
+MONSTER:('h',"bugbear"),(65,09),hostile
+MONSTER:('h',"bugbear"),(67,10),hostile
+MONSTER:('h',"bugbear"),(69,11),hostile
 WALLIFY
 
 #
@@ -161,32 +161,32 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'h',"bugbear",(02,10),hostile
-MONSTER:'h',"bugbear",(03,11),hostile
-MONSTER:'h',"bugbear",(04,12),hostile
-MONSTER:'h',"bugbear",(02,11),hostile
-MONSTER:'h',"bugbear",(16,16),hostile
-MONSTER:'h',"bugbear",(17,17),hostile
-MONSTER:'h',"bugbear",(18,18),hostile
-MONSTER:'h',"bugbear",(19,16),hostile
-MONSTER:'h',"bugbear",(30,06),hostile
-MONSTER:'h',"bugbear",(31,07),hostile
-MONSTER:'h',"bugbear",(32,08),hostile
-MONSTER:'h',"bugbear",(33,06),hostile
-MONSTER:'h',"bugbear",(34,07),hostile
-MONSTER:'h',"bugbear",random,hostile
-MONSTER:'h',"bugbear",random,hostile
-MONSTER:'h',"bugbear",random,hostile
-MONSTER:'h',"bugbear",random,hostile
+MONSTER:('h',"bugbear"),(02,10),hostile
+MONSTER:('h',"bugbear"),(03,11),hostile
+MONSTER:('h',"bugbear"),(04,12),hostile
+MONSTER:('h',"bugbear"),(02,11),hostile
+MONSTER:('h',"bugbear"),(16,16),hostile
+MONSTER:('h',"bugbear"),(17,17),hostile
+MONSTER:('h',"bugbear"),(18,18),hostile
+MONSTER:('h',"bugbear"),(19,16),hostile
+MONSTER:('h',"bugbear"),(30,06),hostile
+MONSTER:('h',"bugbear"),(31,07),hostile
+MONSTER:('h',"bugbear"),(32,08),hostile
+MONSTER:('h',"bugbear"),(33,06),hostile
+MONSTER:('h',"bugbear"),(34,07),hostile
+MONSTER:('h',"bugbear"),random,hostile
+MONSTER:('h',"bugbear"),random,hostile
+MONSTER:('h',"bugbear"),random,hostile
+MONSTER:('h',"bugbear"),random,hostile
 MONSTER:'h',random,random,hostile
 MONSTER:'H',random,random,hostile
-MONSTER:'H',"hill giant",(03,12),hostile
-MONSTER:'H',"hill giant",(20,17),hostile
-MONSTER:'H',"hill giant",(35,08),hostile
-MONSTER:'H',"hill giant",random,hostile
-MONSTER:'H',"hill giant",random,hostile
-MONSTER:'H',"hill giant",random,hostile
-MONSTER:'H',"hill giant",random,hostile
+MONSTER:('H',"hill giant"),(03,12),hostile
+MONSTER:('H',"hill giant"),(20,17),hostile
+MONSTER:('H',"hill giant"),(35,08),hostile
+MONSTER:('H',"hill giant"),random,hostile
+MONSTER:('H',"hill giant"),random,hostile
+MONSTER:('H',"hill giant"),random,hostile
+MONSTER:('H',"hill giant"),random,hostile
 MONSTER:'H',random,random,hostile
 WALLIFY
 
@@ -248,16 +248,16 @@ OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
 # monsters.
-MONSTER:'D',"Chromatic Dragon",(23,10),asleep {
+MONSTER:('D',"Chromatic Dragon"),(23,10),asleep {
   OBJECT:random
   OBJECT:random
   OBJECT:random
   OBJECT:random
   OBJECT:random
 }
-MONSTER:'F',"shrieker",(26,13)
-MONSTER:'F',"shrieker",(25,8)
-MONSTER:'F',"shrieker",(45,11)
+MONSTER:('F',"shrieker"),(26,13)
+MONSTER:('F',"shrieker"),(25,8)
+MONSTER:('F',"shrieker"),(45,11)
 WALLIFY
 
 #
@@ -291,13 +291,13 @@ TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 #
-MONSTER: 'h', "bugbear", random, hostile
-MONSTER: 'h', "bugbear", random, hostile
-MONSTER: 'h', "bugbear", random, hostile
-MONSTER: 'h', "bugbear", random, hostile
-MONSTER: 'h', "bugbear", random, hostile
-MONSTER: 'h', random, random, hostile
-MONSTER: 'H', "hill giant", random, hostile
+MONSTER:('h',"bugbear"), random, hostile
+MONSTER:('h',"bugbear"), random, hostile
+MONSTER:('h',"bugbear"), random, hostile
+MONSTER:('h',"bugbear"), random, hostile
+MONSTER:('h',"bugbear"), random, hostile
+MONSTER:'h',random, random, hostile
+MONSTER:('H',"hill giant"), random, hostile
 
 LEVEL: "Cav-filb"
 FLAGS:mazelevel
@@ -326,11 +326,11 @@ TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 #
-MONSTER: 'h', "bugbear", random, hostile
-MONSTER: 'h', "bugbear", random, hostile
-MONSTER: 'h', "bugbear", random, hostile
-MONSTER: 'h', "bugbear", random, hostile
-MONSTER: 'h', random, random, hostile
-MONSTER: 'h', random, random, hostile
-MONSTER: 'H', "hill giant", random, hostile
-MONSTER: 'H', "hill giant", random, hostile
+MONSTER:('h',"bugbear"), random, hostile
+MONSTER:('h',"bugbear"), random, hostile
+MONSTER:('h',"bugbear"), random, hostile
+MONSTER:('h',"bugbear"), random, hostile
+MONSTER:'h',random, random, hostile
+MONSTER:'h',random, random, hostile
+MONSTER:('H',"hill giant"), random, hostile
+MONSTER:('H',"hill giant"), random, hostile

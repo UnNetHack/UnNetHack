@@ -1425,18 +1425,9 @@ monster_detail	: MONSTER_ID chance ':' monster_desc
 		 }
 		;
 
-monster_desc	: monster_c ',' m_name ',' coord_or_var monster_infos
+monster_desc	: monster_or_var ',' coord_or_var monster_infos
 		  {
-		      long token = NON_PM;
-		      if ($3) {
-			  token = get_monster_id($3, (char) $1);
-			  if (token == ERR) {
-			      yywarning("Invalid monster name!  Making random monster.");
-			      token = NON_PM;
-			  }
-			  Free($3);
-		      }
-		      add_opvars(splev, "ii", (long)$1, token);
+		      /* nothing */
 		  }
 		;
 
@@ -2459,17 +2450,17 @@ encodemonster	: STRING
 		      long m = get_monster_id($1, (char)0);
 		      if (m == ERR) {
 			  yyerror("Unknown monster!");
-			  $$ == ERR;
+			  $$ == -MAX_REGISTERS-1;
 		      } else
-			  $$ = (m << 8);
+			  $$ = (m << 8) + (def_monsyms[(int)mons[m].mlet]);
 		  }
 		| CHAR
 		  {
 			if (check_monster_char((char) $1))
-				$$ = $1 ;
+			    $$ = ( $1 ) + ((-1) << 8);
 			else {
 			    yyerror("Unknown monster class!");
-			    $$ = ERR;
+			    $$ = -MAX_REGISTERS-1;
 			}
 		  }
 		| '(' CHAR ',' STRING ')'
@@ -2477,9 +2468,9 @@ encodemonster	: STRING
 		      long m = get_monster_id($4, (char) $2);
 		      if (m == ERR) {
 			  yyerror("Unknown monster!");
-			  $$ == ERR;
+			  $$ == -MAX_REGISTERS-1;
 		      } else
-			  $$ = (m << 8) + (((char) $2) & 0xff);
+			  $$ = (m << 8) + ((char) $2);
 		  }
 		| RANDOM_TYPE
 		  {
