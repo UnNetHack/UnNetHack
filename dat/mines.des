@@ -10,7 +10,7 @@
 #	specific levels as defined below.
 #
 LEVEL: "minefill"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP: mines, '.' , ' ' , true , true , random , true
 NOMAP
 #
