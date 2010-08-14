@@ -54,9 +54,13 @@ DOOR:locked,(39,08)
 DOOR:closed,(50,04)
 DOOR:closed,(50,06)
 # Lord Sato
-MONSTER:'@',"Lord Sato",(20,04)
+MONSTER:'@',"Lord Sato",(20,04) {
+  OBJECT:('[',"splint mail"),+4
+  OBJECT:(')',"katana"),+4
+  OBJECT:'?'
+}
 # The treasure of Lord Sato
-OBJECT:'(',"chest",(20,04)
+OBJECT:('(',"chest"),(20,04)
 # roshi guards for the audience chamber
 MONSTER:'@',"roshi",(18,04)
 MONSTER:'@',"roshi",(18,05)
@@ -157,41 +161,41 @@ STAIR:(25,14),down
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Objects
-OBJECT:'*',random,(25,05)
-OBJECT:'*',random,(26,05)
-OBJECT:'*',random,(27,05)
-OBJECT:'*',random,(28,05)
-OBJECT:'*',random,(25,06)
-OBJECT:'*',random,(26,06)
-OBJECT:'*',random,(27,06)
-OBJECT:'*',random,(28,06)
+OBJECT:'*',(25,05)
+OBJECT:'*',(26,05)
+OBJECT:'*',(27,05)
+OBJECT:'*',(28,05)
+OBJECT:'*',(25,06)
+OBJECT:'*',(26,06)
+OBJECT:'*',(27,06)
+OBJECT:'*',(28,06)
 #
-OBJECT:'[',random,(40,05)
-OBJECT:'[',random,(41,05)
-OBJECT:'[',random,(42,05)
-OBJECT:'[',random,(43,05)
-OBJECT:'[',random,(40,06)
-OBJECT:'[',random,(41,06)
-OBJECT:'[',random,(42,06)
-OBJECT:'[',random,(43,06)
+OBJECT:'[',(40,05)
+OBJECT:'[',(41,05)
+OBJECT:'[',(42,05)
+OBJECT:'[',(43,05)
+OBJECT:'[',(40,06)
+OBJECT:'[',(41,06)
+OBJECT:'[',(42,06)
+OBJECT:'[',(43,06)
 #
-OBJECT:')',random,(27,13)
-OBJECT:')',random,(28,13)
-OBJECT:')',random,(29,13)
-OBJECT:')',random,(30,13)
-OBJECT:')',random,(27,14)
-OBJECT:')',random,(28,14)
-OBJECT:')',random,(29,14)
-OBJECT:')',random,(30,14)
+OBJECT:')',(27,13)
+OBJECT:')',(28,13)
+OBJECT:')',(29,13)
+OBJECT:')',(30,13)
+OBJECT:')',(27,14)
+OBJECT:')',(28,14)
+OBJECT:')',(29,14)
+OBJECT:')',(30,14)
 #
-OBJECT:'(',random,(37,13)
-OBJECT:'(',random,(38,13)
-OBJECT:'(',random,(39,13)
-OBJECT:'(',random,(40,13)
-OBJECT:'(',random,(37,14)
-OBJECT:'(',random,(38,14)
-OBJECT:'(',random,(39,14)
-OBJECT:'(',random,(40,14)
+OBJECT:'(',(37,13)
+OBJECT:'(',(38,13)
+OBJECT:'(',(39,13)
+OBJECT:'(',(40,13)
+OBJECT:'(',(37,14)
+OBJECT:'(',(38,14)
+OBJECT:'(',(39,14)
+OBJECT:'(',(40,14)
 # Random traps
 TRAP:random,random
 TRAP:random,random
@@ -284,21 +288,21 @@ STAIR:$place[0],up
 # Non diggable walls
 NON_DIGGABLE:(00,00,44,19)
 # Objects
-OBJECT:')',"tsurugi",(22,10),blessed,0,NAME:"The Tsurugi of Muramasa"
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:(')',"tsurugi"),(22,10),blessed,0,NAME:"The Tsurugi of Muramasa"
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 #
 TRAP:"board",(22,09)
 TRAP:"board",(24,10)
@@ -311,7 +315,9 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'@',"Ashikaga Takauji",(22,10)
+MONSTER:'@',"Ashikaga Takauji",(22,10) {
+  OBJECT:('[',"splint mail")
+}
 MONSTER:'@',"samurai",random,hostile
 MONSTER:'@',"samurai",random,hostile
 MONSTER:'@',"samurai",random,hostile
@@ -357,15 +363,15 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
 #
 MONSTER: 'd', random, random
 MONSTER: 'd', "wolf", random
@@ -413,15 +419,15 @@ DOOR:closed,(43,08)
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
 #
 MONSTER: 'd', random, random
 MONSTER: 'd', "wolf", random

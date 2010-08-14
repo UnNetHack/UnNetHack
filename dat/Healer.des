@@ -57,9 +57,17 @@ DOOR:closed,(47,08)
 DOOR:closed,(48,12)
 DOOR:locked,(50,10)
 # Hippocrates
-MONSTER:'@',"Hippocrates",(37,10)
+MONSTER:'@',"Hippocrates",(37,10) {
+  OBJECT:'/'
+  OBJECT:'/'
+  OBJECT:'/'
+  OBJECT:'/'
+  OBJECT:'?'
+  OBJECT:'?'
+  OBJECT:(')',"silver dagger"),+4
+}
 # The treasure of Hippocrates
-OBJECT:'(',"chest",(37,10)
+OBJECT:('(',"chest"),(37,10)
 # intern guards for the audience chamber
 MONSTER:'@',"attendant",(29,08)
 MONSTER:'@',"attendant",(29,09)
@@ -143,21 +151,21 @@ NON_DIGGABLE:(11,02,21,07)
 # Altar in the temple.
 ALTAR:(13,05), chaos, shrine
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:random,random
 TRAP:random,random
@@ -237,22 +245,22 @@ STAIR:(39,10),up
 # Non diggable walls
 NON_DIGGABLE:(00,00,40,11)
 # Objects
-OBJECT:')',"quarterstaff",(20,06),blessed,0,NAME:"The Staff of Aesculapius"
-OBJECT:'/',"lightning",(20,06)
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:(')',"quarterstaff"),(20,06),blessed,0,NAME:"The Staff of Aesculapius"
+OBJECT:('/',"lightning"),(20,06)
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:random,random
 TRAP:random,random
@@ -261,7 +269,9 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'H',"Cyclops",(20,06),hostile
+MONSTER:'H',"Cyclops",(20,06),hostile {
+  OBJECT:'[',+3
+}
 MONSTER:'r',"rabid rat",random
 MONSTER:'r',"rabid rat",random
 MONSTER:'r',"rabid rat",random
@@ -312,14 +322,14 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
 #
 MONSTER: 'r', "rabid rat", random
 MONSTER: 'r', random, random,hostile
@@ -349,17 +359,17 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
 #
 MONSTER: 'r', "rabid rat", random
 MONSTER: 'r', "rabid rat", random

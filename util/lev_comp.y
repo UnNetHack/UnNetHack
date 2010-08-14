@@ -1597,20 +1597,10 @@ object_detail	: OBJECT_ID chance ':' object_desc
 		 }
 		;
 
-object_desc	: object_c ',' o_name object_infos
+object_desc	: object_or_var object_infos
 		  {
-		      long token = -1;
-		      if (( $4 & 0x4000) && in_container_obj) yyerror("object cannot have a coord when contained.");
-		      else if (!( $4 & 0x4000) && !in_container_obj) yyerror("object needs a coord when not contained.");
-		      if ($3) {
-			  token = get_object_id($3, $1);
-			  if (token == ERR) {
-			      yywarning("Illegal object name!  Making random object.");
-			      token = -1;
-			  }
-			  Free($3);
-		      }
-		      add_opvars(splev, "ii", (long)$1, token);
+		      if (( $2 & 0x4000) && in_container_obj) yyerror("object cannot have a coord when contained.");
+		      else if (!( $2 & 0x4000) && !in_container_obj) yyerror("object needs a coord when not contained.");
 		  }
 		;
 
@@ -2514,7 +2504,7 @@ object_or_var	: encodeobj
 		  {
 		      struct lc_vardefs *vd;
 		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
-			  if (vd->var_type != (SPOVAR_OBJT|SPOVAR_ARRAY))
+			  if (vd->var_type != (SPOVAR_OBJ|SPOVAR_ARRAY))
 			      yyerror("Trying to use a non-obj array variable as obj");
 		      } else yyerror("Variable not defined");
 		      add_opvars(splev, "iv", $3, $1);
@@ -2526,17 +2516,18 @@ encodeobj	: STRING
 		      long m = get_object_id($1, (char)0);
 		      if (m == ERR) {
 			  yyerror("Unknown object!");
-			  $$ == ERR;
+			  $$ == -MAX_REGISTERS-1;
 		      } else
-			  $$ = (m << 8);
+			  $$ = (m << 8) + 1; /* obj class != 0 to force generation of a specific item */
+
 		  }
 		| CHAR
 		  {
 			if (check_object_char((char) $1))
-				$$ = $1 ;
+			    $$ = ( $1 ) + ((-1) << 8) ;
 			else {
 			    yyerror("Unknown object class!");
-			    $$ = ERR;
+			    $$ = -MAX_REGISTERS-1;
 			}
 		  }
 		| '(' CHAR ',' STRING ')'
@@ -2544,9 +2535,9 @@ encodeobj	: STRING
 		      long m = get_object_id($4, (char) $2);
 		      if (m == ERR) {
 			  yyerror("Unknown object!");
-			  $$ == ERR;
+			  $$ == -MAX_REGISTERS-1;
 		      } else
-			  $$ = (m << 8) + (((char) $2) & 0xff);
+			  $$ = (m << 8) + ((char) $2);
 		  }
 		| RANDOM_TYPE
 		  {

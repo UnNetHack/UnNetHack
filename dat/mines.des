@@ -17,13 +17,13 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: '*', random, random
-OBJECT: '*', random, random
-OBJECT: '*', random, random
-OBJECT: '(', random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: '*', random
+OBJECT: '*', random
+OBJECT: '*', random
+OBJECT: '(', random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
 #
 MONSTER: 'G', "gnome", random
 MONSTER: 'G', "gnome", random
@@ -122,60 +122,60 @@ $place = { (05,04),(09,05),(13,04),(26,04),(31,05),(30,14),(05,14),(10,13),(26,1
 SHUFFLE:$place
 
 # scatter some bodies
-OBJECT:'%',"corpse",(20,12),"aligned priest"
-OBJECT:'%',"corpse",$place[0],"shopkeeper"
-OBJECT:'%',"corpse",$place[1],"shopkeeper"
-OBJECT:'%',"corpse",$place[2],"shopkeeper"
-OBJECT:'%',"corpse",$place[3],"shopkeeper"
-OBJECT:'%',"corpse",$place[4],"shopkeeper"
-OBJECT:'%',"corpse",random,"watchman"
-OBJECT:'%',"corpse",random,"watchman"
-OBJECT:'%',"corpse",random,"watchman"
-OBJECT:'%',"corpse",random,"watchman"
-OBJECT:'%',"corpse",random,"watch captain"
+OBJECT:('%',"corpse"),(20,12),"aligned priest"
+OBJECT:('%',"corpse"),$place[0],"shopkeeper"
+OBJECT:('%',"corpse"),$place[1],"shopkeeper"
+OBJECT:('%',"corpse"),$place[2],"shopkeeper"
+OBJECT:('%',"corpse"),$place[3],"shopkeeper"
+OBJECT:('%',"corpse"),$place[4],"shopkeeper"
+OBJECT:('%',"corpse"),random,"watchman"
+OBJECT:('%',"corpse"),random,"watchman"
+OBJECT:('%',"corpse"),random,"watchman"
+OBJECT:('%',"corpse"),random,"watchman"
+OBJECT:('%',"corpse"),random,"watch captain"
 
 # Rubble!
-OBJECT:'`',"boulder",random
-OBJECT:'`',"boulder",random
-OBJECT:'`',"boulder",random
-OBJECT:'`',"boulder",random
-OBJECT:'`',"boulder",random
-OBJECT:'`',"boulder",random
-OBJECT:'`',"boulder",random
-OBJECT:'`',"boulder",random
-OBJECT:'`',"boulder",random
-OBJECT:'`',"boulder",random
-OBJECT:'`',"boulder",random
-OBJECT:'`',"boulder",random
-OBJECT:'`',"boulder",random
-OBJECT:'*',"rock",random
-OBJECT:'*',"rock",random
-OBJECT:'*',"rock",random
-OBJECT:'*',"rock",random
-OBJECT:'*',"rock",random
-OBJECT:'*',"rock",random
-OBJECT:'*',"rock",random
-OBJECT:'*',"rock",random
-OBJECT:'*',"rock",random
-OBJECT:'*',"rock",random
-OBJECT:'*',"rock",random
+OBJECT:('`',"boulder"),random
+OBJECT:('`',"boulder"),random
+OBJECT:('`',"boulder"),random
+OBJECT:('`',"boulder"),random
+OBJECT:('`',"boulder"),random
+OBJECT:('`',"boulder"),random
+OBJECT:('`',"boulder"),random
+OBJECT:('`',"boulder"),random
+OBJECT:('`',"boulder"),random
+OBJECT:('`',"boulder"),random
+OBJECT:('`',"boulder"),random
+OBJECT:('`',"boulder"),random
+OBJECT:('`',"boulder"),random
+OBJECT:('*',"rock"),random
+OBJECT:('*',"rock"),random
+OBJECT:('*',"rock"),random
+OBJECT:('*',"rock"),random
+OBJECT:('*',"rock"),random
+OBJECT:('*',"rock"),random
+OBJECT:('*',"rock"),random
+OBJECT:('*',"rock"),random
+OBJECT:('*',"rock"),random
+OBJECT:('*',"rock"),random
+OBJECT:('*',"rock"),random
 
 # Guarantee 7 candles since we won't have Izchak available
-OBJECT:'(',"wax candle",$place[0],quantity:2
-OBJECT:'(',"wax candle",$place[1],quantity:1
-OBJECT:'(',"wax candle",$place[2],quantity:2
-OBJECT:'(',"tallow candle",$place[3],quantity:3
-OBJECT:'(',"tallow candle",$place[2],quantity:1
-OBJECT:'(',"tallow candle",$place[0],quantity:1
+OBJECT:('(',"wax candle"),$place[0],quantity:2
+OBJECT:('(',"wax candle"),$place[1],quantity:1
+OBJECT:('(',"wax candle"),$place[2],quantity:2
+OBJECT:('(',"tallow candle"),$place[3],quantity:3
+OBJECT:('(',"tallow candle"),$place[2],quantity:1
+OBJECT:('(',"tallow candle"),$place[0],quantity:1
 
 # go ahead and leave a lamp next to one corpse to be suggestive
 # and some empty wands...
-OBJECT:'(',"oil lamp",$place[2]
-OBJECT:'/',"striking",$place[1],uncursed,0
-OBJECT:'/',"striking",$place[3],uncursed,0
-OBJECT:'/',"striking",$place[4],uncursed,0
-OBJECT:'/',"magic missile",$place[4],uncursed,0
-OBJECT:'/',"magic missile",$place[0],uncursed,0
+OBJECT:('(',"oil lamp"),$place[2]
+OBJECT:('/',"striking"),$place[1],uncursed,0
+OBJECT:('/',"striking"),$place[3],uncursed,0
+OBJECT:('/',"striking"),$place[4],uncursed,0
+OBJECT:('/',"magic missile"),$place[4],uncursed,0
+OBJECT:('/',"magic missile"),$place[0],uncursed,0
 
 # the Orcish Army
 #
@@ -812,14 +812,14 @@ DOOR:locked,(71,06)
 DOOR:closed,(69,04)
 DOOR:closed,(67,16)
 MONSTER: 'G', "gnomish wizard", (67,14)
-OBJECT: '=', random, (70,14)
+OBJECT: '=', (70,14)
 DOOR:locked,(69,18)
 MONSTER: 'G', "gnome lord", (71,19)
 DOOR:locked,(73,18)
-OBJECT: '(', "chest", (73,19)
+OBJECT: ('(', "chest"), (73,19)
 DOOR:locked,(50,06)
-OBJECT: '(', random, (50,03)
-OBJECT: '`', "statue", (38,15), "gnome king", 1
+OBJECT: '(', (50,03)
+OBJECT: ('`', "statue"), (38,15), "gnome king", 1
 # Temple
 REGION:(29,02,33,04),lit,"temple"
 DOOR:closed,(31,05)
@@ -1102,41 +1102,41 @@ STAIR:(36,04),up
 NON_DIGGABLE:(00,00,74,17)
 # Niches
 # Note: place[6] empty
-OBJECT:'*',"diamond",$place[0]
-OBJECT:'*',"emerald",$place[0]
-OBJECT:'*',"worthless piece of violet glass",$place[0]
+OBJECT:('*',"diamond"),$place[0]
+OBJECT:('*',"emerald"),$place[0]
+OBJECT:('*',"worthless piece of violet glass"),$place[0]
 MONSTER:'m',random,$place[0], m_object "luckstone"
-OBJECT:'*',"worthless piece of white glass",$place[1]
-OBJECT:'*',"emerald",$place[1]
-OBJECT:'*',"amethyst",$place[1]
+OBJECT:('*',"worthless piece of white glass"),$place[1]
+OBJECT:('*',"emerald"),$place[1]
+OBJECT:('*',"amethyst"),$place[1]
 MONSTER:'m',random,$place[1], m_object "loadstone"
-OBJECT:'*',"diamond",$place[2]
-OBJECT:'*',"worthless piece of green glass",$place[2]
-OBJECT:'*',"amethyst",$place[2]
+OBJECT:('*',"diamond"),$place[2]
+OBJECT:('*',"worthless piece of green glass"),$place[2]
+OBJECT:('*',"amethyst"),$place[2]
 MONSTER:'m',random,$place[2], m_object "flint"
-OBJECT:'*',"worthless piece of white glass",$place[3]
-OBJECT:'*',"emerald",$place[3]
-OBJECT:'*',"worthless piece of violet glass",$place[3]
+OBJECT:('*',"worthless piece of white glass"),$place[3]
+OBJECT:('*',"emerald"),$place[3]
+OBJECT:('*',"worthless piece of violet glass"),$place[3]
 MONSTER:'m',random,$place[3], m_object "touchstone"
-OBJECT:'*',"worthless piece of red glass",$place[4]
-OBJECT:'*',"ruby",$place[4]
-OBJECT:'*',"loadstone",$place[4]
-OBJECT:'*',"ruby",$place[5]
-OBJECT:'*',"worthless piece of red glass",$place[5]
-OBJECT:'*',"luckstone",$place[5]
+OBJECT:('*',"worthless piece of red glass"),$place[4]
+OBJECT:('*',"ruby"),$place[4]
+OBJECT:('*',"loadstone"),$place[4]
+OBJECT:('*',"ruby"),$place[5]
+OBJECT:('*',"worthless piece of red glass"),$place[5]
+OBJECT:('*',"luckstone"),$place[5]
 # Random objects
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'(',random,random
-OBJECT:'(',random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'(',random
+OBJECT:'(',random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:random,random
 TRAP:random,random
@@ -1219,47 +1219,47 @@ NON_DIGGABLE:(53,14,61,14)
 # The Gnome King's wine cellar.
 ENGRAVING:(12,03),engrave,"You are now entering the Gnome King's wine cellar."
 ENGRAVING:(12,04),engrave,"Trespassers will be persecuted!"
-OBJECT:'!',"booze",(10,07)
-OBJECT:'!',"booze",(10,07)
-OBJECT:'!',random,(10,07)
-OBJECT:'!',"booze",(10,08)
-OBJECT:'!',"booze",(10,08)
-OBJECT:'!',random,(10,08)
-OBJECT:'!',"booze",(10,09)
-OBJECT:'!',"booze",(10,09)
-OBJECT:'!',"object detection",(10,09)
+OBJECT:('!',"booze"),(10,07)
+OBJECT:('!',"booze"),(10,07)
+OBJECT:'!',(10,07)
+OBJECT:('!',"booze"),(10,08)
+OBJECT:('!',"booze"),(10,08)
+OBJECT:'!',(10,08)
+OBJECT:('!',"booze"),(10,09)
+OBJECT:('!',"booze"),(10,09)
+OBJECT:('!',"object detection"),(10,09)
 # Objects
 # The Treasure chamber...
-OBJECT:'*',"diamond",(69,04)
-OBJECT:'*',random,(69,04)
-OBJECT:'*',"diamond",(69,04)
-OBJECT:'*',random,(69,04)
-OBJECT:'*',"emerald",(70,04)
-OBJECT:'*',random,(70,04)
-OBJECT:'*',"emerald",(70,04)
-OBJECT:'*',random,(70,04)
-OBJECT:'*',"emerald",(69,05)
-OBJECT:'*',random,(69,05)
-OBJECT:'*',"ruby",(69,05)
-OBJECT:'*',random,(69,05)
-OBJECT:'*',"ruby",(70,05)
-OBJECT:'*',"amethyst",(70,05)
-OBJECT:'*',random,(70,05)
-OBJECT:'*',"amethyst",(70,05)
-OBJECT:'*',"luckstone",(70,05)
+OBJECT:('*',"diamond"),(69,04)
+OBJECT:'*',(69,04)
+OBJECT:('*',"diamond"),(69,04)
+OBJECT:'*',(69,04)
+OBJECT:('*',"emerald"),(70,04)
+OBJECT:'*',(70,04)
+OBJECT:('*',"emerald"),(70,04)
+OBJECT:'*',(70,04)
+OBJECT:('*',"emerald"),(69,05)
+OBJECT:'*',(69,05)
+OBJECT:('*',"ruby"),(69,05)
+OBJECT:'*',(69,05)
+OBJECT:('*',"ruby"),(70,05)
+OBJECT:('*',"amethyst"),(70,05)
+OBJECT:'*',(70,05)
+OBJECT:('*',"amethyst"),(70,05)
+OBJECT:('*',"luckstone"),(70,05)
 # Scattered gems...
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'(',random,random
-OBJECT:'(',random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'(',random
+OBJECT:'(',random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:random,random
 TRAP:random,random
@@ -1334,36 +1334,36 @@ MAZEWALK:(36,8),west
 STAIR:(42,8),up
 
 # Objects
-OBJECT:'*',"diamond",random
-OBJECT:'*',random,random
-OBJECT:'*',"diamond",random
-OBJECT:'*',random,random
-OBJECT:'*',"emerald",random
-OBJECT:'*',random,random
-OBJECT:'*',"emerald",random
-OBJECT:'*',random,random
-OBJECT:'*',"emerald",random
-OBJECT:'*',random,random
-OBJECT:'*',"ruby",random
-OBJECT:'*',random,random
-OBJECT:'*',"ruby",random
-OBJECT:'*',"amethyst",random
-OBJECT:'*',random,random
-OBJECT:'*',"amethyst",random
-OBJECT:'*',"luckstone",$place[0]
-OBJECT:'*',"flint",$place[1]
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'+',random,random
-OBJECT:'+',random,random
-OBJECT:'+',random,random
-OBJECT:'+',random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:('*',"diamond"),random
+OBJECT:'*',random
+OBJECT:('*',"diamond"),random
+OBJECT:'*',random
+OBJECT:('*',"emerald"),random
+OBJECT:'*',random
+OBJECT:('*',"emerald"),random
+OBJECT:'*',random
+OBJECT:('*',"emerald"),random
+OBJECT:'*',random
+OBJECT:('*',"ruby"),random
+OBJECT:'*',random
+OBJECT:('*',"ruby"),random
+OBJECT:('*',"amethyst"),random
+OBJECT:'*',random
+OBJECT:('*',"amethyst"),random
+OBJECT:('*',"luckstone"),$place[0]
+OBJECT:('*',"flint"),$place[1]
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'+',random
+OBJECT:'+',random
+OBJECT:'+',random
+OBJECT:'+',random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 TRAP:random,random
 TRAP:random,random
 TRAP:random,random

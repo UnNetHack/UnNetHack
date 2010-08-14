@@ -50,7 +50,7 @@ MONSTER:'@',"Wizard of Yendor",(16,05),asleep
 MONSTER:'d',"hell hound",(15,05)
 MONSTER:'V',"vampire lord",(17,05)
 # The local treasure
-OBJECT:'+',"Book of the Dead",(16,05)
+OBJECT:('+',"Book of the Dead"),(16,05)
 # Surrounding terror
 MONSTER:';',"kraken",(14,02)
 MONSTER:';',"giant eel",(17,02)
@@ -80,14 +80,14 @@ TRAP:"sleep gas",random
 TRAP:"anti magic",random
 TRAP:"magic",random
 # Some random loot.
-OBJECT:'*',"ruby",random
-OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'+',random,random
-OBJECT:'+',random,random
-OBJECT:'+',random,random
+OBJECT:('*',"ruby"),random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'+',random
+OBJECT:'+',random
+OBJECT:'+',random
 
 
 # The middle wizard level.
@@ -133,13 +133,13 @@ TRAP:"sleep gas",random
 TRAP:"anti magic",random
 TRAP:"magic",random
 # Some random loot.
-OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'+',random,random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'+',random
 # treasures
-OBJECT:'"',random,(04,06)
+OBJECT:'"',(04,06)
 
 
 # The bottom wizard level.
@@ -209,13 +209,13 @@ TRAP:"board",(12,07)
 TRAP:"board",(11,06)
 TRAP:"board",(11,08)
 # Some loot
-OBJECT:')',random,random
-OBJECT:'!',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'(',random,random
+OBJECT:')',random
+OBJECT:'!',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'(',random
 # treasures
-OBJECT:'"',random,(11,07)
+OBJECT:'"',(11,07)
 
 
 # The former decoy wizard levels.
@@ -281,4 +281,4 @@ TRAP:"board",(04,05)
 TRAP:"board",(03,04)
 TRAP:"board",(05,04)
 # treasures
-OBJECT:'"',random,(04,04)
+OBJECT:'"',(04,04)

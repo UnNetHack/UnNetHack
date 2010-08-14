@@ -96,9 +96,16 @@ MONSTER: 'C',"forest centaur",random
 MONSTER: 'C',"forest centaur",random
 MONSTER: 'C',random,random
 # Twoflower
-MONSTER:'@',"Twoflower",(64,03)
+MONSTER:'@',"Twoflower",(64,03) {
+  OBJECT:random
+  OBJECT:random
+  OBJECT:random
+  OBJECT:random
+  OBJECT:random
+  OBJECT:random
+}
 # The treasure of Twoflower
-OBJECT:'(',"chest",(64,03)
+OBJECT:('(',"chest"),(64,03)
 # guides for the audience chamber
 MONSTER:'@',"guide",(29,03)
 MONSTER:'@',"guide",(32,04)
@@ -246,23 +253,23 @@ DOOR:closed,(60,16)
 DOOR:closed,(73,16)
 
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Toilet paper
-OBJECT:'?',"blank paper",(71,12)
-OBJECT:'?',"blank paper",(71,12)
+OBJECT:('?',"blank paper"),(71,12)
+OBJECT:('?',"blank paper"),(71,12)
 # Random traps
 TRAP:random,random
 TRAP:random,random
@@ -391,21 +398,21 @@ DOOR:random,(51,15)
 DOOR:open,(59,14)
 DOOR:open,(59,17)
 # Objects
-OBJECT:'(',"credit card",(04,01),blessed,0,NAME:"The Platinum Yendorian Express Card"
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:('(',"credit card"),(04,01),blessed,0,NAME:"The Platinum Yendorian Express Card"
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:random,random
 TRAP:random,random
@@ -414,7 +421,14 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'@',"Master of Thieves",(04,01),hostile
+MONSTER:'@',"Master of Thieves",(04,01),hostile {
+  OBJECT:'['
+  OBJECT:')'
+  OBJECT:'!'
+  OBJECT:'!'
+  OBJECT:'!'
+  OBJECT:'!'
+}
 MONSTER:'s',"giant spider",random
 MONSTER:'s',"giant spider",random
 MONSTER:'s',"giant spider",random
@@ -474,13 +488,13 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
 #
 TRAP: random, random
 TRAP: random, random
@@ -504,17 +518,17 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
 #
 TRAP: random, random
 TRAP: random, random

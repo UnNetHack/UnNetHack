@@ -59,60 +59,60 @@ NON_DIGGABLE:(00,00,75,19)
 # note: no priest(esse)s or monks - maybe Moloch has a *special*
 #       fate reserved for members of *those* classes.
 #
-OBJECT:'%',"corpse",random,"archeologist"
-OBJECT:'%',"corpse",random,"archeologist"
-OBJECT:'%',"corpse",random,"barbarian"
-OBJECT:'%',"corpse",random,"barbarian"
-OBJECT:'%',"corpse",random,"caveman"
-OBJECT:'%',"corpse",random,"cavewoman"
-OBJECT:'%',"corpse",random,"healer"
-OBJECT:'%',"corpse",random,"healer"
-OBJECT:'%',"corpse",random,"knight"
-OBJECT:'%',"corpse",random,"knight"
-OBJECT:'%',"corpse",random,"ranger"
-OBJECT:'%',"corpse",random,"ranger"
-OBJECT:'%',"corpse",random,"rogue"
-OBJECT:'%',"corpse",random,"rogue"
-OBJECT:'%',"corpse",random,"samurai"
-OBJECT:'%',"corpse",random,"samurai"
-OBJECT:'%',"corpse",random,"tourist"
-OBJECT:'%',"corpse",random,"tourist"
-OBJECT:'%',"corpse",random,"valkyrie"
-OBJECT:'%',"corpse",random,"valkyrie"
-OBJECT:'%',"corpse",random,"wizard"
-OBJECT:'%',"corpse",random,"wizard"
+OBJECT:('%',"corpse"),random,"archeologist"
+OBJECT:('%',"corpse"),random,"archeologist"
+OBJECT:('%',"corpse"),random,"barbarian"
+OBJECT:('%',"corpse"),random,"barbarian"
+OBJECT:('%',"corpse"),random,"caveman"
+OBJECT:('%',"corpse"),random,"cavewoman"
+OBJECT:('%',"corpse"),random,"healer"
+OBJECT:('%',"corpse"),random,"healer"
+OBJECT:('%',"corpse"),random,"knight"
+OBJECT:('%',"corpse"),random,"knight"
+OBJECT:('%',"corpse"),random,"ranger"
+OBJECT:('%',"corpse"),random,"ranger"
+OBJECT:('%',"corpse"),random,"rogue"
+OBJECT:('%',"corpse"),random,"rogue"
+OBJECT:('%',"corpse"),random,"samurai"
+OBJECT:('%',"corpse"),random,"samurai"
+OBJECT:('%',"corpse"),random,"tourist"
+OBJECT:('%',"corpse"),random,"tourist"
+OBJECT:('%',"corpse"),random,"valkyrie"
+OBJECT:('%',"corpse"),random,"valkyrie"
+OBJECT:('%',"corpse"),random,"wizard"
+OBJECT:('%',"corpse"),random,"wizard"
 #
 # Some random weapons and armor.
 #
-OBJECT:'[',random,random
-OBJECT:'[',random,random
-OBJECT:'[',random,random
-OBJECT:'[',random,random
-OBJECT:')',random,random
-OBJECT:')',random,random
-OBJECT:')',random,random
-OBJECT:')',random,random
+OBJECT:'[',random
+OBJECT:'[',random
+OBJECT:'[',random
+OBJECT:'[',random
+OBJECT:')',random
+OBJECT:')',random
+OBJECT:')',random
+OBJECT:')',random
 #
 # Some random loot.
 #
-OBJECT:'*',"ruby",random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'/',random,random
-OBJECT:'/',random,random
-OBJECT:'=',random,random
-OBJECT:'=',random,random
-OBJECT:'+',random,random
-OBJECT:'+',random,random
-OBJECT:'(',random,random
-OBJECT:'(',random,random
-OBJECT:'(',random,random
+OBJECT:('*',"ruby"),random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'/',random
+OBJECT:'/',random
+OBJECT:'=',random
+OBJECT:'=',random
+OBJECT:'+',random
+OBJECT:'+',random
+OBJECT:'(',random
+OBJECT:'(',random
+OBJECT:'(',random
 
 # (Not so) Random traps.
 TRAP:"spiked pit", (05,02)
@@ -211,60 +211,60 @@ NON_DIGGABLE:(00,00,75,19)
 # note: no priest(esse)s or monks - maybe Moloch has a *special*
 #       fate reserved for members of *those* classes.
 #
-OBJECT:'%',"corpse",random,"archeologist",0
-OBJECT:'%',"corpse",random,"archeologist",0
-OBJECT:'%',"corpse",random,"barbarian",0
-OBJECT:'%',"corpse",random,"barbarian",0
-OBJECT:'%',"corpse",random,"caveman",0
-OBJECT:'%',"corpse",random,"cavewoman",0
-OBJECT:'%',"corpse",random,"healer",0
-OBJECT:'%',"corpse",random,"healer",0
-OBJECT:'%',"corpse",random,"knight",0
-OBJECT:'%',"corpse",random,"knight",0
-OBJECT:'%',"corpse",random,"ranger",0
-OBJECT:'%',"corpse",random,"ranger",0
-OBJECT:'%',"corpse",random,"rogue",0
-OBJECT:'%',"corpse",random,"rogue",0
-OBJECT:'%',"corpse",random,"samurai",0
-OBJECT:'%',"corpse",random,"samurai",0
-OBJECT:'%',"corpse",random,"tourist",0
-OBJECT:'%',"corpse",random,"tourist",0
-OBJECT:'%',"corpse",random,"valkyrie",0
-OBJECT:'%',"corpse",random,"valkyrie",0
-OBJECT:'%',"corpse",random,"wizard",0
-OBJECT:'%',"corpse",random,"wizard",0
+OBJECT:('%',"corpse"),random,"archeologist",0
+OBJECT:('%',"corpse"),random,"archeologist",0
+OBJECT:('%',"corpse"),random,"barbarian",0
+OBJECT:('%',"corpse"),random,"barbarian",0
+OBJECT:('%',"corpse"),random,"caveman",0
+OBJECT:('%',"corpse"),random,"cavewoman",0
+OBJECT:('%',"corpse"),random,"healer",0
+OBJECT:('%',"corpse"),random,"healer",0
+OBJECT:('%',"corpse"),random,"knight",0
+OBJECT:('%',"corpse"),random,"knight",0
+OBJECT:('%',"corpse"),random,"ranger",0
+OBJECT:('%',"corpse"),random,"ranger",0
+OBJECT:('%',"corpse"),random,"rogue",0
+OBJECT:('%',"corpse"),random,"rogue",0
+OBJECT:('%',"corpse"),random,"samurai",0
+OBJECT:('%',"corpse"),random,"samurai",0
+OBJECT:('%',"corpse"),random,"tourist",0
+OBJECT:('%',"corpse"),random,"tourist",0
+OBJECT:('%',"corpse"),random,"valkyrie",0
+OBJECT:('%',"corpse"),random,"valkyrie",0
+OBJECT:('%',"corpse"),random,"wizard",0
+OBJECT:('%',"corpse"),random,"wizard",0
 #
 # Some random weapons and armor.
 #
-OBJECT:'[',random,random
-OBJECT:'[',random,random
-OBJECT:'[',random,random
-OBJECT[50%]:'[',random,random
-OBJECT:')',random,random
-OBJECT:')',random,random
-OBJECT:')',random,random
-OBJECT[50%]:')',random,random
+OBJECT:'[',random
+OBJECT:'[',random
+OBJECT:'[',random
+OBJECT[50%]:'[',random
+OBJECT:')',random
+OBJECT:')',random
+OBJECT:')',random
+OBJECT[50%]:')',random
 #
 # Some random loot.
 #
-OBJECT[50%]:'*',"ruby",random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'/',random,random
-OBJECT:'/',random,random
-OBJECT:'=',random,random
-OBJECT:'=',random,random
-OBJECT:'+',random,random
-OBJECT:'+',random,random
-OBJECT:'(',random,random
-OBJECT:'(',random,random
-OBJECT:'(',random,random
+OBJECT[50%]:('*',"ruby"),random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'/',random
+OBJECT:'/',random
+OBJECT:'=',random
+OBJECT:'=',random
+OBJECT:'+',random
+OBJECT:'+',random
+OBJECT:'(',random
+OBJECT:'(',random
+OBJECT:'(',random
 
 # (Not so) Random traps.
 TRAP[25%]:"spiked pit", (70,02)
@@ -320,7 +320,7 @@ MAP
 }}}}.}}}
 }}}}}}}}
 ENDMAP
-OBJECT:'`',"boulder",random
+OBJECT:('`',"boulder"),random
 GEOMETRY:right,top
 MAP
 }}}}}}}}
@@ -329,7 +329,7 @@ MAP
 }}...}}}
 }}}}}}}}
 ENDMAP
-OBJECT:'`',"boulder",random
+OBJECT:('`',"boulder"),random
 # lair
 GEOMETRY:center,center
 MAP
@@ -376,11 +376,11 @@ MONSTER:'i',"lemure",(43,08)
 MONSTER:'i',"lemure",(44,08)
 MONSTER:'i',"lemure",(45,08)
 # Some liquids and gems
-OBJECT:'*',random,(43,06)
-OBJECT:'*',random,(45,06)
-OBJECT:'!',random,(43,09)
-OBJECT:'!',random,(44,09)
-OBJECT:'!',random,(45,09)
+OBJECT:'*',(43,06)
+OBJECT:'*',(45,06)
+OBJECT:'!',(43,09)
+OBJECT:'!',(44,09)
+OBJECT:'!',(45,09)
 # And lots of blobby monsters
 MONSTER:monster[0],random,(25,06)
 MONSTER:monster[1],random,(24,07)
@@ -409,13 +409,13 @@ MONSTER:'m',random,random
 MONSTER:';',"jellyfish",random
 MONSTER:';',"jellyfish",random
 # Some random objects
-OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'%',random,random
-OBJECT:'`',"boulder",random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'%',random
+OBJECT:'%',random
+OBJECT:'%',random
+OBJECT:('`',"boulder"),random
 # Some traps
 TRAP:"sleep gas",random
 TRAP:"sleep gas",random
@@ -458,30 +458,30 @@ STAIR:levregion(01,00,12,20),levregion(20,01,70,20),up
 BRANCH:levregion(01,00,12,20),levregion(20,01,70,20)
 TELEPORT_REGION:levregion(01,00,12,20),levregion(20,01,70,20)
 # Wall "ruins"
-OBJECT:'`',"boulder",(19,02)
-OBJECT:'`',"boulder",(20,02)
-OBJECT:'`',"boulder",(21,02)
-OBJECT:'`',"boulder",(36,02)
-OBJECT:'`',"boulder",(36,03)
-OBJECT:'`',"boulder",(06,04)
-OBJECT:'`',"boulder",(05,05)
-OBJECT:'`',"boulder",(06,05)
-OBJECT:'`',"boulder",(07,05)
-OBJECT:'`',"boulder",(39,05)
-OBJECT:'`',"boulder",(08,08)
-OBJECT:'`',"boulder",(09,08)
-OBJECT:'`',"boulder",(10,08)
-OBJECT:'`',"boulder",(11,08)
-OBJECT:'`',"boulder",(06,10)
-OBJECT:'`',"boulder",(05,11)
-OBJECT:'`',"boulder",(06,11)
-OBJECT:'`',"boulder",(07,11)
-OBJECT:'`',"boulder",(21,11)
-OBJECT:'`',"boulder",(21,12)
-OBJECT:'`',"boulder",(13,13)
-OBJECT:'`',"boulder",(14,13)
-OBJECT:'`',"boulder",(15,13)
-OBJECT:'`',"boulder",(14,14)
+OBJECT:('`',"boulder"),(19,02)
+OBJECT:('`',"boulder"),(20,02)
+OBJECT:('`',"boulder"),(21,02)
+OBJECT:('`',"boulder"),(36,02)
+OBJECT:('`',"boulder"),(36,03)
+OBJECT:('`',"boulder"),(06,04)
+OBJECT:('`',"boulder"),(05,05)
+OBJECT:('`',"boulder"),(06,05)
+OBJECT:('`',"boulder"),(07,05)
+OBJECT:('`',"boulder"),(39,05)
+OBJECT:('`',"boulder"),(08,08)
+OBJECT:('`',"boulder"),(09,08)
+OBJECT:('`',"boulder"),(10,08)
+OBJECT:('`',"boulder"),(11,08)
+OBJECT:('`',"boulder"),(06,10)
+OBJECT:('`',"boulder"),(05,11)
+OBJECT:('`',"boulder"),(06,11)
+OBJECT:('`',"boulder"),(07,11)
+OBJECT:('`',"boulder"),(21,11)
+OBJECT:('`',"boulder"),(21,12)
+OBJECT:('`',"boulder"),(13,13)
+OBJECT:('`',"boulder"),(14,13)
+OBJECT:('`',"boulder"),(15,13)
+OBJECT:('`',"boulder"),(14,14)
 # Special rooms
 ALTAR:(24,07),noalign,sanctum
 REGION:(22,12,25,16),unlit,"morgue"
@@ -514,19 +514,19 @@ TRAP:"fire", random
 TRAP:"magic", random
 TRAP:"magic", random
 # Some random objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # The resident nasty
 MONSTER:'&',"Orcus",(33,15) {
-  OBJECT:'/',"death"
+  OBJECT:('/',"death")
 }
 # And its preferred companions
 MONSTER:'Z',"human zombie",(32,15)
@@ -631,7 +631,7 @@ REGION:(01,14,05,15),unlit,"shop"
 REGION:(39,01,43,02),unlit,"shop"
 REGION:(18,03,25,05),unlit,"temple"
 ALTAR:(20,04),noncoaligned,altar
-OBJECT:'%',"corpse",(23,03),"priest",0
+OBJECT:('%',"corpse"),(23,03),"priest",0
 # Some traps.
 TRAP:"spiked pit", random
 TRAP:"sleep gas", random
@@ -645,21 +645,21 @@ TRAP:"magic", random
 TRAP:"magic", random
 TRAP:"rust", random
 # Some random objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT[50%]:random,random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT[50%]:random,random
 # The resident nasty
 MONSTER:'&',"Orcus",(71,04) {
-  OBJECT:'/',"death"
+  OBJECT:('/',"death")
 }
 # And its preferred companions
 MONSTER:'Z',"human zombie",(69,03)
@@ -670,19 +670,19 @@ MONSTER:'V',"vampire",(69,04)
 MONSTER:'V',"vampire lord",(70,05)
 MONSTER:'V',"vampire lord",(72,06)
 # Some loot...
-CONTAINER:'(',"chest",(71,09) {
-  OBJECT:'!',random
+CONTAINER:('(',"chest"),(71,09) {
+  OBJECT:'!'
   #OBJECT:'!',"amnesia"
-  OBJECT:'?',random
+  OBJECT:'?'
   #OBJECT:'?',"demonology"
 }
-CONTAINER:'(',"chest",(72,09) {
-  OBJECT:'!',"sickness"
-  OBJECT:'"',"amulet of strangulation"
+CONTAINER:('(',"chest"),(72,09) {
+  OBJECT:('!',"sickness")
+  OBJECT:('"',"amulet of strangulation")
 }
-CONTAINER:'(',"chest",(73,09) {
-  OBJECT:'!',"blindness"
-  OBJECT:'?',"create monster"
+CONTAINER:('(',"chest"),(73,09) {
+  OBJECT:('!',"blindness")
+  OBJECT:('?',"create monster")
 }
 # ...and a guardian
 MONSTER:'P',"green slime",(71,08)
@@ -764,20 +764,20 @@ NON_DIGGABLE:(00,00,20,11)
 REGION:(01,01,20,10),unlit,"ordinary"
 # The fellow in residence
 MONSTER:'&',"Asmodeus",(12,07) {
-  OBJECT:'/',"cold"
-  OBJECT:'/',"fire"
+  OBJECT:('/',"cold")
+  OBJECT:('/',"fire")
 }
 # Some random weapons and armor.
-OBJECT:'[',random,random
-OBJECT:'[',random,random
-OBJECT:')',random,random
-OBJECT:')',random,random
-OBJECT:'*',random,random
-OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
+OBJECT:'[',random
+OBJECT:'[',random
+OBJECT:')',random
+OBJECT:')',random
+OBJECT:'*',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'?',random
 # Some traps.
 TRAP:"spiked pit", (05,02)
 TRAP:"fire", (08,06)
@@ -888,8 +888,8 @@ REGION:(48,03,58,09),lit,"ordinary"
 REGION:(06,15,16,18),lit,"ordinary"
 # The fellow in residence
 MONSTER:'&',"Asmodeus",(11,16) {
-  OBJECT:'/',"cold"
-  OBJECT:'/',"fire"
+  OBJECT:('/',"cold")
+  OBJECT:('/',"fire")
 }
 # His close friends
 MONSTER:'&',"marilith",(08,16),asleep
@@ -911,29 +911,29 @@ MONSTER:'&',random,(07,04)
 MONSTER:'&',random,(14,04)
 MONSTER:'&',random,(07,08)
 MONSTER:'&',random,(14,08)
-OBJECT:'!',"invisibility",(07,04)
-OBJECT:'!',"invisibility",(14,04)
-OBJECT:'!',"invisibility",(07,08)
-OBJECT:'!',"invisibility",(14,08)
+OBJECT:('!',"invisibility"),(07,04)
+OBJECT:('!',"invisibility"),(14,04)
+OBJECT:('!',"invisibility"),(07,08)
+OBJECT:('!',"invisibility"),(14,08)
 MONSTER:'m',"giant mimic", (11,06), m_feature "staircase down"
 TRAP:"magic",(09,06)
 TRAP:"magic",(13,06)
 TRAP:"magic",(11,05)
 TRAP:"magic",(11,07)
 # Some random weapons and armor.
-OBJECT:'[',random,random
-OBJECT:'[',random,random
-OBJECT:'[',random,random
-OBJECT:'[',random,random
-OBJECT:')',random,random
-OBJECT:')',random,random
-OBJECT:')',random,random
-OBJECT:')',random,random
-OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
+OBJECT:'[',random
+OBJECT:'[',random
+OBJECT:'[',random
+OBJECT:'[',random
+OBJECT:')',random
+OBJECT:')',random
+OBJECT:')',random
+OBJECT:')',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'?',random
 # Traps in the outer chambers
 TRAP:"spiked pit",(02,08)
 TRAP:"anti magic",(21,06)
@@ -943,7 +943,7 @@ TRAP:"rust",(53,06)
 TRAP:"spiked pit",(50,03)
 TRAP:"polymorph",(69,02)
 # Teleport scrolls are kept in a closet
-OBJECT:'?',"teleportation",(63,06)
+OBJECT:('?',"teleportation"),(63,06)
 # Traps in the inner spiral
 TRAP:"magic",(22,14)
 TRAP:"anti magic",(26,18)
@@ -953,19 +953,19 @@ TRAP:"spiked pit",(32,13)
 GOLD:500,(38,16)
 GOLD:500,(38,17)
 GOLD:500,(38,18)
-OBJECT:'"',"amulet of change",(37,16)
-OBJECT:'=',"hunger",(37,18),cursed,0
-OBJECT:'*',"diamond",(38,16),cursed,0,NAME:"The Tears of Koth"
-OBJECT:'*',"ruby",(38,17),cursed,0,NAME:"The Heart of Cassanova" 
-OBJECT:'*',"emerald",(38,18),cursed,0,NAME:"The Eye of Hera"
+OBJECT:('"',"amulet of change"),(37,16)
+OBJECT:('=',"hunger"),(37,18),cursed,0
+OBJECT:('*',"diamond"),(38,16),cursed,0,NAME:"The Tears of Koth"
+OBJECT:('*',"ruby"),(38,17),cursed,0,NAME:"The Heart of Cassanova" 
+OBJECT:('*',"emerald"),(38,18),cursed,0,NAME:"The Eye of Hera"
 MONSTER:'&',random,(38,16)
 MONSTER:'&',random,(38,17)
 MONSTER:'&',random,(38,18)
 # Outer Trap Room 
 GOLD:1,(48,13)
 GOLD:1,(48,14)
-OBJECT:'?',"fire",(48,13),cursed,0
-OBJECT:'?',"earth",(48,14),cursed,0
+OBJECT:('?',"fire"),(48,13),cursed,0
+OBJECT:('?',"earth"),(48,14),cursed,0
 TRAP:"magic",(48,13)
 TRAP:"land mine",(48,14)
 GOLD:1,(51,12)
@@ -978,7 +978,7 @@ TRAP:"magic",(52,12)
 TRAP:"magic",(52,15)
 TRAP:"spiked pit",(51,13)
 TRAP:"anti magic",(50,14)
-OBJECT:'!',"polymorph",(50,13)
+OBJECT:('!',"polymorph"),(50,13)
 #OBJECT:'?',"demonology",(50,12),cursed,0
 #OBJECT:'?',"elementalism",(50,12),cursed,0
 # Guardians in the fountain room
@@ -997,9 +997,9 @@ MONSTER:'d',"hell hound",(68,07)
 MONSTER:'j',"blue jelly",(73,02)
 # Greeting in the outer chamber
 MONSTER:'i',"imp",(69,17)
-OBJECT[50%]:'[',"helm of opposite alignment",(65,17),cursed,-2
-OBJECT[50%]:'*',"loadstone",(65,18),cursed,0
-OBJECT[50%]:'"',"amulet of strangulation",(65,18),cursed,0
+OBJECT[50%]:('[',"helm of opposite alignment"),(65,17),cursed,-2
+OBJECT[50%]:('*',"loadstone"),(65,18),cursed,0
+OBJECT[50%]:('"',"amulet of strangulation"),(65,18),cursed,0
 #
 # The Baalzebub level
 #
@@ -1031,16 +1031,16 @@ STAIR:(44,06),down
 # The fellow in residence
 MONSTER:'&',"Baalzebub",(35,06)
 # Some random weapons and armor.
-OBJECT:'[',random,random
-OBJECT:'[',random,random
-OBJECT:')',random,random
-OBJECT:')',random,random
-OBJECT:'*',random,random
-OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
+OBJECT:'[',random
+OBJECT:'[',random
+OBJECT:')',random
+OBJECT:')',random
+OBJECT:'*',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'?',random
 # Some traps.
 TRAP:"spiked pit", random
 TRAP:"fire", random
@@ -1107,26 +1107,26 @@ DRAWBRIDGE:(03,08),east,closed
 # The fellow in residence
 MONSTER:'&',"Baalzebub",(44,08)
 # Some random weapons and armor.
-OBJECT:'[',random,random
-OBJECT:'[',random,random
-OBJECT:'[',random,random
-OBJECT:'[',random,random
-OBJECT:')',random,random
-OBJECT:')',random,random
-OBJECT:')',random,random
-OBJECT:')',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
+OBJECT:'[',random
+OBJECT:'[',random
+OBJECT:'[',random
+OBJECT:'[',random
+OBJECT:')',random
+OBJECT:')',random
+OBJECT:')',random
+OBJECT:')',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'?',random
 # Some traps.
 TRAP:"spiked pit", random
 TRAP:"spiked pit", random
@@ -1264,25 +1264,25 @@ TRAP:"anti magic", random
 TRAP:"fire", random
 TRAP:"magic", random
 # Some random objects
-OBJECT:'[',random,random
-OBJECT:'[',random,random
-OBJECT:'[',random,random
-OBJECT:'[',random,random
-OBJECT:')',random,random
-OBJECT:')',random,random
-OBJECT:'*',random,random
-OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
+OBJECT:'[',random
+OBJECT:'[',random
+OBJECT:'[',random
+OBJECT:'[',random
+OBJECT:')',random
+OBJECT:')',random
+OBJECT:'*',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'?',random
+OBJECT:'?',random
 # for breaking the drawbridges
-OBJECT:'/',"striking",random
-OBJECT:'/',"striking",random
+OBJECT:('/',"striking"),random
+OBJECT:('/',"striking"),random
 # Some monsters.
 MONSTER:'&',"horned devil",(14,12),hostile
 MONSTER:'&',"barbed devil",(18,08),hostile
@@ -1313,13 +1313,13 @@ IF [30%] {
 } ELSE {
 # Cthulhu's didn't like its taste?
  IF [50%] {
-  OBJECT:'%',"corpse",(49,13),"archeologist",0
+  OBJECT:('%',"corpse"),(49,13),"archeologist",0
  } ELSE {
-  OBJECT:'%',"corpse",(49,13),"tourist",0
+  OBJECT:('%',"corpse"),(49,13),"tourist",0
  }
 }
 # poor boy, he got so far
-OBJECT:'"',"cheap plastic imitation of the Amulet of Yendor",(49,13)
+OBJECT:('"',"cheap plastic imitation of the Amulet of Yendor"),(49,13)
 # A few nasties
 MONSTER:'L',random,random
 MONSTER:'L',random,random
@@ -1363,15 +1363,15 @@ IF [50%] {
   }
 }
 #
-RANDOM_OBJECTS:'(','/','=','+',')','[','?','*','%'
-OBJECT: object[0], random, random
-OBJECT: object[0], random, random
-OBJECT: object[1], random, random
-OBJECT: object[2], random, random
-OBJECT: object[3], random, random
-OBJECT: object[4], random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+$object = OBJECT:{ '(','/','=','+',')','[','?','*','%'}
+OBJECT: $object[0], random
+OBJECT: $object[0], random
+OBJECT: $object[1], random
+OBJECT: $object[2], random
+OBJECT: $object[3], random
+OBJECT: $object[4], random
+OBJECT: random, random
+OBJECT: random, random
 #
 RANDOM_MONSTERS:'V','D',' ','&','Z'
 MONSTER:monster[0],random,random,hostile

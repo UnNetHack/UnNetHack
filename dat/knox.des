@@ -37,7 +37,8 @@ BRANCH:(08,16,08,16),(0,0,0,0)
 #   Throne room, with Croesus on the throne
 REGION:(37,08,46,11),lit,"throne"
 MONSTER:'@',"Croesus",(43,10),hostile {
-  OBJECT:')',"two-handed sword"
+  OBJECT:(')',"two-handed sword")
+  OBJECT:'['
 }
 #   The Vault
 #   Using unfilled morgue for
@@ -94,18 +95,18 @@ MONSTER:';',"giant eel",(17,11)
 MONSTER:';',"giant eel",(48,08)
 MONSTER:';',"giant eel",(48,11)
 # The corner rooms treasures
-OBJECT:'*',"diamond",(19,06)
-OBJECT:'*',"diamond",(20,06)
-OBJECT:'*',"diamond",(21,06)
-OBJECT:'*',"emerald",(19,13)
-OBJECT:'*',"emerald",(20,13)
-OBJECT:'*',"emerald",(21,13)
-OBJECT:'*',"ruby",(46,06)
-OBJECT:'*',"ruby",(47,06)
-OBJECT:'*',"ruby",(48,06)
-OBJECT:'*',"amethyst",(46,13)
-OBJECT:'*',"amethyst",(47,13)
-OBJECT:'*',"amethyst",(48,13)
+OBJECT:('*',"diamond"),(19,06)
+OBJECT:('*',"diamond"),(20,06)
+OBJECT:('*',"diamond"),(21,06)
+OBJECT:('*',"emerald"),(19,13)
+OBJECT:('*',"emerald"),(20,13)
+OBJECT:('*',"emerald"),(21,13)
+OBJECT:('*',"ruby"),(46,06)
+OBJECT:('*',"ruby"),(47,06)
+OBJECT:('*',"ruby"),(48,06)
+OBJECT:('*',"amethyst"),(46,13)
+OBJECT:('*',"amethyst"),(47,13)
+OBJECT:('*',"amethyst"),(48,13)
 #
 # "Winterly Fort Ludios" by Patric Mueller <bhaak@gmx.net>
 #
@@ -141,7 +142,10 @@ NON_DIGGABLE:(00,00,75,19)
 BRANCH:(08,16,08,16),(0,0,0,0)
 #   Throne room, with Croesus on the throne
 REGION:(57,06,66,09),lit,"throne"
-MONSTER:'@',"Croesus",(63,08),hostile
+MONSTER:'@',"Croesus",(63,08),hostile {
+  OBJECT:(')',"two-handed sword")
+  OBJECT:'['
+}
 #   The Vault
 #   Using unfilled morgue for
 #   identification in mkmaze.c
@@ -200,18 +204,18 @@ MONSTER:';',"giant eel",(60,04)
 MONSTER:';',"giant eel",(43,12)
 MONSTER:';',"giant eel",(68,09)
 # The corner rooms treasures
-OBJECT:'*',"diamond",(39,04)
-OBJECT:'*',"diamond",(40,04)
-OBJECT:'*',"diamond",(41,04)
-OBJECT:'*',"emerald",(39,11)
-OBJECT:'*',"emerald",(40,11)
-OBJECT:'*',"emerald",(41,11)
-OBJECT:'*',"ruby",(66,04)
-OBJECT:'*',"ruby",(67,04)
-OBJECT:'*',"ruby",(68,04)
-OBJECT:'*',"amethyst",(66,11)
-OBJECT:'*',"amethyst",(67,11)
-OBJECT:'*',"amethyst",(68,11)
+OBJECT:('*',"diamond"),(39,04)
+OBJECT:('*',"diamond"),(40,04)
+OBJECT:('*',"diamond"),(41,04)
+OBJECT:('*',"emerald"),(39,11)
+OBJECT:('*',"emerald"),(40,11)
+OBJECT:('*',"emerald"),(41,11)
+OBJECT:('*',"ruby"),(66,04)
+OBJECT:('*',"ruby"),(67,04)
+OBJECT:('*',"ruby"),(68,04)
+OBJECT:('*',"amethyst"),(66,11)
+OBJECT:('*',"amethyst"),(67,11)
+OBJECT:('*',"amethyst"),(68,11)
 #
 # "Minas Tirith?" by Patric Mueller <bhaak@gmx.net>
 #
@@ -250,7 +254,10 @@ REGION:(00,00,75,19),lit,"ordinary"
 BRANCH:(06,16,06,16),(0,0,0,0)
 #   Throne room, with Croesus on the throne
 REGION:(62,12,75,15),lit,"throne"
-MONSTER:'@',"Croesus",(66,14),hostile
+MONSTER:'@',"Croesus",(66,14),hostile {
+  OBJECT:(')',"two-handed sword")
+  OBJECT:'['
+}
 #   The Vault
 #   Using unfilled morgue for
 #   identification in mkmaze.c
@@ -272,37 +279,37 @@ DRAWBRIDGE:(30,15),east,closed
 DRAWBRIDGE:(34,15),west,closed
 # Guards of first ringwall, with possible offensive wands
 MONSTER:'C',random,(31,02),hostile
-OBJECT[50%]: '/',random,(31,02)
+OBJECT[50%]: '/',(31,02)
 MONSTER:'C',random,(31,03),hostile
-OBJECT[50%]: '/',random,(31,03)
+OBJECT[50%]: '/',(31,03)
 MONSTER:'C',random,(31,07),hostile
-OBJECT[50%]: '/',random,(31,07)
+OBJECT[50%]: '/',(31,07)
 MONSTER:'C',random,(31,08),hostile
-OBJECT[50%]: '/',random,(31,08)
+OBJECT[50%]: '/',(31,08)
 MONSTER:'C',random,(31,12),hostile
-OBJECT[50%]: '/',random,(31,12)
+OBJECT[50%]: '/',(31,12)
 MONSTER:'C',random,(31,13),hostile
-OBJECT[50%]: '/',random,(31,13)
+OBJECT[50%]: '/',(31,13)
 MONSTER:'C',random,(31,17),hostile
-OBJECT[50%]: '/',random,(31,17)
+OBJECT[50%]: '/',(31,17)
 MONSTER:'C',random,(31,18),hostile
-OBJECT[50%]: '/',random,(31,18)
+OBJECT[50%]: '/',(31,18)
 MONSTER:'C',random,(33,02),hostile
-OBJECT[50%]: '/',random,(33,02)
+OBJECT[50%]: '/',(33,02)
 MONSTER:'C',random,(33,03),hostile
-OBJECT[50%]: '/',random,(33,03)
+OBJECT[50%]: '/',(33,03)
 MONSTER:'C',random,(33,07),hostile
-OBJECT[50%]: '/',random,(33,07)
+OBJECT[50%]: '/',(33,07)
 MONSTER:'C',random,(33,08),hostile
-OBJECT[50%]: '/',random,(33,08)
+OBJECT[50%]: '/',(33,08)
 MONSTER:'C',random,(33,12),hostile
-OBJECT[50%]: '/',random,(33,12)
+OBJECT[50%]: '/',(33,12)
 MONSTER:'C',random,(33,13),hostile
-OBJECT[50%]: '/',random,(33,13)
+OBJECT[50%]: '/',(33,13)
 MONSTER:'C',random,(33,17),hostile
-OBJECT[50%]: '/',random,(33,17)
+OBJECT[50%]: '/',(33,17)
 MONSTER:'C',random,(33,18),hostile
-OBJECT[50%]: '/',random,(33,18)
+OBJECT[50%]: '/',(33,18)
 # Drawbridges of second ringwall
 DRAWBRIDGE:(16,06),east,closed
 DRAWBRIDGE:(22,06),west,closed
@@ -313,20 +320,20 @@ DRAWBRIDGE:(22,14),west,closed
 # Guards of first ringwall, with possible offensive wands
 MONSTER:'C',random,(18,04),hostile
 MONSTER:'C',random,(20,04),hostile
-OBJECT[50%]:'/',random,(18,04)
-OBJECT[50%]:'/',random,(20,04)
+OBJECT[50%]:'/',(18,04)
+OBJECT[50%]:'/',(20,04)
 MONSTER:'C',random,(18,08),hostile
 MONSTER:'C',random,(20,08),hostile
-OBJECT[50%]:'/',random,(18,08)
-OBJECT[50%]:'/',random,(20,08)
+OBJECT[50%]:'/',(18,08)
+OBJECT[50%]:'/',(20,08)
 MONSTER:'C',random,(18,12),hostile
 MONSTER:'C',random,(20,12),hostile
-OBJECT[50%]:'/',random,(18,12)
-OBJECT[50%]:'/',random,(20,12)
+OBJECT[50%]:'/',(18,12)
+OBJECT[50%]:'/',(20,12)
 MONSTER:'C',random,(18,16),hostile
 MONSTER:'C',random,(20,16),hostile
-OBJECT[50%]:'/',random,(18,16)
-OBJECT[50%]:'/',random,(20,16)
+OBJECT[50%]:'/',(18,16)
+OBJECT[50%]:'/',(20,16)
 # Doors
 DOOR:closed,(04,14)
 DOOR:closed,(07,03)
@@ -384,15 +391,15 @@ MONSTER:';',"giant eel",(22,15)
 MONSTER:';',"giant eel",(29,07)
 MONSTER:';',"giant eel",(35,14)
 # The corner rooms treasures
-OBJECT:'*',"diamond",(62,17)
-OBJECT:'*',"diamond",(62,18)
-OBJECT:'*',"diamond",(62,19)
-OBJECT:'*',"emerald",(74,17)
-OBJECT:'*',"emerald",(74,18)
-OBJECT:'*',"emerald",(74,19)
-OBJECT:'*',"ruby",(62,01)
-OBJECT:'*',"ruby",(62,02)
-OBJECT:'*',"ruby",(62,03)
-OBJECT:'*',"amethyst",(74,01)
-OBJECT:'*',"amethyst",(74,02)
-OBJECT:'*',"amethyst",(74,03)
+OBJECT:('*',"diamond"),(62,17)
+OBJECT:('*',"diamond"),(62,18)
+OBJECT:('*',"diamond"),(62,19)
+OBJECT:('*',"emerald"),(74,17)
+OBJECT:('*',"emerald"),(74,18)
+OBJECT:('*',"emerald"),(74,19)
+OBJECT:('*',"ruby"),(62,01)
+OBJECT:('*',"ruby"),(62,02)
+OBJECT:('*',"ruby"),(62,03)
+OBJECT:('*',"amethyst"),(74,01)
+OBJECT:('*',"amethyst"),(74,02)
+OBJECT:('*',"amethyst"),(74,03)

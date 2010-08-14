@@ -8,23 +8,23 @@ ROOM: "ordinary", unlit, random, random, (12,7)
 {
 TRAP:"board",random
 TRAP:"board",random
-OBJECT:'(',"chest",random
-OBJECT:'(',"chest",random
-OBJECT:'(',"chest",random
-OBJECT:'(',"chest",random
-OBJECT: '=', random, random
-OBJECT: '=', random, random
-OBJECT: '=', random, random
-OBJECT: '=', random, random
-OBJECT: '*', random, random
-OBJECT: '*', random, random
-OBJECT: '*', random, random
-OBJECT: '*', random, random
-OBJECT: '*', random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT:('(',"chest"),random
+OBJECT:('(',"chest"),random
+OBJECT:('(',"chest"),random
+OBJECT:('(',"chest"),random
+OBJECT:'=', random
+OBJECT:'=', random
+OBJECT:'=', random
+OBJECT:'=', random
+OBJECT:'*', random
+OBJECT:'*', random
+OBJECT:'*', random
+OBJECT:'*', random
+OBJECT:'*', random
+OBJECT:random, random
+OBJECT:random, random
+OBJECT:random, random
+OBJECT:random, random
 MONSTER: 'n', random, random, hostile
 MONSTER: 'n', random, random, hostile
 MONSTER: 'n', random, random, hostile
@@ -37,7 +37,7 @@ ROOM: "ordinary", random, random, random, random
 {
 STAIR: random, up
 TRAP:"board",random
-OBJECT: random,random,random
+OBJECT:random,random
 MONSTER: 'n', random, random, hostile
 }
 
@@ -45,7 +45,7 @@ ROOM: "ordinary", random, random, random, random
 {
 STAIR: random, down
 TRAP:"board",random
-OBJECT: random, random, random
+OBJECT:random, random
 TRAP: random, random
 MONSTER: 'n', random, random, hostile
 }
@@ -53,15 +53,15 @@ MONSTER: 'n', random, random, hostile
 ROOM: "ordinary", random, random, random, random
 {
 TRAP:"board",random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT:random, random
+OBJECT:random, random
 MONSTER: 'n', random, random, hostile
 }
 
 ROOM: "ordinary", random, random, random, random
 {
 TRAP:"board",random
-OBJECT: random, random, random
+OBJECT:random, random
 TRAP: random, random
 MONSTER: 'n', random, random, hostile
 }
@@ -69,7 +69,7 @@ MONSTER: 'n', random, random, hostile
 ROOM: "ordinary", random, random, random, random
 {
 TRAP:"board",random
-OBJECT: random, random, random
+OBJECT:random, random
 TRAP: random, random
 MONSTER: 'n', random, random, hostile
 }

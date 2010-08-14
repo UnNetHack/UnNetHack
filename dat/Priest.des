@@ -67,9 +67,17 @@ DOOR:closed,(52,14)
 # Unattended Altar - unaligned due to conflict - player must align it.
 ALTAR:(28,09),noalign,altar
 # High Priest
-MONSTER:'@',"Arch Priest",(28,10)
+MONSTER:'@',"Arch Priest",(28,10) {
+  OBJECT:('[',"robe"),+4
+  OBJECT:'?'
+  OBJECT:'?'
+  OBJECT:'?'
+  OBJECT:'?'
+  OBJECT:'+'
+  OBJECT:'+'
+}
 # The treasure of High Priest
-OBJECT:'(',"chest",(27,10)
+OBJECT:('(',"chest"),(27,10)
 # knight guards for the audience chamber
 MONSTER:'@',"acolyte",(32,07)
 MONSTER:'@',"acolyte",(32,08)
@@ -154,21 +162,21 @@ STAIR:(20,06),down
 # Non diggable walls
 NON_DIGGABLE:(10,02,30,13)
 # Objects (inside the antechambers).
-OBJECT:random,random,(14,03)
-OBJECT:random,random,(15,03)
-OBJECT:random,random,(16,03)
-OBJECT:random,random,(14,10)
-OBJECT:random,random,(15,10)
-OBJECT:random,random,(16,10)
-OBJECT:random,random,(17,10)
-OBJECT:random,random,(24,03)
-OBJECT:random,random,(25,03)
-OBJECT:random,random,(26,03)
-OBJECT:random,random,(27,03)
-OBJECT:random,random,(24,10)
-OBJECT:random,random,(25,10)
-OBJECT:random,random,(26,10)
-OBJECT:random,random,(27,10)
+OBJECT:random,(14,03)
+OBJECT:random,(15,03)
+OBJECT:random,(16,03)
+OBJECT:random,(14,10)
+OBJECT:random,(15,10)
+OBJECT:random,(16,10)
+OBJECT:random,(17,10)
+OBJECT:random,(24,03)
+OBJECT:random,(25,03)
+OBJECT:random,(26,03)
+OBJECT:random,(27,03)
+OBJECT:random,(24,10)
+OBJECT:random,(25,10)
+OBJECT:random,(26,10)
+OBJECT:random,(27,10)
 # Random traps
 TRAP:random,(15,04)
 TRAP:random,(25,04)
@@ -211,21 +219,21 @@ REGION:(00,00,25,10),unlit,"ordinary"
 # Stairs
 STAIR:(20,05),up
 # Objects
-OBJECT:'[',"helm of brilliance",$place[0],blessed,0,NAME:"The Mitre of Holiness"
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:('[',"helm of brilliance"),$place[0],blessed,0,NAME:"The Mitre of Holiness"
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:"fire",random
 TRAP:"fire",random
@@ -234,7 +242,10 @@ TRAP:"fire",random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'&',"Nalzok",$place[0]
+MONSTER:'&',"Nalzok",$place[0] {
+  OBJECT:')',+6
+  OBJECT:'[',+3
+}
 MONSTER:'Z',"human zombie",random
 MONSTER:'Z',"human zombie",random
 MONSTER:'Z',"human zombie",random
@@ -279,42 +290,42 @@ MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
 ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, up
-OBJECT: random,random,random
+OBJECT: random,random
 MONSTER: 'Z', "human zombie", random
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
-OBJECT: random,random,random
+OBJECT: random, random
+OBJECT: random,random
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
+OBJECT: random, random
 TRAP: random, random
-OBJECT: random,random,random
+OBJECT: random,random
 MONSTER: 'Z', "human zombie", random
 }
 
 ROOM: "morgue" , random, random, random, random
 {
 STAIR: random, down
-OBJECT: random, random, random
+OBJECT: random, random
 TRAP: random, random
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
 TRAP: random, random
 MONSTER: 'W', "wraith", random
 }
 
 ROOM: "morgue" , random, random, random, random
 {
-OBJECT: random, random, random
+OBJECT: random, random
 TRAP: random, random
 }
 
@@ -327,23 +338,23 @@ MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
 ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, up
-OBJECT: random,random,random
+OBJECT: random,random
 MONSTER: 'Z', "human zombie", random
 MONSTER: 'W', "wraith", random
 }
 
 ROOM: "morgue" , random, random, random, random
 {
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random,random,random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random,random
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
+OBJECT: random, random
 TRAP: random, random
-OBJECT: random,random,random
+OBJECT: random,random
 MONSTER: 'Z', "human zombie", random
 MONSTER: 'W', "wraith", random
 }
@@ -351,15 +362,15 @@ MONSTER: 'W', "wraith", random
 ROOM: "morgue" , random, random, random, random
 {
 STAIR: random, down
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
 TRAP: random, random
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
 TRAP: random, random
 MONSTER: 'Z', "human zombie", random
 MONSTER: 'W', "wraith", random
@@ -367,7 +378,7 @@ MONSTER: 'W', "wraith", random
 
 ROOM: "morgue" , random, random, random, random
 {
-OBJECT: random, random, random
+OBJECT: random, random
 TRAP: random, random
 }
 

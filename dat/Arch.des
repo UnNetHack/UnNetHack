@@ -70,9 +70,15 @@ DOOR:locked,(24,14)
 DOOR:closed,(31,14)
 DOOR:locked,(49,14)
 # Lord Carnarvon
-MONSTER:'@',"Lord Carnarvon",(25,10)
+MONSTER:'@',"Lord Carnarvon",(25,10) {
+  OBJECT:('[',"fedora"),+5
+  OBJECT:')',+4
+  OBJECT:random
+  OBJECT:random
+  OBJECT:random
+}
 # The treasure of Lord Carnarvon
-OBJECT:'(',"chest",(25,10)
+OBJECT:('(',"chest"),(25,10)
 # student guards for the audience chamber
 MONSTER:'@',"student",(26,09)
 MONSTER:'@',"student",(27,09)
@@ -188,21 +194,21 @@ ALTAR:(26,15),align[2],altar
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Treasure?
 ENGRAVING:random,engrave,"X marks the spot."
 ENGRAVING:random,engrave,"X marks the spot."
@@ -328,21 +334,21 @@ NON_DIGGABLE:(00,00,75,19)
 # The altar of Huhetotl.  Unattended.
 ALTAR:(50,14),chaos,altar
 # Objects
-OBJECT:'(',"crystal ball",(50,14),blessed,5,NAME:"The Orb of Detection"
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:('(',"crystal ball"),(50,14),blessed,5,NAME:"The Orb of Detection"
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:random,random
 TRAP:random,random
@@ -352,7 +358,11 @@ TRAP:random,random
 TRAP:random,random
 TRAP:"rolling boulder",(46,14)
 # Random monsters.
-MONSTER:'&',"Minion of Huhetotl",(50,14)
+MONSTER:'&',"Minion of Huhetotl",(50,14) {
+  OBJECT:random,cursed
+  OBJECT:random,cursed
+  OBJECT:random,cursed
+}
 MONSTER:'S',random,random
 MONSTER:'S',random,random
 MONSTER:'S',random,random
@@ -396,29 +406,29 @@ MON_GENERATION:86%, (80,'S'), (16,"human mummy"), (4,'M')
 ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, up
-OBJECT: random,random,random
+OBJECT: random,random
 MONSTER: 'S', random, random
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
-OBJECT: random,random,random
+OBJECT: random, random
+OBJECT: random, random
 MONSTER: 'S', random, random
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
+OBJECT: random, random
 TRAP: random, random
-OBJECT: random,random,random
+OBJECT: random, random
 MONSTER: 'S', random, random
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, down
-OBJECT: random, random, random
+OBJECT: random, random
 TRAP: random, random
 MONSTER: 'S', random, random
 MONSTER: 'M', "human mummy", random
@@ -426,15 +436,15 @@ MONSTER: 'M', "human mummy", random
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
 TRAP: random, random
 MONSTER: 'S', random, random
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
+OBJECT: random, random
 TRAP: random, random
 MONSTER: 'S', random, random
 }
@@ -447,29 +457,29 @@ MON_GENERATION:86%, (80,'S'), (16,"human mummy"), (4,'M')
 ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, up
-OBJECT: random,random,random
+OBJECT: random,random
 MONSTER: 'M', random, random
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
-OBJECT: random,random,random
+OBJECT: random, random
+OBJECT: random, random
 MONSTER: 'M', random, random
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
+OBJECT: random, random
 TRAP: random, random
-OBJECT: random,random,random
+OBJECT: random,random
 MONSTER: 'M', random, random
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, down
-OBJECT: random, random, random
+OBJECT: random, random
 TRAP: random, random
 MONSTER: 'S', random, random
 MONSTER: 'M', "human mummy", random
@@ -477,15 +487,15 @@ MONSTER: 'M', "human mummy", random
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
 TRAP: random, random
 MONSTER: 'S', random, random
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
+OBJECT: random, random
 TRAP: random, random
 MONSTER: 'S', random, random
 }

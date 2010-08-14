@@ -54,9 +54,12 @@ DOOR:locked,(19,06)
 # The temple altar (this will force a priest(ess) to be created)
 ALTAR:(36,02),coaligned,shrine
 # Shaman Karnov
-MONSTER:'@',"Shaman Karnov",(35,02)
+MONSTER:'@',"Shaman Karnov",(35,02) {
+  OBJECT:'[',+6
+  OBJECT:')',+6
+}
 # The treasure of Shaman Karnov
-OBJECT:'(',"chest",(34,02)
+OBJECT:('(',"chest"),(34,02)
 # neanderthal guards for the audience chamber
 MONSTER:'@',"neanderthal",(20,03)
 MONSTER:'@',"neanderthal",(20,02)
@@ -135,21 +138,21 @@ STAIR:(73,10),down
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:random,random
 TRAP:random,random
@@ -229,23 +232,29 @@ STAIR:random,up
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Objects
-OBJECT:')',"mace",(23,10),blessed,0,NAME:"The Sceptre of Might"
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:(')',"mace"),(23,10),blessed,0,NAME:"The Sceptre of Might"
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # monsters.
-MONSTER:'D',"Chromatic Dragon",(23,10),asleep
+MONSTER:'D',"Chromatic Dragon",(23,10),asleep {
+  OBJECT:random
+  OBJECT:random
+  OBJECT:random
+  OBJECT:random
+  OBJECT:random
+}
 MONSTER:'F',"shrieker",(26,13)
 MONSTER:'F',"shrieker",(25,8)
 MONSTER:'F',"shrieker",(45,11)
@@ -269,13 +278,13 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
 #
 TRAP: random, random
 TRAP: random, random
@@ -299,18 +308,18 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
 #
 TRAP: random, random
 TRAP: random, random

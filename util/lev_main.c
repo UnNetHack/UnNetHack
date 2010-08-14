@@ -1127,7 +1127,9 @@ sp_lev *maze;
 			   Write(fd, debuf, strlen(debuf));
 			   break;
 		   case SPOVAR_OBJ:
-		       snprintf(debuf, 127, "%li:\t%s\tobj:%i\n", i, opcodestr[tmpo.opcode], ov->vardata.l);
+		       snprintf(debuf, 127, "%li:\t%s\tobj:(id=%i,class=\'%c\')\n",
+				i, opcodestr[tmpo.opcode],
+				SP_OBJ_TYP(ov->vardata.l), SP_OBJ_CLASS(ov->vardata.l));
 		       Write(fd, debuf, strlen(debuf));
 		       break;
 		   case SPOVAR_MONST:

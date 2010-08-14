@@ -119,7 +119,7 @@ MONSTER:'T',"rock troll",(02,17)
 MONSTER:'E',"earth elemental",(04,17),hostile
 MONSTER:'E',"earth elemental",(04,18),hostile
 
-OBJECT:'`',"boulder",random
+OBJECT:('`',"boulder"),random
 
 
 LEVEL:"air"
@@ -374,11 +374,11 @@ MONSTER:'v',"steam vortex",random
 MONSTER:':',"salamander",random,hostile
 MONSTER:':',"salamander",random,hostile
 
-OBJECT:'`',"boulder",random
-OBJECT:'`',"boulder",random
-OBJECT:'`',"boulder",random
-OBJECT:'`',"boulder",random
-OBJECT:'`',"boulder",random
+OBJECT:('`',"boulder"),random
+OBJECT:('`',"boulder"),random
+OBJECT:('`',"boulder"),random
+OBJECT:('`',"boulder"),random
+OBJECT:('`',"boulder"),random
 
 
 LEVEL:"water"
@@ -548,7 +548,7 @@ MONSTER:'@',"aligned priest",(19,10),noalign,hostile
 MONSTER:'A',"Angel",(20,09),noalign,hostile
 MONSTER:'A',"Angel",(20,10),noalign,hostile
 MONSTER:'&',"Pestilence",$place[0],hostile {
-  OBJECT:'!',"sickness"
+  OBJECT:('!',"sickness")
 }
 # South-central round room
 MONSTER:'@',"aligned priest",(36,12),noalign,hostile

@@ -3158,7 +3158,7 @@ spo_object(coder)
     int nparams = 0;
 
     struct opvar *varparam;
-    struct opvar *id, *class, *containment;
+    struct opvar *id, *containment;
 
     object tmpobj;
 
@@ -3178,9 +3178,7 @@ spo_object(coder)
     tmpobj.broken = 0;
     tmpobj.x = tmpobj.y = -MAX_REGISTERS-1;
 
-    if (!OV_pop_i(containment) ||
-	!OV_pop_i(id) ||
-	!OV_pop_i(class)) return;
+    if (!OV_pop_i(containment)) return;
 
     if (!OV_pop_i(varparam)) return;
 
@@ -3268,8 +3266,10 @@ spo_object(coder)
 	}
     }
 
-    tmpobj.id = OV_i(id);
-    tmpobj.class = OV_i(class);
+    if (!OV_pop_typ(id, SPOVAR_OBJ)) panic("no obj type");
+
+    tmpobj.id = SP_OBJ_TYP(OV_i(id));
+    tmpobj.class = SP_OBJ_CLASS(OV_i(id));
     tmpobj.containment = OV_i(containment);
 
     create_object(&tmpobj, coder->croom);
@@ -3278,7 +3278,6 @@ spo_object(coder)
 
     opvar_free(varparam);
     opvar_free(id);
-    opvar_free(class);
     opvar_free(containment);
 }
 

@@ -47,9 +47,14 @@ FOUNTAIN:(53,02)
 DOOR:locked,(26,10)
 DOOR:locked,(43,10)
 # Norn
-MONSTER:'@',"Norn",(35,10)
+MONSTER:'@',"Norn",(35,10) {
+  OBJECT:'['
+  OBJECT:')'
+  OBJECT:'?'
+  OBJECT:'?'
+}
 # The treasure of the Norn
-OBJECT:'(',"chest",(36,10)
+OBJECT:('(',"chest"),(36,10)
 # valkyrie guards for the audience chamber
 MONSTER:'@',"warrior",(27,08)
 MONSTER:'@',"warrior",(27,09)
@@ -117,21 +122,21 @@ STAIR:(20,06),down
 # Non diggable walls
 NON_DIGGABLE:(00,00,39,12)
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:"fire",random
 TRAP:"fire",random
@@ -211,21 +216,21 @@ NON_DIGGABLE:(00,00,34,16)
 DRAWBRIDGE:(17,02),south,open
 DRAWBRIDGE:(17,14),north,open
 # Objects
-OBJECT:'(',"crystal ball",(17,08),blessed,5,NAME:"The Orb of Fate"
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:('(',"crystal ball"),(17,08),blessed,5,NAME:"The Orb of Fate"
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Traps
 TRAP:"board",(13,08)
 TRAP:"board",(21,08)
@@ -238,7 +243,12 @@ TRAP:"board",random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'H',"Lord Surtur",(17,08)
+MONSTER:'H',"Lord Surtur",(17,08) {
+  OBJECT:'['
+  OBJECT:')'
+  OBJECT:random
+  OBJECT:random
+}
 MONSTER:'a',"fire ant",random
 MONSTER:'a',"fire ant",random
 MONSTER:'a',"fire ant",random
@@ -277,15 +287,15 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
 #
 MONSTER: 'a', "fire ant", random
 MONSTER: 'a', "fire ant", random
@@ -312,17 +322,17 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
 #
 MONSTER: 'a', "fire ant", random
 MONSTER: 'a', "fire ant", random
