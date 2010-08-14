@@ -201,6 +201,7 @@ closed		{ yylval.i=D_CLOSED; return DOOR_STATE; }
 locked		{ yylval.i=D_LOCKED; return DOOR_STATE; }
 nodoor		{ yylval.i=D_NODOOR; return DOOR_STATE; }
 broken		{ yylval.i=D_BROKEN; return DOOR_STATE; }
+secret		{ yylval.i=D_SECRET; return DOOR_STATE; }
 north		{ yylval.i=W_NORTH; return DIRECTION; }
 east		{ yylval.i=W_EAST; return DIRECTION; }
 south		{ yylval.i=W_SOUTH; return DIRECTION; }

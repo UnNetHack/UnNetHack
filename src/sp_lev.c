@@ -3447,11 +3447,12 @@ spo_door(coder)
     typ = OV_i(msk) == -1 ? rnddoor() : (xchar)OV_i(msk);
 
     get_location(&x, &y, DRY, (struct mkroom *)0);
-    if (levl[x][y].typ != SDOOR)
-	levl[x][y].typ = DOOR;
-    else {
-	if(typ < D_CLOSED)
-	    typ = D_CLOSED; /* force it to be closed */
+    if (!IS_DOOR(levl[x][y].typ) && levl[x][y].typ != SDOOR)
+	levl[x][y].typ = (typ & D_SECRET) ? SDOOR : DOOR;
+    if (typ & D_SECRET) {
+	typ &= ~D_SECRET;
+	if (typ < D_CLOSED)
+	    typ = D_CLOSED;
     }
     levl[x][y].doormask = typ;
     /*SpLev_Map[x][y] = 1;*/

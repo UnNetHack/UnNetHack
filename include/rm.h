@@ -247,6 +247,7 @@ extern const struct symdef def_warnsyms[WARNCOUNT];
 #define D_CLOSED	4
 #define D_LOCKED	8
 #define D_TRAPPED	16
+#define D_SECRET	32 /* only used by sp_lev.c, NOT in rm-struct */
 
 /*
  * Some altars are considered as shrines, so we need a flag.
