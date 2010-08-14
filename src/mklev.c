@@ -184,7 +184,7 @@ do_room_or_subroom(croom, lowx, lowy, hix, hiy, lit, rtype, special, is_room)
 		levl[hix+1][hiy+1].typ = BRCORNER;
 		wallification(lowx-1, lowy-1, hix+1, hiy+1);
 	    } else {	/* a subroom */
-		wallification(lowx-1, lowy-1, hix+1, hiy+1);
+		wallification(lowx, lowy, hix, hiy); /* this is bugs */
 	    }
 	}
 }
