@@ -1112,9 +1112,9 @@ mineralize()
 
 
 void
-wallwalk_right(x,y,fgtyp,bgtyp,chance)
+wallwalk_right(x,y,fgtyp,fglit,bgtyp,chance)
      xchar x,y;
-     schar fgtyp,bgtyp;
+     schar fgtyp,fglit,bgtyp;
      int chance;
 {
     int sx,sy, nx,ny, dir, cnt;
@@ -1128,8 +1128,7 @@ wallwalk_right(x,y,fgtyp,bgtyp,chance)
 
     do {
 	if (!t_at(x,y) && !bydoor(x,y) && levl[x][y].typ == bgtyp && (chance >= rn2(100))) {
-	    levl[x][y].typ = fgtyp;
-	    if (fgtyp == LAVAPOOL) levl[x][y].lit = 1;
+	    SET_TYPLIT(x,y, fgtyp, fglit);
 	}
 	cnt = 0;
 	do {
@@ -1169,7 +1168,7 @@ mkpoolroom()
     sroom->rtype = POOLROOM;
     typ = !rn2(5) ? POOL : LAVAPOOL;
 
-    wallwalk_right(sroom->lx, sroom->ly, typ, ROOM, 96);
+    wallwalk_right(sroom->lx, sroom->ly, typ, sroom->rlit, ROOM, 96);
 }
 
 

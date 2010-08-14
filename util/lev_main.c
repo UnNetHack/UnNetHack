@@ -181,6 +181,7 @@ static struct {
 
 const char *fname = "(stdin)";
 int fatal_error = 0;
+int got_errors = 0;
 int be_verbose = 0;
 int decompile = 0;
 
@@ -245,7 +246,7 @@ char **argv;
 	if (argc == 1) {		/* Read standard input */
 	    init_yyin(stdin);
 	    (void) yyparse();
-	    if (fatal_error > 0) {
+	    if (fatal_error > 0 || got_errors > 0) {
 		    errors_encountered = TRUE;
 	    }
 	} else {			/* Otherwise every argument is a filename */
@@ -269,7 +270,7 @@ char **argv;
 			init_yyin(fin);
 			(void) yyparse();
 			line_number = 1;
-			if (fatal_error > 0) {
+			if (fatal_error > 0 || got_errors > 0) {
 				errors_encountered = TRUE;
 				fatal_error = 0;
 			}
@@ -685,6 +686,21 @@ add_vardef_type(vd, varname, vartype)
     return vd;
 }
 
+int
+reverse_jmp_opcode(opcode)
+     int opcode;
+{
+    switch (opcode) {
+    case SPO_JE:  return SPO_JNE;
+    case SPO_JNE: return SPO_JE;
+    case SPO_JL:  return SPO_JGE;
+    case SPO_JG:  return SPO_JLE;
+    case SPO_JLE: return SPO_JG;
+    case SPO_JGE: return SPO_JL;
+    default: lc_error("Cannot reverse comparison jmp opcode %i.", opcode); return SPO_NULL;
+    }
+}
+
 /* basically copied from src/sp_lev.c */
 struct opvar *
 opvar_clone(ov)
@@ -838,6 +854,17 @@ char c;		/* class */
 	    if (objname && !strcmp(s, objname))
 		return i;
 	}
+
+	for (i = class ? bases[class] : 0; i < NUM_OBJECTS; i++) {
+	    if (class && objects[i].oc_class != class) break;
+	    objname = obj_descr[i].oc_name;
+	    if (objname && !strcasecmp(s, objname)) {
+		if (be_verbose)
+		    lc_warning("Object type \"%s\" matches \"%s\".", s, objname);
+		return i;
+	    }
+	}
+
 	return ERR;
 }
 
@@ -1191,7 +1218,8 @@ sp_lev *maze;
 	    "sounds",
 	    "wallwalk",
 	    "var_init",
-	    "shuffle_array"
+	    "shuffle_array",
+	    "dice"
 	};
 
 	/* don't bother with the header stuff */
@@ -1232,7 +1260,8 @@ sp_lev *maze;
 		       Write(fd, debuf, strlen(debuf));
 		       break;
 		   case SPOVAR_MAPCHAR:
-		       snprintf(debuf, 127, "%li:\t%s\tmapchar:%li\n", i, opcodestr[tmpo.opcode], ov->vardata.l);
+		       snprintf(debuf, 127, "%li:\t%s\tmapchar:(%li,%i)\n", i, opcodestr[tmpo.opcode],
+				(int)SP_MAPCHAR_TYP(ov->vardata.l), (schar)SP_MAPCHAR_LIT(ov->vardata.l));
 		       Write(fd, debuf, strlen(debuf));
 		       break;
 		   case SPOVAR_INT:

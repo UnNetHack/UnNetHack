@@ -346,6 +346,17 @@ struct rm {
 	Bitfield(edge,1);	/* marks boundaries for special rooms*/
 };
 
+
+#define SET_TYPLIT(x,y,ttyp,llit)				\
+{								\
+    levl[(x)][(y)].typ = ttyp;					\
+    if (ttyp == LAVAPOOL) levl[(x)][(y)].lit = 1;		\
+    else if ((schar)llit != -2) {				\
+	if ((schar)llit == -1) levl[(x)][(y)].lit = rn2(2);	\
+	else levl[(x)][(y)].lit = llit;				\
+    }								\
+}
+
 /*
  * Add wall angle viewing by defining "modes" for each wall type.  Each
  * mode describes which parts of a wall are finished (seen as as wall)
