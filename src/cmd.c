@@ -119,6 +119,7 @@ STATIC_PTR int NDECL(domonability);
 STATIC_PTR int NDECL(dooverview_or_wiz_where);
 STATIC_PTR int NDECL(dotravel);
 # ifdef WIZARD
+int NDECL(wiz_show_rooms);
 STATIC_PTR int NDECL(wiz_wish);
 STATIC_PTR int NDECL(wiz_identify);
 STATIC_PTR int NDECL(wiz_map);
@@ -525,6 +526,37 @@ dooverview_or_wiz_where()
 }
 
 #ifdef WIZARD
+
+int
+wiz_show_rooms()
+{
+    winid win;
+    int x,y;
+    char row[COLNO+1];
+    struct rm*lev;
+
+    win = create_nhwindow(NHW_TEXT);
+    for (y = 0; y < ROWNO; y++) {
+	for (x = 0; x < COLNO; x++) {
+	    int rno = levl[x][y].roomno;
+	    if (rno == NO_ROOM)
+		row[x] = '.';
+	    else if (rno == SHARED)
+		row[x] = '+';
+	    else if (rno == SHARED_PLUS)
+		row[x] = '*';
+	    else {
+		int i = (rno - ROOMOFFSET) % 52;
+		row[x] = (i < 26) ? ('a'+i) : ('A'+i-26);
+	    }
+	}
+	row[COLNO] = '\0';
+	putstr(win, 0, row);
+    }
+    display_nhwindow(win, TRUE);
+    destroy_nhwindow(win);
+    return 0;
+}
 
 /* ^W command - wish for something */
 STATIC_PTR int
@@ -1654,7 +1686,8 @@ struct ext_func_tab extcmdlist[] = {
 #endif
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE}, /* showkills (showborn patch) */
-        {(char *)0, (char *)0, donull, TRUE},
+	{(char *)0, (char *)0, donull, TRUE},
+	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
 #ifdef DEBUG
@@ -1679,6 +1712,7 @@ static const struct ext_func_tab debug_extcmdlist[] = {
 #ifdef PORT_DEBUG
 	{"portdebug", "wizard port debug command", wiz_port_debug, TRUE},
 #endif
+	{"rooms", "show room numbers", wiz_show_rooms, TRUE},
 	{"seenv", "show seen vectors", wiz_show_seenv, TRUE},
 	{"showkills", "show list of monsters killed", wiz_showkills, TRUE},
 	{"stats", "show memory statistics", wiz_show_stats, TRUE},
