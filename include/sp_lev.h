@@ -112,6 +112,7 @@ enum opcode_defs {
     SPO_LEVEL_FLAGS,
     SPO_LEVEL_SOUNDS,
     SPO_WALLWALK,
+    SPO_VAR_INIT, /* variable_name data */
 
     MAX_SP_OPCODES
 };
@@ -172,6 +173,7 @@ enum opcode_defs {
 #define SPOVAR_NULL	0
 #define SPOVAR_INT	1 /* l */
 #define SPOVAR_STRING	2 /* str */
+#define SPOVAR_VARIABLE	3 /* str (contains the variable name) */
 
 struct opvar {
     xchar spovartyp; /* one of SPOVAR_foo */
@@ -179,6 +181,12 @@ struct opvar {
 	char *str;
 	long l;
     } vardata;
+};
+
+struct splev_var {
+    struct splev_var *next;
+    char *name;
+    struct opvar *value;
 };
 
 struct splevstack {
@@ -191,6 +199,7 @@ struct splevstack {
 struct sp_frame {
     struct sp_frame *next;
     struct splevstack *stack;
+    struct splev_var *variables;
     long n_opcode;
 };
 
@@ -409,6 +418,12 @@ struct lc_funcdefs {
     long addr;
     sp_lev code;
     long n_called;
+};
+
+struct lc_vardefs {
+    struct lc_vardefs *next;
+    char *name;
+    long var_type; /* SPOVAR_foo */
 };
 
 #endif /* SP_LEV_H */
