@@ -67,6 +67,11 @@ void FDECL(init_yyout, (FILE *));
 void FDECL(include_push, (const char *));
 int NDECL(include_pop);
 
+long NDECL(handle_varstring_check);
+
+extern struct lc_vardefs *FDECL(vardef_defined,(struct lc_vardefs *,char *, int));
+
+extern struct lc_vardefs *variable_definitions;
 
 /*
  * This doesn't always get put in lev_comp.h
@@ -170,6 +175,7 @@ INCLUDE		return INCLUDE_ID;
 SOUNDS		return SOUNDS_ID;
 SHUFFLE		return SHUFFLE_ID;
 montype		return MONTYPE_ID;
+rect		return rect_ID;
 hear		{ yylval.i=LVLSND_HEARD;  return MSG_OUTPUT_TYPE; }
 pline		{ yylval.i=LVLSND_PLINED; return MSG_OUTPUT_TYPE; }
 verbal		{ yylval.i=LVLSND_VERBAL; return MSG_OUTPUT_TYPE; }
@@ -279,9 +285,7 @@ graveyard	{ yylval.i=GRAVEYARD; return FLAG_TYPE; }
 		  yylval.map = (char *) alloc(strlen(yytext+1)+1);
 		  Strcpy(yylval.map, yytext+1); /* Discard the first \" */
 		  return STRING; }
-\$[a-zA-Z_][a-zA-Z_0-9]*	{ yylval.map = (char *) alloc(strlen(yytext)+1);
-		  Strcpy(yylval.map, yytext);
-		  return VARSTRING; }
+\$[a-zA-Z_][a-zA-Z_0-9]*	{ return handle_varstring_check(); }
 [a-zA-Z_][a-zA-Z_0-9]*	{ yylval.map = (char *) alloc(strlen(yytext)+1);
 		  Strcpy(yylval.map, yytext);
 		  return NQSTRING; }
@@ -373,6 +377,28 @@ yywrap()
 {
     if (doing_included_file >= 0) include_pop();
     return 1;
+}
+
+long
+handle_varstring_check()
+{
+  struct lc_vardefs *vd;
+  yylval.map = (char *) alloc(strlen(yytext)+1);
+  Strcpy(yylval.map, yytext);
+  if ((vd = vardef_defined(variable_definitions, yytext, 1))) {
+     long l = vd->var_type;
+     long a = ((l & SPOVAR_ARRAY) == SPOVAR_ARRAY);
+     l = (l & ~SPOVAR_ARRAY);
+     if (l == SPOVAR_INT) return (a ? VARSTRING_INT_ARRAY : VARSTRING_INT);
+     if (l == SPOVAR_STRING) return (a ? VARSTRING_STRING_ARRAY : VARSTRING_STRING);
+     if (l == SPOVAR_VARIABLE) return (a ? VARSTRING_VAR_ARRAY : VARSTRING_VAR);
+     if (l == SPOVAR_COORD) return (a ? VARSTRING_COORD_ARRAY : VARSTRING_COORD);
+     if (l == SPOVAR_REGION) return (a ? VARSTRING_REGION_ARRAY : VARSTRING_REGION);
+     if (l == SPOVAR_MAPCHAR) return (a ? VARSTRING_MAPCHAR_ARRAY : VARSTRING_MAPCHAR);
+     if (l == SPOVAR_MONST) return (a ? VARSTRING_MONST_ARRAY : VARSTRING_MONST);
+     if (l == SPOVAR_OBJ) return (a ? VARSTRING_OBJ_ARRAY : VARSTRING_OBJ);
+  }
+  return VARSTRING;
 }
 
 /*lev_comp.l*/

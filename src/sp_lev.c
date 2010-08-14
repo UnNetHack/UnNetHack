@@ -3778,30 +3778,48 @@ spo_terrain(coder)
      struct sp_coder *coder;
 {
     terrain tmpterrain;
-    struct opvar *coord1,*x2,*y2,*areatyp,*ter,*tlit;
+    struct opvar *coord1,*coord2 = NULL,*areatyp,*ter;
 
-    if (!OV_pop_i(tlit) ||
-	!OV_pop_i(ter) ||
-	!OV_pop_i(areatyp) ||
-	!OV_pop_i(y2) ||
-	!OV_pop_i(x2) ||
-	!OV_pop_c(coord1)) return;
+    if (!OV_pop_i(areatyp)) return;
 
-    tmpterrain.x1 = SP_COORD_X(OV_i(coord1));
-    tmpterrain.y1 = SP_COORD_Y(OV_i(coord1));
-    tmpterrain.x2 = OV_i(x2);
-    tmpterrain.y2 = OV_i(y2);
+    switch (OV_i(areatyp)) {
+    default:
+    case 0:
+	if (!OV_pop_typ(ter, SPOVAR_MAPCHAR) ||
+	    !OV_pop_c(coord1)) return;
+	tmpterrain.x1 = SP_COORD_X(OV_i(coord1));
+	tmpterrain.y1 = SP_COORD_Y(OV_i(coord1));
+	break;
+    case 1:
+    case 2:
+	if (!OV_pop_c(coord2) ||
+	    !OV_pop_typ(ter, SPOVAR_MAPCHAR) ||
+	    !OV_pop_c(coord1)) return;
+	tmpterrain.x1 = SP_COORD_X(OV_i(coord1));
+	tmpterrain.y1 = SP_COORD_Y(OV_i(coord1));
+	tmpterrain.x2 = SP_COORD_X(OV_i(coord2));
+	tmpterrain.y2 = SP_COORD_Y(OV_i(coord2));
+	break;
+    case 3:
+    case 4:
+	if (!OV_pop_typ(ter, SPOVAR_MAPCHAR) ||
+	    !OV_pop_r(coord1)) return;
+	tmpterrain.x1 = SP_REGION_X1(OV_i(coord1));
+	tmpterrain.y1 = SP_REGION_Y1(OV_i(coord1));
+	tmpterrain.x2 = SP_REGION_X2(OV_i(coord1));
+	tmpterrain.y2 = SP_REGION_Y2(OV_i(coord1));
+	break;
+    }
+
     tmpterrain.areatyp = OV_i(areatyp);
-    tmpterrain.ter = OV_i(ter);
-    tmpterrain.tlit = OV_i(tlit);
+    tmpterrain.ter = SP_MAPCHAR_TYP(OV_i(ter));
+    tmpterrain.tlit = SP_MAPCHAR_LIT(OV_i(ter));
 
     set_terrain(&tmpterrain, coder->croom);
     opvar_free(coord1);
-    opvar_free(x2);
-    opvar_free(y2);
+    if (coord2) opvar_free(coord2);
     opvar_free(areatyp);
     opvar_free(ter);
-    opvar_free(tlit);
 }
 
 void
@@ -4682,10 +4700,37 @@ sp_lev *lvl;
 	case SPO_MATH_ADD:
 	    {
 		struct opvar *a, *b;
-		if (!OV_pop_i(b) || !OV_pop_i(a)) break;
-		OV_i(a) = OV_i(a) + OV_i(b);
-		splev_stack_push(coder->stack, a);
-		opvar_free(b);
+		if (!OV_pop(b) || !OV_pop(a)) break;
+		if (OV_typ(b) == OV_typ(a)) {
+		    if (OV_typ(a) == SPOVAR_INT) {
+			OV_i(a) = OV_i(a) + OV_i(b);
+			splev_stack_push(coder->stack, a);
+			opvar_free(b);
+		    } else if (OV_typ(a) == SPOVAR_STRING) {
+			char *tmpbuf = (char *)alloc(strlen(OV_s(a)) + strlen(OV_s(b)) + 1);
+			if (tmpbuf) {
+			    struct opvar *c;
+			    (void) sprintf(tmpbuf, "%s%s", OV_s(a), OV_s(b));
+			    c = opvar_new_str(tmpbuf);
+			    splev_stack_push(coder->stack, c);
+			    opvar_free(a);
+			    opvar_free(b);
+			    free(tmpbuf);
+			} else {
+			    splev_stack_push(coder->stack, a);
+			    opvar_free(b);
+			    impossible("malloc at str concat");
+			}
+		    } else {
+			splev_stack_push(coder->stack, a);
+			opvar_free(b);
+			impossible("comparing weird type");
+		    }
+		} else {
+		    splev_stack_push(coder->stack, a);
+		    opvar_free(b);
+		    impossible("comparing different types");
+		}
 	    }
 	    break;
 	case SPO_MATH_SUB:
