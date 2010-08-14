@@ -111,6 +111,7 @@ enum opcode_defs {
     SPO_INITLEVEL,
     SPO_LEVEL_FLAGS,
     SPO_LEVEL_SOUNDS,
+    SPO_WALLWALK,
 
     MAX_SP_OPCODES
 };

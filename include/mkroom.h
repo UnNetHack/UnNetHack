@@ -65,7 +65,8 @@ extern NEARDATA coord doors[DOORMAX];
 #define GARDEN		14	/* nymphs, trees and fountains */
 #define ARMORY		15	/* weapons, armor and rust monsters (L) */
 #define LEMUREPIT	16	/* contains lemures and horned devils */
-#define SHOPBASE	17	/* everything above this is a shop */
+#define POOLROOM	17	/*  */
+#define SHOPBASE	18	/* everything above this is a shop */
 #define ARMORSHOP	(SHOPBASE+ 1)	/* specific shop defines for level compiler */
 #define SCROLLSHOP	(SHOPBASE+ 2)
 #define POTIONSHOP	(SHOPBASE+ 3)

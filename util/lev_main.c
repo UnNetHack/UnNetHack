@@ -915,7 +915,8 @@ sp_lev *maze;
 	    "return",
 	    "init_map",
 	    "flags",
-	    "sounds"
+	    "sounds",
+	    "wallwalk"
 	};
 
 	/* don't bother with the header stuff */
