@@ -248,7 +248,7 @@ TRAP:random,random
 TRAP:random,random
 # Random monsters.
 MONSTER:('@',"Master Kaen"),$place[0] {
-  OBJECT:')',+4
+  OBJECT:')',1d4
   OBJECT:'?'
   OBJECT:'?'
   OBJECT:'?'

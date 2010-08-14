@@ -55,8 +55,8 @@ DOOR:closed,(50,04)
 DOOR:closed,(50,06)
 # Lord Sato
 MONSTER:('@',"Lord Sato"),(20,04) {
-  OBJECT:('[',"splint mail"),+4
-  OBJECT:(')',"katana"),+4
+  OBJECT:('[',"splint mail"),1d4
+  OBJECT:(')',"katana"),1d4
   OBJECT:'?'
 }
 # The treasure of Lord Sato

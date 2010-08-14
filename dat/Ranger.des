@@ -45,9 +45,9 @@ STAIR:(10,10),down
 BRANCH:levregion(51,2,77,18),(0,0,40,20)
 # Orion
 MONSTER:('@',"Orion"),(20,10) {
-  OBJECT:('[',"leather armor"),+4
-  OBJECT:(')',"yumi"),+4
-  OBJECT:(')',"arrow"),+4,quantity:50
+  OBJECT:('[',"leather armor"),1d4
+  OBJECT:(')',"yumi"),1d4
+  OBJECT:(')',"arrow"),1d4,quantity:10d5
 }
 # The treasure of Orion
 OBJECT:('(',"chest"),(20,10)

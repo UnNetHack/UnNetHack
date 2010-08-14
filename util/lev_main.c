@@ -278,6 +278,7 @@ char **argv;
 				fatal_error = 0;
 			}
 		    }
+		    (void) fclose(fin);
 	    }
 	}
 	exit(errors_encountered ? EXIT_FAILURE : EXIT_SUCCESS);
@@ -424,7 +425,7 @@ char *val;
 {
     if (ov) {
         ov->spovartyp = SPOVAR_STRING;
-	ov->vardata.str = val;
+	ov->vardata.str = (val) ? strdup(val) : NULL;
     }
     return ov;
 }
@@ -436,7 +437,7 @@ char *val;
 {
     if (ov) {
         ov->spovartyp = SPOVAR_VARIABLE;
-	ov->vardata.str = val;
+	ov->vardata.str = (val) ? strdup(val) : NULL;
     }
     return ov;
 }
@@ -541,7 +542,7 @@ funcdef_new(addr, name)
     }
     f->next = NULL;
     f->addr = addr;
-    f->name = name;
+    f->name = strdup(name);
     f->n_called = 0;
     f->code.opcodes = NULL;
     f->code.n_opcodes = 0;
@@ -1052,6 +1053,10 @@ sp_lev *sp;
 	mbuf[((max_hig-1) * max_len) + (max_len-1) + 1] = '\0';
 
 	add_opvars(sp, "siio", mbuf, max_hig, max_len, SPO_MAP);
+
+	for (dy = 0; dy < max_hig; dy++)
+	    Free(tmpmap[dy]);
+	Free(mbuf);
 }
 
 

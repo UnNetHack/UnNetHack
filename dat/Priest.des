@@ -68,7 +68,7 @@ DOOR:closed,(52,14)
 ALTAR:(28,09),noalign,altar
 # High Priest
 MONSTER:('@',"Arch Priest"),(28,10) {
-  OBJECT:('[',"robe"),+4
+  OBJECT:('[',"robe"),1d4
   OBJECT:'?'
   OBJECT:'?'
   OBJECT:'?'
@@ -243,8 +243,8 @@ TRAP:random,random
 TRAP:random,random
 # Random monsters.
 MONSTER:('&',"Nalzok"),$place[0] {
-  OBJECT:')',+6
-  OBJECT:'[',+3
+  OBJECT:')',1d6
+  OBJECT:'[',1d3
 }
 MONSTER:('Z',"human zombie"),random
 MONSTER:('Z',"human zombie"),random

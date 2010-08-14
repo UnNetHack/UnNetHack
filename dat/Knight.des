@@ -62,8 +62,8 @@ DOOR:closed,(04,12)
 DOOR:closed,(45,12)
 # King Arthur
 MONSTER:('@',"King Arthur"),(09,07) {
-  OBJECT:(')',"long sword"),+4
-  OBJECT:'[',+3
+  OBJECT:(')',"long sword"),1d4
+  OBJECT:'[',1d3
 }
 # The treasure of King Arthur
 OBJECT:('(',"chest"),(09,07)
