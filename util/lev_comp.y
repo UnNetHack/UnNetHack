@@ -2110,10 +2110,10 @@ gold_detail	: GOLD_ID ':' amount ',' coord_or_var
 		  }
 		;
 
-engraving_detail: ENGRAVING_ID ':' coord_or_var ',' engraving_type ',' string
+engraving_detail: ENGRAVING_ID ':' coord_or_var ',' engraving_type ',' string_or_var
 		  {
-		      add_opvars(splev, "sio",
-				 $7, (long)$5, SPO_ENGRAVING);
+		      add_opvars(splev, "io",
+				 (long)$5, SPO_ENGRAVING);
 		  }
 		;
 
