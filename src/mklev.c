@@ -232,7 +232,7 @@ mk_split_room()
     NhRect *r1 = rnd_rect();
     NhRect r2;
     int area;
-    xchar hx, hy, lx, ly, wid, hei;
+    xchar lx, ly, wid, hei;
     xchar rlit;
     struct mkroom *troom;
 
@@ -709,7 +709,7 @@ STATIC_OVL void
 clear_level_structures()
 {
 	static struct rm zerorm = { cmap_to_glyph(S_stone),
-						0, 0, 0, 0, 0, 0, 0, 0 };
+						0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	register int x,y;
 	register struct rm *lev;
 
@@ -1119,7 +1119,6 @@ wallwalk_right(x,y,fgtyp,bgtyp,chance)
 {
     int sx,sy, nx,ny, dir, cnt;
     schar tmptyp;
-    struct rm *lev;
     sx = x;
     sy = y;
     dir = 1;
