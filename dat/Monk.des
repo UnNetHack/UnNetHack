@@ -144,52 +144,20 @@ STAIR:random,down
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,20)
 # Objects
+LOOP [10 + 1d10] {
 OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
+}
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [3 + 2d3] {
+  TRAP:random,random
+}
 # Random monsters.
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('X',"xorn"),random
-MONSTER: ('X',"xorn"),random
-MONSTER: ('X',"xorn"),random
-MONSTER: ('X',"xorn"),random
-MONSTER: ('X',"xorn"),random
-MONSTER: ('X',"xorn"),random
-MONSTER: ('X',"xorn"),random
-MONSTER: ('X',"xorn"),random
-MONSTER: ('X',"xorn"),random
+LOOP [13 + 2d5] {
+  MONSTER: ('E',"earth elemental"),random
+}
+LOOP [8 + 1d6] {
+  MONSTER: ('X',"xorn"),random
+}
 
 #
 #	The "goal" level for the quest.
@@ -225,25 +193,13 @@ REGION:(00,00,25,10),unlit,"ordinary"
 STAIR:(20,05),up
 # Objects
 OBJECT:('(',"lenses"),$place[0],blessed,0,NAME:"The Eyes of the Overworld"
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
+LOOP [10 + 1d10] {
+  OBJECT:random,random
+}
 # Random traps
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
+LOOP [3 + 1d3] {
+  TRAP:"fire",random
+}
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
@@ -254,24 +210,12 @@ MONSTER:('@',"Master Kaen"),$place[0] {
   OBJECT:'?'
 }
 ALTAR:$place[0],noalign,altar
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('E',"earth elemental"),random
-MONSTER: ('X',"xorn"),random
-MONSTER: ('X',"xorn"),random
-MONSTER: ('X',"xorn"),random
-MONSTER: ('X',"xorn"),random
-MONSTER: ('X',"xorn"),random
-MONSTER: ('X',"xorn"),random
-MONSTER: ('X',"xorn"),random
-MONSTER: ('X',"xorn"),random
-MONSTER: ('X',"xorn"),random
+LOOP [10 + 1d6] {
+  MONSTER: ('E',"earth elemental"),random
+}
+LOOP [10 + 1d6] {
+  MONSTER: ('X',"xorn"),random
+}
 
 #
 #	The "fill" levels for the quest.

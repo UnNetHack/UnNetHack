@@ -80,36 +80,22 @@ MONSTER:('@',"attendant"),(40,13)
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [5 + 1d3] {
+  TRAP:random,random
+}
 # Monsters on siege duty.
-MONSTER: ('r',"rabid rat"),random
-MONSTER: ('r',"rabid rat"),random
-MONSTER: ('r',"rabid rat"),random
-MONSTER: ('r',"rabid rat"),random
-MONSTER: ('r',"rabid rat"),random
-MONSTER: ('r',"rabid rat"),random
-MONSTER: ('r',"rabid rat"),random
-MONSTER: ('r',"rabid rat"),random
-MONSTER: ('r',"rabid rat"),random
-MONSTER: ('r',"rabid rat"),random
+LOOP [8 + 1d6] {
+  MONSTER: ('r',"rabid rat"),random
+}
 MONSTER: (';',"giant eel"),random
 MONSTER: (';',"shark"),random
 MONSTER: ';', random
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
+LOOP [3 + 1d5] {
+  MONSTER: 'D',random,hostile
+}
+LOOP [3 + 1d5] {
+  MONSTER: 'S',random,hostile
+}
 #
 #	The "locate" level for the quest.
 #
@@ -151,64 +137,31 @@ NON_DIGGABLE:(11,02,21,07)
 # Altar in the temple.
 ALTAR:(13,05), chaos, shrine
 # Objects
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
+LOOP [10 + 2d5] {
+  OBJECT:random,random
+}
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [4 + 2d3] {
+  TRAP:random,random
+}
 # Random monsters.
-MONSTER:('r',"rabid rat"),random
-MONSTER:('r',"rabid rat"),random
-MONSTER:('r',"rabid rat"),random
-MONSTER:('r',"rabid rat"),random
-MONSTER:('r',"rabid rat"),random
-MONSTER:('r',"rabid rat"),random
-MONSTER:('r',"rabid rat"),random
-MONSTER:('r',"rabid rat"),random
+LOOP [8 + 2d4] {
+  MONSTER:('r',"rabid rat"),random
+  MONSTER[50%]:(';',"giant eel"),random
+  MONSTER[30%]:(';',"electric eel"),random
+}
 MONSTER:'r',random,hostile
-MONSTER:(';',"giant eel"),random
-MONSTER:(';',"giant eel"),random
-MONSTER:(';',"giant eel"),random
-MONSTER:(';',"giant eel"),random
-MONSTER:(';',"giant eel"),random
-MONSTER:(';',"electric eel"),random
-MONSTER:(';',"electric eel"),random
 MONSTER:(';',"kraken"),random
 MONSTER:(';',"shark"),random
 MONSTER:(';',"shark"),random
 MONSTER:';',random, hostile
 MONSTER:';',random, hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
+LOOP [3 + 1d6] {
+  MONSTER: 'D',random,hostile
+}
+LOOP [8 + 2d3] {
+  MONSTER: 'S',random,hostile
+}
 
 #
 #	The "goal" level for the quest.
@@ -247,27 +200,13 @@ NON_DIGGABLE:(00,00,40,11)
 # Objects
 OBJECT:(')',"quarterstaff"),(20,06),blessed,0,NAME:"The Staff of Aesculapius"
 OBJECT:('/',"lightning"),(20,06)
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
+LOOP [10 + 1d5] {
+  OBJECT:random,random
+}
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [3 + 2d3] {
+  TRAP:random,random
+}
 # Random monsters.
 MONSTER:('H',"Cyclops"),(20,06),hostile {
   OBJECT:'[',1d3
@@ -288,21 +227,10 @@ MONSTER:(';',"electric eel"),random
 MONSTER:(';',"shark"),random
 MONSTER:(';',"shark"),random
 MONSTER:';',random, hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
+LOOP [5 + 2d5] {
+  MONSTER[90%]: 'D',random,hostile
+  MONSTER: 'S',random,hostile
+}
 
 #
 #	The "fill" levels for the quest.
@@ -322,14 +250,9 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
+LOOP [5 + 1d10] {
+  OBJECT: random, random
+}
 #
 MONSTER: ('r', "rabid rat"), random
 MONSTER: 'r', random, hostile
@@ -337,18 +260,14 @@ MONSTER: 'r', random, hostile
 MONSTER: (';', "giant eel"), random
 MONSTER: (';', "giant eel"), random
 MONSTER: (';', "electric eel"), random
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
+LOOP [3 + 1d4] {
+  MONSTER: 'D',random,hostile
+  MONSTER[90%]: 'S',random,hostile
+}
 #
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
+LOOP [3 + 1d3] {
+  TRAP: random, random
+}
 
 LEVEL: "Hea-filb"
 FLAGS:mazelevel
@@ -359,17 +278,9 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
+LOOP [5 + 1d10] {
+  OBJECT: random, random
+}
 #
 MONSTER: ('r', "rabid rat"), random
 MONSTER: ('r', "rabid rat"), random
@@ -382,15 +293,11 @@ MONSTER: (';', "giant eel"), random
 MONSTER: (';', "giant eel"), random
 MONSTER: (';', "electric eel"), random
 MONSTER: (';', "electric eel"), random
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'D',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
-MONSTER: 'S',random,hostile
+LOOP [3 + 1d5] {
+  MONSTER: 'D',random,hostile
+  MONSTER[90%]: 'S',random,hostile
+}
 #
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
+LOOP [3 + 1d3] {
+  TRAP: random, random
+}

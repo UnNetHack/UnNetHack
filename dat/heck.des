@@ -412,16 +412,16 @@ MONSTER:'T',random
 MONSTER:'T',random
 MONSTER:'T',random
 MONSTER:'T',random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 TRAP:random,random
 TRAP:random,random
 TRAP:random,random
@@ -572,13 +572,13 @@ MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 TRAP:random,random
 TRAP:random,random
 TRAP:random,random
@@ -707,18 +707,18 @@ MONSTER:('D',"draken"),random,asleep
 MONSTER:('D',"draken"),random,asleep
 TRAP[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:center,center
 MAP
@@ -929,9 +929,9 @@ MONSTER[50%]:('H',"minotaur"),random
 MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 #
 # Voids
@@ -1059,11 +1059,11 @@ MONSTER[50%]:('H',"minotaur"),random
 MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 # more traps than usual
 TRAP:random,random
 TRAP:random,random
@@ -1532,16 +1532,16 @@ MONSTER[50%]:('H',"minotaur"),random
 LOOP [11] {
   MONSTER[50%]:random,random
 }
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 TRAP:random,random
 TRAP:random,random
 TRAP:random,random
@@ -1989,11 +1989,11 @@ MONSTER[50%]:('H',"minotaur"),random
 MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 TRAP:random,random
 TRAP:random,random
 TRAP:random,random
@@ -2024,7 +2024,7 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 GEOMETRY:center,bottom
 MAP
 .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
@@ -2040,7 +2040,7 @@ MONSTER[10%]:('H',"minotaur"),random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 GEOMETRY:left,top
 MAP
 .-.-.-.-.-.
@@ -2065,7 +2065,7 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 GEOMETRY:right,bottom
 MAP
 .-.-.-.-.-.
@@ -2090,7 +2090,7 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:center,top
 MAP
@@ -2179,8 +2179,8 @@ MONSTER[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:center,bottom
 MAP
@@ -2206,8 +2206,8 @@ MONSTER[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:center,top
 MAP
@@ -2273,13 +2273,13 @@ MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 TRAP:random,random
 TRAP:random,random
 TRAP:random,random
@@ -2365,16 +2365,16 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 TRAP:random,random
 TRAP:random,random
 TRAP:random,random
@@ -2430,8 +2430,8 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 
 GEOMETRY:center,top
@@ -2468,8 +2468,8 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 
 GEOMETRY:right,bottom
@@ -2506,8 +2506,8 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:left,top
 MAP
@@ -2607,7 +2607,7 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:left,bottom
 MAP
@@ -2631,7 +2631,7 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:half-right,top
 MAP
@@ -2654,7 +2654,7 @@ MONSTER[10%]:('H',"minotaur"),random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:half-left,top
 MAP
@@ -2679,7 +2679,7 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:right,bottom
 MAP
@@ -2784,7 +2784,7 @@ MONSTER[10%]:('H',"minotaur"),random
 MONSTER:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:half-right,top
 MAP
@@ -2805,7 +2805,7 @@ MONSTER[10%]:('H',"minotaur"),random
 MONSTER[50%]:random,random
 MONSTER:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:half-left,bottom
 MAP
@@ -2826,7 +2826,7 @@ MONSTER[10%]:('H',"minotaur"),random
 MONSTER:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:left,top
 MAP
@@ -2847,7 +2847,7 @@ MONSTER[10%]:('H',"minotaur"),random
 MONSTER:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:right,bottom
 MAP
@@ -2961,7 +2961,7 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:left,top
 MAP
@@ -2985,7 +2985,7 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:half-right,bottom
 MAP
@@ -3008,7 +3008,7 @@ MONSTER[10%]:('H',"minotaur"),random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:half-left,bottom
 MAP
@@ -3033,7 +3033,7 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 
 GEOMETRY:right,top
@@ -3133,7 +3133,7 @@ MONSTER[10%]:('H',"minotaur"),random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:center,bottom
 MAP
@@ -3150,7 +3150,7 @@ MONSTER[10%]:('H',"minotaur"),random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:center,top
 MAP
@@ -3214,13 +3214,13 @@ MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 TRAP:random,random
 TRAP:random,random
 TRAP:random,random
@@ -3264,7 +3264,7 @@ MONSTER[10%]:('H',"minotaur"),random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:left,center
 MAP
@@ -3293,7 +3293,7 @@ MONSTER[10%]:('H',"minotaur"),random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:right,center
 MAP
@@ -3451,8 +3451,8 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:center,center
 MAP
@@ -3484,8 +3484,8 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:right,center
 MAP
@@ -3517,8 +3517,8 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:left,center
 MAP
@@ -3627,8 +3627,8 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:right,center
 MAP
@@ -3678,7 +3678,7 @@ MONSTER[10%]:('H',"minotaur"),random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:half-right,center
 MAP
@@ -3729,7 +3729,7 @@ MONSTER[10%]:('H',"minotaur"),random
 MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
+#GOLD:random,random
 GEOMETRY:half-left,center
 MAP
  - - - - 
@@ -3784,8 +3784,8 @@ MONSTER[50%]:random,random
 MONSTER[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:left,center
 MAP
@@ -3879,8 +3879,8 @@ TRAP[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:right,center
 MAP
@@ -3920,8 +3920,8 @@ TRAP[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:left,center
 MAP
@@ -3961,8 +3961,8 @@ TRAP[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:center,center
 MAP
@@ -4078,8 +4078,8 @@ TRAP[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:center,top
 MAP
@@ -4119,8 +4119,8 @@ TRAP[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:right,center
 MAP
@@ -4160,8 +4160,8 @@ TRAP[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
 TRAP[50%]:random,random
-GOLD:random,random
-GOLD:random,random
+#GOLD:random,random
+#GOLD:random,random
 
 GEOMETRY:left,top
 MAP

@@ -89,12 +89,9 @@ MONSTER: ('C',"forest centaur"),(19,17),hostile
 MONSTER: ('C',"forest centaur"),(21,15),hostile
 MONSTER: ('C',"forest centaur"),(21,16),hostile
 MONSTER: ('C',"forest centaur"),(21,17),hostile
-MONSTER: ('C',"plains centaur"),random,hostile
-MONSTER: ('C',"plains centaur"),random,hostile
-MONSTER: ('C',"plains centaur"),random,hostile
-MONSTER: ('C',"plains centaur"),random,hostile
-MONSTER: ('C',"plains centaur"),random,hostile
-MONSTER: ('C',"plains centaur"),random,hostile
+LOOP [4 + 2d5] {
+  MONSTER: ('C',"plains centaur"),random,hostile
+}
 MONSTER: ('s',"scorpion"),random,hostile
 MONSTER: ('s',"scorpion"),random,hostile
 
@@ -159,26 +156,13 @@ TRAP:"arrow",random
 TRAP:"arrow",random
 # Random monsters.
 MONSTER:('q',"wumpus"),(27,18),hostile,asleep
-MONSTER:('B',"giant bat"),random,hostile
-MONSTER:('B',"giant bat"),random,hostile
-MONSTER:('B',"giant bat"),random,hostile
-MONSTER:('B',"giant bat"),random,hostile
-MONSTER:('C',"forest centaur"),random,hostile
-MONSTER:('C',"forest centaur"),random,hostile
-MONSTER:('C',"forest centaur"),random,hostile
-MONSTER:('C',"forest centaur"),random,hostile
-MONSTER:('C',"mountain centaur"),random,hostile
-MONSTER:('C',"mountain centaur"),random,hostile
-MONSTER:('C',"mountain centaur"),random,hostile
-MONSTER:('C',"mountain centaur"),random,hostile
-MONSTER:('C',"mountain centaur"),random,hostile
-MONSTER:('C',"mountain centaur"),random,hostile
-MONSTER:('C',"mountain centaur"),random,hostile
-MONSTER:('C',"mountain centaur"),random,hostile
-MONSTER:('s',"scorpion"),random,hostile
-MONSTER:('s',"scorpion"),random,hostile
-MONSTER:('s',"scorpion"),random,hostile
-MONSTER:('s',"scorpion"),random,hostile
+LOOP [2 + 1d6] {
+  MONSTER:('B',"giant bat"),random,hostile
+  MONSTER:('C',"forest centaur"),random,hostile
+  MONSTER:('s',"scorpion"),random,hostile
+  MONSTER:('C',"mountain centaur"),random,hostile
+  MONSTER:('C',"mountain centaur"),random,hostile
+}
 MONSTER:'s',random,hostile
 MONSTER:'s',random,hostile
 
@@ -235,18 +219,13 @@ OBJECT:random,(37,11)
 OBJECT:random,(38,09)
 OBJECT:random,(38,10)
 OBJECT:random,(38,11)
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
+LOOP [3 + 1d3] {
+  OBJECT:random,random
+}
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [4 + 1d5] {
+  TRAP:random,random
+}
 # doors
 DOOR:locked,(12,08)
 DOOR:closed,(22,10)
@@ -283,21 +262,19 @@ MONSTER:('C',"mountain centaur"),(02,02),hostile
 MONSTER:('C',"mountain centaur"),(71,02),hostile
 MONSTER:('C',"mountain centaur"),(02,16),hostile
 MONSTER:('C',"mountain centaur"),(71,16),hostile
-MONSTER:('C',"forest centaur"),random,hostile
-MONSTER:('C',"forest centaur"),random,hostile
-MONSTER:('C',"mountain centaur"),random,hostile
-MONSTER:('C',"mountain centaur"),random,hostile
-MONSTER:'C',random,hostile
-MONSTER:'C',random,hostile
 MONSTER:('s',"scorpion"),(03,02),hostile
 MONSTER:('s',"scorpion"),(72,02),hostile
 MONSTER:('s',"scorpion"),(03,17),hostile
 MONSTER:('s',"scorpion"),(72,17),hostile
 MONSTER:('s',"scorpion"),(41,10),hostile
 MONSTER:('s',"scorpion"),(33,09),hostile
-MONSTER:('s',"scorpion"),random,hostile
-MONSTER:('s',"scorpion"),random,hostile
-MONSTER:'s',random,hostile
+LOOP [2 + 1d5] {
+  MONSTER:('C',"forest centaur"),random,hostile
+  MONSTER:('C',"mountain centaur"),random,hostile
+  MONSTER:'C',random,hostile
+  MONSTER:('s',"scorpion"),random,hostile
+  MONSTER:'s',random,hostile
+}
 
 WALLIFY
 
@@ -319,24 +296,18 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
+LOOP [5 + 1d5] {
+  OBJECT: random, random
+}
 #
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
+LOOP [3 + 1d4] {
+  TRAP: random, random
+}
 #
-MONSTER: ('C', "mountain centaur"), random, hostile
-MONSTER: ('C', "mountain centaur"), random, hostile
-MONSTER: ('C', "forest centaur"), random, hostile
-MONSTER: ('C', "forest centaur"), random, hostile
-MONSTER: ('C', "forest centaur"), random, hostile
+LOOP [2 + 1d4] {
+  MONSTER: ('C', "mountain centaur"), random, hostile
+  MONSTER: ('C', "forest centaur"), random, hostile
+}
 MONSTER: 'C', random, hostile
 MONSTER: ('s', "scorpion"), random, hostile
 
@@ -349,28 +320,17 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
+LOOP [9 + 1d5] {
+  OBJECT: random, random
+}
 #
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
+LOOP [2 + 1d5] {
+  TRAP: random, random
+}
 #
-MONSTER: ('C', "mountain centaur"), random, hostile
-MONSTER: ('C', "mountain centaur"), random, hostile
-MONSTER: ('C', "mountain centaur"), random, hostile
-MONSTER: ('C', "mountain centaur"), random, hostile
-MONSTER: 'C', random, hostile
-MONSTER: ('s', "scorpion"), random, hostile
-MONSTER: ('s', "scorpion"), random, hostile
+LOOP [3 + 1d5] {
+  MONSTER: ('C', "mountain centaur"), random, hostile
+  MONSTER: 'C', random, hostile
+  MONSTER: ('s', "scorpion"), random, hostile
+}
 

@@ -73,12 +73,9 @@ MONSTER:('@',"roshi"),(26,07)
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [4 + 1d6] {
+  TRAP:random,random
+}
 # Monsters on siege duty.
 MONSTER: ('@',"ninja"),(64,00),hostile
 MONSTER: ('d',"wolf"),(65,01)
@@ -197,12 +194,9 @@ OBJECT:'(',(38,14)
 OBJECT:'(',(39,14)
 OBJECT:'(',(40,14)
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [4 + 1d6] {
+  TRAP:random,random
+}
 # Random monsters.
 MONSTER:('@',"ninja"),(15,05),hostile
 MONSTER:('@',"ninja"),(16,05),hostile
@@ -222,15 +216,9 @@ MONSTER:('d',"wolf"),(57,14)
 MONSTER:('@',"ninja"),(58,14),hostile
 MONSTER:'d',(59,14)
 MONSTER:('d',"wolf"),(60,14)
-MONSTER:('E',"stalker"),random
-MONSTER:('E',"stalker"),random
-MONSTER:('E',"stalker"),random
-MONSTER:('E',"stalker"),random
-MONSTER:('E',"stalker"),random
-MONSTER:('E',"stalker"),random
-MONSTER:('E',"stalker"),random
-MONSTER:('E',"stalker"),random
-MONSTER:('E',"stalker"),random
+LOOP [7 + 1d10] {
+  MONSTER:('E',"stalker"),random
+}
 #	"guards" for the central courtyard.
 MONSTER:('@',"samurai"),(30,05),hostile
 MONSTER:('@',"samurai"),(31,05),hostile
@@ -289,60 +277,29 @@ STAIR:$place[0],up
 NON_DIGGABLE:(00,00,44,19)
 # Objects
 OBJECT:(')',"tsurugi"),(22,10),blessed,0,NAME:"The Tsurugi of Muramasa"
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
+LOOP [9 + 1d6] {
+  OBJECT:random,random
+}
 #
 TRAP:"board",(22,09)
 TRAP:"board",(24,10)
 TRAP:"board",(22,11)
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [3 + 1d6] {
+  TRAP:random,random
+}
 # Random monsters.
 MONSTER:('@',"Ashikaga Takauji"),(22,10) {
   OBJECT:('[',"splint mail")
 }
-MONSTER:('@',"samurai"),random,hostile
-MONSTER:('@',"samurai"),random,hostile
-MONSTER:('@',"samurai"),random,hostile
-MONSTER:('@',"samurai"),random,hostile
-MONSTER:('@',"samurai"),random,hostile
-MONSTER:('@',"ninja"),random,hostile
-MONSTER:('@',"ninja"),random,hostile
-MONSTER:('@',"ninja"),random,hostile
-MONSTER:('@',"ninja"),random,hostile
-MONSTER:('@',"ninja"),random,hostile
-MONSTER:('d',"wolf"),random
-MONSTER:('d',"wolf"),random
-MONSTER:('d',"wolf"),random
-MONSTER:('d',"wolf"),random
-MONSTER:'d',random
-MONSTER:'d',random
-MONSTER:('E',"stalker"),random
-MONSTER:('E',"stalker"),random
-MONSTER:('E',"stalker"),random
-MONSTER:('E',"stalker"),random
-MONSTER:('E',"stalker"),random
-MONSTER:('E',"stalker"),random
-MONSTER:('E',"stalker"),random
-MONSTER:('E',"stalker"),random
-MONSTER:('E',"stalker"),random
+LOOP [3 + 1d6] {
+  MONSTER:('@',"samurai"),random,hostile
+  MONSTER[90%]:('@',"ninja"),random,hostile
+  MONSTER:('d',"wolf"),random
+  MONSTER[50%]:'d',random
+  MONSTER:('E',"stalker"),random
+  MONSTER[90%]:('E',"stalker"),random
+}
 
 
 #
@@ -363,28 +320,19 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
+LOOP [5 + 1d6] {
+  OBJECT: random, random
+}
 #
 MONSTER: 'd', random
-MONSTER: ('d', "wolf"), random
-MONSTER: ('d', "wolf"), random
-MONSTER: ('d', "wolf"), random
-MONSTER: ('d', "wolf"), random
-MONSTER: ('d', "wolf"), random
+LOOP [3 + 2d4] {
+  MONSTER: ('d', "wolf"), random
+}
 MONSTER: ('E', "stalker"), random
 #
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
+LOOP [3 + 1d6] {
+  TRAP: random, random
+}
 
 LEVEL: "Sam-filb"
 FLAGS:mazelevel
@@ -419,26 +367,16 @@ DOOR:closed,(43,08)
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
+LOOP [6 + 2d3] {
+  OBJECT: random, random
+}
 #
 MONSTER: 'd', random
-MONSTER: ('d', "wolf"), random
-MONSTER: ('d', "wolf"), random
-MONSTER: ('d', "wolf"), random
-MONSTER: ('d', "wolf"), random
-MONSTER: ('E', "stalker"), random
-MONSTER: ('E', "stalker"), random
-MONSTER: ('E', "stalker"), random
+LOOP [3 + 2d3] {
+  MONSTER: ('d', "wolf"), random
+  MONSTER: ('E', "stalker"), random
+}
 #
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
+LOOP [1 + 2d3] {
+  TRAP: random, random
+}

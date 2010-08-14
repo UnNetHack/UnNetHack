@@ -156,7 +156,6 @@ SUBROOM		return SUBROOM_ID;
 RANDOM_CORRIDORS	return RAND_CORRIDOR_ID;
 CORRIDOR	return CORRIDOR_ID;
 SPILL	  return SPILL_ID;
-RANDLINE	return RANDLINE_ID;
 TERRAIN		return TERRAIN_ID;
 REPLACE_TERRAIN	return REPLACE_TERRAIN_ID;
 MON_GENERATION	return MON_GENERATION_ID;
@@ -175,7 +174,17 @@ INCLUDE		return INCLUDE_ID;
 SOUNDS		return SOUNDS_ID;
 SHUFFLE		return SHUFFLE_ID;
 montype		return MONTYPE_ID;
+selection	return selection_ID;
 rect		return rect_ID;
+fillrect	return fillrect_ID;
+line		return line_ID;
+randline	return randline_ID;
+grow		return grow_ID;
+floodfill	return flood_ID;
+rndcoord	return rndcoord_ID;
+circle		return circle_ID;
+ellipse		return ellipse_ID;
+filter		return filter_ID;
 hear		{ yylval.i=LVLSND_HEARD;  return MSG_OUTPUT_TYPE; }
 pline		{ yylval.i=LVLSND_PLINED; return MSG_OUTPUT_TYPE; }
 verbal		{ yylval.i=LVLSND_VERBAL; return MSG_OUTPUT_TYPE; }
@@ -397,6 +406,7 @@ handle_varstring_check()
      if (l == SPOVAR_MAPCHAR) return (a ? VARSTRING_MAPCHAR_ARRAY : VARSTRING_MAPCHAR);
      if (l == SPOVAR_MONST) return (a ? VARSTRING_MONST_ARRAY : VARSTRING_MONST);
      if (l == SPOVAR_OBJ) return (a ? VARSTRING_OBJ_ARRAY : VARSTRING_OBJ);
+     if (l == SPOVAR_SEL) return (a ? VARSTRING_SEL_ARRAY : VARSTRING_SEL);
   }
   return VARSTRING;
 }

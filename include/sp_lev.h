@@ -91,7 +91,6 @@ enum opcode_defs {
     SPO_REPLACETERRAIN,
     SPO_EXIT,
     SPO_ENDROOM,
-    SPO_RANDLINE,
     SPO_POP_CONTAINER,
     SPO_PUSH,
     SPO_POP,
@@ -118,6 +117,18 @@ enum opcode_defs {
     SPO_VAR_INIT, /* variable_name data */
     SPO_SHUFFLE_ARRAY,
     SPO_DICE,
+
+    SPO_SEL_ADD,
+    SPO_SEL_POINT,
+    SPO_SEL_RECT,
+    SPO_SEL_FILLRECT,
+    SPO_SEL_LINE,
+    SPO_SEL_RNDLINE,
+    SPO_SEL_GROW,
+    SPO_SEL_FLOOD,
+    SPO_SEL_RNDCOORD,
+    SPO_SEL_ELLIPSE,
+    SPO_SEL_FILTER,
 
     MAX_SP_OPCODES
 };
@@ -184,6 +195,7 @@ enum opcode_defs {
 #define SPOVAR_MAPCHAR	0x06 /* map char, in l */
 #define SPOVAR_MONST	0x07 /* monster class & specific monster, encoded in l; use SP_MONST_... */
 #define SPOVAR_OBJ	0x08 /* object class & specific object type, encoded in l; use SP_OBJ_... */
+#define SPOVAR_SEL	0x09 /* selection. char[COLNO][ROWNO] in str */
 #define SPOVAR_ARRAY	0x40 /* used in splev_var & lc_vardefs, not in opvar */
 
 #define SP_COORD_X(l)	(l & 0xff)

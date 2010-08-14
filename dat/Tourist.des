@@ -128,15 +128,9 @@ MONSTER:(';',"piranha"),(29,11)
 MONSTER:(';',"kraken"),(34,09)
 MONSTER:(';',"kraken"),(37,09)
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [7 + 1d10] {
+  TRAP:random,random
+}
 
 #
 #	The "locate" level for the quest.
@@ -399,27 +393,13 @@ DOOR:open,(59,14)
 DOOR:open,(59,17)
 # Objects
 OBJECT:('(',"credit card"),(04,01),blessed,0,NAME:"The Platinum Yendorian Express Card"
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
+LOOP [8 + 1d5] {
+  OBJECT:random,random
+}
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [3 + 1d5] {
+  TRAP:random,random
+}
 # Random monsters.
 MONSTER:('@',"Master of Thieves"),(04,01),hostile {
   OBJECT:'['
@@ -429,22 +409,9 @@ MONSTER:('@',"Master of Thieves"),(04,01),hostile {
   OBJECT:'!'
   OBJECT:'!'
 }
-MONSTER:('s',"giant spider"),random
-MONSTER:('s',"giant spider"),random
-MONSTER:('s',"giant spider"),random
-MONSTER:('s',"giant spider"),random
-MONSTER:('s',"giant spider"),random
-MONSTER:('s',"giant spider"),random
-MONSTER:('s',"giant spider"),random
-MONSTER:('s',"giant spider"),random
-MONSTER:('s',"giant spider"),random
-MONSTER:('s',"giant spider"),random
-MONSTER:('s',"giant spider"),random
-MONSTER:('s',"giant spider"),random
-MONSTER:('s',"giant spider"),random
-MONSTER:('s',"giant spider"),random
-MONSTER:('s',"giant spider"),random
-MONSTER:('s',"giant spider"),random
+LOOP [10 + 2d5] {
+  MONSTER:('s',"giant spider"),random
+}
 MONSTER:'s',random
 MONSTER:'s',random
 # ladies of the evening
@@ -488,24 +455,17 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
+LOOP [2 + 2d4] {
+  OBJECT: random, random
+}
 #
+LOOP [2 + 2d4] {
 TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
+}
 #
-MONSTER: ('@', "soldier"), random, hostile
-MONSTER: ('@', "soldier"), random, hostile
-MONSTER: ('@', "soldier"), random, hostile
-MONSTER: ('@', "soldier"), random, hostile
-MONSTER: ('@', "soldier"), random, hostile
+LOOP [2 + 2d4] {
+  MONSTER: ('@', "soldier"), random, hostile
+}
 MONSTER: 'H', random, hostile
 MONSTER: 'C', random, hostile
 
@@ -518,27 +478,20 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
+LOOP [7 + 2d4] {
+  OBJECT: random, random
+}
 #
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
+LOOP [4 + 2d4] {
+  TRAP: random, random
+}
 #
-MONSTER: ('@', "soldier"), random, hostile
+LOOP [2d4] {
+  MONSTER: ('@', "soldier"), random, hostile
+  MONSTER: 'C', random, hostile
+  MONSTER: 's', random
+}
 MONSTER: ('@', "captain"), random, hostile
 MONSTER: ('@', "captain"), random, hostile
 MONSTER: 'H', random, hostile
 MONSTER: 'H', random, hostile
-MONSTER: 'C', random, hostile
-MONSTER: 's', random

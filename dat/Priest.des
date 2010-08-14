@@ -220,20 +220,9 @@ REGION:(00,00,25,10),unlit,"ordinary"
 STAIR:(20,05),up
 # Objects
 OBJECT:('[',"helm of brilliance"),$place[0],blessed,0,NAME:"The Mitre of Holiness"
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
+LOOP [10 + 1d6] {
+  OBJECT:random,random
+}
 # Random traps
 TRAP:"fire",random
 TRAP:"fire",random
@@ -246,32 +235,14 @@ MONSTER:('&',"Nalzok"),$place[0] {
   OBJECT:')',1d6
   OBJECT:'[',1d3
 }
-MONSTER:('Z',"human zombie"),random
-MONSTER:('Z',"human zombie"),random
-MONSTER:('Z',"human zombie"),random
-MONSTER:('Z',"human zombie"),random
-MONSTER:('Z',"human zombie"),random
-MONSTER:('Z',"human zombie"),random
-MONSTER:('Z',"human zombie"),random
-MONSTER:('Z',"human zombie"),random
-MONSTER:('Z',"human zombie"),random
-MONSTER:('Z',"human zombie"),random
-MONSTER:('Z',"human zombie"),random
-MONSTER:('Z',"human zombie"),random
-MONSTER:('Z',"human zombie"),random
-MONSTER:('Z',"human zombie"),random
-MONSTER:('Z',"human zombie"),random
-MONSTER:('Z',"human zombie"),random
+LOOP [15 + 2d5] {
+  MONSTER:('Z',"human zombie"),random
+}
 MONSTER:'Z',random
 MONSTER:'Z',random
-MONSTER:('W',"wraith"),random
-MONSTER:('W',"wraith"),random
-MONSTER:('W',"wraith"),random
-MONSTER:('W',"wraith"),random
-MONSTER:('W',"wraith"),random
-MONSTER:('W',"wraith"),random
-MONSTER:('W',"wraith"),random
-MONSTER:('W',"wraith"),random
+LOOP [4 + 2d4] {
+  MONSTER:('W',"wraith"),random
+}
 MONSTER:'W',random
 
 #

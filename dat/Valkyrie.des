@@ -67,12 +67,9 @@ MONSTER:('@',"warrior"),(42,12)
 # Non diggable walls
 NON_DIGGABLE:(26,07,43,13)
 # Random traps
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
+LOOP [3 + 3d5] {
+  TRAP:"fire",random
+}
 # Monsters on siege duty.
 MONSTER: ('a',"fire ant"),(04,12)
 MONSTER: ('a',"fire ant"),(08,08)
@@ -122,55 +119,24 @@ STAIR:(20,06),down
 # Non diggable walls
 NON_DIGGABLE:(00,00,39,12)
 # Objects
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
+LOOP [6 + 3d5] {
+  OBJECT:random,random
+}
 # Random traps
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
+LOOP [2 + 3d5] {
+  TRAP:"fire",random
+}
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
+LOOP [10 + 3d5] {
+  MONSTER:('a',"fire ant"),random
+}
 MONSTER:'a',random
 MONSTER:'H',random,hostile
-MONSTER:('H',"fire giant"),random,hostile
-MONSTER:('H',"fire giant"),random,hostile
-MONSTER:('H',"fire giant"),random,hostile
-MONSTER:('H',"fire giant"),random,hostile
-MONSTER:('H',"fire giant"),random,hostile
-MONSTER:('H',"fire giant"),random,hostile
-MONSTER:('H',"fire giant"),random,hostile
+LOOP [2 + 3d5] {
+  MONSTER:('H',"fire giant"),random,hostile
+}
 MONSTER:'H',random,hostile
 
 #
@@ -217,28 +183,16 @@ DRAWBRIDGE:(17,02),south,open
 DRAWBRIDGE:(17,14),north,open
 # Objects
 OBJECT:('(',"crystal ball"),(17,08),blessed,5,NAME:"The Orb of Fate"
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
-OBJECT:random,random
+LOOP [4 + 3d5] {
+  OBJECT:random,random
+}
 # Traps
 TRAP:"board",(13,08)
 TRAP:"board",(21,08)
 # Random traps
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
+LOOP [2 + 2d3] {
+  TRAP:"fire",random
+}
 TRAP:"board",random
 TRAP:random,random
 TRAP:random,random
@@ -249,22 +203,14 @@ MONSTER:('H',"Lord Surtur"),(17,08) {
   OBJECT:random
   OBJECT:random
 }
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
-MONSTER:('a',"fire ant"),random
+LOOP [2 + 2d3] {
+  MONSTER:('a',"fire ant"),random
+}
 MONSTER:'a',random
 MONSTER:'a',random
-MONSTER:('H',"fire giant"),(10,06),hostile
-MONSTER:('H',"fire giant"),(10,07),hostile
-MONSTER:('H',"fire giant"),(10,08),hostile
-MONSTER:('H',"fire giant"),(10,09),hostile
-MONSTER:('H',"fire giant"),(10,10),hostile
-MONSTER:('H',"fire giant"),(24,06),hostile
-MONSTER:('H',"fire giant"),(24,07),hostile
-MONSTER:('H',"fire giant"),(24,08),hostile
-MONSTER:('H',"fire giant"),(24,09),hostile
-MONSTER:('H',"fire giant"),(24,10),hostile
+LOOP [5 + 4d3] {
+  MONSTER:('H',"fire giant"),(10,06),hostile
+}
 MONSTER:('H',"fire giant"),random,hostile
 MONSTER:('H',"fire giant"),random,hostile
 MONSTER:'H',random,hostile
@@ -287,31 +233,19 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
+LOOP [5 + 2d3] {
+  OBJECT: random, random
+}
 #
-MONSTER: ('a', "fire ant"), random
-MONSTER: ('a', "fire ant"), random
-MONSTER: ('a', "fire ant"), random
-MONSTER: ('a', "fire ant"), random
-MONSTER: ('a', "fire ant"), random
+LOOP [2 + 2d2] {
+  MONSTER: ('a', "fire ant"), random
+}
 MONSTER: 'a', random
 MONSTER: ('H', "fire giant"), random, hostile
 #
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
+LOOP [6 + 2d2] {
+  TRAP: random, random
+}
 
 LEVEL: "Val-filb"
 FLAGS:mazelevel
@@ -322,30 +256,18 @@ NOMAP
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
+LOOP [8 + 2d2] {
+  OBJECT: random, random
+}
 #
-MONSTER: ('a', "fire ant"), random
-MONSTER: ('a', "fire ant"), random
-MONSTER: ('a', "fire ant"), random
+LOOP [3 + 2d2] {
+  MONSTER: ('a', "fire ant"), random
+  MONSTER[80%]: ('H', "fire giant"), random, hostile
+}
 MONSTER: 'a', random
-MONSTER: ('H', "fire giant"), random, hostile
-MONSTER: ('H', "fire giant"), random, hostile
-MONSTER: ('H', "fire giant"), random, hostile
 #
-TRAP: "fire", random
-TRAP: "fire", random
-TRAP: "fire", random
-TRAP: "fire", random
-TRAP: "fire", random
+LOOP [3 + 3d2] {
+  TRAP: "fire", random
+}
 TRAP: random, random
 TRAP: random, random

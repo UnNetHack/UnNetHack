@@ -130,6 +130,7 @@ splev_stack_done(st)
 		    break;
 		case SPOVAR_VARIABLE:
 		case SPOVAR_STRING:
+		case SPOVAR_SEL:
 		    if (st->stackdata[i]->vardata.str) Free(st->stackdata[i]->vardata.str);
 		    st->stackdata[i]->vardata.str = NULL;
 		    break;
@@ -224,6 +225,17 @@ opvar_new_int(i)
     return tmpov;
 }
 
+struct opvar *
+opvar_new_coord(x,y)
+     int x,y;
+{
+    struct opvar *tmpov = (struct opvar *)alloc(sizeof(struct opvar));
+    if (!tmpov) panic("could not alloc opvar struct");
+    tmpov->spovartyp = SPOVAR_COORD;
+    tmpov->vardata.l = SP_COORD_PACK(x,y);
+    return tmpov;
+}
+
 void
 opvar_free_x(ov)
      struct opvar *ov;
@@ -239,6 +251,7 @@ opvar_free_x(ov)
 	break;
     case SPOVAR_VARIABLE:
     case SPOVAR_STRING:
+    case SPOVAR_SEL:
 	if (ov->vardata.str)
 	    Free(ov->vardata.str);
 	break;
@@ -269,6 +282,7 @@ opvar_clone(ov)
 	break;
     case SPOVAR_VARIABLE:
     case SPOVAR_STRING:
+    case SPOVAR_SEL:
 	{
 	    int len = strlen(ov->vardata.str);
 	    tmpov->spovartyp = ov->spovartyp;
@@ -844,8 +858,15 @@ struct mkroom *croom;
 		*y += my;
 	} else {			/* random location */
 	    do {
-		*x = mx + rn2((int)sx);
-		*y = my + rn2((int)sy);
+		if (croom) { /* handle irregular areas */
+		    coord tmpc;
+		    somexy(croom, &tmpc);
+		    *x = tmpc.x;
+		    *y = tmpc.y;
+		} else {
+		    *x = mx + rn2((int)sx);
+		    *y = my + rn2((int)sy);
+		}
 		if (is_ok_location(*x,*y,humidity)) break;
 	    } while (++cpt < 100);
 	    if (cpt >= 100) {
@@ -1992,83 +2013,6 @@ struct mkroom *croom;
 
 
 void
-put_terr_spot(x,y,ter,lit,thick)
-     schar x,y,ter,lit,thick;
-{
-    int dx, dy;
-
-    if (thick < 1) thick = 1;
-    else if (thick > 10) thick = 10;
-
-    for (dx = x-(thick/2); dx < x+((thick+1)/2); dx++)
-	for (dy = y-(thick/2); dy < y+((thick+1)/2); dy++)
-	    if (!(dx >= COLNO-1 || dx <= 0 || dy <= 0 || dy >= ROWNO-1)) {
-		SET_TYPLIT(dx,dy, ter, lit);
-	    }
-}
-
-void
-line_midpoint_core(x1,y1,x2,y2,rough, ter,lit,thick, rec)
-     schar x1,y1,x2,y2,rough,ter,lit,thick,rec;
-{
-    int mx, my;
-    int dx, dy;
-
-    if (rec < 1) {
-	return;
-    }
-
-    if ((x2 == x1) && (y2 == y1)) {
-	put_terr_spot(x1,y1,ter,lit,thick);
-	return;
-    }
-
-    if (rough > max(abs(x2-x1), abs(y2-y1)))
-	rough = max(abs(x2-x1), abs(y2-y1));
-
-    if (rough < 2) {
-	mx = ((x1 + x2) / 2);
-	my = ((y1 + y2) / 2);
-    } else {
-	do {
-	    dx = (rand() % rough) - (rough / 2);
-	    dy = (rand() % rough) - (rough / 2);
-	    mx = ((x1 + x2) / 2) + dx;
-	    my = ((y1 + y2) / 2) + dy;
-	} while ((mx > COLNO-1 || mx < 0 || my < 0 || my > ROWNO-1));
-    }
-
-    put_terr_spot(mx,my,ter,lit,thick);
-
-    rough = (rough * 2) / 3;
-
-    rec--;
-
-    line_midpoint_core(x1,y1,mx,my, rough,ter,lit,thick, rec);
-    line_midpoint_core(mx,my,x2,y2, rough,ter,lit,thick, rec);
-}
-
-void
-line_midpoint(rndline,croom)
-randline *rndline;
-struct mkroom *croom;
-{
-    schar x1,y1,x2,y2,thick;
-
-    x1 = rndline->x1; y1 = rndline->y1;
-    get_location(&x1, &y1, DRY|WET, croom);
-
-    x2 = rndline->x2; y2 = rndline->y2;
-    get_location(&x2, &y2, DRY|WET, croom);
-
-    thick = rndline->thick;
-
-    line_midpoint_core(x1,y1,x2,y2,rndline->roughness, rndline->fg, rndline->lit, thick, 12);
-}
-
-
-
-void
 set_terrain(terr, croom)
 terrain *terr;
 struct mkroom *croom;
@@ -2738,6 +2682,7 @@ sp_lev *lvl;
 		break;
 	    case SPOVAR_VARIABLE:
 	    case SPOVAR_STRING:
+	    case SPOVAR_SEL:
 		{
 		    char *opd;
 		    Fread((genericptr_t) &nsize, 1, sizeof(nsize), fd);
@@ -3518,49 +3463,6 @@ spo_endroom(coder)
 }
 
 void
-spo_door(coder)
-     struct sp_coder *coder;
-{
-    schar x,y;
-    struct opvar *msk, *coord;
-    struct mkroom *droom;
-    xchar typ;
-
-    if (!OV_pop_i(msk) ||
-	!OV_pop_c(coord)) return;
-
-    droom = &rooms[0];
-
-    x = SP_COORD_X(OV_i(coord)); y = SP_COORD_Y(OV_i(coord));
-    typ = OV_i(msk) == -1 ? rnddoor() : (xchar)OV_i(msk);
-
-    get_location(&x, &y, DRY, (struct mkroom *)0);
-    if (!IS_DOOR(levl[x][y].typ) && levl[x][y].typ != SDOOR)
-	levl[x][y].typ = (typ & D_SECRET) ? SDOOR : DOOR;
-    if (typ & D_SECRET) {
-	typ &= ~D_SECRET;
-	if (typ < D_CLOSED)
-	    typ = D_CLOSED;
-    }
-    levl[x][y].doormask = typ;
-    /*SpLev_Map[x][y] = 1;*/
-
-    /* Now the complicated part, list it with each subroom */
-    /* The dog move and mail daemon routines use this */
-    while(droom->hx >= 0 && doorindex < DOORMAX) {
-	if(droom->hx >= x-1 && droom->lx <= x+1 &&
-	   droom->hy >= y-1 && droom->ly <= y+1) {
-	    /* Found it */
-	    add_door(x, y, droom);
-	}
-	droom++;
-    }
-
-    opvar_free(coord);
-    opvar_free(msk);
-}
-
-void
 spo_stair(coder)
      struct sp_coder *coder;
 {
@@ -3781,53 +3683,445 @@ spo_corridor(coder)
     opvar_free(srcroom);
 }
 
+struct opvar *
+selection_opvar(nbuf)
+     char *nbuf;
+{
+    struct opvar *ov;
+    char buf[(COLNO*ROWNO)+1];
+    int x,y,i = 0;
+
+    if (!nbuf) {
+	(void) memset(buf, 1, sizeof(buf));
+	buf[(COLNO*ROWNO)] = '\0';
+	ov = opvar_new_str(buf);
+    } else {
+	ov = opvar_new_str(nbuf);
+    }
+    ov->spovartyp = SPOVAR_SEL;
+    return ov;
+}
+
+char
+selection_getpoint(x,y,ov)
+     int x,y;
+     struct opvar *ov;
+{
+    if (!ov || ov->spovartyp != SPOVAR_SEL) return 0;
+    if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO) return 0;
+
+    return (ov->vardata.str[COLNO*y + x] - 1);
+}
+
+void
+selection_setpoint(x,y,ov, c)
+     int x,y;
+     struct opvar *ov;
+     char c;
+{
+    if (!ov || ov->spovartyp != SPOVAR_SEL) return;
+    if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO) return;
+
+    ov->vardata.str[COLNO*y + x] = (c + 1);
+}
+
+struct opvar *
+selection_logical_oper(s1, s2, oper)
+     struct opvar *s1, *s2;
+     char oper;
+{
+    struct opvar *ov;
+    int x,y;
+
+    ov = selection_opvar(NULL);
+    if (!ov) return NULL;
+
+    for (x = 0; x < COLNO; x++)
+	for (y = 0; y < ROWNO; y++) {
+	    switch (oper) {
+	    default:
+	    case '|':
+		if (selection_getpoint(x,y,s1) || selection_getpoint(x,y,s2))
+		    selection_setpoint(x,y,ov,1);
+		break;
+	    case '&':
+		if (selection_getpoint(x,y,s1) && selection_getpoint(x,y,s2))
+		    selection_setpoint(x,y,ov,1);
+		break;
+	    }
+	}
+
+    return ov;
+}
+
+
+
+void
+selection_filter_percent(ov, percent)
+    struct opvar *ov;
+    int percent;
+{
+    int x,y;
+    if (!ov) return;
+    for (x = 0; x < COLNO; x++)
+	for (y = 0; y < ROWNO; y++)
+	    if (selection_getpoint(x,y,ov) && (rn2(100) >= percent))
+		selection_setpoint(x,y,ov,0);
+}
+
+int
+selection_rndcoord(ov, x,y)
+    struct opvar *ov;
+    schar *x, *y;
+{
+    struct opvar *coord;
+    int idx = 0;
+    int c;
+    int dx,dy;
+
+    for (dx = 0; dx < COLNO; dx++)
+	for (dy = 0; dy < ROWNO; dy++)
+	    if (isok(dx,dy) && selection_getpoint(dx,dy,ov)) idx++;
+
+    if (idx) {
+	c = rn2(idx);
+	for (dx = 0; dx < COLNO; dx++)
+	    for (dy = 0; dy < ROWNO; dy++)
+		if (isok(dx,dy) && selection_getpoint(dx,dy, ov)) {
+		    if (!c) {
+			*x = dx;
+			*y = dy;
+			return 1;
+		    }
+		    c--;
+		}
+    }
+    *x = *y = -1;
+    return 0;
+}
+
+void
+selection_do_grow(ov, dir)
+     struct opvar *ov;
+     int dir;
+{
+    int x,y, c;
+    char tmp[COLNO][ROWNO];
+
+    if (ov->spovartyp != SPOVAR_SEL) return;
+    if (!ov) return;
+
+    (void) memset(tmp, 0, sizeof(tmp));
+
+    for (x = 0; x < COLNO; x++)
+	for (y = 0; y < ROWNO; y++) {
+	    c = 0;
+	    if ((dir & W_WEST) && (x > 0) && (selection_getpoint(x-1,y, ov))) c++;
+	    if ((dir & (W_WEST|W_NORTH)) && (x > 0) && (y > 0) && (selection_getpoint(x-1,y-1, ov))) c++;
+	    if ((dir & W_NORTH) && (y > 0) && (selection_getpoint(x,y-1, ov))) c++;
+	    if ((dir & (W_NORTH|W_EAST)) && (y > 0) && (x < COLNO-1) && (selection_getpoint(x+1,y-1, ov))) c++;
+	    if ((dir & W_EAST) && (x < COLNO-1) && (selection_getpoint(x+1,y, ov))) c++;
+	    if ((dir & (W_EAST|W_SOUTH)) && (x < COLNO-1) && (y < ROWNO-1) && (selection_getpoint(x+1,y+1, ov))) c++;
+	    if ((dir & W_SOUTH) && (y < ROWNO-1) && (selection_getpoint(x,y+1, ov))) c++;
+	    if ((dir & (W_SOUTH|W_WEST)) && (y < ROWNO-1) && (x > 0) && (selection_getpoint(x-1,y+1, ov))) c++;
+	    if (c) tmp[x][y] = 1;
+	}
+
+    for (x = 0; x < COLNO; x++)
+	for (y = 0; y < ROWNO; y++)
+	    if (tmp[x][y]) selection_setpoint(x,y,ov,1);
+}
+
+void
+selection_floodfill(ov, x,y)
+     struct opvar *ov;
+     int x,y;
+{
+    struct opvar *tmp = selection_opvar(NULL);
+#define SEL_FLOOD_STACK (COLNO*ROWNO)
+#define SEL_FLOOD(nx,ny) {if (idx<SEL_FLOOD_STACK) { dx[idx]=(nx); dy[idx]=(ny); idx++; } else panic("floodfill stack overrun");}
+    int idx = 0;
+    xchar dx[SEL_FLOOD_STACK];
+    xchar dy[SEL_FLOOD_STACK];
+    schar under = levl[x][y].typ;
+    SEL_FLOOD(x,y);
+    do {
+	idx--;
+	x = dx[idx];
+	y = dy[idx];
+	if (isok(x,y)) {
+	    selection_setpoint(x,y, ov, 1);
+	    selection_setpoint(x,y, tmp, 1);
+	}
+	if (isok(x+1,y) && (levl[x+1][y].typ == under) && !selection_getpoint(x+1,y,tmp)) SEL_FLOOD(x+1, y);
+	if (isok(x-1,y) && (levl[x-1][y].typ == under) && !selection_getpoint(x-1,y,tmp)) SEL_FLOOD(x-1, y);
+	if (isok(x,y+1) && (levl[x][y+1].typ == under) && !selection_getpoint(x,y+1,tmp)) SEL_FLOOD(x, y+1);
+	if (isok(x,y-1) && (levl[x][y-1].typ == under) && !selection_getpoint(x,y-1,tmp)) SEL_FLOOD(x, y-1);
+    } while (idx > 0);
+#undef SEL_FLOOD
+#undef SEL_FLOOD_STACK
+    opvar_free(tmp);
+}
+
+/* McIlroy's Ellipse Algorithm */
+void
+selection_do_ellipse(ov, xc,yc, a,b, filled)
+    struct opvar *ov;
+    int xc,yc,a,b,filled;
+{                       /* e(x,y) = b^2*x^2 + a^2*y^2 - a^2*b^2 */
+    int x = 0, y = b;
+    long a2 = (long)a*a, b2 = (long)b*b;
+    long crit1 = -(a2/4 + a%2 + b2);
+    long crit2 = -(b2/4 + b%2 + a2);
+    long crit3 = -(b2/4 + b%2);
+    long t = -a2*y; /* e(x+1/2,y-1/2) - (a^2+b^2)/4 */
+    long dxt = 2*b2*x, dyt = -2*a2*y;
+    long d2xt = 2*b2, d2yt = 2*a2;
+    long width = 1;
+    long i;
+
+    if (!ov) return;
+
+    filled = !filled;
+
+    if (!filled) {
+	while (y>=0 && x<=a) {
+	    selection_setpoint(xc+x, yc+y, ov, 1);
+	    if (x!=0 || y!=0)
+		selection_setpoint(xc-x, yc-y, ov, 1);
+	    if (x!=0 && y!=0) {
+		selection_setpoint(xc+x, yc-y, ov, 1);
+		selection_setpoint(xc-x, yc+y, ov, 1);
+	    }
+	    if (t + b2*x <= crit1 ||   /* e(x+1,y-1/2) <= 0 */
+		t + a2*y <= crit3) {     /* e(x+1/2,y) <= 0 */
+		x++; dxt += d2xt; t += dxt;
+	    } else if (t - a2*y > crit2) { /* e(x+1/2,y-1) > 0 */
+		y--; dyt += d2yt; t += dyt;
+	    } else {
+		x++; dxt += d2xt; t += dxt;
+		y--; dyt += d2yt; t += dyt;
+	    }
+	}
+    } else {
+	while (y>=0 && x<=a) {
+	    if (t + b2*x <= crit1 ||   /* e(x+1,y-1/2) <= 0 */
+		t + a2*y <= crit3) {     /* e(x+1/2,y) <= 0 */
+		x++; dxt += d2xt; t += dxt;
+		width += 2;
+	    } else if (t - a2*y > crit2) { /* e(x+1/2,y-1) > 0 */
+		for (i = 0; i < width; i++) selection_setpoint(xc-x+i, yc-y, ov, 1);
+		if (y!=0)
+		    for (i = 0; i < width; i++) selection_setpoint(xc-x+i, yc+y, ov, 1);
+		y--; dyt += d2yt; t += dyt;
+	    } else {
+		for (i = 0; i < width; i++) selection_setpoint(xc-x+i, yc-y, ov, 1);
+		if (y!=0)
+		    for (i = 0; i < width; i++) selection_setpoint(xc-x+i, yc+y, ov, 1);
+		x++; dxt += d2xt; t += dxt;
+		y--; dyt += d2yt; t += dyt;
+		width += 2;
+	    }
+	}
+    }
+}
+
+
+
+void
+selection_do_line(x1,y1,x2,y2, ov) /* bresenham line algo */
+     schar x1,y1,x2,y2;
+     struct opvar *ov;
+{
+    int d,dx,dy,ai,bi,xi,yi;
+
+    if (x1 < x2) {
+	xi = 1;
+	dx = x2 - x1;
+    } else {
+	xi = - 1;
+	dx = x1 - x2;
+    }
+
+    if (y1 < y2) {
+	yi = 1;
+	dy = y2 - y1;
+    } else {
+	yi = - 1;
+	dy = y1 - y2;
+    }
+
+    selection_setpoint(x1,y1, ov, 1);
+
+    if (dx > dy) {
+	ai = (dy - dx) * 2;
+	bi = dy * 2;
+	d  = bi - dx;
+	do {
+	    if (d >= 0) {
+		y1 += yi;
+		d += ai;
+	    } else d += bi;
+	    x1 += xi;
+	    selection_setpoint(x1,y1, ov, 1);
+	} while (x1 != x2);
+    } else {
+	ai = (dx - dy) * 2;
+	bi = dx * 2;
+	d  = bi - dy;
+	do {
+	    if (d >= 0) {
+		x1 += xi;
+		d += ai;
+	    } else d += bi;
+	    y1 += yi;
+	    selection_setpoint(x1,y1, ov, 1);
+	} while (y1 != y2);
+    }
+}
+
+void
+selection_do_randline(x1,y1,x2,y2,rough, rec, ov)
+     schar x1,y1,x2,y2,rough,rec;
+     struct opvar *ov;
+{
+    int mx, my;
+    int dx, dy;
+
+    if (rec < 1) {
+	return;
+    }
+
+    if ((x2 == x1) && (y2 == y1)) {
+	selection_setpoint(x1,y1, ov, 1);
+	return;
+    }
+
+    if (rough > max(abs(x2-x1), abs(y2-y1)))
+	rough = max(abs(x2-x1), abs(y2-y1));
+
+    if (rough < 2) {
+	mx = ((x1 + x2) / 2);
+	my = ((y1 + y2) / 2);
+    } else {
+	do {
+	    dx = (rand() % rough) - (rough / 2);
+	    dy = (rand() % rough) - (rough / 2);
+	    mx = ((x1 + x2) / 2) + dx;
+	    my = ((y1 + y2) / 2) + dy;
+	} while ((mx > COLNO-1 || mx < 0 || my < 0 || my > ROWNO-1));
+    }
+
+    selection_setpoint(mx,my, ov, 1);
+
+    rough = (rough * 2) / 3;
+
+    rec--;
+
+    selection_do_randline(x1,y1,mx,my, rough, rec, ov);
+    selection_do_randline(mx,my,x2,y2, rough, rec, ov);
+}
+
+
+void
+selection_iterate(ov, func, arg)
+     struct opvar *ov;
+     void FDECL((*func), (int,int,genericptr_t));
+     genericptr_t arg;
+{
+    int x,y;
+    /* yes, this is very naive, but it's not _that_ expensive. */
+    for (x = 0; x < COLNO; x++)
+	for (y = 0; y < ROWNO; y++)
+	    if (selection_getpoint(x,y, ov)) (*func)(x,y, arg);
+}
+
+void
+sel_set_ter(x,y,arg)
+     int x,y;
+     genericptr_t arg;
+{
+    terrain terr;
+    terr = (*(terrain *)arg);
+    SET_TYPLIT(x,y, terr.ter, terr.tlit);
+    /* handle doors and secret doors */
+    if (levl[x][y].typ == SDOOR || IS_DOOR(levl[x][y].typ)) {
+	if(levl[x][y].typ == SDOOR)
+	    levl[x][y].doormask = D_CLOSED;
+	if (x && (IS_WALL(levl[x-1][y].typ) ||
+		  levl[x-1][y].horizontal))
+	    levl[x][y].horizontal = 1;
+    }
+}
+
+void
+sel_set_door(dx,dy,arg)
+     int dx,dy;
+     genericptr_t arg;
+{
+    xchar typ = (*(xchar *)arg);
+    xchar x = dx;
+    xchar y = dy;
+    struct mkroom *droom;
+    droom = &rooms[0];
+    /*get_location(&x, &y, DRY, (struct mkroom *)0);*/
+    if (!IS_DOOR(levl[x][y].typ) && levl[x][y].typ != SDOOR)
+	levl[x][y].typ = (typ & D_SECRET) ? SDOOR : DOOR;
+    if (typ & D_SECRET) {
+	typ &= ~D_SECRET;
+	if (typ < D_CLOSED)
+	    typ = D_CLOSED;
+    }
+    levl[x][y].doormask = typ;
+    /*SpLev_Map[x][y] = 1;*/
+
+    /* Now the complicated part, list it with each subroom */
+    /* The dog move and mail daemon routines use this */
+    while(droom->hx >= 0 && doorindex < DOORMAX) {
+	if(droom->hx >= x-1 && droom->lx <= x+1 &&
+	   droom->hy >= y-1 && droom->ly <= y+1) {
+	    /* Found it */
+	    add_door(x, y, droom);
+	}
+	droom++;
+    }
+
+}
+
+void
+spo_door(coder)
+     struct sp_coder *coder;
+{
+    struct opvar *msk, *sel;
+    xchar typ;
+
+    if (!OV_pop_i(msk) ||
+	!OV_pop_typ(sel, SPOVAR_SEL)) return;
+
+    typ = OV_i(msk) == -1 ? rnddoor() : (xchar)OV_i(msk);
+
+    selection_iterate(sel, sel_set_door, (genericptr_t)&typ);
+
+    opvar_free(sel);
+    opvar_free(msk);
+}
+
 void
 spo_terrain(coder)
      struct sp_coder *coder;
 {
     terrain tmpterrain;
-    struct opvar *coord1,*coord2 = NULL,*areatyp,*ter;
+    struct opvar *ter, *sel;
 
-    if (!OV_pop_i(areatyp)) return;
+    if (!OV_pop_typ(ter, SPOVAR_MAPCHAR) ||
+	!OV_pop_typ(sel, SPOVAR_SEL)) return;
 
-    switch (OV_i(areatyp)) {
-    default:
-    case 0:
-	if (!OV_pop_typ(ter, SPOVAR_MAPCHAR) ||
-	    !OV_pop_c(coord1)) return;
-	tmpterrain.x1 = SP_COORD_X(OV_i(coord1));
-	tmpterrain.y1 = SP_COORD_Y(OV_i(coord1));
-	break;
-    case 1:
-    case 2:
-	if (!OV_pop_c(coord2) ||
-	    !OV_pop_typ(ter, SPOVAR_MAPCHAR) ||
-	    !OV_pop_c(coord1)) return;
-	tmpterrain.x1 = SP_COORD_X(OV_i(coord1));
-	tmpterrain.y1 = SP_COORD_Y(OV_i(coord1));
-	tmpterrain.x2 = SP_COORD_X(OV_i(coord2));
-	tmpterrain.y2 = SP_COORD_Y(OV_i(coord2));
-	break;
-    case 3:
-    case 4:
-	if (!OV_pop_typ(ter, SPOVAR_MAPCHAR) ||
-	    !OV_pop_r(coord1)) return;
-	tmpterrain.x1 = SP_REGION_X1(OV_i(coord1));
-	tmpterrain.y1 = SP_REGION_Y1(OV_i(coord1));
-	tmpterrain.x2 = SP_REGION_X2(OV_i(coord1));
-	tmpterrain.y2 = SP_REGION_Y2(OV_i(coord1));
-	break;
-    }
-
-    tmpterrain.areatyp = OV_i(areatyp);
     tmpterrain.ter = SP_MAPCHAR_TYP(OV_i(ter));
     tmpterrain.tlit = SP_MAPCHAR_LIT(OV_i(ter));
+    selection_iterate(sel, sel_set_ter, (genericptr_t)&tmpterrain);
 
-    set_terrain(&tmpterrain, coder->croom);
-    opvar_free(coord1);
-    if (coord2) opvar_free(coord2);
-    opvar_free(areatyp);
     opvar_free(ter);
+    opvar_free(sel);
 }
 
 void
@@ -3858,36 +4152,6 @@ spo_replace_terrain(coder)
     opvar_free(from_ter);
     opvar_free(to_ter);
     opvar_free(chance);
-}
-
-void
-spo_randline(coder)
-     struct sp_coder *coder;
-{
-    randline rl;
-    struct opvar *coord1,*coord2,*fg,*roughness,*thick;
-    if (!OV_pop_i(thick) ||
-	!OV_pop_i(roughness) ||
-	!OV_pop_typ(fg, SPOVAR_MAPCHAR) ||
-	!OV_pop_c(coord2) ||
-	!OV_pop_c(coord1)) return;
-
-    rl.thick = OV_i(thick);
-    rl.roughness = OV_i(roughness);
-    rl.lit = SP_MAPCHAR_LIT(OV_i(fg));
-    rl.fg = SP_MAPCHAR_TYP(OV_i(fg));
-    rl.x1 = SP_COORD_X(OV_i(coord1));
-    rl.y1 = SP_COORD_Y(OV_i(coord1));
-    rl.x2 = SP_COORD_X(OV_i(coord2));
-    rl.y2 = SP_COORD_Y(OV_i(coord2));
-
-    line_midpoint(&rl, coder->croom);
-
-    opvar_free(coord1);
-    opvar_free(coord2);
-    opvar_free(fg);
-    opvar_free(roughness);
-    opvar_free(thick);
 }
 
 void
@@ -4663,7 +4927,6 @@ sp_lev *lvl;
 	case SPO_CORRIDOR:       spo_corridor(coder);       break;
 	case SPO_TERRAIN:        spo_terrain(coder);        break;
 	case SPO_REPLACETERRAIN: spo_replace_terrain(coder); break;
-	case SPO_RANDLINE:       spo_randline(coder);        break;
 	case SPO_SPILL:          spo_spill(coder);    break;
 	case SPO_LEVREGION:      spo_levregion(coder); break;
 	case SPO_REGION:         spo_region(coder);    break;
@@ -4724,12 +4987,12 @@ sp_lev *lvl;
 		    } else {
 			splev_stack_push(coder->stack, a);
 			opvar_free(b);
-			impossible("comparing weird type");
+			impossible("adding weird types");
 		    }
 		} else {
 		    splev_stack_push(coder->stack, a);
 		    opvar_free(b);
-		    impossible("comparing different types");
+		    impossible("adding different types");
 		}
 	    }
 	    break;
@@ -4858,6 +5121,204 @@ sp_lev *lvl;
 	    spo_var_init(coder); break;
 	case SPO_SHUFFLE_ARRAY:
 	    spo_shuffle_array(coder); break;
+	case SPO_SEL_ADD: /* actually, logical or */
+	    {
+		struct opvar *sel1, *sel2, *pt;
+		if (!OV_pop_typ(sel1, SPOVAR_SEL)) panic("no sel1 for add");
+		if (!OV_pop_typ(sel2, SPOVAR_SEL)) panic("no sel1 for add");
+		pt = selection_logical_oper(sel1, sel2, '|');
+		opvar_free(sel1);
+		opvar_free(sel2);
+		splev_stack_push(coder->stack, pt);
+	    }
+	    break;
+	case SPO_SEL_FILTER: /* sorta like logical and */
+	    {
+		struct opvar *filtertype;
+		int x,y;
+		if (!OV_pop_i(filtertype)) panic("no sel filter type");
+		switch (OV_i(filtertype)) {
+		case 0: /* percentage */
+		    {
+			struct opvar *tmp1, *sel;
+			if (!OV_pop_i(tmp1)) panic("no sel filter percent");
+			if (!OV_pop_typ(sel, SPOVAR_SEL)) panic("no sel filter");
+			selection_filter_percent(sel, OV_i(tmp1));
+			splev_stack_push(coder->stack, sel);
+			opvar_free(tmp1);
+		    }
+		    break;
+		case 1: /* logical and */
+		    {
+			struct opvar *pt, *sel1, *sel2;
+			if (!OV_pop_typ(sel1, SPOVAR_SEL)) panic("no sel filter sel1");
+			if (!OV_pop_typ(sel2, SPOVAR_SEL)) panic("no sel filter sel2");
+			pt = selection_logical_oper(sel1, sel2, '&');
+			splev_stack_push(coder->stack, pt);
+			opvar_free(sel1);
+			opvar_free(sel2);
+		    }
+		    break;
+		default: panic("unknown sel filter type");
+		}
+		opvar_free(filtertype);
+	    }
+	    break;
+	case SPO_SEL_POINT:
+	    {
+		struct opvar *tmp;
+		schar x,y;
+		if (!OV_pop_c(tmp)) panic("no ter sel coord");
+		x = SP_COORD_X(OV_i(tmp));
+		y = SP_COORD_Y(OV_i(tmp));
+		get_location(&x, &y, DRY|WET, coder->croom);
+		if (isok(x,y)) {
+		    struct opvar *pt = selection_opvar(NULL);
+		    selection_setpoint(x,y, pt, 1);
+		    splev_stack_push(coder->stack, pt);
+		}
+		opvar_free(tmp);
+	    }
+	    break;
+	case SPO_SEL_RECT:
+	case SPO_SEL_FILLRECT:
+	    {
+		struct opvar *tmp, *pt = selection_opvar(NULL);
+		schar x,y,x1,y1,x2,y2;
+		if (!OV_pop_r(tmp)) panic("no ter sel region");
+		x1 = min(SP_REGION_X1(OV_i(tmp)), SP_REGION_X2(OV_i(tmp)));
+		y1 = min(SP_REGION_Y1(OV_i(tmp)), SP_REGION_Y2(OV_i(tmp)));
+		x2 = max(SP_REGION_X1(OV_i(tmp)), SP_REGION_X2(OV_i(tmp)));
+		y2 = max(SP_REGION_Y1(OV_i(tmp)), SP_REGION_Y2(OV_i(tmp)));
+		get_location(&x1, &y1, DRY|WET, coder->croom);
+		get_location(&x2, &y2, DRY|WET, coder->croom);
+		x1 = (x1 < 0) ? 0 : x1;
+		y1 = (y1 < 0) ? 0 : y1;
+		x2 = (x2 >= COLNO) ? COLNO-1 : x2;
+		y2 = (y2 >= ROWNO) ? ROWNO-1 : y2;
+		if (coder->opcode == SPO_SEL_RECT) {
+		    for (x = x1; x <= x2; x++) {
+			selection_setpoint(x,y1, pt, 1);
+			selection_setpoint(x,y2, pt, 1);
+		    }
+		    for (y = y1; y <= y2; y++) {
+			selection_setpoint(x1,y, pt, 1);
+			selection_setpoint(x2,y, pt, 1);
+		    }
+		} else {
+		    for (x = x1; x <= x2; x++)
+			for (y = y1; y <= y2; y++)
+			    selection_setpoint(x,y, pt, 1);
+		}
+		splev_stack_push(coder->stack, pt);
+		opvar_free(tmp);
+	    }
+	    break;
+	case SPO_SEL_LINE:
+	    {
+		struct opvar *tmp, *tmp2, *pt = selection_opvar(NULL);
+		schar x1,y1,x2,y2;
+		if (!OV_pop_c(tmp) || !OV_pop_c(tmp2)) panic("no ter sel linecoord");
+		x1 = SP_COORD_X(OV_i(tmp));
+		y1 = SP_COORD_Y(OV_i(tmp));
+		x2 = SP_COORD_X(OV_i(tmp2));
+		y2 = SP_COORD_Y(OV_i(tmp2));
+		get_location(&x1, &y1, DRY|WET, coder->croom);
+		get_location(&x2, &y2, DRY|WET, coder->croom);
+		x1 = (x1 < 0) ? 0 : x1;
+		y1 = (y1 < 0) ? 0 : y1;
+		x2 = (x2 >= COLNO) ? COLNO-1 : x2;
+		y2 = (y2 >= ROWNO) ? ROWNO-1 : y2;
+		selection_do_line(x1,y1,x2,y2, pt);
+		splev_stack_push(coder->stack, pt);
+		opvar_free(tmp);
+		opvar_free(tmp2);
+	    }
+	    break;
+	case SPO_SEL_RNDLINE:
+	    {
+		struct opvar *tmp, *tmp2, *tmp3, *pt = selection_opvar(NULL);
+		schar x1,y1,x2,y2;
+		if (!OV_pop_i(tmp3) || !OV_pop_c(tmp) || !OV_pop_c(tmp2)) panic("no ter sel randline");
+		x1 = SP_COORD_X(OV_i(tmp));
+		y1 = SP_COORD_Y(OV_i(tmp));
+		x2 = SP_COORD_X(OV_i(tmp2));
+		y2 = SP_COORD_Y(OV_i(tmp2));
+		get_location(&x1, &y1, DRY|WET, coder->croom);
+		get_location(&x2, &y2, DRY|WET, coder->croom);
+		x1 = (x1 < 0) ? 0 : x1;
+		y1 = (y1 < 0) ? 0 : y1;
+		x2 = (x2 >= COLNO) ? COLNO-1 : x2;
+		y2 = (y2 >= ROWNO) ? ROWNO-1 : y2;
+		selection_do_randline(x1,y1,x2,y2, OV_i(tmp3), 12, pt);
+		splev_stack_push(coder->stack, pt);
+		opvar_free(tmp);
+		opvar_free(tmp2);
+		opvar_free(tmp3);
+	    }
+	    break;
+	case SPO_SEL_GROW:
+	    {
+		struct opvar *dirs, *pt;
+		if (!OV_pop_i(dirs)) panic("no dirs for grow");
+		if (!OV_pop_typ(pt, SPOVAR_SEL)) panic("no selection for grow");
+		selection_do_grow(pt, OV_i(dirs));
+		splev_stack_push(coder->stack, pt);
+		opvar_free(dirs);
+	    }
+	    break;
+	case SPO_SEL_FLOOD:
+	    {
+		struct opvar *tmp;
+		schar x,y;
+		if (!OV_pop_c(tmp)) panic("no ter sel flood coord");
+		x = SP_COORD_X(OV_i(tmp));
+		y = SP_COORD_Y(OV_i(tmp));
+		get_location(&x, &y, DRY|WET, coder->croom);
+		if (isok(x,y)) {
+		    struct opvar *pt = selection_opvar(NULL);
+		    selection_floodfill(pt, x,y);
+		    splev_stack_push(coder->stack, pt);
+		}
+		opvar_free(tmp);
+	    }
+	    break;
+	case SPO_SEL_RNDCOORD:
+	    {
+		struct opvar *pt;
+		schar x,y;
+		if (!OV_pop_typ(pt, SPOVAR_SEL)) panic("no selection for rndcoord");
+		if (selection_rndcoord(pt, &x, &y)) {
+		    x -= xstart;
+		    y -= ystart;
+		}
+		/*get_location(&x, &y, DRY|WET, coder->croom);*/
+		splev_stack_push(coder->stack, opvar_new_coord(x,y));
+		opvar_free(pt);
+	    }
+	    break;
+	case SPO_SEL_ELLIPSE:
+	    {
+		struct opvar *filled, *xaxis, *yaxis, *pt;
+		schar x,y;
+		if (!OV_pop_i(filled)) panic("no filled for ellipse");
+		if (!OV_pop_i(yaxis)) panic("no yaxis for ellipse");
+		if (!OV_pop_i(xaxis)) panic("no xaxis for ellipse");
+		if (!OV_pop_c(pt)) panic("no pt for ellipse");
+		x = SP_COORD_X(OV_i(pt));
+		y = SP_COORD_Y(OV_i(pt));
+		get_location(&x, &y, DRY|WET, coder->croom);
+		if (isok(x,y)) {
+		    struct opvar *sel = selection_opvar(NULL);
+		    selection_do_ellipse(sel, x,y, OV_i(xaxis), OV_i(yaxis), OV_i(filled));
+		    splev_stack_push(coder->stack, sel);
+		}
+		opvar_free(filled);
+		opvar_free(yaxis);
+		opvar_free(xaxis);
+		opvar_free(pt);
+	    }
+	    break;
 	default:
 	    panic("sp_level_coder: Unknown opcode %i", coder->opcode);
 	}

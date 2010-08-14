@@ -1410,9 +1410,9 @@ IF [50%] {
 	}
 } ELSE {
 	IF [50%] {
-		RANDLINE: (30,00),(50,19), 'L', 10, 2
+		TERRAIN: grow(north|west, randline (30,00)-(50,19),10), 'L'
 	} ELSE {
-		RANDLINE: (50,00),(30,19), 'L', 10, 2
+		TERRAIN: grow(north|west, randline (50,00)-(30,19),10), 'L'
 	}
 }
 
