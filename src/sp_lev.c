@@ -3008,7 +3008,6 @@ spo_monster(coder)
 	    if ((OV_typ(parm) == SPOVAR_STRING) &&
 		!tmpmons.name.str)
 		tmpmons.name.str = strdup(OV_s(parm));
-	    opvar_free(parm);
 	    break;
 	case SP_M_V_APPEAR:
 	    if ((OV_typ(parm) == SPOVAR_INT) &&
@@ -3154,8 +3153,23 @@ spo_object(coder)
 		tmpobj.name.str = strdup(OV_s(parm));
 	    break;
 	case SP_O_V_CORPSENM:
-	    if ((OV_typ(parm) == SPOVAR_INT))
-		tmpobj.corpsenm = OV_i(parm);
+	    if ((OV_typ(parm) == SPOVAR_MONST)) {
+		char monclass = SP_MONST_CLASS(OV_i(parm));
+		int monid = SP_MONST_PM(OV_i(parm));
+		if (monid >= 0 && monid < NUMMONS) {
+		    tmpobj.corpsenm = monid;
+		    break; /* we're done! */
+		} else {
+		    struct permonst *pm = (struct permonst *)0;
+		    if (def_char_to_monclass(monclass) != MAXMCLASSES) {
+			pm = mkclass(def_char_to_monclass(monclass), G_NOGEN);
+		    } else {
+			pm = rndmonst();
+		    }
+		    if (pm)
+			tmpobj.corpsenm = monsndx(pm);
+		}
+	    }
 	    break;
 	case SP_O_V_CURSE:
 	    if (OV_typ(parm) == SPOVAR_INT)
@@ -3806,32 +3820,26 @@ spo_replace_terrain(coder)
      struct sp_coder *coder;
 {
     replaceterrain rt;
-    struct opvar *x1,*y1,*x2,*y2,*from_ter,*to_ter,*to_lit,*chance;
+    struct opvar *reg,*from_ter,*to_ter,*to_lit,*chance;
 
     if (!OV_pop_i(chance) ||
 	!OV_pop_i(to_lit) ||
 	!OV_pop_i(to_ter) ||
-	!OV_pop_i(from_ter) ||
-	!OV_pop_i(y2) ||
-	!OV_pop_i(x2) ||
-	!OV_pop_i(y1) ||
-	!OV_pop_i(x1)) return;
+	!OV_pop_typ(from_ter, SPOVAR_MAPCHAR) ||
+	!OV_pop_r(reg)) return;
 
     rt.chance = OV_i(chance);
     rt.tolit = OV_i(to_lit);
     rt.toter = OV_i(to_ter);
     rt.fromter = OV_i(from_ter);
-    rt.x1 = OV_i(x1);
-    rt.y1 = OV_i(y1);
-    rt.x2 = OV_i(x2);
-    rt.y2 = OV_i(y2);
+    rt.x1 = SP_REGION_X1(OV_i(reg));
+    rt.y1 = SP_REGION_Y1(OV_i(reg));
+    rt.x2 = SP_REGION_X2(OV_i(reg));
+    rt.y2 = SP_REGION_Y2(OV_i(reg));
 
     replace_terrain(&rt, coder->croom);
 
-    opvar_free(x1);
-    opvar_free(y1);
-    opvar_free(x2);
-    opvar_free(y2);
+    opvar_free(reg);
     opvar_free(from_ter);
     opvar_free(to_ter);
     opvar_free(to_lit);
@@ -4239,21 +4247,18 @@ void
 spo_wallify(coder)
      struct sp_coder *coder;
 {
-    struct opvar *x1,*y1,*x2,*y2;
+    struct opvar *r;
     int dx1,dy1,dx2,dy2;
-    if (!OV_pop_i(y2) ||
-	!OV_pop_i(x2) ||
-	!OV_pop_i(y1) ||
-	!OV_pop_i(x1)) return;
-    dx1 = (OV_i(x1) < 0) ? xstart : OV_i(x1);
-    dy1 = (OV_i(y1) < 0) ? ystart : OV_i(y1);
-    dx2 = (OV_i(x2) < 0) ? xstart+xsize : OV_i(x2);
-    dy2 = (OV_i(y2) < 0) ? ystart+ysize : OV_i(y2);
-    wallify_map(dx1, dy1, dx2, dy2);
-    opvar_free(x1);
-    opvar_free(y1);
-    opvar_free(x2);
-    opvar_free(y2);
+    if (!OV_pop_r(r)) return;
+    dx1 = (xchar)SP_REGION_X1(OV_i(r));
+    dy1 = (xchar)SP_REGION_Y1(OV_i(r));
+    dx2 = (xchar)SP_REGION_X2(OV_i(r));
+    dy2 = (xchar)SP_REGION_Y2(OV_i(r));
+    wallify_map(dx1 < 0 ? xstart : dx1,
+		dy1 < 0 ? ystart : dy1,
+		dx2 < 0 ? xstart+xsize : dx2,
+		dy2 < 0 ? ystart+ysize : dy2);
+    opvar_free(r);
 }
 
 void
@@ -4676,6 +4681,67 @@ sp_lev *lvl;
 		if (!OV_pop_i(a)) break;
 		OV_i(a)--;
 		splev_stack_push(coder->stack, a);
+	    }
+	    break;
+	case SPO_INC:
+	    {
+		struct opvar *a;
+		if (!OV_pop_i(a)) break;
+		OV_i(a)++;
+		splev_stack_push(coder->stack, a);
+	    }
+	    break;
+	case SPO_MATH_ADD:
+	    {
+		struct opvar *a, *b;
+		if (!OV_pop_i(b) || !OV_pop_i(a)) break;
+		OV_i(a) = OV_i(a) + OV_i(b);
+		splev_stack_push(coder->stack, a);
+		opvar_free(b);
+	    }
+	    break;
+	case SPO_MATH_SUB:
+	    {
+		struct opvar *a, *b;
+		if (!OV_pop_i(b) || !OV_pop_i(a)) break;
+		OV_i(a) = OV_i(a) - OV_i(b);
+		splev_stack_push(coder->stack, a);
+		opvar_free(b);
+	    }
+	    break;
+	case SPO_MATH_MUL:
+	    {
+		struct opvar *a, *b;
+		if (!OV_pop_i(b) || !OV_pop_i(a)) break;
+		OV_i(a) = OV_i(a) * OV_i(b);
+		splev_stack_push(coder->stack, a);
+		opvar_free(b);
+	    }
+	    break;
+	case SPO_MATH_DIV:
+	    {
+		struct opvar *a, *b;
+		if (!OV_pop_i(b) || !OV_pop_i(a)) break;
+		if (OV_i(b) >= 1) {
+		    OV_i(a) = OV_i(a) / OV_i(b);
+		} else {
+		    OV_i(a) = 0;
+		}
+		splev_stack_push(coder->stack, a);
+		opvar_free(b);
+	    }
+	    break;
+	case SPO_MATH_MOD:
+	    {
+		struct opvar *a, *b;
+		if (!OV_pop_i(b) || !OV_pop_i(a)) break;
+		if (OV_i(b) > 0) {
+		    OV_i(a) = OV_i(a) % OV_i(b);
+		} else {
+		    OV_i(a) = 0;
+		}
+		splev_stack_push(coder->stack, a);
+		opvar_free(b);
 	    }
 	    break;
         case SPO_CMP:

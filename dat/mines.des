@@ -122,17 +122,17 @@ $place = { (05,04),(09,05),(13,04),(26,04),(31,05),(30,14),(05,14),(10,13),(26,1
 SHUFFLE:$place
 
 # scatter some bodies
-OBJECT:('%',"corpse"),(20,12),"aligned priest"
-OBJECT:('%',"corpse"),$place[0],"shopkeeper"
-OBJECT:('%',"corpse"),$place[1],"shopkeeper"
-OBJECT:('%',"corpse"),$place[2],"shopkeeper"
-OBJECT:('%',"corpse"),$place[3],"shopkeeper"
-OBJECT:('%',"corpse"),$place[4],"shopkeeper"
-OBJECT:('%',"corpse"),random,"watchman"
-OBJECT:('%',"corpse"),random,"watchman"
-OBJECT:('%',"corpse"),random,"watchman"
-OBJECT:('%',"corpse"),random,"watchman"
-OBJECT:('%',"corpse"),random,"watch captain"
+OBJECT:('%',"corpse"),(20,12),montype:"aligned priest"
+OBJECT:('%',"corpse"),$place[0],montype:"shopkeeper"
+OBJECT:('%',"corpse"),$place[1],montype:"shopkeeper"
+OBJECT:('%',"corpse"),$place[2],montype:"shopkeeper"
+OBJECT:('%',"corpse"),$place[3],montype:"shopkeeper"
+OBJECT:('%',"corpse"),$place[4],montype:"shopkeeper"
+OBJECT:('%',"corpse"),random,montype:"watchman"
+OBJECT:('%',"corpse"),random,montype:"watchman"
+OBJECT:('%',"corpse"),random,montype:"watchman"
+OBJECT:('%',"corpse"),random,montype:"watchman"
+OBJECT:('%',"corpse"),random,montype:"watch captain"
 
 # Rubble!
 OBJECT:('`',"boulder"),random
@@ -336,7 +336,7 @@ MONSTER:('G',"gnome"),random
 
 RANDOM_CORRIDORS
 
-WALLIFY:levregion(1,0, 70,20)
+WALLIFY:(1,0, 70,20)
 
 # Minetown variant 2
 # "Town Square"
@@ -496,7 +496,7 @@ ROOMDOOR: false,closed,south,random
 SUBROOM:"ordinary",random,(2,10),(2,3)
 {
 ROOMDOOR: false, locked, north, random
-MONSTER: 'G',random,random
+MONSTER: 'G',random
 }
 
 SUBROOM:"ordinary",random,(5,9),(2,2)
@@ -525,7 +525,7 @@ ROOMDOOR:false,closed,west,random
 SUBROOM:"ordinary",random,(14,8),(2,2)
 {
 ROOMDOOR:false,locked,north,random
-MONSTER: 'G',random,random
+MONSTER: 'G',random
 }
 
 SUBROOM:"ordinary",random,(14,11),(2,2)
@@ -634,7 +634,7 @@ MONSTER:('G',"gnomish wizard"),random
 SUBROOM:"ordinary",random,(19,2),(2,2)
 {
 ROOMDOOR: false,closed,south,random
-MONSTER: 'G', random, random
+MONSTER: 'G', random
 }
 
 SUBROOM:"candle shop",lit,(22,2),(3,3)
@@ -645,7 +645,7 @@ ROOMDOOR:false,closed,south,random
 SUBROOM:"ordinary",random,(26,2),(2,2)
 {
 ROOMDOOR:false,locked,east,random
-MONSTER: 'G',random,random
+MONSTER: 'G',random
 }
 
 SUBROOM:"tool shop" [90%],lit,(4,10),(3,3)
@@ -659,7 +659,7 @@ ROOMDOOR:false,locked,south,random
 MONSTER:('k',"kobold shaman"),random
 MONSTER:('k',"kobold shaman"),random
 MONSTER:('f',"kitten"),random
-MONSTER:'f',random,random
+MONSTER:'f',random
 }
 
 SUBROOM:"food shop" [90%],lit,(11,11),(3,2)
@@ -819,7 +819,7 @@ DOOR:locked,(73,18)
 OBJECT: ('(', "chest"), (73,19)
 DOOR:locked,(50,06)
 OBJECT: '(', (50,03)
-OBJECT: ('`', "statue"), (38,15), "gnome king", 1
+OBJECT: ('`', "statue"), (38,15), montype:"gnome king", 1
 # Temple
 REGION:(29,02,33,04),lit,"temple"
 DOOR:closed,(31,05)
@@ -936,7 +936,7 @@ ROOMDOOR: false, closed, south, random
 SUBROOM: "ordinary", random, (14,2), (4,2)
 {
 ROOMDOOR: false, closed, south, 0
-MONSTER: 'n', random, random
+MONSTER: 'n', random
 }
 
 SUBROOM: "ordinary", random, (16,5), (2,2)
@@ -973,7 +973,7 @@ ROOMDOOR: false, closed, north, random
 SUBROOM: "ordinary", random, (11,10), (2,2)
 {
 ROOMDOOR: false, locked, west, random
-MONSTER: 'G',random,random
+MONSTER: 'G',random
 }
 
 SUBROOM: "shop" [60%], lit, (14,10), (2,3)

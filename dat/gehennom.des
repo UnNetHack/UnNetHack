@@ -59,28 +59,28 @@ NON_DIGGABLE:(00,00,75,19)
 # note: no priest(esse)s or monks - maybe Moloch has a *special*
 #       fate reserved for members of *those* classes.
 #
-OBJECT:('%',"corpse"),random,"archeologist"
-OBJECT:('%',"corpse"),random,"archeologist"
-OBJECT:('%',"corpse"),random,"barbarian"
-OBJECT:('%',"corpse"),random,"barbarian"
-OBJECT:('%',"corpse"),random,"caveman"
-OBJECT:('%',"corpse"),random,"cavewoman"
-OBJECT:('%',"corpse"),random,"healer"
-OBJECT:('%',"corpse"),random,"healer"
-OBJECT:('%',"corpse"),random,"knight"
-OBJECT:('%',"corpse"),random,"knight"
-OBJECT:('%',"corpse"),random,"ranger"
-OBJECT:('%',"corpse"),random,"ranger"
-OBJECT:('%',"corpse"),random,"rogue"
-OBJECT:('%',"corpse"),random,"rogue"
-OBJECT:('%',"corpse"),random,"samurai"
-OBJECT:('%',"corpse"),random,"samurai"
-OBJECT:('%',"corpse"),random,"tourist"
-OBJECT:('%',"corpse"),random,"tourist"
-OBJECT:('%',"corpse"),random,"valkyrie"
-OBJECT:('%',"corpse"),random,"valkyrie"
-OBJECT:('%',"corpse"),random,"wizard"
-OBJECT:('%',"corpse"),random,"wizard"
+OBJECT:('%',"corpse"),random,montype:"archeologist"
+OBJECT:('%',"corpse"),random,montype:"archeologist"
+OBJECT:('%',"corpse"),random,montype:"barbarian"
+OBJECT:('%',"corpse"),random,montype:"barbarian"
+OBJECT:('%',"corpse"),random,montype:"caveman"
+OBJECT:('%',"corpse"),random,montype:"cavewoman"
+OBJECT:('%',"corpse"),random,montype:"healer"
+OBJECT:('%',"corpse"),random,montype:"healer"
+OBJECT:('%',"corpse"),random,montype:"knight"
+OBJECT:('%',"corpse"),random,montype:"knight"
+OBJECT:('%',"corpse"),random,montype:"ranger"
+OBJECT:('%',"corpse"),random,montype:"ranger"
+OBJECT:('%',"corpse"),random,montype:"rogue"
+OBJECT:('%',"corpse"),random,montype:"rogue"
+OBJECT:('%',"corpse"),random,montype:"samurai"
+OBJECT:('%',"corpse"),random,montype:"samurai"
+OBJECT:('%',"corpse"),random,montype:"tourist"
+OBJECT:('%',"corpse"),random,montype:"tourist"
+OBJECT:('%',"corpse"),random,montype:"valkyrie"
+OBJECT:('%',"corpse"),random,montype:"valkyrie"
+OBJECT:('%',"corpse"),random,montype:"wizard"
+OBJECT:('%',"corpse"),random,montype:"wizard"
 #
 # Some random weapons and armor.
 #
@@ -211,28 +211,28 @@ NON_DIGGABLE:(00,00,75,19)
 # note: no priest(esse)s or monks - maybe Moloch has a *special*
 #       fate reserved for members of *those* classes.
 #
-OBJECT:('%',"corpse"),random,"archeologist",0
-OBJECT:('%',"corpse"),random,"archeologist",0
-OBJECT:('%',"corpse"),random,"barbarian",0
-OBJECT:('%',"corpse"),random,"barbarian",0
-OBJECT:('%',"corpse"),random,"caveman",0
-OBJECT:('%',"corpse"),random,"cavewoman",0
-OBJECT:('%',"corpse"),random,"healer",0
-OBJECT:('%',"corpse"),random,"healer",0
-OBJECT:('%',"corpse"),random,"knight",0
-OBJECT:('%',"corpse"),random,"knight",0
-OBJECT:('%',"corpse"),random,"ranger",0
-OBJECT:('%',"corpse"),random,"ranger",0
-OBJECT:('%',"corpse"),random,"rogue",0
-OBJECT:('%',"corpse"),random,"rogue",0
-OBJECT:('%',"corpse"),random,"samurai",0
-OBJECT:('%',"corpse"),random,"samurai",0
-OBJECT:('%',"corpse"),random,"tourist",0
-OBJECT:('%',"corpse"),random,"tourist",0
-OBJECT:('%',"corpse"),random,"valkyrie",0
-OBJECT:('%',"corpse"),random,"valkyrie",0
-OBJECT:('%',"corpse"),random,"wizard",0
-OBJECT:('%',"corpse"),random,"wizard",0
+OBJECT:('%',"corpse"),random,montype:"archeologist",0
+OBJECT:('%',"corpse"),random,montype:"archeologist",0
+OBJECT:('%',"corpse"),random,montype:"barbarian",0
+OBJECT:('%',"corpse"),random,montype:"barbarian",0
+OBJECT:('%',"corpse"),random,montype:"caveman",0
+OBJECT:('%',"corpse"),random,montype:"cavewoman",0
+OBJECT:('%',"corpse"),random,montype:"healer",0
+OBJECT:('%',"corpse"),random,montype:"healer",0
+OBJECT:('%',"corpse"),random,montype:"knight",0
+OBJECT:('%',"corpse"),random,montype:"knight",0
+OBJECT:('%',"corpse"),random,montype:"ranger",0
+OBJECT:('%',"corpse"),random,montype:"ranger",0
+OBJECT:('%',"corpse"),random,montype:"rogue",0
+OBJECT:('%',"corpse"),random,montype:"rogue",0
+OBJECT:('%',"corpse"),random,montype:"samurai",0
+OBJECT:('%',"corpse"),random,montype:"samurai",0
+OBJECT:('%',"corpse"),random,montype:"tourist",0
+OBJECT:('%',"corpse"),random,montype:"tourist",0
+OBJECT:('%',"corpse"),random,montype:"valkyrie",0
+OBJECT:('%',"corpse"),random,montype:"valkyrie",0
+OBJECT:('%',"corpse"),random,montype:"wizard",0
+OBJECT:('%',"corpse"),random,montype:"wizard",0
 #
 # Some random weapons and armor.
 #
@@ -296,15 +296,15 @@ MONSTER:'L',random
 # Some undead nasties for good measure
 MONSTER:'V',random
 MONSTER:'V',random
-MONSTER[50%]:'V',random,random
+MONSTER[50%]:'V',random
 MONSTER:'Z',random
 MONSTER:'Z',random
 MONSTER:'Z',random
-MONSTER[50%]:'Z',random,random
+MONSTER[50%]:'Z',random
 MONSTER:'M',random
 MONSTER:'M',random
 MONSTER:'M',random
-MONSTER[50%]:'M',random,random
+MONSTER[50%]:'M',random
 #
 # The Juiblex level
 #
@@ -631,7 +631,7 @@ REGION:(01,14,05,15),unlit,"shop"
 REGION:(39,01,43,02),unlit,"shop"
 REGION:(18,03,25,05),unlit,"temple"
 ALTAR:(20,04),noncoaligned,altar
-OBJECT:('%',"corpse"),(23,03),"priest",0
+OBJECT:('%',"corpse"),(23,03),montype:"priest",0
 # Some traps.
 TRAP:"spiked pit", random
 TRAP:"sleep gas", random
@@ -1174,7 +1174,7 @@ MONSTER:'F',random
 MONSTER:('P',"green slime"),random
 MONSTER:'P',random
 MONSTER:'P',random
-MONSTER[50%]:'P',random,random
+MONSTER[50%]:'P',random
 
 #
 # The Sanctum Level
@@ -1313,9 +1313,9 @@ IF [30%] {
 } ELSE {
 # Cthulhu's didn't like its taste?
  IF [50%] {
-  OBJECT:('%',"corpse"),(49,13),"archeologist",0
+  OBJECT:('%',"corpse"),(49,13),montype:"archeologist",0
  } ELSE {
-  OBJECT:('%',"corpse"),(49,13),"tourist",0
+  OBJECT:('%',"corpse"),(49,13),montype:"tourist",0
  }
 }
 # poor boy, he got so far

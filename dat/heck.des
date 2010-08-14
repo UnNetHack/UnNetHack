@@ -318,20 +318,20 @@ TRAP:"spiked pit",random
 TRAP:random,random
 TRAP:random,random
 TRAP:random,random
-OBJECT:('%',"egg"),random,"scorpion",0
-OBJECT:('%',"egg"),random,"scorpion",0
-OBJECT:('%',"egg"),random,"scorpion",0
-OBJECT:('%',"egg"),random,"scorpion",0
-OBJECT:('%',"egg"),random,"scorpion",0
-OBJECT:('%',"egg"),random,"scorpion",0
-OBJECT:('%',"egg"),random,"scorpion",0
-OBJECT:('%',"egg"),random,"scorpion",0
-OBJECT:('%',"egg"),random,"scorpion",0
-OBJECT:('%',"egg"),random,"scorpion",0
-OBJECT:('%',"egg"),random,"scorpion",0
-OBJECT:('%',"egg"),random,"scorpion",0
-OBJECT:('%',"egg"),random,"scorpion",0
-OBJECT:('%',"egg"),random,"scorpion",0
+OBJECT:('%',"egg"),random,montype:"scorpion"
+OBJECT:('%',"egg"),random,montype:"scorpion"
+OBJECT:('%',"egg"),random,montype:"scorpion"
+OBJECT:('%',"egg"),random,montype:"scorpion"
+OBJECT:('%',"egg"),random,montype:"scorpion"
+OBJECT:('%',"egg"),random,montype:"scorpion"
+OBJECT:('%',"egg"),random,montype:"scorpion"
+OBJECT:('%',"egg"),random,montype:"scorpion"
+OBJECT:('%',"egg"),random,montype:"scorpion"
+OBJECT:('%',"egg"),random,montype:"scorpion"
+OBJECT:('%',"egg"),random,montype:"scorpion"
+OBJECT:('%',"egg"),random,montype:"scorpion"
+OBJECT:('%',"egg"),random,montype:"scorpion"
+OBJECT:('%',"egg"),random,montype:"scorpion"
 
 #
 # Iron

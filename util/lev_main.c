@@ -327,6 +327,20 @@ const char *s;
 				fname, colon_line_number, s);
 }
 
+void
+lc_warning(const char *fmt, ...)
+{
+    char buf[512];
+    va_list argp;
+
+    va_start(argp, fmt);
+    (void) vsnprintf(buf, 511, fmt, argp);
+    va_end(argp);
+
+    yywarning(buf);
+}
+
+
 struct opvar *
 set_opvar_int(ov, val)
 struct opvar *ov;
@@ -518,7 +532,7 @@ funcdef_new(addr, name)
 {
     struct lc_funcdefs *f = New(struct lc_funcdefs);
     if (!f) {
-	yyerror("Could not alloc funcdefs");
+	lc_error("Could not alloc function definition for '%s'.", name);
 	return NULL;
     }
     f->next = NULL;
@@ -570,7 +584,7 @@ vardef_new(typ, name)
 {
     struct lc_vardefs *f = New(struct lc_vardefs);
     if (!f) {
-	yyerror("Could not alloc vardefs");
+	lc_error("Could not alloc variable definition for '%s'.", name);
 	return NULL;
     }
     f->next = NULL;
@@ -610,21 +624,66 @@ vardef_defined(f, name, casesense)
     return NULL;
 }
 
+const char *
+spovar2str(spovar)
+     long spovar;
+{
+    static togl = 0;
+    static char buf[2][128];
+    char *n;
+    int is_array = (spovar & SPOVAR_ARRAY);
+    spovar &= ~SPOVAR_ARRAY;
+
+    switch (spovar) {
+    default:		  lc_error("spovar2str(%li)", spovar); break;
+    case SPOVAR_INT:	  n = "integer"; break;
+    case SPOVAR_STRING:   n = "string"; break;
+    case SPOVAR_VARIABLE: n = "variable"; break;
+    case SPOVAR_COORD:	  n = "coordinate"; break;
+    case SPOVAR_REGION:	  n = "region"; break;
+    case SPOVAR_MAPCHAR:  n = "mapchar"; break;
+    case SPOVAR_MONST:	  n = "monster"; break;
+    case SPOVAR_OBJ:	  n = "object"; break;
+    }
+
+    togl = ((togl + 1) % 2);
+
+    snprintf(buf[togl], 127, "%s%s", n, (is_array ? " array" : ""));
+    return buf[togl];
+}
+
 void
-check_vardef_type(vd, varname, vartype, vartypestr)
+check_vardef_type(vd, varname, vartype)
      struct lc_vardefs *vd;
      char *varname;
      long vartype;
-     char *vartypestr;
 {
     struct lc_vardefs *tmp;
     if ((tmp = vardef_defined(vd, varname, 1))) {
 	if (tmp->var_type != vartype)
-	    lc_error("Trying to use a non-%s%s variable '%s' as %s",
-		     vartypestr, ((vartype & SPOVAR_ARRAY) ? " array" : ""), varname, vartypestr);
-    } else lc_error("Variable '%s' not defined", varname);
+	    lc_error("Trying to use variable '%s' as %s, when it is %s.",
+		     varname, spovar2str(vartype), spovar2str(tmp->var_type));
+    } else lc_error("Variable '%s' not defined.", varname);
 }
 
+struct lc_vardefs *
+add_vardef_type(vd, varname, vartype)
+     struct lc_vardefs *vd;
+     char *varname;
+     long vartype;
+{
+    struct lc_vardefs *tmp;
+    if ((tmp = vardef_defined(vd, varname, 1))) {
+	if (tmp->var_type != vartype)
+	    lc_error("Trying to redefine variable '%s' as %s, when it is %s.",
+		     varname, spovar2str(vartype), spovar2str(tmp->var_type));
+    } else {
+	tmp = vardef_new(vartype, varname);
+	tmp->next = vd;
+	return tmp;
+    }
+    return vd;
+}
 
 /* basically copied from src/sp_lev.c */
 struct opvar *
@@ -659,9 +718,7 @@ opvar_clone(ov)
 	    break;
 	default:
 	    {
-		char buf[BUFSZ];
-		sprintf(buf, "Unknown push value type (%i)!", ov->spovartyp);
-		yyerror(buf);
+		lc_error("Unknown opvar_clone value type (%i)!", ov->spovartyp);
 	    }
 	}
 	return tmpov;
@@ -695,7 +752,7 @@ char c;
 	val = what_map_char(c);
 	if(val == INVALID_TYPE) {
 	    val = ERR;
-	    yywarning("Invalid fill character in MAZE declaration");
+	    lc_warning("Invalid fill character '%c' in MAZE declaration", c);
 	}
 	return val;
 }
@@ -752,7 +809,11 @@ char c;
 	/* didn't find it; lets try case insensitive search */
 	for (i = LOW_PM; i < NUMMONS; i++)
 	    if (!class || class == mons[i].mlet)
-		if (!strcasecmp(s, mons[i].mname)) return i;
+		if (!strcasecmp(s, mons[i].mname)) {
+		    if (be_verbose)
+			lc_warning("Monster type \"%s\" matches \"%s\".", s, mons[i].mname);
+		    return i;
+		}
 	return ERR;
 }
 
@@ -841,7 +902,7 @@ char c;
 #ifdef SINKS
 		      return(SINK);
 #else
-		      yywarning("Sinks are not allowed in this version!  Ignoring...");
+		      lc_warning("Sinks ('K') are not allowed in this version!  Ignoring...");
 		      return(ROOM);
 #endif
 		  case '}'  : return(MOAT);
@@ -866,14 +927,14 @@ genericptr_t dat;
    _opcode *tmp;
 
    if ((opc < 0) || (opc >= MAX_SP_OPCODES))
-     yyerror("Unknown opcode");
+       lc_error("Unknown opcode '%i'", opc);
 
    tmp = (_opcode *)alloc(sizeof(_opcode)*(nop+1));
    if (sp->opcodes && nop) {
        (void) memcpy(tmp, sp->opcodes, sizeof(_opcode)*nop);
        free(sp->opcodes);
    } else if (!tmp)
-       yyerror("Couldn't alloc opcode space");
+       lc_error("Could not alloc opcode space");
 
    sp->opcodes = tmp;
 
@@ -934,10 +995,7 @@ sp_lev *sp;
 		}
 		for(i=0; i<len; i++)
 		  if((tmpmap[max_hig][i] = what_map_char(map[i])) == INVALID_TYPE) {
-		      Sprintf(msg,
-			 "Invalid character @ (%d, %d) - replacing with stone",
-			      max_hig, i);
-		      yywarning(msg);
+		      lc_warning("Invalid character '%c' @ (%d, %d) - replacing with stone", map[i], max_hig, i);
 		      tmpmap[max_hig][i] = STONE;
 		    }
 		while(i < max_len)
@@ -953,8 +1011,7 @@ sp_lev *sp;
 
 
 	if(max_len > MAP_X_LIM || max_hig > MAP_Y_LIM) {
-	    Sprintf(msg, "Map too large! (max %d x %d)", MAP_X_LIM, MAP_Y_LIM);
-	    yyerror(msg);
+	    lc_error("Map too large at (%d x %d), max is (%d x %d)", max_len, max_hig, MAP_X_LIM, MAP_Y_LIM);
 	}
 
 	mbuf = (char *) alloc(((max_hig-1) * max_len) + (max_len-1) + 2);
@@ -1115,6 +1172,12 @@ sp_lev *maze;
 	    "pop",
 	    "rn2",
 	    "dec",
+	    "inc",
+	    "add",
+	    "sub",
+	    "mul",
+	    "div",
+	    "mod",
 	    "copy",
 	    "mon_generation",
 	    "end_moninvent",
@@ -1164,7 +1227,8 @@ sp_lev *maze;
 		       Write(fd, debuf, strlen(debuf));
 		       break;
 		   case SPOVAR_MONST:
-		       snprintf(debuf, 127, "%li:\t%s\tmonster:%i\n", i, opcodestr[tmpo.opcode], ov->vardata.l);
+		       snprintf(debuf, 127, "%li:\t%s\tmonster:(pm=%i, class='%c')\n", i, opcodestr[tmpo.opcode],
+				SP_MONST_PM(ov->vardata.l), SP_MONST_CLASS(ov->vardata.l));
 		       Write(fd, debuf, strlen(debuf));
 		       break;
 		   case SPOVAR_MAPCHAR:

@@ -22,14 +22,14 @@ MONSTER: ('@', "Oracle"), (1,1) {
 ROOMDOOR: false , nodoor , random, random
 }
 
-OBJECT:('`',"statue"),(0,0),"forest centaur",1
-OBJECT:('`',"statue"),(0,8),"mountain centaur",1
-OBJECT:('`',"statue"),(10,0),"mountain centaur",1
-OBJECT:('`',"statue"),(10,8),"forest centaur",1
-OBJECT:('`',"statue"),(5,1),"plains centaur",1
-OBJECT:('`',"statue"),(5,7),"plains centaur",1
-OBJECT:('`',"statue"),(2,4),"plains centaur",1
-OBJECT:('`',"statue"),(8,4),"plains centaur",1
+OBJECT:('`',"statue"),(0,0),montype:'C',1
+OBJECT:('`',"statue"),(0,8),montype:'C',1
+OBJECT:('`',"statue"),(10,0),montype:'C',1
+OBJECT:('`',"statue"),(10,8),montype:'C',1
+OBJECT:('`',"statue"),(5,1),montype:'C',1
+OBJECT:('`',"statue"),(5,7),montype:'C',1
+OBJECT:('`',"statue"),(2,4),montype:'C',1
+OBJECT:('`',"statue"),(8,4),montype:'C',1
 MONSTER: random, random
 MONSTER: random, random
 

@@ -423,14 +423,14 @@ ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, up
 OBJECT:random,random
-MONSTER: 'E', random, random, hostile
+MONSTER: 'E', random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
 OBJECT:random,random
 OBJECT:random,random
-MONSTER: 'E', random, random, hostile
+MONSTER: 'E', random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
@@ -447,7 +447,7 @@ ROOM: "ordinary" , random, random, random, random
 STAIR: random, down
 OBJECT:random,random
 TRAP: random, random
-MONSTER:'E',random, random, hostile
+MONSTER:'E',random, hostile
 MONSTER:('E',"earth elemental"), random
 }
 
@@ -456,7 +456,7 @@ ROOM: "ordinary" , random, random, random, random
 OBJECT:random,random
 OBJECT:random,random
 TRAP: random, random
-MONSTER: 'X', random, random, hostile
+MONSTER: 'X',random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
@@ -475,14 +475,14 @@ ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, up
 OBJECT:random,random
-MONSTER:'X',random, random, hostile
+MONSTER:'X',random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
 OBJECT:random,random
 OBJECT:random,random
-MONSTER:'X',random, random, hostile
+MONSTER:'X',random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
@@ -490,7 +490,7 @@ ROOM: "ordinary" , random, random, random, random
 OBJECT:random,random
 TRAP: random, random
 OBJECT:random,random
-MONSTER:'E',random, random, hostile
+MONSTER:'E',random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
@@ -498,7 +498,7 @@ ROOM: "ordinary" , random, random, random, random
 STAIR: random, down
 OBJECT:random,random
 TRAP: random, random
-MONSTER:'E',random, random, hostile
+MONSTER:'E',random, hostile
 MONSTER:('E',"earth elemental"), random
 }
 
@@ -507,7 +507,7 @@ ROOM: "ordinary" , random, random, random, random
 OBJECT:random,random
 OBJECT:random,random
 TRAP: random, random
-MONSTER:'X',random, random, hostile
+MONSTER:'X',random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random

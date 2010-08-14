@@ -97,6 +97,12 @@ enum opcode_defs {
     SPO_POP,
     SPO_RN2,
     SPO_DEC,
+    SPO_INC,
+    SPO_MATH_ADD,
+    SPO_MATH_SUB,
+    SPO_MATH_MUL,
+    SPO_MATH_DIV,
+    SPO_MATH_MOD,
     SPO_COPY,
     SPO_MON_GENERATION,
     SPO_END_MONINVENT,
@@ -181,17 +187,21 @@ enum opcode_defs {
 
 #define SP_COORD_X(l)	(l & 0xff)
 #define SP_COORD_Y(l)	((l >> 16) & 0xff)
+#define SP_COORD_PACK(x,y) ((( x ) & 0xff) + ((( y ) & 0xff) << 16))
 
 #define SP_REGION_X1(l)	(l & 0xff)
 #define SP_REGION_Y1(l)	((l >> 8) & 0xff)
 #define SP_REGION_X2(l)	((l >> 16) & 0xff)
 #define SP_REGION_Y2(l)	((l >> 24) & 0xff)
+#define SP_REGION_PACK(x1,y1,x2,y2) ((( x1 ) & 0xff) + ((( y1 ) & 0xff) << 8) + ((( x2 ) & 0xff) << 16) + ((( y2 ) & 0xff) << 24))
 
 #define SP_MONST_CLASS(l) (l & 0xff)
 #define SP_MONST_PM(l)	  ((l >> 8) & 0xffff)
+#define SP_MONST_PACK(m,c) ((( m ) << 8) + ((char)( c )))
 
 #define SP_OBJ_CLASS(l)	  (l & 0xff)
 #define SP_OBJ_TYP(l)	  ((l >> 8) & 0xffff)
+#define SP_OBJ_PACK(o,c)  ((( o ) << 8) + ((char)( c )))
 
 struct opvar {
     xchar spovartyp; /* one of SPOVAR_foo */

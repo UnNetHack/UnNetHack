@@ -178,8 +178,8 @@ MONSTER:('h',"bugbear"),random,hostile
 MONSTER:('h',"bugbear"),random,hostile
 MONSTER:('h',"bugbear"),random,hostile
 MONSTER:('h',"bugbear"),random,hostile
-MONSTER:'h',random,random,hostile
-MONSTER:'H',random,random,hostile
+MONSTER:'h',random,hostile
+MONSTER:'H',random,hostile
 MONSTER:('H',"hill giant"),(03,12),hostile
 MONSTER:('H',"hill giant"),(20,17),hostile
 MONSTER:('H',"hill giant"),(35,08),hostile
@@ -187,7 +187,7 @@ MONSTER:('H',"hill giant"),random,hostile
 MONSTER:('H',"hill giant"),random,hostile
 MONSTER:('H',"hill giant"),random,hostile
 MONSTER:('H',"hill giant"),random,hostile
-MONSTER:'H',random,random,hostile
+MONSTER:'H',random,hostile
 WALLIFY
 
 #
@@ -296,7 +296,7 @@ MONSTER:('h',"bugbear"), random, hostile
 MONSTER:('h',"bugbear"), random, hostile
 MONSTER:('h',"bugbear"), random, hostile
 MONSTER:('h',"bugbear"), random, hostile
-MONSTER:'h',random, random, hostile
+MONSTER:'h',random, hostile
 MONSTER:('H',"hill giant"), random, hostile
 
 LEVEL: "Cav-filb"
@@ -330,7 +330,7 @@ MONSTER:('h',"bugbear"), random, hostile
 MONSTER:('h',"bugbear"), random, hostile
 MONSTER:('h',"bugbear"), random, hostile
 MONSTER:('h',"bugbear"), random, hostile
-MONSTER:'h',random, random, hostile
-MONSTER:'h',random, random, hostile
+MONSTER:'h',random, hostile
+MONSTER:'h',random, hostile
 MONSTER:('H',"hill giant"), random, hostile
 MONSTER:('H',"hill giant"), random, hostile

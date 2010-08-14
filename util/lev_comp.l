@@ -169,6 +169,7 @@ FUNCTION	return FUNCTION_ID;
 INCLUDE		return INCLUDE_ID;
 SOUNDS		return SOUNDS_ID;
 SHUFFLE		return SHUFFLE_ID;
+montype		return MONTYPE_ID;
 hear		{ yylval.i=LVLSND_HEARD;  return MSG_OUTPUT_TYPE; }
 pline		{ yylval.i=LVLSND_PLINED; return MSG_OUTPUT_TYPE; }
 verbal		{ yylval.i=LVLSND_VERBAL; return MSG_OUTPUT_TYPE; }
@@ -177,6 +178,7 @@ levregion	return LEV;
 quantity	return QUANTITY_ID;
 buried		return BURIED_ID;
 eroded		return ERODED_ID;
+erodeproof	return ERODEPROOF_ID;
 trapped		return TRAPPED_ID;
 recharged	return RECHARGED_ID;
 invisible	return INVIS_ID;
@@ -260,8 +262,10 @@ shroud		{ yylval.i=SHROUD; return FLAG_TYPE; }
 stormy		{ yylval.i=STORMY; return FLAG_TYPE; }
 graveyard	{ yylval.i=GRAVEYARD; return FLAG_TYPE; }
 \[\ *[0-9]+\%\ *\] { yylval.i = atoi(yytext + 1); return PERCENT; }
+-[0-9]+		{ yylval.i=atoi(yytext); return MINUS_INTEGER; }
+\+[0-9]+	{ yylval.i=atoi(yytext); return PLUS_INTEGER; }
 [0-9]+\%	{ yylval.i = atoi(yytext); return SPERCENT; }
-[+\-]?[0-9]+	{ yylval.i=atoi(yytext); return INTEGER; }
+[0-9]+		{ yylval.i=atoi(yytext); return INTEGER; }
 \"[^"]*\"	{ yytext[yyleng-1] = 0; /* Discard the trailing \" */
 		  yylval.map = (char *) alloc(strlen(yytext+1)+1);
 		  Strcpy(yylval.map, yytext+1); /* Discard the first \" */
