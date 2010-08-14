@@ -449,7 +449,8 @@ MAP
 |...|-----     --|.....|  
 -----            -------  
 ENDMAP
-RANDOM_PLACES:(16,11),(16,13),(16,15)
+$place = { (16,11),(16,13),(16,15) }
+SHUFFLE: $place
 STAIR:(01,01),down
 REGION:(00,00,25,17),lit,"ordinary"
 NON_DIGGABLE:(00,00,25,17)
@@ -507,10 +508,10 @@ DOOR:closed,(17,11)
 DOOR:closed,(17,13)
 DOOR:closed,(17,15)
 REGION:(18,10,22,16),lit,"zoo",filled,true
-#OBJECT:'(',"bag of holding",place[0]
-ENGRAVING:place[0],burn,"Elbereth"
-ENGRAVING:place[1],burn,"Elbereth"
-ENGRAVING:place[2],burn,"Elbereth"
+#OBJECT:'(',"bag of holding",$place[0]
+ENGRAVING:$place[0],burn,"Elbereth"
+ENGRAVING:$place[1],burn,"Elbereth"
+ENGRAVING:$place[2],burn,"Elbereth"
 
 
 LEVEL:"soko1-2"
@@ -537,7 +538,8 @@ MAP
      |..|..|   --|.....|  
      -------     -------  
 ENDMAP
-RANDOM_PLACES:(16,10),(16,12),(16,14)
+$place = { (16,10),(16,12),(16,14) }
+SHUFFLE: $place
 STAIR:(06,15),down
 REGION:(00,00,25,16),lit,"ordinary"
 NON_DIGGABLE:(00,00,25,16)
@@ -598,10 +600,10 @@ DOOR:closed,(17,10)
 DOOR:closed,(17,12)
 DOOR:closed,(17,14)
 REGION:(18,09,22,15),lit,"zoo",filled,true
-#OBJECT:'"',"amulet of reflection",place[0]
-ENGRAVING:place[0],burn,"Elbereth"
-ENGRAVING:place[1],burn,"Elbereth"
-ENGRAVING:place[2],burn,"Elbereth"
+#OBJECT:'"',"amulet of reflection",$place[0]
+ENGRAVING:$place[0],burn,"Elbereth"
+ENGRAVING:$place[1],burn,"Elbereth"
+ENGRAVING:$place[2],burn,"Elbereth"
 
 
 # Following Sokoban levels heavily modified for NetHack by Pasi Kallinen
@@ -1657,7 +1659,8 @@ MAP
    |....|..-----
    ---------
 ENDMAP
-RANDOM_PLACES:(20,9),(20,11),(20,13)
+$place = { (20,9),(20,11),(20,13) }
+SHUFFLE: $place
 STAIR:(2,3), down
 REGION:(00,00,21,17),lit,"ordinary"
 REGION:(16,03,19,07),lit,"zoo",filled,true
@@ -1704,10 +1707,10 @@ OBJECT:'%',random,random
 OBJECT:'%',random,random
 OBJECT:'=',random,random
 OBJECT:'/',random,random
-#OBJECT:'(',"bag of holding",place[0]
-ENGRAVING:place[0],burn,"Elbereth"
-ENGRAVING:place[1],burn,"Elbereth"
-ENGRAVING:place[2],burn,"Elbereth"
+#OBJECT:'(',"bag of holding",$place[0]
+ENGRAVING:$place[0],burn,"Elbereth"
+ENGRAVING:$place[1],burn,"Elbereth"
+ENGRAVING:$place[2],burn,"Elbereth"
 
 MONSTER:'m',"giant mimic", random, m_object "boulder"
 MONSTER:'m',"giant mimic", random, m_object "boulder"
@@ -1738,7 +1741,8 @@ MAP
  |...|...-----..|
  ---------   ----
 ENDMAP
-RANDOM_PLACES:(1,1),(10,1),(1,3),(1,5),(10,5)
+$place = { (1,1),(10,1),(1,3),(1,5),(10,5) }
+SHUFFLE: $place
 STAIR:(6,10), down
 REGION:(00,00,17,18),lit,"ordinary"
 REGION:(03,01,08,05),lit,"zoo",filled,true
@@ -1789,10 +1793,10 @@ OBJECT:'%',random,random
 OBJECT:'%',random,random
 OBJECT:'=',random,random
 OBJECT:'/',random,random
-#OBJECT:'"',"amulet of reflection",place[0]
-ENGRAVING:place[0],burn,"Elbereth"
-ENGRAVING:place[1],burn,"Elbereth"
-ENGRAVING:place[2],burn,"Elbereth"
+#OBJECT:'"',"amulet of reflection",$place[0]
+ENGRAVING:$place[0],burn,"Elbereth"
+ENGRAVING:$place[1],burn,"Elbereth"
+ENGRAVING:$place[2],burn,"Elbereth"
 
 MONSTER:'m',"giant mimic", random, m_object "boulder"
 MONSTER:'m',"giant mimic", random, m_object "boulder"

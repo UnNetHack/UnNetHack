@@ -27,13 +27,13 @@
 #     loops or too many short dead ends (vertical ones
 #     especially are distinctive).
 # (2) Do two MAPs that overlay. The first has ROOM in all
-#     the places that will be ROOM after the MAZEWALK. The
+#     the $places that will be ROOM after the MAZEWALK. The
 #     level loader reads this MAP first (we assume)
-#     and happily places items randomly. Then in your second
+#     and happily $places items randomly. Then in your second
 #     MAP that is MAZEWALK fodder, the items are covered up
 #     with stone--but are are soon dug out again by the
 #     MAZEWALK. Gotchas: You can only have nine MAPs (grr).
-#     Also, you cannot place STAIRs this way because the
+#     Also, you cannot $place STAIRs this way because the
 #     second map will truly overwrite them. It also makes
 #     level entries longer.
 
@@ -106,7 +106,8 @@ MAP
 -----------------------------
  - - - - - - - - - - - - - -
 ENDMAP
-RANDOM_PLACES:(8,7),(8,9),(13,12),(15,12),(13,4),(15,4),(20,7),(20,9)
+$place = { (8,7),(8,9),(13,12),(15,12),(13,4),(15,4),(20,7),(20,9) }
+SHUFFLE: $place
 MAZEWALK:(0,0),west
 NON_DIGGABLE:(1,5,27,11)
 NON_DIGGABLE:(3,3,25,13)
@@ -130,23 +131,23 @@ DOOR:locked,(18,4)
 DOOR:locked,(9,11)
 TRAP:"board",(8,11)
 TRAP:"board",(19,3)
-OBJECT:'+',random,place[0]
-OBJECT:'+',random,place[0]
-OBJECT:'+',random,place[0]
-OBJECT:'+',random,place[0]
-OBJECT:'?',random,place[1]
-OBJECT:'?',random,place[1]
-OBJECT:'?',random,place[1]
-OBJECT:'?',random,place[1]
-OBJECT[75%]:'(',"magic marker",place[2]
-OBJECT:'!',random,place[3]
-OBJECT:'!',random,place[3]
-OBJECT:'!',random,place[3]
-OBJECT:'!',random,place[3]
-MONSTER:'P',"green slime",place[4]
-MONSTER:'P',"green slime",place[5]
-MONSTER:'P',"green slime",place[6]
-MONSTER:'P',"green slime",place[7]
+OBJECT:'+',random,$place[0]
+OBJECT:'+',random,$place[0]
+OBJECT:'+',random,$place[0]
+OBJECT:'+',random,$place[0]
+OBJECT:'?',random,$place[1]
+OBJECT:'?',random,$place[1]
+OBJECT:'?',random,$place[1]
+OBJECT:'?',random,$place[1]
+OBJECT[75%]:'(',"magic marker",$place[2]
+OBJECT:'!',random,$place[3]
+OBJECT:'!',random,$place[3]
+OBJECT:'!',random,$place[3]
+OBJECT:'!',random,$place[3]
+MONSTER:'P',"green slime",$place[4]
+MONSTER:'P',"green slime",$place[5]
+MONSTER:'P',"green slime",$place[6]
+MONSTER:'P',"green slime",$place[7]
 MONSTER:'&',"Dispater",(14,8),asleep,hostile
 MONSTER:'R',"disenchanter",(10,8),asleep
 MONSTER:'R',"disenchanter",(18,8),asleep

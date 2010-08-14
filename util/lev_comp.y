@@ -165,7 +165,7 @@ extern const char *fname;
 %token	<i> SUBROOM_ID NAME_ID FLAGS_ID FLAG_TYPE MON_ATTITUDE MON_ALERTNESS
 %token	<i> MON_APPEARANCE ROOMDOOR_ID IF_ID ELSE_ID
 %token	<i> SPILL_ID TERRAIN_ID HORIZ_OR_VERT REPLACE_TERRAIN_ID
-%token	<i> EXIT_ID
+%token	<i> EXIT_ID SHUFFLE_ID
 %token	<i> QUANTITY_ID BURIED_ID LOOP_ID
 %token	<i> SWITCH_ID CASE_ID BREAK_ID DEFAULT_ID
 %token	<i> ERODED_ID TRAPPED_ID RECHARGED_ID INVIS_ID GREASED_ID
@@ -188,10 +188,10 @@ extern const char *fname;
 %type	<i> levstatements region_detail_end
 %type	<i> engraving_type flag_list prefilled
 %type	<i> monster monster_c m_register object object_c o_register
-%type	<i> comparestmt
+%type	<i> comparestmt encodecoord encoderegion mapchar
 %type	<i> seen_trap_mask
-%type	<i> mon_gen_list
-%type	<i> sounds_list
+%type	<i> mon_gen_list encodemonster encodeobj encodeobj_list
+%type	<i> sounds_list integer_list string_list encodecoord_list encoderegion_list mapchar_list encodemonster_list
 %type	<i> opt_percent opt_spercent opt_int opt_fillchar
 %type	<map> string level_def m_name o_name
 %type	<corpos> corr_spec
@@ -370,6 +370,7 @@ levstatement 	: message
 		| branch_region
 		| corridor
 		| variable_define
+		| shuffle_detail
 		| diggable_detail
 		| door_detail
 		| wallwalk_detail
@@ -394,6 +395,7 @@ levstatement 	: message
 		| portal_region
 		| random_corridors
 		| region_detail
+		| region_detail_TEST
 		| room_def
 		| subroom_def
 		| room_chance
@@ -410,6 +412,17 @@ levstatement 	: message
 		| wallify_detail
 		;
 
+shuffle_detail	: SHUFFLE_ID ':' VARSTRING
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $3, 1))) {
+			  if (!(vd->var_type & SPOVAR_ARRAY))
+			      yyerror("Trying to shuffle non-array variable");
+		      } else yyerror("Trying to shuffle undefined variable");
+		      add_opvars(splev, "so", $3, SPO_SHUFFLE_ARRAY);
+		  }
+		;
+
 variable_define	: VARSTRING '=' INTEGER
 		  {
 		      struct lc_vardefs *vd;
@@ -421,7 +434,7 @@ variable_define	: VARSTRING '=' INTEGER
 			  vd->next = variable_definitions;
 			  variable_definitions = vd;
 		      }
-		      add_opvars(splev, "iso", (long)$3, $1, SPO_VAR_INIT);
+		      add_opvars(splev, "iiso", (long)$3, 0, $1, SPO_VAR_INIT);
 		  }
 		| VARSTRING '=' STRING
 		  {
@@ -434,7 +447,7 @@ variable_define	: VARSTRING '=' INTEGER
 			  vd->next = variable_definitions;
 			  variable_definitions = vd;
 		      }
-		      add_opvars(splev, "sso", $3, $1, SPO_VAR_INIT);
+		      add_opvars(splev, "siso", $3, 0, $1, SPO_VAR_INIT);
 		  }
 		| VARSTRING '=' VARSTRING
 		  {
@@ -453,7 +466,254 @@ variable_define	: VARSTRING '=' INTEGER
 			      variable_definitions = vd1;
 			  }
 		      }
-		      add_opvars(splev, "vso", $3, $1, SPO_VAR_INIT);
+		      add_opvars(splev, "siso", $3, -1, $1, SPO_VAR_INIT);
+		  }
+		| VARSTRING '=' mapchar
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != SPOVAR_MAPCHAR)
+			      yyerror("Trying to redefine non-mapchar variable as mapchar");
+		      } else {
+			  vd = vardef_new(SPOVAR_MAPCHAR, $1);
+			  vd->next = variable_definitions;
+			  variable_definitions = vd;
+		      }
+		      add_opvars(splev, "miso", (long)$3, 0, $1, SPO_VAR_INIT);
+		  }
+		| VARSTRING '=' MONSTER_ID ':' encodemonster
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != SPOVAR_MONST)
+			      yyerror("Trying to redefine non-monst variable as monst");
+		      } else {
+			  vd = vardef_new(SPOVAR_MONST, $1);
+			  vd->next = variable_definitions;
+			  variable_definitions = vd;
+		      }
+		      add_opvars(splev, "Miso", (long)$5, 0, $1, SPO_VAR_INIT);
+		  }
+		| VARSTRING '=' OBJECT_ID ':' encodeobj
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != SPOVAR_OBJ)
+			      yyerror("Trying to redefine non-obj variable as obj");
+		      } else {
+			  vd = vardef_new(SPOVAR_OBJ, $1);
+			  vd->next = variable_definitions;
+			  variable_definitions = vd;
+		      }
+		      add_opvars(splev, "Oiso", (long)$5, 0, $1, SPO_VAR_INIT);
+		  }
+		| VARSTRING '=' encodecoord
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != SPOVAR_COORD)
+			      yyerror("Trying to redefine non-coord variable as coord");
+		      } else {
+			  vd = vardef_new(SPOVAR_COORD, $1);
+			  vd->next = variable_definitions;
+			  variable_definitions = vd;
+		      }
+		      add_opvars(splev, "ciso", (long)$3, 0, $1, SPO_VAR_INIT);
+		  }
+		| VARSTRING '=' encoderegion
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != SPOVAR_REGION)
+			      yyerror("Trying to redefine non-region variable as region");
+		      } else {
+			  vd = vardef_new(SPOVAR_REGION, $1);
+			  vd->next = variable_definitions;
+			  variable_definitions = vd;
+		      }
+		      add_opvars(splev, "riso", (long)$3, 0, $1, SPO_VAR_INIT);
+		  }
+		| VARSTRING '=' '{' integer_list '}'
+		  {
+		      long n_items = $4;
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != (SPOVAR_INT|SPOVAR_ARRAY))
+			      yyerror("Trying to redefine variable as integer array");
+		      } else {
+			  vd = vardef_new(SPOVAR_INT|SPOVAR_ARRAY, $1);
+			  vd->next = variable_definitions;
+			  variable_definitions = vd;
+		      }
+		      add_opvars(splev, "iso", n_items, $1, SPO_VAR_INIT);
+		  }
+		| VARSTRING '=' '{' encodecoord_list '}'
+		  {
+		      long n_items = $4;
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != (SPOVAR_COORD|SPOVAR_ARRAY))
+			      yyerror("Trying to redefine variable as coord array");
+		      } else {
+			  vd = vardef_new(SPOVAR_COORD|SPOVAR_ARRAY, $1);
+			  vd->next = variable_definitions;
+			  variable_definitions = vd;
+		      }
+		      add_opvars(splev, "iso", n_items, $1, SPO_VAR_INIT);
+		  }
+		| VARSTRING '=' '{' encoderegion_list '}'
+		  {
+		      long n_items = $4;
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != (SPOVAR_REGION|SPOVAR_ARRAY))
+			      yyerror("Trying to redefine variable as region array");
+		      } else {
+			  vd = vardef_new(SPOVAR_REGION|SPOVAR_ARRAY, $1);
+			  vd->next = variable_definitions;
+			  variable_definitions = vd;
+		      }
+		      add_opvars(splev, "iso", n_items, $1, SPO_VAR_INIT);
+		  }
+		| VARSTRING '=' '{' mapchar_list '}'
+		  {
+		      long n_items = $4;
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != (SPOVAR_MAPCHAR|SPOVAR_ARRAY))
+			      yyerror("Trying to redefine variable as mapchar array");
+		      } else {
+			  vd = vardef_new(SPOVAR_MAPCHAR|SPOVAR_ARRAY, $1);
+			  vd->next = variable_definitions;
+			  variable_definitions = vd;
+		      }
+		      add_opvars(splev, "iso", n_items, $1, SPO_VAR_INIT);
+		  }
+		| VARSTRING '=' MONSTER_ID ':' '{' encodemonster_list '}'
+		  {
+		      long n_items = $4;
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != (SPOVAR_MONST|SPOVAR_ARRAY))
+			      yyerror("Trying to redefine variable as monst array");
+		      } else {
+			  vd = vardef_new(SPOVAR_MONST|SPOVAR_ARRAY, $1);
+			  vd->next = variable_definitions;
+			  variable_definitions = vd;
+		      }
+		      add_opvars(splev, "iso", n_items, $1, SPO_VAR_INIT);
+		  }
+		| VARSTRING '=' OBJECT_ID ':' '{' encodeobj_list '}'
+		  {
+		      long n_items = $4;
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != (SPOVAR_OBJ|SPOVAR_ARRAY))
+			      yyerror("Trying to redefine variable as obj array");
+		      } else {
+			  vd = vardef_new(SPOVAR_OBJ|SPOVAR_ARRAY, $1);
+			  vd->next = variable_definitions;
+			  variable_definitions = vd;
+		      }
+		      add_opvars(splev, "iso", n_items, $1, SPO_VAR_INIT);
+		  }
+		| VARSTRING '=' '{' string_list '}'
+		  {
+		      long n_items = $4;
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != (SPOVAR_STRING|SPOVAR_ARRAY))
+			      yyerror("Trying to redefine variable as string array");
+		      } else {
+			  vd = vardef_new(SPOVAR_STRING|SPOVAR_ARRAY, $1);
+			  vd->next = variable_definitions;
+			  variable_definitions = vd;
+		      }
+		      add_opvars(splev, "iso", n_items, $1, SPO_VAR_INIT);
+		  }
+		;
+
+encodeobj_list	: encodeobj
+		  {
+		      add_opvars(splev, "O", $1);
+		      $$ = 1;
+		  }
+		| encodeobj_list ',' encodeobj
+		  {
+		      add_opvars(splev, "O", $3);
+		      $$ = 1 + $1;
+		  }
+		;
+
+encodemonster_list	: encodemonster
+		  {
+		      add_opvars(splev, "M", $1);
+		      $$ = 1;
+		  }
+		| encodemonster_list ',' encodemonster
+		  {
+		      add_opvars(splev, "M", $3);
+		      $$ = 1 + $1;
+		  }
+		;
+
+mapchar_list	: mapchar
+		  {
+		      add_opvars(splev, "m", $1);
+		      $$ = 1;
+		  }
+		| mapchar_list ',' mapchar
+		  {
+		      add_opvars(splev, "m", $3);
+		      $$ = 1 + $1;
+		  }
+		;
+
+encoderegion_list	: encoderegion
+		  {
+		      add_opvars(splev, "r", $1);
+		      $$ = 1;
+		  }
+		| encoderegion_list ',' encoderegion
+		  {
+		      add_opvars(splev, "r", $3);
+		      $$ = 1 + $1;
+		  }
+		;
+
+encodecoord_list	: encodecoord
+		  {
+		      add_opvars(splev, "c", $1);
+		      $$ = 1;
+		  }
+		| encodecoord_list ',' encodecoord
+		  {
+		      add_opvars(splev, "c", $3);
+		      $$ = 1 + $1;
+		  }
+		;
+
+integer_list	: INTEGER
+		  {
+		      add_opvars(splev, "i", $1);
+		      $$ = 1;
+		  }
+		| integer_list ',' INTEGER
+		  {
+		      add_opvars(splev, "i", $3);
+		      $$ = 1 + $1;
+		  }
+		;
+
+string_list	: STRING
+		  {
+		      add_opvars(splev, "s", $1);
+		      $$ = 1;
+		  }
+		| string_list ',' STRING
+		  {
+		      add_opvars(splev, "s", $3);
+		      $$ = 1 + $1;
 		  }
 		;
 
@@ -748,19 +1008,19 @@ message		: MESSAGE_ID ':' string_or_var
 		  }
 		;
 
-wallwalk_detail	: WALLWALK_ID ':' coordinate ',' CHAR opt_spercent
+wallwalk_detail	: WALLWALK_ID ':' coord_or_var ',' CHAR opt_spercent
 		  {
 		      long fgtyp = what_map_char((char) $5);
 		      if (fgtyp >= MAX_TYPE) yyerror("Wallwalk: illegal foreground map char");
-		      add_opvars(splev, "iiiiio", $3.x, $3.y, $6, fgtyp, ROOM, SPO_WALLWALK);
+		      add_opvars(splev, "iiio", $6, fgtyp, ROOM, SPO_WALLWALK);
 		  }
-		| WALLWALK_ID ':' coordinate ',' CHAR ',' CHAR opt_spercent
+		| WALLWALK_ID ':' coord_or_var ',' CHAR ',' CHAR opt_spercent
 		  {
 		      long fgtyp = what_map_char((char) $5);
 		      long bgtyp = what_map_char((char) $7);
 		      if (fgtyp >= MAX_TYPE) yyerror("Wallwalk: illegal foreground map char");
 		      if (bgtyp >= MAX_TYPE) yyerror("Wallwalk: illegal background map char");
-		      add_opvars(splev, "iiiiio", $3.x, $3.y, $8, fgtyp, bgtyp, SPO_WALLWALK);
+		      add_opvars(splev, "iiio", $8, fgtyp, bgtyp, SPO_WALLWALK);
 		  }
 		;
 
@@ -920,10 +1180,9 @@ door_detail	: ROOMDOOR_ID ':' secret ',' door_state ',' door_wall ',' door_pos
 			    add_opvars(splev, "iiiio", (long)$9, (long)$5, (long)$3, (long)$7, SPO_ROOM_DOOR);
 			}
 		  }
-		| DOOR_ID ':' door_state ',' coordinate
+		| DOOR_ID ':' door_state ',' coord_or_var
 		  {
-		      add_opvars(splev, "iiio",
-				 $5.x, $5.y, (long)$3, SPO_DOOR);
+		      add_opvars(splev, "io", (long)$3, SPO_DOOR);
 		  }
 		;
 
@@ -951,19 +1210,19 @@ door_pos	: INTEGER
 
 map_definition	: NOMAP_ID
 		  {
-		      add_opvars(splev, "iiiisiio", 0, 1, 1, 1, (char *)0, 0, 0, SPO_MAP);
+		      add_opvars(splev, "ciisiio", 0, 0, 1, (char *)0, 0, 0, SPO_MAP);
 		      max_x_map = COLNO-1;
 		      max_y_map = ROWNO;
 		  }
 		| map_geometry roomfill MAP_ID
 		  {
-		      add_opvars(splev, "iiii", 1, (long)$2, (long)($1 % 10), (long)($1 / 10));
+		      add_opvars(splev, "cii", ((long)($1 % 10) & 0xff) + (((long)($1 / 10) & 0xff) << 16), 1, (long)$2);
 		      scan_map($3, splev);
 		      Free($3);
 		  }
-		| GEOMETRY_ID ':' coordinate roomfill MAP_ID
+		| GEOMETRY_ID ':' coord_or_var roomfill MAP_ID
 		  {
-		      add_opvars(splev, "iiii", 2, (long)$4, $3.x, $3.y);
+		      add_opvars(splev, "ii", 2, (long)$4);
 		      scan_map($5, splev);
 		      Free($5);
 		  }
@@ -1172,7 +1431,7 @@ monster_detail	: MONSTER_ID chance ':' monster_desc
 		 }
 		;
 
-monster_desc	: monster_c ',' m_name ',' coordinate monster_infos
+monster_desc	: monster_c ',' m_name ',' coord_or_var monster_infos
 		  {
 		      long token = NON_PM;
 		      if ($3) {
@@ -1183,7 +1442,7 @@ monster_desc	: monster_c ',' m_name ',' coordinate monster_infos
 			  }
 			  Free($3);
 		      }
-		      add_opvars(splev, "iiii", $5.x, $5.y, (long)$1, token);
+		      add_opvars(splev, "ii", (long)$1, token);
 		  }
 		;
 
@@ -1347,8 +1606,8 @@ object_detail	: OBJECT_ID chance ':' object_desc
 object_desc	: object_c ',' o_name object_infos
 		  {
 		      long token = -1;
-		      if (( $4 & 0x4000) && in_container_obj) yyerror("object cannot have a coordinate when contained.");
-		      else if (!( $4 & 0x4000) && !in_container_obj) yyerror("object needs a coordinate when not contained.");
+		      if (( $4 & 0x4000) && in_container_obj) yyerror("object cannot have a coord when contained.");
+		      else if (!( $4 & 0x4000) && !in_container_obj) yyerror("object needs a coord when not contained.");
 		      if ($3) {
 			  token = get_object_id($3, $1);
 			  if (token == ERR) {
@@ -1454,16 +1713,16 @@ object_info	: CURSE_TYPE
 		      add_opvars(splev, "ii", 1, SP_O_V_GREASED);
 		      $$ = 0x2000;
 		  }
-		| coordinate
+		| coord_or_var
 		  {
-		      add_opvars(splev, "iii", $1.x, $1.y, SP_O_V_COORD);
+		      add_opvars(splev, "i", SP_O_V_COORD);
 		      $$ = 0x4000;
 		  }
 		;
 
-trap_detail	: TRAP_ID chance ':' trap_name ',' coordinate
+trap_detail	: TRAP_ID chance ':' trap_name ',' coord_or_var
 		  {
-		      add_opvars(splev, "iiio", $6.x, $6.y, (long)$4, SPO_TRAP);
+		      add_opvars(splev, "io", (long)$4, SPO_TRAP);
 		      if ( 1 == $2 ) {
 			  if (n_if_list > 0) {
 			      struct opvar *tmpjmp;
@@ -1474,7 +1733,7 @@ trap_detail	: TRAP_ID chance ':' trap_name ',' coordinate
 		  }
 		;
 
-drawbridge_detail: DRAWBRIDGE_ID ':' coordinate ',' DIRECTION ',' door_state
+drawbridge_detail: DRAWBRIDGE_ID ':' coord_or_var ',' DIRECTION ',' door_state
 		   {
 		       long d, state = 0;
 		       /* convert dir from a DIRECTION to a DB_DIR */
@@ -1495,19 +1754,18 @@ drawbridge_detail: DRAWBRIDGE_ID ':' coordinate ',' DIRECTION ',' door_state
 			   state = 0;
 		       else
 			   yyerror("A drawbridge can only be open or closed!");
-		       add_opvars(splev, "iiiio", $3.x, $3.y, state, d, SPO_DRAWBRIDGE);
+		       add_opvars(splev, "iio", state, d, SPO_DRAWBRIDGE);
 		   }
 		;
 
-mazewalk_detail : MAZEWALK_ID ':' coordinate ',' DIRECTION
+mazewalk_detail : MAZEWALK_ID ':' coord_or_var ',' DIRECTION
 		  {
-		      add_opvars(splev, "iiiiio",
-				 $3.x, $3.y, (long)$5, 1, 0, SPO_MAZEWALK);
+		      add_opvars(splev, "iiio",
+				 (long)$5, 1, 0, SPO_MAZEWALK);
 		  }
-		| MAZEWALK_ID ':' coordinate ',' DIRECTION ',' BOOLEAN opt_fillchar
+		| MAZEWALK_ID ':' coord_or_var ',' DIRECTION ',' BOOLEAN opt_fillchar
 		  {
-		      add_opvars(splev, "iiiiio",
-				 $3.x, $3.y,
+		      add_opvars(splev, "iiio",
 				 (long)$5, (long)$<i>7, (long)$8, SPO_MAZEWALK);
 		  }
 		;
@@ -1523,15 +1781,15 @@ wallify_detail	: WALLIFY_ID
 		  }
 		;
 
-ladder_detail	: LADDER_ID ':' coordinate ',' UP_OR_DOWN
+ladder_detail	: LADDER_ID ':' coord_or_var ',' UP_OR_DOWN
 		  {
-		      add_opvars(splev, "iiio", $3.x, $3.y, (long)$<i>5, SPO_LADDER);
+		      add_opvars(splev, "io", (long)$<i>5, SPO_LADDER);
 		  }
 		;
 
-stair_detail	: STAIR_ID ':' coordinate ',' UP_OR_DOWN
+stair_detail	: STAIR_ID ':' coord_or_var ',' UP_OR_DOWN
 		  {
-		      add_opvars(splev, "iiio", $3.x, $3.y, (long)$<i>5, SPO_STAIR);
+		      add_opvars(splev, "io", (long)$<i>5, SPO_STAIR);
 		  }
 		;
 
@@ -1588,21 +1846,21 @@ teleprt_detail	: /* empty */
 		  }
 		;
 
-fountain_detail : FOUNTAIN_ID ':' coordinate
+fountain_detail : FOUNTAIN_ID ':' coord_or_var
 		  {
-		      add_opvars(splev, "iio", $3.x, $3.y, SPO_FOUNTAIN);
+		      add_opvars(splev, "o", SPO_FOUNTAIN);
 		  }
 		;
 
-sink_detail : SINK_ID ':' coordinate
+sink_detail : SINK_ID ':' coord_or_var
 		  {
-		      add_opvars(splev, "iio", $3.x, $3.y, SPO_SINK);
+		      add_opvars(splev, "o", SPO_SINK);
 		  }
 		;
 
-pool_detail : POOL_ID ':' coordinate
+pool_detail : POOL_ID ':' coord_or_var
 		  {
-		      add_opvars(splev, "iio", $3.x, $3.y, SPO_POOL);
+		      add_opvars(splev, "o", SPO_POOL);
 		  }
 		;
 
@@ -1638,15 +1896,15 @@ replace_terrain_detail : REPLACE_TERRAIN_ID ':' region ',' CHAR ',' terrain_type
 		  }
 		;
 
-terrain_detail : TERRAIN_ID chance ':' coordinate ',' terrain_type
+terrain_detail : TERRAIN_ID chance ':' coord_or_var ',' terrain_type
 		 {
 		     long c;
 
 		     c = $6.ter;
 		     if (c >= MAX_TYPE) yyerror("Terrain: illegal map char");
 
-		     add_opvars(splev, "iiii iiio",
-				$4.x, $4.y, -1, -1,
+		     add_opvars(splev, "ii iiio",
+				-1, -1,
 				0, c, $6.lit, SPO_TERRAIN);
 
 		     if ( 1 == $2 ) {
@@ -1658,7 +1916,7 @@ terrain_detail : TERRAIN_ID chance ':' coordinate ',' terrain_type
 		     }
 		 }
 	       |
-	         TERRAIN_ID chance ':' coordinate ',' HORIZ_OR_VERT ',' INTEGER ',' terrain_type
+	         TERRAIN_ID chance ':' coord_or_var ',' HORIZ_OR_VERT ',' INTEGER ',' terrain_type
 		 {
 		     long areatyp, c, x2,y2;
 
@@ -1674,8 +1932,8 @@ terrain_detail : TERRAIN_ID chance ':' coordinate ',' terrain_type
 		     c = $10.ter;
 		     if (c >= MAX_TYPE) yyerror("Terrain: illegal map char");
 
-		     add_opvars(splev, "iiii iiio",
-				$4.x, $4.y, x2, y2,
+		     add_opvars(splev, "ii iiio",
+				x2, y2,
 				areatyp, c, (long)$10.lit, SPO_TERRAIN);
 
 		     if ( 1 == $2 ) {
@@ -1694,8 +1952,8 @@ terrain_detail : TERRAIN_ID chance ':' coordinate ',' terrain_type
 		     c = $8.ter;
 		     if (c >= MAX_TYPE) yyerror("Terrain: illegal map char");
 
-		     add_opvars(splev, "iiii iiio",
-				$4.x1, $4.y1, $4.x2, $4.y2,
+		     add_opvars(splev, "iii iiio",
+				(($4.x1 & 0xff) + (($4.y1 << 16) & 0xff)), $4.x2, $4.y2,
 				(long)(3 + $<i>6), c, (long)$8.lit, SPO_TERRAIN);
 
 		     if ( 1 == $2 ) {
@@ -1728,7 +1986,7 @@ opt_int		: /* empty */
 		  }
 		;
 
-spill_detail : SPILL_ID ':' coordinate ',' terrain_type ',' DIRECTION ',' INTEGER
+spill_detail : SPILL_ID ':' coord_or_var ',' terrain_type ',' DIRECTION ',' INTEGER
 		{
 		    long c, typ;
 
@@ -1740,8 +1998,7 @@ spill_detail : SPILL_ID ':' coordinate ',' terrain_type ',' DIRECTION ',' INTEGE
 		    c = $9;
 		    if (c < 1) yyerror("SPILL: Invalid count!");
 
-		    add_opvars(splev, "iiiiiio", $3.x, $3.y,
-			       typ, (long)$7, c, (long)$5.lit, SPO_SPILL);
+		    add_opvars(splev, "iiiio", typ, (long)$7, c, (long)$5.lit, SPO_SPILL);
 		}
 		;
 
@@ -1776,8 +2033,37 @@ region_detail	: REGION_ID ':' region ',' light_state ',' room_type prefilled
 					 ( $3.y2 - $3.y1 != 1)))
 			 yyerror("Vaults must be exactly 2x2!");
 
-		     add_opvars(splev, "iiii iiio",
-				$3.x1, $3.y1, $3.x2, $3.y2,
+		     add_opvars(splev, "riiio",
+				(( $3.x1 & 0xff) + (( $3.y1 & 0xff) << 8) +
+				(( $3.x2 & 0xff) << 16) + (( $3.y2 & 0xff) << 24)),
+				(long)$5, rt, irr, SPO_REGION);
+
+		     $<i>$ = (irr || ($8 & 1) || rt != OROOM);
+		  }
+		  region_detail_end
+		  {
+		      if ( $<i>9 ) {
+			  add_opcode(splev, SPO_ENDROOM, NULL);
+		      } else if ( $<i>10 )
+			  yyerror("Cannot use lev statements in non-permanent REGION");
+		  }
+		;
+
+region_detail_TEST	: REGION_ID '-' region_or_var ',' light_state ',' room_type prefilled
+		  {
+		      long rt, irr;
+
+		      rt = $7;
+		      if (( $8 ) & 1) rt += MAXRTYPE+1;
+
+		      irr = ((( $8 ) & 2) != 0);
+		      /*
+		      if (rt == VAULT && (irr ||
+					 ( $3.x2 - $3.x1 != 1) ||
+					 ( $3.y2 - $3.y1 != 1)))
+			 yyerror("Vaults must be exactly 2x2!");
+		      */
+		     add_opvars(splev, "iiio",
 				(long)$5, rt, irr, SPO_REGION);
 
 		     $<i>$ = (irr || ($8 & 1) || rt != OROOM);
@@ -1801,40 +2087,39 @@ region_detail_end : /* nothing */
 		  }
 		;
 
-altar_detail	: ALTAR_ID ':' coordinate ',' alignment ',' altar_type
+altar_detail	: ALTAR_ID ':' coord_or_var ',' alignment ',' altar_type
 		  {
-		      add_opvars(splev, "iiiio", $3.x, $3.y,
-				 (long)$7, (long)$5, SPO_ALTAR);
+		      add_opvars(splev, "iio", (long)$7, (long)$5, SPO_ALTAR);
 		  }
 		;
 
-grave_detail	: GRAVE_ID ':' coordinate ',' string
+grave_detail	: GRAVE_ID ':' coord_or_var ',' string
 		  {
-		      add_opvars(splev, "iisio",
-				 $3.x, $3.y, $5, 2, SPO_GRAVE);
+		      add_opvars(splev, "sio",
+				 $5, 2, SPO_GRAVE);
 		  }
-		| GRAVE_ID ':' coordinate ',' RANDOM_TYPE
+		| GRAVE_ID ':' coord_or_var ',' RANDOM_TYPE
 		  {
-		      add_opvars(splev, "iisio",
-				 $3.x, $3.y, (char *)0, 1, SPO_GRAVE);
+		      add_opvars(splev, "sio",
+				 (char *)0, 1, SPO_GRAVE);
 		  }
-		| GRAVE_ID ':' coordinate
+		| GRAVE_ID ':' coord_or_var
 		  {
-		      add_opvars(splev, "iisio",
-				 $3.x, $3.y, (char *)0, 0, SPO_GRAVE);
-		  }
-		;
-
-gold_detail	: GOLD_ID ':' amount ',' coordinate
-		  {
-		      add_opvars(splev, "iiio", (long)$3, $5.y, $5.x, SPO_GOLD);
+		      add_opvars(splev, "sio",
+				 (char *)0, 0, SPO_GRAVE);
 		  }
 		;
 
-engraving_detail: ENGRAVING_ID ':' coordinate ',' engraving_type ',' string
+gold_detail	: GOLD_ID ':' amount ',' coord_or_var
 		  {
-		      add_opvars(splev, "iisio",
-				 $3.x, $3.y, $7, (long)$5, SPO_ENGRAVING);
+		      add_opvars(splev, "io", (long)$3, SPO_GOLD);
+		  }
+		;
+
+engraving_detail: ENGRAVING_ID ':' coord_or_var ',' engraving_type ',' string
+		  {
+		      add_opvars(splev, "sio",
+				 $7, (long)$5, SPO_ENGRAVING);
 		  }
 		;
 
@@ -2009,33 +2294,270 @@ object		: CHAR
 		;
 
 string_or_var	: STRING
-		{
-		    add_opvars(splev, "s", $1);
-		}
+		  {
+		      add_opvars(splev, "s", $1);
+		  }
 		| VARSTRING
-		{
-		    struct lc_vardefs *vd;
-		    if ((vd = vardef_defined(variable_definitions, $1, 1))) {
-			if (vd->var_type != SPOVAR_STRING)
-			    yyerror("Trying to use a non-string variable as string");
-		    } else yyerror("Variable not defined");
-		    add_opvars(splev, "v", $1);
-		}
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != SPOVAR_STRING)
+			      yyerror("Trying to use a non-string variable as string");
+		      } else yyerror("Variable not defined");
+		      add_opvars(splev, "v", $1);
+		  }
+		| VARSTRING '[' INTEGER ']'
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != (SPOVAR_STRING|SPOVAR_ARRAY))
+			      yyerror("Trying to use a non-string array variable as string");
+		      } else yyerror("Variable not defined");
+		      add_opvars(splev, "iv", $3, $1);
+		  }
 		;
 
 integer_or_var	: INTEGER
-		{
-		    add_opvars(splev, "i", $1);
-		}
+		  {
+		      add_opvars(splev, "i", $1);
+		  }
 		| VARSTRING
-		{
-		    struct lc_vardefs *vd;
-		    if ((vd = vardef_defined(variable_definitions, $1, 1))) {
-			if (vd->var_type != SPOVAR_INT)
-			    yyerror("Trying to use a non-integer variable as integer");
-		    } else yyerror("Variable not defined");
-		    add_opvars(splev, "v", $1);
-		}
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != SPOVAR_INT)
+			      yyerror("Trying to use a non-integer variable as integer");
+		      } else yyerror("Variable not defined");
+		      add_opvars(splev, "v", $1);
+		  }
+		| VARSTRING '[' INTEGER ']'
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != (SPOVAR_INT|SPOVAR_ARRAY))
+			      yyerror("Trying to use a non-integer array variable as integer");
+		      } else yyerror("Variable not defined");
+		      add_opvars(splev, "iv", $3, $1);
+		  }
+		;
+
+coord_or_var	: encodecoord
+		  {
+		      add_opvars(splev, "c", $1);
+		  }
+		| VARSTRING
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != SPOVAR_COORD)
+			      yyerror("Trying to use a non-coord variable as coord");
+		      } else yyerror("Variable not defined");
+		      add_opvars(splev, "v", $1);
+		  }
+		| VARSTRING '[' INTEGER ']'
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != (SPOVAR_COORD|SPOVAR_ARRAY))
+			      yyerror("Trying to use a non-coord array variable as coord");
+		      } else yyerror("Variable not defined");
+		      add_opvars(splev, "iv", $3, $1);
+		  }
+		;
+
+encodecoord	: '(' INTEGER ',' INTEGER ')'
+		  {
+		      if ($2 < 0 || $4 < 0 || $2 >= COLNO || $4 >= ROWNO)
+			  yyerror("Coordinates out of map range!");
+		      $$ = ($2 & 0xff) + (($4 & 0xff) << 16);
+		  }
+		| RANDOM_TYPE
+		  {
+		      $$ = ((char)(-MAX_REGISTERS-1) & 0xff) + (((char)(-MAX_REGISTERS-1) & 0xff) << 16);
+		  }
+		;
+
+region_or_var	: encoderegion
+		  {
+		      add_opvars(splev, "r", $1);
+		  }
+		| VARSTRING
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != SPOVAR_REGION)
+			      yyerror("Trying to use a non-region variable as region");
+		      } else yyerror("Variable not defined");
+		      add_opvars(splev, "v", $1);
+		  }
+		| VARSTRING '[' INTEGER ']'
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != (SPOVAR_REGION|SPOVAR_ARRAY))
+			      yyerror("Trying to use a non-region array variable as region");
+		      } else yyerror("Variable not defined");
+		      add_opvars(splev, "iv", $3, $1);
+		  }
+		;
+
+encoderegion	: '(' INTEGER ',' INTEGER ',' INTEGER ',' INTEGER ')'
+		  {
+		      if ( $2 > $6 || $4 > $8 )
+			  yyerror("Region start > end!");
+
+		      $$ = ( $2 & 0xff) + (( $4 & 0xff) << 8) +
+			  (( $6 & 0xff) << 16) + (( $8 & 0xff) << 24);
+		  }
+		;
+
+mapchar_or_var	: mapchar
+		  {
+		      add_opvars(splev, "m", $1);
+		  }
+		| VARSTRING
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != SPOVAR_MAPCHAR)
+			      yyerror("Trying to use a non-mapchar variable as mapchar");
+		      } else yyerror("Variable not defined");
+		      add_opvars(splev, "v", $1);
+		  }
+		| VARSTRING '[' INTEGER ']'
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != (SPOVAR_MAPCHAR|SPOVAR_ARRAY))
+			      yyerror("Trying to use a non-mapchar array variable as mapchar");
+		      } else yyerror("Variable not defined");
+		      add_opvars(splev, "iv", $3, $1);
+		  }
+		;
+
+mapchar		: CHAR
+		  {
+		      if (what_map_char((char) $1) != INVALID_TYPE)
+			  $$ = what_map_char((char) $1);
+		      else {
+			  yyerror("Unknown map char type!");
+			  $$ = STONE;
+		      }
+		  }
+		;
+
+monster_or_var	: encodemonster
+		  {
+		      add_opvars(splev, "M", $1);
+		  }
+		| VARSTRING
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != SPOVAR_MONST)
+			      yyerror("Trying to use a non-monclass variable as monclass");
+		      } else yyerror("Variable not defined");
+		      add_opvars(splev, "v", $1);
+		  }
+		| VARSTRING '[' INTEGER ']'
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != (SPOVAR_MONST|SPOVAR_ARRAY))
+			      yyerror("Trying to use a non-monclass array variable as monclass");
+		      } else yyerror("Variable not defined");
+		      add_opvars(splev, "iv", $3, $1);
+		  }
+		;
+
+encodemonster	: STRING
+		  {
+		      long m = get_monster_id($1, (char)0);
+		      if (m == ERR) {
+			  yyerror("Unknown monster!");
+			  $$ == ERR;
+		      } else
+			  $$ = (m << 8);
+		  }
+		| CHAR
+		  {
+			if (check_monster_char((char) $1))
+				$$ = $1 ;
+			else {
+			    yyerror("Unknown monster class!");
+			    $$ = ERR;
+			}
+		  }
+		| '(' CHAR ',' STRING ')'
+		  {
+		      long m = get_monster_id($4, (char) $2);
+		      if (m == ERR) {
+			  yyerror("Unknown monster!");
+			  $$ == ERR;
+		      } else
+			  $$ = (m << 8) + (((char) $2) & 0xff);
+		  }
+		| RANDOM_TYPE
+		  {
+		      $$ = -MAX_REGISTERS-1;
+		  }
+		;
+
+object_or_var	: encodeobj
+		  {
+		      add_opvars(splev, "O", $1);
+		  }
+		| VARSTRING
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != SPOVAR_OBJ)
+			      yyerror("Trying to use a non-obj variable as obj");
+		      } else yyerror("Variable not defined");
+		      add_opvars(splev, "v", $1);
+		  }
+		| VARSTRING '[' INTEGER ']'
+		  {
+		      struct lc_vardefs *vd;
+		      if ((vd = vardef_defined(variable_definitions, $1, 1))) {
+			  if (vd->var_type != (SPOVAR_OBJT|SPOVAR_ARRAY))
+			      yyerror("Trying to use a non-obj array variable as obj");
+		      } else yyerror("Variable not defined");
+		      add_opvars(splev, "iv", $3, $1);
+		  }
+		;
+
+encodeobj	: STRING
+		  {
+		      long m = get_object_id($1, (char)0);
+		      if (m == ERR) {
+			  yyerror("Unknown object!");
+			  $$ == ERR;
+		      } else
+			  $$ = (m << 8);
+		  }
+		| CHAR
+		  {
+			if (check_object_char((char) $1))
+				$$ = $1 ;
+			else {
+			    yyerror("Unknown object class!");
+			    $$ = ERR;
+			}
+		  }
+		| '(' CHAR ',' STRING ')'
+		  {
+		      long m = get_object_id($4, (char) $2);
+		      if (m == ERR) {
+			  yyerror("Unknown object!");
+			  $$ == ERR;
+		      } else
+			  $$ = (m << 8) + (((char) $2) & 0xff);
+		  }
+		| RANDOM_TYPE
+		  {
+		      $$ = -MAX_REGISTERS-1;
+		  }
 		;
 
 string		: STRING

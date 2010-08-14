@@ -354,7 +354,8 @@ MAP
 ENDMAP
 # Random registers
 RANDOM_MONSTERS:'j','b','P','F'
-RANDOM_PLACES:(04,02),(46,02),(04,15),(46,15)
+$place = { (04,02),(46,02),(04,15),(46,15) }
+SHUFFLE:$place
 # Dungeon description
 REGION:(00,00,50,17),unlit,"swamp"
 MAZEWALK:(00,09),west
@@ -364,10 +365,10 @@ STAIR:levregion(69,00,79,20),(0,0,50,17),up
 BRANCH:levregion(01,00,11,20),(0,0,50,17)
 TELEPORT_REGION:levregion(01,00,11,20),(0,0,50,17),up
 TELEPORT_REGION:levregion(69,00,79,20),(0,0,50,17),down
-FOUNTAIN:place[0]
-MONSTER:'m',"giant mimic",place[1],m_feature "fountain"
-MONSTER:'m',"giant mimic",place[2],m_feature "fountain"
-MONSTER:'m',"giant mimic",place[3],m_feature "fountain"
+FOUNTAIN:$place[0]
+MONSTER:'m',"giant mimic",$place[1],m_feature "fountain"
+MONSTER:'m',"giant mimic",$place[2],m_feature "fountain"
+MONSTER:'m',"giant mimic",$place[3],m_feature "fountain"
 # The demon of the swamp
 MONSTER:'&',"Juiblex",(25,08)
 # And a couple demons

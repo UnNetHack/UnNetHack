@@ -113,6 +113,7 @@ enum opcode_defs {
     SPO_LEVEL_SOUNDS,
     SPO_WALLWALK,
     SPO_VAR_INIT, /* variable_name data */
+    SPO_SHUFFLE_ARRAY,
 
     MAX_SP_OPCODES
 };
@@ -170,10 +171,30 @@ enum opcode_defs {
 
 
 
-#define SPOVAR_NULL	0
-#define SPOVAR_INT	1 /* l */
-#define SPOVAR_STRING	2 /* str */
-#define SPOVAR_VARIABLE	3 /* str (contains the variable name) */
+#define SPOVAR_NULL	0x00
+#define SPOVAR_INT	0x01 /* l */
+#define SPOVAR_STRING	0x02 /* str */
+#define SPOVAR_VARIABLE	0x03 /* str (contains the variable name) */
+#define SPOVAR_COORD	0x04 /* coordinate, encoded in l; use SP_COORD_X() and SP_COORD_Y() */
+#define SPOVAR_REGION	0x05 /* region, encoded in l; use SP_REGION_X1() etc */
+#define SPOVAR_MAPCHAR	0x06 /* map char, in l */
+#define SPOVAR_MONST	0x07 /* monster class & specific monster, encoded in l; use SP_MONST_... */
+#define SPOVAR_OBJ	0x08 /* object class & specific object type, encoded in l; use SP_OBJ_... */
+#define SPOVAR_ARRAY	0x40 /* used in splev_var & lc_vardefs, not in opvar */
+
+#define SP_COORD_X(l)	(l & 0xff)
+#define SP_COORD_Y(l)	((l >> 16) & 0xff)
+
+#define SP_REGION_X1(l)	(l & 0xff)
+#define SP_REGION_Y1(l)	((l >> 8) & 0xff)
+#define SP_REGION_X2(l)	((l >> 16) & 0xff)
+#define SP_REGION_Y2(l)	((l >> 24) & 0xff)
+
+#define SP_MONST_CLASS(l) (l & 0xff)
+#define SP_MONST_PM(l)	  ((l >> 8) & 0xffff)
+
+#define SP_OBJ_CLASS(l)	  (l & 0xff)
+#define SP_OBJ_TYP(l)	  ((l >> 8) & 0xffff)
 
 struct opvar {
     xchar spovartyp; /* one of SPOVAR_foo */
@@ -186,7 +207,12 @@ struct opvar {
 struct splev_var {
     struct splev_var *next;
     char *name;
-    struct opvar *value;
+    xchar svtyp; /* SPOVAR_foo */
+    union {
+	struct opvar *value;
+	struct opvar **arrayvalues;
+    } data;
+    long array_len;
 };
 
 struct splevstack {

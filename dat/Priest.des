@@ -205,12 +205,13 @@ LL........................
 .........LLL.........L....
 ENDMAP
 # Dungeon Description
-RANDOM_PLACES:(14,04),(13,07)
+$place = { (14,04),(13,07) }
+SHUFFLE: $place
 REGION:(00,00,25,10),unlit,"ordinary"
 # Stairs
 STAIR:(20,05),up
 # Objects
-OBJECT:'[',"helm of brilliance",place[0],blessed,0,NAME:"The Mitre of Holiness"
+OBJECT:'[',"helm of brilliance",$place[0],blessed,0,NAME:"The Mitre of Holiness"
 OBJECT:random,random,random
 OBJECT:random,random,random
 OBJECT:random,random,random
@@ -233,7 +234,7 @@ TRAP:"fire",random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'&',"Nalzok",place[0]
+MONSTER:'&',"Nalzok",$place[0]
 MONSTER:'Z',"human zombie",random
 MONSTER:'Z',"human zombie",random
 MONSTER:'Z',"human zombie",random

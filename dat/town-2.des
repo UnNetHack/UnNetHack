@@ -7,13 +7,14 @@
 LEVEL: "town-2"
 MESSAGE: "You reach the surface.  You hear the sounds of civilization."
 RANDOM_MONSTERS:'@','r'
-RANDOM_PLACES:(4,6),(4,16),(18,2),(25,10),(40,13),(55,4),(58,12),(71,2),(73,15)
+$place = { (4,6),(4,16),(18,2),(25,10),(40,13),(55,4),(58,12),(71,2),(73,15) }
+SHUFFLE: $place
 ROOM: "ordinary", lit, random, random, (76,17)
 {
 FOUNTAIN: (55,9)
 FOUNTAIN: (22,8)
-STAIR:place[0],down
-ENGRAVING: place[1], mark, "Welcome to the city of Angband!"
+STAIR:$place[0],down
+ENGRAVING: $place[1], mark, "Welcome to the city of Angband!"
 #
 #       The Shops
 #

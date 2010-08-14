@@ -509,7 +509,8 @@ MAP
                              -----------------                             
 ENDMAP
 # Rider locations
-RANDOM_PLACES:(23,9),(37,14),(51,9)
+$place = { (23,9),(37,14),(51,9) }
+SHUFFLE:$place
 # Where the player will land on arrival
 TELEPORT_REGION:(29,15,45,15),(30,15,44,15)
 # Lit courts
@@ -546,7 +547,7 @@ MONSTER:'@',"aligned priest",(19,09),noalign,hostile
 MONSTER:'@',"aligned priest",(19,10),noalign,hostile
 MONSTER:'A',"Angel",(20,09),noalign,hostile
 MONSTER:'A',"Angel",(20,10),noalign,hostile
-MONSTER:'&',"Pestilence",place[0],hostile {
+MONSTER:'&',"Pestilence",$place[0],hostile {
   OBJECT:'!',"sickness"
 }
 # South-central round room
@@ -556,7 +557,7 @@ MONSTER:'@',"aligned priest",(38,12),noalign,hostile
 MONSTER:'@',"aligned priest",(36,13),noalign,hostile
 MONSTER:'A',"Angel",(38,13),noalign,hostile
 MONSTER:'A',"Angel",(37,13),noalign,hostile
-MONSTER:'&',"Death",place[1],hostile
+MONSTER:'&',"Death",$place[1],hostile
 # East round room
 MONSTER:'@',"aligned priest",(56,09),noalign,hostile
 MONSTER:'@',"aligned priest",(55,08),noalign,hostile
@@ -564,7 +565,7 @@ MONSTER:'@',"aligned priest",(55,09),noalign,hostile
 MONSTER:'@',"aligned priest",(55,10),noalign,hostile
 MONSTER:'A',"Angel",(54,09),noalign,hostile
 MONSTER:'A',"Angel",(54,10),noalign,hostile
-MONSTER:'&',"Famine",place[2],hostile
+MONSTER:'&',"Famine",$place[2],hostile
 #
 # The aligned horde
 #

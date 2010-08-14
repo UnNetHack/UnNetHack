@@ -41,11 +41,12 @@ ENDMAP
 #REGION:(00,00,75,20),lit,"ordinary"
 # The down stairs is at one of the 4 "exits".  The others are mimics,
 # mimicing stairwells.
-RANDOM_PLACES: (33,0), (0,12), (25,20), (75,05)
-STAIR:place[0],down
-MONSTER:'m',"giant mimic", place[1], m_feature "staircase down"
-MONSTER:'m',"large mimic", place[2], m_feature "staircase down"
-MONSTER:'m',"small mimic", place[3], m_feature "staircase down"
+$place = { (33,0), (0,12), (25,20), (75,05) }
+SHUFFLE: $place
+STAIR:$place[0],down
+MONSTER:'m',"giant mimic", $place[1], m_feature "staircase down"
+MONSTER:'m',"large mimic", $place[2], m_feature "staircase down"
+MONSTER:'m',"small mimic", $place[3], m_feature "staircase down"
 # Portal arrival point
 BRANCH:(19,09,19,09),(0,0,0,0)
 # Doors (secret)

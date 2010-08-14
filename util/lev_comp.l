@@ -171,6 +171,7 @@ DEFAULT		return DEFAULT_ID;
 FUNCTION	return FUNCTION_ID;
 INCLUDE		return INCLUDE_ID;
 SOUNDS		return SOUNDS_ID;
+SHUFFLE		return SHUFFLE_ID;
 hear		{ yylval.i=LVLSND_HEARD;  return MSG_OUTPUT_TYPE; }
 pline		{ yylval.i=LVLSND_PLINED; return MSG_OUTPUT_TYPE; }
 verbal		{ yylval.i=LVLSND_VERBAL; return MSG_OUTPUT_TYPE; }
