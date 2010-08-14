@@ -172,6 +172,7 @@ extern const char *fname;
 %type	<i> alignment altar_type a_register roomfill door_pos
 %type	<i> door_wall walled secret amount chance
 %type	<i> dir_list
+%type	<i> levstatements region_detail_end
 %type	<i> engraving_type flag_list prefilled
 %type	<i> monster monster_c m_register object object_c o_register
 %type	<i> comparestmt
@@ -332,7 +333,13 @@ flag_list	: FLAG_TYPE ',' flag_list
 		;
 
 levstatements	: /* nothing */
+		  {
+		      $<i>$ = 0;
+		  }
 		| levstatement levstatements
+		  {
+		      $<i>$ = 1 + $2;
+		  }
 		;
 
 levstatement 	: message
@@ -1810,6 +1817,25 @@ region_detail	: REGION_ID ':' region ',' light_state ',' room_type prefilled
 		     add_opvars(splev, "iiii iiio",
 				$3.x1, $3.y1, $3.x2, $3.y2,
 				(long)$<i>5, rt, irr, SPO_REGION);
+
+		     $<i>$ = (irr || ($<i>8 & 1) || rt != OROOM);
+		  }
+		  region_detail_end
+		  {
+		      if ( $<i>9 ) {
+			  add_opcode(splev, SPO_ENDROOM, NULL);
+		      } else if ( $<i>10 )
+			  yyerror("Cannot use lev statements in non-permanent REGION");
+		  }
+		;
+
+region_detail_end : /* nothing */
+		  {
+		      $$ = 0;
+		  }
+		| '{' levstatements '}'
+		  {
+		      $$ = $2;
 		  }
 		;
 

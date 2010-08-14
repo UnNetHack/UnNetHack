@@ -4005,6 +4005,16 @@ spo_region(coder)
 #endif
     }
 
+    if (!room_not_needed) {
+	if (coder->n_subroom > 1)
+	    impossible("region as subroom");
+	else {
+	    coder->tmproomlist[coder->n_subroom] = troom;
+	    coder->failed_room[coder->n_subroom] = FALSE;
+	    coder->n_subroom++;
+	}
+    }
+
     opvar_free(x1);
     opvar_free(y1);
     opvar_free(x2);
