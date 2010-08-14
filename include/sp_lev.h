@@ -157,7 +157,8 @@ enum opcode_defs {
 #define SP_O_V_INVIS		11
 #define SP_O_V_GREASED		12
 #define SP_O_V_BROKEN		13
-#define SP_O_V_END              14 /* end of variable parameters */
+#define SP_O_V_COORD		14
+#define SP_O_V_END              15 /* end of variable parameters */
 
 
 /* When creating objects, we need to know whether

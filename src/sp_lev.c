@@ -3043,7 +3043,7 @@ spo_object(coder)
     int nparams = 0;
 
     struct opvar *varparam;
-    struct opvar *id, *x, *y, *class, *containment;
+    struct opvar *id, *class, *containment;
 
     object tmpobj;
 
@@ -3061,12 +3061,11 @@ spo_object(coder)
     tmpobj.invis = 0;
     tmpobj.greased = 0;
     tmpobj.broken = 0;
+    tmpobj.x = tmpobj.y = -MAX_REGISTERS-1;
 
     if (!OV_pop_i(containment) ||
 	!OV_pop_i(id) ||
-	!OV_pop_i(class) ||
-	!OV_pop_i(y) ||
-	!OV_pop_i(x)) return;
+	!OV_pop_i(class)) return;
 
     if (!OV_pop_i(varparam)) return;
 
@@ -3133,6 +3132,13 @@ spo_object(coder)
 	    if (OV_typ(parm) == SPOVAR_INT)
 		tmpobj.broken = OV_i(parm);
 	    break;
+	case SP_O_V_COORD:
+	    if (OV_typ(parm) == SPOVAR_INT)
+		tmpobj.y = OV_i(parm);
+	    parm = splev_stack_pop(coder->stack);
+	    if (OV_typ(parm) == SPOVAR_INT)
+		tmpobj.x = OV_i(parm);
+	    break;
 	case SP_O_V_END:
 	    nparams = SP_O_V_END+1;
 	    break;
@@ -3148,8 +3154,6 @@ spo_object(coder)
     }
 
     tmpobj.id = OV_i(id);
-    tmpobj.x = OV_i(x);
-    tmpobj.y = OV_i(y);
     tmpobj.class = OV_i(class);
     tmpobj.containment = OV_i(containment);
 
@@ -3159,8 +3163,6 @@ spo_object(coder)
 
     opvar_free(varparam);
     opvar_free(id);
-    opvar_free(x);
-    opvar_free(y);
     opvar_free(class);
     opvar_free(containment);
 }

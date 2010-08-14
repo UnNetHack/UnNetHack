@@ -90,6 +90,8 @@ static short on_olist = 0, on_mlist = 0, on_plist = 0;
 unsigned int max_x_map, max_y_map;
 int obj_containment = 0;
 
+int in_container_obj = 0;
+
 int in_switch_statement = 0;
 static struct opvar *switch_check_jump = NULL;
 static struct opvar *switch_default_case = NULL;
@@ -172,6 +174,7 @@ extern const char *fname;
 %type	<i> alignment altar_type a_register roomfill door_pos
 %type	<i> door_wall walled secret amount chance
 %type	<i> dir_list
+%type	<i> object_infos
 %type	<i> levstatements region_detail_end
 %type	<i> engraving_type flag_list prefilled
 %type	<i> monster monster_c m_register object object_c o_register
@@ -693,67 +696,6 @@ message		: MESSAGE_ID ':' STRING
 		  }
 		;
 
-cobj_ifstatement : IF_ID comparestmt
-		  {
-		      struct opvar *tmppush2 = New(struct opvar);
-
-		      if (n_if_list >= MAX_NESTED_IFS) {
-			  yyerror("IF: Too deeply nested IFs.");
-			  n_if_list = MAX_NESTED_IFS - 1;
-		      }
-
-		      add_opcode(splev, SPO_CMP, NULL);
-
-		      set_opvar_int(tmppush2, splev->n_opcodes+1);
-
-		      if_list[n_if_list++] = tmppush2;
-
-		      add_opcode(splev, SPO_PUSH, tmppush2);
-
-		      add_opcode(splev, $2, NULL);
-		  }
-		 cobj_if_ending
-		  {
-		     /* do nothing */
-		  }
-		;
-
-cobj_if_ending	: '{' cobj_statements '}'
-		  {
-		      if (n_if_list > 0) {
-			  struct opvar *tmppush;
-			  tmppush = (struct opvar *) if_list[--n_if_list];
-			  set_opvar_int(tmppush, splev->n_opcodes - tmppush->vardata.l);
-		      } else yyerror("IF: Huh?!  No start address?");
-		  }
-		| '{' cobj_statements '}'
-		  {
-		      if (n_if_list > 0) {
-			  struct opvar *tmppush = New(struct opvar);
-			  struct opvar *tmppush2;
-
-			  set_opvar_int(tmppush, splev->n_opcodes+1);
-			  add_opcode(splev, SPO_PUSH, tmppush);
-
-			  add_opcode(splev, SPO_JMP, NULL);
-
-			  tmppush2 = (struct opvar *) if_list[--n_if_list];
-
-			  set_opvar_int(tmppush2, splev->n_opcodes - tmppush2->vardata.l);
-			  if_list[n_if_list++] = tmppush;
-		      } else yyerror("IF: Huh?!  No else-part address?");
-		  }
-		 ELSE_ID '{' cobj_statements '}'
-		  {
-		      if (n_if_list > 0) {
-			  struct opvar *tmppush;
-			  tmppush = (struct opvar *) if_list[--n_if_list];
-			  set_opvar_int(tmppush, splev->n_opcodes - tmppush->vardata.l);
-		      } else yyerror("IF: Huh?! No end address?");
-		  }
-		;
-
-
 wallwalk_detail	: WALLWALK_ID ':' coordinate ',' CHAR opt_spercent
 		  {
 		      long fgtyp = what_map_char((char) $5);
@@ -1166,9 +1108,11 @@ monster_detail	: MONSTER_ID chance ':' monster_desc
 		  {
 		      add_opvars(splev, "io", 1, SPO_MONSTER);
 		      $<i>$ = $2;
+		      in_container_obj++;
 		  }
-		'{' cobj_statements '}'
+		'{' levstatements '}'
 		 {
+		     in_container_obj--;
 		     add_opvars(splev, "o", SPO_END_MONINVENT);
 		     if ( 1 == $<i>5 ) {
 			 if (n_if_list > 0) {
@@ -1202,92 +1146,92 @@ monster_infos	: /* nothing */
 		      add_opcode(splev, SPO_PUSH, stopit);
 		      $<i>$ = 0x00;
 		  }
-		| monster_infos monster_info
+		| monster_infos ',' monster_info
 		  {
-		      if (( $<i>1 & $<i>2 ))
+		      if (( $<i>1 & $<i>3 ))
 			  yyerror("MONSTER extra info already used.");
-		      $<i>$ = ( $<i>1 | $<i>2 );
+		      $<i>$ = ( $<i>1 | $<i>3 );
 		  }
 		;
 
-monster_info	: ',' string
+monster_info	: string
 		  {
-		      add_opvars(splev, "si", $2, SP_M_V_NAME);
+		      add_opvars(splev, "si", $1, SP_M_V_NAME);
 		      $<i>$ = 0x0001;
 		  }
-		| ',' MON_ATTITUDE
+		| MON_ATTITUDE
 		  {
-		      add_opvars(splev, "ii", (long)$<i>2, SP_M_V_PEACEFUL);
+		      add_opvars(splev, "ii", (long)$<i>1, SP_M_V_PEACEFUL);
 		      $<i>$ = 0x0002;
 		  }
-		| ',' MON_ALERTNESS
+		| MON_ALERTNESS
 		  {
-		      add_opvars(splev, "ii", (long)$<i>2, SP_M_V_ASLEEP);
+		      add_opvars(splev, "ii", (long)$<i>1, SP_M_V_ASLEEP);
 		      $<i>$ = 0x0004;
 		  }
-		| ',' alignment
+		| alignment
 		  {
-		      add_opvars(splev, "ii", (long)$<i>2, SP_M_V_ALIGN);
+		      add_opvars(splev, "ii", (long)$<i>1, SP_M_V_ALIGN);
 		      $<i>$ = 0x0008;
 		  }
-		| ',' MON_APPEARANCE string
+		| MON_APPEARANCE string
 		  {
-		      add_opvars(splev, "sii", $3, (long)$<i>2, SP_M_V_APPEAR);
+		      add_opvars(splev, "sii", $2, (long)$<i>1, SP_M_V_APPEAR);
 		      $<i>$ = 0x0010;
 		  }
-		| ',' FEMALE_ID
+		| FEMALE_ID
 		  {
 		      add_opvars(splev, "ii", 1, SP_M_V_FEMALE);
 		      $<i>$ = 0x0020;
 		  }
-		| ',' INVIS_ID
+		| INVIS_ID
 		  {
 		      add_opvars(splev, "ii", 1, SP_M_V_INVIS);
 		      $<i>$ = 0x0040;
 		  }
-		| ',' CANCELLED_ID
+		| CANCELLED_ID
 		  {
 		      add_opvars(splev, "ii", 1, SP_M_V_CANCELLED);
 		      $<i>$ = 0x0080;
 		  }
-		| ',' REVIVED_ID
+		| REVIVED_ID
 		  {
 		      add_opvars(splev, "ii", 1, SP_M_V_REVIVED);
 		      $<i>$ = 0x0100;
 		  }
-		| ',' AVENGE_ID
+		| AVENGE_ID
 		  {
 		      add_opvars(splev, "ii", 1, SP_M_V_AVENGE);
 		      $<i>$ = 0x0200;
 		  }
-		| ',' FLEEING_ID ':' INTEGER
+		| FLEEING_ID ':' INTEGER
 		  {
-		      add_opvars(splev, "ii", (long)$4, SP_M_V_FLEEING);
+		      add_opvars(splev, "ii", (long)$3, SP_M_V_FLEEING);
 		      $<i>$ = 0x0400;
 		  }
-		| ',' BLINDED_ID ':' INTEGER
+		| BLINDED_ID ':' INTEGER
 		  {
-		      add_opvars(splev, "ii", (long)$4, SP_M_V_BLINDED);
+		      add_opvars(splev, "ii", (long)$3, SP_M_V_BLINDED);
 		      $<i>$ = 0x0800;
 		  }
-		| ',' PARALYZED_ID ':' INTEGER
+		| PARALYZED_ID ':' INTEGER
 		  {
-		      add_opvars(splev, "ii", (long)$4, SP_M_V_PARALYZED);
+		      add_opvars(splev, "ii", (long)$3, SP_M_V_PARALYZED);
 		      $<i>$ = 0x1000;
 		  }
-		| ',' STUNNED_ID
+		| STUNNED_ID
 		  {
 		      add_opvars(splev, "ii", 1, SP_M_V_STUNNED);
 		      $<i>$ = 0x2000;
 		  }
-		| ',' CONFUSED_ID
+		| CONFUSED_ID
 		  {
 		      add_opvars(splev, "ii", 1, SP_M_V_CONFUSED);
 		      $<i>$ = 0x4000;
 		  }
-		| ',' SEENTRAPS_ID ':' seen_trap_mask
+		| SEENTRAPS_ID ':' seen_trap_mask
 		  {
-		      add_opvars(splev, "ii", (long)$4, SP_M_V_SEENTRAPS);
+		      add_opvars(splev, "ii", (long)$3, SP_M_V_SEENTRAPS);
 		      $<i>$ = 0x8000;
 		  }
 		;
@@ -1316,49 +1260,11 @@ seen_trap_mask	: STRING
 		  }
 		;
 
-cobj_statements	: /* nothing */
-		  {
-		  }
-		| cobj_statement cobj_statements
-		;
-
-cobj_statement  : cobj_detail
-		| cobj_ifstatement
-		;
-
-cobj_detail	: OBJECT_ID chance ':' cobj_desc
-		  {
-		      add_opvars(splev, "io", (long)SP_OBJ_CONTENT, SPO_OBJECT);
-		      if ( 1 == $2 ) {
-			  if (n_if_list > 0) {
-			      struct opvar *tmpjmp;
-			      tmpjmp = (struct opvar *) if_list[--n_if_list];
-			      set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
-			  } else yyerror("conditional creation of obj, but no jump point marker.");
-		      }
-		  }
-		| COBJECT_ID chance ':' cobj_desc
-		  {
-		      add_opvars(splev, "io", (long)(SP_OBJ_CONTENT|SP_OBJ_CONTAINER), SPO_OBJECT);
-		      $<i>$ = $2;
-		  }
-		'{' cobj_statements '}'
-		  {
-		      add_opcode(splev, SPO_POP_CONTAINER, NULL);
-
-		      if ( 1 == $<i>5 ) {
-			  if (n_if_list > 0) {
-			      struct opvar *tmpjmp;
-			      tmpjmp = (struct opvar *) if_list[--n_if_list];
-			      set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
-			  } else yyerror("conditional creation of obj, but no jump point marker.");
-		      }
-		  }
-		;
-
 object_detail	: OBJECT_ID chance ':' object_desc
 		  {
-		      add_opvars(splev, "io", 0, SPO_OBJECT); /* 0 == not container, nor contents of one. */
+		      long cnt = 0;
+		      if (in_container_obj) cnt |= SP_OBJ_CONTENT;
+		      add_opvars(splev, "io", cnt, SPO_OBJECT); /* 0 == not container, nor contents of one. */
 		      if ( 1 == $2 ) {
 			  if (n_if_list > 0) {
 			      struct opvar *tmpjmp;
@@ -1369,11 +1275,15 @@ object_detail	: OBJECT_ID chance ':' object_desc
 		  }
 		| COBJECT_ID chance ':' object_desc
 		  {
-		      add_opvars(splev, "io", (long)SP_OBJ_CONTAINER, SPO_OBJECT);
+		      long cnt = SP_OBJ_CONTAINER;
+		      if (in_container_obj) cnt |= SP_OBJ_CONTENT;
+		      add_opvars(splev, "io", cnt, SPO_OBJECT);
 		      $<i>$ = $2;
+		      in_container_obj++;
 		  }
-		'{' cobj_statements '}'
+		'{' levstatements '}'
 		 {
+		     in_container_obj--;
 		     add_opcode(splev, SPO_POP_CONTAINER, NULL);
 
 		     if ( 1 == $<i>5 ) {
@@ -1386,9 +1296,11 @@ object_detail	: OBJECT_ID chance ':' object_desc
 		 }
 		;
 
-cobj_desc	: object_c ',' o_name object_infos
+object_desc	: object_c ',' o_name object_infos
 		  {
 		      long token = -1;
+		      if (( $4 & 0x4000) && in_container_obj) yyerror("object cannot have a coordinate when contained.");
+		      else if (!( $4 & 0x4000) && !in_container_obj) yyerror("object needs a coordinate when not contained.");
 		      if ($3) {
 			  token = get_object_id($3, $<i>1);
 			  if (token == ERR) {
@@ -1397,23 +1309,8 @@ cobj_desc	: object_c ',' o_name object_infos
 			  }
 			  Free($3);
 		      }
-		      add_opvars(splev, "iiii", -1, -1, (long)$<i>1, token);
+		      add_opvars(splev, "ii", (long)$<i>1, token);
 		  }
-		;
-
-object_desc	: object_c ',' o_name ',' coordinate object_infos
-		  {
-		      long token = -1;
-		      if ($3) {
-			  token = get_object_id($3, $<i>1);
-			  if (token == ERR) {
-			      yywarning("Illegal object name!  Making random object.");
-			      token = -1;
-			  }
-			  Free($3);
-		      }
-		      add_opvars(splev, "iiii", $5.x, $5.y, (long)$<i>1, token);
-		}
 		;
 
 object_infos	: /* nothing */
@@ -1423,91 +1320,96 @@ object_infos	: /* nothing */
 		      add_opcode(splev, SPO_PUSH, stopit);
 		      $<i>$ = 0x00;
 		  }
-		| object_infos object_info
+		| object_infos ',' object_info
 		  {
-		      if (( $<i>1 & $<i>2 ))
+		      if (( $<i>1 & $<i>3 ))
 			  yyerror("OBJECT extra info already used.");
-		      $<i>$ = ( $<i>1 | $<i>2 );
+		      $<i>$ = ( $<i>1 | $<i>3 );
 		  }
 		;
 
-object_info	: ',' CURSE_TYPE
+object_info	: CURSE_TYPE
 		  {
-		      add_opvars(splev, "ii", (long)$2, SP_O_V_CURSE);
+		      add_opvars(splev, "ii", (long)$1, SP_O_V_CURSE);
 		      $<i>$ = 0x0001;
 		  }
-		| ',' STRING
+		| STRING
 		  {
-		      long token = get_monster_id($2, (char)0);
+		      long token = get_monster_id($1, (char)0);
 		      if (token == ERR) {
 			  /* "random" */
 			  yywarning("OBJECT: Are you sure you didn't mean NAME:\"foo\"?");
 			  token = NON_PM - 1;
 		      }
 		      add_opvars(splev, "ii", token, SP_O_V_CORPSENM);
-		      Free($2);
+		      Free($1);
 		      $<i>$ = 0x0002;
 		  }
-		| ',' INTEGER
+		| INTEGER
 		  {
-		      add_opvars(splev, "ii", (long)$2, SP_O_V_SPE);
+		      add_opvars(splev, "ii", (long)$1, SP_O_V_SPE);
 		      $<i>$ = 0x0004;
 		  }
-		| ',' NAME_ID ':' STRING
+		| NAME_ID ':' STRING
 		  {
-		      add_opvars(splev, "si", $4, SP_O_V_NAME);
+		      add_opvars(splev, "si", $3, SP_O_V_NAME);
 		      $<i>$ = 0x0008;
 		  }
-		| ',' QUANTITY_ID ':' INTEGER
+		| QUANTITY_ID ':' INTEGER
 		  {
-		      add_opvars(splev, "ii", (long)$4, SP_O_V_QUAN);
+		      add_opvars(splev, "ii", (long)$3, SP_O_V_QUAN);
 		      $<i>$ = 0x0010;
 		  }
-		| ',' BURIED_ID
+		| BURIED_ID
 		  {
 		      add_opvars(splev, "ii", 1, SP_O_V_BURIED);
 		      $<i>$ = 0x0020;
 		  }
-		| ',' LIGHT_STATE
+		| LIGHT_STATE
 		  {
-		      add_opvars(splev, "ii", (long)$2, SP_O_V_LIT);
+		      add_opvars(splev, "ii", (long)$1, SP_O_V_LIT);
 		      $<i>$ = 0x0040;
 		  }
-		| ',' ERODED_ID ':' INTEGER
+		| ERODED_ID ':' INTEGER
 		  {
-		      add_opvars(splev, "ii", (long)$4, SP_O_V_ERODED);
+		      add_opvars(splev, "ii", (long)$3, SP_O_V_ERODED);
 		      $<i>$ = 0x0080;
 		  }
-		| ',' DOOR_STATE
+		| DOOR_STATE
 		  {
-		      if ($2 == D_LOCKED) {
+		      if ($1 == D_LOCKED) {
 			  add_opvars(splev, "ii", 1, SP_O_V_LOCKED);
 			  $<i>$ = 0x0100;
-		      } else if ($2 == D_BROKEN) {
+		      } else if ($1 == D_BROKEN) {
 			  add_opvars(splev, "ii", 1, SP_O_V_BROKEN);
 			  $<i>$ = 0x0200;
 		      } else
 			  yyerror("OBJECT state can only be locked or broken.");
 		  }
-		| ',' TRAPPED_ID
+		| TRAPPED_ID
 		  {
 		      add_opvars(splev, "ii", 1, SP_O_V_TRAPPED);
 		      $<i>$ = 0x0400;
 		  }
-		| ',' RECHARGED_ID ':' INTEGER
+		| RECHARGED_ID ':' INTEGER
 		  {
-		      add_opvars(splev, "ii", (long)$4, SP_O_V_RECHARGED);
+		      add_opvars(splev, "ii", (long)$3, SP_O_V_RECHARGED);
 		      $<i>$ = 0x0800;
 		  }
-		| ',' INVIS_ID
+		| INVIS_ID
 		  {
 		      add_opvars(splev, "ii", 1, SP_O_V_INVIS);
 		      $<i>$ = 0x1000;
 		  }
-		| ',' GREASED_ID
+		| GREASED_ID
 		  {
 		      add_opvars(splev, "ii", 1, SP_O_V_GREASED);
 		      $<i>$ = 0x2000;
+		  }
+		| coordinate
+		  {
+		      add_opvars(splev, "iii", $1.x, $1.y, SP_O_V_COORD);
+		      $<i>$ = 0x4000;
 		  }
 		;
 
