@@ -3,7 +3,6 @@
 #
 
 LEVEL: "nymph"
-RANDOM_MONSTERS: 'n'
 ROOM: "ordinary", unlit, random, random, (12,7)
 {
 TRAP:"board",random

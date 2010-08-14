@@ -418,7 +418,6 @@ MONSTER:('X',"xorn"),random
 LEVEL: "Mon-fila"
 MON_GENERATION:86%, (64,"earth elemental"), (16,'E'), (16,"xorn"), (4,'X')
 # Random Monsters
-RANDOM_MONSTERS: 'E', 'X'
 #
 ROOM: "ordinary" , random, random, random, random
 {
@@ -471,8 +470,6 @@ RANDOM_CORRIDORS
 
 LEVEL: "Mon-filb"
 MON_GENERATION:86%, (64,"earth elemental"), (16,'E'), (16,"xorn"), (4,'X')
-# Random Monsters
-RANDOM_MONSTERS: 'E', 'X'
 #
 ROOM: "ordinary" , random, random, random, random
 {

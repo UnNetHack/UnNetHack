@@ -301,6 +301,21 @@ const char *s;
 	}
 }
 
+
+void
+lc_error(const char *fmt, ...)
+{
+    char buf[512];
+    va_list argp;
+
+    va_start(argp, fmt);
+    (void) vsnprintf(buf, 511, fmt, argp);
+    va_end(argp);
+
+    yyerror(buf);
+}
+
+
 /*
  * Just display a warning (that is : a non fatal error)
  */
@@ -595,6 +610,21 @@ vardef_defined(f, name, casesense)
     return NULL;
 }
 
+void
+check_vardef_type(vd, varname, vartype, vartypestr)
+     struct lc_vardefs *vd;
+     char *varname;
+     long vartype;
+     char *vartypestr;
+{
+    struct lc_vardefs *tmp;
+    if ((tmp = vardef_defined(vd, varname, 1))) {
+	if (tmp->var_type != vartype)
+	    lc_error("Trying to use a non-%s%s variable '%s' as %s",
+		     vartypestr, ((vartype & SPOVAR_ARRAY) ? " array" : ""), varname, vartypestr);
+    } else lc_error("Variable '%s' not defined", varname);
+}
+
 
 /* basically copied from src/sp_lev.c */
 struct opvar *
@@ -719,6 +749,10 @@ char c;
 	for (i = LOW_PM; i < NUMMONS; i++)
 	    if (!class || class == mons[i].mlet)
 		if (!strcmp(s, mons[i].mname)) return i;
+	/* didn't find it; lets try case insensitive search */
+	for (i = LOW_PM; i < NUMMONS; i++)
+	    if (!class || class == mons[i].mlet)
+		if (!strcasecmp(s, mons[i].mname)) return i;
 	return ERR;
 }
 
@@ -1054,9 +1088,6 @@ sp_lev *maze;
 	    "gold",
 	    "corridor",
 	    "levregion",
-	    "random_objects",
-	    "random_places",
-	    "random_monsters",
 	    "drawbridge",
 	    "mazewalk",
 	    "non_diggable",

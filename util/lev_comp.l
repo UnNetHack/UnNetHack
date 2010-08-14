@@ -131,9 +131,6 @@ DRAWBRIDGE	return DRAWBRIDGE_ID;
 MAZEWALK	return MAZEWALK_ID;
 WALLIFY		return WALLIFY_ID;
 REGION		return REGION_ID;
-RANDOM_OBJECTS	return RANDOM_OBJECTS_ID;
-RANDOM_MONSTERS	return RANDOM_MONSTERS_ID;
-RANDOM_PLACES	return RANDOM_PLACES_ID;
 ALTAR		return ALTAR_ID;
 LADDER		return LADDER_ID;
 STAIR		return STAIR_ID;
@@ -209,9 +206,6 @@ south		{ yylval.i=W_SOUTH; return DIRECTION; }
 west		{ yylval.i=W_WEST; return DIRECTION; }
 random		{ yylval.i = -1; return RANDOM_TYPE; }
 none		{ yylval.i = -2; return NONE; }
-object		return O_REGISTER;
-monster		return M_REGISTER;
-place		return P_REGISTER;
 align		return A_REGISTER;
 left		{ yylval.i=1; return LEFT_OR_RIGHT; }
 half-left	{ yylval.i=2; return LEFT_OR_RIGHT; }
