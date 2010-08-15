@@ -242,7 +242,7 @@ LOOP [5 + 2d5] {
 #
 
 LEVEL: "Hea-fila"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP: mines, '.' , 'P' , false , true , lit , false
 MON_GENERATION:86%, (64,"giant rat"), (16,'r'), (16,"snake"), (4,'Y')
 NOMAP
@@ -270,7 +270,7 @@ LOOP [3 + 1d3] {
 }
 
 LEVEL: "Hea-filb"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP: mines, '.' , 'P' , false , true , lit , false
 MON_GENERATION:86%, (64,"giant rat"), (16,'r'), (16,"snake"), (4,'Y')
 NOMAP

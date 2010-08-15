@@ -1671,19 +1671,19 @@ teleprt_detail	: /* empty */
 		  }
 		;
 
-fountain_detail : FOUNTAIN_ID ':' coord_or_var
+fountain_detail : FOUNTAIN_ID ':' ter_selection
 		  {
 		      add_opvars(splev, "o", SPO_FOUNTAIN);
 		  }
 		;
 
-sink_detail : SINK_ID ':' coord_or_var
+sink_detail : SINK_ID ':' ter_selection
 		  {
 		      add_opvars(splev, "o", SPO_SINK);
 		  }
 		;
 
-pool_detail : POOL_ID ':' coord_or_var
+pool_detail : POOL_ID ':' ter_selection
 		  {
 		      add_opvars(splev, "o", SPO_POOL);
 		  }

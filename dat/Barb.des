@@ -318,7 +318,7 @@ WALLIFY
 #
 
 LEVEL: "Bar-fila"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP: mines, '.' , '.' , true , true , unlit , false
 MON_GENERATION:86%, (64,"ogre"), (16,'O'), (16,"troll"), (4,'T')
 NOMAP
@@ -346,7 +346,7 @@ MONSTER: 'O', random, hostile
 MONSTER: ('T', "rock troll"), random, hostile
 
 LEVEL: "Bar-filb"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP: mines, '.' , ' ' , true , true , unlit , true
 MON_GENERATION:86%, (64,"ogre"), (16,'O'), (16,"troll"), (4,'T')
 NOMAP

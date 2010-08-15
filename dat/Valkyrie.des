@@ -225,7 +225,7 @@ MONSTER:'H',random,hostile
 #
 
 LEVEL: "Val-fila"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP: mines, '.' , 'I' , true , true , lit, false
 MON_GENERATION:86%, (64,"fire ant"), (16,'a'), (16,"fire giant"), (4,'H')
 NOMAP
@@ -248,7 +248,7 @@ LOOP [6 + 2d2] {
 }
 
 LEVEL: "Val-filb"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP: mines, '.' , 'L' , true , true , lit, false
 MON_GENERATION:86%, (64,"fire ant"), (16,'a'), (16,"fire giant"), (4,'H')
 NOMAP

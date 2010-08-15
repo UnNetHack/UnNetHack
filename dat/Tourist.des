@@ -447,7 +447,7 @@ WALLIFY
 #
 
 LEVEL: "Tou-fila"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP: mines, '.' , ' ', true, true, random, true
 MON_GENERATION:86%, (64,"giant spider"), (16,'S'), (16,"forest centaur"), (4,'C')
 NOMAP
@@ -470,7 +470,7 @@ MONSTER: 'H', random, hostile
 MONSTER: 'C', random, hostile
 
 LEVEL: "Tou-filb"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP: mines, '.' , ' ', true, true, random, true
 MON_GENERATION:86%, (64,"giant spider"), (16,'S'), (16,"forest centaur"), (4,'C')
 NOMAP

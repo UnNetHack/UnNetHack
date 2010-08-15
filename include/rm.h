@@ -349,11 +349,11 @@ struct rm {
 
 #define SET_TYPLIT(x,y,ttyp,llit)				\
 {								\
-    levl[(x)][(y)].typ = ttyp;					\
-    if (ttyp == LAVAPOOL) levl[(x)][(y)].lit = 1;		\
-    else if ((schar)llit != -2) {				\
-	if ((schar)llit == -1) levl[(x)][(y)].lit = rn2(2);	\
-	else levl[(x)][(y)].lit = llit;				\
+    if ((ttyp) < MAX_TYPE) levl[(x)][(y)].typ = (ttyp);		\
+    if ((ttyp) == LAVAPOOL) levl[(x)][(y)].lit = 1;		\
+    else if ((schar)(llit) != -2) {				\
+	if ((schar)(llit) == -1) levl[(x)][(y)].lit = rn2(2);	\
+	else levl[(x)][(y)].lit = (llit);			\
     }								\
 }
 

@@ -1762,9 +1762,14 @@ struct mkroom	*croom;
 	/* contents */
 	if (o->containment & SP_OBJ_CONTENT) {
 	    if (!container_idx) {
-		if (!invent_carrying_monster)
-		    warning("create_object: no container");
-		else {
+		if (!invent_carrying_monster) {
+		    /*impossible("create_object: no container");*/
+		    /* don't complain, the monster may be gone legally (eg. unique demon already generated)
+		       TODO: In the case of unique demon lords, they should get their inventories even when
+		       they get generated outside the des-file. Maybe another data file that determines what
+		       inventories monsters get by default?
+		     */
+		} else {
 		    int c;
 		    struct obj *objcheck = otmp;
 		    int inuse = -1;
@@ -2741,7 +2746,7 @@ lev_init *linit;
 	lvlfill_maze_grid(2,0, x_maze_max,y_maze_max, linit->filling);
 	break;
     case LVLINIT_MINES:
-	if (linit->filling > -1) lvlfill_solid(linit->filling);
+	if (linit->filling > -1) lvlfill_solid(linit->filling, 0);
 	mkmap(linit);
 	break;
     }
@@ -3597,26 +3602,6 @@ spo_wallwalk(coder)
 }
 
 void
-spo_feature(coder)
-     struct sp_coder *coder;
-{
-    struct opvar *coord;
-    int typ;
-
-    if (!OV_pop_c(coord)) return;
-
-    switch (coder->opcode) {
-    default: impossible("spo_feature called with wrong opcode %i.", coder->opcode); break;
-    case SPO_FOUNTAIN: typ = FOUNTAIN; break;
-    case SPO_SINK:     typ = SINK;     break;
-    case SPO_POOL:     typ = POOL;     break;
-    }
-
-    create_feature(SP_COORD_X(OV_i(coord)), SP_COORD_Y(OV_i(coord)), coder->croom, typ);
-    opvar_free(coord);
-}
-
-void
 spo_trap(coder)
      struct sp_coder *coder;
 {
@@ -4055,6 +4040,15 @@ sel_set_ter(x,y,arg)
 }
 
 void
+sel_set_feature(x,y,arg)
+     int x,y;
+     genericptr_t arg;
+{
+    if (IS_FURNITURE(levl[x][y].typ)) return;
+    levl[x][y].typ = (*(int *)arg);
+}
+
+void
 sel_set_door(dx,dy,arg)
      int dx,dy;
      genericptr_t arg;
@@ -4104,6 +4098,25 @@ spo_door(coder)
 
     opvar_free(sel);
     opvar_free(msk);
+}
+
+void
+spo_feature(coder)
+     struct sp_coder *coder;
+{
+    struct opvar *sel;
+    int typ;
+
+    if (!OV_pop_typ(sel, SPOVAR_SEL)) return;
+
+    switch (coder->opcode) {
+    default: impossible("spo_feature called with wrong opcode %i.", coder->opcode); break;
+    case SPO_FOUNTAIN: typ = FOUNTAIN; break;
+    case SPO_SINK:     typ = SINK;     break;
+    case SPO_POOL:     typ = POOL;     break;
+    }
+    selection_iterate(sel, sel_set_feature, (genericptr_t)&typ);
+    opvar_free(sel);
 }
 
 void

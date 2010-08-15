@@ -39,6 +39,7 @@ ENDMAP
 REGION:(00,00,75,19),lit,"ordinary"
 REGION:(24,06,33,13),lit,"temple"
 # Portal arrival point
+TERRAIN:(05,04),'.'
 BRANCH:(05,04,05,04),(0,0,0,0)
 # Stairs
 STAIR:(52,09),down

@@ -1334,7 +1334,7 @@ STAIR:(63,15),up
 #	specific levels as defined above.
 #
 LEVEL: "hellfill"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP: mines,'.',' ',true,true,unlit,true,'L'
 TELEPORT_REGION:levregion(11,01,59,19),levregion(01,01,02,02)
 NOMAP

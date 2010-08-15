@@ -312,7 +312,7 @@ LOOP [3 + 1d6] {
 #
 
 LEVEL: "Sam-fila"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP: mines, '.' , 'P', true, true, random, true
 MON_GENERATION:86%, (64,"wolf"), (16,'d'), (16,"stalker"), (4,'E')
 NOMAP
