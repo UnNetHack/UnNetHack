@@ -1386,8 +1386,15 @@ struct mkroom	*croom;
 	y = t->y;
 	if (croom)
 	    get_free_room_loc(&x, &y, croom);
-	else
-	    get_location(&x, &y, DRY, croom);
+	else {
+	    int trycnt = 0;
+	    do {
+		x = t->x;
+		y = t->y;
+		get_location(&x, &y, DRY, croom);
+	    } while ((levl[x][y].typ == STAIRS || levl[x][y].typ == LADDER) && ++trycnt <= 100);
+	    if (trycnt > 100) return;
+	}
 
 	tm.x = x;
 	tm.y = y;
