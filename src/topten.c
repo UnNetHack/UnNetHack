@@ -737,6 +737,7 @@ boolean so;
 	char linebuf[BUFSZ];
 	char *bp, hpbuf[24], linebuf3[BUFSZ];
 	int hppos, lngr;
+	boolean nospacefound = FALSE;
 
 
 	linebuf[0] = '\0';
@@ -846,13 +847,22 @@ boolean so;
 		    !(*bp == ' ' && (bp-linebuf < hppos));
 		    bp--)
 		;
-	    /* crude fix for un-wrappable word.
-	     * needs improvement, swallows one character of the long word */
-	    if (linebuf+15 == bp) { bp += hppos-15; }
+	    /* check for un-wrappable word */
+	    if (linebuf+15 == bp) {
+		bp += hppos-15;
+		nospacefound = TRUE;
+	    }
 	    /* special case: if about to wrap in the middle of maximum
 	       dungeon depth reached, wrap in front of it instead */
 	    if (bp > linebuf + 5 && !strncmp(bp - 5, " [max", 5)) bp -= 5;
-	    Strcpy(linebuf3, bp+1);
+	    if (nospacefound) {
+		/* word wrap in the middle of a long word */
+		Strcpy(linebuf3, bp);
+		nospacefound = FALSE;
+	    } else {
+		/* word wrap on space */
+		Strcpy(linebuf3, bp+1);
+	    }
 	    *bp = 0;
 	    if (so) {
 		while (bp < linebuf + (COLNO-1)) *bp++ = ' ';
