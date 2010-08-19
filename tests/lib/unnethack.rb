@@ -88,5 +88,33 @@ def wish_for(wish)
 	return @stdin.readline.strip
 end
 
+# Name an object in slot with name
+def name(slot, name)
+	@stdout.puts "#"
+	@stdout.puts "name"
+	read_until("Name an individual object")
+	@stdout.puts 'y'
+	read_until("What do you want to name")
+	@stdout.puts slot
+	read_until("What do you want to name")
+	@stdout.puts name
+	read_until("dummy_nh_poskey")
+	return true
+end
+
+# Call an object in slot with name
+def call(slot, name)
+	@stdout.puts "#"
+	@stdout.puts "name"
+	read_until("Name an individual object")
+	@stdout.puts 'n'
+	read_until("What do you want to call")
+	@stdout.puts slot
+	read_until("Call a")
+	@stdout.puts name
+	read_until("dummy_nh_poskey")
+	return true
+end
+
 end
 
