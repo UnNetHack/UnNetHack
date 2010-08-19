@@ -315,7 +315,10 @@ register struct obj *obj;
 	short objtyp;
 
 	Sprintf(qbuf, "What do you want to name %s %s?",
-		is_plural(obj) ? "these" : "this", xname(obj));
+		is_plural(obj) ? "these" : "this",
+		safe_qbuf("", sizeof("What do you want to name these ?"),
+			xname(obj), simple_typename(obj->otyp),
+			is_plural(obj) ? "things" : "thing"));
 	getlin(qbuf, buf);
 	if(!*buf || *buf == '\033')	return;
 	/* strip leading and trailing spaces; unnames item if all spaces */
