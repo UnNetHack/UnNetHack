@@ -230,6 +230,9 @@ update: $(GAME) recover $(VARDAT) dungeon spec_levs
 	touch $(VARDIR)/perm $(VARDIR)/record
 # and a reminder
 	@echo You may also want to install the man pages via the doc Makefile.
+	@echo
+	@echo 'Note: Preferred way of building UnNetHack is by using'
+	@echo '      the configure script in the top directory!'
 
 install: $(GAME) recover $(VARDAT) dungeon spec_levs
 # set up the directories
@@ -250,6 +253,9 @@ install: $(GAME) recover $(VARDAT) dungeon spec_levs
 			chmod $(FILEPERM) perm record logfile )
 # and a reminder
 	@echo You may also want to reinstall the man pages via the doc Makefile.
+	@echo
+	@echo 'Note: Preferred way of building UnNetHack is by using'
+	@echo '      the configure script in the top directory!'
 
 
 # 'make clean' removes all the .o files, but leaves around all the executables
