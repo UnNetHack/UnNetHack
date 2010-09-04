@@ -1,4 +1,4 @@
-#	NetHack Makefile.
+#	UnNetHack Makefile.
 #	SCCS Id: @(#)Makefile.doc	3.4	1996/03/23
 
 # for Atari
@@ -39,19 +39,18 @@ Guidebook.ps:	Guidebook.mn
 Guidebook.dvi:	Guidebook.tex
 	latex Guidebook.tex
 
-
-GAME	= nethack
+GAME    = unnethack
 MANDIR	= /usr/man/man6
 MANEXT	= 6
 
 # manual installation for most BSD-style systems
-GAMEMANCREATE = cp nethack.6
+GAMEMANCREATE = cp $(GAME).6
 LEVMANCREATE = cp lev_comp.6
 DGNMANCREATE = cp dgn_comp.6
 RCVRMANCREATE = cp recover.6
 DLBMANCREATE = cp dlb.6
 # manual installation for most SYSV-style systems
-# GAMEMANCREATE = nroff -man nethack.6 >
+# GAMEMANCREATE = nroff -man $(GAME).6 >
 # LEVMANCREATE = nroff -man lev_comp.6 >
 # DGNMANCREATE = nroff -man dgn_comp.6 >
 # RCVRMANCREATE = nroff -man recover.6 >
@@ -65,15 +64,15 @@ manpages:
 	-$(DLBMANCREATE) $(MANDIR)/dlb.$(MANEXT)
 
 # manual creation for distribution
-DISTRIB = Guidebook.txt nethack.txt lev_comp.txt dgn_comp.txt recover.txt dlb.txt
+DISTRIB = Guidebook.txt $(GAME).txt lev_comp.txt dgn_comp.txt recover.txt dlb.txt
 
 distrib: $(DISTRIB)
 	@echo "Plain text documentation is up to date."
 
 Guidebook.txt	: Guidebook.mn tmac.n
 	$(GUIDECMD) > Guidebook.txt
-nethack.txt	: nethack.6
-	nroff -man nethack.6 | $(COLCMD) > nethack.txt
+$(GAME).txt	: $(GAME).6
+	nroff -man $(GAME).6 | $(COLCMD) > $(GAME).txt
 lev_comp.txt	: lev_comp.6
 	nroff -man lev_comp.6 | $(COLCMD) > lev_comp.txt
 dgn_comp.txt	: dgn_comp.6

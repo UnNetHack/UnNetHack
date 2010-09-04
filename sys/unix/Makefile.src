@@ -1,4 +1,4 @@
-#	NetHack Makefile.
+#	UnNetHack Makefile.
 #	SCCS Id: @(#)Makefile.src	3.4	2002/03/02
 
 # newer makes predefine $(MAKE) to 'make' and do smarter processing of
@@ -305,8 +305,8 @@ WINLIB = $(WINTTYLIB)
 #
 LIBS =
 
-# make NetHack
-GAME     = nethack
+# make UnNetHack
+GAME     = unnethack
 # GAME     = nethack.prg
 
 # if you defined RANDOM in unixconf.h/tosconf.h since your system did not come
@@ -331,7 +331,7 @@ MAKEDEFS = ../util/makedefs
 CONFIG_H = ../src/config.h-t
 HACK_H	= ../src/hack.h-t
 
-# all .c that are part of the main NetHack program and are not operating- or
+# all .c that are part of the main UnNetHack program and are not operating- or
 # windowing-system specific
 HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   botl.c cmd.c dbridge.c decl.c detect.c dig.c display.c dlb.c do.c \
@@ -348,7 +348,8 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   spell.c steal.c steed.c teleport.c timeout.c topten.c track.c \
            trap.c tutorial.c u_init.c uhitm.c vault.c version.c vision.c \
 	   weapon.c were.c wield.c windows.c wizard.c worm.c worn.c write.c \
-           zap.c
+	         zap.c \
+	         livelog.c
 
 # all operating-system-dependent .c (for dependencies and such)
 SYSCSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
@@ -394,7 +395,7 @@ FIRSTOBJ = monst.o objects.o
 HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	bones.o botl.o cmd.o dbridge.o decl.o detect.o dig.o display.o dlb.o \
 	do.o do_name.o do_wear.o dog.o dogmove.o dokick.o dothrow.o \
-	drawing.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
+	drawing.o dump.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
 	extralev.o files.o fountain.o hack.o hacklib.o invent.o light.o \
 	lock.o mail.o makemon.o mapglyph.o mcastu.o mhitm.o mhitu.o \
 	minion.o mklev.o mkmap.o \
@@ -406,7 +407,8 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o \
 	tutorial.o u_init.o uhitm.o vault.o vision.o vis_tab.o weapon.o \
 	were.o wield.o windows.o wizard.o worm.o worn.o write.o zap.o \
-	$(RANDOBJ) $(SYSOBJ) $(WINOBJ) version.o
+	$(RANDOBJ) $(SYSOBJ) $(WINOBJ) version.o \
+	livelog.o
 # the .o files from the HACKCSRC, SYSSRC, and WINSRC lists
 
 $(GAME):	$(SYSTEM)
@@ -440,7 +442,7 @@ SysV-AT:	DUMB.Setup $(HOBJ) Makefile
 SysBe: $(HOBJ) Makefile
 	@echo "Loading ..."
 	@$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LIBS)
-	@xres -o $(GAME) ../win/BeOS/nethack.rsrc
+	@xres -o $(GAME) ../win/BeOS/unnethack.rsrc
 	@mimeset -f $(GAME)
 	@touch SysBe
 
@@ -760,6 +762,7 @@ dogmove.o: dogmove.c $(HACK_H) ../include/mfndpos.h ../include/edog.h
 dokick.o: dokick.c $(HACK_H) ../include/eshk.h
 dothrow.o: dothrow.c $(HACK_H) ../include/edog.h
 drawing.o: drawing.c $(HACK_H) ../include/tcap.h
+dump.o: dump.c $(HACK_H) ../include/date.h
 dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h ../include/dlb.h
 eat.o: eat.c $(HACK_H)
 end.o: end.c $(HACK_H) ../include/eshk.h ../include/dlb.h
@@ -773,6 +776,7 @@ hack.o: hack.c $(HACK_H)
 hacklib.o: hacklib.c $(HACK_H)
 invent.o: invent.c $(HACK_H)
 light.o: light.c $(HACK_H) ../include/lev.h
+livelog.o: livelog.c $(HACK_H)
 lock.o: lock.c $(HACK_H)
 mail.o: mail.c $(HACK_H) ../include/mail.h
 makemon.o: makemon.c $(HACK_H) ../include/epri.h ../include/emin.h \
