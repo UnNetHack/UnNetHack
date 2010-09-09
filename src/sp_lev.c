@@ -2753,6 +2753,7 @@ lev_init *linit;
 	lvlfill_maze_grid(2,0, x_maze_max,y_maze_max, linit->filling);
 	break;
     case LVLINIT_MINES:
+	if (linit->lit == -1) linit->lit = rn2(2);
 	if (linit->filling > -1) lvlfill_solid(linit->filling, 0);
 	mkmap(linit);
 	break;
