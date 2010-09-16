@@ -1440,7 +1440,7 @@ Optional Features:
                           file=["/tmp/%n.nh"])
   --enable-dump-messages=NUMBER
                           Number of dumped messages (default=yes, default
-                          number=[20])
+                          number=[30])
   --enable-dump-text      Dump a text file (default=yes)
   --enable-dump-html      Dump an HTML file (default=no)
   --enable-dump-html-css-file=FILE
@@ -6442,10 +6442,10 @@ $as_echo_n "checking whether to enable dump messages... " >&6; }
 if test "${enable_dump_messages+set}" = set; then :
   enableval=$enable_dump_messages; if test "$enableval" != no; then enable_dump_messages=yes;
          if test "$enableval" != yes; then dump_messages=$enableval;
-         else dump_messages=20; fi;
+         else dump_messages=30; fi;
         else enable_dump_messages=no; fi
 else
-  enable_dump_messages=yes;dump_messages=20
+  enable_dump_messages=yes;dump_messages=30
 fi
 
    if test "$enable_dump_messages" != "no" ; then
