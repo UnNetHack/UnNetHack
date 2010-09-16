@@ -42,6 +42,7 @@ STATIC_DCL void FDECL(savelife, (int));
 void FDECL(list_vanquished, (CHAR_P,BOOLEAN_P));
 #ifdef DUMP_LOG
 extern char msgs[][BUFSZ];
+extern int msgs_count[];
 extern int lastmsg;
 void FDECL(do_vanquished, (int, BOOLEAN_P));
 #endif /* DUMP_LOG */
@@ -693,16 +694,20 @@ die:
 	}
 # ifdef DUMPMSGS
 	if (lastmsg >= 0) {
-		int i;
+		char tmpbuf[BUFSZ];
+		int i,j;
 		dump_title("Latest messages");
 		dump_blockquote_start();
-		for (i = lastmsg + 1; i < DUMPMSGS; i++) {
-		  if (msgs[i] && strcmp(msgs[i], "") )
-		    dump_line("  ", msgs[i]);
-		}
-		for (i = 0; i <= lastmsg; i++) {
-		  if (msgs[i] && strcmp(msgs[i], "") )
-		    dump_line("  ", msgs[i]);
+		for (j = lastmsg + 1; j < DUMPMSGS + lastmsg + 1; j++) {
+		  i = j % DUMPMSGS;
+		  if (msgs[i] && strcmp(msgs[i], "") ) {
+		    if (msgs_count[i] == 1) {
+		      dump_line("  ", msgs[i]);
+		    } else {
+		      Sprintf(tmpbuf, "%s (%dx)", msgs[i], msgs_count[i]);
+		      dump_line("  ", tmpbuf);
+		    }
+		  }
 		}
 		dump_blockquote_end();
 		dump("","");
