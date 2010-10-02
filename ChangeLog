@@ -1,4 +1,8 @@
-2010-XX-XX  UnNetHack 3.5.3
+2011-XX-XX  UnNetHack 3.5.4
+	* changing color of monster with config line:
+	  MONSTERCOLOR=acid blog:lightcyan
+
+2010-09-04  UnNetHack 3.5.3
 	* Conflict makes blackmarket shopkeeper angry
 	* Fully eroded armor gets destroyed
 	* Lowered the needed experience level for the quest
