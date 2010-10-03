@@ -1,6 +1,6 @@
 2011-XX-XX  UnNetHack 3.5.4
 	* changing color of monster with config line:
-	  MONSTERCOLOR=acid blog:lightcyan
+	  MONSTERCOLOR=acid blob:lightcyan
 
 2010-09-04  UnNetHack 3.5.3
 	* Conflict makes blackmarket shopkeeper angry
