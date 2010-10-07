@@ -1229,9 +1229,6 @@ int bool_or_comp;	/* 0 == boolean option, 1 == compound */
 	}
 }
 
-#ifdef MENU_COLOR
-extern struct menucoloring *menu_colorings;
-
 static const struct {
    const char *name;
    const int color;
@@ -1252,6 +1249,9 @@ static const struct {
    {"lightcyan", CLR_BRIGHT_CYAN},
    {"white", CLR_WHITE}
 };
+
+#ifdef MENU_COLOR
+extern struct menucoloring *menu_colorings;
 
 static const struct {
    const char *name;
