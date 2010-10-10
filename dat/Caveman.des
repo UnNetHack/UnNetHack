@@ -238,6 +238,7 @@ LOOP [10 + 2d8] {
 }
 # monsters.
 MONSTER:('D',"Chromatic Dragon"),(23,10),asleep {
+  OBJECT:('(', "Bell of Opening"),uncursed
   OBJECT:random
   OBJECT:random
   OBJECT:random

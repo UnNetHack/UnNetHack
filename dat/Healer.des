@@ -209,6 +209,7 @@ LOOP [3 + 2d3] {
 }
 # Random monsters.
 MONSTER:('H',"Cyclops"),(20,06),hostile {
+  OBJECT:('(', "Bell of Opening"),uncursed
   OBJECT:'[',1d3
 }
 MONSTER:('r',"rabid rat"),random

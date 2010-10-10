@@ -198,6 +198,7 @@ TRAP:random,random
 TRAP:random,random
 # Random monsters.
 MONSTER:('H',"Lord Surtur"),(17,08) {
+  OBJECT:('(', "Bell of Opening"),uncursed
   OBJECT:'['
   OBJECT:')'
   OBJECT:random

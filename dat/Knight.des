@@ -278,6 +278,7 @@ LOOP [2 + 2d2] {
 }
 # Random monsters.
 MONSTER:('D',"Ixoth"),(50,06),hostile {
+  OBJECT:('(', "Bell of Opening"),uncursed
   OBJECT:'?'
   OBJECT:'?'
 }

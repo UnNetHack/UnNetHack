@@ -295,6 +295,7 @@ TRAP:random,random
 TRAP:random,random
 # Random monsters.
 MONSTER:('@',"Dark One"),(16,11) {
+  OBJECT:('(', "Bell of Opening"),uncursed
   OBJECT:'/'
   OBJECT:'?'
   OBJECT:'+'

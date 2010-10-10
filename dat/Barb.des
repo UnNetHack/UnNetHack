@@ -273,7 +273,8 @@ TRAP:random,random
 TRAP:random,random
 # Random monsters.
 MONSTER:('@',"Thoth Amon"),(63,04),hostile {
-  OBJECT:')',+2
+  OBJECT:('(', "Bell of Opening"),uncursed
+  OBJECT:')',1d2
   OBJECT:'['
   OBJECT:random
   OBJECT:random

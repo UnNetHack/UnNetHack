@@ -1663,7 +1663,7 @@ struct mkroom	*croom;
 	    }
 
 	    if (m->has_invent) {
-		/*discard_minvent(mtmp);*/
+		discard_minvent(mtmp);
 		invent_carrying_monster = mtmp;
 	    }
 	}

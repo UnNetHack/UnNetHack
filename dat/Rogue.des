@@ -288,6 +288,7 @@ LOOP [7 + 1d6] {
 }
 # Random monsters.
 MONSTER:('@',"Master Assassin"),(38,10),hostile {
+  OBJECT:('(', "Bell of Opening"),uncursed
   OBJECT:'['
   OBJECT:')'
   OBJECT:'?'

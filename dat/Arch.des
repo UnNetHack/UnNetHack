@@ -359,6 +359,7 @@ TRAP:random,random
 TRAP:"rolling boulder",(46,14)
 # Random monsters.
 MONSTER:('&',"Minion of Huhetotl"),(50,14) {
+  OBJECT:('(', "Bell of Opening"),uncursed
   OBJECT:random,cursed
   OBJECT:random,cursed
   OBJECT:random,cursed

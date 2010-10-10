@@ -233,6 +233,7 @@ TRAP:random,random
 TRAP:random,random
 # Random monsters.
 MONSTER:('&',"Nalzok"),$place[0] {
+  OBJECT:('(', "Bell of Opening"),uncursed
   OBJECT:')',1d6
   OBJECT:'[',1d3
 }

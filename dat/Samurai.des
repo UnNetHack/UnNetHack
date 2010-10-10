@@ -290,6 +290,7 @@ LOOP [3 + 1d6] {
 }
 # Random monsters.
 MONSTER:('@',"Ashikaga Takauji"),(22,10) {
+  OBJECT:('(', "Bell of Opening"),uncursed
   OBJECT:('[',"splint mail")
 }
 LOOP [3 + 1d6] {

@@ -1030,8 +1030,6 @@ register int	mmflags;
 		flags.ghost_count++;
 		if (!(mmflags & MM_NONAME))
 			mtmp = christen_monst(mtmp, rndghostname());
-	} else if (ptr->msound == MS_NEMESIS) {
-		mitem = BELL_OF_OPENING;
 	}
 	if (mitem && allow_minvent) (void) mongets(mtmp, mitem);
 
@@ -1565,8 +1563,6 @@ register int otyp;
 		otmp->spe = 0;
 		otmp->age = 0L;
 		otmp->lamplit = FALSE;
-		otmp->blessed = otmp->cursed = FALSE;
-	    } else if (otmp->otyp == BELL_OF_OPENING) {
 		otmp->blessed = otmp->cursed = FALSE;
 	    } else if (otmp->otyp == SPE_BOOK_OF_THE_DEAD) {
 		otmp->blessed = FALSE;
