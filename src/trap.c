@@ -2290,7 +2290,7 @@ const char * str;
 	result = (youmonst.data->cwt);
 	weight_dmg(result);
 	result = min(6, result); 
-	killer_format = KILLED_BY_AN;
+	killer_format = KILLED_BY;
 	killer = str;
 	u.ugrave_arise = -3;
 	done(DISINTEGRATED);
