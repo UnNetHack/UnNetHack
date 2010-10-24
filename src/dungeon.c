@@ -2156,6 +2156,10 @@ recalc_mapseen()
 	/* recalculate room knowledge: for now, just shops and temples
 	 * this could be extended to an array of 0..SHOPBASE
 	 */
+#ifdef BLACKMARKET
+	/* kludge for not recording the shop room on the blackmarket level */
+	if (!Is_blackmarket(&u.uz))
+#endif
 	for (x = 0; x < sizeof(mptr->rooms); x++) {
 		if (mptr->rooms[x] & MSR_SEEN) {
 			if (rooms[x].rtype >= SHOPBASE) {
