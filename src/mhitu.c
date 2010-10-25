@@ -1413,7 +1413,8 @@ dopois:
 		    hitmsg(mtmp, mattk);
 		    break;
 		}
-		if(!uwep
+		/* this condition must match the one in sounds.c for MS_NURSE */
+		if ((!(uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
 #ifdef TOURIST
 		   && !uarmu
 #endif
