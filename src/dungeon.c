@@ -64,7 +64,7 @@ mapseen *mapseenchn = (struct mapseen *)0;
 STATIC_DCL mapseen *FDECL(load_mapseen, (int));
 STATIC_DCL void FDECL(save_mapseen, (int, mapseen *));
 STATIC_DCL mapseen *FDECL(find_mapseen, (d_level *));
-STATIC_DCL void FDECL(print_mapseen, (winid,mapseen *,boolean, boolean));
+STATIC_DCL void FDECL(print_mapseen, (winid,mapseen *, boolean, boolean, boolean));
 STATIC_DCL boolean FDECL(interest_mapseen, (mapseen *));
 STATIC_DCL char *FDECL(seen_string, (xchar, const char *));
 STATIC_DCL const char *FDECL(br_string2, (branch *));
@@ -2262,7 +2262,7 @@ dooverview()
 		if (interest_mapseen(mptr)) {
 			printdun = (first || lastdun != mptr->lev.dnum);
 			/* if (!first) putstr(win, 0, ""); */
-			print_mapseen(win, mptr, printdun, FALSE);
+			print_mapseen(win, mptr, printdun, FALSE, FALSE);
 
 			if (printdun) {
 				first = FALSE;
@@ -2309,7 +2309,8 @@ dumpoverview()
 				dump_title("Dungeon overview");
 				dump_list_start();
 			}
-			print_mapseen(0, mptr, printdun, TRUE);
+			/* currently dumping is always at the end of the game */
+			print_mapseen(0, mptr, printdun, TRUE, TRUE);
 
 			if (printdun) {
 				first = FALSE;
@@ -2419,11 +2420,12 @@ int rtype;
 #define ADDTOBUF(nam, var) { if (var) Sprintf(eos(buf), "%s " nam, COMMA); }
 
 STATIC_OVL void
-print_mapseen(win, mptr, printdun, dump)
+print_mapseen(win, mptr, printdun, dump, final)
 winid win;
 mapseen *mptr;
 boolean printdun;
-boolean dump;
+boolean dump; /**< if information should be dumped to file */
+boolean final; /**< if game is finished */
 {
 	char buf[BUFSZ];
 	int i, depthstart;
@@ -2435,7 +2437,7 @@ boolean dump;
 	if (mptr->lev.dnum == quest_dnum || mptr->lev.dnum == knox_level.dnum)
 		depthstart = 1;
 	else
-		depthstart = dungeons[mptr->lev.dnum].depth_start;  
+		depthstart = dungeons[mptr->lev.dnum].depth_start;
 
 	if (printdun) {
 		/* Sokoban lies about dunlev_ureached and we should
@@ -2480,7 +2482,7 @@ boolean dump;
 	
 #ifdef WIZARD
 	/* wizmode prints out proto dungeon names for clarity */
-	if (wizard) {
+	if (wizard || final) {
 		s_level *slev;
 		if ((slev = Is_special(&mptr->lev)))
 			Sprintf(eos(buf), " [%s]", slev->proto);
@@ -2492,7 +2494,7 @@ boolean dump;
 
 	/* print out glyph or something more interesting? */
 	Sprintf(eos(buf), "%s", on_level(&u.uz, &mptr->lev) ? 
-		" <- You are here" : "");
+		(final ? " <- You were here" : " <- You are here") : "");
 	if (!dump) {
 		putstr(win, ATR_BOLD, buf);
 	} else {
