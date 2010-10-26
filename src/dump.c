@@ -268,6 +268,49 @@ dump_blockquote_end()
 #endif
 }
 
+/** Starts a definition list in the dump. */
+void
+dump_definition_list_start()
+{
+#ifdef DUMP_LOG
+	if (html_dump_fp)
+		fprintf(html_dump_fp, "<dl>\n");
+#endif
+}
+
+/** Dumps a definition list item. */
+void
+dump_definition_list_dt(str)
+const char *str;
+{
+#ifdef DUMP_LOG
+	if (dump_fp)
+		fprintf(dump_fp, "  %s\n", str);
+	if (html_dump_fp)
+		fprintf(html_dump_fp, "<dt>%s</dt>\n", str);
+#endif
+}
+
+/** Dumps a definition list item. */
+void
+dump_definition_list_dd(str)
+const char *str;
+{
+#ifdef DUMP_LOG
+	if (dump_fp)
+		fprintf(dump_fp, "  %s\n", str);
+	if (html_dump_fp)
+		fprintf(html_dump_fp, "<dd>%s</dd>\n", str);
+#endif
+}
+
+/** Ends a list in the dump. */
+void
+dump_definition_list_end()
+{
+	dump_html("</dl>\n","");
+}
+
 #ifdef DUMP_HTML_CSS_FILE
 # ifdef DUMP_HTML_CSS_EMBEDDED
 static

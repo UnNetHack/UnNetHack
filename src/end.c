@@ -855,6 +855,12 @@ die:
 	done_money = umoney;
 #endif
 
+#ifdef DUMP_LOG
+	dumpoverview();
+	dump("", "");
+#endif
+
+	/* dump some time related information */
 #define DUMP_DATE_FORMAT "%Y-%m-%d %H:%M:%S"
 	dump_title("Game information");
 	dump_html("<div class=\"nh_game_information\">\n", "");
