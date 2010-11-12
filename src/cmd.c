@@ -124,8 +124,10 @@ STATIC_PTR int NDECL(wiz_wish);
 STATIC_PTR int NDECL(wiz_identify);
 STATIC_PTR int NDECL(wiz_map);
 STATIC_PTR int NDECL(wiz_genesis);
+#if 0
 STATIC_PTR int NDECL(wiz_where);
 STATIC_PTR int NDECL(wiz_detect);
+#endif
 STATIC_PTR int NDECL(wiz_panic);
 STATIC_PTR int NDECL(wiz_polyself);
 STATIC_PTR int NDECL(wiz_level_tele);
@@ -533,7 +535,6 @@ wiz_show_rooms()
     winid win;
     int x,y;
     char row[COLNO+1];
-    struct rm*lev;
 
     win = create_nhwindow(NHW_TEXT);
     for (y = 0; y < ROWNO; y++) {
@@ -614,6 +615,7 @@ wiz_genesis()
 	return 0;
 }
 
+#if 0
 /* ^O command - display dungeon layout */
 STATIC_PTR int
 wiz_where()
@@ -631,6 +633,7 @@ wiz_detect()
 	else	    pline("Unavailable command '^E'.");
 	return 0;
 }
+#endif
 
 /* ^V command - level teleport, or tutorial review */
 STATIC_PTR int
@@ -1512,122 +1515,122 @@ int want_disp;
 #endif
 
 static const struct func_tab cmdlist[] = {
-	{C('d'), FALSE, dokick}, /* "D" is for door!...?  Msg is in dokick.c */
-	{C('e'), TRUE, doengrave_elbereth},
+	{C('d'), FALSE, dokick, NULL}, /* "D" is for door!...?  Msg is in dokick.c */
+	{C('e'), TRUE, doengrave_elbereth, NULL},
 #ifdef WIZARD
-	{C('f'), TRUE, wiz_map},
-	{C('g'), TRUE, wiz_genesis},
-	{C('i'), TRUE, wiz_identify},
+	{C('f'), TRUE, wiz_map, NULL},
+	{C('g'), TRUE, wiz_genesis, NULL},
+	{C('i'), TRUE, wiz_identify, NULL},
 #endif
-	{C('l'), TRUE, doredraw}, /* if number_pad is set */
-	{C('n'), TRUE, donamelevel}, /* if number_pad is set */
-	{C('o'), TRUE, dooverview_or_wiz_where}, /* depending on wizard status */
-	{C('p'), TRUE, doprev_message},
-	{C('r'), TRUE, doredraw},
-	{C('t'), TRUE, dotele},
+	{C('l'), TRUE, doredraw, NULL}, /* if number_pad is set */
+	{C('n'), TRUE, donamelevel, NULL}, /* if number_pad is set */
+	{C('o'), TRUE, dooverview_or_wiz_where, NULL}, /* depending on wizard status */
+	{C('p'), TRUE, doprev_message, NULL},
+	{C('r'), TRUE, doredraw, NULL},
+	{C('t'), TRUE, dotele, NULL},
 #ifdef WIZARD
-	{C('v'), TRUE, wiz_level_tele},
-	{C('w'), TRUE, wiz_wish},
+	{C('v'), TRUE, wiz_level_tele, NULL},
+	{C('w'), TRUE, wiz_wish, NULL},
 #else
-	{C('v'), TRUE, tutorial_redisplay},
+	{C('v'), TRUE, tutorial_redisplay, NULL},
 #endif
-	{C('x'), TRUE, doattributes},
+	{C('x'), TRUE, doattributes, NULL},
 #ifdef SUSPEND
-	{C('z'), TRUE, dosuspend},
+	{C('z'), TRUE, dosuspend, NULL},
 #endif
-	{'a', FALSE, doapply},
-	{'A', FALSE, doddoremarm},
-	{M('a'), TRUE, doorganize},
+	{'a', FALSE, doapply, NULL},
+	{'A', FALSE, doddoremarm, NULL},
+	{M('a'), TRUE, doorganize, NULL},
 /*	'b', 'B' : go sw */
-	{'c', FALSE, doclose},
-	{'C', TRUE, do_mname},
-	{M('c'), TRUE, dotalk},
-	{'d', FALSE, dodrop},
-	{'D', FALSE, doddrop},
-	{M('d'), FALSE, dodip},
-	{'e', FALSE, doeat},
-	{'E', FALSE, doengrave},
-	{M('e'), TRUE, enhance_weapon_skill},
-	{'f', FALSE, dofire},
+	{'c', FALSE, doclose, NULL},
+	{'C', TRUE, do_mname, NULL},
+	{M('c'), TRUE, dotalk, NULL},
+	{'d', FALSE, dodrop, NULL},
+	{'D', FALSE, doddrop, NULL},
+	{M('d'), FALSE, dodip, NULL},
+	{'e', FALSE, doeat, NULL},
+	{'E', FALSE, doengrave, NULL},
+	{M('e'), TRUE, enhance_weapon_skill, NULL},
+	{'f', FALSE, dofire, NULL},
 /*	'F' : fight (one time) */
-	{M('f'), FALSE, doforce},
+	{M('f'), FALSE, doforce, NULL},
 /*	'g', 'G' : multiple go */
 /*	'h', 'H' : go west */
-	{'h', TRUE, dohelp}, /* if number_pad is set */
-	{'i', TRUE, ddoinv},
-	{'I', TRUE, dotypeinv},		/* Robert Viduya */
-	{M('i'), TRUE, doinvoke},
+	{'h', TRUE, dohelp, NULL}, /* if number_pad is set */
+	{'i', TRUE, ddoinv, NULL},
+	{'I', TRUE, dotypeinv, NULL},		/* Robert Viduya */
+	{M('i'), TRUE, doinvoke, NULL},
 /*	'j', 'J', 'k', 'K', 'l', 'L', 'm', 'M', 'n', 'N' : move commands */
-	{'j', FALSE, dojump}, /* if number_pad is on */
-	{M('j'), FALSE, dojump},
-	{'k', FALSE, dokick}, /* if number_pad is on */
-	{'l', FALSE, doloot}, /* if number_pad is on */
-	{M('l'), FALSE, doloot},
+	{'j', FALSE, dojump, NULL}, /* if number_pad is on */
+	{M('j'), FALSE, dojump, NULL},
+	{'k', FALSE, dokick, NULL}, /* if number_pad is on */
+	{'l', FALSE, doloot, NULL}, /* if number_pad is on */
+	{M('l'), FALSE, doloot, NULL},
 /*	'n' prefixes a count if number_pad is on */
-	{M('m'), TRUE, domonability},
-	{'N', TRUE, ddocall}, /* if number_pad is on */
-	{M('n'), TRUE, ddocall},
-	{M('N'), TRUE, ddocall},
-	{'o', FALSE, doopen},
-	{'O', TRUE, doset},
-	{M('o'), FALSE, dosacrifice},
-	{'p', FALSE, dopay},
-	{'P', FALSE, doputon},
-	{M('p'), TRUE, dopray},
-	{'q', FALSE, dodrink},
-	{'Q', FALSE, dowieldquiver},
-	{M('q'), TRUE, done2},
-	{'r', FALSE, doread},
-	{'R', FALSE, doremring},
-	{M('r'), FALSE, dorub},
+	{M('m'), TRUE, domonability, NULL},
+	{'N', TRUE, ddocall, NULL}, /* if number_pad is on */
+	{M('n'), TRUE, ddocall, NULL},
+	{M('N'), TRUE, ddocall, NULL},
+	{'o', FALSE, doopen, NULL},
+	{'O', TRUE, doset, NULL},
+	{M('o'), FALSE, dosacrifice, NULL},
+	{'p', FALSE, dopay, NULL},
+	{'P', FALSE, doputon, NULL},
+	{M('p'), TRUE, dopray, NULL},
+	{'q', FALSE, dodrink, NULL},
+	{'Q', FALSE, dowieldquiver, NULL},
+	{M('q'), TRUE, done2, NULL},
+	{'r', FALSE, doread, NULL},
+	{'R', FALSE, doremring, NULL},
+	{M('r'), FALSE, dorub, NULL},
 	{'s', TRUE, dosearch, "searching"},
-	{'S', TRUE, dosave},
-	{M('s'), FALSE, dosit},
-	{'t', FALSE, dothrow},
-	{'T', FALSE, dotakeoff},
-	{M('t'), TRUE, doturn},
+	{'S', TRUE, dosave, NULL},
+	{M('s'), FALSE, dosit, NULL},
+	{'t', FALSE, dothrow, NULL},
+	{'T', FALSE, dotakeoff, NULL},
+	{M('t'), TRUE, doturn, NULL},
 /*	'u', 'U' : go ne */
-	{'u', FALSE, dountrap}, /* if number_pad is on */
-	{M('u'), FALSE, dountrap},
-	{'v', TRUE, doversion},
-	{'V', TRUE, dohistory},
-	{M('v'), TRUE, doextversion},
-	{'w', FALSE, dowield},
-	{'W', FALSE, dowear},
-	{M('w'), FALSE, dowipe},
-	{'x', FALSE, doswapweapon},
-	{'X', TRUE, enter_explore_mode},
+	{'u', FALSE, dountrap, NULL}, /* if number_pad is on */
+	{M('u'), FALSE, dountrap, NULL},
+	{'v', TRUE, doversion, NULL},
+	{'V', TRUE, dohistory, NULL},
+	{M('v'), TRUE, doextversion, NULL},
+	{'w', FALSE, dowield, NULL},
+	{'W', FALSE, dowear, NULL},
+	{M('w'), FALSE, dowipe, NULL},
+	{'x', FALSE, doswapweapon, NULL},
+	{'X', TRUE, enter_explore_mode, NULL},
 /*	'y', 'Y' : go nw */
-	{'z', FALSE, dozap},
-	{'Z', TRUE, docast},
-	{'<', FALSE, doup},
-	{'>', FALSE, dodown},
-	{'/', TRUE, dowhatis},
-	{'&', TRUE, dowhatdoes},
-	{'?', TRUE, dohelp},
-	{M('?'), TRUE, doextlist},
+	{'z', FALSE, dozap, NULL},
+	{'Z', TRUE, docast, NULL},
+	{'<', FALSE, doup, NULL},
+	{'>', FALSE, dodown, NULL},
+	{'/', TRUE, dowhatis, NULL},
+	{'&', TRUE, dowhatdoes, NULL},
+	{'?', TRUE, dohelp, NULL},
+	{M('?'), TRUE, doextlist, NULL},
 #ifdef SHELL
-	{'!', TRUE, dosh},
+	{'!', TRUE, dosh, NULL},
 #endif
 	{'.', TRUE, donull, "waiting"},
 	{' ', TRUE, donull, "waiting"},
-	{',', FALSE, dopickup},
-	{':', TRUE, dolook},
-	{';', TRUE, doquickwhatis},
-	{'^', TRUE, doidtrap},
-	{'\\', TRUE, dodiscovered},		/* Robert Viduya */
-	{'@', TRUE, dotogglepickup},
-	{M('2'), FALSE, dotwoweapon},
-	{WEAPON_SYM,  TRUE, doprwep},
-	{ARMOR_SYM,  TRUE, doprarm},
-	{RING_SYM,  TRUE, doprring},
-	{AMULET_SYM, TRUE, dopramulet},
-	{TOOL_SYM, TRUE, doprtool},
-	{'*', TRUE, doprinuse},	/* inventory of all equipment in use */
-	{GOLD_SYM, TRUE, doprgold},
-	{SPBOOK_SYM, TRUE, dovspell},			/* Mike Stephenson */
-	{'#', TRUE, doextcmd},
-	{'_', TRUE, dotravel},
+	{',', FALSE, dopickup, NULL},
+	{':', TRUE, dolook, NULL},
+	{';', TRUE, doquickwhatis, NULL},
+	{'^', TRUE, doidtrap, NULL},
+	{'\\', TRUE, dodiscovered, NULL},		/* Robert Viduya */
+	{'@', TRUE, dotogglepickup, NULL},
+	{M('2'), FALSE, dotwoweapon, NULL},
+	{WEAPON_SYM,  TRUE, doprwep, NULL},
+	{ARMOR_SYM,  TRUE, doprarm, NULL},
+	{RING_SYM,  TRUE, doprring, NULL},
+	{AMULET_SYM, TRUE, dopramulet, NULL},
+	{TOOL_SYM, TRUE, doprtool, NULL},
+	{'*', TRUE, doprinuse, NULL},	/* inventory of all equipment in use */
+	{GOLD_SYM, TRUE, doprgold, NULL},
+	{SPBOOK_SYM, TRUE, dovspell, NULL},			/* Mike Stephenson */
+	{'#', TRUE, doextcmd, NULL},
+	{'_', TRUE, dotravel, NULL},
 	{0,0,0,0}
 };
 
