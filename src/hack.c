@@ -924,7 +924,7 @@ int mode;
 		    if (amorphous(youmonst.data))
 			You("try to ooze under the door, but can't squeeze your possessions through.");
 #ifdef AUTO_OPEN
-		    else if (iflags.autoopen && !flags.run
+		    else if (iflags.autoopen
 				&& !Confusion && !Stunned && !Fumbling) {
 			    door_opened = flags.move = doopen_indir(x, y);
 		    }
