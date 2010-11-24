@@ -660,7 +660,7 @@ boolean playing; /**< True if game is running.  */
 #endif
 	        urole.name.m,
 	        urace.adj,
-	        u.mfemale ? "Fem" : "Mal",
+	        genders[flags.female].filecode,
 	        align_str(u.ualign.type),
 #ifdef RECORD_CONDUCT
 	        encodeconduct(),
