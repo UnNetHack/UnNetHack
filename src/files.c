@@ -658,7 +658,7 @@ boolean playing; /**< True if game is running.  */
 #else
 	        0L,
 #endif
-	        urole.name.m,
+	        (flags.female && urole.name.f) ? urole.name.f : urole.name.m,
 	        urace.adj,
 	        genders[flags.female].filecode,
 	        align_str(u.ualign.type),
