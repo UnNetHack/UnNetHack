@@ -131,13 +131,6 @@ DESCRIPTION:	mazelike
 ALIGNMENT:	unaligned
 RNDLEVEL:	"knox" "K" @ (-1, 0) 3
 
-#	The Advent Calendar
-#
-DUNGEON:	"Advent Calendar" "none" (1, 0)
-DESCRIPTION:	mazelike
-ALIGNMENT:	unaligned
-LEVEL:		"advcal" "none" @ (-1, 0)
-
 ### The Black Market ###
 DUNGEON:        "One-eyed Sam's Market" "D" (1, 0)
 ALIGNMENT:      chaotic
@@ -173,3 +166,14 @@ LEVEL:		"fire"   "none" @ (3, 0)
 LEVEL:		"air"    "none" @ (4, 0)
 LEVEL:		"earth"  "none" @ (5, 0)
 LEVEL:		"dummy"  "none" @ (6, 0)
+
+#	The Advent Calendar
+#
+#	It is moved to the end to not screw up
+#	the dnum numbering for versions with the
+#	Advent Calendar
+#
+DUNGEON:	"Advent Calendar" "none" (1, 0)
+DESCRIPTION:	mazelike
+ALIGNMENT:	unaligned
+LEVEL:		"advcal" "none" @ (-1, 0)
