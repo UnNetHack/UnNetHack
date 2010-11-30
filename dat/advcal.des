@@ -61,82 +61,82 @@ DOOR:locked,(58,17)
 DOOR:locked,(64,17)
 DOOR:locked,(70,17)
 ## 64 gems in christmas colors
-OBJECT:'*',"worthless piece of violet glass",random
-OBJECT:'*',"worthless piece of violet glass",random
-OBJECT:'*',"worthless piece of violet glass",random
-OBJECT:'*',"worthless piece of violet glass",random
-OBJECT:'*',"worthless piece of violet glass",random
-OBJECT:'*',"worthless piece of violet glass",random
-OBJECT:'*',"worthless piece of violet glass",random
-OBJECT:'*',"worthless piece of violet glass",random
+OBJECT:('*',"worthless piece of violet glass"),random
+OBJECT:('*',"worthless piece of violet glass"),random
+OBJECT:('*',"worthless piece of violet glass"),random
+OBJECT:('*',"worthless piece of violet glass"),random
+OBJECT:('*',"worthless piece of violet glass"),random
+OBJECT:('*',"worthless piece of violet glass"),random
+OBJECT:('*',"worthless piece of violet glass"),random
+OBJECT:('*',"worthless piece of violet glass"),random
 
-OBJECT:'*',"worthless piece of green glass",random
-OBJECT:'*',"worthless piece of green glass",random
-OBJECT:'*',"worthless piece of green glass",random
-OBJECT:'*',"worthless piece of green glass",random
-OBJECT:'*',"worthless piece of green glass",random
-OBJECT:'*',"worthless piece of green glass",random
-OBJECT:'*',"worthless piece of green glass",random
+OBJECT:('*',"worthless piece of green glass"),random
+OBJECT:('*',"worthless piece of green glass"),random
+OBJECT:('*',"worthless piece of green glass"),random
+OBJECT:('*',"worthless piece of green glass"),random
+OBJECT:('*',"worthless piece of green glass"),random
+OBJECT:('*',"worthless piece of green glass"),random
+OBJECT:('*',"worthless piece of green glass"),random
 
-OBJECT:'*',"worthless piece of red glass",random
-OBJECT:'*',"worthless piece of red glass",random
-OBJECT:'*',"worthless piece of red glass",random
-OBJECT:'*',"worthless piece of red glass",random
-OBJECT:'*',"worthless piece of red glass",random
-OBJECT:'*',"worthless piece of red glass",random
-OBJECT:'*',"worthless piece of red glass",random
-OBJECT:'*',"worthless piece of red glass",random
-OBJECT:'*',"worthless piece of red glass",random
-OBJECT:'*',"worthless piece of red glass",random
-OBJECT:'*',"worthless piece of red glass",random
-OBJECT:'*',"worthless piece of red glass",random
-OBJECT:'*',"worthless piece of red glass",random
-OBJECT:'*',"worthless piece of red glass",random
-OBJECT:'*',"worthless piece of red glass",random
-OBJECT:'*',"worthless piece of red glass",random
+OBJECT:('*',"worthless piece of red glass"),random
+OBJECT:('*',"worthless piece of red glass"),random
+OBJECT:('*',"worthless piece of red glass"),random
+OBJECT:('*',"worthless piece of red glass"),random
+OBJECT:('*',"worthless piece of red glass"),random
+OBJECT:('*',"worthless piece of red glass"),random
+OBJECT:('*',"worthless piece of red glass"),random
+OBJECT:('*',"worthless piece of red glass"),random
+OBJECT:('*',"worthless piece of red glass"),random
+OBJECT:('*',"worthless piece of red glass"),random
+OBJECT:('*',"worthless piece of red glass"),random
+OBJECT:('*',"worthless piece of red glass"),random
+OBJECT:('*',"worthless piece of red glass"),random
+OBJECT:('*',"worthless piece of red glass"),random
+OBJECT:('*',"worthless piece of red glass"),random
+OBJECT:('*',"worthless piece of red glass"),random
 
-OBJECT:'*',"worthless piece of white glass",random
-OBJECT:'*',"worthless piece of white glass",random
-OBJECT:'*',"worthless piece of white glass",random
-OBJECT:'*',"worthless piece of white glass",random
-OBJECT:'*',"worthless piece of white glass",random
-OBJECT:'*',"worthless piece of white glass",random
-OBJECT:'*',"worthless piece of white glass",random
-OBJECT:'*',"worthless piece of white glass",random
-OBJECT:'*',"worthless piece of white glass",random
-OBJECT:'*',"worthless piece of white glass",random
-OBJECT:'*',"worthless piece of white glass",random
-OBJECT:'*',"worthless piece of white glass",random
-OBJECT:'*',"worthless piece of white glass",random
-OBJECT:'*',"worthless piece of white glass",random
-OBJECT:'*',"worthless piece of white glass",random
-OBJECT:'*',"worthless piece of white glass",random
+OBJECT:('*',"worthless piece of white glass"),random
+OBJECT:('*',"worthless piece of white glass"),random
+OBJECT:('*',"worthless piece of white glass"),random
+OBJECT:('*',"worthless piece of white glass"),random
+OBJECT:('*',"worthless piece of white glass"),random
+OBJECT:('*',"worthless piece of white glass"),random
+OBJECT:('*',"worthless piece of white glass"),random
+OBJECT:('*',"worthless piece of white glass"),random
+OBJECT:('*',"worthless piece of white glass"),random
+OBJECT:('*',"worthless piece of white glass"),random
+OBJECT:('*',"worthless piece of white glass"),random
+OBJECT:('*',"worthless piece of white glass"),random
+OBJECT:('*',"worthless piece of white glass"),random
+OBJECT:('*',"worthless piece of white glass"),random
+OBJECT:('*',"worthless piece of white glass"),random
+OBJECT:('*',"worthless piece of white glass"),random
 
-OBJECT:'*',"worthless piece of yellow glass",random
-OBJECT:'*',"worthless piece of yellow glass",random
-OBJECT:'*',"worthless piece of yellow glass",random
-OBJECT:'*',"worthless piece of yellow glass",random
-OBJECT:'*',"worthless piece of yellowish brown glass",random
-OBJECT:'*',"worthless piece of yellowish brown glass",random
-OBJECT:'*',"worthless piece of yellowish brown glass",random
-OBJECT:'*',"worthless piece of yellowish brown glass",random
-OBJECT:'*',"worthless piece of blue glass",random
-OBJECT:'*',"worthless piece of blue glass",random
-OBJECT:'*',"worthless piece of blue glass",random
-OBJECT:'*',"worthless piece of blue glass",random
-OBJECT:'*',"worthless piece of orange glass",random
-OBJECT:'*',"worthless piece of orange glass",random
-OBJECT:'*',"worthless piece of orange glass",random
-OBJECT:'*',"worthless piece of orange glass",random
+OBJECT:('*',"worthless piece of yellow glass"),random
+OBJECT:('*',"worthless piece of yellow glass"),random
+OBJECT:('*',"worthless piece of yellow glass"),random
+OBJECT:('*',"worthless piece of yellow glass"),random
+OBJECT:('*',"worthless piece of yellowish brown glass"),random
+OBJECT:('*',"worthless piece of yellowish brown glass"),random
+OBJECT:('*',"worthless piece of yellowish brown glass"),random
+OBJECT:('*',"worthless piece of yellowish brown glass"),random
+OBJECT:('*',"worthless piece of blue glass"),random
+OBJECT:('*',"worthless piece of blue glass"),random
+OBJECT:('*',"worthless piece of blue glass"),random
+OBJECT:('*',"worthless piece of blue glass"),random
+OBJECT:('*',"worthless piece of orange glass"),random
+OBJECT:('*',"worthless piece of orange glass"),random
+OBJECT:('*',"worthless piece of orange glass"),random
+OBJECT:('*',"worthless piece of orange glass"),random
 
-OBJECT[40%]:'*',"jade",random
-OBJECT[40%]:'*',"agate",random
-OBJECT[40%]:'*',"fluorite",random
-OBJECT[40%]:'*',"jasper",random
-OBJECT[40%]:'*',"amethyst",random
-OBJECT[40%]:'*',"garnet",random
-OBJECT[40%]:'*',"chrysoberyl",random
-OBJECT[40%]:'*',"opal",random
+OBJECT[40%]:('*',"jade"),random
+OBJECT[40%]:('*',"agate"),random
+OBJECT[40%]:('*',"fluorite"),random
+OBJECT[40%]:('*',"jasper"),random
+OBJECT[40%]:('*',"amethyst"),random
+OBJECT[40%]:('*',"garnet"),random
+OBJECT[40%]:('*',"chrysoberyl"),random
+OBJECT[40%]:('*',"opal"),random
 
 
 LEVEL:"advcal-2"
@@ -168,67 +168,6 @@ REGION:(00,00,74,17),lit,"ordinary"
 # Non diggable walls
 NON_DIGGABLE:(00,00,74,17)
 # Objects
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
-OBJECT:'*',random,random
+LOOP [64] {
+  OBJECT:'*',random
+}
