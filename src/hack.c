@@ -1300,20 +1300,6 @@ domove()
 			return;
 		}
 
-		/* warn player before walking into known traps */
-		if (iflags.paranoid_trap &&
-		    ((trap = t_at(x, y)) && trap->tseen)) {
-			char qbuf[BUFSZ];
-			Sprintf(qbuf,"Do you really want to %s into that %s?", 
-				locomotion(youmonst.data, "step"),
-				defsyms[trap_to_defsym(trap->ttyp)].explanation);
-			if (yn(qbuf) != 'y') {
-				nomul(0, 0);
-				flags.move = 0;
-				return;
-			}
-		}
-
 		if (((trap = t_at(x, y)) && trap->tseen) ||
 		    (Blind && !Levitation && !Flying &&
 		     !is_clinger(youmonst.data) &&
@@ -1482,6 +1468,20 @@ domove()
 		    "in place" : "to the ground");
 		nomul(0, 0);
 		return;
+	}
+
+	/* warn player before walking into known traps */
+	if (iflags.paranoid_trap &&
+			((trap = t_at(x, y)) && trap->tseen)) {
+		char qbuf[BUFSZ];
+		Sprintf(qbuf,"Do you really want to %s into that %s?", 
+				locomotion(youmonst.data, "step"),
+				defsyms[trap_to_defsym(trap->ttyp)].explanation);
+		if (yn(qbuf) != 'y') {
+			nomul(0, 0);
+			flags.move = 0;
+			return;
+		}
 	}
 	if(u.utrap) {
 		if(u.utraptype == TT_PIT) {
