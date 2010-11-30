@@ -116,7 +116,7 @@ unsigned *ospecial;
 		color = CLR_MAGENTA;
 	    else if (offset == S_corr || offset == S_litcorr)
 		color = CLR_GRAY;
-	    else if (offset >= S_room && offset <= S_water)
+	    else if (offset >= S_room && offset <= S_water && offset != S_darkroom)
 		color = CLR_GREEN;
 	    else
 		color = NO_COLOR;
@@ -144,6 +144,12 @@ unsigned *ospecial;
 	} else
 #endif
 	    obj_color(offset);
+	    /* use inverse video for multiple items */
+	    if (offset != BOULDER &&
+	        level.objects[x][y] &&
+	        level.objects[x][y]->nexthere) {
+		special |= MG_INVERSE;
+	    }
     } else if ((offset = (glyph - GLYPH_RIDDEN_OFF)) >= 0) {	/* mon ridden */
 	ch = monsyms[(int)mons[offset].mlet];
 #ifdef ROGUE_COLOR
@@ -165,6 +171,11 @@ unsigned *ospecial;
 #endif
 	    mon_color(offset);
 	    special |= MG_CORPSE;
+	    /* use inverse video for multiple items */
+	    if (level.objects[x][y] &&
+	        level.objects[x][y]->nexthere) {
+		special |= MG_INVERSE;
+	    }
     } else if ((offset = (glyph - GLYPH_DETECT_OFF)) >= 0) {	/* mon detect */
 	ch = monsyms[(int)mons[offset].mlet];
 #ifdef ROGUE_COLOR

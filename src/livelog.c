@@ -5,6 +5,12 @@
 
 #ifdef LIVELOGFILE
 
+#ifdef SHORT_FILENAMES
+#include "patchlev.h"
+#else
+#include "patchlevel.h"
+#endif
+
 /* Encodes the current xlog "achieve" status to an integer */
 long
 encodeachieve(void)
@@ -51,6 +57,7 @@ long last_achieve_int;
 /* Generic buffer for snprintf */
 #define STRBUF_LEN (4096)
 char strbuf[STRBUF_LEN];
+char prefixbuf[STRBUF_LEN];
 
 /* Open the live log file */
 boolean livelog_start() {
@@ -75,6 +82,43 @@ void livelog_write_string(char* buffer) {
 	}
 }
 
+static
+char *livelog_prefix() {
+	s_level *lev = Is_special(&u.uz);
+	snprintf(prefixbuf, STRBUF_LEN,
+			"version=%s-%d.%d.%d:"
+			"player=%s:turns=%ld:starttime=%ld:"
+			"currenttime=%ld:"
+			"dnum=%d:dlev=%d:maxlvl=%d:"
+			"dlev_name=%s:"
+			"hp=%d:maxhp=%d:deaths=%d:"
+#ifdef RECORD_REALTIME
+			"realtime=%ld:"
+#endif
+			"conduct=0x%lx:"
+			"role=%s:race=%s:"
+			"gender=%s:align=%s:"
+			"gender0=%s:align0=%s:"
+			"explvl=%d:exp=%ld",
+			GAME_SHORT_NAME, VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
+			plname,
+			moves,
+			(long)u.ubirthday,
+			(long)current_epoch(),
+			u.uz.dnum, depth(&u.uz), deepest_lev_reached(TRUE),
+			lev ? lev->proto : "", /* proto level name if special level */
+			u.uhp, u.uhpmax, u.umortality,
+#ifdef RECORD_REALTIME
+			(long)realtime_data.realtime,
+#endif
+			encodeconduct(),
+			urole.filecode, urace.filecode,
+			genders[flags.female].filecode, aligns[1-u.ualign.type].filecode,
+			genders[flags.initgend].filecode, aligns[1-u.ualignbase[A_ORIGINAL]].filecode,
+			u.ulevel,u.uexp);
+	return prefixbuf;
+}
+
 /* Writes changes in the achieve structure to the live log.
  * Called from various places in the NetHack source,
  * usually where xlog's achieve is set. */
@@ -91,10 +135,8 @@ void livelog_achieve_update() {
 	}
 
 	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:starttime=%ld:achieve=0x%lx:achieve_diff=0x%lx\n",
-		plname, 
-		moves, 
-		(long)u.ubirthday,
+		"%s:type=achievements:achieve=0x%lx:achieve_diff=0x%lx\n",
+		livelog_prefix(),
 		achieve_int,
 		achieve_diff);
 	livelog_write_string(strbuf);
@@ -108,10 +150,8 @@ livelog_wish(item)
 char *item;
 {
 	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:starttime=%ld:wish=%s:wish_count=%ld\n",
-		plname,
-		moves,
-		(long)u.ubirthday,
+		"%s:type=wish:wish=%s:wish_count=%ld\n",
+		livelog_prefix(),
 		item,
 		u.uconduct.wishes);
 	livelog_write_string(strbuf);
@@ -136,14 +176,8 @@ doshout()
 		if( *p == ':' )
 			*p = ' ';
 
-	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:starttime=%ld:shout=%s\n",
-		plname,
-		moves,
-		(long)u.ubirthday,
-		buf);
-	livelog_write_string(strbuf);
-	
+	livelog_generic("shout", buf);
+
 	return 0;
 }
 
@@ -161,30 +195,20 @@ struct monst *mtmp;
 		/* $player killed the $bones_monst of $bones_killed the former
 		 * $bones_rank on $turns on dungeon level $dlev! */
 		snprintf(strbuf, STRBUF_LEN,
-				"player=%s:turns=%ld:starttime=%ld:dlev=%d:"
-				"bones_killed=%s:bones_rank=%s:bones_monst=%s\n",
-				plname,
-				moves,
-				(long)u.ubirthday,
-				depth(&u.uz),
+				"%s:type=bones_killed:bones_killed=%s:bones_rank=%s:bones_monst=%s\n",
+				livelog_prefix(),
 				name,
 				mtmp->former_rank,
 				mtmp->data->mname);
 		livelog_write_string(strbuf);
-	} else if ((mtmp->data->geno & G_UNIQ)
-#ifdef BLACKMARKET
-	           || (mtmp->data == &mons[PM_BLACK_MARKETEER])
-#endif
-		  ) {
+	} else if (mtmp->data->geno & G_UNIQ) {
 		char *n = noit_mon_nam(mtmp);
 		/* $player killed a uniq monster */
-		snprintf(strbuf, STRBUF_LEN,
-				"player=%s:turns=%ld:starttime=%ld:killed_uniq=%s\n",
-				plname,
-				moves,
-				(long)u.ubirthday,
-				n);
-		livelog_write_string(strbuf);
+		livelog_generic("killed_uniq", n);
+	} else if (mtmp->isshk) {
+		char *n = noit_mon_nam(mtmp);
+		/* $player killed a shopkeeper */
+		livelog_generic("killed_shopkeeper", n);
 	}
 }
 #endif /* LIVELOG_BONES_KILLER */
@@ -200,17 +224,13 @@ long total;
 	   shop:       Name of the shop (e.g. general store)
 	   shoplifted: Merchandise worth this many Zorkmids was stolen */
 	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:starttime=%ld:shopkeeper=%s:shop=%s:shoplifted=%ld\n",
-		plname,
-		moves,
-		(long)u.ubirthday,
+		"%s:type=shoplifting:shopkeeper=%s:shop=%s:shoplifted=%ld\n",
+		livelog_prefix(),
 		shk_name,
 		shop_name,
 		total);
 	livelog_write_string(strbuf);
 }
-
-#endif /* LIVELOGFILE */
 
 /** Livelog method for reporting the starting/resuming of a game. */
 void
@@ -221,11 +241,9 @@ const char* race;
 const char* role;
 {
 	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:starttime=%ld:game_action=%s:"
-		"alignment=%s:race=%s:role=%s\n",
-		plname,
-		moves,
-		(long)u.ubirthday,
+		"%s:type=%s:game_action=%s:character=%s %s %s\n",
+		livelog_prefix(),
+		verb,
 		verb,
 		alignment_sex,
 		race,
@@ -239,10 +257,40 @@ livelog_game_action(verb)
 const char* verb;
 {
 	snprintf(strbuf, STRBUF_LEN,
-		"player=%s:turns=%ld:starttime=%ld:game_action=%s\n",
-		plname,
-		moves,
-		(long)u.ubirthday,
+		"%s:type=%s:game_action=%s\n",
+		livelog_prefix(),
+		verb,
 		verb);
 	livelog_write_string(strbuf);
 }
+
+/** Livelog method for reporting generic events with one customizable field. */
+void
+livelog_generic(field, text)
+const char* field;
+const char* text;
+{
+	snprintf(strbuf, STRBUF_LEN,
+		"%s:type=%s:%s=%s\n",
+		livelog_prefix(),
+		field,
+		field,
+		text);
+	livelog_write_string(strbuf);
+}
+
+/** Livelog method for reporting monster genocides. */
+void
+livelog_genocide(genocided_monster, level_wide)
+const char* genocided_monster;
+int level_wide;
+{
+	snprintf(strbuf, STRBUF_LEN,
+		"%s:type=genocide:genocided_monster=%s:dungeon_wide=%s\n",
+		livelog_prefix(),
+		genocided_monster,
+		level_wide ? "no" : "yes");
+	livelog_write_string(strbuf);
+}
+
+#endif /* LIVELOGFILE */

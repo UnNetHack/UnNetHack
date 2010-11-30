@@ -516,8 +516,11 @@ version_string(outbuf)
 char *outbuf;
 {
     Sprintf(outbuf, "%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
+#ifdef VERSION_REVISION
+    Sprintf(eos(outbuf), "-%d", VERSION_REVISION);
+#endif
 #ifdef BETA
-    Sprintf(eos(outbuf), "-%d", EDITLEVEL);
+    Sprintf(eos(outbuf), "-e%d", EDITLEVEL);
 #endif
     return outbuf;
 }
@@ -664,6 +667,7 @@ static const char *build_opts[] = {
 #ifdef REALTIME_ON_BOTL
 		"elapsed time on status line",
 #endif
+		"dungeon map overview patch",
 #ifdef ELBERETH
 		"Elbereth",
 #endif
@@ -832,6 +836,9 @@ static const char *window_opts[] = {
 #ifdef TTY_GRAPHICS
 		"traditional tty-based graphics",
 #endif
+#ifdef CURSES_GRAPHICS
+		"curses",
+#endif
 #ifdef X11_GRAPHICS
 		"X11",
 #endif
@@ -864,6 +871,7 @@ do_options()
 {
 	register int i, length;
 	register const char *str, *indent = "    ";
+	char versbuf[64];
 
 	filename[0]='\0';
 #ifdef FILE_PREFIX
@@ -878,11 +886,11 @@ do_options()
 	build_savebones_compat_string();
 	Fprintf(ofp,
 #ifdef BETA
-		"\n    UnNetHack version %d.%d.%d [beta]\n",
+		"\n    UnNetHack version %s [beta]\n",
 #else
-		"\n    UnNetHack version %d.%d.%d\n",
+		"\n    UnNetHack version %s\n",
 #endif
-		VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
+		version_string(versbuf));
 
 	Fprintf(ofp,"\nOptions compiled into this edition:\n");
 

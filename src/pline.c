@@ -18,6 +18,7 @@ static char *FDECL(You_buf, (int));
 
 #if defined(DUMP_LOG) && defined(DUMPMSGS)
 char msgs[DUMPMSGS][BUFSZ];
+int msgs_count[DUMPMSGS];
 int lastmsg = -1;
 #endif
 
@@ -63,8 +64,14 @@ pline VA_DECL(const char *, line)
 	}
 #if defined(DUMP_LOG) && defined(DUMPMSGS)
 	if (DUMPMSGS > 0 && !program_state.gameover) {
-	  lastmsg = (lastmsg + 1) % DUMPMSGS;
-	  strncpy(msgs[lastmsg], line, BUFSZ);
+		/* count identical messages */
+		if (!strncmp(msgs[lastmsg], line, BUFSZ)) {
+			msgs_count[lastmsg] += 1;
+		} else {
+			lastmsg = (lastmsg + 1) % DUMPMSGS;
+			strncpy(msgs[lastmsg], line, BUFSZ);
+			msgs_count[lastmsg] = 1;
+		}
 	}
 #endif
 	if (!iflags.window_inited) {

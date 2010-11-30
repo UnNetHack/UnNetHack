@@ -1197,8 +1197,8 @@ do_storms()
     int dirx, diry;
     int count;
 
-    /* no lightning if not the air level or too often, even then */
-    if(!Is_airlevel(&u.uz) || rn2(8))
+    /* no lightning if not stormy level or too often, even then */
+    if(!level.flags.stormy || rn2(8))
 	return;
 
     /* the number of strikes is 8-log2(nstrike) */
@@ -1839,10 +1839,10 @@ relink_timers(ghostly)
 	if (curr->needs_fixup) {
 	    if (curr->kind == TIMER_OBJECT) {
 		if (ghostly) {
-		    if (!lookup_id_mapping((unsigned)curr->arg, &nid))
+		    if (!lookup_id_mapping((size_t)curr->arg, &nid))
 			panic("relink_timers 1");
 		} else
-		    nid = (unsigned) curr->arg;
+		    nid = (size_t) curr->arg;
 		curr->arg = (genericptr_t) find_oid(nid);
 		if (!curr->arg) panic("cant find o_id %d", nid);
 		curr->needs_fixup = 0;

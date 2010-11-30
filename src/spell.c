@@ -665,8 +665,9 @@ cast_protection()
 			      hgolden);
 		else
 		    pline_The("%s around you begins to shimmer with %s haze.",
-			/*[ what about being inside solid rock while polyd? ]*/
-			(Underwater || Is_waterlevel(&u.uz)) ? "water" : "air",
+			(Underwater || Is_waterlevel(&u.uz)) ? "water" :
+			 u.uswallow ? mbodypart(u.ustuck, STOMACH) :
+			 IS_STWALL(levl[u.dx][u.dy].typ) ? "stone" : "air",
 			      an(hgolden));
 	    }
 	    u.uspellprot += gain;
@@ -1115,8 +1116,8 @@ int *spell_no;
 	return FALSE;
 }
 
-#ifdef DUMP_LOG
-void 
+/** Dump the currently known spells. */
+void
 dump_spells()
 {
 	int i;
@@ -1127,22 +1128,29 @@ dump_spells()
 	    dump("", "");
 	    return;
 	}
-	dump("", "Spells known in the end");
+	dump_title("Spells known in the end");
 
 	Sprintf(buf, "%-20s   Level    %-12s Fail", "    Name", "Category");
-	dump("  ",buf);
+	dump_text("  %s\n",buf);
+	dump_html("<table class=\"nh_spells\">\n", "");
+	dump_html("<tr><th></th><th>Name</th><th>Level</th><th>Category</th><th>Fail</th></tr>\n", "");
 	for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
 		Sprintf(buf, "%c - %-20s  %2d%s   %-12s %3d%%",
 			spellet(i), spellname(i), spellev(i),
 			spellknow(i) ? " " : "*",
 			spelltypemnemonic(spell_skilltype(spellid(i))),
 			100 - percent_success(i));
-		dump("  ", buf);
+		dump_text("  %s\n", buf);
+		Sprintf(buf, "<tr><td class=\"nh_item_letter\">%c</td><td>%s</td><td align=\"right\">%d</td><td>%s</td><td align=\"right\">%d%%</td></tr>\n",
+			spellet(i), spellname(i), spellev(i),
+			spelltypemnemonic(spell_skilltype(spellid(i))),
+			100 - percent_success(i));
+		dump_html(buf,"");
 	}
+	dump_html("</table>\n", "");
 	dump("","");
 
 } /* dump_spells */
-#endif
 
 /**
  * Integer square root function without using floating point.

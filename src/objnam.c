@@ -238,8 +238,11 @@ register struct obj *obj;
 	register int typ = obj->otyp;
 	register struct objclass *ocl = &objects[typ];
 	register int nn = ocl->oc_name_known ||
-		/* only reveal Sokoban prices when in sight */
-		(Is_sokoprize(obj) && cansee(obj->ox, obj->oy));
+		/* only reveal Sokoban prizes when in sight */
+		(Is_sokoprize(obj) &&
+		 (cansee(obj->ox, obj->oy) ||
+		  /* even reveal when Sokoban prize only felt */
+		  (u.ux == obj->ox && u.uy == obj->oy)));
 	register const char *actualn = OBJ_NAME(*ocl);
 	register const char *dn = OBJ_DESCR(*ocl);
 	register const char *un = ocl->oc_uname;
@@ -257,6 +260,8 @@ register struct obj *obj;
 	 */
 	if (!nn && ocl->oc_uses_known && ocl->oc_unique) obj->known = 0;
 	if (!Blind) obj->dknown = TRUE;
+	/* needed, otherwise BoH shows only up as "bag" when blind */
+	if (Is_sokoprize(obj)) obj->dknown = TRUE;
 	if (Role_if(PM_PRIEST)) obj->bknown = TRUE;
 	if (obj_is_pname(obj))
 	    goto nameit;
@@ -346,6 +351,9 @@ register struct obj *obj;
 			}
 			if (!f) warning("Bad fruit #%d?", obj->spe);
 			break;
+		} else if (typ == CREAM_PIE && piday()) {
+			Strcpy(buf, "irrational pie");
+			break;
 		}
 
 		Strcpy(buf, actualn);
@@ -392,7 +400,14 @@ register struct obj *obj;
 				obj->bknown && (obj->blessed || obj->cursed)) {
 				Strcat(buf, obj->blessed ? "holy " : "unholy ");
 			    }
-			    Strcat(buf, actualn);
+			    /* work around for potion alchemy bug that lets one
+			     * alchemize potions in unused range */
+			    if (actualn) {
+				Strcat(buf, actualn);
+			    } else {
+				warning("inexistant potion %d", obj->otyp);
+				Strcat(buf, "inexistant");
+			    }
 			} else {
 				Strcat(buf, " called ");
 				Strcat(buf, un);
@@ -553,9 +568,10 @@ char *prefix;
 		       is_flammable(obj) ? "fireproof " : "");
 }
 
-char *
-doname(obj)
+static char *
+doname_base(obj, with_price)
 register struct obj *obj;
+boolean with_price;
 {
 	boolean ispoisoned = FALSE;
 	char prefix[PREFIX];
@@ -600,7 +616,7 @@ register struct obj *obj;
 		Strcat(prefix, "cursed ");
 	    else if (obj->blessed)
 		Strcat(prefix, "blessed ");
-	    else if (iflags.show_buc || (!obj->known || !objects[obj->otyp].oc_charged ||
+	    else if (iflags.show_buc || ((!obj->known || !objects[obj->otyp].oc_charged ||
 		      (obj->oclass == ARMOR_CLASS ||
 		       obj->oclass == RING_CLASS))
 		/* For most items with charges or +/-, if you know how many
@@ -618,7 +634,7 @@ register struct obj *obj;
 #endif
 			&& obj->otyp != FAKE_AMULET_OF_YENDOR
 			&& obj->otyp != AMULET_OF_YENDOR
-			&& !Role_if(PM_PRIEST))
+			&& !Role_if(PM_PRIEST)))
 		Strcat(prefix, "uncursed ");
 	}
 
@@ -787,6 +803,11 @@ ring:
 			quotedprice += contained_cost(obj, shkp, 0L, FALSE, TRUE);
 		Sprintf(eos(bp), " (unpaid, %ld %s)",
 			quotedprice, currency(quotedprice));
+	} else if (with_price) {
+		long price = get_cost_of_shop_item(obj);
+		if (price > 0) {
+			Sprintf(eos(bp), " (%ld %s)", price, currency(price));
+		}
 	}
 	if (!strncmp(prefix, "a ", 2) &&
 			index(vowels, *(prefix+2) ? *(prefix+2) : *bp)
@@ -799,6 +820,22 @@ ring:
 	}
 	bp = strprepend(bp, prefix);
 	return(bp);
+}
+
+/** Wrapper function for vanilla behaviour. */
+char *
+doname(obj)
+register struct obj *obj;
+{
+	return doname_base(obj, FALSE);
+}
+
+/** Name of object including price. */
+char *
+doname_with_price(obj)
+register struct obj *obj;
+{
+	return doname_base(obj, TRUE);
 }
 
 #endif /* OVL0 */
@@ -2083,7 +2120,8 @@ boolean from_user;
     }
 
 	/* dragon scales - assumes order of dragons */
-	if(!strcmpi(bp, "scales") &&
+	if ((!strcmpi(bp, "scales") || !strcmpi(bp, "dragon scales")) &&
+			mntmp != NON_PM &&
 			mntmp >= PM_GRAY_DRAGON && mntmp <= PM_YELLOW_DRAGON) {
 		typ = GRAY_DRAGON_SCALES + mntmp - PM_GRAY_DRAGON;
 		mntmp = NON_PM;	/* no monster */
@@ -2489,15 +2527,6 @@ typfnd:
 #endif
 	    )
 	    return((struct obj *)0);
-
-	/* convert magic lamps to regular lamps before lighting them or setting
-	   the charges */
-	if (typ == MAGIC_LAMP
-#ifdef WIZARD
-				&& !wizard
-#endif
-						)
-	    typ = OIL_LAMP;
 
 	if(typ) {
 		otmp = mksobj(typ, TRUE, FALSE);

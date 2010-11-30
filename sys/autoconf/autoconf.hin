@@ -27,6 +27,9 @@
 /* Options to pass to the compression program, if any */
 #undef COMPRESS_OPTIONS
 
+/* Curses interface */
+#undef CURSES_GRAPHICS
+
 /* Unix on win32 */
 #undef CYGWIN32
 
@@ -39,14 +42,29 @@
 /* Data librarian */
 #undef DLB
 
+/* Dummy graphics */
+#undef DUMMY_GRAPHICS
+
 /* Number of dumped messages */
 #undef DUMPMSGS
 
 /* Name of character dump file */
 #undef DUMP_FN
 
+/* CSS file should be included in the HTML dump */
+#undef DUMP_HTML_CSS_EMBEDDED
+
+/* Path to the css dump file */
+#undef DUMP_HTML_CSS_FILE
+
+/* Dump an HTML file */
+#undef DUMP_HTML_LOG
+
 /* Dumping character stats */
 #undef DUMP_LOG
+
+/* Dump a text file */
+#undef DUMP_TEXT_LOG
 
 /* Dungeon growth */
 #undef DUNGEON_GROWTH
@@ -107,6 +125,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Define to 1 if you have the <utime.h> header file. */
+#undef HAVE_UTIME_H
+
 /* Use UnNetHack's compression routines */
 #undef INTERNAL_COMP
 
@@ -118,6 +139,9 @@
 
 /* Live game progress logfile */
 #undef LIVELOGFILE
+
+/* Reporting killing of uniques and ghosts of former players */
+#undef LIVELOG_BONES_KILLER
 
 /* Shoutting into the live game logfile */
 #undef LIVELOG_SHOUT
@@ -152,8 +176,14 @@
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
 
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
+
+/* Require some questions to be answered with 'yes' instead of 'y' */
+#undef PARANOID
 
 /* Compare High Score entries by user id instead of user name */
 #undef PERS_IS_UID

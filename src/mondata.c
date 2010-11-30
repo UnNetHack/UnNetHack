@@ -382,6 +382,8 @@ monsndx(ptr)		/* return an index into the mons array */
 {
 	register int	i;
 
+	if (ptr == &upermonst) return PM_PLAYERMON;
+
 	i = (int)(ptr - &mons[0]);
 	if (i < LOW_PM || i >= NUMMONS) {
 		/* ought to switch this to use `fmt_ptr' */
@@ -579,7 +581,11 @@ static const short grownups[][2] = {
 	{PM_ELF_LORD, PM_ELVENKING},
 	{PM_LICH, PM_DEMILICH}, {PM_DEMILICH, PM_MASTER_LICH},
 	{PM_MASTER_LICH, PM_ARCH_LICH},
-	{PM_VAMPIRE, PM_VAMPIRE_LORD}, {PM_BAT, PM_GIANT_BAT},
+	{PM_VAMPIRE, PM_VAMPIRE_LORD},
+#if 0 /* DEFERRED */
+	{PM_VAMPIRE_LORD, PM_VAMPIRE_MAGE},
+#endif
+	{PM_BAT, PM_GIANT_BAT},
 	{PM_BABY_GRAY_DRAGON, PM_GRAY_DRAGON},
 	{PM_BABY_SILVER_DRAGON, PM_SILVER_DRAGON},
 #if 0	/* DEFERRED */

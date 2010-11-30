@@ -36,7 +36,10 @@ NON_DIGGABLE:(00,00,75,19)
 BRANCH:(08,16,08,16),(0,0,0,0)
 #   Throne room, with Croesus on the throne
 REGION:(37,08,46,11),lit,"throne"
-MONSTER:'@',"Croesus",(43,10),hostile
+MONSTER:('@',"Croesus"),(43,10),hostile {
+  OBJECT:(')',"two-handed sword")
+  OBJECT:'['
+}
 #   The Vault
 #   Using unfilled morgue for
 #   identification in mkmaze.c
@@ -64,46 +67,46 @@ DOOR:open,(68,11)
 DOOR:closed,(63,14)
 DOOR:closed,(66,14)
 # Soldiers guarding the fort
-MONSTER:'@',"soldier",(12,14)
-MONSTER:'@',"soldier",(12,13)
-MONSTER:'@',"soldier",(11,10)
-MONSTER:'@',"soldier",(13,02)
-MONSTER:'@',"soldier",(14,03)
-MONSTER:'@',"soldier",(20,02)
-MONSTER:'@',"soldier",(30,02)
-MONSTER:'@',"soldier",(40,02)
-MONSTER:'@',"soldier",(30,16)
-MONSTER:'@',"soldier",(32,16)
-MONSTER:'@',"soldier",(40,16)
-MONSTER:'@',"soldier",(54,16)
-MONSTER:'@',"soldier",(54,14)
-MONSTER:'@',"soldier",(54,13)
-MONSTER:'@',"soldier",(57,10)
-MONSTER:'@',"soldier",(57,09)
-MONSTER:'@',"lieutenant",(15,08)
+MONSTER:('@',"soldier"),(12,14)
+MONSTER:('@',"soldier"),(12,13)
+MONSTER:('@',"soldier"),(11,10)
+MONSTER:('@',"soldier"),(13,02)
+MONSTER:('@',"soldier"),(14,03)
+MONSTER:('@',"soldier"),(20,02)
+MONSTER:('@',"soldier"),(30,02)
+MONSTER:('@',"soldier"),(40,02)
+MONSTER:('@',"soldier"),(30,16)
+MONSTER:('@',"soldier"),(32,16)
+MONSTER:('@',"soldier"),(40,16)
+MONSTER:('@',"soldier"),(54,16)
+MONSTER:('@',"soldier"),(54,14)
+MONSTER:('@',"soldier"),(54,13)
+MONSTER:('@',"soldier"),(57,10)
+MONSTER:('@',"soldier"),(57,09)
+MONSTER:('@',"lieutenant"),(15,08)
 # Four dragons guarding each side
-MONSTER:'D',random,(18,09)
-MONSTER:'D',random,(49,10)
-MONSTER:'D',random,(33,05)
-MONSTER:'D',random,(33,14)
+MONSTER:'D',(18,09)
+MONSTER:'D',(49,10)
+MONSTER:'D',(33,05)
+MONSTER:'D',(33,14)
 # Eels in the moat
-MONSTER:';',"giant eel",(17,08)
-MONSTER:';',"giant eel",(17,11)
-MONSTER:';',"giant eel",(48,08)
-MONSTER:';',"giant eel",(48,11)
+MONSTER:(';',"giant eel"),(17,08)
+MONSTER:(';',"giant eel"),(17,11)
+MONSTER:(';',"giant eel"),(48,08)
+MONSTER:(';',"giant eel"),(48,11)
 # The corner rooms treasures
-OBJECT:'*',"diamond",(19,06)
-OBJECT:'*',"diamond",(20,06)
-OBJECT:'*',"diamond",(21,06)
-OBJECT:'*',"emerald",(19,13)
-OBJECT:'*',"emerald",(20,13)
-OBJECT:'*',"emerald",(21,13)
-OBJECT:'*',"ruby",(46,06)
-OBJECT:'*',"ruby",(47,06)
-OBJECT:'*',"ruby",(48,06)
-OBJECT:'*',"amethyst",(46,13)
-OBJECT:'*',"amethyst",(47,13)
-OBJECT:'*',"amethyst",(48,13)
+OBJECT:('*',"diamond"),(19,06)
+OBJECT:('*',"diamond"),(20,06)
+OBJECT:('*',"diamond"),(21,06)
+OBJECT:('*',"emerald"),(19,13)
+OBJECT:('*',"emerald"),(20,13)
+OBJECT:('*',"emerald"),(21,13)
+OBJECT:('*',"ruby"),(46,06)
+OBJECT:('*',"ruby"),(47,06)
+OBJECT:('*',"ruby"),(48,06)
+OBJECT:('*',"amethyst"),(46,13)
+OBJECT:('*',"amethyst"),(47,13)
+OBJECT:('*',"amethyst"),(48,13)
 #
 # "Winterly Fort Ludios" by Patric Mueller <bhaak@gmx.net>
 #
@@ -139,7 +142,10 @@ NON_DIGGABLE:(00,00,75,19)
 BRANCH:(08,16,08,16),(0,0,0,0)
 #   Throne room, with Croesus on the throne
 REGION:(57,06,66,09),lit,"throne"
-MONSTER:'@',"Croesus",(63,08),hostile
+MONSTER:('@',"Croesus"),(63,08),hostile {
+  OBJECT:(')',"two-handed sword")
+  OBJECT:'['
+}
 #   The Vault
 #   Using unfilled morgue for
 #   identification in mkmaze.c
@@ -169,47 +175,47 @@ DOOR:closed,(72,15)
 #MONSTER: '@', "lieutenant",(19,07),hostile
 #OBJECT:'/',"fire",(19,07)
 # Soldiers guarding the fort
-MONSTER:'@',"soldier",(12,14)
-MONSTER:'@',"soldier",(12,13)
-MONSTER:'@',"soldier",(11,10)
-MONSTER:'@',"soldier",(13,02)
-MONSTER:'@',"soldier",(14,03)
-MONSTER:'@',"soldier",(20,02)
-MONSTER:'@',"soldier",(30,02)
-MONSTER:'@',"soldier",(40,01)
-MONSTER:'@',"soldier",(30,16)
-MONSTER:'@',"soldier",(32,16)
-MONSTER:'@',"soldier",(36,08)
-MONSTER:'@',"soldier",(54,15)
-MONSTER:'@',"soldier",(54,13)
-MONSTER:'@',"soldier",(53,12)
-MONSTER:'@',"soldier",(71,10)
-MONSTER:'@',"soldier",(57,03)
-MONSTER:'@',"lieutenant",(15,08)
+MONSTER:('@',"soldier"),(12,14)
+MONSTER:('@',"soldier"),(12,13)
+MONSTER:('@',"soldier"),(11,10)
+MONSTER:('@',"soldier"),(13,02)
+MONSTER:('@',"soldier"),(14,03)
+MONSTER:('@',"soldier"),(20,02)
+MONSTER:('@',"soldier"),(30,02)
+MONSTER:('@',"soldier"),(40,01)
+MONSTER:('@',"soldier"),(30,16)
+MONSTER:('@',"soldier"),(32,16)
+MONSTER:('@',"soldier"),(36,08)
+MONSTER:('@',"soldier"),(54,15)
+MONSTER:('@',"soldier"),(54,13)
+MONSTER:('@',"soldier"),(53,12)
+MONSTER:('@',"soldier"),(71,10)
+MONSTER:('@',"soldier"),(57,03)
+MONSTER:('@',"lieutenant"),(15,08)
 # Four dragons guarding each side
-MONSTER:'D',random,(32,09)
-MONSTER:'D',random,(49,02)
-MONSTER:'D',random,(50,12)
+MONSTER:'D',(32,09)
+MONSTER:'D',(49,02)
+MONSTER:'D',(50,12)
 # this one isn't where he's supposed to be
-MONSTER:'D',random,(25,03)
+MONSTER:'D',(25,03)
 # Eels in the moat
-MONSTER:';',"giant eel",(50,04)
-MONSTER:';',"giant eel",(60,04)
-MONSTER:';',"giant eel",(43,12)
-MONSTER:';',"giant eel",(68,09)
+MONSTER:(';',"giant eel"),(50,04)
+MONSTER:(';',"giant eel"),(60,04)
+MONSTER:(';',"giant eel"),(43,12)
+MONSTER:(';',"giant eel"),(68,09)
 # The corner rooms treasures
-OBJECT:'*',"diamond",(39,04)
-OBJECT:'*',"diamond",(40,04)
-OBJECT:'*',"diamond",(41,04)
-OBJECT:'*',"emerald",(39,11)
-OBJECT:'*',"emerald",(40,11)
-OBJECT:'*',"emerald",(41,11)
-OBJECT:'*',"ruby",(66,04)
-OBJECT:'*',"ruby",(67,04)
-OBJECT:'*',"ruby",(68,04)
-OBJECT:'*',"amethyst",(66,11)
-OBJECT:'*',"amethyst",(67,11)
-OBJECT:'*',"amethyst",(68,11)
+OBJECT:('*',"diamond"),(39,04)
+OBJECT:('*',"diamond"),(40,04)
+OBJECT:('*',"diamond"),(41,04)
+OBJECT:('*',"emerald"),(39,11)
+OBJECT:('*',"emerald"),(40,11)
+OBJECT:('*',"emerald"),(41,11)
+OBJECT:('*',"ruby"),(66,04)
+OBJECT:('*',"ruby"),(67,04)
+OBJECT:('*',"ruby"),(68,04)
+OBJECT:('*',"amethyst"),(66,11)
+OBJECT:('*',"amethyst"),(67,11)
+OBJECT:('*',"amethyst"),(68,11)
 #
 # "Minas Tirith?" by Patric Mueller <bhaak@gmx.net>
 #
@@ -248,7 +254,10 @@ REGION:(00,00,75,19),lit,"ordinary"
 BRANCH:(06,16,06,16),(0,0,0,0)
 #   Throne room, with Croesus on the throne
 REGION:(62,12,75,15),lit,"throne"
-MONSTER:'@',"Croesus",(66,14),hostile
+MONSTER:('@',"Croesus"),(66,14),hostile {
+  OBJECT:(')',"two-handed sword")
+  OBJECT:'['
+}
 #   The Vault
 #   Using unfilled morgue for
 #   identification in mkmaze.c
@@ -269,38 +278,38 @@ DRAWBRIDGE:(35,10),west,closed
 DRAWBRIDGE:(30,15),east,closed
 DRAWBRIDGE:(34,15),west,closed
 # Guards of first ringwall, with possible offensive wands
-MONSTER:'C',random,(31,02),hostile
-OBJECT[50%]: '/',random,(31,02)
-MONSTER:'C',random,(31,03),hostile
-OBJECT[50%]: '/',random,(31,03)
-MONSTER:'C',random,(31,07),hostile
-OBJECT[50%]: '/',random,(31,07)
-MONSTER:'C',random,(31,08),hostile
-OBJECT[50%]: '/',random,(31,08)
-MONSTER:'C',random,(31,12),hostile
-OBJECT[50%]: '/',random,(31,12)
-MONSTER:'C',random,(31,13),hostile
-OBJECT[50%]: '/',random,(31,13)
-MONSTER:'C',random,(31,17),hostile
-OBJECT[50%]: '/',random,(31,17)
-MONSTER:'C',random,(31,18),hostile
-OBJECT[50%]: '/',random,(31,18)
-MONSTER:'C',random,(33,02),hostile
-OBJECT[50%]: '/',random,(33,02)
-MONSTER:'C',random,(33,03),hostile
-OBJECT[50%]: '/',random,(33,03)
-MONSTER:'C',random,(33,07),hostile
-OBJECT[50%]: '/',random,(33,07)
-MONSTER:'C',random,(33,08),hostile
-OBJECT[50%]: '/',random,(33,08)
-MONSTER:'C',random,(33,12),hostile
-OBJECT[50%]: '/',random,(33,12)
-MONSTER:'C',random,(33,13),hostile
-OBJECT[50%]: '/',random,(33,13)
-MONSTER:'C',random,(33,17),hostile
-OBJECT[50%]: '/',random,(33,17)
-MONSTER:'C',random,(33,18),hostile
-OBJECT[50%]: '/',random,(33,18)
+MONSTER:'C',(31,02),hostile
+OBJECT[50%]: '/',(31,02)
+MONSTER:'C',(31,03),hostile
+OBJECT[50%]: '/',(31,03)
+MONSTER:'C',(31,07),hostile
+OBJECT[50%]: '/',(31,07)
+MONSTER:'C',(31,08),hostile
+OBJECT[50%]: '/',(31,08)
+MONSTER:'C',(31,12),hostile
+OBJECT[50%]: '/',(31,12)
+MONSTER:'C',(31,13),hostile
+OBJECT[50%]: '/',(31,13)
+MONSTER:'C',(31,17),hostile
+OBJECT[50%]: '/',(31,17)
+MONSTER:'C',(31,18),hostile
+OBJECT[50%]: '/',(31,18)
+MONSTER:'C',(33,02),hostile
+OBJECT[50%]: '/',(33,02)
+MONSTER:'C',(33,03),hostile
+OBJECT[50%]: '/',(33,03)
+MONSTER:'C',(33,07),hostile
+OBJECT[50%]: '/',(33,07)
+MONSTER:'C',(33,08),hostile
+OBJECT[50%]: '/',(33,08)
+MONSTER:'C',(33,12),hostile
+OBJECT[50%]: '/',(33,12)
+MONSTER:'C',(33,13),hostile
+OBJECT[50%]: '/',(33,13)
+MONSTER:'C',(33,17),hostile
+OBJECT[50%]: '/',(33,17)
+MONSTER:'C',(33,18),hostile
+OBJECT[50%]: '/',(33,18)
 # Drawbridges of second ringwall
 DRAWBRIDGE:(16,06),east,closed
 DRAWBRIDGE:(22,06),west,closed
@@ -309,22 +318,22 @@ DRAWBRIDGE:(21,10),west,closed
 DRAWBRIDGE:(16,14),east,closed
 DRAWBRIDGE:(22,14),west,closed
 # Guards of first ringwall, with possible offensive wands
-MONSTER:'C',random,(18,04),hostile
-MONSTER:'C',random,(20,04),hostile
-OBJECT[50%]:'/',random,(18,04)
-OBJECT[50%]:'/',random,(20,04)
-MONSTER:'C',random,(18,08),hostile
-MONSTER:'C',random,(20,08),hostile
-OBJECT[50%]:'/',random,(18,08)
-OBJECT[50%]:'/',random,(20,08)
-MONSTER:'C',random,(18,12),hostile
-MONSTER:'C',random,(20,12),hostile
-OBJECT[50%]:'/',random,(18,12)
-OBJECT[50%]:'/',random,(20,12)
-MONSTER:'C',random,(18,16),hostile
-MONSTER:'C',random,(20,16),hostile
-OBJECT[50%]:'/',random,(18,16)
-OBJECT[50%]:'/',random,(20,16)
+MONSTER:'C',(18,04),hostile
+MONSTER:'C',(20,04),hostile
+OBJECT[50%]:'/',(18,04)
+OBJECT[50%]:'/',(20,04)
+MONSTER:'C',(18,08),hostile
+MONSTER:'C',(20,08),hostile
+OBJECT[50%]:'/',(18,08)
+OBJECT[50%]:'/',(20,08)
+MONSTER:'C',(18,12),hostile
+MONSTER:'C',(20,12),hostile
+OBJECT[50%]:'/',(18,12)
+OBJECT[50%]:'/',(20,12)
+MONSTER:'C',(18,16),hostile
+MONSTER:'C',(20,16),hostile
+OBJECT[50%]:'/',(18,16)
+OBJECT[50%]:'/',(20,16)
 # Doors
 DOOR:closed,(04,14)
 DOOR:closed,(07,03)
@@ -337,60 +346,60 @@ DOOR:closed,(42,03)
 DOOR:closed,(42,17)
 DOOR:closed,(42,19)
 # elves
-MONSTER:'@',"Grey-elf",    (60,03),hostile
-MONSTER:'@',"Woodland-elf",(60,04),hostile
-MONSTER:'@',"Green-elf",   (60,05),hostile
-MONSTER:'@',"Grey-elf",    (60,06),hostile
-MONSTER:'@',"Woodland-elf",(60,07),hostile
-MONSTER:'@',"Green-elf",   (60,08),hostile
-MONSTER:'@',"Grey-elf",    (60,09),hostile
-MONSTER:'@',"Woodland-elf",(60,10),hostile
-MONSTER:'@',"Elvenking",   (60,11),hostile
-MONSTER:'@',"Grey-elf",    (60,12),hostile
-MONSTER:'@',"Woodland-elf",(60,13),hostile
-MONSTER:'@',"Green-elf",   (60,14),hostile
-MONSTER:'@',"elf-lord",    (60,15),hostile
-MONSTER:'@',"Grey-elf",    (60,16),hostile
-MONSTER:'@',"Woodland-elf",(60,17),hostile
+MONSTER:('@',"Grey-elf"),    (60,03),hostile
+MONSTER:('@',"Woodland-elf"),(60,04),hostile
+MONSTER:('@',"Green-elf"),   (60,05),hostile
+MONSTER:('@',"Grey-elf"),    (60,06),hostile
+MONSTER:('@',"Woodland-elf"),(60,07),hostile
+MONSTER:('@',"Green-elf"),   (60,08),hostile
+MONSTER:('@',"Grey-elf"),    (60,09),hostile
+MONSTER:('@',"Woodland-elf"),(60,10),hostile
+MONSTER:('@',"Elvenking"),   (60,11),hostile
+MONSTER:('@',"Grey-elf"),    (60,12),hostile
+MONSTER:('@',"Woodland-elf"),(60,13),hostile
+MONSTER:('@',"Green-elf"),   (60,14),hostile
+MONSTER:('@',"elf-lord"),    (60,15),hostile
+MONSTER:('@',"Grey-elf"),    (60,16),hostile
+MONSTER:('@',"Woodland-elf"),(60,17),hostile
 # Soldiers guarding the fort in front of ringwalls
-MONSTER:'@',"soldier",(12,14)
-MONSTER:'@',"soldier",(12,13)
-MONSTER:'@',"soldier",(11,10)
-MONSTER:'@',"soldier",(13,15)
-MONSTER:'@',"soldier",(14,04)
-MONSTER:'@',"soldier",(12,18)
-MONSTER:'@',"soldier",(13,12)
-MONSTER:'@',"soldier",(14,8)
-MONSTER:'@',"lieutenant",(12,08)
-MONSTER:'@',"soldier",(28,16)
-MONSTER:'@',"soldier",(24,17)
-MONSTER:'@',"soldier",(25,09)
-MONSTER:'@',"soldier",(25,15)
-MONSTER:'@',"soldier",(26,13)
-MONSTER:'@',"soldier",(27,04)
-MONSTER:'@',"soldier",(28,10)
-MONSTER:'@',"soldier",(23,03)
-MONSTER:'@',"lieutenant",(26,08)
+MONSTER:('@',"soldier"),(12,14)
+MONSTER:('@',"soldier"),(12,13)
+MONSTER:('@',"soldier"),(11,10)
+MONSTER:('@',"soldier"),(13,15)
+MONSTER:('@',"soldier"),(14,04)
+MONSTER:('@',"soldier"),(12,18)
+MONSTER:('@',"soldier"),(13,12)
+MONSTER:('@',"soldier"),(14,8)
+MONSTER:('@',"lieutenant"),(12,08)
+MONSTER:('@',"soldier"),(28,16)
+MONSTER:('@',"soldier"),(24,17)
+MONSTER:('@',"soldier"),(25,09)
+MONSTER:('@',"soldier"),(25,15)
+MONSTER:('@',"soldier"),(26,13)
+MONSTER:('@',"soldier"),(27,04)
+MONSTER:('@',"soldier"),(28,10)
+MONSTER:('@',"soldier"),(23,03)
+MONSTER:('@',"lieutenant"),(26,08)
 # Four dragons guarding the fort
-MONSTER:'D',random,(42,09)
-MONSTER:'D',random,(50,09)
-MONSTER:'D',random,(49,08)
-MONSTER:'D',random,(46,12)
+MONSTER:'D',(42,09)
+MONSTER:'D',(50,09)
+MONSTER:'D',(49,08)
+MONSTER:'D',(46,12)
 # Eels in the moat
-MONSTER:';',"giant eel",(16,04)
-MONSTER:';',"giant eel",(22,15)
-MONSTER:';',"giant eel",(29,07)
-MONSTER:';',"giant eel",(35,14)
+MONSTER:(';',"giant eel"),(16,04)
+MONSTER:(';',"giant eel"),(22,15)
+MONSTER:(';',"giant eel"),(29,07)
+MONSTER:(';',"giant eel"),(35,14)
 # The corner rooms treasures
-OBJECT:'*',"diamond",(62,17)
-OBJECT:'*',"diamond",(62,18)
-OBJECT:'*',"diamond",(62,19)
-OBJECT:'*',"emerald",(74,17)
-OBJECT:'*',"emerald",(74,18)
-OBJECT:'*',"emerald",(74,19)
-OBJECT:'*',"ruby",(62,01)
-OBJECT:'*',"ruby",(62,02)
-OBJECT:'*',"ruby",(62,03)
-OBJECT:'*',"amethyst",(74,01)
-OBJECT:'*',"amethyst",(74,02)
-OBJECT:'*',"amethyst",(74,03)
+OBJECT:('*',"diamond"),(62,17)
+OBJECT:('*',"diamond"),(62,18)
+OBJECT:('*',"diamond"),(62,19)
+OBJECT:('*',"emerald"),(74,17)
+OBJECT:('*',"emerald"),(74,18)
+OBJECT:('*',"emerald"),(74,19)
+OBJECT:('*',"ruby"),(62,01)
+OBJECT:('*',"ruby"),(62,02)
+OBJECT:('*',"ruby"),(62,03)
+OBJECT:('*',"amethyst"),(74,01)
+OBJECT:('*',"amethyst"),(74,02)
+OBJECT:('*',"amethyst"),(74,03)

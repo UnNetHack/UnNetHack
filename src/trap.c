@@ -196,6 +196,7 @@ struct monst *victim;
 			  Monnam(victim), ostr,
 			  vtense(ostr, "look"), msg[type]);
 	    }
+	    destroy_arm(otmp);
 	}
 	return(TRUE);
 }
@@ -325,7 +326,8 @@ boolean td;	/* td == TRUE : trap door or hole */
 	d_level dtmp;
 	char msgbuf[BUFSZ];
 	const char *dont_fall = 0;
-	register int newlevel = dunlev(&u.uz);
+	int currentlevel = dunlev(&u.uz);
+	int newlevel = currentlevel;
 
 	/* KMH -- You can't escape the Sokoban level traps */
 	if(Blind && Levitation && !In_sokoban(&u.uz)) return;
@@ -373,8 +375,31 @@ boolean td;	/* td == TRUE : trap door or hole */
 	if (Is_stronghold(&u.uz)) {
 	    find_hell(&dtmp);
 	} else {
+		static const char * const falling_down_msgs[] = {
+			"fall down a shaft!",
+			"fall down a deep shaft!",
+			"keep falling down a really deep shaft!",
+			"keep falling down an unbelievable deep shaft!",
+		};
+		/* TODO: Hallucination messages */
+
 	    dtmp.dnum = u.uz.dnum;
 	    dtmp.dlevel = newlevel;
+	    switch (newlevel-currentlevel) {
+	    case 1:
+		    /* no message when falling to the next level */
+		    break;
+	    case 2:
+	    case 3:
+	    case 4:
+	    case 5:
+		    You(falling_down_msgs[newlevel-currentlevel-2]);
+		    break;
+	    default:
+		    You("are falling down an unbelievable deep shaft!");
+		    pline("While falling you wonder how unlikely it is to find such a deep shaft."); /* (1/4)^5 ~= 0.1% */
+		    break;
+	    }
 	}
 	if (!td)
 	    Sprintf(msgbuf, "The hole in the %s above you closes up.",
@@ -2267,7 +2292,7 @@ const char * str;
 	result = (youmonst.data->cwt);
 	weight_dmg(result);
 	result = min(6, result); 
-	killer_format = KILLED_BY_AN;
+	killer_format = KILLED_BY;
 	killer = str;
 	u.ugrave_arise = -3;
 	done(DISINTEGRATED);
@@ -3053,6 +3078,15 @@ drown()
 	}
 	u.uinwater = 1;
 	You("drown.");
+	/* [ALI] Vampires return to vampiric form on drowning.
+	 */
+	if (Upolyd && !Unchanging && Race_if(PM_VAMPIRE)) {
+		rehumanize();
+		u.uinwater = 0;
+		/* should be unnecessary as spoteffects() should get called */
+		/* You("fly up out of the water!"); */
+		return (TRUE);
+	}
 	killer_format = KILLED_BY_AN;
 	killer = (levl[u.ux][u.uy].typ == POOL || Is_medusa_level(&u.uz)) ?
 	    "pool of water" : "moat";
@@ -3063,9 +3097,9 @@ drown()
 		done(DROWNING);
 	}
 	if (u.uinwater) {
-	    u.uinwater = 0;
-	    You("find yourself back %s.", Is_waterlevel(&u.uz) ?
-		"in an air bubble" : "on land");
+		u.uinwater = 0;
+		You("find yourself back %s.", Is_waterlevel(&u.uz) ?
+				"in an air bubble" : "on land");
 	}
 	return(TRUE);
 }

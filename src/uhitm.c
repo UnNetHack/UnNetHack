@@ -201,7 +201,7 @@ struct obj *wep;	/* uwep for attack(), null for kick_monster() */
 		}
 		if (canspotmon(mtmp)) {
 			Sprintf(qbuf, "Really attack %s?", mon_nam(mtmp));
-			if (yn(qbuf) != 'y') {
+			if (paranoid_yn(qbuf, iflags.paranoid_hit) != 'y') {
 				flags.move = 0;
 				return(TRUE);
 			}
@@ -411,7 +411,7 @@ register struct monst *mtmp;
 		return(FALSE);
 
 	tmp = find_roll_to_hit(mtmp);
-	if (Upolyd)
+	if (Upolyd || Race_if(PM_VAMPIRE))
 		(void) hmonas(mtmp, tmp);
 	else
 		(void) hitum(mtmp, tmp, youmonst.data->mattk);
@@ -1763,22 +1763,18 @@ register struct attack *mattk;
 		}
 
 		You("eat %s brain!", s_suffix(mon_nam(mdef)));
-		u.uconduct.food++;
 		if (touch_petrifies(mdef->data) && !Stone_resistance && !Stoned) {
 		    Stoned = 5;
 		    killer_format = KILLED_BY_AN;
 		    delayed_killer = mdef->data->mname;
-#ifdef WEBB_DISINT
-          /*		handled in tohit
-
-                  } else if (touch_disintegrates(mdef->data)) {
-                  tmp += instadisintegrate(mdef->data->mname); */
-#endif
 		}
-		if (!vegan(mdef->data))
-		    u.uconduct.unvegan++;
 		if (!vegetarian(mdef->data))
-		    violated_vegetarian();
+		    violated(CONDUCT_VEGETARIAN);
+		else if (!vegan(mdef->data))
+		    violated(CONDUCT_VEGAN);
+		else
+		    violated(CONDUCT_FOODLESS);
+
 		if (mindless(mdef->data)) {
 		    pline("%s doesn't notice.", Monnam(mdef));
 		    break;
@@ -2021,11 +2017,12 @@ register struct attack *mattk;
 			}
 
 			/* KMH, conduct */
-			u.uconduct.food++;
-			if (!vegan(mdef->data))
-			     u.uconduct.unvegan++;
 			if (!vegetarian(mdef->data))
-			     violated_vegetarian();
+			    violated(CONDUCT_VEGETARIAN);
+			else if (!vegan(mdef->data))
+			    violated(CONDUCT_VEGAN);
+			else
+			    violated(CONDUCT_FOODLESS);
 
 			/* Use up amulet of life saving */
 			if (!!(otmp = mlifesaver(mdef))) m_useup(mdef, otmp);
@@ -2180,6 +2177,7 @@ register int tmp;
 	int	i, sum[NATTK], hittmp = 0;
 	int	nsum = 0;
 	int	dhit = 0;
+	boolean Old_Upolyd = Upolyd;
 
 	for(i = 0; i < NATTK; i++) {
 
@@ -2231,15 +2229,21 @@ use_weapon:
 		case AT_BITE:
 			/* [ALI] Vampires are also smart. They avoid biting
 			   monsters if doing so would be fatal */
-			if ((uwep || (u.twoweap && uswapwep)) &&
-				is_vampire(youmonst.data) &&
+			if (i > 0 && is_vampire(youmonst.data) &&
 				(is_rider(mon->data) ||
+				 touch_petrifies(mon->data) ||
+				 mon->data == &mons[PM_MEDUSA] ||
 				 mon->data == &mons[PM_GREEN_SLIME]))
 			    break;
 		case AT_KICK:
 		case AT_STNG:
 		case AT_TUCH:
 		case AT_BUTT:
+			if (i==0 && uwep && (youmonst.data->mlet==S_LICH)) goto use_weapon;
+			if ((uwep || u.twoweap && uswapwep) &&
+				(touch_petrifies(mon->data) ||
+				 mon->data == &mons[PM_MEDUSA]))
+			    break;
 		case AT_TENT:
 			if (i==0 && uwep && (youmonst.data->mlet==S_LICH)) goto use_weapon;
 			if ((dhit = (tmp > rnd(20) || u.uswallow)) != 0) {
@@ -2401,8 +2405,8 @@ use_weapon:
 		(void) passive(mon, sum[i], 1, mattk->aatyp);
 		nsum |= sum[i];
 	    }
-	    if (!Upolyd)
-		break; /* No extra attacks if no longer a monster */
+	    if (Upolyd != Old_Upolyd)
+		break; /* No extra attacks if form changed */
 	    if (multi < 0)
 		break; /* If paralyzed while attacking, i.e. floating eye */
 	}

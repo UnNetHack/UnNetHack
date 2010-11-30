@@ -302,7 +302,7 @@ register boolean restrict_typ; /* restrict for otmp->otyp? */
 	    if (restrict_typ && a->otyp != otmp->otyp) continue;
 	    aname = a->name;
 	    if (!strncmpi(aname, "the ", 4)) aname += 4;
-	    if (!strcmp(aname, name))
+	    if (!strcmpi(aname, name))
 		return ((boolean)((a->spfx & (SPFX_NOGEN|SPFX_RESTR)) != 0 ||
 			otmp->quan > 1L));
 	}
@@ -1381,7 +1381,7 @@ arti_invoke(obj)
 	    break;
 	  }
 	case ENLIGHTENING:
-	    enlightenment(0);
+	    enlightenment(0, TRUE);
 	    break;
 	case CREATE_AMMO: {
 	    struct obj *otmp = mksobj(ARROW, TRUE, FALSE);

@@ -10,6 +10,7 @@
 LEVEL: "Rog-strt"
 FLAGS: noteleport, hardfloor, nommap, mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"leprechaun"), (16,'n'), (16,"guardian naga"), (4,'N')
 GEOMETRY:center,center
 #         1         2         3         4         5         6         7
 #123456789012345678901234567890123456789012345678901234567890123456789012345
@@ -40,11 +41,15 @@ ENDMAP
 #REGION:(00,00,75,20),lit,"ordinary"
 # The down stairs is at one of the 4 "exits".  The others are mimics,
 # mimicing stairwells.
-RANDOM_PLACES: (33,0), (0,12), (25,20), (75,05)
-STAIR:place[0],down
-MONSTER:'m',"giant mimic", place[1], m_feature "staircase down"
-MONSTER:'m',"large mimic", place[2], m_feature "staircase down"
-MONSTER:'m',"small mimic", place[3], m_feature "staircase down"
+
+$streets = selection: floodfill(0,12)
+
+$place = { (33,0), (0,12), (25,20), (75,05) }
+SHUFFLE: $place
+STAIR:$place[0],down
+MONSTER:('m',"giant mimic"), $place[1], m_feature "staircase down"
+MONSTER:('m',"large mimic"), $place[2], m_feature "staircase down"
+MONSTER:('m',"small mimic"), $place[3], m_feature "staircase down"
 # Portal arrival point
 BRANCH:(19,09,19,09),(0,0,0,0)
 # Doors (secret)
@@ -97,75 +102,62 @@ DOOR: closed, ( 6,18)
 DOOR: closed, (65,18)
 DOOR: closed, (68,18)
 # Master of Thieves
-MONSTER:'@',"Master of Thieves",(36,11)
+MONSTER:('@',"Master of Thieves"),(36,11) {
+  OBJECT:'['
+  OBJECT:')'
+  OBJECT:'!'
+  OBJECT:'!'
+  OBJECT:'!'
+  OBJECT:'!'
+}
 # The treasure of Master of Thieves
-OBJECT:'(',"chest",(36,11)
+OBJECT:('(',"chest"),(36,11)
 # thug guards, room #1
-MONSTER:'@',"thug",(28,10)
-MONSTER:'@',"thug",(29,11)
-MONSTER:'@',"thug",(30,09)
-MONSTER:'@',"thug",(31,07)
+MONSTER:('@',"thug"),(28,10)
+MONSTER:('@',"thug"),(29,11)
+MONSTER:('@',"thug"),(30,09)
+MONSTER:('@',"thug"),(31,07)
 # thug guards, room #2
-MONSTER:'@',"thug",(31,13)
-MONSTER:'@',"thug",(33,14)
-MONSTER:'@',"thug",(30,15)
+MONSTER:('@',"thug"),(31,13)
+MONSTER:('@',"thug"),(33,14)
+MONSTER:('@',"thug"),(30,15)
 #thug guards, room #3
-MONSTER:'@',"thug",(35,09)
-MONSTER:'@',"thug",(36,13)
+MONSTER:('@',"thug"),(35,09)
+MONSTER:('@',"thug"),(36,13)
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,20)
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [15 + 1d10] {
+  TRAP:random,random
+}
 #
 # Monsters to get in the way.
 #
 # West exit
-MONSTER: 'l',"leprechaun",(01,12),hostile
-MONSTER: 'n',"water nymph",(02,12),hostile
+MONSTER: ('l',"leprechaun"),(01,12),hostile
+MONSTER: ('n',"water nymph"),(02,12),hostile
 # North exit
-MONSTER: 'n',"water nymph",(33,01),hostile
-MONSTER: 'l',"leprechaun",(33,02),hostile
+MONSTER: ('n',"water nymph"),(33,01),hostile
+MONSTER: ('l',"leprechaun"),(33,02),hostile
 # East exit
-MONSTER: 'n',"water nymph",(74,05),hostile
-MONSTER: 'l',"leprechaun",(74,04),hostile
+MONSTER: ('n',"water nymph"),(74,05),hostile
+MONSTER: ('l',"leprechaun"),(74,04),hostile
 # South exit
-MONSTER: 'l',"leprechaun",(25,19),hostile
-MONSTER: 'n',"water nymph",(25,18),hostile
-# Wandering the streets.  What I'd really like for this is a random
-# location, but make sure we're on a given type, e.g. street (if they
-# existed, of course).
-MONSTER: 'n',"water nymph",(07,05),hostile
-MONSTER: 'l',"leprechaun",(28,06),hostile
-MONSTER: 'n',"water nymph",(38,07),hostile
-MONSTER: 'l',"leprechaun",(45,01),hostile
-MONSTER: 'n',"water nymph",(59,07),hostile
-MONSTER: 'l',"leprechaun",(62,14),hostile
-MONSTER: 'n',"water nymph",(71,14),hostile
-MONSTER: 'l',"leprechaun",(39,13),hostile
-MONSTER: 'n',"water nymph",(18,14),hostile
-MONSTER: ':',"chameleon",(19,08),hostile
-MONSTER: ':',"chameleon",(22,08),hostile
-MONSTER: ':',"chameleon",(16,08),hostile
-MONSTER: ':',"chameleon",random,hostile
-MONSTER: ':',"chameleon",random,hostile
-MONSTER: ':',"chameleon",random,hostile
-MONSTER: ':',"chameleon",random,hostile
-MONSTER: ':',"chameleon",random,hostile
+MONSTER: ('l',"leprechaun"),(25,19),hostile
+MONSTER: ('n',"water nymph"),(25,18),hostile
+# Wandering the streets.
+LOOP [3 + 2d2] {
+  MONSTER: ('n',"water nymph"),rndcoord($streets),hostile
+}
+LOOP [1 + 2d2] {
+  MONSTER: ('l',"leprechaun"),rndcoord($streets),hostile
+}
+LOOP [2d2] {
+  MONSTER: (':',"chameleon"),rndcoord($streets),hostile
+}
+LOOP [3 + 1d7] {
+  MONSTER: (':',"chameleon"),rndcoord($streets),hostile
+}
 
 #
 #	The "locate" level for the quest.
@@ -177,6 +169,7 @@ MONSTER: ':',"chameleon",random,hostile
 LEVEL: "Rog-loca"
 FLAGS:mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"leprechaun"), (16,'n'), (16,"guardian naga"), (4,'N')
 GEOMETRY:center,center
 #         1         2         3         4         5         6         7
 #123456789012345678901234567890123456789012345678901234567890123456789012345
@@ -213,62 +206,28 @@ STAIR:random,down
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,20)
 # Objects
-OBJECT:'?',"teleportation",(11,18),cursed,0
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:('?',"teleportation"),(11,18),cursed,0
+LOOP [10 + 1d6] {
+  OBJECT:random,random
+}
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [ 5 + 1d6] {
+  TRAP:random,random
+}
 # Random monsters.
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',random,random,hostile
-MONSTER:'N',"guardian naga",random,hostile
-MONSTER:'N',"guardian naga",random,hostile
-MONSTER:'N',"guardian naga",random,hostile
-MONSTER:'N',"guardian naga",random,hostile
-MONSTER:'N',"guardian naga",random,hostile
-MONSTER:'N',"guardian naga",random,hostile
-MONSTER:'N',"guardian naga",random,hostile
-MONSTER:'N',random,random,hostile
-MONSTER:'N',random,random,hostile
-MONSTER:'N',random,random,hostile
-MONSTER: ':',"chameleon",random,hostile
-MONSTER: ':',"chameleon",random,hostile
-MONSTER: ':',"chameleon",random,hostile
-MONSTER: ':',"chameleon",random,hostile
-MONSTER: ':',"chameleon",random,hostile
+LOOP [15 + 2d6] {
+  MONSTER:('l',"leprechaun"),random,hostile
+}
+MONSTER:'l',random,hostile
+LOOP [5 + 1d6] {
+  MONSTER:('N',"guardian naga"),random,hostile
+}
+MONSTER:'N',random,hostile
+MONSTER:'N',random,hostile
+MONSTER:'N',random,hostile
+LOOP [4 + 1d3] {
+  MONSTER: (':',"chameleon"),random,hostile
+}
 
 #
 #	The "goal" level for the quest.  Teleportation and digging are
@@ -281,6 +240,7 @@ MONSTER: ':',"chameleon",random,hostile
 LEVEL: "Rog-goal"
 FLAGS: noteleport,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"leprechaun"), (16,'n'), (16,"guardian naga"), (4,'N')
 GEOMETRY:center,center
 #         1         2         3         4         5         6         7
 #123456789012345678901234567890123456789012345678901234567890123456789012345
@@ -317,73 +277,41 @@ NON_DIGGABLE:(00,00,75,20)
 # One trap to keep the gnomes at bay.
 TRAP:"spiked pit",(37,07)
 # Objects
-OBJECT:'(',"skeleton key",(38,10),blessed,0,"The Master Key of Thievery"
-OBJECT:'%',"tin",(26,12),"chameleon",0
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:('(',"skeleton key"),(38,10),blessed,0,NAME:"The Master Key of Thievery"
+OBJECT:('%',"tin"),(26,12),montype:"chameleon",0
+LOOP [10 + 1d8] {
+  OBJECT:random,random
+}
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [7 + 1d6] {
+  TRAP:random,random
+}
 # Random monsters.
-MONSTER:'@',"Master Assassin",(38,10),hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',"leprechaun",random,hostile
-MONSTER:'l',random,random,hostile
-MONSTER:'l',random,random,hostile
-MONSTER:'N',"guardian naga",random,hostile
-MONSTER:'N',"guardian naga",random,hostile
-MONSTER:'N',"guardian naga",random,hostile
-MONSTER:'N',"guardian naga",random,hostile
-MONSTER:'N',"guardian naga",random,hostile
-MONSTER:'N',"guardian naga",random,hostile
-MONSTER:'N',"guardian naga",random,hostile
-MONSTER:'N',"guardian naga",random,hostile
-MONSTER:'N',random,random,hostile
-MONSTER:'N',random,random,hostile
-MONSTER:'N',random,random,hostile
-MONSTER: ':',"chameleon",random,hostile
-MONSTER: ':',"chameleon",random,hostile
-MONSTER: ':',"chameleon",random,hostile
-MONSTER: ':',"chameleon",random,hostile
-MONSTER: ':',"chameleon",random,hostile
-MONSTER:';',"shark",(51,14),hostile
-MONSTER:';',"shark",(53,09),hostile
-MONSTER:';',"shark",(55,15),hostile
-MONSTER:';',"shark",(58,10),hostile
+MONSTER:('@',"Master Assassin"),(38,10),hostile {
+  OBJECT:('(', "Bell of Opening"),uncursed
+  OBJECT:'['
+  OBJECT:')'
+  OBJECT:'?'
+  OBJECT:'!'
+}
+LOOP [13 + 2d6] {
+  MONSTER:('l',"leprechaun"),random,hostile
+}
+MONSTER:'l',random,hostile
+MONSTER:'l',random,hostile
+LOOP [5 + 2d3] {
+  MONSTER:('N',"guardian naga"),random,hostile
+}
+MONSTER:'N',random,hostile
+MONSTER:'N',random,hostile
+MONSTER:'N',random,hostile
+LOOP [4 + 1d3] {
+  MONSTER: (':',"chameleon"),random,hostile
+}
+MONSTER:(';',"shark"),(51,14),hostile
+MONSTER:(';',"shark"),(53,09),hostile
+MONSTER:(';',"shark"),(55,15),hostile
+MONSTER:(';',"shark"),(58,10),hostile
 
 #
 #	The "fill" level for the quest.
@@ -392,57 +320,58 @@ MONSTER:';',"shark",(58,10),hostile
 #	levels as defined above.
 #
 LEVEL: "Rog-fila"
+MON_GENERATION:86%, (64,"leprechaun"), (16,'n'), (16,"guardian naga"), (4,'N')
 #
 ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, up
-OBJECT: random,random,random
-MONSTER: 'l', "leprechaun", random, hostile
+OBJECT: random,random
+MONSTER: ('l', "leprechaun"), random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
-OBJECT: random,random,random
-MONSTER: 'l', "leprechaun", random, hostile
-MONSTER: 'N', "guardian naga", random, hostile
+OBJECT: random, random
+OBJECT: random,random
+MONSTER: ('l', "leprechaun"), random, hostile
+MONSTER: ('N', "guardian naga"), random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
+OBJECT: random, random
 TRAP: random, random
 TRAP: random, random
-OBJECT: random,random,random
-MONSTER: 'n', "water nymph", random, hostile
+OBJECT: random,random
+MONSTER: ('n', "water nymph"), random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, down
-OBJECT: random, random, random
+OBJECT: random, random
 TRAP: random, random
 TRAP: random, random
-MONSTER: 'l', random, random, hostile
-MONSTER: 'N', "guardian naga", random, hostile
+MONSTER: 'l', random, hostile
+MONSTER: ('N', "guardian naga"), random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
 TRAP: random, random
 TRAP: random, random
-MONSTER: 'l', "leprechaun", random, hostile
+MONSTER: ('l', "leprechaun"), random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
+OBJECT: random, random
 TRAP: random, random
 TRAP: random, random
-MONSTER: 'l', "leprechaun", random, hostile
-MONSTER: 'n', "water nymph", random, hostile
+MONSTER: ('l', "leprechaun"), random, hostile
+MONSTER: ('n', "water nymph"), random, hostile
 }
 
 RANDOM_CORRIDORS
@@ -451,57 +380,58 @@ RANDOM_CORRIDORS
 # currently a & b are the same.
 #
 LEVEL: "Rog-filb"
+MON_GENERATION:86%, (64,"leprechaun"), (16,'n'), (16,"guardian naga"), (4,'N')
 #
 ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, up
-OBJECT: random,random,random
-MONSTER: 'l', "leprechaun", random, hostile
+OBJECT: random,random
+MONSTER: ('l', "leprechaun"), random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
-OBJECT: random,random,random
-MONSTER: 'l', "leprechaun", random, hostile
-MONSTER: 'N', "guardian naga", random, hostile
+OBJECT: random, random
+OBJECT: random,random
+MONSTER: ('l', "leprechaun"), random, hostile
+MONSTER: ('N', "guardian naga"), random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
+OBJECT: random, random
 TRAP: random, random
 TRAP: random, random
-OBJECT: random,random,random
-MONSTER: 'n', "water nymph", random, hostile
+OBJECT: random,random
+MONSTER: ('n', "water nymph"), random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
 STAIR: random, down
-OBJECT: random, random, random
+OBJECT: random, random
 TRAP: random, random
 TRAP: random, random
-MONSTER: 'l', random, random, hostile
-MONSTER: 'N', "guardian naga", random, hostile
+MONSTER: 'l', random, hostile
+MONSTER: ('N', "guardian naga"), random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
 TRAP: random, random
 TRAP: random, random
-MONSTER: 'l', "leprechaun", random, hostile
+MONSTER: ('l', "leprechaun"), random, hostile
 }
 
 ROOM: "ordinary" , random, random, random, random
 {
-OBJECT: random, random, random
+OBJECT: random, random
 TRAP: random, random
 TRAP: random, random
-MONSTER: 'l', "leprechaun", random, hostile
-MONSTER: 'n', "water nymph", random, hostile
+MONSTER: ('l', "leprechaun"), random, hostile
+MONSTER: ('n', "water nymph"), random, hostile
 }
 
 RANDOM_CORRIDORS

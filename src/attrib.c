@@ -565,6 +565,7 @@ int oldlevel, newlevel;
 	case PM_HUMAN:
 	case PM_DWARF:
 	case PM_GNOME:
+	case PM_VAMPIRE:
 	default:                rabil = 0;		break;
 	}
 
@@ -738,5 +739,20 @@ beautiful()
 		(poly_gender()==1 ? "beautiful" : "handsome") :
 		"ugly");
 }
+
+/** Returns the hitpoints of your current form. */
+int
+uhp()
+{
+	return (Upolyd ? u.mh : u.uhp);
+}
+
+/** Returns the maximal hitpoints of your current form. */
+int
+uhpmax()
+{
+	return (Upolyd ? u.mhmax : u.uhpmax);
+}
+
 
 /*attrib.c*/

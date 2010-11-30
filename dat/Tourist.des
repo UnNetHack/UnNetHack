@@ -11,6 +11,7 @@
 LEVEL: "Tou-strt"
 FLAGS: noteleport,hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"giant spider"), (16,'S'), (16,"forest centaur"), (4,'C')
 GEOMETRY:center,center
 MAP
 .......}}....---------..-------------------------------------------------...
@@ -71,64 +72,65 @@ DOOR:open,(16,17)
 DOOR:locked,(35,07)
 DOOR:locked,(36,07)
 # Monsters on siege duty.
-MONSTER: 's',"giant spider",random
-MONSTER: 's',"giant spider",random
-MONSTER: 's',"giant spider",random
-MONSTER: 's',"giant spider",random
-MONSTER: 's',"giant spider",random
-MONSTER: 's',"giant spider",random
-MONSTER: 's',"giant spider",random
-MONSTER: 's',"giant spider",random
-MONSTER: 's',"giant spider",random
-MONSTER: 's',"giant spider",random
-MONSTER: 's',"giant spider",random
-MONSTER: 's',"giant spider",random
-MONSTER: 's',random,random
-MONSTER: 's',random,random
-MONSTER: 'C',"forest centaur",random
-MONSTER: 'C',"forest centaur",random
-MONSTER: 'C',"forest centaur",random
-MONSTER: 'C',"forest centaur",random
-MONSTER: 'C',"forest centaur",random
-MONSTER: 'C',"forest centaur",random
-MONSTER: 'C',"forest centaur",random
-MONSTER: 'C',"forest centaur",random
-MONSTER: 'C',random,random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:'s',random
+MONSTER:'s',random
+MONSTER:('C',"forest centaur"),random
+MONSTER:('C',"forest centaur"),random
+MONSTER:('C',"forest centaur"),random
+MONSTER:('C',"forest centaur"),random
+MONSTER:('C',"forest centaur"),random
+MONSTER:('C',"forest centaur"),random
+MONSTER:('C',"forest centaur"),random
+MONSTER:('C',"forest centaur"),random
+MONSTER:'C',random
 # Twoflower
-MONSTER:'@',"Twoflower",(64,03)
+MONSTER:('@',"Twoflower"),(64,03) {
+  OBJECT:random
+  OBJECT:random
+  OBJECT:random
+  OBJECT:random
+  OBJECT:random
+  OBJECT:random
+}
 # The treasure of Twoflower
-OBJECT:'(',"chest",(64,03)
+OBJECT:('(',"chest"),(64,03)
 # guides for the audience chamber
-MONSTER:'@',"guide",(29,03)
-MONSTER:'@',"guide",(32,04)
-MONSTER:'@',"guide",(35,02)
-MONSTER:'@',"guide",(38,03)
-MONSTER:'@',"guide",(45,03)
-MONSTER:'@',"guide",(48,02)
-MONSTER:'@',"guide",(49,04)
-MONSTER:'@',"guide",(51,03)
-MONSTER:'@',"guide",(57,03)
-MONSTER:'@',"guide",(62,04)
-MONSTER:'@',"guide",(66,04)
+MONSTER:('@',"guide"),(29,03)
+MONSTER:('@',"guide"),(32,04)
+MONSTER:('@',"guide"),(35,02)
+MONSTER:('@',"guide"),(38,03)
+MONSTER:('@',"guide"),(45,03)
+MONSTER:('@',"guide"),(48,02)
+MONSTER:('@',"guide"),(49,04)
+MONSTER:('@',"guide"),(51,03)
+MONSTER:('@',"guide"),(57,03)
+MONSTER:('@',"guide"),(62,04)
+MONSTER:('@',"guide"),(66,04)
 # path guards
-MONSTER:'@',"watchman",(35,08)
-MONSTER:'@',"watchman",(36,08)
+MONSTER:('@',"watchman"),(35,08)
+MONSTER:('@',"watchman"),(36,08)
 # river monsters
-MONSTER:';',"giant eel",(62,12)
-MONSTER:';',"piranha",(47,10)
-MONSTER:';',"piranha",(29,11)
-MONSTER:';',"kraken",(34,09)
-MONSTER:';',"kraken",(37,09)
+MONSTER:(';',"giant eel"),(62,12)
+MONSTER:(';',"piranha"),(47,10)
+MONSTER:(';',"piranha"),(29,11)
+MONSTER:(';',"kraken"),(34,09)
+MONSTER:(';',"kraken"),(37,09)
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [7 + 1d10] {
+  TRAP:random,random
+}
 
 #
 #	The "locate" level for the quest.
@@ -140,6 +142,7 @@ TRAP:random,random
 LEVEL: "Tou-loca"
 FLAGS: hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"giant spider"), (16,'S'), (16,"forest centaur"), (4,'C')
 GEOMETRY:center,center
 MAP
 ----------------------------------------------------------------------------
@@ -244,23 +247,23 @@ DOOR:closed,(60,16)
 DOOR:closed,(73,16)
 
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Toilet paper
-OBJECT:'?',"blank paper",(71,12)
-OBJECT:'?',"blank paper",(71,12)
+OBJECT:('?',"blank paper"),(71,12)
+OBJECT:('?',"blank paper"),(71,12)
 # Random traps
 TRAP:random,random
 TRAP:random,random
@@ -272,24 +275,24 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',random,random
-MONSTER:'s',random,random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:('s',"giant spider"),random
+MONSTER:'s',random
+MONSTER:'s',random
 
 #
 #	The "goal" level for the quest.
@@ -302,6 +305,7 @@ MONSTER:'s',random,random
 LEVEL: "Tou-goal"
 FLAGS:mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"giant spider"), (16,'S'), (16,"forest centaur"), (4,'C')
 GEOMETRY:center,center
 MAP
 ----------------------------------------------------------------------------
@@ -388,70 +392,51 @@ DOOR:random,(51,15)
 DOOR:open,(59,14)
 DOOR:open,(59,17)
 # Objects
-OBJECT:'(',"credit card",(04,01),blessed,0,"The Platinum Yendorian Express Card"
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:('(',"credit card"),(04,01),blessed,0,NAME:"The Platinum Yendorian Express Card"
+LOOP [8 + 1d5] {
+  OBJECT:random,random
+}
 # Random traps
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
-TRAP:random,random
+LOOP [3 + 1d5] {
+  TRAP:random,random
+}
 # Random monsters.
-MONSTER:'@',"Master of Thieves",(04,01),hostile
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',"giant spider",random
-MONSTER:'s',random,random
-MONSTER:'s',random,random
+MONSTER:('@',"Master of Thieves"),(04,01),hostile {
+  OBJECT:('(', "Bell of Opening"),uncursed
+  OBJECT:'['
+  OBJECT:')'
+  OBJECT:'!'
+  OBJECT:'!'
+  OBJECT:'!'
+  OBJECT:'!'
+}
+LOOP [10 + 2d5] {
+  MONSTER:('s',"giant spider"),random
+}
+MONSTER:'s',random
+MONSTER:'s',random
 # ladies of the evening
-MONSTER:'&',"succubus",(02,08)
-MONSTER:'&',"succubus",(08,08)
-MONSTER:'&',"incubus",(02,14)
-MONSTER:'&',"incubus",(08,14)
-MONSTER:'&',"incubus",(02,17)
-MONSTER:'&',"incubus",(08,17)
+MONSTER:('&',"succubus"),(02,08)
+MONSTER:('&',"succubus"),(08,08)
+MONSTER:('&',"incubus"),(02,14)
+MONSTER:('&',"incubus"),(08,14)
+MONSTER:('&',"incubus"),(02,17)
+MONSTER:('&',"incubus"),(08,17)
 # Police station (with drunken prisoners)
-MONSTER:'K',"Kop Kaptain",(24,09),hostile
-MONSTER:'K',"Kop Lieutenant",(20,09),hostile
-MONSTER:'K',"Kop Lieutenant",(22,11),hostile
-MONSTER:'K',"Kop Lieutenant",(22,07),hostile
-MONSTER:'K',"Keystone Kop",(19,07),hostile
-MONSTER:'K',"Keystone Kop",(19,08),hostile
-MONSTER:'K',"Keystone Kop",(22,09),hostile
-MONSTER:'K',"Keystone Kop",(24,11),hostile
-MONSTER:'K',"Keystone Kop",(19,11),hostile
-MONSTER:'@',"prisoner",(19,13)
-MONSTER:'@',"prisoner",(21,13)
-MONSTER:'@',"prisoner",(24,13)
+MONSTER:('K',"Kop Kaptain"),(24,09),hostile
+MONSTER:('K',"Kop Lieutenant"),(20,09),hostile
+MONSTER:('K',"Kop Lieutenant"),(22,11),hostile
+MONSTER:('K',"Kop Lieutenant"),(22,07),hostile
+MONSTER:('K',"Keystone Kop"),(19,07),hostile
+MONSTER:('K',"Keystone Kop"),(19,08),hostile
+MONSTER:('K',"Keystone Kop"),(22,09),hostile
+MONSTER:('K',"Keystone Kop"),(24,11),hostile
+MONSTER:('K',"Keystone Kop"),(19,11),hostile
+MONSTER:('@',"prisoner"),(19,13)
+MONSTER:('@',"prisoner"),(21,13)
+MONSTER:('@',"prisoner"),(24,13)
 #
-MONSTER:'@',"watchman",(33,10),hostile
+MONSTER:('@',"watchman"),(33,10),hostile
 
 WALLIFY
 
@@ -463,63 +448,51 @@ WALLIFY
 #
 
 LEVEL: "Tou-fila"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP: mines, '.' , ' ', true, true, random, true
+MON_GENERATION:86%, (64,"giant spider"), (16,'S'), (16,"forest centaur"), (4,'C')
 NOMAP
 #
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+LOOP [2 + 2d4] {
+  OBJECT: random, random
+}
 #
+LOOP [2 + 2d4] {
 TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
+}
 #
-MONSTER: '@', "soldier", random, hostile
-MONSTER: '@', "soldier", random, hostile
-MONSTER: '@', "soldier", random, hostile
-MONSTER: '@', "soldier", random, hostile
-MONSTER: '@', "soldier", random, hostile
-MONSTER: 'H', random, random, hostile
-MONSTER: 'C', random, random, hostile
+LOOP [2 + 2d4] {
+  MONSTER: ('@', "soldier"), random, hostile
+}
+MONSTER: 'H', random, hostile
+MONSTER: 'C', random, hostile
 
 LEVEL: "Tou-filb"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP: mines, '.' , ' ', true, true, random, true
+MON_GENERATION:86%, (64,"giant spider"), (16,'S'), (16,"forest centaur"), (4,'C')
 NOMAP
 #
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+LOOP [7 + 2d4] {
+  OBJECT: random, random
+}
 #
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
+LOOP [4 + 2d4] {
+  TRAP: random, random
+}
 #
-MONSTER: '@', "soldier", random, hostile
-MONSTER: '@', "captain", random, hostile
-MONSTER: '@', "captain", random, hostile
-MONSTER: 'H', random, random, hostile
-MONSTER: 'H', random, random, hostile
-MONSTER: 'C', random, random, hostile
-MONSTER: 's', random, random
+LOOP [2d4] {
+  MONSTER: ('@', "soldier"), random, hostile
+  MONSTER: 'C', random, hostile
+  MONSTER: 's', random
+}
+MONSTER: ('@', "captain"), random, hostile
+MONSTER: ('@', "captain"), random, hostile
+MONSTER: 'H', random, hostile
+MONSTER: 'H', random, hostile

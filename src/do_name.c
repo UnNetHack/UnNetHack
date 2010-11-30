@@ -142,14 +142,28 @@ const char *goal;
 			    lo_x = (pass == 0 && ty == lo_y) ? cx + 1 : 1;
 			    hi_x = (pass == 1 && ty == hi_y) ? cx : COLNO - 1;
 			    for (tx = lo_x; tx <= hi_x; tx++) {
-				k = levl[tx][ty].glyph;
-				/* TODO: open doors aren't matched */
-				/* TODO: remebered or seen items aren't matched */
+				/* look at dungeon feature, not at user-visible glyph */
+				k = back_to_glyph(tx,ty);
+				/* uninteresting background glyph */
+				if (glyph_is_cmap(k) &&
+				    (IS_DOOR(levl[tx][ty].typ) || /* monsters mimicking a door */
+				     glyph_to_cmap(k) == S_darkroom ||
+				     glyph_to_cmap(k) == S_room ||
+				     glyph_to_cmap(k) == S_corr ||
+				     glyph_to_cmap(k) == S_litcorr)) {
+					/* what the user remembers to be at tx,ty */
+					k = glyph_at(tx, ty);
+				}
+				/* TODO: - open doors are only matched with '-' */
+				/* should remembered or seen items be matched? */
 				if (glyph_is_cmap(k) &&
 					matching[glyph_to_cmap(k)] &&
-					(IS_DRAWBRIDGE(levl[tx][ty].typ) ||
-					 IS_DOOR(levl[tx][ty].typ) ||
-					 IS_FURNITURE(levl[tx][ty].typ))
+					levl[tx][ty].seenv && /* only if already seen */
+					(!IS_WALL(levl[tx][ty].typ) &&
+					 (levl[tx][ty].typ != SDOOR) &&
+					 glyph_to_cmap(k) != S_room &&
+					 glyph_to_cmap(k) != S_corr &&
+					 glyph_to_cmap(k) != S_litcorr)
 				    ) {
 				    cx = tx,  cy = ty;
 				    if (msg_given) {
@@ -301,7 +315,10 @@ register struct obj *obj;
 	short objtyp;
 
 	Sprintf(qbuf, "What do you want to name %s %s?",
-		is_plural(obj) ? "these" : "this", xname(obj));
+		is_plural(obj) ? "these" : "this",
+		safe_qbuf("", sizeof("What do you want to name these ?"),
+			xname(obj), simple_typename(obj->otyp),
+			is_plural(obj) ? "things" : "thing"));
 	getlin(qbuf, buf);
 	if(!*buf || *buf == '\033')	return;
 	/* strip leading and trailing spaces; unnames item if all spaces */
@@ -499,6 +516,7 @@ register struct obj *obj;
 	register char **str1;
 
 	if (!obj->dknown) return; /* probably blind */
+	check_tutorial_message(QT_T_CALLITEM);
 	otemp = *obj;
 	otemp.quan = 1L;
 	otemp.onamelth = 0;
@@ -1025,8 +1043,12 @@ static const char * const bogusmons[] = {
 	"rape golem",				/* schnippi */
 	"tridude",				/* POWDER */
 	"orcus cosmicus",			/* Radomir Dopieralski */
+	"yeek", "quylthulg",
 	"Greater Hell Beast",			/* Angband */
 	"Vendor of Yizard",			/* Souljazz */
+	"Sigmund", "lernaean hydra", "Ijyb",
+	"Gloorx Vloq", "Blork the orc",		/* Dungeon Crawl Stone Soup */
+	"unicorn pegasus kitten",		/* Wil Wheaton, John Scalzi */
 };
 
 

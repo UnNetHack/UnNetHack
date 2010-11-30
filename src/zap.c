@@ -1381,10 +1381,7 @@ poly_obj(obj, id)
 	switch (otmp->oclass) {
 
 	case TOOL_CLASS:
-	    if (otmp->otyp == MAGIC_LAMP) {
-		otmp->otyp = OIL_LAMP;
-		otmp->age = 1500L;	/* "best" oil lamp possible */
-	    } else if (otmp->otyp == MAGIC_MARKER) {
+	    if (otmp->otyp == MAGIC_MARKER) {
 		otmp->recharged = 1;	/* degraded quality */
 	    }
 	    /* don't care about the recharge count of other tools */
@@ -1568,6 +1565,7 @@ struct obj *obj, *otmp;
 		if (obj->otyp == WAN_POLYMORPH ||
 			obj->otyp == SPE_POLYMORPH ||
 			obj->otyp == POT_POLYMORPH ||
+			obj->otyp == AMULET_OF_UNCHANGING ||
 			obj_resists(obj, 5, 95)) {
 		    res = 0;
 		    break;
@@ -1862,7 +1860,7 @@ register struct obj *obj;
 			known = TRUE;
 			You_feel("self-knowledgeable...");
 			display_nhwindow(WIN_MESSAGE, FALSE);
-			enlightenment(FALSE);
+			enlightenment(FALSE, TRUE);
 			pline_The("feeling subsides.");
 			exercise(A_WIS, TRUE);
 			break;
@@ -2313,7 +2311,7 @@ boolean			youattack, allow_cancel_kill, self_cancel;
 		flags.botl = 1;	/* potential AC change */
 		find_ac();
 	    }
-	} else {
+	} else if (!(obj && (obj->oartifact == ART_MAGICBANE))) { /* Magicbane doesn't cancel inventory items */
 		/* select one random item to cancel */
 		struct obj *otmp;
 		int count = 0;
@@ -4217,10 +4215,11 @@ boolean magical; /**< if wishing for magical items is allowed */
 {
 	char buf[BUFSZ];
 #ifdef LIVELOGFILE
-	char rawbuf[BUFSZ]; // for exact livelog reporting
+	char rawbuf[BUFSZ]; /* for exact livelog reporting */
 #endif
 	struct obj *otmp, nothing;
 	int tries = 0;
+	boolean magical_object;
 
 	nothing = zeroobj;  /* lint suppression; only its address matters */
 	if (flags.verbose) You("may wish for an object.");
@@ -4262,14 +4261,16 @@ retry:
 	    return;
 	}
 	/* check if wishing for magical objects is allowed */
-	if (!magical && otmp &&
-	    (otmp->oartifact || objects[otmp->otyp].oc_magic)) {
+	magical_object = otmp && (otmp->oartifact || objects[otmp->otyp].oc_magic);
+	if (!magical && magical_object) {
 		verbalize("I'm sorry but I'm not able to provide you with magical items.");
 		if (otmp->oartifact) artifact_exists(otmp, ONAME(otmp), FALSE);
 		obfree(otmp, (struct obj *) 0);
 		otmp = &zeroobj;
 		goto retry;
 	}
+
+	if (magical_object) { u.uconduct.wishmagic++; }
 
 	/* KMH, conduct */
 	u.uconduct.wishes++;

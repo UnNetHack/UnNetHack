@@ -4,7 +4,6 @@
 
 #include "hack.h"
 #include "tcap.h"
-
 /* Relevent header information in rm.h and objclass.h. */
 
 #ifdef C
@@ -178,7 +177,7 @@ const char * const monexplain[MAXMCLASSES] = {
     "gnome",			"giant humanoid",	0,
     "jabberwock",		"Keystone Kop",		"lich",
     "mummy",			"naga",			"ogre",
-    "pudding or ooze",		"quantum mechanic",	"rust monster or disenchanter",
+    "pudding or ooze",		"quantum mechanic",	"rust monster, disenchanter or disintegrator",
     "snake",			"troll",		"umber hulk",
     "vampire",			"wraith",		"xorn",
     "apelike creature",		"zombie",
@@ -204,7 +203,7 @@ const struct symdef def_warnsyms[WARNCOUNT] = {
  *  Note:  {ibm|dec|mac}_graphics[] arrays also depend on this symbol order.
  */
 struct symdef defsyms[MAXPCHARS] = {
-/* 0*/	{' ', "dark part of a room",C(NO_COLOR)},	/* stone */
+/* 0*/	{' ', "unexplored area",C(NO_COLOR)},	/* stone */
 	{'|', "wall",		C(CLR_GRAY)},	/* vwall */
 	{'-', "wall",		C(CLR_GRAY)},	/* hwall */
 	{'-', "wall",		C(CLR_GRAY)},	/* tlcorn */
@@ -224,6 +223,7 @@ struct symdef defsyms[MAXPCHARS] = {
 	{'#', "iron bars",	C(HI_METAL)},	/* bars */
 	{'#', "tree",		C(CLR_GREEN)},	/* tree */
 	{'.', "floor of a room",C(CLR_GRAY)},	/* room */
+	{'.', "dark part of a room",C(CLR_BLACK)},	/* dark room */
 /*20*/	{'#', "corridor",	C(CLR_GRAY)},	/* dark corr */
 	{'#', "lit corridor",	C(CLR_GRAY)},	/* lit corr (see mapglyph.c) */
 	{'<', "staircase up",	C(CLR_GRAY)},	/* upstair */
@@ -314,6 +314,10 @@ struct symdef defsyms[MAXPCHARS] = {
 void NDECL((*ibmgraphics_mode_callback)) = 0;	/* set in tty_start_screen() */
 #endif /* PC9800 */
 
+#ifdef CURSES_GRAPHICS
+void NDECL((*cursesgraphics_mode_callback)) = 0;
+#endif
+
 static uchar ibm_graphics[MAXPCHARS] = {
 /* 0*/	g_FILLER(S_stone),
 	0xb3,	/* S_vwall:	meta-3, vertical rule */
@@ -335,6 +339,7 @@ static uchar ibm_graphics[MAXPCHARS] = {
 	240,	/* S_bars:	equivalence symbol */
 	241,	/* S_tree:	plus or minus symbol */
 	0xfa,	/* S_room:	meta-z, centered dot */
+	g_FILLER(S_stone),	/* S_darkroom:	meta-z, centered dot */
 /*20*/	0xb0,	/* S_corr:	meta-0, light shading */
 	0xb1,	/* S_litcorr:	meta-1, medium shading */
 	g_FILLER(S_upstair),
@@ -434,6 +439,7 @@ static uchar dec_graphics[MAXPCHARS] = {
 	0xfb,	/* S_bars:	meta-{, small pi */
 	0xe7,	/* S_tree:	meta-g, plus-or-minus */
 	0xfe,	/* S_room:	meta-~, centered dot */
+	g_FILLER(S_stone),	/* S_darkroom:	meta-~, centered dot */
 /*20*/	g_FILLER(S_corr),
 	g_FILLER(S_litcorr),
 	g_FILLER(S_upstair),
@@ -531,6 +537,7 @@ static uchar mac_graphics[MAXPCHARS] = {
 	0xf0,	/* S_bars:	equivalency symbol */
 	0xf1,	/* S_tree:	plus-or-minus */
 	g_FILLER(S_Room),
+	g_FILLER(S_stone), /* S_darkroom */
 /*20*/	0xB0,	/* S_corr */
 	g_FILLER(S_litcorr),
 	g_FILLER(S_upstair),
@@ -674,6 +681,9 @@ int gr_set_flag;
  */
 	    iflags.IBMgraphics = TRUE;
 	    iflags.DECgraphics = FALSE;
+#ifdef CURSES_GRAPHICS
+        iflags.cursesgraphics = FALSE;
+#endif
 	    assign_graphics(ibm_graphics, SIZE(ibm_graphics), MAXPCHARS, 0);
 #ifdef PC9800
 	    if (ibmgraphics_mode_callback) (*ibmgraphics_mode_callback)();
@@ -687,6 +697,9 @@ int gr_set_flag;
  */
 	    iflags.DECgraphics = TRUE;
 	    iflags.IBMgraphics = FALSE;
+#ifdef CURSES_GRAPHICS
+        iflags.cursesgraphics = FALSE;
+#endif
 	    assign_graphics(dec_graphics, SIZE(dec_graphics), MAXPCHARS, 0);
 	    if (decgraphics_mode_callback) (*decgraphics_mode_callback)();
 	    break;
@@ -695,6 +708,14 @@ int gr_set_flag;
 	case MAC_GRAPHICS:
 	    assign_graphics(mac_graphics, SIZE(mac_graphics), MAXPCHARS, 0);
 	    break;
+#endif
+#ifdef CURSES_GRAPHICS
+    case CURS_GRAPHICS:
+	    assign_graphics((uchar *)0, 0, MAXPCHARS, 0);
+        iflags.cursesgraphics = TRUE;
+	    iflags.IBMgraphics = FALSE;
+	    iflags.DECgraphics = FALSE;
+        break;
 #endif
 	}
     return;

@@ -22,7 +22,7 @@ struct obj {
 #define ocarry		v.v_ocarry
 
 	struct obj *cobj;	/* contents list for containers */
-	unsigned o_id;
+	size_t o_id;
 	xchar ox,oy;
 	short otyp;		/* object class number */
 	unsigned owt;
@@ -95,7 +95,8 @@ struct obj {
 	Bitfield(bypass,1);	/* mark this as an object to be skipped by bhito() */
 	Bitfield(was_thrown,1);	/* thrown by the hero since last picked up */
 	Bitfield(odrained,1);	/* drained corpse */
-	/* 4 free bits */
+	Bitfield(was_dropped,1); /* dropped deliberately by the hero */
+	/* 3 free bits */
 
 	int	corpsenm;	/* type of corpse is mons[corpsenm] */
 #define leashmon  corpsenm	/* gets m_id of attached pet */
@@ -103,7 +104,7 @@ struct obj {
 #define fromsink  corpsenm	/* a potion from a sink */
 
 #ifdef RECORD_ACHIEVE
-#define record_achieve_special corpsenm
+	xchar record_achieve_special;
 #endif
 
 	unsigned oeaten;	/* nutrition left in food, if partly eaten */

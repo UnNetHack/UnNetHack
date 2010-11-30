@@ -40,7 +40,7 @@
 struct monst {
 	struct monst *nmon;
 	struct permonst *data;
-	unsigned m_id;
+	size_t m_id;
 	short mnum;		/* permanent monster index number */
 	short movement;		/* movement points (derived from permonst definition and added effects */
 	uchar m_lev;		/* adjusted difficulty level of monster */

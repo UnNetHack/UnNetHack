@@ -9,15 +9,30 @@
 /*
  * PATCHLEVEL is updated for each release.
  */
-#define PATCHLEVEL	2
+#define PATCHLEVEL	4
 /*
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
 #define EDITLEVEL	0
 
+/*
+ * UnNetHack follows a more modern approach regarding version numbers:
+ * major.minor.patchlevel[-revision]
+ *
+ * Odd-numbered minor versions are for development releases with no guarantees
+ * for save and bones compatibility between different patchlevels, whereas
+ * even-numbered minor releases are considered stable releases with save and
+ * bones compatibility within the same minor number releases.
+ *
+ * Releases with increasing revision numbers are always save and bones compatbile
+ * and are considered only bugfix releases. Therefore the revision number isn't
+ * included into VERSION_COMPATIBILITY.
+ */
+/* #define VERSION_REVISION	1 */
+
 #define COPYRIGHT_BANNER_A \
-"UnNetHack, Copyright 2009"
+"UnNetHack, Copyright 2009-2010"
 
 #define COPYRIGHT_BANNER_B \
 "    Based on NetHack, Copyright 1985-2003 by Stichting Mathematisch"
@@ -34,10 +49,11 @@
  * PP = patch level, ee = edit level, L = literal suffix "L",
  * with all four numbers specified as two hexadecimal digits.
  */
-#define VERSION_COMPATIBILITY 0x03050000L	/* 3.5.0-0 */
+#define VERSION_COMPATIBILITY 0x03050300L	/* 3.5.3-e0 */
 
 
 /*****************************************************************************/
+/* Old vanilla ChangeLog. See top level file ChangeLog for UnNetHack */
 /* Version 3.4.x */
 
 /*  Patch 3, December 7, 2003

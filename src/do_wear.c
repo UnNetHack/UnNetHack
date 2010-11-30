@@ -708,7 +708,6 @@ register struct obj *obj;
 
     switch(obj->otyp){
 	case RIN_TELEPORTATION:
-	case RIN_REGENERATION:
 	case RIN_SEARCHING:
 	case RIN_STEALTH:
 	case RIN_HUNGER:
@@ -717,14 +716,29 @@ register struct obj *obj;
 	case RIN_FIRE_RESISTANCE:
 	case RIN_COLD_RESISTANCE:
 	case RIN_SHOCK_RESISTANCE:
-	case RIN_CONFLICT:
 	case RIN_TELEPORT_CONTROL:
 	case RIN_POLYMORPH:
 	case RIN_POLYMORPH_CONTROL:
-	case RIN_FREE_ACTION:                
+	case RIN_FREE_ACTION:
 	case RIN_SLOW_DIGESTION:
 	case RIN_SUSTAIN_ABILITY:
 	case MEAT_RING:
+		break;
+	case RIN_REGENERATION:
+		if (!oldprop && !HRegeneration && !regenerates(youmonst.data)) {
+			if ((uhp() < uhpmax()) &&
+			    !objects[obj->otyp].oc_name_known) {
+				Your("wounds are rapidly healing!");
+				makeknown(RIN_REGENERATION);
+			}
+		}
+		break;
+	case RIN_CONFLICT:
+#ifdef BLACKMARKET
+		if (Is_blackmarket(&u.uz)) {
+			set_black_marketeer_angry();
+		}
+#endif /* BLACKMARKET */
 		break;
 	case RIN_WARNING:
 		see_monsters();
@@ -975,6 +989,7 @@ register struct obj *otmp;
 {
 	boolean was_blind = Blind, changed = FALSE;
 
+	violated(CONDUCT_BLINDFOLDED);
 	takeoff_mask &= ~W_TOOL;
 	setworn((struct obj *)0, otmp->owornmask);
 	off_msg(otmp);
@@ -1109,7 +1124,7 @@ dotakeoff()
 			  "  Use 'R' command to remove accessories." : "");
 		return 0;
 	}
-	if (armorpieces > 1)
+	if (armorpieces > 1 || iflags.paranoid_remove)
 		otmp = getobj(clothes, "take off");
 	if (otmp == 0) return(0);
 	if (!(otmp->owornmask & W_ARMOR)) {
@@ -1159,7 +1174,8 @@ doremring()
 		      "  Use 'T' command to take off armor." : "");
 		return(0);
 	}
-	if (Accessories != 1) otmp = getobj(accessories, "remove");
+	if (Accessories != 1 || iflags.paranoid_remove)
+		otmp = getobj(accessories, "remove");
 	if(!otmp) return(0);
 	if(!(otmp->owornmask & (W_RING | W_AMUL | W_TOOL))) {
 		You("are not wearing that.");
@@ -2149,7 +2165,8 @@ register struct obj *atmp;
 		useup(otmp);
 	} else if (DESTROY_ARM(uarm)) {
 		if (donning(otmp)) cancel_don();
-		Your("armor turns to dust and falls to the %s!",
+		pline("%s turns to dust and falls to the %s!",
+			Ysimple_name2(otmp),
 			surface(u.ux,u.uy));
 		(void) Armor_gone();
 		useup(otmp);

@@ -156,6 +156,9 @@ E NEARDATA s_level *sp_levchn;
 #include "quest.h"
 E struct q_score quest_status;
 
+#include "qtext.h"
+E NEARDATA char pl_tutorial[QT_T_MAX-QT_T_FIRST+1];
+
 E NEARDATA char pl_character[PL_CSIZ];
 E NEARDATA char pl_race;		/* character's race */
 
@@ -352,6 +355,10 @@ E NEARDATA struct you u;
 
 E NEARDATA struct monst youmonst;	/* init'd and defined in decl.c */
 E NEARDATA struct monst *mydogs, *migrating_mons;
+
+E NEARDATA struct permonst upermonst;	/* init'd in decl.c, 
+					 * defined in polyself.c 
+					 */
 
 E NEARDATA struct mvitals {
 	uchar	born;

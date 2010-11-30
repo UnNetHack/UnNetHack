@@ -443,6 +443,19 @@ register struct monst *shkp;
     }
     rlock = FALSE;
 }
+
+/** Makes the black marketeer on the current level angry. */
+void
+set_black_marketeer_angry()
+{
+	struct monst *mtmp;
+	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+		if (mtmp && mtmp->isshk &&
+		    mtmp->data == &mons[PM_BLACK_MARKETEER]) {
+			setmangry(mtmp);
+		}
+	}
+}
 #endif /* BLACKMARKET */
 
 /* x,y is strictly inside shop */
@@ -1764,7 +1777,7 @@ int croaked;
 	/* the simplifying principle is that first-come */
 	/* already took everything you had.		*/
 	if (numsk > 1) {
-	    if (cansee(shkp->mx, shkp->my && croaked))
+	    if (cansee(shkp->mx, shkp->my) && croaked)
 		pline("%s %slooks at your corpse%s and %s.",
 		      Monnam(shkp),
 		      (!shkp->mcanmove || shkp->msleeping) ? "wakes up, " : "",
@@ -1959,6 +1972,35 @@ unsigned id;
 #endif /*OVLB*/
 #ifdef OVL3
 
+/** Returns the price of an arbitrary item in the shop.
+ * Returns 0 if the item doesn't belong to a shopkeeper. */
+long
+get_cost_of_shop_item(obj)
+register struct obj *obj;
+{
+	struct monst *shkp;
+	xchar x, y;
+	int cost=0;
+
+	if (get_obj_location(obj, &x, &y, 0) &&
+	    (obj->unpaid ||
+	     (obj->where==OBJ_FLOOR && !obj->no_charge && costly_spot(x,y)))) {
+
+		if (!(shkp = shop_keeper(*in_rooms(x, y, SHOPBASE)))) return 0;
+		if (!inhishop(shkp)) return 0;
+		if (!costly_spot(x, y))	return 0;
+		if (!*u.ushops) return 0;
+
+		if (obj->oclass != COIN_CLASS) {
+			cost = (obj == uball || obj == uchain) ? 0L :
+			         obj->quan * get_cost(obj, shkp);
+			if (Has_contents(obj)) {
+				cost += contained_cost(obj, shkp, 0L, FALSE, FALSE);
+			}
+		}
+	}
+	return cost;
+}
 /* calculate the value that the shk will charge for [one of] an object */
 STATIC_OVL long
 get_cost(obj, shkp)
@@ -2401,7 +2443,7 @@ speak:
 		return;
 	    }
 	    Strcpy(buf, "\"For you, ");
-	    if (ANGRY(shkp)) Strcat(buf, "scum ");
+	    if (ANGRY(shkp)) Strcat(buf, "scum");
 	    else {
 		static const char *honored[5] = {
 		  "good", "honored", "most gracious", "esteemed",

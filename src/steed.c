@@ -646,6 +646,8 @@ int x, y;
     }
     mon->mx = x, mon->my = y;
     level.monsters[x][y] = mon;
+    if (mon->data == &mons[PM_GIANT_TURTLE] && (!mon->minvis || See_invisible))
+	block_point(x,y);
 }
 
 #endif /* STEED */

@@ -44,6 +44,20 @@ dosounds()
 
     if (!flags.soundok || u.uswallow || Underwater) return;
 
+    if (level.sounds && !rn2(level.sounds->freq)) {
+	int idx = rn2(level.sounds->n_sounds);
+	char *buf;
+	struct lvl_sound_bite snd = level.sounds->sounds[idx];
+	buf = string_subst(snd.msg);
+	switch (snd.flags) {
+	default:
+	case LVLSND_HEARD:  You_hear(buf);  break;
+	case LVLSND_PLINED: pline(buf);     break;
+	case LVLSND_VERBAL: verbalize(buf); break;
+	case LVLSND_FELT:   You_feel(buf);  break;
+	}
+    }
+
     hallu = Hallucination ? 1 : 0;
 
     if (level.flags.nfountains && !rn2(400)) {
@@ -529,8 +543,10 @@ register struct monst *mtmp;
 	    {
 	    /* vampire messages are varied by tameness, peacefulness, and time of night */
 		boolean isnight = night();
-		boolean kindred =    (Upolyd && (u.umonnum == PM_VAMPIRE ||
-				       u.umonnum == PM_VAMPIRE_LORD));
+		boolean kindred = maybe_polyd(u.umonnum == PM_VAMPIRE ||
+				    u.umonnum == PM_VAMPIRE_LORD,
+				    /* DEFERRED u.umonnum == PM_VAMPIRE_MAGE, */
+				    Race_if(PM_VAMPIRE));
 		boolean nightchild = (Upolyd && (u.umonnum == PM_WOLF ||
 				       u.umonnum == PM_WINTER_WOLF ||
 	    			       u.umonnum == PM_WINTER_WOLF_CUB));
@@ -918,6 +934,8 @@ dochat()
     register struct monst *mtmp;
     register int tx,ty;
     struct obj *otmp;
+    int mon_count = 0;
+    int dx,dy;
 
     if (is_silent(youmonst.data)) {
 	pline("As %s, you cannot speak.", an(youmonst.data->mname));
@@ -948,7 +966,23 @@ dochat()
 	return(1);
     }
 
-    if (!getdir("Talk to whom? (in what direction)")) {
+    /* count the monsters surrounding the player */
+    u.dx = u.dy = u.dz = 0;
+    for (dx = -1; dx <= +1; dx++) {
+	for (dy = -1; dy <= +1; dy++) {
+	    if (u.ux+dx == u.ux && u.uy+dy == u.uy) continue;
+	    mtmp = m_at(u.ux+dx, u.uy+dy);
+	    if (mtmp && canspotmon(mtmp)) {
+		mon_count++;
+		u.dx = dx; u.dy = dy;
+	    }
+	}
+    }
+
+    /* only ask for directions if there is more or less than one monster
+     * around */
+    if ((mon_count != 1 || iflags.vanilla_ui_behavior) &&
+        !getdir("Talk to whom? (in what direction)")) {
 	/* decided not to chat */
 	return(0);
     }

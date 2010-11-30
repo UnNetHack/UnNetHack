@@ -6,6 +6,9 @@
 #ifdef TTY_GRAPHICS
 #include "wintty.h"
 #endif
+#ifdef CURSES_GRAPHICS
+extern struct window_procs curses_procs;
+#endif
 #ifdef X11_GRAPHICS
 /* cannot just blindly include winX.h without including all of X11 stuff */
 /* and must get the order of include files right.  Don't bother */
@@ -40,6 +43,9 @@ extern struct window_procs Gnome_procs;
 #ifdef MSWIN_GRAPHICS
 extern struct window_procs mswin_procs;
 #endif
+#ifdef DUMMY_GRAPHICS
+extern struct window_procs dummy_procs;
+#endif
 
 STATIC_DCL void FDECL(def_raw_print, (const char *s));
 
@@ -52,6 +58,9 @@ struct win_choices {
 } winchoices[] = {
 #ifdef TTY_GRAPHICS
     { &tty_procs, win_tty_init },
+#endif
+#ifdef CURSES_GRAPHICS
+    { &curses_procs, 0 },
 #endif
 #ifdef X11_GRAPHICS
     { &X11_procs, win_X11_init },
@@ -80,6 +89,9 @@ struct win_choices {
 #endif
 #ifdef MSWIN_GRAPHICS
     { &mswin_procs, 0 },
+#endif
+#ifdef DUMMY_GRAPHICS
+    { &dummy_procs, 0 },
 #endif
     { 0, 0 }		/* must be last */
 };

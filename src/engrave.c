@@ -285,6 +285,36 @@ sengr_at(s, x, y)
 }
 #endif /* ELBERETH */
 
+#ifdef ELBERETH_CONDUCT
+/** Return the number of distinct times Elbereth is engraved at
+ * the specified location. Case insensitive.  Counts an engraving
+ * as being present even if it's still being written: if you're
+ * killed while trying to write Elbereth, it still violates the
+ * conduct (mainly because it's easier to implement that way).
+ */
+static
+unsigned
+nengr_at(x, y)
+	xchar x, y;
+{
+	const char *s = "Elbereth";
+	register struct engr *ep = engr_at(x, y);
+	unsigned count = 0;
+	const char *p;
+	
+	if (!ep || HEADSTONE == ep->engr_type)
+		return 0;
+	
+	p = ep->engr_txt;	
+	while (strstri(p, s)) {
+		count++;
+		p += 8;
+	}
+
+	return count;
+}
+#endif /* ELBERETH_CONDUCT */
+
 #endif /* OVL0 */
 #ifdef OVL2
 
@@ -390,9 +420,14 @@ register int x,y;
 			et = buf;
 		} else
 			et = ep->engr_txt;
-		You("%s: \"%s\".",
-		      (Blind) ? "feel the words" : "read",  et);
+		if (u.roleplay.illiterate && strcmp(et, "X")) {
+			pline("But you cannot read.");
+		} else {
+			You("%s: \"%s\".",
+					(Blind) ? "feel the words" : "read",  et);
+		}
 		if(flags.run > 1) nomul(0, 0);
+		if (moves > 5) check_tutorial_message(QT_T_ENGRAVING);
 	    }
 	}
 }
@@ -481,9 +516,25 @@ static NEARDATA const char styluses[] =
  * moonstone  -  6	(orthoclase)	* amber      -	2-2.5
  */
 
-/* return 1 if action took 1 (or more) moves, 0 if error or aborted */
+static int engrave(const char *, boolean);
+
+/** return 1 if action took 1 (or more) moves, 0 if error or aborted */
 int
 doengrave()
+{
+	return engrave(NULL, FALSE);
+}
+int
+doengrave_elbereth()
+{
+	return engrave("Elbereth", TRUE);
+}
+
+static
+int
+engrave(engraving, fingers)
+const char *engraving;
+boolean fingers;
 {
 	boolean dengr = FALSE;	/* TRUE if we wipe out the current engraving */
 	boolean doblind = FALSE;/* TRUE if engraving blinds the player */
@@ -498,8 +549,10 @@ doengrave()
 	char ebuf[BUFSZ];	/* Buffer for initial engraving text */
 	char qbuf[QBUFSZ];	/* Buffer for query text */
 	char post_engr_text[BUFSZ]; /* Text displayed after engraving prompt */
+	const char *eword;	/* What to engrave */
 	const char *everb;	/* Present tense of engraving type */
-	const char *eloc;	/* Where the engraving is (ie dust/floor/...) */
+	const char *eloc; 	/* Where to engrave in the ground */
+	const char *eground;	/* Type of the ground (ie dust/floor/...) */
 	char *sp;		/* Place holder for space count of engr text */
 	int len;		/* # of nonspace chars of new engraving text */
 	int maxelen;		/* Max allowable length of engraving text */
@@ -553,7 +606,15 @@ doengrave()
 	 * Edited by GAN 10/20/86 so as not to change weapon wielded.
 	 */
 
-	otmp = getobj(styluses, "write with");
+	if (fingers) {
+		if (uwep && uwep->otyp == ATHAME) {
+			otmp = uwep;
+		} else {
+			otmp = &zeroobj;
+		}
+	} else {
+		otmp = getobj(styluses, "write with");
+	}
 	if(!otmp) return(0);		/* otmp == zeroobj if fingers */
 
 	if (otmp == &zeroobj) writer = makeplural(body_part(FINGER));
@@ -934,7 +995,7 @@ doengrave()
 
 	    /* Give player the choice to add to engraving. */
 
-	    if (type == HEADSTONE) {
+	    if (type == HEADSTONE || engraving) {
 		/* no choice, only append */
 		c = 'y';
 	    } else if ( (type == oep->engr_type) && (!Blind ||
@@ -978,51 +1039,68 @@ doengrave()
 	    }
 	}
 
-	eloc = surface(u.ux,u.uy);
+	eword = (u.roleplay.illiterate ? "your name " : "");
+	eground = surface(u.ux,u.uy);
 	switch(type){
 	    default:
-		everb = (oep && !eow ? "add to the weird writing on" :
-				       "write strangely on");
+		everb = (oep && !eow ? "add" : "write");
+		eloc = (oep && !eow ? "to the weird writing on" :
+		    "strangely onto");
 		break;
 	    case DUST:
-		everb = (oep && !eow ? "add to the writing in" :
-				       "write in");
-		eloc = is_ice(u.ux,u.uy) ? "frost" : "dust";
+		everb = (oep && !eow ? "add" : "write");
+		eloc = (oep && !eow ? "to the writing in" : "into");
+		eground = (is_ice(u.ux,u.uy) ? "frost" : "dust");
 		break;
 	    case HEADSTONE:
-		everb = (oep && !eow ? "add to the epitaph on" :
-				       "engrave on");
+		everb = (oep && !eow ? "add" : "engrave");
+		eloc = (oep && !eow ? "to the epitaph on" : "on");
 		break;
 	    case ENGRAVE:
-		everb = (oep && !eow ? "add to the engraving in" :
-				       "engrave in");
+		everb = (oep && !eow ? "add" : "engrave");
+		eloc = (oep && !eow ? "to the engraving in" : "into");
 		break;
 	    case BURN:
-		everb = (oep && !eow ?
-			( is_ice(u.ux,u.uy) ? "add to the text melted into" :
-					      "add to the text burned into") :
-			( is_ice(u.ux,u.uy) ? "melt into" : "burn into"));
+		everb = (oep && !eow ? "add" :
+			( is_ice(u.ux,u.uy) ? "melt" : "burn" ) );
+		eloc = (oep && !eow ? ( is_ice(u.ux,u.uy) ?
+			"to the text melted into" : "to the text burned into" ) :
+			"into");
 		break;
 	    case MARK:
-		everb = (oep && !eow ? "add to the graffiti on" :
-				       "scribble on");
+		everb = (oep && !eow ? "add" : "scribble");
+		eloc = (oep && !eow ? "to the graffiti on" : "onto");
 		break;
 	    case ENGR_BLOOD:
-		everb = (oep && !eow ? "add to the scrawl on" :
-				       "scrawl on");
+		everb = (oep && !eow ? "add" : "scrawl");
+		eloc = (oep && !eow ? "to the scrawl on" : "onto");
 		break;
 	}
 
 	/* Tell adventurer what is going on */
-	if (otmp != &zeroobj)
-	    You("%s the %s with %s.", everb, eloc, doname(otmp));
+	if (engraving && otmp == &zeroobj)
+	    You("%s \"%s\" %swith your %s %s the %s.", everb, engraving,
+		eword, makeplural(body_part(FINGER)), eloc, eground);
+	else if (engraving && otmp != &zeroobj)
+	    You("%s \"%s\" %swith %s %s the %s.", everb, engraving,
+		eword, doname(otmp), eloc, eground);
+	else if (otmp != &zeroobj)
+	    You("%s %swith %s %s the %s.", everb, eword, doname(otmp),
+		eloc, eground);
 	else
-	    You("%s the %s with your %s.", everb, eloc,
-		makeplural(body_part(FINGER)));
+	    You("%s %swith your %s %s the %s.", everb, eword,
+		makeplural(body_part(FINGER)), eloc, eground);
 
-	/* Prompt for engraving! */
-	Sprintf(qbuf,"What do you want to %s the %s here?", everb, eloc);
-	getlin(qbuf, ebuf);
+	/* Prompt for engraving! (if literate) */
+	if(u.roleplay.illiterate) {
+	    Sprintf(ebuf,"X");
+	} else if (engraving) {
+	    Sprintf(ebuf, engraving);
+	} else {
+	    Sprintf(qbuf,"What do you want to %s %s the %s here?", everb,
+		eloc, eground);
+	    getlin(qbuf, ebuf);
+	}
 
 	/* Count the actual # of chars engraved not including spaces */
 	len = strlen(ebuf);
@@ -1042,7 +1120,7 @@ doengrave()
 
 	/* A single `x' is the traditional signature of an illiterate person */
 	if (len != 1 || (!index(ebuf, 'x') && !index(ebuf, 'X')))
-	    u.uconduct.literate++;
+	    violated(CONDUCT_ILLITERACY);
 
 	/* Mix up engraving if surface or state of mind is unsound.
 	   Note: this won't add or remove any spaces. */
@@ -1124,7 +1202,7 @@ doengrave()
 			multi = -(maxelen/10);
 		    } else
 			if (len > 1) otmp->spe -= len >> 1;
-			else otmp->spe -= 1; /* Prevent infinite grafitti */
+			else otmp->spe -= 1; /* Prevent infinite graffiti */
 		}
 		if (multi) nomovemsg = "You finish defacing the dungeon.";
 		break;
@@ -1150,7 +1228,17 @@ doengrave()
 
 	(void) strncat(buf, ebuf, (BUFSZ - (int)strlen(buf) - 1));
 
+#ifdef ELBERETH_CONDUCT
+	{
+		unsigned ecount1, ecount0 = nengr_at(u.ux, u.uy);
+		make_engr_at(u.ux, u.uy, buf, (moves - multi), type);
+		ecount1 = nengr_at(u.ux, u.uy);
+		if (ecount1 > ecount0)
+			u.uconduct.elbereths += (ecount1 - ecount0);
+	}
+#else
 	make_engr_at(u.ux, u.uy, buf, (moves - multi), type);
+#endif
 
 	if (post_engr_text[0]) pline(post_engr_text);
 

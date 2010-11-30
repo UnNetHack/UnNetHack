@@ -1413,7 +1413,8 @@ dopois:
 		    hitmsg(mtmp, mattk);
 		    break;
 		}
-		if(!uwep
+		/* this condition must match the one in sounds.c for MS_NURSE */
+		if ((!(uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
 #ifdef TOURIST
 		   && !uarmu
 #endif
@@ -1663,7 +1664,7 @@ dopois:
 				destroy_arm(destroyme);
 				dmg = 0;
 			} else if (touched) {
-				int recip_damage = instadisintegrate(mtmp->data->mname);
+				int recip_damage = instadisintegrate(an(mtmp->data->mname));
 				if (recip_damage) {
 					dmg=0;
 					mtmp->mhp -= recip_damage;

@@ -683,7 +683,7 @@ still_chewing(x,y)
     }
 
     /* Okay, you've chewed through something */
-    u.uconduct.food++;
+    violated(CONDUCT_FOODLESS);
     u.uhunger += rnd(20);
 
     if (boulder) {
@@ -938,14 +938,13 @@ int mode;
 		if (mode == DO_MOVE) {
 		    if (amorphous(youmonst.data))
 			You("try to ooze under the door, but can't squeeze your possessions through.");
-		    else if (x == ux || y == uy) {
 #ifdef AUTO_OPEN
-			if (iflags.autoopen && !flags.run
+		    else if (iflags.autoopen
 				&& !Confusion && !Stunned && !Fumbling) {
 			    door_opened = flags.move = doopen_indir(x, y);
-			} else
-
+		    }
 #endif
+		    else if (x == ux || y == uy) {
 			if (Blind || Stunned || ACURR(A_DEX) < 10 || Fumbling) {
 #ifdef STEED
 			    if (u.usteed) {
@@ -1315,6 +1314,7 @@ domove()
 			nomul(0, 0);
 			return;
 		}
+
 		if (((trap = t_at(x, y)) && trap->tseen) ||
 		    (Blind && !Levitation && !Flying &&
 		     !is_clinger(youmonst.data) &&
@@ -1483,6 +1483,20 @@ domove()
 		    "in place" : "to the ground");
 		nomul(0, 0);
 		return;
+	}
+
+	/* warn player before walking into known traps */
+	if (iflags.paranoid_trap &&
+			((trap = t_at(x, y)) && trap->tseen)) {
+		char qbuf[BUFSZ];
+		Sprintf(qbuf,"Do you really want to %s into that %s?", 
+				locomotion(youmonst.data, "step"),
+				defsyms[trap_to_defsym(trap->ttyp)].explanation);
+		if (yn(qbuf) != 'y') {
+			nomul(0, 0);
+			flags.move = 0;
+			return;
+		}
 	}
 	if(u.utrap) {
 		if(u.utraptype == TT_PIT) {
@@ -1710,7 +1724,7 @@ domove()
 		    /* you killed your pet by direct action.
 		     * minliquid and mintrap don't know to do this
 		     */
-		    u.uconduct.killer++;
+		    violated(CONDUCT_PACIFISM);
 		    break;
 		default:
 		    pline("that's strange, unknown mintrap result!");
@@ -2172,6 +2186,7 @@ register boolean newlev;
 		    if(monstinroom(&mons[PM_ORACLE], roomno))
 			verbalize("%s, %s, welcome to Delphi!",
 					Hello((struct monst *) 0), plname);
+		    check_tutorial_message(QT_T_ORACLE);
 		    break;
 		case TEMPLE:
 		    intemple(roomno + ROOMOFFSET);
@@ -2545,8 +2560,17 @@ boolean you; /**< true, if you are hit */
 
 void
 losehp(n, knam, k_format)
-register int n;
-register const char *knam;
+int n;
+const char *knam;
+{
+	losehp_how(n, knam, k_format, DIED);
+}
+
+void
+losehp_how(n, knam, k_format, how)
+int n;
+const char *knam;
+int how;
 boolean k_format;
 {
 	showdmg(n, TRUE);
@@ -2570,7 +2594,7 @@ boolean k_format;
 		killer_format = k_format;
 		killer = knam;		/* the thing that killed you */
 		You("die...");
-		done(DIED);
+		done(how);
 	} else if (n > 0 && u.uhp*10 < u.uhpmax) {
 		maybe_wail();
 	}

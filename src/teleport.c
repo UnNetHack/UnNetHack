@@ -902,6 +902,17 @@ level_tele()
 		Your("body rematerializes%s.", invent ?
 			", and you gather up all your possessions" : "");
 		return;
+#ifdef WIZARD
+	    /* allow only jump beyond the Dungeons of Doom branch */
+	    } else if (!wizard && newlev > 0 && u.uz.dnum != 0) {
+#else
+	    } else if (newlev > 0 && u.uz.dnum != 0) {
+#endif
+		/* random teleport for destination level outside of the current dungeon branch */
+		if (newlev > dungeons[u.uz.dnum].depth_start + dunlevs_in_dungeon(&u.uz)) {
+			You_feel("like bouncing off a solid wall!");
+			goto random_levtport;
+		}
 	    }
 
 	    /* if in Knox and the requested level > 0, stay put.

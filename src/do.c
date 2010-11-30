@@ -579,6 +579,8 @@ register struct obj *obj;
 		setuswapwep((struct obj *)0);
 	}
 
+	obj->was_dropped = TRUE;
+
 	if (u.uswallow) {
 		/* barrier between you and the floor */
 		if(flags.verbose)
@@ -894,7 +896,8 @@ dodown()
 	}
 	if (!stairs_down && !ladder_down) {
 		if (!(trap = t_at(u.ux,u.uy)) ||
-			(trap->ttyp != TRAPDOOR && trap->ttyp != HOLE)
+			(trap->ttyp != TRAPDOOR && trap->ttyp != HOLE &&
+			 trap->ttyp != PIT && trap->ttyp != SPIKED_PIT)
 			|| !Can_fall_thru(&u.uz) || !trap->tseen) {
 
 			if (flags.autodig && !flags.nopick &&
@@ -926,9 +929,26 @@ dodown()
 		return(0);
 	}
 
-	if (trap)
-	    You("%s %s.", locomotion(youmonst.data, "jump"),
-		trap->ttyp == HOLE ? "down the hole" : "through the trap door");
+	if (trap) {
+		if (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT) {
+			if (u.utrap && (u.utraptype == TT_PIT)) {
+				if (flags.autodig && !flags.nopick &&
+					uwep && is_pick(uwep)) {
+					return use_pick_axe2(uwep);
+				} else {
+					You("are already in the pit."); /* YAFM needed */
+				}
+			} else {
+				u.utrap = 1;
+				u.utraptype = TT_PIT;
+				You("%s down into the pit.", locomotion(youmonst.data, "go"));
+			}
+			return(0);
+		} else {
+			You("%s %s.", locomotion(youmonst.data, "jump"),
+					trap->ttyp == HOLE ? "down the hole" : "through the trap door");
+		}
+	}
 
 	if (trap && Is_stronghold(&u.uz)) {
 		goto_hell(FALSE, TRUE);
@@ -1123,6 +1143,7 @@ boolean at_stairs, falling, portal;
 	keepdogs(FALSE);
 	if (u.uswallow)				/* idem */
 		u.uswldtim = u.uswallow = 0;
+	recalc_mapseen(); /* recalculate map overview before we leave the level */
 	/*
 	 *  We no longer see anything on the level.  Make sure that this
 	 *  follows u.uswallow set to null since uswallow overrides all
@@ -1158,6 +1179,11 @@ boolean at_stairs, falling, portal;
 #ifdef USE_TILES
 	substitute_tiles(newlevel);
 #endif
+	/* record this level transition as a potential seen branch unless using
+	 * some non-standard means of transportation (level teleport).
+	 */
+	if ((at_stairs || falling || portal) && (u.uz.dnum != newlevel->dnum))
+		recbranch_mapseen(&u.uz, newlevel);
 	assign_level(&u.uz0, &u.uz);
 	assign_level(&u.uz, newlevel);
 	assign_level(&u.utolev, newlevel);
@@ -1455,6 +1481,12 @@ boolean at_stairs, falling, portal;
 		for(mtmp = fmon; mtmp; mtmp = mtmp->nmon)
 		    if (!DEADMONSTER(mtmp) && mtmp->msleeping) mtmp->msleeping = 0;
 	}
+
+#ifdef BLACKMARKET
+	if (Is_blackmarket(&u.uz) && Conflict) {
+		set_black_marketeer_angry();
+	}
+#endif /* BLACKMARKET */
 
 	if (on_level(&u.uz, &astral_level))
 	    final_level();

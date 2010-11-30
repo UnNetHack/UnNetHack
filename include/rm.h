@@ -124,93 +124,94 @@
 #define S_bars		17	/* KMH -- iron bars */
 #define S_tree		18	/* KMH */
 #define S_room		19
-#define S_corr		20
-#define S_litcorr	21
-#define S_upstair	22
-#define S_dnstair	23
-#define S_upladder	24
-#define S_dnladder	25
-#define S_altar		26
-#define S_grave		27
-#define S_throne	28
-#define S_sink		29
-#define S_fountain	30
-#define S_pool		31
-#define S_ice		32
-#define S_lava		33
-#define S_vodbridge	34
-#define S_hodbridge	35
-#define S_vcdbridge	36	/* closed drawbridge, vertical wall */
-#define S_hcdbridge	37	/* closed drawbridge, horizontal wall */
-#define S_air		38
-#define S_cloud		39
-#define S_water		40
+#define S_darkroom	20
+#define S_corr		21
+#define S_litcorr	22
+#define S_upstair	23
+#define S_dnstair	24
+#define S_upladder	25
+#define S_dnladder	26
+#define S_altar		27
+#define S_grave		28
+#define S_throne	29
+#define S_sink		30
+#define S_fountain	31
+#define S_pool		32
+#define S_ice		33
+#define S_lava		34
+#define S_vodbridge	35
+#define S_hodbridge	36
+#define S_vcdbridge	37	/* closed drawbridge, vertical wall */
+#define S_hcdbridge	38	/* closed drawbridge, horizontal wall */
+#define S_air		39
+#define S_cloud		40
+#define S_water		41
 
 /* end dungeon characters, begin traps */
 
-#define S_arrow_trap		41
-#define S_dart_trap		42
-#define S_falling_rock_trap	43
-#define S_squeaky_board		44
-#define S_bear_trap		45
-#define S_land_mine		46
-#define S_rolling_boulder_trap	47
-#define S_sleeping_gas_trap	48
-#define S_rust_trap		49
-#define S_fire_trap		50
-#define S_pit			51
-#define S_spiked_pit		52
-#define S_hole			53
-#define S_trap_door		54
-#define S_teleportation_trap	55
-#define S_level_teleporter	56
-#define S_magic_portal		57
-#define S_web			58
-#define S_statue_trap		59
-#define S_magic_trap		60
-#define S_anti_magic_trap	61
-#define S_polymorph_trap	62
+#define S_arrow_trap		42
+#define S_dart_trap		43
+#define S_falling_rock_trap	44
+#define S_squeaky_board		45
+#define S_bear_trap		46
+#define S_land_mine		47
+#define S_rolling_boulder_trap	48
+#define S_sleeping_gas_trap	49
+#define S_rust_trap		50
+#define S_fire_trap		51
+#define S_pit			52
+#define S_spiked_pit		53
+#define S_hole			54
+#define S_trap_door		55
+#define S_teleportation_trap	56
+#define S_level_teleporter	57
+#define S_magic_portal		58
+#define S_web			59
+#define S_statue_trap		60
+#define S_magic_trap		61
+#define S_anti_magic_trap	62
+#define S_polymorph_trap	63
 
 /* end traps, begin special effects */
 
-#define S_vbeam		63	/* The 4 zap beam symbols.  Do NOT separate. */
-#define S_hbeam		64	/* To change order or add, see function     */
-#define S_lslant	65	/* zapdir_to_glyph() in display.c.	    */
-#define S_rslant	66
-#define S_digbeam	67	/* dig beam symbol */
-#define S_flashbeam	68	/* camera flash symbol */
-#define S_boomleft	69	/* thrown boomerang, open left, e.g ')'    */
-#define S_boomright	70	/* thrown boomerand, open right, e.g. '('  */
-#define S_ss1		71	/* 4 magic shield glyphs */
-#define S_ss2		72
-#define S_ss3		73
-#define S_ss4		74
+#define S_vbeam		64	/* The 4 zap beam symbols.  Do NOT separate. */
+#define S_hbeam		65	/* To change order or add, see function     */
+#define S_lslant	66	/* zapdir_to_glyph() in display.c.	    */
+#define S_rslant	67
+#define S_digbeam	68	/* dig beam symbol */
+#define S_flashbeam	69	/* camera flash symbol */
+#define S_boomleft	70	/* thrown boomerang, open left, e.g ')'    */
+#define S_boomright	71	/* thrown boomerand, open right, e.g. '('  */
+#define S_ss1		72	/* 4 magic shield glyphs */
+#define S_ss2		73
+#define S_ss3		74
+#define S_ss4		75
 
 /* The 8 swallow symbols.  Do NOT separate.  To change order or add, see */
 /* the function swallow_to_glyph() in display.c.			 */
-#define S_sw_tl		75	/* swallow top left [1]			*/
-#define S_sw_tc		76	/* swallow top center [2]	Order:	*/
-#define S_sw_tr		77	/* swallow top right [3]		*/
-#define S_sw_ml		78	/* swallow middle left [4]	1 2 3	*/
-#define S_sw_mr		79	/* swallow middle right [6]	4 5 6	*/
-#define S_sw_bl		80	/* swallow bottom left [7]	7 8 9	*/
-#define S_sw_bc		81	/* swallow bottom center [8]		*/
-#define S_sw_br		82	/* swallow bottom right [9]		*/
+#define S_sw_tl		76	/* swallow top left [1]			*/
+#define S_sw_tc		77	/* swallow top center [2]	Order:	*/
+#define S_sw_tr		78	/* swallow top right [3]		*/
+#define S_sw_ml		79	/* swallow middle left [4]	1 2 3	*/
+#define S_sw_mr		80	/* swallow middle right [6]	4 5 6	*/
+#define S_sw_bl		81	/* swallow bottom left [7]	7 8 9	*/
+#define S_sw_bc		82	/* swallow bottom center [8]		*/
+#define S_sw_br		83	/* swallow bottom right [9]		*/
 
-#define S_explode1	83	/* explosion top left			*/
-#define S_explode2	84	/* explosion top center			*/
-#define S_explode3	85	/* explosion top right		 Ex.	*/
-#define S_explode4	86	/* explosion middle left		*/
-#define S_explode5	87	/* explosion middle center	 /-\	*/
-#define S_explode6	88	/* explosion middle right	 |@|	*/
-#define S_explode7	89	/* explosion bottom left	 \-/	*/
-#define S_explode8	90	/* explosion bottom center		*/
-#define S_explode9	91	/* explosion bottom right		*/
+#define S_explode1	84	/* explosion top left			*/
+#define S_explode2	85	/* explosion top center			*/
+#define S_explode3	86	/* explosion top right		 Ex.	*/
+#define S_explode4	87	/* explosion middle left		*/
+#define S_explode5	88	/* explosion middle center	 /-\	*/
+#define S_explode6	89	/* explosion middle right	 |@|	*/
+#define S_explode7	90	/* explosion bottom left	 \-/	*/
+#define S_explode8	91	/* explosion bottom center		*/
+#define S_explode9	92	/* explosion bottom right		*/
 
 /* end effects */
 
-#define MAXPCHARS	92	/* maximum number of mapped characters */
-#define MAXDCHARS	41	/* maximum of mapped dungeon characters */
+#define MAXPCHARS	93	/* maximum number of mapped characters */
+#define MAXDCHARS	42	/* maximum of mapped dungeon characters */
 #define MAXTCHARS	22	/* maximum of mapped trap characters */
 #define MAXECHARS	29	/* maximum of mapped effects characters */
 #define MAXEXPCHARS	9	/* number of explosion characters */
@@ -234,6 +235,7 @@ extern const struct symdef def_warnsyms[WARNCOUNT];
 #define IBM_GRAPHICS	1	/* PC graphic characters */
 #define DEC_GRAPHICS	2	/* VT100 line drawing characters */
 #define MAC_GRAPHICS	3	/* Macintosh drawing characters */
+#define CURS_GRAPHICS   4   /* Portable curses drawing characters */
 
 /*
  * The 5 possible states of doors
@@ -245,6 +247,7 @@ extern const struct symdef def_warnsyms[WARNCOUNT];
 #define D_CLOSED	4
 #define D_LOCKED	8
 #define D_TRAPPED	16
+#define D_SECRET	32 /* only used by sp_lev.c, NOT in rm-struct */
 
 /*
  * Some altars are considered as shrines, so we need a flag.
@@ -333,6 +336,7 @@ extern const struct symdef def_warnsyms[WARNCOUNT];
 struct rm {
 	int glyph;		/* what the hero thinks is there */
 	schar typ;		/* what is really there */
+	Bitfield(styp, 6);	/* last seen/touched dungeon typ */
 	uchar seenv;		/* seen vector */
 	Bitfield(flags,5);	/* extra information for typ */
 	Bitfield(horizontal,1); /* wall/door/etc is horiz. (more typ info) */
@@ -341,6 +345,17 @@ struct rm {
 	Bitfield(roomno,6);	/* room # for special rooms */
 	Bitfield(edge,1);	/* marks boundaries for special rooms*/
 };
+
+
+#define SET_TYPLIT(x,y,ttyp,llit)				\
+{								\
+    if ((ttyp) < MAX_TYPE) levl[(x)][(y)].typ = (ttyp);		\
+    if ((ttyp) == LAVAPOOL) levl[(x)][(y)].lit = 1;		\
+    else if ((schar)(llit) != -2) {				\
+	if ((schar)(llit) == -1) levl[(x)][(y)].lit = rn2(2);	\
+	else levl[(x)][(y)].lit = (llit);			\
+    }								\
+}
 
 /*
  * Add wall angle viewing by defining "modes" for each wall type.  Each
@@ -464,9 +479,39 @@ struct levelflags {
 	Bitfield(shortsighted,1);	/* monsters are shortsighted */
 	Bitfield(graveyard,1);		/* has_morgue, but remains set */
 	Bitfield(is_maze_lev,1);
+	Bitfield(stormy,1);		/* thunderous clouds */
 
 	Bitfield(is_cavernous_lev,1);
 	Bitfield(arboreal, 1);		/* Trees replace rock */
+};
+
+struct mon_gen_tuple {
+    int freq;
+    boolean is_sym;
+    int monid;
+    struct mon_gen_tuple *next;
+};
+
+struct mon_gen_override {
+    int override_chance;
+    int total_mon_freq;
+    struct mon_gen_tuple *gen_chances;
+};
+
+#define LVLSND_HEARD	0	/* You_hear(msg); */
+#define LVLSND_PLINED	1	/* pline(msg); */
+#define LVLSND_VERBAL	2	/* verbalize(msg); */
+#define LVLSND_FELT	3	/* You_feel(msg); */
+
+struct lvl_sound_bite {
+    int flags; /* LVLSND_foo */
+    char *msg;
+};
+
+struct lvl_sounds {
+    int freq;
+    int n_sounds;
+    struct lvl_sound_bite *sounds;
 };
 
 typedef struct
@@ -486,6 +531,8 @@ typedef struct
     struct monst	*monlist;
     struct damage	*damagelist;
     struct levelflags	flags;
+    struct mon_gen_override *mon_gen;
+    struct lvl_sounds	*sounds;
 }
 dlevel_t;
 
@@ -514,12 +561,7 @@ extern dlevel_t level;	/* structure describing the current level */
 			 !(level.monsters[x][y])->mburied)
 #define MON_BURIED_AT(x,y)	(level.monsters[x][y] != (struct monst *)0 && \
 				(level.monsters[x][y])->mburied)
-#ifndef STEED
-#define place_monster(m,x,y)	((m)->mx=(x),(m)->my=(y),\
-				 level.monsters[(m)->mx][(m)->my]=(m))
-#endif
 #define place_worm_seg(m,x,y)	level.monsters[x][y] = m
-#define remove_monster(x,y)	level.monsters[x][y] = (struct monst *)0
 #define m_at(x,y)		(MON_AT(x,y) ? level.monsters[x][y] : \
 						(struct monst *)0)
 #define m_buried_at(x,y)	(MON_BURIED_AT(x,y) ? level.monsters[x][y] : \

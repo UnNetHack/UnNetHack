@@ -179,13 +179,14 @@ magic_map_background(x, y, show)
     if (!cansee(x,y) && !lev->waslit) {
 	/* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
 	if (lev->typ == ROOM && glyph == cmap_to_glyph(S_room))
-	    glyph = cmap_to_glyph(S_stone);
+	    glyph = cmap_to_glyph(S_darkroom);
 	else if (lev->typ == CORR && glyph == cmap_to_glyph(S_litcorr))
 	    glyph = cmap_to_glyph(S_corr);
     }
     if (level.flags.hero_memory)
 	lev->glyph = glyph;
     if (show) show_glyph(x,y, glyph);
+    lev->styp = lev->typ;
 }
 
 /*
@@ -306,7 +307,7 @@ unmap_object(x, y)
 	/* turn remembered dark room squares dark */
 	if (!lev->waslit && lev->glyph == cmap_to_glyph(S_room) &&
 							    lev->typ == ROOM)
-	    lev->glyph = cmap_to_glyph(S_stone);
+	    lev->glyph = cmap_to_glyph(S_darkroom);
     } else
 	levl[x][y].glyph = cmap_to_glyph(S_stone);	/* default val */
 }
@@ -560,15 +561,14 @@ feel_location(x, y)
 		if (lev->typ != ROOM && lev->seenv) {
 		    map_background(x, y, 1);
 		} else {
-		    lev->glyph = lev->waslit ? cmap_to_glyph(S_room) :
-					       cmap_to_glyph(S_stone);
+		    lev->glyph = (!lev->waslit) ? cmap_to_glyph(S_darkroom) : cmap_to_glyph(S_room);
 		    show_glyph(x,y,lev->glyph);
 		}
 	    } else if ((lev->glyph >= cmap_to_glyph(S_stone) &&
-			lev->glyph < cmap_to_glyph(S_room)) ||
+			lev->glyph < cmap_to_glyph(S_darkroom)) ||
 		       glyph_is_invisible(levl[x][y].glyph)) {
-		lev->glyph = lev->waslit ? cmap_to_glyph(S_room) :
-					   cmap_to_glyph(S_stone);
+		lev->glyph = (!cansee(x,y) && !lev->waslit) ? cmap_to_glyph(S_darkroom) :
+					   cmap_to_glyph(S_room);
 		show_glyph(x,y,lev->glyph);
 	    }
 	} else {
@@ -607,8 +607,8 @@ feel_location(x, y)
 
 	/* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
 	if (lev->typ == ROOM &&
-		    lev->glyph == cmap_to_glyph(S_room) && !lev->waslit)
-	    show_glyph(x,y, lev->glyph = cmap_to_glyph(S_stone));
+		    lev->glyph == cmap_to_glyph(S_room))
+	    show_glyph(x,y, lev->glyph = cmap_to_glyph(S_darkroom));
 	else if (lev->typ == CORR &&
 		    lev->glyph == cmap_to_glyph(S_litcorr) && !lev->waslit)
 	    show_glyph(x,y, lev->glyph = cmap_to_glyph(S_corr));
@@ -752,11 +752,11 @@ newsym(x,y)
 	 * These checks and changes must be here and not in back_to_glyph().
 	 * They are dependent on the position being out of sight.
 	 */
-	else if (!lev->waslit) {
+	else if (!lev->waslit || (iflags.dark_room && iflags.use_color)) {
 	    if (lev->glyph == cmap_to_glyph(S_litcorr) && lev->typ == CORR)
 		show_glyph(x, y, lev->glyph = cmap_to_glyph(S_corr));
 	    else if (lev->glyph == cmap_to_glyph(S_room) && lev->typ == ROOM)
-		show_glyph(x, y, lev->glyph = cmap_to_glyph(S_stone));
+		show_glyph(x, y, lev->glyph = cmap_to_glyph(S_darkroom));
 	    else
 		goto show_mem;
 	} else {
@@ -1372,11 +1372,13 @@ flush_screen(cursor_on_u)
 
 #ifdef DUMP_LOG
 /* D: Added to dump screen to output file */
-STATIC_PTR uchar get_glyph_char(glyph)
+STATIC_PTR uchar get_glyph_char(glyph, oclass)
 int glyph;
+int *oclass;
 {
     uchar   ch;
     register int offset;
+    *oclass = 0;
 
     if (glyph >= NO_GLYPH)
         return ' ';
@@ -1397,8 +1399,10 @@ int glyph;
 	ch = defsyms[S_vbeam + (offset & 0x3)].sym;
     } else if ((offset = (glyph - GLYPH_CMAP_OFF)) >= 0) {	/* cmap */
 	ch = defsyms[offset].sym;
+	*oclass = -1;
     } else if ((offset = (glyph - GLYPH_OBJ_OFF)) >= 0) {	/* object */
 	ch = def_oc_syms[(int)objects[offset].oc_class];
+	*oclass = (int)objects[offset].oc_class;
     } else if ((offset = (glyph - GLYPH_RIDDEN_OFF)) >= 0) { /* mon ridden */
 	ch = def_monsyms[(int)mons[offset].mlet];
     } else if ((offset = (glyph - GLYPH_BODY_OFF)) >= 0) {	/* a corpse */
@@ -1442,22 +1446,80 @@ const char *str;
 void dump_screen()
 {
     register int x,y;
-    int lastc;
+    int lastc = -1;
     /* D: botl.c has a closer approximation to the size, but we'll go with
      *    this */
-    char buf[300], *ptr;
-    
+    char buf[COLNO*100], html_buf[COLNO*100], tmpbuf[100], *ptr;
+    int ch, glyph, oclass;
+    int color;
+    unsigned special;
+
+    dump_html("<pre class=\"nh_screen\">\n", "");
     for (y = 0; y < ROWNO; y++) {
+	buf[0] = '\0';
+	html_buf[0] = '\0';
 	lastc = 0;
-	ptr = buf;
 	for (x = 1; x < COLNO; x++) {
-	    uchar c = get_glyph_char(gbuf[y][x].glyph);
-	    *ptr++ = c;
+	    /* map glyph to character and color */
+	    glyph = gbuf[y][x].glyph;
+	    mapglyph(glyph, &ch, &color, &special, x, y);
+	    /* we can't use ch for output as that may be non-ASCII due
+	     * to DEC- or IBMgraphics */
+	    uchar c = get_glyph_char(glyph, &oclass);
+	    if (c == ' ')
+		Strcpy(tmpbuf, " ");
+	    else if (x == u.ux && y == u.uy)
+		Sprintf(tmpbuf, "<span class=\"nh_inv_%d nh_player\">%c</span>", color, c);
+	    else if (special & (MG_PET|MG_DETECT))
+		Sprintf(tmpbuf, "<span class=\"nh_inv_%d nh_pet\">%c</span>", color, c);
+	    else if (special & (MG_PET|MG_DETECT))
+		Sprintf(tmpbuf, "<span class=\"nh_inv_%d\">%c</span>", color, c);
+	    else if (special & MG_INVERSE)
+		Sprintf(tmpbuf, "<span class=\"nh_inv_%d\">%c</span>", color, c);
+	    else if (oclass < 0 && IS_DOOR(levl[x][y].typ) && levl[x][y].doormask >= D_ISOPEN)
+		Sprintf(tmpbuf, "<span class=\"nh_door\">%c</span>", c);
+	    else if (oclass < 0 && IS_DRAWBRIDGE(levl[x][y].typ))
+		Sprintf(tmpbuf, "<span class=\"nh_drawbridge\">%c</span>", c);
+	    else if (oclass < 0 && levl[x][y].typ == POOL)
+		Sprintf(tmpbuf, "<span class=\"nh_pool\">%c</span>", c);
+	    else if (oclass < 0 && levl[x][y].typ == MOAT)
+		Sprintf(tmpbuf, "<span class=\"nh_moat\">%c</span>", c);
+	    else if (oclass < 0 && levl[x][y].typ == WATER)
+		Sprintf(tmpbuf, "<span class=\"nh_water\">%c</span>", c);
+	    else if (oclass < 0 && levl[x][y].typ == LAVAPOOL)
+		Sprintf(tmpbuf, "<span class=\"nh_lava\">%c</span>", c);
+	    else if (oclass < 0 && levl[x][y].typ == IRONBARS)
+		Sprintf(tmpbuf, "<span class=\"nh_ironbars\">%c</span>", c);
+	    else if (oclass < 0 && levl[x][y].typ == CORR)
+		Sprintf(tmpbuf, "<span class=\"nh_corridor\">%c</span>", c);
+	    else if (oclass < 0 && levl[x][y].typ == STAIRS)
+		Sprintf(tmpbuf, "<span class=\"nh_stairs\">%s</span>", html_escape_character(c));
+	    else if (oclass < 0 && levl[x][y].typ == LADDER)
+		Sprintf(tmpbuf, "<span class=\"nh_ladder\">%c</span>", c);
+	    else if (oclass < 0 && levl[x][y].typ == FOUNTAIN)
+		Sprintf(tmpbuf, "<span class=\"nh_fountain\">%c</span>", c);
+	    else if (oclass < 0 && levl[x][y].typ == THRONE)
+		Sprintf(tmpbuf, "<span class=\"nh_throne\">%c</span>", c);
+	    else if (oclass < 0 && levl[x][y].typ == SINK)
+		Sprintf(tmpbuf, "<span class=\"nh_sink\">%c</span>", c);
+	    else if (oclass < 0 && levl[x][y].typ == GRAVE)
+		Sprintf(tmpbuf, "<span class=\"nh_grave\">%c</span>", c);
+	    else if (oclass < 0 && levl[x][y].typ == ALTAR)
+		Sprintf(tmpbuf, "<span class=\"nh_altar\">%c</span>", c);
+	    else if (oclass < 0 && levl[x][y].typ == ICE)
+		Sprintf(tmpbuf, "<span class=\"nh_ice\">%c</span>", c);
+	    else
+		Sprintf(tmpbuf, "<span class=\"nh_color_%d\">%s</span>", color, html_escape_character(c));
+	    Strcat(html_buf, tmpbuf);
+	    Sprintf(tmpbuf, "%c", c);
+	    Strcat(buf, tmpbuf);
+
 	    if (c != ' ')
-		lastc = x;
+		    lastc = x;
 	}
+	dump_html("<span class=\"nh_screen\">%s</span>\n", html_buf);
 	buf[lastc] = '\0';
-	dump("", buf);
+	dump_text("%s\n", buf);
     }
     dump("", "");
     bot1str(buf);
@@ -1465,6 +1527,7 @@ void dump_screen()
     dump("", ptr);
     bot2str(buf);
     dump("", buf);
+    dump_html("</pre>\n", "");
     dump("", "");
     dump("", "");
 }
@@ -1497,7 +1560,9 @@ back_to_glyph(x,y)
 	case STONE:
 	    idx = level.flags.arboreal ? S_tree : S_stone;
 	    break;
-	case ROOM:		idx = S_room;	  break;
+	case ROOM:
+	    idx = (!cansee(x,y) && !ptr->waslit) ? S_darkroom : S_room;
+	    break;
 	case CORR:
 	    idx = (ptr->waslit || flags.lit_corridor) ? S_litcorr : S_corr;
 	    break;
@@ -1554,11 +1619,11 @@ back_to_glyph(x,y)
 	    case DB_MOAT:  idx = S_pool; break;
 	    case DB_LAVA:  idx = S_lava; break;
 	    case DB_ICE:   idx = S_ice;  break;
-	    case DB_FLOOR: idx = S_room; break;
+	    case DB_FLOOR: idx = (!cansee(x,y) && !ptr->waslit) ? S_darkroom : S_room; break;
 	    default:
 		impossible("Strange db-under: %d",
 			   ptr->drawbridgemask & DB_UNDER);
-		idx = S_room; /* something is better than nothing */
+		idx = (!cansee(x,y) && !ptr->waslit) ? S_darkroom : S_room; /* something is better than nothing */
 		break;
 	    }
 	    break;
@@ -1567,7 +1632,7 @@ back_to_glyph(x,y)
 	    break;
 	default:
 	    impossible("back_to_glyph:  unknown level type [ = %d ]",ptr->typ);
-	    idx = S_room;
+	    idx = (!cansee(x,y) && !ptr->waslit) ? S_darkroom : S_room;
 	    break;
     }
 

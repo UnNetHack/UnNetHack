@@ -55,6 +55,18 @@ STATIC_DCL void FDECL(lifesaved_monster, (struct monst *, uchar));
 #else
 STATIC_DCL void FDECL(lifesaved_monster, (struct monst *));
 #endif
+void
+remove_monster(x,y)
+int x,y;
+{
+    if (level.monsters[x][y] &&
+	(level.monsters[x][y]->data == &mons[PM_GIANT_TURTLE] &&
+	 (!level.monsters[x][y]->minvis || See_invisible)))
+	unblock_point(x,y);
+    level.monsters[x][y] = (struct monst *)0;
+}
+
+
 /* convert the monster index of an undead to its living counterpart */
 int
 undead_to_corpse(mndx)
@@ -217,6 +229,9 @@ register struct monst *mtmp;
 		goto default_1;
 	    case PM_VAMPIRE:
 	    case PM_VAMPIRE_LORD:
+#if 0	/* DEFERRED */
+	    case PM_VAMPIRE_MAGE:
+#endif
 		/* include mtmp in the mkcorpstat() call */
 		num = undead_to_corpse(mndx);
 		obj = mkcorpstat(CORPSE, mtmp, &mons[num], x, y, TRUE);
@@ -1496,6 +1511,10 @@ uchar adtyp;
 	tmp = monsndx(mtmp->data);
 	if (mvitals[tmp].died < 255) mvitals[tmp].died++;
 
+	/* killing an artifact-guardian is ordinary robbery */
+	if (is_guardian(mtmp->data))
+		violated(CONDUCT_THIEVERY);
+
 	/* if it's a (possibly polymorphed) quest leader, mark him as dead */
 	if (mtmp->m_id == quest_status.leader_m_id)
 	    quest_status.leader_is_dead = TRUE;
@@ -1673,6 +1692,9 @@ register struct monst *mdef;
 	struct obj *otmp, *obj, *oldminvent;
 	xchar x = mdef->mx, y = mdef->my;
 	boolean wasinside = FALSE;
+#ifndef GOLDOBJ
+	long mgold=0;
+#endif
 
 	/* we have to make the statue before calling mondead, to be able to
 	 * put inventory in it, and we have to check for lifesaving before
@@ -1712,6 +1734,12 @@ register struct monst *mdef;
 			oldminvent = obj;
 		    }
 		}
+	
+#ifndef GOLDOBJ
+		/* fix SC343-8 and C343-94 */
+		mgold = mdef->mgold;
+		mdef->mgold = 0;
+#endif
 		/* defer statue creation until after inventory removal
 		   so that saved monster traits won't retain any stale
 		   item-conferred attributes */
@@ -1723,13 +1751,12 @@ register struct monst *mdef;
 		    (void) add_to_container(otmp, obj);
 		}
 #ifndef GOLDOBJ
-		if (mdef->mgold) {
+		if (mgold) {
 			struct obj *au;
 			au = mksobj(GOLD_PIECE, FALSE, FALSE);
-			au->quan = mdef->mgold;
+			au->quan = mgold;
 			au->owt = weight(au);
 			(void) add_to_container(otmp, au);
-			mdef->mgold = 0;
 		}
 #endif
 		/* Archeologists should not break unique statues */
@@ -1847,7 +1874,7 @@ xkilled(mtmp, dest)
 
 
 	/* KMH, conduct */
-	u.uconduct.killer++;
+	violated(CONDUCT_PACIFISM);
 
 	if (dest & 1) {
 	    const char *verb = nonliving(mtmp->data) ? "destroy" : "kill";
@@ -2121,6 +2148,7 @@ int  typ, fatal;
 {
 	int i, plural, kprefix = KILLED_BY_AN;
 	boolean thrown_weapon = (fatal < 0);
+	int how;
 
 	if (thrown_weapon) fatal = -fatal;
 	if(strcmp(string, "blast") && !thrown_weapon) {
@@ -2147,10 +2175,16 @@ int  typ, fatal;
 	    /*[ does this need a plural check too? ]*/
 	    kprefix = KILLED_BY;
 	}
+
+	how = strstri(pname, "poison") ? DIED : POISONING;
 	i = rn2(fatal + 20*thrown_weapon);
 	if(i == 0 && typ != A_CHA) {
-		u.uhp = -1;
-		pline_The("poison was deadly...");
+		/* used to be instantly fatal; now just gongs your maxhp for (3d6)/2
+		 * ...which is probably pretty close to fatal anyway for low-levels */
+		pline_The("poison was extremely toxic!");
+		i = d(4,6);
+		u.uhpmax -= i / 2;
+		losehp_how(i,pname,kprefix,how);
 	} else if(i <= 5) {
 		/* Check that a stat change was made */
 		if (adjattrib(typ, thrown_weapon ? -1 : -rn1(3,3), 1))
@@ -2164,7 +2198,7 @@ int  typ, fatal;
 		killer_format = kprefix;
 		killer = pname;
 		/* "Poisoned by a poisoned ___" is redundant */
-		done(strstri(pname, "poison") ? DIED : POISONING);
+		done(how);
 	}
 	(void) encumber_msg();
 }

@@ -406,7 +406,8 @@ m_throw(mon, x, y, dx, dy, range, obj)
 					AT_SPIT : AT_WEAP), singleobj)) {
 			blindinc = rnd(25);
 			if(singleobj->otyp == CREAM_PIE) {
-			    if(!Blind) pline("Yecch!  You've been creamed.");
+			    if(!Blind) pline("Yecch!  You've been %s.",
+			                     piday() ? "pied" : "creamed");
 			    else pline("There's %s sticky all over your %s.",
 				       something,
 				       body_part(FACE));

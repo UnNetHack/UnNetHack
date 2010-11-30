@@ -248,6 +248,8 @@ static struct inv_sub { short race_pm, item_otyp, subs_otyp; } inv_subs[] = {
  /* { PM_DWARF, PICK_AXE,		DWARVISH_MATTOCK      }, */
     { PM_GNOME, BOW,			CROSSBOW	      },
     { PM_GNOME, ARROW,			CROSSBOW_BOLT	      },
+    { PM_VAMPIRE,	POT_FRUIT_JUICE,	POT_BLOOD	      },
+    { PM_VAMPIRE,	FOOD_RATION,		POT_VAMPIRE_BLOOD     },
     { NON_PM,	STRANGE_OBJECT,		STRANGE_OBJECT	      }
 };
 
@@ -563,7 +565,7 @@ u_init()
 	u.umonnum = u.umonster = (flags.female &&
 			urole.femalenum != NON_PM) ? urole.femalenum :
 			urole.malenum;
-	set_uasmon();
+	init_uasmon();
 
 	u.ulevel = 0;	/* set up some of the initial attributes */
 	u.uhp = u.uhpmax = newhp();
@@ -576,6 +578,23 @@ u_init()
 	u.uspellprot = 0;
 	adjabil(0,1);
 	u.ulevel = u.ulevelmax = 1;
+
+	/*
+	 * u.roleplay should be treated similar to gender and alignment
+	 *   - it gets set at character creation
+	 *   - it's hard to change in-game
+	 *     (e.g. a special NPC could teach literacy somewhere)
+	 * the initialisation has to be in front of food, alignment
+	 * and inventory.
+	 */
+	u.roleplay.ascet	= flags.ascet;
+	u.roleplay.atheist	= flags.atheist;
+	u.roleplay.blindfolded	= flags.blindfolded;
+	u.roleplay.illiterate	= flags.illiterate;
+	u.roleplay.pacifist	= flags.pacifist;
+	u.roleplay.nudist	= flags.nudist;
+	u.roleplay.vegan	= flags.vegan;
+	u.roleplay.vegetarian	= flags.vegetarian;
 
 	init_uhunger();
 	for (i = 0; i <= MAXSPELL; i++) spl_book[i].sp_id = NO_SPELL;
@@ -732,6 +751,7 @@ u_init()
 		break;
 
 	default:	/* impossible */
+		warning("u_init: unknown role %d", Role_switch);
 		break;
 	}
 
@@ -803,13 +823,32 @@ u_init()
 	    knows_object(ORCISH_CLOAK);
 	    break;
 
+	case PM_VAMPIRE:
+	    /* Vampires start off with gods not as pleased, luck penalty */
+	    adjalign(-5); 
+	    change_luck(-1);
+	    break;
+
 	default:	/* impossible */
+		warning("u_init: unknown race %d", Race_switch);
 		break;
 	}
 
+#ifdef TOURIST
 	/* Towel Day: In Memoriam Douglas Adams */
 	if (towelday())
 		ini_inv(Towel);
+#endif
+
+	/*** Conduct specific initialisation ***/
+
+	if (u.roleplay.blindfolded) {
+		if(!ublindf) ini_inv(Blindfold);
+	} else {
+		violated(CONDUCT_BLINDFOLDED);
+	}
+	if (u.roleplay.atheist) 
+		u.ugangr++;
 
 	if (discover)
 		ini_inv(Wishing);
@@ -932,7 +971,7 @@ register struct trobj *trop;
 				/* 'useless' items */
 				|| otyp == POT_HALLUCINATION
 				|| otyp == POT_ACID
-				|| otyp == SCR_AMNESIA
+				|| otyp == SCR_FLOOD
 				|| otyp == SCR_FIRE
 				|| otyp == SCR_BLANK_PAPER
 				|| otyp == SPE_BLANK_PAPER
@@ -1020,7 +1059,7 @@ register struct trobj *trop;
 		if (otyp == OIL_LAMP)
 			discover_object(POT_OIL, TRUE, FALSE);
 
-		if(obj->oclass == ARMOR_CLASS){
+		if((obj->oclass == ARMOR_CLASS && !u.roleplay.nudist)){
 			if (is_shield(obj) && !uarms) {
 				setworn(obj, W_ARMS);
 				if (uswapwep) setuswapwep((struct obj *) 0);
@@ -1044,12 +1083,15 @@ register struct trobj *trop;
 			otyp == TIN_OPENER || otyp == FLINT || otyp == ROCK) {
 		    if (is_ammo(obj) || is_missile(obj)) {
 			if (!uquiver) setuqwep(obj);
-		    } else if (!uwep) setuwep(obj);
+		    } else if ((!uwep) && !u.roleplay.pacifist) setuwep(obj);
 		    else if (!uswapwep) setuswapwep(obj);
 		}
 		if (obj->oclass == SPBOOK_CLASS &&
 				obj->otyp != SPE_BLANK_PAPER)
 		    initialspell(obj);
+
+		if ((obj->otyp == BLINDFOLD) && u.roleplay.blindfolded)
+				setworn(obj, W_TOOL);
 
 #if !defined(PYRAMID_BUG) && !defined(MAC)
 		if(--trop->trquan) continue;	/* make a similar object */

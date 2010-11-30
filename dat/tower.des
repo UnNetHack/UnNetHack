@@ -22,13 +22,15 @@ MAP
 ENDMAP
 LADDER:(11,05),down
 # The lord and his court
-MONSTER:'V',"Vlad the Impaler",(06,05)
-MONSTER:'V',random,(03,09)
-MONSTER:'V',random,(07,09)
-MONSTER:'V',random,(11,09)
-MONSTER:'V',random,(03,01)
-MONSTER:'V',random,(07,01)
-MONSTER:'V',random,(11,01)
+MONSTER:('V',"Vlad the Impaler"),(06,05) {
+  OBJECT:('(',"Candelabrum of Invocation")
+}
+MONSTER:'V',(03,09)
+MONSTER:'V',(07,09)
+MONSTER:'V',(11,09)
+MONSTER:'V',(03,01)
+MONSTER:'V',(07,01)
+MONSTER:'V',(11,01)
 # The doors
 DOOR:closed,(08,03)
 DOOR:closed,(10,03)
@@ -38,13 +40,13 @@ DOOR:locked,(08,07)
 DOOR:locked,(10,07)
 DOOR:closed,(03,06)
 # treasures
-OBJECT:'(',"chest",(07,05)
-OBJECT:'(',"chest",(03,09)
-OBJECT:'(',"chest",(07,09)
-OBJECT:'(',"chest",(11,09)
-OBJECT:'(',"chest",(03,01)
-OBJECT:'(',"chest",(07,01)
-OBJECT:'(',"chest",(11,01)
+OBJECT:('(',"chest"),(07,05)
+OBJECT:('(',"chest"),(03,09)
+OBJECT:('(',"chest"),(07,09)
+OBJECT:('(',"chest"),(11,09)
+OBJECT:('(',"chest"),(03,01)
+OBJECT:('(',"chest"),(07,01)
+OBJECT:('(',"chest"),(11,01)
 # We have to protect the tower against outside attacks
 NON_DIGGABLE:(00,00,14,10)
 
@@ -68,44 +70,45 @@ MAP
   --- --- ---  
 ENDMAP
 # Random places are the 10 niches
-RANDOM_PLACES:(03,01),(07,01),(11,01),(01,03),(13,03),
-	      (01,07),(13,07),(03,09),(07,09),(11,09)
+$place = { (03,01),(07,01),(11,01),(01,03),(13,03),
+	      (01,07),(13,07),(03,09),(07,09),(11,09) }
+SHUFFLE:$place
 LADDER:(11,05),up
 LADDER:(03,07),down
 DOOR:locked,(10,04)
 DOOR:locked,(09,07)
-MONSTER:'&',random,place[0]
-MONSTER:'&',random,place[1]
-MONSTER:'d',"hell hound pup",place[2]
-MONSTER:'d',"hell hound pup",place[3]
-MONSTER:'d',"winter wolf",place[4]
+MONSTER:'&',$place[0]
+MONSTER:'&',$place[1]
+MONSTER:('d',"hell hound pup"),$place[2]
+MONSTER:('d',"hell hound pup"),$place[3]
+MONSTER:('d',"winter wolf"),$place[4]
 IF [50%] {
-  CONTAINER:'(',"chest",place[5] {
-    IF [50%] {
-      OBJECT:'"',"amulet of life saving"
-    } ELSE {
-      OBJECT:'"',"amulet of change"
-    }
+  CONTAINER:('(',"chest"),$place[5] {
+#    IF [50%] {
+      OBJECT:('"',"amulet of life saving")
+#    } ELSE {
+      OBJECT:('"',"amulet of change")
+#    }
   }
 } ELSE {
-  CONTAINER:'(',"iron safe",place[5] {
-    IF [50%] {
-      OBJECT:'"',"amulet of life saving"
-    } ELSE {
-      OBJECT:'"',"amulet of change"
+  CONTAINER:('(',"iron safe"),$place[5] {
+#    IF [50%] {
+      OBJECT:('"',"amulet of life saving")
+#    } ELSE {
+      OBJECT:('"',"amulet of change")
     }
-  }
+#  }
 }
-CONTAINER:'(',"chest",place[6] {
-  IF [50%] {
-    OBJECT:'"',"amulet of strangulation"
-  } ELSE {
-    OBJECT:'"',"amulet of restful sleep"
-  }
+CONTAINER:('(',"chest"),$place[6] {
+#  IF [50%] {
+    OBJECT:('"',"amulet of strangulation")
+#  } ELSE {
+    OBJECT:('"',"amulet of restful sleep")
+#  }
 }
-OBJECT[60%]:'[',"water walking boots",place[7]
-OBJECT[60%]:'[',"crystal plate mail",place[8]
-OBJECT[60%]:'+',"invisibility",place[9]
+OBJECT[60%]:('[',"water walking boots"),$place[7]
+OBJECT[60%]:('[',"crystal plate mail"),$place[8]
+OBJECT[60%]:('+',"invisibility"),$place[9]
 # Walls in the tower are non diggable
 NON_DIGGABLE:(00,00,14,10)
 
@@ -131,29 +134,30 @@ MAP
   ---------------  
 ENDMAP
 # Random places are the 10 niches
-RANDOM_PLACES:(05,01),(09,01),(13,01),(03,03),(15,03),
-	      (03,07),(15,07),(05,09),(09,09),(13,09)
+$place = { (05,01),(09,01),(13,01),(03,03),(15,03),
+	      (03,07),(15,07),(05,09),(09,09),(13,09) }
+SHUFFLE:$place
 BRANCH:(02,05,02,05),(00,00,00,00)
 LADDER:(05,07),up
 # Entry door is, of course, locked
 DOOR:locked,(14,05)
 # Let's put a dragon behind the door, just for the fun...
-MONSTER:'D',random,(13,05)
-MONSTER:random,random,(12,04)
-MONSTER:random,random,(12,06)
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-MONSTER:random,random,random
-OBJECT[75%]:')',"long sword",place[0]
-TRAP:random,place[0]
-OBJECT[75%]:'(',"lock pick",place[1]
-TRAP:random,place[1]
-OBJECT[75%]:'[',"elven cloak",place[2]
-TRAP:random,place[2]
-OBJECT[75%]:'(',"blindfold",place[3]
-TRAP:random,place[3]
+MONSTER:'D',(13,05)
+MONSTER:random,(12,04)
+MONSTER:random,(12,06)
+MONSTER:random,random
+MONSTER:random,random
+MONSTER:random,random
+MONSTER:random,random
+MONSTER:random,random
+MONSTER:random,random
+OBJECT[75%]:(')',"long sword"),$place[0]
+TRAP:random,$place[0]
+OBJECT[75%]:('(',"lock pick"),$place[1]
+TRAP:random,$place[1]
+OBJECT[75%]:('[',"elven cloak"),$place[2]
+TRAP:random,$place[2]
+OBJECT[75%]:('(',"blindfold"),$place[3]
+TRAP:random,$place[3]
 # Walls in the tower are non diggable
 NON_DIGGABLE:(00,00,18,12)

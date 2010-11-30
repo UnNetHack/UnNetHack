@@ -534,7 +534,7 @@ peffects(otmp)
 			}
 			You_feel("self-knowledgeable...");
 			display_nhwindow(WIN_MESSAGE, FALSE);
-			enlightenment(0);
+			enlightenment(0, TRUE);
 			pline_The("feeling subsides.");
 			exercise(A_WIS, TRUE);
 		}
@@ -1599,7 +1599,12 @@ register struct obj *o1, *o2;
 		} else {
 			return 0;
 		}
-		return alchemy_table2[result];
+		if (OBJ_NAME(objects[alchemy_table2[result]]) == 0) {
+			/* mixed potion doesn't exist in this game */
+			return 0;
+		} else {
+			return alchemy_table2[result];
+		}
 	} else {
 		switch (o1->otyp) {
 			case UNICORN_HORN:
@@ -1748,13 +1753,20 @@ dodip()
 	here = levl[u.ux][u.uy].typ;
 	/* Is there a fountain to dip into here? */
 	if (IS_FOUNTAIN(here)) {
-		if(yn("Dip it into the fountain?") == 'y') {
+		Sprintf(qbuf, "Dip %s into the fountain?",
+				safe_qbuf("", sizeof("Dip  into the fountain?"),
+					the(xname(obj)), the(simple_typename(obj->otyp)),
+					"this item"));
+		if(yn(qbuf) == 'y') {
 			dipfountain(obj);
 			return(1);
 		}
 	} else if (is_pool(u.ux,u.uy)) {
 		tmp = waterbody_name(u.ux,u.uy);
-		Sprintf(qbuf, "Dip it into the %s?", tmp);
+		Sprintf(qbuf, "Dip %s into the %s?", 
+				safe_qbuf("", sizeof("Dip  into the pool of water?"),
+					the(xname(obj)), the(simple_typename(obj->otyp)),
+					"this item"), tmp);
 		if (yn(qbuf) == 'y') {
 		    if (Levitation) {
 			floating_above(tmp);
@@ -1771,7 +1783,11 @@ dodip()
 		}
 	}
 
-	if(!(potion = getobj(beverages, "dip into")))
+	Sprintf(qbuf, "dip %s into",
+			safe_qbuf("", sizeof("dip  into"),
+				the(xname(obj)), the(simple_typename(obj->otyp)),
+				"this item"));
+	if(!(potion = getobj(beverages, qbuf)))
 		return(0);
 	if (potion == obj && potion->quan == 1L) {
 		pline("That is a potion bottle, not a Klein bottle!");
@@ -1853,6 +1869,7 @@ struct obj *potion, *obj;
 	    if (obj->otyp == potion->otyp ||	/* both POT_POLY */
 		    obj->otyp == WAN_POLYMORPH ||
 		    obj->otyp == SPE_POLYMORPH ||
+		    obj->otyp == AMULET_OF_UNCHANGING ||
 		    obj == uball || obj == uskin ||
 		    obj_resists(obj->otyp == POT_POLYMORPH ?
 				potion : obj, 5, 95)) {
@@ -1941,6 +1958,10 @@ struct obj *potion, *obj;
 		}
 
 		obj->odiluted = (obj->otyp != POT_WATER);
+
+		if (OBJ_NAME(objects[obj->otyp]) == 0) {
+			panic("dipping created an inexistant potion (%d)", obj->otyp);
+		}
 
 		if (obj->otyp == POT_WATER && !Hallucination) {
 			pline_The("mixture bubbles%s.",

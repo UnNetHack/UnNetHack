@@ -11,6 +11,7 @@
 LEVEL: "Val-strt"
 FLAGS: noteleport,hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"fire ant"), (16,'a'), (16,"fire giant"), (4,'H')
 GEOMETRY:center,center
 MAP
 IIIIIIPPPIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
@@ -46,40 +47,42 @@ FOUNTAIN:(53,02)
 DOOR:locked,(26,10)
 DOOR:locked,(43,10)
 # Norn
-MONSTER:'@',"Norn",(35,10)
+MONSTER:('@',"Norn"),(35,10) {
+  OBJECT:'['
+  OBJECT:')'
+  OBJECT:'?'
+  OBJECT:'?'
+}
 # The treasure of the Norn
-OBJECT:'(',"chest",(36,10)
+OBJECT:('(',"chest"),(36,10)
 # valkyrie guards for the audience chamber
-MONSTER:'@',"warrior",(27,08)
-MONSTER:'@',"warrior",(27,09)
-MONSTER:'@',"warrior",(27,11)
-MONSTER:'@',"warrior",(27,12)
-MONSTER:'@',"warrior",(42,08)
-MONSTER:'@',"warrior",(42,09)
-MONSTER:'@',"warrior",(42,11)
-MONSTER:'@',"warrior",(42,12)
+MONSTER:('@',"warrior"),(27,08)
+MONSTER:('@',"warrior"),(27,09)
+MONSTER:('@',"warrior"),(27,11)
+MONSTER:('@',"warrior"),(27,12)
+MONSTER:('@',"warrior"),(42,08)
+MONSTER:('@',"warrior"),(42,09)
+MONSTER:('@',"warrior"),(42,11)
+MONSTER:('@',"warrior"),(42,12)
 # Non diggable walls
 NON_DIGGABLE:(26,07,43,13)
 # Random traps
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
+LOOP [3 + 3d5] {
+  TRAP:"fire",random
+}
 # Monsters on siege duty.
-MONSTER: 'a',"fire ant",(04,12)
-MONSTER: 'a',"fire ant",(08,08)
-MONSTER: 'a',"fire ant",(14,04)
-MONSTER: 'a',"fire ant",(17,11)
-MONSTER: 'a',"fire ant",(24,10)
-MONSTER: 'a',"fire ant",(45,10)
-MONSTER: 'a',"fire ant",(54,02)
-MONSTER: 'a',"fire ant",(55,07)
-MONSTER: 'a',"fire ant",(58,14)
-MONSTER: 'a',"fire ant",(63,17)
-MONSTER: 'H',"fire giant",(18,01),hostile
-MONSTER: 'H',"fire giant",(10,16),hostile
+MONSTER: ('a',"fire ant"),(04,12)
+MONSTER: ('a',"fire ant"),(08,08)
+MONSTER: ('a',"fire ant"),(14,04)
+MONSTER: ('a',"fire ant"),(17,11)
+MONSTER: ('a',"fire ant"),(24,10)
+MONSTER: ('a',"fire ant"),(45,10)
+MONSTER: ('a',"fire ant"),(54,02)
+MONSTER: ('a',"fire ant"),(55,07)
+MONSTER: ('a',"fire ant"),(58,14)
+MONSTER: ('a',"fire ant"),(63,17)
+MONSTER: ('H',"fire giant"),(18,01),hostile
+MONSTER: ('H',"fire giant"),(10,16),hostile
 
 #
 #	The "locate" level for the quest.
@@ -91,6 +94,7 @@ MONSTER: 'H',"fire giant",(10,16),hostile
 LEVEL: "Val-loca"
 FLAGS: hardfloor,mazelevel
 INIT_MAP: mines, '.' , 'I' , true , true , lit , false
+MON_GENERATION:86%, (64,"fire ant"), (16,'a'), (16,"fire giant"), (4,'H')
 GEOMETRY:center,center
 MAP
 PPPP....                      ....PPPPP.
@@ -115,56 +119,25 @@ STAIR:(20,06),down
 # Non diggable walls
 NON_DIGGABLE:(00,00,39,12)
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+LOOP [6 + 3d5] {
+  OBJECT:random,random
+}
 # Random traps
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
+LOOP [2 + 3d5] {
+  TRAP:"fire",random
+}
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',random,random
-MONSTER:'H',random,random,hostile
-MONSTER:'H',"fire giant",random,hostile
-MONSTER:'H',"fire giant",random,hostile
-MONSTER:'H',"fire giant",random,hostile
-MONSTER:'H',"fire giant",random,hostile
-MONSTER:'H',"fire giant",random,hostile
-MONSTER:'H',"fire giant",random,hostile
-MONSTER:'H',"fire giant",random,hostile
-MONSTER:'H',random,random,hostile
+LOOP [10 + 3d5] {
+  MONSTER:('a',"fire ant"),random
+}
+MONSTER:'a',random
+MONSTER:'H',random,hostile
+LOOP [2 + 3d5] {
+  MONSTER:('H',"fire giant"),random,hostile
+}
+MONSTER:'H',random,hostile
 
 #
 #	The "goal" level for the quest.
@@ -177,6 +150,7 @@ MONSTER:'H',random,random,hostile
 LEVEL: "Val-goal"
 FLAGS:mazelevel
 INIT_MAP: mines, '.' , 'L' , true , true , lit , false
+MON_GENERATION:86%, (64,"fire ant"), (16,'a'), (16,"fire giant"), (4,'H')
 GEOMETRY:center,center
 MAP
 .L............................LLLLL
@@ -208,53 +182,39 @@ NON_DIGGABLE:(00,00,34,16)
 DRAWBRIDGE:(17,02),south,open
 DRAWBRIDGE:(17,14),north,open
 # Objects
-OBJECT:'(',"crystal ball",(17,08),blessed,5,"The Orb of Fate"
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:('(',"crystal ball"),(17,08),blessed,5,NAME:"The Orb of Fate"
+LOOP [4 + 3d5] {
+  OBJECT:random,random
+}
 # Traps
 TRAP:"board",(13,08)
 TRAP:"board",(21,08)
 # Random traps
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
-TRAP:"fire",random
+LOOP [2 + 2d3] {
+  TRAP:"fire",random
+}
 TRAP:"board",random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'H',"Lord Surtur",(17,08)
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',"fire ant",random
-MONSTER:'a',random,random
-MONSTER:'a',random,random
-MONSTER:'H',"fire giant",(10,06),hostile
-MONSTER:'H',"fire giant",(10,07),hostile
-MONSTER:'H',"fire giant",(10,08),hostile
-MONSTER:'H',"fire giant",(10,09),hostile
-MONSTER:'H',"fire giant",(10,10),hostile
-MONSTER:'H',"fire giant",(24,06),hostile
-MONSTER:'H',"fire giant",(24,07),hostile
-MONSTER:'H',"fire giant",(24,08),hostile
-MONSTER:'H',"fire giant",(24,09),hostile
-MONSTER:'H',"fire giant",(24,10),hostile
-MONSTER:'H',"fire giant",random,hostile
-MONSTER:'H',"fire giant",random,hostile
-MONSTER:'H',random,random,hostile
+MONSTER:('H',"Lord Surtur"),(17,08) {
+  OBJECT:('(', "Bell of Opening"),uncursed
+  OBJECT:'['
+  OBJECT:')'
+  OBJECT:random
+  OBJECT:random
+}
+LOOP [2 + 2d3] {
+  MONSTER:('a',"fire ant"),random
+}
+MONSTER:'a',random
+MONSTER:'a',random
+LOOP [5 + 4d3] {
+  MONSTER:('H',"fire giant"),(10,06),hostile
+}
+MONSTER:('H',"fire giant"),random,hostile
+MONSTER:('H',"fire giant"),random,hostile
+MONSTER:'H',random,hostile
 
 #
 #	The "fill" levels for the quest.
@@ -266,71 +226,49 @@ MONSTER:'H',random,random,hostile
 #
 
 LEVEL: "Val-fila"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP: mines, '.' , 'I' , true , true , lit, false
+MON_GENERATION:86%, (64,"fire ant"), (16,'a'), (16,"fire giant"), (4,'H')
 NOMAP
 #
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+LOOP [5 + 2d3] {
+  OBJECT: random, random
+}
 #
-MONSTER: 'a', "fire ant", random
-MONSTER: 'a', "fire ant", random
-MONSTER: 'a', "fire ant", random
-MONSTER: 'a', "fire ant", random
-MONSTER: 'a', "fire ant", random
-MONSTER: 'a', random, random
-MONSTER: 'H', "fire giant", random, hostile
+LOOP [2 + 2d2] {
+  MONSTER: ('a', "fire ant"), random
+}
+MONSTER: 'a', random
+MONSTER: ('H', "fire giant"), random, hostile
 #
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
+LOOP [6 + 2d2] {
+  TRAP: random, random
+}
 
 LEVEL: "Val-filb"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP: mines, '.' , 'L' , true , true , lit, false
+MON_GENERATION:86%, (64,"fire ant"), (16,'a'), (16,"fire giant"), (4,'H')
 NOMAP
 #
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+LOOP [8 + 2d2] {
+  OBJECT: random, random
+}
 #
-MONSTER: 'a', "fire ant", random
-MONSTER: 'a', "fire ant", random
-MONSTER: 'a', "fire ant", random
-MONSTER: 'a', random, random
-MONSTER: 'H', "fire giant", random, hostile
-MONSTER: 'H', "fire giant", random, hostile
-MONSTER: 'H', "fire giant", random, hostile
+LOOP [3 + 2d2] {
+  MONSTER: ('a', "fire ant"), random
+  MONSTER[80%]: ('H', "fire giant"), random, hostile
+}
+MONSTER: 'a', random
 #
-TRAP: "fire", random
-TRAP: "fire", random
-TRAP: "fire", random
-TRAP: "fire", random
-TRAP: "fire", random
+LOOP [3 + 3d2] {
+  TRAP: "fire", random
+}
 TRAP: random, random
 TRAP: random, random

@@ -1,4 +1,4 @@
-#	NetHack Makefile.
+#	UnNetHack Makefile.
 #	SCCS Id: @(#)Makefile.dat	3.4	1992/09/18
 
 # for Atari
@@ -100,14 +100,18 @@ options:	../util/makedefs
 
 
 spec_levs: ../util/lev_comp \
-	bigroom.des castle.des endgame.des gehennom.des knox.des medusa.des \
-	mines.des oracle.des sokoban.des tower.des yendor.des
+	bigroom.des blkmar.des castle.des endgame.des gehennom.des heck.des knox.des town-?.des medusa.des \
+	mines.des nymph.des oracle.des sokoban.des tower.des yendor.des
 	../util/lev_comp bigroom.des
+	../util/lev_comp blkmar.des
 	../util/lev_comp castle.des
 	../util/lev_comp endgame.des
 	../util/lev_comp gehennom.des
+	../util/lev_comp heck.des
 	../util/lev_comp knox.des
 	../util/lev_comp medusa.des
+	../util/lev_comp nymph.des
+	../util/lev_comp town-?.des
 	../util/lev_comp mines.des
 	../util/lev_comp oracle.des
 	../util/lev_comp sokoban.des

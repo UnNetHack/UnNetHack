@@ -34,8 +34,10 @@ init_map(bg_typ)
 	if (bg_typ >= MAX_TYPE) return;
 
 	for(i=1; i<COLNO; i++)
-	    for(j=0; j<ROWNO; j++)
+	    for(j=0; j<ROWNO; j++) {
 		levl[i][j].typ = bg_typ;
+		levl[i][j].lit = FALSE;
+	    }
 }
 
 

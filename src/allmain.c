@@ -51,6 +51,7 @@ moveloop()
     monstr_init();	/* monster strengths */
     objects_init();
     dragons_init();
+    shop_selection_init();
 
 #ifdef WIZARD
     if (wizard) add_debug_extended_commands();
@@ -425,6 +426,7 @@ moveloop()
 #ifdef MAIL
 	    ckmailstatus();
 #endif
+            maybe_tutorial();
 	    rhack((char *)0);
 	}
 	if (u.utotype)		/* change dungeon level */

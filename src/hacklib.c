@@ -46,6 +46,8 @@ NetHack, except that rounddiv may call panic().
 	int		night		(void)
 	int		midnight	(void)
 	boolean		towelday	(void)
+	char *		get_formatted_time		(time_t, const char *)
+	char *		iso8601		(time_t)
 =*/
 #ifdef LINT
 # define Static		/* pacify lint */
@@ -511,13 +513,8 @@ setrandom()
 static struct tm *
 getlt()
 {
-	time_t date;
+	time_t date = current_epoch();
 
-#if defined(BSD) && !defined(POSIX_TYPES)
-	(void) time((long *)(&date));
-#else
-	(void) time(&date);
-#endif
 #if (defined(ULTRIX) && !(defined(ULTRIX_PROTO) || defined(NHSTDC))) || (defined(BSD) && !defined(POSIX_TYPES))
 	return(localtime((long *)(&date)));
 #else
@@ -653,6 +650,64 @@ boolean
 towelday()
 {
 	return(boolean)((getmday()==25) && (getmonth()==5));
+}
+
+boolean
+piday()
+{
+	return(boolean)((getmonth()==3) && (getmday()==14));
+}
+
+static char buf_fmt_time[BUFSZ];
+/** Returns a date formatted by strftime.
+ * Returns current time if time is 0. */
+char *
+get_formatted_time(time, fmt)
+time_t time;
+const char *fmt;
+{
+	strftime(buf_fmt_time, BUFSZ, fmt,
+	         (time == 0) ? getlt() : localtime(&time));
+	return buf_fmt_time;
+}
+
+/** Returns a iso-8601 formatted date (e.g. 2010-03-19T08:46:23+0100). */
+char *
+iso8601(date)
+time_t date;
+{
+	return get_formatted_time(date, "%Y-%m-%dT%H:%M:%S%z");
+}
+
+static char buf_fmt_duration[BUFSZ];
+/** Returns a iso-8601 formatted duration (e.g. PThh:mm:ss). */
+char *
+iso8601_duration(seconds)
+long seconds;
+{
+	/* currently no days, months and years, as the conversion
+	 * is non-trivial */
+	long minutes = seconds / 60;
+	long hours = minutes / 60;
+
+	/* PThh:mm:ss */
+	sprintf(buf_fmt_duration, "PT%02ld:%02ld:%02ld",
+			hours, minutes % 60, seconds % 60);
+	return buf_fmt_duration;
+}
+
+/** Returns epoch time. */
+time_t
+current_epoch()
+{
+	time_t date;
+
+#if defined(BSD) && !defined(POSIX_TYPES)
+	(void) time((long *)(&date));
+#else
+	(void) time(&date);
+#endif
+	return date;
 }
 
 /*hacklib.c*/

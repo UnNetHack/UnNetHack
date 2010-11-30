@@ -26,9 +26,15 @@ dnl  ----- Window systems
 # NETHACK_WIN_ENABLE(proxy, auto)
 nethack_default_win=""
 # Note: Order is important: The last listed enabled port will be the default.
+NETHACK_WIN_ENABLE(dummy, no, [dummy graphics for unit tests])
+NETHACK_WIN_ENABLE(dummy, no, [dummy graphics for unit tests])
+NETHACK_WIN_ENABLE(curses, no, [use curses interface])
 NETHACK_WIN_ENABLE(tty, auto)
-NETHACK_WIN_ENABLE(x11, no)
-NETHACK_WIN_ENABLE(mswin, no, [use Microsoft Window's native graphics])
+#NETHACK_WIN_ENABLE(x11, no)
+#NETHACK_WIN_ENABLE(mswin, no, [use Microsoft Window's native graphics])
+dnl deactivate X11 and Win32 tiles version
+enable_x11_graphics="no"
+enable_mswin_graphics="no"
 
 dnl  ----- Figure out a C compiler to use; set @CC@
 AC_PROG_CC
@@ -181,6 +187,34 @@ if test "$enable_tty_graphics" = "no" -a $host_os = mingw32; then
 fi
 AC_SUBST(WINTTYLIB)
 
+
+WINCURSESLIB=
+if test "$enable_curses_graphics" != "no"; then
+	# For curses, determine the curses lib
+	CURSES_VARIANTS="ncurses curses"
+	for curseslib in ${CURSES_VARIANTS}; do
+	    AC_CHECK_LIB(${curseslib}, tgetent,
+	      [WINCURSESLIB="-l${curseslib}"
+	      WINSRC="${WINSRC} \$(WINCURSESSRC)"
+	      WINOBJ="${WINOBJ} \$(WINCURSESOBJ)"
+	      WINLIB="${WINLIB} \$(WINCURSESLIB)"
+	      AC_DEFINE(CURSES_GRAPHICS, [], [Curses interface])
+	      break])
+	done
+	if test -z "$curseslib"; then
+	    if test "$enable_curses_graphics" = yes; then
+		AC_MSG_ERROR([Can't find tgetent (needed for curses graphics)])
+	    else
+		AC_MSG_WARN([Can't enable curses graphics (no tgetent)])
+		NETHACK_AUTO_WIN_DISABLE(curses)
+	    fi
+	fi
+
+	OPTIONS_FILE="options"
+	OPTIONS_FILES="options"
+fi
+AC_SUBST(WINCURSESLIB)
+
 dnl if test "$enable_proxy_graphics" != "no"; then
 dnl     if test "$have_libpng" = "no"; then
 dnl 	if test "$enable_proxy_graphics" = "yes"; then
@@ -217,6 +251,15 @@ if test "$enable_x11_graphics" != "no"; then
     WINLIB="${WINLIB} ${LIBXAW_LIBS}"
     CNF_SHARE_DATND="${CNF_SHARE_DATND} \$(CNF_SHARE_X11ND)"
     AC_DEFINE(X11_GRAPHICS, [], [X11 graphics])
+
+    OPTIONS_FILE="options"
+    OPTIONS_FILES="options"
+fi
+
+if test "$enable_dummy_graphics" != "no"; then
+    WINSRC="${WINSRC} \$(WINDUMMYSRC)"
+    WINOBJ="${WINOBJ} \$(WINDUMMYOBJ)"
+    AC_DEFINE(DUMMY_GRAPHICS, [], [Dummy graphics])
 
     OPTIONS_FILE="options"
     OPTIONS_FILES="options"
@@ -264,7 +307,7 @@ AC_HEADER_STDC
 # Due to what may be a bug in autoconf, we have to call AC_CHECK_HEADERS()
 # to get the various HAVE_xxx_H preprocessor variables detected by
 # AC_HEADER_STDC active. These are needed for AC_CHECK_DECLS(), below.
-AC_CHECK_HEADERS([string.h])
+AC_CHECK_HEADERS([string.h utime.h])
 AC_CHECK_HEADER(regex.h, [have_regex_h=yes],[have_regex_h=no],/* TEST_REGEX */)
 
 dnl ------ Check for data types
@@ -384,6 +427,7 @@ NETHACK_ARG(high-score-comparison-by-uid,[Compare High Score entries by user id 
 # NETHACK_ARG(show-dmg,[Display damage reports],SHOW_DMG,yes)
 # NETHACK_ARG(show-weight,[Display object weight],SHOW_WEIGHT,yes)
 # NETHACK_ARG(other-services,[Shopkeeper services],OTHER_SERVICES,yes)
+NETHACK_ARG(paranoid,[Require some questions to be answered with 'yes' instead of 'y'],PARANOID,yes)
 NETHACK_ARG(show-born,[Display number of created monsters at the end of game],SHOW_BORN,yes)
 NETHACK_ARG(show-extinct,[Display extinct monsters at the end of game],SHOW_EXTINCT,yes)
 NETHACK_ARG(dungeon-growth,[Dungeon growth],DUNGEON_GROWTH,yes)
@@ -400,12 +444,19 @@ NETHACK_ARG_WITH_PARAM(xlogfile,[More verbose logfile],XLOGFILE,yes,FILE,[xlogfi
 NETHACK_ARG_WITH_PARAM(livelog,[Live game progress logfile],LIVELOGFILE,no,FILE,[livelog])
 if test "$enable_livelog" != "no" ; then
 	NETHACK_ARG(livelog-shout,[Shoutting into the live game logfile],LIVELOG_SHOUT,no)
+	NETHACK_ARG(livelog-killing,[Reporting killing of uniques and ghosts of former players],LIVELOG_BONES_KILLER,no)
 fi
 
 NETHACK_ARG(dump,[Dumping character stats],DUMP_LOG,yes)
 if test "$enable_dump" != "no" ; then
-	NETHACK_ARG_WITH_PARAM(dump-file,[Name of character dump file],DUMP_FN,no,FILE,"/tmp/%s.nh")
-	NETHACK_ARG_WITH_PARAM(dump-messages,[Number of dumped messages],DUMPMSGS,yes,NUMBER,20)
+	NETHACK_ARG_WITH_PARAM(dump-file,[Name of character dump file],DUMP_FN,no,FILE,"/tmp/%n.nh")
+	NETHACK_ARG_WITH_PARAM(dump-messages,[Number of dumped messages],DUMPMSGS,yes,NUMBER,30)
+	NETHACK_ARG(dump-text,[Dump a text file],DUMP_TEXT_LOG,yes)
+	NETHACK_ARG(dump-html,[Dump an HTML file],DUMP_HTML_LOG,no)
+	if test "$enable_dump_html" != "no" ; then
+		NETHACK_ARG_WITH_PARAM(dump-html-css-file,[Path to the css dump file],DUMP_HTML_CSS_FILE,yes,FILE,"unnethack_dump.css")
+		NETHACK_ARG(dump-html-css-embedded,[CSS file should be included in the HTML dump],DUMP_HTML_CSS_EMBEDDED,no)
+	fi
 fi
 
 NETHACK_ARG_WITH_PARAM(whereis-file,[Log information about running games],WHEREIS_FILE,no,FILE,[%n.whereis])

@@ -20,11 +20,56 @@ STATIC_DCL void NDECL(uunstick);
 STATIC_DCL int FDECL(armor_to_dragon,(int));
 STATIC_DCL void NDECL(newman);
 
+/* Assumes u.umonster is set up already */
+/* Use u.umonster since we might be restoring and you may be polymorphed */
+void
+init_uasmon()
+{
+	int i;
+
+	upermonst = mons[u.umonster];
+
+	/* Fix up the flags */
+	/* Default flags assume human,  so replace with your race's flags */
+
+	upermonst.mflags1 &= ~(mons[PM_HUMAN].mflags1);
+	upermonst.mflags1 |= (mons[urace.malenum].mflags1);
+
+	upermonst.mflags2 &= ~(mons[PM_HUMAN].mflags2);
+	upermonst.mflags2 |= (mons[urace.malenum].mflags2);
+
+	upermonst.mflags3 &= ~(mons[PM_HUMAN].mflags3);
+	upermonst.mflags3 |= (mons[urace.malenum].mflags3);
+	
+	/* Fix up the attacks */
+	/* crude workaround, needs better general solution */
+	if (Race_if(PM_VAMPIRE)) {
+	  for(i = 0; i < NATTK; i++) {
+	    upermonst.mattk[i] = mons[urace.malenum].mattk[i];
+	  }
+	}
+	
+	set_uasmon();
+}
+
 /* update the youmonst.data structure pointer */
 void
 set_uasmon()
 {
-	set_mon_data(&youmonst, &mons[u.umonnum], 0);
+	set_mon_data(&youmonst, ((u.umonnum == u.umonster) ? 
+					&upermonst : &mons[u.umonnum]), 0);
+}
+
+/** Returns true if the player monster is genocided. */
+boolean
+is_playermon_genocided()
+{
+	return ((mvitals[urole.malenum].mvflags & G_GENOD) ||
+			(urole.femalenum != NON_PM &&
+			(mvitals[urole.femalenum].mvflags & G_GENOD)) ||
+			(mvitals[urace.malenum].mvflags & G_GENOD) ||
+			(urace.femalenum != NON_PM &&
+			(mvitals[urace.femalenum].mvflags & G_GENOD)));
 }
 
 /* make a (new) human out of the player */
@@ -61,12 +106,7 @@ const char *fmt, *arg;
 
 	You(fmt, arg);
 	/* check whether player foolishly genocided self while poly'd */
-	if ((mvitals[urole.malenum].mvflags & G_GENOD) ||
-			(urole.femalenum != NON_PM &&
-			(mvitals[urole.femalenum].mvflags & G_GENOD)) ||
-			(mvitals[urace.malenum].mvflags & G_GENOD) ||
-			(urace.femalenum != NON_PM &&
-			(mvitals[urace.femalenum].mvflags & G_GENOD))) {
+	if (is_playermon_genocided()) {
 	    /* intervening activity might have clobbered genocide info */
 	    killer = delayed_killer;
 	    if (!killer || !strstri(killer, "genocid")) {
@@ -279,11 +319,11 @@ boolean forcecontrol;
 				mntmp = PM_HUMAN; /* Illegal; force newman() */
 			else
 				mntmp = u.ulycn;
-		} else {
-			if (youmonst.data->mlet == S_VAMPIRE)
+		} else if (isvamp) {
+			if (u.umonnum != PM_VAMPIRE_BAT)
 				mntmp = PM_VAMPIRE_BAT;
 			else
-				mntmp = PM_VAMPIRE;
+				mntmp = PM_HUMAN; /* newman() */
 		}
 		/* if polymon fails, "you feel" message has been given
 		   so don't follow up with another polymon or newman */
@@ -1097,7 +1137,7 @@ domindblast()
 		if(mtmp->mpeaceful)
 			continue;
 		u_sen = telepathic(mtmp->data) && !mtmp->mcansee;
-		if ((u_sen || (telepathic(mtmp->data) && rn2(2)) || !rn2(10)
+		if (u_sen || (telepathic(mtmp->data) && rn2(2)) || (!rn2(10)
 			&& (which_armor(mtmp, W_ARMH) &&
 			    which_armor(mtmp, W_ARMH)->otyp != TINFOIL_HAT))) {
 			You("lock in on %s %s.", s_suffix(mon_nam(mtmp)),

@@ -17,7 +17,6 @@
 
 #ifdef OVLB
 STATIC_DCL boolean FDECL(isbig, (struct mkroom *));
-STATIC_DCL struct mkroom * FDECL(pick_room,(BOOLEAN_P));
 STATIC_DCL void NDECL(mkshop), FDECL(mkzoo,(int)), NDECL(mkswamp);
 STATIC_DCL void NDECL(mktemple);
 STATIC_DCL void FDECL(mkgarden, (struct mkroom *));
@@ -25,7 +24,6 @@ STATIC_DCL coord * FDECL(shrine_pos, (int));
 STATIC_DCL struct permonst * NDECL(morguemon);
 STATIC_DCL struct permonst * NDECL(antholemon);
 STATIC_DCL struct permonst * NDECL(squadmon);
-STATIC_DCL struct permonst * NDECL(armorymon);
 STATIC_DCL void FDECL(save_room, (int,struct mkroom *));
 STATIC_DCL void FDECL(rest_room, (int,struct mkroom *));
 #endif /* OVLB */
@@ -66,6 +64,7 @@ int	roomtype;
 	case ARMORY:	mkzoo(ARMORY); break;
 	case ANTHOLE:	mkzoo(ANTHOLE); break;
 	case LEMUREPIT:	mkzoo(LEMUREPIT); break;
+	case POOLROOM:	mkpoolroom(); break;
 	default:	impossible("Tried to make a room of type %d.", roomtype);
     }
 }
@@ -83,6 +82,12 @@ mkshop()
 #ifndef MAC
 		ep = nh_getenv("SHOPTYPE");
 		if(ep){
+			for (i=0; shtypes[i].name; i++) {
+				if (!strcmp(shtypes[i].name, ep) ||
+				    (*ep == def_oc_syms[(int)shtypes[i].symb])) {
+				    goto gottype;
+				}
+			}
 			if(*ep == 'z' || *ep == 'Z'){
 				mkzoo(ZOO);
 				return;
@@ -123,6 +128,10 @@ mkshop()
 				mkzoo(LEPREHALL);
 				return;
 			}
+			if(*ep == 'o' || *ep == 'O'){
+				mkpoolroom();
+				return;
+			}
 			if(*ep == '_'){
 				mktemple();
 				return;
@@ -135,9 +144,6 @@ mkshop()
 				mkswamp();
 				return;
 			}
-			for(i=0; shtypes[i].name; i++)
-				if(*ep == def_oc_syms[(int)shtypes[i].symb])
-				    goto gottype;
 			if(*ep == 'g' || *ep == 'G')
 				i = 0;
 			else
@@ -199,7 +205,7 @@ gottype:
 	stock_room(i, sroom);
 }
 
-STATIC_OVL struct mkroom *
+struct mkroom *
 pick_room(strict)
 register boolean strict;
 /* pick an unused room, preferably with only one door */

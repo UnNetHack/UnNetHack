@@ -58,6 +58,12 @@ long mask;
 	    uskin = obj;
 	 /* assert( !uarm ); */
 	} else {
+	    if (obj && (mask & W_ARMOR)) {	
+		violated(CONDUCT_NUDISM);			
+		/* Restoring a game and naming worn armor uses setworn.  *
+		 * This can unneccessariely increase the conduct-counter *
+		 * (only visible in Wizmode)				 */
+	    }
 	    for(wp = worn; wp->w_mask; wp++) if(wp->w_mask & mask) {
 		oobj = *(wp->w_obj);
 		if(oobj && !(oobj->owornmask & wp->w_mask))
@@ -148,6 +154,8 @@ struct monst *mon;
 	mon->perminvis = 1;
 	if (!mon->invis_blkd) {
 	    mon->minvis = 1;
+	    if (mon->data == &mons[PM_GIANT_TURTLE])
+		unblock_point(mon->mx, mon->my);
 	    newsym(mon->mx, mon->my);		/* make it disappear */
 	    if (mon->wormno) see_wsegs(mon);	/* and any tail too */
 	}

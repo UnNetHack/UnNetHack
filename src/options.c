@@ -23,6 +23,10 @@ NEARDATA struct instance_flags iflags;	/* provide linkage */
 #define PREFER_TILED FALSE
 #endif
 
+#ifdef CURSES_GRAPHICS
+extern int curses_read_attrs(char *attrs);
+#endif
+
 /*
  *  NOTE:  If you add (or delete) an option, please update the short
  *  options help (option_help()), the long options help (dat/opthelp),
@@ -72,19 +76,21 @@ static struct Bool_Opt
 	{"checkspace", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"cmdassist", &iflags.cmdassist, TRUE, SET_IN_GAME},
-# if defined(MICRO) || defined(WIN32)
-	{"color",         &iflags.wc_color,TRUE, SET_IN_GAME},		/*WC*/
-# else	/* systems that support multiple terminals, many monochrome */
-	{"color",         &iflags.wc_color, FALSE, SET_IN_GAME},	/*WC*/
-# endif
+	{"color", &iflags.wc_color, TRUE, SET_IN_GAME},		/*WC*/
 	{"confirm",&flags.confirm, TRUE, SET_IN_GAME},
+#ifdef CURSES_GRAPHICS
+	{"cursesgraphics", &iflags.cursesgraphics, TRUE, SET_IN_GAME},
+#else
+	{"cursesgraphics", (boolean *)0, FALSE, SET_IN_FILE},
+#endif
+	{"dark_room", &iflags.dark_room, TRUE, SET_IN_GAME},
 #if defined(TERMLIB) && !defined(MAC_GRAPHICS_ENV)
 	{"DECgraphics", &iflags.DECgraphics, FALSE, SET_IN_GAME},
 #else
 	{"DECgraphics", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"eight_bit_tty", &iflags.wc_eight_bit_input, FALSE, SET_IN_GAME},	/*WC*/
-#ifdef TTY_GRAPHICS
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
 	{"extmenu", &iflags.extmenu, FALSE, SET_IN_GAME},
 #else
 	{"extmenu", (boolean *)0, FALSE, SET_IN_FILE},
@@ -102,8 +108,10 @@ static struct Bool_Opt
 	{"flush", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"fullscreen", &iflags.wc2_fullscreen, FALSE, SET_IN_FILE},
+	{"guicolor", &iflags.wc2_guicolor, TRUE, SET_IN_GAME},
 	{"help", &flags.help, TRUE, SET_IN_GAME},
-	{"hilite_pet",    &iflags.wc_hilite_pet, FALSE, SET_IN_GAME},	/*WC*/
+	{"hilite_pet",    &iflags.wc_hilite_pet, TRUE, SET_IN_GAME},	/*WC*/
+	{"hitpointbar", &flags.hitpointbar, FALSE, SET_IN_GAME},
 #ifdef ASCIIGRAPH
 	{"IBMgraphics", &iflags.IBMgraphics, FALSE, SET_IN_GAME},
 #else
@@ -116,7 +124,7 @@ static struct Bool_Opt
 #endif
 	{"large_font", &iflags.obsolete, FALSE, SET_IN_FILE},	/* OBSOLETE */
 	{"legacy", &flags.legacy, TRUE, DISP_IN_GAME},
-	{"lit_corridor", &flags.lit_corridor, FALSE, SET_IN_GAME},
+	{"lit_corridor", &flags.lit_corridor, TRUE, SET_IN_GAME},
 	{"lootabc", &iflags.lootabc, FALSE, SET_IN_GAME},
 #ifdef MAC_GRAPHICS_ENV
 	{"Macgraphics", &iflags.MACgraphics, TRUE, SET_IN_GAME},
@@ -143,22 +151,45 @@ static struct Bool_Opt
 #else
 	{"menu_tab_sep", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+#ifdef CURSES_GRAPHICS
+	{"mouse_support", &iflags.wc_mouse_support, FALSE, DISP_IN_GAME},	/*WC*/
+#else
 	{"mouse_support", &iflags.wc_mouse_support, TRUE, DISP_IN_GAME},	/*WC*/
+#endif
 	{"newcolors", &iflags.wc2_newcolors, TRUE, SET_IN_FILE},
 #ifdef NEWS
 	{"news", &iflags.news, TRUE, DISP_IN_GAME},
 #else
 	{"news", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+	{"conducts_ascet", &flags.ascet, FALSE, SET_IN_FILE },
+	{"conducts_atheist", &flags.atheist, FALSE, SET_IN_FILE },
+	{"conducts_blindfolded", &flags.blindfolded, FALSE, SET_IN_FILE },
+	{"conducts_illiterate", &flags.illiterate, FALSE, SET_IN_FILE },
+	{"conducts_pacifist", &flags.pacifist, FALSE, SET_IN_FILE },
+	{"conducts_nudist", &flags.nudist, FALSE, SET_IN_FILE },
+	{"conducts_vegan", &flags.vegan, FALSE, SET_IN_FILE }, 
+	{"conducts_vegetarian", &flags.vegetarian, FALSE, SET_IN_FILE }, 
 	{"null", &flags.null, TRUE, SET_IN_GAME},
 #ifdef MAC
 	{"page_wait", &flags.page_wait, TRUE, SET_IN_GAME},
 #else
 	{"page_wait", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+#ifdef PARANOID
+	{"paranoid_hit", &iflags.paranoid_hit, FALSE, SET_IN_FILE},
+	{"paranoid_quit", &iflags.paranoid_quit, FALSE, SET_IN_FILE},
+	{"paranoid_remove", &iflags.paranoid_remove, FALSE, SET_IN_FILE},
+	{"paranoid_trap", &iflags.paranoid_trap, FALSE, SET_IN_FILE},
+#endif
 	{"perm_invent", &flags.perm_invent, FALSE, SET_IN_GAME},
+	{"pickup_dropped", &flags.pickup_dropped, FALSE, SET_IN_GAME},
 	{"pickup_thrown", &flags.pickup_thrown, TRUE, SET_IN_GAME},
+#ifdef CURSES_GRAPHICS
+	{"popup_dialog",  &iflags.wc_popup_dialog, TRUE, SET_IN_GAME},	/*WC*/
+#else
 	{"popup_dialog",  &iflags.wc_popup_dialog, FALSE, SET_IN_GAME},	/*WC*/
+#endif  /* CURSES_GRAPHICS */
 	{"prayconfirm", &flags.prayconfirm, TRUE, SET_IN_GAME},
 	{"preload_tiles", &iflags.wc_preload_tiles, TRUE, DISP_IN_GAME},	/*WC*/
 	{"pushweapon", &flags.pushweapon, FALSE, SET_IN_GAME},
@@ -180,7 +211,7 @@ static struct Bool_Opt
 #ifdef SHOW_BORN
 	{"showborn", &iflags.show_born, FALSE, SET_IN_GAME},
 #endif
-	{"showbuc", &iflags.show_buc, FALSE, SET_IN_GAME},
+	{"showbuc", &iflags.show_buc, TRUE, SET_IN_GAME},
 	{"showdmg", &iflags.showdmg, FALSE, SET_IN_GAME},
 	{"show_dgn_name", &iflags.show_dgn_name, FALSE, SET_IN_GAME},
 #ifdef EXP_ON_BOTL
@@ -202,7 +233,8 @@ static struct Bool_Opt
 	{"sortpack", &flags.sortpack, TRUE, SET_IN_GAME},
 	{"sound", &flags.soundok, TRUE, SET_IN_GAME},
 	{"sparkle", &flags.sparkle, TRUE, SET_IN_GAME},
-	{"standout", &flags.standout, FALSE, SET_IN_GAME},
+	/* not removed for backwards compatibilty */
+	{"standout", &flags.standout, TRUE, SET_IN_FILE}, 
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	{"statuscolors", &iflags.use_status_colors, TRUE, SET_IN_GAME},
 #else
@@ -210,7 +242,7 @@ static struct Bool_Opt
 #endif
 	{"splash_screen",     &iflags.wc_splash_screen, TRUE, DISP_IN_GAME},	/*WC*/
 	{"tiled_map",     &iflags.wc_tiled_map, PREFER_TILED, DISP_IN_GAME},	/*WC*/
-	{"time", &flags.time, FALSE, SET_IN_GAME},
+	{"time", &flags.time, TRUE, SET_IN_GAME},
 #ifdef TIMED_DELAY
 	{"timed_delay", &flags.nap, TRUE, SET_IN_GAME},
 #else
@@ -219,16 +251,13 @@ static struct Bool_Opt
 	{"tombstone",&flags.tombstone, TRUE, SET_IN_GAME},
 	{"toptenwin",&flags.toptenwin, FALSE, SET_IN_GAME},
 	{"travel", &iflags.travelcmd, TRUE, SET_IN_GAME},
-#ifdef WIN32CON
 	{"use_inverse",   &iflags.wc_inverse, TRUE, SET_IN_GAME},		/*WC*/
-#else
-	{"use_inverse",   &iflags.wc_inverse, FALSE, SET_IN_GAME},		/*WC*/
-#endif
 #ifdef WIN_EDGE
 	{"win_edge", &iflags.win_edge, FALSE, SET_IN_GAME},
 #else
 	{"win_edge", (boolean *)0, TRUE, SET_IN_FILE},
 #endif
+	{"vanilla_ui_behavior", &iflags.vanilla_ui_behavior, FALSE, SET_IN_FILE},
 	{"verbose", &flags.verbose, TRUE, SET_IN_GAME},
 	{"wraptext", &iflags.wc2_wraptext, FALSE, SET_IN_GAME},
 	{(char *)0, (boolean *)0, FALSE, 0}
@@ -255,6 +284,9 @@ static struct Comp_Opt
 						1, SET_IN_GAME },
 	{ "catname",  "the name of your (first) cat (e.g., catname:Tabby)",
 						PL_PSIZ, DISP_IN_GAME },
+	{ "conducts", "the kind of conducts you want to adhere to",
+						1, /* not needed */
+						DISP_IN_GAME },
 #ifdef EXOTIC_PETS
 	{ "crocodilename", "the name of your (first) crocodile (e.g., crocodilename:TickTock)",
 						PL_PSIZ, DISP_IN_GAME },
@@ -341,11 +373,19 @@ static struct Comp_Opt
 						15, SET_IN_FILE },
 # endif
 #endif
+	{ "petattr",  "attributes for highlighting pets", 12, SET_IN_FILE },
+#ifdef PARANOID
+	{ "paranoid", "the kind of actions you want to be paranoid about",
+						1, /* not needed */
+						SET_IN_GAME },
+#endif
 	{ "pettype",  "your preferred initial pet type", 4, DISP_IN_GAME },
 	{ "pickup_burden",  "maximum burden picked up before prompt",
 						20, SET_IN_GAME },
 	{ "pickup_types", "types of objects to pick up automatically",
 						MAXOCLASSES, SET_IN_GAME },
+	{ "pilesize", "maximum number of items on floor to list automatically",
+						20, SET_IN_GAME },
 	{ "player_selection", "choose character via dialog or prompts",
 						12, DISP_IN_GAME },
 	{ "race",     "your starting race (e.g., Human, Elf)",
@@ -569,9 +609,10 @@ initoptions()
 	iflags.runmode = RUN_LEAP;
 	iflags.msg_history = 20;
 #ifdef TTY_GRAPHICS
-	iflags.prevmsg_window = 's';
+	iflags.prevmsg_window = 'f';
 #endif
 	iflags.menu_headings = ATR_INVERSE;
+	iflags.pilesize = 5;
 
 	/* Use negative indices to indicate not yet selected */
 	flags.initrole = -1;
@@ -596,7 +637,7 @@ initoptions()
 	(void)memcpy((genericptr_t)flags.inv_order,
 		     (genericptr_t)def_inv_order, sizeof flags.inv_order);
 	flags.pickup_types[0] = '\0';
-	flags.pickup_burden = MOD_ENCUMBER;
+	flags.pickup_burden = SLT_ENCUMBER;
 
 	for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++)
 		flags.end_disclose[i] = DISCLOSE_PROMPT_DEFAULT_NO;
@@ -663,6 +704,11 @@ initoptions()
 	/* result in the player's preferred fruit [better than "\033"].	*/
 	obj_descr[SLIME_MOLD].oc_name = "fruit";
 
+	if (iflags.dark_room && iflags.use_color) {
+		showsyms[S_darkroom]=showsyms[S_room];
+	} else {
+		showsyms[S_darkroom]=showsyms[S_stone];
+	}
 	return;
 }
 
@@ -1183,9 +1229,6 @@ int bool_or_comp;	/* 0 == boolean option, 1 == compound */
 	}
 }
 
-#ifdef MENU_COLOR
-extern struct menucoloring *menu_colorings;
-
 static const struct {
    const char *name;
    const int color;
@@ -1206,6 +1249,9 @@ static const struct {
    {"lightcyan", CLR_BRIGHT_CYAN},
    {"white", CLR_WHITE}
 };
+
+#ifdef MENU_COLOR
+extern struct menucoloring *menu_colorings;
 
 static const struct {
    const char *name;
@@ -1309,6 +1355,127 @@ char *str;
     }
 }
 #endif /* MENU_COLOR */
+
+/* parse '"monster name":color' and change monster info accordingly */
+boolean
+parse_monster_color(str)
+char *str;
+{
+	int i, c = NO_COLOR;
+	char *tmps, *cs = strchr(str, ':');
+	char buf[BUFSZ];
+	int monster;
+
+	if (!str) return FALSE;
+
+	strncpy(buf, str, BUFSZ);
+	cs = strchr(buf, ':');
+	if (!cs) return FALSE;
+
+	tmps = cs;
+	tmps++;
+	/* skip whitespace at start of string */
+	while (*tmps && isspace(*tmps)) tmps++;
+
+	/* determine color */
+	for (i = 0; i < SIZE(colornames); i++)
+		if (strstri(tmps, colornames[i].name) == tmps) {
+			c = colornames[i].color;
+			break;
+		}
+	if ((i == SIZE(colornames)) && (*tmps >= '0' && *tmps <='9'))
+		c = atoi(tmps);
+
+	if (c > 15) return FALSE;
+
+	/* determine monster name */
+	*cs = '\0';
+	tmps = buf;
+	if ((*tmps == '"') || (*tmps == '\'')) {
+		cs--;
+		while (isspace(*cs)) cs--;
+		if (*cs == *tmps) {
+			*cs = '\0';
+			tmps++;
+		}
+	}
+
+	monster = name_to_mon(tmps);
+	if (monster > -1) {
+		mons[monster].mcolor = c;
+		return TRUE;
+	} else {
+		return FALSE;
+	}
+}
+
+void
+common_prefix_options_parser(fullname, opts, negated)
+const char *fullname;
+char *opts;
+boolean negated;
+{
+	boolean badopt = FALSE;
+	int i;
+	char *op;
+	int fullname_len = strlen(fullname);
+
+	op = string_for_opt(opts, TRUE);
+	if (op && negated) {
+		bad_negation(fullname, TRUE);
+		return;
+	}
+	/* "fullname" without a value means "all"
+	   and negated means "none" */
+	if (!op || !strcmpi(op, "all") || !strcmpi(op, "none")) {
+		if (op && !strcmpi(op, "none")) negated = TRUE;
+		boolean value = negated ? FALSE : TRUE;
+		/* set all boolean options starting with fullname */
+		for (i = 0; boolopt[i].name; i++) {
+			if (!strncmp(boolopt[i].name, fullname, fullname_len)) {
+				*boolopt[i].addr = value;
+			}
+		}
+		return;
+	}
+
+	/* check for "+option1 -option2" */
+	while (*op) {
+		boolean check = FALSE, value = FALSE;
+		register char c;
+		c = *op;
+		if (c == '+') {
+			check = TRUE;
+			value = TRUE;
+		} else if (c == '-' || c == '!') {
+			check = TRUE;
+			value = FALSE;
+		} else if (c == ' ') {
+			/* do nothing */
+			check = FALSE;
+		} else {
+			badopt = TRUE;
+		}
+		op++;
+		if (check) {
+			int i;
+			for (i = 0; boolopt[i].name; i++) {
+				int name_len = strlen(boolopt[i].name)-fullname_len-1;
+				if ((strlen(boolopt[i].name) > fullname_len) &&
+				    /* name starts with fullname */
+				    !strncmp(boolopt[i].name, fullname, fullname_len) &&
+				    boolopt[i].name[fullname_len] == '_' &&
+				    /* name ends with user supplied option name */
+				    !strncmp(boolopt[i].name+fullname_len+1, op, name_len)) {
+					op += name_len;
+					*boolopt[i].addr = value;
+				}
+			}
+		}
+	}
+
+	if (badopt) badoption(opts);
+}
 
 void
 parseoptions(opts, tinitial, tfrom_file)
@@ -2120,6 +2287,18 @@ goodfruit:
 		}
 		return;
 	}
+
+	fullname = "pilesize";
+	if (match_optname(opts, fullname, sizeof("pilesize")-1, TRUE)) {
+		if (negated) {
+			bad_negation(fullname, FALSE);
+			return;
+		} else if (!(op = string_for_opt(opts, FALSE))) return;
+		iflags.pilesize = atoi(op);
+		if (iflags.pilesize < 1) iflags.pilesize = 1;
+		return;
+	}
+
 	/* WINCAP
 	 * player_selection: dialog | prompts */
 	fullname = "player_selection";
@@ -2214,6 +2393,20 @@ goodfruit:
 		if (badopt) badoption(opts);
 		return;
 	}
+
+#ifdef PARANOID
+	fullname = "conducts";
+	if (match_optname(opts, fullname, 8, TRUE)) {
+		common_prefix_options_parser(fullname, opts, negated);
+		return;
+	}
+	/* things the player want an extended yes/no answer to */
+	fullname = "paranoid";
+	if (match_optname(opts, fullname, 8, TRUE)) {
+		common_prefix_options_parser(fullname, opts, negated);
+		return;
+	}
+#endif
 
 	/* scores:5t[op] 5a[round] o[wn] */
 	if (match_optname(opts, "scores", 4, TRUE)) {
@@ -2471,6 +2664,63 @@ goodfruit:
 		return;
 	}
 
+	/* WINCAP2
+	 * term_cols:amount */
+	fullname = "term_cols";
+	if (match_optname(opts, fullname, sizeof("term_cols")-1, TRUE)) {
+		op = string_for_opt(opts, negated);
+		iflags.wc2_term_cols = atoi(op);
+		if (negated) bad_negation(fullname, FALSE);
+		return;
+	}
+
+	/* WINCAP2
+	 * term_rows:amount */
+	fullname = "term_rows";
+	if (match_optname(opts, fullname, sizeof("term_rows")-1, TRUE)) {
+		op = string_for_opt(opts, negated);
+		iflags.wc2_term_rows = atoi(op);
+		if (negated) bad_negation(fullname, FALSE);
+		return;
+	}
+
+#ifdef CURSES_GRAPHICS
+	/* WINCAP2
+	 * petattr:string */
+	fullname = "petattr";
+	if (match_optname(opts, fullname, sizeof("petattr")-1, TRUE)) {
+		op = string_for_opt(opts, negated);
+		if (op && !negated) {
+		    iflags.wc2_petattr = curses_read_attrs(op);
+		    if (!curses_read_attrs(op))
+		    	badoption(opts);
+		} else if (negated) bad_negation(fullname, TRUE);
+		return;
+	}
+#endif
+
+	/* WINCAP2
+	 * windowborders:n */
+	fullname = "windowborders";
+	if (match_optname(opts, fullname, sizeof("windowborders")-1, TRUE)) {
+		op = string_for_opt(opts, negated);
+		if (negated && op) bad_negation(fullname, TRUE);
+		else {
+		    if (negated)
+		        iflags.wc2_windowborders = 2; /* Off */
+		    else if (!op)
+		        iflags.wc2_windowborders = 1; /* On */
+		    else    /* Value supplied */
+		        iflags.wc2_windowborders = atoi(op);
+		    if ((iflags.wc2_windowborders > 3) ||
+		     (iflags.wc2_windowborders < 1)) {
+		        iflags.wc2_windowborders = 0;
+		        badoption(opts);
+		    }
+		}
+		return;
+	}
+
 	/* menustyle:traditional or combo or full or partial */
 	if (match_optname(opts, "menustyle", 4, TRUE)) {
 		int tmp;
@@ -2577,7 +2827,7 @@ goodfruit:
 
 			duplicate_opt_detection(boolopt[i].name, 0);
 
-#if defined(TERMLIB) || defined(ASCIIGRAPH) || defined(MAC_GRAPHICS_ENV)
+#if defined(TERMLIB) || defined(ASCIIGRAPH) || defined(MAC_GRAPHICS_ENV) || defined(CURSES_GRAPHICS)
 			if (FALSE
 # ifdef TERMLIB
 				 || (boolopt[i].addr) == &iflags.DECgraphics
@@ -2587,6 +2837,9 @@ goodfruit:
 # endif
 # ifdef MAC_GRAPHICS_ENV
 				 || (boolopt[i].addr) == &iflags.MACgraphics
+# endif
+# ifdef CURSES_GRAPHICS
+				 || (boolopt[i].addr) == &iflags.cursesgraphics
 # endif
 				) {
 # ifdef REINCARNATION
@@ -2608,6 +2861,11 @@ goodfruit:
 			    if ((boolopt[i].addr) == &iflags.MACgraphics)
 				switch_graphics(iflags.MACgraphics ?
 						MAC_GRAPHICS : ASCII_GRAPHICS);
+# endif
+# ifdef CURSES_GRAPHICS
+			    if ((boolopt[i].addr) == &iflags.cursesgraphics)
+				switch_graphics(iflags.cursesgraphics ?
+						CURS_GRAPHICS : ASCII_GRAPHICS);
 # endif
 # ifdef REINCARNATION
 			    if (!initial && Is_rogue_level(&u.uz))
@@ -2638,7 +2896,8 @@ goodfruit:
 			    else lan_mail_finish();
 			}
 #endif
-			else if ((boolopt[i].addr) == &flags.lit_corridor) {
+			else if (((boolopt[i].addr) == &flags.lit_corridor) ||
+			         ((boolopt[i].addr) == &iflags.dark_room)) {
 			    /*
 			     * All corridor squares seen via night vision or
 			     * candles & lamps change.  Update them by calling
@@ -2648,12 +2907,19 @@ goodfruit:
 			     */
 			    vision_recalc(2);		/* shut down vision */
 			    vision_full_recalc = 1;	/* delayed recalc */
+			    if (iflags.use_color) need_redraw = TRUE;  /* darkroom refresh */
 			}
 			else if ((boolopt[i].addr) == &iflags.use_inverse ||
 					(boolopt[i].addr) == &iflags.showrace ||
-					(boolopt[i].addr) == &iflags.hilite_pet) {
+					(boolopt[i].addr) == &iflags.hilite_pet ||
+					(boolopt[i].addr) == &iflags.wc2_guicolor) {
 			    need_redraw = TRUE;
 			}
+#ifdef CURSES_GRAPHICS
+			else if ((boolopt[i].addr) == &iflags.cursesgraphics) {
+			    need_redraw = TRUE;
+			}
+#endif
 #ifdef TEXTCOLOR
 			else if ((boolopt[i].addr) == &iflags.use_color) {
 			    need_redraw = TRUE;
@@ -2832,7 +3098,7 @@ doset()
 			!wc2_supported(boolopt[i].name)) continue;
 		    any.a_int = (pass == 0) ? 0 : i + 1;
 		    if (!iflags.menu_tab_sep)
-			Sprintf(buf, "%s%-13s [%s]",
+			Sprintf(buf, "%s%-14s [%s]",
 			    pass == 0 ? "    " : "",
 			    boolopt[i].name, *bool_p ? "true" : "false");
  		    else
@@ -2952,8 +3218,14 @@ doset()
 	}
 
 	destroy_nhwindow(tmpwin);
-	if (need_redraw)
+	if (need_redraw) {
+	    if (iflags.dark_room && iflags.use_color) {
+		showsyms[S_darkroom]=showsyms[S_room];
+	    } else {
+		showsyms[S_darkroom]=showsyms[S_stone];
+	    }
 	    (void) doredraw();
+	}
 	return 0;
 }
 
@@ -3016,6 +3288,49 @@ boolean setinitial,setfromfile;
 	/* parseoptions will prompt for the list of types */
 	parseoptions(strcpy(buf, "pickup_types"), setinitial, setfromfile);
 	retval = TRUE;
+#ifdef PARANOID
+    } else if (!strcmp("paranoid", optname)) {
+	int pick_cnt, pick_idx, opt_idx;
+	menu_item *paranoid_category_pick = (menu_item *)0;
+
+	static const char *paranoid_names[] = {
+		"hit", "quit", "remove", "trap"
+	};
+	#define NUM_PARANOID_OPTIONS SIZE(paranoid_names)
+	static boolean *paranoid_bools[NUM_PARANOID_OPTIONS];
+	paranoid_bools[0] = &iflags.paranoid_hit;
+	paranoid_bools[1] = &iflags.paranoid_quit;
+	paranoid_bools[2] = &iflags.paranoid_remove;
+	paranoid_bools[3] = &iflags.paranoid_trap;
+	int paranoid_settings[NUM_PARANOID_OPTIONS];
+
+	tmpwin = create_nhwindow(NHW_MENU);
+	start_menu(tmpwin);
+	for (i = 0; i < NUM_PARANOID_OPTIONS; i++) {
+		any.a_int = i + 1;
+		add_menu(tmpwin, NO_GLYPH, &any, paranoid_names[i][0], 0,
+		         ATR_NONE, paranoid_names[i],
+		         *paranoid_bools[i] ? MENU_SELECTED : MENU_UNSELECTED);
+		paranoid_settings[i] = 0;
+	}
+	end_menu(tmpwin, "Change which paranoid settings:");
+	if ((pick_cnt = select_menu(tmpwin, PICK_ANY, &paranoid_category_pick)) > 0) {
+		for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
+			opt_idx = paranoid_category_pick[pick_idx].item.a_int - 1;
+			paranoid_settings[opt_idx] = 1;
+		}
+		free((genericptr_t)paranoid_category_pick);
+		paranoid_category_pick = (menu_item *)0;
+	}
+	destroy_nhwindow(tmpwin);
+
+	iflags.paranoid_hit = paranoid_settings[0];
+	iflags.paranoid_quit = paranoid_settings[1];
+	iflags.paranoid_remove = paranoid_settings[2];
+	iflags.paranoid_trap = paranoid_settings[3];
+
+	retval = TRUE;
+#endif
     } else if (!strcmp("disclose", optname)) {
 	int pick_cnt, pick_idx, opt_idx;
 	menu_item *disclosure_category_pick = (menu_item *)0;
@@ -3349,6 +3664,16 @@ char *buf;
 			iflags.bouldersym : oc_syms[(int)objects[BOULDER].oc_class]);
 	else if (!strcmp(optname, "catname")) 
 		Sprintf(buf, "%s", catname[0] ? catname : none );
+	else if (!strcmp(optname, "conducts"))
+		Sprintf(buf, "%s%s %s%s %s%s %s%s %s%s %s%s %s%s %s%s",
+			flags.ascet ? "+" : "-", "ascet",
+			flags.atheist ? "+" : "-", "atheist",
+			flags.blindfolded ? "+" : "-", "blindfolded",
+			flags.illiterate ? "+" : "-", "illiterate",
+			flags.nudist ? "+" : "-", "nudist",
+			flags.pacifist ? "+" : "-", "pacifist",
+			flags.vegan ? "+" : "-", "vegan",
+			flags.vegetarian ? "+" : "-", "vegetarian");
 #ifdef EXOTIC_PETS
 	else if (!strcmp(optname, "crocodilename")) 
 		Sprintf(buf, "%s", crocodilename[0] ? crocodilename : none);
@@ -3485,6 +3810,14 @@ char *buf;
 	else if (!strcmp(optname, "palette")) 
 		Sprintf(buf, "%s", get_color_string());
 #endif
+#ifdef PARANOID
+	else if (!strcmp(optname, "paranoid"))
+		Sprintf(buf, "%s%s %s%s %s%s %s%s",
+			iflags.paranoid_hit ? "+" : "-", "hit",
+			iflags.paranoid_quit ? "+" : "-", "quit",
+			iflags.paranoid_remove ? "+" : "-", "remove",
+			iflags.paranoid_trap ? "+" : "-", "trap");
+#endif
 	else if (!strcmp(optname, "pettype")) 
 		Sprintf(buf, "%s", (preferred_pet == 'c') ? "cat" :
 				(preferred_pet == 'd') ? "dog" :
@@ -3495,6 +3828,9 @@ char *buf;
 	else if (!strcmp(optname, "pickup_types")) {
 		oc_to_str(flags.pickup_types, ocl);
 		Sprintf(buf, "%s", ocl[0] ? ocl : "all" );
+	     }
+	else if (!strcmp(optname, "pilesize")) {
+		Sprintf(buf, "%u", iflags.pilesize);
 	     }
 	else if (!strcmp(optname, "race"))
 		Sprintf(buf, "%s", rolestring(flags.initrace, races, noun));
@@ -3528,6 +3864,14 @@ char *buf;
 			FEATURE_NOTICE_VER_MAJ,
 			FEATURE_NOTICE_VER_MIN,
 			FEATURE_NOTICE_VER_PATCH);
+	}
+	else if (!strcmp(optname, "term_cols")) {
+		if (iflags.wc2_term_cols) Sprintf(buf, "%d",iflags.wc2_term_cols);
+		else Strcpy(buf, defopt);
+	}
+	else if (!strcmp(optname, "term_rows")) {
+		if (iflags.wc2_term_rows) Sprintf(buf, "%d",iflags.wc2_term_rows);
+		else Strcpy(buf, defopt);
 	}
 	else if (!strcmp(optname, "tile_file"))
 		Sprintf(buf, "%s", iflags.wc_tile_file ? iflags.wc_tile_file : defopt);
@@ -3575,6 +3919,11 @@ char *buf;
 			ttycolors[CLR_BRIGHT_CYAN], ttycolors[CLR_WHITE]);
 # endif /* MSDOS */
 #endif /* VIDEOSHADES */
+	else if (!strcmp(optname,"windowborders"))
+		Sprintf(buf, "%s", iflags.wc2_windowborders == 1     ? "1=on" :
+				   iflags.wc2_windowborders == 2             ? "2=off" :
+				   iflags.wc2_windowborders == 3             ? "3=auto" :
+				   defopt);
 	else if (!strcmp(optname, "windowtype"))
 		Sprintf(buf, "%s", windowprocs.name);
 	else if (!strcmp(optname, "windowcolors"))
@@ -4053,6 +4402,11 @@ struct wc_Opt wc2_options[] = {
 	{"newcolors", WC2_NEWCOLORS},
 	{"softkeyboard", WC2_SOFTKEYBOARD},
 	{"wraptext", WC2_WRAPTEXT},
+	{"term_cols", WC2_TERM_COLS},
+	{"term_rows", WC2_TERM_ROWS},
+	{"windowborders", WC2_WINDOWBORDERS},
+	{"petattr", WC2_PETATTR},
+	{"guicolor", WC2_GUICOLOR},
 	{(char *)0, 0L}
 };
 

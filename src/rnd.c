@@ -100,13 +100,15 @@ int
 rne(x)
 register int x;
 {
-	register int tmp, utmp;
+	register int n, utmp;
 
 	utmp = (u.ulevel < 15) ? 5 : u.ulevel/3;
-	tmp = 1;
-	while (tmp < utmp && !rn2(x))
-		tmp++;
-	return tmp;
+	n = 1;
+	/* Slightly higher probabilities for higher n than in NetHack 3.4.3
+	 * p(n) = \left(\frac{2}{x+2}\right)^{n-1} \frac{x}{x+2} */
+	while (n < utmp && rnf(2,x+2))
+		n++;
+	return n;
 
 	/* was:
 	 *	tmp = 1;

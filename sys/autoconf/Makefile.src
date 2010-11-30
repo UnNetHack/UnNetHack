@@ -33,6 +33,13 @@ WINDRES = @WINDRES@
 CFLAGS = -Wall -I../include -I$(srcdir)/../include @CFLAGS@ #-fbounds-check #-fprofile-arcs -ftest-coverage
 LFLAGS = @LFLAGS@ #-fbounds-check
 
+# Compile with PDCurses installed in a separate directory that doesn't
+# conflict with the system curses/ncurses library
+#CFLAGS = -O -I../include -I/usr/local/include/pdcurses
+# Same as above, but for XCurses
+#CFLAGS = -O -DXCURSES -I../include -I/usr/local/include/pdcurses
+
+
 # Only used for the Gnome interface.
 GNOMEINC=`gnome-config gnome --cflags` -I$(srcdir)/../win/gnome
 
@@ -50,6 +57,14 @@ CXX=g++
 WINTTYSRC = $(srcdir)/../win/tty/getline.c $(srcdir)/../win/tty/termcap.c $(srcdir)/../win/tty/topl.c \
 	$(srcdir)/../win/tty/wintty.c 
 WINTTYOBJ = getline.o termcap.o topl.o wintty.o 
+#
+# Files for curses interface
+WINCURSESSRC = ../win/curses/cursmain.c ../win/curses/curswins.c \
+	../win/curses/cursmisc.c ../win/curses/cursdial.c \
+	../win/curses/cursstat.c ../win/curses/cursinit.c \
+	../win/curses/cursmesg.c
+WINCURSESOBJ = cursmain.o curswins.o cursmisc.o cursdial.o cursstat.o \
+	cursinit.o cursmesg.o
 #
 # files for an X11 port
 # (tile.c is included in the defn. for WINCSRC, below)
@@ -103,9 +118,14 @@ WINMSOBJ = mswproc.o winhack.o mhdlg.o mhaskyn.o mhfont.o mhinput.o mhmain.o \
 	winres.o nhwin.a
 WINMSCFLAGS=-I$(srcdir)/../win/win32 -D_WIN32_IE=0x0400
 
+# files for a line oriented port for unit tests
+WINDUMMYSRC = $(srcdir)/../win/dummy/dummy_graphics.c
+WINDUMMYOBJ = dummy_graphics.o
+
 WINSRC = @WINSRC@
 WINOBJ = @WINOBJ@
 WINTTYLIB = @WINTTYLIB@
+WINCURSESLIB = @WINCURSESLIB@
 WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
 
 # libraries for Qt
@@ -196,7 +216,7 @@ GENCSRC = monstr.c vis_tab.c  #tile.c
 
 # all windowing-system-dependent .c (for dependencies and such)
 WINCSRC = $(WINTTYSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC) \
-	$(WINPROXYSRC) $(WINGLSRC) $(WINMSSRC) tile.c
+	$(WINPROXYSRC) $(WINGLSRC) $(WINMSSRC) $(WINDUMMYSRC) tile.c
 # all windowing-system-dependent .cpp (for dependencies and such)
 WINCXXSRC = $(WINQTSRC) $(WINBESRC)
 
@@ -230,7 +250,7 @@ FIRSTOBJ = monst.o objects.o alloc.o
 HOBJ = $(FIRSTOBJ) allmain.o apply.o artifact.o attrib.o ball.o \
 	bones.o botl.o cmd.o dbridge.o decl.o detect.o dig.o display.o dlb.o \
 	do.o do_name.o do_wear.o dog.o dogmove.o dokick.o dothrow.o \
-	drawing.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
+	drawing.o dump.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
 	extralev.o files.o fountain.o hack.o hacklib.o invent.o light.o \
 	lock.o mail.o makemon.o mapglyph.o mcastu.o mhitm.o mhitu.o \
 	minion.o mklev.o mkmap.o \
@@ -239,9 +259,9 @@ HOBJ = $(FIRSTOBJ) allmain.o apply.o artifact.o attrib.o ball.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
 	role.o rumors.o save.o shk.o shknam.o sit.o sounds.o sp_lev.o spell.o \
-	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o u_init.o \
-	uhitm.o vault.o vision.o vis_tab.o weapon.o were.o wield.o windows.o \
-	wizard.o worm.o worn.o write.o zap.o \
+	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o tutorial.o \
+	u_init.o uhitm.o vault.o vision.o vis_tab.o weapon.o were.o wield.o \
+	windows.o wizard.o worm.o worn.o write.o zap.o \
 	$(RANDOBJ) $(SYSOBJ) $(WINOBJ) version.o \
 	livelog.o
 # the .o files from the HACKCSRC, SYSSRC, and WINSRC lists
@@ -509,6 +529,26 @@ topl.o: $(srcdir)/../win/tty/topl.c $(HACK_H) ../include/tcap.h
 wintty.o: $(srcdir)/../win/tty/wintty.c $(HACK_H) ../include/dlb.h \
 		../include/patchlevel.h ../include/tcap.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/tty/wintty.c
+cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/wincurs.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursmain.c
+curswins.o: ../win/curses/curswins.c $(HACK_H) ../include/func_tab.h \
+		../include/wincurs.h ../win/curses/curswins.h
+	$(CC) $(CFLAGS) -c ../win/curses/curswins.c
+cursmisc.o: ../win/curses/cursmisc.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursmisc.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursmisc.c
+cursdial.o: ../win/curses/cursdial.c $(HACK_H) ../include/func_tab.h \
+		../include/wincurs.h ../win/curses/cursdial.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursdial.c
+cursstat.o: ../win/curses/cursstat.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursstat.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursstat.c
+cursinit.o: ../win/curses/cursinit.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursinit.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursinit.c
+cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursmesg.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursmesg.c
 Window.o: $(srcdir)/../win/X11/Window.c ../include/xwindowp.h \
 		../include/xwindow.h $(CONFIG_H)
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/X11/Window.c
@@ -659,6 +699,8 @@ mhrip.o: $(srcdir)/../win/win32/mhrip.c ../win/win32/winMS.h \
 		../win/win32/resource.h ../win/win32/mhrip.h \
 		../win/win32/mhmsg.h ../win/win32/mhfont.h
 	$(CC) $(CFLAGS) $(WINMSCFLAGS) -c $(srcdir)/../win/win32/mhrip.c
+dummy_graphics.o: $(srcdir)/../win/dummy/dummy_graphics.c $(HACK_H)
+	$(CC) $(CFLAGS) -c $(srcdir)/../win/dummy/dummy_graphics.c
 tile.o: tile.c $(HACK_H)
 qt_win.o: $(srcdir)/../win/Qt/qt_win.cpp $(HACK_H) ../include/func_tab.h \
 		../include/dlb.h ../include/date.h ../include/patchlevel.h \
@@ -698,6 +740,7 @@ dogmove.o: $(srcdir)/dogmove.c $(HACK_H) ../include/mfndpos.h \
 dokick.o: $(srcdir)/dokick.c $(HACK_H) ../include/eshk.h
 dothrow.o: $(srcdir)/dothrow.c $(HACK_H) ../include/edog.h
 drawing.o: $(srcdir)/drawing.c $(HACK_H) ../include/tcap.h
+dump.o: $(srcdir)/dump.c $(HACK_H) ../include/date.h
 dungeon.o: $(srcdir)/dungeon.c $(HACK_H) ../include/dlb.h
 eat.o: $(srcdir)/eat.c $(HACK_H)
 end.o: $(srcdir)/end.c $(HACK_H) ../include/eshk.h ../include/dlb.h
@@ -779,6 +822,7 @@ timeout.o: $(srcdir)/timeout.c $(HACK_H) ../include/lev.h
 topten.o: $(srcdir)/topten.c $(HACK_H) ../include/dlb.h ../include/patchlevel.h
 track.o: $(srcdir)/track.c $(HACK_H)
 trap.o: $(srcdir)/trap.c $(HACK_H)
+tutorial.o: $(srcdir)/tutorial.c $(HACK_H)
 u_init.o: $(srcdir)/u_init.c $(HACK_H)
 uhitm.o: $(srcdir)/uhitm.c $(HACK_H)
 vault.o: $(srcdir)/vault.c $(HACK_H) ../include/vault.h

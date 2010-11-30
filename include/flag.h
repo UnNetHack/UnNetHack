@@ -35,6 +35,7 @@ struct flag {
 #define wizard	 flags.debug
 	boolean  end_own;	/* list all own scores */
 	boolean  explore;	/* in exploration mode */
+	boolean  tutorial;      /* in tutorial mode */
 #ifdef OPT_DISPMAP
 	boolean  fast_map;	/* use optimized, less flexible map display */
 #endif
@@ -43,6 +44,7 @@ struct flag {
 	boolean  forcefight;
 	boolean  friday13;	/* it's Friday the 13th */
 	boolean  help;		/* look in data file for info about stuff */
+	boolean  hitpointbar;	/* colourful hit point status bar */
 	boolean  ignintr;	/* ignore interrupts */
 #ifdef INSURANCE
 	boolean  ins_chkpt;	/* checkpoint as appropriate */
@@ -63,6 +65,7 @@ struct flag {
 #endif
 	boolean  perm_invent;	/* keep full inventories up until dismissed */
 	boolean  pickup;	/* whether you pickup or move and look */
+	boolean  pickup_dropped;	/* don't auto-pickup items you dropped */
 	boolean  pickup_thrown;		/* auto-pickup items you threw */
 
 	boolean  pushweapon;	/* When wielding, push old weapon into second slot */
@@ -147,6 +150,30 @@ struct flag {
 	int	 initalign;	/* starting alignment (index into aligns[])  */
 	int	 randomall;	/* randomly assign everything not specified */
 	int	 pantheon;	/* deity selection for priest character */
+
+	/* --- initial roleplay flags ---
+	 * These flags represent the player's conduct/roleplay
+	 * intention at character creation.
+	 *
+	 * First the player can sets some of these at character
+	 * creation. (via configuration-file, ..)
+	 * Then role_init() may set/prevent certain combinations,
+	 * e.g. Monks get the vegetarian flag, vegans should also be
+	 * vegetarians, ..
+	 * 
+	 * After that the initial flags shouldn't be modified.
+	 * In u_init() the flags can be used to put some
+	 * roleplay-intrinsics into the u structure. Only those
+	 * should be modified during gameplay.
+	 */
+	boolean  ascet;
+	boolean  atheist;
+	boolean  blindfolded;
+	boolean  illiterate;
+	boolean  pacifist;
+	boolean  nudist;
+	boolean  vegan;
+	boolean  vegetarian;
 };
 
 /*
@@ -157,6 +184,9 @@ struct flag {
 
 struct instance_flags {
 	boolean  cbreak;	/* in cbreak mode, rogue format */
+#ifdef CURSES_GRAPHICS
+	boolean  cursesgraphics; /* Use portable curses extended characters */
+#endif
 	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
 	boolean  echo;		/* 1 to echo characters */
 	boolean  IBMgraphics;	/* use IBM extended character set */
@@ -188,6 +218,8 @@ struct instance_flags {
 #endif
 #ifdef TTY_GRAPHICS
 	char prevmsg_window;	/* type of old message window to use */
+#endif
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
 	boolean  extmenu;	/* extended commands use menu interface */
 #endif
 #ifdef MENU_COLOR
@@ -236,6 +268,11 @@ struct instance_flags {
 	boolean show_born;	/* show numbers of created monsters */
 #endif
 	boolean showdmg;	/* show damage */
+	/* only set when PARANOID is defined */
+	boolean paranoid_hit;	/* Ask for 'yes' when hitting peacefuls */
+	boolean paranoid_quit;	/* Ask for 'yes' when quitting */
+	boolean paranoid_remove; /* Always show menu for 'T' and 'R' */
+	boolean paranoid_trap; /* Ask for 'yes' before walking into known traps */
 /*
  * Window capability support.
  */
@@ -283,6 +320,11 @@ struct instance_flags {
 	boolean wc2_fullscreen;		/* run fullscreen */
 	boolean wc2_softkeyboard;	/* use software keyboard */
 	boolean wc2_wraptext;		/* wrap text */
+	int     wc2_term_cols;		/* terminal width, in characters */
+	int     wc2_term_rows;		/* terminal height, in characters */
+	int     wc2_windowborders;	/* display borders on NetHack windows */
+	int     wc2_petattr;		/* points to text attributes for pet */
+	boolean wc2_guicolor;		/* allow colors in GUI (outside map) */
 	boolean wc2_newcolors;		/* try to use slashem like colors including
 					 * dark-gray to represent black object */
 
@@ -295,6 +337,7 @@ struct instance_flags {
 	boolean  travelcmd;	/* allow travel command */
 	boolean  show_dgn_name; /* show dungeon names instead of Dlvl: on bottom line */
 	int	 runmode;	/* update screen display during run moves */
+	int	 pilesize;	/* how many items to list automatically */
 #ifdef AUTOPICKUP_EXCEPTIONS
 	struct autopickup_exception *autopickup_exceptions[2];
 #define AP_LEAVE 0
@@ -310,6 +353,8 @@ struct instance_flags {
 #ifdef AUTO_OPEN
 	boolean  autoopen;	/* open doors by walking into them */
 #endif
+	boolean  dark_room;	/* show shadows in lit rooms */
+	boolean  vanilla_ui_behavior;	/* fall back to vanilla behavior */
 };
 
 /*

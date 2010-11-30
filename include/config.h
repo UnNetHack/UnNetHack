@@ -47,6 +47,7 @@
  * Some combinations make no sense.  See the installation document.
  */
 /* #define TTY_GRAPHICS */	/* good old tty based graphics */
+/* #define CURSES_GRAPHICS */	/* Proper curses interface */
 /* #define X11_GRAPHICS */	/* X11 interface */
 /* #define QT_GRAPHICS */	/* Qt interface */
 /* #define GNOME_GRAPHICS */	/* Gnome interface */
@@ -117,6 +118,12 @@
 # define HACKDIR "\\unnethack"
 #endif
 
+#ifdef CURSES_GRAPHICS
+# ifndef DEFAULT_WINDOW_SYS
+#  define DEFAULT_WINDOW_SYS "curses"
+# endif
+#endif
+
 #ifndef DEFAULT_WINDOW_SYS
 # define DEFAULT_WINDOW_SYS "tty"
 #endif
@@ -178,11 +185,11 @@
 #ifndef AUTOCONF
 #ifdef UNIX
 /* path and file name extension for compression program */
-#define COMPRESS "/usr/bin/compress"	/* Lempel-Ziv compression */
-#define COMPRESS_EXTENSION ".Z"		/* compress's extension */
+/* #define COMPRESS "/usr/bin/compress" */	/* Lempel-Ziv compression */
+/* #define COMPRESS_EXTENSION ".Z"	*/	/* compress's extension */
 /* An example of one alternative you might want to use: */
-/* #define COMPRESS "/usr/local/bin/gzip" */	/* FSF gzip compression */
-/* #define COMPRESS_EXTENSION ".gz" */		/* normal gzip extension */
+#define COMPRESS "/bin/gzip"	/* FSF gzip compression */
+#define COMPRESS_EXTENSION ".gz"		/* normal gzip extension */
 #endif
 
 #ifndef COMPRESS
@@ -388,7 +395,8 @@ typedef unsigned char	uchar;
 #define BLACKMARKET	/* Massimo Campostrini (campo@sunthpi3.difi.unipi.it) */
 
 
-#if defined(TTY_GRAPHICS) || defined(MSWIN_GRAPHICS)
+#if defined(TTY_GRAPHICS) || defined(MSWIN_GRAPHICS) || \
+ defined(CURSES_GRAPHICS)
 # define MENU_COLOR
 # define MENU_COLOR_REGEX
 /*# define MENU_COLOR_REGEX_POSIX */
@@ -408,11 +416,12 @@ typedef unsigned char	uchar;
 #define DUMP_LOG        /* Dump game end information to a file */
 /* #define DUMP_FN "/tmp/%n.nh" */      /* Fixed dumpfile name, if you want
                                          * to prevent definition by users */
-#define DUMPMSGS 20     /* Number of latest messages in the dump file  */
+#define DUMP_HTML_LOG   /* Dump game end information to a html file */
+#define DUMPMSGS 30     /* Number of latest messages in the dump file  */
 
 #define AUTO_OPEN	/* open doors by walking into them - Stefano Busti */
 
-#define WHEREIS_FILE "./whereis/%n.whereis" /* Write out player's current location to player.whereis */
+/* #define WHEREIS_FILE "./whereis/%n.whereis" */ /* Write out player's current location to player.whereis */
 
 #endif /* AUTOCONF */
 
@@ -436,6 +445,9 @@ typedef unsigned char	uchar;
 #define ASTRAL_ESCAPE /* Allow escape from Astral plane (with the Amulet) - CWC */
 /* #define LIVELOG_BONES_KILLER */ /* Report if a ghost of a former player is
                                     * killed - Patric Mueller (15 Aug 2009) */
+#define ADJSPLIT /* splittable #adjust - Sam Dennis, conditionalized by Jukka Lahtinen */
+#define TUTORIAL_MODE /* Alex Smith */
+#define ELBERETH_CONDUCT /* Track the number of times the player engraves Elbereth. - Ray Kulhanek */
 
 /* End of Section 6 */
 

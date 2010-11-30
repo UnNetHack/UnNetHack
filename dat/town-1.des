@@ -6,77 +6,69 @@
 #
 LEVEL: "town-1"
 MESSAGE: "You step into the sunlight. You hear the sounds of civilization."
-RANDOM_MONSTERS:'@','r'
-RANDOM_PLACES:(4,6),(4,16),(18,2),(25,10),(40,13),(55,4),(58,12),(71,2),(73,15)
+$place = { (4,6),(4,16),(18,2),(25,10),(40,13),(55,4),(58,12),(71,2),(73,15) }
+SHUFFLE: $place
 ROOM: "ordinary", lit, random, random, (76,17)
 {
-NAME: "town"
-STAIR: place[0], down
-ENGRAVING: place[1], mark, "Welcome to the town of Angband!"
+STAIR: $place[0], down
+ENGRAVING: $place[1], mark, "Welcome to the town of Angband!"
 FOUNTAIN: ( 6,12)
 FOUNTAIN: (39, 9)
 FOUNTAIN: (68, 3)
 #
 #       The Shops
 #
-SUBROOM: "armor shop", lit, (10,4), (5,2), "town"
+SUBROOM: "armor shop" [66%], lit, (10,4), (5,2)
 {
-CHANCE: 66
 ROOMDOOR: false, closed, random, random
 }
-SUBROOM: "shop", lit, (26,4), (6,3), "town"
+SUBROOM: "pet shop" [66%], lit, (26,4), (6,3)
 {
-CHANCE: 66
 ROOMDOOR: false, closed, random, random
 }
-SUBROOM: "tool shop", lit, (44,2), (3,3), "town"
+SUBROOM: "tool shop" [66%], lit, (44,2), (3,3)
 {
-CHANCE: 66
 ROOMDOOR: false, closed, random, random
 }
-SUBROOM: "candle shop", lit, (59,6), (2,2), "town"
+SUBROOM: "candle shop" [66%], lit, (59,6), (2,2)
 {
-CHANCE: 66
 ROOMDOOR: false, closed, random, random
 }
 
-SUBROOM: "shop", lit, (16,12), (3,2), "town"
+SUBROOM: "shop", lit, (16,12), (3,2)
 {
 ROOMDOOR: false, closed, random, random
 }
-SUBROOM: "weapon shop", lit, (30,13), (3,2), "town"
+SUBROOM: "weapon shop" [66%], lit, (30,13), (3,2)
 {
-CHANCE: 66
 ROOMDOOR: false, closed, random, random
 }
-SUBROOM: "book shop", lit, (48,11), (2,3), "town"
+SUBROOM: "music shop" [66%], lit, (48,11), (2,3)
 {
-CHANCE: 66
 ROOMDOOR: false, closed, random, random
 }
-SUBROOM: "food shop", lit, (65,13), (4,2), "town"
+SUBROOM: "tin shop" [66%], lit, (65,13), (4,2)
 {
-CHANCE: 66
 ROOMDOOR: false, closed, random, random
 }
 #
 #       The Town Watch.
 #
-MONSTER: '@', "watchman", random, peaceful
-MONSTER: '@', "watchman", random, peaceful
-MONSTER: '@', "watchman", random, peaceful
-MONSTER: '@', "watchman", random, peaceful
-MONSTER: '@', "watch captain", random, peaceful
-MONSTER: '@', "watch captain", random, peaceful
-MONSTER: '@', "watch captain", random, peaceful
+MONSTER:('@', "watchman"), random, peaceful
+MONSTER:('@', "watchman"), random, peaceful
+MONSTER:('@', "watchman"), random, peaceful
+MONSTER:('@', "watchman"), random, peaceful
+MONSTER:('@', "watch captain"), random, peaceful
+MONSTER:('@', "watch captain"), random, peaceful
+MONSTER:('@', "watch captain"), random, peaceful
 #
 #       Some distracting townspeople
 #
-MONSTER: '@', "mugger", random, hostile
-MONSTER: '@', "mugger", random, hostile
-MONSTER: '@', "mugger", random, hostile
-MONSTER: '@', "mugger", random, hostile
-MONSTER: 'r', "sewer rat", random, hostile
-MONSTER: 'r', "sewer rat", random, hostile
-MONSTER: 'd', "little dog", random, hostile
+MONSTER:('@', "mugger"), random, hostile
+MONSTER:('@', "mugger"), random, hostile
+MONSTER:('@', "mugger"), random, hostile
+MONSTER:('@', "mugger"), random, hostile
+MONSTER:('r', "sewer rat"), random, hostile
+MONSTER:('r', "sewer rat"), random, hostile
+MONSTER:('d', "little dog"), random, hostile
 }

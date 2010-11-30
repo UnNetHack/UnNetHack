@@ -658,9 +658,9 @@ boolean playing; /**< True if game is running.  */
 #else
 	        0L,
 #endif
-	        urole.name.m,
+	        (flags.female && urole.name.f) ? urole.name.f : urole.name.m,
 	        urace.adj,
-	        u.mfemale ? "Fem" : "Mal",
+	        genders[flags.female].filecode,
 	        align_str(u.ualign.type),
 #ifdef RECORD_CONDUCT
 	        encodeconduct(),
@@ -1972,6 +1972,8 @@ char		*tmp_levels;
 #ifdef MENU_COLOR
 	    (void) add_menu_coloring(bufp);
 #endif
+	} else if (match_varname(buf, "MONSTERCOLOR", 12)) {
+	    return parse_monster_color(bufp);
 	} else if (match_varname(buf, "GRAPHICS", 4)) {
 	    len = get_uchars(fp, buf, bufp, translate, FALSE,
 			     MAXPCHARS, "GRAPHICS");

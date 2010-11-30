@@ -115,7 +115,10 @@ initworm(worm, wseg_count)
     register struct wseg *seg, *new_tail = create_worm_tail(wseg_count);
     register int wnum = worm->wormno;
 
-/*  if (!wnum) return;  bullet proofing */
+    if (!wnum) {
+	warning("initworm: worm->wormno was 0");
+	return;
+    }
 
     if (new_tail) {
 	wtails[wnum] = new_tail;
@@ -200,7 +203,10 @@ worm_move(worm)
     register int	 wnum = worm->wormno;	/* worm number */
 
 
-/*  if (!wnum) return;  bullet proofing */
+    if (!wnum) {
+	warning("worm_move: worm->wormno was 0");
+	return;
+    }
 
     /*
      *  Place a segment at the old worm head.  The head has already moved.
@@ -265,7 +271,10 @@ wormgone(worm)
 {
     register int wnum = worm->wormno;
 
-/*  if (!wnum) return;  bullet proofing */
+    if (!wnum) {
+	warning("wormgone: worm->wormno was 0");
+	return;
+    }
 
     worm->wormno = 0;
 
@@ -291,7 +300,10 @@ wormhitu(worm)
     register int wnum = worm->wormno;
     register struct wseg *seg;
 
-/*  if (!wnum) return;  bullet proofing */
+    if (!wnum) {
+	warning("wormhitu: worm->wormno was 0");
+	return;
+    }
 
 /*  This does not work right now because mattacku() thinks that the head is
  *  out of range of the player.  We might try to kludge, and bring the head
@@ -339,7 +351,7 @@ cutworm(worm, x, y, weap)
     int wnum = worm->wormno;
     int cut_chance, new_wnum;
 
-    if (!wnum) return; /* bullet proofing */
+    if (!wnum) return; /* no worm */
 
     if (x == worm->mx && y == worm->my) return;		/* hit on head */
 
@@ -358,7 +370,7 @@ cutworm(worm, x, y, weap)
     while ( (curr->wx != x) || (curr->wy != y) ) {
 	curr = curr->nseg;
 	if (!curr) {
-	    impossible("cutworm: no segment at (%d,%d)", (int) x, (int) y);
+	    warning("cutworm: no segment at (%d,%d)", (int) x, (int) y);
 	    return;
 	}
     }
@@ -437,7 +449,10 @@ see_wsegs(worm)
 {
     struct wseg *curr = wtails[worm->wormno];
 
-/*  if (!mtmp->wormno) return;  bullet proofing */
+    if (!worm->wormno) {
+	warning("cutworm: worm->wormno was 0");
+	return;
+    }
 
     while (curr != wheads[worm->wormno]) {
 	newsym(curr->wx,curr->wy);
@@ -458,7 +473,10 @@ detect_wsegs(worm, use_detection_glyph)
     int num;
     struct wseg *curr = wtails[worm->wormno];
 
-/*  if (!mtmp->wormno) return;  bullet proofing */
+    if (!worm->wormno) {
+	warning("detect_wsegs: worm->wormno was 0");
+	return;
+    }
 
     while (curr != wheads[worm->wormno]) {
 	num = use_detection_glyph ?
@@ -561,7 +579,10 @@ place_wsegs(worm)
 {
     struct wseg *curr = wtails[worm->wormno];
 
-/*  if (!mtmp->wormno) return;  bullet proofing */
+    if (!worm->wormno) {
+	warning("place_wsegs: worm->wormno was 0");
+	return;
+    }
 
     while (curr != wheads[worm->wormno]) {
 	place_worm_seg(worm,curr->wx,curr->wy);
@@ -583,7 +604,10 @@ remove_worm(worm)
 {
     register struct wseg *curr = wtails[worm->wormno];
 
-/*  if (!mtmp->wormno) return;  bullet proofing */
+    if (!worm->wormno) {
+	warning("remove_worm: worm->wormno was 0");
+	return;
+    }
 
     while (curr) {
 	remove_monster(curr->wx, curr->wy);
@@ -611,10 +635,13 @@ place_worm_tail_randomly(worm, x, y)
     struct wseg *new_tail;
     register xchar ox = x, oy = y;
 
-/*  if (!wnum) return;  bullet proofing */
+    if (!wnum) {
+	warning("place_worm_tail_randomly: worm->wormno was 0");
+	return;
+    }
 
     if (wnum && (!wtails[wnum] || !wheads[wnum]) ) {
-	impossible("place_worm_tail_randomly: wormno is set without a tail!");
+	warning("place_worm_tail_randomly: wormno is set without a tail!");
 	return;
     }
 
@@ -700,7 +727,10 @@ count_wsegs(mtmp)
     register int i=0;
     register struct wseg *curr = (wtails[mtmp->wormno])->nseg;
 
-/*  if (!mtmp->wormno) return 0;  bullet proofing */
+    if (!mtmp->wormno) {
+	warning("count_wsegs: mtmp->wormno was 0");
+	return 0;
+    }
 
     while (curr) {
 	i++;

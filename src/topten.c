@@ -101,10 +101,6 @@ NEARDATA const char * const killed_by_prefix[] = {
 
 static winid toptenwin = WIN_ERR;
 
-#ifdef RECORD_START_END_TIME
-static time_t deathtime = 0L;
-#endif
-
 STATIC_OVL void
 topten_print(x)
 const char *x;
@@ -279,7 +275,7 @@ write_xlentry(rfile,tt)
 FILE *rfile;
 struct toptenentry *tt;
 {
-
+  s_level *lev = Is_special(&u.uz);
   char buf[DTHSZ+1];
 
   /* Log all of the data found in the regular logfile */
@@ -289,6 +285,7 @@ struct toptenentry *tt;
                 SEP "deathdnum=%d"
                 SEP "deathlev=%d"
                 SEP "maxlvl=%d"
+                SEP "dlev_name=%s"
                 SEP "hp=%d"
                 SEP "maxhp=%d"
                 SEP "deaths=%d"
@@ -298,7 +295,9 @@ struct toptenentry *tt;
                 GAME_SHORT_NAME,
                 tt->ver_major, tt->ver_minor, tt->patchlevel,
                 tt->points, tt->deathdnum, tt->deathlev,
-                tt->maxlvl, tt->hp, tt->maxhp, tt->deaths,
+                tt->maxlvl,
+                lev ? lev->proto : "", /* proto level name if special level */
+                tt->hp, tt->maxhp, tt->deaths,
                 tt->deathdate, tt->birthdate, tt->uid);
 
   (void)fprintf(rfile,
@@ -332,7 +331,7 @@ struct toptenentry *tt;
 
 #ifdef RECORD_START_END_TIME
   (void)fprintf(rfile, SEP "starttime=%ld", (long)u.ubirthday);
-  (void)fprintf(rfile, SEP "endtime=%ld", (long)deathtime);
+  (void)fprintf(rfile, SEP "endtime=%ld", (long)u.udeathday);
 #endif
 
 #ifdef RECORD_GENDER0
@@ -461,21 +460,7 @@ int how;
 			break;
 	}
 	t0->birthdate = yyyymmdd(u.ubirthday);
-
-#ifdef RECORD_START_END_TIME
-	/* Make sure that deathdate and deathtime refer to the same time; it
-	 * wouldn't be good to have deathtime refer to the day after deathdate. */
-
-#if defined(BSD) && !defined(POSIX_TYPES)
-	(void) time((long *)&deathtime);
-#else
-	(void) time(&deathtime);
-#endif
-
-	t0->deathdate = yyyymmdd(deathtime);
-#else
-	t0->deathdate = yyyymmdd((time_t)0L);
-#endif /* RECORD_START_END_TIME */
+	t0->deathdate = yyyymmdd(u.udeathday);
 
 	t0->tt_next = 0;
 #ifdef UPDATE_RECORD_IN_PLACE
@@ -644,6 +629,9 @@ int how;
 #endif
 		}
 	}
+#ifdef DUMP_LOG
+	dump_html("<pre>", "");
+#endif
 	if(rank0 == 0) rank0 = rank1;
 	if(rank0 <= 0) rank0 = rank;
 	if(!done_stopprint) outheader();
@@ -684,6 +672,9 @@ int how;
 	}
 	if(rank0 >= rank) if(!done_stopprint)
 		outentry(0, t0, TRUE);
+#ifdef DUMP_LOG
+	dump_html("</pre>", "");
+#endif
 #ifdef UPDATE_RECORD_IN_PLACE
 	if (flg) {
 # ifdef TRUNCATE_FILE
@@ -746,6 +737,7 @@ boolean so;
 	char linebuf[BUFSZ];
 	char *bp, hpbuf[24], linebuf3[BUFSZ];
 	int hppos, lngr;
+	boolean nospacefound = FALSE;
 
 
 	linebuf[0] = '\0';
@@ -778,6 +770,12 @@ boolean so;
 	    /* fixup for closing paren in "escaped... with...Amulet)[max..." */
 	    if ((bp = index(linebuf, ')')) != 0)
 		*bp = (t1->deathdnum == astral_level.dnum) ? '\0' : ' ';
+	    second_line = FALSE;
+	} else if (!strncmp("ascended ", t1->death, 9)) {
+	    Strcat(linebuf, "the ");
+	    Strcat(linebuf, t1->death + 9);
+	    Sprintf(eos(linebuf), " ascended to demigod%s-hood",
+		    (t1->plgend[0] == 'F') ? "dess" : "");
 	    second_line = FALSE;
 	} else if (!strncmp("ascended", t1->death, 8)) {
 	    Sprintf(eos(linebuf), "ascended to demigod%s-hood",
@@ -829,6 +827,7 @@ boolean so;
 	    }
 
 	    /* kludge for "quit while already on Charon's boat" */
+	    /* and "quit after breaking pacifism conduct"	*/
 	    if (!strncmp(t1->death, "quit ", 5))
 		Strcat(linebuf, t1->death + 4);
 	}
@@ -848,10 +847,22 @@ boolean so;
 		    !(*bp == ' ' && (bp-linebuf < hppos));
 		    bp--)
 		;
+	    /* check for un-wrappable word */
+	    if (linebuf+15 == bp) {
+		bp += hppos-15;
+		nospacefound = TRUE;
+	    }
 	    /* special case: if about to wrap in the middle of maximum
 	       dungeon depth reached, wrap in front of it instead */
 	    if (bp > linebuf + 5 && !strncmp(bp - 5, " [max", 5)) bp -= 5;
-	    Strcpy(linebuf3, bp+1);
+	    if (nospacefound) {
+		/* word wrap in the middle of a long word */
+		Strcpy(linebuf3, bp);
+		nospacefound = FALSE;
+	    } else {
+		/* word wrap on space */
+		Strcpy(linebuf3, bp+1);
+	    }
 	    *bp = 0;
 	    if (so) {
 		while (bp < linebuf + (COLNO-1)) *bp++ = ' ';

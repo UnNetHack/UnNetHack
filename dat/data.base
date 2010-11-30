@@ -695,7 +695,7 @@ large box
 	of his pickaxe between the chest and the lid and pushed down
 	on the handle.  The lid creaked, then flew open.
 	Dantes was seized with a sort of giddy fever.  He cocked his
-	gun and placed it beside him.  The he closed his eyes like a
+	gun and placed it beside him.  Then he closed his eyes like a
 	child, opened them and stood dumbfounded.
 	The chest was divided into three compartments.  In the first
 	were shining gold coins.  In the second, unpolished gold
@@ -1965,6 +1965,14 @@ succubus
 	same demon, one who lies with a human for its own purposes,
 	usually to the detriment of the mortals who are unwise in
 	their dealings with them.
+irrational pi*
+	The primary purpose of the DATA statement is to give names to
+	constants; instead of referring to pi as 3.141592653589793 at
+	every appearance, the variable PI can be given that value with
+	a DATA statement and used instead of the longer form of the
+	constant. This also simplifies modifying the program, should
+	the value of pi change.
+		[ FORTRAN manual for Xerox Computers ]
 *iron ball
 *iron chain
 	"You are fettered, " said Scrooge, trembling.  "Tell me why?"
