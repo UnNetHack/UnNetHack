@@ -129,6 +129,9 @@ static char obuf[BUFSIZ];	/* BUFSIZ is defined in stdio.h */
 static char winpanicstr[] = "Bad window id %d";
 char defmorestr[] = "--More--";
 
+/** Track if the player is still selecting his character. */
+boolean in_character_selection = FALSE;
+
 #ifdef MENU_COLOR
 extern struct menucoloring *menu_colorings;
 #endif
@@ -332,6 +335,8 @@ tty_player_selection()
 	winid win;
 	anything any;
 	menu_item *selected = 0;
+
+	in_character_selection = TRUE;
 
 	/* prevent an unnecessary prompt */
 	rigid_role_checks();
@@ -709,6 +714,7 @@ give_up:	/* Quit */
 	    }
 	}
 	/* Success! */
+	in_character_selection = FALSE;
 	tty_display_nhwindow(BASE_WINDOW, FALSE);
 }
 
@@ -2412,7 +2418,8 @@ docorner(xmin, ymax)
     }
 
     end_glyphout();
-    if (ymax >= (int) wins[WIN_STATUS]->offy) {
+    if (!in_character_selection && /* check for status lines to update */
+        (ymax >= (int) wins[WIN_STATUS]->offy)) {
 					/* we have wrecked the bottom line */
 	flags.botlx = 1;
 	bot();
