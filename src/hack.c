@@ -2547,6 +2547,7 @@ void
 losehp(n, knam, k_format)
 int n;
 const char *knam;
+boolean k_format;
 {
 	losehp_how(n, knam, k_format, DIED);
 }

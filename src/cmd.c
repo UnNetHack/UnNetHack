@@ -907,7 +907,7 @@ char *outbuf;
 void
 enlightenment(final, want_disp)
 int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
-int want_disp;
+boolean want_disp;
 {
 	int ltmp;
 	char buf[BUFSZ];
@@ -1365,7 +1365,7 @@ doconduct()
 void
 show_conduct(final, want_disp)
 int final;
-int want_disp;
+boolean want_disp;
 {
 	char buf[BUFSZ];
 	int ngenocided;

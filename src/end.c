@@ -1259,7 +1259,7 @@ STATIC_OVL void
 list_genocided(defquery, ask, want_disp)
 int defquery;
 boolean ask;
-int want_disp;
+boolean want_disp;
 {
     register int i;
     int ngenocided=0;
