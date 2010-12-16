@@ -1,20 +1,20 @@
 #   SCCS Id: @(#)Makefile.gcc       3.4     $Date: 2003/11/16 04:50:57 $
 #   Copyright (c) NetHack PC Development Team 1993-2003
+#   Copyright (c) Patric Mueller 2010
 #
-#   NetHack 3.4.x Makefile for MinGW
+#   UnNetHack Makefile for MinGW
 #
 #   Win32 Compilers Tested:
-#                  - MinGW 1.0 (gcc version 2.95.3-6) (Console NetHack only)
-#                  - MinGW 2.0 (gcc version 3.2)
+#                  - MinGW 5.1.4 (gcc (GCC) 3.4.5 (mingw-vista special r3)) (console version only)
 #
 #   If you don't have this compiler, you can get it at:
 #       http://www.mingw.org/
 #
-#   This is used for building two versions of NetHack:
+#   This is used for building two versions of UnNetHack:
 #   A tty port utilizing the Win32 Console I/O subsystem, Console
-#       NetHack;
-#   A Win32 native port built on the Windows API, Graphical NetHack or
-#       NetHackW.
+#       UnNetHack;
+#   A Win32 native port built on the Windows API, Graphical UnNetHack or
+#       UnNetHackW. (untested at the moment)
 #
 #   In addition to your C compiler,
 #
@@ -63,10 +63,10 @@ endif
 
 ifeq  "$(GRAPHICAL)" "Y"
 # Game Name
-GAME    = NetHackW
+GAME    = UnNetHackW
 else
 # Game Name
-GAME    = NetHack
+GAME    = UnNetHack
 endif
 # Game directory
 GAMEDIR = ../binary
@@ -173,7 +173,7 @@ WINPHDR = $(WIN32)/mhaskyn.h $(WIN32)/mhdlg.h $(WIN32)/mhfont.h \
 WINPLIBS =  -lcomctl32 -lwinmm
 else
 WINPORT = $(O)nttty.o
-WINPFLAG= -DWIN32CON
+WINPFLAG= -DWIN32CON -DTTY_GRAPHICS
 WINPHDR =
 NHRES   = $(O)console.o
 WINPINC =
@@ -390,6 +390,7 @@ VOBJ24 = $(O)trap.o     $(O)u_init.o   $(O)uhitm.o    $(O)vault.o
 VOBJ25 = $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o   $(O)were.o
 VOBJ26 = $(O)wield.o    $(O)windows.o  $(O)wizard.o   $(O)worm.o
 VOBJ27 = $(O)worn.o     $(O)write.o    $(O)zap.o
+VOBJ28 = $(O)dump.o     $(O)livelog.o  $(O)tutorial.o
 
 DLBOBJ = $(O)dlb.o
 
@@ -403,7 +404,7 @@ OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 	$(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
 	$(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
 	$(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
-	$(VOBJ26) $(VOBJ27)
+	$(VOBJ26) $(VOBJ27) $(VOBJ28)
 
 WINPOBJ = $(WINPORT)
 
@@ -523,17 +524,24 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	 $(DAT)/caveman.des $(DAT)/healer.des   $(DAT)/knight.des \
 	 $(DAT)/monk.des    $(DAT)/priest.des   $(DAT)/ranger.des \
 	 $(DAT)/rogue.des   $(DAT)/samurai.des  $(DAT)/sokoban.des \
-	 $(DAT)/tourist.des $(DAT)/valkyrie.des $(DAT)/wizard.des
+	 $(DAT)/tourist.des $(DAT)/valkyrie.des $(DAT)/wizard.des \
+         $(DAT)/blkmar.des  $(DAT)/heck.des     $(DAT)/nymph.des \
+         $(DAT)/town-1.des  $(DAT)/town-2.des
 	$(subst /,\,$(U)lev_comp $(DAT)/bigroom.des)
+	$(subst /,\,$(U)lev_comp $(DAT)/blkmar.des)
 	$(subst /,\,$(U)lev_comp $(DAT)/castle.des)
 	$(subst /,\,$(U)lev_comp $(DAT)/endgame.des)
 	$(subst /,\,$(U)lev_comp $(DAT)/gehennom.des)
+	$(subst /,\,$(U)lev_comp $(DAT)/heck.des)
 	$(subst /,\,$(U)lev_comp $(DAT)/knox.des)
 	$(subst /,\,$(U)lev_comp $(DAT)/mines.des)
 	$(subst /,\,$(U)lev_comp $(DAT)/medusa.des)
+	$(subst /,\,$(U)lev_comp $(DAT)/nymph.des)
 	$(subst /,\,$(U)lev_comp $(DAT)/oracle.des)
 	$(subst /,\,$(U)lev_comp $(DAT)/sokoban.des)
 	$(subst /,\,$(U)lev_comp $(DAT)/tower.des)
+	$(subst /,\,$(U)lev_comp $(DAT)/town-1.des)
+	$(subst /,\,$(U)lev_comp $(DAT)/town-2.des)
 	$(subst /,\,$(U)lev_comp $(DAT)/yendor.des)
 	$(subst /,\,$(U)lev_comp $(DAT)/arch.des)
 	$(subst /,\,$(U)lev_comp $(DAT)/barb.des)
