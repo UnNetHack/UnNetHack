@@ -529,6 +529,8 @@ flip_level(int flp)
 	    else if (mtmp->isshk) {
 		ESHK(mtmp)->shk.y = y2 - ESHK(mtmp)->shk.y;
 		ESHK(mtmp)->shd.y = y2 - ESHK(mtmp)->shd.y;
+	    } else if (mtmp->wormno) {
+		flip_worm_segs_vertical(mtmp, y2);
 	    }
 	}
 	if (flp & 2) {
@@ -538,6 +540,8 @@ flip_level(int flp)
 	    else if (mtmp->isshk) {
 		ESHK(mtmp)->shk.x = x2 - ESHK(mtmp)->shk.x;
 		ESHK(mtmp)->shd.x = x2 - ESHK(mtmp)->shd.x;
+	    } else if (mtmp->wormno) {
+		flip_worm_segs_horizontal(mtmp, x2);
 	    }
 	}
     }

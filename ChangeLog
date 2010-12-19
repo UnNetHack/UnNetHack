@@ -1,6 +1,7 @@
 2011-XX-XX  UnNetHack 3.5.4
 	* changing color of monster with config line:
 	  MONSTERCOLOR=acid blob:lightcyan
+	* Fixed crashes when attacking long worms on flipped levels
 	* vanilla bug fixes:
 	  - C343-198
 

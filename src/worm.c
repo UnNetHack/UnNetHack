@@ -790,4 +790,31 @@ struct monst *worm;
     return FALSE;
 }
 
+void
+flip_worm_segs_vertical(worm, y)
+struct monst *worm;
+int y;
+{
+    struct wseg *curr = wtails[worm->wormno];
+
+	pline("1");
+    while (curr) {
+	curr->wy = y - curr->wy;
+	curr = curr->nseg;
+    }
+}
+
+void
+flip_worm_segs_horizontal(worm, x)
+struct monst *worm;
+int x;
+{
+    struct wseg *curr = wtails[worm->wormno];
+
+    while (curr) {
+	curr->wx = x - curr->wx;
+	curr = curr->nseg;
+    }
+}
+
 /*worm.c*/
