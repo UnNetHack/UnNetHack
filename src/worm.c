@@ -797,7 +797,6 @@ int y;
 {
     struct wseg *curr = wtails[worm->wormno];
 
-	pline("1");
     while (curr) {
 	curr->wy = y - curr->wy;
 	curr = curr->nseg;
