@@ -32,6 +32,7 @@ int explcolors[] = {
 #define pet_color(n)  color = iflags.use_color ? mons[n].mcolor : NO_COLOR
 #define warn_color(n) color = iflags.use_color ? def_warnsyms[n].color : NO_COLOR
 #define explode_color(n) color = iflags.use_color ? explcolors[n] : NO_COLOR
+#define sokoban_prize_color()  color = iflags.use_color ? CLR_BRIGHT_MAGENTA : NO_COLOR
 # if defined(REINCARNATION) && defined(ASCIIGRAPH)
 #  define ROGUE_COLOR
 # endif
@@ -46,6 +47,7 @@ int explcolors[] = {
 #define pet_color(c)
 #define warn_color(n)
 #define explode_color(n)
+#define sokoban_prize_color()
 #endif
 
 #ifdef ROGUE_COLOR
@@ -150,6 +152,10 @@ unsigned *ospecial;
 	        level.objects[x][y]->nexthere) {
 		special |= MG_INVERSE;
 	    }
+	    if (level.objects[x][y] && Is_sokoprize(level.objects[x][y])) {
+	      sokoban_prize_color();
+	    }
+
     } else if ((offset = (glyph - GLYPH_RIDDEN_OFF)) >= 0) {	/* mon ridden */
 	ch = monsyms[(int)mons[offset].mlet];
 #ifdef ROGUE_COLOR
