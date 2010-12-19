@@ -277,6 +277,8 @@ register struct obj *obj;
 			Strcpy(buf, actualn);
 		else if (un)
 			Sprintf(buf,"amulet called %s", un);
+		else if (Is_sokoprize(obj))
+			Strcpy(buf, "sokoban amulet");
 		else
 			Sprintf(buf,"%s amulet", dn);
 		break;
@@ -296,6 +298,8 @@ register struct obj *obj;
 			Strcat(buf, dn ? dn : actualn);
 			Strcat(buf, " called ");
 			Strcat(buf, un);
+		} else if (Is_sokoprize(obj)) {
+			Strcpy(buf, "sokoban bag");
 		} else
 			Strcat(buf, dn ? dn : actualn);
 		/* If we use an() here we'd have to remember never to use */
@@ -337,6 +341,8 @@ register struct obj *obj;
 				Strcpy(buf,"armor");
 			Strcat(buf, " called ");
 			Strcat(buf, un);
+		} else if (Is_sokoprize(obj)) {
+			Strcpy(buf, "sokoban cloak");
 		} else	Strcat(buf, dn);
 		break;
 	    case FOOD_CLASS:
