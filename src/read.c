@@ -1906,14 +1906,15 @@ boolean only_on_level; /**< if TRUE only genocide monsters on current level,
 		which = !type_is_pname(ptr) ? "the " : "";
 	}
 	if (how & REALLY) {
+	    char* genocided_name = (*which != 'a') ? buf : makeplural(buf);
 	    /* setting no-corpse affects wishing and random tin generation */
 	    if (!only_on_level) { mvitals[mndx].mvflags |= (G_GENOD | G_NOCORPSE); }
 	    pline("Wiped out %s%s%s.", which,
-		  (*which != 'a') ? buf : makeplural(buf),
+		  genocided_name,
 		  on_this_level);
 
 #ifdef LIVELOGFILE
-	livelog_genocide(buf, only_on_level);
+	livelog_genocide(genocided_name, only_on_level);
 #endif
 
 	if (killplayer) {
