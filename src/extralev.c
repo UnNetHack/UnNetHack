@@ -278,11 +278,7 @@ void
 corr(x,y)
 int x, y;
 {
-	if (rn2(50)) {
-		levl[x][y].typ = CORR;
-	} else {
-		levl[x][y].typ = SCORR;
-	}
+	levl[x][y].typ = CORR;
 }
 
 void

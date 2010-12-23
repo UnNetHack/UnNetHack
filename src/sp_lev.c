@@ -2192,7 +2192,7 @@ schar ftyp, btyp;
 			if(nxcor && !rn2(50))
 				(void) mksobj_at(BOULDER, xx, yy, TRUE, FALSE);
 		} else {
-			crm->typ = SCORR;
+			crm->typ = CORR; /* formerly secret corridor */
 		}
 	    } else
 	    if(crm->typ != ftyp && crm->typ != SCORR) {
