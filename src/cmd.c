@@ -1599,7 +1599,8 @@ static const struct func_tab cmdlist[] = {
 	{'W', FALSE, dowear, NULL},
 	{M('w'), FALSE, dowipe, NULL},
 	{'x', FALSE, doswapweapon, NULL},
-	{'X', TRUE, enter_explore_mode, NULL},
+	{'X', FALSE, dotwoweapon, NULL},
+	{M('x'), TRUE, enter_explore_mode, NULL},
 /*	'y', 'Y' : go nw */
 	{'z', FALSE, dozap, NULL},
 	{'Z', TRUE, docast, NULL},
@@ -1669,6 +1670,7 @@ struct ext_func_tab extcmdlist[] = {
 	{"version", "list compile time options for this version of UnNetHack",
 		doextversion, TRUE},
 	{"wipe", "wipe off your face", dowipe, FALSE},
+	{"xplore", "enter the explore mode", enter_explore_mode, TRUE},
 	{"?", "get this list of extended commands", doextlist, TRUE},
 #if defined(WIZARD)
 	/*

@@ -2,6 +2,10 @@
 	* changing color of monster with config line:
 	  MONSTERCOLOR=acid blob:lightcyan
 	* Fixed crashes when attacking long worms on flipped levels
+
+	* user interface improvements:
+	  - 'X' toggles twoweaponing, explore mode is on alt-x resp. #xplore
+
 	* vanilla bug fixes:
 	  - C343-198
 
