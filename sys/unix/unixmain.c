@@ -176,6 +176,9 @@ char *argv[];
 #ifdef SIGXCPU
 	(void) signal(SIGXCPU, (SIG_RET_TYPE) hangup);
 #endif
+#ifdef WHEREIS_FILE
+	(void) signal(SIGUSR1, (SIG_RET_TYPE) signal_whereis);
+#endif
 
 	process_options(argc, argv);	/* command line options */
 

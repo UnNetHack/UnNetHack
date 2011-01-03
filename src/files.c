@@ -685,6 +685,14 @@ boolean playing; /**< True if game is running.  */
 	}
 }
 
+/** Signal handler to update whereis information. */
+void
+signal_whereis(sig_unused)
+int sig_unused;
+{
+	touch_whereis();
+}
+
 void
 touch_whereis()
 {

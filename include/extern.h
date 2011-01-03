@@ -720,6 +720,7 @@ E void NDECL(really_close);
 #ifdef WHEREIS_FILE
 E void NDECL(touch_whereis);
 E void NDECL(delete_whereis);
+E void FDECL(signal_whereis, (int));
 #endif
 
 /* ### fountain.c ### */
