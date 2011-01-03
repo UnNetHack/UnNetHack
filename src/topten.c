@@ -283,6 +283,7 @@ struct toptenentry *tt;
                 "version=%s-%d.%d.%d"
                 SEP "points=%ld"
                 SEP "deathdnum=%d"
+                SEP "deathdname=%s"
                 SEP "deathlev=%d"
                 SEP "maxlvl=%d"
                 SEP "dlev_name=%s"
@@ -294,7 +295,7 @@ struct toptenentry *tt;
                 SEP "uid=%d",
                 GAME_SHORT_NAME,
                 tt->ver_major, tt->ver_minor, tt->patchlevel,
-                tt->points, tt->deathdnum, tt->deathlev,
+                tt->points, tt->deathdnum, dungeons[tt->deathdnum].dname, tt->deathlev,
                 tt->maxlvl,
                 lev ? lev->proto : "", /* proto level name if special level */
                 tt->hp, tt->maxhp, tt->deaths,

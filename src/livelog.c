@@ -89,7 +89,7 @@ char *livelog_prefix() {
 			"version=%s-%d.%d.%d:"
 			"player=%s:turns=%ld:starttime=%ld:"
 			"currenttime=%ld:"
-			"dnum=%d:dlev=%d:maxlvl=%d:"
+			"dnum=%d:dname=%s:dlev=%d:maxlvl=%d:"
 			"dlev_name=%s:"
 			"hp=%d:maxhp=%d:deaths=%d:"
 #ifdef RECORD_REALTIME
@@ -105,7 +105,7 @@ char *livelog_prefix() {
 			moves,
 			(long)u.ubirthday,
 			(long)current_epoch(),
-			u.uz.dnum, depth(&u.uz), deepest_lev_reached(TRUE),
+			u.uz.dnum, dungeons[u.uz.dnum].dname, depth(&u.uz), deepest_lev_reached(TRUE),
 			lev ? lev->proto : "", /* proto level name if special level */
 			u.uhp, u.uhpmax, u.umortality,
 #ifdef RECORD_REALTIME
