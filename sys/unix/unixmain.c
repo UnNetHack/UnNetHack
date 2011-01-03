@@ -172,6 +172,7 @@ char *argv[];
 	 */
 	u.uhp = 1;	/* prevent RIP on early quits */
 	(void) signal(SIGHUP, (SIG_RET_TYPE) hangup);
+	(void) signal(SIGTERM, (SIG_RET_TYPE) hangup);
 #ifdef SIGXCPU
 	(void) signal(SIGXCPU, (SIG_RET_TYPE) hangup);
 #endif
