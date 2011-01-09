@@ -4,6 +4,7 @@
 	* Fixed crashes when attacking long worms on flipped levels
 
 	* user interface improvements:
+	  - New category menu option: "Unidentified items"
 	  - 'X' toggles twoweaponing, explore mode is on alt-x resp. #xplore
 
 	* vanilla bug fixes:

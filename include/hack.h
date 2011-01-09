@@ -174,6 +174,7 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define BUC_UNCURSED 0x200
 #define BUC_UNKNOWN  0x400
 #define BUC_ALLBKNOWN (BUC_BLESSED|BUC_CURSED|BUC_UNCURSED)
+#define UNIDENTIFIED_TYPES 0x800
 #define ALL_TYPES_SELECTED -2
 
 /* Flags to control find_mid() */
