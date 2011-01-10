@@ -1893,7 +1893,7 @@ struct obj *bag;
 			else
 				You("smell a musty odor.");
 		} else {
-			pline_The("bag exhales of puff of spores.");
+			pline_The("bag exhales a puff of spores.");
 		}
 		if (!breathless(youmonst.data))
 			(void) make_hallucinated(HHallucination + rn1(35, 10),TRUE,0L);
