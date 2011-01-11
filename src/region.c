@@ -922,8 +922,15 @@ genericptr_t p2;
 	/* Make sure Cthulhu doesn't get the Amulet again! :-) */
 	cthulhu = makemon(&mons[PM_CTHULHU], cx, cy, 
 				MM_NOCOUNTBIRTH | NO_MINVENT);
-	if (cthulhu && canseemon(cthulhu))
-	    pline("%s reforms!", Monnam(cthulhu));
+	if (cthulhu) {
+		if (canseemon(cthulhu)) {
+			pline("%s reforms!", Monnam(cthulhu));
+		}
+		/* don't let Cthulhu meditate after being killed once
+		 * by the player */
+		wakeup(cthulhu);
+	}
+	
     }
     return ret;
 }
