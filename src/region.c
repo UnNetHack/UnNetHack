@@ -990,24 +990,26 @@ genericptr_t p2;
 }
 
 NhRegion *
-create_cthulhu_death_cloud(x, y, radius, damage)
+create_cthulhu_death_cloud(x, y, radius, damage, duration)
 xchar x, y;
 int radius;
 size_t damage;
+int duration;
 {
     NhRegion *cloud;
 
-    cloud = create_gas_cloud(x, y, radius, damage);
+    cloud = create_gas_cloud(x, y, radius, damage, duration);
     if (cloud) cloud->expire_f = REVIVE_CTHULHU;
 
     return cloud;
 }
 
 NhRegion *
-create_gas_cloud(x, y, radius, damage)
+create_gas_cloud(x, y, radius, damage, duration)
 xchar x, y;
 int radius;
 size_t damage;
+int duration;
 {
     NhRegion *cloud;
     int i, nrect;
@@ -1026,7 +1028,7 @@ size_t damage;
 	tmprect.ly++;
 	tmprect.hy--;
     }
-    cloud->ttl = rn1(3,4);
+    cloud->ttl = duration;
     if (!in_mklev && !flags.mon_moving)
 	set_heros_fault(cloud);		/* assume player has created it */
     cloud->inside_f = INSIDE_GAS_CLOUD;

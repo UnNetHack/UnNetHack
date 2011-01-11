@@ -1510,7 +1510,7 @@ register struct obj	*sobj;
 		    return 0;
 		}
 		(void) create_gas_cloud(cc.x, cc.y, 3+bcsign(sobj),
-						8+4*bcsign(sobj));
+						8+4*bcsign(sobj), rn1(3,4));
 		break;
 	}
 	default:

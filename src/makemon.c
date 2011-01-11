@@ -1884,7 +1884,7 @@ struct obj *bag;
 		else
 			pline_The("bag belches out %s.",
 				Hallucination ? "the alphabet":"a noxious cloud");
-		(void)create_gas_cloud(u.ux,u.uy,2,8);
+		(void)create_gas_cloud(u.ux, u.uy, 2, 8, rn1(3,2));
 		break;
 	case 5:
 		if (Blind) {

@@ -1644,7 +1644,15 @@ struct monst *mon; /**< Cthulhu's struct */
 			You_hear("hissing and bubbling!");
 		}
 		/* ...into a stinking cloud... */
-		(void) create_cthulhu_death_cloud(mon->mx, mon->my, 3, 8);
+		if (mvitals[PM_CTHULHU].died == 1 &&
+		    distu(mon->mx, mon->my) > 2) {
+			/* Cthulhu got killed while meditating and the player
+			 * was not next to him.
+			 * You can't get rid of the True Final Boss so easily! */
+			(void) create_cthulhu_death_cloud(mon->mx, mon->my, 2, 4, rnd(4));
+		} else {
+			(void) create_cthulhu_death_cloud(mon->mx, mon->my, 3, 8, rn1(30,30));
+		}
 	}
 }
 
