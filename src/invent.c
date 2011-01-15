@@ -1483,8 +1483,15 @@ nextclass:
 		if (ident && !not_fully_identified(otmp)) continue;
 		if (ckfn && !(*ckfn)(otmp)) continue;
 		if (!allflag) {
-			Strcpy(qbuf, !ininv ? doname(otmp) :
-				xprname(otmp, (char *)0, ilet, !nodot, 0L, 0L));
+			char name[BUFSZ];
+			char simple_name[BUFSZ];
+			char this_item[BUFSZ];
+			/* make sure a overly long named item doesn't buffer overflow
+			 * qbuf when using the traditional menu style */
+			Strcpy(qbuf, safe_qbuf("", sizeof("?"),
+						!ininv ? doname(otmp) : name,
+						!ininv ? the(simple_typename(otmp->otyp)) : simple_name,
+						!ininv ? "this item" : this_item));
 			Strcat(qbuf, "?");
 			sym = (takeoff || ident || otmp->quan < 2L) ?
 				nyaq(qbuf) : nyNaq(qbuf);
