@@ -1449,7 +1449,7 @@ void dump_screen()
     int lastc = -1;
     /* D: botl.c has a closer approximation to the size, but we'll go with
      *    this */
-    char buf[COLNO*100], html_buf[COLNO*100], tmpbuf[100], *ptr;
+    char buf[COLNO*100], html_buf[COLNO*100], html_c[BUFSZ], tmpbuf[100], *ptr;
     int ch, glyph, oclass;
     int color;
     unsigned special;
@@ -1466,51 +1466,63 @@ void dump_screen()
 	    /* we can't use ch for output as that may be non-ASCII due
 	     * to DEC- or IBMgraphics */
 	    uchar c = get_glyph_char(glyph, &oclass);
+
+	    /* determine unicode point for HTML output */
+	    int unicode_codepoint = get_unicode_codepoint(ch);
+	    if (unicode_codepoint > 127) {
+	      Sprintf(html_c, "&#%d;", unicode_codepoint);
+	    } else {
+	      Sprintf(html_c, "%s", html_escape_character(unicode_codepoint));
+	    }
+
 	    if (c == ' ')
 		Strcpy(tmpbuf, " ");
 	    else if (x == u.ux && y == u.uy)
-		Sprintf(tmpbuf, "<span class=\"nh_inv_%d nh_player\">%c</span>", color, c);
+		Sprintf(tmpbuf, "<span class=\"nh_inv_%d nh_player\">%s</span>", color, html_c);
 	    else if (special & (MG_PET|MG_DETECT))
-		Sprintf(tmpbuf, "<span class=\"nh_inv_%d nh_pet\">%c</span>", color, c);
+		Sprintf(tmpbuf, "<span class=\"nh_inv_%d nh_pet\">%s</span>", color, html_c);
 	    else if (special & (MG_PET|MG_DETECT))
-		Sprintf(tmpbuf, "<span class=\"nh_inv_%d\">%c</span>", color, c);
+		Sprintf(tmpbuf, "<span class=\"nh_inv_%d\">%s</span>", color, html_c);
 	    else if (special & MG_INVERSE)
-		Sprintf(tmpbuf, "<span class=\"nh_inv_%d\">%c</span>", color, c);
+		Sprintf(tmpbuf, "<span class=\"nh_inv_%d\">%s</span>", color, html_c);
 	    else if (oclass < 0 && IS_DOOR(levl[x][y].typ) && levl[x][y].doormask >= D_ISOPEN)
-		Sprintf(tmpbuf, "<span class=\"nh_door\">%c</span>", c);
+		Sprintf(tmpbuf, "<span class=\"nh_door\">%s</span>", html_c);
 	    else if (oclass < 0 && IS_DRAWBRIDGE(levl[x][y].typ))
-		Sprintf(tmpbuf, "<span class=\"nh_drawbridge\">%c</span>", c);
+		Sprintf(tmpbuf, "<span class=\"nh_drawbridge\">%s</span>", html_c);
 	    else if (oclass < 0 && levl[x][y].typ == POOL)
-		Sprintf(tmpbuf, "<span class=\"nh_pool\">%c</span>", c);
+		Sprintf(tmpbuf, "<span class=\"nh_pool\">%s</span>", html_c);
 	    else if (oclass < 0 && levl[x][y].typ == MOAT)
-		Sprintf(tmpbuf, "<span class=\"nh_moat\">%c</span>", c);
+		Sprintf(tmpbuf, "<span class=\"nh_moat\">%s</span>", html_c);
 	    else if (oclass < 0 && levl[x][y].typ == WATER)
-		Sprintf(tmpbuf, "<span class=\"nh_water\">%c</span>", c);
+		Sprintf(tmpbuf, "<span class=\"nh_water\">%s</span>", html_c);
 	    else if (oclass < 0 && levl[x][y].typ == LAVAPOOL)
-		Sprintf(tmpbuf, "<span class=\"nh_lava\">%c</span>", c);
+		Sprintf(tmpbuf, "<span class=\"nh_lava\">%s</span>", html_c);
 	    else if (oclass < 0 && levl[x][y].typ == IRONBARS)
-		Sprintf(tmpbuf, "<span class=\"nh_ironbars\">%c</span>", c);
+		Sprintf(tmpbuf, "<span class=\"nh_ironbars\">%s</span>", html_c);
 	    else if (oclass < 0 && levl[x][y].typ == CORR)
-		Sprintf(tmpbuf, "<span class=\"nh_corridor\">%c</span>", c);
+		Sprintf(tmpbuf, "<span class=\"nh_corridor\">%s</span>", html_c);
 	    else if (oclass < 0 && levl[x][y].typ == STAIRS)
-		Sprintf(tmpbuf, "<span class=\"nh_stairs\">%s</span>", html_escape_character(c));
+		Sprintf(tmpbuf, "<span class=\"nh_stairs\">%s</span>", html_c);
 	    else if (oclass < 0 && levl[x][y].typ == LADDER)
-		Sprintf(tmpbuf, "<span class=\"nh_ladder\">%c</span>", c);
+		Sprintf(tmpbuf, "<span class=\"nh_ladder\">%s</span>", html_c);
 	    else if (oclass < 0 && levl[x][y].typ == FOUNTAIN)
-		Sprintf(tmpbuf, "<span class=\"nh_fountain\">%c</span>", c);
+		Sprintf(tmpbuf, "<span class=\"nh_fountain\">%s</span>", html_c);
 	    else if (oclass < 0 && levl[x][y].typ == THRONE)
-		Sprintf(tmpbuf, "<span class=\"nh_throne\">%c</span>", c);
+		Sprintf(tmpbuf, "<span class=\"nh_throne\">%s</span>", html_c);
 	    else if (oclass < 0 && levl[x][y].typ == SINK)
-		Sprintf(tmpbuf, "<span class=\"nh_sink\">%c</span>", c);
+		Sprintf(tmpbuf, "<span class=\"nh_sink\">%s</span>", html_c);
 	    else if (oclass < 0 && levl[x][y].typ == GRAVE)
-		Sprintf(tmpbuf, "<span class=\"nh_grave\">%c</span>", c);
+		Sprintf(tmpbuf, "<span class=\"nh_grave\">%s</span>", html_c);
 	    else if (oclass < 0 && levl[x][y].typ == ALTAR)
-		Sprintf(tmpbuf, "<span class=\"nh_altar\">%c</span>", c);
+		Sprintf(tmpbuf, "<span class=\"nh_altar\">%s</span>", html_c);
 	    else if (oclass < 0 && levl[x][y].typ == ICE)
-		Sprintf(tmpbuf, "<span class=\"nh_ice\">%c</span>", c);
+		Sprintf(tmpbuf, "<span class=\"nh_ice\">%s</span>", html_c);
 	    else
-		Sprintf(tmpbuf, "<span class=\"nh_color_%d\">%s</span>", color, html_escape_character(c));
+		Sprintf(tmpbuf, "<span class=\"nh_color_%d\">%s</span>", color, html_c);
+	    /* HTML map */
 	    Strcat(html_buf, tmpbuf);
+
+	    /* ASCII map */
 	    Sprintf(tmpbuf, "%c", c);
 	    Strcat(buf, tmpbuf);
 

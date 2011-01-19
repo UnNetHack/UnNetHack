@@ -260,7 +260,7 @@ HOBJ = $(FIRSTOBJ) allmain.o apply.o artifact.o attrib.o ball.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
 	role.o rumors.o save.o shk.o shknam.o sit.o sounds.o sp_lev.o spell.o \
 	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o tutorial.o \
-	u_init.o uhitm.o vault.o vision.o vis_tab.o weapon.o were.o wield.o \
+	u_init.o uhitm.o unicode.o vault.o vision.o vis_tab.o weapon.o were.o wield.o \
 	windows.o wizard.o worm.o worn.o write.o zap.o \
 	$(RANDOBJ) $(SYSOBJ) $(WINOBJ) version.o \
 	livelog.o
@@ -825,6 +825,7 @@ trap.o: $(srcdir)/trap.c $(HACK_H)
 tutorial.o: $(srcdir)/tutorial.c $(HACK_H)
 u_init.o: $(srcdir)/u_init.c $(HACK_H)
 uhitm.o: $(srcdir)/uhitm.c $(HACK_H)
+unicode.o: $(srcdir)/unicode.c $(HACK_H)
 vault.o: $(srcdir)/vault.c $(HACK_H) ../include/vault.h
 version.o: $(srcdir)/version.c $(HACK_H) ../include/date.h \
 		../include/patchlevel.h
