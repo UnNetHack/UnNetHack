@@ -137,15 +137,55 @@ static int cp437_to_unicode[] = {
 	0x00a0, /* NO-BREAK SPACE */
 };
 
+/* DEC Special Graphic Character Set aka VT 100 graphics.
+ * Only the last 32 characters are significantly different from ASCII
+ * http://support.attachmate.com/techdocs/1184.html */
+static int dec_graphics_to_unicode[] = {
+	0x25c6, /* BLACK DIAMOND */
+	0x2592, /* MEDIUM SHADE */
+	0x0009, /* CHARACTER TABULATION */
+	0x000c, /* FORM FEED */
+	0x000d, /* CARRIAGE RETURN */
+	0x000a, /* LINE FEED */
+	0x00b0, /* DEGREE SIGN */
+	0x00b1, /* PLUS-MINUS SIGN */
+	0x000a, /* NEW LINE (=LINE FEED) */
+	0x000b, /* LINE TABULATION */
+	0x2518, /* BOX DRAWINGS LIGHT UP AND LEFT */
+	0x2510, /* BOX DRAWINGS LIGHT DOWN AND LEFT */
+	0x250c, /* BOX DRAWINGS LIGHT DOWN AND RIGHT */
+	0x2514, /* BOX DRAWINGS LIGHT UP AND RIGHT */
+	0x253c, /* BOX DRAWINGS LIGHT VERTICAL AND HORIZONTAL */
+	0x00a0, /*_NO-BREAK SPACE */
+	0x00a0, /*_NO-BREAK SPACE */
+	0x2500, /* BOX DRAWINGS LIGHT HORIZONTAL */
+	0x00a0, /*_NO-BREAK SPACE */
+	0x00a0, /*_NO-BREAK SPACE */
+	0x251c, /* BOX DRAWINGS LIGHT VERTICAL AND RIGHT */
+	0x2524, /* BOX DRAWINGS LIGHT VERTICAL AND LEFT */
+	0x2534, /* BOX DRAWINGS LIGHT UP AND HORIZONTAL */
+	0x252c, /* BOX DRAWINGS LIGHT DOWN AND HORIZONTAL */
+	0x2502, /* BOX DRAWINGS LIGHT VERTICAL */
+	0x2264, /* LESS-THAN OR EQUAL TO */
+	0x2265, /* GREATER-THAN OR EQUAL TO */
+	0x03c0, /* GREEK SMALL LETTER PI */
+	0x2260, /* NOT EQUAL TO */
+	0x00a3, /* POUND SIGN */
+	0x00b7, /* MIDDLE DOT */
+	0x00a0, /*_NO-BREAK SPACE */
+};
+
 /** Returns unicode codepoint of character according to selected graphics mode. */
 int
 get_unicode_codepoint(int ch)
 {
-	if (ch < 256) {
-		if (ch < 128) {
+	if (ch <= 0xFF) {
+		if (ch < 0x80) {
 			return ch;
 		} else if (iflags.IBMgraphics) {
-			return cp437_to_unicode[ch-128];
+			return cp437_to_unicode[ch-0x80];
+		} else if (iflags.DECgraphics && ch >= 0xE0) {
+			return dec_graphics_to_unicode[ch-0xE0];
 		}
 	}
 	return ch;

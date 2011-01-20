@@ -2,7 +2,7 @@
 	* changing color of monster with config line:
 	  MONSTERCOLOR=acid blob:lightcyan
 	* Fixed crashes when attacking long worms on flipped levels
-	* HTML dump: output IBMgraphics characters
+	* HTML dump: output IBMgraphics and DECgraphics characters
 
 	* user interface improvements:
 	  - New category menu option: "Unidentified items"
