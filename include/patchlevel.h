@@ -32,7 +32,7 @@
 /* #define VERSION_REVISION	1 */
 
 #define COPYRIGHT_BANNER_A \
-"UnNetHack, Copyright 2009-2010"
+"UnNetHack, Copyright 2009-2011"
 
 #define COPYRIGHT_BANNER_B \
 "    Based on NetHack, Copyright 1985-2003 by Stichting Mathematisch"
