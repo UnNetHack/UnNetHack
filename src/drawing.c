@@ -642,10 +642,10 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
 	g_FILLER(S_litcorr),
 	g_FILLER(S_upstair),
 	g_FILLER(S_dnstair),
-	0x2265,	/* S_upladder:	GREATER-THAN OR EQUAL TO */
-	0x2264,	/* S_dnladder:	LESS-THAN OR EQUAL TO */
-	0x2020,	/* S_altar:	DAGGER */
-	0x03A9,	/* S_grave:	GREEK CAPITAL LETTER OMEGA */
+	0x2264,	/* S_upladder:	LESS-THAN OR EQUAL TO */
+	0x2265,	/* S_dnladder:	GREATER-THAN OR EQUAL TO */
+	0x03A9,	/* S_altar:	GREEK CAPITAL LETTER OMEGA */
+	0x2020,	/* S_grave:	DAGGER */
 	g_FILLER(S_throne),
 	g_FILLER(S_sink),
 	0x00b6,	/* S_fountain:	PILCROW SIGN */
