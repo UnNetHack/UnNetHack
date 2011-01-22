@@ -1831,7 +1831,15 @@ tty_putsym(window, x, y, ch)
     case NHW_MAP:
     case NHW_BASE:
 	tty_curs(window, x, y);
+#ifdef UTF8_GLYPHS
+	if (iflags.UTF8graphics) {
+		pututf8char(ch);
+	} else {
+		(void) putchar(ch);
+	}
+#else
 	(void) putchar(ch);
+#endif
 	ttyDisplay->curx++;
 	cw->curx++;
 	break;
@@ -2585,7 +2593,15 @@ tty_print_glyph(window, x, y, glyph)
       xputg(glyph,ch,special);
     else
 #endif
+#ifdef UTF8_GLYPHS
+	if (iflags.UTF8graphics) {
+		pututf8char(ch);
+	} else {
+		g_putch(ch);	/* print the character */
+	}
+#else
 	g_putch(ch);		/* print the character */
+#endif
 
     if (reverse_on) {
     	term_end_attr(ATR_INVERSE);

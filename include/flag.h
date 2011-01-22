@@ -190,6 +190,7 @@ struct instance_flags {
 	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
 	boolean  echo;		/* 1 to echo characters */
 	boolean  IBMgraphics;	/* use IBM extended character set */
+	boolean  UTF8graphics;	/* use UTF-8 characters */
 	unsigned msg_history;	/* hint: # of top lines to save */
 	boolean  num_pad;	/* use numbers for movement commands */
 	boolean  news;		/* print news */

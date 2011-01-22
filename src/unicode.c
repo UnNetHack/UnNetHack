@@ -6,7 +6,7 @@
 
 /** CP437 to Unicode mapping according to the Unicode Consortium
  * http://unicode.org/Public/MAPPINGS/VENDORS/MICSFT/PC/CP437.TXT */
-static int cp437_to_unicode[] = {
+static glyph_t cp437_to_unicode[] = {
 	0x00c7, /* LATIN CAPITAL LETTER C WITH CEDILLA */
 	0x00fc, /* LATIN SMALL LETTER U WITH DIAERESIS */
 	0x00e9, /* LATIN SMALL LETTER E WITH ACUTE */
@@ -140,7 +140,7 @@ static int cp437_to_unicode[] = {
 /* DEC Special Graphic Character Set aka VT 100 graphics.
  * Only the last 32 characters are significantly different from ASCII
  * http://support.attachmate.com/techdocs/1184.html */
-static int dec_graphics_to_unicode[] = {
+static glyph_t dec_graphics_to_unicode[] = {
 	0x25c6, /* BLACK DIAMOND */
 	0x2592, /* MEDIUM SHADE */
 	0x0009, /* CHARACTER TABULATION */
@@ -176,7 +176,7 @@ static int dec_graphics_to_unicode[] = {
 };
 
 /** Returns unicode codepoint of character according to selected graphics mode. */
-int
+glyph_t
 get_unicode_codepoint(int ch)
 {
 	if (ch <= 0xFF) {
@@ -190,5 +190,31 @@ get_unicode_codepoint(int ch)
 	}
 	return ch;
 }
+
+#ifdef UTF8_GLYPHS
+/** Prints a Unicode codepoint as UTF-8 encoded byte sequence.
+ * Originally from Ray Chason's Unicode proof of concept patch. */
+int
+pututf8char(glyph_t c)
+{
+  if (c < 0x80) {
+    putchar(c);
+  } else if(c < 0x800) {
+    putchar(0xC0 | (c>>6));
+    putchar(0x80 | (c & 0x3F));
+  } else if (c < 0x10000) {
+    putchar(0xE0 | (c>>12));
+    putchar(0x80 | (c>>6 & 0x3F));
+    putchar(0x80 | (c & 0x3F));
+  } else if (c < 0x200000) {
+    putchar(0xF0 | (c>>18));
+    putchar(0x80 | (c>>12 & 0x3F));
+    putchar(0x80 | (c>>6 & 0x3F));
+    putchar(0x80 | (c & 0x3F));
+  }
+
+  return 0;
+}
+#endif
 
 /*unicode.c*/

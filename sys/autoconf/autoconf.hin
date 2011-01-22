@@ -221,6 +221,15 @@
 /* Kitchen sinks */
 #undef SINKS
 
+/* The size of `unsigned int', as computed by sizeof. */
+#undef SIZEOF_UNSIGNED_INT
+
+/* The size of `unsigned long', as computed by sizeof. */
+#undef SIZEOF_UNSIGNED_LONG
+
+/* The size of `unsigned long long', as computed by sizeof. */
+#undef SIZEOF_UNSIGNED_LONG_LONG
+
 /* TTY graphics status color */
 #undef STATUS_COLORS
 
@@ -251,6 +260,9 @@
 /* Using Mersenne Twister as RNG */
 #undef USE_MERSENNE_TWISTER
 
+/* Enable UTF-8 glyphs in TTY */
+#undef UTF8_GLYPHS
+
 /* Fancy mazes */
 #undef WALLIFIED_MAZE
 
@@ -272,5 +284,8 @@
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */
 #undef YYTEXT_POINTER
+
+/* If not already defined, then define as a datatype of *exactly* 32 bits. */
+#undef uint32_t
 
 #endif /* AUTOCONF_H */

@@ -293,6 +293,22 @@ typedef signed char	schar;
 typedef unsigned char	uchar;
 #endif
 
+/* Type used for outputting DECgraphics and IBMgraphics characters into
+ * HTML dumps or for holding unicode codepoints. */
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# if HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+#ifdef UINT32_MAX
+typedef uint32_t glyph_t;
+#else
+/* Fallback that should work on most systems */
+typedef long glyph_t;
+#endif
+
 /*
  * Various structures have the option of using bitfields to save space.
  * If your C compiler handles bitfields well (e.g., it can initialize structs

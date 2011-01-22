@@ -63,14 +63,14 @@ int explcolors[] = {
 void
 mapglyph(glyph, ochar, ocolor, ospecial, x, y)
 int glyph, *ocolor, x, y;
-int *ochar;
+glyph_t *ochar;
 unsigned *ospecial;
 {
 	register int offset;
 #if defined(TEXTCOLOR) || defined(ROGUE_COLOR)
 	int color = NO_COLOR;
 #endif
-	uchar ch;
+	glyph_t ch;
 	unsigned special = 0;
 
     /*
@@ -89,7 +89,7 @@ unsigned *ospecial;
 	    warn_color(offset);
     } else if ((offset = (glyph - GLYPH_SWALLOW_OFF)) >= 0) {	/* swallow */
 	/* see swallow_to_glyph() in display.c */
-	ch = (uchar) showsyms[S_sw_tl + (offset & 0x7)];
+	ch = showsyms[S_sw_tl + (offset & 0x7)];
 #ifdef ROGUE_COLOR
 	if (HAS_ROGUE_IBM_GRAPHICS && iflags.use_color)
 	    color = NO_COLOR;
@@ -247,7 +247,7 @@ unsigned *ospecial;
 	color = NO_COLOR;
 #endif
 
-    *ochar = (int)ch;
+    *ochar = ch;
     *ospecial = special;
 #ifdef TEXTCOLOR
     *ocolor = color;

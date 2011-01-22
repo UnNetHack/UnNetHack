@@ -469,7 +469,7 @@ E boolean FDECL(hurtle_step, (genericptr_t, int, int));
 E int FDECL(def_char_to_objclass, (CHAR_P));
 E int FDECL(def_char_to_monclass, (CHAR_P));
 #if !defined(MAKEDEFS_C) && !defined(LEV_LEX_C)
-E void FDECL(assign_graphics, (uchar *,int,int,int));
+E void FDECL(assign_graphics, (glyph_t *,int,int,int));
 E void FDECL(switch_graphics, (int));
 #ifdef REINCARNATION
 E void FDECL(assign_rogue_graphics, (BOOLEAN_P));
@@ -1027,7 +1027,7 @@ E int NDECL(max_monster_difficulty);
 
 /* ### mapglyph.c ### */
 
-E void FDECL(mapglyph, (int, int *, int *, unsigned *, int, int));
+E void FDECL(mapglyph, (int, glyph_t *, int *, unsigned *, int, int));
 
 /* ### mcastu.c ### */
 
@@ -2551,6 +2551,10 @@ E void NDECL(tutorial_redisplay_message);
 E void FDECL(check_tutorial_farlook, (int, int));
 E void FDECL(check_tutorial_command, (char));
 E int FDECL(check_tutorial_location, (int, int, BOOLEAN_P));
+
+/* ### unicode.c ### */
+E glyph_t FDECL(get_unicode_codepoint, (int));
+E int FDECL(pututf8char, (glyph_t));
 
 #undef E
 

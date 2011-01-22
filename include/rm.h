@@ -225,7 +225,7 @@ struct symdef {
 };
 
 extern struct symdef defsyms[MAXPCHARS];	/* defaults */
-extern uchar showsyms[MAXPCHARS];
+extern glyph_t showsyms[MAXPCHARS];
 extern const struct symdef def_warnsyms[WARNCOUNT];
 
 /*
@@ -235,7 +235,8 @@ extern const struct symdef def_warnsyms[WARNCOUNT];
 #define IBM_GRAPHICS	1	/* PC graphic characters */
 #define DEC_GRAPHICS	2	/* VT100 line drawing characters */
 #define MAC_GRAPHICS	3	/* Macintosh drawing characters */
-#define CURS_GRAPHICS   4   /* Portable curses drawing characters */
+#define CURS_GRAPHICS	4	/* Portable curses drawing characters */
+#define UTF8_GRAPHICS	5	/* UTF8 characters */
 
 /*
  * The 5 possible states of doors

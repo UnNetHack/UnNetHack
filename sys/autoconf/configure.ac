@@ -112,7 +112,6 @@ case $host_os in
      *linux* )		AC_DEFINE(LINUX,[],[GNU Linux]);;
 esac
 
-
 dnl  ----- Check for programs
 AC_PROG_LEX
 if test "$LEX" == ":"; then
@@ -345,6 +344,9 @@ fi
 dnl ------ Check fcntl for USE_FCNTL
 AC_CHECK_FUNCS(fcntl)
 
+dnl ------ Check for 32 bit datatype
+AX_DEFINE_INTEGER_BITS(uint32_t, unsigned int, unsigned long, unsigned long long)
+
 dnl  ----- Check for program needed to build Guidebook
 AC_CHECK_PROG(HAVE_NROFF, nroff, "yes", "no")
 AC_CHECK_PROG(HAVE_TBL, tbl, "yes", "no")
@@ -458,6 +460,17 @@ if test "$enable_dump" != "no" ; then
 		NETHACK_ARG(dump-html-css-embedded,[CSS file should be included in the HTML dump],DUMP_HTML_CSS_EMBEDDED,no)
 	fi
 fi
+
+if test "$enable_tty_graphics" != "no"; then
+	NETHACK_ARG(utf8-glyphs,[Enable UTF-8 glyphs in TTY],UTF8_GLYPHS,yes)
+	if test "$enable_utf8_glyphs" != "no" ; then
+		dnl check for uint32_t
+		if test "$uint32_t" = no; then
+			AC_MSG_ERROR([unable to continue without a 4-bytes datatype that could hold unicode codepoints])
+		fi
+	fi
+fi
+
 
 NETHACK_ARG_WITH_PARAM(whereis-file,[Log information about running games],WHEREIS_FILE,no,FILE,[%n.whereis])
 
