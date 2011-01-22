@@ -764,7 +764,9 @@ int gr_set_flag;
 {
     iflags.IBMgraphics = FALSE;
     iflags.DECgraphics = FALSE;
+#ifdef CURSES_GRAPHICS
     iflags.cursesgraphics = FALSE;
+#endif
     iflags.UTF8graphics = FALSE;
 
     switch (gr_set_flag) {
