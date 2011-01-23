@@ -462,7 +462,7 @@ do_look(quick)
     const char *x_str, *firstmatch = 0;
     struct permonst *pm = 0;
     int     i, ans = 0;
-    int     sym;		/* typed symbol or converted glyph */
+    glyph_t     sym;		/* typed symbol or converted glyph */
     int	    found;		/* count of matching syms found */
     coord   cc;			/* screen pos of unknown glyph */
     boolean save_verbose;	/* saved value of flags.verbose */
@@ -529,7 +529,14 @@ do_look(quick)
 	    /* Convert the glyph at the selected position to a symbol. */
 	    glyph = glyph_at(cc.x,cc.y);
 	    if (glyph_is_cmap(glyph)) {
-		sym = showsyms[glyph_to_cmap(glyph)];
+		if (iflags.UTF8graphics) {
+			/* Temporary workaround as UnNetHack can't yet
+			 * display UTF-8 glyphs on the topline */
+			from_screen = FALSE;
+			sym = defsyms[glyph_to_cmap(glyph)].sym;
+		} else {
+			sym = showsyms[glyph_to_cmap(glyph)];
+		}
 	    } else if (glyph_is_trap(glyph)) {
 		sym = showsyms[trap_to_defsym(glyph_to_trap(glyph))];
 	    } else if (glyph_is_object(glyph)) {
