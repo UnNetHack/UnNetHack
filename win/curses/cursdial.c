@@ -446,11 +446,11 @@ int curses_ext_cmd()
         {
             if (strlen(extcmdlist[count].ef_txt) > prompt_width)
             {
-                if (strncmp(cur_choice, extcmdlist[count].ef_txt,
+                if (strncasecmp(cur_choice, extcmdlist[count].ef_txt,
                  prompt_width) == 0)
                 {
                     if ((extcmdlist[count].ef_txt[prompt_width] ==
-                     letter) || letter == '*')
+			 lowc(letter)) || letter == '*')
                     {
                         if ((matches == 0) && (letter != '*'))
                         {

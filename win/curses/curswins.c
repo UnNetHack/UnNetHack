@@ -467,14 +467,19 @@ boolean curses_window_has_border(winid wid)
 
 boolean curses_window_exists(winid wid)
 {
-    if (nhwins[wid].nhwin == wid)
+    nethack_wid *widptr = nhwids;
+    
+    while (widptr != NULL)
     {
-        return TRUE;
+        if (widptr->nhwid == wid)
+        {
+            return TRUE;
+	}
+
+	widptr = widptr->next_wid;
     }
-    else
-    {
-        return FALSE;
-    }
+
+    return FALSE;
 }
 
 
