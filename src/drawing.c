@@ -634,7 +634,7 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
 	0x2592,	/* S_hodoor:	MEDIUM SHADE */
 	g_FILLER(S_vcdoor),
 	g_FILLER(S_hcdoor),
-	0x03c0,	/* S_bars:	GREEK SMALL LETTER PI */
+	0x03a0,	/* S_bars:	GREEK CAPITAL LETTER PI */
 	0x03a8,	/* S_tree:	GREEK CAPITAL LETTER PSI */
 	0x00b7,	/* S_room:	MIDDLE DOT */
 	g_FILLER(S_stone),	/* S_darkroom:	meta-~, centered dot */
@@ -681,8 +681,8 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
 	g_FILLER(S_magic_trap),
 	g_FILLER(S_anti_magic_trap),
 	g_FILLER(S_polymorph_trap),
-	0x58,	/* S_vbeam:	meta-x, vertical rule */ // TODO
-	0x51,	/* S_hbeam:	meta-q, horizontal rule */ // TODO
+	0x2502,	/* S_vbeam:	BOX DRAWINGS LIGHT VERTICAL */
+	0x2500,	/* S_hbeam:	BOX DRAWINGS LIGHT HORIZONTAL */
 	g_FILLER(S_lslant),
 	g_FILLER(S_rslant),
 	g_FILLER(S_digbeam),
@@ -694,21 +694,21 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
 	g_FILLER(S_ss3),
 	g_FILLER(S_ss4),
 	g_FILLER(S_sw_tl),
-	0x5f,	/* S_sw_tc:	meta-o, high horizontal line */ // TODO
+	0x2594,	/* S_sw_tc:	UPPER ONE EIGHTH BLOCK */
 	g_FILLER(S_sw_tr),
-	0x58,	/* S_sw_ml:	meta-x, vertical rule */ // TODO
-	0x58,	/* S_sw_mr:	meta-x, vertical rule */ // TODO
+	0x258f,	/* S_sw_ml:	LEFT ONE EIGHTH BLOCK */
+	0x2595,	/* S_sw_mr:	RIGHT ONE EIGHTH BLOCK */
 	g_FILLER(S_sw_bl),
-	0x53,	/* S_sw_bc:	meta-s, low horizontal line */ // TODO
+	0x2581,	/* S_sw_bc:	LOWER ONE EIGHTH BLOCK */
 	g_FILLER(S_sw_br),
 	g_FILLER(S_explode1),
-	0x5f,	/* S_explode2:	meta-o, high horizontal line */ // TODO
+	0x2594,	/* S_explode2:	UPPER ONE EIGHTH BLOCK */
 	g_FILLER(S_explode3),
-	0x58,	/* S_explode4:	meta-x, vertical rule */ // TODO
+	0x258f,	/* S_explode4:	LEFT ONE EIGHTH BLOCK */
 	g_FILLER(S_explode5),
-	0x58,	/* S_explode6:	meta-x, vertical rule */ // TODO
+	0x2595,	/* S_explode6:	RIGHT ONE EIGHTH BLOCK */
 	g_FILLER(S_explode7),
-	0x53,	/* S_explode8:	meta-s, low horizontal line */ // TODO
+	0x2581,	/* S_explode8:	LOWER ONE EIGHTH BLOCK */
 	g_FILLER(S_explode9)
 };
 #endif
