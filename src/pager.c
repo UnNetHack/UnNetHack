@@ -467,6 +467,7 @@ do_look(quick)
     coord   cc;			/* screen pos of unknown glyph */
     boolean save_verbose;	/* saved value of flags.verbose */
     boolean from_screen;	/* question from the screen */
+    boolean force_defsyms;	/* force using glyphs from defsyms[].sym */
     boolean need_to_look;	/* need to get explan. from glyph */
     boolean hit_trap;		/* true if found trap explanation */
     int skipped_venom;		/* non-zero if we ignored "splash of venom" */
@@ -532,7 +533,7 @@ do_look(quick)
 		if (iflags.UTF8graphics) {
 			/* Temporary workaround as UnNetHack can't yet
 			 * display UTF-8 glyphs on the topline */
-			from_screen = FALSE;
+			force_defsyms = TRUE;
 			sym = defsyms[glyph_to_cmap(glyph)].sym;
 		} else {
 			sym = showsyms[glyph_to_cmap(glyph)];
@@ -637,7 +638,7 @@ do_look(quick)
 	/* Now check for graphics symbols */
 	for (hit_trap = FALSE, i = 0; i < MAXPCHARS; i++) {
 	    x_str = defsyms[i].explanation;
-	    if (sym == (from_screen ? showsyms[i] : defsyms[i].sym) && *x_str) {
+	    if (sym == (force_defsyms ? defsyms[i].sym : (from_screen ? showsyms[i] : defsyms[i].sym)) && *x_str) {
 		/* avoid "an air", "a water", "a floor of a room", "a dark part of a room" */
 		int article = ((i == S_room)||(i == S_darkroom)) ? 2 :		/* 2=>"the" */
 			      !(strcmp(x_str, "air") == 0 ||	/* 1=>"an"  */
