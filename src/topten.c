@@ -79,6 +79,7 @@ STATIC_DCL int FDECL(score_wanted,
 #ifdef RECORD_ACHIEVE
 STATIC_DCL long FDECL(encodeachieve, (void));
 #endif
+STATIC_DCL long FDECL(encode_xlogflags, (void));
 #ifdef NO_SCAN_BRACK
 STATIC_DCL void FDECL(nsb_mung_line,(char*));
 STATIC_DCL void FDECL(nsb_unmung_line,(char*));
@@ -313,6 +314,8 @@ struct toptenentry *tt;
 
    munge_xlstring(buf, tt->death, DTHSZ + 1);
   (void)fprintf(rfile, SEP "death=%s", buf);
+
+  (void)fprintf(rfile, SEP "flags=0x%lx", encode_xlogflags());
 
 #ifdef RECORD_CONDUCT
   (void)fprintf(rfile, SEP "conduct=0x%lx", encodeconduct());
@@ -947,6 +950,20 @@ int uid;
 		return 1;
 	}
 	return 0;
+}
+
+long
+encode_xlogflags(void)
+{
+	long e = 0L;
+
+	if (wizard)              e |= 0x001L; /* wizard mode */
+	if (discover)            e |= 0x002L; /* explore mode */
+	if (killer_flags & 0x1)  e |= 0x004L; /* died, (with the Amulet) */
+	if (killer_flags & 0x2)  e |= 0x008L; /* died, (in celestial disgrace) */
+	if (killer_flags & 0x4)  e |= 0x010L; /* died, (with a fake Amulet) */
+
+	return e;
 }
 
 #ifdef RECORD_CONDUCT

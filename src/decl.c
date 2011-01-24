@@ -58,6 +58,9 @@ const char *delayed_killer = 0;
 NEARDATA long done_money = 0;
 #endif
 char killer_buf[BUFSZ] = DUMMY;
+
+long killer_flags = 0L;
+
 const char *nomovemsg = 0;
 const char nul[40] = DUMMY;			/* contains zeros */
 NEARDATA char plname[PL_NSIZ] = DUMMY;		/* player name */

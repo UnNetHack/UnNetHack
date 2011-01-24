@@ -208,6 +208,9 @@ E const char *delayed_killer;
 E long done_money;
 #endif
 E char killer_buf[BUFSZ];
+
+E long killer_flags;
+
 #ifdef DUMP_LOG
 E char dump_fn[];		/* dumpfile name (dump patch) */
 #endif
