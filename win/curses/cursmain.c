@@ -110,7 +110,7 @@ void curses_init_nhwindows(int* argcp, char** argv)
     noecho();
     raw();
     meta(stdscr, TRUE);
-    curs_set(0);
+    orig_cursor = curs_set(0);
     keypad(stdscr, TRUE);
 #ifdef NCURSES_VERSION
 # ifdef __APPLE__
@@ -207,6 +207,8 @@ void curses_get_nh_event()
 */
 void curses_exit_nhwindows(const char *str)
 {
+    curses_cleanup();
+    curs_set(orig_cursor);
     endwin();
     iflags.window_inited = 0;
     if (str != NULL)
@@ -218,6 +220,7 @@ void curses_exit_nhwindows(const char *str)
 /* Prepare the window to be suspended. */
 void curses_suspend_nhwindows(const char *str)
 {
+    endwin();
 }
 
 
