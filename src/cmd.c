@@ -118,6 +118,7 @@ STATIC_PTR int NDECL(doextcmd);
 STATIC_PTR int NDECL(domonability);
 STATIC_PTR int NDECL(dooverview_or_wiz_where);
 STATIC_PTR int NDECL(dotravel);
+STATIC_PTR int NDECL(doautoexplore);
 # ifdef WIZARD
 int NDECL(wiz_show_rooms);
 STATIC_PTR int NDECL(wiz_wish);
@@ -1592,8 +1593,8 @@ static const struct func_tab cmdlist[] = {
 /*	'u', 'U' : go ne */
 	{'u', FALSE, dountrap, NULL}, /* if number_pad is on */
 	{M('u'), FALSE, dountrap, NULL},
-	{'v', TRUE, doversion, NULL},
-	{'V', TRUE, dohistory, NULL},
+	{'v', TRUE, doautoexplore, NULL},
+	{'V', TRUE, doversion, NULL},
 	{M('v'), TRUE, doextversion, NULL},
 	{'w', FALSE, dowield, NULL},
 	{'W', FALSE, dowear, NULL},
@@ -2099,7 +2100,7 @@ register char *cmd;
 			    flags.travel = 1;
 			    iflags.travel1 = 1;
 			    flags.run = 8;
-			    flags.nopick = 1;
+			    flags.nopick = !iflags.autoexplore;
 			    do_rush = TRUE;
 			    break;
 		    }
@@ -2680,6 +2681,17 @@ dotravel()
 	}
 	iflags.travelcc.x = u.tx = cc.x;
 	iflags.travelcc.y = u.ty = cc.y;
+	iflags.autoexplore = FALSE;
+	cmd[0] = CMD_TRAVEL;
+	readchar_queue = cmd;
+	return 0;
+}
+
+STATIC_PTR int
+doautoexplore()
+{
+	static char cmd[2];
+	iflags.autoexplore = TRUE;
 	cmd[0] = CMD_TRAVEL;
 	readchar_queue = cmd;
 	return 0;

@@ -526,7 +526,8 @@ int mode;
 			&& prm->lit == rgrm->lit
 			&& prm->waslit == rgrm->waslit
 			&& prm->roomno == rgrm->roomno
-			&& prm->edge == rgrm->edge) {
+			&& prm->edge == rgrm->edge
+			&& prm->stepped_on == rgrm->stepped_on) {
 			match++;
 			if (match > 254) {
 			    match = 254;	/* undo this match */

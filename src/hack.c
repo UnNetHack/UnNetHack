@@ -12,7 +12,7 @@ STATIC_DCL int FDECL(still_chewing,(XCHAR_P,XCHAR_P));
 #ifdef SINKS
 STATIC_DCL void NDECL(dosinkfall);
 #endif
-STATIC_DCL boolean FDECL(findtravelpath, (BOOLEAN_P));
+STATIC_DCL boolean FDECL(findtravelpath, (boolean(*)(int, int)));
 STATIC_DCL boolean FDECL(monstinroom, (struct permonst *,int));
 
 STATIC_DCL void FDECL(move_update, (BOOLEAN_P));
@@ -869,7 +869,7 @@ xchar x, y;
 #ifdef OVL3
 
 /* return TRUE if (dx,dy) is an OK place to move
- * mode is one of DO_MOVE, TEST_MOVE or TEST_TRAV
+ * mode is one of DO_MOVE, TEST_MOVE, TEST_TRAV or TEST_TRAP
  */
 boolean 
 test_move(ux, uy, dx, dy, mode)
@@ -943,7 +943,7 @@ int mode;
 			    }
 			} else pline("That door is closed.");
 		    }
-		} else if (mode == TEST_TRAV) goto testdiag;
+		} else if (mode == TEST_TRAV || mode == TEST_TRAP) goto testdiag;
 		return FALSE;
 	    }
 	} else {
@@ -983,15 +983,18 @@ int mode;
     /* Pick travel path that does not require crossing a trap.
      * Avoid water and lava using the usual running rules.
      * (but not u.ux/u.uy because findtravelpath walks toward u.ux/u.uy) */
-    if (flags.run == 8 && mode != DO_MOVE && (x != u.ux || y != u.uy)) {
+    if (flags.run == 8 && (mode == TEST_MOVE || mode == TEST_TRAP) &&
+        (x != u.ux || y != u.uy)) {
 	struct trap* t = t_at(x, y);
 
 	if ((t && t->tseen) ||
 	    (!Levitation && !Flying &&
 	     !is_clinger(youmonst.data) &&
 	     (is_pool(x, y) || is_lava(x, y)) && levl[x][y].seenv))
-	    return FALSE;
+	    return mode == TEST_TRAP;
     }
+
+    if (mode == TEST_TRAP) return FALSE; /* not a move through a trap */
 
     ust = &levl[ux][uy];
 
@@ -1037,15 +1040,60 @@ int mode;
     return TRUE;
 }
 
+/* Returns whether a square might be interesting to autoexplore onto.
+   This is done purely in terms of the glyph on the square, and the
+   stepped-on memory, i.e. information the player knows already, to
+   avoid leaking information. The algorithm is taken from TAEB: "step
+   on any item we haven't stepped on, or any square we haven't stepped
+   on adjacent to stone that isn't adjacent to a square that has been
+   stepped on; however, never step on a boulder this way". We also
+   avoid treating traps and doors known to be locked as valid explore
+   targets (although they are still valid travel intermediates). */
+static boolean
+unexplored(x, y)
+int x, y;
+{
+	int i, j, k, l;
+	struct trap *ttmp = t_at(x, y);
+	if (!isok(x, y)) return FALSE;
+	if (levl[x][y].stepped_on) return FALSE;
+#if 0
+	if (glyph_to_cmap(levl[x][y].glyph) == S_vcdoor ||
+			glyph_to_cmap(levl[x][y].glyph) == S_hcdoor)
+		if (levl[x][y].fknown & FKNOWN_LOCKED &&
+				levl[x][y].flags & D_LOCKED) return FALSE;
+#endif
+	if (ttmp && ttmp->tseen) return FALSE;
+	if (glyph_is_object(levl[x][y].glyph) &&
+			glyph_to_obj(levl[x][y].glyph) == BOULDER) return FALSE;
+	if (glyph_is_object(levl[x][y].glyph)) return TRUE;
+	for (i = -1; i <= 1; i++) {
+		for (j = -1; j <= 1; j++) {
+			if (isok(x+i, y+j) &&
+					glyph_is_cmap(levl[x+i][y+j].glyph) &&
+					glyph_to_cmap(levl[x+i][y+j].glyph) == S_stone) {
+				int flag = TRUE;
+				for (k = -1; k <= 1; k++)
+					for (l = -1; l <= 1; l++)
+						if (isok(x+i+k, y+j+l) && levl[x+i+k][y+j+l].stepped_on)
+							flag = FALSE;
+				if (flag) return TRUE;
+			}
+		}
+	}
+	return FALSE;
+}
+
 /*
  * Find a path from the destination (u.tx,u.ty) back to (u.ux,u.uy).
- * A shortest path is returned.  If guess is TRUE, consider various
- * inaccessible locations as valid intermediate path points.
+ * A shortest path is returned.  If guess is non-NULL, instead travel
+ * as near to the target as you can, using guess as a function that
+ * specifies what is considered to be a valid target.
  * Returns TRUE if a path was found.
  */
 static boolean
 findtravelpath(guess)
-boolean guess;
+boolean (*guess)(int, int);
 {
     /* if travel to adjacent, reachable location, use normal movement rules */
     if (!guess && iflags.travel1 && distmin(u.ux, u.uy, u.tx, u.ty) == 1) {
@@ -1059,8 +1107,8 @@ boolean guess;
 	}
 	flags.run = 8;
     }
-    if (u.tx != u.ux || u.ty != u.uy) {
-	xchar travel[COLNO][ROWNO];
+    if (u.tx != u.ux || u.ty != u.uy || guess == unexplored) {
+	unsigned travel[COLNO][ROWNO];
 	xchar travelstepx[2][COLNO*ROWNO];
 	xchar travelstepy[2][COLNO*ROWNO];
 	xchar tx, ty, ux, uy;
@@ -1094,6 +1142,7 @@ boolean guess;
 		static int ordered[] = { 0, 2, 4, 6, 1, 3, 5, 7 };
 		/* no diagonal movement for grid bugs */
 		int dirmax = u.umonnum == PM_GRID_BUG ? 4 : 8;
+		boolean alreadyrepeated = FALSE;
 
 		for (dir = 0; dir < dirmax; ++dir) {
 		    int nx = x+xdir[ordered[dir]];
@@ -1101,14 +1150,18 @@ boolean guess;
 
 		    if (!isok(nx, ny)) continue;
 		    if ((!Passes_walls && !can_ooze(&youmonst) &&
-			closed_door(x, y)) || sobj_at(BOULDER, x, y)) {
+			closed_door(x, y)) || sobj_at(BOULDER, x, y) ||
+                        test_move(x, y, nx-x, ny-y, TEST_TRAP)) {
 			/* closed doors and boulders usually
 			 * cause a delay, so prefer another path */
 			if (travel[x][y] > radius-3) {
+                            if (!alreadyrepeated) {
 			    travelstepx[1-set][nn] = x;
 			    travelstepy[1-set][nn] = y;
 			    /* don't change travel matrix! */
 			    nn++;
+                                alreadyrepeated = TRUE;
+                            }
 			    continue;
 			}
 		    }
@@ -1148,18 +1201,23 @@ boolean guess;
 
 	    dist = distmin(ux, uy, tx, ty);
 	    d2 = dist2(ux, uy, tx, ty);
+	    if (guess == unexplored) {
+		    dist = COLNO * ROWNO;
+		    d2 = COLNO * COLNO * ROWNO * ROWNO;
+	    }
 	    for (tx = 1; tx < COLNO; ++tx)
 		for (ty = 0; ty < ROWNO; ++ty)
 		    if (travel[tx][ty]) {
 			nxtdist = distmin(ux, uy, tx, ty);
-			if (nxtdist == dist && couldsee(tx, ty)) {
+                        if (guess == unexplored) nxtdist = travel[tx][ty];
+			if (nxtdist == dist && guess(tx, ty)) {
 			    nd2 = dist2(ux, uy, tx, ty);
 			    if (nd2 < d2) {
 				/* prefer non-zigzag path */
 				px = tx; py = ty;
 				d2 = nd2;
 			    }
-			} else if (nxtdist < dist && couldsee(tx, ty)) {
+			} else if (nxtdist < dist && guess(tx, ty)) {
 			    px = tx; py = ty;
 			    dist = nxtdist;
 			    d2 = dist2(ux, uy, tx, ty);
@@ -1170,6 +1228,10 @@ boolean guess;
 		/* no guesses, just go in the general direction */
 		u.dx = sgn(u.tx - u.ux);
 		u.dy = sgn(u.ty - u.uy);
+		if (u.dx == 0 && u.dy == 0) {
+			nomul(0, 0);
+			return FALSE;
+		}
 		if (test_move(u.ux, u.uy, u.dx, u.dy, TEST_MOVE))
 		    return TRUE;
 		goto found;
@@ -1180,7 +1242,7 @@ boolean guess;
 	    uy = u.uy;
 	    set = 0;
 	    n = radius = 1;
-	    guess = FALSE;
+	    guess = NULL;
 	    goto noguess;
 	}
 	return FALSE;
@@ -1191,6 +1253,14 @@ found:
     u.dy = 0;
     nomul(0, 0);
     return FALSE;
+}
+
+/* A function version of couldsee, so we can take a pointer to it. */
+static boolean
+couldsee_func(x, y)
+int x, y;
+{
+  return couldsee(x, y);
 }
 
 void
@@ -1210,9 +1280,46 @@ domove()
 	u_wipe_engr(rnd(5));
 
 	if (flags.travel) {
-	    if (!findtravelpath(FALSE))
-		(void) findtravelpath(TRUE);
+            if (iflags.autoexplore) {
+                if (Blind) {
+                  /* necessary to not autoexplore while blind; the logic
+                     can't handle it, nor could it sensibly without
+                     somehow knowing when to search and when to move */
+                  pline("You stop exploring, because you can't see where"
+                        " you're going.");
+                  flags.move = 0;
+                  nomul(0, 0);
+                  return;
+                }
+                if (In_sokoban(&u.uz)) {
+                  pline("You somehow know the layout of this place"
+                        " without exploring.");
+                  pline("But, you feel you should be careful moving"
+                        " around.");
+                  flags.move = 0;
+                  nomul(0, 0);
+                  return;
+                }
+                if (Stunned || Confusion) {
+                  pline("Your head is spinning too much to explore.");
+                  flags.move = 0;
+                  nomul(0, 0);
+                  return;
+                }
+                u.tx = u.ux;
+                u.ty = u.uy;
+                if(!findtravelpath(unexplored))
+                    iflags.autoexplore = FALSE;
+            }
+	    else if (!findtravelpath(NULL))
+		(void) findtravelpath(couldsee_func);
 	    iflags.travel1 = 0;
+            if (u.dx == 0 && u.dy == 0) {
+              /* couldn't find a move; end travel without costing a turn */
+                flags.move = 0;
+                nomul(0, 0);
+                return;
+            }
 	}
 
 	if(((wtcap = near_capacity()) >= OVERLOADED
@@ -1357,8 +1464,9 @@ domove()
 		}
 
 		mtmp = m_at(x,y);
-		if (mtmp) {
+		if (mtmp && !is_safepet(mtmp)) {
 			/* Don't attack if you're running, and can see it */
+                        /* It's fine to displace pets, though */
 			/* We should never get here if forcefight */
 			if (flags.run &&
 			    ((!Blind && mon_visible(mtmp) &&
@@ -1381,7 +1489,10 @@ domove()
 
 	/* attack monster */
 	if(mtmp) {
-	    nomul(0, 0);
+            /* don't stop travel when displacing pets; if the
+               displace fails for some reason, attack() in uhitm.c
+               will stop travel rather than domove */
+            if (!is_safepet(mtmp) || flags.forcefight) nomul(0, 0);
 	    /* only attack if we know it's there */
 	    /* or if we used the 'F' command to fight blindly */
 	    /* or if it hides_under, in which case we call attack() to print
@@ -1396,7 +1507,7 @@ domove()
 	     * invisible monster--then, we fall through to attack() and
 	     * attack_check(), which still wastes a turn, but prints a
 	     * different message and makes the player remember the monster.		     */
-	    if(flags.nopick &&
+	    if(flags.nopick && !flags.travel &&
 		  (canspotmon(mtmp) || glyph_is_invisible(levl[x][y].glyph))){
 		if(mtmp->m_ap_type && !Protection_from_shape_changers
 						    && !sensemon(mtmp))
@@ -1720,10 +1831,32 @@ domove()
 
 	reset_occupations();
 	if (flags.run) {
-	    if ( flags.run < 8 )
+	    if (flags.run < 8) {
 		if (IS_DOOR(tmpr->typ) || IS_ROCK(tmpr->typ) ||
 			IS_FURNITURE(tmpr->typ))
 		    nomul(0, 0);
+            } else if (flags.travel && iflags.autoexplore) {
+              /* autoexplore stoppers: being orthogonally
+                 adjacent to a boulder, being orthogonally adjacent
+                 to 3 or more walls; this logic could be incorrect
+                 when blind, but we check for that earlier; while
+                 not blind, we'll assume the hero knows about adjacent
+                 walls and boulders due to being able to see them */
+              int wallcount = 0;
+              if (isok(u.ux-1, u.uy  ))
+                wallcount += IS_ROCK(levl[u.ux-1][u.uy  ].typ) +
+                  !!sobj_at(BOULDER, u.ux-1, u.uy  ) * 3;
+              if (isok(u.ux+1, u.uy  ))
+                wallcount += IS_ROCK(levl[u.ux+1][u.uy  ].typ) +
+                  !!sobj_at(BOULDER, u.ux+1, u.uy  ) * 3;
+              if (isok(u.ux  , u.uy-1))
+                wallcount += IS_ROCK(levl[u.ux  ][u.uy-1].typ) +
+                  !!sobj_at(BOULDER, u.ux  , u.uy-1) * 3;
+              if (isok(u.ux  , u.uy+1))
+                wallcount += IS_ROCK(levl[u.ux  ][u.uy+1].typ) +
+                  !!sobj_at(BOULDER, u.ux  , u.uy+1) * 3;
+              if (wallcount >= 3) nomul(0, 0);
+            }
 	}
 
 	if (hides_under(youmonst.data))
@@ -1784,6 +1917,10 @@ domove()
 void
 invocation_message()
 {
+	/* mark the square as stepped on, whether it's the VS or not;
+	    don't do so when blind, though, because it would misleadingly
+	    imply we'd properly explored that area */
+	if (!Blind) levl[u.ux][u.uy].stepped_on = 1;
 	/* a special clue-msg when near the Invocation position */
 	if (Invocation_lev(&u.uz)) {
 		char *strange_vibration;
@@ -2323,6 +2460,21 @@ lookaround()
 	return;
     }
 
+    /* Having a hostile monster in LOS stops running after one turn,
+       unless sessile or shift-moving. We don't count detection just
+       via telepathy, as it might be over the other end of the level,
+       unless the monster is within 5 spaces of us. */
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if ((canseemon(mtmp) ||
+             (canspotmon(mtmp) &&
+              distmin(u.ux, u.uy, mtmp->mx, mtmp->my) <= 5)) &&
+            !mtmp->mpeaceful && !mtmp->mtame &&
+            mtmp->data->mmove && flags.run != 1) {
+            nomul(0, 0);
+            return;
+        }
+    }
+
     if(Blind || flags.run == 0) return;
     for(x = u.ux-1; x <= u.ux+1; x++) for(y = u.uy-1; y <= u.uy+1; y++) {
 	if(!isok(x,y)) continue;
@@ -2336,7 +2488,7 @@ lookaround()
 		    mtmp->m_ap_type != M_AP_OBJECT &&
 		    (!mtmp->minvis || See_invisible) && !mtmp->mundetected) {
 	    if((flags.run != 1 && !mtmp->mtame)
-					|| (x == u.ux+u.dx && y == u.uy+u.dy))
+	       || (x == u.ux+u.dx && y == u.uy+u.dy && !flags.travel))
 		goto stop;
 	}
 
@@ -2575,6 +2727,8 @@ boolean k_format;
 	u.uhp -= n;
 	if(u.uhp > u.uhpmax)
 		u.uhpmax = u.uhp;	/* perhaps n was negative */
+        else
+		nomul(0, 0);               /* taking damage stops command repeat */
 	flags.botl = 1;
 	if(u.uhp < 1) {
 		killer_format = k_format;

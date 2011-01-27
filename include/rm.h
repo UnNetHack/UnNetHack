@@ -345,6 +345,7 @@ struct rm {
 	Bitfield(waslit,1);	/* remember if a location was lit */
 	Bitfield(roomno,6);	/* room # for special rooms */
 	Bitfield(edge,1);	/* marks boundaries for special rooms*/
+	Bitfield(stepped_on,1);	/* player has stepped on this square */
 };
 
 
