@@ -865,11 +865,23 @@ xchar x, y;
 	return((boolean)(Invocation_lev(&u.uz) && x == inv_pos.x && y == inv_pos.y));
 }
 
+static void
+autoexplore_msg(text, mode)
+const char *text;
+int mode;
+{
+	if (iflags.autoexplore) {
+		char tmp[BUFSZ];
+		Strcpy(tmp, text);
+		pline("%s blocks your way.", upstart(tmp));
+	}
+}
+
 #endif /* OVL1 */
 #ifdef OVL3
 
-/* return TRUE if (dx,dy) is an OK place to move
- * mode is one of DO_MOVE, TEST_MOVE, TEST_TRAV or TEST_TRAP
+/** Return TRUE if (dx,dy) is an OK place to move
+ *  mode is one of DO_MOVE, TEST_MOVE, TEST_TRAV or TEST_TRAP
  */
 boolean 
 test_move(ux, uy, dx, dy, mode)
@@ -1007,19 +1019,23 @@ int mode;
 			     || block_entry(x, y))
 			 )) {
 	/* Can't move at a diagonal out of a doorway with door. */
-	return FALSE;
+	 if (mode == DO_MOVE) autoexplore_msg("something", mode);
+	 return FALSE;
     }
 
     if (sobj_at(BOULDER,x,y) && (In_sokoban(&u.uz) || !Passes_walls)) {
-	if (!(Blind || Hallucination) && (flags.run >= 2) && mode != TEST_TRAV)
+	if (!(Blind || Hallucination) && (flags.run >= 2) && mode != TEST_TRAV) {
+	    if (sobj_at(BOULDER,x,y) && mode == DO_MOVE) autoexplore_msg("a boulder", mode);
 	    return FALSE;
+	}
 	if (mode == DO_MOVE) {
 	    /* tunneling monsters will chew before pushing */
 	    if (tunnels(youmonst.data) && !needspick(youmonst.data) &&
 		!In_sokoban(&u.uz)) {
 		if (still_chewing(x,y)) return FALSE;
-	    } else
+	    } else {
 		if (moverock() < 0) return FALSE;
+	    }
 	} else if (mode == TEST_TRAV) {
 	    struct obj* obj;
 
@@ -1306,13 +1322,18 @@ domove()
                   nomul(0, 0);
                   return;
                 }
-                u.tx = u.ux;
-                u.ty = u.uy;
-                if(!findtravelpath(unexplored))
-                    iflags.autoexplore = FALSE;
-            }
-	    else if (!findtravelpath(NULL))
+		u.tx = u.ux;
+		u.ty = u.uy;
+		if (!findtravelpath(unexplored)) {
+			iflags.autoexplore = FALSE;
+			/* TODO: Check if really done (known closed doors,
+			 * boulders blocking your way) and offer doing
+			 * travel when done */
+			pline("Done exploring.");
+		}
+	    } else if (!findtravelpath(NULL)) {
 		(void) findtravelpath(couldsee_func);
+	    }
 	    iflags.travel1 = 0;
             if (u.dx == 0 && u.dy == 0) {
               /* couldn't find a move; end travel without costing a turn */
@@ -1476,6 +1497,7 @@ domove()
 			     sensemon(mtmp))) {
 				nomul(0, 0);
 				flags.move = 0;
+				autoexplore_msg(Monnam(mtmp));
 				return;
 			}
 		}
