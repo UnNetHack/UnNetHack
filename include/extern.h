@@ -500,6 +500,7 @@ E void FDECL(dump_containerconts, (struct obj *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 E char* FDECL(html_escape_character, (const char));
 #ifdef DUMP_LOG
 E int NDECL(dump_screenshot);
+E int NDECL(dumpoverview);
 #endif
 
 /* ### dungeon.c ### */
@@ -1483,6 +1484,7 @@ E const char *FDECL(mimic_obj_name, (struct monst *));
 E boolean FDECL(match_optname, (const char *,const char *,int,BOOLEAN_P));
 E void NDECL(initoptions);
 E void FDECL(parseoptions, (char *,BOOLEAN_P,BOOLEAN_P));
+E boolean FDECL(parse_monster_color, (char *));
 E int NDECL(doset);
 E int NDECL(dotogglepickup);
 E void NDECL(option_help);
@@ -2551,6 +2553,7 @@ E void NDECL(tutorial_redisplay_message);
 E void FDECL(check_tutorial_farlook, (int, int));
 E void FDECL(check_tutorial_command, (char));
 E int FDECL(check_tutorial_location, (int, int, BOOLEAN_P));
+E int FDECL(check_tutorial_oclass, (int));
 
 /* ### unicode.c ### */
 E glyph_t FDECL(get_unicode_codepoint, (int));
