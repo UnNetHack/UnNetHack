@@ -1520,6 +1520,10 @@ void dump_screen()
 		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_altar\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == ICE)
 		Sprintf(tmpbuf, "<span class=\"nh_ice\">%s</span>", html_c);
+	    else if (oclass < 0 && glyph_is_trap(glyph))
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_color_%d\">%s</span>",
+				defsyms[trap_to_defsym(t_at(x,y)->ttyp)].explanation,
+				color, html_c);
 	    else {
 		struct monst *mtmp = m_at(x,y);
 		if (mtmp && canspotmon(mtmp)) {
