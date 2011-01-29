@@ -634,7 +634,7 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
 	0x2592,	/* S_hodoor:	MEDIUM SHADE */
 	g_FILLER(S_vcdoor),
 	g_FILLER(S_hcdoor),
-	0x03a0,	/* S_bars:	GREEK CAPITAL LETTER PI */
+	0x2261,	/* S_bars:	IDENTICAL TO */
 	0x03a8,	/* S_tree:	GREEK CAPITAL LETTER PSI */
 	0x00b7,	/* S_room:	MIDDLE DOT */
 	g_FILLER(S_stone),	/* S_darkroom:	meta-~, centered dot */
@@ -649,9 +649,9 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
 	g_FILLER(S_throne),
 	g_FILLER(S_sink),
 	0x00b6,	/* S_fountain:	PILCROW SIGN */
-	0x2248,	/* S_pool:	ALMOST EQUAL TO */
+	0x224b,	/* S_pool:	TRIPLE TILDE */
 	0x00b7,	/* S_ice:	MIDDLE DOT */
-	0x25c6,	/* S_lava:	BLACK DIAMOND */
+	0x224b,	/* S_lava:	TRIPLE TILDE */
 	0x00b7,	/* S_vodbridge:	MIDDLE DOT */
 	0x00b7,	/* S_hodbridge:	MIDDLE DOT */
 	g_FILLER(S_vcdbridge),
