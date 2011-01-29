@@ -474,6 +474,7 @@ E void FDECL(switch_graphics, (int));
 #ifdef REINCARNATION
 E void FDECL(assign_rogue_graphics, (BOOLEAN_P));
 #endif
+E void FDECL(assign_utf8graphics_symbol, (int, glyph_t));
 
 /* ### dungeon.c ### */
 
@@ -1485,6 +1486,7 @@ E boolean FDECL(match_optname, (const char *,const char *,int,BOOLEAN_P));
 E void NDECL(initoptions);
 E void FDECL(parseoptions, (char *,BOOLEAN_P,BOOLEAN_P));
 E boolean FDECL(parse_monster_color, (char *));
+E boolean FDECL(parse_symbol, (const char *));
 E int NDECL(doset);
 E int NDECL(dotogglepickup);
 E void NDECL(option_help);

@@ -1414,6 +1414,106 @@ char *str;
 	}
 }
 
+/** Split up a string that matches name:value or 'name':value and
+ * return name and value separately. */
+static boolean
+parse_extended_option(str, option_name, option_value)
+const char *str;
+char *option_name;	/**< Output string buffer for option name */
+char *option_value;	/**< Output string buffer for option value */
+{
+	int i;
+	char *tmps, *cs;
+	char buf[BUFSZ];
+
+	if (!str) return FALSE;
+
+	strncpy(buf, str, BUFSZ);
+
+	/* remove comment*/
+	cs = strrchr(buf, '#');
+	if (cs) *cs = '\0';
+
+	/* trim whitespace at end of string */
+	i = strlen(buf)-1;
+	while (i>=0 && isspace(buf[i])) {
+		buf[i--] = '\0';
+	}
+
+	/* extract value */
+	cs = strchr(buf, ':');
+	if (!cs) return FALSE;
+
+	tmps = cs;
+	tmps++;
+	/* skip whitespace at start of string */
+	while (*tmps && isspace(*tmps)) tmps++;
+
+	strncpy(option_value, tmps, BUFSZ);
+
+	/* extract option name */
+	*cs = '\0';
+	tmps = buf;
+	if ((*tmps == '"') || (*tmps == '\'')) {
+		cs--;
+		while (isspace(*cs)) cs--;
+		if (*cs == *tmps) {
+			*cs = '\0';
+			tmps++;
+		}
+	}
+
+	strncpy(option_name, tmps, BUFSZ);
+
+	return TRUE;
+}
+
+/** Parse '"dungeon feature":unicode_codepoint' and change symbol in
+ * UTF8graphics. */
+boolean
+parse_symbol(str)
+const char *str;
+{
+	char feature[BUFSZ];
+	char codepoint[BUFSZ];
+	char *ptr, *endptr;
+	int i, num=0;
+
+	if (!parse_extended_option(str, feature, codepoint)) {
+		return FALSE;
+	}
+
+	/* parse codepoint */
+	if (!strncmpi(codepoint, "u+", 2) ||
+	    !strncmpi(codepoint, "0x", 2)) {
+		/* hexadecimal */
+		ptr = &(codepoint[2]);
+		errno = 0;
+		num = strtol(ptr, &endptr, 16);
+		if (errno != 0 || *endptr != 0 || endptr == ptr) {
+			return FALSE;
+		}
+	} else {
+		/* decimal */
+		ptr = &codepoint[0];
+		errno = 0;
+		num = strtol(ptr, &endptr, 10);
+		if (errno != 0 || *endptr != 0 || endptr == ptr) {
+			return FALSE;
+		}
+	}
+
+	/* find dungeon feature */
+	for (i=0; i < MAXPCHARS; i++) {
+		if (!strcmpi(feature, defsyms[i].explanation)) {
+			assign_utf8graphics_symbol(i, num);
+			return TRUE;
+		}
+	}
+	
+	return FALSE;
+}
+
 void
 common_prefix_options_parser(fullname, opts, negated)
 const char *fullname;

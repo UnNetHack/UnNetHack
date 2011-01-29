@@ -834,6 +834,22 @@ int gr_set_flag;
     return;
 }
 
+/** Change the UTF8graphics symbol at position with codepoint "value". */
+void
+assign_utf8graphics_symbol(position, value)
+int position;
+glyph_t value;
+{
+#ifdef UTF8_GLYPHS
+	if (position < MAXPCHARS) {
+		utf8_graphics[position] = value;
+		/* need to update showsym */
+		if (iflags.UTF8graphics) {
+			switch_graphics(UTF8_GRAPHICS);
+		}
+	}
+#endif
+}
 
 #ifdef REINCARNATION
 
