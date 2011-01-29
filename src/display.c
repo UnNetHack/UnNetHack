@@ -1453,6 +1453,8 @@ void dump_screen()
     int ch, glyph, oclass;
     int color;
     unsigned special;
+    const char *dfeature = (char *)0;
+    char dfeaturebuf[BUFSZ];
 
     dump_html("<pre class=\"nh_screen\">\n", "");
     for (y = 0; y < ROWNO; y++) {
@@ -1474,51 +1476,58 @@ void dump_screen()
 	    } else {
 	      Sprintf(html_c, "%s", html_escape_character(unicode_codepoint));
 	    }
+	    dfeature = dfeature_at(x, y, dfeaturebuf);
 
 	    if (c == ' ')
 		Strcpy(tmpbuf, " ");
 	    else if (x == u.ux && y == u.uy)
-		Sprintf(tmpbuf, "<span class=\"nh_inv_%d nh_player\">%s</span>", color, html_c);
+		Sprintf(tmpbuf, "<span title=\"you\" class=\"nh_inv_%d nh_player\">%s</span>", color, html_c);
 	    else if (special & (MG_PET|MG_DETECT))
 		Sprintf(tmpbuf, "<span class=\"nh_inv_%d nh_pet\">%s</span>", color, html_c);
 	    else if (special & (MG_PET|MG_DETECT))
 		Sprintf(tmpbuf, "<span class=\"nh_inv_%d\">%s</span>", color, html_c);
 	    else if (special & MG_INVERSE)
-		Sprintf(tmpbuf, "<span class=\"nh_inv_%d\">%s</span>", color, html_c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_inv_%d\">%s</span>", dfeature, color, html_c);
 	    else if (oclass < 0 && IS_DOOR(levl[x][y].typ) && levl[x][y].doormask >= D_ISOPEN)
-		Sprintf(tmpbuf, "<span class=\"nh_door\">%s</span>", html_c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_door\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && IS_DRAWBRIDGE(levl[x][y].typ))
-		Sprintf(tmpbuf, "<span class=\"nh_drawbridge\">%s</span>", html_c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_drawbridge\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == POOL)
-		Sprintf(tmpbuf, "<span class=\"nh_pool\">%s</span>", html_c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_pool\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == MOAT)
-		Sprintf(tmpbuf, "<span class=\"nh_moat\">%s</span>", html_c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_moat\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == WATER)
-		Sprintf(tmpbuf, "<span class=\"nh_water\">%s</span>", html_c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_water\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == LAVAPOOL)
-		Sprintf(tmpbuf, "<span class=\"nh_lava\">%s</span>", html_c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_lava\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == IRONBARS)
-		Sprintf(tmpbuf, "<span class=\"nh_ironbars\">%s</span>", html_c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_ironbars\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == CORR)
 		Sprintf(tmpbuf, "<span class=\"nh_corridor\">%s</span>", html_c);
 	    else if (oclass < 0 && levl[x][y].typ == STAIRS)
-		Sprintf(tmpbuf, "<span class=\"nh_stairs\">%s</span>", html_c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_stairs\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == LADDER)
-		Sprintf(tmpbuf, "<span class=\"nh_ladder\">%s</span>", html_c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_ladder\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == FOUNTAIN)
-		Sprintf(tmpbuf, "<span class=\"nh_fountain\">%s</span>", html_c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_fountain\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == THRONE)
-		Sprintf(tmpbuf, "<span class=\"nh_throne\">%s</span>", html_c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_throne\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == SINK)
-		Sprintf(tmpbuf, "<span class=\"nh_sink\">%s</span>", html_c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_sink\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == GRAVE)
-		Sprintf(tmpbuf, "<span class=\"nh_grave\">%s</span>", html_c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_grave\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == ALTAR)
-		Sprintf(tmpbuf, "<span class=\"nh_altar\">%s</span>", html_c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_altar\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == ICE)
 		Sprintf(tmpbuf, "<span class=\"nh_ice\">%s</span>", html_c);
-	    else
-		Sprintf(tmpbuf, "<span class=\"nh_color_%d\">%s</span>", color, html_c);
+	    else {
+		struct monst *mtmp = m_at(x,y);
+		if (mtmp && canspotmon(mtmp)) {
+			Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_color_%d\">%s</span>", m_monnam(mtmp), color, html_c);
+		} else {
+			Sprintf(tmpbuf, "<span class=\"nh_color_%d\">%s</span>", color, html_c);
+		}
+	    }
 	    /* HTML map */
 	    Strcat(html_buf, tmpbuf);
 
