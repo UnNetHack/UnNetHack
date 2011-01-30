@@ -1518,6 +1518,8 @@ void dump_screen()
 		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_grave\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == ALTAR)
 		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_altar\">%s</span>", dfeature, html_c);
+	    else if (oclass < 0 && levl[x][y].typ == TREE)
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_tree\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == ICE)
 		Sprintf(tmpbuf, "<span class=\"nh_ice\">%s</span>", html_c);
 	    else if (oclass < 0 && glyph_is_trap(glyph))
