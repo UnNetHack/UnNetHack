@@ -716,7 +716,7 @@ int prop;
 
 	for(y = y1; y <= y2; y++)
 	    for(x = x1; x <= x2; x++)
-		if(IS_STWALL(levl[x][y].typ))
+		if(IS_STWALL(levl[x][y].typ) || IS_TREES(levl[x][y].typ))
 		    levl[x][y].wall_info |= prop;
 }
 
