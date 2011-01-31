@@ -1620,6 +1620,7 @@ back_to_glyph(x,y)
 	    break;
 	case IRONBARS:	idx = S_bars;     break;
 	case TREE:		idx = S_tree;     break;
+	case DEADTREE:		idx = S_deadtree; break;
 	case POOL:
 	case MOAT:		idx = S_pool;	  break;
 	case STAIRS:
@@ -1745,12 +1746,12 @@ static const char *type_names[MAX_TYPE] = {
 	"STONE",	"VWALL",	"HWALL",	"TLCORNER",
 	"TRCORNER",	"BLCORNER",	"BRCORNER",	"CROSSWALL",
 	"TUWALL",	"TDWALL",	"TLWALL",	"TRWALL",
-	"DBWALL",	"SDOOR",	"SCORR",	"POOL",
-	"MOAT",		"WATER",	"DRAWBRIDGE_UP","LAVAPOOL",
-	"DOOR",		"CORR",		"ROOM",		"STAIRS",
-	"LADDER",	"FOUNTAIN",	"THRONE",	"SINK",
-	"ALTAR",	"ICE",		"DRAWBRIDGE_DOWN","AIR",
-	"CLOUD"
+	"DBWALL",	"TREE",		"SDOOR",	"SCORR",
+	"POOL",		"MOAT",		"WATER",	"DRAWBRIDGE_UP",
+	"LAVAPOOL",	"IRONBARS",	"DEADTREE",	"DOOR",
+	"CORR",		"ROOM",		"STAIRS",	"LADDER",
+	"FOUNTAIN",	"THRONE",	"SINK",		"ALTAR",
+	"ICE",		"DRAWBRIDGE_DOWN","AIR",	"CLOUD"
 };
 
 

@@ -3582,6 +3582,16 @@ register int dx,dy;
 	    nomul(0, 0);
 	}
 
+	if(lev->typ == TREE && abstype == ZT_DEATH && abs(type) != ZT_BREATH(ZT_DEATH)) {
+	    lev->typ = DEADTREE;
+	    if (cansee(sx,sy)) {
+		pline("The tree withers!");
+		newsym(sx,sy);
+	    }
+	    range = 0;
+	    break;
+	}
+
 	if(!ZAP_POS(lev->typ) || (closed_door(sx, sy) && (range >= 0))) {
 	    int bounce;
 	    uchar rmn;

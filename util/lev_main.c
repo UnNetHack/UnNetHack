@@ -941,8 +941,9 @@ char c;
 		  case 'L'  : return(LAVAPOOL);
 		  case 'I'  : return(ICE);
 		  case 'W'  : return(WATER);
-		  case 'T'	: return (TREE);
-		  case 'F'	: return (IRONBARS);	/* Fe = iron */
+		  case 'T'  : return(TREE);
+		  case 't'  : return(DEADTREE);
+		  case 'F'  : return(IRONBARS);	/* Fe = iron */
 		  case 'x'  : return(MAX_TYPE); /* 'see-through' */
 	    }
 	return(INVALID_TYPE);

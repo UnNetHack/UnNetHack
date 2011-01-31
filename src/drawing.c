@@ -222,6 +222,7 @@ struct symdef defsyms[MAXPCHARS] = {
 	{'+', "closed door",	C(CLR_BROWN)},	/* hcdoor */
 	{'#', "iron bars",	C(HI_METAL)},	/* bars */
 	{'#', "tree",		C(CLR_GREEN)},	/* tree */
+	{'#', "dead tree",	C(CLR_BLACK)},	/* dead tree */
 	{'.', "floor of a room",C(CLR_GRAY)},	/* room */
 	{'.', "dark part of a room",C(CLR_BLACK)},	/* dark room */
 /*20*/	{'#', "corridor",	C(CLR_GRAY)},	/* dark corr */
@@ -338,6 +339,7 @@ static glyph_t ibm_graphics[MAXPCHARS] = {
 	g_FILLER(S_hcdoor),
 	240,	/* S_bars:	equivalence symbol */
 	241,	/* S_tree:	plus or minus symbol */
+	241,	/* S_deadtree:	plus or minus symbol */
 	0xfa,	/* S_room:	meta-z, centered dot */
 	g_FILLER(S_stone),	/* S_darkroom:	meta-z, centered dot */
 /*20*/	0xb0,	/* S_corr:	meta-0, light shading */
@@ -438,6 +440,7 @@ static glyph_t dec_graphics[MAXPCHARS] = {
 	g_FILLER(S_hcdoor),
 	0xfb,	/* S_bars:	meta-{, small pi */
 	0xe7,	/* S_tree:	meta-g, plus-or-minus */
+	0xe7,	/* S_deadtree:	meta-g, plus-or-minus */
 	0xfe,	/* S_room:	meta-~, centered dot */
 	g_FILLER(S_stone),	/* S_darkroom:	meta-~, centered dot */
 /*20*/	g_FILLER(S_corr),
@@ -536,6 +539,7 @@ static glyph_t mac_graphics[MAXPCHARS] = {
 	0xef,	/* S_hcdoor */
 	0xf0,	/* S_bars:	equivalency symbol */
 	0xf1,	/* S_tree:	plus-or-minus */
+	0xf1,	/* S_deadtree:	plus-or-minus */
 	g_FILLER(S_Room),
 	g_FILLER(S_stone), /* S_darkroom */
 /*20*/	0xB0,	/* S_corr */
@@ -636,6 +640,7 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
 	g_FILLER(S_hcdoor),
 	0x2261,	/* S_bars:	IDENTICAL TO */
 	0x03a8,	/* S_tree:	GREEK CAPITAL LETTER PSI */
+	0x03a8,	/* S_deadtree:	GREEK CAPITAL LETTER PSI */
 	0x00b7,	/* S_room:	MIDDLE DOT */
 	g_FILLER(S_stone),	/* S_darkroom:	meta-~, centered dot */
 	g_FILLER(S_corr),

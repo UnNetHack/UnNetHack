@@ -45,6 +45,7 @@ enum {
     TRWALL,
     DBWALL,
     TREE,	/* KMH */
+    DEADTREE,	/* youkan */
     SDOOR,
     SCORR,
     POOL,
@@ -82,6 +83,8 @@ enum {
 #define IS_DOOR(typ)	((typ) == DOOR)
 #define IS_TREE(typ)	((typ) == TREE || \
 			(level.flags.arboreal && (typ) == STONE))
+#define IS_DEADTREE(typ) ((typ) == DEADTREE)
+#define IS_TREES(typ)	(IS_TREE(typ) || IS_DEADTREE(typ))
 #define ACCESSIBLE(typ) ((typ) >= DOOR)		/* good position */
 #define IS_ROOM(typ)	((typ) >= ROOM)		/* ROOM, STAIRS, furniture.. */
 #define ZAP_POS(typ)	((typ) >= POOL)
@@ -125,6 +128,7 @@ enum {
     S_hcdoor,	/* closed door, horizontal wall */
     S_bars,	/* KMH -- iron bars */
     S_tree,	/* KMH */
+    S_deadtree,	/* youkan */
     S_room,
     S_darkroom,
     S_corr,

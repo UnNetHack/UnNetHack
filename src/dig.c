@@ -273,6 +273,8 @@ dig()
 			   uwep->spe - greatest_erosion(uwep) + u.udaminc;
 	if (Race_if(PM_DWARF))
 	    digging.effort *= 2;
+	if (lev->typ == DEADTREE)
+	    digging.effort *= 2;
 	if (digging.down) {
 		register struct trap *ttmp;
 
