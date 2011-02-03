@@ -1340,6 +1340,12 @@ boolean at_stairs, falling, portal;
 
 	initrack();
 
+#ifdef RECORD_ACHIEVE
+#ifdef LIVELOGFILE
+	livelog_achieve_update();
+#endif
+#endif
+
 	if ((mtmp = m_at(u.ux, u.uy)) != 0
 #ifdef STEED
 		&& mtmp != u.usteed
