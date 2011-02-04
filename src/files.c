@@ -1984,6 +1984,8 @@ char		*tmp_levels;
 	    return parse_monster_color(bufp);
 	} else if (match_varname(buf, "SYMBOL", 6)) {
 	    return parse_symbol(bufp);
+	} else if (match_varname(buf, "SPELLORDER", 10)) {
+	    return parse_spellorder(bufp);
 	} else if (match_varname(buf, "GRAPHICS", 4)) {
 	    len = get_uchars(fp, buf, bufp, translate, FALSE,
 			     MAXPCHARS, "GRAPHICS");

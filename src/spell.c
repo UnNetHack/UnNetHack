@@ -17,8 +17,6 @@ static NEARDATA struct obj *book;	/* last/current book being xscribed */
 
 #define spellev(spell)		spl_book[spell].sp_lev
 #define spellname(spell)	OBJ_NAME(objects[spellid(spell)])
-#define spellet(spell)	\
-	((char)((spell < 26) ? ('a' + spell) : ('A' + spell - 26)))
 
 STATIC_DCL int FDECL(spell_let_to_idx, (CHAR_P));
 STATIC_DCL boolean FDECL(cursed_book, (struct obj *bp));
@@ -1020,6 +1018,34 @@ losespells()
 		}
 	}
 }
+
+/** Standard spell order in the spell menu. */
+static char spellorder[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+/** Return the shortcut character for the spell menu spell number. */
+static int
+spellet(spell)
+int spell;
+{
+	if (spell < strlen(spellorder)) {
+		return spellorder[spell];
+	} else {
+		return -1;
+	}
+}
+
+/** Overwrite standard spell order with user supplied string. */
+boolean
+parse_spellorder(str)
+char *str;
+{
+	int i;
+	for (i=0; i < strlen(str) && i < strlen(spellorder); i++) {
+		spellorder[i] = str[i];
+	}
+	return TRUE;
+}
+
 
 /* the '+' command -- view known spells */
 int
