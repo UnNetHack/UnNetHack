@@ -685,6 +685,7 @@ forget_map(howmuch)
 	    if (howmuch & ALL_MAP || rn2(7)) {
 		/* Zonk all memory of this location. */
 		levl[zx][zy].seenv = 0;
+		levl[zx][zy].stepped_on = 0;
 		levl[zx][zy].waslit = 0;
 		levl[zx][zy].glyph = cmap_to_glyph(S_stone);
 		levl[zx][zy].styp = STONE;
