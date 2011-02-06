@@ -1279,6 +1279,31 @@ int x, y;
   return couldsee(x, y);
 }
 
+/** Returns if (x,y) could be explored.
+ * Differs from unexplore() in that it is uses information not
+ * available to the player.
+ * It should only leak information about "obvious" coordinates, e.g.
+ * unexplored rooms or big areas not reachable by the player. */
+static boolean
+interesting_to_explore(x,y) {
+	if (!goodpos(x, y, &youmonst, 0)) return FALSE;
+
+	if (!unexplored(x, y)) return FALSE;
+
+	/* don't leak information about secret locations */
+	if (levl[x][y].typ == SCORR ||
+	    levl[y][y].typ == SDOOR) {
+		return FALSE;
+	}
+	/* don't leak information about gold vaults */
+	if (*in_rooms(x,y,VAULT)) return FALSE;
+
+	/* corridor are uninteresting */
+	if (levl[y][y].typ == CORR) return FALSE;
+
+	return TRUE;
+}
+
 void
 domove()
 {
@@ -1325,11 +1350,30 @@ domove()
 		u.tx = u.ux;
 		u.ty = u.uy;
 		if (!findtravelpath(unexplored)) {
+			char msg[BUFSZ];
+			int unexplored_cnt=0, i, j;
+			/* check if this level has been thoroughly explored */
+			for (i=1; i < COLNO; i++) {
+				for (j=0; j < ROWNO; j++) {
+					if (interesting_to_explore(i,j)) {
+						unexplored_cnt++;
+					}
+				}
+			}
 			iflags.autoexplore = FALSE;
 			/* TODO: Check if really done (known closed doors,
 			 * boulders blocking your way) and offer doing
 			 * travel when done */
-			pline("Done exploring.");
+			if (unexplored_cnt > 0) {
+				if (wizard) {
+					Sprintf(msg, "Partly explored, can't reach %d places.", unexplored_cnt);
+				} else {
+					Strcpy(msg, "Partly explored, can't reach some places.");
+				}
+			} else {
+				Strcpy(msg, "Done exploring.");
+			}
+			pline("%s", msg);
 		}
 	    } else if (!findtravelpath(NULL)) {
 		(void) findtravelpath(couldsee_func);
