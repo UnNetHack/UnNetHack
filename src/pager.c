@@ -473,6 +473,7 @@ do_look(quick)
     int skipped_venom;		/* non-zero if we ignored "splash of venom" */
     static const char *mon_interior = "the interior of a monster";
 
+    force_defsyms = FALSE;
     if (quick) {
 	from_screen = TRUE;	/* yes, we want to use the cursor */
     } else {
