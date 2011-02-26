@@ -4,6 +4,9 @@
 	* Fixed crashes when attacking long worms on flipped levels
 	* HTML dump: output IBMgraphics and DECgraphics characters
 
+	* patches:
+	  - Sortloot (by Jukka Lahtinen)
+
 	* user interface improvements:
 	  - Autoexplore (from AceHack)
 	  - New category menu option: "Unidentified items"

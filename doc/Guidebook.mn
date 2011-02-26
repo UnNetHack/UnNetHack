@@ -2144,6 +2144,18 @@ the appearance of the display, not the way the game treats you.
 Show your approximate accumulated score on bottom line (default off).
 .lp "silent  "
 Suppress terminal beeps (default on).
+.lp sortloot
+Controls the behavior of the sortloot patch that sorts pickup lists for
+inventory and #loot commands and some others.
+The possible values are:
+.sd
+.si
+full - always sort the lists;
+loot - only sort the lists that don't use inventory
+       letters, like with the #loot and pickup commands;
+none - show lists the traditional way without sorting.
+.ei
+.ed
 .lp sortpack
 Sort the pack contents by type when displaying inventory (default on).
 .lp sound

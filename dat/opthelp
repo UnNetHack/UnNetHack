@@ -143,6 +143,11 @@ runmode       controls how often the map window is updated when performing
 scores        the parts of the score list you wish to see when the game ends
               You choose a combination of top scores, scores around the top
               scores, and all of your own scores.  [!own/3 top/2 around]
+sortloot      controls the sortloot patch [none]:
+              full -- All pickup lists of items are sorted by item description
+              loot -- When inventory letters are shown, has no effect.
+                      Otherwise sorts by description
+              none -- Works the traditional way, like without the patch
 suppress_alert disable various version-specific warnings about changes
               in game play or the user interface, such as notification given
               for the 'Q' command that quitting is now done via #quit

@@ -2625,6 +2625,21 @@ Show your approximate accumulated score on bottom line (default off).
 \item[\ib{silent}]
 Suppress terminal beeps (default on).
 %.lp
+\item[\ib{sortloot}]
+Controls the behavior of the sortloot patch that sorts pickup lists for
+inventory and \#loot commands and some others.
+
+The possible values are:
+%.sd
+%.si
+{\tt full} --- always sort the lists;\\
+{\tt loot} --- only sort the lists that don't use inventory
+       letters, like with the \#loot and pickup commands;\\
+{\tt none} --- show lists the traditional way without sorting.
+%.ei
+%.ed
+%.lp
+The default is 'none', the way an unpatched game works.
 \item[\ib{sortpack}]
 Sort the pack contents by type when displaying inventory (default on).
 %.lp

@@ -1080,6 +1080,11 @@ struct obj *list;
 boolean identified, all_containers, want_disp;
 {
 	register struct obj *box, *obj;
+#ifdef SORTLOOT
+	struct obj **oarray;
+	int i,j,n;
+	char *invlet;
+#endif /* SORTLOOT */
 	char buf[BUFSZ];
 
 	for (box = list; box; box = box->nobj) {
@@ -1090,6 +1095,40 @@ boolean identified, all_containers, want_disp;
 		    winid tmpwin = WIN_ERR;
 		    if (want_disp)
 			    tmpwin = create_nhwindow(NHW_MENU);
+#ifdef SORTLOOT
+		    /* count the number of items */
+		    for (n = 0, obj = box->cobj; obj; obj = obj->nobj) n++;
+		    /* Make a temporary array to store the objects sorted */
+		    oarray = (struct obj **) alloc(n*sizeof(struct obj*));
+
+		    /* Add objects to the array */
+		    i = 0;
+		    invlet = flags.inv_order;
+		nextclass:
+		    for (obj = box->cobj; obj; obj = obj->nobj) {
+                      if (!flags.sortpack || obj->oclass == *invlet) {
+			if (iflags.sortloot == 'f'
+			    || iflags.sortloot == 'l') {
+			  /* Insert object at correct index */
+			  for (j = i; j; j--) {
+			    if (strcmpi(cxname2(obj), cxname2(oarray[j-1]))>0
+			    || (flags.sortpack &&
+				oarray[j-1]->oclass != obj->oclass))
+			      break;
+			    oarray[j] = oarray[j-1];
+			  }
+			  oarray[j] = obj;
+			  i++;
+			} else {
+			  /* Just add it to the array */
+			  oarray[i++] = obj;
+			}
+		      }
+		    } /* for loop */
+		    if (flags.sortpack) {
+		      if (*++invlet) goto nextclass;
+		    }
+#endif /* SORTLOOT */
 		    Sprintf(buf, "Contents of %s:", the(xname(box)));
 		    if (want_disp) {
 			    putstr(tmpwin, 0, buf);
@@ -1097,7 +1136,12 @@ boolean identified, all_containers, want_disp;
 		    }
 		    dump_subtitle(buf);
 		    dump_list_start();
+#ifdef SORTLOOT
+		    for (i = 0; i < n; i++) {
+			obj = oarray[i];
+#else
 		    for (obj = box->cobj; obj; obj = obj->nobj) {
+#endif
 			if (identified) {
 			    makeknown(obj->otyp);
 			    obj->known = obj->bknown =

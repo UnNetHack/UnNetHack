@@ -732,6 +732,7 @@ enable_high_score_comparison_by_uid
 enable_paranoid
 enable_show_born
 enable_show_extinct
+enable_sortloot
 enable_dungeon_growth
 enable_goldobj
 enable_autopickup_exceptions
@@ -1420,6 +1421,8 @@ Optional Features:
   --enable-show-born      Display number of created monsters at the end of
                           game (default=yes)
   --enable-show-extinct   Display extinct monsters at the end of game
+                          (default=yes)
+  --enable-sortloot       Sort item lists alphabetically by description.
                           (default=yes)
   --enable-dungeon-growth Dungeon growth (default=yes)
   --enable-goldobj        Gold is kept on object chains (experimental)
@@ -6523,6 +6526,25 @@ $as_echo "$enable_show_extinct" >&6; }
 
 cat >>confdefs.h <<_ACEOF
 #define SHOW_EXTINCT /**/
+_ACEOF
+
+   fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable sortloot" >&5
+$as_echo_n "checking whether to enable sortloot... " >&6; }
+   # Check whether --enable-sortloot was given.
+if test "${enable_sortloot+set}" = set; then :
+  enableval=$enable_sortloot;
+else
+  enable_sortloot="yes"
+fi
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_sortloot" >&5
+$as_echo "$enable_sortloot" >&6; }
+   if test "$enable_sortloot" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define SORTLOOT /**/
 _ACEOF
 
    fi

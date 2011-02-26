@@ -230,6 +230,9 @@
 /* The size of `unsigned long long', as computed by sizeof. */
 #undef SIZEOF_UNSIGNED_LONG_LONG
 
+/* Sort item lists alphabetically by description. */
+#undef SORTLOOT
+
 /* TTY graphics status color */
 #undef STATUS_COLORS
 
