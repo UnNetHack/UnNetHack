@@ -481,6 +481,19 @@ struct autopickup_exception {
 };
 #endif /* AUTOPICKUP_EXCEPTIONS */
 
+struct _plinemsg {
+	xchar msgtype;
+	char *pattern;
+	struct _plinemsg *next;
+};
+
+E struct _plinemsg *pline_msg;
+
+#define MSGTYP_NORMAL	0
+#define MSGTYP_NOREP	1
+#define MSGTYP_NOSHOW	2
+#define MSGTYP_STOP	3
+
 #ifdef RECORD_ACHIEVE
 struct u_achieve {
         Bitfield(get_bell,1);        /* You have obtained the bell of 
