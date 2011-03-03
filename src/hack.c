@@ -1294,14 +1294,14 @@ interesting_to_explore(x,y) {
 
 	/* don't leak information about secret locations */
 	if (levl[x][y].typ == SCORR ||
-	    levl[y][y].typ == SDOOR) {
+	    levl[x][y].typ == SDOOR) {
 		return FALSE;
 	}
 	/* don't leak information about gold vaults */
 	if (*in_rooms(x,y,VAULT)) return FALSE;
 
-	/* corridor are uninteresting */
-	if (levl[y][y].typ == CORR) return FALSE;
+	/* corridors are uninteresting */
+	if (levl[x][y].typ == CORR) return FALSE;
 
 	return TRUE;
 }
