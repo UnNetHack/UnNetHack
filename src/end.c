@@ -617,7 +617,7 @@ int how;
 		Your("medallion %s!",
 		      !Blind ? "begins to glow" : "feels warm");
 		/* Keep it blessed! */
-		if (uamul && uamul->cursed && (rn2(4)>0)) {
+		if (uamul && uamul->cursed && rnf(1,4)) {
 			pline("But ... the chain on your medallion breaks and it falls to the %s!", surface(u.ux,u.uy));
 			You_hear("homeric laughter!"); /* Hah ha! */
 			/* It already started to work. Too bad you couldn't hold onto it. */
