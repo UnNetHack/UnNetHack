@@ -14,7 +14,7 @@ STATIC_DCL char *FDECL(strprepend,(char *,const char *));
 static boolean FDECL(wishymatch, (const char *,const char *,BOOLEAN_P));
 #endif
 static char *NDECL(nextobuf);
-static void FDECL(add_erosion_words, (struct obj *, char *));
+static void FDECL(add_erosion_words, (struct obj *, char *,BOOLEAN_P));
 #ifdef SORTLOOT
 char * FDECL(xname2, (struct obj *, boolean));
 #endif
@@ -554,9 +554,10 @@ register struct obj *obj;
 }
 
 static void
-add_erosion_words(obj,prefix)
+add_erosion_words(obj,prefix,in_final_dump)
 struct obj *obj;
 char *prefix;
+boolean in_final_dump;
 {
 	boolean iscrys = (obj->otyp == CRYSKNIFE);
 
@@ -581,12 +582,20 @@ char *prefix;
 		Strcat(prefix, is_corrodeable(obj) ? "corroded " :
 			"rotted ");
 	}
-	if (obj->rknown && obj->oerodeproof)
-		Strcat(prefix,
-		       iscrys ? "fixed " :
-		       is_rustprone(obj) ? "rustproof " :
-		       is_corrodeable(obj) ? "corrodeproof " :	/* "stainless"? */
-		       is_flammable(obj) ? "fireproof " : "");
+	if (obj->oerodeproof) {
+		if (in_final_dump && !obj->rknown)
+		  Strcat(prefix,
+		         iscrys ? "[fixed] " :
+		         is_rustprone(obj) ? "[rustproof] " :
+		         is_corrodeable(obj) ? "[corrodeproof] " :	/* "stainless"? */
+		         is_flammable(obj) ? "[fireproof] " : "");
+		else if (obj->rknown)
+		  Strcat(prefix,
+		         iscrys ? "fixed " :
+		         is_rustprone(obj) ? "rustproof " :
+		         is_corrodeable(obj) ? "corrodeproof " :	/* "stainless"? */
+		         is_flammable(obj) ? "fireproof " : "");
+	}
 }
 
 static char *
@@ -601,6 +610,102 @@ boolean with_price;
 	 * end (Strcat is used on the end)
 	 */
 	register char *bp = xname(obj);
+	char *tmp;
+
+	int dump_ID_flag = program_state.gameover;
+	boolean do_ID = dump_ID_flag && !objects[obj->otyp].oc_name_known;
+	boolean do_known = dump_ID_flag && !obj->known;
+	boolean do_dknown = dump_ID_flag && !obj->dknown;
+	boolean do_bknown = dump_ID_flag && !obj->bknown;
+	/*boolean do_rknown = dump_ID_flag && !obj->rknown;*/
+
+	if (!dump_ID_flag); /* early exit */
+	else if (exist_artifact(obj->otyp, (tmp = ONAME(obj)))) {
+		if (do_dknown || do_known) {
+				Sprintf(eos(bp), " [%s]", tmp);
+		}
+		/* if the object is already known as an artifact, don't bother identifying 
+		   the object type */
+	}
+	else if (obj->otyp == EGG && obj->corpsenm >= LOW_PM &&
+		   !(obj->known || mvitals[obj->corpsenm].mvflags & MV_KNOWS_EGG))
+				 Sprintf(eos(bp), " [%s]", mons[obj->corpsenm].mname);
+	else if (do_ID || do_dknown) {
+		/* append the actual ID, but try to remove duplicate information */
+		char *cp = nextobuf();
+		if(obj->otyp == POT_WATER && (obj->blessed || obj->cursed))
+			Sprintf(cp, "%sholy water", obj->blessed?"":"un");
+		else
+			Strcpy(cp, OBJ_NAME(objects[obj->otyp]));
+
+		/* post-process */
+		if (!strcmp(bp, cp))
+			*cp = '\0';
+		else if(Role_if(PM_SAMURAI) && (tmp = (char*)Japanese_item_name(obj->otyp)))
+			Strcpy(cp, tmp);
+
+		else switch(obj->oclass) {
+			case COIN_CLASS:
+				*cp = '\0';
+				break;
+			case AMULET_CLASS:
+				if (strstr(cp, "amulet of ")) cp += sizeof("amulet of");
+				else if (strstr(cp, "amulet ")) cp += sizeof("amulet"); /* versus poison */
+				else if ((tmp = strstr(cp, " of the Amulet of Yendor"))) *tmp = '\0'; /* cheap plastic imitation */
+				else if (!strcmp(cp, "Amulet of Yendor")) *cp = '\0'; /* is it's own description */
+				break;
+			case WEAPON_CLASS:
+				if ((tmp = strstr(cp, " dagger"))) *tmp = '\0';
+				else if ((tmp = strstr(cp, " bow"))) *tmp = '\0';
+				else if ((tmp = strstr(cp, " arrow"))) *tmp = '\0';
+				else if ((tmp = strstr(cp, " short sword"))) *tmp = '\0';
+				else if ((tmp = strstr(cp, " broadsword"))) *tmp = '\0';
+				else if ((tmp = strstr(cp, " spear"))) *tmp = '\0';
+				break;
+			case ARMOR_CLASS:
+				if (!strcmp(cp, "dwarvish cloak")) Strcpy(cp, "dwarvish");
+				/* only remove "cloak" if unIDed is already "opera cloak" */
+				else if(strstr(bp, "cloak")) {
+					if((tmp = strstr(cp, " cloak"))) *tmp = '\0'; /* elven */
+					else if(strstr(cp, "cloak of ")) cp += sizeof("cloak of"); /* other */
+				}
+				else if (!strcmp(cp, "leather gloves")) Strcpy(cp, "leather");
+				else if ((tmp = strstr(cp, " gloves"))) *tmp = '\0'; /* leather */
+				else if ((tmp = strstr(cp, " boots"))) *tmp = '\0';
+				else if ((tmp = strstr(cp, " shoes"))) *tmp = '\0'; /* iron */
+				else if (strstr(cp, "helm of ")) cp += sizeof("helm of");
+				else if (strstr(cp, "shield of ")) cp += sizeof("shield of"); /* reflection */
+				else if ((tmp = strstr(cp, " shield"))) *tmp = '\0';
+				else if ((tmp = strstr(cp, "ring mail"))) *tmp = '\0'; /* orcish */
+				else if ((tmp = strstr(cp, "chain mail"))) *tmp = '\0'; /* orcish */
+				break;
+			case TOOL_CLASS:
+				if ((tmp = strstr(cp, " candle"))) *tmp = '\0';
+				else if ((tmp = strstr(cp, " whistle"))) *tmp = '\0';
+				else if ((tmp = strstr(cp, " lamp"))) *tmp = '\0';
+				else if ((tmp = strstr(cp, " flute"))) *tmp = '\0';
+				else if ((tmp = strstr(cp, " horn"))) *tmp = '\0';
+				else if (strstr(cp, "horn of ")) cp += sizeof("horn of"); /* plenty */
+				else if ((tmp = strstr(cp, " harp"))) *tmp = '\0';
+				else if (!strcmp(cp, "leather drum")) Strcpy(cp, "leather");
+				else if (!strcmp(cp, "drum of earthquake")) Strcpy(cp, "earthquake");
+				break;
+			default:
+				if (strstr(cp, "worthless piece of ")) Strcpy(cp, "worthless glass");
+				else if((tmp = strstr(cp, " venom"))) *tmp = '\0';
+		}
+		if (strlen(cp) > 0)
+			Sprintf(eos(bp), " [%s]", cp);
+	} else if (obj->otyp == TIN && do_known) {
+		if (obj->spe > 0)
+			Strcat(bp, " [spinach]");
+		else if (obj->corpsenm == NON_PM)
+			Strcat(bp, " [empty]");
+		else if (vegetarian(&mons[obj->corpsenm]))
+			Sprintf(eos(bp), " [%s]", mons[obj->corpsenm].mname);
+		else
+			Sprintf(eos(bp), " [%s meat]", mons[obj->corpsenm].mname);
+	}
 
 	/* When using xname, we want "poisoned arrow", and when using
 	 * doname, we want "poisoned +0 arrow".  This kludge is about the only
@@ -626,7 +731,7 @@ boolean with_price;
 	if (obj->oinvis) Strcat(prefix,"invisible ");
 #endif
 
-	if (obj->bknown &&
+	if ((obj->bknown || do_bknown) &&
 	    obj->oclass != COIN_CLASS &&
 	    (obj->otyp != POT_WATER || !objects[POT_WATER].oc_name_known
 		|| (!obj->cursed && !obj->blessed))) {
@@ -634,9 +739,9 @@ boolean with_price;
 	     * always allow "uncursed potion of water"
 	     */
 	    if (obj->cursed)
-		Strcat(prefix, "cursed ");
+		Strcat(prefix, do_bknown ? "[cursed] " : "cursed ");
 	    else if (obj->blessed)
-		Strcat(prefix, "blessed ");
+		Strcat(prefix, do_bknown ? "[blessed] " : "blessed ");
 	    else if (iflags.show_buc || ((!obj->known || !objects[obj->otyp].oc_charged ||
 		      (obj->oclass == ARMOR_CLASS ||
 		       obj->oclass == RING_CLASS))
@@ -656,7 +761,7 @@ boolean with_price;
 			&& obj->otyp != FAKE_AMULET_OF_YENDOR
 			&& obj->otyp != AMULET_OF_YENDOR
 			&& !Role_if(PM_PRIEST)))
-		Strcat(prefix, "uncursed ");
+		Strcat(prefix, do_bknown ? "[uncursed] " : "uncursed ");
 	}
 
 	if (obj->greased) Strcat(prefix, "greased ");
@@ -670,10 +775,10 @@ boolean with_price;
 		if(ispoisoned)
 			Strcat(prefix, "poisoned ");
 plus:
-		add_erosion_words(obj, prefix);
-		if(obj->known) {
-			Strcat(prefix, sitoa(obj->spe));
-			Strcat(prefix, " ");
+		add_erosion_words(obj, prefix, dump_ID_flag);
+		if (obj->known || do_known) {
+			Sprintf(eos(prefix), "%s%s%s ",
+			  do_known ? "[" : "", sitoa(obj->spe), do_known ? "]" : "");
 		}
 		break;
 	case ARMOR_CLASS:
@@ -684,7 +789,7 @@ plus:
 	case TOOL_CLASS:
 		/* weptools already get this done when we go to the +n code */
 		if (!is_weptool(obj))
-		    add_erosion_words(obj, prefix);
+		    add_erosion_words(obj, prefix, dump_ID_flag);
 		if(obj->owornmask & (W_TOOL /* blindfold */
 #ifdef STEED
 				| W_SADDLE
@@ -721,17 +826,19 @@ plus:
 		    goto charges;
 		break;
 	case WAND_CLASS:
-		add_erosion_words(obj, prefix);
+		add_erosion_words(obj, prefix, dump_ID_flag);
 charges:
-		if(obj->known)
-		    Sprintf(eos(bp), " (%d:%d)", (int)obj->recharged, obj->spe);
+		if (obj->known || do_known) {
+		    Sprintf(eos(bp), " %s%d:%d%s", do_known ? "[" : "(",
+		      (int)obj->recharged, obj->spe, do_known ? "]" : ")");
+		}
 		break;
 	case POTION_CLASS:
 		if (obj->otyp == POT_OIL && obj->lamplit)
 		    Strcat(bp, " (lit)");
 		break;
 	case RING_CLASS:
-		add_erosion_words(obj, prefix);
+		add_erosion_words(obj, prefix, dump_ID_flag);
 ring:
 		if(obj->owornmask & W_RINGR) Strcat(bp, " (on right ");
 		if(obj->owornmask & W_RINGL) Strcat(bp, " (on left ");
@@ -739,9 +846,9 @@ ring:
 		    Strcat(bp, body_part(HAND));
 		    Strcat(bp, ")");
 		}
-		if(obj->known && objects[obj->otyp].oc_charged) {
-			Strcat(prefix, sitoa(obj->spe));
-			Strcat(prefix, " ");
+		if ((obj->known || do_known) && objects[obj->otyp].oc_charged) {
+			Sprintf(eos(prefix), "%s%s%s ",
+			  do_known ? "[" : "", sitoa(obj->spe), do_known ? "]" : "");
 		}
 		break;
 	case FOOD_CLASS:
@@ -788,7 +895,7 @@ ring:
 		break;
 	case BALL_CLASS:
 	case CHAIN_CLASS:
-		add_erosion_words(obj, prefix);
+		add_erosion_words(obj, prefix, dump_ID_flag);
 		if(obj->owornmask & W_BALL)
 			Strcat(bp, " (chained to you)");
 			break;
@@ -838,6 +945,14 @@ ring:
 		Strcpy(tmpbuf, prefix);
 		Strcpy(prefix, "an ");
 		Strcpy(prefix+3, tmpbuf+2);
+	}
+	/* merge bracketed attribs
+	   eg. [rustproof] [+1] -> [rustproof +1]
+	   don't do this for bp because the only possible case is
+	   IDed-name next to charges, which we want to keep separate */
+	while ((tmp = strstr(prefix, "] ["))) {
+		*tmp = ' ';
+		memmove(tmp + 1, tmp + 3, strlen(tmp + 1) + 1);
 	}
 	bp = strprepend(bp, prefix);
 	return(bp);

@@ -400,10 +400,6 @@ boolean taken;
 			boolean want_disp = (c == 'y') ? TRUE: FALSE;
 			struct obj *obj;
 
-			for (obj = invent; obj; obj = obj->nobj) {
-			    makeknown(obj->otyp);
-			    obj->known = obj->bknown = obj->dknown = obj->rknown = 1;
-			}
 			(void) dump_inventory((char *)0, TRUE, want_disp);
 			container_contents(invent, TRUE, TRUE, want_disp);
 	    }
@@ -1082,7 +1078,7 @@ boolean identified, all_containers, want_disp;
 	register struct obj *box, *obj;
 #ifdef SORTLOOT
 	struct obj **oarray;
-	int i,j,n;
+	int i,j,n,saveknown;
 	char *invlet;
 #endif /* SORTLOOT */
 	char buf[BUFSZ];
@@ -1129,12 +1125,15 @@ boolean identified, all_containers, want_disp;
 		      if (*++invlet) goto nextclass;
 		    }
 #endif /* SORTLOOT */
+		    saveknown = objects[box->otyp].oc_name_known;
+		    objects[box->otyp].oc_name_known = 1;
 		    Sprintf(buf, "Contents of %s:", the(xname(box)));
 		    if (want_disp) {
 			    putstr(tmpwin, 0, buf);
 			    putstr(tmpwin, 0, "");
 		    }
 		    dump_subtitle(buf);
+		    objects[box->otyp].oc_name_known = saveknown;
 		    dump_list_start();
 #ifdef SORTLOOT
 		    for (i = 0; i < n; i++) {
@@ -1142,11 +1141,6 @@ boolean identified, all_containers, want_disp;
 #else
 		    for (obj = box->cobj; obj; obj = obj->nobj) {
 #endif
-			if (identified) {
-			    makeknown(obj->otyp);
-			    obj->known = obj->bknown =
-			    obj->dknown = obj->rknown = 1;
-			}
 			dump_list_item(doname(obj));
 			if (want_disp)
 				putstr(tmpwin, 0, doname(obj));
@@ -1162,12 +1156,15 @@ boolean identified, all_containers, want_disp;
 					  want_disp);
 		    }
 		} else {
+		    saveknown = objects[box->otyp].oc_name_known;
+		    objects[box->otyp].oc_name_known = 1;
 		    if (want_disp) {
 			    pline("%s empty.", Tobjnam(box, "are"));
 			    display_nhwindow(WIN_MESSAGE, FALSE);
 		    }
 		    dump_line(The(xname(box)), " is empty.");
 		    dump("", "");
+		    objects[box->otyp].oc_name_known = saveknown;
 		}
 	    }
 	    if (!all_containers)
