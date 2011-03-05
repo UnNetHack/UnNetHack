@@ -4,6 +4,7 @@
 
 #include "hack.h"
 
+/* the following may be obsolete with dump_ID patch */
 /* "an uncursed greased partly eaten guardian naga hatchling [corpse]" */
 #define PREFIX	80	/* (56) */
 #define SCHAR_LIM 127
@@ -613,6 +614,7 @@ boolean with_price;
 	char *tmp;
 
 	int dump_ID_flag = program_state.gameover;
+	dump_ID_flag = TRUE; // TODO REMOVE ME
 	boolean do_ID = dump_ID_flag && !objects[obj->otyp].oc_name_known;
 	boolean do_known = dump_ID_flag && !obj->known;
 	boolean do_dknown = dump_ID_flag && !obj->dknown;
@@ -638,7 +640,8 @@ boolean with_price;
 		else
 			Strcpy(cp, OBJ_NAME(objects[obj->otyp]));
 
-		/* post-process */
+		/* hideous post-processing code */
+
 		if (!strcmp(bp, cp))
 			*cp = '\0';
 		else if(Role_if(PM_SAMURAI) && (tmp = (char*)Japanese_item_name(obj->otyp)))
@@ -649,10 +652,10 @@ boolean with_price;
 				*cp = '\0';
 				break;
 			case AMULET_CLASS:
-				if (strstr(cp, "amulet of ")) cp += sizeof("amulet of");
-				else if (strstr(cp, "amulet ")) cp += sizeof("amulet"); /* versus poison */
-				else if ((tmp = strstr(cp, " of the Amulet of Yendor"))) *tmp = '\0'; /* cheap plastic imitation */
-				else if (!strcmp(cp, "Amulet of Yendor")) *cp = '\0'; /* is it's own description */
+				if(obj->otyp == AMULET_VERSUS_POISON) cp += sizeof("amulet"); /* versus poison */
+				else if(obj->otyp == FAKE_AMULET_OF_YENDOR) *strstr(cp, " of the Amulet of Yendor") = '\0'; /* cheap plastic imitation */
+				else if(obj->otyp == AMULET_OF_YENDOR) *cp = '\0'; /* is its own description */
+				else cp += sizeof("amulet");
 				break;
 			case WEAPON_CLASS:
 				if ((tmp = strstr(cp, " dagger"))) *tmp = '\0';
@@ -663,18 +666,18 @@ boolean with_price;
 				else if ((tmp = strstr(cp, " spear"))) *tmp = '\0';
 				break;
 			case ARMOR_CLASS:
-				if (!strcmp(cp, "dwarvish cloak")) Strcpy(cp, "dwarvish");
+				if (obj->otyp == DWARVISH_CLOAK) Strcpy(cp, "dwarvish");
 				/* only remove "cloak" if unIDed is already "opera cloak" */
-				else if(strstr(bp, "cloak")) {
-					if((tmp = strstr(cp, " cloak"))) *tmp = '\0'; /* elven */
-					else if(strstr(cp, "cloak of ")) cp += sizeof("cloak of"); /* other */
+				else if (strstr(bp, "cloak")) {
+					if ((tmp = strstr(cp, " cloak"))) *tmp = '\0'; /* elven */
+					else if (strstr(cp, "cloak of ")) cp += sizeof("cloak"); /* other */
 				}
-				else if (!strcmp(cp, "leather gloves")) Strcpy(cp, "leather");
+				else if (obj->otyp == LEATHER_GLOVES) Strcpy(cp, "leather");
 				else if ((tmp = strstr(cp, " gloves"))) *tmp = '\0'; /* leather */
 				else if ((tmp = strstr(cp, " boots"))) *tmp = '\0';
 				else if ((tmp = strstr(cp, " shoes"))) *tmp = '\0'; /* iron */
-				else if (strstr(cp, "helm of ")) cp += sizeof("helm of");
-				else if (strstr(cp, "shield of ")) cp += sizeof("shield of"); /* reflection */
+				else if (strstr(cp, "helm of ")) cp += sizeof("helm");
+				else if (strstr(cp, "shield of ")) cp += sizeof("shield"); /* of reflection */
 				else if ((tmp = strstr(cp, " shield"))) *tmp = '\0';
 				else if ((tmp = strstr(cp, "ring mail"))) *tmp = '\0'; /* orcish */
 				else if ((tmp = strstr(cp, "chain mail"))) *tmp = '\0'; /* orcish */
@@ -685,26 +688,38 @@ boolean with_price;
 				else if ((tmp = strstr(cp, " lamp"))) *tmp = '\0';
 				else if ((tmp = strstr(cp, " flute"))) *tmp = '\0';
 				else if ((tmp = strstr(cp, " horn"))) *tmp = '\0';
-				else if (strstr(cp, "horn of ")) cp += sizeof("horn of"); /* plenty */
+				else if (strstr(cp, "horn of ")) cp += sizeof("horn"); /* of plenty */
 				else if ((tmp = strstr(cp, " harp"))) *tmp = '\0';
-				else if (!strcmp(cp, "leather drum")) Strcpy(cp, "leather");
-				else if (!strcmp(cp, "drum of earthquake")) Strcpy(cp, "earthquake");
+				else if (obj->otyp == LEATHER_DRUM) Strcpy(cp, "leather");
+				else if (obj->otyp == DRUM_OF_EARTHQUAKE) Strcpy(cp, "of earthquake");
+				else if ((tmp = strstr(cp, "bag of "))) cp += sizeof("bag");
 				break;
-			default:
+			case GEM_CLASS:
 				if (strstr(cp, "worthless piece of ")) Strcpy(cp, "worthless glass");
-				else if((tmp = strstr(cp, " venom"))) *tmp = '\0';
+				break;
+			case VENOM_CLASS:
+				if ((tmp = strstr(cp, " venom"))) *tmp = '\0';
+				break;
 		}
-		if (strlen(cp) > 0)
-			Sprintf(eos(bp), " [%s]", cp);
-	} else if (obj->otyp == TIN && do_known) {
+		/* end post-processing */
+		if (strlen(cp) > 0) {
+			if (obj->oclass == POTION_CLASS || obj->oclass == SCROLL_CLASS
+			   || (obj->oclass == SPBOOK_CLASS && obj->otyp != SPE_BOOK_OF_THE_DEAD)
+			   || obj->oclass == WAND_CLASS || obj->oclass == RING_CLASS)
+				Sprintf(eos(bp), " [of %s]", cp);
+			else
+				Sprintf(eos(bp), " [%s]", cp);
+		}
+	}
+	else if (obj->otyp == TIN && do_known) {
 		if (obj->spe > 0)
-			Strcat(bp, " [spinach]");
+			Strcat(bp, " [of spinach]");
 		else if (obj->corpsenm == NON_PM)
 			Strcat(bp, " [empty]");
 		else if (vegetarian(&mons[obj->corpsenm]))
-			Sprintf(eos(bp), " [%s]", mons[obj->corpsenm].mname);
+			Sprintf(eos(bp), " [of %s]", mons[obj->corpsenm].mname);
 		else
-			Sprintf(eos(bp), " [%s meat]", mons[obj->corpsenm].mname);
+			Sprintf(eos(bp), " [of %s meat]", mons[obj->corpsenm].mname);
 	}
 
 	/* When using xname, we want "poisoned arrow", and when using
@@ -938,7 +953,8 @@ ring:
 		}
 	}
 	if (!strncmp(prefix, "a ", 2) &&
-			index(vowels, *(prefix+2) ? *(prefix+2) : *bp)
+			(index(vowels, prefix[2] ? prefix[2] : *bp)
+			 || (dump_ID_flag && !strncmp(prefix+2, "[uncursed", 9)))
 			&& (*(prefix+2) || (strncmp(bp, "uranium", 7)
 				&& strncmp(bp, "unicorn", 7)
 				&& strncmp(bp, "eucalyptus", 10)))) {
@@ -952,7 +968,7 @@ ring:
 	   IDed-name next to charges, which we want to keep separate */
 	while ((tmp = strstr(prefix, "] ["))) {
 		*tmp = ' ';
-		memmove(tmp + 1, tmp + 3, strlen(tmp + 1) + 1);
+		memmove(tmp + 1, tmp + 3, strlen(tmp + 3) + 1);
 	}
 	bp = strprepend(bp, prefix);
 	return(bp);
