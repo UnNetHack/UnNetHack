@@ -614,7 +614,6 @@ boolean with_price;
 	char *tmp;
 
 	int dump_ID_flag = program_state.gameover;
-	dump_ID_flag = TRUE; // TODO REMOVE ME
 	boolean do_ID = dump_ID_flag && !objects[obj->otyp].oc_name_known;
 	boolean do_known = dump_ID_flag && !obj->known;
 	boolean do_dknown = dump_ID_flag && !obj->dknown;
