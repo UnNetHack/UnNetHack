@@ -586,9 +586,9 @@ boolean in_final_dump;
 	if (obj->oerodeproof && (in_final_dump || obj->rknown))
 		Sprintf(eos(prefix), "%s%s%s ",
 			obj->rknown ? "" : "[",
-			iscrys ? "fixed " :
-			is_rustprone(obj) ? "rustproof " :
-			is_corrodeable(obj) ? "corrodeproof " :	/* "stainless"? */
+			iscrys ? "fixed" :
+			is_rustprone(obj) ? "rustproof" :
+			is_corrodeable(obj) ? "corrodeproof" :	/* "stainless"? */
 			is_flammable(obj) ? "fireproof" : "",
 			obj->rknown ? "" : "]");
 }
