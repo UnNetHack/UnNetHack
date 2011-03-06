@@ -1938,7 +1938,7 @@ nextclass:
 	      if (want_disp)
 			add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 			       let_to_name(*invlet, FALSE), MENU_UNSELECTED);
-	      dump("  ", let_to_name(*invlet, FALSE));
+	      dump_subtitle(let_to_name(*invlet, FALSE));
 	      classcount++;
 	    }
 	    any.a_char = ilet;
