@@ -583,20 +583,14 @@ boolean in_final_dump;
 		Strcat(prefix, is_corrodeable(obj) ? "corroded " :
 			"rotted ");
 	}
-	if (obj->oerodeproof) {
-		if (in_final_dump && !obj->rknown)
-		  Strcat(prefix,
-		         iscrys ? "[fixed] " :
-		         is_rustprone(obj) ? "[rustproof] " :
-		         is_corrodeable(obj) ? "[corrodeproof] " :	/* "stainless"? */
-		         is_flammable(obj) ? "[fireproof] " : "");
-		else if (obj->rknown)
-		  Strcat(prefix,
-		         iscrys ? "fixed " :
-		         is_rustprone(obj) ? "rustproof " :
-		         is_corrodeable(obj) ? "corrodeproof " :	/* "stainless"? */
-		         is_flammable(obj) ? "fireproof " : "");
-	}
+	if (obj->oerodeproof && (in_final_dump || obj->rknown))
+		Sprintf(eos(prefix), "%s%s%s ",
+			obj->rknown ? "" : "[",
+			iscrys ? "fixed " :
+			is_rustprone(obj) ? "rustproof " :
+			is_corrodeable(obj) ? "corrodeproof " :	/* "stainless"? */
+			is_flammable(obj) ? "fireproof" : "",
+			obj->rknown ? "" : "]");
 }
 
 static char *
@@ -610,17 +604,18 @@ boolean with_price;
 	/* when we have to add something at the start of prefix instead of the
 	 * end (Strcat is used on the end)
 	 */
-	register char *bp = xname(obj);
-	char *tmp;
+	register char *bp = xname(obj), *tmp;
 
 	int dump_ID_flag = program_state.gameover;
+	/* display ID in addition to appearance */
 	boolean do_ID = dump_ID_flag && !objects[obj->otyp].oc_name_known;
 	boolean do_known = dump_ID_flag && !obj->known;
 	boolean do_dknown = dump_ID_flag && !obj->dknown;
 	boolean do_bknown = dump_ID_flag && !obj->bknown;
 	/*boolean do_rknown = dump_ID_flag && !obj->rknown;*/
 
-	if (!dump_ID_flag); /* early exit */
+	if (!dump_ID_flag)
+		; /* early exit */
 	else if (exist_artifact(obj->otyp, (tmp = ONAME(obj)))) {
 		if (do_dknown || do_known) {
 				Sprintf(eos(bp), " [%s]", tmp);
@@ -630,23 +625,22 @@ boolean with_price;
 	}
 	else if (obj->otyp == EGG && obj->corpsenm >= LOW_PM &&
 		   !(obj->known || mvitals[obj->corpsenm].mvflags & MV_KNOWS_EGG))
-				 Sprintf(eos(bp), " [%s]", mons[obj->corpsenm].mname);
+		Sprintf(bp, "[%s] egg%s", mons[obj->corpsenm].mname, obj->quan > 1 ? "s" : "");
+
 	else if (do_ID || do_dknown) {
-		/* append the actual ID, but try to remove duplicate information */
 		char *cp = nextobuf();
-		if(obj->otyp == POT_WATER && (obj->blessed || obj->cursed))
-			Sprintf(cp, "%sholy water", obj->blessed?"":"un");
-		else
-			Strcpy(cp, OBJ_NAME(objects[obj->otyp]));
-
-		/* hideous post-processing code */
-
-		if (!strcmp(bp, cp))
-			*cp = '\0';
-		else if(Role_if(PM_SAMURAI) && (tmp = (char*)Japanese_item_name(obj->otyp)))
+		if (Role_if(PM_SAMURAI) && (tmp = (char*)Japanese_item_name(obj->otyp)))
 			Strcpy(cp, tmp);
+		else if (obj->otyp == POT_WATER && (obj->blessed || obj->cursed))
+			Sprintf(cp, "%sholy water", obj->blessed? "" : "un");
+		else {
+			Strcpy(cp, OBJ_NAME(objects[obj->otyp]));
+			if(GemStone(obj->otyp)) Strcat(cp, " stone");
+			if(obj->quan > 1) cp = makeplural(cp);
+		}
 
-		else switch(obj->oclass) {
+		/* hideous post-processing: try to merge the ID and appearance naturally */
+		switch(obj->oclass) {
 			case COIN_CLASS:
 				*cp = '\0';
 				break;
@@ -701,6 +695,7 @@ boolean with_price;
 				break;
 		}
 		/* end post-processing */
+
 		if (strlen(cp) > 0) {
 			if (obj->oclass == POTION_CLASS || obj->oclass == SCROLL_CLASS
 			   || (obj->oclass == SPBOOK_CLASS && obj->otyp != SPE_BOOK_OF_THE_DEAD)
@@ -719,6 +714,10 @@ boolean with_price;
 			Sprintf(eos(bp), " [of %s]", mons[obj->corpsenm].mname);
 		else
 			Sprintf(eos(bp), " [of %s meat]", mons[obj->corpsenm].mname);
+	}
+	else if (obj->otyp == POT_WATER &&
+		 (obj->blessed || obj->cursed) && do_bknown) {
+		Sprintf(bp, "potion of [%sholy] water", obj->cursed? "un" : "");
 	}
 
 	/* When using xname, we want "poisoned arrow", and when using

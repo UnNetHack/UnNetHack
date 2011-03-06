@@ -1078,12 +1078,14 @@ boolean identified, all_containers, want_disp;
 	register struct obj *box, *obj;
 #ifdef SORTLOOT
 	struct obj **oarray;
-	int i,j,n,saveknown;
+	int i,j,n;
 	char *invlet;
 #endif /* SORTLOOT */
 	char buf[BUFSZ];
 
 	for (box = list; box; box = box->nobj) {
+	    int saveknown = objects[box->otyp].oc_name_known;
+	    objects[box->otyp].oc_name_known = 1;
 	    if (Is_container(box) || box->otyp == STATUE) {
 		if (box->otyp == BAG_OF_TRICKS && box->spe) {
 		    continue;	/* bag of tricks with charges can't contain anything */
@@ -1125,15 +1127,12 @@ boolean identified, all_containers, want_disp;
 		      if (*++invlet) goto nextclass;
 		    }
 #endif /* SORTLOOT */
-		    saveknown = objects[box->otyp].oc_name_known;
-		    objects[box->otyp].oc_name_known = 1;
 		    Sprintf(buf, "Contents of %s:", the(xname(box)));
 		    if (want_disp) {
 			    putstr(tmpwin, 0, buf);
 			    putstr(tmpwin, 0, "");
 		    }
 		    dump_subtitle(buf);
-		    objects[box->otyp].oc_name_known = saveknown;
 		    dump_list_start();
 #ifdef SORTLOOT
 		    for (i = 0; i < n; i++) {
@@ -1156,7 +1155,6 @@ boolean identified, all_containers, want_disp;
 					  want_disp);
 		    }
 		} else {
-		    saveknown = objects[box->otyp].oc_name_known;
 		    objects[box->otyp].oc_name_known = 1;
 		    if (want_disp) {
 			    pline("%s empty.", Tobjnam(box, "are"));
@@ -1164,9 +1162,9 @@ boolean identified, all_containers, want_disp;
 		    }
 		    dump_line(The(xname(box)), " is empty.");
 		    dump("", "");
-		    objects[box->otyp].oc_name_known = saveknown;
 		}
 	    }
+	    objects[box->otyp].oc_name_known = saveknown;
 	    if (!all_containers)
 		break;
 	}
