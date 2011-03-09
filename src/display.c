@@ -1486,8 +1486,10 @@ void dump_screen()
 		Sprintf(tmpbuf, "<span class=\"nh_inv_%d nh_pet\">%s</span>", color, html_c);
 	    else if (special & (MG_PET|MG_DETECT))
 		Sprintf(tmpbuf, "<span class=\"nh_inv_%d\">%s</span>", color, html_c);
-	    else if (special & MG_INVERSE)
+	    else if (special & MG_INVERSE && dfeature != NULL)
 		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_inv_%d\">%s</span>", dfeature, color, html_c);
+	    else if (special & MG_INVERSE)
+		Sprintf(tmpbuf, "<span class=\"nh_inv_%d\">%s</span>", color, html_c);
 	    else if (oclass < 0 && IS_DOOR(levl[x][y].typ) && levl[x][y].doormask >= D_ISOPEN)
 		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_door\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && IS_DRAWBRIDGE(levl[x][y].typ))
