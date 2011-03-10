@@ -1887,7 +1887,7 @@ boolean want_disp;
 		  {
 		    char letbuf[7];
 		    sprintf(letbuf, "  %c - ", lets[0]);
-		    dump_object(lets[0],
+		    dump_object(lets[0], otmp,
 			 xprname(otmp, (char *)0, lets[0], TRUE, 0L, 0L));
 		  }
 		    break;
@@ -1946,7 +1946,7 @@ nextclass:
 		add_menu(win, obj_to_glyph(otmp),
 			     &any, ilet, 0, ATR_NONE, doname(otmp),
 			     MENU_UNSELECTED);
-	    dump_object(ilet, doname(otmp));
+	    dump_object(ilet, otmp, doname(otmp));
 	  }
 	}
 #else /* SORTLOOT */
@@ -1966,7 +1966,7 @@ nextclass:
 			    {
 			      char letbuf[7];
 			      sprintf(letbuf, "  %c - ", ilet);
-			      dump_object(ilet, doname(otmp));
+			      dump_object(ilet, otmp, doname(otmp));
 			    }
 			    if (want_disp)
 			    add_menu(win, obj_to_glyph(otmp),

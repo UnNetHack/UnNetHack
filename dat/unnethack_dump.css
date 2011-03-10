@@ -81,3 +81,11 @@ span.nh_screen {
 .nh_inv_15 { color: black; background-color:#FCFCFC; } /* CLR_WHITE          */
 
 .nh_corridor   { color:#666666; }
+
+a {
+	background-color: inherit;
+	color: inherit;
+	text-decoration: inherit;
+}
+a:hover { border-bottom: 1px dotted gray; }
+

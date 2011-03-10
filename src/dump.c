@@ -167,25 +167,28 @@ extern boolean get_menu_coloring(const char *str, int *color, int *attr);
 
 /** Dumps an object from the inventory. */
 void
-dump_object(c, str)
+dump_object(c, obj, str)
 const char c;
+const struct obj *obj;
 const char *str;
 {
 #ifdef DUMP_LOG
 	if (dump_fp)
 		fprintf(dump_fp, "  %c - %s\n", c, str);
 	if (html_dump_fp) {
+		char link[BUFSZ];
+		Sprintf(link, "<a href=\"http://nethackwiki.com/wiki/%s\">%s</a>", dump_typename(obj->otyp), str);
 #ifdef MENU_COLOR
 # ifdef TTY_GRAPHICS
 		int color;
 		int attr;
 		if (iflags.use_menu_color &&
 		    get_menu_coloring(str, &color, &attr)) {
-			fprintf(html_dump_fp, "<span class=\"nh_color_%d\"><span class=\"nh_item_letter\">%c</span> - %s</span><br />\n", color, c, str);
+			fprintf(html_dump_fp, "<span class=\"nh_color_%d\"><span class=\"nh_item_letter\">%c</span> - %s</span><br />\n", color, c, link);
 		} else
 # endif
 #endif
-		fprintf(html_dump_fp, "<span class=\"nh_item_letter\">%c</span> - %s<br />\n", c, str);
+		fprintf(html_dump_fp, "<span class=\"nh_item_letter\">%c</span> - %s<br />\n", c, link);
 	}
 #endif
 }
@@ -225,6 +228,20 @@ dump_list_start()
 #ifdef DUMP_LOG
 	if (html_dump_fp)
 		fprintf(html_dump_fp, "<ul>\n");
+#endif
+}
+
+/** Dumps a list item. */
+void
+dump_list_item_object(obj)
+struct obj *obj;
+{
+#ifdef DUMP_LOG
+	if (dump_fp)
+		fprintf(dump_fp, "  %s\n", doname(obj));
+	if (html_dump_fp)
+		fprintf(html_dump_fp, "<li><a href=\"http://nethackwiki.com/wiki/%s\">%s</a></li>\n", dump_typename(obj->otyp), doname(obj));
+		//Sprintf(link, "<a href=\"http://nethackwiki.com/wiki/%s\">%s</a>", dump_typename(obj->otyp), str);
 #endif
 }
 

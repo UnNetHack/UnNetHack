@@ -1140,7 +1140,7 @@ boolean identified, all_containers, want_disp;
 #else
 		    for (obj = box->cobj; obj; obj = obj->nobj) {
 #endif
-			dump_list_item(doname(obj));
+			dump_list_item_object(obj);
 			if (want_disp)
 				putstr(tmpwin, 0, doname(obj));
 		    }
