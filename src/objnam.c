@@ -635,8 +635,6 @@ boolean with_price;
 			Sprintf(cp, "%sholy water", obj->blessed? "" : "un");
 		else {
 			Strcpy(cp, OBJ_NAME(objects[obj->otyp]));
-			if(GemStone(obj->otyp)) Strcat(cp, " stone");
-			if(obj->quan > 1) cp = makeplural(cp);
 		}
 
 		/* hideous post-processing: try to merge the ID and appearance naturally */
@@ -688,7 +686,7 @@ boolean with_price;
 				else if ((tmp = strstr(cp, "bag of "))) cp += sizeof("bag");
 				break;
 			case GEM_CLASS:
-				if (strstr(cp, "worthless piece of ")) Strcpy(cp, "worthless glass");
+				if (strstr(cp, "worthless piece")) Strcpy(cp, "worthless glass");
 				break;
 			case VENOM_CLASS:
 				if ((tmp = strstr(cp, " venom"))) *tmp = '\0';
