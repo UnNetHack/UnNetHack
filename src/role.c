@@ -458,7 +458,7 @@ const struct Race races[] = {
 	MH_VAMPIRE | ROLE_MALE|ROLE_FEMALE | ROLE_CHAOTIC,
 	MH_VAMPIRE, 0, MH_ELF|MH_GNOME|MH_DWARF|MH_ORC,
 	/*    Str     Int Wis Dex Con Cha */
-	{      4,      0,  0,  4,  3,  4 },
+	{      3,      3,  3,  3,  3,  3 },
 	{ STR19(19), 18, 18, 20, 20, 20 },
 	/* Init   Lower  Higher */
 	{  3, 0,  0, 3,  2, 0 },	/* Hit points */
