@@ -165,6 +165,20 @@ const char *pre, *str;
 extern boolean get_menu_coloring(const char *str, int *color, int *attr);
 #endif
 
+static char tmp_html_link[BUFSZ];
+/** Return a link to nethackwiki . */
+static
+char *
+html_link(link_name, name)
+const char *link_name;
+const char *name;
+{
+	snprintf(tmp_html_link, BUFSZ,
+		"<a href=\"http://nethackwiki.com/wiki/%s\">%s</a>",
+		link_name, name);
+	return tmp_html_link;
+}
+
 /** Dumps an object from the inventory. */
 void
 dump_object(c, obj, str)
@@ -176,8 +190,7 @@ const char *str;
 	if (dump_fp)
 		fprintf(dump_fp, "  %c - %s\n", c, str);
 	if (html_dump_fp) {
-		char link[BUFSZ];
-		Sprintf(link, "<a href=\"http://nethackwiki.com/wiki/%s\">%s</a>", dump_typename(obj->otyp), str);
+		char *link = html_link(dump_typename(obj->otyp), str);
 #ifdef MENU_COLOR
 # ifdef TTY_GRAPHICS
 		int color;
@@ -231,7 +244,7 @@ dump_list_start()
 #endif
 }
 
-/** Dumps a list item. */
+/** Dumps an object as list item. */
 void
 dump_list_item_object(obj)
 struct obj *obj;
@@ -240,8 +253,7 @@ struct obj *obj;
 	if (dump_fp)
 		fprintf(dump_fp, "  %s\n", doname(obj));
 	if (html_dump_fp)
-		fprintf(html_dump_fp, "<li><a href=\"http://nethackwiki.com/wiki/%s\">%s</a></li>\n", dump_typename(obj->otyp), doname(obj));
-		//Sprintf(link, "<a href=\"http://nethackwiki.com/wiki/%s\">%s</a>", dump_typename(obj->otyp), str);
+		fprintf(html_dump_fp, "<li>%s</li>\n", html_link(dump_typename(obj->otyp), doname(obj)));
 #endif
 }
 
