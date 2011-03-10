@@ -169,7 +169,12 @@ doshout()
 	Sprintf(qbuf,"Shout what?");
 	getlin(qbuf, buf);
 	
-	You("shout into the void: %s", buf);
+	if (strlen(buf) == 0) {
+		Strcpy(buf, "*@&%!!");
+		You("shout profanities into the void!");
+	} else {
+		You("shout into the void: %s", buf);
+	}
 
 	/* filter livelog delimiter */
 	for (p = buf; *p != 0; p++)
