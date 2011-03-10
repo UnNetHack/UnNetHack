@@ -244,6 +244,20 @@ dump_list_start()
 #endif
 }
 
+/** Dumps a linked list item. */
+void
+dump_list_item_link(link, str)
+const char *link;
+const char *str;
+{
+#ifdef DUMP_LOG
+	if (dump_fp)
+		fprintf(dump_fp, "  %s\n", str);
+	if (html_dump_fp)
+		fprintf(html_dump_fp, "<li>%s</li>\n", html_link(link, str));
+#endif
+}
+
 /** Dumps an object as list item. */
 void
 dump_list_item_object(obj)

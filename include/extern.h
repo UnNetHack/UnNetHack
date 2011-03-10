@@ -493,6 +493,7 @@ E void FDECL(dump_line, (const char *, const char *));
 E void NDECL(dump_list_start);
 E void FDECL(dump_list_item, (const char *));
 E void FDECL(dump_list_item_object, (struct obj *));
+E void FDECL(dump_list_item_link, (const char *, const char *));
 E void NDECL(dump_list_end);
 E void NDECL(dump_definition_list_start);
 E void FDECL(dump_definition_list_dd, (const char *));

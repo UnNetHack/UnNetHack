@@ -1267,7 +1267,7 @@ boolean ask;
 #endif
 		    }
 		    if (c == 'y') putstr(klwin, 0, buf);
-		    dump_list_item(buf);
+		    dump_list_item_link(mons[i].mname, buf);
 		}
 	    dump_list_end();
 	    /*
