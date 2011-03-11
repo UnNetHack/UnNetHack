@@ -1374,6 +1374,12 @@ boolean want_disp;
 		    if (klwin) putstr(klwin, 0, buf);
 		    dump_list_item(buf);
 		}
+#ifdef SHOW_EXTINCT
+	    if (nextincted > 0 && aprilfoolsday()) {
+		dump_list_item("ammonites (extinct)");
+		nextincted++;
+	    }
+#endif
 	    dump_list_end();
 
 	    if (klwin) putstr(klwin, 0, "");

@@ -46,6 +46,8 @@ NetHack, except that rounddiv may call panic().
 	int		night		(void)
 	int		midnight	(void)
 	boolean		towelday	(void)
+	boolean		piday		(void)
+	boolean		aprilfoolsday	(void)
 	char *		get_formatted_time		(time_t, const char *)
 	char *		iso8601		(time_t)
 =*/
@@ -656,6 +658,12 @@ boolean
 piday()
 {
 	return(boolean)((getmonth()==3) && (getmday()==14));
+}
+
+boolean
+aprilfoolsday()
+{
+	return(boolean)((getmonth()==4) && (getmday()==1));
 }
 
 static char buf_fmt_time[BUFSZ];
