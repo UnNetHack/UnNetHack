@@ -167,7 +167,6 @@ extern boolean get_menu_coloring(const char *str, int *color, int *attr);
 
 static char tmp_html_link[BUFSZ];
 /** Return a link to nethackwiki . */
-static
 char *
 html_link(link_name, name)
 const char *link_name;

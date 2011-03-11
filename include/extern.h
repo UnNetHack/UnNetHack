@@ -501,6 +501,7 @@ E void FDECL(dump_definition_list_dt, (const char *));
 E void NDECL(dump_definition_list_end);
 E void FDECL(dump_containerconts, (struct obj *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 E char* FDECL(html_escape_character, (const char));
+E char* FDECL(html_link, (const char *, const char *));
 #ifdef DUMP_LOG
 E int NDECL(dump_screenshot);
 E int NDECL(dumpoverview);

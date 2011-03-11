@@ -1442,8 +1442,9 @@ const char *str;
 }
 #endif /* TTY_GRAPHICS */
 
-/* Take a screen dump */
-void dump_screen()
+/** Take a screen dump */
+void
+dump_screen()
 {
     register int x,y;
     int lastc = -1;
@@ -1531,7 +1532,7 @@ void dump_screen()
 	    else {
 		struct monst *mtmp = m_at(x,y);
 		if (mtmp && canspotmon(mtmp)) {
-			Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_color_%d\">%s</span>", m_monnam(mtmp), color, html_c);
+			Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_color_%d\">%s</span>", m_monnam(mtmp), color, html_link(mtmp->data->mname, html_c));
 		} else {
 			Sprintf(tmpbuf, "<span class=\"nh_color_%d\">%s</span>", color, html_c);
 		}
