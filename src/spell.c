@@ -665,7 +665,7 @@ cast_protection()
 		    pline_The("%s around you begins to shimmer with %s haze.",
 			(Underwater || Is_waterlevel(&u.uz)) ? "water" :
 			 u.uswallow ? mbodypart(u.ustuck, STOMACH) :
-			 IS_STWALL(levl[u.dx][u.dy].typ) ? "stone" : "air",
+			 IS_STWALL(levl[u.ux][u.uy].typ) ? "stone" : "air",
 			      an(hgolden));
 	    }
 	    u.uspellprot += gain;
