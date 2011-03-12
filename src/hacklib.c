@@ -657,7 +657,10 @@ towelday()
 boolean
 piday()
 {
-	return(boolean)((getmonth()==3) && (getmday()==14));
+	return(boolean)(
+	 ((getmonth()==3) && (getmday()==14)) || /* Pi Day */
+	 ((getmday()==22) && (getmonth()==7)));  /* Pi Approximation Day */
+
 }
 
 boolean
