@@ -472,26 +472,34 @@ int how;
 #endif
 
 #ifdef LOGFILE		/* used for debugging (who dies of what, where) */
+#ifdef FILE_AREAS
+	if (lock_file_area(LOGAREA, LOGFILE, 10)) {
+#else
 	if (lock_file(LOGFILE, SCOREPREFIX, 10)) {
-	    if(!(lfile = fopen_datafile(LOGFILE, "a", SCOREPREFIX))) {
+#endif
+	    if(!(lfile = fopen_datafile_area(LOGAREA, LOGFILE, "a", SCOREPREFIX))) {
 		HUP raw_print("Cannot open log file!");
 	    } else {
 		writeentry(lfile, t0);
 		(void) fclose(lfile);
 	    }
-	    unlock_file(LOGFILE);
+	    unlock_file_area(LOGAREA, LOGFILE);
 	}
 #endif /* LOGFILE */
 
 #ifdef XLOGFILE
-	if(lock_file(XLOGFILE, SCOREPREFIX, 10)) {
-		if(!(xlfile = fopen_datafile(XLOGFILE, "a", SCOREPREFIX))) {
+#ifdef FILE_AREAS
+	if (lock_file_area(LOGAREA, LOGFILE, 10)) {
+#else
+	if (lock_file(XLOGFILE, SCOREPREFIX, 10)) {
+#endif
+		if(!(xlfile = fopen_datafile_area(LOGAREA, XLOGFILE, "a", SCOREPREFIX))) {
 			HUP raw_print("Cannot open extended log file!");
 		} else {
 			write_xlentry(xlfile, t0);
 			(void) fclose(xlfile);
 		}
-		unlock_file(XLOGFILE);
+		unlock_file_area(LOGAREA, XLOGFILE);
 	}
 #endif /* XLOGFILE */
 
@@ -513,18 +521,22 @@ int how;
 	    goto showwin;
 	}
 
+#ifdef FILE_AREAS
+	if (!lock_file_area(NH_RECORD_AREA, RECORD, 60))
+#else
 	if (!lock_file(RECORD, SCOREPREFIX, 60))
+#endif
 		goto destroywin;
 
 #ifdef UPDATE_RECORD_IN_PLACE
-	rfile = fopen_datafile(RECORD, "r+", SCOREPREFIX);
+	rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "r+", SCOREPREFIX);
 #else
-	rfile = fopen_datafile(RECORD, "r", SCOREPREFIX);
+	rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "r", SCOREPREFIX);
 #endif
 
 	if (!rfile) {
 		HUP raw_print("Cannot open record file!");
-		unlock_file(RECORD);
+		unlock_file_area(NH_RECORD_AREA, RECORD);
 		goto destroywin;
 	}
 

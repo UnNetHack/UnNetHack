@@ -511,15 +511,24 @@ if test "$CHGRP" != "true"; then
     fi
 fi
 
+
+NETHACK_ARG(file-areas,[Place files in different directories],FILE_AREAS,no)
+
 AC_DEFUN([NETHACK_DIR_SET],
   [
-   AC_MSG_CHECKING([setting $1])
+   AC_MSG_CHECKING([which directory is $1])
    AC_ARG_WITH([$1], [AS_HELP_STRING([--with-$1=DIR],
     [Set the directory for $2 (default=$3)])],
     [], [withval=$4])
-   AC_SUBST($5,[$withval])
-   AC_DEFINE_UNQUOTED($5, [$withval], [$6])
-   AC_MSG_RESULT([$withval])
+   if test "$enable_file_areas" != "no" ; then
+     AC_SUBST($5,[$withval])
+     AC_DEFINE_UNQUOTED($5, [$withval], [$6])
+     AC_MSG_RESULT([$withval])
+   else
+     # set default values if FILE_AREAS is not defined
+     AC_SUBST($5,[$4])
+     AC_MSG_RESULT([default value: $3])
+   fi
   ])
 
 NETHACK_DIR_SET(gamesdir, gamesdir, [LOCALSTATEDIR/unnethack],

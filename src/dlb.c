@@ -31,7 +31,16 @@ typedef struct dlb_procs {
 } dlb_procs_t;
 
 /* without extern.h via hack.h, these haven't been declared for us */
+#ifdef FILE_AREAS
+extern FILE *FDECL(fopen_datafile_area, (const char *,const char *,
+                                                      const char *,int));
+#else
+/*
+ * If FILE_AREAS is not defined, then fopen_datafile_area
+ * is a macro defined in terms of fopen_datafile.
+ */
 extern FILE *FDECL(fopen_datafile, (const char *,const char *,int));
+#endif
 
 #ifdef DLBLIB
 /*
@@ -451,8 +460,13 @@ dlb_cleanup()
 }
 
 dlb *
+#ifndef FILE_AREAS
 dlb_fopen(name, mode)
     const char *name, *mode;
+#else
+dlb_fopen_area(area, name, mode)
+    const char *area, *name, *mode;
+#endif
 {
     FILE *fp;
     dlb *dp;
@@ -462,7 +476,11 @@ dlb_fopen(name, mode)
     dp = (dlb *) alloc(sizeof(dlb));
     if (do_dlb_fopen(dp, name, mode))
     	dp->fp = (FILE *) 0;
+#ifndef FILE_AREAS
     else if ((fp = fopen_datafile(name, mode, DATAPREFIX)) != 0)
+#else
+    else if ((fp = fopen_datafile_area(area, name, mode, DATAPREFIX)) != 0)
+#endif
 	dp->fp = fp;
     else {
 	/* can't find anything */

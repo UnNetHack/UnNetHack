@@ -189,7 +189,7 @@ char *argv[];
 		(void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #ifdef NEWS
 		if(iflags.news) {
-		    display_file(NEWS, FALSE);
+		    display_file_area(NEWS_AREA, NEWS, FALSE);
 		    iflags.news = FALSE; /* in case dorecover() fails */
 		}
 #endif

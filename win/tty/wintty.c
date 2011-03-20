@@ -2023,14 +2023,23 @@ tty_putstr(window, attr, str)
 }
 
 void
+#ifdef FILE_AREAS
+tty_display_file(farea, fname, complain)
+const char *farea;
+#else
 tty_display_file(fname, complain)
+#endif
 const char *fname;
 boolean complain;
 {
 #ifdef DEF_PAGER			/* this implies that UNIX is defined */
     {
 	/* use external pager; this may give security problems */
+#ifdef FILE_AREAS
+	register int fd = open_area(farea, fname, 0, 0);
+#else
 	register int fd = open(fname, 0);
+#endif
 
 	if(fd < 0) {
 	    if(complain) pline("Cannot open %s.", fname);
@@ -2060,7 +2069,11 @@ boolean complain;
 	char *cr;
 
 	tty_clear_nhwindow(WIN_MESSAGE);
+#ifdef FILE_AREAS
+	f = dlb_fopen_area(farea, fname, "r");
+#else
 	f = dlb_fopen(fname, "r");
+#endif
 	if (!f) {
 	    if(complain) {
 		home();  tty_mark_synch();  tty_raw_print("");

@@ -255,13 +255,17 @@ char *argv[];
 		 */
 		boolean remember_wiz_mode = wizard;
 #endif
+#ifndef FILE_AREAS
 		const char *fq_save = fqname(SAVEF, SAVEPREFIX, 1);
 
 		(void) chmod(fq_save,0);	/* disallow parallel restores */
+#else
+		(void) chmod_area(FILE_AREA_SAVE, SAVEF, 0);
+#endif
 		(void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #ifdef NEWS
 		if(iflags.news) {
-		    display_file(NEWS, FALSE);
+		    display_file_area(NEWS_AREA, NEWS, FALSE);
 		    iflags.news = FALSE; /* in case dorecover() fails */
 		}
 #endif
@@ -279,8 +283,13 @@ char *argv[];
 			if(yn("Do you want to keep the save file?") == 'n')
 			    (void) delete_savefile();
 			else {
+#ifndef FILE_AREAS
 			    (void) chmod(fq_save,FCMASK); /* back to readable */
-			    compress(fq_save);
+			    compress_area(NULL, fq_save);
+#else
+			    (void) chmod_area(FILE_AREA_SAVE, SAVEF, FCMASK);
+			    compress_area(FILE_AREA_SAVE, SAVEF);
+#endif
 			}
 		}
 		flags.move = 0;

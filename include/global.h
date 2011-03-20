@@ -182,6 +182,33 @@ typedef xchar	boolean;		/* 0 or 1 */
 #endif
 #endif
 
+#ifndef FILE_AREAS
+
+#define fopen_datafile_area(area, filename, mode, use_spfx) \
+ 		fopen_datafile(filename, mode, use_spfx)
+#define lock_file_area(area, filename, prefix, retryct) \
+ 		lock_file(filename, prefix, retryct)
+#define unlock_file_area(area, filename) unlock_file(filename)
+#define dlb_fopen_area(area, name, mode) dlb_fopen(name, mode)
+
+/*
+ * ALI
+ *
+ * By defining these, functions can pass them around even though they're
+ * not actually used. This can make the code easier to read at the cost
+ * of some efficiency. Given the high overhead of dealing with files anyway,
+ * this is often a good trade-off.
+ */
+
+#define FILE_AREA_VAR		NULL
+#define FILE_AREA_SAVE		NULL
+#define FILE_AREA_LEVL		NULL
+#define FILE_AREA_BONES		NULL
+#define FILE_AREA_SHARE		NULL
+#define FILE_AREA_UNSHARE	NULL
+
+#endif
+
 /* Displayable name of this port; don't redefine if defined in *conf.h */
 #ifndef PORT_ID
 # ifdef AMIGA

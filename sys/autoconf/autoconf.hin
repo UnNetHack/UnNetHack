@@ -87,6 +87,9 @@
 /* Show experience on bottom line */
 #undef EXP_ON_BOTL
 
+/* Place files in different directories */
+#undef FILE_AREAS
+
 /* Gold is kept on object chains (experimental) */
 #undef GOLDOBJ
 

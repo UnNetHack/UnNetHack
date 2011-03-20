@@ -758,6 +758,7 @@ enable_whereis_file
 enable_wizmode
 with_owner
 with_group
+enable_file_areas
 with_gamesdir
 with_bonesdir
 with_savesdir
@@ -1467,6 +1468,7 @@ Optional Features:
                           default file=[%n.whereis])
   --enable-wizmode=USER   enable wizard mode for the specified user
                           (default=yes, default user=[wizard])
+  --enable-file-areas     Place files in different directories (default=no)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -7081,10 +7083,31 @@ $as_echo "not set" >&6; }
 fi
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable file-areas" >&5
+$as_echo_n "checking whether to enable file-areas... " >&6; }
+   # Check whether --enable-file-areas was given.
+if test "${enable_file_areas+set}" = set; then :
+  enableval=$enable_file_areas;
+else
+  enable_file_areas="no"
+fi
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_file_areas" >&5
+$as_echo "$enable_file_areas" >&6; }
+   if test "$enable_file_areas" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define FILE_AREAS /**/
+_ACEOF
+
+   fi
 
 
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking setting gamesdir" >&5
-$as_echo_n "checking setting gamesdir... " >&6; }
+
+
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking which directory is gamesdir" >&5
+$as_echo_n "checking which directory is gamesdir... " >&6; }
 
 # Check whether --with-gamesdir was given.
 if test "${with_gamesdir+set}" = set; then :
@@ -7093,20 +7116,28 @@ else
   withval=${localstatedir}/unnethack
 fi
 
-   AUTOCONF_GAMESDIR=$withval
+   if test "$enable_file_areas" != "no" ; then
+     AUTOCONF_GAMESDIR=$withval
 
 
 cat >>confdefs.h <<_ACEOF
 #define AUTOCONF_GAMESDIR $withval
 _ACEOF
 
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
 $as_echo "$withval" >&6; }
+   else
+     # set default values if FILE_AREAS is not defined
+     AUTOCONF_GAMESDIR=${localstatedir}/unnethack
+
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: default value: LOCALSTATEDIR/unnethack" >&5
+$as_echo "default value: LOCALSTATEDIR/unnethack" >&6; }
+   fi
 
 
 
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking setting bonesdir" >&5
-$as_echo_n "checking setting bonesdir... " >&6; }
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking which directory is bonesdir" >&5
+$as_echo_n "checking which directory is bonesdir... " >&6; }
 
 # Check whether --with-bonesdir was given.
 if test "${with_bonesdir+set}" = set; then :
@@ -7115,20 +7146,28 @@ else
   withval=${AUTOCONF_GAMESDIR}/bones
 fi
 
-   AUTOCONF_FILE_AREA_BONES=$withval
+   if test "$enable_file_areas" != "no" ; then
+     AUTOCONF_FILE_AREA_BONES=$withval
 
 
 cat >>confdefs.h <<_ACEOF
 #define AUTOCONF_FILE_AREA_BONES $withval
 _ACEOF
 
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
 $as_echo "$withval" >&6; }
+   else
+     # set default values if FILE_AREAS is not defined
+     AUTOCONF_FILE_AREA_BONES=${AUTOCONF_GAMESDIR}/bones
+
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: default value: GAMESDIR/bones" >&5
+$as_echo "default value: GAMESDIR/bones" >&6; }
+   fi
 
 
 
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking setting savesdir" >&5
-$as_echo_n "checking setting savesdir... " >&6; }
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking which directory is savesdir" >&5
+$as_echo_n "checking which directory is savesdir... " >&6; }
 
 # Check whether --with-savesdir was given.
 if test "${with_savesdir+set}" = set; then :
@@ -7137,20 +7176,28 @@ else
   withval=${AUTOCONF_GAMESDIR}/saves
 fi
 
-   AUTOCONF_FILE_AREA_SAVES=$withval
+   if test "$enable_file_areas" != "no" ; then
+     AUTOCONF_FILE_AREA_SAVES=$withval
 
 
 cat >>confdefs.h <<_ACEOF
 #define AUTOCONF_FILE_AREA_SAVES $withval
 _ACEOF
 
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
 $as_echo "$withval" >&6; }
+   else
+     # set default values if FILE_AREAS is not defined
+     AUTOCONF_FILE_AREA_SAVES=${AUTOCONF_GAMESDIR}/saves
+
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: default value: GAMESDIR/saves" >&5
+$as_echo "default value: GAMESDIR/saves" >&6; }
+   fi
 
 
 
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking setting leveldir" >&5
-$as_echo_n "checking setting leveldir... " >&6; }
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking which directory is leveldir" >&5
+$as_echo_n "checking which directory is leveldir... " >&6; }
 
 # Check whether --with-leveldir was given.
 if test "${with_leveldir+set}" = set; then :
@@ -7159,15 +7206,23 @@ else
   withval=${AUTOCONF_GAMESDIR}/level
 fi
 
-   AUTOCONF_FILE_AREA_LEVEL=$withval
+   if test "$enable_file_areas" != "no" ; then
+     AUTOCONF_FILE_AREA_LEVEL=$withval
 
 
 cat >>confdefs.h <<_ACEOF
 #define AUTOCONF_FILE_AREA_LEVEL $withval
 _ACEOF
 
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
 $as_echo "$withval" >&6; }
+   else
+     # set default values if FILE_AREAS is not defined
+     AUTOCONF_FILE_AREA_LEVEL=${AUTOCONF_GAMESDIR}/level
+
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: default value: GAMESDIR/level" >&5
+$as_echo "default value: GAMESDIR/level" >&6; }
+   fi
 
 
 
