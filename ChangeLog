@@ -3,6 +3,7 @@
 	  MONSTERCOLOR=acid blob:lightcyan
 	* Fixed crashes when attacking long worms on flipped levels
 	* HTML dump: output IBMgraphics and DECgraphics characters
+	* Autoconf compliant installation directory variables
 
 	* patches:
 	  - DYWYPISI? (by Jafet)

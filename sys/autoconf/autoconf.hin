@@ -3,6 +3,18 @@
 #ifndef AUTOCONF_H
 #define AUTOCONF_H
 
+/* Location of bones files */
+#undef AUTOCONF_FILE_AREA_BONES
+
+/* Location of temporary level files */
+#undef AUTOCONF_FILE_AREA_LEVEL
+
+/* Location of save files */
+#undef AUTOCONF_FILE_AREA_SAVES
+
+/* Location of generic game files */
+#undef AUTOCONF_GAMESDIR
+
 /* Exceptions to autopickup (experimental) */
 #undef AUTOPICKUP_EXCEPTIONS
 

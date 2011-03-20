@@ -18,7 +18,20 @@ srcdir=@srcdir@
 # MAKE = make
 
 # make UnNetHack
+
 PREFIX   = @prefix@
+prefix   = @prefix@
+
+datarootdir = @datarootdir@
+datadir = @datadir@
+docdir = @docdir@
+dvidir = @dvidir@
+exec_prefix = @exec_prefix@
+libdir = @libdir@
+localstatedir = @localstatedir@
+mkdir_p = mkdir -p --
+bindir = @bindir@
+
 EXEEXT	 = @EXEEXT@
 SCRIPT   = unnethack
 GAME     = unnethack$(EXEEXT)
@@ -45,16 +58,16 @@ VARDIRPERM  = 0755
 # These must agree with the definitions in unixconf.h
 
 # Defs. for non file areas support.
-GAMEDIR  = $(PREFIX)/unnethackdir
-VARDIR = $(GAMEDIR)
-FILE_AREA_VAR = $(VARDIR)
-FILE_AREA_SAVE = $(VARDIR)/save
-FILE_AREA_SHARE = $(GAMEDIR)
-FILE_AREA_UNSHARE = $(GAMEDIR)
-FILE_AREA_DOC = $(GAMEDIR)
-FILE_AREA_BONES = $(FILE_AREA_VAR)
-FILE_AREA_LEVL = $(FILE_AREA_VAR)
-SHELLDIR = $(PREFIX)/bin
+GAMEDIR  = $(PREFIX)/UNNETHACK
+VARDIR = $(datarootdir)/@PACKAGE_TARNAME@
+FILE_AREA_VAR = @AUTOCONF_GAMESDIR@
+FILE_AREA_SAVE = @AUTOCONF_FILE_AREA_SAVES@
+FILE_AREA_SHARE = $(GAMEDIR)/share
+FILE_AREA_UNSHARE = $(GAMEDIR)/unshare
+FILE_AREA_DOC = $(docdir)
+FILE_AREA_BONES = @AUTOCONF_FILE_AREA_BONES@
+FILE_AREA_LEVL = @AUTOCONF_FILE_AREA_LEVEL@
+SHELLDIR = $(bindir)
 
 # Shareable (architecture independent) data files which are not candidates
 # for inclusion in DLB libraries (ND) and which are (D). Port specific files
@@ -290,6 +303,7 @@ update: $(GAME) recover$(EXEEXT) $(CNF_SHARE_DAT) dungeon spec_levs @GUIDEBOOK_T
 install: $(GAME) recover$(EXEEXT) $(CNF_SHARE_DAT) dungeon spec_levs @GUIDEBOOK_TXT@
 # set up the directories
 # not all mkdirs have -p; those that don't will create a -p directory
+	-mkdir -p $(GAMEDIR) $(VARDIR)
 	-mkdir -p $(SHELLDIR)
 	-rm -rf $(FILE_AREA_VAR) $(FILE_AREA_BONES) $(FILE_AREA_SAVE)
 	-rm -rf $(FILE_AREA_LEVL) $(FILE_AREA_SHARE) $(FILE_AREA_UNSHARE)

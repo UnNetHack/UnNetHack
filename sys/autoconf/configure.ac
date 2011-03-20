@@ -1,5 +1,5 @@
 dnl	UNNETHACK autoconf template
-AC_INIT(UNNETHACK, 3.5.1, bhaak@gmx.net)
+AC_INIT(UNNETHACK, 3.5.4, bhaak@gmx.net)
 dnl Avoid AC_REVISION() because we check configure into CVS
 dnl and it will cause confusing revision numbers to be included
 dnl in configure if developers forget to check in configure.ac
@@ -510,6 +510,34 @@ if test "$CHGRP" != "true"; then
 	AC_MSG_RESULT([not set])
     fi
 fi
+
+AC_DEFUN([NETHACK_DIR_SET],
+  [
+   AC_MSG_CHECKING([setting $1])
+   AC_ARG_WITH([$1], [AS_HELP_STRING([--with-$1=DIR],
+    [Set the directory for $2 (default=$3)])],
+    [], [withval=$4])
+   AC_SUBST($5,[$withval])
+   AC_DEFINE_UNQUOTED($5, [$withval], [$6])
+   AC_MSG_RESULT([$withval])
+  ])
+
+NETHACK_DIR_SET(gamesdir, gamesdir, [LOCALSTATEDIR/unnethack],
+		[${localstatedir}/unnethack],
+		AUTOCONF_GAMESDIR, [Location of generic game files])
+
+NETHACK_DIR_SET(bonesdir, bones, [GAMESDIR/bones],
+		[${AUTOCONF_GAMESDIR}/bones],
+		AUTOCONF_FILE_AREA_BONES, [Location of bones files])
+
+NETHACK_DIR_SET(savesdir, saves, [GAMESDIR/saves],
+		[${AUTOCONF_GAMESDIR}/saves],
+		AUTOCONF_FILE_AREA_SAVES, [Location of save files])
+
+NETHACK_DIR_SET(leveldir, level, [GAMESDIR/level],
+		[${AUTOCONF_GAMESDIR}/level],
+		AUTOCONF_FILE_AREA_LEVEL, [Location of temporary level files])
+
 
 NETHACK_LINKS=
 NETHACK_LINKS_ADD([dat/data.base])
