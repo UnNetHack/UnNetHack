@@ -123,7 +123,9 @@ struct obj *obj;
 		return 2;
 	    }
 	}
-	if (obj->oclass == WAND_CLASS && obj->cursed && !rn2(100)) {
+	/* same probability for blowing up a cursed wand as in dozap()
+	 * for the player */
+	if (obj->oclass == WAND_CLASS && obj->cursed && !rn2(30)) {
 	    int dam = d(obj->spe+2, 6);
 
 	    if (flags.soundok) {
