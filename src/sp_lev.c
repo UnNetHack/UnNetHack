@@ -5401,7 +5401,7 @@ const char *name;
 	boolean result = FALSE;
 	struct version_info vers_info;
 
-	fd = dlb_fopen(name, RDBMODE);
+	fd = dlb_fopen_area(FILE_AREA_UNSHARE, name, RDBMODE);
 	if (!fd) return FALSE;
 
 	Fread((genericptr_t) &vers_info, sizeof vers_info, 1, fd);

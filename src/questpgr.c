@@ -7,6 +7,7 @@
 
 /*  quest-specific pager routines. */
 
+#define QTEXT_AREA      FILE_AREA_SHARE
 #include "qtext.h"
 
 #define QTEXT_FILE	"quest.dat"
@@ -95,7 +96,7 @@ load_qtlist()
 	char	qt_classes[N_HDR][LEN_HDR];
 	long	qt_offsets[N_HDR];
 
-	msg_file = dlb_fopen(QTEXT_FILE, RDBMODE);
+	msg_file = dlb_fopen_area(QTEXT_AREA, QTEXT_FILE, RDBMODE);
 	if (!msg_file)
 	    panic("CANNOT OPEN QUEST TEXT FILE %s.", QTEXT_FILE);
 

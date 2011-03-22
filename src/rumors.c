@@ -77,7 +77,7 @@ boolean exclude_cookie;
 	if (true_rumor_size < 0L)	/* we couldn't open RUMORFILE */
 		return rumor_buf;
 
-	rumors = dlb_fopen(RUMORFILE, "r");
+	rumors = dlb_fopen_area(NH_RUMORAREA, RUMORFILE, "r");
 
 	if (rumors) {
 	    int count = 0;
@@ -245,7 +245,7 @@ boolean delphi;
 	   (oracle_flg > 0 && oracle_cnt == 0))	/* oracles already exhausted */
 		return;
 
-	oracles = dlb_fopen(ORACLEFILE, "r");
+	oracles = dlb_fopen_area(NH_ORACLEAREA, ORACLEFILE, "r");
 
 	if (oracles) {
 		winid tmpwin;

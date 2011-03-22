@@ -5,6 +5,8 @@
 #include "hack.h"
 #include "dlb.h"
 
+#define NH_RECORD_AREA FILE_AREA_VAR
+
 #ifdef TTY_GRAPHICS
 #include "wintty.h" /* more() */
 #endif
@@ -2513,7 +2515,7 @@ const char *dir;
 
 #if defined(UNIX) || defined(VMS)
 # ifdef FILE_AREAS
-	fd = open_area(NH_RECORD_AREA, NH_RECORD, O_RDWR, 0);
+	fd = open_area(NH_RECORD_AREA, RECORD, O_RDWR, 0);
 # else
 	fq_record = fqname(RECORD, SCOREPREFIX, 0);
 	fd = open(fq_record, O_RDWR, 0);
@@ -2537,14 +2539,14 @@ const char *dir;
 # if defined(VMS) && !defined(SECURE)
 	    /* Re-protect RECORD with world:read+write+execute+delete access. */
 #  ifdef FILE_AREAS
-	    (void) chmod_area(NH_RECORD_AREA, NH_RECORD, FCMASK | 007);
+	    (void) chmod_area(NH_RECORD_AREA, RECORD, FCMASK | 007);
 #  else
 	    (void) chmod(fq_record, FCMASK | 007);
 #  endif
 # endif /* VMS && !SECURE */
 	} else {
 # ifdef FILE_AREAS
-	    raw_printf("Warning: cannot write scoreboard file %s", NH_RECORD);
+	    raw_printf("Warning: cannot write scoreboard file %s", RECORD);
 # else
 	    raw_printf("Warning: cannot write scoreboard file %s", fq_record);
 # endif

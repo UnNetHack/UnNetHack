@@ -76,7 +76,7 @@ static int FDECL(lib_dlb_fgetc,(dlb *));
 static long FDECL(lib_dlb_ftell,(dlb *));
 
 /* not static because shared with dlb_main.c */
-boolean FDECL(open_library,(const char *lib_name, library *lp));
+boolean FDECL(open_library,(const char *lib_area, const char *lib_name, library *lp));
 void FDECL(close_library,(library *lp));
 
 /* without extern.h via hack.h, these haven't been declared for us */
@@ -204,13 +204,13 @@ find_file(name, lib, startp, sizep)
  * structure.  Return TRUE if successful, FALSE otherwise.
  */
 boolean
-open_library(lib_name, lp)
-    const char *lib_name;
+open_library(lib_area, lib_name, lp)
+    const char *lib_area, *lib_name;
     library *lp;
 {
     boolean status = FALSE;
 
-    lp->fdata = fopen_datafile(lib_name, RDBMODE, DATAPREFIX);
+    lp->fdata = fopen_datafile_area(lib_area, lib_name, RDBMODE, DATAPREFIX);
     if (lp->fdata) {
 	if (readlibdir(lp)) {
 	    status = TRUE;
@@ -244,9 +244,9 @@ lib_dlb_init()
     (void) memset((char *)&dlb_libs[0], 0, sizeof(dlb_libs));
 
     /* To open more than one library, add open library calls here. */
-    if (!open_library(DLBFILE, &dlb_libs[0])) return FALSE;
+    if (!open_library(DLBAREA, DLBFILE, &dlb_libs[0])) return FALSE;
 #ifdef DLBFILE2
-    if (!open_library(DLBFILE2, &dlb_libs[1]))  {
+    if (!open_library(DLBAREA2, DLBFILE2, &dlb_libs[1]))  {
 	close_library(&dlb_libs[0]);
 	return FALSE;
     }

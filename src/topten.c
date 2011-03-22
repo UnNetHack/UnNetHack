@@ -617,7 +617,7 @@ int how;
 		(void) fclose(rfile);
 		if(!(rfile = fopen_datafile(RECORD, "w", SCOREPREFIX))){
 			HUP raw_print("Cannot write record file");
-			unlock_file(RECORD);
+			unlock_file_area(NH_RECORD_AREA, RECORD);
 			free_ttlist(tt_head);
 			goto destroywin;
 		}
@@ -713,7 +713,7 @@ int how;
 	}
 #endif	/* UPDATE_RECORD_IN_PLACE */
 	(void) fclose(rfile);
-	unlock_file(RECORD);
+	unlock_file_area(NH_RECORD_AREA, RECORD);
 	free_ttlist(tt_head);
 
   showwin:

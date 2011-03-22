@@ -198,11 +198,11 @@ getlock()
 			if(eraseoldlocks())
 				goto gotlock;
 			else {
-				unlock_file(HLOCK);
+				unlock_file_area(HLOCK_AREA, HLOCK);
 				error("Couldn't destroy old game.");
 			}
 		else {
-			unlock_file(HLOCK);
+			unlock_file_area(HLOCK_AREA, HLOCK);
 			error("%s", "");
 		}
 	}

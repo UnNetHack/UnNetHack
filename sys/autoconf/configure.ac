@@ -522,7 +522,7 @@ AC_DEFUN([NETHACK_DIR_SET],
     [], [withval=$4])
    if test "$enable_file_areas" != "no" ; then
      AC_SUBST($5,[$withval])
-     AC_DEFINE_UNQUOTED($5, [$withval], [$6])
+     AC_DEFINE_UNQUOTED($5, ["$withval"], [$6])
      AC_MSG_RESULT([$withval])
    else
      # set default values if FILE_AREAS is not defined
@@ -533,19 +533,29 @@ AC_DEFUN([NETHACK_DIR_SET],
 
 NETHACK_DIR_SET(gamesdir, gamesdir, [LOCALSTATEDIR/unnethack],
 		[${localstatedir}/unnethack],
-		AUTOCONF_GAMESDIR, [Location of generic game files])
+		FILE_AREA_VAR, [Location of other files which may be modified])
 
 NETHACK_DIR_SET(bonesdir, bones, [GAMESDIR/bones],
-		[${AUTOCONF_GAMESDIR}/bones],
-		AUTOCONF_FILE_AREA_BONES, [Location of bones files])
+		[${FILE_AREA_VAR}/bones],
+		FILE_AREA_BONES, [Location of bones files (r/w)])
 
 NETHACK_DIR_SET(savesdir, saves, [GAMESDIR/saves],
-		[${AUTOCONF_GAMESDIR}/saves],
-		AUTOCONF_FILE_AREA_SAVES, [Location of save files])
+		[${FILE_AREA_VAR}/saves],
+		FILE_AREA_SAVE, [Location of save files (r/w)])
 
 NETHACK_DIR_SET(leveldir, level, [GAMESDIR/level],
-		[${AUTOCONF_GAMESDIR}/level],
-		AUTOCONF_FILE_AREA_LEVEL, [Location of temporary level files])
+		[${FILE_AREA_VAR}/level],
+		FILE_AREA_LEVL, [Location of level files (r/w)])
+
+NETHACK_DIR_SET(sharedir, share, [GAMESDIR],
+		[${FILE_AREA_VAR}],
+		FILE_AREA_SHARE, [For read-only, architechure independent, files])
+
+NETHACK_DIR_SET(unsharedir, unshare, [GAMESDIR],
+		[${FILE_AREA_VAR}],
+		FILE_AREA_UNSHARE, [For read-only, architechure dependent, files])
+
+AC_DEFINE_UNQUOTED(FILE_AREA_DOC, ["$docdir"], [Location of human-readable documentation])
 
 
 NETHACK_LINKS=

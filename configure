@@ -596,10 +596,12 @@ ac_includes_default="\
 
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
-AUTOCONF_FILE_AREA_LEVEL
-AUTOCONF_FILE_AREA_SAVES
-AUTOCONF_FILE_AREA_BONES
-AUTOCONF_GAMESDIR
+FILE_AREA_UNSHARE
+FILE_AREA_SHARE
+FILE_AREA_LEVL
+FILE_AREA_SAVE
+FILE_AREA_BONES
+FILE_AREA_VAR
 GROUP
 OWNER
 WIZARD
@@ -763,6 +765,8 @@ with_gamesdir
 with_bonesdir
 with_savesdir
 with_leveldir
+with_sharedir
+with_unsharedir
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1483,6 +1487,8 @@ Optional Packages:
   --with-bonesdir=DIR     Set the directory for bones (default=GAMESDIR/bones)
   --with-savesdir=DIR     Set the directory for saves (default=GAMESDIR/saves)
   --with-leveldir=DIR     Set the directory for level (default=GAMESDIR/level)
+  --with-sharedir=DIR     Set the directory for share (default=GAMESDIR)
+  --with-unsharedir=DIR   Set the directory for unshare (default=GAMESDIR)
 
 Some influential environment variables:
   CC          C compiler
@@ -7117,18 +7123,18 @@ else
 fi
 
    if test "$enable_file_areas" != "no" ; then
-     AUTOCONF_GAMESDIR=$withval
+     FILE_AREA_VAR=$withval
 
 
 cat >>confdefs.h <<_ACEOF
-#define AUTOCONF_GAMESDIR $withval
+#define FILE_AREA_VAR "$withval"
 _ACEOF
 
      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
 $as_echo "$withval" >&6; }
    else
      # set default values if FILE_AREAS is not defined
-     AUTOCONF_GAMESDIR=${localstatedir}/unnethack
+     FILE_AREA_VAR=${localstatedir}/unnethack
 
      { $as_echo "$as_me:${as_lineno-$LINENO}: result: default value: LOCALSTATEDIR/unnethack" >&5
 $as_echo "default value: LOCALSTATEDIR/unnethack" >&6; }
@@ -7143,22 +7149,22 @@ $as_echo_n "checking which directory is bonesdir... " >&6; }
 if test "${with_bonesdir+set}" = set; then :
   withval=$with_bonesdir;
 else
-  withval=${AUTOCONF_GAMESDIR}/bones
+  withval=${FILE_AREA_VAR}/bones
 fi
 
    if test "$enable_file_areas" != "no" ; then
-     AUTOCONF_FILE_AREA_BONES=$withval
+     FILE_AREA_BONES=$withval
 
 
 cat >>confdefs.h <<_ACEOF
-#define AUTOCONF_FILE_AREA_BONES $withval
+#define FILE_AREA_BONES "$withval"
 _ACEOF
 
      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
 $as_echo "$withval" >&6; }
    else
      # set default values if FILE_AREAS is not defined
-     AUTOCONF_FILE_AREA_BONES=${AUTOCONF_GAMESDIR}/bones
+     FILE_AREA_BONES=${FILE_AREA_VAR}/bones
 
      { $as_echo "$as_me:${as_lineno-$LINENO}: result: default value: GAMESDIR/bones" >&5
 $as_echo "default value: GAMESDIR/bones" >&6; }
@@ -7173,22 +7179,22 @@ $as_echo_n "checking which directory is savesdir... " >&6; }
 if test "${with_savesdir+set}" = set; then :
   withval=$with_savesdir;
 else
-  withval=${AUTOCONF_GAMESDIR}/saves
+  withval=${FILE_AREA_VAR}/saves
 fi
 
    if test "$enable_file_areas" != "no" ; then
-     AUTOCONF_FILE_AREA_SAVES=$withval
+     FILE_AREA_SAVE=$withval
 
 
 cat >>confdefs.h <<_ACEOF
-#define AUTOCONF_FILE_AREA_SAVES $withval
+#define FILE_AREA_SAVE "$withval"
 _ACEOF
 
      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
 $as_echo "$withval" >&6; }
    else
      # set default values if FILE_AREAS is not defined
-     AUTOCONF_FILE_AREA_SAVES=${AUTOCONF_GAMESDIR}/saves
+     FILE_AREA_SAVE=${FILE_AREA_VAR}/saves
 
      { $as_echo "$as_me:${as_lineno-$LINENO}: result: default value: GAMESDIR/saves" >&5
 $as_echo "default value: GAMESDIR/saves" >&6; }
@@ -7203,26 +7209,92 @@ $as_echo_n "checking which directory is leveldir... " >&6; }
 if test "${with_leveldir+set}" = set; then :
   withval=$with_leveldir;
 else
-  withval=${AUTOCONF_GAMESDIR}/level
+  withval=${FILE_AREA_VAR}/level
 fi
 
    if test "$enable_file_areas" != "no" ; then
-     AUTOCONF_FILE_AREA_LEVEL=$withval
+     FILE_AREA_LEVL=$withval
 
 
 cat >>confdefs.h <<_ACEOF
-#define AUTOCONF_FILE_AREA_LEVEL $withval
+#define FILE_AREA_LEVL "$withval"
 _ACEOF
 
      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
 $as_echo "$withval" >&6; }
    else
      # set default values if FILE_AREAS is not defined
-     AUTOCONF_FILE_AREA_LEVEL=${AUTOCONF_GAMESDIR}/level
+     FILE_AREA_LEVL=${FILE_AREA_VAR}/level
 
      { $as_echo "$as_me:${as_lineno-$LINENO}: result: default value: GAMESDIR/level" >&5
 $as_echo "default value: GAMESDIR/level" >&6; }
    fi
+
+
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking which directory is sharedir" >&5
+$as_echo_n "checking which directory is sharedir... " >&6; }
+
+# Check whether --with-sharedir was given.
+if test "${with_sharedir+set}" = set; then :
+  withval=$with_sharedir;
+else
+  withval=${FILE_AREA_VAR}
+fi
+
+   if test "$enable_file_areas" != "no" ; then
+     FILE_AREA_SHARE=$withval
+
+
+cat >>confdefs.h <<_ACEOF
+#define FILE_AREA_SHARE "$withval"
+_ACEOF
+
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
+$as_echo "$withval" >&6; }
+   else
+     # set default values if FILE_AREAS is not defined
+     FILE_AREA_SHARE=${FILE_AREA_VAR}
+
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: default value: GAMESDIR" >&5
+$as_echo "default value: GAMESDIR" >&6; }
+   fi
+
+
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking which directory is unsharedir" >&5
+$as_echo_n "checking which directory is unsharedir... " >&6; }
+
+# Check whether --with-unsharedir was given.
+if test "${with_unsharedir+set}" = set; then :
+  withval=$with_unsharedir;
+else
+  withval=${FILE_AREA_VAR}
+fi
+
+   if test "$enable_file_areas" != "no" ; then
+     FILE_AREA_UNSHARE=$withval
+
+
+cat >>confdefs.h <<_ACEOF
+#define FILE_AREA_UNSHARE "$withval"
+_ACEOF
+
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
+$as_echo "$withval" >&6; }
+   else
+     # set default values if FILE_AREAS is not defined
+     FILE_AREA_UNSHARE=${FILE_AREA_VAR}
+
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: default value: GAMESDIR" >&5
+$as_echo "default value: GAMESDIR" >&6; }
+   fi
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define FILE_AREA_DOC "$docdir"
+_ACEOF
 
 
 

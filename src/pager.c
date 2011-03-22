@@ -311,7 +311,7 @@ checkfile(inp, pm, user_typed_name, without_asking)
     int chk_skip;
     boolean found_in_file = FALSE, skipping_entry = FALSE;
 
-    fp = dlb_fopen(DATAFILE, "r");
+    fp = dlb_fopen_area(NH_DATAAREA, DATAFILE, "r");
     if (!fp) {
 	pline("Cannot open data file!");
 	return;
@@ -815,7 +815,7 @@ char *cbuf;
 	char bufr[BUFSZ];
 	register char *buf = &bufr[6], *ep, ctrl, meta;
 
-	fp = dlb_fopen(CMDHELPFILE, "r");
+	fp = dlb_fopen_area(NH_CMDHELPAREA, CMDHELPFILE, "r");
 	if (!fp) {
 		pline("Cannot open data file!");
 		return 0;
@@ -951,19 +951,19 @@ dohelp()
 
 	if (help_menu(&sel)) {
 		switch (sel) {
-			case  0:  display_file(HELP, TRUE);  break;
-			case  1:  display_file(SHELP, TRUE);  break;
+			case  0:  display_file_area(NH_HELP_AREA, HELP, TRUE);  break;
+			case  1:  display_file_area(NH_SHELP_AREA, SHELP, TRUE);  break;
 			case  2:  (void) dohistory();  break;
 			case  3:  (void) dowhatis();  break;
 			case  4:  (void) dowhatdoes();  break;
 			case  5:  option_help();  break;
-			case  6:  display_file(OPTIONFILE, TRUE);  break;
+			case  6:  display_file_area(NH_OPTIONAREA, OPTIONFILE, TRUE);  break;
 			case  7:  (void) doextlist();  break;
-			case  8:  display_file(LICENSE, TRUE);  break;
+			case  8:  display_file_area(NH_LICENSE_AREA, LICENSE, TRUE);  break;
 			case  9:  tutorial_redisplay();  break;
 #ifdef WIZARD
 			/* handle slot 10 or 11 */
-			default: display_file(DEBUGHELP, TRUE);  break;
+			default: display_file_area(NH_DEBUGHELP_AREA, DEBUGHELP, TRUE);  break;
 #endif
 #ifdef PORT_HELP
 			case PORT_HELP_ID:  port_help();  break;
@@ -976,7 +976,7 @@ dohelp()
 int
 dohistory()
 {
-	display_file(HISTORY, TRUE);
+	display_file_area(NH_HISTORY_AREA, HISTORY, TRUE);
 	return 0;
 }
 
