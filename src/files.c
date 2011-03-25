@@ -166,7 +166,6 @@ STATIC_DCL char *NDECL(set_bonestemp_name);
 STATIC_DCL void FDECL(redirect, (const char *,const char *,const char *, FILE *,BOOLEAN_P));
 STATIC_DCL void FDECL(docompress_file, (const char *,const char *,BOOLEAN_P));
 #endif
-STATIC_DCL char *FDECL(make_lockname, (const char *,char *));
 #ifndef FILE_AREAS
 STATIC_DCL char *FDECL(make_lockname, (const char *,char *));
 #endif
@@ -1482,8 +1481,6 @@ const char *filearea, *filename;
 
 /* ----------  END FILE COMPRESSION HANDLING ----------- */
 
-#ifndef FILE_AREAS
-
 /* ----------  BEGIN FILE LOCKING HANDLING ----------- */
 
 static int nesting = 0;
@@ -1496,6 +1493,8 @@ struct flock sflock; /* for unlocking, same as above */
 #endif
 
 #define HUP	if (!program_state.done_hup)
+
+#ifndef FILE_AREAS
 
 STATIC_OVL char *
 make_lockname(filename, lockname)
@@ -1531,13 +1530,21 @@ char *lockname;
 #endif
 }
 
+#endif /* FILE_AREAS */
 
 /* lock a file */
 boolean
+#ifdef FILE_AREAS
+lock_file(filearea, filename, retryct)
+const char *filearea;
+const char *filename;
+int retryct;
+#else
 lock_file(filename, whichprefix, retryct)
 const char *filename;
 int whichprefix;
 int retryct;
+#endif
 {
 #if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
 # pragma unused(filename, retryct)
@@ -1559,7 +1566,11 @@ int retryct;
 	lockname = fqname(lockname, LOCKPREFIX, 2);
 # endif
 #endif
+#ifdef FILE_AREAS
+	filename = make_file_name(filearea, filename);
+#else
 	filename = fqname(filename, whichprefix, 0);
+#endif
 
 #ifdef USE_FCNTL
 	lockfd = open(filename,O_RDWR);
@@ -1576,13 +1587,13 @@ int retryct;
 #if defined(UNIX) || defined(VMS)
 # ifdef USE_FCNTL
 	while (fcntl(lockfd,F_SETLK,&sflock) == -1) {
-# else 
+# else
 #  ifdef NO_FILE_LINKS
 	while ((lockfd = open(lockname, O_RDWR|O_CREAT|O_EXCL, 0666)) == -1) {
 #  else
 	while (link(filename, lockname) == -1) {
 #  endif
-# endif 
+# endif
 
 #ifdef USE_FCNTL
 		if (retryct--) {
@@ -1681,6 +1692,19 @@ int retryct;
 	return TRUE;
 }
 
+#ifdef FILE_AREAS
+/*
+ * lock a file
+ */
+boolean
+lock_file_area(filearea, filename, retryct)
+const char *filearea, *filename;
+int retryct;
+{
+	return lock_file(filearea, filename, retryct);
+}
+#endif
+
 
 #ifdef VMS	/* for unlock_file, use the unlink() routine in vmsunix.c */
 # ifdef unlink
@@ -1735,9 +1759,17 @@ const char *filename;
 	nesting--;
 }
 
-/* ----------  END FILE LOCKING HANDLING ----------- */
+#ifdef FILE_AREAS
+/* unlock file, which must be currently locked by lock_file_area */
+void
+unlock_file_area(filearea, filename)
+const char *filearea, *filename;
+{
+	unlock_file(filename);
+}
+#endif
 
-#endif	/* FILE_AREAS */
+/* ----------  END FILE LOCKING HANDLING ----------- */
 
 /* ----------  BEGIN CONFIG FILE HANDLING ----------- */
 
