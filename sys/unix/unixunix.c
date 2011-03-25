@@ -367,9 +367,10 @@ const char *filearea, *filename;
 	if (filearea && filename[0]!='/')
 	{
 		lenarea = strlen(filearea);
-		buf = (char *)alloc(lenarea+strlen(filename)+1);
+		buf = (char *)alloc(lenarea+strlen(filename)+2);
 		strcpy(buf, filearea);
-		strcpy(buf+lenarea, filename);
+		if (filearea[lenarea-1] != '/') strcat(buf, "/");
+		strcat(buf, filename);
 	}
 	else
 	{
