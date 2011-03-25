@@ -358,7 +358,8 @@ int wt;
  * Unix file areas are directories with trailing slashes.
  */
 
-char *make_file_name(filearea, filename)
+char *
+make_file_name(filearea, filename)
 const char *filearea, *filename;
 {
 	char *buf;
@@ -578,10 +579,12 @@ int retryct;
 		HUP raw_printf("Can't find file %s to lock!", filename);
 		nesting--;
 		retval = FALSE;
+		break;
 	    case EACCES:
 		HUP raw_printf("No write permission to lock %s!", filename);
 		nesting--;
 		retval = FALSE;
+		break;
 	    default:
 		HUP perror(lockname);
 		HUP raw_printf(
@@ -589,6 +592,7 @@ int retryct;
 			       filename, errnosv);
 		nesting--;
 		retval = FALSE;
+		break;
 	    }
 
 	}

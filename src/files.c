@@ -707,7 +707,7 @@ boolean playing; /**< True if game is running.  */
 	        u.uevent.ascended ? 2 : killer ? 1 : 0,
 	        playing);
 
-	fp = fopen_datafile(whereis_file,"w",LEVELPREFIX);
+	fp = fopen_datafile_area(LOGAREA, whereis_file, "w", SCOREPREFIX);
 	if (fp) {
 #ifdef UNIX
 		mode_t whereismode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH;
