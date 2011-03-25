@@ -389,6 +389,7 @@ boolean use_scoreprefix;
 	char *buf;
 	buf = make_file_name(filearea, filename);
 	fp = fopen(buf, mode);
+	free(buf);
 	return fp;
 }
 
