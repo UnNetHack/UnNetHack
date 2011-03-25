@@ -1843,10 +1843,10 @@ struct obj *bag;
 
 	consume_obj_charge(bag, TRUE);
 
-	switch(rn2(40)) {
+	switch(0) {
 	case 0:
 	case 1:
-		if (bag->recharged==0 && !bag->cursed) {
+		if (!bag->cursed) {
 			for (cnt=3;cnt>0 && (otmp = mkobj(RANDOM_CLASS,FALSE));cnt--) {
 				if (otmp->owt<100 && !objects[otmp->otyp].oc_big)
 					break;

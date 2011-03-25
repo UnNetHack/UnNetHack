@@ -489,7 +489,7 @@ int how;
 
 #ifdef XLOGFILE
 #ifdef FILE_AREAS
-	if (lock_file_area(LOGAREA, LOGFILE, 10)) {
+	if (lock_file_area(LOGAREA, XLOGFILE, 10)) {
 #else
 	if (lock_file(XLOGFILE, SCOREPREFIX, 10)) {
 #endif
@@ -615,7 +615,7 @@ int how;
 				     t0->fpos : final_fpos), SEEK_SET);
 #else
 		(void) fclose(rfile);
-		if(!(rfile = fopen_datafile(RECORD, "w", SCOREPREFIX))){
+		if(!(rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "w", SCOREPREFIX))){
 			HUP raw_print("Cannot write record file");
 			unlock_file_area(NH_RECORD_AREA, RECORD);
 			free_ttlist(tt_head);
@@ -1070,7 +1070,7 @@ char **argv;
 		return;
 	}
 
-	rfile = fopen_datafile(RECORD, "r", SCOREPREFIX);
+	rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "r", SCOREPREFIX);
 	if (!rfile) {
 		raw_print("Cannot open record file!");
 		return;
@@ -1228,7 +1228,7 @@ struct obj *otmp;
 
 	if (!otmp) return((struct obj *) 0);
 
-	rfile = fopen_datafile(RECORD, "r", SCOREPREFIX);
+	rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "r", SCOREPREFIX);
 	if (!rfile) {
 		impossible("Cannot open record file!");
 		return (struct obj *)0;

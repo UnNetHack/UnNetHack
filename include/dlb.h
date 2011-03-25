@@ -113,6 +113,10 @@ long FDECL(dlb_ftell, (DLB_P));
 # define dlb_fgetc	fgetc
 # define dlb_ftell	ftell
 
+# ifdef FILE_AREAS
+#  define dlb_fopen_area(area, name, mode)	fopen_datafile_area(area, name, mode, DATAPREFIX)
+# endif
+
 #endif /* DLB */
 
 
