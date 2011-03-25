@@ -438,7 +438,6 @@ const char *filearea, *oldfilename, *newfilename;
 {
 	int retval;
 	char *oldpath,*newpath;
-	int lenarea;
 	oldpath = make_file_name(filearea, oldfilename);
 	newpath = make_file_name(filearea, newfilename);
 	retval = rename(oldpath, newpath);

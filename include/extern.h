@@ -2254,6 +2254,8 @@ E int FDECL(open_area, (const char *, const char *, int, int));
 E int FDECL(creat_area, (const char *, const char *, int));
 E boolean FDECL(lock_file_area, (const char *, const char *,int));
 E void FDECL(unlock_file_area, (const char *, const char *));
+E int FDECL(rename_area, (const char *, const char *, const char *));
+E int FDECL(remove_area, (const char *, const char *));
 #endif
 #endif /* UNIX */
 

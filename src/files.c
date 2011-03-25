@@ -552,7 +552,7 @@ int lev;
 	if (lev == 0 || (level_info[lev].flags & LFILE_EXISTS)) {
 		set_levelfile_name(lock, lev);
 #ifdef FILE_AREAS
-		(void) remove_area(FILE_AREA_LEVL, lock, 0);
+		(void) remove_area(FILE_AREA_LEVL, lock);
 #else
 # ifdef HOLD_LOCKFILE_OPEN
 		if (lev == 0) really_close();
@@ -873,7 +873,10 @@ void
 commit_bonesfile(lev)
 d_level *lev;
 {
-	const char *fq_bones, *tempname;
+#ifndef FILE_AREAS
+	const char *fq_bones;
+#endif
+	const char *tempname;
 	int ret;
 
 	(void) set_bonesfile_name(bones, lev);
@@ -915,7 +918,9 @@ open_bonesfile(lev, bonesid)
 d_level *lev;
 char **bonesid;
 {
+#ifndef FILE_AREAS
 	const char *fq_bones;
+#endif
 	int fd;
 
 	*bonesid = set_bonesfile_name(bones, lev);
