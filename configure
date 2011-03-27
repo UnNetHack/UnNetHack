@@ -5637,19 +5637,6 @@ fi
 
 
 if test "$have_regex_h" = "yes"; then
-  ac_fn_c_check_type "$LINENO" "struct re_pattern_buffer" "ac_cv_type_struct_re_pattern_buffer" "$ac_includes_default
-	#include <regex.h>
-
-"
-if test "x$ac_cv_type_struct_re_pattern_buffer" = x""yes; then :
-
-$as_echo "#define MENU_COLOR_REGEX /**/" >>confdefs.h
-
-
-$as_echo "#define MENU_COLOR_REGEX_GNU /**/" >>confdefs.h
-
-
-else
   ac_fn_c_check_type "$LINENO" "regex_t" "ac_cv_type_regex_t" "$ac_includes_default
 	#include <regex.h>
 
@@ -5660,6 +5647,19 @@ $as_echo "#define MENU_COLOR_REGEX /**/" >>confdefs.h
 
 
 $as_echo "#define MENU_COLOR_REGEX_POSIX /**/" >>confdefs.h
+
+
+else
+  ac_fn_c_check_type "$LINENO" "struct re_pattern_buffer" "ac_cv_type_struct_re_pattern_buffer" "$ac_includes_default
+	#include <regex.h>
+
+"
+if test "x$ac_cv_type_struct_re_pattern_buffer" = x""yes; then :
+
+$as_echo "#define MENU_COLOR_REGEX /**/" >>confdefs.h
+
+
+$as_echo "#define MENU_COLOR_REGEX_GNU /**/" >>confdefs.h
 
 
 fi

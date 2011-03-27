@@ -312,13 +312,13 @@ AC_CHECK_HEADER(regex.h, [have_regex_h=yes],[have_regex_h=no],/* TEST_REGEX */)
 dnl ------ Check for data types
 dnl -- Regex-Check for MENU_COLOR
 if test "$have_regex_h" = "yes"; then
-  AC_CHECK_TYPE(struct re_pattern_buffer,
+  AC_CHECK_TYPE(regex_t,
     [AC_DEFINE(MENU_COLOR_REGEX, [], [Use regular expressions])
-     AC_DEFINE(MENU_COLOR_REGEX_GNU, [], [GNU regex is available])
+     AC_DEFINE(MENU_COLOR_REGEX_POSIX, [], [Posix regex is available])
     ],
-    [AC_CHECK_TYPE(regex_t,
+    [AC_CHECK_TYPE(struct re_pattern_buffer,
       [AC_DEFINE(MENU_COLOR_REGEX, [], [Use regular expressions])
-	AC_DEFINE(MENU_COLOR_REGEX_POSIX, [], [Posix regex is available])
+	AC_DEFINE(MENU_COLOR_REGEX_GNU, [], [GNU regex is available])
       ],,
       [AC_INCLUDES_DEFAULT([])
 	#include <regex.h>
