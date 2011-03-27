@@ -38,6 +38,7 @@
 #include "config1.h"	/* should auto-detect MSDOS, MAC, AMIGA, and WIN32 */
 
 #ifdef AUTOCONF
+# include "autoconf_paths.h"
 # include "autoconf.h"
 #endif
 

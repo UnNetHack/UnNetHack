@@ -58,15 +58,13 @@ VARDIRPERM  = 0755
 # These must agree with the definitions in unixconf.h
 
 # Defs. for non file areas support.
-#GAMEDIR  = $(PREFIX)/UNNETHACK
-#VARDIR = $(datarootdir)/@PACKAGE_TARNAME@
 GAMEDIR = @FILE_AREA_VAR@
 VARDIR = @FILE_AREA_VAR@
 FILE_AREA_VAR = @FILE_AREA_VAR@
 FILE_AREA_SAVE = @FILE_AREA_SAVE@
 FILE_AREA_SHARE = @FILE_AREA_SHARE@
 FILE_AREA_UNSHARE = @FILE_AREA_UNSHARE@
-FILE_AREA_DOC = $(docdir)
+FILE_AREA_DOC = @FILE_AREA_DOC@
 FILE_AREA_BONES = @FILE_AREA_BONES@
 FILE_AREA_LEVL = @FILE_AREA_LEVL@
 SHELLDIR = $(bindir)
@@ -138,7 +136,7 @@ SHARE_DAT = $(SHARE_DATNODLB) $(SHARE_DATDLB)
 UNSHARE_DAT = $(UNSHARE_DATNODLB) $(UNSHARE_DATDLB)
 
 
-$(GAME):
+$(GAME): include/autoconf_paths.h
 	( cd src ; $(MAKE) )
 
 all:	$(GAME) recover$(EXEEXT) @GUIDEBOOK@ $(CNF_SHARE_DAT) dungeon spec_levs check-dlb
@@ -344,4 +342,15 @@ spotless:
 	( cd util ; $(MAKE) spotless )
 	( cd dat ; $(MAKE) spotless )
 	( cd doc ; $(MAKE) spotless )
-	-rm -f Makefile include/autoconf.h include/win32api.h
+	-rm -f Makefile include/autoconf.h include/autoconf_paths.h include/win32api.h
+
+include/autoconf_paths.h: Makefile
+	echo '#ifndef AUTOCONF_PATH_H'  >$@
+	echo '#undef AUTOCONF_PATH_H'  >>$@
+	echo '#define AUTOCONF_PATH_H' >>$@
+	echo '#define AUTOCONF_PREFIX  "$(prefix)"' >>$@
+	echo '#define AUTOCONF_LOCALSTATEDIR  "$(localstatedir)"' >>$@
+	echo '#define AUTOCONF_DATADIR "$(datadir)"' >>$@
+	echo '#define AUTOCONF_DATAROOTDIR "$(datarootdir)"' >>$@
+	echo '#define AUTOCONF_DOCDIR "$(docdir)"' >>$@
+	echo '#endif' >>$@

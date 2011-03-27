@@ -512,50 +512,69 @@ if test "$CHGRP" != "true"; then
 fi
 
 
-NETHACK_ARG(file-areas,[Place files in different directories],FILE_AREAS,no)
+NETHACK_ARG(file-areas,[Place files in different directories],FILE_AREAS,yes)
 
 AC_DEFUN([NETHACK_DIR_SET],
   [
    AC_MSG_CHECKING([which directory is $1])
    AC_ARG_WITH([$1], [AS_HELP_STRING([--with-$1=DIR],
     [Set the directory for $2 (default=$3)])],
-    [], [withval=$4])
+    [autoconf_val='"'$withval'"'], [withval=$4;autoconf_val='$5'])
    if test "$enable_file_areas" != "no" ; then
-     AC_SUBST($5,[$withval])
-     AC_DEFINE_UNQUOTED($5, ["$withval"], [$6])
+     AC_SUBST($6,[$withval])
+     AC_DEFINE_UNQUOTED($6, [$autoconf_val], [$7])
      AC_MSG_RESULT([$withval])
    else
-     # set default values if FILE_AREAS is not defined
-     AC_SUBST($5,[$4])
-     AC_MSG_RESULT([default value: $3])
+     # set default value if FILE_AREAS is not defined
+     if test "$6" != "FILE_AREA_SAVE" ; then
+       tmp_installdir=[${datadir}/unnethack]
+     else
+       tmp_installdir=[${datadir}/unnethack/save]
+     fi
+     AC_SUBST($6,[${tmp_installdir}])
+     AC_MSG_RESULT([default value: ${tmp_installdir}])
    fi
   ])
 
+# set doc directory manually
+if test "$enable_file_areas" != "no" ; then
+  AC_SUBST(FILE_AREA_DOC,[${docdir}/unnethack])
+  AC_DEFINE_UNQUOTED(FILE_AREA_DOC, [AUTOCONF_DOCDIR"/unnethack"],
+    [Location of human-readable documentation])
+else
+  # ignore ${docdir} if FILE_AREAS is not defined
+  AC_SUBST(FILE_AREA_DOC,[${datadir}/unnethack])
+fi
+
 NETHACK_DIR_SET(gamesdir, gamesdir, [LOCALSTATEDIR/unnethack],
 		[${localstatedir}/unnethack],
+		[AUTOCONF_LOCALSTATEDIR"/unnethack"],
 		FILE_AREA_VAR, [Location of other files which may be modified])
 
 NETHACK_DIR_SET(bonesdir, bones, [GAMESDIR/bones],
 		[${FILE_AREA_VAR}/bones],
+		[FILE_AREA_VAR"/bones"],
 		FILE_AREA_BONES, [Location of bones files (r/w)])
 
 NETHACK_DIR_SET(savesdir, saves, [GAMESDIR/saves],
 		[${FILE_AREA_VAR}/saves],
+		[FILE_AREA_VAR"/saves"],
 		FILE_AREA_SAVE, [Location of save files (r/w)])
 
 NETHACK_DIR_SET(leveldir, level, [GAMESDIR/level],
 		[${FILE_AREA_VAR}/level],
+		[FILE_AREA_VAR"/level"],
 		FILE_AREA_LEVL, [Location of level files (r/w)])
 
-NETHACK_DIR_SET(sharedir, share, [GAMESDIR],
-		[${FILE_AREA_VAR}],
+NETHACK_DIR_SET(sharedir, share, [DATADIR/unnethack],
+		[${datadir}/unnethack],
+		[AUTOCONF_DATADIR"/unnethack"],
 		FILE_AREA_SHARE, [For read-only, architechure independent, files])
 
-NETHACK_DIR_SET(unsharedir, unshare, [GAMESDIR],
-		[${FILE_AREA_VAR}],
+NETHACK_DIR_SET(unsharedir, unshare, [DATADIR/unnethack],
+		[${datadir}/unnethack],
+		[AUTOCONF_DATADIR"/unnethack"],
 		FILE_AREA_UNSHARE, [For read-only, architechure dependent, files])
-
-AC_DEFINE_UNQUOTED(FILE_AREA_DOC, ["$docdir"], [Location of human-readable documentation])
 
 
 NETHACK_LINKS=
