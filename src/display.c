@@ -1450,7 +1450,10 @@ dump_screen()
     int lastc = -1;
     /* D: botl.c has a closer approximation to the size, but we'll go with
      *    this */
-    char buf[COLNO*100], html_buf[COLNO*100], html_c[BUFSZ], tmpbuf[100], *ptr;
+    /* Longest monster name:    guardian naga hatchling
+     * Longest dungeon feature: altar to Amaterasu Omikami (lawful) */
+#define BUFSIZE_PER_SQUARE 200
+    char buf[COLNO*BUFSIZE_PER_SQUARE], html_buf[COLNO*BUFSIZE_PER_SQUARE], html_c[BUFSZ], tmpbuf[BUFSIZE_PER_SQUARE], *ptr;
     int ch, glyph, oclass;
     int color;
     unsigned special;
@@ -1537,6 +1540,10 @@ dump_screen()
 			Sprintf(tmpbuf, "<span class=\"nh_color_%d\">%s</span>", color, html_c);
 		}
 	    }
+	    /* Warning in case there's no crash */
+	    if (strlen(tmpbuf) > BUFSIZE_PER_SQUARE) {
+		warning("tmpbuf > %d: %d, %s", BUFSIZE_PER_SQUARE, strlen(tmpbuf), tmpbuf);
+	    }
 	    /* HTML map */
 	    Strcat(html_buf, tmpbuf);
 
@@ -1560,6 +1567,7 @@ dump_screen()
     dump_html("</pre>\n", "");
     dump("", "");
     dump("", "");
+#undef BUFSIZE_PER_SQUARE
 }
 #endif /* DUMP_LOG */
 
