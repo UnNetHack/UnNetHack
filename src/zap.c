@@ -2298,6 +2298,10 @@ boolean			youattack, allow_cancel_kill, self_cancel;
 				"Some writing vanishes from %s head!";
 	static const char your[] = "your";	/* should be extern */
 
+	if (youdefend)
+	    You(!Hallucination? "are covered in sparkling lights!"
+			      : "are enveloped by psychedelic fireworks!");
+
 	if (youdefend ? (!youattack && Antimagic)
 		      : resist(mdef, obj->oclass, 0, NOTELL))
 		return FALSE;	/* resisted cancellation */
