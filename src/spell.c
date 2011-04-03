@@ -352,8 +352,14 @@ learn()
 			    book->spestudied++;
 			    exercise(A_WIS,TRUE);       /* extra study */
 			} else { /* 1000 < spellknow(i) <= MAX_SPELL_STUDY */
-			    You("know %s quite well already.", splname);
-			    costly = FALSE;
+				You("know %s quite well already.", splname);
+				if (yn("Do you want to read the book anyway?") == 'y') {
+					You("refresh your knowledge of %s.", splname);
+					incrnknow(i);
+					book->spestudied++;
+				} else {
+					costly = FALSE;
+				}
 			}
 			/* make book become known even when spell is already
 			   known, in case amnesia made you forget the book */
