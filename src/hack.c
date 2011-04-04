@@ -1002,8 +1002,14 @@ int mode;
 	if ((t && t->tseen) ||
 	    (!Levitation && !Flying &&
 	     !is_clinger(youmonst.data) &&
-	     (is_pool(x, y) || is_lava(x, y)) && levl[x][y].seenv))
+	     (is_pool(x, y) || is_lava(x, y)) && levl[x][y].seenv)) {
+	    if (mode == DO_MOVE) {
+	        if (t && t->tseen) autoexplore_msg("a trap", mode);
+	        else if (is_pool(x, y)) autoexplore_msg("a body of water", mode);
+	        else if (is_lava(x, y)) autoexplore_msg("a pool of lava", mode);
+	    }
 	    return mode == TEST_TRAP;
+	}
     }
 
     if (mode == TEST_TRAP) return FALSE; /* not a move through a trap */
@@ -1182,31 +1188,35 @@ boolean (*guess)(int, int);
                             }
 			    continue;
 			}
+			if (test_move(x, y, nx-x, ny-y, TEST_TRAP))
+				goto release_travel_hold;
 		    }
-		    if (test_move(x, y, nx-x, ny-y, TEST_TRAV) &&
-			(levl[nx][ny].seenv || (!Blind && couldsee(nx, ny)))) {
-			if (nx == ux && ny == uy) {
-			    if (!guess) {
-				u.dx = x-ux;
-				u.dy = y-uy;
-				if (x == u.tx && y == u.ty) {
-				    nomul(0, 0);
-				    /* reset run so domove run checks work */
-				    flags.run = 8;
-				    iflags.travelcc.x = iflags.travelcc.y = -1;
-				}
-				return TRUE;
+		    if (test_move(x, y, nx-x, ny-y, TEST_TRAV)) {
+release_travel_hold:
+			    if (levl[nx][ny].seenv || (!Blind && couldsee(nx, ny))) {
+				    if (nx == ux && ny == uy) {
+					    if (!guess) {
+						    u.dx = x-ux;
+						    u.dy = y-uy;
+						    if (x == u.tx && y == u.ty) {
+							    nomul(0, 0);
+							    /* reset run so domove run checks work */
+							    flags.run = 8;
+							    iflags.travelcc.x = iflags.travelcc.y = -1;
+						    }
+						    return TRUE;
+					    }
+				    } else if (!travel[nx][ny]) {
+					    travelstepx[1-set][nn] = nx;
+					    travelstepy[1-set][nn] = ny;
+					    travel[nx][ny] = radius;
+					    nn++;
+				    }
 			    }
-			} else if (!travel[nx][ny]) {
-			    travelstepx[1-set][nn] = nx;
-			    travelstepy[1-set][nn] = ny;
-			    travel[nx][ny] = radius;
-			    nn++;
-			}
 		    }
 		}
 	    }
-	    
+
 	    n = nn;
 	    set = 1-set;
 	    radius++;
