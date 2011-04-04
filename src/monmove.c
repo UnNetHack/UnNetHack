@@ -269,7 +269,10 @@ int *inrange, *nearby, *scared;
 	}
 	*scared = (*nearby && (onscary(seescaryx, seescaryy, mtmp) ||
 			       (!mtmp->mpeaceful &&
-				    in_your_sanctuary(mtmp, 0, 0))));
+				    in_your_sanctuary(mtmp, 0, 0) &&
+				    /* don't warn due to fleeing monsters about
+				     * the right temple on Astral */
+				    !Is_astralevel(&u.uz))));
 
 	if(*scared) {
 		if (rn2(7))
