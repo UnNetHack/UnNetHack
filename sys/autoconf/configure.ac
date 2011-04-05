@@ -31,10 +31,9 @@ NETHACK_WIN_ENABLE(dummy, no, [dummy graphics for unit tests])
 NETHACK_WIN_ENABLE(curses, no, [use curses interface])
 NETHACK_WIN_ENABLE(tty, auto)
 #NETHACK_WIN_ENABLE(x11, no)
-#NETHACK_WIN_ENABLE(mswin, no, [use Microsoft Window's native graphics])
+NETHACK_WIN_ENABLE(mswin, no, [use Microsoft Window's native graphics])
 dnl deactivate X11 and Win32 tiles version
 enable_x11_graphics="no"
-enable_mswin_graphics="no"
 
 dnl  ----- Figure out a C compiler to use; set @CC@
 AC_PROG_CC

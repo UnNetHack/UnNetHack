@@ -707,6 +707,7 @@ enable_option_checking
 enable_dummy_graphics
 enable_curses_graphics
 enable_tty_graphics
+enable_mswin_graphics
 with_compression
 enable_data_librarian
 enable_sinks
@@ -1390,6 +1391,7 @@ Optional Features:
   --enable-curses-graphics
                           use curses interface (default=no)
   --enable-tty-graphics   use tty-graphics (default=auto)
+  --enable-mswin-graphics use Microsoft Window's native graphics (default=no)
   --enable-data-librarian Data librarian (default=auto)
   --enable-sinks          Kitchen sinks (default=yes)
   --enable-wallified-maze Fancy mazes (default=yes)
@@ -2677,9 +2679,17 @@ fi
     nethack_wins="tty $nethack_wins"
   fi
 #NETHACK_WIN_ENABLE(x11, no)
-#NETHACK_WIN_ENABLE(mswin, no, [use Microsoft Window's native graphics])
+# Check whether --enable-mswin-graphics was given.
+if test "${enable_mswin_graphics+set}" = set; then :
+  enableval=$enable_mswin_graphics; enable_mswin_graphics="$enableval"
+else
+  enable_mswin_graphics="no"
+fi
+
+  if test "$enable_mswin_graphics" != "no"; then
+    nethack_wins="mswin $nethack_wins"
+  fi
 enable_x11_graphics="no"
-enable_mswin_graphics="no"
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
