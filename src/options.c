@@ -1343,6 +1343,7 @@ char *str;
 	err = errbuf;
     }
 #else
+    re_syntax_options = RE_SYNTAX_POSIX_EXTENDED;
     tmp->match.translate = 0;
     tmp->match.fastmap = 0;
     tmp->match.buffer = 0;
