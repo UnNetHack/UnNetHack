@@ -120,7 +120,7 @@ char *str;
 int *color, *attr;
 {
     struct menucoloring *tmpmc;
-    if (iflags.use_menu_color)
+    if (iflags.use_menu_color && iflags.use_color)
 	for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
 # ifdef MENU_COLOR_REGEX
 #  ifdef MENU_COLOR_REGEX_POSIX
@@ -876,6 +876,7 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 #ifdef MENU_COLOR
 			if (iflags.use_menu_color &&
+			    iflags.use_color &&
 			    (menucolr = get_menu_coloring(item->str, &color,&attr))) {
 			    /* TODO: use attr too */
 			    if (color != NO_COLOR)

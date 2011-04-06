@@ -1202,7 +1202,7 @@ const char *str;
 int *color, *attr;
 {
     struct menucoloring *tmpmc;
-    if (iflags.use_menu_color)
+    if (iflags.use_menu_color && iflags.use_color)
 	for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
 # ifdef MENU_COLOR_REGEX
 #  ifdef MENU_COLOR_REGEX_POSIX
@@ -1317,7 +1317,7 @@ struct WinDesc *cw;
 		     * this.
 		     */
 #ifdef MENU_COLOR
-		   if (iflags.use_menu_color &&
+		   if (iflags.use_menu_color && iflags.use_color &&
 		       (menucolr = get_menu_coloring(curr->str, &color,&attr))) {
 		       term_start_attr(attr);
 		       if (color != NO_COLOR) term_start_color(color);
@@ -1341,7 +1341,7 @@ struct WinDesc *cw;
 			} else
 			    (void) putchar(*cp);
 #ifdef MENU_COLOR
-		   if (iflags.use_menu_color && menucolr) {
+		   if (iflags.use_menu_color && iflags.use_color && menucolr) {
 		       if (color != NO_COLOR) term_end_color();
 		       term_end_attr(attr);
 		   } else

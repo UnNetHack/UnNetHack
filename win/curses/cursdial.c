@@ -1099,7 +1099,8 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
             }
         }
 #ifdef MENU_COLOR
-		if (iflags.use_menu_color && (menu_color = get_menu_coloring
+		if (iflags.use_menu_color && iflags.use_color &&
+		    (menu_color = get_menu_coloring
 		 ((char *)menu_item_ptr->str, &color, &attr)))
 		{
 		    if (color != NO_COLOR)
@@ -1562,7 +1563,7 @@ static void menu_clear_selections(nhmenu *menu)
 static boolean get_menu_coloring(char *str, int *color, int *attr)
 {
     struct menucoloring *tmpmc;
-    if (iflags.use_menu_color)
+    if (iflags.use_menu_color && iflags.use_color)
 	for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
 # ifdef MENU_COLOR_REGEX
 #  ifdef MENU_COLOR_REGEX_POSIX

@@ -90,7 +90,7 @@ struct color_option color_option;
 const char *newbot2;
 int statusline; /* apply color on this statusline: 1 or 2 */
 {
-	if (!iflags.use_status_colors) return;
+	if (!iflags.use_status_colors || !iflags.use_color) return;
 	curs(WIN_STATUS, 1, statusline-1);
 	start_color_option(color_option);
 	putstr(WIN_STATUS, 0, newbot2);
