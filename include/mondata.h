@@ -206,7 +206,7 @@
 
 /* For vampires */
 #define has_blood(ptr)		(!vegetarian(ptr) && \
-				   (ptr)->mlet != S_GOLEM && \
+				   ((ptr)->mlet != S_GOLEM || (ptr) == &mons[PM_FLESH_GOLEM]) && \
 				   (!is_undead(ptr) || is_vampire(ptr)))
 
 #define befriend_with_obj(ptr, obj) ((obj)->oclass == FOOD_CLASS && \
