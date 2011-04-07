@@ -12,6 +12,9 @@
 /* Blackmarket */
 #undef BLACKMARKET
 
+/* Multiple bones per level */
+#undef BONES_POOL
+
 /* A BSD like system */
 #undef BSD
 

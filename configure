@@ -725,6 +725,7 @@ enable_menu_color
 enable_status_color
 enable_auto_open
 enable_elbereth
+enable_bones_pool
 enable_user_sounds
 enable_exp_on_botl
 enable_score_on_botl
@@ -1409,6 +1410,7 @@ Optional Features:
   --enable-status-color   TTY graphics status color (default=yes)
   --enable-auto-open      Open doors by walking into them (default=yes)
   --enable-elbereth       Engraving the E-word repels monsters (default=yes)
+  --enable-bones-pool     Multiple bones per level (default=yes)
   --enable-user-sounds    Allow user-defined mapping from messages to sounds)
                           (default=no)
   --enable-exp-on-botl    Show experience on bottom line (default=yes)
@@ -6382,6 +6384,27 @@ _ACEOF
 # NETHACK_ARG(noartifactwish,[Prevent wishing for special artifacts],
 #  NOARTIFACTWISH,no)
 # NETHACK_ARG(no-bones,[Disable loading and saving bones levels],NO_BONES,no)
+if test $host_os != mingw32; then
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable bones-pool" >&5
+$as_echo_n "checking whether to enable bones-pool... " >&6; }
+   # Check whether --enable-bones-pool was given.
+if test "${enable_bones_pool+set}" = set; then :
+  enableval=$enable_bones_pool;
+else
+  enable_bones_pool="yes"
+fi
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_bones_pool" >&5
+$as_echo "$enable_bones_pool" >&6; }
+   if test "$enable_bones_pool" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define BONES_POOL /**/
+_ACEOF
+
+   fi
+
+fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable user-sounds" >&5
 $as_echo_n "checking whether to enable user-sounds... " >&6; }
    # Check whether --enable-user-sounds was given.
