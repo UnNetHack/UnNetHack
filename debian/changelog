@@ -1,0 +1,11 @@
+unnethack (3.5.3-0ubuntu3) maverick; urgency=low
+
+  * Fixed build.
+
+ -- Patric Mueller <bhaak@gmx.net>  Sun, 10 Apr 2011 10:54:31 +0200
+
+unnethack (3.5.3-0ubuntu1) maverick; urgency=low
+
+  * Initial release.
+
+ -- Benjamin Rubin <bnrubin@ubuntu.com>  Thu, 11 Nov 2010 18:06:45 -0500
