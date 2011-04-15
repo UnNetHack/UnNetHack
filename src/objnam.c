@@ -4,9 +4,8 @@
 
 #include "hack.h"
 
-/* the following may be obsolete with dump_ID patch */
-/* "an uncursed greased partly eaten guardian naga hatchling [corpse]" */
-#define PREFIX	80	/* (56) */
+/* "an [uncursed] greased [very rotten] partly eaten guardian naga hatchling (corpse)" */
+#define PREFIX	80	/* (73) */
 #define SCHAR_LIM 127
 #define NUMOBUF 12
 
@@ -634,8 +633,7 @@ boolean with_price;
 		if (do_dknown || do_known) {
 				Sprintf(eos(bp), " [%s]", tmp);
 		}
-		/* if the object is already known as an artifact, don't bother identifying 
-		   the object type */
+		; /* if already known as an artifact, don't bother showing the base type */
 	}
 	else if (obj->otyp == EGG && obj->corpsenm >= LOW_PM &&
 		   !(obj->known || mvitals[obj->corpsenm].mvflags & MV_KNOWS_EGG))
@@ -651,7 +649,22 @@ boolean with_price;
 			Strcpy(cp, OBJ_NAME(objects[obj->otyp]));
 		}
 
-		/* hideous post-processing: try to merge the ID and appearance naturally */
+		/* Hideous post-processing: try to merge the ID and appearance naturally
+		   The cases are significant, to avoid matching fruit names.
+		   General rules, barring bugs:
+		     thing of foo [thing of actual] -> thing of foo [of actual]
+		       (no such objects)
+		     foo thing [thing of actual] -> foo thing [of actual]
+		       eg. square amulet [of strangulation]
+		     thing of foo [actual thing] -> thing of foo [of actual]
+		       eg. scroll labeled DUAM XNAHT [of amnesia]
+		     foo thing [actual thing] -> foo thing [actual]
+		       eg. mud boots [speed boots]
+		     thing [thing of actual] -> thing [of actual]
+		       eg. bag [of holding]
+		     thing [actual thing] -> [actual] thing
+		       eg. [wax] candle
+		*/
 		switch(obj->oclass) {
 			case COIN_CLASS:
 				*cp = '\0';
@@ -678,23 +691,36 @@ boolean with_price;
 					else if (strstr(cp, "cloak of ")) cp += sizeof("cloak"); /* other */
 				}
 				else if (obj->otyp == LEATHER_GLOVES) Strcpy(cp, "leather");
-				else if ((tmp = strstr(cp, " gloves"))) *tmp = '\0'; /* leather */
+				else if ((tmp = strstr(cp, " gloves"))) *tmp = '\0'; /* other */
 				else if ((tmp = strstr(cp, " boots"))) *tmp = '\0';
+				/* else if((tmp = strstr(cp, " boots"))) {
+					*tmp = '\0';
+					memmove(cp + 3, cp, strlen(cp) + 1);
+					strncpy(cp, "of ", 3);
+				} foo boots [actual boots] -> foo boots [of actual] */
 				else if ((tmp = strstr(cp, " shoes"))) *tmp = '\0'; /* iron */
 				else if (strstr(cp, "helm of ")) cp += sizeof("helm");
 				else if (strstr(cp, "shield of ")) cp += sizeof("shield"); /* of reflection */
 				else if ((tmp = strstr(cp, " shield"))) *tmp = '\0';
-				else if ((tmp = strstr(cp, "ring mail"))) *tmp = '\0'; /* orcish */
-				else if ((tmp = strstr(cp, "chain mail"))) *tmp = '\0'; /* orcish */
+				else if ((tmp = strstr(cp, " ring mail"))) *tmp = '\0'; /* orcish */
+				else if ((tmp = strstr(cp, " chain mail"))) *tmp = '\0'; /* orcish */
 				break;
 			case TOOL_CLASS:
-				if ((tmp = strstr(cp, " candle"))) *tmp = '\0';
-				else if ((tmp = strstr(cp, " whistle"))) *tmp = '\0';
-				else if ((tmp = strstr(cp, " lamp"))) *tmp = '\0';
-				else if ((tmp = strstr(cp, " flute"))) *tmp = '\0';
-				else if ((tmp = strstr(cp, " horn"))) *tmp = '\0';
+				/* thing [actual thing] -> [actual] thing */
+				if ((tmp = strstr(cp, " candle")) ||
+				    (tmp = strstr(cp, " horn")) ||
+				    (tmp = strstr(cp, " lamp")) ||
+				    (tmp = strstr(cp, " flute")) ||
+				    (tmp = strstr(cp, " harp")) ||
+				    (tmp = strstr(cp, " whistle"))) {
+					*tmp = '\0';
+					memmove(cp + 1, cp, strlen(cp) + 1);
+					*cp = '[';
+					Strcat(cp, "] ");
+					bp = strprepend(bp, cp);
+					*cp = '\0';
+				}
 				else if (strstr(cp, "horn of ")) cp += sizeof("horn"); /* of plenty */
-				else if ((tmp = strstr(cp, " harp"))) *tmp = '\0';
 				else if (obj->otyp == LEATHER_DRUM) Strcpy(cp, "leather");
 				else if (obj->otyp == DRUM_OF_EARTHQUAKE) Strcpy(cp, "of earthquake");
 				else if ((tmp = strstr(cp, "bag of "))) cp += sizeof("bag");
@@ -703,6 +729,7 @@ boolean with_price;
 				if (strstr(cp, "worthless piece")) Strcpy(cp, "worthless glass");
 				break;
 			case VENOM_CLASS:
+				/* technically, this doesn't follow the rules... if anyone cares. */
 				if ((tmp = strstr(cp, " venom"))) *tmp = '\0';
 				break;
 		}
@@ -850,12 +877,17 @@ plus:
 		if(objects[obj->otyp].oc_charged)
 		    goto charges;
 		break;
+	case SPBOOK_CLASS:
+#define MAX_SPELL_STUDY 3 /* spell.c */
+		if(dump_ID_flag && obj->spestudied > MAX_SPELL_STUDY / 2)
+			Strcat(prefix, "[faint] ");
+		break;
 	case WAND_CLASS:
 		add_erosion_words(obj, prefix, dump_ID_flag);
 charges:
 		if (obj->known || do_known) {
-		    Sprintf(eos(bp), " %s%d:%d%s", do_known ? "[" : "(",
-		      (int)obj->recharged, obj->spe, do_known ? "]" : ")");
+		    Sprintf(eos(bp), " %s%d:%d%s", do_known ? "[(" : "(",
+		      (int)obj->recharged, obj->spe, do_known ? ")]" : ")");
 		}
 		break;
 	case POTION_CLASS:
@@ -877,6 +909,15 @@ ring:
 		}
 		break;
 	case FOOD_CLASS:
+		/* eat.c: edibility_prompts() */
+		if (dump_ID_flag && obj->otyp == CORPSE && obj->corpsenm != PM_ACID_BLOB &&
+			obj->corpsenm != PM_LIZARD && obj->corpsenm != PM_LICHEN) {
+			long age = monstermoves - peek_at_iced_corpse_age(obj);
+			long bucmod = obj->cursed? 2 : obj->blessed? -2 : 0;
+			long mayberot = age / 10L + bucmod, surerot = age / 29L + bucmod;
+			if (surerot > 5L) Strcat(prefix, "[very rotten] ");
+			else if (mayberot > 5L) Strcat(prefix, "[rotten] ");
+		}
 		if (obj->otyp == CORPSE && obj->odrained) {
 #ifdef WIZARD
 		    if (wizard && obj->oeaten < drainlevel(obj))
@@ -903,10 +944,8 @@ ring:
 			Strcat(prefix, " ");
 		    }
 		} else if (obj->otyp == EGG) {
-#if 0	/* corpses don't tell if they're stale either */
-		    if (obj->known && stale_egg(obj))
-			Strcat(prefix, "stale ");
-#endif
+		    if (dump_ID_flag && stale_egg(obj))
+			Strcat(prefix, "[stale] ");
 		    if (obj->corpsenm >= LOW_PM &&
 			    (obj->known ||
 			    mvitals[obj->corpsenm].mvflags & MV_KNOWS_EGG)) {
@@ -973,14 +1012,26 @@ ring:
 		Strcpy(prefix+3, tmpbuf+2);
 	}
 	/* merge bracketed attribs
-	   eg. [rustproof] [+1] -> [rustproof +1]
-	   don't do this for bp because the only possible case is
-	   IDed-name next to charges, which we want to keep separate */
-	while ((tmp = strstr(prefix, "] ["))) {
+	   eg. [rustproof] [+1] -> [rustproof +1] */
+	tmp = prefix;
+	while ((tmp = strstr(tmp, "] ["))) {
 		*tmp = ' ';
 		memmove(tmp + 1, tmp + 3, strlen(tmp + 3) + 1);
 	}
 	bp = strprepend(bp, prefix);
+	if (obj->otyp != SLIME_MOLD) {
+		tmp = bp;
+		while ((tmp = strstr(tmp, "] ["))) {
+			*tmp = ' ';
+			memmove(tmp + 1, tmp + 3, strlen(tmp + 3) + 1);
+		}
+		/* turn [(n:n)] wand charges into [n:n] */
+		if ((tmp = strstr(bp, "[("))) {
+			char *tmp2 = strstr(tmp, ")]");
+			memmove(tmp2, tmp2 + 1, strlen(tmp2 + 1) + 1);
+			memmove(tmp + 1, tmp + 2, strlen(tmp + 2) + 1);
+		}
+	}
 	return(bp);
 }
 
