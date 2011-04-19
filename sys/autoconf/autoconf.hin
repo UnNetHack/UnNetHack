@@ -3,7 +3,7 @@
 #ifndef AUTOCONF_H
 #define AUTOCONF_H
 
-/* Exceptions to autopickup (experimental) */
+/* Exceptions to autopickup */
 #undef AUTOPICKUP_EXCEPTIONS
 
 /* Open doors by walking into them */

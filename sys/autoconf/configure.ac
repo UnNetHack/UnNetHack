@@ -439,8 +439,8 @@ NETHACK_ARG(dungeon-growth,[Dungeon growth],DUNGEON_GROWTH,yes)
 #NETHACK_ARG(shout,[Shouting and pet commands (not implemented)],SHOUT,no)
 # NETHACK_ARG(display-layers,[Support transparent tilesets],DISPLAY_LAYERS,yes)
 NETHACK_ARG(goldobj,[Gold is kept on object chains (experimental)],GOLDOBJ,no)
-NETHACK_ARG(autopickup-exceptions,[Exceptions to autopickup (experimental)],
-  AUTOPICKUP_EXCEPTIONS,no)
+NETHACK_ARG(autopickup-exceptions,[Exceptions to autopickup],
+  AUTOPICKUP_EXCEPTIONS,yes)
 NETHACK_ARG(qwertz,[QWERTZ keyboard layout support],QWERTZ,yes)
 NETHACK_ARG(simple-mail,[simple mail dgamelaunch support],SIMPLE_MAIL,no)
 
