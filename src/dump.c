@@ -265,8 +265,21 @@ struct obj *obj;
 #ifdef DUMP_LOG
 	if (dump_fp)
 		fprintf(dump_fp, "  %s\n", doname(obj));
-	if (html_dump_fp)
-		fprintf(html_dump_fp, "<li>%s</li>\n", html_link(dump_typename(obj->otyp), doname(obj)));
+	if (html_dump_fp) {
+		const char* str = doname(obj);
+		char *link = html_link(dump_typename(obj->otyp), str);
+#ifdef MENU_COLOR
+# ifdef TTY_GRAPHICS
+		int color;
+		int attr;
+		if (iflags.use_menu_color &&
+		    get_menu_coloring(str, &color, &attr)) {
+			fprintf(html_dump_fp, "<li class=\"nh_color_%d\">%s</li>\n", color, link);
+		} else
+# endif
+#endif
+		fprintf(html_dump_fp, "<li>%s</li>\n", link);
+	}
 #endif
 }
 
