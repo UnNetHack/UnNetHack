@@ -1511,7 +1511,7 @@ dump_screen()
 	    else if (oclass < 0 && levl[x][y].typ == CORR)
 		Sprintf(tmpbuf, "<span class=\"nh_corridor\">%s</span>", html_c);
 	    else if (oclass < 0 && levl[x][y].typ == STAIRS)
-		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_stairs\">%s</span>", dfeature, html_c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_color_%d\">%s</span>", dfeature, color, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == LADDER)
 		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_ladder\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == FOUNTAIN)

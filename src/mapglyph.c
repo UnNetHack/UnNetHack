@@ -130,6 +130,10 @@ unsigned *ospecial;
 	    if (iflags.use_color &&
 		offset == S_litcorr && ch == showsyms[S_corr])
 		color = CLR_WHITE;
+	    else if (iflags.use_color &&
+		     (offset == S_upstair || offset == S_dnstair) &&
+		     (x == sstairs.sx && y == sstairs.sy))
+		color = CLR_YELLOW;
 	    else
 #endif
 	    cmap_color(offset);
