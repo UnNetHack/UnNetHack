@@ -487,6 +487,7 @@ ALTAR:(24,07),noalign,sanctum
 REGION:(22,12,25,16),unlit,"morgue"
 REGION:(32,09,37,12),lit,"shop"
 REGION:(12,00,15,04),lit,"shop"
+REGION:(02,14,05,16),lit,"candle shop"
 # Doors
 DOOR:closed,(23,02)
 DOOR:open,(31,03)
@@ -613,7 +614,6 @@ DOOR:random,(30,16)
 DOOR:random,(14,16)
 DOOR:closed,(11,14)
 DOOR:random,(03,16)
-DOOR:random,(05,05)
 DOOR:random,(05,03)
 DOOR:locked,(11,04)
 DOOR:nodoor,(26,04)
@@ -630,6 +630,8 @@ REGION:(56,01,65,07),unlit,"morgue"
 REGION:(01,14,05,15),unlit,"shop"
 REGION:(39,01,43,02),unlit,"shop"
 REGION:(18,03,25,05),unlit,"temple"
+REGION:(02,05,03,07),lit,"candle shop",filled,true
+DOOR:random,(05,05)
 ALTAR:(20,04),noncoaligned,altar
 OBJECT:('%',"corpse"),(23,03),montype:"priest",0
 # Some traps.
