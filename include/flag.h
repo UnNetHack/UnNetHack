@@ -278,6 +278,9 @@ struct instance_flags {
 	boolean paranoid_quit;	/* Ask for 'yes' when quitting */
 	boolean paranoid_remove; /* Always show menu for 'T' and 'R' */
 	boolean paranoid_trap; /* Ask for 'yes' before walking into known traps */
+#ifdef QUIVER_FIRED
+	boolean quiver_fired;	/* quiver with f command */
+#endif
 /*
  * Window capability support.
  */

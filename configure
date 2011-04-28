@@ -745,6 +745,7 @@ enable_sortloot
 enable_dungeon_growth
 enable_goldobj
 enable_autopickup_exceptions
+enable_quiver_fired
 enable_qwertz
 enable_simple_mail
 enable_xlogfile
@@ -1447,6 +1448,8 @@ Optional Features:
                           (default=no)
   --enable-autopickup-exceptions
                           Exceptions to autopickup (default=yes)
+  --enable-quiver-fired   Firing without anything quivered will ask you what
+                          to quiver (default=yes)
   --enable-qwertz         QWERTZ keyboard layout support (default=yes)
   --enable-simple-mail    simple mail dgamelaunch support (default=no)
   --enable-xlogfile=FILE  More verbose logfile (default=yes, default
@@ -6661,6 +6664,25 @@ $as_echo "$enable_autopickup_exceptions" >&6; }
 
 cat >>confdefs.h <<_ACEOF
 #define AUTOPICKUP_EXCEPTIONS /**/
+_ACEOF
+
+   fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable quiver-fired" >&5
+$as_echo_n "checking whether to enable quiver-fired... " >&6; }
+   # Check whether --enable-quiver-fired was given.
+if test "${enable_quiver_fired+set}" = set; then :
+  enableval=$enable_quiver_fired;
+else
+  enable_quiver_fired="yes"
+fi
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_quiver_fired" >&5
+$as_echo "$enable_quiver_fired" >&6; }
+   if test "$enable_quiver_fired" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define QUIVER_FIRED /**/
 _ACEOF
 
    fi

@@ -215,6 +215,9 @@
 /* Compare High Score entries by user id instead of user name */
 #undef PERS_IS_UID
 
+/* Firing without anything quivered will ask you what to quiver */
+#undef QUIVER_FIRED
+
 /* QWERTZ keyboard layout support */
 #undef QWERTZ
 
