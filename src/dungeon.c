@@ -9,6 +9,7 @@
 
 #ifdef OVL1
 
+#define DUNGEON_AREA    FILE_AREA_UNSHARE
 #define DUNGEON_FILE	"dungeon"
 
 #define X_START		"x-strt"
@@ -744,7 +745,7 @@ init_dungeons()		/* initialize the "dungeon" structs */
 
 	pd.n_levs = pd.n_brs = 0;
 
-	dgn_file = dlb_fopen(DUNGEON_FILE, RDBMODE);
+	dgn_file = dlb_fopen_area(DUNGEON_AREA, DUNGEON_FILE, RDBMODE);
 	if (!dgn_file) {
 	    char tbuf[BUFSZ];
 	    Sprintf(tbuf, "Cannot open dungeon description - \"%s",

@@ -15,6 +15,7 @@
  * autoconf.h which should override the defaults set earlier in
  * config.h and *conf.h
  */
+#include "autoconf_paths.h"
 #include "autoconf.h"
 #if HAVE_STRING_H
 #include <string.h>

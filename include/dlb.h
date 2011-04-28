@@ -38,6 +38,10 @@ typedef struct dlb_library {
 /* library definitions */
 # ifndef DLBFILE
 #  define DLBFILE	"nhdat"			/* name of library */
+/*#  define DLBFILE	"nhshare"*/		/* shareable library */
+#  define DLBAREA	FILE_AREA_SHARE
+/*#  define DLBFILE2	"nhushare"*/		/* unshareable library */
+/*#  define DLBAREA2	FILE_AREA_UNSHARE*/
 # endif
 # ifndef FILENAME_CMP
 #  define FILENAME_CMP	strcmp			/* case sensitive */
@@ -71,7 +75,11 @@ typedef struct dlb_handle {
 boolean NDECL(dlb_init);
 void NDECL(dlb_cleanup);
 
+#ifndef FILE_AREAS
 dlb *FDECL(dlb_fopen, (const char *,const char *));
+#else
+dlb *FDECL(dlb_fopen_area, (const char *,const char *,const char *));
+#endif
 int FDECL(dlb_fclose, (DLB_P));
 int FDECL(dlb_fread, (char *,int,int,DLB_P));
 int FDECL(dlb_fseek, (DLB_P,long,int));
@@ -108,6 +116,10 @@ long FDECL(dlb_ftell, (DLB_P));
 # define dlb_fgets	fgets
 # define dlb_fgetc	fgetc
 # define dlb_ftell	ftell
+
+# ifdef FILE_AREAS
+#  define dlb_fopen_area(area, name, mode)	fopen_datafile_area(area, name, mode, DATAPREFIX)
+# endif
 
 #endif /* DLB */
 

@@ -31,7 +31,16 @@ typedef struct dlb_procs {
 } dlb_procs_t;
 
 /* without extern.h via hack.h, these haven't been declared for us */
+#ifdef FILE_AREAS
+extern FILE *FDECL(fopen_datafile_area, (const char *,const char *,
+                                                      const char *,int));
+#else
+/*
+ * If FILE_AREAS is not defined, then fopen_datafile_area
+ * is a macro defined in terms of fopen_datafile.
+ */
 extern FILE *FDECL(fopen_datafile, (const char *,const char *,int));
+#endif
 
 #ifdef DLBLIB
 /*
@@ -67,7 +76,7 @@ static int FDECL(lib_dlb_fgetc,(dlb *));
 static long FDECL(lib_dlb_ftell,(dlb *));
 
 /* not static because shared with dlb_main.c */
-boolean FDECL(open_library,(const char *lib_name, library *lp));
+boolean FDECL(open_library,(const char *lib_area, const char *lib_name, library *lp));
 void FDECL(close_library,(library *lp));
 
 /* without extern.h via hack.h, these haven't been declared for us */
@@ -195,13 +204,13 @@ find_file(name, lib, startp, sizep)
  * structure.  Return TRUE if successful, FALSE otherwise.
  */
 boolean
-open_library(lib_name, lp)
-    const char *lib_name;
+open_library(lib_area, lib_name, lp)
+    const char *lib_area, *lib_name;
     library *lp;
 {
     boolean status = FALSE;
 
-    lp->fdata = fopen_datafile(lib_name, RDBMODE, DATAPREFIX);
+    lp->fdata = fopen_datafile_area(lib_area, lib_name, RDBMODE, DATAPREFIX);
     if (lp->fdata) {
 	if (readlibdir(lp)) {
 	    status = TRUE;
@@ -235,9 +244,9 @@ lib_dlb_init()
     (void) memset((char *)&dlb_libs[0], 0, sizeof(dlb_libs));
 
     /* To open more than one library, add open library calls here. */
-    if (!open_library(DLBFILE, &dlb_libs[0])) return FALSE;
+    if (!open_library(DLBAREA, DLBFILE, &dlb_libs[0])) return FALSE;
 #ifdef DLBFILE2
-    if (!open_library(DLBFILE2, &dlb_libs[1]))  {
+    if (!open_library(DLBAREA2, DLBFILE2, &dlb_libs[1]))  {
 	close_library(&dlb_libs[0]);
 	return FALSE;
     }
@@ -451,8 +460,13 @@ dlb_cleanup()
 }
 
 dlb *
+#ifndef FILE_AREAS
 dlb_fopen(name, mode)
     const char *name, *mode;
+#else
+dlb_fopen_area(area, name, mode)
+    const char *area, *name, *mode;
+#endif
 {
     FILE *fp;
     dlb *dp;
@@ -462,7 +476,11 @@ dlb_fopen(name, mode)
     dp = (dlb *) alloc(sizeof(dlb));
     if (do_dlb_fopen(dp, name, mode))
     	dp->fp = (FILE *) 0;
+#ifndef FILE_AREAS
     else if ((fp = fopen_datafile(name, mode, DATAPREFIX)) != 0)
+#else
+    else if ((fp = fopen_datafile_area(area, name, mode, DATAPREFIX)) != 0)
+#endif
 	dp->fp = fp;
     else {
 	/* can't find anything */

@@ -5,6 +5,7 @@
 	* HTML dump: output IBMgraphics and DECgraphics characters
 	* HTML dump: fix crash if monster name is too long
 	* Multiple bones files per level (not on Win32)
+	* Autoconf compliant installation directory variables
 
 	* more candles:
 	  - lighting shop in orcus town

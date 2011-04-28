@@ -18,7 +18,20 @@ srcdir=@srcdir@
 # MAKE = make
 
 # make UnNetHack
+
 PREFIX   = @prefix@
+prefix   = @prefix@
+
+datarootdir = @datarootdir@
+datadir = @datadir@
+docdir = @docdir@
+dvidir = @dvidir@
+exec_prefix = @exec_prefix@
+libdir = @libdir@
+localstatedir = @localstatedir@
+mkdir_p = mkdir -p --
+bindir = @bindir@
+
 EXEEXT	 = @EXEEXT@
 SCRIPT   = unnethack
 GAME     = unnethack$(EXEEXT)
@@ -45,16 +58,16 @@ VARDIRPERM  = 0755
 # These must agree with the definitions in unixconf.h
 
 # Defs. for non file areas support.
-GAMEDIR  = $(PREFIX)/unnethackdir
-VARDIR = $(GAMEDIR)
-FILE_AREA_VAR = $(VARDIR)
-FILE_AREA_SAVE = $(VARDIR)/save
-FILE_AREA_SHARE = $(GAMEDIR)
-FILE_AREA_UNSHARE = $(GAMEDIR)
-FILE_AREA_DOC = $(GAMEDIR)
-FILE_AREA_BONES = $(FILE_AREA_VAR)
-FILE_AREA_LEVL = $(FILE_AREA_VAR)
-SHELLDIR = $(PREFIX)/bin
+GAMEDIR = @FILE_AREA_VAR@
+VARDIR = @FILE_AREA_VAR@
+FILE_AREA_VAR = @FILE_AREA_VAR@
+FILE_AREA_SAVE = @FILE_AREA_SAVE@
+FILE_AREA_SHARE = @FILE_AREA_SHARE@
+FILE_AREA_UNSHARE = @FILE_AREA_UNSHARE@
+FILE_AREA_DOC = @FILE_AREA_DOC@
+FILE_AREA_BONES = @FILE_AREA_BONES@
+FILE_AREA_LEVL = @FILE_AREA_LEVL@
+SHELLDIR = $(bindir)
 
 # Shareable (architecture independent) data files which are not candidates
 # for inclusion in DLB libraries (ND) and which are (D). Port specific files
@@ -123,7 +136,7 @@ SHARE_DAT = $(SHARE_DATNODLB) $(SHARE_DATDLB)
 UNSHARE_DAT = $(UNSHARE_DATNODLB) $(UNSHARE_DATDLB)
 
 
-$(GAME):
+$(GAME): include/autoconf_paths.h
 	( cd src ; $(MAKE) )
 
 all:	$(GAME) recover$(EXEEXT) @GUIDEBOOK@ $(CNF_SHARE_DAT) dungeon spec_levs check-dlb
@@ -289,6 +302,7 @@ update: $(GAME) recover$(EXEEXT) $(CNF_SHARE_DAT) dungeon spec_levs @GUIDEBOOK_T
 install: $(GAME) recover$(EXEEXT) $(CNF_SHARE_DAT) dungeon spec_levs @GUIDEBOOK_TXT@
 # set up the directories
 # not all mkdirs have -p; those that don't will create a -p directory
+	-mkdir -p $(DESTDIR)$(GAMEDIR) $(DESTDIR)$(VARDIR)
 	-mkdir -p $(DESTDIR)$(SHELLDIR)
 	-rm -rf $(DESTDIR)$(FILE_AREA_VAR) $(DESTDIR)$(FILE_AREA_BONES) $(DESTDIR)$(FILE_AREA_SAVE)
 	-rm -rf $(DESTDIR)$(FILE_AREA_LEVL) $(DESTDIR)$(FILE_AREA_SHARE) $(DESTDIR)$(FILE_AREA_UNSHARE)
@@ -306,7 +320,7 @@ install: $(GAME) recover$(EXEEXT) $(CNF_SHARE_DAT) dungeon spec_levs @GUIDEBOOK_
 # set up the game files
 	( $(MAKE) dofiles )
 # set up some additional files
-	touch $(DESTDIR)$(FILE_AREA_VAR)/perm $(DESTDIR)$(FILE_AREA_VAR)/record $(DESTDIR)$(FILE_AREA_VAR)/logfile $(DESTDIR)$(FILE_AREA_VAR)/@XLOGFILE@ $(DESTDIR)$(FILE_AREA_VAR)/@LIVELOGFILE@
+	-( cd $(DESTDIR)$(FILE_AREA_VAR) ; touch perm record logfile @XLOGFILE@ @LIVELOGFILE@ )
 	-( cd $(DESTDIR)$(FILE_AREA_VAR) ; $(CHOWN) $(GAMEUID) perm record logfile @XLOGFILE@ @LIVELOGFILE@ ; \
 			$(CHGRP) $(GAMEGRP) perm record logfile @XLOGFILE@ @LIVELOGFILE@ ; \
 			chmod $(VARFILEPERM) perm record logfile @XLOGFILE@ @LIVELOGFILE@ )
@@ -327,4 +341,15 @@ spotless:
 	( cd util ; $(MAKE) spotless )
 	( cd dat ; $(MAKE) spotless )
 	( cd doc ; $(MAKE) spotless )
-	-rm -f Makefile include/autoconf.h include/win32api.h
+	-rm -f Makefile include/autoconf.h include/autoconf_paths.h include/win32api.h
+
+include/autoconf_paths.h: Makefile
+	echo '#ifndef AUTOCONF_PATH_H'  >$@
+	echo '#undef AUTOCONF_PATH_H'  >>$@
+	echo '#define AUTOCONF_PATH_H' >>$@
+	echo '#define AUTOCONF_PREFIX  "$(prefix)"' >>$@
+	echo '#define AUTOCONF_LOCALSTATEDIR  "$(localstatedir)"' >>$@
+	echo '#define AUTOCONF_DATADIR "$(datadir)"' >>$@
+	echo '#define AUTOCONF_DATAROOTDIR "$(datarootdir)"' >>$@
+	echo '#define AUTOCONF_DOCDIR "$(docdir)"' >>$@
+	echo '#endif' >>$@

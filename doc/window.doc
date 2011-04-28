@@ -182,9 +182,17 @@ player_selection()
 		   player_selection() offers a Quit option, it is its
 		   responsibility to clean up and terminate the process.
 		   You need to fill in pl_character[0].
+#ifdef FILE_AREAS
+display_file(area, str, boolean complain)
+#else
 display_file(str, boolean complain)
+#endif
 		-- Display the file named str.  Complain about missing files
-		   iff complain is TRUE.
+		   iff complain is TRUE. If FILE_AREAS is defined then the
+		   file should be found in the named area. Note that vanilla
+		   does not define FILE_AREAS and therefore window ports
+		   defined in this way will be compatible with both Slash'EM
+		   and vanilla NetHack.
 update_inventory()
 		-- Indicate to the window port that the inventory has been
 		   changed.

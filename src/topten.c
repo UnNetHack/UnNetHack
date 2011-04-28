@@ -472,26 +472,34 @@ int how;
 #endif
 
 #ifdef LOGFILE		/* used for debugging (who dies of what, where) */
+#ifdef FILE_AREAS
+	if (lock_file_area(LOGAREA, LOGFILE, 10)) {
+#else
 	if (lock_file(LOGFILE, SCOREPREFIX, 10)) {
-	    if(!(lfile = fopen_datafile(LOGFILE, "a", SCOREPREFIX))) {
+#endif
+	    if(!(lfile = fopen_datafile_area(LOGAREA, LOGFILE, "a", SCOREPREFIX))) {
 		HUP raw_print("Cannot open log file!");
 	    } else {
 		writeentry(lfile, t0);
 		(void) fclose(lfile);
 	    }
-	    unlock_file(LOGFILE);
+	    unlock_file_area(LOGAREA, LOGFILE);
 	}
 #endif /* LOGFILE */
 
 #ifdef XLOGFILE
-	if(lock_file(XLOGFILE, SCOREPREFIX, 10)) {
-		if(!(xlfile = fopen_datafile(XLOGFILE, "a", SCOREPREFIX))) {
+#ifdef FILE_AREAS
+	if (lock_file_area(LOGAREA, XLOGFILE, 10)) {
+#else
+	if (lock_file(XLOGFILE, SCOREPREFIX, 10)) {
+#endif
+		if(!(xlfile = fopen_datafile_area(LOGAREA, XLOGFILE, "a", SCOREPREFIX))) {
 			HUP raw_print("Cannot open extended log file!");
 		} else {
 			write_xlentry(xlfile, t0);
 			(void) fclose(xlfile);
 		}
-		unlock_file(XLOGFILE);
+		unlock_file_area(LOGAREA, XLOGFILE);
 	}
 #endif /* XLOGFILE */
 
@@ -513,18 +521,22 @@ int how;
 	    goto showwin;
 	}
 
+#ifdef FILE_AREAS
+	if (!lock_file_area(NH_RECORD_AREA, RECORD, 60))
+#else
 	if (!lock_file(RECORD, SCOREPREFIX, 60))
+#endif
 		goto destroywin;
 
 #ifdef UPDATE_RECORD_IN_PLACE
-	rfile = fopen_datafile(RECORD, "r+", SCOREPREFIX);
+	rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "r+", SCOREPREFIX);
 #else
-	rfile = fopen_datafile(RECORD, "r", SCOREPREFIX);
+	rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "r", SCOREPREFIX);
 #endif
 
 	if (!rfile) {
 		HUP raw_print("Cannot open record file!");
-		unlock_file(RECORD);
+		unlock_file_area(NH_RECORD_AREA, RECORD);
 		goto destroywin;
 	}
 
@@ -603,9 +615,9 @@ int how;
 				     t0->fpos : final_fpos), SEEK_SET);
 #else
 		(void) fclose(rfile);
-		if(!(rfile = fopen_datafile(RECORD, "w", SCOREPREFIX))){
+		if(!(rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "w", SCOREPREFIX))){
 			HUP raw_print("Cannot write record file");
-			unlock_file(RECORD);
+			unlock_file_area(NH_RECORD_AREA, RECORD);
 			free_ttlist(tt_head);
 			goto destroywin;
 		}
@@ -701,7 +713,7 @@ int how;
 	}
 #endif	/* UPDATE_RECORD_IN_PLACE */
 	(void) fclose(rfile);
-	unlock_file(RECORD);
+	unlock_file_area(NH_RECORD_AREA, RECORD);
 	free_ttlist(tt_head);
 
   showwin:
@@ -1058,7 +1070,7 @@ char **argv;
 		return;
 	}
 
-	rfile = fopen_datafile(RECORD, "r", SCOREPREFIX);
+	rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "r", SCOREPREFIX);
 	if (!rfile) {
 		raw_print("Cannot open record file!");
 		return;
@@ -1216,7 +1228,7 @@ struct obj *otmp;
 
 	if (!otmp) return((struct obj *) 0);
 
-	rfile = fopen_datafile(RECORD, "r", SCOREPREFIX);
+	rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "r", SCOREPREFIX);
 	if (!rfile) {
 		impossible("Cannot open record file!");
 		return (struct obj *)0;

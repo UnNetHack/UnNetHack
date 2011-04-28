@@ -670,7 +670,9 @@ E void NDECL(makerogueghost);
 E char *FDECL(fname_encode, (const char *, CHAR_P, char *, char *, int));
 E char *FDECL(fname_decode, (CHAR_P, char *, char *, int));
 E const char *FDECL(fqname, (const char *, int, int));
+#ifndef FILE_AREAS
 E FILE *FDECL(fopen_datafile, (const char *,const char *,int));
+#endif
 E boolean FDECL(uptodate, (int,const char *));
 E void FDECL(store_version, (int));
 #ifdef MFLOPPY
@@ -702,8 +704,12 @@ E int NDECL(delete_savefile);
 E int NDECL(restore_saved_game);
 E void FDECL(compress, (const char *));
 E void FDECL(uncompress, (const char *));
+E void FDECL(compress_area, (const char *, const char *));
+E void FDECL(uncompress_area, (const char *, const char *));
+#ifndef FILE_AREAS
 E boolean FDECL(lock_file, (const char *,int,int));
 E void FDECL(unlock_file, (const char *));
+#endif
 #ifdef USER_SOUNDS
 E boolean FDECL(can_read_file, (const char *));
 #endif
@@ -2238,6 +2244,19 @@ E int NDECL(dosh);
 # if defined(SHELL) || defined(DEF_PAGER) || defined(DEF_MAILREADER)
 E int FDECL(child, (int));
 # endif
+#ifdef FILE_AREAS
+E char *FDECL(make_file_name, (const char *, const char *));
+E FILE *FDECL(fopen_datafile_area, (const char *,const char *,const char *,
+				BOOLEAN_P));
+E FILE *FDECL(freopen_area, (const char *,const char *,const char *, FILE *));
+E int FDECL(chmod_area, (const char *, const char *, int));
+E int FDECL(open_area, (const char *, const char *, int, int));
+E int FDECL(creat_area, (const char *, const char *, int));
+E boolean FDECL(lock_file_area, (const char *, const char *,int));
+E void FDECL(unlock_file_area, (const char *, const char *));
+E int FDECL(rename_area, (const char *, const char *, const char *));
+E int FDECL(remove_area, (const char *, const char *));
+#endif
 #endif /* UNIX */
 
 /* ### unixres.c ### */

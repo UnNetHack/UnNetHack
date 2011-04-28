@@ -411,7 +411,7 @@ char *argv[];
 #endif
 #ifdef NEWS
 		if(iflags.news){
-		    display_file(NEWS, FALSE);
+		    display_file_area(NEWS_AREA, NEWS, FALSE);
 		    iflags.news = FALSE;
 		}
 #endif

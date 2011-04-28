@@ -78,6 +78,30 @@
 /* Show experience on bottom line */
 #undef EXP_ON_BOTL
 
+/* Place files in different directories */
+#undef FILE_AREAS
+
+/* Location of bones files (r/w) */
+#undef FILE_AREA_BONES
+
+/* Location of human-readable documentation */
+#undef FILE_AREA_DOC
+
+/* Location of level files (r/w) */
+#undef FILE_AREA_LEVL
+
+/* Location of save files (r/w) */
+#undef FILE_AREA_SAVE
+
+/* For read-only, architechure independent, files */
+#undef FILE_AREA_SHARE
+
+/* For read-only, architechure dependent, files */
+#undef FILE_AREA_UNSHARE
+
+/* Location of other files which may be modified */
+#undef FILE_AREA_VAR
+
 /* Gold is kept on object chains (experimental) */
 #undef GOLDOBJ
 

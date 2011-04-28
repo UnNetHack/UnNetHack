@@ -182,7 +182,11 @@ E void FDECL(tty_dismiss_nhwindow, (winid));
 E void FDECL(tty_destroy_nhwindow, (winid));
 E void FDECL(tty_curs, (winid,int,int));
 E void FDECL(tty_putstr, (winid, int, const char *));
+#ifdef FILE_AREAS
+E void FDECL(tty_display_file, (const char *, const char *, BOOLEAN_P));
+#else
 E void FDECL(tty_display_file, (const char *, BOOLEAN_P));
+#endif
 E void FDECL(tty_start_menu, (winid));
 E void FDECL(tty_add_menu, (winid,int,const ANY_P *,
 			CHAR_P,CHAR_P,int,const char *, BOOLEAN_P));
