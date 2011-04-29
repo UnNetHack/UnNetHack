@@ -22,6 +22,7 @@
 	  - 'X' toggles twoweaponing, explore mode is on alt-x resp. #xplore
 	  - BUC items inside containers dropped on altars (from AceHack)
 	  - stairs leading to branches are colored yellow
+	  - inventory improvement: generic item usage menu (from AceHack)
 
 	* new dungeon features:
 	  - dead trees (from NetHack Brass)
