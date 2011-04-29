@@ -1976,13 +1976,13 @@ struct obj *obj;
 		add_menu(win, NO_GLYPH, &any, 'r', 0, ATR_NONE,
 				"Read the message inside this cookie", MENU_UNSELECTED);
 	else if (obj->otyp == T_SHIRT)
-		add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, &any, 'r', 0, ATR_NONE,
 				"Read the slogan on the shirt", MENU_UNSELECTED);
 	else if (obj->oclass == SCROLL_CLASS)
-		add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, &any, 'r', 0, ATR_NONE,
 				"Cast the spell on this scroll", MENU_UNSELECTED);
 	else if (obj->oclass == SPBOOK_CLASS)
-		add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, &any, 'r', 0, ATR_NONE,
 				"Study this spellbook", MENU_UNSELECTED);
 	/* t: throw item, works on everything */
 	any.a_void = (genericptr_t)dothrow;
