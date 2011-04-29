@@ -1884,11 +1884,16 @@ struct obj *obj;
 			obj->otyp == BRASS_LANTERN)
 		add_menu(win, NO_GLYPH, &any, 'a', 0, ATR_NONE,
 				"Light or extinguish this light source", MENU_UNSELECTED);
+	else if (obj->otyp == POT_OIL && objects[obj->otyp].oc_name_known)
+		add_menu(win, NO_GLYPH, &any, 'a', 0, ATR_NONE,
+				"Light or extinguish this oil", MENU_UNSELECTED);
+#if 0 /* TODO */
 	else if (obj->oclass == POTION_CLASS) {
 		any.a_void = (genericptr_t) dodip;
 		add_menu(win, NO_GLYPH, &any, 'a', 0, ATR_NONE,
 				"Dip something into this potion", MENU_UNSELECTED);
 	}
+#endif
 #ifdef TOURIST
 	else if (obj->otyp == EXPENSIVE_CAMERA)
 		add_menu(win, NO_GLYPH, &any, 'a', 0, ATR_NONE,
@@ -1922,6 +1927,9 @@ struct obj *obj;
 	else if (obj->otyp == PICK_AXE || obj->otyp == DWARVISH_MATTOCK)
 		add_menu(win, NO_GLYPH, &any, 'a', 0, ATR_NONE,
 				"Dig with this digging tool", MENU_UNSELECTED);
+	else if (obj->oclass == WAND_CLASS)
+		add_menu(win, NO_GLYPH, &any, 'a', 0, ATR_NONE,
+				"Break this wand", MENU_UNSELECTED);
 	/* d: drop item, works on everything */
 	any.a_void = (genericptr_t)dodrop;
 	add_menu(win, NO_GLYPH, &any, 'd', 0, ATR_NONE,
@@ -1984,6 +1992,18 @@ struct obj *obj;
 	else if (obj->oclass == SPBOOK_CLASS)
 		add_menu(win, NO_GLYPH, &any, 'r', 0, ATR_NONE,
 				"Study this spellbook", MENU_UNSELECTED);
+	any.a_void = (genericptr_t)dorub;
+	if (obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP)
+		add_menu(win, NO_GLYPH, &any, 'R', 0, ATR_NONE,
+				"Rub this lamp", MENU_UNSELECTED);
+	else if (obj->otyp == BRASS_LANTERN)
+		add_menu(win, NO_GLYPH, &any, 'R', 0, ATR_NONE,
+				"Rub this lantern", MENU_UNSELECTED);
+#if 0 /* TODO */
+	else if (obj->oclass == GEM_CLASS && is_graystone(obj))
+		add_menu(win, NO_GLYPH, &any, 'R', 0, ATR_NONE,
+				"Rub something on this stone", MENU_UNSELECTED);
+#endif
 	/* t: throw item, works on everything */
 	any.a_void = (genericptr_t)dothrow;
 	add_menu(win, NO_GLYPH, &any, 't', 0, ATR_NONE,
@@ -1995,26 +2015,11 @@ struct obj *obj;
 				"Unequip this equipment", MENU_UNSELECTED);
 	/* V: invoke, rub, or break */
 	any.a_void = (genericptr_t)doinvoke;
-	if (obj->oclass == WAND_CLASS)
-		add_menu(win, NO_GLYPH, &any, 'V', 0, ATR_NONE,
-				"Break this wand", MENU_UNSELECTED);
-	else if (obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP)
-		add_menu(win, NO_GLYPH, &any, 'V', 0, ATR_NONE,
-				"Rub this lamp", MENU_UNSELECTED);
-	else if (obj->otyp == BRASS_LANTERN)
-		add_menu(win, NO_GLYPH, &any, 'V', 0, ATR_NONE,
-				"Rub this lantern", MENU_UNSELECTED);
-	else if (obj->oclass == GEM_CLASS && is_graystone(obj))
-		add_menu(win, NO_GLYPH, &any, 'V', 0, ATR_NONE,
-				"Rub something on this stone", MENU_UNSELECTED);
-	else if ((obj->otyp == FAKE_AMULET_OF_YENDOR && !obj->known) ||
+	if ((obj->otyp == FAKE_AMULET_OF_YENDOR && !obj->known) ||
 			obj->oartifact || objects[obj->otyp].oc_unique ||
 			obj->otyp == MIRROR) /* wtf NetHack devteam? */
 		add_menu(win, NO_GLYPH, &any, 'V', 0, ATR_NONE,
 				"Try to invoke a unique power of this object", MENU_UNSELECTED);
-	else if (obj->otyp == POT_OIL)
-		add_menu(win, NO_GLYPH, &any, 'V', 0, ATR_NONE,
-				"Ignite or extinguish this oil", MENU_UNSELECTED);
 	/* w: hold in hands, works on everything but with different
 	   advice text; not mentioned for things that are already
 	   wielded */
@@ -2064,7 +2069,7 @@ struct obj *obj;
 		add_menu(win, NO_GLYPH, &any, 'z', 0, ATR_NONE,
 				"Zap this wand to release its magic", MENU_UNSELECTED);
 	/* S: Sacrifice object (should be > but that causes problems) */
-#if 0 // TODO
+#if 0 /* TODO */
 	any.a_void = (genericptr_t)doterrain;
 	if (IS_ALTAR(levl[u.ux][u.uy].typ) && !u.uswallow) {
 		if (obj->otyp == CORPSE)
