@@ -1922,12 +1922,6 @@ struct obj *obj;
 	else if (obj->otyp == PICK_AXE || obj->otyp == DWARVISH_MATTOCK)
 		add_menu(win, NO_GLYPH, &any, 'a', 0, ATR_NONE,
 				"Dig with this digging tool", MENU_UNSELECTED);
-	/* c: pay for unpaid items */
-	any.a_void = (genericptr_t)dopay;
-	if ((mtmp = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE))) &&
-			inhishop(mtmp) && obj->unpaid)
-		add_menu(win, NO_GLYPH, &any, 'p', 0, ATR_NONE,
-				"Buy this unpaid item", MENU_UNSELECTED);
 	/* d: drop item, works on everything */
 	any.a_void = (genericptr_t)dodrop;
 	add_menu(win, NO_GLYPH, &any, 'd', 0, ATR_NONE,
@@ -1959,6 +1953,12 @@ struct obj *obj;
 	any.a_void = (genericptr_t)dotypeinv;
 	add_menu(win, NO_GLYPH, &any, 'I', 0, ATR_NONE,
 			"Describe this item", MENU_UNSELECTED);
+	/* p: pay for unpaid items */
+	any.a_void = (genericptr_t)dopay;
+	if ((mtmp = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE))) &&
+			inhishop(mtmp) && obj->unpaid)
+		add_menu(win, NO_GLYPH, &any, 'p', 0, ATR_NONE,
+				"Buy this unpaid item", MENU_UNSELECTED);
 	/* q: drink item; strangely, this one seems to have no exceptions */
 	any.a_void = (genericptr_t)dodrink;
 	if (obj->oclass == POTION_CLASS)
