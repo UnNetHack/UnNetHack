@@ -1519,7 +1519,10 @@ proceed:
 	}
 	/* now check items on bill */
 	if (eshkp->billct) {
-	    register boolean itemize;
+	    boolean itemize = FALSE;
+	    /* get item selected by inventory menu */
+	    struct obj* payme_item = getnextgetobj();
+
 #ifndef GOLDOBJ
 	    if (!u.ugold && !eshkp->credit) {
 #else
@@ -1545,7 +1548,9 @@ proceed:
 
 	    /* this isn't quite right; it itemizes without asking if the
 	     * single item on the bill is partly used up and partly unpaid */
-	    itemize = (eshkp->billct > 1 ? yn("Itemized billing?") == 'y' : 1);
+	    if (!payme_item) {
+		    itemize = (eshkp->billct > 1 ? yn("Itemized billing?") == 'y' : 1);
+	    }
 
 	    for (pass = 0; pass <= 1; pass++) {
 		tmp = 0;
@@ -1571,25 +1576,29 @@ proceed:
 			 * are processed on both passes */
 			tmp++;
 		    } else {
-			switch (dopayobj(shkp, bp, &otmp, pass, itemize)) {
-			  case PAY_CANT:
-				return 1;	/*break*/
-			  case PAY_BROKE:
-				paid = TRUE;
-				goto thanks;	/*break*/
-			  case PAY_SKIP:
-				tmp++;
-				continue;	/*break*/
-			  case PAY_SOME:
-				paid = TRUE;
+			if (payme_item == NULL || payme_item == otmp) {
+				switch (dopayobj(shkp, bp, &otmp, pass, itemize)) {
+					case PAY_CANT:
+						return 1;	/*break*/
+					case PAY_BROKE:
+						paid = TRUE;
+						goto thanks;	/*break*/
+					case PAY_SKIP:
+						tmp++;
+						continue;	/*break*/
+					case PAY_SOME:
+						paid = TRUE;
+						if (itemize) bot();
+						continue;	/*break*/
+					case PAY_BUY:
+						paid = TRUE;
+						break;
+				}
 				if (itemize) bot();
-				continue;	/*break*/
-			  case PAY_BUY:
-				paid = TRUE;
-				break;
+				*bp = eshkp->bill_p[--eshkp->billct];
+			} else {
+				tmp++;
 			}
-			if (itemize) bot();
-			*bp = eshkp->bill_p[--eshkp->billct];
 		    }
 		}
 	    }

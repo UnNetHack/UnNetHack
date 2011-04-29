@@ -819,6 +819,19 @@ const char *action;
 
 static struct obj *nextgetobj = 0;
 
+/** Returns the object to use in the inventory usage menu.
+ * nextgetobj is set to NULL before the pointer of the item is returned. */
+struct obj*
+getnextgetobj()
+{
+	if (nextgetobj) {
+		struct obj* ptr = nextgetobj;
+		nextgetobj = NULL;
+		return ptr;
+	}
+	return NULL;
+}
+
 /*
  * getobj returns:
  *	struct obj *xxx:	object to do something with.
@@ -1910,10 +1923,10 @@ struct obj *obj;
 		add_menu(win, NO_GLYPH, &any, 'a', 0, ATR_NONE,
 				"Dig with this digging tool", MENU_UNSELECTED);
 	/* c: pay for unpaid items */
-	any.a_void = (genericptr_t)dotalk;
+	any.a_void = (genericptr_t)dopay;
 	if ((mtmp = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE))) &&
 			inhishop(mtmp) && obj->unpaid)
-		add_menu(win, NO_GLYPH, &any, 'c', 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, &any, 'p', 0, ATR_NONE,
 				"Buy this unpaid item", MENU_UNSELECTED);
 	/* d: drop item, works on everything */
 	any.a_void = (genericptr_t)dodrop;
