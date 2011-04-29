@@ -2026,7 +2026,7 @@ struct obj *obj;
 	any.a_void = (genericptr_t)dowield;
 	if (obj == uwep) {}
 	else if (obj->oclass == WEAPON_CLASS || obj->otyp == PICK_AXE ||
-			obj->oclass == UNICORN_HORN)
+			obj->otyp == UNICORN_HORN)
 		add_menu(win, NO_GLYPH, &any, 'w', 0, ATR_NONE,
 				"Wield this as your weapon", MENU_UNSELECTED);
 	else if (obj->otyp == TIN_OPENER)
