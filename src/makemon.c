@@ -658,7 +658,7 @@ register struct	monst	*mtmp;
 	    case S_GNOME:
 		/* In AceHack, these have a chance of generating with
 		   candles, especially on dark Mines levels. */
-		if (In_mines(&u.uz) && rn(2)) {
+		if (In_mines(&u.uz) && rn2(2)) {
 			/* Pick a random square. If it's a floor square and unlit,
 			   generate a lit candle. If it isn't a floor square,
 			   pick once more. */
