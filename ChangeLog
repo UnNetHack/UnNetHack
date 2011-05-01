@@ -6,6 +6,7 @@
 	* HTML dump: fix crash if monster name is too long
 	* Multiple bones files per level (not on Win32)
 	* Autoconf compliant installation directory variables
+	* added new tiles and fixed building of 16x16 tiles (by Stephan T. Lavavej)
 
 	* more candles:
 	  - lighting shop in orcus town
