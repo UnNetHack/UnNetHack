@@ -654,6 +654,46 @@ register struct	monst	*mtmp;
 			(void)mongets(mtmp, AMULET_OF_YENDOR);
 			(void)mongets(mtmp, POT_FULL_HEALING);
 		}
+		break;
+	    case S_GNOME:
+		/* In AceHack, these have a chance of generating with
+		   candles, especially on dark Mines levels. */
+		if (In_mines(&u.uz) && rn(2)) {
+			/* Pick a random square. If it's a floor square and unlit,
+			   generate a lit candle. If it isn't a floor square,
+			   pick once more. */
+			int x, y;
+			x = rnd(COLNO-1); y = rn2(ROWNO);
+			if (isok(x,y) && levl[x][y].typ != ROOM) {
+				x = rnd(COLNO-1); y = rn2(ROWNO);
+			}
+			if (isok(x,y) && levl[x][y].typ == ROOM &&
+					!levl[x][y].lit) {
+				otmp = mksobj(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE,
+						TRUE, FALSE);
+				otmp->quan = 1;
+				/* We need to add the object to the monster inventory
+				   before we light it. */
+				if (!mpickobj(mtmp, otmp)) {
+					/* mpickobj returns FALSE if the object is still
+					   addressable, i.e. not merged with another object */
+					begin_burn(otmp, FALSE);
+				}
+			} else if (!rn2(5)) {
+				/* Add a candle to inventory anyway, but don't light it. */
+				otmp = mksobj(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE,
+						TRUE, FALSE);
+				otmp->quan = 1;
+				(void) mpickobj(mtmp, otmp);
+			}
+		} else if (!rn2(10)) {
+			/* A small chance gnomes away from home have one too */
+			otmp = mksobj(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE,
+					TRUE, FALSE);
+			otmp->quan = 1;
+			(void) mpickobj(mtmp, otmp);
+		}
+		break;
 	    default:
 		break;
 	}
