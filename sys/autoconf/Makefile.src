@@ -199,6 +199,7 @@ HACKCSRC = $(srcdir)/allmain.c $(srcdir)/alloc.c $(srcdir)/apply.c \
 	$(srcdir)/were.c $(srcdir)/wield.c $(srcdir)/windows.c \
 	$(srcdir)/wizard.c $(srcdir)/worm.c $(srcdir)/worn.c $(srcdir)/write.c \
 	$(srcdir)/zap.c \
+	$(srcdir)/dump.c $(srcdir)/tutorial.c \
 	$(srcdir)/livelog.c
 
 # all operating-system-dependent .c (for dependencies and such)
