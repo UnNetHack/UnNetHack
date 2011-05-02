@@ -1173,8 +1173,9 @@ dump_spells()
 			spelltypemnemonic(spell_skilltype(spellid(i))),
 			100 - percent_success(i));
 		dump_text("  %s\n", buf);
-		Sprintf(buf, "<tr><td class=\"nh_item_letter\">%c</td><td>%s</td><td align=\"right\">%d</td><td>%s</td><td align=\"right\">%d%%</td></tr>\n",
+		Sprintf(buf, "<tr><td class=\"nh_item_letter\">%c</td><td>%s</td><td align=\"right\">%d%s</td><td>%s</td><td align=\"right\">%d%%</td></tr>\n",
 			spellet(i), spellname(i), spellev(i),
+			(spellknow(i) > 1000) ? "&nbsp;" : (spellknow(i) ? "!" : "*"),
 			spelltypemnemonic(spell_skilltype(spellid(i))),
 			100 - percent_success(i));
 		dump_html(buf,"");
