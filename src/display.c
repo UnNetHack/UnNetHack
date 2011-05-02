@@ -1483,7 +1483,7 @@ dump_screen()
 	    dfeature = dfeature_at(x, y, dfeaturebuf);
 
 	    if (c == ' ')
-		Strcpy(tmpbuf, " ");
+		Strcpy(tmpbuf, "&nbsp;");
 	    else if (x == u.ux && y == u.uy)
 		Sprintf(tmpbuf, "<span title=\"you\" class=\"nh_inv_%d nh_player\">%s</span>", color, html_c);
 	    else if (special & (MG_PET|MG_DETECT))
