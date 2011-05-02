@@ -1112,7 +1112,7 @@ int *spell_no;
 		Sprintf(buf, iflags.menu_tab_sep ?
 			"%s\t%-d%s\t%s\t%-d%%" : "%-20s  %2d%s   %-12s %3d%%",
 			spellname(i), spellev(i),
-			spellknow(i) ? " " : "*",
+			(spellknow(i) > 1000) ? " " : (spellknow(i) ? "!" : "*"),
 			spelltypemnemonic(spell_skilltype(spellid(i))),
 			100 - percent_success(i));
 
@@ -1169,7 +1169,7 @@ dump_spells()
 	for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
 		Sprintf(buf, "%c - %-20s  %2d%s   %-12s %3d%%",
 			spellet(i), spellname(i), spellev(i),
-			spellknow(i) ? " " : "*",
+			(spellknow(i) > 1000) ? " " : (spellknow(i) ? "!" : "*"),
 			spelltypemnemonic(spell_skilltype(spellid(i))),
 			100 - percent_success(i));
 		dump_text("  %s\n", buf);
