@@ -2454,14 +2454,7 @@ speak:
 	    Strcpy(buf, "\"For you, ");
 	    if (ANGRY(shkp)) Strcat(buf, "scum");
 	    else {
-		static const char *honored[5] = {
-		  "good", "honored", "most gracious", "esteemed",
-		  "most renowned and sacred"
-		};
-		Strcat(buf, honored[rn2(4) + u.uevent.udemigod]);
-		if (!is_human(youmonst.data)) Strcat(buf, " creature");
-		else
-		    Strcat(buf, (flags.female) ? " lady" : " sir");
+		append_honorific(buf);
 	    }
 	    if(ininv) {
 		long quan = obj->quan;
@@ -2479,6 +2472,22 @@ speak:
 				   (obj->quan > 1L) ? " each" : "");
 	    else pline("%s does not notice.", Monnam(shkp));
 	}
+}
+
+void
+append_honorific(buf)
+char *buf;
+{
+	static const char *honored[5] = {
+	  "good", "honored", "most gracious", "esteemed",
+	  "most renowned and sacred"
+	};
+	Strcat(buf, honored[rn2(4) + u.uevent.udemigod]);
+	if (is_vampire(youmonst.data)) Strcat(buf,
+			(flags.female) ? " dark lady" : " dark lord");
+	else if (!is_human(youmonst.data)) Strcat(buf, " creature");
+	else
+	    Strcat(buf, (flags.female) ? " lady" : " sir");
 }
 
 void
