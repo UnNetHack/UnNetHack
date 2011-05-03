@@ -27,6 +27,7 @@
 	  - inventory improvement: generic item usage menu (from AceHack)
 	  - visualized HP bar(hitpointbar) activated by default
 	  - visual indicator showing which spells can be refreshed (from K-Mod)
+	  - show level annotation when entering level (idea by Chris Smith)
 
 	* new dungeon features:
 	  - dead trees (from NetHack Brass)

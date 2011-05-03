@@ -567,6 +567,7 @@ E void FDECL(init_mapseen, (d_level *));
 E void NDECL(recalc_mapseen);
 E void FDECL(recbranch_mapseen, (d_level *, d_level *));
 E void FDECL(remdun_mapseen, (int));
+E char *FDECL(get_annotation, (d_level *));
 
 /* ### eat.c ### */
 

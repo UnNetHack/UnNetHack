@@ -1110,6 +1110,7 @@ boolean at_stairs, falling, portal;
 	boolean new = FALSE;	/* made a new level? */
 	struct monst *mtmp;
 	char whynot[BUFSZ];
+	char *annotation;
 
 	if (dunlev(newlevel) > dunlevs_in_dungeon(newlevel))
 		newlevel->dlevel = dunlevs_in_dungeon(newlevel);
@@ -1506,6 +1507,12 @@ boolean at_stairs, falling, portal;
 	else
 	    onquest();
 	assign_level(&u.uz0, &u.uz); /* reset u.uz0 */
+
+	/* show level annotation when entering the level */
+	if (iflags.show_annotation &&
+	    (annotation = get_annotation(&u.uz))) {
+		You("annotated this level: %s", annotation);
+	}
 
 #ifdef INSURANCE
 	save_currentstate();

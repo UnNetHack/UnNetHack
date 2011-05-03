@@ -2583,4 +2583,18 @@ boolean final; /**< if game is finished */
 #endif
 }
 
+/** Get annotation for a specific level. */
+char *
+get_annotation(lev)
+d_level *lev;
+{
+	mapseen *mptr;
+
+	if (!(mptr = find_mapseen(&u.uz))) {
+		return NULL;
+	} else {
+		return mptr->custom;
+	}
+}
+
 /*dungeon.c*/

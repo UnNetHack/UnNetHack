@@ -212,6 +212,7 @@ static struct Bool_Opt
 #else
 	{"sanity_check", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+	{"showannotation", &iflags.show_annotation, TRUE, SET_IN_FILE},
 #ifdef SHOW_BORN
 	{"showborn", &iflags.show_born, FALSE, SET_IN_GAME},
 #endif
