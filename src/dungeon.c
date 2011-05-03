@@ -1922,7 +1922,11 @@ donamelevel()
 
 	if (!(mptr = find_mapseen(&u.uz))) return 0;
 
-	Sprintf(qbuf,"What do you want to call this dungeon level? ");
+	if (mptr->custom) {
+		Sprintf(qbuf,"Replace previous annotation \"%s\" with?", mptr->custom);
+	} else {
+		Sprintf(qbuf,"What do you want to call this dungeon level?");
+	}
 	getlin(qbuf, nbuf);
 
 	if (index(nbuf, '\033')) return 0;
