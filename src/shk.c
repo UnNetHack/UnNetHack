@@ -2486,6 +2486,8 @@ char *buf;
 	Strcat(buf, honored[rn2(4) + u.uevent.udemigod]);
 	if (is_vampire(youmonst.data)) Strcat(buf,
 			(flags.female) ? " dark lady" : " dark lord");
+	else if (is_elf(youmonst.data)) Strcat(buf,
+			(flags.female) ? " hiril" : " hir");
 	else if (!is_human(youmonst.data)) Strcat(buf, " creature");
 	else
 	    Strcat(buf, (flags.female) ? " lady" : " sir");
