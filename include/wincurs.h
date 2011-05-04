@@ -9,6 +9,8 @@ WINDOW *base_term;    /* underlying terminal window */
 
 WINDOW *mapwin, *statuswin, *messagewin;    /* Main windows */
 
+int orig_cursor;	/* Preserve initial cursor state */
+
 boolean counting;   /* Count window is active */
 
 
@@ -277,6 +279,8 @@ extern int curses_character_dialog(const char** choices, const char *prompt);
 extern void curses_init_options(void);
 
 extern void curses_display_splash_window(void);
+
+extern void curses_cleanup(void);
 
 
 /* cursmesg.c */

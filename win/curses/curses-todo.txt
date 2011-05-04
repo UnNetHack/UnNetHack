@@ -12,9 +12,6 @@ NetHack Interface
   * I am confused as to how mark_synch and wait_synch should work.
   Help, please?
 
-  * Both PDCurses and Ncurses have mouse support, so the poskey
- function could probably be implemented easily enough.
-
   * raw_print is supposed to be able to work before the windowing
  system has been initialized, as well as after, so I am unsure if
  curses functions should be used here. Maybe check to see if
@@ -24,8 +21,6 @@ NetHack Interface
 
 Display
 =======
-
-  * Consolidate refreshes of the display for smoother output.
 
   * Calls to getch() should probably be turned into wgetch() for the
  appropriate window. This causes quirky cursor behavior under
@@ -38,12 +33,6 @@ Menus
 =====
 
 (cursdial.c)
-
-  * Menus need to be able to accept a count as input, e.g. to specify
- how many items to drop Done
-
-  * Currently the "preselected" flag for an individual menu item is
- ignored. This should eventually be implemented Done
 
   * Menus probably should never overlap with the message window, since
  the user sometimes needs to be able to see the messages while the
@@ -59,6 +48,9 @@ Status Window
 =============
 
 (cursstat.c)
+
+ * Possibly show thermometer bars for hit points and magical power
+with an expanded status display
 
   * Maybe add some configuration options for what colors are used and
  the like.
@@ -89,4 +81,12 @@ Misc
 
   * Maybe add in a very small built-in editor for editing the config
   file from withing the game.
+
+  * Implement perm_invent option to allow inventory window to always
+be visible on larger terminals 
+
+  * Add window_borders option to not draw window borders for the main
+windows on the outside edge of the terminal 
+
+Retrieved from "http://nethack-curses.wikia.com/wiki/Developers"
 

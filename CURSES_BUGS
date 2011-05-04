@@ -1,9 +1,0 @@
-If compiled together with tty, color doesn't work in the curses GUI
-
-There are more options than the curses GUI can handle. It labels the
-options from a-z and then from A-Z and the rest of the options are all
-labeled Z.
-
-If decgraphics is set in the options file, the display isn't correct.
-Setting cursesgraphics and IBMgraphics to true and false fixes the
-display.

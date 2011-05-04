@@ -15,6 +15,26 @@
 #define UNNETHACK_CURSES    3
 #define SPORKHACK_CURSES    4
 
+/* array to save initial terminal colors for later restoration */
+
+typedef struct nhrgb_type
+{
+    short r;
+    short g;
+    short b;
+} nhrgb;
+
+nhrgb orig_yellow;
+nhrgb orig_white;
+nhrgb orig_darkgray;
+nhrgb orig_hired;
+nhrgb orig_higreen;
+nhrgb orig_hiyellow;
+nhrgb orig_hiblue;
+nhrgb orig_himagenta;
+nhrgb orig_hicyan;
+nhrgb orig_hiwhite;
+
 /* Banners used for an optional ASCII splash screen */
 
 #define NETHACK_SPLASH_A \
@@ -560,10 +580,34 @@ void curses_init_nhcolors()
 
         if (can_change_color())
         {
+            /* Preserve initial terminal colors */
+            color_content(COLOR_YELLOW, &orig_yellow.r, &orig_yellow.g,
+             &orig_yellow.b);
+            color_content(COLOR_WHITE, &orig_white.r, &orig_white.g,
+             &orig_white.b);
+            
+            /* Set colors to appear as NetHack expects */
             init_color(COLOR_YELLOW, 500, 300, 0);
             init_color(COLOR_WHITE, 600, 600, 600);
             if (COLORS >= 16)
             {
+                /* Preserve initial terminal colors */
+                color_content(COLOR_RED + 8, &orig_hired.r,
+                 &orig_hired.g, &orig_hired.b);
+                color_content(COLOR_GREEN + 8, &orig_higreen.r,
+                 &orig_higreen.g, &orig_higreen.b);
+                color_content(COLOR_YELLOW + 8, &orig_hiyellow.r,
+                 &orig_hiyellow.g, &orig_hiyellow.b);
+                color_content(COLOR_BLUE + 8, &orig_hiblue.r,
+                 &orig_hiblue.g, &orig_hiblue.b);
+                color_content(COLOR_MAGENTA + 8, &orig_himagenta.r,
+                 &orig_himagenta.g, &orig_himagenta.b);
+                color_content(COLOR_CYAN + 8, &orig_hicyan.r,
+                 &orig_hicyan.g, &orig_hicyan.b);
+                color_content(COLOR_WHITE + 8, &orig_hiwhite.r,
+                 &orig_hiwhite.g, &orig_hiwhite.b);
+            
+                /* Set colors to appear as NetHack expects */
                 init_color(COLOR_RED + 8, 1000, 500, 0);
                 init_color(COLOR_GREEN + 8, 0, 1000, 0);
                 init_color(COLOR_YELLOW + 8, 1000, 1000, 0);
@@ -1195,3 +1239,45 @@ void curses_display_splash_window()
 #endif
     refresh();
 }
+
+
+/* Resore colors and cursor state before exiting */
+
+void curses_cleanup()
+{
+#ifdef TEXTCOLOR
+    if (has_colors() && can_change_color())
+    {
+        init_color(COLOR_YELLOW, orig_yellow.r, orig_yellow.g,
+         orig_yellow.b);
+        init_color(COLOR_WHITE, orig_white.r, orig_white.g,
+         orig_white.b);
+         
+        if (COLORS >= 16)
+        {
+            init_color(COLOR_RED + 8, orig_hired.r, orig_hired.g,
+             orig_hired.b);
+            init_color(COLOR_GREEN + 8, orig_higreen.r, orig_higreen.g,
+             orig_higreen.b);
+            init_color(COLOR_YELLOW + 8, orig_hiyellow.r,
+             orig_hiyellow.g, orig_hiyellow.b);
+            init_color(COLOR_BLUE + 8, orig_hiblue.r, orig_hiblue.g,
+             orig_hiblue.b);
+            init_color(COLOR_MAGENTA + 8, orig_himagenta.r,
+             orig_himagenta.g, orig_himagenta.b);
+            init_color(COLOR_CYAN + 8, orig_hicyan.r, orig_hicyan.g,
+             orig_hicyan.b);
+            init_color(COLOR_WHITE + 8, orig_hiwhite.r, orig_hiwhite.g,
+             orig_hiwhite.b);
+# ifdef USE_DARKGRAY
+            if (COLORS > 16)
+            {
+                init_color(CURSES_DARK_GRAY, orig_darkgray.r,
+             orig_darkgray.g, orig_darkgray.b);
+            }
+# endif
+        }
+    }
+#endif
+}
+
