@@ -919,7 +919,6 @@ save_lvl_sounds(fd, or, mode)
 register int fd, mode;
 register struct lvl_sounds *or;
 {
-    struct lvl_sound_bite *mt;
     int marker = 0;
     int i;
     int len;

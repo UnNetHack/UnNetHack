@@ -1251,7 +1251,7 @@ room_door *dd;
 struct mkroom *broom;
 {
 	int	x = 0, y = 0;
-	int	trycnt = 0, walltry = 0, wtry = 0;
+	int	trycnt = 0, wtry = 0;
 
 	if (dd->secret == -1)
 	    dd->secret = rn2(2);
@@ -3332,7 +3332,6 @@ spo_level_sounds(coder)
 {
     struct opvar *freq, *n_tuples;
     struct lvl_sounds *mg;
-    struct lvl_sound_bite *mgtuple;
 
     if (level.sounds) {
 	impossible("level sounds already defined.");
@@ -3686,7 +3685,6 @@ selection_opvar(nbuf)
 {
     struct opvar *ov;
     char buf[(COLNO*ROWNO)+1];
-    int x,y,i = 0;
 
     if (!nbuf) {
 	(void) memset(buf, 1, sizeof(buf));
@@ -3771,7 +3769,6 @@ selection_rndcoord(ov, x,y)
     struct opvar *ov;
     schar *x, *y;
 {
-    struct opvar *coord;
     int idx = 0;
     int c;
     int dx,dy;
@@ -5160,7 +5157,6 @@ sp_lev *lvl;
 	case SPO_SEL_FILTER: /* sorta like logical and */
 	    {
 		struct opvar *filtertype;
-		int x,y;
 		if (!OV_pop_i(filtertype)) panic("no sel filter type");
 		switch (OV_i(filtertype)) {
 		case 0: /* percentage */

@@ -1643,6 +1643,7 @@ do_it:
 	vision_full_recalc = 1;	/* delayed vision recalculation */
 }
 
+#if 0
 static void
 do_class_genocide()
 {
@@ -1795,6 +1796,7 @@ do_class_genocide()
 		return;
 	}
 }
+#endif
 
 #define REALLY 1
 #define PLAYER 2

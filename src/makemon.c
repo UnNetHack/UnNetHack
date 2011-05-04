@@ -1262,7 +1262,6 @@ struct mon_gen_override *override;
 {
     int chance, try = 100;
     struct mon_gen_tuple *mt;
-    int ok;
     if (!override) return NULL;
 
     chance = rnd(override->total_mon_freq);

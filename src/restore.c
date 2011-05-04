@@ -196,7 +196,6 @@ register int fd;
 {
     int marker;
     struct lvl_sounds *or = NULL;
-    struct lvl_sound_bite *mt = NULL;
     mread(fd, (genericptr_t) &marker, sizeof(marker));
     if (marker) {
 	or = (struct lvl_sounds *)alloc(sizeof(struct lvl_sounds));

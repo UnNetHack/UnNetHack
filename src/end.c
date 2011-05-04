@@ -398,7 +398,6 @@ boolean taken;
 	    }
 	    {
 			boolean want_disp = (c == 'y') ? TRUE: FALSE;
-			struct obj *obj;
 
 			(void) dump_inventory((char *)0, TRUE, want_disp);
 			container_contents(invent, TRUE, TRUE, want_disp);
