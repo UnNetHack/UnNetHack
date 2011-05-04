@@ -51,6 +51,7 @@ STATIC_DCL long FDECL(stolen_container, (struct obj *, struct monst *, long,
 STATIC_DCL long FDECL(getprice, (struct obj *,BOOLEAN_P));
 STATIC_DCL void FDECL(shk_names_obj,
 		 (struct monst *,struct obj *,const char *,long,const char *));
+STATIC_DCL void FDECL(append_honorific, (char *));
 STATIC_DCL struct obj *FDECL(bp_to_obj, (struct bill_x *));
 STATIC_DCL boolean FDECL(inherits, (struct monst *,int,int));
 STATIC_DCL void FDECL(set_repo_loc, (struct eshk *));
