@@ -37,6 +37,12 @@
 	* vanilla bug fixes:
 	  - C343-74, C343-198
 
+2010-10-10  UnNetHack 3.5.3-1
+	* bug fixes:
+	  - Quest nemesis not carrying bell of opening
+	  - Door being created in the corner of a room
+	  - Mine levels being lit too often
+
 2010-09-04  UnNetHack 3.5.3
 	* Conflict makes blackmarket shopkeeper angry
 	* Fully eroded armor gets destroyed
