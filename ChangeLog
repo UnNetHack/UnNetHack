@@ -8,6 +8,7 @@
 	* Autoconf compliant installation directory variables
 	* added new tiles and fixed building of 16x16 tiles (by Stephan T. Lavavej)
 	* Curses GUI updated to last version
+	* Giantslayer grants STR 18/** when wielded
 
 	* more candles:
 	  - lighting shop in orcus town

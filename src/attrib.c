@@ -670,6 +670,7 @@ int x;
 
 	if (x == A_STR) {
 		if (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER) return(125);
+		else if (uwep && uwep->oartifact == ART_GIANTSLAYER) return(118);
 #ifdef WIN32_BUG
 		else return(x=((tmp >= 125) ? 125 : (tmp <= 3) ? 3 : tmp));
 #else
