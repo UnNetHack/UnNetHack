@@ -2234,8 +2234,8 @@ recalc_mapseen()
 				break;
 			case ALTAR:
 				if (!mptr->feat.naltar)
-					mptr->feat.msalign = Amask2msa(levl[x][y].altarmask);
-				else if (mptr->feat.msalign != Amask2msa(levl[x][y].altarmask))
+					mptr->feat.msalign = Amask2msa(levl[x][y].altarmask & ~AM_SHRINE);
+				else if (mptr->feat.msalign != Amask2msa(levl[x][y].altarmask & ~AM_SHRINE))
 					mptr->feat.msalign = MSA_NONE;
 						
 				mptr->feat.naltar = min(mptr->feat.naltar + 1, 3);
