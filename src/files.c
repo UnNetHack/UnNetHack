@@ -171,7 +171,7 @@ STATIC_DCL char *FDECL(make_lockname, (const char *,char *));
 #endif
 STATIC_DCL FILE *FDECL(fopen_config_file, (const char *));
 STATIC_DCL int FDECL(get_uchars, (FILE *,char *,char *,uchar *,BOOLEAN_P,int,const char *));
-int FDECL(parse_config_line, (FILE *,char *,char *,char *));
+int FDECL(parse_config_line, (FILE *,char *,char *,char *, BOOLEAN_P));
 #ifdef NOCWD_ASSUMPTIONS
 STATIC_DCL void FDECL(adjust_prefix, (char *, int));
 #endif
@@ -2038,11 +2038,12 @@ int prefixid;
 
 /*ARGSUSED*/
 int
-parse_config_line(fp, buf, tmp_ramdisk, tmp_levels)
+parse_config_line(fp, buf, tmp_ramdisk, tmp_levels, recursive)
 FILE		*fp;
 char		*buf;
 char		*tmp_ramdisk;
 char		*tmp_levels;
+boolean		recursive;
 {
 #if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
 # pragma unused(tmp_ramdisk,tmp_levels)
@@ -2174,19 +2175,24 @@ char		*tmp_levels;
 	    (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE,
 			      1, "BOULDER");
 	} else if (match_varname(buf, "INCLUDE", 7)) {
-		FILE *include_fp;
-		char include_buf[4*BUFSZ];
-		/* parse a config file from a global path or relative
-		 * to the program binary */
-		if ((include_fp = fopenp(bufp, "r")) == (FILE *)0) return 0;
+		if (!recursive) {
+			raw_printf("Recursive config inclusion not allowed: %s.", bufp);
+			wait_synch();
+		} else {
+			FILE *include_fp;
+			char include_buf[4*BUFSZ];
+			/* parse a config file from a global path or relative
+			 * to the program binary */
+			if ((include_fp = fopenp(bufp, "r")) == (FILE *)0) return 0;
 
-		while (fgets(include_buf, 4*BUFSZ, include_fp)) {
-			if (!parse_config_line(include_fp, include_buf, (char *)0, (char *)0)) {
-				raw_printf("Bad option line in %s:  \"%.50s\"", bufp, include_buf);
-				wait_synch();
+			while (fgets(include_buf, 4*BUFSZ, include_fp)) {
+				if (!parse_config_line(include_fp, include_buf, (char *)0, (char *)0, FALSE)) {
+					raw_printf("Bad option line in %s:  \"%.50s\"", bufp, include_buf);
+					wait_synch();
+				}
 			}
+			(void) fclose(include_fp);
 		}
-		(void) fclose(include_fp);
 
 	} else if (match_varname(buf, "MENUCOLOR", 9)) {
 #ifdef MENU_COLOR
@@ -2417,7 +2423,7 @@ const char *filename;
 	set_duplicate_opt_detection(1);
 
 	while (fgets(buf, 4*BUFSZ, fp)) {
-		if (!parse_config_line(fp, buf, tmp_ramdisk, tmp_levels)) {
+		if (!parse_config_line(fp, buf, tmp_ramdisk, tmp_levels, TRUE)) {
 			raw_printf("Bad option line:  \"%.50s\"", buf);
 			wait_synch();
 		}
