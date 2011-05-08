@@ -385,8 +385,11 @@ register int oindx;
 
 	/* clear last slot */
 	if (found) disco[dindx-1] = 0;
+#if 0
+	/* don't freak out about already forgotten stuff */
 	else warning("named object \"%s\"(index %d; base: %d; end: %d) not found in discovery list.",
 			OBJ_NAME(objects[oindx]), oindx, bases[acls], dindx);
+#endif
 
 	update_inventory();
     }
