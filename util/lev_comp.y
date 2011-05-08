@@ -1639,7 +1639,7 @@ portal_region	: PORTAL_ID ':' lev_region ',' lev_region ',' string
 
 teleprt_region	: TELEPRT_ID ':' lev_region ',' lev_region teleprt_detail
 		  {
-		      long rtype;
+		      long rtype = 0;
 		      switch($6) {
 		      case -1: rtype = LR_TELE; break;
 		      case  0: rtype = LR_DOWNTELE; break;

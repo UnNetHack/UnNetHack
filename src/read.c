@@ -24,13 +24,17 @@ static NEARDATA const char readable[] =
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
 static void FDECL(wand_explode, (struct obj *));
+#if 0
 static void NDECL(do_class_genocide);
+#endif
 static void FDECL(stripspe,(struct obj *));
 static void FDECL(p_glow1,(struct obj *));
 static void FDECL(p_glow2,(struct obj *,const char *));
 static void FDECL(randomize,(int *, int));
 static void FDECL(forget_single_object, (int));
+#if 0
 static void FDECL(forget, (int));
+#endif
 static void FDECL(maybe_tame, (struct monst *,struct obj *));
 
 STATIC_PTR void FDECL(do_flood, (int,int,genericptr_t));
@@ -753,6 +757,7 @@ forget_levels(percent)
 	}
 }
 
+#if 0
 /*
  * Forget some things (e.g. after reading a scroll of amnesia).  When called,
  * the following are always forgotten:
@@ -795,6 +800,7 @@ int howmuch;
 	 */
 	docrt();		/* this correctly will reset vision */
 }
+#endif
 
 /* monster is hit by scroll of taming's effect */
 static void

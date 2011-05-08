@@ -633,9 +633,9 @@ const char *
 spovar2str(spovar)
      long spovar;
 {
-    static togl = 0;
+    static int togl = 0;
     static char buf[2][128];
-    char *n;
+    char *n = NULL;
     int is_array = (spovar & SPOVAR_ARRAY);
     spovar &= ~SPOVAR_ARRAY;
 

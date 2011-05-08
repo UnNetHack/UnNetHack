@@ -1388,7 +1388,7 @@ char mswin_yn_function(const char *question, const char *choices,
     char message[BUFSZ];
 	char res_ch[2];
     int createcaret;
-	boolean digit_ok, allow_num;
+	boolean digit_ok, allow_num = 0;
 
 	logDebug("mswin_yn_function(%s, %s, %d)\n", question, choices, def);
 

@@ -3453,7 +3453,7 @@ struct trap *ttmp;
 	struct obj *otmp;
 	boolean uprob;
 #ifdef WEBB_DISINT
-	boolean udied;
+	boolean udied = FALSE;
 	boolean can_disint = (touch_disintegrates(mtmp->data) &&
 	                      !mtmp->mcan &&
 	                       mtmp->mhp>6);
