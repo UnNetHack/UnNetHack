@@ -2173,6 +2173,21 @@ char		*tmp_levels;
 	} else if (match_varname(buf, "BOULDER", 3)) {
 	    (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE,
 			      1, "BOULDER");
+	} else if (match_varname(buf, "INCLUDE", 7)) {
+		FILE *include_fp;
+		char include_buf[4*BUFSZ];
+		/* parse a config file from a global path or relative
+		 * to the program binary */
+		if ((include_fp = fopenp(bufp, "r")) == (FILE *)0) return 0;
+
+		while (fgets(include_buf, 4*BUFSZ, include_fp)) {
+			if (!parse_config_line(include_fp, include_buf, (char *)0, (char *)0)) {
+				raw_printf("Bad option line in %s:  \"%.50s\"", bufp, include_buf);
+				wait_synch();
+			}
+		}
+		(void) fclose(include_fp);
+
 	} else if (match_varname(buf, "MENUCOLOR", 9)) {
 #ifdef MENU_COLOR
 	    (void) add_menu_coloring(bufp);
