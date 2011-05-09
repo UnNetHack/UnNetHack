@@ -822,9 +822,10 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	COLORREF OldBg, OldFg, NewBg;
 	char *p, *p1;
 	int column;
+	int use_attr = ATR_NONE;
 
 #ifdef MENU_COLOR
-	int color = NO_COLOR, attr;
+	int color = NO_COLOR, attr = ATR_NONE;
 	boolean menucolr = FALSE;
 #endif
 
@@ -836,20 +837,27 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
 
     item = &data->menu.items[lpdis->itemID];
+	use_attr = item->attr;
+
+#ifdef MENU_COLOR
+	if (iflags.use_menu_color && iflags.use_color) {
+		menucolr = get_menu_coloring(item->str, &color, &attr);
+	}
+
+	if (menucolr) {
+		use_attr = attr;
+	}
+#endif
 
 	tileDC = CreateCompatibleDC(lpdis->hDC);
-	saveFont = SelectObject(lpdis->hDC, mswin_get_font(NHW_MENU, item->attr, lpdis->hDC, FALSE));
+	saveFont = SelectObject(lpdis->hDC, mswin_get_font(NHW_MENU, use_attr, lpdis->hDC, FALSE));
 	NewBg = menu_bg_brush ? menu_bg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_BG_MENU);
 	OldBg = SetBkColor(lpdis->hDC, NewBg);
 	OldFg = SetTextColor(lpdis->hDC, 
 		menu_fg_brush ? menu_fg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_FG_MENU)); 
 
 #ifdef MENU_COLOR
-	if (iflags.use_menu_color &&
-		iflags.use_color &&
-		(menucolr = get_menu_coloring(item->str, &color,&attr))) {
-		/* TODO: use attr too */
-		if (color != NO_COLOR)
+	if (menucolr && color != NO_COLOR) {
 		SetTextColor(lpdis->hDC, nhcolor_to_RGB(color));
 	}
 #endif
