@@ -355,6 +355,14 @@ if test "$HAVE_TBL" != "no" ; then
 	AC_SUBST(GUIDEBOOK_TXT,[Guidebook.txt])
 fi
 fi
+AC_CHECK_PROG(HAVE_COL, col, "yes", "no")
+if test "$HAVE_COL" != "yes" ; then
+        if test $host_os != mingw32; then
+                AC_MSG_ERROR([Couldn't find 'col'])
+        else
+                AC_MSG_ERROR([Couldn't find 'col' (install 'util-linux' in Cygwin)])
+        fi
+fi
 
 if test $host_os != mingw32; then
   dnl searching for non blocking random device
