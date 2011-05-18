@@ -2148,6 +2148,49 @@ find_unpaid(list, last_found)
     return (struct obj *) 0;
 }
 
+#ifdef SORTLOOT
+int
+sortloot_cmp(obj1, obj2)
+struct obj *obj1;
+struct obj *obj2;
+{
+	int name_cmp = strcmpi(cxname2(obj1), cxname2(obj2));
+	if (name_cmp != 0) {
+		return name_cmp;
+	} else {
+		/* compare BUC state */
+		if ((obj1->bknown) && (obj2->bknown)) {
+			/* wrap BUC state into a sortable int */
+			int bo1 = (obj1->blessed)+(obj1->cursed << 1)+((!obj1->blessed&&!obj1->cursed) << 2);
+			int bo2 = (obj2->blessed)+(obj2->cursed << 1)+((!obj2->blessed&&!obj2->cursed) << 2);
+			if (bo1 != bo2) {
+				return bo1 - bo2;
+			} else {
+				/* compare enchantment */
+				if ((obj1->known) && (obj2->known)) {
+					return obj1->spe - obj2->spe;
+				} else if ((obj1->known) && (!obj2->known)) {
+					/* sort items with known enchantment always after unknown */
+					return 1;
+				} else if ((!obj1->known) && (obj2->known)) {
+					/* sort items with known enchantment always after unknown */
+					return -1;
+				}
+			}
+		} else if ((obj1->bknown) && (!obj2->bknown)) {
+			/* sort items with known BUC always after unknown */
+			return 1;
+		} else if ((!obj1->bknown) && (obj2->bknown)) {
+			/* sort items with known BUC always after unknown */
+			return -1;
+		}
+	}
+	/* as far as the player knows, for sorting issues these two objects
+	 * are identical */
+	return -1;
+}
+#endif
+
 /*
  * Internal function used by display_inventory and getobj that can display
  * inventory and return a count as well as a letter. If out_cnt is not null,
@@ -2255,7 +2298,7 @@ boolean want_disp;
 	    if (iflags.sortloot == 'f') {
 	      /* Insert object at correct index */
 	      for (j = i; j; j--) {
-		if (strcmpi(cxname2(otmp), cxname2(oarray[j-1]))>0) break;
+		if (sortloot_cmp(otmp, oarray[j-1])>0) break;
 		oarray[j] = oarray[j-1];
 	      }
 	      oarray[j] = otmp;

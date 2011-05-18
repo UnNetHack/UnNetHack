@@ -1108,7 +1108,7 @@ boolean identified, all_containers, want_disp;
 			    || iflags.sortloot == 'l') {
 			  /* Insert object at correct index */
 			  for (j = i; j; j--) {
-			    if (strcmpi(cxname2(obj), cxname2(oarray[j-1]))>0
+			    if ((sortloot_cmp(obj, oarray[j-1])>0)
 			    || (flags.sortpack &&
 				oarray[j-1]->oclass != obj->oclass))
 			      break;
