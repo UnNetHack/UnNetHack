@@ -2154,40 +2154,53 @@ sortloot_cmp(obj1, obj2)
 struct obj *obj1;
 struct obj *obj2;
 {
+	int val1 = 0;
+	int val2 = 0;
+
+	/* Sort object names in lexicographical order. */
 	int name_cmp = strcmpi(cxname2(obj1), cxname2(obj2));
+
 	if (name_cmp != 0) {
 		return name_cmp;
-	} else {
-		/* compare BUC state */
-		if ((obj1->bknown) && (obj2->bknown)) {
-			/* wrap BUC state into a sortable int */
-			int bo1 = (obj1->blessed)+(obj1->cursed << 1)+((!obj1->blessed&&!obj1->cursed) << 2);
-			int bo2 = (obj2->blessed)+(obj2->cursed << 1)+((!obj2->blessed&&!obj2->cursed) << 2);
-			if (bo1 != bo2) {
-				return bo1 - bo2;
-			} else {
-				/* compare enchantment */
-				if ((obj1->known) && (obj2->known)) {
-					return obj1->spe - obj2->spe;
-				} else if ((obj1->known) && (!obj2->known)) {
-					/* sort items with known enchantment always after unknown */
-					return 1;
-				} else if ((!obj1->known) && (obj2->known)) {
-					/* sort items with known enchantment always after unknown */
-					return -1;
-				}
-			}
-		} else if ((obj1->bknown) && (!obj2->bknown)) {
-			/* sort items with known BUC always after unknown */
-			return 1;
-		} else if ((!obj1->bknown) && (obj2->bknown)) {
-			/* sort items with known BUC always after unknown */
-			return -1;
-		}
 	}
-	/* as far as the player knows, for sorting issues these two objects
-	 * are identical */
-	return -1;
+
+	/* Sort by BUC. Map blessed to 4, uncursed to 2, cursed to 1, and unknown to 0. */
+	val1 = obj1->bknown ? (obj1->blessed << 2) + ((!obj1->blessed && !obj1->cursed) << 1) + obj1->cursed : 0;
+	val2 = obj2->bknown ? (obj2->blessed << 2) + ((!obj2->blessed && !obj2->cursed) << 1) + obj2->cursed : 0;
+	if (val1 != val2) {
+		return val2 - val1; /* Because bigger is better. */
+	}
+
+	/* Sort by greasing. This will put the objects in degreasing order. */
+	val1 = obj1->greased;
+	val2 = obj2->greased;
+	if (val1 != val2) {
+		return val2 - val1; /* Because bigger is better. */
+	}
+
+	/* Sort by erosion. The effective amount is what matters. */
+	val1 = greatest_erosion(obj1);
+	val2 = greatest_erosion(obj2);
+	if (val1 != val2) {
+		return val1 - val2; /* Because bigger is WORSE. */
+	}
+
+	/* Sort by erodeproofing. Map known-invulnerable to 1, and both
+	 * known-vulnerable and unknown-vulnerability to 0, because that's how they're displayed. */
+	val1 = obj1->rknown && obj1->oerodeproof;
+	val2 = obj2->rknown && obj2->oerodeproof;
+	if (val1 != val2) {
+		return val2 - val1; /* Because bigger is better. */
+	}
+
+	/* Sort by enchantment. Map unknown to -1000, which is comfortably below the range of ->spe. */
+	val1 = obj1->known ? obj1->spe : -1000;
+	val2 = obj2->known ? obj2->spe : -1000;
+	if (val1 != val2) {
+		return val2 - val1; /* Because bigger is better. */
+	}
+
+	return 0; /* They're identical, as far as we're concerned. */
 }
 #endif
 
