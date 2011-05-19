@@ -2300,7 +2300,7 @@ dumpoverview()
 	for (mptr = mapseenchn; mptr; mptr = mptr->next) {
 		/* try to find out if the last branch printed something */
 		if (!first && lastdun != mptr->lev.dnum && previous_was_interesting) {
-			dump_html("</li a>\n", "");
+			dump_html("</li>\n", "");
 			previous_was_interesting = FALSE;
 		}
 		/* only print out info for a level or a dungeon if interest */
