@@ -548,13 +548,13 @@ winid endwin;
 		makeknown(otmp->otyp);
 		otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
 		/* assumes artifacts don't have quan > 1 */
-		Sprintf(pbuf, "%s%s (worth %ld %s and %ld points)",
+		Sprintf(pbuf, "%s%s (worth %ld %s and %ld points),",
 			the_unique_obj(otmp) ? "The " : "",
 			otmp->oartifact ? artifact_name(xname(otmp), &dummy) :
 				OBJ_NAME(objects[otmp->otyp]),
 			value, currency(value), points);
 #ifdef DUMP_LOG
-		dump("", pbuf);
+		dump_line("", pbuf);
 		if (endwin != WIN_ERR)
 #endif
 		putstr(endwin, 0, pbuf);

@@ -341,8 +341,12 @@ const char *str;
 #ifdef DUMP_LOG
 	if (dump_fp)
 		fprintf(dump_fp, "  %s\n", str);
-	if (html_dump_fp)
-		fprintf(html_dump_fp, "<dt>%s</dt>\n", str);
+	if (html_dump_fp) {
+		fprintf(html_dump_fp, "<dt>");
+		while (*str != '\0')
+			fprintf(html_dump_fp, "%s", html_escape_character(*str++));
+		fprintf(html_dump_fp, "</dt>\n");
+	}
 #endif
 }
 
