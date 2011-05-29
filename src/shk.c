@@ -3484,9 +3484,10 @@ register struct monst *shkp;
 		} else {
 		    uondoor = (u.ux == eshkp->shd.x && u.uy == eshkp->shd.y);
 		    if(uondoor) {
-			badinv = (carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK) ||
-				  (Fast && (sobj_at(PICK_AXE, u.ux, u.uy) ||
-				  sobj_at(DWARVISH_MATTOCK, u.ux, u.uy))));
+			badinv = (!Is_blackmarket(&u.uz) &&
+				  (carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK) ||
+				   (Fast && (sobj_at(PICK_AXE, u.ux, u.uy) ||
+				   sobj_at(DWARVISH_MATTOCK, u.ux, u.uy)))));
 			if(satdoor && badinv)
 			    return(0);
 			avoid = !badinv;
@@ -4278,7 +4279,9 @@ register xchar x, y;
 	if(shkp->mx == sx && shkp->my == sy
 		&& shkp->mcanmove && !shkp->msleeping
 		&& (x == sx-1 || x == sx+1 || y == sy-1 || y == sy+1)
-		&& (Invis || carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK)
+		&& (Invis ||
+		 (!Is_blackmarket(&u.uz) &&
+		  (carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK)))
 #ifdef STEED
 			|| u.usteed
 #endif
