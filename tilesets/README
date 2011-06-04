@@ -1,0 +1,9 @@
+Tilesets for UnNetHack
+======================
+
+untiles32x.png (by Stephan T. Lavavej)
+
+ Based on Vanilla's 32x32 tileset, missing unnethack tiles added
+ and some general changes by Stephan T. Lavavej.
+
+ OPTIONS=tile_file:untiles32x.png, tile_width:32, tile_height:32
