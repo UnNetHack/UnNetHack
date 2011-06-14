@@ -33,6 +33,7 @@
 	  - visual indicator showing which spells can be refreshed (from K-Mod)
 	  - show level annotation when entering level (idea by Chris Smith)
 	  - refreshing spells is allowed at all time (with prompt) (from AceHack)
+	  - Automatically apply unlocking tool when trying to open a locked door
 
 	* new dungeon features:
 	  - dead trees (from NetHack Brass)

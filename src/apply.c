@@ -194,7 +194,7 @@ struct obj* tobj;
 	}
 	/* using a stethoscope on a safe?  You safe-cracker, you. */
 	if ((otmp = sobj_at(IRON_SAFE,rx,ry))) {
-		pick_lock(tobj,rx,ry);
+		pick_lock(tobj,rx,ry,FALSE);
 		return TRUE;
 	}
 
@@ -2849,7 +2849,7 @@ doapply()
 	case CREDIT_CARD:
 #endif
 	case SKELETON_KEY:
-		(void) pick_lock(obj,0,0);
+		(void) pick_lock(obj,0,0,FALSE);
 		break;
 	case PICK_AXE:
 	case DWARVISH_MATTOCK:
