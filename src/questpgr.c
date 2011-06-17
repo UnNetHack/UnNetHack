@@ -489,8 +489,14 @@ static const char *creator_names[] = {
 STATIC_OVL const char *
 creatorname()	
 {
-	int index = u.ubirthday % SIZE(creator_names);
-	return creator_names[index];
+	if (pirateday()) {
+		return "the FSM";
+	} else if (discordian_holiday()) {
+		return (u.ubirthday % 2) ? "Discordia" : "Eris";
+	} else {
+		int index = u.ubirthday % SIZE(creator_names);
+		return creator_names[index];
+	}
 }
 
 /*questpgr.c*/
