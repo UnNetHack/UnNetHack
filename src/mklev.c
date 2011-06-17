@@ -571,6 +571,8 @@ static const char * const illuminati_engravings[] = {
 	"Jeder Gedanke ist verschenkt, wenn Adam Weishaupt fuer dich denkt", /* Welle:Erdball */
 	"Novus Ordo Seclorum",
 	"Think for yourself, schmuck",
+	"Adam Weishaupt wasn't here!",
+	"Nothing is True, Everything is Permitted", /* Hassan-i Sabbah */
 };
 /* Quotes from or about the Hitchhikers Guide to the Galaxy */
 static const char * const hhgtg_engravings[] = {
