@@ -665,6 +665,7 @@ static const char * const currencies[] = {
 	"Ankh-Morpork Dollar",	/* Discworld */
 	"auric",		/* The Domination of Draka */
 	"buckazoid",		/* Space Quest */
+	"cirbozoid",		/* Starslip */
 	"credit chit",		/* Deus Ex */
 	"cubit",		/* Battlestar Galactica */
 	"Flanian Pobble Bead",	/* The Hitchhiker's Guide to the Galaxy */
