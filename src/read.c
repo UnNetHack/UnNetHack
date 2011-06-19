@@ -889,7 +889,9 @@ register struct obj	*sobj;
 #ifdef MAIL
 	case SCR_MAIL:
 		known = TRUE;
-		if (sobj->spe)
+		if (sobj->spe == MAIL_HINT)
+		    read_hint(sobj);
+		else if (sobj->spe == MAIL_JUNK)
 		    pline("This seems to be junk mail addressed to the finder of the Eye of Larn.");
 		/* note to the puzzled: the game Larn actually sends you junk
 		 * mail if you win!

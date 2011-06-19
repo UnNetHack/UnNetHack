@@ -87,7 +87,7 @@ boolean restore;
 
 			if (otmp->otyp == SLIME_MOLD) goodfruit(otmp->spe);
 #ifdef MAIL
-			else if (otmp->otyp == SCR_MAIL) otmp->spe = 1;
+			else if (otmp->otyp == SCR_MAIL) otmp->spe = MAIL_JUNK;
 #endif
 			else if (otmp->otyp == EGG) otmp->spe = 0;
 			else if (otmp->otyp == TIN) {

@@ -1014,6 +1014,7 @@ E void FDECL(nocmov, (int x, int y));
 E void NDECL(getmailstatus);
 # endif
 E void NDECL(ckmailstatus);
+E void FDECL(read_hint, (struct obj *));
 E void FDECL(readmail, (struct obj *));
 #endif /* MAIL */
 

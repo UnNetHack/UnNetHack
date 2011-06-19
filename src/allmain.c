@@ -425,6 +425,7 @@ moveloop()
 	} else if (multi == 0) {
 #ifdef MAIL
 	    ckmailstatus();
+	    maybe_hint();
 #endif
             maybe_tutorial();
 	    rhack((char *)0);

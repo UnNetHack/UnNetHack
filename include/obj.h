@@ -34,10 +34,14 @@ struct obj {
 				   royal coffers for a court ( == 2)
 				   tells which fruit a fruit is
 				   special for uball and amulet
-				   historic and gender for statues */
+				   historic and gender for statues
+				   real mail, junk mail or hint for scrolls of mail */
 #define STATUE_HISTORIC 0x01
 #define STATUE_MALE     0x02
 #define STATUE_FEMALE   0x04
+#define MAIL_MAIL 0
+#define MAIL_JUNK 1
+#define MAIL_HINT 2
 	char	oclass;		/* object class */
 	char	invlet;		/* designation in inventory */
 	char	oartifact;	/* artifact array index */
