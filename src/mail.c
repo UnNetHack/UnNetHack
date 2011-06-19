@@ -705,7 +705,7 @@ struct obj *otmp;
 
 		/* interface changes */
 		"'X' toggles twoweaponing.",
-		"Autopickup won't pick up dropped items if pickup_dropped is on.",
+		"Autopickup never picks up dropped items if pickup_dropped is set to false.",
 		"Ctrl-o resp. #overview lists interesting levels you already visited.",
 		"Press inventory letter for a menu of possible actions.",
 		"Pressing 'v' let's you explore faster.",
@@ -725,7 +725,7 @@ struct obj *otmp;
 void
 maybe_hint()
 {
-	if (u.uswallow) return;
+	if (u.uswallow || !flags.biff) return;
 	if (gethint < 0) {
 		/* */
 		if (moves < 100) {
