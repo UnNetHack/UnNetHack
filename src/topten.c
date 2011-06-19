@@ -278,31 +278,34 @@ encode_uevent()
 
   /* game plot events */
   if (u.uevent.minor_oracle ||
-      u.uevent.major_oracle)        c |= 0x0001UL; /* any Oracle consultation */
-  if (u.uevent.qcalled)             c |= 0x0002UL; /* reached quest portal level */
+      u.uevent.major_oracle)        c |= 0x00001UL; /* any Oracle consultation */
+  if (u.uevent.qcalled)             c |= 0x00002UL; /* reached quest portal level */
   if (quest_status.got_quest ||
-      quest_status.got_thanks)      c |= 0x0004UL; /* was accepted for quest */
-  if (u.uevent.qcompleted)          c |= 0x0008UL; /* showed quest arti to leader */
-  if (u.uevent.uopened_dbridge)     c |= 0x0010UL; /* opened/destroyed Castle drawbridge */
-  if (u.uevent.gehennom_entered)    c |= 0x0020UL; /* entered Gehennom the front way */
-  if (u.uevent.udemigod)            c |= 0x0040UL; /* provoked Rodney's wrath */
-  if (u.uevent.invoked)             c |= 0x0080UL; /* did the invocation */
-  if (u.uevent.ascended)            c |= 0x0100UL; /* someone needs to use this variable */
+      quest_status.got_thanks)      c |= 0x00004UL; /* was accepted for quest */
+  if (u.uevent.qcompleted)          c |= 0x00008UL; /* showed quest arti to leader */
+  if (u.uevent.uopened_dbridge)     c |= 0x00010UL; /* opened/destroyed Castle drawbridge */
+  if (u.uevent.gehennom_entered)    c |= 0x00020UL; /* entered Gehennom the front way */
+  if (u.uevent.udemigod)            c |= 0x00040UL; /* provoked Rodney's wrath */
+  if (u.uevent.invoked)             c |= 0x00080UL; /* did the invocation */
+  if (u.uevent.ascended)            c |= 0x00100UL; /* someone needs to use this variable */
 
   /* notable other events */
 #ifdef ELBERETH
-  if (u.uevent.uhand_of_elbereth)   c |= 0x0200UL; /* was crowned */
+  if (u.uevent.uhand_of_elbereth)   c |= 0x00200UL; /* was crowned */
 #endif
 
   /* boss kills */
-  if (quest_status.killed_nemesis)  c |= 0x0400UL; /* defeated quest nemesis */
-  if (mvitals[PM_CROESUS].died)     c |= 0x0800UL; /* defeated Croesus */
-  if (mvitals[PM_MEDUSA].died)      c |= 0x1000UL; /* defeated Medusa */
+  if (quest_status.killed_nemesis)  c |= 0x00400UL; /* defeated quest nemesis */
+  if (mvitals[PM_CROESUS].died)     c |= 0x00800UL; /* defeated Croesus */
+  if (mvitals[PM_MEDUSA].died)      c |= 0x01000UL; /* defeated Medusa */
   if (mvitals[PM_VLAD_THE_IMPALER].
-      died)                         c |= 0x2000UL; /* defeated Vlad */
+      died)                         c |= 0x02000UL; /* defeated Vlad */
   if (mvitals[PM_WIZARD_OF_YENDOR].
-      died)                         c |= 0x4000UL; /* defeated Rodney */
-  if (mvitals[PM_HIGH_PRIEST].died) c |= 0x8000UL; /* defeated a high priest */
+      died)                         c |= 0x04000UL; /* defeated Rodney */
+  if (mvitals[PM_HIGH_PRIEST].died) c |= 0x08000UL; /* defeated a high priest */
+  if (mvitals[PM_BLACK_MARKETEER].
+      died)                         c |= 0x10000UL; /* defeated One-eyed Sam */
+  if (mvitals[PM_CTHULHU].died)     c |= 0x20000UL; /* defeated Cthulhu */
 
   return c;
 }
