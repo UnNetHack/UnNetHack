@@ -1,9 +1,7 @@
 2011-XX-XX  UnNetHack 3.5.4
 	* changing color of monster with config line:
 	  MONSTERCOLOR=acid blob:lightcyan
-	* Fixed crashes when attacking long worms on flipped levels
 	* HTML dump: output IBMgraphics and DECgraphics characters
-	* HTML dump: fix crash if monster name is too long
 	* Multiple bones files per level (not on Win32)
 	* Autoconf compliant installation directory variables
 	* added new tiles and fixed building of 16x16 tiles (by Stephan T. Lavavej)
@@ -40,6 +38,11 @@
 
 	* vanilla bug fixes:
 	  - C343-74, C343-198
+
+	* bug fixes:
+	  - HTML dump: fix crash if monster name is too long
+	  - Fixed crashes when attacking long worms on flipped levels
+	  - Fixed ctrl-e overwriting engraved engravings with dust messages
 
 2010-10-10  UnNetHack 3.5.3-1
 	* bug fixes:

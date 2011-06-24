@@ -996,7 +996,7 @@ boolean fingers;
 
 	    /* Give player the choice to add to engraving. */
 
-	    if (type == HEADSTONE || engraving) {
+	    if (type == HEADSTONE) {
 		/* no choice, only append */
 		c = 'y';
 	    } else if ( (type == oep->engr_type) && (!Blind ||
@@ -1009,7 +1009,8 @@ boolean fingers;
 		}
 	    }
 
-	    if (c == 'n' || Blind) {
+	    if (c == 'n' || Blind ||
+	        (engraving && (oep->engr_type != type))) {
 
 		if( (oep->engr_type == DUST) || (oep->engr_type == ENGR_BLOOD) ||
 		    (oep->engr_type == MARK) ) {
