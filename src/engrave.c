@@ -569,7 +569,7 @@ boolean fingers;
 	ebuf[0] = (char)0;
 	post_engr_text[0] = (char)0;
 	maxelen = BUFSZ - 1;
-	if (is_demon(youmonst.data) || youmonst.data->mlet == S_VAMPIRE)
+	if (is_demon(youmonst.data) || is_vampire(youmonst.data))
 	    type = ENGR_BLOOD;
 
 	/* Can the adventurer engrave at all? */
@@ -996,7 +996,7 @@ boolean fingers;
 
 	    /* Give player the choice to add to engraving. */
 
-	    if (type == HEADSTONE) {
+	    if (type == HEADSTONE || engraving) {
 		/* no choice, only append */
 		c = 'y';
 	    } else if ( (type == oep->engr_type) && (!Blind ||
