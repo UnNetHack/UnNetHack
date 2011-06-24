@@ -1023,7 +1023,7 @@ static const char * const bogusmons[] = {
 	/* from UnNetHack */
 	"apostroph golem", "Bob the angry flower",
 	"bonsai-kitten", "Boxxy", "lonelygirl15",
-	"tie-thulu", "Domo-kun",
+	"tie-thulu", "Domo-kun", "nyan cat",
 	"looooooooooooong cat",			/* internet memes */
 	"bohrbug", "mandelbug", "schroedinbug", /* bugs */
 	"Gerbenok",				/* Monty Python killer rabbit */
