@@ -740,6 +740,7 @@ enable_score_on_botl
 enable_realtime_on_botl
 enable_high_score_comparison_by_uid
 enable_paranoid
+enable_shell
 enable_show_born
 enable_show_extinct
 enable_sortloot
@@ -1438,6 +1439,7 @@ Optional Features:
                           user name (default=no)
   --enable-paranoid       Require some questions to be answered with 'yes'
                           instead of 'y' (default=yes)
+  --enable-shell          Start a shell from within the game (default=no)
   --enable-show-born      Display number of created monsters at the end of
                           game (default=yes)
   --enable-show-extinct   Display extinct monsters at the end of game
@@ -6594,6 +6596,25 @@ $as_echo "$enable_paranoid" >&6; }
 
 cat >>confdefs.h <<_ACEOF
 #define PARANOID /**/
+_ACEOF
+
+   fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable shell" >&5
+$as_echo_n "checking whether to enable shell... " >&6; }
+   # Check whether --enable-shell was given.
+if test "${enable_shell+set}" = set; then :
+  enableval=$enable_shell;
+else
+  enable_shell="no"
+fi
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_shell" >&5
+$as_echo "$enable_shell" >&6; }
+   if test "$enable_shell" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define SHELL /**/
 _ACEOF
 
    fi
