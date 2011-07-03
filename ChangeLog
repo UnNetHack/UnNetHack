@@ -43,6 +43,8 @@
 	  - HTML dump: fix crash if monster name is too long
 	  - Fixed crashes when attacking long worms on flipped levels
 	  - Fixed ctrl-e overwriting engraved engravings with dust messages
+	  - Workaround for preventing the stairs to Vlad's tower appearing
+	    in the wizard's tower
 
 2010-10-10  UnNetHack 3.5.3-1
 	* bug fixes:
