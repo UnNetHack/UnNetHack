@@ -45,6 +45,8 @@
 	  - Fixed ctrl-e overwriting engraved engravings with dust messages
 	  - Workaround for preventing the stairs to Vlad's tower appearing
 	    in the wizard's tower
+	  - Fixed breaking of pacifist conduct when killing a monster with
+	    an unknown rolling boulder trap
 
 2010-10-10  UnNetHack 3.5.3-1
 	* bug fixes:
