@@ -7,3 +7,11 @@ untiles32x.png (by Stephan T. Lavavej)
  and some general changes by Stephan T. Lavavej.
 
  OPTIONS=tile_file:untiles32x.png, tile_width:32, tile_height:32
+
+
+unchozo32b.png
+
+ Based on Abigaba Tiles by James Hogwood
+ modified by Kevin Bailey and Patric Mueller
+
+ OPTIONS=tile_file:unchozo32b.png, tile_width:32, tile_height:32
