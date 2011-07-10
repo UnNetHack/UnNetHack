@@ -1,4 +1,4 @@
-2011-XX-XX  UnNetHack 3.5.4
+2011-XX-XX  UnNetHack 3.6.0
 	* changing color of monster with config line:
 	  MONSTERCOLOR=acid blob:lightcyan
 	* HTML dump: output IBMgraphics and DECgraphics characters
