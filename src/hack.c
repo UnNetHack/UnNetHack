@@ -1089,7 +1089,10 @@ int x, y;
 	if (glyph_is_object(levl[x][y].glyph) &&
 			glyph_to_obj(levl[x][y].glyph) == BOULDER) return FALSE;
 	if (glyph_is_object(levl[x][y].glyph) &&
-			inside_shop(x, y)) return FALSE;
+			inside_shop(x, y)) {
+		/* Black Market items are interesting */
+		return (Is_blackmarket(&u.uz));
+	}
 	if (glyph_is_object(levl[x][y].glyph)) return TRUE;
 	for (i = -1; i <= 1; i++) {
 		for (j = -1; j <= 1; j++) {
