@@ -346,7 +346,7 @@ doextlist()	/* here after #? - now list all full-word commands */
 }
 
 #if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
-#define MAX_EXT_CMD 40		/* Change if we ever have > 40 ext cmds */
+#define MAX_EXT_CMD 50		/* Change if we ever have > 50 ext cmds */
 /*
  * This is currently used only by the tty port and is
  * controlled via runtime option 'extmenu'
@@ -381,13 +381,11 @@ extcmd_via_menu()	/* here after # - now show pick-list of possible commands */
 				biggest = strlen(efp->ef_desc);
 				Sprintf(fmtstr,"%%-%ds", biggest + 15);
 			}
-#ifdef DEBUG
 			if (i >= MAX_EXT_CMD - 2) {
 			    warning("Exceeded %d extended commands in doextcmd() menu",
 					MAX_EXT_CMD - 2);
 			    return 0;
 			}
-#endif
 		}
 	    }
 	    choices[i] = (struct ext_func_tab *)0;
