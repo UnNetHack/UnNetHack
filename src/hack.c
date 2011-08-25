@@ -1096,6 +1096,12 @@ int x, y;
 		return (Is_blackmarket(&u.uz));
 	}
 	if (glyph_is_object(levl[x][y].glyph)) return TRUE;
+
+	/* step into shop doorways so autoexplore can be interrupted */
+	if (IS_DOOR(levl[x][y].typ) && *in_rooms(x, y, SHOPBASE)) {
+		return TRUE;
+	}
+
 	for (i = -1; i <= 1; i++) {
 		for (j = -1; j <= 1; j++) {
 			if (isok(x+i, y+j) &&

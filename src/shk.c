@@ -612,6 +612,9 @@ register char *enterstring;
 	if(!*enterstring)
 		return;
 
+	/* interrupt multi turn stuff */
+	nomul(0, 0);
+
 	if(!(shkp = shop_keeper(*enterstring))) {
 	    if (!index(empty_shops, *enterstring) &&
 		in_rooms(u.ux, u.uy, SHOPBASE) !=
