@@ -179,8 +179,8 @@ static struct Bool_Opt
 	{"page_wait", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 #ifdef PARANOID
-	{"paranoid_hit", &iflags.paranoid_hit, FALSE, SET_IN_FILE},
-	{"paranoid_quit", &iflags.paranoid_quit, FALSE, SET_IN_FILE},
+	{"paranoid_hit", &iflags.paranoid_hit, TRUE, SET_IN_FILE},
+	{"paranoid_quit", &iflags.paranoid_quit, TRUE, SET_IN_FILE},
 	{"paranoid_remove", &iflags.paranoid_remove, FALSE, SET_IN_FILE},
 	{"paranoid_trap", &iflags.paranoid_trap, FALSE, SET_IN_FILE},
 #endif

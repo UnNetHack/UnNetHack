@@ -32,6 +32,7 @@
 	  - show level annotation when entering level (idea by Chris Smith)
 	  - refreshing spells is allowed at all time (with prompt) (from AceHack)
 	  - Automatically apply unlocking tool when trying to open a locked door
+	  - Options paranoid_hit and paranoid_quit on by default
 
 	* new dungeon features:
 	  - dead trees (from NetHack Brass)
