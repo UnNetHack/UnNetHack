@@ -945,6 +945,10 @@ hitmu(mtmp, mattk)
 				goto do_stone;
 			}
 			dmg += dmgval(otmp, &youmonst);
+			if (objects[otmp->otyp].oc_material == SILVER &&
+				hates_silver(youmonst.data)) {
+			    pline("The silver sears your flesh!");
+			}
 			if (dmg <= 0) dmg = 1;
 			if (!(otmp->oartifact &&
 				artifact_hit(mtmp, &youmonst, otmp, &dmg,dieroll)))

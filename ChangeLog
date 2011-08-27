@@ -39,6 +39,8 @@
 
 	* vanilla bug fixes:
 	  - C343-74, C343-198
+	  - C343-171: Silver weapon damage message is sometimes missing when
+	              hero is polymorphed
 
 	* bug fixes:
 	  - HTML dump: fix crash if monster name is too long
