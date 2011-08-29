@@ -2227,9 +2227,10 @@ register struct monst *shkp;
 	/* some shopkeepers just want to rip you off */
 	if (tmp > 4L && ESHK(shkp)->cheapskate) {
 		tmp -= tmp / 4L;
+	}
 	/* shopkeeper may notice if the player isn't very knowledgeable -
 	   especially when gem prices are concerned */
-	} else if (!obj->dknown || !objects[obj->otyp].oc_name_known) {
+	if (!obj->dknown || !objects[obj->otyp].oc_name_known) {
 		if (obj->oclass == GEM_CLASS) {
 			/* different shop keepers give different prices */
 			if (objects[obj->otyp].oc_material == GEMSTONE ||
