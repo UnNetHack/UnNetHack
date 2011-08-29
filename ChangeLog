@@ -38,7 +38,10 @@
 	  - dead trees (from NetHack Brass)
 
 	* vanilla bug fixes:
-	  - C343-74, C343-198
+	  - C343-74:  Entering a long running, uninterruptible command after
+	              stoning starts will kill you.
+	  - C343-198: Playing in a 20 or 21 line window can cause the game to
+	              crash.
 	  - C343-171: Silver weapon damage message is sometimes missing when
 	              hero is polymorphed
 
@@ -88,8 +91,16 @@
 	      walking into known traps
 
 	* vanilla bug fixes:
-	  - C343-12, C343-94, C343-189, C343-235
-	  - SC343-8, SC343-20
+	  - C343-12:  You can't use '>' to enter a pit.
+	  - C343-94:  Probing a re-animated statue may cause a panic.
+	  - C343-189: Temple donations and protection lost to gremlin attack
+	              interact incorrectly.
+	  - C343-235: Casting spell of protection gives incorrect message if
+	              hero is swallowed or in rock.
+	  - SC343-8:  Re-animating a statue containing gold produces too much
+	              gold.
+	  - SC343-20: Hangup save while picking up gold in a shop may
+	              duplicate the gold.
 
 	* added items:
 	  - scroll of flood
@@ -136,7 +147,12 @@
 	  - While Helpless (by Pasi Kallinen)
 
 	* vanilla bug fixes:
-	  - C343-55, C343-116, C343-136, C343-211, C343-231
+	  - C343-55:  "Ulch" messages have inconsistent capitalization.
+	  - C343-116: Grammar error in messages related to choking on gold.
+	  - C343-136: A samurai quest guardian message uses "ninja" where
+	              "ronin" is intended.
+	  - C343-211: Engraving under water gives a poorly worded message.
+	  - C343-231: Time is distorted while sinking into lava.
 
 	* user interface improvements:
 	  - Interrupt a multi turn action if hit points or magical energy is restored 
@@ -181,9 +197,32 @@
 	  - xlogfile (by Aardvark Joe)
 
 	* vanilla bug fixes:
-	  - Astral Call Bug (SC343-11, SC343-12)
-	  - C343-8, C343-19, C343-100, C343-179, C343-218, C343-258, C343-259,
-	    C343-268, C343-275, C343-276, C343-298, C343-318, C343-324
+	  - Astral Call Bug:
+	    SC343-11: It's possible to easily find the identity of a high
+	              priest on the Astral plane.
+	    SC343-12: Hero using telepathy can abuse Call on the Astral Plane.
+	  - C343-8:   Plural of Nazgul is Nazgul - not Nazguls.
+	  - C343-19:  Dipping acid in a fountain may not destroy the acid.
+	  - C343-100: Game may crash if thrown potion hits bars before a
+	              monster.
+	  - C343-179: If a monster is killed or tamed while over water (or by
+	              a drawbridge) while carrying a potion of acid, the game
+	              may panic.
+	  - C343-218: Applying a wielded cream pie can crash the game.
+	  - C343-258: Grammar error in samurai quest: "wakarimasu?" instead of
+	              "wakarimasu ka?"
+	  - C343-259: "Dr. Dolittle" is spelled incorrectly.
+	  - C343-268: Used up potion of acid may end up in bones file.
+	  - C343-275: If a lit, wielded, candle or potion of oil burns out,
+	              the game may crash.
+	  - C343-276: If a figurine auto-transforms while wielded or worn, the
+	              game may crash.
+	  - C343-298: Kicking at "empty space" uses no time.
+	  - C343-318: Opening or closing the castle drawbridge using music
+	              takes no time.
+	  - C343-324: Cutting a long worm in two will crash the game if the
+	              cut takes the worm to 1 HP or if long worms had become
+	              extinct.
 
 	* new monsters:
 	  - Cthulhu (from Slash'Em Lethe)
