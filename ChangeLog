@@ -54,6 +54,8 @@
 	  - Fixed breaking of pacifist conduct when killing a monster with
 	    an unknown rolling boulder trap
 	  - Fixed crash in wizard mode when using extmenu set to true
+	  - Cheapskate shopkeepers calculated unknown gem prices as if they
+	    were known.
 
 2010-10-10  UnNetHack 3.5.3-1
 	* bug fixes:
