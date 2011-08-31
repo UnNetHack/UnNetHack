@@ -912,10 +912,12 @@ dodown()
 	    return (0);   /* didn't move */
 	}
 	if (!stairs_down && !ladder_down) {
-		if (!(trap = t_at(u.ux,u.uy)) ||
+		trap = t_at(u.ux,u.uy);
+		boolean can_fall_thru_trap = trap && (trap->ttyp == TRAPDOOR || trap->ttyp == HOLE);
+		if (!trap ||
 			(trap->ttyp != TRAPDOOR && trap->ttyp != HOLE &&
 			 trap->ttyp != PIT && trap->ttyp != SPIKED_PIT)
-			|| !Can_fall_thru(&u.uz) || !trap->tseen) {
+			|| ((!Can_fall_thru(&u.uz)) && can_fall_thru_trap) || !trap->tseen) {
 
 			if (flags.autodig && !flags.nopick &&
 				uwep && is_pick(uwep)) {
