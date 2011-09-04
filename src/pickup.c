@@ -643,13 +643,15 @@ menu_item **pick_list;	/* list of objects and counts to pick up */
 #ifndef AUTOPICKUP_EXCEPTIONS
 	    if ((!*otypes || index(otypes, curr->oclass) ||
 	         (flags.pickup_thrown && curr->was_thrown)) &&
-	        (flags.pickup_dropped || !curr->was_dropped))
+	        (flags.pickup_dropped || !curr->was_dropped) &&
+	        !Is_sokoprize(curr))
 #else
 	    if ((!*otypes || index(otypes, curr->oclass) ||
 	         (flags.pickup_thrown && curr->was_thrown) ||
 		 is_autopickup_exception(curr, TRUE)) &&
 	        ((flags.pickup_dropped || !curr->was_dropped) &&
-	    	 !is_autopickup_exception(curr, FALSE)))
+	         !is_autopickup_exception(curr, FALSE) &&
+	         !Is_sokoprize(curr)))
 #endif
 		n++;
 	}
@@ -660,13 +662,15 @@ menu_item **pick_list;	/* list of objects and counts to pick up */
 #ifndef AUTOPICKUP_EXCEPTIONS
 		if ((!*otypes || index(otypes, curr->oclass) ||
 	             (flags.pickup_thrown && curr->was_thrown)) &&
-	            (flags.pickup_dropped || !curr->was_dropped)) {
+	            (flags.pickup_dropped || !curr->was_dropped) &&
+	            !Is_sokoprize(curr)) {
 #else
 	    if ((!*otypes || index(otypes, curr->oclass) ||
 		 (flags.pickup_thrown && curr->was_thrown) ||
 		 is_autopickup_exception(curr, TRUE)) &&
 	        ((flags.pickup_dropped || !curr->was_dropped) &&
-	    	 !is_autopickup_exception(curr, FALSE))) {
+	         !is_autopickup_exception(curr, FALSE) &&
+	         !Is_sokoprize(curr))) {
 #endif
 		    pi[n].item.a_obj = curr;
 		    pi[n].count = curr->quan;
