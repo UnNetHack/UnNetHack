@@ -1215,11 +1215,8 @@ boolean (*guess)(int, int);
                             }
 			    continue;
 			}
-			if (test_move(x, y, nx-x, ny-y, TEST_TRAP))
-				goto release_travel_hold;
 		    }
 		    if (test_move(x, y, nx-x, ny-y, TEST_TRAV)) {
-release_travel_hold:
 			    if (levl[nx][ny].seenv || (!Blind && couldsee(nx, ny))) {
 				    if (nx == ux && ny == uy) {
 					    if (!guess) {
