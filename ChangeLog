@@ -1,4 +1,4 @@
-2011-XX-XX  UnNetHack 3.6.0
+2011-09-XX  UnNetHack 3.6.0
 	* changing color of monster with config line:
 	  MONSTERCOLOR=acid blob:lightcyan
 	* HTML dump: output IBMgraphics and DECgraphics characters
@@ -7,14 +7,18 @@
 	* added new tiles and fixed building of 16x16 tiles (by Stephan T. Lavavej)
 	* Curses GUI updated to last version
 	* Giantslayer grants STR 18/** when wielded
+	* Simple hint mode
+	* New config option for changing order of spells in spell menu:
+	  SPELLORDER=ZzqwertuiopasdfghjklyxcvbnmQWERTUIOPASDFGHJKLYXCVBNM
+	* Hallucination: fictional currencies
 
 	* more candles:
 	  - lighting shop in orcus town
 	  - Gnomes get candles (more likely in dark mines) (from AceHack)
 
 	* patches:
-	  - DYWYPISI? (by Jafet)
-	  - Grudge (by Nephi)
+	  - DYWYPISI? (adds identification details to dump) (by Jafet)
+	  - Grudge (some NPC monsters attacking each other) (by Nephi)
 	  - MSGTYPE option (by Pasi Kallinen)
 	  - Sortloot (by Jukka Lahtinen)
 	    * changed to sort by description, BUC and more
@@ -34,6 +38,7 @@
 	  - Automatically apply unlocking tool when trying to open a locked door
 	  - Options paranoid_hit and paranoid_quit on by default
 	  - Don't autopickup sokoban prizes
+	  - Auto-opening doors when using autotravel
 
 	* new dungeon features:
 	  - dead trees (from NetHack Brass)
@@ -57,6 +62,10 @@
 	  - Fixed crash in wizard mode when using extmenu set to true
 	  - Cheapskate shopkeepers calculated unknown gem prices as if they
 	    were known.
+	  - Enable entering pits with > on undiggable levels
+	  - Blackmarket shopkeeper not blocking player carrying a digging tool
+	  - Draining corpses shouldn't make your fingers slippery
+	  - Prevent player vampire from rising as other monster
 
 2010-10-10  UnNetHack 3.5.3-1
 	* bug fixes:
