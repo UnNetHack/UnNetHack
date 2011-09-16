@@ -343,7 +343,7 @@ $(srcdir)/../src/tile.c: tilemap
 
 ../include/tile.h: ../win/share/tile.h tilemap
 	./tilemap
-#	cp ../win/share/tile.h ../include/tile.h
+	cp ../win/share/tile.h ../include/tile.h
 
 tiletext.o: $(srcdir)/../win/share/tiletext.c $(CONFIG_H) ../include/tile.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/share/tiletext.c
