@@ -87,6 +87,7 @@ doread()
     "Don't Panic",				/* HHGTTG */
     "Furinkan High School Athletic Dept.",	/* Ranma 1/2 */
     "Hel-LOOO, Nurse!",			/* Animaniacs */
+    "I made a NetHack fork and all I got was this lousy T-shirt!",	/* galehar */
 	    };
 	    char buf[BUFSZ];
 	    int erosion;
