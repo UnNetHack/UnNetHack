@@ -1,3 +1,9 @@
+unnethack (3.6.0) lucid; urgency=low
+
+  * New major release.
+
+ -- Patric Mueller <bhaak@gmx.net>  Sat, 08 Oct 2011 18:28:34 +0200
+
 unnethack (3.5.3-0ubuntu3) maverick; urgency=low
 
   * Fixed build.
