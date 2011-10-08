@@ -14,10 +14,10 @@
 
 override_dh_fixperms:
 	dh_fixperms
-	for filename in perm record logfile xlogfile save; do \
-		chmod g+w debian/unnethack/var/games/unnethack/$$filename; \
+	for filename in perm record logfile xlogfile bones level saves; do \
+		chmod g+w debian/unnethack/var/unnethack/$$filename; \
 	done
-	chmod g+w debian/unnethack/var/games/unnethack
-	chgrp -R games debian/unnethack/var/games/unnethack
-	chmod -R 02755 debian/unnethack/var/games/unnethack/unnethack
+	chmod g+w debian/unnethack/var/unnethack
+	chgrp -R games debian/unnethack/var/unnethack debian/unnethack/usr/share/unnethack/
+	chmod -R 02755 debian/unnethack/usr/share/unnethack/unnethack
 
