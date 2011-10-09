@@ -1030,7 +1030,7 @@ static const char * const bogusmons[] = {
 	"doenertier",				/* Erkan & Stefan */
 	"Invisible Pink Unicorn",
 	"Flying Spaghetti Monster",		/* deities */
-	"Bluebear", "Professor Abdullah Nightingale"
+	"Bluebear", "Professor Abdullah Nightingale",
 	"Qwerty Uiop", "troglotroll",		/* Zamonien */
 	"wolpertinger", "elwedritsche", "skvader",
 	"Nessie", "tatzelwurm", "dahu",		/* european cryptids */
