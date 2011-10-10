@@ -272,18 +272,19 @@ void curses_clear_nhwindow(winid wid)
 void curses_display_nhwindow(winid wid, BOOLEAN_P block)
 {
     menu_item *selected = NULL;
-    
+
+    if ((wid == MAP_WIN) && block)
+    {
+      (void) curses_more();
+    }
+
     if (curses_is_menu(wid) || curses_is_text(wid))
     {
         curses_end_menu(wid, "");
         curses_select_menu(wid, PICK_NONE, &selected);
         return;
     }
-    
-    if ((wid == MAP_WIN) && (curses_window_exists(MAP_WIN)) && block)
-    {
-        (void) curses_more();
-    }
+
 }
 
 
