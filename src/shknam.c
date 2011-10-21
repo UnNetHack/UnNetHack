@@ -33,7 +33,7 @@ static const char * const shkliquors[] = {
     "Brzeg", "Krnov", "Hradec Kralove",
     /* Schweiz */
     "Leuk", "Brig", "Brienz", "Thun", "Sarnen", "Burglen", "Elm",
-    "Flims", "Vals", "Scuol", 
+    "Flims", "Vals", "Scuol",
     "Chur", "Pagig",
     0
 };
@@ -172,8 +172,8 @@ static const char * const shkgeneral[] = {
 };
 
 static const char *shkmusic[] = {
-    "John", "Paul", "George", "Ringo"
-    "Elvis", "Mick", "Keith", "Ron", "Charlie"
+    "John", "Paul", "George", "Ringo",
+    "Elvis", "Mick", "Keith", "Ron", "Charlie",
     "Joseph", "Franz", "Richard", "Ludwig", "Wolfgang Amadeus",
     "Johann Sebastian",
     "Karlheinz", "Gyorgy",
