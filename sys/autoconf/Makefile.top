@@ -304,9 +304,6 @@ install: $(GAME) recover$(EXEEXT) $(CNF_SHARE_DAT) dungeon spec_levs @GUIDEBOOK_
 # not all mkdirs have -p; those that don't will create a -p directory
 	-mkdir -p $(DESTDIR)$(GAMEDIR) $(DESTDIR)$(VARDIR)
 	-mkdir -p $(DESTDIR)$(SHELLDIR)
-	-rm -rf $(DESTDIR)$(FILE_AREA_VAR) $(DESTDIR)$(FILE_AREA_BONES) $(DESTDIR)$(FILE_AREA_SAVE)
-	-rm -rf $(DESTDIR)$(FILE_AREA_LEVL) $(DESTDIR)$(FILE_AREA_SHARE) $(DESTDIR)$(FILE_AREA_UNSHARE)
-	-rm -rf $(DESTDIR)$(FILE_AREA_DOC)
 	-mkdir -p $(DESTDIR)$(FILE_AREA_VAR) $(DESTDIR)$(FILE_AREA_BONES) $(DESTDIR)$(FILE_AREA_SAVE)
 	-mkdir -p $(DESTDIR)$(FILE_AREA_LEVL) $(DESTDIR)$(FILE_AREA_SHARE) $(DESTDIR)$(FILE_AREA_UNSHARE)
 	-mkdir -p $(DESTDIR)$(FILE_AREA_DOC)
