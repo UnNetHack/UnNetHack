@@ -346,11 +346,14 @@ moveloop()
 	}
 
 #ifdef REALTIME_ON_BOTL
-	if(iflags.showrealtime) {
+	if (iflags.showrealtime) {
 		/* Update the bottom line if the number of minutes has
 		 * changed */
-		if(get_realtime() / 60 != realtime_data.last_displayed_time / 60)
+		time_t currenttime = get_realtime();
+		if (currenttime / 60 != realtime_data.last_displayed_time / 60) {
 			flags.botl = 1;
+			realtime_data.last_displayed_time = currenttime;
+		}
 	}
 #endif
 
