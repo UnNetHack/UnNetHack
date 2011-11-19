@@ -678,26 +678,41 @@ do_positionbar()
 time_t
 get_realtime(void)
 {
-	time_t curtime;
+	time_t current_time = 0;
+	/* Add maximally this many seconds per invocation to get somewhat
+	 * reasonable realtime values. */
+#define MAX_IDLE_TIME_IN_SECONDS 60
+	static time_t time_last_activity = 0;
+	static time_t time_spent_playing = 0;
 
     /* Get current time */
 #if defined(BSD) && !defined(POSIX_TYPES)
-	(void) time((long *)&curtime);
+	(void) time((long *)&current_time);
 #else
-	(void) time(&curtime);
+	(void) time(&current_time);
 #endif
+
+	/* Initialize last_activity_time. */
+	if (time_last_activity == 0) {
+		time_last_activity = current_time;
+	}
 
 	/* Since the timer isn't set until the game starts, this prevents us
 	 * from displaying nonsense on the bottom line before it does. */
-	if(realtime_data.restoretime == 0) {
-		curtime = realtime_data.realtime;
+	if (realtime_data.restoretime == 0) {
+		time_spent_playing = realtime_data.realtime;
 	} else {
-		curtime -= realtime_data.restoretime;
-		curtime += realtime_data.realtime;
+		time_t idletime = current_time - time_last_activity;
+		time_last_activity = current_time;
+		/* Add time the player spent "thinking". */
+		time_spent_playing += (idletime > MAX_IDLE_TIME_IN_SECONDS) ? MAX_IDLE_TIME_IN_SECONDS : idletime;
+		/* Update realtime for livelog events. */
+		realtime_data.realtime = time_spent_playing;
 	}
 
-	return curtime;
+	return time_spent_playing;
 }
+#undef MAX_IDLE_TIME_IN_SECONDS
 #endif /* REALTIME_ON_BOTL || RECORD_REALTIME */
 
 #endif /* OVLB */
