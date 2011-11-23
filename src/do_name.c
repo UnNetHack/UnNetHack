@@ -28,6 +28,7 @@ const char *goal;
     putstr(tmpwin, 0, "Or enter a background symbol (ex. <).");
     /* disgusting hack; the alternate selection characters work for any
        getpos call, but they only matter for dowhatis (and doquickwhatis) */
+    putstr(tmpwin, 0, "Use m and M to select a monster.");
     doing_what_is = (goal == what_is_an_unknown_object);
     Sprintf(sbuf, "Type a .%s when you are at the right place.",
             doing_what_is ? " or , or ; or :" : "");
@@ -38,6 +39,96 @@ const char *goal;
     display_nhwindow(tmpwin, TRUE);
     destroy_nhwindow(tmpwin);
 }
+
+struct _getpos_monarr {
+    coord pos;
+    long du;
+};
+static int getpos_monarr_len = 0;
+static int getpos_monarr_idx = 0;
+static struct _getpos_monarr *getpos_monarr_pos = NULL;
+
+void
+getpos_freemons()
+{
+    if (getpos_monarr_pos) free(getpos_monarr_pos);
+    getpos_monarr_pos = NULL;
+    getpos_monarr_len = 0;
+}
+
+static int
+getpos_monarr_cmp(a, b)
+     const void *a;
+     const void *b;
+{
+    const struct _getpos_monarr *m1 = (const struct _getpos_monarr *)a;
+    const struct _getpos_monarr *m2 = (const struct _getpos_monarr *)b;
+    return (m1->du - m2->du);
+}
+
+void
+getpos_initmons()
+{
+    struct monst *mtmp = fmon;
+    if (getpos_monarr_pos) getpos_freemons();
+    while (mtmp) {
+	if (!DEADMONSTER(mtmp) && canspotmon(mtmp)) getpos_monarr_len++;
+	mtmp = mtmp->nmon;
+    }
+    if (getpos_monarr_len) {
+	int idx = 0;
+	getpos_monarr_pos = (struct _getpos_monarr *)malloc(sizeof(struct _getpos_monarr) * getpos_monarr_len);
+	mtmp = fmon;
+	while (mtmp) {
+	    if (!DEADMONSTER(mtmp) && canspotmon(mtmp)) {
+		getpos_monarr_pos[idx].pos.x = mtmp->mx;
+		getpos_monarr_pos[idx].pos.y = mtmp->my;
+		getpos_monarr_pos[idx].du = distu(mtmp->mx, mtmp->my);
+		idx++;
+	    }
+	    mtmp = mtmp->nmon;
+	}
+	qsort(getpos_monarr_pos, getpos_monarr_len, sizeof(struct _getpos_monarr), getpos_monarr_cmp);
+    }
+}
+
+struct monst *
+getpos_nextmon()
+{
+    if (!getpos_monarr_pos) {
+	getpos_initmons();
+	if (getpos_monarr_len < 1) return NULL;
+	getpos_monarr_idx = -1;
+    }
+    if (getpos_monarr_idx >= -1 && getpos_monarr_idx < getpos_monarr_len) {
+	struct monst *mon;
+	getpos_monarr_idx = (getpos_monarr_idx + 1) % getpos_monarr_len;
+	mon = m_at(getpos_monarr_pos[getpos_monarr_idx].pos.x,
+		   getpos_monarr_pos[getpos_monarr_idx].pos.y);
+	return mon;
+    }
+    return NULL;
+}
+
+struct monst *
+getpos_prevmon()
+{
+    if (!getpos_monarr_pos) {
+	getpos_initmons();
+	if (getpos_monarr_len < 1) return NULL;
+	getpos_monarr_idx = getpos_monarr_len;
+    }
+    if (getpos_monarr_idx >= 0 && getpos_monarr_idx <= getpos_monarr_len) {
+	struct monst *mon;
+	getpos_monarr_idx = (getpos_monarr_idx - 1);
+	if (getpos_monarr_idx < 0) getpos_monarr_idx = getpos_monarr_len - 1;
+	mon = m_at(getpos_monarr_pos[getpos_monarr_idx].pos.x,
+		   getpos_monarr_pos[getpos_monarr_idx].pos.y);
+	return mon;
+    }
+    return NULL;
+}
+
 
 int
 getpos(cc, force, goal)
@@ -124,6 +215,13 @@ const char *goal;
 
 	if(c == '?'){
 	    getpos_help(force, goal);
+	} else if (c == 'm' || c == 'M') {
+	    struct monst *tmpmon = (c == 'm') ? getpos_nextmon() : getpos_prevmon();
+	    if (tmpmon) {
+		cx = tmpmon->mx;
+		cy = tmpmon->my;
+		goto nxtc;
+	    }
 	} else {
 	    if (!index(quitchars, c)) {
 		char matching[MAXPCHARS];
@@ -207,6 +305,7 @@ const char *goal;
     if (msg_given) clear_nhwindow(WIN_MESSAGE);
     cc->x = cx;
     cc->y = cy;
+    getpos_freemons();
     return result;
 }
 

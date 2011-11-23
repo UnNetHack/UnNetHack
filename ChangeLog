@@ -1,3 +1,7 @@
+201X-XX-XX  UnNetHack X.X.X
+	* user interface improvements:
+	  - Monster Targeting v1.2 (by Pasi Kallinen)
+
 2011-10-08  UnNetHack 3.6.0
 	* changing color of monster with config line:
 	  MONSTERCOLOR=acid blob:lightcyan
