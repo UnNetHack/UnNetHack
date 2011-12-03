@@ -6,7 +6,6 @@
 
 #ifdef OVLB
 
-STATIC_DCL void FDECL(do_oname, (struct obj *));
 static void FDECL(getpos_help, (BOOLEAN_P,const char *));
 
 extern const char what_is_an_unknown_object[];		/* from pager.c */
@@ -404,7 +403,6 @@ do_mname()
  * when there might be pointers around in unknown places. For now: only
  * when obj is in the inventory.
  */
-STATIC_OVL
 void
 do_oname(obj)
 register struct obj *obj;

@@ -1342,6 +1342,89 @@ minimal_enlightenment()
 	return (n != -1);
 }
 
+int
+do_naming(typ)
+int typ;
+{
+    winid win;
+    anything any;
+    menu_item *pick_list = NULL;
+    int n;
+    register struct obj *obj;
+    char allowall[2];
+    static NEARDATA const char callable[] = {
+	SCROLL_CLASS, POTION_CLASS, WAND_CLASS, RING_CLASS, AMULET_CLASS,
+	GEM_CLASS, SPBOOK_CLASS, ARMOR_CLASS, TOOL_CLASS, 0 };
+
+    if (!typ) {
+      any.a_void = 0;
+      win = create_nhwindow(NHW_MENU);
+      start_menu(win);
+
+      any.a_int = 1;
+      add_menu(win, NO_GLYPH, &any, 'a', 0, ATR_NONE, "Name a monster", MENU_UNSELECTED);
+
+      any.a_int = 2;
+      add_menu(win, NO_GLYPH, &any, 'b', 'y', ATR_NONE, "Name an individual item", MENU_UNSELECTED);
+
+      any.a_int = 3;
+      add_menu(win, NO_GLYPH, &any, 'c', 'n', ATR_NONE, "Name all items of a certain type", MENU_UNSELECTED);
+
+      any.a_int = 0;
+      add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+
+      end_menu(win, "What do you wish to name?");
+      n = select_menu(win, PICK_ONE, &pick_list);
+      destroy_nhwindow(win);
+
+      if (pick_list) {
+	n = (pick_list[0].item.a_int - 1);
+	free((genericptr_t) pick_list);
+      } else return 0;
+    } else {
+      n = (typ - 1);
+    }
+    switch (n) {
+    default: break;
+    case 0: do_mname(); break;
+	/* cases 1 & 2 duplicated from ddocall() */
+    case 1:
+	allowall[0] = ALL_CLASSES; allowall[1] = '\0';
+	obj = getobj(allowall, "name");
+	if(obj) do_oname(obj);
+	break;
+    case 2:
+	obj = getobj(callable, "call");
+	if (obj) {
+	    /* behave as if examining it in inventory;
+                           this might set dknown if it was picked up
+                           while blind and the hero can now see */
+	    (void) xname(obj);
+
+	    if (!obj->dknown) {
+		You("would never recognize another one.");
+		return 0;
+	    }
+	    docall(obj);
+	}
+	break;
+    }
+    return 0;
+}
+
+int
+do_naming_mname()
+{
+  if (iflags.vanilla_ui_behavior) return do_naming(1);
+  return do_naming(0);
+}
+
+int
+do_naming_ddocall()
+{
+  return do_naming(0);
+}
+
 STATIC_PTR int
 doattributes()
 {
@@ -1543,7 +1626,7 @@ static const struct func_tab cmdlist[] = {
 	{M('a'), TRUE, doorganize, NULL},
 /*	'b', 'B' : go sw */
 	{'c', FALSE, doclose, NULL},
-	{'C', TRUE, do_mname, NULL},
+	{'C', TRUE, do_naming_mname, NULL},
 	{M('c'), TRUE, dotalk, NULL},
 	{'d', FALSE, dodrop, NULL},
 	{'D', FALSE, doddrop, NULL},
@@ -1648,7 +1731,7 @@ struct ext_func_tab extcmdlist[] = {
 	{"jump", "jump to a location", dojump, FALSE},
 	{"loot", "loot a box on the floor", doloot, FALSE},
 	{"monster", "use a monster's special ability", domonability, TRUE},
-	{"name", "name an item or type of object", ddocall, TRUE},
+	{"name", "name an item or type of object", do_naming_ddocall, TRUE},
 	{"offer", "offer a sacrifice to the gods", dosacrifice, FALSE},
 	{"overview", "show an overview of the dungeon", dooverview, TRUE},
 	{"pray", "pray to the gods for help", dopray, TRUE},

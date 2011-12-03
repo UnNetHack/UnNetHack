@@ -1,6 +1,7 @@
 201X-XX-XX  UnNetHack X.X.X
 	* user interface improvements:
 	  - Monster Targeting v1.2 (by Pasi Kallinen)
+	  - Changed 'C' to present a menu (from NAO)
 	* bug fixes:
 	  - Fixed crash when player polyed into gold dragon because of wearing
 	    a gold dragon armor and a bones file gets written and the gold
