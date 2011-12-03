@@ -1,6 +1,10 @@
 201X-XX-XX  UnNetHack X.X.X
 	* user interface improvements:
 	  - Monster Targeting v1.2 (by Pasi Kallinen)
+	* bug fixes:
+	  - Fixed crash when player polyed into gold dragon because of wearing
+	    a gold dragon armor and a bones file gets written and the gold
+	    armor gets removed during bones trimming
 
 2011-10-08  UnNetHack 3.6.0
 	* changing color of monster with config line:

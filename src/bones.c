@@ -142,13 +142,20 @@ int prob2;
 			trim_contents(otmp->cobj, prob1, prob2);
 		}
 		if (rnf(prob1, prob2)) {
+			/* Don't remove dragon scales or scale mails when player
+			 * is polyed into this dragon type.
+			 * Also, UnNetHack will crash because not deleting the
+			 * associated light source if these are gold and get
+			 * removed. */
+			if (!(otmp == uskin && Is_dragon_armor(uskin->otyp))) {
 #if defined(DEBUG) && defined(WIZARD)
-			if (wizard)
-				pline("trim_contents: %s just disappeared", doname(otmp));
+				if (wizard)
+					pline("trim_contents: %s just disappeared", doname(otmp));
 #endif
-			obj_extract_self(otmp);
-			obfree(otmp, (struct obj *)0);  /* dealloc_obj() isn't sufficient */
-			disappeared++; /* only counts explicitly obfree'd objects */
+				obj_extract_self(otmp);
+				obfree(otmp, (struct obj *)0);  /* dealloc_obj() isn't sufficient */
+				disappeared++; /* only counts explicitly obfree'd objects */
+			}
 		}
 	}
 #if defined(DEBUG) && defined(WIZARD)
