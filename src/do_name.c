@@ -1117,6 +1117,11 @@ static const char * const bogusmons[] = {
 	"wereplatypus",
 	"zergling",
 	"hag of bolding",
+	"grind bug",
+	"enderman",
+	"wight supremacist",
+	"Magical Trevor",
+	"first category perpetual motion device",
 	/* from UnNetHack */
 	"apostroph golem", "Bob the angry flower",
 	"bonsai-kitten", "Boxxy", "lonelygirl15",
