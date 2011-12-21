@@ -1968,6 +1968,20 @@ struct obj *obj;
 			inhishop(mtmp) && obj->unpaid)
 		add_menu(win, NO_GLYPH, &any, 'p', 0, ATR_NONE,
 				"Buy this unpaid item", MENU_UNSELECTED);
+	/* P: Put on an accessory */
+	any.a_void = (genericptr_t)doputon;
+	if (obj->oclass == RING_CLASS || obj->otyp == MEAT_RING)
+		add_menu(win, NO_GLYPH, &any, 'P', 0, ATR_NONE,
+				"Put this ring on", MENU_UNSELECTED);
+	else if (obj->oclass == AMULET_CLASS)
+		add_menu(win, NO_GLYPH, &any, 'P', 0, ATR_NONE,
+				"Put this amulet on", MENU_UNSELECTED);
+	else if (obj->otyp == TOWEL || obj->otyp == BLINDFOLD)
+		add_menu(win, NO_GLYPH, &any, 'P', 0, ATR_NONE,
+				"Use this to blindfold yourself", MENU_UNSELECTED);
+	else if (obj->otyp == LENSES)
+		add_menu(win, NO_GLYPH, &any, 'P', 0, ATR_NONE,
+				"Put these lenses on", MENU_UNSELECTED);
 	/* q: drink item; strangely, this one seems to have no exceptions */
 	any.a_void = (genericptr_t)dodrink;
 	if (obj->oclass == POTION_CLASS)
@@ -2005,13 +2019,18 @@ struct obj *obj;
 		add_menu(win, NO_GLYPH, &any, 'R', 0, ATR_NONE,
 				"Rub something on this stone", MENU_UNSELECTED);
 #endif
+	/* R: Remove an accessory */
+	any.a_void = (genericptr_t)doremring;
+	if ((obj->owornmask & (W_RING | W_AMUL | W_TOOL)))
+		add_menu(win, NO_GLYPH, &any, 'R', 0, ATR_NONE,
+				"Remove this accessory", MENU_UNSELECTED);
 	/* t: throw item, works on everything */
 	any.a_void = (genericptr_t)dothrow;
 	add_menu(win, NO_GLYPH, &any, 't', 0, ATR_NONE,
 			"Throw this item", MENU_UNSELECTED);
 	/* T: unequip worn item */
 	any.a_void = (genericptr_t)dotakeoff; 
-	if ((obj->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL)))
+	if ((obj->owornmask & (W_ARMOR)))
 		add_menu(win, NO_GLYPH, &any, 'T', 0, ATR_NONE,
 				"Unequip this equipment", MENU_UNSELECTED);
 	/* V: invoke, rub, or break */
@@ -2041,18 +2060,6 @@ struct obj *obj;
 	if (obj->oclass == ARMOR_CLASS)
 		add_menu(win, NO_GLYPH, &any, 'W', 0, ATR_NONE,
 				"Wear this armor", MENU_UNSELECTED);
-	else if (obj->oclass == RING_CLASS || obj->otyp == MEAT_RING)
-		add_menu(win, NO_GLYPH, &any, 'W', 0, ATR_NONE,
-				"Put this ring on", MENU_UNSELECTED);
-	else if (obj->oclass == AMULET_CLASS)
-		add_menu(win, NO_GLYPH, &any, 'W', 0, ATR_NONE,
-				"Put this amulet on", MENU_UNSELECTED);
-	else if (obj->otyp == TOWEL || obj->otyp == BLINDFOLD)
-		add_menu(win, NO_GLYPH, &any, 'W', 0, ATR_NONE,
-				"Use this to blindfold yourself", MENU_UNSELECTED);
-	else if (obj->otyp == LENSES)
-		add_menu(win, NO_GLYPH, &any, 'W', 0, ATR_NONE,
-				"Put these lenses on", MENU_UNSELECTED);
 	/* x: Swap main and readied weapon */
 	any.a_void = (genericptr_t)doswapweapon;
 	if (obj == uwep && uswapwep)
