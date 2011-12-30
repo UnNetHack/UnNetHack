@@ -1217,6 +1217,16 @@ postmov:
 		    if (meatobj(mtmp) == 2) return 2;	/* it died */
 		}
 
+		/* Because of the overloading of ALLOW_ROCK, we need
+		 * to ensure that for a rockbreaker mpickupstuff() gets
+		 * called, otherwise the monster might only walk over
+		 * the boulder. */
+		if (breakrock) {
+				boolean picked = FALSE;
+				picked |= mpickstuff(mtmp, boulder_class);
+				if(picked) mmoved = 3;
+		}
+
 		if(!*in_rooms(mtmp->mx, mtmp->my, SHOPBASE) || !rn2(25)) {
 		    boolean picked = FALSE;
 

@@ -213,6 +213,7 @@
 				     is_domestic(ptr))
 
 #define is_rockbreaker(ptr)	(((ptr)->msound == MS_LEADER || \
+				 ((ptr) == &mons[PM_BLACK_MARKETEER]) || \
 				  is_rider((ptr))) && \
 				 !mtmp->mpeaceful)
 

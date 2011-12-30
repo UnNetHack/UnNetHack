@@ -1219,6 +1219,7 @@ E int FDECL(meatmetal, (struct monst *));
 E int FDECL(meatobj, (struct monst *));
 E void FDECL(mpickgold, (struct monst *));
 E boolean FDECL(mpickstuff, (struct monst *,const char *));
+E void FDECL(mpickup_obj, (struct monst *, struct obj *));
 E int FDECL(curr_mon_load, (struct monst *));
 E int FDECL(max_mon_load, (struct monst *));
 E boolean FDECL(can_carry, (struct monst *,struct obj *));

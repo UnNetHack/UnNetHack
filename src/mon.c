@@ -891,8 +891,11 @@ mpickstuff(mtmp, str)
 {
 	register struct obj *otmp, *otmp2;
 
+	/* let angry 1ES pick up stuff so she can smash boulders */
+	if ((mtmp->data != &mons[PM_BLACK_MARKETEER]) && (!mtmp->mpeaceful))  {
 /*	prevent shopkeepers from leaving the door of their shop */
-	if(mtmp->isshk && inhishop(mtmp)) return FALSE;
+		if(mtmp->isshk && inhishop(mtmp)) return FALSE;
+	}
 
 	for(otmp = level.objects[mtmp->mx][mtmp->my]; otmp; otmp = otmp2) {
 	    otmp2 = otmp->nexthere;
@@ -911,35 +914,46 @@ mpickstuff(mtmp, str)
 		if (otmp->oinvis && !perceives(mtmp->data)) continue;
 #endif
 		if (Is_sokoprize(otmp)) continue;
-		if (otmp->otyp == BOULDER && is_rockbreaker(mtmp->data)) {
-			if (cansee(mtmp->mx,mtmp->my)) {
-				pline("A thunderclap rings out, and %s shatters!", (distu(mtmp->mx, mtmp->my) <= 5) ? doname(otmp) : distant_name(otmp, doname));
-				pline("%s strides through the dust cloud.", Monnam(mtmp));
-			} else {
-				pline("A thunderclap rings out!");
-			}
-		} else {
-			if (cansee(mtmp->mx,mtmp->my) && flags.verbose) {
-				pline("%s picks up %s.", Monnam(mtmp),
-						(distu(mtmp->mx, mtmp->my) <= 5) ?
-						doname(otmp) : distant_name(otmp, doname));
-			}
-		}
-		if (otmp->otyp == BOULDER && is_rockbreaker(mtmp->data)) {
-			remove_object(otmp);
-		} else {
-			obj_extract_self(otmp);
-			/* unblock point after extract, before pickup */
-			if (otmp->otyp == BOULDER)
-				unblock_point(otmp->ox,otmp->oy);	/* vision */
-			(void) mpickobj(mtmp, otmp);	/* may merge and free otmp */
-		}
-		m_dowear(mtmp, FALSE);
-		newsym(mtmp->mx, mtmp->my);
+
+		/* let monster pickup the object */
+		mpickup_obj(mtmp, otmp);
+
 		return TRUE;			/* pick only one object */
 	    }
 	}
 	return FALSE;
+}
+
+void
+mpickup_obj(mtmp, otmp)
+	struct monst *mtmp;
+	struct obj *otmp;
+{
+	if (otmp->otyp == BOULDER && is_rockbreaker(mtmp->data)) {
+		if (cansee(mtmp->mx,mtmp->my)) {
+			pline("A thunderclap rings out, and %s shatters!", (distu(mtmp->mx, mtmp->my) <= 5) ? doname(otmp) : distant_name(otmp, doname));
+			pline("%s strides through the dust cloud.", Monnam(mtmp));
+		} else {
+			pline("A thunderclap rings out!");
+		}
+	} else {
+		if (cansee(mtmp->mx,mtmp->my) && flags.verbose) {
+			pline("%s picks up %s.", Monnam(mtmp),
+					(distu(mtmp->mx, mtmp->my) <= 5) ?
+					doname(otmp) : distant_name(otmp, doname));
+		}
+	}
+	if (otmp->otyp == BOULDER && is_rockbreaker(mtmp->data)) {
+		remove_object(otmp);
+	} else {
+		obj_extract_self(otmp);
+		/* unblock point after extract, before pickup */
+		if (otmp->otyp == BOULDER)
+			unblock_point(otmp->ox,otmp->oy);	/* vision */
+		(void) mpickobj(mtmp, otmp);	/* may merge and free otmp */
+	}
+	m_dowear(mtmp, FALSE);
+	newsym(mtmp->mx, mtmp->my);
 }
 
 #endif /* OVL2 */

@@ -48,7 +48,7 @@ register xchar omx,omy,gx,gy;
 	if (mtmp->isshk) allowflags = ALLOW_SSM;
 	else allowflags = ALLOW_SSM | ALLOW_SANCT;
 	if (passes_walls(mtmp->data)) allowflags |= (ALLOW_ROCK|ALLOW_WALL);
-	if (throws_rocks(mtmp->data)) allowflags |= ALLOW_ROCK;
+	if (throws_rocks(mtmp->data) || is_rockbreaker(mtmp->data)) allowflags |= ALLOW_ROCK;
 	if (tunnels(mtmp->data)) allowflags |= ALLOW_DIG;
 	if (!nohands(mtmp->data) && !verysmall(mtmp->data)) {
 		allowflags |= OPENDOOR;
@@ -93,17 +93,15 @@ pick_move:
 
 	if(nix != omx || niy != omy) {
 		remove_monster(omx, omy);
+		newsym(omx,omy);
 		place_monster(mtmp, nix, niy);
 		newsym(nix,niy);
 		if (mtmp->isshk && !in_his_shop && inhishop(mtmp))
 		    check_special_room(FALSE);
-		if(ib) {
-			if (cansee(mtmp->mx,mtmp->my))
-			    pline("%s picks up %s.", Monnam(mtmp),
-				distant_name(ib,doname));
-			obj_extract_self(ib);
-			(void) mpickobj(mtmp, ib);
+		if ((ib = sobj_at(BOULDER, nix, niy))) {
+			mpickup_obj(mtmp, ib);
 		}
+		newsym(nix,niy);
 		return(1);
 	}
 	return(0);
