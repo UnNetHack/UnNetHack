@@ -212,4 +212,8 @@
 #define befriend_with_obj(ptr, obj) ((obj)->oclass == FOOD_CLASS && \
 				     is_domestic(ptr))
 
+#define is_rockbreaker(ptr)	(((ptr)->msound == MS_LEADER || \
+				  is_rider((ptr))) && \
+				 !mtmp->mpeaceful)
+
 #endif /* MONDATA_H */
