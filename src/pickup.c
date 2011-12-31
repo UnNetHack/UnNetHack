@@ -38,6 +38,7 @@ STATIC_DCL int FDECL(in_or_out_menu, (const char *,struct obj *, BOOLEAN_P, BOOL
 STATIC_DCL int FDECL(container_at, (int, int, BOOLEAN_P));
 STATIC_DCL boolean FDECL(able_to_loot, (int, int));
 STATIC_DCL boolean FDECL(mon_beside, (int, int));
+STATIC_DCL int FDECL(dump_container, (struct obj*, BOOLEAN_P));
 STATIC_DCL void NDECL(del_sokoprize);
 
 /* define for query_objlist() and autopickup() */
@@ -1963,19 +1964,17 @@ register struct obj *obj;
 		}
 	} else if (Is_mbag(current_container) && mbag_explodes(obj, 0)) {
 		/* explicitly mention what item is triggering the explosion */
-		pline(
-	      "As you put %s inside, you are blasted by a magical explosion!",
-		      doname(obj));
+		pline( "As you put %s inside, you are blasted by a magical explosion!", doname(obj));
 		/* did not actually insert obj yet */
 		if (was_unpaid) addtobill(obj, FALSE, FALSE, TRUE);
 		obfree(obj, (struct obj *)0);
+
+		/* dump it out onto the floor so the scatterage can take effect */
+		if (dump_container(current_container, TRUE)) {
+			pline("The contents fly everywhere!");
+		}
+		scatter(u.ux,u.uy,10,VIS_EFFECTS|MAY_HIT|MAY_DESTROY|MAY_FRACTURE,0);
 		delete_contents(current_container);
-		if (!floor_container)
-			useup(current_container);
-		else if (obj_here(current_container, u.ux, u.uy))
-			useupf(current_container, obj->quan);
-		else
-			panic("in_container:  bag not found.");
 
 		losehp(d(6,6),"magical explosion", KILLED_BY_AN);
 		current_container = 0;	/* baggone = TRUE; */
@@ -2497,6 +2496,60 @@ boolean outokay, inokay;
 	free((genericptr_t) pick_list);
     }
     return n;
+}
+
+
+/** Dumps out a container, possibly as the prelude/result of an explosion.
+ * destroy_after trashes the container afterwards; try not to use it :P
+ *
+ * Player is assumed to not be handling the contents directly.
+ *
+ * Returns 1 if at least one object was present, 0 if empty.
+ */ 
+int
+dump_container(container, destroy_after)
+struct obj* container;
+BOOLEAN_P destroy_after;
+{
+	struct obj* otmp,*otmp2;
+	int ret = 0;
+
+	/* sanity check */
+	if (!container) { return 0; }
+
+	for (otmp = container->cobj; otmp; otmp = otmp2)
+	{
+		ret = 1;
+		otmp2 = otmp->nobj;
+		obj_extract_self(otmp);
+		container->owt = weight(container);
+
+		/* we do need to start the timer on these */
+		if (container->otyp == ICE_BOX && !age_is_relative(otmp)) {
+			otmp->age = monstermoves - otmp->age;
+			if (otmp->otyp == CORPSE) {
+				start_corpse_timeout(otmp);
+			}
+		}
+		place_object(otmp,u.ux,u.uy);
+
+		if (otmp->otyp == GOLD_PIECE) {
+#ifndef GOLDOBJ
+			dealloc_obj(otmp);
+#endif
+			bot();	/* update character's gold piece count immediately */
+		}
+	}
+
+	if (destroy_after) {
+		if (container->where == OBJ_INVENT) {
+			useup(container);
+		} else if (obj_here(container, u.ux, u.uy)) {
+			useupf(container, container->quan);
+		}
+	}
+
+	return ret;
 }
 
 

@@ -1,4 +1,6 @@
 201X-XX-XX  UnNetHack X.X.X
+	* Scatter contents of bag of holding explosion instead of
+	  destroying it (from SporkHack)
 	* Quest leaders can smash rocks when angry (from SporkHack)
 	* Blackmarket shopkeeper can smash rocks when angry
 	* user interface improvements:
