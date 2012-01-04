@@ -726,17 +726,29 @@ int
 dbon()		/* damage bonus for strength */
 {
 	int str = ACURR(A_STR);
+	int dbon = 0;
 
 	if (Upolyd) return(0);
 
-	if (str < 6) return(-1);
-	else if (str < 16) return(0);
-	else if (str < 18) return(1);
-	else if (str == 18) return(2);		/* up to 18 */
-	else if (str <= STR18(75)) return(3);		/* up to 18/75 */
-	else if (str <= STR18(90)) return(4);		/* up to 18/90 */
-	else if (str < STR18(100)) return(5);		/* up to 18/99 */
-	else return(6);
+	if (str < 6) dbon = -1;
+	else if (str < 16) dbon = 0;
+	else if (str < 18) dbon = 1;
+	else if (str == 18) dbon = 2;		/* up to 18 */
+	else if (str <= STR18(75)) dbon = 3;	/* up to 18/75 */
+	else if (str <= STR18(90)) dbon = 4;	/* up to 18/90 */
+	else if (str < STR18(100)) dbon = 5;	/* up to 18/99 */
+	else if (str == STR18(100)) dbon = 6;	/* 18/00 only */
+	else dbon = 7;				/* gauntlets of power */
+
+	/* HASAAAAAN CHOP!
+	 *
+	 * If you're wielding a two-handed weapon, let's just, hmm,
+	 * double this bonus.  Yes, even when negative; those are HEAVY.
+	 *
+	 * This should sharply increase the appeal of two-handers compared to #twoweapon. */
+
+	if (uwep && bimanual(uwep)) { dbon *= 2; }
+	return dbon;
 }
 
 
