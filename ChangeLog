@@ -3,9 +3,15 @@
 	  destroying it (from SporkHack)
 	* Quest leaders can smash rocks when angry (from SporkHack)
 	* Blackmarket shopkeeper can smash rocks when angry
+	* Strength bonus for two-handed weaponry is doubled. (from SporkHack)
+
+	* Gauntlets of power give +7 damage bonus to differentiate
+	  from 18/** (from SporkHack)
+
 	* user interface improvements:
 	  - Monster Targeting v1.2 (by Pasi Kallinen)
 	  - Changed 'C' to present a menu (from NAO)
+
 	* bug fixes:
 	  - Fixed crash when player polyed into gold dragon because of wearing
 	    a gold dragon armor and a bones file gets written and the gold
