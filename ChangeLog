@@ -19,6 +19,10 @@
 	    a gold dragon armor and a bones file gets written and the gold
 	    armor gets removed during bones trimming
 
+	* vanilla bug fixes:
+	  - C343-174: Drum of earthquake gives inappropriate message if hero
+	              or monster is in a pit.
+
 2011-10-08  UnNetHack 3.6.0
 	* changing color of monster with config line:
 	  MONSTERCOLOR=acid blob:lightcyan

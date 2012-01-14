@@ -316,7 +316,7 @@ do_pit:		    chasm = maketrap(x,y,PIT);
 				    xkilled(mtmp,0);
 				}
 			}
-		    } else if (x == u.ux && y == u.uy) {
+		    } else if (!u.utrap && x == u.ux && y == u.uy) {
 			    if (Levitation || Flying ||
 						is_clinger(youmonst.data)) {
 				    pline("A chasm opens up under you!");
