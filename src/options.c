@@ -3222,6 +3222,7 @@ doset()
 	int indexoffset, startpass, endpass;
 	boolean setinitial = FALSE, fromfile = FALSE;
 	int biggest_name = 0;
+	boolean istty = !strncmpi(windowprocs.name, "tty", 3);
 
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
@@ -3242,6 +3243,12 @@ doset()
 		    if (bool_p == &iflags.menu_tab_sep && !wizard) continue;
 		    if (bool_p == &iflags.showdmg && !wizard) continue;
 #endif
+		    /* hide options that are useless in tty*/
+		    if (istty) {
+			    if (bool_p == &flags.perm_invent) continue;
+			    if (bool_p == &iflags.cursesgraphics) continue;
+		    }
+
 		    if (is_wc_option(boolopt[i].name) &&
 			!wc_supported(boolopt[i].name)) continue;
 		    if (is_wc2_option(boolopt[i].name) &&
