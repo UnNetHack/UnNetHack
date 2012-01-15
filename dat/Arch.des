@@ -9,7 +9,7 @@
 #	and receive your quest assignment.
 #
 LEVEL: "Arc-strt"
-FLAGS: noteleport,hardfloor,mazelevel
+FLAGS: noteleport,hardfloor,mazelevel,sky
 INIT_MAP:solidfill,' '
 MON_GENERATION:86%, (80,'S'), (16,"human mummy"), (4,'M')
 GEOMETRY:center,center

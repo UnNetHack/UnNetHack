@@ -5,6 +5,7 @@
 # NetHack may be freely redistributed.  See license for details.
 #
 LEVEL: "town-1"
+FLAGS: sky
 MESSAGE: "You step into the sunlight. You hear the sounds of civilization."
 $place = { (4,6),(4,16),(18,2),(25,10),(40,13),(55,4),(58,12),(71,2),(73,15) }
 SHUFFLE: $place

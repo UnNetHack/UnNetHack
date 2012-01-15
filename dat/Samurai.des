@@ -9,7 +9,7 @@
 #	and receive your quest assignment.
 #
 LEVEL: "Sam-strt"
-FLAGS: noteleport,hardfloor,mazelevel
+FLAGS: noteleport,hardfloor,mazelevel,sky
 INIT_MAP:solidfill,' '
 MON_GENERATION:86%, (64,"wolf"), (16,'d'), (16,"stalker"), (4,'E')
 GEOMETRY:center,center

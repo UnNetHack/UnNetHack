@@ -9,7 +9,7 @@
 #	and receive your quest assignment.
 #
 LEVEL: "Mon-strt"
-FLAGS: noteleport,hardfloor,mazelevel
+FLAGS: noteleport,hardfloor,mazelevel,sky
 INIT_MAP:solidfill,' '
 MON_GENERATION:86%, (64,"earth elemental"), (16,'E'), (16,"xorn"), (4,'X')
 GEOMETRY:center,center

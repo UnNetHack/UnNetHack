@@ -9,7 +9,7 @@
 #	and receive your quest assignment.
 #
 LEVEL: "Hea-strt"
-FLAGS: noteleport,hardfloor,mazelevel
+FLAGS: noteleport,hardfloor,mazelevel,sky
 INIT_MAP:solidfill,' '
 MON_GENERATION:86%, (64,"giant rat"), (16,'r'), (16,"snake"), (4,'Y')
 GEOMETRY:center,center

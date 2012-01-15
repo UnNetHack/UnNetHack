@@ -9,7 +9,7 @@
 #	and receive your quest assignment.
 #
 LEVEL: "Tou-strt"
-FLAGS: noteleport,hardfloor,mazelevel
+FLAGS: noteleport,hardfloor,mazelevel,sky
 INIT_MAP:solidfill,' '
 MON_GENERATION:86%, (64,"giant spider"), (16,'S'), (16,"forest centaur"), (4,'C')
 GEOMETRY:center,center

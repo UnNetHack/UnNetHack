@@ -9,7 +9,7 @@
 #	and receive your quest assignment.
 #
 LEVEL: "Ran-strt"
-FLAGS: noteleport,hardfloor,arboreal,mazelevel
+FLAGS: noteleport,hardfloor,arboreal,mazelevel,sky
 INIT_MAP:mines,'.','.',true,true,lit,false
 MON_GENERATION:86%, (64,"forest centaur"), (16,'C'), (16,"scorpion"), (4,'s')
 GEOMETRY:left,center
