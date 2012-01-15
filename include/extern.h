@@ -477,7 +477,7 @@ E void FDECL(assign_rogue_graphics, (BOOLEAN_P));
 #endif
 E void FDECL(assign_utf8graphics_symbol, (int, glyph_t));
 
-/* ### dungeon.c ### */
+/* ### dump.c ### */
 
 E void FDECL(dump, (const char *, const char *));
 E void NDECL(dump_blockquote_start);
@@ -569,6 +569,7 @@ E void NDECL(recalc_mapseen);
 E void FDECL(recbranch_mapseen, (d_level *, d_level *));
 E void FDECL(remdun_mapseen, (int));
 E char *FDECL(get_annotation, (d_level *));
+E char *FDECL(get_generic_level_description, (d_level *));
 
 /* ### eat.c ### */
 

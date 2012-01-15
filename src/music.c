@@ -449,7 +449,7 @@ struct obj *instr;
 		consume_obj_charge(instr, TRUE);
 
 		You("produce a heavy, thunderous rolling!");
-		pline_The("entire dungeon is shaking around you!");
+		pline_The("entire %s is shaking around you!", get_generic_level_description(&u.uz));
 		do_earthquake((u.ulevel - 1) / 3 + 1);
 		/* shake up monsters in a much larger radius... */
 		awaken_monsters(ROWNO * COLNO);

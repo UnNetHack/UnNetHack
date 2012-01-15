@@ -18,6 +18,8 @@
 	  - Fixed crash when player polyed into gold dragon because of wearing
 	    a gold dragon armor and a bones file gets written and the gold
 	    armor gets removed during bones trimming
+	  - replace "dungeon" when applying drum of earthquake with
+	    appropriate description depening on branch or level
 
 	* vanilla bug fixes:
 	  - C343-174: Drum of earthquake gives inappropriate message if hero

@@ -2601,4 +2601,29 @@ d_level *lev;
 	}
 }
 
+/** Return a generic description of the current level like "plane" for the
+ * planes, "tower" for Vlad's tower, or "dungeon" for a normal level. */
+const char *
+get_generic_level_description(lev)
+d_level *lev;
+{
+	if (Is_astralevel(lev)) {
+		return "astral plane";
+	} else if (In_endgame(lev)) {
+		return "plane";
+	} else if (Is_sanctum(lev)) {
+		return "sanctum";
+	} else if (Is_blackmarket(lev)) {
+		return "blackmarket";
+	} else if (In_sokoban(lev)) {
+		return "puzzle";
+	} else if (In_V_tower(lev)) {
+		return "tower";
+	} else if (level.flags.sky) {
+		return "ground";
+	} else {
+		return "dungeon";
+	}
+}
+
 /*dungeon.c*/
