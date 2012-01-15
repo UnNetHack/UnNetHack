@@ -276,6 +276,7 @@ premapped	{ yylval.i=PREMAPPED; return FLAG_TYPE; }
 shroud		{ yylval.i=SHROUD; return FLAG_TYPE; }
 stormy		{ yylval.i=STORMY; return FLAG_TYPE; }
 graveyard	{ yylval.i=GRAVEYARD; return FLAG_TYPE; }
+sky		{ yylval.i=SKYMAP; return FLAG_TYPE; }
 [0-9]+d[0-9]+	{ char *p = strchr(yytext, 'd');
 		  if (p) {
 			*p = '\0';

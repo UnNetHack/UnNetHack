@@ -3240,6 +3240,7 @@ spo_level_flags(coder)
     if (flags & SHROUD)       level.flags.hero_memory = 0;
     if (flags & STORMY)       level.flags.stormy = 1;
     if (flags & GRAVEYARD)    level.flags.graveyard = 1;
+    if (flags & SKYMAP)       level.flags.sky = 1;
 
     opvar_free(flagdata);
 }
