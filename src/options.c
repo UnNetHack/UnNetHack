@@ -3246,7 +3246,9 @@ doset()
 		    /* hide options that are useless in tty*/
 		    if (istty) {
 			    if (bool_p == &flags.perm_invent) continue;
+#ifdef CURSES_GRAPHICS
 			    if (bool_p == &iflags.cursesgraphics) continue;
+#endif
 		    }
 
 		    if (is_wc_option(boolopt[i].name) &&

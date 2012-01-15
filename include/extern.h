@@ -569,7 +569,7 @@ E void NDECL(recalc_mapseen);
 E void FDECL(recbranch_mapseen, (d_level *, d_level *));
 E void FDECL(remdun_mapseen, (int));
 E char *FDECL(get_annotation, (d_level *));
-E char *FDECL(get_generic_level_description, (d_level *));
+E const char *FDECL(get_generic_level_description, (d_level *));
 
 /* ### eat.c ### */
 
