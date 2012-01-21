@@ -341,7 +341,9 @@ dosounds()
 
 static const char * const h_sounds[] = {
     "beep", "boing", "sing", "belche", "creak", "cough", "rattle",
-    "ululate", "pop", "jingle", "sniffle", "tinkle", "eep"
+    "ululate", "pop", "jingle", "sniffle", "tinkle", "eep",
+    "clatter", "hum", "sizzle", "twitter", "wheeze", "rustle",
+    "honk", "lisp", "yodel", "coo", "burp", "moo",
 };
 
 const char *
