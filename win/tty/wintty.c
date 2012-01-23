@@ -1351,14 +1351,15 @@ struct WinDesc *cw;
 			    ttyDisplay->curx += 4;
 		    }
 		    if (curr->glyph != NO_GLYPH && !iflags.vanilla_ui_behavior) {
+			    int glyph_color = NO_COLOR;
 			    glyph_t character;
 			    unsigned special; /* unused */
 			    /* map glyph to character and color */
-			    mapglyph(curr->glyph, &character, &color, &special, 0, 0);
+			    mapglyph(curr->glyph, &character, &glyph_color, &special, 0, 0);
 
-			    if (color != NO_COLOR) term_start_color(color);
+			    if (glyph_color != NO_COLOR) term_start_color(glyph_color);
 			    putchar(character);
-			    if (color != NO_COLOR) term_end_color();
+			    if (glyph_color != NO_COLOR) term_end_color();
 			    putchar(' ');
 			    ttyDisplay->curx +=2;
 		    }
