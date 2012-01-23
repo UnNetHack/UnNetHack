@@ -16,6 +16,7 @@
 	  - Monster Targeting v1.2 (by Pasi Kallinen)
 	  - Changed 'C' to present a menu (from NAO)
 	  - Hiding useless options in TTY mode
+	  - Display items in inventory list
 
 	* bug fixes:
 	  - Fixed crash when player polyed into gold dragon because of wearing
