@@ -25,6 +25,8 @@
 	    appropriate description depening on branch or level
 
 	* vanilla bug fixes:
+	  - C343-72:  You get confusing messages when you stop levitating
+	              while on a flying steed. (by Edoardo Spadolini)
 	  - C343-174: Drum of earthquake gives inappropriate message if hero
 	              or monster is in a pit.
 

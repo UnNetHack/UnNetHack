@@ -2439,7 +2439,8 @@ long hmask, emask;     /* might cancel timeout */
 	ELevitation &= ~emask;
 	if(Levitation) return(0); /* maybe another ring/potion/boots */
 	if(u.uswallow) {
-	    You("float down, but you are still %s.",
+	    You((Flying) ? "feel less buoyant, but you are still %s.":
+	                   "float down, but you are still %s.",
 		is_animal(u.ustuck->data) ? "swallowed" : "engulfed");
 	    return(1);
 	}
@@ -2487,7 +2488,8 @@ long hmask, emask;     /* might cancel timeout */
 	if (!trap) {
 	    trap = t_at(u.ux,u.uy);
 	    if(Is_airlevel(&u.uz))
-		You("begin to tumble in place.");
+		if (Flying) You("feel less buoyant.");
+		else You("begin to tumble in place.");
 	    else if (Is_waterlevel(&u.uz) && !no_msg)
 		You_feel("heavier.");
 	    /* u.uinwater msgs already in spoteffects()/drown() */
@@ -2504,7 +2506,8 @@ long hmask, emask;     /* might cancel timeout */
 			      "hit the ground");
 		    else {
 			if (!sokoban_trap)
-			    You("float gently to the %s.",
+			    if (Flying) You("feel less buoyant.");
+			    else You("float gently to the %s.",
 				surface(u.ux, u.uy));
 			else {
 			    /* Justification elsewhere for Sokoban traps
