@@ -366,6 +366,7 @@ struct instance_flags {
 	boolean  vanilla_ui_behavior;	/* fall back to vanilla behavior */
 	boolean  show_annotation;	/* level annotation when entering level */
 	boolean  bones;		/* allow loading bones */
+	int  statuslines;	/* number of status lines */
 };
 
 /*

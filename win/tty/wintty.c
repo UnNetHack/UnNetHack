@@ -900,15 +900,16 @@ tty_create_nhwindow(type)
 	newwin->maxcol = newwin->cols = 0;
 	break;
     case NHW_STATUS:
-	/* status window, 2 lines long, full width, bottom of screen */
+	/* status window, 2 or 3 lines long, full width, bottom of screen */
+	iflags.statuslines = (LI > ROWNO+3) ? 3 : 2;
 	newwin->offx = 0;
 #if defined(USE_TILES) && defined(MSDOS)
 	if (iflags.grmode) {
-		newwin->offy = ttyDisplay->rows-2;
+		newwin->offy = ttyDisplay->rows-iflags.statuslines;
 	} else
 #endif
-	newwin->offy = min((int)ttyDisplay->rows-2, ROWNO+1);
-	newwin->rows = newwin->maxrow = 2;
+	newwin->offy = min((int)ttyDisplay->rows-iflags.statuslines, ROWNO+iflags.statuslines-1);
+	newwin->rows = newwin->maxrow = iflags.statuslines;
 	newwin->cols = newwin->maxcol = min(ttyDisplay->cols, MAXCO);
 	break;
     case NHW_MAP:
@@ -1058,6 +1059,10 @@ tty_clear_nhwindow(window)
 	cl_end();
 	tty_curs(window, 1, 1);
 	cl_end();
+	if (iflags.statuslines == 3) {
+		tty_curs(window, 1, 2);
+		cl_end();
+	}
 	break;
     case NHW_MAP:
 	/* cheap -- clear the whole thing and tell nethack to redraw botl */
@@ -1985,7 +1990,7 @@ tty_putstr(window, attr, str)
 
 	(void) strncpy(&cw->data[cw->cury][j], str, cw->cols - j - 1);
 	cw->data[cw->cury][cw->cols-1] = '\0'; /* null terminate */
-	cw->cury = (cw->cury+1) % 2;
+	cw->cury = (cw->cury+1) % iflags.statuslines;
 	cw->curx = 0;
 	break;
     case NHW_MAP:
