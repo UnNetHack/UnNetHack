@@ -1127,8 +1127,8 @@ int thrown;
 	if (disint_obj && obj) {
 		if (!hittxt) {
 			if (cansee(mon->mx, mon->my)) {
-				pline_The("%s %s!", mshot_xname(obj),
-				          (obj->oartifact) ? "dissolves" : "disintegrates");
+				pline("%s %s!", The(distant_name(obj,mshot_xname)),
+				          otense(obj, (obj->oartifact) ? "dissolve" : "disintegrate"));
 			} else {
 				pline("Vip!%s",
 				      (!thrown)? "  Your weapon vanishes from your grip!":"");
