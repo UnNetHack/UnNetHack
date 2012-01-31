@@ -1225,6 +1225,7 @@ static const char * const bogusmons[] = {
 	"Sigmund", "lernaean hydra", "Ijyb",
 	"Gloorx Vloq", "Blork the orc",		/* Dungeon Crawl Stone Soup */
 	"unicorn pegasus kitten",		/* Wil Wheaton, John Scalzi */
+	"dwerga nethackus", "dwerga castrum",	/* Ask ASCII Ponies */
 };
 
 
