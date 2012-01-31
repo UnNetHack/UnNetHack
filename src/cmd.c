@@ -1361,8 +1361,11 @@ int typ;
       win = create_nhwindow(NHW_MENU);
       start_menu(win);
 
+      /* the accelerator keys are chosen to be compatible with NAO and
+       * where possible similar to AceHack's keys. That explains the
+       * choice for the group accelerators. */
       any.a_int = 1;
-      add_menu(win, NO_GLYPH, &any, 'a', 0, ATR_NONE, "Name a monster", MENU_UNSELECTED);
+      add_menu(win, NO_GLYPH, &any, 'a', 'C', ATR_NONE, "Name a monster", MENU_UNSELECTED);
 
       any.a_int = 2;
       add_menu(win, NO_GLYPH, &any, 'b', 'y', ATR_NONE, "Name an individual item", MENU_UNSELECTED);
@@ -1370,8 +1373,11 @@ int typ;
       any.a_int = 3;
       add_menu(win, NO_GLYPH, &any, 'c', 'n', ATR_NONE, "Name all items of a certain type", MENU_UNSELECTED);
 
+      any.a_int = 4;
+      add_menu(win, NO_GLYPH, &any, 'd', 'f', ATR_NONE, "Annotate the current level", MENU_UNSELECTED);
+
       any.a_int = 0;
-      add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+      add_menu(win, NO_GLYPH, &any, 0, 'q', ATR_NONE, "", MENU_UNSELECTED);
 
       end_menu(win, "What do you wish to name?");
       n = select_menu(win, PICK_ONE, &pick_list);
@@ -1407,6 +1413,9 @@ int typ;
 	    }
 	    docall(obj);
 	}
+	break;
+    case 3:
+	donamelevel();
 	break;
     }
     return 0;
