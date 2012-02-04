@@ -20,8 +20,8 @@
 
 	* bug fixes:
 	  - Fixed crash when player polyed into gold dragon because of wearing
-	    a gold dragon armor and a bones file gets written and the gold
-	    armor gets removed during bones trimming
+	    a gold dragon armor and a bones file getting written and the gold
+	    armor getting removed during bones inventory trimming
 	  - replace "dungeon" when applying drum of earthquake with
 	    appropriate description depening on branch or level
 
