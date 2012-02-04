@@ -379,7 +379,7 @@ boolean td;	/* td == TRUE : trap door or hole */
 			"fall down a shaft!",
 			"fall down a deep shaft!",
 			"keep falling down a really deep shaft!",
-			"keep falling down an unbelievable deep shaft!",
+			"keep falling down an unbelievably deep shaft!",
 		};
 		/* TODO: Hallucination messages */
 
@@ -396,7 +396,7 @@ boolean td;	/* td == TRUE : trap door or hole */
 		    You(falling_down_msgs[newlevel-currentlevel-2]);
 		    break;
 	    default:
-		    You("are falling down an unbelievable deep shaft!");
+		    You("are falling down an unbelievably deep shaft!");
 		    pline("While falling you wonder how unlikely it is to find such a deep shaft."); /* (1/4)^5 ~= 0.1% */
 		    break;
 	    }
