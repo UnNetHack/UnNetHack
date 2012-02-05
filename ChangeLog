@@ -1,13 +1,16 @@
-201X-XX-XX  UnNetHack X.X.X
+2012-02-05  UnNetHack 3.6.1
 	* Scatter contents of bag of holding explosion instead of
 	  destroying it (from SporkHack)
 	* Quest leaders can smash rocks when angry (from SporkHack)
 	* Blackmarket shopkeeper can smash rocks when angry
 	* Strength bonus for two-handed weaponry is doubled. (from SporkHack)
 	* Tins made from giant turtles are delicious and nutritious (by Bernard Helyer)
-
 	* Gauntlets of power give +7 damage bonus to differentiate
 	  from 18/** (from SporkHack)
+
+	* Win32:
+	  - Standard Windows GUI bundled
+	  - HTML dumps enabled
 
 	* New option: bones: allow player control of loading bones (partly
 	  from NAO)
