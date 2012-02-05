@@ -46,6 +46,11 @@ OPTIONS=IBMGraphics
 #OPTIONS=nolegacy,noverbose
 #OPTIONS=menustyle:traditional
 
+# some decent defaults
+OPTIONS=pickup_types:$"?+!=/,autopickup
+OPTIONS=disclose:yiyayvygyc
+OPTIONS=pickup_burden:u
+
 #
 # General options.  You might also set "silent" so as not to attract
 # the boss's attention.
@@ -57,12 +62,6 @@ OPTIONS=time,noshowexp,number_pad:2,lit_corridor
 # If you want to get rid of "use #quit to quit..." use:
 OPTIONS=suppress_alert:3.4.3
 #
-# Note: the rest_on_space in the next line may not be
-#       appropriate for a beginning NetHack player, since
-#       it could result in use of a turn unintentionally.
-#       If you're new to NetHack, leave it commented it out.
-#OPTIONS=rest_on_space
-#
 # Set some options to control graphical window-port (these will
 # be safely and silently ignored by the tty port)
 #
@@ -71,18 +70,19 @@ OPTIONS=suppress_alert:3.4.3
 #                                    ascii7x12|ascii8x12|ascii16x12|ascii12x16|
 #                                    ascii10x18|fit_to_screen
 # OPTIONS=map_mode:ascii10x18,scroll_margin:5
+OPTIONS=tile_file:chozo32b.bmp,tile_width:32,tile_height:32
 
 # Message window settings
-# OPTIONS=font_message:Arial,font_size_message:11,align_message:top
+OPTIONS=font_message:DejaVu Condensed,font_size_message:12,align_message:top
 
 # Menu settings
-#OPTIONS=font_menu:Arial,font_size_menu:11
+OPTIONS=font_menu:DejaVu Condensed,font_size_menu:12
 
 # Text settings
-# OPTIONS=font_text:Courier New,font_size_text:11
+OPTIONS=font_text:DejaVu Mono,font_size_text:13
 
 # Status window settings
-# OPTIONS=font_status:Courier New,font_size_status:11
+OPTIONS=font_status:DejaVu Mono,font_size_status:13
 
 # Other
 OPTIONS=hilite_pet
@@ -98,6 +98,7 @@ OPTIONS=hilite_pet
 # highlighttext, inactiveborder, inactivecaption, menu, menutext, scrollbar,
 # window, windowframe, windowtext.
 #OPTIONS=windowcolors:status windowtext/window message windowtext/window
+OPTIONS=windowcolors:menu white/black message trueblack/#EEEEEE status trueblack/#EEEEEE text white/black
 
 # *** LOCATIONS ***
 # IMPORTANT: If you change any of these locations, the directories they
