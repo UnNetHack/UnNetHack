@@ -9,7 +9,7 @@
 /*
  * PATCHLEVEL is updated for each release.
  */
-#define PATCHLEVEL	0
+#define PATCHLEVEL	1
 /*
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
@@ -49,7 +49,7 @@
  * PP = patch level, ee = edit level, L = literal suffix "L",
  * with all four numbers specified as two hexadecimal digits.
  */
-/*#define VERSION_COMPATIBILITY 0x03060000L*/	/* 3.6.0-e0 */
+#define VERSION_COMPATIBILITY 0x03060000L	/* 3.6.0-e0 */
 
 
 /*****************************************************************************/
