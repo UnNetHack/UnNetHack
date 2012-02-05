@@ -70,7 +70,7 @@ OPTIONS=suppress_alert:3.4.3
 #                                    ascii7x12|ascii8x12|ascii16x12|ascii12x16|
 #                                    ascii10x18|fit_to_screen
 # OPTIONS=map_mode:ascii10x18,scroll_margin:5
-OPTIONS=tile_file:chozo32b.bmp,tile_width:32,tile_height:32
+OPTIONS=tile_file:unchozo32b.bmp,tile_width:32,tile_height:32
 
 # Message window settings
 OPTIONS=font_message:DejaVu Condensed,font_size_message:12,align_message:top
