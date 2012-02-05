@@ -1351,10 +1351,14 @@ struct WinDesc *cw;
 		     */
 		    /* add selector for display */
 		    if (curr->selector) {
-			    putchar(curr->selector);
-			    putchar(' '); putchar('-'); putchar(' ');
-			    ttyDisplay->curx += 4;
+			    /* because WIN32CON this must be done in
+			     * a brain-dead way */
+			    putchar(curr->selector); ttyDisplay->curx++;
+			    putchar(' '); ttyDisplay->curx++;
+			    putchar('-'); ttyDisplay->curx++;
+			    putchar(' '); ttyDisplay->curx++;
 		    }
+#ifndef WIN32CON
 		    if (curr->glyph != NO_GLYPH && !iflags.vanilla_ui_behavior) {
 			    int glyph_color = NO_COLOR;
 			    glyph_t character;
@@ -1368,6 +1372,7 @@ struct WinDesc *cw;
 			    putchar(' ');
 			    ttyDisplay->curx +=2;
 		    }
+#endif
 
 #ifdef MENU_COLOR
 		   if (iflags.use_menu_color && iflags.use_color &&
