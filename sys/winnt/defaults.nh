@@ -2,27 +2,14 @@
 # A '#' at the beginning of a line means the rest of the line is a comment.
 #
 # Some options MUST be set in this file, other options can be toggled while
-# playing.  For a list of options available see the <opthelp.> file.
+# playing by selecting the options menu with 'O'.
+#  For a list of options available see the <opthelp.> file.
 #
 # To change the configuration, comment out the unwanted lines, and
 # uncomment the configuration you want.
 
 # *** OPTIONS ***
 #
-# Use the IBM character set rather than just plain ascii characters
-# for tty window-port.
-#
-# This also works for the curses interface compiled with the PDCurses-SDL
-# library.
-#
-OPTIONS=IBMGraphics
-
-#
-# cursesgraphics may be set for the curses interface if the IBMGraphics
-# option above doesn't work with your curses implementation.
-#
-# OPTIONS=cursesgraphics
-
 # Keyboard handling
 # Different keyboard handlers can be loaded.
 # Default is nhdefkey.dll but you can override that.
@@ -46,10 +33,51 @@ OPTIONS=IBMGraphics
 #OPTIONS=nolegacy,noverbose
 #OPTIONS=menustyle:traditional
 
+# Here are some examples of reasonable defaults:
+
+# Automatically pick up things onto which you move
+OPTIONS=autopickup
+
+# Specify the object types to be picked up when autopickup is on.
+# For example "pickup_types:?!/" would pick up all scrolls, potions and wands.
+OPTIONS=pickup_types:$"?!=/
+
+# Prompt for confirmation before picking up items that will push the
+# character's encumbrance past a given level:
+# Valid values are: unencumbered, burdened, stressed, strained, or overtaxed
+OPTIONS=pickup_burden:unencumbered
+
+# German keyboard layout users can uncomment following option
+# to swap the 'y' and 'z' keys:
+#OPTIONS=!qwertz_layout
+
+# Show descriptive dungeon names on bottom status line
+OPTIONS=show_dgn_name
+
 # some decent defaults
-OPTIONS=pickup_types:$"?+!=/,autopickup
 OPTIONS=disclose:yiyayvygyc
-OPTIONS=pickup_burden:u
+
+# Use DEC line-drawing characters. Won't work for all terminals.
+#OPTIONS=DECgraphics
+# Use IBM extended characters. Won't work for all terminals
+# http://nethack.wikia.com/wiki/IBMgraphics
+OPTIONS=IBMgraphics
+
+# Set the symbol used to display boulders. Default value is `
+OPTIONS=boulder:0
+
+# Distinguish visually between lit and unlit corridors
+OPTIONS=lit_corridor
+
+# Visually distinguish pets from similar animals
+OPTIONS=hilite_pet
+
+# Always show the "uncursed" label on objects
+OPTIONS=showbuc
+
+# Prevent alert notification messages about feature changes in a
+# (Un)NetHack version and the previous versions
+OPTIONS=suppress_alert=3.5.0
 
 #
 # General options.  You might also set "silent" so as not to attract
@@ -57,10 +85,7 @@ OPTIONS=pickup_burden:u
 #
 # number_pad option can have an optional value of 0 (off), 1 (on), 
 # or 2(on,legacy-mode) which causes 5='g', alt-5='G', alt-0='I'
-OPTIONS=time,noshowexp,number_pad:2,lit_corridor
-#
-# If you want to get rid of "use #quit to quit..." use:
-OPTIONS=suppress_alert:3.4.3
+OPTIONS=notime,noshowexp,number_pad:2
 #
 # Set some options to control graphical window-port (these will
 # be safely and silently ignored by the tty port)
@@ -84,10 +109,6 @@ OPTIONS=font_text:DejaVu Mono,font_size_text:13
 # Status window settings
 OPTIONS=font_status:DejaVu Mono,font_size_status:13
 
-# Other
-OPTIONS=hilite_pet
-#OPTIONS=!splash_screen,player_selection:prompts
-
 # Status/message window colors
 # Possible color options include:
 # six digit hexadecimal RGB color value ("#8F8F8F"), black, red, green, brown,
@@ -99,33 +120,6 @@ OPTIONS=hilite_pet
 # window, windowframe, windowtext.
 #OPTIONS=windowcolors:status windowtext/window message windowtext/window
 OPTIONS=windowcolors:menu white/black message trueblack/#EEEEEE status trueblack/#EEEEEE text white/black
-
-# *** LOCATIONS ***
-# IMPORTANT: If you change any of these locations, the directories they
-# point at must exist.  NetHack will not create them for you.
-#
-# HACKDIR is the default location for everything.
-# Note: On Windows HACKDIR defaults to the location 
-#       of the NetHack.exe or NetHackw.exe file so
-#       setting HACKDIR below to override that is 
-#       not usually necessary or recommended.
-#HACKDIR=c:\games\nethack
-#
-# The location that level files in progress are stored (default=HACKDIR, writeable)
-#LEVELDIR=c:\nethack\levels
-#
-# The location where saved games are kept (default=HACKDIR, writeable)
-#SAVEDIR=c:\nethack\save
-#
-# The location that bones files are kept (default=HACKDIR, writeable)
-#BONESDIR=c:\nethack\save
-#
-# The location that file synchronization locks are stored (default=HACKDIR, writeable)
-#LOCKDIR=c:\nethack\levels
-#
-# The location that a record of game aborts and self-diagnosed game problems
-# is kept (default=HACKDIR, writeable)
-#TROUBLEDIR=c:\nethack\trouble
 
 # Finnish keyboards might need these modifications uncommented. 
 # For  \, @, $, [, |
@@ -197,13 +191,12 @@ OPTIONS=windowcolors:menu white/black message trueblack/#EEEEEE status trueblack
 OPTIONS=dumpfile:dump_%s.txt
 
 OPTIONS=menucolors
-MENUCOLOR="* blessed *"=green
-MENUCOLOR="* holy *"=green
+MENUCOLOR="* blessed *"=lightgreen
+MENUCOLOR="* holy *"=lightgreen
 MENUCOLOR="* cursed *"=red
 MENUCOLOR="* unholy *"=red
 MENUCOLOR="* cursed * (being worn)"=orange
 
-OPTIONS= showborn
 OPTIONS= !newcolors
 
 ## HP
