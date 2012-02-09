@@ -69,7 +69,7 @@ static struct Bool_Opt
 #endif
 	{"bones", &iflags.bones, TRUE, SET_IN_FILE},
 #ifdef INSURANCE
-	{"checkpoint", &flags.ins_chkpt, TRUE, SET_IN_GAME},
+	{"checkpoint", &flags.ins_chkpt, TRUE, SET_IN_FILE},
 #else
 	{"checkpoint", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
@@ -126,8 +126,8 @@ static struct Bool_Opt
 	{"ignintr", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"large_font", &iflags.obsolete, FALSE, SET_IN_FILE},	/* OBSOLETE */
-	{"legacy", &flags.legacy, TRUE, DISP_IN_GAME},
-	{"lit_corridor", &flags.lit_corridor, TRUE, SET_IN_GAME},
+	{"legacy", &flags.legacy, TRUE, SET_IN_FILE},
+	{"lit_corridor", &flags.lit_corridor, TRUE, SET_IN_FILE},
 	{"lootabc", &iflags.lootabc, FALSE, SET_IN_GAME},
 #ifdef MAC_GRAPHICS_ENV
 	{"Macgraphics", &iflags.MACgraphics, TRUE, SET_IN_GAME},
@@ -141,12 +141,12 @@ static struct Bool_Opt
 #endif
 #ifdef MENU_COLOR
 # ifdef MICRO
-	{"menucolors", &iflags.use_menu_color, TRUE,  SET_IN_GAME},
+	{"menucolors", &iflags.use_menu_color, TRUE,  SET_IN_FILE},
 # else
-	{"menucolors", &iflags.use_menu_color, FALSE, SET_IN_GAME},
+	{"menucolors", &iflags.use_menu_color, FALSE, SET_IN_FILE},
 # endif
 #else
-	{"menucolors", (boolean *)0, FALSE, SET_IN_GAME},
+	{"menucolors", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 #ifdef WIZARD
 	/* for menu debugging only*/
@@ -173,7 +173,7 @@ static struct Bool_Opt
 	{"conducts_nudist", &flags.nudist, FALSE, SET_IN_FILE },
 	{"conducts_vegan", &flags.vegan, FALSE, SET_IN_FILE }, 
 	{"conducts_vegetarian", &flags.vegetarian, FALSE, SET_IN_FILE }, 
-	{"null", &flags.null, TRUE, SET_IN_GAME},
+	{"null", &flags.null, TRUE, SET_IN_FILE},
 #ifdef MAC
 	{"page_wait", &flags.page_wait, TRUE, SET_IN_GAME},
 #else
@@ -195,7 +195,7 @@ static struct Bool_Opt
 #endif  /* CURSES_GRAPHICS */
 	{"prayconfirm", &flags.prayconfirm, TRUE, SET_IN_GAME},
 	{"preload_tiles", &iflags.wc_preload_tiles, TRUE, DISP_IN_GAME},	/*WC*/
-	{"pushweapon", &flags.pushweapon, FALSE, SET_IN_GAME},
+	{"pushweapon", &flags.pushweapon, FALSE, SET_IN_FILE},
 #ifdef QUIVER_FIRED
 	{"quiver_fired", &iflags.quiver_fired, TRUE, SET_IN_GAME},
 #endif
@@ -207,7 +207,7 @@ static struct Bool_Opt
 #else
 	{"rawio", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
-	{"rest_on_space", &flags.rest_on_space, FALSE, SET_IN_GAME},
+	{"rest_on_space", &flags.rest_on_space, FALSE, SET_IN_FILE},
 	{"safe_pet", &flags.safe_dog, TRUE, SET_IN_GAME},
 #ifdef WIZARD
 	{"sanity_check", &iflags.sanity_check, FALSE, SET_IN_GAME},
@@ -216,11 +216,11 @@ static struct Bool_Opt
 #endif
 	{"showannotation", &iflags.show_annotation, TRUE, SET_IN_FILE},
 #ifdef SHOW_BORN
-	{"showborn", &iflags.show_born, FALSE, SET_IN_GAME},
+	{"showborn", &iflags.show_born, TRUE, SET_IN_GAME},
 #endif
 	{"showbuc", &iflags.show_buc, TRUE, SET_IN_GAME},
 	{"showdmg", &iflags.showdmg, FALSE, SET_IN_GAME},
-	{"show_dgn_name", &iflags.show_dgn_name, FALSE, SET_IN_GAME},
+	{"show_dgn_name", &iflags.show_dgn_name, TRUE, SET_IN_GAME},
 #ifdef EXP_ON_BOTL
 	{"showexp", &flags.showexp, FALSE, SET_IN_GAME},
 #else
@@ -3224,6 +3224,7 @@ doset()
 	boolean setinitial = FALSE, fromfile = FALSE;
 	int biggest_name = 0;
 	boolean istty = !strncmpi(windowprocs.name, "tty", 3);
+	boolean ismswin = !strncmpi(windowprocs.name, "mswin", 5);
 
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
@@ -3250,6 +3251,15 @@ doset()
 #ifdef CURSES_GRAPHICS
 			    if (bool_p == &iflags.cursesgraphics) continue;
 #endif
+			    if (bool_p == &iflags.wc_popup_dialog) continue;
+		    } else {
+			    /* only implemented for tty */
+			    if (bool_p == &flags.hitpointbar) continue;
+		    }
+		    if (ismswin) {
+			    if (bool_p == &iflags.use_inverse) continue;
+			    /* nobody would want to disable these in mswin */
+			    if (bool_p == &iflags.hilite_pet) continue;
 		    }
 
 		    if (is_wc_option(boolopt[i].name) &&
