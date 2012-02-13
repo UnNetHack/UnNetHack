@@ -1,4 +1,8 @@
 2012-0X-XX  UnNetHack X.X.X
+	* bug fixes:
+	  - Draw health bar in inverse when color is disabled (reported by
+	    Bernard Helyer)
+
 	* build fixes:
 	  - Compilation failed on openSUSE when trying to link with curses but
 	    tparm being present in ncurses (reported by Roger Koot)

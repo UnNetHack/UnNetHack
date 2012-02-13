@@ -323,7 +323,14 @@ bot1()
 		/* draw hp bar */
 		if (iflags.use_inverse) term_start_attr(ATR_INVERSE);
 		p[filledbar] = '\0';
-		apply_color_option(percentage_color_of(uhp(), uhpmax(), hp_colors), tmp, 1);
+		if (iflags.use_color) {
+			/* draw in color mode */
+			apply_color_option(percentage_color_of(uhp(), uhpmax(), hp_colors), tmp, 1);
+		} else {
+			/* draw in inverse mode */
+			curs(WIN_STATUS, 1, 0);
+			putstr(WIN_STATUS, 0, tmp);
+		}
 		term_end_color();
 		if (iflags.use_inverse) term_end_attr(ATR_INVERSE);
 
