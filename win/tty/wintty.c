@@ -1355,7 +1355,16 @@ struct WinDesc *cw;
 			     * a brain-dead way */
 			    putchar(curr->selector); ttyDisplay->curx++;
 			    putchar(' '); ttyDisplay->curx++;
-			    putchar('-'); ttyDisplay->curx++;
+			    /* set item state */
+			    if (curr->identifier.a_void != 0 && curr->selected) {
+				    if (curr->count == -1L)
+					    (void) putchar('+'); /* all selected */
+				    else
+					    (void) putchar('#'); /* count selected */
+			    } else {
+				    putchar('-');
+			    }
+			    ttyDisplay->curx++;
 			    putchar(' '); ttyDisplay->curx++;
 		    }
 #ifndef WIN32CON
@@ -1390,13 +1399,6 @@ struct WinDesc *cw;
 			  *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
 			  cp++, n++, ttyDisplay->curx++)
 #endif
-			if (n == 2 && curr->identifier.a_void != 0 &&
-							curr->selected) {
-			    if (curr->count == -1L)
-				(void) putchar('+'); /* all selected */
-			    else
-				(void) putchar('#'); /* count selected */
-			} else
 			    (void) putchar(*cp);
 #ifdef MENU_COLOR
 		   if (iflags.use_menu_color && iflags.use_color && menucolr) {
