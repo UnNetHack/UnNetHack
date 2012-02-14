@@ -1277,6 +1277,15 @@ dosacrifice()
 	}
     } /* corpse */
 
+    /* Don't accidentally break atheist conduct */
+    if (otmp->otyp == AMULET_OF_YENDOR ||
+        otmp->otyp == FAKE_AMULET_OF_YENDOR) {
+	if (successful_cdt(CONDUCT_ATHEISM) &&
+	    paranoid_yn("Really stop being an atheist by sacrificing the Amulet of Yendor?", TRUE) == 'n') {
+		return 0;
+	}
+    }
+
     if (otmp->otyp == AMULET_OF_YENDOR) {
 #ifdef ASTRAL_ESCAPE
 	/* There's now an atheist option to win the game */

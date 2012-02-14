@@ -2,6 +2,7 @@
 	* bug fixes:
 	  - Draw health bar in inverse when color is disabled (reported by
 	    Bernard Helyer)
+	  - Warn atheist player when trying to offering the Amulet of Yendor
 
 	* build fixes:
 	  - Compilation failed on openSUSE when trying to link with curses but
