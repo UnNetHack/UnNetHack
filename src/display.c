@@ -1502,6 +1502,8 @@ dump_screen()
 		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_pool\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == MOAT)
 		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_moat\">%s</span>", dfeature, html_c);
+	    else if (oclass < 0 && levl[x][y].typ == BOG)
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_swamp\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == WATER)
 		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_water\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == LAVAPOOL)
@@ -1650,6 +1652,7 @@ back_to_glyph(x,y)
 	case AIR:		idx = S_air;	  break;
 	case CLOUD:		idx = S_cloud;	  break;
 	case WATER:		idx = S_water;	  break;
+	case BOG:		idx = S_bog;	  break;
 	case DBWALL:
 	    idx = (ptr->horizontal) ? S_hcdbridge : S_vcdbridge;
 	    break;
@@ -1659,6 +1662,7 @@ back_to_glyph(x,y)
 	    case DB_LAVA:  idx = S_lava; break;
 	    case DB_ICE:   idx = S_ice;  break;
 	    case DB_FLOOR: idx = (!cansee(x,y) && !ptr->waslit) ? S_darkroom : S_room; break;
+	    case DB_BOG:   idx = S_bog; break;
 	    default:
 		impossible("Strange db-under: %d",
 			   ptr->drawbridgemask & DB_UNDER);
@@ -1762,7 +1766,8 @@ static const char *type_names[MAX_TYPE] = {
 	"LAVAPOOL",	"IRONBARS",	"DEADTREE",	"DOOR",
 	"CORR",		"ROOM",		"STAIRS",	"LADDER",
 	"FOUNTAIN",	"THRONE",	"SINK",		"ALTAR",
-	"ICE",		"DRAWBRIDGE_DOWN","AIR",	"CLOUD"
+	"ICE",		"BOG",		"DRAWBRIDGE_DOWN","AIR",
+	"CLOUD"
 };
 
 

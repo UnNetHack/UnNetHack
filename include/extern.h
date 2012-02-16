@@ -199,6 +199,7 @@ E char FDECL(paranoid_yn, (const char *, BOOLEAN_P));
 E boolean FDECL(is_pool, (int,int));
 E boolean FDECL(is_lava, (int,int));
 E boolean FDECL(is_ice, (int,int));
+E boolean FDECL(is_swamp, (int,int));
 E int FDECL(is_drawbridge_wall, (int,int));
 E boolean FDECL(is_db_wall, (int,int));
 E boolean FDECL(find_drawbridge, (int *,int*));
@@ -243,6 +244,7 @@ E boolean NDECL(is_digging);
 E int NDECL(dig);
 #endif
 E int NDECL(holetime);
+E schar FDECL(fillholetyp, (int, int));
 E boolean FDECL(dig_check, (struct monst *, BOOLEAN_P, int, int));
 E void FDECL(digactualhole, (int,int,struct monst *,int));
 E boolean FDECL(dighole, (BOOLEAN_P));
@@ -2200,6 +2202,7 @@ E struct trap *FDECL(t_at, (int,int));
 E void FDECL(b_trapped, (const char *,int));
 E boolean NDECL(unconscious);
 E boolean NDECL(lava_effects);
+E boolean NDECL(swamp_effects);
 E void FDECL(blow_up_landmine, (struct trap *));
 E int FDECL(launch_obj,(SHORT_P,int,int,int,int,int));
 

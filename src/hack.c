@@ -18,6 +18,7 @@ STATIC_DCL boolean FDECL(findtravelpath, (boolean(*)(int, int)));
 STATIC_DCL boolean FDECL(monstinroom, (struct permonst *,int));
 
 STATIC_DCL void FDECL(move_update, (BOOLEAN_P));
+STATIC_DCL void FDECL(struggle_sub, (const char *));
 
 static boolean door_opened;	/* set to true if door was opened during test_move */
 
@@ -1004,7 +1005,7 @@ int mode;
 	if ((t && t->tseen) ||
 	    (!Levitation && !Flying &&
 	     !is_clinger(youmonst.data) &&
-	     (is_pool(x, y) || is_lava(x, y)) && levl[x][y].seenv)) {
+	     (is_pool(x, y) || is_lava(x, y) || is_swamp(x, y)) && levl[x][y].seenv)) {
 	    if (mode == DO_MOVE) {
 	        if (t && t->tseen) autoexplore_msg("a trap", mode);
 	        else if (is_pool(x, y)) autoexplore_msg("a body of water", mode);
@@ -1731,16 +1732,7 @@ domove()
 				"You are still in a pit." );
 		    }
 		} else if (u.utraptype == TT_LAVA) {
-		    if(flags.verbose) {
-			predicament = "stuck in the lava";
-#ifdef STEED
-			if (u.usteed)
-			    Norep("%s is %s.", upstart(y_monnam(u.usteed)),
-				  predicament);
-			else
-#endif
-			Norep("You are %s.", predicament);
-		    }
+		    struggle_sub("stuck in the lava");
 		    if(!is_lava(x,y)) {
 			u.utrap--;
 			if((u.utrap & 0xff) == 0) {
@@ -1762,16 +1754,7 @@ domove()
 			return;
 		    }
 		    if(--u.utrap) {
-			if(flags.verbose) {
-			    predicament = "stuck to the web";
-#ifdef STEED
-			    if (u.usteed)
-				Norep("%s is %s.", upstart(y_monnam(u.usteed)),
-				      predicament);
-			    else
-#endif
-			    Norep("You are %s.", predicament);
-			}
+			    struggle_sub("stuck to the web");
 		    } else {
 #ifdef STEED
 			if (u.usteed)
@@ -1780,6 +1763,10 @@ domove()
 			else
 #endif
 			You("disentangle yourself.");
+		    }
+		} else if (u.utraptype == TT_SWAMP) {
+		    if(--u.utrap) {
+			struggle_sub("stuck in the mud");
 		    }
 		} else if (u.utraptype == TT_INFLOOR) {
 		    if(--u.utrap) {
@@ -2023,6 +2010,21 @@ domove()
 }
 
 void
+struggle_sub(predicament)
+const char *predicament;
+{
+	if (flags.verbose) {
+#ifdef STEED
+		if (u.usteed)
+			Norep("%s is %s.", upstart(y_monnam(u.usteed)),
+					predicament);
+		else
+#endif
+			Norep("You are %s.", predicament);
+	}
+}
+
+void
 invocation_message()
 {
 	/* mark the square as stepped on, whether it's the VS or not;
@@ -2090,6 +2092,8 @@ boolean pick;
 				You("pop into an air bubble.");
 			else if (is_lava(u.ux, u.uy))
 				You("leave the water...");	/* oops! */
+			else if (is_swamp(u.ux, u.uy))
+				You("are on shallows.");
 			else
 				You("are on solid %s again.",
 				    is_ice(u.ux, u.uy) ? "ice" : "land");
@@ -2112,9 +2116,29 @@ boolean pick;
 		}
 	}
 stillinwater:;
+	if (u.utraptype == TT_SWAMP) {
+		if (!is_swamp(u.ux, u.uy)) {
+			if (is_lava(u.ux, u.uy))	/* oops! */
+				You("get out of the mud...");
+			else
+				You("are on solid %s again.",
+				    is_ice(u.ux, u.uy) ? "ice" : "land");
+		}
+		else if (Levitation)
+			You("rise out of the swamp.");
+		else if (Flying)
+			You("fly out of the swamp.");
+		else if (Wwalking)
+			You("slowly rise above the muddy water.");
+		else goto stillinswamp;
+		u.utrap = 0;
+		u.utraptype = 0;
+	}
+stillinswamp:
 	if (!Levitation && !u.ustuck && !Flying) {
 	    /* limit recursive calls through teleds() */
-	    if (is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) {
+	    if (is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy) ||
+		is_swamp(u.ux, u.uy)) {
 #ifdef STEED
 		if (u.usteed && !is_flyer(u.usteed->data) &&
 			!is_floater(u.usteed->data) &&
@@ -2128,6 +2152,8 @@ stillinwater:;
 #endif
 		if (is_lava(u.ux, u.uy)) {
 		    if (lava_effects()) return;
+		} else if (is_swamp(u.ux, u.uy)) {
+		    if (swamp_effects()) return;
 		} else if (!Wwalking && drown())
 		    return;
 	    }

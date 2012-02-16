@@ -2807,6 +2807,8 @@ char *buf;
 	    dfeature = "set of iron bars";
 	else if (ltyp == DEADTREE)
 	    cmap = S_deadtree;
+	else if (ltyp == BOG)
+	    cmap = S_bog;
 
 	if (cmap >= 0) dfeature = defsyms[cmap].explanation;
 	if (dfeature) Strcpy(buf, dfeature);

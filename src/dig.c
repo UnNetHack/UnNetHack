@@ -15,7 +15,6 @@ STATIC_DCL void FDECL(mkcavepos, (XCHAR_P,XCHAR_P,int,BOOLEAN_P,BOOLEAN_P));
 STATIC_DCL void FDECL(mkcavearea, (BOOLEAN_P));
 STATIC_DCL int FDECL(dig_typ, (struct obj *,XCHAR_P,XCHAR_P));
 STATIC_DCL int NDECL(dig);
-STATIC_DCL schar FDECL(fillholetyp, (int, int));
 STATIC_DCL void NDECL(dig_up_grave);
 
 /* Indices returned by dig_typ() */
@@ -443,7 +442,6 @@ holetime()
 }
 
 /* Return typ of liquid to fill a hole with, or ROOM, if no liquid nearby */
-STATIC_OVL
 schar
 fillholetyp(x,y)
 int x, y;
@@ -451,8 +449,9 @@ int x, y;
     register int x1, y1;
     int lo_x = max(1,x-1), hi_x = min(x+1,COLNO-1),
 	lo_y = max(0,y-1), hi_y = min(y+1,ROWNO-1);
-    int pool_cnt = 0, moat_cnt = 0, lava_cnt = 0;
+    int pool_cnt = 0, moat_cnt = 0, lava_cnt = 0, swamp_cnt = 0;
 
+    /* count the terrain types at and around x,y including those under drawbridges */
     for (x1 = lo_x; x1 <= hi_x; x1++)
 	for (y1 = lo_y; y1 <= hi_y; y1++)
 	    if (levl[x1][y1].typ == POOL)
@@ -465,6 +464,10 @@ int x, y;
 		    (levl[x1][y1].typ == DRAWBRIDGE_UP &&
 			(levl[x1][y1].drawbridgemask & DB_UNDER) == DB_LAVA))
 		lava_cnt++;
+	    else if (levl[x1][y1].typ == BOG ||
+		    (levl[x1][y1].typ == DRAWBRIDGE_UP &&
+			(levl[x1][y1].drawbridgemask & DB_UNDER) == DB_BOG))
+		swamp_cnt++;
     pool_cnt /= 3;		/* not as much liquid as the others */
 
     if (lava_cnt > moat_cnt + pool_cnt && rn2(lava_cnt + 1))
@@ -473,6 +476,8 @@ int x, y;
 	return MOAT;
     else if (pool_cnt > 0 && rn2(pool_cnt + 1))
 	return POOL;
+    else if (swamp_cnt > 0 && rn2(swamp_cnt + 1))
+	return BOG;
     else
 	return ROOM;
 }
@@ -719,7 +724,8 @@ boolean pit_only;
 		}
 
 		lev->drawbridgemask &= ~DB_UNDER;
-		lev->drawbridgemask |= (typ == LAVAPOOL) ? DB_LAVA : DB_MOAT;
+		lev->drawbridgemask |= (typ == LAVAPOOL) ? DB_LAVA :
+				       (typ == BOG) ? DB_BOG : DB_MOAT;
 
  liquid_flow:
 		if (ttmp) (void) delfloortrap(ttmp);
@@ -731,7 +737,7 @@ boolean pit_only;
 		if (!Levitation && !Flying) {
 		    if (typ == LAVAPOOL)
 			(void) lava_effects();
-		    else if (!Wwalking)
+		    else if (!Wwalking && typ != BOG)
 			(void) drown();
 		}
 		return TRUE;

@@ -64,12 +64,14 @@ boolean pushing;
 {
 	if (!otmp || otmp->otyp != BOULDER)
 	    warning("Not a boulder?");
-	else if (!Is_waterlevel(&u.uz) && (is_pool(rx,ry) || is_lava(rx,ry))) {
+	else if (!Is_waterlevel(&u.uz) &&
+		 (is_pool(rx,ry) || is_lava(rx,ry) || is_swamp(rx,ry))) {
 	    boolean lava = is_lava(rx,ry), fills_up;
+	    boolean swamp = is_swamp(rx,ry);
 	    const char *what = waterbody_name(rx,ry);
 	    schar ltyp = levl[rx][ry].typ;
 	    int chance = rn2(10);		/* water: 90%; lava: 10% */
-	    fills_up = lava ? chance == 0 : chance != 0;
+	    fills_up = swamp ? 1 : lava ? chance == 0 : chance != 0;
 
 	    if (fills_up) {
 		struct trap *ttmp = t_at(rx, ry);
@@ -214,7 +216,7 @@ const char *verb;
 		}
 	} else if (is_lava(x, y)) {
 		return fire_damage(obj, FALSE, FALSE, x, y);
-	} else if (is_pool(x, y)) {
+	} else if (is_pool(x, y) || is_swamp(x, y)) {
 		/* Reasonably bulky objects (arbitrary) splash when dropped.
 		 * If you're floating above the water even small things make noise.
 		 * Stuff dropped near fountains always misses */

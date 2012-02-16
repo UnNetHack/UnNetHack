@@ -1761,7 +1761,7 @@ dodip()
 			dipfountain(obj);
 			return(1);
 		}
-	} else if (is_pool(u.ux,u.uy)) {
+	} else if (is_pool(u.ux,u.uy) || is_swamp(u.ux,u.uy)) {
 		tmp = waterbody_name(u.ux,u.uy);
 		Sprintf(qbuf, "Dip %s into the %s?", 
 				safe_qbuf("", sizeof("Dip  into the pool of water?"),

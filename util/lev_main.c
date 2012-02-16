@@ -944,7 +944,8 @@ char c;
 		  case 'T'  : return(TREE);
 		  case 't'  : return(DEADTREE);
 		  case 'F'  : return(IRONBARS);	/* Fe = iron */
-		  case 'x'  : return(MAX_TYPE); /* 'see-through' */
+		  case 'M'  : return(BOG);	/* muddy swamp */
+		  case 'x'  : return(MAX_TYPE);	/* 'see-through' */
 	    }
 	return(INVALID_TYPE);
 }

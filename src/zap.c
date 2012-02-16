@@ -3655,14 +3655,17 @@ xchar x, y;
 	struct rm *lev = &levl[x][y];
 	struct obj *otmp;
 
-	if (lev->typ == DRAWBRIDGE_UP)
-	    lev->drawbridgemask &= ~DB_ICE;	/* revert to DB_MOAT */
-	else {	/* lev->typ == ICE */
+	if (lev->typ == DRAWBRIDGE_UP) {
+	    lev->drawbridgemask &= ~DB_UNDER;
+	    lev->drawbridgemask |= DB_MOAT;	/* revert to DB_MOAT */
+	} else {	/* lev->typ == ICE */
 #ifdef STUPID
 	    if (lev->icedpool == ICED_POOL) lev->typ = POOL;
-	    else lev->typ = MOAT;
+	    else if (lev->icedpool == ICED_MOAT) lev->typ = MOAT;
+	    else lev->typ = BOG;
 #else
-	    lev->typ = (lev->icedpool == ICED_POOL ? POOL : MOAT);
+	    lev->typ = (lev->icedpool == ICED_POOL ? POOL :
+			lev->icedpool == ICED_MOAT ? MOAT : BOG);
 #endif
 	    lev->icedpool = 0;
 	}
@@ -3678,7 +3681,7 @@ xchar x, y;
 		if (!boulder_hits_pool(otmp, x, y, FALSE))
 		    warning("melt_ice: no pool?");
 		/* try again if there's another boulder and pool didn't fill */
-	    } while (is_pool(x,y) && (otmp = sobj_at(BOULDER, x, y)) != 0);
+	    } while ((is_pool(x,y) || is_swamp(x,y)) && (otmp = sobj_at(BOULDER, x, y)) != 0);
 	    newsym(x,y);
 	}
 	if (x == u.ux && y == u.uy)
@@ -3712,21 +3715,41 @@ boolean *shopdamage;
 	    }
 	    if(is_ice(x, y)) {
 		melt_ice(x, y);
-	    } else if(is_pool(x,y)) {
+	    } else if(is_pool(x,y) || is_swamp(x,y)) {
 		const char *msgtxt = "You hear hissing gas.";
-		if(lev->typ != POOL) {	/* MOAT or DRAWBRIDGE_UP */
+		schar filltyp;
+		int dried = 0;
+		if(lev->typ != POOL && lev->typ != BOG) {	/* MOAT or DRAWBRIDGE_UP */
 		    if (cansee(x,y)) msgtxt = "Some water evaporates.";
 		} else {
 		    register struct trap *ttmp;
 
 		    rangemod -= 3;
-		    lev->typ = ROOM;
-		    ttmp = maketrap(x, y, PIT);
-		    if (ttmp) ttmp->tseen = 1;
-		    if (cansee(x,y)) msgtxt = "The water evaporates.";
+		    if (lev->typ == BOG) {
+			lev->typ = ROOM;
+			filltyp = fillholetyp(x,y);
+			if (filltyp == ROOM) {
+			    dried = 1;
+			} else {
+			    lev->typ = BOG;
+			}
+		    } else {
+			lev->typ = ROOM;
+			filltyp = fillholetyp(x,y);
+			if (filltyp == ROOM) {
+			    ttmp = maketrap(x, y, PIT);
+			    if (ttmp) ttmp->tseen = 1;
+			    dried = 1;
+			} else {
+			    lev->typ = filltyp;
+			}
+		    }
+		    if (cansee(x,y))
+			msgtxt = (dried) ? "The water evaporates." :
+					   "Some water evaporates.";
 		}
 		Norep(msgtxt);
-		if (lev->typ == ROOM) newsym(x,y);
+		if (dried) newsym(x,y);
 	    } else if(IS_FOUNTAIN(lev->typ)) {
 		    if (cansee(x,y))
 			pline("Steam billows from the fountain.");
@@ -3734,9 +3757,10 @@ boolean *shopdamage;
 		    dryup(x, y, type > 0);
 	    }
 	}
-	else if(abstype == ZT_COLD && (is_pool(x,y) || is_lava(x,y))) {
+	else if(abstype == ZT_COLD && (is_pool(x,y) || is_lava(x,y) || is_swamp(x,y))) {
 		boolean lava = is_lava(x,y);
-		boolean moat = (!lava && (lev->typ != POOL) &&
+		boolean swamp = is_swamp(x,y);
+		boolean moat = (!lava && !swamp && (lev->typ != POOL) &&
 				(lev->typ != WATER) &&
 				!Is_medusa_level(&u.uz) &&
 				!Is_waterlevel(&u.uz));
@@ -3756,7 +3780,8 @@ boolean *shopdamage;
 		    } else {
 			if (!lava)
 			    lev->icedpool =
-				    (lev->typ == POOL ? ICED_POOL : ICED_MOAT);
+				    (lev->typ == POOL ? ICED_POOL :
+				     lev->typ == MOAT ? ICED_MOAT : ICED_BOG);
 			lev->typ = (lava ? ROOM : ICE);
 		    }
 		    bury_objs(x,y);

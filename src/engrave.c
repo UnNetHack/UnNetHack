@@ -219,6 +219,8 @@ register int x, y;
 	    return "headstone";
 	else if(IS_FOUNTAIN(levl[x][y].typ))
 	    return "fountain";
+	else if (is_swamp(x,y))
+	    return "swamp";
 	else if ((IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz)) ||
 		 IS_WALL(lev->typ) || IS_DOOR(lev->typ) || lev->typ == SDOOR)
 	    return "floor";
@@ -589,7 +591,8 @@ boolean fingers;
 	} else if (Underwater) {
 		You_cant("write underwater!");
 		return(0);
-	} else if (is_pool(u.ux,u.uy) || IS_FOUNTAIN(levl[u.ux][u.uy].typ)) {
+	} else if (is_pool(u.ux,u.uy) || IS_FOUNTAIN(levl[u.ux][u.uy].typ) ||
+		   is_swamp(u.ux,u.uy)) {
 		You_cant("write on the water!");
 		return(0);
 	}

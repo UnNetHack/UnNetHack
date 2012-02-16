@@ -1,4 +1,7 @@
 2012-0X-XX  UnNetHack X.X.X
+	* new dungeon features:
+	  - muddy swamp (from NetHack Brass)
+
 	* bug fixes:
 	  - Draw health bar in inverse when color is disabled (reported by
 	    Bernard Helyer)

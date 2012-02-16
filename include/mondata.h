@@ -186,6 +186,10 @@
 				 (ptr)->mlet == S_VORTEX || \
 				 (ptr) == &mons[PM_MANES])
 
+#define likes_swamp(ptr)	((ptr)->mlet == S_PUDDING || \
+				 (ptr)->mlet == S_FUNGUS || \
+				 (ptr) == &mons[PM_OCHRE_JELLY])
+
 /* Used for conduct with corpses, tins, and digestion attacks */
 /* G_NOCORPSE monsters might still be swallowed as a purple worm */
 /* Maybe someday this could be in mflags... */

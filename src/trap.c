@@ -2377,6 +2377,10 @@ float_up()
 		} else if (u.utraptype == TT_INFLOOR) {
 			Your("body pulls upward, but your %s are still stuck.",
 			     makeplural(body_part(LEG)));
+		} else if (u.utraptype == TT_SWAMP) {
+			You("float up, out of the swamp.");
+			u.utrap = 0;
+			u.utraptype = 0;
 		} else {
 			You("float up, only your %s is still stuck.",
 				body_part(LEG));
@@ -2483,6 +2487,10 @@ long hmask, emask;     /* might cancel timeout */
 
 		if(is_lava(u.ux,u.uy)) {
 			(void) lava_effects();
+			no_msg = TRUE;
+		}
+		if(is_swamp(u.ux,u.uy) && !Wwalking) {
+			(void) swamp_effects();
 			no_msg = TRUE;
 		}
 	}
@@ -4204,6 +4212,50 @@ burn_stuff:
     destroy_item(SPBOOK_CLASS, AD_FIRE);
     destroy_item(POTION_CLASS, AD_FIRE);
     return(FALSE);
+}
+
+boolean
+swamp_effects()
+{
+	static int mudboots = 0;
+	int i;
+	boolean swampok;
+
+	if (!mudboots && uarmf) {
+	    const char *s;
+	    if ((s = OBJ_DESCR(objects[uarmf->otyp])) != (char *)0 &&
+		!strncmp(s, "mud ", 4))
+		mudboots = uarmf->otyp;
+	}
+	swampok = (Wwalking || (uarmf && uarmf->otyp == mudboots));
+	if (!swampok) {
+		if (u.utraptype != TT_SWAMP) {
+		    if (!Swimming && !Amphibious) {
+			You("step into muddy swamp.");
+			u.utrap = rnd(3);
+			u.utraptype = TT_SWAMP;
+		    } else
+			Norep("You are swimming in the muddy water.");
+		}
+	}
+
+	if (!swampok) {
+	    if (!rn2(5)) {
+		Your("baggage gets wet.");
+		water_damage(invent, FALSE, FALSE);
+	    } else if (uarmf)
+		rust_dmg(uarmf, "boots", 1/*rust*/, TRUE, &youmonst);
+	}
+
+	if (u.umonnum == PM_GREMLIN && rn2(3))
+	    (void)split_mon(&youmonst, (struct monst *)0);
+	else if (u.umonnum == PM_IRON_GOLEM) {
+	    You("rust!");
+	    i = rnd(6);
+	    if (u.mhmax > i) u.mhmax -= i;
+	    losehp(i, "rusting away", KILLED_BY);
+	}
+	return(FALSE);
 }
 
 #endif /* OVLB */

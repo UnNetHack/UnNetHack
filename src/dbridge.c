@@ -75,6 +75,21 @@ int x,y;
     return FALSE;
 }
 
+boolean
+is_swamp(x,y)
+int x,y;
+{
+    schar ltyp;
+
+    if (!isok(x,y)) return FALSE;
+    ltyp = levl[x][y].typ;
+    if (ltyp == BOG
+	|| (ltyp == DRAWBRIDGE_UP
+	    && (levl[x][y].drawbridgemask & DB_UNDER) == DB_BOG)) return TRUE;
+    return FALSE;
+}
+
+
 #endif /* OVL0 */
 
 #ifdef OVL1
@@ -851,6 +866,7 @@ int x,y;
 	register struct rm *lev1, *lev2;
 	struct trap *t;
 	int x2, y2;
+	int db_u;
 	boolean e_inview;
 	struct entity *etmp1 = &(occupants[0]), *etmp2 = &(occupants[1]);
 
@@ -860,24 +876,24 @@ int x,y;
 	x2 = x; y2 = y;
 	get_wall_for_db(&x2,&y2);
 	lev2 = &levl[x2][y2];
-	if ((lev1->drawbridgemask & DB_UNDER) == DB_MOAT ||
-	    (lev1->drawbridgemask & DB_UNDER) == DB_LAVA) {
+	db_u = (lev1->drawbridgemask & DB_UNDER);
+	if (db_u == DB_MOAT || db_u == DB_LAVA || db_u == DB_BOG) {
 		struct obj *otmp;
-		boolean lava = (lev1->drawbridgemask & DB_UNDER) == DB_LAVA;
+		int where = (db_u == DB_LAVA) ? 0 :
+			    (db_u == DB_MOAT) ? 1 : 2;
+		static char *wstr[3] = { "lava", "moat", "swamp" };
 		if (lev1->typ == DRAWBRIDGE_UP) {
 			if (cansee(x2,y2))
-			    pline_The("portcullis of the drawbridge falls into the %s!",
-				  lava ? "lava" : "moat");
+			    pline_The("portcullis of the drawbridge falls into the %s!", wstr[where]);
 			else if (flags.soundok)
 				You_hear("a loud *SPLASH*!");
 		} else {
 			if (cansee(x,y))
-			    pline_The("drawbridge collapses into the %s!",
-				  lava ? "lava" : "moat");
+			    pline_The("drawbridge collapses into the %s!", wstr[where]);
 			else if (flags.soundok)
 				You_hear("a loud *SPLASH*!");
 		}
-		lev1->typ = lava ? LAVAPOOL : MOAT;
+		lev1->typ = (where == 0) ? LAVAPOOL : (where == 1) ? MOAT : BOG;
 		lev1->drawbridgemask = 0;
 		if ((otmp = sobj_at(BOULDER,x,y)) != 0) {
 		    obj_extract_self(otmp);
