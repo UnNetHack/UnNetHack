@@ -1371,7 +1371,7 @@ register struct obj	*sobj;
 			int random_classes[] = { WEAPON_CLASS, ARMOR_CLASS, RING_CLASS, AMULET_CLASS,
 				TOOL_CLASS, FOOD_CLASS, POTION_CLASS, SCROLL_CLASS, SPBOOK_CLASS,
 				WAND_CLASS, COIN_CLASS, GEM_CLASS };
-			return object_detect((struct obj *)0, random_classes[rn2(SIZE(random_classes))]);
+			return object_detect((struct obj *)0, random_classes[rn2(SIZE(random_classes))], FALSE);
 		} else if (sobj->cursed) return(trap_detect(sobj));
 		else return(gold_detect(sobj));
 	case SCR_FOOD_DETECTION:
@@ -1427,14 +1427,14 @@ register struct obj	*sobj;
 		    make_confused(HConfusion + rnd(30), FALSE);
 		    break;
 		}
-		if (sobj->blessed) {
-		    register int x, y;
-
-		    for (x = 1; x < COLNO; x++)
-		    	for (y = 0; y < ROWNO; y++)
-		    	    if (levl[x][y].typ == SDOOR)
-		    	    	cvt_sdoor_to_door(&levl[x][y]);
-		    /* do_mapping() already reveals secret passages */
+		/* reveal secret doors for uncursed and blessed scrolls */
+		if (!sobj->cursed) {
+			register int x, y;
+			for (x = 1; x < COLNO; x++)
+				for (y = 0; y < ROWNO; y++)
+					if (levl[x][y].typ == SDOOR)
+						cvt_sdoor_to_door(&levl[x][y]);
+			/* do_mapping() already reveals secret passages */
 		}
 		known = TRUE;
 	case SPE_MAGIC_MAPPING:
@@ -1447,6 +1447,10 @@ register struct obj	*sobj;
 		cval = (sobj->cursed && !confused);
 		if(cval) HConfusion = 1;	/* to screw up map */
 		do_mapping();
+		/* objects, too, pal! */
+		if (sobj->blessed && !cval) {
+		  object_detect(sobj, 0, TRUE);
+		}
 		if(cval) {
 		    HConfusion = 0;		/* restore */
 		    pline("Unfortunately, you can't grasp the details.");

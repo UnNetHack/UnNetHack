@@ -658,7 +658,7 @@ peffects(otmp)
 		break;
 	case POT_OBJECT_DETECTION:
 	case SPE_DETECT_TREASURE:
-		if (object_detect(otmp, 0))
+		if (object_detect(otmp, 0, FALSE))
 			return(1);		/* nothing detected */
 		exercise(A_WIS, TRUE);
 		break;
