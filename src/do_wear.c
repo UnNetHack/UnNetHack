@@ -567,7 +567,43 @@ Armor_on()
 		if (!Blind)
 			pline("%s to glow.",Tobjnam(uarm,"begin"));
 	}
-    return 0;
+	switch (uarm->otyp) {
+		case	CHROMATIC_DRAGON_SCALES:
+		case	CHROMATIC_DRAGON_SCALE_MAIL:
+			EFire_resistance   |= W_ARM;
+			ECold_resistance   |= W_ARM;
+			ESleep_resistance  |= W_ARM;
+			EDisint_resistance |= W_ARM;
+			EShock_resistance  |= W_ARM;
+			EPoison_resistance |= W_ARM;
+			EAcid_resistance   |= W_ARM;
+			EStone_resistance  |= W_ARM;
+			EReflecting        |= W_ARM;
+			break;
+		default:
+			break;
+	}
+	return 0;
+}
+static void
+Armor_off_sub()
+{
+	switch (uarm->otyp) {
+		case	CHROMATIC_DRAGON_SCALES:
+		case	CHROMATIC_DRAGON_SCALE_MAIL:
+			EFire_resistance   &= ~W_ARM;
+			ECold_resistance   &= ~W_ARM;
+			ESleep_resistance  &= ~W_ARM;
+			EDisint_resistance &= ~W_ARM;
+			EShock_resistance  &= ~W_ARM;
+			EPoison_resistance &= ~W_ARM;
+			EAcid_resistance   &= ~W_ARM;
+			EStone_resistance  &= ~W_ARM;
+			EReflecting        &= ~W_ARM;
+			break;
+		default:
+			break;
+	}
 }
 
 int
@@ -578,10 +614,11 @@ Armor_off()
 		if (!Blind)
 			pline("%s glowing.",Tobjnam(uarm,"stop"));
 	}
-    takeoff_mask &= ~W_ARM;
-    setworn((struct obj *)0, W_ARM);
-    cancelled_don = FALSE;
-    return 0;
+	Armor_off_sub();
+	takeoff_mask &= ~W_ARM;
+	setworn((struct obj *)0, W_ARM);
+	cancelled_don = FALSE;
+	return 0;
 }
 
 /* The gone functions differ from the off functions in that if you die from
@@ -592,10 +629,11 @@ Armor_gone()
 {
 	if (uarm && Is_gold_dragon_armor(uarm->otyp))
 		end_burn(uarm,FALSE);
+	Armor_off_sub();
 	takeoff_mask &= ~W_ARM;
-    setnotworn(uarm);
-    cancelled_don = FALSE;
-    return 0;
+	setnotworn(uarm);
+	cancelled_don = FALSE;
+	return 0;
 }
 
 STATIC_OVL void

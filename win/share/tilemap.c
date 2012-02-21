@@ -69,7 +69,7 @@ struct conditionals {
 	{ MON_GLYPH, PM_LORD_SATO, "Twoflower" },
 #endif
 	/* commented out in monst.c at present */
-	{ MON_GLYPH, PM_CHROMATIC_DRAGON, "Goblin King" },
+	{ MON_GLYPH, PM_TIAMAT, "Goblin King" },
 	{ MON_GLYPH, PM_NEANDERTHAL, "High-elf" },
 #ifndef TOURIST
 	{ MON_GLYPH, PM_ROSHI, "guide" },

@@ -2349,7 +2349,7 @@ boolean from_user;
 	/* dragon scales - assumes order of dragons */
 	if ((!strcmpi(bp, "scales") || !strcmpi(bp, "dragon scales")) &&
 			mntmp != NON_PM &&
-			mntmp >= PM_GRAY_DRAGON && mntmp <= PM_YELLOW_DRAGON) {
+			mntmp >= PM_GRAY_DRAGON && mntmp <= PM_CHROMATIC_DRAGON) {
 		typ = GRAY_DRAGON_SCALES + mntmp - PM_GRAY_DRAGON;
 		mntmp = NON_PM;	/* no monster */
 		found_by_descr = TRUE;

@@ -267,7 +267,7 @@ boolean forcecontrol;
 	int tries=0;
 	boolean draconian = (uarm &&
 				uarm->otyp >= GRAY_DRAGON_SCALE_MAIL &&
-				uarm->otyp <= YELLOW_DRAGON_SCALES);
+				uarm->otyp <= CHROMATIC_DRAGON_SCALES);
 	boolean iswere = (u.ulycn >= LOW_PM || is_were(youmonst.data));
 	boolean isvamp = (is_vampire(youmonst.data));
 	boolean was_floating = (Levitation || Flying);
@@ -1379,6 +1379,9 @@ int atyp;
 	    case YELLOW_DRAGON_SCALE_MAIL:
 	    case YELLOW_DRAGON_SCALES:
 		return PM_YELLOW_DRAGON;
+	    case CHROMATIC_DRAGON_SCALE_MAIL:
+	    case CHROMATIC_DRAGON_SCALES:
+		return PM_CHROMATIC_DRAGON;
 	    default:
 		return -1;
 	}

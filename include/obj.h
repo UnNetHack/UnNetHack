@@ -242,9 +242,9 @@ struct obj {
 
 /* dragon gear */
 #define Is_dragon_scales(idx)	(idx >= GRAY_DRAGON_SCALES && \
-				 idx <= YELLOW_DRAGON_SCALES)
+				 idx <= CHROMATIC_DRAGON_SCALES)
 #define Is_dragon_mail(idx)	(idx >= GRAY_DRAGON_SCALE_MAIL && \
-				 idx <= YELLOW_DRAGON_SCALE_MAIL)
+				 idx <= CHROMATIC_DRAGON_SCALE_MAIL)
 #define Is_dragon_armor(idx)	(Is_dragon_scales(idx) || Is_dragon_mail(idx))
 #define Is_gold_dragon_armor(idx)	(Is_dragon_armor(idx) && \
 					 (OBJ_DESCR(objects[idx])) && \

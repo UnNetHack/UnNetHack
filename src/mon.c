@@ -204,11 +204,20 @@ register struct monst *mtmp;
 	    case PM_GREEN_DRAGON:
 	    case PM_GOLD_DRAGON:
 	    case PM_YELLOW_DRAGON:
+	    case PM_CHROMATIC_DRAGON:
 		/* Make dragon scales.  This assumes that the order of the */
 		/* dragons is the same as the order of the scales.	   */
 		if (!rn2(mtmp->mrevived ? 20 : 3)) {
 		    num = GRAY_DRAGON_SCALES + monsndx(mdat) - PM_GRAY_DRAGON;
 		    obj = mksobj_at(num, x, y, FALSE, FALSE);
+		    obj->spe = 0;
+		    obj->cursed = obj->blessed = FALSE;
+		}
+		goto default_1;
+	    case PM_TIAMAT:
+		/* Make chromatic dragon scales. */
+		if (!rn2(mtmp->mrevived ? 20 : 1)) {
+		    obj = mksobj_at(CHROMATIC_DRAGON_SCALES, x, y, FALSE, FALSE);
 		    obj->spe = 0;
 		    obj->cursed = obj->blessed = FALSE;
 		}

@@ -88,7 +88,7 @@ const struct Role roles[] = {
 	"Anu", "_Ishtar", "Anshar", /* Babylonian */
 	"Cav", "the Caves of the Ancestors", "the Dragon's Lair",
 	PM_CAVEMAN, PM_CAVEWOMAN, NON_PM,
-	PM_SHAMAN_KARNOV, PM_NEANDERTHAL, PM_CHROMATIC_DRAGON,
+	PM_SHAMAN_KARNOV, PM_NEANDERTHAL, PM_TIAMAT,
 	ART_SCEPTRE_OF_MIGHT,
 	MH_HUMAN|MH_DWARF|MH_GNOME|MH_VAMPIRE | ROLE_MALE|ROLE_FEMALE |
 	  ROLE_LAWFUL|ROLE_NEUTRAL,

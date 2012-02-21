@@ -4,6 +4,9 @@
 	* new dungeon features:
 	  - muddy swamp (from NetHack Brass)
 
+	* added items:
+	  - chromatic dragon scales and scale mail
+
 	* bug fixes:
 	  - Draw health bar in inverse when color is disabled (reported by
 	    Bernard Helyer)
