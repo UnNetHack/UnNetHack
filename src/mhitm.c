@@ -896,6 +896,7 @@ mdamagem(magr, mdef, mattk)
 		    pline("%s is %s!", Monnam(mdef),
 			  on_fire(mdef->data, mattk));
 		if (pd == &mons[PM_STRAW_GOLEM] ||
+		    pd == &mons[PM_WAX_GOLEM] ||
 		    pd == &mons[PM_PAPER_GOLEM]) {
 			if (vis) pline("%s burns completely!", Monnam(mdef));
 			mondied(mdef);

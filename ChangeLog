@@ -7,6 +7,9 @@
 	* added items:
 	  - chromatic dragon scales and scale mail
 
+	* new monster:
+	  - wax golems (providing candles as death drop) (from Slash'Em)
+
 	* bug fixes:
 	  - Draw health bar in inverse when color is disabled (reported by
 	    Bernard Helyer)
