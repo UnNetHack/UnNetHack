@@ -946,7 +946,7 @@ boolean want_disp;
 	else if (u.ualign.record >= -8)	you_have("sinned");
 	else you_have("transgressed");
 #ifdef WIZARD
-	if (wizard) {
+	if (wizard || final) {
 		Sprintf(buf, " %d", u.uhunger);
 		enl_msg("Hunger level ", "is", "was", buf);
 		Sprintf(buf, " %d / %ld", u.ualign.record, ALIGNLIM);
@@ -1007,7 +1007,7 @@ boolean want_disp;
 		you_have(buf);
 	}
 #if defined(WIZARD) && defined(STEED)
-	if (Wounded_legs && u.usteed && wizard) {
+	if (Wounded_legs && u.usteed && (wizard || final)) {
 	    Strcpy(buf, x_monnam(u.usteed, ARTICLE_YOUR, (char *)0, 
 		    SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION, FALSE));
 	    *buf = highc(*buf);
@@ -1090,7 +1090,7 @@ boolean want_disp;
 	if (u.uswallow) {
 	    Sprintf(buf, "swallowed by %s", a_monnam(u.ustuck));
 #ifdef WIZARD
-	    if (wizard) Sprintf(eos(buf), " (%u)", u.uswldtim);
+	    if (wizard || final) Sprintf(eos(buf), " (%u)", u.uswldtim);
 #endif
 	    you_are(buf);
 	} else if (u.ustuck) {
@@ -1132,7 +1132,7 @@ boolean want_disp;
 	    if (u.umonnum == u.ulycn) Strcpy(buf, "in beast form");
 	    else Sprintf(buf, "polymorphed into %s", an(youmonst.data->mname));
 #ifdef WIZARD
-	    if (wizard) Sprintf(eos(buf), " (%d)", u.mtimedone);
+	    if (wizard || final) Sprintf(eos(buf), " (%d)", u.mtimedone);
 #endif
 	    you_are(buf);
 	}
@@ -1152,12 +1152,12 @@ boolean want_disp;
 		    ltmp >= 10 ? "extremely " : ltmp >= 5 ? "very " : "",
 		    Luck < 0 ? "un" : "");
 #ifdef WIZARD
-	    if (wizard) Sprintf(eos(buf), " (%d)", Luck);
+	    if (wizard || final) Sprintf(eos(buf), " (%d)", Luck);
 #endif
 	    you_are(buf);
 	}
 #ifdef WIZARD
-	 else if (wizard) enl_msg("Your luck ", "is", "was", " zero");
+	 else if (wizard || final) enl_msg("Your luck ", "is", "was", " zero");
 #endif
 	if (u.moreluck > 0) you_have("extra luck");
 	else if (u.moreluck < 0) you_have("reduced luck");
@@ -1173,7 +1173,7 @@ boolean want_disp;
 	    Sprintf(buf, " %sangry with you",
 		    u.ugangr > 6 ? "extremely " : u.ugangr > 3 ? "very " : "");
 #ifdef WIZARD
-	    if (wizard) Sprintf(eos(buf), " (%d)", u.ugangr);
+	    if (wizard || final) Sprintf(eos(buf), " (%d)", u.ugangr);
 #endif
 	    enl_msg(u_gname(), " is", " was", buf);
 	} else
@@ -1191,7 +1191,7 @@ boolean want_disp;
 	    Sprintf(buf, "%ssafely pray", can_pray(FALSE) ? "" : "not ");
 #endif
 #ifdef WIZARD
-	    if (wizard) Sprintf(eos(buf), " (%d)", u.ublesscnt);
+	    if (wizard || final) Sprintf(eos(buf), " (%d)", u.ublesscnt);
 #endif
 	    you_can(buf);
 	}
@@ -1503,19 +1503,19 @@ boolean want_disp;
 
 	if (!u.uconduct.weaphit)
 	    you_have_never("hit with a wielded weapon");
-#ifdef WIZARD
-	else if (wizard) {
+	else if (wizard || final) {
 	    Sprintf(buf, "used a wielded weapon %ld time%s",
 		    u.uconduct.weaphit, plur(u.uconduct.weaphit));
 	    you_have_X(buf);
 	}
 
-	if (wizard && u.uconduct.literate){
+#ifdef WIZARD
+	if ((wizard || final) && u.uconduct.literate){
 	    Sprintf(buf, "read items or engraved %ld time%s",
 		    u.uconduct.literate, plur(u.uconduct.literate));
 	    you_have_X(buf);
 	}
-	if (wizard && u.uconduct.armoruses) {
+	if ((wizard || final) && u.uconduct.armoruses) {
 	    Sprintf(buf, "put on armor %ld time%s",
 		  u.uconduct.armoruses, plur(u.uconduct.armoruses));
 	    you_have_X(buf);
@@ -1534,7 +1534,7 @@ boolean want_disp;
 	if (!u.uconduct.polypiles)
 	    you_have_never("polymorphed an object");
 #ifdef WIZARD
-	else if (wizard) {
+	else if (wizard || final) {
 	    Sprintf(buf, "polymorphed %ld item%s",
 		    u.uconduct.polypiles, plur(u.uconduct.polypiles));
 	    you_have_X(buf);
@@ -1544,7 +1544,7 @@ boolean want_disp;
 	if (!u.uconduct.polyselfs)
 	    you_have_never("changed form");
 #ifdef WIZARD
-	else if (wizard) {
+	else if (wizard || final) {
 	    Sprintf(buf, "changed form %ld time%s",
 		    u.uconduct.polyselfs, plur(u.uconduct.polyselfs));
 	    you_have_X(buf);
