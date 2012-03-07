@@ -139,7 +139,7 @@ struct monst *mtmp;
 	    mtmp->data == &mons[PM_VLAD_THE_IMPALER] ||
 	    mtmp->mnum == quest_info(MS_NEMESIS) ||
 	    (mtmp->data->geno & G_UNIQ && is_demon(mtmp->data)) ||
-	    is_rider(mtmp->data) || mtmp->data == &mons[PM_MINOTAUR])
+	    is_rider(mtmp->data))
 		return(FALSE);
 
 	return (boolean)(sobj_at(SCR_SCARE_MONSTER, x, y)
