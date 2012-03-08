@@ -458,7 +458,7 @@ getbones()
 #endif
 		) return(0);
 
-	if (!iflags.bones) return(0);
+	if (!flags.bones) return(0);
 	if(no_bones_level(&u.uz)) return(0);
 	fd = open_bonesfile(&u.uz, &bonesid);
 	if (fd < 0) return(0);
@@ -526,6 +526,8 @@ getbones()
 	if(wizard) {
 		if(yn("Unlink bones?") == 'n') {
 			compress_bonesfile();
+			/* bones tracking */
+			if (ok) { u.uconduct.bones++; }
 			return(ok);
 		}
 	}
@@ -540,6 +542,10 @@ getbones()
 		/* pline("Cannot unlink bones."); */
 		return(0);
 	}
+
+	/* bones tracking */
+	if (ok) { u.uconduct.bones++; }
+
 	return(ok);
 }
 

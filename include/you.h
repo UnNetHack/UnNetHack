@@ -74,6 +74,7 @@ struct u_conduct {		/* number of times... */
 	long	unblinded;	/* starting non-blindfolded and removing a blindfold */
 	long	robbed;		/* killed an artifact-guardian (like an ordinary robber) */
 	long	elbereths;	/* engraved Elbereth */
+	long	bones;		/* encountered bones level */
 				/* genocides already listed at end of game */
 };
 

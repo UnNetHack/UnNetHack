@@ -118,6 +118,7 @@ struct flag {
 	unsigned short amii_dripens[ 20 ]; /* DrawInfo Pens currently there are 13 in v39 */
 	AMII_COLOR_TYPE amii_curmap[ AMII_MAXCOLORS ]; /* colormap */
 #endif
+	boolean	bones;		/* allow loading bones */
 
 	/* KMH, role patch -- Variables used during startup.
 	 *
@@ -365,7 +366,6 @@ struct instance_flags {
 	boolean  dark_room;	/* show shadows in lit rooms */
 	boolean  vanilla_ui_behavior;	/* fall back to vanilla behavior */
 	boolean  show_annotation;	/* level annotation when entering level */
-	boolean  bones;		/* allow loading bones */
 	int  statuslines;	/* number of status lines */
 };
 

@@ -1582,6 +1582,14 @@ boolean want_disp;
 #endif /* ELBERETH */
 #endif /* ELBERETH_CONDUCT */
 
+	if ((wizard || final) && !u.uconduct.bones) {
+	    you_have_never("encountered a bones level");
+	} else if (wizard || final) {
+	    Sprintf(buf, "encountered %ld bones level%s",
+		    u.uconduct.bones, plur(u.uconduct.bones));
+	    you_have_X(buf);
+	}
+
 	dump_list_end();
 	dump("", "");
 
