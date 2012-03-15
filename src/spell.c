@@ -1165,7 +1165,7 @@ dump_spells()
 	Sprintf(buf, "%-20s   Level    %-12s Fail", "    Name", "Category");
 	dump_text("  %s\n",buf);
 	dump_html("<table class=\"nh_spells\">\n", "");
-	dump_html("<tr><th></th><th>Name</th><th>Level</th><th>Category</th><th>Fail</th></tr>\n", "");
+	dump_html("<tr><th>Name</th><th>Level</th><th>Category</th><th>Fail</th></tr>\n", "");
 	for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
 		Sprintf(buf, "%c - %-20s  %2d%s   %-12s %3d%%",
 			spellet(i), spellname(i), spellev(i),
@@ -1173,8 +1173,8 @@ dump_spells()
 			spelltypemnemonic(spell_skilltype(spellid(i))),
 			100 - percent_success(i));
 		dump_text("  %s\n", buf);
-		Sprintf(buf, "<tr><td class=\"nh_item_letter\">%c</td><td>%s</td><td align=\"right\">%d%s</td><td>%s</td><td align=\"right\">%d%%</td></tr>\n",
-			spellet(i), spellname(i), spellev(i),
+		Sprintf(buf, "<tr><td>%s</td><td align=\"right\">%d%s</td><td>%s</td><td align=\"right\">%d%%</td></tr>\n",
+			spellname(i), spellev(i),
 			(spellknow(i) > 1000) ? "&nbsp;" : (spellknow(i) ? "!" : "*"),
 			spelltypemnemonic(spell_skilltype(spellid(i))),
 			100 - percent_success(i));
