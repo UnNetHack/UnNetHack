@@ -1521,6 +1521,12 @@ boolean want_disp;
 	    you_have_X(buf);
 	}
 #endif
+	if (!u.uconduct.non_racial_armor &&
+	    /* only show when armor was worn at all */
+	    u.uconduct.armoruses > 0) {
+	    Sprintf(buf, "wearing only %s armor", urace.adj);
+	    you_have_been(buf);
+	}
 
 	ngenocided = num_genocides();
 	if (ngenocided == 0) {

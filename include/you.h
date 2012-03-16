@@ -75,6 +75,8 @@ struct u_conduct {		/* number of times... */
 	long	robbed;		/* killed an artifact-guardian (like an ordinary robber) */
 	long	elbereths;	/* engraved Elbereth */
 	long	bones;		/* encountered bones level */
+	long	non_racial_armor;	/* put on non-racial armor */
+	long	non_racial_weapons;	/* wielded non-racial weapons */
 				/* genocides already listed at end of game */
 };
 

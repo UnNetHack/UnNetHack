@@ -199,6 +199,8 @@ struct obj {
 			 objects[otmp->otyp].oc_armcat == ARM_SHIRT)
 #define is_suit(otmp)	(otmp->oclass == ARMOR_CLASS && \
 			 objects[otmp->otyp].oc_armcat == ARM_SUIT)
+
+/* http://nethackwiki.com/wiki/Unofficial_conduct#Racial */
 #define is_elven_armor(otmp)	((otmp)->otyp == ELVEN_LEATHER_HELM\
 				|| (otmp)->otyp == ELVEN_MITHRIL_COAT\
 				|| (otmp)->otyp == ELVEN_CLOAK\
@@ -257,6 +259,7 @@ struct obj {
 				      - GRAY_DRAGON_SCALE_MAIL]
 #define Dragon_to_scales(pm)	(GRAY_DRAGON_SCALES + (pm - mons))
 
+/* http://nethackwiki.com/wiki/Unofficial_conduct#Racial */
 /* Elven gear */
 #define is_elven_weapon(otmp)	((otmp)->otyp == ELVEN_ARROW\
 				|| (otmp)->otyp == ELVEN_SPEAR\

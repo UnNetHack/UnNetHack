@@ -140,6 +140,9 @@ Boots_on()
 		break;
 	default: warning(unknown_type, c_boots, uarmf->otyp);
     }
+    if (uarmf && !is_racial_armor(uarmf)) {
+	u.uconduct.non_racial_armor++;
+    }
     return 0;
 }
 
@@ -249,6 +252,9 @@ Cloak_on()
   		break;
 	default: warning(unknown_type, c_cloak, uarmc->otyp);
     }
+    if (uarmc && !is_racial_armor(uarmc)) {
+	u.uconduct.non_racial_armor++;
+    }
     return 0;
 }
 
@@ -354,6 +360,9 @@ Helmet_on()
 		break;
 	default: warning(unknown_type, c_helmet, uarmh->otyp);
     }
+    if (uarmh && !is_racial_armor(uarmh)) {
+	u.uconduct.non_racial_armor++;
+    }
     return 0;
 }
 
@@ -422,6 +431,9 @@ Gloves_on()
 		adj_abon(uarmg, uarmg->spe);
 		break;
 	default: warning(unknown_type, c_gloves, uarmg->otyp);
+    }
+    if (uarmg && !is_racial_armor(uarmg)) {
+	u.uconduct.non_racial_armor++;
     }
     return 0;
 }
@@ -498,6 +510,9 @@ Shield_on()
 	default: warning(unknown_type, c_shield, uarms->otyp);
     }
 */
+    if (uarms && !is_racial_armor(uarms)) {
+	u.uconduct.non_racial_armor++;
+    }
     return 0;
 }
 
@@ -534,6 +549,9 @@ Shirt_on()
 	default: warning(unknown_type, c_shirt, uarmu->otyp);
     }
 */
+    if (uarmu && !is_racial_armor(uarmu)) {
+	u.uconduct.non_racial_armor++;
+    }
     return 0;
 }
 
@@ -582,6 +600,9 @@ Armor_on()
 			break;
 		default:
 			break;
+	}
+	if (uarm && !is_racial_armor(uarm)) {
+		u.uconduct.non_racial_armor++;
 	}
 	return 0;
 }

@@ -3658,6 +3658,42 @@ boolean as_if_seen;
 	return n;
 }
 
+boolean
+is_racial_armor(obj)
+struct obj *obj;
+{
+	if (Race_if(PM_DWARF)) {
+		return is_dwarvish_armor(obj);
+	} else if (Race_if(PM_ELF)) {
+		return is_elven_armor(obj);
+	} else if (Race_if(PM_GNOME)) {
+		return is_gnomish_armor(obj);
+	} else if (Race_if(PM_ORC)) {
+		return is_orcish_armor(obj);
+	}
+
+	return FALSE;
+}
+
+boolean
+is_racial_weapon(obj)
+struct obj *obj;
+{
+	/* don't use is_race_weapon(), we don't want to break the racial
+	 * conduct just because the player is wielding armor */
+	if (Race_if(PM_DWARF)) {
+		return is_dwarvish_obj(obj);
+	} else if (Race_if(PM_ELF)) {
+		return is_elven_obj(obj);
+	} else if (Race_if(PM_GNOME)) {
+		return is_gnomish_obj(obj);
+	} else if (Race_if(PM_ORC)) {
+		return is_orcish_obj(obj);
+	}
+
+	return FALSE;
+}
+
 #endif /* OVL1 */
 
 /*invent.c*/
