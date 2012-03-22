@@ -367,6 +367,7 @@ struct instance_flags {
 	boolean  vanilla_ui_behavior;	/* fall back to vanilla behavior */
 	boolean  show_annotation;	/* level annotation when entering level */
 	int  statuslines;	/* number of status lines */
+	boolean  hint;		/* enable the helpful hint daemon */
 };
 
 /*

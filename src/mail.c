@@ -726,25 +726,19 @@ struct obj *otmp;
 void
 maybe_hint()
 {
-	if (u.uswallow || !flags.biff) return;
-	if (gethint < 0) {
-		/* */
-		if (moves < 100) {
-			gethint = 100;
-		} else if (moves < 1000) {
-			gethint = 1000;
-		} else if (moves < 5000) {
-			gethint = 5000;
-		} else {
-			gethint = 10000;
-		}
+	if (u.uswallow || !flags.biff || !iflags.hint) return;
+
+	/* initialize gethint */
+	if (gethint < 0 && moves < 250) {
+		gethint = 250;
 		return;
 	}
-	if (--gethint <= 0 && moves < 20000) {
+	if (--gethint <= 0) {
 		static struct mail_info
 			deliver = {MSG_HINT,"I have a hint for you",0,0};
 		newmail(&deliver);
-		gethint = -1;
+		/* only deliver once per game */
+		iflags.hint = FALSE;
 	}
 }
 
