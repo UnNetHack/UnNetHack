@@ -709,7 +709,7 @@ struct obj *otmp;
 		"Ctrl-e automatically writes resp. engraves \"Elbereth\" for you.",
 		"Ctrl-o resp. #overview lists interesting levels you already visited.",
 		"Press inventory letter for a menu of possible actions.",
-		"Pressing 'v' let's you explore faster.",
+		"Pressing 'v' lets you explore faster.",
 		"Unlocked doors will open when you walk into them.",
 
 #ifdef SIMPLE_MAIL
