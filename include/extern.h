@@ -919,8 +919,8 @@ E struct obj *NDECL(getnextgetobj);
 #ifdef SORTLOOT
 E int FDECL(sortloot_cmp, (struct obj *, struct obj *));
 #endif
-E int FDECL(is_racial_armor, (struct obj *));
-E int FDECL(is_racial_weapon, (struct obj *));
+E boolean FDECL(is_racial_armor, (struct obj *));
+E boolean FDECL(is_racial_weapon, (struct obj *));
 
 /* ### ioctl.c ### */
 
