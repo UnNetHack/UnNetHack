@@ -386,7 +386,7 @@ register struct obj *obj;
 giveback:
 		obj->in_use = FALSE;
 		dropx(obj);
-		trycall(obj);
+		makeknown(obj->otyp);
 		return;
 	    case RIN_LEVITATION:
 		pline_The("sink quivers upward for a moment.");
@@ -516,7 +516,7 @@ giveback:
 	    }
 	}
 	if(ideed)
-	    trycall(obj);
+		makeknown(obj->otyp);
 	else
 	    You_hear("the ring bouncing down the drainpipe.");
 	if (!rn2(20)) {
