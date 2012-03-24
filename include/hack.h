@@ -289,6 +289,8 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define plur(x) (((x) == 1) ? "" : "s")
 
 #define ARM_BONUS(obj)	(objects[(obj)->otyp].a_ac + (obj)->spe \
+			 /* extra AC point for racial armor */ \
+			 + (is_racial_armor(obj) ? 1 : 0) \
 			 - min((int)greatest_erosion(obj),objects[(obj)->otyp].a_ac))
 
 #define makeknown(x)	discover_object((x),TRUE,TRUE)

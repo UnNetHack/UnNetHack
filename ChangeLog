@@ -5,6 +5,7 @@
 	* Minotaurs respect Elbereth
 	* Bones level tracking
 	* Conduct: Racial armor tracking
+	* extra AC point per worn piece of racial armor
 	* Reduce occurrences of hint daemon to once per game
 	* Automatically identify rings dropped into a sink when message is
 	  shown
