@@ -192,6 +192,24 @@ struct obj* tobj;
 	    }
 	    return TRUE;
 	}
+
+	/* listening to eggs is a little fishy, but so is stethoscopes detecting alignment
+	 * The overcomplex wording is because all the monster-naming functions operate
+	 * on actual instances of the monsters, and we're dealing with just an index
+	 * so we can avoid things like "a owlbear", etc. */
+	if (otmp = sobj_at(EGG,rx,ry)) {
+		if (Hallucination) {
+			pline("You listen to the egg and guess... %s?",rndmonnam());
+		} else {
+			if (stale_egg(otmp) || otmp->corpsenm == NON_PM) {
+				pline("The egg doesn't make much noise at all.");
+			} else {
+				pline("You listen to the egg and guess... %s?",mons[otmp->corpsenm].mname);
+			}
+		}
+		return TRUE;
+	}
+
 	/* using a stethoscope on a safe?  You safe-cracker, you. */
 	if ((otmp = sobj_at(IRON_SAFE,rx,ry))) {
 		pick_lock(tobj,rx,ry,FALSE);

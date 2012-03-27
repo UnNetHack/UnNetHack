@@ -9,6 +9,8 @@
 	* Reduce occurrences of hint daemon to once per game
 	* Automatically identify rings dropped into a sink when message is
 	  shown
+	* Allow stethoscopes to identify egg types (unless hallucinating)
+	  (from SporkHack)
 
 	* new dungeon features:
 	  - muddy swamp (from NetHack Brass)
