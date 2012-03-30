@@ -60,6 +60,7 @@ LEVEL:		"sanctum" "none" @ (-1, 0)
 LEVEL:		"juiblex" "J" @ (4, 4)
 RNDLEVEL:	"baalz" "B" @ (6, 4) 2
 RNDLEVEL:	"asmod" "A" @ (2, 6) 2
+BRANCH:		"The Dragon Caves" @ (10, 4)
 LEVEL:		"wizard1" "none" @ (11, 6)
 CHAINLEVEL:	"wizard2" "X" "wizard1" + (1, 0)
 CHAINLEVEL:	"wizard3" "Y" "wizard1" + (2, 0)
@@ -147,6 +148,16 @@ DESCRIPTION:	mazelike
 ALIGNMENT:	chaotic
 ENTRY:		-1
 LEVEL:		"tower1" "none" @ (1, 0)
+
+### The Dragon Caves ###
+DUNGEON:	"The Dragon Caves" "D" (4, 0) 75
+ALIGNMENT:	chaotic
+DESCRIPTION:	mazelike
+LEVEL:		"drgnA" "D" @ (1, 0)
+LEVEL:		"drgnB" "D" @ (2, 0)
+LEVELDESC:	town
+LEVEL:		"drgnC" "D" @ (3, 0)
+LEVEL:		"drgnD" "D" @ (4, 0)
 
 #
 #	The Endgame levels
