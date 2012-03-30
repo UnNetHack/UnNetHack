@@ -213,36 +213,52 @@ ENDMAP
 
 STAIR: (73,18),up
 
+# dragon hoard
+OBJECT:       '*', (01,02)
+GOLD: 600 + 12d100,(01,02)
 
 OBJECT[60%]: ('!', "gain ability"), (01,03)
 OBJECT[80%]:  '=', (01,03)
 OBJECT[40%]:  '"', (01,03)
 OBJECT:       '*', (01,03)
+GOLD: 600 + 10d100,(01,03)
 
 OBJECT[60%]: ('!',"gain level"), (02,03)
 OBJECT[80%]:  '=', (02,03)
 OBJECT[40%]:  '"', (02,03)
 OBJECT:       '*', (02,03)
+GOLD: 600 + 10d100,(02,03)
 
 OBJECT[60%]: ('!',"full healing"), (01,04)
 OBJECT[80%]:  '=', (01,04)
 OBJECT[40%]:  '"', (01,04)
 OBJECT:       '*', (01,04)
+GOLD: 600 + 10d100,(01,04)
 
 OBJECT[60%]: ('!',"enlightenment"), (02,04)
 OBJECT[80%]:  '=', (02,04)
 OBJECT[40%]:  '"', (02,04)
 OBJECT:       '*', (02,04)
+GOLD: 600 + 10d100,(02,04)
+
+GOLD: 400 + 10d100,(01,05)
+
+GOLD: 200 +  5d100,(00,06)
+GOLD: 200 +  5d100,(01,06)
+GOLD: 200 +  5d100,(02,06)
+GOLD: 100 +  5d100,(02,07)
+
+LOOP [ 2d10 ] {
+  GOLD:1d100, random
+}
 
 OBJECT: ('`',"boulder"),(01,05)
 
-LOOP [28] {
+LOOP [12] {
   OBJECT: '*', random
 }
 LOOP [3] {
   OBJECT: '(', random
-}
-LOOP [4] {
   OBJECT: ')', random
   OBJECT: '!', random
   OBJECT: '?', random
