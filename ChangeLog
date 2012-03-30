@@ -29,6 +29,8 @@
 	  - Draw health bar in inverse when color is disabled (reported by
 	    Bernard Helyer)
 	  - Warn atheist player when trying to offering the Amulet of Yendor
+	  - Workaround for preventing the stairs to Vlad's tower appearing
+	    in the wizard's tower
 
 	* build fixes:
 	  - Compilation failed on openSUSE when trying to link with curses but
