@@ -364,7 +364,7 @@ DRGN_ARMR("electric dragon scales", "leviathan scales", 0, SHOCK_RES,  500, 7, C
 DRGN_ARMR("poison dragon scales", "wyvern scales", 0, POISON_RES, 500, 7, CLR_GREEN),
 DRGN_ARMR("stone dragon scales", "gold dragon scales", 0, STONE_RES,  500, 7, HI_GOLD),
 DRGN_ARMR("acid dragon scales", "guivre scales", 0, ACID_RES,   500, 7, CLR_YELLOW),
-DRGN_ARMR("chromatic dragon scales", "chromatic dragon scales", 1, 0, 1500, 7, CLR_MAGENTA), /* intrinsics are set manually */
+DRGN_ARMR("chromatic dragon scales", "chromatic dragon scales", 0, 0, 1500, 7, CLR_MAGENTA), /* intrinsics are set manually */
 #undef DRGN_ARMR
 
 ARMOR("plate mail", (char *)0,
