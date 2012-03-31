@@ -25,6 +25,9 @@
 	* new monsters:
 	  - chromatic dragons
 	  - wax golems (providing candles as death drop) (from Slash'Em)
+	
+	* new levels:
+	  - Sokoban levels (from GruntHack)
 
 	* bug fixes:
 	  - Draw health bar in inverse when color is disabled (reported by

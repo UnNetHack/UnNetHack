@@ -1750,3 +1750,541 @@ ENGRAVING:$place[2],burn,"Elbereth"
 
 MONSTER:('m',"giant mimic"), random, m_object "boulder"
 MONSTER:('m',"giant mimic"), random, m_object "boulder"
+
+
+LEVEL:"soko4-3"
+FLAGS:noteleport,hardfloor,premapped
+INIT_MAP:solidfill,' '
+GEOMETRY:center, center
+# Steve Melenchuk <smelenchuk@gmail.com>
+MAP
+        --- 
+----   --.--
+|..-----...|
+|..........|
+|.----.-...|
+|.----.|...|
+|.||...|...|
+|.||...-...|
+|.||.......|
+|.||..--...|
+------------
+ENDMAP
+BRANCH:(09,01,09,01),(0,0,0,0)
+STAIR:(01,09),up
+REGION:(00,00,11,10),lit,"ordinary"
+NON_DIGGABLE:(00,00,11,10)
+NON_PASSWALL:(00,00,11,10)
+
+# Boulders
+OBJECT:('`',"boulder"),(08,03)
+OBJECT:('`',"boulder"),(09,03)
+OBJECT:('`',"boulder"),(09,04)
+OBJECT:('`',"boulder"),(09,05)
+OBJECT:('`',"boulder"),(05,06)
+OBJECT:('`',"boulder"),(08,06)
+OBJECT:('`',"boulder"),(06,07)
+OBJECT:('`',"boulder"),(09,07)
+OBJECT:('`',"boulder"),(05,08)
+OBJECT:('`',"boulder"),(08,08)
+
+# Traps
+TRAP:"pit",(05,03)
+TRAP:"pit",(04,03)
+TRAP:"pit",(03,03)
+TRAP:"pit",(01,04)
+TRAP:"pit",(01,05)
+TRAP:"pit",(01,06)
+TRAP:"pit",(01,07)
+TRAP:"pit",(01,08)
+
+# A little help
+OBJECT:('?',"earth"),(01,02)
+OBJECT:('?',"earth"),(02,02)
+
+soko_loot()
+
+
+LEVEL:"soko4-4"
+FLAGS:noteleport,hardfloor, premapped
+INIT_MAP:solidfill,' '
+GEOMETRY:center, center
+# Steve Melenchuk <smelenchuk@gmail.com>
+MAP
+------------- 
+|.|.....|..-- 
+|.|.....|...| 
+|.|-.......-- 
+|.||....-...| 
+|.|---.--...| 
+|.|  |.---.-- 
+|.|  |.---.---
+|.----.--....|
+|............|
+|..------....|
+----    |...--
+        ----- 
+ENDMAP
+BRANCH:(11,05,11,05),(0,0,0,0)
+STAIR:(01,01),up
+REGION:(00,00,13,12),lit,"ordinary"
+NON_DIGGABLE:(00,00,13,12)
+NON_PASSWALL:(00,00,13,12)
+
+# Boulders
+OBJECT:('`',"boulder"),(04,02)
+OBJECT:('`',"boulder"),(06,02)
+OBJECT:('`',"boulder"),(07,02)
+OBJECT:('`',"boulder"),(04,03)
+OBJECT:('`',"boulder"),(09,03)
+OBJECT:('`',"boulder"),(06,04)
+OBJECT:('`',"boulder"),(10,05)
+OBJECT:('`',"boulder"),(06,06)
+OBJECT:('`',"boulder"),(08,09)
+OBJECT:('`',"boulder"),(11,09)
+OBJECT:('`',"boulder"),(11,10)
+
+# Traps
+TRAP:"pit",(05,09)
+TRAP:"pit",(04,09)
+TRAP:"pit",(03,09)
+TRAP:"pit",(01,08)
+TRAP:"pit",(01,07)
+TRAP:"pit",(01,06)
+TRAP:"pit",(01,05)
+TRAP:"pit",(01,04)
+TRAP:"pit",(01,03)
+TRAP:"pit",(01,02)
+
+# A little help
+OBJECT:('?',"earth"),(01,10)
+OBJECT:('?',"earth"),(02,10)
+
+soko_loot()
+
+
+LEVEL:"soko2-10"
+FLAGS:noteleport, premapped
+INIT_MAP:solidfill,' '
+GEOMETRY:center,center
+# Steve Melenchuk <smelenchuk@gmail.com>
+MAP
+ ---------     
+ |...|...|     
+--.......|     
+|..--....-------
+|..--....|.....|
+|..|..-..|.....|
+|..|.--..|.....|
+|........|.....|
+----.--..|.....|
+   |.--..|.....|
+  --.--..|.....|
+  |..------+---|
+  |.........|
+  -----------
+ENDMAP
+STAIR:(04,06),down
+STAIR:(12,07),up
+DOOR:locked,(11,11)
+REGION:(00,00,15,13),lit,"ordinary"
+NON_DIGGABLE:(00,00,15,13)
+NON_PASSWALL:(00,00,15,13)
+
+# Boulders
+OBJECT:('`',"boulder"),(06,02)
+OBJECT:('`',"boulder"),(07,02)
+OBJECT:('`',"boulder"),(02,03)
+OBJECT:('`',"boulder"),(05,03)
+OBJECT:('`',"boulder"),(06,04)
+OBJECT:('`',"boulder"),(07,04)
+OBJECT:('`',"boulder"),(02,06)
+OBJECT:('`',"boulder"),(07,06)
+OBJECT:('`',"boulder"),(03,07)
+OBJECT:('`',"boulder"),(07,09)
+
+# Traps
+TRAP:"hole",(04,08)
+TRAP:"hole",(04,09)
+TRAP:"hole",(04,10)
+TRAP:"hole",(05,12)
+TRAP:"hole",(06,12)
+TRAP:"hole",(07,12)
+TRAP:"hole",(08,12)
+TRAP:"hole",(09,12)
+TRAP:"hole",(10,12)
+
+soko_loot()
+
+
+LEVEL:"soko2-11"
+FLAGS:noteleport, premapped
+INIT_MAP:solidfill,' '
+GEOMETRY:center, center
+# Steve Melenchuk <smelenchuk@gmail.com>
+MAP
+ ----           
+ |..|  ---------
+ |..----.|.....|
+ |.......|.....|
+ |..-....|.....|
+ |.....-.|.....|
+ |.......|.....|
+ |...-...|.....|
+--.-------.....|
+|..----------+--
+|.............| 
+--------------- 
+ENDMAP
+STAIR:(08,02),down
+STAIR:(12,05),up
+REGION:(00,00,15,11),lit,"ordinary"
+NON_DIGGABLE:(00,00,15,11)
+NON_PASSWALL:(00,00,15,11)
+
+DOOR:locked,(13,09)
+
+# Boulders
+OBJECT:('`',"boulder"),(03,03)
+OBJECT:('`',"boulder"),(06,03)
+OBJECT:('`',"boulder"),(02,04)
+OBJECT:('`',"boulder"),(05,04)
+OBJECT:('`',"boulder"),(07,04)
+OBJECT:('`',"boulder"),(03,06)
+OBJECT:('`',"boulder"),(04,06)
+OBJECT:('`',"boulder"),(05,06)
+OBJECT:('`',"boulder"),(06,06)
+OBJECT:('`',"boulder"),(07,06)
+OBJECT:('`',"boulder"),(02,07)
+
+# Traps
+TRAP:"hole",(03,10)
+TRAP:"hole",(04,10)
+TRAP:"hole",(05,10)
+TRAP:"hole",(06,10)
+TRAP:"hole",(07,10)
+TRAP:"hole",(08,10)
+TRAP:"hole",(09,10)
+TRAP:"hole",(10,10)
+TRAP:"hole",(11,10)
+TRAP:"hole",(12,10)
+
+soko_loot()
+
+
+LEVEL:"soko2-8"
+FLAGS:noteleport, premapped
+INIT_MAP:solidfill,' '
+GEOMETRY:center,center
+# Steve Melenchuk <smelenchuk@gmail.com>
+MAP
+  --------------------
+  |..................|
+  |.....------------.|
+  --.----..--------|.|
+----.--...........||.|
+----....-.....-...||.|
+ |.....-..-...-----|.|
+ |.-......-.--------+|
+ |..-.--.....| |.....|
+ --......--.-- |.....|
+  --.........| |.....|
+   ---..---..- |.....|
+     ----.|..| |.....|
+          ---- |.....|
+               |.....|
+               -------
+ENDMAP
+STAIR:(07,11),down
+STAIR:(18,11),up
+DOOR:locked,(20,07)
+REGION:(00,00,21,15),lit,"ordinary"
+NON_DIGGABLE:(00,00,21,15)
+NON_PASSWALL:(00,00,21,15)
+
+# Boulders
+OBJECT:('`',"boulder"),(08,04)
+OBJECT:('`',"boulder"),(11,05)
+OBJECT:('`',"boulder"),(12,05)
+OBJECT:('`',"boulder"),(05,06)
+OBJECT:('`',"boulder"),(12,06)
+OBJECT:('`',"boulder"),(05,07)
+OBJECT:('`',"boulder"),(07,07)
+OBJECT:('`',"boulder"),(08,07)
+OBJECT:('`',"boulder"),(05,08)
+OBJECT:('`',"boulder"),(05,09)
+OBJECT:('`',"boulder"),(07,09)
+OBJECT:('`',"boulder"),(08,09)
+OBJECT:('`',"boulder"),(10,10)
+OBJECT:('`',"boulder"),(11,11)
+
+# Traps
+TRAP:"hole",(08,01)
+TRAP:"hole",(09,01)
+TRAP:"hole",(10,01)
+TRAP:"hole",(11,01)
+TRAP:"hole",(12,01)
+TRAP:"hole",(13,01)
+TRAP:"hole",(14,01)
+TRAP:"hole",(15,01)
+TRAP:"hole",(16,01)
+TRAP:"hole",(17,01)
+TRAP:"hole",(18,01)
+TRAP:"hole",(19,01)
+
+soko_loot()
+
+LEVEL:"soko2-9"
+FLAGS:noteleport, premapped
+INIT_MAP:solidfill,' '
+GEOMETRY:center,center
+#12345678901234567890123456789012345678901234567890
+# Steve Melenchuk <smelenchuk@gmail.com>
+MAP
+---------                
+|.......|                
+--.....--                
+ --...-------------------
+  --.--.................|
+  |......--------------+|
+  |..--..-----    |.....|
+  |.....--...|    |.....|
+ --...---....|    |.....|
+ |....|.....--    |.....|
+ |....-.....|     |.....|
+ --.........|     |.....|
+  |...-...---     |.....|
+  --..|...|       -------
+   |..-----              
+   ----                  
+ENDMAP
+
+STAIR:(04,05),down
+STAIR:(21,09),up
+DOOR:locked,(23,05)
+REGION:(00,00,24,15),lit,"ordinary"
+NON_DIGGABLE:(00,00,24,15)
+NON_PASSWALL:(00,00,24,15)
+
+# Boulders
+OBJECT:('`',"boulder"),(05,02)
+OBJECT:('`',"boulder"),(04,03)
+OBJECT:('`',"boulder"),(03,06)
+OBJECT:('`',"boulder"),(04,07)
+OBJECT:('`',"boulder"),(05,07)
+OBJECT:('`',"boulder"),(03,08)
+OBJECT:('`',"boulder"),(10,08)
+OBJECT:('`',"boulder"),(03,09)
+OBJECT:('`',"boulder"),(11,09)
+OBJECT:('`',"boulder"),(05,10)
+OBJECT:('`',"boulder"),(08,10)
+OBJECT:('`',"boulder"),(03,11)
+OBJECT:('`',"boulder"),(07,11)
+OBJECT:('`',"boulder"),(09,11)
+OBJECT:('`',"boulder"),(10,11)
+OBJECT:('`',"boulder"),(04,12)
+OBJECT:('`',"boulder"),(08,12)
+
+# Traps
+TRAP:"hole",(09,04)
+TRAP:"hole",(10,04)
+TRAP:"hole",(11,04)
+TRAP:"hole",(12,04)
+TRAP:"hole",(13,04)
+TRAP:"hole",(14,04)
+TRAP:"hole",(15,04)
+TRAP:"hole",(16,04)
+TRAP:"hole",(17,04)
+TRAP:"hole",(18,04)
+TRAP:"hole",(19,04)
+TRAP:"hole",(20,04)
+TRAP:"hole",(21,04)
+TRAP:"hole",(22,04)
+
+soko_loot()
+
+LEVEL:"soko1-5"
+FLAGS:noteleport, premapped
+INIT_MAP:solidfill,' '
+GEOMETRY:center,center
+# Steve Melenchuk <smelenchuk@gmail.com>
+MAP
+    ----
+    -..--                   
+ ----...---------------------
+ |..-.......................|
+--...-..------------------|.|
+|.................|       |.|
+|..-....-...----.-| -------.|
+--.-..--...-......---.....|.|
+--.---..--.-..-...|.+.....|.|
+--.- -....---.-...---.....|.|
+--.---..-..-....--|.+.....+.|
+--.-..-.--......-----.....---
+|...........-....||.+.....|  
+|...-.....-......|---.....|  
+-----.........-..|  -------  
+    |..-..-..--..|           
+    --------------           
+ENDMAP
+
+$place = { (19,08),(19,10),(19,12) }
+SHUFFLE: $place
+STAIR:(15,15),down
+REGION:(00,00,28,16),lit,"ordinary"
+NON_DIGGABLE:(00,00,28,16)
+NON_PASSWALL:(00,00,28,16)
+
+# Boulders
+OBJECT:('`',"boulder"),(06,03)
+OBJECT:('`',"boulder"),(07,03)
+OBJECT:('`',"boulder"),(07,04)
+OBJECT:('`',"boulder"),(02,05)
+OBJECT:('`',"boulder"),(08,05)
+OBJECT:('`',"boulder"),(11,05)
+OBJECT:('`',"boulder"),(05,06)
+OBJECT:('`',"boulder"),(15,08)
+OBJECT:('`',"boulder"),(13,09)
+OBJECT:('`',"boulder"),(16,09)
+OBJECT:('`',"boulder"),(13,10)
+OBJECT:('`',"boulder"),(11,11)
+OBJECT:('`',"boulder"),(04,12)
+OBJECT:('`',"boulder"),(06,12)
+OBJECT:('`',"boulder"),(09,12)
+OBJECT:('`',"boulder"),(15,12)
+OBJECT:('`',"boulder"),(07,13)
+OBJECT:('`',"boulder"),(08,13)
+OBJECT:('`',"boulder"),(09,13)
+OBJECT:('`',"boulder"),(11,13)
+OBJECT:('`',"boulder"),(14,13)
+OBJECT:('`',"boulder"),(11,14)
+
+# Traps
+TRAP:"hole",(08,03)
+TRAP:"hole",(09,03)
+TRAP:"hole",(10,03)
+TRAP:"hole",(11,03)
+TRAP:"hole",(12,03)
+TRAP:"hole",(13,03)
+TRAP:"hole",(14,03)
+TRAP:"hole",(15,03)
+TRAP:"hole",(16,03)
+TRAP:"hole",(17,03)
+TRAP:"hole",(18,03)
+TRAP:"hole",(19,03)
+TRAP:"hole",(20,03)
+TRAP:"hole",(21,03)
+TRAP:"hole",(22,03)
+TRAP:"hole",(23,03)
+TRAP:"hole",(24,03)
+TRAP:"hole",(25,03)
+
+MONSTER:('m',"giant mimic"), random, m_object "boulder"
+MONSTER:('m',"giant mimic"), random, m_object "boulder"
+
+soko_loot()
+
+# Rewards
+DOOR:locked,(26,10)
+DOOR:closed,(20,08)
+DOOR:closed,(20,10)
+DOOR:closed,(20,12)
+REGION:(21,07,25,13),lit,"zoo",filled,true
+#OBJECT:'[',"cloak of magic resistance",place[0]
+ENGRAVING:$place[0],burn,"Elbereth"
+#OBJECT:'"',"amulet of reflection",place[1]
+ENGRAVING:$place[1],burn,"Elbereth"
+#OBJECT:'(',"bag of holding",place[2]
+ENGRAVING:$place[2],burn,"Elbereth"
+
+LEVEL:"soko1-6"
+FLAGS:noteleport, premapped
+INIT_MAP:solidfill,' '
+GEOMETRY:center,center
+# Steve Melenchuk <smelenchuk@gmail.com>
+MAP
+  -----                        
+  |...------  -----   -------  
+  |........----...| ---.....|  
+ --..--.--.--.....| |.+.....|  
+ |................| ---.....|--
+--.....--.--....--- |.+.....+.|
+|...-----.-----.-   ---.....|.|
+|.....--..-----.--  |.+.....|.|
+--....---.---....|  ---.....|.|
+ ---..---...-....|    ------|.|
+   |......-......|          |.|
+   |..--...-.....|          |.|
+   ------..-----------------|.|
+       -......................|
+       -...--------------------
+       -----                   
+ENDMAP
+
+$place = { (21,03),(21,05),(21,07) }
+SHUFFLE: $place
+STAIR:(08,07),down
+REGION:(00,00,30,15),lit,"ordinary"
+NON_DIGGABLE:(00,00,30,15)
+NON_PASSWALL:(00,00,30,15)
+
+# Boulders
+OBJECT:('`',"boulder"),(04,02)
+OBJECT:('`',"boulder"),(06,02)
+OBJECT:('`',"boulder"),(08,02)
+OBJECT:('`',"boulder"),(16,03)
+OBJECT:('`',"boulder"),(03,04)
+OBJECT:('`',"boulder"),(06,04)
+OBJECT:('`',"boulder"),(12,04)
+OBJECT:('`',"boulder"),(14,04)
+OBJECT:('`',"boulder"),(14,05)
+OBJECT:('`',"boulder"),(02,06)
+OBJECT:('`',"boulder"),(03,06)
+OBJECT:('`',"boulder"),(15,07)
+OBJECT:('`',"boulder"),(04,08)
+OBJECT:('`',"boulder"),(09,08)
+OBJECT:('`',"boulder"),(15,08)
+OBJECT:('`',"boulder"),(15,09)
+OBJECT:('`',"boulder"),(05,10)
+OBJECT:('`',"boulder"),(06,10)
+OBJECT:('`',"boulder"),(12,10)
+OBJECT:('`',"boulder"),(14,10)
+OBJECT:('`',"boulder"),(15,10)
+
+# Traps
+TRAP:"hole",(11,13)
+TRAP:"hole",(12,13)
+TRAP:"hole",(13,13)
+TRAP:"hole",(14,13)
+TRAP:"hole",(15,13)
+TRAP:"hole",(16,13)
+TRAP:"hole",(17,13)
+TRAP:"hole",(18,13)
+TRAP:"hole",(19,13)
+TRAP:"hole",(20,13)
+TRAP:"hole",(21,13)
+TRAP:"hole",(22,13)
+TRAP:"hole",(23,13)
+TRAP:"hole",(24,13)
+TRAP:"hole",(25,13)
+TRAP:"hole",(26,13)
+TRAP:"hole",(27,13)
+TRAP:"hole",(28,13)
+
+MONSTER:('m',"giant mimic"), random, m_object "boulder"
+MONSTER:('m',"giant mimic"), random, m_object "boulder"
+
+soko_loot()
+
+# Rewards
+DOOR:locked,(28,05)
+DOOR:closed,(22,03)
+DOOR:closed,(22,05)
+DOOR:closed,(22,07)
+REGION:(23,02,27,08),lit,"zoo",filled,true
+#OBJECT:'[',"cloak of magic resistance",place[0]
+ENGRAVING:$place[0],burn,"Elbereth"
+#OBJECT:'"',"amulet of reflection",place[1]
+ENGRAVING:$place[1],burn,"Elbereth"
+#OBJECT:'(',"bag of holding",place[2]
+ENGRAVING:$place[2],burn,"Elbereth"
