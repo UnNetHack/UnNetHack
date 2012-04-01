@@ -2,10 +2,10 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* UnNetHack 3.7.0 */
+/* UnNetHack 4.0.0 */
 #define GAME_SHORT_NAME	"UNH"
-#define VERSION_MAJOR	3
-#define VERSION_MINOR	7
+#define VERSION_MAJOR	4
+#define VERSION_MINOR	0
 /*
  * PATCHLEVEL is updated for each release.
  */
@@ -49,7 +49,7 @@
  * PP = patch level, ee = edit level, L = literal suffix "L",
  * with all four numbers specified as two hexadecimal digits.
  */
-#define VERSION_COMPATIBILITY 0x03070000L	/* 3.7.0-e0 */
+#define VERSION_COMPATIBILITY 0x04000000L	/* 4.0.0-e0 */
 
 
 /*****************************************************************************/
