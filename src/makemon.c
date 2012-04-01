@@ -982,6 +982,9 @@ register int	mmflags;
 		(8 * mtmp->m_lev) : (4 * mtmp->m_lev + d((int)mtmp->m_lev, 4)));
 	} else if (!mtmp->m_lev) {
 	    mtmp->mhpmax = mtmp->mhp = rnd(4);
+	} else if (ptr->msound == MS_LEADER) {
+		/* Quest Leaders need to be fairly burly */
+		mtmp->mhpmax = mtmp->mhp = 135 + rnd(30);
 	} else {
 	    mtmp->mhpmax = mtmp->mhp = d((int)mtmp->m_lev, 8);
 	    if (is_home_elemental(ptr))
