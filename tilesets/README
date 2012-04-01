@@ -2,6 +2,7 @@ Tilesets for UnNetHack
 ======================
 
 untiles32x.png (by Stephan T. Lavavej)
+ (currently out of date for 4.0.0, will be updated later)
 
  Based on Vanilla's 32x32 tileset, missing unnethack tiles added
  and some general changes by Stephan T. Lavavej.
