@@ -1,3 +1,9 @@
+unnethack (4.0.0) lucid; urgency=low
+
+  * New major release.
+
+ -- Patric Mueller <bhaak@gmx.net>  Sun, 01 Apr 2012 16:24:35 +0200
+
 unnethack (3.6.0) lucid; urgency=low
 
   * New major release.
