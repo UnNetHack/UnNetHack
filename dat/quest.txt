@@ -359,7 +359,7 @@ need of your help.  There is a great quest you must undertake.
 %Cc Bar 00018
 "Pah!  You have betrayed the gods, %p.  You will never attain
 the glory which you aspire to.  Your failure to follow the true path has
-closed this future to you.
+closed that future to you.
 
 "I will protect these people as best I can, but soon %n will overcome
 me and destroy all who once called you %s.  Now begone!"
@@ -619,8 +619,7 @@ ask you to undertake."
 "Ah, %p.  Are you finally ready?"
 %E
 %Cc Cav 00018
-"%pC!  You have sealed our fate.  You seem unable to reform yourself,
-so I must select another to take your place.
+"%pC!  You have sealed our fate by being unable to reform yourself.
 
 "Begone from %H!  You have betrayed us by choosing
 the path of the %C over the true path of the %L.
@@ -2138,7 +2137,7 @@ think me as stupid as your behavior.  I warn you not to try my patience."
 %Cc Rog 00018
 "Well %gp, it looks like our friend has forgotten who is the boss
 around here.  Our friend seems to think that %rp have been put in
-charge.  Wrong.  DEAD WRONG!"
+charge.  Wrong.  DEAD wrong, in fact..."
 
 Your sudden shift in surroundings prevents you from hearing the end
 of %ls curse.
@@ -2884,8 +2883,8 @@ made changes to become ready for this task..."
 %E
 %Cc Val 00018
 "No, %p.  Your fate is sealed.  I must cast about for another
-champion.  Begone from my presence, and never return.  Know this, that
-you shall never succeed in this life, and Valhalla is denied to you."
+champion.  Begone from my presence, and never return.  Know that
+Valhalla shall be denied to you."
 %E
 %Cc Val 00019
 "I see you and %n fighting, %p.  But you are not prepared and
@@ -3462,10 +3461,9 @@ essential in locating the Amulet of Yendor."
 My allegiance to %d holds fast and I cannot condone or accept what you 
 have done.
 
-Leave this place.  You shall never set foot at %H again.
-That which you seek is now lost forever, for without the Bell of Opening, 
-you will never be able to enter the place where he who has the Amulet 
-resides.
+Leave this place. You shall never set foot beyond %H again as long as I
+draw breath... and without the Bell of Opening, you will never be able to 
+enter the place where he who has the Amulet resides.
 
 Go now!  You are banished from this place.
 %E

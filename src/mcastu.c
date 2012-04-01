@@ -214,6 +214,8 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
 	if (mattk->adtyp == AD_SPEL || mattk->adtyp == AD_CLRC) {
 	    mtmp->mspec_used = 10 - mtmp->m_lev;
 	    if (mtmp->mspec_used < 2) mtmp->mspec_used = 2;
+	    /* your quest leader is a badass and does not need recharge time */
+	    if (mtmp->data->msound == MS_LEADER) mtmp->mspec_used = 0;
 	}
 
 	/* monster can cast spells, but is casting a directed spell at the

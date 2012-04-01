@@ -3083,7 +3083,7 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 			break;
 		    }
 		    if (nonliving(mon->data) || is_demon(mon->data) ||
-			    resists_magm(mon)) {	/* similar to player */
+			    resists_magm(mon) || mon->data->msound == MS_LEADER) {	/* similar to player */
 			sho_shieldeff = TRUE;
 			break;
 		    }
