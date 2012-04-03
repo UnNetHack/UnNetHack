@@ -1,3 +1,6 @@
+2012-XX-XX  UnNetHack 4.X.X
+	* Mind flayer attacks only cause physical damage and int drain
+
 2012-04-01  UnNetHack 4.0.0
 	* Uncursed and blessed scrolls of magic mapping reveal secret doors
 	* Blessed scrolls of magic mapping reveal objects
