@@ -176,8 +176,7 @@
 				 (ptr) == &mons[PM_CHICKATRICE])
 
 #ifdef WEBB_DISINT
-# define touch_disintegrates(ptr) ((ptr) == &mons[PM_DISINTEGRATOR] || \
-				 (ptr) == &mons[PM_ANTI_MATTER_VORTEX])
+# define touch_disintegrates(ptr) ((ptr) == &mons[PM_DISINTEGRATOR])
 #endif
   
 #define is_mind_flayer(ptr)	((ptr) == &mons[PM_MIND_FLAYER] || \
