@@ -36,10 +36,8 @@ STATIC_DCL int FDECL(noncoalignment, (ALIGNTYP_P));
 STATIC_DCL void FDECL(create_monster, (monster *, struct mkroom *));
 STATIC_DCL void FDECL(create_object, (object *, struct mkroom *));
 STATIC_DCL void FDECL(create_engraving, (engraving *,struct mkroom *));
-STATIC_DCL void FDECL(create_stairs, (stair *, struct mkroom *));
 STATIC_DCL void FDECL(create_altar, (altar *, struct mkroom *));
 STATIC_DCL void FDECL(create_gold, (gold *, struct mkroom *));
-STATIC_DCL void FDECL(create_feature, (int,int,struct mkroom *,int));
 STATIC_DCL boolean FDECL(search_door, (struct mkroom *, xchar *, xchar *,
 					XCHAR_P, int));
 STATIC_DCL void NDECL(fix_stair_rooms);
@@ -79,9 +77,6 @@ STATIC_DCL int NDECL(rnddoor);
 STATIC_DCL int NDECL(rndtrap);
 STATIC_DCL void FDECL(get_location, (schar *,schar *,int, struct mkroom *));
 STATIC_DCL void FDECL(light_region, (region *));
-STATIC_DCL void FDECL(load_one_monster, (dlb *,monster *));
-STATIC_DCL void FDECL(load_one_object, (dlb *,object *));
-STATIC_DCL void FDECL(load_one_engraving, (dlb *,engraving *));
 STATIC_DCL void FDECL(maze1xy, (coord *,int));
 STATIC_DCL boolean FDECL(sp_level_loader, (dlb *, sp_lev *));
 STATIC_DCL void FDECL(create_door, (room_door *, struct mkroom *));
@@ -1889,23 +1884,6 @@ struct mkroom *croom;
 }
 
 /*
- * Create stairs in a room.
- *
- */
-
-STATIC_OVL void
-create_stairs(s,croom)
-stair	*s;
-struct mkroom	*croom;
-{
-	schar		x,y;
-
-	x = s->x; y = s->y;
-	get_location(&x, &y, DRY, croom);
-	mkstairs(x,y,(char)s->up, croom);
-}
-
-/*
  * Create an altar in a room.
  */
 
@@ -1987,27 +1965,6 @@ struct mkroom	*croom;
 	if (g->amount == -1)
 	    g->amount = rnd(200);
 	(void) mkgold((long) g->amount, x, y);
-}
-
-/*
- * Create a feature (e.g a fountain) in a room.
- */
-
-STATIC_OVL void
-create_feature(fx, fy, croom, typ)
-int		fx, fy;
-struct mkroom	*croom;
-int		typ;
-{
-	schar		x,y;
-
-	x = fx;  y = fy;
-	get_location(&x, &y, DRY, croom);
-	/* Don't cover up an existing feature (particularly randomly
-	   placed stairs). */
-	if (IS_FURNITURE(levl[x][y].typ)) return;
-
-	levl[x][y].typ = typ;
 }
 
 void
@@ -2469,80 +2426,6 @@ light_region(tmpregion)
 		lev->lit = litstate;
 	    lev++;
 	}
-    }
-}
-
-STATIC_OVL void
-load_one_monster(fd, m)
-dlb *fd;
-monster *m;
-{
-	int size;
-
-	Fread((genericptr_t) m, 1, sizeof *m, fd);
-	if ((size = m->name.len) != 0) {
-	    m->name.str = (char *) alloc((unsigned)size + 1);
-	    Fread((genericptr_t) m->name.str, 1, size, fd);
-	    m->name.str[size] = '\0';
-	} else
-	    m->name.str = (char *) 0;
-	if ((size = m->appear_as.len) != 0) {
-	    m->appear_as.str = (char *) alloc((unsigned)size + 1);
-	    Fread((genericptr_t) m->appear_as.str, 1, size, fd);
-	    m->appear_as.str[size] = '\0';
-	} else
-	    m->appear_as.str = (char *) 0;
-}
-
-STATIC_OVL void
-load_one_object(fd, o)
-dlb *fd;
-object *o;
-{
-	int size;
-
-	Fread((genericptr_t) o, 1, sizeof *o, fd);
-	if ((size = o->name.len) != 0) {
-	    o->name.str = (char *) alloc((unsigned)size + 1);
-	    Fread((genericptr_t) o->name.str, 1, size, fd);
-	    o->name.str[size] = '\0';
-	} else
-	    o->name.str = (char *) 0;
-}
-
-STATIC_OVL void
-load_one_engraving(fd, e)
-dlb *fd;
-engraving *e;
-{
-	int size;
-
-	Fread((genericptr_t) e, 1, sizeof *e, fd);
-	size = e->engr.len;
-	e->engr.str = (char *) alloc((unsigned)size+1);
-	Fread((genericptr_t) e->engr.str, 1, size, fd);
-	e->engr.str[size] = '\0';
-}
-
-STATIC_OVL void
-load_one_room(fd, r)
-dlb *fd;
-room *r;
-{
-    int size;
-
-    Fread((genericptr_t) r, 1, sizeof *r, fd);
-    size = r->name.len;
-    if (size > 0) {
-	r->name.str = (char *) alloc((unsigned)size + 1);
-	Fread((genericptr_t) r->name.str, 1, size, fd);
-	r->name.str[size] = '\0';
-    }
-    size = r->parent.len;
-    if (size > 0) {
-	r->parent.str = (char *) alloc((unsigned)size + 1);
-	Fread((genericptr_t) r->parent.str, 1, size, fd);
-	r->parent.str[size] = '\0';
     }
 }
 
