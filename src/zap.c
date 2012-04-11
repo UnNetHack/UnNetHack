@@ -1902,7 +1902,7 @@ dozap()
 	check_unpaid(obj);
 
 	/* zappable addition done by GAN 11/03/86 */
-	if(!zappable(obj)) pline(nothing_happens);
+	if(!zappable(obj)) pline("%s", nothing_happens);
 	/* PM 2008-04-16: 50% chance of blowing up, if zapped 20 times.
 	 * Same probability as in muse.c precheck() for monsters */
 	else if (obj->cursed && !rn2(30)) {
@@ -1981,7 +1981,7 @@ boolean ordinary;
 		    if (!resists_blnd(&youmonst)) {
 			    You(are_blinded_by_the_flash);
 			    make_blinded((long)rnd(100),FALSE);
-			    if (!Blind) Your(vision_clears);
+			    if (!Blind) Your("%s", vision_clears);
 		    }
 		    break;
 
@@ -2162,7 +2162,7 @@ boolean ordinary;
 			You(are_blinded_by_the_flash);
 			make_blinded((long)damage, FALSE);
 			makeknown(obj->otyp);
-			if (!Blind) Your(vision_clears);
+			if (!Blind) Your("%s", vision_clears);
 		    }
 		    damage = 0;	/* reset */
 		    break;
@@ -2476,7 +2476,7 @@ struct obj *obj;	/* wand or spell */
 	case SPE_STONE_TO_FLESH:
 	    if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) ||
 		     Underwater || (Is_qstart(&u.uz) && u.dz < 0)) {
-		pline(nothing_happens);
+		pline("%s", nothing_happens);
 	    } else if (u.dz < 0) {	/* we should do more... */
 		pline("Blood drips on your %s.", body_part(FACE));
 	    } else if (u.dz > 0 && !OBJ_AT(u.ux, u.uy)) {
@@ -2487,7 +2487,7 @@ struct obj *obj;	/* wand or spell */
 		e = engr_at(u.ux, u.uy);
 		if (!(e && e->engr_type == ENGRAVE)) {
 		    if (is_pool(u.ux, u.uy) || is_ice(u.ux, u.uy))
-			pline(nothing_happens);
+			pline("%s", nothing_happens);
 		    else
 			pline("Blood %ss %s your %s.",
 			      is_lava(u.ux, u.uy) ? "boil" : "pool",
@@ -3585,7 +3585,7 @@ register int dx,dy;
 	    if (abstype == ZT_LIGHTNING && !resists_blnd(&youmonst)) {
 		You(are_blinded_by_the_flash);
 		make_blinded((long)d(nd,50),FALSE);
-		if (!Blind) Your(vision_clears);
+		if (!Blind) Your("%s", vision_clears);
 	    }
 	    stop_occupation();
 	    nomul(0, 0);
@@ -3752,7 +3752,7 @@ boolean *shopdamage;
 			msgtxt = (dried) ? "The water evaporates." :
 					   "Some water evaporates.";
 		}
-		Norep(msgtxt);
+		Norep("%s", msgtxt);
 		if (dried) newsym(x,y);
 	    } else if(IS_FOUNTAIN(lev->typ)) {
 		    if (cansee(x,y))
@@ -3878,12 +3878,12 @@ boolean *shopdamage;
 		    lev->doormask = new_doormask;
 		    unblock_point(x, y);	/* vision */
 		    if (cansee(x, y)) {
-			pline(see_txt);
+			pline("%s", see_txt);
 			newsym(x, y);
 		    } else if (sense_txt) {
-			You(sense_txt);
+			You("%s", sense_txt);
 		    } else if (hear_txt) {
-			if (flags.soundok) You_hear(hear_txt);
+			if (flags.soundok) You_hear("%s", hear_txt);
 		    }
 		    if (picking_at(x, y)) {
 			stop_occupation();
@@ -4290,7 +4290,7 @@ retry:
 	if (!otmp) {
 	    pline("Nothing fitting that description exists in the game.");
 	    if (++tries < 5) goto retry;
-	    pline(thats_enough_tries);
+	    pline("%s", thats_enough_tries);
 	    otmp = readobjnam((char *)0, (struct obj *)0, TRUE);
 	    if (!otmp) return;	/* for safety; should never happen */
 	} else if (otmp == &nothing) {

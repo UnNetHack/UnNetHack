@@ -597,7 +597,7 @@ int spellnum;
 		  (num_eyes == 1) ?
 		  body_part(EYE) : makeplural(body_part(EYE)));
 	    make_blinded(Half_spell_damage ? 100L : 200L, FALSE);
-	    if (!Blind) Your(vision_clears);
+	    if (!Blind) Your("%s", vision_clears);
 	    dmg = 0;
 	} else
 	    warning("no reason for monster to cast blindness spell?");

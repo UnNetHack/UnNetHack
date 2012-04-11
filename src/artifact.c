@@ -1238,7 +1238,7 @@ arti_invoke(obj)
 			return invoke_amulet(obj);
 #endif
 	else
-	    pline(nothing_happens);
+	    pline("%s", nothing_happens);
 	return 1;
     }
 

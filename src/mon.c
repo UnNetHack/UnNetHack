@@ -2621,7 +2621,7 @@ struct monst *mon;
 				You("cannot polymorph %s into that.", mon_nam(mon));
 			else break;
 		} while(++tries < 5);
-		if (tries==5) pline(thats_enough_tries);
+		if (tries==5) pline("%s", thats_enough_tries);
 	}
 #endif /*WIZARD*/
 	if (mndx == NON_PM) mndx = rn1(SPECIAL_PM - LOW_PM, LOW_PM);

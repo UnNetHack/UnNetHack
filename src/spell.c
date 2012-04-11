@@ -954,7 +954,7 @@ boolean atme;
 		break;
 	case SPE_JUMPING:
 		if (!jump(max(role_skill,1)))
-			pline(nothing_happens);
+			pline("%s", nothing_happens);
 		break;
 	default:
 		warning("Unknown spell %d attempted.", spell);

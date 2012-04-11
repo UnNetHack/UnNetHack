@@ -274,7 +274,7 @@ boolean forcecontrol;
 
         if(!Polymorph_control && !forcecontrol && !draconian && !iswere && !isvamp) {
 	    if (rn2(20) > ACURR(A_CON)) {
-		You(shudder_for_moment);
+		You("%s", shudder_for_moment);
 		losehp(rnd(30), "system shock", KILLED_BY_AN);
 		exercise(A_CON, FALSE);
 		return;
@@ -296,7 +296,7 @@ boolean forcecontrol;
 				You("cannot polymorph into that.");
 			else break;
 		} while(++tries < 5);
-		if (tries==5) pline(thats_enough_tries);
+		if (tries==5) pline("%s", thats_enough_tries);
 		/* allow skin merging, even when polymorph is controlled */
 		if (draconian &&
 		    (mntmp == armor_to_dragon(uarm->otyp) || tries == 5))

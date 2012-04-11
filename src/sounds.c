@@ -51,10 +51,10 @@ dosounds()
 	buf = string_subst(snd.msg);
 	switch (snd.flags) {
 	default:
-	case LVLSND_HEARD:  You_hear(buf);  break;
-	case LVLSND_PLINED: pline(buf);     break;
-	case LVLSND_VERBAL: verbalize(buf); break;
-	case LVLSND_FELT:   You_feel(buf);  break;
+	case LVLSND_HEARD:  You_hear("%s", buf);  break;
+	case LVLSND_PLINED: pline("%s", buf);     break;
+	case LVLSND_VERBAL: verbalize("%s", buf); break;
+	case LVLSND_FELT:   You_feel("%s", buf);  break;
 	}
     }
 
@@ -67,7 +67,7 @@ dosounds()
 		"the splashing of a naiad.",
 		"a soda fountain!",
 	};
-	You_hear(fountain_msg[rn2(3)+hallu]);
+	You_hear("%s", fountain_msg[rn2(3)+hallu]);
     }
 #ifdef SINK
     if (level.flags.nsinks && !rn2(300)) {
@@ -76,7 +76,7 @@ dosounds()
 		"a gurgling noise.",
 		"dishes being washed!",
 	};
-	You_hear(sink_msg[rn2(2)+hallu]);
+	You_hear("%s", sink_msg[rn2(2)+hallu]);
     }
 #endif
     if (level.flags.has_court && !rn2(200)) {
@@ -95,7 +95,7 @@ dosounds()
 		/* finding one is enough, at least for now */
 		int which = rn2(3)+hallu;
 
-		if (which != 2) You_hear(throne_msg[which]);
+		if (which != 2) You_hear("%s", throne_msg[which]);
 		else		pline(throne_msg[2], uhis());
 		return;
 	    }
@@ -108,7 +108,7 @@ dosounds()
 		"grass growing!",
 		"wind in the willows!",
 	};
-	You_hear(garden_msg[rn2(2) + 2 * hallu]);
+	You_hear("%s", garden_msg[rn2(2) + 2 * hallu]);
 	return;
     }
     if (level.flags.has_swamp && !rn2(200)) {
@@ -117,7 +117,7 @@ dosounds()
 		"smell marsh gas!",	/* so it's a smell...*/
 		"hear Donald Duck!",
 	};
-	You(swamp_msg[rn2(2)+hallu]);
+	You("%s", swamp_msg[rn2(2)+hallu]);
 	return;
     }
     if (level.flags.has_vault && !rn2(200)) {
@@ -268,7 +268,7 @@ dosounds()
 		mon_in_room(mtmp, BARRACKS) &&
 		/* sleeping implies not-yet-disturbed (usually) */
 		(mtmp->msleeping || ++count > 5)) {
-		You_hear(barracks_msg[rn2(3)+hallu]);
+		You_hear("%s", barracks_msg[rn2(3)+hallu]);
 		return;
 	    }
 	}
@@ -283,7 +283,7 @@ dosounds()
 	    if (DEADMONSTER(mtmp)) continue;
 	    if ((mtmp->msleeping || is_animal(mtmp->data)) &&
 		    mon_in_room(mtmp, ZOO)) {
-		You_hear(zoo_msg[rn2(2)+hallu]);
+		You_hear("%s", zoo_msg[rn2(2)+hallu]);
 		return;
 	    }
 	}
@@ -301,7 +301,7 @@ dosounds()
 		    "the chime of a cash register.",
 		    "Neiman and Marcus arguing!",
 	    };
-	    You_hear(shop_msg[rn2(2)+hallu]);
+	    You_hear("%s", shop_msg[rn2(2)+hallu]);
 	}
 	return;
     }
@@ -319,7 +319,7 @@ dosounds()
 		    "someone say \"No more woodchucks!\"",
 		    "a loud ZOT!"		/* both rec.humor.oracle */
 	    };
-	    You_hear(ora_msg[rn2(3)+hallu*2]);
+	    You_hear("%s", ora_msg[rn2(3)+hallu*2]);
 	}
 	return;
     }
@@ -331,7 +331,7 @@ dosounds()
         "Somebody whispers: \"Food rations? Only 900 zorkmids.\"",
         "You feel like searching for more gold.",
       };
-      pline(blkmar_msg[rn2(2)+hallu]);
+      pline("%s", blkmar_msg[rn2(2)+hallu]);
     }
 #endif /* BLACKMARKET */
 }
@@ -914,7 +914,7 @@ register struct monst *mtmp;
     }
 
     if (pline_msg) pline("%s %s", Monnam(mtmp), pline_msg);
-    else if (verbl_msg) verbalize(verbl_msg);
+    else if (verbl_msg) verbalize("%s", verbl_msg);
     return(1);
 }
 

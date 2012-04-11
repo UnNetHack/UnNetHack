@@ -1004,7 +1004,7 @@ register const char *txt;
 		You("have a %s feeling for a moment, then it passes.",
 		Hallucination ? "normal" : "strange");
 	else
-		pline(txt);
+		pline("%s", txt);
 
 	if(!obj)	/* e.g., crystal ball finds no traps */
 		return;
@@ -1380,7 +1380,7 @@ register struct obj *obj;
 		    pline("It suddenly gets dark.");
 		}
 		make_blinded(itimeout_incr(Blinded, rnd(5)), FALSE);
-		if (!Blind && !u.usleep) Your(vision_clears);
+		if (!Blind && !u.usleep) Your("%s", vision_clears);
 		break;
 	case POT_WATER:
 		if(u.umonnum == PM_GREMLIN) {
@@ -1873,7 +1873,7 @@ struct obj *potion, *obj;
 		    obj == uball || obj == uskin ||
 		    obj_resists(obj->otyp == POT_POLYMORPH ?
 				potion : obj, 5, 95)) {
-		pline(nothing_happens);
+		pline("%s", nothing_happens);
 	    } else {
 	    	boolean was_wep = FALSE, was_swapwep = FALSE, was_quiver = FALSE;
 		short save_otyp = obj->otyp;

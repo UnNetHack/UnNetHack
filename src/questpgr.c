@@ -380,7 +380,7 @@ struct qtmsg *qt_msg;
 	    (void) dlb_fgets(xbuf, 80, msg_file);
 	    (void) xcrypt(xbuf, in_line);
 	    convert_line();
-	    pline(out_line);
+	    pline("%s", out_line);
 	}
 
 }

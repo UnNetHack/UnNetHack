@@ -1424,7 +1424,7 @@ verbalize("In return for thy service, I grant thee the gift of Immortality!");
     } /* fake Amulet */
 
     if (value == 0) {
-	pline(nothing_happens);
+	pline("%s", nothing_happens);
 	return (1);
     }
 
@@ -1993,7 +1993,7 @@ invoke_amulet(otmp)
 	aligntyp altaralign = a_align(u.ux,u.uy);
 
 	if (!on_altar()) {
-		pline(nothing_happens);
+		pline("%s", nothing_happens);
 		return 1;
 	}
 
