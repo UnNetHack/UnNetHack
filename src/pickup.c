@@ -1963,6 +1963,9 @@ register struct obj *obj;
 			if (rot_alarm) obj->norevive = 1;
 		}
 	} else if (Is_mbag(current_container) && mbag_explodes(obj, 0)) {
+#ifdef LIVELOGFILE
+		livelog_generic("boh_explosion", dump_typename(obj->otyp));
+#endif
 		/* explicitly mention what item is triggering the explosion */
 		pline( "As you put %s inside, you are blasted by a magical explosion!", doname(obj));
 		/* did not actually insert obj yet */
