@@ -231,7 +231,6 @@ mk_split_room()
 {
     NhRect *r1 = rnd_rect();
     NhRect r2;
-    int area;
     xchar hx, hy, lx, ly, wid, hei;
     xchar rlit;
     struct mkroom *troom;
@@ -247,7 +246,6 @@ mk_split_room()
     lx = ((hx < 1) ? 0 : rn2(hx)) + 1;
     ly = ((hy < 1) ? 0 : rn2(hy)) + 1;
 
-    area = wid*hei;
     if (!check_room(&lx, &wid, &ly, &hei, FALSE)) return;
     if (wid < 5 || hei < 5) return;
 

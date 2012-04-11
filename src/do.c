@@ -8,9 +8,6 @@
 #include "lev.h"
 
 #ifdef SINKS
-# ifdef OVLB
-STATIC_DCL void FDECL(trycall, (struct obj *));
-# endif /* OVLB */
 STATIC_DCL void FDECL(dosinkring, (struct obj *));
 #endif /* SINKS */
 
@@ -292,16 +289,6 @@ doaltarobj(obj)  /* obj is an object dropped on an altar */
 }
 
 #ifdef SINKS
-STATIC_OVL
-void
-trycall(obj)
-register struct obj *obj;
-{
-	if(!objects[obj->otyp].oc_name_known &&
-	   !objects[obj->otyp].oc_uname)
-	   docall(obj);
-}
-
 /** Transforms the sink at the player's position into
  * a fountain, throne, altar or grave. */
 STATIC_OVL

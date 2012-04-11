@@ -160,10 +160,9 @@ register xchar x, y;
 				}
 			} else {
 				char kbuf[BUFSZ];
-				int dis_dmg;
 				Sprintf(kbuf, "barefootedly kicking %s",
 				        an(mon->data->mname));
-				dis_dmg = instadisintegrate(kbuf);
+				instadisintegrate(kbuf);
 				break;
 			}
 		} else

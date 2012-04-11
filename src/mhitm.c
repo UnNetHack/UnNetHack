@@ -703,7 +703,7 @@ defdisintagr(magr, mdef, mattk)
 				weight_dmg(mass);
 			tmp = mass; 
 		} else {
-			struct obj * lifesave = mlifesaver(magr);
+			mlifesaver(magr);
 			mass += magr->data->cwt;
 			weight_dmg(mass);
 			if (mass)

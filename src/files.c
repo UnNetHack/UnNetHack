@@ -13,6 +13,7 @@
 
 #if defined(WHEREIS_FILE) && defined(UNIX)
 #include <sys/types.h> /* whereis-file chmod() */
+#include <sys/stat.h>
 #endif
 
 #include <ctype.h>
@@ -769,7 +770,7 @@ d_level *lev;
 	/* Simple bones pool by adding a number to the bones filename.
 	 * The number must stay the same for the current game. */
 	dptr = eos(file);
-	Sprintf(dptr, ".%d", u.ubirthday % 5);
+	Sprintf(dptr, ".%d", (int)(u.ubirthday % 5));
 #endif
 
 #ifdef VMS
@@ -2207,7 +2208,7 @@ boolean		recursive;
 	} else if (match_varname(buf, "GRAPHICS", 4)) {
 	    len = get_uchars(fp, buf, bufp, translate, FALSE,
 			     MAXPCHARS, "GRAPHICS");
-	    assign_graphics(translate, len, MAXPCHARS, 0);
+	    assign_graphics((glyph_t*)translate, len, MAXPCHARS, 0);
 	} else if (match_varname(buf, "STATUSCOLOR", 11)) {
 	    /* ignore statuscolor entries if not compiled in */
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
@@ -2216,15 +2217,15 @@ boolean		recursive;
 	} else if (match_varname(buf, "DUNGEON", 4)) {
 	    len = get_uchars(fp, buf, bufp, translate, FALSE,
 			     MAXDCHARS, "DUNGEON");
-	    assign_graphics(translate, len, MAXDCHARS, 0);
+	    assign_graphics((glyph_t*)translate, len, MAXDCHARS, 0);
 	} else if (match_varname(buf, "TRAPS", 4)) {
 	    len = get_uchars(fp, buf, bufp, translate, FALSE,
 			     MAXTCHARS, "TRAPS");
-	    assign_graphics(translate, len, MAXTCHARS, MAXDCHARS);
+	    assign_graphics((glyph_t*)translate, len, MAXTCHARS, MAXDCHARS);
 	} else if (match_varname(buf, "EFFECTS", 4)) {
 	    len = get_uchars(fp, buf, bufp, translate, FALSE,
 			     MAXECHARS, "EFFECTS");
-	    assign_graphics(translate, len, MAXECHARS, MAXDCHARS+MAXTCHARS);
+	    assign_graphics((glyph_t*)translate, len, MAXECHARS, MAXDCHARS+MAXTCHARS);
 
 	} else if (match_varname(buf, "OBJECTS", 3)) {
 	    /* oc_syms[0] is the RANDOM object, unused */

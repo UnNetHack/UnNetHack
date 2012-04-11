@@ -197,7 +197,7 @@ struct obj* tobj;
 	 * The overcomplex wording is because all the monster-naming functions operate
 	 * on actual instances of the monsters, and we're dealing with just an index
 	 * so we can avoid things like "a owlbear", etc. */
-	if (otmp = sobj_at(EGG,rx,ry)) {
+	if ((otmp = sobj_at(EGG,rx,ry))) {
 		if (Hallucination) {
 			pline("You listen to the egg and guess... %s?",rndmonnam());
 		} else {

@@ -1022,6 +1022,7 @@ E void NDECL(getmailstatus);
 E void NDECL(ckmailstatus);
 E void FDECL(read_hint, (struct obj *));
 E void FDECL(readmail, (struct obj *));
+E void NDECL(maybe_hint);
 #endif /* MAIL */
 
 /* ### makemon.c ### */

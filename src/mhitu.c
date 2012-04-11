@@ -234,7 +234,7 @@ boolean message;
 			for(i = 0; i < NATTK; i++)
 				if(mdat->mattk[i].aatyp == AT_ENGL)
 					break;
-			if (mdat->mattk[i].aatyp != AT_ENGL)
+			if (i < NATTK && mdat->mattk[i].aatyp != AT_ENGL)
 			      warning("Swallower has no engulfing attack?");
 			else {
 				if (is_whirly(mdat)) {
