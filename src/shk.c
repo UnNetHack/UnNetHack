@@ -511,12 +511,6 @@ boolean newlev;
 		      plname);
 	    return;
 	}
-#ifdef CONVICT
-	/* Visible striped prison shirt */
-	if ((uarmu && (uarmu->otyp == STRIPED_SHIRT)) && !uarm && !uarmc) {
-	    eshkp->pbanned = TRUE;
-	}
-#endif /* CONVICT */
 
 	if (rob_shop(shkp)) {
 
@@ -664,6 +658,12 @@ register char *enterstring;
 		    return;
 	    }
 	}
+#ifdef CONVICT
+	/* Visible striped prison shirt */
+	if ((uarmu && (uarmu->otyp == STRIPED_SHIRT)) && !uarm && !uarmc) {
+	    eshkp->pbanned = TRUE;
+	}
+#endif /* CONVICT */
  
 #ifdef BLACKMARKET
 	    if (Is_blackmarket(&u.uz) &&
