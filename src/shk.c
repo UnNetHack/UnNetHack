@@ -659,15 +659,10 @@ register char *enterstring;
 
 	if (Invis) {
 	    pline("%s senses your presence.", shkname(shkp));
-#ifdef BLACKMARKET            
 	    if (!Is_blackmarket(&u.uz)) {
-	    verbalize("Invisible customers are not welcome!");
-	    return;
-	}
-#else /* BLACKMARKET */
-	    verbalize("Invisible customers are not welcome!");
-	    return;
-#endif /* BLACKMARKET */
+		    verbalize("Invisible customers are not welcome!");
+		    return;
+	    }
 	}
  
 #ifdef BLACKMARKET
