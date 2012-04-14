@@ -1162,6 +1162,10 @@ struct obj *obj;
 	if (!obj)
 		/* Not using a weapon */
 		return (P_BARE_HANDED_COMBAT);
+#ifdef CONVICT
+	if ((obj->otyp == HEAVY_IRON_BALL) && Role_if(PM_CONVICT))
+		return objects[obj->otyp].oc_skill;
+#endif /* CONVICT */
 	if (obj->oclass != WEAPON_CLASS && obj->oclass != TOOL_CLASS &&
 	    obj->oclass != GEM_CLASS)
 		/* Not a weapon, weapon-tool, or ammo */

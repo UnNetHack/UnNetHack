@@ -313,12 +313,13 @@ spec_levs: ../util/lev_comp \
 	touch spec_levs
 
 quest_levs: ../util/lev_comp \
-	Arch.des Barb.des Caveman.des Healer.des Knight.des \
+	Arch.des Barb.des Caveman.des Convict.des Healer.des Knight.des \
 	Monk.des Priest.des Ranger.des Rogue.des Samurai.des \
 	Tourist.des Valkyrie.des Wizard.des
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Arch.des
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Barb.des
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Caveman.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Convict.des
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Healer.des
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Knight.des
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Monk.des

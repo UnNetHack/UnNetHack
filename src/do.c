@@ -1286,7 +1286,14 @@ boolean at_stairs, falling, portal;
 		    You("fly down along the %s.",
 			at_ladder ? "ladder" : "stairs");
 		else if (u.dz &&
+#ifdef CONVICT
+		    (near_capacity() > UNENCUMBERED || (Punished &&
+		    ((uwep != uball) || ((P_SKILL(P_FLAIL) < P_BASIC))
+            || !Role_if(PM_CONVICT)))
+		     || Fumbling)) {
+#else
 		    (near_capacity() > UNENCUMBERED || Punished || Fumbling)) {
+#endif /* CONVICT */
 		    You("fall down the %s.", at_ladder ? "ladder" : "stairs");
 		    if (Punished) {
 			drag_down();

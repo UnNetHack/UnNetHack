@@ -411,6 +411,7 @@ NETHACK_ARG(randomized-planes,[Shuffling order of Elemental Planes],RANDOMIZED_P
 NETHACK_ARG(steed,[Ability to ride monsters],STEED,yes)
 # NETHACK_ARG(dwarf,[Dwarf race],DWARF,yes)
 NETHACK_ARG(tourist,[Tourist class],TOURIST,yes)
+NETHACK_ARG(convict,[Convict class],CONVICT,yes)
 # NETHACK_ARG(yeoman,[Yeoman class],YEOMAN,yes)
 # NETHACK_ARG(zouthern,[Zoutherner class],ZOUTHERN,no)
 NETHACK_ARG(redo,[Redo last command],REDO,yes)

@@ -224,6 +224,9 @@ NEARDATA char wolfname[PL_PSIZ] = DUMMY;
 NEARDATA char crocodilename[PL_PSIZ] = DUMMY;
 /* ...and 'preferred_pet', just below, can now be 'e'. */
 #endif
+#ifdef CONVICT
+NEARDATA char ratname[PL_PSIZ] = DUMMY;
+#endif /* CONVICT */
 
 char preferred_pet;	/* '\0', 'c', 'd', 'n' (none) */
 /* monsters that went down/up together with @ */

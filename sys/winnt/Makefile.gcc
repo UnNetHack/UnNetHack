@@ -525,8 +525,9 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	 $(DAT)/monk.des    $(DAT)/priest.des   $(DAT)/ranger.des \
 	 $(DAT)/rogue.des   $(DAT)/samurai.des  $(DAT)/sokoban.des \
 	 $(DAT)/tourist.des $(DAT)/valkyrie.des $(DAT)/wizard.des \
-         $(DAT)/blkmar.des  $(DAT)/heck.des     $(DAT)/nymph.des \
-         $(DAT)/town-1.des  $(DAT)/town-2.des
+	 $(DAT)/blkmar.des  $(DAT)/heck.des     $(DAT)/nymph.des \
+	 $(DAT)/town-1.des  $(DAT)/town-2.des \
+	 $(DAT)/convict.des
 	$(subst /,\,$(U)lev_comp $(DAT)/bigroom.des)
 	$(subst /,\,$(U)lev_comp $(DAT)/blkmar.des)
 	$(subst /,\,$(U)lev_comp $(DAT)/castle.des)
@@ -556,6 +557,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	$(subst /,\,$(U)lev_comp $(DAT)/tourist.des)
 	$(subst /,\,$(U)lev_comp $(DAT)/valkyrie.des)
 	$(subst /,\,$(U)lev_comp $(DAT)/wizard.des)
+	$(subst /,\,$(U)lev_comp $(DAT)/convict.des)
 	$(subst /,\,copy *.lev $(DAT))
 	$(subst /,\,del *.lev)
 	$(subst /,\,echo sp_levs done > $(O)sp_lev.tag)

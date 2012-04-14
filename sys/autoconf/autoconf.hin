@@ -30,6 +30,9 @@
 /* Options to pass to the compression program, if any */
 #undef COMPRESS_OPTIONS
 
+/* Convict class */
+#undef CONVICT
+
 /* Curses interface */
 #undef CURSES_GRAPHICS
 

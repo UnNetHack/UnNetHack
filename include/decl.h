@@ -227,6 +227,9 @@ E NEARDATA char monkeyname[];
 E NEARDATA char wolfname[];
 E NEARDATA char crocodilename[];
 #endif
+#ifdef CONVICT
+E NEARDATA char ratname[];
+#endif /* CONVICT */
 E char preferred_pet;
 E const char *occtxt;			/* defined when occupation != NULL */
 E const char *nomovemsg;

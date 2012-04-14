@@ -100,6 +100,34 @@ const struct Role roles[] = {
 	{  1, 0,  0, 1,  0, 1 },10,	/* Energy */
 	0, 12, 0, 1,  8, A_INT, SPE_DIG,             -4
 },
+#ifdef CONVICT
+{	{"Convict", 0}, {
+	{"Detainee",     0},
+	{"Inmate",   0},
+	{"Jail-bird",0},
+	{"Prisoner",0},
+	{"Outlaw",    0},
+	{"Crook",   0},
+	{"Desperado",     0},
+	{"Felon",    0},
+	{"Fugitive",  0} },
+	"Ilmater", "Grumbar", "_Tymora",	/* Faerunian */
+	"Con", "Castle Waterdeep Dungeon", "the Warden's Level",
+	PM_CONVICT, NON_PM, PM_SEWER_RAT,
+	PM_ROBERT_THE_LIFER, PM_INMATE, PM_WARDEN_ARIANNA,
+	/*PM_GIANT_BEETLE, PM_SOLDIER_ANT, S_RODENT, S_SPIDER,*/
+	ART_IRON_BALL_OF_LIBERATION,
+	MH_HUMAN|MH_DWARF|MH_GNOME|MH_ORC | ROLE_MALE|ROLE_FEMALE |
+	  ROLE_CHAOTIC,
+	/* Str Int Wis Dex Con Cha */
+	{  10,  7,  7,  7, 13,  6 },
+	{  20, 20, 10, 20, 20, 10 },
+	/* Init   Lower  Higher */
+	{  8, 0,  0, 8,  0, 0 },	/* Hit points */
+	{  1, 0,  0, 1,  0, 1 },10,	/* Energy */
+	-10, 5, 0, 2, 10, A_INT, SPE_TELEPORT_AWAY,   -4
+},
+#endif	/* CONVICT */
 {	{"Healer", 0}, {
 	{"Rhizotomist",    0},
 	{"Empiric",        0},
