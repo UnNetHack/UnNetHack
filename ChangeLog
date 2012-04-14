@@ -8,6 +8,10 @@
 
 	* New role: Convict class
 
+	* vanilla bug fixes:
+	  - Prevent the Book of the Dead from being destroyed when the
+	    player falls into lava. (from GruntHack)
+
 2012-04-01  UnNetHack 4.0.0
 	* Uncursed and blessed scrolls of magic mapping reveal secret doors
 	* Blessed scrolls of magic mapping reveal objects
