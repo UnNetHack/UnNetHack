@@ -1196,9 +1196,10 @@ static const char * const bogusmons[] = {
 	"yellow wight",
 
 	/* from UnNetHack */
-	"apostroph golem", "Bob the angry flower",
+	"apostrophe golem", "Bob the angry flower",
 	"bonsai-kitten", "Boxxy", "lonelygirl15",
 	"tie-thulu", "Domo-kun", "nyan cat",
+	"Zalgo", "common comma",
 	"looooooooooooong cat",			/* internet memes */
 	"bohrbug", "mandelbug", "schroedinbug", /* bugs */
 	"Gerbenok",				/* Monty Python killer rabbit */
@@ -1226,6 +1227,7 @@ static const char * const bogusmons[] = {
 	"Gloorx Vloq", "Blork the orc",		/* Dungeon Crawl Stone Soup */
 	"unicorn pegasus kitten",		/* Wil Wheaton, John Scalzi */
 	"dwerga nethackus", "dwerga castrum",	/* Ask ASCII Ponies */
+	"Irrenhaus the Third", /* http://www.youtube.com/user/Irrenhaus3 */
 };
 
 
