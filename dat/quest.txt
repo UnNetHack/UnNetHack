@@ -814,10 +814,12 @@ casts its influence throughout our world.
 %Cc Con 00001
 Somehow, you have been captured and teleported back to
 %H!  But wait, the portal you went through is still
-here.  Didn't you hear %l calling for
-you earlier?  Also, %H is not as you had left it.
-There seems to be damage to the walls, and you hear sounds
-of strife all around you.
+here.  You had heard your old mentor %l,
+the prison chaplain who taught you the ways of
+%d calling for your help.  Also, %H
+is not as you had left it.  There seems to be damage
+to the walls, and you hear sounds of strife all
+around you.
 %E
 %Cp Con 00002
 You have returned to %H.  Somehow, things are even

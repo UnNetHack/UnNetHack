@@ -48,8 +48,6 @@ MONSTER:('@',"inmate"),random
 MONSTER:('@',"inmate"),random
 MONSTER:('@',"inmate"),random
 MONSTER:('@',"inmate"),random
-MONSTER:('@',"inmate"),random
-MONSTER:('@',"inmate"),random
 # Corrupt guards
 MONSTER[50%]:('@',"prison guard"),random
 MONSTER[50%]:('@',"prison guard"),random
@@ -275,7 +273,7 @@ MONSTER:('&',"lava demon"),(26,14),hostile,awake
 # Elite guard
 MONSTER:(''',"iron golem"),(04,13),hostile
 # Objects
-OBJECT:('0',"heavy iron ball"),(38,10),blessed,0,NAME:"The Iron Ball of Liberation"
+OBJECT:('0',"heavy iron ball"),(31,10),blessed,0,NAME:"The Iron Ball of Liberation"
 OBJECT:('(',"chest"),(55,18),blessed,2
 # Warden Arianna
 MONSTER:('@',"Warden Arianna"),(31,10),hostile {
@@ -312,7 +310,7 @@ MAP
 |....|...|...F.......|...|...F.......|...|...F.......|...|...F.............|
 |....|---|---|.......|---|---|.......|---|---|.......|---|---|.............|
 |....F...|...|.......F...|...|.......F...|...|.......F...|...|.............|
-|....|...|...F.......|...|...F.......|...|...F.......|...|...F.............|
+|....|...|...F.......|...|...........|...|...F.......|...|...F.............|
 |....|---|---|.......|---|---|.......|---|---|.......|---|---|.............|
 |........|...|.......................F...|...|.............................|
 |....|...|...F.......................|...|...F.............................|
@@ -338,7 +336,7 @@ MONSTER:('@',"inmate"),(06,05)
 MONSTER:(' ',"ghost"),(42,17),"Orzo the Inmate"
 MONSTER[50%]:(' ',"ghost"),(40,18),"Fredgar the Inmate"
 MONSTER[50%]:(' ',"ghost"),(06,12),"Rastilon the Inmate"
-MONSTER:('Z',"skeleton"),(28,15)
+MONSTER:('Z',"skeleton"),(28,15),awake
 # Bugs and snakes
 MONSTER:('S',"pit viper"),(06,17)
 MONSTER:('x',"xan"),random
@@ -382,11 +380,18 @@ MONSTER:('@',"miner"),random,peaceful
 # Earth creatures
 MONSTER:('X',"xorn"),random
 MONSTER:('E',"earth elemental"),random
+MONSTER:('X',"xorn"),random
+MONSTER:('E',"earth elemental"),random
 # Other nasties
 MONSTER[50%]:('t',"lurker above"),random
 MONSTER[50%]:('t',"trapper"),random
+MONSTER[50%]:('t',"lurker above"),random
+MONSTER[50%]:('t',"trapper"),random
+MONSTER[50%]:('p',"rock piercer"),random
 MONSTER[50%]:('p',"rock piercer"),random
 MONSTER[50%]:('p',"iron piercer"),random
+MONSTER[50%]:('p',"iron piercer"),random
+MONSTER[50%]:('p',"glass piercer"),random
 MONSTER[50%]:('p',"glass piercer"),random
 # Tools and corpses
 OBJECT[50%]:('(', "pick-axe"), random
@@ -403,6 +408,10 @@ TRAP: "pit", random
 TRAP: "pit", random
 TRAP: "pit", random
 TRAP: "pit", random
+TRAP: "falling rock", random
+TRAP: "falling rock", random
+TRAP: "falling rock", random
+TRAP: "falling rock", random
 TRAP: "web", random
 TRAP: "web", random
 

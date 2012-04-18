@@ -1,4 +1,4 @@
-Convict role patch v0.6 for NetHack 3.4.3
+Convict role patch v0.7 for NetHack 3.4.3
 Karl Garrison <kgarrison@pobox.com>
 
 
@@ -37,12 +37,13 @@ Spoiler Information
 ~~~~~~~~~~~~~~~~~~~
 
 There may be a few surprises to this role for the unaware.  They start
-out with a small amouint of bad luck, which times out, as well as a
-negative alignment ("You have transgressed").  This means that a
+with a negative alignment ("You have transgressed").  This means that a
 Convict will not be able to pray successfully early on.  Some time and
 killing of monsters will make up for this before too long, though.
 They also start the game on the verge of hungry, which also makes the
-very early game challenging for Convicts.
+very early game challenging for Convicts.  On the bright side, it takes
+them longer to progress from hungry to weak, etc, due to their higher
+tolerance for irregular meals.
 
 Stats: Excellent CON, good STR, average DEX and INT, poor WIS and CHA.
 
@@ -74,6 +75,9 @@ will remember the player.
 Guards: Guards (town watch and vault guards) who see a Convict will
 recognize him from wanted posters, and immediately become hostile.
 
+Hunger: Convicts start on the verge of hungry, but the effects of
+hunger kick in a bit more slowly for this role, due to their learned
+tolerance of inadequate nutrition.
 
 Weapon Skills:
 

@@ -2359,6 +2359,10 @@ gethungry()	/* as time goes by - called by moveloop() and domove() */
 	if ((!u.usleep || !rn2(10))	/* slow metabolic rate while asleep */
 		&& (carnivorous(youmonst.data) || herbivorous(youmonst.data) ||
 		    is_vampire(youmonst.data))
+#ifdef CONVICT
+		/* Convicts can last twice as long at hungry and below */
+		&& (!Role_if(PM_CONVICT) || (moves % 2) || (u.uhs < HUNGRY))
+#endif /* CONVICT */
 		&& !Slow_digestion)
 	    u.uhunger--;		/* ordinary food consumption */
 
