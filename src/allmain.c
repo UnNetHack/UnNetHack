@@ -606,6 +606,7 @@ boolean new_game;	/* false => restoring an old game */
     char buf[BUFSZ];
     boolean currentgend = Upolyd ? u.mfemale : flags.female;
     const char *role_name;
+    char *annotation;
 
     /*
      * The "welcome back" message always describes your innate form
@@ -633,6 +634,11 @@ boolean new_game;	/* false => restoring an old game */
 	  livelog_game_started(new_game ? "started" : "resumed",
 	                       buf, urace.adj, role_name);
 #endif
+	/* show level annotation when restoring the level */
+	if (!new_game && iflags.show_annotation &&
+	    (annotation = get_annotation(&u.uz))) {
+		You("annotated this level: %s", annotation);
+	}
 }
 
 #ifdef POSITIONBAR
