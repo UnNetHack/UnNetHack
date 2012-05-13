@@ -1530,11 +1530,15 @@ dump_screen()
 		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_tree\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == ICE)
 		Sprintf(tmpbuf, "<span class=\"nh_ice\">%s</span>", html_c);
-	    else if (oclass < 0 && glyph_is_trap(glyph))
+	    else if (oclass < 0 && glyph_is_trap(glyph)) {
+		/* See bug C343-20, the level data can actually be gone
+		 * already, even though the map is still showing a trap.
+		 * Thus prevent null pointer crashes. */
+		struct trap *t = t_at(x,y);
 		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_color_%d\">%s</span>",
-				defsyms[trap_to_defsym(t_at(x,y)->ttyp)].explanation,
+				t ? defsyms[trap_to_defsym(t->ttyp)].explanation : "trap",
 				color, html_c);
-	    else {
+	    } else {
 		struct monst *mtmp = m_at(x,y);
 		if (mtmp && canspotmon(mtmp)) {
 			Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_color_%d\">%s</span>", m_monnam(mtmp), color, html_link(mtmp->data->mname, html_c));

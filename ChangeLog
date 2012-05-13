@@ -8,6 +8,11 @@
 
 	* New role: Convict class
 
+	* bug fixes:
+	  - Fixed crash when player gets killed when entering a new level and
+	    a trap on the previous level causes a null pointer dereference
+	    when writing the HTML map (related to C343-20).
+
 	* vanilla bug fixes:
 	  - Prevent the Book of the Dead from being destroyed when the
 	    player falls into lava. (from GruntHack)
