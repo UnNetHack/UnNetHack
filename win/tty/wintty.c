@@ -2300,7 +2300,7 @@ tty_end_menu(window, prompt)
 	len = strlen(curr->str) + 2;	/* extra space at beg & end */
 
 	if (curr->selector) {
-		/* extra space for keyboard accelator */
+		/* extra space for keyboard accelerator */
 		len += 4;
 		if (curr->glyph != NO_GLYPH &&
 		    !iflags.vanilla_ui_behavior) {
