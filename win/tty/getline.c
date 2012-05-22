@@ -68,10 +68,21 @@ getlin_hook_proc hook;
 #endif /* not NEWAUTOCOMP */
 			break;
 		}
-		if(c == '\033') {
-			*obufp = c;
-			obufp[1] = 0;
-			break;
+		if (c == '\033') {
+			/* player pressed cursor keys, clear input string */
+			if (obufp[0] != '\0') {
+				obufp[0] = 0;
+				bufp = obufp;
+				tty_clear_nhwindow(WIN_MESSAGE);
+				cw->maxcol = cw->maxrow;
+				addtopl(query);
+				addtopl(" ");
+				addtopl(obufp);
+			} else {
+				*obufp = c;
+				obufp[1] = 0;
+				break;
+			}
 		}
 		if (ttyDisplay->intr) {
 		    ttyDisplay->intr--;
