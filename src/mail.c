@@ -706,8 +706,8 @@ struct obj *otmp;
 		/* interface changes */
 		"'X' toggles twoweaponing.",
 		"Autopickup never picks up dropped items if pickup_dropped is set to false.",
-		"Ctrl-e automatically writes resp. engraves \"Elbereth\" for you.",
-		"Ctrl-o resp. #overview lists interesting levels you already visited.",
+		"Ctrl-e automatically writes or engraves \"Elbereth\" for you.",
+		"Ctrl-o (or #overview) lists interesting levels you already visited.",
 		"Press inventory letter for a menu of possible actions.",
 		"Pressing 'v' lets you explore faster.",
 		"Unlocked doors will open when you walk into them.",
