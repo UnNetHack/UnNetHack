@@ -16,6 +16,8 @@
 	* vanilla bug fixes:
 	  - Prevent the Book of the Dead from being destroyed when the
 	    player falls into lava. (from GruntHack)
+	  - Fix security bug in options handler (reported by Matthew Daley,
+	    fixed by Pasi Kallinen)
 
 2012-04-01  UnNetHack 4.0.0
 	* Uncursed and blessed scrolls of magic mapping reveal secret doors

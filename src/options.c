@@ -787,7 +787,7 @@ char *tp;
 		for (; (index("0123456789",*cp)) && (dcount++ < 3); cp++)
 		    cval = (cval * 10) + (*cp - '0');
 	}
-	else if (*cp == '\\')		/* C-style character escapes */
+	else if (*cp == '\\' && cp[1] != '\0')	/* C-style character escapes */
 	{
 	    switch (*++cp)
 	    {
@@ -800,13 +800,17 @@ char *tp;
 	    }
 	    cp++;
 	}
-	else if (*cp == '^')		/* expand control-character syntax */
+	else if (*cp == '^' && cp[1] != '\0')	/* expand control-character syntax */
 	{
 	    cval = (*++cp & 0x1f);
 	    cp++;
 	}
-	else
+	else if (*cp != '\0') {
 	    cval = *cp++;
+	} else {
+	    cval = 0;
+	    meta = 0;
+	}
 	if (meta)
 	    cval |= 0x80;
 	*tp++ = cval;
