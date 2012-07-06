@@ -1,6 +1,8 @@
 2012-XX-XX  UnNetHack 4.X.X
 	* Mind flayer attacks only cause physical damage and int drain
 	* Wands and spells of digging are no longer restricted on maze levels
+	* Sokoban luck penalty removed and added tracking of solving Sokoban
+	  without any tricks
 
 	* removed monsters:
 	  - anti-matter vortex

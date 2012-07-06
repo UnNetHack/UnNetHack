@@ -646,7 +646,7 @@ hurtle(dx, dy, range, verbose)
 	m_shot.n = m_shot.i;	/* make current shot be the last */
     }
     if (In_sokoban(&u.uz))
-	change_luck(-1);	/* Sokoban guilt */
+	sokoban_trickster();	/* Sokoban guilt */
     uc.x = u.ux;
     uc.y = u.uy;
     /* this setting of cc is only correct if dx and dy are [-1,0,1] only */

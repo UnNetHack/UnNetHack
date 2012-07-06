@@ -77,6 +77,7 @@ struct u_conduct {		/* number of times... */
 	long	bones;		/* encountered bones level */
 	long	non_racial_armor;	/* put on non-racial armor */
 	long	non_racial_weapons;	/* wielded non-racial weapons */
+	long	sokoban;		/* how many times violated sokoban "rules" */
 				/* genocides already listed at end of game */
 };
 

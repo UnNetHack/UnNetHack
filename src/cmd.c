@@ -1601,6 +1601,14 @@ boolean want_disp;
 	    you_have_X(buf);
 	}
 
+	if ((wizard || final) && !u.uconduct.sokoban) {
+		you_have_never("used any Sokoban shortcuts");
+	} else if (wizard || final) {
+		Sprintf(buf, "used Sokoban shortcuts %ld time%s",
+			u.uconduct.sokoban, plur(u.uconduct.sokoban));
+		you_have_X(buf);
+	}
+
 	dump_list_end();
 	dump("", "");
 
@@ -2915,6 +2923,20 @@ boolean paranoid;
 		return (!(strcmp (buf, "yes"))) ? 'y' : 'n';
 	} else {
 		return yn(query);
+	}
+}
+
+/**
+ * Tracks how many times the player "cheated" in Sokoban.
+ *
+ * Stops tracking after the player found the sokoban prize.
+ */
+void
+sokoban_trickster()
+{
+	if (!achieve.finish_sokoban) {
+		/* not yet found the sokoban prize */
+		u.uconduct.sokoban += 1;
 	}
 }
 

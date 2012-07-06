@@ -1376,7 +1376,7 @@ int magic; /* 0=Physical, otherwise skill level */
 
 	    /* A little Sokoban guilt... */
 	    if (In_sokoban(&u.uz))
-		change_luck(-1);
+		sokoban_trickster();
 
 	    teleds(cc.x, cc.y, TRUE);
 	    nomul(-1, "jumping around");

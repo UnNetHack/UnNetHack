@@ -1520,7 +1520,7 @@ register struct obj	*sobj;
 	    			sobj->blessed ? "around" : "above");
 	    	known = 1;
 	    	if (In_sokoban(&u.uz))
-	    	    change_luck(-1);	/* Sokoban guilt */
+	    	    sokoban_trickster();	/* Sokoban guilt */
 
 	    	/* Loop through the surrounding squares */
 	    	if (!sobj->cursed) for (x = u.ux-1; x <= u.ux+1; x++) {
