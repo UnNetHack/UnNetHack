@@ -13,6 +13,9 @@
 	* new monsters:
 	  - locusts (from SporkHack)
 
+	* user interface improvements:
+	  - HP notify, showing HP changes in the message area (from NAO)
+
 	* bug fixes:
 	  - Fixed crash when player gets killed when entering a new level and
 	    a trap on the previous level causes a null pointer dereference

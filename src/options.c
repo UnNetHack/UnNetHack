@@ -116,6 +116,7 @@ static struct Bool_Opt
 	{"hilite_pet",    &iflags.wc_hilite_pet, TRUE, SET_IN_GAME},	/*WC*/
 	{"hint", &iflags.hint, TRUE, SET_IN_FILE},
 	{"hitpointbar", &flags.hitpointbar, TRUE, SET_IN_GAME},
+	{"hp_notify", &iflags.hp_notify, FALSE, SET_IN_GAME},
 #ifdef ASCIIGRAPH
 	{"IBMgraphics", &iflags.IBMgraphics, FALSE, SET_IN_GAME},
 #else
@@ -338,6 +339,7 @@ static struct Comp_Opt
 						8, DISP_IN_GAME },
 	{ "horsename", "the name of your (first) horse (e.g., horsename:Silver)",
 						PL_PSIZ, DISP_IN_GAME },
+	{ "hp_notify_fmt", "hp_notify format string", 20, SET_IN_GAME },
 	{ "map_mode", "map display mode under Windows", 20, DISP_IN_GAME },	/*WC*/
 	{ "menucolor", "set menu colors", PL_PSIZ, SET_IN_FILE },
 	{ "menustyle", "user interface for object selection",
@@ -1825,6 +1827,16 @@ boolean tinitial, tfrom_file;
 		    badoption(opts);
 #endif
 	    return;
+	}
+
+	fullname = "hp_notify_fmt";
+	if (match_optname(opts, fullname, sizeof("hp_notify_fmt")-1, TRUE)) {
+		if ((op = string_for_opt(opts, FALSE)) != 0) {
+			if (iflags.hp_notify_fmt) free(iflags.hp_notify_fmt);
+			iflags.hp_notify_fmt = (char *)alloc(strlen(op) + 1);
+			Strcpy(iflags.hp_notify_fmt, op);
+		}
+		return;
 	}
 
 #ifdef EXOTIC_PETS
@@ -3903,6 +3915,8 @@ char *buf;
 	else if (!strcmp(optname, "dumpfile"))
 		Sprintf(buf, "%s", dump_fn[0] ? dump_fn: none );
 #endif
+	else if (!strcmp(optname, "hp_notify_fmt"))
+		Sprintf(buf, "%s", iflags.hp_notify_fmt ? iflags.hp_notify_fmt : "[HP%c%a=%h]" );
 	else if (!strcmp(optname, "dungeon"))
 		Sprintf(buf, "%s", to_be_done);
 	else if (!strcmp(optname, "effects"))

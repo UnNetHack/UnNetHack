@@ -338,6 +338,8 @@ struct instance_flags {
 	boolean wc2_newcolors;		/* try to use slashem like colors including
 					 * dark-gray to represent black object */
 
+	boolean hp_notify;
+	char *hp_notify_fmt;
 	boolean  show_buc;	/* always show BUC status */
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
 	boolean	 obsolete;	/* obsolete options can point at this, it isn't used */

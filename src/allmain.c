@@ -17,6 +17,76 @@ STATIC_DCL void FDECL(interrupt_multi, (const char *,int,int));
 
 #ifdef OVL0
 
+static int prev_hp_notify;
+
+char *
+hpnotify_format_str(char *str)
+{
+    static char buf[128];
+    char *f, *p, *end;
+    int ispercent = 0;
+
+    buf[0] = '\0';
+
+    if (!str) return NULL;
+
+    f = str;
+    p = buf;
+    end = buf + sizeof(buf) - 10;
+
+    while (*f) {
+      if (ispercent) {
+	switch (*f) {
+	case 'a':
+	    snprintf (p, end + 1 - p, "%ld", (long)abs(uhp()-prev_hp_notify));
+	  while (*p != '\0')
+	    p++;
+	  break;
+        case 'c':
+	    snprintf (p, end + 1 - p, "%c", (prev_hp_notify > uhp() ? '-' : '+'));
+	  p++;
+	  break;
+	case 'm':
+	    snprintf (p, end + 1 - p, "%ld", (long)uhpmax());
+	  while (*p != '\0')
+	    p++;
+	  break;
+	case 'H':
+	    if (uhp() == uhpmax()) {
+	    snprintf (p, end + 1 - p, "%s", "max");
+	  } else {
+		snprintf (p, end + 1 - p, "%ld", (long)uhp());
+	  }
+	  while (*p != '\0')
+	    p++;
+	  break;
+	case 'h':
+	    snprintf (p, end + 1 - p, "%ld", (long)uhp());
+	  while (*p != '\0')
+	    p++;
+	  break;
+	default:
+	  *p = *f;
+	  if (p < end)
+	    p++;
+	}
+	ispercent = 0;
+      } else {
+	if (*f == '%')
+	  ispercent = 1;
+	else {
+	  *p = *f;
+	  if (p < end)
+	    p++;
+	}
+      }
+      f++;
+    }
+    *p = '\0';
+
+    return buf;
+}
+
 void
 moveloop()
 {
@@ -61,6 +131,7 @@ moveloop()
 
     u.uz0.dlevel = u.uz.dlevel;
     youmonst.movement = NORMAL_SPEED;	/* give the hero some movement points */
+    prev_hp_notify = uhp();
 #ifdef WHEREIS_FILE
     touch_whereis();
 #endif
@@ -358,6 +429,11 @@ moveloop()
 #endif
 
 	if(flags.botl || flags.botlx) bot();
+
+	if (iflags.hp_notify && (prev_hp_notify != uhp())) {
+	  pline("%s", hpnotify_format_str(iflags.hp_notify_fmt ? iflags.hp_notify_fmt : "[HP%c%a=%h]"));
+	  prev_hp_notify = uhp();
+	}
 
 	flags.move = 1;
 
