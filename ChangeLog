@@ -10,6 +10,9 @@
 
 	* New role: Convict class
 
+	* new monsters:
+	  - locusts (from SporkHack)
+
 	* bug fixes:
 	  - Fixed crash when player gets killed when entering a new level and
 	    a trap on the previous level causes a null pointer dereference
