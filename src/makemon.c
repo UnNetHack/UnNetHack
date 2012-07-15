@@ -892,7 +892,7 @@ register int	x, y;
 register int	mmflags;
 {
 	register struct monst *mtmp;
-	int mndx, mcham, ct, mitem, xlth;
+	int mndx, mcham, ct, mitem, xlth, mhitdie;
 	boolean anymon = (!ptr);
 	boolean byyou = (x == u.ux && y == u.uy);
 	boolean allow_minvent = ((mmflags & NO_MINVENT) == 0);
@@ -983,8 +983,10 @@ register int	mmflags;
 	if (is_golem(ptr)) {
 	    mtmp->mhpmax = mtmp->mhp = golemhp(mndx);
 	} else if (is_rider(ptr)) {
-	    /* We want low HP, but a high mlevel so they can attack well */
-	    mtmp->mhpmax = mtmp->mhp = d(10,8);
+	    /* We want low HP, but a high mlevel so they can attack well
+		  *
+		  * DSR 10/31/09: What, are you nuts?  They're way too crunchy. */
+	    mtmp->mhpmax = mtmp->mhp = 100 + d(8,8);
 	} else if (ptr->mlevel > 49) {
 	    /* "special" fixed hp monster
 	     * the hit points are encoded in the mlevel in a somewhat strange
@@ -992,17 +994,32 @@ register int	mmflags;
 	     * above the 1..49 that indicate "normal" monster levels */
 	    mtmp->mhpmax = mtmp->mhp = 2*(ptr->mlevel - 6);
 	    mtmp->m_lev = mtmp->mhp / 4;	/* approximation */
-	} else if (ptr->mlet == S_DRAGON && mndx >= PM_GRAY_DRAGON) {
-	    /* adult dragons */
-	    mtmp->mhpmax = mtmp->mhp = (int) (In_endgame(&u.uz) ?
-		(8 * mtmp->m_lev) : (4 * mtmp->m_lev + d((int)mtmp->m_lev, 4)));
+	} else if (ptr->mlet == S_DRAGON && mndx >= PM_GRAY_DRAGON && In_endgame(&u.uz)) {
+	    /* dragons in the endgame are always at least average HP
+		  * note modified hit die here as well; they're MZ_GIGANTIC */
+	    mtmp->mhpmax = mtmp->mhp = 7 * mtmp->m_lev + d((int)mtmp->m_lev, 8);
 	} else if (!mtmp->m_lev) {
-	    mtmp->mhpmax = mtmp->mhp = rnd(4);
+	    mtmp->mhpmax = mtmp->mhp = rnd(4);	 /* level 0 monsters are pathetic */
 	} else if (ptr->msound == MS_LEADER) {
 		/* Quest Leaders need to be fairly burly */
 		mtmp->mhpmax = mtmp->mhp = 135 + rnd(30);
 	} else {
-	    mtmp->mhpmax = mtmp->mhp = d((int)mtmp->m_lev, 8);
+		/* plain old ordinary monsters; modify hit die based on size;
+		 * big-ass critters like mastodons should have big-ass HP, and
+		 * small things like bees and locusts should get less 
+		 */
+		switch (mtmp->data->msize) {
+			case MZ_TINY: mhitdie = 4; break;
+			case MZ_SMALL: mhitdie = 6; break;
+			case MZ_LARGE: mhitdie = 10; break;
+			case MZ_HUGE: mhitdie = 12; break;
+			case MZ_GIGANTIC: mhitdie = 15; break;
+			case MZ_MEDIUM: 
+			default:	
+				mhitdie = 8;
+				break;
+		}
+	    mtmp->mhpmax = mtmp->mhp = d((int)mtmp->m_lev, mhitdie);
 	    if (is_home_elemental(ptr))
 		mtmp->mhpmax = (mtmp->mhp *= 3);
 	}
