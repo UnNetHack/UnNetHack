@@ -797,13 +797,13 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 		    /* if sorting, print type name (once only) */
 		    if (qflags & INVORDER_SORT && !printed_type_name) {
 			any.a_obj = (struct obj *) 0;
-			add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings,
 					let_to_name(*pack, FALSE), MENU_UNSELECTED);
 			printed_type_name = TRUE;
 		    }
 
 		    any.a_obj = curr;
-		    add_menu(win, obj_to_glyph(curr), &any,
+		    add_menu(win, obj_to_glyph(curr), curr->quan, &any,
 			    qflags & USE_INVLET ? curr->invlet : 0,
 			    def_oc_syms[(int)objects[curr->otyp].oc_class],
 			    ATR_NONE, doname_with_price(curr), MENU_UNSELECTED);
@@ -908,7 +908,7 @@ int how;			/* type of query */
 		invlet = 'a';
 		any.a_void = 0;
 		any.a_int = ALL_TYPES_SELECTED;
-		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
 		       (qflags & WORN_TYPES) ? "All worn types" : "All types",
 			MENU_UNSELECTED);
 		invlet = 'b';
@@ -925,7 +925,7 @@ int how;			/* type of query */
 		   if (!collected_type_name) {
 			any.a_void = 0;
 			any.a_int = curr->oclass;
-			add_menu(win, NO_GLYPH, &any, invlet++,
+			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet++,
 				def_oc_syms[(int)objects[curr->otyp].oc_class],
 				ATR_NONE, let_to_name(*pack, FALSE),
 				MENU_UNSELECTED);
@@ -944,7 +944,7 @@ int how;			/* type of query */
 		invlet = 'u';
 		any.a_void = 0;
 		any.a_int = 'u';
-		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
 			"Unpaid items", MENU_UNSELECTED);
 	}
 	/* billed items: checked by caller, so always include if BILLED_TYPES */
@@ -952,14 +952,14 @@ int how;			/* type of query */
 		invlet = 'x';
 		any.a_void = 0;
 		any.a_int = 'x';
-		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
 			 "Unpaid items already used up", MENU_UNSELECTED);
 	}
 	if (qflags & CHOOSE_ALL) {
 		invlet = 'A';
 		any.a_void = 0;
 		any.a_int = 'A';
-		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
 			(qflags & WORN_TYPES) ?
 			"Auto-select every item being worn" :
 			"Auto-select every item", MENU_UNSELECTED);
@@ -969,7 +969,7 @@ int how;			/* type of query */
 		invlet = 'I';
 		any.a_void = 0;
 		any.a_int = 'I';
-		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
 			"Unidentified items", MENU_UNSELECTED);
 	}
 	/* items with b/u/c/unknown if there are any */
@@ -977,28 +977,28 @@ int how;			/* type of query */
 		invlet = 'B';
 		any.a_void = 0;
 		any.a_int = 'B';
-		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
 			"Items known to be Blessed", MENU_UNSELECTED);
 	}
 	if (do_cursed) {
 		invlet = 'C';
 		any.a_void = 0;
 		any.a_int = 'C';
-		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
 			"Items known to be Cursed", MENU_UNSELECTED);
 	}
 	if (do_uncursed) {
 		invlet = 'U';
 		any.a_void = 0;
 		any.a_int = 'U';
-		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
 			"Items known to be Uncursed", MENU_UNSELECTED);
 	}
 	if (do_buc_unknown) {
 		invlet = 'X';
 		any.a_void = 0;
 		any.a_int = 'X';
-		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
 			"Items of unknown B/C/U status",
 			MENU_UNSELECTED);
 	}
@@ -2476,19 +2476,19 @@ boolean outokay, inokay;
     if (outokay) {
 	any.a_int = 1;
 	Sprintf(buf,"Take %s out of %s", something, the(xname(obj)));
-	add_menu(win, NO_GLYPH, &any, *menuselector, 0, ATR_NONE,
+	add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, *menuselector, 0, ATR_NONE,
 			buf, MENU_UNSELECTED);
     }
     menuselector++;
     if (inokay) {
 	any.a_int = 2;
 	Sprintf(buf,"Put %s into %s", something, the(xname(obj)));
-	add_menu(win, NO_GLYPH, &any, *menuselector, 0, ATR_NONE, buf, MENU_UNSELECTED);
+	add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, *menuselector, 0, ATR_NONE, buf, MENU_UNSELECTED);
     }
     menuselector++;
     if (outokay && inokay) {
 	any.a_int = 3;
-	add_menu(win, NO_GLYPH, &any, *menuselector, 0, ATR_NONE,
+	add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, *menuselector, 0, ATR_NONE,
 			"Both of the above", MENU_UNSELECTED);
     }
     end_menu(win, prompt);

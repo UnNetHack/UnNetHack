@@ -546,7 +546,7 @@ tutorial_redisplay()
       qt_com_firstline(i.a_int, namebuf);
       /* adding 10 to namebuf removes the 'Tutorial: ' at the start */
       name = *namebuf ? namebuf + 10 : "(not found)";
-      add_menu(tempwin, NO_GLYPH, &i, 0, 0, ATR_NONE, name, FALSE);
+      add_menu(tempwin, NO_GLYPH, MENU_DEFCNT, &i, 0, 0, ATR_NONE, name, FALSE);
     }
   }
   end_menu(tempwin, "Which tutorial?");

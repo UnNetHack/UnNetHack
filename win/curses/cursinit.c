@@ -732,19 +732,19 @@ void curses_choose_character()
 	    win = curses_get_wid(NHW_MENU);
         curses_create_nhmenu(win);
 	    any.a_int = 1;
-	    curses_add_menu(win, NO_GLYPH, &any, 'v', 0, ATR_NONE,
+	    curses_add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'v', 0, ATR_NONE,
 		     "lawful female dwarf Valkyrie (uses melee and thrown weapons)",
 		     MENU_UNSELECTED);
 	    any.a_int = 2;
-	    curses_add_menu(win, NO_GLYPH, &any, 'w', 0, ATR_NONE,
+	    curses_add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'w', 0, ATR_NONE,
 		     "chaotic male elf Wizard (relies mostly on spells)",
 		     MENU_UNSELECTED);
 	    any.a_int = 3;
-	    curses_add_menu(win, NO_GLYPH, &any, 'R', 0, ATR_NONE,
+	    curses_add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'R', 0, ATR_NONE,
 		     "neutral female human Ranger (good with ranged combat)",
 		     MENU_UNSELECTED);
 	    any.a_int = 4;
-	    curses_add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE,
+	    curses_add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'q', 0, ATR_NONE,
 		     "quit", MENU_UNSELECTED);
 	    curses_end_menu(win, "What character do you want to try?");
 	    n = curses_select_menu(win, PICK_ONE, &selected);
@@ -1013,19 +1013,19 @@ int curses_character_dialog(const char** choices, const char *prompt)
         }
 
         identifier.a_int = (count + 1); /* Must be non-zero */
-        curses_add_menu(wid, NO_GLYPH, &identifier, curletter, 0,
+        curses_add_menu(wid, NO_GLYPH, MENU_DEFCNT, &identifier, curletter, 0,
          A_NORMAL, choices[count], FALSE);
         used_letters[count] = curletter;
     }
 
     /* Random Selection */
     identifier.a_int = ROLE_RANDOM;
-    curses_add_menu(wid, NO_GLYPH, &identifier, '*', 0, A_NORMAL, "Random",
+    curses_add_menu(wid, NO_GLYPH, MENU_DEFCNT, &identifier, '*', 0, A_NORMAL, "Random",
      FALSE);    
     
     /* Quit prompt */
     identifier.a_int = ROLE_NONE;
-    curses_add_menu(wid, NO_GLYPH, &identifier, 'q', 0, A_NORMAL, "Quit",
+    curses_add_menu(wid, NO_GLYPH, MENU_DEFCNT, &identifier, 'q', 0, A_NORMAL, "Quit",
      FALSE);    
     curses_end_menu(wid, prompt);
     ret = curses_select_menu(wid, PICK_ONE, &selected);

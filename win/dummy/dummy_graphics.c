@@ -525,13 +525,13 @@ add_menu(windid window, int glyph, const anything identifier,
                 -- If you want this choice to be preselected when the
                    menu is displayed, set preselected to TRUE.
 */
-void dummy_add_menu(winid wid, int glyph, const ANY_P * identifier,
+void dummy_add_menu(winid wid, int glyph, int cnt, const ANY_P * identifier,
 		CHAR_P accelerator, CHAR_P group_accel, int attr, 
 		const char *str, BOOLEAN_P presel)
 {
 	/* Do Nothing */
-	printf("dummy_add_menu(%s, %d, %d, %c, %c, %d, %s, %d\n", winid2str(wid),
-	       glyph, (int)identifier, accelerator, group_accel, attr, str, presel);
+	printf("dummy_add_menu(%s, %d, %d, %d, %c, %c, %d, %s, %d\n", winid2str(wid),
+	       glyph, cnt, (int)identifier, accelerator, group_accel, attr, str, presel);
 }
 
 /*

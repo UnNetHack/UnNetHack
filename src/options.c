@@ -3238,7 +3238,7 @@ doset_add_menu(win, option, indexoffset)
 	Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ", option, value);
     else
 	Sprintf(buf, fmtstr_doset_add_menu_tab, option, value);
-    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
+    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 }
 
 /* Changing options via menu by Per Liboriussen */
@@ -3261,7 +3261,7 @@ doset()
 	start_menu(tmpwin);
 
 	any.a_void = 0;
- add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+ add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings,
 		 "Booleans (selecting will toggle value):", MENU_UNSELECTED);
 	any.a_int = 0;
 	/* first list any other non-modifiable booleans, then modifiable ones */
@@ -3305,15 +3305,15 @@ doset()
  		    else
 			Sprintf(buf, "%s\t[%s]",
 			    boolopt[i].name, *bool_p ? "true" : "false");
-		    add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
+		    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0,
 			     ATR_NONE, buf, MENU_UNSELECTED);
 		}
 
 	boolcount = i;
 	indexoffset = boolcount;
 	any.a_void = 0;
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
- add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+ add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings,
 		 "Compounds (selecting will prompt for new value):",
 		 MENU_UNSELECTED);
 
@@ -3359,13 +3359,13 @@ doset()
 	any.a_int = -1;
 	Sprintf(buf, "autopickup exceptions (%d currently set)",
 		count_ape_maps((int *)0, (int *)0));
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 
 #endif /* AUTOPICKUP_EXCEPTIONS */
 #ifdef PREFIXES_IN_USE
 	any.a_void = 0;
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings,
 		 "Variable playground locations:", MENU_UNSELECTED);
 	for (i = 0; i < PREFIX_COUNT; i++)
 		doset_add_menu(tmpwin, fqn_prefix_names[i], 0);
@@ -3457,7 +3457,7 @@ boolean setinitial,setfromfile;
     		/* note: separate `style_name' variable used
 		   to avoid an optimizer bug in VAX C V2.3 */
 		any.a_int = i + 1;
-		add_menu(tmpwin, NO_GLYPH, &any, *style_name, 0,
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, *style_name, 0,
 			 ATR_NONE, style_name, MENU_UNSELECTED);
         }
 	end_menu(tmpwin, "Select menustyle:");
@@ -3475,8 +3475,8 @@ boolean setinitial,setfromfile;
 	for (i = 0; i < SIZE(burdentype); i++) {
 		burden_name = burdentype[i];
 		any.a_int = i + 1;
-		add_menu(tmpwin, NO_GLYPH, &any, burden_letters[i], 0,
-			 ATR_NONE, burden_name, MENU_UNSELECTED);
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, burden_letters[i],
+			 0, ATR_NONE, burden_name, MENU_UNSELECTED);
         }
 	end_menu(tmpwin, "Select encumbrance level:");
 	if (select_menu(tmpwin, PICK_ONE, &burden_pick) > 0) {
@@ -3509,7 +3509,7 @@ boolean setinitial,setfromfile;
 	start_menu(tmpwin);
 	for (i = 0; i < NUM_PARANOID_OPTIONS; i++) {
 		any.a_int = i + 1;
-		add_menu(tmpwin, NO_GLYPH, &any, paranoid_names[i][0], 0,
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, paranoid_names[i][0], 0,
 		         ATR_NONE, paranoid_names[i],
 		         *paranoid_bools[i] ? MENU_SELECTED : MENU_UNSELECTED);
 		paranoid_settings[i] = 0;
@@ -3550,7 +3550,7 @@ boolean setinitial,setfromfile;
 	for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
 		disclosure_name = disclosure_names[i];
 		any.a_int = i + 1;
-		add_menu(tmpwin, NO_GLYPH, &any, disclosure_options[i], 0,
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, disclosure_options[i], 0,
 			 ATR_NONE, disclosure_name, MENU_UNSELECTED);
 		disc_cat[i] = 0;
         }
@@ -3573,19 +3573,19 @@ boolean setinitial,setfromfile;
 	        tmpwin = create_nhwindow(NHW_MENU);
 		start_menu(tmpwin);
 		any.a_char = DISCLOSE_NO_WITHOUT_PROMPT;
-		add_menu(tmpwin, NO_GLYPH, &any, 'a', 0,
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 'a', 0,
 			ATR_NONE,"Never disclose and don't prompt", MENU_UNSELECTED);
 		any.a_void = 0;
 		any.a_char = DISCLOSE_YES_WITHOUT_PROMPT;
-		add_menu(tmpwin, NO_GLYPH, &any, 'b', 0,
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 'b', 0,
 			ATR_NONE,"Always disclose and don't prompt", MENU_UNSELECTED);
 		any.a_void = 0;
 		any.a_char = DISCLOSE_PROMPT_DEFAULT_NO;
-		add_menu(tmpwin, NO_GLYPH, &any, 'c', 0,
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 'c', 0,
 			ATR_NONE,"Prompt and default answer to \"No\"", MENU_UNSELECTED);
 		any.a_void = 0;
 		any.a_char = DISCLOSE_PROMPT_DEFAULT_YES;
-		add_menu(tmpwin, NO_GLYPH, &any, 'd', 0,
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 'd', 0,
 			ATR_NONE,"Prompt and default answer to \"Yes\"", MENU_UNSELECTED);
 		end_menu(tmpwin, dbuf);
 		if (select_menu(tmpwin, PICK_ONE, &disclosure_option_pick) > 0) {
@@ -3604,7 +3604,7 @@ boolean setinitial,setfromfile;
 	for (i = 0; i < SIZE(runmodes); i++) {
 		mode_name = runmodes[i];
 		any.a_int = i + 1;
-		add_menu(tmpwin, NO_GLYPH, &any, *mode_name, 0,
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, *mode_name, 0,
 			 ATR_NONE, mode_name, MENU_UNSELECTED);
 	}
 	end_menu(tmpwin, "Select run/travel display mode:");
@@ -3622,16 +3622,16 @@ boolean setinitial,setfromfile;
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
 	any.a_char = 's';
-	add_menu(tmpwin, NO_GLYPH, &any, 's', 0,
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 's', 0,
 		ATR_NONE, "single", MENU_UNSELECTED);
 	any.a_char = 'c';
-	add_menu(tmpwin, NO_GLYPH, &any, 'c', 0,
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 'c', 0,
 		ATR_NONE, "combination", MENU_UNSELECTED);
 	any.a_char = 'f';
-	add_menu(tmpwin, NO_GLYPH, &any, 'f', 0,
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 'f', 0,
 		ATR_NONE, "full", MENU_UNSELECTED);
 	any.a_char = 'r';
-	add_menu(tmpwin, NO_GLYPH, &any, 'r', 0,
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 'r', 0,
 		ATR_NONE, "reversed", MENU_UNSELECTED);
 	end_menu(tmpwin, "Select message history display type:");
 	if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
@@ -3649,7 +3649,7 @@ boolean setinitial,setfromfile;
 	for (i = 0; i < SIZE(sortltype); i++) {
 	    sortl_name = sortltype[i];
 	    any.a_char = *sortl_name;
-	    add_menu(tmpwin, NO_GLYPH, &any, *sortl_name, 0,
+	    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, *sortl_name, 0,
 		     ATR_NONE, sortl_name, MENU_UNSELECTED);
 	}
 	end_menu(tmpwin, "Select loot sorting type:");
@@ -3671,16 +3671,16 @@ boolean setinitial,setfromfile;
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
 	any.a_int = ALIGN_TOP;
-	add_menu(tmpwin, NO_GLYPH, &any, 't', 0,
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 't', 0,
 		ATR_NONE, "top", MENU_UNSELECTED);
 	any.a_int = ALIGN_BOTTOM;
-	add_menu(tmpwin, NO_GLYPH, &any, 'b', 0,
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 'b', 0,
 		ATR_NONE, "bottom", MENU_UNSELECTED);
 	any.a_int = ALIGN_LEFT;
-	add_menu(tmpwin, NO_GLYPH, &any, 'l', 0,
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 'l', 0,
 		ATR_NONE, "left", MENU_UNSELECTED);
 	any.a_int = ALIGN_RIGHT;
-	add_menu(tmpwin, NO_GLYPH, &any, 'r', 0,
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 'r', 0,
 		ATR_NONE, "right", MENU_UNSELECTED);
 	Sprintf(abuf, "Select %s window placement relative to the map:",
 		msg ? "message" : "status");
@@ -3702,7 +3702,7 @@ boolean setinitial,setfromfile;
 	start_menu(tmpwin);
 	for (i = 0; i < SIZE(npchoices); i++) {
 		any.a_int = i + 1;
-		add_menu(tmpwin, NO_GLYPH, &any, npletters[i], 0,
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, npletters[i], 0,
 			 ATR_NONE, npchoices[i], MENU_UNSELECTED);
         }
 	end_menu(tmpwin, "Select number_pad mode:");
@@ -3735,7 +3735,7 @@ boolean setinitial,setfromfile;
 	start_menu(tmpwin);
 	for (i = 0; i < SIZE(mhchoices); i++) {
 		any.a_int = i + 1;
-		add_menu(tmpwin, NO_GLYPH, &any, npletters[i], 0,
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, npletters[i], 0,
 			 ATR_NONE, mhchoices[i], MENU_UNSELECTED);
         }
 	end_menu(tmpwin, "How to highlight menu headings:");
@@ -3779,7 +3779,7 @@ ape_again:
 	for (i = 0; i < SIZE(action_titles) ; i += 2) {
 		any.a_int++;
 		if (!totalapes && (i >= 2 && i < 6)) continue;
-		add_menu(tmpwin, NO_GLYPH, &any, *action_titles[i],
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, *action_titles[i],
 		      0, ATR_NONE, action_titles[i+1], MENU_UNSELECTED);
         }
 	end_menu(tmpwin, "Do what?");
@@ -3809,13 +3809,13 @@ ape_again:
 		    if (numapes[pass] == 0) continue;
 		    ape = iflags.autopickup_exceptions[pass];
 		    any.a_void = 0;
-		    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+		    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings,
 				(pass == 0) ? "Never pickup" : "Always pickup",
 				MENU_UNSELECTED);
 		    for (i = 0; i < numapes[pass] && ape; i++) {
 			any.a_void = (opt_idx == 1) ? 0 : ape;
 			Sprintf(apebuf, "\"%s\"", ape->pattern);
-			add_menu(tmpwin, NO_GLYPH, &any,
+			add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any,
 				0, 0, ATR_NONE, apebuf, MENU_UNSELECTED);
 			ape = ape->next;
 		    }
@@ -4569,7 +4569,7 @@ char *class_select;
 		}
 	}
 	any.a_int = *class_list;
-	add_menu(win, NO_GLYPH, &any, accelerator,
+	add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, accelerator,
 		  category ? *class_list : 0,
 		  ATR_NONE, buf, selected);
 	++class_list;

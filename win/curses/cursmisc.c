@@ -634,7 +634,7 @@ void curses_view_file(const char *filename, boolean must_exist)
     
     while (dlb_fgets(buf, BUFSZ, fp) != NULL)
     {
-        curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL, buf,
+        curses_add_menu(wid, NO_GLYPH, MENU_DEFCNT, identifier, 0, 0, A_NORMAL, buf,
          FALSE);
     }
     

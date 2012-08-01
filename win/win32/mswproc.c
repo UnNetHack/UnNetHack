@@ -406,7 +406,7 @@ give_up:	/* Quit */
 				} else 
 					Strcpy(rolenamebuf, roles[i].name.m);
 			}	
-			add_menu(win, NO_GLYPH, &any, thisch,
+			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, thisch,
 			    0, ATR_NONE, an(rolenamebuf), MENU_UNSELECTED);
 			lastch = thisch;
 		    }
@@ -415,10 +415,10 @@ give_up:	/* Quit */
 				    flags.initalign, PICK_RANDOM)+1;
 		if (any.a_int == 0)	/* must be non-zero */
 		    any.a_int = randrole()+1;
-		add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , '*', 0, ATR_NONE,
 				"Random", MENU_UNSELECTED);
 		any.a_int = i+1;	/* must be non-zero */
-		add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				"Quit", MENU_UNSELECTED);
 		Sprintf(pbuf, "Pick a role for your %s", plbuf);
 		end_menu(win, pbuf);
@@ -479,17 +479,17 @@ give_up:	/* Quit */
 			if (ok_race(flags.initrole, i, flags.initgend,
 							flags.initalign)) {
 			    any.a_int = i+1;	/* must be non-zero */
-			    add_menu(win, NO_GLYPH, &any, races[i].noun[0],
+			    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, races[i].noun[0],
 				0, ATR_NONE, races[i].noun, MENU_UNSELECTED);
 			}
 		    any.a_int = pick_race(flags.initrole, flags.initgend,
 					flags.initalign, PICK_RANDOM)+1;
 		    if (any.a_int == 0)	/* must be non-zero */
 			any.a_int = randrace(flags.initrole)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , '*', 0, ATR_NONE,
 				    "Random", MENU_UNSELECTED);
 		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				    "Quit", MENU_UNSELECTED);
 		    Sprintf(pbuf, "Pick the race of your %s", plbuf);
 		    end_menu(win, pbuf);
@@ -551,17 +551,17 @@ give_up:	/* Quit */
 			if (ok_gend(flags.initrole, flags.initrace, i,
 							    flags.initalign)) {
 			    any.a_int = i+1;
-			    add_menu(win, NO_GLYPH, &any, genders[i].adj[0],
+			    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, genders[i].adj[0],
 				0, ATR_NONE, genders[i].adj, MENU_UNSELECTED);
 			}
 		    any.a_int = pick_gend(flags.initrole, flags.initrace,
 					    flags.initalign, PICK_RANDOM)+1;
 		    if (any.a_int == 0)	/* must be non-zero */
 			any.a_int = randgend(flags.initrole, flags.initrace)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , '*', 0, ATR_NONE,
 				    "Random", MENU_UNSELECTED);
 		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				    "Quit", MENU_UNSELECTED);
 		    Sprintf(pbuf, "Pick the gender of your %s", plbuf);
 		    end_menu(win, pbuf);
@@ -622,17 +622,17 @@ give_up:	/* Quit */
 			if (ok_align(flags.initrole, flags.initrace,
 							flags.initgend, i)) {
 			    any.a_int = i+1;
-			    add_menu(win, NO_GLYPH, &any, aligns[i].adj[0],
+			    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, aligns[i].adj[0],
 				 0, ATR_NONE, aligns[i].adj, MENU_UNSELECTED);
 			}
 		    any.a_int = pick_align(flags.initrole, flags.initrace,
 					    flags.initgend, PICK_RANDOM)+1;
 		    if (any.a_int == 0)	/* must be non-zero */
 			any.a_int = randalign(flags.initrole, flags.initrace)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , '*', 0, ATR_NONE,
 				    "Random", MENU_UNSELECTED);
 		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				    "Quit", MENU_UNSELECTED);
 		    Sprintf(pbuf, "Pick the alignment of your %s", plbuf);
 		    end_menu(win, pbuf);
@@ -1075,7 +1075,7 @@ add_menu(windid window, int glyph, const anything identifier,
                 -- If you want this choice to be preselected when the
                    menu is displayed, set preselected to TRUE.
 */
-void mswin_add_menu(winid wid, int glyph, const ANY_P * identifier,
+void mswin_add_menu(winid wid, int glyph, int cnt, const ANY_P * identifier,
 		CHAR_P accelerator, CHAR_P group_accel, int attr, 
 		const char *str, BOOLEAN_P presel)
 {

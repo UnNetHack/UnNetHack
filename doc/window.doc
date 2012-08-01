@@ -253,7 +253,7 @@ start_menu(window)
 		   before add_menu().  After calling start_menu() you may not
 		   putstr() to the window.  Only windows of type NHW_MENU may
 		   be used for menus.
-add_menu(windid window, int glyph, const anything identifier,
+add_menu(windid window, int glyph, int cnt, const anything identifier,
 				char accelerator, char groupacc,
 				int attr, char *str, boolean preselected)
 		-- Add a text line str to the given menu window.  If identifier

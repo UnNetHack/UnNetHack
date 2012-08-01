@@ -412,7 +412,7 @@ extcmd_via_menu()	/* here after # - now show pick-list of possible commands */
  			/* flush the extended commands for that letter already in buf */
 			Sprintf(buf, fmtstr, prompt);
 			any.a_char = prevaccelerator;
-			add_menu(win, NO_GLYPH, &any, any.a_char, 0,
+			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, any.a_char, 0,
 					ATR_NONE, buf, FALSE);
 			acount = 0;
 		    }
@@ -434,7 +434,7 @@ extcmd_via_menu()	/* here after # - now show pick-list of possible commands */
 		/* flush buf */
 		Sprintf(buf, fmtstr, prompt);
 		any.a_char = prevaccelerator;
-		add_menu(win, NO_GLYPH, &any, any.a_char, 0, ATR_NONE, buf, FALSE);
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, any.a_char, 0, ATR_NONE, buf, FALSE);
 	    }
 	    Sprintf(prompt, "Extended Command: %s", cbuf);
 	    end_menu(win, prompt);
@@ -1263,67 +1263,67 @@ minimal_enlightenment()
 	buf[0] = buf2[0] = '\0';
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, "Starting", FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings, "Starting", FALSE);
 
 	/* Starting name, race, role, gender */
 	Sprintf(buf, fmtstr, "name", plname);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	Sprintf(buf, fmtstr, "race", urace.noun);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	Sprintf(buf, fmtstr, "role",
 		(flags.initgend && urole.name.f) ? urole.name.f : urole.name.m);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	Sprintf(buf, fmtstr, "gender", genders[flags.initgend].adj);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 
 	/* Starting alignment */
 	Sprintf(buf, fmtstr, "alignment", align_str(u.ualignbase[A_ORIGINAL]));
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 
 	/* Current name, race, role, gender */
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", FALSE);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, "Current", FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, "", FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings, "Current", FALSE);
 	Sprintf(buf, fmtstr, "race", Upolyd ? youmonst.data->mname : urace.noun);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	if (Upolyd) {
 	    Sprintf(buf, fmtstr, "role (base)",
 		(u.mfemale && urole.name.f) ? urole.name.f : urole.name.m);
-	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	} else {
 	    Sprintf(buf, fmtstr, "role",
 		(flags.female && urole.name.f) ? urole.name.f : urole.name.m);
-	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	}
 	/* don't want poly_gender() here; it forces `2' for non-humanoids */
 	genidx = is_neuter(youmonst.data) ? 2 : flags.female;
 	Sprintf(buf, fmtstr, "gender", genders[genidx].adj);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	if (Upolyd && (int)u.mfemale != genidx) {
 	    Sprintf(buf, fmtstr, "gender (base)", genders[u.mfemale].adj);
-	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	}
 
 	/* Current alignment */
 	Sprintf(buf, fmtstr, "alignment", align_str(u.ualign.type));
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 
 	/* Current position of hero */
 	if (wizard) {
 		Sprintf(buf2, "(%2d,%2d)", u.ux, u.uy);
 		Sprintf(buf, fmtstr, "position", buf2);
-		add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	}
 
 	/* Deity list */
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", FALSE);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, "Deities", FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, "", FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings, "Deities", FALSE);
 	Sprintf(buf2, deity_fmtstr, align_gname(A_CHAOTIC),
 	    (u.ualignbase[A_ORIGINAL] == u.ualign.type
 		&& u.ualign.type == A_CHAOTIC) ? " (s,c)" :
 	    (u.ualignbase[A_ORIGINAL] == A_CHAOTIC)       ? " (s)" :
 	    (u.ualign.type   == A_CHAOTIC)       ? " (c)" : "");
 	Sprintf(buf, fmtstr, "Chaotic", buf2);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 
 	Sprintf(buf2, deity_fmtstr, align_gname(A_NEUTRAL),
 	    (u.ualignbase[A_ORIGINAL] == u.ualign.type
@@ -1331,7 +1331,7 @@ minimal_enlightenment()
 	    (u.ualignbase[A_ORIGINAL] == A_NEUTRAL)       ? " (s)" :
 	    (u.ualign.type   == A_NEUTRAL)       ? " (c)" : "");
 	Sprintf(buf, fmtstr, "Neutral", buf2);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 
 	Sprintf(buf2, deity_fmtstr, align_gname(A_LAWFUL),
 	    (u.ualignbase[A_ORIGINAL] == u.ualign.type &&
@@ -1339,7 +1339,7 @@ minimal_enlightenment()
 	    (u.ualignbase[A_ORIGINAL] == A_LAWFUL)        ? " (s)" :
 	    (u.ualign.type   == A_LAWFUL)        ? " (c)" : "");
 	Sprintf(buf, fmtstr, "Lawful", buf2);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 
 	end_menu(tmpwin, "Base Attributes");
 	n = select_menu(tmpwin, PICK_NONE, &selected);
@@ -1370,19 +1370,19 @@ int typ;
        * where possible similar to AceHack's keys. That explains the
        * choice for the group accelerators. */
       any.a_int = 1;
-      add_menu(win, NO_GLYPH, &any, 'a', 'C', ATR_NONE, "Name a monster", MENU_UNSELECTED);
+      add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'a', 'C', ATR_NONE, "Name a monster", MENU_UNSELECTED);
 
       any.a_int = 2;
-      add_menu(win, NO_GLYPH, &any, 'b', 'y', ATR_NONE, "Name an individual item", MENU_UNSELECTED);
+      add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'b', 'y', ATR_NONE, "Name an individual item", MENU_UNSELECTED);
 
       any.a_int = 3;
-      add_menu(win, NO_GLYPH, &any, 'c', 'n', ATR_NONE, "Name all items of a certain type", MENU_UNSELECTED);
+      add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'c', 'n', ATR_NONE, "Name all items of a certain type", MENU_UNSELECTED);
 
       any.a_int = 4;
-      add_menu(win, NO_GLYPH, &any, 'd', 'f', ATR_NONE, "Annotate the current level", MENU_UNSELECTED);
+      add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'd', 'f', ATR_NONE, "Annotate the current level", MENU_UNSELECTED);
 
       any.a_int = 0;
-      add_menu(win, NO_GLYPH, &any, 0, 'q', ATR_NONE, "", MENU_UNSELECTED);
+      add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 'q', ATR_NONE, "", MENU_UNSELECTED);
 
       end_menu(win, "What do you wish to name?");
       n = select_menu(win, PICK_ONE, &pick_list);
@@ -2860,7 +2860,7 @@ wiz_port_debug()
 		start_menu(win);
 		for (k=0; k < num_menu_selections; ++k) {
 			any.a_int = k+1;
-			add_menu(win, NO_GLYPH, &any, item++, 0, ATR_NONE,
+			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, item++, 0, ATR_NONE,
 				menu_selections[k].menutext, MENU_UNSELECTED);
 		}
 		end_menu(win, "Which port debugging feature?");

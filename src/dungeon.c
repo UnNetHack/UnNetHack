@@ -1710,7 +1710,7 @@ print_branch(win, dnum, lower_bound, upper_bound, bymenu, lchoices)
 		lchoices->playerlev[lchoices->idx] = depth(&br->end1);
 		any.a_void = 0;
 		any.a_int = lchoices->idx + 1;
-		add_menu(win, NO_GLYPH, &any, lchoices->menuletter,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, lchoices->menuletter,
 				0, ATR_NONE, buf, MENU_UNSELECTED);
 		if (lchoices->menuletter == 'z') lchoices->menuletter = 'A';
 		else lchoices->menuletter++;
@@ -1762,7 +1762,7 @@ xchar *rdgn;
 	}
 	if (bymenu) {
 	    any.a_void = 0;
-	    add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, buf, MENU_UNSELECTED);
+	    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings, buf, MENU_UNSELECTED);
 	} else
 	    putstr(win, 0, buf);
 
@@ -1791,7 +1791,7 @@ xchar *rdgn;
 		lchoices.playerlev[lchoices.idx] = depth(&slev->dlevel);
 		any.a_void = 0;
 		any.a_int = lchoices.idx + 1;
-		add_menu(win, NO_GLYPH, &any, lchoices.menuletter,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, lchoices.menuletter,
 				0, ATR_NONE, buf, MENU_UNSELECTED);
 		if (lchoices.menuletter == 'z') lchoices.menuletter = 'A';
 		else lchoices.menuletter++;

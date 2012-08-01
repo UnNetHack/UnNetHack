@@ -949,17 +949,17 @@ int enhance_skill(boolean want_dump)
 			    (u.ulevel < MAXULEV) ?
 				"when you're more experienced" :
 				"if skill slots become available");
-		    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
 			     buf, MENU_UNSELECTED);
 		}
 		if (maxxed_cnt > 0) {
 		    Sprintf(buf,
 		  "(Skill%s flagged by \"#\" cannot be enhanced any further.)",
 			    plur(maxxed_cnt));
-		    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
 			     buf, MENU_UNSELECTED);
 		}
-		add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
 			     "", MENU_UNSELECTED);
 	    }
 	    } /* want_dump or not */
@@ -983,7 +983,7 @@ int enhance_skill(boolean want_dump)
 		    dump_html("<tr><th>%s</th></tr>\n",(char *)skill_ranges[pass].name);
 		    logged=FALSE;
 		} else
-		    add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings,
 			     skill_ranges[pass].name, MENU_UNSELECTED);
 		}
 		if (want_dump) {
@@ -1042,7 +1042,7 @@ int enhance_skill(boolean want_dump)
 			    prefix, P_NAME(i), sklnambuf);
 		}
 		any.a_int = can_advance(i, speedy) ? i+1 : 0;
-		add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
 			 buf, MENU_UNSELECTED);
 		} /* !want_dump */
 	    }

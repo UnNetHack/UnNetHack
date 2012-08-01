@@ -385,19 +385,19 @@ give_up:	/* Quit */
 	    win = create_nhwindow(NHW_MENU);
 	    start_menu(win);
 	    any.a_int = 1;
-	    add_menu(win, NO_GLYPH, &any, 'v', 0, ATR_NONE,
+	    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'v', 0, ATR_NONE,
 		     "lawful female dwarf Valkyrie (uses melee and thrown weapons)",
 		     MENU_UNSELECTED);
 	    any.a_int = 2;
-	    add_menu(win, NO_GLYPH, &any, 'w', 0, ATR_NONE,
+	    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'w', 0, ATR_NONE,
 		     "chaotic male elf Wizard      (relies mostly on spells)",
 		     MENU_UNSELECTED);
 	    any.a_int = 3;
-	    add_menu(win, NO_GLYPH, &any, 'R', 0, ATR_NONE,
+	    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'R', 0, ATR_NONE,
 		     "neutral female human Ranger  (good with ranged combat)",
 		     MENU_UNSELECTED);
 	    any.a_int = 4;
-	    add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE,
+	    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'q', 0, ATR_NONE,
 		     "quit", MENU_UNSELECTED);
 	    end_menu(win, "What character do you want to try?");
 	    n = select_menu(win, PICK_ONE, &selected);
@@ -472,7 +472,7 @@ give_up:	/* Quit */
 				} else 
 					Strcpy(rolenamebuf, roles[i].name.m);
 			}	
-			add_menu(win, NO_GLYPH, &any, thisch,
+			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, thisch,
 			    0, ATR_NONE, an(rolenamebuf), MENU_UNSELECTED);
 			lastch = thisch;
 		    }
@@ -481,10 +481,10 @@ give_up:	/* Quit */
 				    flags.initalign, PICK_RANDOM)+1;
 		if (any.a_int == 0)	/* must be non-zero */
 		    any.a_int = randrole()+1;
-		add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , '*', 0, ATR_NONE,
 				"Random", MENU_UNSELECTED);
 		any.a_int = i+1;	/* must be non-zero */
-		add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				"Quit", MENU_UNSELECTED);
 		Sprintf(pbuf, "Pick a role for your %s", plbuf);
 		end_menu(win, pbuf);
@@ -545,17 +545,17 @@ give_up:	/* Quit */
 			if (ok_race(flags.initrole, i, flags.initgend,
 							flags.initalign)) {
 			    any.a_int = i+1;	/* must be non-zero */
-			    add_menu(win, NO_GLYPH, &any, races[i].noun[0],
+			    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, races[i].noun[0],
 				0, ATR_NONE, races[i].noun, MENU_UNSELECTED);
 			}
 		    any.a_int = pick_race(flags.initrole, flags.initgend,
 					flags.initalign, PICK_RANDOM)+1;
 		    if (any.a_int == 0)	/* must be non-zero */
 			any.a_int = randrace(flags.initrole)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , '*', 0, ATR_NONE,
 				    "Random", MENU_UNSELECTED);
 		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				    "Quit", MENU_UNSELECTED);
 		    Sprintf(pbuf, "Pick the race of your %s", plbuf);
 		    end_menu(win, pbuf);
@@ -617,17 +617,17 @@ give_up:	/* Quit */
 			if (ok_gend(flags.initrole, flags.initrace, i,
 							    flags.initalign)) {
 			    any.a_int = i+1;
-			    add_menu(win, NO_GLYPH, &any, genders[i].adj[0],
+			    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, genders[i].adj[0],
 				0, ATR_NONE, genders[i].adj, MENU_UNSELECTED);
 			}
 		    any.a_int = pick_gend(flags.initrole, flags.initrace,
 					    flags.initalign, PICK_RANDOM)+1;
 		    if (any.a_int == 0)	/* must be non-zero */
 			any.a_int = randgend(flags.initrole, flags.initrace)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , '*', 0, ATR_NONE,
 				    "Random", MENU_UNSELECTED);
 		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				    "Quit", MENU_UNSELECTED);
 		    Sprintf(pbuf, "Pick the gender of your %s", plbuf);
 		    end_menu(win, pbuf);
@@ -688,17 +688,17 @@ give_up:	/* Quit */
 			if (ok_align(flags.initrole, flags.initrace,
 							flags.initgend, i)) {
 			    any.a_int = i+1;
-			    add_menu(win, NO_GLYPH, &any, aligns[i].adj[0],
+			    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, aligns[i].adj[0],
 				 0, ATR_NONE, aligns[i].adj, MENU_UNSELECTED);
 			}
 		    any.a_int = pick_align(flags.initrole, flags.initrace,
 					    flags.initgend, PICK_RANDOM)+1;
 		    if (any.a_int == 0)	/* must be non-zero */
 			any.a_int = randalign(flags.initrole, flags.initrace)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , '*', 0, ATR_NONE,
 				    "Random", MENU_UNSELECTED);
 		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				    "Quit", MENU_UNSELECTED);
 		    Sprintf(pbuf, "Pick the alignment of your %s", plbuf);
 		    end_menu(win, pbuf);
@@ -1568,24 +1568,20 @@ struct WinDesc *cw;
 			curr != page_end;
 			n++, curr = curr->next)
 		    if (morc == curr->selector) {
-			if (curr->selected) {
-			    if (counting && count > 0) {
-				curr->count = count;
-				set_item_state(window, n, curr);
-			    } else { /* change state */
-				curr->selected = FALSE;
-				curr->count = -1L;
-				set_item_state(window, n, curr);
-			    }
+		    	if (counting && count > 0) {
+			    curr->selected = TRUE;
+			    if (count < curr->maxcount)
+			    	curr->count = count;
+			    else
+			        curr->count = -1L;
+			    set_item_state(window, n, curr);
+			} else if (curr->selected) { /* change state */
+			    curr->selected = FALSE;
+			    curr->count = -1L;
+			    set_item_state(window, n, curr);
 			} else {	/* !selected */
-			    if (counting && count > 0) {
-				curr->count = count;
-				curr->selected = TRUE;
-				set_item_state(window, n, curr);
-			    } else if (!counting) {
-				curr->selected = TRUE;
-				set_item_state(window, n, curr);
-			    }
+			    curr->selected = TRUE;
+			    set_item_state(window, n, curr);
 			    /* do nothing counting&&count==0 */
 			}
 
@@ -2187,9 +2183,10 @@ tty_start_menu(window)
  * later.
  */
 void
-tty_add_menu(window, glyph, identifier, ch, gch, attr, str, preselected)
+tty_add_menu(window, glyph, cnt, identifier, ch, gch, attr, str, preselected)
     winid window;	/* window to use, must be of type NHW_MENU */
     int glyph;		/* glyph to display with item */
+    int cnt;		/* max number of times this item can be selected */
     const anything *identifier;	/* what to return if selected */
     char ch;		/* keyboard accelerator (0 = pick our own) */
     char gch;		/* group accelerator (0 = no group) */
@@ -2218,6 +2215,7 @@ tty_add_menu(window, glyph, identifier, ch, gch, attr, str, preselected)
     item->attr = attr;
     item->str = copy_of(str);
     item->glyph = glyph;
+    item->maxcount = cnt;
 
     item->next = cw->mlist;
     cw->mlist = item;
@@ -2268,8 +2266,8 @@ tty_end_menu(window, prompt)
 	anything any;
 
 	any.a_void = 0;	/* not selectable */
-	tty_add_menu(window, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
-	tty_add_menu(window, NO_GLYPH, &any, 0, 0, ATR_NONE, prompt, MENU_UNSELECTED);
+	tty_add_menu(window, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+	tty_add_menu(window, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, prompt, MENU_UNSELECTED);
     }
 
     lmax = min(52, (int)ttyDisplay->rows - 1);		/* # lines per page */
