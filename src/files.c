@@ -2205,6 +2205,8 @@ boolean		recursive;
 #endif
 	} else if (match_varname(buf, "MONSTERCOLOR", 12)) {
 	    return parse_monster_color(bufp);
+	} else if (match_varname(buf, "MONSTERSYMBOL", 13)) {
+	    return parse_monster_symbol(bufp);
 	} else if (match_varname(buf, "SYMBOL", 6)) {
 	    return parse_symbol(bufp);
 	} else if (match_varname(buf, "SPELLORDER", 10)) {

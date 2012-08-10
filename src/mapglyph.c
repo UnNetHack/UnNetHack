@@ -59,6 +59,21 @@ int explcolors[] = {
 # endif
 #endif
 
+/** Returns the correct monster glyph.
+ *  Returns a Unicode codepoint in UTF8graphics and an ASCII character otherwise. */
+static glyph_t
+get_monsym(glyph)
+int glyph;
+{
+	if (iflags.UTF8graphics &&
+	    mons[glyph].unicode_codepoint) {
+		/* only return a Unicode codepoint when there is one configured */
+		return mons[glyph].unicode_codepoint;
+	} else {
+		return monsyms[(int)mons[glyph].mlet];
+	}
+}
+
 /*ARGSUSED*/
 void
 mapglyph(glyph, ochar, ocolor, ospecial, x, y)
@@ -161,7 +176,7 @@ unsigned *ospecial;
 	    }
 
     } else if ((offset = (glyph - GLYPH_RIDDEN_OFF)) >= 0) {	/* mon ridden */
-	ch = monsyms[(int)mons[offset].mlet];
+	ch = get_monsym(offset);
 #ifdef ROGUE_COLOR
 	if (HAS_ROGUE_IBM_GRAPHICS)
 	    /* This currently implies that the hero is here -- monsters */
@@ -187,7 +202,7 @@ unsigned *ospecial;
 		special |= MG_INVERSE;
 	    }
     } else if ((offset = (glyph - GLYPH_DETECT_OFF)) >= 0) {	/* mon detect */
-	ch = monsyms[(int)mons[offset].mlet];
+	ch = get_monsym(offset);
 #ifdef ROGUE_COLOR
 	if (HAS_ROGUE_IBM_GRAPHICS)
 	    color = NO_COLOR;	/* no need to check iflags.use_color */
@@ -207,7 +222,7 @@ unsigned *ospecial;
 	    invis_color(offset);
 	    special |= MG_INVIS;
     } else if ((offset = (glyph - GLYPH_PET_OFF)) >= 0) {	/* a pet */
-	ch = monsyms[(int)mons[offset].mlet];
+	ch = get_monsym(offset);
 #ifdef ROGUE_COLOR
 	if (HAS_ROGUE_IBM_GRAPHICS)
 	    color = NO_COLOR;	/* no need to check iflags.use_color */
@@ -216,7 +231,7 @@ unsigned *ospecial;
 	    pet_color(offset);
 	    special |= MG_PET;
     } else {							/* a monster */
-	ch = monsyms[(int)mons[glyph].mlet];
+	ch = get_monsym(glyph);
 #ifdef ROGUE_COLOR
 	if (HAS_ROGUE_IBM_GRAPHICS && iflags.use_color) {
 	    if (x == u.ux && y == u.uy)

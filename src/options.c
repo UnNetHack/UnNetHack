@@ -1494,23 +1494,16 @@ char *option_value;	/**< Output string buffer for option value */
 	return TRUE;
 }
 
-/** Parse '"dungeon feature":unicode_codepoint' and change symbol in
- * UTF8graphics.
+/** Parse a string as Unicode codepoint and return the numerical codepoint.
  * Valid codepoints are decimal numbers or U+FFFF and 0xFFFF for hexadecimal
  * values. */
-boolean
-parse_symbol(str)
-const char *str;
+static int
+parse_codepoint(codepoint)
+char *codepoint;
 {
-	char feature[BUFSZ];
-	char codepoint[BUFSZ];
 	char *ptr, *endptr;
-	int i, num=0, base;
-
-	if (!parse_extended_option(str, feature, codepoint)) {
-		return FALSE;
-	}
-
+	int num=0, base;
+	
 	/* parse codepoint */
 	if (!strncmpi(codepoint, "u+", 2) ||
 	    !strncmpi(codepoint, "0x", 2)) {
@@ -1525,6 +1518,57 @@ const char *str;
 	errno = 0;
 	num = strtol(ptr, &endptr, base);
 	if (errno != 0 || *endptr != 0 || endptr == ptr) {
+		return FALSE;
+	}
+	return num;
+}
+
+/** Parse '"monster name":unicode_codepoint' and change symbol in
+ * monster list. */
+boolean
+parse_monster_symbol(str)
+const char *str;
+{
+	char monster[BUFSZ];
+	char codepoint[BUFSZ];
+	int i, num=0;
+
+	if (!parse_extended_option(str, monster, codepoint)) {
+		return FALSE;
+	}
+
+	num = parse_codepoint(codepoint);
+	if (num < 0) {
+		return FALSE;
+	}
+
+	/* find monster */
+	for (i=0; mons[i].mlet != 0; i++) {
+		if (!strcmpi(monster, mons[i].mname)) {
+			mons[i].unicode_codepoint = num;
+			return TRUE;
+		}
+	}
+	
+	return FALSE;
+}
+
+/** Parse '"dungeon feature":unicode_codepoint' and change symbol in
+ * UTF8graphics. */
+boolean
+parse_symbol(str)
+const char *str;
+{
+	char feature[BUFSZ];
+	char codepoint[BUFSZ];
+	int i, num;
+
+	if (!parse_extended_option(str, feature, codepoint)) {
+		return FALSE;
+	}
+
+	num = parse_codepoint(codepoint);
+	if (num < 0) {
 		return FALSE;
 	}
 

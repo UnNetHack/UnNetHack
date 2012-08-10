@@ -42,7 +42,7 @@ void NDECL(monst_init);
  *	symbol color (C(x) macro)
  */
 #define MON(nam,sym,lvl,gen,atk,siz,mr1,mr2,flg1,flg2,flg3,col) \
-	   {nam,sym,lvl,gen,atk,siz,mr1,mr2,flg1,flg2,flg3,C(col)}
+	   {nam,sym,0,lvl,gen,atk,siz,mr1,mr2,flg1,flg2,flg3,C(col)}
 /* LVL() and SIZ() collect several fields to cut down on # of args for MON() */
 #define LVL(lvl,mov,ac,mr,aln) lvl,mov,ac,mr,aln
 #define SIZ(wt,nut,pxl,snd,siz) wt,nut,pxl,snd,siz

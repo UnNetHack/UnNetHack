@@ -3,6 +3,9 @@
 	* Wands and spells of digging are no longer restricted on maze levels
 	* Sokoban luck penalty removed and added tracking of solving Sokoban
 	  without any tricks
+	
+	* New config option for customizing monster letter in UTF8graphics:
+	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke
 
 	* removed monsters:
 	  - anti-matter vortex
