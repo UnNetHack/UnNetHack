@@ -4,7 +4,7 @@
 
 #ifndef OBJECTS_PASS_2_
 /* first pass */
-struct monst { struct monst *dummy; };	/* lint: struct obj's union */
+/*struct monst { struct monst *dummy; };*/	/* lint: struct obj's union */
 #include "config.h"
 #include "obj.h"
 #include "objclass.h"
@@ -41,7 +41,7 @@ NEARDATA struct objdescr obj_descr[] = {
 # define BITS(nmkn,mrg,uskn,ctnr,mgc,chrg,uniq,nwsh,big,tuf,dir,sub,mtrl) \
 	nmkn,mrg,uskn,0,mgc,chrg,uniq,nwsh,big,tuf,dir,mtrl,sub /* SCO ODT 1.1 cpp fodder */
 # define OBJECT(obj,bits,prp,sym,prob,dly,wt,cost,sdam,ldam,oc1,oc2,nut,color) \
-	{0, 0, (char *)0, bits, prp, sym, dly, COLOR_FIELD(color) \
+	{0, 0, (char *)0, bits, prp, sym, 0, dly, COLOR_FIELD(color) \
 	 prob, wt, cost, sdam, ldam, oc1, oc2, nut}
 # ifndef lint
 #  define HARDGEM(n) (n >= 8)

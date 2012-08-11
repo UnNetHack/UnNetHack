@@ -1583,6 +1583,47 @@ const char *str;
 	return FALSE;
 }
 
+/** Parse '"object name":unicode_codepoint' and change symbol in
+ * object list. */
+boolean
+parse_object_symbol(str)
+const char *str;
+{
+	char object[BUFSZ];
+	char codepoint[BUFSZ];
+	int i, num=0;
+
+	if (!parse_extended_option(str, object, codepoint)) {
+		return FALSE;
+	}
+
+	num = parse_codepoint(codepoint);
+	if (num < 0) {
+		return FALSE;
+	}
+
+	/* find object */
+	for (i=0; obj_descr[i].oc_name || obj_descr[i].oc_descr; i++) {
+		if ((obj_descr[i].oc_name && obj_descr[i].oc_descr) ||
+		    (obj_descr[i].oc_descr)) {
+			/* Items with both descriptive and actual name or only
+			 * descriptive name. */
+			if (!strcmpi(object, obj_descr[i].oc_descr)) {
+				objects[i].unicode_codepoint = num;
+				return TRUE;
+			}
+		} else if (obj_descr[i].oc_name) {
+			/* items with only actual name like "carrot" */
+			if (!strcmpi(object, obj_descr[i].oc_name)) {
+				objects[i].unicode_codepoint = num;
+				return TRUE;
+			}
+		}
+	}
+	
+	return FALSE;
+}
+
 void
 common_prefix_options_parser(fullname, opts, negated)
 const char *fullname;

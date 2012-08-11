@@ -90,6 +90,7 @@ struct objclass {
 
 	uchar	oc_oprop;		/* property (invis, &c.) conveyed */
 	char	oc_class;		/* object class */
+	glyph_t	unicode_codepoint;	/* unicode codepoint for utf8graphics */
 	schar	oc_delay;		/* delay when using such an object */
 	uchar	oc_color;		/* color of the object */
 

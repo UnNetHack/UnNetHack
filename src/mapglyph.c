@@ -74,6 +74,21 @@ int glyph;
 	}
 }
 
+/** Returns the correct object glyph.
+ *  Returns a Unicode codepoint in UTF8graphics and an ASCII character otherwise. */
+static glyph_t
+get_objsym(glyph)
+int glyph;
+{
+	if (iflags.UTF8graphics &&
+	    objects[glyph].unicode_codepoint) {
+		/* only return a Unicode codepoint when there is one configured */
+		return objects[glyph].unicode_codepoint;
+	} else {
+		return oc_syms[(int)objects[glyph].oc_class];
+	}
+}
+
 /*ARGSUSED*/
 void
 mapglyph(glyph, ochar, ocolor, ospecial, x, y)
@@ -154,7 +169,7 @@ unsigned *ospecial;
 	    cmap_color(offset);
     } else if ((offset = (glyph - GLYPH_OBJ_OFF)) >= 0) {	/* object */
 	if (offset == BOULDER && iflags.bouldersym) ch = iflags.bouldersym;
-	else ch = oc_syms[(int)objects[offset].oc_class];
+	else ch = get_objsym(offset);
 #ifdef ROGUE_COLOR
 	if (HAS_ROGUE_IBM_GRAPHICS && iflags.use_color) {
 	    switch(objects[offset].oc_class) {
@@ -188,7 +203,7 @@ unsigned *ospecial;
 	    mon_color(offset);
 	    special |= MG_RIDDEN;
     } else if ((offset = (glyph - GLYPH_BODY_OFF)) >= 0) {	/* a corpse */
-	ch = oc_syms[(int)objects[CORPSE].oc_class];
+	ch = get_objsym(CORPSE);
 #ifdef ROGUE_COLOR
 	if (HAS_ROGUE_IBM_GRAPHICS && iflags.use_color)
 	    color = CLR_RED;
