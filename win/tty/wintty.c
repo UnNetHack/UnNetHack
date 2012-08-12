@@ -1376,7 +1376,11 @@ struct WinDesc *cw;
 			    mapglyph(curr->glyph, &character, &glyph_color, &special, 0, 0);
 
 			    if (glyph_color != NO_COLOR) term_start_color(glyph_color);
+#ifdef UTF8_GLYPHS
 			    pututf8char(character);
+#else
+			    putchar(character);
+#endif
 			    if (glyph_color != NO_COLOR) term_end_color();
 			    putchar(' ');
 			    ttyDisplay->curx +=2;
