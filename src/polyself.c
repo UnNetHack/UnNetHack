@@ -796,7 +796,7 @@ dobreathe()
 
 	mattk = attacktype_fordmg(youmonst.data, AT_BREA, AD_ANY);
 	/* if new breath types are added, change AD_ACID to max type */
-	/* see also breamu() in polyself.c */
+	/* see also breamu() in mthrowu.c */
 	int typ = (mattk->adtyp == AD_RBRE) ? rnd(AD_ACID) : mattk->adtyp ;
 	if (!mattk) {
 		warning("bad breath attack?");	/* mouthwash needed... */
