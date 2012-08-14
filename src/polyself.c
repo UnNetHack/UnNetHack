@@ -795,11 +795,17 @@ dobreathe()
 	if (!getdir((char *)0)) return(0);
 
 	mattk = attacktype_fordmg(youmonst.data, AT_BREA, AD_ANY);
-	if (!mattk)
-	    warning("bad breath attack?");	/* mouthwash needed... */
-	else
-	    buzz((int) (20 + mattk->adtyp-1), (int)mattk->damn,
-		u.ux, u.uy, u.dx, u.dy);
+	/* if new breath types are added, change AD_ACID to max type */
+	/* see also breamu() in polyself.c */
+	int typ = (mattk->adtyp == AD_RBRE) ? rnd(AD_ACID) : mattk->adtyp ;
+	if (!mattk) {
+		warning("bad breath attack?");	/* mouthwash needed... */
+	} else if ((typ >= AD_MAGM) && (typ <= AD_ACID)) {
+		buzz((int) (20 + typ-1), (int)mattk->damn,
+				u.ux, u.uy, u.dx, u.dy);
+	} else {
+		warning("Breath weapon %d used", typ-1);
+	}
 	return(1);
 }
 
