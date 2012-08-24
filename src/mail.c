@@ -727,11 +727,11 @@ struct obj *otmp;
 void
 maybe_hint()
 {
-	if (u.uswallow || !flags.biff || !iflags.hint) return;
+	if (u.uswallow || !flags.biff || !flags.hint) return;
 
 	/* initialize gethint */
-	if (gethint < 0 && moves < 250) {
-		gethint = 250;
+	if (gethint < 0) {
+		gethint = rn2(250)+250;
 		return;
 	}
 	if (--gethint <= 0) {
@@ -739,7 +739,7 @@ maybe_hint()
 			deliver = {MSG_HINT,"I have a hint for you",0,0};
 		newmail(&deliver);
 		/* only deliver once per game */
-		iflags.hint = FALSE;
+		flags.hint = FALSE;
 	}
 }
 

@@ -29,6 +29,7 @@ struct flag {
 #ifdef MAIL
 	boolean  biff;		/* enable checking for mail */
 #endif
+	boolean  hint;		/* enable Unclippy the helpful hint daemon */
 	boolean  botl;		/* partially redo status line */
 	boolean  botlx;		/* print an entirely new bottom line */
 	boolean  confirm;	/* confirm before hitting tame monsters */
@@ -369,7 +370,6 @@ struct instance_flags {
 	boolean  vanilla_ui_behavior;	/* fall back to vanilla behavior */
 	boolean  show_annotation;	/* level annotation when entering level */
 	int  statuslines;	/* number of status lines */
-	boolean  hint;		/* enable the helpful hint daemon */
 };
 
 /*
