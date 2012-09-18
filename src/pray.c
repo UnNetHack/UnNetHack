@@ -1367,7 +1367,7 @@ verbalize("In return for thy service, I grant thee the gift of Immortality!");
 
 		    cdt = conduct + 1;
 
-		    while (cdt <= LAST_CONDUCT){ 
+		    while (cdt <= LAST_CONDUCT){
 
 			if (successful_cdt(cdt) && conducts[cdt].highscore
 					&& !superfluous_cdt(cdt)) {
