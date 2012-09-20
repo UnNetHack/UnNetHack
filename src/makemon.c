@@ -131,9 +131,11 @@ register int x, y, n;
 		 */
 		if (enexto(&mm, mm.x, mm.y, mtmp->data)) {
 		    mon = makemon(mtmp->data, mm.x, mm.y, NO_MM_FLAGS);
-		    mon->mpeaceful = FALSE;
-		    mon->mavenge = 0;
-		    set_malign(mon);
+		    if (mon) {
+			    mon->mpeaceful = FALSE;
+			    mon->mavenge = 0;
+			    set_malign(mon);
+		    }
 		    /* Undo the second peace_minded() check in makemon(); if the
 		     * monster turned out to be peaceful the first time we
 		     * didn't create it at all; we don't want a second check.

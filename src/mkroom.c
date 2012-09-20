@@ -525,7 +525,7 @@ struct mkroom *croom; /* NULL == choose random room */
 	    struct permonst *pmon;
 	    if (!MON_AT(pos.x, pos.y) && (pmon = mkclass(S_NYMPH,0))) {
 		struct monst *mtmp = makemon(pmon, pos.x,pos.y, NO_MM_FLAGS);
-		mtmp->msleeping = 1;
+		if (mtmp) mtmp->msleeping = 1;
 		i--;
 	    }
 	}
