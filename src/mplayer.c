@@ -167,6 +167,11 @@ register boolean special;
 		    else if (rn2(2)) weapon = CLUB;
 		    if (helm == HELM_OF_BRILLIANCE) helm = STRANGE_OBJECT;
 		    break;
+#ifdef PM_CONVICT
+		case PM_CONVICT:
+		    /* Defaults are just fine */
+		    break;
+#endif
 		case PM_HEALER:
 		    if (rn2(4)) weapon = QUARTERSTAFF;
 		    else if (rn2(2)) weapon = rn2(2) ? UNICORN_HORN : SCALPEL;
@@ -219,7 +224,7 @@ register boolean special;
 		    if (rn2(4)) helm = HELM_OF_BRILLIANCE;
 		    shield = STRANGE_OBJECT;
 		    break;
-		default: warning("bad mplayer monster");
+		default: warning("bad mplayer monster %d", monsndx(ptr));
 		    weapon = 0;
 		    break;
 	    }
