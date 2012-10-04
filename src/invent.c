@@ -1532,9 +1532,14 @@ nextclass:
 		if (ident && !not_fully_identified(otmp)) continue;
 		if (ckfn && !(*ckfn)(otmp)) continue;
 		if (!allflag) {
-			char name[BUFSZ];
+			char *name;
 			char simple_name[BUFSZ];
 			char this_item[BUFSZ];
+			if (!ininv) {
+				name = xprname(otmp, (char *)0, ilet, !nodot, 0L, 0L);
+				Sprintf(simple_name, "%c - %s", ilet, the(simple_typename(otmp->otyp)));
+				Sprintf(this_item, "%c - this item", ilet);
+			}
 			/* make sure a overly long named item doesn't buffer overflow
 			 * qbuf when using the traditional menu style */
 			Strcpy(qbuf, safe_qbuf("", sizeof("?"),

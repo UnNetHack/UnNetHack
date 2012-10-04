@@ -26,6 +26,7 @@
 	    when writing the HTML map (related to C343-20).
 	  - Really reduce occurrences of hint daemon to once per game
 	  - Fixed crash with ray beams at edges of maps
+	  - Fixed missing item name with traditional menustyle
 
 	* vanilla bug fixes:
 	  - Prevent the Book of the Dead from being destroyed when the
