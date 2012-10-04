@@ -1535,7 +1535,7 @@ nextclass:
 			char *name;
 			char simple_name[BUFSZ];
 			char this_item[BUFSZ];
-			if (!ininv) {
+			if (ininv) {
 				name = xprname(otmp, (char *)0, ilet, !nodot, 0L, 0L);
 				Sprintf(simple_name, "%c - %s", ilet, the(simple_typename(otmp->otyp)));
 				Sprintf(this_item, "%c - this item", ilet);
