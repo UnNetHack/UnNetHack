@@ -28,6 +28,7 @@
 	  - Fixed crash with ray beams at edges of maps
 	  - Fixed missing item name with traditional menustyle
 	  - Disabled chromatic dragon generation by monster summoning
+	  - Fixed sporadic crash with hitpointbar when hp was below 0
 
 	* vanilla bug fixes:
 	  - Prevent the Book of the Dead from being destroyed when the
