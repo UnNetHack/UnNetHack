@@ -39,11 +39,17 @@ struct bubble {
 /* used in light.c */
 typedef struct ls_t {
     struct ls_t *next;
+#if SIZEOF_VOIDP==4
+    uint32_t dummy_next;
+#endif
     xchar x, y;		/* source's position */
     short range;	/* source's current range */
     short flags;
     short type;		/* type of light source */
     genericptr_t id;	/* source's identifier */
+#if SIZEOF_VOIDP==4
+    uint32_t dummy_id;
+#endif
 } light_source;
 
 #endif /* LEV_H */

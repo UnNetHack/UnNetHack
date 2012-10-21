@@ -35,6 +35,8 @@ int otg_temp;			/* used by object_to_glyph() [otg] */
 NEARDATA int in_doagain = 0;
 #endif
 
+uint32_t dummy_uint32_t = 0;
+
 /*
  *	The following structure will be initialized at startup time with
  *	the level numbers of some "important" things in the game.
@@ -201,7 +203,7 @@ const int shield_static[SHIELD_COUNT] = {
 
 NEARDATA struct spell spl_book[MAXSPELL + 1] = {DUMMY};
 
-NEARDATA long moves = 1L, monstermoves = 1L;
+NEARDATA int32_t moves = 1L, monstermoves = 1L;
 	 /* These diverge when player is Fast */
 NEARDATA long wailmsg = 0L;
 

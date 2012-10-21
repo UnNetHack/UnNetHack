@@ -1386,12 +1386,12 @@ print_queue(win, base)
 	for (curr = base; curr; curr = curr->next) {
 #ifdef VERBOSE_TIMER
 	    Sprintf(buf, " %4ld   %4ld  %-6s %s(%s)",
-		curr->timeout, curr->tid, kind_name(curr->kind),
+		(long)curr->timeout, (long)curr->tid, kind_name(curr->kind),
 		timeout_funcs[curr->func_index].name,
 		fmt_ptr((genericptr_t)curr->arg, arg_address));
 #else
 	    Sprintf(buf, " %4ld   %4ld  %-6s #%d(%s)",
-		curr->timeout, curr->tid, kind_name(curr->kind),
+		(long)curr->timeout, (long)curr->tid, kind_name(curr->kind),
 		curr->func_index,
 		fmt_ptr((genericptr_t)curr->arg, arg_address));
 #endif
@@ -1409,7 +1409,7 @@ wiz_timeout_queue()
     win = create_nhwindow(NHW_MENU);	/* corner text window */
     if (win == WIN_ERR) return 0;
 
-    Sprintf(buf, "Current time = %ld.", monstermoves);
+    Sprintf(buf, "Current time = %ld.", (long)monstermoves);
     putstr(win, 0, buf);
     putstr(win, 0, "");
     putstr(win, 0, "Active timeout queue:");
@@ -1434,7 +1434,7 @@ timer_sanity_check()
 	    struct obj *obj = (struct obj *) curr->arg;
 	    if (obj->timed == 0) {
 		pline("timer sanity: untimed obj %s, timer %ld",
-		      fmt_ptr((genericptr_t)obj, obj_address), curr->tid);
+		      fmt_ptr((genericptr_t)obj, obj_address), (long)curr->tid);
 	    }
 	}
 }
@@ -1802,8 +1802,12 @@ save_timers(fd, mode, range)
     int count;
 
     if (perform_bwrite(mode)) {
-	if (range == RANGE_GLOBAL)
+	if (range == RANGE_GLOBAL) {
 	    bwrite(fd, (genericptr_t) &timer_id, sizeof(timer_id));
+#if SIZEOF_VOIDP==4
+	    bwrite(fd, (genericptr_t)&dummy_uint32_t, sizeof(uint32_t));
+#endif
+	}
 
 	count = maybe_write_timer(fd, range, FALSE);
 	bwrite(fd, (genericptr_t) &count, sizeof count);
@@ -1842,11 +1846,20 @@ restore_timers(fd, range, ghostly, adjust)
     int count;
     timer_element *curr;
 
-    if (range == RANGE_GLOBAL)
+    //pline("sizeof(timer_id) %ld", sizeof(timer_id)); // TODO REMOVE ME
+    if (range == RANGE_GLOBAL) {
 	mread(fd, (genericptr_t) &timer_id, sizeof timer_id);
+#if SIZEOF_VOIDP==4
+	mread(fd, (genericptr_t)&dummy_uint32_t, sizeof(uint32_t));
+#endif
+    }
+
 
     /* restore elements */
     mread(fd, (genericptr_t) &count, sizeof count);
+    //pline("timer count %d", count); // TODO REMOVE ME
+    //pline("sizeof(count) %ld", sizeof(count)); // TODO REMOVE ME
+    //pline("sizeof(timer_element) %d %ld #", sizeof(timer_element), lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
     while (count-- > 0) {
 	curr = (timer_element *) alloc(sizeof(timer_element));
 	mread(fd, (genericptr_t) curr, sizeof(timer_element));
@@ -1854,6 +1867,7 @@ restore_timers(fd, range, ghostly, adjust)
 	    curr->timeout += adjust;
 	insert_timer(curr);
     }
+    pline("sizeof(timer_element) %d %ld #", sizeof(timer_element), lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 }
 
 

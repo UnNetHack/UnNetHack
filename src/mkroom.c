@@ -854,6 +854,7 @@ struct mkroom *r;
 	short i;
 
 	mread(fd, (genericptr_t) r, sizeof(struct mkroom));
+	//pline("sizeof(struct mkroom) %d %ld #", sizeof(struct mkroom), lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	for(i=0; i<r->nsubrooms; i++) {
 		r->sbrooms[i] = &subrooms[nsubroom];
 		rest_room(fd, &subrooms[nsubroom]);
@@ -873,6 +874,8 @@ int	fd;
 	short i;
 
 	mread(fd, (genericptr_t) &nroom, sizeof(nroom));
+	//pline("nroom %d", nroom); // TODO REMOVE ME
+	//pline("sizeof(nroom) %d %ld #", sizeof(nroom), lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	nsubroom = 0;
 	for(i = 0; i<nroom; i++) {
 	    rest_room(fd, &rooms[i]);

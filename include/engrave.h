@@ -6,11 +6,17 @@
 #define ENGRAVE_H
 
 struct engr {
-	struct engr *nxt_engr;
-	char *engr_txt;
+	struct engr *nxt_engr __attribute__ ((aligned (8)));
+#if SIZEOF_VOIDP==4
+	uint32_t dummy_padding_nxt_engr;
+#endif
+	char *engr_txt __attribute__ ((aligned (8)));
+#if SIZEOF_VOIDP==4
+	uint32_t dummy_padding_engr_txt;
+#endif
 	xchar engr_x, engr_y;
 	unsigned engr_lth;	/* for save & restore; not length of text */
-	long engr_time;		/* moment engraving was (will be) finished */
+	int32_t engr_time;		/* moment engraving was (will be) finished */
 	xchar engr_type;
 #define DUST	   1
 #define ENGRAVE    2

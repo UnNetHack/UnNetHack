@@ -92,7 +92,7 @@ struct flag {
 	int	 end_top, end_around;	/* describe desired score list */
 	unsigned ident;		/* social security number for each monster */
 	unsigned moonphase;
-	unsigned long suppress_alert;
+	uint32_t suppress_alert;
 #define NEW_MOON	0
 #define FULL_MOON	4
 	unsigned no_of_wizards; /* 0, 1 or 2 (wizard and his shadow) */
@@ -100,7 +100,7 @@ struct flag {
 	unsigned run;		/* 0: h (etc), 1: H (etc), 2: fh (etc) */
 				/* 3: FH, 4: ff+, 5: ff-, 6: FF+, 7: FF- */
 				/* 8: travel */
-	unsigned long warntype; /* warn_of_mon monster type M2 */
+	uint32_t warntype; /* warn_of_mon monster type M2 */
 	int	 warnlevel;
 	int	 djinni_count, ghost_count;	/* potion effect tuning */
 	int	 pickup_burden;		/* maximum burden before prompt */

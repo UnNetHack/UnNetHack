@@ -177,7 +177,7 @@ extern uchar oc_syms[MAXOCLASSES];		/* current class symbols */
 struct fruit {
 	char fname[PL_FSIZ];
 	int fid;
-	struct fruit *nextf;
+	struct fruit *nextf __attribute__ ((aligned (8)));
 };
 #define newfruit() (struct fruit *)alloc(sizeof(struct fruit))
 #define dealloc_fruit(rind) free((genericptr_t) (rind))

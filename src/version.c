@@ -90,6 +90,8 @@ boolean complain;
 #endif
 		   version_data->entity_count != VERSION_SANITY1 ||
 		   version_data->struct_sizes != VERSION_SANITY2) {
+	    pline("version_data->entity_count %ld VERSION_SANITY1 %ld", (long)version_data->entity_count, VERSION_SANITY1); // TODO REMOVE ME
+	    pline("version_data->struct_sizes %ld VERSION_SANITY2 %ld", (long)version_data->struct_sizes, VERSION_SANITY2); // TODO REMOVE ME
 	    if (complain)
 		pline("Configuration incompatibility for file \"%s\".",
 		      filename);

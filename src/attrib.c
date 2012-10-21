@@ -23,7 +23,7 @@ const char	* const plusattr[] = {
 static
 const struct innate {
 	schar	ulevel;
-	long	*ability;
+	int32_t	*ability;
 	const char *gainstr, *losestr;
 }	arc_abil[] = { {	 1, &(HStealth), "", "" },
 		     {   1, &(HFast), "", "" },
@@ -105,7 +105,7 @@ const struct innate {
 
 static long next_check = 600L;	/* arbitrary first setting */
 STATIC_DCL void NDECL(exerper);
-STATIC_DCL void FDECL(postadjabil, (long *));
+STATIC_DCL void FDECL(postadjabil, (int32_t *));
 
 /* adjust an attribute; return TRUE if change is made, FALSE otherwise */
 boolean
@@ -532,7 +532,7 @@ redist_attr()
 STATIC_OVL
 void
 postadjabil(ability)
-long *ability;
+int32_t *ability;
 {
 	if (!ability) return;
 	if (ability == &(HWarning) || ability == &(HSee_invisible))

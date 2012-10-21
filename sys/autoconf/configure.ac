@@ -347,6 +347,12 @@ AC_CHECK_FUNCS(fcntl)
 dnl ------ Check for 32 bit datatype
 AX_DEFINE_INTEGER_BITS(uint32_t, unsigned int, unsigned long, unsigned long long)
 
+# Obtain size of size_t and define as SIZEOF_SIZE_T
+AC_CHECK_SIZEOF(size_t)
+
+# Obtain size of an void pointer and define as SIZEOF_VOIDP
+AC_CHECK_SIZEOF(void*)
+
 dnl  ----- Check for program needed to build Guidebook
 AC_CHECK_PROG(HAVE_NROFF, nroff, "yes", "no")
 AC_CHECK_PROG(HAVE_TBL, tbl, "yes", "no")

@@ -285,13 +285,21 @@ restore_light_sources(fd)
     light_source *ls;
 
     /* restore elements */
+    //pline("ls %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
     mread(fd, (genericptr_t) &count, sizeof count);
+    //pline("ls %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
+    //pline("ls %d", count); // TODO REMOVE ME
+    //pline("ls sizeof(count) %d", sizeof(count)); // TODO REMOVE ME
+    //pline("sizeof(light_source) %d", sizeof(light_source)); // TODO REMOVE ME
 
     while (count-- > 0) {
 	ls = (light_source *) alloc(sizeof(light_source));
+	//pline("ls %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	mread(fd, (genericptr_t) ls, sizeof(light_source));
+	//pline("ls %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	ls->next = light_base;
 	light_base = ls;
+	//pline("ls %d: %dx%d, %d, %d, %d, %d %ld #", count, ls->x, ls->y, ls->range, ls->flags, ls->type, ls->id, lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
     }
 }
 

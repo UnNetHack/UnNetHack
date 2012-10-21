@@ -357,7 +357,7 @@ register struct obj *otmp;
 boolean on;
 long wp_mask;
 {
-	long *mask = 0;
+	int32_t *mask = 0;
 	register const struct artifact *oart = get_artifact(otmp);
 	uchar dtyp;
 	long spfx;
@@ -388,7 +388,7 @@ long wp_mask;
 		if(obj != otmp && obj->oartifact) {
 		    register const struct artifact *art = get_artifact(obj);
 		    if(art->cary.adtyp == dtyp) {
-			mask = (long *) 0;
+			mask = (int32_t *) 0;
 			break;
 		    }
 		}

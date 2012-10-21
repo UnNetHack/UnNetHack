@@ -993,16 +993,26 @@ register struct monst *mtmp;
 	unsigned int xl;
 	int minusone = -1;
 	struct permonst *monbegin = &mons[0];
+	struct permonst *saved_mon;
 
-	if (perform_bwrite(mode))
+	if (perform_bwrite(mode)) {
 	    bwrite(fd, (genericptr_t) &monbegin, sizeof(monbegin));
+#if SIZEOF_VOIDP==4
+	    bwrite(fd, (genericptr_t)&dummy_uint32_t, sizeof(uint32_t));
+#endif
+	}
 
 	while (mtmp) {
 	    mtmp2 = mtmp->nmon;
 	    if (perform_bwrite(mode)) {
 		xl = mtmp->mxlth + mtmp->mnamelth;
 		bwrite(fd, (genericptr_t) &xl, sizeof(int));
+		/* only save the real offset */
+		saved_mon = mtmp->data;
+		mtmp->data = saved_mon - monbegin;
 		bwrite(fd, (genericptr_t) mtmp, xl + sizeof(struct monst));
+		/* restore mons data pointer */
+		mtmp->data = saved_mon;
 	    }
 	    if (mtmp->minvent)
 		saveobjchn(fd,mtmp->minvent,mode);

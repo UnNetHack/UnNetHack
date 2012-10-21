@@ -964,7 +964,7 @@ die:
 					"defied the Gods and escaped" :
 					"escaped from the dungeon"),
 #endif
-			u.urscore, plur(u.urscore));
+			(long)u.urscore, plur(u.urscore));
 	    dump_line("", pbuf);
 	    if (!done_stopprint) {
 		putstr(endwin, 0, pbuf);
@@ -1024,13 +1024,13 @@ die:
 	    }
 
 	    Sprintf(eos(pbuf), " with %ld point%s,",
-		    u.urscore, plur(u.urscore));
+		    (long)u.urscore, plur(u.urscore));
 	    if (!done_stopprint) putstr(endwin, 0, pbuf);
 	    dump_line("", pbuf);
 	}
 
 	    Sprintf(pbuf, "and %ld piece%s of gold, after %ld move%s.",
-		    umoney, plur(umoney), moves, plur(moves));
+		    umoney, plur(umoney), (long)moves, plur(moves));
 	if (!done_stopprint)  putstr(endwin, 0, pbuf);
 	dump_line("", pbuf);
 	Sprintf(pbuf, "Killer: %s", killer);

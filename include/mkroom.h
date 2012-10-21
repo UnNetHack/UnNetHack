@@ -16,8 +16,13 @@ struct mkroom {
 	schar fdoor;		/* index for the first door of the room */
 	schar nsubrooms;	/* number of subrooms */
 	boolean irregular;	/* true if room is non-rectangular */
-	struct mkroom *sbrooms[MAX_SUBROOMS];  /* Subrooms pointers */
-	struct monst *resident; /* priest/shopkeeper/guard for this room */
+	struct mkroom *sbrooms[MAX_SUBROOMS] __attribute__ ((aligned (8)));  /* Subrooms pointers */
+#if SIZEOF_VOIDP==4
+	/* we need a dummy array here as there can't be any padding in
+	 * between array elements */
+	uint32_t *dummy[MAX_SUBROOMS] __attribute__ ((aligned (8)));
+#endif
+	struct monst *resident __attribute__ ((aligned (8))); /* priest/shopkeeper/guard for this room */
 };
 
 struct shclass {

@@ -256,8 +256,9 @@ E NEARDATA struct dig_info {		/* apply.c, hack.c */
 	boolean down, chew, warned, quiet;
 } digging;
 
-E NEARDATA long moves, monstermoves;
+E NEARDATA int32_t moves, monstermoves;
 E NEARDATA long wailmsg;
+E NEARDATA uint32_t dummy_uint32_t;
 
 E NEARDATA boolean in_mklev;
 E NEARDATA boolean stoned;

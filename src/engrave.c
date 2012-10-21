@@ -1288,11 +1288,14 @@ int fd;
 	unsigned lth;
 
 	head_engr = 0;
+	//pline("engrave %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	while(1) {
 		mread(fd, (genericptr_t) &lth, sizeof(unsigned));
+		//pline("sizeof(lth) %d %ld #", sizeof(lth), lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 		if(lth == 0) return;
 		ep = newengr(lth);
 		mread(fd, (genericptr_t) ep, sizeof(struct engr) + lth);
+		//pline("sizeof(struct engr) %d %ld #", sizeof(struct engr), lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 		ep->nxt_engr = head_engr;
 		head_engr = ep;
 		ep->engr_txt = (char *) (ep + 1);	/* Andreas Bormann */

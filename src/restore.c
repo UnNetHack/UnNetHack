@@ -60,7 +60,7 @@ extern int amii_numcolors;
 
 boolean restoring = FALSE;
 static NEARDATA struct fruit *oldfruit;
-static NEARDATA long omoves;
+static NEARDATA int32_t omoves;
 
 #define Is_IceBox(o) ((o)->otyp == ICE_BOX ? TRUE : FALSE)
 
@@ -137,6 +137,7 @@ register int fd;
 
 	    tmplev = (s_level *)alloc(sizeof(s_level));
 	    mread(fd, (genericptr_t) tmplev, sizeof(s_level));
+	    pline("sizeof(s_level) %d", sizeof(s_level)); // TODO REMOVE ME
 	    if(!sp_levchn) sp_levchn = tmplev;
 	    else {
 
@@ -156,6 +157,8 @@ boolean ghostly;
 	struct damage *tmp_dam;
 
 	mread(fd, (genericptr_t) &counter, sizeof(counter));
+	pline("sizeof(counter) %d", sizeof(counter)); // TODO REMOVE ME
+	pline("sizeof(struct damage) %d %ld", sizeof(struct damage), lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	if (!counter)
 	    return;
 	tmp_dam = (struct damage *)alloc(sizeof(struct damage));
@@ -229,11 +232,13 @@ register int fd;
     if (marker) {
 	or = (struct mon_gen_override *)alloc(sizeof(struct mon_gen_override));
 	mread(fd, (genericptr_t) or, sizeof(*or));
+	pline("sizeof(struct mon_gen_override) %d %ld", sizeof(struct mon_gen_override), lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	if (or->gen_chances) {
 	    or->gen_chances = NULL;
 	    do {
 		mt = (struct mon_gen_tuple *)alloc(sizeof(struct mon_gen_tuple));
 		mread(fd, (genericptr_t) mt, sizeof(*mt));
+		pline("sizeof(struct mon_gen_tuple) %d %ld", sizeof(struct mon_gen_tuple), lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 		if (mt->next) {
 		    next = 1;
 		} else {
@@ -257,14 +262,21 @@ boolean ghostly, frozen;
 	register struct obj *first = (struct obj *)0;
 	int xl;
 
+	//pline("0 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	while(1) {
+		//pline("sizeof(xl) %d %ld", sizeof(xl), lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 		mread(fd, (genericptr_t) &xl, sizeof(xl));
+		//pline("1 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 		if(xl == -1) break;
 		otmp = newobj(xl);
 		if(!first) first = otmp;
 		else otmp2->nobj = otmp;
+		//pline("sizeof((unsigned) xl + sizeof(struct monst)) %d %ld", sizeof((unsigned) xl + sizeof(struct monst)), lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
+		//pline("restmonchn %ld 0 #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
+		//pline("2 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 		mread(fd, (genericptr_t) otmp,
 					(unsigned) xl + sizeof(struct obj));
+		//pline("3 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 		if (ghostly) {
 		    unsigned nid = flags.ident++;
 		    add_id_mapping(otmp->o_id, nid);
@@ -303,31 +315,46 @@ restmonchn(fd, ghostly)
 register int fd;
 boolean ghostly;
 {
-	register struct monst *mtmp, *mtmp2 = 0;
+	struct monst *mtmp, *mtmp2 = 0;
 	register struct monst *first = (struct monst *)0;
 	int xl;
 	struct permonst *monbegin;
-	boolean moved;
 
+	//pline("1 restmonchn %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	/* get the original base address */
 	mread(fd, (genericptr_t)&monbegin, sizeof(monbegin));
-	moved = (monbegin != mons);
+#if SIZEOF_VOIDP==4
+	mread(fd, (genericptr_t)&dummy_uint32_t, sizeof(uint32_t));
+#endif
+	//pline("2 restmonchn %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 
+	//pline("sizeof(xl) %d", sizeof(xl)); // TODO REMOVE ME
 	while(1) {
 		mread(fd, (genericptr_t) &xl, sizeof(xl));
 		if(xl == -1) break;
 		mtmp = newmonst(xl);
 		if(!first) first = mtmp;
 		else mtmp2->nmon = mtmp;
+		//pline("sizeof((unsigned) xl + sizeof(struct monst)) %d %ld", sizeof((unsigned) xl + sizeof(struct monst)), lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
+		//pline("restmonchn %ld 0 #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 		mread(fd, (genericptr_t) mtmp, (unsigned) xl + sizeof(struct monst));
+#if SIZEOF_VOIDP==4
+		//mread(fd, (genericptr_t)&dummy_uint32_t, sizeof(uint32_t));
+		//pline("restmonchn %ld # #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
+#endif
+		////pline("restmonchn %ld 1 #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
+		//pline("mtmp->m_id %d %ld #", mtmp->m_id, lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 		if (ghostly) {
 			unsigned nid = flags.ident++;
 			add_id_mapping(mtmp->m_id, nid);
 			mtmp->m_id = nid;
 		}
-		if (moved && mtmp->data) {
-			int offset = mtmp->data - monbegin;	/*(ptrdiff_t)*/
+		//pline("mtmp->m_id %d %ld #", mtmp->m_id, lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
+		if (mtmp->data) {
+			long offset = mtmp->data;	/*(ptrdiff_t)*/
+			//pline("mtmp->data %ld #", mtmp->data); // TODO REMOVE ME
 			mtmp->data = mons + offset;  /* new permonst location */
+			//pline("offset %ld #", offset); // TODO REMOVE ME
 		}
 		if (ghostly) {
 			int mndx = monsndx(mtmp->data);
@@ -374,6 +401,7 @@ int fd;
 	register struct fruit *flist, *fnext;
 
 	flist = 0;
+	//pline("sizeof(*fnext) %d", sizeof(*fnext)); // TODO REMOVE ME
 	while (fnext = newfruit(),
 	       mread(fd, (genericptr_t)fnext, sizeof *fnext),
 	       fnext->fid != 0) {
@@ -421,6 +449,7 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	struct obj *otmp;
 	int uid;
 
+	pline("sizeof(uid) %d", sizeof(uid)); // TODO REMOVE ME
 	mread(fd, (genericptr_t) &uid, sizeof uid);
 	if (uid != getuid()) {		/* strange ... */
 	    /* for wizard mode, issue a reminder; for others, treat it
@@ -432,6 +461,7 @@ unsigned int *stuckid, *steedid;	/* STEED */
 		return FALSE;
 	}
 
+	pline("sizeof(flags) %d", sizeof(flags)); // TODO REMOVE ME
 	mread(fd, (genericptr_t) &flags, sizeof(struct flag));
 	flags.bypasses = 0;	/* never use the saved value of bypasses */
 	if (remember_discover) discover = remember_discover;
@@ -440,6 +470,7 @@ unsigned int *stuckid, *steedid;	/* STEED */
 #ifdef AMII_GRAPHICS
 	amii_setpens(amii_numcolors);	/* use colors from save file */
 #endif
+	pline("sizeof(struct you) %d", sizeof(struct you)); // TODO REMOVE ME
 	mread(fd, (genericptr_t) &u, sizeof(struct you));
 	init_uasmon();
 #ifdef CLIPPING
@@ -482,8 +513,11 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	restore_dungeon(fd);
 	restlevchn(fd);
 	mread(fd, (genericptr_t) &moves, sizeof moves);
+	//pline("sizeof(moves) %d", sizeof(moves)); // TODO REMOVE ME
 	mread(fd, (genericptr_t) &monstermoves, sizeof monstermoves);
+	//pline("sizeof(monstermoves) %d", sizeof(monstermoves)); // TODO REMOVE ME
 	mread(fd, (genericptr_t) &quest_status, sizeof(struct q_score));
+	//pline("sizeof(struct q_score) %d", sizeof(struct q_score)); // TODO REMOVE ME
 	mread(fd, (genericptr_t) spl_book,
 				sizeof(struct spell) * (MAXSPELL + 1));
 	restore_artifacts(fd);
@@ -803,6 +837,9 @@ boolean ghostly;
 
 	/* First some sanity checks */
 	mread(fd, (genericptr_t) &hpid, sizeof(hpid));
+	//pline("hpid %d", hpid); // TODO REMOVE ME
+	//pline("sizeof(hpid) %d", sizeof(hpid)); // TODO REMOVE ME
+	//pline("sizeof(dlvl) %d", sizeof(dlvl)); // TODO REMOVE ME
 /* CHECK:  This may prevent restoration */
 #ifdef TOS
 	mread(fd, (genericptr_t) &tlev, sizeof(tlev));
@@ -854,25 +891,36 @@ boolean ghostly;
 	mread(fd, (genericptr_t) levl, sizeof(levl));
 #endif	/* RLECOMP */
 
+	//pline("omoves %d", omoves); // TODO REMOVE ME
+	//pline("sizeof(omoves) %d", sizeof(omoves)); // TODO REMOVE ME
 	mread(fd, (genericptr_t)&omoves, sizeof(omoves));
 	mread(fd, (genericptr_t)&upstair, sizeof(stairway));
+	//pline("upstair %dx%d", upstair.sx, upstair.sy); // TODO REMOVE ME
 	mread(fd, (genericptr_t)&dnstair, sizeof(stairway));
+	//pline("dnstair %dx%d", dnstair.sx, dnstair.sy); // TODO REMOVE ME
 	mread(fd, (genericptr_t)&upladder, sizeof(stairway));
 	mread(fd, (genericptr_t)&dnladder, sizeof(stairway));
 	mread(fd, (genericptr_t)&sstairs, sizeof(stairway));
 	mread(fd, (genericptr_t)&updest, sizeof(dest_area));
 	mread(fd, (genericptr_t)&dndest, sizeof(dest_area));
+	//pline("sizeof(dest_area) %d", sizeof(dest_area)); // TODO REMOVE ME
 	mread(fd, (genericptr_t)&level.flags, sizeof(level.flags));
+	//pline("sizeof(level.flags) %d", sizeof(level.flags)); // TODO REMOVE ME
 	mread(fd, (genericptr_t)doors, sizeof(doors));
+	//pline("sizeof(doors) %d %ld #", sizeof(doors), lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	rest_rooms(fd);		/* No joke :-) */
 	if (nroom)
 	    doorindex = rooms[nroom - 1].fdoor + rooms[nroom - 1].doorct;
 	else
 	    doorindex = 0;
 
+	pline("100 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	restore_timers(fd, RANGE_LEVEL, ghostly, monstermoves - omoves);
+	pline("200 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	restore_light_sources(fd);
+	pline("300 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	fmon = restmonchn(fd, ghostly);
+	pline("400 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 
 	/* regenerate animals while on another level */
 	if (u.uz.dlevel) {
@@ -894,9 +942,12 @@ boolean ghostly;
 		restore_cham(mtmp);
 	    }
 	}
+	pline("500 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 
 	rest_worm(fd);	/* restore worm information */
+	pline("600 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	ftrap = 0;
+	//pline("sizeof(struct trap) %d", sizeof(struct trap)); // TODO REMOVE ME
 	while (trap = newtrap(),
 	       mread(fd, (genericptr_t)trap, sizeof(struct trap)),
 	       trap->tx != 0) {	/* need "!= 0" to work around DICE 3.0 bug */
@@ -904,15 +955,23 @@ boolean ghostly;
 		ftrap = trap;
 	}
 	dealloc_trap(trap);
+	pline("700 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	fobj = restobjchn(fd, ghostly, FALSE);
+	pline("800 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	find_lev_obj();
 	/* restobjchn()'s `frozen' argument probably ought to be a callback
 	   routine so that we can check for objects being buried under ice */
 	level.buriedobjlist = restobjchn(fd, ghostly, FALSE);
+	pline("900 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	billobjs = restobjchn(fd, ghostly, FALSE);
+	pline("1000 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	level.mon_gen = rest_mongen_override(fd);
+	pline("1100 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	level.sounds = rest_lvl_sounds(fd);
+	pline("sizeof(struct lvl_sounds) %d %ld", sizeof(struct lvl_sounds), lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
+	pline("1200 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	rest_engravings(fd);
+	pline("1300 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 
 	/* reset level.monsters for new level */
 	for (x = 0; x < COLNO; x++)
@@ -924,9 +983,12 @@ boolean ghostly;
 	    place_monster(mtmp, mtmp->mx, mtmp->my);
 	    if (mtmp->wormno) place_wsegs(mtmp);
 	}
+	pline("1400 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	restdamage(fd, ghostly);
+	pline("1500 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 
 	rest_regions(fd, ghostly);
+	pline("1600 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 	if (ghostly) {
 	    /* Now get rid of all the temp fruits... */
 	    freefruitchn(oldfruit),  oldfruit = 0;
@@ -987,6 +1049,7 @@ boolean ghostly;
 #endif
 	if (ghostly)
 	    clear_id_mapping();
+	pline("2000 %ld #", lseek(fd, 0, SEEK_CUR)); // TODO REMOVE ME
 }
 
 

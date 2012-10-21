@@ -58,26 +58,26 @@ struct u_event {
  * times a challenge has been violated.
  */
 struct u_conduct {		/* number of times... */
-	long	unvegetarian;	/* eaten any animal */
-	long	unvegan;	/* ... or any animal byproduct */
-	long	food;		/* ... or any comestible */
-	long	gnostic;	/* used prayer, priest, or altar */
-	long	weaphit;	/* hit a monster with a weapon */
-	long	killer;		/* killed a monster yourself */
-	long	literate;	/* read something (other than BotD) */
-	long	polypiles;	/* polymorphed an object */
-	long	polyselfs;	/* transformed yourself */
-	long	wishes;		/* used a wish */
-	long	wisharti;	/* wished for an artifact */
-	long	wishmagic;	/* wished for a magic object */
-	long	armoruses;	/* put on a piece of armor */
-	long	unblinded;	/* starting non-blindfolded and removing a blindfold */
-	long	robbed;		/* killed an artifact-guardian (like an ordinary robber) */
-	long	elbereths;	/* engraved Elbereth */
-	long	bones;		/* encountered bones level */
-	long	non_racial_armor;	/* put on non-racial armor */
-	long	non_racial_weapons;	/* wielded non-racial weapons */
-	long	sokoban;		/* how many times violated sokoban "rules" */
+	int32_t	unvegetarian;	/* eaten any animal */
+	int32_t	unvegan;	/* ... or any animal byproduct */
+	int32_t	food;		/* ... or any comestible */
+	int32_t	gnostic;	/* used prayer, priest, or altar */
+	int32_t	weaphit;	/* hit a monster with a weapon */
+	int32_t	killer;		/* killed a monster yourself */
+	int32_t	literate;	/* read something (other than BotD) */
+	int32_t	polypiles;	/* polymorphed an object */
+	int32_t	polyselfs;	/* transformed yourself */
+	int32_t	wishes;		/* used a wish */
+	int32_t	wisharti;	/* wished for an artifact */
+	int32_t	wishmagic;	/* wished for a magic object */
+	int32_t	armoruses;	/* put on a piece of armor */
+	int32_t	unblinded;	/* starting non-blindfolded and removing a blindfold */
+	int32_t	robbed;		/* killed an artifact-guardian (like an ordinary robber) */
+	int32_t	elbereths;	/* engraved Elbereth */
+	int32_t	bones;		/* encountered bones level */
+	int32_t	non_racial_armor;	/* put on non-racial armor */
+	int32_t	non_racial_weapons;	/* wielded non-racial weapons */
+	int32_t	sokoban;		/* how many times violated sokoban "rules" */
 				/* genocides already listed at end of game */
 };
 
@@ -413,32 +413,31 @@ struct you {
 	int ugifts;			/* number of artifacts bestowed */
 	int ublessed, ublesscnt;	/* blessing/duration from #pray */
 #ifndef GOLDOBJ
-	long	ugold, ugold0;
+	int32_t	ugold, ugold0;
 #else
-	long	umoney0;
+	int32_t	umoney0;
 #endif
-	long	uexp, urexp;
-	long	urscore;	/**< the current score */
-	long	ucleansed;	/* to record moves when player was cleansed */
-	long	usleep;		/* sleeping; monstermove you last started */
+	int32_t	uexp, urexp;
+	int32_t	urscore;	/**< the current score */
+	int32_t	ucleansed;	/* to record moves when player was cleansed */
+	int32_t	usleep;		/* sleeping; monstermove you last started */
 	int uinvault;
-	struct monst *ustuck;
+	struct monst *ustuck __attribute__ ((aligned (8)));
 #ifdef STEED
-	struct monst *usteed;
-	long ugallop;
+	struct monst *usteed __attribute__ ((aligned (8)));
+	int32_t ugallop;
 	int urideturns;
 #endif
 	int	umortality;		/* how many times you died */
 	int ugrave_arise; /* you die and become something aside from a ghost */
-	time_t	ubirthday;		/* real world time when game began */
-	time_t	udeathday;		/* real world time when game ended */
+	time_t	ubirthday __attribute__ ((aligned (8)));	/* real world time when game began */
+	time_t	udeathday __attribute__ ((aligned (8)));	/* real world time when game ended */
 
 	int	weapon_slots;		/* unused skill slots */
 	int	skills_advanced;		/* # of advances made so far */
-	xchar	skill_record[P_SKILL_LIMIT];	/* skill advancements */
-	struct skills weapon_skills[P_NUM_SKILLS];
+	xchar	skill_record[P_SKILL_LIMIT] __attribute__ ((aligned (8)));	/* skill advancements */
+	struct skills weapon_skills[P_NUM_SKILLS] __attribute__ ((aligned (8)));
 	boolean twoweap;		/* KMH -- Using two-weapon combat */
-
 };	/* end of `struct you' */
 
 #define Upolyd (u.umonnum != u.umonster)

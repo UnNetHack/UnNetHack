@@ -10,23 +10,41 @@
 
 union vptrs {
 	    struct obj *v_nexthere;	/* floor location lists */
+#if SIZEOF_VOIDP==4
+	    uint32_t dummy_padding_v_nexthere;
+#endif
 	    struct obj *v_ocontainer;	/* point back to container */
+#if SIZEOF_VOIDP==4
+	    uint32_t dummy_padding_v_ocontainer;
+#endif
 	    struct monst *v_ocarry;	/* point back to carrying monst */
+#if SIZEOF_VOIDP==4
+	    uint32_t dummy_padding_v_ocarry;
+#endif
 };
 
 struct obj {
 	struct obj *nobj;
+#if SIZEOF_VOIDP==4
+	uint32_t dummy_padding_nobj;
+#endif
 	union vptrs v;
 #define nexthere	v.v_nexthere
 #define ocontainer	v.v_ocontainer
 #define ocarry		v.v_ocarry
 
 	struct obj *cobj;	/* contents list for containers */
+#if SIZEOF_VOIDP==4
+	uint32_t dummy_padding_cobj;
+#endif
 	size_t o_id;
+#if SIZEOF_SIZE_T==4
+	uint32_t dummy_padding_m_id;
+#endif
+	int32_t quan;		/* number of items */
 	xchar ox,oy;
 	short otyp;		/* object class number */
 	unsigned owt;
-	long quan;		/* number of items */
 
 	schar spe;		/* quality of weapon, armor or ring (+ or -)
 				   number of charges for wand ( >= -1 )
@@ -102,7 +120,7 @@ struct obj {
 	Bitfield(was_dropped,1); /* dropped deliberately by the hero */
 	/* 3 free bits */
 
-	int	corpsenm;	/* type of corpse is mons[corpsenm] */
+	int	corpsenm __attribute__ ((aligned (8)));	/* type of corpse is mons[corpsenm] */
 #define leashmon  corpsenm	/* gets m_id of attached pet */
 #define spestudied corpsenm	/* # of times a spellbook has been studied */
 #define fromsink  corpsenm	/* a potion from a sink */
@@ -112,15 +130,17 @@ struct obj {
 #endif
 
 	unsigned oeaten;	/* nutrition left in food, if partly eaten */
-	long age;		/* creation date */
+	int32_t age;		/* creation date */
 
 	uchar onamelth;		/* length of name (following oxlth) */
 	short oxlth;		/* length of following data */
 	/* in order to prevent alignment problems oextra should
 	   be (or follow) a long int */
-	long owornmask;
-	long oextra[1];		/* used for name of ordinary objects - length
+	int32_t owornmask;
+	int32_t oextra[1];		/* used for name of ordinary objects - length
 				   is flexible; amount for tmp gold objects */
+#if 0
+#endif
 };
 
 #define newobj(xl)	(struct obj *)alloc((unsigned)(xl) + sizeof(struct obj))

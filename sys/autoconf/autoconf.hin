@@ -260,6 +260,12 @@
 /* Kitchen sinks */
 #undef SINKS
 
+/* The size of `long', as computed by sizeof. */
+#undef SIZEOF_LONG
+
+/* The size of `size_t', as computed by sizeof. */
+#undef SIZEOF_SIZE_T
+
 /* The size of `unsigned int', as computed by sizeof. */
 #undef SIZEOF_UNSIGNED_INT
 
@@ -268,6 +274,9 @@
 
 /* The size of `unsigned long long', as computed by sizeof. */
 #undef SIZEOF_UNSIGNED_LONG_LONG
+
+/* The size of `void*', as computed by sizeof. */
+#undef SIZEOF_VOIDP
 
 /* Sort item lists alphabetically by description. */
 #undef SORTLOOT

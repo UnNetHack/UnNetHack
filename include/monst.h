@@ -39,8 +39,25 @@
 
 struct monst {
 	struct monst *nmon;
+#if SIZEOF_VOIDP==4
+	uint32_t dummy_padding_nmon;
+#endif
 	struct permonst *data;
+#if SIZEOF_VOIDP==4
+	uint32_t dummy_padding_data;
+#endif
 	size_t m_id;
+#if SIZEOF_SIZE_T==4
+	uint32_t dummy_padding_m_id;
+#endif
+	struct obj *minvent;
+#if SIZEOF_VOIDP==4
+	uint32_t dummy_padding_minvent;
+#endif
+	struct obj *mw;
+#if SIZEOF_VOIDP==4
+	uint32_t dummy_padding_nw;
+#endif
 	short mnum;		/* permanent monster index number */
 	short movement;		/* movement points (derived from permonst definition and added effects */
 	uchar m_lev;		/* adjusted difficulty level of monster */
@@ -111,7 +128,7 @@ struct monst {
 	Bitfield(wormno,5);	/* at most 31 worms on any level */
 #define MAX_NUM_WORMS	32	/* should be 2^(wormno bitfield size) */
 
-	long mstrategy;		/* for monsters with mflag3: current strategy */
+	uint32_t mstrategy;		/* for monsters with mflag3: current strategy */
 #define STRAT_ARRIVE	0x40000000L	/* just arrived on current level */
 #define STRAT_WAITFORU	0x20000000L
 #define STRAT_CLOSE	0x10000000L
@@ -128,27 +145,24 @@ struct monst {
 #define STRAT_GOALX(s)	((xchar)((s & STRAT_XMASK) >> 16))
 #define STRAT_GOALY(s)	((xchar)((s & STRAT_YMASK) >> 8))
 
-	long mtrapseen;		/* bitmap of traps we've been trapped in */
-	long mlstmv;		/* for catching up with lost time */
+	uint32_t mtrapseen;		/* bitmap of traps we've been trapped in */
+	uint32_t mlstmv;		/* for catching up with lost time */
 #ifndef GOLDOBJ
-	long mgold;
+	uint32_t mgold;
 #endif
-	struct obj *minvent;
-
-	struct obj *mw;
-	long misc_worn_check;
+	uint32_t misc_worn_check;
 	xchar weapon_check;
 
 #ifdef LIVELOG_BONES_KILLER
-	char former_rank[25];	/* for bones' ghost rank in the former life */
+	char former_rank[32];	/* for bones' ghost rank in the former life */
 #endif
 
 	uchar mnamelth;		/* length of name (following mxlth) */
 	short mxlth;		/* length of following data */
 	/* in order to prevent alignment problems mextra should
 	   be (or follow) a long int */
-	int meating;		/* monster is eating timeout */
-	long mextra[1]; /* monster dependent info */
+	uint32_t meating;		/* monster is eating timeout */
+	uint32_t mextra[1] __attribute__ ((aligned (8))); /* monster dependent info */
 };
 
 /*

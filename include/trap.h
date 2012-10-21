@@ -13,7 +13,10 @@ union vlaunchinfo {
 };
 
 struct trap {
-	struct trap *ntrap;
+	struct trap *ntrap __attribute__ ((aligned (8)));
+#if SIZEOF_VOIDP==4
+	uint32_t dummy_padding_ntrap;
+#endif
 	xchar tx,ty;
 	d_level dst;	/* destination for portals */
 	coord launch;

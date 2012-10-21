@@ -432,10 +432,12 @@ struct obj *corpse;
 
 	store_version(fd);
 	bwrite(fd, (genericptr_t) &c, sizeof c);
+//#if 0 // TODO REMOVE ME
 	bwrite(fd, (genericptr_t) bonesid, (unsigned) c);	/* DD.nnn */
 	savefruitchn(fd, WRITE_SAVE | FREE_SAVE);
 	update_mlstmv();	/* update monsters for eventual restoration */
 	savelev(fd, ledger_no(&u.uz), WRITE_SAVE | FREE_SAVE);
+//#endif // TODO REMOVE ME
 	bclose(fd);
 	commit_bonesfile(&u.uz);
 	compress_bonesfile();
@@ -479,7 +481,10 @@ getbones()
 		}
 #endif
 		mread(fd, (genericptr_t) &c, sizeof c);	/* length incl. '\0' */
+		//pline("c %d", c); // TODO REMOVE ME
+		//pline("sizeof(c) %d", sizeof(c)); // TODO REMOVE ME
 		mread(fd, (genericptr_t) oldbonesid, (unsigned) c); /* DD.nnn */
+		//pline("%s", oldbonesid); // TODO REMOVE ME
 		if (strcmp(bonesid, oldbonesid) != 0) {
 			char errbuf[BUFSZ];
 

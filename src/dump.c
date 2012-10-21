@@ -446,7 +446,7 @@ dump_screenshot()
 {
 	char screenshot[BUFSZ];
 	char *filename = get_dump_filename();
-	Sprintf(screenshot, "%s_screenshot_%ld_t%ld.html", filename, u.ubirthday, moves);
+	Sprintf(screenshot, "%s_screenshot_%ld_t%ld.html", filename, (long)u.ubirthday, (long)moves);
 	if (filename) free(filename);
 
 	html_dump_fp = fopen(screenshot, "w");

@@ -428,10 +428,10 @@ make_version()
 	/*
 	 * integer version number
 	 */
-	version.incarnation = ((unsigned long)VERSION_MAJOR << 24) |
-				((unsigned long)VERSION_MINOR << 16) |
-				((unsigned long)PATCHLEVEL << 8) |
-				((unsigned long)EDITLEVEL);
+	version.incarnation = ((uint32_t)VERSION_MAJOR << 24) |
+				((uint32_t)VERSION_MINOR << 16) |
+				((uint32_t)PATCHLEVEL << 8) |
+				((uint32_t)EDITLEVEL);
 	/*
 	 * encoded feature list
 	 * Note:  if any of these magic numbers are changed or reassigned,
@@ -439,7 +439,7 @@ make_version()
 	 * The actual values have no special meaning, and the category
 	 * groupings are just for convenience.
 	 */
-	version.feature_set = (unsigned long)(0L
+	version.feature_set = (uint32_t)(0L
 		/* levels and/or topology (0..4) */
 #ifdef REINCARNATION
 			| (1L <<  1)

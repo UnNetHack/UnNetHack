@@ -470,8 +470,11 @@ struct rm {
 #define disturbed	horizontal  /* a grave that has been disturbed */
 
 struct damage {
-	struct damage *next;
-	long when, cost;
+	struct damage *next __attribute__ ((aligned (8)));
+#if SIZEOF_VOIDP==4
+	uint32_t dummy_padding_next;
+#endif
+	int32_t when, cost;
 	coord place;
 	schar typ;
 };
@@ -510,13 +513,19 @@ struct mon_gen_tuple {
     int freq;
     boolean is_sym;
     int monid;
-    struct mon_gen_tuple *next;
+    struct mon_gen_tuple *next __attribute__ ((aligned (8)));
+#if SIZEOF_VOIDP==4
+    uint32_t dummy_padding_next;
+#endif
 };
 
 struct mon_gen_override {
     int override_chance;
     int total_mon_freq;
-    struct mon_gen_tuple *gen_chances;
+    struct mon_gen_tuple *gen_chances __attribute__ ((aligned (8)));
+#if SIZEOF_VOIDP==4
+    uint32_t dummy_padding_gen_chances;
+#endif
 };
 
 #define LVLSND_HEARD	0	/* You_hear(msg); */
@@ -533,6 +542,9 @@ struct lvl_sounds {
     int freq;
     int n_sounds;
     struct lvl_sound_bite *sounds;
+#if SIZEOF_VOIDP==4
+    uint32_t dummy_padding_sounds;
+#endif
 };
 
 typedef struct
