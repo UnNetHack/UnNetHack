@@ -594,6 +594,21 @@ void curses_init_nhcolors()
         init_pair(7, COLOR_CYAN, -1);
         init_pair(8, -1, -1);
 
+	{
+	    int i;
+	    for (i = 0; i < 16; i++) {
+		int clr_remap[16] = {
+		    COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW, COLOR_BLUE,
+		    COLOR_MAGENTA, COLOR_CYAN, -1, COLOR_WHITE,
+		    COLOR_RED+8, COLOR_GREEN+8, COLOR_YELLOW+8, COLOR_BLUE+8,
+		    COLOR_MAGENTA+8, COLOR_CYAN+8, COLOR_WHITE+8
+		};
+		init_pair(17 + (i*2) + 0, clr_remap[i], COLOR_RED);
+		init_pair(17 + (i*2) + 1, clr_remap[i], COLOR_BLUE);
+	    }
+	}
+
+
         if (COLORS >= 16)
         {
             init_pair(9, COLOR_WHITE, -1);

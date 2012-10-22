@@ -115,14 +115,17 @@ void curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
     curses_color = color + 1;
     if (COLORS < 16)
     {
-        if (curses_color > 8)
+        if (curses_color > 8 && curses_color < 17)
             curses_color -= 8;
+        else if (curses_color > (17+16))
+            curses_color -= 16;
     }
     if (onoff == ON)    /* Turn on color/attributes */
     {
         if (color != NONE)
         {
-            if ((color > 7) && (COLORS < 16))
+            if ((((color > 7) && (color < 17)) ||
+		 (color > 17+17)) && (COLORS < 16))
             {
                 wattron(win, A_BOLD);
             }
