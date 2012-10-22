@@ -179,8 +179,6 @@ makedog()
 			if(Role_if(PM_SAMURAI)) petname = "Hachi";     /* Shibuya Station */
 			if(Role_if(PM_BARBARIAN)) petname = "Idefix";  /* Obelix */
 			if(Role_if(PM_RANGER)) petname = "Sirius";     /* Orion's dog */
-		} else if (pettype == PM_KITTEN) {
-			if (!rn2(100)) petname = "Shiva"; /* RIP 1 Oct 1998 - 6 Sep 2009 */
 		}
 	}
 
@@ -219,6 +217,11 @@ makedog()
 	    update_mon_intrinsics(mtmp, otmp, TRUE, TRUE);
 	}
 #endif
+
+	if (!*petname && pettype == PM_KITTEN && !rn2(100)) {
+		if (mtmp->female) petname = "Shiva"; /* RIP 1 Oct 1998 - 6 Sep 2009 */
+		else petname = "Kali"; /* RIP 1 May 2000 - 22 Oct 2012 */
+	}
 
 	if (!petname_used++ && *petname)
 		mtmp = christen_monst(mtmp, petname);
