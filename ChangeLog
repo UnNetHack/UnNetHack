@@ -29,6 +29,8 @@
 	  - Fixed missing item name with traditional menustyle
 	  - Disabled chromatic dragon generation by monster summoning
 	  - Fixed sporadic crash with hitpointbar when hp was below 0
+	  - Clear dungeon overview info for bones files (reported by Christian
+	    Stegen)
 
 	* vanilla bug fixes:
 	  - Prevent the Book of the Dead from being destroyed when the

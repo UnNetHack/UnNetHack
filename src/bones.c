@@ -383,6 +383,7 @@ struct obj *corpse;
 	    levl[x][y].stepped_on = 0;
 	    levl[x][y].waslit = 0;
 	    levl[x][y].glyph = cmap_to_glyph(S_stone);
+	    levl[x][y].styp = STONE; /* clear dungeon overview last seen info */
 	}
 
 	fd = create_bonesfile(&u.uz, &bonesid, whynot);
