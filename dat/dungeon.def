@@ -116,10 +116,11 @@ RNDLEVEL:		"soko3" "none" @ (3, 0) 16
 #
 #   The city of Angband
 #
-DUNGEON:	"Town" "A" (5, 0)
+DUNGEON:        "Town" "A" (2, 0)
 LEVALIGN:       lawful
 ENTRY:		-1
 RNDLEVEL:       "town" "T" @ (1, 0) 2
+RNDLEVEL:       "townfill" "T" @ (2, 0) 1
 LEVELDESC:      town
 
 

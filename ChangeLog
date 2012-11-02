@@ -16,6 +16,9 @@
 	* new monsters:
 	  - locusts (from SporkHack)
 
+	* dungeon layout:
+	  - length of Town branch reduced and special filler level added
+
 	* user interface improvements:
 	  - HP notify, showing HP changes in the message area (from NAO)
 	  - Menus made aware of the maximum count of an item (by heinrich5991)
