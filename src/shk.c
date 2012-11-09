@@ -2324,7 +2324,7 @@ add_to_billobjs(obj)
     struct obj *obj;
 {
     if (obj->where != OBJ_FREE)
-	panic("add_to_billobjs: obj not free (%d)", obj->where);
+	panic("add_to_billobjs: obj not free (%d,%d,%d)", obj->where, obj->otyp, obj->invlet);
     if (obj->timed)
 	obj_stop_timers(obj);
 

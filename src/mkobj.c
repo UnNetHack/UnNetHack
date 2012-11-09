@@ -1122,7 +1122,7 @@ int x, y;
     register struct obj *otmp2 = level.objects[x][y];
 
     if (otmp->where != OBJ_FREE)
-	panic("place_object: obj not free (%d)", otmp->where);
+	panic("place_object: obj not free (%d,%d,%d)", otmp->where, otmp->otyp, otmp->invlet);
 
     obj_no_longer_held(otmp);
     if (otmp->otyp == BOULDER) block_point(x,y);	/* vision */
@@ -1410,7 +1410,7 @@ add_to_minv(mon, obj)
     struct obj *otmp;
 
     if (obj->where != OBJ_FREE)
-	panic("add_to_minv: obj not free (%d)", obj->where);
+	panic("add_to_minv: obj not free (%d,%d,%d)", obj->where, obj->otyp, obj->invlet);
 
     /* merge if possible */
     for (otmp = mon->minvent; otmp; otmp = otmp->nobj)
@@ -1435,7 +1435,7 @@ add_to_container(container, obj)
     struct obj *otmp;
 
     if (obj->where != OBJ_FREE)
-	panic("add_to_container: obj not free (%d)", obj->where);
+	panic("add_to_container: obj not free (%d,%d,%d)", obj->where, obj->otyp, obj->invlet);
     if (container->where != OBJ_INVENT && container->where != OBJ_MINVENT)
 	obj_no_longer_held(obj);
 
@@ -1455,7 +1455,7 @@ add_to_migration(obj)
     struct obj *obj;
 {
     if (obj->where != OBJ_FREE)
-	panic("add_to_migration: obj not free (%d)", obj->where);
+	panic("add_to_migration: obj not free (%d,%d,%d)", obj->where, obj->otyp, obj->invlet);
 
     obj->where = OBJ_MIGRATING;
     obj->nobj = migrating_objs;
@@ -1467,7 +1467,7 @@ add_to_buried(obj)
     struct obj *obj;
 {
     if (obj->where != OBJ_FREE)
-	panic("add_to_buried: obj not free (%d)", obj->where);
+	panic("add_to_buried: obj not free (%d,%d,%d)", obj->where, obj->otyp, obj->invlet);
 
     obj->where = OBJ_BURIED;
     obj->nobj = level.buriedobjlist;
@@ -1497,7 +1497,7 @@ dealloc_obj(obj)
     struct obj *obj;
 {
     if (obj->where != OBJ_FREE)
-	panic("dealloc_obj: obj not free (%d)", obj->where);
+	panic("dealloc_obj: obj not free (%d,%d,%d)", obj->where, obj->otyp, obj->invlet);
 
     /* free up any timers attached to the object */
     if (obj->timed)

@@ -349,7 +349,7 @@ struct obj *obj;
 	struct obj *otmp, *prev;
 
 	if (obj->where != OBJ_FREE)
-	    panic("addinv: obj not free (%d)", obj->where);
+	    panic("addinv: obj not free (%d,%d,%d)", obj->where, obj->otyp, obj->invlet);
 	obj->no_charge = 0;	/* not meaningful for invent */
 	obj->was_thrown = 0;
 	obj->was_dropped = 0;
