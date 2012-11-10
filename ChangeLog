@@ -34,6 +34,7 @@
 	  - Fixed sporadic crash with hitpointbar when hp was below 0
 	  - Clear dungeon overview info for bones files (reported by Christian
 	    Stegen)
+	  - Fixed crash when destroying bag of holding containing gold pieces
 
 	* vanilla bug fixes:
 	  - Prevent the Book of the Dead from being destroyed when the
