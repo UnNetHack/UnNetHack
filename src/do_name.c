@@ -1025,8 +1025,10 @@ static const char * const bogusmons[] = {
 	"brogmoid", "dornbeast",		/* Quendor (Zork, &c.) */
 	"Ancient Multi-Hued Dragon", "Evil Iggy",
 						/* Moria */
+	"rattlesnake", "ice monster", "phantom",
+	"quagga", "aquator", "griffin",
 	"emu", "kestrel", "xeroc", "venus flytrap",
-						/* Rogue */
+						/* Rogue V5 http://rogue.rogueforge.net/vade-mecum/ */
 	"creeping coins",			/* Wizardry */
 	"hydra", "siren",			/* Greek legend */
 	"killer bunny",				/* Monty Python */
