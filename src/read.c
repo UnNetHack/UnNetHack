@@ -24,13 +24,17 @@ static NEARDATA const char readable[] =
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
 static void FDECL(wand_explode, (struct obj *));
+#if 0
 static void NDECL(do_class_genocide);
+#endif
 static void FDECL(stripspe,(struct obj *));
 static void FDECL(p_glow1,(struct obj *));
 static void FDECL(p_glow2,(struct obj *,const char *));
 static void FDECL(randomize,(int *, int));
 static void FDECL(forget_single_object, (int));
+#if 0
 static void FDECL(forget, (int));
+#endif
 static void FDECL(maybe_tame, (struct monst *,struct obj *));
 
 STATIC_PTR void FDECL(do_flood, (int,int,genericptr_t));
@@ -83,6 +87,56 @@ doread()
     "Don't Panic",				/* HHGTTG */
     "Furinkan High School Athletic Dept.",	/* Ranma 1/2 */
     "Hel-LOOO, Nurse!",			/* Animaniacs */
+    /* NAO */
+    "=^.^=",
+    "100% goblin hair - do not wash",
+    "Aim >>> <<< here",
+    "cK -- Cockatrice touches the Kop",
+    "Don't ask me, I only adventure here",
+    "Down With Pants!",
+    "Gehennoms Angels",
+    "Glutton For Punishment",
+    "Go Team Ant!",
+    "Got Newt?",
+    "Heading for Godhead",
+    "Hello, my darlings!", /* Charlie Drake */
+    "Hey! Nymphs! Steal This T-Shirt!",
+    "I <3 Dungeon of Doom",
+    "I am a Valkyrie. If you see me running, try to keep up.",
+    "I Am Not a Pack Rat - I Am a Collector",
+    "I bounced off a rubber tree",
+    "If you can read this, I can hit you with my polearm",
+    "I Support Single Succubi",
+    "I want to live forever or die in the attempt.",
+    "Kop Killaz",
+    "Lichen Park",
+    "LOST IN THOUGHT - please send search party",
+    "Minetown Watch",
+    "Ms. Palm's House of Negotiable Affection -- A Very Reputable House Of Disrepute",
+    "^^  My eyes are up there!  ^^",
+    "Next time you wave at me, use more than one finger, please.",
+    "Objects In This Shirt Are Closer Than They Appear",
+    "Protection Racketeer",
+    "P Happens",
+    "Real men love Crom",
+    "Sokoban Gym -- Get Strong or Die Trying",
+    "Somebody stole my Mojo!",
+    "The Hellhound Gang",
+    "The Werewolves",
+    "They Might Be Storm Giants",
+    "Weapons don't kill people, I kill people",
+    "White Zombie",
+    "Worship me",
+    "You laugh because I'm different, I laugh because you're about to die",
+    "You should hear what the voices in my head are saying about you.",
+    "Anhur State University - Home of the Fighting Fire Ants!",
+    "FREE HUGS",
+    "Serial Ascender",
+    "I couldn't afford this T-shirt so I stole it!",
+    "End Mercantile Opacity Discrimination Now: Let Invisible Customers Shop!",
+    "Elvira's House O'Succubi, granting the gift of immorality!",
+    /* UnNetHack */
+    "I made a NetHack fork and all I got was this lousy T-shirt!",	/* galehar */
 	    };
 	    char buf[BUFSZ];
 	    int erosion;
@@ -287,14 +341,14 @@ static void
 stripspe(obj)
 register struct obj *obj;
 {
-	if (obj->blessed) pline(nothing_happens);
+	if (obj->blessed) pline("%s", nothing_happens);
 	else {
 		if (obj->spe > 0) {
 		    obj->spe = 0;
 		    if (obj->otyp == OIL_LAMP || obj->otyp == BRASS_LANTERN)
 			obj->age = 0;
 		    Your("%s %s briefly.",xname(obj), otense(obj, "vibrate"));
-		} else pline(nothing_happens);
+		} else pline("%s", nothing_happens);
 	}
 }
 
@@ -451,7 +505,7 @@ int curse_bless;
 		    if (obj->spe < 3)
 			Your("marker seems permanently dried out.");
 		    else
-			pline(nothing_happens);
+			pline("%s", nothing_happens);
 		} else if (is_blessed) {
 		    n = rn1(16,15);		/* 15..30 */
 		    if (obj->spe + n <= 50)
@@ -509,7 +563,7 @@ int curse_bless;
 		    if (obj->spe < 5) {
 			obj->spe++;
 			p_glow1(obj);
-		    } else pline(nothing_happens);
+		    } else pline("%s", nothing_happens);
 		}
 		break;
 	    case BAG_OF_TRICKS:
@@ -685,6 +739,7 @@ forget_map(howmuch)
 	    if (howmuch & ALL_MAP || rn2(7)) {
 		/* Zonk all memory of this location. */
 		levl[zx][zy].seenv = 0;
+		levl[zx][zy].stepped_on = 0;
 		levl[zx][zy].waslit = 0;
 		levl[zx][zy].glyph = cmap_to_glyph(S_stone);
 		levl[zx][zy].styp = STONE;
@@ -752,6 +807,7 @@ forget_levels(percent)
 	}
 }
 
+#if 0
 /*
  * Forget some things (e.g. after reading a scroll of amnesia).  When called,
  * the following are always forgotten:
@@ -794,6 +850,7 @@ int howmuch;
 	 */
 	docrt();		/* this correctly will reset vision */
 }
+#endif
 
 /* monster is hit by scroll of taming's effect */
 static void
@@ -882,7 +939,9 @@ register struct obj	*sobj;
 #ifdef MAIL
 	case SCR_MAIL:
 		known = TRUE;
-		if (sobj->spe)
+		if (sobj->spe == MAIL_HINT)
+		    read_hint(sobj);
+		else if (sobj->spe == MAIL_JUNK)
 		    pline("This seems to be junk mail addressed to the finder of the Eye of Larn.");
 		/* note to the puzzled: the game Larn actually sends you junk
 		 * mail if you win!
@@ -966,7 +1025,7 @@ register struct obj	*sobj;
 		    otmp->spe >= 9 ? (rn2(otmp->spe) == 0) :
 		    sobj->blessed ? rnd(3-otmp->spe/3) : 1;
 		if (s >= 0 && otmp->otyp >= GRAY_DRAGON_SCALES &&
-					otmp->otyp <= YELLOW_DRAGON_SCALES) {
+					otmp->otyp <= CHROMATIC_DRAGON_SCALES) {
 			/* dragon scales get turned into dragon scale mail */
 			Your("%s merges and hardens!", xname(otmp));
 			setworn((struct obj *)0, W_ARM);
@@ -1285,8 +1344,8 @@ register struct obj	*sobj;
 	case SCR_GENOCIDE:
 		You("have found a scroll of genocide!");
 		known = TRUE;
-		do_genocide(!sobj->cursed | (2 * !!Confusion),
-		            !sobj->blessed);
+		do_genocide((!sobj->cursed) | (2 * !!Confusion),
+		             !sobj->blessed);
 		break;
 	case SCR_LIGHT:
 		if(!Blind) known = TRUE;
@@ -1312,7 +1371,7 @@ register struct obj	*sobj;
 			int random_classes[] = { WEAPON_CLASS, ARMOR_CLASS, RING_CLASS, AMULET_CLASS,
 				TOOL_CLASS, FOOD_CLASS, POTION_CLASS, SCROLL_CLASS, SPBOOK_CLASS,
 				WAND_CLASS, COIN_CLASS, GEM_CLASS };
-			return object_detect((struct obj *)0, random_classes[rn2(SIZE(random_classes))]);
+			return object_detect((struct obj *)0, random_classes[rn2(SIZE(random_classes))], FALSE);
 		} else if (sobj->cursed) return(trap_detect(sobj));
 		else return(gold_detect(sobj));
 	case SCR_FOOD_DETECTION:
@@ -1368,14 +1427,14 @@ register struct obj	*sobj;
 		    make_confused(HConfusion + rnd(30), FALSE);
 		    break;
 		}
-		if (sobj->blessed) {
-		    register int x, y;
-
-		    for (x = 1; x < COLNO; x++)
-		    	for (y = 0; y < ROWNO; y++)
-		    	    if (levl[x][y].typ == SDOOR)
-		    	    	cvt_sdoor_to_door(&levl[x][y]);
-		    /* do_mapping() already reveals secret passages */
+		/* reveal secret doors for uncursed and blessed scrolls */
+		if (!sobj->cursed) {
+			register int x, y;
+			for (x = 1; x < COLNO; x++)
+				for (y = 0; y < ROWNO; y++)
+					if (levl[x][y].typ == SDOOR)
+						cvt_sdoor_to_door(&levl[x][y]);
+			/* do_mapping() already reveals secret passages */
 		}
 		known = TRUE;
 	case SPE_MAGIC_MAPPING:
@@ -1388,6 +1447,10 @@ register struct obj	*sobj;
 		cval = (sobj->cursed && !confused);
 		if(cval) HConfusion = 1;	/* to screw up map */
 		do_mapping();
+		/* objects, too, pal! */
+		if (sobj->blessed && !cval) {
+		  object_detect(sobj, 0, TRUE);
+		}
 		if(cval) {
 		    HConfusion = 0;		/* restore */
 		    pline("Unfortunately, you can't grasp the details.");
@@ -1457,7 +1520,7 @@ register struct obj	*sobj;
 	    			sobj->blessed ? "around" : "above");
 	    	known = 1;
 	    	if (In_sokoban(&u.uz))
-	    	    change_luck(-1);	/* Sokoban guilt */
+	    	    sokoban_trickster();	/* Sokoban guilt */
 
 	    	/* Loop through the surrounding squares */
 	    	if (!sobj->cursed) for (x = u.ux-1; x <= u.ux+1; x++) {
@@ -1502,7 +1565,7 @@ register struct obj	*sobj;
 		cc.x = u.ux;
 		cc.y = u.uy;
 		if (getpos(&cc, TRUE, "the desired position") < 0) {
-		    pline(Never_mind);
+		    pline("%s", Never_mind);
 		    return 0;
 		}
 		if (!cansee(cc.x, cc.y) || distu(cc.x, cc.y) >= 32) {
@@ -1510,7 +1573,7 @@ register struct obj	*sobj;
 		    return 0;
 		}
 		(void) create_gas_cloud(cc.x, cc.y, 3+bcsign(sobj),
-						8+4*bcsign(sobj));
+						8+4*bcsign(sobj), rn1(3,4));
 		break;
 	}
 	default:
@@ -1642,6 +1705,7 @@ do_it:
 	vision_full_recalc = 1;	/* delayed vision recalculation */
 }
 
+#if 0
 static void
 do_class_genocide()
 {
@@ -1651,7 +1715,7 @@ do_class_genocide()
 
 	for(j=0; ; j++) {
 		if (j >= 5) {
-			pline(thats_enough_tries);
+			pline("%s", thats_enough_tries);
 			return;
 		}
 		do {
@@ -1794,6 +1858,7 @@ do_class_genocide()
 		return;
 	}
 }
+#endif
 
 #define REALLY 1
 #define PLAYER 2
@@ -1823,7 +1888,7 @@ boolean only_on_level; /**< if TRUE only genocide monsters on current level,
 	} else {
 	    for(i = 0; ; i++) {
 		if(i >= 5) {
-		    pline(thats_enough_tries);
+		    pline("%s", thats_enough_tries);
 		    return;
 		}
 		getlin("What monster do you want to genocide? [type the name]",
@@ -1906,14 +1971,15 @@ boolean only_on_level; /**< if TRUE only genocide monsters on current level,
 		which = !type_is_pname(ptr) ? "the " : "";
 	}
 	if (how & REALLY) {
+	    char* genocided_name = (*which != 'a') ? buf : makeplural(buf);
 	    /* setting no-corpse affects wishing and random tin generation */
 	    if (!only_on_level) { mvitals[mndx].mvflags |= (G_GENOD | G_NOCORPSE); }
 	    pline("Wiped out %s%s%s.", which,
-		  (*which != 'a') ? buf : makeplural(buf),
+		  genocided_name,
 		  on_this_level);
 
 #ifdef LIVELOGFILE
-	livelog_genocide(buf, only_on_level);
+	livelog_genocide(genocided_name, only_on_level);
 #endif
 
 	if (killplayer) {
@@ -1976,7 +2042,7 @@ boolean only_on_level; /**< if TRUE only genocide monsters on current level,
 	    if (cnt)
 		pline("Sent in some %s.", makeplural(buf));
 	    else
-		pline(nothing_happens);
+		pline("%s", nothing_happens);
 	}
 }
 
@@ -1984,6 +2050,9 @@ void
 punish(sobj)
 register struct obj	*sobj;
 {
+#ifdef CONVICT
+	struct obj *otmp;
+#endif /* CONVICT */
 	/* KMH -- Punishment is still okay when you are riding */
 	You("are being punished for your misbehavior!");
 	if(Punished){
@@ -1997,7 +2066,17 @@ register struct obj	*sobj;
 		return;
 	}
 	setworn(mkobj(CHAIN_CLASS, TRUE), W_CHAIN);
+#ifdef CONVICT
+    if (((otmp = carrying(HEAVY_IRON_BALL)) != 0) &&(otmp->oartifact ==
+     ART_IRON_BALL_OF_LIBERATION)) {
+        setworn(otmp, W_BALL);
+        Your("%s chains itself to you!", xname(otmp));
+    } else {
 	setworn(mkobj(BALL_CLASS, TRUE), W_BALL);
+    }
+#else
+	setworn(mkobj(BALL_CLASS, TRUE), W_BALL);
+#endif /* CONVICT */
 	uball->spe = 1;		/* special ball (see save) */
 
 	/*
@@ -2096,7 +2175,7 @@ create_particular()
 	} while (++tries < 5);
 
 	if (tries == 5) {
-	    pline(thats_enough_tries);
+	    pline("%s", thats_enough_tries);
 	} else {
 	    (void) cant_create(&which, FALSE);
 	    whichpm = &mons[which];

@@ -62,7 +62,7 @@ use_camera(obj)
 	if(!getdir((char *)0)) return(0);
 
 	if (obj->spe <= 0) {
-		pline(nothing_happens);
+		pline("%s", nothing_happens);
 		return (1);
 	}
 	consume_obj_charge(obj, TRUE);
@@ -192,9 +192,27 @@ struct obj* tobj;
 	    }
 	    return TRUE;
 	}
+
+	/* listening to eggs is a little fishy, but so is stethoscopes detecting alignment
+	 * The overcomplex wording is because all the monster-naming functions operate
+	 * on actual instances of the monsters, and we're dealing with just an index
+	 * so we can avoid things like "a owlbear", etc. */
+	if ((otmp = sobj_at(EGG,rx,ry))) {
+		if (Hallucination) {
+			pline("You listen to the egg and guess... %s?",rndmonnam());
+		} else {
+			if (stale_egg(otmp) || otmp->corpsenm == NON_PM) {
+				pline("The egg doesn't make much noise at all.");
+			} else {
+				pline("You listen to the egg and guess... %s?",mons[otmp->corpsenm].mname);
+			}
+		}
+		return TRUE;
+	}
+
 	/* using a stethoscope on a safe?  You safe-cracker, you. */
 	if ((otmp = sobj_at(IRON_SAFE,rx,ry))) {
-		pick_lock(tobj,rx,ry);
+		pick_lock(tobj,rx,ry,FALSE);
 		return TRUE;
 	}
 
@@ -628,7 +646,7 @@ struct obj *obj;
 		if(!Blind && !Invisible) {
 		    if (u.umonnum == PM_FLOATING_EYE) {
 			if (!Free_action) {
-			pline(Hallucination ?
+			pline("%s", Hallucination ?
 			      "Yow!  The mirror stares back!" :
 			      "Yikes!  You've frozen yourself!");
 			nomul(-rnd((MAXULEV+6) - u.ulevel), "gazing into a mirror");
@@ -805,7 +823,7 @@ struct obj **optr;
 		if (!obj->cursed)
 		    (void) openit();
 		else
-		    pline(nothing_happens);
+		    pline("%s", nothing_happens);
 
 	    } else if (obj->cursed) {
 		coord mm;
@@ -837,7 +855,7 @@ struct obj **optr;
 		}
 		res += openit();
 		switch (res) {
-		  case 0:  pline(nothing_happens); break;
+		  case 0:  pline("%s", nothing_happens); break;
 		  case 1:  pline("%s opens...", Something);
 			   learno = TRUE; break;
 		  default: pline("Things open around you...");
@@ -849,7 +867,7 @@ struct obj **optr;
 		amii_speaker( obj, "AeFeaeFeAefegw", AMII_OKAY_VOLUME );
 #endif
 		if (findit() != 0) learno = TRUE;
-		else pline(nothing_happens);
+		else pline("%s", nothing_happens);
 	    }
 
 	}	/* charged BofO */
@@ -1195,12 +1213,12 @@ dorub()
 		update_inventory();
 	    } else if (rn2(2) && !Blind)
 		You("see a puff of smoke.");
-	    else pline(nothing_happens);
+	    else pline("%s", nothing_happens);
 	} else if (obj->otyp == BRASS_LANTERN) {
 	    /* message from Adventure */
 	    pline("Rubbing the electric lamp is not particularly rewarding.");
 	    pline("Anyway, nothing exciting happens.");
-	} else pline(nothing_happens);
+	} else pline("%s", nothing_happens);
 	return 1;
 }
 
@@ -1358,7 +1376,7 @@ int magic; /* 0=Physical, otherwise skill level */
 
 	    /* A little Sokoban guilt... */
 	    if (In_sokoban(&u.uz))
-		change_luck(-1);
+		sokoban_trickster();
 
 	    teleds(cc.x, cc.y, TRUE);
 	    nomul(-1, "jumping around");
@@ -1516,7 +1534,7 @@ int attr_point; /* number of attribute points per attribute we might fix */
 	}
 
 	if (trouble_count == 0) {
-	    pline(nothing_happens);
+	    pline("%s", nothing_happens);
 	    return;
 	} else if (trouble_count > 1) {		/* shuffle */
 	    int i, j, k;
@@ -1708,7 +1726,7 @@ boolean quietly;
 	    !(passes_walls(&mons[obj->corpsenm]) && may_passwall(x,y))) {
 		if (!quietly)
 		    You("cannot place a figurine in %s!",
-			IS_TREE(levl[x][y].typ) ? "a tree" : "solid rock");
+			IS_TREES(levl[x][y].typ) ? "a tree" : "solid rock");
 		return FALSE;
 	}
 	if (sobj_at(BOULDER,x,y) && !passes_walls(&mons[obj->corpsenm])
@@ -1894,7 +1912,7 @@ struct obj *tstone;
     }
 
     if (Blind) {
-	pline(scritch);
+	pline("%s", scritch);
 	return;
     } else if (Hallucination) {
 	pline("Oh wow, man: Fractals!");
@@ -1972,7 +1990,7 @@ struct obj *tstone;
     else if (streak_color)
 	pline("You see %s streaks on the %s.", streak_color, stonebuf);
     else
-	pline(scritch);
+	pline("%s", scritch);
     return;
 }
 
@@ -2178,7 +2196,7 @@ struct obj *obj;
 		You("wrap your bullwhip around %s on the %s.",
 		    an(singular(otmp, xname)), surface(u.ux, u.uy));
 		if (rnl(6) || pickup_object(otmp, 1L, TRUE) < 1)
-		    pline(msg_slipsfree);
+		    pline("%s", msg_slipsfree);
 		return 1;
 	    }
 	}
@@ -2219,7 +2237,7 @@ struct obj *obj;
 		wrapped_what = strcpy(buf, mon_nam(mtmp));
 	    } else if (proficient) {
 		if (attack(mtmp)) return 1;
-		else pline(msg_snap);
+		else pline("%s", msg_snap);
 	    }
 	}
 	if (!wrapped_what) {
@@ -2241,10 +2259,10 @@ struct obj *obj;
 		    vision_full_recalc = 1;
 		}
 	    } else {
-		pline(msg_slipsfree);
+		pline("%s", msg_slipsfree);
 	    }
 	    if (mtmp) wakeup(mtmp);
-	} else pline(msg_snap);
+	} else pline("%s", msg_snap);
 
     } else if (mtmp) {
 	if (!canspotmon(mtmp) &&
@@ -2336,7 +2354,7 @@ struct obj *obj;
 		    break;
 		}
 	    } else {
-		pline(msg_slipsfree);
+		pline("%s", msg_slipsfree);
 	    }
 	    wakeup(mtmp);
 	} else {
@@ -2346,7 +2364,7 @@ struct obj *obj;
 	    else You("flick your bullwhip towards %s.", mon_nam(mtmp));
 	    if (proficient) {
 		if (attack(mtmp)) return 1;
-		else pline(msg_snap);
+		else pline("%s", msg_snap);
 	    }
 	}
 
@@ -2355,7 +2373,7 @@ struct obj *obj;
 	    You("snap your whip through thin air.");
 
     } else {
-	pline(msg_snap);
+	pline("%s", msg_snap);
 
     }
     return 1;
@@ -2380,7 +2398,7 @@ use_pole (obj)
 
 	/* Are you allowed to use the pole? */
 	if (u.uswallow) {
-	    pline(not_enough_room);
+	    pline("%s", not_enough_room);
 	    return (0);
 	}
 	if (obj != uwep) {
@@ -2390,7 +2408,7 @@ use_pole (obj)
      /* assert(obj == uwep); */
 
 	/* Prompt for a location */
-	pline(where_to_hit);
+	pline("%s", where_to_hit);
 	cc.x = u.ux;
 	cc.y = u.uy;
 	if (getpos(&cc, TRUE, "the spot to hit") < 0)
@@ -2432,7 +2450,7 @@ use_pole (obj)
 		u.uconduct.weaphit++;
 	} else
 	    /* Now you know that nothing is there... */
-	    pline(nothing_happens);
+	    pline("%s", nothing_happens);
 	return (1);
 }
 
@@ -2486,7 +2504,7 @@ use_grapple (obj)
 
 	/* Are you allowed to use the hook? */
 	if (u.uswallow) {
-	    pline(not_enough_room);
+	    pline("%s", not_enough_room);
 	    return (0);
 	}
 	if (obj != uwep) {
@@ -2496,7 +2514,7 @@ use_grapple (obj)
      /* assert(obj == uwep); */
 
 	/* Prompt for a location */
-	pline(where_to_hit);
+	pline("%s", where_to_hit);
 	cc.x = u.ux;
 	cc.y = u.uy;
 	if (getpos(&cc, TRUE, "the spot to hit") < 0)
@@ -2531,14 +2549,14 @@ use_grapple (obj)
 	    start_menu(tmpwin);
 	    any.a_int++;
 	    Sprintf(buf, "an object on the %s", surface(cc.x, cc.y));
-	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+	    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
 			 buf, MENU_UNSELECTED);
 	    any.a_int++;
-	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+	    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
 			"a monster", MENU_UNSELECTED);
 	    any.a_int++;
 	    Sprintf(buf, "the %s", surface(cc.x, cc.y));
-	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+	    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
 			 buf, MENU_UNSELECTED);
 	    end_menu(tmpwin, "Aim for what?");
 	    tohit = rn2(4);
@@ -2594,7 +2612,7 @@ use_grapple (obj)
 	    }
 	    break;
 	}
-	pline(nothing_happens);
+	pline("%s", nothing_happens);
 	return (1);
 }
 
@@ -2644,7 +2662,7 @@ do_break_wand(obj)
     setnotworn(obj);		/* so we need to do this ourselves */
 
     if (obj->spe <= 0) {
-	pline(nothing_else_happens);
+	pline("%s", nothing_else_happens);
 	goto discard_broken_wand;
     }
     obj->ox = u.ux;
@@ -2660,7 +2678,7 @@ do_break_wand(obj)
     case WAN_ENLIGHTENMENT:
     case WAN_OPENING:
     case WAN_SECRET_DOOR_DETECTION:
-	pline(nothing_else_happens);
+	pline("%s", nothing_else_happens);
 	goto discard_broken_wand;
     case WAN_DEATH:
     case WAN_LIGHTNING:
@@ -2836,8 +2854,8 @@ doapply()
 	case BAG_OF_HOLDING:
 	case OILSKIN_SACK:
 	case IRON_SAFE:
-		res = use_container(obj, 1);
-		break;
+		/* return immediately as the container might be destroyed */
+		return use_container(obj, 1);
 	case BAG_OF_TRICKS:
 		res = bagotricks(obj);
 		break;
@@ -2849,7 +2867,7 @@ doapply()
 	case CREDIT_CARD:
 #endif
 	case SKELETON_KEY:
-		(void) pick_lock(obj,0,0);
+		(void) pick_lock(obj,0,0,FALSE);
 		break;
 	case PICK_AXE:
 	case DWARVISH_MATTOCK:
@@ -2996,7 +3014,7 @@ doapply()
 					       (const char *)0);
 		    makeknown(HORN_OF_PLENTY);
 		} else
-		    pline(nothing_happens);
+		    pline("%s", nothing_happens);
 		break;
 	case LAND_MINE:
 	case BEARTRAP:

@@ -1701,6 +1701,8 @@ into account the blessed/cursed status, enchantment, damage, or
 quality of the weapon; you are free to manually fill your quiver with
 the `Q' command instead.  If no weapon is found or the option is
 false, the `t' (throw) command is executed instead.  (default false)
+.lp autounlock
+Automatically apply unlocking tool when trying to open a locked door (default true).
 .lp boulder
 Set the character used to display boulders (default is rock class symbol).
 .lp catname
@@ -2093,6 +2095,9 @@ Prompt for confirmation before praying (default on).
 .lp pushweapon
 Using the `w' (wield) command when already wielding
 something pushes the old item into your alternate weapon slot (default off).
+.lp quiver_fired
+Using the 'f' (fire) command when nothing is quivered, prompts for ammunition 
+to quiver, then fires it (default on).
 .lp qwertz_layout
 If QWERTZ was set in config.h at compile-time this option can be used to swap
 the y and z keys. This is useful for some keyboard layouts.
@@ -2144,6 +2149,18 @@ the appearance of the display, not the way the game treats you.
 Show your approximate accumulated score on bottom line (default off).
 .lp "silent  "
 Suppress terminal beeps (default on).
+.lp sortloot
+Controls the behavior of the sortloot patch that sorts pickup lists for
+inventory and #loot commands and some others.
+The possible values are:
+.sd
+.si
+full - always sort the lists;
+loot - only sort the lists that don't use inventory
+       letters, like with the #loot and pickup commands;
+none - show lists the traditional way without sorting.
+.ei
+.ed
 .lp sortpack
 Sort the pack contents by type when displaying inventory (default on).
 .lp sound

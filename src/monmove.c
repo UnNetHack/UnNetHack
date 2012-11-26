@@ -54,6 +54,15 @@ register struct monst *mtmp;
 	if(mtmp->mpeaceful && in_town(u.ux+u.dx, u.uy+u.dy) &&
 	   mtmp->mcansee && m_canseeu(mtmp) && !rn2(3)) {
 
+#ifdef CONVICT
+	if(Role_if(PM_CONVICT) && !Upolyd) {
+		verbalize("%s yells: Hey!  You are the one from the wanted poster!",
+			Amonnam(mtmp));
+		(void) angry_guards(!(flags.soundok));
+		stop_occupation();
+		return;
+	}
+#endif /* CONVICT */
 	    if(picking_lock(&x, &y) && IS_DOOR(levl[x][y].typ) &&
 	       (levl[x][y].doormask & D_LOCKED)) {
 
@@ -139,7 +148,7 @@ struct monst *mtmp;
 	    mtmp->data == &mons[PM_VLAD_THE_IMPALER] ||
 	    mtmp->mnum == quest_info(MS_NEMESIS) ||
 	    (mtmp->data->geno & G_UNIQ && is_demon(mtmp->data)) ||
-	    is_rider(mtmp->data) || mtmp->data == &mons[PM_MINOTAUR])
+	    is_rider(mtmp->data))
 		return(FALSE);
 
 	return (boolean)(sobj_at(SCR_SCARE_MONSTER, x, y)
@@ -269,7 +278,10 @@ int *inrange, *nearby, *scared;
 	}
 	*scared = (*nearby && (onscary(seescaryx, seescaryy, mtmp) ||
 			       (!mtmp->mpeaceful &&
-				    in_your_sanctuary(mtmp, 0, 0))));
+				    in_your_sanctuary(mtmp, 0, 0) &&
+				    /* don't warn due to fleeing monsters about
+				     * the right temple on Astral */
+				    !Is_astralevel(&u.uz))));
 
 	if(*scared) {
 		if (rn2(7))
@@ -385,6 +397,9 @@ register struct monst *mtmp;
 
 	/* Demonic Blackmail! */
 	if(nearby && mdat->msound == MS_BRIBE &&
+#ifdef CONVICT
+       (monsndx(mdat) != PM_PRISON_GUARD) &&
+#endif /* CONVICT */
 	   mtmp->mpeaceful && !mtmp->mtame && !u.uswallow) {
 		if (mtmp->mux != u.ux || mtmp->muy != u.uy) {
 			pline("%s whispers at thin air.",
@@ -402,6 +417,26 @@ register struct monst *mtmp;
 			}
 		} else if(demon_talk(mtmp)) return(1);	/* you paid it off */
 	}
+
+#ifdef CONVICT
+	/* Prison guard extortion */
+    if(nearby && (monsndx(mdat) == PM_PRISON_GUARD) && !mtmp->mpeaceful
+	 && !mtmp->mtame && !u.uswallow && (!mtmp->mspec_used)) {
+        long gdemand = 500 * u.ulevel;
+        long goffer = 0;
+
+        pline("%s demands %ld %s to avoid re-arrest.", Amonnam(mtmp),
+         gdemand, currency(gdemand));
+        if ((goffer = bribe(mtmp)) >= gdemand) {
+            verbalize("Good.  Now beat it, scum!");
+            mtmp->mpeaceful = 1;
+            set_malign(mtmp);
+        } else {
+            pline("I said %ld!", gdemand);
+            mtmp->mspec_used = 1000;
+        }
+    }
+#endif /* CONVICT */
 
 	/* the watch will look around and see if you are up to no good :-) */
 	if (mdat == &mons[PM_WATCHMAN] || mdat == &mons[PM_WATCH_CAPTAIN])
@@ -626,7 +661,7 @@ register int after;
 	xchar gx,gy,nix,niy,chcnt;
 	int chi;	/* could be schar except for stupid Sun-2 compiler */
 	boolean likegold=0, likegems=0, likeobjs=0, likemagic=0, conceals=0;
-	boolean likerock=0, can_tunnel=0;
+	boolean likerock=0, can_tunnel=0, breakrock=0;
 	boolean can_open=0, can_unlock=0, doorbuster=0;
 	boolean uses_items=0, setlikes=0;
 	boolean avoid=FALSE;
@@ -637,6 +672,12 @@ register int after;
 	long flag;
 	int  omx = mtmp->mx, omy = mtmp->my;
 	struct obj *mw_tmp;
+
+	if (is_swamp(mtmp->mx, mtmp->my) && rn2(3) &&
+	    !is_flyer(mtmp->data) && !is_floater(mtmp->data) &&
+	    !is_clinger(mtmp->data) && !is_swimmer(mtmp->data) &&
+	    !amphibious(mtmp->data) && !likes_swamp(mtmp->data))
+		return(0);
 
 	if(mtmp->mtrapped) {
 	    int i = mintrap(mtmp);
@@ -807,6 +848,7 @@ not_special:
 		likeobjs = (likes_objs(ptr) && pctload < 75);
 		likemagic = (likes_magic(ptr) && pctload < 85);
 		likerock = (throws_rocks(ptr) && pctload < 50 && !In_sokoban(&u.uz));
+		breakrock = is_rockbreaker(ptr);
 		conceals = hides_under(ptr);
 		setlikes = TRUE;
 	    }
@@ -825,7 +867,7 @@ not_special:
 	/* guards shouldn't get too distracted */
 	if(!mtmp->mpeaceful && is_mercenary(ptr)) minr = 1;
 
-	if((likegold || likegems || likeobjs || likemagic || likerock || conceals)
+	if((likegold || likegems || likeobjs || likemagic || likerock || breakrock || conceals)
 	      && (!*in_rooms(omx, omy, SHOPBASE) || (!rn2(25) && !mtmp->isshk))) {
 	look_for_obj:
 	    oomx = min(COLNO-1, omx+minr);
@@ -898,7 +940,7 @@ not_special:
 	} else if(likegold) {
 	    /* don't try to pick up anything else, but use the same loop */
 	    uses_items = 0;
-	    likegems = likeobjs = likemagic = likerock = conceals = 0;
+	    likegems = likeobjs = likemagic = likerock = breakrock = conceals = 0;
 	    goto look_for_obj;
 	}
 
@@ -931,7 +973,7 @@ not_special:
 	if (can_tunnel) flag |= ALLOW_DIG;
 	if (is_human(ptr) || ptr == &mons[PM_MINOTAUR]) flag |= ALLOW_SSM;
 	if (is_undead(ptr) && ptr->mlet != S_GHOST) flag |= NOGARLIC;
-	if (throws_rocks(ptr)) flag |= ALLOW_ROCK;
+	if (throws_rocks(ptr) || is_rockbreaker(ptr)) flag |= ALLOW_ROCK;
 	if (can_open) flag |= OPENDOOR;
 	if (can_unlock) flag |= UNLOCKDOOR;
 	if (doorbuster) flag |= BUSTDOOR;
@@ -1197,6 +1239,7 @@ postmov:
 		    likemagic = (likes_magic(ptr) && pctload < 85);
 		    likerock = (throws_rocks(ptr) && pctload < 50 &&
 				!In_sokoban(&u.uz));
+		    breakrock = is_rockbreaker(ptr);
 		    conceals = hides_under(ptr);
 		}
 
@@ -1212,12 +1255,22 @@ postmov:
 		    if (meatobj(mtmp) == 2) return 2;	/* it died */
 		}
 
+		/* Because of the overloading of ALLOW_ROCK, we need
+		 * to ensure that for a rockbreaker mpickupstuff() gets
+		 * called, otherwise the monster might only walk over
+		 * the boulder. */
+		if (breakrock) {
+				boolean picked = FALSE;
+				picked |= mpickstuff(mtmp, boulder_class);
+				if(picked) mmoved = 3;
+		}
+
 		if(!*in_rooms(mtmp->mx, mtmp->my, SHOPBASE) || !rn2(25)) {
 		    boolean picked = FALSE;
 
 		    if(likeobjs) picked |= mpickstuff(mtmp, practical);
 		    if(likemagic) picked |= mpickstuff(mtmp, magical);
-		    if(likerock) picked |= mpickstuff(mtmp, boulder_class);
+		    if(likerock || breakrock) picked |= mpickstuff(mtmp, boulder_class);
 		    if(likegems) picked |= mpickstuff(mtmp, gem_class);
 		    if(uses_items) picked |= mpickstuff(mtmp, (char *)0);
 		    if(picked) mmoved = 3;

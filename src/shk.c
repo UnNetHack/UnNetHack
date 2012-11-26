@@ -51,6 +51,7 @@ STATIC_DCL long FDECL(stolen_container, (struct obj *, struct monst *, long,
 STATIC_DCL long FDECL(getprice, (struct obj *,BOOLEAN_P));
 STATIC_DCL void FDECL(shk_names_obj,
 		 (struct monst *,struct obj *,const char *,long,const char *));
+STATIC_DCL void FDECL(append_honorific, (char *));
 STATIC_DCL struct obj *FDECL(bp_to_obj, (struct bill_x *));
 STATIC_DCL boolean FDECL(inherits, (struct monst *,int,int));
 STATIC_DCL void FDECL(set_repo_loc, (struct eshk *));
@@ -611,6 +612,9 @@ register char *enterstring;
 	if(!*enterstring)
 		return;
 
+	/* interrupt multi turn stuff */
+	nomul(0, 0);
+
 	if(!(shkp = shop_keeper(*enterstring))) {
 	    if (!index(empty_shops, *enterstring) &&
 		in_rooms(u.ux, u.uy, SHOPBASE) !=
@@ -649,16 +653,17 @@ register char *enterstring;
 
 	if (Invis) {
 	    pline("%s senses your presence.", shkname(shkp));
-#ifdef BLACKMARKET            
 	    if (!Is_blackmarket(&u.uz)) {
-	    verbalize("Invisible customers are not welcome!");
-	    return;
+		    verbalize("Invisible customers are not welcome!");
+		    return;
+	    }
 	}
-#else /* BLACKMARKET */
-	    verbalize("Invisible customers are not welcome!");
-	    return;
-#endif /* BLACKMARKET */
+#ifdef CONVICT
+	/* Visible striped prison shirt */
+	if ((uarmu && (uarmu->otyp == STRIPED_SHIRT)) && !uarm && !uarmc) {
+	    eshkp->pbanned = TRUE;
 	}
+#endif /* CONVICT */
  
 #ifdef BLACKMARKET
 	    if (Is_blackmarket(&u.uz) &&
@@ -678,6 +683,9 @@ register char *enterstring;
 	} else if (eshkp->robbed) {
 	    pline("%s mutters imprecations against shoplifters.", shkname(shkp));
 	} else {
+#ifdef CONVICT
+        if (!eshkp->pbanned || inside_shop(u.ux, u.uy))
+#endif /* CONVICT */
 	    verbalize("%s, %s!  Welcome%s to %s %s!",
 		      Hello(shkp), plname,
 		      eshkp->visitct++ ? " again" : "",
@@ -685,7 +693,7 @@ register char *enterstring;
 		      shtypes[rt - SHOPBASE].name);
 	}
 	/* can't do anything about blocking if teleported in */
-	if (!inside_shop(u.ux, u.uy)) {
+	if (!inside_shop(u.ux, u.uy) && !(Is_blackmarket(&u.uz))) {
 	    boolean should_block;
 	    int cnt;
 	    const char *tool;
@@ -719,6 +727,11 @@ register char *enterstring;
 		verbalize(NOTANGRY(shkp) ?
 			  "Will you please leave %s outside?" :
 			  "Leave %s outside.", y_monnam(u.usteed));
+		should_block = TRUE;
+#endif
+#ifdef CONVICT
+	    } else if (eshkp->pbanned) {
+	    verbalize("I don't sell to your kind here.");
 		should_block = TRUE;
 #endif
 	    } else {
@@ -1472,7 +1485,7 @@ proceed:
 		    else Strcat(sbuf,
 			   "for gold picked up and the use of merchandise.");
 		} else Strcat(sbuf, "for the use of merchandise.");
-		pline(sbuf);
+		pline("%s", sbuf);
 #ifndef GOLDOBJ
 		if (u.ugold + eshkp->credit < dtmp) {
 #else
@@ -1519,7 +1532,10 @@ proceed:
 	}
 	/* now check items on bill */
 	if (eshkp->billct) {
-	    register boolean itemize;
+	    boolean itemize = FALSE;
+	    /* get item selected by inventory menu */
+	    struct obj* payme_item = getnextgetobj();
+
 #ifndef GOLDOBJ
 	    if (!u.ugold && !eshkp->credit) {
 #else
@@ -1545,7 +1561,9 @@ proceed:
 
 	    /* this isn't quite right; it itemizes without asking if the
 	     * single item on the bill is partly used up and partly unpaid */
-	    itemize = (eshkp->billct > 1 ? yn("Itemized billing?") == 'y' : 1);
+	    if (!payme_item) {
+		    itemize = (eshkp->billct > 1 ? yn("Itemized billing?") == 'y' : 1);
+	    }
 
 	    for (pass = 0; pass <= 1; pass++) {
 		tmp = 0;
@@ -1571,25 +1589,29 @@ proceed:
 			 * are processed on both passes */
 			tmp++;
 		    } else {
-			switch (dopayobj(shkp, bp, &otmp, pass, itemize)) {
-			  case PAY_CANT:
-				return 1;	/*break*/
-			  case PAY_BROKE:
-				paid = TRUE;
-				goto thanks;	/*break*/
-			  case PAY_SKIP:
-				tmp++;
-				continue;	/*break*/
-			  case PAY_SOME:
-				paid = TRUE;
+			if (payme_item == NULL || payme_item == otmp) {
+				switch (dopayobj(shkp, bp, &otmp, pass, itemize)) {
+					case PAY_CANT:
+						return 1;	/*break*/
+					case PAY_BROKE:
+						paid = TRUE;
+						goto thanks;	/*break*/
+					case PAY_SKIP:
+						tmp++;
+						continue;	/*break*/
+					case PAY_SOME:
+						paid = TRUE;
+						if (itemize) bot();
+						continue;	/*break*/
+					case PAY_BUY:
+						paid = TRUE;
+						break;
+				}
 				if (itemize) bot();
-				continue;	/*break*/
-			  case PAY_BUY:
-				paid = TRUE;
-				break;
+				*bp = eshkp->bill_p[--eshkp->billct];
+			} else {
+				tmp++;
 			}
-			if (itemize) bot();
-			*bp = eshkp->bill_p[--eshkp->billct];
 		    }
 		}
 	    }
@@ -1752,6 +1774,9 @@ int croaked;	/* -1: escaped dungeon; 0: quit; 1: died */
 		else {
 		    numsk++;
 		    taken |= inherits(mtmp, numsk, croaked);
+#ifdef CONVICT
+		    ESHK(mtmp)->pbanned = FALSE; /* Un-ban for bones levels */
+#endif /* CONVICT */
 		}
 	    }
 	}
@@ -2214,9 +2239,10 @@ register struct monst *shkp;
 	/* some shopkeepers just want to rip you off */
 	if (tmp > 4L && ESHK(shkp)->cheapskate) {
 		tmp -= tmp / 4L;
+	}
 	/* shopkeeper may notice if the player isn't very knowledgeable -
 	   especially when gem prices are concerned */
-	} else if (!obj->dknown || !objects[obj->otyp].oc_name_known) {
+	if (!obj->dknown || !objects[obj->otyp].oc_name_known) {
 		if (obj->oclass == GEM_CLASS) {
 			/* different shop keepers give different prices */
 			if (objects[obj->otyp].oc_material == GEMSTONE ||
@@ -2298,7 +2324,7 @@ add_to_billobjs(obj)
     struct obj *obj;
 {
     if (obj->where != OBJ_FREE)
-	panic("add_to_billobjs: obj not free (%d)", obj->where);
+	panic("add_to_billobjs: obj not free (%d,%d,%d)", obj->where, obj->otyp, obj->invlet);
     if (obj->timed)
 	obj_stop_timers(obj);
 
@@ -2445,14 +2471,7 @@ speak:
 	    Strcpy(buf, "\"For you, ");
 	    if (ANGRY(shkp)) Strcat(buf, "scum");
 	    else {
-		static const char *honored[5] = {
-		  "good", "honored", "most gracious", "esteemed",
-		  "most renowned and sacred"
-		};
-		Strcat(buf, honored[rn2(4) + u.uevent.udemigod]);
-		if (!is_human(youmonst.data)) Strcat(buf, " creature");
-		else
-		    Strcat(buf, (flags.female) ? " lady" : " sir");
+		append_honorific(buf);
 	    }
 	    if(ininv) {
 		long quan = obj->quan;
@@ -2470,6 +2489,24 @@ speak:
 				   (obj->quan > 1L) ? " each" : "");
 	    else pline("%s does not notice.", Monnam(shkp));
 	}
+}
+
+void
+append_honorific(buf)
+char *buf;
+{
+	static const char *honored[5] = {
+	  "good", "honored", "most gracious", "esteemed",
+	  "most renowned and sacred"
+	};
+	Strcat(buf, honored[rn2(4) + u.uevent.udemigod]);
+	if (is_vampire(youmonst.data)) Strcat(buf,
+			(flags.female) ? " dark lady" : " dark lord");
+	else if (is_elf(youmonst.data)) Strcat(buf,
+			(flags.female) ? " hiril" : " hir");
+	else if (!is_human(youmonst.data)) Strcat(buf, " creature");
+	else
+	    Strcat(buf, (flags.female) ? " lady" : " sir");
 }
 
 void
@@ -3463,9 +3500,13 @@ register struct monst *shkp;
 		} else {
 		    uondoor = (u.ux == eshkp->shd.x && u.uy == eshkp->shd.y);
 		    if(uondoor) {
-			badinv = (carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK) ||
-				  (Fast && (sobj_at(PICK_AXE, u.ux, u.uy) ||
-				  sobj_at(DWARVISH_MATTOCK, u.ux, u.uy))));
+			badinv = (!Is_blackmarket(&u.uz) &&
+				  (carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK) ||
+#ifdef CONVICT
+				  eshkp->pbanned ||
+#endif /* CONVICT */
+				   (Fast && (sobj_at(PICK_AXE, u.ux, u.uy) ||
+				   sobj_at(DWARVISH_MATTOCK, u.ux, u.uy)))));
 			if(satdoor && badinv)
 			    return(0);
 			avoid = !badinv;
@@ -4257,7 +4298,9 @@ register xchar x, y;
 	if(shkp->mx == sx && shkp->my == sy
 		&& shkp->mcanmove && !shkp->msleeping
 		&& (x == sx-1 || x == sx+1 || y == sy-1 || y == sy+1)
-		&& (Invis || carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK)
+		&& (Invis ||
+		 (!Is_blackmarket(&u.uz) &&
+		  (carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK)))
 #ifdef STEED
 			|| u.usteed
 #endif

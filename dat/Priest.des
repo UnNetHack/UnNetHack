@@ -12,7 +12,7 @@
 # so there's less chance for undead corpses.
 #
 LEVEL: "Pri-strt"
-FLAGS: noteleport,hardfloor,mazelevel,graveyard
+FLAGS: noteleport,hardfloor,mazelevel,graveyard,sky
 INIT_MAP:solidfill,' '
 MON_GENERATION:86%, (64,"human zombie"), (16,'Z'), (16,"wraith"), (4,'W')
 GEOMETRY:center,center

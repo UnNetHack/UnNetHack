@@ -227,7 +227,7 @@ boolean verbose;  /* give message(s) even when you can't see what happened */
 			? "destroyed" : "killed");
 		/* don't blame hero for unknown rolling boulder trap */
 		if (!flags.mon_moving &&
-		    (otmp->otyp != BOULDER || range >= 0 || !otmp->otrapped))
+		    (otmp->otyp != BOULDER || range >= 0 || otmp->otrapped))
 		    xkilled(mtmp,0);
 		else mondied(mtmp);
 	    }
@@ -463,7 +463,7 @@ m_throw(mon, x, y, dx, dy, range, obj)
 	if (blindinc) {
 		u.ucreamed += blindinc;
 		make_blinded(Blinded + (long)blindinc, FALSE);
-		if (!Blind) Your(vision_clears);
+		if (!Blind) Your("%s", vision_clears);
 	}
 }
 

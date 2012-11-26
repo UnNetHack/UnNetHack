@@ -1,13 +1,36 @@
 #ifndef lint
-static char yysccsid[] = "@(#)yaccpar	1.9 (Berkeley) 02/21/93";
+static const char yysccsid[] = "@(#)yaccpar	1.9 (Berkeley) 02/21/93";
 #endif
+
+#include <stdlib.h>
+#include <string.h>
+
 #define YYBYACC 1
 #define YYMAJOR 1
 #define YYMINOR 9
-#define yyclearin (yychar=(-1))
-#define yyerrok (yyerrflag=0)
-#define YYRECOVERING (yyerrflag!=0)
+
+#define YYEMPTY        (-1)
+#define yyclearin      (yychar = YYEMPTY)
+#define yyerrok        (yyerrflag = 0)
+#define YYRECOVERING() (yyerrflag != 0)
+
+/* compatibility with bison */
+#ifdef YYPARSE_PARAM
+/* compatibility with FreeBSD */
+#ifdef YYPARSE_PARAM_TYPE
+#define YYPARSE_DECL() yyparse(YYPARSE_PARAM_TYPE YYPARSE_PARAM)
+#else
+#define YYPARSE_DECL() yyparse(void *YYPARSE_PARAM)
+#endif
+#else
+#define YYPARSE_DECL() yyparse(void)
+#endif /* YYPARSE_PARAM */
+
+extern int YYPARSE_DECL();
+
+static int yygrowstack(void);
 #define YYPREFIX "yy"
+#line 2 "dgn_comp.y"
 /*	SCCS Id: @(#)dgn_comp.c	3.4	1996/06/22	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /*	Copyright (c) 1990 by M. Stephenson				  */
@@ -70,11 +93,13 @@ extern int fatal_error;
 extern const char *fname;
 extern FILE *yyin, *yyout;	/* from dgn_lex.c */
 
+#line 66 "dgn_comp.y"
 typedef union
 {
 	int	i;
 	char*	str;
 } YYSTYPE;
+#line 102 "y.tab.c"
 #define INTEGER 257
 #define A_DUNGEON 258
 #define BRANCH 259
@@ -97,21 +122,21 @@ typedef union
 #define PORTAL 276
 #define STRING 277
 #define YYERRCODE 256
-short yylhs[] = {                                        -1,
+static const short yylhs[] = {                           -1,
     0,    0,    5,    5,    6,    6,    6,    6,    7,    1,
     1,    8,    8,    8,   12,   13,   15,   15,   14,   10,
    10,   10,   10,   10,   16,   16,   17,   17,   18,   18,
    19,   19,   20,   20,    9,    9,   22,   23,    3,    3,
     3,    3,    3,    2,    2,    4,   21,   11,
 };
-short yylen[] = {                                         2,
+static const short yylen[] = {                            2,
     0,    1,    1,    2,    1,    1,    1,    1,    6,    0,
     1,    1,    1,    1,    3,    1,    3,    3,    3,    1,
     1,    1,    1,    1,    6,    7,    7,    8,    3,    3,
     7,    8,    8,    9,    1,    1,    7,    8,    0,    1,
     1,    1,    1,    0,    1,    1,    5,    5,
 };
-short yydefred[] = {                                      0,
+static const short yydefred[] = {                         0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    3,    5,    6,    7,    8,
    12,   13,   14,   16,   20,   21,   22,   23,   24,   35,
@@ -124,12 +149,12 @@ short yydefred[] = {                                      0,
     0,   45,   37,    0,   27,    0,    0,    0,    0,    0,
    38,   28,   33,    0,   48,   47,   34,
 };
-short yydgoto[] = {                                      14,
+static const short yydgoto[] = {                         14,
    78,   93,   84,   60,   15,   16,   17,   18,   19,   20,
    68,   21,   22,   23,   24,   25,   26,   27,   28,   29,
    70,   30,   31,
 };
-short yysindex[] = {                                   -237,
+static const short yysindex[] = {                      -237,
   -46,  -45,  -44,  -39,  -38,  -30,  -22,  -21,  -20,  -19,
   -18,  -17,  -16,    0, -237,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -142,7 +167,7 @@ short yysindex[] = {                                   -237,
  -178,    0,    0, -193,    0, -177, -176, -175,   42,   43,
     0,    0,    0, -172,    0,    0,    0,
 };
-short yyrindex[] = {                                     86,
+static const short yyrindex[] = {                        86,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
     0,    0,    0,    0,   87,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -155,13 +180,13 @@ short yyrindex[] = {                                     86,
     0,    0,    0,   31,    0,   61,   76,    0,    0,    0,
     0,    0,    0,   91,    0,    0,    0,
 };
-short yygindex[] = {                                      0,
+static const short yygindex[] = {                         0,
     0,   -6,    4,  -43,    0,   75,    0,    0,    0,    0,
   -71,    0,    0,    0,    0,    0,    0,    0,    0,    0,
   -62,    0,    0,
 };
 #define YYTABLESIZE 363
-short yytable[] = {                                      85,
+static const short yytable[] = {                         85,
    39,   80,   81,   82,   83,   63,   64,   65,   66,   86,
    87,   32,   33,   34,   46,   10,   97,   98,   35,   36,
     1,    2,    3,    4,    5,    6,    7,   37,    8,    9,
@@ -200,7 +225,7 @@ short yytable[] = {                                      85,
    32,   32,   32,   32,   32,    0,   32,   32,    0,   32,
    32,   32,   32,
 };
-short yycheck[] = {                                      71,
+static const short yycheck[] = {                         71,
     0,  273,  274,  275,  276,   49,   50,   51,   52,   72,
    73,   58,   58,   58,  277,    0,   88,   89,   58,   58,
   258,  259,  260,  261,  262,  263,  264,   58,  266,  267,
@@ -245,7 +270,8 @@ short yycheck[] = {                                      71,
 #endif
 #define YYMAXTOKEN 277
 #if YYDEBUG
-char *yyname[] = {
+static const char *yyname[] = {
+
 "end-of-file",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,"'('","')'",0,"'+'","','",0,0,0,0,0,0,0,0,0,0,0,0,0,"':'",0,0,0,0,0,
 "'@'",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -257,7 +283,7 @@ char *yyname[] = {
 "UP_OR_DOWN","PROTOFILE","DESCRIPTION","DESCRIPTOR","LEVELDESC","ALIGNMENT",
 "LEVALIGN","ENTRY","STAIR","NO_UP","NO_DOWN","PORTAL","STRING",
 };
-char *yyrule[] = {
+static const char *yyrule[] = {
 "$accept : file",
 "file :",
 "file : dungeons",
@@ -307,30 +333,43 @@ char *yyrule[] = {
 "bones_tag : STRING",
 "acouple : '(' INTEGER ',' INTEGER ')'",
 "rcouple : '(' INTEGER ',' INTEGER ')'",
+
 };
 #endif
+#if YYDEBUG
+#include <stdio.h>
+#endif
+
+/* define the initial stack-sizes */
 #ifdef YYSTACKSIZE
 #undef YYMAXDEPTH
-#define YYMAXDEPTH YYSTACKSIZE
+#define YYMAXDEPTH  YYSTACKSIZE
 #else
 #ifdef YYMAXDEPTH
 #define YYSTACKSIZE YYMAXDEPTH
 #else
 #define YYSTACKSIZE 500
-#define YYMAXDEPTH 500
+#define YYMAXDEPTH  500
 #endif
 #endif
-int yydebug;
-int yynerrs;
-int yyerrflag;
-int yychar;
-short *yyssp;
+
+#define YYINITSTACKSIZE 500
+
+int      yydebug;
+int      yynerrs;
+int      yyerrflag;
+int      yychar;
+short   *yyssp;
 YYSTYPE *yyvsp;
-YYSTYPE yyval;
-YYSTYPE yylval;
-short yyss[YYSTACKSIZE];
-YYSTYPE yyvs[YYSTACKSIZE];
-#define yystacksize YYSTACKSIZE
+YYSTYPE  yyval;
+YYSTYPE  yylval;
+
+/* variables for the parser stack */
+static short   *yyss;
+static short   *yysslim;
+static YYSTYPE *yyvs;
+static unsigned yystacksize;
+#line 433 "dgn_comp.y"
 
 void
 init_dungeon()
@@ -577,17 +616,55 @@ output_dgn()
 }
 
 /*dgn_comp.y*/
-#define YYABORT goto yyabort
+#line 619 "y.tab.c"
+/* allocate initial stack or double stack size, up to YYMAXDEPTH */
+static int yygrowstack(void)
+{
+    int i;
+    unsigned newsize;
+    short *newss;
+    YYSTYPE *newvs;
+
+    if ((newsize = yystacksize) == 0)
+        newsize = YYINITSTACKSIZE;
+    else if (newsize >= YYMAXDEPTH)
+        return -1;
+    else if ((newsize *= 2) > YYMAXDEPTH)
+        newsize = YYMAXDEPTH;
+
+    i = yyssp - yyss;
+    newss = (yyss != 0)
+          ? (short *)realloc(yyss, newsize * sizeof(*newss))
+          : (short *)malloc(newsize * sizeof(*newss));
+    if (newss == 0)
+        return -1;
+
+    yyss  = newss;
+    yyssp = newss + i;
+    newvs = (yyvs != 0)
+          ? (YYSTYPE *)realloc(yyvs, newsize * sizeof(*newvs))
+          : (YYSTYPE *)malloc(newsize * sizeof(*newvs));
+    if (newvs == 0)
+        return -1;
+
+    yyvs = newvs;
+    yyvsp = newvs + i;
+    yystacksize = newsize;
+    yysslim = yyss + newsize - 1;
+    return 0;
+}
+
+#define YYABORT  goto yyabort
 #define YYREJECT goto yyabort
 #define YYACCEPT goto yyaccept
-#define YYERROR goto yyerrlab
+#define YYERROR  goto yyerrlab
+
 int
-yyparse()
+YYPARSE_DECL()
 {
-    register int yym, yyn, yystate;
+    int yym, yyn, yystate;
 #if YYDEBUG
-    register char *yys;
-    extern char *getenv();
+    const char *yys;
 
     if ((yys = getenv("YYDEBUG")) != 0)
     {
@@ -599,11 +676,14 @@ yyparse()
 
     yynerrs = 0;
     yyerrflag = 0;
-    yychar = (-1);
+    yychar = YYEMPTY;
+    yystate = 0;
 
+    if (yyss == NULL && yygrowstack()) goto yyoverflow;
     yyssp = yyss;
     yyvsp = yyvs;
-    *yyssp = yystate = 0;
+    yystate = 0;
+    *yyssp = 0;
 
 yyloop:
     if ((yyn = yydefred[yystate]) != 0) goto yyreduce;
@@ -621,7 +701,7 @@ yyloop:
         }
 #endif
     }
-    if ((yyn = yysindex[yystate]) != 0 && (yyn += yychar) >= 0 &&
+    if ((yyn = yysindex[yystate]) && (yyn += yychar) >= 0 &&
             yyn <= YYTABLESIZE && yycheck[yyn] == yychar)
     {
 #if YYDEBUG
@@ -629,40 +709,39 @@ yyloop:
             printf("%sdebug: state %d, shifting to state %d\n",
                     YYPREFIX, yystate, yytable[yyn]);
 #endif
-        if (yyssp >= yyss + yystacksize - 1)
+        if (yyssp >= yysslim && yygrowstack())
         {
             goto yyoverflow;
         }
-        *++yyssp = yystate = yytable[yyn];
+        yystate = yytable[yyn];
+        *++yyssp = yytable[yyn];
         *++yyvsp = yylval;
-        yychar = (-1);
+        yychar = YYEMPTY;
         if (yyerrflag > 0)  --yyerrflag;
         goto yyloop;
     }
-    if ((yyn = yyrindex[yystate]) != 0 && (yyn += yychar) >= 0 &&
+    if ((yyn = yyrindex[yystate]) && (yyn += yychar) >= 0 &&
             yyn <= YYTABLESIZE && yycheck[yyn] == yychar)
     {
         yyn = yytable[yyn];
         goto yyreduce;
     }
     if (yyerrflag) goto yyinrecovery;
-#ifdef lint
-    goto yynewerror;
-#endif
-yynewerror:
+
     yyerror("syntax error");
-#ifdef lint
+
     goto yyerrlab;
-#endif
+
 yyerrlab:
     ++yynerrs;
+
 yyinrecovery:
     if (yyerrflag < 3)
     {
         yyerrflag = 3;
         for (;;)
         {
-            if ((yyn = yysindex[*yyssp]) != 0 && (yyn += YYERRCODE) >= 0 &&
+            if ((yyn = yysindex[*yyssp]) && (yyn += YYERRCODE) >= 0 &&
                     yyn <= YYTABLESIZE && yycheck[yyn] == YYERRCODE)
             {
 #if YYDEBUG
@@ -670,11 +749,12 @@ yyinrecovery:
                     printf("%sdebug: state %d, error recovery shifting\
  to state %d\n", YYPREFIX, *yyssp, yytable[yyn]);
 #endif
-                if (yyssp >= yyss + yystacksize - 1)
+                if (yyssp >= yysslim && yygrowstack())
                 {
                     goto yyoverflow;
                 }
-                *++yyssp = yystate = yytable[yyn];
+                yystate = yytable[yyn];
+                *++yyssp = yytable[yyn];
                 *++yyvsp = yylval;
                 goto yyloop;
             }
@@ -704,9 +784,10 @@ yyinrecovery:
                     YYPREFIX, yystate, yychar, yys);
         }
 #endif
-        yychar = (-1);
+        yychar = YYEMPTY;
         goto yyloop;
     }
+
 yyreduce:
 #if YYDEBUG
     if (yydebug)
@@ -714,16 +795,21 @@ yyreduce:
                 YYPREFIX, yystate, yyn, yyrule[yyn]);
 #endif
     yym = yylen[yyn];
-    yyval = yyvsp[1-yym];
+    if (yym)
+        yyval = yyvsp[1-yym];
+    else
+        memset(&yyval, 0, sizeof yyval);
     switch (yyn)
     {
 case 2:
-{
+#line 83 "dgn_comp.y"
+	{
 			output_dgn();
 		  }
 break;
 case 9:
-{
+#line 99 "dgn_comp.y"
+	{
 			init_dungeon();
 			Strcpy(tmpdungeon[n_dgns].name, yyvsp[-3].str);
 			tmpdungeon[n_dgns].boneschar = (char)yyvsp[-2].i;
@@ -734,22 +820,26 @@ case 9:
 		  }
 break;
 case 10:
-{
+#line 111 "dgn_comp.y"
+	{
 			yyval.i = 0;
 		  }
 break;
 case 11:
-{
+#line 115 "dgn_comp.y"
+	{
 			yyval.i = yyvsp[0].i;
 		  }
 break;
 case 15:
-{
+#line 126 "dgn_comp.y"
+	{
 			tmpdungeon[n_dgns].entry_lev = yyvsp[0].i;
 		  }
 break;
 case 17:
-{
+#line 135 "dgn_comp.y"
+	{
 			if(yyvsp[0].i <= TOWN || yyvsp[0].i >= D_ALIGN_CHAOTIC)
 			    yyerror("Illegal description - ignoring!");
 			else
@@ -757,7 +847,8 @@ case 17:
 		  }
 break;
 case 18:
-{
+#line 142 "dgn_comp.y"
+	{
 			if(yyvsp[0].i && yyvsp[0].i < D_ALIGN_CHAOTIC)
 			    yyerror("Illegal alignment - ignoring!");
 			else
@@ -765,13 +856,15 @@ case 18:
 		  }
 break;
 case 19:
-{
+#line 151 "dgn_comp.y"
+	{
 			Strcpy(tmpdungeon[n_dgns].protoname, yyvsp[0].str);
 			Free(yyvsp[0].str);
 		  }
 break;
 case 25:
-{
+#line 165 "dgn_comp.y"
+	{
 			init_level();
 			Strcpy(tmplevel[n_levs].name, yyvsp[-3].str);
 			tmplevel[n_levs].boneschar = (char)yyvsp[-2].i;
@@ -782,7 +875,8 @@ case 25:
 		  }
 break;
 case 26:
-{
+#line 175 "dgn_comp.y"
+	{
 			init_level();
 			Strcpy(tmplevel[n_levs].name, yyvsp[-4].str);
 			tmplevel[n_levs].boneschar = (char)yyvsp[-3].i;
@@ -794,7 +888,8 @@ case 26:
 		  }
 break;
 case 27:
-{
+#line 188 "dgn_comp.y"
+	{
 			init_level();
 			Strcpy(tmplevel[n_levs].name, yyvsp[-4].str);
 			tmplevel[n_levs].boneschar = (char)yyvsp[-3].i;
@@ -806,7 +901,8 @@ case 27:
 		  }
 break;
 case 28:
-{
+#line 199 "dgn_comp.y"
+	{
 			init_level();
 			Strcpy(tmplevel[n_levs].name, yyvsp[-5].str);
 			tmplevel[n_levs].boneschar = (char)yyvsp[-4].i;
@@ -819,7 +915,8 @@ case 28:
 		  }
 break;
 case 29:
-{
+#line 213 "dgn_comp.y"
+	{
 			if(yyvsp[0].i >= D_ALIGN_CHAOTIC)
 			    yyerror("Illegal description - ignoring!");
 			else
@@ -827,7 +924,8 @@ case 29:
 		  }
 break;
 case 30:
-{
+#line 220 "dgn_comp.y"
+	{
 			if(yyvsp[0].i && yyvsp[0].i < D_ALIGN_CHAOTIC)
 			    yyerror("Illegal alignment - ignoring!");
 			else
@@ -835,7 +933,8 @@ case 30:
 		  }
 break;
 case 31:
-{
+#line 229 "dgn_comp.y"
+	{
 			init_level();
 			Strcpy(tmplevel[n_levs].name, yyvsp[-4].str);
 			tmplevel[n_levs].boneschar = (char)yyvsp[-3].i;
@@ -849,7 +948,8 @@ case 31:
 		  }
 break;
 case 32:
-{
+#line 242 "dgn_comp.y"
+	{
 			init_level();
 			Strcpy(tmplevel[n_levs].name, yyvsp[-5].str);
 			tmplevel[n_levs].boneschar = (char)yyvsp[-4].i;
@@ -864,7 +964,8 @@ case 32:
 		  }
 break;
 case 33:
-{
+#line 258 "dgn_comp.y"
+	{
 			init_level();
 			Strcpy(tmplevel[n_levs].name, yyvsp[-5].str);
 			tmplevel[n_levs].boneschar = (char)yyvsp[-4].i;
@@ -879,7 +980,8 @@ case 33:
 		  }
 break;
 case 34:
-{
+#line 272 "dgn_comp.y"
+	{
 			init_level();
 			Strcpy(tmplevel[n_levs].name, yyvsp[-6].str);
 			tmplevel[n_levs].boneschar = (char)yyvsp[-5].i;
@@ -895,7 +997,8 @@ case 34:
 		  }
 break;
 case 37:
-{
+#line 293 "dgn_comp.y"
+	{
 			init_branch();
 			Strcpy(tmpbranch[n_brs].name, yyvsp[-4].str);
 			tmpbranch[n_brs].lev.base = couple.base;
@@ -908,7 +1011,8 @@ case 37:
 		  }
 break;
 case 38:
-{
+#line 307 "dgn_comp.y"
+	{
 			init_branch();
 			Strcpy(tmpbranch[n_brs].name, yyvsp[-5].str);
 			tmpbranch[n_brs].chain = getchain(yyvsp[-4].str);
@@ -923,42 +1027,50 @@ case 38:
 		  }
 break;
 case 39:
-{
+#line 323 "dgn_comp.y"
+	{
 			yyval.i = TBR_STAIR;	/* two way stair */
 		  }
 break;
 case 40:
-{
+#line 327 "dgn_comp.y"
+	{
 			yyval.i = TBR_STAIR;	/* two way stair */
 		  }
 break;
 case 41:
-{
+#line 331 "dgn_comp.y"
+	{
 			yyval.i = TBR_NO_UP;	/* no up staircase */
 		  }
 break;
 case 42:
-{
+#line 335 "dgn_comp.y"
+	{
 			yyval.i = TBR_NO_DOWN;	/* no down staircase */
 		  }
 break;
 case 43:
-{
+#line 339 "dgn_comp.y"
+	{
 			yyval.i = TBR_PORTAL;	/* portal connection */
 		  }
 break;
 case 44:
-{
+#line 345 "dgn_comp.y"
+	{
 			yyval.i = 0;	/* defaults to down */
 		  }
 break;
 case 45:
-{
+#line 349 "dgn_comp.y"
+	{
 			yyval.i = yyvsp[0].i;
 		  }
 break;
 case 46:
-{
+#line 355 "dgn_comp.y"
+	{
 			char *p = yyvsp[0].str;
 			if (strlen(p) != 1) {
 			    if (strcmp(p, "none") != 0)
@@ -970,7 +1082,8 @@ case 46:
 		  }
 break;
 case 47:
-{
+#line 385 "dgn_comp.y"
+	{
 			if (yyvsp[-3].i < -MAXLEVEL || yyvsp[-3].i > MAXLEVEL) {
 			    yyerror("Abs base out of dlevel range - zeroing!");
 			    couple.base = couple.rand = 0;
@@ -986,7 +1099,8 @@ case 47:
 		  }
 break;
 case 48:
-{
+#line 422 "dgn_comp.y"
+	{
 			if (yyvsp[-3].i < -MAXLEVEL || yyvsp[-3].i > MAXLEVEL) {
 			    yyerror("Rel base out of dlevel range - zeroing!");
 			    couple.base = couple.rand = 0;
@@ -996,6 +1110,7 @@ case 48:
 			}
 		  }
 break;
+#line 1113 "y.tab.c"
     }
     yyssp -= yym;
     yystate = *yyssp;
@@ -1028,7 +1143,7 @@ break;
         if (yychar == 0) goto yyaccept;
         goto yyloop;
     }
-    if ((yyn = yygindex[yym]) != 0 && (yyn += yystate) >= 0 &&
+    if ((yyn = yygindex[yym]) && (yyn += yystate) >= 0 &&
             yyn <= YYTABLESIZE && yycheck[yyn] == yystate)
         yystate = yytable[yyn];
     else
@@ -1038,17 +1153,20 @@ break;
         printf("%sdebug: after reduction, shifting from state %d \
 to state %d\n", YYPREFIX, *yyssp, yystate);
 #endif
-    if (yyssp >= yyss + yystacksize - 1)
+    if (yyssp >= yysslim && yygrowstack())
     {
         goto yyoverflow;
     }
-    *++yyssp = yystate;
+    *++yyssp = (short) yystate;
     *++yyvsp = yyval;
     goto yyloop;
+
 yyoverflow:
     yyerror("yacc stack overflow");
+
 yyabort:
     return (1);
+
 yyaccept:
     return (0);
 }

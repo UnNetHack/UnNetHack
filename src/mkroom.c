@@ -525,7 +525,7 @@ struct mkroom *croom; /* NULL == choose random room */
 	    struct permonst *pmon;
 	    if (!MON_AT(pos.x, pos.y) && (pmon = mkclass(S_NYMPH,0))) {
 		struct monst *mtmp = makemon(pmon, pos.x,pos.y, NO_MM_FLAGS);
-		mtmp->msleeping = 1;
+		if (mtmp) mtmp->msleeping = 1;
 		i--;
 	    }
 	}
@@ -578,6 +578,8 @@ mkswamp()	/* Michiel Huisjes & Fred de Wilde */
 			if(!rn2(4))	/* swamps tend to be moldy */
 			    (void) makemon(mkclass(S_FUNGUS,0),
 						sx, sy, NO_MM_FLAGS);
+			else if(!rn2(6))
+			    levl[sx][sy].typ = BOG;
 		}
 		level.flags.has_swamp = 1;
 	}

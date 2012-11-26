@@ -74,6 +74,10 @@ struct u_conduct {		/* number of times... */
 	long	unblinded;	/* starting non-blindfolded and removing a blindfold */
 	long	robbed;		/* killed an artifact-guardian (like an ordinary robber) */
 	long	elbereths;	/* engraved Elbereth */
+	long	bones;		/* encountered bones level */
+	long	non_racial_armor;	/* put on non-racial armor */
+	long	non_racial_weapons;	/* wielded non-racial weapons */
+	long	sokoban;		/* how many times violated sokoban "rules" */
 				/* genocides already listed at end of game */
 };
 
@@ -320,6 +324,7 @@ struct you {
 #define TT_WEB		2
 #define TT_LAVA		3
 #define TT_INFLOOR	4
+#define TT_SWAMP	5
 	char	urooms[5];	/* rooms (roomno + 3) occupied now */
 	char	urooms0[5];	/* ditto, for previous position */
 	char	uentered[5];	/* rooms (roomno + 3) entered this turn */

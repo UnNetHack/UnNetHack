@@ -31,7 +31,11 @@ void curses_prehousekeeping(void);
 
 void curses_posthousekeeping(void);
 
+#ifdef FILE_AREAS
+void curses_view_file(const char *filearea, const char *filename, boolean must_exist);
+#else
 void curses_view_file(const char *filename, boolean must_exist);
+#endif
 
 void curses_rtrim(char *str);
 

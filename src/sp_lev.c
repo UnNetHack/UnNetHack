@@ -36,10 +36,8 @@ STATIC_DCL int FDECL(noncoalignment, (ALIGNTYP_P));
 STATIC_DCL void FDECL(create_monster, (monster *, struct mkroom *));
 STATIC_DCL void FDECL(create_object, (object *, struct mkroom *));
 STATIC_DCL void FDECL(create_engraving, (engraving *,struct mkroom *));
-STATIC_DCL void FDECL(create_stairs, (stair *, struct mkroom *));
 STATIC_DCL void FDECL(create_altar, (altar *, struct mkroom *));
 STATIC_DCL void FDECL(create_gold, (gold *, struct mkroom *));
-STATIC_DCL void FDECL(create_feature, (int,int,struct mkroom *,int));
 STATIC_DCL boolean FDECL(search_door, (struct mkroom *, xchar *, xchar *,
 					XCHAR_P, int));
 STATIC_DCL void NDECL(fix_stair_rooms);
@@ -79,9 +77,6 @@ STATIC_DCL int NDECL(rnddoor);
 STATIC_DCL int NDECL(rndtrap);
 STATIC_DCL void FDECL(get_location, (schar *,schar *,int, struct mkroom *));
 STATIC_DCL void FDECL(light_region, (region *));
-STATIC_DCL void FDECL(load_one_monster, (dlb *,monster *));
-STATIC_DCL void FDECL(load_one_object, (dlb *,object *));
-STATIC_DCL void FDECL(load_one_engraving, (dlb *,engraving *));
 STATIC_DCL void FDECL(maze1xy, (coord *,int));
 STATIC_DCL boolean FDECL(sp_level_loader, (dlb *, sp_lev *));
 STATIC_DCL void FDECL(create_door, (room_door *, struct mkroom *));
@@ -529,6 +524,8 @@ flip_level(int flp)
 	    else if (mtmp->isshk) {
 		ESHK(mtmp)->shk.y = y2 - ESHK(mtmp)->shk.y;
 		ESHK(mtmp)->shd.y = y2 - ESHK(mtmp)->shd.y;
+	    } else if (mtmp->wormno) {
+		flip_worm_segs_vertical(mtmp, y2);
 	    }
 	}
 	if (flp & 2) {
@@ -538,6 +535,8 @@ flip_level(int flp)
 	    else if (mtmp->isshk) {
 		ESHK(mtmp)->shk.x = x2 - ESHK(mtmp)->shk.x;
 		ESHK(mtmp)->shd.x = x2 - ESHK(mtmp)->shd.x;
+	    } else if (mtmp->wormno) {
+		flip_worm_segs_horizontal(mtmp, x2);
 	    }
 	}
     }
@@ -694,6 +693,11 @@ flip_level_rnd(int flp)
     int c = 0;
     if ((flp & 1) && rn2(2)) c |= 1;
     if ((flp & 2) && rn2(2)) c |= 2;
+
+    /* Workaround for preventing the stairs to Vlad's tower appearing
+     * in the wizard's tower because of a bug in level flipping. */
+    if (On_W_tower_level(&u.uz)) { flp &= 1; }
+
     flip_level(c);
 }
 
@@ -712,7 +716,7 @@ int prop;
 
 	for(y = y1; y <= y2; y++)
 	    for(x = x1; x <= x2; x++)
-		if(IS_STWALL(levl[x][y].typ))
+		if(IS_STWALL(levl[x][y].typ) || IS_TREES(levl[x][y].typ))
 		    levl[x][y].wall_info |= prop;
 }
 
@@ -1247,7 +1251,7 @@ room_door *dd;
 struct mkroom *broom;
 {
 	int	x = 0, y = 0;
-	int	trycnt = 0, walltry = 0, wtry = 0;
+	int	trycnt = 0, wtry = 0;
 
 	if (dd->secret == -1)
 	    dd->secret = rn2(2);
@@ -1819,26 +1823,32 @@ struct mkroom	*croom;
 	    struct monst *was;
 	    struct obj *obj;
 	    int wastyp;
+	    int i=0; /* prevent endless loop in case makemon always fails */
 
 	    /* Named random statues are of player types, and aren't stone-
 	     * resistant (if they were, we'd have to reset the name as well as
 	     * setting corpsenm).
 	     */
-	    for (wastyp = otmp->corpsenm; ; wastyp = rndmonnum()) {
+	    for (wastyp = otmp->corpsenm; i < 1000 ; i++) {
 		/* makemon without rndmonst() might create a group */
 		was = makemon(&mons[wastyp], 0, 0, NO_MM_FLAGS);
-		if (!resists_ston(was)) break;
+		if (was) {
+			if (!resists_ston(was)) break;
+			mongone(was);
+		}
+		wastyp = rndmonnum();
+	    }
+	    if (was) {
+		otmp->corpsenm = wastyp;
+		while (was->minvent) {
+			obj = was->minvent;
+			obj->owornmask = 0;
+			obj_extract_self(obj);
+			(void) add_to_container(otmp, obj);
+		}
+		otmp->owt = weight(otmp);
 		mongone(was);
 	    }
-	    otmp->corpsenm = wastyp;
-	    while(was->minvent) {
-		obj = was->minvent;
-		obj->owornmask = 0;
-		obj_extract_self(obj);
-		(void) add_to_container(otmp, obj);
-	    }
-	    otmp->owt = weight(otmp);
-	    mongone(was);
 	}
 
 #ifdef RECORD_ACHIEVE
@@ -1877,23 +1887,6 @@ struct mkroom *croom;
 	get_location(&x, &y, DRY, croom);
 
 	make_engr_at(x, y, e->engr.str, 0L, e->etype);
-}
-
-/*
- * Create stairs in a room.
- *
- */
-
-STATIC_OVL void
-create_stairs(s,croom)
-stair	*s;
-struct mkroom	*croom;
-{
-	schar		x,y;
-
-	x = s->x; y = s->y;
-	get_location(&x, &y, DRY, croom);
-	mkstairs(x,y,(char)s->up, croom);
 }
 
 /*
@@ -1978,27 +1971,6 @@ struct mkroom	*croom;
 	if (g->amount == -1)
 	    g->amount = rnd(200);
 	(void) mkgold((long) g->amount, x, y);
-}
-
-/*
- * Create a feature (e.g a fountain) in a room.
- */
-
-STATIC_OVL void
-create_feature(fx, fy, croom, typ)
-int		fx, fy;
-struct mkroom	*croom;
-int		typ;
-{
-	schar		x,y;
-
-	x = fx;  y = fy;
-	get_location(&x, &y, DRY, croom);
-	/* Don't cover up an existing feature (particularly randomly
-	   placed stairs). */
-	if (IS_FURNITURE(levl[x][y].typ)) return;
-
-	levl[x][y].typ = typ;
 }
 
 void
@@ -2188,7 +2160,7 @@ schar ftyp, btyp;
 			if(nxcor && !rn2(50))
 				(void) mksobj_at(BOULDER, xx, yy, TRUE, FALSE);
 		} else {
-			crm->typ = SCORR;
+			crm->typ = CORR; /* formerly secret corridor */
 		}
 	    } else
 	    if(crm->typ != ftyp && crm->typ != SCORR) {
@@ -2460,80 +2432,6 @@ light_region(tmpregion)
 		lev->lit = litstate;
 	    lev++;
 	}
-    }
-}
-
-STATIC_OVL void
-load_one_monster(fd, m)
-dlb *fd;
-monster *m;
-{
-	int size;
-
-	Fread((genericptr_t) m, 1, sizeof *m, fd);
-	if ((size = m->name.len) != 0) {
-	    m->name.str = (char *) alloc((unsigned)size + 1);
-	    Fread((genericptr_t) m->name.str, 1, size, fd);
-	    m->name.str[size] = '\0';
-	} else
-	    m->name.str = (char *) 0;
-	if ((size = m->appear_as.len) != 0) {
-	    m->appear_as.str = (char *) alloc((unsigned)size + 1);
-	    Fread((genericptr_t) m->appear_as.str, 1, size, fd);
-	    m->appear_as.str[size] = '\0';
-	} else
-	    m->appear_as.str = (char *) 0;
-}
-
-STATIC_OVL void
-load_one_object(fd, o)
-dlb *fd;
-object *o;
-{
-	int size;
-
-	Fread((genericptr_t) o, 1, sizeof *o, fd);
-	if ((size = o->name.len) != 0) {
-	    o->name.str = (char *) alloc((unsigned)size + 1);
-	    Fread((genericptr_t) o->name.str, 1, size, fd);
-	    o->name.str[size] = '\0';
-	} else
-	    o->name.str = (char *) 0;
-}
-
-STATIC_OVL void
-load_one_engraving(fd, e)
-dlb *fd;
-engraving *e;
-{
-	int size;
-
-	Fread((genericptr_t) e, 1, sizeof *e, fd);
-	size = e->engr.len;
-	e->engr.str = (char *) alloc((unsigned)size+1);
-	Fread((genericptr_t) e->engr.str, 1, size, fd);
-	e->engr.str[size] = '\0';
-}
-
-STATIC_OVL void
-load_one_room(fd, r)
-dlb *fd;
-room *r;
-{
-    int size;
-
-    Fread((genericptr_t) r, 1, sizeof *r, fd);
-    size = r->name.len;
-    if (size > 0) {
-	r->name.str = (char *) alloc((unsigned)size + 1);
-	Fread((genericptr_t) r->name.str, 1, size, fd);
-	r->name.str[size] = '\0';
-    }
-    size = r->parent.len;
-    if (size > 0) {
-	r->parent.str = (char *) alloc((unsigned)size + 1);
-	Fread((genericptr_t) r->parent.str, 1, size, fd);
-	r->parent.str[size] = '\0';
     }
 }
 
@@ -3231,6 +3129,7 @@ spo_level_flags(coder)
     if (flags & SHROUD)       level.flags.hero_memory = 0;
     if (flags & STORMY)       level.flags.stormy = 1;
     if (flags & GRAVEYARD)    level.flags.graveyard = 1;
+    if (flags & SKYMAP)       level.flags.sky = 1;
 
     opvar_free(flagdata);
 }
@@ -3328,7 +3227,6 @@ spo_level_sounds(coder)
 {
     struct opvar *freq, *n_tuples;
     struct lvl_sounds *mg;
-    struct lvl_sound_bite *mgtuple;
 
     if (level.sounds) {
 	impossible("level sounds already defined.");
@@ -3682,7 +3580,6 @@ selection_opvar(nbuf)
 {
     struct opvar *ov;
     char buf[(COLNO*ROWNO)+1];
-    int x,y,i = 0;
 
     if (!nbuf) {
 	(void) memset(buf, 1, sizeof(buf));
@@ -3767,7 +3664,6 @@ selection_rndcoord(ov, x,y)
     struct opvar *ov;
     schar *x, *y;
 {
-    struct opvar *coord;
     int idx = 0;
     int c;
     int dx,dy;
@@ -5156,7 +5052,6 @@ sp_lev *lvl;
 	case SPO_SEL_FILTER: /* sorta like logical and */
 	    {
 		struct opvar *filtertype;
-		int x,y;
 		if (!OV_pop_i(filtertype)) panic("no sel filter type");
 		switch (OV_i(filtertype)) {
 		case 0: /* percentage */
@@ -5397,7 +5292,7 @@ const char *name;
 	boolean result = FALSE;
 	struct version_info vers_info;
 
-	fd = dlb_fopen(name, RDBMODE);
+	fd = dlb_fopen_area(FILE_AREA_UNSHARE, name, RDBMODE);
 	if (!fd) return FALSE;
 
 	Fread((genericptr_t) &vers_info, sizeof vers_info, 1, fd);

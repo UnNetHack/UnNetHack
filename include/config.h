@@ -38,6 +38,7 @@
 #include "config1.h"	/* should auto-detect MSDOS, MAC, AMIGA, and WIN32 */
 
 #ifdef AUTOCONF
+# include "autoconf_paths.h"
 # include "autoconf.h"
 #endif
 
@@ -162,8 +163,10 @@
 #endif
 
 #define LOGFILE "logfile"	/* larger file for debugging purposes */
+#define LOGAREA FILE_AREA_VAR
 /* #define XLOGFILE "xlogfile" */ /* even larger logfile */
 #define NEWS "news"		/* the file containing the latest hack news */
+#define NEWS_AREA FILE_AREA_SHARE
 #define PANICLOG "paniclog"	/* log of panic and impossible events */
 /* #define LIVELOGFILE "livelog" */ /* live game progress log file */
 
@@ -293,6 +296,22 @@ typedef signed char	schar;
 typedef unsigned char	uchar;
 #endif
 
+/* Type used for outputting DECgraphics and IBMgraphics characters into
+ * HTML dumps or for holding unicode codepoints. */
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# if HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+#ifdef UINT32_MAX
+typedef uint32_t glyph_t;
+#else
+/* Fallback that should work on most systems */
+typedef long glyph_t;
+#endif
+
 /*
  * Various structures have the option of using bitfields to save space.
  * If your C compiler handles bitfields well (e.g., it can initialize structs
@@ -345,6 +364,8 @@ typedef unsigned char	uchar;
 #define SEDUCE		/* Succubi/incubi seduction, by KAA, suggested by IM */
 #define STEED		/* Riding steeds */
 #define TOURIST		/* Tourist players with cameras and Hawaiian shirts */
+#define CONVICT		/* Convict player with heavy iron ball */
+
 /* difficulty */
 #define ELBERETH	/* Engraving the E-word repels monsters */
 /* I/O */
@@ -398,7 +419,7 @@ typedef unsigned char	uchar;
 #if defined(TTY_GRAPHICS) || defined(MSWIN_GRAPHICS) || \
  defined(CURSES_GRAPHICS)
 # define MENU_COLOR
-# define MENU_COLOR_REGEX
+/*# define MENU_COLOR_REGEX*/
 /*# define MENU_COLOR_REGEX_POSIX */
 /* if MENU_COLOR_REGEX is defined, use regular expressions (regex.h,
  * GNU specific functions by default, POSIX functions with
@@ -416,7 +437,8 @@ typedef unsigned char	uchar;
 #define DUMP_LOG        /* Dump game end information to a file */
 /* #define DUMP_FN "/tmp/%n.nh" */      /* Fixed dumpfile name, if you want
                                          * to prevent definition by users */
-#define DUMP_HTML_LOG   /* Dump game end information to a html file */
+#define DUMP_TEXT_LOG   /* Dump game end information in a plain text form */
+/*#define DUMP_HTML_LOG*/   /* Dump game end information to a html file */
 #define DUMPMSGS 30     /* Number of latest messages in the dump file  */
 
 #define AUTO_OPEN	/* open doors by walking into them - Stefano Busti */

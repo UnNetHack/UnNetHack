@@ -703,7 +703,7 @@ defdisintagr(magr, mdef, mattk)
 				weight_dmg(mass);
 			tmp = mass; 
 		} else {
-			struct obj * lifesave = mlifesaver(magr);
+			mlifesaver(magr);
 			mass += magr->data->cwt;
 			weight_dmg(mass);
 			if (mass)
@@ -896,6 +896,7 @@ mdamagem(magr, mdef, mattk)
 		    pline("%s is %s!", Monnam(mdef),
 			  on_fire(mdef->data, mattk));
 		if (pd == &mons[PM_STRAW_GOLEM] ||
+		    pd == &mons[PM_WAX_GOLEM] ||
 		    pd == &mons[PM_PAPER_GOLEM]) {
 			if (vis) pline("%s burns completely!", Monnam(mdef));
 			mondied(mdef);
@@ -1530,6 +1531,20 @@ int mdead;
 		    }
 		} else tmp = 0;
 		goto assess_dmg;
+		case AD_MAGM:
+	    /* wrath of gods for attacking Oracle */
+	    if(resists_magm(magr)) {
+		if(canseemon(magr)) {
+		shieldeff(magr->mx, magr->my);
+		pline("A hail of magic missiles narrowly misses %s!",mon_nam(magr));
+		}
+	    } else {
+		if(canseemon(magr))
+			pline(magr->data == &mons[PM_WOODCHUCK] ? "ZOT!" : 
+			"%s is hit by magic missiles appearing from thin air!",Monnam(magr));
+		goto assess_dmg;
+	    }
+	    break;
 	    case AD_ENCH:	/* KMH -- remove enchantment (disenchanter) */
 		if (mhit && !mdef->mcan && otmp) {
 		    (void) drain_item(otmp);

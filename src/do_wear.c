@@ -101,11 +101,16 @@ Boots_on()
 	case LOW_BOOTS:
 	case IRON_SHOES:
 	case HIGH_BOOTS:
-	case JUMPING_BOOTS:
 	case KICKING_BOOTS:
 		break;
+	case JUMPING_BOOTS:
+		/* jumping is obvious no matter what the situation */
+		makeknown(uarmf->otyp);
+		pline("Your %s feel longer.", makeplural(body_part(LEG)));
+		break;
 	case WATER_WALKING_BOOTS:
-		if (u.uinwater) spoteffects(TRUE);
+		if (u.uinwater || is_lava(u.ux,u.uy) || is_swamp(u.ux,u.uy))
+			spoteffects(TRUE);
 		break;
 	case SPEED_BOOTS:
 		/* Speed boots are still better than intrinsic speed, */
@@ -135,6 +140,9 @@ Boots_on()
 		break;
 	default: warning(unknown_type, c_boots, uarmf->otyp);
     }
+    if (uarmf && !is_racial_armor(uarmf)) {
+	u.uconduct.non_racial_armor++;
+    }
     return 0;
 }
 
@@ -158,7 +166,8 @@ Boots_off()
 		}
 		break;
 	case WATER_WALKING_BOOTS:
-		if (is_pool(u.ux,u.uy) && !Levitation && !Flying &&
+		if ((is_pool(u.ux,u.uy) || is_lava(u.ux,u.uy) || is_swamp(u.ux,u.uy)) &&
+		    !Levitation && !Flying &&
 		    !is_clinger(youmonst.data) && !cancelled_don) {
 			makeknown(otyp);
 			/* make boots known in case you survive the drowning */
@@ -181,10 +190,14 @@ Boots_off()
 			makeknown(otyp);
 		}
 		break;
+	case JUMPING_BOOTS:
+		/* jumping is obvious no matter what the situation */
+		makeknown(otyp);
+		pline("Your %s feel shorter.", makeplural(body_part(LEG)));
+		break;
 	case LOW_BOOTS:
 	case IRON_SHOES:
 	case HIGH_BOOTS:
-	case JUMPING_BOOTS:
 	case KICKING_BOOTS:
 		break;
 	default: warning(unknown_type, c_boots, otyp);
@@ -238,6 +251,9 @@ Cloak_on()
 		EAcid_resistance |= WORN_CLOAK;
   		break;
 	default: warning(unknown_type, c_cloak, uarmc->otyp);
+    }
+    if (uarmc && !is_racial_armor(uarmc)) {
+	u.uconduct.non_racial_armor++;
     }
     return 0;
 }
@@ -344,6 +360,9 @@ Helmet_on()
 		break;
 	default: warning(unknown_type, c_helmet, uarmh->otyp);
     }
+    if (uarmh && !is_racial_armor(uarmh)) {
+	u.uconduct.non_racial_armor++;
+    }
     return 0;
 }
 
@@ -412,6 +431,9 @@ Gloves_on()
 		adj_abon(uarmg, uarmg->spe);
 		break;
 	default: warning(unknown_type, c_gloves, uarmg->otyp);
+    }
+    if (uarmg && !is_racial_armor(uarmg)) {
+	u.uconduct.non_racial_armor++;
     }
     return 0;
 }
@@ -488,6 +510,9 @@ Shield_on()
 	default: warning(unknown_type, c_shield, uarms->otyp);
     }
 */
+    if (uarms && !is_racial_armor(uarms)) {
+	u.uconduct.non_racial_armor++;
+    }
     return 0;
 }
 
@@ -524,6 +549,9 @@ Shirt_on()
 	default: warning(unknown_type, c_shirt, uarmu->otyp);
     }
 */
+    if (uarmu && !is_racial_armor(uarmu)) {
+	u.uconduct.non_racial_armor++;
+    }
     return 0;
 }
 
@@ -557,7 +585,46 @@ Armor_on()
 		if (!Blind)
 			pline("%s to glow.",Tobjnam(uarm,"begin"));
 	}
-    return 0;
+	switch (uarm->otyp) {
+		case	CHROMATIC_DRAGON_SCALES:
+		case	CHROMATIC_DRAGON_SCALE_MAIL:
+			EFire_resistance   |= W_ARM;
+			ECold_resistance   |= W_ARM;
+			ESleep_resistance  |= W_ARM;
+			EDisint_resistance |= W_ARM;
+			EShock_resistance  |= W_ARM;
+			EPoison_resistance |= W_ARM;
+			EAcid_resistance   |= W_ARM;
+			EStone_resistance  |= W_ARM;
+			EReflecting        |= W_ARM;
+			break;
+		default:
+			break;
+	}
+	if (uarm && !is_racial_armor(uarm)) {
+		u.uconduct.non_racial_armor++;
+	}
+	return 0;
+}
+static void
+Armor_off_sub()
+{
+	switch (uarm->otyp) {
+		case	CHROMATIC_DRAGON_SCALES:
+		case	CHROMATIC_DRAGON_SCALE_MAIL:
+			EFire_resistance   &= ~W_ARM;
+			ECold_resistance   &= ~W_ARM;
+			ESleep_resistance  &= ~W_ARM;
+			EDisint_resistance &= ~W_ARM;
+			EShock_resistance  &= ~W_ARM;
+			EPoison_resistance &= ~W_ARM;
+			EAcid_resistance   &= ~W_ARM;
+			EStone_resistance  &= ~W_ARM;
+			EReflecting        &= ~W_ARM;
+			break;
+		default:
+			break;
+	}
 }
 
 int
@@ -568,10 +635,11 @@ Armor_off()
 		if (!Blind)
 			pline("%s glowing.",Tobjnam(uarm,"stop"));
 	}
-    takeoff_mask &= ~W_ARM;
-    setworn((struct obj *)0, W_ARM);
-    cancelled_don = FALSE;
-    return 0;
+	Armor_off_sub();
+	takeoff_mask &= ~W_ARM;
+	setworn((struct obj *)0, W_ARM);
+	cancelled_don = FALSE;
+	return 0;
 }
 
 /* The gone functions differ from the off functions in that if you die from
@@ -582,10 +650,11 @@ Armor_gone()
 {
 	if (uarm && Is_gold_dragon_armor(uarm->otyp))
 		end_burn(uarm,FALSE);
+	Armor_off_sub();
 	takeoff_mask &= ~W_ARM;
-    setnotworn(uarm);
-    cancelled_don = FALSE;
-    return 0;
+	setnotworn(uarm);
+	cancelled_don = FALSE;
+	return 0;
 }
 
 STATIC_OVL void

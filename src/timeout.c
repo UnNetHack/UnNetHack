@@ -6,6 +6,9 @@
 #include "lev.h"	/* for checking save modes */
 
 STATIC_DCL void NDECL(stoned_dialogue);
+#ifdef CONVICT
+STATIC_DCL void NDECL(phasing_dialogue);
+#endif /* CONVICT */
 STATIC_DCL void NDECL(vomiting_dialogue);
 STATIC_DCL void NDECL(choke_dialogue);
 STATIC_DCL void NDECL(slime_dialogue);
@@ -30,14 +33,38 @@ stoned_dialogue()
 {
 	register long i = (Stoned & TIMEOUT);
 
-	if (i > 0L && i <= SIZE(stoned_texts))
-		pline(stoned_texts[SIZE(stoned_texts) - i]);
+	if (i > 0L && i <= SIZE(stoned_texts)) {
+		pline("%s", stoned_texts[SIZE(stoned_texts) - i]);
+		nomul(0, 0); /* fix for C343-74 */
+	}
 	if (i == 5L)
 		HFast = 0L;
 	if (i == 3L)
 		nomul(-3, "getting stoned");
 	exercise(A_DEX, FALSE);
 }
+
+#ifdef CONVICT
+STATIC_OVL void
+phasing_dialogue()
+{
+    if (Phasing == 15) {
+        if (!Hallucination) {
+            Your("body is beginning to feel more solid.");
+        } else {
+            You_feel("more distant from the spirit world.");
+        }
+        stop_occupation();
+    } else if (Phasing == 1) {
+        if (!Hallucination) {
+            Your("body is solid again.");
+        } else {
+            You_feel("totally separated from the spirit world.");
+        }
+        stop_occupation();
+    }
+}
+#endif /* CONVICT */
 
 /* He is getting sicker and sicker prior to vomiting */
 static NEARDATA const char * const vomiting_texts[] = {
@@ -55,7 +82,7 @@ vomiting_dialogue()
 
 	if ((((Vomiting & TIMEOUT) % 3L) == 2) && (i >= 0)
 	    && (i < SIZE(vomiting_texts)))
-		You(vomiting_texts[SIZE(vomiting_texts) - i - 1]);
+		You("%s", vomiting_texts[SIZE(vomiting_texts) - i - 1]);
 
 	switch ((int) i) {
 	case 0:
@@ -102,7 +129,7 @@ choke_dialogue()
 		if (index(str, '%'))
 		    pline(str, hcolor(NH_BLUE));
 		else
-		    pline(str);
+		    pline("%s", str);
 	    }
 	}
 	exercise(A_STR, FALSE);
@@ -132,7 +159,7 @@ slime_dialogue()
 		} else
 		    pline(str, an(Hallucination ? rndmonnam() : "green slime"));
 	    } else
-		pline(str);
+		pline("%s", str);
 	}
 	if (i == 3L) {	/* limbs becoming oozy */
 	    HFast = 0L;	/* lose intrinsic speed */
@@ -182,6 +209,9 @@ nh_timeout()
 	    else if(u.uluck < baseluck && (nostone || time_luck > 0))
 		u.uluck++;
 	}
+#ifdef CONVICT
+    if(Phasing) phasing_dialogue();
+#endif /* CONVICT */
 	if(u.uinvulnerable) return; /* things past this point could kill you */
 	if(Stoned) stoned_dialogue();
 	if(Slimed) slime_dialogue();
@@ -879,7 +909,7 @@ long timeout;
 			break;
 		}
 
-		if (obj->age)
+		if (obj && obj->age)
 		    begin_burn(obj, TRUE);
 
 		break;

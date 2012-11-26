@@ -110,7 +110,7 @@ void curses_init_nhwindows(int* argcp, char** argv)
     noecho();
     raw();
     meta(stdscr, TRUE);
-    curs_set(0);
+    orig_cursor = curs_set(0);
     keypad(stdscr, TRUE);
 #ifdef NCURSES_VERSION
 # ifdef __APPLE__
@@ -207,6 +207,8 @@ void curses_get_nh_event()
 */
 void curses_exit_nhwindows(const char *str)
 {
+    curses_cleanup();
+    curs_set(orig_cursor);
     endwin();
     iflags.window_inited = 0;
     if (str != NULL)
@@ -218,6 +220,7 @@ void curses_exit_nhwindows(const char *str)
 /* Prepare the window to be suspended. */
 void curses_suspend_nhwindows(const char *str)
 {
+    endwin();
 }
 
 
@@ -269,18 +272,19 @@ void curses_clear_nhwindow(winid wid)
 void curses_display_nhwindow(winid wid, BOOLEAN_P block)
 {
     menu_item *selected = NULL;
-    
+
+    if ((wid == MAP_WIN) && block)
+    {
+      (void) curses_more();
+    }
+
     if (curses_is_menu(wid) || curses_is_text(wid))
     {
         curses_end_menu(wid, "");
         curses_select_menu(wid, PICK_NONE, &selected);
         return;
     }
-    
-    if ((wid == MAP_WIN) && (curses_window_exists(MAP_WIN)) && block)
-    {
-        (void) curses_more();
-    }
+
 }
 
 
@@ -336,10 +340,17 @@ void curses_putstr(winid wid, int attr, const char *text)
 /* Display the file named str.  Complain about missing files
                    iff complain is TRUE.
 */
+#ifdef FILE_AREAS
+void curses_display_file(const char *filearea,const char *filename,BOOLEAN_P must_exist)
+{
+    curses_view_file(filearea, filename, must_exist);
+}
+#else
 void curses_display_file(const char *filename,BOOLEAN_P must_exist)
 {
     curses_view_file(filename, must_exist);
 }
+#endif
 
 /* Start using window as a menu.  You must call start_menu()
    before add_menu().  After calling start_menu() you may not
@@ -382,7 +393,7 @@ add_menu(winid wid, int glyph, const anything identifier,
                 -- If you want this choice to be preselected when the
                    menu is displayed, set preselected to TRUE.
 */
-void curses_add_menu(winid wid, int glyph, const ANY_P * identifier,
+void curses_add_menu(winid wid, int glyph, int cnt, const ANY_P * identifier,
 		CHAR_P accelerator, CHAR_P group_accel, int attr, 
 		const char *str, BOOLEAN_P presel)
 {
@@ -494,7 +505,7 @@ void curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph)
     int attr = -1;
 
     /* map glyph to character and color */
-    mapglyph(glyph, &ch, &color, &special, x, y);
+    mapglyph(glyph, (glyph_t*)&ch, &color, &special, x, y);
     if ((special & MG_PET) && iflags.hilite_pet)
     {
         attr = iflags.wc2_petattr;

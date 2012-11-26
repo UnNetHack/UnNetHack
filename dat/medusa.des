@@ -254,6 +254,11 @@ REGION:(49,14,51,16),random,"ordinary",unfilled
 REGION:(07,05,09,07),unlit,"ordinary"
 REGION:(65,04,67,06),unlit,"ordinary"
 REGION:(45,14,47,16),unlit,"ordinary"
+# Non diggable walls
+# 4th room has diggable walls as Medusa is never placed there
+NON_DIGGABLE:(06,04,10,08)
+NON_DIGGABLE:(64,03,68,07)
+NON_DIGGABLE:(44,13,48,17)
 # All places are accessible also with jumping, so don't bother
 # restricting the placement when teleporting from levels below this.
 TELEPORT_REGION:(33,02,38,07),(0,0,0,0),down

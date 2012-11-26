@@ -288,10 +288,10 @@ void curses_prev_mesg()
         mesg = get_msg_line(TRUE, count);
         if ((turn != mesg->turn) && (count != 0))
         {
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
+            curses_add_menu(wid, NO_GLYPH, MENU_DEFCNT, identifier, 0, 0, A_NORMAL,
              "---", FALSE);
         }
-        curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
+        curses_add_menu(wid, NO_GLYPH, MENU_DEFCNT, identifier, 0, 0, A_NORMAL,
          mesg->str, FALSE);
         turn = mesg->turn;
     }

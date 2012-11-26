@@ -87,7 +87,7 @@ boolean restore;
 
 			if (otmp->otyp == SLIME_MOLD) goodfruit(otmp->spe);
 #ifdef MAIL
-			else if (otmp->otyp == SCR_MAIL) otmp->spe = 1;
+			else if (otmp->otyp == SCR_MAIL) otmp->spe = MAIL_JUNK;
 #endif
 			else if (otmp->otyp == EGG) otmp->spe = 0;
 			else if (otmp->otyp == TIN) {
@@ -142,13 +142,20 @@ int prob2;
 			trim_contents(otmp->cobj, prob1, prob2);
 		}
 		if (rnf(prob1, prob2)) {
+			/* Don't remove dragon scales or scale mails when player
+			 * is polyed into this dragon type.
+			 * Also, UnNetHack will crash because not deleting the
+			 * associated light source if these are gold and get
+			 * removed. */
+			if (!(otmp == uskin && Is_dragon_armor(uskin->otyp))) {
 #if defined(DEBUG) && defined(WIZARD)
-			if (wizard)
-				pline("trim_contents: %s just disappeared", doname(otmp));
+				if (wizard)
+					pline("trim_contents: %s just disappeared", doname(otmp));
 #endif
-			obj_extract_self(otmp);
-			obfree(otmp, (struct obj *)0);  /* dealloc_obj() isn't sufficient */
-			disappeared++; /* only counts explicitly obfree'd objects */
+				obj_extract_self(otmp);
+				obfree(otmp, (struct obj *)0);  /* dealloc_obj() isn't sufficient */
+				disappeared++; /* only counts explicitly obfree'd objects */
+			}
 		}
 	}
 #if defined(DEBUG) && defined(WIZARD)
@@ -310,6 +317,11 @@ struct obj *corpse;
 		drop_upon_death((struct monst *)0, otmp);
 		if (!otmp) return;	/* couldn't make statue */
 		mtmp = (struct monst *)0;
+	} else if (Race_if(PM_VAMPIRE)) {
+		/* don't let vampires rise as some other monsters */
+		drop_upon_death((struct monst *)0, (struct obj *)0);
+		mtmp = (struct monst *)0;
+		u.ugrave_arise = NON_PM;
 	} else if (u.ugrave_arise < LOW_PM) {
 		/* drop everything */
 		drop_upon_death((struct monst *)0, (struct obj *)0);
@@ -368,8 +380,10 @@ struct obj *corpse;
 	/* Clear all memory from the level. */
 	for(x=0; x<COLNO; x++) for(y=0; y<ROWNO; y++) {
 	    levl[x][y].seenv = 0;
+	    levl[x][y].stepped_on = 0;
 	    levl[x][y].waslit = 0;
 	    levl[x][y].glyph = cmap_to_glyph(S_stone);
+	    levl[x][y].styp = STONE; /* clear dungeon overview last seen info */
 	}
 
 	fd = create_bonesfile(&u.uz, &bonesid, whynot);
@@ -444,6 +458,8 @@ getbones()
 		&& !wizard
 #endif
 		) return(0);
+
+	if (!flags.bones) return(0);
 	if(no_bones_level(&u.uz)) return(0);
 	fd = open_bonesfile(&u.uz, &bonesid);
 	if (fd < 0) return(0);
@@ -511,6 +527,8 @@ getbones()
 	if(wizard) {
 		if(yn("Unlink bones?") == 'n') {
 			compress_bonesfile();
+			/* bones tracking */
+			if (ok) { u.uconduct.bones++; }
 			return(ok);
 		}
 	}
@@ -525,6 +543,10 @@ getbones()
 		/* pline("Cannot unlink bones."); */
 		return(0);
 	}
+
+	/* bones tracking */
+	if (ok) { u.uconduct.bones++; }
+
 	return(ok);
 }
 

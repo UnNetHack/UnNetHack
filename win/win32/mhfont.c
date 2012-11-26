@@ -22,7 +22,6 @@ static void __cdecl font_table_cleanup(void);
 void mswin_init_splashfonts(HWND hWnd)
 {
 	HDC hdc = GetDC(hWnd);
-	HFONT fnt = NULL;
 	LOGFONT lgfnt;
 	ZeroMemory( &lgfnt, sizeof(lgfnt) );
 	lgfnt.lfHeight		= -80;	 // height of font
@@ -103,7 +102,7 @@ HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 		lgfnt.lfOrientation		=	0;					 // base-line orientation angle
 		lgfnt.lfWeight			=	(attr==ATR_BOLD || attr==ATR_INVERSE)? FW_BOLD : FW_NORMAL;   // font weight
 		lgfnt.lfItalic			=	(attr==ATR_BLINK)? TRUE: FALSE;		     // italic attribute option
-		lgfnt.lfUnderline		=	(attr==ATR_ULINE)? TRUE : FALSE;		 // underline attribute option
+		lgfnt.lfUnderline		=	(attr==ATR_ULINE || attr==ATR_INVERSE)? TRUE : FALSE;		 // underline attribute option
 		lgfnt.lfStrikeOut		=	FALSE;				// strikeout attribute option
 		lgfnt.lfCharSet			=	mswin_charset();     // character set identifier
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision

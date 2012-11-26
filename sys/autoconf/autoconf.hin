@@ -3,7 +3,7 @@
 #ifndef AUTOCONF_H
 #define AUTOCONF_H
 
-/* Exceptions to autopickup (experimental) */
+/* Exceptions to autopickup */
 #undef AUTOPICKUP_EXCEPTIONS
 
 /* Open doors by walking into them */
@@ -11,6 +11,9 @@
 
 /* Blackmarket */
 #undef BLACKMARKET
+
+/* Multiple bones per level */
+#undef BONES_POOL
 
 /* A BSD like system */
 #undef BSD
@@ -26,6 +29,9 @@
 
 /* Options to pass to the compression program, if any */
 #undef COMPRESS_OPTIONS
+
+/* Convict class */
+#undef CONVICT
 
 /* Curses interface */
 #undef CURSES_GRAPHICS
@@ -75,6 +81,30 @@
 /* Show experience on bottom line */
 #undef EXP_ON_BOTL
 
+/* Place files in different directories */
+#undef FILE_AREAS
+
+/* Location of bones files (r/w) */
+#undef FILE_AREA_BONES
+
+/* Location of human-readable documentation */
+#undef FILE_AREA_DOC
+
+/* Location of level files (r/w) */
+#undef FILE_AREA_LEVL
+
+/* Location of save files (r/w) */
+#undef FILE_AREA_SAVE
+
+/* For read-only, architechure independent, files */
+#undef FILE_AREA_SHARE
+
+/* For read-only, architechure dependent, files */
+#undef FILE_AREA_UNSHARE
+
+/* Location of other files which may be modified */
+#undef FILE_AREA_VAR
+
 /* Gold is kept on object chains (experimental) */
 #undef GOLDOBJ
 
@@ -97,6 +127,9 @@
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the <ncurses.h> header file. */
+#undef HAVE_NCURSES_H
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
@@ -188,6 +221,9 @@
 /* Compare High Score entries by user id instead of user name */
 #undef PERS_IS_UID
 
+/* Firing without anything quivered will ask you what to quiver */
+#undef QUIVER_FIRED
+
 /* QWERTZ keyboard layout support */
 #undef QWERTZ
 
@@ -209,6 +245,9 @@
 /* Succubi/incubi seduction */
 #undef SEDUCE
 
+/* Start a shell from within the game */
+#undef SHELL
+
 /* Display number of created monsters at the end of game */
 #undef SHOW_BORN
 
@@ -220,6 +259,18 @@
 
 /* Kitchen sinks */
 #undef SINKS
+
+/* The size of `unsigned int', as computed by sizeof. */
+#undef SIZEOF_UNSIGNED_INT
+
+/* The size of `unsigned long', as computed by sizeof. */
+#undef SIZEOF_UNSIGNED_LONG
+
+/* The size of `unsigned long long', as computed by sizeof. */
+#undef SIZEOF_UNSIGNED_LONG_LONG
+
+/* Sort item lists alphabetically by description. */
+#undef SORTLOOT
 
 /* TTY graphics status color */
 #undef STATUS_COLORS
@@ -251,6 +302,9 @@
 /* Using Mersenne Twister as RNG */
 #undef USE_MERSENNE_TWISTER
 
+/* Enable UTF-8 glyphs in TTY */
+#undef UTF8_GLYPHS
+
 /* Fancy mazes */
 #undef WALLIFIED_MAZE
 
@@ -272,5 +326,8 @@
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */
 #undef YYTEXT_POINTER
+
+/* If not already defined, then define as a datatype of *exactly* 32 bits. */
+#undef uint32_t
 
 #endif /* AUTOCONF_H */

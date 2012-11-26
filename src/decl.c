@@ -58,6 +58,9 @@ const char *delayed_killer = 0;
 NEARDATA long done_money = 0;
 #endif
 char killer_buf[BUFSZ] = DUMMY;
+
+long killer_flags = 0L;
+
 const char *nomovemsg = 0;
 const char nul[40] = DUMMY;			/* contains zeros */
 NEARDATA char plname[PL_NSIZ] = DUMMY;		/* player name */
@@ -221,6 +224,9 @@ NEARDATA char wolfname[PL_PSIZ] = DUMMY;
 NEARDATA char crocodilename[PL_PSIZ] = DUMMY;
 /* ...and 'preferred_pet', just below, can now be 'e'. */
 #endif
+#ifdef CONVICT
+NEARDATA char ratname[PL_PSIZ] = DUMMY;
+#endif /* CONVICT */
 
 char preferred_pet;	/* '\0', 'c', 'd', 'n' (none) */
 /* monsters that went down/up together with @ */
@@ -312,6 +318,8 @@ struct u_achieve achieve = DUMMY;
 #if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
 struct realtime_data realtime_data = { 0, 0, 0 };
 #endif
+
+struct _plinemsg *pline_msg = NULL;
 
 /* dummy routine used to force linkage */
 void

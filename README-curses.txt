@@ -21,6 +21,10 @@ interface include:
   * Makes better use of larger and smaller terminal windows, such as a
     multi-line message window if there is space
 
+  * Optional mouse support (click to move player, etc) 
+
+  * Menu text search/selection 
+
   * Fancier display (e.g. window borders, optional popup dialogs,
     splash screen, and better menus)
 
@@ -106,6 +110,10 @@ OPTIONS=petattr:u
 # window borders, message text, etc.  This is separate from the color
 # option, which only controls the color of the map itself.
 OPTIONS=guicolor
+#
+# Use the mouse for moving around.  This option defaults to false.
+#
+OPTIONS=mouse_support
 
 Compiling From Source
 =====================
@@ -144,13 +152,13 @@ Windows:
 Make sure you are compiling from a standard Windows command prompt and
 not a UNIX-style shell, or else it will not work!
 
-Mac OS X:
-
 
 Known Issues
 ============
 
-None as of this writing.
+The current list may be found at:
+
+http://nethack-curses.wikia.com/wiki/Known_Issues
 
 Contact
 =======

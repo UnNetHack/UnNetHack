@@ -9,6 +9,7 @@
 
 #ifdef OVL1
 
+#define DUNGEON_AREA    FILE_AREA_UNSHARE
 #define DUNGEON_FILE	"dungeon"
 
 #define X_START		"x-strt"
@@ -745,7 +746,7 @@ init_dungeons()		/* initialize the "dungeon" structs */
 
 	pd.n_levs = pd.n_brs = 0;
 
-	dgn_file = dlb_fopen(DUNGEON_FILE, RDBMODE);
+	dgn_file = dlb_fopen_area(DUNGEON_AREA, DUNGEON_FILE, RDBMODE);
 	if (!dgn_file) {
 	    char tbuf[BUFSZ];
 	    Sprintf(tbuf, "Cannot open dungeon description - \"%s",
@@ -769,7 +770,7 @@ init_dungeons()		/* initialize the "dungeon" structs */
 	    interject_assistance(1, INTERJECT_PANIC, (genericptr_t)tbuf,
 				 (genericptr_t)fqn_prefix[DATAPREFIX]);
 #endif
-	    panic(tbuf);
+	    panic("%s", tbuf);
 	}
 
 	/* validate the data's version against the program's version */
@@ -1726,7 +1727,7 @@ print_branch(win, dnum, lower_bound, upper_bound, bymenu, lchoices)
 		lchoices->playerlev[lchoices->idx] = depth(&br->end1);
 		any.a_void = 0;
 		any.a_int = lchoices->idx + 1;
-		add_menu(win, NO_GLYPH, &any, lchoices->menuletter,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, lchoices->menuletter,
 				0, ATR_NONE, buf, MENU_UNSELECTED);
 		if (lchoices->menuletter == 'z') lchoices->menuletter = 'A';
 		else lchoices->menuletter++;
@@ -1778,7 +1779,7 @@ xchar *rdgn;
 	}
 	if (bymenu) {
 	    any.a_void = 0;
-	    add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, buf, MENU_UNSELECTED);
+	    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings, buf, MENU_UNSELECTED);
 	} else
 	    putstr(win, 0, buf);
 
@@ -1811,7 +1812,7 @@ xchar *rdgn;
 		lchoices.playerlev[lchoices.idx] = depth(&slev->dlevel);
 		any.a_void = 0;
 		any.a_int = lchoices.idx + 1;
-		add_menu(win, NO_GLYPH, &any, lchoices.menuletter,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, lchoices.menuletter,
 				0, ATR_NONE, buf, MENU_UNSELECTED);
 		if (lchoices.menuletter == 'z') lchoices.menuletter = 'A';
 		else lchoices.menuletter++;
@@ -1942,7 +1943,11 @@ donamelevel()
 
 	if (!(mptr = find_mapseen(&u.uz))) return 0;
 
-	Sprintf(qbuf,"What do you want to call this dungeon level? ");
+	if (mptr->custom) {
+		Sprintf(qbuf,"Replace previous annotation \"%s\" with?", mptr->custom);
+	} else {
+		Sprintf(qbuf,"What do you want to call this dungeon level?");
+	}
 	getlin(qbuf, nbuf);
 
 	if (index(nbuf, '\033')) return 0;
@@ -2250,8 +2255,8 @@ recalc_mapseen()
 				break;
 			case ALTAR:
 				if (!mptr->feat.naltar)
-					mptr->feat.msalign = Amask2msa(levl[x][y].altarmask);
-				else if (mptr->feat.msalign != Amask2msa(levl[x][y].altarmask))
+					mptr->feat.msalign = Amask2msa(levl[x][y].altarmask & ~AM_SHRINE);
+				else if (mptr->feat.msalign != Amask2msa(levl[x][y].altarmask & ~AM_SHRINE))
 					mptr->feat.msalign = MSA_NONE;
 						
 				mptr->feat.naltar = min(mptr->feat.naltar + 1, 3);
@@ -2316,7 +2321,7 @@ dumpoverview()
 	for (mptr = mapseenchn; mptr; mptr = mptr->next) {
 		/* try to find out if the last branch printed something */
 		if (!first && lastdun != mptr->lev.dnum && previous_was_interesting) {
-			dump_html("</li a>\n", "");
+			dump_html("</li>\n", "");
 			previous_was_interesting = FALSE;
 		}
 		/* only print out info for a level or a dungeon if interest */
@@ -2601,6 +2606,45 @@ boolean final; /**< if game is finished */
 #ifdef DUMP_LOG
 	if (dump) dump_definition_list_end();
 #endif
+}
+
+/** Get annotation for a specific level. */
+char *
+get_annotation(lev)
+d_level *lev;
+{
+	mapseen *mptr;
+
+	if (!(mptr = find_mapseen(&u.uz))) {
+		return NULL;
+	} else {
+		return mptr->custom;
+	}
+}
+
+/** Return a generic description of the current level like "plane" for the
+ * planes, "tower" for Vlad's tower, or "dungeon" for a normal level. */
+const char *
+get_generic_level_description(lev)
+d_level *lev;
+{
+	if (Is_astralevel(lev)) {
+		return "astral plane";
+	} else if (In_endgame(lev)) {
+		return "plane";
+	} else if (Is_sanctum(lev)) {
+		return "sanctum";
+	} else if (Is_blackmarket(lev)) {
+		return "blackmarket";
+	} else if (In_sokoban(lev)) {
+		return "puzzle";
+	} else if (In_V_tower(lev)) {
+		return "tower";
+	} else if (level.flags.sky) {
+		return "ground";
+	} else {
+		return "dungeon";
+	}
 }
 
 /*dungeon.c*/

@@ -92,6 +92,13 @@
 #define is_bat(ptr)		((ptr) == &mons[PM_BAT] || \
 				 (ptr) == &mons[PM_GIANT_BAT] || \
 				 (ptr) == &mons[PM_VAMPIRE_BAT])
+#ifdef CONVICT
+# define is_rat(ptr)		((ptr) == &mons[PM_SEWER_RAT] || \
+				 (ptr) == &mons[PM_GIANT_RAT] || \
+				 (ptr) == &mons[PM_RABID_RAT] || \
+				 (ptr) == &mons[PM_ENORMOUS_RAT] || \
+				 (ptr) == &mons[PM_RODENT_OF_UNUSUAL_SIZE])
+#endif /* CONVICT */
 #define is_bird(ptr)		((ptr)->mlet == S_BAT && !is_bat(ptr))
 #define is_giant(ptr)		(((ptr)->mflags2 & M2_GIANT) != 0L)
 #define is_golem(ptr)		((ptr)->mlet == S_GOLEM)
@@ -156,6 +163,7 @@
 #define emits_light(ptr)	(((ptr)->mlet == S_LIGHT || \
 				  (ptr) == &mons[PM_FLAMING_SPHERE] || \
 				  (ptr) == &mons[PM_SHOCKING_SPHERE] || \
+				  (ptr) == &mons[PM_WAX_GOLEM] || \
 				  (!strcmp((ptr)->mname, "gold dragon")) || \
 				  (!strcmp((ptr)->mname, "baby gold dragon")) || \
 				  (ptr) == &mons[PM_FIRE_VORTEX]) ? 1 : \
@@ -175,8 +183,7 @@
 				 (ptr) == &mons[PM_CHICKATRICE])
 
 #ifdef WEBB_DISINT
-# define touch_disintegrates(ptr) ((ptr) == &mons[PM_DISINTEGRATOR] || \
-				 (ptr) == &mons[PM_ANTI_MATTER_VORTEX])
+# define touch_disintegrates(ptr) ((ptr) == &mons[PM_DISINTEGRATOR])
 #endif
   
 #define is_mind_flayer(ptr)	((ptr) == &mons[PM_MIND_FLAYER] || \
@@ -185,6 +192,10 @@
 #define nonliving(ptr)		(is_golem(ptr) || is_undead(ptr) || \
 				 (ptr)->mlet == S_VORTEX || \
 				 (ptr) == &mons[PM_MANES])
+
+#define likes_swamp(ptr)	((ptr)->mlet == S_PUDDING || \
+				 (ptr)->mlet == S_FUNGUS || \
+				 (ptr) == &mons[PM_OCHRE_JELLY])
 
 /* Used for conduct with corpses, tins, and digestion attacks */
 /* G_NOCORPSE monsters might still be swallowed as a purple worm */
@@ -206,10 +217,20 @@
 
 /* For vampires */
 #define has_blood(ptr)		(!vegetarian(ptr) && \
-				   (ptr)->mlet != S_GOLEM && \
+				   ((ptr)->mlet != S_GOLEM || (ptr) == &mons[PM_FLESH_GOLEM]) && \
 				   (!is_undead(ptr) || is_vampire(ptr)))
 
+#ifdef CONVICT
+#define befriend_with_obj(ptr, obj) ((obj)->oclass == FOOD_CLASS && \
+				     (is_domestic(ptr) || (is_rat(ptr) && Role_if(PM_CONVICT))))
+#else
 #define befriend_with_obj(ptr, obj) ((obj)->oclass == FOOD_CLASS && \
 				     is_domestic(ptr))
+#endif
+
+#define is_rockbreaker(ptr)	(((ptr)->msound == MS_LEADER || \
+				 ((ptr) == &mons[PM_BLACK_MARKETEER]) || \
+				  is_rider((ptr))) && \
+				 !mtmp->mpeaceful)
 
 #endif /* MONDATA_H */

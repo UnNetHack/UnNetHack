@@ -164,6 +164,10 @@ makedog()
 	else if (pettype == PM_BABY_CROCODILE)
 		petname = crocodilename;
 #endif
+#ifdef CONVICT
+	else if (pettype == PM_SEWER_RAT)
+		petname = ratname;
+#endif /* CONVICT */
 	else
 		petname = catname;
 
@@ -175,11 +179,14 @@ makedog()
 			if(Role_if(PM_SAMURAI)) petname = "Hachi";     /* Shibuya Station */
 			if(Role_if(PM_BARBARIAN)) petname = "Idefix";  /* Obelix */
 			if(Role_if(PM_RANGER)) petname = "Sirius";     /* Orion's dog */
-		} else if (pettype == PM_KITTEN) {
-			if (!rn2(100)) petname = "Shiva"; /* RIP 1 Oct 1998 - 6 Sep 2009 */
 		}
 	}
 
+#ifdef CONVICT
+	if (!*petname && pettype == PM_SEWER_RAT) {
+	    if(Role_if(PM_CONVICT)) petname = "Nicodemus"; /* Rats of NIMH */
+    }
+#endif /* CONVICT */
 	mtmp = makemon(&mons[pettype], u.ux, u.uy, MM_EDOG);
 
 	if(!mtmp) return((struct monst *) 0); /* pets were genocided */
@@ -210,6 +217,11 @@ makedog()
 	    update_mon_intrinsics(mtmp, otmp, TRUE, TRUE);
 	}
 #endif
+
+	if (!*petname && pettype == PM_KITTEN && !rn2(100)) {
+		if (mtmp->female) petname = "Shiva"; /* RIP 1 Oct 1998 - 6 Sep 2009 */
+		else petname = "Kali"; /* RIP 1 May 2000 - 22 Oct 2012 */
+	}
 
 	if (!petname_used++ && *petname)
 		mtmp = christen_monst(mtmp, petname);
@@ -820,6 +832,13 @@ register struct obj *obj;
 						&& mtmp->data->mlet == S_DOG)
 		return((struct monst *)0);
 
+#ifdef CONVICT
+	if (Role_if(PM_CONVICT) && (is_domestic(mtmp->data) && obj)) {
+		/* Domestic animals are wary of the Convict */
+		pline("%s still looks wary of you.", Monnam(mtmp));
+		return((struct monst *)0);
+	}
+#endif
 	/* If we cannot tame it, at least it's no longer afraid. */
 	mtmp->mflee = 0;
 	mtmp->mfleetim = 0;

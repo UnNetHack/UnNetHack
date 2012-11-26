@@ -164,13 +164,44 @@ const char *filename, *mode;
 #define fopen vms_fopen
 #endif	/* VMS */
 
-/* open_library(dlb.c) needs this (which normally comes from src/files.c) */
+/*
+ * open_library(dlb.c) needs this (which normally comes from src/files.c,
+ * or sys/unix/unixunix.c if file areas are enabled). As yet only the UNIX
+ * port supports file areas so this works. We might need access to the
+ * actual port functions, rather than duplicating them here, if other ports
+ * follow suit.
+ */
+#ifdef FILE_AREAS
+#ifdef UNIX
+FILE *
+fopen_datafile_area(filearea, filename, mode)
+const char *filearea, *filename, *mode;
+{
+    FILE *fp;
+    char *buf;
+    int lenarea;
+    if (filearea && filename[0]!='/')
+    {
+	lenarea = strlen(filearea);
+	buf = (char *)alloc(lenarea+strlen(filename)+1);
+	strcpy(buf, filearea);
+	strcpy(buf+lenarea, filename);
+	fp = fopen(buf, mode);
+	free(buf);
+    }
+    else
+	fp = fopen(filename, mode);
+    return fp;
+}
+#endif
+#else	/* FILE_AREAS */
 FILE *
 fopen_datafile(filename, mode)
 const char *filename, *mode;
 {
     return fopen(filename, mode);
 }
+#endif	/* FILE_AREAS */
 
 #endif	/* DLBLIB */
 #endif	/* DLB */

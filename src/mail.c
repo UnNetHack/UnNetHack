@@ -47,6 +47,7 @@ extern char *viz_rmin, *viz_rmax;	/* line-of-sight limits (vision.c) */
 # if !defined(UNIX) && !defined(VMS) && !defined(LAN_MAIL)
 int mustgetmail = -1;
 # endif
+static int gethint = -1;
 
 #endif /* OVL0 */
 #ifdef OVLB
@@ -323,7 +324,7 @@ md_rush(md,tx,ty)
 	if (fx == tx && fy == ty) break;
 
 	if ((mon = m_at(fx,fy)) != 0)	/* save monster at this position */
-	    verbalize(md_exclamations());
+	    verbalize("%s", md_exclamations());
 	else if (fx == u.ux && fy == u.uy)
 	    verbalize("Excuse me.");
 
@@ -392,6 +393,7 @@ struct mail_info *info;
 
     if (info->message_typ) {
 	struct obj *obj = mksobj(SCR_MAIL, FALSE, FALSE);
+	if (info->message_typ == MSG_HINT) obj->spe = MAIL_HINT;
 	if (distu(md->mx,md->my) > 2)
 	    verbalize("Catch!");
 	display_nhwindow(WIN_MESSAGE, FALSE);
@@ -691,6 +693,55 @@ struct obj *otmp;
 # endif /* LAN_MAIL */
 
 #endif /* OVL0 */
+
+void
+read_hint(otmp)
+struct obj *otmp;
+{
+	/* TODO: option for beginner, general changes, public server hints? */
+	static char *hint[] = {
+		/* beginner hints */
+		/* none at the moment */
+
+		/* interface changes */
+		"'X' toggles twoweaponing.",
+		"Autopickup never picks up dropped items if pickup_dropped is set to false.",
+		"Ctrl-e automatically writes or engraves \"Elbereth\" for you.",
+		"Ctrl-o (or #overview) lists interesting levels you already visited.",
+		"Press inventory letter for a menu of possible actions.",
+		"Pressing 'v' lets you explore faster.",
+		"Unlocked doors will open when you walk into them.",
+
+#ifdef SIMPLE_MAIL
+		/* public server hints */
+		"If you need advice, #shout, somebody might mail you help.",
+		"Visit IRC channel #unnethack on freenode.",
+		"Visit http://un.nethack.nu/ for dumps of your games.",
+		"To opt out of these hints, put OPTIONS=nohint into your options.",
+#endif
+	};
+
+	pline("\"%s\"", hint[rn2(SIZE(hint))]);
+}
+
+void
+maybe_hint()
+{
+	if (u.uswallow || !flags.biff || !flags.hint) return;
+
+	/* initialize gethint */
+	if (gethint < 0) {
+		gethint = rn2(250)+250;
+		return;
+	}
+	if (--gethint <= 0) {
+		static struct mail_info
+			deliver = {MSG_HINT,"I have a hint for you",0,0};
+		newmail(&deliver);
+		/* only deliver once per game */
+		flags.hint = FALSE;
+	}
+}
 
 #endif /* MAIL */
 

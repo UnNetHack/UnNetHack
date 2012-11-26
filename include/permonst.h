@@ -41,6 +41,7 @@ struct attack {
 struct permonst {
 	const char	*mname;			/* full name */
 	char		mlet;			/* symbol */
+	glyph_t		unicode_codepoint;	/* unicode codepoint for utf8graphics */
 	schar		mlevel,			/* base monster level */
 			mmove,			/* move speed */
 			ac,			/* (base) armor class */

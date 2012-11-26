@@ -567,6 +567,19 @@ touch_artifact(obj,mon)
 	if (yours) pline("%s your grasp!", Tobjnam(obj, "evade"));
 	return 0;
     }
+#ifdef CONVICT
+    /* This is a kludge, but I'm not sure where else to put it */
+    if (oart == &artilist[ART_IRON_BALL_OF_LIBERATION]) {
+	if (Role_if(PM_CONVICT) && (!obj->oerodeproof)) {
+	    obj->oerodeproof = TRUE;
+	    obj->owt = 300; /* Magically lightened, but still heavy */
+	}
+
+	if (Punished && (obj != uball)) {
+	    unpunish(); /* Remove a mundane heavy iron ball */
+	}
+    }
+#endif /* CONVICT */
 
     return 1;
 }
@@ -1238,7 +1251,7 @@ arti_invoke(obj)
 			return invoke_amulet(obj);
 #endif
 	else
-	    pline(nothing_happens);
+	    pline("%s", nothing_happens);
 	return 1;
     }
 
@@ -1337,7 +1350,7 @@ arti_invoke(obj)
 	    for (i = num_ok_dungeons = 0; i < n_dgns; i++) {
 		if (!dungeons[i].dunlev_ureached) continue;
 		any.a_int = i+1;
-		add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
 			 dungeons[i].dname, MENU_UNSELECTED);
 		num_ok_dungeons++;
 		last_ok_dungeon = i;
@@ -1401,6 +1414,35 @@ arti_invoke(obj)
 	    otmp = hold_another_object(otmp, "Suddenly %s out.",
 				       aobjnam(otmp, "fall"), (const char *)0);
 	    break;
+#ifdef CONVICT
+	case PHASING:   /* Walk through walls and stone like a xorn */
+        if (Passes_walls) goto nothing_special;
+	    if (oart == &artilist[ART_IRON_BALL_OF_LIBERATION]) {
+		if (Punished && (obj != uball)) {
+		    unpunish(); /* Remove a mundane heavy iron ball */
+		}
+		
+		if (!Punished) {
+		    setworn(mkobj(CHAIN_CLASS, TRUE), W_CHAIN);
+		    setworn(obj, W_BALL);
+		    uball->spe = 1;
+		    if (!u.uswallow) {
+			placebc();
+			if (Blind) set_bc(1);	/* set up ball and chain variables */
+			newsym(u.ux,u.uy);		/* see ball&chain if can't see self */
+		    }
+		    Your("%s chains itself to you!", xname(obj));
+		}
+	    }
+        if (!Hallucination) {    
+            Your("body begins to feel less solid.");
+        } else {
+            You_feel("one with the spirit world.");
+        }
+        incr_itimeout(&Phasing, (50 + rnd(100)));
+        obj->age += Phasing; /* Time begins after phasing ends */
+        break;
+#endif /* CONVICT */
 	  }
 	}
     } else {

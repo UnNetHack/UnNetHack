@@ -359,7 +359,7 @@ need of your help.  There is a great quest you must undertake.
 %Cc Bar 00018
 "Pah!  You have betrayed the gods, %p.  You will never attain
 the glory which you aspire to.  Your failure to follow the true path has
-closed this future to you.
+closed that future to you.
 
 "I will protect these people as best I can, but soon %n will overcome
 me and destroy all who once called you %s.  Now begone!"
@@ -619,8 +619,7 @@ ask you to undertake."
 "Ah, %p.  Are you finally ready?"
 %E
 %Cc Cav 00018
-"%pC!  You have sealed our fate.  You seem unable to reform yourself,
-so I must select another to take your place.
+"%pC!  You have sealed our fate by being unable to reform yourself.
 
 "Begone from %H!  You have betrayed us by choosing
 the path of the %C over the true path of the %L.
@@ -808,6 +807,302 @@ take you into the Astral Planes, where the Great Temple of %d
 casts its influence throughout our world.
 
 "Sacrifice the Amulet on the altar.  Thus shall %d become supreme!"
+%E
+#
+#	Convict
+#
+%Cc Con 00001
+Somehow, you have been captured and teleported back to
+%H!  But wait, the portal you went through is still
+here.  You had heard your old mentor %l,
+the prison chaplain who taught you the ways of
+%d calling for your help.  Also, %H
+is not as you had left it.  There seems to be damage
+to the walls, and you hear sounds of strife all
+around you.
+%E
+%Cp Con 00002
+You have returned to %H.  Somehow, things are even
+worse now than when you were on your previous visit.  Has
+%l managed to still hold out?
+%E
+%Cp Con 00003
+The situation seems to degrade, and you wonder how long
+your fellow %gp can hold out against the corrupt
+guards and creatures of the Underdark that pervade the
+formerly tranquil %H.
+%E
+%Cp Con 00005
+"How did you manage to escape?"
+%E
+%Cp Con 00006
+"How is life on the outside?"
+%E
+%Cp Con 00007
+"Between the abusive guards, and the nasty vermin, I
+don't know how we will hold out."
+%E
+%Cp Con 00008
+"This place used to be so much nicer before %n
+became corrupt."
+%E
+%Cp Con 00009
+"You are really back?  I thought you were gone for
+good."
+%E
+%Cp Con 00010
+"Thank you for ridding us of %n.  I hope the
+new warden will be better."
+%E
+%Cp Con 00011
+"Take me with you!  I will be glad to be rid of this
+awful place."
+%E
+%Cp Con 00012
+"Don't forget to come back for us once you have
+completed your quest!"
+%E
+%Cp Con 00013
+"Thank you for coming back to help us in our hour
+of need!"
+%E
+%Cp Con 00014
+"Leave while you still can!  If you can escape,
+maybe there is hope for the rest of us."
+%E
+%Cc Con 00015
+"%p, I am very happy to see that you are
+alive and well!  We were all proud of your daring
+escape, and hoped that you were doing well.
+Things have become much worse in your absence,
+however, and we desperately need your help.  Let
+me have a look at you, and see if you are ready."
+%E
+%Cp Con 00016
+"I see that you are back, %p.  I hope that
+you are now ready to help us?  Let me see if you
+are."
+%E
+%Cp Con 00017
+"Once again, you have returned.  Let me see if you
+are finally ready to help us."
+%E
+%Cc Con 00018
+"You have betrayed us all, %p!  Begone from
+here, and don't come back!  You are not even worthy
+to share a cell with the least of us now."
+%E
+%Cc Con 00019
+"%p, I am afraid that a %r will be no
+match for %n.  If I sent you now,
+she would dispatch you all too easily.
+
+"Continue your other quest, and practice your
+skills.  Return to us once you have achieved the rank
+of %R."
+%E
+%Cc Con 00020
+"%p, I see that you are not yet a loyal servant of
+%d.  Leave this place for now, and only
+return when you have cleansed your spirit.  Only then
+will you be ready to stand up to %n and
+recover %o."
+%E
+%Cc Con 00021
+"Yes, %p, it looks like you are now ready to
+help us.  Things have become much worse since you
+left.  The dungeons are overrun by vermin, guards
+have become brutal and corrupt, and I believe that
+%n has had dealings with dark powers.
+
+"I had spent many years enchanting my iron ball
+with powers to help lead an escape from this place,
+turning it into %o.
+Unfortunately, %n stole it from me,
+likely using it for dark, twisted purposes.
+
+"We need your help to go down to the warden's level
+to defeat the corrupt %n and recover
+%o for us so that
+%H will be safe again."
+%E
+%Cp Con 00025
+"The sooner you are able to recover %o,
+the better off we will be."
+%E
+%Cp Con 00026
+"I am not sure what has happened, but even without
+%o, %n will make a formidable opponent."
+%E
+%Cp Con 00027
+"Stay true to the teachings of %d, and good
+fortune will be with you."
+%E
+%Cp Con 00028
+"I am afraid without the power of %o
+to protect us, we will soon be overwhelmed."
+%E
+%Cp Con 00029
+"%n used to be a woman of honor before turning
+to dark ways.  It is much too late for
+redemption, however."
+%E
+%Cp Con 00030
+"%n is arrogant, and will try to diminish
+your confidence.  Do not let yourself be
+discouraged!"
+%E
+%Cp Con 00031
+"You will have to be very alert, and will need
+to use all of your cunning if you hope to
+defeat %n."
+%E
+%Cp Con 00032
+"Call upon the power of %d to protect you
+when you encounter %n."
+%E
+%Cp Con 00033
+"If you remain true to your faith, you should
+be able to sense the power of %o when
+you are near."
+%E
+%Cp Con 00034
+"You should be able to defeat %n easily
+enough in a fair fight.  Unfortunately, she doesn't
+fight fair."
+%E
+%Cc Con 00035
+This must be the level that leads to the warden's
+area.  You must be getting closer to
+%o now!
+%E
+%Cp Con 00036
+Once again, you find yourself near the entrance to
+the warden's area.  Hopefully, you can acquire
+%o before it's too late!
+%E
+%Cc Con 00040
+You sense the presence of %o as soon as you
+enter this level.  If %o is here, then
+%n must not be far away.
+%E
+%Cp Con 00041
+Once again, you find yourself in the abode of
+%n, and feel the presence of
+%o.
+%E
+%Cc Con 00050
+"So, %p.  You have returned, and are here to get
+%o for %l?
+What makes you think you can get it if
+%l couldn't?  I have many
+allies that have made me even stronger."
+%E
+%Cp Con 00051
+"I see that you have returned, %p.  I
+suggest you leave and save yourself while you still
+have a chance."
+%E
+%Cp Con 00052
+"Back again, %p?  You will certainly die in
+your attempt to defeat me."
+%E
+%Cp Con 00053
+"I will get %o from you, just as I did
+%l!  You can not defeat me."
+%E
+%Cp Con 00060
+"You should never come back.  You will not escape
+here alive again!"
+%E
+%Cp Con 00061
+"Even all of your pathetic lot put together would
+not be enough to defeat me."
+%E
+%Cp Con 00062
+"You are no more than lowly prison scum.  You are
+unworthy to even challenge me."
+%E
+%Cp Con 00063
+"Even %l could not stand up to me, so
+you have no chance at all."
+%E
+%Cp Con 00064
+"Even %o would not be enough to
+make you my equal."
+%E
+%Cp Con 00065
+"Your pathetic devotion to %d will not
+save you, either."
+%E
+%Cp Con 00066
+"After I kill you, I will go after %l next,
+and any that dare to defy me again!"
+%E
+%Cp Con 00067
+"Die with dishonor, lowly %c!"
+%E
+%Cp Con 00068
+"Once a %c, always a %c."
+%E
+%Cp Con 00069
+"How about you find yourself a cosy little cell,
+and hope that I forgive your insolence?"
+%E
+%Cc Con 00070
+As you pick up %o, you feel its power
+flow through you, protecting you, and making you
+more aware of your surroundings.  You know that
+you need to get it back to %l as soon
+as possible now.
+%E
+%Cc Con 00080
+As %n approaches death, you see sudden
+clarity in her eyes.
+
+"What have I done?  Those demons have been clouding my mind.
+Please forgive me, %p, although I know that I
+probably do not deserve it.  Take 
+%o back to %l
+with my blessing."
+
+With a final coughing fit, %n spasms, and her
+eyes see no more.
+%E
+%Cc Con 00081
+"Congratulations, %p!  You have returned with
+your life, and with %o!  I had
+planned to use %o to lead an
+escape from here, but with %n defeated,
+life should go back to normal before long.
+
+"Whether I like it or not, I know my place is here.  I
+see that %o has already attuned
+itself to you.  I offer it to you in hopes that
+it will aid in your quest to recover the Amulet
+of Yendor." 
+%E
+%Cc Con 00082
+%l looks upon %o
+with fondness.
+"You are its keeper now.  Take it with you back to
+%Z, through the magic portal
+that brought you here."
+%E
+%Cc Con 00090
+"Welcome back, %p.  We have done well in your
+absence.  How far have you come with your quest to
+regain the Amulet of Yendor for %d?"
+%E
+%Cc Con 00091
+"Congratulations, %p!  You have redeemed yourself
+and proven yourself a worthy servant of %d,
+and in doing so have made all of us proud.
+
+"One final task remains for you now.  You must take
+the Amulet up to the Great Temple of %d, on
+the Astral plane.  There you must offer the Amulet
+to %d."
 %E
 #
 #	Healer
@@ -2138,7 +2433,7 @@ think me as stupid as your behavior.  I warn you not to try my patience."
 %Cc Rog 00018
 "Well %gp, it looks like our friend has forgotten who is the boss
 around here.  Our friend seems to think that %rp have been put in
-charge.  Wrong.  DEAD WRONG!"
+charge.  Wrong.  DEAD wrong, in fact..."
 
 Your sudden shift in surroundings prevents you from hearing the end
 of %ls curse.
@@ -2884,8 +3179,8 @@ made changes to become ready for this task..."
 %E
 %Cc Val 00018
 "No, %p.  Your fate is sealed.  I must cast about for another
-champion.  Begone from my presence, and never return.  Know this, that
-you shall never succeed in this life, and Valhalla is denied to you."
+champion.  Begone from my presence, and never return.  Know that
+Valhalla shall be denied to you."
 %E
 %Cc Val 00019
 "I see you and %n fighting, %p.  But you are not prepared and
@@ -3462,10 +3757,9 @@ essential in locating the Amulet of Yendor."
 My allegiance to %d holds fast and I cannot condone or accept what you 
 have done.
 
-Leave this place.  You shall never set foot at %H again.
-That which you seek is now lost forever, for without the Bell of Opening, 
-you will never be able to enter the place where he who has the Amulet 
-resides.
+Leave this place. You shall never set foot beyond %H again as long as I
+draw breath... and without the Bell of Opening, you will never be able to 
+enter the place where he who has the Amulet resides.
 
 Go now!  You are banished from this place.
 %E
@@ -5478,4 +5772,26 @@ you can gain a lot of information that way.
 
 There are more 'special levels' deeper in the dungeon; but you'll have
 to figure out how those ones work for yourself.
+%E
+#
+# Alternate legacy text for Convict role
+#
+%Cc - 00199
+It is written in the Book of %d:
+
+    After the Creation, the cruel god Moloch rebelled
+    against the authority of Marduk the Creator.
+    Moloch stole from Marduk the most powerful of all
+    the artifacts of the gods, the Amulet of Yendor,
+    and he hid it in the dark cavities of Gehennom, the
+    Under World, where he now lurks, and bides his time.
+
+Your %G %d seeks to possess the Amulet, and with it
+to gain deserved ascendance over the other gods.
+
+You, a newly escaped %r, have chosen to redeem
+yourself by recovering the Amulet for %d.  You are
+determined to recover the Amulet for your deity, or die
+in the attempt.  Your hour of destiny has come.  For
+the sake of us all:  Go bravely with %d!
 %E

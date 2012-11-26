@@ -8,9 +8,6 @@
 #include "lev.h"
 
 #ifdef SINKS
-# ifdef OVLB
-STATIC_DCL void FDECL(trycall, (struct obj *));
-# endif /* OVLB */
 STATIC_DCL void FDECL(dosinkring, (struct obj *));
 #endif /* SINKS */
 
@@ -64,12 +61,14 @@ boolean pushing;
 {
 	if (!otmp || otmp->otyp != BOULDER)
 	    warning("Not a boulder?");
-	else if (!Is_waterlevel(&u.uz) && (is_pool(rx,ry) || is_lava(rx,ry))) {
+	else if (!Is_waterlevel(&u.uz) &&
+		 (is_pool(rx,ry) || is_lava(rx,ry) || is_swamp(rx,ry))) {
 	    boolean lava = is_lava(rx,ry), fills_up;
+	    boolean swamp = is_swamp(rx,ry);
 	    const char *what = waterbody_name(rx,ry);
 	    schar ltyp = levl[rx][ry].typ;
 	    int chance = rn2(10);		/* water: 90%; lava: 10% */
-	    fills_up = lava ? chance == 0 : chance != 0;
+	    fills_up = swamp ? 1 : lava ? chance == 0 : chance != 0;
 
 	    if (fills_up) {
 		struct trap *ttmp = t_at(rx, ry);
@@ -140,7 +139,7 @@ const char *verb;
 	struct monst *mtmp;
 
 	if (obj->where != OBJ_FREE)
-	    panic("flooreffects: obj not free (%d)", obj->where);
+	    panic("flooreffects: obj not free (%d,%d,%d)", obj->where, obj->otyp, obj->invlet);
 
 	/* make sure things like water_damage() have no pointers to follow */
 	obj->nobj = obj->nexthere = (struct obj *)0;
@@ -214,7 +213,7 @@ const char *verb;
 		}
 	} else if (is_lava(x, y)) {
 		return fire_damage(obj, FALSE, FALSE, x, y);
-	} else if (is_pool(x, y)) {
+	} else if (is_pool(x, y) || is_swamp(x, y)) {
 		/* Reasonably bulky objects (arbitrary) splash when dropped.
 		 * If you're floating above the water even small things make noise.
 		 * Stuff dropped near fountains always misses */
@@ -270,19 +269,26 @@ doaltarobj(obj)  /* obj is an object dropped on an altar */
 			otense(obj, "land"));
 		obj->bknown = 1;
 	}
+	/* Also BUC one level deep inside containers */
+	if (Has_contents(obj)) {
+		int bcucount = 0;
+		struct obj *otmp;
+		for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
+			if (otmp->blessed || otmp->cursed)
+				bcucount++;
+			if (!Hallucination) otmp->bknown = 1;
+		}
+		if (bcucount == 1) {
+			pline("Looking inside %s, you see a colored flash.",
+					the(xname(obj)));
+		} else if (bcucount > 1) {
+			pline("Looking inside %s, you see colored flashes.",
+					the(xname(obj)));
+		}
+	}
 }
 
 #ifdef SINKS
-STATIC_OVL
-void
-trycall(obj)
-register struct obj *obj;
-{
-	if(!objects[obj->otyp].oc_name_known &&
-	   !objects[obj->otyp].oc_uname)
-	   docall(obj);
-}
-
 /** Transforms the sink at the player's position into
  * a fountain, throne, altar or grave. */
 STATIC_OVL
@@ -367,7 +373,7 @@ register struct obj *obj;
 giveback:
 		obj->in_use = FALSE;
 		dropx(obj);
-		trycall(obj);
+		makeknown(obj->otyp);
 		return;
 	    case RIN_LEVITATION:
 		pline_The("sink quivers upward for a moment.");
@@ -497,7 +503,7 @@ giveback:
 	    }
 	}
 	if(ideed)
-	    trycall(obj);
+		makeknown(obj->otyp);
 	else
 	    You_hear("the ring bouncing down the drainpipe.");
 	if (!rn2(20)) {
@@ -774,7 +780,7 @@ int retry;
 	all_categories = FALSE;
 	n = query_category("Drop what type of items?",
 			invent,
-			UNPAID_TYPES | ALL_TYPES | CHOOSE_ALL |
+			UNIDENTIFIED_TYPES | UNPAID_TYPES | ALL_TYPES | CHOOSE_ALL |
 			BUC_BLESSED | BUC_CURSED | BUC_UNCURSED | BUC_UNKNOWN,
 			&pick_list, PICK_ANY);
 	if (!n) goto drop_done;
@@ -895,10 +901,12 @@ dodown()
 	    return (0);   /* didn't move */
 	}
 	if (!stairs_down && !ladder_down) {
-		if (!(trap = t_at(u.ux,u.uy)) ||
+		trap = t_at(u.ux,u.uy);
+		boolean can_fall_thru_trap = trap && (trap->ttyp == TRAPDOOR || trap->ttyp == HOLE);
+		if (!trap ||
 			(trap->ttyp != TRAPDOOR && trap->ttyp != HOLE &&
 			 trap->ttyp != PIT && trap->ttyp != SPIKED_PIT)
-			|| !Can_fall_thru(&u.uz) || !trap->tseen) {
+			|| ((!Can_fall_thru(&u.uz)) && can_fall_thru_trap) || !trap->tseen) {
 
 			if (flags.autodig && !flags.nopick &&
 				uwep && is_pick(uwep)) {
@@ -1093,6 +1101,7 @@ boolean at_stairs, falling, portal;
 	boolean new = FALSE;	/* made a new level? */
 	struct monst *mtmp;
 	char whynot[BUFSZ];
+	char *annotation;
 
 	if (dunlev(newlevel) > dunlevs_in_dungeon(newlevel))
 		newlevel->dlevel = dunlevs_in_dungeon(newlevel);
@@ -1277,7 +1286,14 @@ boolean at_stairs, falling, portal;
 		    You("fly down along the %s.",
 			at_ladder ? "ladder" : "stairs");
 		else if (u.dz &&
+#ifdef CONVICT
+		    (near_capacity() > UNENCUMBERED || (Punished &&
+		    ((uwep != uball) || ((P_SKILL(P_FLAIL) < P_BASIC))
+            || !Role_if(PM_CONVICT)))
+		     || Fumbling)) {
+#else
 		    (near_capacity() > UNENCUMBERED || Punished || Fumbling)) {
+#endif /* CONVICT */
 		    You("fall down the %s.", at_ladder ? "ladder" : "stairs");
 		    if (Punished) {
 			drag_down();
@@ -1339,6 +1355,12 @@ boolean at_stairs, falling, portal;
 	run_timers();
 
 	initrack();
+
+#ifdef RECORD_ACHIEVE
+#ifdef LIVELOGFILE
+	livelog_achieve_update();
+#endif
+#endif
 
 	if ((mtmp = m_at(u.ux, u.uy)) != 0
 #ifdef STEED
@@ -1432,7 +1454,7 @@ boolean at_stairs, falling, portal;
 		Sprintf(buf, mesg, !Blind ? "looks" : "seems");
 		mesg = buf;
 	    }
-	    if (mesg) pline(mesg);
+	    if (mesg) pline("%s", mesg);
 	}
 
 #ifdef REINCARNATION
@@ -1493,6 +1515,12 @@ boolean at_stairs, falling, portal;
 	else
 	    onquest();
 	assign_level(&u.uz0, &u.uz); /* reset u.uz0 */
+
+	/* show level annotation when entering the level */
+	if (iflags.show_annotation &&
+	    (annotation = get_annotation(&u.uz))) {
+		You("annotated this level: %s", annotation);
+	}
 
 #ifdef INSURANCE
 	save_currentstate();
@@ -1607,7 +1635,7 @@ deferred_goto()
 	    int typmask = u.utotype; /* save it; goto_level zeroes u.utotype */
 
 	    assign_level(&dest, &u.utolev);
-	    if (dfr_pre_msg) pline(dfr_pre_msg);
+	    if (dfr_pre_msg) pline("%s", dfr_pre_msg);
 	    goto_level(&dest, !!(typmask&1), !!(typmask&2), !!(typmask&4));
 	    if (typmask & 0200) {	/* remove portal */
 		struct trap *t = t_at(u.ux, u.uy);
@@ -1617,7 +1645,7 @@ deferred_goto()
 		    newsym(u.ux, u.uy);
 		}
 	    }
-	    if (dfr_post_msg) pline(dfr_post_msg);
+	    if (dfr_post_msg) pline("%s", dfr_post_msg);
 	}
 	u.utotype = 0;		/* our caller keys off of this */
 	if (dfr_pre_msg)

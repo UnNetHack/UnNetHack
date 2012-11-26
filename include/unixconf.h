@@ -96,7 +96,13 @@
  */
 
 /* #define NO_FILE_LINKS */	/* if no hard links */
-/* #define LOCKDIR "/usr/games/lib/nethackdir" */	/* where to put locks */
+#ifdef NO_FILE_LINKS
+# ifdef FILE_AREAS
+# define LOCKDIR FILE_AREA_VAR			/* where to put locks */
+# else
+# define LOCKDIR "/usr/games/lib/nethackdir"	/* where to put locks */
+# endif
+#endif
 
 /*
  * If you want the static parts of your playground on a read-only file
@@ -271,6 +277,7 @@
 #endif
 
 #define HLOCK	"perm"	/* an empty file used for locking purposes */
+#define HLOCK_AREA	FILE_AREA_VAR
 
 #include "system.h"
 
@@ -279,7 +286,9 @@
 #endif
 #define tgetch getchar
 
+#ifndef AUTOCONF
 #define SHELL		/* do not delete the '!' command */
+#endif
 
 #if defined(POSIX_TYPES) || defined(__GNUC__)
 #include <stdlib.h>

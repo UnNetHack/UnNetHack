@@ -104,7 +104,7 @@ FILE *orig_yyin = NULL;
 		  map_cnt = 0;
 		  return MAP_ID;
 		}
-<MAPC>[-|}{+xABCISHKPLWTF\\#. 0123456789]*\r?\n	{
+<MAPC>[-|}{+xABCISHKMPLWTtF\\#. 0123456789]*\r?\n	{
 		  int len = yyleng;
 		  /* convert \r\n to \n */
 		  if (len >= 2 && yytext[len - 2] == '\r') len -= 1;
@@ -276,6 +276,7 @@ premapped	{ yylval.i=PREMAPPED; return FLAG_TYPE; }
 shroud		{ yylval.i=SHROUD; return FLAG_TYPE; }
 stormy		{ yylval.i=STORMY; return FLAG_TYPE; }
 graveyard	{ yylval.i=GRAVEYARD; return FLAG_TYPE; }
+sky		{ yylval.i=SKYMAP; return FLAG_TYPE; }
 [0-9]+d[0-9]+	{ char *p = strchr(yytext, 'd');
 		  if (p) {
 			*p = '\0';

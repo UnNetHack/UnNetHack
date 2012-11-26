@@ -214,6 +214,9 @@ E const char *delayed_killer;
 E long done_money;
 #endif
 E char killer_buf[BUFSZ];
+
+E long killer_flags;
+
 #ifdef DUMP_LOG
 E char dump_fn[];		/* dumpfile name (dump patch) */
 #endif
@@ -230,6 +233,9 @@ E NEARDATA char monkeyname[];
 E NEARDATA char wolfname[];
 E NEARDATA char crocodilename[];
 #endif
+#ifdef CONVICT
+E NEARDATA char ratname[];
+#endif /* CONVICT */
 E char preferred_pet;
 E const char *occtxt;			/* defined when occupation != NULL */
 E const char *nomovemsg;
@@ -483,6 +489,19 @@ struct autopickup_exception {
 	struct autopickup_exception *next;
 };
 #endif /* AUTOPICKUP_EXCEPTIONS */
+
+struct _plinemsg {
+	xchar msgtype;
+	char *pattern;
+	struct _plinemsg *next;
+};
+
+E struct _plinemsg *pline_msg;
+
+#define MSGTYP_NORMAL	0
+#define MSGTYP_NOREP	1
+#define MSGTYP_NOSHOW	2
+#define MSGTYP_STOP	3
 
 #ifdef RECORD_ACHIEVE
 struct u_achieve {

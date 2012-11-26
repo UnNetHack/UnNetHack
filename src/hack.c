@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#include <limits.h>
+
 #include "hack.h"
 
 #ifdef OVL1
@@ -12,10 +14,10 @@ STATIC_DCL int FDECL(still_chewing,(XCHAR_P,XCHAR_P));
 #ifdef SINKS
 STATIC_DCL void NDECL(dosinkfall);
 #endif
-STATIC_DCL boolean FDECL(findtravelpath, (BOOLEAN_P));
+STATIC_DCL boolean FDECL(findtravelpath, (boolean(*)(int, int)));
 STATIC_DCL boolean FDECL(monstinroom, (struct permonst *,int));
-
 STATIC_DCL void FDECL(move_update, (BOOLEAN_P));
+STATIC_DCL void FDECL(struggle_sub, (const char *));
 
 static boolean door_opened;	/* set to true if door was opened during test_move */
 
@@ -120,10 +122,8 @@ xchar x,y;
 boolean showmsg, update;
 {
    struct obj *otmp;
-   struct rm *lev;
 
    rndmappos(&x, &y);
-   lev = &levl[x][y];
    otmp = sobj_at(herb, x, y);
    if (otmp && herb_can_grow_at(x,y, FALSE)) {
       if (otmp->quan <= rn2(HERB_GROWTH_LIMIT)) {
@@ -140,7 +140,6 @@ boolean showmsg, update;
 	    pos.x += x;
 	    pos.y += y;
 	    if (isok(pos.x,pos.y) && herb_can_grow_at(pos.x,pos.y, FALSE)) {
-	       lev = &levl[pos.x][pos.y];
 	       otmp = sobj_at(herb, pos.x, pos.y);
 	       if (otmp) {
 		  if (otmp->quan <= rn2(HERB_GROWTH_LIMIT)) {
@@ -606,7 +605,7 @@ moverock()
 			(flags.pickup && !In_sokoban(&u.uz))
 			    ? "pick it up" : "push it aside");
 		    if (In_sokoban(&u.uz))
-			change_luck(-1);	/* Sokoban guilt */
+			sokoban_trickster();	/* Sokoban guilt */
 		    break;
 		}
 		break;
@@ -622,7 +621,7 @@ moverock()
 		|| verysmall(youmonst.data))) {
 		pline("However, you can squeeze yourself into a small opening.");
 		if (In_sokoban(&u.uz))
-		    change_luck(-1);	/* Sokoban guilt */
+		    sokoban_trickster();	/* Sokoban guilt */
 		break;
 	    } else
 		return (-1);
@@ -650,7 +649,7 @@ still_chewing(x,y)
 
     if (!boulder && IS_ROCK(lev->typ) && !may_dig(x,y)) {
 	You("hurt your teeth on the %s.",
-	    IS_TREE(lev->typ) ? "tree" : "hard stone");
+	    IS_TREES(lev->typ) ? "tree" : "hard stone");
 	nomul(0, 0);
 	return 1;
     } else if (digging.pos.x != x || digging.pos.y != y ||
@@ -663,11 +662,11 @@ still_chewing(x,y)
 	assign_level(&digging.level, &u.uz);
 	/* solid rock takes more work & time to dig through */
 	digging.effort =
-	    (IS_ROCK(lev->typ) && !IS_TREE(lev->typ) ? 30 : 60) + u.udaminc;
+	    (IS_ROCK(lev->typ) && !IS_TREES(lev->typ) ? 30 : 60) + u.udaminc;
 	You("start chewing %s %s.",
-	    (boulder || IS_TREE(lev->typ)) ? "on a" : "a hole in the",
+	    (boulder || IS_TREES(lev->typ)) ? "on a" : "a hole in the",
 	    boulder ? "boulder" :
-	    IS_TREE(lev->typ) ? "tree" : IS_ROCK(lev->typ) ? "rock" : "door");
+	    IS_TREES(lev->typ) ? "tree" : IS_ROCK(lev->typ) ? "rock" : "door");
 	watch_dig((struct monst *)0, x, y, FALSE);
 	return 1;
     } else if ((digging.effort += (30 + u.udaminc)) <= 100)  {
@@ -675,7 +674,7 @@ still_chewing(x,y)
 	    You("%s chewing on the %s.",
 		digging.chew ? "continue" : "begin",
 		boulder ? "boulder" :
-		IS_TREE(lev->typ) ? "tree" :
+		IS_TREES(lev->typ) ? "tree" :
 		IS_ROCK(lev->typ) ? "rock" : "door");
 	digging.chew = TRUE;
 	watch_dig((struct monst *)0, x, y, FALSE);
@@ -751,7 +750,7 @@ still_chewing(x,y)
 
     unblock_point(x, y);	/* vision */
     newsym(x, y);
-    if (digtxt) You(digtxt);	/* after newsym */
+    if (digtxt) You("%s",digtxt);	/* after newsym */
     if (dmgtxt) pay_for_damage(dmgtxt, FALSE);
     (void) memset((genericptr_t)&digging, 0, sizeof digging);
     return 0;
@@ -832,7 +831,7 @@ may_dig(x,y)
 register xchar x,y;
 /* intended to be called only on ROCKs */
 {
-    return (boolean)(!(IS_STWALL(levl[x][y].typ) &&
+    return (boolean)(!((IS_STWALL(levl[x][y].typ) || IS_TREES(levl[x][y].typ)) &&
 			(levl[x][y].wall_info & W_NONDIGGABLE)));
 }
 
@@ -840,7 +839,7 @@ boolean
 may_passwall(x,y)
 register xchar x,y;
 {
-   return (boolean)(!(IS_STWALL(levl[x][y].typ) &&
+   return (boolean)(!((IS_STWALL(levl[x][y].typ) || IS_TREES(levl[x][y].typ)) &&
 			(levl[x][y].wall_info & W_NONPASSWALL)));
 }
 
@@ -865,11 +864,23 @@ xchar x, y;
 	return((boolean)(Invocation_lev(&u.uz) && x == inv_pos.x && y == inv_pos.y));
 }
 
+static void
+autoexplore_msg(text, mode)
+const char *text;
+int mode;
+{
+	if (iflags.autoexplore) {
+		char tmp[BUFSZ];
+		Strcpy(tmp, text);
+		pline("%s blocks your way.", upstart(tmp));
+	}
+}
+
 #endif /* OVL1 */
 #ifdef OVL3
 
-/* return TRUE if (dx,dy) is an OK place to move
- * mode is one of DO_MOVE, TEST_MOVE or TEST_TRAV
+/** Return TRUE if (dx,dy) is an OK place to move
+ *  mode is one of DO_MOVE, TEST_MOVE, TEST_TRAV or TEST_TRAP
  */
 boolean 
 test_move(ux, uy, dx, dy, mode)
@@ -958,7 +969,7 @@ int mode;
 			    }
 			} else pline("That door is closed.");
 		    }
-		} else if (mode == TEST_TRAV) goto testdiag;
+		} else if (mode == TEST_TRAV || mode == TEST_TRAP) goto testdiag;
 		return FALSE;
 	    }
 	} else {
@@ -991,6 +1002,9 @@ int mode;
 	}
 	if (invent && (inv_weight() + weight_cap() > 600)) {
 	    if (mode == DO_MOVE)
+#ifdef CONVICT
+        if (!Passes_walls)
+#endif /* CONVICT */
 		You("are carrying too much to get through.");
 	    return FALSE;
 	}
@@ -998,15 +1012,24 @@ int mode;
     /* Pick travel path that does not require crossing a trap.
      * Avoid water and lava using the usual running rules.
      * (but not u.ux/u.uy because findtravelpath walks toward u.ux/u.uy) */
-    if (flags.run == 8 && mode != DO_MOVE && (x != u.ux || y != u.uy)) {
+    if (flags.run == 8 && (mode != DO_MOVE) &&
+        (x != u.ux || y != u.uy)) {
 	struct trap* t = t_at(x, y);
 
 	if ((t && t->tseen) ||
 	    (!Levitation && !Flying &&
 	     !is_clinger(youmonst.data) &&
-	     (is_pool(x, y) || is_lava(x, y)) && levl[x][y].seenv))
-	    return FALSE;
+	     (is_pool(x, y) || is_lava(x, y) || is_swamp(x, y)) && levl[x][y].seenv)) {
+	    if (mode == DO_MOVE) {
+	        if (t && t->tseen) autoexplore_msg("a trap", mode);
+	        else if (is_pool(x, y)) autoexplore_msg("a body of water", mode);
+	        else if (is_lava(x, y)) autoexplore_msg("a pool of lava", mode);
+	    }
+	    return mode == TEST_TRAP;
+	}
     }
+
+    if (mode == TEST_TRAP) return FALSE; /* not a move through a trap */
 
     ust = &levl[ux][uy];
 
@@ -1019,19 +1042,23 @@ int mode;
 			     || block_entry(x, y))
 			 )) {
 	/* Can't move at a diagonal out of a doorway with door. */
-	return FALSE;
+	 if (mode == DO_MOVE) autoexplore_msg("something", mode);
+	 return FALSE;
     }
 
     if (sobj_at(BOULDER,x,y) && (In_sokoban(&u.uz) || !Passes_walls)) {
-	if (!(Blind || Hallucination) && (flags.run >= 2) && mode != TEST_TRAV)
+	if (!(Blind || Hallucination) && (flags.run >= 2) && mode != TEST_TRAV) {
+	    if (sobj_at(BOULDER,x,y) && mode == DO_MOVE) autoexplore_msg("a boulder", mode);
 	    return FALSE;
+	}
 	if (mode == DO_MOVE) {
 	    /* tunneling monsters will chew before pushing */
 	    if (tunnels(youmonst.data) && !needspick(youmonst.data) &&
 		!In_sokoban(&u.uz)) {
 		if (still_chewing(x,y)) return FALSE;
-	    } else
+	    } else {
 		if (moverock() < 0) return FALSE;
+	    }
 	} else if (mode == TEST_TRAV) {
 	    struct obj* obj;
 
@@ -1052,15 +1079,87 @@ int mode;
     return TRUE;
 }
 
+/* Returns whether a square might be interesting to autoexplore onto.
+   This is done purely in terms of the glyph on the square, and the
+   stepped-on memory, i.e. information the player knows already, to
+   avoid leaking information. The algorithm is taken from TAEB: "step
+   on any item we haven't stepped on, or any square we haven't stepped
+   on adjacent to stone that isn't adjacent to a square that has been
+   stepped on; however, never step on a boulder this way". We also
+   avoid treating traps and doors known to be locked as valid explore
+   targets (although they are still valid travel intermediates). */
+static boolean
+unexplored(x, y)
+int x, y;
+{
+	int i, j, k, l;
+	struct trap *ttmp = t_at(x, y);
+	if (!isok(x, y)) return FALSE;
+	if (levl[x][y].stepped_on) return FALSE;
+#if 0
+	if (glyph_to_cmap(levl[x][y].glyph) == S_vcdoor ||
+			glyph_to_cmap(levl[x][y].glyph) == S_hcdoor)
+		if (levl[x][y].fknown & FKNOWN_LOCKED &&
+				levl[x][y].flags & D_LOCKED) return FALSE;
+#endif
+	if (ttmp && ttmp->tseen) return FALSE;
+	if (glyph_is_object(levl[x][y].glyph) &&
+			glyph_to_obj(levl[x][y].glyph) == BOULDER) return FALSE;
+	if (glyph_is_object(levl[x][y].glyph) &&
+			inside_shop(x, y)) {
+		/* Black Market items are interesting */
+		return (Is_blackmarket(&u.uz));
+	}
+	if (glyph_is_object(levl[x][y].glyph)) return TRUE;
+
+	/* step into shop doorways so autoexplore can be interrupted */
+	if (IS_DOOR(levl[x][y].typ) && *in_rooms(x, y, SHOPBASE)) {
+		return TRUE;
+	}
+
+	for (i = -1; i <= 1; i++) {
+		for (j = -1; j <= 1; j++) {
+			if (isok(x+i, y+j) &&
+					glyph_is_cmap(levl[x+i][y+j].glyph) &&
+					glyph_to_cmap(levl[x+i][y+j].glyph) == S_stone) {
+				int flag = TRUE;
+				for (k = -1; k <= 1; k++)
+					for (l = -1; l <= 1; l++)
+						if (isok(x+i+k, y+j+l) && levl[x+i+k][y+j+l].stepped_on)
+							flag = FALSE;
+				if (flag) return TRUE;
+			}
+		}
+	}
+	return FALSE;
+}
+
+/** Returns a distance modified by a constant factor.
+ * The lower the value the better.*/
+int
+autotravel_weighting(x, y, distance)
+int x, y;
+unsigned distance;
+{
+	if (glyph_is_object(levl[x][y].glyph)) {
+		/* greedy for items */
+		return distance;
+	}
+	/* by default return distance multiplied by a large constant factor */
+	return distance*10;
+}
+
+
 /*
  * Find a path from the destination (u.tx,u.ty) back to (u.ux,u.uy).
- * A shortest path is returned.  If guess is TRUE, consider various
- * inaccessible locations as valid intermediate path points.
+ * A shortest path is returned.  If guess is non-NULL, instead travel
+ * as near to the target as you can, using guess as a function that
+ * specifies what is considered to be a valid target.
  * Returns TRUE if a path was found.
  */
 static boolean
 findtravelpath(guess)
-boolean guess;
+boolean (*guess)(int, int);
 {
     /* if travel to adjacent, reachable location, use normal movement rules */
     if (!guess && iflags.travel1 && distmin(u.ux, u.uy, u.tx, u.ty) == 1) {
@@ -1074,8 +1173,8 @@ boolean guess;
 	}
 	flags.run = 8;
     }
-    if (u.tx != u.ux || u.ty != u.uy) {
-	xchar travel[COLNO][ROWNO];
+    if (u.tx != u.ux || u.ty != u.uy || guess == unexplored) {
+	unsigned travel[COLNO][ROWNO];
 	xchar travelstepx[2][COLNO*ROWNO];
 	xchar travelstepy[2][COLNO*ROWNO];
 	xchar tx, ty, ux, uy;
@@ -1109,6 +1208,7 @@ boolean guess;
 		static int ordered[] = { 0, 2, 4, 6, 1, 3, 5, 7 };
 		/* no diagonal movement for grid bugs */
 		int dirmax = u.umonnum == PM_GRID_BUG ? 4 : 8;
+		boolean alreadyrepeated = FALSE;
 
 		for (dir = 0; dir < dirmax; ++dir) {
 		    int nx = x+xdir[ordered[dir]];
@@ -1116,41 +1216,46 @@ boolean guess;
 
 		    if (!isok(nx, ny)) continue;
 		    if ((!Passes_walls && !can_ooze(&youmonst) &&
-			closed_door(x, y)) || sobj_at(BOULDER, x, y)) {
+			closed_door(x, y)) || sobj_at(BOULDER, x, y) ||
+                        test_move(x, y, nx-x, ny-y, TEST_TRAP)) {
 			/* closed doors and boulders usually
 			 * cause a delay, so prefer another path */
 			if (travel[x][y] > radius-3) {
+                            if (!alreadyrepeated) {
 			    travelstepx[1-set][nn] = x;
 			    travelstepy[1-set][nn] = y;
 			    /* don't change travel matrix! */
 			    nn++;
+                                alreadyrepeated = TRUE;
+                            }
 			    continue;
 			}
 		    }
-		    if (test_move(x, y, nx-x, ny-y, TEST_TRAV) &&
-			(levl[nx][ny].seenv || (!Blind && couldsee(nx, ny)))) {
-			if (nx == ux && ny == uy) {
-			    if (!guess) {
-				u.dx = x-ux;
-				u.dy = y-uy;
-				if (x == u.tx && y == u.ty) {
-				    nomul(0, 0);
-				    /* reset run so domove run checks work */
-				    flags.run = 8;
-				    iflags.travelcc.x = iflags.travelcc.y = -1;
-				}
-				return TRUE;
+		    if (test_move(x, y, nx-x, ny-y, TEST_TRAV)) {
+			    if (levl[nx][ny].seenv || (!Blind && couldsee(nx, ny))) {
+				    if (nx == ux && ny == uy) {
+					    if (!guess) {
+						    u.dx = x-ux;
+						    u.dy = y-uy;
+						    if (x == u.tx && y == u.ty) {
+							    nomul(0, 0);
+							    /* reset run so domove run checks work */
+							    flags.run = 8;
+							    iflags.travelcc.x = iflags.travelcc.y = -1;
+						    }
+						    return TRUE;
+					    }
+				    } else if (!travel[nx][ny]) {
+					    travelstepx[1-set][nn] = nx;
+					    travelstepy[1-set][nn] = ny;
+					    travel[nx][ny] = radius;
+					    nn++;
+				    }
 			    }
-			} else if (!travel[nx][ny]) {
-			    travelstepx[1-set][nn] = nx;
-			    travelstepy[1-set][nn] = ny;
-			    travel[nx][ny] = radius;
-			    nn++;
-			}
 		    }
 		}
 	    }
-	    
+
 	    n = nn;
 	    set = 1-set;
 	    radius++;
@@ -1160,31 +1265,46 @@ boolean guess;
 	if (guess) {
 	    int px = tx, py = ty;	/* pick location */
 	    int dist, nxtdist, d2, nd2;
+	    int autoexploring = (guess == unexplored);
 
 	    dist = distmin(ux, uy, tx, ty);
 	    d2 = dist2(ux, uy, tx, ty);
-	    for (tx = 1; tx < COLNO; ++tx)
-		for (ty = 0; ty < ROWNO; ++ty)
+	    if (autoexploring) {
+		    dist = INT_MAX;
+		    d2 = INT_MAX;
+	    }
+
+	    for (tx = 1; tx < COLNO; ++tx) {
+		for (ty = 0; ty < ROWNO; ++ty) {
 		    if (travel[tx][ty]) {
 			nxtdist = distmin(ux, uy, tx, ty);
-			if (nxtdist == dist && couldsee(tx, ty)) {
+                        if (autoexploring) {
+				nxtdist = autotravel_weighting(tx, ty, travel[tx][ty]);
+			}
+			if (nxtdist == dist && guess(tx, ty)) {
 			    nd2 = dist2(ux, uy, tx, ty);
 			    if (nd2 < d2) {
 				/* prefer non-zigzag path */
 				px = tx; py = ty;
 				d2 = nd2;
 			    }
-			} else if (nxtdist < dist && couldsee(tx, ty)) {
+			} else if (nxtdist < dist && guess(tx, ty)) {
 			    px = tx; py = ty;
 			    dist = nxtdist;
 			    d2 = dist2(ux, uy, tx, ty);
 			}
 		    }
+		 }
+	    }
 
 	    if (px == u.ux && py == u.uy) {
 		/* no guesses, just go in the general direction */
 		u.dx = sgn(u.tx - u.ux);
 		u.dy = sgn(u.ty - u.uy);
+		if (u.dx == 0 && u.dy == 0) {
+			nomul(0, 0);
+			return FALSE;
+		}
 		if (test_move(u.ux, u.uy, u.dx, u.dy, TEST_MOVE))
 		    return TRUE;
 		goto found;
@@ -1195,7 +1315,7 @@ boolean guess;
 	    uy = u.uy;
 	    set = 0;
 	    n = radius = 1;
-	    guess = FALSE;
+	    guess = NULL;
 	    goto noguess;
 	}
 	return FALSE;
@@ -1206,6 +1326,39 @@ found:
     u.dy = 0;
     nomul(0, 0);
     return FALSE;
+}
+
+/* A function version of couldsee, so we can take a pointer to it. */
+static boolean
+couldsee_func(x, y)
+int x, y;
+{
+  return couldsee(x, y);
+}
+
+/** Returns if (x,y) could be explored.
+ * Differs from unexplore() in that it is uses information not
+ * available to the player.
+ * It should only leak information about "obvious" coordinates, e.g.
+ * unexplored rooms or big areas not reachable by the player. */
+static boolean
+interesting_to_explore(x,y) {
+	if (!goodpos(x, y, &youmonst, 0)) return FALSE;
+
+	if (!unexplored(x, y)) return FALSE;
+
+	/* don't leak information about secret locations */
+	if (levl[x][y].typ == SCORR ||
+	    levl[x][y].typ == SDOOR) {
+		return FALSE;
+	}
+	/* don't leak information about gold vaults */
+	if (*in_rooms(x,y,VAULT)) return FALSE;
+
+	/* corridors are uninteresting */
+	if (levl[x][y].typ == CORR) return FALSE;
+
+	return TRUE;
 }
 
 void
@@ -1225,9 +1378,70 @@ domove()
 	u_wipe_engr(rnd(5));
 
 	if (flags.travel) {
-	    if (!findtravelpath(FALSE))
-		(void) findtravelpath(TRUE);
+            if (iflags.autoexplore) {
+                if (Blind) {
+                  /* necessary to not autoexplore while blind; the logic
+                     can't handle it, nor could it sensibly without
+                     somehow knowing when to search and when to move */
+                  pline("You stop exploring, because you can't see where"
+                        " you're going.");
+                  flags.move = 0;
+                  nomul(0, 0);
+                  return;
+                }
+                if (In_sokoban(&u.uz)) {
+                  pline("You somehow know the layout of this place"
+                        " without exploring.");
+                  pline("But, you feel you should be careful moving"
+                        " around.");
+                  flags.move = 0;
+                  nomul(0, 0);
+                  return;
+                }
+                if (Stunned || Confusion) {
+                  pline("Your head is spinning too much to explore.");
+                  flags.move = 0;
+                  nomul(0, 0);
+                  return;
+                }
+		u.tx = u.ux;
+		u.ty = u.uy;
+		if (!findtravelpath(unexplored)) {
+			char msg[BUFSZ];
+			int unexplored_cnt=0, i, j;
+			/* check if this level has been thoroughly explored */
+			for (i=1; i < COLNO; i++) {
+				for (j=0; j < ROWNO; j++) {
+					if (interesting_to_explore(i,j)) {
+						unexplored_cnt++;
+					}
+				}
+			}
+			iflags.autoexplore = FALSE;
+			/* TODO: Check if really done (known closed doors,
+			 * boulders blocking your way) and offer doing
+			 * travel when done */
+			if (unexplored_cnt > 0) {
+				if (wizard) {
+					Sprintf(msg, "Partly explored, can't reach %d places.", unexplored_cnt);
+				} else {
+					Strcpy(msg, "Partly explored, can't reach some places.");
+				}
+			} else {
+				Strcpy(msg, "Done exploring.");
+			}
+			pline("%s", msg);
+		}
+	    } else if (!findtravelpath(NULL)) {
+		(void) findtravelpath(couldsee_func);
+	    }
 	    iflags.travel1 = 0;
+            if (u.dx == 0 && u.dy == 0) {
+              /* couldn't find a move; end travel without costing a turn */
+                flags.move = 0;
+                nomul(0, 0);
+                return;
+            }
 	}
 
 	if(((wtcap = near_capacity()) >= OVERLOADED
@@ -1372,8 +1586,9 @@ domove()
 		}
 
 		mtmp = m_at(x,y);
-		if (mtmp) {
+		if (mtmp && !is_safepet(mtmp)) {
 			/* Don't attack if you're running, and can see it */
+                        /* It's fine to displace pets, though */
 			/* We should never get here if forcefight */
 			if (flags.run &&
 			    ((!Blind && mon_visible(mtmp) &&
@@ -1383,6 +1598,7 @@ domove()
 			     sensemon(mtmp))) {
 				nomul(0, 0);
 				flags.move = 0;
+				autoexplore_msg(Monnam(mtmp));
 				return;
 			}
 		}
@@ -1396,7 +1612,10 @@ domove()
 
 	/* attack monster */
 	if(mtmp) {
-	    nomul(0, 0);
+            /* don't stop travel when displacing pets; if the
+               displace fails for some reason, attack() in uhitm.c
+               will stop travel rather than domove */
+            if (!is_safepet(mtmp) || flags.forcefight) nomul(0, 0);
 	    /* only attack if we know it's there */
 	    /* or if we used the 'F' command to fight blindly */
 	    /* or if it hides_under, in which case we call attack() to print
@@ -1411,7 +1630,7 @@ domove()
 	     * invisible monster--then, we fall through to attack() and
 	     * attack_check(), which still wastes a turn, but prints a
 	     * different message and makes the player remember the monster.		     */
-	    if(flags.nopick &&
+	    if(flags.nopick && !flags.travel &&
 		  (canspotmon(mtmp) || glyph_is_invisible(levl[x][y].glyph))){
 		if(mtmp->m_ap_type && !Protection_from_shape_changers
 						    && !sensemon(mtmp))
@@ -1527,16 +1746,7 @@ domove()
 				"You are still in a pit." );
 		    }
 		} else if (u.utraptype == TT_LAVA) {
-		    if(flags.verbose) {
-			predicament = "stuck in the lava";
-#ifdef STEED
-			if (u.usteed)
-			    Norep("%s is %s.", upstart(y_monnam(u.usteed)),
-				  predicament);
-			else
-#endif
-			Norep("You are %s.", predicament);
-		    }
+		    struggle_sub("stuck in the lava");
 		    if(!is_lava(x,y)) {
 			u.utrap--;
 			if((u.utrap & 0xff) == 0) {
@@ -1558,16 +1768,7 @@ domove()
 			return;
 		    }
 		    if(--u.utrap) {
-			if(flags.verbose) {
-			    predicament = "stuck to the web";
-#ifdef STEED
-			    if (u.usteed)
-				Norep("%s is %s.", upstart(y_monnam(u.usteed)),
-				      predicament);
-			    else
-#endif
-			    Norep("You are %s.", predicament);
-			}
+			    struggle_sub("stuck to the web");
 		    } else {
 #ifdef STEED
 			if (u.usteed)
@@ -1576,6 +1777,10 @@ domove()
 			else
 #endif
 			You("disentangle yourself.");
+		    }
+		} else if (u.utraptype == TT_SWAMP) {
+		    if(--u.utrap) {
+			struggle_sub("stuck in the mud");
 		    }
 		} else if (u.utraptype == TT_INFLOOR) {
 		    if(--u.utrap) {
@@ -1735,10 +1940,32 @@ domove()
 
 	reset_occupations();
 	if (flags.run) {
-	    if ( flags.run < 8 )
+	    if (flags.run < 8) {
 		if (IS_DOOR(tmpr->typ) || IS_ROCK(tmpr->typ) ||
 			IS_FURNITURE(tmpr->typ))
 		    nomul(0, 0);
+            } else if (flags.travel && iflags.autoexplore) {
+              /* autoexplore stoppers: being orthogonally
+                 adjacent to a boulder, being orthogonally adjacent
+                 to 3 or more walls; this logic could be incorrect
+                 when blind, but we check for that earlier; while
+                 not blind, we'll assume the hero knows about adjacent
+                 walls and boulders due to being able to see them */
+              int wallcount = 0;
+              if (isok(u.ux-1, u.uy  ))
+                wallcount += IS_ROCK(levl[u.ux-1][u.uy  ].typ) +
+                  !!sobj_at(BOULDER, u.ux-1, u.uy  ) * 3;
+              if (isok(u.ux+1, u.uy  ))
+                wallcount += IS_ROCK(levl[u.ux+1][u.uy  ].typ) +
+                  !!sobj_at(BOULDER, u.ux+1, u.uy  ) * 3;
+              if (isok(u.ux  , u.uy-1))
+                wallcount += IS_ROCK(levl[u.ux  ][u.uy-1].typ) +
+                  !!sobj_at(BOULDER, u.ux  , u.uy-1) * 3;
+              if (isok(u.ux  , u.uy+1))
+                wallcount += IS_ROCK(levl[u.ux  ][u.uy+1].typ) +
+                  !!sobj_at(BOULDER, u.ux  , u.uy+1) * 3;
+              if (wallcount >= 3) nomul(0, 0);
+            }
 	}
 
 	if (hides_under(youmonst.data))
@@ -1797,8 +2024,27 @@ domove()
 }
 
 void
+struggle_sub(predicament)
+const char *predicament;
+{
+	if (flags.verbose) {
+#ifdef STEED
+		if (u.usteed)
+			Norep("%s is %s.", upstart(y_monnam(u.usteed)),
+					predicament);
+		else
+#endif
+			Norep("You are %s.", predicament);
+	}
+}
+
+void
 invocation_message()
 {
+	/* mark the square as stepped on, whether it's the VS or not;
+	    don't do so when blind, though, because it would misleadingly
+	    imply we'd properly explored that area */
+	if (!Blind) levl[u.ux][u.uy].stepped_on = 1;
 	/* a special clue-msg when near the Invocation position */
 	if (Invocation_lev(&u.uz)) {
 		char *strange_vibration;
@@ -1860,6 +2106,8 @@ boolean pick;
 				You("pop into an air bubble.");
 			else if (is_lava(u.ux, u.uy))
 				You("leave the water...");	/* oops! */
+			else if (is_swamp(u.ux, u.uy))
+				You("are on shallows.");
 			else
 				You("are on solid %s again.",
 				    is_ice(u.ux, u.uy) ? "ice" : "land");
@@ -1882,9 +2130,29 @@ boolean pick;
 		}
 	}
 stillinwater:;
+	if (u.utraptype == TT_SWAMP) {
+		if (!is_swamp(u.ux, u.uy)) {
+			if (is_lava(u.ux, u.uy))	/* oops! */
+				You("get out of the mud...");
+			else
+				You("are on solid %s again.",
+				    is_ice(u.ux, u.uy) ? "ice" : "land");
+		}
+		else if (Levitation)
+			You("rise out of the swamp.");
+		else if (Flying)
+			You("fly out of the swamp.");
+		else if (Wwalking)
+			You("slowly rise above the muddy water.");
+		else goto stillinswamp;
+		u.utrap = 0;
+		u.utraptype = 0;
+	}
+stillinswamp:
 	if (!Levitation && !u.ustuck && !Flying) {
 	    /* limit recursive calls through teleds() */
-	    if (is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) {
+	    if (is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy) ||
+		is_swamp(u.ux, u.uy)) {
 #ifdef STEED
 		if (u.usteed && !is_flyer(u.usteed->data) &&
 			!is_floater(u.usteed->data) &&
@@ -1898,6 +2166,8 @@ stillinwater:;
 #endif
 		if (is_lava(u.ux, u.uy)) {
 		    if (lava_effects()) return;
+		} else if (is_swamp(u.ux, u.uy)) {
+		    if (swamp_effects()) return;
 		} else if (!Wwalking && drown())
 		    return;
 	    }
@@ -2338,6 +2608,21 @@ lookaround()
 	return;
     }
 
+    /* Having a hostile monster in LOS stops running after one turn,
+       unless sessile or shift-moving. We don't count detection just
+       via telepathy, as it might be over the other end of the level,
+       unless the monster is within 5 spaces of us. */
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if ((canseemon(mtmp) ||
+             (canspotmon(mtmp) &&
+              distmin(u.ux, u.uy, mtmp->mx, mtmp->my) <= 5)) &&
+            !mtmp->mpeaceful && !mtmp->mtame &&
+            mtmp->data->mmove && flags.run != 1) {
+            nomul(0, 0);
+            return;
+        }
+    }
+
     if(Blind || flags.run == 0) return;
     for(x = u.ux-1; x <= u.ux+1; x++) for(y = u.uy-1; y <= u.uy+1; y++) {
 	if(!isok(x,y)) continue;
@@ -2351,7 +2636,7 @@ lookaround()
 		    mtmp->m_ap_type != M_AP_OBJECT &&
 		    (!mtmp->minvis || See_invisible) && !mtmp->mundetected) {
 	    if((flags.run != 1 && !mtmp->mtame)
-					|| (x == u.ux+u.dx && y == u.uy+u.dy))
+	       || (x == u.ux+u.dx && y == u.uy+u.dy && !flags.travel))
 		goto stop;
 	}
 
@@ -2498,7 +2783,7 @@ const char *msg_override;
 	(void) memset(multi_txt, 0, BUFSZ);
 	if (msg_override) nomovemsg = msg_override;
 	else if (!nomovemsg) nomovemsg = You_can_move_again;
-	if (*nomovemsg) pline(nomovemsg);
+	if (*nomovemsg) pline("%s", nomovemsg);
 	nomovemsg = 0;
 	u.usleep = 0;
 	if (afternmv) (*afternmv)();
@@ -2562,6 +2847,7 @@ void
 losehp(n, knam, k_format)
 int n;
 const char *knam;
+boolean k_format;
 {
 	losehp_how(n, knam, k_format, DIED);
 }
@@ -2589,6 +2875,8 @@ boolean k_format;
 	u.uhp -= n;
 	if(u.uhp > u.uhpmax)
 		u.uhpmax = u.uhp;	/* perhaps n was negative */
+        else
+		nomul(0, 0);               /* taking damage stops command repeat */
 	flags.botl = 1;
 	if(u.uhp < 1) {
 		killer_format = k_format;
@@ -2703,7 +2991,7 @@ const char *str;
 {
     if(near_capacity() >= EXT_ENCUMBER) {
 	if(str)
-	    pline(str);
+	    pline("%s", str);
 	else
 	    You_cant("do that while carrying so much stuff.");
 	return 1;

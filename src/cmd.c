@@ -118,6 +118,7 @@ STATIC_PTR int NDECL(doextcmd);
 STATIC_PTR int NDECL(domonability);
 STATIC_PTR int NDECL(dooverview_or_wiz_where);
 STATIC_PTR int NDECL(dotravel);
+STATIC_PTR int NDECL(doautoexplore);
 # ifdef WIZARD
 int NDECL(wiz_show_rooms);
 STATIC_PTR int NDECL(wiz_wish);
@@ -174,6 +175,7 @@ static void NDECL(end_of_input);
 #endif /* OVLB */
 
 static const char* readchar_queue="";
+static char last_cmd_char='\0';
 
 STATIC_DCL char *NDECL(parse);
 STATIC_DCL boolean FDECL(help_dir, (CHAR_P,const char *));
@@ -344,7 +346,7 @@ doextlist()	/* here after #? - now list all full-word commands */
 }
 
 #if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
-#define MAX_EXT_CMD 40		/* Change if we ever have > 40 ext cmds */
+#define MAX_EXT_CMD 50		/* Change if we ever have > 50 ext cmds */
 /*
  * This is currently used only by the tty port and is
  * controlled via runtime option 'extmenu'
@@ -379,13 +381,11 @@ extcmd_via_menu()	/* here after # - now show pick-list of possible commands */
 				biggest = strlen(efp->ef_desc);
 				Sprintf(fmtstr,"%%-%ds", biggest + 15);
 			}
-#ifdef DEBUG
 			if (i >= MAX_EXT_CMD - 2) {
 			    warning("Exceeded %d extended commands in doextcmd() menu",
 					MAX_EXT_CMD - 2);
 			    return 0;
 			}
-#endif
 		}
 	    }
 	    choices[i] = (struct ext_func_tab *)0;
@@ -412,7 +412,7 @@ extcmd_via_menu()	/* here after # - now show pick-list of possible commands */
  			/* flush the extended commands for that letter already in buf */
 			Sprintf(buf, fmtstr, prompt);
 			any.a_char = prevaccelerator;
-			add_menu(win, NO_GLYPH, &any, any.a_char, 0,
+			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, any.a_char, 0,
 					ATR_NONE, buf, FALSE);
 			acount = 0;
 		    }
@@ -434,7 +434,7 @@ extcmd_via_menu()	/* here after # - now show pick-list of possible commands */
 		/* flush buf */
 		Sprintf(buf, fmtstr, prompt);
 		any.a_char = prevaccelerator;
-		add_menu(win, NO_GLYPH, &any, any.a_char, 0, ATR_NONE, buf, FALSE);
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, any.a_char, 0, ATR_NONE, buf, FALSE);
 	    }
 	    Sprintf(prompt, "Extended Command: %s", cbuf);
 	    end_menu(win, prompt);
@@ -669,7 +669,7 @@ wiz_level_change()
     else ret = sscanf(buf, "%d", &newlevel);
 
     if (ret != 1) {
-	pline(Never_mind);
+	pline("%s", Never_mind);
 	return 0;
     }
     if (newlevel == u.ulevel) {
@@ -907,7 +907,7 @@ char *outbuf;
 void
 enlightenment(final, want_disp)
 int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
-int want_disp;
+boolean want_disp;
 {
 	int ltmp;
 	char buf[BUFSZ];
@@ -946,7 +946,7 @@ int want_disp;
 	else if (u.ualign.record >= -8)	you_have("sinned");
 	else you_have("transgressed");
 #ifdef WIZARD
-	if (wizard) {
+	if (wizard || final) {
 		Sprintf(buf, " %d", u.uhunger);
 		enl_msg("Hunger level ", "is", "was", buf);
 		Sprintf(buf, " %d / %ld", u.ualign.record, ALIGNLIM);
@@ -989,6 +989,11 @@ int want_disp;
 			if (u.usick_type & SICK_NONVOMITABLE)
 				you_are("sick from illness");
 		}
+#ifdef CONVICT
+		if (Punished) {
+			you_are("punished");
+		}
+#endif /* CONVICT */
 	}
 	if (Stoned) you_are("turning to stone");
 	if (Slimed) you_are("turning into slime");
@@ -1007,7 +1012,7 @@ int want_disp;
 		you_have(buf);
 	}
 #if defined(WIZARD) && defined(STEED)
-	if (Wounded_legs && u.usteed && wizard) {
+	if (Wounded_legs && u.usteed && (wizard || final)) {
 	    Strcpy(buf, x_monnam(u.usteed, ARTICLE_YOUR, (char *)0, 
 		    SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION, FALSE));
 	    *buf = highc(*buf);
@@ -1090,7 +1095,7 @@ int want_disp;
 	if (u.uswallow) {
 	    Sprintf(buf, "swallowed by %s", a_monnam(u.ustuck));
 #ifdef WIZARD
-	    if (wizard) Sprintf(eos(buf), " (%u)", u.uswldtim);
+	    if (wizard || final) Sprintf(eos(buf), " (%u)", u.uswldtim);
 #endif
 	    you_are(buf);
 	} else if (u.ustuck) {
@@ -1132,7 +1137,7 @@ int want_disp;
 	    if (u.umonnum == u.ulycn) Strcpy(buf, "in beast form");
 	    else Sprintf(buf, "polymorphed into %s", an(youmonst.data->mname));
 #ifdef WIZARD
-	    if (wizard) Sprintf(eos(buf), " (%d)", u.mtimedone);
+	    if (wizard || final) Sprintf(eos(buf), " (%d)", u.mtimedone);
 #endif
 	    you_are(buf);
 	}
@@ -1152,12 +1157,12 @@ int want_disp;
 		    ltmp >= 10 ? "extremely " : ltmp >= 5 ? "very " : "",
 		    Luck < 0 ? "un" : "");
 #ifdef WIZARD
-	    if (wizard) Sprintf(eos(buf), " (%d)", Luck);
+	    if (wizard || final) Sprintf(eos(buf), " (%d)", Luck);
 #endif
 	    you_are(buf);
 	}
 #ifdef WIZARD
-	 else if (wizard) enl_msg("Your luck ", "is", "was", " zero");
+	 else if (wizard || final) enl_msg("Your luck ", "is", "was", " zero");
 #endif
 	if (u.moreluck > 0) you_have("extra luck");
 	else if (u.moreluck < 0) you_have("reduced luck");
@@ -1173,7 +1178,7 @@ int want_disp;
 	    Sprintf(buf, " %sangry with you",
 		    u.ugangr > 6 ? "extremely " : u.ugangr > 3 ? "very " : "");
 #ifdef WIZARD
-	    if (wizard) Sprintf(eos(buf), " (%d)", u.ugangr);
+	    if (wizard || final) Sprintf(eos(buf), " (%d)", u.ugangr);
 #endif
 	    enl_msg(u_gname(), " is", " was", buf);
 	} else
@@ -1191,7 +1196,7 @@ int want_disp;
 	    Sprintf(buf, "%ssafely pray", can_pray(FALSE) ? "" : "not ");
 #endif
 #ifdef WIZARD
-	    if (wizard) Sprintf(eos(buf), " (%d)", u.ublesscnt);
+	    if (wizard || final) Sprintf(eos(buf), " (%d)", u.ublesscnt);
 #endif
 	    you_can(buf);
 	}
@@ -1258,67 +1263,67 @@ minimal_enlightenment()
 	buf[0] = buf2[0] = '\0';
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, "Starting", FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings, "Starting", FALSE);
 
 	/* Starting name, race, role, gender */
 	Sprintf(buf, fmtstr, "name", plname);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	Sprintf(buf, fmtstr, "race", urace.noun);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	Sprintf(buf, fmtstr, "role",
 		(flags.initgend && urole.name.f) ? urole.name.f : urole.name.m);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	Sprintf(buf, fmtstr, "gender", genders[flags.initgend].adj);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 
 	/* Starting alignment */
 	Sprintf(buf, fmtstr, "alignment", align_str(u.ualignbase[A_ORIGINAL]));
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 
 	/* Current name, race, role, gender */
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", FALSE);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, "Current", FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, "", FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings, "Current", FALSE);
 	Sprintf(buf, fmtstr, "race", Upolyd ? youmonst.data->mname : urace.noun);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	if (Upolyd) {
 	    Sprintf(buf, fmtstr, "role (base)",
 		(u.mfemale && urole.name.f) ? urole.name.f : urole.name.m);
-	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	} else {
 	    Sprintf(buf, fmtstr, "role",
 		(flags.female && urole.name.f) ? urole.name.f : urole.name.m);
-	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	}
 	/* don't want poly_gender() here; it forces `2' for non-humanoids */
 	genidx = is_neuter(youmonst.data) ? 2 : flags.female;
 	Sprintf(buf, fmtstr, "gender", genders[genidx].adj);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	if (Upolyd && (int)u.mfemale != genidx) {
 	    Sprintf(buf, fmtstr, "gender (base)", genders[u.mfemale].adj);
-	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	}
 
 	/* Current alignment */
 	Sprintf(buf, fmtstr, "alignment", align_str(u.ualign.type));
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 
 	/* Current position of hero */
 	if (wizard) {
 		Sprintf(buf2, "(%2d,%2d)", u.ux, u.uy);
 		Sprintf(buf, fmtstr, "position", buf2);
-		add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 	}
 
 	/* Deity list */
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", FALSE);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, "Deities", FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, "", FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings, "Deities", FALSE);
 	Sprintf(buf2, deity_fmtstr, align_gname(A_CHAOTIC),
 	    (u.ualignbase[A_ORIGINAL] == u.ualign.type
 		&& u.ualign.type == A_CHAOTIC) ? " (s,c)" :
 	    (u.ualignbase[A_ORIGINAL] == A_CHAOTIC)       ? " (s)" :
 	    (u.ualign.type   == A_CHAOTIC)       ? " (c)" : "");
 	Sprintf(buf, fmtstr, "Chaotic", buf2);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 
 	Sprintf(buf2, deity_fmtstr, align_gname(A_NEUTRAL),
 	    (u.ualignbase[A_ORIGINAL] == u.ualign.type
@@ -1326,7 +1331,7 @@ minimal_enlightenment()
 	    (u.ualignbase[A_ORIGINAL] == A_NEUTRAL)       ? " (s)" :
 	    (u.ualign.type   == A_NEUTRAL)       ? " (c)" : "");
 	Sprintf(buf, fmtstr, "Neutral", buf2);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 
 	Sprintf(buf2, deity_fmtstr, align_gname(A_LAWFUL),
 	    (u.ualignbase[A_ORIGINAL] == u.ualign.type &&
@@ -1334,12 +1339,104 @@ minimal_enlightenment()
 	    (u.ualignbase[A_ORIGINAL] == A_LAWFUL)        ? " (s)" :
 	    (u.ualign.type   == A_LAWFUL)        ? " (c)" : "");
 	Sprintf(buf, fmtstr, "Lawful", buf2);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, FALSE);
 
 	end_menu(tmpwin, "Base Attributes");
 	n = select_menu(tmpwin, PICK_NONE, &selected);
 	destroy_nhwindow(tmpwin);
 	return (n != -1);
+}
+
+int
+do_naming(typ)
+int typ;
+{
+    winid win;
+    anything any;
+    menu_item *pick_list = NULL;
+    int n;
+    register struct obj *obj;
+    char allowall[2];
+    static NEARDATA const char callable[] = {
+	SCROLL_CLASS, POTION_CLASS, WAND_CLASS, RING_CLASS, AMULET_CLASS,
+	GEM_CLASS, SPBOOK_CLASS, ARMOR_CLASS, TOOL_CLASS, 0 };
+
+    if (!typ) {
+      any.a_void = 0;
+      win = create_nhwindow(NHW_MENU);
+      start_menu(win);
+
+      /* the accelerator keys are chosen to be compatible with NAO and
+       * where possible similar to AceHack's keys. That explains the
+       * choice for the group accelerators. */
+      any.a_int = 1;
+      add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'a', 'C', ATR_NONE, "Name a monster", MENU_UNSELECTED);
+
+      any.a_int = 2;
+      add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'b', 'y', ATR_NONE, "Name an individual item", MENU_UNSELECTED);
+
+      any.a_int = 3;
+      add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'c', 'n', ATR_NONE, "Name all items of a certain type", MENU_UNSELECTED);
+
+      any.a_int = 4;
+      add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'd', 'f', ATR_NONE, "Annotate the current level", MENU_UNSELECTED);
+
+      any.a_int = 0;
+      add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 'q', ATR_NONE, "", MENU_UNSELECTED);
+
+      end_menu(win, "What do you wish to name?");
+      n = select_menu(win, PICK_ONE, &pick_list);
+      destroy_nhwindow(win);
+
+      if (pick_list) {
+	n = (pick_list[0].item.a_int - 1);
+	free((genericptr_t) pick_list);
+      } else return 0;
+    } else {
+      n = (typ - 1);
+    }
+    switch (n) {
+    default: break;
+    case 0: do_mname(); break;
+	/* cases 1 & 2 duplicated from ddocall() */
+    case 1:
+	allowall[0] = ALL_CLASSES; allowall[1] = '\0';
+	obj = getobj(allowall, "name");
+	if(obj) do_oname(obj);
+	break;
+    case 2:
+	obj = getobj(callable, "call");
+	if (obj) {
+	    /* behave as if examining it in inventory;
+                           this might set dknown if it was picked up
+                           while blind and the hero can now see */
+	    (void) xname(obj);
+
+	    if (!obj->dknown) {
+		You("would never recognize another one.");
+		return 0;
+	    }
+	    docall(obj);
+	}
+	break;
+    case 3:
+	donamelevel();
+	break;
+    }
+    return 0;
+}
+
+int
+do_naming_mname()
+{
+  if (iflags.vanilla_ui_behavior) return do_naming(1);
+  return do_naming(0);
+}
+
+int
+do_naming_ddocall()
+{
+  return do_naming(0);
 }
 
 STATIC_PTR int
@@ -1365,7 +1462,7 @@ doconduct()
 void
 show_conduct(final, want_disp)
 int final;
-int want_disp;
+boolean want_disp;
 {
 	char buf[BUFSZ];
 	int ngenocided;
@@ -1411,24 +1508,30 @@ int want_disp;
 
 	if (!u.uconduct.weaphit)
 	    you_have_never("hit with a wielded weapon");
-#ifdef WIZARD
-	else if (wizard) {
+	else if (wizard || final) {
 	    Sprintf(buf, "used a wielded weapon %ld time%s",
 		    u.uconduct.weaphit, plur(u.uconduct.weaphit));
 	    you_have_X(buf);
 	}
 
-	if (wizard && u.uconduct.literate){
+#ifdef WIZARD
+	if ((wizard || final) && u.uconduct.literate){
 	    Sprintf(buf, "read items or engraved %ld time%s",
 		    u.uconduct.literate, plur(u.uconduct.literate));
 	    you_have_X(buf);
 	}
-	if (wizard && u.uconduct.armoruses) {
+	if ((wizard || final) && u.uconduct.armoruses) {
 	    Sprintf(buf, "put on armor %ld time%s",
 		  u.uconduct.armoruses, plur(u.uconduct.armoruses));
 	    you_have_X(buf);
 	}
 #endif
+	if (!u.uconduct.non_racial_armor &&
+	    /* only show when armor was worn at all */
+	    u.uconduct.armoruses > 0) {
+	    Sprintf(buf, "wearing only %s armor", urace.adj);
+	    you_have_been(buf);
+	}
 
 	ngenocided = num_genocides();
 	if (ngenocided == 0) {
@@ -1442,7 +1545,7 @@ int want_disp;
 	if (!u.uconduct.polypiles)
 	    you_have_never("polymorphed an object");
 #ifdef WIZARD
-	else if (wizard) {
+	else if (wizard || final) {
 	    Sprintf(buf, "polymorphed %ld item%s",
 		    u.uconduct.polypiles, plur(u.uconduct.polypiles));
 	    you_have_X(buf);
@@ -1452,7 +1555,7 @@ int want_disp;
 	if (!u.uconduct.polyselfs)
 	    you_have_never("changed form");
 #ifdef WIZARD
-	else if (wizard) {
+	else if (wizard || final) {
 	    Sprintf(buf, "changed form %ld time%s",
 		    u.uconduct.polyselfs, plur(u.uconduct.polyselfs));
 	    you_have_X(buf);
@@ -1489,6 +1592,24 @@ int want_disp;
 	}
 #endif /* ELBERETH */
 #endif /* ELBERETH_CONDUCT */
+
+	if ((wizard || final) && !u.uconduct.bones) {
+	    you_have_never("encountered a bones level");
+	} else if (wizard || final) {
+	    Sprintf(buf, "encountered %ld bones level%s",
+		    u.uconduct.bones, plur(u.uconduct.bones));
+	    you_have_X(buf);
+	}
+
+#ifdef RECORD_ACHIEVE
+	if ((wizard || final) && !u.uconduct.sokoban) {
+		you_have_never("used any Sokoban shortcuts");
+	} else if (wizard || final) {
+		Sprintf(buf, "used Sokoban shortcuts %ld time%s",
+			u.uconduct.sokoban, plur(u.uconduct.sokoban));
+		you_have_X(buf);
+	}
+#endif
 
 	dump_list_end();
 	dump("", "");
@@ -1543,7 +1664,7 @@ static const struct func_tab cmdlist[] = {
 	{M('a'), TRUE, doorganize, NULL},
 /*	'b', 'B' : go sw */
 	{'c', FALSE, doclose, NULL},
-	{'C', TRUE, do_mname, NULL},
+	{'C', TRUE, do_naming_mname, NULL},
 	{M('c'), TRUE, dotalk, NULL},
 	{'d', FALSE, dodrop, NULL},
 	{'D', FALSE, doddrop, NULL},
@@ -1592,14 +1713,15 @@ static const struct func_tab cmdlist[] = {
 /*	'u', 'U' : go ne */
 	{'u', FALSE, dountrap, NULL}, /* if number_pad is on */
 	{M('u'), FALSE, dountrap, NULL},
-	{'v', TRUE, doversion, NULL},
-	{'V', TRUE, dohistory, NULL},
+	{'v', TRUE, doautoexplore, NULL},
+	{'V', TRUE, doversion, NULL},
 	{M('v'), TRUE, doextversion, NULL},
 	{'w', FALSE, dowield, NULL},
 	{'W', FALSE, dowear, NULL},
 	{M('w'), FALSE, dowipe, NULL},
 	{'x', FALSE, doswapweapon, NULL},
-	{'X', TRUE, enter_explore_mode, NULL},
+	{'X', FALSE, dotwoweapon, NULL},
+	{M('x'), TRUE, enter_explore_mode, NULL},
 /*	'y', 'Y' : go nw */
 	{'z', FALSE, dozap, NULL},
 	{'Z', TRUE, docast, NULL},
@@ -1647,7 +1769,7 @@ struct ext_func_tab extcmdlist[] = {
 	{"jump", "jump to a location", dojump, FALSE},
 	{"loot", "loot a box on the floor", doloot, FALSE},
 	{"monster", "use a monster's special ability", domonability, TRUE},
-	{"name", "name an item or type of object", ddocall, TRUE},
+	{"name", "name an item or type of object", do_naming_ddocall, TRUE},
 	{"offer", "offer a sacrifice to the gods", dosacrifice, FALSE},
 	{"overview", "show an overview of the dungeon", dooverview, TRUE},
 	{"pray", "pray to the gods for help", dopray, TRUE},
@@ -1669,6 +1791,7 @@ struct ext_func_tab extcmdlist[] = {
 	{"version", "list compile time options for this version of UnNetHack",
 		doextversion, TRUE},
 	{"wipe", "wipe off your face", dowipe, FALSE},
+	{"xplore", "enter the explore mode", enter_explore_mode, TRUE},
 	{"?", "get this list of extended commands", doextlist, TRUE},
 #if defined(WIZARD)
 	/*
@@ -2097,7 +2220,7 @@ register char *cmd;
 			    flags.travel = 1;
 			    iflags.travel1 = 1;
 			    flags.run = 8;
-			    flags.nopick = 1;
+			    flags.nopick = !iflags.autoexplore;
 			    do_rush = TRUE;
 			    break;
 		    }
@@ -2171,6 +2294,8 @@ register char *cmd;
 		    func = ((struct func_tab *)tlist)->f_funct;
 		    if (tlist->f_text && !occupation && multi)
 			set_occupation(func, tlist->f_text, multi);
+		    /* remember pressed character */
+		    last_cmd_char = *cmd;
 		    res = (*func)();		/* perform the command */
 		}
 		if (!res) {
@@ -2269,7 +2394,7 @@ coord *cc;
 {
 	xchar new_x, new_y;
 	if (!getdir(prompt)) {
-		pline(Never_mind);
+		pline("%s", Never_mind);
 		return 0;
 	}
 	new_x = x + u.dx;
@@ -2278,7 +2403,7 @@ coord *cc;
 		cc->x = new_x;
 		cc->y = new_y;
 	} else {
-		if (emsg) pline(emsg);
+		if (emsg) pline("%s", emsg);
 		return 0;
 	}
 	return 1;
@@ -2289,6 +2414,8 @@ getdir(s)
 const char *s;
 {
 	char dirsym;
+	/* saved direction of the previous call of getdir() */
+	static char saved_dirsym = '\0';
 
 #ifdef REDO
 	if(in_doagain || *readchar_queue)
@@ -2300,7 +2427,13 @@ const char *s;
 #ifdef REDO
 	savech(dirsym);
 #endif
-	if(dirsym == '.' || dirsym == 's')
+	if (dirsym == last_cmd_char) {
+		/* in here dirsym is not representing a direction
+		 * but the same sym used before for calling the
+		 * current cmd */
+		movecmd(saved_dirsym);
+		dirsym = saved_dirsym;
+	} else if(dirsym == '.' || dirsym == 's')
 		u.dx = u.dy = u.dz = 0;
 	else if(!movecmd(dirsym) && !u.dz) {
 		boolean did_help = FALSE;
@@ -2313,6 +2446,7 @@ const char *s;
 		}
 		return 0;
 	}
+	saved_dirsym = dirsym;
 	if(!u.dz && (Stunned || (Confusion && !rn2(5)))) confdir();
 	return 1;
 }
@@ -2549,7 +2683,7 @@ parse()
 		    if (multi > 9) {
 			clear_nhwindow(WIN_MESSAGE);
 			Sprintf(in_line, "Count: %d", multi);
-			pline(in_line);
+			pline("%s", in_line);
 			mark_synch();
 		    }
 		    last_multi = multi;
@@ -2678,6 +2812,17 @@ dotravel()
 	}
 	iflags.travelcc.x = u.tx = cc.x;
 	iflags.travelcc.y = u.ty = cc.y;
+	iflags.autoexplore = FALSE;
+	cmd[0] = CMD_TRAVEL;
+	readchar_queue = cmd;
+	return 0;
+}
+
+STATIC_PTR int
+doautoexplore()
+{
+	static char cmd[2];
+	iflags.autoexplore = TRUE;
 	cmd[0] = CMD_TRAVEL;
 	readchar_queue = cmd;
 	return 0;
@@ -2715,7 +2860,7 @@ wiz_port_debug()
 		start_menu(win);
 		for (k=0; k < num_menu_selections; ++k) {
 			any.a_int = k+1;
-			add_menu(win, NO_GLYPH, &any, item++, 0, ATR_NONE,
+			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, item++, 0, ATR_NONE,
 				menu_selections[k].menutext, MENU_UNSELECTED);
 		}
 		end_menu(win, "Which port debugging feature?");
@@ -2781,6 +2926,22 @@ boolean paranoid;
 	} else {
 		return yn(query);
 	}
+}
+
+/**
+ * Tracks how many times the player "cheated" in Sokoban.
+ *
+ * Stops tracking after the player found the sokoban prize.
+ */
+void
+sokoban_trickster()
+{
+#ifdef RECORD_ACHIEVE
+	if (!achieve.finish_sokoban) {
+		/* not yet found the sokoban prize */
+		u.uconduct.sokoban += 1;
+	}
+#endif
 }
 
 /*cmd.c*/

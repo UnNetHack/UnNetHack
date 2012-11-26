@@ -1336,7 +1336,12 @@ dismiss_file(w, event, params, num_params)
 }
 
 void
+#ifdef FILE_AREAS
+X11_display_file(farea, str, complain)
+    const char *farea;
+#else
 X11_display_file(str, complain)
+#endif
     const char *str;
     boolean complain;
 {
@@ -1354,7 +1359,11 @@ X11_display_file(str, complain)
     int charcount;
 
     /* Use the port-independent file opener to see if the file exists. */
+#ifdef FILE_AREAS
+    fp = dlb_fopen_area(farea, str, RDTMODE);
+#else
     fp = dlb_fopen(str, RDTMODE);
+#endif
 
     if (!fp) {
 	if(complain) pline("Cannot open %s.  Sorry.", str);
@@ -1388,7 +1397,11 @@ X11_display_file(str, complain)
     textlines = (char *) alloc((unsigned int) charcount);
     textlines[0] = '\0';
 
+#ifdef FILE_AREAS
+    fp = dlb_fopen_area(farea, str, RDTMODE);
+#else
     fp = dlb_fopen(str, RDTMODE);
+#endif
 
     while (dlb_fgets(line, LLEN, fp)) {
 	(void) strcat(textlines, line);

@@ -38,6 +38,7 @@ STATIC_DCL int FDECL(in_or_out_menu, (const char *,struct obj *, BOOLEAN_P, BOOL
 STATIC_DCL int FDECL(container_at, (int, int, BOOLEAN_P));
 STATIC_DCL boolean FDECL(able_to_loot, (int, int));
 STATIC_DCL boolean FDECL(mon_beside, (int, int));
+STATIC_DCL int FDECL(dump_container, (struct obj*, BOOLEAN_P));
 STATIC_DCL void NDECL(del_sokoprize);
 
 /* define for query_objlist() and autopickup() */
@@ -328,6 +329,9 @@ struct obj *obj;
     if (Role_if(PM_PRIEST)) obj->bknown = TRUE;
     if (((index(valid_menu_classes,'u') != (char *)0) && obj->unpaid) ||
 	(index(valid_menu_classes, obj->oclass) != (char *)0))
+	return TRUE;
+    else if (((index(valid_menu_classes,'I') != (char *)0) &&
+	(obj->oclass != COIN_CLASS && not_fully_identified(obj))))
 	return TRUE;
     else if (((index(valid_menu_classes,'U') != (char *)0) &&
 	(obj->oclass != COIN_CLASS && obj->bknown && !obj->blessed && !obj->cursed)))
@@ -640,13 +644,15 @@ menu_item **pick_list;	/* list of objects and counts to pick up */
 #ifndef AUTOPICKUP_EXCEPTIONS
 	    if ((!*otypes || index(otypes, curr->oclass) ||
 	         (flags.pickup_thrown && curr->was_thrown)) &&
-	        (flags.pickup_dropped || !curr->was_dropped))
+	        (flags.pickup_dropped || !curr->was_dropped) &&
+	        !Is_sokoprize(curr))
 #else
 	    if ((!*otypes || index(otypes, curr->oclass) ||
 	         (flags.pickup_thrown && curr->was_thrown) ||
 		 is_autopickup_exception(curr, TRUE)) &&
 	        ((flags.pickup_dropped || !curr->was_dropped) &&
-	    	 !is_autopickup_exception(curr, FALSE)))
+	         !is_autopickup_exception(curr, FALSE) &&
+	         !Is_sokoprize(curr)))
 #endif
 		n++;
 	}
@@ -657,13 +663,15 @@ menu_item **pick_list;	/* list of objects and counts to pick up */
 #ifndef AUTOPICKUP_EXCEPTIONS
 		if ((!*otypes || index(otypes, curr->oclass) ||
 	             (flags.pickup_thrown && curr->was_thrown)) &&
-	            (flags.pickup_dropped || !curr->was_dropped)) {
+	            (flags.pickup_dropped || !curr->was_dropped) &&
+	            !Is_sokoprize(curr)) {
 #else
 	    if ((!*otypes || index(otypes, curr->oclass) ||
 		 (flags.pickup_thrown && curr->was_thrown) ||
 		 is_autopickup_exception(curr, TRUE)) &&
 	        ((flags.pickup_dropped || !curr->was_dropped) &&
-	    	 !is_autopickup_exception(curr, FALSE))) {
+	         !is_autopickup_exception(curr, FALSE) &&
+	         !Is_sokoprize(curr))) {
 #endif
 		    pi[n].item.a_obj = curr;
 		    pi[n].count = curr->quan;
@@ -698,9 +706,15 @@ menu_item **pick_list;		/* return list of items picked */
 int how;			/* type of query */
 boolean FDECL((*allow), (OBJ_P));/* allow function */
 {
+#ifdef SORTLOOT
+	int i, j;
+#endif
 	int n;
 	winid win;
 	struct obj *curr, *last;
+#ifdef SORTLOOT
+	struct obj **oarray;
+#endif
 	char *pack;
 	anything any;
 	boolean printed_type_name;
@@ -725,6 +739,33 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 	    return 1;
 	}
 
+#ifdef SORTLOOT
+	/* Make a temporary array to store the objects sorted */
+	oarray = (struct obj **)alloc(n*sizeof(struct obj*));
+
+	/* Add objects to the array */
+	i = 0;
+	for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
+	  if ((*allow)(curr)) {
+	    if (iflags.sortloot == 'f' ||
+		(iflags.sortloot == 'l' && !(qflags & USE_INVLET)))
+	      {
+		/* Insert object at correct index */
+		for (j = i; j; j--)
+		  {
+		    if (sortloot_cmp(curr, oarray[j-1])>0) break;
+		    oarray[j] = oarray[j-1];
+		  }
+		oarray[j] = curr;
+		i++;
+	      } else {
+		/* Just add it to the array */
+		oarray[i++] = curr;
+	      }
+	  }
+	}
+#endif /* SORTLOOT */
+
 	win = create_nhwindow(NHW_MENU);
 	start_menu(win);
 	any.a_obj = (struct obj *) 0;
@@ -738,7 +779,12 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 	pack = flags.inv_order;
 	do {
 	    printed_type_name = FALSE;
+#ifdef SORTLOOT
+	    for (i = 0; i < n; i++) {
+		curr = oarray[i];
+#else /* SORTLOOT */
 	    for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
+#endif /* SORTLOOT */
 		if ((qflags & FEEL_COCKATRICE) && curr->otyp == CORPSE &&
 		     will_feel_cockatrice(curr, FALSE)) {
 			destroy_nhwindow(win);	/* stop the menu and revert */
@@ -751,13 +797,13 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 		    /* if sorting, print type name (once only) */
 		    if (qflags & INVORDER_SORT && !printed_type_name) {
 			any.a_obj = (struct obj *) 0;
-			add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings,
 					let_to_name(*pack, FALSE), MENU_UNSELECTED);
 			printed_type_name = TRUE;
 		    }
 
 		    any.a_obj = curr;
-		    add_menu(win, obj_to_glyph(curr), &any,
+		    add_menu(win, obj_to_glyph(curr), curr->quan, &any,
 			    qflags & USE_INVLET ? curr->invlet : 0,
 			    def_oc_syms[(int)objects[curr->otyp].oc_class],
 			    ATR_NONE, doname_with_price(curr), MENU_UNSELECTED);
@@ -766,6 +812,9 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 	    pack++;
 	} while (qflags & INVORDER_SORT && *pack);
 
+#ifdef SORTLOOT
+	free(oarray);
+#endif
 	end_menu(win, qstr);
 	n = select_menu(win, how, pick_list);
 	destroy_nhwindow(win);
@@ -805,6 +854,7 @@ int how;			/* type of query */
 	char invlet;
 	int ccount;
 	boolean do_unpaid = FALSE;
+	boolean do_unidentified = FALSE;
 	boolean do_blessed = FALSE, do_cursed = FALSE, do_uncursed = FALSE,
 	    do_buc_unknown = FALSE;
 	int num_buc_types = 0;
@@ -812,6 +862,7 @@ int how;			/* type of query */
 	*pick_list = (menu_item *) 0;
 	if (!olist) return 0;
 	if ((qflags & UNPAID_TYPES) && count_unpaid(olist)) do_unpaid = TRUE;
+	if ((qflags & UNIDENTIFIED_TYPES) && count_unidentified(olist)) do_unidentified = TRUE;
 	if ((qflags & BUC_BLESSED) && count_buc(olist, BUC_BLESSED)) {
 	    do_blessed = TRUE;
 	    num_buc_types++;
@@ -857,7 +908,7 @@ int how;			/* type of query */
 		invlet = 'a';
 		any.a_void = 0;
 		any.a_int = ALL_TYPES_SELECTED;
-		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
 		       (qflags & WORN_TYPES) ? "All worn types" : "All types",
 			MENU_UNSELECTED);
 		invlet = 'b';
@@ -874,7 +925,7 @@ int how;			/* type of query */
 		   if (!collected_type_name) {
 			any.a_void = 0;
 			any.a_int = curr->oclass;
-			add_menu(win, NO_GLYPH, &any, invlet++,
+			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet++,
 				def_oc_syms[(int)objects[curr->otyp].oc_class],
 				ATR_NONE, let_to_name(*pack, FALSE),
 				MENU_UNSELECTED);
@@ -893,7 +944,7 @@ int how;			/* type of query */
 		invlet = 'u';
 		any.a_void = 0;
 		any.a_int = 'u';
-		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
 			"Unpaid items", MENU_UNSELECTED);
 	}
 	/* billed items: checked by caller, so always include if BILLED_TYPES */
@@ -901,45 +952,53 @@ int how;			/* type of query */
 		invlet = 'x';
 		any.a_void = 0;
 		any.a_int = 'x';
-		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
 			 "Unpaid items already used up", MENU_UNSELECTED);
 	}
 	if (qflags & CHOOSE_ALL) {
 		invlet = 'A';
 		any.a_void = 0;
 		any.a_int = 'A';
-		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
 			(qflags & WORN_TYPES) ?
 			"Auto-select every item being worn" :
 			"Auto-select every item", MENU_UNSELECTED);
+	}
+	/* unidentifed items if there are any */
+	if (do_unidentified) {
+		invlet = 'I';
+		any.a_void = 0;
+		any.a_int = 'I';
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
+			"Unidentified items", MENU_UNSELECTED);
 	}
 	/* items with b/u/c/unknown if there are any */
 	if (do_blessed) {
 		invlet = 'B';
 		any.a_void = 0;
 		any.a_int = 'B';
-		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
 			"Items known to be Blessed", MENU_UNSELECTED);
 	}
 	if (do_cursed) {
 		invlet = 'C';
 		any.a_void = 0;
 		any.a_int = 'C';
-		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
 			"Items known to be Cursed", MENU_UNSELECTED);
 	}
 	if (do_uncursed) {
 		invlet = 'U';
 		any.a_void = 0;
 		any.a_int = 'U';
-		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
 			"Items known to be Uncursed", MENU_UNSELECTED);
 	}
 	if (do_buc_unknown) {
 		invlet = 'X';
 		any.a_void = 0;
 		any.a_int = 'X';
-		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
 			"Items of unknown B/C/U status",
 			MENU_UNSELECTED);
 	}
@@ -1904,20 +1963,20 @@ register struct obj *obj;
 			if (rot_alarm) obj->norevive = 1;
 		}
 	} else if (Is_mbag(current_container) && mbag_explodes(obj, 0)) {
+#ifdef LIVELOGFILE
+		livelog_generic("boh_explosion", dump_typename(obj->otyp));
+#endif
 		/* explicitly mention what item is triggering the explosion */
-		pline(
-	      "As you put %s inside, you are blasted by a magical explosion!",
-		      doname(obj));
+		pline( "As you put %s inside, you are blasted by a magical explosion!", doname(obj));
 		/* did not actually insert obj yet */
 		if (was_unpaid) addtobill(obj, FALSE, FALSE, TRUE);
 		obfree(obj, (struct obj *)0);
-		delete_contents(current_container);
-		if (!floor_container)
-			useup(current_container);
-		else if (obj_here(current_container, u.ux, u.uy))
-			useupf(current_container, obj->quan);
-		else
-			panic("in_container:  bag not found.");
+
+		/* dump it out onto the floor so the scatterage can take effect */
+		if (dump_container(current_container, TRUE)) {
+			pline("The contents fly everywhere!");
+		}
+		scatter(u.ux,u.uy,10,VIS_EFFECTS|MAY_HIT|MAY_DESTROY|MAY_FRACTURE,0);
 
 		losehp(d(6,6),"magical explosion", KILLED_BY_AN);
 		current_container = 0;	/* baggone = TRUE; */
@@ -2344,8 +2403,8 @@ boolean put_in;
     } else if (flags.menu_style == MENU_FULL) {
 	all_categories = FALSE;
 	Sprintf(buf,"%s what type of objects?", put_in ? putin : takeout);
-	mflags = put_in ? ALL_TYPES | BUC_ALLBKNOWN | BUC_UNKNOWN :
-		          ALL_TYPES | CHOOSE_ALL | BUC_ALLBKNOWN | BUC_UNKNOWN;
+	mflags = put_in ? ALL_TYPES | BUC_ALLBKNOWN | BUC_UNKNOWN | UNPAID_TYPES | UNIDENTIFIED_TYPES :
+		          ALL_TYPES | CHOOSE_ALL | BUC_ALLBKNOWN | BUC_UNKNOWN | UNPAID_TYPES | UNIDENTIFIED_TYPES;
 	n = query_category(buf, put_in ? invent : container->cobj,
 			   mflags, &pick_list, PICK_ANY);
 	if (!n) return 0;
@@ -2416,19 +2475,19 @@ boolean outokay, inokay;
     if (outokay) {
 	any.a_int = 1;
 	Sprintf(buf,"Take %s out of %s", something, the(xname(obj)));
-	add_menu(win, NO_GLYPH, &any, *menuselector, 0, ATR_NONE,
+	add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, *menuselector, 0, ATR_NONE,
 			buf, MENU_UNSELECTED);
     }
     menuselector++;
     if (inokay) {
 	any.a_int = 2;
 	Sprintf(buf,"Put %s into %s", something, the(xname(obj)));
-	add_menu(win, NO_GLYPH, &any, *menuselector, 0, ATR_NONE, buf, MENU_UNSELECTED);
+	add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, *menuselector, 0, ATR_NONE, buf, MENU_UNSELECTED);
     }
     menuselector++;
     if (outokay && inokay) {
 	any.a_int = 3;
-	add_menu(win, NO_GLYPH, &any, *menuselector, 0, ATR_NONE,
+	add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, *menuselector, 0, ATR_NONE,
 			"Both of the above", MENU_UNSELECTED);
     }
     end_menu(win, prompt);
@@ -2439,6 +2498,57 @@ boolean outokay, inokay;
 	free((genericptr_t) pick_list);
     }
     return n;
+}
+
+
+/** Dumps out a container, possibly as the prelude/result of an explosion.
+ * destroy_after trashes the container afterwards; try not to use it :P
+ *
+ * Player is assumed to not be handling the contents directly.
+ *
+ * Returns 1 if at least one object was present, 0 if empty.
+ */ 
+int
+dump_container(container, destroy_after)
+struct obj* container;
+BOOLEAN_P destroy_after;
+{
+	struct obj* otmp,*otmp2;
+	int ret = 0;
+
+	/* sanity check */
+	if (!container) { return 0; }
+
+	for (otmp = container->cobj; otmp; otmp = otmp2)
+	{
+		ret = 1;
+		otmp2 = otmp->nobj;
+		obj_extract_self(otmp);
+		container->owt = weight(container);
+
+		/* we do need to start the timer on these */
+		if (container->otyp == ICE_BOX && !age_is_relative(otmp)) {
+			otmp->age = monstermoves - otmp->age;
+			if (otmp->otyp == CORPSE) {
+				start_corpse_timeout(otmp);
+			}
+		}
+		place_object(otmp,u.ux,u.uy);
+
+		if (otmp->otyp == GOLD_PIECE) {
+			bot();	/* update character's gold piece count immediately */
+		}
+	}
+
+	if (destroy_after) {
+		if (container->where == OBJ_INVENT) {
+			useup(container);
+		} else if (obj_here(container, u.ux, u.uy)) {
+			useupf(container, container->quan);
+		}
+	}
+
+	return ret;
 }
 
 

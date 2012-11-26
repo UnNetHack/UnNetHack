@@ -265,6 +265,16 @@ register struct monst *mtmp;
 	if (is_orc(mtmp->data) && maybe_polyd(is_elf(youmonst.data),
 			Race_if(PM_ELF)))
 	    tmp++;
+#ifdef CONVICT
+    /* Adding iron ball as a weapon skill gives a -4 penalty for
+    unskilled vs no penalty for non-weapon objects.  Add 4 to
+    compensate. */
+    if (uwep && (uwep->otyp == HEAVY_IRON_BALL)) {
+        tmp += 4;   /* Compensate for iron ball weapon skill -4
+                    penalty for unskilled vs no penalty for non-
+                    weapon objects. */
+    }
+#endif /* CONVICT */
 	if(Role_if(PM_MONK) && !Upolyd) {
 	    if (uarm) {
 		Your("armor is rather cumbersome...");
@@ -638,7 +648,11 @@ int thrown;
     {
 	    Strcpy(saved_oname, cxname(obj));
 	    if(obj->oclass == WEAPON_CLASS || is_weptool(obj) ||
+#ifdef CONVICT
+	       obj->oclass == GEM_CLASS || obj->otyp == HEAVY_IRON_BALL) {
+#else
 	       obj->oclass == GEM_CLASS) {
+#endif /* CONVICT */
 
 		/* is it not a melee weapon? */
 		if (/* if you strike with a bow... */
@@ -1127,8 +1141,8 @@ int thrown;
 	if (disint_obj && obj) {
 		if (!hittxt) {
 			if (cansee(mon->mx, mon->my)) {
-				pline_The("%s %s!", mshot_xname(obj),
-				          (obj->oartifact) ? "dissolves" : "disintegrates");
+				pline("%s %s!", The(distant_name(obj,mshot_xname)),
+				          otense(obj, (obj->oartifact) ? "dissolve" : "disintegrate"));
 			} else {
 				pline("Vip!%s",
 				      (!thrown)? "  Your weapon vanishes from your grip!":"");
@@ -2232,6 +2246,7 @@ use_weapon:
 			if (i > 0 && is_vampire(youmonst.data) &&
 				(is_rider(mon->data) ||
 				 touch_petrifies(mon->data) ||
+				 touch_disintegrates(mon->data) ||
 				 mon->data == &mons[PM_MEDUSA] ||
 				 mon->data == &mons[PM_GREEN_SLIME]))
 			    break;
@@ -2240,7 +2255,7 @@ use_weapon:
 		case AT_TUCH:
 		case AT_BUTT:
 			if (i==0 && uwep && (youmonst.data->mlet==S_LICH)) goto use_weapon;
-			if ((uwep || u.twoweap && uswapwep) &&
+			if ((uwep || (u.twoweap && uswapwep)) &&
 				(touch_petrifies(mon->data) ||
 				 mon->data == &mons[PM_MEDUSA]))
 			    break;

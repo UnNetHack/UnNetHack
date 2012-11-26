@@ -487,6 +487,7 @@ ALTAR:(24,07),noalign,sanctum
 REGION:(22,12,25,16),unlit,"morgue"
 REGION:(32,09,37,12),lit,"shop"
 REGION:(12,00,15,04),lit,"shop"
+REGION:(02,14,05,16),lit,"candle shop"
 # Doors
 DOOR:closed,(23,02)
 DOOR:open,(31,03)
@@ -613,7 +614,6 @@ DOOR:random,(30,16)
 DOOR:random,(14,16)
 DOOR:closed,(11,14)
 DOOR:random,(03,16)
-DOOR:random,(05,05)
 DOOR:random,(05,03)
 DOOR:locked,(11,04)
 DOOR:nodoor,(26,04)
@@ -630,6 +630,8 @@ REGION:(56,01,65,07),unlit,"morgue"
 REGION:(01,14,05,15),unlit,"shop"
 REGION:(39,01,43,02),unlit,"shop"
 REGION:(18,03,25,05),unlit,"temple"
+REGION:(02,05,03,07),lit,"candle shop",filled,true
+DOOR:random,(05,05)
 ALTAR:(20,04),noncoaligned,altar
 OBJECT:('%',"corpse"),(23,03),montype:"priest",0
 # Some traps.
@@ -838,11 +840,11 @@ MAP
          |...|            ###           |}}}}----|......|          #        
          |...|              #  ###       }}}}| |.+......+###########        
      -----+++-----    ####  #  #         }}}}  |.+......+###########        
-     |...........|    #     ######  ----  }}}} --|......|          #        
-     |...........S#####     #    #  |..|  }}}}   --------       ---+---     
-     |...........|    #     #    ###+..|   }}}}                 |.....|     
-     |.....\.....|    #######       |..|   }}}}                 |.....|     
-     -------------                  ----  }}}}                  -------     
+     |...........|    #     ######  ----}}}}}  --|......|          #        
+     |...........S#####     #    #  |...}}}}}    --------       ---+---     
+     |...........|    #     #    ###+..| }}}}}                  |.....|     
+     |.....\.....|    #######       |..| }}}}}                  |.....|     
+     -------------                  ----}}}}}                   -------     
 ENDMAP
 STAIR:(65,17),up
 STAIR:(11,16),down
@@ -899,6 +901,8 @@ MONSTER:('&',"succubus"),(13,17),asleep
 MONSTER:('&',"incubus"),(11,18),asleep
 MONSTER:('&',"barbed devil"),(10,13),asleep
 MONSTER:('&',"barbed devil"),(12,13),asleep
+# A back door opportunity
+MONSTER:('m',"giant mimic"), (39,16), m_feature "wall"
 # A few traps on the way in
 TRAP:"board",(10,12)
 TRAP:"board",(11,12)
@@ -956,7 +960,7 @@ GOLD:500,(38,18)
 OBJECT:('"',"amulet of change"),(37,16)
 OBJECT:('=',"hunger"),(37,18),cursed,0
 OBJECT:('*',"diamond"),(38,16),cursed,0,NAME:"The Tears of Koth"
-OBJECT:('*',"ruby"),(38,17),cursed,0,NAME:"The Heart of Cassanova" 
+OBJECT:('*',"ruby"),(38,17),cursed,0,NAME:"The Heart of Casanova" 
 OBJECT:('*',"emerald"),(38,18),cursed,0,NAME:"The Eye of Hera"
 MONSTER:'&',(38,16)
 MONSTER:'&',(38,17)

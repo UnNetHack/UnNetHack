@@ -718,7 +718,7 @@ xchar x, y;
 	if (u.ux0 != u.ux || u.uy0 != u.uy) {
 	    spoteffects(TRUE);
 	    if (In_sokoban(&u.uz))
-		change_luck(-1);	/* Sokoban guilt */
+		sokoban_trickster();	/* Sokoban guilt */
 	}
     }
 }

@@ -361,7 +361,7 @@ boolean td;	/* td == TRUE : trap door or hole */
 	    dont_fall = "are jerked back by your pet!";
 	}
 	if (dont_fall) {
-	    You(dont_fall);
+	    You("%s", dont_fall);
 	    /* hero didn't fall through, but any objects here might */
 	    impact_drop((struct obj *)0, u.ux, u.uy, 0);
 	    if (!td) {
@@ -379,7 +379,7 @@ boolean td;	/* td == TRUE : trap door or hole */
 			"fall down a shaft!",
 			"fall down a deep shaft!",
 			"keep falling down a really deep shaft!",
-			"keep falling down an unbelievable deep shaft!",
+			"keep falling down an unbelievably deep shaft!",
 		};
 		/* TODO: Hallucination messages */
 
@@ -393,10 +393,10 @@ boolean td;	/* td == TRUE : trap door or hole */
 	    case 3:
 	    case 4:
 	    case 5:
-		    You(falling_down_msgs[newlevel-currentlevel-2]);
+		    You("%s", falling_down_msgs[newlevel-currentlevel-2]);
 		    break;
 	    default:
-		    You("are falling down an unbelievable deep shaft!");
+		    You("are falling down an unbelievably deep shaft!");
 		    pline("While falling you wonder how unlikely it is to find such a deep shaft."); /* (1/4)^5 ~= 0.1% */
 		    break;
 	    }
@@ -1615,7 +1615,8 @@ long ocount;
 		cc.x = x; cc.y = y;
 		/* Prevent boulder from being placed on water */
 		if (ttmp->ttyp == ROLLING_BOULDER_TRAP
-				&& is_pool(x+distance*dx,y+distance*dy))
+				&& (is_pool(x+distance*dx,y+distance*dy) ||
+				    is_lava(x+distance*dx,y+distance*dy)))
 			success = FALSE;
 		else success = isclearpath(&cc, distance, dx, dy);
 		if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {
@@ -2378,6 +2379,10 @@ float_up()
 		} else if (u.utraptype == TT_INFLOOR) {
 			Your("body pulls upward, but your %s are still stuck.",
 			     makeplural(body_part(LEG)));
+		} else if (u.utraptype == TT_SWAMP) {
+			You("float up, out of the swamp.");
+			u.utrap = 0;
+			u.utraptype = 0;
 		} else {
 			You("float up, only your %s is still stuck.",
 				body_part(LEG));
@@ -2441,7 +2446,8 @@ long hmask, emask;     /* might cancel timeout */
 	ELevitation &= ~emask;
 	if(Levitation) return(0); /* maybe another ring/potion/boots */
 	if(u.uswallow) {
-	    You("float down, but you are still %s.",
+	    You((Flying) ? "feel less buoyant, but you are still %s.":
+	                   "float down, but you are still %s.",
 		is_animal(u.ustuck->data) ? "swallowed" : "engulfed");
 	    return(1);
 	}
@@ -2485,11 +2491,16 @@ long hmask, emask;     /* might cancel timeout */
 			(void) lava_effects();
 			no_msg = TRUE;
 		}
+		if(is_swamp(u.ux,u.uy) && !Wwalking) {
+			(void) swamp_effects();
+			no_msg = TRUE;
+		}
 	}
 	if (!trap) {
 	    trap = t_at(u.ux,u.uy);
 	    if(Is_airlevel(&u.uz))
-		You("begin to tumble in place.");
+		if (Flying) You("feel less buoyant.");
+		else You("begin to tumble in place.");
 	    else if (Is_waterlevel(&u.uz) && !no_msg)
 		You_feel("heavier.");
 	    /* u.uinwater msgs already in spoteffects()/drown() */
@@ -2506,7 +2517,8 @@ long hmask, emask;     /* might cancel timeout */
 			      "hit the ground");
 		    else {
 			if (!sokoban_trap)
-			    You("float gently to the %s.",
+			    if (Flying) You("feel less buoyant.");
+			    else You("float gently to the %s.",
 				surface(u.ux, u.uy));
 			else {
 			    /* Justification elsewhere for Sokoban traps
@@ -2626,7 +2638,7 @@ domagictrap()
 	  if (!resists_blnd(&youmonst)) {
 		You("are momentarily blinded by a flash of light!");
 		make_blinded((long)rn1(5,10),FALSE);
-		if (!Blind) Your(vision_clears);
+		if (!Blind) Your("%s", vision_clears);
 	  } else if (!Blind) {
 		You("see a flash of light!");
 	  }  else
@@ -3455,7 +3467,7 @@ struct trap *ttmp;
 	struct obj *otmp;
 	boolean uprob;
 #ifdef WEBB_DISINT
-	boolean udied;
+	boolean udied = FALSE;
 	boolean can_disint = (touch_disintegrates(mtmp->data) &&
 	                      !mtmp->mcan &&
 	                       mtmp->mhp>6);
@@ -4142,6 +4154,14 @@ lava_effects()
 	for(obj = invent; obj; obj = obj2) {
 	    obj2 = obj->nobj;
 	    if(is_organic(obj) && !obj->oerodeproof) {
+		/* prevent the Book of the Dead from being destroyed when
+		 * the player falls into lava. */
+		if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
+			if (!Blind && usurvive)
+				pline("%s glows a strange %s, but remains intact.",
+						The(xname(obj)), hcolor("dark red"));
+			continue;
+		}
 		if(obj->owornmask) {
 		    if (usurvive)
 			Your("%s into flame!", aobjnam(obj, "burst"));
@@ -4202,6 +4222,50 @@ burn_stuff:
     destroy_item(SPBOOK_CLASS, AD_FIRE);
     destroy_item(POTION_CLASS, AD_FIRE);
     return(FALSE);
+}
+
+boolean
+swamp_effects()
+{
+	static int mudboots = 0;
+	int i;
+	boolean swampok;
+
+	if (!mudboots && uarmf) {
+	    const char *s;
+	    if ((s = OBJ_DESCR(objects[uarmf->otyp])) != (char *)0 &&
+		!strncmp(s, "mud ", 4))
+		mudboots = uarmf->otyp;
+	}
+	swampok = (Wwalking || (uarmf && uarmf->otyp == mudboots));
+	if (!swampok) {
+		if (u.utraptype != TT_SWAMP) {
+		    if (!Swimming && !Amphibious) {
+			You("step into muddy swamp.");
+			u.utrap = rnd(3);
+			u.utraptype = TT_SWAMP;
+		    } else
+			Norep("You are swimming in the muddy water.");
+		}
+	}
+
+	if (!swampok) {
+	    if (!rn2(5)) {
+		Your("baggage gets wet.");
+		water_damage(invent, FALSE, FALSE);
+	    } else if (uarmf)
+		rust_dmg(uarmf, "boots", 1/*rust*/, TRUE, &youmonst);
+	}
+
+	if (u.umonnum == PM_GREMLIN && rn2(3))
+	    (void)split_mon(&youmonst, (struct monst *)0);
+	else if (u.umonnum == PM_IRON_GOLEM) {
+	    You("rust!");
+	    i = rnd(6);
+	    if (u.mhmax > i) u.mhmax -= i;
+	    losehp(i, "rusting away", KILLED_BY);
+	}
+	return(FALSE);
 }
 
 #endif /* OVLB */

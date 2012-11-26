@@ -35,6 +35,7 @@ static struct trobj Archeologist[] = {
 	{ TINNING_KIT, UNDEF_SPE, TOOL_CLASS, 1, UNDEF_BLESS },
 	{ TOUCHSTONE, 0, GEM_CLASS, 1, 0 },
 	{ SACK, 0, TOOL_CLASS, 1, 0 },
+
 	{ 0, 0, 0, 0, 0 }
 };
 static struct trobj Barbarian[] = {
@@ -55,6 +56,13 @@ static struct trobj Cave_man[] = {
 	{ LEATHER_ARMOR, 0, ARMOR_CLASS, 1, UNDEF_BLESS },
 	{ 0, 0, 0, 0, 0 }
 };
+#ifdef CONVICT
+static struct trobj Convict[] = {
+	{ ROCK, 0, GEM_CLASS, 1, 0 },
+	{ STRIPED_SHIRT, 0, ARMOR_CLASS, 1, 0 },
+	{ 0, 0, 0, 0, 0 }
+};
+#endif  /* CONVICT */
 static struct trobj Healer[] = {
 	{ SCALPEL, 0, WEAPON_CLASS, 1, UNDEF_BLESS },
 	{ LEATHER_GLOVES, 1, ARMOR_CLASS, 1, UNDEF_BLESS },
@@ -304,6 +312,20 @@ static const struct def_skill Skill_C[] = {
     { P_BARE_HANDED_COMBAT, P_MASTER },
     { P_NONE, 0 }
 };
+
+#ifdef CONVICT
+static const struct def_skill Skill_Con[] = {
+    { P_DAGGER, P_SKILLED },		{ P_KNIFE,  P_EXPERT },
+    { P_HAMMER, P_SKILLED },		{ P_PICK_AXE, P_EXPERT },
+    { P_CLUB, P_EXPERT },		    { P_MACE, P_BASIC },
+    { P_DART, P_SKILLED },		    { P_FLAIL, P_EXPERT },
+    { P_SHORT_SWORD, P_BASIC },		{ P_SLING, P_SKILLED },
+    { P_ATTACK_SPELL, P_BASIC },	{ P_ESCAPE_SPELL, P_EXPERT },
+    { P_TWO_WEAPON_COMBAT, P_SKILLED },
+    { P_BARE_HANDED_COMBAT, P_SKILLED },
+    { P_NONE, 0 }
+};
+#endif  /* CONVICT */
 
 static const struct def_skill Skill_H[] = {
     { P_DAGGER, P_SKILLED },		{ P_KNIFE, P_EXPERT },
@@ -648,6 +670,19 @@ u_init()
 		ini_inv(Cave_man);
 		skill_init(Skill_C);
 		break;
+#ifdef CONVICT
+	case PM_CONVICT:
+        ini_inv(Convict);
+        knows_object(SKELETON_KEY);
+        knows_object(GRAPPLING_HOOK);
+        skill_init(Skill_Con);
+        u.uhunger = 200;  /* On the verge of hungry */
+    	u.ualignbase[A_CURRENT] = u.ualignbase[A_ORIGINAL] =
+        u.ualign.type = A_CHAOTIC; /* Override racial alignment */
+        urace.hatemask |= urace.lovemask;   /* Hated by the race's allies */
+        urace.lovemask = 0; /* Convicts are pariahs of their race */
+        break;
+#endif	/* CONVICT */
 	case PM_HEALER:
 #ifndef GOLDOBJ
 		u.ugold = u.ugold0 = rn1(1000, 1001);
@@ -808,6 +843,9 @@ u_init()
 	case PM_ORC:
 	    /* compensate for generally inferior equipment */
 	    if (!Role_if(PM_WIZARD))
+#ifdef CONVICT
+        if (!Role_if(PM_CONVICT))
+#endif /* CONVICT */
 		ini_inv(Xtra_food);
 	    /* Orcs can recognize all orcish objects */
 	    knows_object(ORCISH_SHORT_SWORD);
@@ -901,6 +939,9 @@ int otyp;
      case PM_ARCHEOLOGIST:	skills = Skill_A; break;
      case PM_BARBARIAN:		skills = Skill_B; break;
      case PM_CAVEMAN:		skills = Skill_C; break;
+#ifdef CONVICT
+     case PM_CONVICT:		skills = Skill_Con; break;
+#endif  /* CONVICT */
      case PM_HEALER:		skills = Skill_H; break;
      case PM_KNIGHT:		skills = Skill_K; break;
      case PM_MONK:		skills = Skill_Mon; break;
@@ -1042,6 +1083,11 @@ register struct trobj *trop;
 				is_graystone(obj) && obj->otyp != FLINT) {
 			    obj->quan = 1L;
 			}
+#ifdef CONVICT
+            if (obj->otyp == STRIPED_SHIRT ) {
+                obj->cursed = TRUE;
+            }
+#endif /* CONVICT */
 			if (trop->trspe != UNDEF_SPE)
 			    obj->spe = trop->trspe;
 			if (trop->trbless != UNDEF_BLESS)

@@ -231,7 +231,6 @@ mk_split_room()
 {
     NhRect *r1 = rnd_rect();
     NhRect r2;
-    int area;
     xchar hx, hy, lx, ly, wid, hei;
     xchar rlit;
     struct mkroom *troom;
@@ -247,7 +246,6 @@ mk_split_room()
     lx = ((hx < 1) ? 0 : rn2(hx)) + 1;
     ly = ((hy < 1) ? 0 : rn2(hy)) + 1;
 
-    area = wid*hei;
     if (!check_room(&lx, &wid, &ly, &hei, FALSE)) return;
     if (wid < 5 || hei < 5) return;
 
@@ -571,6 +569,8 @@ static const char * const illuminati_engravings[] = {
 	"Jeder Gedanke ist verschenkt, wenn Adam Weishaupt fuer dich denkt", /* Welle:Erdball */
 	"Novus Ordo Seclorum",
 	"Think for yourself, schmuck",
+	"Adam Weishaupt wasn't here!",
+	"Nothing is True, Everything is Permitted", /* Hassan-i Sabbah */
 };
 /* Quotes from or about the Hitchhikers Guide to the Galaxy */
 static const char * const hhgtg_engravings[] = {
@@ -759,6 +759,7 @@ clear_level_structures()
 	level.flags.is_maze_lev = 0;
 	level.flags.is_cavernous_lev = 0;
 	level.flags.stormy = 0;
+	level.flags.sky = 0;
 
 	nroom = 0;
 	rooms[0].hx = -1;

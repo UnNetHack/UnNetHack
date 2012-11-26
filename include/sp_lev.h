@@ -29,6 +29,7 @@
 #define SHROUD		0x00000200L
 #define STORMY		0x00000400L
 #define GRAVEYARD	0x00000800L
+#define SKYMAP		0x00001000L
 
 /* different level layout initializers */
 #define LVLINIT_NONE		0

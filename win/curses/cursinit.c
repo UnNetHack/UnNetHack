@@ -15,6 +15,26 @@
 #define UNNETHACK_CURSES    3
 #define SPORKHACK_CURSES    4
 
+/* array to save initial terminal colors for later restoration */
+
+typedef struct nhrgb_type
+{
+    short r;
+    short g;
+    short b;
+} nhrgb;
+
+nhrgb orig_yellow;
+nhrgb orig_white;
+nhrgb orig_darkgray;
+nhrgb orig_hired;
+nhrgb orig_higreen;
+nhrgb orig_hiyellow;
+nhrgb orig_hiblue;
+nhrgb orig_himagenta;
+nhrgb orig_hicyan;
+nhrgb orig_hiwhite;
+
 /* Banners used for an optional ASCII splash screen */
 
 #define NETHACK_SPLASH_A \
@@ -560,10 +580,34 @@ void curses_init_nhcolors()
 
         if (can_change_color())
         {
+            /* Preserve initial terminal colors */
+            color_content(COLOR_YELLOW, &orig_yellow.r, &orig_yellow.g,
+             &orig_yellow.b);
+            color_content(COLOR_WHITE, &orig_white.r, &orig_white.g,
+             &orig_white.b);
+            
+            /* Set colors to appear as NetHack expects */
             init_color(COLOR_YELLOW, 500, 300, 0);
             init_color(COLOR_WHITE, 600, 600, 600);
             if (COLORS >= 16)
             {
+                /* Preserve initial terminal colors */
+                color_content(COLOR_RED + 8, &orig_hired.r,
+                 &orig_hired.g, &orig_hired.b);
+                color_content(COLOR_GREEN + 8, &orig_higreen.r,
+                 &orig_higreen.g, &orig_higreen.b);
+                color_content(COLOR_YELLOW + 8, &orig_hiyellow.r,
+                 &orig_hiyellow.g, &orig_hiyellow.b);
+                color_content(COLOR_BLUE + 8, &orig_hiblue.r,
+                 &orig_hiblue.g, &orig_hiblue.b);
+                color_content(COLOR_MAGENTA + 8, &orig_himagenta.r,
+                 &orig_himagenta.g, &orig_himagenta.b);
+                color_content(COLOR_CYAN + 8, &orig_hicyan.r,
+                 &orig_hicyan.g, &orig_hicyan.b);
+                color_content(COLOR_WHITE + 8, &orig_hiwhite.r,
+                 &orig_hiwhite.g, &orig_hiwhite.b);
+            
+                /* Set colors to appear as NetHack expects */
                 init_color(COLOR_RED + 8, 1000, 500, 0);
                 init_color(COLOR_GREEN + 8, 0, 1000, 0);
                 init_color(COLOR_YELLOW + 8, 1000, 1000, 0);
@@ -688,19 +732,19 @@ void curses_choose_character()
 	    win = curses_get_wid(NHW_MENU);
         curses_create_nhmenu(win);
 	    any.a_int = 1;
-	    curses_add_menu(win, NO_GLYPH, &any, 'v', 0, ATR_NONE,
+	    curses_add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'v', 0, ATR_NONE,
 		     "lawful female dwarf Valkyrie (uses melee and thrown weapons)",
 		     MENU_UNSELECTED);
 	    any.a_int = 2;
-	    curses_add_menu(win, NO_GLYPH, &any, 'w', 0, ATR_NONE,
+	    curses_add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'w', 0, ATR_NONE,
 		     "chaotic male elf Wizard (relies mostly on spells)",
 		     MENU_UNSELECTED);
 	    any.a_int = 3;
-	    curses_add_menu(win, NO_GLYPH, &any, 'R', 0, ATR_NONE,
+	    curses_add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'R', 0, ATR_NONE,
 		     "neutral female human Ranger (good with ranged combat)",
 		     MENU_UNSELECTED);
 	    any.a_int = 4;
-	    curses_add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE,
+	    curses_add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'q', 0, ATR_NONE,
 		     "quit", MENU_UNSELECTED);
 	    curses_end_menu(win, "What character do you want to try?");
 	    n = curses_select_menu(win, PICK_ONE, &selected);
@@ -969,19 +1013,19 @@ int curses_character_dialog(const char** choices, const char *prompt)
         }
 
         identifier.a_int = (count + 1); /* Must be non-zero */
-        curses_add_menu(wid, NO_GLYPH, &identifier, curletter, 0,
+        curses_add_menu(wid, NO_GLYPH, MENU_DEFCNT, &identifier, curletter, 0,
          A_NORMAL, choices[count], FALSE);
         used_letters[count] = curletter;
     }
 
     /* Random Selection */
     identifier.a_int = ROLE_RANDOM;
-    curses_add_menu(wid, NO_GLYPH, &identifier, '*', 0, A_NORMAL, "Random",
+    curses_add_menu(wid, NO_GLYPH, MENU_DEFCNT, &identifier, '*', 0, A_NORMAL, "Random",
      FALSE);    
     
     /* Quit prompt */
     identifier.a_int = ROLE_NONE;
-    curses_add_menu(wid, NO_GLYPH, &identifier, 'q', 0, A_NORMAL, "Quit",
+    curses_add_menu(wid, NO_GLYPH, MENU_DEFCNT, &identifier, 'q', 0, A_NORMAL, "Quit",
      FALSE);    
     curses_end_menu(wid, prompt);
     ret = curses_select_menu(wid, PICK_ONE, &selected);
@@ -1195,3 +1239,45 @@ void curses_display_splash_window()
 #endif
     refresh();
 }
+
+
+/* Resore colors and cursor state before exiting */
+
+void curses_cleanup()
+{
+#ifdef TEXTCOLOR
+    if (has_colors() && can_change_color())
+    {
+        init_color(COLOR_YELLOW, orig_yellow.r, orig_yellow.g,
+         orig_yellow.b);
+        init_color(COLOR_WHITE, orig_white.r, orig_white.g,
+         orig_white.b);
+         
+        if (COLORS >= 16)
+        {
+            init_color(COLOR_RED + 8, orig_hired.r, orig_hired.g,
+             orig_hired.b);
+            init_color(COLOR_GREEN + 8, orig_higreen.r, orig_higreen.g,
+             orig_higreen.b);
+            init_color(COLOR_YELLOW + 8, orig_hiyellow.r,
+             orig_hiyellow.g, orig_hiyellow.b);
+            init_color(COLOR_BLUE + 8, orig_hiblue.r, orig_hiblue.g,
+             orig_hiblue.b);
+            init_color(COLOR_MAGENTA + 8, orig_himagenta.r,
+             orig_himagenta.g, orig_himagenta.b);
+            init_color(COLOR_CYAN + 8, orig_hicyan.r, orig_hicyan.g,
+             orig_hicyan.b);
+            init_color(COLOR_WHITE + 8, orig_hiwhite.r, orig_hiwhite.g,
+             orig_hiwhite.b);
+# ifdef USE_DARKGRAY
+            if (COLORS > 16)
+            {
+                init_color(CURSES_DARK_GRAY, orig_darkgray.r,
+             orig_darkgray.g, orig_darkgray.b);
+            }
+# endif
+        }
+    }
+#endif
+}
+

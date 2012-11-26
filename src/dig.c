@@ -15,7 +15,6 @@ STATIC_DCL void FDECL(mkcavepos, (XCHAR_P,XCHAR_P,int,BOOLEAN_P,BOOLEAN_P));
 STATIC_DCL void FDECL(mkcavearea, (BOOLEAN_P));
 STATIC_DCL int FDECL(dig_typ, (struct obj *,XCHAR_P,XCHAR_P));
 STATIC_DCL int NDECL(dig);
-STATIC_DCL schar FDECL(fillholetyp, (int, int));
 STATIC_DCL void NDECL(dig_up_grave);
 
 /* Indices returned by dig_typ() */
@@ -140,7 +139,7 @@ xchar x, y;
 	return (ispick && sobj_at(STATUE, x, y) ? DIGTYP_STATUE :
 		ispick && sobj_at(BOULDER, x, y) ? DIGTYP_BOULDER :
 		closed_door(x, y) ? DIGTYP_DOOR :
-		IS_TREE(levl[x][y].typ) ?
+		IS_TREES(levl[x][y].typ) ?
 			(ispick ? DIGTYP_UNDIGGABLE : DIGTYP_TREE) :
 		ispick && IS_ROCK(levl[x][y].typ) &&
 			(!level.flags.arboreal || IS_WALL(levl[x][y].typ)) ?
@@ -232,7 +231,7 @@ dig()
 	if (digging.down) {
 	    if(!dig_check(BY_YOU, TRUE, u.ux, u.uy)) return(0);
 	} else { /* !digging.down */
-	    if (IS_TREE(lev->typ) && !may_dig(dpx,dpy) &&
+	    if (IS_TREES(lev->typ) && !may_dig(dpx,dpy) &&
 			dig_typ(uwep, dpx, dpy) == DIGTYP_TREE) {
 		pline("This tree seems to be petrified.");
 		return(0);
@@ -280,6 +279,8 @@ dig()
 	digging.effort += 10 + rn2(5) + abon() +
 			   uwep->spe - greatest_erosion(uwep) + u.udaminc;
 	if (Race_if(PM_DWARF))
+	    digging.effort *= 2;
+	if (lev->typ == DEADTREE)
 	    digging.effort *= 2;
 	if (digging.down) {
 		register struct trap *ttmp;
@@ -332,7 +333,7 @@ dig()
 			}
 			digtxt = "The boulder falls apart.";
 		} else if (lev->typ == STONE || lev->typ == SCORR ||
-				IS_TREE(lev->typ)) {
+				IS_TREES(lev->typ)) {
 			if(Is_earthlevel(&u.uz)) {
 			    if(uwep->blessed && !rn2(3)) {
 				mkcavearea(FALSE);
@@ -343,7 +344,7 @@ dig()
 				goto cleanup;
 			    }
 			}
-			if (IS_TREE(lev->typ)) {
+			if (IS_TREES(lev->typ)) {
 			    digtxt = "You cut down the tree.";
 			    lev->typ = ROOM;
 			    if (!rn2(5)) (void) rnd_treefruit_at(dpx, dpy);
@@ -387,7 +388,7 @@ dig()
 		    feel_location(dpx, dpy);
 		else
 		    newsym(dpx, dpy);
-		if(digtxt && !digging.quiet) pline(digtxt); /* after newsym */
+		if(digtxt && !digging.quiet) pline("%s", digtxt); /* after newsym */
 		if(dmgtxt)
 		    pay_for_damage(dmgtxt, FALSE);
 
@@ -449,7 +450,6 @@ holetime()
 }
 
 /* Return typ of liquid to fill a hole with, or ROOM, if no liquid nearby */
-STATIC_OVL
 schar
 fillholetyp(x,y)
 int x, y;
@@ -457,8 +457,9 @@ int x, y;
     register int x1, y1;
     int lo_x = max(1,x-1), hi_x = min(x+1,COLNO-1),
 	lo_y = max(0,y-1), hi_y = min(y+1,ROWNO-1);
-    int pool_cnt = 0, moat_cnt = 0, lava_cnt = 0;
+    int pool_cnt = 0, moat_cnt = 0, lava_cnt = 0, swamp_cnt = 0;
 
+    /* count the terrain types at and around x,y including those under drawbridges */
     for (x1 = lo_x; x1 <= hi_x; x1++)
 	for (y1 = lo_y; y1 <= hi_y; y1++)
 	    if (levl[x1][y1].typ == POOL)
@@ -471,6 +472,10 @@ int x, y;
 		    (levl[x1][y1].typ == DRAWBRIDGE_UP &&
 			(levl[x1][y1].drawbridgemask & DB_UNDER) == DB_LAVA))
 		lava_cnt++;
+	    else if (levl[x1][y1].typ == BOG ||
+		    (levl[x1][y1].typ == DRAWBRIDGE_UP &&
+			(levl[x1][y1].drawbridgemask & DB_UNDER) == DB_BOG))
+		swamp_cnt++;
     pool_cnt /= 3;		/* not as much liquid as the others */
 
     if (lava_cnt > moat_cnt + pool_cnt && rn2(lava_cnt + 1))
@@ -479,6 +484,8 @@ int x, y;
 	return MOAT;
     else if (pool_cnt > 0 && rn2(pool_cnt + 1))
 	return POOL;
+    else if (swamp_cnt > 0 && rn2(swamp_cnt + 1))
+	return BOG;
     else
 	return ROOM;
 }
@@ -727,7 +734,8 @@ boolean pit_only;
 		}
 
 		lev->drawbridgemask &= ~DB_UNDER;
-		lev->drawbridgemask |= (typ == LAVAPOOL) ? DB_LAVA : DB_MOAT;
+		lev->drawbridgemask |= (typ == LAVAPOOL) ? DB_LAVA :
+				       (typ == BOG) ? DB_BOG : DB_MOAT;
 
  liquid_flow:
 		if (ttmp) (void) delfloortrap(ttmp);
@@ -739,7 +747,7 @@ boolean pit_only;
 		if (!Levitation && !Flying) {
 		    if (typ == LAVAPOOL)
 			(void) lava_effects();
-		    else if (!Wwalking)
+		    else if (!Wwalking && typ != BOG)
 			(void) drown();
 		}
 		return TRUE;
@@ -931,7 +939,7 @@ struct obj *obj;
 			} else if (lev->typ == IRONBARS) {
 			    pline("Clang!");
 			    wake_nearby();
-			} else if (IS_TREE(lev->typ))
+			} else if (IS_TREES(lev->typ))
 			    You("need an axe to cut down a tree.");
 			else if (IS_ROCK(lev->typ))
 			    You("need a pick to dig rock.");
@@ -1240,7 +1248,6 @@ zap_dig()
 		room->doormask = D_NODOOR;
 		unblock_point(zx,zy); /* vision */
 		digdepth -= 2;
-		if (maze_dig) break;
 	    } else if (maze_dig) {
 		if (IS_WALL(room->typ)) {
 		    if (!(room->wall_info & W_NONDIGGABLE)) {
@@ -1250,23 +1257,29 @@ zap_dig()
 			}
 			room->typ = ROOM;
 			unblock_point(zx,zy); /* vision */
-		    } else if (!Blind)
-			pline_The("wall glows then fades.");
-		    break;
+			digdepth -= 2;
+		    } else {
+			if (!Blind) pline_The("wall glows then fades.");
+			digdepth = 0;
+		    }
 		} else if (IS_TREE(room->typ)) { /* check trees before stone */
 		    if (!(room->wall_info & W_NONDIGGABLE)) {
 			room->typ = ROOM;
 			unblock_point(zx,zy); /* vision */
-		    } else if (!Blind)
-			pline_The("tree shudders but is unharmed.");
-		    break;
+			digdepth -= 2;
+		    } else {
+			if (!Blind) pline_The("tree shudders but is unharmed.");
+			digdepth = 0;
+		    }
 		} else if (room->typ == STONE || room->typ == SCORR) {
 		    if (!(room->wall_info & W_NONDIGGABLE)) {
 			room->typ = CORR;
 			unblock_point(zx,zy); /* vision */
-		    } else if (!Blind)
-			pline_The("rock glows then fades.");
-		    break;
+			digdepth -= 2;
+		    } else {
+			if (!Blind) pline_The("rock glows then fades.");
+			digdepth = 0;
+		    }
 		}
 	    } else if (IS_ROCK(room->typ)) {
 		if (!may_dig(zx,zy)) break;

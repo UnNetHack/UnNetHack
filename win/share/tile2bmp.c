@@ -17,7 +17,7 @@
 #include "win32api.h"
 #endif
 
-/* #define COLORS_IN_USE MAXCOLORMAPSIZE       /* 256 colors */
+/* #define COLORS_IN_USE MAXCOLORMAPSIZE */    /* 256 colors */
 #if (TILE_X==32)
 #define COLORS_IN_USE 256
 #else

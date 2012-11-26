@@ -72,7 +72,7 @@ static const char *random_mesg[] = {
 	"What's the sitch?", /* Kim Possible */
 	"So not the drama.", /* Kim Possible */
 	"Sudden decompression sucks!", /* Space Quest 3 death message */
-	"Thanks for playing UnNetHack.  As usual, you've been a real pantload!" /* Space Quest 4 death message, paraphrased */
+	"Thanks for playing UnNetHack.  As usual, you've been a real pantload!", /* Space Quest 4 death message, paraphrased */
 	"Colorless green ideas sleep furiously.", /* Noam Chomsky */
 	"Time flies like an arrow.", /* linguistic humor */
 	"All Your Base Are Belong To Us!", /* Zero Wing */
@@ -82,6 +82,7 @@ static const char *random_mesg[] = {
 	"The Truth is Out There", /* X-Files */
 	"Look behind you, a Three-Headed Monkey!", /* Monkey Island */
 	"Ifnkovhgroghprm", /* Kings Quest I */
+	"Cookies are delicious delicacies", /* Mozilla Firefox */
 };
 
 char *
@@ -218,6 +219,8 @@ register int x, y;
 	    return "headstone";
 	else if(IS_FOUNTAIN(levl[x][y].typ))
 	    return "fountain";
+	else if (is_swamp(x,y))
+	    return "swamp";
 	else if ((IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz)) ||
 		 IS_WALL(lev->typ) || IS_DOOR(lev->typ) || lev->typ == SDOOR)
 	    return "floor";
@@ -568,7 +571,7 @@ boolean fingers;
 	ebuf[0] = (char)0;
 	post_engr_text[0] = (char)0;
 	maxelen = BUFSZ - 1;
-	if (is_demon(youmonst.data) || youmonst.data->mlet == S_VAMPIRE)
+	if (is_demon(youmonst.data) || is_vampire(youmonst.data))
 	    type = ENGR_BLOOD;
 
 	/* Can the adventurer engrave at all? */
@@ -588,7 +591,8 @@ boolean fingers;
 	} else if (Underwater) {
 		You_cant("write underwater!");
 		return(0);
-	} else if (is_pool(u.ux,u.uy) || IS_FOUNTAIN(levl[u.ux][u.uy].typ)) {
+	} else if (is_pool(u.ux,u.uy) || IS_FOUNTAIN(levl[u.ux][u.uy].typ) ||
+		   is_swamp(u.ux,u.uy)) {
 		You_cant("write on the water!");
 		return(0);
 	}
@@ -1003,12 +1007,13 @@ boolean fingers;
 		c = yn_function("Do you want to add to the current engraving?",
 				ynqchars, 'y');
 		if (c == 'q') {
-		    pline(Never_mind);
+		    pline("%s", Never_mind);
 		    return(0);
 		}
 	    }
 
-	    if (c == 'n' || Blind) {
+	    if (c == 'n' || Blind ||
+	        (engraving && (oep->engr_type != type))) {
 
 		if( (oep->engr_type == DUST) || (oep->engr_type == ENGR_BLOOD) ||
 		    (oep->engr_type == MARK) ) {
@@ -1095,7 +1100,7 @@ boolean fingers;
 	if(u.roleplay.illiterate) {
 	    Sprintf(ebuf,"X");
 	} else if (engraving) {
-	    Sprintf(ebuf, engraving);
+	    Sprintf(ebuf, "%s", engraving);
 	} else {
 	    Sprintf(qbuf,"What do you want to %s %s the %s here?", everb,
 		eloc, eground);
@@ -1113,7 +1118,7 @@ boolean fingers;
 			  Tobjnam(otmp, "glow"), otense(otmp, "fade"));
 		return(1);
 	    } else {
-		pline(Never_mind);
+		pline("%s", Never_mind);
 		return(0);
 	    }
 	}
@@ -1240,12 +1245,12 @@ boolean fingers;
 	make_engr_at(u.ux, u.uy, buf, (moves - multi), type);
 #endif
 
-	if (post_engr_text[0]) pline(post_engr_text);
+	if (post_engr_text[0]) pline("%s", post_engr_text);
 
 	if (doblind && !resists_blnd(&youmonst)) {
 	    You("are blinded by the flash!");
 	    make_blinded((long)rnd(50),FALSE);
-	    if (!Blind) Your(vision_clears);
+	    if (!Blind) Your("%s", vision_clears);
 	}
 
 	return(1);

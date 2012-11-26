@@ -79,6 +79,7 @@ STATIC_DCL int FDECL(score_wanted,
 #ifdef RECORD_ACHIEVE
 STATIC_DCL long FDECL(encodeachieve, (void));
 #endif
+STATIC_DCL long FDECL(encode_xlogflags, (void));
 #ifdef NO_SCAN_BRACK
 STATIC_DCL void FDECL(nsb_mung_line,(char*));
 STATIC_DCL void FDECL(nsb_unmung_line,(char*));
@@ -270,6 +271,61 @@ int n;
   return;
 }
 
+STATIC_OVL unsigned long
+encode_uevent()
+{
+  unsigned long c = 0UL;
+
+  /* game plot events */
+  if (u.uevent.minor_oracle ||
+      u.uevent.major_oracle)        c |= 0x00001UL; /* any Oracle consultation */
+  if (u.uevent.qcalled)             c |= 0x00002UL; /* reached quest portal level */
+  if (quest_status.got_quest ||
+      quest_status.got_thanks)      c |= 0x00004UL; /* was accepted for quest */
+  if (u.uevent.qcompleted)          c |= 0x00008UL; /* showed quest arti to leader */
+  if (u.uevent.uopened_dbridge)     c |= 0x00010UL; /* opened/destroyed Castle drawbridge */
+  if (u.uevent.gehennom_entered)    c |= 0x00020UL; /* entered Gehennom the front way */
+  if (u.uevent.udemigod)            c |= 0x00040UL; /* provoked Rodney's wrath */
+  if (u.uevent.invoked)             c |= 0x00080UL; /* did the invocation */
+  if (u.uevent.ascended)            c |= 0x00100UL; /* someone needs to use this variable */
+
+  /* notable other events */
+#ifdef ELBERETH
+  if (u.uevent.uhand_of_elbereth)   c |= 0x00200UL; /* was crowned */
+#endif
+
+  /* boss kills */
+  if (quest_status.killed_nemesis)  c |= 0x00400UL; /* defeated quest nemesis */
+  if (mvitals[PM_CROESUS].died)     c |= 0x00800UL; /* defeated Croesus */
+  if (mvitals[PM_MEDUSA].died)      c |= 0x01000UL; /* defeated Medusa */
+  if (mvitals[PM_VLAD_THE_IMPALER].
+      died)                         c |= 0x02000UL; /* defeated Vlad */
+  if (mvitals[PM_WIZARD_OF_YENDOR].
+      died)                         c |= 0x04000UL; /* defeated Rodney */
+  if (mvitals[PM_HIGH_PRIEST].died) c |= 0x08000UL; /* defeated a high priest */
+  if (mvitals[PM_BLACK_MARKETEER].
+      died)                         c |= 0x10000UL; /* defeated One-eyed Sam */
+  if (mvitals[PM_CTHULHU].died)     c |= 0x20000UL; /* defeated Cthulhu */
+
+  return c;
+}
+
+STATIC_OVL unsigned long
+encode_carried()
+{
+  unsigned long c = 0UL;
+
+  /* this encodes important items potentially owned by the player at the
+     time of death */
+  if (u.uhave.amulet)   c |= 0x0001UL; /* real Amulet of Yendor */
+  if (u.uhave.bell)     c |= 0x0002UL; /* Bell of Opening */
+  if (u.uhave.book)     c |= 0x0004UL; /* Book of the Dead */
+  if (u.uhave.menorah)  c |= 0x0008UL; /* Candelabrum of Invocation */
+  if (u.uhave.questart) c |= 0x0010UL; /* own quest artifact */
+
+  return c;
+}
+
 STATIC_OVL void
 write_xlentry(rfile,tt)
 FILE *rfile;
@@ -314,6 +370,8 @@ struct toptenentry *tt;
    munge_xlstring(buf, tt->death, DTHSZ + 1);
   (void)fprintf(rfile, SEP "death=%s", buf);
 
+  (void)fprintf(rfile, SEP "flags=0x%lx", encode_xlogflags());
+
 #ifdef RECORD_CONDUCT
   (void)fprintf(rfile, SEP "conduct=0x%lx", encodeconduct());
 #endif
@@ -325,6 +383,9 @@ struct toptenentry *tt;
 #ifdef RECORD_ACHIEVE
   (void)fprintf(rfile, SEP "achieve=0x%lx", encodeachieve());
 #endif
+
+  (void)fprintf(rfile, SEP "event=%ld", encode_uevent());
+  (void)fprintf(rfile, SEP "carried=%ld", encode_carried());
 
 #ifdef RECORD_REALTIME
   (void)fprintf(rfile, SEP "realtime=%ld", (long)realtime_data.realtime);
@@ -343,6 +404,7 @@ struct toptenentry *tt;
   (void)fprintf(rfile, SEP "align0=%s", 
           aligns[1 - u.ualignbase[A_ORIGINAL]].filecode);
 #endif
+  (void)fprintf(rfile, SEP "elbereths=%ld", u.uconduct.elbereths);
 
   (void)fprintf(rfile, "\n");
 
@@ -469,26 +531,34 @@ int how;
 #endif
 
 #ifdef LOGFILE		/* used for debugging (who dies of what, where) */
+#ifdef FILE_AREAS
+	if (lock_file_area(LOGAREA, LOGFILE, 10)) {
+#else
 	if (lock_file(LOGFILE, SCOREPREFIX, 10)) {
-	    if(!(lfile = fopen_datafile(LOGFILE, "a", SCOREPREFIX))) {
+#endif
+	    if(!(lfile = fopen_datafile_area(LOGAREA, LOGFILE, "a", SCOREPREFIX))) {
 		HUP raw_print("Cannot open log file!");
 	    } else {
 		writeentry(lfile, t0);
 		(void) fclose(lfile);
 	    }
-	    unlock_file(LOGFILE);
+	    unlock_file_area(LOGAREA, LOGFILE);
 	}
 #endif /* LOGFILE */
 
 #ifdef XLOGFILE
-	if(lock_file(XLOGFILE, SCOREPREFIX, 10)) {
-		if(!(xlfile = fopen_datafile(XLOGFILE, "a", SCOREPREFIX))) {
+#ifdef FILE_AREAS
+	if (lock_file_area(LOGAREA, XLOGFILE, 10)) {
+#else
+	if (lock_file(XLOGFILE, SCOREPREFIX, 10)) {
+#endif
+		if(!(xlfile = fopen_datafile_area(LOGAREA, XLOGFILE, "a", SCOREPREFIX))) {
 			HUP raw_print("Cannot open extended log file!");
 		} else {
 			write_xlentry(xlfile, t0);
 			(void) fclose(xlfile);
 		}
-		unlock_file(XLOGFILE);
+		unlock_file_area(LOGAREA, XLOGFILE);
 	}
 #endif /* XLOGFILE */
 
@@ -510,18 +580,22 @@ int how;
 	    goto showwin;
 	}
 
+#ifdef FILE_AREAS
+	if (!lock_file_area(NH_RECORD_AREA, RECORD, 60))
+#else
 	if (!lock_file(RECORD, SCOREPREFIX, 60))
+#endif
 		goto destroywin;
 
 #ifdef UPDATE_RECORD_IN_PLACE
-	rfile = fopen_datafile(RECORD, "r+", SCOREPREFIX);
+	rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "r+", SCOREPREFIX);
 #else
-	rfile = fopen_datafile(RECORD, "r", SCOREPREFIX);
+	rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "r", SCOREPREFIX);
 #endif
 
 	if (!rfile) {
 		HUP raw_print("Cannot open record file!");
-		unlock_file(RECORD);
+		unlock_file_area(NH_RECORD_AREA, RECORD);
 		goto destroywin;
 	}
 
@@ -600,9 +674,9 @@ int how;
 				     t0->fpos : final_fpos), SEEK_SET);
 #else
 		(void) fclose(rfile);
-		if(!(rfile = fopen_datafile(RECORD, "w", SCOREPREFIX))){
+		if(!(rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "w", SCOREPREFIX))){
 			HUP raw_print("Cannot write record file");
-			unlock_file(RECORD);
+			unlock_file_area(NH_RECORD_AREA, RECORD);
 			free_ttlist(tt_head);
 			goto destroywin;
 		}
@@ -698,7 +772,7 @@ int how;
 	}
 #endif	/* UPDATE_RECORD_IN_PLACE */
 	(void) fclose(rfile);
-	unlock_file(RECORD);
+	unlock_file_area(NH_RECORD_AREA, RECORD);
 	free_ttlist(tt_head);
 
   showwin:
@@ -949,6 +1023,20 @@ int uid;
 	return 0;
 }
 
+long
+encode_xlogflags(void)
+{
+	long e = 0L;
+
+	if (wizard)              e |= 0x001L; /* wizard mode */
+	if (discover)            e |= 0x002L; /* explore mode */
+	if (killer_flags & 0x1)  e |= 0x004L; /* died, (with the Amulet) */
+	if (killer_flags & 0x2)  e |= 0x008L; /* died, (in celestial disgrace) */
+	if (killer_flags & 0x4)  e |= 0x010L; /* died, (with a fake Amulet) */
+
+	return e;
+}
+
 #ifdef RECORD_CONDUCT
 long
 encodeconduct(void)
@@ -1041,7 +1129,7 @@ char **argv;
 		return;
 	}
 
-	rfile = fopen_datafile(RECORD, "r", SCOREPREFIX);
+	rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "r", SCOREPREFIX);
 	if (!rfile) {
 		raw_print("Cannot open record file!");
 		return;
@@ -1199,7 +1287,7 @@ struct obj *otmp;
 
 	if (!otmp) return((struct obj *) 0);
 
-	rfile = fopen_datafile(RECORD, "r", SCOREPREFIX);
+	rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "r", SCOREPREFIX);
 	if (!rfile) {
 		impossible("Cannot open record file!");
 		return (struct obj *)0;

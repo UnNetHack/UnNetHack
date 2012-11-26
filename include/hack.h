@@ -174,6 +174,7 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define BUC_UNCURSED 0x200
 #define BUC_UNKNOWN  0x400
 #define BUC_ALLBKNOWN (BUC_BLESSED|BUC_CURSED|BUC_UNCURSED)
+#define UNIDENTIFIED_TYPES 0x800
 #define ALL_TYPES_SELECTED -2
 
 /* Flags to control find_mid() */
@@ -195,6 +196,7 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define DO_MOVE		0	/* really doing the move */
 #define TEST_MOVE	1	/* test a normal move (move there next) */
 #define TEST_TRAV	2	/* test a future travel location */
+#define TEST_TRAP	3	/* check if a future travel location is a trap */
 
 /*** some utility macros ***/
 #define yn(query) yn_function(query,ynchars, 'n')
@@ -259,6 +261,8 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define MENU_SELECTED	TRUE
 #define MENU_UNSELECTED FALSE
 
+#define MENU_DEFCNT	1
+
 /*
  * Option flags
  * Each higher number includes the characteristics of the numbers
@@ -287,6 +291,8 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define plur(x) (((x) == 1) ? "" : "s")
 
 #define ARM_BONUS(obj)	(objects[(obj)->otyp].a_ac + (obj)->spe \
+			 /* extra AC point for racial armor */ \
+			 + (is_racial_armor(obj) ? 1 : 0) \
 			 - min((int)greatest_erosion(obj),objects[(obj)->otyp].a_ac))
 
 #define makeknown(x)	discover_object((x),TRUE,TRUE)

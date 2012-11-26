@@ -18,10 +18,10 @@
 
 #define g_FILLER(symbol) 0
 
-uchar oc_syms[MAXOCLASSES] = DUMMY; /* the current object  display symbols */
-uchar showsyms[MAXPCHARS]  = DUMMY; /* the current feature display symbols */
-uchar monsyms[MAXMCLASSES] = DUMMY; /* the current monster display symbols */
-uchar warnsyms[WARNCOUNT]  = DUMMY;  /* the current warning display symbols */
+uchar oc_syms[MAXOCLASSES]  = DUMMY; /* the current object  display symbols */
+glyph_t showsyms[MAXPCHARS] = DUMMY; /* the current feature display symbols */
+uchar monsyms[MAXMCLASSES]  = DUMMY; /* the current monster display symbols */
+uchar warnsyms[WARNCOUNT]   = DUMMY;  /* the current warning display symbols */
 
 /* Default object class symbols.  See objclass.h. */
 const char def_oc_syms[MAXOCLASSES] = {
@@ -222,6 +222,7 @@ struct symdef defsyms[MAXPCHARS] = {
 	{'+', "closed door",	C(CLR_BROWN)},	/* hcdoor */
 	{'#', "iron bars",	C(HI_METAL)},	/* bars */
 	{'#', "tree",		C(CLR_GREEN)},	/* tree */
+	{'#', "dead tree",	C(CLR_BLACK)},	/* dead tree */
 	{'.', "floor of a room",C(CLR_GRAY)},	/* room */
 	{'.', "dark part of a room",C(CLR_BLACK)},	/* dark room */
 /*20*/	{'#', "corridor",	C(CLR_GRAY)},	/* dark corr */
@@ -241,6 +242,7 @@ struct symdef defsyms[MAXPCHARS] = {
 /*30*/	{'{', "fountain",	C(CLR_BLUE)},	/* fountain */
 	{'}', "water",		C(CLR_BLUE)},	/* pool */
 	{'.', "ice",		C(CLR_CYAN)},	/* ice */
+	{'}', "muddy swamp",	C(CLR_GREEN)},	/* muddy swamp, bog */
 	{'}', "molten lava",	C(CLR_RED)},	/* lava */
 	{'.', "lowered drawbridge",C(CLR_BROWN)},	/* vodbridge */
 	{'.', "lowered drawbridge",C(CLR_BROWN)},	/* hodbridge */
@@ -318,7 +320,7 @@ void NDECL((*ibmgraphics_mode_callback)) = 0;	/* set in tty_start_screen() */
 void NDECL((*cursesgraphics_mode_callback)) = 0;
 #endif
 
-static uchar ibm_graphics[MAXPCHARS] = {
+static glyph_t ibm_graphics[MAXPCHARS] = {
 /* 0*/	g_FILLER(S_stone),
 	0xb3,	/* S_vwall:	meta-3, vertical rule */
 	0xc4,	/* S_hwall:	meta-D, horizontal rule */
@@ -338,6 +340,7 @@ static uchar ibm_graphics[MAXPCHARS] = {
 	g_FILLER(S_hcdoor),
 	240,	/* S_bars:	equivalence symbol */
 	241,	/* S_tree:	plus or minus symbol */
+	241,	/* S_deadtree:	plus or minus symbol */
 	0xfa,	/* S_room:	meta-z, centered dot */
 	g_FILLER(S_stone),	/* S_darkroom:	meta-z, centered dot */
 /*20*/	0xb0,	/* S_corr:	meta-0, light shading */
@@ -353,6 +356,7 @@ static uchar ibm_graphics[MAXPCHARS] = {
 /*30*/	0xf4,	/* S_fountain:	meta-t, integral top half */
 	0xf7,	/* S_pool:	meta-w, approx. equals */
 	0xfa,	/* S_ice:	meta-z, centered dot */
+	0xf7,	/* S_bog:	meta-w, approx. equals */
 	0xf7,	/* S_lava:	meta-w, approx. equals */
 	0xfa,	/* S_vodbridge:	meta-z, centered dot */
 	0xfa,	/* S_hodbridge:	meta-z, centered dot */
@@ -418,7 +422,7 @@ static uchar ibm_graphics[MAXPCHARS] = {
 #ifdef TERMLIB
 void NDECL((*decgraphics_mode_callback)) = 0;  /* set in tty_start_screen() */
 
-static uchar dec_graphics[MAXPCHARS] = {
+static glyph_t dec_graphics[MAXPCHARS] = {
 /* 0*/	g_FILLER(S_stone),
 	0xf8,	/* S_vwall:	meta-x, vertical rule */
 	0xf1,	/* S_hwall:	meta-q, horizontal rule */
@@ -438,6 +442,7 @@ static uchar dec_graphics[MAXPCHARS] = {
 	g_FILLER(S_hcdoor),
 	0xfb,	/* S_bars:	meta-{, small pi */
 	0xe7,	/* S_tree:	meta-g, plus-or-minus */
+	0xe7,	/* S_deadtree:	meta-g, plus-or-minus */
 	0xfe,	/* S_room:	meta-~, centered dot */
 	g_FILLER(S_stone),	/* S_darkroom:	meta-~, centered dot */
 /*20*/	g_FILLER(S_corr),
@@ -453,6 +458,7 @@ static uchar dec_graphics[MAXPCHARS] = {
 /*30*/	g_FILLER(S_fountain),	/* 0xdb, \E)3: meta-[, integral top half */
 	0xe0,	/* S_pool:	meta-\, diamond */
 	0xfe,	/* S_ice:	meta-~, centered dot */
+	0xe0,	/* S_bog:	meta-\, diamond */
 	0xe0,	/* S_lava:	meta-\, diamond */
 	0xfe,	/* S_vodbridge:	meta-~, centered dot */
 	0xfe,	/* S_hodbridge:	meta-~, centered dot */
@@ -516,7 +522,7 @@ static uchar dec_graphics[MAXPCHARS] = {
 #endif  /* TERMLIB */
 
 #ifdef MAC_GRAPHICS_ENV
-static uchar mac_graphics[MAXPCHARS] = {
+static glyph_t mac_graphics[MAXPCHARS] = {
 /* 0*/	g_FILLER(S_stone),
 	0xba,	/* S_vwall */
 	0xcd,	/* S_hwall */
@@ -536,6 +542,7 @@ static uchar mac_graphics[MAXPCHARS] = {
 	0xef,	/* S_hcdoor */
 	0xf0,	/* S_bars:	equivalency symbol */
 	0xf1,	/* S_tree:	plus-or-minus */
+	0xf1,	/* S_deadtree:	plus-or-minus */
 	g_FILLER(S_Room),
 	g_FILLER(S_stone), /* S_darkroom */
 /*20*/	0xB0,	/* S_corr */
@@ -551,6 +558,7 @@ static uchar mac_graphics[MAXPCHARS] = {
 /*30*/	g_FILLER(S_fountain),
 	0xe0,	/* S_pool */
 	g_FILLER(S_ice),
+	g_FILLER(S_bog),
 	g_FILLER(S_lava),
 	g_FILLER(S_vodbridge),
 	g_FILLER(S_hodbridge),
@@ -613,6 +621,108 @@ static uchar mac_graphics[MAXPCHARS] = {
 };
 #endif	/* MAC_GRAPHICS_ENV */
 
+#ifdef UTF8_GLYPHS
+/* Probably best to only use characters from this list
+ * http://en.wikipedia.org/wiki/WGL4 */
+static glyph_t utf8_graphics[MAXPCHARS] = {
+/* 0*/	g_FILLER(S_stone),
+	0x2502,	/* S_vwall:	BOX DRAWINGS LIGHT VERTICAL */
+	0x2500,	/* S_hwall:	BOX DRAWINGS LIGHT HORIZONTAL */
+	0x250c,	/* S_tlcorn:	BOX DRAWINGS LIGHT DOWN AND RIGHT */
+	0x2510,	/* S_trcorn:	BOX DRAWINGS LIGHT DOWN AND LEFT */
+	0x2514,	/* S_blcorn:	BOX DRAWINGS LIGHT UP AND RIGHT */
+	0x2518,	/* S_brcorn:	BOX DRAWINGS LIGHT UP AND LEFT */
+	0x253c,	/* S_crwall:	BOX DRAWINGS LIGHT VERTICAL AND HORIZONTAL */
+	0x2534,	/* S_tuwall:	BOX DRAWINGS LIGHT UP AND HORIZONTAL */
+	0x252c,	/* S_tdwall:	BOX DRAWINGS LIGHT DOWN AND HORIZONTAL */
+	0x2524,	/* S_tlwall:	BOX DRAWINGS LIGHT VERTICAL AND LEFT */
+	0x251c,	/* S_trwall:	BOX DRAWINGS LIGHT VERTICAL AND RIGHT */
+	0x00b7,	/* S_ndoor:	MIDDLE DOT */
+	0x2592,	/* S_vodoor:	MEDIUM SHADE */
+	0x2592,	/* S_hodoor:	MEDIUM SHADE */
+	g_FILLER(S_vcdoor),
+	g_FILLER(S_hcdoor),
+	0x2261,	/* S_bars:	IDENTICAL TO */
+	0x03a8,	/* S_tree:	GREEK CAPITAL LETTER PSI */
+	0x03a8,	/* S_deadtree:	GREEK CAPITAL LETTER PSI */
+	0x00b7,	/* S_room:	MIDDLE DOT */
+	g_FILLER(S_stone),	/* S_darkroom:	meta-~, centered dot */
+	g_FILLER(S_corr),
+	g_FILLER(S_litcorr),
+	g_FILLER(S_upstair),
+	g_FILLER(S_dnstair),
+	0x2264,	/* S_upladder:	LESS-THAN OR EQUAL TO */
+	0x2265,	/* S_dnladder:	GREATER-THAN OR EQUAL TO */
+	0x03A9,	/* S_altar:	GREEK CAPITAL LETTER OMEGA */
+	0x2020,	/* S_grave:	DAGGER */
+	g_FILLER(S_throne),
+	g_FILLER(S_sink),
+	0x00b6,	/* S_fountain:	PILCROW SIGN */
+	0x224b,	/* S_pool:	TRIPLE TILDE */
+	0x00b7,	/* S_ice:	MIDDLE DOT */
+	0x224b,	/* S_bog:	TRIPLE TILDE */
+	0x224b,	/* S_lava:	TRIPLE TILDE */
+	0x00b7,	/* S_vodbridge:	MIDDLE DOT */
+	0x00b7,	/* S_hodbridge:	MIDDLE DOT */
+	g_FILLER(S_vcdbridge),
+	g_FILLER(S_hcdbridge),
+	g_FILLER(S_air),
+	g_FILLER(S_cloud),
+	0x2248,	/* S_water:	ALMOST EQUAL TO */
+	g_FILLER(S_arrow_trap),
+	g_FILLER(S_dart_trap),
+	g_FILLER(S_falling_rock_trap),
+	g_FILLER(S_squeaky_board),
+	g_FILLER(S_bear_trap),
+	g_FILLER(S_land_mine),
+	g_FILLER(S_rolling_boulder_trap),
+	g_FILLER(S_sleeping_gas_trap),
+	g_FILLER(S_rust_trap),
+	g_FILLER(S_fire_trap),
+	g_FILLER(S_pit),
+	g_FILLER(S_spiked_pit),
+	g_FILLER(S_hole),
+	g_FILLER(S_trap_door),
+	g_FILLER(S_teleportation_trap),
+	g_FILLER(S_level_teleporter),
+	g_FILLER(S_magic_portal),
+	0x00A4,	/* S_web:	CURRENCY SIGN */
+	g_FILLER(S_statue_trap),
+	g_FILLER(S_magic_trap),
+	g_FILLER(S_anti_magic_trap),
+	g_FILLER(S_polymorph_trap),
+	0x2502,	/* S_vbeam:	BOX DRAWINGS LIGHT VERTICAL */
+	0x2500,	/* S_hbeam:	BOX DRAWINGS LIGHT HORIZONTAL */
+	g_FILLER(S_lslant),
+	g_FILLER(S_rslant),
+	g_FILLER(S_digbeam),
+	g_FILLER(S_flashbeam),
+	g_FILLER(S_boomleft),
+	g_FILLER(S_boomright),
+	g_FILLER(S_ss1),
+	g_FILLER(S_ss2),
+	g_FILLER(S_ss3),
+	g_FILLER(S_ss4),
+	g_FILLER(S_sw_tl),
+	0x2594,	/* S_sw_tc:	UPPER ONE EIGHTH BLOCK */
+	g_FILLER(S_sw_tr),
+	0x258f,	/* S_sw_ml:	LEFT ONE EIGHTH BLOCK */
+	0x2595,	/* S_sw_mr:	RIGHT ONE EIGHTH BLOCK */
+	g_FILLER(S_sw_bl),
+	0x2581,	/* S_sw_bc:	LOWER ONE EIGHTH BLOCK */
+	g_FILLER(S_sw_br),
+	g_FILLER(S_explode1),
+	0x2594,	/* S_explode2:	UPPER ONE EIGHTH BLOCK */
+	g_FILLER(S_explode3),
+	0x258f,	/* S_explode4:	LEFT ONE EIGHTH BLOCK */
+	g_FILLER(S_explode5),
+	0x2595,	/* S_explode6:	RIGHT ONE EIGHTH BLOCK */
+	g_FILLER(S_explode7),
+	0x2581,	/* S_explode8:	LOWER ONE EIGHTH BLOCK */
+	g_FILLER(S_explode9)
+};
+#endif
+
 #ifdef PC9800
 void NDECL((*ascgraphics_mode_callback)) = 0;	/* set in tty_start_screen() */
 #endif
@@ -648,7 +758,7 @@ def_char_to_monclass(ch)
 
 void
 assign_graphics(graph_chars, glth, maxlen, offset)
-register uchar *graph_chars;
+register glyph_t *graph_chars;
 int glth, maxlen, offset;
 {
     register int i;
@@ -662,10 +772,17 @@ void
 switch_graphics(gr_set_flag)
 int gr_set_flag;
 {
+    iflags.IBMgraphics = FALSE;
+    iflags.DECgraphics = FALSE;
+#ifdef CURSES_GRAPHICS
+    iflags.cursesgraphics = FALSE;
+#endif
+    iflags.UTF8graphics = FALSE;
+
     switch (gr_set_flag) {
 	default:
 	case ASCII_GRAPHICS:
-	    assign_graphics((uchar *)0, 0, MAXPCHARS, 0);
+	    assign_graphics((glyph_t *)0, 0, MAXPCHARS, 0);
 #ifdef PC9800
 	    if (ascgraphics_mode_callback) (*ascgraphics_mode_callback)();
 #endif
@@ -711,27 +828,49 @@ int gr_set_flag;
 #endif
 #ifdef CURSES_GRAPHICS
     case CURS_GRAPHICS:
-	    assign_graphics((uchar *)0, 0, MAXPCHARS, 0);
+	    assign_graphics((glyph_t *)0, 0, MAXPCHARS, 0);
         iflags.cursesgraphics = TRUE;
 	    iflags.IBMgraphics = FALSE;
 	    iflags.DECgraphics = FALSE;
         break;
 #endif
+#ifdef UTF8_GLYPHS
+	case UTF8_GRAPHICS:
+	    assign_graphics(utf8_graphics, SIZE(utf8_graphics), MAXPCHARS, 0);
+	    iflags.UTF8graphics = TRUE;
+	    break;
+#endif
 	}
     return;
 }
 
+/** Change the UTF8graphics symbol at position with codepoint "value". */
+void
+assign_utf8graphics_symbol(position, value)
+int position;
+glyph_t value;
+{
+#ifdef UTF8_GLYPHS
+	if (position < MAXPCHARS) {
+		utf8_graphics[position] = value;
+		/* need to update showsym */
+		if (iflags.UTF8graphics) {
+			switch_graphics(UTF8_GRAPHICS);
+		}
+	}
+#endif
+}
 
 #ifdef REINCARNATION
 
 /*
  * saved display symbols for objects & features.
  */
-static uchar save_oc_syms[MAXOCLASSES] = DUMMY;
-static uchar save_showsyms[MAXPCHARS]  = DUMMY;
-static uchar save_monsyms[MAXPCHARS]   = DUMMY;
+static uchar save_oc_syms[MAXOCLASSES]  = DUMMY;
+static glyph_t save_showsyms[MAXPCHARS] = DUMMY;
+static uchar save_monsyms[MAXPCHARS]    = DUMMY;
 
-static const uchar r_oc_syms[MAXOCLASSES] = {
+static const glyph_t r_oc_syms[MAXOCLASSES] = {
 /* 0*/	'\0',
 	ILLOBJ_SYM,
 	WEAPON_SYM,

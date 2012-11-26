@@ -9,7 +9,7 @@
 #	and receive your quest assignment.
 #
 LEVEL: "Bar-strt"
-FLAGS: noteleport,hardfloor,mazelevel
+FLAGS: noteleport,hardfloor,mazelevel,sky
 INIT_MAP:solidfill,' '
 MON_GENERATION:86%, (64,"ogre"), (16,'O'), (16,"troll"), (4,'T')
 GEOMETRY:center,center

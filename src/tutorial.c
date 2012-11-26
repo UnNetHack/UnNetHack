@@ -81,10 +81,11 @@ boolean from_farlook;
     if ((lx == xupstair   && ly == yupstair) ||
         (lx == xupladder  && ly == yupladder) ||
         (lx == sstairs.sx && ly == sstairs.sy && sstairs.up)) {
-      if (u.uz.dlevel > 1)
+      if (u.uz.dlevel > 1) {
       if (check_tutorial_message(QT_T_STAIRS)) return TRUE;
       else if (from_farlook)
         if (check_tutorial_message(QT_T_L1UPSTAIRS)) return TRUE;
+      }
     } else if ((lx == xdnstair   && ly == ydnstair) ||
                (lx == xdnladder  && ly == ydnladder) ||
                (lx == sstairs.sx && ly == sstairs.sy && !sstairs.up)) {
@@ -545,7 +546,7 @@ tutorial_redisplay()
       qt_com_firstline(i.a_int, namebuf);
       /* adding 10 to namebuf removes the 'Tutorial: ' at the start */
       name = *namebuf ? namebuf + 10 : "(not found)";
-      add_menu(tempwin, NO_GLYPH, &i, 0, 0, ATR_NONE, name, FALSE);
+      add_menu(tempwin, NO_GLYPH, MENU_DEFCNT, &i, 0, 0, ATR_NONE, name, FALSE);
     }
   }
   end_menu(tempwin, "Which tutorial?");

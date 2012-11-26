@@ -162,6 +162,8 @@ static const struct { const char *txt; int nut; } tintxts[] = {
 	{"sauteed",      95},
 	{"broiled",      80},
 	{"smoked",       50},
+#define DELICIOUS_SOUP_TIN 15
+	{"delicious soup made from", 200},
 	{"", 0}
 };
 #define TTSZ	SIZE(tintxts)
@@ -447,7 +449,7 @@ boolean message;
 	occupation = 0; /* do this early, so newuhs() knows we're done */
 	newuhs(FALSE);
 	if (nomovemsg) {
-		if (message) pline(nomovemsg);
+		if (message) pline("%s", nomovemsg);
 		nomovemsg = 0;
 	} else if (message)
 		You("finish %s %s.", victual.piece->odrained ? "draining" :
@@ -1113,11 +1115,19 @@ opentin()		/* called during each move whilst opening a tin */
 		tin.tin->dknown = tin.tin->known = TRUE;
 		costly_tin((const char*)0);
 		goto use_me;
-	    }
-	    r = tin.tin->cursed ? ROTTEN_TIN :	/* always rotten if cursed */
-		    (tin.tin->spe == -1) ? HOMEMADE_TIN :  /* player made it */
-			rn2(TTSZ-1);		/* else take your pick */
-	    if (r == ROTTEN_TIN && (tin.tin->corpsenm == PM_LIZARD ||
+		}
+		if (tin.tin->cursed) {
+			r = ROTTEN_TIN;  /* always rotten if cursed */
+		} else if (tin.tin->spe == -1) {
+			r = HOMEMADE_TIN;  /* player made it */
+		} else {
+			r = rn2(TTSZ-2); /* else take your pick */
+		}
+		if (tin.tin->corpsenm == PM_GIANT_TURTLE && !tin.tin->cursed) {
+			/* Giant turtles are always endangeredelicious! */
+			r = DELICIOUS_SOUP_TIN;
+		}
+		if (r == ROTTEN_TIN && (tin.tin->corpsenm == PM_LIZARD ||
 			tin.tin->corpsenm == PM_LICHEN))
 		r = HOMEMADE_TIN;		/* lizards don't rot */
 	    else if (tin.tin->spe == -1 && !tin.tin->blessed && !rn2(7))
@@ -1296,7 +1306,7 @@ struct obj *obj;
 	} else if(!rn2(4) && !Blind) {
 		pline("Everything suddenly goes dark.");
 		make_blinded((long)d(2,10),FALSE);
-		if (!Blind) Your(vision_clears);
+		if (!Blind) Your("%s", vision_clears);
 	} else if(!rn2(3)) {
 		const char *what, *where;
 		if (!Blind)
@@ -1458,12 +1468,13 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 		  ? "is delicious" : "tastes terrible");
 	}
 
-	/* Eating slimy or oily corpses make your fingers slippery.
+	/* Eating slimy or oily corpses makes your fingers slippery.
 	   Note: Snakes are not slimy. */
 	if ((amorphous(&mons[mnum]) || slithy(&mons[mnum]) ||
 	     mons[mnum].mlet == S_BLOB) &&
 	    mons[mnum].mlet != S_SNAKE && mons[mnum].mlet != S_NAGA &&
-	    mons[mnum].mlet != S_MIMIC && rnf(1,5)) {
+	    mons[mnum].mlet != S_MIMIC && rnf(1,5) &&
+	    !is_vampiric(youmonst.data)) {
 		pline("Eating this %s corpse makes your %s %s slippery.",
 		      amorphous(&mons[mnum]) ? "glibbery" : "slimy",
 		      makeplural(body_part(FINGER)),
@@ -1534,11 +1545,18 @@ struct obj *otmp;
 			  "Mmm, tripe... not bad!");
 		else {
 		    pline("Yak - dog food!");
+#ifdef CONVICT
+		    if (Role_if(PM_CONVICT))
+			pline("At least it's not prison food.");
+#endif /* CONVICT */
 		    more_experienced(1,1,0);
 		    newexplevel();
 		    /* not cannibalism, but we use similar criteria
 		       for deciding whether to be sickened by this meal */
 		    if (rn2(2) && !CANNIBAL_ALLOWED())
+#ifdef CONVICT
+		    if (!Role_if(PM_CONVICT))
+#endif /* CONVICT */
 			make_vomiting((long)rn1(victual.reqtime, 14), FALSE);
 		}
 		break;
@@ -1582,6 +1600,11 @@ struct obj *otmp;
 #endif
 		if (otmp->otyp == EGG && stale_egg(otmp)) {
 		    pline("Ugh.  Rotten egg.");	/* perhaps others like it */
+#ifdef CONVICT
+		if (Role_if(PM_CONVICT) && (rn2(8) > u.ulevel)) {
+		    You_feel("a slight stomach ache.");	/* prisoners are used to bad food */
+		} else
+#endif /* CONVICT */
 		    make_vomiting(Vomiting+d(10,4), TRUE);
 		} else
  give_feedback:
@@ -2336,6 +2359,10 @@ gethungry()	/* as time goes by - called by moveloop() and domove() */
 	if ((!u.usleep || !rn2(10))	/* slow metabolic rate while asleep */
 		&& (carnivorous(youmonst.data) || herbivorous(youmonst.data) ||
 		    is_vampire(youmonst.data))
+#ifdef CONVICT
+		/* Convicts can last twice as long at hungry and below */
+		&& (!Role_if(PM_CONVICT) || (moves % 2) || (u.uhs < HUNGRY))
+#endif /* CONVICT */
 		&& !Slow_digestion)
 	    u.uhunger--;		/* ordinary food consumption */
 

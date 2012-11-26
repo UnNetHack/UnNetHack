@@ -1,5 +1,5 @@
 dnl	UNNETHACK autoconf template
-AC_INIT(UNNETHACK, 3.5.1, bhaak@gmx.net)
+AC_INIT(UNNETHACK, 4.0.0, bhaak@gmx.net)
 dnl Avoid AC_REVISION() because we check configure into CVS
 dnl and it will cause confusing revision numbers to be included
 dnl in configure if developers forget to check in configure.ac
@@ -30,11 +30,10 @@ NETHACK_WIN_ENABLE(dummy, no, [dummy graphics for unit tests])
 NETHACK_WIN_ENABLE(dummy, no, [dummy graphics for unit tests])
 NETHACK_WIN_ENABLE(curses, no, [use curses interface])
 NETHACK_WIN_ENABLE(tty, auto)
-#NETHACK_WIN_ENABLE(x11, no)
-#NETHACK_WIN_ENABLE(mswin, no, [use Microsoft Window's native graphics])
+NETHACK_WIN_ENABLE(x11, no)
+NETHACK_WIN_ENABLE(mswin, no, [use Microsoft Window's native graphics])
 dnl deactivate X11 and Win32 tiles version
-enable_x11_graphics="no"
-enable_mswin_graphics="no"
+dnl enable_x11_graphics="no"
 
 dnl  ----- Figure out a C compiler to use; set @CC@
 AC_PROG_CC
@@ -112,10 +111,9 @@ case $host_os in
      *linux* )		AC_DEFINE(LINUX,[],[GNU Linux]);;
 esac
 
-
 dnl  ----- Check for programs
 AC_PROG_LEX
-if test "$LEX" == ":"; then
+if test "$LEX" = ":"; then
 	AC_MSG_ERROR([cannot find flex or lex])
 fi
 AC_CHECK_PROGS(YACC, ['bison -y' byacc yacc])
@@ -174,8 +172,9 @@ if test "$enable_tty_graphics" != "no"; then
 	    fi
 	fi
 	dnl  ----- Check for tparm in curses
-	AC_CHECK_HEADERS(curses.h termcap.h)
-	AC_CHECK_LIB(curses, tparm, AC_DEFINE(HAVE_TPARM, 1, [Define this if you have the tparm function in an included lib.]),)
+	AC_CHECK_HEADERS(ncurses.h curses.h termcap.h)
+	AC_CHECK_LIB(curses, tparm, AC_DEFINE(HAVE_TPARM, 1, [Define this if you have the tparm function in an included lib.]),
+	  [AC_CHECK_LIB(ncurses, tparm, AC_DEFINE(HAVE_TPARM, 1, [Define this if you have the tparm function in an included lib.])]))
 
     fi
 
@@ -313,13 +312,13 @@ AC_CHECK_HEADER(regex.h, [have_regex_h=yes],[have_regex_h=no],/* TEST_REGEX */)
 dnl ------ Check for data types
 dnl -- Regex-Check for MENU_COLOR
 if test "$have_regex_h" = "yes"; then
-  AC_CHECK_TYPE(struct re_pattern_buffer,
+  AC_CHECK_TYPE(regex_t,
     [AC_DEFINE(MENU_COLOR_REGEX, [], [Use regular expressions])
-     AC_DEFINE(MENU_COLOR_REGEX_GNU, [], [GNU regex is available])
+     AC_DEFINE(MENU_COLOR_REGEX_POSIX, [], [Posix regex is available])
     ],
-    [AC_CHECK_TYPE(regex_t,
+    [AC_CHECK_TYPE(struct re_pattern_buffer,
       [AC_DEFINE(MENU_COLOR_REGEX, [], [Use regular expressions])
-	AC_DEFINE(MENU_COLOR_REGEX_POSIX, [], [Posix regex is available])
+	AC_DEFINE(MENU_COLOR_REGEX_GNU, [], [GNU regex is available])
       ],,
       [AC_INCLUDES_DEFAULT([])
 	#include <regex.h>
@@ -345,6 +344,9 @@ fi
 dnl ------ Check fcntl for USE_FCNTL
 AC_CHECK_FUNCS(fcntl)
 
+dnl ------ Check for 32 bit datatype
+AX_DEFINE_INTEGER_BITS(uint32_t, unsigned int, unsigned long, unsigned long long)
+
 dnl  ----- Check for program needed to build Guidebook
 AC_CHECK_PROG(HAVE_NROFF, nroff, "yes", "no")
 AC_CHECK_PROG(HAVE_TBL, tbl, "yes", "no")
@@ -353,6 +355,14 @@ if test "$HAVE_TBL" != "no" ; then
 	AC_SUBST(GUIDEBOOK,[Guidebook])
 	AC_SUBST(GUIDEBOOK_TXT,[Guidebook.txt])
 fi
+fi
+AC_CHECK_PROG(HAVE_COL, col, "yes", "no")
+if test "$HAVE_COL" != "yes" ; then
+        if test $host_os != mingw32; then
+                AC_MSG_ERROR([Couldn't find 'col'])
+        else
+                AC_MSG_ERROR([Couldn't find 'col' (install 'util-linux' in Cygwin)])
+        fi
 fi
 
 if test $host_os != mingw32; then
@@ -401,6 +411,7 @@ NETHACK_ARG(randomized-planes,[Shuffling order of Elemental Planes],RANDOMIZED_P
 NETHACK_ARG(steed,[Ability to ride monsters],STEED,yes)
 # NETHACK_ARG(dwarf,[Dwarf race],DWARF,yes)
 NETHACK_ARG(tourist,[Tourist class],TOURIST,yes)
+NETHACK_ARG(convict,[Convict class],CONVICT,yes)
 # NETHACK_ARG(yeoman,[Yeoman class],YEOMAN,yes)
 # NETHACK_ARG(zouthern,[Zoutherner class],ZOUTHERN,no)
 NETHACK_ARG(redo,[Redo last command],REDO,yes)
@@ -414,6 +425,9 @@ NETHACK_ARG(elbereth,[Engraving the E-word repels monsters],ELBERETH,yes)
 # NETHACK_ARG(noartifactwish,[Prevent wishing for special artifacts],
 #  NOARTIFACTWISH,no)
 # NETHACK_ARG(no-bones,[Disable loading and saving bones levels],NO_BONES,no)
+if test $host_os != mingw32; then
+ NETHACK_ARG(bones-pool,[Multiple bones per level],BONES_POOL,yes)
+fi
 NETHACK_ARG(user-sounds,
   [Allow user-defined mapping from messages to sounds)],
   USER_SOUNDS,no)
@@ -428,14 +442,17 @@ NETHACK_ARG(high-score-comparison-by-uid,[Compare High Score entries by user id 
 # NETHACK_ARG(show-weight,[Display object weight],SHOW_WEIGHT,yes)
 # NETHACK_ARG(other-services,[Shopkeeper services],OTHER_SERVICES,yes)
 NETHACK_ARG(paranoid,[Require some questions to be answered with 'yes' instead of 'y'],PARANOID,yes)
+NETHACK_ARG(shell,[Start a shell from within the game],SHELL,no)
 NETHACK_ARG(show-born,[Display number of created monsters at the end of game],SHOW_BORN,yes)
 NETHACK_ARG(show-extinct,[Display extinct monsters at the end of game],SHOW_EXTINCT,yes)
+NETHACK_ARG(sortloot,[Sort item lists alphabetically by description.],SORTLOOT,yes)
 NETHACK_ARG(dungeon-growth,[Dungeon growth],DUNGEON_GROWTH,yes)
 #NETHACK_ARG(shout,[Shouting and pet commands (not implemented)],SHOUT,no)
 # NETHACK_ARG(display-layers,[Support transparent tilesets],DISPLAY_LAYERS,yes)
 NETHACK_ARG(goldobj,[Gold is kept on object chains (experimental)],GOLDOBJ,no)
-NETHACK_ARG(autopickup-exceptions,[Exceptions to autopickup (experimental)],
-  AUTOPICKUP_EXCEPTIONS,no)
+NETHACK_ARG(autopickup-exceptions,[Exceptions to autopickup],
+  AUTOPICKUP_EXCEPTIONS,yes)
+NETHACK_ARG(quiver-fired,[Firing without anything quivered will ask you what to quiver],QUIVER_FIRED,yes)
 NETHACK_ARG(qwertz,[QWERTZ keyboard layout support],QWERTZ,yes)
 NETHACK_ARG(simple-mail,[simple mail dgamelaunch support],SIMPLE_MAIL,no)
 
@@ -458,6 +475,17 @@ if test "$enable_dump" != "no" ; then
 		NETHACK_ARG(dump-html-css-embedded,[CSS file should be included in the HTML dump],DUMP_HTML_CSS_EMBEDDED,no)
 	fi
 fi
+
+if test "$enable_tty_graphics" != "no"; then
+	NETHACK_ARG(utf8-glyphs,[Enable UTF-8 glyphs in TTY],UTF8_GLYPHS,yes)
+	if test "$enable_utf8_glyphs" != "no" ; then
+		dnl check for uint32_t
+		if test "$uint32_t" = no; then
+			AC_MSG_ERROR([unable to continue without a 4-bytes datatype that could hold unicode codepoints])
+		fi
+	fi
+fi
+
 
 NETHACK_ARG_WITH_PARAM(whereis-file,[Log information about running games],WHEREIS_FILE,no,FILE,[%n.whereis])
 
@@ -496,6 +524,72 @@ if test "$CHGRP" != "true"; then
 	AC_MSG_RESULT([not set])
     fi
 fi
+
+
+NETHACK_ARG(file-areas,[Place files in different directories],FILE_AREAS,yes)
+
+AC_DEFUN([NETHACK_DIR_SET],
+  [
+   AC_MSG_CHECKING([which directory is $1])
+   AC_ARG_WITH([$1], [AS_HELP_STRING([--with-$1=DIR],
+    [Set the directory for $2 (default=$3)])],
+    [autoconf_val='"'$withval'"'], [withval=$4;autoconf_val='$5'])
+   if test "$enable_file_areas" != "no" ; then
+     AC_SUBST($6,[$withval])
+     AC_DEFINE_UNQUOTED($6, [$autoconf_val], [$7])
+     AC_MSG_RESULT([$withval])
+   else
+     # set default value if FILE_AREAS is not defined
+     if test "$6" != "FILE_AREA_SAVE" ; then
+       tmp_installdir=[${datadir}/unnethack]
+     else
+       tmp_installdir=[${datadir}/unnethack/save]
+     fi
+     AC_SUBST($6,[${tmp_installdir}])
+     AC_MSG_RESULT([default value: ${tmp_installdir}])
+   fi
+  ])
+
+# set doc directory manually
+if test "$enable_file_areas" != "no" ; then
+  AC_SUBST(FILE_AREA_DOC,[${docdir}/unnethack])
+  AC_DEFINE_UNQUOTED(FILE_AREA_DOC, [AUTOCONF_DOCDIR"/unnethack"],
+    [Location of human-readable documentation])
+else
+  # ignore ${docdir} if FILE_AREAS is not defined
+  AC_SUBST(FILE_AREA_DOC,[${datadir}/unnethack])
+fi
+
+NETHACK_DIR_SET(gamesdir, gamesdir, [LOCALSTATEDIR/unnethack],
+		[${localstatedir}/unnethack],
+		[AUTOCONF_LOCALSTATEDIR"/unnethack"],
+		FILE_AREA_VAR, [Location of other files which may be modified])
+
+NETHACK_DIR_SET(bonesdir, bones, [GAMESDIR/bones],
+		[${FILE_AREA_VAR}/bones],
+		[FILE_AREA_VAR"/bones"],
+		FILE_AREA_BONES, [Location of bones files (r/w)])
+
+NETHACK_DIR_SET(savesdir, saves, [GAMESDIR/saves],
+		[${FILE_AREA_VAR}/saves],
+		[FILE_AREA_VAR"/saves"],
+		FILE_AREA_SAVE, [Location of save files (r/w)])
+
+NETHACK_DIR_SET(leveldir, level, [GAMESDIR/level],
+		[${FILE_AREA_VAR}/level],
+		[FILE_AREA_VAR"/level"],
+		FILE_AREA_LEVL, [Location of level files (r/w)])
+
+NETHACK_DIR_SET(sharedir, share, [DATADIR/unnethack],
+		[${datadir}/unnethack],
+		[AUTOCONF_DATADIR"/unnethack"],
+		FILE_AREA_SHARE, [For read-only, architechure independent, files])
+
+NETHACK_DIR_SET(unsharedir, unshare, [DATADIR/unnethack],
+		[${datadir}/unnethack],
+		[AUTOCONF_DATADIR"/unnethack"],
+		FILE_AREA_UNSHARE, [For read-only, architechure dependent, files])
+
 
 NETHACK_LINKS=
 NETHACK_LINKS_ADD([dat/data.base])

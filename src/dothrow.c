@@ -300,8 +300,16 @@ dofire()
 		if (!flags.autoquiver) {
 			/* Don't automatically fill the quiver */
 			You("have no ammunition readied!");
-			return(dothrow());
+#ifdef QUIVER_FIRED
+			if (iflags.quiver_fired)
+			  dowieldquiver(); /* quiver_fired */
+			if (!uquiver)
+#endif
+			  return(dothrow());
 		}
+#ifdef QUIVER_FIRED
+		else { /* quiver_fired */
+#endif
 		autoquiver();
 		if (!uquiver) {
 			You("have nothing appropriate for your quiver!");
@@ -310,6 +318,9 @@ dofire()
 			You("fill your quiver:");
 			prinv((char *)0, uquiver, 0L);
 		}
+#ifdef QUIVER_FIRED
+		} /* quiver_fired */
+#endif
 	}
 
 	/*
@@ -468,7 +479,7 @@ hurtle_step(arg, x, y)
 	    const char *s;
 
 	    pline("Ouch!");
-	    if (IS_TREE(levl[x][y].typ))
+	    if (IS_TREES(levl[x][y].typ))
 		s = "bumping into a tree";
 	    else if (IS_ROCK(levl[x][y].typ))
 		s = "bumping into a wall";
@@ -635,7 +646,7 @@ hurtle(dx, dy, range, verbose)
 	m_shot.n = m_shot.i;	/* make current shot be the last */
     }
     if (In_sokoban(&u.uz))
-	change_luck(-1);	/* Sokoban guilt */
+	sokoban_trickster();	/* Sokoban guilt */
     uc.x = u.ux;
     uc.y = u.uy;
     /* this setting of cc is only correct if dx and dy are [-1,0,1] only */
@@ -770,7 +781,7 @@ boolean hitsroof;
 			pline("It blinds you!");
 		    u.ucreamed += blindinc;
 		    make_blinded(Blinded + (long)blindinc, FALSE);
-		    if (!Blind) Your(vision_clears);
+		    if (!Blind) Your("%s", vision_clears);
 		}
 		break;
 	default:

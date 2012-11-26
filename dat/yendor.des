@@ -7,7 +7,9 @@
 # Keeping the Moat for old-time's sake
 LEVEL:"wizard1"
 # Must have noflipx, due to the morgue-hack (see below).
-FLAGS:noteleport,hardfloor,mazelevel,noflipx
+# Don't allow any flipping for preventing the stairs to Vlad's tower
+#appearing in the wizard's tower because of a bug in level flipping.
+FLAGS:noteleport,hardfloor,mazelevel,noflip
 INIT_MAP:mazegrid,'-'
 GEOMETRY:center,center
 MAP
@@ -92,7 +94,7 @@ OBJECT:'+',random
 
 # The middle wizard level.
 LEVEL:"wizard2"
-FLAGS:noteleport,hardfloor,mazelevel
+FLAGS:noteleport,hardfloor,mazelevel,noflip
 INIT_MAP:mazegrid,'-'
 GEOMETRY:center,center
 MAP
@@ -145,7 +147,7 @@ OBJECT:'"',(04,06)
 # The bottom wizard level.
 # Memorialize the fakewiz setup.
 LEVEL:"wizard3"
-FLAGS:noteleport,hardfloor,mazelevel
+FLAGS:noteleport,hardfloor,mazelevel,noflip
 INIT_MAP:mazegrid,'-'
 GEOMETRY:center,center
 MAP

@@ -90,7 +90,7 @@ struct color_option color_option;
 const char *newbot2;
 int statusline; /* apply color on this statusline: 1 or 2 */
 {
-	if (!iflags.use_status_colors) return;
+	if (!iflags.use_status_colors || !iflags.use_color) return;
 	curs(WIN_STATUS, 1, statusline-1);
 	start_color_option(color_option);
 	putstr(WIN_STATUS, 0, newbot2);
@@ -307,23 +307,33 @@ bot1()
 			mbot[k] += 'A' - 'a';
 		    k++;
 		}
-		Sprintf(nb = eos(nb), mbot);
+		Sprintf(nb = eos(nb), "%s", mbot);
 	} else
-		Sprintf(nb = eos(nb), rank());
+		Sprintf(nb = eos(nb), "%s", rank());
 
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	if (flags.hitpointbar) {
 		int bar_length = strlen(newbot1)-1;
 		char tmp[MAXCO];
 		char *p = tmp;
-		int filledbar = uhp() * bar_length / uhpmax();
+		/* filledbar >= 0 and < MAXCO */
+		int hp = (uhp() < 0) ? 0 : uhp();
+		int filledbar = hp * bar_length / uhpmax();
+		if (filledbar >= MAXCO) { filledbar = MAXCO-1; }
 		Strcpy(tmp, newbot1);
 		p++;
 
 		/* draw hp bar */
 		if (iflags.use_inverse) term_start_attr(ATR_INVERSE);
 		p[filledbar] = '\0';
-		apply_color_option(percentage_color_of(uhp(), uhpmax(), hp_colors), tmp, 1);
+		if (iflags.use_color) {
+			/* draw in color mode */
+			apply_color_option(percentage_color_of(uhp(), uhpmax(), hp_colors), tmp, 1);
+		} else {
+			/* draw in inverse mode */
+			curs(WIN_STATUS, 1, 0);
+			putstr(WIN_STATUS, 0, tmp);
+		}
 		term_end_color();
 		if (iflags.use_inverse) term_end_attr(ATR_INVERSE);
 

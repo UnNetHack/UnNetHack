@@ -8,7 +8,7 @@
 #	and receive your quest assignment.
 #
 LEVEL: "Wiz-strt"
-FLAGS: noteleport,hardfloor,mazelevel
+FLAGS: noteleport,hardfloor,mazelevel,sky
 INIT_MAP:solidfill,' '
 MON_GENERATION:86%, (64,"vampire bat"), (16,'B'), (16,"xorn"), (4,'W')
 GEOMETRY:center,center

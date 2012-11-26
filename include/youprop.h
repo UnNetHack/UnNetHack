@@ -277,7 +277,9 @@
 #define EPasses_walls		u.uprops[PASSES_WALLS].extrinsic
 #define Passes_walls		(HPasses_walls || EPasses_walls || \
 				 passes_walls(youmonst.data))
-
+#ifdef CONVICT
+# define Phasing            u.uprops[PASSES_WALLS].intrinsic
+#endif /* CONVICT */
 
 /*** Physical attributes ***/
 #define HSlow_digestion		u.uprops[SLOW_DIGESTION].intrinsic
@@ -332,6 +334,7 @@
 
 #define EReflecting		u.uprops[REFLECTING].extrinsic
 #define Reflecting		(EReflecting || \
+				 (youmonst.data == &mons[PM_CHROMATIC_DRAGON]) || \
 				 (youmonst.data == &mons[PM_SILVER_DRAGON]))
 
 #define Free_action		u.uprops[FREE_ACTION].extrinsic /* [Tom] */

@@ -11,7 +11,6 @@ BIOS           allow the use of IBM ROM BIOS calls                [FALSE]
 cmdassist      give help for errors on direction & other commands [TRUE]
 confirm        ask before hitting tame or peaceful monsters       [TRUE]
 DECgraphics    use DEC/VT line-drawing characters for the dungeon [FALSE]
-eight_bit_tty  send 8-bit characters straight to terminal         [FALSE]
 extmenu        use a menu for selecting extended commands (#)     [FALSE]
 fixinv         try to retain the same letter for the same object  [TRUE]
 help           print all available info when using the / command  [TRUE]
@@ -92,6 +91,11 @@ timed_delay    on unix and VMS, use a timer instead of sending
                display effect.  on MSDOS without the termcap
                lib, whether or not to pause for visual effect.    [TRUE]
 
+Boolean option if QUIVER_FIRED was set at compile time:
+quiver_fired   when using the f (fire) command and no ammunition
+               is quivered, prompt for ammunition to quiver, then 
+               fire it.                                           [TRUE]
+
 Boolean option if QWERTZ was set at compile time:
 qwertz_layout  swap the y and z keys                              [FALSE]
 
@@ -144,6 +148,11 @@ runmode       controls how often the map window is updated when performing
 scores        the parts of the score list you wish to see when the game ends
               You choose a combination of top scores, scores around the top
               scores, and all of your own scores.  [!own/3 top/2 around]
+sortloot      controls the sortloot patch [none]:
+              full -- All pickup lists of items are sorted by item description
+              loot -- When inventory letters are shown, has no effect.
+                      Otherwise sorts by description
+              none -- Works the traditional way, like without the patch
 suppress_alert disable various version-specific warnings about changes
               in game play or the user interface, such as notification given
               for the 'Q' command that quitting is now done via #quit

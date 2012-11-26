@@ -32,7 +32,7 @@ static NEARDATA const int nasties[] = {
 	PM_COUATL, PM_CAPTAIN, PM_WINGED_GARGOYLE, PM_MASTER_MIND_FLAYER,
 	PM_FIRE_ELEMENTAL, PM_JABBERWOCK, PM_ARCH_LICH, PM_OGRE_KING,
 	PM_OLOG_HAI, PM_IRON_GOLEM, PM_OCHRE_JELLY, PM_GREEN_SLIME,
-	PM_DISENCHANTER
+	PM_DISENCHANTER,
 	};
 
 static NEARDATA const unsigned wizapp[] = {
@@ -231,8 +231,16 @@ target_on(mask, mtmp)
 		return(STRAT(STRAT_PLAYER, u.ux, u.uy, mask));
 	    else if((otmp = on_ground(otyp)))
 		return(STRAT(STRAT_GROUND, otmp->ox, otmp->oy, mask));
-	    else if((mtmp2 = other_mon_has_arti(mtmp, otyp)))
-		return(STRAT(STRAT_MONSTR, mtmp2->mx, mtmp2->my, mask));
+	    else if((mtmp2 = other_mon_has_arti(mtmp, otyp))) {
+		/* Don't let uniques attack other uniques with the amulet
+		 * as long the unique with amulet can't fight back. */
+		if ((mtmp->data->geno & G_UNIQ) &&
+		    (mtmp2->data->geno & G_UNIQ)) {
+			return(STRAT_NONE);
+		} else {
+			return(STRAT(STRAT_MONSTR, mtmp2->mx, mtmp2->my, mask));
+		}
+	    }
 	}
 	return(STRAT_NONE);
 }

@@ -129,6 +129,9 @@ static char obuf[BUFSIZ];	/* BUFSIZ is defined in stdio.h */
 static char winpanicstr[] = "Bad window id %d";
 char defmorestr[] = "--More--";
 
+/** Track if the player is still selecting his character. */
+boolean in_character_selection = FALSE;
+
 #ifdef MENU_COLOR
 extern struct menucoloring *menu_colorings;
 #endif
@@ -333,6 +336,8 @@ tty_player_selection()
 	anything any;
 	menu_item *selected = 0;
 
+	in_character_selection = TRUE;
+
 	/* prevent an unnecessary prompt */
 	rigid_role_checks();
 
@@ -380,19 +385,19 @@ give_up:	/* Quit */
 	    win = create_nhwindow(NHW_MENU);
 	    start_menu(win);
 	    any.a_int = 1;
-	    add_menu(win, NO_GLYPH, &any, 'v', 0, ATR_NONE,
+	    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'v', 0, ATR_NONE,
 		     "lawful female dwarf Valkyrie (uses melee and thrown weapons)",
 		     MENU_UNSELECTED);
 	    any.a_int = 2;
-	    add_menu(win, NO_GLYPH, &any, 'w', 0, ATR_NONE,
+	    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'w', 0, ATR_NONE,
 		     "chaotic male elf Wizard      (relies mostly on spells)",
 		     MENU_UNSELECTED);
 	    any.a_int = 3;
-	    add_menu(win, NO_GLYPH, &any, 'R', 0, ATR_NONE,
+	    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'R', 0, ATR_NONE,
 		     "neutral female human Ranger  (good with ranged combat)",
 		     MENU_UNSELECTED);
 	    any.a_int = 4;
-	    add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE,
+	    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'q', 0, ATR_NONE,
 		     "quit", MENU_UNSELECTED);
 	    end_menu(win, "What character do you want to try?");
 	    n = select_menu(win, PICK_ONE, &selected);
@@ -467,7 +472,7 @@ give_up:	/* Quit */
 				} else 
 					Strcpy(rolenamebuf, roles[i].name.m);
 			}	
-			add_menu(win, NO_GLYPH, &any, thisch,
+			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, thisch,
 			    0, ATR_NONE, an(rolenamebuf), MENU_UNSELECTED);
 			lastch = thisch;
 		    }
@@ -476,10 +481,10 @@ give_up:	/* Quit */
 				    flags.initalign, PICK_RANDOM)+1;
 		if (any.a_int == 0)	/* must be non-zero */
 		    any.a_int = randrole()+1;
-		add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , '*', 0, ATR_NONE,
 				"Random", MENU_UNSELECTED);
 		any.a_int = i+1;	/* must be non-zero */
-		add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				"Quit", MENU_UNSELECTED);
 		Sprintf(pbuf, "Pick a role for your %s", plbuf);
 		end_menu(win, pbuf);
@@ -540,17 +545,17 @@ give_up:	/* Quit */
 			if (ok_race(flags.initrole, i, flags.initgend,
 							flags.initalign)) {
 			    any.a_int = i+1;	/* must be non-zero */
-			    add_menu(win, NO_GLYPH, &any, races[i].noun[0],
+			    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, races[i].noun[0],
 				0, ATR_NONE, races[i].noun, MENU_UNSELECTED);
 			}
 		    any.a_int = pick_race(flags.initrole, flags.initgend,
 					flags.initalign, PICK_RANDOM)+1;
 		    if (any.a_int == 0)	/* must be non-zero */
 			any.a_int = randrace(flags.initrole)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , '*', 0, ATR_NONE,
 				    "Random", MENU_UNSELECTED);
 		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				    "Quit", MENU_UNSELECTED);
 		    Sprintf(pbuf, "Pick the race of your %s", plbuf);
 		    end_menu(win, pbuf);
@@ -612,17 +617,17 @@ give_up:	/* Quit */
 			if (ok_gend(flags.initrole, flags.initrace, i,
 							    flags.initalign)) {
 			    any.a_int = i+1;
-			    add_menu(win, NO_GLYPH, &any, genders[i].adj[0],
+			    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, genders[i].adj[0],
 				0, ATR_NONE, genders[i].adj, MENU_UNSELECTED);
 			}
 		    any.a_int = pick_gend(flags.initrole, flags.initrace,
 					    flags.initalign, PICK_RANDOM)+1;
 		    if (any.a_int == 0)	/* must be non-zero */
 			any.a_int = randgend(flags.initrole, flags.initrace)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , '*', 0, ATR_NONE,
 				    "Random", MENU_UNSELECTED);
 		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				    "Quit", MENU_UNSELECTED);
 		    Sprintf(pbuf, "Pick the gender of your %s", plbuf);
 		    end_menu(win, pbuf);
@@ -683,17 +688,17 @@ give_up:	/* Quit */
 			if (ok_align(flags.initrole, flags.initrace,
 							flags.initgend, i)) {
 			    any.a_int = i+1;
-			    add_menu(win, NO_GLYPH, &any, aligns[i].adj[0],
+			    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, aligns[i].adj[0],
 				 0, ATR_NONE, aligns[i].adj, MENU_UNSELECTED);
 			}
 		    any.a_int = pick_align(flags.initrole, flags.initrace,
 					    flags.initgend, PICK_RANDOM)+1;
 		    if (any.a_int == 0)	/* must be non-zero */
 			any.a_int = randalign(flags.initrole, flags.initrace)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , '*', 0, ATR_NONE,
 				    "Random", MENU_UNSELECTED);
 		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				    "Quit", MENU_UNSELECTED);
 		    Sprintf(pbuf, "Pick the alignment of your %s", plbuf);
 		    end_menu(win, pbuf);
@@ -709,6 +714,7 @@ give_up:	/* Quit */
 	    }
 	}
 	/* Success! */
+	in_character_selection = FALSE;
 	tty_display_nhwindow(BASE_WINDOW, FALSE);
 }
 
@@ -894,15 +900,16 @@ tty_create_nhwindow(type)
 	newwin->maxcol = newwin->cols = 0;
 	break;
     case NHW_STATUS:
-	/* status window, 2 lines long, full width, bottom of screen */
+	/* status window, 2 or 3 lines long, full width, bottom of screen */
+	iflags.statuslines = (LI > ROWNO+3) ? 3 : 2;
 	newwin->offx = 0;
 #if defined(USE_TILES) && defined(MSDOS)
 	if (iflags.grmode) {
-		newwin->offy = ttyDisplay->rows-2;
+		newwin->offy = ttyDisplay->rows-iflags.statuslines;
 	} else
 #endif
-	newwin->offy = min((int)ttyDisplay->rows-2, ROWNO+1);
-	newwin->rows = newwin->maxrow = 2;
+	newwin->offy = min((int)ttyDisplay->rows-iflags.statuslines, ROWNO+iflags.statuslines-1);
+	newwin->rows = newwin->maxrow = iflags.statuslines;
 	newwin->cols = newwin->maxcol = min(ttyDisplay->cols, MAXCO);
 	break;
     case NHW_MAP:
@@ -1052,6 +1059,10 @@ tty_clear_nhwindow(window)
 	cl_end();
 	tty_curs(window, 1, 1);
 	cl_end();
+	if (iflags.statuslines == 3) {
+		tty_curs(window, 1, 2);
+		cl_end();
+	}
 	break;
     case NHW_MAP:
 	/* cheap -- clear the whole thing and tell nethack to redraw botl */
@@ -1189,14 +1200,42 @@ invert_all(window, page_start, page_end, acc)
     }
 }
 
+/* Strip [] from strings like "a [cursed] rusty iron wand" so
+ * menucolors regexp can apply.
+ * Completely hacky. */
+static void
+strip_brackets(str)
+char *str;
+{
+	/* from http://stackoverflow.com/questions/4161822 */
+	char *src, *dest;
+
+	src = dest = str; /* both pointers point to the first char of input */
+	while (*src != '\0') /* exit loop when null terminator reached */
+	{
+		if (*src != '[' && *src != ']') /* if source is not a [] char */
+		{
+			*dest = *src; /* copy the char at source to destination */
+			dest++;       /* increment destination pointer */
+		}
+		src++; /* increment source pointer */
+	}
+	*dest = '\0'; /* terminate string with null terminator */
+}
+
 #ifdef MENU_COLOR
 boolean
-get_menu_coloring(str, color, attr)
-const char *str;
+get_menu_coloring(line, color, attr)
+const char *line;
 int *color, *attr;
 {
     struct menucoloring *tmpmc;
-    if (iflags.use_menu_color)
+    char str[BUFSZ];
+
+    strcpy(str, line);
+    strip_brackets(str);
+
+    if (iflags.use_menu_color && iflags.use_color)
 	for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
 # ifdef MENU_COLOR_REGEX
 #  ifdef MENU_COLOR_REGEX_POSIX
@@ -1310,8 +1349,46 @@ struct WinDesc *cw;
 		     * actually output the character.  We're faster doing
 		     * this.
 		     */
+		    /* add selector for display */
+		    if (curr->selector) {
+			    /* because WIN32CON this must be done in
+			     * a brain-dead way */
+			    putchar(curr->selector); ttyDisplay->curx++;
+			    putchar(' '); ttyDisplay->curx++;
+			    /* set item state */
+			    if (curr->identifier.a_void != 0 && curr->selected) {
+				    if (curr->count == -1L)
+					    (void) putchar('+'); /* all selected */
+				    else
+					    (void) putchar('#'); /* count selected */
+			    } else {
+				    putchar('-');
+			    }
+			    ttyDisplay->curx++;
+			    putchar(' '); ttyDisplay->curx++;
+		    }
+#ifndef WIN32CON
+		    if (curr->glyph != NO_GLYPH && !iflags.vanilla_ui_behavior) {
+			    int glyph_color = NO_COLOR;
+			    glyph_t character;
+			    unsigned special; /* unused */
+			    /* map glyph to character and color */
+			    mapglyph(curr->glyph, &character, &glyph_color, &special, 0, 0);
+
+			    if (glyph_color != NO_COLOR) term_start_color(glyph_color);
+#ifdef UTF8_GLYPHS
+			    pututf8char(character);
+#else
+			    putchar(character);
+#endif
+			    if (glyph_color != NO_COLOR) term_end_color();
+			    putchar(' ');
+			    ttyDisplay->curx +=2;
+		    }
+#endif
+
 #ifdef MENU_COLOR
-		   if (iflags.use_menu_color &&
+		   if (iflags.use_menu_color && iflags.use_color &&
 		       (menucolr = get_menu_coloring(curr->str, &color,&attr))) {
 		       term_start_attr(attr);
 		       if (color != NO_COLOR) term_start_color(color);
@@ -1326,16 +1403,9 @@ struct WinDesc *cw;
 			  *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
 			  cp++, n++, ttyDisplay->curx++)
 #endif
-			if (n == 2 && curr->identifier.a_void != 0 &&
-							curr->selected) {
-			    if (curr->count == -1L)
-				(void) putchar('+'); /* all selected */
-			    else
-				(void) putchar('#'); /* count selected */
-			} else
 			    (void) putchar(*cp);
 #ifdef MENU_COLOR
-		   if (iflags.use_menu_color && menucolr) {
+		   if (iflags.use_menu_color && iflags.use_color && menucolr) {
 		       if (color != NO_COLOR) term_end_color();
 		       term_end_attr(attr);
 		   } else
@@ -1502,24 +1572,20 @@ struct WinDesc *cw;
 			curr != page_end;
 			n++, curr = curr->next)
 		    if (morc == curr->selector) {
-			if (curr->selected) {
-			    if (counting && count > 0) {
-				curr->count = count;
-				set_item_state(window, n, curr);
-			    } else { /* change state */
-				curr->selected = FALSE;
-				curr->count = -1L;
-				set_item_state(window, n, curr);
-			    }
+		    	if (counting && count > 0) {
+			    curr->selected = TRUE;
+			    if (count < curr->maxcount)
+			    	curr->count = count;
+			    else
+			        curr->count = -1L;
+			    set_item_state(window, n, curr);
+			} else if (curr->selected) { /* change state */
+			    curr->selected = FALSE;
+			    curr->count = -1L;
+			    set_item_state(window, n, curr);
 			} else {	/* !selected */
-			    if (counting && count > 0) {
-				curr->count = count;
-				curr->selected = TRUE;
-				set_item_state(window, n, curr);
-			    } else if (!counting) {
-				curr->selected = TRUE;
-				set_item_state(window, n, curr);
-			    }
+			    curr->selected = TRUE;
+			    set_item_state(window, n, curr);
 			    /* do nothing counting&&count==0 */
 			}
 
@@ -1825,7 +1891,15 @@ tty_putsym(window, x, y, ch)
     case NHW_MAP:
     case NHW_BASE:
 	tty_curs(window, x, y);
+#ifdef UTF8_GLYPHS
+	if (iflags.UTF8graphics) {
+		pututf8char(ch);
+	} else {
+		(void) putchar(ch);
+	}
+#else
 	(void) putchar(ch);
+#endif
 	ttyDisplay->curx++;
 	cw->curx++;
 	break;
@@ -1923,7 +1997,7 @@ tty_putstr(window, attr, str)
 
 	(void) strncpy(&cw->data[cw->cury][j], str, cw->cols - j - 1);
 	cw->data[cw->cury][cw->cols-1] = '\0'; /* null terminate */
-	cw->cury = (cw->cury+1) % 2;
+	cw->cury = (cw->cury+1) % iflags.statuslines;
 	cw->curx = 0;
 	break;
     case NHW_MAP:
@@ -2009,14 +2083,23 @@ tty_putstr(window, attr, str)
 }
 
 void
+#ifdef FILE_AREAS
+tty_display_file(farea, fname, complain)
+const char *farea;
+#else
 tty_display_file(fname, complain)
+#endif
 const char *fname;
 boolean complain;
 {
 #ifdef DEF_PAGER			/* this implies that UNIX is defined */
     {
 	/* use external pager; this may give security problems */
+#ifdef FILE_AREAS
+	register int fd = open_area(farea, fname, 0, 0);
+#else
 	register int fd = open(fname, 0);
+#endif
 
 	if(fd < 0) {
 	    if(complain) pline("Cannot open %s.", fname);
@@ -2046,7 +2129,11 @@ boolean complain;
 	char *cr;
 
 	tty_clear_nhwindow(WIN_MESSAGE);
+#ifdef FILE_AREAS
+	f = dlb_fopen_area(farea, fname, "r");
+#else
 	f = dlb_fopen(fname, "r");
+#endif
 	if (!f) {
 	    if(complain) {
 		home();  tty_mark_synch();  tty_raw_print("");
@@ -2100,9 +2187,10 @@ tty_start_menu(window)
  * later.
  */
 void
-tty_add_menu(window, glyph, identifier, ch, gch, attr, str, preselected)
+tty_add_menu(window, glyph, cnt, identifier, ch, gch, attr, str, preselected)
     winid window;	/* window to use, must be of type NHW_MENU */
-    int glyph;		/* glyph to display with item (unused) */
+    int glyph;		/* glyph to display with item */
+    int cnt;		/* max number of times this item can be selected */
     const anything *identifier;	/* what to return if selected */
     char ch;		/* keyboard accelerator (0 = pick our own) */
     char gch;		/* group accelerator (0 = no group) */
@@ -2112,8 +2200,6 @@ tty_add_menu(window, glyph, identifier, ch, gch, attr, str, preselected)
 {
     register struct WinDesc *cw = 0;
     tty_menu_item *item;
-    const char *newstr;
-    char buf[4+BUFSZ];
 
     if (str == (const char*) 0)
 	return;
@@ -2123,19 +2209,6 @@ tty_add_menu(window, glyph, identifier, ch, gch, attr, str, preselected)
 	panic(winpanicstr,  window);
 
     cw->nitems++;
-    if (identifier->a_void) {
-	int len = strlen(str);
-	if (len >= BUFSZ) {
-	    /* We *think* everything's coming in off at most BUFSZ bufs... */
-	    impossible("Menu item too long (%d).", len);
-	    len = BUFSZ - 1;
-	}
-	Sprintf(buf, "%c - ", ch ? ch : '?');
-	(void) strncpy(buf+4, str, len);
-	buf[4+len] = '\0';
-	newstr = buf;
-    } else
-	newstr = str;
 
     item = (tty_menu_item *) alloc(sizeof(tty_menu_item));
     item->identifier = *identifier;
@@ -2144,7 +2217,9 @@ tty_add_menu(window, glyph, identifier, ch, gch, attr, str, preselected)
     item->selector = ch;
     item->gselector = gch;
     item->attr = attr;
-    item->str = copy_of(newstr);
+    item->str = copy_of(str);
+    item->glyph = glyph;
+    item->maxcount = cnt;
 
     item->next = cw->mlist;
     cw->mlist = item;
@@ -2195,8 +2270,8 @@ tty_end_menu(window, prompt)
 	anything any;
 
 	any.a_void = 0;	/* not selectable */
-	tty_add_menu(window, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
-	tty_add_menu(window, NO_GLYPH, &any, 0, 0, ATR_NONE, prompt, MENU_UNSELECTED);
+	tty_add_menu(window, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+	tty_add_menu(window, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, prompt, MENU_UNSELECTED);
     }
 
     lmax = min(52, (int)ttyDisplay->rows - 1);		/* # lines per page */
@@ -2219,12 +2294,23 @@ tty_end_menu(window, prompt)
 	    cw->plist[n/lmax] = curr;
 	}
 	if (curr->identifier.a_void && !curr->selector) {
-	    curr->str[0] = curr->selector = menu_ch;
+	    curr->selector = menu_ch;
 	    if (menu_ch++ == 'z') menu_ch = 'A';
 	}
 
 	/* cut off any lines that are too long */
 	len = strlen(curr->str) + 2;	/* extra space at beg & end */
+
+	if (curr->selector) {
+		/* extra space for keyboard accelerator */
+		len += 4;
+		if (curr->glyph != NO_GLYPH &&
+		    !iflags.vanilla_ui_behavior) {
+			/* extra space for glyph */
+			len += 2;
+		}
+	}
+
 	if (len > (int)ttyDisplay->cols) {
 	    curr->str[ttyDisplay->cols-2] = 0;
 	    len = ttyDisplay->cols;
@@ -2412,7 +2498,8 @@ docorner(xmin, ymax)
     }
 
     end_glyphout();
-    if (ymax >= (int) wins[WIN_STATUS]->offy) {
+    if (!in_character_selection && /* check for status lines to update */
+        (ymax >= (int) wins[WIN_STATUS]->offy)) {
 					/* we have wrecked the bottom line */
 	flags.botlx = 1;
 	bot();
@@ -2527,7 +2614,7 @@ tty_print_glyph(window, x, y, glyph)
     xchar x, y;
     int glyph;
 {
-    int ch;
+    glyph_t ch;
     boolean reverse_on = FALSE;
     int	    color;
     unsigned special;
@@ -2578,7 +2665,15 @@ tty_print_glyph(window, x, y, glyph)
       xputg(glyph,ch,special);
     else
 #endif
+#ifdef UTF8_GLYPHS
+	if (iflags.UTF8graphics) {
+		pututf8char(ch);
+	} else {
+		g_putch(ch);	/* print the character */
+	}
+#else
 	g_putch(ch);		/* print the character */
+#endif
 
     if (reverse_on) {
     	term_end_attr(ATR_INVERSE);

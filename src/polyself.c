@@ -267,14 +267,14 @@ boolean forcecontrol;
 	int tries=0;
 	boolean draconian = (uarm &&
 				uarm->otyp >= GRAY_DRAGON_SCALE_MAIL &&
-				uarm->otyp <= YELLOW_DRAGON_SCALES);
+				uarm->otyp <= CHROMATIC_DRAGON_SCALES);
 	boolean iswere = (u.ulycn >= LOW_PM || is_were(youmonst.data));
 	boolean isvamp = (is_vampire(youmonst.data));
 	boolean was_floating = (Levitation || Flying);
 
         if(!Polymorph_control && !forcecontrol && !draconian && !iswere && !isvamp) {
 	    if (rn2(20) > ACURR(A_CON)) {
-		You(shudder_for_moment);
+		You("%s", shudder_for_moment);
 		losehp(rnd(30), "system shock", KILLED_BY_AN);
 		exercise(A_CON, FALSE);
 		return;
@@ -296,7 +296,7 @@ boolean forcecontrol;
 				You("cannot polymorph into that.");
 			else break;
 		} while(++tries < 5);
-		if (tries==5) pline(thats_enough_tries);
+		if (tries==5) pline("%s", thats_enough_tries);
 		/* allow skin merging, even when polymorph is controlled */
 		if (draconian &&
 		    (mntmp == armor_to_dragon(uarm->otyp) || tries == 5))
@@ -795,11 +795,17 @@ dobreathe()
 	if (!getdir((char *)0)) return(0);
 
 	mattk = attacktype_fordmg(youmonst.data, AT_BREA, AD_ANY);
-	if (!mattk)
-	    warning("bad breath attack?");	/* mouthwash needed... */
-	else
-	    buzz((int) (20 + mattk->adtyp-1), (int)mattk->damn,
-		u.ux, u.uy, u.dx, u.dy);
+	/* if new breath types are added, change AD_ACID to max type */
+	/* see also breamu() in mthrowu.c */
+	int typ = (mattk->adtyp == AD_RBRE) ? rnd(AD_ACID) : mattk->adtyp ;
+	if (!mattk) {
+		warning("bad breath attack?");	/* mouthwash needed... */
+	} else if ((typ >= AD_MAGM) && (typ <= AD_ACID)) {
+		buzz((int) (20 + typ-1), (int)mattk->damn,
+				u.ux, u.uy, u.dx, u.dy);
+	} else {
+		warning("Breath weapon %d used", typ-1);
+	}
 	return(1);
 }
 
@@ -1379,6 +1385,9 @@ int atyp;
 	    case YELLOW_DRAGON_SCALE_MAIL:
 	    case YELLOW_DRAGON_SCALES:
 		return PM_YELLOW_DRAGON;
+	    case CHROMATIC_DRAGON_SCALE_MAIL:
+	    case CHROMATIC_DRAGON_SCALES:
+		return PM_CHROMATIC_DRAGON;
 	    default:
 		return -1;
 	}

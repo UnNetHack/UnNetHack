@@ -9,7 +9,7 @@
 #	and receive your quest assignment.
 #
 LEVEL: "Kni-strt"
-FLAGS: noteleport,hardfloor,mazelevel
+FLAGS: noteleport,hardfloor,mazelevel,sky
 # This is a kludge to init the level as a lit field.
 INIT_MAP: mines, '.' , '.' , false , false , lit , false
 MON_GENERATION:86%, (64,"quasit"), (16,'i'), (16,"ochre jelly"), (4,'j')

@@ -17,6 +17,76 @@ STATIC_DCL void FDECL(interrupt_multi, (const char *,int,int));
 
 #ifdef OVL0
 
+static int prev_hp_notify;
+
+char *
+hpnotify_format_str(char *str)
+{
+    static char buf[128];
+    char *f, *p, *end;
+    int ispercent = 0;
+
+    buf[0] = '\0';
+
+    if (!str) return NULL;
+
+    f = str;
+    p = buf;
+    end = buf + sizeof(buf) - 10;
+
+    while (*f) {
+      if (ispercent) {
+	switch (*f) {
+	case 'a':
+	    snprintf (p, end + 1 - p, "%ld", (long)abs(uhp()-prev_hp_notify));
+	  while (*p != '\0')
+	    p++;
+	  break;
+        case 'c':
+	    snprintf (p, end + 1 - p, "%c", (prev_hp_notify > uhp() ? '-' : '+'));
+	  p++;
+	  break;
+	case 'm':
+	    snprintf (p, end + 1 - p, "%ld", (long)uhpmax());
+	  while (*p != '\0')
+	    p++;
+	  break;
+	case 'H':
+	    if (uhp() == uhpmax()) {
+	    snprintf (p, end + 1 - p, "%s", "max");
+	  } else {
+		snprintf (p, end + 1 - p, "%ld", (long)uhp());
+	  }
+	  while (*p != '\0')
+	    p++;
+	  break;
+	case 'h':
+	    snprintf (p, end + 1 - p, "%ld", (long)uhp());
+	  while (*p != '\0')
+	    p++;
+	  break;
+	default:
+	  *p = *f;
+	  if (p < end)
+	    p++;
+	}
+	ispercent = 0;
+      } else {
+	if (*f == '%')
+	  ispercent = 1;
+	else {
+	  *p = *f;
+	  if (p < end)
+	    p++;
+	}
+      }
+      f++;
+    }
+    *p = '\0';
+
+    return buf;
+}
+
 void
 moveloop()
 {
@@ -61,6 +131,7 @@ moveloop()
 
     u.uz0.dlevel = u.uz.dlevel;
     youmonst.movement = NORMAL_SPEED;	/* give the hero some movement points */
+    prev_hp_notify = uhp();
 #ifdef WHEREIS_FILE
     touch_whereis();
 #endif
@@ -346,15 +417,23 @@ moveloop()
 	}
 
 #ifdef REALTIME_ON_BOTL
-	if(iflags.showrealtime) {
+	if (iflags.showrealtime) {
 		/* Update the bottom line if the number of minutes has
 		 * changed */
-		if(get_realtime() / 60 != realtime_data.last_displayed_time / 60)
+		time_t currenttime = get_realtime();
+		if (currenttime / 60 != realtime_data.last_displayed_time / 60) {
 			flags.botl = 1;
+			realtime_data.last_displayed_time = currenttime;
+		}
 	}
 #endif
 
 	if(flags.botl || flags.botlx) bot();
+
+	if (iflags.hp_notify && (prev_hp_notify != uhp())) {
+	  pline("%s", hpnotify_format_str(iflags.hp_notify_fmt ? iflags.hp_notify_fmt : "[HP%c%a=%h]"));
+	  prev_hp_notify = uhp();
+	}
 
 	flags.move = 1;
 
@@ -425,6 +504,7 @@ moveloop()
 	} else if (multi == 0) {
 #ifdef MAIL
 	    ckmailstatus();
+	    maybe_hint();
 #endif
             maybe_tutorial();
 	    rhack((char *)0);
@@ -529,7 +609,7 @@ newgame()
 	(void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #endif
 #ifdef NEWS
-	if(iflags.news) display_file(NEWS, FALSE);
+	if(iflags.news) display_file_area(NEWS_AREA, NEWS, FALSE);
 #endif
 	load_qtlist();	/* load up the quest text info */
 /*	quest_init();*/	/* Now part of role_init() */
@@ -548,10 +628,27 @@ newgame()
 	if(MON_AT(u.ux, u.uy)) mnexto(m_at(u.ux, u.uy));
 	(void) makedog();
 	docrt();
+#ifdef CONVICT
+	if (Role_if(PM_CONVICT)) {
+		setworn(mkobj(CHAIN_CLASS, TRUE), W_CHAIN);
+		setworn(mkobj(BALL_CLASS, TRUE), W_BALL);
+		uball->spe = 1;
+		placebc();
+		newsym(u.ux,u.uy);
+	}
+#endif /* CONVICT */
 
 	if (flags.legacy) {
 		flush_screen(1);
+#ifdef CONVICT
+	if (Role_if(PM_CONVICT)) {
+		com_pager(199);
+	} else {
 		com_pager(1);
+	}
+#else
+		com_pager(1);
+#endif /* CONVICT */
 	}
 
 #ifdef INSURANCE
@@ -585,6 +682,7 @@ boolean new_game;	/* false => restoring an old game */
     char buf[BUFSZ];
     boolean currentgend = Upolyd ? u.mfemale : flags.female;
     const char *role_name;
+    char *annotation;
 
     /*
      * The "welcome back" message always describes your innate form
@@ -612,6 +710,11 @@ boolean new_game;	/* false => restoring an old game */
 	  livelog_game_started(new_game ? "started" : "resumed",
 	                       buf, urace.adj, role_name);
 #endif
+	/* show level annotation when restoring the level */
+	if (!new_game && iflags.show_annotation &&
+	    (annotation = get_annotation(&u.uz))) {
+		You("annotated this level: %s", annotation);
+	}
 }
 
 #ifdef POSITIONBAR
@@ -674,26 +777,41 @@ do_positionbar()
 time_t
 get_realtime(void)
 {
-	time_t curtime;
+	time_t current_time = 0;
+	/* Add maximally this many seconds per invocation to get somewhat
+	 * reasonable realtime values. */
+#define MAX_IDLE_TIME_IN_SECONDS 60
+	static time_t time_last_activity = 0;
+	static time_t time_spent_playing = 0;
 
     /* Get current time */
 #if defined(BSD) && !defined(POSIX_TYPES)
-	(void) time((long *)&curtime);
+	(void) time((long *)&current_time);
 #else
-	(void) time(&curtime);
+	(void) time(&current_time);
 #endif
+
+	/* Initialize last_activity_time. */
+	if (time_last_activity == 0) {
+		time_last_activity = current_time;
+	}
 
 	/* Since the timer isn't set until the game starts, this prevents us
 	 * from displaying nonsense on the bottom line before it does. */
-	if(realtime_data.restoretime == 0) {
-		curtime = realtime_data.realtime;
+	if (realtime_data.restoretime == 0) {
+		time_spent_playing = realtime_data.realtime;
 	} else {
-		curtime -= realtime_data.restoretime;
-		curtime += realtime_data.realtime;
+		time_t idletime = current_time - time_last_activity;
+		time_last_activity = current_time;
+		/* Add time the player spent "thinking". */
+		time_spent_playing += (idletime > MAX_IDLE_TIME_IN_SECONDS) ? MAX_IDLE_TIME_IN_SECONDS : idletime;
+		/* Update realtime for livelog events. */
+		realtime_data.realtime = time_spent_playing;
 	}
 
-	return curtime;
+	return time_spent_playing;
 }
+#undef MAX_IDLE_TIME_IN_SECONDS
 #endif /* REALTIME_ON_BOTL || RECORD_REALTIME */
 
 #endif /* OVLB */

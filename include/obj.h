@@ -34,14 +34,18 @@ struct obj {
 				   royal coffers for a court ( == 2)
 				   tells which fruit a fruit is
 				   special for uball and amulet
-				   historic and gender for statues */
+				   historic and gender for statues
+				   real mail, junk mail or hint for scrolls of mail */
 #define STATUE_HISTORIC 0x01
 #define STATUE_MALE     0x02
 #define STATUE_FEMALE   0x04
+#define MAIL_MAIL 0
+#define MAIL_JUNK 1
+#define MAIL_HINT 2
 	char	oclass;		/* object class */
 	char	invlet;		/* designation in inventory */
-	char	oartifact;	/* artifact array index */
-
+	int	oartifact;	/* artifact array index */
+	int	mysterious_reserved_int;	/* so I might add something cool in 3.6.1+ */
 	xchar where;		/* where the object thinks it is */
 #define OBJ_FREE	0		/* object not attached to anything */
 #define OBJ_FLOOR	1		/* object on floor */
@@ -195,6 +199,8 @@ struct obj {
 			 objects[otmp->otyp].oc_armcat == ARM_SHIRT)
 #define is_suit(otmp)	(otmp->oclass == ARMOR_CLASS && \
 			 objects[otmp->otyp].oc_armcat == ARM_SUIT)
+
+/* http://nethackwiki.com/wiki/Unofficial_conduct#Racial */
 #define is_elven_armor(otmp)	((otmp)->otyp == ELVEN_LEATHER_HELM\
 				|| (otmp)->otyp == ELVEN_MITHRIL_COAT\
 				|| (otmp)->otyp == ELVEN_CLOAK\
@@ -238,9 +244,9 @@ struct obj {
 
 /* dragon gear */
 #define Is_dragon_scales(idx)	(idx >= GRAY_DRAGON_SCALES && \
-				 idx <= YELLOW_DRAGON_SCALES)
+				 idx <= CHROMATIC_DRAGON_SCALES)
 #define Is_dragon_mail(idx)	(idx >= GRAY_DRAGON_SCALE_MAIL && \
-				 idx <= YELLOW_DRAGON_SCALE_MAIL)
+				 idx <= CHROMATIC_DRAGON_SCALE_MAIL)
 #define Is_dragon_armor(idx)	(Is_dragon_scales(idx) || Is_dragon_mail(idx))
 #define Is_gold_dragon_armor(idx)	(Is_dragon_armor(idx) && \
 					 (OBJ_DESCR(objects[idx])) && \
@@ -253,6 +259,7 @@ struct obj {
 				      - GRAY_DRAGON_SCALE_MAIL]
 #define Dragon_to_scales(pm)	(GRAY_DRAGON_SCALES + (pm - mons))
 
+/* http://nethackwiki.com/wiki/Unofficial_conduct#Racial */
 /* Elven gear */
 #define is_elven_weapon(otmp)	((otmp)->otyp == ELVEN_ARROW\
 				|| (otmp)->otyp == ELVEN_SPEAR\

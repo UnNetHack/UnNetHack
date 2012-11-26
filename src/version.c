@@ -51,7 +51,7 @@ doversion()
 int
 doextversion()
 {
-	display_file(OPTIONS_USED, TRUE);
+	display_file_area(NH_OPTIONS_USED_AREA, OPTIONS_USED, TRUE);
 	return 0;
 }
 

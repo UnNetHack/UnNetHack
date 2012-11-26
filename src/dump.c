@@ -165,27 +165,42 @@ const char *pre, *str;
 extern boolean get_menu_coloring(const char *str, int *color, int *attr);
 #endif
 
+static char tmp_html_link[BUFSZ];
+/** Return a link to nethackwiki . */
+char *
+html_link(link_name, name)
+const char *link_name;
+const char *name;
+{
+	snprintf(tmp_html_link, BUFSZ,
+		"<a href=\"http://nethackwiki.com/wiki/%s\">%s</a>",
+		link_name, name);
+	return tmp_html_link;
+}
+
 /** Dumps an object from the inventory. */
 void
-dump_object(c, str)
+dump_object(c, obj, str)
 const char c;
+const struct obj *obj;
 const char *str;
 {
 #ifdef DUMP_LOG
 	if (dump_fp)
 		fprintf(dump_fp, "  %c - %s\n", c, str);
 	if (html_dump_fp) {
+		char *link = html_link(dump_typename(obj->otyp), str);
 #ifdef MENU_COLOR
 # ifdef TTY_GRAPHICS
 		int color;
 		int attr;
 		if (iflags.use_menu_color &&
 		    get_menu_coloring(str, &color, &attr)) {
-			fprintf(html_dump_fp, "<span class=\"nh_color_%d\"><span class=\"nh_item_letter\">%c</span> - %s</span><br />\n", color, c, str);
+			fprintf(html_dump_fp, "<span class=\"nh_color_%d\"><span class=\"nh_item_letter\">%c</span> - %s</span><br />\n", color, c, link);
 		} else
 # endif
 #endif
-		fprintf(html_dump_fp, "<span class=\"nh_item_letter\">%c</span> - %s<br />\n", c, str);
+		fprintf(html_dump_fp, "<span class=\"nh_item_letter\">%c</span> - %s<br />\n", c, link);
 	}
 #endif
 }
@@ -225,6 +240,46 @@ dump_list_start()
 #ifdef DUMP_LOG
 	if (html_dump_fp)
 		fprintf(html_dump_fp, "<ul>\n");
+#endif
+}
+
+/** Dumps a linked list item. */
+void
+dump_list_item_link(link, str)
+const char *link;
+const char *str;
+{
+#ifdef DUMP_LOG
+	if (dump_fp)
+		fprintf(dump_fp, "  %s\n", str);
+	if (html_dump_fp)
+		fprintf(html_dump_fp, "<li>%s</li>\n", html_link(link, str));
+#endif
+}
+
+/** Dumps an object as list item. */
+void
+dump_list_item_object(obj)
+struct obj *obj;
+{
+#ifdef DUMP_LOG
+	if (dump_fp)
+		fprintf(dump_fp, "  %s\n", doname(obj));
+	if (html_dump_fp) {
+		const char* str = doname(obj);
+		char *link = html_link(dump_typename(obj->otyp), str);
+#ifdef MENU_COLOR
+# ifdef TTY_GRAPHICS
+		int color;
+		int attr;
+		if (iflags.use_menu_color &&
+		    get_menu_coloring(str, &color, &attr)) {
+			fprintf(html_dump_fp, "<li class=\"nh_color_%d\">%s</li>\n", color, link);
+		} else
+# endif
+#endif
+		fprintf(html_dump_fp, "<li>%s</li>\n", link);
+	}
 #endif
 }
 
@@ -286,8 +341,12 @@ const char *str;
 #ifdef DUMP_LOG
 	if (dump_fp)
 		fprintf(dump_fp, "  %s\n", str);
-	if (html_dump_fp)
-		fprintf(html_dump_fp, "<dt>%s</dt>\n", str);
+	if (html_dump_fp) {
+		fprintf(html_dump_fp, "<dt>");
+		while (*str != '\0')
+			fprintf(html_dump_fp, "%s", html_escape_character(*str++));
+		fprintf(html_dump_fp, "</dt>\n");
+	}
 #endif
 }
 

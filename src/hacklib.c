@@ -46,6 +46,10 @@ NetHack, except that rounddiv may call panic().
 	int		night		(void)
 	int		midnight	(void)
 	boolean		towelday	(void)
+	boolean		piday		(void)
+	boolean		pirateday	(void)
+	boolean		aprilfoolsday	(void)
+	boolean		discordian_holiday	(void)
 	char *		get_formatted_time		(time_t, const char *)
 	char *		iso8601		(time_t)
 =*/
@@ -655,8 +659,30 @@ towelday()
 boolean
 piday()
 {
-	return(boolean)((getmonth()==3) && (getmday()==14));
+	return(boolean)(
+	 ((getmonth()==3) && (getmday()==14)) || /* Pi Day */
+	 ((getmday()==22) && (getmonth()==7)));  /* Pi Approximation Day */
+
 }
+
+boolean
+aprilfoolsday()
+{
+	return(boolean)((getmonth()==4) && (getmday()==1));
+}
+
+boolean
+pirateday()
+{
+	return(boolean)((getmday()==19) && (getmonth()==9));
+}
+
+boolean
+discordian_holiday()
+{
+	return(boolean)((getmday()==23) && (getmonth()==5));
+}
+
 
 static char buf_fmt_time[BUFSZ];
 /** Returns a date formatted by strftime.

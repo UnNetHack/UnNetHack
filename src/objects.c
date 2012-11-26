@@ -4,7 +4,7 @@
 
 #ifndef OBJECTS_PASS_2_
 /* first pass */
-struct monst { struct monst *dummy; };	/* lint: struct obj's union */
+/*struct monst { struct monst *dummy; };*/	/* lint: struct obj's union */
 #include "config.h"
 #include "obj.h"
 #include "objclass.h"
@@ -41,7 +41,7 @@ NEARDATA struct objdescr obj_descr[] = {
 # define BITS(nmkn,mrg,uskn,ctnr,mgc,chrg,uniq,nwsh,big,tuf,dir,sub,mtrl) \
 	nmkn,mrg,uskn,0,mgc,chrg,uniq,nwsh,big,tuf,dir,mtrl,sub /* SCO ODT 1.1 cpp fodder */
 # define OBJECT(obj,bits,prp,sym,prob,dly,wt,cost,sdam,ldam,oc1,oc2,nut,color) \
-	{0, 0, (char *)0, bits, prp, sym, dly, COLOR_FIELD(color) \
+	{0, 0, (char *)0, bits, prp, sym, 0, dly, COLOR_FIELD(color) \
 	 prob, wt, cost, sdam, ldam, oc1, oc2, nut}
 # ifndef lint
 #  define HARDGEM(n) (n >= 8)
@@ -333,36 +333,38 @@ HELM("helm of telepathy", "visored helmet",
 	ARMOR(name,desc,0,mgc,1,power,0,5,40,cost,ac,0,ARM_SUIT,DRAGON_HIDE,color)
 /* 3.4.1: dragon scale mail reclassified as "magic" since magic is
    needed to create them */
-DRGN_ARMR("magic dragon scale mail", "tatzelworm scale mail", 1, ANTIMAGIC,  1200, 1, CLR_GRAY),
-DRGN_ARMR("reflecting dragon scale mail", "amphitere scale mail", 1, REFLECTING, 1200, 1, DRAGON_SILVER),
+DRGN_ARMR("magic dragon scale mail", "tatzelworm scale mail", 1, ANTIMAGIC,  1200, 5, CLR_GRAY),
+DRGN_ARMR("reflecting dragon scale mail", "amphitere scale mail", 1, REFLECTING, 1200, 5, DRAGON_SILVER),
 #if 0	/* DEFERRED */
-DRGN_ARMR("shimmering dragon scale mail", 1, DISPLACED, 1200, 1, CLR_CYAN),
+DRGN_ARMR("shimmering dragon scale mail", 1, DISPLACED, 1200, 5, CLR_CYAN),
 #endif
-DRGN_ARMR("fire dragon scale mail", "draken scale mail", 1, FIRE_RES,    900, 1, CLR_RED),
-DRGN_ARMR("ice dragon scale mail", "lindworm scale mail", 1, COLD_RES,    900, 1, CLR_WHITE),
-DRGN_ARMR("sleep dragon scale mail", "sarkany scale mail", 1, SLEEP_RES,   900, 1, CLR_ORANGE),
-DRGN_ARMR("disintegration dragon scale mail", "sirrush scale mail", 1, DISINT_RES, 1200, 1, CLR_BLACK),
-DRGN_ARMR("electric dragon scale mail", "leviathan scale mail", 1, SHOCK_RES,   900, 1, CLR_BLUE),
-DRGN_ARMR("poison dragon scale mail", "wyvern scale mail", 1, POISON_RES,  900, 1, CLR_GREEN),
-DRGN_ARMR("stone dragon scale mail", "gold dragon scale mail", 1, STONE_RES,   900, 1, HI_GOLD),
-DRGN_ARMR("acid dragon scale mail", "guivre scale mail", 1, ACID_RES,    900, 1, CLR_YELLOW),
+DRGN_ARMR("fire dragon scale mail", "draken scale mail", 1, FIRE_RES,    900, 5, CLR_RED),
+DRGN_ARMR("ice dragon scale mail", "lindworm scale mail", 1, COLD_RES,    900, 5, CLR_WHITE),
+DRGN_ARMR("sleep dragon scale mail", "sarkany scale mail", 1, SLEEP_RES,   900, 5, CLR_ORANGE),
+DRGN_ARMR("disintegration dragon scale mail", "sirrush scale mail", 1, DISINT_RES, 1200, 5, CLR_BLACK),
+DRGN_ARMR("electric dragon scale mail", "leviathan scale mail", 1, SHOCK_RES,   900, 5, CLR_BLUE),
+DRGN_ARMR("poison dragon scale mail", "wyvern scale mail", 1, POISON_RES,  900, 5, CLR_GREEN),
+DRGN_ARMR("stone dragon scale mail", "gold dragon scale mail", 1, STONE_RES,   900, 5, HI_GOLD),
+DRGN_ARMR("acid dragon scale mail", "guivre scale mail", 1, ACID_RES,    900, 5, CLR_YELLOW),
+DRGN_ARMR("chromatic dragon scale mail", "chromatic dragon scale mail", 1, POISON_RES, 2400, 5, CLR_MAGENTA), /* intrinsics are set manually */
 
 /* For now, only dragons leave these. */
 /* 3.4.1: dragon scales left classified as "non-magic"; they confer
    magical properties but are produced "naturally" */
-DRGN_ARMR("magic dragon scales", "tatzelworm scales", 0, ANTIMAGIC,  700, 7, CLR_GRAY),
-DRGN_ARMR("reflecting dragon scales", "amphitere scales", 0, REFLECTING, 700, 7, DRAGON_SILVER),
+DRGN_ARMR("magic dragon scales", "tatzelworm scales", 0, ANTIMAGIC,  700, 9, CLR_GRAY),
+DRGN_ARMR("reflecting dragon scales", "amphitere scales", 0, REFLECTING, 700, 9, DRAGON_SILVER),
 #if 0	/* DEFERRED */
-DRGN_ARMR("shimmering dragon scales", 0, DISPLACED,  700, 7, CLR_CYAN),
+DRGN_ARMR("shimmering dragon scales", 0, DISPLACED,  700, 9, CLR_CYAN),
 #endif
-DRGN_ARMR("fire dragon scales", "draken scales", 0, FIRE_RES,   500, 7, CLR_RED),
-DRGN_ARMR("ice dragon scales", "lindworm scales", 0, COLD_RES,   500, 7, CLR_WHITE),
-DRGN_ARMR("sleep dragon scales", "sarkany scales", 0, SLEEP_RES,  500, 7, CLR_ORANGE),
-DRGN_ARMR("disintegration dragon scales", "sirrush scales",  0, DISINT_RES, 700, 7, CLR_BLACK),
-DRGN_ARMR("electric dragon scales", "leviathan scales", 0, SHOCK_RES,  500, 7, CLR_BLUE),
-DRGN_ARMR("poison dragon scales", "wyvern scales", 0, POISON_RES, 500, 7, CLR_GREEN),
-DRGN_ARMR("stone dragon scales", "gold dragon scales", 0, STONE_RES,  500, 7, HI_GOLD),
-DRGN_ARMR("acid dragon scales", "guivre scales", 0, ACID_RES,   500, 7, CLR_YELLOW),
+DRGN_ARMR("fire dragon scales", "draken scales", 0, FIRE_RES,   500, 9, CLR_RED),
+DRGN_ARMR("ice dragon scales", "lindworm scales", 0, COLD_RES,   500, 9, CLR_WHITE),
+DRGN_ARMR("sleep dragon scales", "sarkany scales", 0, SLEEP_RES,  500, 9, CLR_ORANGE),
+DRGN_ARMR("disintegration dragon scales", "sirrush scales",  0, DISINT_RES, 700, 9, CLR_BLACK),
+DRGN_ARMR("electric dragon scales", "leviathan scales", 0, SHOCK_RES,  500, 9, CLR_BLUE),
+DRGN_ARMR("poison dragon scales", "wyvern scales", 0, POISON_RES, 500, 9, CLR_GREEN),
+DRGN_ARMR("stone dragon scales", "gold dragon scales", 0, STONE_RES,  500, 9, HI_GOLD),
+DRGN_ARMR("acid dragon scales", "guivre scales", 0, ACID_RES,   500, 9, CLR_YELLOW),
+DRGN_ARMR("chromatic dragon scales", "chromatic dragon scales", 0, 0, 1500, 9, CLR_MAGENTA), /* intrinsics are set manually */
 #undef DRGN_ARMR
 
 ARMOR("plate mail", (char *)0,
@@ -405,9 +407,13 @@ ARMOR("leather jacket", (char *)0,
 /* shirts */
 ARMOR("Hawaiian shirt", (char *)0,
 	1, 0, 0, 0,	 8, 0,	 5,   3, 10, 0, ARM_SHIRT, CLOTH, CLR_MAGENTA),
+# ifdef CONVICT
+ARMOR("striped shirt", (char *)0,
+	1, 0, 0, 0,	 0, 0,	 5,   2, 10, 0, ARM_SHIRT, CLOTH, CLR_GRAY),
+# endif /* CONVICT */
 ARMOR("T-shirt", (char *)0,
 	1, 0, 0, 0,	 2, 0,	 5,   2, 10, 0, ARM_SHIRT, CLOTH, CLR_WHITE),
-#endif
+#endif  /* TOURIST */
 
 /* cloaks */
 /*  'cope' is not a spelling mistake... leave it be */
@@ -658,6 +664,8 @@ TOOL("magic marker", (char *)0, 1, 0, 1, 1,  15,  2,  50, PLASTIC, CLR_RED),
 TOOL("land mine",(char *)0,     1, 0, 0, 0,   0,300, 180, IRON, CLR_RED),
 TOOL("beartrap", (char *)0,     1, 0, 0, 0,   0,200,  60, IRON, HI_METAL),
 /* instruments */
+/* some code in invent.c requires wooden flute .. drum of earthquake to be
+   consecutive, with the wooden flute first and drum of earthquake last */
 TOOL("tin whistle", "whistle",  0, 0, 0, 0, 100,  3,  10, METAL, HI_METAL),
 TOOL("magic whistle", "whistle",0, 0, 1, 0,  30,  3,  10, METAL, HI_METAL),
 /* "If tin whistles are made out of tin, what do they make foghorns out of?" */
@@ -1055,7 +1063,11 @@ OBJECT(OBJ("boulder",(char *)0), BITS(1,0,0,0,0,0,0,0,1,0,0,P_NONE,MINERAL), 0,
 OBJECT(OBJ("statue", (char *)0), BITS(1,0,0,1,0,0,0,0,0,0,0,P_NONE,MINERAL), 0,
 		ROCK_CLASS,   900, 0, 2500,  0, 20, 20, 0, 0, 2500, CLR_WHITE),
 
+#ifdef CONVICT
+OBJECT(OBJ("heavy iron ball", (char *)0), BITS(1,0,0,0,0,0,0,0,0,0,WHACK,P_FLAIL,IRON), 0,
+#else
 OBJECT(OBJ("heavy iron ball", (char *)0), BITS(1,0,0,0,0,0,0,0,0,0,WHACK,P_NONE,IRON), 0,
+#endif /* CONVICT */
 		BALL_CLASS,  1000, 0,  480, 10, 25, 25, 0, 0,  200, HI_METAL),
 						/* +d4 when "very heavy" */
 OBJECT(OBJ("iron chain", (char *)0), BITS(1,0,0,0,0,0,0,0,0,0,WHACK,P_NONE,IRON), 0,

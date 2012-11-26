@@ -71,14 +71,18 @@ boolean livelog_start() {
 /* Locks the live log file and writes 'buffer' */
 void livelog_write_string(char* buffer) {
 	FILE* livelogfile;
-	if(lock_file(LIVELOGFILE, SCOREPREFIX, 10)) {
-		if(!(livelogfile = fopen_datafile(LIVELOGFILE, "a", SCOREPREFIX))) {
+#ifdef FILE_AREAS
+	if (lock_file_area(LOGAREA, LIVELOGFILE, 10)) {
+#else
+	if (lock_file(LIVELOGFILE, SCOREPREFIX, 10)) {
+#endif
+		if(!(livelogfile = fopen_datafile_area(LOGAREA, LIVELOGFILE, "a", SCOREPREFIX))) {
 			pline("Cannot open live log file!");
 		} else {
-			fprintf(livelogfile, buffer);
+			fprintf(livelogfile, "%s", buffer);
 			(void) fclose(livelogfile);
 		}
-		unlock_file(LIVELOGFILE);
+		unlock_file_area(LOGAREA, LIVELOGFILE);
 	}
 }
 
@@ -99,7 +103,8 @@ char *livelog_prefix() {
 			"role=%s:race=%s:"
 			"gender=%s:align=%s:"
 			"gender0=%s:align0=%s:"
-			"explvl=%d:exp=%ld",
+			"explvl=%d:exp=%ld:"
+			"elbereths=%ld",
 			GAME_SHORT_NAME, VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
 			plname,
 			moves,
@@ -115,7 +120,8 @@ char *livelog_prefix() {
 			urole.filecode, urace.filecode,
 			genders[flags.female].filecode, aligns[1-u.ualign.type].filecode,
 			genders[flags.initgend].filecode, aligns[1-u.ualignbase[A_ORIGINAL]].filecode,
-			u.ulevel,u.uexp);
+			u.ulevel,u.uexp,
+			u.uconduct.elbereths);
 	return prefixbuf;
 }
 
@@ -169,7 +175,12 @@ doshout()
 	Sprintf(qbuf,"Shout what?");
 	getlin(qbuf, buf);
 	
-	You("shout into the void: %s", buf);
+	if (strlen(buf) == 0) {
+		Strcpy(buf, "*@&%!!");
+		You("shout profanities into the void!");
+	} else {
+		You("shout into the void: %s", buf);
+	}
 
 	/* filter livelog delimiter */
 	for (p = buf; *p != 0; p++)

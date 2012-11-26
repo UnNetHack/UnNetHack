@@ -398,12 +398,7 @@ boolean taken;
 	    }
 	    {
 			boolean want_disp = (c == 'y') ? TRUE: FALSE;
-			struct obj *obj;
 
-			for (obj = invent; obj; obj = obj->nobj) {
-			    makeknown(obj->otyp);
-			    obj->known = obj->bknown = obj->dknown = obj->rknown = 1;
-			}
 			(void) dump_inventory((char *)0, TRUE, want_disp);
 			container_contents(invent, TRUE, TRUE, want_disp);
 	    }
@@ -553,13 +548,13 @@ winid endwin;
 		makeknown(otmp->otyp);
 		otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
 		/* assumes artifacts don't have quan > 1 */
-		Sprintf(pbuf, "%s%s (worth %ld %s and %ld points)",
+		Sprintf(pbuf, "%s%s (worth %ld %s and %ld points),",
 			the_unique_obj(otmp) ? "The " : "",
 			otmp->oartifact ? artifact_name(xname(otmp), &dummy) :
 				OBJ_NAME(objects[otmp->otyp]),
 			value, currency(value), points);
 #ifdef DUMP_LOG
-		dump("", pbuf);
+		dump_line("", pbuf);
 		if (endwin != WIN_ERR)
 #endif
 		putstr(endwin, 0, pbuf);
@@ -617,7 +612,7 @@ int how;
 		Your("medallion %s!",
 		      !Blind ? "begins to glow" : "feels warm");
 		/* Keep it blessed! */
-		if (uamul && uamul->cursed && (rn2(4)>0)) {
+		if (uamul && uamul->cursed && rnf(1,4)) {
 			pline("But ... the chain on your medallion breaks and it falls to the %s!", surface(u.ux,u.uy));
 			You_hear("homeric laughter!"); /* Hah ha! */
 			/* It already started to work. Too bad you couldn't hold onto it. */
@@ -893,13 +888,19 @@ die:
 /* changing kilbuf really changes killer. we do it this way because
    killer is declared a (const char *)
 */
-	if (u.uhave.amulet) Strcat(kilbuf, " (with the Amulet)");
+	if (u.uhave.amulet) {
+		Strcat(kilbuf, " (with the Amulet)");
+		killer_flags |= 0x1;
+	}
 	else if (how == ESCAPED) {
-	    if (Is_astralevel(&u.uz))	/* offered Amulet to wrong deity */
+	    if (Is_astralevel(&u.uz)) {	/* offered Amulet to wrong deity */
 		Strcat(kilbuf, " (in celestial disgrace)");
-	    else if (carrying(FAKE_AMULET_OF_YENDOR))
+		killer_flags |= 0x2;
+	    } else if (carrying(FAKE_AMULET_OF_YENDOR)) {
 		Strcat(kilbuf, " (with a fake Amulet)");
+		killer_flags |= 0x4;
 		/* don't bother counting to see whether it should be plural */
+	    }
 	}
 
 	    Sprintf(pbuf, "%s %s the %s...", Goodbye(), plname,
@@ -1074,9 +1075,16 @@ struct obj *list;
 boolean identified, all_containers, want_disp;
 {
 	register struct obj *box, *obj;
+#ifdef SORTLOOT
+	struct obj **oarray;
+	int i,j,n;
+	char *invlet;
+#endif /* SORTLOOT */
 	char buf[BUFSZ];
 
 	for (box = list; box; box = box->nobj) {
+	    int saveknown = objects[box->otyp].oc_name_known;
+	    objects[box->otyp].oc_name_known = 1;
 	    if (Is_container(box) || box->otyp == STATUE) {
 		if (box->otyp == BAG_OF_TRICKS && box->spe) {
 		    continue;	/* bag of tricks with charges can't contain anything */
@@ -1084,6 +1092,40 @@ boolean identified, all_containers, want_disp;
 		    winid tmpwin = WIN_ERR;
 		    if (want_disp)
 			    tmpwin = create_nhwindow(NHW_MENU);
+#ifdef SORTLOOT
+		    /* count the number of items */
+		    for (n = 0, obj = box->cobj; obj; obj = obj->nobj) n++;
+		    /* Make a temporary array to store the objects sorted */
+		    oarray = (struct obj **) alloc(n*sizeof(struct obj*));
+
+		    /* Add objects to the array */
+		    i = 0;
+		    invlet = flags.inv_order;
+		nextclass:
+		    for (obj = box->cobj; obj; obj = obj->nobj) {
+                      if (!flags.sortpack || obj->oclass == *invlet) {
+			if (iflags.sortloot == 'f'
+			    || iflags.sortloot == 'l') {
+			  /* Insert object at correct index */
+			  for (j = i; j; j--) {
+			    if ((sortloot_cmp(obj, oarray[j-1])>0)
+			    || (flags.sortpack &&
+				oarray[j-1]->oclass != obj->oclass))
+			      break;
+			    oarray[j] = oarray[j-1];
+			  }
+			  oarray[j] = obj;
+			  i++;
+			} else {
+			  /* Just add it to the array */
+			  oarray[i++] = obj;
+			}
+		      }
+		    } /* for loop */
+		    if (flags.sortpack) {
+		      if (*++invlet) goto nextclass;
+		    }
+#endif /* SORTLOOT */
 		    Sprintf(buf, "Contents of %s:", the(xname(box)));
 		    if (want_disp) {
 			    putstr(tmpwin, 0, buf);
@@ -1091,13 +1133,13 @@ boolean identified, all_containers, want_disp;
 		    }
 		    dump_subtitle(buf);
 		    dump_list_start();
+#ifdef SORTLOOT
+		    for (i = 0; i < n; i++) {
+			obj = oarray[i];
+#else
 		    for (obj = box->cobj; obj; obj = obj->nobj) {
-			if (identified) {
-			    makeknown(obj->otyp);
-			    obj->known = obj->bknown =
-			    obj->dknown = obj->rknown = 1;
-			}
-			dump_list_item(doname(obj));
+#endif
+			dump_list_item_object(obj);
 			if (want_disp)
 				putstr(tmpwin, 0, doname(obj));
 		    }
@@ -1112,6 +1154,7 @@ boolean identified, all_containers, want_disp;
 					  want_disp);
 		    }
 		} else {
+		    objects[box->otyp].oc_name_known = 1;
 		    if (want_disp) {
 			    pline("%s empty.", Tobjnam(box, "are"));
 			    display_nhwindow(WIN_MESSAGE, FALSE);
@@ -1120,6 +1163,7 @@ boolean identified, all_containers, want_disp;
 		    dump("", "");
 		}
 	    }
+	    objects[box->otyp].oc_name_known = saveknown;
 	    if (!all_containers)
 		break;
 	}
@@ -1222,7 +1266,7 @@ boolean ask;
 #endif
 		    }
 		    if (c == 'y') putstr(klwin, 0, buf);
-		    dump_list_item(buf);
+		    dump_list_item_link(mons[i].mname, buf);
 		}
 	    dump_list_end();
 	    /*
@@ -1259,7 +1303,7 @@ STATIC_OVL void
 list_genocided(defquery, ask, want_disp)
 int defquery;
 boolean ask;
-int want_disp;
+boolean want_disp;
 {
     register int i;
     int ngenocided=0;
@@ -1267,7 +1311,7 @@ int want_disp;
     int nextincted=0;
 #endif
     char c;
-    winid klwin = (winid)NULL;
+    winid klwin = (winid)0;
     char buf[BUFSZ];
 
     /* get totals first */
@@ -1329,6 +1373,12 @@ int want_disp;
 		    if (klwin) putstr(klwin, 0, buf);
 		    dump_list_item(buf);
 		}
+#ifdef SHOW_EXTINCT
+	    if (nextincted > 0 && aprilfoolsday()) {
+		dump_list_item("ammonites (extinct)");
+		nextincted++;
+	    }
+#endif
 	    dump_list_end();
 
 	    if (klwin) putstr(klwin, 0, "");

@@ -11,8 +11,6 @@
 STATIC_DCL boolean FDECL(is_swallow_sym, (int));
 STATIC_DCL int FDECL(append_str, (char *, const char *));
 STATIC_DCL struct permonst * FDECL(lookat, (int, int, char *, char *));
-STATIC_DCL void FDECL(checkfile,
-		      (char *,struct permonst *,BOOLEAN_P,BOOLEAN_P));
 STATIC_DCL int FDECL(do_look, (BOOLEAN_P));
 STATIC_DCL boolean FDECL(help_menu, (int *));
 #ifdef PORT_HELP
@@ -298,7 +296,7 @@ lookat(x, y, buf, monbuf)
  *	 lcase() for data.base lookup so that we can have a clean key.
  *	 Therefore, we create a copy of inp _just_ for data.base lookup.
  */
-STATIC_OVL void
+void
 checkfile(inp, pm, user_typed_name, without_asking)
     char *inp;
     struct permonst *pm;
@@ -311,7 +309,7 @@ checkfile(inp, pm, user_typed_name, without_asking)
     int chk_skip;
     boolean found_in_file = FALSE, skipping_entry = FALSE;
 
-    fp = dlb_fopen(DATAFILE, "r");
+    fp = dlb_fopen_area(NH_DATAAREA, DATAFILE, "r");
     if (!fp) {
 	pline("Cannot open data file!");
 	return;
@@ -462,16 +460,18 @@ do_look(quick)
     const char *x_str, *firstmatch = 0;
     struct permonst *pm = 0;
     int     i, ans = 0;
-    int     sym;		/* typed symbol or converted glyph */
+    glyph_t     sym;		/* typed symbol or converted glyph */
     int	    found;		/* count of matching syms found */
     coord   cc;			/* screen pos of unknown glyph */
     boolean save_verbose;	/* saved value of flags.verbose */
     boolean from_screen;	/* question from the screen */
+    boolean force_defsyms;	/* force using glyphs from defsyms[].sym */
     boolean need_to_look;	/* need to get explan. from glyph */
     boolean hit_trap;		/* true if found trap explanation */
     int skipped_venom;		/* non-zero if we ignored "splash of venom" */
     static const char *mon_interior = "the interior of a monster";
 
+    force_defsyms = FALSE;
     if (quick) {
 	from_screen = TRUE;	/* yes, we want to use the cursor */
     } else {
@@ -529,7 +529,14 @@ do_look(quick)
 	    /* Convert the glyph at the selected position to a symbol. */
 	    glyph = glyph_at(cc.x,cc.y);
 	    if (glyph_is_cmap(glyph)) {
-		sym = showsyms[glyph_to_cmap(glyph)];
+		if (iflags.UTF8graphics) {
+			/* Temporary workaround as UnNetHack can't yet
+			 * display UTF-8 glyphs on the topline */
+			force_defsyms = TRUE;
+			sym = defsyms[glyph_to_cmap(glyph)].sym;
+		} else {
+			sym = showsyms[glyph_to_cmap(glyph)];
+		}
 	    } else if (glyph_is_trap(glyph)) {
 		sym = showsyms[trap_to_defsym(glyph_to_trap(glyph))];
 	    } else if (glyph_is_object(glyph)) {
@@ -630,7 +637,7 @@ do_look(quick)
 	/* Now check for graphics symbols */
 	for (hit_trap = FALSE, i = 0; i < MAXPCHARS; i++) {
 	    x_str = defsyms[i].explanation;
-	    if (sym == (from_screen ? showsyms[i] : defsyms[i].sym) && *x_str) {
+	    if (sym == (force_defsyms ? defsyms[i].sym : (from_screen ? showsyms[i] : defsyms[i].sym)) && *x_str) {
 		/* avoid "an air", "a water", "a floor of a room", "a dark part of a room" */
 		int article = ((i == S_room)||(i == S_darkroom)) ? 2 :		/* 2=>"the" */
 			      !(strcmp(x_str, "air") == 0 ||	/* 1=>"an"  */
@@ -806,7 +813,7 @@ char *cbuf;
 	char bufr[BUFSZ];
 	register char *buf = &bufr[6], *ep, ctrl, meta;
 
-	fp = dlb_fopen(CMDHELPFILE, "r");
+	fp = dlb_fopen_area(NH_CMDHELPAREA, CMDHELPFILE, "r");
 	if (!fp) {
 		pline("Cannot open data file!");
 		return 0;
@@ -914,14 +921,14 @@ help_menu(sel)
 	    if (help_menu_items[i][0] == '%') {
 		Sprintf(helpbuf, help_menu_items[i], PORT_ID);
 		any.a_int = PORT_HELP_ID + 1;
-		add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
 			 helpbuf, MENU_UNSELECTED);
 	    } else
 #endif
 	    {
 		any.a_int = (*help_menu_items[i]) ? i+1 : 0;
 		if (flags.tutorial || i != TUTHLP_SLOT)
-		add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0,
 			ATR_NONE, help_menu_items[i], MENU_UNSELECTED);
 	    }
 	end_menu(tmpwin, "Select one item:");
@@ -942,19 +949,19 @@ dohelp()
 
 	if (help_menu(&sel)) {
 		switch (sel) {
-			case  0:  display_file(HELP, TRUE);  break;
-			case  1:  display_file(SHELP, TRUE);  break;
+			case  0:  display_file_area(NH_HELP_AREA, HELP, TRUE);  break;
+			case  1:  display_file_area(NH_SHELP_AREA, SHELP, TRUE);  break;
 			case  2:  (void) dohistory();  break;
 			case  3:  (void) dowhatis();  break;
 			case  4:  (void) dowhatdoes();  break;
 			case  5:  option_help();  break;
-			case  6:  display_file(OPTIONFILE, TRUE);  break;
+			case  6:  display_file_area(NH_OPTIONAREA, OPTIONFILE, TRUE);  break;
 			case  7:  (void) doextlist();  break;
-			case  8:  display_file(LICENSE, TRUE);  break;
+			case  8:  display_file_area(NH_LICENSE_AREA, LICENSE, TRUE);  break;
 			case  9:  tutorial_redisplay();  break;
 #ifdef WIZARD
 			/* handle slot 10 or 11 */
-			default: display_file(DEBUGHELP, TRUE);  break;
+			default: display_file_area(NH_DEBUGHELP_AREA, DEBUGHELP, TRUE);  break;
 #endif
 #ifdef PORT_HELP
 			case PORT_HELP_ID:  port_help();  break;
@@ -967,7 +974,7 @@ dohelp()
 int
 dohistory()
 {
-	display_file(HISTORY, TRUE);
+	display_file_area(NH_HISTORY_AREA, HISTORY, TRUE);
 	return 0;
 }
 

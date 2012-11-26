@@ -1442,17 +1442,23 @@ const char *str;
 }
 #endif /* TTY_GRAPHICS */
 
-/* Take a screen dump */
-void dump_screen()
+/** Take a screen dump */
+void
+dump_screen()
 {
     register int x,y;
     int lastc = -1;
     /* D: botl.c has a closer approximation to the size, but we'll go with
      *    this */
-    char buf[COLNO*100], html_buf[COLNO*100], tmpbuf[100], *ptr;
+    /* Longest monster name:    guardian naga hatchling
+     * Longest dungeon feature: altar to Amaterasu Omikami (lawful) */
+#define BUFSIZE_PER_SQUARE 200
+    char buf[COLNO*BUFSIZE_PER_SQUARE], html_buf[COLNO*BUFSIZE_PER_SQUARE], html_c[BUFSZ], tmpbuf[BUFSIZE_PER_SQUARE], *ptr;
     int ch, glyph, oclass;
     int color;
     unsigned special;
+    const char *dfeature = (char *)0;
+    char dfeaturebuf[BUFSZ];
 
     dump_html("<pre class=\"nh_screen\">\n", "");
     for (y = 0; y < ROWNO; y++) {
@@ -1462,55 +1468,92 @@ void dump_screen()
 	for (x = 1; x < COLNO; x++) {
 	    /* map glyph to character and color */
 	    glyph = gbuf[y][x].glyph;
-	    mapglyph(glyph, &ch, &color, &special, x, y);
+	    mapglyph(glyph, (glyph_t*)&ch, &color, &special, x, y);
 	    /* we can't use ch for output as that may be non-ASCII due
 	     * to DEC- or IBMgraphics */
 	    uchar c = get_glyph_char(glyph, &oclass);
+
+	    /* determine unicode point for HTML output */
+	    int unicode_codepoint = get_unicode_codepoint(ch);
+	    if (unicode_codepoint > 127) {
+	      Sprintf(html_c, "&#%d;", unicode_codepoint);
+	    } else {
+	      Sprintf(html_c, "%s", html_escape_character(unicode_codepoint));
+	    }
+	    dfeature = dfeature_at(x, y, dfeaturebuf);
+
 	    if (c == ' ')
-		Strcpy(tmpbuf, " ");
+		Strcpy(tmpbuf, "&nbsp;");
 	    else if (x == u.ux && y == u.uy)
-		Sprintf(tmpbuf, "<span class=\"nh_inv_%d nh_player\">%c</span>", color, c);
+		Sprintf(tmpbuf, "<span title=\"you\" class=\"nh_inv_%d nh_player\">%s</span>", color, html_c);
 	    else if (special & (MG_PET|MG_DETECT))
-		Sprintf(tmpbuf, "<span class=\"nh_inv_%d nh_pet\">%c</span>", color, c);
+		Sprintf(tmpbuf, "<span class=\"nh_inv_%d nh_pet\">%s</span>", color, html_c);
 	    else if (special & (MG_PET|MG_DETECT))
-		Sprintf(tmpbuf, "<span class=\"nh_inv_%d\">%c</span>", color, c);
+		Sprintf(tmpbuf, "<span class=\"nh_inv_%d\">%s</span>", color, html_c);
+	    else if (special & MG_INVERSE && dfeature != NULL)
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_inv_%d\">%s</span>", dfeature, color, html_c);
 	    else if (special & MG_INVERSE)
-		Sprintf(tmpbuf, "<span class=\"nh_inv_%d\">%c</span>", color, c);
+		Sprintf(tmpbuf, "<span class=\"nh_inv_%d\">%s</span>", color, html_c);
 	    else if (oclass < 0 && IS_DOOR(levl[x][y].typ) && levl[x][y].doormask >= D_ISOPEN)
-		Sprintf(tmpbuf, "<span class=\"nh_door\">%c</span>", c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_door\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && IS_DRAWBRIDGE(levl[x][y].typ))
-		Sprintf(tmpbuf, "<span class=\"nh_drawbridge\">%c</span>", c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_drawbridge\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == POOL)
-		Sprintf(tmpbuf, "<span class=\"nh_pool\">%c</span>", c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_pool\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == MOAT)
-		Sprintf(tmpbuf, "<span class=\"nh_moat\">%c</span>", c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_moat\">%s</span>", dfeature, html_c);
+	    else if (oclass < 0 && levl[x][y].typ == BOG)
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_swamp\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == WATER)
-		Sprintf(tmpbuf, "<span class=\"nh_water\">%c</span>", c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_water\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == LAVAPOOL)
-		Sprintf(tmpbuf, "<span class=\"nh_lava\">%c</span>", c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_lava\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == IRONBARS)
-		Sprintf(tmpbuf, "<span class=\"nh_ironbars\">%c</span>", c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_ironbars\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == CORR)
-		Sprintf(tmpbuf, "<span class=\"nh_corridor\">%c</span>", c);
+		Sprintf(tmpbuf, "<span class=\"nh_corridor\">%s</span>", html_c);
 	    else if (oclass < 0 && levl[x][y].typ == STAIRS)
-		Sprintf(tmpbuf, "<span class=\"nh_stairs\">%s</span>", html_escape_character(c));
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_color_%d\">%s</span>", dfeature, color, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == LADDER)
-		Sprintf(tmpbuf, "<span class=\"nh_ladder\">%c</span>", c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_ladder\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == FOUNTAIN)
-		Sprintf(tmpbuf, "<span class=\"nh_fountain\">%c</span>", c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_fountain\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == THRONE)
-		Sprintf(tmpbuf, "<span class=\"nh_throne\">%c</span>", c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_throne\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == SINK)
-		Sprintf(tmpbuf, "<span class=\"nh_sink\">%c</span>", c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_sink\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == GRAVE)
-		Sprintf(tmpbuf, "<span class=\"nh_grave\">%c</span>", c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_grave\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == ALTAR)
-		Sprintf(tmpbuf, "<span class=\"nh_altar\">%c</span>", c);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_altar\">%s</span>", dfeature, html_c);
+	    else if (oclass < 0 && levl[x][y].typ == TREE)
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_tree\">%s</span>", dfeature, html_c);
 	    else if (oclass < 0 && levl[x][y].typ == ICE)
-		Sprintf(tmpbuf, "<span class=\"nh_ice\">%c</span>", c);
-	    else
-		Sprintf(tmpbuf, "<span class=\"nh_color_%d\">%s</span>", color, html_escape_character(c));
+		Sprintf(tmpbuf, "<span class=\"nh_ice\">%s</span>", html_c);
+	    else if (oclass < 0 && glyph_is_trap(glyph)) {
+		/* See bug C343-20, the level data can actually be gone
+		 * already, even though the map is still showing a trap.
+		 * Thus prevent null pointer crashes. */
+		struct trap *t = t_at(x,y);
+		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_color_%d\">%s</span>",
+				t ? defsyms[trap_to_defsym(t->ttyp)].explanation : "trap",
+				color, html_c);
+	    } else {
+		struct monst *mtmp = m_at(x,y);
+		if (mtmp && canspotmon(mtmp)) {
+			Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_color_%d\">%s</span>", m_monnam(mtmp), color, html_link(mtmp->data->mname, html_c));
+		} else {
+			Sprintf(tmpbuf, "<span class=\"nh_color_%d\">%s</span>", color, html_c);
+		}
+	    }
+	    /* Warning in case there's no crash */
+	    if (strlen(tmpbuf) > BUFSIZE_PER_SQUARE) {
+		warning("tmpbuf > %d: %zd, %s", BUFSIZE_PER_SQUARE, strlen(tmpbuf), tmpbuf);
+	    }
+	    /* HTML map */
 	    Strcat(html_buf, tmpbuf);
+
+	    /* ASCII map */
 	    Sprintf(tmpbuf, "%c", c);
 	    Strcat(buf, tmpbuf);
 
@@ -1530,6 +1573,7 @@ void dump_screen()
     dump_html("</pre>\n", "");
     dump("", "");
     dump("", "");
+#undef BUFSIZE_PER_SQUARE
 }
 #endif /* DUMP_LOG */
 
@@ -1593,6 +1637,7 @@ back_to_glyph(x,y)
 	    break;
 	case IRONBARS:	idx = S_bars;     break;
 	case TREE:		idx = S_tree;     break;
+	case DEADTREE:		idx = S_deadtree; break;
 	case POOL:
 	case MOAT:		idx = S_pool;	  break;
 	case STAIRS:
@@ -1611,6 +1656,7 @@ back_to_glyph(x,y)
 	case AIR:		idx = S_air;	  break;
 	case CLOUD:		idx = S_cloud;	  break;
 	case WATER:		idx = S_water;	  break;
+	case BOG:		idx = S_bog;	  break;
 	case DBWALL:
 	    idx = (ptr->horizontal) ? S_hcdbridge : S_vcdbridge;
 	    break;
@@ -1620,6 +1666,7 @@ back_to_glyph(x,y)
 	    case DB_LAVA:  idx = S_lava; break;
 	    case DB_ICE:   idx = S_ice;  break;
 	    case DB_FLOOR: idx = (!cansee(x,y) && !ptr->waslit) ? S_darkroom : S_room; break;
+	    case DB_BOG:   idx = S_bog; break;
 	    default:
 		impossible("Strange db-under: %d",
 			   ptr->drawbridgemask & DB_UNDER);
@@ -1718,11 +1765,12 @@ static const char *type_names[MAX_TYPE] = {
 	"STONE",	"VWALL",	"HWALL",	"TLCORNER",
 	"TRCORNER",	"BLCORNER",	"BRCORNER",	"CROSSWALL",
 	"TUWALL",	"TDWALL",	"TLWALL",	"TRWALL",
-	"DBWALL",	"SDOOR",	"SCORR",	"POOL",
-	"MOAT",		"WATER",	"DRAWBRIDGE_UP","LAVAPOOL",
-	"DOOR",		"CORR",		"ROOM",		"STAIRS",
-	"LADDER",	"FOUNTAIN",	"THRONE",	"SINK",
-	"ALTAR",	"ICE",		"DRAWBRIDGE_DOWN","AIR",
+	"DBWALL",	"TREE",		"SDOOR",	"SCORR",
+	"POOL",		"MOAT",		"WATER",	"DRAWBRIDGE_UP",
+	"LAVAPOOL",	"IRONBARS",	"DEADTREE",	"DOOR",
+	"CORR",		"ROOM",		"STAIRS",	"LADDER",
+	"FOUNTAIN",	"THRONE",	"SINK",		"ALTAR",
+	"ICE",		"BOG",		"DRAWBRIDGE_DOWN","AIR",
 	"CLOUD"
 };
 

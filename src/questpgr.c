@@ -7,6 +7,7 @@
 
 /*  quest-specific pager routines. */
 
+#define QTEXT_AREA      FILE_AREA_SHARE
 #include "qtext.h"
 
 #define QTEXT_FILE	"quest.dat"
@@ -95,7 +96,7 @@ load_qtlist()
 	char	qt_classes[N_HDR][LEN_HDR];
 	long	qt_offsets[N_HDR];
 
-	msg_file = dlb_fopen(QTEXT_FILE, RDBMODE);
+	msg_file = dlb_fopen_area(QTEXT_AREA, QTEXT_FILE, RDBMODE);
 	if (!msg_file)
 	    panic("CANNOT OPEN QUEST TEXT FILE %s.", QTEXT_FILE);
 
@@ -379,7 +380,7 @@ struct qtmsg *qt_msg;
 	    (void) dlb_fgets(xbuf, 80, msg_file);
 	    (void) xcrypt(xbuf, in_line);
 	    convert_line();
-	    pline(out_line);
+	    pline("%s", out_line);
 	}
 
 }
@@ -488,8 +489,14 @@ static const char *creator_names[] = {
 STATIC_OVL const char *
 creatorname()	
 {
-	int index = u.ubirthday % SIZE(creator_names);
-	return creator_names[index];
+	if (pirateday()) {
+		return "the FSM";
+	} else if (discordian_holiday()) {
+		return (u.ubirthday % 2) ? "Discordia" : "Eris";
+	} else {
+		int index = u.ubirthday % SIZE(creator_names);
+		return creator_names[index];
+	}
 }
 
 /*questpgr.c*/

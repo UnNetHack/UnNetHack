@@ -316,7 +316,7 @@ do_pit:		    chasm = maketrap(x,y,PIT);
 				    xkilled(mtmp,0);
 				}
 			}
-		    } else if (x == u.ux && y == u.uy) {
+		    } else if (!u.utrap && x == u.ux && y == u.uy) {
 			    if (Levitation || Flying ||
 						is_clinger(youmonst.data)) {
 				    pline("A chasm opens up under you!");
@@ -451,7 +451,7 @@ struct obj *instr;
 		consume_obj_charge(instr, TRUE);
 
 		You("produce a heavy, thunderous rolling!");
-		pline_The("entire dungeon is shaking around you!");
+		pline_The("entire %s is shaking around you!", get_generic_level_description(&u.uz));
 		do_earthquake((u.ulevel - 1) / 3 + 1);
 		/* shake up monsters in a much larger radius... */
 		awaken_monsters(ROWNO * COLNO);

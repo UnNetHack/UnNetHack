@@ -278,8 +278,8 @@ level_def	: LEVEL_ID ':' string
 		      struct lc_funcdefs *f;
 			if (index($3, '.'))
 			    lc_error("Invalid dot ('.') in level name '%s'.", $3);
-			if ((int) strlen($3) > 8)
-			    lc_error("Level names limited to 8 characters ('%s').", $3);
+			if ((int) strlen($3) > 14)
+			    lc_error("Level names limited to 14 characters ('%s').", $3);
 			f = function_definitions;
 			while (f) {
 			    f->n_called = 0;
@@ -1639,7 +1639,7 @@ portal_region	: PORTAL_ID ':' lev_region ',' lev_region ',' string
 
 teleprt_region	: TELEPRT_ID ':' lev_region ',' lev_region teleprt_detail
 		  {
-		      long rtype;
+		      long rtype = 0;
 		      switch($6) {
 		      case -1: rtype = LR_TELE; break;
 		      case  0: rtype = LR_DOWNTELE; break;

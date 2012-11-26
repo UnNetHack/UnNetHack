@@ -131,9 +131,11 @@ register int x, y, n;
 		 */
 		if (enexto(&mm, mm.x, mm.y, mtmp->data)) {
 		    mon = makemon(mtmp->data, mm.x, mm.y, NO_MM_FLAGS);
-		    mon->mpeaceful = FALSE;
-		    mon->mavenge = 0;
-		    set_malign(mon);
+		    if (mon) {
+			    mon->mpeaceful = FALSE;
+			    mon->mavenge = 0;
+			    set_malign(mon);
+		    }
 		    /* Undo the second peace_minded() check in makemon(); if the
 		     * monster turned out to be peaceful the first time we
 		     * didn't create it at all; we don't want a second check.
@@ -204,6 +206,9 @@ register struct monst *mtmp;
 			case PM_LIEUTENANT:
 			  w1 = rn2(2) ? BROADSWORD : LONG_SWORD;
 			  break;
+#ifdef CONVICT
+			case PM_PRISON_GUARD:
+#endif /* CONVICT */
 			case PM_CAPTAIN:
 			case PM_WATCH_CAPTAIN:
 			  w1 = rn2(2) ? LONG_SWORD : SILVER_SABER;
@@ -254,7 +259,14 @@ register struct monst *mtmp;
 			if(!rn2(2)) curse(otmp);
 			(void) mpickobj(mtmp, otmp);
 		    }
+#ifdef CONVICT
+		} else if (mm == PM_MINER) {
+		    (void)mongets(mtmp, PICK_AXE);
+		    otmp = mksobj(BRASS_LANTERN, TRUE, FALSE);
+			(void) mpickobj(mtmp, otmp);
+            begin_burn(otmp, FALSE);
 		}
+#endif /* CONVICT */
 		break;
 
 	    case S_ANGEL:
@@ -503,6 +515,9 @@ register struct	monst	*mtmp;
 
 		    switch(monsndx(ptr)) {
 			case PM_GUARD: mac = -1; break;
+#ifdef CONVICT
+			case PM_PRISON_GUARD: mac = -2; break;
+#endif /* CONVICT */
 			case PM_SOLDIER: mac = 3; break;
 			case PM_SERGEANT: mac = 0; break;
 			case PM_LIEUTENANT: mac = -2; break;
@@ -544,6 +559,9 @@ register struct	monst	*mtmp;
 			mac += 1 + mongets(mtmp, LEATHER_CLOAK);
 
 		    if(ptr != &mons[PM_GUARD] &&
+#ifdef CONVICT
+			ptr != &mons[PM_PRISON_GUARD] &&
+#endif /* CONVICT */
 			ptr != &mons[PM_WATCHMAN] &&
 			ptr != &mons[PM_WATCH_CAPTAIN]) {
 			if (!rn2(3)) (void) mongets(mtmp, K_RATION);
@@ -654,6 +672,46 @@ register struct	monst	*mtmp;
 			(void)mongets(mtmp, AMULET_OF_YENDOR);
 			(void)mongets(mtmp, POT_FULL_HEALING);
 		}
+		break;
+	    case S_GNOME:
+		/* In AceHack, these have a chance of generating with
+		   candles, especially on dark Mines levels. */
+		if (In_mines(&u.uz) && rnf(1,5)) {
+			/* Pick a random square. If it's a floor square and unlit,
+			   generate a lit candle. If it isn't a floor square,
+			   pick once more. */
+			int x, y;
+			x = rnd(COLNO-1); y = rn2(ROWNO);
+			if (isok(x,y) && levl[x][y].typ != ROOM) {
+				x = rnd(COLNO-1); y = rn2(ROWNO);
+			}
+			if (isok(x,y) && levl[x][y].typ == ROOM &&
+					!levl[x][y].lit) {
+				otmp = mksobj(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE,
+						TRUE, FALSE);
+				otmp->quan = 1;
+				/* We need to add the object to the monster inventory
+				   before we light it. */
+				if (!mpickobj(mtmp, otmp)) {
+					/* mpickobj returns FALSE if the object is still
+					   addressable, i.e. not merged with another object */
+					begin_burn(otmp, FALSE);
+				}
+			} else if (!rn2(5)) {
+				/* Add a candle to inventory anyway, but don't light it. */
+				otmp = mksobj(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE,
+						TRUE, FALSE);
+				otmp->quan = 1;
+				(void) mpickobj(mtmp, otmp);
+			}
+		} else if (!rn2(10)) {
+			/* A small chance gnomes away from home have one too */
+			otmp = mksobj(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE,
+					TRUE, FALSE);
+			otmp->quan = 1;
+			(void) mpickobj(mtmp, otmp);
+		}
+		break;
 	    default:
 		break;
 	}
@@ -836,7 +894,7 @@ register int	x, y;
 register int	mmflags;
 {
 	register struct monst *mtmp;
-	int mndx, mcham, ct, mitem, xlth;
+	int mndx, mcham, ct, mitem, xlth, mhitdie;
 	boolean anymon = (!ptr);
 	boolean byyou = (x == u.ux && y == u.uy);
 	boolean allow_minvent = ((mmflags & NO_MINVENT) == 0);
@@ -927,8 +985,10 @@ register int	mmflags;
 	if (is_golem(ptr)) {
 	    mtmp->mhpmax = mtmp->mhp = golemhp(mndx);
 	} else if (is_rider(ptr)) {
-	    /* We want low HP, but a high mlevel so they can attack well */
-	    mtmp->mhpmax = mtmp->mhp = d(10,8);
+	    /* We want low HP, but a high mlevel so they can attack well
+		  *
+		  * DSR 10/31/09: What, are you nuts?  They're way too crunchy. */
+	    mtmp->mhpmax = mtmp->mhp = 100 + d(8,8);
 	} else if (ptr->mlevel > 49) {
 	    /* "special" fixed hp monster
 	     * the hit points are encoded in the mlevel in a somewhat strange
@@ -936,14 +996,32 @@ register int	mmflags;
 	     * above the 1..49 that indicate "normal" monster levels */
 	    mtmp->mhpmax = mtmp->mhp = 2*(ptr->mlevel - 6);
 	    mtmp->m_lev = mtmp->mhp / 4;	/* approximation */
-	} else if (ptr->mlet == S_DRAGON && mndx >= PM_GRAY_DRAGON) {
-	    /* adult dragons */
-	    mtmp->mhpmax = mtmp->mhp = (int) (In_endgame(&u.uz) ?
-		(8 * mtmp->m_lev) : (4 * mtmp->m_lev + d((int)mtmp->m_lev, 4)));
+	} else if (ptr->mlet == S_DRAGON && mndx >= PM_GRAY_DRAGON && In_endgame(&u.uz)) {
+	    /* dragons in the endgame are always at least average HP
+		  * note modified hit die here as well; they're MZ_GIGANTIC */
+	    mtmp->mhpmax = mtmp->mhp = 7 * mtmp->m_lev + d((int)mtmp->m_lev, 8);
 	} else if (!mtmp->m_lev) {
-	    mtmp->mhpmax = mtmp->mhp = rnd(4);
+	    mtmp->mhpmax = mtmp->mhp = rnd(4);	 /* level 0 monsters are pathetic */
+	} else if (ptr->msound == MS_LEADER) {
+		/* Quest Leaders need to be fairly burly */
+		mtmp->mhpmax = mtmp->mhp = 135 + rnd(30);
 	} else {
-	    mtmp->mhpmax = mtmp->mhp = d((int)mtmp->m_lev, 8);
+		/* plain old ordinary monsters; modify hit die based on size;
+		 * big-ass critters like mastodons should have big-ass HP, and
+		 * small things like bees and locusts should get less 
+		 */
+		switch (mtmp->data->msize) {
+			case MZ_TINY: mhitdie = 4; break;
+			case MZ_SMALL: mhitdie = 6; break;
+			case MZ_LARGE: mhitdie = 10; break;
+			case MZ_HUGE: mhitdie = 12; break;
+			case MZ_GIGANTIC: mhitdie = 15; break;
+			case MZ_MEDIUM: 
+			default:	
+				mhitdie = 8;
+				break;
+		}
+	    mtmp->mhpmax = mtmp->mhp = d((int)mtmp->m_lev, mhitdie);
 	    if (is_home_elemental(ptr))
 		mtmp->mhpmax = (mtmp->mhp *= 3);
 	}
@@ -1222,7 +1300,6 @@ struct mon_gen_override *override;
 {
     int chance, try = 100;
     struct mon_gen_tuple *mt;
-    int ok;
     if (!override) return NULL;
 
     chance = rnd(override->total_mon_freq);
@@ -1593,6 +1670,7 @@ int type;
 	switch(type) {
 		case PM_STRAW_GOLEM: return 20;
 		case PM_PAPER_GOLEM: return 20;
+		case PM_WAX_GOLEM: return 20;
 		case PM_ROPE_GOLEM: return 30;
 		case PM_LEATHER_GOLEM: return 40;
 		case PM_GOLD_GOLEM: return 40;
@@ -1884,7 +1962,7 @@ struct obj *bag;
 		else
 			pline_The("bag belches out %s.",
 				Hallucination ? "the alphabet":"a noxious cloud");
-		(void)create_gas_cloud(u.ux,u.uy,2,8);
+		(void)create_gas_cloud(u.ux, u.uy, 2, 8, rn1(3,2));
 		break;
 	case 5:
 		if (Blind) {
@@ -1893,7 +1971,7 @@ struct obj *bag;
 			else
 				You("smell a musty odor.");
 		} else {
-			pline_The("bag exhales of puff of spores.");
+			pline_The("bag exhales a puff of spores.");
 		}
 		if (!breathless(youmonst.data))
 			(void) make_hallucinated(HHallucination + rn1(35, 10),TRUE,0L);

@@ -17,8 +17,6 @@ static NEARDATA struct obj *book;	/* last/current book being xscribed */
 
 #define spellev(spell)		spl_book[spell].sp_lev
 #define spellname(spell)	OBJ_NAME(objects[spellid(spell)])
-#define spellet(spell)	\
-	((char)((spell < 26) ? ('a' + spell) : ('A' + spell - 26)))
 
 STATIC_DCL int FDECL(spell_let_to_idx, (CHAR_P));
 STATIC_DCL boolean FDECL(cursed_book, (struct obj *bp));
@@ -354,8 +352,14 @@ learn()
 			    book->spestudied++;
 			    exercise(A_WIS,TRUE);       /* extra study */
 			} else { /* 1000 < spellknow(i) <= MAX_SPELL_STUDY */
-			    You("know %s quite well already.", splname);
-			    costly = FALSE;
+				You("know %s quite well already.", splname);
+				if (yn("Do you want to read the book anyway?") == 'y') {
+					You("refresh your knowledge of %s.", splname);
+					incrnknow(i);
+					book->spestudied++;
+				} else {
+					costly = FALSE;
+				}
 			}
 			/* make book become known even when spell is already
 			   known, in case amnesia made you forget the book */
@@ -667,7 +671,7 @@ cast_protection()
 		    pline_The("%s around you begins to shimmer with %s haze.",
 			(Underwater || Is_waterlevel(&u.uz)) ? "water" :
 			 u.uswallow ? mbodypart(u.ustuck, STOMACH) :
-			 IS_STWALL(levl[u.dx][u.dy].typ) ? "stone" : "air",
+			 IS_STWALL(levl[u.ux][u.uy].typ) ? "stone" : "air",
 			      an(hgolden));
 	    }
 	    u.uspellprot += gain;
@@ -950,7 +954,7 @@ boolean atme;
 		break;
 	case SPE_JUMPING:
 		if (!jump(max(role_skill,1)))
-			pline(nothing_happens);
+			pline("%s", nothing_happens);
 		break;
 	default:
 		warning("Unknown spell %d attempted.", spell);
@@ -1021,6 +1025,34 @@ losespells()
 	}
 }
 
+/** Standard spell order in the spell menu. */
+static char spellorder[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+/** Return the shortcut character for the spell menu spell number. */
+static int
+spellet(spell)
+int spell;
+{
+	if (spell < strlen(spellorder)) {
+		return spellorder[spell];
+	} else {
+		return -1;
+	}
+}
+
+/** Overwrite standard spell order with user supplied string. */
+boolean
+parse_spellorder(str)
+char *str;
+{
+	int i;
+	for (i=0; i < strlen(str) && i < strlen(spellorder); i++) {
+		spellorder[i] = str[i];
+	}
+	return TRUE;
+}
+
+
 /* the '+' command -- view known spells */
 int
 dovspell()
@@ -1075,17 +1107,17 @@ int *spell_no;
 		Sprintf(buf, "%-20s     Level  %-12s Fail", "    Name", "Category");
 	else
 		Sprintf(buf, "Name\tLevel\tCategory\tFail");
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_BOLD, buf, MENU_UNSELECTED);
+	add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_BOLD, buf, MENU_UNSELECTED);
 	for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
 		Sprintf(buf, iflags.menu_tab_sep ?
 			"%s\t%-d%s\t%s\t%-d%%" : "%-20s  %2d%s   %-12s %3d%%",
 			spellname(i), spellev(i),
-			spellknow(i) ? " " : "*",
+			(spellknow(i) > 1000) ? " " : (spellknow(i) ? "!" : "*"),
 			spelltypemnemonic(spell_skilltype(spellid(i))),
 			100 - percent_success(i));
 
 		any.a_int = i+1;	/* must be non-zero */
-		add_menu(tmpwin, NO_GLYPH, &any,
+		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any,
 			 spellet(i), 0, ATR_NONE, buf,
 			 (i == splaction) ? MENU_SELECTED : MENU_UNSELECTED);
 	      }
@@ -1133,16 +1165,17 @@ dump_spells()
 	Sprintf(buf, "%-20s   Level    %-12s Fail", "    Name", "Category");
 	dump_text("  %s\n",buf);
 	dump_html("<table class=\"nh_spells\">\n", "");
-	dump_html("<tr><th></th><th>Name</th><th>Level</th><th>Category</th><th>Fail</th></tr>\n", "");
+	dump_html("<tr><th>Name</th><th>Level</th><th>Category</th><th>Fail</th></tr>\n", "");
 	for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
 		Sprintf(buf, "%c - %-20s  %2d%s   %-12s %3d%%",
 			spellet(i), spellname(i), spellev(i),
-			spellknow(i) ? " " : "*",
+			(spellknow(i) > 1000) ? " " : (spellknow(i) ? "!" : "*"),
 			spelltypemnemonic(spell_skilltype(spellid(i))),
 			100 - percent_success(i));
 		dump_text("  %s\n", buf);
-		Sprintf(buf, "<tr><td class=\"nh_item_letter\">%c</td><td>%s</td><td align=\"right\">%d</td><td>%s</td><td align=\"right\">%d%%</td></tr>\n",
-			spellet(i), spellname(i), spellev(i),
+		Sprintf(buf, "<tr><td>%s</td><td align=\"right\">%d%s</td><td>%s</td><td align=\"right\">%d%%</td></tr>\n",
+			spellname(i), spellev(i),
+			(spellknow(i) > 1000) ? "&nbsp;" : (spellknow(i) ? "!" : "*"),
 			spelltypemnemonic(spell_skilltype(spellid(i))),
 			100 - percent_success(i));
 		dump_html(buf,"");

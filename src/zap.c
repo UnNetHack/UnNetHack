@@ -889,7 +889,7 @@ register struct obj *obj;
 	/*       Suggested by Daniel Morris in RGRN */
 
 	if (obj->otyp >= GRAY_DRAGON_SCALE_MAIL &&
-	    obj->otyp <= YELLOW_DRAGON_SCALE_MAIL) {
+	    obj->otyp <= CHROMATIC_DRAGON_SCALE_MAIL) {
 		/* dragon scale mail reverts to dragon scales */
 
 		boolean worn = (obj == uarm);
@@ -1163,6 +1163,10 @@ create_polymon(obj, okind)
 	    pm_index = PM_FLESH_GOLEM;
 	    material = "organic ";
 	    break;
+	case WAX:
+	    pm_index = PM_WAX_GOLEM;
+	    material = "wax ";
+	    break;
 	case WOOD:
 	    pm_index = PM_WOOD_GOLEM;
 	    material = "wood ";
@@ -1274,7 +1278,7 @@ poly_obj(obj, id)
 	int obj_location = obj->where;
 
 	if (obj->otyp == BOULDER && In_sokoban(&u.uz))
-	    change_luck(-1);	/* Sokoban guilt */
+	    sokoban_trickster();	/* Sokoban guilt */
 	if (id == STRANGE_OBJECT) { /* preserve symbol */
 	    int try_limit = 3;
 	    /* Try up to 3 times to make the magic-or-not status of
@@ -1898,8 +1902,9 @@ dozap()
 	check_unpaid(obj);
 
 	/* zappable addition done by GAN 11/03/86 */
-	if(!zappable(obj)) pline(nothing_happens);
-	/* PM 2008-04-16: 50% chance of blowing up, if zapped 20 times */
+	if(!zappable(obj)) pline("%s", nothing_happens);
+	/* PM 2008-04-16: 50% chance of blowing up, if zapped 20 times.
+	 * Same probability as in muse.c precheck() for monsters */
 	else if (obj->cursed && !rn2(30)) {
 		backfire(obj);	/* the wand blows up in your face! */
 		exercise(A_STR, FALSE);
@@ -1976,7 +1981,7 @@ boolean ordinary;
 		    if (!resists_blnd(&youmonst)) {
 			    You(are_blinded_by_the_flash);
 			    make_blinded((long)rnd(100),FALSE);
-			    if (!Blind) Your(vision_clears);
+			    if (!Blind) Your("%s", vision_clears);
 		    }
 		    break;
 
@@ -2157,7 +2162,7 @@ boolean ordinary;
 			You(are_blinded_by_the_flash);
 			make_blinded((long)damage, FALSE);
 			makeknown(obj->otyp);
-			if (!Blind) Your(vision_clears);
+			if (!Blind) Your("%s", vision_clears);
 		    }
 		    damage = 0;	/* reset */
 		    break;
@@ -2296,6 +2301,10 @@ boolean			youattack, allow_cancel_kill, self_cancel;
 	static const char writing_vanishes[] =
 				"Some writing vanishes from %s head!";
 	static const char your[] = "your";	/* should be extern */
+
+	if (youdefend)
+	    You(!Hallucination? "are covered in sparkling lights!"
+			      : "are enveloped by psychedelic fireworks!");
 
 	if (youdefend ? (!youattack && Antimagic)
 		      : resist(mdef, obj->oclass, 0, NOTELL))
@@ -2467,7 +2476,7 @@ struct obj *obj;	/* wand or spell */
 	case SPE_STONE_TO_FLESH:
 	    if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) ||
 		     Underwater || (Is_qstart(&u.uz) && u.dz < 0)) {
-		pline(nothing_happens);
+		pline("%s", nothing_happens);
 	    } else if (u.dz < 0) {	/* we should do more... */
 		pline("Blood drips on your %s.", body_part(FACE));
 	    } else if (u.dz > 0 && !OBJ_AT(u.ux, u.uy)) {
@@ -2478,7 +2487,7 @@ struct obj *obj;	/* wand or spell */
 		e = engr_at(u.ux, u.uy);
 		if (!(e && e->engr_type == ENGRAVE)) {
 		    if (is_pool(u.ux, u.uy) || is_ice(u.ux, u.uy))
-			pline(nothing_happens);
+			pline("%s", nothing_happens);
 		    else
 			pline("Blood %ss %s your %s.",
 			      is_lava(u.ux, u.uy) ? "boil" : "pool",
@@ -3074,7 +3083,7 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 			break;
 		    }
 		    if (nonliving(mon->data) || is_demon(mon->data) ||
-			    resists_magm(mon)) {	/* similar to player */
+			    resists_magm(mon) || mon->data->msound == MS_LEADER) {	/* similar to player */
 			sho_shieldeff = TRUE;
 			break;
 		    }
@@ -3430,7 +3439,7 @@ register int dx,dy;
 		    unmap_object(sx, sy);
 		    newsym(sx, sy);
 		}
-		if(ZAP_POS(lev->typ) || cansee(lsx,lsy))
+		if(ZAP_POS(lev->typ) || (isok(lsx,lsy) && cansee(lsx,lsy)))
 		    tmp_at(sx,sy);
 		delay_output(); /* wait a little */
 	    }
@@ -3576,10 +3585,20 @@ register int dx,dy;
 	    if (abstype == ZT_LIGHTNING && !resists_blnd(&youmonst)) {
 		You(are_blinded_by_the_flash);
 		make_blinded((long)d(nd,50),FALSE);
-		if (!Blind) Your(vision_clears);
+		if (!Blind) Your("%s", vision_clears);
 	    }
 	    stop_occupation();
 	    nomul(0, 0);
+	}
+
+	if(lev->typ == TREE && abstype == ZT_DEATH && abs(type) != ZT_BREATH(ZT_DEATH)) {
+	    lev->typ = DEADTREE;
+	    if (cansee(sx,sy)) {
+		pline("The tree withers!");
+		newsym(sx,sy);
+	    }
+	    range = 0;
+	    break;
 	}
 
 	if(!ZAP_POS(lev->typ) || (closed_door(sx, sy) && (range >= 0))) {
@@ -3640,14 +3659,17 @@ xchar x, y;
 	struct rm *lev = &levl[x][y];
 	struct obj *otmp;
 
-	if (lev->typ == DRAWBRIDGE_UP)
-	    lev->drawbridgemask &= ~DB_ICE;	/* revert to DB_MOAT */
-	else {	/* lev->typ == ICE */
+	if (lev->typ == DRAWBRIDGE_UP) {
+	    lev->drawbridgemask &= ~DB_UNDER;
+	    lev->drawbridgemask |= DB_MOAT;	/* revert to DB_MOAT */
+	} else {	/* lev->typ == ICE */
 #ifdef STUPID
 	    if (lev->icedpool == ICED_POOL) lev->typ = POOL;
-	    else lev->typ = MOAT;
+	    else if (lev->icedpool == ICED_MOAT) lev->typ = MOAT;
+	    else lev->typ = BOG;
 #else
-	    lev->typ = (lev->icedpool == ICED_POOL ? POOL : MOAT);
+	    lev->typ = (lev->icedpool == ICED_POOL ? POOL :
+			lev->icedpool == ICED_MOAT ? MOAT : BOG);
 #endif
 	    lev->icedpool = 0;
 	}
@@ -3663,7 +3685,7 @@ xchar x, y;
 		if (!boulder_hits_pool(otmp, x, y, FALSE))
 		    warning("melt_ice: no pool?");
 		/* try again if there's another boulder and pool didn't fill */
-	    } while (is_pool(x,y) && (otmp = sobj_at(BOULDER, x, y)) != 0);
+	    } while ((is_pool(x,y) || is_swamp(x,y)) && (otmp = sobj_at(BOULDER, x, y)) != 0);
 	    newsym(x,y);
 	}
 	if (x == u.ux && y == u.uy)
@@ -3697,21 +3719,41 @@ boolean *shopdamage;
 	    }
 	    if(is_ice(x, y)) {
 		melt_ice(x, y);
-	    } else if(is_pool(x,y)) {
+	    } else if(is_pool(x,y) || is_swamp(x,y)) {
 		const char *msgtxt = "You hear hissing gas.";
-		if(lev->typ != POOL) {	/* MOAT or DRAWBRIDGE_UP */
+		schar filltyp;
+		int dried = 0;
+		if(lev->typ != POOL && lev->typ != BOG) {	/* MOAT or DRAWBRIDGE_UP */
 		    if (cansee(x,y)) msgtxt = "Some water evaporates.";
 		} else {
 		    register struct trap *ttmp;
 
 		    rangemod -= 3;
-		    lev->typ = ROOM;
-		    ttmp = maketrap(x, y, PIT);
-		    if (ttmp) ttmp->tseen = 1;
-		    if (cansee(x,y)) msgtxt = "The water evaporates.";
+		    if (lev->typ == BOG) {
+			lev->typ = ROOM;
+			filltyp = fillholetyp(x,y);
+			if (filltyp == ROOM) {
+			    dried = 1;
+			} else {
+			    lev->typ = BOG;
+			}
+		    } else {
+			lev->typ = ROOM;
+			filltyp = fillholetyp(x,y);
+			if (filltyp == ROOM) {
+			    ttmp = maketrap(x, y, PIT);
+			    if (ttmp) ttmp->tseen = 1;
+			    dried = 1;
+			} else {
+			    lev->typ = filltyp;
+			}
+		    }
+		    if (cansee(x,y))
+			msgtxt = (dried) ? "The water evaporates." :
+					   "Some water evaporates.";
 		}
-		Norep(msgtxt);
-		if (lev->typ == ROOM) newsym(x,y);
+		Norep("%s", msgtxt);
+		if (dried) newsym(x,y);
 	    } else if(IS_FOUNTAIN(lev->typ)) {
 		    if (cansee(x,y))
 			pline("Steam billows from the fountain.");
@@ -3719,9 +3761,10 @@ boolean *shopdamage;
 		    dryup(x, y, type > 0);
 	    }
 	}
-	else if(abstype == ZT_COLD && (is_pool(x,y) || is_lava(x,y))) {
+	else if(abstype == ZT_COLD && (is_pool(x,y) || is_lava(x,y) || is_swamp(x,y))) {
 		boolean lava = is_lava(x,y);
-		boolean moat = (!lava && (lev->typ != POOL) &&
+		boolean swamp = is_swamp(x,y);
+		boolean moat = (!lava && !swamp && (lev->typ != POOL) &&
 				(lev->typ != WATER) &&
 				!Is_medusa_level(&u.uz) &&
 				!Is_waterlevel(&u.uz));
@@ -3741,7 +3784,8 @@ boolean *shopdamage;
 		    } else {
 			if (!lava)
 			    lev->icedpool =
-				    (lev->typ == POOL ? ICED_POOL : ICED_MOAT);
+				    (lev->typ == POOL ? ICED_POOL :
+				     lev->typ == MOAT ? ICED_MOAT : ICED_BOG);
 			lev->typ = (lava ? ROOM : ICE);
 		    }
 		    bury_objs(x,y);
@@ -3837,12 +3881,12 @@ boolean *shopdamage;
 		    lev->doormask = new_doormask;
 		    unblock_point(x, y);	/* vision */
 		    if (cansee(x, y)) {
-			pline(see_txt);
+			pline("%s", see_txt);
 			newsym(x, y);
 		    } else if (sense_txt) {
-			You(sense_txt);
+			You("%s", sense_txt);
 		    } else if (hear_txt) {
-			if (flags.soundok) You_hear(hear_txt);
+			if (flags.soundok) You_hear("%s", hear_txt);
 		    }
 		    if (picking_at(x, y)) {
 			stop_occupation();
@@ -3881,7 +3925,7 @@ register struct obj *obj;		   /* no texts here! */
 {
 	/* A little Sokoban guilt... */
 	if (obj->otyp == BOULDER && In_sokoban(&u.uz) && !flags.mon_moving)
-	    change_luck(-1);
+	    sokoban_trickster();
 
 	obj->otyp = ROCK;
 	obj->quan = (long) rn1(60, 7);
@@ -4249,7 +4293,7 @@ retry:
 	if (!otmp) {
 	    pline("Nothing fitting that description exists in the game.");
 	    if (++tries < 5) goto retry;
-	    pline(thats_enough_tries);
+	    pline("%s", thats_enough_tries);
 	    otmp = readobjnam((char *)0, (struct obj *)0, TRUE);
 	    if (!otmp) return;	/* for safety; should never happen */
 	} else if (otmp == &nothing) {

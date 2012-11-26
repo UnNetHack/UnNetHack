@@ -785,6 +785,9 @@ static const char *build_opts[] = {
 #ifdef TOURIST
 		"tourists",
 #endif
+#ifdef UTF8_GLYPHS
+		"UTF-8 glyphs",
+#endif
 #ifdef USER_SOUNDS
 # ifdef USER_SOUNDS_REGEX
 		"user sounds via regular expressions",

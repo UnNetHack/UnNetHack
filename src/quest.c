@@ -95,8 +95,11 @@ artitouch()
 boolean
 ok_to_quest()
 {
-	return((boolean)((Qstat(got_quest) || Qstat(got_thanks)))
-			&& (is_pure(FALSE) > 0));
+	if (((Qstat(got_quest) || Qstat(got_thanks)) && is_pure(FALSE) > 0) ||
+		quest_status.leader_is_dead) {
+		return TRUE;
+	}
+	return FALSE;
 }
 
 STATIC_OVL boolean
@@ -247,7 +250,11 @@ chat_with_leader()
 	    qt_pager(QT_FIRSTLEADER);
 	    Qstat(met_leader) = TRUE;
 	    Qstat(not_ready) = 0;
-	  } else qt_pager(QT_NEXTLEADER);
+	  } else if (!Qstat(pissed_off)) {
+		  qt_pager(QT_NEXTLEADER);
+	  } else {
+		  verbalize("Your bones shall serve to warn others.");
+	  }
 	  /* the quest leader might have passed through the portal into
 	     the regular dungeon; none of the remaining make sense there */
 	  if (!on_level(&u.uz, &qstart_level)) return;
@@ -257,18 +264,18 @@ chat_with_leader()
 	    exercise(A_WIS, TRUE);
 	    expulsion(FALSE);
 	  } else if(is_pure(TRUE) < 0) {
-	    com_pager(QT_BANISHED);
-	    expulsion(TRUE);
+		  /* don't keep lecturing once the player's been kicked out once. */
+		  if (!Qstat(pissed_off)) {
+			com_pager(QT_BANISHED);
+			Qstat(pissed_off) = 1;
+			expulsion(FALSE);
+		  }
 	  } else if(is_pure(TRUE) == 0) {
+		  /* Don't end the game for too many tries anymore, that's silly */
 	    qt_pager(QT_BADALIGN);
-	    if(Qstat(not_ready) == MAX_QUEST_TRIES) {
-	      qt_pager(QT_LASTLEADER);
-	      expulsion(TRUE);
-	    } else {
-	      Qstat(not_ready)++;
-	      exercise(A_WIS, TRUE);
-	      expulsion(FALSE);
-	    }
+		Qstat(not_ready) = 1;
+		exercise(A_WIS, TRUE);
+		expulsion(FALSE);
 	  } else {	/* You are worthy! */
 	    qt_pager(QT_ASSIGNQUEST);
 	    exercise(A_WIS, TRUE);
@@ -283,6 +290,12 @@ leader_speaks(mtmp)
 {
 	/* maybe you attacked leader? */
 	if(!mtmp->mpeaceful) {
+		if (!Qstat(pissed_off)) {
+			/* again, don't end it permanently if the leader gets angry
+			* since you're going to have to kill him to go questing... :)
+			* ...but do only show this crap once. */
+			qt_pager(QT_LASTLEADER);
+		}
 		Qstat(pissed_off) = TRUE;
 		mtmp->mstrategy &= ~STRAT_WAITMASK;	/* end the inaction */
 	}
@@ -290,10 +303,13 @@ leader_speaks(mtmp)
 	   regular dungeon; if so, mustn't perform "backwards expulsion" */
 	if (!on_level(&u.uz, &qstart_level)) return;
 
+	if(!Qstat(pissed_off)) chat_with_leader();
+
+	/* leader might have become pissed during the chat */
 	if(Qstat(pissed_off)) {
-	  qt_pager(QT_LASTLEADER);
-	  expulsion(TRUE);
-	} else chat_with_leader();
+		mtmp->mstrategy &= ~STRAT_WAITMASK;
+		mtmp->mpeaceful = FALSE;
+	}
 }
 
 STATIC_OVL void

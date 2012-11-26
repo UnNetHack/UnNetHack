@@ -78,10 +78,18 @@ eraseoldlocks()
 	for(i = 1; i <= MAXDUNGEON*MAXLEVEL + 1; i++) {
 		/* try to remove all */
 		set_levelfile_name(lock, i);
+#ifdef FILE_AREAS
+		(void) remove_area(FILE_AREA_LEVL, lock);
+#else
 		(void) unlink(fqname(lock, LEVELPREFIX, 0));
+#endif
 	}
 	set_levelfile_name(lock, 0);
+#ifdef FILE_AREAS
+	if (remove_area(FILE_AREA_LEVL, lock))
+#else
 	if (unlink(fqname(lock, LEVELPREFIX, 0)))
+#endif
 		return(0);				/* cannot remove it */
 	return(1);					/* success! */
 }
@@ -90,7 +98,9 @@ void
 getlock()
 {
 	register int i = 0, fd, c;
+#ifndef FILE_AREAS
 	const char *fq_lock;
+#endif
 
 #ifdef TTY_GRAPHICS
 	/* idea from rpick%ucqais@uccba.uc.edu
@@ -106,7 +116,11 @@ getlock()
 #endif
 
 	/* we ignore QUIT and INT at this point */
+#ifndef FILE_AREAS
 	if (!lock_file(HLOCK, LOCKPREFIX, 10)) {
+#else
+	if (!lock_file_area(HLOCK_AREA, HLOCK, 10)) {
+#endif
 		wait_synch();
 		error("%s", "");
 	}
@@ -119,13 +133,23 @@ getlock()
 
 		do {
 			lock[0] = 'a' + i++;
-			fq_lock = fqname(lock, LEVELPREFIX, 0);
 
-			if((fd = open(fq_lock, 0)) == -1) {
+#ifndef FILE_AREAS
+			fq_lock = fqname(lock, LEVELPREFIX, 0);
+			if((fd = open(fq_lock, 0, 0)) == -1) {
+#else
+			if((fd = open_area(FILE_AREA_LEVL, lock, 0, 0)) == -1) {
+#endif
 			    if(errno == ENOENT) goto gotlock; /* no such file */
+#ifndef FILE_AREAS
 			    perror(fq_lock);
 			    unlock_file(HLOCK);
 			    error("Cannot open %s", fq_lock);
+#else
+			    perror(lock);
+			    unlock_file_area(HLOCK_AREA, HLOCK);
+			    error("Cannot open %s", lock);
+#endif
 			}
 
 			if(veryold(fd) /* closes fd if true */
@@ -134,15 +158,25 @@ getlock()
 			(void) close(fd);
 		} while(i < locknum);
 
-		unlock_file(HLOCK);
+		unlock_file_area(HLOCK_AREA, HLOCK);
 		error("Too many hacks running now.");
 	} else {
+#ifndef FILE_AREAS
 		fq_lock = fqname(lock, LEVELPREFIX, 0);
-		if((fd = open(fq_lock, 0)) == -1) {
+		if((fd = open(fq_lock, 0, 0)) == -1) {
+#else
+		if((fd = open_area(FILE_AREA_LEVL, lock, 0, 0)) == -1) {
+#endif
 			if(errno == ENOENT) goto gotlock;    /* no such file */
+#ifndef FILE_AREAS
 			perror(fq_lock);
 			unlock_file(HLOCK);
 			error("Cannot open %s", fq_lock);
+#else
+			perror(lock);
+			unlock_file_area(HLOCK_AREA, HLOCK);
+			error("Cannot open %s", lock);
+#endif
 		}
 
 		if(veryold(fd) /* closes fd if true */ && eraseoldlocks())
@@ -164,27 +198,46 @@ getlock()
 			if(eraseoldlocks())
 				goto gotlock;
 			else {
-				unlock_file(HLOCK);
+				unlock_file_area(HLOCK_AREA, HLOCK);
 				error("Couldn't destroy old game.");
 			}
 		else {
-			unlock_file(HLOCK);
+			unlock_file_area(HLOCK_AREA, HLOCK);
 			error("%s", "");
 		}
 	}
 
 gotlock:
+#ifndef FILE_AREAS
 	fd = creat(fq_lock, FCMASK);
-	unlock_file(HLOCK);
+#else
+	fd = creat_area(FILE_AREA_LEVL, lock, FCMASK);
+#endif
+	unlock_file_area(HLOCK_AREA, HLOCK);
 	if(fd == -1) {
+#ifndef FILE_AREAS
 		error("cannot creat lock file (%s).", fq_lock);
+#else
+		error("cannot creat lock file (%s in %s).", lock,
+		  FILE_AREA_LEVL);
+#endif
 	} else {
 		if(write(fd, (genericptr_t) &hackpid, sizeof(hackpid))
 		    != sizeof(hackpid)){
+#ifndef FILE_AREAS
 			error("cannot write lock (%s)", fq_lock);
+#else
+			error("cannot write lock (%s in %s)", lock,
+			  FILE_AREA_LEVL);
+#endif
 		}
 		if(close(fd) == -1) {
+#ifndef FILE_AREAS
 			error("cannot close lock (%s)", fq_lock);
+#else
+			error("cannot close lock (%s in %s)", lock,
+			  FILE_AREA_LEVL);
+#endif
 		}
 	}
 }
@@ -298,6 +351,140 @@ int wt;
 	return(0);
 }
 #endif
+
+#ifdef FILE_AREAS
+
+/*
+ * Unix file areas are directories with trailing slashes.
+ */
+
+char *
+make_file_name(filearea, filename)
+const char *filearea, *filename;
+{
+	char *buf;
+	int lenarea;
+	if (filearea && filename[0]!='/')
+	{
+		lenarea = strlen(filearea);
+		buf = (char *)alloc(lenarea+strlen(filename)+2);
+		strcpy(buf, filearea);
+		if (filearea[lenarea-1] != '/') strcat(buf, "/");
+		strcat(buf, filename);
+	}
+	else
+	{
+		buf = (char *)alloc(strlen(filename)+1);
+		strcpy(buf, filename);
+	}
+	return buf;
+}
+
+FILE *
+fopen_datafile_area(filearea, filename, mode, use_scoreprefix)
+const char *filearea, *filename, *mode;
+boolean use_scoreprefix;
+{
+	FILE *fp;
+	char *buf;
+	buf = make_file_name(filearea, filename);
+	fp = fopen(buf, mode);
+	free(buf);
+	return fp;
+}
+
+int
+chmod_area(filearea, filename, mode)
+const char *filearea, *filename;
+int mode;
+{
+	int retval;
+	char *buf;
+	buf = make_file_name(filearea, filename);
+	retval = chmod(buf, mode);
+	free(buf);
+	return retval;
+}
+
+int
+open_area(filearea, filename, flags, mode)
+const char *filearea, *filename;
+int flags, mode;
+{
+	int fd;
+	char *buf;
+	buf = make_file_name(filearea, filename);
+	fd = open(buf, flags, mode);
+	free(buf);
+	return fd;
+}
+
+int
+creat_area(filearea, filename, mode)
+const char *filearea, *filename;
+int mode;
+{
+	int fd;
+	char *buf;
+	buf = make_file_name(filearea, filename);
+	fd = creat(buf, mode);
+	free(buf);
+	return fd;
+}
+
+int
+rename_area(filearea, oldfilename, newfilename)
+const char *filearea, *oldfilename, *newfilename;
+{
+	int retval;
+	char *oldpath,*newpath;
+	oldpath = make_file_name(filearea, oldfilename);
+	newpath = make_file_name(filearea, newfilename);
+	retval = rename(oldpath, newpath);
+	free(oldpath);
+	free(newpath);
+	return retval;
+}
+
+int
+remove_area(filearea, filename)
+const char *filearea, *filename;
+{
+	int retval;
+	char *buf;
+	buf = make_file_name(filearea, filename);
+	retval = remove(buf);
+	free(buf);
+	return retval;
+}
+
+FILE *
+freopen_area(filearea, filename, mode, stream)
+const char *filearea, *filename, *mode;
+FILE *stream;
+{
+	FILE *fp;
+	char *buf;
+	buf = make_file_name(filearea, filename);
+	fp = freopen(buf, mode, stream);
+	free(buf);
+	return fp;
+}
+
+/* ----------  BEGIN FILE LOCKING HANDLING ----------- */
+
+/*
+ * ALI
+ *
+ * We assume that filenames are unique and so locks
+ * don't need to take the filearea into account. Since
+ * these locks are only used for RECORD, LOGFILE and HLOCK,
+ * this assumption is currently valid.
+ */
+
+/* ----------  END FILE LOCKING HANDLING ----------- */
+
+#endif	/* FILE_AREAS */
 
 #ifdef GETRES_SUPPORT
 

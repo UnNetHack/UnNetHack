@@ -79,7 +79,7 @@ struct obj *obj;
 		    m_useup(mon, obj);
 		    mtmp = makemon(&mons[PM_GHOST], cc.x, cc.y, NO_MM_FLAGS);
 		    if (!mtmp) {
-			if (vis) pline(empty);
+			if (vis) pline("%s", empty);
 		    } else {
 			if (vis) {
 			    pline("As %s opens the bottle, an enormous %s emerges!",
@@ -102,7 +102,7 @@ struct obj *obj;
 		m_useup(mon, obj);
 		mtmp = makemon(&mons[PM_DJINNI], cc.x, cc.y, NO_MM_FLAGS);
 		if (!mtmp) {
-		    if (vis) pline(empty);
+		    if (vis) pline("%s", empty);
 		} else {
 		    if (vis)
 			pline("In a cloud of smoke, %s emerges!",
@@ -123,7 +123,9 @@ struct obj *obj;
 		return 2;
 	    }
 	}
-	if (obj->oclass == WAND_CLASS && obj->cursed && !rn2(100)) {
+	/* same probability for blowing up a cursed wand as in dozap()
+	 * for the player */
+	if (obj->oclass == WAND_CLASS && obj->cursed && !rn2(30)) {
 	    int dam = d(obj->spe+2, 6);
 
 	    if (flags.soundok) {
@@ -2003,11 +2005,13 @@ const char *str;
 	    }
 	    return TRUE;
 	} else if ((orefl = which_armor(mon, W_ARM)) &&
-		(orefl->otyp == SILVER_DRAGON_SCALES || orefl->otyp == SILVER_DRAGON_SCALE_MAIL)) {
+		(orefl->otyp == CHROMATIC_DRAGON_SCALES || orefl->otyp == CHROMATIC_DRAGON_SCALE_MAIL ||
+		 orefl->otyp == SILVER_DRAGON_SCALES || orefl->otyp == SILVER_DRAGON_SCALE_MAIL)) {
 	    if (str)
 		pline(str, s_suffix(mon_nam(mon)), "armor");
 	    return TRUE;
 	} else if (mon->data == &mons[PM_SILVER_DRAGON] ||
+		mon->data == &mons[PM_TIAMAT] ||
 		mon->data == &mons[PM_CHROMATIC_DRAGON]) {
 	    /* Silver dragons only reflect when mature; babies do not */
 	    if (str)
@@ -2043,7 +2047,8 @@ const char *fmt, *str;
 	    if (fmt && str)
 	    	pline(fmt, str, "armor");
 	    return TRUE;
-	} else if (youmonst.data == &mons[PM_SILVER_DRAGON]) {
+	} else if ((youmonst.data == &mons[PM_SILVER_DRAGON]) ||
+		   (youmonst.data == &mons[PM_CHROMATIC_DRAGON])) {
 	    if (fmt && str)
 	    	pline(fmt, str, "scales");
 	    return TRUE;

@@ -88,27 +88,26 @@ static void reset_menu_count(HWND hwndList, PNHMenuWindow data);
 static BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch);
 
 #ifdef MENU_COLOR
-/* FIXME: nhcolor_to_RGB copied from mhmap.c */
 /* map nethack color to RGB */
 COLORREF nhcolor_to_RGB(int c)
 {
 	switch(c) {
-	case CLR_BLACK:			return RGB(0x55, 0x55, 0x55);
+	case CLR_BLACK:			return RGB(0x30, 0x30, 0x30);
 	case CLR_RED:			return RGB(0xFF, 0x00, 0x00);
-	case CLR_GREEN:			return RGB(0x00, 0x80, 0x00);
-	case CLR_BROWN:			return RGB(0xA5, 0x2A, 0x2A);
-	case CLR_BLUE:			return RGB(0x00, 0x00, 0xFF);
-	case CLR_MAGENTA:		return RGB(0xFF, 0x00, 0xFF);
-	case CLR_CYAN:			return RGB(0x00, 0xFF, 0xFF);
-	case CLR_GRAY:			return RGB(0xC0, 0xC0, 0xC0);
+	case CLR_GREEN:			return RGB(0x00, 0x60, 0x00);
+	case CLR_BROWN:			return RGB(0x80, 0x00, 0x00);
+	case CLR_BLUE:			return RGB(0x20, 0x20, 0xA0);
+	case CLR_MAGENTA:		return RGB(0xA0, 0x00, 0xA0);
+	case CLR_CYAN:			return RGB(0x00, 0x80, 0x80);
+	case CLR_GRAY:			return RGB(0x60, 0x60, 0x60);
 	case NO_COLOR:			return RGB(0xFF, 0xFF, 0xFF);
-	case CLR_ORANGE:		return RGB(0xFF, 0xA5, 0x00);
-	case CLR_BRIGHT_GREEN:		return RGB(0x00, 0xFF, 0x00);
-	case CLR_YELLOW:		return RGB(0xFF, 0xFF, 0x00);
-	case CLR_BRIGHT_BLUE:		return RGB(0x00, 0xC0, 0xFF);
-	case CLR_BRIGHT_MAGENTA: 	return RGB(0xFF, 0x80, 0xFF);
-	case CLR_BRIGHT_CYAN:		return RGB(0x80, 0xFF, 0xFF);	/* something close to aquamarine */
-	case CLR_WHITE:			return RGB(0xFF, 0xFF, 0xFF);
+	case CLR_ORANGE:		return RGB(0xFF, 0x80, 0x00);
+	case CLR_BRIGHT_GREEN:		return RGB(0x00, 0xC0, 0x00);
+	case CLR_YELLOW:		return RGB(0xC0, 0xC0, 0x00);
+	case CLR_BRIGHT_BLUE:		return RGB(0x40, 0x40, 0xFF);
+	case CLR_BRIGHT_MAGENTA: 	return RGB(0xFF, 0x00, 0xFF);
+	case CLR_BRIGHT_CYAN:		return RGB(0x00, 0xC0, 0xC0);
+	case CLR_WHITE:			return RGB(0x90, 0x90, 0x90);
 	default:			return RGB(0x00, 0x00, 0x00);	/* black */
 	}
 }
@@ -120,7 +119,7 @@ char *str;
 int *color, *attr;
 {
     struct menucoloring *tmpmc;
-    if (iflags.use_menu_color)
+    if (iflags.use_menu_color && iflags.use_color)
 	for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
 # ifdef MENU_COLOR_REGEX
 #  ifdef MENU_COLOR_REGEX_POSIX
@@ -822,9 +821,10 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	COLORREF OldBg, OldFg, NewBg;
 	char *p, *p1;
 	int column;
+	int use_attr = ATR_NONE;
 
 #ifdef MENU_COLOR
-	int color = NO_COLOR, attr;
+	int color = NO_COLOR, attr = ATR_NONE;
 	boolean menucolr = FALSE;
 #endif
 
@@ -836,13 +836,30 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
 
     item = &data->menu.items[lpdis->itemID];
+	use_attr = item->attr;
+
+#ifdef MENU_COLOR
+	if (iflags.use_menu_color && iflags.use_color) {
+		menucolr = get_menu_coloring(item->str, &color, &attr);
+	}
+
+	if (menucolr) {
+		use_attr = attr;
+	}
+#endif
 
 	tileDC = CreateCompatibleDC(lpdis->hDC);
-	saveFont = SelectObject(lpdis->hDC, mswin_get_font(NHW_MENU, item->attr, lpdis->hDC, FALSE));
+	saveFont = SelectObject(lpdis->hDC, mswin_get_font(NHW_MENU, use_attr, lpdis->hDC, FALSE));
 	NewBg = menu_bg_brush ? menu_bg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_BG_MENU);
 	OldBg = SetBkColor(lpdis->hDC, NewBg);
 	OldFg = SetTextColor(lpdis->hDC, 
 		menu_fg_brush ? menu_fg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_FG_MENU)); 
+
+#ifdef MENU_COLOR
+	if (menucolr && color != NO_COLOR) {
+		SetTextColor(lpdis->hDC, nhcolor_to_RGB(color));
+	}
+#endif
 
     GetTextMetrics(lpdis->hDC, &tm);
 
@@ -873,16 +890,6 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		if(item->accelerator!=0) {
 			buf[0] = item->accelerator;
 			buf[1] = '\x0';
-
-#ifdef MENU_COLOR
-			if (iflags.use_menu_color &&
-			    (menucolr = get_menu_coloring(item->str, &color,&attr))) {
-			    /* TODO: use attr too */
-			    if (color != NO_COLOR)
-				SetTextColor(lpdis->hDC, nhcolor_to_RGB(color));
-			}
-#endif
-
 			SetRect( &drawRect, x, lpdis->rcItem.top, lpdis->rcItem.right, lpdis->rcItem.bottom );
 			DrawText(lpdis->hDC, NH_A2W(buf, wbuf, 2), 1, &drawRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
 		}

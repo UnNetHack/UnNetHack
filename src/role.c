@@ -88,7 +88,7 @@ const struct Role roles[] = {
 	"Anu", "_Ishtar", "Anshar", /* Babylonian */
 	"Cav", "the Caves of the Ancestors", "the Dragon's Lair",
 	PM_CAVEMAN, PM_CAVEWOMAN, NON_PM,
-	PM_SHAMAN_KARNOV, PM_NEANDERTHAL, PM_CHROMATIC_DRAGON,
+	PM_SHAMAN_KARNOV, PM_NEANDERTHAL, PM_TIAMAT,
 	ART_SCEPTRE_OF_MIGHT,
 	MH_HUMAN|MH_DWARF|MH_GNOME|MH_VAMPIRE | ROLE_MALE|ROLE_FEMALE |
 	  ROLE_LAWFUL|ROLE_NEUTRAL,
@@ -100,6 +100,34 @@ const struct Role roles[] = {
 	{  1, 0,  0, 1,  0, 1 },10,	/* Energy */
 	0, 12, 0, 1,  8, A_INT, SPE_DIG,             -4
 },
+#ifdef CONVICT
+{	{"Convict", 0}, {
+	{"Detainee",     0},
+	{"Inmate",   0},
+	{"Jail-bird",0},
+	{"Prisoner",0},
+	{"Outlaw",    0},
+	{"Crook",   0},
+	{"Desperado",     0},
+	{"Felon",    0},
+	{"Fugitive",  0} },
+	"Ilmater", "Grumbar", "_Tymora",	/* Faerunian */
+	"Con", "Castle Waterdeep Dungeon", "the Warden's Level",
+	PM_CONVICT, NON_PM, PM_SEWER_RAT,
+	PM_ROBERT_THE_LIFER, PM_INMATE, PM_WARDEN_ARIANNA,
+	/*PM_GIANT_BEETLE, PM_SOLDIER_ANT, S_RODENT, S_SPIDER,*/
+	ART_IRON_BALL_OF_LIBERATION,
+	MH_HUMAN|MH_DWARF|MH_GNOME|MH_ORC|MH_VAMPIRE | ROLE_MALE|ROLE_FEMALE |
+	  ROLE_CHAOTIC,
+	/* Str Int Wis Dex Con Cha */
+	{  10,  7,  7,  7, 13,  6 },
+	{  20, 20, 10, 20, 20, 10 },
+	/* Init   Lower  Higher */
+	{  8, 0,  0, 8,  0, 0 },	/* Hit points */
+	{  1, 0,  0, 1,  0, 1 },10,	/* Energy */
+	-10, 5, 0, 2, 10, A_INT, SPE_TELEPORT_AWAY,   -4
+},
+#endif	/* CONVICT */
 {	{"Healer", 0}, {
 	{"Rhizotomist",    0},
 	{"Empiric",        0},
@@ -458,7 +486,7 @@ const struct Race races[] = {
 	MH_VAMPIRE | ROLE_MALE|ROLE_FEMALE | ROLE_CHAOTIC,
 	MH_VAMPIRE, 0, MH_ELF|MH_GNOME|MH_DWARF|MH_ORC,
 	/*    Str     Int Wis Dex Con Cha */
-	{      4,      0,  0,  4,  3,  4 },
+	{      3,      3,  3,  3,  3,  3 },
 	{ STR19(19), 18, 18, 20, 20, 20 },
 	/* Init   Lower  Higher */
 	{  3, 0,  0, 3,  2, 0 },	/* Hit points */

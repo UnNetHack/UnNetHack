@@ -262,7 +262,6 @@ dgn_lex.o:   dgn_lex.c $(CONFIG.H) ../include/dgn_comp.h ../include/dgn_file.h
 	@echo $(CC) -c $(CFLAGS) dgn_lex.c
 	@$(CC) -c $(CFLAGS) -DWEIRD_LEX=`egrep -c _cplusplus dgn_lex.c` dgn_lex.c
 
-
 ../include/dgn_comp.h: dgn_yacc.c
 
 dgn_yacc.c: $(srcdir)/dgn_comp.y
@@ -343,7 +342,7 @@ $(srcdir)/../src/tile.c: tilemap
 
 ../include/tile.h: ../win/share/tile.h tilemap
 	./tilemap
-#	cp ../win/share/tile.h ../include/tile.h
+	cp ../win/share/tile.h ../include/tile.h
 
 tiletext.o: $(srcdir)/../win/share/tiletext.c $(CONFIG_H) ../include/tile.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/share/tiletext.c
@@ -423,3 +422,11 @@ spotless: clean
 tileedit: tileedit.cpp $(TEXT_IO)
 	$(QTDIR)/bin/moc -o tileedit.moc tileedit.h
 	$(CC) -o tileedit -I../include -I$(srcdir)/../include -I$(QTDIR)/include -L$(QTDIR)/lib tileedit.cpp $(TEXT_IO) -lqt
+
+# Because the targets dgn_yacc.c, dgn_lex.c, lev_yacc.c, and lev_lex.c
+# use lex and yacc and mv the resulting output to the correct filenames,
+# in case of parralel compilation this might break.
+#
+# This special target name surpresses parallel compilation for this entire
+# Makefile
+.NOTPARALLEL:

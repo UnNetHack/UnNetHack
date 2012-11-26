@@ -5,7 +5,7 @@
 # NetHack may be freely redistributed.  See license for details.
 #
 LEVEL:"knox-1"
-FLAGS: noteleport,mazelevel
+FLAGS: noteleport,mazelevel,sky
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
@@ -111,7 +111,7 @@ OBJECT:('*',"amethyst"),(48,13)
 # "Winterly Fort Ludios" by Patric Mueller <bhaak@gmx.net>
 #
 LEVEL:"knox-2"
-FLAGS: noteleport,shortsighted,mazelevel
+FLAGS: noteleport,shortsighted,mazelevel,sky
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
@@ -220,7 +220,7 @@ OBJECT:('*',"amethyst"),(68,11)
 # "Minas Tirith?" by Patric Mueller <bhaak@gmx.net>
 #
 LEVEL:"knox-3"
-FLAGS: noteleport,shortsighted,mazelevel
+FLAGS: noteleport,shortsighted,mazelevel,sky
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP

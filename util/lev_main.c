@@ -633,9 +633,9 @@ const char *
 spovar2str(spovar)
      long spovar;
 {
-    static togl = 0;
+    static int togl = 0;
     static char buf[2][128];
-    char *n;
+    char *n = NULL;
     int is_array = (spovar & SPOVAR_ARRAY);
     spovar &= ~SPOVAR_ARRAY;
 
@@ -941,9 +941,11 @@ char c;
 		  case 'L'  : return(LAVAPOOL);
 		  case 'I'  : return(ICE);
 		  case 'W'  : return(WATER);
-		  case 'T'	: return (TREE);
-		  case 'F'	: return (IRONBARS);	/* Fe = iron */
-		  case 'x'  : return(MAX_TYPE); /* 'see-through' */
+		  case 'T'  : return(TREE);
+		  case 't'  : return(DEADTREE);
+		  case 'F'  : return(IRONBARS);	/* Fe = iron */
+		  case 'M'  : return(BOG);	/* muddy swamp */
+		  case 'x'  : return(MAX_TYPE);	/* 'see-through' */
 	    }
 	return(INVALID_TYPE);
 }
@@ -988,7 +990,6 @@ sp_lev *sp;
 	register char *s1, *s2;
 	long max_len = 0;
 	long max_hig = 0;
-	char msg[256];
 	char *tmpmap[ROWNO];
 	int dx,dy;
 	char *mbuf;
@@ -1089,7 +1090,6 @@ int fd;
 sp_lev *maze;
 {
         int i;
-        uchar len;
 
         if (!write_common_data(fd, maze))
             return FALSE;
@@ -1159,7 +1159,6 @@ int fd;
 sp_lev *maze;
 {
         int i;
-        uchar len;
 	char debuf[128];
 	const char *opcodestr[MAX_SP_OPCODES] = {
 	    "null",

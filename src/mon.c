@@ -204,11 +204,20 @@ register struct monst *mtmp;
 	    case PM_GREEN_DRAGON:
 	    case PM_GOLD_DRAGON:
 	    case PM_YELLOW_DRAGON:
+	    case PM_CHROMATIC_DRAGON:
 		/* Make dragon scales.  This assumes that the order of the */
 		/* dragons is the same as the order of the scales.	   */
 		if (!rn2(mtmp->mrevived ? 20 : 3)) {
 		    num = GRAY_DRAGON_SCALES + monsndx(mdat) - PM_GRAY_DRAGON;
 		    obj = mksobj_at(num, x, y, FALSE, FALSE);
+		    obj->spe = 0;
+		    obj->cursed = obj->blessed = FALSE;
+		}
+		goto default_1;
+	    case PM_TIAMAT:
+		/* Make chromatic dragon scales. */
+		if (!rn2(mtmp->mrevived ? 20 : 1)) {
+		    obj = mksobj_at(CHROMATIC_DRAGON_SCALES, x, y, FALSE, FALSE);
 		    obj->spe = 0;
 		    obj->cursed = obj->blessed = FALSE;
 		}
@@ -290,6 +299,12 @@ register struct monst *mtmp;
 		num = d(2,4);
 		while(num--)
 			obj = mksobj_at(LEATHER_ARMOR, x, y, TRUE, FALSE);
+		mtmp->mnamelth = 0;
+		break;
+	    case PM_WAX_GOLEM:
+		num = d(2,4);
+		while (num--)
+			obj = mksobj_at(WAX_CANDLE, x, y, TRUE, FALSE);
 		mtmp->mnamelth = 0;
 		break;
 	    case PM_GOLD_GOLEM:
@@ -400,12 +415,12 @@ int
 minliquid(mtmp)
 register struct monst *mtmp;
 {
-    boolean inpool, inlava, infountain;
+    boolean inpool, inlava, inswamp, infountain, grounded;
 
-    inpool = is_pool(mtmp->mx,mtmp->my) &&
-	     !is_flyer(mtmp->data) && !is_floater(mtmp->data);
-    inlava = is_lava(mtmp->mx,mtmp->my) &&
-	     !is_flyer(mtmp->data) && !is_floater(mtmp->data);
+    grounded = !is_flyer(mtmp->data) && !is_floater(mtmp->data);
+    inpool = is_pool(mtmp->mx,mtmp->my) && grounded;
+    inlava = is_lava(mtmp->mx,mtmp->my) && grounded;
+    inswamp = is_swamp(mtmp->mx,mtmp->my) && grounded;
     infountain = IS_FOUNTAIN(levl[mtmp->mx][mtmp->my].typ);
 
 #ifdef STEED
@@ -419,12 +434,12 @@ register struct monst *mtmp;
      * keep going down, and when it gets to 1 hit point the clone
      * function will fail.
      */
-    if (mtmp->data == &mons[PM_GREMLIN] && (inpool || infountain) && rn2(3)) {
+    if (mtmp->data == &mons[PM_GREMLIN] && (inpool || infountain || inswamp) && rn2(3)) {
 	if (split_mon(mtmp, (struct monst *)0))
 	    dryup(mtmp->mx, mtmp->my, FALSE);
 	if (inpool) water_damage(mtmp->minvent, FALSE, FALSE);
 	return (0);
-    } else if (mtmp->data == &mons[PM_IRON_GOLEM] && inpool && !rn2(5)) {
+    } else if (mtmp->data == &mons[PM_IRON_GOLEM] && (inpool || inswamp) && !rn2(5)) {
 	int dam = d(2,6);
 	if (cansee(mtmp->mx,mtmp->my))
 	    pline("%s rusts.", Monnam(mtmp));
@@ -492,6 +507,12 @@ register struct monst *mtmp;
 		return 0;
 	    }
 	    return (1);
+	}
+    } else if (inswamp) {
+	if (!is_clinger(mtmp->data)
+	    && !is_swimmer(mtmp->data) && !amphibious(mtmp->data)) {
+	    water_damage(mtmp->minvent, FALSE, FALSE);
+	    return (0);
 	}
     } else {
 	/* but eels have a difficult time outside */
@@ -891,8 +912,11 @@ mpickstuff(mtmp, str)
 {
 	register struct obj *otmp, *otmp2;
 
+	/* let angry 1ES pick up stuff so she can smash boulders */
+	if ((mtmp->data != &mons[PM_BLACK_MARKETEER]) && (!mtmp->mpeaceful))  {
 /*	prevent shopkeepers from leaving the door of their shop */
-	if(mtmp->isshk && inhishop(mtmp)) return FALSE;
+		if(mtmp->isshk && inhishop(mtmp)) return FALSE;
+	}
 
 	for(otmp = level.objects[mtmp->mx][mtmp->my]; otmp; otmp = otmp2) {
 	    otmp2 = otmp->nexthere;
@@ -911,21 +935,46 @@ mpickstuff(mtmp, str)
 		if (otmp->oinvis && !perceives(mtmp->data)) continue;
 #endif
 		if (Is_sokoprize(otmp)) continue;
-		if (cansee(mtmp->mx,mtmp->my) && flags.verbose)
-			pline("%s picks up %s.", Monnam(mtmp),
-			      (distu(mtmp->mx, mtmp->my) <= 5) ?
-				doname(otmp) : distant_name(otmp, doname));
-		obj_extract_self(otmp);
-		/* unblock point after extract, before pickup */
-		if (otmp->otyp == BOULDER)
-		    unblock_point(otmp->ox,otmp->oy);	/* vision */
-		(void) mpickobj(mtmp, otmp);	/* may merge and free otmp */
-		m_dowear(mtmp, FALSE);
-		newsym(mtmp->mx, mtmp->my);
+
+		/* let monster pickup the object */
+		mpickup_obj(mtmp, otmp);
+
 		return TRUE;			/* pick only one object */
 	    }
 	}
 	return FALSE;
+}
+
+void
+mpickup_obj(mtmp, otmp)
+	struct monst *mtmp;
+	struct obj *otmp;
+{
+	if (otmp->otyp == BOULDER && is_rockbreaker(mtmp->data)) {
+		if (cansee(mtmp->mx,mtmp->my)) {
+			pline("A thunderclap rings out, and %s shatters!", (distu(mtmp->mx, mtmp->my) <= 5) ? doname(otmp) : distant_name(otmp, doname));
+			pline("%s strides through the dust cloud.", Monnam(mtmp));
+		} else {
+			pline("A thunderclap rings out!");
+		}
+	} else {
+		if (cansee(mtmp->mx,mtmp->my) && flags.verbose) {
+			pline("%s picks up %s.", Monnam(mtmp),
+					(distu(mtmp->mx, mtmp->my) <= 5) ?
+					doname(otmp) : distant_name(otmp, doname));
+		}
+	}
+	if (otmp->otyp == BOULDER && is_rockbreaker(mtmp->data)) {
+		remove_object(otmp);
+	} else {
+		obj_extract_self(otmp);
+		/* unblock point after extract, before pickup */
+		if (otmp->otyp == BOULDER)
+			unblock_point(otmp->ox,otmp->oy);	/* vision */
+		(void) mpickobj(mtmp, otmp);	/* may merge and free otmp */
+	}
+	m_dowear(mtmp, FALSE);
+	newsym(mtmp->mx, mtmp->my);
 }
 
 #endif /* OVL2 */
@@ -1004,8 +1053,9 @@ struct obj *otmp;
 	 * their alignment if the monster takes something they need
 	 */
 
-	/* special--boulder throwers carry unlimited amounts of boulders */
-	if (throws_rocks(mdat) && otyp == BOULDER)
+	/* special--boulder throwers carry unlimited amounts of boulders
+	 * and some monsters can shatter boulders (will be handled in mpickstuff) */
+	if ((throws_rocks(mdat) || is_rockbreaker(mdat)) && otyp == BOULDER)
 		return(TRUE);
 
 	/* nymphs deal in stolen merchandise, but not boulders or statues */
@@ -1239,14 +1289,46 @@ mm_aggression(magr, mdef)
 struct monst *magr,	/* monster that is currently deciding where to move */
 	     *mdef;	/* another monster which is next to it */
 {
+	struct permonst *ma,*md;
+
+	ma = magr->data;
+	md = mdef->data;
 	/* supposedly purple worms are attracted to shrieking because they
 	   like to eat shriekers, so attack the latter when feasible */
-	if (magr->data == &mons[PM_PURPLE_WORM] &&
-		mdef->data == &mons[PM_SHRIEKER])
-	    return ALLOW_M|ALLOW_TM;
-	/* Various other combinations such as dog vs cat, cat vs rat, and
-	   elf vs orc have been suggested.  For the time being we don't
-	   support those. */
+	if (ma == &mons[PM_PURPLE_WORM] &&
+		md == &mons[PM_SHRIEKER])
+			return ALLOW_M|ALLOW_TM;
+
+	/* Since the quest guardians are under siege, it makes sense to have 
+       them fight hostiles.  (But we don't want the quest leader to be in danger.) */
+	if(ma->msound==MS_GUARDIAN && mdef->mpeaceful==FALSE)
+		return ALLOW_M|ALLOW_TM;
+	/* and vice versa */
+	if(md->msound==MS_GUARDIAN && magr->mpeaceful==FALSE)
+		return ALLOW_M|ALLOW_TM;
+
+	/* elves vs. orcs */
+	if(is_elf(ma) && is_orc(md))
+		return ALLOW_M|ALLOW_TM;
+	/* and vice versa */
+	if(is_elf(md) && is_orc(ma))
+		return ALLOW_M|ALLOW_TM;
+
+	/* angels vs. demons */
+	if(ma->mlet==S_ANGEL && is_demon(md))
+		return ALLOW_M|ALLOW_TM;
+	/* and vice versa */
+	if(md->mlet==S_ANGEL && is_demon(ma))
+		return ALLOW_M|ALLOW_TM;
+
+	/* woodchucks vs. The Oracle */
+	if(ma == &mons[PM_WOODCHUCK] && md == &mons[PM_ORACLE])
+		return ALLOW_M|ALLOW_TM;
+
+	/* ravens like eyes */
+	if(ma == &mons[PM_RAVEN] && md == &mons[PM_FLOATING_EYE])
+		return ALLOW_M|ALLOW_TM;
+
 	return 0L;
 }
 
@@ -1644,7 +1726,15 @@ struct monst *mon; /**< Cthulhu's struct */
 			You_hear("hissing and bubbling!");
 		}
 		/* ...into a stinking cloud... */
-		(void) create_cthulhu_death_cloud(mon->mx, mon->my, 3, 8);
+		if (mvitals[PM_CTHULHU].died == 1 &&
+		    distu(mon->mx, mon->my) > 2) {
+			/* Cthulhu got killed while meditating and the player
+			 * was not next to him.
+			 * You can't get rid of the True Final Boss so easily! */
+			(void) create_cthulhu_death_cloud(mon->mx, mon->my, 2, 4, rnd(4));
+		} else {
+			(void) create_cthulhu_death_cloud(mon->mx, mon->my, 3, 8, rn1(30,30));
+		}
 	}
 }
 
@@ -2531,7 +2621,7 @@ struct monst *mon;
 				You("cannot polymorph %s into that.", mon_nam(mon));
 			else break;
 		} while(++tries < 5);
-		if (tries==5) pline(thats_enough_tries);
+		if (tries==5) pline("%s", thats_enough_tries);
 	}
 #endif /*WIZARD*/
 	if (mndx == NON_PM) mndx = rn1(SPECIAL_PM - LOW_PM, LOW_PM);

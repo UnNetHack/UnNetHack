@@ -2133,6 +2133,9 @@ quality of the weapon; you are free to manually fill your quiver with
 the `Q' command instead.  If no weapon is found or the option is
 false, the `t' (throw) command is executed instead.  (default false)
 %.lp
+\item[\ib{autounlock}]
+Automatically apply unlocking tool when trying to open a locked door (default true).
+%.lp
 \item[\ib{boulder}]
 Set the character used to display boulders (default is rock class symbol).
 %.lp
@@ -2558,6 +2561,10 @@ Prompt for confirmation before praying (default on).
 \item[\ib{pushweapon}]
 Using the `w' (wield) command when already wielding
 something pushes the old item into your alternate weapon slot (default off).
+%.lp
+\item[\ib{quiver\_fired}]
+Using the 'f' (fire) command when nothing is quivered, prompts for ammunition 
+to quiver, then fires it (default on).
 %.Ip
 \item[\ib{qwertz\_layout}]
 If {\tt QWERTZ} was set in {\it config.h} at compile-time this option can be
@@ -2625,6 +2632,21 @@ Show your approximate accumulated score on bottom line (default off).
 \item[\ib{silent}]
 Suppress terminal beeps (default on).
 %.lp
+\item[\ib{sortloot}]
+Controls the behavior of the sortloot patch that sorts pickup lists for
+inventory and \#loot commands and some others.
+
+The possible values are:
+%.sd
+%.si
+{\tt full} --- always sort the lists;\\
+{\tt loot} --- only sort the lists that don't use inventory
+       letters, like with the \#loot and pickup commands;\\
+{\tt none} --- show lists the traditional way without sorting.
+%.ei
+%.ed
+%.lp
+The default is 'none', the way an unpatched game works.
 \item[\ib{sortpack}]
 Sort the pack contents by type when displaying inventory (default on).
 %.lp

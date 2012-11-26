@@ -9,7 +9,7 @@
 #	and receive your quest assignment.
 #
 LEVEL: "Val-strt"
-FLAGS: noteleport,hardfloor,mazelevel
+FLAGS: noteleport,hardfloor,mazelevel,sky
 INIT_MAP:solidfill,' '
 MON_GENERATION:86%, (64,"fire ant"), (16,'a'), (16,"fire giant"), (4,'H')
 GEOMETRY:center,center

@@ -726,17 +726,29 @@ int
 dbon()		/* damage bonus for strength */
 {
 	int str = ACURR(A_STR);
+	int dbon = 0;
 
 	if (Upolyd) return(0);
 
-	if (str < 6) return(-1);
-	else if (str < 16) return(0);
-	else if (str < 18) return(1);
-	else if (str == 18) return(2);		/* up to 18 */
-	else if (str <= STR18(75)) return(3);		/* up to 18/75 */
-	else if (str <= STR18(90)) return(4);		/* up to 18/90 */
-	else if (str < STR18(100)) return(5);		/* up to 18/99 */
-	else return(6);
+	if (str < 6) dbon = -1;
+	else if (str < 16) dbon = 0;
+	else if (str < 18) dbon = 1;
+	else if (str == 18) dbon = 2;		/* up to 18 */
+	else if (str <= STR18(75)) dbon = 3;	/* up to 18/75 */
+	else if (str <= STR18(90)) dbon = 4;	/* up to 18/90 */
+	else if (str < STR18(100)) dbon = 5;	/* up to 18/99 */
+	else if (str == STR18(100)) dbon = 6;	/* 18/00 only */
+	else dbon = 7;				/* gauntlets of power */
+
+	/* HASAAAAAN CHOP!
+	 *
+	 * If you're wielding a two-handed weapon, let's just, hmm,
+	 * double this bonus.  Yes, even when negative; those are HEAVY.
+	 *
+	 * This should sharply increase the appeal of two-handers compared to #twoweapon. */
+
+	if (uwep && bimanual(uwep)) { dbon *= 2; }
+	return dbon;
 }
 
 
@@ -937,17 +949,17 @@ int enhance_skill(boolean want_dump)
 			    (u.ulevel < MAXULEV) ?
 				"when you're more experienced" :
 				"if skill slots become available");
-		    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
 			     buf, MENU_UNSELECTED);
 		}
 		if (maxxed_cnt > 0) {
 		    Sprintf(buf,
 		  "(Skill%s flagged by \"#\" cannot be enhanced any further.)",
 			    plur(maxxed_cnt));
-		    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
 			     buf, MENU_UNSELECTED);
 		}
-		add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
 			     "", MENU_UNSELECTED);
 	    }
 	    } /* want_dump or not */
@@ -971,7 +983,7 @@ int enhance_skill(boolean want_dump)
 		    dump_html("<tr><th>%s</th></tr>\n",(char *)skill_ranges[pass].name);
 		    logged=FALSE;
 		} else
-		    add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings,
 			     skill_ranges[pass].name, MENU_UNSELECTED);
 		}
 		if (want_dump) {
@@ -1030,7 +1042,7 @@ int enhance_skill(boolean want_dump)
 			    prefix, P_NAME(i), sklnambuf);
 		}
 		any.a_int = can_advance(i, speedy) ? i+1 : 0;
-		add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
 			 buf, MENU_UNSELECTED);
 		} /* !want_dump */
 	    }
@@ -1150,6 +1162,10 @@ struct obj *obj;
 	if (!obj)
 		/* Not using a weapon */
 		return (P_BARE_HANDED_COMBAT);
+#ifdef CONVICT
+	if ((obj->otyp == HEAVY_IRON_BALL) && Role_if(PM_CONVICT))
+		return objects[obj->otyp].oc_skill;
+#endif /* CONVICT */
 	if (obj->oclass != WEAPON_CLASS && obj->oclass != TOOL_CLASS &&
 	    obj->oclass != GEM_CLASS)
 		/* Not a weapon, weapon-tool, or ammo */

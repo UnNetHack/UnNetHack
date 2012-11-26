@@ -160,10 +160,9 @@ register xchar x, y;
 				}
 			} else {
 				char kbuf[BUFSZ];
-				int dis_dmg;
 				Sprintf(kbuf, "barefootedly kicking %s",
 				        an(mon->data->mname));
-				dis_dmg = instadisintegrate(kbuf);
+				instadisintegrate(kbuf);
 				break;
 			}
 		} else
@@ -342,6 +341,10 @@ register struct obj *gold;
 			   goldreqd = 500L;
 			else if (mtmp->data == &mons[PM_CAPTAIN])
 			   goldreqd = 750L;
+#ifdef CONVICT
+			else if (mtmp->data == &mons[PM_PRISON_GUARD])
+			   goldreqd = 200L;
+#endif /* CONVICT */
 
 			if (goldreqd) {
 #ifndef GOLDOBJ
@@ -641,6 +644,7 @@ char *buf;
 	else if (IS_DOOR(maploc->typ)) what = "a door";
 	else if (IS_TREE(maploc->typ)) what = "a tree";
 	else if (IS_STWALL(maploc->typ)) what = "a wall";
+	else if (IS_DEADTREE(maploc->typ)) what = "a dead tree";
 	else if (IS_ROCK(maploc->typ)) what = "a rock";
 	else if (IS_THRONE(maploc->typ)) what = "a throne";
 	else if (IS_FOUNTAIN(maploc->typ)) what = "a fountain";
@@ -977,6 +981,27 @@ dokick()
 			return(1);
 		    }
 		    goto ouch;
+		}
+		if(IS_DEADTREE(maploc->typ)) {
+		    if(Levitation) goto dumb;
+		    You("kick %s.", Blind ? something : "the dead tree");
+		    switch (rn2(4)) {
+			case 0:	goto ouch;
+			case 1:	pline("The tree is tottering...");
+				break;
+			case 2:	pline("Some branches are swinging...");
+				break;
+			case 3:	if (!may_dig(x,y)) goto ouch;
+				pline("The dead tree falls down.");
+				maploc->typ = ROOM;
+				if (Blind)
+				    feel_location(x,y);	/* we know it's gone */
+				else
+				    newsym(x,y);
+				unblock_point(x,y);	/* vision */
+				break;
+		    }
+		    return(1);
 		}
 #ifdef SINKS
 		if(IS_SINK(maploc->typ)) {

@@ -227,7 +227,6 @@ BOOL CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	PNHRIPWindow data;
-	static int InRipText = 1;
 	data = (PNHRIPWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	switch( wParam ) {
 		case MSNH_MSG_PUTSTR: {

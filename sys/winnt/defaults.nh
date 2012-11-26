@@ -2,27 +2,14 @@
 # A '#' at the beginning of a line means the rest of the line is a comment.
 #
 # Some options MUST be set in this file, other options can be toggled while
-# playing.  For a list of options available see the <opthelp.> file.
+# playing by selecting the options menu with 'O'.
+#  For a list of options available see the <opthelp.> file.
 #
 # To change the configuration, comment out the unwanted lines, and
 # uncomment the configuration you want.
 
 # *** OPTIONS ***
 #
-# Use the IBM character set rather than just plain ascii characters
-# for tty window-port.
-#
-# This also works for the curses interface compiled with the PDCurses-SDL
-# library.
-#
-OPTIONS=IBMGraphics
-
-#
-# cursesgraphics may be set for the curses interface if the IBMGraphics
-# option above doesn't work with your curses implementation.
-#
-# OPTIONS=cursesgraphics
-
 # Keyboard handling
 # Different keyboard handlers can be loaded.
 # Default is nhdefkey.dll but you can override that.
@@ -31,53 +18,6 @@ OPTIONS=IBMGraphics
 #
 # NetHack 3.4.0 keyboard handling
 # OPTIONS=altkeyhandler:nh340key.dll
-
-# *** Curses Options ***
-#
-# Use this if the binary was compiled with multiple window interfaces,
-# and curses is not the default
-OPTIONS=windowtype:curses
-#
-# Optionally specify the alignment of the message and status windows
-# relative to the map window.  If not specified, the code will default
-# to the locations used in the tty interface: message window on top,
-# and status window on bottom.  Placing either of these on the right or
-# left really only works well for winder terminal windows.
-OPTIONS=align_message:bottom,align_status:right
-#
-# Use a small popup "window" for short prompts, e.g. "Really save?".
-# If this is not set, the message window will be used for these as is
-# done for the tty interface.
-OPTIONS=popup_dialog
-#
-# Specify the initial window size for NetHack in units of characters.
-# This is supported on PDCurses for SDL as well as PDCurses for
-# Windows.
-OPTIONS=term_cols:110,term_rows:32
-#
-# Controls the usage of window borders for the main NetHack windows
-# (message, map, and status windows).  A value of 1 forces the borders
-# to be drawn, a value of 2 forces them to be off, and a value of 3
-# allows the code to decide if they should be drawn based on the size
-# of the terminal window.
-OPTIONS=windowborders:3
-#
-# Whether or not to display a fancy ascii-graphics splash screen on
-# startup.
-OPTIONS=splash_screen
-#
-# This controls what text attributes are used to highlight any pets.
-# Any combination of single letters representing each text attribute
-# may be used.  Not all attributes work on all terminals.
-#
-# Attributes may be one or more of: Bold, Inverse, Underline, blinK,
-# iTalic, Rightline, or Leftline.  The default is underline.
-OPTIONS=petattr:u
-#
-# Controls whether color and attributes are used for menu headers,
-# window borders, message text, etc.  This is separate from the color
-# option, which only controls the color of the map itself.
-OPTIONS=guicolor
 
 # *** Personal Preferences ***
 # Some options to set personal preferences.  Uncomment and change these to
@@ -93,22 +33,59 @@ OPTIONS=guicolor
 #OPTIONS=nolegacy,noverbose
 #OPTIONS=menustyle:traditional
 
+# Here are some examples of reasonable defaults:
+
+# Automatically pick up things onto which you move
+OPTIONS=autopickup
+
+# Specify the object types to be picked up when autopickup is on.
+# For example "pickup_types:?!/" would pick up all scrolls, potions and wands.
+OPTIONS=pickup_types:$"?!=/
+
+# Prompt for confirmation before picking up items that will push the
+# character's encumbrance past a given level:
+# Valid values are: unencumbered, burdened, stressed, strained, or overtaxed
+OPTIONS=pickup_burden:unencumbered
+
+# German keyboard layout users can uncomment following option
+# to swap the 'y' and 'z' keys:
+#OPTIONS=!qwertz_layout
+
+# Show descriptive dungeon names on bottom status line
+OPTIONS=show_dgn_name
+
+# some decent defaults
+OPTIONS=disclose:yiyayvygyc
+
+# Use DEC line-drawing characters. Won't work for all terminals.
+#OPTIONS=DECgraphics
+# Use IBM extended characters. Won't work for all terminals
+# http://nethack.wikia.com/wiki/IBMgraphics
+OPTIONS=IBMgraphics
+
+# Set the symbol used to display boulders. Default value is `
+OPTIONS=boulder:0
+
+# Distinguish visually between lit and unlit corridors
+OPTIONS=lit_corridor
+
+# Visually distinguish pets from similar animals
+OPTIONS=hilite_pet
+
+# Always show the "uncursed" label on objects
+OPTIONS=showbuc
+
+# Prevent alert notification messages about feature changes in a
+# (Un)NetHack version and the previous versions
+OPTIONS=suppress_alert=3.5.0
+
 #
 # General options.  You might also set "silent" so as not to attract
 # the boss's attention.
 #
 # number_pad option can have an optional value of 0 (off), 1 (on), 
 # or 2(on,legacy-mode) which causes 5='g', alt-5='G', alt-0='I'
-OPTIONS=time,noshowexp,number_pad:2,lit_corridor
-#
-# If you want to get rid of "use #quit to quit..." use:
-OPTIONS=suppress_alert:3.4.3
-#
-# Note: the rest_on_space in the next line may not be
-#       appropriate for a beginning NetHack player, since
-#       it could result in use of a turn unintentionally.
-#       If you're new to NetHack, leave it commented it out.
-#OPTIONS=rest_on_space
+OPTIONS=notime,noshowexp,number_pad:2
 #
 # Set some options to control graphical window-port (these will
 # be safely and silently ignored by the tty port)
@@ -118,22 +95,19 @@ OPTIONS=suppress_alert:3.4.3
 #                                    ascii7x12|ascii8x12|ascii16x12|ascii12x16|
 #                                    ascii10x18|fit_to_screen
 # OPTIONS=map_mode:ascii10x18,scroll_margin:5
+OPTIONS=tile_file:unchozo32b.bmp,tile_width:32,tile_height:32
 
 # Message window settings
-# OPTIONS=font_message:Arial,font_size_message:11,align_message:top
+OPTIONS=font_message:DejaVu Condensed,font_size_message:12,align_message:top
 
 # Menu settings
-#OPTIONS=font_menu:Arial,font_size_menu:11
+OPTIONS=font_menu:DejaVu Condensed,font_size_menu:12
 
 # Text settings
-# OPTIONS=font_text:Courier New,font_size_text:11
+OPTIONS=font_text:DejaVu Mono,font_size_text:13
 
 # Status window settings
-# OPTIONS=font_status:Courier New,font_size_status:11
-
-# Other
-OPTIONS=hilite_pet
-#OPTIONS=!splash_screen,player_selection:prompts
+OPTIONS=font_status:DejaVu Mono,font_size_status:13
 
 # Status/message window colors
 # Possible color options include:
@@ -145,33 +119,7 @@ OPTIONS=hilite_pet
 # highlighttext, inactiveborder, inactivecaption, menu, menutext, scrollbar,
 # window, windowframe, windowtext.
 #OPTIONS=windowcolors:status windowtext/window message windowtext/window
-
-# *** LOCATIONS ***
-# IMPORTANT: If you change any of these locations, the directories they
-# point at must exist.  NetHack will not create them for you.
-#
-# HACKDIR is the default location for everything.
-# Note: On Windows HACKDIR defaults to the location 
-#       of the NetHack.exe or NetHackw.exe file so
-#       setting HACKDIR below to override that is 
-#       not usually necessary or recommended.
-#HACKDIR=c:\games\nethack
-#
-# The location that level files in progress are stored (default=HACKDIR, writeable)
-#LEVELDIR=c:\nethack\levels
-#
-# The location where saved games are kept (default=HACKDIR, writeable)
-#SAVEDIR=c:\nethack\save
-#
-# The location that bones files are kept (default=HACKDIR, writeable)
-#BONESDIR=c:\nethack\save
-#
-# The location that file synchronization locks are stored (default=HACKDIR, writeable)
-#LOCKDIR=c:\nethack\levels
-#
-# The location that a record of game aborts and self-diagnosed game problems
-# is kept (default=HACKDIR, writeable)
-#TROUBLEDIR=c:\nethack\trouble
+OPTIONS=windowcolors:menu white/black message trueblack/#EEEEEE status trueblack/#EEEEEE text white/black
 
 # Finnish keyboards might need these modifications uncommented. 
 # For  \, @, $, [, |
@@ -240,14 +188,15 @@ OPTIONS=hilite_pet
 #          047 045 092 058 058 092 045 047         \
 #          047 045 092 058 032 058 092 045 047
 
+OPTIONS=dumpfile:dump_%s.txt
+
 OPTIONS=menucolors
-MENUCOLOR="* blessed *"=green
-MENUCOLOR="* holy *"=green
+MENUCOLOR="* blessed *"=lightgreen
+MENUCOLOR="* holy *"=lightgreen
 MENUCOLOR="* cursed *"=red
 MENUCOLOR="* unholy *"=red
 MENUCOLOR="* cursed * (being worn)"=orange
 
-OPTIONS= showborn
 OPTIONS= !newcolors
 
 ## HP

@@ -9,6 +9,8 @@ WINDOW *base_term;    /* underlying terminal window */
 
 WINDOW *mapwin, *statuswin, *messagewin;    /* Main windows */
 
+int orig_cursor;	/* Preserve initial cursor state */
+
 boolean counting;   /* Count window is active */
 
 
@@ -84,11 +86,15 @@ extern void curses_curs(winid wid, int x, int y);
 
 extern void curses_putstr(winid wid, int attr, const char *text);
 
+#ifdef FILE_AREAS
+extern void curses_display_file(const char *filearea,const char *filename,BOOLEAN_P must_exist);
+#else
 extern void curses_display_file(const char *filename,BOOLEAN_P must_exist);
+#endif
 
 extern void curses_start_menu(winid wid);
 
-extern void curses_add_menu(winid wid, int glyph, const ANY_P * identifier,
+extern void curses_add_menu(winid wid, int glyph, int cnt, const ANY_P * identifier,
 		CHAR_P accelerator, CHAR_P group_accel, int attr, 
 		const char *str, BOOLEAN_P presel);
 
@@ -212,7 +218,11 @@ extern void curses_prehousekeeping(void);
 
 extern void curses_posthousekeeping(void);
 
+#ifdef FILE_AREAS
+extern void curses_view_file(const char *filearea, const char *filename, boolean must_exist);
+#else
 extern void curses_view_file(const char *filename, boolean must_exist);
+#endif
 
 extern void curses_rtrim(char *str);
 
@@ -269,6 +279,8 @@ extern int curses_character_dialog(const char** choices, const char *prompt);
 extern void curses_init_options(void);
 
 extern void curses_display_splash_window(void);
+
+extern void curses_cleanup(void);
 
 
 /* cursmesg.c */

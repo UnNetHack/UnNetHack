@@ -24,10 +24,12 @@ struct flag {
 #endif
 	boolean  autodig;       /* MRKR: Automatically dig */
 	boolean  autoquiver;	/* Automatically fill quiver */
+	boolean  autounlock;	/* Automatically apply unlocking tool */
 	boolean  beginner;
 #ifdef MAIL
 	boolean  biff;		/* enable checking for mail */
 #endif
+	boolean  hint;		/* enable Unclippy the helpful hint daemon */
 	boolean  botl;		/* partially redo status line */
 	boolean  botlx;		/* print an entirely new bottom line */
 	boolean  confirm;	/* confirm before hitting tame monsters */
@@ -117,6 +119,7 @@ struct flag {
 	unsigned short amii_dripens[ 20 ]; /* DrawInfo Pens currently there are 13 in v39 */
 	AMII_COLOR_TYPE amii_curmap[ AMII_MAXCOLORS ]; /* colormap */
 #endif
+	boolean	bones;		/* allow loading bones */
 
 	/* KMH, role patch -- Variables used during startup.
 	 *
@@ -190,6 +193,7 @@ struct instance_flags {
 	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
 	boolean  echo;		/* 1 to echo characters */
 	boolean  IBMgraphics;	/* use IBM extended character set */
+	boolean  UTF8graphics;	/* use UTF-8 characters */
 	unsigned msg_history;	/* hint: # of top lines to save */
 	boolean  num_pad;	/* use numbers for movement commands */
 	boolean  news;		/* print news */
@@ -204,6 +208,7 @@ struct instance_flags {
 	int *opt_booldup;	/* for duplication of boolean opts in config file */
 	int *opt_compdup;	/* for duplication of compound opts in config file */
 	uchar	bouldersym;	/* symbol for boulder display */
+	boolean	autoexplore;	/* in autoexplore */
 	boolean travel1;	/* first travel step */
 	coord	travelcc;	/* coordinates for travel_cache */
 #ifdef QWERTZ
@@ -264,6 +269,9 @@ struct instance_flags {
 	boolean lan_mail;	/* mail is initialized */
 	boolean lan_mail_fetched; /* mail is awaiting display */
 #endif
+#ifdef SORTLOOT
+	char sortloot;		/* sort items to loot alphabetically */
+#endif
 #ifdef SHOW_BORN
 	boolean show_born;	/* show numbers of created monsters */
 #endif
@@ -273,6 +281,9 @@ struct instance_flags {
 	boolean paranoid_quit;	/* Ask for 'yes' when quitting */
 	boolean paranoid_remove; /* Always show menu for 'T' and 'R' */
 	boolean paranoid_trap; /* Ask for 'yes' before walking into known traps */
+#ifdef QUIVER_FIRED
+	boolean quiver_fired;	/* quiver with f command */
+#endif
 /*
  * Window capability support.
  */
@@ -328,6 +339,8 @@ struct instance_flags {
 	boolean wc2_newcolors;		/* try to use slashem like colors including
 					 * dark-gray to represent black object */
 
+	boolean hp_notify;
+	char *hp_notify_fmt;
 	boolean  show_buc;	/* always show BUC status */
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
 	boolean	 obsolete;	/* obsolete options can point at this, it isn't used */
@@ -355,6 +368,8 @@ struct instance_flags {
 #endif
 	boolean  dark_room;	/* show shadows in lit rooms */
 	boolean  vanilla_ui_behavior;	/* fall back to vanilla behavior */
+	boolean  show_annotation;	/* level annotation when entering level */
+	int  statuslines;	/* number of status lines */
 };
 
 /*
