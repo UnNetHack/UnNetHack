@@ -19,7 +19,7 @@ Sheol - The icy cold netherworld.
                 Like fire traps but ice you instead.
 
         - New monsters:
-                crystal golem, ice golem, black angel, blinker, Punisher,
+                crystal ice golem, ice golem, black angel, chillbug, Punisher,
                 white naga and the Executioner. Many of these have abilities
                 not seen in vanilla.
 
