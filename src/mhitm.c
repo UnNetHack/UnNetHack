@@ -1708,7 +1708,7 @@ int* pdmg;
 	    !is_floater(mdef->data) &&
 	    !is_whirly(mdef->data) &&
 	    !amorphous(mdef->data)) {
-	    mdef->mfeetfrozen = rn1(16, 2);
+	    mdef->mfeetfrozen = max(rn1(16, 2), mdef->mfeetfrozen);
 	    if (vis)
 		pline("%s is held in place by ice!", Monnam(mdef));
 	} else { if (pdmg) (*pdmg) = 0;}

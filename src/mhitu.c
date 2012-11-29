@@ -2608,8 +2608,7 @@ int* pdmg;
 		else
 		    pline_The("ice holds your feet in place.");
 	    }
-
-	    u.ufeetfrozen = rn1(16, 2);
+	    u.ufeetfrozen = max(rn1(16, 2), u.ufeetfrozen);
 	}
 }
 
