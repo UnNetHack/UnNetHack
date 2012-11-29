@@ -30,7 +30,6 @@ STATIC_DCL int NDECL(throwspell);
 STATIC_DCL void NDECL(cast_protection);
 STATIC_DCL void FDECL(spell_backfire, (int));
 STATIC_DCL const char *FDECL(spelltypemnemonic, (int));
-STATIC_DCL int FDECL(isqrt, (int));
 
 /* The roles[] table lists the role-specific values for tuning
  * percent_success().
@@ -1184,23 +1183,6 @@ dump_spells()
 	dump("","");
 
 } /* dump_spells */
-
-/**
- * Integer square root function without using floating point.
- */
-STATIC_OVL int
-isqrt(val)
-int val;
-{
-    int rt = 0;
-    int odd = 1;
-    while(val >= odd) {
-	val = val-odd;
-	odd = odd+2;
-	rt = rt + 1;
-    }
-    return rt;
-}
 
 /**
  * Returns the success rate of the specified spell in percent.

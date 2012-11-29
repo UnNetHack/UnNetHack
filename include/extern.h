@@ -815,6 +815,7 @@ E char *FDECL(sitoa, (int));
 E int FDECL(sgn, (int));
 E int FDECL(rounddiv, (long,int));
 E int FDECL(dist2, (int,int,int,int));
+E int FDECL(isqrt, (int));
 E int FDECL(distmin, (int,int,int,int));
 E boolean FDECL(online2, (int,int,int,int));
 E boolean FDECL(pmatch, (const char *,const char *));
