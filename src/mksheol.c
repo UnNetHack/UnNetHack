@@ -49,6 +49,14 @@ static void fuzzy_circle(int x, int y,
 static void
 wallify_map();
 
+/* Return values from plug_unreachable_places */
+#define STAT_REJECT 0       /* "please reject the map, it's too bad" */
+#define STAT_SEMIPLUGGED  1 /* Some places are only reachable behind ice */
+#define STAT_ALLREACHABLE 2 /* Every place is reachable by walking or 
+			       levitating */
+
+static int plug_unreachable_places();
+
 void
 mksheol(init_lev)
 	lev_init *init_lev;
@@ -58,6 +66,8 @@ mksheol(init_lev)
 	floorprob* probs;
 
 	probs = (floorprob*) alloc(sizeof(floorprob) * COLNO * ROWNO);
+
+	again:
 	memset(probs, 0, sizeof(floorprob) * COLNO * ROWNO);
 
 	init_level_base_voronoi(typs, 10);
@@ -86,6 +96,9 @@ mksheol(init_lev)
 			else if (levl[i1][i2].typ == POOL)
 				levl[i1][i2].typ = ICEWALL;
 		}
+
+	if (plug_unreachable_places() == STAT_REJECT)
+		goto again;
 
 	/* Finalization */
 	for (i1 = 1; i1 < COLNO; ++i1)
@@ -242,13 +255,6 @@ carve_path(floorprobs)
 	}
 
 	num_points = i1;
-	/*num_points = 3;
-	points[0].x = 5;
-	points[0].y = ROWNO/2;
-	points[1].x = 40;
-	points[1].y = ROWNO-1;
-	points[2].x = COLNO-5;
-	points[2].y = ROWNO/2;*/
 
 	for (i1 = 0; i1 < num_points - 2; i1 += 2) {
 		sample_points = isqrt(dist2(points[i1].x, points[i1].y,
@@ -274,7 +280,7 @@ carve_path(floorprobs)
 
 			#undef BEZNUMERICAL
 
-			fuzzy_circle(x, y, 1, 0, floorprobs);
+			fuzzy_circle(x, y, 1, 2, floorprobs);
 		}
 	}
 }
@@ -338,5 +344,132 @@ wallify_map()
 			    else	levl[x][y].typ = VWALL;
 			}
 	    }
+}
+
+#define VALID_PASSABLE(x, y) (levl[x][y].typ == ICE || \
+			      levl[x][y].typ == POOL || \
+			      levl[x][y].typ == ROOM)
+#define VALID_PASSABLE2(x, y) (VALID_PASSABLE(x, y) || \
+			       IS_ANY_ICEWALL(levl[x][y].typ))
+
+static int 
+plug_unreachable_places()
+{
+	char fillmap[COLNO][ROWNO];
+	int not_passable;
+	int x, y;
+	int flood_x, flood_y;
+	int tries;
+	int done;
+
+	not_passable = 0;
+
+	memset(fillmap, 0, sizeof(fillmap));
+
+	tries = 100;
+	while(tries > 0) {
+		tries--;
+		x = rn1(COLNO-2, 1);
+		y = rn2(ROWNO);
+		if (levl[x][y].typ != ROOM &&
+		    levl[x][y].typ != ICE)
+			continue;
+		break;
+	}
+	if (tries <= 0)
+		return STAT_REJECT;
+	
+	/* flood fill */
+	done = 0;
+	flood_x = x;
+	flood_y = y;
+	fillmap[flood_x][flood_y] = 1;
+
+	while(!done) {
+		done = 1;
+		for (x = 2; x < COLNO-1; ++x)
+			for (y = 1; y < ROWNO-1; ++y)
+			{
+				if (fillmap[x+1][y] == 0 &&
+				    VALID_PASSABLE(x+1, y)) {
+				    fillmap[x+1][y] = 1;
+				    done = 0;
+				}
+				if (fillmap[x-1][y] == 0 &&
+				    VALID_PASSABLE(x-1, y)) {
+				    fillmap[x-1][y] = 1;
+				    done = 0;
+				}
+				if (fillmap[x][y-1] == 0 &&
+				    VALID_PASSABLE(x, y-1)) {
+				    fillmap[x][y-1] = 1;
+				    done = 0;
+				}
+				if (fillmap[x][y+1] == 0 &&
+				    VALID_PASSABLE(x, y+1)) {
+				    fillmap[x][y+1] = 1;
+				    done = 0;
+				}
+			}
+	}
+
+	for (x = 1; x < COLNO; ++x)
+		for (y = 0; y < ROWNO; ++y)
+			if (VALID_PASSABLE(x, y) &&
+			    fillmap[x][y] != 1)
+			{
+			    not_passable = 1;
+			    break;
+			}
+
+	if (!not_passable)
+		return STAT_ALLREACHABLE;
+
+	/* flood fill again, but go through ice this time */
+	done = 0;
+	not_passable = 0;
+	memset(fillmap, 0, sizeof(fillmap));
+	fillmap[flood_x][flood_y] = 1;
+
+	while(!done) {
+		done = 1;
+		for (x = 2; x < COLNO-1; ++x)
+			for (y = 1; y < ROWNO-1; ++y)
+			{
+				if (fillmap[x+1][y] == 0 &&
+				    VALID_PASSABLE2(x+1, y)) {
+				    fillmap[x+1][y] = 1;
+				    done = 0;
+				}
+				if (fillmap[x-1][y] == 0 &&
+				    VALID_PASSABLE2(x-1, y)) {
+				    fillmap[x-1][y] = 1;
+				    done = 0;
+				}
+				if (fillmap[x][y-1] == 0 &&
+				    VALID_PASSABLE2(x, y-1)) {
+				    fillmap[x][y-1] = 1;
+				    done = 0;
+				}
+				if (fillmap[x][y+1] == 0 &&
+				    VALID_PASSABLE2(x, y+1)) {
+				    fillmap[x][y+1] = 1;
+				    done = 0;
+				}
+			}
+	}
+
+	for (x = 1; x < COLNO; ++x)
+		for (y = 0; y < ROWNO; ++y)
+			if (VALID_PASSABLE(x, y) &&
+			    fillmap[x][y] != 1)
+			{
+			    not_passable = 1;
+			    break;
+			}
+	
+	if (not_passable)
+		return STAT_REJECT;
+	return STAT_SEMIPLUGGED;
 }
 
