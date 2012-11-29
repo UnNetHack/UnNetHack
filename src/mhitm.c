@@ -1707,7 +1707,17 @@ int* pdmg;
 	    !is_flyer(mdef->data) &&
 	    !is_floater(mdef->data) &&
 	    !is_whirly(mdef->data) &&
+	    !is_lava(mdef->mx, mdef->my) &&
 	    !amorphous(mdef->data)) {
+	    if (levl[mdef->mx][mdef->my].typ == POOL) {
+		pline_The("water freezes!");
+		levl[mdef->mx][mdef->my].typ = ICE;
+	    }
+	    else if (is_pool(mdef->mx, mdef->my))
+	    {
+		if (pdmg) (*pdmg) = 0;
+		return;
+	    }
 	    mdef->mfeetfrozen = max(rn1(16, 2), mdef->mfeetfrozen);
 	    if (vis)
 		pline("%s is held in place by ice!", Monnam(mdef));

@@ -2589,6 +2589,8 @@ int* pdmg;
 {
 	if (Levitation || Flying) {
 	    if (pdmg) (*pdmg) = 0;
+	} else if (is_lava(u.ux, u.uy)) {
+	    /* this block intentionally left blank */
 	} else if (flaming(youmonst.data) ||
 	    flaming(u.usteed)) {
 	    pline_The("ice melts away!");
@@ -2598,16 +2600,23 @@ int* pdmg;
 	    pline_The("ice doesn't restrain you.");
 	    if (pdmg) (*pdmg) = 0;
 	} else {
+	    if (levl[u.ux][u.uy].typ == POOL) {
+		levl[u.ux][u.uy].typ = ICE;
+		pline_The("water freezes!");
+	    }
+	    /* Other kinds of water let you escape from freezing. */
+	    else if (is_pool(u.ux, u.uy)) {
+		if (pdmg) (*pdmg) = 0;
+		return;
+	    }
 	    if (u.usteed) {
 		pline_The("ice holds you and your %s "
 			  "in place.", mon_nam(u.usteed));
 	    }
-	    else {
-		if (nolimbs(youmonst.data))
-		    pline_The("ice holds you in place.");
-		else
-		    pline_The("ice holds your feet in place.");
-	    }
+	    else if (nolimbs(youmonst.data))
+		pline_The("ice holds you in place.");
+	    else
+		pline_The("ice holds your feet in place.");
 	    u.ufeetfrozen = max(rn1(16, 2), u.ufeetfrozen);
 	}
 }
