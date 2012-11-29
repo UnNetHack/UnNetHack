@@ -681,8 +681,8 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
 	g_FILLER(S_hcdbridge),
 	g_FILLER(S_air),
 	g_FILLER(S_cloud),
-	g_FILLER(S_icewall),
-	g_FILLER(S_crystalicewall),
+	0x2588,	/* S_icewall:	FULL BLOCK */
+	0x2588,	/* S_crystalicewall:	FULL BLOCK */
 	0x2248,	/* S_water:	ALMOST EQUAL TO */
 	g_FILLER(S_arrow_trap),
 	g_FILLER(S_dart_trap),
