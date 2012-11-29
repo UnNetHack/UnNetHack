@@ -53,6 +53,11 @@ OBJECT:'(',random,random
 OBJECT:'(',random,random
 OBJECT:')',random,random
 
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+
 # Middle level, always 5th of Sheol
 MAZE: "sheolmid", ' '
 FLAGS: sheol,hardfloor,noteleport
@@ -132,6 +137,13 @@ OBJECT:'(',random,random
 OBJECT:')',random,random
 OBJECT:')',random,random
 OBJECT:')',random,random
+
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
 
 MONSTER: random, random, random
 MONSTER: random, random, random
@@ -263,6 +275,13 @@ DOOR:locked,(49,5)
 # Secret passageway door
 DOOR:locked,(71,13)
 
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+
 # The outsides are (somewhat) lit
 REGION:(28,9,46,18),lit,"ordinary"
 
@@ -350,6 +369,15 @@ STAIR: (4,9),up
 NON_DIGGABLE:(00,00,75,19)
 
 MONSTER: '@', "Executioner",(61,9)
+
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
 
 # Random chests
 OBJECT:'(',"chest",(62,8)

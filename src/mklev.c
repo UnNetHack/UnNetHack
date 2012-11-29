@@ -1470,6 +1470,9 @@ coord *tm;
 	} else if (Inhell && !rn2(5)) {
 	    /* bias the frequency of fire traps in Gehennom */
 	    kind = FIRE_TRAP;
+	} else if (Insheol && !rn2(3)) {
+	    /* similarly for ice traps */
+	    kind = ICE_TRAP;
 	} else {
 	    unsigned lvl = level_difficulty();
 
