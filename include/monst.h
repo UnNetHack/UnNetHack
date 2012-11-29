@@ -139,11 +139,6 @@ struct monst {
 	long misc_worn_check;
 	xchar weapon_check;
 
-	/* blinker AI */
-	Bitfield(mblattacking, 1);  /* when true, blinker has more AC
-				       and attacks the player. Otherwise,
-				       blinker avoids the player and has
-				       increased regeneration. */
 	long mgrlastattack;	    /* turn when a grouper last attacked.
 				       at certain points, the blinker decides
 				       to blink back to attacking. */

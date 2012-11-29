@@ -169,7 +169,7 @@ struct monst *mon;
 boolean digest_meal;
 {
 	int freq = 20;
-	if (is_blinker(mon->data) && mon->mblattacking == 0)
+	if (is_blinker(mon->data) && !mon->mflee)
 		freq = 1;
 
 	if (mon->mhp < mon->mhpmax &&
@@ -386,9 +386,6 @@ register struct monst *mtmp;
 				currmon->data == mdat) {
 				currmon->mflee = 0;
 				currmon->mgrlastattack = monstermoves;
-				/* blinkers go to attack mode */
-				if (is_blinker(currmon->data))
-					currmon->mblattacking = 1;
 			}
 		}
 		pline("%s suddenly charges at you!", Monnam(mtmp));
@@ -643,8 +640,6 @@ toofar:
 		/* group attacker AI */
 		if (is_groupattacker(mdat)) {
 			mtmp->mgrlastattack = monstermoves;
-			/* blinkers go to regen mode */
-			mtmp->mblattacking = 0;
 			mtmp->mflee = 1; /* avoid fleeing messages
 					    since the monster isn't
 					    really fleeing in thematic
