@@ -1379,6 +1379,7 @@ rndmonst()
 #ifdef BLACKMARKET	/* SWD: pets are not allowed in the black market */
 		if (is_domestic(ptr) && Is_blackmarket(&u.uz)) continue;
 #endif
+		if (Insheol && !(ptr->geno & G_SHEOL)) continue;
 		if ( (Inhell && (ptr->geno & G_NOHELL)) &&
 		     (!Insheol || !(ptr->geno & G_SHEOL) )) continue;
 		ct = (int)(ptr->geno & G_FREQ) + align_shift(ptr);
