@@ -30,7 +30,7 @@
 #define CLC_FIRE_PILLAR	 8
 #define CLC_GEYSER	 9
 
-/* punisher spells, some are copies of above spells */
+/* punisher spells, some call back to magical or clerical spells */
 #define PUN_OPEN_WOUNDS 0
 #define PUN_PSI_BOLT    1
 #define PUN_HASTE_SELF  2
@@ -40,8 +40,9 @@
 #define PUN_SUMMON_MONS 6
 #define PUN_AGGRAVATION 7
 #define PUN_DEATH_TOUCH 8
+#define PUN_PUNISHMENT  9  /* gives punishment */
 
-#define NUM_PUN_SPELLS  9
+#define NUM_PUN_SPELLS  10
 
 STATIC_DCL void FDECL(cursetxt,(struct monst *,BOOLEAN_P));
 STATIC_DCL int FDECL(choose_magic_spell, (int));
@@ -342,8 +343,11 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
 
 		if (effective_adtyp == AD_SPEL)
 		    cast_wizard_spell(mtmp, dmg, snum);
-		else
+		else if (effective_adtyp == AD_PUNI)
 		    cast_cleric_spell(mtmp, dmg, snum);
+		else
+		    cast_punisher_spell(mtmp, dmg, snum);
+
 		dmg = 0; /* done by the spell casting functions */
 		break;
 	    }
@@ -523,6 +527,20 @@ int spellnum;
     }
 
     if (dmg) mdamageu(mtmp, dmg);
+}
+
+STATIC_OVL
+void
+cast_punisher_spell(mtmp, dmg, spellnum)
+struct monst* mtmp;
+int dmg;
+int spellnum;
+{
+    switch(spellnum) {
+    case PUN_PUNISHMENT:
+    punish((struct obj *) 0);
+    break;
+    }
 }
 
 STATIC_OVL
@@ -755,10 +773,8 @@ int* pspellnum;
 	    (*pspellnum) = MGC_DEATH_TOUCH;
 	break;
 	default:
-	    impossible("no mapping for punisher spell %d", spellnum);
-	    (*padtyp) = AD_CLRC;
-	    (*pspellnum) = CLC_OPEN_WOUNDS;
-	break;
+	    (*padtyp) = AD_PUNI;
+	    (*pspellnum) = spellnum;
     }
 }
 
@@ -792,6 +808,12 @@ int spellnum;
 	unsigned int typl;
 	int snum;
 	map_punisher_spell(spellnum, &typl, &snum);
+	if (typl == AD_PUNI)
+	    switch(snum) {
+	        case PUN_PUNISHMENT:
+		return FALSE;
+		break;
+	    }
 	return is_undirected_spell(typl, snum);
     }
     return FALSE;
@@ -857,6 +879,8 @@ int spellnum;
 	unsigned int typ;
 	int snum;
 	map_punisher_spell(spellnum, &typ, &snum);
+	if (typ == AD_PUNI)
+	    return FALSE;
 	return spell_would_be_useless(mtmp, typ, snum);
     }
     return FALSE;
