@@ -666,6 +666,9 @@ xchar x, y;
 	    case TT_LAVA:
 		pline(pullmsg, "lava");
 		break;
+	    case TT_ICE:
+		pline(pullmsg, "ice");
+		break;
 	    case TT_BEARTRAP: {
 		register long side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
 		pline(pullmsg, "bear trap");

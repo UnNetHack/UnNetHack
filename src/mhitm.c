@@ -1299,6 +1299,16 @@ mdamagem(magr, mdef, mattk)
 		    tmp = 0;
 		}
 		break;
+	    case AD_FREZ:
+		if (cancelled) break;
+		if (!flaming(mdef->data &&
+		    !is_whirly(mdef->data) &&
+		    !amorphous(mdef->data))) {
+		    mdef->mtrapped = 1;
+		    if (vis) 
+			pline("%s is held in place by ice!", Monnam(mdef));
+		} else tmp = 0;
+		break;
 	    case AD_STCK:
 		if (cancelled) tmp = 0;
 		break;

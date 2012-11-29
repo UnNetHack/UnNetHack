@@ -623,6 +623,7 @@ hurtle(dx, dy, range, verbose)
 	return;
     } else if (u.utrap) {
 	You("are anchored by the %s.",
+	    u.utraptype == TT_ICE ? "ice" :
 	    u.utraptype == TT_WEB ? "web" : u.utraptype == TT_LAVA ? "lava" :
 		u.utraptype == TT_INFLOOR ? surface(u.ux,u.uy) : "trap");
 	nomul(0, 0);

@@ -325,6 +325,7 @@ struct you {
 #define TT_LAVA		3
 #define TT_INFLOOR	4
 #define TT_SWAMP	5
+#define TT_ICE		6
 	char	urooms[5];	/* rooms (roomno + 3) occupied now */
 	char	urooms0[5];	/* ditto, for previous position */
 	char	uentered[5];	/* rooms (roomno + 3) entered this turn */

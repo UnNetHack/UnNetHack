@@ -1812,6 +1812,17 @@ domove()
 #endif
 			You("finally wiggle free.");
 		    }
+		} else if (u.utraptype == TT_ICE) {
+		    if (--u.utrap) {
+			if (flags.verbose)
+			    Norep("You are hindered by the ice.");
+		    } else {
+			if (u.usteed)
+			    pline("You and %s break out of the ice!",
+				  y_monnam(u.usteed));
+			else
+			    pline("You break out of the ice!");
+		    }
 		} else {
 		    if(flags.verbose) {
 			predicament = "caught in a bear trap";
