@@ -332,6 +332,8 @@ do_pit:		    chasm = maketrap(x,y,PIT);
 		    } else newsym(x,y);
 		    break;
 		  case DOOR : /* Make the door collapse */
+		    /* ALI - artifact doors */
+		    if (artifact_door(x, y))  break;
 		    if (levl[x][y].doormask == D_NODOOR) goto do_pit;
 		    if (cansee(x,y))
 			pline_The("door collapses.");

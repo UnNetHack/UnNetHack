@@ -970,6 +970,7 @@ E boolean FDECL(boxlock, (struct obj *,struct obj *));
 E boolean FDECL(doorlock, (struct obj *,int,int));
 E int NDECL(doopen);
 E int NDECL(doclose);
+E int FDECL(artifact_door, (int,int));
 #ifdef AUTO_OPEN
 E  int FDECL(doopen_indir,(int,int));
 #endif
@@ -1125,6 +1126,9 @@ E void FDECL(mktrap, (int,int,struct mkroom *,coord*));
 E void FDECL(mkstairs, (XCHAR_P,XCHAR_P,CHAR_P,struct mkroom *));
 E void NDECL(mkinvokearea);
 E void FDECL(wallwalk_right, (XCHAR_P,XCHAR_P,SCHAR_P,SCHAR_P,SCHAR_P,int));
+#ifdef ADVENT_CALENDAR
+E boolean NDECL(mk_advcal_portal);
+#endif
 
 /* ### mkmap.c ### */
 
@@ -1149,6 +1153,10 @@ E void NDECL(water_friction);
 E void FDECL(save_waterlevel, (int,int));
 E void FDECL(restore_waterlevel, (int));
 E const char *FDECL(waterbody_name, (XCHAR_P,XCHAR_P));
+
+#ifdef ADVENT_CALENDAR
+E void FDECL(fill_advent_calendar, (boolean));
+#endif
 
 /* ### mkobj.c ### */
 

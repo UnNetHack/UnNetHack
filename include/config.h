@@ -452,6 +452,8 @@ typedef long glyph_t;
 # define VIDEOSHADES    /* Slash'Em like colors */
 #endif
 
+#define ADVENT_CALENDAR
+
 /* End of Section 5 */
 
 /*
