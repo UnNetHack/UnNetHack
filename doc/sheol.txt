@@ -12,6 +12,9 @@ Sheol - The icy cold netherworld.
                 They act like normal walls but can be melted with a wand
                 of fire. Crystal ice walls can't be dug.
 
+        - Ice traps
+                Like fire traps but ice you instead.
+
         - New monsters:
                 crystal golem, ice golem, black angel, blinker, punisher,
                 white naga and the Executioner. Each of these have abilities
