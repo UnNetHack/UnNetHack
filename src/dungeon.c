@@ -1738,6 +1738,7 @@ print_branch(win, dnum, lower_bound, upper_bound, bymenu, lchoices)
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, lchoices->menuletter,
 				0, ATR_NONE, buf, MENU_UNSELECTED);
 		if (lchoices->menuletter == 'z') lchoices->menuletter = 'A';
+		else if (lchoices->menuletter == 'Z') lchoices->menuletter = 'a';
 		else lchoices->menuletter++;
 		lchoices->idx++;
 	    } else
@@ -1823,6 +1824,7 @@ xchar *rdgn;
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, lchoices.menuletter,
 				0, ATR_NONE, buf, MENU_UNSELECTED);
 		if (lchoices.menuletter == 'z') lchoices.menuletter = 'A';
+		else if (lchoices.menuletter == 'Z') lchoices.menuletter = 'a';
 		else lchoices.menuletter++;
 		lchoices.idx++;
 	    } else
