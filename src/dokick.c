@@ -91,7 +91,7 @@ register boolean clumsy;
 		showdmg(dmg, FALSE);
 	}
 	if (mon->mhp > 0 && martial() && !bigmonst(mon->data) && !rn2(3) &&
-	    mon->mcanmove && mon != u.ustuck && !mon->mtrapped) {
+	    mon->mcanmove && mon != u.ustuck && !IS_TRAPPED(mon)) {
 		/* see if the monster has a place to move into */
 		mdx = mon->mx + u.dx;
 		mdy = mon->my + u.dy;

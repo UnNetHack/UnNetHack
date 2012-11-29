@@ -319,6 +319,7 @@ struct you {
 	int ulevelmax;
 	unsigned utrap;		/* trap timeout */
 	unsigned utraptype;	/* defined if utrap nonzero */
+	unsigned ufeetfrozen;   /* feet frozen, works similarly to utrap */
 #define TT_BEARTRAP	0
 #define TT_PIT		1
 #define TT_WEB		2

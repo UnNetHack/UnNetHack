@@ -576,7 +576,7 @@ toofar:
 	    mw_tmp = MON_WEP(mtmp);
 	    if (!(scared && mw_tmp && is_pick(mw_tmp)) &&
 		mtmp->weapon_check == NEED_WEAPON &&
-		!(mtmp->mtrapped && !nearby && select_rwep(mtmp))) {
+		!(IS_TRAPPED(mtmp) && !nearby && select_rwep(mtmp))) {
 		mtmp->weapon_check = NEED_HTH_WEAPON;
 		if (mon_wield_item(mtmp) != 0) return(0);
 	    }
@@ -748,6 +748,10 @@ register int after;
 	    int i = mintrap(mtmp);
 	    if(i >= 2) { newsym(mtmp->mx,mtmp->my); return(2); }/* it died */
 	    if(i == 1) return(0);	/* still in trap, so didn't move */
+	}
+	if (mtmp->mfeetfrozen) {
+	    --mtmp->mfeetfrozen;
+	    if (mtmp->mfeetfrozen) return(0);
 	}
 	ptr = mtmp->data; /* mintrap() can change mtmp->data -dlc */
 

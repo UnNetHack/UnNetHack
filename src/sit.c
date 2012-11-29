@@ -95,9 +95,6 @@ dosit()
 		} else if(u.utraptype == TT_INFLOOR) {
 		    You_cant("maneuver to sit!");
 		    u.utrap++;
-		} else if(u.utraptype == TT_ICE) {
-		    You_cant("sit down while hindered by ice.");
-		    u.utrap++;
 		}
 	    } else {
 	        You("sit down.");

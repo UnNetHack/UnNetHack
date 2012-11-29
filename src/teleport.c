@@ -488,6 +488,7 @@ boolean allow_drag;
 		}
 	    }
 	}
+	u.ufeetfrozen = 0;   /* ice doesn't teleport with the player */
 	u.utrap = 0;
 	u.ustuck = 0;
 	u.ux0 = u.ux;

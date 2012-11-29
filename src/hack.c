@@ -1724,6 +1724,12 @@ domove()
 			return;
 		}
 	}
+	if(u.ufeetfrozen) {
+		--u.ufeetfrozen;
+		You("are stuck in ice.");
+		nomul(0);
+		return;
+	}
 	if(u.utrap) {
 		if(u.utraptype == TT_PIT) {
 		    if (!rn2(2) && sobj_at(BOULDER, u.ux, u.uy)) {

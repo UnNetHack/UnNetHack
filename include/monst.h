@@ -64,9 +64,8 @@ struct monst {
 	int mspec_used;		/* monster's special ability attack timeout */
 
 	int mtrapped;		/* trapped in a pit, web or bear trap */
-
-	Bitfield(frozen,1);	/* 1 if monster is frozen as opposed to
-				   being trapped. used with mtrapped. */
+	int mfeetfrozen;        /* monster's feet are frozen so it can't
+				   move (0 = not frozen) */
 
 	Bitfield(female,1);	/* is female */
 	Bitfield(minvis,1);	/* currently invisible */
@@ -190,5 +189,9 @@ struct monst {
 #define MON_NOWEP(mon)	((mon)->mw = (struct obj *)0)
 
 #define DEADMONSTER(mon)	((mon)->mhp < 1)
+
+/* Returns true if monster is trapped in place but can still attack.
+ * (mon evaluated twice) */
+#define IS_TRAPPED(mon) ((mon)->mtrapped || (mon)->mfeetfrozen)
 
 #endif /* MONST_H */

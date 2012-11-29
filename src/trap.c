@@ -4329,10 +4329,10 @@ void
 decrease_mon_trapcounter(mon)
 struct monst* mon;
 {
-	if (mon->mtrapped)
+	if (mon->mfeetfrozen)
+		--mon->mfeetfrozen; /* only decrease the other */
+	else if (mon->mtrapped)
 		--mon->mtrapped;
-	if (!mon->mtrapped)
-		mon->frozen = 0;
 }
 
 #endif /* OVLB */

@@ -1804,6 +1804,10 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 				u.utraptype==TT_WEB ? "web" : "trap");
 			u.utrap = 0;
 		}
+		if (u.ufeetfrozen) {
+			You("break free from the ice!");
+			u.ufeetfrozen = 0;
+		}
 
 		i = number_leashed();
 		if (i > 0) {
@@ -2600,16 +2604,10 @@ int* pdmg;
 		if (nolimbs(youmonst.data))
 		    pline_The("ice holds you in place.");
 		else
-		    pline_The("ice holds your legs in place.");
+		    pline_The("ice holds your feet in place.");
 	    }
 
-	    /* It's possible that you are already trapped
-	     * when encased in ice. I have no good ideas how
-	     * to handle this. Can be a little silly to be
-	     * floated up from a pit because you were freezed. */
-
-	    u.utrap = rn1(16, 2);
-	    u.utraptype = TT_ICE;
+	    u.ufeetfrozen = rn1(16, 2);
 	}
 }
 

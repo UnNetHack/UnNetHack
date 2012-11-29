@@ -286,7 +286,7 @@ register struct monst *mtmp;
 
 /*	with a lot of luggage, your agility diminishes */
 	if ((tmp2 = near_capacity()) != 0) tmp -= (tmp2*2) - 1;
-	if (u.utrap) tmp -= 3;
+	if (u.utrap || u.ufeetfrozen) tmp -= 3;
 /*	Some monsters have a combination of weapon attacks and non-weapon
  *	attacks.  It is therefore wrong to add hitval to tmp; we must add
  *	it only for the specific attack (in hmonas()).

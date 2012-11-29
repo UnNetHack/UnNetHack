@@ -628,6 +628,10 @@ hurtle(dx, dy, range, verbose)
 		u.utraptype == TT_INFLOOR ? surface(u.ux,u.uy) : "trap");
 	nomul(0, 0);
 	return;
+    } else if (u.ufeetfrozen) {
+	You("are anchored by the ice.");
+	nomul(0);
+	return;
     }
 
     /* make sure dx and dy are [-1,0,1] */

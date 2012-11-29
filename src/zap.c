@@ -3728,6 +3728,11 @@ boolean *shopdamage;
 	if(abstype == ZT_FIRE) {
 	    struct trap *t = t_at(x, y);
 
+	    if (x == u.ux && y == u.uy && u.ufeetfrozen) {
+		    u.ufeetfrozen = 0;
+		    The("fire melts the ice holding you in place.");
+	    }
+
 	    if (t && t->ttyp == WEB) {
 		/* a burning web is too flimsy to notice if you can't see it */
 		if (cansee(x,y)) Norep("A web bursts into flames!");

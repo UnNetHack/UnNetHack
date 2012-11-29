@@ -403,8 +403,8 @@ register struct monst *mtmp;
 	else if (mtmp->mstrategy & STRAT_WAITMASK)
 				  Strcat(info, ", meditating");
 	else if (mtmp->mflee)	  Strcat(info, ", scared");
-	if (mtmp->mtrapped)	  Strcat(info, mtmp->frozen ? ", frozen" :
-							      ", trapped");
+	if (mtmp->mtrapped)	  Strcat(info, ", trapped");
+	if (mtmp->mfeetfrozen)	  Strcat(info, ", stuck in ice");
 	if (mtmp->mspeed)	  Strcat(info,
 					mtmp->mspeed == MFAST ? ", fast" :
 					mtmp->mspeed == MSLOW ? ", slow" :
@@ -485,6 +485,7 @@ ustatusline()
 	if (Glib)		Sprintf(eos(info), ", slippery %s",
 					makeplural(body_part(HAND)));
 	if (u.utrap)		Strcat(info, ", trapped");
+	if (u.ufeetfrozen)	Strcat(info, ", stuck in ice");
 	if (Fast)		Strcat(info, Very_fast ?
 						", very fast" : ", fast");
 	if (u.uundetected)	Strcat(info, ", concealed");
