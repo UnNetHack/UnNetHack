@@ -154,6 +154,7 @@ const char def_monsyms[MAXMCLASSES] = {
 	DEF_LIZARD,
 	DEF_WORM_TAIL,
 	DEF_MIMIC_DEF,		/* 60 */
+	DEF_STATUE,
 };
 
 /* The explanations below are also used when the user gives a string
@@ -184,7 +185,7 @@ const char * const monexplain[MAXMCLASSES] = {
 
     "human or elf",		"ghost",		"golem",
     "major demon",		"sea monster",		"lizard",
-    "long worm tail",		"mimic"
+    "long worm tail",		"mimic",		"statue",
 };
 
 const struct symdef def_warnsyms[WARNCOUNT] = {

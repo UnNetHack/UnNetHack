@@ -30,11 +30,27 @@
 #define CLC_FIRE_PILLAR	 8
 #define CLC_GEYSER	 9
 
+/* punisher spells, some are copies of above spells */
+#define PUN_OPEN_WOUNDS 0
+#define PUN_PSI_BOLT    1
+#define PUN_HASTE_SELF  2
+#define PUN_PARALYZE    3
+#define PUN_GEYSER      4
+#define PUN_FIRE_PILLAR 5
+#define PUN_SUMMON_MONS 6
+#define PUN_AGGRAVATION 7
+#define PUN_DEATH_TOUCH 8
+
+#define NUM_PUN_SPELLS  9
+
 STATIC_DCL void FDECL(cursetxt,(struct monst *,BOOLEAN_P));
 STATIC_DCL int FDECL(choose_magic_spell, (int));
 STATIC_DCL int FDECL(choose_clerical_spell, (int));
+STATIC_DCL int FDECL(choose_punisher_spell, (void));
 STATIC_DCL void FDECL(cast_wizard_spell,(struct monst *, int,int));
 STATIC_DCL void FDECL(cast_cleric_spell,(struct monst *, int,int));
+STATIC_DCL void FDECL(cast_punisher_spell,(struct monst *, int,int));
+STATIC_DCL void FDECL(map_punisher_spell,(int,unsigned int*,int*));
 STATIC_DCL boolean FDECL(is_undirected_spell,(unsigned int,int));
 STATIC_DCL boolean FDECL(spell_would_be_useless,(struct monst *,unsigned int,int));
 
@@ -49,6 +65,9 @@ cursetxt(mtmp, undirected)
 struct monst *mtmp;
 boolean undirected;
 {
+	/* silent monsters don't curse. */
+	if (is_silent(mtmp->data)) return;
+
 	if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my)) {
 	    const char *point_msg;  /* spellcasting monsters are impolite */
 
@@ -154,6 +173,14 @@ int spellnum;
     }
 }
 
+/* choose a Punisher statue spell. These statues are powerful enough
+ * that I think adjusting based on level is not useful. */
+STATIC_OVL int
+choose_punisher_spell(void)
+{
+    return rn2(NUM_PUN_SPELLS);
+}
+
 /* return values:
  * 1: successful spell
  * 0: unsuccessful spell
@@ -181,15 +208,20 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
 	 * attacking casts spells only a small portion of the time that an
 	 * attacking monster does.
 	 */
-	if ((mattk->adtyp == AD_SPEL || mattk->adtyp == AD_CLRC) && ml) {
+	if ((mattk->adtyp == AD_SPEL || 
+	     mattk->adtyp == AD_CLRC ||
+	     mattk->adtyp == AD_PUNI) && ml) {
 	    int cnt = 40;
 
 	    do {
 		spellnum = rn2(ml);
 		if (mattk->adtyp == AD_SPEL)
 		    spellnum = choose_magic_spell(spellnum);
-		else
+		else if (mattk->adtyp == AD_CLRC)
 		    spellnum = choose_clerical_spell(spellnum);
+		else
+		    spellnum = choose_punisher_spell();
+
 		/* not trying to attack?  don't allow directed spells */
 		if (!thinks_it_foundyou) {
 		    if (!is_undirected_spell(mattk->adtyp, spellnum) ||
@@ -254,7 +286,8 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
  */
 	if (!foundyou) {
 	    dmg = 0;
-	    if (mattk->adtyp != AD_SPEL && mattk->adtyp != AD_CLRC) {
+	    if (mattk->adtyp != AD_SPEL && mattk->adtyp != AD_CLRC &&
+		mattk->adtyp != AD_PUNI) {
 		warning(
 	      "%s casting non-hand-to-hand version of hand-to-hand spell %d?",
 			   Monnam(mtmp), mattk->adtyp);
@@ -296,11 +329,21 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
 		break;
 	    case AD_SPEL:	/* wizard spell */
 	    case AD_CLRC:       /* clerical spell */
+	    case AD_PUNI:
 	    {
-		if (mattk->adtyp == AD_SPEL)
-		    cast_wizard_spell(mtmp, dmg, spellnum);
+		unsigned int effective_adtyp;
+		int snum;
+
+		effective_adtyp = mattk->adtyp;
+		snum = spellnum;
+
+		if (effective_adtyp == AD_PUNI)
+		    map_punisher_spell(spellnum, &effective_adtyp, &snum);
+
+		if (effective_adtyp == AD_SPEL)
+		    cast_wizard_spell(mtmp, dmg, snum);
 		else
-		    cast_cleric_spell(mtmp, dmg, spellnum);
+		    cast_cleric_spell(mtmp, dmg, snum);
 		dmg = 0; /* done by the spell casting functions */
 		break;
 	    }
@@ -668,6 +711,58 @@ int spellnum;
 }
 
 STATIC_DCL
+void
+map_punisher_spell(spellnum, padtyp, pspellnum)
+int spellnum;
+unsigned int* padtyp;
+int* pspellnum;
+{
+    switch(spellnum) {
+	case PUN_OPEN_WOUNDS: 
+	    (*padtyp) = AD_CLRC; 
+	    (*pspellnum) = CLC_OPEN_WOUNDS; 
+	break;
+	case PUN_PSI_BOLT:
+	    (*padtyp) = AD_SPEL;
+	    (*pspellnum) = MGC_PSI_BOLT;
+	break;
+	case PUN_HASTE_SELF:
+	    (*padtyp) = AD_SPEL;
+	    (*pspellnum) = MGC_HASTE_SELF;
+	break;
+	case PUN_GEYSER:
+	    (*padtyp) = AD_CLRC; 
+	    (*pspellnum) = CLC_GEYSER;
+	break;
+	case PUN_PARALYZE:
+	    (*padtyp) = AD_CLRC; 
+	    (*pspellnum) = CLC_PARALYZE;
+	break;
+	case PUN_FIRE_PILLAR:
+	    (*padtyp) = AD_CLRC; 
+	    (*pspellnum) = CLC_FIRE_PILLAR;
+	break;
+	case PUN_SUMMON_MONS:
+	    (*padtyp) = AD_SPEL;
+	    (*pspellnum) = MGC_SUMMON_MONS;
+	break;
+	case PUN_AGGRAVATION:
+	    (*padtyp) = AD_SPEL;
+	    (*pspellnum) = MGC_AGGRAVATION;
+	break;
+	case PUN_DEATH_TOUCH:
+	    (*padtyp) = AD_SPEL;
+	    (*pspellnum) = MGC_DEATH_TOUCH;
+	break;
+	default:
+	    impossible("no mapping for punisher spell %d", spellnum);
+	    (*padtyp) = AD_CLRC;
+	    (*pspellnum) = CLC_OPEN_WOUNDS;
+	break;
+    }
+}
+
+STATIC_DCL
 boolean
 is_undirected_spell(adtyp, spellnum)
 unsigned int adtyp;
@@ -693,6 +788,11 @@ int spellnum;
 	default:
 	    break;
 	}
+    } else if (adtyp == AD_PUNI) {
+	unsigned int typl;
+	int snum;
+	map_punisher_spell(spellnum, &typl, &snum);
+	return is_undirected_spell(typl, snum);
     }
     return FALSE;
 }
@@ -753,6 +853,11 @@ int spellnum;
 	/* blindness spell on blinded player */
 	if (Blinded && spellnum == CLC_BLIND_YOU)
 	    return TRUE;
+    } else if (adtyp == AD_PUNI) {
+	unsigned int typ;
+	int snum;
+	map_punisher_spell(spellnum, &typ, &snum);
+	return spell_would_be_useless(mtmp, typ, snum);
     }
     return FALSE;
 }

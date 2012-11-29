@@ -63,6 +63,7 @@
 #define thick_skinned(ptr)	(((ptr)->mflags1 & M1_THICK_HIDE) != 0L)
 #define lays_eggs(ptr)		(((ptr)->mflags1 & M1_OVIPAROUS) != 0L)
 #define regenerates(ptr)	(((ptr)->mflags1 & M1_REGEN) != 0L)
+#define noregen(ptr)		(((ptr)->mflags3 & M3_NOREGEN) != 0L)
 #define perceives(ptr)		(((ptr)->mflags1 & M1_SEE_INVIS) != 0L)
 #define can_teleport(ptr)	(((ptr)->mflags1 & M1_TPORT) != 0L)
 #define control_teleport(ptr)	(((ptr)->mflags1 & M1_TPORT_CNTRL) != 0L)
@@ -199,6 +200,7 @@
 #define likes_swamp(ptr)	((ptr)->mlet == S_PUDDING || \
 				 (ptr)->mlet == S_FUNGUS || \
 				 (ptr) == &mons[PM_OCHRE_JELLY])
+#define stationary(ptr)		((ptr)->mflags3 & M3_STATIONARY)
 
 /* Used for conduct with corpses, tins, and digestion attacks */
 /* G_NOCORPSE monsters might still be swallowed as a purple worm */

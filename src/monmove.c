@@ -175,8 +175,8 @@ boolean digest_meal;
 	if (is_blinker(mon->data) && !mon->mflee)
 		freq = 1;
 
-	if (mon->mhp < mon->mhpmax &&
-+	    (moves % freq == 0 || regenerates(mon->data))) mon->mhp++;
+	if (mon->mhp < mon->mhpmax && !noregen(mon->data) &&
+	    (moves % freq == 0 || regenerates(mon->data))) mon->mhp++;
 	if (mon->mspec_used) mon->mspec_used--;
 	if (digest_meal) {
 	    if (mon->meating) mon->meating--;
@@ -614,7 +614,7 @@ toofar:
 		    struct attack *a;
 
 		    for (a = &mdat->mattk[0]; a < &mdat->mattk[NATTK]; a++) {
-			if (a->aatyp == AT_MAGC && (a->adtyp == AD_SPEL || a->adtyp == AD_CLRC)) {
+			if (a->aatyp == AT_MAGC && (a->adtyp == AD_SPEL || a->adtyp == AD_CLRC || a->adtyp == AD_PUNI)) {
 			    if (castmu(mtmp, a, FALSE, FALSE)) {
 				tmp = 3;
 				break;
@@ -741,6 +741,8 @@ register int after;
 	    !is_clinger(mtmp->data) && !is_swimmer(mtmp->data) &&
 	    !amphibious(mtmp->data) && !likes_swamp(mtmp->data))
 		return(0);
+
+	if (stationary(mtmp->data)) return(0);
 
 	if(mtmp->mtrapped) {
 	    int i = mintrap(mtmp);

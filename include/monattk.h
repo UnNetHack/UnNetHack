@@ -81,6 +81,8 @@
 #define AD_FREZ		43	/* freezing attack (blue slime) */
 #define AD_HEAD		50	/* decapitate (vorpal jabberwock) */
 
+#define AD_PUNI		44	/* punisher spells */
+
 #define AD_CLRC		240	/* random clerical spell */
 #define AD_SPEL		241	/* random magic spell */
 #define AD_RBRE		242	/* random breath weapon */

@@ -165,6 +165,9 @@
 #define M3_GROUPATTACK  0x0400		/* hits and runs in groups */
 #define M3_BLINKER	0x0800		/* alternates between regenerating
 					   and attacking. */
+#define M3_NOREGEN	0x1000		/* does not naturally regenerate
+					   hp. */
+#define M3_STATIONARY	0x2000		/* does not move. */
 
 #define MZ_TINY		0		/* < 2' */
 #define MZ_SMALL	1		/* 2-4' */
