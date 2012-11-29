@@ -82,11 +82,11 @@ RNDLEVEL:	"heck-e" "Q" @ (-19,17) 50 9
 #	Sheol
 #	Ice-themed branch in Gehennom.
 #
-DUNGEON:	"Sheol" "S" (10, 5)
+DUNGEON:	"Sheol" "S" (6, 2)
 DESCRIPTION:	hellish
 ALIGNMENT:	noalign
-BRANCH:		"Vlad's Tower" @ (6, 4) up
-LEVEL:		"sheolmid" "H" @ (5, 0)
+BRANCH:		"Vlad's Tower" @ (2, 2) up
+LEVEL:		"sheolmid" "H" @ (2, 0)
 LEVEL:		"palace_f" "P" @ (-2, 0)
 LEVEL:		"palace_e" "U" @ (-1, 0)
 
