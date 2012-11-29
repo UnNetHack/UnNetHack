@@ -1431,6 +1431,16 @@ boolean at_stairs, falling, portal;
 #endif
 #endif
 	}
+	else if (In_hell(&u.uz0) &&
+		 !In_sheol(&u.uz0) &&
+		 In_sheol(&u.uz)) {
+	    pline("It is freezing here.  You feel cold wind...");
+	}
+	else if (In_sheol(&u.uz0) &&
+		 In_hell(&u.uz) &&
+		 !In_sheol(&u.uz)) {
+	    pline("It is hot here.  You smell smoke...");
+	}
 
 	if (familiar) {
 	    static const char * const fam_msgs[4] = {
@@ -1473,7 +1483,7 @@ boolean at_stairs, falling, portal;
 	if (In_endgame(&u.uz) && newdungeon && u.uhave.amulet)
 		resurrect();
 	if (newdungeon && In_V_tower(&u.uz) && In_hell(&u.uz0))
-		pline_The("icy wind is gone.");
+		pline_The("cold wind is gone.");
 
 	/* the message from your quest leader */
 	if (!In_quest(&u.uz0) && at_dgn_entrance("The Quest") &&
