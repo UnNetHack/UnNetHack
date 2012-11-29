@@ -358,6 +358,10 @@ OBJECT:'(',"chest",(66,10)
 
 # Some serious slimy fun, these should freeze the player in place
 # while the Executioner slices them into little pieces.
+MONSTER: ''', "crystal golem", random
+MONSTER: ''', "crystal golem", random
+MONSTER: ''', "ice golem", random
+MONSTER: ''', "ice golem", random
 MONSTER: 'P', "blue slime", random
 MONSTER: 'P', "blue slime", random
 MONSTER: 'P', "blue slime", random
@@ -367,4 +371,15 @@ MONSTER: 'P', "blue slime", random
 MONSTER: 'P', "blue slime", random
 MONSTER: 'P', "blue slime", random
 MONSTER: 'P', "blue slime", random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
 
