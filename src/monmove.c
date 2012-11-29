@@ -400,9 +400,20 @@ register struct monst *mtmp;
 	/* blinkers can share damage and also keep fleeing */
 	if (is_blinker(mdat)) {
 		for (currmon = fmon; currmon; currmon = currmon->nmon) {
+			/* various conditions before sharing
+			 * is allowed.
+			 *
+			 * Peacefuls can share hp with hostiles.
+			 * They are "symphathetic" with the hostiles. 
+			 *
+			 * Hostiles can also share with peacefuls. 
+			 *
+			 * But tames can only share between themselves. */
 			if (is_blinker(currmon->data) &&
 			     currmon->data == mdat &&
 			     currmon != mtmp &&
+			     ((!currmon->mtame && !mtmp->mtame) ||
+			      (currmon->mtame && mtmp->mtame)) &&
 			     abs(currmon->mx - mtmp->mx) <= 1 &&
 			     abs(currmon->my - mtmp->my) <= 1) {
 				share_hp(mtmp, currmon);
