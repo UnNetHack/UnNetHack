@@ -65,6 +65,9 @@ struct monst {
 
 	int mtrapped;		/* trapped in a pit, web or bear trap */
 
+	Bitfield(frozen,1);	/* 1 if monster is frozen as opposed to
+				   being trapped. used with mtrapped. */
+
 	Bitfield(female,1);	/* is female */
 	Bitfield(minvis,1);	/* currently invisible */
 	Bitfield(invis_blkd,1); /* invisibility blocked */
