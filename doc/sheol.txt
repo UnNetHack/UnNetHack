@@ -1,0 +1,38 @@
+
+Sheol - The icy cold netherworld.
+(c) 2012 Mikko Juola
+
+
+        Sheol is a branch in Gehennom that features more danger and less
+        tediousness.
+
+        It adds:
+
+        - Ice walls and crystal ice walls
+                They act like normal walls but can be melted with a wand
+                of fire. Crystal ice walls can't be dug.
+
+        - New monsters:
+                crystal golem, ice golem, black angel, blinker, punisher,
+                white naga and the Executioner. Each of these have abilities
+                not seen in vanilla.
+
+        - New items:
+                crystal pick, scythe
+
+        - New levels:
+                Sheol has one new map generator and two hand-made levels.
+                Sheol has 15 levels at maximum.
+
+        - New challenges:
+                There's no natural HP regeneration in Sheol.
+
+
+        Vlad has been put inside Sheol. It will be found somewhere below
+        the middle level of Sheol.
+
+        This branch is aimed at experienced players who think Gehennom is too
+        easy or too tedious. Sheol is potentially even harder than the Astral
+        Plane.
+
+
