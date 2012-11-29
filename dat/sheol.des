@@ -23,6 +23,14 @@ MONSTER: random, random, random
 MONSTER: random, random, random
 MONSTER: random, random, random
 MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
 
 # Some loot
 OBJECT:'*',random,random
@@ -82,6 +90,8 @@ DOOR:locked,(9,8)
 OBJECT:'/',"fire",random
 OBJECT:'/',"fire",random
 
+MONSTER: ''', "crystal golem", random
+
 MONSTER: monster[0], random, (3, 7)
 MONSTER: monster[0], random, (3, 9)
 MONSTER: monster[1], random, (4, 7)
@@ -119,6 +129,25 @@ OBJECT:'(',random,random
 OBJECT:')',random,random
 OBJECT:')',random,random
 OBJECT:')',random,random
+
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
 
 # From http://www.jewishencyclopedia.com/articles/13563-sheol):
 #
@@ -180,6 +209,10 @@ MONSTER: 'x', "blinker", (58, 5)
 MONSTER: 'x', "blinker", (57, 5)
 
 # Lots of defenders around the level
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
 MONSTER: random, random, random
 MONSTER: random, random, random
 MONSTER: random, random, random
