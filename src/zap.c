@@ -3653,6 +3653,20 @@ register int dx,dy;
 #ifdef OVL0
 
 void
+melt_icewall(x, y)
+xchar x, y;
+{
+	struct rm *lev = &levl[x][y];
+	if (cansee(x, y)) {
+		Norep("The ice wall melts and breaks down.");
+	}
+	lev->typ = ICE;
+	newsym(x,y);
+	unblock_point(x,y);
+	vision_recalc(1);
+}
+
+void
 melt_ice(x, y)
 xchar x, y;
 {
@@ -3717,7 +3731,9 @@ boolean *shopdamage;
 		(void) delfloortrap(t);
 		if (cansee(x,y)) newsym(x,y);
 	    }
-	    if(is_ice(x, y)) {
+	    if(is_icewall(x, y)) {
+		melt_icewall(x, y);
+	    } else if(is_ice(x, y)) {
 		melt_ice(x, y);
 	    } else if(is_pool(x,y) || is_swamp(x,y)) {
 		const char *msgtxt = "You hear hissing gas.";

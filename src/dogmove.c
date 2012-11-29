@@ -760,7 +760,9 @@ newdogpos:
 		}
 		if (!m_in_out_region(mtmp, nix, niy))
 		    return 1;
-		if (((IS_ROCK(levl[nix][niy].typ) && may_dig(nix,niy)) ||
+		if ((((IS_ROCK(levl[nix][niy].typ) ||
+		       levl[nix][niy].typ == ICEWALL) && 
+		      may_dig(nix,niy)) ||
 		     closed_door(nix, niy)) &&
 		    mtmp->weapon_check != NO_WEAPON_WANTED &&
 		    tunnels(mtmp->data) && needspick(mtmp->data)) {

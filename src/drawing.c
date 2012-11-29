@@ -251,6 +251,7 @@ struct symdef defsyms[MAXPCHARS] = {
 	{' ', "air",		C(CLR_CYAN)},	/* open air */
 	{'#', "cloud",		C(CLR_GRAY)},	/* [part of] a cloud */
 /*40*/	{'}', "water",		C(CLR_BLUE)},	/* under water */
+	{'#', "ice wall",       C(CLR_BRIGHT_CYAN)}, /* ice wall */
 	{'^', "arrow trap",	C(HI_METAL)},	/* trap */
 	{'^', "dart trap",	C(HI_METAL)},	/* trap */
 	{'^', "falling rock trap",C(CLR_GRAY)},	/* trap */
@@ -364,6 +365,7 @@ static glyph_t ibm_graphics[MAXPCHARS] = {
 	g_FILLER(S_hcdbridge),
 	g_FILLER(S_air),
 	g_FILLER(S_cloud),
+	g_FILLER(S_icewall),
 /*40*/	0xf7,	/* S_water:	meta-w, approx. equals */
 	g_FILLER(S_arrow_trap),
 	g_FILLER(S_dart_trap),
@@ -466,6 +468,7 @@ static glyph_t dec_graphics[MAXPCHARS] = {
 	g_FILLER(S_hcdbridge),
 	g_FILLER(S_air),
 	g_FILLER(S_cloud),
+	g_FILLER(S_icewall),
 /*40*/	0xe0,	/* S_water:	meta-\, diamond */
 	g_FILLER(S_arrow_trap),
 	g_FILLER(S_dart_trap),
@@ -566,6 +569,7 @@ static glyph_t mac_graphics[MAXPCHARS] = {
 	g_FILLER(S_hcdbridge),
 	g_FILLER(S_air),
 	g_FILLER(S_cloud),
+	g_FILLER(S_icewall),
 /*40*/	g_FILLER(S_water),
 	g_FILLER(S_arrow_trap),
 	g_FILLER(S_dart_trap),
@@ -668,6 +672,7 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
 	g_FILLER(S_hcdbridge),
 	g_FILLER(S_air),
 	g_FILLER(S_cloud),
+	g_FILLER(S_icewall),
 	0x2248,	/* S_water:	ALMOST EQUAL TO */
 	g_FILLER(S_arrow_trap),
 	g_FILLER(S_dart_trap),

@@ -647,7 +647,8 @@ still_chewing(x,y)
     if (digging.down)		/* not continuing previous dig (w/ pick-axe) */
 	(void) memset((genericptr_t)&digging, 0, sizeof digging);
 
-    if (!boulder && IS_ROCK(lev->typ) && !may_dig(x,y)) {
+    if (!boulder && (IS_ROCK(lev->typ) || IS_ICEWALL(lev->typ)) && 
+	!may_dig(x,y)) {
 	You("hurt your teeth on the %s.",
 	    IS_TREES(lev->typ) ? "tree" : "hard stone");
 	nomul(0, 0);
@@ -675,6 +676,7 @@ still_chewing(x,y)
 		digging.chew ? "continue" : "begin",
 		boulder ? "boulder" :
 		IS_TREES(lev->typ) ? "tree" :
+		IS_ICEWALL(lev->typ) ? "ice wall" :
 		IS_ROCK(lev->typ) ? "rock" : "door");
 	digging.chew = TRUE;
 	watch_dig((struct monst *)0, x, y, FALSE);
@@ -720,6 +722,9 @@ still_chewing(x,y)
     } else if (IS_TREE(lev->typ)) {
 	digtxt = "chew through the tree.";
 	lev->typ = ROOM;
+    } else if (IS_ICEWALL(lev->typ)) {
+	digtxt = "chew through the ice.";
+	lev->typ = ICE;
     } else if (lev->typ == SDOOR) {
 	if (lev->doormask & D_TRAPPED) {
 	    lev->doormask = D_NODOOR;

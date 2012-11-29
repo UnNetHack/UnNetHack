@@ -278,6 +278,9 @@ lookat(x, y, buf, monbuf)
     case S_cloud:
 	Strcpy(buf, Is_airlevel(&u.uz) ? "cloudy area" : "fog/vapor cloud");
 	break;
+	case S_icewall:
+	Strcat(buf, "ice wall");
+	break;
     default:
 	Strcpy(buf,defsyms[glyph_to_cmap(glyph)].explanation);
 	break;

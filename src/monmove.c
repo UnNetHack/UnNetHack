@@ -1031,7 +1031,9 @@ not_special:
 	    if (mmoved==1 && (u.ux != nix || u.uy != niy) && itsstuck(mtmp))
 		return(3);
 
-	    if (((IS_ROCK(levl[nix][niy].typ) && may_dig(nix,niy)) ||
+	    if ((((IS_ROCK(levl[nix][niy].typ) || 
+	           levl[nix][niy].typ == ICEWALL) && 
+	           may_dig(nix,niy)) ||
 		 closed_door(nix, niy)) &&
 		mmoved==1 && can_tunnel && needspick(ptr)) {
 		if (closed_door(nix, niy)) {

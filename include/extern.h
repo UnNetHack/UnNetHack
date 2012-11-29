@@ -201,6 +201,7 @@ E boolean FDECL(is_pool, (int,int));
 E boolean FDECL(is_lava, (int,int));
 E boolean FDECL(is_ice, (int,int));
 E boolean FDECL(is_swamp, (int,int));
+E boolean FDECL(is_icewall, (int,int));
 E int FDECL(is_drawbridge_wall, (int,int));
 E boolean FDECL(is_db_wall, (int,int));
 E boolean FDECL(find_drawbridge, (int *,int*));

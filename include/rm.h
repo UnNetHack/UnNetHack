@@ -46,6 +46,7 @@ enum {
     DBWALL,
     TREE,	/* KMH */
     DEADTREE,	/* youkan */
+    ICEWALL,
     SDOOR,
     SCORR,
     POOL,
@@ -81,6 +82,7 @@ enum {
 #define IS_WALL(typ)	((typ) && (typ) <= DBWALL)
 #define IS_STWALL(typ)	((typ) <= DBWALL)	/* STONE <= (typ) <= DBWALL */
 #define IS_ROCK(typ)	((typ) < POOL)		/* absolutely nonaccessible */
+#define IS_ICEWALL(typ) ((typ) == ICEWALL)
 #define IS_DOOR(typ)	((typ) == DOOR)
 #define IS_TREE(typ)	((typ) == TREE || \
 			(level.flags.arboreal && (typ) == STONE))
@@ -154,6 +156,7 @@ enum {
     S_hcdbridge,	/* closed drawbridge, horizontal wall */
     S_air,
     S_cloud,
+    S_icewall,
     S_water,
 
 /* end dungeon characters, begin traps */

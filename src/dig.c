@@ -24,6 +24,7 @@ STATIC_DCL void NDECL(dig_up_grave);
 #define DIGTYP_BOULDER    3
 #define DIGTYP_DOOR       4
 #define DIGTYP_TREE       5
+#define DIGTYP_ICEWALL    6
 
 
 STATIC_OVL boolean
@@ -139,6 +140,7 @@ xchar x, y;
 	return (ispick && sobj_at(STATUE, x, y) ? DIGTYP_STATUE :
 		ispick && sobj_at(BOULDER, x, y) ? DIGTYP_BOULDER :
 		closed_door(x, y) ? DIGTYP_DOOR :
+		ispick && IS_ICEWALL(levl[x][y].typ) ? DIGTYP_ICEWALL :
 		IS_TREES(levl[x][y].typ) ?
 			(ispick ? DIGTYP_UNDIGGABLE : DIGTYP_TREE) :
 		ispick && IS_ROCK(levl[x][y].typ) &&
@@ -244,6 +246,11 @@ dig()
 			IS_DOOR(lev->typ) ? "door" : "wall", verb);
 		return(0);
 	    }
+	    if (IS_ICEWALL(lev->typ) && !may_dig(dpx,dpy) &&
+			dig_typ(uwep, dpx, dpy) == DIGTYP_ICEWALL) {
+		pline("This ice wall is too hard to shatter.");
+		return(0);
+	    }
 	}
 	if(Fumbling && !rn2(3)) {
 	    switch(rn2(3)) {
@@ -280,8 +287,15 @@ dig()
 			   uwep->spe - greatest_erosion(uwep) + u.udaminc;
 	if (Race_if(PM_DWARF))
 	    digging.effort *= 2;
+<<<<<<< HEAD
 	if (lev->typ == DEADTREE)
 	    digging.effort *= 2;
+=======
+	/* ice is easier to dig than rock */
+	if (IS_ICEWALL(lev->typ))
+	    digging.effort *= 2;
+
+>>>>>>> Add ice walls.
 	if (digging.down) {
 		register struct trap *ttmp;
 
@@ -332,6 +346,9 @@ dig()
 			    place_object(bobj, dpx, dpy);
 			}
 			digtxt = "The boulder falls apart.";
+		} else if (lev->typ == ICEWALL) {
+		    digtxt = "You shatter the ice wall.";
+		    lev->typ = ICE;
 		} else if (lev->typ == STONE || lev->typ == SCORR ||
 				IS_TREES(lev->typ)) {
 			if(Is_earthlevel(&u.uz)) {
@@ -419,8 +436,9 @@ cleanup:
 		digging.level.dlevel = -1;
 		return(0);
 	} else {		/* not enough effort has been spent yet */
-		static const char *const d_target[6] = {
-			"", "rock", "statue", "boulder", "door", "tree"
+		static const char *const d_target[7] = {
+			"", "rock", "statue", "boulder", "door", "tree",
+			"ice wall"
 		};
 		int dig_target = dig_typ(uwep, dpx, dpy);
 
@@ -955,13 +973,14 @@ struct obj *obj;
 			    You("swing your %s through thin air.",
 				aobjnam(obj, (char *)0));
 		} else {
-			static const char * const d_action[6] = {
+			static const char * const d_action[7] = {
 						"swinging",
 						"digging",
 						"chipping the statue",
 						"hitting the boulder",
 						"chopping at the door",
-						"cutting the tree"
+						"cutting the tree",
+						"hacking the ice wall"
 			};
 			did_dig_msg = FALSE;
 			digging.quiet = FALSE;
@@ -1066,6 +1085,8 @@ watch_dig(mtmp, x, y, zap)
 			str = "tree";
 		    else if (IS_ROCK(lev->typ))
 			str = "wall";
+		    else if (IS_ICEWALL(lev->typ))
+			str = "ice wall";
 		    else
 			str = "fountain";
 		    verbalize("Hey, stop damaging that %s!", str);
@@ -1140,6 +1161,8 @@ register struct monst *mtmp;
 	    here->typ = ROOM;
 	    if (pile && pile < 5)
 		(void) rnd_treefruit_at(mtmp->mx, mtmp->my);
+	} else if (IS_ICEWALL(here->typ)) {
+	    here->typ = ICE;
 	} else {
 	    here->typ = CORR;
 	    if (pile && pile < 5)

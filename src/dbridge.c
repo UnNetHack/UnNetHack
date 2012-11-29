@@ -62,6 +62,16 @@ int x,y;
 }
 
 boolean
+is_icewall(x, y)
+int x,y;
+{
+    if (!isok(x,y)) return FALSE;
+    if (levl[x][y].typ == ICEWALL)
+	return TRUE;
+    return FALSE;
+}
+
+boolean
 is_ice(x,y)
 int x,y;
 {
