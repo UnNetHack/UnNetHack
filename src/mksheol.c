@@ -39,23 +39,35 @@ static schar typs[10] = { ICEWALL,
 			  POOL, POOL,
 			  STONE, STONE, STONE, STONE };
 
-static void init_level_base_voronoi(schar* typs, int numtyps);
+static schar opentyps[10] = { ICEWALL, 
+			  CRYSTALICEWALL, CRYSTALICEWALL, STONE,
+			  POOL, POOL,
+			  ROOM, ROOM, ROOM, ROOM };
+
+static void init_level_base_voronoi(schar* vtyps, int numtyps, int numpoints);
 static int check_voronoi_winner(patchcoord* coords, int num_coords,
 								int x, int y);
 static void carve_path(floorprob* probs);
 static void fuzzy_circle(int x, int y, 
 			 int guaranteed_passage_radius, int fallout,
 			 floorprob* floorprobs);
-static void
-wallify_map();
+static void wallify_map();
 
-/* Return values from plug_unreachable_places */
+static void finalize_map();
+static int under_middle();
+
+/* Return values from plug_unreachable_places and verify_stairs_place. */
+/*  Any value >0 means "ok" */
 #define STAT_REJECT 0       /* "please reject the map, it's too bad" */
 #define STAT_SEMIPLUGGED  1 /* Some places are only reachable behind ice */
 #define STAT_ALLREACHABLE 2 /* Every place is reachable by walking or 
 			       levitating */
+#define STAT_STAIRSOK     3 /*  Stairs have adequate space. */
 
 static int plug_unreachable_places();
+static int verify_stairs_place();
+
+static void mkopensheol();
 
 void
 mksheol(init_lev)
@@ -65,12 +77,18 @@ mksheol(init_lev)
 	int testval;
 	floorprob* probs;
 
+	/* Sometimes make an almost open level instead */
+	if (!under_middle() && !rn2(3)) {
+		mkopensheol();
+		return;
+	}
+
 	probs = (floorprob*) alloc(sizeof(floorprob) * COLNO * ROWNO);
 
 	again:
 	memset(probs, 0, sizeof(floorprob) * COLNO * ROWNO);
 
-	init_level_base_voronoi(typs, 10);
+	init_level_base_voronoi(typs, 10, 300);
 
 	/* Then, carve a "path" from somewhere left of the level to the right
 	 * of the level. */
@@ -97,64 +115,33 @@ mksheol(init_lev)
 				levl[i1][i2].typ = ICEWALL;
 		}
 	
-	/* Make sure there is ROOM somewhere in both sides of the level */
-	for (i1 = 1; i1 <= 15; ++i1) {
-		for (i2 = 0; i2 < ROWNO; ++i2)
-			if (levl[i1][i2].typ == ROOM)
-				break;
-		if (i2 < ROWNO)
-			break;
-	}
-	if (i1 > 15)
+	if (verify_stairs_place() == STAT_REJECT)
 		goto again;
-
-	for (i1 = 65; i1 < COLNO; ++i1) {
-		for (i2 = 0; i2 < ROWNO; ++i2)
-			if (levl[i1][i2].typ == ROOM)
-				break;
-		if (i2 < ROWNO)
-			break;
-	}
-	if (i1 >= COLNO)
-		goto again;
-	
 
 	if (plug_unreachable_places() == STAT_REJECT)
 		goto again;
 
-	/* Finalization */
-	for (i1 = 1; i1 < COLNO; ++i1)
-		for (i2 = 0; i2 < ROWNO; ++i2) {
-			levl[i1][i2].lit = TRUE; /* lit things up */
-			if (IS_ROCK(levl[i1][i2].typ) &&
-			    !IS_ANY_ICEWALL(levl[i1][i2].typ))
-				levl[i1][i2].wall_info |= W_NONDIGGABLE;
-		}
-	
-	wallify_map();
-
-	level.flags.is_maze_lev = FALSE;
-	level.flags.is_cavernous_lev = TRUE;
+	finalize_map();
 
 	free(probs);
 }
 
 static void 
-init_level_base_voronoi(schar* typs, int numtyps)
+init_level_base_voronoi(schar* vtyps, int numtyps, int numpoints)
 {
 	int patches, i1, i2, i3;
 	int winner_patch, winner_distance, tmpdist;
-	patchcoord points[150];
+	patchcoord* points;
 
 	/* We use a voronoi diagram to put ice and solid ground on the level.
 	 * Maybe it looks interesting? I hope so. That's kind of the point. */
-
-	patches = rn1(145, 5);
+	points = (patchcoord*) alloc(sizeof(patchcoord)*numpoints);
+	patches = numpoints;
 
 	for (i1 = 0; i1 < patches; ++i1) {
 		points[i1].c.x = rn1(COLNO-1, 1);
 		points[i1].c.y = rn2(ROWNO);
-		points[i1].typ = typs[rn2(numtyps)];
+		points[i1].typ = vtyps[rn2(numtyps)];
 
 		/* Don't want them to be too close to other points... */
 		for (i2 = 0; i2 < i1; ++i2) {
@@ -172,6 +159,8 @@ init_level_base_voronoi(schar* typs, int numtyps)
 			winner_patch = check_voronoi_winner(points, patches, i1, i2);
 			levl[i1][i2].typ = points[winner_patch].typ;
 		}
+	
+	free(points);
 }
 
 static int 
@@ -302,7 +291,7 @@ carve_path(floorprobs)
 
 			#undef BEZNUMERICAL
 
-			if (u.uz.dlevel > 5)
+			if (under_middle())
 				fuzzy_circle(x, y, 1, 0, floorprobs);
 			else
 				fuzzy_circle(x, y, 1, 2, floorprobs);
@@ -496,5 +485,67 @@ plug_unreachable_places()
 	if (not_passable)
 		return STAT_REJECT;
 	return STAT_SEMIPLUGGED;
+}
+
+/* Return 1 if below the middle Sheol level. */
+static int 
+under_middle() {
+	return u.uz.dlevel > 5;
+}
+
+static void 
+mkopensheol() {
+	/*  This one's simple. */
+	do {
+		init_level_base_voronoi(opentyps, 10, 300);
+	} while(verify_stairs_place() != STAT_STAIRSOK);
+
+	finalize_map();
+}
+
+static void
+finalize_map() {
+	int i1, i2;
+
+	for (i1 = 1; i1 < COLNO; ++i1)
+		for (i2 = 0; i2 < ROWNO; ++i2) {
+			levl[i1][i2].lit = TRUE; /* lit things up */
+			if (IS_ROCK(levl[i1][i2].typ) &&
+			    !IS_ANY_ICEWALL(levl[i1][i2].typ))
+				levl[i1][i2].wall_info |= W_NONDIGGABLE;
+		}
+	
+	wallify_map();
+
+	level.flags.is_maze_lev = FALSE;
+	level.flags.is_cavernous_lev = TRUE;
+}
+
+static int
+verify_stairs_place() {
+	int i1, i2;
+
+	/* Make sure there is ROOM somewhere in both sides of the level */
+	for (i1 = 1; i1 <= 15; ++i1) {
+		for (i2 = 0; i2 < ROWNO; ++i2)
+			if (levl[i1][i2].typ == ROOM)
+				break;
+		if (i2 < ROWNO)
+			break;
+	}
+	if (i1 > 15)
+		return STAT_REJECT;
+
+	for (i1 = 65; i1 < COLNO; ++i1) {
+		for (i2 = 0; i2 < ROWNO; ++i2)
+			if (levl[i1][i2].typ == ROOM)
+				break;
+		if (i2 < ROWNO)
+			break;
+	}
+	if (i1 >= COLNO)
+		return STAT_REJECT;
+
+	return STAT_STAIRSOK;
 }
 
