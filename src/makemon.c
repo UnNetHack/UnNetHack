@@ -1693,7 +1693,7 @@ int type;
 		case PM_GLASS_GOLEM: return 60;
 		case PM_IRON_GOLEM: return 80;
 		case PM_ICE_GOLEM: return 150;
-		case PM_CRYSTAL_GOLEM: return 300;
+		case PM_CRYSTAL_ICE_GOLEM: return 300;
 		default: return 0;
 	}
 }

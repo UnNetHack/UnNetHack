@@ -11,8 +11,8 @@ STAIR: levregion(1, 0, 15, 20), levregion(16, 0, 64, 20), up
 STAIR: levregion(65, 0, 79, 20), levregion(16, 0, 64, 20), down
 
 # Golems and random monsters
-MONSTER: ''', "crystal golem", random
-MONSTER: ''', "crystal golem", random
+MONSTER: ''', "crystal ice golem", random
+MONSTER: ''', "crystal ice golem", random
 MONSTER: 'P', "blue slime", random
 MONSTER[33%]: '`', "Punisher", random
 MONSTER: random, random, random
@@ -82,7 +82,7 @@ DOOR:locked,(9,8)
 OBJECT:'/',"fire",random
 OBJECT:'/',"fire",random
 
-MONSTER: ''', "crystal golem", random
+MONSTER: ''', "crystal ice golem", random
 MONSTER: 'P', "blue slime", random
 
 MONSTER: monster[0], random, (3, 7)
@@ -176,8 +176,8 @@ STAIR: (37,18),up
 STAIR: (7,2,60,7), (10,2,56,7),down
 
 # Golems in loot rooms
-MONSTER: ''', "crystal golem", (34,2)
-MONSTER: ''', "crystal golem", (40,2)
+MONSTER: ''', "crystal ice golem", (34,2)
+MONSTER: ''', "crystal ice golem", (40,2)
 
 # Freezers!
 MONSTER: 'P', "blue slime", random
@@ -347,19 +347,22 @@ OBJECT:')',"crystal pick",contained
 
 # Some serious slimy fun, these should freeze the player in place
 # while the Executioner slices them into little pieces.
-MONSTER: ''', "crystal golem", random
-MONSTER: ''', "crystal golem", random
+MONSTER: 'P', "blue slime", random
+MONSTER: 'P', "blue slime", random
+MONSTER: 'P', "blue slime", random
+MONSTER: 'P', "blue slime", random
+MONSTER: 'P', "blue slime", random
+MONSTER: 'P', "blue slime", random
+MONSTER: 'P', "blue slime", random
+MONSTER: 'P', "blue slime", random
+MONSTER: 'N', "white naga", random
+MONSTER: 'N', "white naga", random
+MONSTER: 'N', "white naga", random
+MONSTER: 'N', "white naga", random
+MONSTER: ''', "crystal ice golem", random
+MONSTER: ''', "crystal ice golem", random
 MONSTER: ''', "ice golem", random
 MONSTER: ''', "ice golem", random
-MONSTER: 'P', "blue slime", random
-MONSTER: 'P', "blue slime", random
-MONSTER: 'P', "blue slime", random
-MONSTER: 'P', "blue slime", random
-MONSTER: 'P', "blue slime", random
-MONSTER: 'P', "blue slime", random
-MONSTER: 'P', "blue slime", random
-MONSTER: 'P', "blue slime", random
-MONSTER: 'P', "blue slime", random
 MONSTER: 'A', "black Angel", random
 MONSTER: 'A', "black Angel", random
 MONSTER: 'A', "black Angel", random
