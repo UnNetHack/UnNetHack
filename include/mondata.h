@@ -103,6 +103,7 @@
 #define is_bird(ptr)		((ptr)->mlet == S_BAT && !is_bat(ptr))
 #define is_giant(ptr)		(((ptr)->mflags2 & M2_GIANT) != 0L)
 #define is_golem(ptr)		((ptr)->mlet == S_GOLEM)
+#define is_statue(ptr)		((ptr)->mlet == S_STATUE)
 #define is_domestic(ptr)	(((ptr)->mflags2 & M2_DOMESTIC) != 0L)
 #define is_demon(ptr)		(((ptr)->mflags2 & M2_DEMON) != 0L)
 #define is_mercenary(ptr)	(((ptr)->mflags2 & M2_MERC) != 0L)
@@ -191,6 +192,7 @@
 				 (ptr) == &mons[PM_MASTER_MIND_FLAYER])
 
 #define nonliving(ptr)		(is_golem(ptr) || is_undead(ptr) || \
+				 is_statue(ptr) || \
 				 (ptr)->mlet == S_VORTEX || \
 				 (ptr) == &mons[PM_MANES])
 
