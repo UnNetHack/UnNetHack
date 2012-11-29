@@ -649,7 +649,7 @@ NEARDATA struct permonst mons[] = {
  * nymphs
  */
     MON("wood nymph", S_NYMPH,
-	LVL(3, 12, 9, 20, 0), (G_GENO|G_SHEOL|2),
+	LVL(3, 12, 9, 20, 0), (G_GENO|2),
 	A(ATTK(AT_CLAW, AD_SITM, 0, 0), ATTK(AT_CLAW, AD_SEDU, 0, 0),
 	  NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
 	SIZ(600, 300, 0, MS_SEDUCE, MZ_HUMAN), 0, 0,
