@@ -140,8 +140,8 @@ struct monst {
 	xchar weapon_check;
 
 	long mgrlastattack;	    /* turn when a grouper last attacked.
-				       at certain points, the blinker decides
-				       to blink back to attacking. */
+				       at certain points, the attackers decide
+				       to get back to attacking all at once. */
 
 
 #ifdef LIVELOG_BONES_KILLER

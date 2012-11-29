@@ -16,6 +16,9 @@ STATIC_DCL void FDECL(distfleeck,(struct monst *,int *,int *,int *));
 STATIC_DCL int FDECL(m_arrival, (struct monst *));
 STATIC_DCL void FDECL(watch_on_duty,(struct monst *));
 
+static void make_group_attackers_flee(struct monst* mtmp);
+static void share_hp(struct monst* mon1, struct monst* mon2);
+
 #endif /* OVL0 */
 #ifdef OVLB
 
@@ -376,9 +379,13 @@ register struct monst *mtmp;
 	if (mtmp->mhp <= 0) return(1); /* m_respond gaze can kill medusa */
 
 	/* group attackers rapidly attack back. */
-	if (is_groupattacker(mdat) && 
-	     (monstermoves - mtmp->mgrlastattack) >= rn2(25)+5)
+	if (is_groupattacker(mdat))
 	{
+		if (mtmp->mhpmax / 2 > mtmp->mhp) {
+			make_group_attackers_flee(mtmp);
+		}
+
+		if ((monstermoves - mtmp->mgrlastattack) >= rn2(10)+5)
 		/* collect monsters around and make them ALL attack. */
 		/* only from same species */
 		for (currmon = fmon; currmon; currmon = currmon->nmon) {
@@ -388,7 +395,23 @@ register struct monst *mtmp;
 				currmon->mgrlastattack = monstermoves;
 			}
 		}
-		pline("%s suddenly charges at you!", Monnam(mtmp));
+	}
+
+	/* blinkers can share damage and also keep fleeing */
+	if (is_blinker(mdat)) {
+		for (currmon = fmon; currmon; currmon = currmon->nmon) {
+			if (is_blinker(currmon->data) &&
+			     currmon->data == mdat &&
+			     currmon != mtmp &&
+			     abs(currmon->mx - mtmp->mx) <= 1 &&
+			     abs(currmon->my - mtmp->my) <= 1) {
+				share_hp(mtmp, currmon);
+				break;
+			}
+		}
+		/* Can gain these statuses from sharing. */
+		if (!mtmp->mcanmove || mtmp->msleeping)
+			return(0);
 	}
 
 
@@ -640,15 +663,6 @@ toofar:
 		/* group attacker AI */
 		if (is_groupattacker(mdat)) {
 			mtmp->mgrlastattack = monstermoves;
-			mtmp->mflee = 1; /* avoid fleeing messages
-					    since the monster isn't
-					    really fleeing in thematic
-					    sense */
-			mtmp->mfleetim = 0;
-			if (canseemon(mtmp)) {
-				pline("%s steps away from you!",
-				      Monnam(mtmp));
-			}
 		}
 	    }
 
@@ -1492,6 +1506,102 @@ struct monst *mtmp;
 		    
 	}
 	return TRUE;
+}
+
+static void
+make_group_attackers_flee(mtmp)
+	struct monst *mtmp;
+{
+	struct monst* currmon;
+
+	/* group attackers flee together */
+	/* this includes all groupers on the level but maybe it's
+	 * approximate enough. */
+	for (currmon = fmon; currmon; currmon = currmon->nmon) {
+		if (is_groupattacker(currmon->data) &&
+			currmon->data == mtmp->data) {
+			currmon->mflee = 1;
+			currmon->mfleetim = 0;
+		}
+	}
+}
+
+static void 
+share_hp(mon1, mon2)
+	struct monst *mon1, *mon2;
+{
+	struct monst *tmp;
+	char nam[BUFSZ];
+	int oldhp;
+
+	Strcpy(nam, makeplural(mon1->data->mname));
+
+	/* Share same damage with another monster. */
+
+	if (mon1->mhp == mon2->mhp)
+		return;
+
+	if (mon1->mhp < mon2->mhp)
+	{
+		tmp = mon1;
+		mon1 = mon2;
+		mon2 = tmp;
+	}
+
+	/* Some statuses block sharing, but only if
+	 * that's on the contributing side.
+	 *
+	 * The contributing side does the action, the other
+	 * one is just a passive receiver. */
+	if (mon1->mfrozen || mon1->msleeping)
+		return;
+
+	/* It doesn't always happen, only 1/2 of time. */
+	if (rn2(2))
+		return;
+
+	/* If the other monster is frozen or sleeping, the
+	 * status is exchanged. After all, the monster with more
+	 * hp is more likely to survive. The woken up creature
+	 * is put into fleeing. */
+	if (!mon2->mcanmove) {
+		mon1->mcanmove = mon2->mcanmove;
+		mon1->mfrozen = mon2->mfrozen;
+		mon2->mcanmove = 1;
+		mon2->mfrozen = 0;
+		mon2->mflee = 1;
+		mon2->mfleetim = 0;
+		/* TODO: come up with a better message for frozen/sleeping
+		 * status exchange. */
+		if (cansee(mon1->mx, mon1->my) &&
+		    cansee(mon2->mx, mon2->my)) {
+			pline("The %s appear to share their wounds.", nam);
+		}
+		return;
+	}
+	if (mon2->msleeping) {
+		mon1->msleeping = mon2->msleeping;
+		mon2->msleeping = 0;
+		mon2->mflee = 1;
+		mon2->mfleetim = 0;
+		if (cansee(mon1->mx, mon1->my) &&
+		    cansee(mon2->mx, mon2->my)) {
+			pline("The %s appear to share their wounds.", nam);
+		}
+		return;
+	}
+
+	oldhp = mon2->mhp;
+	mon2->mhp = (mon2->mhp + mon1->mhp) / 2;
+	if (mon2->mhp > mon2->mhpmax)
+		mon2->mhp = mon2->mhpmax;
+
+	mon1->mhp -= (mon2->mhp - oldhp);
+	if (oldhp != mon2->mhp &&
+	    cansee(mon1->mx, mon1->my) &&
+	    cansee(mon2->mx, mon2->my)) {
+		pline("The %s appear to share their wounds.", nam);
+	}
 }
 
 #endif /* OVL0 */
