@@ -186,16 +186,16 @@ MONSTER: 'P', "blue slime", random
 MONSTER: 'P', "blue slime", random
 MONSTER: 'P', "blue slime", random
 
-# Blinkers in wings
-MONSTER: 'x', "blinker", (16, 4)
-MONSTER: 'x', "blinker", (17, 4)
-MONSTER: 'x', "blinker", (16, 5)
-MONSTER: 'x', "blinker", (17, 5)
+# Chillbugs in wings
+MONSTER: 'x', "chillbug", (16, 4)
+MONSTER: 'x', "chillbug", (17, 4)
+MONSTER: 'x', "chillbug", (16, 5)
+MONSTER: 'x', "chillbug", (17, 5)
 
-MONSTER: 'x', "blinker", (58, 4)
-MONSTER: 'x', "blinker", (57, 4)
-MONSTER: 'x', "blinker", (58, 5)
-MONSTER: 'x', "blinker", (57, 5)
+MONSTER: 'x', "chillbug", (58, 4)
+MONSTER: 'x', "chillbug", (57, 4)
+MONSTER: 'x', "chillbug", (58, 5)
+MONSTER: 'x', "chillbug", (57, 5)
 
 # Lots of defenders around the level
 MONSTER: random, random, random
