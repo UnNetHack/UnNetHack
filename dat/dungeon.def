@@ -86,6 +86,7 @@ RNDLEVEL:	"heck-e" "Q" @ (-19,17) 50 9
 DUNGEON:	"Sheol" "S" (10, 5)
 DESCRIPTION:	hellish
 ALIGNMENT:	noalign
+LEVEL:		"sheolmid" "H" @ (5, 0)
 LEVEL:		"palace_f" "P" @ (-2, 0)
 LEVEL:		"palace_e" "U" @ (-1, 0)
 

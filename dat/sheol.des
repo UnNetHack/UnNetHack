@@ -10,6 +10,34 @@ NOMAP
 STAIR: levregion(1, 0, 15, 20), levregion(16, 0, 64, 20), up
 STAIR: levregion(65, 0, 79, 20), levregion(16, 0, 64, 20), down
 
+# Middle level, always 5th of Sheol
+MAZE: "sheolmid", ' '
+FLAGS: sheol,hardfloor,noteleport
+INIT_MAP:'.', ' ', false, false, lit, true
+GEOMETRY:left,center
+MAP
+WWWWWWWWIWWWWWWWWWWWWW...
+WWUWWWWWIWWWWWWWWWWWWWW..
+WWWWWWWUIWWWWWWWWUIWWWW..
+WWWWWWWWWWWWWWWUWWIIWWWW.
+............WWWWWWWWWIWW.
+.............WWWWWWWWUIW.
+..--------....WWWWWWWWWWW
+..|......|....WWWWWWWWWWW
+..|......+....WWWWWWWWWWW
+..|......|....WWWWWWWWIWW
+..--------....WWWWWWWWWWW
+.............WWWWUIWIWWW.
+............WWWWWWIIWWWW.
+WWWWWWWWWWWWWWWWWWWWWWWW.
+WWWWUWWIWWWWWWWWWWWUWWW..
+WWWWWWWWWWWWWUIWWIIWWWW..
+WWWWWWWWWIWWIIWWWUWWWW...
+ENDMAP
+
+REGION: (0,0,24,16),lit,"ordinary"
+STAIR: (4,8),down
+STAIR: levregion(65, 0, 79, 20), levregion(16, 0, 64, 20), up
 
 # This realm of the dead is in the earth ("erẓitu" = ; comp. Job, x. 21, 22), the gateway being in the west. It is the "land without return." It is a dark place filled with dust (see Sheol, Biblical Data); but it contains a palace for the divine ruler of this shadow-realm (comp. Job xviii. 13, 14). Seven gates guard successively the approach to this land, at the first of which is a watchman. A stream of water flows through Sheol (comp. Enoch, xvii. 6, xxii. 9; Luke xvi. 24; Ps. xviii. 5; II Sam. xxii. 5).
 
@@ -19,7 +47,7 @@ STAIR: levregion(65, 0, 79, 20), levregion(16, 0, 64, 20), down
 
 # The second-to-end level
 MAZE: "palace_f", ' '
-FLAGS: noteleport,hardfloor
+FLAGS: sheol,noteleport,hardfloor
 GEOMETRY:center,center
 MAP
       |..................-----------   -----------...........|              
@@ -114,7 +142,7 @@ OBJECT:'=',"regeneration",(47,2)
 
 # Bottom level of Sheol
 MAZE: "palace_e", ' '
-FLAGS: noteleport,hardfloor
+FLAGS: sheol,noteleport,hardfloor
 GEOMETRY:center,center
 MAP
                                                                             
