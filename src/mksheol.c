@@ -280,7 +280,10 @@ carve_path(floorprobs)
 
 			#undef BEZNUMERICAL
 
-			fuzzy_circle(x, y, 1, 2, floorprobs);
+			if (u.uz.dlevel > 5)
+				fuzzy_circle(x, y, 1, 0, floorprobs);
+			else
+				fuzzy_circle(x, y, 1, 2, floorprobs);
 		}
 	}
 }
