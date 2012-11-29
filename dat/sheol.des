@@ -343,7 +343,7 @@ OBJECT:'(',"magic marker",contained
 CONTAINER:'(',"chest",(66,10)
 OBJECT:'(',"magic lamp",contained
 CONTAINER:'(',"chest",(68,9)
-OBJECT:')',"crystal pick",contained
+OBJECT:'(',"crystal pick",contained
 
 # Some serious slimy fun, these should freeze the player in place
 # while the Executioner slices them into little pieces.
