@@ -14,6 +14,7 @@ STAIR: levregion(65, 0, 79, 20), levregion(16, 0, 64, 20), down
 MONSTER: ''', "crystal golem", random
 MONSTER: ''', "crystal golem", random
 MONSTER: 'P', "blue slime", random
+MONSTER[33%]: '`', "Punisher", random
 MONSTER: random, random, random
 MONSTER: random, random, random
 MONSTER: random, random, random
