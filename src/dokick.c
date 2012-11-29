@@ -645,6 +645,7 @@ char *buf;
 	else if (IS_TREE(maploc->typ)) what = "a tree";
 	else if (IS_STWALL(maploc->typ)) what = "a wall";
 	else if (IS_DEADTREE(maploc->typ)) what = "a dead tree";
+	else if (IS_ANY_ICEWALL(maploc->typ)) what = "an ice wall";
 	else if (IS_ROCK(maploc->typ)) what = "a rock";
 	else if (IS_THRONE(maploc->typ)) what = "a throne";
 	else if (IS_FOUNTAIN(maploc->typ)) what = "a fountain";
@@ -1058,7 +1059,8 @@ dokick()
 		}
 #endif
 		if (maploc->typ == STAIRS || maploc->typ == LADDER ||
-						    IS_STWALL(maploc->typ)) {
+			IS_STWALL(maploc->typ) ||
+			IS_ANY_ICEWALL(maploc->typ)) {
 		    if(!IS_STWALL(maploc->typ) && maploc->ladder == LA_DOWN)
 			goto dumb;
 ouch:
