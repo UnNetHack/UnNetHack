@@ -10,11 +10,13 @@ On Linux and MacOSX for a single-user installation (a Linux Debian
 
  ./configure --prefix=$HOME/unnethack --with-owner=`id -un` --with-group=`id -gn` --enable-wizmode=`id -un` && make && make install
 
+
+On Windows for a tty build (replace Username and Usergroup with your local
+ settings):
+ ./configure --prefix=$HOME/unnethack --with-owner=Username --with-group=Usergroup --build=mingw32 --disable-file-areas --without-compression --enable-tty-graphics && make && make install
+
+
  The game will be started with ~/unnethack/bin/unnethack
-
-
-On Windows for a tty build:
- ./configure --with-owner=Username --with-group=Usergroup --build=mingw32 --prefix=/opt/unnethack --without-compression --enable-tty-graphics && make && make install
 
 
 Please direct bugs and questions to <bhaak@gmx.net> or post them to the
