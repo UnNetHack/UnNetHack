@@ -162,6 +162,10 @@
 #define M3_INFRAVISION	0x0100		/* has infravision */
 #define M3_INFRAVISIBLE 0x0200		/* visible by infravision */
 
+#define M3_GROUPATTACK  0x0400		/* hits and runs in groups */
+#define M3_BLINKER	0x0800		/* alternates between regenerating
+					   and attacking. */
+
 #define MZ_TINY		0		/* < 2' */
 #define MZ_SMALL	1		/* 2-4' */
 #define MZ_MEDIUM	2		/* 4-7' */

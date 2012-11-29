@@ -193,6 +193,9 @@
 				 (ptr)->mlet == S_VORTEX || \
 				 (ptr) == &mons[PM_MANES])
 
+#define is_blinker(ptr)		((ptr)->mflags3 & M3_BLINKER)
+#define is_groupattacker(ptr)   ((ptr)->mflags3 & M3_GROUPATTACK)
+
 #define likes_swamp(ptr)	((ptr)->mlet == S_PUDDING || \
 				 (ptr)->mlet == S_FUNGUS || \
 				 (ptr) == &mons[PM_OCHRE_JELLY])

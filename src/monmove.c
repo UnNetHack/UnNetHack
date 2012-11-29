@@ -168,8 +168,12 @@ mon_regen(mon, digest_meal)
 struct monst *mon;
 boolean digest_meal;
 {
+	int freq = 20;
+	if (is_blinker(mon->data) && mon->mblattacking == 0)
+		freq = 1;
+
 	if (mon->mhp < mon->mhpmax &&
-	    (moves % 20 == 0 || regenerates(mon->data))) mon->mhp++;
++	    (moves % freq == 0 || regenerates(mon->data))) mon->mhp++;
 	if (mon->mspec_used) mon->mspec_used--;
 	if (digest_meal) {
 	    if (mon->meating) mon->meating--;
@@ -317,6 +321,7 @@ register struct monst *mtmp;
 #ifdef GOLDOBJ
         struct obj *ygold = 0, *lepgold = 0;
 #endif
+	struct monst* currmon;
 
 /*	Pre-movement adjustments	*/
 
@@ -369,6 +374,26 @@ register struct monst *mtmp;
 	if (mdat == &mons[PM_MEDUSA] && couldsee(mtmp->mx, mtmp->my))
 	    m_respond(mtmp);
 	if (mtmp->mhp <= 0) return(1); /* m_respond gaze can kill medusa */
+
+	/* group attackers rapidly attack back. */
+	if (is_groupattacker(mdat) && 
+	     (monstermoves - mtmp->mgrlastattack) >= rn2(25)+5)
+	{
+		/* collect monsters around and make them ALL attack. */
+		/* only from same species */
+		for (currmon = fmon; currmon; currmon = currmon->nmon) {
+			if (is_groupattacker(currmon->data) &&
+				currmon->data == mdat) {
+				currmon->mflee = 0;
+				currmon->mgrlastattack = monstermoves;
+				/* blinkers go to attack mode */
+				if (is_blinker(currmon->data))
+					currmon->mblattacking = 1;
+			}
+		}
+		pline("%s suddenly charges at you!", Monnam(mtmp));
+	}
+
 
 	/* fleeing monsters might regain courage */
 	if (mtmp->mflee && !mtmp->mfleetim
@@ -612,7 +637,25 @@ toofar:
 #endif
 	)) {
 	    if(inrange && !noattacks(mdat) && u.uhp > 0 && !scared && tmp != 3)
+	    {
 		if(mattacku(mtmp)) return(1); /* monster died (e.g. exploded) */
+
+		/* group attacker AI */
+		if (is_groupattacker(mdat)) {
+			mtmp->mgrlastattack = monstermoves;
+			/* blinkers go to regen mode */
+			mtmp->mblattacking = 0;
+			mtmp->mflee = 1; /* avoid fleeing messages
+					    since the monster isn't
+					    really fleeing in thematic
+					    sense */
+			mtmp->mfleetim = 0;
+			if (canseemon(mtmp)) {
+				pline("%s steps away from you!",
+				      Monnam(mtmp));
+			}
+		}
+	    }
 
 	    if(mtmp->wormno) wormhitu(mtmp);
 	}

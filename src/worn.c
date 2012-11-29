@@ -362,6 +362,13 @@ register struct monst *mon;
 	int base = mon->data->ac;
 	long mwflags = mon->misc_worn_check;
 
+	/* blinkers are special; when they are not attacking, they get
+	 * AC bonus. */
+	if (is_blinker(mon->data) && mon->mflee) {
+		base -= 10;
+	}
+
+
 	for (obj = mon->minvent; obj; obj = obj->nobj) {
 	    if (obj->owornmask & mwflags)
 		base -= ARM_BONUS(obj);
