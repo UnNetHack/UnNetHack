@@ -17,7 +17,7 @@ Sheol - The icy cold netherworld.
 
         - New monsters:
                 crystal golem, ice golem, black angel, blinker, Punisher,
-                white naga and the Executioner. Each of these have abilities
+                white naga and the Executioner. Many of these have abilities
                 not seen in vanilla.
 
         - New items:
