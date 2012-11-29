@@ -63,6 +63,8 @@ struct monst {
 	unsigned short mintrinsics;	/* low 8 correspond to mresists */
 	int mspec_used;		/* monster's special ability attack timeout */
 
+	int mtrapped;		/* trapped in a pit, web or bear trap */
+
 	Bitfield(female,1);	/* is female */
 	Bitfield(minvis,1);	/* currently invisible */
 	Bitfield(invis_blkd,1); /* invisibility blocked */
@@ -100,7 +102,6 @@ struct monst {
 	Bitfield(mstun,1);	/* stunned (off balance) */
 	Bitfield(mconf,1);	/* confused */
 	Bitfield(mpeaceful,1);	/* does not attack unprovoked */
-	Bitfield(mtrapped,1);	/* trapped in a pit, web or bear trap */
 	Bitfield(mleashed,1);	/* monster is on a leash */
 	Bitfield(isshk,1);	/* is shopkeeper */
 	Bitfield(isminion,1);	/* is a minion */

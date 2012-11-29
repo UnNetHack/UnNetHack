@@ -373,6 +373,7 @@ m_throw(mon, x, y, dx, dy, range, obj)
 			    /* fall through */
 			case CREAM_PIE:
 			case BLINDING_VENOM:
+			case FREEZING_ICE:
 			    hitu = thitu(8, 0, singleobj, (char *)0);
 			    break;
 			default:
@@ -399,6 +400,9 @@ m_throw(mon, x, y, dx, dy, range, obj)
 			Strcpy(onmbuf, xname(singleobj));
 			Strcpy(knmbuf, killer_xname(singleobj));
 			poisoned(onmbuf, A_STR, knmbuf, -10);
+		    }
+		    if (hitu && singleobj->otyp == FREEZING_ICE) {
+			maybe_freeze_u(0);
 		    }
 		    if(hitu &&
 		       can_blnd((struct monst*)0, &youmonst,
@@ -647,6 +651,9 @@ register struct attack *mattk;
 		    case AD_DRST:
 			otmp = mksobj(BLINDING_VENOM, TRUE, FALSE);
 			break;
+		    case AD_COLD:
+			otmp = mksobj(FREEZING_ICE, TRUE, FALSE);
+		    break;
 		    default:
 			warning("bad attack type in spitmu");
 				/* fall through */
@@ -655,8 +662,12 @@ register struct attack *mattk;
 			break;
 		}
 		if(!rn2(BOLT_LIM-distmin(mtmp->mx,mtmp->my,mtmp->mux,mtmp->muy))) {
-		    if (canseemon(mtmp))
-			pline("%s spits venom!", Monnam(mtmp));
+		    if (canseemon(mtmp)) {
+			if (mattk->adtyp == AD_COLD)
+				pline("%s spits ice!", Monnam(mtmp));
+			else
+				pline("%s spits venom!", Monnam(mtmp));
+		    }
 		    m_throw(mtmp, mtmp->mx, mtmp->my, sgn(tbx), sgn(tby),
 			distmin(mtmp->mx,mtmp->my,mtmp->mux,mtmp->muy), otmp);
 		    nomul(0, 0);

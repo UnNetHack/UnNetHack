@@ -1589,34 +1589,7 @@ dopois:
 		 * doesn't directly attack the player character itself
 		 * so it's justified. */
 		hitmsg(mtmp, mattk);
-		if (flaming(youmonst.data) ||
-		    flaming(u.usteed)) {
-		    pline_The("ice melts away!");
-		    dmg = 0;
-		} else if (is_whirly(youmonst.data) ||
-			   amorphous(youmonst.data)) {
-		    pline_The("ice doesn't restrain you.");
-		    dmg = 0;
-		} else {
-		    if (u.usteed) {
-		        pline_The("ice holds you and your %s "
-			          "in place.", mon_nam(u.usteed));
-		    }
-		    else {
-		        if (nolimbs(youmonst.data))
-		            pline_The("ice holds you in place.");
-		        else
-			    pline_The("ice holds your legs in place.");
-		    }
-
-		    /* It's possible that you are already trapped
-		     * when encased in ice. I have no good ideas how
-		     * to handle this. Can be a little silly to be
-		     * floated up from a pit because you were freezed. */
-
-		    u.utrap = rn1(16, 2);
-		    u.utraptype = TT_ICE;
-		}
+		maybe_freeze_u(&dmg);
 		break;
 	    case AD_ENCH:	/* KMH -- remove enchantment (disenchanter) */
 		hitmsg(mtmp, mattk);
@@ -2604,6 +2577,40 @@ register struct monst *mon;
 	if (!rn2(25)) mon->mcan = 1; /* monster is worn out */
 	if (!tele_restrict(mon)) (void) rloc(mon, FALSE);
 	return 1;
+}
+
+void
+maybe_freeze_u(pdmg)
+int* pdmg;
+{
+	if (flaming(youmonst.data) ||
+	    flaming(u.usteed)) {
+	    pline_The("ice melts away!");
+	    if (pdmg) (*pdmg) = 0;
+	} else if (is_whirly(youmonst.data) ||
+		   amorphous(youmonst.data)) {
+	    pline_The("ice doesn't restrain you.");
+	    if (pdmg) (*pdmg) = 0;
+	} else {
+	    if (u.usteed) {
+		pline_The("ice holds you and your %s "
+			  "in place.", mon_nam(u.usteed));
+	    }
+	    else {
+		if (nolimbs(youmonst.data))
+		    pline_The("ice holds you in place.");
+		else
+		    pline_The("ice holds your legs in place.");
+	    }
+
+	    /* It's possible that you are already trapped
+	     * when encased in ice. I have no good ideas how
+	     * to handle this. Can be a little silly to be
+	     * floated up from a pit because you were freezed. */
+
+	    u.utrap = rn1(16, 2);
+	    u.utraptype = TT_ICE;
+	}
 }
 
 STATIC_OVL void

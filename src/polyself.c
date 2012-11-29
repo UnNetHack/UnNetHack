@@ -540,7 +540,7 @@ int	mntmp;
 	    if (can_breathe(youmonst.data))
 		pline(use_thec,monsterc,"use your breath weapon");
 	    if (attacktype(youmonst.data, AT_SPIT))
-		pline(use_thec,monsterc,"spit venom");
+		pline(use_thec,monsterc,"spit venom or ice");
 	    if (youmonst.data->mlet == S_NYMPH)
 		pline(use_thec,monsterc,"remove an iron ball");
 	    if (attacktype(youmonst.data, AT_GAZE))
@@ -815,7 +815,9 @@ dospit()
 	struct obj *otmp;
 
 	if (!getdir((char *)0)) return(0);
-	otmp = mksobj(u.umonnum==PM_COBRA ? BLINDING_VENOM : ACID_VENOM,
+	otmp = mksobj(u.umonnum==PM_COBRA ? BLINDING_VENOM : 
+		      u.umonnum==PM_WHITE_NAGA ? FREEZING_ICE :
+		      ACID_VENOM,
 			TRUE, FALSE);
 	otmp->spe = 1; /* to indicate it's yours */
 	throwit(otmp, 0L, FALSE);

@@ -1075,6 +1075,7 @@ E int FDECL(noattacks, (struct permonst *));
 E int FDECL(sleep_monst, (struct monst *,int,int));
 E void FDECL(slept_monst, (struct monst *));
 E long FDECL(attk_protection, (int));
+E void FDECL(maybe_freeze_m, (struct monst *,int,int*));
 
 /* ### mhitu.c ### */
 
@@ -1091,6 +1092,7 @@ E int FDECL(could_seduce, (struct monst *,struct monst *,struct attack *));
 #ifdef SEDUCE
 E int FDECL(doseduce, (struct monst *));
 #endif
+E void FDECL(maybe_freeze_u, (int*));
 
 /* ### minion.c ### */
 

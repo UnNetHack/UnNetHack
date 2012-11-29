@@ -6,6 +6,7 @@
 
 extern const char * const destroy_strings[];	/* from zap.c */
 
+STATIC_DCL void FDECL(decrease_mon_trapcounter, (struct monst *));
 STATIC_DCL void FDECL(dofiretrap, (struct obj *));
 STATIC_DCL void NDECL(domagictrap);
 STATIC_DCL boolean FDECL(emergency_disrobe,(boolean *));
@@ -1050,7 +1051,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 
 			/* mintrap currently does not return 2(died) for webs */
 			if (mintrap(u.usteed)) {
-			    u.usteed->mtrapped = 0;
+			    decrease_mon_trapcounter(u.usteed);
 			    if (strongmonst(u.usteed->data)) str = 17;
 			} else {
 			    break;
@@ -1693,7 +1694,7 @@ register struct monst *mtmp;
 #endif
 
 	if (!trap) {
-	    mtmp->mtrapped = 0;	/* perhaps teleported? */
+	    decrease_mon_trapcounter(mtmp);
 	} else if (mtmp->mtrapped) {	/* is currently in the trap */
 	    if (!trap->tseen &&
 		cansee(mtmp->mx, mtmp->my) && canseemon(mtmp) &&
@@ -4266,6 +4267,15 @@ swamp_effects()
 	    losehp(i, "rusting away", KILLED_BY);
 	}
 	return(FALSE);
+}
+
+static 
+void
+decrease_mon_trapcounter(mon)
+struct monst* mon;
+{
+	if (mon->mtrapped)
+		--mon->mtrapped;
 }
 
 #endif /* OVLB */

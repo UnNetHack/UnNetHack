@@ -774,6 +774,9 @@ boolean hitsroof;
 		    !uarmh && !Stone_resistance &&
 		    !(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM)))
 		goto petrify;
+	case FREEZING_ICE:
+		maybe_freeze_u((int*) 0);
+		break;
 	case CREAM_PIE:
 	case BLINDING_VENOM:
 		pline("You've got it all over your %s!", body_part(FACE));
@@ -1419,7 +1422,8 @@ register struct obj   *obj;
 	    }
 
 	} else if ((otyp == EGG || otyp == CREAM_PIE ||
-        otyp == BLINDING_VENOM || otyp == ACID_VENOM) &&
+		    otyp == BLINDING_VENOM || otyp == ACID_VENOM ||
+		    otyp == FREEZING_ICE) &&
 		(guaranteed_hit || ACURR(A_DEX) > rnd(25))) {
 	    (void) hmon(mon, obj, 1);
 	    return 1;	/* hmon used it up */
@@ -1742,6 +1746,7 @@ struct obj *obj;
 		case MELON:
 		case ACID_VENOM:
 		case BLINDING_VENOM:
+		case FREEZING_ICE:
 			return 1;
 		default:
 			return 0;
@@ -1785,6 +1790,7 @@ boolean in_view;
 			if (in_view) pline("What a mess!");
 			break;
 		case ACID_VENOM:
+		case FREEZING_ICE:
 		case BLINDING_VENOM:
 			pline("Splash!");
 			break;

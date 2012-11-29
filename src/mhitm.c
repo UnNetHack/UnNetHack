@@ -1301,13 +1301,7 @@ mdamagem(magr, mdef, mattk)
 		break;
 	    case AD_FREZ:
 		if (cancelled) break;
-		if (!flaming(mdef->data &&
-		    !is_whirly(mdef->data) &&
-		    !amorphous(mdef->data))) {
-		    mdef->mtrapped = 1;
-		    if (vis) 
-			pline("%s is held in place by ice!", Monnam(mdef));
-		} else tmp = 0;
+		maybe_freeze_m(mdef, vis, &tmp);
 		break;
 	    case AD_STCK:
 		if (cancelled) tmp = 0;
@@ -1702,6 +1696,21 @@ int aatyp;
 }
 
 #endif /* OVLB */
+
+void
+maybe_freeze_m(mdef, vis, pdmg)
+struct monst* mdef;
+int vis;
+int* pdmg;
+{
+	if (!flaming(mdef->data &&
+	    !is_whirly(mdef->data) &&
+	    !amorphous(mdef->data))) {
+	    mdef->mtrapped = rn1(16, 2);
+	    if (vis) 
+		pline("%s is held in place by ice!", Monnam(mdef));
+	} else { if (pdmg) (*pdmg) = 0;}
+}
 
 /*mhitm.c*/
 

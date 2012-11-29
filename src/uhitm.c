@@ -939,6 +939,14 @@ int thrown;
 			get_dmg_bonus = FALSE;
 			tmp = 0;
 			break;
+		    case FREEZING_ICE:
+			Your("ice hits %s!", mon_nam(mon));
+			maybe_freeze_m(mon, FALSE, &tmp);
+			if (thrown) obfree(obj, (struct obj *) 0);
+			else useup(obj);
+			hittxt = TRUE;
+			get_dmg_bonus = FALSE;
+			break;
 		    case ACID_VENOM: /* thrown (or spit) */
 			if (resists_acid(mon)) {
 				Your("venom hits %s harmlessly.",

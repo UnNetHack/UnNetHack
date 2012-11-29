@@ -225,6 +225,7 @@ struct monst *mon;
 		case HALBERD:
 		case SPETUM:		tmp += rnd(6); break;
 
+		case FREEZING_ICE:
 		case BATTLE_AXE:
 		case BARDICHE:
 		case TRIDENT:		tmp += d(2,4); break;

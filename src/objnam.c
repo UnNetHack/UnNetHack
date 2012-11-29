@@ -1790,7 +1790,7 @@ STATIC_OVL NEARDATA const struct o_range o_ranges[] = {
 			ARMOR_CLASS,  GRAY_DRAGON_SCALE_MAIL, YELLOW_DRAGON_SCALE_MAIL },
 	{ "sword",	WEAPON_CLASS, SHORT_SWORD,    KATANA },
 #ifdef WIZARD
-	{ "venom",	VENOM_CLASS,  BLINDING_VENOM, ACID_VENOM },
+	{ "venom",	VENOM_CLASS,  BLINDING_VENOM, FREEZING_ICE },
 #endif
 	{ "gray stone",	GEM_CLASS,    LUCKSTONE,      FLINT },
 	{ "grey stone",	GEM_CLASS,    LUCKSTONE,      FLINT },
