@@ -2582,6 +2582,7 @@ register struct monst *mon;
 	if (!tele_restrict(mon)) (void) rloc(mon, FALSE);
 	return 1;
 }
+#endif /* SEDUCE */
 
 void
 maybe_freeze_u(pdmg)
@@ -2621,6 +2622,7 @@ int* pdmg;
 	}
 }
 
+#ifdef SEDUCE
 STATIC_OVL void
 mayberem(obj, str)
 register struct obj *obj;
