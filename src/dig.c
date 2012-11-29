@@ -199,6 +199,9 @@ dig_check(madeby, verbose, x, y)
 	    if(verbose) pline_The("%s here is too hard to %s.",
 				  surface(x,y), verb);
 	    return(FALSE);
+	} else if (IS_ANY_ICEWALL(levl[x][y].typ)) {
+	    if(verbose) You("cannot %s ice walls.", verb);
+	    return(FALSE);
 	} else if (sobj_at(BOULDER, x, y)) {
 	    if(verbose) There("isn't enough room to %s here.", verb);
 	    return(FALSE);
@@ -1279,7 +1282,9 @@ zap_dig()
 		unblock_point(zx,zy); /* vision */
 		digdepth -= 2;
 	    } else if (maze_dig) {
-		if (IS_WALL(room->typ)) {
+		if (IS_ANY_ICEWALL(room->typ)) {
+		    pline_The("ice glows then fades.");
+		} else if (IS_WALL(room->typ)) {
 		    if (!(room->wall_info & W_NONDIGGABLE)) {
 			if (*in_rooms(zx,zy,SHOPBASE)) {
 			    add_damage(zx, zy, 200L);
@@ -1313,6 +1318,7 @@ zap_dig()
 		}
 	    } else if (IS_ROCK(room->typ)) {
 		if (!may_dig(zx,zy)) break;
+		if (IS_ANY_ICEWALL(room->typ)) break;
 		if (IS_WALL(room->typ) || room->typ == SDOOR) {
 		    if (*in_rooms(zx,zy,SHOPBASE)) {
 			add_damage(zx, zy, 200L);

@@ -10,7 +10,10 @@ Sheol - The icy cold netherworld.
 
         - Ice walls and crystal ice walls
                 They act like normal walls but can be melted with a wand
-                of fire. Crystal ice walls can't be dug.
+                of fire. Crystal ice walls are immune to everything except
+                fire and crystal picks. Ice walls can be shattered with
+                a mattock or a pick-axe but wands of digging don't work
+                on them.
 
         - Ice traps
                 Like fire traps but ice you instead.
