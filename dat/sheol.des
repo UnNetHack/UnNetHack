@@ -43,36 +43,34 @@ TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 
-# Middle level, always 5th of Sheol
+# Middle level
 MAZE: "sheolmid", ' '
 FLAGS: sheol,hardfloor,noteleport
 INIT_MAP:'.', ' ', false, false, lit, true
 
 GEOMETRY:left,center
 MAP
-WWWWWWWWIWWWWWWWWWW......
-WWUWWWWWIWWWWWWWWWWWWW...
-WWWWWWWUIWWWWWWWWUIWWWW..
-WWWWWWWWWWWWWWWUWWIIWWWW.
-............WWWWWWWWWIWW.
-.............WWWWWWWWUIW.
-..--------....WWWWWWWWWWW
-..|......|....WWWWWWWWWWW
-..|......+....WWWWWWWWWWW
-..|......|....WWWWWWWWIWW
-..--------....WWWWWWWWWWW
-.............WWWWUIWIWWW.
-............WWWWWWIIWWWW.
-WWWWWWWWWWWWWWWWWWWWWWWW.
-WWWWUWWIWWWWWWWWWWWUWWW..
-WWWWWWWWWWWWWUIWWIIWWW...
-WWWWWWWWWIWWIIWWWUW......
+YPPPPPPPIPPPPPPPPPP......
+YPUPPPPPIPPPPPPPPPPPPP...
+YPPPPPPUIPPPPPPPPUIPPPP..
+YPPPPPPPPPPPPPPUPPIIPPPP.
+Y...........PPPPPPPPPIPP.
+Y............PPPPPPPPUIP.
+Y.--------....PPPPPPPPPPP
+Y.|......|....PPPPPPPPPPP
+Y.|......+....PPPPPPPPPPP
+Y.|......|....PPPPPPPPIPP
+Y.--------....PPPPPPPPPPP
+Y............PPPPUIPIPPP.
+Y...........PPPPPPIIPPPP.
+YPPPPPPPPPPPPPPPPPPPPPPP.
+YPPPUPPIPPPPPPPPPPPUPPP..
+YPPPPPPPPPPPPUIPPIIPPP...
+YPPPPPPPPIPPIIPPPUP......
 ENDMAP
-
 
 RANDOM_MONSTERS: 'X','T','L',''','N','x','@','V'
 
-REGION: (0,0,24,16),unlit,"ordinary"
 STAIR: (4,8),down
 STAIR: levregion(65, 0, 79, 20), levregion(16, 0, 64, 20), up
 
@@ -103,6 +101,10 @@ MONSTER: monster[7], random, (1, 7)
 MONSTER: monster[7], random, (1, 9)
 
 NOMAP
+
+# Make the island area lit
+REGION:(00,00,30,19),lit,"ordinary"
+
 OBJECT:'*',random,random
 OBJECT:'!',random,random
 OBJECT:'"',random,random
