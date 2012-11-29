@@ -10,6 +10,11 @@ NOMAP
 STAIR: levregion(1, 0, 15, 20), levregion(16, 0, 64, 20), up
 STAIR: levregion(65, 0, 79, 20), levregion(16, 0, 64, 20), down
 
+MONSTER: ''', "crystal golem", random
+MONSTER: ''', "crystal golem", random
+MONSTER: ''', "crystal golem", random
+MONSTER: ''', "crystal golem", random
+
 # Middle level, always 5th of Sheol
 MAZE: "sheolmid", ' '
 FLAGS: sheol,hardfloor,noteleport
