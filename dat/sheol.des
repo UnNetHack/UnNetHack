@@ -1,7 +1,7 @@
 
 # The fill level for Sheol
 LEVEL: "sheolfil"
-FLAGS: sheol,hardfloor,noteleport
+FLAGS: sheol,hardfloor,noteleport,noflip
 INIT_MAP: sheollev
 NOMAP
 
@@ -45,7 +45,7 @@ TRAP: random, random
 
 # Middle level
 LEVEL: "sheolmid"
-FLAGS: sheol,hardfloor,noteleport
+FLAGS: sheol,hardfloor,noteleport,noflip
 INIT_MAP: sheollev
 
 GEOMETRY:left,center
@@ -150,7 +150,7 @@ MONSTER: random, random
 
 # The second-to-end level
 LEVEL: "palace_f"
-FLAGS: sheol,noteleport,hardfloor
+FLAGS: sheol,noteleport,hardfloor,noflip
 GEOMETRY:center,center
 MAP
       |..................-----------   -----------...........|              
@@ -297,7 +297,7 @@ OBJECT:'/',random
 
 # Bottom level of Sheol
 LEVEL: "palace_e"
-FLAGS: sheol,noteleport,hardfloor
+FLAGS: sheol,noteleport,hardfloor,noflip
 GEOMETRY:center,center
 MAP
                                                                             
