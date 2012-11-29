@@ -42,7 +42,7 @@ static schar typs[10] = { ICEWALL,
 static schar opentyps[10] = { ICEWALL, 
 			  CRYSTALICEWALL, CRYSTALICEWALL, STONE,
 			  POOL, POOL,
-			  ROOM, ROOM, ROOM, ROOM };
+			  ROOM, ICE, ICE, ROOM };
 
 static void init_level_base_voronoi(schar* vtyps, int numtyps, int numpoints);
 static int check_voronoi_winner(patchcoord* coords, int num_coords,
@@ -105,7 +105,8 @@ mksheol(init_lev)
 			if (testval < probs[i1+i2*COLNO].prob ||
 			    probs[i1+i2*COLNO].guaranteed)
 			{
-				if (levl[i1][i2].typ == ICEWALL)
+				if (levl[i1][i2].typ == ICEWALL ||
+				    levl[i1][i2].typ == CRYSTALICEWALL)
 					levl[i1][i2].typ = ICE;
 				else if (levl[i1][i2].typ != POOL)
 					levl[i1][i2].typ = ROOM;
