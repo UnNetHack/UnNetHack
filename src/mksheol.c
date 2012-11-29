@@ -34,21 +34,21 @@ typedef struct sfloorprob
 } floorprob;
 
 /* These are chances which type to use for each tile in a voronoi diagram. */
-static schar typs[10] = { ICEWALL, 
+static schar typs[10] = { ICEWALL,
 			  CRYSTALICEWALL, CRYSTALICEWALL, CRYSTALICEWALL,
 			  POOL, POOL,
 			  STONE, STONE, STONE, STONE };
 
-static schar opentyps[10] = { ICEWALL, 
+static schar opentyps[10] = { ICEWALL,
 			  CRYSTALICEWALL, CRYSTALICEWALL, STONE,
 			  POOL, POOL,
 			  ROOM, ICE, ICE, ROOM };
 
 static void init_level_base_voronoi(schar* vtyps, int numtyps, int numpoints);
 static int check_voronoi_winner(patchcoord* coords, int num_coords,
-								int x, int y);
+				int x, int y);
 static void carve_path(floorprob* probs);
-static void fuzzy_circle(int x, int y, 
+static void fuzzy_circle(int x, int y,
 			 int guaranteed_passage_radius, int fallout,
 			 floorprob* floorprobs);
 static void wallify_map(void);
@@ -121,7 +121,7 @@ mksheol(init_lev)
 	
 	/* Sometimes, put a lot of clouds somewhere on the level. */
 	if (!rn2(5))
-	    place_clouds();
+		place_clouds();
 
 	/* The middle level? Place perform a hack where the left and right
 	 * 3 columns are walls (if not already). The reason is to disallow
