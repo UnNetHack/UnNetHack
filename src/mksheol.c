@@ -123,10 +123,10 @@ mksheol(init_lev)
 	if (verify_stairs_place() == STAT_REJECT)
 		goto again;
 
+	finalize_map();
+
 	if (plug_unreachable_places() == STAT_REJECT)
 		goto again;
-
-	finalize_map();
 
 	free(probs);
 }
@@ -501,11 +501,15 @@ under_middle(void) {
 static void 
 mkopensheol(void) {
 	/*  This one's simple. */
+again:
 	do {
 		init_level_base_voronoi(opentyps, 10, 300);
 	} while(verify_stairs_place() != STAT_STAIRSOK);
 
 	finalize_map();
+
+	if (plug_unreachable_places() == STAT_REJECT)
+		goto again;
 }
 
 static void
