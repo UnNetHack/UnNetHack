@@ -96,6 +96,28 @@ mksheol(init_lev)
 			else if (levl[i1][i2].typ == POOL)
 				levl[i1][i2].typ = ICEWALL;
 		}
+	
+	/* Make sure there is ROOM somewhere in both sides of the level */
+	for (i1 = 1; i1 <= 15; ++i1) {
+		for (i2 = 0; i2 < ROWNO; ++i2)
+			if (levl[i1][i2].typ == ROOM)
+				break;
+		if (i2 < ROWNO)
+			break;
+	}
+	if (i1 > 15)
+		goto again;
+
+	for (i1 = 65; i1 < COLNO; ++i1) {
+		for (i2 = 0; i2 < ROWNO; ++i2)
+			if (levl[i1][i2].typ == ROOM)
+				break;
+		if (i2 < ROWNO)
+			break;
+	}
+	if (i1 >= COLNO)
+		goto again;
+	
 
 	if (plug_unreachable_places() == STAT_REJECT)
 		goto again;
