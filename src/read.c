@@ -2057,7 +2057,7 @@ register struct obj	*sobj;
 	You("are being punished for your misbehavior!");
 	if(Punished){
 		Your("iron ball gets heavier.");
-		uball->owt += 160 * (1 + sobj->cursed);
+		uball->owt += 160 * (1 + (sobj ? sobj->cursed : 0));
 		return;
 	}
 	if (amorphous(youmonst.data) || is_whirly(youmonst.data) || unsolid(youmonst.data)) {
