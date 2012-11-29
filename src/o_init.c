@@ -191,7 +191,8 @@ shuffle_all()
 				oclass != TOOL_CLASS &&
 				oclass != WEAPON_CLASS &&
 				oclass != ARMOR_CLASS &&
-				oclass != GEM_CLASS) {
+				oclass != GEM_CLASS &&
+				oclass != VENOM_CLASS) {
 			int j = last-1;
 
 			if (oclass == POTION_CLASS)
