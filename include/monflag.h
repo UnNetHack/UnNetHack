@@ -182,6 +182,7 @@
 
 
 /* for mons[].geno (constant during game) */
+#define G_SHEOL  	0x2000		/* can be generated in sheol */
 #define G_UNIQ		0x1000		/* generated only once */
 #define G_NOHELL	0x0800		/* not generated in "hell" */
 #define G_HELL		0x0400		/* generated only in "hell" */

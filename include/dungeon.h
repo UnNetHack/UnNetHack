@@ -138,6 +138,7 @@ typedef struct branch {
 
 #define In_sokoban(x)		((x)->dnum == sokoban_dnum)
 #define Inhell			In_hell(&u.uz)	/* now gehennom */
+#define Insheol  		In_sheol(&u.uz)	/* now sheol */
 #define In_endgame(x)		((x)->dnum == astral_level.dnum)
 
 #define within_bounded_area(X,Y,LX,LY,HX,HY) \
