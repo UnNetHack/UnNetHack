@@ -175,6 +175,8 @@ ENDMAP
 STAIR: (37,18),up
 STAIR: (7,2,60,7), (10,2,56,7),down
 
+TELEPORT_REGION:(00,14,63,18),(0,0,0,0)
+
 # Golems in loot rooms
 MONSTER: ''', "crystal ice golem", (34,2)
 MONSTER: ''', "crystal ice golem", (40,2)
