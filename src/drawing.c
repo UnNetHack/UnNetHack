@@ -260,9 +260,9 @@ struct symdef defsyms[MAXPCHARS] = {
 	{'^', "bear trap",	C(HI_METAL)},	/* trap */
 	{'^', "land mine",	C(CLR_RED)},	/* trap */
 	{'^', "rolling boulder trap",	C(CLR_GRAY)},	/* trap */
-	{'^', "sleeping gas trap",C(HI_ZAP)},	/* trap */
+/*50*/	{'^', "sleeping gas trap",C(HI_ZAP)},	/* trap */
 	{'^', "rust trap",	C(CLR_BLUE)},	/* trap */
-/*50*/	{'^', "fire trap",	C(CLR_ORANGE)},	/* trap */
+	{'^', "fire trap",	C(CLR_ORANGE)},	/* trap */
 	{'^', "pit",		C(CLR_BLACK)},	/* trap */
 	{'^', "spiked pit",	C(CLR_BLACK)},	/* trap */
 	{'^', "hole",	C(CLR_BROWN)},	/* trap */
@@ -270,9 +270,9 @@ struct symdef defsyms[MAXPCHARS] = {
 	{'^', "teleportation trap", C(CLR_MAGENTA)},	/* trap */
 	{'^', "level teleporter", C(CLR_MAGENTA)},	/* trap */
 	{'^', "magic portal",	C(CLR_BRIGHT_MAGENTA)},	/* trap */
-	{'"', "web",		C(CLR_GRAY)},	/* web */
+/*60*/	{'"', "web",		C(CLR_GRAY)},	/* web */
 	{'^', "statue trap",	C(CLR_GRAY)},	/* trap */
-/*60*/	{'^', "magic trap",	C(HI_ZAP)},	/* trap */
+	{'^', "magic trap",	C(HI_ZAP)},	/* trap */
 	{'^', "anti-magic field", C(HI_ZAP)},	/* trap */
 	{'^', "polymorph trap",	C(CLR_BRIGHT_GREEN)},	/* trap */
 	{'|', "wall",		C(CLR_GRAY)},	/* vbeam */
@@ -280,9 +280,9 @@ struct symdef defsyms[MAXPCHARS] = {
 	{'\\',"wall",		C(CLR_GRAY)},	/* lslant */
 	{'/', "wall",		C(CLR_GRAY)},	/* rslant */
 	{'*', "",		C(CLR_WHITE)},	/* dig beam */
-	{'!', "",		C(CLR_WHITE)},	/* camera flash beam */
+/*70*/	{'!', "",		C(CLR_WHITE)},	/* camera flash beam */
 	{')', "",		C(HI_WOOD)},	/* boomerang open left */
-/*70*/	{'(', "",		C(HI_WOOD)},	/* boomerang open right */
+	{'(', "",		C(HI_WOOD)},	/* boomerang open right */
 	{'0', "",		C(HI_ZAP)},	/* 4 magic shield symbols */
 	{'#', "",		C(HI_ZAP)},
 	{'@', "",		C(HI_ZAP)},
@@ -290,9 +290,9 @@ struct symdef defsyms[MAXPCHARS] = {
 	{'/', "",		C(CLR_GREEN)},	/* swallow top left	*/
 	{'-', "",		C(CLR_GREEN)},	/* swallow top center	*/
 	{'\\', "",		C(CLR_GREEN)},	/* swallow top right	*/
-	{'|', "",		C(CLR_GREEN)},	/* swallow middle left	*/
+/*80*/	{'|', "",		C(CLR_GREEN)},	/* swallow middle left	*/
 	{'|', "",		C(CLR_GREEN)},	/* swallow middle right	*/
-/*80*/	{'\\', "",		C(CLR_GREEN)},	/* swallow bottom left	*/
+	{'\\', "",		C(CLR_GREEN)},	/* swallow bottom left	*/
 	{'-', "",		C(CLR_GREEN)},	/* swallow bottom center*/
 	{'/', "",		C(CLR_GREEN)},	/* swallow bottom right	*/
 	{'/', "",		C(CLR_ORANGE)},	/* explosion top left     */
@@ -300,9 +300,9 @@ struct symdef defsyms[MAXPCHARS] = {
 	{'\\', "",		C(CLR_ORANGE)},	/* explosion top right    */
 	{'|', "",		C(CLR_ORANGE)},	/* explosion middle left  */
 	{' ', "",		C(CLR_ORANGE)},	/* explosion middle center*/
-	{'|', "",		C(CLR_ORANGE)},	/* explosion middle right */
+/*90*/	{'|', "",		C(CLR_ORANGE)},	/* explosion middle right */
 	{'\\', "",		C(CLR_ORANGE)},	/* explosion bottom left  */
-/*90*/	{'-', "",		C(CLR_ORANGE)},	/* explosion bottom center*/
+	{'-', "",		C(CLR_ORANGE)},	/* explosion bottom center*/
 	{'/', "",		C(CLR_ORANGE)},	/* explosion bottom right */
 /*
  *  Note: Additions to this array should be reflected in the
@@ -376,9 +376,9 @@ static glyph_t ibm_graphics[MAXPCHARS] = {
 	g_FILLER(S_bear_trap),
 	g_FILLER(S_land_mine),
 	g_FILLER(S_rolling_boulder_trap),
-	g_FILLER(S_sleeping_gas_trap),
+/*50*/	g_FILLER(S_sleeping_gas_trap),
 	g_FILLER(S_rust_trap),
-/*50*/	g_FILLER(S_fire_trap),
+	g_FILLER(S_fire_trap),
 	g_FILLER(S_pit),
 	g_FILLER(S_spiked_pit),
 	g_FILLER(S_hole),
@@ -386,9 +386,9 @@ static glyph_t ibm_graphics[MAXPCHARS] = {
 	g_FILLER(S_teleportation_trap),
 	g_FILLER(S_level_teleporter),
 	g_FILLER(S_magic_portal),
-	g_FILLER(S_web),
+/*60*/	g_FILLER(S_web),
 	g_FILLER(S_statue_trap),
-/*60*/	g_FILLER(S_magic_trap),
+	g_FILLER(S_magic_trap),
 	g_FILLER(S_anti_magic_trap),
 	g_FILLER(S_polymorph_trap),
 	0xb3,	/* S_vbeam:	meta-3, vertical rule */
@@ -396,9 +396,9 @@ static glyph_t ibm_graphics[MAXPCHARS] = {
 	g_FILLER(S_lslant),
 	g_FILLER(S_rslant),
 	g_FILLER(S_digbeam),
-	g_FILLER(S_flashbeam),
+/*70*/	g_FILLER(S_flashbeam),
 	g_FILLER(S_boomleft),
-/*70*/	g_FILLER(S_boomright),
+	g_FILLER(S_boomright),
 	g_FILLER(S_ss1),
 	g_FILLER(S_ss2),
 	g_FILLER(S_ss3),
@@ -406,9 +406,9 @@ static glyph_t ibm_graphics[MAXPCHARS] = {
 	g_FILLER(S_sw_tl),
 	g_FILLER(S_sw_tc),
 	g_FILLER(S_sw_tr),
-	0xb3,	/* S_sw_ml:	meta-3, vertical rule */
+/*80*/	0xb3,	/* S_sw_ml:	meta-3, vertical rule */
 	0xb3,	/* S_sw_mr:	meta-3, vertical rule */
-/*80*/	g_FILLER(S_sw_bl),
+	g_FILLER(S_sw_bl),
 	g_FILLER(S_sw_bc),
 	g_FILLER(S_sw_br),
 	g_FILLER(S_explode1),
@@ -416,9 +416,9 @@ static glyph_t ibm_graphics[MAXPCHARS] = {
 	g_FILLER(S_explode3),
 	0xb3,	/* S_explode4:	meta-3, vertical rule */
 	g_FILLER(S_explode5),
-	0xb3,	/* S_explode6:	meta-3, vertical rule */
+/*90*/	0xb3,	/* S_explode6:	meta-3, vertical rule */
 	g_FILLER(S_explode7),
-/*90*/	g_FILLER(S_explode8),
+	g_FILLER(S_explode8),
 	g_FILLER(S_explode9)
 };
 #endif  /* ASCIIGRAPH */
@@ -480,9 +480,9 @@ static glyph_t dec_graphics[MAXPCHARS] = {
 	g_FILLER(S_bear_trap),
 	g_FILLER(S_land_mine),
 	g_FILLER(S_rolling_boulder_trap),
-	g_FILLER(S_sleeping_gas_trap),
+/*50*/	g_FILLER(S_sleeping_gas_trap),
 	g_FILLER(S_rust_trap),
-/*50*/	g_FILLER(S_fire_trap),
+	g_FILLER(S_fire_trap),
 	g_FILLER(S_pit),
 	g_FILLER(S_spiked_pit),
 	g_FILLER(S_hole),
@@ -490,9 +490,9 @@ static glyph_t dec_graphics[MAXPCHARS] = {
 	g_FILLER(S_teleportation_trap),
 	g_FILLER(S_level_teleporter),
 	g_FILLER(S_magic_portal),
-	g_FILLER(S_web),	/* 0xbd, \E)3: meta-=, int'l currency */
+/*60*/	g_FILLER(S_web),	/* 0xbd, \E)3: meta-=, int'l currency */
 	g_FILLER(S_statue_trap),
-/*60*/	g_FILLER(S_magic_trap),
+	g_FILLER(S_magic_trap),
 	g_FILLER(S_anti_magic_trap),
 	g_FILLER(S_polymorph_trap),
 	0xf8,	/* S_vbeam:	meta-x, vertical rule */
@@ -500,9 +500,9 @@ static glyph_t dec_graphics[MAXPCHARS] = {
 	g_FILLER(S_lslant),
 	g_FILLER(S_rslant),
 	g_FILLER(S_digbeam),
-	g_FILLER(S_flashbeam),
+/*70*/	g_FILLER(S_flashbeam),
 	g_FILLER(S_boomleft),
-/*70*/	g_FILLER(S_boomright),
+	g_FILLER(S_boomright),
 	g_FILLER(S_ss1),
 	g_FILLER(S_ss2),
 	g_FILLER(S_ss3),
@@ -510,9 +510,9 @@ static glyph_t dec_graphics[MAXPCHARS] = {
 	g_FILLER(S_sw_tl),
 	0xef,	/* S_sw_tc:	meta-o, high horizontal line */
 	g_FILLER(S_sw_tr),
-	0xf8,	/* S_sw_ml:	meta-x, vertical rule */
+/*80*/	0xf8,	/* S_sw_ml:	meta-x, vertical rule */
 	0xf8,	/* S_sw_mr:	meta-x, vertical rule */
-/*80*/	g_FILLER(S_sw_bl),
+	g_FILLER(S_sw_bl),
 	0xf3,	/* S_sw_bc:	meta-s, low horizontal line */
 	g_FILLER(S_sw_br),
 	g_FILLER(S_explode1),
@@ -520,9 +520,9 @@ static glyph_t dec_graphics[MAXPCHARS] = {
 	g_FILLER(S_explode3),
 	0xf8,	/* S_explode4:	meta-x, vertical rule */
 	g_FILLER(S_explode5),
-	0xf8,	/* S_explode6:	meta-x, vertical rule */
+/*90*/	0xf8,	/* S_explode6:	meta-x, vertical rule */
 	g_FILLER(S_explode7),
-/*90*/	0xf3,	/* S_explode8:	meta-s, low horizontal line */
+	0xf3,	/* S_explode8:	meta-s, low horizontal line */
 	g_FILLER(S_explode9)
 };
 #endif  /* TERMLIB */
@@ -582,9 +582,9 @@ static glyph_t mac_graphics[MAXPCHARS] = {
 	g_FILLER(S_bear_trap),
 	g_FILLER(S_land_mine),
 	g_FILLER(S_rolling_boulder_trap),
-	g_FILLER(S_sleeping_gas_trap),
+/*50*/	g_FILLER(S_sleeping_gas_trap),
 	g_FILLER(S_rust_trap),
-/*50*/	g_FILLER(S_fire_trap),
+	g_FILLER(S_fire_trap),
 	g_FILLER(S_pit),
 	g_FILLER(S_spiked_pit),
 	g_FILLER(S_hole),
@@ -592,9 +592,9 @@ static glyph_t mac_graphics[MAXPCHARS] = {
 	g_FILLER(S_teleportation_trap),
 	g_FILLER(S_level_teleporter),
 	g_FILLER(S_magic_portal),
-	g_FILLER(S_web),
+/*60*/	g_FILLER(S_web),
 	g_FILLER(S_statue_trap),
-/*60*/	g_FILLER(S_magic_trap),
+	g_FILLER(S_magic_trap),
 	g_FILLER(S_anti_magic_trap),
 	g_FILLER(S_polymorph_trap),
 	g_FILLER(S_vbeam),
@@ -602,9 +602,9 @@ static glyph_t mac_graphics[MAXPCHARS] = {
 	g_FILLER(S_lslant),
 	g_FILLER(S_rslant),
 	g_FILLER(S_digbeam),
-	g_FILLER(S_flashbeam),
+/*70*/	g_FILLER(S_flashbeam),
 	g_FILLER(S_boomleft),
-/*70*/	g_FILLER(S_boomright),
+	g_FILLER(S_boomright),
 	g_FILLER(S_ss1),
 	g_FILLER(S_ss2),
 	g_FILLER(S_ss3),
@@ -612,9 +612,9 @@ static glyph_t mac_graphics[MAXPCHARS] = {
 	g_FILLER(S_sw_tl),
 	g_FILLER(S_sw_tc),
 	g_FILLER(S_sw_tr),
-	g_FILLER(S_sw_ml),
+/*80*/	g_FILLER(S_sw_ml),
 	g_FILLER(S_sw_mr),
-/*80*/	g_FILLER(S_sw_bl),
+	g_FILLER(S_sw_bl),
 	g_FILLER(S_sw_bc),
 	g_FILLER(S_sw_br),
 	g_FILLER(S_explode1),
@@ -622,9 +622,9 @@ static glyph_t mac_graphics[MAXPCHARS] = {
 	g_FILLER(S_explode3),
 	g_FILLER(S_explode4),
 	g_FILLER(S_explode5),
-	g_FILLER(S_explode6),
+/*90*/	g_FILLER(S_explode6),
 	g_FILLER(S_explode7),
-/*90*/	g_FILLER(S_explode8),
+	g_FILLER(S_explode8),
 	g_FILLER(S_explode9)
 };
 #endif	/* MAC_GRAPHICS_ENV */
