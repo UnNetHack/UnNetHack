@@ -1419,7 +1419,10 @@ boolean at_stairs, falling, portal;
 		display_nhwindow(WIN_MESSAGE, FALSE);
 #endif
 		You_hear("groans and moans everywhere.");
-	    } else pline("It is hot here.  You smell smoke...");
+	    } else if (!In_sheol(&u.uz))
+		pline("It is hot here.  You smell smoke...");
+	    else
+		pline("It is freezing here.  You feel cold wind...");
 
 #ifdef RECORD_ACHIEVE
 	achieve.enter_gehennom = 1;
