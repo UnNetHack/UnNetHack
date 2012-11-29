@@ -251,8 +251,8 @@ struct symdef defsyms[MAXPCHARS] = {
 	{' ', "air",		C(CLR_CYAN)},	/* open air */
 	{'#', "cloud",		C(CLR_GRAY)},	/* [part of] a cloud */
 /*40*/	{'}', "water",		C(CLR_BLUE)},	/* under water */
-	{'#', "ice wall",       C(CLR_BRIGHT_CYAN)}, /* ice wall */
-	{'#', "crystal ice wall",C(CLR_WHITE)}, /* ice wall */
+	{'8', "ice wall",       C(CLR_BRIGHT_CYAN)}, /* ice wall */
+	{'8', "crystal ice wall",C(CLR_WHITE)}, /* ice wall */
 	{'^', "arrow trap",	C(HI_METAL)},	/* trap */
 	{'^', "dart trap",	C(HI_METAL)},	/* trap */
 	{'^', "falling rock trap",C(CLR_GRAY)},	/* trap */
