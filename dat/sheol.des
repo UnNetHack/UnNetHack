@@ -53,6 +53,8 @@ OBJECT:'(',random,random
 OBJECT:'(',random,random
 OBJECT:')',random,random
 
+OBJECT[33%]:'/',"wand of fire",random
+
 TRAP: random, random
 TRAP: random, random
 TRAP: random, random
