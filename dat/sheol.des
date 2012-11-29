@@ -10,15 +10,44 @@ NOMAP
 STAIR: levregion(1, 0, 15, 20), levregion(16, 0, 64, 20), up
 STAIR: levregion(65, 0, 79, 20), levregion(16, 0, 64, 20), down
 
+# Golems and random monsters
 MONSTER: ''', "crystal golem", random
 MONSTER: ''', "crystal golem", random
-MONSTER: ''', "crystal golem", random
-MONSTER: ''', "crystal golem", random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+
+# Some loot
+OBJECT:'*',random,random
+OBJECT:'!',random,random
+OBJECT:'!',random,random
+OBJECT:'!',random,random
+OBJECT:'"',random,random
+OBJECT:'?',random,random
+OBJECT:'?',random,random
+OBJECT:'?',random,random
+OBJECT:'/',random,random
+OBJECT:'=',random,random
+OBJECT:'=',random,random
+OBJECT:'+',random,random
+OBJECT:'+',random,random
+OBJECT:'(',random,random
+OBJECT:'(',random,random
+OBJECT:'(',random,random
+OBJECT:')',random,random
 
 # Middle level, always 5th of Sheol
 MAZE: "sheolmid", ' '
 FLAGS: sheol,hardfloor,noteleport
 INIT_MAP:'.', ' ', false, false, lit, true
+
 GEOMETRY:left,center
 MAP
 WWWWWWWWIWWWWWWWWWW......
@@ -40,20 +69,68 @@ WWWWWWWWWWWWWUIWWIIWWW...
 WWWWWWWWWIWWIIWWWUW......
 ENDMAP
 
-REGION: (0,0,24,16),lit,"ordinary"
+
+RANDOM_MONSTERS: 'X','T','L',''','N','x','@','V'
+
+REGION: (0,0,24,16),unlit,"ordinary"
 STAIR: (4,8),down
 STAIR: levregion(65, 0, 79, 20), levregion(16, 0, 64, 20), up
 
-# This realm of the dead is in the earth ("erẓitu" = ; comp. 
-# Job, x. 21, 22), the gateway being in the west. It is the 
-# "land without return." It is a dark place filled with dust (see 
-# Sheol, Biblical Data); but it contains a palace for the divine ruler 
-# of this shadow-realm (comp. Job xviii. 13, 14). Seven gates guard 
-# successively the approach to this land, at the first of which is a 
-# watchman. A stream of water flows through Sheol (comp. Enoch, 
-# xvii. 6, xxii. 9; Luke xvi. 24; Ps. xviii. 5; II Sam. xxii. 5).
+DOOR:locked,(9,8)
 
-# (that was from http://www.jewishencyclopedia.com/articles/13563-sheol)
+# Wands of fire
+OBJECT:'/',"fire",random
+OBJECT:'/',"fire",random
+
+MONSTER: monster[0], random, (3, 7)
+MONSTER: monster[0], random, (3, 9)
+MONSTER: monster[1], random, (4, 7)
+MONSTER: monster[1], random, (4, 9)
+MONSTER: monster[2], random, (5, 7)
+MONSTER: monster[2], random, (5, 9)
+MONSTER: monster[3], random, (6, 7)
+MONSTER: monster[3], random, (6, 9)
+MONSTER: monster[4], random, (7, 7)
+MONSTER: monster[4], random, (7, 9)
+MONSTER: monster[5], random, (8, 7)
+MONSTER: monster[5], random, (8, 9)
+MONSTER: monster[6], random, (10, 7)
+MONSTER: monster[6], random, (10, 9)
+MONSTER: monster[7], random, (1, 7)
+MONSTER: monster[7], random, (1, 9)
+
+NOMAP
+OBJECT:'*',random,random
+OBJECT:'!',random,random
+OBJECT:'!',random,random
+OBJECT:'!',random,random
+OBJECT:'"',random,random
+OBJECT:'?',random,random
+OBJECT:'?',random,random
+OBJECT:'?',random,random
+OBJECT:'/',random,random
+OBJECT:'=',random,random
+OBJECT:'=',random,random
+OBJECT:'+',random,random
+OBJECT:'+',random,random
+OBJECT:'(',random,random
+OBJECT:'(',random,random
+OBJECT:'(',random,random
+OBJECT:')',random,random
+OBJECT:')',random,random
+OBJECT:')',random,random
+
+# From http://www.jewishencyclopedia.com/articles/13563-sheol):
+#
+#   "This realm of the dead is in the earth ("erẓitu" = ; comp. 
+#   Job, x. 21, 22), the gateway being in the west. It is the 
+#   "land without return." It is a dark place filled with dust (see 
+#   Sheol, Biblical Data); but it contains a palace for the divine ruler 
+#   of this shadow-realm (comp. Job xviii. 13, 14). Seven gates guard 
+#   successively the approach to this land, at the first of which is a 
+#   watchman. A stream of water flows through Sheol (comp. Enoch, 
+#   xvii. 6, xxii. 9; Luke xvi. 24; Ps. xviii. 5; II Sam. xxii. 5)."
+
 # So supposedly there should be a palace of some kind we'll have it be two
 # levels.
 
@@ -86,6 +163,43 @@ ENDMAP
 
 STAIR: (37,18),up
 STAIR: (7,2,60,7), (10,2,56,7),down
+
+# Golems in loot rooms
+MONSTER: ''', "crystal golem", (34,2)
+MONSTER: ''', "crystal golem", (40,2)
+
+# Blinkers in wings
+MONSTER: 'x', "blinker", (16, 4)
+MONSTER: 'x', "blinker", (17, 4)
+MONSTER: 'x', "blinker", (16, 5)
+MONSTER: 'x', "blinker", (17, 5)
+
+MONSTER: 'x', "blinker", (58, 4)
+MONSTER: 'x', "blinker", (57, 4)
+MONSTER: 'x', "blinker", (58, 5)
+MONSTER: 'x', "blinker", (57, 5)
+
+# Lots of defenders around the level
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
+MONSTER: random, random, random
 
 # Non diggable walls, like duh
 NON_DIGGABLE:(00,00,75,19)
@@ -150,6 +264,17 @@ OBJECT:')',"halberd",(46,2)
 OBJECT:'(',"pick-axe",(47,1)
 OBJECT:'=',"regeneration",(47,2)
 
+# Other random loot
+OBJECT:'+',random,random
+OBJECT:'+',random,random
+OBJECT:'+',random,random
+OBJECT:'+',random,random
+OBJECT:'=',random,random
+OBJECT:'=',random,random
+OBJECT:'=',random,random
+OBJECT:'/',random,random
+OBJECT:'/',random,random
+OBJECT:'/',random,random
 
 
 # Bottom level of Sheol
