@@ -495,7 +495,7 @@ plug_unreachable_places(void)
 /* Return 1 if below the middle Sheol level. */
 static int 
 under_middle(void) {
-	return u.uz.dlevel > 5;
+	return u.uz.dlevel > 2;
 }
 
 static void 
