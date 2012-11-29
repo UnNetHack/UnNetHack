@@ -366,8 +366,8 @@ static glyph_t ibm_graphics[MAXPCHARS] = {
 	g_FILLER(S_hcdbridge),
 	g_FILLER(S_air),
 	g_FILLER(S_cloud),
-	g_FILLER(S_icewall),
-	g_FILLER(S_crystalicewall),
+	0xb2,   /* S_icewall:	solid block */
+	0xb2,   /* S_crystalicewall:	solid block */
 /*40*/	0xf7,	/* S_water:	meta-w, approx. equals */
 	g_FILLER(S_arrow_trap),
 	g_FILLER(S_dart_trap),
@@ -470,8 +470,8 @@ static glyph_t dec_graphics[MAXPCHARS] = {
 	g_FILLER(S_hcdbridge),
 	g_FILLER(S_air),
 	g_FILLER(S_cloud),
-	g_FILLER(S_icewall),
-	g_FILLER(S_crystalicewall),
+	0xe1,	/* S_icewall,		solid block */
+	0xe1,	/* S_crystalicewall,	solid block */
 /*40*/	0xe0,	/* S_water:	meta-\, diamond */
 	g_FILLER(S_arrow_trap),
 	g_FILLER(S_dart_trap),
