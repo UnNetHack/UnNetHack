@@ -251,7 +251,7 @@ dig()
 		pline("This ice wall is too hard to shatter.");
 		return(0);
 	    }
-	    if (IS_CRYSTALICEWALL(lev->typ)) {
+	    if (IS_CRYSTALICEWALL(lev->typ) && !is_crystal_pick(uwep)) {
 		pline("This crystal ice is too hard to dig away.");
 		return(0);
 	    }
@@ -295,6 +295,9 @@ dig()
 	    digging.effort *= 2;
 	/* ice is easier to dig than rock */
 	if (IS_ICEWALL(lev->typ))
+	    digging.effort *= 2;
+	/* and crystal picks are awesome digging tools */
+	if (is_crystal_pick(uwep))
 	    digging.effort *= 2;
 
 	if (digging.down) {
@@ -347,6 +350,9 @@ dig()
 			    place_object(bobj, dpx, dpy);
 			}
 			digtxt = "The boulder falls apart.";
+		} else if (lev->typ == CRYSTALICEWALL) {
+		    digtxt = "You shatter the crystal ice wall.";
+		    lev->typ = ICE;
 		} else if (lev->typ == ICEWALL) {
 		    digtxt = "You shatter the ice wall.";
 		    lev->typ = ICE;

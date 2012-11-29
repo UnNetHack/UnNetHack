@@ -147,6 +147,7 @@ struct obj {
 #define is_pick(otmp)	((otmp->oclass == WEAPON_CLASS || \
 			 otmp->oclass == TOOL_CLASS) && \
 			 objects[otmp->otyp].oc_skill == P_PICK_AXE)
+#define is_crystal_pick(otmp) ((otmp)->otyp == CRYSTAL_PICK)
 #define is_sword(otmp)	(otmp->oclass == WEAPON_CLASS && \
 			 objects[otmp->otyp].oc_skill >= P_SHORT_SWORD && \
 			 objects[otmp->otyp].oc_skill <= P_SABER)

@@ -210,6 +210,9 @@ WEAPON("voulge", "pole cleaver",
 WEAPON("dwarvish mattock", "broad pick",
 	0, 0, 1, 13,120, 50, 12,  8,-1, B,   P_PICK_AXE, IRON, HI_METAL),
 
+WEAPON("crystal pick", (char *)0,
+	0, 0, 1, 0, 80, 500, 16,  12,0, B,   P_PICK_AXE, METAL, HI_METAL),
+
 /* curved/hooked */
 WEAPON("fauchard", "pole sickle",
 	0, 0, 1,  6, 60,  5,  6,  8, 0, P|S, P_POLEARMS, IRON, HI_METAL),
