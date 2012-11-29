@@ -343,7 +343,7 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
 
 		if (effective_adtyp == AD_SPEL)
 		    cast_wizard_spell(mtmp, dmg, snum);
-		else if (effective_adtyp == AD_PUNI)
+		else if (effective_adtyp == AD_CLRC)
 		    cast_cleric_spell(mtmp, dmg, snum);
 		else
 		    cast_punisher_spell(mtmp, dmg, snum);
