@@ -2587,7 +2587,9 @@ void
 maybe_freeze_u(pdmg)
 int* pdmg;
 {
-	if (flaming(youmonst.data) ||
+	if (Levitation || Flying) {
+	    if (pdmg) (*pdmg) = 0;
+	} else if (flaming(youmonst.data) ||
 	    flaming(u.usteed)) {
 	    pline_The("ice melts away!");
 	    if (pdmg) (*pdmg) = 0;
