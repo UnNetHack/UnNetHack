@@ -630,7 +630,7 @@ hurtle(dx, dy, range, verbose)
 	return;
     } else if (u.ufeetfrozen) {
 	You("are anchored by the ice.");
-	nomul(0);
+	nomul(0, 0);
 	return;
     }
 

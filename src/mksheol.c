@@ -74,9 +74,14 @@ static void shake_position(int* x, int* y);
 static void left_right_3walls(void);
 
 void
-mksheol(init_lev)
-	lev_init *init_lev;
+mksheol(init_lev_par)
+	void *init_lev_par;
 {
+	lev_init* init_lev = (lev_init*) init_lev_par;
+
+	/* init_lev isn't actually used... */
+	((void) init_lev);
+
 	int i1, i2;
 	int testval;
 	floorprob* probs;
@@ -144,8 +149,8 @@ mksheol(init_lev)
 static void 
 init_level_base_voronoi(schar* vtyps, int numtyps, int numpoints)
 {
-	int patches, i1, i2, i3;
-	int winner_patch, winner_distance, tmpdist;
+	int patches, i1, i2;
+	int winner_patch;
 	patchcoord* points;
 
 	/* We use a voronoi diagram to put ice and solid ground on the level.
@@ -185,8 +190,7 @@ check_voronoi_winner(coords, num_coords, x, y)
 	int x, y;
 {
 	int i1;
-	int winner_distance;
-	int winner;
+	int winner = 0, winner_distance;
 	int d;
 
 	winner_distance = 10000;
@@ -328,9 +332,7 @@ fuzzy_circle(x, y, guaranteed_passage_radius, fallout, floorprobs)
 {
 	int i1, i2;
 	int fallout_2 = fallout * fallout;
-	int guaranteed_2 = guaranteed_passage_radius * 
-			   guaranteed_passage_radius;
-	int prob, d;
+	int d;
 
 	if (fallout < guaranteed_passage_radius)
 		fallout = guaranteed_passage_radius;

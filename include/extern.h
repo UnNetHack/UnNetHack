@@ -1228,6 +1228,10 @@ E void FDECL(save_rooms, (int));
 E void FDECL(rest_rooms, (int));
 E struct mkroom *FDECL(search_special, (SCHAR_P));
 
+/* #### mksheol.c ### */
+
+E void FDECL(mksheol, (void*));
+
 /* ### mon.c ### */
 
 E void FDECL(remove_monster, (int, int));

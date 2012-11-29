@@ -123,7 +123,7 @@ INIT_MAP	return LEV_INIT_ID;
 mazegrid	return MAZE_GRID_ID;
 solidfill	return SOLID_FILL_ID;
 mines		return MINES_ID;
-sheol		return SHEOL_ID;
+sheollev	return SHEOL_ID;
 FLAGS		return FLAGS_ID;
 GEOMETRY	return GEOMETRY_ID;
 ^MAP\r?\n		{ BEGIN(MAPC); line_number++; }

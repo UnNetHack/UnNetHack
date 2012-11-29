@@ -1,8 +1,8 @@
 
 # The fill level for Sheol
-MAZE: "sheolfil" , ' '
+LEVEL: "sheolfil"
 FLAGS: sheol,hardfloor,noteleport
-INIT_MAP:sheol
+INIT_MAP: sheollev
 NOMAP
 
 # Stairs at the ends of the level
@@ -11,32 +11,32 @@ STAIR: levregion(1, 0, 15, 20), levregion(16, 0, 64, 20), up
 STAIR: levregion(65, 0, 79, 20), levregion(16, 0, 64, 20), down
 
 # Golems and random monsters
-MONSTER: ''', "crystal ice golem", random
-MONSTER: ''', "crystal ice golem", random
-MONSTER: 'P', "blue slime", random
-MONSTER[33%]: '`', "Punisher", random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
+MONSTER:(''', "crystal ice golem"), random
+MONSTER:(''', "crystal ice golem"), random
+MONSTER:('P', "blue slime"), random
+MONSTER[33%]:('`', "Punisher"), random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
 
 # Some loot
-OBJECT:'*',random,random
-OBJECT:'!',random,random
-OBJECT:'"',random,random
-OBJECT:'?',random,random
-OBJECT:'/',random,random
-OBJECT:'=',random,random
-OBJECT:'+',random,random
-OBJECT:'(',random,random
-OBJECT:')',random,random
+OBJECT:'*',random
+OBJECT:'!',random
+OBJECT:'"',random
+OBJECT:'?',random
+OBJECT:'/',random
+OBJECT:'=',random
+OBJECT:'+',random
+OBJECT:'(',random
+OBJECT:')',random
 
-OBJECT[33%]:'/',"wand of fire",random
+OBJECT[33%]:('/',"fire"),random
 
 TRAP: random, random
 TRAP: random, random
@@ -44,9 +44,9 @@ TRAP: random, random
 TRAP: random, random
 
 # Middle level
-MAZE: "sheolmid", ' '
+LEVEL: "sheolmid"
 FLAGS: sheol,hardfloor,noteleport
-INIT_MAP:'.', ' ', false, false, lit, true
+INIT_MAP: sheollev
 
 GEOMETRY:left,center
 MAP
@@ -69,7 +69,8 @@ YPPPPPPPPPPPPUIPPIIPPP...
 YPPPPPPPPIPPIIPPPUP......
 ENDMAP
 
-RANDOM_MONSTERS: 'X','T','L',''','N','x','@','V'
+$monster = MONSTER: { 'X','T','L',''','N','x','@','V' }
+SHUFFLE: $monster
 
 STAIR: (4,8),down
 STAIR: levregion(65, 0, 79, 20), levregion(16, 0, 64, 20), up
@@ -77,45 +78,45 @@ STAIR: levregion(65, 0, 79, 20), levregion(16, 0, 64, 20), up
 DOOR:locked,(9,8)
 
 # Wands of fire
-OBJECT:'/',"fire",random
-OBJECT:'/',"fire",random
+OBJECT:('/',"fire"),random
+OBJECT:('/',"fire"),random
 
-MONSTER: ''', "crystal ice golem", random
-MONSTER: 'P', "blue slime", random
+MONSTER: (''', "crystal ice golem"), random
+MONSTER: ('P', "blue slime"), random
 
-MONSTER: monster[0], random, (3, 7)
-MONSTER: monster[0], random, (3, 9)
-MONSTER: monster[1], random, (4, 7)
-MONSTER: monster[1], random, (4, 9)
-MONSTER: monster[2], random, (5, 7)
-MONSTER: monster[2], random, (5, 9)
-MONSTER: monster[3], random, (6, 7)
-MONSTER: monster[3], random, (6, 9)
-MONSTER: monster[4], random, (7, 7)
-MONSTER: monster[4], random, (7, 9)
-MONSTER: monster[5], random, (8, 7)
-MONSTER: monster[5], random, (8, 9)
-MONSTER: monster[6], random, (10, 7)
-MONSTER: monster[6], random, (10, 9)
-MONSTER: monster[7], random, (1, 7)
-MONSTER: monster[7], random, (1, 9)
+MONSTER: $monster[0], (3, 7)
+MONSTER: $monster[0], (3, 9)
+MONSTER: $monster[1], (4, 7)
+MONSTER: $monster[1], (4, 9)
+MONSTER: $monster[2], (5, 7)
+MONSTER: $monster[2], (5, 9)
+MONSTER: $monster[3], (6, 7)
+MONSTER: $monster[3], (6, 9)
+MONSTER: $monster[4], (7, 7)
+MONSTER: $monster[4], (7, 9)
+MONSTER: $monster[5], (8, 7)
+MONSTER: $monster[5], (8, 9)
+MONSTER: $monster[6], (10, 7)
+MONSTER: $monster[6], (10, 9)
+MONSTER: $monster[7], (1, 7)
+MONSTER: $monster[7], (1, 9)
 
 NOMAP
 
 # Make the island area lit
 REGION:(00,00,30,19),lit,"ordinary"
 
-OBJECT:'*',random,random
-OBJECT:'!',random,random
-OBJECT:'"',random,random
-OBJECT:'?',random,random
-OBJECT:'/',random,random
-OBJECT:'=',random,random
-OBJECT:'+',random,random
-OBJECT:'(',random,random
-OBJECT:'(',random,random
-OBJECT:')',random,random
-OBJECT:')',random,random
+OBJECT:'*',random
+OBJECT:'!',random
+OBJECT:'"',random
+OBJECT:'?',random
+OBJECT:'/',random
+OBJECT:'=',random
+OBJECT:'+',random
+OBJECT:'(',random
+OBJECT:'(',random
+OBJECT:')',random
+OBJECT:')',random
 
 TRAP: random, random
 TRAP: random, random
@@ -124,14 +125,14 @@ TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
 
 # From http://www.jewishencyclopedia.com/articles/13563-sheol):
 #
@@ -148,7 +149,7 @@ MONSTER: random, random, random
 # levels.
 
 # The second-to-end level
-MAZE: "palace_f", ' '
+LEVEL: "palace_f"
 FLAGS: sheol,noteleport,hardfloor
 GEOMETRY:center,center
 MAP
@@ -180,40 +181,40 @@ STAIR: (7,2,60,7), (10,2,56,7),down
 TELEPORT_REGION:(00,14,63,18),(0,0,0,0)
 
 # Golems in loot rooms
-MONSTER: ''', "crystal ice golem", (34,2)
-MONSTER: ''', "crystal ice golem", (40,2)
+MONSTER: (''', "crystal ice golem"), (34,2)
+MONSTER: (''', "crystal ice golem"), (40,2)
 
 # Freezers!
-MONSTER: 'P', "blue slime", random
-MONSTER: 'P', "blue slime", random
-MONSTER: 'P', "blue slime", random
+MONSTER: ('P', "blue slime"), random
+MONSTER: ('P', "blue slime"), random
+MONSTER: ('P', "blue slime"), random
 
 # Chillbugs in wings
-MONSTER: 'x', "chillbug", (16, 4)
-MONSTER: 'x', "chillbug", (17, 4)
-MONSTER: 'x', "chillbug", (16, 5)
-MONSTER: 'x', "chillbug", (17, 5)
+MONSTER: ('x', "chillbug"), (16, 4)
+MONSTER: ('x', "chillbug"), (17, 4)
+MONSTER: ('x', "chillbug"), (16, 5)
+MONSTER: ('x', "chillbug"), (17, 5)
 
-MONSTER: 'x', "chillbug", (58, 4)
-MONSTER: 'x', "chillbug", (57, 4)
-MONSTER: 'x', "chillbug", (58, 5)
-MONSTER: 'x', "chillbug", (57, 5)
+MONSTER: ('x', "chillbug"), (58, 4)
+MONSTER: ('x', "chillbug"), (57, 4)
+MONSTER: ('x', "chillbug"), (58, 5)
+MONSTER: ('x', "chillbug"), (57, 5)
 
 # Lots of defenders around the level
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
 
 # Non diggable walls, like duh
 NON_DIGGABLE:(00,00,75,19)
@@ -248,54 +249,54 @@ REGION:(28,9,46,18),lit,"ordinary"
 
 # This is hard, late-game branch so guarantee some useful loot.
 # Nothing too ridiculous though
-OBJECT:'(',"chest",(34,2)
-OBJECT:'(',"chest",(40,2)
+OBJECT:('(',"chest"),(34,2)
+OBJECT:('(',"chest"),(40,2)
 # Maybe spoiled players defer wishing for these in the castle if they
 # know they'll be available later...which may or may not be a 
 # good idea for them
-OBJECT:'?',"genocide",(34,1)
-OBJECT:'?',"charging",(40,1)
-OBJECT:'!',"full healing",(33,1)
-OBJECT:'!',"full healing",(33,2)
-OBJECT:'!',"gain ability",(41,1)
-OBJECT:'!',"gain ability",(41,2)
-OBJECT:'*',"dilithium crystal",(32,1)
-OBJECT:'*',"dilithium crystal",(32,2)
-OBJECT:'*',"dilithium crystal",(31,1)
-OBJECT:'*',"dilithium crystal",(31,2)
-OBJECT:'(',"tinning kit",(30,1)
-OBJECT:'(',"grappling hook",(30,2)
-OBJECT:'%',"lembas wafer",(29,1)
-OBJECT:'%',"lembas wafer",(29,2)
-OBJECT:'%',"lembas wafer",(28,1)
-OBJECT:'%',"lembas wafer",(28,2)
-OBJECT:'"',"amulet of ESP",(27,1)
-OBJECT:'"',"amulet versus poison",(27,2)
+OBJECT:('?',"genocide"),(34,1)
+OBJECT:('?',"charging"),(40,1)
+OBJECT:('!',"full healing"),(33,1)
+OBJECT:('!',"full healing"),(33,2)
+OBJECT:('!',"gain ability"),(41,1)
+OBJECT:('!',"gain ability"),(41,2)
+OBJECT:('*',"dilithium crystal"),(32,1)
+OBJECT:('*',"dilithium crystal"),(32,2)
+OBJECT:('*',"dilithium crystal"),(31,1)
+OBJECT:('*',"dilithium crystal"),(31,2)
+OBJECT:('(',"tinning kit"),(30,1)
+OBJECT:('(',"grappling hook"),(30,2)
+OBJECT:('%',"lembas wafer"),(29,1)
+OBJECT:('%',"lembas wafer"),(29,2)
+OBJECT:('%',"lembas wafer"),(28,1)
+OBJECT:('%',"lembas wafer"),(28,2)
+OBJECT:('"',"amulet of ESP"),(27,1)
+OBJECT:('"',"amulet versus poison"),(27,2)
 
-OBJECT:'+',"finger of death",(42,1)
-OBJECT:'+',"fireball",(42,2)
-OBJECT:'(',"tooled horn",(43,1)
-OBJECT:'(',"towel",(43,2)
-OBJECT:'*',"diamond",(44,1)
-OBJECT:'*',"diamond",(44,2)
-OBJECT:'*',"diamond",(45,1)
-OBJECT:'*',"diamond",(45,2)
-OBJECT:')',"athame",(46,1)
-OBJECT:')',"halberd",(46,2)
-OBJECT:'(',"pick-axe",(47,1)
-OBJECT:'=',"regeneration",(47,2)
+OBJECT:('+',"finger of death"),(42,1)
+OBJECT:('+',"fireball"),(42,2)
+OBJECT:('(',"tooled horn"),(43,1)
+OBJECT:('(',"towel"),(43,2)
+OBJECT:('*',"diamond"),(44,1)
+OBJECT:('*',"diamond"),(44,2)
+OBJECT:('*',"diamond"),(45,1)
+OBJECT:('*',"diamond"),(45,2)
+OBJECT:(')',"athame"),(46,1)
+OBJECT:(')',"halberd"),(46,2)
+OBJECT:('(',"pick-axe"),(47,1)
+OBJECT:('=',"regeneration"),(47,2)
 
 # Other random loot
-OBJECT:'+',random,random
-OBJECT:'+',random,random
-OBJECT:'=',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
-OBJECT:'/',random,random
+OBJECT:'+',random
+OBJECT:'+',random
+OBJECT:'=',random
+OBJECT:'=',random
+OBJECT:'/',random
+OBJECT:'/',random
 
 
 # Bottom level of Sheol
-MAZE: "palace_e", ' '
+LEVEL: "palace_e"
 FLAGS: sheol,noteleport,hardfloor
 GEOMETRY:center,center
 MAP
@@ -325,7 +326,7 @@ STAIR: (4,9),up
 
 NON_DIGGABLE:(00,00,75,19)
 
-MONSTER: '@', "Executioner",(61,9)
+MONSTER: ('@', "Executioner"),(61,9)
 
 TRAP: random, random
 TRAP: random, random
@@ -337,48 +338,53 @@ TRAP: random, random
 TRAP: random, random
 
 # Random chests
-OBJECT:'(',"chest",(62,8)
-OBJECT:'(',"chest",(62,10)
-OBJECT:'(',"chest",(64,8)
-OBJECT:'(',"chest",(64,10)
+OBJECT:('(',"chest"),(62,8)
+OBJECT:('(',"chest"),(62,10)
+OBJECT:('(',"chest"),(64,8)
+OBJECT:('(',"chest"),(64,10)
 
-CONTAINER:'(',"chest",(66,8)
-OBJECT:'(',"magic marker",contained
-CONTAINER:'(',"chest",(66,10)
-OBJECT:'(',"magic lamp",contained
-CONTAINER:'(',"chest",(68,9)
-OBJECT:'(',"crystal pick",contained
+CONTAINER:('(',"chest"),(66,8) {
+  OBJECT:('(',"magic marker")
+}
+
+CONTAINER:('(',"chest"),(66,10) {
+  OBJECT:('(',"magic lamp")
+}
+
+CONTAINER:('(',"chest"),(68,9) {
+  OBJECT:('(',"crystal pick")
+}
 
 # Some serious slimy fun, these should freeze the player in place
 # while the Executioner slices them into little pieces.
-MONSTER: 'P', "blue slime", random
-MONSTER: 'P', "blue slime", random
-MONSTER: 'P', "blue slime", random
-MONSTER: 'P', "blue slime", random
-MONSTER: 'P', "blue slime", random
-MONSTER: 'P', "blue slime", random
-MONSTER: 'P', "blue slime", random
-MONSTER: 'P', "blue slime", random
-MONSTER: 'N', "white naga", random
-MONSTER: 'N', "white naga", random
-MONSTER: 'N', "white naga", random
-MONSTER: 'N', "white naga", random
-MONSTER: ''', "crystal ice golem", random
-MONSTER: ''', "crystal ice golem", random
-MONSTER: ''', "ice golem", random
-MONSTER: ''', "ice golem", random
-MONSTER: 'A', "black Angel", random
-MONSTER: 'A', "black Angel", random
-MONSTER: 'A', "black Angel", random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
+MONSTER:( 'P', "blue slime"), random
+MONSTER:( 'P', "blue slime"), random
+MONSTER:( 'P', "blue slime"), random
+MONSTER:( 'P', "blue slime"), random
+MONSTER:( 'P', "blue slime"), random
+MONSTER:( 'P', "blue slime"), random
+MONSTER:( 'P', "blue slime"), random
+MONSTER:( 'P', "blue slime"), random
+MONSTER:( 'N', "white naga"), random
+MONSTER:( 'N', "white naga"), random
+MONSTER:( 'N', "white naga"), random
+MONSTER:( 'N', "white naga"), random
+MONSTER:( ''', "crystal ice golem"), random
+MONSTER:( ''', "crystal ice golem"), random
+MONSTER:( ''', "ice golem"), random
+MONSTER:( ''', "ice golem"), random
+MONSTER:( 'A', "black Angel"), random
+MONSTER:( 'A', "black Angel"), random
+MONSTER:( 'A', "black Angel"), random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
 

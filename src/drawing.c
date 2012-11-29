@@ -275,8 +275,8 @@ struct symdef defsyms[MAXPCHARS] = {
 	{'^', "statue trap",	C(CLR_GRAY)},	/* trap */
 	{'^', "magic trap",	C(HI_ZAP)},	/* trap */
 	{'^', "anti-magic field", C(HI_ZAP)},	/* trap */
-	{'^', "polymorph trap",	C(CLR_BRIGHT_GREEN)},	/* trap */
 	{'^', "ice trap",	C(CLR_WHITE)},  /* trap */
+	{'^', "polymorph trap",	C(CLR_BRIGHT_GREEN)},	/* trap */
 	{'|', "wall",		C(CLR_GRAY)},	/* vbeam */
 	{'-', "wall",		C(CLR_GRAY)},	/* hbeam */
 	{'\\',"wall",		C(CLR_GRAY)},	/* lslant */
@@ -705,6 +705,7 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
 	g_FILLER(S_statue_trap),
 	g_FILLER(S_magic_trap),
 	g_FILLER(S_anti_magic_trap),
+	g_FILLER(S_ice_trap),
 	g_FILLER(S_polymorph_trap),
 	0x2502,	/* S_vbeam:	BOX DRAWINGS LIGHT VERTICAL */
 	0x2500,	/* S_hbeam:	BOX DRAWINGS LIGHT HORIZONTAL */

@@ -1727,7 +1727,7 @@ domove()
 	if(u.ufeetfrozen) {
 		--u.ufeetfrozen;
 		You("are stuck in ice.");
-		nomul(0);
+		nomul(0, 0);
 		return;
 	}
 	if(u.utrap) {

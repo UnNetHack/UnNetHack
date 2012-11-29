@@ -294,6 +294,7 @@ spec_levs: ../util/lev_comp \
 	endgame.des gehennom.des heck.des knox.des town-?.des \
 	medusa.des \
 	mines.des nymph.des oracle.des \
+	sheol.des \
 	sokoban.des tower.des yendor.des
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/advcal.des
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/bigroom.des
@@ -310,6 +311,7 @@ spec_levs: ../util/lev_comp \
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/mines.des
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/oracle.des
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/sokoban.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/sheol.des
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/tower.des
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/yendor.des
 	touch spec_levs
