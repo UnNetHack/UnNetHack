@@ -511,6 +511,7 @@ struct levelflags {
 	Bitfield(is_cavernous_lev,1);
 	Bitfield(arboreal, 1);		/* Trees replace rock */
 	Bitfield(sky, 1);		/* map has sky instead of ceiling */
+	Bitfield(sheol,1);
 };
 
 struct mon_gen_tuple {

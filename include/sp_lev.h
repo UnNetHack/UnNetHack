@@ -30,12 +30,14 @@
 #define STORMY		0x00000400L
 #define GRAVEYARD	0x00000800L
 #define SKYMAP		0x00001000L
+#define SHEOL_LEV	0x00002000L
 
 /* different level layout initializers */
 #define LVLINIT_NONE		0
 #define LVLINIT_SOLIDFILL	1
 #define LVLINIT_MAZEGRID	2
 #define LVLINIT_MINES		3
+#define LVLINIT_SHEOL		4
 
 /* max. layers of object containment */
 #define MAX_CONTAINMENT 10

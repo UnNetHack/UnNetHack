@@ -807,6 +807,9 @@ makelevel()
 	    } else if (In_mines(&u.uz)) {
 		    makemaz("minefill");
 		    return;
+	    } else if (In_sheol(&u.uz)) {
+		    makemaz("sheolfil");
+		    return;
 	    } else if (In_quest(&u.uz)) {
 		    char	fillname[9];
 		    s_level	*loc_lev;

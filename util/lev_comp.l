@@ -104,7 +104,7 @@ FILE *orig_yyin = NULL;
 		  map_cnt = 0;
 		  return MAP_ID;
 		}
-<MAPC>[-|}{+xABCISHKMPLWTtF\\#. 0123456789]*\r?\n	{
+<MAPC>[-|}{+xABCISHKMPLWTtFYU\\#. 0123456789]*\r?\n	{
 		  int len = yyleng;
 		  /* convert \r\n to \n */
 		  if (len >= 2 && yytext[len - 2] == '\r') len -= 1;
@@ -123,6 +123,7 @@ INIT_MAP	return LEV_INIT_ID;
 mazegrid	return MAZE_GRID_ID;
 solidfill	return SOLID_FILL_ID;
 mines		return MINES_ID;
+sheol		return SHEOL_ID;
 FLAGS		return FLAGS_ID;
 GEOMETRY	return GEOMETRY_ID;
 ^MAP\r?\n		{ BEGIN(MAPC); line_number++; }
@@ -264,6 +265,7 @@ blessed		{ yylval.i=1; return CURSE_TYPE; }
 uncursed	{ yylval.i=2; return CURSE_TYPE; }
 cursed		{ yylval.i=3; return CURSE_TYPE; }
 noteleport	{ yylval.i=NOTELEPORT; return FLAG_TYPE; }
+sheol		{ yylval.i=SHEOL_LEV; return FLAG_TYPE; }
 hardfloor	{ yylval.i=HARDFLOOR; return FLAG_TYPE; }
 nommap		{ yylval.i=NOMMAP; return FLAG_TYPE; }
 arboreal	{ yylval.i=ARBOREAL; return FLAG_TYPE; }	/* KMH */

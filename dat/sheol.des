@@ -1,0 +1,48 @@
+
+# The fill level for Sheol
+MAZE: "sheolfil" , ' '
+FLAGS: sheol
+INIT_MAP:sheol
+NOMAP
+
+# Stairs at the ends of the level
+
+STAIR: levregion(1, 0, 15, 20), levregion(16, 0, 64, 20), up
+STAIR: levregion(65, 0, 79, 20), levregion(16, 0, 64, 20), down
+
+
+# This realm of the dead is in the earth ("erẓitu" = ; comp. Job, x. 21, 22), the gateway being in the west. It is the "land without return." It is a dark place filled with dust (see Sheol, Biblical Data); but it contains a palace for the divine ruler of this shadow-realm (comp. Job xviii. 13, 14). Seven gates guard successively the approach to this land, at the first of which is a watchman. A stream of water flows through Sheol (comp. Enoch, xvii. 6, xxii. 9; Luke xvi. 24; Ps. xviii. 5; II Sam. xxii. 5).
+
+# (that was from http://www.jewishencyclopedia.com/articles/13563-sheol)
+# So supposedly there should be a palace of some kind we'll have it be two
+# levels.
+
+# The second-to-end level
+MAZE: "palace_f", ' '
+FLAGS: noteleport,hardfloor
+GEOMETRY:center,center
+MAP
+      |..................-----------   -----------...........|              
+      |.......-.....-....--........-----........--.....-.....|              
+      |......| |...| |...Y+........|.\.|........+Y....| |....|              
+      |...UU..-.....-....-----------...-----------.....-.....|-----------   
+      |...U..............+.......YYY...YYY.......+...........S..........|   
+      |...U..............+.......YYY...YYY.......+...........|---------.|   
+      |...UU..-.....-...------------...------------....-.....|        |.|   
+      |......| |...| |..|          |...|          |...| |....|---     |.|   
+      |.......-.....-...---------- |...| ----------....-....---W|     |.|   
+      |..................--......---+++---......IW--.......--WWW|     |.|   
+      --------------------...---...........---..IWW---...---WWWW|     |.|   
+     --WWWIIIIIIIIIIIIIIII...| |.---.{.---.| |..IIWWW-----WWWWWW|     |.|   
+    --WWWWWIIIIIIIIIIIIIIII..---.| |...|.|.---...IIWWWWWWIIIWIII|     |.|   
+   --WWWWWIIIIIIIIIIIIIIIII......---.{.---........IIWWWIII.III..-------+----
+  --WWWWWWIIIIIIIIIIIIIIII.........................IIIII........UUYY..III...
+ -------------IIIIIIIIIII............{.....................T..T.UUYY........
+             -------IIIII.......................................UUYY........
+                   ---IIII.....----.....--------IIII............UUYY........
+                     -----------..---.---      ----IIIII...T..T.UUYY........
+                                    ---           ----III.......UUYY........
+ENDMAP
+
+STAIR: (38,18),up
+

@@ -91,7 +91,8 @@ mksheol(init_lev)
 	for (i1 = 1; i1 < COLNO; ++i1)
 		for (i2 = 0; i2 < ROWNO; ++i2) {
 			levl[i1][i2].lit = TRUE; /* lit things up */
-			if (IS_WALL(levl[i1][i2].typ))
+			if (IS_ROCK(levl[i1][i2].typ) &&
+			    !IS_ANY_ICEWALL(levl[i1][i2].typ))
 				levl[i1][i2].wall_info |= W_NONDIGGABLE;
 		}
 	

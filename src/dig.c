@@ -291,15 +291,12 @@ dig()
 			   uwep->spe - greatest_erosion(uwep) + u.udaminc;
 	if (Race_if(PM_DWARF))
 	    digging.effort *= 2;
-<<<<<<< HEAD
 	if (lev->typ == DEADTREE)
 	    digging.effort *= 2;
-=======
 	/* ice is easier to dig than rock */
 	if (IS_ICEWALL(lev->typ))
 	    digging.effort *= 2;
 
->>>>>>> Add ice walls.
 	if (digging.down) {
 		register struct trap *ttmp;
 

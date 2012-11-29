@@ -998,6 +998,7 @@ init_dungeons()		/* initialize the "dungeon" structs */
 	blackmarket_dnum = dname_to_dnum("The Black Market");
 #endif
 */
+	sheol_dnum = dname_to_dnum("Sheol");
 
 	/* one special fixup for dummy surface level */
 	if ((x = find_level("dummy")) != 0) {
@@ -1435,6 +1436,13 @@ In_mines(lev)	/* are you in the mines dungeon? */
 d_level	*lev;
 {
 	return((boolean)(lev->dnum == mines_dnum));
+}
+
+boolean
+In_sheol(lev)	/* are you in Sheol? */
+d_level	*lev;
+{
+	return((boolean)(lev->dnum == sheol_dnum));
 }
 
 /*

@@ -946,6 +946,8 @@ char c;
 		  case 'F'  : return(IRONBARS);	/* Fe = iron */
 		  case 'M'  : return(BOG);	/* muddy swamp */
 		  case 'x'  : return(MAX_TYPE);	/* 'see-through' */
+		  case 'Y'  : return(CRYSTALICEWALL);
+		  case 'U'  : return(ICEWALL);
 	    }
 	return(INVALID_TYPE);
 }

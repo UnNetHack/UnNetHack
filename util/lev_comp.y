@@ -159,7 +159,7 @@ extern const char *fname;
 
 %token	<i> CHAR INTEGER BOOLEAN PERCENT SPERCENT
 %token	<i> MINUS_INTEGER PLUS_INTEGER
-%token	<i> MAZE_GRID_ID SOLID_FILL_ID MINES_ID
+%token	<i> MAZE_GRID_ID SOLID_FILL_ID MINES_ID SHEOL_ID
 %token	<i> MESSAGE_ID LEVEL_ID LEV_INIT_ID GEOMETRY_ID NOMAP_ID
 %token	<i> OBJECT_ID COBJECT_ID MONSTER_ID TRAP_ID DOOR_ID DRAWBRIDGE_ID
 %token	<i> MAZEWALK_ID WALLIFY_ID REGION_ID FILLING
@@ -313,6 +313,10 @@ lev_init	: LEV_INIT_ID ':' SOLID_FILL_ID ',' terrain_type
 		      add_opvars(splev, "iiiiiiiio", LVLINIT_MAZEGRID,filling,0,0, 0,0,0,0, SPO_INITLEVEL);
 		      max_x_map = COLNO-1;
 		      max_y_map = ROWNO;
+		  }
+		| LEV_INIT_ID ':' SHEOL_ID
+		  {
+		      add_opvars(splev, "iiiiiiiio", LVLINIT_SHEOL,0,0,0,0,0,0,0, SPO_INITLEVEL);
 		  }
 		| LEV_INIT_ID ':' MINES_ID ',' CHAR ',' CHAR ',' BOOLEAN ',' BOOLEAN ',' light_state ',' walled opt_fillchar
 		  {
