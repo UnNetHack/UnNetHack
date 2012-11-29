@@ -51,10 +51,10 @@ static void carve_path(floorprob* probs);
 static void fuzzy_circle(int x, int y, 
 			 int guaranteed_passage_radius, int fallout,
 			 floorprob* floorprobs);
-static void wallify_map();
+static void wallify_map(void);
 
-static void finalize_map();
-static int under_middle();
+static void finalize_map(void);
+static int under_middle(void);
 
 /* Return values from plug_unreachable_places and verify_stairs_place. */
 /*  Any value >0 means "ok" */
@@ -64,10 +64,12 @@ static int under_middle();
 			       levitating */
 #define STAT_STAIRSOK     3 /*  Stairs have adequate space. */
 
-static int plug_unreachable_places();
-static int verify_stairs_place();
+static int plug_unreachable_places(void);
+static int verify_stairs_place(void);
 
-static void mkopensheol();
+static void mkopensheol(void);
+static void place_clouds(void);
+static void shake_position(int* x, int* y);
 
 void
 mksheol(init_lev)
@@ -93,8 +95,6 @@ mksheol(init_lev)
 	/* Then, carve a "path" from somewhere left of the level to the right
 	 * of the level. */
 	carve_path(probs);
-	
-	/* Sometimes, put a lot of clouds at one side of the level. */
 
 	for (i1 = 1; i1 < COLNO; ++i1)
 		for (i2 = 0; i2 < ROWNO; ++i2) {
@@ -115,6 +115,10 @@ mksheol(init_lev)
 			else if (levl[i1][i2].typ == POOL)
 				levl[i1][i2].typ = ICEWALL;
 		}
+	
+	/* Sometimes, put a lot of clouds somewhere on the level. */
+	if (!rn2(5))
+	    place_clouds();
 	
 	if (verify_stairs_place() == STAT_REJECT)
 		goto again;
@@ -344,7 +348,7 @@ fuzzy_circle(x, y, guaranteed_passage_radius, fallout, floorprobs)
 }
 
 static void
-wallify_map()
+wallify_map(void)
 {
 
     int x, y, xx, yy;
@@ -368,7 +372,7 @@ wallify_map()
 			       IS_ANY_ICEWALL(levl[x][y].typ))
 
 static int 
-plug_unreachable_places()
+plug_unreachable_places(void)
 {
 	char fillmap[COLNO][ROWNO];
 	int not_passable;
@@ -490,12 +494,12 @@ plug_unreachable_places()
 
 /* Return 1 if below the middle Sheol level. */
 static int 
-under_middle() {
+under_middle(void) {
 	return u.uz.dlevel > 5;
 }
 
 static void 
-mkopensheol() {
+mkopensheol(void) {
 	/*  This one's simple. */
 	do {
 		init_level_base_voronoi(opentyps, 10, 300);
@@ -505,7 +509,7 @@ mkopensheol() {
 }
 
 static void
-finalize_map() {
+finalize_map(void) {
 	int i1, i2;
 
 	for (i1 = 1; i1 < COLNO; ++i1)
@@ -523,7 +527,7 @@ finalize_map() {
 }
 
 static int
-verify_stairs_place() {
+verify_stairs_place(void) {
 	int i1, i2;
 
 	/* Make sure there is ROOM somewhere in both sides of the level */
@@ -548,5 +552,105 @@ verify_stairs_place() {
 		return STAT_REJECT;
 
 	return STAT_STAIRSOK;
+}
+
+static void
+place_clouds(void) {
+	int num_clouds;
+	int x, y;
+	int tries;
+
+	num_clouds = rn2(25) + rn2(40) + 5;
+
+	while(1) {
+		x = rn1(COLNO-2,1);
+		y = rn2(ROWNO);
+		if (levl[x][y].typ == ICE ||
+		    levl[x][y].typ == ROOM)
+			break;
+	}
+
+	tries = 200;
+	while(num_clouds > 0 && tries > 0) {
+		if (levl[x][y].typ == ICE ||
+		    levl[x][y].typ == ROOM) {
+			levl[x][y].typ = CLOUD;
+			num_clouds--;
+			tries = 200;
+		}
+		else {
+			--tries;
+			shake_position(&x, &y);
+		}
+	}
+}
+
+static void
+shake_position(x, y)
+	int* x;
+	int* y;
+{
+	int i1;
+	int old_x, old_y;
+	int tries;
+
+	int dx, dy;
+
+	old_x = (*x);
+	old_y = (*y);
+
+	tries = 10;
+
+again:
+	if (!tries)
+		return;
+	--tries;
+
+	(*x) = old_x;
+	(*y) = old_y;
+
+	if (!rn2(30)) {
+		(*x) += rn2(7)-3;
+		(*y) += rn2(7)-3;
+	}
+	else {
+		(*x) += rn2(3)-1;
+		(*y) += rn2(3)-1;
+	}
+
+	if ((*x) >= COLNO)
+		(*x) = COLNO-1;
+	if ((*x) < 1)
+		(*x) = 1;
+	if ((*y) < 0)
+		(*y) = 0;
+	if ((*y) >= ROWNO)
+		(*y) = ROWNO-1;
+
+	dx = (*x) > old_x ? 1 : -1;
+	dy = (*y) > old_y ? 1 : -1;
+
+	for (i1 = old_x; i1 != (*x); i1 += dx)
+	{
+		if (levl[i1][old_y].typ != ICE ||
+		    levl[i1][old_y].typ != ROOM ||
+		    levl[i1][old_y].typ != CLOUD)
+			goto again;
+	}
+	if (levl[*x][old_y].typ != ICE ||
+	    levl[*x][old_y].typ != ROOM ||
+	    levl[*x][old_y].typ != CLOUD)
+		goto again;
+	for (i1 = old_y; i1 != (*y); i1 += dy)
+	{
+		if (levl[*x][i1].typ != ICE ||
+		    levl[*x][i1].typ != ROOM ||
+		    levl[*x][i1].typ != CLOUD)
+			goto again;
+	}
+	if (levl[*x][*y].typ != ICE ||
+	    levl[*x][*y].typ != ROOM ||
+	    levl[*x][*y].typ != CLOUD)
+		goto again;
 }
 
