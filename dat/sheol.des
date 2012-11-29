@@ -268,8 +268,8 @@ REGION:(28,9,46,18),lit,"ordinary"
 
 # This is hard, late-game branch so guarantee some useful loot.
 # Nothing too ridiculous though
-OBJECT:'(',"magic marker",(34,2)
-OBJECT:'(',"magic lamp",(40,2)
+OBJECT:'(',"chest",(34,2)
+OBJECT:'(',"chest",(40,2)
 # Maybe spoiled players defer wishing for these in the castle if they
 # know they'll be available later...which may or may not be a 
 # good idea for them
@@ -354,8 +354,12 @@ OBJECT:'(',"chest",(62,8)
 OBJECT:'(',"chest",(62,10)
 OBJECT:'(',"chest",(64,8)
 OBJECT:'(',"chest",(64,10)
-OBJECT:'(',"chest",(66,8)
-OBJECT:'(',"chest",(66,10)
+
+
+CONTAINER:'(',"chest",(66,8)
+OBJECT:'(',"magic marker",contained
+CONTAINER:'(',"chest",(66,10)
+OBJECT:'(',"magic lamp",contained
 
 # Some serious slimy fun, these should freeze the player in place
 # while the Executioner slices them into little pieces.
