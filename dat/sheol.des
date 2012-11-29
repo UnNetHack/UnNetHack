@@ -24,32 +24,15 @@ MONSTER: random, random, random
 MONSTER: random, random, random
 MONSTER: random, random, random
 MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
 
 # Some loot
 OBJECT:'*',random,random
 OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'!',random,random
 OBJECT:'"',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
 OBJECT:'?',random,random
 OBJECT:'/',random,random
 OBJECT:'=',random,random
-OBJECT:'=',random,random
 OBJECT:'+',random,random
-OBJECT:'+',random,random
-OBJECT:'(',random,random
-OBJECT:'(',random,random
 OBJECT:'(',random,random
 OBJECT:')',random,random
 
@@ -122,21 +105,13 @@ MONSTER: monster[7], random, (1, 9)
 NOMAP
 OBJECT:'*',random,random
 OBJECT:'!',random,random
-OBJECT:'!',random,random
-OBJECT:'!',random,random
 OBJECT:'"',random,random
-OBJECT:'?',random,random
-OBJECT:'?',random,random
 OBJECT:'?',random,random
 OBJECT:'/',random,random
 OBJECT:'=',random,random
-OBJECT:'=',random,random
-OBJECT:'+',random,random
 OBJECT:'+',random,random
 OBJECT:'(',random,random
 OBJECT:'(',random,random
-OBJECT:'(',random,random
-OBJECT:')',random,random
 OBJECT:')',random,random
 OBJECT:')',random,random
 
@@ -147,16 +122,6 @@ TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
 MONSTER: random, random, random
 MONSTER: random, random, random
 MONSTER: random, random, random
@@ -245,16 +210,6 @@ MONSTER: random, random, random
 MONSTER: random, random, random
 MONSTER: random, random, random
 MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
-MONSTER: random, random, random
 
 # Non diggable walls, like duh
 NON_DIGGABLE:(00,00,75,19)
@@ -329,12 +284,8 @@ OBJECT:'=',"regeneration",(47,2)
 # Other random loot
 OBJECT:'+',random,random
 OBJECT:'+',random,random
-OBJECT:'+',random,random
-OBJECT:'+',random,random
 OBJECT:'=',random,random
 OBJECT:'=',random,random
-OBJECT:'=',random,random
-OBJECT:'/',random,random
 OBJECT:'/',random,random
 OBJECT:'/',random,random
 
