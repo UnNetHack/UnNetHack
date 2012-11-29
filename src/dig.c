@@ -251,6 +251,10 @@ dig()
 		pline("This ice wall is too hard to shatter.");
 		return(0);
 	    }
+	    if (IS_CRYSTALICEWALL(lev->typ)) {
+		pline("This crystal ice is too hard to dig away.");
+		return(0);
+	    }
 	}
 	if(Fumbling && !rn2(3)) {
 	    switch(rn2(3)) {

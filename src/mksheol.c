@@ -33,8 +33,11 @@ typedef struct sfloorprob
 	int guaranteed;
 } floorprob;
 
-static schar typs[10] = { ICEWALL, ICEWALL, ICEWALL, POOL, ICEWALL,
-			  STONE, STONE, POOL, STONE, STONE };
+/* These are chances which type to use for each tile in a voronoi diagram. */
+static schar typs[10] = { ICEWALL, 
+			  CRYSTALICEWALL, CRYSTALICEWALL, CRYSTALICEWALL,
+			  POOL, POOL,
+			  STONE, STONE, STONE, STONE };
 
 static void init_level_base_voronoi(schar* typs, int numtyps);
 static int check_voronoi_winner(patchcoord* coords, int num_coords,

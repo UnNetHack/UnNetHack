@@ -1031,6 +1031,10 @@ not_special:
 	    if (mmoved==1 && (u.ux != nix || u.uy != niy) && itsstuck(mtmp))
 		return(3);
 
+	    /* Can't go through crystal wall no matter what */
+	    if (IS_CRYSTALICEWALL(levl[nix][niy].typ))
+		return(3);
+
 	    if ((((IS_ROCK(levl[nix][niy].typ) || 
 	           levl[nix][niy].typ == ICEWALL) && 
 	           may_dig(nix,niy)) ||

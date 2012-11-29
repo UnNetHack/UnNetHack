@@ -3658,7 +3658,10 @@ xchar x, y;
 {
 	struct rm *lev = &levl[x][y];
 	if (cansee(x, y)) {
-		Norep("The ice wall melts and breaks down.");
+		if (IS_CRYSTALICEWALL(lev->typ))
+			Norep("The crystal ice wall melts and breaks down.");
+		else
+			Norep("The ice wall melts away.");
 	}
 	lev->typ = ICE;
 	newsym(x,y);
@@ -3731,7 +3734,7 @@ boolean *shopdamage;
 		(void) delfloortrap(t);
 		if (cansee(x,y)) newsym(x,y);
 	    }
-	    if(is_icewall(x, y)) {
+	    if(is_any_icewall(x, y)) {
 		melt_icewall(x, y);
 	    } else if(is_ice(x, y)) {
 		melt_ice(x, y);

@@ -1655,7 +1655,8 @@ back_to_glyph(x,y)
 	case ICE:		idx = S_ice;      break;
 	case AIR:		idx = S_air;	  break;
 	case CLOUD:		idx = S_cloud;	  break;
-	case ICEWALL:	idx = S_icewall;	break;
+	case ICEWALL:		idx = S_icewall;  break;
+	case CRYSTALICEWALL:	idx = S_crystalicewall;  break;
 	case WATER:		idx = S_water;	  break;
 	case BOG:		idx = S_bog;	  break;
 	case DBWALL:

@@ -760,6 +760,10 @@ newdogpos:
 		}
 		if (!m_in_out_region(mtmp, nix, niy))
 		    return 1;
+
+		if (IS_CRYSTALICEWALL(levl[nix][niy].typ))
+		    return 0;
+
 		if ((((IS_ROCK(levl[nix][niy].typ) ||
 		       levl[nix][niy].typ == ICEWALL) && 
 		      may_dig(nix,niy)) ||
