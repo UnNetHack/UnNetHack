@@ -836,7 +836,9 @@ may_dig(x,y)
 register xchar x,y;
 /* intended to be called only on ROCKs */
 {
-    return (boolean)(!((IS_STWALL(levl[x][y].typ) || IS_TREES(levl[x][y].typ)) &&
+    return (boolean)(!((IS_STWALL(levl[x][y].typ) ||
+		        IS_TREES(levl[x][y].typ) ||
+			IS_ICEWALL(levl[x][y].typ)) &&
 			(levl[x][y].wall_info & W_NONDIGGABLE)));
 }
 

@@ -86,13 +86,16 @@ mksheol(init_lev)
 			else if (levl[i1][i2].typ == POOL)
 				levl[i1][i2].typ = ICEWALL;
 		}
+
+	/* Finalization */
+	for (i1 = 1; i1 < COLNO; ++i1)
+		for (i2 = 0; i2 < ROWNO; ++i2) {
+			levl[i1][i2].lit = TRUE; /* lit things up */
+			if (IS_WALL(levl[i1][i2].typ))
+				levl[i1][i2].wall_info |= W_NONDIGGABLE;
+		}
 	
 	wallify_map();
-
-	/* Light the level up */
-	for (i1 = 1; i1 < COLNO; ++i1)
-		for (i2 = 0; i2 < ROWNO; ++i2)
-			levl[i1][i2].lit = TRUE;
 
 	level.flags.is_maze_lev = FALSE;
 	level.flags.is_cavernous_lev = TRUE;
