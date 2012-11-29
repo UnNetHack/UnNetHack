@@ -55,7 +55,6 @@ DUNGEON:	"Gehennom" "G" (20, 5)
 DESCRIPTION:	mazelike
 DESCRIPTION:	hellish
 ALIGNMENT:	noalign
-BRANCH:		"Vlad's Tower" @ (9, 5) up
 BRANCH:		"Sheol" @ (14, 5) down
 RNDLEVEL:	"valley" "V" @ (1, 0) 2
 LEVEL:		"sanctum" "none" @ (-1, 0)
@@ -86,6 +85,7 @@ RNDLEVEL:	"heck-e" "Q" @ (-19,17) 50 9
 DUNGEON:	"Sheol" "S" (10, 5)
 DESCRIPTION:	hellish
 ALIGNMENT:	noalign
+BRANCH:		"Vlad's Tower" @ (6, 4) up
 LEVEL:		"sheolmid" "H" @ (5, 0)
 LEVEL:		"palace_f" "P" @ (-2, 0)
 LEVEL:		"palace_e" "U" @ (-1, 0)
