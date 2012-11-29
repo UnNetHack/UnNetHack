@@ -1,7 +1,7 @@
 
 # The fill level for Sheol
 MAZE: "sheolfil" , ' '
-FLAGS: sheol
+FLAGS: sheol,hardfloor,noteleport
 INIT_MAP:sheol
 NOMAP
 
@@ -34,15 +34,39 @@ MAP
       |..................--......---+++---......IW--.......--WWW|     |.|   
       --------------------...---...........---..IWW---...---WWWW|     |.|   
      --WWWIIIIIIIIIIIIIIII...| |.---.{.---.| |..IIWWW-----WWWWWW|     |.|   
-    --WWWWWIIIIIIIIIIIIIIII..---.| |...|.|.---...IIWWWWWWIIIWIII|     |.|   
+    --WWWWWIIIIIIIIIIIIIIII..---.| |...| |.---...IIWWWWWWIIIWIII|     |.|   
    --WWWWWIIIIIIIIIIIIIIIII......---.{.---........IIWWWIII.III..-------+----
   --WWWWWWIIIIIIIIIIIIIIII.........................IIIII........UUYY..III...
  -------------IIIIIIIIIII............{.....................T..T.UUYY........
              -------IIIII.......................................UUYY........
                    ---IIII.....----.....--------IIII............UUYY........
-                     -----------..---.---      ----IIIII...T..T.UUYY........
+                     -----------  ---.---      ----IIIII...T..T.UUYY........
                                     ---           ----III.......UUYY........
 ENDMAP
 
-STAIR: (38,18),up
+STAIR: (37,18),up
+
+# Non diggable walls, duh
+NON_DIGGABLE:(00,00,75,19)
+
+# Front doors
+DOOR:locked,(36,9)
+DOOR:locked,(37,9)
+DOOR:locked,(38,9)
+
+# Left side
+DOOR:locked,(26,2)
+DOOR:locked,(25,4)
+DOOR:locked,(25,5)
+
+# Right side
+DOOR:locked,(48,2)
+DOOR:locked,(49,4)
+DOOR:locked,(49,5)
+
+# Secret passageway door
+DOOR:locked,(71,13)
+
+# The outsides are (somewhat) lit
+REGION:(28,9,46,18),lit,"ordinary"
 
