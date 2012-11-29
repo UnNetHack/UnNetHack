@@ -4331,6 +4331,8 @@ struct monst* mon;
 {
 	if (mon->mtrapped)
 		--mon->mtrapped;
+	if (!mon->mtrapped)
+		mon->frozen = 0;
 }
 
 #endif /* OVLB */

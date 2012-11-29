@@ -403,7 +403,8 @@ register struct monst *mtmp;
 	else if (mtmp->mstrategy & STRAT_WAITMASK)
 				  Strcat(info, ", meditating");
 	else if (mtmp->mflee)	  Strcat(info, ", scared");
-	if (mtmp->mtrapped)	  Strcat(info, ", trapped");
+	if (mtmp->mtrapped)	  Strcat(info, mtmp->frozen ? ", frozen" :
+							      ", trapped");
 	if (mtmp->mspeed)	  Strcat(info,
 					mtmp->mspeed == MFAST ? ", fast" :
 					mtmp->mspeed == MSLOW ? ", slow" :

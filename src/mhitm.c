@@ -1707,6 +1707,7 @@ int* pdmg;
 	    !is_whirly(mdef->data) &&
 	    !amorphous(mdef->data))) {
 	    mdef->mtrapped = rn1(16, 2);
+	    mdef->frozen = 1;
 	    if (vis) 
 		pline("%s is held in place by ice!", Monnam(mdef));
 	} else { if (pdmg) (*pdmg) = 0;}
