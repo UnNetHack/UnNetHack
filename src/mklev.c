@@ -1467,7 +1467,7 @@ coord *tm;
 		case 6: kind = RUST_TRAP; break;
 	    }
 #endif
-	} else if (Inhell && !rn2(5)) {
+	} else if (Inhell && !Insheol && !rn2(5)) {
 	    /* bias the frequency of fire traps in Gehennom */
 	    kind = FIRE_TRAP;
 	} else if (Insheol && !rn2(3)) {
