@@ -8,6 +8,7 @@ extern const char * const destroy_strings[];	/* from zap.c */
 
 STATIC_DCL void FDECL(decrease_mon_trapcounter, (struct monst *));
 STATIC_DCL void FDECL(dofiretrap, (struct obj *));
+STATIC_DCL void FDECL(doicetrap, (struct obj *));
 STATIC_DCL void NDECL(domagictrap);
 STATIC_DCL boolean FDECL(emergency_disrobe,(boolean *));
 STATIC_DCL int FDECL(untrap_prob, (struct trap *ttmp));
@@ -882,6 +883,10 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 	    case FIRE_TRAP:
 		seetrap(trap);
 		dofiretrap((struct obj *)0);
+		break;
+	    case ICE_TRAP:
+		seetrap(trap);
+		doicetrap((struct obj*)0);
 		break;
 
 	    case PIT:
@@ -1949,6 +1954,31 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			}
 			break;
 		    }
+	
+	        case ICE_TRAP:
+			if (in_sight)
+			    pline("A freezing cloud shoots from "
+			          "the %s under %s!",
+				  surface(mtmp->mx, mtmp->my),
+				  mon_nam(mtmp));
+			else if (see_it)
+			    You("see a freezing cloud shoot from the %s!",
+				surface(mtmp->mx, mtmp->my));
+
+			if (resists_cold(mtmp)) {
+			    if (in_sight) {
+				shieldeff(mtmp->mx,mtmp->my);
+				pline("%s is uninjured.", Monnam(mtmp));
+			    }
+			} else {
+			  int num = d(2,4);
+			  if (thitm(0, mtmp, (struct obj *)0, num, FALSE))
+			      trapkilled = TRUE;
+			  else if (!rn2(2))
+			      (void) destroy_mitem(mtmp, POTION_CLASS, AD_COLD);
+			}
+			if (see_it) seetrap(trap);
+			break;
 		case FIRE_TRAP:
  mfiretrap:
 			if (in_sight)
@@ -2565,6 +2595,31 @@ long hmask, emask;     /* might cancel timeout */
 		on_level(&u.uz, &current_dungeon_level))
 	    (void) pickup(1);
 	return 1;
+}
+
+STATIC_OVL void
+doicetrap(box)
+struct obj *box;	/* at the moment only for floor traps */
+{
+	int num = 0;
+	num = d(4, 4);
+	if (box) {
+		impossible("doicetrap() called with non-null box.");
+		return;
+	}
+
+	pline("A freezing cloud shoots from %s!", surface(u.ux, u.uy));
+	if (Cold_resistance) {
+		shieldeff(u.ux, u.uy);
+		num = 0;
+	}
+
+	if (!num)
+		You("are uninjured.");
+	else
+		losehp(num, "freezing cloud", KILLED_BY_AN);
+
+	destroy_item(POTION_CLASS, AD_COLD);
 }
 
 STATIC_OVL void

@@ -186,6 +186,7 @@ enum {
     S_statue_trap,
     S_magic_trap,
     S_anti_magic_trap,
+    S_ice_trap,
     S_polymorph_trap,
 
 /* end traps, begin special effects */

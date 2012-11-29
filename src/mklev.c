@@ -556,7 +556,7 @@ static NEARDATA const char *trap_engravings[TRAPNUM] = {
 			/* 14..16: trap door, teleport, level-teleport */
 			"Vlad was here", "ad aerarium", "ad aerarium",
 			(char *)0, (char *)0, (char *)0, (char *)0, (char *)0,
-			(char *)0,
+			(char *)0, (char *)0
 };
 
 /* Quotes from or about the Illuminati */
@@ -1495,7 +1495,9 @@ coord *tm;
 		    case POLY_TRAP:
 			if (lvl < 8) kind = NO_TRAP; break;
 		    case FIRE_TRAP:
-			if (!Inhell) kind = NO_TRAP; break;
+			if (!Inhell || Insheol) kind = NO_TRAP; break;
+		    case ICE_TRAP:
+			if (!Insheol) kind = NO_TRAP; break;
 		    case TELEP_TRAP:
 			if (level.flags.noteleport) kind = NO_TRAP; break;
 		    case HOLE:
