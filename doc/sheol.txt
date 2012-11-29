@@ -28,9 +28,8 @@ Sheol - The icy cold netherworld.
 
         - New levels:
                 Sheol has a new map generator and some hand-made levels.
-                Sheol has 15 levels at maximum.
 
-        Vlad has been put inside Sheol. It will be found somewhere below
+        Vlad has been put inside Sheol. It will be found somewhere below or at
         the middle level of Sheol.
 
         This branch is aimed at experienced players who think Gehennom is too
