@@ -372,6 +372,9 @@ MONSTER: 'P', "blue slime", random
 MONSTER: 'P', "blue slime", random
 MONSTER: 'P', "blue slime", random
 MONSTER: 'P', "blue slime", random
+MONSTER: 'A', "black Angel", random
+MONSTER: 'A', "black Angel", random
+MONSTER: 'A', "black Angel", random
 MONSTER: random, random, random
 MONSTER: random, random, random
 MONSTER: random, random, random
