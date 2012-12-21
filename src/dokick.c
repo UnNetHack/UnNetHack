@@ -929,8 +929,25 @@ dokick()
 		    exercise(A_DEX, TRUE);
 		    return(1);
 		}
-		if(IS_GRAVE(maploc->typ) || maploc->typ == IRONBARS)
+		if(maploc->typ == IRONBARS) {
 		    goto ouch;
+		}
+		if(IS_GRAVE(maploc->typ)) {
+		    if (!rn2(5)) {
+		       maploc->typ = ROOM;
+		       maploc->doormask = 0;
+		       (void) mksobj_at(ROCK, x,y, TRUE, FALSE);
+		       del_engr_at(x, y);
+		       if (Blind)
+			   pline("Crack!  %s broke!", Something);
+		       else {
+			  pline_The("headstone topples over and breaks!");
+			  newsym(x, y);
+		       }
+		       return 1;
+		    }
+		    goto ouch;
+		}
 		if(IS_TREE(maploc->typ)) {
 		    struct obj *treefruit;
 		    /* nothing, fruit or trouble? 75:23.5:1.5% */
