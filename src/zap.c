@@ -2996,8 +2996,10 @@ int dx, dy;
 		delay_output();
 		if(ct % 5 != 0) i++;
 #ifdef SINKS
-		if(IS_SINK(levl[bhitpos.x][bhitpos.y].typ))
+		if(IS_SINK(levl[bhitpos.x][bhitpos.y].typ)) {
+			pline("Klonk!");
 			break;	/* boomerang falls on sink */
+		}
 #endif
 	}
 	tmp_at(DISP_END, 0);	/* do not leave last symbol */
