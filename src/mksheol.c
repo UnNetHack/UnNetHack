@@ -421,6 +421,8 @@ plug_unreachable_places(void)
 		for (x = 2; x < COLNO-1; ++x)
 			for (y = 1; y < ROWNO-1; ++y)
 			{
+				if (!fillmap[x][y])
+					continue;
 				if (fillmap[x+1][y] == 0 &&
 				    VALID_PASSABLE(x+1, y)) {
 				    fillmap[x+1][y] = 1;
@@ -467,6 +469,8 @@ plug_unreachable_places(void)
 		for (x = 2; x < COLNO-1; ++x)
 			for (y = 1; y < ROWNO-1; ++y)
 			{
+				if (!fillmap[x][y])
+					continue;
 				if (fillmap[x+1][y] == 0 &&
 				    VALID_PASSABLE2(x+1, y)) {
 				    fillmap[x+1][y] = 1;
