@@ -344,15 +344,15 @@ OBJECT:('(',"chest"),(64,8)
 OBJECT:('(',"chest"),(64,10)
 
 CONTAINER:('(',"chest"),(66,8) {
-  OBJECT:('(',"magic marker")
+  OBJECT:('(',"crystal pick")
 }
 
 CONTAINER:('(',"chest"),(66,10) {
-  OBJECT:('(',"magic lamp")
+  OBJECT:('(',"crystal pick")
 }
 
 CONTAINER:('(',"chest"),(68,9) {
-  OBJECT:('(',"crystal pick")
+  OBJECT:('(',"magic marker")
 }
 
 # Some serious slimy fun, these should freeze the player in place
