@@ -686,7 +686,7 @@ TOOL("drum of earthquake", "drum",
 WEPTOOL("pick-axe", (char *)0,
 	1, 0, 0, 20, 100,  50,	6,  3, WHACK,  P_PICK_AXE, IRON, HI_METAL),
 WEPTOOL("crystal pick", (char *)0,
-	1, 0, 0, 0,  80,  500, 18, 12, WHACK,  P_PICK_AXE, METAL, HI_METAL),
+	1, 0, 0, 0,  80,  500, 12, 10, WHACK,  P_PICK_AXE, METAL, HI_METAL),
 WEPTOOL("grappling hook", "iron hook",
 	0, 0, 0,  5,  30,  50,  2,  6, WHACK,  P_FLAIL, IRON, HI_METAL),
 /* 3.4.1: unicorn horn left classified as "magic" */
