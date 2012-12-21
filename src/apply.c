@@ -2628,7 +2628,7 @@ do_break_wand(obj)
     register int i, x, y;
     register struct monst *mon;
     int dmg, damage;
-    boolean affects_objects;
+    boolean affects_objects, is_fragile;
     boolean shop_damage = FALSE;
     int expltype = EXPL_MAGICAL;
     char confirm[QBUFSZ], the_wand[BUFSZ], buf[BUFSZ];
@@ -2639,15 +2639,17 @@ do_break_wand(obj)
 				the_wand, ysimple_name(obj), "the wand"));
     if (yn(confirm) == 'n' ) return 0;
 
+    is_fragile = (!strcmp(OBJ_DESCR(objects[obj->otyp]), "balsa"));
+
     if (nohands(youmonst.data)) {
 	You_cant("break %s without hands!", the_wand);
 	return 0;
-    } else if (ACURR(A_STR) < 10) {
+    } else if (ACURR(A_STR) < (is_fragile ? 5 : 10)) {
 	You("don't have the strength to break %s!", the_wand);
 	return 0;
     }
-    pline("Raising %s high above your %s, you break it in two!",
-	  the_wand, body_part(HEAD));
+    pline("Raising %s high above your %s, you %s it in two!",
+	  the_wand, body_part(HEAD), is_fragile ? "snap" : "break");
 
     /* [ALI] Do this first so that wand is removed from bill. Otherwise,
      * the freeinv() below also hides it from setpaid() which causes problems.
