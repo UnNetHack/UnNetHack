@@ -1977,6 +1977,9 @@ boolean only_on_level; /**< if TRUE only genocide monsters on current level,
 	    pline("Wiped out %s%s%s.", which,
 		  genocided_name,
 		  on_this_level);
+	    if (!only_on_level && mons[mndx].mlet == S_TROLL) {
+		    pline("*plonk*");
+	    }
 
 #ifdef LIVELOGFILE
 	livelog_genocide(genocided_name, only_on_level);
@@ -2039,10 +2042,15 @@ boolean only_on_level; /**< if TRUE only genocide monsters on current level,
 		    if (mvitals[mndx].mvflags & G_EXTINCT)
 			break;	/* just made last one */
 		}
-	    if (cnt)
-		pline("Sent in some %s.", makeplural(buf));
-	    else
-		pline("%s", nothing_happens);
+	    if (cnt) {
+		    if (!Hallucination && mons[mndx].mlet == S_TROLL) {
+			    pline("%s", "S3n7 1n s0m3 7r0llz!!!");
+		    } else {
+			    pline("Sent in some %s.", makeplural(buf));
+		    }
+	    } else {
+		    pline("%s", nothing_happens);
+	    }
 	}
 }
 
