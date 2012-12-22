@@ -415,7 +415,11 @@ kick_steed()
 	}
 
 	pline("%s gallops!", Monnam(u.usteed));
-	u.ugallop += rn1(20, 30);
+	/* Unskilled:  10-19 (more) turns
+	 * Basic:      20-39 (more) turns
+	 * Skilled:    30-59 (more) turns
+	 * Expert:     40-79 (more) turns */
+	u.ugallop += rn1(P_SKILL(P_RIDING)*10, P_SKILL(P_RIDING)*10);
 	return;
 }
 
