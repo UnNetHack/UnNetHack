@@ -662,7 +662,8 @@ initoptions()
 	flags.pickup_burden = SLT_ENCUMBER;
 
 #ifdef SORTLOOT
-	iflags.sortloot = 'n';
+	/* sort only loot by default */
+	iflags.sortloot = 'l';
 #endif
 
 	for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++)
