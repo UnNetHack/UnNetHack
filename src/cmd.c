@@ -934,7 +934,7 @@ boolean want_disp;
 	}
 #endif
 
-	/* note: piousness 20 matches MIN_QUEST_ALIGN (quest.h) */
+	/* note: piousness 3 matches MIN_QUEST_ALIGN (quest.h) */
 	if (u.ualign.record >= 20)	you_are("piously aligned");
 	else if (u.ualign.record > 13)	you_are("devoutly aligned");
 	else if (u.ualign.record > 8)	you_are("fervently aligned");
