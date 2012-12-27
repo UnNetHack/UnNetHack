@@ -374,6 +374,7 @@ int	mntmp;
 		was_blind = !!Blind, dochange = FALSE;
 	boolean could_pass_walls = Passes_walls;
 	int mlvl;
+	const char *s;
 
 	if (mvitals[mntmp].mvflags & G_GENOD) {	/* allow G_EXTINCT */
 		You_feel("rather %s-ish.",mons[mntmp].mname);
@@ -432,6 +433,12 @@ int	mntmp;
 		Stoned = 0;
 		delayed_killer = 0;
 	}
+	if (uarmc && (s = OBJ_DESCR(objects[uarmc->otyp])) != (char *)0 &&
+	   !strcmp(s, "opera cloak") &&
+	   maybe_polyd(is_vampire(youmonst.data), Race_if(PM_VAMPIRE))) {
+		ABON(A_CHA) -= 1;
+		flags.botl = 1;
+	}
 
 	u.mtimedone = rn1(500, 500);
 	u.umonnum = mntmp;
@@ -441,6 +448,16 @@ int	mntmp;
 	 * Currently only strength gets changed.
 	 */
 	if(strongmonst(&mons[mntmp])) ABASE(A_STR) = AMAX(A_STR) = STR18(100);
+
+	if (uarmc && (s = OBJ_DESCR(objects[uarmc->otyp])) != (char *)0 &&
+	   !strcmp(s, "opera cloak") &&
+	   maybe_polyd(is_vampire(youmonst.data), Race_if(PM_VAMPIRE))) {
+		You("%s very impressive in your %s.", Blind ||
+				(Invis && !See_invisible) ? "feel" : "look",
+				OBJ_DESCR(objects[uarmc->otyp]));
+		ABON(A_CHA) += 1;
+		flags.botl = 1;
+	}
 
 	if (Stone_resistance && Stoned) { /* parnes@eniac.seas.upenn.edu */
 		Stoned = 0;
