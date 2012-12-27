@@ -1,10 +1,12 @@
-2012-XX-XX  UnNetHack 4.X.X
+2013-XX-XX  UnNetHack 4.X.X
 	* Mind flayer attacks only cause physical damage and int drain
 	* Wands and spells of digging are no longer restricted on maze levels
 	* Sokoban luck penalty removed and added tracking of solving Sokoban
 	  without any tricks
 	* Monster generation increasing with turn count (from SporkHack)
 	* Galloping duration depends on riding skills (idea by Beolach, code by Pasi Kallinen)
+	* Removed the Quest turn limit
+	* Player vampire gets a charisma bonus when wearing an opera cloak (by L)
 	
 	* New config option for customizing monster letter in UTF8graphics:
 	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke
@@ -63,8 +65,6 @@
 	* Reduce AC of dragon scales to 1 and dragon scale mails to 5
 	* Killing your Quest leader opens up the stairs to the lower quest
 	  levels (from SporkHack)
-	* Removed the Quest turn limit
-	* Player vampire gets a charisma bonus when wearing an opera cloak (by L)
 
 	* new branch:
 	  - the Dragon Caves (from NetHack Brass R/S)
