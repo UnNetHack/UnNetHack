@@ -86,7 +86,14 @@ struct color_option {
     int attr_bits;
 };
 
+#define STATCLR_TYPE_PERCENT 0
+#define STATCLR_TYPE_NUMBER_LT 1
+#define STATCLR_TYPE_NUMBER_GT 2
+#define STATCLR_TYPE_NUMBER_EQ 3
+
+
 struct percent_color_option {
+	xchar statclrtype;
 	int percentage;
 	struct color_option color_option;
 	const struct percent_color_option *next;

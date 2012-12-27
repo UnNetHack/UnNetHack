@@ -50,8 +50,25 @@ const struct percent_color_option *color_options;
 		struct color_option result = {NO_COLOR, 0};
 		return result;
 	}
-	if (100 * value <= color_options->percentage * max)
-		return color_options->color_option;
+	switch (color_options->statclrtype) {
+		default:
+		case STATCLR_TYPE_PERCENT:
+			if (100 * value <= color_options->percentage * max)
+				return color_options->color_option;
+			break;
+		case STATCLR_TYPE_NUMBER_EQ:
+			if (value == color_options->percentage)
+				return color_options->color_option;
+			break;
+		case STATCLR_TYPE_NUMBER_LT:
+			if (value < color_options->percentage)
+				return color_options->color_option;
+			break;
+		case STATCLR_TYPE_NUMBER_GT:
+			if (value > color_options->percentage)
+				return color_options->color_option;
+			break;
+	}
 	return percentage_color_of(value, max, color_options->next);
 }
 

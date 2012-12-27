@@ -1128,11 +1128,18 @@ char *start;
 	while (*start && isspace(*start)) start++;
 	for (middle = start; *middle != ':' && *middle != '=' && *middle != '\0'; ++middle);
 	*middle++ = '\0';
-	if (middle - start > 2 && start[2] == '%') {
+	if (middle - start > 2 && (start[2] == '%' || start[2] == '.' || start[2] == '<' || start[2] == '>')) {
 		struct percent_color_option *percent_color_option =
 			(struct percent_color_option *)alloc(sizeof(*percent_color_option));
 		percent_color_option->next = NULL;
 		percent_color_option->percentage = atoi(start + 3);
+		switch (start[2]) {
+			default:
+			case '%': percent_color_option->statclrtype = STATCLR_TYPE_PERCENT; break;
+			case '.': percent_color_option->statclrtype = STATCLR_TYPE_NUMBER_EQ; break;
+			case '>': percent_color_option->statclrtype = STATCLR_TYPE_NUMBER_GT; break;
+			case '<': percent_color_option->statclrtype = STATCLR_TYPE_NUMBER_LT; break;
+		}
 		percent_color_option->color_option = parse_color_option(middle);
 		start[2] = '\0';
 		if (percent_color_option->color_option.color >= 0

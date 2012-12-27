@@ -26,6 +26,7 @@
 
 	* Options:
 	  - default of sortloot changed to 'loot'
+	  - Allow exact numbers in STATUSCOLOR settings (from NAO)
 
 	* user interface improvements:
 	  - HP notify, showing HP changes in the message area (from NAO)
