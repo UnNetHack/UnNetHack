@@ -510,6 +510,7 @@ register struct	monst	*mtmp;
 	register int cnt;
 	register struct obj *otmp;
 	register struct permonst *ptr = mtmp->data;
+	int i;
 #ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) return;
 #endif
@@ -661,6 +662,18 @@ register struct	monst	*mtmp;
 #endif
 		break;
 	    case S_VAMPIRE:
+		/* some vampires get an opera cloak */
+		for (i = CLOAK_OF_PROTECTION; i < NUM_OBJECTS; i++) {
+			const char *zn;
+			if ((zn = OBJ_DESCR(objects[i])) && !strcmpi(zn, "opera cloak")) {
+				if (!OBJ_NAME(objects[i])) i = STRANGE_OBJECT;
+				break;
+			}
+		}
+		if (i != NUM_OBJECTS && rnf(1,8)) {
+			mongets(mtmp, i);
+		}
+
 		if (rn2(2)) {
 		    if ((int) mtmp->m_lev > rn2(30))
 			(void)mongets(mtmp, POT_VAMPIRE_BLOOD);
