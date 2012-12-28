@@ -615,7 +615,7 @@ int	mntmp;
 	    You("orient yourself on the web.");
 	    u.utrap = 0;
 	}
-	if (flaming(youmonst.data) || flaming(u.usteed) ||
+	if (flaming(youmonst.data) || (u.usteed && flaming(u.usteed->data)) ||
 	    is_whirly(youmonst.data) || amorphous(youmonst.data))
 	    u.ufeetfrozen = 0;
 

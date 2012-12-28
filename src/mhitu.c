@@ -2593,7 +2593,7 @@ int* pdmg;
 	} else if (is_lava(u.ux, u.uy)) {
 	    /* this block intentionally left blank */
 	} else if (flaming(youmonst.data) ||
-	    flaming(u.usteed)) {
+	    (u.usteed && flaming(u.usteed->data))) {
 	    pline_The("ice melts away!");
 	    if (pdmg) (*pdmg) = 0;
 	} else if (is_whirly(youmonst.data) ||
