@@ -1020,7 +1020,7 @@ int
 artifact_door(x, y)
 int x, y;
 {
-    int i;
+    /*int i;*/
 
 #ifdef ADVENT_CALENDAR
     /* on the advent calendar level all doors are indestructible */

@@ -1605,7 +1605,7 @@ domove()
 			     sensemon(mtmp))) {
 				nomul(0, 0);
 				flags.move = 0;
-				autoexplore_msg(Monnam(mtmp));
+				autoexplore_msg(Monnam(mtmp), -1);
 				return;
 			}
 		}

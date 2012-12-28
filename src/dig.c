@@ -242,9 +242,9 @@ dig()
 		return(0);
 	    }
 	    /* ALI - Artifact doors */
-	    if (IS_ROCK(lev->typ) && !may_dig(dpx,dpy) &&
-	    		dig_typ(uwep, dpx, dpy) == DIGTYP_ROCK ||
-		    IS_DOOR(lev->typ) && artifact_door(dpx, dpy)) {
+	    if ((IS_ROCK(lev->typ) && !may_dig(dpx,dpy) &&
+	    		dig_typ(uwep, dpx, dpy) == DIGTYP_ROCK) ||
+		    (IS_DOOR(lev->typ) && artifact_door(dpx, dpy))) {
 		pline("This %s is too hard to %s.",
 			IS_DOOR(lev->typ) ? "door" : "wall", verb);
 		return(0);
@@ -700,7 +700,7 @@ boolean pit_only;
 
 	if ((ttmp && (ttmp->ttyp == MAGIC_PORTAL || nohole)) ||
 	   /* ALI - artifact doors */
-	   IS_DOOR(levl[u.ux][u.uy].typ) && artifact_door(u.ux, u.uy) ||
+	   (IS_DOOR(levl[u.ux][u.uy].typ) && artifact_door(u.ux, u.uy)) ||
 	   (IS_ROCK(lev->typ) && lev->typ != SDOOR &&
 	    (lev->wall_info & W_NONDIGGABLE) != 0)) {
 		pline_The("%s here is too hard to dig in.", surface(u.ux,u.uy));
