@@ -1337,6 +1337,10 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	    long iw = (long)max_capacity() - GOLD_WT(u.ugold);
 	    long gold_capacity = GOLD_CAPACITY(iw, u.ugold);
 
+	    if ((res = lift_object(obj, (struct obj *)0, &count, telekinesis)) <= 0) {
+		return res;
+	    }
+
 	    if (gold_capacity <= 0L) {
 		pline(
 	       "There %s %ld gold piece%s %s, but you cannot carry any more.",

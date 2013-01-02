@@ -50,6 +50,7 @@
 	    player falls into lava. (from GruntHack)
 	  - Fix security bug in options handler (reported by Matthew Daley,
 	    fixed by Pasi Kallinen)
+	  - Honor pickup_burden when picking up gold.
 
 2012-04-01  UnNetHack 4.0.0
 	* Uncursed and blessed scrolls of magic mapping reveal secret doors
