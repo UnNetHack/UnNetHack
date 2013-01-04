@@ -1604,7 +1604,7 @@ boolean
 Invocation_lev(lev)
 d_level *lev;
 {
-	return((boolean)(In_hell(lev) &&
+	return((boolean)(In_hell(lev) && !In_sheol(lev) &&
 		lev->dlevel == (dungeons[lev->dnum].num_dunlevs - 1)));
 }
 
