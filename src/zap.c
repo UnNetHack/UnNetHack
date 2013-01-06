@@ -2384,9 +2384,9 @@ boolean			youattack, allow_cancel_kill, self_cancel;
 		const char* msg = (char *)0;
 		/* this is probably not the proper way of doing it */
 		int adtyp = mdef->data->mattk[0].adtyp;
-		int attyp = mdef->data->mattk[0].adtyp;
+		int aatyp = mdef->data->mattk[0].aatyp;
 
-		if (attyp != AT_NONE) {
+		if (aatyp != AT_NONE) {
 			switch (adtyp) {
 				case AD_COLD:
 					msg = "warmer";
