@@ -2364,6 +2364,7 @@ boolean			youattack, allow_cancel_kill, self_cancel;
 		    rehumanize();
 	    }
 	} else {
+	    boolean got_cancelled = !mdef->mcan;
 	    mdef->mcan = TRUE;
 
 	    if (is_were(mdef->data) && mdef->data->mlet != S_HUMAN)
@@ -2378,6 +2379,39 @@ boolean			youattack, allow_cancel_kill, self_cancel;
 			killed(mdef);
 		    else
 			monkilled(mdef, "", AD_SPEL);
+		}
+	    } else if (got_cancelled && canseemon(mdef)) {
+		const char* msg = (char *)0;
+		/* this is probably not the proper way of doing it */
+		int adtyp = mdef->data->mattk[0].adtyp;
+		int attyp = mdef->data->mattk[0].adtyp;
+
+		if (attyp != AT_NONE) {
+			switch (adtyp) {
+				case AD_COLD:
+					msg = "warmer";
+					break;
+				case AD_FIRE:
+					msg = "colder";
+					break;
+				case AD_CORR:
+					msg = "less corrosive";
+					break;
+				case AD_RUST:
+					msg = "less rusting";
+					break;
+				case AD_ENCH:
+					msg = "less effective";
+					break;
+				case AD_DISN:
+					msg = "less disintegrative";
+					break;
+				default:
+					break;
+			}
+			if (msg) {
+				pline("%s seems to be %s!", Monnam(mdef), msg);
+			}
 		}
 	    }
 	}
