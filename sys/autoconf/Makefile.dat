@@ -12,7 +12,7 @@ EXEEXT = @EXEEXT@
 # UUDECODE=uudecode
 
 VARDAT = data rumors quest.dat oracles options
-LEVCOMP_FLAGS=-v
+LEVCOMP_FLAGS=
 
 all:	$(VARDAT) spec_levs quest_levs dungeon
 
