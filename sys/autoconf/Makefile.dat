@@ -332,10 +332,10 @@ quest_levs: ../util/lev_comp \
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Rogue.des
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Samurai.des
 	@if egrep -s tourists options > /dev/null ; then \
-	echo ../util/lev_comp $(srcdir)/Tourist.des ; ../util/lev_comp $(srcdir)/Tourist.des ; \
+	echo ../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Tourist.des ; ../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Tourist.des ; \
 	else rm -f Tou-goal.lev Tou-fil?.lev Tou-loca.lev Tou-strt.lev ; fi
-	../util/lev_comp $(srcdir)/Valkyrie.des
-	../util/lev_comp $(srcdir)/Wizard.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Valkyrie.des
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Wizard.des
 	touch quest_levs
 
 dungeon: $(srcdir)/dungeon.def ../util/makedefs ../util/dgn_comp
