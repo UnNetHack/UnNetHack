@@ -273,7 +273,7 @@ MONSTER:('&',"lava demon"),(26,14),hostile,awake
 # Elite guard
 MONSTER:(''',"iron golem"),(04,13),hostile
 # Objects
-OBJECT:('0',"heavy iron ball"),(31,10),blessed,0,NAME:"The Iron Ball of Liberation"
+OBJECT:('0',"heavy iron ball"),(31,10),blessed,0,name:"The Iron Ball of Liberation"
 OBJECT:('(',"chest"),(55,18),blessed,2
 # Warden Arianna
 MONSTER:('@',"Warden Arianna"),(31,10),hostile {

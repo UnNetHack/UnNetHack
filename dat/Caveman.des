@@ -232,7 +232,7 @@ STAIR:random,up
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Objects
-OBJECT:(')',"mace"),(23,10),blessed,0,NAME:"The Sceptre of Might"
+OBJECT:(')',"mace"),(23,10),blessed,0,name:"The Sceptre of Might"
 LOOP [10 + 2d8] {
   OBJECT:random,random
 }

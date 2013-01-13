@@ -182,7 +182,7 @@ NON_DIGGABLE:(00,00,34,16)
 DRAWBRIDGE:(17,02),south,open
 DRAWBRIDGE:(17,14),north,open
 # Objects
-OBJECT:('(',"crystal ball"),(17,08),blessed,5,NAME:"The Orb of Fate"
+OBJECT:('(',"crystal ball"),(17,08),blessed,5,name:"The Orb of Fate"
 LOOP [4 + 3d5] {
   OBJECT:random,random
 }

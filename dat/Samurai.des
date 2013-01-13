@@ -276,7 +276,7 @@ STAIR:$place[0],up
 # Non diggable walls
 NON_DIGGABLE:(00,00,44,19)
 # Objects
-OBJECT:(')',"tsurugi"),(22,10),blessed,0,NAME:"The Tsurugi of Muramasa"
+OBJECT:(')',"tsurugi"),(22,10),blessed,0,name:"The Tsurugi of Muramasa"
 LOOP [9 + 1d6] {
   OBJECT:random,random
 }

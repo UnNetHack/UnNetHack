@@ -198,7 +198,7 @@ STAIR:(39,10),up
 # Non diggable walls
 NON_DIGGABLE:(00,00,40,11)
 # Objects
-OBJECT:(')',"quarterstaff"),(20,06),blessed,0,NAME:"The Staff of Aesculapius"
+OBJECT:(')',"quarterstaff"),(20,06),blessed,0,name:"The Staff of Aesculapius"
 OBJECT:('/',"lightning"),(20,06)
 LOOP [10 + 1d5] {
   OBJECT:random,random
