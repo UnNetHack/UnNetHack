@@ -168,7 +168,7 @@ extern const char *fname;
 %token	<i> MAZE_GRID_ID SOLID_FILL_ID MINES_ID SHEOL_ID
 %token	<i> MESSAGE_ID LEVEL_ID LEV_INIT_ID GEOMETRY_ID NOMAP_ID
 %token	<i> OBJECT_ID COBJECT_ID MONSTER_ID TRAP_ID DOOR_ID DRAWBRIDGE_ID
-%token	<i> object_ID
+%token	<i> object_ID monster_ID terrain_ID
 %token	<i> MAZEWALK_ID WALLIFY_ID REGION_ID FILLING
 %token	<i> ALTAR_ID LADDER_ID STAIR_ID NON_DIGGABLE_ID NON_PASSWALL_ID ROOM_ID
 %token	<i> PORTAL_ID TELEPRT_ID BRANCH_ID LEV CHANCE_ID
@@ -225,7 +225,7 @@ extern const char *fname;
 %type	<i> all_integers
 %type	<i> ter_selection ter_selection_x
 %type	<i> corefunc_param_part
-%type	<i> objectid
+%type	<i> objectid monsterid terrainid
 %type	<map> string level_def
 %type	<map> any_var any_var_array any_var_or_arr
 %type	<map> corefunc_param_list corefunc_params_list
@@ -526,13 +526,13 @@ variable_define	: any_var_or_arr '=' math_expr
 		      Free($1);
 		      Free($3);
 		  }
-		| any_var_or_arr '=' TERRAIN_ID ':' mapchar
+		| any_var_or_arr '=' terrainid ':' mapchar
 		  {
 		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_MAPCHAR);
 		      add_opvars(splev, "miso", (long)$5, 0, $1, SPO_VAR_INIT);
 		      Free($1);
 		  }
-		| any_var_or_arr '=' MONSTER_ID ':' encodemonster
+		| any_var_or_arr '=' monsterid ':' encodemonster
 		  {
 		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_MONST);
 		      add_opvars(splev, "Miso", (long)$5, 0, $1, SPO_VAR_INIT);
@@ -577,14 +577,14 @@ variable_define	: any_var_or_arr '=' math_expr
 		      add_opvars(splev, "iso", n_items, $1, SPO_VAR_INIT);
 		      Free($1);
 		  }
-		| any_var_or_arr '=' TERRAIN_ID ':' '{' mapchar_list '}'
+		| any_var_or_arr '=' terrainid ':' '{' mapchar_list '}'
 		  {
 		      long n_items = $6;
 		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_MAPCHAR|SPOVAR_ARRAY);
 		      add_opvars(splev, "iso", n_items, $1, SPO_VAR_INIT);
 		      Free($1);
 		  }
-		| any_var_or_arr '=' MONSTER_ID ':' '{' encodemonster_list '}'
+		| any_var_or_arr '=' monsterid ':' '{' encodemonster_list '}'
 		  {
 		      long n_items = $6;
 		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_MONST|SPOVAR_ARRAY);
@@ -2422,6 +2422,14 @@ string		: STRING
 
 objectid	: object_ID
 		| OBJECT_ID
+		;
+
+monsterid	: monster_ID
+		| MONSTER_ID
+		;
+
+terrainid	: terrain_ID
+		| TERRAIN_ID
 		;
 
 chance		: /* empty */
