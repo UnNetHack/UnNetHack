@@ -120,6 +120,7 @@ enum opcode_defs {
     SPO_VAR_INIT, /* variable_name data */
     SPO_SHUFFLE_ARRAY,
     SPO_DICE,
+    SPO_COREFUNC,
 
     SPO_SEL_ADD,
     SPO_SEL_POINT,
@@ -134,6 +135,35 @@ enum opcode_defs {
     SPO_SEL_FILTER,
 
     MAX_SP_OPCODES
+};
+
+/* "Functions" exposed from the core to the level compiler.
+ * Function handling is in spo_corefunc() in sp_lev.c
+ * See also core_vars[] in util/lev_main.c for their public
+ * names and what parameters they take and return.
+ */
+enum corefuncs {
+    COREFUNC_NONE = 0,
+    COREFUNC_LEVEL_DIFFICULTY,
+    COREFUNC_DISCORDIAN_HOLIDAY,
+    COREFUNC_PIRATEDAY,
+    COREFUNC_APRILFOOLSDAY,
+    COREFUNC_PIDAY,
+    COREFUNC_TOWELDAY,
+    COREFUNC_MIDNIGHT,
+    COREFUNC_NIGHT,
+    COREFUNC_FRIDAY_13TH,
+    COREFUNC_POM,
+    COREFUNC_YYYYMMDD,
+    COREFUNC_PLNAME,
+    COREFUNC_TOSTRING,
+    COREFUNC_TOINT,
+    COREFUNC_SOBJ_AT,
+    COREFUNC_CARRYING,
+    COREFUNC_ROLE,
+    COREFUNC_RACE,
+
+    NUM_COREFUNCS
 };
 
 /* MONSTER and OBJECT can take a variable number of parameters,
