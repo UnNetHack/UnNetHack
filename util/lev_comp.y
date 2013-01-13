@@ -757,7 +757,6 @@ opt_percent	: /* nothing */
 		  }
 		| PERCENT
 		  {
-		      if ($1 < 0 || $1 > 100) lc_error("Unexpected percentile chance '%li%%'", $1);
 		      $$ = $1;
 		  }
 		;
@@ -768,7 +767,6 @@ opt_spercent	: /* nothing */
 		  }
 		| ',' SPERCENT
 		  {
-		      if ($2 < 0 || $2 > 100) lc_error("Unexpected percentile chance '%li%%'", $2);
 		      $$ = $2;
 		  }
 		;
@@ -1233,13 +1231,9 @@ lvl_sound_part	: '(' MSG_OUTPUT_TYPE ',' string_expr ')'
 
 mon_generation	: MON_GENERATION_ID ':' SPERCENT ',' mon_gen_list
 		  {
-		      long chance = $3;
 		      long total_mons = $5;
-		      if (chance < 0) chance = 0;
-		      else if (chance > 100) chance = 100;
-
 		      if (total_mons < 1) lc_error("Monster generation: zero monsters defined?");
-		      add_opvars(splev, "iio", chance, total_mons, SPO_MON_GENERATION);
+		      add_opvars(splev, "iio", $3, total_mons, SPO_MON_GENERATION);
 		  }
 		;
 
@@ -1726,12 +1720,7 @@ terrain_type	: CHAR
 
 replace_terrain_detail : REPLACE_TERRAIN_ID ':' region_or_var ',' mapchar_or_var ',' mapchar_or_var ',' SPERCENT
 		  {
-		      long chance;
-
-		      chance = $9;
-		      if (chance < 0) chance = 0;
-		      else if (chance > 100) chance = 100;
-		      add_opvars(splev, "io", chance, SPO_REPLACETERRAIN);
+		      add_opvars(splev, "io", $9, SPO_REPLACETERRAIN);
 		  }
 		;
 

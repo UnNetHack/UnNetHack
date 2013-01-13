@@ -290,10 +290,16 @@ sky		{ yylval.i=SKYMAP; return FLAG_TYPE; }
 		  } else { yylval.dice.num = yylval.dice.die = 1; }
 		  return DICE;
 		}
-\[\ *[0-9]+\%\ *\] { yylval.i = atoi(yytext + 1); return PERCENT; }
+\[\ *[0-9]+\%\ *\] { yylval.i = atoi(yytext + 1);
+		     if (yylval.i < 0 || yylval.i > 100)
+			lc_error("Unexpected percentile '%li%%'", yylval.i);
+		     return PERCENT; }
 -[0-9]+		{ yylval.i=atoi(yytext); return MINUS_INTEGER; }
 \+[0-9]+	{ yylval.i=atoi(yytext); return PLUS_INTEGER; }
-[0-9]+\%	{ yylval.i = atoi(yytext); return SPERCENT; }
+[0-9]+\%	{ yylval.i = atoi(yytext);
+		  if (yylval.i < 0 || yylval.i > 100)
+		     lc_error("Unexpected percentile '%li%%'", yylval.i);
+		  return SPERCENT; }
 [0-9]+		{ yylval.i=atoi(yytext); return INTEGER; }
 \"[^"]*\"	{ yytext[yyleng-1] = 0; /* Discard the trailing \" */
 		  yylval.map = (char *) alloc(strlen(yytext+1)+1);
