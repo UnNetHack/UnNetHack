@@ -1456,6 +1456,10 @@ static const char *epitaphs[] = {
 	"Res omnia mea culpa est",
 	"Rest In Pieces",
 	"You said it wasn't poisonous!",
+
+	/* from UnNetHackPlus */
+	"2007-2010 SporkHack",
+	"1998-2006 SLASH'EM",
 };
 
 /* Create a headstone at the given location.
