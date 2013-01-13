@@ -1457,9 +1457,13 @@ static const char *epitaphs[] = {
 	"Rest In Pieces",
 	"You said it wasn't poisonous!",
 
+	/* from UnNetHack */
+	"Hack 1984-1985",
+	"NetHack 1987-2003",
+
 	/* from UnNetHackPlus */
-	"2007-2010 SporkHack",
-	"1998-2006 SLASH'EM",
+	"SporkHack 2007-2010",
+	"SLASH'EM 1997-2006",
 };
 
 /* Create a headstone at the given location.
