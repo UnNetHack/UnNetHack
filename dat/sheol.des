@@ -69,7 +69,7 @@ YPPPPPPPPPPPPUIPPIIPPP...
 YPPPPPPPPIPPIIPPPUP......
 ENDMAP
 
-$monster = MONSTER: { 'X','T','L',''','N','x','@','V' }
+$monster = monster: { 'X','T','L',''','N','x','@','V' }
 SHUFFLE: $monster
 
 STAIR: (4,8),down

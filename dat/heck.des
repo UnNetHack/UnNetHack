@@ -1320,7 +1320,7 @@ MAP
 --------.--------
  - - - - - - - - 
 ENDMAP
-$monster = MONSTER:{ 'P','E','R','X','&' }
+$monster = monster:{ 'P','E','R','X','&' }
 SHUFFLE: $monster
 BRANCH:levregion(1,0,79,20),(0,0,0,0)
 MONSTER:$monster[0],random
@@ -1353,7 +1353,7 @@ MAP
 --------.--------
  - - - - - - - - 
 ENDMAP
-$monster = MONSTER:{ 'P','E','R','X','&' }
+$monster = monster:{ 'P','E','R','X','&' }
 SHUFFLE: $monster
 MAZEWALK:(0,0),east
 MONSTER:$monster[0],random
@@ -1726,7 +1726,7 @@ MAP
 ----.----
  - - - - 
 ENDMAP
-$monster = MONSTER:{ 'H','O','D','A','n','E' }
+$monster = monster:{ 'H','O','D','A','n','E' }
 SHUFFLE: $monster
 BRANCH:levregion(1,0,79,20),(0,0,0,0)
 MAZEWALK:(2,4),west

@@ -137,7 +137,7 @@ MAP
 ENDMAP
 
 IF [30%] {
-   $outside = TERRAIN:{ 'L', 'T', '}', 'C' }
+   $outside = terrain:{ 'L', 'T', '}', 'C' }
    SHUFFLE: $outside
    REPLACE_TERRAIN:(6,5, 68,11),'-',$outside[0],100%
    REPLACE_TERRAIN:(6,5, 68,11),'|',$outside[0],100%
@@ -221,12 +221,12 @@ MAP
 ENDMAP
 
 $corners = selection: (05,02) & (05,15) & (69,02) & (69,15)
-$terrain = TERRAIN:{ 'L', 'T', '{', '.' }
+$terrain = terrain:{ 'L', 'T', '{', '.' }
 SHUFFLE:$terrain
 TERRAIN:$corners, $terrain[0]
 
 IF [30%] {
-   $outside = TERRAIN:{ 'L', 'T', '}' }
+   $outside = terrain:{ 'L', 'T', '}' }
    SHUFFLE: $outside
    REPLACE_TERRAIN:(0,0, 74,17),'-',$outside[0],100%
    REPLACE_TERRAIN:(0,0, 74,17),'|',$outside[0],100%
@@ -383,7 +383,7 @@ MAP
               -----                                                        
 ENDMAP
 
-$terrain = TERRAIN:{ 'L', 'T', '{', '.' }
+$terrain = terrain:{ 'L', 'T', '{', '.' }
 SHUFFLE:$terrain
 REPLACE_TERRAIN:(00,00,74,18),'L',$terrain[0],100%
 

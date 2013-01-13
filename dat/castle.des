@@ -44,9 +44,9 @@ MAP
 ENDMAP
 
 # Random registers initialisation
-$object = OBJECT: { '[',')','*','%' }
+$object = object: { '[',')','*','%' }
 $place = { (04,02),(58,02),(04,14),(58,14) }
-$monster = MONSTER:{ 'L','N','E','H','M','O','R','T','X','Z' }
+$monster = monster:{ 'L','N','E','H','M','O','R','T','X','Z' }
 SHUFFLE: $place
 SHUFFLE: $object
 SHUFFLE: $monster
@@ -283,9 +283,9 @@ T.}}}.}.|....|.LLLLL.|..........--FFFF-|......|}}}}}}}}...}....|------------
 }}}}}}}}}.....}}}}}}}}}}}}}}}}}}}}}}}}.....T..}}}}}}}}.}}}}}}..-------------
 ENDMAP
 
-$object = OBJECT: { '[',')' }
+$object = object: { '[',')' }
 $place = { (09,08),(09,09),(09,10),(52,03),(52,15) }
-$monster = MONSTER:{ 'L','N','E','V','M','O','R','T','X','Z' }
+$monster = monster:{ 'L','N','E','V','M','O','R','T','X','Z' }
 SHUFFLE: $place
 SHUFFLE: $object
 SHUFFLE: $monster
@@ -509,7 +509,7 @@ LLLLLL.............| - - - - - - - - - - - - - - - - - - - - - - - - |......
 LLLL...............---------------------------------------------------......
 ENDMAP
 
-$monster = MONSTER:{ 'L','L','E','E','R','R','T','T','O','O' }
+$monster = monster:{ 'L','L','E','E','R','R','T','T','O','O' }
 $place = { (15,01),(11,01),(09,01),(05,01),
            (03,03),(03,07),
            (05,09),(08,09),(12,09),(15,09) }

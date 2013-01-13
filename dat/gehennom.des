@@ -353,7 +353,7 @@ MAP
 ..}}}}}.}}}}}.}}}}}.}}}}}.}}}}}.}}}}}.}}}}}.}}}}}..
 ENDMAP
 # Random registers
-$monster = MONSTER:{'j','b','P','F'}
+$monster = monster:{'j','b','P','F'}
 $place = { (04,02),(46,02),(04,15),(46,15) }
 SHUFFLE:$place
 # Dungeon description
@@ -1367,7 +1367,7 @@ IF [50%] {
   }
 }
 #
-$object = OBJECT:{ '(','/','=','+',')','[','?','*','%'}
+$object = object:{ '(','/','=','+',')','[','?','*','%'}
 OBJECT: $object[0], random
 OBJECT: $object[0], random
 OBJECT: $object[1], random
@@ -1377,7 +1377,7 @@ OBJECT: $object[4], random
 OBJECT: random, random
 OBJECT: random, random
 #
-$monster = MONSTER:{ 'V','D',' ','&','Z' }
+$monster = monster:{ 'V','D',' ','&','Z' }
 MONSTER:$monster[0],random,hostile
 MONSTER:$monster[0],random,hostile
 MONSTER:$monster[1],random,hostile
