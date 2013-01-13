@@ -833,6 +833,7 @@ rndtrap()
  */
 #define DRY	0x1
 #define WET	0x2
+#define ANY_LOC 0x4
 
 STATIC_DCL boolean FDECL(is_ok_location, (SCHAR_P, SCHAR_P, int));
 
@@ -901,6 +902,8 @@ register int humidity;
 	register int typ;
 
 	if (Is_waterlevel(&u.uz)) return TRUE;	/* accept any spot */
+
+	if (humidity & ANY_LOC) return TRUE;
 
 	if (humidity & DRY) {
 	    typ = levl[x][y].typ;
@@ -2692,6 +2695,86 @@ frame_del(frame)
     Free(frame);
 }
 
+void
+spo_corefunc(coder, fn)
+     struct sp_coder *coder;
+     long fn;
+{
+    struct opvar *i;
+    struct opvar *s;
+    switch (fn) {
+    default: impossible("Unknown sp_lev core function %li", fn); break;
+    case COREFUNC_LEVEL_DIFFICULTY: i = opvar_new_int(level_difficulty()); splev_stack_push(coder->stack, i); break;
+    case COREFUNC_DISCORDIAN_HOLIDAY: i = opvar_new_int(discordian_holiday()); splev_stack_push(coder->stack, i); break;
+    case COREFUNC_PIRATEDAY: i = opvar_new_int(pirateday()); splev_stack_push(coder->stack, i); break;
+    case COREFUNC_APRILFOOLSDAY: i = opvar_new_int(aprilfoolsday()); splev_stack_push(coder->stack, i); break;
+    case COREFUNC_PIDAY: i = opvar_new_int(piday()); splev_stack_push(coder->stack, i); break;
+    case COREFUNC_TOWELDAY: i = opvar_new_int(towelday()); splev_stack_push(coder->stack, i); break;
+    case COREFUNC_MIDNIGHT: i = opvar_new_int(midnight()); splev_stack_push(coder->stack, i); break;
+    case COREFUNC_NIGHT: i = opvar_new_int(night()); splev_stack_push(coder->stack, i); break;
+    case COREFUNC_FRIDAY_13TH: i = opvar_new_int(friday_13th()); splev_stack_push(coder->stack, i); break;
+    case COREFUNC_POM: i = opvar_new_int(phase_of_the_moon()); splev_stack_push(coder->stack, i); break;
+    case COREFUNC_YYYYMMDD: i = opvar_new_int(yyyymmdd(0)); splev_stack_push(coder->stack, i); break;
+    case COREFUNC_PLNAME: s = opvar_new_str(plname); splev_stack_push(coder->stack, s); break;
+    case COREFUNC_ROLE: s = opvar_new_str(urole.name.m); splev_stack_push(coder->stack, s); break;
+    case COREFUNC_RACE: s = opvar_new_str(urace.noun); splev_stack_push(coder->stack, s); break;
+    case COREFUNC_TOSTRING:
+	if (OV_pop_i(i)) {
+	    char tmpbuf[64];
+	    sprintf(tmpbuf, "%li", OV_i(i));
+	    s = opvar_new_str(tmpbuf);
+	    splev_stack_push(coder->stack, s);
+	    opvar_free(i);
+	} else impossible("No int in stack for tostring()");
+	break;
+    case COREFUNC_TOINT:
+	if (OV_pop_s(s)) {
+	    long li = atoi(OV_s(s));
+	    i = opvar_new_int(li);
+	    splev_stack_push(coder->stack, i);
+	    opvar_free(s);
+	} else impossible("No string in stack for toint()?");
+	break;
+    case COREFUNC_SOBJ_AT:
+	{
+	    long retval = 0;
+	    struct opvar *obj;
+	    struct opvar *crd;
+	    int otyp;
+	    schar ox, oy;
+	    if (!OV_pop_c(crd) || !OV_pop_typ(obj, SPOVAR_OBJ)) {
+		impossible("No coord and obj for obj_at()");
+		return;
+	    }
+	    otyp = SP_OBJ_TYP(OV_i(obj));
+	    ox = SP_COORD_X(OV_i(crd));
+	    oy = SP_COORD_Y(OV_i(crd));
+	    get_location(&ox, &oy, ANY_LOC, coder->croom);
+	    if (otyp >= 0 && ox >= 0 && oy >= 0 && ox < COLNO && oy < ROWNO) {
+		retval = sobj_at(otyp, ox, oy) ? 1 : 0;
+	    }
+	    i = opvar_new_int(retval);
+	    splev_stack_push(coder->stack, i);
+	    opvar_free(obj);
+	    opvar_free(crd);
+	}
+	break;
+    case COREFUNC_CARRYING:
+	{
+	    struct opvar *obj;
+	    int otyp;
+	    if (!OV_pop_typ(obj, SPOVAR_OBJ)) {
+		impossible("No obj for carrying()");
+		return;
+	    }
+	    otyp = SP_OBJ_TYP(OV_i(obj));
+	    i = opvar_new_int(carrying(otyp) ? 1 : 0);
+	    splev_stack_push(coder->stack, i);
+	    opvar_free(obj);
+	}
+	break;
+    }
+}
 
 void
 spo_frame_push(coder)
@@ -5023,6 +5106,13 @@ sp_lev *lvl;
 		opvar_free(tmpv);
 	    }
          break;
+	case SPO_COREFUNC:
+	    {
+		struct opvar *a;
+		if (!OV_pop_i(a)) break;
+		spo_corefunc(coder, OV_i(a));
+	    }
+	    break;
 	case SPO_DICE:
 	    {
 		struct opvar *a, *b, *t;

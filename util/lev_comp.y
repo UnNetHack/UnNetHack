@@ -81,6 +81,12 @@ extern struct lc_vardefs *FDECL(add_vardef_type, (struct lc_vardefs *, char *, l
 
 extern int FDECL(reverse_jmp_opcode, (int));
 
+extern int FDECL(is_core_func, (char *));
+extern int FDECL(core_func_idx, (char *));
+extern char FDECL(core_func_retval, (int));
+extern const char *FDECL(core_func_params, (int));
+extern const char *FDECL(core_func_name, (int));
+extern int FDECL(handle_corefunc, (sp_lev *, char *, char *, char));
 
 struct coord {
 	long x;
@@ -162,6 +168,7 @@ extern const char *fname;
 %token	<i> MAZE_GRID_ID SOLID_FILL_ID MINES_ID SHEOL_ID
 %token	<i> MESSAGE_ID LEVEL_ID LEV_INIT_ID GEOMETRY_ID NOMAP_ID
 %token	<i> OBJECT_ID COBJECT_ID MONSTER_ID TRAP_ID DOOR_ID DRAWBRIDGE_ID
+%token	<i> object_ID
 %token	<i> MAZEWALK_ID WALLIFY_ID REGION_ID FILLING
 %token	<i> ALTAR_ID LADDER_ID STAIR_ID NON_DIGGABLE_ID NON_PASSWALL_ID ROOM_ID
 %token	<i> PORTAL_ID TELEPRT_ID BRANCH_ID LEV CHANCE_ID
@@ -189,6 +196,7 @@ extern const char *fname;
 %token	<i> ',' ':' '(' ')' '[' ']' '{' '}'
 %token	<map> STRING MAP_ID
 %token	<map> NQSTRING VARSTRING
+%token	<map> COREFUNC COREFUNC_INT COREFUNC_STR
 %token	<map> VARSTRING_INT VARSTRING_INT_ARRAY
 %token	<map> VARSTRING_STRING VARSTRING_STRING_ARRAY
 %token	<map> VARSTRING_VAR VARSTRING_VAR_ARRAY
@@ -211,12 +219,16 @@ extern const char *fname;
 %type	<i> comparestmt encodecoord encoderegion mapchar
 %type	<i> seen_trap_mask
 %type	<i> mon_gen_list encodemonster encodeobj encodeobj_list
+%type	<i> encodexobj
 %type	<i> sounds_list integer_list string_list encodecoord_list encoderegion_list mapchar_list encodemonster_list
 %type	<i> opt_percent opt_spercent opt_fillchar
 %type	<i> all_integers
 %type	<i> ter_selection ter_selection_x
+%type	<i> corefunc_param_part
+%type	<i> objectid
 %type	<map> string level_def
 %type	<map> any_var any_var_array any_var_or_arr
+%type	<map> corefunc_param_list corefunc_params_list
 %type	<corpos> corr_spec
 %type	<lregn> region lev_region
 %type	<crd> room_pos subroom_pos room_align
@@ -411,6 +423,7 @@ levstatement 	: message
 		| exitstatement
 		| function_define
 		| function_call
+		| corefunc_stmt
 		| ladder_detail
 		| map_definition
 		| mazewalk_detail
@@ -525,7 +538,7 @@ variable_define	: any_var_or_arr '=' math_expr
 		      add_opvars(splev, "Miso", (long)$5, 0, $1, SPO_VAR_INIT);
 		      Free($1);
 		  }
-		| any_var_or_arr '=' OBJECT_ID ':' encodeobj
+		| any_var_or_arr '=' objectid ':' encodeobj
 		  {
 		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_OBJ);
 		      add_opvars(splev, "Oiso", (long)$5, 0, $1, SPO_VAR_INIT);
@@ -578,7 +591,7 @@ variable_define	: any_var_or_arr '=' math_expr
 		      add_opvars(splev, "iso", n_items, $1, SPO_VAR_INIT);
 		      Free($1);
 		  }
-		| any_var_or_arr '=' OBJECT_ID ':' '{' encodeobj_list '}'
+		| any_var_or_arr '=' objectid ':' '{' encodeobj_list '}'
 		  {
 		      long n_items = $6;
 		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_OBJ|SPOVAR_ARRAY);
@@ -769,6 +782,12 @@ comparestmt     : PERCENT
 		| '[' math_expr_var COMPARE_TYPE math_expr_var ']'
                   {
 		      $$ = $3;
+                  }
+		| '[' math_expr_var ']'
+                  {
+		      /* boolean, explicit foo != 0 */
+		      add_opvars(splev, "i", 0);
+		      $$ = SPO_JNE;
                   }
 		;
 
@@ -1925,6 +1944,7 @@ string_or_var	: STRING
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
+		| corefunc_str		{ }
 		;
 
 
@@ -2102,6 +2122,45 @@ object_or_var	: encodeobj
 		  }
 		;
 
+xobject_or_var	: encodexobj
+		  {
+		      add_opvars(splev, "O", $1);
+		  }
+		| VARSTRING_OBJ
+		  {
+		      check_vardef_type(variable_definitions, $1, SPOVAR_OBJ);
+		      add_opvars(splev, "v", $1);
+		      Free($1);
+		  }
+		| VARSTRING_OBJ_ARRAY '[' math_expr ']'
+		  {
+		      check_vardef_type(variable_definitions, $1, SPOVAR_OBJ|SPOVAR_ARRAY);
+		      add_opvars(splev, "v", $1);
+		      Free($1);
+		  }
+		;
+
+/* exact object type */
+encodexobj	: '(' CHAR ',' STRING ')'
+		  {
+		      long m = get_object_id($4, (char) $2);
+		      if (m == ERR) {
+			  lc_error("Unknown object ('%c', \"%s\")!", $2, $4);
+			  $$ == -1;
+		      } else
+			  $$ = SP_OBJ_PACK(m, $2);
+		  }
+		| objectid ':' STRING
+		  {
+		      long m = get_object_id($3, (char)0);
+		      if (m == ERR) {
+			  lc_error("Unknown object \"%s\"!", $3);
+			  $$ == -1;
+		      } else
+			  $$ = SP_OBJ_PACK(m, 1); /* obj class != 0 to force generation of a specific item */
+		  }
+		;
+
 encodeobj	: STRING
 		  {
 		      long m = get_object_id($1, (char)0);
@@ -2147,6 +2206,7 @@ string_expr	: string_or_var                 { }
 math_expr_var	: INTEGER                       { add_opvars(splev, "i", $1 ); }
 		| dice				{ }
 		| '(' MINUS_INTEGER ')'         { add_opvars(splev, "i", $2 ); }
+		| corefunc_int			{ }
 		| VARSTRING_INT
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_INT);
@@ -2167,9 +2227,91 @@ math_expr_var	: INTEGER                       { add_opvars(splev, "i", $1 ); }
 		| '(' math_expr ')'             { }
 		;
 
+corefunc_param_part	: math_expr_var
+			  {
+			      $$ = (int)'i';
+			  }
+			| string_expr
+			  {
+			      $$ = (int)'s';
+			  }
+			| xobject_or_var
+			  {
+			      $$ = (int)'O';
+			  }
+			| coord_or_var
+			  {
+			      $$ = (int)'c';
+			  }
+			;
+
+corefunc_param_list	: corefunc_param_part
+			  {
+			      char tmpbuf[2];
+			      tmpbuf[0] = (char) $1;
+			      tmpbuf[1] = '\0';
+			      $$ = strdup(tmpbuf);
+			  }
+			| corefunc_param_part ',' corefunc_param_list
+			  {
+			      long len = strlen( $3 );
+			      char *tmp = (char *)alloc(len + 2);
+			      sprintf(tmp, "%c%s", $1, $3 );
+			      Free( $3 );
+			      $$ = tmp;
+			  }
+			;
+
+corefunc_params_list	: /* nothing */
+			  {
+			      $$ = strdup(" ");
+			  }
+			| corefunc_param_list
+			  {
+			      $$ = strdup($1);
+			      Free($1);
+			  }
+			;
+
+corefunc_stmt	: COREFUNC '(' corefunc_params_list ')'
+		  {
+		      handle_corefunc(splev, $1, $3, 'i');
+		      Free($1);
+		      Free($3);
+		  }
+		;
+
+corefunc_int	: COREFUNC_INT
+		  {
+		      handle_corefunc(splev, $1, "", 'i');
+		      Free($1);
+		  }
+		| COREFUNC_INT '(' corefunc_params_list ')'
+		  {
+		      handle_corefunc(splev, $1, $3, 'i');
+		      Free($1);
+		      Free($3);
+		  }
+		;
+
+corefunc_str	: COREFUNC_STR
+		  {
+		      handle_corefunc(splev, $1, "", 's');
+		      Free($1);
+		  }
+		| COREFUNC_STR '(' corefunc_params_list ')'
+		  {
+		      handle_corefunc(splev, $1, $3, 's');
+		      Free($1);
+		      Free($3);
+		  }
+		;
+
+
 math_expr	: INTEGER                       { add_opvars(splev, "i", $1 ); }
 		| dice				{ }
 		| '(' MINUS_INTEGER ')'         { add_opvars(splev, "i", $2 ); }
+		| corefunc_int			{ }
 		| math_expr '+' math_expr       { add_opvars(splev, "o", SPO_MATH_ADD); }
 		| math_expr '-' math_expr       { add_opvars(splev, "o", SPO_MATH_SUB); }
 		| math_expr '*' math_expr       { add_opvars(splev, "o", SPO_MATH_MUL); }
@@ -2287,6 +2429,10 @@ all_ints_push	: MINUS_INTEGER
 		;
 
 string		: STRING
+		;
+
+objectid	: object_ID
+		| OBJECT_ID
 		;
 
 chance		: /* empty */

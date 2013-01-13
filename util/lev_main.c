@@ -109,6 +109,37 @@ static boolean FDECL(write_common_data, (int,sp_lev *));
 static boolean FDECL(write_maze, (int,sp_lev *));
 static void NDECL(init_obj_classes);
 
+void VDECL(lc_error, (const char *, ...));
+void VDECL(add_opvars, (sp_lev *, const char *, ...));
+
+
+static const struct {
+    int functype;
+    const char *name;
+    const char *params;
+    char retval;
+} core_vars[] = {
+    {COREFUNC_DISCORDIAN_HOLIDAY,	"time.discordian_holiday", "", 'i'},
+    {COREFUNC_PIRATEDAY,		"time.pirateday", "", 'i'},
+    {COREFUNC_APRILFOOLSDAY,		"time.aprilfoolsday", "", 'i'},
+    {COREFUNC_PIDAY,			"time.piday", "", 'i'},
+    {COREFUNC_TOWELDAY,			"time.towelday", "", 'i'},
+    {COREFUNC_MIDNIGHT,			"time.midnight", "", 'i'},
+    {COREFUNC_NIGHT,			"time.night", "", 'i'},
+    {COREFUNC_FRIDAY_13TH,		"time.friday_13th", "", 'i'},
+    {COREFUNC_POM,			"time.phase_of_the_moon", "", 'i'},
+    {COREFUNC_YYYYMMDD,			"time.yyyymmdd", "", 'i'},
+    {COREFUNC_LEVEL_DIFFICULTY,		"level.difficulty", "", 'i'},
+    {COREFUNC_SOBJ_AT,			"level.obj_at", "Oc", 'i'},
+    {COREFUNC_PLNAME,			"hero.name", "", 's'},
+    {COREFUNC_ROLE,			"hero.role", "", 's'},
+    {COREFUNC_RACE,			"hero.race", "", 's'},
+    {COREFUNC_CARRYING,			"hero.carrying", "O", 'i'},
+    {COREFUNC_TOSTRING,			"string", "i", 's'},
+    {COREFUNC_TOINT,			"int", "s", 'i'},
+    {0, NULL, NULL, 0}
+};
+
 static struct {
 	const char *name;
 	int type;
@@ -346,6 +377,113 @@ lc_warning(const char *fmt, ...)
     yywarning(buf);
 }
 
+char *
+decode_parm_chr(chr)
+char chr;
+{
+    static char buf[32];
+    switch (chr) {
+    default: sprintf(buf, "unknown"); break;
+    case 'i': sprintf(buf, "int"); break;
+    case 's': sprintf(buf, "str"); break;
+    case 'O': sprintf(buf, "obj"); break;
+    case 'c': sprintf(buf, "coord"); break;
+    case ' ': sprintf(buf, "nothing"); break;
+    case 'm': sprintf(buf, "mapchar"); break;
+    }
+    return buf;
+}
+
+char *
+decode_parm_str(str)
+char *str;
+{
+    static char tmpbuf[1024];
+    char *p = str;
+    tmpbuf[0] = '\0';
+    if (str) {
+	for ( ; *p; p++) {
+	    Strcat(tmpbuf, decode_parm_chr(*p));
+	    if (*(p + 1)) Strcat(tmpbuf, ", ");
+	}
+    }
+    return tmpbuf;
+}
+
+int
+is_core_func(char *str)
+{
+    int i;
+    for (i = 0; core_vars[i].name; i++)
+	if (!strcmp(core_vars[i].name, str))
+	    return core_vars[i].functype;
+    return 0;
+}
+
+int
+core_func_idx(char *str)
+{
+    int i;
+    for (i = 0; core_vars[i].name; i++)
+	if (!strcmp(core_vars[i].name, str))
+	    return i;
+    return -1;
+}
+
+char
+core_func_retval(int idx)
+{
+    return core_vars[idx].retval;
+}
+
+const char *
+core_func_params(int idx)
+{
+    return core_vars[idx].params;
+}
+
+const char *
+core_func_name(int idx)
+{
+    return core_vars[idx].name;
+}
+
+int
+handle_corefunc(splev, funcname, parmlist, retc)
+sp_lev *splev;
+char *funcname;
+char *parmlist;
+char retc;
+{
+    int f = is_core_func(funcname);
+    int i;
+    char *p, *dp;
+    if (!f) {
+	lc_error("Unknown core function '%s'", funcname);
+	return 0;
+    }
+    i = core_func_idx(funcname);
+    p = (char *)core_func_params(i);
+    if (strcmp(parmlist, p)) {
+	if (!strcmp(p, "")) {
+	    lc_error("Core function '%s' takes no parameters.", funcname);
+	} else {
+	    dp = strdup(decode_parm_str(p));
+	    lc_error("Core function '%s' requires '%s' parameter%s, got '%s' instead.",
+		     funcname, dp,
+		     (strlen(p) > 1 ? "s" : ""),
+		     decode_parm_str(parmlist));
+	    free(dp);
+	}
+	return 0;
+    }
+    if (core_func_retval(i) != retc) {
+	lc_error("Core function '%s' does not return '%s' value.", funcname, decode_parm_chr(retc));
+	return 0;
+    }
+    add_opvars(splev, "io", f, SPO_COREFUNC);
+    return 1;
+}
 
 struct opvar *
 set_opvar_int(ov, val)
@@ -1229,6 +1367,7 @@ sp_lev *maze;
 	    "var_init",
 	    "shuffle_array",
 	    "dice",
+	    "corefunc",
 	    "selection_add",
 	    "selection_point",
 	    "selection_rect",

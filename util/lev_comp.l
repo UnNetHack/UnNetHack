@@ -68,6 +68,7 @@ void FDECL(include_push, (const char *));
 int NDECL(include_pop);
 
 long NDECL(handle_varstring_check);
+long FDECL(corefunc_str_check, (char *, long));
 
 extern struct lc_vardefs *FDECL(vardef_defined,(struct lc_vardefs *,char *, int));
 
@@ -127,6 +128,7 @@ sheollev	return SHEOL_ID;
 FLAGS		return FLAGS_ID;
 GEOMETRY	return GEOMETRY_ID;
 ^MAP\r?\n		{ BEGIN(MAPC); line_number++; }
+obj(ect)?	return object_ID;
 OBJECT		return OBJECT_ID;
 CONTAINER	return COBJECT_ID;
 MONSTER		return MONSTER_ID;
@@ -298,9 +300,11 @@ sky		{ yylval.i=SKYMAP; return FLAG_TYPE; }
 		  Strcpy(yylval.map, yytext+1); /* Discard the first \" */
 		  return STRING; }
 \$[a-zA-Z_][a-zA-Z_0-9]*	{ return handle_varstring_check(); }
-[a-zA-Z_][a-zA-Z_0-9]*	{ yylval.map = (char *) alloc(strlen(yytext)+1);
+[a-zA-Z_](\.?[a-zA-Z_0-9]+)*	{
+		  yylval.map = (char *) alloc(strlen(yytext)+1);
 		  Strcpy(yylval.map, yytext);
-		  return NQSTRING; }
+		  return corefunc_str_check(yylval.map, NQSTRING);
+		  }
 "=="		{ yylval.i = SPO_JE; return COMPARE_TYPE; }
 "!="		{ yylval.i = SPO_JNE; return COMPARE_TYPE; }
 "<>"		{ yylval.i = SPO_JNE; return COMPARE_TYPE; }
@@ -412,6 +416,27 @@ handle_varstring_check()
      if (l == SPOVAR_SEL) return (a ? VARSTRING_SEL_ARRAY : VARSTRING_SEL);
   }
   return VARSTRING;
+}
+
+long
+corefunc_str_check(s, retval)
+char *s;
+long retval;
+{
+  int f = is_core_func(s);
+  if (f) {
+    int i = core_func_idx(s);
+    switch (core_func_retval(i)) {
+      default:
+	lc_error("Core function '%s' has unknown return type '%c'.", yylval.map, core_func_retval(i));
+	break;
+      case 'i': return COREFUNC_INT;
+      case 's': return COREFUNC_STR;
+      case 0:
+      case ' ': return COREFUNC;
+    }
+  }
+  return retval;
 }
 
 /*lev_comp.l*/
