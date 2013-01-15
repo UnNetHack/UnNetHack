@@ -224,6 +224,8 @@ int yy_more_len = 0;
 extern unsigned int max_x_map, max_y_map;
 
 extern int line_number, colon_line_number;
+extern int token_start_pos;
+extern char curr_token[512];
 
 struct lc_vardefs *variable_definitions = NULL;
 
@@ -330,8 +332,10 @@ void
 yyerror(s)
 const char *s;
 {
-	(void) fprintf(stderr, "%s: line %d : %s\n", fname,
-		(*s >= 'A' && *s <= 'Z') ? colon_line_number : line_number, s);
+	(void) fprintf(stderr, "%s: line %d, pos %d : %s at \"%s\"\n", fname,
+		       (*s >= 'A' && *s <= 'Z') ? colon_line_number : line_number,
+		       token_start_pos-strlen(curr_token), s, curr_token);
+
 	if (++fatal_error > MAX_ERRORS) {
 		(void) fprintf(stderr,"Too many errors, good bye!\n");
 		exit(EXIT_FAILURE);

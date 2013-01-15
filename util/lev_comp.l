@@ -74,6 +74,10 @@ extern struct lc_vardefs *FDECL(vardef_defined,(struct lc_vardefs *,char *, int)
 
 extern struct lc_vardefs *variable_definitions;
 
+void FDECL(savetoken, (char *));
+void NDECL(newline);
+void FDECL(advancepos, (char *));
+
 /*
  * This doesn't always get put in lev_comp.h
  * (esp. when using older versions of bison).
@@ -81,6 +85,8 @@ extern struct lc_vardefs *variable_definitions;
 extern YYSTYPE yylval;
 
 int line_number = 1, colon_line_number = 1;
+int token_start_pos = 0;
+char curr_token[512];
 static char map[4096];
 static int map_cnt = 0;
 
@@ -98,6 +104,7 @@ FILE *orig_yyin = NULL;
 %s MAPC
 %%
 <MAPC>ENDMAP	{
+		  savetoken(yytext);
 		  BEGIN(INITIAL);
 		  yylval.map = (char *) alloc(map_cnt + 1);
 		  (void) strncpy(yylval.map, map, map_cnt);
@@ -107,183 +114,185 @@ FILE *orig_yyin = NULL;
 		}
 <MAPC>[-|}{+xABCISHKMPLWTtFYU\\#. 0123456789]*\r?\n	{
 		  int len = yyleng;
+		  savetoken(yytext);
 		  /* convert \r\n to \n */
 		  if (len >= 2 && yytext[len - 2] == '\r') len -= 1;
-		  line_number++;
 		  (void) strncpy(map + map_cnt, yytext, len);
 		  map_cnt += len;
 		  map[map_cnt - 1] = '\n';
 		  map[map_cnt] = '\0';
+		  newline();
 		}
-^[ \t]*#.*\n		{ line_number++; }
-:		{ colon_line_number = line_number; return ':'; }
-MESSAGE		return MESSAGE_ID;
-NOMAP		return NOMAP_ID;
-LEVEL		return LEVEL_ID;
-INIT_MAP	return LEV_INIT_ID;
-mazegrid	return MAZE_GRID_ID;
-solidfill	return SOLID_FILL_ID;
-mines		return MINES_ID;
-sheollev	return SHEOL_ID;
-FLAGS		return FLAGS_ID;
-GEOMETRY	return GEOMETRY_ID;
-^MAP\r?\n		{ BEGIN(MAPC); line_number++; }
-obj(ect)?	return object_ID;
-OBJECT		return OBJECT_ID;
-CONTAINER	return COBJECT_ID;
-MONSTER		return MONSTER_ID;
-monster		return monster_ID;
-TRAP		return TRAP_ID;
-DOOR		return DOOR_ID;
-ROOMDOOR	return ROOMDOOR_ID;
-DRAWBRIDGE	return DRAWBRIDGE_ID;
-MAZEWALK	return MAZEWALK_ID;
-WALLIFY		return WALLIFY_ID;
-REGION		return REGION_ID;
-ALTAR		return ALTAR_ID;
-LADDER		return LADDER_ID;
-STAIR		return STAIR_ID;
-PORTAL		return PORTAL_ID;
-TELEPORT_REGION	return TELEPRT_ID;
-BRANCH		return BRANCH_ID;
-FOUNTAIN	return FOUNTAIN_ID;
-SINK		return SINK_ID;
-POOL		return POOL_ID;
-WALLWALK	return WALLWALK_ID;
-NON_DIGGABLE	return NON_DIGGABLE_ID;
-NON_PASSWALL	return NON_PASSWALL_ID;
-IF		return IF_ID;
-ELSE		return ELSE_ID;
-EXIT		return EXIT_ID;
-ROOM		return ROOM_ID;
-SUBROOM		return SUBROOM_ID;
-RANDOM_CORRIDORS	return RAND_CORRIDOR_ID;
-CORRIDOR	return CORRIDOR_ID;
-SPILL	  return SPILL_ID;
-TERRAIN		return TERRAIN_ID;
-terrain		return terrain_ID;
-REPLACE_TERRAIN	return REPLACE_TERRAIN_ID;
-MON_GENERATION	return MON_GENERATION_ID;
-GOLD		return GOLD_ID;
-GRAVE		return GRAVE_ID;
-ENGRAVING	return ENGRAVING_ID;
-(NAME|name)	return NAME_ID;
-CHANCE		return CHANCE_ID;
-LOOP		return LOOP_ID;
-SWITCH		return SWITCH_ID;
-CASE		return CASE_ID;
-BREAK		return BREAK_ID;
-DEFAULT		return DEFAULT_ID;
-FUNCTION	return FUNCTION_ID;
-INCLUDE		return INCLUDE_ID;
-SOUNDS		return SOUNDS_ID;
-SHUFFLE		return SHUFFLE_ID;
-montype		return MONTYPE_ID;
-selection	return selection_ID;
-rect		return rect_ID;
-fillrect	return fillrect_ID;
-line		return line_ID;
-randline	return randline_ID;
-grow		return grow_ID;
-floodfill	return flood_ID;
-rndcoord	return rndcoord_ID;
-circle		return circle_ID;
-ellipse		return ellipse_ID;
-filter		return filter_ID;
-hear		{ yylval.i=LVLSND_HEARD;  return MSG_OUTPUT_TYPE; }
-pline		{ yylval.i=LVLSND_PLINED; return MSG_OUTPUT_TYPE; }
-verbal		{ yylval.i=LVLSND_VERBAL; return MSG_OUTPUT_TYPE; }
-feel		{ yylval.i=LVLSND_FELT;   return MSG_OUTPUT_TYPE; }
-levregion	return LEV;
-quantity	return QUANTITY_ID;
-buried		return BURIED_ID;
-eroded		return ERODED_ID;
-erodeproof	return ERODEPROOF_ID;
-trapped		return TRAPPED_ID;
-recharged	return RECHARGED_ID;
-invisible	return INVIS_ID;
-greased		return GREASED_ID;
-female		return FEMALE_ID;
-cancelled	return CANCELLED_ID;
-revived		return REVIVED_ID;
-avenge		return AVENGE_ID;
-fleeing		return FLEEING_ID;
-blinded		return BLINDED_ID;
-paralyzed	return PARALYZED_ID;
-stunned		return STUNNED_ID;
-confused	return CONFUSED_ID;
-seen_traps	return SEENTRAPS_ID;
-all		return ALL_ID;
-horizontal	{ yylval.i=1; return HORIZ_OR_VERT; }
-vertical	{ yylval.i=2; return HORIZ_OR_VERT; }
-open		{ yylval.i=D_ISOPEN; return DOOR_STATE; }
-closed		{ yylval.i=D_CLOSED; return DOOR_STATE; }
-locked		{ yylval.i=D_LOCKED; return DOOR_STATE; }
-nodoor		{ yylval.i=D_NODOOR; return DOOR_STATE; }
-broken		{ yylval.i=D_BROKEN; return DOOR_STATE; }
-secret		{ yylval.i=D_SECRET; return DOOR_STATE; }
-north		{ yylval.i=W_NORTH; return DIRECTION; }
-east		{ yylval.i=W_EAST; return DIRECTION; }
-south		{ yylval.i=W_SOUTH; return DIRECTION; }
-west		{ yylval.i=W_WEST; return DIRECTION; }
-random		{ yylval.i = -1; return RANDOM_TYPE; }
-none		{ yylval.i = -2; return NONE; }
-align		return A_REGISTER;
-left		{ yylval.i=1; return LEFT_OR_RIGHT; }
-half-left	{ yylval.i=2; return LEFT_OR_RIGHT; }
-center		{ yylval.i=3; return CENTER; }
-half-right	{ yylval.i=4; return LEFT_OR_RIGHT; }
-right		{ yylval.i=5; return LEFT_OR_RIGHT; }
-top		{ yylval.i=1; return TOP_OR_BOT; }
-bottom		{ yylval.i=5; return TOP_OR_BOT; }
-lit		{ yylval.i=1; return LIGHT_STATE; }
-unlit		{ yylval.i=0; return LIGHT_STATE; }
-filled		{ yylval.i=0; return FILLING; }
-unfilled	{ yylval.i=1; return FILLING; }
-noalign		{ yylval.i= AM_NONE; return ALIGNMENT; }
-law		{ yylval.i= AM_LAWFUL; return ALIGNMENT; }
-neutral		{ yylval.i= AM_NEUTRAL; return ALIGNMENT; }
-chaos		{ yylval.i= AM_CHAOTIC; return ALIGNMENT; }
-coaligned	{ yylval.i= AM_SPLEV_CO; return ALIGNMENT; }
-noncoaligned	{ yylval.i= AM_SPLEV_NONCO; return ALIGNMENT; }
-peaceful	{ yylval.i=1; return MON_ATTITUDE; }
-hostile		{ yylval.i=0; return MON_ATTITUDE; }
-asleep		{ yylval.i=1; return MON_ALERTNESS; }
-awake		{ yylval.i=0; return MON_ALERTNESS; }
-m_feature	{ yylval.i= M_AP_FURNITURE; return MON_APPEARANCE; }
-m_monster	{ yylval.i= M_AP_MONSTER;   return MON_APPEARANCE; }
-m_object	{ yylval.i= M_AP_OBJECT;    return MON_APPEARANCE; }
-sanctum		{ yylval.i=2; return ALTAR_TYPE; }
-shrine		{ yylval.i=1; return ALTAR_TYPE; }
-altar		{ yylval.i=0; return ALTAR_TYPE; }
-up		{ yylval.i=1; return UP_OR_DOWN; }
-down		{ yylval.i=0; return UP_OR_DOWN; }
-false		{ yylval.i=0; return BOOLEAN; }
-true		{ yylval.i=1; return BOOLEAN; }
-dust		{ yylval.i=DUST; return ENGRAVING_TYPE; }
-engrave		{ yylval.i=ENGRAVE; return ENGRAVING_TYPE; }
-burn		{ yylval.i=BURN; return ENGRAVING_TYPE; }
-mark		{ yylval.i=MARK; return ENGRAVING_TYPE; }
-blood		{ yylval.i=ENGR_BLOOD; return ENGRAVING_TYPE; }
-blessed		{ yylval.i=1; return CURSE_TYPE; }
-uncursed	{ yylval.i=2; return CURSE_TYPE; }
-cursed		{ yylval.i=3; return CURSE_TYPE; }
-noteleport	{ yylval.i=NOTELEPORT; return FLAG_TYPE; }
-sheol		{ yylval.i=SHEOL_LEV; return FLAG_TYPE; }
-hardfloor	{ yylval.i=HARDFLOOR; return FLAG_TYPE; }
-nommap		{ yylval.i=NOMMAP; return FLAG_TYPE; }
-arboreal	{ yylval.i=ARBOREAL; return FLAG_TYPE; }	/* KMH */
-shortsighted	{ yylval.i=SHORTSIGHTED; return FLAG_TYPE; }
-noflipx		{ yylval.i=NOFLIPX; return FLAG_TYPE; }
-noflipy		{ yylval.i=NOFLIPY; return FLAG_TYPE; }
-noflip		{ yylval.i=(NOFLIPX + NOFLIPY); return FLAG_TYPE; }
-mazelevel	{ yylval.i=MAZELEVEL; return FLAG_TYPE; }
-premapped	{ yylval.i=PREMAPPED; return FLAG_TYPE; }
-shroud		{ yylval.i=SHROUD; return FLAG_TYPE; }
-stormy		{ yylval.i=STORMY; return FLAG_TYPE; }
-graveyard	{ yylval.i=GRAVEYARD; return FLAG_TYPE; }
-sky		{ yylval.i=SKYMAP; return FLAG_TYPE; }
+^[ \t]*#.*\n		{ savetoken(yytext); newline(); }
+:		{ savetoken(yytext); colon_line_number = line_number; return ':'; }
+MESSAGE		{ savetoken(yytext); return MESSAGE_ID; }
+NOMAP		{ savetoken(yytext); return NOMAP_ID; }
+LEVEL		{ savetoken(yytext); return LEVEL_ID; }
+INIT_MAP	{ savetoken(yytext); return LEV_INIT_ID; }
+mazegrid	{ savetoken(yytext); return MAZE_GRID_ID; }
+solidfill	{ savetoken(yytext); return SOLID_FILL_ID; }
+mines		{ savetoken(yytext); return MINES_ID; }
+sheollev	{ savetoken(yytext); return SHEOL_ID; }
+FLAGS		{ savetoken(yytext); return FLAGS_ID; }
+GEOMETRY	{ savetoken(yytext); return GEOMETRY_ID; }
+^MAP\r?\n		{ savetoken(yytext); BEGIN(MAPC); newline(); }
+obj(ect)?	{ savetoken(yytext); return object_ID; }
+OBJECT		{ savetoken(yytext); return OBJECT_ID; }
+CONTAINER	{ savetoken(yytext); return COBJECT_ID; }
+MONSTER		{ savetoken(yytext); return MONSTER_ID; }
+monster		{ savetoken(yytext); return monster_ID; }
+TRAP		{ savetoken(yytext); return TRAP_ID; }
+DOOR		{ savetoken(yytext); return DOOR_ID; }
+ROOMDOOR	{ savetoken(yytext); return ROOMDOOR_ID; }
+DRAWBRIDGE	{ savetoken(yytext); return DRAWBRIDGE_ID; }
+MAZEWALK	{ savetoken(yytext); return MAZEWALK_ID; }
+WALLIFY		{ savetoken(yytext); return WALLIFY_ID; }
+REGION		{ savetoken(yytext); return REGION_ID; }
+ALTAR		{ savetoken(yytext); return ALTAR_ID; }
+LADDER		{ savetoken(yytext); return LADDER_ID; }
+STAIR		{ savetoken(yytext); return STAIR_ID; }
+PORTAL		{ savetoken(yytext); return PORTAL_ID; }
+TELEPORT_REGION	{ savetoken(yytext); return TELEPRT_ID; }
+BRANCH		{ savetoken(yytext); return BRANCH_ID; }
+FOUNTAIN	{ savetoken(yytext); return FOUNTAIN_ID; }
+SINK		{ savetoken(yytext); return SINK_ID; }
+POOL		{ savetoken(yytext); return POOL_ID; }
+WALLWALK	{ savetoken(yytext); return WALLWALK_ID; }
+NON_DIGGABLE	{ savetoken(yytext); return NON_DIGGABLE_ID; }
+NON_PASSWALL	{ savetoken(yytext); return NON_PASSWALL_ID; }
+IF		{ savetoken(yytext); return IF_ID; }
+ELSE		{ savetoken(yytext); return ELSE_ID; }
+EXIT		{ savetoken(yytext); return EXIT_ID; }
+ROOM		{ savetoken(yytext); return ROOM_ID; }
+SUBROOM		{ savetoken(yytext); return SUBROOM_ID; }
+RANDOM_CORRIDORS	{ savetoken(yytext); return RAND_CORRIDOR_ID; }
+CORRIDOR	{ savetoken(yytext); return CORRIDOR_ID; }
+SPILL	  	{ savetoken(yytext); return SPILL_ID; }
+TERRAIN		{ savetoken(yytext); return TERRAIN_ID; }
+terrain		{ savetoken(yytext); return terrain_ID; }
+REPLACE_TERRAIN	{ savetoken(yytext); return REPLACE_TERRAIN_ID; }
+MON_GENERATION	{ savetoken(yytext); return MON_GENERATION_ID; }
+GOLD		{ savetoken(yytext); return GOLD_ID; }
+GRAVE		{ savetoken(yytext); return GRAVE_ID; }
+ENGRAVING	{ savetoken(yytext); return ENGRAVING_ID; }
+(NAME|name)	{ savetoken(yytext); return NAME_ID; }
+CHANCE		{ savetoken(yytext); return CHANCE_ID; }
+LOOP		{ savetoken(yytext); return LOOP_ID; }
+SWITCH		{ savetoken(yytext); return SWITCH_ID; }
+CASE		{ savetoken(yytext); return CASE_ID; }
+BREAK		{ savetoken(yytext); return BREAK_ID; }
+DEFAULT		{ savetoken(yytext); return DEFAULT_ID; }
+FUNCTION	{ savetoken(yytext); return FUNCTION_ID; }
+INCLUDE		{ savetoken(yytext); return INCLUDE_ID; }
+SOUNDS		{ savetoken(yytext); return SOUNDS_ID; }
+SHUFFLE		{ savetoken(yytext); return SHUFFLE_ID; }
+montype		{ savetoken(yytext); return MONTYPE_ID; }
+selection	{ savetoken(yytext); return selection_ID; }
+rect		{ savetoken(yytext); return rect_ID; }
+fillrect	{ savetoken(yytext); return fillrect_ID; }
+line		{ savetoken(yytext); return line_ID; }
+randline	{ savetoken(yytext); return randline_ID; }
+grow		{ savetoken(yytext); return grow_ID; }
+floodfill	{ savetoken(yytext); return flood_ID; }
+rndcoord	{ savetoken(yytext); return rndcoord_ID; }
+circle		{ savetoken(yytext); return circle_ID; }
+ellipse		{ savetoken(yytext); return ellipse_ID; }
+filter		{ savetoken(yytext); return filter_ID; }
+hear		{ savetoken(yytext); yylval.i=LVLSND_HEARD;  return MSG_OUTPUT_TYPE; }
+pline		{ savetoken(yytext); yylval.i=LVLSND_PLINED; return MSG_OUTPUT_TYPE; }
+verbal		{ savetoken(yytext); yylval.i=LVLSND_VERBAL; return MSG_OUTPUT_TYPE; }
+feel		{ savetoken(yytext); yylval.i=LVLSND_FELT;   return MSG_OUTPUT_TYPE; }
+levregion	{ savetoken(yytext); return LEV; }
+quantity	{ savetoken(yytext); return QUANTITY_ID; }
+buried		{ savetoken(yytext); return BURIED_ID; }
+eroded		{ savetoken(yytext); return ERODED_ID; }
+erodeproof	{ savetoken(yytext); return ERODEPROOF_ID; }
+trapped		{ savetoken(yytext); return TRAPPED_ID; }
+recharged	{ savetoken(yytext); return RECHARGED_ID; }
+invisible	{ savetoken(yytext); return INVIS_ID; }
+greased		{ savetoken(yytext); return GREASED_ID; }
+female		{ savetoken(yytext); return FEMALE_ID; }
+cancelled	{ savetoken(yytext); return CANCELLED_ID; }
+revived		{ savetoken(yytext); return REVIVED_ID; }
+avenge		{ savetoken(yytext); return AVENGE_ID; }
+fleeing		{ savetoken(yytext); return FLEEING_ID; }
+blinded		{ savetoken(yytext); return BLINDED_ID; }
+paralyzed	{ savetoken(yytext); return PARALYZED_ID; }
+stunned		{ savetoken(yytext); return STUNNED_ID; }
+confused	{ savetoken(yytext); return CONFUSED_ID; }
+seen_traps	{ savetoken(yytext); return SEENTRAPS_ID; }
+all		{ savetoken(yytext); return ALL_ID; }
+horizontal	{ savetoken(yytext); yylval.i=1; return HORIZ_OR_VERT; }
+vertical	{ savetoken(yytext); yylval.i=2; return HORIZ_OR_VERT; }
+open		{ savetoken(yytext); yylval.i=D_ISOPEN; return DOOR_STATE; }
+closed		{ savetoken(yytext); yylval.i=D_CLOSED; return DOOR_STATE; }
+locked		{ savetoken(yytext); yylval.i=D_LOCKED; return DOOR_STATE; }
+nodoor		{ savetoken(yytext); yylval.i=D_NODOOR; return DOOR_STATE; }
+broken		{ savetoken(yytext); yylval.i=D_BROKEN; return DOOR_STATE; }
+secret		{ savetoken(yytext); yylval.i=D_SECRET; return DOOR_STATE; }
+north		{ savetoken(yytext); yylval.i=W_NORTH; return DIRECTION; }
+east		{ savetoken(yytext); yylval.i=W_EAST; return DIRECTION; }
+south		{ savetoken(yytext); yylval.i=W_SOUTH; return DIRECTION; }
+west		{ savetoken(yytext); yylval.i=W_WEST; return DIRECTION; }
+random		{ savetoken(yytext); yylval.i = -1; return RANDOM_TYPE; }
+none		{ savetoken(yytext); yylval.i = -2; return NONE; }
+align		{ savetoken(yytext); return A_REGISTER; }
+left		{ savetoken(yytext); yylval.i=1; return LEFT_OR_RIGHT; }
+half-left	{ savetoken(yytext); yylval.i=2; return LEFT_OR_RIGHT; }
+center		{ savetoken(yytext); yylval.i=3; return CENTER; }
+half-right	{ savetoken(yytext); yylval.i=4; return LEFT_OR_RIGHT; }
+right		{ savetoken(yytext); yylval.i=5; return LEFT_OR_RIGHT; }
+top		{ savetoken(yytext); yylval.i=1; return TOP_OR_BOT; }
+bottom		{ savetoken(yytext); yylval.i=5; return TOP_OR_BOT; }
+lit		{ savetoken(yytext); yylval.i=1; return LIGHT_STATE; }
+unlit		{ savetoken(yytext); yylval.i=0; return LIGHT_STATE; }
+filled		{ savetoken(yytext); yylval.i=0; return FILLING; }
+unfilled	{ savetoken(yytext); yylval.i=1; return FILLING; }
+noalign		{ savetoken(yytext); yylval.i= AM_NONE; return ALIGNMENT; }
+law		{ savetoken(yytext); yylval.i= AM_LAWFUL; return ALIGNMENT; }
+neutral		{ savetoken(yytext); yylval.i= AM_NEUTRAL; return ALIGNMENT; }
+chaos		{ savetoken(yytext); yylval.i= AM_CHAOTIC; return ALIGNMENT; }
+coaligned	{ savetoken(yytext); yylval.i= AM_SPLEV_CO; return ALIGNMENT; }
+noncoaligned	{ savetoken(yytext); yylval.i= AM_SPLEV_NONCO; return ALIGNMENT; }
+peaceful	{ savetoken(yytext); yylval.i=1; return MON_ATTITUDE; }
+hostile		{ savetoken(yytext); yylval.i=0; return MON_ATTITUDE; }
+asleep		{ savetoken(yytext); yylval.i=1; return MON_ALERTNESS; }
+awake		{ savetoken(yytext); yylval.i=0; return MON_ALERTNESS; }
+m_feature	{ savetoken(yytext); yylval.i= M_AP_FURNITURE; return MON_APPEARANCE; }
+m_monster	{ savetoken(yytext); yylval.i= M_AP_MONSTER;   return MON_APPEARANCE; }
+m_object	{ savetoken(yytext); yylval.i= M_AP_OBJECT;    return MON_APPEARANCE; }
+sanctum		{ savetoken(yytext); yylval.i=2; return ALTAR_TYPE; }
+shrine		{ savetoken(yytext); yylval.i=1; return ALTAR_TYPE; }
+altar		{ savetoken(yytext); yylval.i=0; return ALTAR_TYPE; }
+up		{ savetoken(yytext); yylval.i=1; return UP_OR_DOWN; }
+down		{ savetoken(yytext); yylval.i=0; return UP_OR_DOWN; }
+false		{ savetoken(yytext); yylval.i=0; return BOOLEAN; }
+true		{ savetoken(yytext); yylval.i=1; return BOOLEAN; }
+dust		{ savetoken(yytext); yylval.i=DUST; return ENGRAVING_TYPE; }
+engrave		{ savetoken(yytext); yylval.i=ENGRAVE; return ENGRAVING_TYPE; }
+burn		{ savetoken(yytext); yylval.i=BURN; return ENGRAVING_TYPE; }
+mark		{ savetoken(yytext); yylval.i=MARK; return ENGRAVING_TYPE; }
+blood		{ savetoken(yytext); yylval.i=ENGR_BLOOD; return ENGRAVING_TYPE; }
+blessed		{ savetoken(yytext); yylval.i=1; return CURSE_TYPE; }
+uncursed	{ savetoken(yytext); yylval.i=2; return CURSE_TYPE; }
+cursed		{ savetoken(yytext); yylval.i=3; return CURSE_TYPE; }
+noteleport	{ savetoken(yytext); yylval.i=NOTELEPORT; return FLAG_TYPE; }
+sheol		{ savetoken(yytext); yylval.i=SHEOL_LEV; return FLAG_TYPE; }
+hardfloor	{ savetoken(yytext); yylval.i=HARDFLOOR; return FLAG_TYPE; }
+nommap		{ savetoken(yytext); yylval.i=NOMMAP; return FLAG_TYPE; }
+arboreal	{ savetoken(yytext); yylval.i=ARBOREAL; return FLAG_TYPE; }	/* KMH */
+shortsighted	{ savetoken(yytext); yylval.i=SHORTSIGHTED; return FLAG_TYPE; }
+noflipx		{ savetoken(yytext); yylval.i=NOFLIPX; return FLAG_TYPE; }
+noflipy		{ savetoken(yytext); yylval.i=NOFLIPY; return FLAG_TYPE; }
+noflip		{ savetoken(yytext); yylval.i=(NOFLIPX + NOFLIPY); return FLAG_TYPE; }
+mazelevel	{ savetoken(yytext); yylval.i=MAZELEVEL; return FLAG_TYPE; }
+premapped	{ savetoken(yytext); yylval.i=PREMAPPED; return FLAG_TYPE; }
+shroud		{ savetoken(yytext); yylval.i=SHROUD; return FLAG_TYPE; }
+stormy		{ savetoken(yytext); yylval.i=STORMY; return FLAG_TYPE; }
+graveyard	{ savetoken(yytext); yylval.i=GRAVEYARD; return FLAG_TYPE; }
+sky		{ savetoken(yytext); yylval.i=SKYMAP; return FLAG_TYPE; }
 [0-9]+d[0-9]+	{ char *p = strchr(yytext, 'd');
+		  savetoken(yytext);
 		  if (p) {
 			*p = '\0';
 			p++;
@@ -292,39 +301,41 @@ sky		{ yylval.i=SKYMAP; return FLAG_TYPE; }
 		  } else { yylval.dice.num = yylval.dice.die = 1; }
 		  return DICE;
 		}
-\[\ *[0-9]+\%\ *\] { yylval.i = atoi(yytext + 1);
+\[\ *[0-9]+\%\ *\] { savetoken(yytext); yylval.i = atoi(yytext + 1);
 		     if (yylval.i < 0 || yylval.i > 100)
 			lc_error("Unexpected percentile '%li%%'", yylval.i);
 		     return PERCENT; }
--[0-9]+		{ yylval.i=atoi(yytext); return MINUS_INTEGER; }
-\+[0-9]+	{ yylval.i=atoi(yytext); return PLUS_INTEGER; }
-[0-9]+\%	{ yylval.i = atoi(yytext);
+-[0-9]+		{ savetoken(yytext); yylval.i=atoi(yytext); return MINUS_INTEGER; }
+\+[0-9]+	{ savetoken(yytext); yylval.i=atoi(yytext); return PLUS_INTEGER; }
+[0-9]+\%	{ savetoken(yytext); yylval.i = atoi(yytext);
 		  if (yylval.i < 0 || yylval.i > 100)
 		     lc_error("Unexpected percentile '%li%%'", yylval.i);
 		  return SPERCENT; }
-[0-9]+		{ yylval.i=atoi(yytext); return INTEGER; }
-\"[^"]*\"	{ yytext[yyleng-1] = 0; /* Discard the trailing \" */
+[0-9]+		{ savetoken(yytext); yylval.i=atoi(yytext); return INTEGER; }
+\"[^"]*\"	{ savetoken(yytext);
+		  yytext[yyleng-1] = 0; /* Discard the trailing \" */
 		  yylval.map = (char *) alloc(strlen(yytext+1)+1);
 		  Strcpy(yylval.map, yytext+1); /* Discard the first \" */
 		  return STRING; }
-\$[a-zA-Z_][a-zA-Z_0-9]*	{ return handle_varstring_check(); }
+\$[a-zA-Z_][a-zA-Z_0-9]*	{ savetoken(yytext); return handle_varstring_check(); }
 [a-zA-Z_](\.?[a-zA-Z_0-9]+)*	{
+		  savetoken(yytext);
 		  yylval.map = (char *) alloc(strlen(yytext)+1);
 		  Strcpy(yylval.map, yytext);
 		  return corefunc_str_check(yylval.map, NQSTRING);
 		  }
-"=="		{ yylval.i = SPO_JE; return COMPARE_TYPE; }
-"!="		{ yylval.i = SPO_JNE; return COMPARE_TYPE; }
-"<>"		{ yylval.i = SPO_JNE; return COMPARE_TYPE; }
-"<="		{ yylval.i = SPO_JLE; return COMPARE_TYPE; }
-">="		{ yylval.i = SPO_JGE; return COMPARE_TYPE; }
-"<"		{ yylval.i = SPO_JL; return COMPARE_TYPE; }
-">"		{ yylval.i = SPO_JG; return COMPARE_TYPE; }
-\r?\n		{ line_number++; }
-[ \t]+		;
-'\\.'		{ yylval.i = yytext[2]; return CHAR; }
-'.'		{ yylval.i = yytext[1]; return CHAR; }
-.		{ return yytext[0]; }
+"=="		{ savetoken(yytext); yylval.i = SPO_JE; return COMPARE_TYPE; }
+"!="		{ savetoken(yytext); yylval.i = SPO_JNE; return COMPARE_TYPE; }
+"<>"		{ savetoken(yytext); yylval.i = SPO_JNE; return COMPARE_TYPE; }
+"<="		{ savetoken(yytext); yylval.i = SPO_JLE; return COMPARE_TYPE; }
+">="		{ savetoken(yytext); yylval.i = SPO_JGE; return COMPARE_TYPE; }
+"<"		{ savetoken(yytext); yylval.i = SPO_JL; return COMPARE_TYPE; }
+">"		{ savetoken(yytext); yylval.i = SPO_JG; return COMPARE_TYPE; }
+\r?\n		{ newline(); }
+[ \t]+		{ advancepos(yytext); }
+'\\.'		{ savetoken(yytext); yylval.i = yytext[2]; return CHAR; }
+'.'		{ savetoken(yytext); yylval.i = yytext[1]; return CHAR; }
+.		{ savetoken(yytext); return yytext[0]; }
 %%
 #ifdef	AMIGA
 long *alloc(n)
@@ -445,6 +456,29 @@ long retval;
     }
   }
   return retval;
+}
+
+void
+newline()
+{
+  line_number++;
+  token_start_pos = 0;
+  memset(curr_token, 0, 512);
+}
+
+void
+savetoken(s)
+char *s;
+{
+   sprintf(curr_token, "%s", s);
+   advancepos(s);
+}
+
+void
+advancepos(s)
+char *s;
+{
+   token_start_pos += strlen(s);
 }
 
 /*lev_comp.l*/
