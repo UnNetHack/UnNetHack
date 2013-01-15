@@ -3730,6 +3730,31 @@ selection_logical_oper(s1, s2, oper)
     return ov;
 }
 
+struct opvar *
+selection_filter_mapchar(ov, mc)
+    struct opvar *ov;
+    struct opvar *mc;
+{
+    int x,y;
+    schar mapc;
+    xchar lit;
+    struct opvar *ret = selection_opvar(NULL);
+    if (!ov || !mc || !ret) return NULL;
+    mapc = SP_MAPCHAR_TYP(OV_i(mc));
+    lit = SP_MAPCHAR_LIT(OV_i(mc));
+    for (x = 0; x < COLNO; x++)
+	for (y = 0; y < ROWNO; y++)
+	    if (selection_getpoint(x,y,ov) && (levl[x][y].typ == mapc)) {
+		switch (lit) {
+		default:
+		case -2: selection_setpoint(x,y,ret, 1); break;
+		case -1: selection_setpoint(x,y,ret, rn2(2)); break;
+		case 0:
+		case 1: if (levl[x][y].lit == lit) selection_setpoint(x,y,ret, 1); break;
+		}
+	    }
+    return ret;
+}
 
 
 void
@@ -5147,7 +5172,7 @@ sp_lev *lvl;
 		struct opvar *filtertype;
 		if (!OV_pop_i(filtertype)) panic("no sel filter type");
 		switch (OV_i(filtertype)) {
-		case 0: /* percentage */
+		case SPOFILTER_PERCENT:
 		    {
 			struct opvar *tmp1, *sel;
 			if (!OV_pop_i(tmp1)) panic("no sel filter percent");
@@ -5157,7 +5182,7 @@ sp_lev *lvl;
 			opvar_free(tmp1);
 		    }
 		    break;
-		case 1: /* logical and */
+		case SPOFILTER_SELECTION: /* logical and */
 		    {
 			struct opvar *pt, *sel1, *sel2;
 			if (!OV_pop_typ(sel1, SPOVAR_SEL)) panic("no sel filter sel1");
@@ -5166,6 +5191,17 @@ sp_lev *lvl;
 			splev_stack_push(coder->stack, pt);
 			opvar_free(sel1);
 			opvar_free(sel2);
+		    }
+		    break;
+		case SPOFILTER_MAPCHAR:
+		    {
+			struct opvar *pt, *tmp1, *sel;
+			if (!OV_pop_typ(sel, SPOVAR_SEL)) panic("no sel filter");
+			if (!OV_pop_typ(tmp1, SPOVAR_MAPCHAR)) panic("no sel filter mapchar");
+			pt = selection_filter_mapchar(sel, tmp1);
+			splev_stack_push(coder->stack, pt);
+			opvar_free(tmp1);
+			opvar_free(sel);
 		    }
 		    break;
 		default: panic("unknown sel filter type");

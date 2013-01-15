@@ -2340,11 +2340,15 @@ ter_selection_x	: coord_or_var
 		  }
 		| filter_ID '(' SPERCENT ',' ter_selection ')'
 		  {
-		      add_opvars(splev, "iio", $3, 0, SPO_SEL_FILTER);
+		      add_opvars(splev, "iio", $3, SPOFILTER_PERCENT, SPO_SEL_FILTER);
 		  }
 		| filter_ID '(' ter_selection ',' ter_selection ')'
 		  {
-		      add_opvars(splev, "io", 1, SPO_SEL_FILTER);
+		      add_opvars(splev, "io", SPOFILTER_SELECTION, SPO_SEL_FILTER);
+		  }
+		| filter_ID '(' mapchar_or_var ',' ter_selection ')'
+		  {
+		      add_opvars(splev, "io", SPOFILTER_MAPCHAR, SPO_SEL_FILTER);
 		  }
 		| flood_ID coord_or_var
 		  {

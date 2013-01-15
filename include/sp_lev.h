@@ -218,6 +218,11 @@ enum corefuncs {
 #define SP_OBJ_CONTAINER	0x2
 
 
+/* SPO_FILTER types */
+#define SPOFILTER_PERCENT	0
+#define SPOFILTER_SELECTION	1
+#define SPOFILTER_MAPCHAR	2
+
 
 #define SPOVAR_NULL	0x00
 #define SPOVAR_INT	0x01 /* l */
