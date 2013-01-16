@@ -2738,7 +2738,7 @@ spo_corefunc(coder, fn)
     case COREFUNC_TOCOORD:
 	{
 	    struct opvar *x, *y;
-	    if (!OV_pop_i(x) || !OV_pop_i(y)) {
+	    if (!OV_pop_i(y) || !OV_pop_i(x)) {
 		impossible("No int values for coord()");
 		return;
 	    }
