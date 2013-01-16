@@ -2735,6 +2735,18 @@ spo_corefunc(coder, fn)
 	    opvar_free(s);
 	} else impossible("No string in stack for toint()?");
 	break;
+    case COREFUNC_TOCOORD:
+	{
+	    struct opvar *x, *y;
+	    if (!OV_pop_i(x) || !OV_pop_i(y)) {
+		impossible("No int values for coord()");
+		return;
+	    }
+	    splev_stack_push(coder->stack, opvar_new_coord(OV_i(x), OV_i(y)));
+	    opvar_free(x);
+	    opvar_free(y);
+	}
+	break;
     case COREFUNC_SOBJ_AT:
 	{
 	    long retval = 0;

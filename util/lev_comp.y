@@ -196,7 +196,7 @@ extern const char *fname;
 %token	<i> ',' ':' '(' ')' '[' ']' '{' '}'
 %token	<map> STRING MAP_ID
 %token	<map> NQSTRING VARSTRING
-%token	<map> COREFUNC COREFUNC_INT COREFUNC_STR
+%token	<map> COREFUNC COREFUNC_INT COREFUNC_STR COREFUNC_COORD
 %token	<map> VARSTRING_INT VARSTRING_INT_ARRAY
 %token	<map> VARSTRING_STRING VARSTRING_STRING_ARRAY
 %token	<map> VARSTRING_VAR VARSTRING_VAR_ARRAY
@@ -1947,6 +1947,10 @@ coord_or_var	: encodecoord
 		  {
 		      add_opvars(splev, "c", $1);
 		  }
+		| corefunc_coord
+		  {
+		      /* nothing */
+		  }
 		| rndcoord_ID '(' ter_selection ')'
 		  {
 		      add_opvars(splev, "o", SPO_SEL_RNDCOORD);
@@ -2296,6 +2300,18 @@ corefunc_str	: COREFUNC_STR
 		  }
 		;
 
+corefunc_coord	: COREFUNC_COORD
+		  {
+		      handle_corefunc(splev, $1, "", 'c');
+		      Free($1);
+		  }
+		| COREFUNC_COORD '(' corefunc_params_list ')'
+		  {
+		      handle_corefunc(splev, $1, $3, 'c');
+		      Free($1);
+		      Free($3);
+		  }
+		;
 
 math_expr	: INTEGER                       { add_opvars(splev, "i", $1 ); }
 		| dice				{ }

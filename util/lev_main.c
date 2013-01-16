@@ -137,6 +137,7 @@ static const struct {
     {COREFUNC_CARRYING,			"hero.carrying", "O", 'i'},
     {COREFUNC_TOSTRING,			"string", "i", 's'},
     {COREFUNC_TOINT,			"int", "s", 'i'},
+    {COREFUNC_TOCOORD,			"coord", "ii", 'c'},
     {0, NULL, NULL, 0}
 };
 

@@ -451,6 +451,7 @@ long retval;
 	break;
       case 'i': return COREFUNC_INT;
       case 's': return COREFUNC_STR;
+      case 'c': return COREFUNC_COORD;
       case 0:
       case ' ': return COREFUNC;
     }
