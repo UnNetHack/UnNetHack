@@ -5388,21 +5388,7 @@ next_opcode:
     remove_boundary_syms();
     wallification(1, 0, COLNO-1, ROWNO-1);
 
-	/* disable level flipping for some levels */
-	if (!Is_astralevel(&u.uz) &&
-	    !Is_blackmarket(&u.uz) &&
-	    !Is_knox(&u.uz) &&
-	    !Is_oracle_level(&u.uz) &&
-	    !Is_minetown_level(&u.uz) &&
-	    !Is_town_level(&u.uz) &&
-	    /* When returning from the Valley the player gets
-	     * placed on the right side of the screen. Regardless
-	     * of flipped state. */
-	    !Is_stronghold(&u.uz) &&
-	    /* up and down ladders should be at the same position */
-	    !In_V_tower(&u.uz)) {
-		flip_level_rnd(coder->allow_flips);
-	}
+    flip_level_rnd(coder->allow_flips);
 
     count_features();
 

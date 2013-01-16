@@ -46,7 +46,7 @@ LOOP [4 + 1d5] {
 # overrun by orcs.  Note the barricades (iron bars).
 #
 LEVEL: "minetn-8"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP:mines,'.',' ',true,true,random,true
 GEOMETRY:center,center
 MAP
@@ -186,7 +186,7 @@ LOOP [9 + 2d5] {
 # "Frontier Town"
 #
 LEVEL: "minetn-1"
-
+FLAGS: noflip
 ROOM: "ordinary" , lit, (3,3), (center,center), (31,15)
 {
 FOUNTAIN: (13, 7)
@@ -298,6 +298,7 @@ WALLIFY:(1,0, 70,20)
 # "Town Square"
 #
 LEVEL: "minetn-2"
+FLAGS: noflip
 ROOM: "ordinary" , lit, (3,3), (center,center), (31,15)
 {
 
@@ -435,6 +436,7 @@ RANDOM_CORRIDORS
 # "Alley Town"
 #
 LEVEL: "minetn-3"
+FLAGS: noflip
 ROOM: "ordinary",lit,(3,3),(center,center),(31,15)
 {
 
@@ -564,6 +566,7 @@ RANDOM_CORRIDORS
 # "College Town"
 #
 LEVEL: "minetn-4"
+FLAGS: noflip
 ROOM: "ordinary",lit,(3,3),(center,center),(30,15)
 {
 
@@ -676,7 +679,7 @@ RANDOM_CORRIDORS
 # "Grotto Town" by Kelly Bailey
 #
 LEVEL: "minetn-5"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
@@ -778,7 +781,7 @@ ALTAR:(31,03),align[0],shrine
 # "Bustling Town" by Kelly Bailey
 #
 LEVEL: "minetn-6"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP:mines,'.','-',true,true,lit,true
 GEOMETRY:center,top
 MAP
@@ -855,6 +858,7 @@ MONSTER:('@',"watch captain"), random, peaceful
 # "Bazaar Town" by Kelly Bailey
 #
 LEVEL: "minetn-7"
+FLAGS: noflip
 ROOM: "ordinary" , lit, (3,3), (center,center), (30,15)
 {
 

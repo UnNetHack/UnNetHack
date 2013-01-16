@@ -3,7 +3,7 @@
 # Massimo Campostrini (campo@sunthpi3.difi.unipi.it)
 #
 LEVEL: "blkmar"
-FLAGS: noteleport, hardfloor, mazelevel
+FLAGS: noteleport, hardfloor, mazelevel, noflip
 GEOMETRY: center, center
 MAP
 ---------------------------------------------------------------------------

@@ -5,7 +5,7 @@
 #
 
 LEVEL: "oracle"
-
+FLAGS: noflip
 ROOM: "ordinary" , lit, (3,3), (center,center), (11,9)
 {
 

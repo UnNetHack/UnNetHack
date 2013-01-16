@@ -427,7 +427,7 @@ LOOP [19] {
 
 
 LEVEL:"astral"
-FLAGS: noteleport,hardfloor,nommap,shortsighted,mazelevel
+FLAGS: noteleport,hardfloor,nommap,shortsighted,mazelevel,noflip
 INIT_MAP:solidfill,' '
 MESSAGE: "You arrive on the Astral Plane!"
 MESSAGE: "Here the High Temples of the aligned gods are located."
