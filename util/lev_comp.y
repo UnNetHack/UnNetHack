@@ -196,7 +196,7 @@ extern const char *fname;
 %token	<i> ',' ':' '(' ')' '[' ']' '{' '}'
 %token	<map> STRING MAP_ID
 %token	<map> NQSTRING VARSTRING
-%token	<map> COREFUNC COREFUNC_INT COREFUNC_STR COREFUNC_COORD
+%token	<map> CFUNC CFUNC_INT CFUNC_STR CFUNC_COORD
 %token	<map> VARSTRING_INT VARSTRING_INT_ARRAY
 %token	<map> VARSTRING_STRING VARSTRING_STRING_ARRAY
 %token	<map> VARSTRING_VAR VARSTRING_VAR_ARRAY
@@ -2266,7 +2266,7 @@ corefunc_params_list	: /* nothing */
 			  }
 			;
 
-corefunc_stmt	: COREFUNC '(' corefunc_params_list ')'
+corefunc_stmt	: CFUNC '(' corefunc_params_list ')'
 		  {
 		      handle_corefunc(splev, $1, $3, 'i');
 		      Free($1);
@@ -2274,12 +2274,12 @@ corefunc_stmt	: COREFUNC '(' corefunc_params_list ')'
 		  }
 		;
 
-corefunc_int	: COREFUNC_INT
+corefunc_int	: CFUNC_INT
 		  {
 		      handle_corefunc(splev, $1, "", 'i');
 		      Free($1);
 		  }
-		| COREFUNC_INT '(' corefunc_params_list ')'
+		| CFUNC_INT '(' corefunc_params_list ')'
 		  {
 		      handle_corefunc(splev, $1, $3, 'i');
 		      Free($1);
@@ -2287,12 +2287,12 @@ corefunc_int	: COREFUNC_INT
 		  }
 		;
 
-corefunc_str	: COREFUNC_STR
+corefunc_str	: CFUNC_STR
 		  {
 		      handle_corefunc(splev, $1, "", 's');
 		      Free($1);
 		  }
-		| COREFUNC_STR '(' corefunc_params_list ')'
+		| CFUNC_STR '(' corefunc_params_list ')'
 		  {
 		      handle_corefunc(splev, $1, $3, 's');
 		      Free($1);
@@ -2300,12 +2300,12 @@ corefunc_str	: COREFUNC_STR
 		  }
 		;
 
-corefunc_coord	: COREFUNC_COORD
+corefunc_coord	: CFUNC_COORD
 		  {
 		      handle_corefunc(splev, $1, "", 'c');
 		      Free($1);
 		  }
-		| COREFUNC_COORD '(' corefunc_params_list ')'
+		| CFUNC_COORD '(' corefunc_params_list ')'
 		  {
 		      handle_corefunc(splev, $1, $3, 'c');
 		      Free($1);

@@ -449,11 +449,11 @@ long retval;
       default:
 	lc_error("Core function '%s' has unknown return type '%c'.", yylval.map, core_func_retval(i));
 	break;
-      case 'i': return COREFUNC_INT;
-      case 's': return COREFUNC_STR;
-      case 'c': return COREFUNC_COORD;
+      case 'i': return CFUNC_INT;
+      case 's': return CFUNC_STR;
+      case 'c': return CFUNC_COORD;
       case 0:
-      case ' ': return COREFUNC;
+      case ' ': return CFUNC;
     }
   }
   return retval;
