@@ -130,6 +130,7 @@ static const struct {
     {COREFUNC_POM,			"time.phase_of_the_moon", "", 'i'},
     {COREFUNC_YYYYMMDD,			"time.yyyymmdd", "", 'i'},
     {COREFUNC_LEVEL_DIFFICULTY,		"level.difficulty", "", 'i'},
+    {COREFUNC_LEVEL_DEPTH,		"level.depth", "", 'i'},
     {COREFUNC_SOBJ_AT,			"level.obj_at", "Oc", 'i'},
     {COREFUNC_PLNAME,			"hero.name", "", 's'},
     {COREFUNC_ROLE,			"hero.role", "", 's'},

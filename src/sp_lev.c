@@ -2705,6 +2705,7 @@ spo_corefunc(coder, fn)
     switch (fn) {
     default: impossible("Unknown sp_lev core function %li", fn); break;
     case COREFUNC_LEVEL_DIFFICULTY: i = opvar_new_int(level_difficulty()); splev_stack_push(coder->stack, i); break;
+    case COREFUNC_LEVEL_DEPTH: i = opvar_new_int(depth(&u.uz)); splev_stack_push(coder->stack, i); break;
     case COREFUNC_DISCORDIAN_HOLIDAY: i = opvar_new_int(discordian_holiday()); splev_stack_push(coder->stack, i); break;
     case COREFUNC_PIRATEDAY: i = opvar_new_int(pirateday()); splev_stack_push(coder->stack, i); break;
     case COREFUNC_APRILFOOLSDAY: i = opvar_new_int(aprilfoolsday()); splev_stack_push(coder->stack, i); break;
