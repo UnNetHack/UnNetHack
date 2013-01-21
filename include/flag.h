@@ -71,7 +71,6 @@ struct flag {
 	boolean  pickup_thrown;		/* auto-pickup items you threw */
 
 	boolean  pushweapon;	/* When wielding, push old weapon into second slot */
-	boolean  rest_on_space; /* space means rest */
 	boolean  safe_dog;	/* give complete protection to the dog */
 #ifdef EXP_ON_BOTL
 	boolean  showexp;	/* show experience points */
@@ -344,6 +343,7 @@ struct instance_flags {
 	boolean  show_buc;	/* always show BUC status */
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
 	boolean	 obsolete;	/* obsolete options can point at this, it isn't used */
+	boolean  rest_on_space; /* space means rest */
 	/* Items which belong in flags, but are here to allow save compatibility */
 	boolean  lootabc;	/* use "a/b/c" rather than "o/i/b" when looting */
 	boolean  showrace;	/* show hero glyph by race rather than by role */

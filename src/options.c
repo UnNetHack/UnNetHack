@@ -209,7 +209,7 @@ static struct Bool_Opt
 #else
 	{"rawio", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
-	{"rest_on_space", &flags.rest_on_space, FALSE, SET_IN_FILE},
+	{"rest_on_space", &iflags.rest_on_space, FALSE, SET_IN_FILE},
 	{"safe_pet", &flags.safe_dog, TRUE, SET_IN_GAME},
 #ifdef WIZARD
 	{"sanity_check", &iflags.sanity_check, FALSE, SET_IN_GAME},

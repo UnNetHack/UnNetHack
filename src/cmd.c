@@ -2147,7 +2147,7 @@ register char *cmd;
 	/* Special case of *cmd == ' ' handled better below */
 	if(!*cmd || *cmd == (char)0377)
 #else
-	if(!*cmd || *cmd == (char)0377 || (!flags.rest_on_space && *cmd == ' '))
+	if(!*cmd || *cmd == (char)0377 || (!iflags.rest_on_space && *cmd == ' '))
 #endif
 	{
 		nhbell();
@@ -2264,7 +2264,7 @@ register char *cmd;
 	} else if (prefix_seen && cmd[1] == '\033') {	/* <prefix><escape> */
 	    /* don't report "unknown command" for change of heart... */
 	    bad_command = FALSE;
-	} else if (*cmd == ' ' && !flags.rest_on_space) {
+	} else if (*cmd == ' ' && !iflags.rest_on_space) {
 	    bad_command = TRUE;		/* skip cmdlist[] loop */
 
 	/* handle all other commands */
