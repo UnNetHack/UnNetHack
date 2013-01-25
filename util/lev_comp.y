@@ -69,6 +69,8 @@ extern void VDECL(add_opvars, (sp_lev *, const char *, ...));
 extern struct lc_funcdefs *FDECL(funcdef_new,(long,char *));
 extern void FDECL(funcdef_free_all,(struct lc_funcdefs *));
 extern struct lc_funcdefs *FDECL(funcdef_defined,(struct lc_funcdefs *,char *, int));
+extern char *FDECL(funcdef_paramtypes, (struct lc_funcdefs *));
+extern char *FDECL(decode_parm_str, (char *));
 
 extern struct lc_vardefs *FDECL(vardef_new,(long,char *));
 extern void FDECL(vardef_free_all,(struct lc_vardefs *));
@@ -117,7 +119,10 @@ int n_switch_break_list = 0;
 extern struct lc_vardefs *variable_definitions;
 
 
-static struct lc_funcdefs *function_definitions = NULL;
+struct lc_vardefs *function_tmp_var_defs = NULL;
+extern struct lc_funcdefs *function_definitions;
+struct lc_funcdefs *curr_function = NULL;
+struct lc_funcdefs_parm * curr_function_param = NULL;
 int in_function_definition = 0;
 sp_lev *function_splev_backup = NULL;
 
@@ -224,11 +229,13 @@ extern const char *fname;
 %type	<i> opt_percent opt_spercent opt_fillchar
 %type	<i> all_integers
 %type	<i> ter_selection ter_selection_x
-%type	<i> corefunc_param_part
+%type	<i> corefunc_param_part func_param_type
 %type	<i> objectid monsterid terrainid
 %type	<map> string level_def
 %type	<map> any_var any_var_array any_var_or_arr
 %type	<map> corefunc_param_list corefunc_params_list
+%type	<map> func_call_params_list func_call_param_list
+%type	<i> func_call_param_part
 %type	<corpos> corr_spec
 %type	<lregn> region lev_region
 %type	<crd> room_pos subroom_pos room_align
@@ -691,7 +698,7 @@ string_list	: STRING
 		  }
 		;
 
-function_define	: FUNCTION_ID NQSTRING '(' ')'
+function_define	: FUNCTION_ID NQSTRING '('
 		  {
 		      struct lc_funcdefs *funcdef;
 
@@ -709,21 +716,40 @@ function_define	: FUNCTION_ID NQSTRING '(' ')'
 		      function_splev_backup = splev;
 		      splev = &(funcdef->code);
 		      Free($2);
+		      curr_function = funcdef;
+		      function_tmp_var_defs = variable_definitions;
+		      variable_definitions = NULL;
+		  }
+		func_params_list ')'
+		  {
+		      /* nothing */
 		  }
 		'{' levstatements '}'
 		  {
 		      add_opvars(splev, "io", 0, SPO_RETURN);
 		      splev = function_splev_backup;
 		      in_function_definition--;
+		      curr_function = NULL;
+		      vardef_free_all(variable_definitions);
+		      variable_definitions = function_tmp_var_defs;
 		  }
 		;
 
-function_call	: NQSTRING '(' ')'
+function_call	: NQSTRING '(' func_call_params_list ')'
 		  {
 		      struct lc_funcdefs *tmpfunc;
 		      tmpfunc = funcdef_defined(function_definitions, $1, 1);
 		      if (tmpfunc) {
 			  long l;
+			  long nparams = strlen( $3 );
+			  char *fparamstr = funcdef_paramtypes(tmpfunc);
+			  if (strcmp($3, fparamstr)) {
+			      char *tmps = strdup(decode_parm_str(fparamstr));
+			      lc_error("Function '%s' requires params '%s', got '%s' instead.", $1, tmps, decode_parm_str($3));
+			      Free(tmps);
+			  }
+			  Free(fparamstr);
+			  Free($3);
 			  if (!(tmpfunc->n_called)) {
 			      /* we haven't called the function yet, so insert it in the code */
 			      struct opvar *jmp = New(struct opvar);
@@ -732,11 +758,20 @@ function_call	: NQSTRING '(' ')'
 			      add_opcode(splev, SPO_JMP, NULL); /* we must jump past it first, then CALL it, due to RETURN. */
 
 			      tmpfunc->addr = splev->n_opcodes;
+
+			      { /* init function parameter variables */
+				  struct lc_funcdefs_parm *tfp = tmpfunc->params;
+				  while (tfp) {
+				      add_opvars(splev, "iso", 0, tfp->name, SPO_VAR_INIT);
+				      tfp = tfp->next;
+				  }
+			      }
+
 			      splev_add_from(splev, &(tmpfunc->code));
 			      set_opvar_int(jmp, splev->n_opcodes - jmp->vardata.l);
 			  }
 			  l = tmpfunc->addr - splev->n_opcodes - 2;
-			  add_opvars(splev, "iio", 0, l, SPO_CALL);
+			  add_opvars(splev, "iio", nparams, l, SPO_CALL);
 			  tmpfunc->n_called++;
 		      } else {
 			  lc_error("Function '%s' not defined.", $1);
@@ -2219,6 +2254,99 @@ math_expr_var	: INTEGER                       { add_opvars(splev, "i", $1 ); }
 		| math_expr_var '%' math_expr_var       { add_opvars(splev, "o", SPO_MATH_MOD); }
 		| '(' math_expr ')'             { }
 		;
+
+func_param_type		: CFUNC_INT
+			  {
+			      if (!strcmp("int", $1) || !strcmp("integer", $1)) {
+				  $$ = (int)'i';
+			      } else lc_error("Unknown function parameter type '%s'", $1);
+			  }
+			| CFUNC_STR
+			  {
+			      if (!strcmp("str", $1) || !strcmp("string", $1)) {
+				  $$ = (int)'s';
+			      } else lc_error("Unknown function parameter type '%s'", $1);
+			  }
+			;
+
+func_param_part		: any_var_or_arr ':' func_param_type
+			  {
+			      struct lc_funcdefs_parm *tmp = New(struct lc_funcdefs_parm);
+
+			      if (!curr_function) {
+				  lc_error("Function parameters outside function definition.");
+				  return;
+			      }
+			      if (!tmp) {
+				  lc_error("Could not alloc function params.");
+				  return;
+			      }
+			      tmp->name = strdup($1);
+			      tmp->parmtype = (char) $3;
+			      tmp->next = curr_function->params;
+			      curr_function->params = tmp;
+			      curr_function->n_params++;
+			      {
+				  long vt;
+				  switch (tmp->parmtype) {
+				  case 'i': vt = SPOVAR_INT; break;
+				  case 's': vt = SPOVAR_STRING; break;
+				  default: lc_error("Unknown func param conversion."); break;
+				  }
+				  variable_definitions = add_vardef_type(variable_definitions, $1, vt);
+			      }
+			      Free($1);
+			  }
+			;
+
+
+func_param_list		: func_param_part
+			| func_param_list ',' func_param_part
+			;
+
+func_params_list	: /* nothing */
+			| func_param_list
+			;
+
+func_call_param_part	: math_expr_var
+			  {
+			      $$ = (int)'i';
+			  }
+			| string_expr
+			  {
+			      $$ = (int)'s';
+			  }
+			;
+
+
+func_call_param_list   	: func_call_param_part
+			  {
+			      char tmpbuf[2];
+			      tmpbuf[0] = (char) $1;
+			      tmpbuf[1] = '\0';
+			      $$ = strdup(tmpbuf);
+			  }
+			| func_call_param_list ',' func_call_param_part
+			  {
+			      long len = strlen( $1 );
+			      char *tmp = (char *)alloc(len + 2);
+			      sprintf(tmp, "%c%s", $3, $1 );
+			      Free( $1 );
+			      $$ = tmp;
+			  }
+			;
+
+func_call_params_list	: /* nothing */
+			  {
+			      $$ = strdup("");
+			  }
+			| func_call_param_list
+			  {
+			      char *tmp = strdup( $1 );
+			      Free( $1 );
+			      $$ = tmp;
+			  }
+			;
 
 corefunc_param_part	: math_expr_var
 			  {

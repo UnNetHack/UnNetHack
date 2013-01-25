@@ -501,6 +501,11 @@ typedef struct {
 
 
 /* only used by lev_comp */
+struct lc_funcdefs_parm {
+    char *name;
+    char parmtype;
+    struct lc_funcdefs_parm *next;
+};
 
 struct lc_funcdefs {
     struct lc_funcdefs *next;
@@ -508,6 +513,8 @@ struct lc_funcdefs {
     long addr;
     sp_lev code;
     long n_called;
+    struct lc_funcdefs_parm *params;
+    long n_params;
 };
 
 struct lc_vardefs {

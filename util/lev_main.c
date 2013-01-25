@@ -137,6 +137,8 @@ static const struct {
     {COREFUNC_RACE,			"hero.race", "", 's'},
     {COREFUNC_CARRYING,			"hero.carrying", "O", 'i'},
     {COREFUNC_TOSTRING,			"string", "i", 's'},
+    {COREFUNC_TOSTRING,			"str", "i", 's'},
+    {COREFUNC_TOINT,			"integer", "s", 'i'},
     {COREFUNC_TOINT,			"int", "s", 'i'},
     {COREFUNC_TOCOORD,			"coord", "ii", 'c'},
     {0, NULL, NULL, 0}
@@ -230,6 +232,7 @@ extern int token_start_pos;
 extern char curr_token[512];
 
 struct lc_vardefs *variable_definitions = NULL;
+struct lc_funcdefs *function_definitions = NULL;
 
 
 int
@@ -315,6 +318,7 @@ char **argv;
 			}
 		    }
 		    (void) fclose(fin);
+		    funcdef_free_all(function_definitions);
 	    }
 	}
 	exit(errors_encountered ? EXIT_FAILURE : EXIT_SUCCESS);
@@ -326,16 +330,13 @@ char **argv;
  * Each time the parser detects an error, it uses this function.
  * Here we take count of the errors. To continue farther than
  * MAX_ERRORS wouldn't be reasonable.
- * Assume that explicit calls from lev_comp.y have the 1st letter
- * capitalized, to allow printing of the line containing the start of
- * the current declaration, instead of the beginning of the next declaration.
  */
 void
 yyerror(s)
 const char *s;
 {
 	(void) fprintf(stderr, "%s: line %d, pos %d : %s at \"%s\"\n", fname,
-		       (*s >= 'A' && *s <= 'Z') ? colon_line_number : line_number,
+		       line_number,
 		       token_start_pos-strlen(curr_token), s, curr_token);
 
 	if (++fatal_error > MAX_ERRORS) {
@@ -367,7 +368,7 @@ yywarning(s)
 const char *s;
 {
 	(void) fprintf(stderr, "%s: line %d : WARNING : %s\n",
-				fname, colon_line_number, s);
+				fname, line_number, s);
 }
 
 void
@@ -689,6 +690,8 @@ funcdef_new(addr, name)
     f->addr = addr;
     f->name = strdup(name);
     f->n_called = 0;
+    f->n_params = 0;
+    f->params = NULL;
     f->code.opcodes = NULL;
     f->code.n_opcodes = 0;
     return f;
@@ -700,13 +703,36 @@ funcdef_free_all(fchain)
 {
     struct lc_funcdefs *tmp = fchain;
     struct lc_funcdefs *nxt;
+    struct lc_funcdefs_parm *tmpparam;
     while (tmp) {
 	nxt = tmp->next;
 	Free(tmp->name);
+	while (tmp->params) {
+	    tmpparam = tmp->params->next;
+	    Free(tmp->params->name);
+	    tmp->params = tmpparam;
+	}
 	/* FIXME: free tmp->code */
 	Free(tmp);
 	tmp = nxt;
     }
+}
+
+
+char *
+funcdef_paramtypes(f)
+     struct lc_funcdefs *f;
+{
+    int i = 0;
+    struct lc_funcdefs_parm *fp = f->params;
+    char *tmp = (char *)alloc((f->n_params) + 1);
+    if (!tmp) return NULL;
+    while (fp) {
+	tmp[i++] = fp->parmtype;
+	fp = fp->next;
+    }
+    tmp[i] = '\0';
+    return tmp;
 }
 
 struct lc_funcdefs *

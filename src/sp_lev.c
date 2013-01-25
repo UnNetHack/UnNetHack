@@ -178,6 +178,21 @@ splev_stack_pop(st)
     return ret;
 }
 
+struct splevstack *
+splev_stack_reverse(st)
+     struct splevstack *st;
+{
+    long i;
+    struct opvar *tmp;
+    if (!st) return NULL;
+    if (!st->stackdata) panic("splev_stack_reverse: no stackdata allocated?");
+    for (i = 0; i < (st->depth / 2); i++) {
+	tmp = st->stackdata[i];
+	st->stackdata[i] = st->stackdata[st->depth - i - 1];
+	st->stackdata[st->depth - i - 1] = tmp;
+    }
+    return st;
+}
 
 #define OV_typ(o) (o->spovartyp)
 #define OV_i(o) (o->vardata.l)
@@ -360,7 +375,7 @@ splev_stack_getdat_any(coder)
 {
     if (coder && coder->stack) {
 	struct opvar *tmp = splev_stack_pop(coder->stack);
-	if (tmp->spovartyp == SPOVAR_VARIABLE)
+	if (tmp && tmp->spovartyp == SPOVAR_VARIABLE)
 	    tmp = opvar_var_conversion(coder, tmp);
 	return tmp;
     }
@@ -2827,14 +2842,17 @@ spo_call(coder)
     if (!OV_pop_i(addr) || !OV_pop_i(params)) return;
     if (OV_i(params) < 0) return;
 
-    /* push a frame */
     tmpframe = frame_new(sp_code_jmpaddr(coder->frame->n_opcode, OV_i(addr)-1));
+
+    while (OV_i(params)-- > 0) {
+	splev_stack_push(tmpframe->stack, splev_stack_getdat_any(coder));
+    }
+    splev_stack_reverse(tmpframe->stack);
+
+    /* push a frame */
     tmpframe->next = coder->frame;
     coder->frame = tmpframe;
 
-    while (OV_i(params)-- > 0) {
-	splev_stack_push(tmpframe->stack, splev_stack_pop(coder->stack));
-    }
     opvar_free(addr);
     opvar_free(params);
 }

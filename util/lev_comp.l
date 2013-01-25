@@ -84,7 +84,7 @@ void FDECL(advancepos, (char *));
  */
 extern YYSTYPE yylval;
 
-int line_number = 1, colon_line_number = 1;
+int line_number = 1;
 int token_start_pos = 0;
 char curr_token[512];
 static char map[4096];
@@ -124,7 +124,6 @@ FILE *orig_yyin = NULL;
 		  newline();
 		}
 ^[ \t]*#.*\n		{ savetoken(yytext); newline(); }
-:		{ savetoken(yytext); colon_line_number = line_number; return ':'; }
 MESSAGE		{ savetoken(yytext); return MESSAGE_ID; }
 NOMAP		{ savetoken(yytext); return NOMAP_ID; }
 LEVEL		{ savetoken(yytext); return LEVEL_ID; }
