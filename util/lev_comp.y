@@ -2104,7 +2104,7 @@ encodemonster	: STRING
 		      long m = get_monster_id($1, (char)0);
 		      if (m == ERR) {
 			  lc_error("Unknown monster \"%s\"!", $1);
-			  $$ == -1;
+			  $$ = -1;
 		      } else
 			  $$ = SP_MONST_PACK(m, def_monsyms[(int)mons[m].mlet]);
 		  }
@@ -2122,7 +2122,7 @@ encodemonster	: STRING
 		      long m = get_monster_id($4, (char) $2);
 		      if (m == ERR) {
 			  lc_error("Unknown monster ('%c', \"%s\")!", $2, $4);
-			  $$ == -1;
+			  $$ = -1;
 		      } else
 			  $$ = SP_MONST_PACK(m, $2);
 		  }
@@ -2174,7 +2174,7 @@ encodexobj	: '(' CHAR ',' STRING ')'
 		      long m = get_object_id($4, (char) $2);
 		      if (m == ERR) {
 			  lc_error("Unknown object ('%c', \"%s\")!", $2, $4);
-			  $$ == -1;
+			  $$ = -1;
 		      } else
 			  $$ = SP_OBJ_PACK(m, $2);
 		  }
@@ -2183,7 +2183,7 @@ encodexobj	: '(' CHAR ',' STRING ')'
 		      long m = get_object_id($3, (char)0);
 		      if (m == ERR) {
 			  lc_error("Unknown object \"%s\"!", $3);
-			  $$ == -1;
+			  $$ = -1;
 		      } else
 			  $$ = SP_OBJ_PACK(m, 1); /* obj class != 0 to force generation of a specific item */
 		  }
@@ -2194,7 +2194,7 @@ encodeobj	: STRING
 		      long m = get_object_id($1, (char)0);
 		      if (m == ERR) {
 			  lc_error("Unknown object \"%s\"!", $1);
-			  $$ == -1;
+			  $$ = -1;
 		      } else
 			  $$ = SP_OBJ_PACK(m, 1); /* obj class != 0 to force generation of a specific item */
 
@@ -2213,7 +2213,7 @@ encodeobj	: STRING
 		      long m = get_object_id($4, (char) $2);
 		      if (m == ERR) {
 			  lc_error("Unknown object ('%c', \"%s\")!", $2, $4);
-			  $$ == -1;
+			  $$ = -1;
 		      } else
 			  $$ = SP_OBJ_PACK(m, $2);
 		  }
@@ -2273,27 +2273,25 @@ func_param_part		: any_var_or_arr ':' func_param_type
 			  {
 			      struct lc_funcdefs_parm *tmp = New(struct lc_funcdefs_parm);
 
-			      if (!curr_function) {
+			      if (!curr_function)
 				  lc_error("Function parameters outside function definition.");
-				  return;
-			      }
-			      if (!tmp) {
+			      else if (!tmp)
 				  lc_error("Could not alloc function params.");
-				  return;
-			      }
-			      tmp->name = strdup($1);
-			      tmp->parmtype = (char) $3;
-			      tmp->next = curr_function->params;
-			      curr_function->params = tmp;
-			      curr_function->n_params++;
-			      {
-				  long vt;
-				  switch (tmp->parmtype) {
-				  case 'i': vt = SPOVAR_INT; break;
-				  case 's': vt = SPOVAR_STRING; break;
-				  default: lc_error("Unknown func param conversion."); break;
+			      else {
+				  tmp->name = strdup($1);
+				  tmp->parmtype = (char) $3;
+				  tmp->next = curr_function->params;
+				  curr_function->params = tmp;
+				  curr_function->n_params++;
+				  {
+				      long vt;
+				      switch (tmp->parmtype) {
+				      case 'i': vt = SPOVAR_INT; break;
+				      case 's': vt = SPOVAR_STRING; break;
+				      default: lc_error("Unknown func param conversion."); break;
+				      }
+				      variable_definitions = add_vardef_type(variable_definitions, $1, vt);
 				  }
-				  variable_definitions = add_vardef_type(variable_definitions, $1, vt);
 			      }
 			      Free($1);
 			  }
@@ -2330,7 +2328,7 @@ func_call_param_list   	: func_call_param_part
 			  {
 			      long len = strlen( $1 );
 			      char *tmp = (char *)alloc(len + 2);
-			      sprintf(tmp, "%c%s", $3, $1 );
+			      sprintf(tmp, "%c%s", (char) $3, $1 );
 			      Free( $1 );
 			      $$ = tmp;
 			  }
@@ -2377,7 +2375,7 @@ corefunc_param_list	: corefunc_param_part
 			  {
 			      long len = strlen( $3 );
 			      char *tmp = (char *)alloc(len + 2);
-			      sprintf(tmp, "%c%s", $1, $3 );
+			      sprintf(tmp, "%c%s", (char) $1, $3 );
 			      Free( $3 );
 			      $$ = tmp;
 			  }
