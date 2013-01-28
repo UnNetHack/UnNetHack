@@ -335,7 +335,7 @@ void
 yyerror(s)
 const char *s;
 {
-	char *e = (s + strlen(s) - 1);
+	char *e = ((char *)s + strlen(s) - 1);
 	(void) fprintf(stderr, "%s: line %d, pos %d : %s",
 		       fname, line_number,
 		       token_start_pos-strlen(curr_token), s);
