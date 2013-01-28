@@ -211,7 +211,7 @@ extern const char *fname;
 %token	<map> VARSTRING_MONST VARSTRING_MONST_ARRAY
 %token	<map> VARSTRING_OBJ VARSTRING_OBJ_ARRAY
 %token	<map> VARSTRING_SEL VARSTRING_SEL_ARRAY
-%token	<dice> DICE;
+%token	<dice> DICE
 %type	<i> h_justif v_justif trap_name room_type door_state light_state
 %type	<i> alignment altar_type a_register roomfill door_pos
 %type	<i> alignment_prfx
@@ -231,7 +231,7 @@ extern const char *fname;
 %type	<i> ter_selection ter_selection_x
 %type	<i> corefunc_param_part func_param_type
 %type	<i> objectid monsterid terrainid
-%type	<map> string level_def
+%type	<map> level_def
 %type	<map> any_var any_var_array any_var_or_arr
 %type	<map> corefunc_param_list corefunc_params_list
 %type	<map> func_call_params_list func_call_param_list
@@ -292,7 +292,7 @@ level		: level_def flags levstatements
 		  }
 		;
 
-level_def	: LEVEL_ID ':' string
+level_def	: LEVEL_ID ':' STRING
 		  {
 		      struct lc_funcdefs *f;
 			if (index($3, '.'))
@@ -493,7 +493,7 @@ shuffle_detail	: SHUFFLE_ID ':' any_var_array
 		  }
 		;
 
-variable_define	: any_var_or_arr '=' math_expr
+variable_define	: any_var_or_arr '=' math_expr_var
 		  {
 		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_INT);
 		      add_opvars(splev, "iso", 0, $1, SPO_VAR_INIT);
@@ -505,33 +505,11 @@ variable_define	: any_var_or_arr '=' math_expr
 		      add_opvars(splev, "iso", 0, $1, SPO_VAR_INIT);
 		      Free($1);
 		  }
-		| any_var_or_arr '=' STRING
+		| any_var_or_arr '=' string_expr
 		  {
 		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_STRING);
-		      add_opvars(splev, "siso", $3, 0, $1, SPO_VAR_INIT);
+		      add_opvars(splev, "iso", 0, $1, SPO_VAR_INIT);
 		      Free($1);
-		      Free($3);
-		  }
-		| any_var_or_arr '=' any_var_or_arr
-		  {
-		      struct lc_vardefs *vd1, *vd2;
-		      if (!strcmp($1, $3)) lc_error("Trying to set variable '%s' to value of itself", $1);
-		      vd2 = vardef_defined(variable_definitions, $3, 1);
-		      if (!vd2) {
-			  lc_error("Trying to use an undefined variable '%s'", $3);
-		      } else {
-			  if ((vd1 = vardef_defined(variable_definitions, $1, 1))) {
-			      if (vd1->var_type != vd2->var_type)
-				  lc_error("Trying to redefine variable '%s' as different type", $1);
-			  } else {
-			      vd1 = vardef_new(vd2->var_type, $1);
-			      vd1->next = variable_definitions;
-			      variable_definitions = vd1;
-			  }
-		      }
-		      add_opvars(splev, "siso", $3, -1, $1, SPO_VAR_INIT);
-		      Free($1);
-		      Free($3);
 		  }
 		| any_var_or_arr '=' terrainid ':' mapchar
 		  {
@@ -674,26 +652,22 @@ encodecoord_list	: encodecoord
 		  }
 		;
 
-integer_list	: math_expr
+integer_list	: math_expr_var
 		  {
 		      $$ = 1;
 		  }
-		| integer_list ',' math_expr
+		| integer_list ',' math_expr_var
 		  {
 		      $$ = 1 + $1;
 		  }
 		;
 
-string_list	: STRING
+string_list	: string_expr
 		  {
-		      add_opvars(splev, "s", $1);
-		      Free($1);
 		      $$ = 1;
 		  }
-		| string_list ',' STRING
+		| string_list ',' string_expr
 		  {
-		      add_opvars(splev, "s", $3);
-		      Free($1);
 		      $$ = 1 + $1;
 		  }
 		;
@@ -1288,7 +1262,7 @@ mon_gen_part	: '(' integer_or_var ',' monster ')'
 		      if (token == ERR) lc_error("Monster generation: Invalid monster symbol");
 		      add_opvars(splev, "ii", token, 1);
 		  }
-		| '(' integer_or_var ',' string ')'
+		| '(' integer_or_var ',' STRING ')'
 		  {
 		      long token;
 		      token = get_monster_id($4, (char)0);
@@ -1679,7 +1653,7 @@ stair_region	: STAIR_ID ':' lev_region ',' lev_region ',' UP_OR_DOWN
 		  }
 		;
 
-portal_region	: PORTAL_ID ':' lev_region ',' lev_region ',' string
+portal_region	: PORTAL_ID ':' lev_region ',' lev_region ',' STRING
 		  {
 		      add_opvars(splev, "iiiii iiiii iiso",
 				 $3.x1, $3.y1, $3.x2, $3.y2, $3.area,
@@ -1865,7 +1839,7 @@ engraving_detail: ENGRAVING_ID ':' coord_or_var ',' engraving_type ',' string_ex
 		  }
 		;
 
-trap_name	: string
+trap_name	: STRING
 		  {
 			int token = get_trap_type($1);
 			if (token == ERR)
@@ -1876,7 +1850,7 @@ trap_name	: string
 		| RANDOM_TYPE
 		;
 
-room_type	: string
+room_type	: STRING
 		  {
 			int token = get_room_type($1);
 			if (token == ERR) {
@@ -2561,9 +2535,6 @@ all_ints_push	: MINUS_INTEGER
 		  {
 		      /* nothing */
 		  }
-		;
-
-string		: STRING
 		;
 
 objectid	: object_ID
