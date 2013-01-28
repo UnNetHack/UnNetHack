@@ -335,9 +335,13 @@ void
 yyerror(s)
 const char *s;
 {
-	(void) fprintf(stderr, "%s: line %d, pos %d : %s at \"%s\"\n", fname,
-		       line_number,
-		       token_start_pos-strlen(curr_token), s, curr_token);
+	char *e = (s + strlen(s) - 1);
+	(void) fprintf(stderr, "%s: line %d, pos %d : %s",
+		       fname, line_number,
+		       token_start_pos-strlen(curr_token), s);
+	if (*e != '.' && *e != '!')
+	    (void) fprintf(stderr, " at \"%s\"", curr_token);
+	(void) fprintf(stderr, "\n");
 
 	if (++fatal_error > MAX_ERRORS) {
 		(void) fprintf(stderr,"Too many errors, good bye!\n");
