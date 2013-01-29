@@ -216,7 +216,7 @@ extern const char *fname;
 %type	<i> alignment altar_type a_register roomfill door_pos
 %type	<i> alignment_prfx
 %type	<i> door_wall walled secret chance
-%type	<i> dir_list map_geometry teleprt_detail
+%type	<i> dir_list teleprt_detail
 %type	<i> object_infos object_info monster_infos monster_info
 %type	<i> levstatements region_detail_end
 %type	<i> engraving_type flag_list prefilled
@@ -1187,23 +1187,17 @@ map_definition	: NOMAP_ID
 		      max_x_map = COLNO-1;
 		      max_y_map = ROWNO;
 		  }
-		| map_geometry roomfill MAP_ID
+		| GEOMETRY_ID ':' h_justif ',' v_justif roomfill MAP_ID
 		  {
-		      add_opvars(splev, "cii", ((long)($1 % 10) & 0xff) + (((long)($1 / 10) & 0xff) << 16), 1, (long)$2);
-		      scan_map($3, splev);
-		      Free($3);
+		      add_opvars(splev, "cii", SP_COORD_PACK(($3),($5)), 1, (long)$6);
+		      scan_map($7, splev);
+		      Free($7);
 		  }
 		| GEOMETRY_ID ':' coord_or_var roomfill MAP_ID
 		  {
 		      add_opvars(splev, "ii", 2, (long)$4);
 		      scan_map($5, splev);
 		      Free($5);
-		  }
-		;
-
-map_geometry	: GEOMETRY_ID ':' h_justif ',' v_justif
-		  {
-			$$ = $3 + ($5 * 10);
 		  }
 		;
 
