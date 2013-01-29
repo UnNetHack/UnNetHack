@@ -176,6 +176,8 @@ GRAVE		{ savetoken(yytext); return GRAVE_ID; }
 ENGRAVING	{ savetoken(yytext); return ENGRAVING_ID; }
 (NAME|name)	{ savetoken(yytext); return NAME_ID; }
 CHANCE		{ savetoken(yytext); return CHANCE_ID; }
+FOR		{ savetoken(yytext); return FOR_ID; }
+TO		{ savetoken(yytext); return TO_ID; }
 LOOP		{ savetoken(yytext); return LOOP_ID; }
 SWITCH		{ savetoken(yytext); return SWITCH_ID; }
 CASE		{ savetoken(yytext); return CASE_ID; }
