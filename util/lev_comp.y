@@ -1660,8 +1660,10 @@ drawbridge_detail: DRAWBRIDGE_ID ':' coord_or_var ',' DIRECTION ',' door_state
 			   state = 1;
 		       else if ( $7 == D_CLOSED )
 			   state = 0;
+		       else if ( $7 == -1 )
+			   state = -1;
 		       else
-			   lc_error("A drawbridge can only be open or closed!");
+			   lc_error("A drawbridge can only be open, closed or random!");
 		       add_opvars(splev, "iio", state, d, SPO_DRAWBRIDGE);
 		   }
 		;

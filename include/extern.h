@@ -206,7 +206,7 @@ E boolean FDECL(is_any_icewall, (int,int));
 E int FDECL(is_drawbridge_wall, (int,int));
 E boolean FDECL(is_db_wall, (int,int));
 E boolean FDECL(find_drawbridge, (int *,int*));
-E boolean FDECL(create_drawbridge, (int,int,int,BOOLEAN_P));
+E boolean FDECL(create_drawbridge, (int,int,int,int));
 E void FDECL(open_drawbridge, (int,int));
 E boolean FDECL(close_drawbridge, (int,int));
 E void FDECL(destroy_drawbridge, (int,int));

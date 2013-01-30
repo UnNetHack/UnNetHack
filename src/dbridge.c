@@ -202,12 +202,13 @@ int *x,*y;
 boolean
 create_drawbridge(x,y,dir,flag)
 int x,y,dir;
-boolean flag;
+int flag;
 {
 	int x2,y2;
 	boolean horiz;
 	boolean lava = levl[x][y].typ == LAVAPOOL; /* assume initialized map */
 
+	if (flag < 0 || flag > 1) flag = rn2(2);
 	x2 = x; y2 = y;
 	switch(dir) {
 		case DB_NORTH:
