@@ -521,6 +521,7 @@ struct lc_vardefs {
     struct lc_vardefs *next;
     char *name;
     long var_type; /* SPOVAR_foo */
+    long n_used;
 };
 
 #endif /* SP_LEV_H */

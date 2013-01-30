@@ -79,6 +79,7 @@ extern struct lc_vardefs *FDECL(vardef_defined,(struct lc_vardefs *,char *, int)
 extern void FDECL(splev_add_from, (sp_lev *, sp_lev *));
 
 extern void FDECL(check_vardef_type, (struct lc_vardefs *, char *, long));
+extern void FDECL(vardef_used, (struct lc_vardefs *, char *));
 extern struct lc_vardefs *FDECL(add_vardef_type, (struct lc_vardefs *, char *, long));
 
 extern int FDECL(reverse_jmp_opcode, (int));
@@ -1989,12 +1990,14 @@ string_or_var	: STRING
 		| VARSTRING_STRING
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_STRING);
+		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
 		| VARSTRING_STRING_ARRAY '[' math_expr_var ']'
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_STRING|SPOVAR_ARRAY);
+		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
@@ -2023,12 +2026,14 @@ coord_or_var	: encodecoord
 		| VARSTRING_COORD
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_COORD);
+		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
 		| VARSTRING_COORD_ARRAY '[' math_expr_var ']'
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_COORD|SPOVAR_ARRAY);
+		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
@@ -2053,12 +2058,14 @@ region_or_var	: encoderegion
 		| VARSTRING_REGION
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_REGION);
+		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
 		| VARSTRING_REGION_ARRAY '[' math_expr_var ']'
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_REGION|SPOVAR_ARRAY);
+		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
@@ -2080,12 +2087,14 @@ mapchar_or_var	: mapchar
 		| VARSTRING_MAPCHAR
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_MAPCHAR);
+		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
 		| VARSTRING_MAPCHAR_ARRAY '[' math_expr_var ']'
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_MAPCHAR|SPOVAR_ARRAY);
+		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
@@ -2118,12 +2127,14 @@ monster_or_var	: encodemonster
 		| VARSTRING_MONST
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_MONST);
+		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
 		| VARSTRING_MONST_ARRAY '[' math_expr_var ']'
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_MONST|SPOVAR_ARRAY);
+		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
@@ -2169,12 +2180,14 @@ object_or_var	: encodeobj
 		| VARSTRING_OBJ
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_OBJ);
+		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
 		| VARSTRING_OBJ_ARRAY '[' math_expr_var ']'
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_OBJ|SPOVAR_ARRAY);
+		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
@@ -2187,12 +2200,14 @@ xobject_or_var	: encodexobj
 		| VARSTRING_OBJ
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_OBJ);
+		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
 		| VARSTRING_OBJ_ARRAY '[' math_expr_var ']'
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_OBJ|SPOVAR_ARRAY);
+		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
@@ -2268,12 +2283,14 @@ math_expr_var	: INTEGER                       { add_opvars(splev, "i", $1 ); }
 		| VARSTRING_INT
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_INT);
+		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
 		| VARSTRING_INT_ARRAY '[' math_expr_var ']'
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_INT|SPOVAR_ARRAY);
+		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
@@ -2533,6 +2550,7 @@ ter_selection_x	: coord_or_var
 		| VARSTRING_SEL
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_SEL);
+		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }

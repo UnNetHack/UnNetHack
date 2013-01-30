@@ -770,6 +770,7 @@ vardef_new(typ, name)
     f->next = NULL;
     f->var_type = typ;
     f->name = strdup(name);
+    f->n_used = 0;
     return f;
 }
 
@@ -780,6 +781,8 @@ vardef_free_all(fchain)
     struct lc_vardefs *tmp = fchain;
     struct lc_vardefs *nxt;
     while (tmp) {
+	if (be_verbose && (tmp->n_used == 0))
+	    lc_warning("Unused variable '%s'", tmp->name);
 	nxt = tmp->next;
 	Free(tmp->name);
 	Free(tmp);
@@ -830,6 +833,15 @@ spovar2str(spovar)
 
     snprintf(buf[togl], 127, "%s%s", n, (is_array ? " array" : ""));
     return buf[togl];
+}
+
+void
+vardef_used(vd, varname)
+     struct lc_vardefs *vd;
+     char *varname;
+{
+    struct lc_vardefs *tmp;
+    if ((tmp = vardef_defined(vd, varname, 1))) tmp->n_used++;
 }
 
 void
