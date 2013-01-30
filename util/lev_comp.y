@@ -1882,7 +1882,7 @@ grave_detail	: GRAVE_ID ':' coord_or_var ',' string_expr
 		  }
 		;
 
-gold_detail	: GOLD_ID ':' math_expr ',' coord_or_var
+gold_detail	: GOLD_ID ':' math_expr_var ',' coord_or_var
 		  {
 		      add_opvars(splev, "o", SPO_GOLD);
 		  }
@@ -1992,7 +1992,7 @@ string_or_var	: STRING
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
-		| VARSTRING_STRING_ARRAY '[' math_expr ']'
+		| VARSTRING_STRING_ARRAY '[' math_expr_var ']'
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_STRING|SPOVAR_ARRAY);
 		      add_opvars(splev, "v", $1);
@@ -2026,7 +2026,7 @@ coord_or_var	: encodecoord
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
-		| VARSTRING_COORD_ARRAY '[' math_expr ']'
+		| VARSTRING_COORD_ARRAY '[' math_expr_var ']'
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_COORD|SPOVAR_ARRAY);
 		      add_opvars(splev, "v", $1);
@@ -2056,7 +2056,7 @@ region_or_var	: encoderegion
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
-		| VARSTRING_REGION_ARRAY '[' math_expr ']'
+		| VARSTRING_REGION_ARRAY '[' math_expr_var ']'
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_REGION|SPOVAR_ARRAY);
 		      add_opvars(splev, "v", $1);
@@ -2083,7 +2083,7 @@ mapchar_or_var	: mapchar
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
-		| VARSTRING_MAPCHAR_ARRAY '[' math_expr ']'
+		| VARSTRING_MAPCHAR_ARRAY '[' math_expr_var ']'
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_MAPCHAR|SPOVAR_ARRAY);
 		      add_opvars(splev, "v", $1);
@@ -2121,7 +2121,7 @@ monster_or_var	: encodemonster
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
-		| VARSTRING_MONST_ARRAY '[' math_expr ']'
+		| VARSTRING_MONST_ARRAY '[' math_expr_var ']'
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_MONST|SPOVAR_ARRAY);
 		      add_opvars(splev, "v", $1);
@@ -2172,7 +2172,7 @@ object_or_var	: encodeobj
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
-		| VARSTRING_OBJ_ARRAY '[' math_expr ']'
+		| VARSTRING_OBJ_ARRAY '[' math_expr_var ']'
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_OBJ|SPOVAR_ARRAY);
 		      add_opvars(splev, "v", $1);
@@ -2190,7 +2190,7 @@ xobject_or_var	: encodexobj
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
-		| VARSTRING_OBJ_ARRAY '[' math_expr ']'
+		| VARSTRING_OBJ_ARRAY '[' math_expr_var ']'
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_OBJ|SPOVAR_ARRAY);
 		      add_opvars(splev, "v", $1);
@@ -2271,7 +2271,7 @@ math_expr_var	: INTEGER                       { add_opvars(splev, "i", $1 ); }
 		      add_opvars(splev, "v", $1);
 		      Free($1);
 		  }
-		| VARSTRING_INT_ARRAY '[' math_expr ']'
+		| VARSTRING_INT_ARRAY '[' math_expr_var ']'
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_INT|SPOVAR_ARRAY);
 		      add_opvars(splev, "v", $1);
@@ -2282,7 +2282,7 @@ math_expr_var	: INTEGER                       { add_opvars(splev, "i", $1 ); }
 		| math_expr_var '*' math_expr_var       { add_opvars(splev, "o", SPO_MATH_MUL); }
 		| math_expr_var '/' math_expr_var       { add_opvars(splev, "o", SPO_MATH_DIV); }
 		| math_expr_var '%' math_expr_var       { add_opvars(splev, "o", SPO_MATH_MOD); }
-		| '(' math_expr ')'             { }
+		| '(' math_expr_var ')'             { }
 		;
 
 func_param_type		: CFUNC_INT
@@ -2469,18 +2469,6 @@ corefunc_coord	: CFUNC_COORD
 		  }
 		;
 
-math_expr	: INTEGER                       { add_opvars(splev, "i", $1 ); }
-		| dice				{ }
-		| '(' MINUS_INTEGER ')'         { add_opvars(splev, "i", $2 ); }
-		| corefunc_int			{ }
-		| math_expr '+' math_expr       { add_opvars(splev, "o", SPO_MATH_ADD); }
-		| math_expr '-' math_expr       { add_opvars(splev, "o", SPO_MATH_SUB); }
-		| math_expr '*' math_expr       { add_opvars(splev, "o", SPO_MATH_MUL); }
-		| math_expr '/' math_expr       { add_opvars(splev, "o", SPO_MATH_DIV); }
-		| math_expr '%' math_expr       { add_opvars(splev, "o", SPO_MATH_MOD); }
-		| '(' math_expr ')'             { }
-		;
-
 ter_selection_x	: coord_or_var
 		  {
 		      add_opvars(splev, "o", SPO_SEL_POINT);
@@ -2497,7 +2485,7 @@ ter_selection_x	: coord_or_var
 		  {
 		      add_opvars(splev, "o", SPO_SEL_LINE);
 		  }
-		| randline_ID coord_or_var '-' coord_or_var ',' math_expr
+		| randline_ID coord_or_var '-' coord_or_var ',' math_expr_var
 		  {
 		      /* randline (x1,y1),(x2,y2), roughness */
 		      add_opvars(splev, "o", SPO_SEL_RNDLINE);
@@ -2526,19 +2514,19 @@ ter_selection_x	: coord_or_var
 		  {
 		      add_opvars(splev, "o", SPO_SEL_FLOOD);
 		  }
-		| circle_ID '(' coord_or_var ',' math_expr ')'
+		| circle_ID '(' coord_or_var ',' math_expr_var ')'
 		  {
 		      add_opvars(splev, "oio", SPO_COPY, 1, SPO_SEL_ELLIPSE);
 		  }
-		| circle_ID '(' coord_or_var ',' math_expr ',' FILLING ')'
+		| circle_ID '(' coord_or_var ',' math_expr_var ',' FILLING ')'
 		  {
 		      add_opvars(splev, "oio", SPO_COPY, $7, SPO_SEL_ELLIPSE);
 		  }
-		| ellipse_ID '(' coord_or_var ',' math_expr ',' math_expr ')'
+		| ellipse_ID '(' coord_or_var ',' math_expr_var ',' math_expr_var ')'
 		  {
 		      add_opvars(splev, "io", 1, SPO_SEL_ELLIPSE);
 		  }
-		| ellipse_ID '(' coord_or_var ',' math_expr ',' math_expr ',' FILLING ')'
+		| ellipse_ID '(' coord_or_var ',' math_expr_var ',' math_expr_var ',' FILLING ')'
 		  {
 		      add_opvars(splev, "io", $9, SPO_SEL_ELLIPSE);
 		  }
