@@ -2787,6 +2787,38 @@ spo_corefunc(coder, fn)
 	    opvar_free(crd);
 	}
 	break;
+    case COREFUNC_MON_AT:
+	{
+	    long rv = 0;
+	    struct opvar *mon;
+	    struct opvar *crd;
+	    schar ox, oy;
+	    if (!OV_pop_c(crd) || !OV_pop_typ(mon, SPOVAR_MONST)) {
+		impossible("No coord and mon for mon_at()");
+		return;
+	    }
+	    ox = SP_COORD_X(OV_i(crd));
+	    oy = SP_COORD_Y(OV_i(crd));
+	    get_location(&ox, &oy, ANY_LOC, coder->croom);
+	    if (ox >= 0 && oy >= 0 && ox < COLNO && oy < ROWNO) {
+		struct monst *mtmp = m_at(ox, oy);
+		if (mtmp) {
+		    if (OV_i(mon) == -1) {
+			rv = 1; /* -1 == random monster, always matches */
+		    } else {
+			int mclass = SP_MONST_CLASS(OV_i(mon));
+			int pm = SP_MONST_PM(OV_i(mon));
+			rv = ((((pm != 65535) && (mtmp->data == &mons[pm])) || (pm == 65535)) &&
+			      (((mclass != 65535) && (def_monsyms[(int)mtmp->data->mlet] == mclass)) || (mclass == 65535))) ? 1 : 0;
+		    }
+		}
+	    }
+	    i = opvar_new_int(rv);
+	    splev_stack_push(coder->stack, i);
+	    opvar_free(mon);
+	    opvar_free(crd);
+	}
+	break;
     case COREFUNC_CARRYING:
 	{
 	    struct opvar *obj;

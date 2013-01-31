@@ -132,6 +132,7 @@ static const struct {
     {COREFUNC_LEVEL_DIFFICULTY,		"level.difficulty", "", 'i'},
     {COREFUNC_LEVEL_DEPTH,		"level.depth", "", 'i'},
     {COREFUNC_SOBJ_AT,			"level.obj_at", "Oc", 'i'},
+    {COREFUNC_MON_AT,			"level.mon_at", "Mc", 'i'},
     {COREFUNC_PLNAME,			"hero.name", "", 's'},
     {COREFUNC_ROLE,			"hero.role", "", 's'},
     {COREFUNC_RACE,			"hero.race", "", 's'},
@@ -401,6 +402,7 @@ char chr;
     case 'c': sprintf(buf, "coord"); break;
     case ' ': sprintf(buf, "nothing"); break;
     case 'm': sprintf(buf, "mapchar"); break;
+    case 'M': sprintf(buf, "monster"); break;
     }
     return buf;
 }

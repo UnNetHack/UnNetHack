@@ -2411,6 +2411,11 @@ corefunc_param_part	: math_expr_var
 			  {
 			      $$ = (int)'c';
 			  }
+			| monsterid ':' encodemonster
+			  {
+			      add_opvars(splev, "M", $3);
+			      $$ = (int)'M';
+			  }
 			;
 
 corefunc_param_list	: corefunc_param_part
