@@ -45,7 +45,7 @@ TRAP: random, random
 
 # Middle level
 LEVEL: "sheolmid"
-FLAGS: sheol,hardfloor,noteleport,noflip
+FLAGS: sheol,hardfloor,noteleport
 INIT_MAP: sheollev
 
 GEOMETRY:(0,2)
@@ -73,7 +73,7 @@ $monster = monster: { 'X','T','L',''','N','x','@','V' }
 SHUFFLE: $monster
 
 STAIR: (4,8),down
-STAIR: levregion(65, 0, 79, 20), levregion(16, 0, 64, 20), up
+STAIR: levregion(65, 0, 79, 20), levregion(1, 0, 64, 20), up
 
 DOOR:locked,(9,8)
 
