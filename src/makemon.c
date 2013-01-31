@@ -1406,6 +1406,9 @@ rndmonst()
                 if (!Insheol && (ptr->geno & G_SHEOLONLY)) continue;
 		if ( (Inhell && (ptr->geno & G_NOHELL)) ) continue;
 		ct = (int)(ptr->geno & G_FREQ) + align_shift(ptr);
+		/* Boost Sheol-Only(tm) monster generation in Sheol. */
+		if (Insheol && (ptr->geno & G_SHEOLONLY))
+		    ct *= 2;
 		if (ct < 0 || ct > 127)
 		    panic("rndmonst: bad count [#%d: %d]", mndx, ct);
 		rndmonst_state.choice_count += ct;
