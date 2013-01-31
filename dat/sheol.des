@@ -48,7 +48,7 @@ LEVEL: "sheolmid"
 FLAGS: sheol,hardfloor,noteleport,noflip
 INIT_MAP: sheollev
 
-GEOMETRY:left,center
+GEOMETRY:(0,2)
 MAP
 YPPPPPPPIPPPPPPPPPP......
 YPUPPPPPIPPPPPPPPPPPPP...

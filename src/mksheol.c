@@ -71,7 +71,6 @@ static int verify_stairs_place(void);
 static void mkopensheol(void);
 static void place_clouds(void);
 static void shake_position(int* x, int* y);
-static void left_right_3walls(void);
 
 void
 mksheol(init_lev_par)
@@ -128,13 +127,6 @@ mksheol(init_lev_par)
 	if (!rn2(5))
 		place_clouds();
 
-	/* The middle level? Place perform a hack where the left and right
-	 * 3 columns are walls (if not already). The reason is to disallow
-	 * "pockets" to form behind the Sheol middle level house. */
-	if (at_middle())
-		left_right_3walls();
-	
-	
 	if (verify_stairs_place() == STAT_REJECT)
 		goto again;
 
@@ -680,21 +672,3 @@ again:
 		goto again;
 }
 
-static void
-left_right_3walls(void) {
-    int i1, i2;
-    int v = COLNO - 4;
-	for (i1 = 1; i1 <= 3; ++i1)
-		for (i2 = 0; i2 < ROWNO; ++i2) {
-			if (levl[i1][i2].typ == ICE ||
-			    levl[i1][i2].typ == ROOM ||
-			    levl[i1][i2].typ == CLOUD ||
-			    levl[i1][i2].typ == POOL)
-			    levl[i1][i2].typ = CRYSTALICEWALL;
-			if (levl[i1+v][i2].typ == ICE ||
-			    levl[i1+v][i2].typ == ROOM ||
-			    levl[i1+v][i2].typ == CLOUD ||
-			    levl[i1+v][i2].typ == POOL)
-			    levl[i1+v][i2].typ = CRYSTALICEWALL;
-		}
-}
