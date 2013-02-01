@@ -848,7 +848,9 @@ rndtrap()
  */
 #define DRY	0x1
 #define WET	0x2
-#define ANY_LOC 0x4
+#define HOT	0x4
+#define SOLID	0x8
+#define ANY_LOC 0x10
 
 STATIC_DCL boolean FDECL(is_ok_location, (SCHAR_P, SCHAR_P, int));
 
@@ -918,18 +920,18 @@ register int humidity;
 
 	if (Is_waterlevel(&u.uz)) return TRUE;	/* accept any spot */
 
+	/* TODO: Should perhaps check if wall is diggable/passwall? */
 	if (humidity & ANY_LOC) return TRUE;
 
+	if ((humidity & SOLID) && IS_ROCK(levl[x][y].typ)) return TRUE;
 	if (humidity & DRY) {
 	    typ = levl[x][y].typ;
 	    if (typ == ROOM || typ == AIR ||
 		    typ == CLOUD || typ == ICE || typ == CORR)
 		return TRUE;
 	}
-	if (humidity & WET) {
-	    if (is_pool(x,y) || is_lava(x,y))
-		return TRUE;
-	}
+	if ((humidity & WET) && is_pool(x,y)) return TRUE;
+	if ((humidity & HOT) && is_lava(x,y)) return TRUE;
 	return FALSE;
 }
 
@@ -1444,7 +1446,7 @@ struct mkroom* croom;
 		for (j = 0;j < 500;j++) {
 			x = sp->x;
 			y = sp->y;
-			get_location(&x, &y, DRY|WET, croom);
+			get_location(&x, &y, ANY_LOC, croom);
 			nx = x; ny = y;
 			switch (sp->direction) {
 				case W_NORTH: ny++; break;	  /* backwards to make sure we're against a wall */
@@ -1464,7 +1466,7 @@ struct mkroom* croom;
 		found = TRUE;
 		x = sp->x;
 		y = sp->y;
-		get_location(&x, &y, DRY|WET, croom); /* support random registers too */
+		get_location(&x, &y, ANY_LOC, croom); /* support random registers too */
 	}
 
 	if (!found) { return; }
@@ -1567,12 +1569,17 @@ struct mkroom	*croom;
 
 	x = m->x;
 	y = m->y;
-	    if (!pm || !is_swimmer(pm))
-		get_location(&x, &y, DRY, croom);
-	    else if (pm->mlet == S_EEL)
-		get_location(&x, &y, WET, croom);
-	    else
-		get_location(&x, &y, DRY|WET, croom);
+
+	if (pm) {
+	    int loc = DRY;
+	    if (pm->mlet == S_EEL || amphibious(pm) || is_swimmer(pm)) loc |= WET;
+	    if (is_flyer(pm) || is_floater(pm)) loc |= (HOT | WET);
+	    if (passes_walls(pm) || noncorporeal(pm)) loc |= ANY_LOC;
+	    if (flaming(pm)) loc |= HOT;
+	    get_location(&x, &y, loc, croom);
+	} else
+	    get_location(&x, &y, DRY, croom);
+
 	/* try to find a close place if someone else is already there */
 	if (MON_AT(x,y) && enexto(&cc, x, y, pm))
 	    x = cc.x,  y = cc.y;
@@ -2001,10 +2008,10 @@ struct mkroom *croom;
     if (terr->toter >= MAX_TYPE) return;
 
     x1 = terr->x1;  y1 = terr->y1;
-    get_location(&x1, &y1, DRY|WET, croom);
+    get_location(&x1, &y1, ANY_LOC, croom);
 
     x2 = terr->x2;  y2 = terr->y2;
-    get_location(&x2, &y2, DRY|WET, croom);
+    get_location(&x2, &y2, ANY_LOC, croom);
 
     for (x = x1; x <= x2; x++)
 	for (y = y1; y <= y2; y++)
@@ -2024,7 +2031,7 @@ struct mkroom *croom;
     if (terr->ter >= MAX_TYPE) return;
 
     x1 = terr->x1;  y1 = terr->y1;
-    get_location(&x1, &y1, DRY|WET, croom);
+    get_location(&x1, &y1, ANY_LOC, croom);
 
     switch (terr->areatyp) {
     case 0: /* point */
@@ -2051,7 +2058,7 @@ struct mkroom *croom;
 	break;
     case 3: /* filled rectangle */
 	x2 = terr->x2;  y2 = terr->y2;
-	get_location(&x2, &y2, DRY|WET, croom);
+	get_location(&x2, &y2, ANY_LOC, croom);
 	for (x = x1; x <= x2; x++) {
 	    for (y = y1; y <= y2; y++) {
 		SET_TYPLIT(x,y, terr->ter, terr->tlit);
@@ -2060,7 +2067,7 @@ struct mkroom *croom;
 	break;
     case 4: /* rectangle */
 	x2 = terr->x2;  y2 = terr->y2;
-	get_location(&x2, &y2, DRY|WET, croom);
+	get_location(&x2, &y2, ANY_LOC, croom);
 	for (x = x1; x <= x2; x++) {
 	    SET_TYPLIT(x,y1, terr->ter, terr->tlit);
 	    SET_TYPLIT(x,y2, terr->ter, terr->tlit);
@@ -2542,7 +2549,7 @@ fill_empty_maze()
 		(void) makemon(&mons[PM_MINOTAUR], mm.x, mm.y, NO_MM_FLAGS);
 	    }
 	    for(x = rnd((int) (12 * mapfact) / 100); x; x--) {
-		    maze1xy(&mm, WET|DRY);
+		    maze1xy(&mm, DRY);
 		    (void) makemon((struct permonst *) 0, mm.x, mm.y, NO_MM_FLAGS);
 	    }
 	    for(x = rn2((int) (15 * mapfact) / 100); x; x--) {
@@ -3643,7 +3650,7 @@ spo_wallwalk(coder)
 
     x = SP_COORD_X(OV_i(coord));
     y = SP_COORD_Y(OV_i(coord));
-    get_location(&x, &y, DRY|WET, coder->croom);
+    get_location(&x, &y, ANY_LOC, coder->croom);
 
     if (SP_MAPCHAR_TYP(OV_i(fgtyp)) >= MAX_TYPE) return;
     if (SP_MAPCHAR_TYP(OV_i(bgtyp)) >= MAX_TYPE) return;
@@ -4318,16 +4325,16 @@ spo_levregion(coder)
 
     if(!tmplregion->in_islev) {
 	get_location(&tmplregion->inarea.x1, &tmplregion->inarea.y1,
-		     DRY|WET, (struct mkroom *)0);
+		     ANY_LOC, (struct mkroom *)0);
 	get_location(&tmplregion->inarea.x2, &tmplregion->inarea.y2,
-		     DRY|WET, (struct mkroom *)0);
+		     ANY_LOC, (struct mkroom *)0);
     }
 
     if(!tmplregion->del_islev) {
 	get_location(&tmplregion->delarea.x1, &tmplregion->delarea.y1,
-		     DRY|WET, (struct mkroom *)0);
+		     ANY_LOC, (struct mkroom *)0);
 	get_location(&tmplregion->delarea.x2, &tmplregion->delarea.y2,
-		     DRY|WET, (struct mkroom *)0);
+		     ANY_LOC, (struct mkroom *)0);
     }
     if(num_lregions) {
 	/* realloc the lregion space to add the new one */
@@ -4390,8 +4397,8 @@ spo_region(coder)
     dx2 = SP_REGION_X2(OV_i(area));
     dy2 = SP_REGION_Y2(OV_i(area));
 
-    get_location(&dx1, &dy1, DRY|WET, (struct mkroom *)0);
-    get_location(&dx2, &dy2, DRY|WET, (struct mkroom *)0);
+    get_location(&dx1, &dy1, ANY_LOC, (struct mkroom *)0);
+    get_location(&dx2, &dy2, ANY_LOC, (struct mkroom *)0);
 
     /* for an ordinary room, `prefilled' is a flag to force
        an actual room to be created (such rooms are used to
@@ -4471,7 +4478,7 @@ spo_drawbridge(coder)
 
     x = SP_COORD_X(OV_i(coord));
     y = SP_COORD_Y(OV_i(coord));
-    get_location(&x, &y, DRY|WET, coder->croom);
+    get_location(&x, &y, DRY|WET|HOT, coder->croom);
     if (!create_drawbridge(x, y, OV_i(dir), OV_i(db_open)))
 	impossible("Cannot create drawbridge.");
     SpLev_Map[x][y] = 1;
@@ -4498,7 +4505,7 @@ spo_mazewalk(coder)
     x = SP_COORD_X(OV_i(coord));
     y = SP_COORD_Y(OV_i(coord));
 
-    get_location(&x, &y, DRY|WET, coder->croom);
+    get_location(&x, &y, ANY_LOC, coder->croom);
 
     if (OV_i(ftyp) < 1) {
 #ifndef WALLIFIED_MAZE
@@ -4570,8 +4577,8 @@ spo_wall_property(coder)
     dx2 = SP_REGION_X2(OV_i(r));
     dy2 = SP_REGION_Y2(OV_i(r));
 
-    get_location(&dx1, &dy1, DRY|WET, (struct mkroom *)0);
-    get_location(&dx2, &dy2, DRY|WET, (struct mkroom *)0);
+    get_location(&dx1, &dy1, ANY_LOC, (struct mkroom *)0);
+    get_location(&dx2, &dy2, ANY_LOC, (struct mkroom *)0);
 
     set_wall_property(dx1, dy1, dx2, dy2, wprop);
 
@@ -4672,7 +4679,7 @@ spo_map(coder)
 	if (!(ystart % 2)) ystart++;
 	break;
     case 2:
-	get_location(&halign, &valign, DRY|WET, coder->croom);
+	get_location(&halign, &valign, ANY_LOC, coder->croom);
 	xstart = halign;
 	ystart = valign;
 	break;
@@ -5279,7 +5286,7 @@ sp_lev *lvl;
 		if (!OV_pop_c(tmp)) panic("no ter sel coord");
 		x = SP_COORD_X(OV_i(tmp));
 		y = SP_COORD_Y(OV_i(tmp));
-		get_location(&x, &y, DRY|WET, coder->croom);
+		get_location(&x, &y, ANY_LOC, coder->croom);
 		if (isok(x,y)) {
 		    struct opvar *pt = selection_opvar(NULL);
 		    selection_setpoint(x,y, pt, 1);
@@ -5298,8 +5305,8 @@ sp_lev *lvl;
 		y1 = min(SP_REGION_Y1(OV_i(tmp)), SP_REGION_Y2(OV_i(tmp)));
 		x2 = max(SP_REGION_X1(OV_i(tmp)), SP_REGION_X2(OV_i(tmp)));
 		y2 = max(SP_REGION_Y1(OV_i(tmp)), SP_REGION_Y2(OV_i(tmp)));
-		get_location(&x1, &y1, DRY|WET, coder->croom);
-		get_location(&x2, &y2, DRY|WET, coder->croom);
+		get_location(&x1, &y1, ANY_LOC, coder->croom);
+		get_location(&x2, &y2, ANY_LOC, coder->croom);
 		x1 = (x1 < 0) ? 0 : x1;
 		y1 = (y1 < 0) ? 0 : y1;
 		x2 = (x2 >= COLNO) ? COLNO-1 : x2;
@@ -5331,8 +5338,8 @@ sp_lev *lvl;
 		y1 = SP_COORD_Y(OV_i(tmp));
 		x2 = SP_COORD_X(OV_i(tmp2));
 		y2 = SP_COORD_Y(OV_i(tmp2));
-		get_location(&x1, &y1, DRY|WET, coder->croom);
-		get_location(&x2, &y2, DRY|WET, coder->croom);
+		get_location(&x1, &y1, ANY_LOC, coder->croom);
+		get_location(&x2, &y2, ANY_LOC, coder->croom);
 		x1 = (x1 < 0) ? 0 : x1;
 		y1 = (y1 < 0) ? 0 : y1;
 		x2 = (x2 >= COLNO) ? COLNO-1 : x2;
@@ -5352,8 +5359,8 @@ sp_lev *lvl;
 		y1 = SP_COORD_Y(OV_i(tmp));
 		x2 = SP_COORD_X(OV_i(tmp2));
 		y2 = SP_COORD_Y(OV_i(tmp2));
-		get_location(&x1, &y1, DRY|WET, coder->croom);
-		get_location(&x2, &y2, DRY|WET, coder->croom);
+		get_location(&x1, &y1, ANY_LOC, coder->croom);
+		get_location(&x2, &y2, ANY_LOC, coder->croom);
 		x1 = (x1 < 0) ? 0 : x1;
 		y1 = (y1 < 0) ? 0 : y1;
 		x2 = (x2 >= COLNO) ? COLNO-1 : x2;
@@ -5382,7 +5389,7 @@ sp_lev *lvl;
 		if (!OV_pop_c(tmp)) panic("no ter sel flood coord");
 		x = SP_COORD_X(OV_i(tmp));
 		y = SP_COORD_Y(OV_i(tmp));
-		get_location(&x, &y, DRY|WET, coder->croom);
+		get_location(&x, &y, ANY_LOC, coder->croom);
 		if (isok(x,y)) {
 		    struct opvar *pt = selection_opvar(NULL);
 		    selection_floodfill(pt, x,y);
@@ -5415,7 +5422,7 @@ sp_lev *lvl;
 		if (!OV_pop_c(pt)) panic("no pt for ellipse");
 		x = SP_COORD_X(OV_i(pt));
 		y = SP_COORD_Y(OV_i(pt));
-		get_location(&x, &y, DRY|WET, coder->croom);
+		get_location(&x, &y, ANY_LOC, coder->croom);
 		if (isok(x,y)) {
 		    struct opvar *sel = selection_opvar(NULL);
 		    selection_do_ellipse(sel, x,y, OV_i(xaxis), OV_i(yaxis), OV_i(filled));
