@@ -1598,7 +1598,7 @@ struct mkroom	*croom;
 	     * This is currently hardwired for mimics only.  It should
 	     * eventually be expanded.
 	     */
-	    if (m->appear_as.str && mtmp->data->mlet == S_MIMIC) {
+	    if (m->appear_as.str && ((mtmp->data->mlet == S_MIMIC) || mtmp->cham)) {
 		int i;
 
 		switch (m->appear) {
@@ -1639,8 +1639,34 @@ struct mkroom	*croom;
 			break;
 
 		    case M_AP_MONSTER:
-			/* note: mimics don't appear as monsters! */
-			/*	 (but chameleons can :-)	  */
+			{
+			    int mndx = name_to_mon(m->appear_as.str);
+			    if ((mndx != NON_PM) && (&mons[mndx] != mtmp->data)) {
+				struct permonst *mdat = &mons[mndx];
+				struct permonst *olddata = mtmp->data;
+				/* this code duplicated from newcham() */
+				if(is_male(mdat)) {
+				    if(mtmp->female) mtmp->female = FALSE;
+				} else if (is_female(mdat)) {
+				    if(!mtmp->female) mtmp->female = TRUE;
+				} else if (!is_neuter(mdat)) {
+				    if(!rn2(10)) mtmp->female = !mtmp->female;
+				}
+				set_mon_data(mtmp, mdat, 0);
+				if (emits_light(olddata) != emits_light(mtmp->data)) {
+				    /* used to give light, now doesn't, or vice versa,
+				       or light's range has changed */
+				    if (emits_light(olddata))
+					del_light_source(LS_MONSTER, (genericptr_t)mtmp);
+				    if (emits_light(mtmp->data))
+					new_light_source(mtmp->mx, mtmp->my, emits_light(mtmp->data),
+							 LS_MONSTER, (genericptr_t)mtmp);
+				}
+				if (!mtmp->perminvis || pm_invisible(olddata))
+				    mtmp->perminvis = pm_invisible(mdat);
+			    }
+			}
+			break;
 		    default:
 			warning(
 		"create_monster: unimplemented mon appear type [%d,\"%s\"]",
