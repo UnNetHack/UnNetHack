@@ -1234,6 +1234,7 @@ E void FDECL(mksheol, (void*));
 
 /* ### mon.c ### */
 
+E int FDECL(select_newcham_form, (struct monst *));
 E void FDECL(remove_monster, (int, int));
 E int FDECL(undead_to_corpse, (int));
 E int FDECL(genus, (int,int));

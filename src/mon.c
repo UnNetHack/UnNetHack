@@ -16,7 +16,6 @@ STATIC_DCL boolean FDECL(restrap,(struct monst *));
 STATIC_DCL long FDECL(mm_aggression, (struct monst *,struct monst *));
 #ifdef OVL2
 STATIC_DCL int NDECL(pick_animal);
-STATIC_DCL int FDECL(select_newcham_form, (struct monst *));
 STATIC_DCL void FDECL(kill_eggs, (struct obj *));
 #endif
 
@@ -2577,7 +2576,7 @@ pick_animal()
 	return animal_list[rn2(animal_list_count)];
 }
 
-STATIC_OVL int
+int
 select_newcham_form(mon)
 struct monst *mon;
 {

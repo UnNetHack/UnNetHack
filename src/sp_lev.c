@@ -1640,7 +1640,11 @@ struct mkroom	*croom;
 
 		    case M_AP_MONSTER:
 			{
-			    int mndx = name_to_mon(m->appear_as.str);
+			    int mndx;
+			    if (!strcmpi(m->appear_as.str, "random"))
+				mndx = select_newcham_form(mtmp);
+			    else
+				mndx = name_to_mon(m->appear_as.str);
 			    if ((mndx != NON_PM) && (&mons[mndx] != mtmp->data)) {
 				struct permonst *mdat = &mons[mndx];
 				struct permonst *olddata = mtmp->data;
