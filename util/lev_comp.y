@@ -1682,11 +1682,11 @@ mazewalk_detail : MAZEWALK_ID ':' coord_or_var ',' DIRECTION
 
 wallify_detail	: WALLIFY_ID
 		  {
-		      add_opvars(splev, "ro", SP_REGION_PACK(-1,-1,-1,-1), SPO_WALLIFY);
+		      add_opvars(splev, "rio", SP_REGION_PACK(-1,-1,-1,-1), 0, SPO_WALLIFY);
 		  }
-		| WALLIFY_ID ':' region_or_var
+		| WALLIFY_ID ':' ter_selection
 		  {
-		      add_opvars(splev, "o", SPO_WALLIFY);
+		      add_opvars(splev, "io", 1, SPO_WALLIFY);
 		  }
 		;
 

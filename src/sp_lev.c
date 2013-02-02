@@ -4642,20 +4642,42 @@ spo_room_door(coder)
 }
 
 void
+sel_set_wallify(x,y,arg)
+     int x, y;
+     genericptr_t arg;
+{
+    wallify_map(x,y, x,y);
+}
+
+void
 spo_wallify(coder)
      struct sp_coder *coder;
 {
-    struct opvar *r;
+    struct opvar *typ, *r;
     int dx1,dy1,dx2,dy2;
-    if (!OV_pop_r(r)) return;
-    dx1 = (xchar)SP_REGION_X1(OV_i(r));
-    dy1 = (xchar)SP_REGION_Y1(OV_i(r));
-    dx2 = (xchar)SP_REGION_X2(OV_i(r));
-    dy2 = (xchar)SP_REGION_Y2(OV_i(r));
-    wallify_map(dx1 < 0 ? xstart : dx1,
-		dy1 < 0 ? ystart : dy1,
-		dx2 < 0 ? xstart+xsize : dx2,
-		dy2 < 0 ? ystart+ysize : dy2);
+    if (!OV_pop_i(typ)) return;
+    switch (OV_i(typ)) {
+    default:
+    case 0:
+	{
+	    if (!OV_pop_r(r)) return;
+	    dx1 = (xchar)SP_REGION_X1(OV_i(r));
+	    dy1 = (xchar)SP_REGION_Y1(OV_i(r));
+	    dx2 = (xchar)SP_REGION_X2(OV_i(r));
+	    dy2 = (xchar)SP_REGION_Y2(OV_i(r));
+	    wallify_map(dx1 < 0 ? xstart : dx1,
+			dy1 < 0 ? ystart : dy1,
+			dx2 < 0 ? xstart+xsize : dx2,
+			dy2 < 0 ? ystart+ysize : dy2);
+	}
+	break;
+    case 1:
+	{
+	    if (!OV_pop_typ(r, SPOVAR_SEL)) return;
+	    selection_iterate(r, sel_set_wallify, NULL);
+	}
+	break;
+    }
     opvar_free(r);
 }
 

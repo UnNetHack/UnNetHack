@@ -292,7 +292,7 @@ MONSTER:('G',"gnome"),random
 
 RANDOM_CORRIDORS
 
-WALLIFY:(1,0, 70,20)
+WALLIFY:fillrect(1,0, 70,20)
 
 # Minetown variant 2
 # "Town Square"
