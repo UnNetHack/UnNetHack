@@ -4287,20 +4287,19 @@ spo_spill(coder)
      struct sp_coder *coder;
 {
     spill sp;
-    struct opvar *coord,*typ,*dir,*count,*lit;
-    if (!OV_pop_i(lit) ||
+    struct opvar *coord,*typ,*dir,*count;
+    if (!OV_pop_i(dir) ||
 	!OV_pop_i(count) ||
-	!OV_pop_i(dir) ||
-	!OV_pop_i(typ) ||
+	!OV_pop_typ(typ, SPOVAR_MAPCHAR) ||
 	!OV_pop_c(coord)) return;
 
     sp.x = SP_COORD_X(OV_i(coord));
     sp.y = SP_COORD_Y(OV_i(coord));
 
-    sp.lit = OV_i(lit);
+    sp.lit = SP_MAPCHAR_LIT(OV_i(typ));
     sp.count = OV_i(count);
     sp.direction = OV_i(dir);
-    sp.typ = OV_i(typ);
+    sp.typ = SP_MAPCHAR_TYP(OV_i(typ));
 
     spill_terrain(&sp, coder->croom);
 
@@ -4308,7 +4307,6 @@ spo_spill(coder)
     opvar_free(typ);
     opvar_free(dir);
     opvar_free(count);
-    opvar_free(lit);
 }
 
 void

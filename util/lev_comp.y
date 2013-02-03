@@ -1817,19 +1817,9 @@ terrain_detail : TERRAIN_ID chance ':' ter_selection ',' mapchar_or_var
 		 }
 	       ;
 
-spill_detail : SPILL_ID ':' coord_or_var ',' terrain_type ',' DIRECTION ',' INTEGER
+spill_detail : SPILL_ID ':' coord_or_var ',' mapchar_or_var ',' DIRECTION ',' math_expr_var
 		{
-		    long c, typ;
-
-		    typ = $5.ter;
-		    if (typ == INVALID_TYPE || typ >= MAX_TYPE) {
-			lc_error("SPILL: Invalid map character!");
-		    }
-
-		    c = $9;
-		    if (c < 1) lc_error("SPILL: Invalid count '%li'!", c);
-
-		    add_opvars(splev, "iiiio", typ, (long)$7, c, (long)$5.lit, SPO_SPILL);
+		    add_opvars(splev, "io", (long)$7, SPO_SPILL);
 		}
 		;
 
