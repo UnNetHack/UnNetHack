@@ -99,7 +99,6 @@ struct coord {
 struct forloopdef {
     char *varname;
     long jmp_point;
-    long startvalue, endvalue, step;
 };
 static struct forloopdef forloop_list[MAX_NESTED_IFS];
 static short n_forloops = 0;
@@ -927,26 +926,35 @@ for_to_span	: '.' '.'
 		| TO_ID
 		;
 
-forstmt_start	: FOR_ID any_var_or_unk '=' INTEGER for_to_span INTEGER
+forstmt_start	: FOR_ID any_var_or_unk '=' math_expr_var for_to_span math_expr_var
 		  {
-		      /* ideally we'd want to use math_expr_var instead of INTEGER above, but
-		         then we wouldn't know startvalue or endvalue */
-		      variable_definitions = add_vardef_type(variable_definitions, $2, SPOVAR_INT);
-		      add_opvars(splev, "iiso", $4, 0, $2, SPO_VAR_INIT);
+		      char buf[256], buf2[256];
 
 		      if (n_forloops >= MAX_NESTED_IFS) {
 			  lc_error("FOR: Too deeply nested loops.");
 			  n_forloops = MAX_NESTED_IFS - 1;
 		      }
-		      forloop_list[n_forloops].varname = $2;
+
+		      /* first, define a variable for the for-loop end value */
+		      snprintf(buf, 255, "%s end", $2);
+		      /* the value of which is already in stack (the 2nd math_expr) */
+		      add_opvars(splev, "iso", 0, buf, SPO_VAR_INIT);
+
+		      variable_definitions = add_vardef_type(variable_definitions, $2, SPOVAR_INT);
+		      /* define the for-loop variable. value is in stack (1st math_expr) */
+		      add_opvars(splev, "iso", 0, $2, SPO_VAR_INIT);
+
+		      /* calculate value for the loop "step" variable */
+		      snprintf(buf2, 255, "%s step", $2);
+		      add_opvars(splev, "vvo", buf, $2, SPO_MATH_SUB); /* end - start */
+		      add_opvars(splev, "o", SPO_MATH_SIGN); /* sign of that */
+		      add_opvars(splev, "iso", 0, buf2, SPO_VAR_INIT); /* save the sign into the step var */
+
+		      forloop_list[n_forloops].varname = strdup($2);
 		      forloop_list[n_forloops].jmp_point = splev->n_opcodes;
-		      forloop_list[n_forloops].startvalue = $4;
-		      forloop_list[n_forloops].endvalue = $6;
-		      if (forloop_list[n_forloops].startvalue <= forloop_list[n_forloops].endvalue)
-			  forloop_list[n_forloops].step = 1;
-		      else
-			  forloop_list[n_forloops].step = -1;
+
 		      n_forloops++;
+		      Free($2);
 		  }
 		;
 
@@ -956,16 +964,19 @@ forstatement	: forstmt_start
 		  }
 		 '{' levstatements '}'
 		  {
+		      char buf[256], buf2[256];
 		      n_forloops--;
-		      add_opvars(splev, "ivo", forloop_list[n_forloops].step,
+		      snprintf(buf, 255, "%s step", forloop_list[n_forloops].varname);
+		      snprintf(buf2, 255, "%s end", forloop_list[n_forloops].varname);
+		      /* compare for-loop var to end value */
+		      add_opvars(splev, "vvo", forloop_list[n_forloops].varname, buf2, SPO_CMP);
+		      /* var + step */
+		      add_opvars(splev, "vvo", buf,
 				 forloop_list[n_forloops].varname, SPO_MATH_ADD);
-		      add_opvars(splev, "oiso", SPO_COPY, 0, forloop_list[n_forloops].varname, SPO_VAR_INIT);
-		      add_opvars(splev, "io", forloop_list[n_forloops].endvalue, SPO_CMP);
-		      if (forloop_list[n_forloops].startvalue <= forloop_list[n_forloops].endvalue) {
-			  add_opvars(splev, "io", forloop_list[n_forloops].jmp_point - splev->n_opcodes - 1, SPO_JLE);
-		      } else {
-			  add_opvars(splev, "io", forloop_list[n_forloops].jmp_point - splev->n_opcodes - 1, SPO_JGE);
-		      }
+		      /* for-loop var = (for-loop var + step) */
+		      add_opvars(splev, "iso", 0, forloop_list[n_forloops].varname, SPO_VAR_INIT);
+		      /* jump back if compared values were not equal */
+		      add_opvars(splev, "io", forloop_list[n_forloops].jmp_point - splev->n_opcodes - 1, SPO_JNE);
 		      Free(forloop_list[n_forloops].varname);
 		  }
 		;

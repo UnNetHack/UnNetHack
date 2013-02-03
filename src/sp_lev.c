@@ -5110,6 +5110,14 @@ sp_lev *lvl;
 		splev_stack_push(coder->stack, a);
 	    }
 	    break;
+	case SPO_MATH_SIGN:
+	    {
+		struct opvar *a;
+		if (!OV_pop_i(a)) break;
+		OV_i(a) = ((OV_i(a) < 0) ? -1 : ((OV_i(a) > 0) ? 1 : 0));
+		splev_stack_push(coder->stack, a);
+	    }
+	    break;
 	case SPO_MATH_ADD:
 	    {
 		struct opvar *a, *b;

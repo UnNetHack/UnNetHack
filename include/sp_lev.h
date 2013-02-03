@@ -105,6 +105,7 @@ enum opcode_defs {
     SPO_MATH_MUL,
     SPO_MATH_DIV,
     SPO_MATH_MOD,
+    SPO_MATH_SIGN,
     SPO_COPY,
     SPO_MON_GENERATION,
     SPO_END_MONINVENT,

@@ -1402,6 +1402,7 @@ sp_lev *maze;
 	    "mul",
 	    "div",
 	    "mod",
+	    "sign",
 	    "copy",
 	    "mon_generation",
 	    "end_moninvent",
