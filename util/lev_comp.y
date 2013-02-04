@@ -208,6 +208,7 @@ extern const char *fname;
 %token	<i> WALLWALK_ID COMPARE_TYPE
 %token	<i> rect_ID fillrect_ID line_ID randline_ID grow_ID selection_ID flood_ID
 %token	<i> rndcoord_ID circle_ID ellipse_ID filter_ID
+%token	<i> gradient_ID GRADIENT_TYPE LIMITED
 %token	<i> ',' ':' '(' ')' '[' ']' '{' '}'
 %token	<map> STRING MAP_ID
 %token	<map> NQSTRING VARSTRING
@@ -241,6 +242,7 @@ extern const char *fname;
 %type	<i> ter_selection ter_selection_x
 %type	<i> corefunc_param_part func_param_type
 %type	<i> objectid monsterid terrainid
+%type	<i> opt_coord_or_var opt_limited
 %type	<map> level_def
 %type	<map> any_var any_var_array any_var_or_arr any_var_or_unk
 %type	<map> corefunc_param_list corefunc_params_list
@@ -369,6 +371,27 @@ lev_init	: LEV_INIT_ID ':' SOLID_FILL_ID ',' terrain_type
 		      add_opvars(splev, "iiiiiiiio", LVLINIT_MINES,filling,walled,lit, joined,smoothed,bg,fg, SPO_INITLEVEL);
 			max_x_map = COLNO-1;
 			max_y_map = ROWNO;
+		  }
+		;
+
+opt_limited	: /* nothing */
+		  {
+		      $$ = 0;
+		  }
+		| ',' LIMITED
+		  {
+		      $$ = $2;
+		  }
+		;
+
+opt_coord_or_var	: /* nothing */
+		  {
+		      add_opvars(splev, "o", SPO_COPY);
+		      $$ = 0;
+		  }
+		| ',' coord_or_var
+		  {
+		      $$ = 1;
 		  }
 		;
 
@@ -2554,6 +2577,10 @@ ter_selection_x	: coord_or_var
 		| ellipse_ID '(' coord_or_var ',' math_expr_var ',' math_expr_var ',' FILLING ')'
 		  {
 		      add_opvars(splev, "io", $9, SPO_SEL_ELLIPSE);
+		  }
+		| gradient_ID '(' GRADIENT_TYPE ',' '(' math_expr_var '-' math_expr_var opt_limited ')' ',' coord_or_var opt_coord_or_var ')'
+		  {
+		      add_opvars(splev, "iio", $9, $3, SPO_SEL_GRADIENT);
 		  }
 		| VARSTRING_SEL
 		  {

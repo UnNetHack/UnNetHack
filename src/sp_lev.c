@@ -4026,7 +4026,77 @@ selection_do_ellipse(ov, xc,yc, a,b, filled)
     }
 }
 
+/* distance from line segment (x1,y1, x2,y2) to point (x3,y3) */
+long
+line_dist_coord(x1,y1, x2,y2, x3,y3)
+     long x1,y1,x2,y2,x3,y3;
+{
+    long px = x2-x1;
+    long py = y2-y1;
 
+    if (x1 == x2 && y1 == y2) return isqrt(dist2(x1,y1, x3,y3));
+
+    long s = px*px + py*py;
+    float u = ((x3 - x1) * px + (y3 - y1) * py) / (float)s;
+
+    if (u > 1) u = 1;
+    else if (u < 0) u = 0;
+
+    long x = x1 + u * px;
+    long y = y1 + u * py;
+    long dx = x - x3;
+    long dy = y - y3;
+    long dist = isqrt(dx*dx + dy*dy);
+
+    return dist;
+}
+
+void
+selection_do_gradient(ov, x,y, x2,y2, gtyp, mind, maxd, limit)
+     struct opvar *ov;
+     long x, y, x2,y2, gtyp, mind, maxd, limit;
+{
+    long dx,dy, dofs;
+
+    if (mind > maxd) {
+	long tmp = mind;
+	mind = maxd;
+	maxd = tmp;
+    }
+
+    dofs = maxd - mind;
+    if (dofs < 1) dofs = 1;
+
+    switch (gtyp) {
+    default:
+    case SEL_GRADIENT_RADIAL:
+	{
+	    for (dx = 0; dx < COLNO; dx++)
+		for (dy = 0; dy < ROWNO; dy++) {
+		    long d = line_dist_coord(x,y, x2,y2, dx,dy);
+		    if (d >= mind && (!limit || (d <= maxd))) {
+			if ((d - mind) > rn2(dofs))
+			    selection_setpoint(dx,dy, ov, 1);
+		    }
+		}
+	}
+	break;
+    case SEL_GRADIENT_SQUARE:
+	{
+	    for (dx = 0; dx < COLNO; dx++)
+		for (dy = 0; dy < ROWNO; dy++) {
+		    long d1 = line_dist_coord(x,y, x2,y2, x,dy);
+		    long d2 = line_dist_coord(x,y, x2,y2, dx,y);
+		    long d = (d1 < d2) ? d2 : d1;
+		    if (d >= mind && (!limit || (d <= maxd))) {
+			if ((d - mind) > rn2(dofs))
+			    selection_setpoint(dx,dy, ov, 1);
+		    }
+		}
+	}
+	break;
+    }
+}
 
 void
 selection_do_line(x1,y1,x2,y2, ov) /* bresenham line algo */
@@ -5490,6 +5560,36 @@ sp_lev *lvl;
 		opvar_free(yaxis);
 		opvar_free(xaxis);
 		opvar_free(pt);
+	    }
+	    break;
+	case SPO_SEL_GRADIENT:
+	    {
+		struct opvar *gtyp, *glim, *mind, *maxd, *coord, *coord2;
+		struct opvar *sel;
+		schar x,y, x2,y2;
+		if (!OV_pop_i(gtyp)) panic("no gtyp for grad");
+		if (!OV_pop_i(glim)) panic("no glim for grad");
+		if (!OV_pop_c(coord2)) panic("no coord2 for grad");
+		if (!OV_pop_c(coord)) panic("no coord for grad");
+		if (!OV_pop_i(maxd)) panic("no maxd for grad");
+		if (!OV_pop_i(mind)) panic("no mind for grad");
+		x = SP_COORD_X(OV_i(coord));
+		y = SP_COORD_Y(OV_i(coord));
+		get_location(&x, &y, ANY_LOC, coder->croom);
+		x2 = SP_COORD_X(OV_i(coord2));
+		y2 = SP_COORD_Y(OV_i(coord2));
+		get_location(&x2, &y2, ANY_LOC, coder->croom);
+
+		sel = selection_opvar(NULL);
+		selection_do_gradient(sel, x,y, x2,y2, OV_i(gtyp), OV_i(mind), OV_i(maxd), OV_i(glim));
+		splev_stack_push(coder->stack, sel);
+
+		opvar_free(gtyp);
+		opvar_free(glim);
+		opvar_free(coord);
+		opvar_free(coord2);
+		opvar_free(maxd);
+		opvar_free(mind);
 	    }
 	    break;
 	default:

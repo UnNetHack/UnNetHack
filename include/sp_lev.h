@@ -134,6 +134,7 @@ enum opcode_defs {
     SPO_SEL_RNDCOORD,
     SPO_SEL_ELLIPSE,
     SPO_SEL_FILTER,
+    SPO_SEL_GRADIENT,
 
     MAX_SP_OPCODES
 };
@@ -226,6 +227,10 @@ enum corefuncs {
 #define SPOFILTER_PERCENT	0
 #define SPOFILTER_SELECTION	1
 #define SPOFILTER_MAPCHAR	2
+
+/* gradient filter types */
+#define SEL_GRADIENT_RADIAL	0
+#define SEL_GRADIENT_SQUARE	1
 
 
 #define SPOVAR_NULL	0x00

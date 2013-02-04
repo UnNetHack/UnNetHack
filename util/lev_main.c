@@ -1430,6 +1430,7 @@ sp_lev *maze;
 	    "selection_rndcoord",
 	    "selection_ellipse",
 	    "selection_filter",
+	    "selection_gradient",
 	};
 
 	/* don't bother with the header stuff */

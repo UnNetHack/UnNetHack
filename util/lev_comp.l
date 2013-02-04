@@ -199,6 +199,9 @@ rndcoord	{ savetoken(yytext); return rndcoord_ID; }
 circle		{ savetoken(yytext); return circle_ID; }
 ellipse		{ savetoken(yytext); return ellipse_ID; }
 filter		{ savetoken(yytext); return filter_ID; }
+gradient	{ savetoken(yytext); return gradient_ID; }
+radial		{ savetoken(yytext); yylval.i=SEL_GRADIENT_RADIAL;  return GRADIENT_TYPE; }
+square		{ savetoken(yytext); yylval.i=SEL_GRADIENT_SQUARE;  return GRADIENT_TYPE; }
 hear		{ savetoken(yytext); yylval.i=LVLSND_HEARD;  return MSG_OUTPUT_TYPE; }
 pline		{ savetoken(yytext); yylval.i=LVLSND_PLINED; return MSG_OUTPUT_TYPE; }
 verbal		{ savetoken(yytext); yylval.i=LVLSND_VERBAL; return MSG_OUTPUT_TYPE; }
@@ -249,6 +252,8 @@ lit		{ savetoken(yytext); yylval.i=1; return LIGHT_STATE; }
 unlit		{ savetoken(yytext); yylval.i=0; return LIGHT_STATE; }
 filled		{ savetoken(yytext); yylval.i=0; return FILLING; }
 unfilled	{ savetoken(yytext); yylval.i=1; return FILLING; }
+limited		{ savetoken(yytext); yylval.i=1; return LIMITED; }
+unlimited	{ savetoken(yytext); yylval.i=0; return LIMITED; }
 noalign		{ savetoken(yytext); yylval.i= AM_NONE; return ALIGNMENT; }
 law		{ savetoken(yytext); yylval.i= AM_LAWFUL; return ALIGNMENT; }
 neutral		{ savetoken(yytext); yylval.i= AM_NEUTRAL; return ALIGNMENT; }
