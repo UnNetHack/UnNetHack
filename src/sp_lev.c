@@ -4087,7 +4087,11 @@ selection_do_gradient(ov, x,y, x2,y2, gtyp, mind, maxd, limit)
 		for (dy = 0; dy < ROWNO; dy++) {
 		    long d1 = line_dist_coord(x,y, x2,y2, x,dy);
 		    long d2 = line_dist_coord(x,y, x2,y2, dx,y);
-		    long d = (d1 < d2) ? d2 : d1;
+		    long d3 = line_dist_coord(x,y, x2,y2, x2,dy);
+		    long d4 = line_dist_coord(x,y, x2,y2, dx,y2);
+		    long d5 = line_dist_coord(x,y, x2,y2, dx,dy);
+		    long d = min(d5, min(max(d1, d2),max(d3,d4)));
+
 		    if (d >= mind && (!limit || (d <= maxd))) {
 			if ((d - mind) > rn2(dofs))
 			    selection_setpoint(dx,dy, ov, 1);
