@@ -33,7 +33,6 @@
 
 #define MAX_NESTED_IFS	20
 #define MAX_SWITCH_CASES 20
-#define MAX_SWITCH_BREAKS 20
 
 #define New(type)		\
 	(type *) memset((genericptr_t)alloc(sizeof(type)), 0, sizeof(type))
@@ -75,6 +74,10 @@ extern char *FDECL(decode_parm_str, (char *));
 extern struct lc_vardefs *FDECL(vardef_new,(long,char *));
 extern void FDECL(vardef_free_all,(struct lc_vardefs *));
 extern struct lc_vardefs *FDECL(vardef_defined,(struct lc_vardefs *,char *, int));
+
+extern void NDECL(break_stmt_start);
+extern void FDECL(break_stmt_end, (sp_lev *));
+extern void FDECL(break_stmt_new, (sp_lev *, long));
 
 extern void FDECL(splev_add_from, (sp_lev *, sp_lev *));
 
@@ -121,9 +124,9 @@ static struct opvar *switch_default_case = NULL;
 static struct opvar *switch_case_list[MAX_SWITCH_CASES];
 static long switch_case_value[MAX_SWITCH_CASES];
 int n_switch_case_list = 0;
-static struct opvar *switch_break_list[MAX_SWITCH_BREAKS];
-int n_switch_break_list = 0;
 
+int allow_break_statements = 0;
+struct lc_breakdef *break_list = NULL;
 
 extern struct lc_vardefs *variable_definitions;
 
@@ -229,7 +232,7 @@ extern const char *fname;
 %type	<i> door_wall walled secret chance
 %type	<i> dir_list teleprt_detail
 %type	<i> object_infos object_info monster_infos monster_info
-%type	<i> levstatements region_detail_end
+%type	<i> levstatements stmt_block region_detail_end
 %type	<i> engraving_type flag_list prefilled
 %type	<i> monster
 %type	<i> comparestmt encodecoord encoderegion mapchar
@@ -440,6 +443,12 @@ levstatements	: /* nothing */
 		  }
 		;
 
+stmt_block	: '{' levstatements '}'
+		  {
+		      $$ = $2;
+		  }
+		;
+
 levstatement 	: message
 		| lev_init
 		| altar_detail
@@ -462,6 +471,7 @@ levstatement 	: message
 		| loopstatement
 		| ifstatement
 		| exitstatement
+		| breakstatement
 		| function_define
 		| function_call
 		| corefunc_stmt
@@ -736,7 +746,7 @@ function_define	: FUNCTION_ID NQSTRING '('
 		  {
 		      /* nothing */
 		  }
-		'{' levstatements '}'
+		stmt_block
 		  {
 		      add_opvars(splev, "io", 0, SPO_RETURN);
 		      splev = function_splev_backup;
@@ -845,7 +855,6 @@ switchstatement	: SWITCH_ID '[' integer_or_var ']'
 		      in_switch_statement++;
 
 		      n_switch_case_list = 0;
-		      n_switch_break_list = 0;
 		      switch_default_case = NULL;
 
 		      add_opvars(splev, "o", SPO_RN2);
@@ -855,6 +864,7 @@ switchstatement	: SWITCH_ID '[' integer_or_var ']'
 		      switch_check_jump = chkjmp;
 		      add_opcode(splev, SPO_PUSH, chkjmp);
 		      add_opcode(splev, SPO_JMP, NULL);
+		      break_stmt_start();
 		  }
 		'{' switchcases '}'
 		  {
@@ -883,9 +893,7 @@ switchstatement	: SWITCH_ID '[' integer_or_var ']'
 
 		      set_opvar_int(endjump, splev->n_opcodes - endjump->vardata.l);
 
-		      for (i = 0; i < n_switch_break_list; i++) {
-			  set_opvar_int(switch_break_list[i], splev->n_opcodes - switch_break_list[i]->vardata.l);
-		      }
+		      break_stmt_end(splev);
 
 		      add_opcode(splev, SPO_POP, NULL); /* get rid of the value in stack */
 		      in_switch_statement--;
@@ -907,7 +915,7 @@ switchcase	: CASE_ID all_integers ':'
 			  switch_case_list[n_switch_case_list++] = tmppush;
 		      } else lc_error("Too many cases in a switch.");
 		  }
-		breakstatements
+		levstatements
 		  {
 		  }
 		| DEFAULT_ID ':'
@@ -920,28 +928,18 @@ switchcase	: CASE_ID all_integers ':'
 		      set_opvar_int(tmppush, splev->n_opcodes);
 		      switch_default_case = tmppush;
 		  }
-		breakstatements
+		levstatements
 		  {
 		  }
-		;
-
-breakstatements	: /* nothing */
-		| breakstatement breakstatements
 		;
 
 breakstatement	: BREAK_ID
 		  {
-		      struct opvar *tmppush = New(struct opvar);
-		      set_opvar_int(tmppush, splev->n_opcodes);
-		      if (n_switch_break_list >= MAX_SWITCH_BREAKS)
-			  lc_error("Too many BREAKs inside single SWITCH");
-		      switch_break_list[n_switch_break_list++] = tmppush;
-
-		      add_opcode(splev, SPO_PUSH, tmppush);
-		      add_opcode(splev, SPO_JMP, NULL);
-		  }
-		| levstatement
-		  {
+		      if (!allow_break_statements)
+			  lc_error("Cannot use BREAK outside a statement block.");
+		      else {
+			  break_stmt_new(splev, splev->n_opcodes);
+		      }
 		  }
 		;
 
@@ -984,8 +982,9 @@ forstmt_start	: FOR_ID any_var_or_unk '=' math_expr_var for_to_span math_expr_va
 forstatement	: forstmt_start
 		  {
 		      /* nothing */
+		      break_stmt_start();
 		  }
-		 '{' levstatements '}'
+		 stmt_block
 		  {
 		      char buf[256], buf2[256];
 		      n_forloops--;
@@ -1001,6 +1000,7 @@ forstatement	: forstmt_start
 		      /* jump back if compared values were not equal */
 		      add_opvars(splev, "io", forloop_list[n_forloops].jmp_point - splev->n_opcodes - 1, SPO_JNE);
 		      Free(forloop_list[n_forloops].varname);
+		      break_stmt_end(splev);
 		  }
 		;
 
@@ -1016,8 +1016,9 @@ loopstatement	: LOOP_ID '[' integer_or_var ']'
 		      if_list[n_if_list++] = tmppush;
 
 		      add_opvars(splev, "o", SPO_DEC);
+		      break_stmt_start();
 		  }
-		 '{' levstatements '}'
+		 stmt_block
 		  {
 		      struct opvar *tmppush;
 
@@ -1028,6 +1029,7 @@ loopstatement	: LOOP_ID '[' integer_or_var ']'
 		      add_opcode(splev, SPO_PUSH, tmppush);
 		      add_opcode(splev, SPO_JG, NULL);
 		      add_opcode(splev, SPO_POP, NULL); /* get rid of the count value in stack */
+		      break_stmt_end(splev);
 		  }
 		;
 
@@ -1049,6 +1051,7 @@ ifstatement 	: IF_ID comparestmt
 		      add_opcode(splev, SPO_PUSH, tmppush2);
 
 		      add_opcode(splev, reverse_jmp_opcode( $2 ), NULL);
+
 		  }
 		 if_ending
 		  {
@@ -1056,7 +1059,7 @@ ifstatement 	: IF_ID comparestmt
 		  }
 		;
 
-if_ending	: '{' levstatements '}'
+if_ending	: stmt_block
 		  {
 		      if (n_if_list > 0) {
 			  struct opvar *tmppush;
@@ -1064,7 +1067,7 @@ if_ending	: '{' levstatements '}'
 			  set_opvar_int(tmppush, splev->n_opcodes - tmppush->vardata.l);
 		      } else lc_error("IF: Huh?!  No start address?");
 		  }
-		| '{' levstatements '}'
+		| stmt_block
 		  {
 		      if (n_if_list > 0) {
 			  struct opvar *tmppush = New(struct opvar);
@@ -1081,7 +1084,7 @@ if_ending	: '{' levstatements '}'
 			  if_list[n_if_list++] = tmppush;
 		      } else lc_error("IF: Huh?!  No else-part address?");
 		  }
-		 ELSE_ID '{' levstatements '}'
+		 ELSE_ID stmt_block
 		  {
 		      if (n_if_list > 0) {
 			  struct opvar *tmppush;
@@ -1159,9 +1162,11 @@ subroom_def	: SUBROOM_ID ':' room_begin ',' subroom_pos ',' room_size roomfill
 		  {
 		      add_opvars(splev, "iiiiiiio", (long)$8, ERR, ERR,
 				 $5.x, $5.y, $7.width, $7.height, SPO_SUBROOM);
+		      break_stmt_start();
 		  }
-		  '{' levstatements '}'
+		  stmt_block
 		  {
+		      break_stmt_end(splev);
 		      add_opcode(splev, SPO_ENDROOM, NULL);
 		  }
 		;
@@ -1171,9 +1176,11 @@ room_def	: ROOM_ID ':' room_begin ',' room_pos ',' room_align ',' room_size room
 		      add_opvars(splev, "iiiiiiio", (long)$10,
 				 $7.x, $7.y, $5.x, $5.y,
 				 $9.width, $9.height, SPO_ROOM);
+		      break_stmt_start();
 		  }
-		  '{' levstatements '}'
+		  stmt_block
 		  {
+		      break_stmt_end(splev);
 		      add_opcode(splev, SPO_ENDROOM, NULL);
 		  }
 		;
@@ -1379,9 +1386,11 @@ monster_detail	: MONSTER_ID chance ':' monster_desc
 		      add_opvars(splev, "io", 1, SPO_MONSTER);
 		      $<i>$ = $2;
 		      in_container_obj++;
+		      break_stmt_start();
 		  }
-		'{' levstatements '}'
+		stmt_block
 		 {
+		     break_stmt_end(splev);
 		     in_container_obj--;
 		     add_opvars(splev, "o", SPO_END_MONINVENT);
 		     if ( 1 == $<i>5 ) {
@@ -1541,9 +1550,11 @@ object_detail	: OBJECT_ID chance ':' object_desc
 		      add_opvars(splev, "io", cnt, SPO_OBJECT);
 		      $<i>$ = $2;
 		      in_container_obj++;
+		      break_stmt_start();
 		  }
-		'{' levstatements '}'
+		stmt_block
 		 {
+		     break_stmt_end(splev);
 		     in_container_obj--;
 		     add_opcode(splev, SPO_POP_CONTAINER, NULL);
 
@@ -1867,9 +1878,11 @@ region_detail	: REGION_ID ':' region_or_var ',' light_state ',' room_type prefil
 		      add_opvars(splev, "iiio",
 				 (long)$5, rt, irr, SPO_REGION);
 		      $<i>$ = (irr || ($8 & 1) || rt != OROOM);
+		      break_stmt_start();
 		  }
 		  region_detail_end
 		  {
+		      break_stmt_end(splev);
 		      if ( $<i>9 ) {
 			  add_opcode(splev, SPO_ENDROOM, NULL);
 		      } else if ( $<i>10 )
@@ -1881,9 +1894,9 @@ region_detail_end : /* nothing */
 		  {
 		      $$ = 0;
 		  }
-		| '{' levstatements '}'
+		| stmt_block
 		  {
-		      $$ = $2;
+		      $$ = $1;
 		  }
 		;
 

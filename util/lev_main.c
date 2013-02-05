@@ -235,6 +235,8 @@ extern char curr_token[512];
 struct lc_vardefs *variable_definitions = NULL;
 struct lc_funcdefs *function_definitions = NULL;
 
+extern int allow_break_statements;
+extern struct lc_breakdef *break_list;
 
 int
 main(argc, argv)
@@ -681,6 +683,49 @@ add_opvars(sp_lev *sp, const char *fmt, ...)
     va_end(argp);
 }
 
+void
+break_stmt_start()
+{
+    allow_break_statements++;
+}
+
+void
+break_stmt_end(splev)
+     sp_lev *splev;
+{
+    struct lc_breakdef *tmp = break_list;
+    struct lc_breakdef *prv = NULL;
+    while (tmp) {
+	if (tmp->break_depth == allow_break_statements) {
+	    struct lc_breakdef *nxt = tmp->next;
+	    set_opvar_int(tmp->breakpoint, splev->n_opcodes - tmp->breakpoint->vardata.l-1);
+	    tmp->next = NULL;
+	    Free(tmp);
+	    if (!prv) break_list = NULL;
+	    else prv->next = nxt;
+	    tmp = nxt;
+	} else {
+	    prv = tmp;
+	    tmp = tmp->next;
+	}
+    }
+    allow_break_statements--;
+}
+
+void
+break_stmt_new(splev,i)
+     sp_lev *splev;
+     long i;
+{
+    struct lc_breakdef *tmp = New(struct lc_breakdef);
+    tmp->breakpoint = New(struct opvar);
+    tmp->break_depth = allow_break_statements;
+    tmp->next = break_list;
+    break_list = tmp;
+    set_opvar_int(tmp->breakpoint, i);
+    add_opcode(splev, SPO_PUSH, tmp->breakpoint);
+    add_opcode(splev, SPO_JMP, NULL);
+}
 
 struct lc_funcdefs *
 funcdef_new(addr, name)

@@ -531,4 +531,10 @@ struct lc_vardefs {
     long n_used;
 };
 
+struct lc_breakdef {
+    struct lc_breakdef *next;
+    struct opvar *breakpoint;
+    int break_depth;
+};
+
 #endif /* SP_LEV_H */
