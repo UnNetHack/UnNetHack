@@ -961,7 +961,7 @@ bound_digging()
 	if (xmax >= COLNO) xmax = COLNO-1;
 
 	found = nonwall = FALSE;
-	for(ymin=0; !found; ymin++) {
+	for(ymin=0; !found && (ymin < COLNO); ymin++) {
 		lev = &levl[xmin][ymin];
 		for(x=xmin; x<=xmax; x++, lev += ROWNO) {
 			typ = lev->typ;
@@ -974,7 +974,7 @@ bound_digging()
 	ymin -= (nonwall || !level.flags.is_maze_lev) ? 2 : 1;
 
 	found = nonwall = FALSE;
-	for(ymax=ROWNO-1; !found; ymax--) {
+	for(ymax=ROWNO-1; !found && (ymax >= 0); ymax--) {
 		lev = &levl[xmin][ymax];
 		for(x=xmin; x<=xmax; x++, lev += ROWNO) {
 			typ = lev->typ;
