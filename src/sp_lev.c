@@ -2051,67 +2051,6 @@ struct mkroom *croom;
 }
 
 
-void
-set_terrain(terr, croom)
-terrain *terr;
-struct mkroom *croom;
-{
-    schar x, y, x1, y1, x2, y2;
-
-    if (terr->ter >= MAX_TYPE) return;
-
-    x1 = terr->x1;  y1 = terr->y1;
-    get_location(&x1, &y1, ANY_LOC, croom);
-
-    switch (terr->areatyp) {
-    case 0: /* point */
-    default:
-	if (!isok(x1,y1)) break;
-	SET_TYPLIT(x1,y1, terr->ter, terr->tlit);
-	/* handle doors and secret doors */
-	if (levl[x1][y1].typ == SDOOR || IS_DOOR(levl[x1][y1].typ)) {
-	    if(levl[x1][y1].typ == SDOOR)
-		levl[x1][y1].doormask = D_CLOSED;
-	    if (x1 && (IS_WALL(levl[x1-1][y1].typ) ||
-				levl[x1-1][y1].horizontal))
-		levl[x1][y1].horizontal = 1;
-	}
-	break;
-    case 1: /* horiz line */
-	for (x = 0; x < (terr->x2); x++) {
-	    SET_TYPLIT(x+x1,y1, terr->ter, terr->tlit);
-	}
-	break;
-    case 2: /* vert line */
-	for (y = 0; y < (terr->y2); y++) {
-	    SET_TYPLIT(x1,y+y1, terr->ter, terr->tlit);
-	}
-	break;
-    case 3: /* filled rectangle */
-	x2 = terr->x2;  y2 = terr->y2;
-	get_location(&x2, &y2, ANY_LOC, croom);
-	for (x = max(x1,0); x <= min(x2,COLNO-1); x++) {
-	    for (y = max(y1,0); y <= min(y2,ROWNO-1); y++) {
-		SET_TYPLIT(x,y, terr->ter, terr->tlit);
-	    }
-	}
-	break;
-    case 4: /* rectangle */
-	x2 = terr->x2;  y2 = terr->y2;
-	get_location(&x2, &y2, ANY_LOC, croom);
-	for (x = max(x1,0); x <= min(x2,COLNO-1); x++) {
-	    SET_TYPLIT(x,y1, terr->ter, terr->tlit);
-	    SET_TYPLIT(x,y2, terr->ter, terr->tlit);
-	}
-	for (y = max(y1,0); y <= min(y2,ROWNO-1); y++) {
-	    SET_TYPLIT(x1,y, terr->ter, terr->tlit);
-	    SET_TYPLIT(x2,y, terr->ter, terr->tlit);
-	}
-	break;
-    }
-}
-
-
 /*
  * Search for a door in a room on a specified wall.
  */
