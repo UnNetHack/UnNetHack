@@ -729,8 +729,8 @@ int prop;
 {
 	register xchar x, y;
 
-	for(y = y1; y <= y2; y++)
-	    for(x = x1; x <= x2; x++)
+	for(y = max(y1,0); y <= min(y2,COLNO-1); y++)
+	    for(x = max(x1,0); x <= min(x2,ROWNO-1); x++)
 		if(IS_STWALL(levl[x][y].typ) || IS_TREES(levl[x][y].typ))
 		    levl[x][y].wall_info |= prop;
 }
@@ -850,7 +850,7 @@ rndtrap()
 #define WET	0x2
 #define HOT	0x4
 #define SOLID	0x8
-#define ANY_LOC 0x10
+#define ANY_LOC 0x10 /* even outside the level */
 
 STATIC_DCL boolean FDECL(is_ok_location, (SCHAR_P, SCHAR_P, int));
 
@@ -905,7 +905,7 @@ struct mkroom *croom;
 	}
 found_it:;
 
-	if (!isok(*x,*y)) {
+	if (!(humidity & ANY_LOC) && !isok(*x,*y)) {
 	    warning("get_location:  (%d,%d) out of bounds", *x, *y);
 	    *x = x_maze_max; *y = y_maze_max;
 	}
@@ -1574,7 +1574,7 @@ struct mkroom	*croom;
 	    int loc = DRY;
 	    if (pm->mlet == S_EEL || amphibious(pm) || is_swimmer(pm)) loc |= WET;
 	    if (is_flyer(pm) || is_floater(pm)) loc |= (HOT | WET);
-	    if (passes_walls(pm) || noncorporeal(pm)) loc |= ANY_LOC;
+	    if (passes_walls(pm) || noncorporeal(pm)) loc |= SOLID;
 	    if (flaming(pm)) loc |= HOT;
 	    get_location(&x, &y, loc, croom);
 	} else
@@ -2043,8 +2043,8 @@ struct mkroom *croom;
     x2 = terr->x2;  y2 = terr->y2;
     get_location(&x2, &y2, ANY_LOC, croom);
 
-    for (x = x1; x <= x2; x++)
-	for (y = y1; y <= y2; y++)
+    for (x = max(x1,0); x <= min(x2,COLNO-1); x++)
+	for (y = max(y1,0); y <= min(y2,ROWNO-1); y++)
 	    if ((levl[x][y].typ == terr->fromter) && (rn2(100) < terr->chance)) {
 		SET_TYPLIT(x,y, terr->toter, terr->tolit);
 	    }
@@ -2066,6 +2066,7 @@ struct mkroom *croom;
     switch (terr->areatyp) {
     case 0: /* point */
     default:
+	if (!isok(x1,y1)) break;
 	SET_TYPLIT(x1,y1, terr->ter, terr->tlit);
 	/* handle doors and secret doors */
 	if (levl[x1][y1].typ == SDOOR || IS_DOOR(levl[x1][y1].typ)) {
@@ -2089,8 +2090,8 @@ struct mkroom *croom;
     case 3: /* filled rectangle */
 	x2 = terr->x2;  y2 = terr->y2;
 	get_location(&x2, &y2, ANY_LOC, croom);
-	for (x = x1; x <= x2; x++) {
-	    for (y = y1; y <= y2; y++) {
+	for (x = max(x1,0); x <= min(x2,COLNO-1); x++) {
+	    for (y = max(y1,0); y <= min(y2,ROWNO-1); y++) {
 		SET_TYPLIT(x,y, terr->ter, terr->tlit);
 	    }
 	}
@@ -2098,11 +2099,11 @@ struct mkroom *croom;
     case 4: /* rectangle */
 	x2 = terr->x2;  y2 = terr->y2;
 	get_location(&x2, &y2, ANY_LOC, croom);
-	for (x = x1; x <= x2; x++) {
+	for (x = max(x1,0); x <= min(x2,COLNO-1); x++) {
 	    SET_TYPLIT(x,y1, terr->ter, terr->tlit);
 	    SET_TYPLIT(x,y2, terr->ter, terr->tlit);
 	}
-	for (y = y1; y <= y2; y++) {
+	for (y = max(y1,0); y <= min(y2,ROWNO-1); y++) {
 	    SET_TYPLIT(x1,y, terr->ter, terr->tlit);
 	    SET_TYPLIT(x2,y, terr->ter, terr->tlit);
 	}
@@ -3681,7 +3682,7 @@ spo_wallwalk(coder)
     x = SP_COORD_X(OV_i(coord));
     y = SP_COORD_Y(OV_i(coord));
     get_location(&x, &y, ANY_LOC, coder->croom);
-
+    if (!isok(x,y)) return;
     if (SP_MAPCHAR_TYP(OV_i(fgtyp)) >= MAX_TYPE) return;
     if (SP_MAPCHAR_TYP(OV_i(bgtyp)) >= MAX_TYPE) return;
 
@@ -4608,6 +4609,7 @@ spo_mazewalk(coder)
     y = SP_COORD_Y(OV_i(coord));
 
     get_location(&x, &y, ANY_LOC, coder->croom);
+    if (!isok(x,y)) return;
 
     if (OV_i(ftyp) < 1) {
 #ifndef WALLIFIED_MAZE
@@ -5414,16 +5416,14 @@ sp_lev *lvl;
 	case SPO_SEL_POINT:
 	    {
 		struct opvar *tmp;
+		struct opvar *pt = selection_opvar(NULL);
 		schar x,y;
 		if (!OV_pop_c(tmp)) panic("no ter sel coord");
 		x = SP_COORD_X(OV_i(tmp));
 		y = SP_COORD_Y(OV_i(tmp));
 		get_location(&x, &y, ANY_LOC, coder->croom);
-		if (isok(x,y)) {
-		    struct opvar *pt = selection_opvar(NULL);
-		    selection_setpoint(x,y, pt, 1);
-		    splev_stack_push(coder->stack, pt);
-		}
+		selection_setpoint(x,y, pt, 1);
+		splev_stack_push(coder->stack, pt);
 		opvar_free(tmp);
 	    }
 	    break;
@@ -5547,6 +5547,7 @@ sp_lev *lvl;
 	case SPO_SEL_ELLIPSE:
 	    {
 		struct opvar *filled, *xaxis, *yaxis, *pt;
+		struct opvar *sel = selection_opvar(NULL);
 		schar x,y;
 		if (!OV_pop_i(filled)) panic("no filled for ellipse");
 		if (!OV_pop_i(yaxis)) panic("no yaxis for ellipse");
@@ -5555,11 +5556,8 @@ sp_lev *lvl;
 		x = SP_COORD_X(OV_i(pt));
 		y = SP_COORD_Y(OV_i(pt));
 		get_location(&x, &y, ANY_LOC, coder->croom);
-		if (isok(x,y)) {
-		    struct opvar *sel = selection_opvar(NULL);
-		    selection_do_ellipse(sel, x,y, OV_i(xaxis), OV_i(yaxis), OV_i(filled));
-		    splev_stack_push(coder->stack, sel);
-		}
+		selection_do_ellipse(sel, x,y, OV_i(xaxis), OV_i(yaxis), OV_i(filled));
+		splev_stack_push(coder->stack, sel);
 		opvar_free(filled);
 		opvar_free(yaxis);
 		opvar_free(xaxis);
