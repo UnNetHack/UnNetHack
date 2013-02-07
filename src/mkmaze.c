@@ -19,7 +19,7 @@ STATIC_DCL int FDECL(extend_spine, (int [3][3], int, int, int));
 STATIC_DCL boolean FDECL(okay,(int,int,int));
 STATIC_DCL void FDECL(maze0xy,(coord *));
 STATIC_DCL boolean FDECL(put_lregion_here,(XCHAR_P,XCHAR_P,XCHAR_P,
-	XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,BOOLEAN_P,d_level *));
+   XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,BOOLEAN_P,d_level *, XCHAR_P));
 STATIC_DCL void NDECL(fixup_special);
 STATIC_DCL void FDECL(move, (int *,int *,int));
 STATIC_DCL void NDECL(setup_waterlevel);
@@ -227,21 +227,25 @@ maze0xy(cc)	/* find random starting point for maze generation */
 	return;
 }
 
-/*
- * Bad if:
- *	pos is occupied OR
- *	pos is inside restricted region (lx,ly,hx,hy) OR
- *	NOT (pos is corridor and a maze level OR pos is a room OR pos is air)
- */
 boolean
-bad_location(x, y, lx, ly, hx, hy)
+bad_location(x, y, lx, ly, hx, hy, lax)
     xchar x, y;
     xchar lx, ly, hx, hy;
+    xchar lax;
 {
-    return((boolean)(occupied(x, y) ||
-	   within_bounded_area(x,y, lx,ly, hx,hy) ||
+    return((boolean)(t_at(x, y) || invocation_pos(x,y) ||
+	within_bounded_area(x,y, lx,ly, hx,hy) ||
+	(lax < 2 && IS_FURNITURE(levl[x][y].typ)) ||
 	   !((levl[x][y].typ == CORR && level.flags.is_maze_lev) ||
-	       levl[x][y].typ == ROOM || levl[x][y].typ == AIR)));
+	       levl[x][y].typ == ROOM || levl[x][y].typ == AIR ||
+	     (lax && (levl[x][y].typ == ICE || levl[x][y].typ == CLOUD)) ||
+	     ((lax > 1) && (ACCESSIBLE(levl[x][y].typ) &&
+			    levl[x][y].typ != STAIRS &&
+			    levl[x][y].typ != LADDER)) ||
+	     ((lax > 2) && (levl[x][y].typ == POOL || levl[x][y].typ == MOAT ||
+			    levl[x][y].typ == WATER || levl[x][y].typ == LAVAPOOL ||
+			    levl[x][y].typ == BOG))
+	     )));
 }
 
 /* pick a location in area (lx, ly, hx, hy) but not in (nlx, nly, nhx, nhy) */
@@ -256,6 +260,7 @@ place_lregion(lx, ly, hx, hy, nlx, nly, nhx, nhy, rtype, lev)
     int trycnt;
     boolean oneshot;
     xchar x, y;
+    int lax = 0;
 
     if(!lx) { /* default to whole level */
 	/*
@@ -271,36 +276,37 @@ place_lregion(lx, ly, hx, hy, nlx, nly, nhx, nhy, rtype, lev)
 	ly = 1; hy = ROWNO-1;
     }
 
-    /* first a probabilistic approach */
-
-    oneshot = (lx == hx && ly == hy);
-    for (trycnt = 0; trycnt < 200; trycnt++) {
-	x = rn1((hx - lx) + 1, lx);
-	y = rn1((hy - ly) + 1, ly);
-	if (put_lregion_here(x,y,nlx,nly,nhx,nhy,rtype,oneshot,lev))
-	    return;
-    }
-
-    /* then a deterministic one */
-
-    oneshot = TRUE;
-    for (x = lx; x <= hx; x++)
-	for (y = ly; y <= hy; y++)
-	    if (put_lregion_here(x,y,nlx,nly,nhx,nhy,rtype,oneshot,lev))
+    do {
+	/* first a probabilistic approach */
+	oneshot = (lx == hx && ly == hy);
+	for (trycnt = 0; trycnt < 200; trycnt++) {
+	    x = rn1((hx - lx) + 1, lx);
+	    y = rn1((hy - ly) + 1, ly);
+	    if (put_lregion_here(x,y,nlx,nly,nhx,nhy,rtype,oneshot,lev, lax))
 		return;
+	}
+
+	/* then a deterministic one */
+	oneshot = TRUE;
+	for (x = lx; x <= hx; x++)
+	    for (y = ly; y <= hy; y++)
+		if (put_lregion_here(x,y,nlx,nly,nhx,nhy,rtype,oneshot,lev, lax))
+		    return;
+    } while (lax++ < 4);
 
     impossible("Couldn't place lregion type %d!", rtype);
 }
 
 STATIC_OVL boolean
-put_lregion_here(x,y,nlx,nly,nhx,nhy,rtype,oneshot,lev)
+put_lregion_here(x,y,nlx,nly,nhx,nhy,rtype,oneshot,lev, lax)
 xchar x, y;
 xchar nlx, nly, nhx, nhy;
 xchar rtype;
 boolean oneshot;
 d_level *lev;
+xchar lax;
 {
-    if (bad_location(x, y, nlx, nly, nhx, nhy)) {
+    if (bad_location(x, y, nlx, nly, nhx, nhy, lax)) {
 	if (!oneshot) {
 	    return FALSE;		/* caller should try again */
 	} else {
@@ -310,7 +316,8 @@ d_level *lev;
 	    struct trap *t = t_at(x,y);
 
 	    if (t && t->ttyp != MAGIC_PORTAL) deltrap(t);
-	    if (bad_location(x, y, nlx, nly, nhx, nhy)) return FALSE;
+	    if (bad_location(x, y, nlx, nly, nhx, nhy, lax))
+		return FALSE;
 	}
     }
     switch (rtype) {
@@ -320,7 +327,7 @@ d_level *lev;
 	/* "something" means the player in this case */
 	if(MON_AT(x, y)) {
 	    /* move the monster if no choice, or just try again */
-	    if(oneshot) (void) rloc(m_at(x,y), FALSE);
+	    if(oneshot) (void) rloc(m_at(x,y), TRUE);
 	    else return(FALSE);
 	}
 	u_on_newpos(x, y);
