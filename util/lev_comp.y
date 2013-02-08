@@ -559,34 +559,34 @@ variable_define	: any_var_or_arr '=' math_expr_var
 		      add_opvars(splev, "iso", 0, $1, SPO_VAR_INIT);
 		      Free($1);
 		  }
-		| any_var_or_arr '=' terrainid ':' mapchar
+		| any_var_or_arr '=' terrainid ':' mapchar_or_var
 		  {
 		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_MAPCHAR);
-		      add_opvars(splev, "miso", (long)$5, 0, $1, SPO_VAR_INIT);
+		      add_opvars(splev, "iso", 0, $1, SPO_VAR_INIT);
 		      Free($1);
 		  }
-		| any_var_or_arr '=' monsterid ':' encodemonster
+		| any_var_or_arr '=' monsterid ':' monster_or_var
 		  {
 		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_MONST);
-		      add_opvars(splev, "Miso", (long)$5, 0, $1, SPO_VAR_INIT);
+		      add_opvars(splev, "iso", 0, $1, SPO_VAR_INIT);
 		      Free($1);
 		  }
-		| any_var_or_arr '=' objectid ':' encodeobj
+		| any_var_or_arr '=' objectid ':' object_or_var
 		  {
 		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_OBJ);
-		      add_opvars(splev, "Oiso", (long)$5, 0, $1, SPO_VAR_INIT);
+		      add_opvars(splev, "iso", 0, $1, SPO_VAR_INIT);
 		      Free($1);
 		  }
-		| any_var_or_arr '=' encodecoord
+		| any_var_or_arr '=' coord_or_var
 		  {
 		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_COORD);
-		      add_opvars(splev, "ciso", (long)$3, 0, $1, SPO_VAR_INIT);
+		      add_opvars(splev, "iso", 0, $1, SPO_VAR_INIT);
 		      Free($1);
 		  }
-		| any_var_or_arr '=' encoderegion
+		| any_var_or_arr '=' region_or_var
 		  {
 		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_REGION);
-		      add_opvars(splev, "riso", (long)$3, 0, $1, SPO_VAR_INIT);
+		      add_opvars(splev, "iso", 0, $1, SPO_VAR_INIT);
 		      Free($1);
 		  }
 		| any_var_or_arr '=' '{' integer_list '}'
