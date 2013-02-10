@@ -101,6 +101,7 @@ splev_stack_init(st)
 	st->depth = 0;
 	st->depth_alloc = SPLEV_STACK_RESERVE;
 	st->stackdata = (struct opvar **)alloc(st->depth_alloc * sizeof(struct opvar *));
+	if (!st->stackdata) panic("stack init alloc");
     }
 }
 
@@ -146,11 +147,12 @@ splev_stack_push(st, v)
      struct splevstack *st;
      struct opvar *v;
 {
-    if (!st) return;
+    if (!st || !v) return;
     if (!st->stackdata) panic("splev_stack_push: no stackdata allocated?");
 
     if (st->depth >= st->depth_alloc) {
 	struct opvar **tmp = (struct opvar **)alloc((st->depth_alloc + SPLEV_STACK_RESERVE) * sizeof(struct opvar *));
+	if (!tmp) panic("stack push alloc");
 	(void)memcpy(tmp, st->stackdata, st->depth_alloc * sizeof(struct opvar *));
 	Free(st->stackdata);
 	st->stackdata = tmp;
@@ -216,6 +218,7 @@ opvar_new_str(s)
     if (s) {
 	int len = strlen(s);
 	tmpov->vardata.str = (char *)alloc(len + 1);
+	if (!tmpov->vardata.str) panic("opvar new str alloc");
 	(void)memcpy((genericptr_t)tmpov->vardata.str,
 		     (genericptr_t)s, len);
 	tmpov->vardata.str[len] = '\0';
@@ -276,7 +279,9 @@ struct opvar *
 opvar_clone(ov)
      struct opvar *ov;
 {
-    struct opvar *tmpov = (struct opvar *)alloc(sizeof(struct opvar));
+    struct opvar *tmpov;
+    if (!ov) panic("no opvar to clone");
+    tmpov = (struct opvar *)alloc(sizeof(struct opvar));
     if (!tmpov) panic("could not alloc opvar struct");
     switch (ov->spovartyp) {
     case SPOVAR_COORD:
@@ -297,6 +302,7 @@ opvar_clone(ov)
 	    int len = strlen(ov->vardata.str);
 	    tmpov->spovartyp = ov->spovartyp;
 	    tmpov->vardata.str = (char *)alloc(len+1);
+	    if (!tmpov->vardata.str) panic("opvar clone alloc");
 	    (void)memcpy((genericptr_t)tmpov->vardata.str,
 			 (genericptr_t)ov->vardata.str, len);
 	    tmpov->vardata.str[len] = '\0';
@@ -361,6 +367,7 @@ splev_stack_getdat(coder, typ)
 {
     if (coder && coder->stack) {
 	struct opvar *tmp = splev_stack_pop(coder->stack);
+	if (!tmp) panic("no value type %i in stack.", typ);
 	if (tmp->spovartyp == SPOVAR_VARIABLE)
 	    tmp = opvar_var_conversion(coder, tmp);
 	if (tmp->spovartyp == typ)
@@ -2555,7 +2562,7 @@ sp_lev *lvl;
     Fread((genericptr_t)&(lvl->n_opcodes), 1, sizeof(lvl->n_opcodes), fd);
 
     lvl->opcodes = (_opcode *)alloc(sizeof(_opcode) * (lvl->n_opcodes));
-
+    if (!lvl->opcodes) panic("sp lvl load opcodes alloc");
     while (n_opcode < lvl->n_opcodes) {
 
 	Fread((genericptr_t) &lvl->opcodes[n_opcode].opcode, 1,
@@ -2571,6 +2578,7 @@ sp_lev *lvl;
 	    struct opvar *ov = (opdat = (struct opvar *)alloc(sizeof(struct opvar)));
 	    int nsize;
 
+	    if (!ov) panic("push ov alloc");
 	    ov->spovartyp = SPO_NULL;
 	    ov->vardata.l = 0;
 	    Fread((genericptr_t)&(ov->spovartyp), 1, sizeof(ov->spovartyp), fd);
@@ -2592,6 +2600,7 @@ sp_lev *lvl;
 		    char *opd;
 		    Fread((genericptr_t) &nsize, 1, sizeof(nsize), fd);
 		    opd = (char *)alloc(nsize + 1);
+		    if (!opd) panic("sp lvl load opd alloc");
 		    if (nsize) Fread(opd, 1, nsize, fd);
 		    opd[nsize] = 0;
 		    ov->vardata.str = opd;
@@ -2826,10 +2835,11 @@ void
 spo_frame_pop(coder)
      struct sp_coder *coder;
 {
-    if (coder->frame->next) {
+    if (coder->frame && coder->frame->next) {
 	struct sp_frame *tmpframe = coder->frame->next;
 	frame_del(coder->frame);
 	coder->frame = tmpframe;
+	coder->stack = coder->frame->stack;
     }
 }
 
@@ -2871,7 +2881,7 @@ spo_return(coder)
      struct sp_coder *coder;
 {
     struct opvar *params;
-    if (!coder->frame->next) return; /* something is seriously wrong */
+    if (!coder->frame || !coder->frame->next) panic("return: no frame.");
     if (!OV_pop_i(params)) return;
     if (OV_i(params) < 0) return;
 
@@ -2925,6 +2935,7 @@ spo_message(coder)
     n = strlen(msg);
 
     levmsg = (char *) alloc(old_n+n+1);
+    if (!levmsg) panic("spo_message alloc");
     if (old_n) levmsg[old_n-1] = '\n';
     if (lev_message)
 	(void) memcpy((genericptr_t)levmsg, (genericptr_t)lev_message, old_n-1);
@@ -3316,13 +3327,14 @@ spo_mon_generation(coder)
 	!OV_pop_i(freq)) return;
 
     mg = (struct mon_gen_override *)alloc(sizeof(struct mon_gen_override));
+    if (!mg) panic("mongen mg alloc");
     mg->override_chance = OV_i(freq);
     mg->total_mon_freq = 0;
     mg->gen_chances = NULL;
     while (OV_i(n_tuples)-- > 0) {
 	struct opvar *mfreq, *is_sym, *mon;
 	mgtuple = (struct mon_gen_tuple *)alloc(sizeof(struct mon_gen_tuple));
-
+	if (!mgtuple) panic("mgtuple alloc");
 	if (!OV_pop_i(is_sym) ||
 	    !OV_pop_i(mon) ||
 	    !OV_pop_i(mfreq)) {
@@ -3366,9 +3378,10 @@ spo_level_sounds(coder)
     }
 
     mg = (struct lvl_sounds *)alloc(sizeof(struct lvl_sounds));
+    if (!mg) panic("lvlsnds mg alloc");
     mg->n_sounds = OV_i(n_tuples);
     mg->sounds = (struct lvl_sound_bite *)alloc(sizeof(struct lvl_sound_bite) * mg->n_sounds);
-
+    if (!mg->sounds) panic("lvlsnds snds alloc");
     while (OV_i(n_tuples)-- > 0) {
 	struct opvar *flags, *msg;
 
@@ -4348,7 +4361,7 @@ spo_levregion(coder)
 	!OV_pop_i(ix1)) return;
 
     tmplregion = (lev_region *)alloc(sizeof(lev_region));
-
+    if (!tmplregion) panic("levreg alloc");
     tmplregion->inarea.x1 = OV_i(ix1);
     tmplregion->inarea.y1 = OV_i(iy1);
     tmplregion->inarea.x2 = OV_i(ix2);
@@ -4382,6 +4395,7 @@ spo_levregion(coder)
 	/* realloc the lregion space to add the new one */
 	lev_region *newl = (lev_region *) alloc(sizeof(lev_region) *
 						(unsigned)(1+num_lregions));
+	if (!newl) panic("levreg newl alloc");
 	(void) memcpy((genericptr_t)(newl), (genericptr_t)lregions,
 		      sizeof(lev_region) * num_lregions);
 	Free(lregions);
@@ -4390,6 +4404,7 @@ spo_levregion(coder)
     } else {
 	num_lregions = 1;
 	lregions = (lev_region *) alloc(sizeof(lev_region));
+	if (!lregions) panic("lregions alloc");
     }
     (void) memcpy(&lregions[num_lregions-1], tmplregion, sizeof(lev_region));
 
@@ -4914,7 +4929,7 @@ spo_var_init(coder)
     } else {
 	/* new variable definition */
 	tmpvar = (struct splev_var *)malloc(sizeof(struct splev_var));
-	if (!tmpvar) return;
+	if (!tmpvar) panic("newvar tmpvar alloc");
 	tmpvar->next = coder->frame->variables;
 	tmpvar->name = strdup(OV_s(vname));
 	coder->frame->variables = tmpvar;
@@ -4930,6 +4945,7 @@ copy_variable:
 	    if (tmpvar->array_len) {
 		idx = tmpvar->array_len;
 		tmpvar->data.arrayvalues = (struct opvar **)malloc(sizeof(struct opvar *) * idx);
+		if (!tmpvar->data.arrayvalues) panic("tmpvar->data.arrayvalues alloc");
 		while (idx-- > 0) {
 		    tmpvar->data.arrayvalues[idx] = opvar_clone(tmp2->data.arrayvalues[idx]);
 		}
@@ -5000,7 +5016,7 @@ sp_lev *lvl;
     long exec_opcodes = 0;
     int     tmpi;
     struct sp_coder *coder = (struct sp_coder *)alloc(sizeof(struct sp_coder));
-
+    if (!coder) panic("coder alloc");
     coder->frame = frame_new(0);
     coder->stack = NULL;
     coder->premapped = FALSE;
