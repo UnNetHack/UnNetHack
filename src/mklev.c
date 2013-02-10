@@ -226,64 +226,6 @@ boolean special;
 	nsubroom++;
 }
 
-void
-mk_split_room()
-{
-    NhRect *r1 = rnd_rect();
-    NhRect r2;
-    xchar hx, hy, lx, ly, wid, hei;
-    xchar rlit;
-    struct mkroom *troom;
-
-    if (!r1) return;
-
-    wid = rn1(12, 5);
-    hei = rn1(3, 5);
-
-    hx = (r1->hx - r1->lx - wid - 2);
-    hy = (r1->hy - r1->ly - hei - 2);
-
-    lx = ((hx < 1) ? 0 : rn2(hx)) + 1;
-    ly = ((hy < 1) ? 0 : rn2(hy)) + 1;
-
-    if (!check_room(&lx, &wid, &ly, &hei, FALSE)) return;
-    if (wid < 5 || hei < 5) return;
-
-    r2.lx = lx;
-    r2.ly = ly;
-    r2.hx = lx + wid;
-    r2.hy = ly + hei;
-    split_rects(r1, &r2);
-    smeq[nroom] = nroom;
-    if ((wid > hei) || (wid == hei && rn2(2))) {
-	int adj = (wid/2);
-	rlit = (rnd(1+abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
-	add_room(lx,     ly, lx+adj-1,     ly+hei, rlit, OROOM, FALSE);
-	smeq[nroom] = nroom;
-	rlit = (rnd(1+abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
-	troom = &rooms[nroom];
-#ifdef SPECIALIZATION
-	topologize(troom,FALSE);              /* set roomno */
-#else
-	topologize(troom);                    /* set roomno */
-#endif
-	add_room(lx+adj+1, ly, lx+adj+adj, ly+hei, rlit, OROOM, FALSE);
-    } else {
-	int adj = (hei/2);
-	rlit = (rnd(1+abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
-	add_room(lx, ly,     lx+wid, ly+adj-1,     rlit, OROOM, FALSE);
-	smeq[nroom] = nroom;
-	rlit = (rnd(1+abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
-	troom = &rooms[nroom];
-#ifdef SPECIALIZATION
-	topologize(troom,FALSE);              /* set roomno */
-#else
-	topologize(troom);                    /* set roomno */
-#endif
-	add_room(lx, ly+adj+1, lx+wid, ly+adj+adj, rlit, OROOM, FALSE);
-    }
-}
-
 STATIC_OVL void
 makerooms()
 {
