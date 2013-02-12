@@ -135,7 +135,7 @@ splev_stack_done(st)
 		st->stackdata[i] = NULL;
 	    }
 
-	if (st->stackdata) free(st->stackdata);
+	Free(st->stackdata);
 	st->stackdata = NULL;
 	st->depth = st->depth_alloc = 0;
 	Free(st);
@@ -265,8 +265,7 @@ opvar_free_x(ov)
     case SPOVAR_VARIABLE:
     case SPOVAR_STRING:
     case SPOVAR_SEL:
-	if (ov->vardata.str)
-	    Free(ov->vardata.str);
+	Free(ov->vardata.str);
 	break;
     default: impossible("Unknown opvar value type (%i)!", ov->spovartyp);
     }
@@ -283,6 +282,7 @@ opvar_clone(ov)
     if (!ov) panic("no opvar to clone");
     tmpov = (struct opvar *)alloc(sizeof(struct opvar));
     if (!tmpov) panic("could not alloc opvar struct");
+    tmpov->spovartyp = ov->spovartyp;
     switch (ov->spovartyp) {
     case SPOVAR_COORD:
     case SPOVAR_REGION:
@@ -290,23 +290,12 @@ opvar_clone(ov)
     case SPOVAR_MONST:
     case SPOVAR_OBJ:
     case SPOVAR_INT:
-	{
-	    tmpov->spovartyp = ov->spovartyp;
-	    tmpov->vardata.l = ov->vardata.l;
-	}
+	tmpov->vardata.l = ov->vardata.l;
 	break;
     case SPOVAR_VARIABLE:
     case SPOVAR_STRING:
     case SPOVAR_SEL:
-	{
-	    int len = strlen(ov->vardata.str);
-	    tmpov->spovartyp = ov->spovartyp;
-	    tmpov->vardata.str = (char *)alloc(len+1);
-	    if (!tmpov->vardata.str) panic("opvar clone alloc");
-	    (void)memcpy((genericptr_t)tmpov->vardata.str,
-			 (genericptr_t)ov->vardata.str, len);
-	    tmpov->vardata.str[len] = '\0';
-	}
+	tmpov->vardata.str = strdup(ov->vardata.str);
 	break;
     default: impossible("Unknown push value type (%i)!", ov->spovartyp);
     }
@@ -398,18 +387,18 @@ variable_list_del(varlist)
     struct splev_var *tmp = varlist;
     if (!tmp) return;
     while (tmp) {
-	free(tmp->name);
+	Free(tmp->name);
 	if ((tmp->svtyp & SPOVAR_ARRAY)) {
 	    long idx = tmp->array_len;
 	    while (idx-- > 0) {
 		opvar_free(tmp->data.arrayvalues[idx]);
 	    };
-	    free(tmp->data.arrayvalues);
+	    Free(tmp->data.arrayvalues);
 	} else {
 	    opvar_free(tmp->data.value);
 	}
 	tmp = varlist->next;
-	free(varlist);
+	Free(varlist);
 	varlist = tmp;
     }
 }
@@ -2636,7 +2625,8 @@ sp_lev *lvl;
 	if (opdat) opvar_free(opdat);
 	n_opcode++;
     }
-    free(lvl->opcodes);
+    Free(lvl->opcodes);
+    lvl->opcodes = NULL;
     return TRUE;
 }
 
@@ -3082,8 +3072,8 @@ spo_monster(coder)
 
     create_monster(&tmpmons, coder->croom);
 
-    free(tmpmons.name.str);
-    free(tmpmons.appear_as.str);
+    Free(tmpmons.name.str);
+    Free(tmpmons.appear_as.str);
 
     opvar_free(id);
     opvar_free(coord);
@@ -3497,6 +3487,8 @@ spo_endroom(coder)
 {
     if (coder->n_subroom > 1) {
 	coder->n_subroom--;
+	coder->tmproomlist[coder->n_subroom] = NULL;
+	coder->failed_room[coder->n_subroom] = TRUE;
     } else {
 	/* no subroom, get out of top-level room */
 	/* Need to ensure xstart/ystart/xsize/ysize have something sensible,
@@ -4759,7 +4751,15 @@ spo_map(coder)
 	if (!(ystart % 2)) ystart++;
 	break;
     case 2:
+	if (!coder->croom) {
+	    xstart = 1;
+	    ystart = 0;
+	    xsize = COLNO-1-tmpmazepart.xsize;
+	    ysize = ROWNO-tmpmazepart.ysize;
+	}
 	get_location(&halign, &valign, ANY_LOC, coder->croom);
+	xsize = tmpmazepart.xsize;
+	ysize = tmpmazepart.ysize;
 	xstart = halign;
 	ystart = valign;
 	break;
@@ -4903,7 +4903,7 @@ spo_var_init(coder)
 		while (idx-- > 0) {
 		    opvar_free(tmpvar->data.arrayvalues[idx]);
 		}
-		free(tmpvar->data.arrayvalues);
+		Free(tmpvar->data.arrayvalues);
 	    } else {
 		opvar_free(tmpvar->data.value);
 	    }
@@ -4915,7 +4915,7 @@ spo_var_init(coder)
 	    while (idx-- > 0) {
 		opvar_free(tmpvar->data.arrayvalues[idx]);
 	    }
-	    free(tmpvar->data.arrayvalues);
+	    Free(tmpvar->data.arrayvalues);
 	    tmpvar->data.arrayvalues = NULL;
 	    goto create_new_array;
 	} else {
@@ -5015,6 +5015,7 @@ sp_lev *lvl;
 {
     long exec_opcodes = 0;
     int     tmpi;
+    long room_stack = 0;
     struct sp_coder *coder = (struct sp_coder *)alloc(sizeof(struct sp_coder));
     if (!coder) panic("coder alloc");
     coder->frame = frame_new(0);
@@ -5090,8 +5091,20 @@ sp_lev *lvl;
 	case SPO_LEVEL_SOUNDS:   spo_level_sounds(coder);   break;
 	case SPO_ENGRAVING:      spo_engraving(coder);      break;
 	case SPO_SUBROOM:
-	case SPO_ROOM:           spo_room(coder);           break;
-	case SPO_ENDROOM:        spo_endroom(coder);        break;
+	case SPO_ROOM:
+	    if (!coder->failed_room[coder->n_subroom-1]) {
+		spo_room(coder);
+	    } else room_stack++;
+	    break;
+	case SPO_ENDROOM:
+	    if (coder->failed_room[coder->n_subroom-1]) {
+		if (!room_stack)
+		    spo_endroom(coder);
+		room_stack--;
+	    } else {
+		spo_endroom(coder);
+	    }
+	    break;
 	case SPO_DOOR:           spo_door(coder);           break;
 	case SPO_STAIR:          spo_stair(coder);          break;
 	case SPO_LADDER:         spo_ladder(coder);         break;
@@ -5165,7 +5178,7 @@ sp_lev *lvl;
 			    splev_stack_push(coder->stack, c);
 			    opvar_free(a);
 			    opvar_free(b);
-			    free(tmpbuf);
+			    Free(tmpbuf);
 			} else {
 			    splev_stack_push(coder->stack, a);
 			    opvar_free(b);
@@ -5588,7 +5601,7 @@ load_special(name)
 const char *name;
 {
 	dlb *fd;
-	sp_lev lvl;
+	sp_lev *lvl;
 	boolean result = FALSE;
 	struct version_info vers_info;
 
@@ -5599,9 +5612,12 @@ const char *name;
 	if (!check_version(&vers_info, name, TRUE))
 	    goto give_up;
 
-	result = sp_level_loader(fd, &lvl);
-	if (result) result = sp_level_coder(&lvl);
-	sp_level_free(&lvl);
+	lvl = (sp_lev *)alloc(sizeof(sp_lev));
+	if (!lvl) panic("alloc sp_lev");
+
+	result = sp_level_loader(fd, lvl);
+	if (result) result = sp_level_coder(lvl);
+	sp_level_free(lvl);
  give_up:
 	(void)dlb_fclose(fd);
 	return result;
