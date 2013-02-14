@@ -53,7 +53,7 @@ static char origdir[255]="";
 #define O_BINARY 0
 #endif
 
-#define MAX_DLB_FILES 250	/* max # of files we'll handle */
+#define DLB_IDX_REALLOC 250
 #define DLB_VERS 1		/* version of dlb file we will write */
 
 /*
@@ -114,6 +114,24 @@ verbose_help()
     for (str = long_help; *str; str++)
 	(void) printf("%s\n", *str);
     usage();
+}
+
+libdir *
+realloc_ld(ld, len)
+libdir *ld;
+long *len;
+{
+    libdir *tmp = (libdir *)alloc(((*len) + DLB_IDX_REALLOC) * sizeof(libdir));
+    if (!tmp) {
+	printf("Could not alloc libdir");
+	xexit(EXIT_FAILURE);
+    }
+    if (ld) {
+	memcpy(tmp, ld, (*len) * sizeof(libdir));
+	free(ld);
+    }
+    (*len) += DLB_IDX_REALLOC;
+    return tmp;
 }
 
 static void
@@ -380,11 +398,14 @@ main(argc, argv)
 
     case 'c':			/* create archive */
 	{
-	libdir ld[MAX_DLB_FILES];
+	libdir *ld = NULL;
+	long max_ld = 0;
 	char buf[BUFSIZ];
 	int fd, out, nfiles = 0;
 	long dir_size, slen, flen, fsiz;
 	boolean rewrite_directory = FALSE;
+
+	ld = realloc_ld(ld, &max_ld);
 
 	/*
 	 * Get names from either/both an argv list and a file
@@ -394,11 +415,8 @@ main(argc, argv)
 	/* get file name in argv list */
 	if (argv[ap]) {
 	    for ( ; ap < argc; ap++, nfiles++) {
-		if (nfiles >= MAX_DLB_FILES) {
-		    printf("Too many dlb files!  Stopping at %d.\n",
-								MAX_DLB_FILES);
-		    xexit(EXIT_FAILURE);
-		}
+		if (nfiles >= max_ld)
+		    ld = realloc_ld(ld, &max_ld);
 		ld[nfiles].fname = (char *) alloc(strlen(argv[ap]) + 1);
 		Strcpy(ld[nfiles].fname, argv[ap]);
 	    }
@@ -414,11 +432,8 @@ main(argc, argv)
 
 	    /* get file names, one per line */
 	    for ( ; fgets(buf, sizeof(buf), list); nfiles++) {
-		if (nfiles >= MAX_DLB_FILES) {
-		    printf("Too many dlb files!  Stopping at %d.\n",
-								MAX_DLB_FILES);
-		    xexit(EXIT_FAILURE);
-		}
+		if (nfiles >= max_ld)
+		    ld = realloc_ld(ld, &max_ld);
 		*(eos(buf)-1) = '\0';	/* strip newline */
 		ld[nfiles].fname = (char *) alloc(strlen(buf) + 1);
 		Strcpy(ld[nfiles].fname, buf);
