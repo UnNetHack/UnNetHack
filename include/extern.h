@@ -1216,6 +1216,8 @@ E struct mkroom * FDECL(pick_room,(BOOLEAN_P));
 E void FDECL(mkroom, (int));
 E void FDECL(fill_zoo, (struct mkroom *));
 E boolean FDECL(nexttodoor, (int,int));
+E boolean FDECL(bydoor, (int,int));
+E boolean FDECL(somexyspace, (struct mkroom *,coord *,int));
 E boolean FDECL(has_dnstairs, (struct mkroom *));
 E boolean FDECL(has_upstairs, (struct mkroom *));
 E int FDECL(somex, (struct mkroom *));
