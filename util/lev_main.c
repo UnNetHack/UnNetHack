@@ -220,6 +220,7 @@ int fatal_error = 0;
 int got_errors = 0;
 int be_verbose = 0;
 int decompile = 0;
+int fname_counter = 1;
 
 #ifdef FLEX23_BUG
 /* Flex 2.3 bug work around; not needed for 2.3.6 or later */
@@ -312,6 +313,7 @@ char **argv;
 			perror(fname);
 			errors_encountered = TRUE;
 		    } else {
+			fname_counter = 1;
 			init_yyin(fin);
 			(void) yyparse();
 			line_number = 1;
@@ -1575,6 +1577,29 @@ sp_lev *maze;
 	return TRUE;
 }
 
+char *
+mangle_fname(fname)
+     char *fname;
+{
+    static char buf[256];
+    char *p = strchr(fname, '%');
+
+    if (p) {
+	char buf2[256];
+	p++;
+	while (*p && (*p >= '0') && (*p <= '9')) p++;
+	if (*p != 'i') panic("Illegal counter variable '%%%c' in filename.", *p);
+	if (strchr(p, '%')) panic("Only one counter variable (%%i) in filename allowed.");
+	sprintf(buf2, "%s", fname);
+	sprintf(buf, buf2, fname_counter);
+	fname_counter++;
+    } else {
+	sprintf(buf, "%s", fname);
+    }
+    return buf;
+}
+
+
 /*
  * Open and write special level file.
  * Return TRUE on success, FALSE on failure.
@@ -1586,13 +1611,14 @@ sp_lev *lvl;
 {
 	int fout;
 	char lbuf[60];
+	char * mangled = mangle_fname(filename);
 
 	if (decompile) {
 	    lbuf[0] = '\0';
 #ifdef PREFIX
 	    Strcat(lbuf, PREFIX);
 #endif
-	    Strcat(lbuf, filename);
+	    Strcat(lbuf, mangled);
 	    Strcat(lbuf, "_lev.txt");
 	    fout = open(lbuf, O_TRUNC|O_WRONLY|O_CREAT, OMASK);
 	    if (fout < 0) return FALSE;
@@ -1604,7 +1630,7 @@ sp_lev *lvl;
 #ifdef PREFIX
 	Strcat(lbuf, PREFIX);
 #endif
-	Strcat(lbuf, filename);
+	Strcat(lbuf, mangled);
 	Strcat(lbuf, LEV_EXT);
 
 	fout = open(lbuf, O_WRONLY|O_CREAT|O_BINARY, OMASK);
