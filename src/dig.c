@@ -1353,12 +1353,14 @@ zap_dig()
 /* move objects from fobj/nexthere lists to buriedobjlist, keeping position */
 /* information */
 struct obj *
-bury_an_obj(otmp)
+bury_an_obj(otmp, dealloced)
 	struct obj *otmp;
+	boolean *dealloced; /* return TRUE if otmp was freed */
 {
 	struct obj *otmp2;
 	boolean under_ice;
 
+	if (dealloced) *dealloced = FALSE;
 #ifdef DEBUG
 	pline("bury_an_obj: %s", xname(otmp));
 #endif
@@ -1389,6 +1391,7 @@ bury_an_obj(otmp)
 	if (otmp->otyp == ROCK && !under_ice) {
 		/* merges into burying material */
 		obfree(otmp, (struct obj *)0);
+		if (dealloced) *dealloced = TRUE;
 		return(otmp2);
 	}
 	/*
@@ -1417,7 +1420,7 @@ int x, y;
 		pline("bury_objs: at %d, %d", x, y);
 #endif
 	for (otmp = level.objects[x][y]; otmp; otmp = otmp2)
-		otmp2 = bury_an_obj(otmp);
+		otmp2 = bury_an_obj(otmp, NULL);
 
 	/* don't expect any engravings here, but just in case */
 	del_engr_at(x, y);
@@ -1472,7 +1475,7 @@ long timeout;	/* unused */
 	    /* Everything which can be held in a container can also be
 	       buried, so bury_an_obj's use of obj_extract_self insures
 	       that Has_contents(obj) will eventually become false. */
-	    (void)bury_an_obj(obj->cobj);
+	    (void)bury_an_obj(obj->cobj, NULL);
 	}
 	obj_extract_self(obj);
 	obfree(obj, (struct obj *) 0);

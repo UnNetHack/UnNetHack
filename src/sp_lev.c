@@ -1853,7 +1853,13 @@ struct mkroom	*croom;
 		}
 	    } else {
 		remove_object(otmp);
-		(void) add_to_container(container_obj[container_idx-1], otmp);
+		if (container_obj[container_idx-1])
+		    (void) add_to_container(container_obj[container_idx-1], otmp);
+		else {
+		    obj_extract_self(otmp);
+		    obfree(otmp, NULL);
+		    return;
+		}
 	    }
 	}
 	/* container */
@@ -1918,9 +1924,12 @@ struct mkroom	*croom;
 	    begin_burn(otmp, FALSE);
 	}
 
-	if (o->buried && !o->containment) {
-	    /* What if we'd want to bury a container? bury_an_obj() may dealloc obj. */
-	    (void) bury_an_obj(otmp);
+	if (o->buried) {
+	    boolean dealloced;
+	    (void) bury_an_obj(otmp, &dealloced);
+	    if (dealloced && container_idx) {
+		container_obj[container_idx-1] = NULL;
+	    }
 	}
 }
 
