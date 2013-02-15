@@ -5610,7 +5610,7 @@ load_special(name)
 const char *name;
 {
 	dlb *fd;
-	sp_lev *lvl;
+	sp_lev *lvl = NULL;
 	boolean result = FALSE;
 	struct version_info vers_info;
 
@@ -5627,6 +5627,7 @@ const char *name;
 	result = sp_level_loader(fd, lvl);
 	if (result) result = sp_level_coder(lvl);
 	sp_level_free(lvl);
+	Free(lvl);
  give_up:
 	(void)dlb_fclose(fd);
 	return result;
