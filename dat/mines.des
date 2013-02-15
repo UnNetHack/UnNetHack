@@ -129,7 +129,7 @@ OBJECT:('%',"corpse"),random,montype:"watch captain"
 
 # Rubble!
 LOOP [9 + 2d5] {
-  OBJECT[90%]:('`',"boulder"),random
+  [90%]: OBJECT: ('`',"boulder"),random
   OBJECT:('*',"rock"),random
 }
 
@@ -178,7 +178,7 @@ MONSTER: ('o', "orc shaman"), (24,12), hostile
 # these are not such a big deal
 # to run into outside the bars
 LOOP [9 + 2d5] {
-  MONSTER[90%]: ('o', "hill orc"), random, hostile
+  [90%]: MONSTER:  ('o', "hill orc"), random, hostile
   MONSTER: ('o', "goblin"), random, hostile
 }
 

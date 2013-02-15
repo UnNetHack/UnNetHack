@@ -229,7 +229,7 @@ extern const char *fname;
 %type	<i> h_justif v_justif trap_name room_type door_state light_state
 %type	<i> alignment altar_type a_register roomfill door_pos
 %type	<i> alignment_prfx
-%type	<i> door_wall walled secret chance
+%type	<i> door_wall walled secret
 %type	<i> dir_list teleprt_detail
 %type	<i> object_infos object_info monster_infos monster_info
 %type	<i> levstatements stmt_block region_detail_end
@@ -470,6 +470,7 @@ levstatement 	: message
 		| forstatement
 		| loopstatement
 		| ifstatement
+		| chancestatement
 		| exitstatement
 		| breakstatement
 		| function_define
@@ -1033,6 +1034,36 @@ loopstatement	: LOOP_ID '[' integer_or_var ']'
 		  }
 		;
 
+chancestatement	: comparestmt ':'
+		  {
+		      struct opvar *tmppush2 = New(struct opvar);
+
+		      if (n_if_list >= MAX_NESTED_IFS) {
+			  lc_error("IF: Too deeply nested conditionals.");
+			  n_if_list = MAX_NESTED_IFS - 1;
+		      }
+
+		      add_opcode(splev, SPO_CMP, NULL);
+
+		      set_opvar_int(tmppush2, splev->n_opcodes+1);
+
+		      if_list[n_if_list++] = tmppush2;
+
+		      add_opcode(splev, SPO_PUSH, tmppush2);
+
+		      add_opcode(splev, reverse_jmp_opcode( $1 ), NULL);
+
+		  }
+		levstatement
+		  {
+		      if (n_if_list > 0) {
+			  struct opvar *tmppush;
+			  tmppush = (struct opvar *) if_list[--n_if_list];
+			  set_opvar_int(tmppush, splev->n_opcodes - tmppush->vardata.l);
+		      } else lc_error("IF: Huh?!  No start address?");
+		  }
+		;
+
 ifstatement 	: IF_ID comparestmt
 		  {
 		      struct opvar *tmppush2 = New(struct opvar);
@@ -1369,22 +1400,13 @@ mon_gen_part	: '(' integer_or_var ',' monster ')'
 		  }
 		;
 
-monster_detail	: MONSTER_ID chance ':' monster_desc
+monster_detail	: MONSTER_ID ':' monster_desc
 		  {
 		      add_opvars(splev, "io", 0, SPO_MONSTER);
-
-		      if ( 1 == $2 ) {
-			  if (n_if_list > 0) {
-			      struct opvar *tmpjmp;
-			      tmpjmp = (struct opvar *) if_list[--n_if_list];
-			      set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
-			  } else lc_error("Conditional creation of monster, but no jump point marker.");
-		      }
 		  }
-		| MONSTER_ID chance ':' monster_desc
+		| MONSTER_ID ':' monster_desc
 		  {
 		      add_opvars(splev, "io", 1, SPO_MONSTER);
-		      $<i>$ = $2;
 		      in_container_obj++;
 		      break_stmt_start();
 		  }
@@ -1393,13 +1415,6 @@ monster_detail	: MONSTER_ID chance ':' monster_desc
 		     break_stmt_end(splev);
 		     in_container_obj--;
 		     add_opvars(splev, "o", SPO_END_MONINVENT);
-		     if ( 1 == $<i>5 ) {
-			 if (n_if_list > 0) {
-			     struct opvar *tmpjmp;
-			     tmpjmp = (struct opvar *) if_list[--n_if_list];
-			     set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
-			 } else lc_error("Conditional creation of monster, but no jump point marker.");
-		     }
 		 }
 		;
 
@@ -1530,25 +1545,17 @@ seen_trap_mask	: STRING
 		  }
 		;
 
-object_detail	: OBJECT_ID chance ':' object_desc
+object_detail	: OBJECT_ID ':' object_desc
 		  {
 		      long cnt = 0;
 		      if (in_container_obj) cnt |= SP_OBJ_CONTENT;
 		      add_opvars(splev, "io", cnt, SPO_OBJECT);
-		      if ( 1 == $2 ) {
-			  if (n_if_list > 0) {
-			      struct opvar *tmpjmp;
-			      tmpjmp = (struct opvar *) if_list[--n_if_list];
-			      set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
-			  } else lc_error("conditional creation of obj, but no jump point marker.");
-		      }
 		  }
-		| COBJECT_ID chance ':' object_desc
+		| COBJECT_ID ':' object_desc
 		  {
 		      long cnt = SP_OBJ_CONTAINER;
 		      if (in_container_obj) cnt |= SP_OBJ_CONTENT;
 		      add_opvars(splev, "io", cnt, SPO_OBJECT);
-		      $<i>$ = $2;
 		      in_container_obj++;
 		      break_stmt_start();
 		  }
@@ -1557,14 +1564,6 @@ object_detail	: OBJECT_ID chance ':' object_desc
 		     break_stmt_end(splev);
 		     in_container_obj--;
 		     add_opcode(splev, SPO_POP_CONTAINER, NULL);
-
-		     if ( 1 == $<i>5 ) {
-			 if (n_if_list > 0) {
-			     struct opvar *tmpjmp;
-			     tmpjmp = (struct opvar *) if_list[--n_if_list];
-			     set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
-			 } else lc_error("Conditional creation of obj, but no jump point marker.");
-		     }
 		 }
 		;
 
@@ -1673,16 +1672,9 @@ object_info	: CURSE_TYPE
 		  }
 		;
 
-trap_detail	: TRAP_ID chance ':' trap_name ',' coord_or_var
+trap_detail	: TRAP_ID ':' trap_name ',' coord_or_var
 		  {
-		      add_opvars(splev, "io", (long)$4, SPO_TRAP);
-		      if ( 1 == $2 ) {
-			  if (n_if_list > 0) {
-			      struct opvar *tmpjmp;
-			      tmpjmp = (struct opvar *) if_list[--n_if_list];
-			      set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
-			  } else lc_error("Conditional creation of trap, but no jump point marker.");
-		      }
+		      add_opvars(splev, "io", (long)$3, SPO_TRAP);
 		  }
 		;
 
@@ -1837,17 +1829,9 @@ replace_terrain_detail : REPLACE_TERRAIN_ID ':' region_or_var ',' mapchar_or_var
 		  }
 		;
 
-terrain_detail : TERRAIN_ID chance ':' ter_selection ',' mapchar_or_var
+terrain_detail : TERRAIN_ID ':' ter_selection ',' mapchar_or_var
 		 {
 		     add_opvars(splev, "o", SPO_TERRAIN);
-
-		     if ( 1 == $2 ) {
-			 if (n_if_list > 0) {
-			     struct opvar *tmpjmp;
-			     tmpjmp = (struct opvar *) if_list[--n_if_list];
-			     set_opvar_int(tmpjmp, splev->n_opcodes - tmpjmp->vardata.l);
-			 } else lc_error("Conditional terrain modification, but no jump point marker.");
-		     }
 		 }
 	       ;
 
@@ -2657,28 +2641,6 @@ monsterid	: monster_ID
 
 terrainid	: terrain_ID
 		| TERRAIN_ID
-		;
-
-chance		: /* empty */
-		  {
-		      /* by default we just do it, unconditionally. */
-		      $$ = 0;
-		  }
-		| comparestmt
-		  {
-		      /* otherwise we generate an IF-statement */
-		      struct opvar *tmppush2 = New(struct opvar);
-		      if (n_if_list >= MAX_NESTED_IFS) {
-			  lc_error("Comparison: Too deeply nested IFs.");
-			  n_if_list = MAX_NESTED_IFS - 1;
-		      }
-		      add_opcode(splev, SPO_CMP, NULL);
-		      set_opvar_int(tmppush2, splev->n_opcodes+1);
-		      if_list[n_if_list++] = tmppush2;
-		      add_opcode(splev, SPO_PUSH, tmppush2);
-		      add_opcode(splev, reverse_jmp_opcode( $1 ), NULL);
-		      $$ = 1;
-		  }
 		;
 
 engraving_type	: ENGRAVING_TYPE

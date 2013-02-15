@@ -147,8 +147,8 @@ LOOP [4 + 2d3] {
 # Random monsters.
 LOOP [8 + 2d4] {
   MONSTER:('r',"rabid rat"),random
-  MONSTER[50%]:(';',"giant eel"),random
-  MONSTER[30%]:(';',"electric eel"),random
+  [50%]: MONSTER: (';',"giant eel"),random
+  [30%]: MONSTER: (';',"electric eel"),random
 }
 MONSTER:'r',random,hostile
 MONSTER:(';',"kraken"),random
@@ -229,7 +229,7 @@ MONSTER:(';',"shark"),random
 MONSTER:(';',"shark"),random
 MONSTER:';',random, hostile
 LOOP [5 + 2d5] {
-  MONSTER[90%]: 'D',random,hostile
+  [90%]: MONSTER:  'D',random,hostile
   MONSTER: 'S',random,hostile
 }
 
@@ -263,7 +263,7 @@ MONSTER: (';', "giant eel"), random
 MONSTER: (';', "electric eel"), random
 LOOP [3 + 1d4] {
   MONSTER: 'D',random,hostile
-  MONSTER[90%]: 'S',random,hostile
+  [90%]: MONSTER:  'S',random,hostile
 }
 #
 LOOP [3 + 1d3] {
@@ -296,7 +296,7 @@ MONSTER: (';', "electric eel"), random
 MONSTER: (';', "electric eel"), random
 LOOP [3 + 1d5] {
   MONSTER: 'D',random,hostile
-  MONSTER[90%]: 'S',random,hostile
+  [90%]: MONSTER:  'S',random,hostile
 }
 #
 LOOP [3 + 1d3] {

@@ -128,14 +128,14 @@ TERRAIN: filter(90%, grow(randline (60,1)-(60,20), 20)), '}'
 
 
 # "broken" walls
-OBJECT[90%]:('*',"rock"),(05,00),3d4
-OBJECT[50%]:('*',"rock"),(06,00),3d3
-OBJECT[50%]:('*',"rock"),(07,00),2d3
-OBJECT[25%]:('*',"rock"),(09,00),1d3
-OBJECT[90%]:('*',"rock"),(10,20),3d4
-OBJECT[50%]:('*',"rock"),(11,20),3d3
-OBJECT[50%]:('*',"rock"),(12,20),2d3
-OBJECT[25%]:('*',"rock"),(13,20),1d3
+[90%]: OBJECT: ('*',"rock"),(05,00),3d4
+[50%]: OBJECT: ('*',"rock"),(06,00),3d3
+[50%]: OBJECT: ('*',"rock"),(07,00),2d3
+[25%]: OBJECT: ('*',"rock"),(09,00),1d3
+[90%]: OBJECT: ('*',"rock"),(10,20),3d4
+[50%]: OBJECT: ('*',"rock"),(11,20),3d3
+[50%]: OBJECT: ('*',"rock"),(12,20),2d3
+[25%]: OBJECT: ('*',"rock"),(13,20),1d3
 
 # Random objects
 LOOP [3] {
@@ -146,7 +146,7 @@ LOOP [4] {
   TRAP:random,random
 }
 # Random monsters.
-MONSTER[25%]:(':',"giant turtle"),random
+[25%]: MONSTER: (':',"giant turtle"),random
 LOOP [5] {
   MONSTER:random,random
 }

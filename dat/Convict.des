@@ -49,12 +49,12 @@ MONSTER:('@',"inmate"),random
 MONSTER:('@',"inmate"),random
 MONSTER:('@',"inmate"),random
 # Corrupt guards
-MONSTER[50%]:('@',"prison guard"),random
-MONSTER[50%]:('@',"prison guard"),random
-MONSTER[50%]:('@',"prison guard"),random
-MONSTER[50%]:('@',"prison guard"),random
-MONSTER[50%]:('@',"prison guard"),random
-MONSTER[50%]:('@',"prison guard"),random
+[50%]: MONSTER: ('@',"prison guard"),random
+[50%]: MONSTER: ('@',"prison guard"),random
+[50%]: MONSTER: ('@',"prison guard"),random
+[50%]: MONSTER: ('@',"prison guard"),random
+[50%]: MONSTER: ('@',"prison guard"),random
+[50%]: MONSTER: ('@',"prison guard"),random
 # Good `ol mimics
 MONSTER:('m',"giant mimic"), (74,05), m_feature "staircase up"
 # Random traps
@@ -63,13 +63,13 @@ TRAP:"web",random
 TRAP:"web",random
 TRAP:"web",random
 # Prison debris
-OBJECT[75%]:('_', "iron chain"), random
-OBJECT[75%]:('_', "iron chain"), random
-OBJECT[75%]:('_', "iron chain"), random
-OBJECT[75%]:('_', "iron chain"), random
-OBJECT[75%]:('_', "iron chain"), random
-OBJECT[50%]:('0', "heavy iron ball"), random
-OBJECT[50%]:('0', "heavy iron ball"), random
+[75%]: OBJECT: ('_', "iron chain"), random
+[75%]: OBJECT: ('_', "iron chain"), random
+[75%]: OBJECT: ('_', "iron chain"), random
+[75%]: OBJECT: ('_', "iron chain"), random
+[75%]: OBJECT: ('_', "iron chain"), random
+[50%]: OBJECT: ('0', "heavy iron ball"), random
+[50%]: OBJECT: ('0', "heavy iron ball"), random
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 
@@ -334,30 +334,30 @@ MONSTER:('@',"inmate"),(11,14)
 MONSTER:('@',"inmate"),(06,05)
 # Undead prisoners
 MONSTER:(' ',"ghost"),(42,17),"Orzo the Inmate"
-MONSTER[50%]:(' ',"ghost"),(40,18),"Fredgar the Inmate"
-MONSTER[50%]:(' ',"ghost"),(06,12),"Rastilon the Inmate"
+[50%]: MONSTER: (' ',"ghost"),(40,18),"Fredgar the Inmate"
+[50%]: MONSTER: (' ',"ghost"),(06,12),"Rastilon the Inmate"
 MONSTER:('Z',"skeleton"),(28,15),awake
 # Bugs and snakes
 MONSTER:('S',"pit viper"),(06,17)
 MONSTER:('x',"xan"),random
 # Corrupt guards
-MONSTER[50%]:('@',"prison guard"),random
-MONSTER[50%]:('@',"prison guard"),random
-MONSTER[50%]:('@',"prison guard"),random
-MONSTER[50%]:('@',"prison guard"),random
+[50%]: MONSTER: ('@',"prison guard"),random
+[50%]: MONSTER: ('@',"prison guard"),random
+[50%]: MONSTER: ('@',"prison guard"),random
+[50%]: MONSTER: ('@',"prison guard"),random
 # Random traps
 TRAP:"web",random
 TRAP:"web",random
 TRAP:"web",random
 TRAP:"web",random
 # Prison debris
-OBJECT[75%]:('_', "iron chain"), random
-OBJECT[75%]:('_', "iron chain"), random
-OBJECT[75%]:('_', "iron chain"), random
-OBJECT[75%]:('_', "iron chain"), random
-OBJECT[75%]:('_', "iron chain"), random
-OBJECT[50%]:('0', "heavy iron ball"), random
-OBJECT[50%]:('0', "heavy iron ball"), random
+[75%]: OBJECT: ('_', "iron chain"), random
+[75%]: OBJECT: ('_', "iron chain"), random
+[75%]: OBJECT: ('_', "iron chain"), random
+[75%]: OBJECT: ('_', "iron chain"), random
+[75%]: OBJECT: ('_', "iron chain"), random
+[50%]: OBJECT: ('0', "heavy iron ball"), random
+[50%]: OBJECT: ('0', "heavy iron ball"), random
 
 
 LEVEL:"Con-filb"
@@ -383,24 +383,24 @@ MONSTER:('E',"earth elemental"),random
 MONSTER:('X',"xorn"),random
 MONSTER:('E',"earth elemental"),random
 # Other nasties
-MONSTER[50%]:('t',"lurker above"),random
-MONSTER[50%]:('t',"trapper"),random
-MONSTER[50%]:('t',"lurker above"),random
-MONSTER[50%]:('t',"trapper"),random
-MONSTER[50%]:('p',"rock piercer"),random
-MONSTER[50%]:('p',"rock piercer"),random
-MONSTER[50%]:('p',"iron piercer"),random
-MONSTER[50%]:('p',"iron piercer"),random
-MONSTER[50%]:('p',"glass piercer"),random
-MONSTER[50%]:('p',"glass piercer"),random
+[50%]: MONSTER: ('t',"lurker above"),random
+[50%]: MONSTER: ('t',"trapper"),random
+[50%]: MONSTER: ('t',"lurker above"),random
+[50%]: MONSTER: ('t',"trapper"),random
+[50%]: MONSTER: ('p',"rock piercer"),random
+[50%]: MONSTER: ('p',"rock piercer"),random
+[50%]: MONSTER: ('p',"iron piercer"),random
+[50%]: MONSTER: ('p',"iron piercer"),random
+[50%]: MONSTER: ('p',"glass piercer"),random
+[50%]: MONSTER: ('p',"glass piercer"),random
 # Tools and corpses
-OBJECT[50%]:('(', "pick-axe"), random
-OBJECT[75%]:('(', "brass lantern"), random
-OBJECT[50%]:'(', random
-OBJECT[25%]:('%', "corpse"), random, montype:"miner", 0
-OBJECT[25%]:('%', "corpse"), random, montype:"miner", 0
-OBJECT[25%]:('%', "corpse"), random, montype:"miner", 0
-OBJECT[25%]:('%', "corpse"), random, montype:"miner", 0
+[50%]: OBJECT: ('(', "pick-axe"), random
+[75%]: OBJECT: ('(', "brass lantern"), random
+[50%]: OBJECT: '(', random
+[25%]: OBJECT: ('%', "corpse"), random, montype:"miner", 0
+[25%]: OBJECT: ('%', "corpse"), random, montype:"miner", 0
+[25%]: OBJECT: ('%', "corpse"), random, montype:"miner", 0
+[25%]: OBJECT: ('%', "corpse"), random, montype:"miner", 0
 # Natural cavern hazards
 TRAP: "pit", random
 TRAP: "pit", random

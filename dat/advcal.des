@@ -129,14 +129,14 @@ OBJECT:('*',"worthless piece of orange glass"),random
 OBJECT:('*',"worthless piece of orange glass"),random
 OBJECT:('*',"worthless piece of orange glass"),random
 
-OBJECT[40%]:('*',"jade"),random
-OBJECT[40%]:('*',"agate"),random
-OBJECT[40%]:('*',"fluorite"),random
-OBJECT[40%]:('*',"jasper"),random
-OBJECT[40%]:('*',"amethyst"),random
-OBJECT[40%]:('*',"garnet"),random
-OBJECT[40%]:('*',"chrysoberyl"),random
-OBJECT[40%]:('*',"opal"),random
+[40%]: OBJECT: ('*',"jade"),random
+[40%]: OBJECT: ('*',"agate"),random
+[40%]: OBJECT: ('*',"fluorite"),random
+[40%]: OBJECT: ('*',"jasper"),random
+[40%]: OBJECT: ('*',"amethyst"),random
+[40%]: OBJECT: ('*',"garnet"),random
+[40%]: OBJECT: ('*',"chrysoberyl"),random
+[40%]: OBJECT: ('*',"opal"),random
 
 
 LEVEL:"advcal-2"

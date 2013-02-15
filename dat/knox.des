@@ -279,37 +279,37 @@ DRAWBRIDGE:(30,15),east,closed
 DRAWBRIDGE:(34,15),west,closed
 # Guards of first ringwall, with possible offensive wands
 MONSTER:'C',(31,02),hostile
-OBJECT[50%]: '/',(31,02)
+[50%]: OBJECT:  '/',(31,02)
 MONSTER:'C',(31,03),hostile
-OBJECT[50%]: '/',(31,03)
+[50%]: OBJECT:  '/',(31,03)
 MONSTER:'C',(31,07),hostile
-OBJECT[50%]: '/',(31,07)
+[50%]: OBJECT:  '/',(31,07)
 MONSTER:'C',(31,08),hostile
-OBJECT[50%]: '/',(31,08)
+[50%]: OBJECT:  '/',(31,08)
 MONSTER:'C',(31,12),hostile
-OBJECT[50%]: '/',(31,12)
+[50%]: OBJECT:  '/',(31,12)
 MONSTER:'C',(31,13),hostile
-OBJECT[50%]: '/',(31,13)
+[50%]: OBJECT:  '/',(31,13)
 MONSTER:'C',(31,17),hostile
-OBJECT[50%]: '/',(31,17)
+[50%]: OBJECT:  '/',(31,17)
 MONSTER:'C',(31,18),hostile
-OBJECT[50%]: '/',(31,18)
+[50%]: OBJECT:  '/',(31,18)
 MONSTER:'C',(33,02),hostile
-OBJECT[50%]: '/',(33,02)
+[50%]: OBJECT:  '/',(33,02)
 MONSTER:'C',(33,03),hostile
-OBJECT[50%]: '/',(33,03)
+[50%]: OBJECT:  '/',(33,03)
 MONSTER:'C',(33,07),hostile
-OBJECT[50%]: '/',(33,07)
+[50%]: OBJECT:  '/',(33,07)
 MONSTER:'C',(33,08),hostile
-OBJECT[50%]: '/',(33,08)
+[50%]: OBJECT:  '/',(33,08)
 MONSTER:'C',(33,12),hostile
-OBJECT[50%]: '/',(33,12)
+[50%]: OBJECT:  '/',(33,12)
 MONSTER:'C',(33,13),hostile
-OBJECT[50%]: '/',(33,13)
+[50%]: OBJECT:  '/',(33,13)
 MONSTER:'C',(33,17),hostile
-OBJECT[50%]: '/',(33,17)
+[50%]: OBJECT:  '/',(33,17)
 MONSTER:'C',(33,18),hostile
-OBJECT[50%]: '/',(33,18)
+[50%]: OBJECT:  '/',(33,18)
 # Drawbridges of second ringwall
 DRAWBRIDGE:(16,06),east,closed
 DRAWBRIDGE:(22,06),west,closed
@@ -320,20 +320,20 @@ DRAWBRIDGE:(22,14),west,closed
 # Guards of first ringwall, with possible offensive wands
 MONSTER:'C',(18,04),hostile
 MONSTER:'C',(20,04),hostile
-OBJECT[50%]:'/',(18,04)
-OBJECT[50%]:'/',(20,04)
+[50%]: OBJECT: '/',(18,04)
+[50%]: OBJECT: '/',(20,04)
 MONSTER:'C',(18,08),hostile
 MONSTER:'C',(20,08),hostile
-OBJECT[50%]:'/',(18,08)
-OBJECT[50%]:'/',(20,08)
+[50%]: OBJECT: '/',(18,08)
+[50%]: OBJECT: '/',(20,08)
 MONSTER:'C',(18,12),hostile
 MONSTER:'C',(20,12),hostile
-OBJECT[50%]:'/',(18,12)
-OBJECT[50%]:'/',(20,12)
+[50%]: OBJECT: '/',(18,12)
+[50%]: OBJECT: '/',(20,12)
 MONSTER:'C',(18,16),hostile
 MONSTER:'C',(20,16),hostile
-OBJECT[50%]:'/',(18,16)
-OBJECT[50%]:'/',(20,16)
+[50%]: OBJECT: '/',(18,16)
+[50%]: OBJECT: '/',(20,16)
 # Doors
 DOOR:closed,(04,14)
 DOOR:closed,(07,03)

@@ -106,9 +106,9 @@ CONTAINER:('(',"chest"),$place[6] {
     OBJECT:('"',"amulet of restful sleep")
 #  }
 }
-OBJECT[60%]:('[',"water walking boots"),$place[7]
-OBJECT[60%]:('[',"crystal plate mail"),$place[8]
-OBJECT[60%]:('+',"invisibility"),$place[9]
+[60%]: OBJECT: ('[',"water walking boots"),$place[7]
+[60%]: OBJECT: ('[',"crystal plate mail"),$place[8]
+[60%]: OBJECT: ('+',"invisibility"),$place[9]
 # Walls in the tower are non diggable
 NON_DIGGABLE:(00,00,14,10)
 
@@ -151,13 +151,13 @@ MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
-OBJECT[75%]:(')',"long sword"),$place[0]
+[75%]: OBJECT: (')',"long sword"),$place[0]
 TRAP:random,$place[0]
-OBJECT[75%]:('(',"lock pick"),$place[1]
+[75%]: OBJECT: ('(',"lock pick"),$place[1]
 TRAP:random,$place[1]
-OBJECT[75%]:('[',"elven cloak"),$place[2]
+[75%]: OBJECT: ('[',"elven cloak"),$place[2]
 TRAP:random,$place[2]
-OBJECT[75%]:('(',"blindfold"),$place[3]
+[75%]: OBJECT: ('(',"blindfold"),$place[3]
 TRAP:random,$place[3]
 # Walls in the tower are non diggable
 NON_DIGGABLE:(00,00,18,12)

@@ -295,11 +295,11 @@ MONSTER:('@',"Ashikaga Takauji"),(22,10) {
 }
 LOOP [3 + 1d6] {
   MONSTER:('@',"samurai"),random,hostile
-  MONSTER[90%]:('@',"ninja"),random,hostile
+  [90%]: MONSTER: ('@',"ninja"),random,hostile
   MONSTER:('d',"wolf"),random
-  MONSTER[50%]:'d',random
+  [50%]: MONSTER: 'd',random
   MONSTER:('E',"stalker"),random
-  MONSTER[90%]:('E',"stalker"),random
+  [90%]: MONSTER: ('E',"stalker"),random
 }
 
 

@@ -48,7 +48,7 @@ LOOP [6] {
   TRAP:random,random
 }
 # Random monsters.
-MONSTER[50%]:(':',"giant turtle"),random
+[50%]: MONSTER: (':',"giant turtle"),random
 LOOP [28] {
   MONSTER:random,random
 }
@@ -104,7 +104,7 @@ LOOP [6] {
   TRAP:random,random
 }
 # Random monsters.
-MONSTER[50%]:(':',"giant turtle"),random
+[50%]: MONSTER: (':',"giant turtle"),random
 LOOP [28] {
   MONSTER:random,random
 }
@@ -250,7 +250,7 @@ LOOP [6] {
   TRAP:random,random
 }
 # Random monsters.
-MONSTER[50%]:(':',"giant turtle"),random
+[50%]: MONSTER: (':',"giant turtle"),random
 LOOP [28] {
   MONSTER:random,random
 }
@@ -299,7 +299,7 @@ LOOP [6] {
   TRAP:random,random
 }
 
-MONSTER[50%]:(':',"giant turtle"),random
+[50%]: MONSTER: (':',"giant turtle"),random
 LOOP [28] {
   MONSTER:random,random
 }
@@ -349,7 +349,7 @@ LOOP [6] {
   TRAP:random,random
 }
 
-MONSTER[50%]:(':',"giant turtle"),random
+[50%]: MONSTER: (':',"giant turtle"),random
 LOOP [28] {
   MONSTER:random,random
 }
@@ -404,7 +404,7 @@ LOOP [6] {
   TRAP:random,random
 }
 
-MONSTER[50%]:(':',"giant turtle"),random
+[50%]: MONSTER: (':',"giant turtle"),random
 LOOP [28] {
   MONSTER:random,random
 }
@@ -503,7 +503,7 @@ LOOP [6] {
   TRAP:random,random
 }
 
-MONSTER[50%]:(':',"giant turtle"),random
+[50%]: MONSTER: (':',"giant turtle"),random
 LOOP [28] {
   MONSTER:random,random
 }

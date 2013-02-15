@@ -239,15 +239,15 @@ OBJECT:('%',"corpse"),random,montype:"wizard",0
 OBJECT:'[',random
 OBJECT:'[',random
 OBJECT:'[',random
-OBJECT[50%]:'[',random
+[50%]: OBJECT: '[',random
 OBJECT:')',random
 OBJECT:')',random
 OBJECT:')',random
-OBJECT[50%]:')',random
+[50%]: OBJECT: ')',random
 #
 # Some random loot.
 #
-OBJECT[50%]:('*',"ruby"),random
+[50%]: OBJECT: ('*',"ruby"),random
 OBJECT:'*',random
 OBJECT:'*',random
 OBJECT:'!',random
@@ -267,9 +267,9 @@ OBJECT:'(',random
 OBJECT:'(',random
 
 # (Not so) Random traps.
-TRAP[25%]:"spiked pit", (70,02)
-TRAP[25%]:"spiked pit", (61,05)
-TRAP[25%]:"sleep gas", (72,01)
+[25%]: TRAP: "spiked pit", (70,02)
+[25%]: TRAP: "spiked pit", (61,05)
+[25%]: TRAP: "sleep gas", (72,01)
 TRAP:"board", (56,12)
 TRAP:"board", random
 TRAP:"dart", (15,01)
@@ -296,15 +296,15 @@ MONSTER:'L',random
 # Some undead nasties for good measure
 MONSTER:'V',random
 MONSTER:'V',random
-MONSTER[50%]:'V',random
+[50%]: MONSTER: 'V',random
 MONSTER:'Z',random
 MONSTER:'Z',random
 MONSTER:'Z',random
-MONSTER[50%]:'Z',random
+[50%]: MONSTER: 'Z',random
 MONSTER:'M',random
 MONSTER:'M',random
 MONSTER:'M',random
-MONSTER[50%]:'M',random
+[50%]: MONSTER: 'M',random
 #
 # The Juiblex level
 #
@@ -658,7 +658,7 @@ OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
-OBJECT[50%]:random,random
+[50%]: OBJECT: random,random
 # The resident nasty
 MONSTER:('&',"Orcus"),(71,04) {
   OBJECT:('/',"death")
@@ -696,38 +696,38 @@ MONSTER:('Z',"skeleton"),random
 MONSTER:('Z',"skeleton"),random
 MONSTER:('Z',"skeleton"),random
 MONSTER:('Z',"skeleton"),random
-MONSTER[66%]:('Z',"skeleton"),random
-MONSTER[33%]:('Z',"skeleton"),random
+[66%]: MONSTER: ('Z',"skeleton"),random
+[33%]: MONSTER: ('Z',"skeleton"),random
 MONSTER:(' ',"shade"),random
 MONSTER:(' ',"shade"),random
 MONSTER:(' ',"shade"),random
 MONSTER:(' ',"shade"),random
-MONSTER[50%]:(' ',"shade"),random
+[50%]: MONSTER: (' ',"shade"),random
 MONSTER:('Z',"giant zombie"),random
 MONSTER:('Z',"giant zombie"),random
 MONSTER:('Z',"giant zombie"),random
-MONSTER[50%]:('Z',"giant zombie"),random
+[50%]: MONSTER: ('Z',"giant zombie"),random
 MONSTER:('Z',"ettin zombie"),random
 MONSTER:('Z',"ettin zombie"),random
 MONSTER:('Z',"ettin zombie"),random
-MONSTER[50%]:('Z',"ettin zombie"),random
+[50%]: MONSTER: ('Z',"ettin zombie"),random
 MONSTER:('Z',"human zombie"),random
 MONSTER:('Z',"human zombie"),random
 MONSTER:('Z',"human zombie"),random
-MONSTER[50%]:('Z',"human zombie"),random
+[50%]: MONSTER: ('Z',"human zombie"),random
 MONSTER:('V',"vampire"),random
 MONSTER:('V',"vampire"),random
 MONSTER:('V',"vampire"),random
-MONSTER[66%]:('V',"vampire"),random
-MONSTER[33%]:('V',"vampire"),random
+[66%]: MONSTER: ('V',"vampire"),random
+[33%]: MONSTER: ('V',"vampire"),random
 MONSTER:('V',"vampire lord"),random
 MONSTER:('V',"vampire lord"),random
-MONSTER[50%]:('V',"vampire lord"),random
+[50%]: MONSTER: ('V',"vampire lord"),random
 # A few more for the party
 MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
-MONSTER[50%]:random,random
+[50%]: MONSTER: random,random
 #
 # The Asmodeus Level
 #
@@ -1001,9 +1001,9 @@ MONSTER:('d',"hell hound"),(68,07)
 MONSTER:('j',"blue jelly"),(73,02)
 # Greeting in the outer chamber
 MONSTER:('i',"imp"),(69,17)
-OBJECT[50%]:('[',"helm of opposite alignment"),(65,17),cursed,-2
-OBJECT[50%]:('*',"loadstone"),(65,18),cursed,0
-OBJECT[50%]:('"',"amulet of strangulation"),(65,18),cursed,0
+[50%]: OBJECT: ('[',"helm of opposite alignment"),(65,17),cursed,-2
+[50%]: OBJECT: ('*',"loadstone"),(65,18),cursed,0
+[50%]: OBJECT: ('"',"amulet of strangulation"),(65,18),cursed,0
 #
 # The Baalzebub level
 #
@@ -1155,18 +1155,18 @@ MONSTER:'L',random
 MONSTER:(' ',"ghost"),random
 MONSTER:(' ',"ghost"),random
 MONSTER:(' ',"shade"),random
-MONSTER[50%]:(' ',"shade"),random
+[50%]: MONSTER: (' ',"shade"),random
 MONSTER:'&',random
 MONSTER:'&',random
 MONSTER:('&',"horned devil"),random
 MONSTER:('&',"horned devil"),random
 MONSTER:('&',"horned devil"),random
-MONSTER[50%]:('&',"horned devil"),random
+[50%]: MONSTER: ('&',"horned devil"),random
 MONSTER:('i',"lemure"),random
 MONSTER:('i',"lemure"),random
 MONSTER:('i',"lemure"),random
 MONSTER:('i',"lemure"),random
-MONSTER[50%]:('i',"lemure"),random
+[50%]: MONSTER: ('i',"lemure"),random
 # Some Vampires for good measure
 MONSTER:'V',random
 MONSTER:'V',random
@@ -1178,7 +1178,7 @@ MONSTER:'F',random
 MONSTER:('P',"green slime"),random
 MONSTER:'P',random
 MONSTER:'P',random
-MONSTER[50%]:'P',random
+[50%]: MONSTER: 'P',random
 
 #
 # The Sanctum Level

@@ -421,8 +421,8 @@ OBJECT:('`',"statue"),(22,07)
 OBJECT:('`',"statue"),(22,11)
 
 # the king (and his adviser[s])
-MONSTER[25%]:('H',"titan"),(23,09),hostile,asleep
-MONSTER[50%]:'V',(23,09),asleep
+[25%]: MONSTER: ('H',"titan"),(23,09),hostile,asleep
+[50%]: MONSTER: 'V',(23,09),asleep
 MONSTER:'V',(23,09),asleep
 
 # monsters in the water around the castle
@@ -691,10 +691,10 @@ OBJECT:(')',"arrow"),(18,07)
 OBJECT:(')',"arrow"),(18,08)
 OBJECT:(')',"arrow"),(18,09)
 OBJECT:(')',"arrow"),(18,10)
-OBJECT[20%]:(')',"silver arrow"),(18,07)
-OBJECT[20%]:(')',"elven arrow"),(18,08),blessed,+2
-OBJECT[20%]:(')',"elven arrow"),(18,09),blessed,+3
-OBJECT[20%]:(')',"silver arrow"),(18,10)
+[20%]: OBJECT: (')',"silver arrow"),(18,07)
+[20%]: OBJECT: (')',"elven arrow"),(18,08),blessed,+2
+[20%]: OBJECT: (')',"elven arrow"),(18,09),blessed,+3
+[20%]: OBJECT: (')',"silver arrow"),(18,10)
 OBJECT:(')',"bow"),(18,07),blessed,+1
 OBJECT:(')',"elven bow"),(18,08),blessed,+0
 OBJECT:(')',"elven bow"),(18,09)

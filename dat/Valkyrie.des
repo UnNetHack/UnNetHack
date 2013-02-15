@@ -263,7 +263,7 @@ LOOP [8 + 2d2] {
 #
 LOOP [3 + 2d2] {
   MONSTER: ('a', "fire ant"), random
-  MONSTER[80%]: ('H', "fire giant"), random, hostile
+  [80%]: MONSTER:  ('H', "fire giant"), random, hostile
 }
 MONSTER: 'a', random
 #

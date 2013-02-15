@@ -139,7 +139,7 @@ OBJECT:'?',$place[1]
 OBJECT:'?',$place[1]
 OBJECT:'?',$place[1]
 OBJECT:'?',$place[1]
-OBJECT[75%]:('(',"magic marker"),$place[2]
+[75%]: OBJECT: ('(',"magic marker"),$place[2]
 OBJECT:'!',$place[3]
 OBJECT:'!',$place[3]
 OBJECT:'!',$place[3]
@@ -235,18 +235,18 @@ ENDMAP
 NON_DIGGABLE:(3,1,23,7)
 BRANCH:levregion(1,0,79,20),(0,0,26,8)
 MAZEWALK:(0,0),south
-MONSTER[50%]:('h',"mind flayer"),random
-MONSTER[50%]:('h',"mind flayer"),random
-MONSTER[50%]:('h',"mind flayer"),random
-MONSTER[50%]:('h',"master mind flayer"),random
-MONSTER[50%]:('h',"master mind flayer"),random
+[50%]: MONSTER: ('h',"mind flayer"),random
+[50%]: MONSTER: ('h',"mind flayer"),random
+[50%]: MONSTER: ('h',"mind flayer"),random
+[50%]: MONSTER: ('h',"master mind flayer"),random
+[50%]: MONSTER: ('h',"master mind flayer"),random
 # mindless thralls
 MONSTER:('@',"barbarian"),random,hostile
 MONSTER:('@',"caveman"),random,hostile
 MONSTER:'O',random,hostile
 MONSTER:'T',random,hostile
 # future snack
-MONSTER[50%]:('@',"wizard"),random,hostile
+[50%]: MONSTER: ('@',"wizard"),random,hostile
 OBJECT:('(',"chest"),(11,2)
 OBJECT:('(',"chest"),(16,6)
 TRAP:"rust",(3,4)
@@ -368,19 +368,19 @@ OBJECT:'*',random
 OBJECT:'*',random
 OBJECT:'*',random
 OBJECT:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
 OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
 MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
@@ -429,11 +429,11 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 TRAP:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 
 GEOMETRY:center,center
 MAP
@@ -548,7 +548,7 @@ STAIR:random,down
 STAIR:levregion(1,0,39,20),(0,0,0,0),up
 # Not his lair, but he does hang out here sometimes,
 # Possibly wondering where his gnoll minions are.
-MONSTER[50%]:('&',"Yeenoghu"),random
+[50%]: MONSTER: ('&',"Yeenoghu"),random
 MAZEWALK:(0,8),west
 OBJECT:'*',random
 OBJECT:'*',random
@@ -565,7 +565,7 @@ OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
 LOOP [8] {
-  MONSTER[50%]:('H',"minotaur"),random
+  [50%]: MONSTER: ('H',"minotaur"),random
 }
 MONSTER:random,random
 MONSTER:random,random
@@ -692,10 +692,10 @@ LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
 .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
 ENDMAP
 BRANCH:levregion(1,0,79,20),(0,0,74,8)
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
 MONSTER:('D',"draken"),random,asleep
 MONSTER:('D',"draken"),random,asleep
 MONSTER:('D',"draken"),random,asleep
@@ -705,8 +705,8 @@ MONSTER:('D',"draken"),random,asleep
 MONSTER:('D',"draken"),random,asleep
 MONSTER:('D',"draken"),random,asleep
 MONSTER:('D',"draken"),random,asleep
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 #GOLD:random,random
 #GOLD:random,random
@@ -925,7 +925,7 @@ OBJECT:'*',random
 OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
-MONSTER[50%]:('H',"minotaur"),random
+[50%]: MONSTER: ('H',"minotaur"),random
 MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
@@ -1055,7 +1055,7 @@ OBJECT:random,random
 OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
-MONSTER[50%]:('H',"minotaur"),random
+[50%]: MONSTER: ('H',"minotaur"),random
 MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
@@ -1503,34 +1503,34 @@ OBJECT:'*',random
 OBJECT:'*',random
 OBJECT:'*',random
 OBJECT:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
 OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
 OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[50%]:('H',"minotaur"),random
-MONSTER[50%]:('H',"minotaur"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: ('H',"minotaur"),random
 LOOP [11] {
-  MONSTER[50%]:random,random
+  [50%]: MONSTER: random,random
 }
 #GOLD:random,random
 #GOLD:random,random
@@ -1549,11 +1549,11 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 TRAP:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 
 GEOMETRY:center,center
 MAP
@@ -1985,7 +1985,7 @@ OBJECT:random,random
 OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
-MONSTER[50%]:('H',"minotaur"),random
+[50%]: MONSTER: ('H',"minotaur"),random
 MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
@@ -2016,14 +2016,14 @@ MAP
 .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 ENDMAP
 BRANCH:(0,0,74,4),(0,0,0,0)
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 GEOMETRY:center,bottom
 MAP
@@ -2033,13 +2033,13 @@ MAP
 ---------------------------------------------------------------------------
 .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 GEOMETRY:left,top
 MAP
@@ -2057,14 +2057,14 @@ MAP
 -----------
 .-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 GEOMETRY:right,bottom
 MAP
@@ -2082,14 +2082,14 @@ MAP
 -----------
 .-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 GEOMETRY:center,top
@@ -2163,22 +2163,22 @@ MAP
 .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
 ENDMAP
 BRANCH:levregion(1,0,79,20),(0,0,0,0)
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[20%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[20%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 #GOLD:random,random
 
@@ -2190,22 +2190,22 @@ MAP
 ----------------------------------------------------------------------------
 .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[20%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[20%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 #GOLD:random,random
 
@@ -2267,7 +2267,7 @@ OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
-MONSTER[50%]:('H',"minotaur"),random
+[50%]: MONSTER: ('H',"minotaur"),random
 MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
@@ -2339,32 +2339,32 @@ OBJECT:'*',random
 OBJECT:'*',random
 OBJECT:'*',random
 OBJECT:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
 OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-MONSTER[50%]:('H',"minotaur"),random
-MONSTER[50%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
 #GOLD:random,random
 #GOLD:random,random
 #GOLD:random,random
@@ -2382,11 +2382,11 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 TRAP:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 
 #
 # Vbars4
@@ -2416,20 +2416,20 @@ MAP
 .-.-.-.-.-.-.-.-.-.-.
 ENDMAP
 BRANCH:levregion(1,0,79,20),(0,0,0,0)
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 #GOLD:random,random
 
@@ -2454,20 +2454,20 @@ MAP
 ---------------------
 .-.-.-.-.-.-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 #GOLD:random,random
 
@@ -2492,20 +2492,20 @@ MAP
 ---------------------
 .-.-.-.-.-.-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 #GOLD:random,random
 
@@ -2599,14 +2599,14 @@ MAP
 .-.-.-.-.-.-.-.
 ENDMAP
 BRANCH:levregion(1,0,79,20),(0,0,0,0)
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 GEOMETRY:left,bottom
@@ -2623,14 +2623,14 @@ MAP
 ---------------
 .-.-.-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 GEOMETRY:half-right,top
@@ -2647,13 +2647,13 @@ MAP
 ---------------
 .-.-.-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 GEOMETRY:half-left,top
@@ -2670,15 +2670,15 @@ MAP
 ---------------
 .-.-.-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 GEOMETRY:right,bottom
@@ -2777,13 +2777,13 @@ MAP
 .-.-.-.-.-.
 ENDMAP
 BRANCH:levregion(1,0,79,20),(0,0,0,0)
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
 MONSTER:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 GEOMETRY:half-right,top
@@ -2798,13 +2798,13 @@ MAP
 -----------
 .-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
 MONSTER:random,random
-TRAP[50%]:random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 GEOMETRY:half-left,bottom
@@ -2819,13 +2819,13 @@ MAP
 -----------
 .-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
 MONSTER:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 GEOMETRY:left,top
@@ -2840,13 +2840,13 @@ MAP
 -----------
 .-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
 MONSTER:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 GEOMETRY:right,bottom
@@ -2953,14 +2953,14 @@ MAP
 .-.-.-.-.-.-.-.
 ENDMAP
 BRANCH:levregion(1,0,79,20),(0,0,0,0)
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 GEOMETRY:left,top
@@ -2977,14 +2977,14 @@ MAP
 ---------------
 .-.-.-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 GEOMETRY:half-right,bottom
@@ -3001,13 +3001,13 @@ MAP
 ---------------
 .-.-.-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 GEOMETRY:half-left,bottom
@@ -3024,15 +3024,15 @@ MAP
 ---------------
 .-.-.-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 
@@ -3126,13 +3126,13 @@ MAP
 .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
 ENDMAP
 BRANCH:levregion(1,0,79,20),(0,0,0,0)
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 GEOMETRY:center,bottom
@@ -3143,13 +3143,13 @@ MAP
 ----------------------------------------------------------------------------
 .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 GEOMETRY:center,top
@@ -3208,7 +3208,7 @@ OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
-MONSTER[50%]:('H',"minotaur"),random
+[50%]: MONSTER: ('H',"minotaur"),random
 MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
@@ -3257,13 +3257,13 @@ MAP
 ---------
 .-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 GEOMETRY:left,center
@@ -3286,13 +3286,13 @@ MAP
 ---------
 .-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 GEOMETRY:right,center
@@ -3441,16 +3441,16 @@ MAP
 ---------
 .-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 #GOLD:random,random
 
@@ -3474,16 +3474,16 @@ MAP
 ---------
 .-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 #GOLD:random,random
 
@@ -3507,16 +3507,16 @@ MAP
 ---------
 .-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 #GOLD:random,random
 
@@ -3615,18 +3615,18 @@ MAP
 .-.-.-.-.
 ENDMAP
 BRANCH:levregion(1,0,79,20),(0,0,0,0)
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 #GOLD:random,random
 
@@ -3671,13 +3671,13 @@ MAP
 ---------
 .-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 
 GEOMETRY:half-right,center
@@ -3722,13 +3722,13 @@ MAP
 ---------
 .-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 GEOMETRY:half-left,center
 MAP
@@ -3772,18 +3772,18 @@ MAP
 ---------
 .-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 #GOLD:random,random
 
@@ -3861,24 +3861,24 @@ MAP
 .-.-.-.-.-.-.-.-.-.-.-.-.
 ENDMAP
 BRANCH:levregion(1,0,79,20),(0,0,0,0)
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 #GOLD:random,random
 
@@ -3902,24 +3902,24 @@ MAP
 -----------------
 .-.-.-.-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 #GOLD:random,random
 
@@ -3943,24 +3943,24 @@ MAP
 -----------------
 .-.-.-.-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 #GOLD:random,random
 
@@ -4060,24 +4060,24 @@ MAP
 .-.-.-.-.-.-.-.
 ENDMAP
 BRANCH:levregion(1,0,79,20),(0,0,0,0)
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 #GOLD:random,random
 
@@ -4101,24 +4101,24 @@ MAP
 ---------------
 .-.-.-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 #GOLD:random,random
 
@@ -4142,24 +4142,24 @@ MAP
 ---------------
 .-.-.-.-.-.-.-.
 ENDMAP
-OBJECT[50%]:'*',random
-OBJECT[50%]:'*',random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:random,random
-OBJECT[50%]:('`',"boulder"),random
-OBJECT[50%]:('`',"boulder"),random
-MONSTER[10%]:('H',"minotaur"),random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-MONSTER[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
-TRAP[50%]:random,random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: random,random
+[50%]: OBJECT: ('`',"boulder"),random
+[50%]: OBJECT: ('`',"boulder"),random
+[10%]: MONSTER: ('H',"minotaur"),random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: MONSTER: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
+[50%]: TRAP: random,random
 #GOLD:random,random
 #GOLD:random,random
 
