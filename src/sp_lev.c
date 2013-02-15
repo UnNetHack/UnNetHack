@@ -5109,7 +5109,8 @@ sp_lev *lvl;
 	    if (coder->failed_room[coder->n_subroom-1]) {
 		if (!room_stack)
 		    spo_endroom(coder);
-		room_stack--;
+		else
+		    room_stack--;
 	    } else {
 		spo_endroom(coder);
 	    }
