@@ -142,6 +142,8 @@ extern int fatal_error;
 extern int got_errors;
 extern int line_number;
 extern const char *fname;
+extern int is_rnd_vault;
+extern int rnd_vault_freq;
 
 %}
 
@@ -209,6 +211,7 @@ extern const char *fname;
 %token	<i> INCLUDE_ID
 %token	<i> SOUNDS_ID MSG_OUTPUT_TYPE
 %token	<i> WALLWALK_ID COMPARE_TYPE
+%token	<i> VAULTGEN_ID
 %token	<i> rect_ID fillrect_ID line_ID randline_ID grow_ID selection_ID flood_ID
 %token	<i> rndcoord_ID circle_ID ellipse_ID filter_ID
 %token	<i> gradient_ID GRADIENT_TYPE LIMITED
@@ -326,6 +329,9 @@ level_def	: LEVEL_ID ':' STRING
 			vardef_free_all(variable_definitions);
 			variable_definitions = NULL;
 
+			rnd_vault_freq = 1;
+			is_rnd_vault = 0;
+
 			$$ = $3;
 		  }
 		;
@@ -419,6 +425,8 @@ flags		: /* nothing */
 		  }
 		| FLAGS_ID ':' flag_list
 		  {
+		      if ($3 & FLAG_RNDVAULT)
+			  is_rnd_vault = 1;
 		      add_opvars(splev, "io", $3, SPO_LEVEL_FLAGS);
 		  }
 		;
@@ -476,6 +484,7 @@ levstatement 	: message
 		| function_define
 		| function_call
 		| corefunc_stmt
+		| vaultgen_stmt
 		| ladder_detail
 		| map_definition
 		| mazewalk_detail
@@ -1122,6 +1131,18 @@ if_ending	: stmt_block
 			  tmppush = (struct opvar *) if_list[--n_if_list];
 			  set_opvar_int(tmppush, splev->n_opcodes - tmppush->vardata.l);
 		      } else lc_error("IF: Huh?! No end address?");
+		  }
+		;
+
+vaultgen_stmt	: VAULTGEN_ID ':' INTEGER
+		  {
+		      if (is_rnd_vault) {
+			  if ($3 > 0)
+			      rnd_vault_freq = $3;
+			  else
+			      lc_error("Invalid VAULTGEN frequency");
+		      } else
+			  lc_error("VAULTGEN without rndvault FLAG.");
 		  }
 		;
 

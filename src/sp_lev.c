@@ -995,6 +995,10 @@ boolean vault;
 	register int x,y,hix = *lowx + *ddx, hiy = *lowy + *ddy;
 	register struct rm *lev;
 	int xlim, ylim, ymax;
+	xchar s_lowx, s_ddx, s_lowy, s_ddy;
+
+	s_lowx = *lowx; s_ddx = *ddx;
+	s_lowy = *lowy; s_ddy = *ddy;
 
 	xlim = XLIM + (vault ? 1 : 0);
 	ylim = YLIM + (vault ? 1 : 0);
@@ -1005,6 +1009,10 @@ boolean vault;
 	if (hiy > ROWNO-3)	hiy = ROWNO-3;
 chk:
 	if (hix <= *lowx || hiy <= *lowy)	return FALSE;
+
+	if (in_mk_rndvault &&
+	    (s_lowx != *lowx) && (s_ddx != *ddx)
+	    && (s_lowy != *lowy) && (s_ddy != *ddy)) return FALSE;
 
 	/* check area around room (and make room smaller if necessary) */
 	for (x = *lowx - xlim; x<= hix + xlim; x++) {
@@ -1020,6 +1028,7 @@ chk:
 				    debugpline("strange area [%d,%d] in check_room.",x,y);
 #endif
 				if (!rn2(3))	return FALSE;
+				if (in_mk_rndvault) return FALSE;
 				if (x < *lowx)
 				    *lowx = x + xlim + 1;
 				else
@@ -1034,6 +1043,11 @@ chk:
 	}
 	*ddx = hix - *lowx;
 	*ddy = hiy - *lowy;
+
+	if (in_mk_rndvault &&
+	    (s_lowx != *lowx) && (s_ddx != *ddx)
+	    && (s_lowy != *lowy) && (s_ddy != *ddy)) return FALSE;
+
 	return TRUE;
 }
 
@@ -1135,6 +1149,7 @@ xchar	rtype, rlit;
 			r2.hy = yabs + htmp;
 		} else {	/* Only some parameters are random */
 			int rndpos = 0;
+			xchar dx, dy;
 			if (xtmp < 0 && ytmp < 0) { /* Position is RANDOM */
 				xtmp = rnd(5);
 				ytmp = rnd(5);
@@ -1189,6 +1204,14 @@ xchar	rtype, rlit;
 			r2.hx = xabs + wtmp + rndpos;
 			r2.hy = yabs + htmp + rndpos;
 			r1 = get_rect(&r2);
+
+			dx = wtmp;
+			dy = htmp;
+
+			if (r1 && !check_room(&xabs, &dx, &yabs, &dy, vault)) {
+				r1 = 0;
+			}
+
 		}
 	} while (++trycnt <= 100 && !r1);
 	if (!r1) {	/* creation of room failed ? */
@@ -2398,7 +2421,7 @@ struct mkroom *mkr;
 #else
 		topologize(aroom);			/* set roomno */
 #endif
-		aroom->needfill = ((aroom->rtype != OROOM) && r->filled);
+		aroom->needfill = r->filled;
 	        return aroom;
 	}
 	return (struct mkroom *)0;
@@ -3266,6 +3289,7 @@ spo_level_flags(coder)
     if (flags & STORMY)       level.flags.stormy = 1;
     if (flags & GRAVEYARD)    level.flags.graveyard = 1;
     if (flags & SKYMAP)       level.flags.sky = 1;
+    if (flags & FLAG_RNDVAULT) coder->allow_flips = 0;
 
     opvar_free(flagdata);
 }
@@ -3432,6 +3456,7 @@ void
 spo_room(coder)
      struct sp_coder *coder;
 {
+    int isbigrm = FALSE;
     if (coder->n_subroom > MAX_NESTED_ROOMS)
 	panic("Too deeply nested rooms?!");
     else {
@@ -3464,6 +3489,8 @@ spo_room(coder)
 	tmproom.rlit = OV_i(rlit);
 	tmproom.filled = OV_i(filled);
 
+	isbigrm = ((tmproom.w * tmproom.h) > 20);
+
 	opvar_free(x);
 	opvar_free(y);
 	opvar_free(w);
@@ -3488,6 +3515,7 @@ spo_room(coder)
     coder->tmproomlist[coder->n_subroom] = (struct mkroom *)0;
     coder->failed_room[coder->n_subroom] = TRUE;
     coder->n_subroom++;
+    if (in_mk_rndvault && coder->opcode == SPO_ROOM && !isbigrm) rndvault_failed = TRUE;
 }
 
 void
@@ -4462,7 +4490,7 @@ spo_region(coder)
        an actual room to be created (such rooms are used to
        control placement of migrating monster arrivals) */
     room_not_needed = (OV_i(rtype) == OROOM &&
-		       !OV_i(rirreg) && !prefilled);
+		       !OV_i(rirreg) && !prefilled && !in_mk_rndvault);
     if (room_not_needed || nroom >= MAXNROFROOMS) {
 	region tmpregion;
 	if (!room_not_needed)
@@ -4491,6 +4519,7 @@ spo_region(coder)
     if (OV_i(rirreg)) {
 	min_rx = max_rx = dx1;
 	min_ry = max_ry = dy1;
+	smeq[nroom] = nroom;
 	flood_fill_rm(dx1, dy1, nroom+ROOMOFFSET,
 		      OV_i(rlit), TRUE);
 	add_room(min_rx, min_ry, max_rx, max_ry,
@@ -4506,6 +4535,8 @@ spo_region(coder)
 	topologize(troom);                    /* set roomno */
 #endif
     }
+
+    if (in_mk_rndvault && prefilled) troom->needfill = 1;
 
     if (!room_not_needed) {
 	if (coder->n_subroom > 1)
@@ -4718,6 +4749,7 @@ spo_map(coder)
     struct opvar *mpxs, *mpys, *mpmap, *mpa, *mpkeepr, *mpzalign;
     xchar halign, valign;
     xchar tmpxstart, tmpystart, tmpxsize, tmpysize;
+    int tryct = 0;
 
     if (!OV_pop_i(mpxs) ||
 	!OV_pop_i(mpys) ||
@@ -4725,6 +4757,8 @@ spo_map(coder)
 	!OV_pop_i(mpkeepr) ||
 	!OV_pop_i(mpzalign) ||
 	!OV_pop_c(mpa)) return;
+
+redo_maploc:
 
     tmpmazepart.xsize = OV_i(mpxs);
     tmpmazepart.ysize = OV_i(mpys);
@@ -4774,6 +4808,10 @@ spo_map(coder)
 	break;
     }
     if ((ystart < 0) || (ystart + ysize > ROWNO)) {
+	if (in_mk_rndvault) {
+	    coder->exit_script = TRUE;
+	    goto skipmap;
+	}
 	/* try to move the start a bit */
 	ystart += (ystart > 0) ? -2 : 2;
 	if(ysize == ROWNO) ystart = 0;
@@ -4787,6 +4825,37 @@ spo_map(coder)
 	ysize = ROWNO;
     } else {
 	xchar x,y;
+	/* random vault should never overwrite anything */
+	if (in_mk_rndvault) {
+	    boolean isokp = TRUE;
+	    for(y = ystart - 1; y < ystart+ysize + 1; y++)
+		for(x = xstart - 1; x < xstart+xsize + 1; x++) {
+		    xchar mptyp;
+		    if (!isok(x,y)) {
+			isokp = FALSE;
+		    } else if (y < ystart || y >= (ystart+ysize) ||
+			x < xstart || x >= (xstart+xsize)) {
+			if (levl[x][y].typ != STONE) isokp = FALSE;
+			if (levl[x][y].roomno != NO_ROOM) isokp = FALSE;
+		    } else {
+			mptyp = (mpmap->vardata.str[(y-ystart+1) * xsize + (x-xstart+1)] - 1);
+			if (mptyp >= MAX_TYPE) continue;
+			if (isok(x,y)) {
+			    if (levl[x][y].typ != STONE && levl[x][y].typ != mptyp) isokp = FALSE;
+			    if (levl[x][y].roomno != NO_ROOM) isokp = FALSE;
+			} else isokp = FALSE;
+		    }
+		    if (!isokp) {
+			if ((tryct++ < 100) && (tmpmazepart.zaligntyp == 2) &&
+			    ((tmpmazepart.halign < 0) || (tmpmazepart.valign < 0)) /* rnd pos */ )
+			    goto redo_maploc;
+			if (!((xsize * ysize) > 20)) /* !isbig() */
+			    rndvault_failed = TRUE;
+			coder->exit_script = TRUE;
+			goto skipmap;
+		    }
+		}
+	}
 	/* Load the map */
 	for(y = ystart; y < ystart+ysize; y++)
 	    for(x = xstart; x < xstart+xsize; x++) {
@@ -4820,7 +4889,7 @@ spo_map(coder)
 		else if(levl[x][y].typ == LAVAPOOL)
 		    levl[x][y].lit = 1;
 	    }
-	if (coder->lvl_is_joined)
+	if (coder->lvl_is_joined && !in_mk_rndvault)
 	    remove_rooms(xstart, ystart, xstart+xsize, ystart+ysize);
     }
     if (!OV_i(mpkeepr)) {
@@ -4828,6 +4897,7 @@ spo_map(coder)
 	xsize = tmpxsize; ysize = tmpysize;
     }
 
+skipmap:
     opvar_free(mpxs);
     opvar_free(mpys);
     opvar_free(mpmap);
@@ -5035,6 +5105,7 @@ sp_lev *lvl;
     coder->n_subroom = 1;
     coder->exit_script = FALSE;
     coder->lvl_is_joined = 0;
+    rndvault_failed = FALSE;
 
     for (tmpi = 0; tmpi <= MAX_NESTED_ROOMS; tmpi++) {
 	coder->tmproomlist[tmpi] = (struct mkroom *)0;
@@ -5067,6 +5138,8 @@ sp_lev *lvl;
 	    impossible("Level script is taking too much time, stopping.");
 	    coder->exit_script = TRUE;
 	}
+
+	if (rndvault_failed) coder->exit_script = TRUE;
 
 	if (coder->failed_room[coder->n_subroom-1] &&
 	    coder->opcode != SPO_ENDROOM &&
@@ -5606,6 +5679,40 @@ next_opcode:
  * General loader
  */
 
+struct _sploader_cache {
+    char *fname;
+    sp_lev *lvl;
+    struct _sploader_cache *next;
+};
+
+struct _sploader_cache *sp_loader_cache = NULL;
+
+sp_lev *
+sp_lev_cache(fnam)
+char *fnam;
+{
+    struct _sploader_cache *tmp = sp_loader_cache;
+
+    while (tmp) {
+	if (!strcmp(tmp->fname, fnam)) return tmp->lvl;
+	tmp = tmp->next;
+    }
+    return NULL;
+}
+
+void
+sp_lev_savecache(fnam, lvl)
+char *fnam;
+sp_lev *lvl;
+{
+    struct _sploader_cache *tmp = (struct _sploader_cache *)alloc(sizeof(struct _sploader_cache));
+    if (!tmp) panic("save splev cache");
+    tmp->lvl = lvl;
+    tmp->fname = strdup(fnam);
+    tmp->next = sp_loader_cache;
+    sp_loader_cache = tmp;
+}
+
 boolean
 load_special(name)
 const char *name;
@@ -5615,22 +5722,29 @@ const char *name;
 	boolean result = FALSE;
 	struct version_info vers_info;
 
-	fd = dlb_fopen_area(FILE_AREA_UNSHARE, name, RDBMODE);
-	if (!fd) return FALSE;
+	if (!(lvl = sp_lev_cache(name))) {
+	    fd = dlb_fopen_area(FILE_AREA_UNSHARE, name, RDBMODE);
+	    if (!fd) return FALSE;
+	    Fread((genericptr_t) &vers_info, sizeof vers_info, 1, fd);
+	    if (!check_version(&vers_info, name, TRUE)) {
+		(void)dlb_fclose(fd);
+		goto give_up;
+	    }
+	    lvl = (sp_lev *)alloc(sizeof(sp_lev));
+	    if (!lvl) panic("alloc sp_lev");
+	    result = sp_level_loader(fd, lvl);
+	    (void)dlb_fclose(fd);
+	    if (in_mk_rndvault) sp_lev_savecache(name, lvl);
+	    if (result) result = sp_level_coder(lvl);
+	    if (!in_mk_rndvault) {
+		sp_level_free(lvl);
+		Free(lvl);
+	    }
+	} else {
+	    result = sp_level_coder(lvl);
+	}
 
-	Fread((genericptr_t) &vers_info, sizeof vers_info, 1, fd);
-	if (!check_version(&vers_info, name, TRUE))
-	    goto give_up;
-
-	lvl = (sp_lev *)alloc(sizeof(sp_lev));
-	if (!lvl) panic("alloc sp_lev");
-
-	result = sp_level_loader(fd, lvl);
-	if (result) result = sp_level_coder(lvl);
-	sp_level_free(lvl);
-	Free(lvl);
  give_up:
-	(void)dlb_fclose(fd);
 	return result;
 }
 

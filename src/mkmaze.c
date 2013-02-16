@@ -663,6 +663,7 @@ register const char *s;
 
 	if(*protofile) {
 	    Strcat(protofile, LEV_EXT);
+	    in_mk_rndvault = FALSE;
 	    if(load_special(protofile)) {
 		fixup_special();
 		/* some levels can end up with monsters

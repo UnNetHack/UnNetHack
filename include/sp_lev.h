@@ -31,6 +31,8 @@
 #define GRAVEYARD	0x00000800L
 #define SKYMAP		0x00001000L
 #define SHEOL_LEV	0x00002000L
+#define FLAG_RNDVAULT	0x00004000L
+
 
 /* different level layout initializers */
 #define LVLINIT_NONE		0

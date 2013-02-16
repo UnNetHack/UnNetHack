@@ -187,6 +187,7 @@ FUNCTION	{ savetoken(yytext); return FUNCTION_ID; }
 INCLUDE		{ savetoken(yytext); return INCLUDE_ID; }
 SOUNDS		{ savetoken(yytext); return SOUNDS_ID; }
 SHUFFLE		{ savetoken(yytext); return SHUFFLE_ID; }
+VAULTGEN	{ savetoken(yytext); return VAULTGEN_ID; }
 montype		{ savetoken(yytext); return MONTYPE_ID; }
 selection	{ savetoken(yytext); return selection_ID; }
 rect		{ savetoken(yytext); return rect_ID; }
@@ -282,6 +283,7 @@ blood		{ savetoken(yytext); yylval.i=ENGR_BLOOD; return ENGRAVING_TYPE; }
 blessed		{ savetoken(yytext); yylval.i=1; return CURSE_TYPE; }
 uncursed	{ savetoken(yytext); yylval.i=2; return CURSE_TYPE; }
 cursed		{ savetoken(yytext); yylval.i=3; return CURSE_TYPE; }
+rndvault	{ savetoken(yytext); yylval.i=FLAG_RNDVAULT; return FLAG_TYPE; }
 noteleport	{ savetoken(yytext); yylval.i=NOTELEPORT; return FLAG_TYPE; }
 sheol		{ savetoken(yytext); yylval.i=SHEOL_LEV; return FLAG_TYPE; }
 hardfloor	{ savetoken(yytext); yylval.i=HARDFLOOR; return FLAG_TYPE; }

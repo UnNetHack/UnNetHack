@@ -11,7 +11,7 @@ EXEEXT = @EXEEXT@
 # SHELL=E:/GEMINI2/MUPFEL.TTP
 # UUDECODE=uudecode
 
-VARDAT = data rumors quest.dat oracles options
+VARDAT = data rumors quest.dat oracles options vaults.dat
 LEVCOMP_FLAGS=
 
 all:	$(VARDAT) spec_levs quest_levs dungeon
@@ -282,6 +282,8 @@ quest.dat:	quest.txt ../util/makedefs
 oracles:	oracles.txt ../util/makedefs
 	../util/makedefs -h
 
+vaults.dat:	spec_levs
+
 # note: 'options' should have already been made when include/date.h was created
 options:	../util/makedefs
 	../util/makedefs -v
@@ -295,7 +297,10 @@ spec_levs: ../util/lev_comp \
 	medusa.des \
 	mines.des nymph.des oracle.des \
 	sheol.des \
-	sokoban.des tower.des yendor.des
+	sokoban.des tower.des yendor.des \
+	vaults.des
+	-rm -f vaults.dat
+	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/vaults.des
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/advcal.des
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/bigroom.des
 	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/blkmar.des
@@ -343,7 +348,7 @@ dungeon: $(srcdir)/dungeon.def ../util/makedefs ../util/dgn_comp
 	../util/dgn_comp dungeon.pdf
 
 spotless:
-	-rm -f spec_levs quest_levs *.lev $(VARDAT) dungeon dungeon.pdf
+	-rm -f spec_levs quest_levs *.lev $(VARDAT) dungeon dungeon.pdf vaults.dat
 	-rm -f nhdat x11tiles beostiles pet_mark.xbm rip.xpm mapbg.xpm
 	-rm -f rip.img GEM_RSC.RSC title.img nh16.img UnNetHack.ad
 	-rm -f options guioptions ttyoptions

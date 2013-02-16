@@ -181,6 +181,7 @@ static struct {
 	/* for historical reasons, room types are not contiguous numbers */
 	/* (type 1 is skipped) */
 	{ "ordinary",	 OROOM },
+	{ "rndvault",	 RNDVAULT },
 	{ "throne",	 COURT },
 	{ "swamp",	 SWAMP },
 	{ "vault",	 VAULT },
@@ -220,6 +221,8 @@ int fatal_error = 0;
 int got_errors = 0;
 int be_verbose = 0;
 int decompile = 0;
+int is_rnd_vault = 0;
+int rnd_vault_freq = 1;
 int fname_counter = 1;
 
 #ifdef FLEX23_BUG
@@ -1645,6 +1648,19 @@ sp_lev *lvl;
           return FALSE;
 
 	(void) close(fout);
+
+	if (is_rnd_vault) {
+	    char debuf[256];
+	    lbuf[0] = '\0';
+#ifdef PREFIX
+	    Strcat(lbuf, PREFIX);
+#endif
+	    Strcat(lbuf, "vaults.dat");
+	    fout = open(lbuf, O_WRONLY|O_APPEND|O_CREAT, OMASK);
+	    snprintf(debuf, 255, "%i %s\n", rnd_vault_freq, mangled);
+	    Write(fout, debuf, strlen(debuf));
+	    (void) close(fout);
+	}
 
 	return TRUE;
 }
