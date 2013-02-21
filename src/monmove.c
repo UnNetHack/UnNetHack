@@ -403,6 +403,9 @@ register struct monst *mtmp;
 			/* various conditions before sharing
 			 * is allowed.
 			 *
+			 * Both parts have to be actually alive. (that is,
+			 * hp is greater than 0).
+			 *
 			 * Peacefuls can share hp with hostiles.
 			 * They are "symphathetic" with the hostiles. 
 			 *
@@ -412,6 +415,8 @@ register struct monst *mtmp;
 			if (is_blinker(currmon->data) &&
 			     currmon->data == mdat &&
 			     currmon != mtmp &&
+			     currmon->mhp > 0 &&
+			     mtmp->mhp > 0 &&
 			     ((!currmon->mtame && !mtmp->mtame) ||
 			      (currmon->mtame && mtmp->mtame)) &&
 			     abs(currmon->mx - mtmp->mx) <= 1 &&
