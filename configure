@@ -2710,9 +2710,17 @@ else
   enable_dummy_graphics="no"
 fi
 
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking dummy-graphics" >&5
+$as_echo_n "checking dummy-graphics... " >&6; }
   if test "$enable_dummy_graphics" != "no"; then
     nethack_wins="dummy $nethack_wins"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
   fi
+
 # Check whether --enable-dummy-graphics was given.
 if test "${enable_dummy_graphics+set}" = set; then :
   enableval=$enable_dummy_graphics; enable_dummy_graphics="$enableval"
@@ -2720,9 +2728,17 @@ else
   enable_dummy_graphics="no"
 fi
 
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking dummy-graphics" >&5
+$as_echo_n "checking dummy-graphics... " >&6; }
   if test "$enable_dummy_graphics" != "no"; then
     nethack_wins="dummy $nethack_wins"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
   fi
+
 # Check whether --enable-curses-graphics was given.
 if test "${enable_curses_graphics+set}" = set; then :
   enableval=$enable_curses_graphics; enable_curses_graphics="$enableval"
@@ -2730,9 +2746,17 @@ else
   enable_curses_graphics="no"
 fi
 
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking curses-graphics" >&5
+$as_echo_n "checking curses-graphics... " >&6; }
   if test "$enable_curses_graphics" != "no"; then
     nethack_wins="curses $nethack_wins"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
   fi
+
 # Check whether --enable-tty-graphics was given.
 if test "${enable_tty_graphics+set}" = set; then :
   enableval=$enable_tty_graphics; enable_tty_graphics="$enableval"
@@ -2740,9 +2764,17 @@ else
   enable_tty_graphics="auto"
 fi
 
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking tty-graphics" >&5
+$as_echo_n "checking tty-graphics... " >&6; }
   if test "$enable_tty_graphics" != "no"; then
     nethack_wins="tty $nethack_wins"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
   fi
+
 # Check whether --enable-x11-graphics was given.
 if test "${enable_x11_graphics+set}" = set; then :
   enableval=$enable_x11_graphics; enable_x11_graphics="$enableval"
@@ -2750,9 +2782,17 @@ else
   enable_x11_graphics="no"
 fi
 
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking x11-graphics" >&5
+$as_echo_n "checking x11-graphics... " >&6; }
   if test "$enable_x11_graphics" != "no"; then
     nethack_wins="x11 $nethack_wins"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
   fi
+
 # Check whether --enable-mswin-graphics was given.
 if test "${enable_mswin_graphics+set}" = set; then :
   enableval=$enable_mswin_graphics; enable_mswin_graphics="$enableval"
@@ -2760,9 +2800,17 @@ else
   enable_mswin_graphics="no"
 fi
 
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking mswin-graphics" >&5
+$as_echo_n "checking mswin-graphics... " >&6; }
   if test "$enable_mswin_graphics" != "no"; then
     nethack_wins="mswin $nethack_wins"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
   fi
+
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'

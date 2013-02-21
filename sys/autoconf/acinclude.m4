@@ -47,9 +47,14 @@ AC_DEFUN([NETHACK_WIN_ENABLE],[AC_ARG_ENABLE($1-graphics,
   [AC_HELP_STRING([--enable-$1-graphics],
     m4_ifval([$3],[$3],[use $1-graphics]) [(default=$2)])],
   [enable_$1_graphics="$enableval"], [enable_$1_graphics="$2"])
+  AC_MSG_CHECKING([$1-graphics])
   if test "$enable_$1_graphics" != "no"; then
     nethack_wins="$1 $nethack_wins"
-  fi])
+    AC_MSG_RESULT([yes])
+  else
+    AC_MSG_RESULT([no])
+  fi
+  ])
 
 # NETHACK_AUTO_WIN_DISABLE(win)
 # -----------------------------
