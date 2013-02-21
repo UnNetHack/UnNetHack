@@ -2721,24 +2721,6 @@ $as_echo "yes" >&6; }
 $as_echo "no" >&6; }
   fi
 
-# Check whether --enable-dummy-graphics was given.
-if test "${enable_dummy_graphics+set}" = set; then :
-  enableval=$enable_dummy_graphics; enable_dummy_graphics="$enableval"
-else
-  enable_dummy_graphics="no"
-fi
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking dummy-graphics" >&5
-$as_echo_n "checking dummy-graphics... " >&6; }
-  if test "$enable_dummy_graphics" != "no"; then
-    nethack_wins="dummy $nethack_wins"
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-  else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-  fi
-
 # Check whether --enable-curses-graphics was given.
 if test "${enable_curses_graphics+set}" = set; then :
   enableval=$enable_curses_graphics; enable_curses_graphics="$enableval"

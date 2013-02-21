@@ -27,7 +27,6 @@ dnl  ----- Window systems
 nethack_default_win=""
 # Note: Order is important: The last listed enabled port will be the default.
 NETHACK_WIN_ENABLE(dummy, no, [dummy graphics for unit tests])
-NETHACK_WIN_ENABLE(dummy, no, [dummy graphics for unit tests])
 NETHACK_WIN_ENABLE(curses, no, [use curses interface])
 NETHACK_WIN_ENABLE(tty, auto)
 NETHACK_WIN_ENABLE(x11, no)
