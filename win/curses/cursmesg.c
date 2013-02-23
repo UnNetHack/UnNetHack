@@ -128,7 +128,7 @@ void curses_message_win_puts(const char *message, boolean recursed)
     if ((mx == border_space) && ((message_length + 2) > width))
     {
         tmpstr = curses_break_str(message, (width - 2), 1);
-        mvwprintw(win, my, mx, tmpstr);
+        mvwprintw(win, my, mx, "%s", tmpstr);
         mx += strlen(tmpstr);
         if (strlen(tmpstr) < (width - 2))
         {
@@ -145,7 +145,7 @@ void curses_message_win_puts(const char *message, boolean recursed)
     }
     else
     {
-        mvwprintw(win, my, mx, message);
+        mvwprintw(win, my, mx, "%s", message);
         curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
         mx += message_length + 1;
     }
