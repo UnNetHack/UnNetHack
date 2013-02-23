@@ -8,6 +8,7 @@
 	* Removed the Quest turn limit
 	* Player vampire gets a charisma bonus when wearing an opera cloak (by L)
 	* Some monster vampires get an opera cloak (from Slash'Em)
+	* Dump log: mark starting inventory items with a *
 	
 	* New config option for customizing monster letter in UTF8graphics:
 	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke

@@ -100,7 +100,8 @@ struct obj {
 	Bitfield(was_thrown,1);	/* thrown by the hero since last picked up */
 	Bitfield(odrained,1);	/* drained corpse */
 	Bitfield(was_dropped,1); /* dropped deliberately by the hero */
-	/* 3 free bits */
+	Bitfield(was_in_starting_inventory,1); /* hero started with this item */
+	/* 2 free bits */
 
 	int	corpsenm;	/* type of corpse is mons[corpsenm] */
 #define leashmon  corpsenm	/* gets m_id of attached pet */

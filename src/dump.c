@@ -186,8 +186,9 @@ const struct obj *obj;
 const char *str;
 {
 #ifdef DUMP_LOG
+	char *starting_inventory = obj->was_in_starting_inventory ? "*" : "";
 	if (dump_fp)
-		fprintf(dump_fp, "  %c - %s\n", c, str);
+		fprintf(dump_fp, "  %c - %s%s\n", c, str, starting_inventory);
 	if (html_dump_fp) {
 		char *link = html_link(dump_typename(obj->otyp), str);
 #ifdef MENU_COLOR
@@ -196,11 +197,11 @@ const char *str;
 		int attr;
 		if (iflags.use_menu_color &&
 		    get_menu_coloring(str, &color, &attr)) {
-			fprintf(html_dump_fp, "<span class=\"nh_color_%d\"><span class=\"nh_item_letter\">%c</span> - %s</span><br />\n", color, c, link);
+			fprintf(html_dump_fp, "<span class=\"nh_color_%d\"><span class=\"nh_item_letter\">%c</span> - %s</span>%s<br />\n", color, c, link, starting_inventory);
 		} else
 # endif
 #endif
-		fprintf(html_dump_fp, "<span class=\"nh_item_letter\">%c</span> - %s<br />\n", c, link);
+		fprintf(html_dump_fp, "<span class=\"nh_item_letter\">%c</span> - %s%s<br />\n", c, link, starting_inventory);
 	}
 #endif
 }
