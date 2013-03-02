@@ -350,6 +350,11 @@ tiletxt.o: $(srcdir)/../win/share/tilemap.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -DTILETEXT $(srcdir)/../win/share/tilemap.c
 	mv tilemap.o tiletxt.o
 
+tilelist.o: $(srcdir)/../win/share/tilemap.c $(HACK_H)
+	$(CC) $(CFLAGS) -DTILETEXT -DTILELIST -o tilelist.o -c $(srcdir)/../win/share/tilemap.c
+tilelist: tilelist.o
+	$(CC) $(CFLAGS) $(LFLAGS) ../src/monst.o ../src/objects.o ../src/decl.o ../src/drawing.o tilelist.o -o tilelist
+
 gifread.o: $(srcdir)/../win/share/gifread.c $(CONFIG_H) ../include/tile.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/share/gifread.c
 ppmwrite.o: $(srcdir)/../win/share/ppmwrite.c $(CONFIG_H) ../include/tile.h

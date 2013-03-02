@@ -267,6 +267,34 @@ int set, entry;
 	return buf;
 }
 
+#ifdef TILELIST
+int main()
+{
+	int i;
+	char filename[30];
+	FILE *ofp;
+
+	for (i = 0; i < NUMMONS; i++) {
+		printf("%s\n", tilename(MON_GLYPH, i));
+	}
+	for (i = 0; i < NUM_OBJECTS; i++) {
+		printf("%s\n", tilename(OBJ_GLYPH, i));
+	}
+	int quit = 0;
+	i = 0;
+	while (!quit) {
+		const char* name = tilename(OTH_GLYPH, i++);
+		if (!strncmp("unknown ",name, 8)) {
+			quit = 1;
+		} else {
+			printf("%s\n", name);
+		}
+	}
+
+	return 0;
+}
+#endif
+
 #else	/* TILETEXT */
 
 #define TILE_FILE	"tile.c"
