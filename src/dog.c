@@ -879,6 +879,15 @@ register struct obj *obj;
 		return (struct monst *)0;
 	}
 
+	/* Cannot tame ice golems or crystal ice golems.
+	 * Not because there's a good thematical reason for that but
+	 * because they are too powerful as pets. */
+	if (mtmp->data == &mons[PM_CRYSTAL_ICE_GOLEM] ||
+	    mtmp->data == &mons[PM_ICE_GOLEM]) {
+	    return (struct monst *)0;
+	}
+	
+
 	if (mtmp->mtame || !mtmp->mcanmove ||
 	    /* monsters with conflicting structures cannot be tamed */
 	    mtmp->isshk || mtmp->isgd || mtmp->ispriest || mtmp->isminion ||
