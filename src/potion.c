@@ -1324,6 +1324,7 @@ register struct obj *obj;
 		exercise(A_CON, TRUE);
 		break;
 	case POT_SICKNESS:
+		kn++;
 		if (!Role_if(PM_HEALER)) {
 			if (Upolyd) {
 			    if (u.mh <= 5) u.mh = 1; else u.mh -= 5;
@@ -1335,6 +1336,7 @@ register struct obj *obj;
 		}
 		break;
 	case POT_HALLUCINATION:
+		kn++;
 		You("have a momentary vision.");
 		break;
 	case POT_CONFUSION:
@@ -1370,7 +1372,10 @@ register struct obj *obj;
 		} else You("yawn.");
 		break;
 	case POT_SPEED:
-		if (!Fast) Your("knees seem more flexible now.");
+		if (!Fast) {
+			kn++;
+			Your("knees seem more flexible now.");
+		}
 		incr_itimeout(&HFast, rnd(5));
 		exercise(A_DEX, TRUE);
 		break;
