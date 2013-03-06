@@ -56,6 +56,7 @@
 	    fixed by Pasi Kallinen)
 	  - Honor pickup_burden when picking up gold.
 	  - Fix TTY crashing when a location has more than 32k items (from NAO)
+	  - Correct article when choking on named artifacts
 
 2012-04-01  UnNetHack 4.0.0
 	* Uncursed and blessed scrolls of magic mapping reveal secret doors
