@@ -936,7 +936,7 @@ int mode;
 		    if (amorphous(youmonst.data))
 			You("try to ooze under the door, but the gap is too small.");
 		    else if (tunnels(youmonst.data) && !needspick(youmonst.data))
-			You("hurt your teeth on the re-enforced door.");
+			You("hurt your teeth on the reinforced door.");
 		    else if (x == u.ux || y == u.uy) {
 			if (Blind || Stunned || ACURR(A_DEX) < 10 || Fumbling) {                            pline("Ouch!  You bump into a heavy door.");
 			    exercise(A_DEX, FALSE);
