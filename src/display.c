@@ -591,13 +591,13 @@ feel_location(x, y)
 	     * not cleared, then when the ball/chain is moved it will drop
 	     * the wrong glyph.
 	     */
-	    if (uchain->ox == x && uchain->oy == y) {
+	    if (uchain && uchain->ox == x && uchain->oy == y) {
 		if (level.objects[x][y] == uchain)
 		    u.bc_felt |= BC_CHAIN;
 		else
 		    u.bc_felt &= ~BC_CHAIN;	/* do not feel the chain */
 	    }
-	    if (!carried(uball) && uball->ox == x && uball->oy == y) {
+	    if (uball && !carried(uball) && uball->ox == x && uball->oy == y) {
 		if (level.objects[x][y] == uball)
 		    u.bc_felt |= BC_BALL;
 		else
@@ -886,7 +886,7 @@ tmp_at(x, y)
 
 	default:	/* do it */
 	    if (tglyph->style == DISP_BEAM) {
-		if (!cansee(x,y)) break;
+		if (!isok(x,y) || !cansee(x,y)) break;
 		/* save pos for later erasing */
 		tglyph->saved[tglyph->sidx].x = x;
 		tglyph->saved[tglyph->sidx].y = y;
@@ -896,6 +896,7 @@ tmp_at(x, y)
 		    newsym(tglyph->saved[0].x, tglyph->saved[0].y);
 		    tglyph->sidx = 0;	/* display is presently up to date */
 		}
+		if (!isok(x,y)) break;
 		if (!cansee(x,y) && tglyph->style != DISP_ALWAYS) break;
 		tglyph->saved[0].x = x;
 		tglyph->saved[0].y = y;
