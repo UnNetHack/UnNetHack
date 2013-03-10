@@ -3716,14 +3716,8 @@ xchar x, y;
 	    lev->drawbridgemask &= ~DB_UNDER;
 	    lev->drawbridgemask |= DB_MOAT;	/* revert to DB_MOAT */
 	} else {	/* lev->typ == ICE */
-#ifdef STUPID
-	    if (lev->icedpool == ICED_POOL) lev->typ = POOL;
-	    else if (lev->icedpool == ICED_MOAT) lev->typ = MOAT;
-	    else lev->typ = BOG;
-#else
 	    lev->typ = (lev->icedpool == ICED_POOL ? POOL :
-			lev->icedpool == ICED_MOAT ? MOAT : BOG);
-#endif
+			lev->icedpool == ICED_BOG ? BOG : MOAT);
 	    lev->icedpool = 0;
 	}
 	obj_ice_effects(x, y, FALSE);
@@ -3845,7 +3839,7 @@ boolean *shopdamage;
 			if (!lava)
 			    lev->icedpool =
 				    (lev->typ == POOL ? ICED_POOL :
-				     lev->typ == MOAT ? ICED_MOAT : ICED_BOG);
+				     lev->typ == BOG ? ICED_BOG : ICED_MOAT);
 			lev->typ = (lava ? ROOM : ICE);
 		    }
 		    bury_objs(x,y);
