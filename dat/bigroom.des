@@ -680,6 +680,9 @@ DOOR:locked,(50,11)
 DOOR:locked,(53,15)
 
 # Objects (and twice as many actual statues), themed for the level
+LOOP [10] {
+  OBJECT:random,random
+}
 LOOP [5] {
   OBJECT:('?',"light"),random,cursed
   OBJECT:('!',"blindness"),random,cursed
