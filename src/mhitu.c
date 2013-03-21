@@ -1386,6 +1386,18 @@ dopois:
 		    tele();
 		}
 		break;
+	    case AD_LVLT:
+		hitmsg(mtmp, mattk);
+		if (uncancelled) {
+		    if(flags.verbose)
+		    	if (Teleport_control) {
+				You("feel like you could have lost some potential.");
+			} else {
+				You("suddenly feel like you've lost some potential.");
+			}
+		level_tele();
+		}
+		break;
 	    case AD_RUST:
 		hitmsg(mtmp, mattk);
 		if (mtmp->mcan) break;
@@ -2185,6 +2197,22 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 		    if ((int) mtmp->m_lev > rn2(25))
 			destroy_item(SPBOOK_CLASS, AD_FIRE);
 		    if (dmg) mdamageu(mtmp, dmg);
+		}
+		break;
+	    case AD_BLNK:
+		if (!mtmp->mcan && canseemon(mtmp) &&
+			couldsee(mtmp->mx, mtmp->my) &&
+			mtmp->mcansee && !mtmp->mspec_used && rn2(5)) {
+		    int dmg = d(1,4);
+		    stop_occupation();
+		    if (!Reflecting) {
+			pline("%s reflection in your mind weakens you.", s_suffix(Monnam(mtmp)));
+	    		exercise(A_INT, TRUE);
+		    } else {
+			pline("%s tries to avoid looking at you.", Monnam(mtmp));
+			dmg = 0;
+		    }
+		if (dmg) mdamageu(mtmp, dmg);
 		}
 		break;
 #ifdef PM_BEHOLDER /* work in progress */

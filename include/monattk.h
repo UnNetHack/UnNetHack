@@ -83,6 +83,9 @@
 
 #define AD_PUNI		44	/* punisher spells */
 
+#define AD_LVLT		51	/* level teleport (weeping angel) */
+#define AD_BLNK		52	/* mental invasion (weeping angel) */
+
 #define AD_CLRC		240	/* random clerical spell */
 #define AD_SPEL		241	/* random magic spell */
 #define AD_RBRE		242	/* random breath weapon */

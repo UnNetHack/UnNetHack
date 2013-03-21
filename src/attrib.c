@@ -274,7 +274,8 @@ boolean	inc_or_dec;
 #ifdef DEBUG
 	pline("Exercise:");
 #endif
-	if (i == A_INT || i == A_CHA) return;	/* can't exercise these */
+	if (i == A_CHA) return; 	/* INT can only be exercised by fighting
+					   a weeping angel's mental reflection. */
 
 	/* no physical exercise while polymorphed; the body's temporary */
 	if (Upolyd && i != A_WIS) return;
@@ -398,7 +399,8 @@ exerchk()
 	    for(i = 0; i < A_MAX; AEXE(i++) /= 2) {
 
 		if(ABASE(i) >= 18 || !AEXE(i)) continue;
-		if(i == A_INT || i == A_CHA) continue;/* can't exercise these */
+		if(i == A_CHA) continue; 	/* INT can only be exercised by fighting
+						   a weeping angel's mental reflection. */
 
 #ifdef DEBUG
 		pline("exerchk: testing %s (%d).",
