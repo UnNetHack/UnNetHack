@@ -687,6 +687,7 @@ LOOP [5] {
   OBJECT:('?',"light"),random,cursed
   OBJECT:('!',"blindness"),random,cursed
   OBJECT:"statue",random,montype:('A', "weeping angel")
+  OBJECT:"statue",random,montype:('A', "weeping angel")
 }
 
 GRAVE:(18,01),"Cleric Bob"
