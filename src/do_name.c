@@ -1230,6 +1230,7 @@ static const char * const bogusmons[] = {
 	"unicorn pegasus kitten",		/* Wil Wheaton, John Scalzi */
 	"dwerga nethackus", "dwerga castrum",	/* Ask ASCII Ponies */
 	"Irrenhaus the Third", /* http://www.youtube.com/user/Irrenhaus3 */
+	"weeping archangel", "weeping angle"
 };
 
 
