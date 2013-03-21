@@ -35,7 +35,7 @@
 	  - HP notify, showing HP changes in the message area (from NAO)
 	  - Menus made aware of the maximum count of an item (by heinrich5991)
 	  - Message for some monster cancellation events
-	  - When standing on Elbereth, show it in statuscolors
+	  - When standing on Elbereth, show it in status lines
 
 	* bug fixes:
 	  - Fixed crash when player gets killed when entering a new level and
