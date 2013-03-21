@@ -558,11 +558,13 @@ bot2()
 #else
 		Sprintf(nb = eos(nb), " %s", enc_stat[cap]);
 #endif
+#ifdef ELBERETH
 	if(!Blind && sengr_at("Elbereth", u.ux, u.uy))
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	     	add_colored_text("Elbereth", newbot2);
 #else
 		Strcat(nb = eos(nb), " Elbereth");
+#endif
 #endif
 #ifdef DUMP_LOG
 }
