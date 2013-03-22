@@ -923,7 +923,7 @@ dodown()
 			"swallowed" : "engulfed");
 		return(1);
 	}
-	if (on_level(&valley_level, &u.uz) && !u.uevent.gehennom_entered) {
+	if (on_level(&valley_level, &u.uz) && stairs_down && !u.uevent.gehennom_entered) {
 		You("are standing at the gate to Gehennom.");
 		pline("Unspeakable cruelty and harm lurk down there.");
 		if (yn("Are you sure you want to enter?") != 'y')
