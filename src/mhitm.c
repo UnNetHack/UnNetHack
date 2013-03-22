@@ -1042,6 +1042,29 @@ mdamagem(magr, mdef, mattk)
 			pline("%s suddenly disappears!", mdef_Monnam);
 		}
 		break;
+	    case AD_LVLT:
+		if (!cancelled && tmp < mdef->mhp && !tele_restrict(mdef)) {
+		    char mdef_Monnam[BUFSZ];
+		    if (vis) Strcpy(mdef_Monnam, Monnam(mdef));
+		    mdef->mstrategy &= ~STRAT_WAITFORU;
+			if (u.uevent.udemigod) {
+		    /* Once the player kills Rodney or performs the Invocation, weeping angels will 
+		       be too interested in your potential to feed off the potential of monsters. */
+			    if (vis && canspotmon(mdef) && flags.verbose)
+				pline("%s glances at you with a hungry stare.", Monnam(magr));
+			} else {
+			    if (vis && canspotmon(mdef))
+				if (flags.verbose)
+				    pline("%s vanishes before your eyes.", Monnam(mdef));
+				int nlev;
+				d_level flev;
+				nlev = random_teleport_level();
+				get_level(&flev, nlev); 
+				migrate_to_level(mdef, ledger_no(&flev), MIGR_RANDOM,
+					(coord *)0);
+			}
+		}
+		break;
 	    case AD_SLEE:
 		if (!cancelled && !mdef->msleeping &&
 			sleep_monst(mdef, rnd(10), -1)) {
@@ -1098,6 +1121,18 @@ mdamagem(magr, mdef, mattk)
 		    mdef->mstrategy &= ~STRAT_WAITFORU;
 		}
 		tmp = 0;
+		break;
+	    case AD_BLNK:
+		/* Does no damage to monsters. */
+		Strcpy(buf, Monnam(mdef));
+		if (vis && haseyes(pd) && mdef->mcansee && flags.verbose) {
+		    if (!mon_reflects(mdef, (char *)0))
+			pline("%s glares back at %s.", buf, mon_nam(magr));
+		    if (mon_reflects(mdef, (char *)0))
+			pline("%s deftly avoids looking at its own reflection.", Monnam(magr));
+		} else if (vis && flags.verbose) {
+		    pline("%s cannot see %s.", buf, mon_nam(magr));
+		}
 		break;
 	    case AD_HALU:
 		if (!magr->mcan && haseyes(pd) && mdef->mcansee) {
