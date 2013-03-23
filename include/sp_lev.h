@@ -330,13 +330,6 @@ struct sp_coder {
  */
 
 typedef struct {
-    xchar x1,y1,x2,y2;
-    xchar fg, lit;
-    int roughness;
-    xchar thick;
-} randline;
-
-typedef struct {
 	int cmp_what;
 	int cmp_val;
 } opcmp;
@@ -358,10 +351,6 @@ typedef struct {
 	long	flags;
 	schar	filling;
 } lev_init;
-
-typedef struct {
-	xchar x, y, mask;
-} door;
 
 typedef struct {
 	xchar wall, pos, secret, mask;
@@ -401,26 +390,6 @@ typedef struct {
 } altar;
 
 typedef struct {
-	xchar x, y, dir, db_open;
-} drawbridge;
-
-typedef struct {
-	xchar x, y, dir, stocked, typ;
-} walk;
-
-typedef struct {
-	xchar x1, y1, x2, y2;
-} digpos;
-
-typedef struct {
-	xchar x, y, up;
-} lad;
-
-typedef struct {
-	xchar x, y, up;
-} stair;
-
-typedef struct {
 	xchar x1, y1, x2, y2;
 	xchar rtype, rlit, rirreg;
 } region;
@@ -456,18 +425,6 @@ typedef struct {
 	Str_or_Len engr;
 	xchar etype;
 } engraving;
-
-typedef struct {
-	xchar x, y;
-} fountain;
-
-typedef struct {
-	xchar x, y;
-} sink;
-
-typedef struct {
-	xchar x, y;
-} pool;
 
 typedef struct _room {
 	Str_or_Len name;
