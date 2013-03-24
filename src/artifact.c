@@ -570,7 +570,7 @@ touch_artifact(obj,mon)
 #ifdef CONVICT
     /* This is a kludge, but I'm not sure where else to put it */
     if (oart == &artilist[ART_IRON_BALL_OF_LIBERATION]) {
-	if (Role_if(PM_CONVICT) && (!obj->oerodeproof)) {
+	if (Role_if(PM_CONVICT) && ((!obj->oerodeproof) || (obj->owt != 300))) {
 	    obj->oerodeproof = TRUE;
 	    obj->owt = 300; /* Magically lightened, but still heavy */
 	}
