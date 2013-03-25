@@ -1713,7 +1713,7 @@ prayer_done()		/* M. Stephenson (1.0.3b) */
 		 "Walk no more, perversion of nature!");
 	You_feel("like you are falling apart.");
 	/* KMH -- Gods have mastery over unchanging */
-	if (urace.noun != "vampire") {
+	if (!Race_if(PM_VAMPIRE)) {
 	   rehumanize();
 	   losehp(rnd(20), "residual undead turning effect", KILLED_BY_AN);
 	} else {
