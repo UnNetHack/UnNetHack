@@ -1713,9 +1713,17 @@ prayer_done()		/* M. Stephenson (1.0.3b) */
 		 "Walk no more, perversion of nature!");
 	You_feel("like you are falling apart.");
 	/* KMH -- Gods have mastery over unchanging */
-	rehumanize();
-	losehp(rnd(20), "residual undead turning effect", KILLED_BY_AN);
-	exercise(A_CON, FALSE);
+	if (urace.adj != "vampiric") {
+	   rehumanize();
+	   losehp(rnd(20), "residual undead turning effect", KILLED_BY_AN);
+	   exercise(A_CON, FALSE);
+	} else {
+	   /* Starting vampires are inherently vampiric */
+	   losehp(rnd(20), "undead turning effect", KILLED_BY_AN);
+	   pline("You get the idea that %s will be of little help to you.",
+	      align_gname(alignment));;
+	   exercise(A_CON, FALSE);
+	}
 	return(1);
     }
     if (Inhell) {
