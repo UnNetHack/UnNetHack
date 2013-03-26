@@ -25,6 +25,7 @@ CHAINBRANCH:	"Sokoban" "oracle" + (1, 0) up
 CHAINBRANCH:	"Town" "oracle" + (2, 2) up
 RNDLEVEL:	"bigrm" "B" @ (10, 3) 40 12
 CHAINBRANCH:	"The Quest" "oracle" + (6, 2) portal
+BRANCH:		"The Ruins of Moria" @ (16, 4) up
 BRANCH:		"Fort Ludios" @ (18, 4) portal
 LEVEL:		"nymph" "N" @ (5, 15) 45
 BRANCH:		"One-eyed Sam's Market" @ (20, 5) portal
@@ -134,6 +135,18 @@ ENTRY:		-1
 RNDLEVEL:       "town" "T" @ (1, 0) 2
 RNDLEVEL:       "townfill" "T" @ (2, 0) 1
 LEVELDESC:      town
+
+
+### Ruins of Moria ###
+DUNGEON:	"The Ruins of Moria" "F" (5, 0)
+ALIGNMENT:	noalign
+ENTRY:		-1
+DESCRIPTION:	mazelike
+RNDLEVEL:	"moria5" "F" @ (1, 0) 2
+RNDLEVEL:	"moria4" "F" @ (2, 0) 1
+RNDLEVEL:	"moria3" "F" @ (3, 0) 3
+RNDLEVEL:	"moria2" "F" @ (4, 0) 1
+RNDLEVEL:	"moria1" "F" @ (5, 0) 1
 
 
 #

@@ -149,6 +149,7 @@ struct monst *mtmp;
 	    mtmp->data == &mons[PM_CTHULHU] ||
 	    /* Vlad ignores Elbereth/Scare Monster/Garlic */
 	    mtmp->data == &mons[PM_VLAD_THE_IMPALER] ||
+	    mtmp->data == &mons[PM_WATCHER_IN_THE_WATER] ||
 	    mtmp->mnum == quest_info(MS_NEMESIS) ||
 	    (mtmp->data->geno & G_UNIQ && is_demon(mtmp->data)) ||
 	    is_rider(mtmp->data))
