@@ -32,7 +32,7 @@ MAP
 ENDMAP
 REGION:(01,01,73,18),lit,"ordinary"
 TELEPORT_REGION:(15,12,70,14),(0,0,0,0)
-MON_GENERATION:50%, (7, "moria orc"), (3, 'o')
+MON_GENERATION:50%, (7, "deep orc"), (3, 'o')
 BRANCH:(43,15,43,15),(0,0,0,0)
 STAIR:(71,02), up
 #
@@ -78,7 +78,7 @@ ENDMAP
 REGION:(01,01,73,18),lit,"ordinary"
 TELEPORT_REGION:(01,01,10,17),(0,0,0,0)
 NON_DIGGABLE:(00,00,74,17)
-MON_GENERATION:60%, (7, "moria orc"), (3, 'o')
+MON_GENERATION:60%, (7, "deep orc"), (3, 'o')
 STAIR:(73,09), up
 STAIR:(02,09), down
 #
@@ -139,7 +139,7 @@ FFFFFFFFFFFFFF                            F.........................F
 ENDMAP
 REGION:(01,01,73,18),random,"ordinary"
 NON_DIGGABLE:(00,00,74,17)
-MON_GENERATION:70%, (7, "moria orc"), (3, 'o')
+MON_GENERATION:70%, (7, "deep orc"), (3, 'o')
 MESSAGE: "The dungeon here seems less persistent."
 SOUNDS:200, (feel, "the dungeon suddenly center itself around you!")
 STAIR:(41,02), up
@@ -179,7 +179,7 @@ FFFFFFFFFFFFFF                            F.........................F
 ENDMAP
 REGION:(01,01,73,18),random,"ordinary"
 NON_DIGGABLE:(00,00,74,17)
-MON_GENERATION:70%, (7, "moria orc"), (3, 'o')
+MON_GENERATION:70%, (7, "deep orc"), (3, 'o')
 MESSAGE: "The dungeon here seems less persistent."
 SOUNDS:200, (feel, "the dungeon suddenly center itself around you!")
 STAIR:(24,14), up
@@ -219,7 +219,7 @@ FFFFFFFFFFFFFF                            F.........................F
 ENDMAP
 REGION:(01,01,73,18),random,"ordinary"
 NON_DIGGABLE:(00,00,74,17)
-MON_GENERATION:70%, (7, "moria orc"), (3, 'o')
+MON_GENERATION:70%, (7, "deep orc"), (3, 'o')
 MESSAGE: "The dungeon here seems less persistent."
 SOUNDS:200, (feel, "the dungeon suddenly center itself around you!")
 STAIR:(06,04), up
@@ -260,7 +260,7 @@ MAP
 ENDMAP
 REGION:(01,01,73,18),random,"ordinary"
 NON_DIGGABLE:(00,00,74,17)
-MON_GENERATION:90%, (7, "moria orc"), (3, 'o')
+MON_GENERATION:90%, (7, "deep orc"), (3, 'o')
 STAIR:random, up
 STAIR:random, down
 #
@@ -274,9 +274,9 @@ STAIR:random, down
 LOOP [20] {
   MONSTER: ('o', "orc-captain"), random, hostile
   MONSTER: ('o', "hill orc"), random, hostile
-  MONSTER: ('o', "moria orc"), random, hostile
-  MONSTER: ('o', "moria orc"), random, hostile
-  MONSTER: ('o', "moria orc"), random, hostile
+  MONSTER: ('o', "deep orc"), random, hostile
+  MONSTER: ('o', "deep orc"), random, hostile
+  MONSTER: ('o', "deep orc"), random, hostile
   OBJECT:random,random
   [10%]: MONSTER: 'T', random, hostile
   [25%]: OBJECT:('[',"dwarvish mithril-coat"),random,blessed,1d7
@@ -315,7 +315,7 @@ REGION:(01,01,75,20),lit,"ordinary"
 TELEPORT_REGION:(01,16,11,18),(0,0,0,0)
 SOUNDS:200, (hear, "the sound of restless waters.")
 NON_DIGGABLE:(00,00,75,20)
-MON_GENERATION:40%, (8, "moria orc"), (2, 'o')
+MON_GENERATION:40%, (8, "deep orc"), (2, 'o')
 STAIR:(04,17), down
 #
 
@@ -411,7 +411,7 @@ REGION:(01,01,75,20),lit,"ordinary"
 TELEPORT_REGION:(01,16,11,18),(0,0,0,0)
 SOUNDS:200, (hear, "the sound of restless waters.")
 NON_DIGGABLE:(00,00,75,20)
-MON_GENERATION:60%, (8, "moria orc"), (2, 'o')
+MON_GENERATION:60%, (8, "deep orc"), (2, 'o')
 STAIR:(04,17), down
 #
 
@@ -486,5 +486,5 @@ SHUFFLE:$altarcontainers
 #Ithildin engraving (destroyed in this version)
 #IF [time.night == 1] { ENGRAVING:(44,10),engrave,"Speak, friend, and enter." }
 
-LOOP [10 + 2d5] { MONSTER:  ('o', "Moria orc"), random, hostile }
+LOOP [10 + 2d5] { MONSTER:  ('o', "deep orc"), random, hostile }
 MONSTER: (';',"Watcher in the Water"),(66,10) { OBJECT:('(', "horn of plenty"),uncursed }
