@@ -52,6 +52,8 @@
 	  - Clear dungeon overview info for bones files (reported by Christian
 	    Stegen)
 	  - Fixed crash when destroying bag of holding containing gold pieces
+	  - Fixed gold not merging in containers after container has been BUC
+	    tested on altars
 
 	* vanilla bug fixes:
 	  - Prevent the Book of the Dead from being destroyed when the
