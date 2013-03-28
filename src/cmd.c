@@ -976,10 +976,11 @@ boolean want_disp;
 	if (u.uedibility) you_can("recognize detrimental food");
 
 	/*** Troubles ***/
-	if (Halluc_resistance)
+	if (!flags.perma_hallu && Halluc_resistance)
 		enl_msg("You resist", "", "ed", " hallucinations");
+	if (flags.perma_hallu) you_are("permanently hallucinating");
 	if (final) {
-		if (Hallucination) you_are("hallucinating");
+		if (!flags.perma_hallu && Hallucination) you_are("hallucinating");
 		if (Stunned) you_are("stunned");
 		if (Confusion) you_are("confused");
 		if (Blinded) you_are("blinded");

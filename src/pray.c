@@ -434,9 +434,13 @@ decurse:
 		    make_confused(0L,TRUE);
 		    break;
 	    case TROUBLE_HALLUCINATION:
-		    pline ("Looks like you are back in Kansas.");
-		    (void) make_hallucinated(0L,FALSE,0L);
-		    break;
+			if (flags.perma_hallu) {
+				pline ("You feel boringly normal for a moment.");
+			} else {
+				pline ("Looks like you are back in Kansas.");
+			}
+			(void) make_hallucinated(0L,FALSE,0L);
+			break;
 #ifdef STEED
 	    case TROUBLE_SADDLE:
 		    otmp = which_armor(u.usteed, W_SADDLE);

@@ -253,6 +253,13 @@ long mask;	/* nonzero if resistance status should change by mask */
 	boolean changed = 0;
 	const char *message, *verb;
 
+	if (flags.perma_hallu) {
+		if (xtime > 0) {
+			pline("Oh wow!  You have a yet another vision!");
+		}
+		return 0;
+	}
+
 	message = (!xtime) ? "Everything %s SO boring now." :
 			     "Oh wow!  Everything %s so cosmic!";
 	verb = (!Blind) ? "looks" : "feels";

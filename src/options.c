@@ -188,6 +188,7 @@ static struct Bool_Opt
 	{"paranoid_trap", &iflags.paranoid_trap, FALSE, SET_IN_FILE},
 #endif
 	{"perm_invent", &flags.perm_invent, FALSE, SET_IN_GAME},
+	{"perma_hallu", &flags.perma_hallu, FALSE, SET_IN_FILE},
 	{"pickup_dropped", &flags.pickup_dropped, FALSE, SET_IN_GAME},
 	{"pickup_thrown", &flags.pickup_thrown, TRUE, SET_IN_GAME},
 #ifdef CURSES_GRAPHICS

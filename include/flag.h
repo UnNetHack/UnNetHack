@@ -119,6 +119,7 @@ struct flag {
 	AMII_COLOR_TYPE amii_curmap[ AMII_MAXCOLORS ]; /* colormap */
 #endif
 	boolean	bones;		/* allow loading bones */
+	boolean	perma_hallu;	/* let the player permanently hallucinate */
 
 	/* KMH, role patch -- Variables used during startup.
 	 *
