@@ -1136,8 +1136,11 @@ register struct trobj *trop;
 				obj->otyp != SPE_BLANK_PAPER)
 		    initialspell(obj);
 
-		if ((obj->otyp == BLINDFOLD) && u.roleplay.blindfolded)
-				setworn(obj, W_TOOL);
+		if ((obj->otyp == BLINDFOLD) && u.roleplay.blindfolded) {
+			/* Zen ascension attempt */
+			obj->cursed = TRUE;
+			setworn(obj, W_TOOL);
+		}
 
 #if !defined(PYRAMID_BUG) && !defined(MAC)
 		if(--trop->trquan) continue;	/* make a similar object */
