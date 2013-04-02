@@ -366,9 +366,15 @@ register struct monst *mtmp;
 		alignment = EPRI(mtmp)->shralign;
 	else
 		alignment = mtmp->data->maligntyp;
-	alignment = (alignment > 0) ? A_LAWFUL :
-		(alignment < 0) ? A_CHAOTIC :
-		A_NEUTRAL;
+	if (alignment == A_NONE) {
+	    alignment = A_NONE;
+	  } else if (alignment > 0) {
+	    alignment = A_LAWFUL;
+	  } else if (alignment < 0) {
+	    alignment = A_CHAOTIC;
+	  } else {
+	    alignment = A_NEUTRAL;
+	  }
 
 	info[0] = 0;
 	if (mtmp->mtame) {	  Strcat(info, ", tame");
