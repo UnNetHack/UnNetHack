@@ -1332,18 +1332,26 @@ register struct obj *otmp;
 		if (is_helmet(otmp)) {
 			nomovemsg = "You finish taking off your helmet.";
 			afternmv = Helmet_off;
-		     }
-		else if (is_gloves(otmp)) {
+		} else if (is_gloves(otmp)) {
 			nomovemsg = "You finish taking off your gloves.";
 			afternmv = Gloves_off;
-		     }
-		else if (is_boots(otmp)) {
+		} else if (is_boots(otmp)) {
 			nomovemsg = "You finish taking off your boots.";
 			afternmv = Boots_off;
-		     }
-		else {
+		} else if (otmp == uarm) {
 			nomovemsg = "You finish taking off your suit.";
 			afternmv = Armor_off;
+		} else if (is_cloak(otmp)) {
+			nomovemsg = "You finish taking off your cloak.";
+			afternmv = Cloak_off;
+		} else if (is_shield(otmp)) {
+			nomovemsg = "You finish taking off your shield.";
+			afternmv = Shield_off;
+#ifdef TOURIST
+		} else if (is_shirt(otmp)) {
+			nomovemsg = "You finish taking off your shirt.";
+			afternmv = Shirt_off;
+#endif
 		}
 	} else {
 		/* Be warned!  We want off_msg after removing the item to
@@ -1361,11 +1369,25 @@ register struct obj *otmp;
 		 * 3.2 (actually 3.1 even): this comment is obsolete since
 		 * fire resistance is not needed for Gehennom.
 		 */
-		if(is_cloak(otmp))
+		if(is_helmet(otmp)) {
+			(void) Helmet_off();
+		} else if(is_gloves(otmp)) {
+			(void) Gloves_off();
+		} else if(is_boots(otmp)) {
+			(void) (Boots_off);
+		} else if(otmp == uarm) {
+			(void) Armor_off();
+		} else if(is_cloak(otmp)) {
 			(void) Cloak_off();
-		else if(is_shield(otmp))
+		} else if (is_shield(otmp)) {
 			(void) Shield_off();
-		else setworn((struct obj *)0, otmp->owornmask & W_ARMOR);
+#ifdef TOURIST
+		} else if (is_shirt(otmp)) {
+			(void) Shirt_off();
+#endif
+		} else {
+			setworn((struct obj *)0, otmp->owornmask & W_ARMOR);
+		}
 		off_msg(otmp);
 	}
 	takeoff_mask = taking_off = 0L;
@@ -1586,13 +1608,20 @@ dowear()
 	delay = -objects[otmp->otyp].oc_delay;
 	if(delay){
 		nomul(delay, "dressing up");
-		if(is_boots(otmp)) afternmv = Boots_on;
-		if(is_helmet(otmp)) afternmv = Helmet_on;
-		if(is_gloves(otmp)) afternmv = Gloves_on;
-		if(otmp == uarm) afternmv = Armor_on;
+	if (is_helmet(otmp)) afternmv = Helmet_on;
+	if (is_gloves(otmp)) afternmv = Gloves_on;
+	if (is_boots(otmp)) afternmv = Boots_on;
+	if (otmp == uarm) afternmv = Armor_on;
+	if (is_cloak(otmp)) afternmv = Cloak_on;
+	if (is_shield(otmp)) afternmv = Shield_on;
+	if (is_shirt(otmp)) afternmv = Shirt_on;
 		nomovemsg = "You finish your dressing maneuver.";
 	} else {
-		if(is_cloak(otmp)) (void) Cloak_on();
+	if (is_helmet(otmp)) Helmet_on();
+	if (is_gloves(otmp)) Gloves_on();
+	if (is_boots(otmp)) Boots_on();
+	if (otmp == uarm) Armor_on();
+	if (is_cloak(otmp)) (void) Cloak_on();
 		if (is_shield(otmp)) (void) Shield_on();
 #ifdef TOURIST
 		if (is_shirt(otmp)) (void) Shirt_on();
