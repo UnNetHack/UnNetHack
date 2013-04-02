@@ -1608,20 +1608,20 @@ dowear()
 	delay = -objects[otmp->otyp].oc_delay;
 	if(delay){
 		nomul(delay, "dressing up");
-	if (is_helmet(otmp)) afternmv = Helmet_on;
-	if (is_gloves(otmp)) afternmv = Gloves_on;
-	if (is_boots(otmp)) afternmv = Boots_on;
-	if (otmp == uarm) afternmv = Armor_on;
-	if (is_cloak(otmp)) afternmv = Cloak_on;
-	if (is_shield(otmp)) afternmv = Shield_on;
-	if (is_shirt(otmp)) afternmv = Shirt_on;
+		if (is_helmet(otmp)) afternmv = Helmet_on;
+		if (is_gloves(otmp)) afternmv = Gloves_on;
+		if (is_boots(otmp)) afternmv = Boots_on;
+		if (otmp == uarm) afternmv = Armor_on;
+		if (is_cloak(otmp)) afternmv = Cloak_on;
+		if (is_shield(otmp)) afternmv = Shield_on;
+		if (is_shirt(otmp)) afternmv = Shirt_on;
 		nomovemsg = "You finish your dressing maneuver.";
 	} else {
-	if (is_helmet(otmp)) Helmet_on();
-	if (is_gloves(otmp)) Gloves_on();
-	if (is_boots(otmp)) Boots_on();
-	if (otmp == uarm) Armor_on();
-	if (is_cloak(otmp)) (void) Cloak_on();
+		if (is_helmet(otmp)) Helmet_on();
+		if (is_gloves(otmp)) Gloves_on();
+		if (is_boots(otmp)) Boots_on();
+		if (otmp == uarm) Armor_on();
+		if (is_cloak(otmp)) (void) Cloak_on();
 		if (is_shield(otmp)) (void) Shield_on();
 #ifdef TOURIST
 		if (is_shirt(otmp)) (void) Shirt_on();
