@@ -444,6 +444,10 @@ exerchk()
 				    "must be leading a healthy life-style." :
 				    "haven't been watching your health.");
 				break;
+		    case A_INT: You((mod_val >0) ?
+				    "must have been really concentrating lately." :
+				    "haven't been thinking things through.");
+				break;
 		    }
 		}
 	    }
