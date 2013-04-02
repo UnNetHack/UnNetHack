@@ -2057,7 +2057,8 @@ struct obj *potion, *obj;
 	        i = bases[WAND_CLASS];
 	        while((prob -= objects[i].oc_prob) > 0) i++;
 	        
-		obj = poly_obj(obj, i); 
+		obj = poly_obj(obj, i);
+		u.uconduct.polypiles++;
 
 		goto poof;
 	    }
