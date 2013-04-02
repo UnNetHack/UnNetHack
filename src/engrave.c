@@ -1374,7 +1374,7 @@ static const char *epitaphs[] = {
 	"I made an ash of myself",
 	"Soon ripe. Soon rotten. Soon gone. But not forgotten.",
 	"Here lies the body of Jonathan Blake. Stepped on the gas instead of the brake.",
-	"Go away!"
+	"Go away!",
 
 	/* from NAO */
 	"Alas fair Death, 'twas missed in life - some peace and quiet from my wife",
