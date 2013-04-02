@@ -2038,6 +2038,31 @@ struct obj *potion, *obj;
 	    }
 	}
 
+	if (potion->otyp == POT_GAIN_ABILITY &&
+            obj->oclass == WAND_CLASS) {
+	    if (potion->cursed && obj->otyp != WAN_NOTHING)
+	    {
+	        pline_The("%s glows %s for a moment.",
+		           xname(obj), hcolor(NH_BLACK));
+	        obj = poly_obj(obj, WAN_NOTHING); 
+		goto poof;
+	    }
+	    else if (obj->otyp == WAN_NOTHING)
+	    {
+	        int i, prob = rnd(1000);
+	        pline_The("%s glows %s for a moment.",
+		           xname(obj), hcolor(NH_BLUE));
+
+                //shamelessly borrowed from mkobj
+	        i = bases[WAND_CLASS];
+	        while((prob -= objects[i].oc_prob) > 0) i++;
+	        
+		obj = poly_obj(obj, i); 
+
+		goto poof;
+	    }
+	}
+
 	if (potion->otyp == POT_OIL) {
 	    boolean wisx = FALSE;
 	    if (potion->lamplit) {	/* burning */
