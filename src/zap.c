@@ -3882,6 +3882,9 @@ boolean *shopdamage;
 		}
 		obj_ice_effects(x,y,TRUE);
 	}
+	else if (abstype == ZT_POISON_GAS) {
+	    (void) create_gas_cloud(x, y, 1, 8, rn1(20, 5));
+	}
 	if(closed_door(x, y)) {
 		int new_doormask = -1;
 		const char *see_txt = 0, *sense_txt = 0, *hear_txt = 0;
