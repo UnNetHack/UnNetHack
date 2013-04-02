@@ -205,6 +205,7 @@ struct obj* tobj;
 				pline("The egg doesn't make much noise at all.");
 			} else {
 				pline("You listen to the egg and guess... %s?",mons[otmp->corpsenm].mname);
+				learn_egg_type(otmp->corpsenm);
 			}
 		}
 		return TRUE;
