@@ -951,6 +951,7 @@ genericptr_t p2;
 	    return FALSE;
 	if (!Blind)
 	    make_blinded(1L, FALSE);
+	if (u.uinvulnerable) return FALSE;
 	if (!Poison_resistance) {
 	    pline("%s is burning your %s!", Something, makeplural(body_part(LUNG)));
 	    You("cough and spit blood!");
