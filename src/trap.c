@@ -1641,6 +1641,18 @@ long ocount;
 		cc.x = bcc.x = x;
 		cc.y = bcc.y = y;
 	} else {
+		if (rnf(1,10) &&
+			ttmp->ttyp == ROLLING_BOULDER_TRAP &&
+			otyp == BOULDER) {
+			/* somebody had a little accident */
+			otmp = mkcorpstat(CORPSE, (struct monst *)0, &mons[PM_ARCHEOLOGIST], cc.x, cc.y, TRUE);
+			otmp = mksobj(FEDORA, TRUE, FALSE);
+			place_object(otmp, cc.x, cc.y);
+			if (rnf(1,3)) {
+				otmp = mksobj(BULLWHIP, TRUE, FALSE);
+				place_object(otmp, cc.x, cc.y);
+			}
+		}
 		otmp = mksobj(otyp, TRUE, FALSE);
 		otmp->quan = ocount;
 		otmp->owt = weight(otmp);
