@@ -440,13 +440,8 @@ register struct obj *spellbook;
 		    if (spellbook->cursed) {
 			too_hard = TRUE;
 		    } else {
-			const char *dull = OBJ_DESCR(objects[spellbook->otyp]);
 			if (dull && !strcmp(dull, "dull") && rn2(50)) {
-			    int dulltime = (objects[spellbook->otyp].oc_level+1) * 2;
-			    dulltime += rn2(dulltime);
-			    You("fall asleep trying to read this incredibly dull spellbook.");
-			    spellbook->in_use = FALSE;
-			    fall_asleep(-dulltime, TRUE);
+			    You("feel drowsy trying to read this incredibly dull spellbook.");
 			    return(1);
 			}
 			/* uncursed - chance to fail */
