@@ -442,7 +442,7 @@ register struct obj *spellbook;
 		    } else {
 			const char *dull = OBJ_DESCR(objects[spellbook->otyp]); 
 			if (dull && !strcmp(dull, "dull") && rn2(50)) {
-			    You("fall asleep trying to read this incredibly dull spellbook.");
+			    You("feel drowsy trying to read this incredibly dull spellbook.");
 			    return(1);
 			}
 			/* uncursed - chance to fail */
