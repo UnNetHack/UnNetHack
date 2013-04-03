@@ -17,6 +17,7 @@
 
 	* removed monsters:
 	  - anti-matter vortex
+
 	* Livelog: report bag of holding explosions
 
 	* New role: Convict class
@@ -34,6 +35,9 @@
 	  - default of sortloot changed to 'loot'
 	  - Allow exact numbers in STATUSCOLOR settings (from NAO)
 	  - Permanent hallucination option: perma_hallu
+
+	* Role differentiation:
+	  - Tourists get automatic typ identification for shop items
 
 	* user interface improvements:
 	  - HP notify, showing HP changes in the message area (from NAO)

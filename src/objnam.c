@@ -614,6 +614,15 @@ boolean with_price;
 	boolean ispoisoned = FALSE;
 	char prefix[PREFIX];
 	char tmpbuf[PREFIX+1];
+
+	/* tourists get a special identification service for shop items */
+	if (Role_if(PM_TOURIST)) {
+		long price = get_cost_of_shop_item(obj);
+		if (price > 0) {
+			discover_object(obj->otyp,TRUE,FALSE);
+		}
+	}
+
 	/* when we have to add something at the start of prefix instead of the
 	 * end (Strcat is used on the end)
 	 */
@@ -996,6 +1005,8 @@ ring:
 		Sprintf(eos(bp), " (unpaid, %ld %s)",
 			quotedprice, currency(quotedprice));
 	} else if (with_price) {
+		/* price needs to be recalculated in case identification
+		 * changes the price e.g. with worthless glass */
 		long price = get_cost_of_shop_item(obj);
 		if (price > 0) {
 			Sprintf(eos(bp), " (%ld %s)", price, currency(price));
