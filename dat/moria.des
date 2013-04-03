@@ -279,7 +279,7 @@ LOOP [20] {
   MONSTER: ('o', "deep orc"), random, hostile
   OBJECT:random,random
   [10%]: MONSTER: 'T', random, hostile
-  [25%]: OBJECT:('[',"dwarvish mithril-coat"),random,blessed,1d7
+  [10%]: OBJECT:('[',"dwarvish mithril-coat"),random,blessed,1d5
 }
 
 #The Doors of Durin, abandoned, w/altar
