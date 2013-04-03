@@ -440,8 +440,9 @@ register struct obj *spellbook;
 		    if (spellbook->cursed) {
 			too_hard = TRUE;
 		    } else {
+			const char *dull = OBJ_DESCR(objects[spellbook->otyp]); 
 			if (dull && !strcmp(dull, "dull") && rn2(50)) {
-			    You("feel drowsy trying to read this incredibly dull spellbook.");
+			    You("fall asleep trying to read this incredibly dull spellbook.");
 			    return(1);
 			}
 			/* uncursed - chance to fail */
