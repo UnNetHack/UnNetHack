@@ -2119,6 +2119,14 @@ static const char * const hallu_adverb[] = {
     "incredibly", "unbelievably", "obscenely", "insanely", "amazingly", "absolutely"
 };
 
+void
+wounds_message(mon)
+struct monst *mon;
+{
+    if (mon_wounds(mon))
+	pline("%s is %s.", Monnam(mon), mon_wounds(mon));
+}
+
 char *
 mon_wounds(mon)
 struct monst *mon;
@@ -2131,7 +2139,7 @@ struct monst *mon;
 			  || mon->data == &mons[PM_FLESH_GOLEM]))
 			&& !vegetarian(mon->data));
 
-	/* Healers are able to detect wounds by sight */
+	/* Able to detect wounds? */
 	if (!(canseemon(mon) || (u.ustuck == mon && u.uswallow && !Blind))
 		 || !Role_if(PM_HEALER))
 	    return (char *)0;

@@ -3602,6 +3602,7 @@ register int dx,dy;
 			if (!otmp) {
 			    /* normal non-fatal hit */
 			    hit(fltxt, mon, exclam(tmp));
+			    if (Role_if(PM_HEALER) && flags.wounds) wounds_message(mon);
 			} else {
 			    /* some armor was destroyed; no damage done */
 			    if (canseemon(mon))
@@ -4327,7 +4328,7 @@ int damage, tell;
 	    if (mtmp->mhp < 1) {
 		if(m_using) monkilled(mtmp, "", AD_RBRE);
 		else killed(mtmp);
-	    }
+	    } else if (Role_if(PM_HEALER) && flags.wounds) wounds_message(mtmp);
 	}
 	return(resisted);
 }

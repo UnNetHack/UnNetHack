@@ -1213,7 +1213,10 @@ int thrown;
 		}
 	}
 
-	if (!destroyed) showdmg(tmp, FALSE);
+	if (!destroyed) {
+	    showdmg(tmp, FALSE);
+	    if (Role_if(PM_HEALER) && flags.wounds) wounds_message(mon);
+	}
 
 	return((boolean)(destroyed ? FALSE : TRUE));
 }

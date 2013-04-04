@@ -272,6 +272,7 @@ static struct Bool_Opt
 #else
 	{"win_edge", (boolean *)0, TRUE, SET_IN_FILE},
 #endif
+	{"wound_message", &flags.wounds, TRUE, SET_IN_GAME},
 	{"vanilla_ui_behavior", &iflags.vanilla_ui_behavior, FALSE, SET_IN_FILE},
 	{"verbose", &flags.verbose, TRUE, SET_IN_GAME},
 	{"wraptext", &iflags.wc2_wraptext, FALSE, SET_IN_GAME},
