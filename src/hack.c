@@ -2139,7 +2139,7 @@ struct monst *mon;
 			  || mon->data == &mons[PM_FLESH_GOLEM]))
 			&& !vegetarian(mon->data));
 
-	/* Able to detect wounds? */
+	/* Healers are able to detect wounds by sight */
 	if (!(canseemon(mon) || (u.ustuck == mon && u.uswallow && !Blind))
 		 || !Role_if(PM_HEALER))
 	    return (char *)0;

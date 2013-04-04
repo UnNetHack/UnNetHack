@@ -35,6 +35,8 @@
 	  - default of sortloot changed to 'loot'
 	  - Allow exact numbers in STATUSCOLOR settings (from NAO)
 	  - Permanent hallucination option: perma_hallu
+	  - New option: wound_message. Healers can recieve Crawl-style damage
+	    messages indicating the current health of their foes
 
 	* Role differentiation:
 	  - Tourists get automatic typ identification for shop items
