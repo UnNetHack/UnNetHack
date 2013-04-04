@@ -2113,6 +2113,51 @@ invocation_message()
 	}
 }
 
+static const char * const hallu_adverb[] = {
+    "mildly", "mostly", "somewhat", "slightly", "probably", "massively", "extremely",
+    "flagrantly", "flamboyantly", "supremely", "excessively", "truly", "terribly",
+    "incredibly", "unbelievably", "obscenely", "insanely", "amazingly", "absolutely"
+};
+
+char *
+mon_wounds(mon)
+struct monst *mon;
+{
+	static char buf[BUFSZ];
+	boolean wounded = ((!nonliving(mon->data) || 
+			/* Zombies and mummies (but not skeletons) have flesh */
+			((mon->data->mlet == S_ZOMBIE && mon->data != &mons[PM_SKELETON])
+			  || mon->data->mlet == S_MUMMY || mon->data->mlet == S_VAMPIRE
+			  || mon->data == &mons[PM_FLESH_GOLEM]))
+			&& !vegetarian(mon->data));
+
+	/* Healers are able to detect wounds by sight */
+	if (!(canseemon(mon) || (u.ustuck == mon && u.uswallow && !Blind))
+		 || !Role_if(PM_HEALER))
+	    return (char *)0;
+	if (mon->mhp == mon->mhpmax || mon->mhp < 1)
+	    return (char *)0;
+	if (!Hallucination && mon->mhp <= mon->mhpmax / 6) {
+	    Sprintf(buf,"almost ");
+	    strcat(buf, nonliving(mon->data) ? "destroyed" : "dead");
+	} else {
+	    if (Hallucination) {
+		Sprintf(buf,hallu_adverb[rn2(SIZE(hallu_adverb))]);
+		strcat(buf," ");
+	    }
+	    else if (mon->mhp <= mon->mhpmax / 4)
+	        Sprintf(buf,"horribly ");
+	    else if (mon->mhp <= mon->mhpmax / 3)
+	        Sprintf(buf,"heavily ");
+	    else if (mon->mhp <= 3 * mon->mhpmax / 4)
+	        Sprintf(buf,"moderately ");
+	    else
+		Sprintf(buf,"lightly ");
+	    strcat(buf, wounded || (Hallucination && rn2(2)) ? "wounded" : "damaged");
+	}
+	return buf;
+}
+
 #endif /* OVL3 */
 #ifdef OVL2
 

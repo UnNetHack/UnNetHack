@@ -38,6 +38,7 @@
 
 	* Role differentiation:
 	  - Tourists get automatic typ identification for shop items
+	  - Healers can see how wounded monsters are (by L)
 
 	* user interface improvements:
 	  - HP notify, showing HP changes in the message area (from NAO)
