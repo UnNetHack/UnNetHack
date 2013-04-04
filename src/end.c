@@ -1246,10 +1246,8 @@ list_vanquishedonly()
 		    dump_list_item_link(mons[i].mname, buf);
 		}
 	    dump_list_end();
-	    /*
-	     * if (Hallucination)
-	     *     putstr(klwin, 0, "and a partridge in a pear tree");
-	     */
+	    if (Hallucination)
+		putstr(klwin, 0, "and a partridge in a pear tree");
 	    if (ntypes > 1) {
 		putstr(klwin, 0, "");
 		Sprintf(buf, "%ld creatures vanquished.", total_killed);
