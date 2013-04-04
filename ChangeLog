@@ -18,6 +18,7 @@
 	  with a wand of cancellation (based on the patch by Malcolm Ryan)
 	* Applying zorkmids allows the player to flip a coin (code by Pasi Kallinen)
 	* Autoidentify BUC of products from BUC identified item generators (from UnNetHackPlus)
+	* Sokoban prizes are never cursed or have negative enchantment
 	* New experimental extended command: #vanquished. Shows a list of all monsters that
 	  have been vanquished during the game.
 	
