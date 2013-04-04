@@ -1188,6 +1188,80 @@ int status;
 	nethack_exit(status);
 }
 
+/* #vanquished extended command, based on showborn.
+   There is probably a much better place to put this. */
+void
+list_vanquishedonly()
+{
+    register int i, lev;
+    int ntypes = 0, max_lev = 0, nkilled;
+    long total_killed = 0L;
+    winid klwin = WIN_ERR;
+    char buf[BUFSZ];
+
+    for (i = LOW_PM; i < NUMMONS; i++) {
+	if (mvitals[i].died) ntypes++;
+	total_killed += (long)mvitals[i].died;
+	if (mons[i].mlevel > max_lev) max_lev = mons[i].mlevel;
+    }
+
+    /* vanquished creatures list;
+     * includes all dead monsters, not just those killed by the player
+     */
+    if (ntypes != 0) {
+	Sprintf(buf, "Vanquished creatures:");
+	klwin = create_nhwindow(NHW_MENU);
+	putstr(klwin, 0, buf);
+	putstr(klwin, 0, "");
+	dump_title(buf);
+	dump_list_start();
+
+	    /* countdown by monster "toughness" */
+	    for (lev = max_lev; lev >= 0; lev--)
+	      for (i = LOW_PM; i < NUMMONS; i++)
+		if (mons[i].mlevel == lev && (nkilled = mvitals[i].died) > 0) {
+		    if ((mons[i].geno & G_UNIQ) && i != PM_HIGH_PRIEST) {
+			Sprintf(buf, "%s%s",
+				!type_is_pname(&mons[i]) ? "The " : "",
+				mons[i].mname);
+			if (nkilled > 1) {
+			    switch (nkilled) {
+				case 2:  Sprintf(eos(buf)," (twice)");  break;
+				case 3:  Sprintf(eos(buf)," (thrice)");  break;
+				default: Sprintf(eos(buf)," (%d time%s)",
+						 nkilled, plur(nkilled));
+					 break;
+			    }
+			}
+		    } else {
+			/* trolls or undead might have come back,
+			   but we don't keep track of that */
+			if (nkilled == 1)
+			    Strcpy(buf, an(mons[i].mname));
+			else
+			    Sprintf(buf, "%d %s",
+				    nkilled, makeplural(mons[i].mname));
+		    }
+		    putstr(klwin, 0, buf);
+		    dump_list_item_link(mons[i].mname, buf);
+		}
+	    dump_list_end();
+	    /*
+	     * if (Hallucination)
+	     *     putstr(klwin, 0, "and a partridge in a pear tree");
+	     */
+	    if (ntypes > 1) {
+		putstr(klwin, 0, "");
+		Sprintf(buf, "%ld creatures vanquished.", total_killed);
+		putstr(klwin, 0, buf);
+		dump_line("  ", buf);
+	    }
+	display_nhwindow(klwin, TRUE);
+	destroy_nhwindow(klwin);
+	dump("", "");
+    }
+}
+
 void		/* showborn patch */
 list_vanquished(defquery, ask)
 char defquery;

@@ -98,6 +98,7 @@ extern int NDECL(dowield); /**/
 extern int NDECL(dowieldquiver); /**/
 extern int NDECL(dozap); /**/
 extern int NDECL(doorganize); /**/
+extern int NDECL(dovanquished); /**/
 
 #ifdef DUMP_LOG
 extern int NDECL(dump_screenshot); /**/
@@ -511,6 +512,13 @@ enter_explore_mode()
 			pline("Resuming normal game.");
 		}
 	}
+	return 0;
+}
+
+/* #vanquished command */
+STATIC_PTR int dovanquished()
+{
+	list_vanquishedonly();
 	return 0;
 }
 
@@ -1789,6 +1797,7 @@ struct ext_func_tab extcmdlist[] = {
 	{"turn", "turn undead", doturn, TRUE},
 	{"twoweapon", "toggle two-weapon combat", dotwoweapon, FALSE},
 	{"untrap", "untrap something", dountrap, FALSE},
+	{"vanquished", "show list of monsters killed", dovanquished, TRUE},
 	{"version", "list compile time options for this version of UnNetHack",
 		doextversion, TRUE},
 	{"wipe", "wipe off your face", dowipe, FALSE},
