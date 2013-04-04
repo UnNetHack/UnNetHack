@@ -57,6 +57,8 @@
 	  - Menus made aware of the maximum count of an item (by heinrich5991)
 	  - Message for some monster cancellation events
 	  - When standing on Elbereth, show it in status lines
+	  - New paranoid options: paranoid_lava and paranoid_water, asks for
+	      confirmation before walking into known lava and water squares
 
 	* bug fixes:
 	  - Fixed crash when player gets killed when entering a new level and

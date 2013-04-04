@@ -186,6 +186,8 @@ static struct Bool_Opt
 	{"paranoid_quit", &iflags.paranoid_quit, TRUE, SET_IN_FILE},
 	{"paranoid_remove", &iflags.paranoid_remove, FALSE, SET_IN_FILE},
 	{"paranoid_trap", &iflags.paranoid_trap, FALSE, SET_IN_FILE},
+	{"paranoid_lava", &iflags.paranoid_lava, TRUE, SET_IN_FILE},
+	{"paranoid_water", &iflags.paranoid_water, TRUE, SET_IN_FILE},
 #endif
 	{"perm_invent", &flags.perm_invent, FALSE, SET_IN_GAME},
 	{"perma_hallu", &flags.perma_hallu, FALSE, SET_IN_FILE},
@@ -3590,7 +3592,7 @@ boolean setinitial,setfromfile;
 	menu_item *paranoid_category_pick = (menu_item *)0;
 
 	static const char *paranoid_names[] = {
-		"hit", "quit", "remove", "trap"
+		"hit", "quit", "remove", "trap", "lava", "water"
 	};
 	#define NUM_PARANOID_OPTIONS SIZE(paranoid_names)
 	static boolean *paranoid_bools[NUM_PARANOID_OPTIONS];
@@ -3598,6 +3600,8 @@ boolean setinitial,setfromfile;
 	paranoid_bools[1] = &iflags.paranoid_quit;
 	paranoid_bools[2] = &iflags.paranoid_remove;
 	paranoid_bools[3] = &iflags.paranoid_trap;
+	paranoid_bools[4] = &iflags.paranoid_lava;
+	paranoid_bools[5] = &iflags.paranoid_water;
 	int paranoid_settings[NUM_PARANOID_OPTIONS];
 
 	tmpwin = create_nhwindow(NHW_MENU);
@@ -3624,6 +3628,8 @@ boolean setinitial,setfromfile;
 	iflags.paranoid_quit = paranoid_settings[1];
 	iflags.paranoid_remove = paranoid_settings[2];
 	iflags.paranoid_trap = paranoid_settings[3];
+	iflags.paranoid_lava = paranoid_settings[4];
+	iflags.paranoid_water = paranoid_settings[5];
 
 	retval = TRUE;
 #endif
@@ -4129,11 +4135,13 @@ char *buf;
 #endif
 #ifdef PARANOID
 	else if (!strcmp(optname, "paranoid"))
-		Sprintf(buf, "%s%s %s%s %s%s %s%s",
+		Sprintf(buf, "%s%s %s%s %s%s %s%s %s%s %s%s",
 			iflags.paranoid_hit ? "+" : "-", "hit",
 			iflags.paranoid_quit ? "+" : "-", "quit",
 			iflags.paranoid_remove ? "+" : "-", "remove",
-			iflags.paranoid_trap ? "+" : "-", "trap");
+			iflags.paranoid_trap ? "+" : "-", "trap",
+			iflags.paranoid_lava ? "+" : "-", "lava",
+			iflags.paranoid_water ? "+" : "-", "water");
 #endif
 	else if (!strcmp(optname, "pettype")) 
 		Sprintf(buf, "%s", (preferred_pet == 'c') ? "cat" :
