@@ -11,7 +11,15 @@
 	* Dump log: mark starting inventory items with a *
 	* Automatically identify potions of sickness, hallucination, and speed
 	  when inhaling their vapors.
-	* Sokoban prizes are never cursed or have negative enchantment
+	* Poison gas blasts leave a trail of stinking clouds (from UnNetHackPlus)
+	* Wearing fedora increases luck of archaeologists (from UnNetHackPlus)
+	* Dipping a wand of nothing into a potion of gain ability polymorphs the wand (by Grunt)
+	* Magical traps (except for magic portals and anti-magic fields) can be disarmed
+	  with a wand of cancellation (based on the patch by Malcolm Ryan)
+	* Applying zorkmids allows the player to flip a coin (code by Pasi Kallinen)
+	* Autoidentify BUC of products from BUC identified item generators (from UnNetHackPlus)
+	* New experimental extended command: #vanquished. Shows a list of all monsters that
+	  have been vanquished during the game.
 	
 	* New config option for customizing monster letter in UTF8graphics:
 	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke
