@@ -11,6 +11,7 @@
 	* Dump log: mark starting inventory items with a *
 	* Automatically identify potions of sickness, hallucination, and speed
 	  when inhaling their vapors.
+	* Sokoban prizes are never cursed or have negative enchantment
 	
 	* New config option for customizing monster letter in UTF8graphics:
 	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke

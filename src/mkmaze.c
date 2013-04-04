@@ -451,6 +451,11 @@ fixup_special()
 					}
 					otmp = mksobj_at(price_obj, ep->engr_x, ep->engr_y, TRUE, FALSE);
 					otmp->sokoprize = TRUE;
+					/* sokoban prizes are never cursed or
+					 * have negative enchantment */
+					otmp->cursed = FALSE;
+					if (otmp->spe < 0) { otmp->spe = 0; }
+
 					price++;
 #ifdef RECORD_ACHIEVE
 					if (otmp) otmp->record_achieve_special = 1;
