@@ -194,6 +194,7 @@ E void NDECL(sanity_check);
 E char FDECL(yn_function, (const char *, const char *, CHAR_P));
 E char FDECL(paranoid_yn, (const char *, BOOLEAN_P));
 E void NDECL(sokoban_trickster);
+E void NDECL(list_vanquishedonly);
 
 /* ### dbridge.c ### */
 
