@@ -1585,7 +1585,7 @@ int x, y;
 int
 doloot()	/* loot a container on the floor or loot saddle from mon. */
 {
-    register struct obj *cobj, *nobj;
+    register struct obj *cobj, *nobj, *otmp;
     register int c = -1;
     int timepassed = 0;
     coord cc;
@@ -1631,6 +1631,19 @@ lootcont:
 
 		if (cobj->olocked) {
 		    pline("Hmmm, it seems to be locked.");
+		    if (flags.autounlock) {
+			if(cobj->otyp == IRON_SAFE) {
+			    if((otmp = carrying(STETHOSCOPE))) {
+				pick_lock(otmp, cc.x, cc.y, TRUE);
+			    }
+			} else {
+			    if(((otmp = carrying(SKELETON_KEY)) ||
+				(otmp = carrying(CREDIT_CARD)) ||
+				(otmp = carrying(LOCK_PICK)))) {
+				    pick_lock(otmp, cc.x, cc.y, TRUE);
+			    }
+			}
+		    }
 		    continue;
 		}
 		if (cobj->otyp == BAG_OF_TRICKS && cobj->spe>0) {
