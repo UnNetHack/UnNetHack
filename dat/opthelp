@@ -7,6 +7,7 @@ autoopen       walking into a door attempts to open it            [TRUE]
 autopickup     automatically pick up objects you move over        [TRUE]
 autoquiver     when firing with an empty quiver, select some
                suitable inventory weapon to fill the quiver       [FALSE]
+autounlock     automatically apply unlocking tool                 [TRUE]
 BIOS           allow the use of IBM ROM BIOS calls                [FALSE]
 cmdassist      give help for errors on direction & other commands [TRUE]
 confirm        ask before hitting tame or peaceful monsters       [TRUE]
@@ -47,6 +48,7 @@ toptenwin      print topten in a window rather than stdout        [FALSE]
 travel         enable the command to travel to a map location via [TRUE]
                a shortest-path algorithm, usually invoked by '_'.
 verbose        print more commentary during the game              [TRUE]
+wound_message  healers can see how badly monsters are damaged     [TRUE]
 
 
 
@@ -133,6 +135,13 @@ packorder     a list of default symbols for kinds of objects that gives the
               order in which your pack will be displayed  [")[%?+!=/(*`0_]
               (If you specify only some kinds of items, the others from the
               default order will be appended to the end.)
+paranoid      ask for confirmation before doing any of the following:
+              hit         -- attacking a peaceful monster       [TRUE]
+              quit        -- quitting the game                  [TRUE]
+              remove      -- removing armor or accessories      [TRUE]
+              trap        -- walking into a known trap          [FALSE]
+              lava        -- walking into lava                  [TRUE]
+              water       -- walking into water                 [TRUE]
 pickup_burden when you pick up an item that exceeds this encumberance
               level (Unburdened, Burdened, streSsed, straiNed, overTaxed,
               or overLoaded), you will be asked if you want to continue. [S]
