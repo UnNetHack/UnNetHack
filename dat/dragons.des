@@ -183,7 +183,7 @@ LOOP [4] {
 
 LEVEL: "drgnD"
 #MAZE: "drgnD", ' '
-FLAGS: noteleport, hardfloor, nommap
+FLAGS: noteleport, hardfloor
 
 GEOMETRY: center, center
 MAP

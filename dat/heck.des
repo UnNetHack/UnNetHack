@@ -42,7 +42,7 @@
 #
 
 LEVEL:"heck-a-1"
-FLAGS:nommap,noteleport,mazelevel
+FLAGS:noteleport,mazelevel
 INIT_MAP:mazegrid,'-'
 GEOMETRY:center,center
 MAP
@@ -171,7 +171,7 @@ MONSTER:random,(24,10)
 #
 
 LEVEL:"heck-a-3"
-FLAGS:nommap,mazelevel
+FLAGS:mazelevel
 INIT_MAP:mazegrid,'-'
 GEOMETRY:right,bottom
 MAP

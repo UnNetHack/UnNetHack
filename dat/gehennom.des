@@ -5,7 +5,7 @@
 #
 
 LEVEL: "valley-1"
-FLAGS: noteleport,hardfloor,nommap,mazelevel
+FLAGS: noteleport,hardfloor,mazelevel
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
@@ -155,7 +155,7 @@ MONSTER:'M',random
 MONSTER:'M',random
 #
 LEVEL: "valley-2"
-FLAGS: noteleport,hardfloor,nommap,mazelevel
+FLAGS: noteleport,hardfloor,mazelevel
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP

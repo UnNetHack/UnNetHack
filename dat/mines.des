@@ -1243,7 +1243,7 @@ MONSTER:'h',random
 # Relies on some very specific behavior of MAZEWALK.
 #
 LEVEL:"minend-3"
-FLAGS:nommap,mazelevel
+FLAGS:mazelevel
 INIT_MAP:solidfill,'-'
 GEOMETRY:center,bottom
 MAP
