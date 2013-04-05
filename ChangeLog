@@ -60,6 +60,8 @@
 	  - When standing on Elbereth, show it in status lines
 	  - New paranoid options: paranoid_lava and paranoid_water, asks for
 	      confirmation before walking into known lava and water squares
+	  - Automatically ask whether to unlock when #looting a locked container
+	      and carrying an unlocking tool (from UnNetHackPlus)
 
 	* bug fixes:
 	  - Fixed crash when player gets killed when entering a new level and
@@ -85,6 +87,8 @@
 	  - Fix TTY crashing when a location has more than 32k items (from NAO)
 	  - Correct article when choking on named artifacts
 	  - C343-8: Plural of Nazgul is Nazgul, not Nazguls
+	  - C343-175: Chatting to prisoners may give an inappropriate message
+	    (from UnNetHackPlus, thanks to Reddit user Nuclear_Winterfell)
 
 2012-04-01  UnNetHack 4.0.0
 	* Uncursed and blessed scrolls of magic mapping reveal secret doors

@@ -742,7 +742,20 @@ register struct monst *mtmp;
 	    break;
 	case MS_DJINNI:
 	    if (mtmp->mtame) {
-		verbl_msg = "Sorry, I'm all out of wishes.";
+		if (ptr == &mons[PM_PRISONER]) {
+		    char *honorific;
+		    if (is_neuter(youmonst.data)) {
+			honorific = "creature";
+		    } else if(flags.female) {
+			honorific = "woman";
+		    } else {
+			honorific = "man";
+		    }
+		    Sprintf(verbuf, "I understand you're a %s who knows how to get things.", honorific);
+		    verbl_msg = verbuf;
+		} else {
+		    verbl_msg = "Sorry, I'm all out of wishes.";
+		}
 	    } else if (mtmp->mpeaceful) {
 		if (ptr == &mons[PM_WATER_DEMON])
 		    pline_msg = "gurgles.";
