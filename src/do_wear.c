@@ -330,7 +330,7 @@ Helmet_on()
     switch(uarmh->otyp) {
 	case FEDORA:
 	    if (Role_if(PM_ARCHEOLOGIST)) {
-		change_luck(1);
+		change_luck(get_luck_bonus_for_archeologist_wearing_fedora());
 	    }
 	    break;
 	case HELMET:
@@ -397,7 +397,7 @@ Helmet_off()
     switch(uarmh->otyp) {
 	case FEDORA:
 	    if (Role_if(PM_ARCHEOLOGIST)) {
-		change_luck(-1);
+		change_luck(-get_luck_bonus_for_archeologist_wearing_fedora());
 	    }
 	    break;
 	case HELMET:
@@ -598,6 +598,12 @@ Shirt_off()
     return 0;
 }
 #endif	/*TOURIST*/
+
+int
+get_luck_bonus_for_archeologist_wearing_fedora()
+{
+  return 1;
+}
 
 /* This must be done in worn.c, because one of the possible intrinsics conferred
  * is fire resistance, and we have to immediately set HFire_resistance in worn.c
