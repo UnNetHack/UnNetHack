@@ -32,6 +32,7 @@ abbot
 ac
 armor*
 armour*
+suit or piece of armor
 	"The last spot on the school jousting team came down to another 
 	boy and me. He was poor, and his only armor was a blanket his 
 	mother had made him from her hair. I, on the other hand, had 
@@ -206,6 +207,7 @@ anu
 	Anu features strongly in the _atiku_ festival in
 	Babylon, Uruk and other cities.
 ape
+apelike creature
 * ape
 	The most highly evolved of all the primates, as shown by
 	all their anatomical characters and particularly the
@@ -459,6 +461,7 @@ barbed devil
 	Barbed devils lack any real special abilities, though they
 	are quite difficult to kill.
 *bat
+bat or bird
 	A bat, flitting in the darkness outside, took the wrong turn
 	as it made its nightly rounds and came in through the window
 	which had been left healthfully open.  It then proceeded to
@@ -763,6 +766,7 @@ s*d*g*r* cat
 	linear combination has no relevance.
 		[ The Emperor's New Mind, by Roger Penrose ]
 *cat
+*feline
 kitten
 	Well-known quadruped domestic animal from the family of
 	predatory felines (_Felis ochreata domestica_), with a thick,
@@ -1301,7 +1305,7 @@ dingo
 	A wolflike wild dog, Canis dingo, of Australia, having a
 	reddish- or yellowish-brown coat, believed to have been
 	introduced by the aborigines.
-	[ Webster's Encyclopedic Unabridged Dictionary of the English Language]
+	[Webster's Encyclopedic Unabridged Dictionary of the English Language]
 disenchanter
 	Ask not, what your magic can do to it. Ask what it can do to your magic.
 disintegrator
@@ -1544,6 +1548,7 @@ electric eel
 	water, and earth.  Some mystics have postulated the necessity
 	for a fifth type, the spirit elemental, but none have ever
 	been encountered, at least on this plane of existence.
+~human or elf*
 ~elf ??m*
 ~gr?y*elf
 *elf*
@@ -1759,6 +1764,7 @@ flint*
 	A man's despair with joy allay,
 	Turn bachelors old to lovers gay.
 		[ The Magic Flute, by Wolfgang Amadeus Mozart ]
+# also takes 'fog/vapor cloud'
 fog* cloud
 	The fog comes
 	on little cat feet.
@@ -1865,6 +1871,19 @@ fox
 	escaped their suspicions.
 		[ Dracula, by Bram Stoker ]
 # gas spore -- see *spore
+gehenn*
+*h?nnom
+hell
+	"Place of Torment." The Valley of Hinnom, south-west of Jerusalem, 
+	where Solomon, king of Israel, built "a high place", or place of 
+	worship, for the gods Chemosh and Moloch. The valley came to be 
+	regarded as a place of abomination because some of the Israelites
+	sacrificed their children to Moloch there. In a later period it 
+	was made a refuse dump and perpetual fires were maintained there
+	to prevent pestilence. Thus, in the New Testament, Gehenna became
+	synonymous with hell.
+		[ Encyclopedia Mythica, ed. M.F. Lindemans ]
+*gem
 gem or rock
 	"The difference between false memories and true ones is the same
 	as for jewels: it is always the false ones that look the most real,
@@ -2479,6 +2498,7 @@ student
 warrior
 *watch
 player
+human or elf*
 	These strange creatures live mostly on the surface of the
 	earth, gathering together in societies of various forms, but
 	occasionally a stray will descend into the depths and commit
@@ -2507,7 +2527,8 @@ ice*
 	Whatever I touch,
 	Turns to snow in my clutch!
 	I'm too much!
-		[ The Year Without a Santa Claus ]
+	[ The Year Without a Santa Claus, directed by Jules Bass
+	  and Arthur Rankin Jr., written by William Keenan ]
 
 	Mr. Freeze: I will blanket the city in endless winter. First
 	Gotham, and then the world!
@@ -2518,7 +2539,8 @@ ice*
 	babies will overrun the globe, and we shall rule them, for we
 	will be the only two people left in the world.
 	Mr. Freeze: Yes, Adam and Evil!
-		[ Batman & Robin ]
+	[ Batman & Robin, directed by Joel Schumacher,
+	  written by Akiva Goldsman ]
 ice devil
 	Ice devils are large semi-insectoid creatures, who are
 	equally at home in the fires of Hell and the cold of Limbo,
@@ -3105,6 +3127,7 @@ lichen
 	gobleted, and some with fringe of red to it.
 		[ Lorna Doone, by R.D. Blackmore ]
 ~* of light
+light
 * light
 	Strange creatures formed from energy rather than matter,
 	lights are given to self-destructive behavior when battling
@@ -5224,6 +5247,7 @@ trap*door
 	tragedies of all kinds.
 		[ The Phantom of the Opera, by Gaston Leroux ]
 trapper
+trapper or lurker above
 	The trapper is a creature which has evolved a chameleon-like
 	ability to blend into the dungeon surroundings.  It captures
 	its prey by remaining very still and blending into the
