@@ -329,7 +329,7 @@ Helmet_on()
 {
     switch(uarmh->otyp) {
 	case FEDORA:
-	    /* archeologist recieve luck bonus for wearing fedora */
+	    /* archeologists recieve luck bonus for wearing fedora */
 	    if (Role_if(PM_ARCHEOLOGIST)) {
 		change_luck(lucky_fedora());
 	    }
