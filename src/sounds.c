@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sounds.c	3.4	2002/05/06	*/
+	/*	SCCS Id: @(#)sounds.c	3.4	2002/05/06	*/
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -751,6 +751,7 @@ register struct monst *mtmp;
 		    } else {
 			honorific = "man";
 		    }
+		    /* from http://www.reddit.com/r/nethack/comments/1awkre/looking_for_better_chatting_response_from_tame/ */
 		    Sprintf(verbuf, "I understand you're a %s who knows how to get things.", honorific);
 		    verbl_msg = verbuf;
 		} else {
