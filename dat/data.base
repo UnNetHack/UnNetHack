@@ -127,7 +127,7 @@ maud
 	Than ever I have been yet!
 		[ Maud, And Other Poems by Alfred, Lord Tennyson ]
 ~amulet of yendor
-~amulet of restful sleep
+~amulet of*sleep
 *amulet
 amulet of *
 amulet versus *
@@ -499,6 +499,17 @@ bell of opening
 	* Old Tom was the single cracked bronze bell in the University
 	bell tower.
 		[ Eric, by Terry Pratchett ]
+black angel
+	When we have understood about free will, we shall see how silly
+	it is to ask, as somebody once asked me: 'Why did God make a
+	creature of such rotten stuff that it went wrong?' The better
+	stuff a creature is made of --  the cleverer and stronger and freer
+	it is -- then the better it will be if it goes right, but also the
+	worse it will be if it goes wrong. A cow cannot be very good or
+	very bad; a dog can be both better and worse; a child better and
+	worse still; an ordinary man, still more so; a man of genius,
+	still more so; a superhuman spirit best -- or worst-of-all.
+		[ Mere Christianity, by C. S. Lewis ]
 blindfold
 	The blindfolding was performed by binding a piece of the
 	yellowish linen whereof those of the Amahagger who condescended
@@ -2445,7 +2456,6 @@ chieftain
 guard
 nurse
 ronin
-shopkeeper
 student
 thug
 warrior
@@ -2826,15 +2836,6 @@ kos
 	   [ Swords and Deviltry, by Fritz Leiber ]
 koto
 	A Japanese harp.
-*watcher*
-	Out from the water a long sinuous tentacle had crawled; it
-	was pale-green and luminous and wet.  Its fingered end had
-	hold of Frodo's foot, and was dragging him into the water.
-	Sam on his knees was now slashing at it with a knife.  The
-	arm let go of Frodo, and Sam pulled him away, crying out
-	for help.  Twenty other arms came rippling out.  The dark
-	water boiled, and there was a hideous stench.
-	   [ The Fellowship of the Ring, by J.R.R. Tolkien ]
 kraken
 	"Below the thunders of the upper deep; 
 	Far, far beneath in the abysmal sea, 
@@ -4133,6 +4134,11 @@ punisher
 	to the most minute vibrations in the earth, but may also
 	be awakened by a remote shriek.
 pyrolisk
+	A single glance from this red-feathered cockatrice  can cause even 
+	the bravest adventurer to burst into flames, their flesh withering 
+	and blackening and curling beneath the creature's baleful gaze. 
+		[ The New Bestiary, Wizard Endlebrook ]
+
 	At first glance around the corner, I thought it was another 
 	cockatrice. I had encountered the wretched creatures two or
 	three times since leaving the open area. I quickly ducked my 
@@ -4711,6 +4717,7 @@ sling
 		[ 1 Samuel 17:48-50 ]
 *snake
 serpent
+water moccasin
 pit viper
 	Now the serpent was more subtle than any beast of the field
 	which the Lord God had made.  And he said unto the woman, Yea,
@@ -5447,6 +5454,15 @@ war*hammer
 	while men of both armies scrambled in the swirling waters for
 	rubies knocked free of his armor.
 		[ A Game of Thrones, by George R.R. Martin ]
+*watcher*
+	Out from the water a long sinuous tentacle had crawled; it
+	was pale-green and luminous and wet.  Its fingered end had
+	hold of Frodo's foot, and was dragging him into the water.
+	Sam on his knees was now slashing at it with a knife.  The
+	arm let go of Frodo, and Sam pulled him away, crying out
+	for help.  Twenty other arms came rippling out.  The dark
+	water boiled, and there was a hideous stench.
+	   [ The Fellowship of the Ring, by J.R.R. Tolkien ]
 water
 	Day after day, day after day,
 	We stuck, nor breath nor motion;
