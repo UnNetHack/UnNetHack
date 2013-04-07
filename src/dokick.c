@@ -341,6 +341,15 @@ register struct obj *gold;
 			   goldreqd = 500L;
 			else if (mtmp->data == &mons[PM_CAPTAIN])
 			   goldreqd = 750L;
+                       /* watchmen's wages are less than that of soldiers. */
+                       /* bribery is 90% of soldiers/lieutenants' requirement. */
+                       else if (mtmp->data == &mons[PM_WATCHMAN])
+                          goldreqd = 90L;
+                       else if (mtmp->data == &mons[PM_WATCH_CAPTAIN])
+                          goldreqd = 450L;
+                       /* VERY hard to bribe these guys */
+                       else if (mtmp->data == &mons[PM_GUARD])
+                          goldreqd = 5000L;
 #ifdef CONVICT
 			else if (mtmp->data == &mons[PM_PRISON_GUARD])
 			   goldreqd = 200L;
