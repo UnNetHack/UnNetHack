@@ -964,8 +964,8 @@ genericptr_t p2;
     } else {			/* A monster is inside the cloud */
 	mtmp = (struct monst *) p2;
 
-	/* Non living and non breathing monsters are not concerned */
-	if (!nonliving(mtmp->data) && !breathless(mtmp->data)) {
+	/* Non living, non breathing, aquatic monsters are not concerned */
+	if (!nonliving(mtmp->data) && !breathless(mtmp->data) && !amphibious(mtmp->data)) {
 	    if (cansee(mtmp->mx, mtmp->my))
 		pline("%s coughs!", Monnam(mtmp));
 	    setmangry(mtmp);
