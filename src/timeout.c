@@ -195,7 +195,7 @@ nh_timeout()
 	if (flags.friday13) baseluck -= 1;
 
 	if (Role_if(PM_ARCHEOLOGIST) && uarmh && uarmh->otyp == FEDORA) {
-	    baseluck += get_luck_bonus_for_archeologist_wearing_fedora();
+	    baseluck += lucky_fedora();
 	}
 	if (u.uluck != baseluck &&
 		moves % (u.uhave.amulet || u.ugangr ? 300 : 600) == 0) {

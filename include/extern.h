@@ -374,7 +374,7 @@ E char *FDECL(coyotename, (struct monst *,char *));
 
 /* ### do_wear.c ### */
 
-E int NDECL(get_luck_bonus_for_archeologist_wearing_fedora);
+E int NDECL(lucky_fedora);
 #ifdef USE_TRAMPOLI
 E int NDECL(Armor_on);
 E int NDECL(Boots_on);
