@@ -79,6 +79,7 @@
 	  - Fixed crash when destroying bag of holding containing gold pieces
 	  - Fixed gold not merging in containers after container has been BUC
 	    tested on altars
+	  - Empty bag of tricks don't get destroyed by wands of cancellation
 
 	* vanilla bug fixes:
 	  - Prevent the Book of the Dead from being destroyed when the

@@ -1979,7 +1979,7 @@ register struct obj *obj;
 			/* mark a non-reviving corpse as such */
 			if (rot_alarm) obj->norevive = 1;
 		}
-	} else if (Is_mbag(current_container) && mbag_explodes(obj, 0)) {
+	} else if ((current_container->otyp == BAG_OF_HOLDING) && mbag_explodes(obj, 0)) {
 #ifdef LIVELOGFILE
 		livelog_generic("boh_explosion", dump_typename(obj->otyp));
 #endif
