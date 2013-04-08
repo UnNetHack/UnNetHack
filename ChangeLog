@@ -22,6 +22,8 @@
 	* New experimental extended command: #vanquished. Shows a list of all monsters that
 	  have been vanquished during the game.
 	* Only the Sanctum and the Astral Plane are unmappable levels
+	* Automatically identify wand of cancellation after destroying a bag
+	  of holding with it
 	
 	* New config option for customizing monster letter in UTF8graphics:
 	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke

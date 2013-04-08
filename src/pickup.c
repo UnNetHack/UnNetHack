@@ -1987,6 +1987,11 @@ register struct obj *obj;
 		pline( "As you put %s inside, you are blasted by a magical explosion!", doname(obj));
 		/* did not actually insert obj yet */
 		if (was_unpaid) addtobill(obj, FALSE, FALSE, TRUE);
+		/* At least ID the wand and give some experience for losing a bag of
+		 * holding this way. */
+		if (obj->otyp == WAN_CANCELLATION) {
+			makeknown(obj->otyp);
+		}
 		obfree(obj, (struct obj *)0);
 
 		/* dump it out onto the floor so the scatterage can take effect */
