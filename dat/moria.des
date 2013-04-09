@@ -43,7 +43,7 @@ ENGRAVING:(12,18),burn,"Herein lie the lower remnants of the Endless Stair."
 LOOP [20] {
 	$goldpile = selection:circle(rndcoord(fillrect(04,04,08,15) & fillrect(14,04,65,08)), 2, filled)
 	LOOP [10] {
-	GOLD: 10d100, rndcoord($goldpile)
+	OBJECT:'*', rndcoord($goldpile)
 	TERRAIN:rndcoord($goldpile), 'L'
 	}
 }
@@ -157,12 +157,12 @@ FLAGS:mazelevel
 GEOMETRY: center, center
 MAP
                                      FFFFFFFFFFF
-                                     F.........F      FFFFFFFFFFF
-    FFFFFFFFFF     FFFFFFFFFFFFFFFFFFF.........F      F.........F
-    F........F     F...........................F      F.........FFFFFFFFFFF
-    F........F     F.FFFFFFFFFFFFFFFFFFFFFFFFFFF      F...................F
-    F........F     F.F                                F.........FFFFFFFFF.F
-    FFFFFFFF.FFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFFFFFFF    F.........F       F.F
+                        FFFFFFFFFFFFFF.........F      FFFFFFFFFFF
+    FFFFFFFFFF          F......................F      F.........F
+    F........F          F.FFFFFFFFFFFF.........F      F.........FFFFFFFFFFF
+    F........F          F.F          FFFFFFFFFFF      F...................F
+    F........F          F.F                           F.........FFFFFFFFF.F
+    FFFFFFFF.FFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFF    F.........F       F.F
            F.....................................F    F.........F       F.F
            F.FFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFFFFF.F    F.........F       F.F
            F.F     F.F                         F.F    F.........F       F.F
@@ -279,7 +279,7 @@ LOOP [20] {
   MONSTER: ('o', "deep orc"), random, hostile
   OBJECT:random,random
   [10%]: MONSTER: 'T', random, hostile
-  [10%]: OBJECT:('[',"dwarvish mithril-coat"),random,blessed,1d5
+  [20%]: OBJECT:('[',"dwarvish mithril-coat"),random,blessed,1d5
 }
 
 #The Doors of Durin, abandoned, w/altar
@@ -378,7 +378,7 @@ OBJECT:('(',"large box"), $altarcontainers[5]
 IF [time.night == 1] { ENGRAVING:(44,10),engrave,"Speak, friend, and enter." }
 
 #These are marginally useful, yet so rare.
-MONSTER: (';',"Watcher in the Water"),(66,10) { OBJECT:('(', "horn of plenty"),uncursed }
+MONSTER: (';',"Watcher in the Water"),(66,10) { OBJECT:('(', "magic harp"),uncursed }
 
 #The Doors of Durin, destroyed, w/o altar
 
@@ -487,4 +487,4 @@ SHUFFLE:$altarcontainers
 #IF [time.night == 1] { ENGRAVING:(44,10),engrave,"Speak, friend, and enter." }
 
 LOOP [10 + 2d5] { MONSTER:  ('o', "deep orc"), random, hostile }
-MONSTER: (';',"Watcher in the Water"),(66,10) { OBJECT:('(', "horn of plenty"),uncursed }
+MONSTER: (';',"Watcher in the Water"),(66,10) { OBJECT:('(', "magic harp"),uncursed }
