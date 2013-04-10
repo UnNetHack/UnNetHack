@@ -31,7 +31,7 @@ MAP
 ---------------------------------------------------------------------------
 ENDMAP
 REGION:(01,01,73,18),lit,"ordinary"
-TELEPORT_REGION:(15,12,70,14),(0,0,0,0)
+TELEPORT_REGION:(15,12,70,18),(0,0,0,0)
 MON_GENERATION:50%, (7, "deep orc"), (3, 'o')
 BRANCH:(43,15,43,15),(0,0,0,0)
 STAIR:(71,02), up
@@ -39,14 +39,17 @@ STAIR:(71,02), up
 
 ENGRAVING:(12,18),burn,"Herein lie the lower remnants of the Endless Stair."
 
-#Random piles of gold amongst pits of lava
+#Random piles of gems amongst pits of lava
 LOOP [20] {
-	$goldpile = selection:circle(rndcoord(fillrect(04,04,08,15) & fillrect(14,04,65,08)), 2, filled)
-	LOOP [10] {
-	OBJECT:'*', rndcoord($goldpile)
-	TERRAIN:rndcoord($goldpile), 'L'
-	}
+  $gempile = selection:circle(rndcoord(fillrect(04,04,08,15) & fillrect(14,04,65,08)), 2, filled)
+  LOOP [10] {
+    OBJECT:'*', rndcoord($gempile)
+    TERRAIN:rndcoord($gempile), 'L'
+  }
 }
+
+#And a little treasure yet to be extracted from the earth...
+LOOP [2d8] { OBJECT:('*',"small piece of unrefined mithril"),rndcoord(fillrect(15,12,70,18)),buried }
 
 #The Bridge of Khazad-dûm
 #(Why lava? Because holes look ugly.)
@@ -142,7 +145,7 @@ NON_DIGGABLE:(00,00,74,17)
 MON_GENERATION:70%, (7, "deep orc"), (3, 'o')
 MESSAGE: "The dungeon here seems less persistent."
 SOUNDS:200, (feel, "the dungeon suddenly center itself around you!")
-$stairs = { (05,15), (08,04), (22,14), (42,02), (55,16), (60,04) }
+$stairs = { (05,15), (08,04), (22,14), (42,02), (55, 16), (60,04) }
 SHUFFLE:$stairs
 STAIR:$stairs[0], up
 STAIR:$stairs[1], down
@@ -184,7 +187,7 @@ NON_DIGGABLE:(00,00,74,17)
 MON_GENERATION:70%, (7, "deep orc"), (3, 'o')
 MESSAGE: "The dungeon here seems less persistent."
 SOUNDS:200, (feel, "the dungeon suddenly center itself around you!")
-$stairs = { (05,15), (08,04), (22,14), (44,02), (55,16), (59,04) }
+$stairs = { (05,15), (08,04), (22,14), (44,02), (55, 16), (59,04) }
 SHUFFLE:$stairs
 STAIR:$stairs[0], up
 STAIR:$stairs[1], down
@@ -226,7 +229,7 @@ NON_DIGGABLE:(00,00,74,17)
 MON_GENERATION:70%, (7, "deep orc"), (3, 'o')
 MESSAGE: "The dungeon here seems less persistent."
 SOUNDS:200, (feel, "the dungeon suddenly center itself around you!")
-$stairs = { (05,15), (08,04), (22,14), (35,15), (42,02), (55,16), (60,04) }
+$stairs = { (05,15), (08,04), (22,14), (35,15), (42,02), (55, 16), (60,04) }
 SHUFFLE:$stairs
 STAIR:$stairs[0], up
 STAIR:$stairs[1], down
@@ -482,7 +485,7 @@ LOOP [5] { OBJECT:random,rndcoord(fillrect(18,13,44,18)) }
 OBJECT:('`',"boulder"),(41,03)
 $altarcontainers = { (44,01), (44,03), (44,05), (37,01), (37,03), (37,05) }
 SHUFFLE:$altarcontainers
-[75%]: OBJECT:('(',"ice box"), $altarcontainers[0]
+[75%]:OBJECT:('(',"ice box"), $altarcontainers[0]
 [75%]:OBJECT:('(',"iron safe"), $altarcontainers[1]
 [75%]:OBJECT:('(',"iron safe"), $altarcontainers[2]
 [75%]:OBJECT:('(',"large box"), $altarcontainers[3]
