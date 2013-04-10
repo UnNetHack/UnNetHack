@@ -145,7 +145,7 @@ NON_DIGGABLE:(00,00,74,17)
 MON_GENERATION:70%, (7, "deep orc"), (3, 'o')
 MESSAGE: "The dungeon here seems less persistent."
 SOUNDS:200, (feel, "the dungeon suddenly center itself around you!")
-$stairs = { (05,15), (08,04), (22,14), (42,02), (55, 16), (60,04) }
+$stairs = { (05,15), (08,04), (22,14), (42,02), (55,16), (60,04) }
 SHUFFLE:$stairs
 STAIR:$stairs[0], up
 STAIR:$stairs[1], down
@@ -187,7 +187,7 @@ NON_DIGGABLE:(00,00,74,17)
 MON_GENERATION:70%, (7, "deep orc"), (3, 'o')
 MESSAGE: "The dungeon here seems less persistent."
 SOUNDS:200, (feel, "the dungeon suddenly center itself around you!")
-$stairs = { (05,15), (08,04), (22,14), (44,02), (55, 16), (59,04) }
+$stairs = { (05,15), (08,04), (22,14), (44,02), (55,16), (59,04) }
 SHUFFLE:$stairs
 STAIR:$stairs[0], up
 STAIR:$stairs[1], down
@@ -229,7 +229,7 @@ NON_DIGGABLE:(00,00,74,17)
 MON_GENERATION:70%, (7, "deep orc"), (3, 'o')
 MESSAGE: "The dungeon here seems less persistent."
 SOUNDS:200, (feel, "the dungeon suddenly center itself around you!")
-$stairs = { (05,15), (08,04), (22,14), (35,15), (42,02), (55, 16), (60,04) }
+$stairs = { (05,15), (08,04), (22,14), (35,15), (42,02), (55,16), (60,04) }
 SHUFFLE:$stairs
 STAIR:$stairs[0], up
 STAIR:$stairs[1], down
