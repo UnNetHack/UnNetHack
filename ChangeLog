@@ -64,6 +64,7 @@
 	      confirmation before walking into known lava and water squares
 	  - Automatically ask whether to unlock when #looting a locked container
 	      and carrying an unlocking tool (from UnNetHackPlus)
+	  - Show remaining memory in spellcasting menu as percentage (from AceHack)
 
 	* bug fixes:
 	  - Fixed crash when player gets killed when entering a new level and
