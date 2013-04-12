@@ -46,6 +46,9 @@ typedef struct mi {
 #define ATR_ULINE   4
 #define ATR_BLINK   5
 #define ATR_INVERSE 7
+#ifdef MENU_COLOR
+# define ATR_UNDEFINED 8
+#endif
 
 /* nh_poskey() modifier types */
 #define CLICK_1     1

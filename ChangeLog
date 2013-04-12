@@ -24,7 +24,9 @@
 	* Only the Sanctum and the Astral Plane are unmappable levels
 	* Automatically identify wand of cancellation after destroying a bag
 	  of holding with it
-	
+	* Menucolors: setting a color or attribute doesn't remove a previously
+	  set attribute or color (by aaxelb)
+
 	* New config option for customizing monster letter in UTF8graphics:
 	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke
 

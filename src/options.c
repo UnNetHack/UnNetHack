@@ -1290,6 +1290,9 @@ static const struct {
    {"lightmagenta", CLR_BRIGHT_MAGENTA},
    {"lightcyan", CLR_BRIGHT_CYAN},
    {"white", CLR_WHITE}
+#ifdef MENU_COLOR
+   ,{"none", NO_COLOR}
+#endif
 };
 
 #ifdef MENU_COLOR
@@ -1305,7 +1308,6 @@ static const struct {
      {"underline", ATR_ULINE},
      {"blink", ATR_BLINK},
      {"inverse", ATR_INVERSE}
-
 };
 
 /* parse '"regex_string"=color&attr' and add it to menucoloring */
@@ -1313,7 +1315,7 @@ boolean
 add_menu_coloring(str)
 char *str;
 {
-    int i, c = NO_COLOR, a = ATR_NONE;
+    int i, c = CLR_UNDEFINED, a = ATR_UNDEFINED;
     struct menucoloring *tmp;
     char *tmps, *cs = strchr(str, '=');
 #ifdef MENU_COLOR_REGEX_POSIX
@@ -1336,9 +1338,9 @@ char *str;
     if ((i == SIZE(colornames)) && (*tmps >= '0' && *tmps <='9'))
 	c = atoi(tmps);
 
-    if (c > 15) return FALSE;
+    if (c > CLR_UNDEFINED) return FALSE;
 
-    tmps = strchr(str, '&');
+    tmps = c == CLR_UNDEFINED ? cs : strchr(str, '&');
     if (tmps) {
 	tmps++;
 	while (*tmps && isspace(*tmps)) tmps++;
@@ -1350,6 +1352,8 @@ char *str;
 	if ((i == SIZE(attrnames)) && (*tmps >= '0' && *tmps <='9'))
 	    a = atoi(tmps);
     }
+
+    if (c == CLR_UNDEFINED && a == ATR_UNDEFINED) return FALSE;
 
     *cs = '\0';
     tmps = str;

@@ -119,6 +119,8 @@ char *str;
 int *color, *attr;
 {
     struct menucoloring *tmpmc;
+    boolean foundcolor = FALSE, foundattr = FALSE;
+
     if (iflags.use_menu_color && iflags.use_color)
 	for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
 # ifdef MENU_COLOR_REGEX
@@ -130,11 +132,19 @@ int *color, *attr;
 # else
 	    if (pmatch(tmpmc->match, str)) {
 # endif
-		*color = tmpmc->color;
-		*attr = tmpmc->attr;
-		return TRUE;
+		if (!foundcolor && tmpmc->color != CLR_UNDEFINED) {
+		    *color = tmpmc->color;
+		    foundcolor = TRUE;
+		}
+		if (!foundattr && tmpmc->attr != ATR_UNDEFINED) {
+		    *attr = tmpmc->attr;
+		    foundattr = TRUE;
+		}
+		if (foundcolor && foundattr) return TRUE;
 	    }
-    return FALSE;
+    if (foundcolor && !foundattr) *attr = ATR_NONE;
+    if (foundattr && !foundcolor) *color = NO_COLOR;
+    return foundcolor || foundattr;
 }
 #endif /* MENU_COLOR */
 

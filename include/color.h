@@ -43,6 +43,9 @@
 #define CLR_BRIGHT_CYAN		14
 #define CLR_WHITE		15
 #define CLR_MAX			16
+#ifdef MENU_COLOR
+# define CLR_UNDEFINED		CLR_MAX
+#endif
 
 /* The "half-way" point for tty based color systems.  This is used in */
 /* the tty color setup code.  (IMHO, it should be removed - dean).    */
