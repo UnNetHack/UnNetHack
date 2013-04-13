@@ -1181,7 +1181,7 @@ dump_spells()
 			100 - percent_success(i),
 			(spellknow(i) * 100 + (KEEN-1)) / KEEN);
 		dump_text("  %s\n", buf);
-		Sprintf(buf, "<tr><td>%s</td><td align=\"right\">%d%s</td><td>%s</td><td align=\"right\">%d%%</td><td align=\"center\">%d%%</td></tr>\n",
+		Sprintf(buf, "<tr><td>%s</td><td align=\"right\">%d%s</td><td>%s</td><td align=\"right\">%d%%</td><td align=\"right\">%d%%</td></tr>\n",
 			spellname(i), spellev(i),
 			(spellknow(i) > 1000) ? "&nbsp;" : (spellknow(i) ? "!" : "*"),
 			spelltypemnemonic(spell_skilltype(spellid(i))),
