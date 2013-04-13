@@ -405,6 +405,10 @@ int curse_bless;
 	is_cursed = curse_bless < 0;
 	is_blessed = curse_bless > 0;
 
+	/* Scrolls of charging now ID charge count, as well as doing
+	   the charging, unless cursed. */
+	if (!is_cursed) obj->known = 1;
+
 	if (obj->oclass == WAND_CLASS) {
 	    /* undo any prior cancellation, even when is_cursed */
 	    if (obj->spe == -1) obj->spe = 0;
