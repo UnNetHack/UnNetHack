@@ -69,7 +69,7 @@
 	  - Show remaining memory in spellcasting menu as percentage (from AceHack)
 	  - Applying a spellbook allows the player to flip through the pages,
 	      providing an indication of how many more times it can be read
-	  - Non-cursed charging identifies how many charges an item has (from AceHack)
+	  - Blessed charging identifies how many charges an item has (from AceHack)
 
 	* bug fixes:
 	  - Fixed crash when player gets killed when entering a new level and
