@@ -3153,6 +3153,7 @@ doapply()
 		}
 		break;
 	case SPE_BLANK_PAPER:
+		You("flip through the pages of the spellbook.");
 		pline("This spellbook %s.", Hallucination ? "doesn't have much of a plot" : "has nothing written in it");
 		makeknown(obj->otyp);
 		break;
