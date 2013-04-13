@@ -2872,7 +2872,8 @@ doapply()
 	if (carrying(POT_OIL) || uhave_graystone())
 		Strcpy(class_list, tools_too);
 	else
-		Strcpy(class_list, tools);
+		Strcpy(class_list, tools),
+		add_class(class_list, SPBOOK_CLASS);
 	if (carrying(CREAM_PIE) || carrying(EUCALYPTUS_LEAF))
 		add_class(class_list, FOOD_CLASS);
 
@@ -3087,6 +3088,73 @@ doapply()
 	case LOADSTONE:
 	case TOUCHSTONE:
 		use_stone(obj);
+		break;
+	case SPE_CONE_OF_COLD:
+	case SPE_FIREBALL:
+	case SPE_FORCE_BOLT:
+	case SPE_SLEEP:
+	case SPE_MAGIC_MISSILE:
+	case SPE_KNOCK:
+	case SPE_SLOW_MONSTER:
+	case SPE_WIZARD_LOCK:
+	case SPE_DIG:
+	case SPE_TURN_UNDEAD:
+	case SPE_POLYMORPH:
+	case SPE_TELEPORT_AWAY:
+	case SPE_CANCELLATION:
+	case SPE_FINGER_OF_DEATH:
+	case SPE_LIGHT:
+	case SPE_DETECT_UNSEEN:
+	case SPE_HEALING:
+	case SPE_EXTRA_HEALING:
+	case SPE_DRAIN_LIFE:
+	case SPE_STONE_TO_FLESH:
+	case SPE_REMOVE_CURSE:
+	case SPE_CONFUSE_MONSTER:
+	case SPE_DETECT_FOOD:
+	case SPE_CAUSE_FEAR:
+	case SPE_CHARM_MONSTER:
+	case SPE_MAGIC_MAPPING:
+	case SPE_CREATE_MONSTER:
+	case SPE_IDENTIFY:
+	case SPE_HASTE_SELF:
+	case SPE_DETECT_TREASURE:
+	case SPE_DETECT_MONSTERS:
+	case SPE_LEVITATION:
+	case SPE_RESTORE_ABILITY:
+	case SPE_INVISIBILITY:
+	case SPE_CURE_BLINDNESS:
+	case SPE_CURE_SICKNESS:
+	case SPE_CREATE_FAMILIAR:
+	case SPE_CLAIRVOYANCE:
+	case SPE_PROTECTION:
+	case SPE_JUMPING:
+		if (Underwater) {
+		    pline("You don't want to get the pages even more soggy, do you?");
+		    break;
+		} else {
+		    You("flip through the pages of the spellbook.");
+		    if (!Blind && Hallucination) {
+			You("enjoy the animation in the margins.");
+		    } else if (Blind) {
+			pline("The pages feel %s.", Hallucination ? "freshly picked" : "rough and dry");
+		    /* This assumes that MAX_SPELL_STUDY is defined as 3 */
+		    } else if (obj->spestudied == 0) {
+		 	pline("The ink in this spellbook is fresh.");
+		    } else if (obj->spestudied == 1) {
+		 	pline("The ink in this spellbook is slightly faded.");
+		    } else if (obj->spestudied == 2) {
+		 	pline("The ink in this spellbook is very faded.");
+		    } else if (obj->spestudied == 3) {
+		 	pline("The ink in this spellbook is extremely faded.");
+		    } else if (obj->spestudied > 3) {
+		 	pline("The ink in this spellbook is barely visible.");
+		    }
+		}
+		break;
+	case SPE_BLANK_PAPER:
+		pline("This spellbook %s.", Hallucination ? "doesn't have much of a plot" : "has nothing written in it");
+		makeknown(obj->otyp);
 		break;
 	default:
 		/* Pole-weapons can strike at a distance */

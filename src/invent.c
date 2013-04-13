@@ -1936,6 +1936,9 @@ struct obj *obj;
 	else if (obj->oclass == WAND_CLASS)
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'a', 0, ATR_NONE,
 				"Break this wand", MENU_UNSELECTED);
+	else if (obj->oclass == SPBOOK_CLASS)
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'a', 0, ATR_NONE,
+				"Flip through this spellbook", MENU_UNSELECTED);
 	/* d: drop item, works on everything */
 	any.a_void = (genericptr_t)dodrop;
 	add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'd', 0, ATR_NONE,
