@@ -68,7 +68,7 @@
 	      and carrying an unlocking tool (from UnNetHackPlus)
 	  - Show remaining memory in spellcasting menu as percentage (from AceHack)
 	  - Applying a spellbook allows the player to flip through the pages,
-	      providing an indication of how many reads it has left.
+	      providing an indication of how many more times it can be read.
 
 	* bug fixes:
 	  - Fixed crash when player gets killed when entering a new level and

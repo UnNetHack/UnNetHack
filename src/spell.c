@@ -1116,7 +1116,7 @@ int *spell_no;
 			(spellknow(i) > 1000) ? " " : (spellknow(i) ? "!" : "*"),
 			spelltypemnemonic(spell_skilltype(spellid(i))),
 			100 - percent_success(i),
-                        (spellknow(i) * 100 + (KEEN-1)) / KEEN);
+			(spellknow(i) * 100 + (KEEN-1)) / KEEN);
 
 		any.a_int = i+1;	/* must be non-zero */
 		add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any,
@@ -1174,14 +1174,14 @@ dump_spells()
 			(spellknow(i) > 1000) ? " " : (spellknow(i) ? "!" : "*"),
 			spelltypemnemonic(spell_skilltype(spellid(i))),
 			100 - percent_success(i),
-                        (spellknow(i) * 100 + (KEEN-1)) / KEEN);
+			(spellknow(i) * 100 + (KEEN-1)) / KEEN);
 		dump_text("  %s\n", buf);
 		Sprintf(buf, "<tr><td>%s</td><td align=\"right\">%d%s</td><td>%s</td><td align=\"right\">%d%%</td><td align=\"right\">%d%%</td></tr>\n",
 			spellname(i), spellev(i),
 			(spellknow(i) > 1000) ? "&nbsp;" : (spellknow(i) ? "!" : "*"),
 			spelltypemnemonic(spell_skilltype(spellid(i))),
 			100 - percent_success(i),
-                        (spellknow(i) * 100 + (KEEN-1)) / KEEN);
+			(spellknow(i) * 100 + (KEEN-1)) / KEEN);
 		dump_html(buf,"");
 	}
 	dump_html("</table>\n", "");
