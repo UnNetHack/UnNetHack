@@ -1142,6 +1142,11 @@ register struct trobj *trop;
 			setworn(obj, W_TOOL);
 		}
 
+		/* mark object as start inventory object */
+		if (obj) {
+			obj->was_in_starting_inventory = TRUE;
+		}
+
 #if !defined(PYRAMID_BUG) && !defined(MAC)
 		if(--trop->trquan) continue;	/* make a similar object */
 #else
@@ -1152,11 +1157,6 @@ register struct trobj *trop;
 		}
 #endif
 		trop++;
-
-		/* mark object as start inventory object */
-		if (obj) {
-			obj->was_in_starting_inventory = TRUE;
-		}
 	}
 }
 
