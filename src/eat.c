@@ -2375,7 +2375,7 @@ gethungry()	/* as time goes by - called by moveloop() and domove() */
 	    /* Regeneration uses up food when injured, unless due to an artifact */
 	    if (HRegeneration || ((ERegeneration & (~W_ART)) &&
 				(ERegeneration != W_WEP || !uwep->oartifact)) &&
-				(uhp() < uhpmax())
+				(uhp() < uhpmax()))
 			u.uhunger--;
 	    if (near_capacity() > SLT_ENCUMBER) u.uhunger--;
 	} else {		/* even turns */
