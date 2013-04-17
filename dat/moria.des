@@ -346,16 +346,17 @@ OBJECT:('%',"lembas wafer"),(30,04)
 
 #Chamber of Mazarbul
 GRAVE:(06,03), "Balin, Son of Fundin, Lord of Moria"
+OBJECT:('(',"magic harp"),(06,03),uncursed,buried
 OBJECT:"statue",(01,07),montype:('h', "dwarf"),1
 OBJECT:"statue",(02,07),montype:('h', "dwarf"),1
 OBJECT:"statue",(10,07),montype:('h', "dwarf"),1
 OBJECT:"statue",(11,07),montype:('h', "dwarf"),1
-CONTAINER:"chest", (01,01) { OBJECT: '?',blessed }
-CONTAINER:"chest", (01,03) { OBJECT: '+',blessed }
-CONTAINER:"chest", (01,05) { OBJECT: '!',blessed }
-CONTAINER:"chest", (04,07) { OBJECT: '/',blessed }
-CONTAINER:"chest", (06,07) { OBJECT: '(',blessed }
-CONTAINER:"chest", (08,07) { OBJECT: '=',blessed }
+CONTAINER:"chest", (01,01) { OBJECT:'?',blessed }
+CONTAINER:"chest", (01,03) { OBJECT:'+',blessed }
+CONTAINER:"chest", (01,05) { OBJECT:'!',blessed }
+CONTAINER:"chest", (04,07) { OBJECT:'/',blessed }
+CONTAINER:"chest", (06,07) { OBJECT:'"',blessed }
+CONTAINER:"chest", (08,07) { OBJECT:'=',blessed }
 
 #Random loot
 $chests = { (13,01), (15,01), (17,01), (19,01), (13,07), (15,07), (17,07), (19,07) }
@@ -369,7 +370,7 @@ CONTAINER:"chest", $chests[6] { OBJECT:random,quantity:1d3 }
 CONTAINER:"chest", $chests[7] { OBJECT:random,quantity:1d3 }
 
 #Warehouse
-LOOP [15] { OBJECT:random,rndcoord(fillrect(18,13,44,18)) }
+LOOP [5 + 2d4] { OBJECT:'(',rndcoord(fillrect(18,13,44,18)) }
 
 #Abandoned altar
 ALTAR:(41,03),noncoaligned,altar
@@ -386,8 +387,8 @@ OBJECT:('(',"large box"), $altarcontainers[5]
 #(If you don't first arrive on the level at night, you'll never notice it.)
 IF [time.night == 1] { ENGRAVING:(44,10),engrave,"Speak, friend, and enter." }
 
-#These are marginally useful, yet so rare.
-MONSTER: (';',"Watcher in the Water"),(66,10) { OBJECT:('(', "magic harp"),uncursed }
+#These are now more useful as an infinite light source than for the wish.
+MONSTER: (';',"Watcher in the Water"),(66,10) { OBJECT:('(', "magic lamp"),uncursed }
 
 #The Doors of Durin, destroyed, w/o altar
 
@@ -441,7 +442,7 @@ OBJECT:('`',"boulder"),$doors[5]
 OBJECT:('`',"boulder"),(43,10)
 
 LOOP [10 + 2d5] {
-  [90%]: OBJECT: ('`',"boulder"),random
+  [90%]: OBJECT:('`',"boulder"),random
   OBJECT:('*',"rock"),random
 }
 
@@ -456,16 +457,17 @@ OBJECT:('%',"corpse"),rndcoord(fillrect(21,01,35,07)),montype:"elf"
 
 #Chamber of Mazarbul
 GRAVE:(06,03), "Balin, Son of Fundin, Lord of Moria"
+OBJECT:('(',"magic harp"),(06,03),uncursed,buried
 OBJECT:('*',"rock"),(01,07),quantity:1d25
 OBJECT:('*',"rock"),(02,07),quantity:1d25
 OBJECT:('*',"rock"),(10,07),quantity:1d25
 OBJECT:('*',"rock"),(11,07),quantity:1d25
-CONTAINER:"chest", (01,01) { OBJECT: '?' }
-CONTAINER:"chest", (01,03) { OBJECT: '+' }
-CONTAINER:"chest", (01,05) { OBJECT: '!' }
-CONTAINER:"chest", (04,07) { OBJECT: '/' }
-CONTAINER:"chest", (06,07) { OBJECT: '(' }
-CONTAINER:"chest", (08,07) { OBJECT: '=' }
+CONTAINER:"chest", (01,01) { OBJECT:'?' }
+CONTAINER:"chest", (01,03) { OBJECT:'+' }
+CONTAINER:"chest", (01,05) { OBJECT:'!' }
+CONTAINER:"chest", (04,07) { OBJECT:'/' }
+CONTAINER:"chest", (06,07) { OBJECT:'"' }
+CONTAINER:"chest", (08,07) { OBJECT:'=' }
 
 #Random loot
 $chests = { (13,01), (15,01), (17,01), (19,01), (13,07), (15,07), (17,07), (19,07) }
@@ -479,7 +481,7 @@ $chests = { (13,01), (15,01), (17,01), (19,01), (13,07), (15,07), (17,07), (19,0
 [50%]: CONTAINER:"chest", $chests[7] { OBJECT:random,quantity:1d2 }
 
 #Warehouse
-LOOP [5] { OBJECT:random,rndcoord(fillrect(18,13,44,18)) }
+LOOP [5 + 2d4] { OBJECT:'(',rndcoord(fillrect(18,13,44,18)) }
 
 #Abandoned altar
 OBJECT:('`',"boulder"),(41,03)
@@ -496,4 +498,4 @@ SHUFFLE:$altarcontainers
 #IF [time.night == 1] { ENGRAVING:(44,10),engrave,"Speak, friend, and enter." }
 
 LOOP [10 + 2d5] { MONSTER:  ('o', "deep orc"), random, hostile }
-MONSTER: (';',"Watcher in the Water"),(66,10) { OBJECT:('(', "magic harp"),uncursed }
+MONSTER: (';',"Watcher in the Water"),(66,10) { OBJECT:('(', "magic lamp"),uncursed }
