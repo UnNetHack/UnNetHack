@@ -2459,6 +2459,10 @@ float_up()
 	    }
 	}
 #endif
+	if(u.ufeetfrozen) {
+	    u.ufeetfrozen = 0;
+	    pline_The("ice falls off.");
+	}
 	return;
 }
 
