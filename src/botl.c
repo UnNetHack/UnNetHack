@@ -559,9 +559,11 @@ bot2()
 		Sprintf(nb = eos(nb), " %s", enc_stat[cap]);
 #endif
 	if (u.ufeetfrozen > 0) {
-	     	add_colored_text(" Frozen", newbot2);
-
+#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
+	     	add_colored_text("Frozen", newbot2);
+#else
 		Strcat(nb = eos(nb), " Frozen");
+#endif
 	}
 #ifdef ELBERETH
 	if(!Blind && sengr_at("Elbereth", u.ux, u.uy))
