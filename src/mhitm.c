@@ -1738,25 +1738,36 @@ struct monst* mdef;
 int vis;
 int* pdmg;
 {
-	if (!flaming(mdef->data) &&
-	    !is_flyer(mdef->data) &&
-	    !is_floater(mdef->data) &&
-	    !is_whirly(mdef->data) &&
-	    !is_lava(mdef->mx, mdef->my) &&
-	    !amorphous(mdef->data)) {
-	    if (levl[mdef->mx][mdef->my].typ == POOL) {
-		pline_The("water freezes!");
-		levl[mdef->mx][mdef->my].typ = ICE;
-	    }
-	    else if (is_pool(mdef->mx, mdef->my))
-	    {
-		if (pdmg) (*pdmg) = 0;
-		return;
-	    }
-	    mdef->mfeetfrozen = max(rn1(16, 2), mdef->mfeetfrozen);
-	    if (vis)
-		pline("%s is held in place by ice!", Monnam(mdef));
-	} else { if (pdmg) (*pdmg) = 0;}
+	if (flaming(mdef->data)) {
+	    pline("%s burns the ice away.", Monnam(mdef));
+	    goto nodamage;
+	} else if (is_flyer(mdef->data) || is_floater(mdef->data)) {
+	    pline_The("ice slips away.");
+	    goto nodamage;
+	} else if (is_whirly(mdef->data) || amorphous(mdef->data)) {
+	    pline_The("ice can't hold %s", Monnam(mdef));
+	    goto nodamage;
+	} else if (is_lava(mdef->mx, mdef->my)) {
+	    pline_The("lava melts the ice.");
+	    goto nodamage;
+	}
+
+	if (levl[mdef->mx][mdef->my].typ == POOL) {
+	    pline_The("water freezes!");
+	    levl[mdef->mx][mdef->my].typ = ICE;
+	} else if (is_pool(mdef->mx, mdef->my)) {
+	    pline_The("ice falls into the water.");
+	    goto nodamage;
+	}
+
+	mdef->mfeetfrozen = max(rn1(16, 2), mdef->mfeetfrozen);
+	if (vis)
+	    pline("%s is held in place by ice!", Monnam(mdef));
+
+	return;
+
+nodamage:
+	if (pdmg) (*pdmg) = 0;
 }
 
 /*mhitm.c*/
