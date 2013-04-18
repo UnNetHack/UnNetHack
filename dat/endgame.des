@@ -121,6 +121,10 @@ MONSTER:('E',"earth elemental"),(04,18),hostile
 
 OBJECT:('`',"boulder"),random
 
+# trap decoys when using c?oGD
+LOOP [5d4] {
+  TRAP:"falling rock",random
+}
 
 LEVEL:"air"
 FLAGS: noteleport,hardfloor,shortsighted,mazelevel,stormy
@@ -228,6 +232,10 @@ MONSTER:('v',"steam vortex"),random,hostile
 MONSTER:('v',"steam vortex"),random,hostile
 MONSTER:('v',"steam vortex"),random,hostile
 
+# trap decoys when using c?oGD
+LOOP [5d4] {
+  TRAP:"sleep gas",random
+}
 
 LEVEL:"fire"
 FLAGS: noteleport,hardfloor,shortsighted,mazelevel
@@ -263,6 +271,7 @@ ENDMAP
 TELEPORT_REGION:(69,16,69,16),(0,0,0,0)
 PORTAL:(0,0,75,19),(65,13,75,19),"random_plane"
 
+# trap decoys when using c?oGD
 LOOP [40] {
   TRAP:"fire",random
 }

@@ -1369,7 +1369,7 @@ register struct obj	*sobj;
 		}
 		break;
 	case SCR_GOLD_DETECTION:
-		if (confused || (sobj->cursed && In_endgame(&u.uz))) {
+		if (confused) {
 			/* detect random item class */
 			int random_classes[] = { WEAPON_CLASS, ARMOR_CLASS, RING_CLASS, AMULET_CLASS,
 				TOOL_CLASS, FOOD_CLASS, POTION_CLASS, SCROLL_CLASS, SPBOOK_CLASS,

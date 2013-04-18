@@ -27,6 +27,8 @@
 	* Menucolors: setting a color or attribute doesn't remove a previously
 	  set attribute or color (by aaxelb)
 	* Regeneration only causes additional hunger when injured (by Adeon)
+	* Reinstated vanilla behavior for cursed scrolls of gold detection and
+	  adding some traps to the planes
 
 	* New config option for customizing monster letter in UTF8graphics:
 	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke
