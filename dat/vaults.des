@@ -492,4 +492,16 @@ ENDMAP
 REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
 
 
+# watcher in the water
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+ROOM:"rndvault", unlit, random, random, random {
+  $mon = monster: { (';', "giant eel"), (';', "electric eel"), (';', "kraken") }
+  SHUFFLE: $mon
+  LOOP [1d3] {
+    TERRAIN: random, 'P'
+  }
+  MONSTER: $mon[0], random
+}
+
 

@@ -845,6 +845,7 @@ rndtrap()
 #define HOT	0x4
 #define SOLID	0x8
 #define ANY_LOC 0x10 /* even outside the level */
+#define NO_LOC_WARN 0x20 /* no complaints and set x & y to -1, if no loc */
 
 STATIC_DCL boolean FDECL(is_ok_location, (SCHAR_P, SCHAR_P, int));
 
@@ -894,14 +895,22 @@ struct mkroom *croom;
 			*y = my + yy;
 			if (is_ok_location(*x,*y,humidity)) goto found_it;
 		    }
-		impossible("get_location:  can't find a place!");
+		if (!(humidity & NO_LOC_WARN)) {
+		    impossible("get_location:  can't find a place!");
+		} else {
+		    *x = *y = -1;
+		}
 	    }
 	}
 found_it:;
 
 	if (!(humidity & ANY_LOC) && !isok(*x,*y)) {
-	    warning("get_location:  (%d,%d) out of bounds", *x, *y);
-	    *x = x_maze_max; *y = y_maze_max;
+	    if (!(humidity & NO_LOC_WARN)) {
+		warning("get_location:  (%d,%d) out of bounds", *x, *y);
+		*x = x_maze_max; *y = y_maze_max;
+	    } else {
+		*x = *y = -1;
+	    }
 	}
 }
 
@@ -1589,11 +1598,16 @@ struct mkroom	*croom;
 
 	if (pm) {
 	    int loc = DRY;
-	    if (pm->mlet == S_EEL || amphibious(pm) || is_swimmer(pm)) loc |= WET;
+	    if (pm->mlet == S_EEL || amphibious(pm) || is_swimmer(pm)) loc = WET;
 	    if (is_flyer(pm) || is_floater(pm)) loc |= (HOT | WET);
 	    if (passes_walls(pm) || noncorporeal(pm)) loc |= SOLID;
 	    if (flaming(pm)) loc |= HOT;
-	    get_location(&x, &y, loc, croom);
+	    /* If water-liking monster, first try is without DRY */
+	    get_location(&x, &y, loc|NO_LOC_WARN, croom);
+	    if (x == -1 && y == -1) {
+		loc |= DRY;
+		get_location(&x, &y, loc, croom);
+	    }
 	} else
 	    get_location(&x, &y, DRY, croom);
 
