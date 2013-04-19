@@ -220,7 +220,7 @@ typedef struct mapseen_feat {
 	/* calculated from rooms array */
 	Bitfield(nshop, 2);
 	Bitfield(ntemple, 2);
-	Bitfield(shoptype, 5);
+	Bitfield(shoptype, 6);
 
 	Bitfield(forgot, 1); /* player has forgotten about this level? */
 } mapseen_feat;
