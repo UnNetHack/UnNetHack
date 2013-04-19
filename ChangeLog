@@ -90,7 +90,7 @@
 	    tested on altars
 	  - Empty bag of tricks don't get destroyed by wands of cancellation
 	  - Fixed false warning in dungeon overview when encountering
-	    lightning shops
+	    lighting shops
 
 	* vanilla bug fixes:
 	  - Prevent the Book of the Dead from being destroyed when the
