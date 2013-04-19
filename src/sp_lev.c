@@ -35,9 +35,7 @@ STATIC_DCL void FDECL(create_trap, (trap *, struct mkroom *));
 STATIC_DCL int FDECL(noncoalignment, (ALIGNTYP_P));
 STATIC_DCL void FDECL(create_monster, (monster *, struct mkroom *));
 STATIC_DCL void FDECL(create_object, (object *, struct mkroom *));
-STATIC_DCL void FDECL(create_engraving, (engraving *,struct mkroom *));
 STATIC_DCL void FDECL(create_altar, (altar *, struct mkroom *));
-STATIC_DCL void FDECL(create_gold, (gold *, struct mkroom *));
 STATIC_DCL boolean FDECL(search_door, (struct mkroom *, xchar *, xchar *,
 					XCHAR_P, int));
 STATIC_DCL void NDECL(fix_stair_rooms);
@@ -1957,22 +1955,6 @@ struct mkroom	*croom;
 }
 
 /*
- * Randomly place a specific engraving, then release its memory.
- */
-STATIC_OVL void
-create_engraving(e, croom)
-engraving *e;
-struct mkroom *croom;
-{
-	xchar x, y;
-
-	x = e->x,  y = e->y;
-	get_location(&x, &y, DRY, croom);
-
-	make_engr_at(x, y, e->engr.str, 0L, e->etype);
-}
-
-/*
  * Create an altar in a room.
  */
 
@@ -2035,25 +2017,6 @@ create_altar(a, croom)
 	    levl[x][y].altarmask |= AM_SHRINE;
 	    level.flags.has_temple = TRUE;
 	}
-}
-
-/*
- * Create a gold pile in a room.
- */
-
-STATIC_OVL void
-create_gold(g,croom)
-gold *g;
-struct mkroom	*croom;
-{
-	schar		x,y;
-
-	x = g->x; y= g->y;
-	get_location(&x, &y, DRY, croom);
-
-	if (g->amount == -1)
-	    g->amount = rnd(200);
-	(void) mkgold((long) g->amount, x, y);
 }
 
 void
@@ -3434,18 +3397,17 @@ spo_engraving(coder)
      struct sp_coder *coder;
 {
     struct opvar *etyp, *txt, *coord;
-    engraving tmpe;
+    xchar x,y;
 
     if (!OV_pop_i(etyp) ||
 	!OV_pop_s(txt) ||
 	!OV_pop_c(coord)) return;
 
-    tmpe.x = SP_COORD_X(OV_i(coord));
-    tmpe.y = SP_COORD_Y(OV_i(coord));
-    tmpe.engr.str = OV_s(txt);
-    tmpe.etype = OV_i(etyp);
+    x = SP_COORD_X(OV_i(coord));
+    y = SP_COORD_Y(OV_i(coord));
 
-    create_engraving(&tmpe, coder->croom);
+    get_location(&x, &y, DRY, coder->croom);
+    make_engr_at(x, y, OV_s(txt), 0L, OV_i(etyp));
 
     opvar_free(etyp);
     opvar_free(txt);
@@ -3700,12 +3662,15 @@ spo_gold(coder)
      struct sp_coder *coder;
 {
     struct opvar *coord, *amt;
-    gold tmpgold;
+    schar x,y;
+    long amount;
     if (!OV_pop_c(coord) || !OV_pop_i(amt)) return;
-    tmpgold.x = SP_COORD_X(OV_i(coord));
-    tmpgold.y = SP_COORD_Y(OV_i(coord));
-    tmpgold.amount = OV_i(amt);
-    create_gold(&tmpgold, coder->croom);
+    x = SP_COORD_X(OV_i(coord));
+    y = SP_COORD_Y(OV_i(coord));
+    amount = OV_i(amt);
+    get_location(&x, &y, DRY, coder->croom);
+    if (amount == -1) amount = rnd(200);
+    mkgold(amount, x,y);
     opvar_free(coord);
     opvar_free(amt);
 }

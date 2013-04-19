@@ -395,8 +395,6 @@ typedef struct {
 } region;
 
 typedef struct {
-    xchar areatyp;
-    xchar x1,y1,x2,y2;
     xchar ter, tlit;
 } terrain;
 
@@ -414,17 +412,6 @@ typedef struct {
 	xchar rtype, padding;
 	Str_or_Len rname;
 } lev_region;
-
-typedef struct {
-	xchar x, y;
-	int   amount;
-} gold;
-
-typedef struct {
-	xchar x, y;
-	Str_or_Len engr;
-	xchar etype;
-} engraving;
 
 typedef struct _room {
 	Str_or_Len name;
