@@ -3912,6 +3912,14 @@ boolean *shopdamage;
 	else if (abstype == ZT_POISON_GAS) {
 	    (void) create_gas_cloud(x, y, 1, 8, rn1(20, 5));
 	}
+	else if (abstype == ZT_ACID && levl[x][y].typ == IRONBARS && !rn2(5)) {
+	    if (cansee(x, y))
+		pline_The("iron bars are dissolved!");
+	    else
+		You_hear(Hallucination ? "angry snakes!" : "a hissing noise.");
+	    levl[x][y].typ = ROOM;
+	    newsym(x, y);
+	}
 	if(closed_door(x, y)) {
 		int new_doormask = -1;
 		const char *see_txt = 0, *sense_txt = 0, *hear_txt = 0;
