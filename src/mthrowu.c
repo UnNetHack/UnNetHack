@@ -319,7 +319,7 @@ m_throw(mon, x, y, dx, dy, range, obj)
 	    || IS_ROCK(levl[bhitpos.x+dx][bhitpos.y+dy].typ)
 	    || closed_door(bhitpos.x+dx, bhitpos.y+dy)
 	    || (levl[bhitpos.x + dx][bhitpos.y + dy].typ == IRONBARS &&
-		hits_bars(&singleobj, bhitpos.x, bhitpos.y, 0, 0))) {
+		hits_bars(&singleobj, bhitpos.x, bhitpos.y, dx, dy, 0, 0))) {
 	    (void) drop_throw(singleobj, 0, bhitpos.x, bhitpos.y);
 	    return;
 	}
@@ -447,7 +447,7 @@ m_throw(mon, x, y, dx, dy, range, obj)
 			|| closed_door(bhitpos.x+dx, bhitpos.y+dy)
 			/* missile might hit iron bars */
 			|| (levl[bhitpos.x+dx][bhitpos.y+dy].typ == IRONBARS &&
-			hits_bars(&singleobj, bhitpos.x, bhitpos.y, !rn2(5), 0))
+			hits_bars(&singleobj, bhitpos.x, bhitpos.y, dx, dy, !rn2(5), 0))
 #ifdef SINKS
 			/* Thrown objects "sink" */
 			|| IS_SINK(levl[bhitpos.x][bhitpos.y].typ)
@@ -768,9 +768,9 @@ int type;
 
 /* TRUE iff thrown/kicked/rolled object doesn't pass through iron bars */
 boolean
-hits_bars(obj_p, x, y, always_hit, whodidit)
+hits_bars(obj_p, x, y, dx, dy, always_hit, whodidit)
 struct obj **obj_p;	/* *obj_p will be set to NULL if object breaks */
-int x, y;
+int x, y, dx, dy;
 int always_hit;	/* caller can force a hit for items which would fit through */
 int whodidit;	/* 1==hero, 0=other, -1==just check whether it'll pass thru */
 {
@@ -827,20 +827,41 @@ int whodidit;	/* 1==hero, 0=other, -1==just check whether it'll pass thru */
 	}
 
     if (hits && whodidit != -1) {
-	if (whodidit ? hero_breaks(otmp, x, y, FALSE) : breaks(otmp, x, y))
-	    *obj_p = otmp = 0;		/* object is now gone */
-	    /* breakage makes its own noises */
-	else if (obj_type == BOULDER || obj_type == HEAVY_IRON_BALL)
-	    pline("Whang!");
-	else if (otmp->oclass == COIN_CLASS ||
-		objects[obj_type].oc_material == GOLD ||
-		objects[obj_type].oc_material == SILVER)
-	    pline("Clink!");
-	else
-	    pline("Clonk!");
+	hit_bars(obj_p, x, y, x + dx, y + dy, whodidit, FALSE);
     }
 
     return hits;
+}
+
+void
+hit_bars(obj_p, objx, objy, barsx, barsy, your_fault, from_invent)
+struct obj **obj_p;	/* *obj_p will be set to NULL if object breaks */
+int objx, objy, barsx, barsy;
+boolean your_fault, from_invent;
+{
+    struct obj *otmp = *obj_p;
+    int obj_type = otmp->otyp;
+
+    if (your_fault ? hero_breaks(otmp, objx, objy, from_invent) : breaks(otmp, objx, objy)) {
+	*obj_p = 0;		/* object is now gone */
+	/* breakage makes its own noises */
+	if (obj_type == POT_ACID) {
+	    if (cansee(barsx, barsy))
+		pline_The("iron bars are dissolved!");
+	    else
+		You_hear(Hallucination ? "angry snakes!" : "a hissing noise.");
+	    levl[barsx][barsy].typ = ROOM;
+	    newsym(barsx, barsy);
+	}
+    }
+    else if (obj_type == BOULDER || obj_type == HEAVY_IRON_BALL)
+	pline("Whang!");
+    else if (otmp->oclass == COIN_CLASS ||
+	    objects[obj_type].oc_material == GOLD ||
+	    objects[obj_type].oc_material == SILVER)
+	pline("Clink!");
+    else
+	pline("Clonk!");
 }
 
 #endif /* OVL0 */

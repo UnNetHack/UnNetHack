@@ -1671,6 +1671,19 @@ domove()
 	    }
 	}
 
+	if (flags.forcefight && levl[x][y].typ == IRONBARS && uwep) {
+	    struct obj *obj = uwep, *individual_obj;
+	    if (breaktest(obj)) {
+		if (obj->quan > 1L)
+		    obj = splitobj(obj, 1L);
+		else
+		    setuwep((struct obj *)0);
+		freeinv(obj);
+	    }
+	    hit_bars(&obj, u.ux, u.uy, x, y, TRUE, TRUE);
+	    return;
+	}
+
 	/* specifying 'F' with no monster wastes a turn */
 	if (flags.forcefight ||
 	    /* remembered an 'I' && didn't use a move command */

@@ -1563,7 +1563,7 @@ int style;
 		if (dist > 0 && isok(bhitpos.x + dx,bhitpos.y + dy) &&
 			levl[bhitpos.x + dx][bhitpos.y + dy].typ == IRONBARS) {
 		    x2 = bhitpos.x,  y2 = bhitpos.y;	/* object stops here */
-		    if (hits_bars(&singleobj, x2, y2, !rn2(20), 0)) {
+		    if (hits_bars(&singleobj, x2, y2, dx, dy, !rn2(20), 0)) {
 			if (!singleobj) used_up = TRUE;
 			break;
 		    }

@@ -1427,7 +1427,8 @@ E boolean FDECL(lined_up, (struct monst *));
 E struct obj *FDECL(m_carrying, (struct monst *,int));
 E void FDECL(m_useup, (struct monst *,struct obj *));
 E void FDECL(m_throw, (struct monst *,int,int,int,int,int,struct obj *));
-E boolean FDECL(hits_bars, (struct obj **,int,int,int,int));
+E boolean FDECL(hits_bars, (struct obj **,int,int,int,int,int,int));
+E void FDECL(hit_bars, (struct obj **,int,int,int,int,boolean,boolean));
 
 /* ### muse.c ### */
 
