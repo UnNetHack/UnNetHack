@@ -91,6 +91,7 @@
 	  - Empty bag of tricks don't get destroyed by wands of cancellation
 	  - Fixed false warning in dungeon overview when encountering
 	    lighting shops
+	  - Blasts or thrown potions of acid destroy iron bars
 
 	* vanilla bug fixes:
 	  - Prevent the Book of the Dead from being destroyed when the
