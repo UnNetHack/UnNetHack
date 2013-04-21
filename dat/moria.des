@@ -281,21 +281,103 @@ STAIR:random, down
 #imagine themselves playing with a bowl of Cheerios.
 #The magic of roguelikes is in choices like these. 
 LOOP [20] {
-  MONSTER: ('o', "orc-captain"), random, hostile
+  MONSTER: ('o', "orc-captain"), random, hostile { [25%]: OBJECT:('(', "oil lamp"),lit }
   MONSTER: ('o', "hill orc"), random, hostile
-  MONSTER: ('o', "deep orc"), random, hostile
-  MONSTER: ('o', "deep orc"), random, hostile
   MONSTER: ('o', "deep orc"), random, hostile
   OBJECT:random,random
   [10%]: MONSTER: 'T', random, hostile
   [20%]: OBJECT:('[',"dwarvish mithril-coat"),random,blessed,1d5
 }
 
+#The Forest of BlastHardcheese
+
+LEVEL: "moria5-1"
+FLAGS:hardfloor,mazelevel,noflip,sky
+GEOMETRY: center, center
+MAP
+    |....................................................................|..
+    |................................................................{{..|..
+    |....................................................................|..
+    |..................................................................---F-
+   --..................................................................|....
+   |...................................................................|....
+   |...................................................................|....
+-----..............................................................------S--
+|...|..............................................................|........
+|...S..............................................................S........
+|...|..............................................................|........
+-----..............................................................------S--
+   |...................................................................|....
+   |...................................................................|....
+   --..................................................................|....
+    |..................................................................---F-
+    |....................................................................|..
+    |.................................................................{{.|..
+    |....................................................................|..
+ENDMAP
+REGION:(01,01,74,17),lit,"ordinary"
+NON_DIGGABLE:(00,00,75,18)
+MON_GENERATION:10%, (7, "deep orc"), (3, 'o')
+STAIR:(02,09), down
+STAIR:(72,09), up
+
+#Untamed woodland
+REPLACE_TERRAIN:(06,00,65,18), '.', 'T', 20%
+REPLACE_TERRAIN:(06,00,65,18), '.', 't', 05%
+
+#Abandoned campsites
+LOOP [2d6] {
+  OBJECT:random,random
+  OBJECT:'%',random
+}
+
+#Orcish barracks
+#Due to intense boredom, they are not necessarily hostile.
+MONSTER: ('o',"deep orc"),(72,04)
+MONSTER: ('o',"deep orc"),(73,04)
+MONSTER: ('o',"deep orc"),(74,04)
+MONSTER: ('o',"deep orc"),(75,04)
+MONSTER: ('o',"deep orc"),(72,05)
+MONSTER: ('o',"deep orc"),(73,05)
+MONSTER: ('o',"deep orc"),(74,05)
+MONSTER: ('o',"deep orc"),(75,05)
+MONSTER: ('o',"deep orc"),(72,06)
+MONSTER: ('o',"deep orc"),(73,06)
+MONSTER: ('o',"deep orc"),(74,06)
+MONSTER: ('o',"deep orc"),(75,06)
+MONSTER: ('o',"deep orc"),(72,12)
+MONSTER: ('o',"deep orc"),(73,12)
+MONSTER: ('o',"deep orc"),(74,12)
+MONSTER: ('o',"deep orc"),(75,12)
+MONSTER: ('o',"deep orc"),(72,13)
+MONSTER: ('o',"deep orc"),(73,13)
+MONSTER: ('o',"deep orc"),(74,13)
+MONSTER: ('o',"deep orc"),(75,13)
+MONSTER: ('o',"deep orc"),(72,14)
+MONSTER: ('o',"deep orc"),(73,14)
+MONSTER: ('o',"deep orc"),(74,14)
+MONSTER: ('o',"deep orc"),(75,14)
+
+#Prisoners
+#There is a way to free them if you're clever.
+MONSTER: ('h',"dwarf"),(74,00),peaceful
+MONSTER: ('h',"dwarf"),(75,00),peaceful
+MONSTER: ('h',"dwarf"),(74,01),peaceful
+MONSTER: ('h',"dwarf"),(75,01),peaceful
+MONSTER: ('h',"dwarf"),(74,02),peaceful
+MONSTER: ('h',"dwarf"),(75,02),peaceful
+MONSTER: ('h',"dwarf"),(74,16),peaceful
+MONSTER: ('h',"dwarf"),(75,16),peaceful
+MONSTER: ('h',"dwarf"),(74,17),peaceful
+MONSTER: ('h',"dwarf"),(75,17),peaceful
+MONSTER: ('h',"dwarf"),(74,18),peaceful
+MONSTER: ('h',"dwarf"),(75,18),peaceful
+
 #The Doors of Durin, abandoned, w/altar
 #Strictly speaking, this is the West-gate, but
 #since it can flip anyway it doesn't really matter.
 
-LEVEL: "moria5-1"
+LEVEL: "moria6-1"
 FLAGS:graveyard,hardfloor,mazelevel,sky
 GEOMETRY: center, center
 MAP
@@ -393,7 +475,7 @@ MONSTER: (';',"Watcher in the Water"),(66,10) { OBJECT:('(', "magic lamp"),uncur
 
 #The Doors of Durin, destroyed, w/o altar
 
-LEVEL: "moria5-2"
+LEVEL: "moria6-2"
 FLAGS:graveyard,hardfloor,mazelevel,sky
 GEOMETRY: center, center
 MAP

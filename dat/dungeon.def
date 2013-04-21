@@ -138,15 +138,16 @@ LEVELDESC:      town
 
 
 ### Ruins of Moria ###
-DUNGEON:	"The Ruins of Moria" "F" (5, 0)
+DUNGEON:	"The Ruins of Moria" "F" (6, 0)
 ALIGNMENT:	noalign
 ENTRY:		-1
 DESCRIPTION:	mazelike
-RNDLEVEL:	"moria5" "F" @ (1, 0) 2
-RNDLEVEL:	"moria4" "F" @ (2, 0) 1
-RNDLEVEL:	"moria3" "F" @ (3, 0) 3
-RNDLEVEL:	"moria2" "F" @ (4, 0) 1
-RNDLEVEL:	"moria1" "F" @ (5, 0) 1
+RNDLEVEL:	"moria6" "F" @ (1, 0) 2
+RNDLEVEL:	"moria5" "F" @ (2, 0) 1
+RNDLEVEL:	"moria4" "F" @ (3, 0) 1
+RNDLEVEL:	"moria3" "F" @ (4, 0) 3
+RNDLEVEL:	"moria2" "F" @ (5, 0) 1
+RNDLEVEL:	"moria1" "F" @ (6, 0) 1
 
 
 #

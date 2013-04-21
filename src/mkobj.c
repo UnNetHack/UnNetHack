@@ -881,6 +881,16 @@ int x, y;
 {
 	return mksobj_at(treefruits[rn2(SIZE(treefruits))], x, y, TRUE, FALSE);
 }
+
+void
+rnd_treesticks_at(x,y)
+int x, y;
+{
+	int num = rnd(3);
+	while(num--)
+	    mksobj_at(rn2(2) ? QUARTERSTAFF : CLUB, x, y, TRUE, FALSE);
+}
+
 #endif /* OVL0 */
 #ifdef OVLB
 
