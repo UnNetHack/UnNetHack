@@ -850,8 +850,7 @@ boolean your_fault, from_invent;
 		pline_The("iron bars are dissolved!");
 	    else
 		You_hear(Hallucination ? "angry snakes!" : "a hissing noise.");
-	    levl[barsx][barsy].typ = ROOM;
-	    newsym(barsx, barsy);
+	    dissolve_bars(barsx, barsy);
 	}
     }
     else if (obj_type == BOULDER || obj_type == HEAVY_IRON_BALL)
@@ -862,6 +861,14 @@ boolean your_fault, from_invent;
 	pline("Clink!");
     else
 	pline("Clonk!");
+}
+
+void
+dissolve_bars(x, y)
+register int x, y;
+{
+    levl[x][y].typ = (Is_special(&u.uz) || *in_rooms(x,y,0)) ? ROOM : CORR; 
+    newsym(x, y);    
 }
 
 #endif /* OVL0 */

@@ -92,6 +92,7 @@
 	  - Fixed false warning in dungeon overview when encountering
 	    lighting shops
 	  - Blasts or potions of acid destroy iron bars
+	  - Metallivores can eat through iron bars
 
 	* vanilla bug fixes:
 	  - Prevent the Book of the Dead from being destroyed when the

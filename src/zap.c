@@ -3917,8 +3917,7 @@ boolean *shopdamage;
 		pline_The("iron bars are dissolved!");
 	    else
 		You_hear(Hallucination ? "angry snakes!" : "a hissing noise.");
-	    levl[x][y].typ = ROOM;
-	    newsym(x, y);
+	    dissolve_bars(x, y);
 	}
 	if(closed_door(x, y)) {
 		int new_doormask = -1;

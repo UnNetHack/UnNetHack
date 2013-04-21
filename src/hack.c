@@ -633,8 +633,8 @@ moverock()
 /*
  *  still_chewing()
  *
- *  Chew on a wall, door, or boulder.  Returns TRUE if still eating, FALSE
- *  when done.
+ *  Chew on a wall, door, boulder, or iron bars.  Returns TRUE if still 
+ *  eating, FALSE when done.
  */
 STATIC_OVL int
 still_chewing(x,y)
@@ -664,10 +664,12 @@ still_chewing(x,y)
 	/* solid rock takes more work & time to dig through */
 	digging.effort =
 	    (IS_ROCK(lev->typ) && !IS_TREES(lev->typ) ? 30 : 60) + u.udaminc;
-	You("start chewing %s %s.",
-	    (boulder || IS_TREES(lev->typ)) ? "on a" : "a hole in the",
-	    boulder ? "boulder" :
-	    IS_TREES(lev->typ) ? "tree" : IS_ROCK(lev->typ) ? "rock" : "door");
+	You("start chewing %s.",
+	    boulder ? "on a boulder" :
+	    lev->typ == IRONBARS ? "on the iron bars" :
+	    IS_TREES(lev->typ) ? "on a tree" :
+	    IS_ROCK(lev->typ) ? "a hole in the rock" :
+	    "a hole in the door");
 	watch_dig((struct monst *)0, x, y, FALSE);
 	return 1;
     } else if ((digging.effort += (30 + u.udaminc)) <= 100)  {
@@ -675,6 +677,7 @@ still_chewing(x,y)
 	    You("%s chewing on the %s.",
 		digging.chew ? "continue" : "begin",
 		boulder ? "boulder" :
+		lev->typ == IRONBARS ? "bars" :
 		IS_TREES(lev->typ) ? "tree" :
 		IS_ICEWALL(lev->typ) ? "ice wall" :
 		IS_ROCK(lev->typ) ? "rock" : "door");
@@ -725,6 +728,9 @@ still_chewing(x,y)
     } else if (IS_ICEWALL(lev->typ)) {
 	digtxt = "chew through the ice.";
 	lev->typ = ICE;
+    } else if (lev->typ == IRONBARS) {
+	digtxt = "chew through the iron bars.";
+	dissolve_bars(x,y);
     } else if (lev->typ == SDOOR) {
 	if (lev->doormask & D_TRAPPED) {
 	    lev->doormask = D_NODOOR;
@@ -907,7 +913,11 @@ int mode;
 	if (Passes_walls && may_passwall(x,y)) {
 	    ;	/* do nothing */
 	} else if (tmpr->typ == IRONBARS) {
-	    if (!(Passes_walls || passes_bars(youmonst.data)))
+	    /* Eat the bars if you can */
+	    if (mode == DO_MOVE &&
+		(!flags.nopick && metallivorous(youmonst.data) && 
+		     still_chewing(x,y)) 
+		|| !(Passes_walls || passes_bars(youmonst.data)))
 		return FALSE;
 	} else if (tunnels(youmonst.data) && !needspick(youmonst.data)) {
 	    /* Eat the rock. */
