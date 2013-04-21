@@ -292,7 +292,7 @@ LOOP [20] {
 #The Forest of BlastHardcheese
 
 LEVEL: "moria5-1"
-FLAGS:hardfloor,mazelevel,noflip,sky
+FLAGS:hardfloor,mazelevel,sky
 GEOMETRY: center, center
 MAP
     |....................................................................|..
