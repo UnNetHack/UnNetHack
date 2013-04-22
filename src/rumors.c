@@ -284,6 +284,43 @@ boolean delphi;
 }
 
 int
+oracle_id(oracl)
+register struct monst *oracl;
+{
+#ifdef GOLDOBJ
+    long umoney = money_cnt(invent);
+#endif
+    char qbuf[QBUFSZ];
+    /* cost based on experience level similar to major consultations */
+    long identify_cost = 300 + 100 * u.ulevel;
+
+    Sprintf(qbuf,
+	"\"Perhaps thou would likest a divination?\" (%ld %s)",
+	identify_cost, currency((long)identify_cost));
+
+    if (yn(qbuf) == 'y') {
+#ifndef GOLDOBJ
+	if (u.ugold < (long)identify_cost) {
+#else
+	if (umoney < (long)identify_cost) {
+#endif
+	    pline("%s divines that you are short on cash.", Monnam(oracl));
+	    return 0;
+	}
+#ifndef GOLDOBJ
+	u.ugold -= (long)identify_cost;
+	oracl->mgold += (long)identify_cost;
+#else
+        money2mon(oracl, (long)identify_cost);
+#endif
+	flags.botl = 1;
+	identify_pack(1);
+	return 1;
+    }
+    return 0;
+}
+
+int
 doconsult(oracl)
 register struct monst *oracl;
 {
@@ -339,7 +376,7 @@ register struct monst *oracl;
 		Sprintf(qbuf,
 			"\"Then dost thou desire a major one?\" (%d %s)",
 			major_cost, currency((long)major_cost));
-		if (yn(qbuf) != 'y') return 0;
+		if (yn(qbuf) != 'y') return oracle_id(oracl);
 #ifndef GOLDOBJ
 		u_pay = (u.ugold < (long)major_cost ? (int)u.ugold
 						    : major_cost);
