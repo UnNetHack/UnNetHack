@@ -283,6 +283,7 @@ boolean delphi;
 	}
 }
 
+#if 0 /* DEFERRED */
 int
 oracle_id(oracl)
 register struct monst *oracl;
@@ -319,6 +320,7 @@ register struct monst *oracl;
     }
     return 0;
 }
+#endif
 
 int
 doconsult(oracl)
@@ -376,7 +378,7 @@ register struct monst *oracl;
 		Sprintf(qbuf,
 			"\"Then dost thou desire a major one?\" (%d %s)",
 			major_cost, currency((long)major_cost));
-		if (yn(qbuf) != 'y') return oracle_id(oracl);
+		if (yn(qbuf) != 'y') return 0;
 #ifndef GOLDOBJ
 		u_pay = (u.ugold < (long)major_cost ? (int)u.ugold
 						    : major_cost);
