@@ -142,7 +142,7 @@ DUNGEON:	"The Ruins of Moria" "F" (6, 0)
 ALIGNMENT:	noalign
 ENTRY:		-1
 DESCRIPTION:	mazelike
-RNDLEVEL:	"moria6" "F" @ (1, 0) 2
+RNDLEVEL:	"moria6" "none" @ (1, 0) 2
 RNDLEVEL:	"moria5" "F" @ (2, 0) 1
 RNDLEVEL:	"moria4" "F" @ (3, 0) 1
 RNDLEVEL:	"moria3" "F" @ (4, 0) 3
