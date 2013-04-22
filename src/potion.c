@@ -2082,6 +2082,7 @@ struct obj *potion, *obj;
 			    obj->oeroded == MAX_ERODE ? "destroys" : "damages",
 			    yname(obj));
 		    if (obj->oeroded == MAX_ERODE) {
+			setnotworn(obj);
 			obj_extract_self(obj);
 			obfree(obj, (struct obj *)0);
 			obj = (struct obj *) 0;
