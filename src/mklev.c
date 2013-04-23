@@ -1850,12 +1850,8 @@ xchar x, y;
 	    source = &br->end1;
 	}
 
-	/* Already set or 2/3 chance of deferring until a later level. */
-	if (source->dnum < n_dgns || (rn2(3)
-#ifdef WIZARD
-				      && !wizard
-#endif
-				      )) return;
+	/* Already set. */
+	if (source->dnum < n_dgns) return;
 
 	if (! (u.uz.dnum == oracle_level.dnum	    /* in main dungeon */
 		&& !at_dgn_entrance("The Quest")    /* but not Quest's entry */
