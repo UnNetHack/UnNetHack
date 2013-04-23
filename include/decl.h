@@ -75,6 +75,7 @@ E struct dgn_topology {		/* special dungeon levels for speed */
     xchar	d_sheol_dnum;
     d_level	d_qstart_level, d_qlocate_level, d_nemesis_level;
     d_level	d_knox_level;
+    d_level	d_nymph_level;
 #ifdef ADVENT_CALENDAR
     d_level	d_advcal_level;
 #endif
@@ -121,6 +122,7 @@ E struct dgn_topology {		/* special dungeon levels for speed */
 #define qlocate_level		(dungeon_topology.d_qlocate_level)
 #define nemesis_level		(dungeon_topology.d_nemesis_level)
 #define knox_level		(dungeon_topology.d_knox_level)
+#define nymph_level		(dungeon_topology.d_nymph_level)
 #ifdef ADVENT_CALENDAR
 # define advcal_level		(dungeon_topology.d_advcal_level)
 #endif

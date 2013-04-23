@@ -121,6 +121,7 @@ typedef struct branch {
 #define Is_qlocate(x)		(on_level(x, &qlocate_level))
 #define Is_nemesis(x)		(on_level(x, &nemesis_level))
 #define Is_knox(x)		(on_level(x, &knox_level))
+#define Is_nymph_level(x)	(on_level(x, &nymph_level))
 #ifdef ADVENT_CALENDAR
 #define Is_advent_calendar(x)		(on_level(x, &advcal_level))
 #endif

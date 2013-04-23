@@ -707,6 +707,7 @@ struct level_map {
 	{ "fire",	&fire_level },
 	{ "juiblex",	&juiblex_level },
 	{ "knox",	&knox_level },
+	{ "nymph",	&nymph_level },
 #ifdef BLACKMARKET        
 	{ "blkmar",     &blackmarket_level },
 #endif /* BLACKMARKET */
