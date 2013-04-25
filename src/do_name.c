@@ -28,6 +28,7 @@ const char *goal;
     /* disgusting hack; the alternate selection characters work for any
        getpos call, but they only matter for dowhatis (and doquickwhatis) */
     putstr(tmpwin, 0, "Use m and M to select a monster.");
+    putstr(tmpwin, 0, "Use @ to select yourself.");
     doing_what_is = (goal == what_is_an_unknown_object);
     Sprintf(sbuf, "Type a .%s when you are at the right place.",
             doing_what_is ? " or , or ; or :" : "");
@@ -221,6 +222,10 @@ const char *goal;
 		cy = tmpmon->my;
 		goto nxtc;
 	    }
+	} else if (c == '@') {
+	    cx = u.ux;
+	    cy = u.uy;
+	    goto nxtc;
 	} else {
 	    if (!index(quitchars, c)) {
 		char matching[MAXPCHARS];
