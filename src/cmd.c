@@ -942,6 +942,18 @@ boolean want_disp;
 	}
 #endif
 
+	/* heaven or hell modes */
+	if (heaven_or_hell_mode) {
+		if (u.ulives > 1) {
+			Sprintf(buf, "%d lives left", u.ulives);
+		} else if (u.ulives == 0) {
+			Sprintf(buf, "no lives left");
+		} else {
+			Sprintf(buf, "%d life left", u.ulives);
+		}
+		you_have(buf);
+	}
+
 	/* note: piousness 3 matches MIN_QUEST_ALIGN (quest.h) */
 	if (u.ualign.record >= 20)	you_are("piously aligned");
 	else if (u.ualign.record > 13)	you_are("devoutly aligned");
@@ -1488,6 +1500,14 @@ boolean want_disp;
 	}
 	dump_title(buf);
 	dump_list_start();
+
+	if (heaven_or_hell_mode) {
+		if (hell_and_hell_mode) {
+			you_have_been("following the path of Hell and Hell");
+		} else {
+			you_have_been("following the path of Heaven or Hell");
+		}
+	}
 
 	/* list all major conducts */
 

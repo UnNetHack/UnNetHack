@@ -140,8 +140,9 @@ in_trouble()
 	if(u.utrap && u.utraptype == TT_LAVA) return(TROUBLE_LAVA);
 	if(Sick) return(TROUBLE_SICK);
 	if(u.uhs >= WEAK) return(TROUBLE_STARVING);
-	if (Upolyd ? (u.mh <= 5 || u.mh*7 <= u.mhmax) :
-		(u.uhp <= 5 || u.uhp*7 <= u.uhpmax)) return TROUBLE_HIT;
+	if (!heaven_or_hell_mode && (
+		Upolyd ? (u.mh <= 5 || u.mh*7 <= u.mhmax) :
+		(u.uhp <= 5 || u.uhp*7 <= u.uhpmax))) return TROUBLE_HIT;
 	if(u.ulycn >= LOW_PM) return(TROUBLE_LYCANTHROPE);
 	if(near_capacity() >= EXT_ENCUMBER && AMAX(A_STR)-ABASE(A_STR) > 3)
 		return(TROUBLE_COLLAPSING);
@@ -323,6 +324,7 @@ register int trouble;
 		    }
 		    if (u.uhpmax < u.ulevel * 5 + 11) u.uhpmax += rnd(5);
 		    if (u.uhpmax <= 5) u.uhpmax = 5+1;
+			check_uhpmax();
 		    u.uhp = u.uhpmax;
 		    flags.botl = 1;
 		    break;
@@ -926,6 +928,10 @@ pleased(g_align)
 	    } else {
 		u.uhpmax += 5;
 		if (Upolyd) u.mhmax += 5;
+		if (heaven_or_hell_mode) {
+			u.uhpmax = 1;
+			if (Upolyd) u.mhmax = 1;
+		}
 	    }
 	    u.uhp = u.uhpmax;
 	    if (Upolyd) u.mh = u.mhmax;

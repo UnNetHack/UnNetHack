@@ -461,6 +461,10 @@ display_warning(mon)
     int wl = (int) (mon->m_lev / 4);
     int glyph;
 
+	if (heaven_or_hell_mode && wl == 0) {
+		wl = 1;
+	}
+
     if (mon_warning(mon)) {
         if (wl > WARNCOUNT - 1) wl = WARNCOUNT - 1;
 	/* 3.4.1: this really ought to be rn2(WARNCOUNT), but value "0"

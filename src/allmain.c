@@ -162,6 +162,13 @@ moveloop()
 			break;	/* it's now your turn */
 		} while (monscanmove);
 		flags.mon_moving = FALSE;
+		/* heaven or hell mode: player always has 1 maxhp */
+		if (heaven_or_hell_mode)
+		{
+			u.uhpmax = 1;
+			if (u.uhp > u.uhpmax)
+				u.uhp = u.uhpmax;
+		}
 
 		if (!monscanmove && youmonst.movement < NORMAL_SPEED) {
 		    /* both you and the monsters are out of steam this round */

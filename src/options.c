@@ -112,6 +112,8 @@ static struct Bool_Opt
 #endif
 	{"fullscreen", &iflags.wc2_fullscreen, FALSE, SET_IN_FILE},
 	{"guicolor", &iflags.wc2_guicolor, TRUE, SET_IN_GAME},
+	{"heaven_or_hell", &flags.heaven_or_hell, FALSE, SET_IN_FILE},
+	{"hell_and_hell", &flags.hell_and_hell, FALSE, SET_IN_FILE},
 	{"help", &flags.help, TRUE, SET_IN_GAME},
 	{"hilite_pet",    &iflags.wc_hilite_pet, TRUE, SET_IN_GAME},	/*WC*/
 	{"hint", &flags.hint, TRUE, SET_IN_FILE},
@@ -1767,6 +1769,19 @@ boolean tinitial, tfrom_file;
 			flags.initgend = flags.female = negated;
 		return;
 	}
+
+    /* heaven or hell */
+    if (match_optname(opts, "heaven_or_hell", 14, FALSE)) {
+        if (!initial)
+			flags.heaven_or_hell = !negated;
+    }
+	/* hell or hell */
+    if (match_optname(opts, "hell_and_hell", 13, FALSE)) {
+        if (!initial)
+            flags.hell_and_hell = !negated;
+    }
+	if (flags.hell_and_hell)
+		flags.heaven_or_hell = TRUE;
 
 #if defined(MICRO) && !defined(AMIGA)
 	/* included for compatibility with old NetHack.cnf files */

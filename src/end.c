@@ -34,6 +34,7 @@ STATIC_PTR void FDECL(done_intr, (int));
 static void FDECL(done_hangup, (int));
 # endif
 #endif
+STATIC_PTR int NDECL(heaven_or_hell_lifesave_end);
 STATIC_DCL void FDECL(disclose,(int,BOOLEAN_P));
 STATIC_DCL void FDECL(get_valuables, (struct obj *));
 STATIC_DCL void FDECL(sort_valuables, (struct valuable_data *,int));
@@ -628,7 +629,7 @@ int how;
 			if (uamul) useup(uamul);
 
 			(void) adjattrib(A_CON, -1, TRUE);
-			if(u.uhpmax <= 0) u.uhpmax = 10;	/* arbitrary */
+			if (u.uhpmax <= 0) u.uhpmax = (heaven_or_hell_mode ? 1 : 10); /* arbitrary */
 			savelife(how);
 			if ((how == GENOCIDED) && is_playermon_genocided())
 				pline("Unfortunately you are still genocided...");
@@ -638,6 +639,26 @@ int how;
 				return;
 			}
 		}
+	}
+	/* Save life when under heaven or hell mode, but not when
+	 * self-genociding. */
+	if (u.ulives > 0 && how < GENOCIDED) {
+		pline("But wait...");
+		You("suddenly start to feel better!");
+		if(u.uhpmax <= 0) u.uhpmax = 1;
+		savelife(how);
+		u.ulives--;
+		if (!u.ulives) {
+			You_feel("death is waiting for you just around the corner...");
+		}
+		/* Set invulnerability and wait until player gets another action. */
+		nomul(-5, 0);
+		u.uinvulnerable = TRUE;
+		nomovemsg = You_can_move_again;
+		afternmv = heaven_or_hell_lifesave_end;
+		killer = 0;
+		killer_format = 0;
+		return;
 	}
 	if ((
 #ifdef WIZARD
@@ -1068,6 +1089,14 @@ die:
 	if(done_stopprint) { raw_print(""); raw_print(""); }
 	terminate(EXIT_SUCCESS);
 }
+
+STATIC_PTR int
+heaven_or_hell_lifesave_end()
+{
+	u.uinvulnerable = FALSE;
+	return(1);
+}
+
 
 void
 container_contents(list, identified, all_containers, want_disp)

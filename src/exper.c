@@ -145,6 +145,7 @@ const char *drainer;	/* cause of death, if drain should be fatal */
 	}
 	num = newhp();
 	u.uhpmax -= num;
+	check_uhpmax();
 	if (u.uhpmax < 1) u.uhpmax = 1;
 	u.uhp -= num;
 	if (u.uhp < 1) u.uhp = 1;

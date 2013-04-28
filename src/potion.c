@@ -996,6 +996,8 @@ healup(nhp, nxtra, curesick, cureblind)
 			if(u.uhp > u.uhpmax) u.uhp = (u.uhpmax += nxtra);
 		}
 	}
+	check_uhpmax();
+
 	if(cureblind)	make_blinded(0L,TRUE);
 	if(curesick)	make_sick(0L, (char *) 0, TRUE, SICK_ALL);
 	flags.botl = 1;
@@ -1053,7 +1055,10 @@ boolean your_fault;
 		distance = 0;
 		pline_The("%s crashes on your %s and breaks into shards.",
 			botlnam, body_part(HEAD));
+		if (!heaven_or_hell_mode) {
 		losehp(rnd(2), "thrown potion", KILLED_BY_AN);
+		} else
+			You_feel("as if something protected you.");
 	} else {
 		distance = distu(mon->mx,mon->my);
 #ifdef WEBB_DISINT

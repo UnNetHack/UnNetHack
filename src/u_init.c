@@ -618,6 +618,23 @@ u_init()
 	u.roleplay.vegan	= flags.vegan;
 	u.roleplay.vegetarian	= flags.vegetarian;
 
+	if (flags.heaven_or_hell) {
+		heaven_or_hell_mode = TRUE;
+	}
+	if (flags.hell_and_hell) {
+		heaven_or_hell_mode = TRUE;
+		hell_and_hell_mode = TRUE;
+	}
+
+	if (heaven_or_hell_mode) {
+		u.ulives = 3;
+		u.uhpmax = 1;
+		u.uhp = 1;
+		HWarning = TRUE;
+	} else {
+		u.ulives = 0;
+	}
+
 	init_uhunger();
 	for (i = 0; i <= MAXSPELL; i++) spl_book[i].sp_id = NO_SPELL;
 	u.ublesscnt = 300;			/* no prayers just yet */
@@ -790,6 +807,10 @@ u_init()
 		break;
 	}
 
+	/* Add knowledge of life saving amulets for heaven or hell mode. */
+	if (heaven_or_hell_mode) {
+		knows_object(AMULET_OF_LIFE_SAVING);
+	}
 
 	/*** Race-specific initializations ***/
 	switch (Race_switch) {

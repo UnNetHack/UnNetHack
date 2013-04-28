@@ -178,6 +178,10 @@ struct flag {
 	boolean  nudist;
 	boolean  vegan;
 	boolean  vegetarian;
+
+	/* Heaven or hell modes */
+	boolean heaven_or_hell;
+	boolean hell_and_hell;
 };
 
 /*

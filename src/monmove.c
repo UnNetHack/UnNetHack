@@ -172,6 +172,14 @@ mon_regen(mon, digest_meal)
 struct monst *mon;
 boolean digest_meal;
 {
+	/* regeneration not relevant in heaven or hell mode */
+	if (heaven_or_hell_mode && !hell_and_hell_mode) {
+		mon->mhpmax = 1;
+		if (mon->mhp > mon->mhpmax) {
+			mon->mhp = 1;
+		}
+	}
+
 	int freq = 20;
 	if (is_blinker(mon->data) && !mon->mflee)
 		freq = 1;
@@ -537,6 +545,10 @@ register struct monst *mtmp;
 					rn1(10, 10) :
 					rn1(4, 4);
 				if (Half_spell_damage) dmg = (dmg+1) / 2;
+				if (heaven_or_hell_mode) {
+					You_feel("as if something protected you.");
+				}
+				else
 				losehp(dmg, "psychic blast", KILLED_BY_AN);
 			}
 		}

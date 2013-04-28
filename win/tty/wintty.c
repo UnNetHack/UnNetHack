@@ -445,7 +445,7 @@ give_up:	/* Quit */
 		static const char *conduct_names[] = {
 			"ascet", "atheist", "blindfolded", "illiterate", "nudist",
 			"pacifist", "vegan", "vegetarian",
-			"Quit"
+			"Heaven or Hell", "Quit"
 		};
 #define NUM_CONDUCT_OPTIONS SIZE(conduct_names)
 		static boolean *conduct_bools[NUM_CONDUCT_OPTIONS];
@@ -457,7 +457,8 @@ give_up:	/* Quit */
 		conduct_bools[5] = &flags.nudist;
 		conduct_bools[6] = &flags.vegan;
 		conduct_bools[7] = &flags.vegetarian;
-		conduct_bools[8] = 0;
+		conduct_bools[8] = &flags.heaven_or_hell;
+		conduct_bools[9] = 0;
 		int conduct_settings[NUM_CONDUCT_OPTIONS];
 
 		winid tmpwin = create_nhwindow(NHW_MENU);
@@ -498,6 +499,7 @@ give_up:	/* Quit */
 		flags.nudist      = conduct_settings[5];
 		flags.vegan       = conduct_settings[6];
 		flags.vegetarian  = conduct_settings[7];
+		flags.heaven_or_hell = conduct_settings[8];
 	}
 
 	(void)  root_plselection_prompt(plbuf, QBUFSZ - 1,

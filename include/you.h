@@ -78,8 +78,13 @@ struct u_conduct {		/* number of times... */
 	long	non_racial_armor;	/* put on non-racial armor */
 	long	non_racial_weapons;	/* wielded non-racial weapons */
 	long	sokoban;		/* how many times violated sokoban "rules" */
+	long	heaven_or_hell;	/* heaven or hell mode */
+	long	hell_and_hell;	/* hell and hell mode */
 				/* genocides already listed at end of game */
 };
+
+#define heaven_or_hell_mode u.uconduct.heaven_or_hell
+#define hell_and_hell_mode u.uconduct.hell_and_hell
 
 /*             --- roleplay intrinsics --- 
  *
@@ -387,6 +392,7 @@ struct you {
 	struct u_have	uhave;		/* you're carrying special objects */
 	struct u_conduct uconduct;	/* KMH, conduct */
 	struct u_roleplay roleplay;	/* roleplay intrinsics */
+	long   ulives;			/* heaven or hell mode, number of lives */
 	struct attribs	acurr,		/* your current attributes (eg. str)*/
 			aexe,		/* for gain/loss via "exercise" */
 			abon,		/* your bonus attributes (eg. str) */

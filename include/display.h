@@ -42,9 +42,11 @@
  * vicinity, and a glyph representing the warning level is displayed.
  */
 
-#define mon_warning(mon) (Warning && !(mon)->mpeaceful && 				\
+#define mon_warning(mon) ((Warning || heaven_or_hell_mode) && \
+			 !(mon)->mpeaceful && 				\
 			 (distu((mon)->mx, (mon)->my) < 100) &&				\
-			 (((int) ((mon)->m_lev / 4)) >= flags.warnlevel))
+			 ((((int) ((mon)->m_lev / 4)) >= flags.warnlevel) || \
+			 heaven_or_hell_mode))
 
 /*
  * mon_visible()

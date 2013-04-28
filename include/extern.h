@@ -789,6 +789,8 @@ E void FDECL(unmul, (const char *));
 E void FDECL(showdmg, (int, BOOLEAN_P));
 E void FDECL(losehp, (int,const char *,BOOLEAN_P));
 E void FDECL(losehp_how, (int,const char *,BOOLEAN_P,int));
+E void FDECL(set_uhpmax, (int,BOOLEAN_P));
+E void NDECL(check_uhpmax);
 E int NDECL(weight_cap);
 E int NDECL(inv_weight);
 E int NDECL(near_capacity);

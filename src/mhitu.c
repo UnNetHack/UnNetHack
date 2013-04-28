@@ -31,6 +31,8 @@ STATIC_DCL void FDECL(wildmiss, (struct monst *,struct attack *));
 STATIC_DCL void FDECL(hurtarmor,(int));
 STATIC_DCL void FDECL(hitmsg,(struct monst *,struct attack *));
 
+STATIC_DCL void FDECL(invulnerability_messages,(struct monst *,BOOLEAN_P,BOOLEAN_P));
+
 /* See comment in mhitm.c.  If we use this a lot it probably should be */
 /* changed to a parameter to mhitu. */
 static int dieroll;
@@ -528,16 +530,7 @@ mattacku(mtmp)
 	}
 
 	if(u.uinvulnerable) {
-	    /* monsters won't attack you */
-	    if(mtmp == u.ustuck)
-		pline("%s loosens its grip slightly.", Monnam(mtmp));
-	    else if(!range2) {
-		if (youseeit || sensemon(mtmp))
-		    pline("%s starts to attack you, but pulls back.",
-			  Monnam(mtmp));
-		else
-		    You_feel("%s move nearby.", something);
-	    }
+		invulnerability_messages(mtmp, range2, youseeit);
 	    return (0);
 	}
 
@@ -549,6 +542,14 @@ mattacku(mtmp)
 	}
 
 	for(i = 0; i < NATTK; i++) {
+		/* invulnerability may occur between attacks 
+		   (when HoH life saving.). Cancel attacks if we become
+		   invulnerable. */
+		if (u.uinvulnerable)
+		{
+			invulnerability_messages(mtmp, range2, youseeit);
+			break;
+		}
 
 	    sum[i] = 0;
 	    mattk = getmattk(mdat, i, sum, &alt_attk);
@@ -1085,6 +1086,11 @@ dopois:
 		    if (ABASE(A_INT) <= ATTRMIN(A_INT)) {
 			int lifesaved = 0;
 			struct obj *wore_amulet = uamul;
+
+			/* Set lives to 0; avoids small loop in heaven or hell modes. 
+			   Player dies regardless of lives left when dies to 
+			   brainlessness. */
+			u.ulives = 0;
 
 			while(1) {
 			    /* avoid looping on "die(y/n)?" */
@@ -2804,7 +2810,7 @@ register struct attack *mattk;
 		}
 		pline("%s is suddenly very cold!", Monnam(mtmp));
 		u.mh += tmp / 2;
-		if (u.mhmax < u.mh) u.mhmax = u.mh;
+		if (u.mhmax < u.mh) set_uhpmax(u.mh, TRUE);
 		if (u.mhmax > ((youmonst.data->mlevel+1) * 8))
 		    (void)split_mon(&youmonst, mtmp);
 		break;
@@ -2849,6 +2855,24 @@ register struct attack *mattk;
 		return 2;
 	}
 	return 1;
+}
+
+STATIC_OVL void 
+invulnerability_messages(mtmp, range2, youseeit)
+	struct monst *mtmp;
+	boolean range2;
+	boolean youseeit;
+{
+	/* monsters won't attack you */
+	if(mtmp == u.ustuck)
+	pline("%s loosens its grip slightly.", Monnam(mtmp));
+	else if(!range2) {
+	if (youseeit || sensemon(mtmp))
+		pline("%s starts to attack you, but pulls back.",
+		  Monnam(mtmp));
+	else
+		You_feel("%s move nearby.", something);
+    }
 }
 
 #endif /* OVL1 */
