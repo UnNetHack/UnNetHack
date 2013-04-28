@@ -406,6 +406,15 @@ struct toptenentry *tt;
 #endif
   (void)fprintf(rfile, SEP "elbereths=%ld", u.uconduct.elbereths);
 
+  (void)fprintf(rfile, SEP "xplevel=%d", u.ulevel); /* XP level */
+  (void)fprintf(rfile, SEP "exp=%ld", (long)u.uexp); /* Experience points */
+
+  (void)fprintf(rfile, SEP "mode=%s", (flags.debug ? "debug" :
+                                       flags.explore ? "explore" :
+                                       hell_and_hell_mode ? "hah" :
+                                       heaven_or_hell_mode ? "hoh" :
+                                       "normal"));
+
   (void)fprintf(rfile, "\n");
 
 }

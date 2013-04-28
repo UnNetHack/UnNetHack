@@ -104,7 +104,10 @@ char *livelog_prefix() {
 			"gender=%s:align=%s:"
 			"gender0=%s:align0=%s:"
 			"explvl=%d:exp=%ld:"
-			"elbereths=%ld",
+			"elbereths=%ld:"
+			"xplevel=%d:" /* XP level */
+			"exp=%ld:" /* Experience points */
+			"mode=%s",
 			GAME_SHORT_NAME, VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
 			plname,
 			moves,
@@ -121,7 +124,14 @@ char *livelog_prefix() {
 			genders[flags.female].filecode, aligns[1-u.ualign.type].filecode,
 			genders[flags.initgend].filecode, aligns[1-u.ualignbase[A_ORIGINAL]].filecode,
 			u.ulevel,u.uexp,
-			u.uconduct.elbereths);
+			u.uconduct.elbereths,
+			u.ulevel, /* XP level */
+			(long)u.uexp, /* Experience points */
+			(flags.debug ? "debug" : /* mode */
+			 flags.explore ? "explore" :
+			 hell_and_hell_mode ? "hah" :
+			 heaven_or_hell_mode ? "hoh" :
+			 "normal"));
 	return prefixbuf;
 }
 
