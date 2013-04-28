@@ -331,6 +331,7 @@ tty_player_selection()
 	int i, k, n;
 	char pick4u = 'n', thisch, lastch = 0;
 	boolean tutorial = FALSE;
+	boolean conducts = FALSE;
 	char pbuf[QBUFSZ], plbuf[QBUFSZ];
 	winid win;
 	anything any;
@@ -351,12 +352,15 @@ tty_player_selection()
 
 	    tty_putstr(BASE_WINDOW, 0, "New? Press T to enter a tutorial.");
 	    tty_putstr(BASE_WINDOW, 0, "");
+	    tty_putstr(BASE_WINDOW, 0, "Press C for selecting conduct tracking.");
+	    tty_putstr(BASE_WINDOW, 0, "");
 	    echoline = wins[BASE_WINDOW]->cury;
 	    tty_putstr(BASE_WINDOW, 0, prompt);
 	    do {
 		pick4u = lowc(readchar());
 		if (index(quitchars, pick4u)) pick4u = 'y';
 		if (pick4u == 't') {pick4u = 'y'; tutorial = TRUE;}
+		if (pick4u == 'c') {pick4u = 'n'; conducts = TRUE;}
 	    } while(!index(ynqchars, pick4u));
 	    if ((int)strlen(prompt) + 1 < CO) {
 		/* Echo choice and move back down line */
@@ -427,6 +431,73 @@ give_up:	/* Quit */
 	    free((genericptr_t) selected);
 	    selected = 0;
 	    flags.tutorial = 1;
+	}
+
+	if (conducts) {
+		tty_clear_nhwindow(BASE_WINDOW);
+		tty_putstr(BASE_WINDOW, 0, "Choose conducts");
+		win = create_nhwindow(NHW_MENU);
+		start_menu(win);
+
+		int pick_cnt, pick_idx, opt_idx;
+		menu_item *conduct_category_pick = (menu_item *)0;
+
+		static const char *conduct_names[] = {
+			"ascet", "atheist", "blindfolded", "illiterate", "nudist",
+			"pacifist", "vegan", "vegetarian",
+			"Quit"
+		};
+#define NUM_CONDUCT_OPTIONS SIZE(conduct_names)
+		static boolean *conduct_bools[NUM_CONDUCT_OPTIONS];
+		conduct_bools[0] = &flags.ascet;
+		conduct_bools[1] = &flags.atheist;
+		conduct_bools[2] = &flags.blindfolded;
+		conduct_bools[3] = &flags.illiterate;
+		conduct_bools[4] = &flags.pacifist;
+		conduct_bools[5] = &flags.nudist;
+		conduct_bools[6] = &flags.vegan;
+		conduct_bools[7] = &flags.vegetarian;
+		conduct_bools[8] = 0;
+		int conduct_settings[NUM_CONDUCT_OPTIONS];
+
+		winid tmpwin = create_nhwindow(NHW_MENU);
+		start_menu(tmpwin);
+		for (i = 0; i < NUM_CONDUCT_OPTIONS; i++) {
+			any.a_int = i + 1;
+			/* use uppercase character if previous option has the same
+			 * starting character */
+			char selection_char = conduct_names[i][0];
+			if (i > 0 && conduct_names[i-1][0] == conduct_names[i][0]) {
+				selection_char = highc(selection_char);
+			}
+			add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, selection_char, 0,
+					ATR_NONE, conduct_names[i],
+					!conduct_bools[i] ? MENU_UNSELECTED :
+					(*conduct_bools[i] ? MENU_SELECTED : MENU_UNSELECTED));
+			conduct_settings[i] = 0;
+		}
+		end_menu(tmpwin, "Change which conduct settings:");
+
+		if ((pick_cnt = select_menu(tmpwin, PICK_ANY, &conduct_category_pick)) > 0) {
+			for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
+				opt_idx = conduct_category_pick[pick_idx].item.a_int - 1;
+				conduct_settings[opt_idx] = 1;
+			}
+			free((genericptr_t)conduct_category_pick);
+			conduct_category_pick = (menu_item *)0;
+		}
+		destroy_nhwindow(tmpwin);
+		/* has Quit been selected? */
+		if (conduct_settings[NUM_CONDUCT_OPTIONS-1]) goto give_up;
+
+		flags.ascet       = conduct_settings[0];
+		flags.atheist     = conduct_settings[1];
+		flags.blindfolded = conduct_settings[2];
+		flags.illiterate  = conduct_settings[3];
+		flags.pacifist    = conduct_settings[4];
+		flags.nudist      = conduct_settings[5];
+		flags.vegan       = conduct_settings[6];
+		flags.vegetarian  = conduct_settings[7];
 	}
 
 	(void)  root_plselection_prompt(plbuf, QBUFSZ - 1,
