@@ -180,8 +180,8 @@ struct flag {
 	boolean  vegetarian;
 
 	/* Heaven or hell modes */
-	boolean heaven_or_hell;
-	boolean hell_and_hell;
+	boolean heaven_or_hell; /* player and monsters have max 1 HP and player has 3 lives */
+	boolean hell_and_hell; /* like heaven_or_hell but only player has max 1 HP */
 };
 
 /*
