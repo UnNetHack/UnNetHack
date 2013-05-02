@@ -107,7 +107,8 @@ char *livelog_prefix() {
 			"elbereths=%ld:"
 			"xplevel=%d:" /* XP level */
 			"exp=%ld:" /* Experience points */
-			"mode=%s",
+			"mode=%s:"
+			"gold=%ld",
 			GAME_SHORT_NAME, VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
 			plname,
 			moves,
@@ -131,7 +132,13 @@ char *livelog_prefix() {
 			 flags.explore ? "explore" :
 			 hell_and_hell_mode ? "hah" :
 			 heaven_or_hell_mode ? "hoh" :
-			 "normal"));
+			 "normal"),
+#ifndef GOLDOBJ
+			(u.ugold + hidden_gold())
+#else
+			(money_cnt(invent) + hidden_gold())
+#endif
+			);
 	return prefixbuf;
 }
 
