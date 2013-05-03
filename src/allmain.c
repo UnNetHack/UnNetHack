@@ -101,6 +101,9 @@ moveloop()
     int timeout_start = rnd(10000)+25000;
     int clock_base = 80000L-timeout_start;
     int past_clock;
+    /* for keeping track of Elbereth and correctstatus line display */
+    int was_on_elbereth = 0;
+    int is_on_elbereth = 0;
 
     flags.moonphase = phase_of_the_moon();
     if(flags.moonphase == FULL_MOON) {
@@ -467,6 +470,13 @@ moveloop()
 	     	see_monsters();
 
 	    if (vision_full_recalc) vision_recalc(0);	/* vision! */
+	}
+
+	/* check changes of Elbereth at current player location */
+	is_on_elbereth = sengr_at("Elbereth", u.ux, u.uy);
+	if (was_on_elbereth != is_on_elbereth) {
+		was_on_elbereth = is_on_elbereth;
+		flags.botlx = 1;
 	}
 
 #ifdef REALTIME_ON_BOTL

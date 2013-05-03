@@ -327,7 +327,6 @@ register int cnt;
 {
 	if (can_reach_floor())
 		wipe_engr_at(u.ux, u.uy, cnt);
-	flags.botl = 1;
 }
 
 #endif /* OVL2 */
