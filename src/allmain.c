@@ -128,7 +128,6 @@ moveloop()
     monst_init();
     monstr_init();	/* monster strengths */
     objects_init();
-    dragons_init();
     shop_selection_init();
 
 #ifdef WIZARD
@@ -472,12 +471,14 @@ moveloop()
 	    if (vision_full_recalc) vision_recalc(0);	/* vision! */
 	}
 
+#ifdef ELBERETH
 	/* check changes of Elbereth at current player location */
 	is_on_elbereth = sengr_at("Elbereth", u.ux, u.uy);
 	if (was_on_elbereth != is_on_elbereth) {
 		was_on_elbereth = is_on_elbereth;
 		flags.botlx = 1;
 	}
+#endif
 
 #ifdef REALTIME_ON_BOTL
 	if (iflags.showrealtime) {
