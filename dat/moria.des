@@ -327,9 +327,9 @@ REPLACE_TERRAIN:(06,00,65,18), '.', 't', 05%
 
 #Woodman
 MONSTER: (''',"iron golem"),random,peaceful {
-  OBJECT:(')', "axe"),uncursed,erodeproof,1d5
+  OBJECT:(')', "axe"),uncursed,1d4
   [50%]: OBJECT:('(', "tin opener")
-  [25%]: OBJECT:('(', "can of grease")
+  [20%]: OBJECT:('(', "can of grease")
   [10%]: OBJECT:('(', "tinning kit")
 }
 
