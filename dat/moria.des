@@ -325,6 +325,14 @@ STAIR:(72,09), up
 REPLACE_TERRAIN:(06,00,65,18), '.', 'T', 20%
 REPLACE_TERRAIN:(06,00,65,18), '.', 't', 05%
 
+#Woodman
+MONSTER: (''',"iron golem"),random,peaceful {
+  OBJECT:(')', "axe"),uncursed,erodeproof,1d5
+  [50%]: OBJECT:('(', "tin opener")
+  [25%]: OBJECT:('(', "can of grease")
+  [10%]: OBJECT:('(', "tinning kit")
+}
+
 #Abandoned campsites
 LOOP [2d4] { TRAP:"bear",random }
 LOOP [2d6] { OBJECT:random,random }
