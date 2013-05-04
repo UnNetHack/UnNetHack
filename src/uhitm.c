@@ -727,8 +727,9 @@ int thrown;
 			hittxt = TRUE;
 		    }
 
-		    if (obj->oartifact &&
-			artifact_hit(&youmonst, mon, obj, &tmp, dieroll)) {
+		    if ((obj->oartifact || /* special case for rocks fired from giantslayer */
+					((obj->oclass == GEM_CLASS) && uwep && uwep->oartifact == ART_GIANTSLAYER)) &&
+					artifact_hit(&youmonst, mon, obj, &tmp, dieroll)) {
 			if(mon->mhp <= 0) /* artifact killed monster */
 			    return FALSE;
 			if (tmp == 0) return TRUE;

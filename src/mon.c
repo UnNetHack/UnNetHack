@@ -1669,6 +1669,14 @@ boolean was_swallowed;			/* digestion */
 	    return FALSE;
 	}
 
+	/* Trolls don't leave a corpse when the player is wielding Trollsbane */
+	if (mdat->mlet == S_TROLL && uwep && uwep->oartifact == ART_TROLLSBANE) {
+		if (cansee(mon->mx, mon->my)) {
+			pline("%s corpse flares brightly and burns to ashes.", s_suffix(Monnam(mon)));
+			return FALSE;
+		}
+	}
+
 	/* Gas spores always explode upon death */
 	for(i = 0; i < NATTK; i++) {
 	    if (mdat->mattk[i].aatyp == AT_BOOM) {

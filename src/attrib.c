@@ -5,6 +5,8 @@
 /*  attribute modification routines. */
 
 #include "hack.h"
+#include "artifact.h"
+#include "artilist.h"
 
 /* #define DEBUG */	/* uncomment for debugging info */
 
@@ -687,12 +689,17 @@ int x;
 
 	if (x == A_STR) {
 		if (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER) return(125);
-		else if (uwep && uwep->oartifact == ART_GIANTSLAYER) return(118);
+		if ((uwep && (artilist[uwep->oartifact].spfx & SPFX_STR)) ||
+				(uswapwep && (artilist[uswapwep->oartifact].spfx & SPFX_STR))) {
+			return (118);
+		}
 #ifdef WIN32_BUG
 		else return(x=((tmp >= 125) ? 125 : (tmp <= 3) ? 3 : tmp));
 #else
 		else return((schar)((tmp >= 125) ? 125 : (tmp <= 3) ? 3 : tmp));
 #endif
+	} else if (x == A_CON) {
+		if (uwep && (artilist[uwep->oartifact].spfx & SPFX_CON)) return (25);
 	} else if (x == A_CHA) {
 		if (tmp < 18 && (youmonst.data->mlet == S_NYMPH ||
 		    u.umonnum==PM_SUCCUBUS || u.umonnum == PM_INCUBUS))

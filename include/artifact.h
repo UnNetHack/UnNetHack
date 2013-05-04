@@ -35,6 +35,25 @@
 #define SPFX_XRAY   0x2000000L	/* gives X-RAY vision to player */
 #define SPFX_REFLECT 0x4000000L /* Reflection */
 #define SPFX_WARN_S 0x8000000L	/* item warns you of danger of S_MONSTER */
+#define SPFX_STR    0x10000000L   /* item bestows STR 18(**) */
+#define SPFX_CON    0x20000000L   /* item bestows CON 25 */
+#define SPFX_POLYC  0x40000000L	 /* items grants polymorph control */
+
+#define SPDF_NONE      0x00000000L /* No special effects */
+#define SPDF_MAGIC     0x00000001L /* Magic resistance */
+#define SPDF_FIRE      0x00000002L /* Fire defense */
+#define SPDF_COLD      0x00000004L /* Cold defense */
+#define SPDF_SLEEP     0x00000008L /* Sleep defense */
+#define SPDF_DISINT    0x00000010L /* Disintegration defense */
+#define SPDF_ELEC      0x00000020L /* Shock defense */
+#define SPDF_POISON    0x00000040L /* Poison defense */
+#define SPDF_ACID      0x00000080L /* Acid defense */
+#define SPDF_BLIND     0x00000100L /* Blinding resistance */
+#define SPDF_WERE      0x00000200L /* Lycanthropy resistance */
+#define SPDF_DRAIN     0x00000400L /* Drain level defense */
+#define SPDF_CONFUSE   0x00000800L /* Confusion */
+#define SPDF_STUN      0x00001000L /* Stunning */
+
 
 
 struct artifact {
@@ -43,7 +62,9 @@ struct artifact {
 	unsigned long spfx;	/* special effect from wielding/wearing */
 	unsigned long cspfx;	/* special effect just from carrying obj */
 	unsigned long mtype;	/* monster type, symbol, or flag */
-	struct attack attk, defn, cary;
+	struct attack attk;
+	unsigned long defn;
+	struct attack cary;
 	uchar	    inv_prop;	/* property obtained by invoking artifact */
 	aligntyp    alignment;	/* alignment of bequeathing gods */
 	short	    role;	/* character role associated with */
