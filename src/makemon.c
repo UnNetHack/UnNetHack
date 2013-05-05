@@ -1211,7 +1211,8 @@ mbirth_limit(mndx)
 int mndx;
 {
 	/* assert(MAXMONNO < 255); */
-	return (mndx == PM_NAZGUL ? 9 : mndx == PM_ERINYS ? 3 : MAXMONNO); 
+	return (mndx == PM_NAZGUL ? 9 : mndx == PM_ERINYS ? 3 :
+			mndx == PM_WEEPING_ARCHANGEL ? 7 : MAXMONNO); 
 }
 
 /* used for wand/scroll/spell of create monster */
