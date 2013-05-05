@@ -1079,7 +1079,7 @@ mfndpos(mon, poss, info, flag)
 	register int cnt = 0;
 	register uchar ntyp;
 	uchar nowtyp;
-	boolean wantpool,poolok,lavaok,nodiag;
+	boolean wantpool,poolok,lavaok,nodiag,quantumlock;
 	boolean rockok = FALSE, treeok = FALSE, thrudoor;
 	int maxx, maxy;
 
@@ -1092,6 +1092,7 @@ mfndpos(mon, poss, info, flag)
 	poolok = is_flyer(mdat) || is_clinger(mdat) ||
 		 (is_swimmer(mdat) && !wantpool);
 	lavaok = is_flyer(mdat) || is_clinger(mdat) || likes_lava(mdat);
+	quantumlock = (is_weeping(mdat));
 	thrudoor = ((flag & (ALLOW_WALL|BUSTDOOR)) != 0L);
 	if (flag & ALLOW_DIG) {
 	    struct obj *mw_tmp;
@@ -1147,6 +1148,8 @@ nexttry:	/* eels prefer the water, but if there is no water nearby,
 		(IS_DOOR(ntyp) && (levl[nx][ny].doormask & ~D_BROKEN)))
 #endif
 	       ))
+		continue;
+	    if(nx != 0 && ny != 0 && canseemon(mon) && (quantumlock))
 		continue;
 	    if((is_pool(nx,ny) == wantpool || poolok) &&
 	       (lavaok || !is_lava(nx,ny))) {

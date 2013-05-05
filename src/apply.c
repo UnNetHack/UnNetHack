@@ -744,8 +744,7 @@ struct obj *obj;
 		freeinv(obj);
 		(void) mpickobj(mtmp,obj);
 		if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
-	} else if(!mtmp->mcan && !mtmp->minvis &&
-					mtmp->data == &mons[PM_WEEPING_ANGEL]) {
+	} else if(!mtmp->mcan && !mtmp->minvis && is_weeping(mtmp->data)) {
 		if (vis)
 			pline ("%s stares at its reflection with a stony expression.", Monnam(mtmp));
 			mtmp->mcanmove = 0;

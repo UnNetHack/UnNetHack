@@ -184,6 +184,9 @@
 #define touch_petrifies(ptr)	((ptr) == &mons[PM_COCKATRICE] || \
 				 (ptr) == &mons[PM_CHICKATRICE])
 
+#define is_weeping(ptr)		((ptr) == &mons[PM_WEEPING_ANGEL] || \
+				 (ptr) == &mons[PM_WEEPING_ARCHANGEL])
+
 #ifdef WEBB_DISINT
 # define touch_disintegrates(ptr) ((ptr) == &mons[PM_DISINTEGRATOR])
 #endif

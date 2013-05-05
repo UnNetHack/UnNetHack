@@ -1049,7 +1049,7 @@ mdamagem(magr, mdef, mattk)
 		    mdef->mstrategy &= ~STRAT_WAITFORU;
 			if (u.uevent.udemigod) {
 		    /* Once the player kills Rodney or performs the Invocation, weeping angels will 
-		       be too interested in your potential to feed off the potential of monsters. */
+		       be too interested in your potential to feed off the potential of monsters */
 			    if (vis && canspotmon(mdef) && flags.verbose)
 				pline("%s glances at you with a hungry stare.", Monnam(magr));
 			} else {
@@ -1123,13 +1123,20 @@ mdamagem(magr, mdef, mattk)
 		tmp = 0;
 		break;
 	    case AD_BLNK:
-		/* Does no damage to monsters. */
+		/* Generally has no effect on monsters */
 		Strcpy(buf, Monnam(mdef));
 		if (vis && haseyes(pd) && mdef->mcansee && flags.verbose) {
-		    if (!mon_reflects(mdef, (char *)0))
-			pline("%s glares back at %s.", buf, mon_nam(magr));
+		    if (!mon_reflects(mdef, (char *)0)) {
+			if (is_weeping(pd)) {
+			    monstone(magr);
+			    monstone(mdef);
+			    return (MM_AGR_DIED | MM_DEF_DIED);
+			} else {
+			    pline("%s glares back at %s.", buf, mon_nam(magr));
+		    	}
+		    }
 		    if (mon_reflects(mdef, (char *)0))
-			pline("%s deftly avoids looking at its own reflection.", Monnam(magr));
+			pline("%s deftly avoids glimpsing its reflection.", Monnam(magr));
 		} else if (vis && flags.verbose) {
 		    pline("%s cannot see %s.", buf, mon_nam(magr));
 		}
