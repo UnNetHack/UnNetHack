@@ -735,6 +735,12 @@ register struct	monst	*mtmp;
 			(void) mpickobj(mtmp, otmp);
 		}
 		break;
+	    case S_ANGEL:
+		if (is_weeping(ptr))
+		    if(!rn2(3)) (void) mongets(mtmp, POT_BLINDNESS);
+		if (ptr == &mons[PM_WEEPING_ARCHANGEL])
+		    if(!rn2(3)) (void) mongets(mtmp, WAN_LIGHTNING);
+		break;
 	    default:
 		break;
 	}
