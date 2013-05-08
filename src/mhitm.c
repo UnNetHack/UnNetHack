@@ -461,13 +461,14 @@ gazemm(magr, mdef, mattk)
 	    } else {
 		Sprintf(buf,"%s gazes at", Monnam(magr));
 		pline("%s %s...", buf, mon_nam(mdef));
-		if (magr->mcan || !magr->mcansee ||
-		    (magr->minvis && !perceives(mdef->data)) ||
-		    !mdef->mcansee || mdef->msleeping) {
-		    if(vis) pline("but nothing happens.");
-		    return(MM_MISS);
-		}
 	    }
+	}
+
+	if (magr->mcan || !magr->mcansee ||
+	    (magr->minvis && !perceives(mdef->data)) ||
+	    !mdef->mcansee || mdef->msleeping) {
+	    if(vis && !is_weeping(magr->data)) pline("but nothing happens.");
+	    return(MM_MISS);
 	}
 	/* call mon_reflects 2x, first test, then, if visible, print message */
 	if (magr->data == &mons[PM_MEDUSA] && mon_reflects(mdef, (char *)0)) {
