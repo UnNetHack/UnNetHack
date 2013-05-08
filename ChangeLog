@@ -30,6 +30,8 @@
 	* Reinstated vanilla behavior for cursed scrolls of gold detection and
 	  adding some traps to the planes
 	* Drastically increased generation probability of Fort Ludios portal
+	* Tourists start with more darts to compensate for more training being
+	  needed to advance weapon skills
 
 	* New config option for customizing monster letter in UTF8graphics:
 	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke
