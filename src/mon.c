@@ -1149,7 +1149,7 @@ nexttry:	/* eels prefer the water, but if there is no water nearby,
 #endif
 	       ))
 		continue;
-	    if(nx != 0 && ny != 0 && canseemon(mon) && (quantumlock))
+	    if(nx != 0 && ny != 0 && canseemon(mon) && quantumlock)
 		continue;
 	    if((is_pool(nx,ny) == wantpool || poolok) &&
 	       (lavaok || !is_lava(nx,ny))) {

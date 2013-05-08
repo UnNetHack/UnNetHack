@@ -450,15 +450,24 @@ gazemm(magr, mdef, mattk)
 	char buf[BUFSZ];
 
 	if(vis) {
+	    /* The gaze attack of weeping (arch)angels isn't active like others */
+	    if (is_weeping(magr->data)) {
+		if (mon_reflects(mdef, (char *)0)) {
+		    return (MM_MISS);
+		} else {
+		    Sprintf(buf,"%s is staring at", Monnam(magr));
+		    pline("%s %s.", buf, mon_nam(mdef));
+		}
+	    } else {
 		Sprintf(buf,"%s gazes at", Monnam(magr));
 		pline("%s %s...", buf, mon_nam(mdef));
-	}
-
-	if (magr->mcan || !magr->mcansee ||
-	    (magr->minvis && !perceives(mdef->data)) ||
-	    !mdef->mcansee || mdef->msleeping) {
-	    if(vis) pline("but nothing happens.");
-	    return(MM_MISS);
+		if (magr->mcan || !magr->mcansee ||
+		    (magr->minvis && !perceives(mdef->data)) ||
+		    !mdef->mcansee || mdef->msleeping) {
+		    if(vis) pline("but nothing happens.");
+		    return(MM_MISS);
+		}
+	    }
 	}
 	/* call mon_reflects 2x, first test, then, if visible, print message */
 	if (magr->data == &mons[PM_MEDUSA] && mon_reflects(mdef, (char *)0)) {
@@ -1051,7 +1060,7 @@ mdamagem(magr, mdef, mattk)
 		    /* Once the player kills Rodney or performs the Invocation, weeping angels will 
 		       be too interested in your potential to feed off the potential of monsters */
 			    if (vis && canspotmon(mdef) && flags.verbose)
-				pline("%s glances at you with a hungry stare.", Monnam(magr));
+				pline("%s is glancing at you with a hungry stare.", Monnam(magr));
 			} else {
 			    if (vis && canspotmon(mdef))
 				if (flags.verbose)
@@ -1123,22 +1132,16 @@ mdamagem(magr, mdef, mattk)
 		tmp = 0;
 		break;
 	    case AD_BLNK:
-		/* Generally has no effect on monsters */
-		Strcpy(buf, Monnam(mdef));
-		if (vis && haseyes(pd) && mdef->mcansee && flags.verbose) {
-		    if (!mon_reflects(mdef, (char *)0)) {
-			if (is_weeping(pd)) {
-			    monstone(magr);
-			    monstone(mdef);
-			    return (MM_AGR_DIED | MM_DEF_DIED);
-			} else {
-			    pline("%s glares back at %s.", buf, mon_nam(magr));
-		    	}
+		/* Weeping (arch)angels using their gaze attack on each
+		   other has unfortunate effects for both of them */
+		if (is_weeping(pd) && mdef->mcansee && magr->mcansee) {
+		    if (vis) {
+			Strcpy(buf, Monnam(mdef));
+			pline("%s and %s are permanently quantum-locked!", buf, mon_nam(magr));
 		    }
-		    if (mon_reflects(mdef, (char *)0))
-			pline("%s deftly avoids glimpsing its reflection.", Monnam(magr));
-		} else if (vis && flags.verbose) {
-		    pline("%s cannot see %s.", buf, mon_nam(magr));
+		    monstone(mdef);
+		    monstone(magr);
+		    return (MM_DEF_DIED | MM_AGR_DIED);
 		}
 		break;
 	    case AD_HALU:
@@ -1778,4 +1781,3 @@ nodamage:
 }
 
 /*mhitm.c*/
-

@@ -3152,9 +3152,27 @@ doapply()
 		}
 		break;
 	case SPE_BLANK_PAPER:
+		if (Underwater) {
+		    pline("You don't want to get the pages even more soggy, do you?");
+		    break;
+		} else {
 		You("flip through the pages of the spellbook.");
-		pline("This spellbook %s.", Hallucination ? "doesn't have much of a plot" : "has nothing written in it");
+		    if (Blind) {
+			pline("The pages feel %s.", Hallucination ? "freshly picked" : "rough and dry");
+		    } else {
+			pline("This spellbook %s.", Hallucination ? "doesn't have much of a plot" : "has nothing written in it");
+		    }
+		}
 		makeknown(obj->otyp);
+		break;
+	case SPE_BOOK_OF_THE_DEAD:
+		if (Underwater) {
+		    pline("You don't want to get the pages even more soggy, do you?");
+		    break;
+		} else {
+		    You("flip through the pages of the spellbook.");
+		    You_hear("the pages make an unpleasant %s sound.", Hallucination ? "chuckling" : "rustling");
+		}
 		break;
 	default:
 		/* Pole-weapons can strike at a distance */

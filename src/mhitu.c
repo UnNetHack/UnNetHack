@@ -2217,7 +2217,9 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 	    		exercise(A_INT, TRUE);
 		    } else {
 			if (flags.verbose)
-			    pline("%s tries to avoid looking at you.", Monnam(mtmp));
+			    /* Since this message means the player is unaffected, limit
+			       its occurence to preserve flavor but avoid message spam */
+			    if (!rn2(10)) pline("%s is covering its face.", Monnam(mtmp));
 			dmg = 0;
 		    }
 		if (dmg) mdamageu(mtmp, dmg);

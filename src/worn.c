@@ -215,9 +215,17 @@ struct obj *obj;	/* item to make known if effect can be seen */
 	       even if fast movement rate retained via worn speed boots */
 	    if (flags.verbose) pline("%s is slowing down.", Monnam(mon));
 	} else if (adjust > 0 || mon->mspeed == MFAST)
-	    pline("%s is suddenly moving %sfaster.", Monnam(mon), howmuch);
+	    if (is_weeping(mon->data)) {
+		pline("%s is suddenly changing positions %sfaster.", Monnam(mon), howmuch);
+	    } else {
+		pline("%s is suddenly moving %sfaster.", Monnam(mon), howmuch);
+	    }
 	else
-	    pline("%s seems to be moving %sslower.", Monnam(mon), howmuch);
+	    if (is_weeping(mon->data)) {
+		pline("%s is suddenly changing positions %sslower.", Monnam(mon), howmuch);
+	    } else {
+		pline("%s seems to be moving %sslower.", Monnam(mon), howmuch);
+	    }
 
 	/* might discover an object if we see the speed change happen, but
 	   avoid making possibly forgotten book known when casting its spell */
