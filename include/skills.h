@@ -97,7 +97,7 @@
 #define P_GRAND_MASTER	6	/* Unarmed combat/martial arts only */
 
 /**
- * Too reach the specified skill level:
+ * To reach the specified skill level:
  * P_UNSKILLED       0
  * P_BASIC         100
  * P_SKILLED       200
