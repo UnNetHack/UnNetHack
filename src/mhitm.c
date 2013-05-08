@@ -1060,7 +1060,7 @@ mdamagem(magr, mdef, mattk)
 			if (u.uevent.udemigod) {
 		    /* Once the player kills Rodney or performs the Invocation, weeping angels will 
 		       be too interested in your potential to feed off the potential of monsters */
-			    if (vis && canspotmon(mdef) && flags.verbose)
+			    if (vis && canspotmon(magr) && flags.verbose)
 				pline("%s is glancing at you with a hungry stare.", Monnam(magr));
 			} else {
 			    if (vis && canspotmon(mdef))
