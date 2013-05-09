@@ -421,7 +421,11 @@ hitmm(magr, mdef, mattk)
 				Sprintf(buf,"%s butts", magr_name);
 				break;
 			case AT_TUCH:
-				Sprintf(buf,"%s touches", magr_name);
+				if (is_weeping(magr->data)) {
+					Sprintf(buf,"%s is touching", magr_name);
+				} else {
+					Sprintf(buf,"%s touches", magr_name);
+				}
 				break;
 			case AT_TENT:
 				Sprintf(buf, "%s tentacles suck",
