@@ -44,6 +44,8 @@
 	  - Werebane conveys polymorph control while wielded.
 	  - Ogresmasher gives 25 CON while wielded.
 	  - Trollsbane prevents trolls from leaving corpses while wielded.
+	* Player can wish for up to 100 projectiles (from UnNetHackPlus)
+	* Land mines and beartraps weigh less (from UnNetHackPlus)
 
 	* New config option for customizing monster letter in UTF8graphics:
 	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke

@@ -661,8 +661,8 @@ TOOL("can of grease", (char *)0,1, 0, 0, 1,  15, 15,  20, IRON, HI_METAL),
 TOOL("figurine", (char *)0,     1, 0, 1, 0,  25, 50,  80, MINERAL, HI_MINERAL),
 TOOL("magic marker", (char *)0, 1, 0, 1, 1,  15,  2,  50, PLASTIC, CLR_RED),
 /* traps */
-TOOL("land mine",(char *)0,     1, 0, 0, 0,   0,300, 180, IRON, CLR_RED),
-TOOL("beartrap", (char *)0,     1, 0, 0, 0,   0,200,  60, IRON, HI_METAL),
+TOOL("land mine",(char *)0,     1, 0, 0, 0,   0,200, 180, IRON, CLR_RED),
+TOOL("beartrap", (char *)0,     1, 0, 0, 0,   0,100,  60, IRON, HI_METAL),
 /* instruments */
 /* some code in invent.c requires wooden flute .. drum of earthquake to be
    consecutive, with the wooden flute first and drum of earthquake last */

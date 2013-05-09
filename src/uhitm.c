@@ -2008,7 +2008,10 @@ register struct attack *mattk;
 	 * after exactly 1 round of attack otherwise.  -KAA
 	 */
 
-	if(mdef->data->msize >= MZ_HUGE) return 0;
+	if(mdef->data->msize >= MZ_HUGE) {
+	    pline("%s is too large to be engulfed.", Monnam(mdef));
+	    return 0;
+	}
 
 	if(u.uhunger < 1500 && !u.uswallow) {
 	    for (otmp = mdef->minvent; otmp; otmp = otmp->nobj)
