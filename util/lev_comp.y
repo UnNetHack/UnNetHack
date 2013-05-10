@@ -214,7 +214,7 @@ extern int rnd_vault_freq;
 %token	<i> VAULTGEN_ID
 %token	<i> rect_ID fillrect_ID line_ID randline_ID grow_ID selection_ID flood_ID
 %token	<i> rndcoord_ID circle_ID ellipse_ID filter_ID
-%token	<i> gradient_ID GRADIENT_TYPE LIMITED
+%token	<i> gradient_ID GRADIENT_TYPE LIMITED HUMIDITY_TYPE
 %token	<i> ',' ':' '(' ')' '[' ']' '{' '}'
 %token	<map> STRING MAP_ID
 %token	<map> NQSTRING VARSTRING
@@ -237,7 +237,7 @@ extern int rnd_vault_freq;
 %type	<i> object_infos object_info monster_infos monster_info
 %type	<i> levstatements stmt_block region_detail_end
 %type	<i> engraving_type flag_list prefilled
-%type	<i> monster
+%type	<i> monster humidity_flags
 %type	<i> comparestmt encodecoord encoderegion mapchar
 %type	<i> seen_trap_mask
 %type	<i> mon_gen_list encodemonster encodeobj encodeobj_list
@@ -2091,7 +2091,23 @@ encodecoord	: '(' INTEGER ',' INTEGER ')'
 		  }
 		| RANDOM_TYPE
 		  {
-		      $$ = SP_COORD_PACK(-1,-1);
+		      $$ = SP_COORD_PACK_RANDOM(0);
+		  }
+		| RANDOM_TYPE '[' humidity_flags ']'
+		  {
+		      $$ = SP_COORD_PACK_RANDOM( $3 );
+		  }
+		;
+
+humidity_flags	: HUMIDITY_TYPE
+		  {
+		      $$ = $1;
+		  }
+		| HUMIDITY_TYPE ',' humidity_flags
+		  {
+		      if (($1 & $3))
+			  lc_warning("Humidity flag used twice.");
+		      $$ = ($1 | $3);
 		  }
 		;
 

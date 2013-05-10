@@ -247,9 +247,19 @@ enum corefuncs {
 #define SPOVAR_SEL	0x09 /* selection. char[COLNO][ROWNO] in str */
 #define SPOVAR_ARRAY	0x40 /* used in splev_var & lc_vardefs, not in opvar */
 
+#define SP_COORD_IS_RANDOM 0x01000000
+/* Humidity flags for get_location() and friends, used with SP_COORD_PACK_RANDOM() */
+#define DRY	0x1
+#define WET	0x2
+#define HOT	0x4
+#define SOLID	0x8
+#define ANY_LOC 0x10 /* even outside the level */
+#define NO_LOC_WARN 0x20 /* no complaints and set x & y to -1, if no loc */
+
 #define SP_COORD_X(l)	(l & 0xff)
 #define SP_COORD_Y(l)	((l >> 16) & 0xff)
 #define SP_COORD_PACK(x,y) ((( x ) & 0xff) + ((( y ) & 0xff) << 16))
+#define SP_COORD_PACK_RANDOM(f) (SP_COORD_IS_RANDOM | (f))
 
 #define SP_REGION_X1(l)	(l & 0xff)
 #define SP_REGION_Y1(l)	((l >> 8) & 0xff)
@@ -329,6 +339,13 @@ struct sp_coder {
  * Structures manipulated by the special levels loader & compiler
  */
 
+#define packed_coord long
+typedef struct {
+    xchar is_random;
+    long getloc_flags;
+    int x, y;
+} unpacked_coord;
+
 typedef struct {
 	int cmp_what;
 	int cmp_val;
@@ -357,6 +374,7 @@ typedef struct {
 } room_door;
 
 typedef struct {
+    packed_coord coord;
 	xchar x, y, type;
 } trap;
 
@@ -364,6 +382,7 @@ typedef struct {
 	Str_or_Len name, appear_as;
 	short id;
 	aligntyp align;
+    packed_coord coord;
 	xchar x, y, class, appear;
 	schar peaceful, asleep;
         short female, invis, cancelled, revived, avenge, fleeing, blinded, paralyzed, stunned, confused;
@@ -375,6 +394,7 @@ typedef struct {
 	Str_or_Len name;
 	int   corpsenm;
 	short id, spe;
+    packed_coord coord;
 	xchar x, y, class, containment;
 	schar curse_state;
 	int   quan;
@@ -384,6 +404,7 @@ typedef struct {
 } object;
 
 typedef struct {
+    packed_coord coord;
 	xchar		x, y;
 	aligntyp	align;
 	xchar		shrine;

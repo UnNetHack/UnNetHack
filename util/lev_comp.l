@@ -203,6 +203,11 @@ filter		{ savetoken(yytext); return filter_ID; }
 gradient	{ savetoken(yytext); return gradient_ID; }
 radial		{ savetoken(yytext); yylval.i=SEL_GRADIENT_RADIAL;  return GRADIENT_TYPE; }
 square		{ savetoken(yytext); yylval.i=SEL_GRADIENT_SQUARE;  return GRADIENT_TYPE; }
+dry		{ savetoken(yytext); yylval.i=DRY;  return HUMIDITY_TYPE; }
+wet		{ savetoken(yytext); yylval.i=WET;  return HUMIDITY_TYPE; }
+hot		{ savetoken(yytext); yylval.i=HOT;  return HUMIDITY_TYPE; }
+solid		{ savetoken(yytext); yylval.i=SOLID;  return HUMIDITY_TYPE; }
+any		{ savetoken(yytext); yylval.i=ANY_LOC;  return HUMIDITY_TYPE; }
 hear		{ savetoken(yytext); yylval.i=LVLSND_HEARD;  return MSG_OUTPUT_TYPE; }
 pline		{ savetoken(yytext); yylval.i=LVLSND_PLINED; return MSG_OUTPUT_TYPE; }
 verbal		{ savetoken(yytext); yylval.i=LVLSND_VERBAL; return MSG_OUTPUT_TYPE; }

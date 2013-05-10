@@ -30,7 +30,7 @@
 extern void FDECL(mkmap, (lev_init *));
 
 STATIC_DCL void FDECL(get_room_loc, (schar *, schar *, struct mkroom *));
-STATIC_DCL void FDECL(get_free_room_loc, (schar *, schar *, struct mkroom *));
+STATIC_DCL void FDECL(get_free_room_loc, (schar *, schar *, struct mkroom *, packed_coord));
 STATIC_DCL void FDECL(create_trap, (trap *, struct mkroom *));
 STATIC_DCL int FDECL(noncoalignment, (ALIGNTYP_P));
 STATIC_DCL void FDECL(create_monster, (monster *, struct mkroom *));
@@ -840,12 +840,6 @@ rndtrap()
  *	The "humidity" flag is used to insure that engravings aren't
  *	created underwater, or eels on dry land.
  */
-#define DRY	0x1
-#define WET	0x2
-#define HOT	0x4
-#define SOLID	0x8
-#define ANY_LOC 0x10 /* even outside the level */
-#define NO_LOC_WARN 0x20 /* no complaints and set x & y to -1, if no loc */
 
 STATIC_DCL boolean FDECL(is_ok_location, (SCHAR_P, SCHAR_P, int));
 
@@ -938,6 +932,44 @@ register int humidity;
 	return FALSE;
 }
 
+unpacked_coord
+get_unpacked_coord(loc, defhumidity)
+     long loc;
+     int defhumidity;
+{
+    static unpacked_coord c;
+
+    if (loc & SP_COORD_IS_RANDOM) {
+	c.x = c.y = -1;
+	c.is_random = 1;
+	c.getloc_flags = (loc & ~SP_COORD_IS_RANDOM);
+	if (!c.getloc_flags) c.getloc_flags = defhumidity;
+    } else {
+	c.is_random = 0;
+	c.getloc_flags = defhumidity;
+	c.x = SP_COORD_X(loc);
+	c.y = SP_COORD_Y(loc);
+    }
+    return c;
+}
+
+STATIC_OVL void
+get_location_coord(x, y, humidity, croom, crd)
+schar *x, *y;
+int humidity;
+struct mkroom *croom;
+long crd;
+{
+    unpacked_coord c;
+    c = get_unpacked_coord(crd, humidity);
+    *x = c.x;
+    *y = c.y;
+    get_location(x, y, c.getloc_flags | (c.is_random ? NO_LOC_WARN : 0), croom);
+    if (*x == -1 && *y == -1 && c.is_random)
+	get_location(x,y, humidity, croom);
+}
+
+
 /*
  * Get a relative position inside a room.
  * negative values for x or y means RANDOM!
@@ -972,16 +1004,15 @@ struct mkroom	*croom;
  */
 
 STATIC_OVL void
-get_free_room_loc(x,y, croom)
+get_free_room_loc(x,y, croom, pos)
 schar		*x, *y;
 struct mkroom	*croom;
+packed_coord	pos;
 {
 	schar try_x, try_y;
 	register int trycnt = 0;
 
-        try_x = *x,  try_y = *y;
-
-	get_location(&try_x, &try_y, DRY, croom);
+	get_location_coord(&try_x, &try_y, DRY, croom, pos);
         if (levl[try_x][try_y].typ != ROOM) {
 	    do {
 		try_x = *x,  try_y = *y;
@@ -1432,16 +1463,12 @@ struct mkroom	*croom;
     schar	x,y;
     coord	tm;
 
-	x = t->x;
-	y = t->y;
 	if (croom)
-	    get_free_room_loc(&x, &y, croom);
+	    get_free_room_loc(&x, &y, croom, t->coord);
 	else {
 	    int trycnt = 0;
 	    do {
-		x = t->x;
-		y = t->y;
-		get_location(&x, &y, DRY, croom);
+		get_location_coord(&x, &y, DRY, croom, t->coord);
 	    } while ((levl[x][y].typ == STAIRS || levl[x][y].typ == LADDER) && ++trycnt <= 100);
 	    if (trycnt > 100) return;
 	}
@@ -1593,9 +1620,6 @@ struct mkroom	*croom;
 			(Race_if(PM_DWARF) || Race_if(PM_GNOME)) && rn2(3))
 	    pm = (struct permonst *) 0;
 
-	x = m->x;
-	y = m->y;
-
 	if (pm) {
 	    int loc = DRY;
 	    if (pm->mlet == S_EEL || amphibious(pm) || is_swimmer(pm)) loc = WET;
@@ -1603,10 +1627,10 @@ struct mkroom	*croom;
 	    if (passes_walls(pm) || noncorporeal(pm)) loc |= SOLID;
 	    if (flaming(pm)) loc |= HOT;
 	    /* If water-liking monster, first try is without DRY */
-	    get_location(&x, &y, loc|NO_LOC_WARN, croom);
+	    get_location_coord(&x, &y, loc|NO_LOC_WARN, croom, m->coord);
 	    if (x == -1 && y == -1) {
 		loc |= DRY;
-		get_location(&x, &y, loc, croom);
+		get_location_coord(&x, &y, loc, croom, m->coord);
 	    }
 	} else
 	    get_location(&x, &y, DRY, croom);
@@ -1776,8 +1800,7 @@ struct mkroom	*croom;
 
 	named = o->name.str ? TRUE : FALSE;
 
-	x = o->x; y = o->y;
-	get_location(&x, &y, DRY, croom);
+	get_location_coord(&x, &y, DRY, croom, o->coord);
 
 	if (o->class >= 0)
 	    c = o->class;
@@ -1982,14 +2005,12 @@ create_altar(a, croom)
 	boolean		croom_is_temple = TRUE;
 	int oldtyp;
 
-	x = a->x; y = a->y;
-
 	if (croom) {
-	    get_free_room_loc(&x, &y, croom);
+	    get_free_room_loc(&x, &y, croom, a->coord);
 	    if (croom->rtype != TEMPLE)
 		croom_is_temple = FALSE;
 	} else {
-	    get_location(&x, &y, DRY, croom);
+	    get_location_coord(&x, &y, DRY, croom, a->coord);
 	    if ((sproom = (schar) *in_rooms(x, y, TEMPLE)) != 0)
 		croom = &rooms[sproom - ROOMOFFSET];
 	    else
@@ -2000,9 +2021,6 @@ create_altar(a, croom)
 	oldtyp = levl[x][y].typ;
 	if (oldtyp == STAIRS || oldtyp == LADDER)
 	    return;
-
-	a->x = x;
-	a->y = y;
 
 	/* Is the alignment random ?
 	 * If so, it's an 80% chance that the altar will be co-aligned.
@@ -2760,9 +2778,7 @@ spo_corefunc(coder, fn)
 		return;
 	    }
 	    otyp = SP_OBJ_TYP(OV_i(obj));
-	    ox = SP_COORD_X(OV_i(crd));
-	    oy = SP_COORD_Y(OV_i(crd));
-	    get_location(&ox, &oy, ANY_LOC, coder->croom);
+	    get_location_coord(&ox, &oy, ANY_LOC, coder->croom, OV_i(crd));
 	    if (otyp >= 0 && ox >= 0 && oy >= 0 && ox < COLNO && oy < ROWNO) {
 		retval = sobj_at(otyp, ox, oy) ? 1 : 0;
 	    }
@@ -2782,9 +2798,7 @@ spo_corefunc(coder, fn)
 		impossible("No coord and mon for mon_at()");
 		return;
 	    }
-	    ox = SP_COORD_X(OV_i(crd));
-	    oy = SP_COORD_Y(OV_i(crd));
-	    get_location(&ox, &oy, ANY_LOC, coder->croom);
+	    get_location_coord(&ox, &oy, ANY_LOC, coder->croom, OV_i(crd));
 	    if (ox >= 0 && oy >= 0 && ox < COLNO && oy < ROWNO) {
 		struct monst *mtmp = m_at(ox, oy);
 		if (mtmp) {
@@ -3075,8 +3089,7 @@ spo_monster(coder)
 
     tmpmons.id = SP_MONST_PM(OV_i(id));
     tmpmons.class = SP_MONST_CLASS(OV_i(id));
-    tmpmons.x = SP_COORD_X(OV_i(coord));
-    tmpmons.y = SP_COORD_Y(OV_i(coord));
+    tmpmons.coord = OV_i(coord);
     tmpmons.has_invent = OV_i(has_inv);
 
     create_monster(&tmpmons, coder->croom);
@@ -3116,7 +3129,7 @@ spo_object(coder)
     tmpobj.invis = 0;
     tmpobj.greased = 0;
     tmpobj.broken = 0;
-    tmpobj.x = tmpobj.y = -1;
+    tmpobj.coord = SP_COORD_PACK_RANDOM(0);
 
     if (!OV_pop_i(containment)) return;
 
@@ -3204,8 +3217,7 @@ spo_object(coder)
 	case SP_O_V_COORD:
 	    if (OV_typ(parm) != SPOVAR_COORD)
 		panic("no coord for obj?");
-	    tmpobj.y = SP_COORD_Y(OV_i(parm));
-	    tmpobj.x = SP_COORD_X(OV_i(parm));
+	    tmpobj.coord = OV_i(parm);
 	    break;
 	case SP_O_V_END:
 	    nparams = SP_O_V_END+1;
@@ -3417,10 +3429,7 @@ spo_engraving(coder)
 	!OV_pop_s(txt) ||
 	!OV_pop_c(coord)) return;
 
-    x = SP_COORD_X(OV_i(coord));
-    y = SP_COORD_Y(OV_i(coord));
-
-    get_location(&x, &y, DRY, coder->croom);
+    get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
     make_engr_at(x, y, OV_s(txt), 0L, OV_i(etyp));
 
     opvar_free(etyp);
@@ -3528,15 +3537,12 @@ spo_stair(coder)
     if (!OV_pop_i(up) ||
 	!OV_pop_c(coord)) return;
 
-    x = SP_COORD_X(OV_i(coord));
-    y = SP_COORD_Y(OV_i(coord));
-
     if (coder->croom) {
-	get_location(&x, &y, DRY, coder->croom);
+	get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
 	mkstairs(x,y,(char)OV_i(up), coder->croom);
 	SpLev_Map[x][y] = 1;
     } else {
-	get_location(&x, &y, DRY, coder->croom);
+	get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
 	if ((badtrap = t_at(x,y)) != 0) deltrap(badtrap);
 	mkstairs(x, y, (char)OV_i(up), coder->croom);
 	SpLev_Map[x][y] = 1;
@@ -3556,10 +3562,7 @@ spo_ladder(coder)
     if (!OV_pop_i(up) ||
 	!OV_pop_c(coord)) return;
 
-    x = SP_COORD_X(OV_i(coord));
-    y = SP_COORD_Y(OV_i(coord));
-
-    get_location(&x, &y, DRY, coder->croom);
+    get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
 
     levl[x][y].typ = LADDER;
     SpLev_Map[x][y] = 1;
@@ -3584,8 +3587,7 @@ spo_grave(coder)
 	!OV_pop_s(txt) ||
 	!OV_pop_c(coord)) return;
 
-    x = SP_COORD_X(OV_i(coord)); y = SP_COORD_Y(OV_i(coord));
-    get_location(&x, &y, DRY, coder->croom);
+    get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
 
     if (isok(x, y) && !t_at(x, y)) {
 	levl[x][y].typ = GRAVE;
@@ -3612,8 +3614,7 @@ spo_altar(coder)
 	!OV_pop_i(shrine) ||
 	!OV_pop_c(coord)) return;
 
-    tmpaltar.x = SP_COORD_X(OV_i(coord));
-    tmpaltar.y = SP_COORD_Y(OV_i(coord));
+    tmpaltar.coord = OV_i(coord);
     tmpaltar.align = OV_i(al);
     tmpaltar.shrine = OV_i(shrine);
 
@@ -3636,9 +3637,7 @@ spo_wallwalk(coder)
 	!OV_pop_typ(fgtyp, SPOVAR_MAPCHAR) ||
 	!OV_pop_c(coord)) return;
 
-    x = SP_COORD_X(OV_i(coord));
-    y = SP_COORD_Y(OV_i(coord));
-    get_location(&x, &y, ANY_LOC, coder->croom);
+    get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(coord));
     if (!isok(x,y)) return;
     if (SP_MAPCHAR_TYP(OV_i(fgtyp)) >= MAX_TYPE) return;
     if (SP_MAPCHAR_TYP(OV_i(bgtyp)) >= MAX_TYPE) return;
@@ -3662,8 +3661,7 @@ spo_trap(coder)
     if (!OV_pop_i(type) ||
 	!OV_pop_c(coord)) return;
 
-    tmptrap.x = SP_COORD_X(OV_i(coord));
-    tmptrap.y = SP_COORD_Y(OV_i(coord));
+    tmptrap.coord = OV_i(coord);
     tmptrap.type = OV_i(type);
 
     create_trap(&tmptrap, coder->croom);
@@ -3679,10 +3677,8 @@ spo_gold(coder)
     schar x,y;
     long amount;
     if (!OV_pop_c(coord) || !OV_pop_i(amt)) return;
-    x = SP_COORD_X(OV_i(coord));
-    y = SP_COORD_Y(OV_i(coord));
     amount = OV_i(amt);
-    get_location(&x, &y, DRY, coder->croom);
+    get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
     if (amount == -1) amount = rnd(200);
     mkgold(amount, x,y);
     opvar_free(coord);
@@ -4544,9 +4540,7 @@ spo_drawbridge(coder)
 	!OV_pop_i(db_open) ||
 	!OV_pop_c(coord)) return;
 
-    x = SP_COORD_X(OV_i(coord));
-    y = SP_COORD_Y(OV_i(coord));
-    get_location(&x, &y, DRY|WET|HOT, coder->croom);
+    get_location_coord(&x, &y, DRY|WET|HOT, coder->croom, OV_i(coord));
     if (!create_drawbridge(x, y, OV_i(dir), OV_i(db_open)))
 	impossible("Cannot create drawbridge.");
     SpLev_Map[x][y] = 1;
@@ -4570,10 +4564,8 @@ spo_mazewalk(coder)
 	!OV_pop_c(coord)) return;
 
     dir = OV_i(fdir);
-    x = SP_COORD_X(OV_i(coord));
-    y = SP_COORD_Y(OV_i(coord));
 
-    get_location(&x, &y, ANY_LOC, coder->croom);
+    get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(coord));
     if (!isok(x,y)) return;
 
     if (OV_i(ftyp) < 1) {
@@ -5449,9 +5441,7 @@ sp_lev *lvl;
 		struct opvar *pt = selection_opvar(NULL);
 		schar x,y;
 		if (!OV_pop_c(tmp)) panic("no ter sel coord");
-		x = SP_COORD_X(OV_i(tmp));
-		y = SP_COORD_Y(OV_i(tmp));
-		get_location(&x, &y, ANY_LOC, coder->croom);
+		get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(tmp));
 		selection_setpoint(x,y, pt, 1);
 		splev_stack_push(coder->stack, pt);
 		opvar_free(tmp);
@@ -5496,12 +5486,8 @@ sp_lev *lvl;
 		struct opvar *tmp, *tmp2, *pt = selection_opvar(NULL);
 		schar x1,y1,x2,y2;
 		if (!OV_pop_c(tmp) || !OV_pop_c(tmp2)) panic("no ter sel linecoord");
-		x1 = SP_COORD_X(OV_i(tmp));
-		y1 = SP_COORD_Y(OV_i(tmp));
-		x2 = SP_COORD_X(OV_i(tmp2));
-		y2 = SP_COORD_Y(OV_i(tmp2));
-		get_location(&x1, &y1, ANY_LOC, coder->croom);
-		get_location(&x2, &y2, ANY_LOC, coder->croom);
+		get_location_coord(&x1, &y1, ANY_LOC, coder->croom, OV_i(tmp));
+		get_location_coord(&x2, &y2, ANY_LOC, coder->croom, OV_i(tmp2));
 		x1 = (x1 < 0) ? 0 : x1;
 		y1 = (y1 < 0) ? 0 : y1;
 		x2 = (x2 >= COLNO) ? COLNO-1 : x2;
@@ -5517,12 +5503,8 @@ sp_lev *lvl;
 		struct opvar *tmp, *tmp2, *tmp3, *pt = selection_opvar(NULL);
 		schar x1,y1,x2,y2;
 		if (!OV_pop_i(tmp3) || !OV_pop_c(tmp) || !OV_pop_c(tmp2)) panic("no ter sel randline");
-		x1 = SP_COORD_X(OV_i(tmp));
-		y1 = SP_COORD_Y(OV_i(tmp));
-		x2 = SP_COORD_X(OV_i(tmp2));
-		y2 = SP_COORD_Y(OV_i(tmp2));
-		get_location(&x1, &y1, ANY_LOC, coder->croom);
-		get_location(&x2, &y2, ANY_LOC, coder->croom);
+		get_location_coord(&x1, &y1, ANY_LOC, coder->croom, OV_i(tmp));
+		get_location_coord(&x2, &y2, ANY_LOC, coder->croom, OV_i(tmp2));
 		x1 = (x1 < 0) ? 0 : x1;
 		y1 = (y1 < 0) ? 0 : y1;
 		x2 = (x2 >= COLNO) ? COLNO-1 : x2;
@@ -5549,9 +5531,7 @@ sp_lev *lvl;
 		struct opvar *tmp;
 		schar x,y;
 		if (!OV_pop_c(tmp)) panic("no ter sel flood coord");
-		x = SP_COORD_X(OV_i(tmp));
-		y = SP_COORD_Y(OV_i(tmp));
-		get_location(&x, &y, ANY_LOC, coder->croom);
+		get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(tmp));
 		if (isok(x,y)) {
 		    struct opvar *pt = selection_opvar(NULL);
 		    selection_floodfill(pt, x,y);
@@ -5583,9 +5563,7 @@ sp_lev *lvl;
 		if (!OV_pop_i(yaxis)) panic("no yaxis for ellipse");
 		if (!OV_pop_i(xaxis)) panic("no xaxis for ellipse");
 		if (!OV_pop_c(pt)) panic("no pt for ellipse");
-		x = SP_COORD_X(OV_i(pt));
-		y = SP_COORD_Y(OV_i(pt));
-		get_location(&x, &y, ANY_LOC, coder->croom);
+		get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(pt));
 		selection_do_ellipse(sel, x,y, OV_i(xaxis), OV_i(yaxis), OV_i(filled));
 		splev_stack_push(coder->stack, sel);
 		opvar_free(filled);
@@ -5605,12 +5583,8 @@ sp_lev *lvl;
 		if (!OV_pop_c(coord)) panic("no coord for grad");
 		if (!OV_pop_i(maxd)) panic("no maxd for grad");
 		if (!OV_pop_i(mind)) panic("no mind for grad");
-		x = SP_COORD_X(OV_i(coord));
-		y = SP_COORD_Y(OV_i(coord));
-		get_location(&x, &y, ANY_LOC, coder->croom);
-		x2 = SP_COORD_X(OV_i(coord2));
-		y2 = SP_COORD_Y(OV_i(coord2));
-		get_location(&x2, &y2, ANY_LOC, coder->croom);
+		get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(coord));
+		get_location_coord(&x2, &y2, ANY_LOC, coder->croom, OV_i(coord2));
 
 		sel = selection_opvar(NULL);
 		selection_do_gradient(sel, x,y, x2,y2, OV_i(gtyp), OV_i(mind), OV_i(maxd), OV_i(glim));
