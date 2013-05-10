@@ -851,6 +851,8 @@ boolean your_fault, from_invent;
 	    else
 		You_hear(Hallucination ? "angry snakes!" : "a hissing noise.");
 	    dissolve_bars(barsx, barsy);
+	    if (your_fault && In_sokoban(&u.uz))
+		sokoban_trickster();
 	}
     }
     else if (obj_type == BOULDER || obj_type == HEAVY_IRON_BALL)

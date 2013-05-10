@@ -731,6 +731,8 @@ still_chewing(x,y)
     } else if (lev->typ == IRONBARS) {
 	digtxt = "chew through the iron bars.";
 	dissolve_bars(x,y);
+	if (In_sokoban(&u.uz))
+	    sokoban_trickster();
     } else if (lev->typ == SDOOR) {
 	if (lev->doormask & D_TRAPPED) {
 	    lev->doormask = D_NODOOR;

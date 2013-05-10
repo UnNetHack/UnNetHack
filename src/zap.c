@@ -3918,6 +3918,8 @@ boolean *shopdamage;
 	    else
 		You_hear(Hallucination ? "angry snakes!" : "a hissing noise.");
 	    dissolve_bars(x, y);
+	    if (In_sokoban(&u.uz))
+		sokoban_trickster();
 	}
 	if(closed_door(x, y)) {
 		int new_doormask = -1;
