@@ -103,14 +103,9 @@ MONSTER: ('&',"Durin's Bane"),(66,09),hostile, awake {
   OBJECT:('!',"paralysis"),cursed
 }
 
-LOOP [2d4] {
-  OBJECT:('%',"corpse"),random,montype:"dwarf"
-  [50%]: OBJECT:('[',"dwarvish mithril-coat"),random,buried,cursed
-}
-
-LOOP [10] {
-  OBJECT:random,random
-}
+LOOP [2d5] { OBJECT:random,random }
+LOOP [2d4] { OBJECT:('%',"corpse"),random,montype:"dwarf" }
+LOOP [2d2] { OBJECT:('[',"dwarvish mithril-coat"),random,buried,cursed }
 
 #Moria-tribute levels
 #Generally identical, but with a few small differences
@@ -152,10 +147,8 @@ STAIR:$stairs[1], down
 #
 
 #Level flavor
-LOOP [2d3] {
-  OBJECT:random,random
-  OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall"
-}
+LOOP [2d3] { OBJECT:random,random }
+LOOP [2d3] { OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall" }
 
 LEVEL: "moria3-2"	
 FLAGS:mazelevel
@@ -194,10 +187,8 @@ STAIR:$stairs[1], down
 #
 
 #Level flavor
-LOOP [2d3] {
-  OBJECT:random,random
-  OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall"
-}
+LOOP [2d3] { OBJECT:random,random }
+LOOP [2d3] { OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall" }
 
 LEVEL: "moria3-3"	
 FLAGS:mazelevel
@@ -236,10 +227,8 @@ STAIR:$stairs[1], down
 #
 
 #Level flavor
-LOOP [2d3] {
-  OBJECT:random,random
-  OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall"
-}
+LOOP [2d3] { OBJECT:random,random }
+LOOP [2d3] { OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall" }
 
 #The Halls of Moria
 
@@ -280,14 +269,15 @@ STAIR:random, down
 #battle with seemingly endless waves of orcish foes, or
 #imagine themselves playing with a bowl of Cheerios.
 #The magic of roguelikes is in choices like these. 
-LOOP [20] {
-  MONSTER: ('o', "orc-captain"), random, hostile { [25%]: OBJECT:('(', "oil lamp"),lit }
-  MONSTER: ('o', "hill orc"), random, hostile
-  MONSTER: ('o', "deep orc"), random, hostile
-  OBJECT:random,random
-  [10%]: MONSTER: 'T', random, hostile
-  [20%]: OBJECT:('[',"dwarvish mithril-coat"),random,blessed,1d5
+LOOP [10 + 1d4] { MONSTER: ('o', "orc-captain"), random, hostile {
+  [25%]: OBJECT:('(', "oil lamp"),lit }
 }
+LOOP [20 + 1d4] { MONSTER: ('o', "hill orc"), random, hostile }
+LOOP [30 + 1d4] { MONSTER: ('o', "deep orc"), random, hostile }
+LOOP [1d3] { MONSTER: 'T', random, hostile }
+
+LOOP [2d4] { OBJECT:('[',"dwarvish mithril-coat"),random,blessed,1d5 }
+LOOP [10 + 3d5] { OBJECT:random,random }
 
 #The Forest of BlastHardcheese
 
