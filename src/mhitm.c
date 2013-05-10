@@ -427,6 +427,13 @@ hitmm(magr, mdef, mattk)
 					Sprintf(buf,"%s touches", magr_name);
 				}
 				break;
+			case AT_CLAW:
+				if (is_weeping(magr->data)) {
+					Sprintf(buf,"%s is hitting", magr_name);
+				} else {
+					Sprintf(buf,"%s hits", magr_name);
+				}
+				break;
 			case AT_TENT:
 				Sprintf(buf, "%s tentacles suck",
 					s_suffix(magr_name));
@@ -1061,22 +1068,22 @@ mdamagem(magr, mdef, mattk)
 		    char mdef_Monnam[BUFSZ];
 		    if (vis) Strcpy(mdef_Monnam, Monnam(mdef));
 		    mdef->mstrategy &= ~STRAT_WAITFORU;
-			if (u.uevent.udemigod) {
+		    if (u.uevent.udemigod) {
 		    /* Once the player kills Rodney or performs the Invocation, weeping angels will 
 		       be too interested in your potential to feed off the potential of monsters */
-			    if (vis && canspotmon(magr) && flags.verbose)
-				pline("%s is glancing at you with a hungry stare.", Monnam(magr));
-			} else {
-			    if (vis && canspotmon(mdef))
-				if (flags.verbose)
-				    pline("%s vanishes before your eyes.", Monnam(mdef));
-				int nlev;
-				d_level flev;
-				nlev = random_teleport_level();
-				get_level(&flev, nlev); 
-				migrate_to_level(mdef, ledger_no(&flev), MIGR_RANDOM,
-					(coord *)0);
-			}
+			if (vis && canspotmon(magr) && flags.verbose)
+			    pline("%s is glancing at you with a hungry stare.", Monnam(magr));
+		    } else {
+			if (vis && canspotmon(mdef))
+			    if (flags.verbose)
+				pline("%s vanishes before your eyes.", Monnam(mdef));
+			    int nlev;
+			    d_level flev;
+			    nlev = random_teleport_level();
+			    get_level(&flev, nlev); 
+			    migrate_to_level(mdef, ledger_no(&flev), MIGR_RANDOM,
+				    (coord *)0);
+		    }
 		}
 		break;
 	    case AD_SLEE:
