@@ -154,7 +154,7 @@ STAIR:$stairs[1], down
 #Level flavor
 LOOP [2d3] {
   OBJECT:random,random
-  OBJECT:('?',"blank paper"),random,name:"Word of Recall"
+  OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall"
 }
 
 LEVEL: "moria3-2"	
@@ -196,7 +196,7 @@ STAIR:$stairs[1], down
 #Level flavor
 LOOP [2d3] {
   OBJECT:random,random
-  OBJECT:('?',"blank paper"),random,name:"Word of Recall"
+  OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall"
 }
 
 LEVEL: "moria3-3"	
@@ -238,7 +238,7 @@ STAIR:$stairs[1], down
 #Level flavor
 LOOP [2d3] {
   OBJECT:random,random
-  OBJECT:('?',"blank paper"),random,name:"Word of Recall"
+  OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall"
 }
 
 #The Halls of Moria
