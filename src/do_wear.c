@@ -673,6 +673,7 @@ Armor_off()
 	takeoff_mask &= ~W_ARM;
 	setworn((struct obj *)0, W_ARM);
 	cancelled_don = FALSE;
+	encumber_msg();
 	return 0;
 }
 

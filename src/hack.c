@@ -3119,7 +3119,20 @@ inv_weight()
 			wt += (int)(((long)otmp->quan + 50L) / 100L);
 		else if (otmp->otyp != BOULDER || !throws_rocks(youmonst.data))
 #endif
-			wt += otmp->owt;
+		{
+			int threshold = objects[STUDDED_LEATHER_ARMOR].oc_weight;
+			/* Weight bonus for armor heavier
+			 * than studded leather armor. */
+			if (Role_if(PM_KNIGHT) &&
+				uarm == otmp &&
+				otmp->owt > threshold) {
+				/* e.g. crystal plate mail weighs 325
+				 * instead of 450 */
+				wt += threshold + (otmp->owt-threshold)/2;
+			} else {
+				wt += otmp->owt;
+			}
+		}
 		otmp = otmp->nobj;
 	}
 	wc = weight_cap();
