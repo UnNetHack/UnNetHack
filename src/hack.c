@@ -916,9 +916,9 @@ int mode;
 	    ;	/* do nothing */
 	} else if (tmpr->typ == IRONBARS) {
 	    /* Eat the bars if you can */
-	    if (mode == DO_MOVE &&
+	    if ((mode == DO_MOVE &&
 		(!flags.nopick && metallivorous(youmonst.data) && 
-		     still_chewing(x,y)) 
+		     still_chewing(x,y)))
 		|| !(Passes_walls || passes_bars(youmonst.data)))
 		return FALSE;
 	} else if (tunnels(youmonst.data) && !needspick(youmonst.data)) {
@@ -1684,7 +1684,7 @@ domove()
 	}
 
 	if (flags.forcefight && levl[x][y].typ == IRONBARS && uwep) {
-	    struct obj *obj = uwep, *individual_obj;
+	    struct obj *obj = uwep;
 	    if (breaktest(obj)) {
 		if (obj->quan > 1L)
 		    obj = splitobj(obj, 1L);
