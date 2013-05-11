@@ -261,10 +261,17 @@ boolean fleemsg;
 		if (fleetime == 1) fleetime++;
 		mtmp->mfleetim = min(fleetime, 127);
 	    }
-	    if (!mtmp->mflee && fleemsg && canseemon(mtmp) && !mtmp->mfrozen)
-		pline("%s turns to flee!", (Monnam(mtmp)));
+	    if (!mtmp->mflee && fleemsg && canseemon(mtmp) && !mtmp->mfrozen) {
+		if (mtmp->data->mlet != S_MIMIC)
+		    pline("%s turns to flee!", (Monnam(mtmp)));
+		else
+		    pline("%s mimics a chicken for a moment!", (Monnam(mtmp)));
+	    }
 	    mtmp->mflee = 1;
 	}
+
+	/* ignore recently-stepped spaces when made to flee */
+	memset(mtmp->mtrack, MTSZ, sizeof(coord));
 }
 
 STATIC_OVL void
@@ -1091,6 +1098,7 @@ not_special:
 		ny = poss[i].y;
 
 		if (appr != 0) {
+		    /* avoid stepping back onto recently-stepped spaces */
 		    mtrk = &mtmp->mtrack[0];
 		    for(j=0; j < jcnt; mtrk++, j++)
 			if(nx == mtrk->x && ny == mtrk->y)
