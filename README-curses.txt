@@ -115,50 +115,13 @@ OPTIONS=guicolor
 #
 OPTIONS=mouse_support
 
-Compiling From Source
-=====================
-
-Linux / Other UNIXes:
-
-   Follow the instructions in sys/unix/Install.unx. By default, the
-   Makefile is setup to compile with ncurses. Edit Makefile.src if you
-   wish to compile against a different curses library, such as PDCurses
-   for SDL. Curses implementations other than Ncurses and PDCurses will
-   likely work, too, but have not been tested.
-
-Windows:
-
-  * Make sure your development environment is setup correctly to
-    compile NetHack. You may want to try building it unmodified before
-    trying to add the patch. The makefile that I provide is for
-    Mingw32, so if you use a different compiler, you will have to edit
-    the appropriate makefile by hand.
-  * Download SDL for Windows. Just the base SDL library is needed.
-  * Download PDCurses, and compile PDCurses-SDL in the sdl1
-    subdirectory. The provided makefile assumes you are using Mingw32.
-  * Place both libraries (SDL and PDCurses) somewhere where the NetHack
-    build can use them. The makefile I provide is setup to look for the
-    static versions of these libraries in a lib subdirectory under the
-    main nethack directory.
-  * As an alternative to installing/compiling the SDL and PDCurses-SDL
-    libraries, you may download precompiled versions of these, and
-    unzip them into your NetHack source directory:
-    http://nethack.edeca.net/karl/winlibs.zip
-  * Follow the instructions in sys/winnt/Install.nt witht he following
-    exception:
-       + Instead of typing "mingw32-make -f Makefile.gcc install" you
-         will type "mingw32-make -f cursmake.gcc install"
-
-Make sure you are compiling from a standard Windows command prompt and
-not a UNIX-style shell, or else it will not work!
-
 
 Known Issues
 ============
 
 The current list may be found at:
 
-http://nethack-curses.wikia.com/wiki/Known_Issues
+https://sourceforge.net/tracker/?group_id=317683&atid=1336046
 
 Contact
 =======
