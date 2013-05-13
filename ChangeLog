@@ -34,21 +34,24 @@
 	  needed to advance weapon skills
 	* The #enhance menu now indicates when skills require "just a little"
 	  more exercise before they may be enhanced
-	* Artifact weapon changes (from SporkHack):
-	  - All the weapons below warn against and have 20% instakill chance 
-	    against their target monsters.
-	  - Dragonbane is now a dwarvish spear that conveys fire, cold, shock,
-	    acid, poison, acid, and disintegration resistance while wielded.
-	  - Giantslayer is now a sling that gives 18/** STR while wielded or
-	    in the alternate weapon slot.
-	  - Werebane conveys polymorph control while wielded.
-	  - Ogresmasher gives 25 CON while wielded.
-	  - Trollsbane prevents trolls from leaving corpses while wielded.
 	* Player can wish for up to 100 projectiles (from UnNetHackPlus)
 	* Land mines and beartraps weigh less (from UnNetHackPlus)
-	* Grimtooth is the first sacrifice gift for Rogues
-	  - Grimtooth is now permanently poisoned and grants poison
-	    resistance while wielded
+
+	* Artifact changes:
+	  - From SporkHack:
+	    - All the weapons below warn against and have 20% instakill chance 
+	      against their target monsters.
+	    - Dragonbane is now a dwarvish spear that conveys fire, cold, shock,
+	      acid, poison, acid, and disintegration resistance while wielded.
+	    - Giantslayer is now a sling that gives 18/** STR while wielded or
+	      in the alternate weapon slot.
+	    - Werebane conveys polymorph control while wielded.
+	    - Ogresmasher gives 25 CON while wielded.
+	    - Trollsbane prevents trolls from leaving corpses while wielded.
+	  - Other:
+	    - Luck Blade added, first sacrifice gift for Convicts
+	    - Grimtooth is the first sacrifice gift for Rogues; it is now
+	      permanently poisoned and grants poison resistance while wielded
 
 	* New config option for customizing monster letter in UTF8graphics:
 	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke

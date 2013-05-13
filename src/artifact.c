@@ -1814,4 +1814,4 @@ struct obj *otmp;
 	return NULL;
 }
 
-/*artifact.c*/	
+/*artifact.c*/
