@@ -1265,10 +1265,13 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 		    *dmgptr += d(1,6);
 		    break;
 		case 10:
-		    pline_The("poison was deadly...");
-		    *dmgptr = 2 *
-			    (youdefend ? Upolyd ? u.mh : u.uhp : mdef->mhp) +
-			    FATAL_DAMAGE_MODIFIER;
+		    if (youattack) {
+			pline_The("poison was deadly...");
+			*dmgptr = (2 * mdef->mhp + FATAL_DAMAGE_MODIFIER);
+		    } else if (youdefend) {
+			pline_The("poison was extremely toxic!");
+			u.uhpmax -= d(4,6) / 2;
+		    }
 		    break;
 	    }
 	    return TRUE;
