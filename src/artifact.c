@@ -137,10 +137,12 @@ aligntyp alignment;	/* target alignment, or A_NONE */
 		    (a->alignment == alignment ||
 			(a->alignment == A_NONE && u.ugifts > 0))) &&
 		(!(a->spfx & SPFX_NOGEN) || unique) && !artiexist[m]) {
-		if (by_align && a->race != NON_PM && race_hostile(&mons[a->race]))
-		    continue;	/* skip enemies' equipment */
-		else if (by_align && Role_if(a->role))
+		/* role before race, so certain classes will still get their
+		   first sacrifice gift even if they're not the right species */
+		if (by_align && Role_if(a->role))
 		    goto make_artif;	/* 'a' points to the desired one */
+		else if (by_align && a->race != NON_PM && race_hostile(&mons[a->race]))
+		    continue;	/* skip enemies' equipment */
 		else
 		    eligible[n++] = m;
 	    }
@@ -1241,6 +1243,37 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 
 	}
 
+	if (otmp->oartifact == ART_GRIMTOOTH) {
+	    otmp->dknown = TRUE;
+	    pline_The("jagged blade poisons %s!",
+		    youdefend ? "you" : mon_nam(mdef));
+	    if (youdefend ? Poison_resistance : resists_poison(mdef)) {
+		pline("The poison doesn't seem to affect %s.",
+				youdefend ? "you" : mon_nam(mdef));
+		return TRUE;
+	    }
+	    switch (rnd(10)) {
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+		case 8:
+		case 9:
+		    *dmgptr += d(1,6);
+		    break;
+		case 10:
+		    pline_The("poison was deadly...");
+		    *dmgptr = 2 *
+			    (youdefend ? Upolyd ? u.mh : u.uhp : mdef->mhp) +
+			    FATAL_DAMAGE_MODIFIER;
+		    break;
+	    }
+	    return TRUE;
+	}
+
 	/* We really want "on a natural 20" but Nethack does it in */
 	/* reverse from AD&D. */
 	if (spec_ability(otmp, SPFX_BEHEAD)) {
@@ -1781,4 +1814,4 @@ struct obj *otmp;
 	return NULL;
 }
 
-/*artifact.c*/
+/*artifact.c*/	

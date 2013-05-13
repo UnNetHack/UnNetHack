@@ -46,6 +46,9 @@
 	  - Trollsbane prevents trolls from leaving corpses while wielded.
 	* Player can wish for up to 100 projectiles (from UnNetHackPlus)
 	* Land mines and beartraps weigh less (from UnNetHackPlus)
+	* Grimtooth is the first sacrifice gift for Rogues
+	  - Grimtooth is now permanently poisoned and grants poison
+	    resistance while wielded
 
 	* New config option for customizing monster letter in UTF8graphics:
 	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke

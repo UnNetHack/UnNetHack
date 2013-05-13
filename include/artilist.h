@@ -74,7 +74,7 @@ A("Cleaver",			BATTLE_AXE,
 
 A("Grimtooth",			ORCISH_DAGGER,
 	SPFX_RESTR, 0, 0,
-	PHYS(2,6),	SPDF_NONE,	NO_CARY,	0, A_CHAOTIC, NON_PM, PM_ORC, 300L ),
+	PHYS(2,6),	SPDF_POISON,	NO_CARY,	0, A_CHAOTIC, PM_ROGUE, PM_ORC, 300L ),
 /*
  *	Orcrist and Sting have same alignment as elves.
  */
