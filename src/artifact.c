@@ -1245,7 +1245,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 
 	if (otmp->oartifact == ART_GRIMTOOTH) {
 	    otmp->dknown = TRUE;
-	    if (youattack) {
+	    if (!youdefend) {
 		/* Grimtooth is the only non-projectile poisoned weapon
 		   yet implemented, so place alignment penalties here */
 		if Role_if(PM_SAMURAI) {
@@ -1258,7 +1258,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 		pline_The("jagged blade %s %s%s", resists_poison(mdef) ? "hits" : "poisons",
 					mon_nam(mdef), resists_poison(mdef) ? "." : "!");
 	    	if (resists_poison(mdef)) return TRUE;
-	    } else if (youdefend) {
+	    } else {
 		pline_The("jagged blade %s you%s", Poison_resistance ? "hits" : "poisons",
 					Poison_resistance ? "." : "!");
 	    	if (Poison_resistance) return TRUE;
