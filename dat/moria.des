@@ -268,12 +268,15 @@ STAIR:random, down
 #Players can either imagine themselves engaging in fierce
 #battle with seemingly endless waves of orcish foes, or
 #imagine themselves playing with a bowl of Cheerios.
-#The magic of roguelikes is in choices like these. 
-LOOP [10 + 1d4] { MONSTER: ('o', "orc-captain"), random, hostile {
+#The magic of roguelikes is in choices like these.
+LOOP [30 + 1d4] { MONSTER: ('o', "deep orc"), random, hostile }
+LOOP [20 + 1d4] { MONSTER: ('o', "hill orc"), random, hostile }
+LOOP [5 + 1d2] { MONSTER: ('o', "orc-captain"), random, hostile {
+  [25%]: OBJECT:('(', "oil lamp"),unlit }
+}
+LOOP [5 + 1d2] { MONSTER: ('o', "orc-captain"), random, hostile {
   [25%]: OBJECT:('(', "oil lamp"),lit }
 }
-LOOP [20 + 1d4] { MONSTER: ('o', "hill orc"), random, hostile }
-LOOP [30 + 1d4] { MONSTER: ('o', "deep orc"), random, hostile }
 LOOP [1d3] { MONSTER: 'T', random, hostile }
 
 LOOP [2d4] { OBJECT:('[',"dwarvish mithril-coat"),random,blessed,1d5 }
