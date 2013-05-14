@@ -1245,21 +1245,23 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 
 	if (otmp->oartifact == ART_GRIMTOOTH) {
 	    otmp->dknown = TRUE;
-	    /* Grimtooth is the only non-projectile poisoned weapon
-	       yet implemented, so place alignment penalties here */
-	    if Role_if(PM_SAMURAI) {
-		You("dishonorably use a poisoned weapon!");
-		adjalign(-sgn(u.ualign.type));
-	    } else if ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10)) {
-		You_feel("like an evil coward for using a poisoned weapon.");
-		adjalign(-1);
-	    }
-	    pline_The("jagged blade poisons %s!",
-		    youdefend ? "you" : mon_nam(mdef));
-	    if (youdefend ? Poison_resistance : resists_poison(mdef)) {
-		pline("The poison doesn't seem to affect %s.",
-				youdefend ? "you" : mon_nam(mdef));
-		return TRUE;
+	    if (youattack) {
+		/* Grimtooth is the only non-projectile poisoned weapon
+		   yet implemented, so place alignment penalties here */
+		if Role_if(PM_SAMURAI) {
+		    You("dishonorably use a poisoned weapon!");
+		    adjalign(-sgn(u.ualign.type));
+		} else if ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10)) {
+		    You_feel("like an evil coward for using a poisoned weapon.");
+		    adjalign(-1);
+		}
+		pline_The("jagged blade %s %s%s", resists_poison(mdef) ? "hits" : "poisons",
+					mon_nam(mdef), resists_poison(mdef) ? "." : "!");
+	    	if (resists_poison(mdef)) return TRUE;
+	    } else if (youdefend) {
+		pline_The("jagged blade %s you%s", Poison_resistance ? "hits" : "poisons",
+					Poison_resistance ? "." : "!");
+	    	if (Poison_resistance) return TRUE;
 	    }
 	    switch (rnd(10)) {
 		case 1:
