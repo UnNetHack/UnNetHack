@@ -116,7 +116,7 @@ int shotlimit;
 	    case P_SKILLED:	multishot++; break;
 	    case P_EXPERT:	multishot += 2; break;
 	    }
-	    /* ...or is using a special weapon for their role... */
+	    /* ...or using a special weapon for their role... */
 	    switch (Role_switch) {
 	    case PM_RANGER:
 		multishot++;
@@ -130,7 +130,7 @@ int shotlimit;
 	    default:
 		break;	/* No bonus */
 	    }
-	    /* ...or using their race's special bow */
+	    /* ...or using their race's special bow... */
 	    switch (Race_switch) {
 	    case PM_ELF:
 		if (obj->otyp == ELVEN_ARROW && uwep &&
@@ -140,8 +140,24 @@ int shotlimit;
 		if (obj->otyp == ORCISH_ARROW && uwep &&
 				uwep->otyp == ORCISH_BOW) multishot++;
 		break;
+	    case PM_GNOME:
+		if (obj->otyp == CROSSBOW_BOLT && uwep &&
+				uwep->otyp == CROSSBOW) multishot++;
+		break;
 	    default:
 		break;	/* No bonus */
+	    }
+	    /* ...or using the Longbow of Diana */
+	    if (uwep && uwep->oartifact == ART_LONGBOW_OF_DIANA && 
+		    ammo_and_launcher(obj, uwep)) 
+		multishot++;
+
+	    /* require high strength for crossbow vollies */
+	    if (uwep && uwep->otyp == CROSSBOW) {
+	        int cap = (Race_if(PM_GNOME) ? 16 : 18);
+		if (ACURR(A_STR) < cap) 
+		    multishot -= ((cap + 1 - ACURR(A_STR)) / 2);
+		if (multishot < 1) multishot = 1;
 	    }
 	}
 
@@ -967,28 +983,65 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 			thrownobj = (struct obj*)0;
 			return;
 		}
-	} else {
-		urange = (int)(ACURRSTR)/2;
-		/* balls are easy to throw or at least roll */
-		/* also, this insures the maximum range of a ball is greater
-		 * than 1, so the effects from throwing attached balls are
-		 * actually possible
-		 */
-		if (obj->otyp == HEAVY_IRON_BALL)
-			range = urange - (int)(obj->owt/100);
-		else
-			range = urange - (int)(obj->owt/40);
-		if (obj == uball) {
-			if (u.ustuck) range = 1;
-			else if (range >= 5) range = 5;
-		}
-		if (range < 1) range = 1;
+	} else { 
+		if (uwep && uwep->otyp == CROSSBOW && 
+			ammo_and_launcher(obj, uwep)) {
+		    /* crossbow range is very consistent and independent of strength */
+		    /* this is about the same as a very strong player firing a bow */
+		    urange = 9;
+		    range = 19;
+		} else {
+		    urange = (int)(ACURRSTR)/2;
 
-		if (is_ammo(obj)) {
-		    if (ammo_and_launcher(obj, uwep))
-			range++;
-		    else if (obj->oclass != GEM_CLASS)
-			range /= 2;
+		    /* hard limit this so crossbows will fire further
+		     * than anything except a superstrong elf wielding a
+		     * racial bow, or a samurai with his yumi */
+		    if (urange > 9) { urange = 9; }
+
+		    /* balls are easy to throw or at least roll */
+		    /* also, this insures the maximum range of a ball is greater
+		     * than 1, so the effects from throwing attached balls are
+		     * actually possible
+		     */
+		    if (obj->otyp == HEAVY_IRON_BALL)
+			    range = urange - (int)(obj->owt/100);
+		    else
+			    range = urange - (int)(obj->owt/40);
+		    if (obj == uball) {
+			    if (u.ustuck) range = 1;
+			    else if (range >= 5) range = 5;
+		    }
+		    if (range < 1) range = 1;
+
+		    if (is_ammo(obj)) {
+			/* stuff that's fired from a proper launcher should have
+			 * a noticeably longer range than stuff that was just
+			 * flung (like daggers, darts, etc.) */
+			if (ammo_and_launcher(obj, uwep)) {
+			     switch (uwep->otyp) {
+				 case ELVEN_BOW:
+				 case YUMI:
+				     range += urange + 2;	/* better workmanship... */
+				     break;
+				 case ORCISH_BOW:
+				     range += urange - 2;	/* orcish gear sucks */
+				     break;
+				 case BOW:
+				     if (uwep->oartifact == ART_LONGBOW_OF_DIANA)
+					 range += urange + 2;
+				     else
+					 range += urange;
+				     break;
+				 case SLING:
+				     range += (int)urange/2;
+				     break;
+				 default:
+				     break;
+			     }
+			 } else if (obj->oclass != GEM_CLASS) { 
+			     range /= 2;
+			 } 
+		    }
 		}
 
 		if (Is_airlevel(&u.uz) || Levitation) {

@@ -749,10 +749,12 @@ int thrown;
 #endif
 		    if (thrown && (is_ammo(obj) || is_missile(obj))) {
 			if (ammo_and_launcher(obj, uwep)) {
+			    if (uwep->oartifact == ART_LONGBOW_OF_DIANA)
+				tmp++;
 			    /* Elves and Samurai do extra damage using
 			     * their bows&arrows; they're highly trained.
 			     */
-			    if (Role_if(PM_SAMURAI) &&
+			    else if (Role_if(PM_SAMURAI) &&
 				obj->otyp == YA && uwep->otyp == YUMI)
 				tmp++;
 			    else if (Race_if(PM_ELF) &&

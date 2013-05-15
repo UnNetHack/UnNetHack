@@ -36,6 +36,11 @@
 	  more exercise before they may be enhanced
 	* Player can wish for up to 100 projectiles (from UnNetHackPlus)
 	* Land mines and beartraps weigh less (from UnNetHackPlus)
+	* Increase range of properly fired missiles, and crossbow range no 
+	  longer depends on strength (from SporkHack)
+	* Require high strength for crossbow multishot, with a bonus for
+	  gnomes (from GruntHack)
+	
 
 	* Artifact changes:
 	  - From SporkHack:
@@ -52,6 +57,8 @@
 	    - Luck Blade added, first sacrifice gift for Convicts
 	    - Grimtooth is the first sacrifice gift for Rogues; it is now
 	      permanently poisoned and grants poison resistance while wielded
+	    - The Longbow of Diana gives +1 multishot and +1 damage bonus when
+	      firing any type of arrow
 
 	* New config option for customizing monster letter in UTF8graphics:
 	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke

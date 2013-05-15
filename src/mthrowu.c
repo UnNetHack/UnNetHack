@@ -588,8 +588,16 @@ struct monst *mtmp;
 		    mwep && mwep->otyp == ELVEN_BOW) ||
 		(is_orc(mtmp->data) &&
 		    otmp->otyp == ORCISH_ARROW &&
-		    mwep && mwep->otyp == ORCISH_BOW))
+		    mwep && mwep->otyp == ORCISH_BOW) ||
+		(is_gnome(mtmp->data) &&
+		    otmp->otyp == CROSSBOW_BOLT &&
+		    mwep && mwep->otyp == CROSSBOW))
 		multishot++;
+ 
+	    if (otmp->otyp == CROSSBOW_BOLT && 
+		    mwep && mwep->otyp == CROSSBOW && 
+		    multishot > 1 && !strongmonst(mtmp->data))
+		multishot = is_gnome(mtmp->data) ? 2 : 1;
 
 	    if ((long)multishot > otmp->quan) multishot = (int)otmp->quan;
 	    if (multishot < 1) multishot = 1;
