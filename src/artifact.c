@@ -1053,7 +1053,7 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
     if (youattack || youdefend || vis) {
 	(void) upstart(hittee);	/* capitalize */
 	if (resisted) {
-	    pline("%s %s!", hittee, vtense(hittee, "resist"));
+	    pline("%s resist%s!", hittee, youdefend ? "" : "s");
 	    shieldeff(youdefend ? u.ux : mdef->mx,
 		      youdefend ? u.uy : mdef->my);
 	}
@@ -1064,7 +1064,7 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
 	    if (do_stun) Strcat(buf, "stunned");
 	    if (do_stun && do_confuse) Strcat(buf, " and ");
 	    if (do_confuse) Strcat(buf, "confused");
-	    pline("%s %s %s%c", hittee, vtense(hittee, "are"),
+	    pline("%s %s %s%c", hittee, youdefend ? "are" : "is",
 		  buf, (do_stun && do_confuse) ? '!' : '.');
 	}
     }
@@ -1276,10 +1276,10 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 		    *dmgptr += d(1,6);
 		    break;
 		case 10:
-		    if (youattack) {
+		    if (!youdefend) {
 			pline_The("poison was deadly...");
 			*dmgptr = (2 * mdef->mhp + FATAL_DAMAGE_MODIFIER);
-		    } else if (youdefend) {
+		    } else {
 			pline_The("poison was extremely toxic!");
 			u.uhpmax -= d(4,6) / 2;
 		    }
