@@ -225,7 +225,7 @@ OBJECT:'"',(11,07)
 # There are two of these, and we need to
 # distinguish between them for the portal.
 LEVEL:"fakewiz1"
-FLAGS:mazelevel
+FLAGS:mazelevel,noflip
 INIT_MAP:mazegrid,'-'
 GEOMETRY:center,center
 MAP
