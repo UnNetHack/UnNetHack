@@ -2101,15 +2101,15 @@ register struct monst *shkp;	/* if angry, impose a surcharge */
 	      obj->otyp==LUCKSTONE       || obj->otyp==LOADSTONE        || 
 	      objects[obj->otyp].oc_magic) {
 #ifdef CONVICT
-	    tmp *= Role_if(PM_CONVICT) ? 40 : 50;
-#else
-	    tmp *= 50;
-#endif
-	  } else {
-#ifdef CONVICT
 	    tmp *= Role_if(PM_CONVICT) ? 20 : 25;
 #else
 	    tmp *= 25;
+#endif
+	  } else {
+#ifdef CONVICT
+	    tmp *= Role_if(PM_CONVICT) ? 12 : 15;
+#else
+	    tmp *= 15;
 #endif
 	  }
 	}
