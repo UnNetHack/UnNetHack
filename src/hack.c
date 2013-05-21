@@ -1884,11 +1884,19 @@ domove()
 	if (!flags.nopick || flags.run) {
 		if (!Levitation && !Flying && !is_clinger(youmonst.data) &&
 				!Stunned && !Confusion &&
-				(is_pool(x, y) || is_lava(x, y)) && levl[x][y].seenv &&
-				!is_pool(u.ux, u.uy) && !is_lava(u.ux, u.uy)) {
+				(is_pool(x, y) || is_swamp(x, y) || is_lava(x, y)) &&
+				levl[x][y].seenv && !is_pool(u.ux, u.uy) &&
+				!is_swamp(u.ux, u.uy) && !is_lava(u.ux, u.uy)) {
 			if (is_pool(x, y) && iflags.paranoid_water) {
 				/* water */
 				if (paranoid_yn("Really enter the water?", iflags.paranoid_water) != 'y') {
+					flags.move = 0;
+					nomul(0, 0);
+					return;
+				}
+			} else if (is_swamp(x, y) && iflags.paranoid_water) {
+				/* swamps are included in paranoid_water */
+				if (paranoid_yn("Really enter the muddy swamp?", iflags.paranoid_water) != 'y') {
 					flags.move = 0;
 					nomul(0, 0);
 					return;
