@@ -271,10 +271,7 @@ STAIR:random, down
 #The magic of roguelikes is in choices like these.
 LOOP [30 + 1d4] { MONSTER: ('o', "deep orc"), random, hostile }
 LOOP [20 + 1d4] { MONSTER: ('o', "hill orc"), random, hostile }
-LOOP [5 + 1d2] { MONSTER: ('o', "orc-captain"), random, hostile {
-  [25%]: OBJECT:('(', "oil lamp"),unlit }
-}
-LOOP [5 + 1d2] { MONSTER: ('o', "orc-captain"), random, hostile {
+LOOP [10 + 1d4] { MONSTER: ('o', "orc-captain"), random, hostile {
   [25%]: OBJECT:('(', "oil lamp"),lit }
 }
 LOOP [1d3] { MONSTER: 'T', random, hostile }
@@ -319,7 +316,7 @@ REPLACE_TERRAIN:(06,00,65,18), '.', 'T', 20%
 REPLACE_TERRAIN:(06,00,65,18), '.', 't', 05%
 
 #Woodman
-MONSTER: (''',"iron golem"),random,peaceful {
+MONSTER: (''',"iron golem"),rndcoord(fillrect(06,00,65,18)),peaceful {
   OBJECT:(')', "axe"),uncursed,1d4
   [50%]: OBJECT:('(', "tin opener")
   [20%]: OBJECT:('(', "can of grease")

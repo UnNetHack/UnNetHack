@@ -2681,8 +2681,10 @@ do_break_wand(obj)
     affects_objects = FALSE;
 
     switch (obj->otyp) {
-    case WAN_WISHING:
     case WAN_NOTHING:
+	pline("Suddenly, and without warning, nothing happens.");
+	goto discard_broken_wand;
+    case WAN_WISHING:
     case WAN_LOCKING:
     case WAN_PROBING:
     case WAN_ENLIGHTENMENT:
