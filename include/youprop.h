@@ -205,7 +205,7 @@
 
 #define HConflict		u.uprops[CONFLICT].intrinsic
 #define EConflict		u.uprops[CONFLICT].extrinsic
-#define Conflict		(HConflict || EConflict)
+#define Conflict		((HConflict || EConflict) && !Is_blackmarket(&u.uz))
 
 
 /*** Transportation ***/

@@ -2359,7 +2359,7 @@ register struct monst *mtmp;
 	/* Even if the black marketeer is already angry he may not have called
 	 * for his assistants if he or his staff have not been assaulted yet.
 	 */
-	if (Is_blackmarket(&u.uz) && !mtmp->mpeaceful && mtmp->isshk)
+	if (is_blkmktstaff(mtmp->data) && !mtmp->mpeaceful)
 	    blkmar_guards(mtmp);
 #endif /* BLACKMARKET */
 	if(!mtmp->mpeaceful) return;
@@ -2379,14 +2379,11 @@ register struct monst *mtmp;
 #ifdef BLACKMARKET
 	/* Don't misbehave in the Black Market or else... */
 	if (Is_blackmarket(&u.uz)) {
-	    if (mtmp->isshk)
-		blkmar_guards(mtmp);
-	    else if (NAME(mtmp) && *NAME(mtmp)) {
+	    if (is_blkmktstaff(mtmp->data) || 
 		/* non-tame named monsters are presumably
 		 * black marketeer's assistants */
-		struct monst *shkp;
-		shkp = shop_keeper(inside_shop(mtmp->mx, mtmp->my));
-		if (shkp)  wakeup(shkp);
+		    (NAME(mtmp) && *NAME(mtmp))) {
+		blkmar_guards(mtmp);
 	    }
 	}
 #endif /* BLACKMARKET */

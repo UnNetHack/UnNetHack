@@ -2435,8 +2435,6 @@ int rtype;
 			return "a tin shop";
 		case PETSHOP:
 			return "a pet store";
-		case BLACKSHOP:
-			return "the Blackmarket";
 		default:
 			/* In case another patch adds a shop type that doesn't exist,
 			 * do something reasonable like "a shop".

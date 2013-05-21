@@ -67,7 +67,10 @@ extern NEARDATA coord doors[DOORMAX];
 #define LEMUREPIT	16	/* contains lemures and horned devils */
 #define POOLROOM	17	/*  */
 #define RNDVAULT	18
-#define SHOPBASE	19	/* everything above this is a shop */
+#ifdef BLACKMARKET
+#define BLKMKTROOM       19
+#endif /* BLACKMARKET */
+#define SHOPBASE	20	/* everything above this is a shop */
 #define ARMORSHOP	(SHOPBASE+ 1)	/* specific shop defines for level compiler */
 #define SCROLLSHOP	(SHOPBASE+ 2)
 #define POTIONSHOP	(SHOPBASE+ 3)
@@ -82,12 +85,7 @@ extern NEARDATA coord doors[DOORMAX];
 #define PETSHOP		(SHOPBASE+12)	/* Stephen White */
 #define UNIQUESHOP	(SHOPBASE+13)	/* shops here & above not randomly gen'd. */
 #define CANDLESHOP	(UNIQUESHOP)
-#ifdef BLACKMARKET
-#define BLACKSHOP       (UNIQUESHOP+1)
-#define MAXRTYPE        (UNIQUESHOP+1)      /* maximum valid room type */
-#else /* BLACKMARKET */
 #define MAXRTYPE        (UNIQUESHOP)      /* maximum valid room type */
-#endif /* BLACKMARKET */
 
 /* Special type for search_special() */
 #define ANY_TYPE	(-1)

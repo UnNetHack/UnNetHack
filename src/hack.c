@@ -2592,6 +2592,13 @@ register boolean newlev;
 					Hello((struct monst *) 0), plname);
 		    check_tutorial_message(QT_T_ORACLE);
 		    break;
+		case BLKMKTROOM:
+		    if(monstinroom(&mons[PM_ONE_EYED_SAM], roomno)) {
+			verbalize("%s, %s!  Welcome to the Black Market!",
+				  Hello((struct monst *)0), plname);
+			verbalize("Please visit all our shops, but don't even think about stealing anything.");
+		    }
+		    break;
 		case TEMPLE:
 		    intemple(roomno + ROOMOFFSET);
 		    /* fall through */

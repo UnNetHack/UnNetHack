@@ -239,8 +239,14 @@
 #endif
 
 #define is_rockbreaker(ptr)	(((ptr)->msound == MS_LEADER || \
-				 ((ptr) == &mons[PM_BLACK_MARKETEER]) || \
+				  is_blkmktstaff((ptr)) || \
 				  is_rider((ptr))) && \
 				 !mtmp->mpeaceful)
+
+#ifdef BLACKMARKET
+#define is_blkmktstaff(ptr)	(Is_blackmarket(&u.uz) && \
+				 ((ptr) == &mons[PM_BLACK_MARKETEER] || \
+				  (ptr) == &mons[PM_ONE_EYED_SAM]))
+#endif /* BLACKMARKET */
 
 #endif /* MONDATA_H */

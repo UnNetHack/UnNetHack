@@ -1083,6 +1083,24 @@ register struct trap *ttmp;
 
 	You("activated a magic portal!");
 
+#ifdef BLACKMARKET
+	if (Is_blackmarket(&u.uz)) {
+	    register struct monst *mtmp;
+	    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+		if (mtmp && mtmp->data == &mons[PM_ONE_EYED_SAM])
+		    break;
+	    }
+	    /* Sam figured out how to lock her door */
+	    if (mtmp && !mtmp->mpeaceful) {
+		You_hear("%s laugh.", noit_mon_nam(mtmp));
+		verbalize("You're not getting away that easily!");
+		You_feel("dizzy for a moment, but nothing happens...");
+		return;
+	    }
+	}
+	else
+#endif /* BLACKMARKET */
+
 	/* prevent the poor shnook, whose amulet was stolen while in
 	 * the endgame, from accidently triggering the portal to the
 	 * next level, and thus losing the game
@@ -1388,12 +1406,15 @@ int in_sight;
 #ifdef BLACKMARKET
 	      	} else if (mtmp->mtame &&
 			(Is_blackmarket(&trap->dst) || Is_blackmarket(&u.uz))) {
-	          if (in_sight) {
-		     pline("%s seems to shimmer for a moment.",
-		     Monnam(mtmp));
-		     seetrap(trap);
-	          }
-	          return 0;
+		    if (in_sight) {
+			pline("%s seems to shimmer for a moment.",
+				Monnam(mtmp));
+			seetrap(trap);
+		    }
+		    return 0;
+		} else if (Is_blackmarket(&u.uz) &&
+			mtmp->data == &mons[PM_ONE_EYED_SAM]) {
+		    return 0;
 #endif /* BLACKMARKET */
 		} else {
 		    assign_level(&tolevel, &trap->dst);
@@ -1556,8 +1577,8 @@ boolean give_feedback;
 	    unstuck(mtmp);
 	    (void) rloc(mtmp, FALSE);
 #ifdef BLACKMARKET
-	} else if (mtmp->data == &mons[PM_BLACK_MARKETEER] &&
-	           rn2(13) &&
+	} else if (((mtmp->data == &mons[PM_BLACK_MARKETEER] && rn2(5)) ||
+		    (mtmp->data == &mons[PM_ONE_EYED_SAM] && rn2(13))) &&
 		   enexto_core_range(&cc, u.ux, u.uy, mtmp->data,0,
 		                     rnf(1,10) ? 4 : 3)) {
 	    rloc_to(mtmp, cc.x, cc.y);

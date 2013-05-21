@@ -303,7 +303,7 @@ encode_uevent()
   if (mvitals[PM_WIZARD_OF_YENDOR].
       died)                         c |= 0x04000UL; /* defeated Rodney */
   if (mvitals[PM_HIGH_PRIEST].died) c |= 0x08000UL; /* defeated a high priest */
-  if (mvitals[PM_BLACK_MARKETEER].
+  if (mvitals[PM_ONE_EYED_SAM].
       died)                         c |= 0x10000UL; /* defeated One-eyed Sam */
   if (mvitals[PM_CTHULHU].died)     c |= 0x20000UL; /* defeated Cthulhu */
 

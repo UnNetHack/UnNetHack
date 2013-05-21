@@ -820,6 +820,7 @@ register struct obj *obj;
 	case RIN_FIRE_RESISTANCE:
 	case RIN_COLD_RESISTANCE:
 	case RIN_SHOCK_RESISTANCE:
+	case RIN_CONFLICT:
 	case RIN_TELEPORT_CONTROL:
 	case RIN_POLYMORPH:
 	case RIN_POLYMORPH_CONTROL:
@@ -836,13 +837,6 @@ register struct obj *obj;
 				makeknown(RIN_REGENERATION);
 			}
 		}
-		break;
-	case RIN_CONFLICT:
-#ifdef BLACKMARKET
-		if (Is_blackmarket(&u.uz)) {
-			set_black_marketeer_angry();
-		}
-#endif /* BLACKMARKET */
 		break;
 	case RIN_WARNING:
 		see_monsters();

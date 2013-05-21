@@ -48,6 +48,9 @@
 #define MS_SPELL	37	/* spellcaster not matching any of the above */
 #define MS_WERE		38	/* lycanthrope in human form */
 #define MS_BOAST	39	/* giants */
+#ifdef BLACKMARKET
+#define MS_ONEEYEDSAM	40	/* One-eyed Sam */
+#endif /* BLACKMARKET */
 
 
 #define MR_FIRE		0x01	/* resists fire */

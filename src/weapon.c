@@ -501,8 +501,8 @@ register struct monst *mtmp;
 #ifdef BLACKMARKET
 			/* let black marketeer wield their artifact weapon
 			   in any case. */
-			if (mtmp->data == &mons[PM_BLACK_MARKETEER])
-				return otmp;
+			if (is_blkmktstaff(mtmp->data))
+			    return otmp;
 #endif
 			if ((strong && !wearing_shield) ||
 			    !objects[otmp->otyp].oc_bimanual)

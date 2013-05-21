@@ -591,6 +591,23 @@ register struct	monst	*mtmp;
 		    case 2: (void) mongets(mtmp, POT_HEALING);
 		    case 3: (void) mongets(mtmp, WAN_STRIKING);
 		    }
+		} else if (ptr == &mons[PM_ONE_EYED_SAM]) {
+		    otmp = mksobj(TWO_HANDED_SWORD, FALSE, FALSE);
+		    otmp = oname(otmp, artiname(ART_THIEFBANE));
+		    mpickobj(mtmp, otmp);
+		    if (otmp->spe < 5) otmp->spe += rnd(5);
+		    otmp = mksobj(SHIELD_OF_REFLECTION, FALSE, FALSE);
+		    mpickobj(mtmp, otmp);
+		    if (otmp->spe < 5) otmp->spe += rnd(5);
+		    otmp = mksobj(GRAY_DRAGON_SCALE_MAIL, FALSE, FALSE);
+		    mpickobj(mtmp, otmp);
+		    if (otmp->spe < 5) otmp->spe += rnd(5);
+		    otmp = mksobj(SPEED_BOOTS, FALSE, FALSE);
+		    mpickobj(mtmp, otmp);
+		    if (otmp->spe < 5) otmp->spe += rnd(5);
+		    otmp = mksobj(AMULET_OF_LIFE_SAVING, FALSE, FALSE);
+		    mpickobj(mtmp, otmp);
+		    (void) mongets(mtmp,SKELETON_KEY);
 		} else if (ptr->msound == MS_PRIEST ||
 			quest_mon_represents_role(ptr,PM_PRIEST)) {
 		    (void) mongets(mtmp, rn2(7) ? ROBE :

@@ -623,11 +623,7 @@ toofar:
 	   mtmp->mconf || mtmp->mstun || (mtmp->minvis && !rn2(3)) ||
 	   (mdat->mlet == S_LEPRECHAUN && !ygold && (lepgold || rn2(2))) ||
 #endif
-	   (is_wanderer(mdat) && !rn2(4)) || (Conflict && !mtmp->iswiz
-#ifdef BLACKMARKET
-	   && !Is_blackmarket(&u.uz)
-#endif
-	   ) ||
+	   (is_wanderer(mdat) && !rn2(4)) || (Conflict && !mtmp->iswiz) ||
 	   (!mtmp->mcansee && !rn2(4)) || mtmp->mpeaceful) {
 		/* Possibly cast an undirected spell if not attacking you */
 		/* note that most of the time castmu() will pick a directed
@@ -687,11 +683,7 @@ toofar:
 /*	Now, attack the player if possible - one attack set per monst	*/
 
 	if (!mtmp->mpeaceful ||
-	    (Conflict && !resist(mtmp, RING_CLASS, 0, 0)
-#ifdef BLACKMARKET
-		&& !Is_blackmarket(&u.uz)
-#endif
-	)) {
+	    (Conflict && !resist(mtmp, RING_CLASS, 0, 0))) {
 	    if(inrange && !noattacks(mdat) && u.uhp > 0 && !scared && tmp != 3)
 	    {
 		if(mattacku(mtmp)) return(1); /* monster died (e.g. exploded) */
@@ -959,10 +951,14 @@ not_special:
 	if(distmin(mtmp->mux, mtmp->muy, omx, omy) < SQSRCHRADIUS &&
 	    !mtmp->mpeaceful) minr--;
 	/* guards shouldn't get too distracted */
-	if(!mtmp->mpeaceful && is_mercenary(ptr)) minr = 1;
+	if(!mtmp->mpeaceful && (is_mercenary(ptr) 
+#ifdef BLACKMARKET
+		    || is_blkmktstaff(ptr))
+#endif /* BLACKMARKET */
+		) minr = 1;
 
 	if((likegold || likegems || likeobjs || likemagic || likerock || breakrock || conceals)
-	      && (!*in_rooms(omx, omy, SHOPBASE) || (!rn2(25) && !mtmp->isshk))) {
+	      && (!*in_rooms(omx, omy, SHOPBASE) || (!rn2(25) && !mtmp->isshk && !Is_blackmarket(&u.uz)))) {
 	look_for_obj:
 	    oomx = min(COLNO-1, omx+minr);
 	    oomy = min(ROWNO-1, omy+minr);

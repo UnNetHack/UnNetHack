@@ -413,11 +413,10 @@ register boolean nearshop;
 
 #ifdef BLACKMARKET
 void 
-blkmar_guards(shkp)
-register struct monst *shkp;
+blkmar_guards(mtmp)
+register struct monst *mtmp;
 {
     register struct monst *mt;
-    register struct eshk *eshkp = ESHK(shkp);
     boolean mesg_given = FALSE;	/* Only give message if assistants peaceful */
     static boolean rlock = FALSE; /* Prevent recursive calls (via wakeup) */
 
@@ -425,38 +424,33 @@ register struct monst *shkp;
     rlock = TRUE;
 
     /* allow black marketeer to leave his shop */
-    hot_pursuit(shkp);
+    hot_pursuit(mtmp);
 
     /* wake up assistants */
     for (mt = fmon; mt; mt = mt->nmon) {
 	if (DEADMONSTER(mt)) continue;
 	/* non-tame named monsters are presumably
 	 * black marketeer's assistants */
-	if (!mt->mtame && NAME(mt) && *NAME(mt) && mt->mpeaceful &&
-		mt != shkp && inside_shop(mt->mx, mt->my) == eshkp->shoproom) {
+	else if (mt->mpeaceful && 
+		((!mt->mtame && NAME(mt) && *NAME(mt) && 
+		  mt->mpeaceful && mt != mtmp) ||
+		 mt->data == &mons[PM_ONE_EYED_SAM])) {
 	    if (!mesg_given) {
-		pline("%s calls for %s assistants!",
-			noit_Monnam(shkp), mhis(shkp));
+		pline("%s calls for help!", noit_Monnam(mtmp));
 		mesg_given = TRUE;
+#ifdef KOPS
+		call_kops(mtmp, FALSE);
+#endif /* KOPS */
 	    }
 	    wakeup(mt);
 	}
+	/* All for one and one for all */
+	else if (mt->isshk && mt->data == &mons[PM_BLACK_MARKETEER])
+	    hot_pursuit(mt);
     }
     rlock = FALSE;
 }
 
-/** Makes the black marketeer on the current level angry. */
-void
-set_black_marketeer_angry()
-{
-	struct monst *mtmp;
-	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-		if (mtmp && mtmp->isshk &&
-		    mtmp->data == &mons[PM_BLACK_MARKETEER]) {
-			setmangry(mtmp);
-		}
-	}
-}
 #endif /* BLACKMARKET */
 
 /* x,y is strictly inside shop */
@@ -517,6 +511,7 @@ boolean newlev;
 #ifdef BLACKMARKET
 	    if (Is_blackmarket(&u.uz))
 		blkmar_guards(shkp);
+	    else
 #endif
 
 #ifdef KOPS
@@ -548,6 +543,7 @@ xchar x, y;
 #ifdef BLACKMARKET
 	    if (Is_blackmarket(&u.uz))
 		blkmar_guards(shkp);
+	    else
 #endif
 
 #ifdef KOPS
@@ -660,19 +656,12 @@ register char *enterstring;
 	}
 #ifdef CONVICT
 	/* Visible striped prison shirt */
-	if ((uarmu && (uarmu->otyp == STRIPED_SHIRT)) && !uarm && !uarmc) {
+	if (!Is_blackmarket(&u.uz) && 
+		(uarmu && (uarmu->otyp == STRIPED_SHIRT)) && !uarm && !uarmc) {
 	    eshkp->pbanned = TRUE;
 	}
 #endif /* CONVICT */
  
-#ifdef BLACKMARKET
-	    if (Is_blackmarket(&u.uz) &&
-		u.umonnum>0 && mons[u.umonnum].mlet != S_HUMAN) {
-	      verbalize("Non-human customers are not welcome!");
-	      return;
-	}
-#endif /* BLACKMARKET */
-
 	rt = rooms[*enterstring - ROOMOFFSET].rtype;
 
 	if (ANGRY(shkp)) {
@@ -2111,9 +2100,17 @@ register struct monst *shkp;	/* if angry, impose a surcharge */
 	      obj->oclass==SPBOOK_CLASS  || obj->oclass==WAND_CLASS     ||
 	      obj->otyp==LUCKSTONE       || obj->otyp==LOADSTONE        || 
 	      objects[obj->otyp].oc_magic) {
+#ifdef CONVICT
+	    tmp *= Role_if(PM_CONVICT) ? 40 : 50;
+#else
 	    tmp *= 50;
+#endif
 	  } else {
+#ifdef CONVICT
+	    tmp *= Role_if(PM_CONVICT) ? 20 : 25;
+#else
 	    tmp *= 25;
+#endif
 	  }
 	}
 #endif /* BLACKMARKET */
