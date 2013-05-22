@@ -386,9 +386,10 @@ const char * const *nlp;
 	}
 #ifdef BLACKMARKET
 	if (Is_blackmarket(&u.uz)) {
-	    int parts_avail;
-	    const char *part_name = 0;
-	    static const char *strange_parts[] = { 
+	    int num_prefixes;
+	    const char *prefix = 0;
+	    /* One-eyed Sam's lackeys idolize her and took nicknames like hers */
+	    static const char *prefixes[] = { 
 		"One-armed", "Two-faced", "Three-fingered", "Cross-eyed", 
 		"Four-toed", "Iron-lunged", "Two-footed", "One-handed", 
 		"One-legged", "Barefoot", "Cold-blooded", "Cut-throat", 
@@ -397,19 +398,20 @@ const char * const *nlp;
 		"Silver-tongued", "Crazy-eyed",
 		0
 	    };
-	    for (parts_avail = 0; strange_parts[parts_avail]; parts_avail++)
+	    for (num_prefixes = 0; prefixes[num_prefixes]; num_prefixes++)
 		continue;
 
 	    for (trycnt = 0; trycnt < 50; trycnt++) {
-		part_name = strange_parts[rn2(parts_avail)];
+		prefix = prefixes[rn2(num_prefixes)];
+		/* is this prefix already used on this level? */
 		for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 		    if (DEADMONSTER(mtmp) || (mtmp == shk) || !mtmp->isshk) continue;
-		    if (!strstr(ESHK(mtmp)->shknam, part_name)) continue;
+		    if (!strstr(ESHK(mtmp)->shknam, prefix)) continue;
 		    break;
 		}
-		if (!mtmp) break;
+		if (!mtmp) break; /* found an unused prefix */
 	    }
-	    snprintf(ESHK(shk)->shknam, PL_NSIZ, "%s %s", part_name, shname);
+	    snprintf(ESHK(shk)->shknam, PL_NSIZ, "%s %s", prefix, shname);
 	} else {
 	    (void) strncpy(ESHK(shk)->shknam, shname, PL_NSIZ);
 	}
