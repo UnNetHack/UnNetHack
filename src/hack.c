@@ -2266,10 +2266,8 @@ boolean pick;
 stillinwater:;
 	if (u.utraptype == TT_SWAMP) {
 		if (!is_swamp(u.ux, u.uy)) {
-			if (is_lava(u.ux, u.uy))	/* oops! */
-				You("get out of the mud...");
-			else if (is_pool(u.ux, u.uy))
-				You("get out of the swamp...");
+			if (is_lava(u.ux, u.uy) || is_pool(u.ux, u.uy))
+				You("get out of the mud...");	/* oops! */
 			else
 				You("are on solid %s again.",
 				    is_ice(u.ux, u.uy) ? "ice" : "land");
