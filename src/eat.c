@@ -1304,7 +1304,8 @@ rottenfood(obj)
 struct obj *obj;
 {
 	pline("Blecch!  Rotten %s!",
-		Race_if(PM_VAMPIRE) ? "blood" : foodword(obj));
+		maybe_polyd(is_vampire(youmonst.data),
+			Race_if(PM_VAMPIRE)) ? "blood" : foodword(obj));
 	if(!rn2(4)) {
 		if (Hallucination) You_feel("rather trippy.");
 		else You_feel("rather %s.", body_part(LIGHT_HEADED));
