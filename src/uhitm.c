@@ -2267,7 +2267,10 @@ use_weapon:
 				 touch_petrifies(mon->data) ||
 				 touch_disintegrates(mon->data) ||
 				 mon->data == &mons[PM_MEDUSA] ||
-				 mon->data == &mons[PM_GREEN_SLIME]))
+				 mon->data == &mons[PM_GREEN_SLIME] ||
+				 /* YANI: Silver dentures so vampires can
+				    successfully use bite attack on shades */
+				 mon->data == &mons[PM_SHADE]))
 			    break;
 		case AT_KICK:
 		case AT_STNG:
