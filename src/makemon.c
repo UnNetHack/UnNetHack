@@ -756,7 +756,10 @@ register struct	monst	*mtmp;
 		if (is_weeping(ptr))
 		    if(!rn2(3)) (void) mongets(mtmp, POT_BLINDNESS);
 		if (ptr == &mons[PM_WEEPING_ARCHANGEL])
-		    if(!rn2(3)) (void) mongets(mtmp, WAN_LIGHTNING);
+		    if(!rn2(3)) {
+			(void) mongets(mtmp, WAN_LIGHTNING);
+			(void) mongets(mtmp, AMULET_OF_REFLECTION);
+		    }
 		break;
 	    default:
 		break;
