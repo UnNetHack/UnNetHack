@@ -119,7 +119,7 @@ CHMOD = @CHMOD@
 
 DATHELP = help hh cmdhelp history opthelp wizhelp
 
-SPEC_LEVS = asmod-?.lev baalz-?.lev bigrm-*.lev blkmar.lev castle-?.lev fakewiz?.lev \
+SPEC_LEVS = asmod-?.lev baalz-?.lev bigrm-*.lev blkmar-?.lev castle-?.lev fakewiz?.lev \
 	vlt-*.lev \
 	juiblex.lev knox-?.lev town*.lev \
 	medusa-?.lev minend-?.lev minefill.lev minetn-?.lev \
