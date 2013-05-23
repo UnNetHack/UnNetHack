@@ -2193,18 +2193,21 @@ recalc_mapseen()
 	/* recalculate room knowledge: for now, just shops and temples
 	 * this could be extended to an array of 0..SHOPBASE
 	 */
-#ifdef BLACKMARKET
-	/* kludge for not recording the shop room on the blackmarket level */
-	if (!Is_blackmarket(&u.uz))
-#endif
 	for (x = 0; x < sizeof(mptr->rooms); x++) {
 		if (mptr->rooms[x] & MSR_SEEN) {
 			if (rooms[x].rtype >= SHOPBASE) {
+#ifdef BLACKMARKET
+				/* don't record the large single shop room on the blackmarket level */
+				if (rooms[x].rtype != BLACKSHOP) {
+#endif
 				if (!mptr->feat.nshop)
 					mptr->feat.shoptype = rooms[x].rtype;
 				else if (mptr->feat.shoptype != rooms[x].rtype)
 					mptr->feat.shoptype = 0;
 				mptr->feat.nshop = min(mptr->feat.nshop + 1, 3);
+#ifdef BLACKMARKET
+				}
+#endif
 			} else if (rooms[x].rtype == TEMPLE)
 				/* altar and temple alignment handled below */
 				mptr->feat.ntemple = min(mptr->feat.ntemple + 1, 3);
