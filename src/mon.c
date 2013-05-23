@@ -1330,6 +1330,13 @@ struct monst *magr,	/* monster that is currently deciding where to move */
 	if(md->mlet==S_ANGEL && is_demon(ma))
 		return ALLOW_M|ALLOW_TM;
 
+	/* Nazgul vs. hobbits */
+	if(ma == &mons[PM_NAZGUL] && md == &mons[PM_HOBBIT])
+		return ALLOW_M|ALLOW_TM;
+	/* and vice versa */
+	if(md == &mons[PM_NAZGUL] && ma == &mons[PM_HOBBIT])
+		return ALLOW_M|ALLOW_TM;
+
 	/* deep orcs vs. dwarves */
 	if(is_dwarf(ma) && md == &mons[PM_DEEP_ORC])
 		return ALLOW_M|ALLOW_TM;
