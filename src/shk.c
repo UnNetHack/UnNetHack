@@ -20,9 +20,6 @@ STATIC_DCL void FDECL(call_kops, (struct monst *,BOOLEAN_P));
 STATIC_DCL void FDECL(kops_gone, (BOOLEAN_P));
 # endif /* OVLB */
 #endif /* KOPS */
-#ifdef BLACKMARKET
-static void block_portal();
-#endif
 
 #define IS_SHOP(x)	(rooms[x].rtype >= SHOPBASE)
 
@@ -441,7 +438,7 @@ register struct monst *mtmp;
 	    if (!mesg_given) {
 		pline("%s calls for help!", noit_Monnam(mtmp));
 		mesg_given = TRUE;
-		block_portal();
+		bars_around_portal(FALSE);
 #ifdef KOPS
 		call_kops(mtmp, FALSE);
 #endif /* KOPS */
@@ -455,8 +452,11 @@ register struct monst *mtmp;
     rlock = FALSE;
 }
 
+/* look for a portal on the level and add or 
+ * remove iron bars on every adjacent square */
 void 
-block_portal()
+bars_around_portal(removebars)
+boolean removebars;
 {
     int x, y, dx, dy;
     boolean sawit = FALSE;
@@ -471,15 +471,28 @@ block_portal()
 	    if (!dx && !dy) continue;
 	    x = trap->tx + dx;
 	    y = trap->ty + dy;
-	    if (!IS_ROCK(levl[x][y].typ) && levl[x][y].typ != IRONBARS) {
-		levl[x][y].typ = IRONBARS;
-		newsym(x, y);
-		if (cansee(x,y)) 
-		    sawit = TRUE;
+	    if (removebars) {
+		if (levl[x][y].typ == IRONBARS) {
+		    dissolve_bars(x,y);
+		    if (cansee(x,y)) 
+			sawit = TRUE;
+		}
+	    } else {
+		if (!IS_ROCK(levl[x][y].typ) && levl[x][y].typ != IRONBARS) {
+		    levl[x][y].typ = IRONBARS;
+		    newsym(x, y);
+		    if (cansee(x,y)) 
+			sawit = TRUE;
+		}
 	    }
 	}
-    if(sawit)
-	pline("Iron bars drop from the ceiling around the magic portal!");
+    if (sawit) {
+	if (removebars)
+	    pline("The iron bars rise back into the ceiling.");
+	else
+	    pline("Iron bars drop from the ceiling around the magic portal!");
+    }
+
 }
 
 #endif /* BLACKMARKET */

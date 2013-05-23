@@ -2019,6 +2019,7 @@ E boolean FDECL(block_entry, (XCHAR_P,XCHAR_P));
 #ifdef BLACKMARKET
 E void FDECL(blkmar_guards, (struct monst *));
 E void NDECL(set_black_marketeer_angry);
+E void FDECL(bars_around_portal, (BOOLEAN_P));
 #endif /* BLACKMARKET */
 E char *FDECL(shk_your, (char *,struct obj *));
 E char *FDECL(Shk_Your, (char *,struct obj *));

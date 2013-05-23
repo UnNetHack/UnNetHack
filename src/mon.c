@@ -2048,6 +2048,12 @@ xkilled(mtmp, dest)
 		cthulhu_dies(mtmp);
 	}
 
+#ifdef BLACKMARKET
+	if (Is_blackmarket(&u.uz) && mdat == &mons[PM_ONE_EYED_SAM]) {
+	    bars_around_portal(TRUE);
+	}
+#endif /* BLACKMARKET */
+
 	if (stoned) {
 		stoned = FALSE;
 		goto cleanup;
