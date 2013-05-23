@@ -2595,7 +2595,7 @@ register boolean newlev;
 #ifdef BLACKMARKET
 		case BLACKFOYER:
 		    if(monstinroom(&mons[PM_ONE_EYED_SAM], roomno)) {
-			verbalize("%s, %s!  Welcome to the Black Market!",
+			verbalize("%s, %s!  Welcome to One-eyed Sam's black market!",
 				  Hello((struct monst *)0), plname);
 			verbalize("Please have a look around, but don't even think about stealing anything.");
 		    }

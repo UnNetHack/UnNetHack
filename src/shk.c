@@ -466,6 +466,7 @@ boolean removebars;
 	trap = trap->ntrap;
     }
     if (!trap) return;
+    if (trap->tx == u.ux && trap->ty == u.uy) return;
     for (dx = -1; dx <= 1; dx++)
 	for (dy = -1; dy <= 1; dy++) {
 	    if (!dx && !dy) continue;
@@ -1787,6 +1788,9 @@ int croaked;	/* -1: escaped dungeon; 0: quit; 1: died */
 	   shops don't occur on level 1, but this could happen if hero
 	   level teleports out of the dungeon and manages not to die */
 	if (croaked < 0) return FALSE;
+
+	/* suppress message spam from lots of angry black marketeers */
+	if (Is_blackmarket(&u.uz)) return FALSE;
 
 	/* this is where inventory will end up if any shk takes it */
 	repo_location.x = repo_location.y = 0;
