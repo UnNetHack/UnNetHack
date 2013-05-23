@@ -487,15 +487,13 @@ gsl_rng *rng_state = NULL;
 void
 setrandom()
 {
+	int random_seed=0;
 #ifdef DEV_RANDOM
 	FILE *fptr = NULL;
-	int random_seed;
 
 	fptr = fopen(DEV_RANDOM,"r");
 	if (fptr) fread(&random_seed, sizeof(int),1,fptr);
 	fclose(fptr);
-#else
-	int random_seed=0;
 #endif
 #ifdef USE_MERSENNE_TWISTER
 	if (rng_state != NULL) { gsl_rng_free(rng_state); }
