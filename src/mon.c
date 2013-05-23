@@ -1643,6 +1643,13 @@ uchar adtyp;
 	    }
 	}
 #endif
+
+#ifdef BLACKMARKET
+	if (Is_blackmarket(&u.uz) && tmp == PM_ONE_EYED_SAM) {
+	    bars_around_portal(TRUE);
+	}
+#endif /* BLACKMARKET */
+
 	if(mtmp->iswiz) wizdead();
 	if(mtmp->data->msound == MS_NEMESIS) nemdead();
         
@@ -2047,12 +2054,6 @@ xkilled(mtmp, dest)
 	if (mdat == &mons[PM_CTHULHU]) {
 		cthulhu_dies(mtmp);
 	}
-
-#ifdef BLACKMARKET
-	if (Is_blackmarket(&u.uz) && mdat == &mons[PM_ONE_EYED_SAM]) {
-	    bars_around_portal(TRUE);
-	}
-#endif /* BLACKMARKET */
 
 	if (stoned) {
 		stoned = FALSE;
