@@ -20,6 +20,9 @@ STATIC_DCL void FDECL(call_kops, (struct monst *,BOOLEAN_P));
 STATIC_DCL void FDECL(kops_gone, (BOOLEAN_P));
 # endif /* OVLB */
 #endif /* KOPS */
+#ifdef BLACKMARKET
+static void block_portal();
+#endif
 
 #define IS_SHOP(x)	(rooms[x].rtype >= SHOPBASE)
 
