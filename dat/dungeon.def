@@ -162,7 +162,7 @@ RNDLEVEL:	"knox" "K" @ (-1, 0) 3
 DUNGEON:        "One-eyed Sam's Market" "D" (1, 0)
 ALIGNMENT:      chaotic
 DESCRIPTION:    mazelike
-LEVEL:          "blkmar" "D" @ (1, 0)
+RNDLEVEL:          "blkmar" "D" @ (1, 0) 2
 #
 #	Vlad's Tower
 #

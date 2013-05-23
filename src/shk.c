@@ -438,6 +438,7 @@ register struct monst *mtmp;
 	    if (!mesg_given) {
 		pline("%s calls for help!", noit_Monnam(mtmp));
 		mesg_given = TRUE;
+		block_portal();
 #ifdef KOPS
 		call_kops(mtmp, FALSE);
 #endif /* KOPS */
@@ -449,6 +450,33 @@ register struct monst *mtmp;
 	    hot_pursuit(mt);
     }
     rlock = FALSE;
+}
+
+void 
+block_portal()
+{
+    int x, y, dx, dy;
+    boolean sawit = FALSE;
+    struct trap *trap = ftrap;
+    while (trap) {
+	if (trap->ttyp == MAGIC_PORTAL) break;
+	trap = trap->ntrap;
+    }
+    if (!trap) return;
+    for (dx = -1; dx <= 1; dx++)
+	for (dy = -1; dy <= 1; dy++) {
+	    if (!dx && !dy) continue;
+	    x = trap->tx + dx;
+	    y = trap->ty + dy;
+	    if (!IS_ROCK(levl[x][y].typ) && levl[x][y].typ != IRONBARS) {
+		levl[x][y].typ = IRONBARS;
+		newsym(x, y);
+		if (cansee(x,y)) 
+		    sawit = TRUE;
+	    }
+	}
+    if(sawit)
+	pline("Iron bars drop from the ceiling around the magic portal!");
 }
 
 #endif /* BLACKMARKET */

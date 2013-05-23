@@ -196,9 +196,6 @@ static struct {
 	{ "cocknest",	 COCKNEST },
 	{ "garden",	 GARDEN },
 	{ "leprehall",	 LEPREHALL },
-#ifdef BLACKMARKET
-	{ "black market", BLKMKTROOM },
-#endif /* BLACKMARKET */
 	{ "shop",	 SHOPBASE },
 	{ "armor shop",	 ARMORSHOP },
 	{ "scroll shop", SCROLLSHOP },
@@ -213,6 +210,10 @@ static struct {
 	{ "music shop",	 INSTRUMENTSHOP },
 	{ "candle shop", CANDLESHOP },
 	{ "pet shop",	 PETSHOP },	/* Stephen White */
+#ifdef BLACKMARKET
+	{ "black market", BLACKSHOP },
+	{ "black market foyer", BLACKFOYER },
+#endif /* BLACKMARKET */
 	{ 0, 0 }
 };
 

@@ -1083,24 +1083,6 @@ register struct trap *ttmp;
 
 	You("activated a magic portal!");
 
-#ifdef BLACKMARKET
-	if (Is_blackmarket(&u.uz)) {
-	    register struct monst *mtmp;
-	    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-		if (mtmp && mtmp->data == &mons[PM_ONE_EYED_SAM])
-		    break;
-	    }
-	    /* Sam figured out how to lock her door */
-	    if (mtmp && !mtmp->mpeaceful) {
-		You_hear("%s laugh.", noit_mon_nam(mtmp));
-		verbalize("You're not getting away that easily!");
-		You_feel("dizzy for a moment, but nothing happens...");
-		return;
-	    }
-	}
-	else
-#endif /* BLACKMARKET */
-
 	/* prevent the poor shnook, whose amulet was stolen while in
 	 * the endgame, from accidently triggering the portal to the
 	 * next level, and thus losing the game

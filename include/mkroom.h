@@ -68,7 +68,7 @@ extern NEARDATA coord doors[DOORMAX];
 #define POOLROOM	17	/*  */
 #define RNDVAULT	18
 #ifdef BLACKMARKET
-#define BLKMKTROOM       19
+#define BLACKFOYER       19	/* Foyer to the black market */
 #endif /* BLACKMARKET */
 #define SHOPBASE	20	/* everything above this is a shop */
 #define ARMORSHOP	(SHOPBASE+ 1)	/* specific shop defines for level compiler */
@@ -85,7 +85,12 @@ extern NEARDATA coord doors[DOORMAX];
 #define PETSHOP		(SHOPBASE+12)	/* Stephen White */
 #define UNIQUESHOP	(SHOPBASE+13)	/* shops here & above not randomly gen'd. */
 #define CANDLESHOP	(UNIQUESHOP)
+#ifdef BLACKMARKET
+#define BLACKSHOP       (UNIQUESHOP+1)
+#define MAXRTYPE        (UNIQUESHOP+1)      /* maximum valid room type */
+#else /* BLACKMARKET */
 #define MAXRTYPE        (UNIQUESHOP)      /* maximum valid room type */
+#endif /* BLACKMARKET */
 
 /* Special type for search_special() */
 #define ANY_TYPE	(-1)
