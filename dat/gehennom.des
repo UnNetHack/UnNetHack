@@ -44,9 +44,6 @@ BRANCH:(66,17,66,17),(0,0,0,0)
 TELEPORT_REGION:(58,09,72,18),(0,0,0,0),down
 
 # the valley is the new hub
-PORTAL:(74,02,74,02), (0,0,0,0), "drgnA"
-PORTAL:(21,15,21,15), (0,0,0,0), "sheolmid"
-PORTAL:(30,18,30,18), (0,0,0,0), "tower3"
 IF [33%] {
   PORTAL:(74,02,74,02), (0,0,0,0), "tower3"
   PORTAL:(21,15,21,15), (0,0,0,0), "drgnA"
