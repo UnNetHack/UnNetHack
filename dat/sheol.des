@@ -75,6 +75,8 @@ SHUFFLE: $monster
 STAIR: (4,8),down
 STAIR: levregion(65, 0, 79, 20), levregion(1, 0, 64, 20), up
 
+PORTAL: levregion(65, 0, 79, 20), levregion(1, 0, 64, 20), "valley"
+
 DOOR:locked,(9,8)
 
 # Wands of fire

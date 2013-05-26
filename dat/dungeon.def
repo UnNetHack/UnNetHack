@@ -56,6 +56,7 @@ DUNGEON:	"Gehennom" "G" (20, 5)
 DESCRIPTION:	mazelike
 DESCRIPTION:	hellish
 ALIGNMENT:	noalign
+BRANCH:		"Vlad's Tower" @ (9, 5) up
 BRANCH:		"Sheol" @ (14, 5) down
 RNDLEVEL:	"valley" "V" @ (1, 0) 2
 LEVEL:		"sanctum" "none" @ (-1, 0)
@@ -86,7 +87,6 @@ RNDLEVEL:	"heck-e" "Q" @ (-19,17) 50 9
 DUNGEON:	"Sheol" "S" (6, 2)
 DESCRIPTION:	hellish
 ALIGNMENT:	noalign
-BRANCH:		"Vlad's Tower" @ (2, 2) up
 LEVEL:		"sheolmid" "H" @ (2, 0)
 LEVEL:		"palace_f" "P" @ (-2, 0)
 LEVEL:		"palace_e" "U" @ (-1, 0)
@@ -175,6 +175,7 @@ DESCRIPTION:	mazelike
 ALIGNMENT:	chaotic
 ENTRY:		-1
 LEVEL:		"tower1" "none" @ (1, 0)
+LEVEL:		"tower3" "none" @ (3, 0)
 
 ### The Dragon Caves ###
 DUNGEON:	"The Dragon Caves" "D" (4, 0) 75

@@ -40,6 +40,9 @@ ENDMAP
 
 STAIR: random, up
 STAIR: random, down
+
+PORTAL:(01,00,75,20),(0,0,0,0),"valley"
+
 #
 OBJECT: '*', random
 OBJECT: '*', random

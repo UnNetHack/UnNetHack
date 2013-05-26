@@ -159,5 +159,8 @@ TRAP:random,$place[1]
 TRAP:random,$place[2]
 [75%]: OBJECT: ('(',"blindfold"),$place[3]
 TRAP:random,$place[3]
+
+PORTAL:(05,04,13,08),(0,0,0,0),"valley"
+
 # Walls in the tower are non diggable
 NON_DIGGABLE:(00,00,18,12)
