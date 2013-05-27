@@ -1485,7 +1485,7 @@ boolean at_stairs, falling, portal;
 	if (In_endgame(&u.uz) && newdungeon && u.uhave.amulet)
 		resurrect();
 	if (newdungeon && In_V_tower(&u.uz) && In_hell(&u.uz0))
-		pline_The("cold wind is gone.");
+		pline_The("heat and smoke are gone.");
 
 	/* the message from your quest leader */
 	if (!In_quest(&u.uz0) && at_dgn_entrance("The Quest") &&
