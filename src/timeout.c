@@ -17,8 +17,6 @@ STATIC_DCL void FDECL(see_lamp_flicker, (struct obj *, const char *));
 STATIC_DCL void FDECL(lantern_message, (struct obj *));
 STATIC_DCL void FDECL(cleanup_burn, (genericptr_t,long));
 
-#ifdef OVLB
-
 /* He is being petrified - dialogue by inmet!tower */
 static NEARDATA const char * const stoned_texts[] = {
 	"You are slowing down.",		/* 5 */
@@ -180,9 +178,6 @@ burn_away_slime()
 	return;
 }
 
-
-#endif /* OVLB */
-#ifdef OVL0
 
 void
 nh_timeout()
@@ -385,9 +380,6 @@ nh_timeout()
 
 	run_timers();
 }
-
-#endif /* OVL0 */
-#ifdef OVL1
 
 void
 fall_asleep(how_long, wakeup_msg)
@@ -1191,9 +1183,6 @@ end_burn(obj, timer_attached)
 	    warning("end_burn: obj %s not timed!", xname(obj));
 }
 
-#endif /* OVL1 */
-#ifdef OVL0
-
 /*
  * Cleanup a burning object if timer stopped.
  */
@@ -1218,9 +1207,6 @@ cleanup_burn(arg, expire_time)
     if (obj->where == OBJ_INVENT)
 	update_inventory();
 }
-
-#endif /* OVL0 */
-#ifdef OVL1
 
 void
 do_storms()
@@ -1261,10 +1247,7 @@ do_storms()
     } else
 	You_hear("a rumbling noise.");
 }
-#endif /* OVL1 */
 
-
-#ifdef OVL0
 /* ------------------------------------------------------------------------- */
 /*
  * Generic Timeout Functions.
@@ -1886,7 +1869,5 @@ relink_timers(ghostly)
 	}
     }
 }
-
-#endif /* OVL0 */
 
 /*timeout.c*/

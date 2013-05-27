@@ -7,14 +7,12 @@
 
 STATIC_DCL void FDECL(mkbox_cnts,(struct obj *));
 STATIC_DCL void FDECL(obj_timer_checks,(struct obj *, XCHAR_P, XCHAR_P, int));
-#ifdef OVL1
 STATIC_DCL void FDECL(container_weight, (struct obj *));
 STATIC_DCL struct obj *FDECL(save_mtraits, (struct obj *, struct monst *));
 #ifdef WIZARD
 STATIC_DCL const char *FDECL(where_name, (int));
 STATIC_DCL void FDECL(check_contained, (struct obj *,const char *));
 #endif
-#endif /* OVL1 */
 
 extern struct obj *thrownobj;		/* defined in dothrow.c */
 
@@ -24,8 +22,6 @@ struct icp {
     int  iprob;		/* probability of an item type */
     char iclass;	/* item class */
 };
-
-#ifdef OVL1
 
 const struct icp mkobjprobs[] = {
 {10, WEAPON_CLASS},
@@ -352,9 +348,6 @@ register struct obj *otmp;
 	otmp->unpaid = 0;
 	return;
 }
-
-#endif /* OVL1 */
-#ifdef OVLB
 
 static const char dknowns[] = {
 		WAND_CLASS, RING_CLASS, POTION_CLASS, SCROLL_CLASS,
@@ -774,9 +767,6 @@ register struct obj *otmp;
 	return;
 }
 
-#endif /* OVLB */
-#ifdef OVL1
-
 void
 blessorcurse(otmp, chance)
 register struct obj *otmp;
@@ -794,18 +784,12 @@ register int chance;
 	return;
 }
 
-#endif /* OVL1 */
-#ifdef OVLB
-
 int
 bcsign(otmp)
 register struct obj *otmp;
 {
 	return(!!otmp->blessed - !!otmp->cursed);
 }
-
-#endif /* OVLB */
-#ifdef OVL0
 
 /*
  *  Calculate the weight of the given object.  This will recursively follow
@@ -891,9 +875,6 @@ int x, y;
 	    mksobj_at(rn2(2) ? QUARTERSTAFF : CLUB, x, y, TRUE, FALSE);
 }
 
-#endif /* OVL0 */
-#ifdef OVLB
-
 struct obj *
 mkgold(amount, x, y)
 long amount;
@@ -912,9 +893,6 @@ int x, y;
     gold->owt = weight(gold);
     return (gold);
 }
-
-#endif /* OVLB */
-#ifdef OVL1
 
 /* return TRUE if the corpse has special timing */
 #define special_corpse(num)  (((num) == PM_LIZARD)		\
@@ -1055,9 +1033,6 @@ boolean copyof;
 	return mnew;
 }
 
-#endif /* OVL1 */
-#ifdef OVLB
-
 /* make an object named after someone listed in the scoreboard file */
 struct obj *
 mk_tt_object(objtype, x, y)
@@ -1115,9 +1090,6 @@ register struct obj *otmp;
 	return((boolean)(objects[otyp].oc_material <= WOOD &&
 			objects[otyp].oc_material != LIQUID));
 }
-
-#endif /* OVLB */
-#ifdef OVL1
 
 /*
  * These routines maintain the single-linked lists headed in level.objects[][]
@@ -1661,7 +1633,5 @@ check_contained(container, mesg)
     }
 }
 #endif /* WIZARD */
-
-#endif /* OVL1 */
 
 /*mkobj.c*/

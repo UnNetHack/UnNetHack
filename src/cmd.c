@@ -109,9 +109,7 @@ extern int NDECL(doshout); /**/
 
 #endif /* DUMB */
 
-#ifdef OVL1
 static int NDECL((*timed_occ_fn));
-#endif /* OVL1 */
 
 STATIC_PTR int NDECL(doprev_message);
 STATIC_PTR int NDECL(timed_occupation);
@@ -167,21 +165,17 @@ STATIC_PTR int NDECL(doattributes);
 STATIC_PTR int NDECL(doconduct); /**/
 STATIC_PTR boolean NDECL(minimal_enlightenment);
 
-#ifdef OVLB
 STATIC_DCL void FDECL(enlght_line, (const char *,const char *,const char *));
 STATIC_DCL char *FDECL(enlght_combatinc, (const char *,int,int,char *));
 #ifdef UNIX
 static void NDECL(end_of_input);
 #endif
-#endif /* OVLB */
 
 static const char* readchar_queue="";
 static char last_cmd_char='\0';
 
 STATIC_DCL char *NDECL(parse);
 STATIC_DCL boolean FDECL(help_dir, (CHAR_P,const char *));
-
-#ifdef OVL1
 
 STATIC_PTR int
 doprev_message()
@@ -303,9 +297,6 @@ char ch;
 	return;
 }
 #endif /* REDO */
-
-#endif /* OVL1 */
-#ifdef OVLB
 
 STATIC_PTR int
 doextcmd()	/* here after # - now read a full-word command */
@@ -1650,9 +1641,6 @@ boolean want_disp;
 	}
 }
 
-#endif /* OVLB */
-#ifdef OVL1
-
 #ifndef M
 # ifndef NHSTDC
 #  define M(c)		(0x80 | (c))
@@ -2561,9 +2549,6 @@ const char *msg;
 	return TRUE;
 }
 
-#endif /* OVL1 */
-#ifdef OVLB
-
 void
 confdir()
 {
@@ -2572,9 +2557,6 @@ confdir()
 	u.dy = ydir[x];
 	return;
 }
-
-#endif /* OVLB */
-#ifdef OVL0
 
 int
 isok(x,y)
@@ -2756,9 +2738,6 @@ parse()
 	return(in_line);
 }
 
-#endif /* OVL0 */
-#ifdef OVLB
-
 #ifdef UNIX
 static
 void
@@ -2773,9 +2752,6 @@ end_of_input()
 	terminate(EXIT_SUCCESS);
 }
 #endif
-
-#endif /* OVLB */
-#ifdef OVL0
 
 char
 readchar()
@@ -2908,8 +2884,6 @@ wiz_port_debug()
 }
 # endif /*PORT_DEBUG*/
 
-#endif /* OVL0 */
-#ifdef OVLB
 /*
  *   Parameter validator for generic yes/no function to prevent
  *   the core from sending too long a prompt string to the
@@ -2934,7 +2908,6 @@ char def;
 	Strcat(qbuf,"...");
 	return (*windowprocs.win_yn_function)(qbuf, resp, def);
 }
-#endif
 
 /**
  * Asks the player a yes/no question if paranoid is true.

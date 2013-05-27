@@ -6,7 +6,6 @@
 
 STATIC_PTR int NDECL(stealarm);
 
-#ifdef OVLB
 STATIC_DCL const char *FDECL(equipname, (struct obj *));
 STATIC_DCL void FDECL(mdrop_obj, (struct monst *,struct obj *,BOOLEAN_P));
 
@@ -428,9 +427,6 @@ gotobj:
 	return((multi < 0) ? 0 : 1);
 }
 
-#endif /* OVLB */
-#ifdef OVL1
-
 /* Returns 1 if otmp is free'd, 0 otherwise. */
 int
 mpickobj(mtmp,otmp)
@@ -470,9 +466,6 @@ register struct obj *otmp;
 #endif
     return freed_otmp;
 }
-
-#endif /* OVL1 */
-#ifdef OVLB
 
 void
 stealamulet(mtmp)
@@ -517,9 +510,6 @@ struct monst *mtmp;
 	    (void) rloc(mtmp, FALSE);
     }
 }
-
-#endif /* OVLB */
-#ifdef OVL0
 
 /* drop one object taken from a (possibly dead) monster's inventory */
 STATIC_OVL void
@@ -632,7 +622,5 @@ boolean is_pet;		/* If true, pet should keep wielded/worn items */
 	if (show & cansee(omx, omy))
 		newsym(omx, omy);
 }
-
-#endif /* OVL0 */
 
 /*steal.c*/

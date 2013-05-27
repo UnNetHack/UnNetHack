@@ -8,8 +8,6 @@
 
 extern boolean notonhead;
 
-#ifdef OVLB
-
 static NEARDATA boolean vis, far_noise;
 static NEARDATA long noisetime;
 static NEARDATA struct obj *otmp;
@@ -1446,11 +1444,6 @@ mdamagem(magr, mdef, mattk)
 	return(MM_HIT);
 }
 
-#endif /* OVLB */
-
-
-#ifdef OVL0
-
 int
 noattacks(ptr)			/* returns 1 if monster doesn't attack */
 	struct	permonst *ptr;
@@ -1496,9 +1489,6 @@ struct monst *mon;
 	    unstuck(mon);
 	}
 }
-
-#endif /* OVL0 */
-#ifdef OVLB
 
 STATIC_OVL void
 mrustm(magr, mdef, obj)
@@ -1751,8 +1741,6 @@ int aatyp;
     }
     return w_mask;
 }
-
-#endif /* OVLB */
 
 void
 maybe_freeze_m(mdef, vis, pdmg)

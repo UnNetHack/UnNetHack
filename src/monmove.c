@@ -9,8 +9,6 @@
 
 extern boolean notonhead;
 
-#ifdef OVL0
-
 STATIC_DCL int FDECL(disturb,(struct monst *));
 STATIC_DCL void FDECL(distfleeck,(struct monst *,int *,int *,int *));
 STATIC_DCL int FDECL(m_arrival, (struct monst *));
@@ -18,9 +16,6 @@ STATIC_DCL void FDECL(watch_on_duty,(struct monst *));
 
 static void make_group_attackers_flee(struct monst* mtmp);
 static void share_hp(struct monst* mon1, struct monst* mon2);
-
-#endif /* OVL0 */
-#ifdef OVLB
 
 boolean /* TRUE : mtmp died */
 mb_trapped(mtmp)
@@ -44,9 +39,6 @@ register struct monst *mtmp;
 	}
 	return(FALSE);
 }
-
-#endif /* OVLB */
-#ifdef OVL0
 
 STATIC_OVL void
 watch_on_duty(mtmp)
@@ -87,9 +79,6 @@ register struct monst *mtmp;
 	    }
 	}
 }
-
-#endif /* OVL0 */
-#ifdef OVL1
 
 int
 dochugw(mtmp)
@@ -135,9 +124,6 @@ dochugw(mtmp)
 	return(rd);
 }
 
-#endif /* OVL1 */
-#ifdef OVL2
-
 boolean
 onscary(x, y, mtmp)
 int x, y;
@@ -162,9 +148,6 @@ struct monst *mtmp;
 			 || (is_vampire(mtmp->data)
 			     && IS_ALTAR(levl[x][y].typ)));
 }
-
-#endif /* OVL2 */
-#ifdef OVL0
 
 /* regenerate lost hit points */
 void
@@ -1409,9 +1392,6 @@ postmov:
 	return(mmoved);
 }
 
-#endif /* OVL0 */
-#ifdef OVL2
-
 boolean
 closed_door(x, y)
 register int x, y;
@@ -1426,9 +1406,6 @@ register int x, y;
 {
 	return((boolean)(ACCESSIBLE(levl[x][y].typ) && !closed_door(x, y)));
 }
-
-#endif /* OVL2 */
-#ifdef OVL0
 
 /* decide where the monster thinks you are standing */
 void
@@ -1654,7 +1631,5 @@ share_hp(mon1, mon2)
 		pline("The %s appear to share their wounds.", nam);
 	}
 }
-
-#endif /* OVL0 */
 
 /*monmove.c*/

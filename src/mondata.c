@@ -8,8 +8,6 @@
 
 /*	These routines provide basic data for any type of monster. */
 
-#ifdef OVLB
-
 void
 set_mon_data(mon, ptr, flag)
 struct monst *mon;
@@ -25,9 +23,6 @@ int flag;
 	mon->mintrinsics = (ptr->mresists & 0x00FF);
     return;
 }
-
-#endif /* OVLB */
-#ifdef OVL0
 
 struct attack *
 attacktype_fordmg(ptr, atyp, dtyp)
@@ -50,9 +45,6 @@ int atyp;
 {
     return attacktype_fordmg(ptr, atyp, AD_ANY) ? TRUE : FALSE;
 }
-
-#endif /* OVL0 */
-#ifdef OVLB
 
 boolean
 poly_when_stoned(ptr)
@@ -212,9 +204,6 @@ struct obj *obj;		/* aatyp == AT_WEAP, AT_SPIT */
 	return TRUE;
 }
 
-#endif /* OVLB */
-#ifdef OVL0
-
 boolean
 ranged_attk(ptr)	/* returns TRUE if monster can attack at range */
 struct permonst *ptr;
@@ -258,9 +247,6 @@ struct permonst *mptr;
 		      (slithy(mptr) && !bigmonst(mptr)));
 }
 
-#endif /* OVL0 */
-#ifdef OVL1
-
 boolean
 can_track(ptr)		/* returns TRUE if monster can track well */
 	register struct permonst *ptr;
@@ -270,9 +256,6 @@ can_track(ptr)		/* returns TRUE if monster can track well */
 	else
 		return((boolean)haseyes(ptr));
 }
-
-#endif /* OVL1 */
-#ifdef OVLB
 
 boolean
 sliparm(ptr)	/* creature will slide out of armor */
@@ -291,8 +274,6 @@ breakarm(ptr)	/* creature will break out of armor */
 		ptr == &mons[PM_MARILITH] || ptr == &mons[PM_WINGED_GARGOYLE])
 	      && !sliparm(ptr));
 }
-#endif /* OVLB */
-#ifdef OVL1
 
 boolean
 sticks(ptr)	/* creature sticks other creatures it hits */
@@ -374,9 +355,6 @@ max_passive_dmg(mdef, magr)
     return 0;
 }
 
-#endif /* OVL1 */
-#ifdef OVL0
-
 int
 monsndx(ptr)		/* return an index into the mons array */
 	struct	permonst	*ptr;
@@ -395,10 +373,6 @@ monsndx(ptr)		/* return an index into the mons array */
 
 	return(i);
 }
-
-#endif /* OVL0 */
-#ifdef OVL1
-
 
 int
 name_to_mon(in_str)
@@ -518,9 +492,6 @@ const char *in_str;
 	return mntmp;
 }
 
-#endif /* OVL1 */
-#ifdef OVL2
-
 /* returns 3 values (0=male, 1=female, 2=none) */
 int
 gender(mtmp)
@@ -540,9 +511,6 @@ register struct monst *mtmp;
 	return (humanoid(mtmp->data) || (mtmp->data->geno & G_UNIQ) ||
 		type_is_pname(mtmp->data)) ? (int)mtmp->female : 2;
 }
-
-#endif /* OVL2 */
-#ifdef OVLB
 
 /* used for nearby monsters when you go to another level */
 boolean
@@ -770,7 +738,5 @@ struct attack *mattk;
     }
     return what;
 }
-
-#endif /* OVLB */
 
 /*mondata.c*/

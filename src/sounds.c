@@ -10,14 +10,8 @@
 # endif
 #endif
 
-#ifdef OVLB
-
 static int FDECL(domonnoise,(struct monst *));
 static int NDECL(dochat);
-
-#endif /* OVLB */
-
-#ifdef OVL0
 
 static int FDECL(mon_in_room, (struct monst *,int));
 
@@ -335,9 +329,6 @@ dosounds()
     }
 #endif /* BLACKMARKET */
 }
-
-#endif /* OVL0 */
-#ifdef OVLB
 
 static const char * const h_sounds[] = {
     "beep", "boing", "sing", "belche", "creak", "cough", "rattle",
@@ -1220,7 +1211,5 @@ const char* msg;
 }
 
 #endif /* USER_SOUNDS */
-
-#endif /* OVLB */
 
 /*sounds.c*/

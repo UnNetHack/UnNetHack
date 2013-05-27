@@ -14,16 +14,10 @@ STATIC_DCL void FDECL(dosinkring, (struct obj *));
 STATIC_PTR int FDECL(drop, (struct obj *));
 STATIC_PTR int NDECL(wipeoff);
 
-#ifdef OVL0
 STATIC_DCL int FDECL(menu_drop, (int));
-#endif
-#ifdef OVL2
 STATIC_DCL int NDECL(currentlevel_rewrite);
 STATIC_DCL void NDECL(final_level);
 /* static boolean FDECL(badspot, (XCHAR_P,XCHAR_P)); */
-#endif
-
-#ifdef OVLB
 
 static NEARDATA const char drop_types[] =
 	{ ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, 0 };
@@ -45,9 +39,6 @@ dodrop()
 
 	return result;
 }
-
-#endif /* OVLB */
-#ifdef OVL0
 
 /* Called when a boulder is dropped, thrown, or pushed.  If it ends up
  * in a pool, it either fills the pool up or sinks away.  In either case,
@@ -244,9 +235,6 @@ const char *verb;
 	}
 	return FALSE;
 }
-
-#endif /* OVL0 */
-#ifdef OVLB
 
 void
 doaltarobj(obj)  /* obj is an object dropped on an altar */
@@ -513,9 +501,6 @@ giveback:
 		useup(obj);
 }
 #endif
-
-#endif /* OVLB */
-#ifdef OVL0
 
 /* some common tests when trying to drop or throw items */
 boolean
@@ -852,9 +837,6 @@ int retry;
 #endif
     return n_dropped;
 }
-
-#endif /* OVL0 */
-#ifdef OVL2
 
 /* on a ladder, used in goto_level */
 static NEARDATA boolean at_ladder = FALSE;
@@ -1663,9 +1645,6 @@ deferred_goto()
 	    free((genericptr_t)dfr_post_msg),  dfr_post_msg = 0;
 }
 
-#endif /* OVL2 */
-#ifdef OVL3
-
 /*
  * Return TRUE if we created a monster for the corpse.  If successful, the
  * corpse is gone.
@@ -1778,9 +1757,6 @@ donull()
 	return(1);	/* Do nothing, but let other things happen */
 }
 
-#endif /* OVL3 */
-#ifdef OVLB
-
 STATIC_PTR int
 wipeoff()
 {
@@ -1866,7 +1842,5 @@ heal_legs()
 	}
 	(void)encumber_msg();
 }
-
-#endif /* OVLB */
 
 /*do.c*/

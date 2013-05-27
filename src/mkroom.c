@@ -15,7 +15,6 @@
 
 #include "hack.h"
 
-#ifdef OVLB
 STATIC_DCL boolean FDECL(isbig, (struct mkroom *));
 STATIC_DCL void NDECL(mkshop), FDECL(mkzoo,(int)), NDECL(mkswamp);
 STATIC_DCL void NDECL(mktemple);
@@ -26,13 +25,10 @@ STATIC_DCL struct permonst * NDECL(antholemon);
 STATIC_DCL struct permonst * NDECL(squadmon);
 STATIC_DCL void FDECL(save_room, (int,struct mkroom *));
 STATIC_DCL void FDECL(rest_room, (int,struct mkroom *));
-#endif /* OVLB */
 
 #define sq(x) ((x)*(x))
 
 extern const struct shclass shtypes[];	/* defined in shknam.c */
-
-#ifdef OVLB
 
 STATIC_OVL boolean
 isbig(sroom)
@@ -658,9 +654,6 @@ register struct mkroom *sroom;
 	return FALSE;
 }
 
-#endif /* OVLB */
-#ifdef OVL0
-
 int
 somex(croom)
 register struct mkroom *croom;
@@ -783,9 +776,6 @@ schar type;
 	return (struct mkroom *) 0;
 }
 
-#endif /* OVL0 */
-#ifdef OVLB
-
 struct permonst *
 courtmon()
 {
@@ -903,6 +893,5 @@ int	fd;
 	rooms[nroom].hx = -1;		/* restore ending flags */
 	subrooms[nsubroom].hx = -1;
 }
-#endif /* OVLB */
 
 /*mkroom.c*/

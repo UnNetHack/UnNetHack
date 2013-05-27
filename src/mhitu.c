@@ -9,16 +9,12 @@
 STATIC_VAR NEARDATA struct obj *otmp;
 
 STATIC_DCL void FDECL(urustm, (struct monst *, struct obj *));
-# ifdef OVL1
 STATIC_DCL boolean FDECL(u_slip_free, (struct monst *,struct attack *));
 STATIC_DCL int FDECL(passiveum, (struct permonst *,struct monst *,struct attack *));
-# endif /* OVL1 */
 
-#ifdef OVLB
 # ifdef SEDUCE
 STATIC_DCL void FDECL(mayberem, (struct obj *, const char *));
 # endif
-#endif /* OVLB */
 
 STATIC_DCL boolean FDECL(diseasemu, (struct permonst *));
 STATIC_DCL int FDECL(hitmu, (struct monst *,struct attack *));
@@ -36,9 +32,6 @@ STATIC_DCL void FDECL(invulnerability_messages,(struct monst *,BOOLEAN_P,BOOLEAN
 /* See comment in mhitm.c.  If we use this a lot it probably should be */
 /* changed to a parameter to mhitu. */
 static int dieroll;
-
-#ifdef OVL1
-
 
 STATIC_OVL void
 hitmsg(mtmp, mattk)
@@ -146,9 +139,6 @@ u_slow_down()
 	    Your("quickness feels less natural.");
 	exercise(A_DEX, FALSE);
 }
-
-#endif /* OVL1 */
-#ifdef OVLB
 
 STATIC_OVL void
 wildmiss(mtmp, mattk)		/* monster attacked your displaced image */
@@ -265,9 +255,6 @@ boolean message;
 	if(um_dist(mtmp->mx,mtmp->my,1))
 		pline("Brrooaa...  You land hard at some distance.");
 }
-
-#endif /* OVLB */
-#ifdef OVL0
 
 /* select a monster's next attack, possibly substituting for its usual one */
 struct attack *
@@ -696,9 +683,6 @@ mattacku(mtmp)
 	return(0);
 }
 
-#endif /* OVL0 */
-#ifdef OVLB
-
 /*
  * helper function for some compilers that have trouble with hitmu
  */
@@ -761,9 +745,6 @@ int attk;
 	    break; /* Out of while loop */
 	}
 }
-
-#endif /* OVLB */
-#ifdef OVL1
 
 STATIC_OVL boolean
 diseasemu(mdat)
@@ -1775,9 +1756,6 @@ dopois:
 	return res;
 }
 
-#endif /* OVL1 */
-#ifdef OVLB
-
 STATIC_OVL int
 gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 	register struct monst *mtmp;
@@ -2251,9 +2229,6 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 	return(0);
 }
 
-#endif /* OVLB */
-#ifdef OVL1
-
 void
 mdamageu(mtmp, n)	/* mtmp hits you for n points damage */
 register struct monst *mtmp;
@@ -2269,9 +2244,6 @@ register int n;
 		if(u.uhp < 1) done_in_by(mtmp);
 	}
 }
-
-#endif /* OVL1 */
-#ifdef OVLB
 
 STATIC_OVL void
 urustm(mon, obj)
@@ -2310,9 +2282,6 @@ register struct obj *obj;
 		}
 	}
 }
-
-#endif /* OVLB */
-#ifdef OVL1
 
 int
 could_seduce(magr,mdef,mattk)
@@ -2364,9 +2333,6 @@ struct attack *mattk;
 	else
 		return (pagr->mlet == S_NYMPH) ? 2 : 0;
 }
-
-#endif /* OVL1 */
-#ifdef OVLB
 
 #ifdef SEDUCE
 /* Returns 1 if monster teleported */
@@ -2695,10 +2661,6 @@ const char *str;
 }
 #endif  /* SEDUCE */
 
-#endif /* OVLB */
-
-#ifdef OVL1
-
 STATIC_OVL int
 passiveum(olduasmon,mtmp,mattk)
 struct permonst *olduasmon;
@@ -2878,9 +2840,6 @@ invulnerability_messages(mtmp, range2, youseeit)
     }
 }
 
-#endif /* OVL1 */
-#ifdef OVLB
-
 #include "edog.h"
 struct monst *
 cloneu()
@@ -2902,7 +2861,5 @@ cloneu()
 	}
 	return(mon);
 }
-
-#endif /* OVLB */
 
 /*mhitu.c*/

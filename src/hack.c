@@ -6,9 +6,7 @@
 
 #include "hack.h"
 
-#ifdef OVL1
 STATIC_DCL void NDECL(maybe_wail);
-#endif /*OVL1*/
 STATIC_DCL int NDECL(moverock);
 STATIC_DCL int FDECL(still_chewing,(XCHAR_P,XCHAR_P));
 #ifdef SINKS
@@ -23,8 +21,6 @@ static boolean door_opened;	/* set to true if door was opened during test_move *
 
 
 #define IS_SHOP(x)	(rooms[x].rtype >= SHOPBASE)
-
-#ifdef OVL2
 
 #ifdef DUNGEON_GROWTH
 void
@@ -769,9 +765,6 @@ still_chewing(x,y)
     return 0;
 }
 
-#endif /* OVL2 */
-#ifdef OVLB
-
 void
 movobj(obj, ox, oy)
 register struct obj *obj;
@@ -858,9 +851,6 @@ register xchar x,y;
 			(levl[x][y].wall_info & W_NONPASSWALL)));
 }
 
-#endif /* OVLB */
-#ifdef OVL1
-
 boolean
 bad_rock(mdat,x,y)
 struct permonst *mdat;
@@ -890,9 +880,6 @@ int mode;
 		pline("%s blocks your way.", upstart(tmp));
 	}
 }
-
-#endif /* OVL1 */
-#ifdef OVL3
 
 /** Return TRUE if (dx,dy) is an OK place to move
  *  mode is one of DO_MOVE, TEST_MOVE, TEST_TRAV or TEST_TRAP
@@ -2223,9 +2210,6 @@ struct monst *mon;
 	return buf;
 }
 
-#endif /* OVL3 */
-#ifdef OVL2
-
 void
 spoteffects(pick)
 boolean pick;
@@ -2652,9 +2636,6 @@ register boolean newlev;
 	return;
 }
 
-#endif /* OVL2 */
-#ifdef OVLB
-
 int
 dopickup()
 {
@@ -2744,9 +2725,6 @@ dopickup()
 
 	return (pickup(-count));
 }
-
-#endif /* OVLB */
-#ifdef OVL2
 
 /* stop running if we see something interesting */
 /* turn around a corner if that is the only way we can proceed */
@@ -2947,9 +2925,6 @@ const char *msg_override;
 	if (afternmv) (*afternmv)();
 	afternmv = 0;
 }
-
-#endif /* OVL2 */
-#ifdef OVL1
 
 STATIC_OVL void
 maybe_wail()
@@ -3200,9 +3175,6 @@ const char *str;
     return 0;
 }
 
-#endif /* OVL1 */
-#ifdef OVLB
-
 int
 inv_cnt()
 {
@@ -3233,6 +3205,5 @@ struct obj *otmp;
 	return 0;
 }
 #endif
-#endif /* OVLB */
 
 /*hack.c*/

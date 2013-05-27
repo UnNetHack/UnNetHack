@@ -15,8 +15,6 @@ STATIC_DCL void NDECL(do_positionbar);
 #endif
 STATIC_DCL void FDECL(interrupt_multi, (const char *,int,int));
 
-#ifdef OVL0
-
 static int prev_hp_notify;
 
 char *
@@ -589,9 +587,6 @@ moveloop()
     }
 }
 
-#endif /* OVL0 */
-#ifdef OVL1
-
 void
 stop_occupation()
 {
@@ -609,9 +604,6 @@ stop_occupation()
 #endif
 	}
 }
-
-#endif /* OVL1 */
-#ifdef OVLB
 
 void
 display_gamewindows()
@@ -877,8 +869,6 @@ get_realtime(void)
 }
 #undef MAX_IDLE_TIME_IN_SECONDS
 #endif /* REALTIME_ON_BOTL || RECORD_REALTIME */
-
-#endif /* OVLB */
 
 /** Interrupt a multiturn action if current_points is equal to max_points. */
 STATIC_DCL

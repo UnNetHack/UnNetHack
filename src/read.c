@@ -15,8 +15,6 @@
 	((mndx) == urace.malenum || \
 	 (urace.femalenum != NON_PM && (mndx) == urace.femalenum))
 
-#ifdef OVLB
-
 boolean	known;
 
 static NEARDATA const char readable[] =
@@ -2213,8 +2211,6 @@ create_particular()
 	return madeany;
 }
 #endif /* WIZARD */
-
-#endif /* OVLB */
 
 void
 drop_boulder_on_player(confused, helmet_protects, by_player, drop_directly_to_floor)

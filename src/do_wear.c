@@ -4,12 +4,6 @@
 
 #include "hack.h"
 
-#ifndef OVLB
-
-STATIC_DCL long takeoff_mask, taking_off;
-
-#else /* OVLB */
-
 STATIC_OVL NEARDATA long takeoff_mask = 0L;
 static NEARDATA long taking_off = 0L;
 
@@ -1763,10 +1757,6 @@ doputon()
 	return(1);
 }
 
-#endif /* OVLB */
-
-#ifdef OVL0
-
 void
 find_ac()
 {
@@ -1791,9 +1781,6 @@ find_ac()
 		flags.botl = 1;
 	}
 }
-
-#endif /* OVL0 */
-#ifdef OVLB
 
 void
 glibr()
@@ -2356,7 +2343,5 @@ register schar delta;
 		flags.botl = 1;
 	}
 }
-
-#endif /* OVLB */
 
 /*do_wear.c*/

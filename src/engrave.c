@@ -7,7 +7,6 @@
 #include "decl.h"
 #include <ctype.h>
 
-#ifdef OVLB
 /* random engravings */
 static const char *random_mesg[] = {
 	"Elbereth",
@@ -191,8 +190,6 @@ can_reach_floor()
 			 (!Levitation ||
 			  Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)));
 }
-#endif /* OVLB */
-#ifdef OVL0
 
 const char *
 surface(x, y)
@@ -318,9 +315,6 @@ nengr_at(x, y)
 }
 #endif /* ELBERETH_CONDUCT */
 
-#endif /* OVL0 */
-#ifdef OVL2
-
 void
 u_wipe_engr(cnt)
 register int cnt;
@@ -328,9 +322,6 @@ register int cnt;
 	if (can_reach_floor())
 		wipe_engr_at(u.ux, u.uy, cnt);
 }
-
-#endif /* OVL2 */
-#ifdef OVL1
 
 void
 wipe_engr_at(x,y,cnt)
@@ -351,9 +342,6 @@ register xchar x,y,cnt;
 	    }
 	}
 }
-
-#endif /* OVL1 */
-#ifdef OVL2
 
 void
 read_engr_at(x,y)
@@ -434,9 +422,6 @@ register int x,y;
 	    }
 	}
 }
-
-#endif /* OVL2 */
-#ifdef OVLB
 
 void
 make_engr_at(x,y,s,e_time,e_type)
@@ -1486,8 +1471,5 @@ const char *str;
 	make_engr_at(x, y, str, 0L, HEADSTONE);
 	return;
 }
-
-
-#endif /* OVLB */
 
 /*engrave.c*/
