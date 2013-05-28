@@ -1096,6 +1096,10 @@ mdamagem(magr, mdef, mattk)
 		}
 		break;
 	    case AD_PLYS:
+		if (is_weeping(mdef->data)) {
+		    tmp = 0;
+		    break;
+		}
 		if(!cancelled && mdef->mcanmove) {
 		    if (vis) {
 			Strcpy(buf, Monnam(mdef));
@@ -1107,6 +1111,10 @@ mdamagem(magr, mdef, mattk)
 		}
 		break;
 	    case AD_SLOW:
+		if (is_weeping(mdef->data)) {
+		    tmp = 0;
+		    break;
+		}
 		if (!cancelled && mdef->mspeed != MSLOW) {
 		    unsigned int oldspeed = mdef->mspeed;
 
