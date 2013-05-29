@@ -1,4 +1,4 @@
-2013-XX-XX  UnNetHack 4.X.X
+2013-XX-XX  UnNetHack 5.0.X
 	* Mind flayer attacks only cause physical damage and int drain
 	* Wands and spells of digging are no longer restricted on maze levels
 	* Sokoban luck penalty removed and added tracking of solving Sokoban
