@@ -24,6 +24,7 @@
 #define AT_BOOM		14	/* explodes when killed */
 #define AT_GAZE		15	/* gaze - ranged */
 #define AT_TENT		16	/* tentacles */
+#define AT_SCRE		17	/* scream - sonic attack */
 
 #define AT_WEAP		254	/* uses weapon */
 #define AT_MAGC		255	/* uses magic spell(s) */

@@ -41,6 +41,8 @@
 	* Require high strength for crossbow multishot, with a bonus for
 	  gnomes (from GruntHack)
 	* One-eyed Sam is tougher and it's harder to steal from the black market
+	* Nazgul scream attack added, with limited range (from UnNetHackPlus, based
+	  on code from SporkHack)
 	
 
 	* Artifact changes:

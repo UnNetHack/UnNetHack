@@ -23,6 +23,7 @@ STATIC_DCL int FDECL(explmu, (struct monst *,struct attack *,BOOLEAN_P));
 STATIC_DCL void FDECL(missmu,(struct monst *,BOOLEAN_P,struct attack *));
 STATIC_DCL void FDECL(mswings,(struct monst *,struct obj *));
 STATIC_DCL void FDECL(wildmiss, (struct monst *,struct attack *));
+STATIC_DCL int FDECL(mon_scream, (struct monst*,struct attack*));
 
 STATIC_DCL void FDECL(hurtarmor,(int));
 STATIC_DCL void FDECL(hitmsg,(struct monst *,struct attack *));
@@ -663,6 +664,12 @@ mattacku(mtmp)
 			    else
 				sum[i] = castmu(mtmp, mattk, TRUE, FALSE);
 			}
+			break;
+		case AT_SCRE:
+			if (ranged) {
+			     sum[i] = mon_scream(mtmp, mattk);
+			}
+			/* if you're nice and close, don't bother */
 			break;
 
 		default:		/* no attack */
@@ -2660,6 +2667,48 @@ const char *str;
 	remove_worn_item(obj, TRUE);
 }
 #endif  /* SEDUCE */
+
+STATIC_OVL int
+mon_scream(mtmp,mattk)
+struct monst* mtmp;
+struct attack* mattk;
+{
+	int effect = 0;
+	int dmg = d(mattk->damn,mattk->damd);
+
+	switch (mattk->adtyp) {
+	    case AD_STUN:
+		/* don't let monsters use this every turn, or if not
+		   close, or if monster can see the player is asleep */ 
+		if (mtmp->mspec_used || (m_canseeu(mtmp) && u.usleep) ||
+				distu(mtmp->mx,mtmp->my) > 100) {
+		    return 0;
+		}
+		if (mtmp->mcan) {
+		    if (canseemon(mtmp)) {
+			pline("%s croaks hoarsely.", Monnam(mtmp));
+		    } else {
+			You_hear("a frog nearby.");
+		    }
+		} else {
+		    if (canseemon(mtmp)) {
+			pline("%s screams!", Monnam(mtmp));
+		    } else {
+			You_hear("a horrific scream!");
+		    }
+		    if (u.usleep) { unmul("You are shocked awake!"); } {
+			Your("mind reels from the noise!");
+			effect = 1;
+        	}
+		make_stunned(dmg,FALSE);
+	    }
+	    mtmp->mspec_used = 2 + rn2(3);
+	    break;
+    	default:
+	    break;
+    }
+    return effect;
+}
 
 STATIC_OVL int
 passiveum(olduasmon,mtmp,mattk)
