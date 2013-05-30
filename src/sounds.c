@@ -690,6 +690,7 @@ register struct monst *mtmp;
 	    break;
 	case MS_GRUNT:
 	    if (is_gargoyle(ptr)) {
+		/* from TV series "Gargoyles" */
 		pline("%s %s if you've seen %s.", Monnam(mtmp),
 		    mtmp->mpeaceful ? "asks" : "demands to know",
 		    mtmp->mpeaceful ? "Elisa Maza" : "David Xanatos");
