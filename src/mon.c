@@ -1151,7 +1151,7 @@ nexttry:	/* eels prefer the water, but if there is no water nearby,
 		}
 
 		info[cnt] = 0;
-		if ((checkobj || Displaced) && onscary(dispx, dispy, mon)) {
+		if (onscary(dispx, dispy, mon)) {
 		    if(!(flag & ALLOW_SSM)) continue;
 		    info[cnt] |= ALLOW_SSM;
 		}

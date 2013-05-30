@@ -2017,6 +2017,7 @@ struct obj *potion, *obj;
 		pline("%s %s %s around the edges.", The(cxname(obj)),
 		      otense(obj, "turn"),
 		      potion->odiluted ? hcolor(NH_ORANGE) : hcolor(NH_RED));
+		makeknown(POT_ACID);
 		potion->in_use = FALSE;	/* didn't go poof */
 		return(1);
 	}

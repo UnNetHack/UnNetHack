@@ -689,7 +689,13 @@ register struct monst *mtmp;
 	    pline_msg = mtmp->mpeaceful ? "drones." : "buzzes angrily.";
 	    break;
 	case MS_GRUNT:
-	    pline_msg = "grunts.";
+	    if (is_gargoyle(ptr)) {
+		pline("%s %s if you've seen %s.", Monnam(mtmp),
+		    mtmp->mpeaceful ? "asks" : "demands to know",
+		    mtmp->mpeaceful ? "Elisa Maza" : "David Xanatos");
+	    } else {
+		pline_msg = "grunts.";
+	    }
 	    break;
 	case MS_NEIGH:
 	    if (mtmp->mtame < 5)

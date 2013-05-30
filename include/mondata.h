@@ -184,6 +184,9 @@
 #define touch_petrifies(ptr)	((ptr) == &mons[PM_COCKATRICE] || \
 				 (ptr) == &mons[PM_CHICKATRICE])
 
+#define is_gargoyle(ptr)	((ptr) == &mons[PM_GARGOYLE] || \
+				 (ptr) == &mons[PM_WINGED_GARGOYLE])
+
 #define is_weeping(ptr)		((ptr) == &mons[PM_WEEPING_ANGEL] || \
 				 (ptr) == &mons[PM_WEEPING_ARCHANGEL])
 

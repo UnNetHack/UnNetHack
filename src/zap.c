@@ -4386,7 +4386,6 @@ retry:
 					     Is_airlevel(&u.uz) || u.uinwater ?
 						   "slip" : "drop")),
 				       (const char *)0);
-	    u.ublesscnt += rn1(100,50);  /* the gods take notice */
 	}
 }
 
