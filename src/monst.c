@@ -22,6 +22,7 @@
 #include "color.h"
 #define C(color)	color
 #define HI_DOMESTIC	CLR_WHITE	/* use for player + friendlies */
+#define HI_SHOPKEEPER	CLR_YELLOW	/* use for entities who buy and sell */
 #define HI_LORD		CLR_MAGENTA
 #else
 #define C(color)
@@ -2573,7 +2574,7 @@ struct permonst _mons2[] = {
 	SIZ(WT_HUMAN, 400, sizeof(struct eshk), MS_SELL, MZ_HUMAN), 0, 0,
 	M1_HUMANOID|M1_OMNIVORE,
 	M2_NOPOLY|M2_HUMAN|M2_PEACEFUL|M2_STRONG|M2_COLLECT|M2_MAGIC,
-	M3_INFRAVISIBLE, HI_DOMESTIC),
+	M3_INFRAVISIBLE, HI_SHOPKEEPER),
 #ifdef BLACKMARKET
     MON("black marketeer", S_HUMAN, 
 	LVL(20, 20, -5, 40, -2), G_NOGEN,
@@ -2583,7 +2584,7 @@ struct permonst _mons2[] = {
 	MR_SLEEP|MR_STONE,
 	MR_SLEEP, M1_HUMANOID|M1_OMNIVORE,
 	M2_NOPOLY|M2_HUMAN|M2_PEACEFUL|M2_STRONG|M2_COLLECT|M2_MAGIC, 
-	M3_INFRAVISIBLE, CLR_YELLOW),
+	M3_INFRAVISIBLE, HI_SHOPKEEPER),
     MON("One-eyed Sam", S_HUMAN, 
 	LVL(25, 24, -8, 50, -2), (G_NOGEN|G_UNIQ),
 	A(ATTK(AT_WEAP, AD_PHYS, 4, 10), NO_ATTK, NO_ATTK,
