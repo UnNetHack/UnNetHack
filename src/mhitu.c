@@ -2196,8 +2196,9 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 			couldsee(mtmp->mx, mtmp->my) &&
 			mtmp->mcansee && !mtmp->mspec_used && rn2(5)) {
 		    int dmg = d(1,4);
-		    if (!rn2(30)) {
-			/* Slight chance of turning off the lights */
+		    if (mtmp->data == &mons[PM_WEEPING_ARCHANGEL] ? !rn2(40) : !rn2(100)) {
+			/* Slight chance of turning off the lights; higher
+			   likelihood of archangels being able to do so */
 			pline("%s is pointing at you.", Monnam(mtmp));
 			stop_occupation();
 			litroom(0, 0);
