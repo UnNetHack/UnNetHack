@@ -2196,18 +2196,26 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 			couldsee(mtmp->mx, mtmp->my) &&
 			mtmp->mcansee && !mtmp->mspec_used && rn2(5)) {
 		    int dmg = d(1,4);
-		    if (!Reflecting) {
+		    if (!rn2(30)) {
+			/* Slight chance of turning off the lights */
+			pline("%s is pointing at you.", Monnam(mtmp));
 			stop_occupation();
-			pline("%s reflection in your mind weakens you.", s_suffix(Monnam(mtmp)));
-	    		exercise(A_INT, TRUE);
-		    } else {
-			if (flags.verbose)
-			    /* Since this message means the player is unaffected, limit
-			       its occurence to preserve flavor but avoid message spam */
-			    if (!rn2(10)) pline("%s is covering its face.", Monnam(mtmp));
+			litroom(0, 0);
 			dmg = 0;
+		    } else {
+			if (!Reflecting) {
+			    pline("%s reflection in your mind weakens you.", s_suffix(Monnam(mtmp)));
+			    stop_occupation();
+	    		    exercise(A_INT, TRUE);
+			} else {
+			    if (flags.verbose)
+				/* Since this message means the player is unaffected, limit
+				   its occurence to preserve flavor but avoid message spam */
+				if (!rn2(10)) pline("%s is covering its face.", Monnam(mtmp));
+			    dmg = 0;
+			}
 		    }
-		if (dmg) mdamageu(mtmp, dmg);
+		    if (dmg) mdamageu(mtmp, dmg);
 		}
 		break;
 #ifdef PM_BEHOLDER /* work in progress */
