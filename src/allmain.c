@@ -126,6 +126,7 @@ moveloop()
     monst_init();
     monstr_init();	/* monster strengths */
     objects_init();
+    dragons_init();
     shop_selection_init();
 
 #ifdef WIZARD
