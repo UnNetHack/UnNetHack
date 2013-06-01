@@ -2709,7 +2709,7 @@ struct attack* mattk;
 			Your("mind reels from the noise!");
 			effect = 1;
         	}
-		make_stunned(dmg,FALSE);
+		make_stunned(HStun + dmg, FALSE);
 	    }
 	    mtmp->mspec_used = 2 + rn2(3);
 	    break;
