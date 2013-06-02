@@ -3762,7 +3762,7 @@ struct permonst _mons2[] = {
 
     /* statues, they are stationary */
     MON("Punisher", S_STATUE,
-	LVL(24, 25, -15, 95, 15), (G_SHEOL|G_NOCORPSE|1),
+	LVL(24, 25, -15, 95, 15), (G_NOGEN|G_NOCORPSE|1),
 	A(ATTK(AT_MAGC, AD_PUNI, 0, 0), NO_ATTK,
 	  NO_ATTK, NO_ATTK,
 	  NO_ATTK, NO_ATTK),
