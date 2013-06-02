@@ -210,7 +210,7 @@ rndmonnum()	/* select a random, common monster type */
 	    i = rn1(SPECIAL_PM - LOW_PM, LOW_PM);
 	    ptr = &mons[i];
 	} while((ptr->geno & G_NOGEN) || (!Inhell && (ptr->geno & G_HELL)) ||
-	        (!Insheol && (ptr->geno & G_SHEOLONLY)));
+		(!Insheol && (ptr->geno & G_SHEOL)) || (Insheol && (ptr->geno & G_NOSHEOL)));
 
 	return(i);
 }

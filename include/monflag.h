@@ -192,12 +192,12 @@
 
 
 /* for mons[].geno (constant during game) */
-#define G_SHEOLONLY	0x6000		/* will not appear anywhere but
-                                           sheol (includes G_SHEOL) */
-#define G_SHEOL  	0x2000		/* can be generated in sheol */
-#define G_UNIQ		0x1000		/* generated only once */
-#define G_NOHELL	0x0800		/* not generated in "hell" */
-#define G_HELL		0x0400		/* generated only in "hell" */
+
+#define G_UNIQ		0x4000		/* generated only once */
+#define G_NOSHEOL	0x2000		/* not generated in Sheol */
+#define G_SHEOL		0x1000		/* generated only in Sheol, unless specified otherwise */
+#define G_NOHELL	0x0800		/* not generated in "hell" (Gehennon except Sheol) */
+#define G_HELL		0x0400		/* generated only in "hell", unless specified otherwise */
 #define G_NOGEN		0x0200		/* generated only specially */
 #define G_SGROUP	0x0080		/* appear in small groups normally */
 #define G_LGROUP	0x0040		/* appear in large groups normally */

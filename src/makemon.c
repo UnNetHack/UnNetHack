@@ -1422,14 +1422,12 @@ rndmonst()
 #ifdef BLACKMARKET	/* SWD: pets are not allowed in the black market */
 		if (is_domestic(ptr) && Is_blackmarket(&u.uz)) continue;
 #endif
-		if (Insheol && !(ptr->geno & G_SHEOL)) continue;
-		if (!Insheol && (ptr->geno & (G_SHEOLONLY & ~G_SHEOL)))
-		    continue;
-		if ( (Inhell && (ptr->geno & G_NOHELL)) ) continue;
+		if (Insheol && (ptr->geno & G_NOSHEOL)) continue;
+		if (!Insheol && (ptr->geno & G_SHEOL)) continue;
+		if (Inhell && (ptr->geno & G_NOHELL)) continue;
 		ct = (int)(ptr->geno & G_FREQ) + align_shift(ptr);
 		/* Boost Sheol-Only(tm) monster generation in Sheol. */
-		if (Insheol && (ptr->geno & (G_SHEOLONLY & ~G_SHEOL)))
-		    ct *= 2;
+		if (Insheol && (ptr->geno & G_SHEOL)) ct *= 2;
 		if (ct < 0 || ct > 127)
 		    panic("rndmonst: bad count [#%d: %d]", mndx, ct);
 		rndmonst_state.choice_count += ct;
