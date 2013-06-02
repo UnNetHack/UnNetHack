@@ -211,9 +211,7 @@ rndmonnum()	/* select a random, common monster type */
 		i = rn1(SPECIAL_PM - LOW_PM, LOW_PM);
 		ptr = &mons[i];
 		count++;
-	} while((ptr->geno & G_NOGEN && count < 10000) 
-		|| (!(Inhell && !Insheol) && (ptr->geno & G_HELL)) || (Inhell && !Insheol && (ptr->geno & G_NOHELL)) 
-		|| (!Insheol && (ptr->geno & G_SHEOL)) || (Insheol && (ptr->geno & G_NOSHEOL)));
+	} while (((ptr->geno & G_NOGEN) || prohibited_by_generation_flags(ptr)) && count < 10000);
 
 	/* Plan C: get any common monster */
 	do {

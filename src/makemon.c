@@ -1273,10 +1273,52 @@ int mndx;
 {
 	if (mons[mndx].geno & (G_NOGEN | G_UNIQ)) return TRUE;
 	if (mvitals[mndx].mvflags & G_GONE) return TRUE;
-	if (Inhell && !Insheol)
+	if (Inhell && !Insheol) {
 		return(mons[mndx].maligntyp > A_NEUTRAL);
-	else
+	} else if (!((Insheol) && ((mons[mndx].geno & G_SHEOL) != 0))) {
 		return((mons[mndx].geno & G_HELL) != 0);
+	} else {
+		return FALSE; /* G_SHEOL|G_HELL monster in Sheol */
+	}
+}
+
+boolean
+prohibited_by_generation_flags(struct permonst *ptr)
+{
+	if (Inhell && !Insheol) {
+		/* In Gehennon, outside of the Sheol */
+		if (ptr->geno & G_HELL) {
+			return FALSE;
+		}
+		if (ptr->geno & G_NOHELL) {
+			return TRUE;
+		}
+		if (ptr->geno & G_SHEOL) {
+			return TRUE;
+		}
+		return FALSE;
+	} else if (Insheol) {
+		/* In Sheol */
+		if (ptr->geno & G_SHEOL) {
+			return FALSE;
+		}
+		if (ptr->geno & G_NOSHEOL) {
+			return TRUE;
+		}
+		if (ptr->geno & G_HELL) {
+			return TRUE;
+		}
+		return FALSE;
+	} else {
+		/* Outside of Gehennon and Sheol*/
+		if (ptr->geno & G_SHEOL) {
+			return TRUE;
+		}
+		if (ptr->geno & G_HELL) {
+			return TRUE;
+		}
+		return FALSE;
+	}
 }
 
 /*
@@ -1422,9 +1464,7 @@ rndmonst()
 #ifdef BLACKMARKET	/* SWD: pets are not allowed in the black market */
 		if (is_domestic(ptr) && Is_blackmarket(&u.uz)) continue;
 #endif
-		if (Insheol && (ptr->geno & G_NOSHEOL)) continue;
-		if (!Insheol && (ptr->geno & G_SHEOL)) continue;
-		if (Inhell && !Insheol && (ptr->geno & G_NOHELL)) continue;
+		if (prohibited_by_generation_flags(ptr)) continue;
 		ct = (int)(ptr->geno & G_FREQ) + align_shift(ptr);
 		/* Boost Sheol-Only(tm) monster generation in Sheol. */
 		if (Insheol && (ptr->geno & G_SHEOL)) ct *= 2;
