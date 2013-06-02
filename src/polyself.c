@@ -224,6 +224,8 @@ newman()
 	u.uen = (tmp ? u.uen * (long)u.uenmax / tmp : u.uenmax);
 #endif
 
+	check_uhpmax();
+
 	redist_attr();
 	u.uhunger = rn1(500,500);
 	if (Sick) make_sick(0L, (char *) 0, FALSE, SICK_ALL);
