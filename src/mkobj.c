@@ -205,12 +205,22 @@ rndmonnum()	/* select a random, common monster type */
 	ptr = rndmonst();
 	if (ptr) return(monsndx(ptr));
 
-	/* Plan B: get any common monster */
+	/* Plan B: get any common proper monster */
+	int count = 0;
 	do {
-	    i = rn1(SPECIAL_PM - LOW_PM, LOW_PM);
-	    ptr = &mons[i];
-	} while((ptr->geno & G_NOGEN) || (!Inhell && (ptr->geno & G_HELL)) ||
-		(!Insheol && (ptr->geno & G_SHEOL)) || (Insheol && (ptr->geno & G_NOSHEOL)));
+		i = rn1(SPECIAL_PM - LOW_PM, LOW_PM);
+		ptr = &mons[i];
+		count++;
+	} while((ptr->geno & G_NOGEN && count < 10000) 
+		|| (!(Inhell && !Insheol) && (ptr->geno & G_HELL)) || (Inhell && !Insheol && (ptr->geno & G_NOHELL)) 
+		|| (!Insheol && (ptr->geno & G_SHEOL)) || (Insheol && (ptr->geno & G_NOSHEOL)));
+
+	/* Plan C: get any common monster */
+	do {
+		i = rn1(SPECIAL_PM - LOW_PM, LOW_PM);
+		ptr = &mons[i];
+		count++;
+	} while(ptr->geno & G_NOGEN); 
 
 	return(i);
 }

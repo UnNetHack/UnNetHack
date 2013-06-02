@@ -1273,7 +1273,7 @@ int mndx;
 {
 	if (mons[mndx].geno & (G_NOGEN | G_UNIQ)) return TRUE;
 	if (mvitals[mndx].mvflags & G_GONE) return TRUE;
-	if (Inhell)
+	if (Inhell && !Insheol)
 		return(mons[mndx].maligntyp > A_NEUTRAL);
 	else
 		return((mons[mndx].geno & G_HELL) != 0);
@@ -1424,7 +1424,7 @@ rndmonst()
 #endif
 		if (Insheol && (ptr->geno & G_NOSHEOL)) continue;
 		if (!Insheol && (ptr->geno & G_SHEOL)) continue;
-		if (Inhell && (ptr->geno & G_NOHELL)) continue;
+		if (Inhell && !Insheol && (ptr->geno & G_NOHELL)) continue;
 		ct = (int)(ptr->geno & G_FREQ) + align_shift(ptr);
 		/* Boost Sheol-Only(tm) monster generation in Sheol. */
 		if (Insheol && (ptr->geno & G_SHEOL)) ct *= 2;
