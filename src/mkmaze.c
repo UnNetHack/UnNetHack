@@ -390,7 +390,11 @@ fixup_special()
 #else
 		s_level *sp = find_level(r->rname.str);
 #endif
-		lev = sp->dlevel;
+		if (sp) {
+			lev = sp->dlevel;
+		} else {
+			warning("Couldn't find_level \"%s\". This is an unresolved bug. Sorry.", r->rname.str);
+		}
 	    }
 	    /* fall into... */
 
