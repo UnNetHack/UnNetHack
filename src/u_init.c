@@ -774,7 +774,7 @@ u_init()
 		break;
 #ifdef TOURIST
 	case PM_TOURIST:
-		Tourist[T_DARTS].trquan = rn1(50, 21);
+		Tourist[T_DARTS].trquan = rn1(43, 21); /* 63 darts ought to be enough for anybody. */
 #ifndef GOLDOBJ
 		u.ugold = u.ugold0 = rnd(1000);
 #else
