@@ -1763,7 +1763,7 @@ int* pdmg;
 	    pline_The("ice slips away.");
 	    goto nodamage;
 	} else if (is_whirly(mdef->data) || amorphous(mdef->data)) {
-	    pline_The("ice can't hold %s", Monnam(mdef));
+	    pline_The("ice cannot hold %s.", mon_nam(mdef));
 	    goto nodamage;
 	} else if (is_lava(mdef->mx, mdef->my)) {
 	    pline_The("lava melts the ice.");
