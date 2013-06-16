@@ -4374,18 +4374,46 @@ retry:
 
 	if (otmp != &zeroobj) {
 	    /* The(aobjnam()) is safe since otmp is unidentified -dlc */
-	    (void) hold_another_object(otmp, u.uswallow ?
-				       "Oops!  %s out of your reach!" :
-				       (Is_airlevel(&u.uz) ||
-					Is_waterlevel(&u.uz) ||
-					levl[u.ux][u.uy].typ < IRONBARS ||
-					levl[u.ux][u.uy].typ >= ICE) ?
-				       "Oops!  %s away from you!" :
-				       "Oops!  %s to the floor!",
-				       The(aobjnam(otmp,
-					     Is_airlevel(&u.uz) || u.uinwater ?
-						   "slip" : "drop")),
-				       (const char *)0);
+	    int x = u.ux;
+	    int y = u.uy;
+	    if(otmp->oartifact == ART_EXCALIBUR && !u.uswallow) {
+		/* try to find a neighbouring wall to stick it into
+		   (preferably an orthogonally adjacent one),
+		   otherwise on current square */
+		if(levl[x-1][y+0].typ <=SCORR) { x += -1; y +=  0; }
+		else if(levl[x+1][y+0].typ <=SCORR) { x +=  1; y +=  0; }
+		else if(levl[x+0][y-1].typ <=SCORR) { x +=  0; y += -1; }
+		else if(levl[x+0][y+1].typ <=SCORR) { x +=  0; y +=  1; }
+		else if(levl[x-1][y-1].typ <=SCORR) { x += -1; y += -1; }
+		else if(levl[x-1][y+1].typ <=SCORR) { x += -1; y +=  1; }
+		else if(levl[x+1][y-1].typ <=SCORR) { x +=  1; y += -1; }
+		else if(levl[x+1][y+1].typ <=SCORR) { x +=  1; y +=  1; }
+	    }
+	    if(!(x==u.ux && y==u.uy)) {
+		pline("A sword flashes through the air and embeds itself in %s next to you!",
+		      IS_TREE(levl[x][y].typ) ? "a tree" :
+		      (IS_WALL(levl[x][y].typ) || levl[x][y].typ == SDOOR) ? "the wall" :
+		      closed_door(x,y) ? "a door" :
+		      "the stone");
+		place_object(otmp, x, y);
+		stackobj(otmp);
+		if(Blind && Levitation)
+		    map_object(otmp, 0);
+		newsym(x,y);  /* remap location */
+	    } else {
+		(void) hold_another_object(otmp, u.uswallow ?
+					   "Oops!  %s out of your reach!" :
+					   (Is_airlevel(&u.uz) ||
+					    Is_waterlevel(&u.uz) ||
+					    levl[x][y].typ < IRONBARS ||
+					    levl[x][y].typ >= ICE) ?
+					   "Oops!  %s away from you!" :
+					   "Oops!  %s to the floor!",
+					   The(aobjnam(otmp,
+						       Is_airlevel(&u.uz) || u.uinwater ?
+						       "slip" : "drop")),
+					   (const char *)0);
+	    }
 	}
 }
 

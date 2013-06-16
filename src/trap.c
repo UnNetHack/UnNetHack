@@ -3679,6 +3679,34 @@ boolean force;
 			containercnt++;
 			if (containercnt > 1) break;
 		}
+		if(otmp->oartifact == ART_EXCALIBUR && (levl[x][y].typ <= SCORR)) {
+		    Strcpy(the_trap, doname(otmp));
+
+		    Strcat(the_trap, " here, embedded in ");
+		    if (IS_TREE(levl[x][y].typ))
+			Strcat(the_trap, "a tree");
+		    else if (IS_WALL(levl[x][y].typ) || levl[x][y].typ == SDOOR)
+			Strcat(the_trap, "a wall");
+		    else if (closed_door(x,y))
+			Strcat(the_trap, "a door");
+		    else
+			Strcat(the_trap, "stone");
+		    
+		    You("see %s.", the_trap);
+		    switch (ynq("Try to pull it out?")) {
+			case 'q': return(1);
+			case 'n': trap_skipped = TRUE;  continue;
+		    }
+
+		    if(touch_artifact(otmp, &youmonst) && u.ualign.type == A_LAWFUL && u.ualign.record >= 14) {
+			pline("It slides out easily!");
+			(void) pick_obj(otmp);
+		    } else {
+			pline("It is stuck fast!");
+		    }
+
+		    return(1);
+		}
 	}
 
 	if ((ttmp = t_at(x,y)) && ttmp->tseen) {

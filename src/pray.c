@@ -716,6 +716,42 @@ gcrownu()
 	    if (!Blind) Your("sword shines brightly for a moment.");
 	    obj = oname(obj, artiname(ART_EXCALIBUR));
 	    if (obj && obj->oartifact == ART_EXCALIBUR) u.ugifts++;
+	} else if (!already_exists) {
+	    int x = u.ux;
+	    int y = u.uy;
+	    if(!u.uswallow) {
+		/* try to find a neighbouring wall to stick it into
+		   (preferably an orthogonally adjacent one),
+		   otherwise on current square */
+		     if(levl[u.ux-1][u.uy+0].typ <=SCORR) { x += -1; y +=  0; }
+		else if(levl[u.ux+1][u.uy+0].typ <=SCORR) { x +=  1; y +=  0; }
+		else if(levl[u.ux+0][u.uy-1].typ <=SCORR) { x +=  0; y += -1; }
+		else if(levl[u.ux+0][u.uy+1].typ <=SCORR) { x +=  0; y +=  1; }
+		else if(levl[u.ux-1][u.uy-1].typ <=SCORR) { x += -1; y += -1; }
+		else if(levl[u.ux-1][u.uy+1].typ <=SCORR) { x += -1; y +=  1; }
+		else if(levl[u.ux+1][u.uy-1].typ <=SCORR) { x +=  1; y += -1; }
+		else if(levl[u.ux+1][u.uy+1].typ <=SCORR) { x +=  1; y +=  1; }
+	    }
+	    obj = mksobj(LONG_SWORD, FALSE, FALSE);
+	    obj = oname(obj, artiname(ART_EXCALIBUR));
+	    obj->spe = 1;
+	    if (!u.uswallow && flooreffects(obj,x,y,"drop")) return;
+	    if(!(x==u.ux && y==u.uy)) {
+		pline("A sword flashes through the air and embeds itself in %s next to you!",
+		      IS_TREE(levl[x][y].typ) ? "a tree" :
+		      (IS_WALL(levl[x][y].typ) || levl[x][y].typ == SDOOR) ? "the wall" :
+		      closed_door(x,y) ? "a door" :
+		      "the stone");
+		place_object(obj, x, y);
+		stackobj(obj);
+		if(Blind && Levitation)
+		    map_object(obj, 0);
+		newsym(x,y);  /* remap location */
+	    } else {
+		at_your_feet("A sword");
+		dropy(obj);
+	    }
+	    u.ugifts++;
 	}
 	/* acquire Excalibur's skill regardless of weapon or gift */
 	unrestrict_weapon_skill(P_LONG_SWORD);
