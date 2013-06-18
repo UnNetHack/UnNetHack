@@ -16,7 +16,7 @@
 # normal random room
 LEVEL:"vlt-%04i"
 FLAGS:rndvault
-VAULTGEN:1000
+VAULTGEN:2000
 ROOM:"ordinary", random, random, random, random {
 }
 
