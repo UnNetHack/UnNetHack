@@ -1632,8 +1632,9 @@ struct mkroom	*croom;
 		loc |= DRY;
 		get_location_coord(&x, &y, loc, croom, m->coord);
 	    }
-	} else
-	    get_location(&x, &y, DRY, croom);
+	} else {
+	    get_location_coord(&x, &y, DRY, croom, m->coord);
+	}
 
 	/* try to find a close place if someone else is already there */
 	if (MON_AT(x,y) && enexto(&cc, x, y, pm))
