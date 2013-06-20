@@ -1870,10 +1870,10 @@ domove()
 	/* If no 'm' prefix, paranoid ask dangerous moves */
 	if (!flags.nopick || flags.run) {
 		if (!Levitation && !Flying && !is_clinger(youmonst.data) &&
-				!Stunned && !Confusion &&
-				(is_pool(x, y) || is_swamp(x, y) || is_lava(x, y)) &&
-				levl[x][y].seenv && !is_pool(u.ux, u.uy) &&
-				!is_swamp(u.ux, u.uy) && !is_lava(u.ux, u.uy)) {
+				!Stunned && !Confusion && levl[x][y].seenv &&
+				((is_pool(x, y) && !is_pool(u.ux, u.uy)) ||
+				(is_swamp(x, y) && !is_swamp(u.ux, u.uy)) ||
+				(is_lava(x, y) && !is_lava(u.ux, u.uy)))) {
 			if (is_pool(x, y) && iflags.paranoid_water) {
 				/* water */
 				if (paranoid_yn("Really enter the water?", iflags.paranoid_water) != 'y') {
