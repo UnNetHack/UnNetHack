@@ -62,8 +62,9 @@
 	      permanently poisoned and grants poison resistance while wielded
 	    - The Longbow of Diana gives +1 multishot and +1 damage bonus when
 	      firing any type of arrow
-	    - Excalibur can be cleanly untrapped when embedded in dungeon features;
-	      it also tends to appear there when gifted or wished for
+	    - Excalibur can be cleanly untrapped when embedded in dungeon
+	      features if at least devoutly lawful; it also tends to appear
+	      there when gifted or wished for
 
 	* New config option for customizing monster letter in UTF8graphics:
 	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke

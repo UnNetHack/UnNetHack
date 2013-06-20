@@ -521,7 +521,8 @@ xchar x, y;
 
 	if (IS_ROCK(levl[x][y].typ) || closed_door(x, y)) {
 	    if ((!martial() && rn2(20) > ACURR(A_DEX)) ||
-		    IS_ROCK(levl[u.ux][u.uy].typ) || closed_door(u.ux, u.uy)) {
+		    IS_ROCK(levl[u.ux][u.uy].typ) || closed_door(u.ux, u.uy) ||
+		    (kickobj->oartifact == ART_EXCALIBUR)) {
 		if (Blind)
 		    pline("It doesn't come loose.");
 		else
