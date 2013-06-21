@@ -2196,12 +2196,10 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 			couldsee(mtmp->mx, mtmp->my) &&
 			mtmp->mcansee && !mtmp->mspec_used && rn2(5)) {
 		    int dmg = d(1,4);
-		    if (mtmp->data == &mons[PM_WEEPING_ARCHANGEL] ? !rn2(40) : !rn2(120)) {
-			/* Slight chance of inflicting higher damage regardless
-			   of player reflection; more likely for archangels */
-			pline("%s is pointing at you.", Monnam(mtmp));
+		    if (!rn2(60)) {
+			You("blink!");
+			make_blinded((long)1,FALSE);
 			stop_occupation();
-			dmg = d(1,6);
 		    } else {
 			if (!Reflecting) {
 			    pline("%s reflection in your mind weakens you.", s_suffix(Monnam(mtmp)));
