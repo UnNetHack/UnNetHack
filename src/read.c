@@ -1569,12 +1569,17 @@ register struct obj	*sobj;
 		    pline("%s", Never_mind);
 		    return 0;
 		}
-		if (!cansee(cc.x, cc.y) || distu(cc.x, cc.y) >= 32) {
-		    You("smell rotten eggs.");
-		    return 0;
-		}
-		(void) create_gas_cloud(cc.x, cc.y, 3+bcsign(sobj),
+		if (!confused) {
+		    if (!cansee(cc.x, cc.y) || distu(cc.x, cc.y) >= 32) {
+			You("smell rotten eggs.");
+			return 0;
+		    } else {
+			(void) create_gas_cloud(cc.x, cc.y, 3+bcsign(sobj),
 						8+4*bcsign(sobj), rn1(3,4));
+		    }
+		} else {
+		    (void) create_critters(30 + rn2(70), &mons[PM_GAS_SPORE]);
+		}
 		break;
 	}
 	default:
