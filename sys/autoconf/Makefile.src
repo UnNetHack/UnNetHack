@@ -771,6 +771,7 @@ mkmap.o: $(srcdir)/mkmap.c $(HACK_H) ../include/sp_lev.h
 mkmaze.o: $(srcdir)/mkmaze.c $(HACK_H) ../include/sp_lev.h ../include/lev.h
 mkobj.o: $(srcdir)/mkobj.c $(HACK_H)
 mkroom.o: $(srcdir)/mkroom.c $(HACK_H)
+mksheol.o: $(srcdir)/mksheol.c $(HACK_H) ../include/sp_lev.h
 mon.o: $(srcdir)/mon.c $(HACK_H) ../include/mfndpos.h ../include/edog.h \
 		../include/artifact.h
 mondata.o: $(srcdir)/mondata.c $(HACK_H) ../include/eshk.h ../include/epri.h
