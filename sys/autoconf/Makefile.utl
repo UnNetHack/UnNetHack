@@ -240,8 +240,9 @@ lev_yacc.c: $(srcdir)/lev_comp.y
 	mv lev$(YTABH) ../include/lev_comp.h
 
 lev_lex.c: $(srcdir)/lev_comp.l
-	$(LEX) $(FLEXDIST) $(srcdir)/lev_comp.l
-	mv $(LEXYYC) lev_lex.c
+	rm -f lev_$(LEXYYC)
+	$(LEX) -t $(FLEXDIST) $(srcdir)/lev_comp.l > lev_$(LEXYYC)
+	mv lev_$(LEXYYC) lev_lex.c
 
 # with all of extern.h's functions to complain about, we drown in
 # 'defined but not used' without -u
@@ -270,8 +271,9 @@ dgn_yacc.c: $(srcdir)/dgn_comp.y
 	mv dgn$(YTABH) ../include/dgn_comp.h
 
 dgn_lex.c: $(srcdir)/dgn_comp.l
-	$(LEX) $(FLEXDIST) $(srcdir)/dgn_comp.l
-	mv $(LEXYYC) dgn_lex.c
+	rm -f dgn_$(LEXYYC)
+	$(LEX) -t $(FLEXDIST) $(srcdir)/dgn_comp.l > dgn_$(LEXYYC)
+	mv dgn_$(LEXYYC) dgn_lex.c
 
 # with all of extern.h's functions to complain about, we drown in
 # 'defined but not used' without -u
