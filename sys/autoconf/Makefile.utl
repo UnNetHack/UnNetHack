@@ -116,10 +116,10 @@ OBJDIR = ../src
 LEX      = @LEX@
 YACC     = @YACC@
  
-# these are the names of the output files from YACC/LEX. Under MS-DOS
+# these are the suffixes of the output files from YACC/LEX. Under MS-DOS
 # and similar systems, they may differ
-YTABC = y.tab.c
-YTABH = y.tab.h
+YTABC = .tab.c
+YTABH = .tab.h
 LEXYYC = @LEX_OUTPUT_ROOT@.c
 # LEXYYC = lex.yy.c
 # YTABC = y_tab.c
@@ -235,9 +235,9 @@ lev_lex.o:   lev_lex.c $(HACK_H) ../include/lev_comp.h ../include/sp_lev.h
 ../include/lev_comp.h: lev_yacc.c
 
 lev_yacc.c: $(srcdir)/lev_comp.y
-	$(YACC) $(YACCDIST) -d $(srcdir)/lev_comp.y
-	mv $(YTABC) lev_yacc.c
-	mv $(YTABH) ../include/lev_comp.h
+	$(YACC) $(YACCDIST) -b lev -d $(srcdir)/lev_comp.y
+	mv lev$(YTABC) lev_yacc.c
+	mv lev$(YTABH) ../include/lev_comp.h
 
 lev_lex.c: $(srcdir)/lev_comp.l
 	$(LEX) $(FLEXDIST) $(srcdir)/lev_comp.l
@@ -265,9 +265,9 @@ dgn_lex.o:   dgn_lex.c $(CONFIG.H) ../include/dgn_comp.h ../include/dgn_file.h
 ../include/dgn_comp.h: dgn_yacc.c
 
 dgn_yacc.c: $(srcdir)/dgn_comp.y
-	$(YACC) $(YACCDIST) -d $(srcdir)/dgn_comp.y
-	mv $(YTABC) dgn_yacc.c
-	mv $(YTABH) ../include/dgn_comp.h
+	$(YACC) $(YACCDIST) -b dgn -d $(srcdir)/dgn_comp.y
+	mv dgn$(YTABC) dgn_yacc.c
+	mv dgn$(YTABH) ../include/dgn_comp.h
 
 dgn_lex.c: $(srcdir)/dgn_comp.l
 	$(LEX) $(FLEXDIST) $(srcdir)/dgn_comp.l
@@ -427,11 +427,3 @@ spotless: clean
 tileedit: tileedit.cpp $(TEXT_IO)
 	$(QTDIR)/bin/moc -o tileedit.moc tileedit.h
 	$(CC) -o tileedit -I../include -I$(srcdir)/../include -I$(QTDIR)/include -L$(QTDIR)/lib tileedit.cpp $(TEXT_IO) -lqt
-
-# Because the targets dgn_yacc.c, dgn_lex.c, lev_yacc.c, and lev_lex.c
-# use lex and yacc and mv the resulting output to the correct filenames,
-# in case of parralel compilation this might break.
-#
-# This special target name surpresses parallel compilation for this entire
-# Makefile
-.NOTPARALLEL:
