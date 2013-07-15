@@ -531,7 +531,7 @@ AC_DEFUN([NETHACK_DIR_SET],
   [
    AC_MSG_CHECKING([which directory is $1])
    AC_ARG_WITH([$1], [AS_HELP_STRING([--with-$1=DIR],
-    [Set the directory for $2 (default=$3)])],
+    [$7 (default=$3)])],
     [autoconf_val='"'$withval'"'], [withval=$4;autoconf_val='$5'])
    if test "$enable_file_areas" != "no" ; then
      AC_SUBST($6,[$withval])
@@ -567,27 +567,27 @@ NETHACK_DIR_SET(gamesdir, gamesdir, [LOCALSTATEDIR/unnethack],
 NETHACK_DIR_SET(bonesdir, bones, [GAMESDIR/bones],
 		[${FILE_AREA_VAR}/bones],
 		[FILE_AREA_VAR"/bones"],
-		FILE_AREA_BONES, [Location of bones files (r/w)])
+		FILE_AREA_BONES, [Location of bones files (rw)])
 
 NETHACK_DIR_SET(savesdir, saves, [GAMESDIR/saves],
 		[${FILE_AREA_VAR}/saves],
 		[FILE_AREA_VAR"/saves"],
-		FILE_AREA_SAVE, [Location of save files (r/w)])
+		FILE_AREA_SAVE, [Location of save files (rw)])
 
 NETHACK_DIR_SET(leveldir, level, [GAMESDIR/level],
 		[${FILE_AREA_VAR}/level],
 		[FILE_AREA_VAR"/level"],
-		FILE_AREA_LEVL, [Location of level files (r/w)])
+		FILE_AREA_LEVL, [Location of level files (rw)])
 
 NETHACK_DIR_SET(sharedir, share, [DATADIR/unnethack],
 		[${datadir}/unnethack],
 		[AUTOCONF_DATADIR"/unnethack"],
-		FILE_AREA_SHARE, [For read-only, architechure independent, files])
+		FILE_AREA_SHARE, [For read-only, architecture independent files])
 
 NETHACK_DIR_SET(unsharedir, unshare, [DATADIR/unnethack],
 		[${datadir}/unnethack],
 		[AUTOCONF_DATADIR"/unnethack"],
-		FILE_AREA_UNSHARE, [For read-only, architechure dependent, files])
+		FILE_AREA_UNSHARE, [For read-only, architecture dependent files])
 
 
 NETHACK_LINKS=

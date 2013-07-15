@@ -1510,14 +1510,16 @@ Optional Packages:
                           (default=auto)
   --with-owner=USER       Set the owner of installed files (default=games)
   --with-group=GROUP      Set the group of installed files (default=bin)
-  --with-gamesdir=DIR     Set the directory for gamesdir
+  --with-gamesdir=DIR     Location of other files which may be modified
                           (default=LOCALSTATEDIR/unnethack)
-  --with-bonesdir=DIR     Set the directory for bones (default=GAMESDIR/bones)
-  --with-savesdir=DIR     Set the directory for saves (default=GAMESDIR/saves)
-  --with-leveldir=DIR     Set the directory for level (default=GAMESDIR/level)
-  --with-sharedir=DIR     Set the directory for share
+  --with-bonesdir=DIR     Location of bones files (rw)
+                          (default=GAMESDIR/bones)
+  --with-savesdir=DIR     Location of save files (rw) (default=GAMESDIR/saves)
+  --with-leveldir=DIR     Location of level files (rw)
+                          (default=GAMESDIR/level)
+  --with-sharedir=DIR     For read-only, architecture independent files
                           (default=DATADIR/unnethack)
-  --with-unsharedir=DIR   Set the directory for unshare
+  --with-unsharedir=DIR   For read-only, architecture dependent files
                           (default=DATADIR/unnethack)
 
 Some influential environment variables:

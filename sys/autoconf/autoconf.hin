@@ -84,22 +84,22 @@
 /* Place files in different directories */
 #undef FILE_AREAS
 
-/* Location of bones files (r/w) */
+/* Location of bones files (rw) */
 #undef FILE_AREA_BONES
 
 /* Location of human-readable documentation */
 #undef FILE_AREA_DOC
 
-/* Location of level files (r/w) */
+/* Location of level files (rw) */
 #undef FILE_AREA_LEVL
 
-/* Location of save files (r/w) */
+/* Location of save files (rw) */
 #undef FILE_AREA_SAVE
 
-/* For read-only, architechure independent, files */
+/* For read-only, architecture independent files */
 #undef FILE_AREA_SHARE
 
-/* For read-only, architechure dependent, files */
+/* For read-only, architecture dependent files */
 #undef FILE_AREA_UNSHARE
 
 /* Location of other files which may be modified */
