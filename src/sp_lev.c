@@ -2738,6 +2738,8 @@ spo_corefunc(coder, fn)
     case COREFUNC_PLNAME: s = opvar_new_str(plname); splev_stack_push(coder->stack, s); break;
     case COREFUNC_ROLE: s = opvar_new_str(urole.name.m); splev_stack_push(coder->stack, s); break;
     case COREFUNC_RACE: s = opvar_new_str(urace.noun); splev_stack_push(coder->stack, s); break;
+    case COREFUNC_ROOM_WID: i = opvar_new_int((coder->croom ? (coder->croom->hx - coder->croom->lx + 1) : 0)); splev_stack_push(coder->stack, i); break;
+    case COREFUNC_ROOM_HEI: i = opvar_new_int((coder->croom ? (coder->croom->hy - coder->croom->ly + 1) : 0)); splev_stack_push(coder->stack, i); break;
     case COREFUNC_TOSTRING:
 	if (OV_pop_i(i)) {
 	    char tmpbuf[64];

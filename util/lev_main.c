@@ -142,6 +142,8 @@ static const struct {
     {COREFUNC_TOINT,			"integer", "s", 'i'},
     {COREFUNC_TOINT,			"int", "s", 'i'},
     {COREFUNC_TOCOORD,			"coord", "ii", 'c'},
+    {COREFUNC_ROOM_WID, 		"room.width", "", 'i'},
+    {COREFUNC_ROOM_HEI, 		"room.height", "", 'i'},
     {0, NULL, NULL, 0}
 };
 

@@ -170,6 +170,9 @@ enum corefuncs {
     COREFUNC_ROLE,
     COREFUNC_RACE,
 
+    COREFUNC_ROOM_WID,
+    COREFUNC_ROOM_HEI,
+
     NUM_COREFUNCS
 };
 
