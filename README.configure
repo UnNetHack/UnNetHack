@@ -5,8 +5,8 @@ the NetHack-Cygwin-MinGW HOWTO[2].
 
 
 On Linux and MacOSX for a single-user installation (a Linux Debian
- or Ubuntu system needs the packages gcc, flex, bison, make and
- libncurses5-dev installed):
+ or Ubuntu system needs the packages gcc, flex, bison, make,
+ libncurses5-dev and autotools-dev installed):
 
  ./configure --prefix=$HOME/unnethack --with-owner=`id -un` --with-group=`id -gn` --enable-wizmode=`id -un` && make && make install
 
