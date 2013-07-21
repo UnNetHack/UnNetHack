@@ -245,6 +245,7 @@ east		{ savetoken(yytext); yylval.i=W_EAST; return DIRECTION; }
 south		{ savetoken(yytext); yylval.i=W_SOUTH; return DIRECTION; }
 west		{ savetoken(yytext); yylval.i=W_WEST; return DIRECTION; }
 random		{ savetoken(yytext); yylval.i = -1; return RANDOM_TYPE; }
+random\[	{ savetoken(yytext); yylval.i = -1; return RANDOM_TYPE_BRACKET; }
 none		{ savetoken(yytext); yylval.i = -2; return NONE; }
 align		{ savetoken(yytext); return A_REGISTER; }
 left		{ savetoken(yytext); yylval.i=1; return LEFT_OR_RIGHT; }
