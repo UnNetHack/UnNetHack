@@ -174,7 +174,14 @@ int spellnum;
 STATIC_OVL int
 choose_punisher_spell(void)
 {
-    return rn2(NUM_PUN_SPELLS);
+	int spell = rn2(NUM_PUN_SPELLS);
+	/* If we don't do this, Punishers are a little too eager to summon
+	 * monsters. Horrifying (or fun?) reports of the level entirely filling
+	 * up with monsters have been heard. */
+	if (spell == PUN_SUMMON_MONS && rn2(3)) {
+	    return choose_punisher_spell();
+	}
+	return spell;
 }
 
 /* return values:
