@@ -2740,6 +2740,16 @@ spo_corefunc(coder, fn)
     case COREFUNC_RACE: s = opvar_new_str(urace.noun); splev_stack_push(coder->stack, s); break;
     case COREFUNC_ROOM_WID: i = opvar_new_int((coder->croom ? (coder->croom->hx - coder->croom->lx + 1) : 0)); splev_stack_push(coder->stack, i); break;
     case COREFUNC_ROOM_HEI: i = opvar_new_int((coder->croom ? (coder->croom->hy - coder->croom->ly + 1) : 0)); splev_stack_push(coder->stack, i); break;
+    case COREFUNC_ROOM_X: i = opvar_new_int((coder->croom ? coder->croom->lx : 0)); splev_stack_push(coder->stack, i); break;
+    case COREFUNC_ROOM_Y: i = opvar_new_int((coder->croom ? coder->croom->ly : 0)); splev_stack_push(coder->stack, i); break;
+    case COREFUNC_RN2:
+	if (OV_pop_i(i)) {
+	    long li = ((OV_i(i) > 0) ? rn2(OV_i(i)) : 0);
+	    opvar_free(i);
+	    i = opvar_new_int(li);
+	    splev_stack_push(coder->stack, i);
+	} else impossible("No int in stack for rnd()");
+	break;
     case COREFUNC_TOSTRING:
 	if (OV_pop_i(i)) {
 	    char tmpbuf[64];
