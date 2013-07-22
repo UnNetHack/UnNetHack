@@ -505,3 +505,67 @@ ROOM:"rndvault", unlit, random, random, random {
 }
 
 
+# room with sessile growths
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+ROOM:"rndvault", random, random, random, random {
+  $mon = monster: { ('e', "gas spore"), 'F', 'b', 'j', 'P' }
+  SHUFFLE: $mon
+  LOOP [4d3] {
+    MONSTER: $mon[0], random, asleep
+  }
+}
+
+
+# Pillars
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+ROOM:"ordinary", random, random, random, (10, 10) {
+  $terr = terrain: { '-', '-', '-', '-', '-', 'L', 'I', 'P', 'T' }
+  SHUFFLE: $terr
+  FOR $y = 0 TO ((room.height - 3) / 4) {
+    FOR $x = 0 TO ((room.width - 3) / 4) {
+       TERRAIN:coord(($x * 4) + 2, ($y * 4) + 2), $terr[0]
+       TERRAIN:coord(($x * 4) + 3, ($y * 4) + 2), $terr[0]
+       TERRAIN:coord(($x * 4) + 2, ($y * 4) + 3), $terr[0]
+       TERRAIN:coord(($x * 4) + 3, ($y * 4) + 3), $terr[0]
+    }
+  }
+}
+
+
+# Small tightly-placed pillars
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+ROOM:"ordinary", random, random, random, random {
+  IF [ (room.width % 2) == 0 ] { BREAK }
+  IF [ (room.height % 2) == 0 ] { BREAK }
+  $terr = terrain: { '-', '-', '-', '-', '-', 'L', 'I', 'P', 'T', 'C' ,'F' }
+  SHUFFLE: $terr
+  FOR $y = 0 TO ((room.height - 3) / 2) {
+    FOR $x = 0 TO ((room.width - 3) / 2) {
+       TERRAIN:coord(($x * 2) + 1, ($y * 2) + 1), $terr[0]
+    }
+  }
+}
+
+
+# Mirrored obstacles
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+ROOM:"ordinary", random, random, random, random {
+  IF [ room.width < 4 ] { BREAK }
+  IF [ room.height < 4 ] { BREAK }
+  $terr = terrain: { '-', '-', '-', '-', '-', 'L', 'I', 'P', 'T', 'C', 'F' }
+  SHUFFLE: $terr
+  LOOP [ 1d3 ] {
+     $x = 1d6 - (1)
+     IF [ $x >= room.width ] { $x = (room.width - (1)) }
+     $y = 1d6 - (1)
+     IF [ $y >= room.height ] { $y = (room.height - (1)) }
+     TERRAIN:coord($x, $y), $terr[0]
+     $mx = room.width - ($x) - (1)
+     $my = room.height - ($y) - (1)
+     TERRAIN:coord($mx, $my), $terr[0]
+  }
+}
