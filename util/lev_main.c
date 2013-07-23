@@ -1487,6 +1487,7 @@ sp_lev *maze;
 	    "selection_ellipse",
 	    "selection_filter",
 	    "selection_gradient",
+	    "selection_complement",
 	};
 
 	/* don't bother with the header stuff */
