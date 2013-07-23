@@ -25,6 +25,7 @@ STATIC_DCL boolean FDECL(wrong_elem_type, (struct permonst *));
 STATIC_DCL void FDECL(m_initgrp,(struct monst *,int,int,int));
 STATIC_DCL void FDECL(m_initthrow,(struct monst *,int,int));
 STATIC_DCL void FDECL(m_initweap,(struct monst *));
+STATIC_DCL void FDECL(m_inityour,(struct monst *,struct obj *));
 STATIC_DCL void FDECL(m_initinv,(struct monst *));
 
 extern const int monstr[];
@@ -155,6 +156,24 @@ int otyp,oquan;
 }
 
 STATIC_OVL void
+m_inityour(mtmp,obj)
+struct monst *mtmp;
+struct obj *obj;
+{
+	register struct obj *otmp;
+
+	otmp = mksobj(obj->otyp,FALSE,FALSE);
+	if (obj->blessed) bless(obj);
+	else if (obj->cursed) curse(obj);
+	otmp->quan = obj->quan;
+	otmp->owt = weight(obj);
+	otmp->opoisoned = obj->opoisoned;
+	otmp->oerodeproof = obj->oerodeproof;
+	otmp->spe = obj->spe;
+	(void) mpickobj(mtmp,otmp);
+}
+
+STATIC_OVL void
 m_initweap(mtmp)
 register struct monst *mtmp;
 {
@@ -272,7 +291,31 @@ register struct monst *mtmp;
 		break;
 
 	    case S_ANGEL:
-		{
+		if (mm == PM_ALEAX) {
+		    /* mimic your weapon */
+		    if (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep)))
+			m_inityour(mtmp,uwep);
+		    else (void) mongets(mtmp, LONG_SWORD);
+		    if (uswapwep && (uswapwep->oclass == WEAPON_CLASS ||
+			    is_weptool(uswapwep)))
+			m_inityour(mtmp,uswapwep);
+		    if (uquiver && (is_ammo(uquiver) || is_missile(uquiver)))
+			m_inityour(mtmp,uquiver);
+
+		    /* mimic your armor */
+		    if (uarm) m_inityour(mtmp,uarm);
+		    if (uarmc) m_inityour(mtmp,uarmc);
+		    if (uarmh) m_inityour(mtmp,uarmh);
+		    if (uarms) m_inityour(mtmp,uarms);
+		    if (uarmg) m_inityour(mtmp,uarmg);
+		    if (uarmf) m_inityour(mtmp,uarmf);
+#ifdef TOURIST
+		    if (uarmu) m_inityour(mtmp,uarmu);
+#endif
+		    /* same chance for an amulet of reflection as other
+		       angelic beings have for a shield of reflection */
+		    if (!rn2(4)) (void)mongets(mtmp, AMULET_OF_REFLECTION);
+		} else {
 		    int spe2;
 
 		    /* create minion stuff; can't use mongets */

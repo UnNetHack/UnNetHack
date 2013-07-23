@@ -44,6 +44,9 @@
 	* Nazgul scream attack added, with limited range (from UnNetHackPlus, based
 	  on code from SporkHack)
 	* Skill gain for spells is faster than skill gain for weapons
+	* Aleaxes are created with exact copies (barring artifacts) of your
+	  wielded weapons and armor (provided they are actual weapons); when
+	  your own god sends a hostile monster, it will always be an Aleax (by L)
 	
 
 	* Artifact changes:

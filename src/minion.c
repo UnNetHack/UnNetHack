@@ -91,7 +91,8 @@ boolean talk;
     register struct monst *mon;
     int mnum;
 
-    switch ((int)alignment) {
+    if (alignment == u.ualign.type) mnum = PM_ALEAX;
+    else switch ((int)alignment) {
 	case A_LAWFUL:
 	    mnum = lminion();
 	    break;
@@ -311,7 +312,7 @@ lminion()
 
 	for (tryct = 0; tryct < 20; tryct++) {
 	    ptr = mkclass(S_ANGEL,0);
-	    if (ptr && !is_lord(ptr))
+	    if (ptr && !is_lord(ptr) && ptr != &mons[PM_ALEAX])
 		return(monsndx(ptr));
 	}
 
