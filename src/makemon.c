@@ -168,8 +168,8 @@ struct obj *obj;
 	otmp->quan = obj->quan;
 	otmp->owt = weight(obj);
 	otmp->opoisoned = obj->opoisoned;
-	otmp->oerodeproof = obj->oerodeproof;
-	otmp->spe = obj->spe;
+	otmp->oerodeproof = TRUE;
+	/* otmp->spe = obj->spe; */
 	(void) mpickobj(mtmp,otmp);
 }
 
