@@ -1629,6 +1629,30 @@ arti_invoke(obj)
 	    otmp = hold_another_object(otmp, "Suddenly %s out.",
 				       aobjnam(otmp, "fall"), (const char *)0);
 	    break;
+	case SMOKE_CLOUD: {
+	    coord cc;
+
+	    cc.x = u.ux;
+	    cc.y = u.uy;
+	    /* Cause trouble if cursed or player is wrong role */
+	    if (obj->cursed || (Role_switch == oart->role || !oart->role)) {
+		You("may summon a stinking cloud.");
+		pline("Where do you want to center the cloud?");
+		if (getpos(&cc, TRUE, "the desired position") < 0) {
+		    pline(Never_mind);
+		    obj->age = 0;
+		    return 0;
+		}
+		if (!cansee(cc.x, cc.y) || distu(cc.x, cc.y) >= 32) {
+		    You("smell rotten eggs.");
+		    return 0;
+		}
+	    }
+	    pline("A cloud of toxic smoke pours out!");
+	    (void) create_gas_cloud(cc.x, cc.y, 3+bcsign(obj),
+					8+4*bcsign(obj), rn1(3,4));
+	    break;
+	}
 #ifdef CONVICT
 	case PHASING:   /* Walk through walls and stone like a xorn */
         if (Passes_walls) goto nothing_special;
@@ -1696,15 +1720,6 @@ nothing_special:
 		float_up();
 		spoteffects(FALSE);
 	    } else (void) float_down(I_SPECIAL|TIMEOUT, W_ARTI);
-	    break;
-	case INVIS:
-	    if (BInvis || Blind) goto nothing_special;
-	    newsym(u.ux, u.uy);
-	    if (on)
-		Your("body takes on a %s transparency...",
-		     Hallucination ? "normal" : "strange");
-	    else
-		Your("body seems to unfade...");
 	    break;
 	}
     }

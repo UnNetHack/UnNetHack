@@ -43,7 +43,7 @@ REGION: (32,06,48,06),unlit,"ordinary"
 REGION: (50,06,56,08),lit,"ordinary"
 REGION: (40,08,46,08),unlit,"ordinary"
 REGION: (22,08,22,12),unlit,"ordinary"
-REGION: (24,08,38,12),unlit,"ordinary"
+REGION: (24,08,38,12),lit,"ordinary"
 REGION: (48,08,48,08),lit,"ordinary"
 REGION: (40,10,56,10),lit,"ordinary"
 REGION: (48,12,48,12),lit,"ordinary"
@@ -332,9 +332,11 @@ STAIR:(38,10),up
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # The altar of Huhetotl.  Unattended.
-ALTAR:(50,14),chaos,altar
+$altar = { (26,05), (26,14), (50,05), (50,14) }
+SHUFFLE:$altar
+ALTAR:$altar[0],chaos,altar
 # Objects
-OBJECT:('(',"crystal ball"),(50,14),blessed,5,name:"The Orb of Detection"
+OBJECT:('[',"shield of reflection"),$altar[0],blessed,1,name:"Itlachiayaque"
 OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
@@ -356,9 +358,12 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 TRAP:random,random
+TRAP:"rolling boulder",(30,05)
+TRAP:"rolling boulder",(30,14)
+TRAP:"rolling boulder",(46,05)
 TRAP:"rolling boulder",(46,14)
 # Random monsters.
-MONSTER:('&',"Minion of Huhetotl"),(50,14) {
+MONSTER:('&',"Minion of Huhetotl"),$altar[0] {
   OBJECT:('(', "Bell of Opening"),uncursed
   OBJECT:random,cursed
   OBJECT:random,cursed

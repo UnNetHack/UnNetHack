@@ -39,7 +39,7 @@ const struct Role roles[] = {
 	"Arc", "the College of Archeology", "the Tomb of the Toltec Kings",
 	PM_ARCHEOLOGIST, NON_PM, NON_PM,
 	PM_LORD_CARNARVON, PM_STUDENT, PM_MINION_OF_HUHETOTL,
-	ART_ORB_OF_DETECTION,
+	ART_ITLACHIAYAQUE,
 	MH_HUMAN|MH_DWARF|MH_GNOME|MH_VAMPIRE | ROLE_MALE|ROLE_FEMALE |
 	  ROLE_LAWFUL|ROLE_NEUTRAL,
 	/* Str Int Wis Dex Con Cha */

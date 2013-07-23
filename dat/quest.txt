@@ -267,12 +267,15 @@ guard it now far better than I.
 
 May the blessings of %d follow you and guard you."
 %E
-# assumes Orb of Detection (glass object)
+# Assumes Itlachiayaque (smooth shield)
 %Cc Arc 00082
-"Careful, %p!  %oC might break, and that would be
-a tragic loss.  You are its keeper now, and the time has come to
-resume your search for the Amulet.  %Z await your
-return through the magic portal that brought you here."
+%l looks over %os polished surface.
+
+"Of all the items that have been excavated from %i,
+this one has given us the greatest insight into Toltec civilisation.
+Understand that guarding this artifact is no small responsibility,
+%p. Now, it is time that you resumed your expedition for the
+Amulet. %Z await you through the portal which brought you here."
 %E
 %Cc Arc 00090
 "Welcome back, %p.  Have you progressed with your quest to

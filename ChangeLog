@@ -69,6 +69,11 @@
 	    - Excalibur can be cleanly untrapped when embedded in dungeon
 	      features if at least devoutly lawful; it also tends to appear
 	      there when gifted or wished for
+	    - Replaced the Orb of Detection with Itlachiayaque as the Archeologist
+	      quest artifact: a shield of reflection that grants fire resistance,
+	      half spell damage, and produces stinking clouds when invoked (by L)
+
+(http://l.j-factor.com/nethack/itlachiayaque.diff)
 
 	* New config option for customizing monster letter in UTF8graphics:
 	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke
