@@ -3568,7 +3568,8 @@ register int fall;
 	lang = 2;
 
     if(!inhishop(shkp)) {
-	if (Role_if(PM_KNIGHT)) {
+	if (Role_if(PM_KNIGHT) && u.ualign.type == A_LAWFUL) {
+	    /* only chivalrous (lawful) knights feel this way */
 	    You_feel("like a common thief.");
 	    adjalign(-sgn(u.ualign.type));
 	}

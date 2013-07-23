@@ -240,8 +240,8 @@ register struct monst *mtmp;
 	check_caitiff(mtmp);
 
 /*	attacking peaceful creatures is bad for the samurai's giri */
-	if (Role_if(PM_SAMURAI) && mtmp->mpeaceful &&
-	    u.ualign.record > -10) {
+	if (Role_if(PM_SAMURAI) && u.ualign.type == A_LAWFUL &&
+		mtmp->mpeaceful && u.ualign.record > -10) {
 	    You("dishonorably attack the innocent!");
 	    adjalign(-1);
 	}
@@ -1012,7 +1012,7 @@ int thrown;
 	if (ispoisoned) {
 	    int nopoison = (10 - (obj->owt/10));            
 	    if(nopoison < 2) nopoison = 2;
-	    if Role_if(PM_SAMURAI) {
+	    if (Role_if(PM_SAMURAI) && u.ualign.type == A_LAWFUL) {
 		You("dishonorably use a poisoned weapon!");
 		adjalign(-sgn(u.ualign.type));
 	    } else if ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10)) {

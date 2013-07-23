@@ -1228,7 +1228,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	    if (!youdefend) {
 		/* Grimtooth is the only non-projectile poisoned weapon
 		   yet implemented, so place alignment penalties here */
-		if Role_if(PM_SAMURAI) {
+		if (Role_if(PM_SAMURAI) && u.ualign.type == A_LAWFUL) {
 		    You("dishonorably use a poisoned weapon!");
 		    adjalign(-sgn(u.ualign.type));
 		} else if ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10)) {
