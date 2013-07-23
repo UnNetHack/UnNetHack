@@ -177,6 +177,10 @@ enum corefuncs {
     COREFUNC_ROOM_X,
     COREFUNC_ROOM_Y,
 
+    /* variable methods */
+    COREFUNC_COORD_X,
+    COREFUNC_COORD_Y,
+
     NUM_COREFUNCS
 };
 

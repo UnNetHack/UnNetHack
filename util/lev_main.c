@@ -112,6 +112,29 @@ static void NDECL(init_obj_classes);
 void VDECL(lc_error, (const char *, ...));
 void VDECL(add_opvars, (sp_lev *, const char *, ...));
 
+static const struct {
+    long functype;
+    long objtyp;
+    const char *methodname;
+    long retval;
+} core_methods[] = {
+    {COREFUNC_COORD_X, SPOVAR_COORD, "x", SPOVAR_INT}, /* $coord.x */
+    {COREFUNC_COORD_Y, SPOVAR_COORD, "y", SPOVAR_INT}, /* $coord.y */
+    {0, NULL, 0}
+};
+
+long
+method_defined(char *methname, long o, long *ftyp)
+{
+    int i;
+    for (i = 0; core_methods[i].methodname; i++)
+	if (core_methods[i].objtyp == o && !strcmp(core_methods[i].methodname, methname)) {
+	    *ftyp = core_methods[i].functype;
+	    return core_methods[i].retval;
+	}
+    return 0;
+}
+
 
 static const struct {
     int functype;

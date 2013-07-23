@@ -67,12 +67,14 @@ void FDECL(init_yyout, (FILE *));
 void FDECL(include_push, (const char *));
 int NDECL(include_pop);
 
-long NDECL(handle_varstring_check);
+long NDECL(handle_varstring_method);
 long FDECL(corefunc_str_check, (char *, long));
 
 extern struct lc_vardefs *FDECL(vardef_defined,(struct lc_vardefs *,char *, int));
 
 extern struct lc_vardefs *variable_definitions;
+
+extern long FDECL(method_defined, (char *, long, long *));
 
 void FDECL(savetoken, (char *));
 void NDECL(newline);
@@ -332,7 +334,7 @@ sky		{ savetoken(yytext); yylval.i=SKYMAP; return FLAG_TYPE; }
 		  yylval.map = (char *) alloc(strlen(yytext+1)+1);
 		  Strcpy(yylval.map, yytext+1); /* Discard the first \" */
 		  return STRING; }
-\$[a-zA-Z_][a-zA-Z_0-9]*	{ savetoken(yytext); return handle_varstring_check(); }
+\$[a-zA-Z_](\.?[a-zA-Z_0-9]+)*	{ savetoken(yytext); return handle_varstring_method(); }
 [a-zA-Z_](\.?[a-zA-Z_0-9]+)*	{
 		  savetoken(yytext);
 		  yylval.map = (char *) alloc(strlen(yytext)+1);
@@ -451,6 +453,46 @@ handle_varstring_check()
   }
   return VARSTRING;
 }
+
+long
+handle_varstring_method()
+{
+  struct lc_vardefs *vd;
+  char *idx = index(yytext, '.');
+  long r;
+
+  if (!idx) return handle_varstring_check();
+  *idx = '\0';
+  idx++;
+
+  if ((vd = vardef_defined(variable_definitions, yytext, 1))) {
+     long mth;
+     long l = vd->var_type;
+     long a = ((l & SPOVAR_ARRAY) == SPOVAR_ARRAY);
+     long rval;
+     if (rval = method_defined(idx, l, &mth)) {
+          yylval.meth.varstr = strdup(yytext);
+          yylval.meth.cfunc = mth;
+          long rvala = ((rval & SPOVAR_ARRAY) == SPOVAR_ARRAY);
+          rval = (rval & ~SPOVAR_ARRAY);
+          if (rval == SPOVAR_INT) return (rvala ? METHOD_INT_ARRAY : METHOD_INT);
+          if (rval == SPOVAR_STRING) return (rvala ? METHOD_STRING_ARRAY : METHOD_STRING);
+          if (rval == SPOVAR_VARIABLE) return (rvala ? METHOD_VAR_ARRAY : METHOD_VAR);
+          if (rval == SPOVAR_COORD) return (rvala ? METHOD_COORD_ARRAY : METHOD_COORD);
+          if (rval == SPOVAR_REGION) return (rvala ? METHOD_REGION_ARRAY : METHOD_REGION);
+          if (rval == SPOVAR_MAPCHAR) return (rvala ? METHOD_MAPCHAR_ARRAY : METHOD_MAPCHAR);
+          if (rval == SPOVAR_MONST) return (rvala ? METHOD_MONST_ARRAY : METHOD_MONST);
+          if (rval == SPOVAR_OBJ) return (rvala ? METHOD_OBJ_ARRAY : METHOD_OBJ);
+          if (rval == SPOVAR_SEL) return (rvala ? METHOD_SEL_ARRAY : METHOD_SEL);
+     }
+
+  } else {
+    lc_error("Trying to use a method of unknown variable '%s'.", yylval);
+    return VARSTRING;
+  }
+  return VARSTRING;
+}
+
 
 long
 corefunc_str_check(s, retval)

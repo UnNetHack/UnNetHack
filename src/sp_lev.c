@@ -2750,6 +2750,26 @@ spo_corefunc(coder, fn)
 	    splev_stack_push(coder->stack, i);
 	} else impossible("No int in stack for rnd()");
 	break;
+    case COREFUNC_COORD_X:
+	{
+	    struct opvar *crd;
+	    if (OV_pop_c(crd)) {
+		i = opvar_new_int(SP_COORD_X(OV_i(crd)));
+		splev_stack_push(coder->stack, i);
+		opvar_free(crd);
+	    } else impossible("No coord in stack for $coord.x method");
+	}
+	break;
+    case COREFUNC_COORD_Y:
+	{
+	    struct opvar *crd;
+	    if (OV_pop_c(crd)) {
+		i = opvar_new_int(SP_COORD_Y(OV_i(crd)));
+		splev_stack_push(coder->stack, i);
+		opvar_free(crd);
+	    } else impossible("No coord in stack for $coord.y method");
+	}
+	break;
     case COREFUNC_TOSTRING:
 	if (OV_pop_i(i)) {
 	    char tmpbuf[64];

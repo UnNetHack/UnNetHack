@@ -179,6 +179,10 @@ extern int rnd_vault_freq;
 	long die;
 	long num;
     } dice;
+    struct {
+	long cfunc;
+	char *varstr;
+    } meth;
 }
 
 
@@ -228,6 +232,15 @@ extern int rnd_vault_freq;
 %token	<map> VARSTRING_MONST VARSTRING_MONST_ARRAY
 %token	<map> VARSTRING_OBJ VARSTRING_OBJ_ARRAY
 %token	<map> VARSTRING_SEL VARSTRING_SEL_ARRAY
+%token	<meth> METHOD_INT METHOD_INT_ARRAY
+%token	<meth> METHOD_STRING METHOD_STRING_ARRAY
+%token	<meth> METHOD_VAR METHOD_VAR_ARRAY
+%token	<meth> METHOD_COORD METHOD_COORD_ARRAY
+%token	<meth> METHOD_REGION METHOD_REGION_ARRAY
+%token	<meth> METHOD_MAPCHAR METHOD_MAPCHAR_ARRAY
+%token	<meth> METHOD_MONST METHOD_MONST_ARRAY
+%token	<meth> METHOD_OBJ METHOD_OBJ_ARRAY
+%token	<meth> METHOD_SEL METHOD_SEL_ARRAY
 %token	<dice> DICE
 %type	<i> h_justif v_justif trap_name room_type door_state light_state
 %type	<i> alignment altar_type a_register roomfill door_pos
@@ -2340,6 +2353,11 @@ math_expr_var	: INTEGER                       { add_opvars(splev, "i", $1 ); }
 		| dice				{ }
 		| '(' MINUS_INTEGER ')'         { add_opvars(splev, "i", $2 ); }
 		| corefunc_int			{ }
+		| METHOD_INT
+		  {
+		      add_opvars(splev, "v", $1.varstr);
+		      add_opvars(splev, "io", $1.cfunc, SPO_COREFUNC);
+		  }
 		| VARSTRING_INT
 		  {
 		      check_vardef_type(variable_definitions, $1, SPOVAR_INT);
