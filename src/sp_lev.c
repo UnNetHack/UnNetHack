@@ -3772,6 +3772,23 @@ selection_setpoint(x,y,ov, c)
 }
 
 struct opvar *
+selection_not(s)
+     struct opvar *s;
+{
+    struct opvar *ov;
+    int x,y;
+    ov = selection_opvar(NULL);
+    if (!ov) return NULL;
+
+    for (x = 0; x < COLNO; x++)
+	for (y = 0; y < ROWNO; y++)
+	    if (!selection_getpoint(x,y,s))
+		selection_setpoint(x,y,ov,1);
+
+    return ov;
+}
+
+struct opvar *
 selection_logical_oper(s1, s2, oper)
      struct opvar *s1, *s2;
      char oper;
@@ -5403,6 +5420,15 @@ sp_lev *lvl;
 		pt = selection_logical_oper(sel1, sel2, '|');
 		opvar_free(sel1);
 		opvar_free(sel2);
+		splev_stack_push(coder->stack, pt);
+	    }
+	    break;
+	case SPO_SEL_COMPLEMENT:
+	    {
+		struct opvar *sel, *pt;
+		if (!OV_pop_typ(sel, SPOVAR_SEL)) panic("no sel for not");
+		pt = selection_not(sel);
+		opvar_free(sel);
 		splev_stack_push(coder->stack, pt);
 	    }
 	    break;

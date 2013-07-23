@@ -137,6 +137,7 @@ enum opcode_defs {
     SPO_SEL_ELLIPSE,
     SPO_SEL_FILTER,
     SPO_SEL_GRADIENT,
+    SPO_SEL_COMPLEMENT,
 
     MAX_SP_OPCODES
 };

@@ -213,7 +213,7 @@ extern int rnd_vault_freq;
 %token	<i> WALLWALK_ID COMPARE_TYPE
 %token	<i> VAULTGEN_ID
 %token	<i> rect_ID fillrect_ID line_ID randline_ID grow_ID selection_ID flood_ID
-%token	<i> rndcoord_ID circle_ID ellipse_ID filter_ID
+%token	<i> rndcoord_ID circle_ID ellipse_ID filter_ID complement_ID
 %token	<i> gradient_ID GRADIENT_TYPE LIMITED HUMIDITY_TYPE
 %token	<i> ',' ':' '(' ')' '[' ']' '{' '}'
 %token	<map> STRING MAP_ID
@@ -2615,6 +2615,10 @@ ter_selection_x	: coord_or_var
 		| gradient_ID '(' GRADIENT_TYPE ',' '(' math_expr_var '-' math_expr_var opt_limited ')' ',' coord_or_var opt_coord_or_var ')'
 		  {
 		      add_opvars(splev, "iio", $9, $3, SPO_SEL_GRADIENT);
+		  }
+		| complement_ID ter_selection_x
+		  {
+		      add_opvars(splev, "o", SPO_SEL_COMPLEMENT);
 		  }
 		| VARSTRING_SEL
 		  {

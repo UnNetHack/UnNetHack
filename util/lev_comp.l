@@ -201,6 +201,7 @@ circle		{ savetoken(yytext); return circle_ID; }
 ellipse		{ savetoken(yytext); return ellipse_ID; }
 filter		{ savetoken(yytext); return filter_ID; }
 gradient	{ savetoken(yytext); return gradient_ID; }
+complement	{ savetoken(yytext); return complement_ID; }
 radial		{ savetoken(yytext); yylval.i=SEL_GRADIENT_RADIAL;  return GRADIENT_TYPE; }
 square		{ savetoken(yytext); yylval.i=SEL_GRADIENT_SQUARE;  return GRADIENT_TYPE; }
 dry		{ savetoken(yytext); yylval.i=DRY;  return HUMIDITY_TYPE; }
