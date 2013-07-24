@@ -204,8 +204,10 @@ boolean incr;	/* true iff via incremental experience growth */
 	    num = rn1((int)ACURR(A_WIS)/2 + urole.enadv.hirnd + urace.enadv.hirnd,
 			urole.enadv.hifix + urace.enadv.hifix);
 	num = enermod(num);	/* M. Stephenson */
-	u.uenmax += num;
-	u.uen += num;
+	if (!Role_if(PM_TOURIST)) { /* Tourists have no innate magic abilities */
+	    u.uenmax += num;
+	    u.uen += num;
+	}
 	if (u.ulevel < MAXULEV) {
 	    if (incr) {
 		long tmp = newuexp(u.ulevel + 1);
