@@ -1635,7 +1635,7 @@ arti_invoke(obj)
 	    cc.x = u.ux;
 	    cc.y = u.uy;
 	    /* Cause trouble if cursed or player is wrong role */
-	    if (obj->cursed || (Role_switch == oart->role || !oart->role)) {
+	    if (!obj->cursed && (Role_switch == oart->role || !oart->role)) {
 		You("may summon a stinking cloud.");
 		pline("Where do you want to center the cloud?");
 		if (getpos(&cc, TRUE, "the desired position") < 0) {
