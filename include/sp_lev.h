@@ -180,6 +180,7 @@ enum corefuncs {
     /* variable methods */
     COREFUNC_COORD_X,
     COREFUNC_COORD_Y,
+    COREFUNC_ARRAY_LEN,
 
     NUM_COREFUNCS
 };

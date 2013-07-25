@@ -45,6 +45,8 @@ STATIC_DCL void NDECL(count_features);
 STATIC_DCL boolean FDECL(create_subroom, (struct mkroom *, XCHAR_P, XCHAR_P,
 					XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
 
+long FDECL(opvar_array_length, (struct sp_coder *));
+
 #define LEFT	1
 #define H_LEFT	2
 #define CENTER	3
@@ -2742,6 +2744,7 @@ spo_corefunc(coder, fn)
     case COREFUNC_ROOM_HEI: i = opvar_new_int((coder->croom ? (coder->croom->hy - coder->croom->ly + 1) : 0)); splev_stack_push(coder->stack, i); break;
     case COREFUNC_ROOM_X: i = opvar_new_int((coder->croom ? coder->croom->lx : 0)); splev_stack_push(coder->stack, i); break;
     case COREFUNC_ROOM_Y: i = opvar_new_int((coder->croom ? coder->croom->ly : 0)); splev_stack_push(coder->stack, i); break;
+    case COREFUNC_ARRAY_LEN: i = opvar_new_int(opvar_array_length(coder)); splev_stack_push(coder->stack, i); break;
     case COREFUNC_RN2:
 	if (OV_pop_i(i)) {
 	    long li = ((OV_i(i) > 0) ? rn2(OV_i(i)) : 0);
@@ -5080,6 +5083,39 @@ create_new_array:
     opvar_free(arraylen);
 }
 
+
+long
+opvar_array_length(coder)
+     struct sp_coder *coder;
+{
+    struct opvar *vname;
+    struct splev_var *tmp;
+    long len = 0;
+
+    if (!coder) return 0;
+
+    vname = splev_stack_pop(coder->stack);
+    if (!vname) return 0;
+    if (vname->spovartyp != SPOVAR_VARIABLE) goto pass;
+
+    tmp = coder->frame->variables;
+    while (tmp) {
+	if (!strcmp(tmp->name, OV_s(vname))) {
+	    if ((tmp->svtyp & SPOVAR_ARRAY)) {
+		len = tmp->array_len;
+		if (len < 1) len = 0;
+	    }
+	    goto pass;
+	}
+	tmp = tmp->next;
+    }
+
+pass:
+    opvar_free(vname);
+    return len;
+}
+
+
 void
 spo_shuffle_array(coder)
      struct sp_coder *coder;
@@ -5092,8 +5128,10 @@ spo_shuffle_array(coder)
     if (!OV_pop_s(vname)) return;
 
     tmp = opvar_var_defined(coder, OV_s(vname));
-    if (!tmp || (tmp->array_len < 1)) return;
-
+    if (!tmp || (tmp->array_len < 1)) {
+	opvar_free(vname);
+	return;
+    }
     for (i = tmp->array_len - 1; i > 0; i--) {
 	if ((j = rn2(i + 1)) == i) continue;
 	tmp2 = tmp->data.arrayvalues[j];
