@@ -13,7 +13,6 @@
 	  when inhaling their vapors.
 	* Poison gas blasts leave a trail of stinking clouds (from UnNetHackPlus)
 	* Wearing fedora increases luck of archaeologists (from UnNetHackPlus)
-	* Dipping a wand of nothing into a potion of gain ability polymorphs the wand (by Grunt)
 	* Magical traps (except for magic portals and anti-magic fields) can be disarmed
 	  with a wand of cancellation (based on the patch by Malcolm Ryan)
 	* Applying zorkmids allows the player to flip a coin (code by Pasi Kallinen)
@@ -72,8 +71,6 @@
 	    - Replaced the Orb of Detection with Itlachiayaque as the Archeologist
 	      quest artifact: a shield of reflection that grants fire resistance,
 	      ESP, half spell damage, and produces stinking clouds when invoked (by L)
-
-(http://l.j-factor.com/nethack/itlachiayaque.diff)
 
 	* New config option for customizing monster letter in UTF8graphics:
 	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke
