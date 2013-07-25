@@ -107,12 +107,13 @@ LEVEL:"vlt-%04i"
 FLAGS:rndvault
 ROOM:"rndvault", random, random, random, (5,5) {
   SUBROOM:"rndvault", random, (2,2), (1,1), false {
+    IF [ level.depth < 3 ] { BREAK }
     $mons = MONSTER: { 'M', 'D', 'O', 'Z', 'T', 'H' }
     SHUFFLE: $mons
     MONSTER: $mons[0],(0,0),hostile
   }
-  REPLACE_TERRAIN:(0,0, 4,4), '-', 'F', 100%
-  REPLACE_TERRAIN:(0,0, 4,4), '|', 'F', 100%
+  REPLACE_TERRAIN:(0,0, 4,4), '-', 'F', 90%
+  REPLACE_TERRAIN:(0,0, 4,4), '|', 'F', 90%
 }
 
 
@@ -496,11 +497,12 @@ REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
 LEVEL:"vlt-%04i"
 FLAGS:rndvault
 ROOM:"rndvault", unlit, random, random, random {
-  $mon = monster: { (';', "giant eel"), (';', "electric eel"), (';', "kraken") }
-  SHUFFLE: $mon
   LOOP [1d3] {
     TERRAIN: random, 'P'
   }
+  IF [ level.depth < 3 ] { BREAK }
+  $mon = monster: { (';', "giant eel"), (';', "electric eel"), (';', "kraken") }
+  SHUFFLE: $mon
   MONSTER: $mon[0], random
 }
 
