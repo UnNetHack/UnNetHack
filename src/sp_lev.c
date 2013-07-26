@@ -5151,9 +5151,10 @@ STATIC_OVL boolean
 sp_level_coder(lvl)
 sp_lev *lvl;
 {
-    long exec_opcodes = 0;
+    unsigned long exec_opcodes = 0;
     int     tmpi;
     long room_stack = 0;
+    unsigned long max_execution = SPCODER_MAX_RUNTIME;
     struct sp_coder *coder = (struct sp_coder *)alloc(sizeof(struct sp_coder));
     if (!coder) panic("coder alloc");
     coder->frame = frame_new(0);
@@ -5165,6 +5166,11 @@ sp_lev *lvl;
     coder->exit_script = FALSE;
     coder->lvl_is_joined = 0;
     rndvault_failed = FALSE;
+
+    if (wizard) {
+	char *met = nh_getenv("SPCODER_MAX_RUNTIME");
+	if (met && met[0] == '1') max_execution = (1<<31) - 1;
+    }
 
     for (tmpi = 0; tmpi <= MAX_NESTED_ROOMS; tmpi++) {
 	coder->tmproomlist[tmpi] = (struct mkroom *)0;
@@ -5193,7 +5199,7 @@ sp_lev *lvl;
 
 	coder->stack = coder->frame->stack;
 
-	if (exec_opcodes++ > SPCODER_MAX_RUNTIME) {
+	if (exec_opcodes++ > max_execution) {
 	    impossible("Level script is taking too much time, stopping.");
 	    coder->exit_script = TRUE;
 	}
