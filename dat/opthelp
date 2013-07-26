@@ -162,11 +162,6 @@ sortloot      controls the sortloot patch [none]:
               loot -- When inventory letters are shown, has no effect.
                       Otherwise sorts by description
               none -- Works the traditional way, like without the patch
-suppress_alert disable various version-specific warnings about changes
-              in game play or the user interface, such as notification given
-              for the 'Q' command that quitting is now done via #quit
-              (e.g., use suppress_alert:3.3.1 to stop that and any other
-              notifications added in that version or earlier) default: [(none)]
 
 Compound options which may be set only on startup are:
 

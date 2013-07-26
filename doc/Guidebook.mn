@@ -2173,10 +2173,6 @@ Display a sparkly effect when a monster (including yourself) is hit by an
 attack to which it is resistant (default on).
 .lp standout
 Boldface monsters and ``\fB--More--\fP'' (default off).
-.lp suppress_alert
-This option may be set to a NetHack version level to suppress
-alert notification messages about feature changes for that 
-and prior versions (ex. ``suppress_alert:3.3.1'').
 .lp "time    "
 Show the elapsed game time in turns on bottom line (default off).
 .lp timed_delay

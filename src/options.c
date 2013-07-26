@@ -432,7 +432,7 @@ static struct Comp_Opt
 #endif
 	{ "statuscolor", "set status colors", PL_PSIZ, SET_IN_FILE },
 	{ "suppress_alert", "suppress alerts about version-specific features",
-						8, SET_IN_GAME },
+						8, SET_IN_FILE },
 	{ "tile_width", "width of tiles", 20, DISP_IN_GAME},	/*WC*/
 	{ "tile_height", "height of tiles", 20, DISP_IN_GAME},	/*WC*/
 	{ "tile_file", "name of tile file", 70, DISP_IN_GAME},	/*WC*/
