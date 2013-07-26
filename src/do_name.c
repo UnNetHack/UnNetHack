@@ -1214,7 +1214,8 @@ static const char * const bogusmons[] = {
 	"manbearpig",				/* South Park */
 	"ceiling cat", "basement cat",
 	"monorail cat",				/* the Internet is made for cat pix */
-	"rape golem",				/* schnippi */
+	"stoned golem", "wut golem", "nice golem",
+	"flash golem",				/* silly golems */
 	"tridude",				/* POWDER */
 	"orcus cosmicus",			/* Radomir Dopieralski */
 	"yeek", "quylthulg",
