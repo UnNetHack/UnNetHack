@@ -133,6 +133,12 @@ doread()
     "I couldn't afford this T-shirt so I stole it!",
     "End Mercantile Opacity Discrimination Now: Let Invisible Customers Shop!",
     "Elvira's House O'Succubi, granting the gift of immorality!",
+    "Mind Flayers Suck",
+    "I'm not wearing any pants",
+    "Newt Fodder",
+    "Pudding Farmer",
+    "Vegetarian",
+    "I plan to go to Astral",
     /* UnNetHack */
     "I made a NetHack fork and all I got was this lousy T-shirt!",	/* galehar */
 	    };
