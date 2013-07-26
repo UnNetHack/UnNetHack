@@ -15,6 +15,13 @@ x)	XUSERFILESEARCHPATH="$HACKDIR/%N.ad"
 esac
 export XUSERFILESEARCHPATH
 
+# copy default config file to home directory if none
+# exists for unnethack or vanilla
+if [ ! -e "$HOME/.unnethackrc" -a ! -e "$HOME/.nethackrc" ]
+then
+	cp "$HACKDIR/unnethackrc.default" "$HOME/.unnethackrc"
+fi
+
 # see if we can find the full path name of PAGER, so help files work properly
 # assume that if someone sets up a special variable (HACKPAGER) for NetHack,
 # it will already be in a form acceptable to NetHack
