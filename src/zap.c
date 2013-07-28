@@ -1646,6 +1646,7 @@ struct obj *obj, *otmp;
 	case WAN_NOTHING:
 	case SPE_HEALING:
 	case SPE_EXTRA_HEALING:
+	case WAN_SLEEP:
 		res = 0;
 		break;
 	case SPE_STONE_TO_FLESH:
