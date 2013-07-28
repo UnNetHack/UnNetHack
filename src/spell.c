@@ -53,23 +53,6 @@ STATIC_DCL const char *FDECL(spelltypemnemonic, (int));
  *	The arms penalty is lessened for trained fighters Bar, Kni, Ran,
  *	Sam, Val -
  *	the penalty is its metal interference, not encumbrance.
- *	The `spelspec' is a single spell which is fundamentally easier
- *	 for that role to cast.
- *
- *  spelspec, spelsbon:
- *	Arc map masters (SPE_MAGIC_MAPPING)
- *	Bar fugue/berserker (SPE_HASTE_SELF)
- *	Cav born to dig (SPE_DIG)
- *	Hea to heal (SPE_CURE_SICKNESS)
- *	Kni to turn back evil (SPE_TURN_UNDEAD)
- *	Mon to preserve their abilities (SPE_RESTORE_ABILITY)
- *	Pri to bless (SPE_REMOVE_CURSE)
- *	Ran to hide (SPE_INVISIBILITY)
- *	Rog to find loot (SPE_DETECT_TREASURE)
- *	Sam to be At One (SPE_CLAIRVOYANCE)
- *	Tou to smile (SPE_CHARM_MONSTER)
- *	Val control the cold (SPE_CONE_OF_COLD)
- *	Wiz all really, but SPE_MAGIC_MISSILE is their party trick
  *
  *	See percent_success() below for more comments.
  *
@@ -1226,9 +1209,6 @@ int spell;
 	if (uarmg && is_metallic(uarmg)) splcaster += uarmgbon;
 	if (uarmf && is_metallic(uarmf)) splcaster += uarmfbon;
 
-	if (spellid(spell) == urole.spelspec)
-		splcaster += urole.spelsbon;
-
 	/* `healing spell' bonus */
 	if (spellid(spell) == SPE_HEALING ||
 	    spellid(spell) == SPE_EXTRA_HEALING ||
@@ -1277,15 +1257,10 @@ int spell;
 	if (chance > 120) chance = 120;
 
 	/* Wearing anything but a light shield makes it very awkward
-	 * to cast a spell.  The penalty is not quite so bad for the
-	 * player's role-specific spell.
+	 * to cast a spell.
 	 */
 	if (uarms && weight(uarms) > (int) objects[SMALL_SHIELD].oc_weight) {
-		if (spellid(spell) == urole.spelspec) {
-			chance /= 2;
-		} else {
-			chance /= 4;
-		}
+		chance /= 4;
 	}
 
 	/* Finally, chance (based on player intell/wisdom and level) is
