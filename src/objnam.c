@@ -2879,6 +2879,10 @@ typfnd:
 			break;
 		case EGG:
 			mntmp = can_be_hatched(mntmp);
+			/* don't allow wishes for chromatic dragon eggs */
+			if (mntmp == PM_CHROMATIC_DRAGON && !wizard) {
+				mntmp = rn2(YELLOW_DRAGON_SCALES-GRAY_DRAGON_SCALES) + PM_GRAY_DRAGON;
+			}
 			if (mntmp != NON_PM) {
 			    otmp->corpsenm = mntmp;
 			    if (!dead_species(mntmp, TRUE))
