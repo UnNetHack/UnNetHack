@@ -571,3 +571,56 @@ ROOM:"ordinary", random, random, random, random {
      TERRAIN:coord($mx, $my), $terr[0]
   }
 }
+
+
+# Trap Room
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+ROOM:"rndvault", random, random, random, random {
+  $area = room.width * room.height
+  $ntraps = rnd($area / 3) + ($area / 4)
+  SWITCH [ 6 ] {
+      CASE 0:
+        LOOP [ $ntraps ] {
+           IF [ 50% ] {
+      	      TRAP: "pit", random
+	   } ELSE {
+      	      TRAP: "spiked pit", random
+	   }
+        }
+        BREAK
+      CASE 1:
+        LOOP [ $ntraps ] {
+      	   TRAP: "land mine", random
+        }
+        BREAK
+      CASE 2:
+        LOOP [ $ntraps ] {
+      	   TRAP: "falling rock", random
+        }
+        BREAK
+      CASE 3:
+        LOOP [ $ntraps ] {
+      	   TRAP: "fire", random
+        }
+        BREAK
+      CASE 4:
+        LOOP [ $ntraps ] {
+           IF [ 50% ] {
+      	      TRAP: "trap door", random
+	   } ELSE {
+      	      TRAP: "hole", random
+	   }
+        }
+        BREAK
+      CASE 5:
+        LOOP [ $ntraps ] {
+           IF [ 50% ] {
+      	      TRAP: "arrow", random
+	   } ELSE {
+      	      TRAP: "dart", random
+	   }
+        }
+        BREAK
+  }
+}
