@@ -118,6 +118,9 @@ int obj_containment = 0;
 
 int in_container_obj = 0;
 
+/* integer value is possibly an inconstant value (eg. dice notation or a variable) */
+int is_inconstant_number = 0;
+
 int in_switch_statement = 0;
 static struct opvar *switch_check_jump = NULL;
 static struct opvar *switch_default_case = NULL;
@@ -869,7 +872,11 @@ comparestmt     : PERCENT
                   }
 		;
 
-switchstatement	: SWITCH_ID '[' integer_or_var ']'
+switchstatement	: SWITCH_ID
+		  {
+		      is_inconstant_number = 0;
+		  }
+		  '[' integer_or_var ']'
 		  {
 		      struct opvar *chkjmp;
 		      if (in_switch_statement > 0)
@@ -880,7 +887,9 @@ switchstatement	: SWITCH_ID '[' integer_or_var ']'
 		      n_switch_case_list = 0;
 		      switch_default_case = NULL;
 
-		      add_opvars(splev, "o", SPO_RN2);
+		      if (!is_inconstant_number)
+			  add_opvars(splev, "o", SPO_RN2);
+		      is_inconstant_number = 0;
 
 		      chkjmp = New(struct opvar);
 		      set_opvar_int(chkjmp, splev->n_opcodes+1);
@@ -2350,13 +2359,14 @@ string_expr	: string_or_var                 { }
 		;
 
 math_expr_var	: INTEGER                       { add_opvars(splev, "i", $1 ); }
-		| dice				{ }
+		| dice				{ is_inconstant_number = 1; }
 		| '(' MINUS_INTEGER ')'         { add_opvars(splev, "i", $2 ); }
-		| corefunc_int			{ }
+		| corefunc_int			{ is_inconstant_number = 1; }
 		| METHOD_INT
 		  {
 		      add_opvars(splev, "v", $1.varstr);
 		      add_opvars(splev, "io", $1.cfunc, SPO_COREFUNC);
+		      is_inconstant_number = 1;
 		  }
 		| VARSTRING_INT
 		  {
@@ -2364,6 +2374,7 @@ math_expr_var	: INTEGER                       { add_opvars(splev, "i", $1 ); }
 		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
+		      is_inconstant_number = 1;
 		  }
 		| VARSTRING_INT_ARRAY '[' math_expr_var ']'
 		  {
@@ -2371,6 +2382,7 @@ math_expr_var	: INTEGER                       { add_opvars(splev, "i", $1 ); }
 		      vardef_used(variable_definitions, $1);
 		      add_opvars(splev, "v", $1);
 		      Free($1);
+		      is_inconstant_number = 1;
 		  }
 		| math_expr_var '+' math_expr_var       { add_opvars(splev, "o", SPO_MATH_ADD); }
 		| math_expr_var '-' math_expr_var       { add_opvars(splev, "o", SPO_MATH_SUB); }
