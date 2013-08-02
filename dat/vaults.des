@@ -624,3 +624,16 @@ ROOM:"rndvault", random, random, random, random {
         BREAK
   }
 }
+
+
+# Underground rivers
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+  
+  
+ENDMAP
+$terr = terrain: { ('L', lit), 'P' }
+SHUFFLE:$terr
+SPILL:random, $terr[0], north, 2d4
