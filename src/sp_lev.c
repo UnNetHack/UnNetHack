@@ -4774,6 +4774,7 @@ spo_map(coder)
     xchar halign, valign;
     xchar tmpxstart, tmpystart, tmpxsize, tmpysize;
     int tryct = 0;
+    unpacked_coord upc;
 
     if (!OV_pop_i(mpxs) ||
 	!OV_pop_i(mpys) ||
@@ -4787,8 +4788,10 @@ redo_maploc:
     tmpmazepart.xsize = OV_i(mpxs);
     tmpmazepart.ysize = OV_i(mpys);
     tmpmazepart.zaligntyp = OV_i(mpzalign);
-    tmpmazepart.halign = SP_COORD_X(OV_i(mpa));
-    tmpmazepart.valign = SP_COORD_Y(OV_i(mpa));
+
+    upc = get_unpacked_coord(OV_i(mpa), ANY_LOC);
+    tmpmazepart.halign = upc.x;
+    tmpmazepart.valign = upc.y;
 
     tmpxsize = xsize; tmpysize = ysize;
     tmpxstart = xstart; tmpystart = ystart;
@@ -4824,7 +4827,7 @@ redo_maploc:
 	    xsize = COLNO-1-tmpmazepart.xsize;
 	    ysize = ROWNO-tmpmazepart.ysize;
 	}
-	get_location(&halign, &valign, ANY_LOC, coder->croom);
+	get_location_coord(&halign, &valign, ANY_LOC, coder->croom, OV_i(mpa));
 	xsize = tmpmazepart.xsize;
 	ysize = tmpmazepart.ysize;
 	xstart = halign;
