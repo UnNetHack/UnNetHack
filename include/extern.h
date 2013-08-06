@@ -92,6 +92,7 @@ E const char *FDECL(get_warned_of_monster, (struct obj *));
 E boolean FDECL(adjattrib, (int,int,int));
 E void FDECL(change_luck, (SCHAR_P));
 E int FDECL(stone_luck, (BOOLEAN_P));
+E boolean NDECL(has_luckitem);
 E void NDECL(set_moreluck);
 E void FDECL(gainstr, (struct obj *,int));
 E void FDECL(losestr, (int));

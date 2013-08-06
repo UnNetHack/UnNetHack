@@ -228,14 +228,22 @@ boolean parameter; /* So I can't think up of a good name.  So sue me. --KAA */
 	return sgn((int)bonchance);
 }
 
+boolean
+has_luckitem()
+{
+	register struct obj *otmp;
+
+	for (otmp = invent; otmp; otmp = otmp->nobj)
+	    if (confers_luck(otmp)) return TRUE;
+	return FALSE;
+}
+
 /* there has just been an inventory change affecting a luck-granting item */
 void
 set_moreluck()
 {
-	int luckbon = stone_luck(TRUE);
-
-	if (!luckbon && !carrying(LUCKSTONE)) u.moreluck = 0;
-	else if (luckbon >= 0) u.moreluck = LUCKADD;
+	if (!has_luckitem()) u.moreluck = 0;
+	else if (stone_luck(TRUE) >= 0) u.moreluck = LUCKADD;
 	else u.moreluck = -LUCKADD;
 }
 

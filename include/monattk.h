@@ -80,12 +80,14 @@
 #define AD_ENCH		41	/* remove enchantment (disenchanter) */
 #define AD_CORR		42	/* corrode armor (black pudding) */
 #define AD_FREZ		43	/* freezing attack (blue slime) */
-#define AD_HEAD		50	/* decapitate (vorpal jabberwock) */
+#define AD_HEAD		44	/* decapitate (vorpal jabberwock) */
 
-#define AD_PUNI		44	/* punisher spells */
+#define AD_PUNI		45	/* punisher spells */
 
-#define AD_LVLT		51	/* level teleport (weeping angel) */
-#define AD_BLNK		52	/* mental invasion (weeping angel) */
+#define AD_LVLT		46	/* level teleport (weeping angel) */
+#define AD_BLNK		47	/* mental invasion (weeping angel) */
+
+#define AD_LUCK		48	/* drain luck (evil eye) */
 
 #define AD_CLRC		240	/* random clerical spell */
 #define AD_SPEL		241	/* random magic spell */

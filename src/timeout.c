@@ -192,20 +192,49 @@ nh_timeout()
 	if (Role_if(PM_ARCHEOLOGIST) && uarmh && uarmh->otyp == FEDORA) {
 	    baseluck += lucky_fedora();
 	}
-	if (u.uluck != baseluck &&
-		moves % (u.uhave.amulet || u.ugangr ? 300 : 600) == 0) {
-	/* Cursed luckstones stop bad luck from timing out; blessed luckstones
-	 * stop good luck from timing out; normal luckstones stop both;
-	 * neither is stopped if you don't have a luckstone.
+	if (u.uluck != baseluck) {
+	    int timeout = 600;
+	    int time_luck = stone_luck(FALSE);
+	/* Cursed luckstones slow bad luck timing out; blessed luckstones
+	 * slow good luck timing out; normal luckstones slow both;
+	 * neither is affected if you don't have a luckstone.
 	 * Luck is based at 0 usually, +1 if a full moon and -1 on Friday 13th
 	 */
-	    register int time_luck = stone_luck(FALSE);
-	    boolean nostone = !carrying(LUCKSTONE) && !stone_luck(TRUE);
+	    if (has_luckitem() && 
+		    (!time_luck ||
+		     (time_luck > 0 && u.uluck > baseluck) ||
+		     (time_luck < 0 && u.uluck < baseluck))) {
 
-	    if(u.uluck > baseluck && (nostone || time_luck < 0))
-		u.uluck--;
-	    else if(u.uluck < baseluck && (nostone || time_luck > 0))
-		u.uluck++;
+		/* The slowed timeout depends on the distance between your 
+		 * luck (not including luck bonuses) and your base luck.
+		 * 
+		 * distance	timeout
+		 * --------------------
+		 *  1		24800
+		 *  2		24200
+		 *  3		23200
+		 *  4		21800
+		 *  5		20000
+		 *  6		17800
+		 *  7		15200
+		 *  8		12200
+		 *  9		8800
+		 *  10		5000
+		 *  11		800
+		 */ 
+		int base_dist = u.uluck - baseluck;
+		int slow_timeout = 25000 - 200 * (base_dist * base_dist);
+		if (slow_timeout > timeout) timeout = slow_timeout;
+	    }
+
+	    if (u.uhave.amulet || u.ugangr) timeout = timeout / 2;
+
+	    if (moves % timeout == 0) {
+		if(u.uluck > baseluck)
+		    u.uluck--;
+		else if(u.uluck < baseluck)
+		    u.uluck++;
+	    }
 	}
 #ifdef CONVICT
     if(Phasing) phasing_dialogue();

@@ -647,6 +647,24 @@ int thrown;
 #endif
     {
 	    Strcpy(saved_oname, cxname(obj));
+	    if (mdat == &mons[PM_EVIL_EYE] && confers_luck(obj)) {
+		if (obj->blessed) {
+		    pline("%s screams at the touch of your %s!",
+			    Monnam(mon), saved_oname);
+		    killed(mon);
+		    return FALSE;
+		} else if (obj->cursed) { 
+		    pline("Your %s passes harmlessly through %s.", 
+			    saved_oname, mon_nam(mon));
+		    if (mon->mhp < mon->mhpmax) {
+			mon->mhp += d(4,6); 
+			if (mon->mhp > mon->mhpmax) mon->mhp = mon->mhpmax;
+			pline("%s looks better!", Monnam(mon));
+		    }
+		    return TRUE;
+		}
+	    } 
+
 	    if(obj->oclass == WEAPON_CLASS || is_weptool(obj) ||
 #ifdef CONVICT
 	       obj->oclass == GEM_CLASS || obj->otyp == HEAVY_IRON_BALL) {

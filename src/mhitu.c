@@ -2210,6 +2210,29 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 		    if (dmg) mdamageu(mtmp, dmg);
 		}
 		break;
+	    case AD_LUCK:
+		if(!mtmp->mcan && canseemon(mtmp) && 
+			couldsee(mtmp->mx, mtmp->my) && 
+			mtmp->mcansee && !mtmp->mspec_used && rn2(5)) {
+		    pline("%s glares ominously at you!", Monnam(mtmp));
+		    mtmp->mspec_used = mtmp->mspec_used + d(2,6);
+
+		    if (uwep && uwep->otyp == MIRROR && uwep->blessed) {
+			pline("%s sees its own glare in your mirror.",
+				Monnam(mtmp)); 
+			pline("%s is cancelled!", Monnam(mtmp));
+			mtmp->mcan = 1;
+			monflee(mtmp, 0, FALSE, TRUE);
+		    } else if((uwep && !uwep->cursed && confers_luck(uwep)) || 
+			    (stone_luck(TRUE) > 0 && rn2(4))) {
+			pline("Luckily, you are not affected.");
+		    } else {
+			You_feel("your luck running out.");
+			change_luck(-1);
+		    }
+		    stop_occupation();
+		}
+		break;
 #ifdef PM_BEHOLDER /* work in progress */
 	    case AD_SLEE:
 		if(!mtmp->mcan && canseemon(mtmp) &&

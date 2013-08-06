@@ -48,6 +48,9 @@
 	  your own god sends a hostile monster, it will always be an Aleax (by L)
 	* Applying certain wands has a chance of creating a related trap
 	* Remove bonus for role special spells
+	* Luckstones dramatically slow luck timeout instead of preventing it
+	  completely. Blessed luckstones slow the timeout of positive luck,
+	  cursed luckstones negative luck, and uncursed luckstones both.
 	
 
 	* Artifact changes:
@@ -89,6 +92,7 @@
 	  - weeping angels
 	  - weeping archangels
 	  - deep orcs
+	  - evil eyes
 
 	* new levels:
 	  - Black market version with One-eyed Sam promoted to management

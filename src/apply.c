@@ -718,6 +718,15 @@ struct obj *obj;
 		if ( (int) mtmp->mfrozen + tmp > 127)
 			mtmp->mfrozen = 127;
 		else mtmp->mfrozen += tmp;
+	} else if(!mtmp->mcan && !mtmp->minvis && 
+		mtmp->data == &mons[PM_EVIL_EYE]) {
+	    if (vis) {
+		pline("%s sees its own glare in your mirror.", 
+			Monnam(mtmp));
+		pline("%s is cancelled!", Monnam(mtmp));
+	    }
+	    mtmp->mcan = 1;
+	    monflee(mtmp, 0, FALSE, TRUE);
 	} else if(!mtmp->mcan && !mtmp->minvis &&
 					mtmp->data == &mons[PM_UMBER_HULK]) {
 		if (vis)
