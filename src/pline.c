@@ -442,6 +442,13 @@ register struct monst *mtmp;
 		mtmp->mhpmax,
 		find_mac(mtmp),
 		info);
+
+	/* Heisenberg's code */
+	if (mtmp->data == &mons[PM_QUANTUM_MECHANIC]) {
+	    pline("Having determined %s's speed, you are unable to know its location.", mon_nam(mtmp));
+	    rloc(mtmp, FALSE);
+	    newsym(mtmp->mx, mtmp->my);
+	}
 }
 
 void

@@ -368,7 +368,8 @@ struct monst *mtmp;
 		otmp->dknown = 1;	/* treat as "seen" */
 	    (void) display_minventory(mtmp, MINV_ALL, (char *)0);
 	} else {
-	    pline("%s is not carrying anything.", noit_Monnam(mtmp));
+	    pline("%s %s not carrying anything.", noit_Monnam(mtmp),
+		mtmp->data == &mons[PM_QUANTUM_MECHANIC] ? "was" : "is");
 	}
 }
 
