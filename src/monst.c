@@ -2030,7 +2030,7 @@ struct permonst _mons2[] = {
 	M3_INFRAVISIBLE, CLR_BLUE),
 #ifdef WEBB_DISINT
     MON("disintegrator", S_RUSTMONST,
-	LVL(18, 8, 0, 20, -3), (G_SHEOL|G_HELL|G_GENO|G_NOCORPSE|1),
+	LVL(18, 8, 0, 20, -3), (G_GENO|G_NOCORPSE|G_NOGEN),
 	A(ATTK(AT_CLAW, AD_DISN, 4, 4), /* don't want passive, disintegration
 	                                   has to intercept attacks */
 	  NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
@@ -2146,6 +2146,22 @@ struct permonst _mons2[] = {
 	  NO_ATTK, NO_ATTK),
 	SIZ(1200, 500, 0, MS_SILENT, MZ_LARGE), 0, 0,
 	M1_TUNNEL|M1_CARNIVORE, M2_STRONG, M3_INFRAVISIBLE, CLR_BROWN),
+/*
+ * Placeholder for the random creature...
+ *
+ * None of these stats have any significance, they're just to ensure
+ * that if one does get accidentally generated in the 'normal' way
+ * (without a remapped permonst) that nothing useful happens.
+ *
+ * Also note that the LVL value will affect your generated
+ * monster's internal difficulty in monstr.h; be careful to leave this
+ * fairly high as random permutations of ATTK() could make it nasty
+ */
+	MON("shambling horror", S_UMBER,
+	LVL(10, 12, 0, 0, 0), (G_NOCORPSE|2),
+	A(NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+	SIZ(25, 25, 0, MS_SILENT, MZ_TINY), 0, 0,
+	M1_CARNIVORE, M3_INFRAVISIBLE, 0, DRAGON_SILVER),
 /*
  * Vampires
  */

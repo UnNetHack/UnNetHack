@@ -323,8 +323,8 @@ struct mkroom *sroom;
 		         &mons[PM_LEMURE]) :
 		    (type == LEPREHALL) ? &mons[PM_LEPRECHAUN] :
 		    (type == COCKNEST) ? &mons[PM_COCKATRICE] :
-                   (type == ARMORY) ? (rn2(3) ? mkclass(S_RUSTMONST,0) :
-                       &mons[PM_BROWN_PUDDING]) :
+                   (type == ARMORY) ? (rn2(3) ? (rn2(2) ? &mons[PM_RUST_MONSTER] :
+			&mons[PM_DISENCHANTER]) : &mons[PM_BROWN_PUDDING]) :
 		    (type == ANTHOLE) ? antholemon() :
 		    (struct permonst *) 0,
 		   sx, sy, NO_MM_FLAGS);

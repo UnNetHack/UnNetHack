@@ -1505,7 +1505,7 @@ dopois:
 			pline("You're covered in acid, but it seems harmless.");
 			dmg = 0;
 		    } else {
-			pline("You're covered in acid!	It burns!");
+			pline("You're covered in acid!  It burns!");
 			exercise(A_STR, FALSE);
 		    }
 		else		dmg = 0;
