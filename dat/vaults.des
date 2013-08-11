@@ -637,3 +637,15 @@ ENDMAP
 $terr = terrain: { ('L', lit), 'P' }
 SHUFFLE:$terr
 SPILL:random, $terr[0], north, 2d4
+
+
+# Trapped disintegrator
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+ROOM:"rndvault", random, random, random, (5,5) {
+  SUBROOM:"rndvault", random, (2,2), (1,1), false {
+    MONSTER:('R',"disintegrator"),(0,0),hostile
+  }
+  REPLACE_TERRAIN:(0,0, 4,4), '-', 'P', 100%
+  REPLACE_TERRAIN:(0,0, 4,4), '|', 'P', 100%
+}
