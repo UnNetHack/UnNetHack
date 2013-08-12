@@ -368,6 +368,7 @@ struct monst *mtmp;
 		otmp->dknown = 1;	/* treat as "seen" */
 	    (void) display_minventory(mtmp, MINV_ALL, (char *)0);
 	} else {
+	    /* quantum mechanics don't stay in one place when probed */
 	    pline("%s %s not carrying anything.", noit_Monnam(mtmp),
 		mtmp->data == &mons[PM_QUANTUM_MECHANIC] ? "was" : "is");
 	}
