@@ -967,8 +967,16 @@ register int pm;
 		}
 		break;
 	    case PM_EVIL_EYE:
-		You_feel("more fortunate.");
-		change_luck(rnd(3));
+		if (victual.piece->blessed) {
+		    You_feel("more fortunate.");
+		    change_luck(rnd(3));
+		} else if (victual.piece->cursed) {
+		    You_feel("less fortunate.");
+		    change_luck(-rnd(3));
+		} else {
+		    You_feel("your fortunes in flux.");
+		    change_luck(2-rn2(4));
+		}
 		break;
 	    case PM_MIND_FLAYER:
 	    case PM_MASTER_MIND_FLAYER:
