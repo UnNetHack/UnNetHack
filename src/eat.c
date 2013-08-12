@@ -978,6 +978,10 @@ register int pm;
 		else {
 			pline("For some reason, that tasted bland.");
 		}
+	    case PM_EVIL_EYE:
+		You_feel("more fortunate.");
+		change_luck(rnd(3));
+		break;
 		/* fall through to default case */
 	    default: {
 		register struct permonst *ptr = &mons[pm];
