@@ -966,6 +966,10 @@ register int pm;
 		    polyself(FALSE);
 		}
 		break;
+	    case PM_EVIL_EYE:
+		You_feel("more fortunate.");
+		change_luck(rnd(3));
+		break;
 	    case PM_MIND_FLAYER:
 	    case PM_MASTER_MIND_FLAYER:
 		if (ABASE(A_INT) < ATTRMAX(A_INT)) {
@@ -978,10 +982,6 @@ register int pm;
 		else {
 			pline("For some reason, that tasted bland.");
 		}
-	    case PM_EVIL_EYE:
-		You_feel("more fortunate.");
-		change_luck(rnd(3));
-		break;
 		/* fall through to default case */
 	    default: {
 		register struct permonst *ptr = &mons[pm];
