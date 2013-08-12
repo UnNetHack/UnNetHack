@@ -445,9 +445,10 @@ register struct monst *mtmp;
 
 	/* Heisenberg's code */
 	if (mtmp->data == &mons[PM_QUANTUM_MECHANIC]) {
-	    pline("Having determined %s's speed, you are unable to know its location.", mon_nam(mtmp));
-	    rloc(mtmp, FALSE);
-	    newsym(mtmp->mx, mtmp->my);
+	    if (canspotmon(mtmp))
+		pline("Having determined %s's speed, you are unable to know its location.",
+			mon_nam(mtmp));
+	    (void) rloc(mtmp, FALSE);
 	}
 }
 

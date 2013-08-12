@@ -301,7 +301,8 @@ use_stethoscope(obj)
 			mtmp->mundetected = 0;
 			if (cansee(rx,ry)) newsym(mtmp->mx,mtmp->my);
 		}
-		if (!canspotmon(mtmp))
+		/* workaround for Heisenberg's code */
+		if (!canspotmon(mtmp) && mtmp->data != &mons[PM_QUANTUM_MECHANIC])
 			map_invisible(rx,ry);
 		return res;
 	}

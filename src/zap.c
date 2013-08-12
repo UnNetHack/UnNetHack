@@ -343,8 +343,9 @@ struct obj *otmp;
 	 * might be an invisible worm hit on the tail.
 	 */
 	if (reveal_invis) {
+	    /* workaround for Heisenberg's code */
 	    if (mtmp->mhp > 0 && cansee(bhitpos.x, bhitpos.y) &&
-							!canspotmon(mtmp))
+			!canspotmon(mtmp) && mtmp->data != &mons[PM_QUANTUM_MECHANIC])
 		map_invisible(bhitpos.x, bhitpos.y);
 	}
 	return 0;
@@ -368,7 +369,7 @@ struct monst *mtmp;
 		otmp->dknown = 1;	/* treat as "seen" */
 	    (void) display_minventory(mtmp, MINV_ALL, (char *)0);
 	} else {
-	    /* quantum mechanics don't stay in one place when probed */
+	     /* quantum mechanics don't stay in one place when probed */
 	    pline("%s %s not carrying anything.", noit_Monnam(mtmp),
 		mtmp->data == &mons[PM_QUANTUM_MECHANIC] ? "was" : "is");
 	}
