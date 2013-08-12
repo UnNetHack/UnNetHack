@@ -449,6 +449,9 @@ register struct monst *mtmp;
 		pline("Having determined %s's speed, you are unable to know its location.",
 			mon_nam(mtmp));
 	    (void) rloc(mtmp, FALSE);
+	} else if (mtmp->data == &mons[PM_CTHULHU]) {
+	    pline("There are some things incapable of being understood!");
+	    make_confused(HConfusion + rnd(20), FALSE);
 	}
 }
 
