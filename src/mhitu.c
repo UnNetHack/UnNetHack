@@ -582,6 +582,7 @@ mattacku(mtmp)
 
 		case AT_EXPL:	/* automatic hit if next to, and aimed at you */
 			if(!range2) sum[i] = explmu(mtmp, mattk, foundyou);
+			if (mdat == &mons[PM_DUNGEON_FERN_SPORE]) spore_dies(mtmp);
 			break;
 
 		case AT_ENGL:
@@ -2231,6 +2232,16 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 			change_luck(-1);
 		    }
 		    stop_occupation();
+		}
+		break;
+	    case AD_SPOR:
+		/* release a spore if the player is nearby */
+		if (!mtmp->mcan && distu(mtmp->mx, mtmp->my) <= 100 && !rn2(3)) {
+		    coord mm;
+		    mm.x = mtmp->mx; mm.y = mtmp->my;
+		    enexto(&mm, mm.x, mm.y, &mons[PM_DUNGEON_FERN_SPORE]);
+		    makemon(&mons[PM_DUNGEON_FERN_SPORE], mm.x, mm.y, NO_MM_FLAGS);
+		    if (canseemon(mtmp)) pline("%s releases a spore!", Monnam(mtmp));
 		}
 		break;
 #ifdef PM_BEHOLDER /* work in progress */

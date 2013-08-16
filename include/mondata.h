@@ -190,6 +190,8 @@
 #define is_weeping(ptr)		((ptr) == &mons[PM_WEEPING_ANGEL] || \
 				 (ptr) == &mons[PM_WEEPING_ARCHANGEL])
 
+#define is_vegetation(ptr)	((ptr) == &mons[PM_DUNGEON_FERN])
+
 #ifdef WEBB_DISINT
 # define touch_disintegrates(ptr) ((ptr) == &mons[PM_DISINTEGRATOR])
 #endif

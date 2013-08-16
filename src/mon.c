@@ -1331,6 +1331,17 @@ struct monst *magr,	/* monster that is currently deciding where to move */
 	if(ma == &mons[PM_RAVEN] && md == &mons[PM_FLOATING_EYE])
 		return ALLOW_M|ALLOW_TM;
 
+	/* dungeon fern spores hate everything */
+	if(ma == &mons[PM_DUNGEON_FERN_SPORE] &&
+			md != &mons[PM_DUNGEON_FERN] &&
+			md != &mons[PM_DUNGEON_FERN_SPORE])
+		return ALLOW_M|ALLOW_TM;
+	/* and everything hates them */
+	if(md == &mons[PM_DUNGEON_FERN_SPORE] &&
+			ma != &mons[PM_DUNGEON_FERN] &&
+			ma != &mons[PM_DUNGEON_FERN_SPORE])
+		return ALLOW_M|ALLOW_TM;
+
 	return 0L;
 }
 
@@ -1752,6 +1763,18 @@ struct monst *mon; /**< Cthulhu's struct */
 	}
 }
 
+void
+spore_dies(mon)
+struct monst *mon;
+{
+	if (mon->mhp <= 0) {
+		coord mm;
+		mm.x = mon->mx; mm.y = mon->my;
+		create_gas_cloud(mm.x, mm.y, rn1(2,1), rnd(8), rn1(3,2));
+		if (!rn2(3)) makemon(&mons[PM_DUNGEON_FERN], mm.x, mm.y, NO_MM_FLAGS);
+	}
+}
+
 /** drop (perhaps) a cadaver and remove monster */
 void
 mondied(mdef)
@@ -1922,6 +1945,10 @@ int how;
 		cthulhu_dies(mdef);
 	}
 
+	if (mdef->data == &mons[PM_DUNGEON_FERN_SPORE]) {
+		spore_dies(mdef);
+	}
+
 	if (be_sad && mdef->mhp <= 0) {
 		if (kenny || (Hallucination && !rn2(4))) {
 			verbalize("Oh my god, they killed Kenny!");
@@ -2029,6 +2056,10 @@ xkilled(mtmp, dest)
 
 	if (mdat == &mons[PM_CTHULHU]) {
 		cthulhu_dies(mtmp);
+	}
+
+	if (mdat == &mons[PM_DUNGEON_FERN_SPORE]) {
+		spore_dies(mtmp);
 	}
 
 	if (stoned) {

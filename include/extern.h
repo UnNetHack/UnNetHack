@@ -1101,6 +1101,7 @@ E int FDECL(could_seduce, (struct monst *,struct monst *,struct attack *));
 E int FDECL(doseduce, (struct monst *));
 #endif
 E void FDECL(maybe_freeze_u, (int*));
+E void FDECL(spore_dies, (struct monst *));
 
 /* ### minion.c ### */
 

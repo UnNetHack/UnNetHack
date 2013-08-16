@@ -88,6 +88,7 @@
 #define AD_BLNK		47	/* mental invasion (weeping angel) */
 
 #define AD_LUCK		48	/* drain luck (evil eye) */
+#define AD_SPOR		49	/* generate spore */
 
 #define AD_CLRC		240	/* random clerical spell */
 #define AD_SPEL		241	/* random magic spell */

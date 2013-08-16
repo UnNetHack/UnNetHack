@@ -328,6 +328,7 @@ mattackm(magr, mdef)
 
 	    case AT_EXPL:
 		res[i] = explmm(magr, mdef, mattk);
+		if (magr->data == &mons[PM_DUNGEON_FERN_SPORE]) spore_dies(magr);
 		if (res[i] == MM_MISS) { /* cancelled--no attack */
 		    strike = 0;
 		    attk = 0;
@@ -459,7 +460,7 @@ gazemm(magr, mdef, mattk)
 	char buf[BUFSZ];
 
 	if(vis) {
-	    /* The gaze attack of weeping (arch)angels isn't active like others */
+	    /* the gaze attack of weeping (arch)angels isn't active like others */
 	    if (is_weeping(magr->data)) {
 		if (mon_reflects(mdef, (char *)0)) {
 		    return (MM_MISS);
@@ -467,6 +468,9 @@ gazemm(magr, mdef, mattk)
 		    Sprintf(buf,"%s is staring at", Monnam(magr));
 		    pline("%s %s.", buf, mon_nam(mdef));
 		}
+	    /* ranged actions of plants are implemented as gaze attacks */
+	    } else if (is_vegetation(magr->data)) {
+		return (MM_MISS);
 	    } else {
 		Sprintf(buf,"%s gazes at", Monnam(magr));
 		pline("%s %s...", buf, mon_nam(mdef));

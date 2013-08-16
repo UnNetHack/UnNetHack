@@ -2383,6 +2383,9 @@ boolean			youattack, allow_cancel_kill, self_cancel;
 				case AD_DISN:
 					msg = "less disintegrative";
 					break;
+				case AD_SPOR:
+					msg = "dormant";
+					break;
 				default:
 					break;
 			}
