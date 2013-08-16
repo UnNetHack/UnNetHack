@@ -1584,7 +1584,9 @@ register struct obj	*sobj;
 						8+4*bcsign(sobj), rn1(3,4));
 		    }
 		} else {
-		    (void) create_critters(30 + rn2(70), &mons[PM_GAS_SPORE]);
+		    int i;
+		    for (i = 0; i < 30 + rn2(70); i++)
+			makemon(&mons[PM_GAS_SPORE], 0, 0, NO_MM_FLAGS);
 		}
 		break;
 	}
