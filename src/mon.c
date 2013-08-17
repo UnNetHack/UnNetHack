@@ -1333,13 +1333,13 @@ struct monst *magr,	/* monster that is currently deciding where to move */
 
 	/* dungeon fern spores hate everything */
 	if(ma == &mons[PM_DUNGEON_FERN_SPORE] &&
-			md != &mons[PM_DUNGEON_FERN] &&
-			md != &mons[PM_DUNGEON_FERN_SPORE])
+			md != &mons[PM_DUNGEON_FERN_SPORE] &&
+			!is_vegetation(md))
 		return ALLOW_M|ALLOW_TM;
 	/* and everything hates them */
 	if(md == &mons[PM_DUNGEON_FERN_SPORE] &&
-			ma != &mons[PM_DUNGEON_FERN] &&
-			ma != &mons[PM_DUNGEON_FERN_SPORE])
+			ma != &mons[PM_DUNGEON_FERN_SPORE] &&
+			!is_vegetation(ma))
 		return ALLOW_M|ALLOW_TM;
 
 	return 0L;
@@ -1771,7 +1771,10 @@ struct monst *mon;
 		coord mm;
 		mm.x = mon->mx; mm.y = mon->my;
 		create_gas_cloud(mm.x, mm.y, rn1(2,1), rnd(8), rn1(3,2));
-		if (!rn2(3)) makemon(&mons[PM_DUNGEON_FERN], mm.x, mm.y, NO_MM_FLAGS);
+		if (!rn2(3)) {
+			if (!rn2(6)) makemon(&mons[PM_DUNGEON_FERN], mm.x, mm.y, NO_MM_FLAGS);
+			else makemon(&mons[PM_DUNGEON_FERN_SPROUT], mm.x, mm.y, NO_MM_FLAGS);
+		}
 	}
 }
 

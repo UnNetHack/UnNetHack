@@ -2236,7 +2236,8 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 		break;
 	    case AD_SPOR:
 		/* release a spore if the player is nearby */
-		if (!mtmp->mcan && distu(mtmp->mx, mtmp->my) <= 96 && !rn2(3)) {
+		if (!mtmp->mcan && distu(mtmp->mx, mtmp->my) <= 96 &&
+			mtmp->data == &mons[PM_DUNGEON_FERN] ? !rn2(2) : !rn2(4)) {
 		    coord mm;
 		    mm.x = mtmp->mx; mm.y = mtmp->my;
 		    enexto(&mm, mm.x, mm.y, &mons[PM_DUNGEON_FERN_SPORE]);
