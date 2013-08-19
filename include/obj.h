@@ -250,9 +250,9 @@ struct obj {
 #define Is_dragon_mail(idx)	(idx >= GRAY_DRAGON_SCALE_MAIL && \
 				 idx <= CHROMATIC_DRAGON_SCALE_MAIL)
 #define Is_dragon_armor(idx)	(Is_dragon_scales(idx) || Is_dragon_mail(idx))
-#define Is_gold_dragon_armor(idx)	(Is_dragon_armor(idx) && \
+#define Is_glowing_dragon_armor(idx)	(Is_dragon_armor(idx) && \
 					 (OBJ_DESCR(objects[idx])) && \
-					 (!strncmp(OBJ_DESCR(objects[idx]), "gold ", 5)))
+					 (!strncmp(OBJ_DESCR(objects[idx]), "glowing ", 5)))
 #define Dragon_scales_to_mail(idx) (idx - GRAY_DRAGON_SCALES + GRAY_DRAGON_SCALE_MAIL)
 #define Dragon_mail_to_scales(idx) (idx - GRAY_DRAGON_SCALE_MAIL + GRAY_DRAGON_SCALES)
 #define Dragon_scales_to_pm(obj) &mons[PM_GRAY_DRAGON + (obj)->otyp \

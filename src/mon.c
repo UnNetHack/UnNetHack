@@ -194,7 +194,7 @@ register struct monst *mtmp;
 	    case PM_BLACK_DRAGON:
 	    case PM_BLUE_DRAGON:
 	    case PM_GREEN_DRAGON:
-	    case PM_GOLD_DRAGON:
+	    case PM_GLOWING_DRAGON:
 	    case PM_YELLOW_DRAGON:
 	    case PM_CHROMATIC_DRAGON:
 		/* Make dragon scales.  This assumes that the order of the */
@@ -1574,7 +1574,7 @@ uchar adtyp;
 #endif
 
 	/* extinguish monster's armor */
-	if ((otmp = which_armor(mtmp, W_ARM)) && (Is_gold_dragon_armor(otmp->otyp)))
+	if ((otmp = which_armor(mtmp, W_ARM)) && (Is_glowing_dragon_armor(otmp->otyp)))
 		end_burn(otmp,FALSE);
 
 	mptr = mtmp->data;		/* save this for m_detach() */

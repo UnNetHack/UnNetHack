@@ -827,6 +827,9 @@ dobreathe()
 	} else if ((typ >= AD_MAGM) && (typ <= AD_ACID)) {
 		buzz((int) (20 + typ-1), (int)mattk->damn,
 				u.ux, u.uy, u.dx, u.dy);
+		if (monsndx(youmonst.data) >= PM_GRAY_DRAGON &&
+				monsndx(youmonst.data) <= PM_YELLOW_DRAGON)
+		    identify_dragon(monsndx(youmonst.data) - PM_GRAY_DRAGON);
 	} else {
 		warning("Breath weapon %d used", typ-1);
 	}
@@ -1396,9 +1399,9 @@ int atyp;
 	    case GREEN_DRAGON_SCALE_MAIL:
 	    case GREEN_DRAGON_SCALES:
 		return PM_GREEN_DRAGON;
-	    case GOLD_DRAGON_SCALE_MAIL:
-	    case GOLD_DRAGON_SCALES:
-		return PM_GOLD_DRAGON;
+	    case GLOWING_DRAGON_SCALE_MAIL:
+	    case GLOWING_DRAGON_SCALES:
+		return PM_GLOWING_DRAGON;
 	    case YELLOW_DRAGON_SCALE_MAIL:
 	    case YELLOW_DRAGON_SCALES:
 		return PM_YELLOW_DRAGON;

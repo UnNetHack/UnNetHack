@@ -933,6 +933,7 @@ E int FDECL(sortloot_cmp, (struct obj *, struct obj *));
 #endif
 E boolean FDECL(is_racial_armor, (struct obj *));
 E boolean FDECL(is_racial_weapon, (struct obj *));
+E void FDECL(identify_dragon, (int));
 
 /* ### ioctl.c ### */
 

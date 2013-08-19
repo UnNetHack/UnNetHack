@@ -1568,6 +1568,52 @@ ret:
 	return(cnt);
 }
 
+void 
+identify_dragon(int number)
+{
+    int dragon_id = number+PM_GRAY_DRAGON;
+    if (dragon_id < PM_GRAY_DRAGON || dragon_id > PM_YELLOW_DRAGON ) {
+	warning("bad dragon %d in identify_dragon", dragon_id);
+	return;
+    }
+    struct attack *mattk = attacktype_fordmg(&mons[dragon_id], AT_BREA, AD_ANY);
+    int color = CLR_BROWN;
+    if (mattk->adtyp == AD_MAGM) {
+	color = CLR_GRAY;
+    } else if (mattk->adtyp == AD_FIRE) {
+	color = CLR_RED;
+    } else if (mattk->adtyp == AD_COLD) {
+	if (dragon_id == PM_SILVER_DRAGON) {
+	    color = DRAGON_SILVER;
+	} else {
+	    color = CLR_WHITE;
+	}
+    } else if (mattk->adtyp == AD_SLEE) {
+	color = CLR_ORANGE;
+    } else if (mattk->adtyp == AD_DISN) {
+	color = CLR_BLACK;
+    } else if (mattk->adtyp == AD_ELEC) {
+	color = CLR_BLUE;
+    } else if (mattk->adtyp == AD_DRST) {
+	color = CLR_GREEN;
+    } else if (mattk->adtyp == AD_ACID) {
+	color = CLR_YELLOW;
+    } else {
+	warning("unhandled attack type: %d", mattk->adtyp);
+    }
+    if (mons[number+PM_GRAY_DRAGON].mcolor != color 
+	    || mons[number+PM_BABY_GRAY_DRAGON].mcolor != color 
+	    || objects[number + GRAY_DRAGON_SCALES].oc_name_known != 1
+	    || objects[number + GRAY_DRAGON_SCALES].oc_color != color
+	    || objects[number + GRAY_DRAGON_SCALE_MAIL].oc_color != color) {
+	mons[number+PM_GRAY_DRAGON].mcolor = color;
+	mons[number+PM_BABY_GRAY_DRAGON].mcolor = color;
+	discover_object(number + GRAY_DRAGON_SCALES, TRUE, FALSE); /* to save dragon type discovery */
+	objects[number + GRAY_DRAGON_SCALES].oc_color = color;
+	objects[number + GRAY_DRAGON_SCALE_MAIL].oc_color = color;
+	doredraw();
+    }
+}
 
 /*
  *	Object identification routines:
@@ -1583,6 +1629,10 @@ struct obj *otmp;
     otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
     if (otmp->otyp == EGG && otmp->corpsenm != NON_PM)
 	learn_egg_type(otmp->corpsenm);
+    if (otmp->otyp <= YELLOW_DRAGON_SCALES && otmp->otyp >= GRAY_DRAGON_SCALES)
+	identify_dragon(otmp->otyp - GRAY_DRAGON_SCALES);
+    if (otmp->otyp <= YELLOW_DRAGON_SCALE_MAIL && otmp->otyp >= GRAY_DRAGON_SCALE_MAIL)
+	identify_dragon(otmp->otyp - GRAY_DRAGON_SCALE_MAIL);
 }
 
 /* ggetobj callback routine; identify an object and give immediate feedback */

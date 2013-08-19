@@ -31,6 +31,6 @@ describe UnNetHack do
 		wish_for "wyvern dragon scales", /wyvern scales/
 		wish_for "guivre scales", /guivre scales/
 		wish_for "guivre dragon scales", /guivre scales/
-		wish_for "gold dragon scales", /gold dragon scales/
+		wish_for "glowing dragon scales", /glowing dragon scales/
 	end
 end

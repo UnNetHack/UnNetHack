@@ -344,7 +344,7 @@ DRGN_ARMR("sleep dragon scale mail", "sarkany scale mail", 1, SLEEP_RES,   900, 
 DRGN_ARMR("disintegration dragon scale mail", "sirrush scale mail", 1, DISINT_RES, 1200, 5, CLR_BLACK),
 DRGN_ARMR("electric dragon scale mail", "leviathan scale mail", 1, SHOCK_RES,   900, 5, CLR_BLUE),
 DRGN_ARMR("poison dragon scale mail", "wyvern scale mail", 1, POISON_RES,  900, 5, CLR_GREEN),
-DRGN_ARMR("stone dragon scale mail", "gold dragon scale mail", 1, STONE_RES,   900, 5, HI_GOLD),
+DRGN_ARMR("stone dragon scale mail", "glowing dragon scale mail", 1, STONE_RES,   900, 5, HI_GOLD),
 DRGN_ARMR("acid dragon scale mail", "guivre scale mail", 1, ACID_RES,    900, 5, CLR_YELLOW),
 DRGN_ARMR("chromatic dragon scale mail", "chromatic dragon scale mail", 1, POISON_RES, 2400, 5, CLR_MAGENTA), /* intrinsics are set manually */
 
@@ -362,7 +362,7 @@ DRGN_ARMR("sleep dragon scales", "sarkany scales", 0, SLEEP_RES,  500, 9, CLR_OR
 DRGN_ARMR("disintegration dragon scales", "sirrush scales",  0, DISINT_RES, 700, 9, CLR_BLACK),
 DRGN_ARMR("electric dragon scales", "leviathan scales", 0, SHOCK_RES,  500, 9, CLR_BLUE),
 DRGN_ARMR("poison dragon scales", "wyvern scales", 0, POISON_RES, 500, 9, CLR_GREEN),
-DRGN_ARMR("stone dragon scales", "gold dragon scales", 0, STONE_RES,  500, 9, HI_GOLD),
+DRGN_ARMR("stone dragon scales", "glowing dragon scales", 0, STONE_RES,  500, 9, HI_GOLD),
 DRGN_ARMR("acid dragon scales", "guivre scales", 0, ACID_RES,   500, 9, CLR_YELLOW),
 DRGN_ARMR("chromatic dragon scales", "chromatic dragon scales", 0, 0, 1500, 9, CLR_MAGENTA), /* intrinsics are set manually */
 #undef DRGN_ARMR

@@ -166,8 +166,8 @@
 				  (ptr) == &mons[PM_FLAMING_SPHERE] || \
 				  (ptr) == &mons[PM_SHOCKING_SPHERE] || \
 				  (ptr) == &mons[PM_WAX_GOLEM] || \
-				  (!strcmp((ptr)->mname, "gold dragon")) || \
-				  (!strcmp((ptr)->mname, "baby gold dragon")) || \
+				  (!strcmp((ptr)->mname, "glowing dragon")) || \
+				  (!strcmp((ptr)->mname, "baby glowing dragon")) || \
 				  (ptr) == &mons[PM_FIRE_VORTEX]) ? 1 : \
 				 ((ptr) == &mons[PM_FIRE_ELEMENTAL]) ? 1 : 0)
 /*	[note: the light ranges above were reduced to 1 for performance...] */

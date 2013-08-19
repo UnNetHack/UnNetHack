@@ -690,9 +690,12 @@ breamu(mtmp, mattk)			/* monster breathes at you (ranged) */
 
 		if((typ >= AD_MAGM) && (typ <= AD_ACID)) {
 
-		    if(canseemon(mtmp))
+		    if(canseemon(mtmp)) {
 			pline("%s breathes %s!", Monnam(mtmp),
 			      breathwep[typ-1]);
+			if (monsndx(mtmp->data) >= PM_GRAY_DRAGON && monsndx(mtmp->data) <= PM_YELLOW_DRAGON )
+			    identify_dragon(monsndx(mtmp->data) - PM_GRAY_DRAGON);
+		    }
 		    buzz((int) (-20 - (typ-1)), (int)mattk->damn,
 			 mtmp->mx, mtmp->my, sgn(tbx), sgn(tby));
 		    nomul(0, 0);
