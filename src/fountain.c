@@ -538,13 +538,21 @@ drinksink()
 			}
 			break;
 		case 4: do {
-				otmp = mkobj(POTION_CLASS,FALSE);
-				if (otmp->otyp == POT_WATER) {
-					obfree(otmp, (struct obj *)0);
-					otmp = (struct obj *) 0;
+				/* use Luck here instead of u.uluck */
+				if (!rn2(13) && ((Luck >= 0 && maybe_polyd(is_vampire(youmonst.data), Race_if(PM_VAMPIRE))) ||
+				    (Luck <= 0 && !maybe_polyd(is_vampire(youmonst.data), Race_if(PM_VAMPIRE))))) {
+					otmp = mksobj(POT_VAMPIRE_BLOOD,FALSE,FALSE);
+				} else {
+					otmp = mkobj(POTION_CLASS,FALSE);
+					if (otmp->otyp == POT_WATER) {
+						obfree(otmp, (struct obj *)0);
+						otmp = (struct obj *) 0;
+					}
 				}
 			} while(!otmp);
-			otmp->cursed = otmp->blessed = 0;
+			if (rnf(1,Luck+17)) otmp->cursed = 1;
+			else if (rnf(1,17-Luck)) otmp->blessed = 1;
+			else otmp->cursed = otmp->blessed = 0;
 			pline("Some %s liquid flows from the faucet.",
 			      Blind ? "odd" :
 			      hcolor(OBJ_DESCR(objects[otmp->otyp])));
