@@ -1771,7 +1771,8 @@ struct monst *mon;
 		coord mm;
 		mm.x = mon->mx; mm.y = mon->my;
 		create_gas_cloud(mm.x, mm.y, rn1(2,1), rnd(8), rn1(3,2));
-		if (!rn2(3)) {
+		/* ferns cannot produce viable offspring on ice, lava, or water; swamp is okay */
+		if (!rn2(3) && !is_ice(mm.x, mm.y) && !is_lava(mm.x, mm.y) && !is_pool(mm.x, mm.y)) {
 			if (!rn2(6)) makemon(&mons[PM_DUNGEON_FERN], mm.x, mm.y, NO_MM_FLAGS);
 			else makemon(&mons[PM_DUNGEON_FERN_SPROUT], mm.x, mm.y, NO_MM_FLAGS);
 		}
