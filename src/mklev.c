@@ -1660,8 +1660,11 @@ struct mkroom *croom;
 	coord m;
 	register int tryct = 0;
 	register struct obj *otmp;
-	boolean dobell = !rn2(10);
+	boolean doobj = !rn2(10);
+	boolean dobell = 0;
 
+	if (doobj && rn2(2))
+	    dobell = 1;
 
 	if(croom->rtype != OROOM) return;
 
@@ -1669,7 +1672,10 @@ struct mkroom *croom;
 	    return;
 
 	/* Put a grave at m.x, m.y */
-	make_grave(m.x, m.y, dobell ? "Saved by the bell!" : (char *) 0);
+	if (doobj)
+	    make_grave(m.x, m.y, dobell ? "Saved by the bell!" : "Apres moi, le deluge.");
+	else
+	    make_grave(m.x, m.y, (char *) 0);
 
 	/* Possibly fill it with objects */
 	if (!rn2(3)) (void) mkgold(0L, m.x, m.y);
@@ -1682,8 +1688,12 @@ struct mkroom *croom;
 	    add_to_buried(otmp);
 	}
 
-	/* Leave a bell, in case we accidentally buried someone alive */
-	if (dobell) (void) mksobj_at(BELL, m.x, m.y, TRUE, FALSE);
+	if (doobj) {
+	    /* Leave a bell, in case we accidentally buried someone alive... */
+	    if (dobell) (void) mksobj_at(BELL, m.x, m.y, TRUE, FALSE);
+	    /* ...or a scroll of flood if the deluge comes after them */
+	    else (void) mksobj_at(SCR_FLOOD, m.x, m.y, TRUE, FALSE);
+	}
 	return;
 }
 
