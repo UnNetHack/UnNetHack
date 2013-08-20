@@ -82,6 +82,9 @@ static const char *random_mesg[] = {
 	"Look behind you, a Three-Headed Monkey!", /* Monkey Island */
 	"Ifnkovhgroghprm", /* Kings Quest I */
 	"Cookies are delicious delicacies", /* Mozilla Firefox */
+	"Beware the weeping angels", /* Doctor Who */
+	"Duck, Sally Sparrow", /* Doctor Who */
+	"Love from the Doctor, 1969", /* Doctor Who */
 };
 
 char *
