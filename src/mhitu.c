@@ -582,7 +582,7 @@ mattacku(mtmp)
 
 		case AT_EXPL:	/* automatic hit if next to, and aimed at you */
 			if(!range2) sum[i] = explmu(mtmp, mattk, foundyou);
-			if (mdat == &mons[PM_DUNGEON_FERN_SPORE]) spore_dies(mtmp);
+			if (is_fern_spore(mdat)) spore_dies(mtmp);
 			break;
 
 		case AT_ENGL:
@@ -2236,12 +2236,26 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 		break;
 	    case AD_SPOR:
 		/* release a spore if the player is nearby */
-		if (!mtmp->mcan && distu(mtmp->mx, mtmp->my) <= 96 &&
-			mtmp->data == &mons[PM_DUNGEON_FERN] ? !rn2(2) : !rn2(4)) {
+		if (is_fern(mtmp->data) && !mtmp->mcan && distu(mtmp->mx, mtmp->my) <= 96 &&
+			!is_fern_sprout(mtmp->data) ? !rn2(2) : !rn2(4)) {
 		    coord mm;
 		    mm.x = mtmp->mx; mm.y = mtmp->my;
-		    enexto(&mm, mm.x, mm.y, &mons[PM_DUNGEON_FERN_SPORE]);
-		    makemon(&mons[PM_DUNGEON_FERN_SPORE], mm.x, mm.y, NO_MM_FLAGS);
+		    enexto(&mm, mm.x, mm.y, &mons[PM_FERN_SPORE]);
+		    if (mtmp->data == &mons[PM_ARCTIC_FERN] ||
+				mtmp->data == &mons[PM_ARCTIC_FERN_SPROUT]) {
+			makemon(&mons[PM_ARCTIC_FERN_SPORE], mm.x, mm.y, NO_MM_FLAGS);
+		    } else if (mtmp->data == &mons[PM_BLAZING_FERN] ||
+				mtmp->data == &mons[PM_BLAZING_FERN_SPROUT]) {
+			makemon(&mons[PM_BLAZING_FERN_SPORE], mm.x, mm.y, NO_MM_FLAGS);
+		    } else if (mtmp->data == &mons[PM_DUNGEON_FERN] ||
+				mtmp->data == &mons[PM_DUNGEON_FERN_SPROUT]) {
+			makemon(&mons[PM_DUNGEON_FERN_SPORE], mm.x, mm.y, NO_MM_FLAGS);
+		    } else if (mtmp->data == &mons[PM_SWAMP_FERN] ||
+				mtmp->data == &mons[PM_SWAMP_FERN_SPROUT]) {
+			makemon(&mons[PM_SWAMP_FERN_SPORE], mm.x, mm.y, NO_MM_FLAGS);
+		    } else { /* currently these should not be generated */
+			makemon(&mons[PM_FERN_SPORE], mm.x, mm.y, NO_MM_FLAGS);
+		    }
 		    if (canseemon(mtmp)) pline("%s releases a spore!", Monnam(mtmp));
 		}
 		break;

@@ -1476,16 +1476,6 @@ dungeon*
 	As far remov'd from God and light of Heav'n 
 	As from the Center thrice to th' utmost Pole. 
 		[ Paradise Lost, by John Milton ]
-dungeon fern*
-	These dreadful weeds have been driven to extinction on the
-	surface, yet deep within the dark and damp of the dungeon
-	they still flourish. When it detects the motion of nearby
-	creatures, the dungeon fern releases a deadly, poisonous
-	spore, which quickly detonates to propagate the species.
-
-	Residents of the dungeon have learned how not to disturb
-	the dungeon fern, and will attack its spores on sight to
-	keep them from overtaking their home.
 ~dwarf ??m*
 dwarf*
 	Dwarfs have faces like men (ugly men, with wrinkled, leathery
@@ -1727,6 +1717,18 @@ fauchard
 	in the way of parrying or catching/holding and has no provision 
 	for dismounting opponents, though it is quite useful for crippling 
 	their mounts.
+*fern*
+	These dreadful weeds have been driven to extinction on the
+	surface, yet deep within the dark and damp of the dungeon
+	they still flourish. When it detects the motion of nearby
+	creatures, the dungeon fern releases a deadly, poisonous
+	spore, which quickly detonates to propagate the species.
+
+	Residents of the dungeon have learned how not to disturb
+	the dungeon fern, and will attack its spores on sight to
+	keep them from overtaking their home.
+
+	More than one variety of this plant is known to exist.
 figurine*
 	Then it appeared in Paris at just about the time that Paris
 	was full of Carlists who had to get out of Spain.  One of

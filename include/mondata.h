@@ -166,6 +166,9 @@
 				  (ptr) == &mons[PM_FLAMING_SPHERE] || \
 				  (ptr) == &mons[PM_SHOCKING_SPHERE] || \
 				  (ptr) == &mons[PM_WAX_GOLEM] || \
+				  (ptr) == &mons[PM_BLAZING_FERN] || \
+				  (ptr) == &mons[PM_BLAZING_FERN_SPROUT] || \
+				  (ptr) == &mons[PM_BLAZING_FERN_SPORE] || \
 				  (!strcmp((ptr)->mname, "glowing dragon")) || \
 				  (!strcmp((ptr)->mname, "baby glowing dragon")) || \
 				  (ptr) == &mons[PM_FIRE_VORTEX]) ? 1 : \
@@ -189,9 +192,6 @@
 
 #define is_weeping(ptr)		((ptr) == &mons[PM_WEEPING_ANGEL] || \
 				 (ptr) == &mons[PM_WEEPING_ARCHANGEL])
-
-#define is_vegetation(ptr)	((ptr) == &mons[PM_DUNGEON_FERN] || \
-				 (ptr) == &mons[PM_DUNGEON_FERN_SPROUT])
 
 #ifdef WEBB_DISINT
 # define touch_disintegrates(ptr) ((ptr) == &mons[PM_DISINTEGRATOR])
@@ -230,6 +230,27 @@
 #define vegetarian(ptr)		(vegan(ptr) || \
 				((ptr)->mlet == S_PUDDING &&         \
 				 (ptr) != &mons[PM_BLACK_PUDDING]))
+
+/* Keep track of ferns, fern sprouts, fern spores, and other plants */
+
+#define is_fern_sprout(ptr)	((ptr) == &mons[PM_ARCTIC_FERN_SPROUT] || \
+				 (ptr) == &mons[PM_BLAZING_FERN_SPROUT] || \
+				 (ptr) == &mons[PM_DUNGEON_FERN_SPROUT] || \
+				 (ptr) == &mons[PM_SWAMP_FERN_SPROUT])
+
+#define is_fern_spore(ptr)	((ptr) == &mons[PM_FERN_SPORE] || \
+				 (ptr) == &mons[PM_ARCTIC_FERN_SPORE] || \
+				 (ptr) == &mons[PM_BLAZING_FERN_SPORE] || \
+				 (ptr) == &mons[PM_DUNGEON_FERN_SPORE] || \
+				 (ptr) == &mons[PM_SWAMP_FERN_SPORE])
+
+#define is_fern(ptr)		(is_fern_sprout(ptr) || \
+				 (ptr) == &mons[PM_ARCTIC_FERN] || \
+				 (ptr) == &mons[PM_BLAZING_FERN] || \
+				 (ptr) == &mons[PM_DUNGEON_FERN] || \
+				 (ptr) == &mons[PM_SWAMP_FERN])
+
+#define is_vegetation(ptr)	(is_fern(ptr))
 
 /* For vampires */
 #define has_blood(ptr)		(!vegetarian(ptr) && \
