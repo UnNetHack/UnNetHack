@@ -1770,57 +1770,68 @@ struct monst *mon;
 	    ltyp = levl[mm.x][mm.y].typ;
 	    create_gas_cloud(mm.x, mm.y, rn1(2,1), rnd(8), rn1(3,2));
 	    /* all fern spores have a 2/3 chance of creating nothing, except for
-	       the generic fern spore, which is random and will depend on terrain */
+	       the generic fern spore, which guarantees a suitable random fern */
 	    if (mon->data == &mons[PM_DUNGEON_FERN_SPORE]) {
-		sporetype = 0;
+		/* dungeon ferns cannot reproduce on ice, lava, or water; swamp is okay */
+		if (!is_ice(mm.x, mm.y) && !is_lava(mm.x, mm.y) && !is_pool(mm.x, mm.y))
+		    sporetype = 0;
+		else return;
 		if (rn2(3)) return;
 	    } else if (mon->data == &mons[PM_ARCTIC_FERN_SPORE]) {
-		sporetype = 1;
+		/* arctic ferns can only reproduce on water, ice, or in swamp */
+		if (ltyp == POOL || ltyp == MOAT || is_ice(mm.x, mm.y) || is_swamp(mm.x, mm.y))
+		    sporetype = 1;
+		else return;
 		if (rn2(3)) return;
 	    } else if (mon->data == &mons[PM_BLAZING_FERN_SPORE]) {
-		sporetype = 2;
+		/* blazing ferns can only reproduce on lava */
+		if (is_lava(mm.x, mm.y))
+		    sporetype = 2;
+		else return;
 		if (rn2(3)) return;
 	    } else if (mon->data == &mons[PM_SWAMP_FERN_SPORE]) {
-		sporetype = 3;
+		/* swamp ferns can only reproduce in swamp */
+		if (is_swamp(mm.x, mm.y))
+		    sporetype = 3;
+		else return;
 		if (rn2(3)) return;
 	    } else {
-		sporetype = rn2(4);
+		if (is_ice(mm.x, mm.y) || is_pool(mm.x, mm.y)) {
+		    sporetype = 1;
+		} else if (is_lava(mm.x, mm.y)) {
+		    sporetype = 2;
+		} else if (is_swamp(mm.x, mm.y)) {
+		    sporetype = 3;
+		} else {
+		    sporetype = rn2(4);
+		}
 	    }
 	    /* when creating a new fern, 5/6 chance of creating
 	       a fern sprout and 1/6 chance of a fully-grown one */
 	    switch (sporetype) {
 		case 0:
-		    /* dungeon ferns cannot reproduce on ice, lava, or water; swamp is okay */
-		    if (!is_ice(mm.x, mm.y) && !is_lava(mm.x, mm.y) && !is_pool(mm.x, mm.y)) {
-			if (!rn2(6)) makemon(&mons[PM_DUNGEON_FERN], mm.x, mm.y, NO_MM_FLAGS);
-			else makemon(&mons[PM_DUNGEON_FERN_SPROUT], mm.x, mm.y, NO_MM_FLAGS);
-		    }
+		    if (!rn2(6)) makemon(&mons[PM_DUNGEON_FERN], mm.x, mm.y, NO_MM_FLAGS);
+		    else makemon(&mons[PM_DUNGEON_FERN_SPROUT], mm.x, mm.y, NO_MM_FLAGS);
 		    break;
 		case 1:
-		    /* arctic ferns can only reproduce on water, ice, or in swamp */
-		    if (ltyp == POOL || ltyp == MOAT || is_ice(mm.x, mm.y) || is_swamp(mm.x, mm.y)) {
-			if (ltyp == POOL || ltyp == MOAT || is_swamp(mm.x, mm.y)) {
-			    levl[mm.x][mm.y].typ = ICE;
-			    You_hear("a crackling sound.");
-			}
-			if (!rn2(6)) makemon(&mons[PM_ARCTIC_FERN], mm.x, mm.y, NO_MM_FLAGS);
-			else makemon(&mons[PM_ARCTIC_FERN_SPROUT], mm.x, mm.y, NO_MM_FLAGS);
+		    if (ltyp == POOL || ltyp == MOAT || is_swamp(mm.x, mm.y)) {
+			levl[mm.x][mm.y].typ = ICE;
+			You_hear(Hallucination ? "someone selling hot chocolate." : "a crackling sound.");
 		    }
+		    if (!rn2(6)) makemon(&mons[PM_ARCTIC_FERN], mm.x, mm.y, NO_MM_FLAGS);
+		    else makemon(&mons[PM_ARCTIC_FERN_SPROUT], mm.x, mm.y, NO_MM_FLAGS);
 		    break;
 		case 2:
-		    /* blazing ferns can only reproduce on lava */
-		    if (is_lava(mm.x, mm.y)) {
-			levl[mm.x][mm.y].typ = ROOM;
-			if (!rn2(6)) makemon(&mons[PM_BLAZING_FERN], mm.x, mm.y, NO_MM_FLAGS);
-			else makemon(&mons[PM_BLAZING_FERN_SPROUT], mm.x, mm.y, NO_MM_FLAGS);
-		    }
+		    levl[mm.x][mm.y].typ = ROOM;
+		    if (!rn2(6)) makemon(&mons[PM_BLAZING_FERN], mm.x, mm.y, NO_MM_FLAGS);
+		    else makemon(&mons[PM_BLAZING_FERN_SPROUT], mm.x, mm.y, NO_MM_FLAGS);
 		    break;
 		case 3:
-		    /* swamp ferns can only reproduce in swamp */
-		    if (is_swamp(mm.x, mm.y)) {
-			if (!rn2(6)) makemon(&mons[PM_SWAMP_FERN], mm.x, mm.y, NO_MM_FLAGS);
-			else makemon(&mons[PM_SWAMP_FERN_SPROUT], mm.x, mm.y, NO_MM_FLAGS);
-		    }
+		    if (!rn2(6)) makemon(&mons[PM_SWAMP_FERN], mm.x, mm.y, NO_MM_FLAGS);
+		    else makemon(&mons[PM_SWAMP_FERN_SPROUT], mm.x, mm.y, NO_MM_FLAGS);
+		    break;
+		default:
+		    warning("Unknown spore type: (%d)", sporetype);
 		    break;
 	    }
 

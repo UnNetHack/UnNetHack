@@ -1585,8 +1585,13 @@ register struct obj	*sobj;
 		    }
 		} else {
 		    int i;
-		    for (i = 0; i < 30 + rn2(70); i++)
-			makemon(&mons[PM_GAS_SPORE], 0, 0, NO_MM_FLAGS);
+		    if (!sobj->blessed) {
+			for (i = 0; i < 30 + rn2(70); i++)
+			    makemon(&mons[PM_GAS_SPORE], 0, 0, NO_MM_FLAGS);
+		    } else {
+			for (i = 0; i < rnd(3); i++)
+			    makemon(&mons[PM_FERN_SPORE], 0, 0, NO_MM_FLAGS);
+		    }
 		}
 		break;
 	}
