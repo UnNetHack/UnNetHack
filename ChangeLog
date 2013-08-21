@@ -52,7 +52,7 @@
 	  completely. Blessed luckstones slow the timeout of positive luck,
 	  cursed luckstones negative luck, and uncursed luckstones both.
 	* It is impossible to know both the speed and location of a quantum mechanic
-	* Black Angels changed to dark Angels
+	* Replace Sokoban's Amulet of ESP with an Amulet of Flying
 	
 
 	* Artifact changes:
@@ -82,12 +82,15 @@
 	* New config option for customizing monster letter in UTF8graphics:
 	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke
 
-	* removed monsters:
-	  - anti-matter vortex
-
 	* Livelog: report bag of holding explosions
 
 	* New role: Convict class
+
+	* removed monsters:
+	  - anti-matter vortex
+
+	* renamed monsters:
+	  - black Angels to dark Angels
 
 	* new monsters:
 	  - locusts (from SporkHack)

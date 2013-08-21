@@ -737,6 +737,14 @@ Amulet_on()
 		break;
 	case AMULET_OF_YENDOR:
 		break;
+	case AMULET_OF_FLYING:
+		if (!(EFlying & ~W_AMUL) && !is_flyer(youmonst.data)) {
+			You_feel("like flying!");
+			if (!Levitation)
+				float_up();
+			makeknown(AMULET_OF_FLYING);
+		}
+		break;
     }
 }
 
@@ -784,6 +792,10 @@ Amulet_off()
 		return;
 	case AMULET_OF_YENDOR:
 		break;
+	case AMULET_OF_FLYING:
+		setworn((struct obj *)0, W_AMUL);
+		(void) float_down(0L, 0L);
+		return;
     }
     setworn((struct obj *)0, W_AMUL);
     return;
