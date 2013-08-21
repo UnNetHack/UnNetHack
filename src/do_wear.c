@@ -735,8 +735,6 @@ Amulet_on()
 	case AMULET_OF_RESTFUL_SLEEP:
 		HSleeping = rnd(100);
 		break;
-	case AMULET_OF_YENDOR:
-		break;
 	case AMULET_OF_FLYING:
 		if (!(EFlying & ~W_AMUL) && !is_flyer(youmonst.data)) {
 			You_feel("like flying!");
@@ -744,6 +742,8 @@ Amulet_on()
 				float_up();
 			makeknown(AMULET_OF_FLYING);
 		}
+		break;
+	case AMULET_OF_YENDOR:
 		break;
     }
 }
@@ -790,12 +790,12 @@ Amulet_off()
 		if (!ESleeping)
 			HSleeping = 0;
 		return;
-	case AMULET_OF_YENDOR:
-		break;
 	case AMULET_OF_FLYING:
 		setworn((struct obj *)0, W_AMUL);
 		(void) float_down(0L, 0L);
 		return;
+	case AMULET_OF_YENDOR:
+		break;
     }
     setworn((struct obj *)0, W_AMUL);
     return;
