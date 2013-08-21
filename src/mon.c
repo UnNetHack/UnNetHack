@@ -1770,7 +1770,7 @@ struct monst *mon;
 	    ltyp = levl[mm.x][mm.y].typ;
 	    create_gas_cloud(mm.x, mm.y, rn1(2,1), rnd(8), rn1(3,2));
 	    /* all fern spores have a 2/3 chance of creating nothing, except for
-	       the generic fern spore, which guarantees a suitable random fern */
+	       the generic fern spore, which guarantees a terrain-appropriate fern */
 	    if (mon->data == &mons[PM_DUNGEON_FERN_SPORE]) {
 		/* dungeon ferns cannot reproduce on ice, lava, or water; swamp is okay */
 		if (!is_ice(mm.x, mm.y) && !is_lava(mm.x, mm.y) && !is_pool(mm.x, mm.y))
