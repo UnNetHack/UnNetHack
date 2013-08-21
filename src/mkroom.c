@@ -576,6 +576,9 @@ mkswamp()	/* Michiel Huisjes & Fred de Wilde */
 						sx, sy, NO_MM_FLAGS);
 			else if(!rn2(6))
 			    levl[sx][sy].typ = BOG;
+			    if (!rn2(2)) /* swamp ferns like swamps */
+				(void) makemon(&mons[PM_SWAMP_FERN],
+						sx, sy, NO_MM_FLAGS);
 		}
 		level.flags.has_swamp = 1;
 	}

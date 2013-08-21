@@ -639,13 +639,24 @@ SHUFFLE:$terr
 SPILL:random, $terr[0], north, 2d4
 
 
-# Trapped disintegrator
+# Trapped rust monster, disenchanter, or disintegrator
 LEVEL:"vlt-%04i"
 FLAGS:rndvault
 ROOM:"rndvault", random, random, random, (5,5) {
   SUBROOM:"rndvault", random, (2,2), (1,1), false {
-    MONSTER:('R',"disintegrator"),(0,0),hostile
+    MONSTER: 'R', (0,0), hostile
   }
   REPLACE_TERRAIN:(0,0, 4,4), '-', 'P', 100%
   REPLACE_TERRAIN:(0,0, 4,4), '|', 'P', 100%
+}
+
+
+# Fern nursery
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+ROOM:"rndvault", random, random, random, random {
+  IF [25%] { MONSTER: ('F', "dungeon fern"), random, hostile }
+  IF [50%] { MONSTER: ('F', "arctic fern"), random, hostile }
+  IF [50%] { MONSTER: ('F', "blazing fern"), random, hostile }
+  IF [50%] { MONSTER: ('F', "swamp fern"), random, hostile }
 }
