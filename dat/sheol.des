@@ -370,9 +370,9 @@ MONSTER:( ''', "crystal ice golem"), random
 MONSTER:( ''', "crystal ice golem"), random
 MONSTER:( ''', "ice golem"), random
 MONSTER:( ''', "ice golem"), random
-MONSTER:( 'A', "black Angel"), random
-MONSTER:( 'A', "black Angel"), random
-MONSTER:( 'A', "black Angel"), random
+MONSTER:( 'A', "dark Angel"), random
+MONSTER:( 'A', "dark Angel"), random
+MONSTER:( 'A', "dark Angel"), random
 MONSTER: random, random
 MONSTER: random, random
 MONSTER: random, random
