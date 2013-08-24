@@ -730,6 +730,7 @@ struct level_map {
 	{ X_GOAL,	&nemesis_level },
 	{ "minetn",	&minetown_level },
 	{ "town",	&town_level },
+	{ "moria3",	&moria_level },
 	{ "",		(d_level *)0 }
 };
 

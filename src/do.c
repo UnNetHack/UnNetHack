@@ -18,6 +18,7 @@ STATIC_DCL int FDECL(menu_drop, (int));
 STATIC_DCL int NDECL(currentlevel_rewrite);
 STATIC_DCL void NDECL(final_level);
 /* static boolean FDECL(badspot, (XCHAR_P,XCHAR_P)); */
+STATIC_DCL boolean NDECL(unique_check);
 
 static NEARDATA const char drop_types[] =
 	{ ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, 0 };
@@ -1080,6 +1081,7 @@ boolean at_stairs, falling, portal;
 		was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz),
 		familiar = FALSE;
 	boolean new = FALSE;	/* made a new level? */
+	boolean persistent_level = TRUE;
 	struct monst *mtmp;
 	char whynot[BUFSZ];
 	char *annotation;
@@ -1142,6 +1144,12 @@ boolean at_stairs, falling, portal;
 	vision_recalc(2);
 
 	/*
+	 *  Check for any unique items left behind before
+	 *  we leave, in case the level is non-persistent.
+	 */
+	if (!unique_check()) persistent_level = FALSE;
+
+	/*
 	 * Save the level we're leaving.  If we're entering the endgame,
 	 * we can get rid of all existing levels because they cannot be
 	 * reached any more.  We still need to use savelev()'s cleanup
@@ -1161,6 +1169,14 @@ boolean at_stairs, falling, portal;
 	    for (l_idx = maxledgerno(); l_idx > 0; --l_idx)
 		delete_levelfile(l_idx);
 	}
+	
+	/*  If we left any unique items behind on the non-
+	 *  persistent level, the level remains persistent.
+	 */
+	if (!persistent_level && Is_moria_level(&u.uz)) {
+		delete_levelfile(ledger_no(&u.uz));
+		level_info[ledger_no(&u.uz)].flags = 0;
+	}	
 
 #ifdef REINCARNATION
 	if (Is_rogue_level(newlevel) || Is_rogue_level(&u.uz))
@@ -1841,6 +1857,27 @@ heal_legs()
 		HWounded_legs = EWounded_legs = 0;
 	}
 	(void)encumber_msg();
+}
+
+/* return true if unique items on the floor or in monsters' possession */
+boolean
+unique_check()
+{
+    register struct obj *obj;
+    register struct monst *mtmp;
+    int ct = 0;
+
+    for (obj = fobj; obj; obj = obj->nobj) {
+	if (is_unique(obj)) ct++;
+    }
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	for (obj = mtmp->minvent; obj; obj = obj->nobj) {
+	    if (is_unique(obj)) ct++;
+	}
+    }
+
+    if (ct == 0) return FALSE;
+    else return TRUE;
 }
 
 /*do.c*/

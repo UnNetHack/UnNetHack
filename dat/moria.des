@@ -48,6 +48,9 @@ LOOP [20] {
   }
 }
 
+#Branch flavor
+LOOP [1d2] { OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall" }
+
 #And a little treasure yet to be extracted from the earth...
 LOOP [2d8] { OBJECT:('*',"small piece of unrefined mithril"),rndcoord(fillrect(15,12,70,18)),buried }
 
@@ -107,128 +110,33 @@ LOOP [2d5] { OBJECT:random,random }
 LOOP [2d4] { OBJECT:('%',"corpse"),random,montype:"dwarf" }
 LOOP [2d2] { OBJECT:('[',"dwarvish mithril-coat"),random,buried,cursed }
 
-#Moria-tribute levels
-#Generally identical, but with a few small differences
+#Branch flavor
+LOOP [1d2] { OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall" }
+
+#Moria tribute non-persistent level
+#Left absolutely barren as a side effect of its special property.
 
 LEVEL: "moria3-1"	
-FLAGS:mazelevel
-GEOMETRY: center, center
-MAP
-                                    FFFFFFFFFFF
-                                    F.........F        FFFFFFFFFFF
-    FFFFFFFFFFFFFFFFFFFFFFFFFFFF    F.........F        F.........F
-    F..........................F    F.........F        F.........FFFFFFFFFF
-    F........FFFFFFF.FFFFFFFFF.F    FFF.FFFFFFF        F..................F
-    F........F     F.F       F.F      F.F              F.........FFFFFFFF.F
-    FFFFFFFF.F     F.F       F.FFFFFFFF.FFFFFFFFFFFFFFFF.........F      F.F
-           F.F     F.F       F...................................F      F.F
-           F.F     F.F       FFFFFFFFFFFFFFFF.FFFFFFFFFF.........F      F.F
-           F.F     F.F                      F.F        F.........F      F.F
-           F.F  FFFF.FFFFFFF                F.F        FFFFFFFFFFF      F.F
-           F.F  F..........F                F.F                         F.F
-FFFFFFFFFFFF.F  F..........FFFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFF   F.F
-F............F  F...................................................F   F.F
-F............FFFF..........FFFFFFFFFFFFFFFF.........................F   F.F
-F..........................F              F.........................FFFFF.F
-F............FFFF..........F              F...............................F
-F............F  FFFFFFFFFFFF              F.........................FFFFFFF
-FFFFFFFFFFFFFF                            F.........................F
-                                          FFFFFFFFFFFFFFFFFFFFFFFFFFF
-ENDMAP
-REGION:(01,01,73,18),random,"ordinary"
-NON_DIGGABLE:(00,00,74,17)
+FLAGS:hardfloor,mazelevel
 MON_GENERATION:70%, (7, "deep orc"), (3, 'o')
 MESSAGE: "The dungeon here seems less persistent."
 SOUNDS:200, (feel, "the dungeon suddenly center itself around you!")
-$stairs = { (05,15), (08,04), (22,14), (42,02), (55,16), (60,04) }
-SHUFFLE:$stairs
-STAIR:$stairs[0], up
-STAIR:$stairs[1], down
-#
 
-#Level flavor
-LOOP [2d3] { OBJECT:random,random }
-LOOP [2d3] { OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall" }
+ROOM: "ordinary", random, random, random, random {
+  STAIR: random, up
+}
 
-LEVEL: "moria3-2"	
-FLAGS:mazelevel
-GEOMETRY: center, center
-MAP
-                                     FFFFFFFFFFF
-                        FFFFFFFFFFFFFF.........F      FFFFFFFFFFF
-    FFFFFFFFFF          F......................F      F.........F
-    F........F          F.FFFFFFFFFFFF.........F      F.........FFFFFFFFFFF
-    F........F          F.F          FFFFFFFFFFF      F...................F
-    F........F          F.F                           F.........FFFFFFFFF.F
-    FFFFFFFF.FFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFF    F.........F       F.F
-           F.....................................F    F.........F       F.F
-           F.FFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFFFFF.F    F.........F       F.F
-           F.F     F.F                         F.F    F.........F       F.F
-           F.F  FFFF.FFFFFFF                   F.F    FFFF.FFFFFF       F.F
-           F.F  F..........F                   F.F       F.F            F.F
-FFFFFFFFFFFF.F  F..........FFFFFFFFFFFFFFFFFFFFF.FFFFFFFFF.FFFFFFFFFF   F.F
-F............F  F...................................................F   F.F
-F............FFFF..........FFFFFFFFFFFFFFFF.........................F   F.F
-F..........................F              F.........................FFFFF.F
-F............FFFF..........F              F...............................F
-F............F  FFFFFFFFFFFF              F.........................FFFFFFF
-FFFFFFFFFFFFFF                            F.........................F
-                                          FFFFFFFFFFFFFFFFFFFFFFFFFFF
-ENDMAP
-REGION:(01,01,73,18),random,"ordinary"
-NON_DIGGABLE:(00,00,74,17)
-MON_GENERATION:70%, (7, "deep orc"), (3, 'o')
-MESSAGE: "The dungeon here seems less persistent."
-SOUNDS:200, (feel, "the dungeon suddenly center itself around you!")
-$stairs = { (05,15), (08,04), (22,14), (44,02), (55,16), (59,04) }
-SHUFFLE:$stairs
-STAIR:$stairs[0], up
-STAIR:$stairs[1], down
-#
+ROOM: "ordinary" , random, random, random, random {
+  STAIR: random, down
+}
 
-#Level flavor
-LOOP [2d3] { OBJECT:random,random }
-LOOP [2d3] { OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall" }
+ROOM: "ordinary" , random, random, random, random {
+  [75%]: ENGRAVING: random, engrave, "Why, oh why didn't I leave my items in the town?"
+}
 
-LEVEL: "moria3-3"	
-FLAGS:mazelevel
-GEOMETRY: center, center
-MAP
-                                    FFFFFFFFFFF
-                                    F.........F        FFFFFFFFFFF
-    FFFFFFFFFFFFFFFFFFFFFFFFFFFF    F.........F        F.........F
-    F..........................F    F.........F        F.........FFFFFFFFFF
-    F........FFFFFFF.FFFFFFFFF.F    FFF.FFFFFFF        F..................F
-    F........F     F.F       F.F      F.F              F.........FFFFFFFF.F
-    FFFFFFFFFF     F.F       F.FFFFFFFF.FFFFFFFFFFFFFFFF.........F      F.F
-                   F.F       F...................................F      F.F
-                   F.F       FFFFFF.FFFFFFFFFFFFFFFFFFFF.........F      F.F
-                   F.F            F.F                  F.........F      F.F
-                FFFF.FFFFFFF      F.F                  FFFFFFFFFFF      F.F
-                F..........F      F.F                                   F.F
-FFFFFFFFFFFFFF  F..........F      F.F     FFFFFFFFFFFFFFFFFFFFFFFFFFF   F.F
-F............F  F..........F    FFF.FFF   F.........................F   F.F
-F............FFFF..........F    F.....F   F.........................F   F.F
-F..........................F    F.....F   F.........................FFFFF.F
-F............FFFF..........F    F.....F   F...............................F
-F............F  FFFFFFFFFFFF    FFFFFFF   F.........................FFFFFFF
-FFFFFFFFFFFFFF                            F.........................F
-                                          FFFFFFFFFFFFFFFFFFFFFFFFFFF
-ENDMAP
-REGION:(01,01,73,18),random,"ordinary"
-NON_DIGGABLE:(00,00,74,17)
-MON_GENERATION:70%, (7, "deep orc"), (3, 'o')
-MESSAGE: "The dungeon here seems less persistent."
-SOUNDS:200, (feel, "the dungeon suddenly center itself around you!")
-$stairs = { (05,15), (08,04), (22,14), (35,15), (42,02), (55,16), (60,04) }
-SHUFFLE:$stairs
-STAIR:$stairs[0], up
-STAIR:$stairs[1], down
-#
+LOOP [4] { ROOM: "ordinary" , random, random, random, random {} }
 
-#Level flavor
-LOOP [2d3] { OBJECT:random,random }
-LOOP [2d3] { OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall" }
+RANDOM_CORRIDORS
 
 #The Halls of Moria
 
@@ -278,6 +186,9 @@ LOOP [1d3] { MONSTER: 'T', random, hostile }
 
 LOOP [2d4] { OBJECT:('[',"dwarvish mithril-coat"),random,blessed,1d5 }
 LOOP [10 + 3d5] { OBJECT:random,random }
+
+#Branch flavor
+LOOP [1d2] { OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall" }
 
 #The Forest of BlastHardcheese
 
@@ -370,6 +281,9 @@ MONSTER: ('h',"dwarf"),(75,17),peaceful
 MONSTER: ('h',"dwarf"),(74,18),peaceful
 MONSTER: ('h',"dwarf"),(75,18),peaceful
 
+#Branch flavor
+LOOP [1d2] { OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall" }
+
 #The Doors of Durin, abandoned, w/altar
 #Strictly speaking, this is the West-gate, but
 #since it can flip anyway it doesn't really matter.
@@ -450,6 +364,9 @@ CONTAINER:"chest", $chests[7] { OBJECT:random,quantity:1d3 }
 
 #Warehouse
 LOOP [5 + 2d4] { OBJECT:'(',rndcoord(fillrect(18,13,44,18)) }
+
+#Branch flavor
+LOOP [1d2] { OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall" }
 
 #Abandoned altar
 ALTAR:(41,03),noncoaligned,altar
@@ -562,6 +479,9 @@ $chests = { (13,01), (15,01), (17,01), (19,01), (13,07), (15,07), (17,07), (19,0
 
 #Warehouse
 LOOP [5 + 2d4] { OBJECT:'(',rndcoord(fillrect(18,13,44,18)) }
+
+#Branch flavor
+LOOP [1d2] { OBJECT:('?',"teleportation"),random,cursed,name:"Word of Recall" }
 
 #Abandoned altar
 OBJECT:('`',"boulder"),(41,03)

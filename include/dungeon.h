@@ -136,6 +136,7 @@ typedef struct branch {
 #endif /* BLACKMARKET */
 #define Is_minetown_level(x)	(on_level(x, &minetown_level))
 #define Is_town_level(x)	(on_level(x, &town_level))
+#define Is_moria_level(x)	(on_level(x, &moria_level))
 
 #define In_sokoban(x)		((x)->dnum == sokoban_dnum)
 #define Inhell			In_hell(&u.uz)	/* now gehennom */

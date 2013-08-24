@@ -88,6 +88,7 @@ E struct dgn_topology {		/* special dungeon levels for speed */
 #endif /* BLACKMARKET */
     d_level	d_minetown_level;
     d_level	d_town_level;
+    d_level	d_moria_level;
 } dungeon_topology;
 /* macros for accesing the dungeon levels by their old names */
 #define oracle_level		(dungeon_topology.d_oracle_level)
@@ -135,6 +136,7 @@ E struct dgn_topology {		/* special dungeon levels for speed */
 #endif /* BLACKMARKET */
 #define minetown_level		(dungeon_topology.d_minetown_level)
 #define town_level		(dungeon_topology.d_town_level)
+#define moria_level		(dungeon_topology.d_moria_level)
 
 E NEARDATA stairway dnstair, upstair;		/* stairs up and down */
 #define xdnstair	(dnstair.sx)

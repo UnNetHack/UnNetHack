@@ -104,12 +104,13 @@
 	  - blazing ferns, sprouts, and spores
 	  - swamp ferns, sprouts, and spores
 
-	* new levels:
-	  - Black market version with One-eyed Sam promoted to management
-
 	* dungeon layout:
 	  - length of Town branch reduced and special filler level added
 	  - new branch: The Ruins of Moria
+
+	* new levels:
+	  - Black market version with One-eyed Sam promoted to management
+	  - Special non-persistent level in the Ruins of Moria branch
 
 	* Options:
 	  - default of sortloot changed to 'loot'

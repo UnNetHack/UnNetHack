@@ -309,6 +309,12 @@ struct obj {
 				|| (otmp)->otyp == WAX_CANDLE\
 				|| (otmp)->otyp == POT_OIL)
 
+/* unique items */
+#define is_unique(obj)		((obj)->otyp == AMULET_OF_YENDOR\
+				|| (obj)->otyp == BELL_OF_OPENING\
+				|| (obj)->otyp == CANDELABRUM_OF_INVOCATION\
+				|| (obj)->otyp == SPE_BOOK_OF_THE_DEAD)
+
 /* special stones */
 #define is_graystone(obj)	((obj)->otyp == LUCKSTONE || \
 				 (obj)->otyp == LOADSTONE || \
