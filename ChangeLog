@@ -42,7 +42,6 @@
 	* One-eyed Sam is tougher and it's harder to steal from the black market
 	* Nazgul scream attack added, with limited range (from UnNetHackPlus, based
 	  on code from SporkHack)
-	* Skill gain for spells is faster than skill gain for weapons
 	* Aleaxes are created with exact copies (barring artifacts) of your
 	  wielded weapons and armor (provided they are actual weapons); when
 	  your own god sends a hostile monster, it will always be an Aleax (by L)
@@ -124,6 +123,10 @@
 	  - Healers can see how wounded monsters are (by L)
 	  - Knights get a weight bonus for body armor heavier than
 	      studded leather armor
+
+	* Skill changes
+	  - Skill gain for spells is faster than skill gain for weapons
+	  - Riding skill is exercised more quickly, closer to vanilla
 
 	* user interface improvements:
 	  - HP notify, showing HP changes in the message area (from NAO)
