@@ -18,7 +18,7 @@ STATIC_DCL int FDECL(menu_drop, (int));
 STATIC_DCL int NDECL(currentlevel_rewrite);
 STATIC_DCL void NDECL(final_level);
 /* static boolean FDECL(badspot, (XCHAR_P,XCHAR_P)); */
-STATIC_DCL boolean NDECL(unique_check);
+STATIC_DCL int NDECL(unique_check);
 
 static NEARDATA const char drop_types[] =
 	{ ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, 0 };
@@ -1147,7 +1147,7 @@ boolean at_stairs, falling, portal;
 	 *  Check for any unique items left behind before
 	 *  we leave, in case the level is non-persistent.
 	 */
-	if (!unique_check()) persistent_level = FALSE;
+	if (unique_check() == 0) persistent_level = FALSE;
 
 	/*
 	 * Save the level we're leaving.  If we're entering the endgame,
@@ -1859,8 +1859,8 @@ heal_legs()
 	(void)encumber_msg();
 }
 
-/* return true if unique items on the floor or in monsters' possession */
-boolean
+/* return number of unique items on the floor and in monsters' possession */
+int
 unique_check()
 {
     register struct obj *obj;
@@ -1876,8 +1876,7 @@ unique_check()
 	}
     }
 
-    if (ct == 0) return FALSE;
-    else return TRUE;
+    return (ct);
 }
 
 /*do.c*/
