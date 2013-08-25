@@ -1886,10 +1886,10 @@ void
 levelport_monsters()
 {
     register struct monst *mtmp, *mtmp2;
+    int nlev;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp2) {
 	mtmp2 = mtmp->nmon;
-	int nlev;
 	d_level flev;
 	nlev = random_teleport_level();
 	get_level(&flev, nlev); 
