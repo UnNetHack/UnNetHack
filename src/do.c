@@ -18,7 +18,8 @@ STATIC_DCL int FDECL(menu_drop, (int));
 STATIC_DCL int NDECL(currentlevel_rewrite);
 STATIC_DCL void NDECL(final_level);
 /* static boolean FDECL(badspot, (XCHAR_P,XCHAR_P)); */
-STATIC_DCL boolean NDECL(unique_check);
+STATIC_DCL boolean NDECL(unique_item_check);
+STATIC_DCL void NDECL(levelport_monsters);
 
 static NEARDATA const char drop_types[] =
 	{ ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, 0 };
@@ -1144,10 +1145,14 @@ boolean at_stairs, falling, portal;
 	vision_recalc(2);
 
 	/*
-	 *  Check for any unique items left behind before
-	 *  we leave, in case the level is non-persistent.
+	 *  If this level is supposed to be non-persistent
+	 *  and there are no unique items present, then set
+	 *  persistent_level to false and levelport all monsters.
 	 */
-	if (!unique_check()) persistent_level = FALSE;
+	if (Is_moria_level(&u.uz) && !unique_item_check()) {
+	    persistent_level = FALSE;
+	    levelport_monsters();
+	}
 
 	/*
 	 * Save the level we're leaving.  If we're entering the endgame,
@@ -1170,10 +1175,8 @@ boolean at_stairs, falling, portal;
 		delete_levelfile(l_idx);
 	}
 	
-	/*  If we left any unique items behind on the non-
-	 *  persistent level, the level remains persistent.
-	 */
-	if (!persistent_level && Is_moria_level(&u.uz)) {
+	/* check if the level should remain persistent */
+	if (!persistent_level) {
 		delete_levelfile(ledger_no(&u.uz));
 		level_info[ledger_no(&u.uz)].flags = 0;
 	}	
@@ -1861,7 +1864,7 @@ heal_legs()
 
 /* return true if any unique item is on the floor or in monsters' possession */
 boolean
-unique_check()
+unique_item_check()
 {
     register struct obj *obj;
     register struct monst *mtmp;
@@ -1876,6 +1879,22 @@ unique_check()
     }
 
     return FALSE;
+}
+
+/* prevent monsters from "poofing" -- disappearing due to non-persistent levels */
+void
+levelport_monsters()
+{
+    register struct monst *mtmp, *mtmp2;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp2) {
+	mtmp2 = mtmp->nmon;
+	int nlev;
+	d_level flev;
+	nlev = random_teleport_level();
+	get_level(&flev, nlev); 
+	migrate_to_level(mtmp, ledger_no(&flev), MIGR_RANDOM, (coord *)0);
+    }
 }
 
 /*do.c*/
