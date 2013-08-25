@@ -452,7 +452,7 @@ fixup_special()
 					switch (price) {
 						case 0: price_obj = BAG_OF_HOLDING; break;
 						case 1: price_obj = rn2(2) ? CLOAK_OF_MAGIC_RESISTANCE : CLOAK_OF_DISPLACEMENT; break;
-						case 2: price_obj = !rn2(3) ? AMULET_OF_LIFE_SAVING : rn2(2) ? AMULET_OF_ESP : AMULET_OF_REFLECTION; break;
+						case 2: price_obj = !rn2(3) ? AMULET_OF_LIFE_SAVING : rn2(2) ? AMULET_OF_FLYING : AMULET_OF_REFLECTION; break;
 					}
 					otmp = mksobj_at(price_obj, ep->engr_x, ep->engr_y, TRUE, FALSE);
 					otmp->sokoprize = TRUE;
