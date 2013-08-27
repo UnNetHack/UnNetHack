@@ -1013,7 +1013,7 @@ dokick()
 		if(IS_DEADTREE(maploc->typ)) {
 		    if(Levitation) goto dumb;
 		    You("kick %s.", Blind ? something : "the dead tree");
-		    switch (rn2(4)) {
+		    switch (!(maploc->looted & TREE_FLOCK) ? rn2(5) : rn2(4)) {
 			case 0:	goto ouch;
 			case 1:	pline("The tree is tottering...");
 				break;
@@ -1028,6 +1028,14 @@ dokick()
 				    newsym(x,y);
 				unblock_point(x,y);	/* vision */
 				break;
+			case 4: {
+				coord mm;
+				mm.x = x; mm.y = y;
+		    		enexto(&mm, mm.x, mm.y, &mons[PM_RAVEN]);
+				makemon(&mons[PM_RAVEN], mm.x, mm.y, MM_ANGRY);
+				maploc->looted |= TREE_FLOCK;
+				break;
+			}
 		    }
 		    return(1);
 		}

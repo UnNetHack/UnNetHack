@@ -284,6 +284,7 @@ extern const struct symdef def_warnsyms[WARNCOUNT];
  */
 #define TREE_LOOTED	1
 #define TREE_SWARM	2
+#define TREE_FLOCK	3
 
 /*
  * Fountains have limits, and special warnings.
