@@ -229,11 +229,12 @@ nh_timeout()
 
 	    if (u.uhave.amulet || u.ugangr) timeout = timeout / 2;
 
-	    if (moves % timeout == 0) {
+	    if (moves >= u.luckturn + timeout) {
 		if(u.uluck > baseluck)
 		    u.uluck--;
 		else if(u.uluck < baseluck)
 		    u.uluck++;
+		u.luckturn = moves;
 	    }
 	}
 #ifdef CONVICT

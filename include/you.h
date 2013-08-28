@@ -405,6 +405,7 @@ struct you {
 #define A_CURRENT	0
 	aligntyp ualignbase[CONVERT];	/* for ualign conversion record */
 	schar uluck, moreluck;		/* luck and luck bonus */
+	int luckturn;
 #define Luck	(u.uluck + u.moreluck)
 #define LUCKADD		3	/* added value when carrying luck stone */
 #define LUCKMAX		10	/* on moonlit nights 11 */
