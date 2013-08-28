@@ -5,6 +5,8 @@
 #include "hack.h"
 #include "artifact.h"
 
+STATIC_DCL void FDECL(curse_objects, (struct obj *, int, boolean));
+
 void
 take_gold()
 {
@@ -313,8 +315,6 @@ dosit()
 void
 rndcurse()			/* curse a few inventory items at random! */
 {
-	int	nobj = 0;
-	int	cnt, onum;
 	struct	obj	*otmp;
 	static const char mal_aura[] = "feel a malignant aura surround %s.";
 
@@ -328,41 +328,8 @@ rndcurse()			/* curse a few inventory items at random! */
 	    You(mal_aura, "you");
 	}
 
-	for (otmp = invent; otmp; otmp = otmp->nobj) {
-#ifdef GOLDOBJ
-	    /* gold isn't subject to being cursed or blessed */
-	    if (otmp->oclass == COIN_CLASS) continue;
-#endif
-	    nobj++;
-	}
-	if (nobj) {
-	    for (cnt = rnd(6/((!!Antimagic) + (!!Half_spell_damage) + 1));
-		 cnt > 0; cnt--)  {
-		onum = rnd(nobj);
-		for (otmp = invent; otmp; otmp = otmp->nobj) {
-#ifdef GOLDOBJ
-		    /* as above */
-		    if (otmp->oclass == COIN_CLASS) continue;
-#endif
-		    if (--onum == 0) break;	/* found the target */
-		}
-		/* the !otmp case should never happen; picking an already
-		   cursed item happens--avoid "resists" message in that case */
-		if (!otmp || otmp->cursed) continue;	/* next target */
-
-		if(otmp->oartifact && spec_ability(otmp, SPFX_INTEL) &&
-		   rn2(10) < 8) {
-		    pline("%s!", Tobjnam(otmp, "resist"));
-		    continue;
-		}
-
-		if(otmp->blessed)
-			unbless(otmp);
-		else
-			curse(otmp);
-	    }
-	    update_inventory();
-	}
+	curse_objects(invent, 
+		rnd(6/((!!Antimagic) + (!!Half_spell_damage) + 1)), TRUE);
 
 #ifdef STEED
 	/* treat steed's saddle as extended part of hero's inventory */
@@ -382,6 +349,58 @@ rndcurse()			/* curse a few inventory items at random! */
 	    }
 	}
 #endif	/*STEED*/
+}
+
+void
+curse_objects(firstobj, ncurse, showmsg)
+struct obj *firstobj;
+int ncurse;
+boolean showmsg;
+{
+    struct obj *otmp;
+    int cnt, onum;
+    int nobj = 0;
+
+    for (otmp = firstobj; otmp; otmp = otmp->nobj) {
+#ifdef GOLDOBJ
+	/* gold isn't subject to being cursed or blessed */
+	if (otmp->oclass == COIN_CLASS) continue;
+#endif
+	nobj++;
+    }
+    if (nobj) {
+	for (cnt = ncurse; cnt > 0; cnt--)  {
+	    onum = rnd(nobj);
+	    for (otmp = firstobj; otmp; otmp = otmp->nobj) {
+#ifdef GOLDOBJ
+		/* as above */
+		if (otmp->oclass == COIN_CLASS) continue;
+#endif
+		if (--onum == 0) break;	/* found the target */
+	    }
+	    /* the !otmp case should never happen; picking an already
+	       cursed item happens--avoid "resists" message in that case */
+	    if (!otmp) continue;	/* next target */
+	    else if (otmp->cursed) {
+		if (Is_container(otmp))
+		    curse_objects(otmp->cobj, 1, FALSE);
+		continue;
+	    }
+
+	    if(otmp->oartifact && spec_ability(otmp, SPFX_INTEL) &&
+	       rn2(10) < 8) {
+		if (showmsg)
+		    pline("%s!", Tobjnam(otmp, "resist"));
+		continue;
+	    }
+
+	    if(otmp->blessed)
+		unbless(otmp);
+	    else
+		curse(otmp);
+	}
+	update_inventory();
+    }
 }
 
 void
