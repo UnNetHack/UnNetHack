@@ -128,6 +128,7 @@ maud
 	Than ever I have been yet!
 		[ Maud, And Other Poems by Alfred, Lord Tennyson ]
 ~amulet of yendor
+~amulet of*flying
 ~amulet of*sleep
 *amulet
 amulet of *
@@ -542,17 +543,6 @@ bell of opening
 	* Old Tom was the single cracked bronze bell in the University
 	bell tower.
 		[ Eric, by Terry Pratchett ]
-black angel
-	When we have understood about free will, we shall see how silly
-	it is to ask, as somebody once asked me: 'Why did God make a
-	creature of such rotten stuff that it went wrong?' The better
-	stuff a creature is made of --  the cleverer and stronger and freer
-	it is -- then the better it will be if it goes right, but also the
-	worse it will be if it goes wrong. A cow cannot be very good or
-	very bad; a dog can be both better and worse; a child better and
-	worse still; an ordinary man, still more so; a man of genius,
-	still more so; a superhuman spirit best -- or worst -- of all.
-		[ Mere Christianity, by C. S. Lewis ]
 blindfold
 	The blindfolding was performed by binding a piece of the
 	yellowish linen whereof those of the Amahagger who condescended
@@ -1233,6 +1223,17 @@ cyclops
 	I see thee yet, in form as palpable
 	As this which now I draw.
                 [ Macbeth, by William Shakespeare ]
+dark angel
+	When we have understood about free will, we shall see how silly
+	it is to ask, as somebody once asked me: 'Why did God make a
+	creature of such rotten stuff that it went wrong?' The better
+	stuff a creature is made of --  the cleverer and stronger and freer
+	it is -- then the better it will be if it goes right, but also the
+	worse it will be if it goes wrong. A cow cannot be very good or
+	very bad; a dog can be both better and worse; a child better and
+	worse still; an ordinary man, still more so; a man of genius,
+	still more so; a superhuman spirit best -- or worst -- of all.
+		[ Mere Christianity, by C. S. Lewis ]
 dark one
 	... But he ruled rather by force and fear, if they might
 	avail; and those who perceived his shadow spreading over the
@@ -1803,6 +1804,11 @@ flint*
 	A man's despair with joy allay,
 	Turn bachelors old to lovers gay.
 		[ The Magic Flute, by Wolfgang Amadeus Mozart ]
+*flying
+	There is an art to flying, or rather a knack. Its knack lies
+	in learning to throw yourself at the ground and miss. Clearly,
+	it is this second part, the missing, that provides the difficulties.
+		[ Life, the Universe and Everything, by Douglas Adams ]
 # also takes 'fog/vapor cloud'
 fog* cloud
 	The fog comes
