@@ -512,6 +512,9 @@ register int pm;
 	    case PM_LIZARD:
 		if (Stoned) fix_petrification();
 		break;
+	    case PM_DISENCHANTER:
+		if (rn2(2)) attrcurse();
+		break;
 	    case PM_DEATH:
 	    case PM_PESTILENCE:
 	    case PM_FAMINE:
