@@ -513,7 +513,12 @@ register int pm;
 		if (Stoned) fix_petrification();
 		break;
 	    case PM_DISENCHANTER:
-		if (rn2(2)) attrcurse();
+		/* hallucination decreases chance of removed intrinsic */
+		if (Hallucination ? rn2(5) : rn2(2)) attrcurse();
+		if (Hallucination) {
+		    (void) make_hallucinated(0L, FALSE ,0L);
+		    pline("The world seems less enchanted.");
+		}
 		break;
 	    case PM_DEATH:
 	    case PM_PESTILENCE:

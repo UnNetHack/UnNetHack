@@ -52,7 +52,8 @@
 	  cursed luckstones negative luck, and uncursed luckstones both.
 	* It is impossible to know both the speed and location of a quantum mechanic
 	* Replace Sokoban's Amulet of ESP with an Amulet of Flying
-	* Eating a disenchanter corpse has a 50% chance of removing a random intrinsic
+	* Eating a disenchanter corpse cures hallucination and has a chance of
+	  removing a random intrinsic, 20% chance if hallucinating, 50% otherwise
 	
 
 	* Artifact changes:
