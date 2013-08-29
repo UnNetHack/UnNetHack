@@ -516,7 +516,7 @@ register int pm;
 		/* hallucination decreases chance of removed intrinsic */
 		if (Hallucination ? rn2(5) : rn2(2)) attrcurse();
 		if (Hallucination) {
-		    (void) make_hallucinated(0L, FALSE ,0L);
+		    (void) make_hallucinated(0L, FALSE, 0L);
 		    pline("The world seems less enchanted.");
 		}
 		break;
