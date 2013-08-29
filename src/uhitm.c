@@ -1166,6 +1166,22 @@ int thrown;
 			 mon_nam(mon), canseemon(mon) ? exclam(tmp) : ".");
 	}
 
+	if (mdat == &mons[PM_URANIUM_IMP]) {
+	    if (mon->mhp <= 0) {
+		killed(mon);
+		return FALSE;
+	    } else {
+		if (canseemon(mon)) pline("%s %s reality!", Monnam(mon),
+			level.flags.noteleport ? "tries to warp" : "warps");
+		if (!level.flags.noteleport) {
+		    tele(); coord cc;
+		    enexto(&cc, u.ux, u.uy, &mons[PM_URANIUM_IMP]);
+		    rloc_to(mon, cc.x, cc.y);
+		}
+	    }
+	    return TRUE;
+	 }
+
 #ifdef WEBB_DISINT
 	if (disint_obj && obj) {
 		if (!hittxt) {
@@ -2817,9 +2833,15 @@ struct obj *otmp;	/* source of flash */
 		res = 1;
 	    }
 	} else if (mtmp->data == &mons[PM_DEVIL_S_SNARE]) {
-	    /* it likes the dark and the damp */
+	    /* likes the dark and the damp */
+	    if (u.ustuck == mtmp) {
+		unstuck(mtmp);
+		pline("%s falls away from you.", Monnam(mtmp));
+	    }
 	    if (useeit) pline("%s shrivels.", Monnam(mtmp));
-	    if ((mtmp->mhp -= d(4,20)) <= 0) killed(mtmp);
+	    mtmp->mcanmove = 0;
+	    mtmp->mfrozen = rn1(10,5);
+	    if ((mtmp->mhp -= d(4,8)) <= 0) killed(mtmp);
 	} else if (mtmp->data->mlet != S_LIGHT) {
 	    if (!resists_blnd(mtmp)) {
 		tmp = dist2(otmp->ox, otmp->oy, mtmp->mx, mtmp->my);

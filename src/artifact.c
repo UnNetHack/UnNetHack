@@ -1106,6 +1106,9 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	    if (!rn2(4)) (void) destroy_mitem(mdef, POTION_CLASS, AD_FIRE);
 	    if (!rn2(4)) (void) destroy_mitem(mdef, SCROLL_CLASS, AD_FIRE);
 	    if (!rn2(7)) (void) destroy_mitem(mdef, SPBOOK_CLASS, AD_FIRE);
+	    /* Fire Brand is instantly fatal to Devils' Snares */
+	    if (mdef->data == &mons[PM_DEVIL_S_SNARE])
+			*dmgptr = (2 * mdef->mhp + FATAL_DAMAGE_MODIFIER);
 	    if (youdefend && Slimed) burn_away_slime();
 	    return realizes_damage;
 	}
