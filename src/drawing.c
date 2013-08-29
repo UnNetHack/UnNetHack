@@ -174,13 +174,13 @@ const char * const monexplain[MAXMCLASSES] = {
     "light",			"zruty",
 
     "angelic being",		"bat or bird",		"centaur",
-    "dragon",			"elemental",		"fungus, mold or fern",
+    "dragon",			"elemental",		"fungus, mold, or fern",
     "gnome",			"giant humanoid",	0,
     "jabberwock",		"Keystone Kop",		"lich",
     "mummy",			"naga",			"ogre",
-    "pudding or ooze",		"quantum mechanic",	"rust monster, disenchanter or disintegrator",
+    "pudding or ooze",		"quantum mechanic",	"rust monster, disenchanter, or disintegrator",
     "snake",			"troll",		"umber hulk or shambling horror",
-    "vampire",			"wraith",		"xorn",
+    "vampire",			"wraith",		"xorn or harmful vegetation",
     "apelike creature",		"zombie",
 
     "human or elf",		"ghost",		"golem",

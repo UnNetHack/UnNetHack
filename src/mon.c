@@ -481,7 +481,8 @@ register struct monst *mtmp;
 	if (!is_clinger(mtmp->data)
 	    && !is_swimmer(mtmp->data) && !amphibious(mtmp->data)) {
 	    if (cansee(mtmp->mx,mtmp->my)) {
-		    pline("%s drowns.", Monnam(mtmp));
+		    pline("%s %s.", Monnam(mtmp),
+			is_vegetation(mtmp->data) ? "sinks" : "drowns");
 	    }
 	    if (u.ustuck && u.uswallow && u.ustuck == mtmp) {
 	    /* This can happen after a purple worm plucks you off a

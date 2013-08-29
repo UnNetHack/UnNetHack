@@ -2816,6 +2816,10 @@ struct obj *otmp;	/* source of flash */
 		pline_The("flash awakens %s.", mon_nam(mtmp));
 		res = 1;
 	    }
+	} else if (mtmp->data == &mons[PM_DEVIL_S_SNARE]) {
+	    /* it likes the dark and the damp */
+	    if (useeit) pline("%s shrivels.", Monnam(mtmp));
+	    if ((mtmp->mhp -= d(4,20)) <= 0) killed(mtmp);
 	} else if (mtmp->data->mlet != S_LIGHT) {
 	    if (!resists_blnd(mtmp)) {
 		tmp = dist2(otmp->ox, otmp->oy, mtmp->mx, mtmp->my);

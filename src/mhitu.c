@@ -566,9 +566,10 @@ mattacku(mtmp)
 			break;
 
 		case AT_HUGS:	/* automatic if prev two attacks succeed */
-			/* Note: if displaced, prev attacks never succeeded */
-			if((!range2 && i>=2 && sum[i-1] && sum[i-2])
-							|| mtmp == u.ustuck)
+			/* Notes: also automatic if attacker is a plant;
+			   if displaced, prev attacks never succeeded */
+			if((!range2 && ((i>=2 && sum[i-1] && sum[i-2]) ||
+					is_vegetation(mdat))) || mtmp == u.ustuck)
 				sum[i]= hitmu(mtmp, mattk);
 			break;
 
@@ -1254,12 +1255,13 @@ dopois:
 		break;
 	    case AD_WRAP:
 		if ((!mtmp->mcan || u.ustuck == mtmp) && !sticks(youmonst.data)) {
-		    if (!u.ustuck && !rn2(10)) {
+		    /* vegetation never misses */
+		    if (!u.ustuck && (!rn2(10) || is_vegetation(mdat))) {
 			if (u_slip_free(mtmp, mattk)) {
 			    dmg = 0;
 			} else {
-			    pline("%s swings itself around you!",
-				  Monnam(mtmp));
+			    pline("%s %s itself around you!", Monnam(mtmp),
+				  is_vegetation(mdat) ? "winds" : "swings");
 			    u.ustuck = mtmp;
 			}
 		    } else if(u.ustuck == mtmp) {
