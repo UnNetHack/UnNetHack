@@ -1166,7 +1166,7 @@ int thrown;
 			 mon_nam(mon), canseemon(mon) ? exclam(tmp) : ".");
 	}
 
-	if (mdat == &mons[PM_URANIUM_IMP]) {
+	if (mdat == &mons[PM_URANIUM_IMP] && !mon->mcan) {
 	    if (mon->mhp <= 0) {
 		killed(mon);
 		return FALSE;

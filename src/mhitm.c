@@ -378,6 +378,20 @@ mattackm(magr, mdef)
 	/* return if aggressor can no longer attack */
 	if (!magr->mcanmove || magr->msleeping) return res[i];
 	if (res[i] & MM_HIT) struck = 1;	/* at least one hit */
+
+	if (mdef->data == &mons[PM_URANIUM_IMP] && !mdef->mcan && struck) {
+	    /* avoid mysterious force message by not using tele_restrict() */
+	    if (canseemon(mdef)) pline("%s %s reality!", Monnam(mdef),
+		    level.flags.noteleport ? "tries to warp" : "warps");
+	    if (!level.flags.noteleport) {
+		coord mm;
+		rloc(magr, FALSE);
+		enexto(&mm, magr->mx, magr->my, &mons[PM_URANIUM_IMP]);
+		rloc_to(mdef, mm.x, mm.y);
+	    }
+	return res[i];
+	}
+
     }
 
     return(struck ? MM_HIT : MM_MISS);
