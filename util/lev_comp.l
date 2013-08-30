@@ -134,6 +134,7 @@ mazegrid	{ savetoken(yytext); return MAZE_GRID_ID; }
 solidfill	{ savetoken(yytext); return SOLID_FILL_ID; }
 mines		{ savetoken(yytext); return MINES_ID; }
 sheollev	{ savetoken(yytext); return SHEOL_ID; }
+rogue		{ savetoken(yytext); return ROGUELEV_ID; }
 FLAGS		{ savetoken(yytext); return FLAGS_ID; }
 GEOMETRY	{ savetoken(yytext); return GEOMETRY_ID; }
 ^MAP\r?\n		{ savetoken(yytext); BEGIN(MAPC); newline(); }

@@ -191,7 +191,7 @@ extern int rnd_vault_freq;
 
 %token	<i> CHAR INTEGER BOOLEAN PERCENT SPERCENT
 %token	<i> MINUS_INTEGER PLUS_INTEGER
-%token	<i> MAZE_GRID_ID SOLID_FILL_ID MINES_ID SHEOL_ID
+%token	<i> MAZE_GRID_ID SOLID_FILL_ID MINES_ID SHEOL_ID ROGUELEV_ID
 %token	<i> MESSAGE_ID LEVEL_ID LEV_INIT_ID GEOMETRY_ID NOMAP_ID
 %token	<i> OBJECT_ID COBJECT_ID MONSTER_ID TRAP_ID DOOR_ID DRAWBRIDGE_ID
 %token	<i> object_ID monster_ID terrain_ID
@@ -373,6 +373,10 @@ lev_init	: LEV_INIT_ID ':' SOLID_FILL_ID ',' terrain_type
 		| LEV_INIT_ID ':' SHEOL_ID
 		  {
 		      add_opvars(splev, "iiiiiiiio", LVLINIT_SHEOL,0,0,0,0,0,0,0, SPO_INITLEVEL);
+		  }
+		| LEV_INIT_ID ':' ROGUELEV_ID
+		  {
+		      add_opvars(splev, "iiiiiiiio", LVLINIT_ROGUE,0,0,0,0,0,0,0, SPO_INITLEVEL);
 		  }
 		| LEV_INIT_ID ':' MINES_ID ',' CHAR ',' CHAR ',' BOOLEAN ',' BOOLEAN ',' light_state ',' walled opt_fillchar
 		  {

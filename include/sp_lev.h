@@ -40,6 +40,7 @@
 #define LVLINIT_MAZEGRID	2
 #define LVLINIT_MINES		3
 #define LVLINIT_SHEOL		4
+#define LVLINIT_ROGUE		5
 
 /* max. layers of object containment */
 #define MAX_CONTAINMENT 10
