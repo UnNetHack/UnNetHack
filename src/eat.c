@@ -517,7 +517,7 @@ register int pm;
 		if (Hallucination ? rn2(5) : rn2(2)) attrcurse();
 		if (Hallucination) {
 		    (void) make_hallucinated(0L, FALSE, 0L);
-		    pline("The world seems less enchanted.");
+		    pline("The world seems less enchanting.");
 		}
 		break;
 	    case PM_DEATH:

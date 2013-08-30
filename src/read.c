@@ -2164,7 +2164,7 @@ boolean
 create_particular()
 {
 	char buf[BUFSZ], *bufp, monclass = MAXMCLASSES;
-	int which, tries, i;
+	int which, tries, i, quan;
 	struct permonst *whichpm;
 	struct monst *mtmp;
 	boolean madeany = FALSE;
@@ -2172,12 +2172,22 @@ create_particular()
 
 	tries = 0;
 	do {
+	    if (multi > 0) quan = multi;
+	    else quan = 1;
 	    which = urole.malenum;	/* an arbitrary index into mons[] */
 	    maketame = makepeaceful = makehostile = FALSE;
 	    getlin("Create what kind of monster? [type the name or symbol]",
 		   buf);
 	    bufp = mungspaces(buf);
 	    if (*bufp == '\033') return FALSE;
+	    /* get quantity */
+	    if (digit(*bufp) && strcmp(bufp, "0")) {
+		quan = atoi(bufp);
+		while (digit(*bufp))
+		    bufp++;
+		while (*bufp == ' ')
+		    bufp++;
+	    }
 	    /* allow the initial disposition to be specified */
 	    if (!strncmpi(bufp, "tame ", 5)) {
 		bufp += 5;
@@ -2206,7 +2216,7 @@ create_particular()
 	} else {
 	    (void) cant_create(&which, FALSE);
 	    whichpm = &mons[which];
-	    for (i = 0; i <= multi; i++) {
+	    for (i = 0; i < quan; i++) {
 		if (monclass != MAXMCLASSES)
 		    whichpm = mkclass(monclass, 0);
 		if (maketame) {
