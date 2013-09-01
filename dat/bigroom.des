@@ -738,3 +738,36 @@ LOOP [6] {
 LOOP [28] {
   MONSTER:random,random
 }
+
+
+
+LEVEL:"bigrm-14"
+FLAGS:mazelevel
+INIT_MAP:rogue
+$corr = selection: grow(grow(filter('#', fillrect(0,0, 76,21))))
+TERRAIN:$corr, ('.', lit)
+$border = selection: rect(0,0, 76,21)
+TERRAIN:$border, ' '
+REGION:(00,00,76,21),lit,"ordinary"
+WALLIFY
+
+# Stairs
+STAIR:random,up
+STAIR:random,down
+# Non diggable walls
+NON_DIGGABLE:(00,00,74,17)
+# Objects
+LOOP [15] {
+  OBJECT:random,random
+}
+OBJECT:('(',"wax candle"),random,quantity:2
+
+# Random traps
+LOOP [6] {
+  TRAP:random,random
+}
+# Random monsters.
+[50%]: MONSTER: (':',"giant turtle"),random
+LOOP [28] {
+  MONSTER:random,random
+}

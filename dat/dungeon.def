@@ -23,7 +23,7 @@ LEVEL:		"oracle" "O" @ (5, 5)
 LEVALIGN:	neutral
 CHAINBRANCH:	"Sokoban" "oracle" + (1, 0) up
 CHAINBRANCH:	"Town" "oracle" + (2, 2) up
-RNDLEVEL:	"bigrm" "B" @ (10, 3) 40 13
+RNDLEVEL:	"bigrm" "B" @ (10, 3) 40 14
 CHAINBRANCH:	"The Quest" "oracle" + (6, 2) portal
 BRANCH:		"The Ruins of Moria" @ (16, 4) up
 BRANCH:		"Fort Ludios" @ (18, 4) portal
