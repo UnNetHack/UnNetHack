@@ -1048,10 +1048,9 @@ boolean
 not_fully_identified(otmp)
 register struct obj *otmp;
 {
-#ifdef GOLDOBJ
     /* gold doesn't have any interesting attributes [yet?] */
     if (otmp->oclass == COIN_CLASS) return FALSE;	/* always fully ID'd */
-#endif
+
     /* check fundamental ID hallmarks first */
     if (!otmp->known || !otmp->dknown ||
 #ifdef MAIL
