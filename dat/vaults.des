@@ -313,6 +313,54 @@ MAP
 ENDMAP
 REGION:(1,1,3,3),random,"ordinary",unfilled,true { }
 
+# L-shaped, r2
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+--------
+|......|
+|......|
+|......|
+|...----
+|...|xxx
+|...|xxx
+-----xxx
+ENDMAP
+REGION:(1,1,3,3),random,"ordinary",unfilled,true { }
+
+# L-shaped, r3
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+--------
+|......|
+|......|
+|......|
+----...|
+xxx|...|
+xxx|...|
+xxx-----
+ENDMAP
+REGION:(1,1,3,3),random,"ordinary",unfilled,true { }
+
+# L-shaped, r4
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+xxx-----
+xxx|...|
+xxx|...|
+----...|
+|......|
+|......|
+|......|
+--------
+ENDMAP
+REGION:(4,1,6,3),random,"ordinary",unfilled,true { }
+
 
 # L-shaped, big
 LEVEL:"vlt-%04i"
@@ -334,6 +382,65 @@ MAP
 ENDMAP
 REGION:(3,3,3,3),random,"rndvault",unfilled,true { }
 
+# L-shaped, big, r2
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+-------------
+|...........|
+|...........|
+|...........|
+|...........|
+|...........|
+|.....-------
+|.....|xxxxxx
+|.....|xxxxxx
+|.....|xxxxxx
+|.....|xxxxxx
+-------xxxxxx
+ENDMAP
+REGION:(3,3,3,3),random,"rndvault",unfilled,true { }
+
+# L-shaped, big, r3
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+-------------
+|...........|
+|...........|
+|...........|
+|...........|
+|...........|
+-------.....|
+xxxxxx|.....|
+xxxxxx|.....|
+xxxxxx|.....|
+xxxxxx|.....|
+xxxxxx-------
+ENDMAP
+REGION:(3,3,3,3),random,"rndvault",unfilled,true { }
+
+# L-shaped, big, r4
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+xxxxxx-------
+xxxxxx|.....|
+xxxxxx|.....|
+xxxxxx|.....|
+xxxxxx|.....|
+-------.....|
+|...........|
+|...........|
+|...........|
+|...........|
+|...........|
+-------------
+ENDMAP
+REGION:(8,8,8,8),random,"rndvault",unfilled,true { }
 
 
 
@@ -434,6 +541,61 @@ xxx|...|xxx
 ENDMAP
 REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
 
+# T-shaped, r2
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+-----xxx
+|...|xxx
+|...|xxx
+|...----
+|......|
+|......|
+|......|
+|...----
+|...|xxx
+|...|xxx
+-----xxx
+ENDMAP
+REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+
+# T-shaped, r3
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+-----------
+|.........|
+|.........|
+|.........|
+----...----
+xxx|...|xxx
+xxx|...|xxx
+xxx-----xxx
+ENDMAP
+REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+
+# T-shaped, r4
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+xxx-----
+xxx|...|
+xxx|...|
+----...|
+|......|
+|......|
+|......|
+----...|
+xxx|...|
+xxx|...|
+xxx-----
+ENDMAP
+REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+
+
 
 # S-shaped
 LEVEL:"vlt-%04i"
@@ -454,6 +616,58 @@ xxx-----
 ENDMAP
 REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
 
+# S-shaped, r2
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+xxx--------
+xxx|......|
+xxx|......|
+----......|
+|......----
+|......|xxx
+|......|xxx
+--------xxx
+ENDMAP
+REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+
+# Z-shaped
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+xxx-----
+xxx|...|
+xxx|...|
+----...|
+|......|
+|......|
+|......|
+|...----
+|...|xxx
+|...|xxx
+-----xxx
+ENDMAP
+REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+
+# Z-shaped, r2
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+--------xxx
+|......|xxx
+|......|xxx
+|......----
+----......|
+xxx|......|
+xxx|......|
+xxx--------
+ENDMAP
+REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+
+
 
 
 # U-shaped
@@ -471,6 +685,22 @@ MAP
 -------------
 ENDMAP
 REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+
+# U-shaped, reversed
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+-------------
+|...........|
+|...........|
+|...........|
+|...-----...|
+|...|xxx|...|
+|...|xxx|...|
+-----xxx-----
+ENDMAP
+REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
 
 
 
@@ -491,6 +721,187 @@ MAP
 --------
 ENDMAP
 REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+
+# C-shaped, reversed
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+--------
+|......|
+|......|
+----...|
+xxx|...|
+xxx|...|
+----...|
+|......|
+|......|
+--------
+ENDMAP
+REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+
+
+# Tetris L-shaped
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+-----xxx
+|...|xxx
+|...|xxx
+|...|xxx
+|...|xxx
+|...|xxx
+|...----
+|......|
+|......|
+|......|
+--------
+ENDMAP
+REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+
+# Tetris L-shaped, r2
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+-----------
+|.........|
+|.........|
+|.........|
+|...-------
+|...|xxxxxx
+|...|xxxxxx
+-----xxxxxx
+ENDMAP
+REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+
+# Tetris L-shaped, r3
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+--------
+|......|
+|......|
+|......|
+----...|
+xxx|...|
+xxx|...|
+xxx|...|
+xxx|...|
+xxx|...|
+xxx-----
+ENDMAP
+REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+
+# Tetris L-shaped, r4
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+xxxxxx-----
+xxxxxx|...|
+xxxxxx|...|
+-------...|
+|.........|
+|.........|
+|.........|
+-----------
+ENDMAP
+REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+
+
+# Tetris J-shaped
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+xxx-----
+xxx|...|
+xxx|...|
+xxx|...|
+xxx|...|
+xxx|...|
+----...|
+|......|
+|......|
+|......|
+--------
+ENDMAP
+REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+
+# Tetris J-shaped, r2
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+-----xxxxxx
+|...|xxxxxx
+|...|xxxxxx
+|...-------
+|.........|
+|.........|
+|.........|
+-----------
+ENDMAP
+REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+
+# Tetris J-shaped, r3
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+--------
+|......|
+|......|
+|......|
+|...----
+|...|xxx
+|...|xxx
+|...|xxx
+|...|xxx
+|...|xxx
+-----xxx
+ENDMAP
+REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+
+# Tetris J-shaped, r4
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+-----------
+|.........|
+|.........|
+|.........|
+-------...|
+xxxxxx|...|
+xxxxxx|...|
+xxxxxx-----
+ENDMAP
+REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+
+
+# Four-leaf clover
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+-----x-----
+|...|x|...|
+|...---...|
+|.........|
+---.....---
+xx|.....|xx
+---.....---
+|.........|
+|...---...|
+|...|x|...|
+-----x-----
+ENDMAP
+REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+
 
 
 # watcher in the water
