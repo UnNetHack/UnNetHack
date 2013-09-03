@@ -185,6 +185,16 @@ pass_three(bg_typ, fg_typ)
 		levl[i][j].typ = new_loc(i,j);
 }
 
+boolean
+check_flood_anyroom(x,y, fg_typ, anyroom)
+     int x, y;
+     schar fg_typ;
+     boolean anyroom;
+{
+    if (!isok(x,y)) return FALSE;
+    return (anyroom ? IS_ROOM(levl[x][y].typ) : levl[x][y].typ == fg_typ);
+}
+
 /*
  * use a flooding algorithm to find all locations that should
  * have the same rm number as the current location.
@@ -205,7 +215,7 @@ flood_fill_rm(sx, sy, rmno, lit, anyroom)
 
     /* back up to find leftmost uninitialized location */
     while (sx > 0 &&
-	  (anyroom ? IS_ROOM(levl[sx][sy].typ) : levl[sx][sy].typ == fg_typ) &&
+	   (check_flood_anyroom(sx,sy, fg_typ, anyroom)) &&
 	  (int) levl[sx][sy].roomno != rmno)
 	sx--;
     sx++; /* compensate for extra decrement */
@@ -214,7 +224,7 @@ flood_fill_rm(sx, sy, rmno, lit, anyroom)
     if(sx < min_rx) min_rx = sx;
     if(sy < min_ry) min_ry = sy;
 
-    for(i=sx; i<=WIDTH && levl[i][sy].typ == fg_typ; i++) {
+    for(i=sx; i<=WIDTH && check_flood_anyroom(i,sy, fg_typ, anyroom); i++) {
 	levl[i][sy].roomno = rmno;
 	levl[i][sy].lit = lit;
 	if(anyroom) {
@@ -237,17 +247,17 @@ flood_fill_rm(sx, sy, rmno, lit, anyroom)
 
     if(isok(sx,sy-1)) {
 	for(i=sx; i<nx; i++)
-	    if(levl[i][sy-1].typ == fg_typ) {
+	    if(check_flood_anyroom(i,sy-1, fg_typ, anyroom)) {
 		if ((int) levl[i][sy-1].roomno != rmno)
 		    flood_fill_rm(i,sy-1,rmno,lit,anyroom);
 	    } else {
 		if((i>sx || isok(i-1,sy-1)) &&
-		      levl[i-1][sy-1].typ == fg_typ) {
+		      check_flood_anyroom(i-1,sy-1, fg_typ, anyroom)) {
 		    if ((int) levl[i-1][sy-1].roomno != rmno)
 			flood_fill_rm(i-1,sy-1,rmno,lit,anyroom);
 		}
 		if((i<nx-1 || isok(i+1,sy-1)) &&
-		      levl[i+1][sy-1].typ == fg_typ) {
+		      check_flood_anyroom(i+1,sy-1, fg_typ, anyroom)) {
 		    if ((int) levl[i+1][sy-1].roomno != rmno)
 			flood_fill_rm(i+1,sy-1,rmno,lit,anyroom);
 		}
@@ -255,17 +265,17 @@ flood_fill_rm(sx, sy, rmno, lit, anyroom)
     }
     if(isok(sx,sy+1)) {
 	for(i=sx; i<nx; i++)
-	    if(levl[i][sy+1].typ == fg_typ) {
+	    if(check_flood_anyroom(i,sy+1, fg_typ, anyroom)) {
 		if ((int) levl[i][sy+1].roomno != rmno)
 		    flood_fill_rm(i,sy+1,rmno,lit,anyroom);
 	    } else {
 		if((i>sx || isok(i-1,sy+1)) &&
-		      levl[i-1][sy+1].typ == fg_typ) {
+		      check_flood_anyroom(i-1,sy+1, fg_typ, anyroom)) {
 		    if ((int) levl[i-1][sy+1].roomno != rmno)
 			flood_fill_rm(i-1,sy+1,rmno,lit,anyroom);
 		}
 		if((i<nx-1 || isok(i+1,sy+1)) &&
-		      levl[i+1][sy+1].typ == fg_typ) {
+		   check_flood_anyroom(i+1,sy+1, fg_typ, anyroom)) {
 		    if ((int) levl[i+1][sy+1].roomno != rmno)
 			flood_fill_rm(i+1,sy+1,rmno,lit,anyroom);
 		}
