@@ -2688,9 +2688,11 @@ lev_init *linit;
     case LVLINIT_SHEOL:
 	mksheol(linit);
 	break;
+#ifdef REINCARNATION
     case LVLINIT_ROGUE:
 	makeroguerooms();
 	break;
+#endif
     case LVLINIT_MINES:
 	if (linit->lit == -1) linit->lit = rn2(2);
 	if (linit->filling > -1) lvlfill_solid(linit->filling, 0);
