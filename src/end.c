@@ -615,7 +615,7 @@ int how;
 		/* Keep it blessed! */
 		if (uamul && uamul->cursed && rnf(1,4)) {
 			pline("But ... the chain on your medallion breaks and it falls to the %s!", surface(u.ux,u.uy));
-			You_hear("homeric laughter!"); /* Hah ha! */
+			You_hear("Homeric laughter!"); /* Hah ha! */
 			/* It already started to work. Too bad you couldn't hold onto it. */
 			useup(uamul);
 		} else {
