@@ -1329,7 +1329,8 @@ struct monst *magr,	/* monster that is currently deciding where to move */
 		return ALLOW_M|ALLOW_TM;
 
 	/* ravens like eyes */
-	if(ma == &mons[PM_RAVEN] && md == &mons[PM_FLOATING_EYE])
+	if(ma == &mons[PM_RAVEN] && (md == &mons[PM_FLOATING_EYE] || 
+		    md == &mons[PM_EVIL_EYE]))
 		return ALLOW_M|ALLOW_TM;
 
 	/* dungeon fern spores hate everything */
