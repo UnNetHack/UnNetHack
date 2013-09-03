@@ -470,9 +470,9 @@ SHUFFLE:$place
 # Where the player will land on arrival
 TELEPORT_REGION:(29,15,45,15),(30,15,44,15)
 # Lit courts
-REGION:(01,05,16,14),lit,"ordinary",filled,true
-REGION:(31,01,44,10),lit,"ordinary",filled,true
-REGION:(61,05,74,14),lit,"ordinary",filled,true
+REGION:(01,05,16,14),lit,"ordinary",filled,irregular
+REGION:(31,01,44,10),lit,"ordinary",filled,irregular
+REGION:(61,05,74,14),lit,"ordinary",filled,irregular
 # A Sanctum for each alignment
 # The shrines' alignments are shuffled for
 # each game

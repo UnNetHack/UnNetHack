@@ -34,9 +34,9 @@ ENDMAP
 # The shrine to Moloch.
 REGION:(01,06,05,14),lit,"temple"
 # The Morgues
-REGION:(19,01,24,08),unlit,"morgue",filled,true
-REGION:(09,14,16,18),unlit,"morgue",filled,true
-REGION:(37,09,43,14),unlit,"morgue",filled,true
+REGION:(19,01,24,08),unlit,"morgue",filled,irregular
+REGION:(09,14,16,18),unlit,"morgue",filled,irregular
+REGION:(37,09,43,14),unlit,"morgue",filled,irregular
 # Stairs
 STAIR:(01,01),down
 # Branch location
@@ -201,9 +201,9 @@ ENDMAP
 # The shrine to Moloch.
 REGION:(70,06,74,14),lit,"temple"
 # The Morgues
-REGION:(52,01,57,08),unlit,"morgue",filled,true
-REGION:(59,14,66,18),unlit,"morgue",filled,true
-REGION:(32,09,42,14),unlit,"morgue",filled,true
+REGION:(52,01,57,08),unlit,"morgue",filled,irregular
+REGION:(59,14,66,18),unlit,"morgue",filled,irregular
+REGION:(32,09,42,14),unlit,"morgue",filled,irregular
 # Stairs
 STAIR:(74,01),down
 # Branch location
@@ -664,7 +664,7 @@ REGION:(56,01,65,07),unlit,"morgue"
 REGION:(01,14,05,15),unlit,"shop"
 REGION:(39,01,43,02),unlit,"shop"
 REGION:(18,03,25,05),unlit,"temple"
-REGION:(02,05,03,07),lit,"candle shop",filled,true
+REGION:(02,05,03,07),lit,"candle shop",filled,irregular
 DOOR:random,(05,05)
 ALTAR:(20,04),noncoaligned,altar
 OBJECT:('%',"corpse"),(23,03),montype:"priest",0
@@ -1247,7 +1247,7 @@ LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
 ENDMAP
 REGION:(15,07,21,10),lit,"temple"
 ALTAR:(18,08),noalign,shrine
-REGION:(41,06,48,11),unlit,"morgue",filled,true
+REGION:(41,06,48,11),unlit,"morgue",filled,irregular
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Invisible barrier separating the left & right halves of the level

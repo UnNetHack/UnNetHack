@@ -343,7 +343,7 @@ REGION:(63,00,75,01),lit,"ordinary"
 REGION:(47,03,52,06),unlit,"ordinary"
 REGION:(47,12,52,15),unlit,"ordinary"
 
-REGION:(24,03,31,15),lit,"throne",unfilled,true
+REGION:(24,03,31,15),lit,"throne",unfilled,irregular
 
 REGION:(14,03,22,05),lit,"barracks"
 REGION:(14,13,22,15),lit,"barracks"
@@ -545,7 +545,7 @@ REGION:(01,09,03,11),unlit,"ordinary"
 REGION:(01,11,15,11),unlit,"ordinary"
 
 # the special rooms in the castle
-REGION:(05,03,15,07),lit,"throne",unfilled,true
+REGION:(05,03,15,07),lit,"throne",unfilled,irregular
 REGION:(17,01,23,03),lit,"barracks"
 REGION:(27,01,33,03),lit,"barracks"
 REGION:(17,07,19,10),lit,"barracks"

@@ -244,7 +244,7 @@ BRANCH:levregion(01,00,79,20),(0,0,8,7)
 TELEPORT_REGION:levregion(01,00,79,20),(2,2,6,6)
 PORTAL:(4,4,4,4),(0,0,0,0),"wizard3"
 MAZEWALK:(08,05),east
-REGION:(04,03,06,06),unlit,"ordinary",unfilled,true
+REGION:(04,03,06,06),unlit,"ordinary",unfilled,irregular
 MONSTER:'L',(04,04)
 MONSTER:('V',"vampire lord"),(03,04)
 MONSTER:(';',"kraken"),(06,06)
@@ -274,7 +274,7 @@ STAIR:levregion(01,00,79,20),(0,0,8,7),down
 BRANCH:levregion(01,00,79,20),(0,0,8,7)
 TELEPORT_REGION:levregion(01,00,79,20),(2,2,6,6)
 MAZEWALK:(08,05),east
-REGION:(04,03,06,06),unlit,"ordinary",unfilled,true
+REGION:(04,03,06,06),unlit,"ordinary",unfilled,irregular
 MONSTER:'L',(04,04)
 MONSTER:('V',"vampire lord"),(03,04)
 MONSTER:(';',"kraken"),(06,06)

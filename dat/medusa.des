@@ -137,7 +137,7 @@ ENDMAP
 # Dungeon Description
 REGION:(00,00,74,19),lit,"ordinary"
 REGION:(02,03,05,16),unlit,"ordinary"
-REGION:(61,03,72,16),unlit,"ordinary",unfilled,true
+REGION:(61,03,72,16),unlit,"ordinary",unfilled,irregular
 REGION:(71,08,72,11),unlit,"ordinary"
 REGION:(67,08,69,11),lit,"ordinary"
 # Teleport: down to up stairs island, up to Medusa's island

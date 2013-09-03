@@ -159,13 +159,13 @@ REGION:(25,09,28,11),unlit,"temple"
 REGION:(25,13,28,16),lit,"temple"
 REGION:(30,04,30,16),lit,"ordinary"
 REGION:(32,04,32,16),unlit,"ordinary"
-REGION:(33,04,53,04),unlit,"ordinary",unfilled,true
+REGION:(33,04,53,04),unlit,"ordinary",unfilled,irregular
 REGION:(36,10,37,10),unlit,"ordinary"
 REGION:(39,09,39,11),unlit,"ordinary"
-REGION:(36,06,42,08),unlit,"ordinary",unfilled,true
-REGION:(36,12,42,14),unlit,"ordinary",unfilled,true
+REGION:(36,06,42,08),unlit,"ordinary",unfilled,irregular
+REGION:(36,12,42,14),unlit,"ordinary",unfilled,irregular
 REGION:(46,06,51,09),unlit,"ordinary"
-REGION:(46,11,49,11),unlit,"ordinary",unfilled,true
+REGION:(46,11,49,11),unlit,"ordinary",unfilled,irregular
 REGION:(48,13,51,14),unlit,"ordinary"
 # Doors
 DOOR:closed,(31,04)

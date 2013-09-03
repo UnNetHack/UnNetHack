@@ -37,14 +37,14 @@ MAP
 ENDMAP
 # Dungeon Description
 REGION:(00,00,75,19),unlit,"ordinary"
-REGION:(13,01,40,05),lit,"temple",unfilled,true
+REGION:(13,01,40,05),lit,"temple",unfilled,irregular
 # The occupied rooms.
-REGION:(02,01,08,03),lit,"ordinary",unfilled,true
-REGION:(01,11,06,14),lit,"ordinary",unfilled,true
-REGION:(13,08,18,10),lit,"ordinary",unfilled,true
-REGION:(05,17,14,18),lit,"ordinary",unfilled,true
-REGION:(17,16,23,18),lit,"ordinary",unfilled,true
-REGION:(35,16,44,18),lit,"ordinary",unfilled,true
+REGION:(02,01,08,03),lit,"ordinary",unfilled,irregular
+REGION:(01,11,06,14),lit,"ordinary",unfilled,irregular
+REGION:(13,08,18,10),lit,"ordinary",unfilled,irregular
+REGION:(05,17,14,18),lit,"ordinary",unfilled,irregular
+REGION:(17,16,23,18),lit,"ordinary",unfilled,irregular
+REGION:(35,16,44,18),lit,"ordinary",unfilled,irregular
 # Stairs
 STAIR:(02,03),down
 # Portal arrival point
@@ -129,7 +129,7 @@ MAP
 ENDMAP
 # Dungeon Description
 REGION:(00,00,75,19),unlit,"ordinary"
-REGION:(52,06,73,15),lit,"ordinary",unfilled,true
+REGION:(52,06,73,15),lit,"ordinary",unfilled,irregular
 # Doors
 DOOR:locked,(28,11)
 # Stairs

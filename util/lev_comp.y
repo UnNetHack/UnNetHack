@@ -195,7 +195,7 @@ extern int rnd_vault_freq;
 %token	<i> MESSAGE_ID LEVEL_ID LEV_INIT_ID GEOMETRY_ID NOMAP_ID
 %token	<i> OBJECT_ID COBJECT_ID MONSTER_ID TRAP_ID DOOR_ID DRAWBRIDGE_ID
 %token	<i> object_ID monster_ID terrain_ID
-%token	<i> MAZEWALK_ID WALLIFY_ID REGION_ID FILLING
+%token	<i> MAZEWALK_ID WALLIFY_ID REGION_ID FILLING IRREGULAR
 %token	<i> ALTAR_ID LADDER_ID STAIR_ID NON_DIGGABLE_ID NON_PASSWALL_ID ROOM_ID
 %token	<i> PORTAL_ID TELEPRT_ID BRANCH_ID LEV CHANCE_ID
 %token	<i> CORRIDOR_ID GOLD_ID ENGRAVING_ID FOUNTAIN_ID POOL_ID SINK_ID NONE
@@ -252,7 +252,7 @@ extern int rnd_vault_freq;
 %type	<i> dir_list teleprt_detail
 %type	<i> object_infos object_info monster_infos monster_info
 %type	<i> levstatements stmt_block region_detail_end
-%type	<i> engraving_type flag_list prefilled
+%type	<i> engraving_type flag_list roomregionflag roomregionflags optroomregionflags
 %type	<i> monster humidity_flags
 %type	<i> comparestmt encodecoord encoderegion mapchar
 %type	<i> seen_trap_mask
@@ -1900,7 +1900,7 @@ passwall_detail : NON_PASSWALL_ID ':' region_or_var
 		  }
 		;
 
-region_detail	: REGION_ID ':' region_or_var ',' light_state ',' room_type prefilled
+region_detail	: REGION_ID ':' region_or_var ',' light_state ',' room_type optroomregionflags
 		  {
 		      long rt, irr;
 		      rt = $7;
@@ -1990,17 +1990,33 @@ room_type	: STRING
 		| RANDOM_TYPE
 		;
 
-prefilled	: /* empty */
+optroomregionflags : /* empty */
 		  {
 			$$ = 0;
 		  }
-		| ',' FILLING
+		| ',' roomregionflags
 		  {
 			$$ = $2;
 		  }
-		| ',' FILLING ',' BOOLEAN
+		;
+
+roomregionflags : roomregionflag
 		  {
-			$$ = $2 + ($4 << 1);
+			$$ = $1;
+		  }
+		| roomregionflag ',' roomregionflags
+		  {
+			$$ = $1 | $3;
+		  }
+		;
+
+roomregionflag : FILLING
+		  {
+		      $$ = ($1 << 0);
+		  }
+		| IRREGULAR
+		  {
+		      $$ = ($1 << 1);
 		  }
 		;
 

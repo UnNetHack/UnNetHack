@@ -38,7 +38,7 @@ ENDMAP
 REGION:(00,00,75,19),lit,"ordinary"
 REGION:(35,00,49,03),unlit,"ordinary"
 REGION:(43,12,49,16),unlit,"ordinary"
-REGION:(19,11,33,15),unlit,"ordinary",unfilled,true
+REGION:(19,11,33,15),unlit,"ordinary",unfilled,irregular
 REGION:(30,10,31,10),unlit,"ordinary"
 # Stairs
 STAIR:(30,10),down

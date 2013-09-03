@@ -311,7 +311,7 @@ MAP
 |......|
 --------
 ENDMAP
-REGION:(1,1,3,3),random,"ordinary",unfilled,true { }
+REGION:(1,1,3,3),random,"ordinary",unfilled,irregular { }
 
 # L-shaped, r2
 LEVEL:"vlt-%04i"
@@ -327,7 +327,7 @@ MAP
 |...|xxx
 -----xxx
 ENDMAP
-REGION:(1,1,3,3),random,"ordinary",unfilled,true { }
+REGION:(1,1,3,3),random,"ordinary",unfilled,irregular { }
 
 # L-shaped, r3
 LEVEL:"vlt-%04i"
@@ -343,7 +343,7 @@ xxx|...|
 xxx|...|
 xxx-----
 ENDMAP
-REGION:(1,1,3,3),random,"ordinary",unfilled,true { }
+REGION:(1,1,3,3),random,"ordinary",unfilled,irregular { }
 
 # L-shaped, r4
 LEVEL:"vlt-%04i"
@@ -359,7 +359,7 @@ xxx|...|
 |......|
 --------
 ENDMAP
-REGION:(4,1,6,3),random,"ordinary",unfilled,true { }
+REGION:(4,1,6,3),random,"ordinary",unfilled,irregular { }
 
 
 # L-shaped, big
@@ -380,7 +380,7 @@ MAP
 |...........|
 -------------
 ENDMAP
-REGION:(3,3,3,3),random,"rndvault",unfilled,true { }
+REGION:(3,3,3,3),random,"rndvault",unfilled,irregular { }
 
 # L-shaped, big, r2
 LEVEL:"vlt-%04i"
@@ -400,7 +400,7 @@ MAP
 |.....|xxxxxx
 -------xxxxxx
 ENDMAP
-REGION:(3,3,3,3),random,"rndvault",unfilled,true { }
+REGION:(3,3,3,3),random,"rndvault",unfilled,irregular { }
 
 # L-shaped, big, r3
 LEVEL:"vlt-%04i"
@@ -420,7 +420,7 @@ xxxxxx|.....|
 xxxxxx|.....|
 xxxxxx-------
 ENDMAP
-REGION:(3,3,3,3),random,"rndvault",unfilled,true { }
+REGION:(3,3,3,3),random,"rndvault",unfilled,irregular { }
 
 # L-shaped, big, r4
 LEVEL:"vlt-%04i"
@@ -440,7 +440,7 @@ xxxxxx|.....|
 |...........|
 -------------
 ENDMAP
-REGION:(8,8,8,8),random,"rndvault",unfilled,true { }
+REGION:(8,8,8,8),random,"rndvault",unfilled,irregular { }
 
 
 
@@ -466,7 +466,7 @@ IF [75%] {
   SHUFFLE: $terr
   REPLACE_TERRAIN:(1,1,9,9),'L', $terr[0],100%
 }
-REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+REGION:(1,1,1,1),random,"ordinary",unfilled,irregular { }
 
 
 
@@ -483,7 +483,7 @@ x--.--x
 x--.--x
 xx---xx
 ENDMAP
-REGION:(3,3,3,3),random,"ordinary",unfilled,true { }
+REGION:(3,3,3,3),random,"ordinary",unfilled,irregular { }
 
 
 # Circular, medium
@@ -501,7 +501,7 @@ x--...--x
 x--...--x
 xx-----xx
 ENDMAP
-REGION:(4,4,4,4),random,"ordinary",unfilled,true { }
+REGION:(4,4,4,4),random,"ordinary",unfilled,irregular { }
 
 
 # Circular, big
@@ -521,7 +521,7 @@ x-.......-x
 x---...---x
 xxx-----xxx
 ENDMAP
-REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+REGION:(5,5,5,5),random,"ordinary",unfilled,irregular { }
 
 
 
@@ -539,7 +539,7 @@ xxx|...|xxx
 |.........|
 -----------
 ENDMAP
-REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+REGION:(5,5,5,5),random,"ordinary",unfilled,irregular { }
 
 # T-shaped, r2
 LEVEL:"vlt-%04i"
@@ -558,7 +558,7 @@ MAP
 |...|xxx
 -----xxx
 ENDMAP
-REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+REGION:(5,5,5,5),random,"ordinary",unfilled,irregular { }
 
 # T-shaped, r3
 LEVEL:"vlt-%04i"
@@ -574,7 +574,7 @@ xxx|...|xxx
 xxx|...|xxx
 xxx-----xxx
 ENDMAP
-REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+REGION:(5,5,5,5),random,"ordinary",unfilled,irregular { }
 
 # T-shaped, r4
 LEVEL:"vlt-%04i"
@@ -593,7 +593,7 @@ xxx|...|
 xxx|...|
 xxx-----
 ENDMAP
-REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+REGION:(5,5,5,5),random,"ordinary",unfilled,irregular { }
 
 
 
@@ -614,7 +614,7 @@ xxx|...|
 xxx|...|
 xxx-----
 ENDMAP
-REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+REGION:(5,5,5,5),random,"ordinary",unfilled,irregular { }
 
 # S-shaped, r2
 LEVEL:"vlt-%04i"
@@ -630,7 +630,7 @@ xxx|......|
 |......|xxx
 --------xxx
 ENDMAP
-REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+REGION:(5,5,5,5),random,"ordinary",unfilled,irregular { }
 
 # Z-shaped
 LEVEL:"vlt-%04i"
@@ -649,7 +649,7 @@ xxx|...|
 |...|xxx
 -----xxx
 ENDMAP
-REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+REGION:(5,5,5,5),random,"ordinary",unfilled,irregular { }
 
 # Z-shaped, r2
 LEVEL:"vlt-%04i"
@@ -665,7 +665,7 @@ xxx|......|
 xxx|......|
 xxx--------
 ENDMAP
-REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+REGION:(5,5,5,5),random,"ordinary",unfilled,irregular { }
 
 
 
@@ -684,7 +684,7 @@ MAP
 |...........|
 -------------
 ENDMAP
-REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+REGION:(5,5,5,5),random,"ordinary",unfilled,irregular { }
 
 # U-shaped, reversed
 LEVEL:"vlt-%04i"
@@ -700,7 +700,7 @@ MAP
 |...|xxx|...|
 -----xxx-----
 ENDMAP
-REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+REGION:(1,1,1,1),random,"ordinary",unfilled,irregular { }
 
 
 
@@ -720,7 +720,7 @@ MAP
 |......|
 --------
 ENDMAP
-REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+REGION:(1,1,1,1),random,"ordinary",unfilled,irregular { }
 
 # C-shaped, reversed
 LEVEL:"vlt-%04i"
@@ -738,7 +738,7 @@ xxx|...|
 |......|
 --------
 ENDMAP
-REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+REGION:(1,1,1,1),random,"ordinary",unfilled,irregular { }
 
 
 # Tetris L-shaped
@@ -758,7 +758,7 @@ MAP
 |......|
 --------
 ENDMAP
-REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+REGION:(1,1,1,1),random,"ordinary",unfilled,irregular { }
 
 # Tetris L-shaped, r2
 LEVEL:"vlt-%04i"
@@ -774,7 +774,7 @@ MAP
 |...|xxxxxx
 -----xxxxxx
 ENDMAP
-REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+REGION:(1,1,1,1),random,"ordinary",unfilled,irregular { }
 
 # Tetris L-shaped, r3
 LEVEL:"vlt-%04i"
@@ -793,7 +793,7 @@ xxx|...|
 xxx|...|
 xxx-----
 ENDMAP
-REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+REGION:(5,5,5,5),random,"ordinary",unfilled,irregular { }
 
 # Tetris L-shaped, r4
 LEVEL:"vlt-%04i"
@@ -809,7 +809,7 @@ xxxxxx|...|
 |.........|
 -----------
 ENDMAP
-REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+REGION:(5,5,5,5),random,"ordinary",unfilled,irregular { }
 
 
 # Tetris J-shaped
@@ -829,7 +829,7 @@ xxx|...|
 |......|
 --------
 ENDMAP
-REGION:(5,5,5,5),random,"ordinary",unfilled,true { }
+REGION:(5,5,5,5),random,"ordinary",unfilled,irregular { }
 
 # Tetris J-shaped, r2
 LEVEL:"vlt-%04i"
@@ -845,7 +845,7 @@ MAP
 |.........|
 -----------
 ENDMAP
-REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+REGION:(1,1,1,1),random,"ordinary",unfilled,irregular { }
 
 # Tetris J-shaped, r3
 LEVEL:"vlt-%04i"
@@ -864,7 +864,7 @@ MAP
 |...|xxx
 -----xxx
 ENDMAP
-REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+REGION:(1,1,1,1),random,"ordinary",unfilled,irregular { }
 
 # Tetris J-shaped, r4
 LEVEL:"vlt-%04i"
@@ -880,7 +880,7 @@ xxxxxx|...|
 xxxxxx|...|
 xxxxxx-----
 ENDMAP
-REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+REGION:(1,1,1,1),random,"ordinary",unfilled,irregular { }
 
 
 # Four-leaf clover
@@ -900,7 +900,7 @@ xx|.....|xx
 |...|x|...|
 -----x-----
 ENDMAP
-REGION:(1,1,1,1),random,"ordinary",unfilled,true { }
+REGION:(1,1,1,1),random,"ordinary",unfilled,irregular { }
 
 
 

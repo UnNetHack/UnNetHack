@@ -80,7 +80,7 @@ NON_DIGGABLE: (00,00,75,18)
 NON_PASSWALL: (00,00,75,18)
 BRANCH: (05,05,13,13), (08,08,10,10)
 
-REGION: (09,09,09,09), lit, "black market foyer", unfilled, true
+REGION: (09,09,09,09), lit, "black market foyer", unfilled, irregular
 
 MONSTER:('@', "One-eyed Sam"), (14,09), peaceful
 
@@ -100,15 +100,15 @@ $shopdoors = { (29,07), (35,13), (38,08), (38,11), (58,06), (51,12),
 
 SHUFFLE: $shops
 
-REGION: $shops[0], lit, "shop", filled, true
-REGION: $shops[1], lit, "scroll shop", filled, true
-REGION: $shops[2], lit, "potion shop", filled, true
-REGION: $shops[3], lit, "wand shop", filled, true
-REGION: $shops[4], lit, "ring shop", filled, true
-REGION: $shops[5], lit, "armor shop", filled, true
-REGION: $shops[6], lit, "tool shop", filled, true
-REGION: $shops[7], lit, "weapon shop", filled, true
-REGION: $shops[8], lit, "book shop", filled, true
+REGION: $shops[0], lit, "shop", filled, irregular
+REGION: $shops[1], lit, "scroll shop", filled, irregular
+REGION: $shops[2], lit, "potion shop", filled, irregular
+REGION: $shops[3], lit, "wand shop", filled, irregular
+REGION: $shops[4], lit, "ring shop", filled, irregular
+REGION: $shops[5], lit, "armor shop", filled, irregular
+REGION: $shops[6], lit, "tool shop", filled, irregular
+REGION: $shops[7], lit, "weapon shop", filled, irregular
+REGION: $shops[8], lit, "book shop", filled, irregular
 
 FOR $x = 0 TO 9 {
   IF [80%] {

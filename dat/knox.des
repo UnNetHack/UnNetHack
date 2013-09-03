@@ -50,12 +50,12 @@ REGION:(46,06,48,06),lit,"ordinary"
 REGION:(19,13,21,13),lit,"ordinary"
 REGION:(46,13,48,13),lit,"ordinary"
 #   A welcoming committee
-REGION:(03,10,07,13),lit,"zoo",filled,true
+REGION:(03,10,07,13),lit,"zoo",filled,irregular
 #   arrival chamber; needs to be a real room to control migrating monsters,
 #   and `unfilled' is a kludge to force an ordinary room to remain a room
 REGION:(06,15,09,16),unlit,"ordinary",unfilled
 #   Barracks
-REGION:(62,03,71,04),lit,"barracks",filled,true
+REGION:(62,03,71,04),lit,"barracks",filled,irregular
 # Doors
 DOOR:closed,(06,14)
 DOOR:closed,(09,03)
@@ -156,12 +156,12 @@ REGION:(66,04,68,04),lit,"ordinary"
 REGION:(39,11,41,11),lit,"ordinary"
 REGION:(66,11,68,11),lit,"ordinary"
 #   A welcoming committee
-REGION:(03,10,07,13),lit,"zoo",filled,true
+REGION:(03,10,07,13),lit,"zoo",filled,irregular
 #   arrival chamber; needs to be a real room to control migrating monsters,
 #   and `unfilled' is a kludge to force an ordinary room to remain a room
 REGION:(06,15,09,16),unlit,"ordinary",unfilled
 #   Barracks
-REGION:(36,16,36,18),lit,"barracks",filled,true
+REGION:(36,16,36,18),lit,"barracks",filled,irregular
 # Doors
 DOOR:closed,(06,14)
 DOOR:closed,(09,03)
@@ -263,13 +263,13 @@ MONSTER:('@',"Croesus"),(66,14),hostile {
 #   identification in mkmaze.c
 REGION:(62,05,75,10),lit,"morgue",unfilled
 #   A welcoming committee
-REGION:(01,10,05,13),lit,"zoo",filled,true
+REGION:(01,10,05,13),lit,"zoo",filled,irregular
 #   arrival chamber; needs to be a real room to control migrating monsters,
 #   and `unfilled' is a kludge to force an ordinary room to remain a room
 REGION:(04,15,07,16),unlit,"ordinary",unfilled
 #   Barracks
-REGION:(43,01,44,02),lit,"barracks",filled,true
-REGION:(43,17,44,17),lit,"barracks",filled,true
+REGION:(43,01,44,02),lit,"barracks",filled,irregular
+REGION:(43,17,44,17),lit,"barracks",filled,irregular
 # Drawbridges of first ringwall
 DRAWBRIDGE:(30,05),east,closed
 DRAWBRIDGE:(34,05),west,closed
