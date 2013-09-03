@@ -225,7 +225,7 @@ extern int rnd_vault_freq;
 %token	<i> ',' ':' '(' ')' '[' ']' '{' '}'
 %token	<map> STRING MAP_ID
 %token	<map> NQSTRING VARSTRING
-%token	<map> CFUNC CFUNC_INT CFUNC_STR CFUNC_COORD
+%token	<map> CFUNC CFUNC_INT CFUNC_STR CFUNC_COORD CFUNC_REGION
 %token	<map> VARSTRING_INT VARSTRING_INT_ARRAY
 %token	<map> VARSTRING_STRING VARSTRING_STRING_ARRAY
 %token	<map> VARSTRING_VAR VARSTRING_VAR_ARRAY
@@ -708,12 +708,10 @@ mapchar_list	: mapchar
 
 encoderegion_list	: encoderegion
 		  {
-		      add_opvars(splev, "r", $1);
 		      $$ = 1;
 		  }
 		| encoderegion_list ',' encoderegion
 		  {
-		      add_opvars(splev, "r", $3);
 		      $$ = 1 + $1;
 		  }
 		;
@@ -2155,7 +2153,7 @@ humidity_flags	: HUMIDITY_TYPE
 
 region_or_var	: encoderegion
 		  {
-		      add_opvars(splev, "r", $1);
+		      /* nothing */
 		  }
 		| VARSTRING_REGION
 		  {
@@ -2175,10 +2173,16 @@ region_or_var	: encoderegion
 
 encoderegion	: '(' INTEGER ',' INTEGER ',' INTEGER ',' INTEGER ')'
 		  {
+		      long r = SP_REGION_PACK($2, $4, $6, $8);
 		      if ( $2 > $6 || $4 > $8 )
 			  lc_error("Region start > end: (%li,%li,%li,%li)!", $2, $4, $6, $8);
 
-		      $$ = SP_REGION_PACK($2, $4, $6, $8);
+		      add_opvars(splev, "r", r);
+		      $$ = r;
+		  }
+		| corefunc_region
+		  {
+		      /* nothing */
 		  }
 		;
 
@@ -2519,6 +2523,10 @@ corefunc_param_part	: math_expr_var
 			  {
 			      $$ = (int)'c';
 			  }
+			| region_or_var
+			  {
+			      $$ = (int)'r';
+			  }
 			| monsterid ':' encodemonster
 			  {
 			      add_opvars(splev, "M", $3);
@@ -2596,6 +2604,19 @@ corefunc_coord	: CFUNC_COORD
 		| CFUNC_COORD '(' corefunc_params_list ')'
 		  {
 		      handle_corefunc(splev, $1, $3, 'c');
+		      Free($1);
+		      Free($3);
+		  }
+		;
+
+corefunc_region	: CFUNC_REGION
+		  {
+		      handle_corefunc(splev, $1, "", 'r');
+		      Free($1);
+		  }
+		| CFUNC_REGION '(' corefunc_params_list ')'
+		  {
+		      handle_corefunc(splev, $1, $3, 'r');
 		      Free($1);
 		      Free($3);
 		  }

@@ -512,6 +512,7 @@ long retval;
       case 'i': return CFUNC_INT;
       case 's': return CFUNC_STR;
       case 'c': return CFUNC_COORD;
+      case 'r': return CFUNC_REGION;
       case 0:
       case ' ': return CFUNC;
     }

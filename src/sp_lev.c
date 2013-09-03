@@ -249,6 +249,17 @@ opvar_new_coord(x,y)
     return tmpov;
 }
 
+struct opvar *
+opvar_new_region(x1,y1,x2,y2)
+     int x1,y1,x2,y2;
+{
+    struct opvar *tmpov = (struct opvar *)alloc(sizeof(struct opvar));
+    if (!tmpov) panic("could not alloc opvar struct");
+    tmpov->spovartyp = SPOVAR_REGION;
+    tmpov->vardata.l = SP_REGION_PACK(x1,y1,x2,y2);
+    return tmpov;
+}
+
 void
 opvar_free_x(ov)
      struct opvar *ov;
@@ -2805,6 +2816,18 @@ spo_corefunc(coder, fn)
 	    opvar_free(y);
 	}
 	break;
+    case COREFUNC_TOREGION:
+	{
+	    struct opvar *x1, *y1, *x2, *y2;
+	    if (!OV_pop_i(y2) || !OV_pop_i(x2) || !OV_pop_i(y1) || !OV_pop_i(x1)) {
+		impossible("No int values for region()");
+		return;
+	    }
+	    splev_stack_push(coder->stack, opvar_new_region(OV_i(x1), OV_i(y1), OV_i(x2), OV_i(y2)));
+	    opvar_free(x1); opvar_free(y1);
+	    opvar_free(x2); opvar_free(y2);
+	}
+	break;
     case COREFUNC_SOBJ_AT:
 	{
 	    long retval = 0;
@@ -5175,7 +5198,7 @@ sp_lev *lvl;
 
     if (wizard) {
 	char *met = nh_getenv("SPCODER_MAX_RUNTIME");
-	if (met && met[0] == '1') max_execution = (1<<31) - 1;
+	if (met && met[0] == '1') max_execution = (1<<30) - 1;
     }
 
     for (tmpi = 0; tmpi <= MAX_NESTED_ROOMS; tmpi++) {

@@ -173,6 +173,7 @@ static const struct {
     {COREFUNC_TOINT,			"integer", "s", 'i'},
     {COREFUNC_TOINT,			"int", "s", 'i'},
     {COREFUNC_TOCOORD,			"coord", "ii", 'c'},
+    {COREFUNC_TOREGION,			"region", "iiii", 'r'},
     {COREFUNC_RN2,			"rnd", "i", 'i'},
     {COREFUNC_ROOM_WID, 		"room.width", "", 'i'},
     {COREFUNC_ROOM_HEI, 		"room.height", "", 'i'},
@@ -441,6 +442,7 @@ char chr;
     switch (chr) {
     default: sprintf(buf, "unknown"); break;
     case 'i': sprintf(buf, "int"); break;
+    case 'r': sprintf(buf, "region"); break;
     case 's': sprintf(buf, "str"); break;
     case 'O': sprintf(buf, "obj"); break;
     case 'c': sprintf(buf, "coord"); break;
