@@ -3473,22 +3473,12 @@ register struct monst *shkp;
 		avoid = FALSE;
 	} else {
 #define	GDIST(x,y)	(dist2(x,y,gx,gy))
-#ifdef BLACKMARKET
-	    if ((Is_blackmarket(&u.uz) && u.umonnum>0 &&
-		 mons[u.umonnum].mlet != S_HUMAN) ||
-                /* WAC Let you out if you're stuck inside */                
-                (!Is_blackmarket(&u.uz) && (Invis 
+
+		if ((!Is_blackmarket(&u.uz) && (Invis 
 #ifdef STEED
 			|| u.usteed
 #endif
 			                          ) && !inside_shop(u.ux, u.uy)))
-#else /* BLACKMARKET */
-		if (Invis
-#ifdef STEED
-			|| u.usteed
-#endif
-			)
-#endif /* BLACKMARKET */
 		{
 		    avoid = FALSE;
 		} else {
