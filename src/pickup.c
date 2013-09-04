@@ -2185,8 +2185,8 @@ boolean past;
     struct monst *vampire;
     xchar ox, oy;
 
-    pline(past ? "That wasn't %s, it was a coffin!" :
-		"This isn't %s, it's a coffin!", an(simple_typename(box->otyp)));
+    pline("That %s %s, it%s a coffin!", past ? "wasn't" : "isn't",
+		an(simple_typename(box->otyp)), past ? " was" : "'s");
     box->spe = 3;    /* box->owt will be updated below */
     if (get_obj_location(box, &ox, &oy, 0))
     box->ox = ox, box->oy = oy;  /* in case it's being carried */
@@ -2196,8 +2196,8 @@ boolean past;
     if (!canspotmon(vampire)) {
 	You("think %s brushed against your %s.", something, body_part(HAND));
     } else {
-	pline("There %s a %s in the coffin.", past ? "was" : "is",
-		Hallucination ? "dark knight" : m_monnam(vampire));
+	pline("There %s %s in the coffin.", past ? "was" : "is",
+		Hallucination ? "a dark knight" : a_monnam(vampire));
 	pline_The("%s rises!", Hallucination ? "dark knight" : m_monnam(vampire));
     }
     /* (void) christen_monst(vampire, sc); */
@@ -2249,11 +2249,11 @@ register int held;
 	current_container = obj;	/* for use by in/out_container */
 
 	if (obj->spe == 1) {
-	    observe_quantum_cat(obj, FALSE);	/* box was not destroyed, use present tense */
+	    observe_quantum_cat(obj, FALSE); /* box was not destroyed, use present tense */
 	    used = 1;
-	    quantum_cat = TRUE;			/* for adjusting "it's empty" message */
+	    quantum_cat = TRUE; 	/* for adjusting "it's empty" message */
 	} else if (obj->spe == 4) {
-	    open_coffin(obj, FALSE);		/* box was not destroyed, use present tense */
+	    open_coffin(obj, FALSE); 	/* box was not destroyed, use present tense */
 	    used = 1;
 	    return used;
 	}
