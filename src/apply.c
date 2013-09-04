@@ -2964,7 +2964,8 @@ struct obj *obj;
 
     if (!Fumbling && !Glib && !Blind &&
 	((ACURR(A_DEX) + Luck) > 0) && rn2((ACURR(A_DEX) + Luck))) {
-	xchar ht = rn2(2);
+	srand(time(0));
+	xchar ht = rand() % 2;
 	pline("%s.", ht ? "Heads" : "Tails");
 	if (Hallucination && ht && !rn2(8))
 	    pline("Oh my, it %s at you!", rn2(2) ? "grins" : "winks");
