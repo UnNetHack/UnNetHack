@@ -2174,6 +2174,7 @@ boolean past;
     return;
 }
 
+/* based largely on borrowed code from dNetHack by Chris_ANG */
 void
 open_coffin(box, past)
 struct obj *box;
@@ -2248,11 +2249,11 @@ register int held;
 	current_container = obj;	/* for use by in/out_container */
 
 	if (obj->spe == 1) {
-	    observe_quantum_cat(obj, FALSE); /* FALSE: the box was not destroyed. Use present tense. */
+	    observe_quantum_cat(obj, FALSE);	/* box was not destroyed, use present tense */
 	    used = 1;
-	    quantum_cat = TRUE;	/* for adjusting "it's empty" message */
+	    quantum_cat = TRUE;			/* for adjusting "it's empty" message */
 	} else if (obj->spe == 4) {
-	    open_coffin(obj, FALSE); //FALSE: the box was not destroyed. Use present tense.
+	    open_coffin(obj, FALSE);		/* box was not destroyed, use present tense */
 	    used = 1;
 	    return used;
 	}
