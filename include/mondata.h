@@ -160,6 +160,16 @@
 /* return TRUE if the monster tends to revive */
 #define is_reviver(ptr)		(is_rider(ptr) || (ptr)->mlet == S_TROLL)
 
+
+#ifdef PM_BEHOLDER
+#define is_eye(ptr)		(((ptr) == &mons[PM_FLOATING_EYE]) || \
+				 ((ptr) == &mons[PM_EVIL_EYE]) || \
+				 ((ptr) == &mons[PM_BEHOLDER]))
+#else
+#define is_eye(ptr)		(((ptr) == &mons[PM_FLOATING_EYE]) || \
+				 ((ptr) == &mons[PM_EVIL_EYE]))
+#endif
+
 /* this returns the light's range, or 0 if none; if we add more light emitting
    monsters, we'll likely have to add a new light range field to mons[] */
 #define emits_light(ptr)	(((ptr)->mlet == S_LIGHT || \
