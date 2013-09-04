@@ -2191,7 +2191,7 @@ boolean past;
     if (get_obj_location(box, &ox, &oy, 0))
     box->ox = ox, box->oy = oy;  /* in case it's being carried */
 
-    vampire = makemon(&mons[PM_VAMPIRE], box->ox, box->oy, NO_MINVENT);
+    vampire = makemon(mkclass(S_VAMPIRE,0), box->ox, box->oy, NO_MINVENT);
     set_malign(vampire);
     if (!canspotmon(vampire)) {
 	You("think %s brushed against your %s.", something, body_part(HAND));
