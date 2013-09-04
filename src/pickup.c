@@ -32,7 +32,6 @@ STATIC_PTR int FDECL(in_container,(struct obj *));
 STATIC_PTR int FDECL(ck_bag,(struct obj *));
 STATIC_PTR int FDECL(out_container,(struct obj *));
 STATIC_DCL long FDECL(mbag_item_gone, (int,struct obj *));
-STATIC_DCL void FDECL(observe_quantum_cat, (struct obj *));
 STATIC_DCL int FDECL(menu_loot, (int, struct obj *, BOOLEAN_P));
 STATIC_DCL int FDECL(in_or_out_menu, (const char *,struct obj *, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL int FDECL(container_at, (int, int, BOOLEAN_P));
@@ -2132,9 +2131,10 @@ struct obj *item;
     return loss;
 }
 
-STATIC_OVL void
-observe_quantum_cat(box)
+void
+observe_quantum_cat(box, past)
 struct obj *box;
+boolean past;
 {
     static NEARDATA const char sc[] = "Schroedinger's Cat";
     struct obj *deadcat;
@@ -2149,7 +2149,7 @@ struct obj *box;
        (telepathic or monster/object/food detection) ought to
        force the determination of alive vs dead state; but basing
        it just on opening the box is much simpler to cope with */
-    livecat = rn2(2) ? makemon(&mons[PM_HOUSECAT],
+    livecat = (rn2(2) && !past) ? makemon(&mons[PM_HOUSECAT],
 			       box->ox, box->oy, NO_MINVENT) : 0;
     if (livecat) {
 	livecat->mpeaceful = 1;
@@ -2166,9 +2166,40 @@ struct obj *box;
 	    obj_extract_self(deadcat);
 	    (void) add_to_container(box, deadcat);
 	}
-	pline_The("%s inside the box is dead!",
-	    Hallucination ? rndmonnam() : "housecat");
+	pline_The("%s%s inside the box is dead!",
+		Hallucination ? rndmonnam() : "housecat",
+		past ? " that was" : "");
     }
+    box->owt = weight(box);
+    return;
+}
+
+void
+open_coffin(box, past)
+struct obj *box;
+boolean past;
+{
+    /* static NEARDATA const char sc[] = "Schroedinger's Cat"; */
+    /* Would be nice to name the vampire and put the name on the coffin. But not today. */
+    struct monst *vampire;
+    xchar ox, oy;
+
+    pline(past ? "That wasn't %s, it was a coffin!" :
+		"This isn't %s, it's a coffin!", an(simple_typename(box->otyp)));
+    box->spe = 3;    /* box->owt will be updated below */
+    if (get_obj_location(box, &ox, &oy, 0))
+    box->ox = ox, box->oy = oy;  /* in case it's being carried */
+
+    vampire = makemon(&mons[PM_VAMPIRE], box->ox, box->oy, NO_MINVENT);
+    set_malign(vampire);
+    if (!canspotmon(vampire)) {
+	You("think %s brushed against your %s.", something, body_part(HAND));
+    } else {
+	pline("There %s a %s in the coffin.", past ? "was" : "is",
+		Hallucination ? "dark knight" : m_monnam(vampire));
+	pline_The("%s rises!", Hallucination ? "dark knight" : m_monnam(vampire));
+    }
+    /* (void) christen_monst(vampire, sc); */
     box->owt = weight(box);
     return;
 }
@@ -2217,9 +2248,13 @@ register int held;
 	current_container = obj;	/* for use by in/out_container */
 
 	if (obj->spe == 1) {
-	    observe_quantum_cat(obj);
+	    observe_quantum_cat(obj, FALSE); /* FALSE: the box was not destroyed. Use present tense. */
 	    used = 1;
 	    quantum_cat = TRUE;	/* for adjusting "it's empty" message */
+	} else if (obj->spe == 4) {
+	    open_coffin(obj, FALSE); //FALSE: the box was not destroyed. Use present tense.
+	    used = 1;
+	    return used;
 	}
 	/* Count the number of contained objects. Sometimes toss objects if */
 	/* a cursed magic bag.						    */

@@ -180,6 +180,11 @@ forcelock()	/* try to force a locked chest */
 		  the(xname(xlock.box)));
 
 	    /* Put the contents on ground at the hero's feet. */
+	    if (xlock.box->spe == 1) {
+		observe_quantum_cat(xlock.box, TRUE);	/* TRUE: use past tense */
+	    } else if (xlock.box->spe == 4) {
+		open_coffin(xlock.box, TRUE);		/* TRUE: use past tense */
+	    }
 	    while ((otmp = xlock.box->cobj) != 0) {
 		obj_extract_self(otmp);
 		if(!rn2(3) || otmp->oclass == POTION_CLASS) {

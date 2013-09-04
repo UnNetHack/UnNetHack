@@ -25,12 +25,13 @@ LADDER:(11,05),down
 MONSTER:('V',"Vlad the Impaler"),(06,05) {
   OBJECT:('(',"Candelabrum of Invocation")
 }
-MONSTER:'V',(03,09)
-MONSTER:'V',(07,09)
-MONSTER:'V',(11,09)
-MONSTER:'V',(03,01)
-MONSTER:'V',(07,01)
-MONSTER:'V',(11,01)
+#These vampires are now in coffins.
+#MONSTER:'V',(03,09)
+#MONSTER:'V',(07,09)
+#MONSTER:'V',(11,09)
+#MONSTER:'V',(03,01)
+#MONSTER:'V',(07,01)
+#MONSTER:'V',(11,01)
 # The doors
 DOOR:closed,(08,03)
 DOOR:closed,(10,03)
@@ -40,13 +41,14 @@ DOOR:locked,(08,07)
 DOOR:locked,(10,07)
 DOOR:closed,(03,06)
 # treasures
-OBJECT:('(',"chest"),(07,05)
-OBJECT:('(',"chest"),(03,09)
-OBJECT:('(',"chest"),(07,09)
-OBJECT:('(',"chest"),(11,09)
-OBJECT:('(',"chest"),(03,01)
-OBJECT:('(',"chest"),(07,01)
-OBJECT:('(',"chest"),(11,01)
+# +4 containers are secretly coffins.
+OBJECT:"large box",(07,05),cursed,+4
+OBJECT:"large box",(03,09),cursed,+4
+OBJECT:"large box",(07,09),cursed,+4
+OBJECT:"large box",(11,09),cursed,+4
+OBJECT:"large box",(03,01),cursed,+4
+OBJECT:"large box",(07,01),cursed,+4
+OBJECT:"large box",(11,01),cursed,+4
 # We have to protect the tower against outside attacks
 NON_DIGGABLE:(00,00,14,10)
 
