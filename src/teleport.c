@@ -825,12 +825,15 @@ level_tele()
 
 	    Strcpy(qbuf, "To what level do you want to teleport?");
 	    do {
-		if (++trycnt == 2) {
+		if (++trycnt == 
+			 (flags.suppress_alert < FEATURE_NOTICE_VER(5,0,3) ?
+			  1 : 2)) {
 #ifdef WIZARD
-			if (wizard) Strcat(qbuf, " [type a number or ? for a menu]");
+			if (wizard) Strcat(qbuf, 
+				" [type a number, name, or ? for a menu]");
 			else
 #endif
-			Strcat(qbuf, " [type a number]");
+			Strcat(qbuf, " [type a number or name]");
 		}
 		getlin(qbuf, buf);
 		if (!strcmp(buf,"\033")) {	/* cancelled */
@@ -879,7 +882,7 @@ level_tele()
 			force_dest = TRUE;
 		    } else return;
 		} else
-#endif
+#endif /* WIZARD */
 		if ((newlev = lev_by_name(buf)) == 0) newlev = atoi(buf);
 	    } while (!newlev && !digit(buf[0]) &&
 		     (buf[0] != '-' || !digit(buf[1])) &&

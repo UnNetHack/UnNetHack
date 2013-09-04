@@ -40,6 +40,7 @@ struct lchoice {
 static void FDECL(Fread, (genericptr_t, int, int, dlb *));
 STATIC_DCL xchar FDECL(dname_to_dnum, (const char *));
 STATIC_DCL int FDECL(find_branch, (const char *, struct proto_dungeon *));
+STATIC_DCL mapseen* FDECL(find_level_by_custom_name, (const char *));
 STATIC_DCL xchar FDECL(parent_dnum, (const char *, struct proto_dungeon *));
 STATIC_DCL int FDECL(level_range, (XCHAR_P,int,int,int,struct proto_dungeon *,int *));
 STATIC_DCL xchar FDECL(parent_dlevel, (const char *, struct proto_dungeon *));
@@ -260,6 +261,16 @@ find_level(s)
 	for(curr = sp_levchn; curr; curr = curr->next)
 	    if (!strcmpi(s, curr->proto)) break;
 	return curr;
+}
+
+mapseen *
+find_level_by_custom_name(s)
+const char *s;
+{
+    mapseen *mptr;
+    for (mptr = mapseenchn; mptr; mptr = mptr->next)
+	if (mptr->custom && !strcmpi(s, mptr->custom)) break;
+    return mptr;
 }
 
 #ifdef RANDOMIZED_PLANES
@@ -1608,26 +1619,37 @@ const char *nam;
 {
     schar lev = 0;
     s_level *slev;
+    mapseen *mseen;
     d_level dlev;
     const char *p;
     int idx, idxtoo;
     char buf[BUFSZ];
 
-    /* allow strings like "the oracle level" to find "oracle" */
-    if (!strncmpi(nam, "the ", 4)) nam += 4;
-    if ((p = strstri(nam, " level")) != 0 && p == eos((char*)nam) - 6) {
-	nam = strcpy(buf, nam);
-	*(eos(buf) - 6) = '\0';
-    }
-    /* hell is the old name, and wouldn't match; gehennom would match its
-       branch, yielding the castle level instead of the valley of the dead */
-    if (!strcmpi(nam, "gehennom") || !strcmpi(nam, "hell")) {
-	if (In_V_tower(&u.uz)) nam = " to Vlad's tower";  /* branch to... */
-	else nam = "valley";
+    /* look at the player's custom level annotations first */
+    if ((mseen = find_level_by_custom_name(nam)) != 0) {
+	dlev = mseen->lev;
+    } else {
+	/* no matching annotation, check whether they used a name we know */
+
+	/* allow strings like "the oracle level" to find "oracle" */
+	if (!strncmpi(nam, "the ", 4)) nam += 4;
+	if ((p = strstri(nam, " level")) != 0 && p == eos((char*)nam) - 6) {
+	    nam = strcpy(buf, nam);
+	    *(eos(buf) - 6) = '\0';
+	}
+	/* hell is the old name, and wouldn't match; gehennom would match its
+	   branch, yielding the castle level instead of the valley of the dead */
+	if (!strcmpi(nam, "gehennom") || !strcmpi(nam, "hell")) {
+	    if (In_V_tower(&u.uz)) nam = " to Vlad's tower";  /* branch to... */
+	    else nam = "valley";
+	}
+
+	if ((slev = find_level(nam)) != 0)
+	    dlev = slev->dlevel;
     }
 
-    if ((slev = find_level(nam)) != 0) {
-	dlev = slev->dlevel;
+    if (mseen || slev) {
+	/* found a match, see if it's reachable from here */
 	idx = ledger_no(&dlev);
 	if ((dlev.dnum == u.uz.dnum ||
 		/* within same branch, or else main dungeon <-> gehennom */
@@ -1640,7 +1662,7 @@ const char *nam;
 	     wizard ||
 #endif
 		(level_info[idx].flags & (FORGOTTEN|VISITED)) == VISITED)) {
-	    lev = depth(&slev->dlevel);
+	    lev = depth(&dlev);
 	}
     } else {	/* not a specific level; try branch names */
 	idx = find_branch(nam, (struct proto_dungeon *)0);
