@@ -2964,6 +2964,8 @@ struct obj *obj;
 
     if (!Fumbling && !Glib && !Blind &&
 	((ACURR(A_DEX) + Luck) > 0) && rn2((ACURR(A_DEX) + Luck))) {
+	/* coin flipping is independent of other random
+	   functions, so use rand() intentionally here */
 	xchar ht = rand() % 2;
 	pline("%s.", ht ? "Heads" : "Tails");
 	if (Hallucination && ht && !rn2(8))
