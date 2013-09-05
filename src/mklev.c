@@ -632,6 +632,7 @@ int trap_type;
 	    aroom = &rooms[rn2(nroom)];
 	    if(aroom->rtype != OROOM) continue;	/* not an ordinary room */
 	    if(aroom->doorct == 1 && rn2(5)) continue;
+	    if(!aroom->needjoining) continue;
 	    if(!place_niche(aroom,&dy,&xx,&yy)) continue;
 
 	    rm = &levl[xx][yy+dy];
