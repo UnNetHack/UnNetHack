@@ -341,6 +341,8 @@ boolean nxcor;
 	/* find positions cc and tt for doors in croom and troom
 	   and direction for a corridor between them */
 
+	if (!croom->needjoining || !troom->needjoining) return;
+
 	if(troom->hx < 0 || croom->hx < 0 || doorindex >= DOORMAX) return;
 	if(troom->lx > croom->hx) {
 		dx = 1;
@@ -438,7 +440,7 @@ int style;
 		for (a = 0; a < nroom; a++) {
 		    do {
 			b = rn2(nroom-1);
-		    } while (((a == b) || (rooms[b].doorct)) && cnt++ < 100);
+		    } while (((a == b) || (rooms[b].doorct) || !rooms[b].needjoining) && cnt++ < 100);
 		    if (cnt >= 100) {
 			for (b = 0; b < nroom-1; b++)
 			    if (!rooms[b].doorct && (a != b)) break;
@@ -451,17 +453,27 @@ int style;
 	case 2: /* circular path: room1 -> room2 -> room3 -> ... -> room1  */
 	    if (nroom > 1) {
 		for (a = 0; a < nroom; a++) {
-		    b = (a + 1) % nroom;
-		    join(a, b, FALSE);
+		    if (rooms[a].needjoining) {
+			int cnt = 0;
+			b = a;
+			do {
+			    b++;
+			    b = b % nroom;
+			} while (!rooms[b].needjoining && (++cnt < nroom));
+			join(a, b, FALSE);
+		    }
 		}
 	    }
 	    break;
 	case 3: /* all roads lead to rome. or to the first room. */
 	    if (nroom > 1) {
 		b = 0;
-		for (a = 1; a < nroom; a++) {
-		    join(a, b, FALSE);
-		}
+		while (!rooms[b].needjoining && (b < nroom)) b++;
+		if (b < nroom)
+		    for (a = 0; a < nroom; a++) {
+			if ((a != b))
+			    join(a, b, FALSE);
+		    }
 	    }
 	    break;
 	}

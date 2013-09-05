@@ -195,7 +195,7 @@ extern int rnd_vault_freq;
 %token	<i> MESSAGE_ID LEVEL_ID LEV_INIT_ID GEOMETRY_ID NOMAP_ID
 %token	<i> OBJECT_ID COBJECT_ID MONSTER_ID TRAP_ID DOOR_ID DRAWBRIDGE_ID
 %token	<i> object_ID monster_ID terrain_ID
-%token	<i> MAZEWALK_ID WALLIFY_ID REGION_ID FILLING IRREGULAR
+%token	<i> MAZEWALK_ID WALLIFY_ID REGION_ID FILLING IRREGULAR JOINED
 %token	<i> ALTAR_ID LADDER_ID STAIR_ID NON_DIGGABLE_ID NON_PASSWALL_ID ROOM_ID
 %token	<i> PORTAL_ID TELEPRT_ID BRANCH_ID LEV CHANCE_ID
 %token	<i> CORRIDOR_ID GOLD_ID ENGRAVING_ID FOUNTAIN_ID POOL_ID SINK_ID NONE
@@ -1234,7 +1234,7 @@ room_begin      : room_type opt_percent ',' light_state
                   }
                 ;
 
-subroom_def	: SUBROOM_ID ':' room_begin ',' subroom_pos ',' room_size roomfill
+subroom_def	: SUBROOM_ID ':' room_begin ',' subroom_pos ',' room_size optroomregionflags
 		  {
 		      add_opvars(splev, "iiiiiiio", (long)$8, ERR, ERR,
 				 $5.x, $5.y, $7.width, $7.height, SPO_SUBROOM);
@@ -1247,7 +1247,7 @@ subroom_def	: SUBROOM_ID ':' room_begin ',' subroom_pos ',' room_size roomfill
 		  }
 		;
 
-room_def	: ROOM_ID ':' room_begin ',' room_pos ',' room_align ',' room_size roomfill
+room_def	: ROOM_ID ':' room_begin ',' room_pos ',' room_align ',' room_size optroomregionflags
 		  {
 		      add_opvars(splev, "iiiiiiio", (long)$10,
 				 $7.x, $7.y, $5.x, $5.y,
@@ -1900,13 +1900,14 @@ passwall_detail : NON_PASSWALL_ID ':' region_or_var
 
 region_detail	: REGION_ID ':' region_or_var ',' light_state ',' room_type optroomregionflags
 		  {
-		      long rt, irr;
-		      rt = $7;
-		      if (( $8 ) & 1) rt += MAXRTYPE+1;
-		      irr = ((( $8 ) & 2) != 0);
+		      long irr;
+		      long rt = $7;
+		      long flags = $8;
+		      if (!(( flags ) & 1)) rt += MAXRTYPE+1;
+		      irr = ((( flags ) & 2) != 0);
 		      add_opvars(splev, "iiio",
-				 (long)$5, rt, irr, SPO_REGION);
-		      $<i>$ = (irr || ($8 & 1) || rt != OROOM);
+				 (long)$5, rt, flags, SPO_REGION);
+		      $<i>$ = (irr || (flags & 1) || rt != OROOM);
 		      break_stmt_start();
 		  }
 		  region_detail_end
@@ -2008,6 +2009,7 @@ roomregionflags : roomregionflag
 		  }
 		;
 
+/* 0 is the "default" here */
 roomregionflag : FILLING
 		  {
 		      $$ = ($1 << 0);
@@ -2015,6 +2017,10 @@ roomregionflag : FILLING
 		| IRREGULAR
 		  {
 		      $$ = ($1 << 1);
+		  }
+		| JOINED
+		  {
+		      $$ = ($1 << 2);
 		  }
 		;
 

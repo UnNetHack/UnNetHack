@@ -2431,6 +2431,7 @@ struct mkroom *mkr;
 		topologize(aroom);			/* set roomno */
 #endif
 		aroom->needfill = r->filled;
+		aroom->needjoining = r->joined;
 	        return aroom;
 	}
 	return (struct mkroom *)0;
@@ -3509,7 +3510,7 @@ spo_room(coder)
     if (coder->n_subroom > MAX_NESTED_ROOMS)
 	panic("Too deeply nested rooms?!");
     else {
-	struct opvar *filled, *h, *w, *yalign, *xalign,
+	struct opvar *flags, *h, *w, *yalign, *xalign,
 	    *y, *x, *rlit, *chance, *rtype;
 
 	room tmproom;
@@ -3521,7 +3522,7 @@ spo_room(coder)
 	    !OV_pop_i(x) ||
 	    !OV_pop_i(yalign) ||
 	    !OV_pop_i(xalign) ||
-	    !OV_pop_i(filled) ||
+	    !OV_pop_i(flags) ||
 	    !OV_pop_i(rlit) ||
 	    !OV_pop_i(chance) ||
 	    !OV_pop_i(rtype)) return;
@@ -3536,7 +3537,9 @@ spo_room(coder)
 	tmproom.rtype = OV_i(rtype);
 	tmproom.chance = OV_i(chance);
 	tmproom.rlit = OV_i(rlit);
-	tmproom.filled = OV_i(filled);
+	tmproom.filled = !(OV_i(flags) & (1 << 0));
+	/*tmproom.irregular = (OV_i(flags) & (1 << 1));*/
+	tmproom.joined = !(OV_i(flags) & (1 << 2));
 
 	isbigrm = ((tmproom.w * tmproom.h) > 20);
 
@@ -3549,7 +3552,7 @@ spo_room(coder)
 	opvar_free(rtype);
 	opvar_free(chance);
 	opvar_free(rlit);
-	opvar_free(filled);
+	opvar_free(flags);
 
 	if (!coder->failed_room[coder->n_subroom-1]) {
 	    tmpcr = build_room(&tmproom, coder->croom);
@@ -4514,15 +4517,19 @@ void
 spo_region(coder)
      struct sp_coder *coder;
 {
-    struct opvar *rtype, *rlit, *rirreg, *area;
+    struct opvar *rtype, *rlit, *flags, *area;
     xchar dx1,dy1,dx2,dy2;
     register struct mkroom *troom;
-    boolean prefilled, room_not_needed;
+    boolean prefilled, room_not_needed, irregular, joined;
 
-    if (!OV_pop_i(rirreg) ||
+    if (!OV_pop_i(flags) ||
 	!OV_pop_i(rtype) ||
 	!OV_pop_i(rlit) ||
 	!OV_pop_r(area)) return;
+
+    prefilled = !(OV_i(flags) & (1 << 0));
+    irregular = (OV_i(flags) & (1 << 1));
+    joined = !(OV_i(flags) & (1 << 2));
 
     if(OV_i(rtype) > MAXRTYPE) {
 	OV_i(rtype) -= MAXRTYPE+1;
@@ -4546,7 +4553,7 @@ spo_region(coder)
        an actual room to be created (such rooms are used to
        control placement of migrating monster arrivals) */
     room_not_needed = (OV_i(rtype) == OROOM &&
-		       !OV_i(rirreg) && !prefilled && !in_mk_rndvault);
+		       !irregular && !prefilled && !in_mk_rndvault);
     if (room_not_needed || nroom >= MAXNROFROOMS) {
 	region tmpregion;
 	if (!room_not_needed)
@@ -4559,7 +4566,7 @@ spo_region(coder)
 	light_region(&tmpregion);
 
 	opvar_free(area);
-	opvar_free(rirreg);
+	opvar_free(flags);
 	opvar_free(rlit);
 	opvar_free(rtype);
 
@@ -4572,7 +4579,9 @@ spo_region(coder)
     if (OV_i(rtype) != OROOM)
 	troom->needfill = (prefilled ? 2 : 1);
 
-    if (OV_i(rirreg)) {
+    troom->needjoining = joined;
+
+    if (irregular) {
 	min_rx = max_rx = dx1;
 	min_ry = max_ry = dy1;
 	smeq[nroom] = nroom;
@@ -4605,7 +4614,7 @@ spo_region(coder)
     }
 
     opvar_free(area);
-    opvar_free(rirreg);
+    opvar_free(flags);
     opvar_free(rlit);
     opvar_free(rtype);
 }

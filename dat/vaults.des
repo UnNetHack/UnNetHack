@@ -7,9 +7,9 @@
 #    of random room, as per random level generation.
 #    "rndvault" room type is never converted to another room type.
 #  - To only generate the contents you define in the vault,
-#    set the room prefilled flag to false. Otherwise you'll get normal
-#    room contents in addition to the stuff you defined.
-#    Or, if using MAP & REGION, set the REGION as "filled"
+#    set the room, subroom or region "filled" flag.
+#    Otherwise you'll get normal room contents in addition to
+#    the stuff you defined.
 #
 
 
@@ -106,7 +106,7 @@ ROOM:"rndvault", random, random, random, (3,17) {
 LEVEL:"vlt-%04i"
 FLAGS:rndvault
 ROOM:"rndvault", random, random, random, (5,5) {
-  SUBROOM:"rndvault", random, (2,2), (1,1), false {
+  SUBROOM:"rndvault", random, (2,2), (1,1), filled {
     IF [ level.depth < 3 ] { BREAK }
     $mons = MONSTER: { 'M', 'D', 'O', 'Z', 'T', 'H' }
     SHUFFLE: $mons
@@ -228,7 +228,7 @@ ROOM:"ordinary", unlit, random, random, random {
 # temple of the gods
 LEVEL:"vlt-%04i"
 FLAGS:rndvault
-ROOM:"rndvault", random, random, random, random, false {
+ROOM:"rndvault", random, random, random, random, filled {
   ALTAR:random, align[0], altar
   ALTAR:random, align[1], altar
   ALTAR:random, align[2], altar
@@ -1054,7 +1054,7 @@ SPILL:random, $terr[0], north, 2d4
 LEVEL:"vlt-%04i"
 FLAGS:rndvault
 ROOM:"rndvault", random, random, random, (5,5) {
-  SUBROOM:"rndvault", random, (2,2), (1,1), false {
+  SUBROOM:"rndvault", random, (2,2), (1,1), filled {
     MONSTER: 'R', (0,0), hostile
   }
   REPLACE_TERRAIN:(0,0, 4,4), '-', 'P', 100%

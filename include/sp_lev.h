@@ -453,7 +453,7 @@ typedef struct _room {
 	Str_or_Len parent;
 	xchar x, y, w, h;
 	xchar xalign, yalign;
-	xchar rtype, chance, rlit, filled;
+	xchar rtype, chance, rlit, filled, joined;
 } room;
 
 typedef struct {
