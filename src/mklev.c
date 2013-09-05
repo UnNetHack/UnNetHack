@@ -882,7 +882,10 @@ makelevel()
 	/*sort_rooms();*/ /* messes up roomno order. */
 
 	/* construct stairs (up and down in different rooms if possible) */
-	croom = &rooms[rn2(nroom)];
+	tryct = 0;
+	do {
+	    croom = &rooms[rn2(nroom)];
+	} while (!croom->needjoining && ++tryct < 100);
 	if (!Is_botlevel(&u.uz)) {
 	    if (!somexyspace(croom, &pos, 0)) {
 		pos.x = somex(croom);
@@ -892,8 +895,10 @@ makelevel()
 	}
 	if (nroom > 1) {
 	    troom = croom;
-	    croom = &rooms[rn2(nroom-1)];
-	    if (croom == troom) croom++;
+	    tryct = 0;
+	    do {
+		croom = &rooms[rn2(nroom-1)];
+	    } while ((!croom->needjoining || (croom == troom)) && ++tryct < 100);
 	}
 
 	if (u.uz.dlevel != 1) {
