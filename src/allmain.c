@@ -85,6 +85,28 @@ hpnotify_format_str(char *str)
     return buf;
 }
 
+boolean
+elf_can_regen()
+{
+    if (Race_if(PM_ELF)) {
+	if (uwep && is_iron(uwep) && !uarmg) return 0;
+	if (uarm && is_iron(uarm) && !uarmu) return 0;
+	if (uarmu && is_iron(uarmu)) return 0;
+	if (uarmc && is_iron(uarmc) && !uarmu && !uarm) return 0;
+	if (uarmh && is_iron(uarmh)) return 0;
+	if (uarms && is_iron(uarms) && !uarmg) return 0;
+	if (uarmg && is_iron(uarmg)) return 0;
+	if (uarmf && is_iron(uarmf)) return 0;
+	if (uleft && is_iron(uleft)) return 0;
+	if (uright && is_iron(uright)) return 0;
+	if (uamul && is_iron(uamul)) return 0;
+	if (ublindf && is_iron(ublindf)) return 0;
+	if (uchain && is_iron(uchain)) return 0;
+	if (uswapwep && is_iron(uswapwep) && u.twoweap) return 0;
+    }
+    return 1;
+}
+
 void
 moveloop()
 {
@@ -102,6 +124,7 @@ moveloop()
     /* for keeping track of Elbereth and correctstatus line display */
     int was_on_elbereth = 0;
     int is_on_elbereth = 0;
+    boolean elf_regen = elf_can_regen();
 
     flags.moonphase = phase_of_the_moon();
     if(flags.moonphase == FULL_MOON) {
@@ -303,7 +326,7 @@ moveloop()
 			    u.mh++;
 			    interrupt_multi("Hit points", u.mh, u.mhmax);
 			}
-		    } else if (u.uhp < u.uhpmax &&
+		    } else if (u.uhp < u.uhpmax && elf_can_regen() &&
 			 (wtcap < MOD_ENCUMBER || !u.umoved || Regeneration)) {
 			if (u.ulevel > 9 && !(moves % 3)) {
 			    int heal, Con = (int) ACURR(A_CON);
@@ -497,6 +520,11 @@ moveloop()
 	if (iflags.hp_notify && (prev_hp_notify != uhp())) {
 	  pline("%s", hpnotify_format_str(iflags.hp_notify_fmt ? iflags.hp_notify_fmt : "[HP%c%a=%h]"));
 	  prev_hp_notify = uhp();
+	}
+
+	if (elf_regen != elf_can_regen()) {
+	    You_feel("%s.", (elf_regen) ? "itchy" : "relief");
+	    elf_regen = elf_can_regen();
 	}
 
 	flags.move = 1;

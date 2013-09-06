@@ -105,6 +105,7 @@ static struct trobj Monk[] = {
 	{ 0, 0, 0, 0, 0 }
 };
 static struct trobj Priest[] = {
+#define PRI_MACE	0
 	{ MACE, 1, WEAPON_CLASS, 1, 1 },
 	{ ROBE, 0, ARMOR_CLASS, 1, UNDEF_BLESS },
 	{ SMALL_SHIELD, 0, ARMOR_CLASS, 1, UNDEF_BLESS },
@@ -735,6 +736,7 @@ u_init()
 		skill_init(Skill_Mon);
 		break;
 	case PM_PRIEST:
+		if (Race_switch == PM_ELF) Priest[PRI_MACE].trotyp = CLUB;
 		ini_inv(Priest);
 		if(!rn2(10)) ini_inv(Magicmarker);
 		else if(!rn2(10)) ini_inv(Lamp);

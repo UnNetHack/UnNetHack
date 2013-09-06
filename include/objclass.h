@@ -66,6 +66,7 @@ struct objclass {
 #define is_organic(otmp)	(objects[otmp->otyp].oc_material <= WOOD)
 #define is_metallic(otmp)	(objects[otmp->otyp].oc_material >= IRON && \
 				 objects[otmp->otyp].oc_material <= MITHRIL)
+#define is_iron(otmp)		(objects[otmp->otyp].oc_material == IRON)
 
 /* primary damage: fire/rust/--- */
 /* is_flammable(otmp), is_rottable(otmp) in mkobj.c */
