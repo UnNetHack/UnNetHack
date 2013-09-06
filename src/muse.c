@@ -211,7 +211,8 @@ struct obj *otmp;
 {
 	if (canseemon(mtmp)) {
 		otmp->dknown = 1;
-		pline("%s drinks %s!", Monnam(mtmp), singular(otmp, doname));
+		pline("%s %s %s!", Monnam(mtmp), is_weeping(mtmp->data) ?
+			"is drinking" : "drinks", singular(otmp, doname));
 	} else
 		if (flags.soundok)
 			You_hear("a chugging sound.");
