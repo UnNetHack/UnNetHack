@@ -1369,7 +1369,7 @@ register struct obj	*sobj;
 			for (i = 0; i < rnd(15); i++)
 				makemon(&mons[PM_YELLOW_LIGHT], 0, 0, NO_MM_FLAGS);
 		    }	
-	break;
+	break; /*confused reading summons lights*/
 	}
 	case SCR_TELEPORTATION:
 		if(confused || sobj->cursed) level_tele();
