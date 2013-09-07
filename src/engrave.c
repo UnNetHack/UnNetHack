@@ -68,6 +68,7 @@ static const char *random_mesg[] = {
 	"She's watching you!", /* Portal */
 	"The cake is a lie!", /* Portal */
 	"cjohnson/tier3", /* Portal */
+	"Prometheus was punished for stealing fire from the gods.", /* Portal 2*/
 	"What's the sitch?", /* Kim Possible */
 	"So not the drama.", /* Kim Possible */
 	"Sudden decompression sucks!", /* Space Quest 3 death message */
@@ -85,6 +86,7 @@ static const char *random_mesg[] = {
 	"Beware of the weeping angels", /* Doctor Who */
 	"Duck, Sally Sparrow", /* Doctor Who */
 	"Love from the Doctor, 1969", /* Doctor Who */
+	"Do NOT approach the Dog Park", /* Welcome to Night Vale */
 };
 
 char *
