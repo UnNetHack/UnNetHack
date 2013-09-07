@@ -823,12 +823,16 @@ dig_up_grave()
 	    adjalign(-sgn(u.ualign.type));
 	    You("have violated the sanctity of this grave!");
 	}
-
+if (!rn2(13)) {
+	You("unearth a pine box.");
+	otmp = mksobj_at(LARGE_BOX, u.ux, u.uy, TRUE, FALSE);
+	otmp->spe = +4;
+	} else {
 	switch (rn2(5)) {
 	case 0:
 	case 1:
 	    You("unearth a corpse.");
-	    if (!!(otmp = mk_tt_object(CORPSE, u.ux, u.uy)))
+	    if (!!(otmp = mk_tt_object(CORPSE, u.ux, u.uy)));
 	    	otmp->age -= 100;		/* this is an *OLD* corpse */;
 	    break;
 	case 2:
@@ -843,9 +847,10 @@ dig_up_grave()
 	    break;
 	default:
 	    /* No corpse */
-	    pline_The("grave seems unused.  Strange....");
+	    pline_The("grave seems unused.  Strange...");
 	    break;
 	}
+}
 	levl[u.ux][u.uy].typ = ROOM;
 	del_engr_at(u.ux, u.uy);
 	newsym(u.ux,u.uy);
