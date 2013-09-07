@@ -765,7 +765,10 @@ unsigned trflags;
 		    }
 		} else {
 		    seetrap(trap);
-		    pline("A board beneath you squeaks loudly.");
+		    if (Hallucination)
+				You("accidentally step on a chew toy.");
+		    else
+		    		pline("A board beneath you squeaks loudly.");
 		    wake_nearby();
 		}
 		break;
