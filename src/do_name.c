@@ -1230,7 +1230,10 @@ static const char * const bogusmons[] = {
 	/* bogus UnNetHack monsters */
 	"weeping angle",
 	"gelatinous sphere", "gelatinous pyramid",
-	"gelatinous Klein bottle", "gelatinous Mandelbrot set"
+	"gelatinous Klein bottle", "gelatinous Mandelbrot set",
+	
+	/* Welcome to Night Vale*/
+	"John Peters, you know, the farmer"
 };
 
 
