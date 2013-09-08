@@ -310,6 +310,11 @@ register struct monst *mtmp;
 			obj = mksobj_at(SCR_BLANK_PAPER, x, y, TRUE, FALSE);
 		mtmp->mnamelth = 0;
 		break;
+		case PM_SKELETON
+			if !rn2(20) {
+				obj = mksobj_at(SKELETON_KEY, x, y, TRUE, FALSE);
+			}
+		break;
 	    default_1:
 	    default:
 		if (mvitals[mndx].mvflags & G_NOCORPSE)
