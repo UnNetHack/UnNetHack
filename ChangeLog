@@ -58,7 +58,8 @@
 	  found in graves
 	* Reading a Scroll of Light while confused summons some (black) lights
 	* Elven players do not regenerate health while touching iron with bare skin
-
+	* Instead of 2 scrolls of earth, Sokoban levels have 1 scroll of earth with a 50% chance of a second one
+	
 	* Artifact changes:
 	  - From SporkHack:
 	    - All the weapons below warn against and have 20% instakill chance 
