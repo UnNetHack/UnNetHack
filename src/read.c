@@ -1355,20 +1355,8 @@ register struct obj	*sobj;
 		             !sobj->blessed);
 		break;
 	case SCR_LIGHT:
-		if (!confused) {
-			if (!Blind) known = TRUE;
-			litroom(!sobj->cursed, sobj);
-		} else {
-			/* confused reading summons lights */
-			int i;
-			if (sobj->cursed) {
-				for (i = 0; i < rn1(6,5); i++)
-					makemon(&mons[PM_BLACK_LIGHT], 0, 0, NO_MM_FLAGS);
-			} else {
-				for (i = 0; i < rnd(15); i++)
-					makemon(&mons[PM_YELLOW_LIGHT], 0, 0, NO_MM_FLAGS);
-			}
-		}
+		if(!Blind) known = TRUE;
+		litroom(!confused && !sobj->cursed, sobj);
 		break;
 	case SCR_TELEPORTATION:
 		if(confused || sobj->cursed) level_tele();

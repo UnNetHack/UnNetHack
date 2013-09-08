@@ -1888,7 +1888,7 @@ domove()
 					nomul(0, 0);
 					return;
 				}
-			} else if (is_lava(x, y) && iflags.paranoid_lava) {
+			} else if (iflags.paranoid_lava) {
 				/* lava */
 				if (paranoid_yn("Really walk into lava?", iflags.paranoid_lava) != 'y') {
 					flags.move = 0;

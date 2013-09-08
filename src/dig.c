@@ -823,33 +823,28 @@ dig_up_grave()
 	    adjalign(-sgn(u.ualign.type));
 	    You("have violated the sanctity of this grave!");
 	}
-	if (!rn2(13)) {
-	    You("unearth a pine box.");
-	    otmp = mksobj_at(LARGE_BOX, u.ux, u.uy, TRUE, FALSE);
-	    otmp->spe = +4;
-	} else {
-	    switch (rn2(5)) {
-		case 0:
-		case 1:
-		    You("unearth a corpse.");
-		    if (!!(otmp = mk_tt_object(CORPSE, u.ux, u.uy)));
-			otmp->age -= 100;		/* this is an *OLD* corpse */;
-		    break;
-		case 2:
-		    if (!Blind) pline(Hallucination ? "Dude!  The living dead!" :
- 			    "The grave's owner is very upset!");
- 		    (void) makemon(mkclass(S_ZOMBIE,0), u.ux, u.uy, NO_MM_FLAGS);
-		    break;
-		case 3:
-		    if (!Blind) pline(Hallucination ? "I want my mummy!" :
- 			    "You've disturbed a tomb!");
- 		    (void) makemon(mkclass(S_MUMMY,0), u.ux, u.uy, NO_MM_FLAGS);
-		    break;
-		default:
-		    /* No corpse */
-		    pline_The("grave seems unused.  Strange...");
-		    break;
-		}
+
+	switch (rn2(5)) {
+	case 0:
+	case 1:
+	    You("unearth a corpse.");
+	    if (!!(otmp = mk_tt_object(CORPSE, u.ux, u.uy)))
+	    	otmp->age -= 100;		/* this is an *OLD* corpse */;
+	    break;
+	case 2:
+	    if (!Blind) pline(Hallucination ? "Dude!  The living dead!" :
+ 			"The grave's owner is very upset!");
+ 	    (void) makemon(mkclass(S_ZOMBIE,0), u.ux, u.uy, NO_MM_FLAGS);
+	    break;
+	case 3:
+	    if (!Blind) pline(Hallucination ? "I want my mummy!" :
+ 			"You've disturbed a tomb!");
+ 	    (void) makemon(mkclass(S_MUMMY,0), u.ux, u.uy, NO_MM_FLAGS);
+	    break;
+	default:
+	    /* No corpse */
+	    pline_The("grave seems unused.  Strange....");
+	    break;
 	}
 	levl[u.ux][u.uy].typ = ROOM;
 	del_engr_at(u.ux, u.uy);
@@ -1136,13 +1131,8 @@ register struct monst *mtmp;
 		    return TRUE;
 		}
 	    } else {
-		if (!rn2(3) && flags.verbose) {	/* not too often.. */
-		    if (!Hallucination) {
-			You_feel("an unexpected draft.");
-		    } else {
-			You_feel("an expected draft.");
-		    }
-		}
+		if (!rn2(3) && flags.verbose)	/* not too often.. */
+		    You_feel("an unexpected draft.");
 		here->doormask = D_BROKEN;
 	    }
 	    newsym(mtmp->mx, mtmp->my);

@@ -90,25 +90,16 @@ elf_can_regen()
 {
     if (Race_if(PM_ELF)) {
 	if (uwep && is_iron(uwep) && !uarmg) return 0;
-#ifdef TOURIST
 	if (uarm && is_iron(uarm) && !uarmu) return 0;
 	if (uarmu && is_iron(uarmu)) return 0;
 	if (uarmc && is_iron(uarmc) && !uarmu && !uarm) return 0;
-#else
-	if (uarm && is_iron(uarm)) return 0;
-	if (uarmc && is_iron(uarmc) && !uarm) return 0;
-#endif
 	if (uarmh && is_iron(uarmh)) return 0;
 	if (uarms && is_iron(uarms) && !uarmg) return 0;
 	if (uarmg && is_iron(uarmg)) return 0;
 	if (uarmf && is_iron(uarmf)) return 0;
 	if (uleft && is_iron(uleft)) return 0;
 	if (uright && is_iron(uright)) return 0;
-#ifdef TOURIST
-	if (uamul && is_iron(uamul) && !uarmu && !uarm) return 0;
-#else
-	if (uamul && is_iron(uamul) && !uarm) return 0;
-#endif
+	if (uamul && is_iron(uamul)) return 0;
 	if (ublindf && is_iron(ublindf)) return 0;
 	if (uchain && is_iron(uchain)) return 0;
 	if (uswapwep && is_iron(uswapwep) && u.twoweap) return 0;
@@ -335,7 +326,7 @@ moveloop()
 			    u.mh++;
 			    interrupt_multi("Hit points", u.mh, u.mhmax);
 			}
-		    } else if (u.uhp < u.uhpmax &&
+		    } else if (u.uhp < u.uhpmax && elf_can_regen() &&
 			 (wtcap < MOD_ENCUMBER || !u.umoved || Regeneration)) {
 			if (u.ulevel > 9 && !(moves % 3)) {
 			    int heal, Con = (int) ACURR(A_CON);
@@ -347,7 +338,7 @@ moveloop()
 				if (heal > u.ulevel-9) heal = u.ulevel-9;
 			    }
 			    flags.botl = 1;
-			    u.uhp += elf_can_regen() ? heal : heal/3;
+			    u.uhp += heal;
 			    if(u.uhp > u.uhpmax)
 				u.uhp = u.uhpmax;
 			    interrupt_multi("Hit points", u.uhp, u.uhpmax);
@@ -532,11 +523,7 @@ moveloop()
 	}
 
 	if (elf_regen != elf_can_regen()) {
-	    if (!Hallucination){
-		You_feel("%s.", (elf_regen) ? "itchy" : "relief");
-	    } else {
-		You_feel("%s.", (elf_regen) ? "magnetic" : "like you are no longer failing Organic Chemistry");
-	    }
+	    You_feel("%s.", (elf_regen) ? "itchy" : "relief");
 	    elf_regen = elf_can_regen();
 	}
 

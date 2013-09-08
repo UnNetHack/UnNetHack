@@ -55,10 +55,8 @@
 	* Eating a disenchanter corpse cures hallucination and has a chance of
 	  removing a random intrinsic, 20% chance if hallucinating, 50% otherwise
 	* Vlad's Tower now contains "coffins" instead of chests
-	* Reading a Scroll of Light while confused now summons some (black) lights
-	* Coffins might now be found in graves
-	* Elves now have health regeneration reduced by 2/3 while touching iron with bare skin
 	
+
 	* Artifact changes:
 	  - From SporkHack:
 	    - All the weapons below warn against and have 20% instakill chance 
