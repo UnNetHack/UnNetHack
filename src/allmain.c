@@ -88,7 +88,7 @@ hpnotify_format_str(char *str)
 boolean
 elf_can_regen()
 {
-    if (Race_if(PM_ELF)) {
+    if (maybe_polyd(is_elf(youmonst.data), Race_if(PM_ELF))) {
 	if (uwep && is_iron(uwep) && !uarmg) return 0;
 #ifdef TOURIST
 	if (uarm && is_iron(uarm) && !uarmu) return 0;
