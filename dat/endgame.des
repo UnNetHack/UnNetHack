@@ -120,6 +120,7 @@ MONSTER:('E',"earth elemental"),(04,17),hostile
 MONSTER:('E',"earth elemental"),(04,18),hostile
 
 OBJECT:('`',"boulder"),random
+OBJECT:('?',"earth"), random
 
 # trap decoys when using c?oGD
 LOOP [5d4] {
