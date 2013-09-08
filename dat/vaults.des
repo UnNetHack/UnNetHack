@@ -1012,8 +1012,12 @@ ROOM:"rndvault", random, random, random, random {
         BREAK
       CASE 3:
         LOOP [ $ntraps ] {
-      	   TRAP: "fire", random
+      	   IF [ 50% ] {
+      	      TRAP: "cold", random
+		} ELSE {
+		      TRAP: "fire", random
         }
+		 }
         BREAK
       CASE 4:
         LOOP [ $ntraps ] {
