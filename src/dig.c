@@ -1139,9 +1139,9 @@ register struct monst *mtmp;
 		if (!rn2(3) && flags.verbose) {	/* not too often.. */
 		    if (!Hallucination) {
 			You_feel("an unexpected draft.");
-			} else {
+		    } else {
 			You_feel("an expected draft.");
-			}
+		    }
 		}
 		here->doormask = D_BROKEN;
 	    }

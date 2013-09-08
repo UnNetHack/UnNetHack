@@ -1209,7 +1209,8 @@ static const char * const bogusmons[] = {
 	"Nessie", "tatzelwurm", "dahu",		/* european cryptids */
 	"three-headed monkey",			/* Monkey Island */
 	"little green man",			/* modern folklore */
-	"weighted Companion Cube",	"defective turret",	/* Portal */
+	"weighted Companion Cube",		/* Portal */
+	"defective turret",
 	"/b/tard",				/* /b/ */
 	"manbearpig",				/* South Park */
 	"ceiling cat", "basement cat",
@@ -1226,9 +1227,14 @@ static const char * const bogusmons[] = {
 	"unicorn pegasus kitten",		/* Wil Wheaton, John Scalzi */
 	"dwerga nethackus", "dwerga castrum",	/* Ask ASCII Ponies */
 	"Irrenhaus the Third",			/* http://www.youtube.com/user/Irrenhaus3 */
-    "semipotent demidog", "shale imp", "mercury imp", "Betty Crocker", "Spades Slick", /* Homestuck */
-	"patriarchy", "bourgeiose", "mainstream media", /* talking points */
-	"Demonhead Mobster Kingpin", "courtesan angel", "fractal bee", /* Problem Sleuth */
+	"semipotent demidog", "shale imp",	/* Homestuck */
+	"mercury imp", "Betty Crocker",
+	"Spades Slick",
+	"patriarchy", "bourgeiose",		/* talking points */
+	"mainstream media",
+	"Demonhead Mobster Kingpin",		/* Problem Sleuth */
+	"courtesan angel", "fractal bee",
+
 	/* bogus UnNetHack monsters */
 	"weeping angle",
 	"gelatinous sphere", "gelatinous pyramid",
