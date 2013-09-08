@@ -231,7 +231,7 @@ MONSTER: (''',"iron golem"),rndcoord(fillrect(06,00,65,18)),peaceful {
   OBJECT:(')', "axe"),uncursed,1d4
   [50%]: OBJECT:('(', "tin opener")
   [20%]: OBJECT:('(', "can of grease")
-  [10%]: OBJECT:('(', "tinning kit")
+  [15%]: OBJECT:('(', "tinning kit")
 }
 
 #Abandoned campsites
