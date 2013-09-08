@@ -4038,9 +4038,6 @@ esac
 
 
 if test $host_os = mingw32; then
-    CFLAGS="$CFLAGS -mno-cygwin -isystem /usr/include/mingw"
-    LFLAGS="$LDFLAGS -mno-cygwin -L/usr/lib/mingw"
-
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for how to build UnNetHack key dynamic libraries" >&5
 $as_echo_n "checking for how to build UnNetHack key dynamic libraries... " >&6; }
     if test "$GCC" = yes; then
@@ -5770,7 +5767,7 @@ fi
 # Due to what may be a bug in autoconf, we have to call AC_CHECK_HEADERS()
 # to get the various HAVE_xxx_H preprocessor variables detected by
 # AC_HEADER_STDC active. These are needed for AC_CHECK_DECLS(), below.
-for ac_header in string.h utime.h
+for ac_header in inttypes.h stdint.h unistd.h string.h utime.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"

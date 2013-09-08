@@ -82,6 +82,7 @@ typedef struct tagBMIH {
         unsigned long   biClrImportant;
 } PACK BITMAPINFOHEADER;
 
+#pragma pack(1)
 typedef struct tagBMFH {
         unsigned short bfType;
         unsigned long  bfSize;

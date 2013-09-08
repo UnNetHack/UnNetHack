@@ -80,9 +80,6 @@ AC_SUBST(SYSSRC)
 AC_SUBST(SYSOBJ)
 
 if test $host_os = mingw32; then
-    CFLAGS="$CFLAGS -mno-cygwin -isystem /usr/include/mingw"
-    LFLAGS="$LDFLAGS -mno-cygwin -L/usr/lib/mingw"
-
     AC_MSG_CHECKING([for how to build UnNetHack key dynamic libraries])
     if test "$GCC" = yes; then
 	AC_MSG_RESULT([gcc])
@@ -305,7 +302,7 @@ AC_HEADER_STDC
 # Due to what may be a bug in autoconf, we have to call AC_CHECK_HEADERS()
 # to get the various HAVE_xxx_H preprocessor variables detected by
 # AC_HEADER_STDC active. These are needed for AC_CHECK_DECLS(), below.
-AC_CHECK_HEADERS([string.h utime.h])
+AC_CHECK_HEADERS([inttypes.h stdint.h unistd.h string.h utime.h])
 AC_CHECK_HEADER(regex.h, [have_regex_h=yes],[have_regex_h=no],/* TEST_REGEX */)
 
 dnl ------ Check for data types

@@ -96,7 +96,8 @@ CC = @CC@ -DAUTOCONF
 # flags for debugging:
 # CFLAGS = -g -I../include -I$(srcdir)/../include
 
-CFLAGS = -O -I../include -I$(srcdir)/../include @CFLAGS@
+# i686-pc-mingw32-gcc-4.7.3 crashes with no or just -O optimisation
+CFLAGS = -O2 -I../include -I$(srcdir)/../include @CFLAGS@
 LFLAGS = @LFLAGS@
 
 LIBS =
