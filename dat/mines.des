@@ -35,7 +35,7 @@ MONSTER: 'G', random
 MONSTER: 'G', random
 MONSTER: 'h', random
 #
-LOOP [4 + 1d5] {
+LOOP [4 + 1d6] {
   TRAP: random, random
 }
 
@@ -1097,6 +1097,7 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 TRAP:random,random
+TRAP:random,random
 # Random monsters
 MONSTER:('G',"gnome king"),random
 LOOP [2 + 1d4] {
@@ -1215,6 +1216,7 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 TRAP:random,random
+TRAP:random,random
 # Random monsters.
 MONSTER:('G',"gnome king"),random
 MONSTER:('G',"gnome lord"),random
@@ -1237,7 +1239,7 @@ MONSTER:('h',"dwarf"),random
 MONSTER:('h',"dwarf"),random
 MONSTER:('h',"dwarf"),random
 MONSTER:'h',random
-
+[5%]: MONSTER: ('X',"xorn"),random
 
 # "Catacombs" by Kelly Bailey
 # Relies on some very specific behavior of MAZEWALK.
@@ -1309,7 +1311,7 @@ LOOP [3d2] {
 OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
-LOOP [2 + 3d3] {
+LOOP [2 + 3d4] {
   TRAP:random,random
 }
 # One-time annoyance factor
