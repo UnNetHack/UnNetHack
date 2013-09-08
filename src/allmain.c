@@ -523,7 +523,11 @@ moveloop()
 	}
 
 	if (elf_regen != elf_can_regen()) {
-	    You_feel("%s.", (elf_regen) ? "itchy" : "relief");
+	    if (!Hallucination){
+		You_feel("%s.", (elf_regen) ? "itchy" : "relief");
+		} else {
+		You_feel("%s.", (elf_regen) ? "magnetic" : "like you are no longer failing Organic Chemistry");
+		}
 	    elf_regen = elf_can_regen();
 	}
 
