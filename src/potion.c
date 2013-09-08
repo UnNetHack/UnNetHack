@@ -1693,7 +1693,7 @@ register struct obj *obj;
 		update_inventory();
 		return TRUE;
 	    case SCROLL_CLASS:
-		if (obj->otyp != SCR_BLANK_PAPER
+		if (obj->otyp != SCR_BLANK_PAPER && obj->otyp != SCR_FLOOD
 #ifdef MAIL
 		    && obj->otyp != SCR_MAIL
 #endif
