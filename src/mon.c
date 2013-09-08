@@ -311,7 +311,7 @@ register struct monst *mtmp;
 		mtmp->mnamelth = 0;
 		break;
 		case PM_SKELETON
-			if !rn2(20) {
+			if (!rn2(20)) {
 				obj = mksobj_at(SKELETON_KEY, x, y, TRUE, FALSE);
 			}
 		break;
