@@ -129,8 +129,8 @@ struct obj *obj;
 	    int dam = d(obj->spe+2, 6);
 
 	    if (flags.soundok) {
-		if (vis) pline("%s zaps %s, which suddenly explodes!",
-			Monnam(mon), an(xname(obj)));
+		if (vis) pline("%s %s %s, which suddenly explodes!",
+		    Monnam(mon), is_weeping(mon->data) ? "is zapping" : "zaps", an(xname(obj)));
 		else You_hear("a zap and an explosion in the distance.");
 	    }
 	    m_useup(mon, obj);
@@ -157,10 +157,11 @@ boolean self;
 					(distu(mtmp->mx,mtmp->my) <= (BOLT_LIM+1)*(BOLT_LIM+1)) ?
 					"nearby" : "distant");
 	} else if (self)
-		pline("%s zaps %sself with %s!",
-		      Monnam(mtmp), mhim(mtmp), doname(otmp));
+		pline("%s %s %sself with %s!", Monnam(mtmp),
+		    is_weeping(mtmp->data) ? "is zapping" : "zaps", mhim(mtmp), doname(otmp));
 	else {
-		pline("%s zaps %s!", Monnam(mtmp), an(xname(otmp)));
+		pline("%s %s %s!", Monnam(mtmp),
+		    is_weeping(mtmp->data) ? "is zapping" : "zaps", an(xname(otmp)));
 		stop_occupation();
 	}
 }
@@ -473,7 +474,7 @@ struct monst *mtmp;
 		}
 		nomore(MUSE_SCR_TELEPORTATION);
 		if(obj->otyp == SCR_TELEPORTATION && mtmp->mcansee
-		   && haseyes(mtmp->data)
+		   && haseyes(mtmp->data) && !is_weeping(mtmp->data)
 		   && (!obj->cursed ||
 		       (!(mtmp->isshk && inhishop(mtmp))
 			    && !mtmp->isgd && !mtmp->ispriest))) {
@@ -524,7 +525,7 @@ struct monst *mtmp;
 		}
 	    }
 		nomore(MUSE_SCR_CREATE_MONSTER);
-		if(obj->otyp == SCR_CREATE_MONSTER) {
+		if(obj->otyp == SCR_CREATE_MONSTER && !is_weeping(mtmp->data)) {
 			m.defensive = obj;
 			m.has_defense = MUSE_SCR_CREATE_MONSTER;
 		}
@@ -561,7 +562,8 @@ struct monst *mtmp;
 	case MUSE_UNICORN_HORN:
 		if (vismon) {
 		    if (otmp)
-			pline("%s uses a unicorn horn!", Monnam(mtmp));
+			pline("%s %s a unicorn horn!",
+			    is_weeping(mtmp->data) ? "is using" : "uses", Monnam(mtmp));
 		    else
 			pline_The("tip of %s's horn glows!", mon_nam(mtmp));
 		}
@@ -751,7 +753,7 @@ mon_tele:
 			struct trap *t;
 			t = t_at(trapx,trapy);
 			pline("%s %s into a %s!", Monnam(mtmp),
-			makeplural(locomotion(mtmp->data, "jump")),
+			makeplural(is_weeping(mtmp->data) ? "tips over" : locomotion(mtmp->data, "jump")),
 			t->ttyp == TRAPDOOR ? "trap door" : "hole");
 			if (levl[trapx][trapy].typ == SCORR) {
 			    levl[trapx][trapy].typ = CORR;
@@ -781,7 +783,8 @@ mon_tele:
 			if (mon_has_special(mtmp))
 				return 0;
 			if (vismon)
-			    pline("%s escapes the dungeon!", Monnam(mtmp));
+			    pline("%s %s the dungeon!", Monnam(mtmp),
+				is_weeping(mtmp->data) ? "has escaped" : "escapes");
 			mongone(mtmp);
 			return 2;
 		}
@@ -798,26 +801,30 @@ mon_tele:
 		    migrate_to_level(mtmp, ledger_no(&u.uz) + 1,
 				     MIGR_RANDOM, (coord *)0);
 		} else {
-		    if (vismon) pline("%s escapes upstairs!", Monnam(mtmp));
+		    if (vismon) pline("%s %s upstairs!", Monnam(mtmp),
+			is_weeping(mtmp->data) ? "has escaped" : "escapes");
 		    migrate_to_level(mtmp, ledger_no(&u.uz) - 1,
 				     MIGR_STAIRS_DOWN, (coord *)0);
 		}
 		return 2;
 	case MUSE_DOWNSTAIRS:
 		m_flee(mtmp);
-		if (vismon) pline("%s escapes downstairs!", Monnam(mtmp));
+		if (vismon) pline("%s %s downstairs!", Monnam(mtmp),
+			is_weeping(mtmp->data) ? "has escaped" : "escapes");
 		migrate_to_level(mtmp, ledger_no(&u.uz) + 1,
 				 MIGR_STAIRS_UP, (coord *)0);
 		return 2;
 	case MUSE_UP_LADDER:
 		m_flee(mtmp);
-		if (vismon) pline("%s escapes up the ladder!", Monnam(mtmp));
+		if (vismon) pline("%s %s up the ladder!", Monnam(mtmp),
+			is_weeping(mtmp->data) ? "has escaped" : "escapes");
 		migrate_to_level(mtmp, ledger_no(&u.uz) - 1,
 				 MIGR_LADDER_DOWN, (coord *)0);
 		return 2;
 	case MUSE_DN_LADDER:
 		m_flee(mtmp);
-		if (vismon) pline("%s escapes down the ladder!", Monnam(mtmp));
+		if (vismon) pline("%s %s down the ladder!", Monnam(mtmp),
+			is_weeping(mtmp->data) ? "has escaped" : "escapes");
 		migrate_to_level(mtmp, ledger_no(&u.uz) + 1,
 				 MIGR_LADDER_UP, (coord *)0);
 		return 2;
@@ -827,14 +834,16 @@ mon_tele:
 		/* regular stairs, not sstairs.			*/
 		if (sstairs.up) {
 			if (vismon)
-			    pline("%s escapes upstairs!", Monnam(mtmp));
+			    pline("%s %s upstairs!", Monnam(mtmp),
+				is_weeping(mtmp->data) ? "has escaped" : "escapes");
 			if(Inhell) {
 			    migrate_to_level(mtmp, ledger_no(&sstairs.tolev),
 					     MIGR_RANDOM, (coord *)0);
 			    return 2;
 			}
 		} else	if (vismon)
-		    pline("%s escapes downstairs!", Monnam(mtmp));
+		    pline("%s %s downstairs!", Monnam(mtmp),
+			is_weeping(mtmp->data) ? "has escaped" : "escapes");
 		migrate_to_level(mtmp, ledger_no(&sstairs.tolev),
 				 MIGR_SSTAIRS, (coord *)0);
 		return 2;
@@ -842,6 +851,7 @@ mon_tele:
 		m_flee(mtmp);
 		if (vis) {
 			pline("%s %s onto a teleport trap!", Monnam(mtmp),
+				is_weeping(mtmp->data) ? "tips over" :
 				makeplural(locomotion(mtmp->data, "jump")));
 			if (levl[trapx][trapy].typ == SCORR) {
 			    levl[trapx][trapy].typ = CORR;
