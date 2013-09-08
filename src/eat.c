@@ -141,7 +141,7 @@ static const struct { const char *txt; int nut; } tintxts[] = {
 #define SZECHUAN_TIN 10
 	{"szechuan",     70},
 #define FRENCH_FRIED_TIN 11
-	{"french fried", 40},
+	{"french fried", 55},
 	{"sauteed",      95},
 	{"broiled",      80},
 	{"smoked",       50},
