@@ -87,6 +87,7 @@ static const char *random_mesg[] = {
 	"Duck, Sally Sparrow", /* Doctor Who */
 	"Love from the Doctor, 1969", /* Doctor Who */
 	"Do NOT approach the Dog Park", /* Welcome to Night Vale */
+	"L, do you know", "Gods of Death", "love apples?", /* Death Note */
 };
 
 char *
