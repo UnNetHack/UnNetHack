@@ -1136,8 +1136,13 @@ register struct monst *mtmp;
 		    return TRUE;
 		}
 	    } else {
-		if (!rn2(3) && flags.verbose)	/* not too often.. */
+		if (!rn2(3) && flags.verbose) {	/* not too often.. */
+		    if (!Hallucination) {
 		    You_feel("an unexpected draft.");
+			} else {
+			You_feel("an expected draft.");
+			}
+		}
 		here->doormask = D_BROKEN;
 	    }
 	    newsym(mtmp->mx, mtmp->my);
