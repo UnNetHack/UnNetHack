@@ -335,7 +335,7 @@ moveloop()
 			    u.mh++;
 			    interrupt_multi("Hit points", u.mh, u.mhmax);
 			}
-		    } else if (u.uhp < u.uhpmax && elf_can_regen() &&
+		    } else if (u.uhp < u.uhpmax &&
 			 (wtcap < MOD_ENCUMBER || !u.umoved || Regeneration)) {
 			if (u.ulevel > 9 && !(moves % 3)) {
 			    int heal, Con = (int) ACURR(A_CON);
@@ -347,7 +347,7 @@ moveloop()
 				if (heal > u.ulevel-9) heal = u.ulevel-9;
 			    }
 			    flags.botl = 1;
-			    u.uhp += heal;
+			    u.uhp += elf_can_regen() ? heal : heal/3;
 			    if(u.uhp > u.uhpmax)
 				u.uhp = u.uhpmax;
 			    interrupt_multi("Hit points", u.uhp, u.uhpmax);
