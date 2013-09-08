@@ -1529,7 +1529,7 @@ OBJECT:('`',"boulder"),random
 [50%]: OBJECT: ('`',"boulder"),random
 [50%]: MONSTER: ('H',"minotaur"),random
 [50%]: MONSTER: ('H',"minotaur"),random
-LOOP [11] {
+LOOP [12] {
   [50%]: MONSTER: random,random
 }
 #GOLD:random,random
@@ -1622,7 +1622,7 @@ OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
-
+OBJECT:random,random
 #
 # Vsplit
 #
@@ -2343,6 +2343,7 @@ OBJECT:'*',random
 [50%]: OBJECT: '*',random
 [50%]: OBJECT: '*',random
 [50%]: OBJECT: '*',random
+[50%]: OBJECT: '*',random
 OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
@@ -2351,7 +2352,7 @@ OBJECT:random,random
 [50%]: OBJECT: random,random
 [50%]: OBJECT: random,random
 [50%]: OBJECT: random,random
-[50%]: OBJECT: random,random
+[10%]: OBJECT: random,random
 [50%]: MONSTER: ('H',"minotaur"),random
 [50%]: MONSTER: ('H',"minotaur"),random
 [50%]: MONSTER: random,random
@@ -2365,6 +2366,7 @@ OBJECT:random,random
 [50%]: MONSTER: random,random
 [50%]: MONSTER: random,random
 [50%]: MONSTER: random,random
+[10%]: MONSTER: random,random
 #GOLD:random,random
 #GOLD:random,random
 #GOLD:random,random
