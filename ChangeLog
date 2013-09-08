@@ -56,6 +56,7 @@
 	  removing a random intrinsic, 20% chance if hallucinating, 50% otherwise
 	* Vlad's Tower now contains "coffins" instead of chests
 	* Reading a Scroll of Light while confused now summons some (black) lights
+	* Coffins might now be found in graves
 
 	* Artifact changes:
 	  - From SporkHack:
