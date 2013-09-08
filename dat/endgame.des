@@ -194,6 +194,7 @@ MONSTER:('e',"floating eye"),random,hostile
 MONSTER:('y',"yellow light"),random,hostile
 MONSTER:('y',"yellow light"),random,hostile
 MONSTER:('y',"yellow light"),random,hostile
+[25%]: MONSTER:('y',"black light"),random,hostile
 
 MONSTER:('A',"couatl"),random
 
@@ -232,7 +233,7 @@ MONSTER:('v',"steam vortex"),random,hostile
 MONSTER:('v',"steam vortex"),random,hostile
 MONSTER:('v',"steam vortex"),random,hostile
 MONSTER:('v',"steam vortex"),random,hostile
-
+OBJECT:('?',"stinking cloud"), random
 # trap decoys when using c?oGD
 LOOP [5d4] {
   TRAP:"sleep gas",random
@@ -352,7 +353,7 @@ OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
 OBJECT:('`',"boulder"),random
-
+OBJECT:('?',"fire"), random
 
 LEVEL:"water"
 FLAGS: noteleport,hardfloor,shortsighted,mazelevel,shroud
@@ -430,6 +431,7 @@ MONSTER:';',random
 MONSTER:';',random
 MONSTER:';',random
 MONSTER:';',random
+OBJECT:('?',"flood"), random
 # These guys feel like home here
 LOOP [19] {
   MONSTER:('E',"water elemental"),random,hostile
