@@ -31,8 +31,8 @@
 	* Drastically increased generation probability of Fort Ludios portal
 	* Tourists start with more darts to compensate for more training being
 	  needed to advance weapon skills
-	* The #enhance menu now indicates when skills require "just a little"
-	  more exercise before they may be enhanced
+	* The #enhance menu indicates when skills require "just a little" more
+	  exercise before they may be enhanced
 	* Player can wish for up to 100 projectiles (from UnNetHackPlus)
 	* Land mines and beartraps weigh less (from UnNetHackPlus)
 	* Increase range of properly fired missiles, and crossbow range no 
@@ -54,9 +54,10 @@
 	* Replace Sokoban's Amulet of ESP with an Amulet of Flying
 	* Eating a disenchanter corpse cures hallucination and has a chance of
 	  removing a random intrinsic, 20% chance if hallucinating, 50% otherwise
-	* Vlad's Tower now contains "coffins" instead of chests
-	* Reading a Scroll of Light while confused now summons some (black) lights
-	* Coffins might now be found in graves
+	* Vlad's Tower contains "coffins" instead of chests, and coffins may be
+	  found in graves
+	* Reading a Scroll of Light while confused summons some (black) lights
+	* Elven players do not regenerate health while touching iron with bare skin
 
 	* Artifact changes:
 	  - From SporkHack:
