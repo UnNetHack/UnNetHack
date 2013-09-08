@@ -96,7 +96,7 @@ TRAP:"pit",(07,10)
 
 # A little help
 OBJECT:('?',"earth"),(02,11)
-OBJECT:('?',"earth"),(03,11)
+[50%]: OBJECT:('?',"earth"),(03,11)
 
 soko_loot()
 
@@ -230,7 +230,7 @@ TRAP:"pit",(25,10)
 TRAP:"pit",(26,10)
 
 OBJECT:('?',"earth"),(03,10)
-OBJECT:('?',"earth"),(04,10)
+[50%]: OBJECT:('?',"earth"),(04,10)
 
 soko_loot()
 
@@ -296,7 +296,7 @@ TRAP:"pit",(22,10)
 TRAP:"pit",(23,10)
 
 OBJECT:('?',"earth"),(08,12)
-OBJECT:('?',"earth"),(09,12)
+[50%]: OBJECT:('?',"earth"),(09,12)
 
 soko_loot()
 
@@ -635,7 +635,7 @@ REGION:(00,00,28,12),lit,"ordinary"
 NON_DIGGABLE:(00,00,28,12)
 NON_PASSWALL:(00,00,28,12)
 OBJECT:('?',"earth"),(16,3)
-OBJECT:('?',"earth"),(16,9)
+[50%]: OBJECT:('?',"earth"),(16,9)
 OBJECT:('`',"boulder"),(8,2)
 OBJECT:('`',"boulder"),(8,4)
 OBJECT:('`',"boulder"),(3,5)
@@ -689,7 +689,7 @@ NON_DIGGABLE:(00,00,18,15)
 NON_PASSWALL:(00,00,18,15)
 DOOR:locked,(2,2)
 OBJECT:('?',"earth"),(1,13)
-OBJECT:('?',"earth"),(2,13)
+[50%]: OBJECT:('?',"earth"),(2,13)
 OBJECT:('`',"boulder"),(8,6)
 OBJECT:('`',"boulder"),(10,6)
 OBJECT:('`',"boulder"),(15,6)
@@ -747,7 +747,7 @@ NON_DIGGABLE:(00,00,15,15)
 NON_PASSWALL:(00,00,15,15)
 DOOR:locked,(14,4)
 OBJECT:('?',"earth"),(1,1)
-OBJECT:('?',"earth"),(2,1)
+[50%]: OBJECT:('?',"earth"),(2,1)
 OBJECT:('`',"boulder"),(2,4)
 OBJECT:('`',"boulder"),(2,5)
 OBJECT:('`',"boulder"),(4,5)
@@ -801,7 +801,7 @@ REGION:(00,00,16,12),lit,"ordinary"
 NON_DIGGABLE:(00,00,16,12)
 NON_PASSWALL:(00,00,16,12)
 OBJECT:('?',"earth"),(14,1)
-OBJECT:('?',"earth"),(15,1)
+[50%]: OBJECT:('?',"earth"),(15,1)
 OBJECT:('`',"boulder"),(12,2)
 OBJECT:('`',"boulder"),(6,3)
 OBJECT:('`',"boulder"),(12,3)
@@ -856,7 +856,7 @@ NON_DIGGABLE:(00,00,28,15)
 NON_PASSWALL:(00,00,28,15)
 DOOR:locked,(26,12)
 OBJECT:('?',"earth"),(13,13)
-OBJECT:('?',"earth"),(15,13)
+[50%]: OBJECT:('?',"earth"),(15,13)
 OBJECT:('`',"boulder"),(2,2)
 OBJECT:('`',"boulder"),(7,2)
 OBJECT:('`',"boulder"),(2,3)
@@ -945,7 +945,7 @@ REGION:(00,00,15,10),lit,"ordinary"
 NON_DIGGABLE:(00,00,15,10)
 NON_PASSWALL:(00,00,15,10)
 OBJECT:('?',"earth"),(14,6)
-OBJECT:('?',"earth"),(14,7)
+[50%]: OBJECT:('?',"earth"),(14,7)
 OBJECT:('`',"boulder"),(4,2)
 OBJECT:('`',"boulder"),(8,3)
 OBJECT:('`',"boulder"),(6,4)
@@ -990,7 +990,7 @@ REGION:(00,00,18,11),lit,"ordinary"
 NON_DIGGABLE:(00,00,18,11)
 NON_PASSWALL:(00,00,18,11)
 OBJECT:('?',"earth"),(1,8)
-OBJECT:('?',"earth"),(1,9)
+[50%]: OBJECT:('?',"earth"),(1,9)
 OBJECT:('`',"boulder"),(12,2)
 OBJECT:('`',"boulder"),(14,2)
 OBJECT:('`',"boulder"),(9,3)
@@ -1057,7 +1057,7 @@ TRAP:"pit",(8,5)
 TRAP:"pit",(9,5)
 
 OBJECT:('?',"earth"),(02,06)
-OBJECT:('?',"earth"),(03,06)
+[50%]: OBJECT:('?',"earth"),(03,06)
 
 soko_loot()
 
@@ -1118,7 +1118,7 @@ TRAP:"pit",(7,11)
 TRAP:"pit",(8,11)
 
 OBJECT:('?',"earth"),(02,04)
-OBJECT:('?',"earth"),(03,04)
+[50%]: OBJECT:('?',"earth"),(03,04)
 
 soko_loot()
 
@@ -1174,7 +1174,7 @@ TRAP:"pit",(16,9)
 TRAP:"pit",(17,9)
 
 OBJECT:('?',"earth"),(18,10)
-OBJECT:('?',"earth"),(19,10)
+[50%]: OBJECT:('?',"earth"),(19,10)
 
 soko_loot()
 
@@ -1243,7 +1243,7 @@ TRAP:"pit",(9,11)
 TRAP:"pit",(10,11)
 
 OBJECT:('?',"earth"),(09,12)
-OBJECT:('?',"earth"),(10,12)
+[50%]: OBJECT:('?',"earth"),(10,12)
 
 soko_loot()
 
@@ -1300,7 +1300,7 @@ TRAP:"pit",(16,8)
 TRAP:"pit",(17,8)
 
 OBJECT:('?',"earth"),(18,09)
-OBJECT:('?',"earth"),(19,09)
+[50%]: OBJECT:('?',"earth"),(19,09)
 
 soko_loot()
 
@@ -1800,7 +1800,7 @@ TRAP:"pit",(01,08)
 
 # A little help
 OBJECT:('?',"earth"),(01,02)
-OBJECT:('?',"earth"),(02,02)
+[50%]: OBJECT:('?',"earth"),(02,02)
 
 soko_loot()
 
@@ -1858,7 +1858,7 @@ TRAP:"pit",(01,02)
 
 # A little help
 OBJECT:('?',"earth"),(01,10)
-OBJECT:('?',"earth"),(02,10)
+[50%]: OBJECT:('?',"earth"),(02,10)
 
 soko_loot()
 
