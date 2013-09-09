@@ -265,6 +265,11 @@ MONSTER: ('o',"deep orc"),(72,14)
 MONSTER: ('o',"deep orc"),(73,14)
 MONSTER: ('o',"deep orc"),(74,14)
 MONSTER: ('o',"deep orc"),(75,14)
+# A few birds at night
+IF [time.night == 1]: MONSTER: ('B',"bat"),random
+IF [time.night == 1]: MONSTER: ('B',"bat"),random
+IF [time.night == 1]: MONSTER: 'B',random
+[50%]: [time.night]: MONSTER: 'B',random
 
 #Prisoners
 #There is a way to free them if you're clever.
