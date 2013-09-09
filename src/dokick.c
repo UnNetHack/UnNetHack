@@ -346,53 +346,29 @@ register struct obj *gold;
 			else if (mtmp->data == &mons[PM_WATCHMAN])
 			   goldreqd = 90L;
 			   if ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10)) {
-<<<<<<< .mine
-			   adjalign(-1);
-	           You("feel a bit guilty about bribing a public servant");
+					adjalign(-1);
+					You("feel a bit guilty about bribing a public servant");
 	           }
-=======
-				adjalign(-sgn(u.ualign.type));
-				You("feel a bit guilty about bribing a public servant");
-			   }
->>>>>>> .r1742
 			else if (mtmp->data == &mons[PM_WATCH_CAPTAIN])
 			   goldreqd = 450L;
 			   if ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10)) {
-<<<<<<< .mine
-			   adjalign(-1);
-	           You("feel a bit guilty about bribing a public servant");
-	           }
-=======
-				adjalign(-sgn(u.ualign.type));
-				You("feel a bit guilty about bribing a public servant");
+					adjalign(-1);
+					You("feel a bit guilty about bribing a public servant");
 			   }
->>>>>>> .r1742
 			/* VERY hard to bribe these guys */
 			else if (mtmp->data == &mons[PM_GUARD])
 			   goldreqd = 5000L;
 			   if ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10)) {
-<<<<<<< .mine
-			   adjalign(-1);
-	           You("feel a bit guilty about bribing a public servant");
+					adjalign(-2);
+					You("feel guilty about bribing a public servant");
 	           }
-=======
-				adjalign(-sgn(u.ualign.type));
-				You("feel a bit guilty about bribing a public servant");
-			   }
->>>>>>> .r1742
 #ifdef CONVICT
 			else if (mtmp->data == &mons[PM_PRISON_GUARD])
 			   goldreqd = 200L;
 			   if ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10)) {
-<<<<<<< .mine
-			   adjalign(-1);
-	           You("feel a bit guilty about bribing a public servant");
+					adjalign(-2);
+					You("feel guilty about bribing a public servant");
 	           }
-=======
-				adjalign(-sgn(u.ualign.type));
-				You("feel a bit guilty about bribing a public servant");
-			   }
->>>>>>> .r1742
 #endif /* CONVICT */
 
 			if (goldreqd) {
