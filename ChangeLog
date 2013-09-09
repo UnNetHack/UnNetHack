@@ -142,7 +142,7 @@
 	  - default of sortloot changed to 'loot'
 	  - Allow exact numbers in STATUSCOLOR settings (from NAO)
 	  - Permanent hallucination option: perma_hallu
-	  - New option: wound_message. Healers can recieve Crawl-style damage
+	  - New option: wound_message. Healers can receive Crawl-style damage
 	    messages indicating the current health of their foes
 	  - New options: invweight and showweight (from SLASH'EM 0.7)
 		
