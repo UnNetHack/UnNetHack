@@ -285,6 +285,10 @@ adventure, you gain experience points.  At certain experience point
 totals, you gain an experience level.  The more experienced you are,
 the better you fight and withstand magical attacks.  Many dungeons
 show only your experience level here.
+.lp Weight
+The total weight of all items in your inventory, displayed if you have the
+.op showweight
+option set. The number after the slash is your carrying capacity.
 .lp "Time  "
 The number of turns elapsed so far, displayed if you have the
 .op time
@@ -1882,6 +1886,8 @@ characters for such terminals, so you should specify it when appropriate
 even if you override the selections with your own graphics strings.
 .lp ignintr
 Ignore interrupt signals, including breaks (default off).
+.lp invweight
+Display the weights of items in your inventory (and at other times)
 .lp legacy
 Display an introductory message when starting the game (default on).
 .lp lit_corridor
@@ -2147,6 +2153,8 @@ for your role (default off).  Note that this setting affects only
 the appearance of the display, not the way the game treats you.
 .lp showscore
 Show your approximate accumulated score on bottom line (default off).
+.lp showweight
+Show total weight in inventory on bottom line (default off).
 .lp "silent  "
 Suppress terminal beeps (default on).
 .lp sortloot

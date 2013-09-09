@@ -387,6 +387,11 @@ totals, you gain an experience level.  The more experienced you are,
 the better you fight and withstand magical attacks.  Many dungeons
 show only your experience level here.
 %.lp
+\item[\bb{Weight}]
+The total weight of all items in your inventory, displayed if you have the
+{\it showweight\/}
+option set. The number after the slash is your carrying capacity.
+%.lp
 \item[\bb{Time}]
 The number of turns elapsed so far, displayed if you have the
 {\it time\/} option set.
@@ -2331,6 +2336,10 @@ even if you override the selections with your own graphics strings.
 \item[\ib{ignintr}]
 Ignore interrupt signals, including breaks (default off).
 %.lp
+\item[\ib{invweight}]
+Display the weights of items in your inventory (and at other times)
+in braces (default off).
+%.lp
 \item[\ib{legacy}]
 Display an introductory message when starting the game (default on).
 %.lp
@@ -2628,6 +2637,9 @@ the appearance of the display, not the way the game treats you.
 %.lp
 \item[\ib{showscore}]
 Show your approximate accumulated score on bottom line (default off).
+%.lp
+\item[\ib{showweight}]
+Show total weight in inventory on bottom line (default off).
 %.lp
 \item[\ib{silent}]
 Suppress terminal beeps (default on).
