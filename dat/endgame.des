@@ -189,7 +189,8 @@ MONSTER:('E',"air elemental"),random,hostile
 
 MONSTER:('e',"floating eye"),random,hostile
 MONSTER:('e',"floating eye"),random,hostile
-MONSTER:('e',"floating eye"),random,hostile
+[75%]: MONSTER:('e',"floating eye"),random,hostile
+MONSTER: ('e', "evil eye"),random,hostile
 
 MONSTER:('y',"yellow light"),random,hostile
 MONSTER:('y',"yellow light"),random,hostile
