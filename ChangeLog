@@ -4,7 +4,6 @@
 	* Sokoban luck penalty removed and added tracking of solving Sokoban
 	  without any tricks
 	* Monster generation increasing with turn count (from SporkHack)
-	* Galloping duration depends on riding skills (idea by Beolach, code by Pasi Kallinen)
 	* Removed the Quest turn limit
 	* Player vampire gets a charisma bonus when wearing an opera cloak (by L)
 	* Some monster vampires get an opera cloak (from Slash'Em)
@@ -14,7 +13,6 @@
 	* Magical traps (except for magic portals and anti-magic fields) can be disarmed
 	  with a wand of cancellation (based on the patch by Malcolm Ryan)
 	* Applying zorkmids allows the player to flip a coin (code by Pasi Kallinen)
-	* Autoidentify BUC of products from BUC identified item generators (from UnNetHackPlus)
 	* Sokoban prizes are never cursed or have negative enchantment
 	* Automatically identify wand of cancellation after destroying a bag
 	  of holding with it
@@ -45,6 +43,7 @@
 	* Elven players do not regenerate health while touching iron with bare skin
 
 	* Item changes:
+	  - Autoidentify BUC of products from BUC identified item generators (from UnNetHackPlus)
 	  - Wearing fedora increases luck of archaeologists (from UnNetHackPlus)
 	  - Applying certain wands has a chance of creating a related trap
 	  - Land mines and beartraps weigh less (from UnNetHackPlus)
@@ -80,31 +79,45 @@
 	      ESP, half spell damage, and produces stinking clouds when invoked (by L)
 
 	* New config option for customizing monster letter in UTF8graphics:
-	  MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke
+	  - MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke
 
 	* Livelog: report bag of holding explosions
 
-	* New role: Convict class
+	* New role: Convict class, based on the patch by Karl Garrison
 
 	* removed monsters:
 	  - anti-matter vortex
 
-	* renamed monsters:
-	  - black Angels to dark Angels
-
 	* new monsters:
-	  - locusts (from SporkHack)
-	  - weeping angels
-	  - weeping archangels
-	  - deep orcs
-	  - evil eyes
-	  - shambling horrors (from Sporkhack)
-	  - dungeon ferns, sprouts, and spores
-	  - arctic ferns, sprouts, and spores
-	  - blazing ferns, sprouts, and spores
-	  - swamp ferns, sprouts, and spores
-	  - Devil's Snare
-	  - uranium imps
+	  - Sheol-specific monsters:
+	    - blue slimes
+	    - crystal ice golems
+	    - chillbugs
+	    - ice golems
+	    - Punishers
+	    - white nagas
+	  - Moria-specific monsters:
+	    - deep orcs
+	  - Unique monsters:
+	    - Executioner (Sheol)
+	    - Durin's Bane (Moria)
+	    - Watcher in the Water (Moria)
+	    - Robert the Lifer (Convict quest leader)
+	    - Warden Arianna (Convict quest nemesis)
+	  - General monsters:
+	    - dark Angels
+	    - white naga hatchlings
+	    - locusts (from SporkHack)
+	    - weeping angels
+	    - weeping archangels
+	    - evil eyes
+	    - shambling horrors (from Sporkhack)
+	    - dungeon ferns, sprouts, and spores
+	    - arctic ferns, sprouts, and spores
+	    - blazing ferns, sprouts, and spores
+	    - swamp ferns, sprouts, and spores
+	    - Devil's Snare
+	    - uranium imps
 
 	* dungeon layout:
 	  - Length of Town branch reduced and special filler level added
@@ -140,6 +153,8 @@
 	      studded leather armor
 
 	* Skill changes
+	  - Galloping duration depends on riding skills (idea by Beolach,
+	      code by Pasi Kallinen)
 	  - Skill gain for spells is faster than skill gain for weapons
 	  - Riding skill is exercised more quickly, closer to vanilla
 
