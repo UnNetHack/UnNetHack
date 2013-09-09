@@ -8,19 +8,14 @@
 	* Removed the Quest turn limit
 	* Player vampire gets a charisma bonus when wearing an opera cloak (by L)
 	* Some monster vampires get an opera cloak (from Slash'Em)
-	* Dump log: mark starting inventory items with a *
 	* Automatically identify potions of sickness, hallucination, and speed
 	  when inhaling their vapors.
 	* Poison gas blasts leave a trail of stinking clouds (from UnNetHackPlus)
-	* Wearing fedora increases luck of archaeologists (from UnNetHackPlus)
 	* Magical traps (except for magic portals and anti-magic fields) can be disarmed
 	  with a wand of cancellation (based on the patch by Malcolm Ryan)
 	* Applying zorkmids allows the player to flip a coin (code by Pasi Kallinen)
 	* Autoidentify BUC of products from BUC identified item generators (from UnNetHackPlus)
 	* Sokoban prizes are never cursed or have negative enchantment
-	* New experimental extended command: #vanquished. Shows a list of all monsters that
-	  have been vanquished during the game.
-	* Only the Sanctum and the Astral Plane are unmappable levels
 	* Automatically identify wand of cancellation after destroying a bag
 	  of holding with it
 	* Menucolors: setting a color or attribute doesn't remove a previously
@@ -28,13 +23,9 @@
 	* Regeneration only causes additional hunger when injured (by Adeon)
 	* Reinstated vanilla behavior for cursed scrolls of gold detection and
 	  adding some traps to the planes
-	* Drastically increased generation probability of Fort Ludios portal
 	* Tourists start with more darts to compensate for more training being
 	  needed to advance weapon skills
-	* The #enhance menu indicates when skills require "just a little" more
-	  exercise before they may be enhanced
 	* Player can wish for up to 100 projectiles (from UnNetHackPlus)
-	* Land mines and beartraps weigh less (from UnNetHackPlus)
 	* Increase range of properly fired missiles, and crossbow range no 
 	  longer depends on strength (from SporkHack)
 	* Require high strength for crossbow multishot, with a bonus for
@@ -45,24 +36,24 @@
 	* Aleaxes are created with exact copies (barring artifacts) of your
 	  wielded weapons and armor (provided they are actual weapons); when
 	  your own god sends a hostile monster, it will always be an Aleax (by L)
-	* Applying certain wands has a chance of creating a related trap
 	* Remove bonus for role special spells
-	* Luckstones dramatically slow luck timeout instead of preventing it
-	  completely. Blessed luckstones slow the timeout of positive luck,
-	  cursed luckstones negative luck, and uncursed luckstones both.
 	* It is impossible to know both the speed and location of a quantum mechanic
-	* Replace Sokoban's Amulet of ESP with an Amulet of Flying
-	* It is possible to get vampire blood out of a sink; additionally, the random potions out of a sink
-	  can have any BUC, depending on luck
+	* It is possible to get vampire blood out of a sink; additionally, the random potions
+	  out of a sink can have any BUC, depending on luck
 	* Eating a disenchanter corpse cures hallucination and has a chance of
 	  removing a random intrinsic, 20% chance if hallucinating, 50% otherwise
-	* Vlad's Tower contains "coffins" instead of chests, and coffins may be
-	  found in graves
-	* Reading a Scroll of Light while confused summons some (black) lights
 	* Elven players do not regenerate health while touching iron with bare skin
-	* Instead of 2 scrolls of earth, Sokoban levels have 1 scroll of earth with a 50% chance of a second one
-	* Elemental Planes each have a scroll related to their element somewhere on the level
-	* Reading a non-blessed scroll of punishment while confused summons a Punisher. BE CAREFUL
+
+	* Item changes:
+	  - Wearing fedora increases luck of archaeologists (from UnNetHackPlus)
+	  - Applying certain wands has a chance of creating a related trap
+	  - Land mines and beartraps weigh less (from UnNetHackPlus)
+	  - Sokoban's Amulet of ESP replaced with an Amulet of Flying
+	  - Luckstones dramatically slow luck timeout instead of preventing it
+	      completely. Blessed luckstones slow the timeout of positive luck,
+	      cursed luckstones negative luck, and uncursed luckstones both.
+	  - Reading a Scroll of Light while confused summons some (black) lights
+	  - Reading a non-blessed scroll of punishment while confused summons a Punisher. BE CAREFUL
 	
 	* Artifact changes:
 	  - From SporkHack:
@@ -116,8 +107,19 @@
 	  - uranium imps
 
 	* dungeon layout:
-	  - length of Town branch reduced and special filler level added
-	  - new branch: The Ruins of Moria
+	  - Length of Town branch reduced and special filler level added
+	  - Drastically increased generation probability of Fort Ludios portal
+	  - New branch: Sheol
+	  - New branch: The Ruins of Moria
+
+	* level changes:
+	  - Only the Sanctum and the Astral Plane are unmappable levels
+	  - Vlad's Tower contains "coffins" instead of chests, and coffins
+	      may be found in graves
+	  - Instead of two scrolls of earth, Sokoban levels have one scroll
+	      of earth with a 50% chance of a second one
+	  - Elemental Planes each have a scroll related to their element
+	      somewhere on the level
 
 	* new levels:
 	  - Black market version with One-eyed Sam promoted to management
@@ -129,7 +131,7 @@
 	  - Permanent hallucination option: perma_hallu
 	  - New option: wound_message. Healers can recieve Crawl-style damage
 	    messages indicating the current health of their foes
-      - New option: show weight (from SLASH'EM 0.7)
+	  - New options: invweight and showweight (from SLASH'EM 0.7)
 		
 	* Role differentiation:
 	  - Tourists get automatic typ identification for shop items
@@ -148,11 +150,16 @@
 	  - When standing on Elbereth, show it in status lines
 	  - New paranoid options: paranoid_lava and paranoid_water, asks for
 	      confirmation before walking into known lava and water squares
+	  - New experimental extended command: #vanquished. Shows a list of all
+	      monsters that have been vanquished during the game.
+	  - Dump log: mark starting inventory items with a *
 	  - Automatically ask whether to unlock when #looting a locked container
 	      and carrying an unlocking tool (from UnNetHackPlus)
 	  - Show remaining memory in spellcasting menu as percentage (from AceHack)
 	  - Applying a spellbook allows the player to flip through the pages,
 	      providing an indication of how many more times it can be read
+	  - The #enhance menu indicates when skills require "just a little" more
+	      exercise before they may be enhanced
 	  - Blessed charging identifies how many charges an item has (from AceHack)
 	  - When targeting a coordinate, you can press @ to move cursor to
 	      yourself. (from NAO, idea from b_jonas)
