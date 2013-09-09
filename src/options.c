@@ -130,15 +130,10 @@ static struct Bool_Opt
 	{"ignintr", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 #ifdef SHOW_WEIGHT
-    {"invweight", &flags.invweight, FALSE, SET_IN_GAME},
+	{"invweight", &flags.invweight, FALSE, SET_IN_GAME},
 #else
-    {"invweight", (boolean *)0, FALSE, SET_IN_FILE},
+	{"invweight", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
- #ifdef SHOW_WEIGHT
-     {"showweight", &flags.showweight, FALSE, SET_IN_GAME},
- #else
-     {"showweight", (boolean *)0, FALSE, SET_IN_FILE},
- #endif
 	{"large_font", &iflags.obsolete, FALSE, SET_IN_FILE},	/* OBSOLETE */
 	{"legacy", &flags.legacy, TRUE, SET_IN_FILE},
 	{"lit_corridor", &flags.lit_corridor, TRUE, SET_IN_FILE},
@@ -251,6 +246,11 @@ static struct Bool_Opt
 	{"showscore", &flags.showscore, FALSE, SET_IN_GAME},
 #else
 	{"showscore", (boolean *)0, FALSE, SET_IN_FILE},
+#endif
+#ifdef SHOW_WEIGHT
+	{"showweight", &flags.showweight, FALSE, SET_IN_GAME},
+#else
+	{"showweight", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"silent", &flags.silent, TRUE, SET_IN_GAME},
 	{"softkeyboard", &iflags.wc2_softkeyboard, FALSE, SET_IN_FILE},
