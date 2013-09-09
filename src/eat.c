@@ -514,8 +514,8 @@ register int pm;
 		break;
 	    case PM_DISENCHANTER:
 		/* hallucination decreases chance of removed intrinsic */
-		if (Hallucination ? rn2(5) : rn2(2)) attrcurse();
-		if (Hallucination) {
+		if ((!flags.perma_hallu && Hallucination) ? rn2(5) : rn2(2)) attrcurse();
+		if ((!flags.perma_hallu && Hallucination)) {
 		    (void) make_hallucinated(0L, FALSE, 0L);
 		    pline("The world seems less enchanting.");
 		}

@@ -2967,7 +2967,11 @@ struct obj *obj;
 	/* coin flipping is independent of other random
 	   functions, so use rand() intentionally here */
 	xchar ht = rand() % 2;
+	if (!Hallucination){
 	pline("%s.", ht ? "Heads" : "Tails");
+	} else {
+	pline("%s.", rn2(2) ? "Happy" : "Sad");
+	}
 	if (Hallucination && ht && !rn2(8))
 	    pline("Oh my, it %s at you!", rn2(2) ? "grins" : "winks");
     } else {
