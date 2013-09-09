@@ -2970,7 +2970,7 @@ struct obj *obj;
 	if (!Hallucination){
 	pline("%s.", ht ? "Heads" : "Tails");
 	} else {
-	pline("%s.", rn2(2) ? "Happy" : "Sad");
+	pline("%s.", rn2(2) ? "Happy" : "Sad"); /* purposefully doesn't use ht - can't correctly see flip */
 	}
 	if (Hallucination && ht && !rn2(8))
 	    pline("Oh my, it %s at you!", rn2(2) ? "grins" : "winks");
