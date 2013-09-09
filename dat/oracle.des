@@ -64,6 +64,8 @@ TRAP: random, random
 MONSTER: random, random
 }
 
+MONSTER: ('r',"woodchuck"),random
+
 ROOM: "ordinary" , random, random, random, random
 {
 OBJECT: random, random
