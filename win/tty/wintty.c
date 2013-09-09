@@ -443,22 +443,22 @@ give_up:	/* Quit */
 		menu_item *conduct_category_pick = (menu_item *)0;
 
 		static const char *conduct_names[] = {
-			"ascet", "atheist", "blindfolded", "illiterate", "nudist",
-			"pacifist", "vegan", "vegetarian",
-			"Heaven or Hell", "permanent hallucination","Quit"
+			"ascet", "atheist", "blindfolded", "hallucinating",
+			"illiterate", "nudist", "pacifist", "vegan",
+			"vegetarian", "Heaven or Hell", "Quit"
 		};
 #define NUM_CONDUCT_OPTIONS SIZE(conduct_names)
 		static boolean *conduct_bools[NUM_CONDUCT_OPTIONS];
 		conduct_bools[0] = &flags.ascet;
 		conduct_bools[1] = &flags.atheist;
 		conduct_bools[2] = &flags.blindfolded;
-		conduct_bools[3] = &flags.illiterate;
-		conduct_bools[4] = &flags.pacifist;
-		conduct_bools[5] = &flags.nudist;
-		conduct_bools[6] = &flags.vegan;
-		conduct_bools[7] = &flags.vegetarian;
-		conduct_bools[8] = &flags.heaven_or_hell;
-		conduct_bools[9] = &flags.perma_hallu;
+		conduct_bools[3] = &flags.perma_hallu;
+		conduct_bools[4] = &flags.illiterate;
+		conduct_bools[5] = &flags.pacifist;
+		conduct_bools[6] = &flags.nudist;
+		conduct_bools[7] = &flags.vegan;
+		conduct_bools[8] = &flags.vegetarian;
+		conduct_bools[9] = &flags.heaven_or_hell;
 		conduct_bools[10] = 0;
 		int conduct_settings[NUM_CONDUCT_OPTIONS];
 
@@ -495,13 +495,13 @@ give_up:	/* Quit */
 		flags.ascet          = conduct_settings[0];
 		flags.atheist        = conduct_settings[1];
 		flags.blindfolded    = conduct_settings[2];
-		flags.illiterate     = conduct_settings[3];
-		flags.pacifist       = conduct_settings[4];
-		flags.nudist         = conduct_settings[5];
-		flags.vegan          = conduct_settings[6];
-		flags.vegetarian     = conduct_settings[7];
-		flags.heaven_or_hell = conduct_settings[8];
-		flags.perma_hallu    = conduct_settings[9];
+		flags.perma_hallu    = conduct_settings[3];
+		flags.illiterate     = conduct_settings[4];
+		flags.pacifist       = conduct_settings[5];
+		flags.nudist         = conduct_settings[6];
+		flags.vegan          = conduct_settings[7];
+		flags.vegetarian     = conduct_settings[8];
+		flags.heaven_or_hell = conduct_settings[9];
 	}
 
 	(void)  root_plselection_prompt(plbuf, QBUFSZ - 1,
