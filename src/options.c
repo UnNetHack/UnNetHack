@@ -129,6 +129,16 @@ static struct Bool_Opt
 #else
 	{"ignintr", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+#ifdef SHOW_WEIGHT
+    {"invweight", &flags.invweight, FALSE, SET_IN_GAME},
+#else
+    {"invweight", (boolean *)0, FALSE, SET_IN_FILE},
+#endif
+ #ifdef SHOW_WEIGHT
+     {"showweight", &flags.showweight, FALSE, SET_IN_GAME},
+ #else
+     {"showweight", (boolean *)0, FALSE, SET_IN_FILE},
+ #endif
 	{"large_font", &iflags.obsolete, FALSE, SET_IN_FILE},	/* OBSOLETE */
 	{"legacy", &flags.legacy, TRUE, SET_IN_FILE},
 	{"lit_corridor", &flags.lit_corridor, TRUE, SET_IN_FILE},
@@ -3175,6 +3185,9 @@ goodfruit:
 #endif
 #ifdef SCORE_ON_BOTL
 			 || (boolopt[i].addr) == &flags.showscore
+#endif
+#ifdef SHOW_WEIGHT
+             || (boolopt[i].addr) == &flags.showweight
 #endif
 			    )
 			    flags.botl = TRUE;

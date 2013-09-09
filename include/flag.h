@@ -75,6 +75,8 @@ struct flag {
 #ifdef EXP_ON_BOTL
 	boolean  showexp;	/* show experience points */
 #endif
+	boolean  invweight;
+	boolean  showweight;
 #ifdef SCORE_ON_BOTL
 	boolean  showscore;	/* show score */
 #endif

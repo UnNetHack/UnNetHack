@@ -470,7 +470,7 @@ typedef long glyph_t;
 #define ADJSPLIT /* splittable #adjust - Sam Dennis, conditionalized by Jukka Lahtinen */
 #define TUTORIAL_MODE /* Alex Smith */
 #define ELBERETH_CONDUCT /* Track the number of times the player engraves Elbereth. - Ray Kulhanek */
-
+#define SHOW_WEIGHT
 /* End of Section 6 */
 
 #include "global.h"	/* Define everything else according to choices above */
