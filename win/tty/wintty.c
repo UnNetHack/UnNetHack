@@ -458,7 +458,8 @@ give_up:	/* Quit */
 		conduct_bools[6] = &flags.vegan;
 		conduct_bools[7] = &flags.vegetarian;
 		conduct_bools[8] = &flags.heaven_or_hell;
-		conduct_bools[9] = 0;
+		conduct_bools[9] = &flags.perma_hallu;
+		conduct_bools[10] = 0;
 		int conduct_settings[NUM_CONDUCT_OPTIONS];
 
 		winid tmpwin = create_nhwindow(NHW_MENU);
@@ -491,15 +492,16 @@ give_up:	/* Quit */
 		/* has Quit been selected? */
 		if (conduct_settings[NUM_CONDUCT_OPTIONS-1]) goto give_up;
 
-		flags.ascet       = conduct_settings[0];
-		flags.atheist     = conduct_settings[1];
-		flags.blindfolded = conduct_settings[2];
-		flags.illiterate  = conduct_settings[3];
-		flags.pacifist    = conduct_settings[4];
-		flags.nudist      = conduct_settings[5];
-		flags.vegan       = conduct_settings[6];
-		flags.vegetarian  = conduct_settings[7];
+		flags.ascet          = conduct_settings[0];
+		flags.atheist        = conduct_settings[1];
+		flags.blindfolded    = conduct_settings[2];
+		flags.illiterate     = conduct_settings[3];
+		flags.pacifist       = conduct_settings[4];
+		flags.nudist         = conduct_settings[5];
+		flags.vegan          = conduct_settings[6];
+		flags.vegetarian     = conduct_settings[7];
 		flags.heaven_or_hell = conduct_settings[8];
+		flags.perma_hallu    = conduct_settings[9];
 	}
 
 	(void)  root_plselection_prompt(plbuf, QBUFSZ - 1,
