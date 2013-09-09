@@ -1569,8 +1569,11 @@ register struct obj	*sobj;
 	    break;
 	case SCR_PUNISHMENT:
 		known = TRUE;
-		if(confused || sobj->blessed) {
+		if(sobj->blessed) {
 			You_feel("guilty.");
+			break;
+		} else if (confused) {
+			makemon(&mons[PM_PUNISHER], 0, 0, NO_MM_FLAGS);
 			break;
 		}
 		punish(sobj);
