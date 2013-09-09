@@ -383,6 +383,7 @@ OBJECT:('(',"large box"), $altarcontainers[5]
 #(If you don't first arrive on the level at night, you'll never notice it.)
 IF [time.night == 1] { ENGRAVING:(44,10),engrave,"Speak, friend, and enter." }
 OBJECT:('%',"melon"),(44,10),quantity:1
+# (mellon = friend)
 
 #These are now more useful as an infinite light source than for the wish.
 MONSTER: (';',"Watcher in the Water"),(66,10) { OBJECT:('(', "magic lamp"),uncursed }
@@ -497,6 +498,7 @@ SHUFFLE:$altarcontainers
 #Ithildin engraving (destroyed in this version)
 #IF [time.night == 1] { ENGRAVING:(44,10),engrave,"Speak, friend, and enter." }
 OBJECT:('%',"melon"),(44,10),quantity:1
+# (mellon = friend)
 
 LOOP [10 + 2d5] { MONSTER:  ('o', "deep orc"), random, hostile }
 MONSTER: (';',"Watcher in the Water"),(66,10) { OBJECT:('(', "magic lamp"),uncursed }
