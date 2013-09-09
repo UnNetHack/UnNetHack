@@ -445,7 +445,7 @@ give_up:	/* Quit */
 		static const char *conduct_names[] = {
 			"ascet", "atheist", "blindfolded", "illiterate", "nudist",
 			"pacifist", "vegan", "vegetarian",
-			"Heaven or Hell", "Quit"
+			"Heaven or Hell", "permanent hallucination","Quit"
 		};
 #define NUM_CONDUCT_OPTIONS SIZE(conduct_names)
 		static boolean *conduct_bools[NUM_CONDUCT_OPTIONS];
