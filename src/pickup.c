@@ -1630,7 +1630,8 @@ lootcont:
 
 		if (cobj->olocked) {
 		    pline("Hmmm, it seems to be locked.");
-		    if (flags.autounlock) {
+		    /* autounlock only works properly with one container */
+		    if (flags.autounlock && container_count == 1) {
 			if(cobj->otyp == IRON_SAFE) {
 			    if((otmp = carrying(STETHOSCOPE))) {
 				pick_lock(otmp, cc.x, cc.y, TRUE);
