@@ -1124,7 +1124,7 @@ boolean want_disp;
 	    you_have(enlght_combatinc("damage", u.udaminc, final, buf));
 	if (Slow_digestion) you_have("slower digestion");
 	if (Regeneration && elf_can_regen()) enl_msg("You regenerate", "", "d", "");
-	if (!elf_can_regen()) you_are("in contact with cold iron");
+	if (!elf_can_regen()) you_are("in direct contact with cold iron");
 	if (u.uspellprot || Protection) {
 	    int prot = 0;
 
