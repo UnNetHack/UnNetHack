@@ -936,11 +936,11 @@ boolean want_disp;
 	/* heaven or hell modes */
 	if (heaven_or_hell_mode) {
 		if (u.ulives > 1) {
-			Sprintf(buf, "%d lives left", u.ulives);
+			Sprintf(buf, "%zu lives left", u.ulives);
 		} else if (u.ulives == 0) {
 			Sprintf(buf, "no lives left");
 		} else {
-			Sprintf(buf, "%d life left", u.ulives);
+			Sprintf(buf, "%zu life left", u.ulives);
 		}
 		you_have(buf);
 	}
@@ -1123,7 +1123,8 @@ boolean want_disp;
 	if (u.udaminc)
 	    you_have(enlght_combatinc("damage", u.udaminc, final, buf));
 	if (Slow_digestion) you_have("slower digestion");
-	if (Regeneration) enl_msg("You regenerate", "", "d", "");
+	if (Regeneration && elf_can_regen()) enl_msg("You regenerate", "", "d", "");
+	if (!elf_can_regen()) you_are("in contact with cold iron");
 	if (u.uspellprot || Protection) {
 	    int prot = 0;
 
