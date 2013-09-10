@@ -330,7 +330,7 @@ STAIR:(04,17), down
 #
 
 #Welcoming committee
-REGION:(13,13,16,18),unlit,"morgue"
+REGION:(13,13,16,18),unlit,"morgue",filled
 
 #Specific doors
 DOOR:closed,(12,03)
@@ -432,7 +432,7 @@ STAIR:(04,17), down
 #
 
 #Welcoming committee
-REGION:(13,13,16,18),unlit,"morgue"
+REGION:(13,13,16,18),unlit,"morgue",filled
 
 #Specific doors (and their status)
 $doors = { (12,03), (12,04), (20,04), (27,08), (27,12), (41,06) }
