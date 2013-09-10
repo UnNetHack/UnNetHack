@@ -936,11 +936,11 @@ boolean want_disp;
 	/* heaven or hell modes */
 	if (heaven_or_hell_mode) {
 		if (u.ulives > 1) {
-			Sprintf(buf, "%zu lives left", u.ulives);
+			Sprintf(buf, "%ld lives left", u.ulives);
 		} else if (u.ulives == 0) {
 			Sprintf(buf, "no lives left");
 		} else {
-			Sprintf(buf, "%zu life left", u.ulives);
+			Sprintf(buf, "%ld life left", u.ulives);
 		}
 		you_have(buf);
 	}
