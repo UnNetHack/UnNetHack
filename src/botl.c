@@ -479,7 +479,7 @@ bot2()
 
 #ifdef SHOW_WEIGHT
     if (flags.showweight)
-        Sprintf(nb = eos(nb), "  Wt:%ld/%ld", (long)(inv_weight()+weight_cap()),
+        Sprintf(nb = eos(nb), " Wt:%ld/%ld", (long)(inv_weight()+weight_cap()),
                 (long)weight_cap());
 #endif
 
