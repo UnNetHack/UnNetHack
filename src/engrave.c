@@ -74,7 +74,7 @@ static const char *random_mesg[] = {
 	"Sudden decompression sucks!", /* Space Quest 3 death message */
 	"Thanks for playing UnNetHack.  As usual, you've been a real pantload!", /* Space Quest 4 death message, paraphrased */
 	"Colorless green ideas sleep furiously.", /* Noam Chomsky */
-	"Time flies like an arrow.", /* linguistic humor */
+	"Time flies like an arrow.", "Fruit flies like a banana.", /* linguistic humor */
 	"All Your Base Are Belong To Us!", /* Zero Wing */
 	"Numa Numa", /* Internet Meme */
 	"I want to believe!", /* X-Files */
@@ -89,8 +89,9 @@ static const char *random_mesg[] = {
 	"Do NOT approach the Dog Park", /* Welcome to Night Vale */
 	"L, do you know", "Gods of Death", "love apples?", /* Death Note */
 	/* From dNetHack */
-	"[REDACTED]", "[DATA EXPUNGED]", "[DATA PLUNGED]", "[DATA EXPANDED]", "I am a toaster!", /* SCP Foundation */
-+   "I prepared Explosive Runes this morning.", /*Order of the Stick*/
+	"[REDACTED]", "[DATA EXPUNGED]", "[DATA PLUNGED]", /* SCP Foundation */
+	"[DATA EXPANDED]", "I am a toaster!",
+	"I prepared Explosive Runes this morning.", /*Order of the Stick*/
 	"I SAW THE EYE. Over the horizon, like a rising sun!", /* Dresden Codak */
 };
 
