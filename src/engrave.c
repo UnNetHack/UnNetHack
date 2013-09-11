@@ -88,6 +88,9 @@ static const char *random_mesg[] = {
 	"Love from the Doctor, 1969", /* Doctor Who */
 	"Do NOT approach the Dog Park", /* Welcome to Night Vale */
 	"L, do you know", "Gods of Death", "love apples?", /* Death Note */
+	"This engraving is false!", 
+	"The engraving you have just started reading is the engraving you have just finished reading", 
+	
 	/* From dNetHack */
 	"[REDACTED]", "[DATA EXPUNGED]", "[DATA PLUNGED]", /* SCP Foundation */
 	"[DATA EXPANDED]", "I am a toaster!",
