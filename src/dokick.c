@@ -16,6 +16,7 @@ extern boolean notonhead;	/* for long worms */
 
 STATIC_DCL void FDECL(kickdmg, (struct monst *, BOOLEAN_P));
 STATIC_DCL void FDECL(kick_monster, (XCHAR_P, XCHAR_P));
+STATIC_DCL void FDECL(lawful_bribery_alignment, (SCHAR_P));
 STATIC_DCL int FDECL(kick_object, (XCHAR_P, XCHAR_P));
 STATIC_DCL char *FDECL(kickstr, (char *));
 STATIC_DCL void FDECL(otransit_msg, (struct obj *, BOOLEAN_P, long));
@@ -333,43 +334,32 @@ register struct obj *gold;
 		    long goldreqd = 0L;
 
 		    if (rn2(3)) {
-			if (mtmp->data == &mons[PM_SOLDIER])
+			if (mtmp->data == &mons[PM_SOLDIER]) {
 			   goldreqd = 100L;
-			else if (mtmp->data == &mons[PM_SERGEANT])
+			} else if (mtmp->data == &mons[PM_SERGEANT]) {
 			   goldreqd = 250L;
-			else if (mtmp->data == &mons[PM_LIEUTENANT])
+			} else if (mtmp->data == &mons[PM_LIEUTENANT]) {
 			   goldreqd = 500L;
-			else if (mtmp->data == &mons[PM_CAPTAIN])
+			} else if (mtmp->data == &mons[PM_CAPTAIN]) {
 			   goldreqd = 750L;
 			/* watchmen's wages are less than that of soldiers. */
 			/* bribery is 90% of soldiers/lieutenants' requirement. */
-			else if (mtmp->data == &mons[PM_WATCHMAN])
+			} else if (mtmp->data == &mons[PM_WATCHMAN]) {
 			   goldreqd = 90L;
-			   if ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10)) {
-				adjalign(-1);
-				You("feel a bit guilty about bribing a public servant");
-			   } 
-			else if (mtmp->data == &mons[PM_WATCH_CAPTAIN])
+			   lawful_bribery_alignment(-1);
+			} else if (mtmp->data == &mons[PM_WATCH_CAPTAIN]) {
 			   goldreqd = 450L;
-			   if ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10)) {
-				adjalign(-1);
-				You("feel a bit guilty about bribing a public servant");
-			   }
+			   lawful_bribery_alignment(-1);
 			/* VERY hard to bribe these guys */
-			else if (mtmp->data == &mons[PM_GUARD])
+			} else if (mtmp->data == &mons[PM_GUARD]) {
 			   goldreqd = 5000L;
-			   if ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10)) {
-				adjalign(-2);
-				You("feel guilty about bribing a public servant");
-			   }
+			   lawful_bribery_alignment(-2);
 #ifdef CONVICT
-			else if (mtmp->data == &mons[PM_PRISON_GUARD])
+			} else if (mtmp->data == &mons[PM_PRISON_GUARD]) {
 			   goldreqd = 200L;
-			   if ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10)) {
-				adjalign(-2);
-				You("feel guilty about bribing a public servant");
-			   }
+			   lawful_bribery_alignment(-2);
 #endif /* CONVICT */
+			}
 
 			if (goldreqd) {
 #ifndef GOLDOBJ
@@ -397,6 +387,17 @@ register struct obj *gold;
 
 	if (!msg_given) miss(xname(gold), mtmp);
 	return FALSE;
+}
+
+void
+lawful_bribery_alignment(penalty)
+register schar penalty;
+{
+	if ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10)) {
+	    adjalign(penalty);
+	    You("feel%s guilty about bribing a public servant.",
+					penalty < -1 ? "" : " a bit");
+	}
 }
 
 /* container is kicked, dropped, thrown or otherwise impacted by player.
