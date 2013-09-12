@@ -79,15 +79,15 @@
 #define AD_SLIM		40	/* turns you into green slime */
 #define AD_ENCH		41	/* remove enchantment (disenchanter) */
 #define AD_CORR		42	/* corrode armor (black pudding) */
-#define AD_FREZ		43	/* freezing attack (blue slime) */
-#define AD_HEAD		44	/* decapitate (vorpal jabberwock) */
+#define AD_LUCK		43	/* drain luck (evil eye) */
+#define AD_FREZ		44	/* freezing attack (blue slime) */
+#define AD_HEAD		45	/* decapitate (vorpal jabberwock) */
 
-#define AD_PUNI		45	/* punisher spells */
+#define AD_PUNI		46	/* punisher spells */
 
-#define AD_LVLT		46	/* level teleport (weeping angel) */
-#define AD_BLNK		47	/* mental invasion (weeping angel) */
+#define AD_LVLT		47	/* level teleport (weeping angel) */
+#define AD_BLNK		48	/* mental invasion (weeping angel) */
 
-#define AD_LUCK		48	/* drain luck (evil eye) */
 #define AD_SPOR		49	/* generate spore */
 
 #define AD_CLRC		240	/* random clerical spell */
