@@ -1072,6 +1072,7 @@ ROOM:"rndvault", random, random, random, (5,5) {
 LEVEL:"vlt-%04i"
 FLAGS:rndvault
 ROOM:"rndvault", random, random, random, random {
+  IF [ level.depth < 3 ] { BREAK }
   IF [25%] { MONSTER: ('F', "dungeon fern"), random, hostile }
   IF [50%] { MONSTER: ('F', "arctic fern"), random, hostile }
   IF [50%] { MONSTER: ('F', "blazing fern"), random, hostile }

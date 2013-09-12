@@ -950,7 +950,7 @@ u_init()
 	}
 
 	/* what a horrible night to have a curse */
-	shambler->mlevel += rnd(6)-3;				/* shuffle level */
+	shambler->mlevel += rnd(12)-3;				/* shuffle level */
 	shambler->mmove = rn2(10)+9;				/* slow to very fast */
 	shambler->ac = rn2(21)-10;				/* any AC */
 	shambler->mr = rn2(5)*25;				/* varying amounts of MR */
@@ -968,6 +968,7 @@ u_init()
 		attkptr->adtyp = 0;
 		while (attkptr->adtyp == 0 || attkptr->adtyp == AD_DETH || attkptr->adtyp == AD_TLPT ||
 					attkptr->adtyp == AD_DGST || attkptr->adtyp == AD_SLIM ||
+					attkptr->adtyp == AD_ENCH || attkptr->adtyp == AD_DISN ||
 					attkptr->adtyp == AD_PEST || attkptr->adtyp == AD_FAMN ||
 					attkptr->adtyp == AD_SPC1 || attkptr->adtyp == AD_SPC2) {
 			attkptr->adtyp = rn2(AD_FREZ);

@@ -2169,7 +2169,7 @@ struct permonst _mons2[] = {
  * fairly high as random permutations of ATTK() could make it nasty
  */
 	MON("shambling horror", S_UMBER,
-	LVL(10, 12, 0, 0, 0), (G_NOCORPSE|2),
+	LVL(10, 12, 0, 0, 0), (G_NOCORPSE|G_HELL|G_NOSHEOL),
 	A(NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
 	SIZ(25, 25, 0, MS_SILENT, MZ_TINY), 0, 0,
 	M1_CARNIVORE, 0, M3_INFRAVISIBLE, DRAGON_SILVER),
