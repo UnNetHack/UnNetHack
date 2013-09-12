@@ -161,7 +161,9 @@ LEVEL:"vlt-%04i"
 FLAGS:rndvault
 ROOM:"rndvault", random, random, random, random {
   TERRAIN:floodfill(1,1), 'I'
+  [10%]: TRAP: "cold", random
 }
+
 
 
 # random cloud/lava/ice/pool/tree room
