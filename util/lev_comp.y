@@ -197,7 +197,7 @@ extern int rnd_vault_freq;
 %token	<i> object_ID monster_ID terrain_ID
 %token	<i> MAZEWALK_ID WALLIFY_ID REGION_ID FILLING IRREGULAR JOINED
 %token	<i> ALTAR_ID LADDER_ID STAIR_ID NON_DIGGABLE_ID NON_PASSWALL_ID ROOM_ID
-%token	<i> PORTAL_ID TELEPRT_ID BRANCH_ID LEV CHANCE_ID
+%token	<i> PORTAL_ID TELEPRT_ID BRANCH_ID LEV CHANCE_ID MINERALIZE_ID
 %token	<i> CORRIDOR_ID GOLD_ID ENGRAVING_ID FOUNTAIN_ID POOL_ID SINK_ID NONE
 %token	<i> RAND_CORRIDOR_ID DOOR_STATE LIGHT_STATE CURSE_TYPE ENGRAVING_TYPE
 %token	<i> DIRECTION RANDOM_TYPE RANDOM_TYPE_BRACKET A_REGISTER
@@ -492,6 +492,7 @@ levstatement 	: message
 		| wallwalk_detail
 		| drawbridge_detail
 		| engraving_detail
+		| mineralize
 		| fountain_detail
 		| gold_detail
 		| switchstatement
@@ -1962,6 +1963,16 @@ engraving_detail: ENGRAVING_ID ':' coord_or_var ',' engraving_type ',' string_ex
 		  {
 		      add_opvars(splev, "io",
 				 (long)$5, SPO_ENGRAVING);
+		  }
+		;
+
+mineralize	: MINERALIZE_ID ':' integer_or_var ',' integer_or_var ',' integer_or_var ',' integer_or_var
+		  {
+		      add_opvars(splev, "o", SPO_MINERALIZE);
+		  }
+		| MINERALIZE_ID
+		  {
+		      add_opvars(splev, "iiiio", -1L, -1L, -1L, -1L, SPO_MINERALIZE);
 		  }
 		;
 

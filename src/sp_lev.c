@@ -3503,6 +3503,25 @@ spo_engraving(coder)
 }
 
 void
+spo_mineralize(coder)
+     struct sp_coder *coder;
+{
+    struct opvar *kelp_pool, *kelp_moat, *gold_prob, *gem_prob;
+
+    if (!OV_pop_i(gem_prob) ||
+	!OV_pop_i(gold_prob) ||
+	!OV_pop_i(kelp_moat) ||
+	!OV_pop_i(kelp_pool)) return;
+
+    mineralize(OV_i(kelp_pool), OV_i(kelp_moat), OV_i(gold_prob), OV_i(gem_prob), TRUE);
+
+    opvar_free(gem_prob);
+    opvar_free(gold_prob);
+    opvar_free(kelp_moat);
+    opvar_free(kelp_pool);
+}
+
+void
 spo_room(coder)
      struct sp_coder *coder;
 {
@@ -5277,6 +5296,7 @@ sp_lev *lvl;
 	case SPO_MON_GENERATION: spo_mon_generation(coder); break;
 	case SPO_LEVEL_SOUNDS:   spo_level_sounds(coder);   break;
 	case SPO_ENGRAVING:      spo_engraving(coder);      break;
+	case SPO_MINERALIZE:     spo_mineralize(coder);     break;
 	case SPO_SUBROOM:
 	case SPO_ROOM:
 	    if (!coder->failed_room[coder->n_subroom-1]) {

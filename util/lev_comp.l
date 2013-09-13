@@ -177,6 +177,7 @@ MON_GENERATION	{ savetoken(yytext); return MON_GENERATION_ID; }
 GOLD		{ savetoken(yytext); return GOLD_ID; }
 GRAVE		{ savetoken(yytext); return GRAVE_ID; }
 ENGRAVING	{ savetoken(yytext); return ENGRAVING_ID; }
+MINERALIZE	{ savetoken(yytext); return MINERALIZE_ID; }
 (NAME|name)	{ savetoken(yytext); return NAME_ID; }
 CHANCE		{ savetoken(yytext); return CHANCE_ID; }
 FOR		{ savetoken(yytext); return FOR_ID; }

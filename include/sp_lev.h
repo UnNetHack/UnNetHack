@@ -84,6 +84,7 @@ enum opcode_defs {
     SPO_MAP,
     SPO_ROOM_DOOR,
     SPO_REGION,
+    SPO_MINERALIZE,
     SPO_CMP,
     SPO_JMP,
     SPO_JL,

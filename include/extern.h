@@ -1119,6 +1119,7 @@ E int NDECL(lminion);
 
 /* ### mklev.c ### */
 
+E void FDECL(mineralize, (int, int, int, int, boolean));
 #ifdef USE_TRAMPOLI
 E int FDECL(do_comp, (genericptr_t,genericptr_t));
 #endif
