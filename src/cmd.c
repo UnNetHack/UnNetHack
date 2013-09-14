@@ -1123,8 +1123,13 @@ boolean want_disp;
 	if (u.udaminc)
 	    you_have(enlght_combatinc("damage", u.udaminc, final, buf));
 	if (Slow_digestion) you_have("slower digestion");
-	if (Regeneration && elf_can_regen()) enl_msg("You regenerate", "", "d", "");
-	if (!elf_can_regen()) you_are("in direct contact with cold iron");
+	if (Regeneration && can_regenerate()) enl_msg("You regenerate", "", "d", "");
+	if (!can_regenerate()) {
+	    if (is_elf(youmonst.data))
+		you_are("in direct contact with cold iron");
+	    else if (is_vampiric(youmonst.data))
+		you_are("in direct contact with silver");
+	}
 	if (u.uspellprot || Protection) {
 	    int prot = 0;
 

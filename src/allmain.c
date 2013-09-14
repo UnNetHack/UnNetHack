@@ -86,9 +86,9 @@ hpnotify_format_str(char *str)
 }
 
 boolean
-elf_can_regen()
+can_regenerate()
 {
-    if (maybe_polyd(is_elf(youmonst.data), Race_if(PM_ELF))) {
+    if (is_elf(youmonst.data)) {
 	if (uwep && is_iron(uwep) && !uarmg) return 0;
 #ifdef TOURIST
 	if (uarm && is_iron(uarm) && !uarmu) return 0;
@@ -112,6 +112,11 @@ elf_can_regen()
 	if (ublindf && is_iron(ublindf)) return 0;
 	if (uchain && is_iron(uchain)) return 0;
 	if (uswapwep && is_iron(uswapwep) && u.twoweap) return 0;
+    } else if (is_vampiric(youmonst.data)) {
+	if (uwep && is_silver(uwep) && !uarmg) return 0;
+	if (uarms && is_silver(uarms) && !uarmg) return 0;
+	if (uleft && is_silver(uleft)) return 0;
+	if (uright && is_silver(uright)) return 0;
     }
     return 1;
 }
@@ -133,7 +138,7 @@ moveloop()
     /* for keeping track of Elbereth and correctstatus line display */
     int was_on_elbereth = 0;
     int is_on_elbereth = 0;
-    boolean elf_regen = elf_can_regen();
+    boolean can_regen = can_regenerate();
 
     flags.moonphase = phase_of_the_moon();
     if(flags.moonphase == FULL_MOON) {
@@ -329,13 +334,13 @@ moveloop()
 		    } else if (Upolyd && u.mh < u.mhmax) {
 			if (u.mh < 1)
 			    rehumanize();
-			else if (Regeneration ||
-				    (wtcap < MOD_ENCUMBER && !(moves%20))) {
+			else if (can_regenerate() && (Regeneration ||
+				    (wtcap < MOD_ENCUMBER && !(moves%20)))) {
 			    flags.botl = 1;
 			    u.mh++;
 			    interrupt_multi("Hit points", u.mh, u.mhmax);
 			}
-		    } else if (u.uhp < u.uhpmax && elf_can_regen() &&
+		    } else if (u.uhp < u.uhpmax && can_regenerate() &&
 			 (wtcap < MOD_ENCUMBER || !u.umoved || Regeneration)) {
 			if (u.ulevel > 9 && !(moves % 3)) {
 			    int heal, Con = (int) ACURR(A_CON);
@@ -531,13 +536,13 @@ moveloop()
 	  prev_hp_notify = uhp();
 	}
 
-	if (elf_regen != elf_can_regen()) {
+	if (can_regen != can_regenerate()) {
 	    if (!Hallucination){
-	    You_feel("%s.", (elf_regen) ? "itchy" : "relief");
-		} else {
-		You_feel("%s.", (elf_regen) ? "magnetic" : "like you are no longer failing Organic Chemistry");
-		}
-	    elf_regen = elf_can_regen();
+		You_feel("%s.", (can_regen) ? "itchy" : "relief");
+	     } else {
+		You_feel("%s.", (can_regen) ? "magnetic" : "like you are no longer failing Organic Chemistry");
+	     }
+	    can_regen = can_regenerate();
 	}
 
 	flags.move = 1;
