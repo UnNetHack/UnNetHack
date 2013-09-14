@@ -539,9 +539,11 @@ moveloop()
 	if (can_regen != can_regenerate()) {
 	    if (!Hallucination){
 		You_feel("%s.", (can_regen) ? "itchy" : "relief");
-	     } else {
+	     } else if (is_elf(youmonst.data)) {
 		You_feel("%s.", (can_regen) ? "magnetic" : "like you are no longer failing Organic Chemistry");
-	     }
+	     } else {
+		You_feel("%s.", (can_regen) ? "semi-precious" : "like you are no longer failing Organic Chemistry");
+		}
 	    can_regen = can_regenerate();
 	}
 
