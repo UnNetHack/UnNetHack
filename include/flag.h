@@ -59,6 +59,7 @@ struct flag {
 	boolean  move;
 	boolean  mv;
 	boolean  bypasses;	/* bypass flag is set on at least one fobj */
+	boolean	 namewands;	/* automatically name wands known to be empty */
 	boolean  nap;		/* `timed_delay' option for display effects */
 	boolean  nopick;	/* do not pickup objects (as when running) */
 	boolean  null;		/* OK to send nulls to the terminal */

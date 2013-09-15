@@ -1882,7 +1882,10 @@ dozap()
 	check_unpaid(obj);
 
 	/* zappable addition done by GAN 11/03/86 */
-	if(!zappable(obj)) pline("%s", nothing_happens);
+	if(!zappable(obj)) {
+	    pline("%s", nothing_happens);
+	    if (flags.namewands && !obj->onamelth) oname(obj, "empty");
+	}
 	/* PM 2008-04-16: 50% chance of blowing up, if zapped 20 times.
 	 * Same probability as in muse.c precheck() for monsters */
 	else if (obj->cursed && !rn2(30)) {
