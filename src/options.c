@@ -338,7 +338,7 @@ static struct Comp_Opt
 						MAXDCHARS+1, SET_IN_FILE },
 	{ "effects",  "the symbols to use in drawing special effects",
 						MAXECHARS+1, SET_IN_FILE },
-	{ "emptyname",  "what to automatically name empty wands (default nothing)",
+	{ "emptyname",  "the automatic name given to known empty wands (e.g., emptyname:empty)",
 						20, DISP_IN_GAME },
 	{ "font_map", "the font to use in the map window", 40, DISP_IN_GAME },	/*WC*/
 	{ "font_menu", "the font to use in menus", 40, DISP_IN_GAME },		/*WC*/
