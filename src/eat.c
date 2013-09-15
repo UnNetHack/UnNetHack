@@ -2618,6 +2618,7 @@ boolean incr;
 		u.uhs = newhs;
 		flags.botl = 1;
 		bot();
+		nomul(0, 0);	/* stop running or travelling */
 		if ((Upolyd ? u.mh : u.uhp) < 1) {
 			You("die from hunger and exhaustion.");
 			killer_format = KILLED_BY;
