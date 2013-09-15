@@ -541,7 +541,7 @@ moveloop()
 		You_feel("%s.", (can_regen) ? "itchy" : "relief");
 	    } else {
 		You_feel("%s.", (can_regen) ? (is_elf(youmonst.data) ? "magnetic" :
-			"semi-precious") : "like you are no longer failing Organic Chemistry");
+			"varnished") : "like you are no longer failing Organic Chemistry");
 	    }
 	    can_regen = can_regenerate();
 	}
