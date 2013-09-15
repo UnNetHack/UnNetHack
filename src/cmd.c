@@ -2589,6 +2589,8 @@ click_to_cmd(x, y, mod)
     y -= u.uy;
 
     if (iflags.travelcmd) {
+        iflags.autoexplore = FALSE;
+
         if (abs(x) <= 1 && abs(y) <= 1 ) {
             x = sgn(x), y = sgn(y);
         } else {
