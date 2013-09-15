@@ -439,8 +439,9 @@ int curse_bless;
 	    /* didn't explode, so increment the recharge count */
 	    obj->recharged = (unsigned)(n + 1);
 
-	    /* if named and autonamewands enabled, remove name now */
-	    if (flags.namewands && obj->onamelth) obj->onamelth = 0;
+	    /* if named "{empty}" and autonamewands enabled, remove name now */
+	    if (flags.namewands && !strncmp(ONAME(obj), "{empty}", (int)obj->onamelth))
+		obj->onamelth = 0;
 
 	    /* now handle the actual recharging */
 	    if (is_cursed) {
