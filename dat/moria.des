@@ -347,17 +347,18 @@ OBJECT:('%',"lembas wafer"),(30,04)
 
 #Chamber of Mazarbul
 GRAVE:(06,03), "Balin, Son of Fundin, Lord of Moria"
-OBJECT:('(',"magic harp"),(06,03),uncursed,buried
 OBJECT:"statue",(01,07),montype:('h', "dwarf"),1
 OBJECT:"statue",(02,07),montype:('h', "dwarf"),1
 OBJECT:"statue",(10,07),montype:('h', "dwarf"),1
 OBJECT:"statue",(11,07),montype:('h', "dwarf"),1
-CONTAINER:"chest", (01,01) { OBJECT:'?',blessed }
-CONTAINER:"chest", (01,03) { OBJECT:'+',blessed }
-CONTAINER:"chest", (01,05) { OBJECT:'!',blessed }
-CONTAINER:"chest", (04,07) { OBJECT:'/',blessed }
-CONTAINER:"chest", (06,07) { OBJECT:'"',blessed }
-CONTAINER:"chest", (08,07) { OBJECT:'=',blessed }
+$mazarbulchests = { (01,01), (01,03), (01,05), (04,07), (06,07), (08,07) }
+SHUFFLE:$mazarbulchests
+CONTAINER:"chest", $mazarbulchests[0] { OBJECT:'?' }
+CONTAINER:"chest", $mazarbulchests[1] { OBJECT:'+' }
+CONTAINER:"chest", $mazarbulchests[2] { OBJECT:'!' }
+CONTAINER:"chest", $mazarbulchests[3] { OBJECT:'/' }
+CONTAINER:"chest", $mazarbulchests[4] { OBJECT:'"' }
+CONTAINER:"chest", $mazarbulchests[5] { OBJECT:'=' }
 
 #Random loot
 $chests = { (13,01), (15,01), (17,01), (19,01), (13,07), (15,07), (17,07), (19,07) }
@@ -387,11 +388,13 @@ OBJECT:('(',"large box"), $altarcontainers[3]
 OBJECT:('(',"large box"), $altarcontainers[4]
 OBJECT:('(',"large box"), $altarcontainers[5]
 
-#Ithildin engraving
-#(If you don't first arrive on the level at night, you'll never notice it.)
+#Ithildin engraving (only appears if you first arrive on the level at night)
 IF [time.night == 1] { ENGRAVING:(44,10),engrave,"Speak, friend, and enter." }
-OBJECT:('%',"melon"),(44,10),quantity:1
-# (mellon = friend)
+
+#"Mellon" is the elvish word for "friend", and this is NetHack.
+$mellonlocation = { (44,09), (44,10), (44,11), (45,09), (45,10), (45,11) }
+SHUFFLE:$mellonlocation
+OBJECT:('%',"melon"),$mellonlocation[0],quantity:1
 
 #These are now more useful as an infinite light source than for the wish.
 MONSTER: (';',"Watcher in the Water"),(66,10) { OBJECT:('(', "magic lamp"),uncursed }
@@ -463,28 +466,29 @@ OBJECT:('%',"corpse"),rndcoord(fillrect(21,01,35,07)),montype:"elf"
 
 #Chamber of Mazarbul
 GRAVE:(06,03), "Balin, Son of Fundin, Lord of Moria"
-OBJECT:('(',"magic harp"),(06,03),uncursed,buried
 OBJECT:('*',"rock"),(01,07),quantity:1d25
 OBJECT:('*',"rock"),(02,07),quantity:1d25
 OBJECT:('*',"rock"),(10,07),quantity:1d25
 OBJECT:('*',"rock"),(11,07),quantity:1d25
-CONTAINER:"chest", (01,01) { OBJECT:'?' }
-CONTAINER:"chest", (01,03) { OBJECT:'+' }
-CONTAINER:"chest", (01,05) { OBJECT:'!' }
-CONTAINER:"chest", (04,07) { OBJECT:'/' }
-CONTAINER:"chest", (06,07) { OBJECT:'"' }
-CONTAINER:"chest", (08,07) { OBJECT:'=' }
+$mazarbulchests = { (01,01), (01,03), (01,05), (04,07), (06,07), (08,07) }
+SHUFFLE:$mazarbulchests
+CONTAINER:"chest", $mazarbulchests[0] { OBJECT:'?' }
+CONTAINER:"chest", $mazarbulchests[1] { OBJECT:'+' }
+CONTAINER:"chest", $mazarbulchests[2] { OBJECT:'!' }
+CONTAINER:"chest", $mazarbulchests[3] { OBJECT:'/' }
+CONTAINER:"chest", $mazarbulchests[4] { OBJECT:'"' }
+CONTAINER:"chest", $mazarbulchests[5] { OBJECT:'=' }
 
 #Random loot
 $chests = { (13,01), (15,01), (17,01), (19,01), (13,07), (15,07), (17,07), (19,07) }
-[50%]: CONTAINER:"chest", $chests[0] { OBJECT:random,quantity:1d2 }
-[50%]: CONTAINER:"chest", $chests[1] { OBJECT:random,quantity:1d2 }
-[50%]: CONTAINER:"chest", $chests[2] { OBJECT:random,quantity:1d2 }
-[50%]: CONTAINER:"chest", $chests[3] { OBJECT:random,quantity:1d2 }
-[50%]: CONTAINER:"chest", $chests[4] { OBJECT:random,quantity:1d2 }
-[50%]: CONTAINER:"chest", $chests[5] { OBJECT:random,quantity:1d2 }
-[50%]: CONTAINER:"chest", $chests[6] { OBJECT:random,quantity:1d2 }
-[50%]: CONTAINER:"chest", $chests[7] { OBJECT:random,quantity:1d2 }
+[50%]: CONTAINER:"chest", $chests[0] { OBJECT:random,quantity:1d3 }
+[50%]: CONTAINER:"chest", $chests[1] { OBJECT:random,quantity:1d3 }
+[50%]: CONTAINER:"chest", $chests[2] { OBJECT:random,quantity:1d3 }
+[50%]: CONTAINER:"chest", $chests[3] { OBJECT:random,quantity:1d3 }
+[50%]: CONTAINER:"chest", $chests[4] { OBJECT:random,quantity:1d3 }
+[50%]: CONTAINER:"chest", $chests[5] { OBJECT:random,quantity:1d3 }
+[50%]: CONTAINER:"chest", $chests[6] { OBJECT:random,quantity:1d3 }
+[50%]: CONTAINER:"chest", $chests[7] { OBJECT:random,quantity:1d3 }
 
 #Warehouse
 LOOP [5 + 2d4] { OBJECT:'(',rndcoord(fillrect(18,13,44,18)) }
@@ -505,8 +509,11 @@ SHUFFLE:$altarcontainers
 
 #Ithildin engraving (destroyed in this version)
 #IF [time.night == 1] { ENGRAVING:(44,10),engrave,"Speak, friend, and enter." }
-OBJECT:('%',"melon"),(44,10),quantity:1
-# (mellon = friend)
+
+#"Mellon" is the elvish word for "friend", and this is NetHack.
+$mellonlocation = { (45,09), (44,10), (45,11) }
+SHUFFLE:$mellonlocation
+OBJECT:('%',"melon"),$mellonlocation[0],quantity:1
 
 LOOP [10 + 2d5] { MONSTER:  ('o', "deep orc"), random, hostile }
 MONSTER: (';',"Watcher in the Water"),(66,10) { OBJECT:('(', "magic lamp"),uncursed }
