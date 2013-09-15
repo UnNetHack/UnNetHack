@@ -118,6 +118,7 @@ STATIC_PTR int NDECL(domonability);
 STATIC_PTR int NDECL(dooverview_or_wiz_where);
 STATIC_PTR int NDECL(dotravel);
 STATIC_PTR int NDECL(doautoexplore);
+STATIC_PTR int NDECL(doautofight);
 # ifdef WIZARD
 int NDECL(wiz_show_rooms);
 STATIC_PTR int NDECL(wiz_wish);
@@ -1776,6 +1777,7 @@ static const struct func_tab cmdlist[] = {
 	{SPBOOK_SYM, TRUE, dovspell, NULL},			/* Mike Stephenson */
 	{'#', TRUE, doextcmd, NULL},
 	{'_', TRUE, dotravel, NULL},
+	{'\'', TRUE, doautofight, NULL},
 	{0,0,0,0}
 };
 
@@ -2839,6 +2841,32 @@ doautoexplore()
 	iflags.autoexplore = TRUE;
 	cmd[0] = CMD_TRAVEL;
 	readchar_queue = cmd;
+	return 0;
+}
+
+/** Chooses a suitable monster and fights it. */
+STATIC_PTR int
+doautofight()
+{
+	int i,j;
+	struct monst *mtmp;
+	/* TODO: - selection strategy when facing multiple monsters
+	 *       - fire ammunition when wielding a launcher
+	 *       - fire quivered objects when monsters are in range?
+	 */
+
+	/* check surrounding squares for monster to attack */
+	for (i = -1; i <= 1; i++) {
+		for (j = -1; j <= 1; j++) {
+			if (!isok(u.ux+i, u.uy+j)) continue;
+			mtmp = m_at(u.ux+i, u.uy+j);
+			if (mtmp && canspotmon(mtmp) && !is_safepet(mtmp)) {
+				if (attack(mtmp)) return 1;
+				break;
+			}
+		}
+	}
+
 	return 0;
 }
 
