@@ -27,8 +27,8 @@ S       save    save the game (to be continued later) and exit
 O       options set options
 /       whatis  tell what a map symbol represents
 \       known   display list of what's been discovered
-v       version display version number
-V       history display game history
+v       version start automatic exploring until something interesting is seen
+V       version display version number
 X       explore switch the game to explore (discovery) mode
 ^A      again   redo the previous command (^A denotes the keystroke CTRL-A)
 ^R      redraw  redraw the screen
