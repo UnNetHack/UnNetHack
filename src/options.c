@@ -56,7 +56,6 @@ static struct Bool_Opt
 	{"asksavedisk", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"autodig", &flags.autodig, FALSE, SET_IN_GAME},
-	{"autonamewands", &flags.namewands, FALSE, SET_IN_GAME},
 #ifdef AUTO_OPEN
 	{"autoopen", &iflags.autoopen, TRUE, SET_IN_GAME},
 #endif /* AUTO_OPEN */
@@ -339,6 +338,8 @@ static struct Comp_Opt
 						MAXDCHARS+1, SET_IN_FILE },
 	{ "effects",  "the symbols to use in drawing special effects",
 						MAXECHARS+1, SET_IN_FILE },
+	{ "emptyname",  "what to automatically name empty wands (default nothing)",
+						20, DISP_IN_GAME },
 	{ "font_map", "the font to use in the map window", 40, DISP_IN_GAME },	/*WC*/
 	{ "font_menu", "the font to use in menus", 40, DISP_IN_GAME },		/*WC*/
 	{ "font_message", "the font to use in the message window",
@@ -1865,6 +1866,16 @@ boolean tinitial, tfrom_file;
 		return;
        }
 #endif
+
+	fullname = "emptyname";
+	if (match_optname(opts, fullname, sizeof("emptyname")-1, TRUE)) {
+		if ((op = string_for_opt(opts, FALSE)) != 0) {
+			if (iflags.emptyname) free(iflags.emptyname);
+			iflags.emptyname = (char *)alloc(strlen(op) + 1);
+			Strcpy(iflags.emptyname, op);
+		}
+		return;
+	}
 
 	fullname = "horsename";
 	if (match_optname(opts, fullname, 5, TRUE)) {
@@ -4152,6 +4163,8 @@ char *buf;
 #endif
 	else if (!strcmp(optname, "name"))
 		Sprintf(buf, "%s", plname);
+	else if (!strcmp(optname, "emptyname")) 
+		Sprintf(buf, "%s", iflags.emptyname ? iflags.emptyname : none );
 	else if (!strcmp(optname, "number_pad"))
 		Sprintf(buf, "%s",
 			(!iflags.num_pad) ? "0=off" :

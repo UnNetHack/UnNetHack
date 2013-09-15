@@ -59,7 +59,6 @@ struct flag {
 	boolean  move;
 	boolean  mv;
 	boolean  bypasses;	/* bypass flag is set on at least one fobj */
-	boolean	 namewands;	/* automatically name wands known to be empty */
 	boolean  nap;		/* `timed_delay' option for display effects */
 	boolean  nopick;	/* do not pickup objects (as when running) */
 	boolean  null;		/* OK to send nulls to the terminal */
@@ -351,6 +350,7 @@ struct instance_flags {
 
 	boolean hp_notify;
 	char *hp_notify_fmt;
+	char *emptyname;	/* what to automatically name known empty wands */
 	boolean  show_buc;	/* always show BUC status */
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
 	boolean	 obsolete;	/* obsolete options can point at this, it isn't used */
