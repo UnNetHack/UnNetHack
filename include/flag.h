@@ -350,7 +350,7 @@ struct instance_flags {
 
 	boolean hp_notify;
 	char *hp_notify_fmt;
-	char *emptyname;	/* what to automatically name known empty wands */
+	char *nameempty;	/* what to automatically name known empty wands */
 	boolean  show_buc;	/* always show BUC status */
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
 	boolean	 obsolete;	/* obsolete options can point at this, it isn't used */

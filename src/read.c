@@ -439,8 +439,8 @@ int curse_bless;
 	    /* didn't explode, so increment the recharge count */
 	    obj->recharged = (unsigned)(n + 1);
 
-	    /* if the name of the wand matches the emptyname option, remove name now */
-	    if (iflags.emptyname && !strncmp(ONAME(obj), iflags.emptyname, (int)obj->onamelth))
+	    /* if the name of the wand matches the nameempty option, remove name now */
+	    if (iflags.nameempty && !strncmp(ONAME(obj), iflags.nameempty, (int)obj->onamelth))
 		obj->onamelth = 0;
 
 	    /* now handle the actual recharging */

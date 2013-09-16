@@ -338,8 +338,6 @@ static struct Comp_Opt
 						MAXDCHARS+1, SET_IN_FILE },
 	{ "effects",  "the symbols to use in drawing special effects",
 						MAXECHARS+1, SET_IN_FILE },
-	{ "emptyname",  "the automatic name given to known empty wands (e.g., emptyname:empty)",
-						20, DISP_IN_GAME },
 	{ "font_map", "the font to use in the map window", 40, DISP_IN_GAME },	/*WC*/
 	{ "font_menu", "the font to use in menus", 40, DISP_IN_GAME },		/*WC*/
 	{ "font_message", "the font to use in the message window",
@@ -393,6 +391,8 @@ static struct Comp_Opt
 # endif
 	{ "name",     "your character's name (e.g., name:Merlin-W)",
 						PL_NSIZ, DISP_IN_GAME },
+	{ "nameempty",  "the automatic name given to known empty wands (e.g., nameempty:empty)",
+						20, DISP_IN_GAME },
 	{ "number_pad", "use the number pad", 1, SET_IN_GAME},
 	{ "objects",  "the symbols to use for objects",
 						MAXOCLASSES, SET_IN_FILE },
@@ -1867,16 +1867,6 @@ boolean tinitial, tfrom_file;
        }
 #endif
 
-	fullname = "emptyname";
-	if (match_optname(opts, fullname, sizeof("emptyname")-1, TRUE)) {
-		if ((op = string_for_opt(opts, FALSE)) != 0) {
-			if (iflags.emptyname) free(iflags.emptyname);
-			iflags.emptyname = (char *)alloc(strlen(op) + 1);
-			Strcpy(iflags.emptyname, op);
-		}
-		return;
-	}
-
 	fullname = "horsename";
 	if (match_optname(opts, fullname, 5, TRUE)) {
 		if (negated) bad_negation(fullname, FALSE);
@@ -1894,6 +1884,16 @@ boolean tinitial, tfrom_file;
 		return;
 	}
 #endif /* CONVICT */
+
+	fullname = "nameempty";
+	if (match_optname(opts, fullname, sizeof("nameempty")-1, TRUE)) {
+		if ((op = string_for_opt(opts, FALSE)) != 0) {
+			if (iflags.nameempty) free(iflags.nameempty);
+			iflags.nameempty = (char *)alloc(strlen(op) + 1);
+			Strcpy(iflags.nameempty, op);
+		}
+		return;
+	}
 
 	fullname = "number_pad";
 	if (match_optname(opts, fullname, 10, TRUE)) {
@@ -4163,8 +4163,8 @@ char *buf;
 #endif
 	else if (!strcmp(optname, "name"))
 		Sprintf(buf, "%s", plname);
-	else if (!strcmp(optname, "emptyname")) 
-		Sprintf(buf, "%s", iflags.emptyname ? iflags.emptyname : none );
+	else if (!strcmp(optname, "nameempty")) 
+		Sprintf(buf, "%s", iflags.nameempty ? iflags.nameempty : none );
 	else if (!strcmp(optname, "number_pad"))
 		Sprintf(buf, "%s",
 			(!iflags.num_pad) ? "0=off" :

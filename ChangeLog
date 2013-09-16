@@ -150,7 +150,7 @@
 		line (from SLASH'EM 0.7)
 	    - showweight -- Display the weight of individial items in
 		your inventory (from SLASH'EM 0.7)
-	    - emptyname -- Automatically #name wands known to be empty
+	    - nameempty -- Automatically #name wands known to be empty
 		
 	* Role differentiation:
 	  - Tourists get automatic typ identification for shop items

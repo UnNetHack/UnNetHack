@@ -1884,8 +1884,8 @@ dozap()
 	/* zappable addition done by GAN 11/03/86 */
 	if(!zappable(obj)) {
 	    pline("%s", nothing_happens);
-	    /* if emptyname is set, then #name unnamed known empty wands */
-	    if (iflags.emptyname && !obj->onamelth) oname(obj, iflags.emptyname);
+	    /* if nameempty is set, then #name unnamed known empty wands */
+	    if (iflags.nameempty && !obj->onamelth) oname(obj, iflags.nameempty);
 	}
 	/* PM 2008-04-16: 50% chance of blowing up, if zapped 20 times.
 	 * Same probability as in muse.c precheck() for monsters */
