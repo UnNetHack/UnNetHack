@@ -3193,6 +3193,13 @@ doapply()
 			otmp = mkobj(POTION_CLASS, FALSE);
 			if (objects[otmp->otyp].oc_magic) do {
 			    otmp->otyp = rnd_class(POT_BOOZE, POT_WATER);
+				if (!rn2(131)) {       /* this number is very large on purpose */
+					if (!rn2(5) {
+					otmp->otyp = POT_VAMPIRE_BLOOD;
+					} else {
+					otmp->otyp = POT_BLOOD;
+					}
+				}
 			} while (otmp->otyp == POT_SICKNESS);
 			what = "A potion";
 		    } else {
