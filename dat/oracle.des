@@ -6,6 +6,7 @@
 
 LEVEL: "oracle"
 FLAGS: noflip
+MON_GENERATION: 1%, (1, "woodchuck"), (1, "floating eye"), (1, 'u'), (1, 'r'), (1, 'n'), (5, 'i') 
 ROOM: "ordinary" , lit, (3,3), (center,center), (11,9)
 {
 
