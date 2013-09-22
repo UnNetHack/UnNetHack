@@ -1238,6 +1238,7 @@ static const char * const bogusmons[] = {
 	"weeping angle",
 	"gelatinous sphere", "gelatinous pyramid",
 	"gelatinous Klein bottle", "gelatinous Mandelbrot set",
+	"robot unicorn",
 	
 	/* Welcome to Night Vale*/
 	"John Peters, you know, the farmer"
