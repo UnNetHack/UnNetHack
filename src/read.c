@@ -978,7 +978,7 @@ register struct obj	*sobj;
 		if(confused) {
 			otmp->oerodeproof = !(sobj->cursed);
 			if(Blind) {
-			    otmp->rknown = FALSE;
+			    otmp->rknown = sobj->bknown;
 			    Your("%s %s warm for a moment.",
 				xname(otmp), otense(otmp, "feel"));
 			} else {
@@ -1271,7 +1271,7 @@ register struct obj	*sobj;
 		/* oclass check added 10/25/86 GAN */
 			uwep->oerodeproof = !(sobj->cursed);
 			if (Blind) {
-			    uwep->rknown = FALSE;
+			    uwep->rknown = sobj->bknown;
 			    Your("weapon feels warm for a moment.");
 			} else {
 			    uwep->rknown = TRUE;

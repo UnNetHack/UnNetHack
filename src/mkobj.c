@@ -389,6 +389,8 @@ boolean artif;
 		otmp->dknown = 0;
 	if (!objects[otmp->otyp].oc_uses_known)
 		otmp->known = 1;
+	if (is_rustprone(otmp) || is_corrodeable(otmp) || is_flammable(otmp))
+		otmp->rknown = 1; 
 #ifdef INVISIBLE_OBJECTS
 	otmp->oinvis = !rn2(1250);
 #endif
