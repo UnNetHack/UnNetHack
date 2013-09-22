@@ -188,7 +188,9 @@
 	  - When targeting a coordinate, you can press @ to move cursor to
 	      yourself. (from NAO, idea from b_jonas)
 	  - Dragons auto-ID after observing breath attacks (from UnNetHackPlus)
+	  - Dragons auto-ID after being probed (from DynaHack)
 	  - You can level-port to levels based on their annotation
+	  - Rustproof/Erodeproof/Fixed is known by default (from DynaHack)
 	  
 	* bug fixes:
 	  - Fixed crash when player gets killed when entering a new level and
