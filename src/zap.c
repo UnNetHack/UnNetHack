@@ -357,6 +357,15 @@ struct monst *mtmp;
 {
 	struct obj *otmp;
 
+	/* identify type of dragon when probing */
+	if (monsndx(mtmp->data) >= PM_BABY_GRAY_DRAGON && monsndx(mtmp->data) <= PM_YELLOW_DRAGON ) {
+	    if (monsndx(mtmp->data) < PM_GRAY_DRAGON) {
+		identify_dragon(monsndx(mtmp->data) - PM_BABY_GRAY_DRAGON);
+	    } else {
+		identify_dragon(monsndx(mtmp->data) - PM_GRAY_DRAGON);
+	    }
+	}
+
 	mstatusline(mtmp);
 	if (notonhead) return;	/* don't show minvent for long worm tail */
 
@@ -2163,6 +2172,15 @@ boolean ordinary;
 		case SPE_WIZARD_LOCK:
 		    break;
 		case WAN_PROBING:
+		    /* identify type of dragon when probing */
+		    if (Upolyd && (monsndx(youmonst.data) >= PM_BABY_GRAY_DRAGON &&
+					monsndx(youmonst.data) <= PM_YELLOW_DRAGON)) {
+			if (monsndx(youmonst.data) < PM_GRAY_DRAGON) {
+			    identify_dragon(monsndx(youmonst.data) - PM_BABY_GRAY_DRAGON);
+			} else {
+			    identify_dragon(monsndx(youmonst.data) - PM_GRAY_DRAGON);
+			}
+		    }
 		    for (obj = invent; obj; obj = obj->nobj)
 			obj->dknown = 1;
 		    /* note: `obj' reused; doesn't point at wand anymore */
