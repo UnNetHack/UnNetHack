@@ -1388,9 +1388,9 @@ dopois:
 		if (uncancelled) {
 		    if(flags.verbose) {
 		    	if (Teleport_control) {
-				You("feel like you could have lost some potential.");
+			    You("feel like you could have lost some potential.");
 			} else {
-				You("suddenly feel like you've lost some potential.");
+			    You("suddenly feel like you've lost some potential.");
 			}
 		    }
 		level_tele();
