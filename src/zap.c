@@ -2550,20 +2550,22 @@ struct obj *obj;	/* wand or spell */
 		case SPE_CANCELLATION: 
 		    /* MRKR: Disarm magical traps */
 		    /* from an idea posted to rgrn by Haakon Studebaker */
-		    if (ttmp->ttyp == MAGIC_TRAP || 
-			ttmp->ttyp == TELEP_TRAP ||
-			ttmp->ttyp == LEVEL_TELEP ||
-			ttmp->ttyp == POLY_TRAP) {
-			if (ttmp->tseen) {
-			    You("disarm a %s.", 
-			    defsyms[trap_to_defsym(ttmp->ttyp)].explanation);
-			    deltrap(ttmp);
+		    if (ttmp->ttyp == MAGIC_TRAP || ttmp->ttyp == TELEP_TRAP ||
+			ttmp->ttyp == LEVEL_TELEP || ttmp->ttyp == POLY_TRAP ||
+			ttmp->ttyp == MAGIC_PORTAL || ttmp->ttyp == ANTI_MAGIC) {
+			if (ttmp->ttyp != MAGIC_PORTAL && ttmp->ttyp != ANTI_MAGIC) {
+			    if (ttmp->tseen) {
+				You("disarm a %s.", 
+				defsyms[trap_to_defsym(ttmp->ttyp)].explanation);
+				deltrap(ttmp);
+			    }
+			} else {
+			    if (ttmp->tseen) {
+				You("are mesmerised by%s conflicting magics.",
+				    objects[WAN_CANCELLATION].oc_name_known ? " the" : "");
+			    }
 			}
-		    } else if (ttmp->ttyp == MAGIC_PORTAL ||
-				ttmp->ttyp == ANTI_MAGIC) {
-			if (ttmp->tseen) {
-			    You("are mesmerised by the conflicting magics.");
-			}
+			if (obj->otyp == WAN_CANCELLATION) makeknown(obj->otyp);
 		    }
 		    break;
 		default:
@@ -2574,16 +2576,25 @@ struct obj *obj;	/* wand or spell */
 	    if ((e = engr_at(x, y)) != 0 && e->engr_type != HEADSTONE) {
 		switch (obj->otyp) {
 		case WAN_POLYMORPH:
+		    makeknown(obj->otyp);
 		case SPE_POLYMORPH:
 		    del_engr(e);
 		    make_engr_at(x, y, random_engraving(buf), moves, (xchar)0);
 		    break;
 		case WAN_CANCELLATION:
-		case SPE_CANCELLATION:
 		case WAN_MAKE_INVISIBLE:
+		    if ((objects[WAN_TELEPORTATION].oc_name_known &&
+			    objects[WAN_CANCELLATION].oc_name_known) ||
+			    (objects[WAN_TELEPORTATION].oc_name_known &&
+			    objects[WAN_MAKE_INVISIBLE].oc_name_known))
+			makeknown(obj->otyp);
+		case SPE_CANCELLATION:
 		    del_engr(e);
 		    break;
 		case WAN_TELEPORTATION:
+		    if (objects[WAN_CANCELLATION].oc_name_known &&
+			    objects[WAN_MAKE_INVISIBLE].oc_name_known)
+			makeknown(obj->otyp);
 		case SPE_TELEPORT_AWAY:
 		    rloc_engr(e);
 		    break;
