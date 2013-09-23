@@ -94,7 +94,7 @@ static const char *random_mesg[] = {
 	/* From dNetHack */
 	"[REDACTED]", "[DATA EXPUNGED]", "[DATA PLUNGED]", /* SCP Foundation */
 	"[DATA EXPANDED]", "I am a toaster!",
-	"I prepared Explosive Runes this morning.", /*Order of the Stick*/
+	"I prepared Explosive Runes this morning.", /* Order of the Stick */
 	"I SAW THE EYE. Over the horizon, like a rising sun!", /* Dresden Codak */
 };
 
@@ -541,6 +541,7 @@ boolean fingers;
 	boolean dengr = FALSE;	/* TRUE if we wipe out the current engraving */
 	boolean doblind = FALSE;/* TRUE if engraving blinds the player */
 	boolean doknown = FALSE;/* TRUE if we identify the stylus */
+	boolean eknown = FALSE;	/* TRUE if we identify the stylus after seeing effects */
 	boolean eow = FALSE;	/* TRUE if we are overwriting oep */
 	boolean jello = FALSE;	/* TRUE if we are engraving in slime */
 	boolean ptext = TRUE;	/* TRUE if we must prompt for engrave text */
@@ -739,12 +740,14 @@ boolean fingers;
 			Strcpy(post_engr_text,
 			"The wand unsuccessfully fights your attempt to write!"
 			);
+			eknown = TRUE;
 			break;
 		    case WAN_SLOW_MONSTER:
 			if (!Blind) {
 			   Sprintf(post_engr_text,
 				   "The bugs on the %s slow down!",
 				   surface(u.ux, u.uy));
+			   eknown = TRUE;
 			}
 			break;
 		    case WAN_SPEED_MONSTER:
@@ -752,6 +755,7 @@ boolean fingers;
 			   Sprintf(post_engr_text,
 				   "The bugs on the %s speed up!",
 				   surface(u.ux, u.uy));
+			   eknown = TRUE;
 			}
 			break;
 		    case WAN_POLYMORPH:
@@ -759,6 +763,7 @@ boolean fingers;
 			    if (!Blind) {
 				type = (xchar)0;	/* random */
 				(void) random_engraving(buf);
+				eknown = TRUE;
 			    }
 			    dengr = TRUE;
 			}
@@ -777,6 +782,7 @@ boolean fingers;
 			   Sprintf(post_engr_text,
 				   "The %s is riddled by bullet holes!",
 				   surface(u.ux, u.uy));
+			   eknown = TRUE;
 			}
 			break;
 
@@ -787,29 +793,46 @@ boolean fingers;
 			   Sprintf(post_engr_text,
 				   "The bugs on the %s stop moving!",
 				   surface(u.ux, u.uy));
+			   /* automatically use the process of elimination */
+			   if (objects[WAN_SLEEP].oc_name_known || objects[WAN_DEATH].oc_name_known)
+				eknown = TRUE;
 			}
 			break;
 
 		    case WAN_COLD:
-			if (!Blind)
+			if (!Blind) {
 			    Strcpy(post_engr_text,
 				"A few ice cubes drop from the wand.");
+			    eknown = TRUE;
+			}
 			if(!oep || (oep->engr_type != BURN))
 			    break;
 		    case WAN_CANCELLATION:
 		    case WAN_MAKE_INVISIBLE:
 			if (oep && oep->engr_type != HEADSTONE) {
-			    if (!Blind)
+			    if (!Blind) {
 				pline_The("engraving on the %s vanishes!",
 					surface(u.ux,u.uy));
+				/* automatically use the process of elimination */
+				if ((objects[WAN_TELEPORTATION].oc_name_known &&
+					objects[WAN_CANCELLATION].oc_name_known) ||
+					(objects[WAN_TELEPORTATION].oc_name_known &&
+					objects[WAN_MAKE_INVISIBLE].oc_name_known))
+				    eknown = TRUE;
+			    }
 			    dengr = TRUE;
 			}
 			break;
 		    case WAN_TELEPORTATION:
 			if (oep && oep->engr_type != HEADSTONE) {
-			    if (!Blind)
+			    if (!Blind) {
 				pline_The("engraving on the %s vanishes!",
 					surface(u.ux,u.uy));
+				/* automatically use the process of elimination */
+				if (objects[WAN_CANCELLATION].oc_name_known &&
+					objects[WAN_MAKE_INVISIBLE].oc_name_known)
+				    eknown = TRUE;
+			    }
 			    teleengr = TRUE;
 			}
 			break;
@@ -1245,6 +1268,12 @@ boolean fingers;
 #endif
 
 	if (post_engr_text[0]) pline("%s", post_engr_text);
+
+	/* identify stylus after seeing its effect */
+	if (eknown) {
+	    makeknown(otmp->otyp);
+	    more_experienced(0,0,10);
+	}
 
 	if (doblind && !resists_blnd(&youmonst)) {
 	    You("are blinded by the flash!");

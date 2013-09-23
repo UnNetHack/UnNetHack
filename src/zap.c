@@ -2105,6 +2105,7 @@ boolean ordinary;
 		    break;
 
 		case WAN_TELEPORTATION:
+		    makeknown(WAN_TELEPORTATION);
 		case SPE_TELEPORT_AWAY:
 		    tele();
 		    break;
@@ -2246,6 +2247,7 @@ struct obj *obj;	/* wand or spell */
 		    steedhit = TRUE;
 		    break;
 		case WAN_TELEPORTATION:
+		    makeknown(WAN_TELEPORTATION);
 		case SPE_TELEPORT_AWAY:
 		    /* you go together */
 		    tele();
@@ -2413,6 +2415,8 @@ boolean			youattack, allow_cancel_kill, self_cancel;
 			}
 			if (msg) {
 				pline("%s seems to be %s!", Monnam(mdef), msg);
+				/* identify wand if receiving message */
+				if (obj->otyp == WAN_CANCELLATION) makeknown(obj->otyp);
 			}
 		}
 	    }
