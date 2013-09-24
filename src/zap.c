@@ -96,6 +96,7 @@ struct obj *otmp;
 {
 	boolean wake = TRUE;	/* Most 'zaps' should wake monster */
 	boolean reveal_invis = FALSE;
+	boolean visible = FALSE;
 	boolean dbldam = Role_if(PM_KNIGHT) && u.uhave.questart;
 	int dmg, otyp = otmp->otyp;
 	const char *zap_type_text = "spell";
@@ -196,7 +197,11 @@ struct obj *otmp;
 		break;
 	case WAN_TELEPORTATION:
 	case SPE_TELEPORT_AWAY:
+		visible = canspotmon(mtmp);
 		reveal_invis = !u_teleport_mon(mtmp, TRUE);
+		/* if you can tell the monster has teleported, ID the wand */
+		if (!reveal_invis && visible && otyp == WAN_TELEPORTATION)
+		    makeknown(otyp);
 		break;
 	case WAN_MAKE_INVISIBLE:
 	    {
