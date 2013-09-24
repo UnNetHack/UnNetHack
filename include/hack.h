@@ -45,6 +45,7 @@
 #define DISMOUNT_ENGULFED	4
 #define DISMOUNT_BONES		5
 #define DISMOUNT_BYCHOICE	6
+#define DISMOUNT_VANISHED	7
 #endif
 
 /* Special returns from mapglyph() */
