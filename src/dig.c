@@ -236,7 +236,7 @@ dig()
 	} else { /* !digging.down */
 	    if (IS_TREES(lev->typ) && !may_dig(dpx,dpy) &&
 			dig_typ(uwep, dpx, dpy) == DIGTYP_TREE) {
-		pline("This tree seems to be petrified.");
+			pline(Hallucination ? "The Lorax prevents you from destroying this statue of a Truffula tree" : "This tree seems to be petrified.");
 		return(0);
 	    }
 	    /* ALI - Artifact doors */
