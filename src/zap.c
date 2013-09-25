@@ -97,6 +97,7 @@ struct obj *otmp;
 	boolean wake = TRUE;	/* Most 'zaps' should wake monster */
 	boolean reveal_invis = FALSE;
 	boolean visible = FALSE;
+	boolean knowninvisible = FALSE;
 	boolean dbldam = Role_if(PM_KNIGHT) && u.uhave.questart;
 	int dmg, otyp = otmp->otyp;
 	const char *zap_type_text = "spell";
@@ -198,9 +199,15 @@ struct obj *otmp;
 	case WAN_TELEPORTATION:
 	case SPE_TELEPORT_AWAY:
 		visible = canspotmon(mtmp);
+		knowninvisible = knowninvisible(mtmp);
 		reveal_invis = !u_teleport_mon(mtmp, TRUE);
-		/* if you can tell the monster has teleported, ID the wand */
-		if (!reveal_invis && visible && otyp == WAN_TELEPORTATION)
+		/* if the monster was teleported, the method of teleportation
+		   was a wand, you could tell where the monster was before it
+		   teleported, and you can tell that it has teleported and not
+		   just turned invisible (or you have already identified wands
+		   of make invisible), then automatically identify the wand  */
+		if (!reveal_invis && otyp == WAN_TELEPORTATION && visible &&
+			(knowninvisible || canspotmon(mtmp) || objects[WAN_MAKE_INVISIBLE].oc_name_known))
 		    makeknown(otyp);
 		break;
 	case WAN_MAKE_INVISIBLE:
@@ -211,8 +218,10 @@ struct obj *otmp;
 		/* format monster's name before altering its visibility */
 		Strcpy(nambuf, Monnam(mtmp));
 		mon_set_minvis(mtmp);
-		if (!oldinvis && knowninvisible(mtmp)) {
-		    pline("%s turns transparent!", nambuf);
+		/* if you've already identified wands of teleportation, automatically
+		   identify wands of make invisible when they make a monster invisible */
+		if (!oldinvis && (knowninvisible(mtmp) || objects[WAN_TELEPORTATION].oc_name_known)) {
+		    if (knowninvisible(mtmp)) pline("%s turns transparent!", nambuf);
 		    makeknown(otyp);
 		}
 		break;
