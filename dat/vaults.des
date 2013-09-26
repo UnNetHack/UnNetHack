@@ -1097,3 +1097,33 @@ ROOM:"rndvault", random, random, random, random {
   IF [50%] { MONSTER: ('F', "blazing fern"), random, hostile }
   IF [50%] { MONSTER: ('F', "swamp fern"), random, hostile }
 }
+
+# Ozymandias' Tomb
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+---------
+|.......|
+|.......|
+|.......|
++......\|
+|.......|
+|.......|
+|.......|
+---------
+ENDMAP
+REGION:(9,9,9,9),lit,"rndvault",filled { }
+ENGRAVING: (7,5), burn, "Look on my works, ye mighty, and despair"
+[10%]: ENGRAVING: (6,5), burn, "My name is Ozymandias, king of kings"
+[50%]: TRAP: "hole", (4,3)
+[80%]: TRAP: "hole", (6,4)
+[30%]: TRAP: "hole", (4,7)
+[75%]: TRAP: "web", (2,2)
+[75%]: TRAP: "web", (2,7)
+TRAP: "web", (8,7)
+CONTAINER:"large chest", (8,2), trapped { }
+TRAP: "statue", (8,4)
+TRAP: "statue", (8,8)
+OBJECT:('`',"statue"),(8,4),montype:('d', "werejackal")
+OBJECT:('`',"statue"),(8,2),montype:('@', "elvenking")
