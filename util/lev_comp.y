@@ -1237,7 +1237,9 @@ room_begin      : room_type opt_percent ',' light_state
 
 subroom_def	: SUBROOM_ID ':' room_begin ',' subroom_pos ',' room_size optroomregionflags
 		  {
-		      add_opvars(splev, "iiiiiiio", (long)$8, ERR, ERR,
+		      long flags = $8;
+		      if (flags == -1) flags = (1 << 0);
+		      add_opvars(splev, "iiiiiiio", flags, ERR, ERR,
 				 $5.x, $5.y, $7.width, $7.height, SPO_SUBROOM);
 		      break_stmt_start();
 		  }
@@ -1250,7 +1252,9 @@ subroom_def	: SUBROOM_ID ':' room_begin ',' subroom_pos ',' room_size optroomreg
 
 room_def	: ROOM_ID ':' room_begin ',' room_pos ',' room_align ',' room_size optroomregionflags
 		  {
-		      add_opvars(splev, "iiiiiiio", (long)$10,
+		      long flags = $8;
+		      if (flags == -1) flags = (1 << 0);
+		      add_opvars(splev, "iiiiiiio", flags,
 				 $7.x, $7.y, $5.x, $5.y,
 				 $9.width, $9.height, SPO_ROOM);
 		      break_stmt_start();
@@ -1904,6 +1908,7 @@ region_detail	: REGION_ID ':' region_or_var ',' light_state ',' room_type optroo
 		      long irr;
 		      long rt = $7;
 		      long flags = $8;
+		      if (flags == -1) flags = (1 << 0);
 		      if (!(( flags ) & 1)) rt += MAXRTYPE+1;
 		      irr = ((( flags ) & 2) != 0);
 		      add_opvars(splev, "iiio",
@@ -2002,7 +2007,7 @@ room_type	: STRING
 
 optroomregionflags : /* empty */
 		  {
-			$$ = 0;
+			$$ = -1;
 		  }
 		| ',' roomregionflags
 		  {

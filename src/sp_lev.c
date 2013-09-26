@@ -3556,7 +3556,7 @@ spo_room(coder)
 	tmproom.rtype = OV_i(rtype);
 	tmproom.chance = OV_i(chance);
 	tmproom.rlit = OV_i(rlit);
-	tmproom.filled = !(OV_i(flags) & (1 << 0));
+	tmproom.filled = (OV_i(flags) & (1 << 0));
 	/*tmproom.irregular = (OV_i(flags) & (1 << 1));*/
 	tmproom.joined = !(OV_i(flags) & (1 << 2));
 
