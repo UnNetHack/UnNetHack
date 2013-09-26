@@ -905,6 +905,26 @@ ENDMAP
 REGION:(1,1,1,1),random,"ordinary",unfilled,irregular { }
 
 
+# Cross
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+VAULTGEN:2000
+GEOMETRY:random
+MAP
+xxx-----xxx
+xxx|...|xxx
+xxx|...|xxx
+----...----
+|.........|
+|.........|
+|.........|
+----...----
+xxx|...|xxx
+xxx|...|xxx
+xxx-----xxx
+ENDMAP
+REGION:(5,5,5,5),random,"ordinary",unfilled,irregular { }
+
 
 # watcher in the water
 LEVEL:"vlt-%04i"
