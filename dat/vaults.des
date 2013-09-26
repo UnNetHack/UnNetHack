@@ -1122,7 +1122,7 @@ ENGRAVING: (6,4), burn, "Look on my works, ye mighty, and despair"
 [75%]: TRAP: "web", (1,1)
 [75%]: TRAP: "web", (1,6)
 TRAP: "web", (7,6)
-CONTAINER:"large chest", (7,1), trapped { }
+CONTAINER:"chest", (7,1), trapped { }
 TRAP: "statue", (7,3)
 TRAP: "statue", (7,7)
 OBJECT:('`',"statue"),(7,3),montype:('d', "werejackal")
