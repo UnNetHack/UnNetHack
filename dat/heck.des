@@ -2826,6 +2826,7 @@ ENDMAP
 [50%]: OBJECT: ('`',"boulder"),random
 [10%]: MONSTER: ('H',"minotaur"),random
 MONSTER:random,random
+[80%]: MONSTER: ('U',"shambling horror"),random
 [50%]: MONSTER: random,random
 [50%]: TRAP: random,random
 #GOLD:random,random
@@ -2848,6 +2849,7 @@ ENDMAP
 [10%]: MONSTER: ('H',"minotaur"),random
 MONSTER:random,random
 [50%]: MONSTER: random,random
+[80%]: MONSTER: ('i',"uranium imp),random
 [50%]: TRAP: random,random
 #GOLD:random,random
 
