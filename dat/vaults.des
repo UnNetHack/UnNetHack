@@ -1114,16 +1114,16 @@ MAP
 ---------
 ENDMAP
 REGION:(9,9,9,9),lit,"rndvault",filled { }
-ENGRAVING: (7,5), burn, "Look on my works, ye mighty, and despair"
-[10%]: ENGRAVING: (6,5), burn, "My name is Ozymandias, king of kings"
-[50%]: TRAP: "hole", (4,3)
-[80%]: TRAP: "hole", (6,4)
-[30%]: TRAP: "hole", (4,7)
-[75%]: TRAP: "web", (2,2)
-[75%]: TRAP: "web", (2,7)
-TRAP: "web", (8,7)
-CONTAINER:"large chest", (8,2), trapped { }
-TRAP: "statue", (8,4)
-TRAP: "statue", (8,8)
-OBJECT:('`',"statue"),(8,4),montype:('d', "werejackal")
-OBJECT:('`',"statue"),(8,2),montype:('@', "elvenking")
+ENGRAVING: (6,4), burn, "Look on my works, ye mighty, and despair"
+[10%]: ENGRAVING: (5,4), burn, "My name is Ozymandias, king of kings"
+[50%]: TRAP: "hole", (3,2)
+[80%]: TRAP: "hole", (5,3)
+[30%]: TRAP: "hole", (3,6)
+[75%]: TRAP: "web", (1,1)
+[75%]: TRAP: "web", (1,6)
+TRAP: "web", (7,6)
+CONTAINER:"large chest", (7,1), trapped { }
+TRAP: "statue", (7,3)
+TRAP: "statue", (7,7)
+OBJECT:('`',"statue"),(7,3),montype:('d', "werejackal")
+OBJECT:('`',"statue"),(7,1),montype:('@', "elvenking")
