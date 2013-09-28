@@ -47,7 +47,13 @@ init_uasmon()
 	    upermonst.mattk[i] = mons[urace.malenum].mattk[i];
 	  }
 	}
-	
+
+	/* Fix mflags because of impossible mixing of role and race flags */
+	if (Role_if(PM_MONK)) {
+		/* monks are declared herbivorous */
+		upermonst.mflags1 &= ~M1_CARNIVORE;
+	}
+
 	set_uasmon();
 }
 
