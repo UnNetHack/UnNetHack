@@ -464,7 +464,7 @@ MAP
 -----------
 ENDMAP
 IF [75%] {
-  $terr = TERRAIN:{ '-', 'P' }
+  $terr = TERRAIN:{ '-', 'P', 'Y' }
   SHUFFLE: $terr
   REPLACE_TERRAIN:(1,1,9,9),'L', $terr[0],100%
 }
@@ -955,7 +955,7 @@ ROOM:"rndvault", random, random, random, random {
 LEVEL:"vlt-%04i"
 FLAGS:rndvault
 ROOM:"ordinary", random, random, random, (10, 10) {
-  $terr = terrain: { '-', '-', '-', '-', '-', 'L', 'I', 'P', 'T' }
+  $terr = terrain: { '-', '-', '-', '-', '-', 'L', 'I', 'P', 'T', 'Y' }
   SHUFFLE: $terr
   FOR $y = 0 TO ((room.height - 3) / 4) {
     FOR $x = 0 TO ((room.width - 3) / 4) {
@@ -974,7 +974,7 @@ FLAGS:rndvault
 ROOM:"ordinary", random, random, random, random {
   IF [ (room.width % 2) == 0 ] { BREAK }
   IF [ (room.height % 2) == 0 ] { BREAK }
-  $terr = terrain: { '-', '-', '-', '-', '-', 'L', 'I', 'P', 'T', 'C' ,'F' }
+  $terr = terrain: { '-', '-', '-', '-', '-', 'L', 'I', 'P', 'T', 'Y', 'C' ,'F' }
   SHUFFLE: $terr
   FOR $y = 0 TO ((room.height - 3) / 2) {
     FOR $x = 0 TO ((room.width - 3) / 2) {
@@ -990,7 +990,7 @@ FLAGS:rndvault
 ROOM:"ordinary", random, random, random, random {
   IF [ room.width < 4 ] { BREAK }
   IF [ room.height < 4 ] { BREAK }
-  $terr = terrain: { '-', '-', '-', '-', '-', 'L', 'I', 'P', 'T', 'C', 'F' }
+  $terr = terrain: { '-', '-', '-', '-', '-', 'L', 'I', 'P', 'T', 'Y', 'C', 'F' }
   SHUFFLE: $terr
   LOOP [ 1d3 ] {
      $x = 1d6 - (1)
