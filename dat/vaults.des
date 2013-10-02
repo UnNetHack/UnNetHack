@@ -1113,8 +1113,7 @@ MAP
 |.......|
 ---------
 ENDMAP
-REGION:(9,9,9,9),lit,"rndvault",filled { }
-DOOR: closed, (4,0)
+REGION:(0,8,8,0),lit,"rndvault",filled { }
 ENGRAVING: (6,4), burn, "Look on my works, ye mighty, and despair"
 [10%]: ENGRAVING: (5,4), burn, "My name is Ozymandias, king of kings"
 [50%]: TRAP: "hole", (3,2)
