@@ -530,7 +530,7 @@ resurrect()
 void
 intervene()
 {
-	int which = Is_astralevel(&u.uz) ? rnd(4) : rn2(6);
+	int which = Is_astralevel(&u.uz) ? rnd(4) : rn2(7);
 	/* cases 0 and 5 don't apply on the Astral level */
 	switch (which) {
 	    case 0:
@@ -547,6 +547,12 @@ intervene()
 			break;
 	    case 5:	resurrect();
 			break;
+	    case 6:
+		pline_The("entire %s is shaking around you!", get_generic_level_description(&u.uz));
+		do_earthquake((MAXULEV - 1) / 3 + 1);
+		/* shake up monsters in a much larger radius... */
+		awaken_monsters(ROWNO * COLNO);
+		break;
 	}
 }
 

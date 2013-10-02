@@ -1461,6 +1461,8 @@ E boolean FDECL(munstone, (struct monst *,BOOLEAN_P));
 
 /* ### music.c ### */
 
+E void FDECL(awaken_monsters, (int));
+E void FDECL(do_earthquake, (int));
 E void NDECL(awaken_soldiers);
 E int FDECL(do_play_instrument, (struct obj *));
 
