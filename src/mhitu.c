@@ -2745,6 +2745,7 @@ struct attack* mattk;
 		    if (canseemon(mtmp)) {
 			pline("%s screams!", Monnam(mtmp));
 		    } else {
+			if (distu(mtmp->mx,mtmp->my) > (dmg * 2)) dmg = 1;
 			You_hear("a horrific scream!");
 		    }
 		    if (u.usleep) { unmul("You are shocked awake!"); } {
@@ -2753,7 +2754,7 @@ struct attack* mattk;
         	}
 		make_stunned(HStun + dmg, FALSE);
 	    }
-	    mtmp->mspec_used = 2 + rn2(3);
+	    mtmp->mspec_used = 2 + rn2(3) + dmg;
 	    break;
     	default:
 	    break;
