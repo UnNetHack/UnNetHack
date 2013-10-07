@@ -924,6 +924,15 @@ register struct obj *obj;
 	if (!invocation_pos(u.ux, u.uy)) {
 		pline_The("%s %s being rapidly consumed!", s, vtense(s, "are"));
 		obj->age /= 2;
+		/* Fix for bug C343-424 "Unlit candelabrum becomes unlightable
+		 *  if candles have exactly one turn of fuel left and it was
+		 *  applied in the wrong location.".
+		 * begin_burn() won't consume a candle when its age (i.e. its
+		 * remaining turns) is 0.  Setting its age to 1 will consume it
+		 * at the next call of begin_burn(). */
+		if (obj->age == 0) {
+			obj->age = 1;
+		}
 	} else {
 		if(obj->spe == 7) {
 		    if (Blind)

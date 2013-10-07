@@ -227,6 +227,9 @@
 	  - C343-175: Chatting to prisoners may give an inappropriate message
 	    (from UnNetHackPlus, thanks to Reddit user Nuclear_Winterfell)
 	  - C343-162: Ungrammatical Magicbane hit messages (by Ray Chason)
+	  - C343-424: Unlit candelabrum becomes unlightable if candles have
+	              exactly one turn of fuel left and it was applied in the
+	              wrong location.
 
 2012-04-01  UnNetHack 4.0.0
 	* Uncursed and blessed scrolls of magic mapping reveal secret doors
