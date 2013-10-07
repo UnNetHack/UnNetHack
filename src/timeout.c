@@ -1057,7 +1057,7 @@ long timeout;
 		break;
 
 	    default:
-		warning("burn_object: unexpeced obj %s", xname(obj));
+		warning("burn_object: unexpected obj %s", xname(obj));
 		break;
 	}
 	if (need_newsym) newsym(x, y);
