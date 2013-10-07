@@ -33,6 +33,7 @@ struct flag {
 	boolean  botl;		/* partially redo status line */
 	boolean  botlx;		/* print an entirely new bottom line */
 	boolean  confirm;	/* confirm before hitting tame monsters */
+	boolean  deathdropless;	/* disable monsters dropping random items */
 	boolean  debug;		/* in debugging mode */
 #define wizard	 flags.debug
 	boolean  end_own;	/* list all own scores */

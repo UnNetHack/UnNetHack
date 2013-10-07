@@ -2152,7 +2152,8 @@ xkilled(mtmp, dest)
 	    if(wasinside) spoteffects(TRUE);
 	} else if(x != u.ux || y != u.uy) {
 		/* might be here after swallowed */
-		if (!rn2(6) && !(mvitals[mndx].mvflags & G_NOCORPSE)
+		if (!flags.deathdropless && !rn2(6) &&
+			!(mvitals[mndx].mvflags & G_NOCORPSE)
 		    /* disable death drop for puddings */
 		    && mdat->mlet != S_PUDDING
 #ifdef KOPS

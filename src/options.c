@@ -87,6 +87,7 @@ static struct Bool_Opt
 	{"cursesgraphics", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"dark_room", &iflags.dark_room, TRUE, SET_IN_GAME},
+	{"deathdropless", &flags.deathdropless, FALSE, SET_IN_FILE},
 #if defined(TERMLIB) && !defined(MAC_GRAPHICS_ENV)
 	{"DECgraphics", &iflags.DECgraphics, FALSE, SET_IN_GAME},
 #else

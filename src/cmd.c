@@ -1507,6 +1507,9 @@ boolean want_disp;
 		}
 	}
 
+	if (flags.deathdropless)
+		you_have_been("ignoring all death drops");
+
 	/* list all major conducts */
 
 	for(cdt=FIRST_CONDUCT; cdt<=LAST_CONDUCT; cdt++){
