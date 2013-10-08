@@ -3758,12 +3758,16 @@ register int dx,dy;
 	    bounce = 0;
 	    range--;
 	    if (range) {
-		/* lava does not bounce off walls, but melts them */
-		if (isok(sx, sy) && abstype == ZT_LAVA) {
+		/* lava does not bounce off walls, but melts them;
+		   intentionally do not use isok() here so lava
+		   will not bounce off of the edge of the map */
+		if (abstype == ZT_LAVA) {
 		    if (IS_STWALL(levl[sx][sy].typ)) {
 			levl[sx][sy].typ = LAVAPOOL;
-			if (cansee(sx, sy))
+			if (cansee(sx, sy)) {
 			    pline("%s melts the wall!", The(fltxt));
+			    newsym(sx, sy);
+			}
 		    } else if (is_any_icewall(sx, sy)) {
 			melt_icewall(sx, sy);
 		    }
