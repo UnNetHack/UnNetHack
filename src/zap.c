@@ -3762,7 +3762,8 @@ register int dx,dy;
 		   intentionally do not use isok() here so lava
 		   will not bounce off of the edge of the map */
 		if (abstype == ZT_LAVA) {
-		    if (IS_STWALL(levl[sx][sy].typ)) {
+		    if (IS_STWALL(levl[sx][sy].typ) &&
+			  !(levl[sx][sy].wall_info & W_NONDIGGABLE)) {
 			levl[sx][sy].typ = LAVAPOOL;
 			if (cansee(sx, sy)) {
 			    pline("%s melts the wall!", The(fltxt));
