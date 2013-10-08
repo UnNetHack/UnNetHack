@@ -3602,6 +3602,9 @@ register int dx,dy;
 			shieldeff(mon->mx, mon->my);
 			(void) mon_reflects(mon, "But it reflects from %s %s!");
 		    }
+		    /* lava is reflected, but doesn't bounce back */
+		    if (abstype == ZT_LAVA)
+			range = 0;
 		    dx = -dx;
 		    dy = -dy;
 		} else {
@@ -3709,14 +3712,13 @@ register int dx,dy;
 		if (Reflecting) {
 		    if (!Blind) {
 		    	(void) ureflects("But %s reflects from your %s!", "it");
-		    } else {
+		    } else
 			pline("For some reason you are not affected.");
-		    }
-		    /* lava is blocked by reflection, but not reflected */
-		    if (abstype != ZT_LAVA) {
-			dx = -dx;
-			dy = -dy;
-		    }
+		    dx = -dx;
+		    dy = -dy;
+		    /* lava is reflected, but doesn't bounce back */
+		    if (abstype == ZT_LAVA)
+			range = 0;
 		    shieldeff(sx, sy);
 		} else {
 		    zhitu(type, nd, fltxt, sx, sy);
@@ -3756,7 +3758,7 @@ register int dx,dy;
 	    bounce = 0;
 	    range--;
 	    if (range) {
-		/* lava does not bounce off walls, but melts */
+		/* lava does not bounce off walls, but melts them */
 		if (isok(sx, sy) && abstype == ZT_LAVA) {
 		    if (IS_STWALL(levl[sx][sy].typ)) {
 			levl[sx][sy].typ = LAVAPOOL;
