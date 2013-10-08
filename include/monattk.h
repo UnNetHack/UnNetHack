@@ -43,52 +43,53 @@
 #define AD_DISN		5	/* disintegration (death ray) */
 #define AD_ELEC		6	/* shock damage */
 #define AD_DRST		7	/* drains str (poison) */
-#define AD_ACID		8	/* acid damage */
-#define AD_SPC1		9	/* for extension of buzz() */
-#define AD_SPC2		10	/* for extension of buzz() */
-#define AD_BLND		11	/* blinds (yellow light) */
-#define AD_STUN		12	/* stuns */
-#define AD_SLOW		13	/* slows */
-#define AD_PLYS		14	/* paralyses */
-#define AD_DRLI		15	/* drains life levels (Vampire) */
-#define AD_DREN		16	/* drains magic energy */
-#define AD_LEGS		17	/* damages legs (xan) */
-#define AD_STON		18	/* petrifies (Medusa, cockatrice) */
-#define AD_STCK		19	/* sticks to you (mimic) */
-#define AD_SGLD		20	/* steals gold (leppie) */
-#define AD_SITM		21	/* steals item (nymphs) */
-#define AD_SEDU		22	/* seduces & steals multiple items */
-#define AD_TLPT		23	/* teleports you (Quantum Mech.) */
-#define AD_RUST		24	/* rusts armour (Rust Monster)*/
-#define AD_CONF		25	/* confuses (Umber Hulk) */
-#define AD_DGST		26	/* digests opponent (trapper, etc.) */
-#define AD_HEAL		27	/* heals opponent's wounds (nurse) */
-#define AD_WRAP		28	/* special "stick" for eels */
-#define AD_WERE		29	/* confers lycanthropy */
-#define AD_DRDX		30	/* drains dexterity (quasit) */
-#define AD_DRCO		31	/* drains constitution */
-#define AD_DRIN		32	/* drains intelligence (mind flayer) */
-#define AD_DISE		33	/* confers diseases */
-#define AD_DCAY		34	/* decays organics (brown Pudding) */
-#define AD_SSEX		35	/* Succubus seduction (extended) */
+#define AD_LAVA		8	/* a jet of molten lava */
+#define AD_ACID		9	/* acid damage */
+#define AD_SPC1		10	/* for extension of buzz() */
+#define AD_SPC2		11	/* for extension of buzz() */
+#define AD_BLND		12	/* blinds (yellow light) */
+#define AD_STUN		13	/* stuns */
+#define AD_SLOW		14	/* slows */
+#define AD_PLYS		15	/* paralyses */
+#define AD_DRLI		16	/* drains life levels (Vampire) */
+#define AD_DREN		17	/* drains magic energy */
+#define AD_LEGS		18	/* damages legs (xan) */
+#define AD_STON		19	/* petrifies (Medusa, cockatrice) */
+#define AD_STCK		20	/* sticks to you (mimic) */
+#define AD_SGLD		21	/* steals gold (leppie) */
+#define AD_SITM		22	/* steals item (nymphs) */
+#define AD_SEDU		23	/* seduces & steals multiple items */
+#define AD_TLPT		24	/* teleports you (Quantum Mech.) */
+#define AD_RUST		25	/* rusts armour (Rust Monster)*/
+#define AD_CONF		26	/* confuses (Umber Hulk) */
+#define AD_DGST		27	/* digests opponent (trapper, etc.) */
+#define AD_HEAL		28	/* heals opponent's wounds (nurse) */
+#define AD_WRAP		29	/* special "stick" for eels */
+#define AD_WERE		30	/* confers lycanthropy */
+#define AD_DRDX		31	/* drains dexterity (quasit) */
+#define AD_DRCO		32	/* drains constitution */
+#define AD_DRIN		33	/* drains intelligence (mind flayer) */
+#define AD_DISE		34	/* confers diseases */
+#define AD_DCAY		35	/* decays organics (brown Pudding) */
+#define AD_SSEX		36	/* Succubus seduction (extended) */
 				/* If no SEDUCE then same as AD_SEDU */
-#define AD_HALU		36	/* causes hallucination */
-#define AD_DETH		37	/* for Death only */
-#define AD_PEST		38	/* for Pestilence only */
-#define AD_FAMN		39	/* for Famine only */
-#define AD_SLIM		40	/* turns you into green slime */
-#define AD_ENCH		41	/* remove enchantment (disenchanter) */
-#define AD_CORR		42	/* corrode armor (black pudding) */
-#define AD_LUCK		43	/* drain luck (evil eye) */
-#define AD_FREZ		44	/* freezing attack (blue slime) */
-#define AD_HEAD		45	/* decapitate (vorpal jabberwock) */
+#define AD_HALU		37	/* causes hallucination */
+#define AD_DETH		38	/* for Death only */
+#define AD_PEST		39	/* for Pestilence only */
+#define AD_FAMN		40	/* for Famine only */
+#define AD_SLIM		41	/* turns you into green slime */
+#define AD_ENCH		42	/* remove enchantment (disenchanter) */
+#define AD_CORR		43	/* corrode armor (black pudding) */
+#define AD_LUCK		44	/* drain luck (evil eye) */
+#define AD_FREZ		45	/* freezing attack (blue slime) */
+#define AD_HEAD		46	/* decapitate (vorpal jabberwock) */
 
-#define AD_PUNI		46	/* punisher spells */
+#define AD_PUNI		47	/* punisher spells */
 
-#define AD_LVLT		47	/* level teleport (weeping angel) */
-#define AD_BLNK		48	/* mental invasion (weeping angel) */
+#define AD_LVLT		48	/* level teleport (weeping angel) */
+#define AD_BLNK		49	/* mental invasion (weeping angel) */
 
-#define AD_SPOR		49	/* generate spore */
+#define AD_SPOR		50	/* generate spore */
 
 #define AD_CLRC		240	/* random clerical spell */
 #define AD_SPEL		241	/* random magic spell */

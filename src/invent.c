@@ -1596,6 +1596,8 @@ identify_dragon(int number)
 	color = CLR_BLUE;
     } else if (mattk->adtyp == AD_DRST) {
 	color = CLR_GREEN;
+    } else if (mattk->adtyp == AD_LAVA) {
+	color = CLR_BRIGHT_MAGENTA;
     } else if (mattk->adtyp == AD_ACID) {
 	color = CLR_YELLOW;
     } else {

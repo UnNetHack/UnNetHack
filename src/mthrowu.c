@@ -21,8 +21,8 @@ STATIC_OVL NEARDATA const char *breathwep[] = {
 				"a disintegration blast",
 				"lightning",
 				"poison gas",
+				"a jet of molten lava",
 				"acid",
-				"strange breath #8",
 				"strange breath #9"
 };
 

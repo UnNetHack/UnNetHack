@@ -41,8 +41,9 @@ STATIC_DCL int FDECL(spell_hit_bonus, (int));
 #define ZT_DEATH		(AD_DISN-1)	/* or disintegration */
 #define ZT_LIGHTNING		(AD_ELEC-1)
 #define ZT_POISON_GAS		(AD_DRST-1)
+#define ZT_LAVA			(AD_LAVA-1)
 #define ZT_ACID			(AD_ACID-1)
-/* 8 and 9 are currently unassigned */
+/* 9 is currently unassigned */
 
 #define ZT_WAND(x)		(x)
 #define ZT_SPELL(x)		(10+(x))
@@ -82,8 +83,8 @@ const char * const flash_types[] = {	/* also used in buzzmu(mcastu.c) */
 	"blast of disintegration",
 	"blast of lightning",
 	"blast of poison gas",
+	"jet of molten lava",
 	"blast of acid",
-	"",
 	""
 };
 
@@ -3117,6 +3118,7 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 			spell_damage_bonus());
 #endif
 		break;
+	case ZT_LAVA:
 	case ZT_FIRE:
 		if (resists_fire(mon)) {
 		    sho_shieldeff = TRUE;
@@ -3278,6 +3280,7 @@ xchar sx, sy;
 		exercise(A_STR, FALSE);
 	    }
 	    break;
+	case ZT_LAVA:
 	case ZT_FIRE:
 	    if (Fire_resistance) {
 		shieldeff(sx, sy);
@@ -3386,6 +3389,57 @@ xchar sx, sy;
 	    dam = (dam + 1) / 2;
 	losehp(dam, fltxt, KILLED_BY_AN);
 	return;
+}
+
+void
+melt_icewall(x, y)
+xchar x, y;
+{
+	struct rm *lev = &levl[x][y];
+	if (cansee(x, y)) {
+		if (IS_CRYSTALICEWALL(lev->typ))
+			Norep("The crystal ice wall melts and breaks down.");
+		else
+			Norep("The ice wall melts away.");
+	}
+	lev->typ = ICE;
+	newsym(x,y);
+	unblock_point(x,y);
+	vision_recalc(1);
+}
+
+void
+melt_ice(x, y)
+xchar x, y;
+{
+	struct rm *lev = &levl[x][y];
+	struct obj *otmp;
+
+	if (lev->typ == DRAWBRIDGE_UP) {
+	    lev->drawbridgemask &= ~DB_UNDER;
+	    lev->drawbridgemask |= DB_MOAT;	/* revert to DB_MOAT */
+	} else {	/* lev->typ == ICE */
+	    lev->typ = (lev->icedpool == ICED_POOL ? POOL :
+			lev->icedpool == ICED_BOG ? BOG : MOAT);
+	    lev->icedpool = 0;
+	}
+	obj_ice_effects(x, y, FALSE);
+	unearth_objs(x, y);
+	if (Underwater) vision_recalc(1);
+	newsym(x,y);
+	if (cansee(x,y)) Norep("The ice crackles and melts.");
+	if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
+	    if (cansee(x,y)) pline("%s settles...", An(xname(otmp)));
+	    do {
+		obj_extract_self(otmp);	/* boulder isn't being pushed */
+		if (!boulder_hits_pool(otmp, x, y, FALSE))
+		    warning("melt_ice: no pool?");
+		/* try again if there's another boulder and pool didn't fill */
+	    } while ((is_pool(x,y) || is_swamp(x,y)) && (otmp = sobj_at(BOULDER, x, y)) != 0);
+	    newsym(x,y);
+	}
+	if (x == u.ux && y == u.uy)
+		spoteffects(TRUE);	/* possibly drown, notice objects */
 }
 
 /*
@@ -3655,10 +3709,14 @@ register int dx,dy;
 		if (Reflecting) {
 		    if (!Blind) {
 		    	(void) ureflects("But %s reflects from your %s!", "it");
-		    } else
+		    } else {
 			pline("For some reason you are not affected.");
-		    dx = -dx;
-		    dy = -dy;
+		    }
+		    /* lava is blocked by reflection, but not reflected */
+		    if (abstype != ZT_LAVA) {
+			dx = -dx;
+			dy = -dy;
+		    }
 		    shieldeff(sx, sy);
 		} else {
 		    zhitu(type, nd, fltxt, sx, sy);
@@ -3697,8 +3755,22 @@ register int dx,dy;
 	    }
 	    bounce = 0;
 	    range--;
-	    if(range && isok(lsx, lsy) && cansee(lsx,lsy))
-		pline("%s bounces!", The(fltxt));
+	    if (range) {
+		/* lava does not bounce off walls, but melts */
+		if (isok(sx, sy) && abstype == ZT_LAVA) {
+		    if (IS_STWALL(levl[sx][sy].typ)) {
+			levl[sx][sy].typ = LAVAPOOL;
+			if (cansee(sx, sy))
+			    pline("%s melts the wall!", The(fltxt));
+		    } else if (is_any_icewall(sx, sy)) {
+			melt_icewall(sx, sy);
+		    }
+		    break;
+		} else {
+		    if (isok(lsx, lsy) && cansee(lsx, lsy))
+			pline("%s bounces!", The(fltxt));
+		}
+	    }
 	    if(!dx || !dy || !rn2(20)) {
 		dx = -dx;
 		dy = -dy;
@@ -3732,57 +3804,6 @@ register int dx,dy;
 		       abstype == ZT_COLD ?  "shatter" :
 		       abstype == ZT_DEATH ? "disintegrate" : "destroy", FALSE);
     bhitpos = save_bhitpos;
-}
-
-void
-melt_icewall(x, y)
-xchar x, y;
-{
-	struct rm *lev = &levl[x][y];
-	if (cansee(x, y)) {
-		if (IS_CRYSTALICEWALL(lev->typ))
-			Norep("The crystal ice wall melts and breaks down.");
-		else
-			Norep("The ice wall melts away.");
-	}
-	lev->typ = ICE;
-	newsym(x,y);
-	unblock_point(x,y);
-	vision_recalc(1);
-}
-
-void
-melt_ice(x, y)
-xchar x, y;
-{
-	struct rm *lev = &levl[x][y];
-	struct obj *otmp;
-
-	if (lev->typ == DRAWBRIDGE_UP) {
-	    lev->drawbridgemask &= ~DB_UNDER;
-	    lev->drawbridgemask |= DB_MOAT;	/* revert to DB_MOAT */
-	} else {	/* lev->typ == ICE */
-	    lev->typ = (lev->icedpool == ICED_POOL ? POOL :
-			lev->icedpool == ICED_BOG ? BOG : MOAT);
-	    lev->icedpool = 0;
-	}
-	obj_ice_effects(x, y, FALSE);
-	unearth_objs(x, y);
-	if (Underwater) vision_recalc(1);
-	newsym(x,y);
-	if (cansee(x,y)) Norep("The ice crackles and melts.");
-	if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
-	    if (cansee(x,y)) pline("%s settles...", An(xname(otmp)));
-	    do {
-		obj_extract_self(otmp);	/* boulder isn't being pushed */
-		if (!boulder_hits_pool(otmp, x, y, FALSE))
-		    warning("melt_ice: no pool?");
-		/* try again if there's another boulder and pool didn't fill */
-	    } while ((is_pool(x,y) || is_swamp(x,y)) && (otmp = sobj_at(BOULDER, x, y)) != 0);
-	    newsym(x,y);
-	}
-	if (x == u.ux && y == u.uy)
-		spoteffects(TRUE);	/* possibly drown, notice objects */
 }
 
 /* Burn floor scrolls, evaporate pools, etc...  in a single square.  Used
@@ -3948,6 +3969,7 @@ boolean *shopdamage;
 		if (artifact_door(x, y))
 		    goto def_case;
 		switch(abstype) {
+		case ZT_LAVA:
 		case ZT_FIRE:
 		    new_doormask = D_NODOOR;
 		    see_txt = "The door is consumed in flames!";
