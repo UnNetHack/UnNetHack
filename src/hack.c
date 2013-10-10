@@ -1872,6 +1872,9 @@ domove()
 	/* If no 'm' prefix, paranoid ask dangerous moves */
 	if (!flags.nopick || flags.run) {
 		known_wwalking = (uarmf && objects[uarmf->otyp].oc_name_known &&
+#ifdef STEED
+					!u.usteed &&
+#endif
 					uarmf->otyp == WATER_WALKING_BOOTS);
 		known_lwalking = (known_wwalking && Fire_resistance &&
 					uarmf->rknown && uarmf->oerodeproof);
