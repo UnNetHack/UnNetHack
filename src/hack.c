@@ -1379,6 +1379,8 @@ domove()
 	xchar chainx, chainy, ballx, bally;	/* ball&chain new positions */
 	int bc_control;				/* control for ball&chain */
 	boolean cause_delay = FALSE;	/* dragging ball will skip a move */
+	boolean known_wwalking = FALSE;	/* player is aware of wearing water walking boots */
+	boolean known_lwalking = FALSE;	/* player knows water walking boots are fireproof */
 	const char *predicament;
 
 	u_wipe_engr(rnd(5));
@@ -1869,27 +1871,31 @@ domove()
 
 	/* If no 'm' prefix, paranoid ask dangerous moves */
 	if (!flags.nopick || flags.run) {
+		known_wwalking = (uarmf && uarmf->otyp == WATER_WALKING_BOOTS &&
+					objects[WATER_WALKING_BOOTS].oc_name_known);
+		known_lwalking = (known_wwalking && Fire_resistance &&
+					uarmf->oerodeproof && uarmf->rknown);
 		if (!Levitation && !Flying && !is_clinger(youmonst.data) &&
-				!Stunned && !Confusion && levl[x][y].seenv &&
+				!Stunned && !Confusion && levl[x][y].seenv &
 				((is_pool(x, y) && !is_pool(u.ux, u.uy)) ||
 				(is_swamp(x, y) && !is_swamp(u.ux, u.uy)) ||
 				(is_lava(x, y) && !is_lava(u.ux, u.uy)))) {
-			if (is_pool(x, y) && iflags.paranoid_water) {
-				/* water */
+			/* paranoid_water */
+			if (is_pool(x, y) && iflags.paranoid_water && !known_wwalking) {
 				if (paranoid_yn("Really enter the water?", iflags.paranoid_water) != 'y') {
 					flags.move = 0;
 					nomul(0, 0);
 					return;
 				}
-			} else if (is_swamp(x, y) && iflags.paranoid_water) {
-				/* swamps are included in paranoid_water */
+			/* swamps are included in paranoid_water */
+			} else if (is_swamp(x, y) && iflags.paranoid_water && !known_wwalking) {
 				if (paranoid_yn("Really enter the muddy swamp?", iflags.paranoid_water) != 'y') {
 					flags.move = 0;
 					nomul(0, 0);
 					return;
 				}
-			} else if (is_lava(x, y) && iflags.paranoid_lava) {
-				/* lava */
+			/* paranoid_lava */
+			} else if (is_lava(x, y) && iflags.paranoid_lava && !known_lwalking) {
 				if (paranoid_yn("Really walk into lava?", iflags.paranoid_lava) != 'y') {
 					flags.move = 0;
 					nomul(0, 0);
