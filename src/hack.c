@@ -1871,12 +1871,12 @@ domove()
 
 	/* If no 'm' prefix, paranoid ask dangerous moves */
 	if (!flags.nopick || flags.run) {
-		known_wwalking = (uarmf && uarmf->otyp == WATER_WALKING_BOOTS &&
-					objects[WATER_WALKING_BOOTS].oc_name_known);
+		known_wwalking = (uarmf && objects[uarmf->otyp].oc_name_known &&
+					uarmf->otyp == WATER_WALKING_BOOTS);
 		known_lwalking = (known_wwalking && Fire_resistance &&
-					uarmf->oerodeproof && uarmf->rknown);
+					uarmf->rknown && uarmf->oerodeproof);
 		if (!Levitation && !Flying && !is_clinger(youmonst.data) &&
-				!Stunned && !Confusion && levl[x][y].seenv &
+				!Stunned && !Confusion && levl[x][y].seenv &&
 				((is_pool(x, y) && !is_pool(u.ux, u.uy)) ||
 				(is_swamp(x, y) && !is_swamp(u.ux, u.uy)) ||
 				(is_lava(x, y) && !is_lava(u.ux, u.uy)))) {
