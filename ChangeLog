@@ -41,6 +41,7 @@
 	* Eating a disenchanter corpse cures hallucination and has a chance of
 	  removing a random intrinsic, 20% chance if hallucinating, 50% otherwise
 	* Elven players do not regenerate health while touching iron with bare skin
+	* Vampiric players do not regenerate health while touching silver with bare skin
 
 	* Item changes:
 	  - Autoidentify BUC of products from BUC identified item generators (from UnNetHackPlus)
@@ -175,6 +176,7 @@
 	  - When standing on Elbereth, show it in status lines
 	  - New paranoid options: paranoid_lava and paranoid_water, asks for
 	      confirmation before walking into known lava and water squares
+	      unless the player knows that worn water walking boots make it safe
 	  - New experimental extended command: #vanquished. Shows a list of all
 	      monsters that have been vanquished during the game.
 	  - Dump log: mark starting inventory items with a *
