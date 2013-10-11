@@ -40,8 +40,8 @@
 	  out of a sink can have any BUC, depending on luck
 	* Eating a disenchanter corpse cures hallucination and has a chance of
 	  removing a random intrinsic, 20% chance if hallucinating, 50% otherwise
-	* Elven players do not regenerate health while touching iron with bare skin
-	* Vampiric players do not regenerate health while touching silver with bare skin
+	* Elven/vampiric payers do not regenerate health while touching iron/silver with
+	  bare skin (respectively), unless the iron/silver object is their quest artifact
 
 	* Item changes:
 	  - Autoidentify BUC of products from BUC identified item generators (from UnNetHackPlus)

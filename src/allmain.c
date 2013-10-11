@@ -85,11 +85,19 @@ hpnotify_format_str(char *str)
     return buf;
 }
 
+/* Elven players cannot regenerate if in direct contact with cold
+ * iron, and vampiric players cannot if in direct contact with silver.
+ * Make an exception for your quest artifact, though -- currently,
+ * the only worn iron quest artifacts are weapons, a helm, and an
+ * amulet, and the only worn silver quest artifact is a shield.
+ * It is also not possible to hold artifacts as secondary weapons.
+ */
 boolean
 can_regenerate()
 {
     if (is_elf(youmonst.data)) {
-	if (uwep && is_iron(uwep) && !uarmg) return 0;
+	if (uwep && is_iron(uwep) &&
+		!is_quest_artifact(uwep) && !uarmg) return 0;
 #ifdef TOURIST
 	if (uarm && is_iron(uarm) && !uarmu) return 0;
 	if (uarmu && is_iron(uarmu)) return 0;
@@ -98,23 +106,27 @@ can_regenerate()
 	if (uarm && is_iron(uarm)) return 0;
 	if (uarmc && is_iron(uarmc) && !uarm) return 0;
 #endif
-	if (uarmh && is_iron(uarmh)) return 0;
+	if (uarmh && is_iron(uarmh) &&
+		!is_quest_artifact(uarmh)) return 0;
 	if (uarms && is_iron(uarms) && !uarmg) return 0;
 	if (uarmg && is_iron(uarmg)) return 0;
 	if (uarmf && is_iron(uarmf)) return 0;
 	if (uleft && is_iron(uleft)) return 0;
 	if (uright && is_iron(uright)) return 0;
 #ifdef TOURIST
-	if (uamul && is_iron(uamul) && !uarmu && !uarm) return 0;
+	if (uamul && is_iron(uamul) &&
+		!is_quest_artifact(uamul) && !uarmu && !uarm) return 0;
 #else
-	if (uamul && is_iron(uamul) && !uarm) return 0;
+	if (uamul && is_iron(uamul) &&
+		!is_quest_artifact(uamul) && !uarm) return 0;
 #endif
 	if (ublindf && is_iron(ublindf)) return 0;
 	if (uchain && is_iron(uchain)) return 0;
 	if (uswapwep && is_iron(uswapwep) && u.twoweap) return 0;
     } else if (is_vampiric(youmonst.data)) {
 	if (uwep && is_silver(uwep) && !uarmg) return 0;
-	if (uarms && is_silver(uarms) && !uarmg) return 0;
+	if (uarms && is_silver(uarms) &&
+		!is_quest_artifact(uarms) && !uarmg) return 0;
 	if (uleft && is_silver(uleft)) return 0;
 	if (uright && is_silver(uright)) return 0;
     }
