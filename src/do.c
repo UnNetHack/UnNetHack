@@ -618,13 +618,17 @@ void
 dropx(obj)
 register struct obj *obj;
 {
+	/* Tipped objects aren't considered carried, even if
+	 * their container is, so don't freeinv() it. */
+	if (carried(obj)) {
 #ifndef GOLDOBJ
-	if (obj->oclass != COIN_CLASS || obj == invent) freeinv(obj);
+	    if (obj->oclass != COIN_CLASS || obj == invent) freeinv(obj);
 #else
-        /* Ensure update when we drop gold objects */
-        if (obj->oclass == COIN_CLASS) flags.botl = 1;
-        freeinv(obj);
+            /* Ensure update when we drop gold objects */
+            if (obj->oclass == COIN_CLASS) flags.botl = 1;
+            freeinv(obj);
 #endif
+	}
 	if (!u.uswallow) {
 	    if (ship_object(obj, u.ux, u.uy, FALSE)) return;
 	    if (IS_ALTAR(levl[u.ux][u.uy].typ))

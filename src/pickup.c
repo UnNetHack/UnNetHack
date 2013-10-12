@@ -1785,6 +1785,8 @@ dotip()
 	/* "Can't do that while carrying so much stuff." */
 	return 0;
     }
+
+    if (Levitation || u.uswallow) goto tipinventory;
     cc.x = u.ux; cc.y = u.uy;
 
     if (container_at(cc.x, cc.y, FALSE)) {
@@ -1803,21 +1805,21 @@ dotip()
 
 		You("tip %s over.", the(xname(cobj)));
 
-		if (cobj->olocked) {
-		    pline("%s to be locked.", Tobjnam(cobj, "seem"));
-		    return 0;
-		}
-
 		if (cobj->otyp == BAG_OF_TRICKS) {
 		    bagotricks(cobj);	/* unleashing the full power is too cruel */ 
 		    return 1;
 		}
 
 		dump_container(cobj, FALSE);
+		if (cobj->olocked) {
+		    pline("%s to be locked.", Tobjnam(cobj, "seem"));
+		    return 0;
+		}
 		return 1;
 	    }
 	}
     }
+tipinventory:
     cobj = getobj(tools, "empty");
     if(!cobj) return 0;
 
@@ -1829,16 +1831,15 @@ dotip()
 
     You("tip %s over.", the(xname(cobj)));
 
-    if (cobj->olocked) {
-	pline("%s to be locked.", Tobjnam(cobj, "seem"));
-	You("must put it down to unlock.");
-	return 0;
-    }
-
     if (cobj->otyp == BAG_OF_TRICKS) {
 	bagotricks(cobj);
-    } else
+    } else {
 	dump_container(cobj, FALSE);
+	if (cobj->olocked) {
+	    pline("%s to be locked.", Tobjnam(cobj, "seem"));
+	    return 0;
+	}
+    }
     return 1;
 }
 
@@ -2630,7 +2631,7 @@ boolean outokay, inokay;
 }
 
 
-/** Dumps out a container, possibly as the prelude/result of an explosion.
+/* Dumps out a container, possibly as the prelude/result of an explosion.
  * destroy_after trashes the container afterwards; try not to use it :P
  *
  * Player is assumed to not be handling the contents directly.
@@ -2645,8 +2646,22 @@ BOOLEAN_P destroy_after;
 	struct obj* otmp,*otmp2;
 	int ret = 0;
 
-	/* sanity check */
-	if (!container) { return 0; }
+	/* sanity checks */
+	if (!container || !Is_container(container))
+	    return 0;
+
+	/* cursed bags of holding are generally difficult */
+	if (!destroy_after && Is_mbag(container) && container->cursed) {
+	    pline("%s reluctant to give up its contents.", Tobjnam(container, "seem"));
+	    return 0;
+	}
+
+	/* trying to empty a locked container may damage its contents */
+	if (!destroy_after && container->olocked) {
+	    ret = !!container->cobj;
+	    container_impact_dmg(container);
+	    return ret;
+	}
 
 	for (otmp = container->cobj; otmp; otmp = otmp2)
 	{
@@ -2662,7 +2677,20 @@ BOOLEAN_P destroy_after;
 				start_corpse_timeout(otmp);
 			}
 		}
-		place_object(otmp,u.ux,u.uy);
+		if (destroy_after) {
+		    /* bag of holding explosions */
+		    place_object(otmp, u.ux, u.uy);
+		} else {
+		    if (!u.uswallow) {
+			/* tipping is too uncoordinated to get rings to hit the drain */
+			if ((otmp->oclass == RING_CLASS) && IS_SINK(levl[u.ux][u.uy].typ))
+			    You("hear a%s clatter.", is_metallic(otmp) ? " metallic" : "");
+			if (!can_reach_floor()) hitfloor(otmp);
+			else dropx(otmp);
+		    } else {
+			dropx(otmp);
+		    }
+		}
 
 		if (otmp->otyp == GOLD_PIECE) {
 			bot();	/* update character's gold piece count immediately */
