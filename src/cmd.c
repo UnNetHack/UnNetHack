@@ -1813,6 +1813,7 @@ struct ext_func_tab extcmdlist[] = {
 	{"shout", "shout something", doshout, FALSE},
 #endif
 	{"sit", "sit down", dosit, FALSE},
+	{"tip", "empty a container of its contents", dotip, FALSE},
 	{"turn", "turn undead", doturn, TRUE},
 	{"twoweapon", "toggle two-weapon combat", dotwoweapon, FALSE},
 	{"untrap", "untrap something", dountrap, FALSE},

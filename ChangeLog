@@ -165,13 +165,17 @@
 	  - Knights get a weight bonus for body armor heavier than
 	      studded leather armor
 
-	* Skill changes
+	* Skill changes:
 	  - Galloping duration depends on riding skills (idea by Beolach,
 	      code by Pasi Kallinen)
 	  - Skill gain for spells is faster than skill gain for weapons
 	  - Riding skill is exercised more quickly, closer to vanilla
 
-	* user interface improvements:
+	* Extended commands:
+	  - #vanquished: Shows a list of all vanquished monsters
+	  - #tip: Tips over a container to empty it of its contents
+
+	* User interface improvements:
 	  - HP notify, showing HP changes in the message area (from NAO)
 	  - Menus made aware of the maximum count of an item (by heinrich5991)
 	  - Message for some monster cancellation events
@@ -179,8 +183,6 @@
 	  - New paranoid options: paranoid_lava and paranoid_water, asks for
 	      confirmation before walking into known lava and water squares
 	      unless the player knows that worn water walking boots make it safe
-	  - New experimental extended command: #vanquished. Shows a list of all
-	      monsters that have been vanquished during the game.
 	  - Dump log: mark starting inventory items with a *
 	  - Automatically ask whether to unlock when #looting a locked container
 	      and carrying an unlocking tool (from UnNetHackPlus)
