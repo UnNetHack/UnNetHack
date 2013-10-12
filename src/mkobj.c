@@ -589,7 +589,7 @@ boolean artif;
 		break;
 	case WAND_CLASS:
 		if (otmp->otyp == WAN_WISHING) {
-			otmp->spe = 2;	/* grants three wishes including wrest */
+			otmp->spe = (rnf(2,3) ? 1 : rnf(1,2) ? 0 : 2);
 			otmp->recharged = 1;
 		} else {
 			otmp->spe = rn1(5,
