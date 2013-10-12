@@ -36,14 +36,17 @@
 	  your own god sends a hostile monster, it will always be an Aleax (by L)
 	* Remove bonus for role special spells
 	* It is impossible to know both the speed and location of a quantum mechanic
-	* It is possible to get vampire blood out of a sink; additionally, the random potions
-	  out of a sink can have any BUC, depending on luck
+	* It is possible to get vampire blood out of a sink; additionally, the
+	  random potions out of a sink can have any BUC, depending on luck
 	* Eating a disenchanter corpse cures hallucination and has a chance of
 	  removing a random intrinsic, 20% chance if hallucinating, 50% otherwise
 	* Elven/vampiric payers do not regenerate health while touching iron/silver with
 	  bare skin (respectively), unless the iron/silver object is their quest artifact
 
-	* Item changes:
+	* New config option for customizing monster letter in UTF8graphics:
+	  - MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke
+
+	* item changes:
 	  - Autoidentify BUC of products from BUC identified item generators (from UnNetHackPlus)
 	  - Wearing fedora increases luck of archaeologists (from UnNetHackPlus)
 	  - Applying certain wands has a chance of creating a related trap
@@ -56,7 +59,7 @@
 	  - Reading a non-blessed scroll of punishment while confused summons a Punisher. BE CAREFUL
 	  - A horn of plenty has a *small* chance to produce potions of [vampire] blood
 	
-	* Artifact changes:
+	* artifact changes:
 	  - From SporkHack:
 	    - All the weapons below warn against and have 20% instakill chance 
 	      against their target monsters.
@@ -80,15 +83,15 @@
 	      quest artifact: a shield of reflection that grants fire resistance,
 	      ESP, half spell damage, and produces stinking clouds when invoked (by L)
 
-	* New config option for customizing monster letter in UTF8graphics:
-	  - MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke
+	* livelog: report bag of holding explosions
 
-	* Livelog: report bag of holding explosions
-
-	* New role: Convict class, based on the patch by Karl Garrison
+	* new role: Convict class, based on the patch by Karl Garrison
 
 	* removed monsters:
-	  - anti-matter vortex
+	  - anti-matter vortices
+
+	* replaced monsters:
+	  - gold dragons replaced with glowing dragons
 
 	* new monsters:
 	  - Sheol-specific monsters:
@@ -135,14 +138,13 @@
 	      of earth with a 50% chance of a second one
 	  - Elemental Planes each have a scroll related to their element
 	      somewhere on the level
-	  - Monster generation on the Oracle level is different from
-		  vanilla
+	  - Monster generation on the Oracle level is different from vanilla
 
 	* new levels:
 	  - Black market version with One-eyed Sam promoted to management
 	  - Special non-persistent level in the Ruins of Moria branch
 
-	* Options:
+	* options:
 	  - default of sortloot changed to 'loot'
 	  - Allow exact numbers in STATUSCOLOR settings (from NAO)
 	  - Permanent hallucination conduct option: perma_hallu
@@ -157,23 +159,23 @@
 		your inventory (from SLASH'EM 0.7)
 	    - nameempty -- Automatically #name wands known to be empty
 		
-	* Role differentiation:
+	* role differentiation:
 	  - Tourists get automatic typ identification for shop items
 	  - Healers can see how wounded monsters are (by L)
 	  - Knights get a weight bonus for body armor heavier than
 	      studded leather armor
 
-	* Skill changes:
+	* skill changes:
 	  - Galloping duration depends on riding skills (idea by Beolach,
 	      code by Pasi Kallinen)
 	  - Skill gain for spells is faster than skill gain for weapons
 	  - Riding skill is exercised more quickly, closer to vanilla
 
-	* Extended commands:
+	* extended commands:
 	  - #vanquished: Shows a list of all vanquished monsters
 	  - #tip: Tips over a container to empty it of its contents
 
-	* User interface improvements:
+	* user interface improvements:
 	  - HP notify, showing HP changes in the message area (from NAO)
 	  - Menus made aware of the maximum count of an item (by heinrich5991)
 	  - Message for some monster cancellation events

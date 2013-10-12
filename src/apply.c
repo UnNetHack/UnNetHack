@@ -3311,7 +3311,7 @@ doapply()
 		    pline("You don't want to get the pages even more soggy, do you?");
 		    break;
 		} else {
-		You("flip through the pages of the spellbook.");
+		    You("flip through the pages of the spellbook.");
 		    if (Blind) {
 			pline("The pages feel %s.", Hallucination ?
 				"freshly picked" : "rough and dry");
