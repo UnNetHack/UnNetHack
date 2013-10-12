@@ -3290,7 +3290,8 @@ doapply()
 		    if (!Blind && Hallucination) {
 			You("enjoy the animation in the margins.");
 		    } else if (Blind) {
-			pline("The pages feel %s.", Hallucination ? "freshly picked" : "rough and dry");
+			pline("The pages feel %s.", Hallucination ?
+				"freshly picked" : "rough and dry");
 		    /* This assumes that MAX_SPELL_STUDY is defined as 3 */
 		    } else if (obj->spestudied == 0) {
 		 	pline("The ink in this spellbook is fresh.");
@@ -3312,9 +3313,11 @@ doapply()
 		} else {
 		You("flip through the pages of the spellbook.");
 		    if (Blind) {
-			pline("The pages feel %s.", Hallucination ? "freshly picked" : "rough and dry");
+			pline("The pages feel %s.", Hallucination ?
+				"freshly picked" : "rough and dry");
 		    } else {
-			pline("This spellbook %s.", Hallucination ? "doesn't have much of a plot" : "has nothing written in it");
+			pline("This spellbook %s.", Hallucination ?
+				"doesn't have much of a plot" : "has nothing written in it");
 		    }
 		}
 		makeknown(obj->otyp);
@@ -3325,7 +3328,8 @@ doapply()
 		    break;
 		} else {
 		    You("flip through the pages of the spellbook.");
-		    You_hear("the pages make an unpleasant %s sound.", Hallucination ? "chuckling" : "rustling");
+		    You_hear("the pages make an unpleasant %s sound.",
+				Hallucination ? "chuckling" : "rustling");
 		}
 		break;
 	default:
