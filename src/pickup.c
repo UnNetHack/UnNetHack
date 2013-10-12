@@ -1823,7 +1823,7 @@ dotip()
 
     /* TODO: empty out other items, like potions? */
     if (!Is_container(cobj)) {
-        pline("That isn't a container.");
+	pline("That isn't a container.");
 	return 0;
     }
 
@@ -1836,9 +1836,9 @@ dotip()
     }
 
     if (cobj->otyp == BAG_OF_TRICKS) {
-    	bagotricks(cobj);
+	bagotricks(cobj);
     } else
-        dump_container(cobj, FALSE);
+	dump_container(cobj, FALSE);
     return 1;
 }
 
