@@ -465,10 +465,6 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	migrating_mons = restmonchn(fd, FALSE);
 	mread(fd, (genericptr_t) mvitals, sizeof(mvitals));
 
-	/* this comes after inventory has been loaded */
-	for(otmp = invent; otmp; otmp = otmp->nobj)
-		if(otmp->owornmask)
-			setworn(otmp, otmp->owornmask);
 	/* reset weapon so that player will get a reminder about "bashing"
 	   during next fight when bare-handed or wielding an unconventional
 	   item; for pick-axe, we aren't able to distinguish between having
@@ -722,6 +718,11 @@ register int fd;
 	gameDiskPrompt();
 #endif
 	max_rank_sz(); /* to recompute mrank_sz (botl.c) */
+
+	/* this comes after inventory has been loaded */
+	for(otmp = invent; otmp; otmp = otmp->nobj)
+		if(otmp->owornmask)
+			setworn(otmp, otmp->owornmask);
 	/* take care of iron ball & chain */
 	for(otmp = fobj; otmp; otmp = otmp->nobj)
 		if(otmp->owornmask)
