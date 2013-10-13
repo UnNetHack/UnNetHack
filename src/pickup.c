@@ -2671,47 +2671,45 @@ BOOLEAN_P destroy_after;
 
 	for (otmp = container->cobj; otmp; otmp = otmp2)
 	{
-		ret = 1;
-		otmp2 = otmp->nobj;
-		obj_extract_self(otmp);
-		container->owt = weight(container);
+	    ret = 1;
+	    otmp2 = otmp->nobj;
+	    obj_extract_self(otmp);
+	    container->owt = weight(container);
 
-		/* we do need to start the timer on these */
-		if (container->otyp == ICE_BOX && !age_is_relative(otmp)) {
-			otmp->age = monstermoves - otmp->age;
-			if (otmp->otyp == CORPSE) {
-				start_corpse_timeout(otmp);
-			}
+	    /* we do need to start the timer on these */
+	    if (container->otyp == ICE_BOX && !age_is_relative(otmp)) {
+		otmp->age = monstermoves - otmp->age;
+		if (otmp->otyp == CORPSE) {
+		    start_corpse_timeout(otmp);
 		}
-		if (destroy_after) {
-		    /* bag of holding explosions */
-		    place_object(otmp, u.ux, u.uy);
-		} else {
-		    if (!u.uswallow) {
-			if (!can_reach_floor()) {
-			    hitfloor(otmp);
-			} else {
-			    if (!IS_ALTAR(ltyp)) {
-				pline("%s spill%s %sto the %s.", Doname2(otmp),
-				    (otmp->quan == 1L) ? "s" : "",
-				    (IS_SINK(ltyp) || IS_LAVA(ltyp)
-				     || IS_SOFT(ltyp)) ? "in" : "on",
-				    IS_SINK(ltyp) ? "sink" : surface(u.ux,u.uy));
-			    }
-			    dropx(otmp);
-			}
-			/* tipping is too uncoordinated to get rings to hit the drain */
-			if ((otmp->oclass == RING_CLASS) && IS_SINK(ltyp))
-			    You("hear a%s clatter.",
-				    is_metallic(otmp) ? " metallic" : "");
+	    }
+
+	    if (destroy_after) {
+		/* bag of holding explosions */
+		place_object(otmp, u.ux, u.uy);
+	    } else {
+		if (!u.uswallow) {
+		    if (!can_reach_floor()) {
+			hitfloor(otmp);
 		    } else {
+			if (!IS_ALTAR(ltyp)) pline("%s spill%s %sto the %s.",
+			    Doname2(otmp), (otmp->otyp == LENSES || is_gloves(otmp)
+			    || is_boots(otmp) || otmp->quan != 1L) ? "" : "s",
+			    (IS_SINK(ltyp) || IS_LAVA(ltyp) || IS_SOFT(ltyp)) ?
+			    "in" : "on", IS_SINK(ltyp) ? "sink" : surface(u.ux,u.uy));
 			dropx(otmp);
 		    }
+		    /* tipping is too uncoordinated to get rings to hit the drain */
+		    if ((otmp->oclass == RING_CLASS) && IS_SINK(ltyp))
+			You("hear a%s clatter.", is_metallic(otmp) ? " metallic" : "");
+		} else {
+		    dropx(otmp);
 		}
+	    }
 
-		if (otmp->otyp == GOLD_PIECE) {
-			bot();	/* update character's gold piece count immediately */
-		}
+	    if (otmp->otyp == GOLD_PIECE) {
+		bot();	/* update character's gold piece count immediately */
+	    }
 	}
 
 	if (destroy_after) {
