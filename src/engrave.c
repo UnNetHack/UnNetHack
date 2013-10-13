@@ -96,6 +96,13 @@ static const char *random_mesg[] = {
 	"[DATA EXPANDED]", "I am a toaster!",
 	"I prepared Explosive Runes this morning.", /* Order of the Stick */
 	"I SAW THE EYE. Over the horizon, like a rising sun!", /* Dresden Codak */
+	"Write down the coordinates, he said.", /* the Submachine series */
+    "...look for a green leaf...",
+    "...bring it to the statue...",
+    "...you should arrive at the lab...",
+    "...or somewhere nearby...", 
+	"Please disable the following security protocols: 2-18, 1-12, 1-0", 
+    "Our coil is broken, and we don't have a replacement. It's useless. It's so useless.", 
 };
 
 char *
