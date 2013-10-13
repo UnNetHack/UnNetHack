@@ -210,8 +210,8 @@ const char *verb;
 		/* Reasonably bulky objects (arbitrary) splash when dropped.
 		 * If you're floating above the water even small things make noise.
 		 * Stuff dropped near fountains always misses */
-		if ((Blind || (Levitation || Flying)) && flags.soundok &&
-		    ((x == u.ux) && (y == u.uy))) {
+		if ((Blind || (Levitation || Flying || Wwalking)) &&
+		    flags.soundok && ((x == u.ux) && (y == u.uy))) {
 		    if (!Underwater) {
 			if (weight(obj) > 9) {
 				pline("Splash!");

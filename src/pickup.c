@@ -2694,8 +2694,8 @@ BOOLEAN_P destroy_after;
 			    if (!IS_ALTAR(ltyp)) {
 				pline("%s spill%s %sto the %s.", Doname2(otmp),
 				    (otmp->quan == 1L) ? "s" : "",
-				    (IS_SINK(ltyp) || IS_POOL(ltyp) ||
-				    IS_SWAMP(ltyp) || IS_LAVA(ltyp)) ? "in" : "on",
+				    (IS_SINK(ltyp) || IS_LAVA(ltyp)
+				     || IS_SOFT(ltyp)) ? "in" : "on",
 				    IS_SINK(ltyp) ? "sink" : surface(u.ux,u.uy));
 			    }
 			    dropx(otmp);
