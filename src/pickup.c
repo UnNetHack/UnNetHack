@@ -2649,6 +2649,8 @@ BOOLEAN_P destroy_after;
 {
 	struct obj* otmp,*otmp2;
 	int ret = 0;
+	schar ltyp;
+	ltyp = levl[u.ux][u.uy].typ;
 
 	/* sanity checks */
 	if (!container || !Is_container(container))
@@ -2686,11 +2688,22 @@ BOOLEAN_P destroy_after;
 		    place_object(otmp, u.ux, u.uy);
 		} else {
 		    if (!u.uswallow) {
+			if (!can_reach_floor()) {
+			    hitfloor(otmp);
+			} else {
+			    if (!IS_ALTAR(ltyp)) {
+				pline("%s spill%s %sto the %s.", Doname2(otmp),
+				    (otmp->quan == 1L) ? "s" : "",
+				    (IS_SINK(ltyp) || IS_POOL(ltyp) ||
+				    IS_SWAMP(ltyp) || IS_LAVA(ltyp)) ? "in" : "on",
+				    IS_SINK(ltyp) ? "sink" : surface(u.ux,u.uy));
+			    }
+			    dropx(otmp);
+			}
 			/* tipping is too uncoordinated to get rings to hit the drain */
-			if ((otmp->oclass == RING_CLASS) && IS_SINK(levl[u.ux][u.uy].typ))
-			    You("hear a%s clatter.", is_metallic(otmp) ? " metallic" : "");
-			if (!can_reach_floor()) hitfloor(otmp);
-			else dropx(otmp);
+			if ((otmp->oclass == RING_CLASS) && IS_SINK(ltyp))
+			    You("hear a%s clatter.",
+				    is_metallic(otmp) ? " metallic" : "");
 		    } else {
 			dropx(otmp);
 		    }

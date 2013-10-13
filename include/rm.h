@@ -106,6 +106,7 @@ enum {
 #define IS_FURNITURE(typ) ((typ) >= STAIRS && (typ) <= ALTAR)
 #define IS_AIR(typ)	((typ) == AIR || (typ) == CLOUD)
 #define IS_SOFT(typ)	((typ) == AIR || (typ) == CLOUD || IS_POOL(typ) || (typ) == BOG)
+#define IS_LAVA(typ)	((typ) == LAVAPOOL)
 
 /*
  * The screen symbols may be the default or defined at game startup time.
