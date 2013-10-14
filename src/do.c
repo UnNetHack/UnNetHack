@@ -528,9 +528,9 @@ register const char *word;
 			      word, obj->corpsenm ? " any of" : "",
 			      plur(obj->quan));
 		}
-		obj->corpsenm = 0;		/* reset */
-		obj->bknown = 1;		/* unambiguously cursed */
-		makeknown(obj->otyp);		/* unambiguously a loadstone */
+		obj->corpsenm = 0;	/* reset */
+		obj->bknown = 1;	/* unambiguously cursed */
+		makeknown(obj->otyp);	/* unambiguously a loadstone */
 		return(FALSE);
 	}
 	if (obj->otyp == LEASH && obj->leashmon != 0) {
