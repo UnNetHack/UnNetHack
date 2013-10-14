@@ -1782,7 +1782,7 @@ shopclutter()
 	    verbalize("Don't even think about cluttering my shop!");
 	} else {
 	    Strcpy(buf, "\"Please, ");
-	    (void) append_honorific(buf);
+	    append_honorific(buf);
 	    pline("%s; try not to create a mess.\"", buf);
 	}
 	return TRUE;

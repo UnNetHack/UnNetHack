@@ -88,7 +88,7 @@ static const char *random_mesg[] = {
 	"Love from the Doctor, 1969", /* Doctor Who */
 	"Do NOT approach the Dog Park", /* Welcome to Night Vale */
 	"L, do you know", "Gods of Death", "love apples?", /* Death Note */
-	"This engraving is false!", 
+	"This engraving is false!",
 	"The engraving you have just started reading is the engraving you have just finished reading", 
 	
 	/* From dNetHack */
@@ -97,12 +97,10 @@ static const char *random_mesg[] = {
 	"I prepared Explosive Runes this morning.", /* Order of the Stick */
 	"I SAW THE EYE. Over the horizon, like a rising sun!", /* Dresden Codak */
 	"Write down the coordinates, he said.", /* the Submachine series */
-    "...look for a green leaf...",
-    "...bring it to the statue...",
-    "...you should arrive at the lab...",
-    "...or somewhere nearby...", 
+	"...look for a green leaf...", "...bring it to the statue...",
+	"...you should arrive at the lab...", "...or somewhere nearby...", 
 	"Please disable the following security protocols: 2-18, 1-12, 1-0", 
-    "Our coil is broken, and we don't have a replacement. It's useless. It's so useless.", 
+	"Our coil is broken, and we don't have a replacement. It's useless. It's so useless.", 
 };
 
 char *
