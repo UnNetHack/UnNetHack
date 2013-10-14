@@ -1824,17 +1824,16 @@ dotip()
 
 		You("tip %s over.", the(xname(cobj)));
 
-		if (cobj->otyp == BAG_OF_TRICKS) {
+		if (cobj->otyp == BAG_OF_TRICKS && cobj->spe > 0) {
 		    bagotricks(cobj);	/* unleashing the full power is too cruel */ 
-		    return 1;
-		}
-
-		dump_container(cobj, FALSE);
-		if (cobj->olocked) {
-		    pline("%s to be locked.", Tobjnam(cobj, "seem"));
-		    return 0;
-		} else if (cobj->otrapped) {
-		    (void) chest_trap(cobj, HAND, FALSE);
+		} else {
+		    dump_container(cobj, FALSE);
+		    if (cobj->olocked) {
+			pline("%s to be locked.", Tobjnam(cobj, "seem"));
+			return 0;
+		    } else if (cobj->otrapped) {
+			(void) chest_trap(cobj, HAND, FALSE);
+		    }
 		}
 		return 1;
 	    }
@@ -1854,7 +1853,7 @@ tipinventory:
 
     You("tip %s over.", the(xname(cobj)));
 
-    if (cobj->otyp == BAG_OF_TRICKS) {
+    if (cobj->otyp == BAG_OF_TRICKS && cobj->spe > 0) {
 	bagotricks(cobj);
     } else {
 	dump_container(cobj, FALSE);
