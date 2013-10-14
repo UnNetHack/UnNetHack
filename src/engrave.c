@@ -75,6 +75,7 @@ static const char *random_mesg[] = {
 	"Thanks for playing UnNetHack.  As usual, you've been a real pantload!", /* Space Quest 4 death message, paraphrased */
 	"Colorless green ideas sleep furiously.", /* Noam Chomsky */
 	"Time flies like an arrow.", "Fruit flies like a banana.", /* linguistic humor */
+	"Buffalo buffalo Buffalo buffalo buffalo buffalo Buffalo buffalo.",
 	"All Your Base Are Belong To Us!", /* Zero Wing */
 	"Numa Numa", /* Internet Meme */
 	"I want to believe!", /* X-Files */
@@ -89,7 +90,9 @@ static const char *random_mesg[] = {
 	"Do NOT approach the Dog Park", /* Welcome to Night Vale */
 	"L, do you know", "Gods of Death", "love apples?", /* Death Note */
 	"This engraving is false!",
-	"The engraving you have just started reading is the engraving you have just finished reading", 
+	"The engraving you have just started reading is the engraving you have just finished reading",
+	"Elvis has left the dungeon.",
+	"For truth, justice, and the Yendorian way!",
 	
 	/* From dNetHack */
 	"[REDACTED]", "[DATA EXPUNGED]", "[DATA PLUNGED]", /* SCP Foundation */

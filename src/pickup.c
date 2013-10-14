@@ -1788,8 +1788,7 @@ shopclutter()
 	return TRUE;
     } else {
 	return FALSE;
-    }
-	
+    }	
 }
 
 int
