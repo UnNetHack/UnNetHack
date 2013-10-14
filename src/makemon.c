@@ -2025,7 +2025,9 @@ struct obj *bag;
     if (!bag || bag->otyp != BAG_OF_TRICKS) {
 	warning("bad bag o' tricks");
     } else if (bag->spe < 1) {
-		return use_container(bag, 1);
+	/* if lootable, reveal charges */
+	if (objects[bag->otyp].oc_name_known) bag->known = 1;
+	return use_container(bag, 1);
     } else {
 	
 	boolean gotone = TRUE;
