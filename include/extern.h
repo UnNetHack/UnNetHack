@@ -2003,6 +2003,7 @@ E long FDECL(contained_gold, (struct obj *));
 E void FDECL(picked_container, (struct obj *));
 E long FDECL(unpaid_cost, (struct obj *));
 E void FDECL(addtobill, (struct obj *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
+E void FDECL(append_honorific, (char *));
 E void FDECL(splitbill, (struct obj *,struct obj *));
 E void FDECL(subfrombill, (struct obj *,struct monst *));
 E long FDECL(stolen_value, (struct obj *,XCHAR_P,XCHAR_P,BOOLEAN_P,BOOLEAN_P));

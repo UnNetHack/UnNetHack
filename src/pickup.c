@@ -1772,6 +1772,26 @@ gotit:
     return (timepassed);
 }
 
+boolean
+shopclutter()
+{
+    /* try to be a civilized adventurer, will you? */
+    if (*u.ushops && shop_keeper(*u.ushops)) {
+	char buf[BUFSZ];
+	if (!(shop_keeper(*u.ushops))->mpeaceful) {
+	    verbalize("Don't even think about cluttering my shop!");
+	} else {
+	    Strcpy(buf, "\"Please, ");
+	    (void) append_honorific(buf);
+	    pline("%s; try not to create a mess.\"", buf);
+	}
+	return TRUE;
+    } else {
+	return FALSE;
+    }
+	
+}
+
 int
 dotip()
 {
@@ -1780,14 +1800,12 @@ dotip()
     coord cc;
     char qbuf[BUFSZ];
     const char tools[] = {TOOL_CLASS, 0};
+    cc.x = u.ux; cc.y = u.uy;
 
-    if (check_capacity((char *)0)) {
-	/* "Can't do that while carrying so much stuff." */
-	return 0;
-    }
+    /* "Can't do that while carrying so much stuff." */
+    if (check_capacity((char *)0)) return 0;
 
     if (Levitation || u.uswallow) goto tipinventory;
-    cc.x = u.ux; cc.y = u.uy;
 
     if (container_at(cc.x, cc.y, FALSE)) {
 	if (able_to_loot(cc.x, cc.y));
@@ -1802,6 +1820,8 @@ dotip()
 		c = ynq(qbuf);
 		if (c == 'q') return 0;
 		if (c == 'n') continue;
+
+		if (shopclutter()) return 0;
 
 		You("tip %s over.", the(xname(cobj)));
 
@@ -1830,6 +1850,8 @@ tipinventory:
 	pline("That isn't a container.");
 	return 0;
     }
+
+    if (shopclutter()) return 0;
 
     You("tip %s over.", the(xname(cobj)));
 
