@@ -1200,7 +1200,8 @@ int spell;
 		urole.spelarmr/2 : urole.spelarmr;
 	else if (uarmc && uarmc->otyp == ROBE)
 	    splcaster -= urole.spelarmr;
-	if (uarms) splcaster += urole.spelshld;
+	/* archeologists are not penalized for their quest artifact */
+	if (uarms && !is_quest_artifact(uarms)) splcaster += urole.spelshld;
 
 	if (uarmh && is_metallic(uarmh) && uarmh->otyp != HELM_OF_BRILLIANCE)
 		splcaster += uarmhbon;
@@ -1256,10 +1257,11 @@ int spell;
 	if (chance < 0) chance = 0;
 	if (chance > 120) chance = 120;
 
-	/* Wearing anything but a light shield makes it very awkward
-	 * to cast a spell.
+	/* Wearing anything but a light shield makes it very awkward to
+	 * cast a spell (unless an archeologist wearing quest artifact).
 	 */
-	if (uarms && weight(uarms) > (int) objects[SMALL_SHIELD].oc_weight) {
+	if (uarms && !is_quest_artifact(uarms) &&
+	    weight(uarms) > (int) objects[SMALL_SHIELD].oc_weight) {
 		chance /= 4;
 	}
 
