@@ -667,6 +667,8 @@ toofar:
 /*	Now, attack the player if possible - one attack set per monst	*/
 
 	if (!mtmp->mpeaceful ||
+	    /* Attacks work even when engulfed by tame monsters */
+	    (u.uswallow && mtmp == u.ustuck) ||
 	    (Conflict && !resist(mtmp, RING_CLASS, 0, 0))) {
 	    if(inrange && !noattacks(mdat) && u.uhp > 0 && !scared && tmp != 3)
 	    {
