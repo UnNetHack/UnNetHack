@@ -1646,7 +1646,7 @@ arti_invoke(obj)
 		    obj->age = 0;
 		    return 0;
 		}
-		if (!cansee(cc.x, cc.y) || distu(cc.x, cc.y) >= 32) {
+		if (!cansee(cc.x, cc.y) || distu(cc.x, cc.y) >= 64) {
 		    You("smell rotten eggs.");
 		    return 0;
 		}
