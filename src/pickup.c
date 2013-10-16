@@ -1792,6 +1792,37 @@ shopclutter()
 }
 
 int
+safetip(cobj)
+struct obj *cobj;
+{
+    if (shopclutter()) return 0;
+
+    You("tip %s over.", the(xname(cobj)));
+
+    if (cobj->otyp == BAG_OF_TRICKS && cobj->spe > 0) {
+	/* unleasing full power would be too cruel */
+	bagotricks(cobj);
+    } else {
+	dump_container(cobj, FALSE);
+	if (cobj->olocked) {
+	    pline("%s to be locked.", Tobjnam(cobj, "seem"));
+	    return 0;
+	} else if (cobj->otrapped) {
+	    (void) chest_trap(cobj, HAND, FALSE);
+	} else if (cobj->spe > 0) {
+	    if (cobj->spe == 1) {
+		observe_quantum_cat(cobj, FALSE);
+		/* call dump_container() again to dump corpse */
+		dump_container(cobj, FALSE);
+	    } else if (cobj->spe == 4) {
+		open_coffin(cobj, TRUE);
+	    }
+	}
+    }
+    return 1;
+}
+
+int
 dotip()
 {
     register struct obj *cobj, *nobj;
@@ -1820,22 +1851,7 @@ dotip()
 		if (c == 'q') return 0;
 		if (c == 'n') continue;
 
-		if (shopclutter()) return 0;
-
-		You("tip %s over.", the(xname(cobj)));
-
-		if (cobj->otyp == BAG_OF_TRICKS && cobj->spe > 0) {
-		    bagotricks(cobj);	/* unleashing the full power is too cruel */ 
-		} else {
-		    dump_container(cobj, FALSE);
-		    if (cobj->olocked) {
-			pline("%s to be locked.", Tobjnam(cobj, "seem"));
-			return 0;
-		    } else if (cobj->otrapped) {
-			(void) chest_trap(cobj, HAND, FALSE);
-		    }
-		}
-		return 1;
+		return safetip(cobj);
 	    }
 	}
     }
@@ -1849,22 +1865,7 @@ tipinventory:
 	return 0;
     }
 
-    if (shopclutter()) return 0;
-
-    You("tip %s over.", the(xname(cobj)));
-
-    if (cobj->otyp == BAG_OF_TRICKS && cobj->spe > 0) {
-	bagotricks(cobj);
-    } else {
-	dump_container(cobj, FALSE);
-	if (cobj->olocked) {
-	    pline("%s to be locked.", Tobjnam(cobj, "seem"));
-	    return 0;
-	} else if (cobj->otrapped) {
-	    (void) chest_trap(cobj, HAND, FALSE);
-	}
-    }
-    return 1;
+    return safetip(cobj);
 }
 
 /* loot_mon() returns amount of time passed.
