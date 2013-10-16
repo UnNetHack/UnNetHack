@@ -96,11 +96,6 @@ if test $host_os = mingw32; then
 fi
 
 
-dnl Disable GCC warning: "format not a string literal and no format arguments"
-if test "$GCC" = "yes"; then
-	AX_CHECK_COMPILER_FLAGS(-Wno-format-security, CFLAGS="$CFLAGS -Wno-format-security")
-fi
-
 dnl ------ Common subtypes
 case $host_os in
      *cygwin* )		AC_DEFINE(CYGWIN32,[],[Unix on win32]);;

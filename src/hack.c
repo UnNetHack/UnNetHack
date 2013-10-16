@@ -2203,7 +2203,7 @@ struct monst *mon;
 	    strcat(buf, nonliving(mon->data) ? "destroyed" : "dead");
 	} else {
 	    if (Hallucination) {
-		Sprintf(buf,hallu_adverb[rn2(SIZE(hallu_adverb))]);
+		Sprintf(buf, "%s", hallu_adverb[rn2(SIZE(hallu_adverb))]);
 		strcat(buf," ");
 	    }
 	    else if (mon->mhp <= mon->mhpmax / 4)

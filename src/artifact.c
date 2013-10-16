@@ -1642,7 +1642,7 @@ arti_invoke(obj)
 		You("may summon a stinking cloud.");
 		pline("Where do you want to center the cloud?");
 		if (getpos(&cc, TRUE, "the desired position") < 0) {
-		    pline(Never_mind);
+		    pline("%s", Never_mind);
 		    obj->age = 0;
 		    return 0;
 		}
