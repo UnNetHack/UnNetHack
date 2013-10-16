@@ -1795,21 +1795,25 @@ int
 safetip(cobj)
 struct obj *cobj;
 {
+    /* do not allow tipping in occupied shops */ 
     if (shopclutter()) return 0;
 
     You("tip %s over.", the(xname(cobj)));
 
     if (cobj->otyp == BAG_OF_TRICKS && cobj->spe > 0) {
-	/* unleasing full power would be too cruel */
+	/* unleashing the full power would be too cruel */
 	bagotricks(cobj);
     } else {
 	dump_container(cobj, FALSE);
 	if (cobj->olocked) {
+	    /* intentionally place this after dump_container() */
 	    pline("%s to be locked.", Tobjnam(cobj, "seem"));
 	    return 0;
 	} else if (cobj->otrapped) {
+	    /* no using #tip to avoid traps */
 	    (void) chest_trap(cobj, HAND, FALSE);
 	} else if (cobj->spe > 0) {
+	    /* behavior for quantum mechanic boxes and coffins */
 	    if (cobj->spe == 1) {
 		observe_quantum_cat(cobj, FALSE);
 		/* call dump_container() again to dump corpse */
