@@ -2726,6 +2726,8 @@ BOOLEAN_P destroy_after;
 		} else {
 		    dropx(otmp);
 		}
+		/* consider spilled objects deliberately dropped */
+		otmp->was_dropped = TRUE;
 	    }
 
 	    if (otmp->otyp == GOLD_PIECE) {
