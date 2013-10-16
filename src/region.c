@@ -958,7 +958,7 @@ genericptr_t p2;
 	    losehp(rnd(dam) + 5, "gas cloud", KILLED_BY_AN);
 	    return FALSE;
 	} else {
-	    You("cough!");
+	    /* You("cough!"); */
 	    return FALSE;
 	}
     } else {			/* A monster is inside the cloud */
