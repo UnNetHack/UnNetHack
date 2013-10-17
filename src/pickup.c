@@ -1849,6 +1849,8 @@ struct obj *cobj;
 /* Called to tip over a container. Ask for boxes at the
  * hero's current location unless the hero is unable to
  * reach any that could be there, or if there are none.
+ * Since tipping in shops is disallowed, act differently
+ * when confused or hallucinating in such a circumstance.
  */
 int
 dotip()
@@ -1864,6 +1866,38 @@ dotip()
 
     if (Underwater) {
 	pline("Water turbulence prevents you from tipping anything.");
+	return 0;
+    }
+
+    if (*u.ushops && shop_keeper(*u.ushops) && (Confusion || Hallucination)) {
+	if (uarmh && !cursed(uarmh) && rn2(3)) {
+	    You("tip your %s to %s.", xname(uarmh),
+		Hallucination ? the(rndmonnam()) :
+		shkname(shop_keeper(*u.ushops)));
+	} else {
+	    int gratuity;
+#ifndef GOLDOBJ
+	    if (u.ugold >= 5) {
+		gratuity = u.ugold/5;
+#else
+	    if (money_cnt(invent) >= 5) {
+		gratuity = money_cnt(invent)/5;
+#endif
+		You("tip %s for providing a pleasant shopping experience.",
+		    Hallucination ? the(rndmonnam()) :
+		    shkname(shop_keeper(*u.ushops)));
+#ifndef GOLDOBJ
+		u.ugold -= gratuity;
+		shop_keeper(*u.ushops)->mgold += gratuity;
+#else
+		money2mon(shop_keeper(*u.ushops), gratuity);
+#endif
+	    } else {
+		pline("Unfortunately, you do not have enough enough money to tip %s.",
+		    Hallucination ? the(rndmonnam()) :
+		    shkname(shop_keeper(*u.ushops)));
+	    }
+	}
 	return 0;
     }
 
