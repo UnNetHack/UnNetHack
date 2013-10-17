@@ -1877,11 +1877,11 @@ dotip()
 	} else {
 	    int gratuity;
 #ifndef GOLDOBJ
-	    if (u.ugold >= 5) {
-		gratuity = u.ugold/5;
+	    if (u.ugold >= 10){
+		gratuity = rnd(10);
 #else
-	    if (money_cnt(invent) >= 5) {
-		gratuity = money_cnt(invent)/5;
+	    if (money_cnt(invent) >= 10) {
+		gratuity = rnd(10);
 #endif
 		You("tip %s for providing a pleasant shopping experience.",
 		    Hallucination ? the(rndmonnam()) :
