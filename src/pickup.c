@@ -35,7 +35,7 @@ STATIC_DCL long FDECL(mbag_item_gone, (int,struct obj *));
 STATIC_DCL int FDECL(menu_loot, (int, struct obj *, BOOLEAN_P));
 STATIC_DCL int FDECL(in_or_out_menu, (const char *,struct obj *, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL int FDECL(container_at, (int, int, BOOLEAN_P));
-STATIC_DCL boolean FDECL(able_to_loot, (int, int));
+STATIC_DCL boolean FDECL(able_to_loot, (int, int, BOOLEAN_P));
 STATIC_DCL boolean FDECL(mon_beside, (int, int));
 STATIC_DCL int FDECL(dump_container, (struct obj*, BOOLEAN_P));
 STATIC_DCL void NDECL(del_sokoprize);
@@ -1538,30 +1538,40 @@ boolean countem;
 	return container_count;
 }
 
+/* If being called to check for the ability to tip a
+ * container, use slightly different pool/lava message,
+ * allow despite the lack of limbs or free hands, and
+ * do not bother mentioning anything if you cannot reach.
+ */
 STATIC_OVL boolean
-able_to_loot(x, y)
+able_to_loot(x, y, tip)
 int x, y;
+boolean tip;
 {
 	if (!can_reach_floor()) {
+	    if (!tip) {
 #ifdef STEED
 		if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
-			rider_cant_reach(); /* not skilled enough to reach */
+		    rider_cant_reach(); /* not skilled enough to reach */
 		else
 #endif
-			You("cannot reach the %s.", surface(x, y));
+		    You("cannot reach the %s.", surface(x, y));
+	    }
 		return FALSE;
 	} else if (is_pool(x, y) || is_lava(x, y)) {
 		/* at present, can't loot in water even when Underwater */
-		You("cannot loot things that are deep in the %s.",
-		    is_lava(x, y) ? "lava" : "water");
+		You("cannot %s things that are deep in the %s.",
+			tip ? "tip" : "loot", is_lava(x, y) ? "lava" : "water");
 		return FALSE;
-	} else if (nolimbs(youmonst.data)) {
+	} else if (!tip) {
+	    if (nolimbs(youmonst.data)) {
 		pline("Without limbs, you cannot loot anything.");
 		return FALSE;
-	} else if (!freehand()) {
+	    } else if (!freehand()) {
 		pline("Without a free %s, you cannot loot anything.",
 			body_part(HAND));
 		return FALSE;
+	    }
 	}
 	return TRUE;
 }
@@ -1611,7 +1621,7 @@ lootcont:
     if ((container_count = container_at(cc.x, cc.y, TRUE))) {
 	boolean any = FALSE;
 
-	if (!able_to_loot(cc.x, cc.y)) return 0;
+	if (!able_to_loot(cc.x, cc.y, FALSE)) return 0;
 	for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
 	    nobj = cobj->nexthere;
 
@@ -1791,32 +1801,38 @@ shopclutter()
     }	
 }
 
+/* Actually tip over and empty a container. This is not
+ * allowed inside of occupied shops, and bags of tricks
+ * with charges behave as though applied. Traps are still
+ * set off this way, and quantum mechanic boxes and
+ * vampires in coffins still work appropriately. (Note
+ * that dump_container() is called twice in the case of
+ * Schroedinger's Cat: once to empty the box, and again
+ * to dump the corpse should the cat's wavefunction be
+ * collapsed in an unfortunate manner.) The "seems to
+ * be locked" message comes after the potential item
+ * breakage which takes place in dump_container().
+ */
 int
-safetip(cobj)
+tip_container(cobj)
 struct obj *cobj;
 {
-    /* do not allow tipping in occupied shops */ 
     if (shopclutter()) return 0;
 
     You("tip %s over.", the(xname(cobj)));
 
     if (cobj->otyp == BAG_OF_TRICKS && cobj->spe > 0) {
-	/* unleashing the full power would be too cruel */
 	bagotricks(cobj);
     } else {
 	dump_container(cobj, FALSE);
 	if (cobj->olocked) {
-	    /* intentionally place this after dump_container() */
 	    pline("%s to be locked.", Tobjnam(cobj, "seem"));
 	    return 0;
 	} else if (cobj->otrapped) {
-	    /* no using #tip to avoid traps */
 	    (void) chest_trap(cobj, HAND, FALSE);
 	} else if (cobj->spe > 0) {
-	    /* behavior for quantum mechanic boxes and coffins */
 	    if (cobj->spe == 1) {
 		observe_quantum_cat(cobj, FALSE);
-		/* call dump_container() again to dump corpse */
 		dump_container(cobj, FALSE);
 	    } else if (cobj->spe == 4) {
 		open_coffin(cobj, TRUE);
@@ -1826,6 +1842,10 @@ struct obj *cobj;
     return 1;
 }
 
+/* Called to tip over a container. Ask for boxes at the
+ * hero's current location unless the hero is unable to
+ * reach any that could be there, or if there are none.
+ */
 int
 dotip()
 {
@@ -1836,13 +1856,11 @@ dotip()
     const char tools[] = {TOOL_CLASS, 0};
     cc.x = u.ux; cc.y = u.uy;
 
-    /* "Can't do that while carrying so much stuff." */
     if (check_capacity((char *)0)) return 0;
 
-    if (Levitation || u.uswallow) goto tipinventory;
-
-    if (container_at(cc.x, cc.y, FALSE)) {
-	if (able_to_loot(cc.x, cc.y));
+    if (!able_to_loot(cc.x, cc.y, TRUE)) {
+	goto tipinventory;
+    } else if (container_at(cc.x, cc.y, FALSE)) {
 	for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
 	    nobj = cobj->nexthere;
 
@@ -1855,11 +1873,12 @@ dotip()
 		if (c == 'q') return 0;
 		if (c == 'n') continue;
 
-		return safetip(cobj);
+		return tip_container(cobj);
 	    }
 	}
     }
-tipinventory:
+
+ tipinventory:
     cobj = getobj(tools, "empty");
     if(!cobj) return 0;
 
@@ -1869,7 +1888,7 @@ tipinventory:
 	return 0;
     }
 
-    return safetip(cobj);
+    return tip_container(cobj);
 }
 
 /* loot_mon() returns amount of time passed.
