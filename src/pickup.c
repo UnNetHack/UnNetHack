@@ -1862,6 +1862,11 @@ dotip()
 
     if (check_capacity((char *)0)) return 0;
 
+    if (Underwater) {
+	pline("Water turbulence prevents you from tipping anything.");
+	return 0;
+    }
+
     if (!able_to_loot(cc.x, cc.y, TRUE)) {
 	goto tipinventory;
     } else if (container_at(cc.x, cc.y, FALSE)) {
@@ -2746,8 +2751,8 @@ BOOLEAN_P destroy_after;
 			if (!IS_ALTAR(ltyp)) pline("%s spill%s %sto the %s.",
 			    Doname2(otmp), (otmp->otyp == LENSES || is_gloves(otmp)
 			    || is_boots(otmp) || otmp->quan != 1L) ? "" : "s",
-			    (IS_SINK(ltyp) || IS_LAVA(ltyp) || (IS_SOFT(ltyp) && !Underwater))
-			    ? "in" : "on", IS_SINK(ltyp) ? "sink" : surface(u.ux,u.uy));
+			    (IS_SINK(ltyp) || IS_LAVA(ltyp) || IS_SOFT(ltyp)) ?
+			    "in" : "on", IS_SINK(ltyp) ? "sink" : surface(u.ux,u.uy));
 			dropx(otmp);
 		    }
 		    /* tipping is too uncoordinated to get rings to hit the drain */
