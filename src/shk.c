@@ -61,8 +61,6 @@ STATIC_DCL void FDECL(add_one_tobill, (struct obj *, BOOLEAN_P));
 STATIC_DCL void FDECL(dropped_container, (struct obj *, struct monst *,
 				      BOOLEAN_P));
 STATIC_DCL void FDECL(add_to_billobjs, (struct obj *));
-STATIC_DCL void FDECL(bill_box_content, (struct obj *, BOOLEAN_P, BOOLEAN_P,
-				     struct monst *));
 static boolean FDECL(rob_shop, (struct monst *));
 
 /*
@@ -2337,11 +2335,10 @@ add_to_billobjs(obj)
 }
 
 /* recursive billing of objects within containers. */
-STATIC_OVL void
-bill_box_content(obj, ininv, dummy, shkp)
+void
+bill_box_content(obj, dummy)
 register struct obj *obj;
-register boolean ininv, dummy;
-register struct monst *shkp;
+register boolean dummy;
 {
 	register struct obj *otmp;
 
@@ -2352,7 +2349,7 @@ register struct monst *shkp;
 		if (!otmp->no_charge)
 		    add_one_tobill(otmp, dummy);
 		if (Has_contents(otmp))
-		    bill_box_content(otmp, ininv, dummy, shkp);
+		    bill_box_content(otmp, dummy);
 	}
 
 }
@@ -2447,7 +2444,7 @@ register boolean ininv, dummy, silent;
 	    }
 
 	    if(ltmp) add_one_tobill(obj, dummy);
-	    if(cltmp) bill_box_content(obj, ininv, dummy, shkp);
+	    if(cltmp) bill_box_content(obj, dummy);
 	    picked_container(obj); /* reset contained obj->no_charge */
 
 	    ltmp += cltmp;

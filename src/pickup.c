@@ -1786,12 +1786,13 @@ gotit:
     return (timepassed);
 }
 
-/* TODO: Allow tipping in shops, but add a fine for doing so. */
+#if 0 /* DEFERRED */
 boolean
 shopclutter()
 {
     /* try to be a civilized adventurer, will you? */
-    if (*u.ushops && shop_keeper(*u.ushops)) {
+    if (*u.ushops && shop_keeper(*u.ushops)
+		&& inhishop(shop_keeper(*u.ushops))) {
 	char buf[BUFSZ];
 	if (!(shop_keeper(*u.ushops))->mpeaceful) {
 	    verbalize("Don't even think about cluttering my shop!");
@@ -1805,9 +1806,9 @@ shopclutter()
 	return FALSE;
     }	
 }
+#endif
 
-/* Actually tip over and empty a container. This is not
- * allowed inside of occupied shops, and bags of tricks
+/* Actually tip over and empty a container. Bags of tricks
  * with charges behave as though applied. Traps are still
  * set off this way, and quantum mechanic boxes and
  * vampires in coffins still work appropriately. (Note
@@ -1822,14 +1823,14 @@ int
 tip_container(cobj)
 struct obj *cobj;
 {
-    if (shopclutter()) return 0;
-
     You("tip %s over.", the(xname(cobj)));
 
     if (cobj->otyp == BAG_OF_TRICKS && cobj->spe > 0) {
 	bagotricks(cobj);
     } else {
+	sellobj_state(SELL_DELIBERATE);
 	dump_container(cobj, FALSE);
+	sellobj_state(SELL_NORMAL);
 	if (cobj->olocked) {
 	    pline("%s to be locked.", Tobjnam(cobj, "seem"));
 	    return 0;
@@ -1838,7 +1839,9 @@ struct obj *cobj;
 	} else if (cobj->spe > 0) {
 	    if (cobj->spe == 1) {
 		observe_quantum_cat(cobj, FALSE);
+		sellobj_state(SELL_DELIBERATE);
 		dump_container(cobj, FALSE);
+		sellobj_state(SELL_NORMAL);
 	    } else if (cobj->spe == 4) {
 		open_coffin(cobj, TRUE);
 	    }
@@ -1857,6 +1860,7 @@ int
 dotip()
 {
     register struct obj *cobj, *nobj;
+    register struct monst *shkp;
     register int c = -1;
     coord cc;
     char qbuf[BUFSZ];
@@ -1870,11 +1874,11 @@ dotip()
 	return 0;
     }
 
-    if (*u.ushops && shop_keeper(*u.ushops) && (Confusion || Hallucination)) {
+    if (*u.ushops && (shkp = shop_keeper(*u.ushops)) &&
+	inhishop(shkp) && (Confusion || Hallucination)) {
 	if (uarmh && !cursed(uarmh) && rn2(3)) {
 	    You("tip your %s to %s.", xname(uarmh),
-		Hallucination ? the(rndmonnam()) :
-		shkname(shop_keeper(*u.ushops)));
+		Hallucination ? the(rndmonnam()) : shkname(shkp));
 	} else {
 #ifndef GOLDOBJ
 	    if (u.ugold >= 10) {
@@ -1883,18 +1887,16 @@ dotip()
 #endif
 		int gratuity = rnd(10);
 		You("tip %s for providing a pleasant shopping experience.",
-		    Hallucination ? the(rndmonnam()) :
-		    shkname(shop_keeper(*u.ushops)));
+		    Hallucination ? the(rndmonnam()) : shkname(shkp));
 #ifndef GOLDOBJ
 		u.ugold -= gratuity;
-		shop_keeper(*u.ushops)->mgold += gratuity;
+		shkp->mgold += gratuity;
 #else
-		money2mon(shop_keeper(*u.ushops), gratuity);
+		money2mon(shkp, gratuity);
 #endif
 	    } else {
 		pline("Unfortunately, you do not have enough enough money to tip %s.",
-		    Hallucination ? the(rndmonnam()) :
-		    shkname(shop_keeper(*u.ushops)));
+		    Hallucination ? the(rndmonnam()) : shkname(shkp));
 	    }
 	}
 	return 0;
@@ -2725,7 +2727,9 @@ boolean outokay, inokay;
 /* Dumps out a container, possibly as the prelude/result of an explosion.
  * destroy_after trashes the container afterwards; try not to use it :P
  *
- * Player is assumed to not be handling the contents directly.
+ * Assumption 1: Player is assumed to not be handling the contents directly.
+ * Assumption 2: !destroy_after == #tip command
+ * Assumption 3: #tip always occurs at the hero's location
  *
  * Returns 1 if at least one object was present, 0 if empty.
  */ 
@@ -2757,6 +2761,27 @@ BOOLEAN_P destroy_after;
 	    container_impact_dmg(container);
 	    return ret;
 	}
+
+        /* make sure floor container contents are billed properly when tipping */
+        if (!destroy_after) {
+            struct monst *shkp;
+
+            /* logic courtesy of pick_obj() */
+            if (container->where == OBJ_FLOOR &&
+                !u.uswallow &&
+                costly_spot(container->ox, container->oy) &&
+                /* logic courtesy of addtobill() */
+                *u.ushops &&
+                (shkp = shop_keeper(*u.ushops)) &&
+                inhishop(shkp)) {
+
+                /* logic courtesy of addtobill() */
+                long gltmp = contained_gold(container);
+                if (gltmp) costly_gold(container->ox, container->oy, gltmp);
+                bill_box_content(container, FALSE);
+                picked_container(container);
+            }
+        }
 
 	for (otmp = container->cobj; otmp; otmp = otmp2)
 	{
