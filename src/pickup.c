@@ -1538,10 +1538,14 @@ boolean countem;
 	return container_count;
 }
 
-/* If being called to check for the ability to tip a
- * container, use slightly different pool/lava message,
- * allow despite the lack of limbs or free hands, and
- * do not bother mentioning anything if you cannot reach.
+/* If called to check for the ability to tip a container,
+ * allow despite the lack of limbs or free hands, and do
+ * not bother mentioning anything if not possible. This
+ * difference in responses is because #loot can only be
+ * used on items on the ground or adjacent, while #tip can
+ * also be used on containers in the player's inventory.
+ * We don't want to add annoying messages between checking
+ * for tippability and bringing up the inventory prompt.
  */
 STATIC_OVL boolean
 able_to_loot(x, y, tip)
@@ -1560,8 +1564,8 @@ boolean tip;
 		return FALSE;
 	} else if (is_pool(x, y) || is_lava(x, y)) {
 		/* at present, can't loot in water even when Underwater */
-		You("cannot %s things that are deep in the %s.",
-			tip ? "tip" : "loot", is_lava(x, y) ? "lava" : "water");
+		if (!tip) You("cannot loot things that are deep in the %s.",
+				is_lava(x, y) ? "lava" : "water");
 		return FALSE;
 	} else if (!tip) {
 	    if (nolimbs(youmonst.data)) {
