@@ -1786,6 +1786,7 @@ gotit:
     return (timepassed);
 }
 
+/* TODO: Allow tipping in shops, but add a fine for doing so. */
 boolean
 shopclutter()
 {
@@ -1876,7 +1877,7 @@ dotip()
 		shkname(shop_keeper(*u.ushops)));
 	} else {
 #ifndef GOLDOBJ
-	    if (u.ugold >= 10){
+	    if (u.ugold >= 10) {
 #else
 	    if (money_cnt(invent) >= 10) {
 #endif
