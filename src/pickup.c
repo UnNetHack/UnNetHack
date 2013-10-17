@@ -2744,7 +2744,7 @@ BOOLEAN_P destroy_after;
 			if (!IS_ALTAR(ltyp)) pline("%s spill%s %sto the %s.",
 			    Doname2(otmp), (otmp->otyp == LENSES || is_gloves(otmp)
 			    || is_boots(otmp) || otmp->quan != 1L) ? "" : "s",
-			    (IS_SINK(ltyp) || IS_LAVA(ltyp) || IS_SOFT(ltyp)) ?
+			    (IS_SINK(ltyp) || IS_LAVA(ltyp) || (IS_SOFT(ltyp) && !Underwater)) ?
 			    "in" : "on", IS_SINK(ltyp) ? "sink" : surface(u.ux,u.uy));
 			dropx(otmp);
 		    }
