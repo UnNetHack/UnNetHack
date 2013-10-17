@@ -2705,7 +2705,9 @@ BOOLEAN_P destroy_after;
 	if (!container || !Is_container(container))
 	    return 0;
 
-	/* cursed bags of holding are generally difficult */
+	/* cursed bags of holding are supposed to be generally
+	   difficult, so when trying to tip them while cursed,
+	   make them literally become bags of "holding" only */
 	if (!destroy_after && Is_mbag(container) && container->cursed) {
 	    pline("%s reluctant to give up its contents.", Tobjnam(container, "seem"));
 	    return 0;
@@ -2744,8 +2746,8 @@ BOOLEAN_P destroy_after;
 			if (!IS_ALTAR(ltyp)) pline("%s spill%s %sto the %s.",
 			    Doname2(otmp), (otmp->otyp == LENSES || is_gloves(otmp)
 			    || is_boots(otmp) || otmp->quan != 1L) ? "" : "s",
-			    (IS_SINK(ltyp) || IS_LAVA(ltyp) || (IS_SOFT(ltyp) && !Underwater)) ?
-			    "in" : "on", IS_SINK(ltyp) ? "sink" : surface(u.ux,u.uy));
+			    (IS_SINK(ltyp) || IS_LAVA(ltyp) || (IS_SOFT(ltyp) && !Underwater))
+			    ? "in" : "on", IS_SINK(ltyp) ? "sink" : surface(u.ux,u.uy));
 			dropx(otmp);
 		    }
 		    /* tipping is too uncoordinated to get rings to hit the drain */

@@ -1469,13 +1469,20 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 	    if (retcode<2 && otmp->odrained && otmp->oeaten < drainlevel(otmp))
 	        otmp->oeaten = drainlevel(otmp);
 	} else if (!is_vampiric(youmonst.data)) {
-	    pline("%s%s %s!",
+	    /* special messages for certain corpses */
+	    if (is_rat(&mons[mnum]) && is_dwarf(youmonst.data)) {
+		pline("This %s is delicious!", food_xname(otmp, FALSE));
+	    } else if (is_longworm(&mons[mnum])) {
+		pline("This %s is spicy!", food_xname(otmp, FALSE));
+	    } else {
+		pline("%s%s %s!",
 		  !uniq ? "This " : !type_is_pname(&mons[mnum]) ? "The " : "",
 		  food_xname(otmp, FALSE),
 		  (vegan(&mons[mnum]) ?
 		   (!carnivorous(youmonst.data) && herbivorous(youmonst.data)) :
 		   (carnivorous(youmonst.data) && !herbivorous(youmonst.data)))
 		  ? "is delicious" : "tastes terrible");
+	    }
 	}
 
 	/* Eating slimy or oily corpses makes your fingers slippery.
