@@ -1875,14 +1875,12 @@ dotip()
 		Hallucination ? the(rndmonnam()) :
 		shkname(shop_keeper(*u.ushops)));
 	} else {
-	    int gratuity;
 #ifndef GOLDOBJ
 	    if (u.ugold >= 10){
-		gratuity = rnd(10);
 #else
 	    if (money_cnt(invent) >= 10) {
-		gratuity = rnd(10);
 #endif
+		int gratuity = rnd(10);
 		You("tip %s for providing a pleasant shopping experience.",
 		    Hallucination ? the(rndmonnam()) :
 		    shkname(shop_keeper(*u.ushops)));
