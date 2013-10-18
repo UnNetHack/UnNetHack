@@ -2790,7 +2790,7 @@ xchar x, y;
 
 		if(container) {
 			dropped_container(obj, shkp, FALSE);
-			if(!obj->unpaid && !saleitem)
+			if(!obj->unpaid)
 			    obj->no_charge = 1;
 			if(obj->unpaid || count_unpaid(obj->cobj))
 			    subfrombill(obj, shkp);
@@ -2951,7 +2951,7 @@ move_on:
 		 case 'a':  sell_response = 'y';
 		 case 'y':  if (container)
 				dropped_container(obj, shkp, TRUE);
-			    if (!obj->unpaid) obj->no_charge = 1;
+			    if (!obj->unpaid && !saleitem) obj->no_charge = 1;
 			    subfrombill(obj, shkp);
 			    pay(-offer, shkp);
 			    shk_names_obj(shkp, obj, (sell_how != SELL_NORMAL) ?
