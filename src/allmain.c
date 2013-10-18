@@ -138,42 +138,45 @@ can_regenerate()
     return 1;
 }
 
+FILE *flevelinfo;
+
+write_level_info()
+{
+	s_level *lev = Is_special(&u.uz);
+	if (lev) {
+		fprintf(flevelinfo, "%s:%d\n", lev->proto, depth(&u.uz));
+		//pline("%s:%d\n", lev->proto, depth(&u.uz));
+	}
+	//wiz_map();
+}
 
 void
 level_statistics(boolean up)
 {
-
-    //while (TRUE) {
-      //pline("%d %d\n", u.uz.dnum, u.uz.dlevel);
-      //goto_next_levels(&u.uz);
-      //pline("next");
-      //sleep(1);
-    //}
 	int dnum=0;
 	int dlevel=1;
 
-
-	pline("new call to level_statistics() dunlev(&u.uz) %d dunlevs_in_dungeon(&u.uz) %d\n", dunlev(&u.uz), dunlevs_in_dungeon(&u.uz));
-	pline("%d dunlev() %d\n", u.uz.dlevel, dunlev(&u.uz));
+	//pline("new call to level_statistics() dunlev(&u.uz) %d dunlevs_in_dungeon(&u.uz) %d\n", dunlev(&u.uz), dunlevs_in_dungeon(&u.uz));
+	//pline("%d dunlev() %d\n", u.uz.dlevel, dunlev(&u.uz));
 	int end_level = (up ? 1 : dunlevs_in_dungeon(&u.uz));
 	int start_level = (up ? dunlevs_in_dungeon(&u.uz) : 1);
 	while (u.uz.dlevel != end_level) {
 		d_level tolevel;
 		tolevel.dnum = u.uz.dnum;
 		tolevel.dlevel = u.uz.dlevel + (up ? -1 : 1);
-		pline("%d %d dunlev() %d\n", u.uz.dnum, u.uz.dlevel, dunlev(&u.uz));
+		//pline("%d %d dunlev() %d\n", u.uz.dnum, u.uz.dlevel, dunlev(&u.uz));
 
 		if ((u.uz.dlevel != start_level) && // ignore special stairs on level 1 of each branch
 		    (sstairs.sx > 0 && sstairs.sy > 0)) {
-			pline("sstairs 1 %d %d %d %d %d\n", u.uz.dnum, u.uz.dlevel, sstairs.sx, sstairs.sy, sstairs.up);
+			//pline("sstairs 1 %d %d %d %d %d\n", u.uz.dnum, u.uz.dlevel, sstairs.sx, sstairs.sy, sstairs.up);
 			boolean new_up = sstairs.up;
 			//if (sstairs.up != up) {
 				d_level slevel;
 				slevel.dnum = sstairs.tolev.dnum;
 				slevel.dlevel = sstairs.tolev.dlevel;
 				goto_level(&slevel, FALSE, FALSE, FALSE);
-				wiz_map();
-				pline("sstairs 2 %d %d\n", u.uz.dnum, u.uz.dlevel);
+				write_level_info();
+				//pline("sstairs 2 %d %d\n", u.uz.dnum, u.uz.dlevel);
 
 				level_statistics(new_up);
 			//}
@@ -186,7 +189,7 @@ level_statistics(boolean up)
 				if (ttrap->ttyp == MAGIC_PORTAL) break;
 			if (ttrap) {
 				goto_level(&ttrap->dst, FALSE, FALSE, FALSE);
-				wiz_map();
+				write_level_info();
 				// none of the branches reachable by portals are going up
 				level_statistics(FALSE);
 			}
@@ -194,12 +197,12 @@ level_statistics(boolean up)
 
 
 		goto_level(&tolevel, FALSE, FALSE, FALSE);
-		wiz_map();
+		write_level_info();
 	}
 
 	if (Is_stronghold(&u.uz)) {
 		goto_hell(FALSE, FALSE);
-		wiz_map();
+		write_level_info();
 		level_statistics(FALSE);
 	}
 }
@@ -271,7 +274,10 @@ boolean resuming;
     touch_whereis();
 #endif
 
+	flevelinfo = fopen("level_info.txt", "a");
 	level_statistics(FALSE);
+	fclose(flevelinfo);
+	done(QUIT);
 
     for(;;) {
         get_nh_event();
