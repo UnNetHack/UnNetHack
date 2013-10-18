@@ -1349,6 +1349,7 @@ boolean at_stairs, falling, portal;
     assign_level(&new_dlevel, newlevel);
 #endif
 
+#if 0
     /* Prevent the player from going past the first quest level unless
      * (s)he has been given the go-ahead by the leader.
      */
@@ -1356,6 +1357,7 @@ boolean at_stairs, falling, portal;
         pline("A mysterious force prevents you from descending.");
         return;
     }
+#endif
 
     if (on_level(newlevel, &u.uz)) return; /* this can happen */
 
@@ -1677,6 +1679,7 @@ boolean at_stairs, falling, portal;
     /* special levels can have a custom arrival message */
     deliver_splev_message();
 
+#if 0
     /* give room entrance message, if any */
     check_special_room(FALSE);
 
@@ -1798,6 +1801,7 @@ boolean at_stairs, falling, portal;
         (annotation = get_annotation(&u.uz))) {
         You("annotated this level: %s", annotation);
     }
+#endif
 
 #ifdef INSURANCE
     save_currentstate();
