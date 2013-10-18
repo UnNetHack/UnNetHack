@@ -2783,7 +2783,7 @@ xchar x, y;
 	offer = ltmp + cltmp;
 
 	/* get one case out of the way: nothing to sell, and no gold */
-	if(!isgold &&
+	if (!(isgold || cgold) &&
 	   ((offer + gltmp) == 0L || sell_how == SELL_DONTSELL)) {
 		register boolean unpaid = (obj->unpaid ||
 				  (container && count_unpaid(obj->cobj)));
@@ -2846,12 +2846,13 @@ xchar x, y;
 		    pline("%ld %s %s added to your credit.",
 				delta, currency(delta), delta > 1L ? "are" : "is");
 		}
-		if(offer) goto move_on;
-		else {
+		if (offer && sell_how != SELL_DONTSELL) {
+		    goto move_on;
+		} else {
 		    if(!isgold) {
 			if (container)
 			    dropped_container(obj, shkp, FALSE);
-			if (!obj->unpaid && !saleitem) obj->no_charge = 1;
+			if (!obj->unpaid) obj->no_charge = 1;
 			subfrombill(obj, shkp);
 		    }
 		    return;
@@ -2950,7 +2951,7 @@ move_on:
 		 case 'a':  sell_response = 'y';
 		 case 'y':  if (container)
 				dropped_container(obj, shkp, TRUE);
-			    if (!obj->unpaid && !saleitem) obj->no_charge = 1;
+			    if (!obj->unpaid) obj->no_charge = 1;
 			    subfrombill(obj, shkp);
 			    pay(-offer, shkp);
 			    shk_names_obj(shkp, obj, (sell_how != SELL_NORMAL) ?
