@@ -160,8 +160,8 @@ ROOM:"rndvault", unlit, random, random, random {
 LEVEL:"vlt-%04i"
 FLAGS:rndvault
 ROOM:"rndvault", random, random, random, random {
-  TERRAIN:floodfill(1,1), 'I'
   [10%]: TRAP: "cold", random
+  TERRAIN:floodfill(1,1), 'I'
 }
 
 
