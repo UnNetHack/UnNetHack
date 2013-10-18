@@ -140,11 +140,12 @@ can_regenerate()
 
 FILE *flevelinfo;
 
+void
 write_level_info()
 {
 	s_level *lev = Is_special(&u.uz);
 	if (lev) {
-		fprintf(flevelinfo, "%s:%d\n", lev->proto, depth(&u.uz));
+		fprintf(flevelinfo, "%s:%s:%d\n", encode_base32(level_info[0].seed), lev->proto, depth(&u.uz));
 		//pline("%s:%d\n", lev->proto, depth(&u.uz));
 	}
 	//wiz_map();
