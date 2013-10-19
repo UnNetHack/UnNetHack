@@ -154,9 +154,6 @@ write_level_info()
 void
 level_statistics(boolean up)
 {
-	int dnum=0;
-	int dlevel=1;
-
 	//pline("new call to level_statistics() dunlev(&u.uz) %d dunlevs_in_dungeon(&u.uz) %d\n", dunlev(&u.uz), dunlevs_in_dungeon(&u.uz));
 	//pline("%d dunlev() %d\n", u.uz.dlevel, dunlev(&u.uz));
 	int end_level = (up ? 1 : dunlevs_in_dungeon(&u.uz));
@@ -189,13 +186,15 @@ level_statistics(boolean up)
 			for (ttrap = ftrap; ttrap; ttrap = ttrap->ntrap)
 				if (ttrap->ttyp == MAGIC_PORTAL) break;
 			if (ttrap) {
-				goto_level(&ttrap->dst, FALSE, FALSE, FALSE);
+				d_level magicportal;
+				magicportal.dnum = ttrap->dst.dnum;
+				magicportal.dlevel = ttrap->dst.dlevel;
+				goto_level(&magicportal, FALSE, FALSE, FALSE);
 				write_level_info();
 				// none of the branches reachable by portals are going up
 				level_statistics(FALSE);
 			}
 		}
-
 
 		goto_level(&tolevel, FALSE, FALSE, FALSE);
 		write_level_info();
@@ -228,6 +227,7 @@ boolean resuming;
 #endif
     boolean can_regen = can_regenerate();
 
+#if LEVEL_STAT
     flags.moonphase = phase_of_the_moon();
     if(flags.moonphase == FULL_MOON) {
         You("are lucky!  Full moon tonight.");
@@ -247,6 +247,7 @@ boolean resuming;
         set_wear(); /* for side-effects of starting gear */
         (void) pickup(1);      /* autopickup at initial location */
     }
+#endif
 
     initrack();
 
@@ -864,6 +865,7 @@ newgame()
     }
 #endif /* CONVICT */
 
+#if LEVEL_STAT
     if (flags.legacy) {
         flush_screen(1);
 #ifdef CONVICT
@@ -876,6 +878,7 @@ newgame()
         com_pager(1);
 #endif /* CONVICT */
     }
+#endif
 
 #ifdef INSURANCE
     save_currentstate();
@@ -903,6 +906,8 @@ boolean new_game;   /* false => restoring an old game */
     boolean currentgend = Upolyd ? u.mfemale : flags.female;
     const char *role_name;
     char *annotation;
+
+    return; // LEVEL_STAT
 
     /*
      * The "welcome back" message always describes your innate form
