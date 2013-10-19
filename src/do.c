@@ -1676,10 +1676,10 @@ boolean at_stairs, falling, portal;
      *  Move all plines beyond the screen reset.
      */
 
+#if LEVEL_STAT
     /* special levels can have a custom arrival message */
     deliver_splev_message();
 
-#if LEVEL_STAT
     /* give room entrance message, if any */
     check_special_room(FALSE);
 
