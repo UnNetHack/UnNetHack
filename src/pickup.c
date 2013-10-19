@@ -510,6 +510,8 @@ int what; /* should be a long */
         return 0;
     }
 
+    return 0; // LEVEL_STAT
+
     if (what < 0)       /* pick N of something */
         count = -what;
     else            /* pick anything */

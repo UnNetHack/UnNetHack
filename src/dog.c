@@ -673,6 +673,7 @@ boolean pets_only;  /* true for ascension or final escape */
             /* monster won't follow if it hasn't noticed you yet */
             && !(mtmp->mstrategy & STRAT_WAITFORU)) {
             stay_behind = FALSE;
+#if LEVEL_STAT
             if (mtmp->mtrapped)
                 (void) mintrap(mtmp); /* try to escape */
             if (mtmp == u.usteed) {
@@ -700,6 +701,7 @@ boolean pets_only;  /* true for ascension or final escape */
                           Monnam(mtmp));
                 stay_behind = TRUE;
             }
+#endif
             if (stay_behind) {
                 if (mtmp->mleashed) {
                     pline("%s leash suddenly comes loose.",
