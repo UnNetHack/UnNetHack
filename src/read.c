@@ -1001,7 +1001,8 @@ register struct obj	*sobj;
 		}
 		/* elven armor vibrates warningly when enchanted beyond a limit */
 		special_armor = is_elven_armor(otmp) ||
-			(Role_if(PM_WIZARD) && otmp->otyp == CORNUTHAUM);
+			(Role_if(PM_WIZARD) && otmp->otyp == CORNUTHAUM) ||
+			(Role_if(PM_ARCHEOLOGIST) && otmp->otyp == FEDORA);
 		if (sobj->cursed)
 		    same_color =
 			(otmp->otyp == BLACK_DRAGON_SCALE_MAIL ||
