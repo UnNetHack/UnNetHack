@@ -144,6 +144,7 @@ init_level_base_voronoi(schar* vtyps, int numtyps, int numpoints)
     int patches, i1, i2;
     int winner_patch;
     patchcoord* points;
+    int i1_tries=0, i1_last_try=0;
 
     /* We use a voronoi diagram to put ice and solid ground on the level.
     * Maybe it looks interesting? I hope so. That's kind of the point. */
@@ -151,9 +152,21 @@ init_level_base_voronoi(schar* vtyps, int numtyps, int numpoints)
     patches = numpoints;
 
     for (i1 = 0; i1 < patches; ++i1) {
+        if (i1_last_try != i1) {
+            i1_tries = 0;
+            i1_last_try = i1;
+        }
         points[i1].c.x = rn1(COLNO-1, 1);
         points[i1].c.y = rn2(ROWNO);
         points[i1].typ = vtyps[rn2(numtyps)];
+
+        /* Continue loop when no point positioned far enough away from
+         * the other points has been found. We don't need a perfect
+         * match here as level properties are checked further up
+         * anyway. */
+        if (i1_tries++ > 1000) {
+            continue;
+        }
 
         /* Don't want them to be too close to other points... */
         for (i2 = 0; i2 < i1; ++i2) {
