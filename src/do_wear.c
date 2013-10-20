@@ -379,9 +379,11 @@ Cloak_on()
     if (cloak_desc != (char *)0 &&
         !strcmp(cloak_desc, "opera cloak") &&
         maybe_polyd(is_vampire(youmonst.data), Race_if(PM_VAMPIRE))) {
+#if LEVEL_STAT
         You("%s very impressive in your %s.", Blind ||
             (Invis && !See_invisible) ? "feel" : "look",
             OBJ_DESCR(objects[uarmc->otyp]));
+#endif
         ABON(A_CHA) += 1;
         flags.botl = 1;
     }
