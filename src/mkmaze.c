@@ -393,7 +393,7 @@ fixup_special()
 		if (sp) {
 			lev = sp->dlevel;
 		} else {
-			warning("Couldn't find_level \"%s\". This is an unresolved bug. Sorry.", r->rname.str);
+			warning("Couldn't find_level \"%s\".", r->rname.str);
 			break;
 		}
 	    }

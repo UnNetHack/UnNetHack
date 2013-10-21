@@ -178,7 +178,7 @@ LEVEL:		"tower1" "none" @ (1, 0)
 LEVEL:		"tower3" "none" @ (3, 0)
 
 ### The Dragon Caves ###
-DUNGEON:	"The Dragon Caves" "D" (4, 0) 75
+DUNGEON:	"The Dragon Caves" "D" (4, 0)
 ALIGNMENT:	chaotic
 DESCRIPTION:	mazelike
 LEVEL:		"drgnA" "D" @ (1, 0)
