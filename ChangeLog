@@ -230,6 +230,8 @@
 	  - Correct article when choking on named artifacts
 	  - Fix crash while restoring game when riding and wielding an
 	    artifact with SPFX_WARN or SPFX_WARN_S (e.g. Sting or Dragonbane)
+	  - Fix crash when teleporting onto a sink while equipping levitation
+	    boots. (found by Alex Smith)
 	  - C343-8: Plural of Nazgul is Nazgul, not Nazguls
 	  - C343-52: Worn or wielded objects destroyed by dipping into lit
 	             potions of oil are not handled properly; this can result
