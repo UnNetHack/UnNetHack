@@ -17,6 +17,7 @@
 /dat/quest_levs
 /dat/rumors
 /dat/spec_levs
+/dat/vaults.dat
 
 # /doc/
 /doc/Makefile
@@ -24,6 +25,7 @@
 
 # /include/
 /include/autoconf.h
+/include/autoconf_paths.h
 /include/date.h
 /include/dgn_comp.h
 /include/lev_comp.h
@@ -34,6 +36,7 @@
 
 # /src/
 /src/*.o
+/src/nhwin.a
 /src/unnethack
 /src/Makefile
 /src/Sysunix
@@ -41,6 +44,7 @@
 /src/hack.h-t
 /src/vis_tab.c
 /src/monstr.c
+/src/tile.c
 
 # /util/
 /util/*.o
@@ -54,3 +58,7 @@
 /util/lev_yacc.c
 /util/makedefs
 /util/recover
+/util/tilemap
+
+# /win/
+/win/*/*.o
