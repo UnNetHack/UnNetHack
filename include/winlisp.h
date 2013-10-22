@@ -32,10 +32,14 @@ E void FDECL(lisp_display_nhwindow, (winid, BOOLEAN_P));
 E void FDECL(lisp_destroy_nhwindow, (winid));
 E void FDECL(lisp_curs, (winid,int,int));
 E void FDECL(lisp_putstr, (winid, int, const char *));
+#ifdef FILE_AREAS
+E void FDECL(lisp_display_file, (const char *, const char *, BOOLEAN_P));
+#else
 E void FDECL(lisp_display_file, (const char *, BOOLEAN_P));
+#endif
 E void FDECL(lisp_start_menu, (winid));
-E void FDECL(lisp_add_menu, (winid,int,const ANY_P *,
-			CHAR_P, CHAR_P, int, const char *, BOOLEAN_P));
+E void FDECL(lisp_add_menu, (winid, int, int, const ANY_P *,
+			     CHAR_P, CHAR_P, int, const char *, BOOLEAN_P));
 E void FDECL(lisp_end_menu, (winid, const char *));
 E int FDECL(lisp_select_menu, (winid, int, MENU_ITEM_P **));
 E char FDECL(lisp_message_menu, (char, int, const char *mesg));

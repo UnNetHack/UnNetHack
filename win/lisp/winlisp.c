@@ -330,6 +330,7 @@ struct window_procs lisp_procs = {
     }						\
   while (0)
 #define lisp_int(i) printf("%d ",i)
+#define lisp_long(i) printf("%ld", i)
 #define lisp_coord(c) printf("'(%d,%d) ",c.x,c.y)
 #define lisp_boolean(i) printf("%s ",i?"t":"nil")
 #define lisp_string(s)					\
@@ -435,6 +436,7 @@ how_to_string (how)
     default:
       impossible ("Invalid how value %d", how);
     }
+  return NULL;
 }
 
 static int
@@ -608,7 +610,7 @@ lisp_player_selection ()
 				} else 
 					Strcpy(rolenamebuf, roles[i].name.m);
 			}	
-			add_menu(win, NO_GLYPH, &any, thisch,
+			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, thisch,
 			    0, ATR_NONE, an(rolenamebuf), MENU_UNSELECTED);
 			lastch = thisch;
 		    }
@@ -617,10 +619,10 @@ lisp_player_selection ()
 				    flags.initalign, PICK_RANDOM)+1;
 		if (any.a_int == 0)	/* must be non-zero */
 		    any.a_int = randrole()+1;
-		add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , '*', 0, ATR_NONE,
 				"Random", MENU_UNSELECTED);
 		any.a_int = i+1;	/* must be non-zero */
-		add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				"Quit", MENU_UNSELECTED);
 		Sprintf(pbuf, "Pick a role for your %s", plbuf);
 		end_menu(win, pbuf);
@@ -679,17 +681,17 @@ lisp_player_selection ()
 			if (ok_race(flags.initrole, i, flags.initgend,
 							flags.initalign)) {
 			    any.a_int = i+1;	/* must be non-zero */
-			    add_menu(win, NO_GLYPH, &any, races[i].noun[0],
+			    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, races[i].noun[0],
 				0, ATR_NONE, races[i].noun, MENU_UNSELECTED);
 			}
 		    any.a_int = pick_race(flags.initrole, flags.initgend,
 					flags.initalign, PICK_RANDOM)+1;
 		    if (any.a_int == 0)	/* must be non-zero */
 			any.a_int = randrace(flags.initrole)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , '*', 0, ATR_NONE,
 				    "Random", MENU_UNSELECTED);
 		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				    "Quit", MENU_UNSELECTED);
 		    Sprintf(pbuf, "Pick the race of your %s", plbuf);
 		    end_menu(win, pbuf);
@@ -749,17 +751,17 @@ lisp_player_selection ()
 			if (ok_gend(flags.initrole, flags.initrace, i,
 							    flags.initalign)) {
 			    any.a_int = i+1;
-			    add_menu(win, NO_GLYPH, &any, genders[i].adj[0],
+			    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, genders[i].adj[0],
 				0, ATR_NONE, genders[i].adj, MENU_UNSELECTED);
 			}
 		    any.a_int = pick_gend(flags.initrole, flags.initrace,
 					    flags.initalign, PICK_RANDOM)+1;
 		    if (any.a_int == 0)	/* must be non-zero */
 			any.a_int = randgend(flags.initrole, flags.initrace)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , '*', 0, ATR_NONE,
 				    "Random", MENU_UNSELECTED);
 		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				    "Quit", MENU_UNSELECTED);
 		    Sprintf(pbuf, "Pick the gender of your %s", plbuf);
 		    end_menu(win, pbuf);
@@ -818,17 +820,17 @@ lisp_player_selection ()
 			if (ok_align(flags.initrole, flags.initrace,
 							flags.initgend, i)) {
 			    any.a_int = i+1;
-			    add_menu(win, NO_GLYPH, &any, aligns[i].adj[0],
+			    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, aligns[i].adj[0],
 				 0, ATR_NONE, aligns[i].adj, MENU_UNSELECTED);
 			}
 		    any.a_int = pick_align(flags.initrole, flags.initrace,
 					    flags.initgend, PICK_RANDOM)+1;
 		    if (any.a_int == 0)	/* must be non-zero */
 			any.a_int = randalign(flags.initrole, flags.initrace)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , '*', 0, ATR_NONE,
 				    "Random", MENU_UNSELECTED);
 		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
+		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				    "Quit", MENU_UNSELECTED);
 		    Sprintf(pbuf, "Pick the alignment of your %s", plbuf);
 		    end_menu(win, pbuf);
@@ -945,9 +947,6 @@ generate_status_line ()
 	     lisp_string (plname););
   if (Upolyd) 
     {
-      char mbot[BUFSZ];
-      int k = 0;
-
       lisp_list (lisp_string ("rank");
 		 lisp_nil);
       lisp_list (lisp_string ("monster");
@@ -1004,7 +1003,7 @@ generate_status_line ()
 		 lisp_int (depth(&u.uz)););
 
   lisp_list (lisp_string ("$");
-	     lisp_int (u.ugold););
+	     lisp_long (u.ugold););
   lisp_list (lisp_string ("HP");
 	     lisp_int (hp););
   lisp_list (lisp_string ("HPmax");
@@ -1031,10 +1030,10 @@ generate_status_line ()
 	     lisp_int (u.ulevel););
 #ifdef EXP_ON_BOTL
   lisp_list (lisp_string ("XP");
-	     lisp_int (u.uexp););
+	     lisp_long (u.uexp););
 #endif
   lisp_list (lisp_string ("T");
-	     lisp_int (moves););
+	     lisp_long (moves););
 
   if (Confusion)
     lisp_list (lisp_string ("confusion"); lisp_string ("Conf"));
@@ -1123,9 +1122,10 @@ lisp_start_menu(window)
 }
 
 void
-lisp_add_menu(window, glyph, identifier, ch, gch, attr, str, preselected)
+lisp_add_menu(window, glyph, cnt, identifier, ch, gch, attr, str, preselected)
     winid window;		/* window to use, must be of type NHW_MENU */
     int glyph;			/* glyph to display with item (unused) */
+    int cnt;                    /* max number of times this item can be selected */
     const anything *identifier;	/* what to return if selected */
     char ch;			/* keyboard accelerator (0 = pick our own) */
     char gch;			/* group accelerator (0 = no group) */
@@ -1160,7 +1160,8 @@ lisp_add_menu(window, glyph, identifier, ch, gch, attr, str, preselected)
 	    lisp_int (gch);
 	    lisp_literal (attr_to_string (attr));
 	    lisp_string (str);
-	    preselected ? lisp_t : lisp_nil);
+	    preselected ? lisp_t : lisp_nil;
+	    lisp_int (cnt););
 }
 
 void
@@ -1202,7 +1203,6 @@ lisp_select_menu(window, how, menu_list)
   char *list;
   char *token;
   int size = 0;
-  int toggle;
 
   lisp_cmd ("select-menu",
 	    lisp_int (window);
@@ -1414,6 +1414,7 @@ lisp_nhgetch()
     {
       impossible ("Impossible command type: %d", cmd_index[cmd].type);
     }
+  return NULL;
 }
 
 int
@@ -1757,12 +1758,17 @@ lisp_get_ext_cmd()
 }
 
 void
-lisp_display_file(str, complain)
-     const char *str;
+#ifdef FILE_AREAS
+lisp_display_file(farea, fname, complain)
+     const char *farea;
+#else
+lisp_display_file(fname, complain)
+#endif
+     const char *fname;
      boolean complain;
 {
   lisp_cmd ("display-file",
-	    lisp_string (str);
+	    lisp_string (fname);
 	    complain ? lisp_t : lisp_nil);;
 }
 
@@ -1849,8 +1855,7 @@ lisp_print_glyph(window, x, y, glyph)
     xchar x, y;
     int glyph;
 {
-    int ch;
-    boolean reverse_on = FALSE;
+    glyph_t ch;
     int	    color;
     unsigned special;
 
@@ -1932,6 +1937,6 @@ lisp_outrip(window, how)
   lisp_cmd ("outrip",
 	    lisp_int (window);	    
 	    lisp_string (plname);
-	    lisp_int (u.ugold);
+	    lisp_long (u.ugold);
 	    lisp_string ("Died while trying to finish nethack-el."));
 }
