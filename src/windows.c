@@ -46,6 +46,10 @@ extern struct window_procs mswin_procs;
 #ifdef DUMMY_GRAPHICS
 extern struct window_procs dummy_procs;
 #endif
+#ifdef LISP_GRAPHICS
+#include "winlisp.h"
+extern struct window_procs lisp_procs;
+#endif
 
 STATIC_DCL void FDECL(def_raw_print, (const char *s));
 
@@ -92,6 +96,9 @@ struct win_choices {
 #endif
 #ifdef DUMMY_GRAPHICS
     { &dummy_procs, 0 },
+#endif
+#ifdef LISP_GRAPHICS
+    { &lisp_procs, win_lisp_init },
 #endif
     { 0, 0 }		/* must be last */
 };
