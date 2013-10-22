@@ -1895,7 +1895,7 @@ dotip()
 		money2mon(shkp, gratuity);
 #endif
 	    } else {
-		pline("Unfortunately, you do not have enough enough money to tip %s.",
+		pline("Unfortunately, you do not have enough money to tip %s.",
 		    Hallucination ? the(rndmonnam()) : shkname(shkp));
 	    }
 	}
