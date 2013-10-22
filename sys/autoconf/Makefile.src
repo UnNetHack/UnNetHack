@@ -122,6 +122,11 @@ WINMSCFLAGS=-I$(srcdir)/../win/win32 -D_WIN32_IE=0x0400
 WINDUMMYSRC = $(srcdir)/../win/dummy/dummy_graphics.c
 WINDUMMYOBJ = dummy_graphics.o
 
+# Files for Lisp interface
+WINLISPSRC = $(srcdir)/../win/lisp/winlisp.c
+WINLISPOBJ = winlisp.o nhwin.a
+WINLISPLIB =
+
 WINSRC = @WINSRC@
 WINOBJ = @WINOBJ@
 WINTTYLIB = @WINTTYLIB@
@@ -703,6 +708,10 @@ mhrip.o: $(srcdir)/../win/win32/mhrip.c ../win/win32/winMS.h \
 	$(CC) $(CFLAGS) $(WINMSCFLAGS) -c $(srcdir)/../win/win32/mhrip.c
 dummy_graphics.o: $(srcdir)/../win/dummy/dummy_graphics.c $(HACK_H)
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/dummy/dummy_graphics.c
+winlisp.o:	$(srcdir)/../win/lisp/winlisp.o $(HACK_H) \
+		$(srcdir)/../include/winlisp.h $(srcdir)/../include/func_tab.h \
+		$(srcdir)/../include/dlb.h $(srcdir)/../include/patchlevel.h
+	$(CC) $(CFLAGS) -c $(srcdir)/../win/lisp/winlisp.c
 tile.o: tile.c $(HACK_H)
 qt_win.o: $(srcdir)/../win/Qt/qt_win.cpp $(HACK_H) ../include/func_tab.h \
 		../include/dlb.h ../include/date.h ../include/patchlevel.h \
@@ -837,7 +846,7 @@ weapon.o: $(srcdir)/weapon.c $(HACK_H)
 were.o: $(srcdir)/were.c $(HACK_H)
 wield.o: $(srcdir)/wield.c $(HACK_H)
 windows.o: $(srcdir)/windows.c $(HACK_H) ../include/wingem.h \
-		../include/winGnome.h 
+		../include/winGnome.h ../include/winlisp.h
 wizard.o: $(srcdir)/wizard.c $(HACK_H) ../include/qtext.h ../include/epri.h
 worm.o: $(srcdir)/worm.c $(HACK_H) ../include/lev.h
 worn.o: $(srcdir)/worn.c $(HACK_H)

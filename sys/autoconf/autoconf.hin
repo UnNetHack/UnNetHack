@@ -170,6 +170,9 @@
 /* GNU Linux */
 #undef LINUX
 
+/* Lisp interface */
+#undef LISP_GRAPHICS
+
 /* Live game progress logfile */
 #undef LIVELOGFILE
 

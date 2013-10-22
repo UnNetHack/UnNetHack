@@ -27,6 +27,7 @@ dnl  ----- Window systems
 nethack_default_win=""
 # Note: Order is important: The last listed enabled port will be the default.
 NETHACK_WIN_ENABLE(dummy, no, [dummy graphics for unit tests])
+NETHACK_WIN_ENABLE(lisp, no, [enable playing UnNetHack in Emacs])
 NETHACK_WIN_ENABLE(curses, no, [use curses interface])
 NETHACK_WIN_ENABLE(tty, auto)
 NETHACK_WIN_ENABLE(x11, no)
@@ -270,6 +271,18 @@ if test "$enable_mswin_graphics" != "no"; then
     OPTIONS_FILE="guioptions"
     OPTIONS_FILES="$OPTIONS_FILES guioptions"
 fi
+
+LISPLIB=
+if test "$enable_lisp_graphics" != "no"; then
+    WINSRC="${WINSRC} \$(WINLISPSRC)"
+    WINOBJ="${WINOBJ} \$(WINLISPOBJ)"
+    WINLIB="${WINLIB} \$(WINLISPLIB)"
+    AC_DEFINE(LISP_GRAPHICS, [], [Lisp interface])
+
+    OPTIONS_FILE="options"
+    OPTIONS_FILES="options"
+fi
+AC_SUBST(LISPLIB)
 
 AC_SUBST(WINSRC)
 AC_SUBST(WINOBJ)
