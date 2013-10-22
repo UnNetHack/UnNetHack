@@ -1161,7 +1161,10 @@ lisp_add_menu(window, glyph, cnt, identifier, ch, gch, attr, str, preselected)
 	    lisp_literal (attr_to_string (attr));
 	    lisp_string (str);
 	    preselected ? lisp_t : lisp_nil;
-	    lisp_int (cnt););
+	    /* The max count feature is already implemented in
+	       nethack-el, so we can avoid emitting `cnt'.  */
+	    /* lisp_int (cnt); */
+	    );
 }
 
 void
