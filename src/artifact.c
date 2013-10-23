@@ -1166,7 +1166,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 					*dmgptr = (2 * mdef->mhp + FATAL_DAMAGE_MODIFIER);
 				} else if (youdefend && instakill) {
 					pline("The deadly spear pierces your heart!");
-					*dmgptr = (2 * Upolyd ? u.mh : u.uhp + FATAL_DAMAGE_MODIFIER);
+					*dmgptr = (2 * (Upolyd ? u.mh : u.uhp + FATAL_DAMAGE_MODIFIER));
 				} else {
 					return FALSE;
 				}
@@ -1175,7 +1175,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 				if (youattack && instakill) {
 					*dmgptr = (2 * mdef->mhp + FATAL_DAMAGE_MODIFIER);
 				} else if (youdefend && instakill) {
-					*dmgptr = (2 * Upolyd ? u.mh : u.uhp + FATAL_DAMAGE_MODIFIER);
+					*dmgptr = (2 * (Upolyd ? u.mh : u.uhp + FATAL_DAMAGE_MODIFIER));
 				} else {
 					return FALSE;
 				}
@@ -1188,7 +1188,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 					You("strike %s in the forehead!",mon_nam(mdef));
 					*dmgptr = (2 * mdef->mhp + FATAL_DAMAGE_MODIFIER);
 				} else if (youdefend && instakill) {
-					*dmgptr = (2 * Upolyd ? u.mh : u.uhp + FATAL_DAMAGE_MODIFIER);
+					*dmgptr = (2 * (Upolyd ? u.mh : u.uhp + FATAL_DAMAGE_MODIFIER));
 					You("are hit in the center of your forehead!");
 				}
 				return TRUE;
@@ -1198,7 +1198,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 					*dmgptr = (2 * mdef->mhp + FATAL_DAMAGE_MODIFIER);
 				} else if (youdefend && instakill) {
 					pline("The monstrous hammer crushes your skull!");
-					*dmgptr = (2 * Upolyd ? u.mh : u.uhp + FATAL_DAMAGE_MODIFIER);
+					*dmgptr = (2 * (Upolyd ? u.mh : u.uhp + FATAL_DAMAGE_MODIFIER));
 				} else {
 					return FALSE;
 				}
@@ -1209,7 +1209,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 					*dmgptr = (2 * mdef->mhp + FATAL_DAMAGE_MODIFIER);
 				} else if (youdefend && instakill) {
 					You("burst into flame as you are hit!");
-					*dmgptr = (2 * Upolyd ? u.mh : u.uhp + FATAL_DAMAGE_MODIFIER);
+					*dmgptr = (2 * (Upolyd ? u.mh : u.uhp + FATAL_DAMAGE_MODIFIER));
 				} else {
 					return FALSE;
 				}
@@ -1792,7 +1792,7 @@ struct monst *mon;
 	if (uwep && uwep->oartifact) {
 		const struct artifact *arti = get_artifact(uwep);
 		if (arti->spfx & SPFX_WARN_S &&
-		    arti->mtype && arti->mtype == mon->data->mlet) {
+		    arti->mtype && arti->mtype == (unsigned)mon->data->mlet) {
 			return TRUE;
 		}
 	}
