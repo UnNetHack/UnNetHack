@@ -3,6 +3,8 @@
 /Makefile
 /config.log
 /config.status
+/tags
+/TAGS
 
 # /dat/
 /dat/Makefile
