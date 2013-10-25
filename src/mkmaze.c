@@ -248,9 +248,11 @@ bad_location(x, y, lx, ly, hx, hy, lax)
 	     )));
 }
 
-/* pick a location in area (lx, ly, hx, hy) but not in (nlx, nly, nhx, nhy) */
-/* and place something (based on rtype) in that region */
-void
+/** Pick a location in area (lx, ly, hx, hy) but not in (nlx, nly, nhx, nhy)
+ * and place something (based on rtype) in that region.
+ *
+ * Returns TRUE if it could place the location. */
+int
 place_lregion(lx, ly, hx, hy, nlx, nly, nhx, nhy, rtype, lev)
     xchar	lx, ly, hx, hy;
     xchar	nlx, nly, nhx, nhy;
@@ -269,7 +271,7 @@ place_lregion(lx, ly, hx, hy, nlx, nly, nhx, nhy, rtype, lev)
 	 */
 	if(rtype == LR_BRANCH && nroom) {
 	    place_branch(Is_branchlev(&u.uz), 0, 0);
-	    return;
+	    return TRUE;
 	}
 
 	lx = 1; hx = COLNO-1;
@@ -283,7 +285,7 @@ place_lregion(lx, ly, hx, hy, nlx, nly, nhx, nhy, rtype, lev)
 	    x = rn1((hx - lx) + 1, lx);
 	    y = rn1((hy - ly) + 1, ly);
 	    if (put_lregion_here(x,y,nlx,nly,nhx,nhy,rtype,oneshot,lev, lax))
-		return;
+		return TRUE;
 	}
 
 	/* then a deterministic one */
@@ -291,10 +293,10 @@ place_lregion(lx, ly, hx, hy, nlx, nly, nhx, nhy, rtype, lev)
 	for (x = lx; x <= hx; x++)
 	    for (y = ly; y <= hy; y++)
 		if (put_lregion_here(x,y,nlx,nly,nhx,nhy,rtype,oneshot,lev, lax))
-		    return;
+		    return TRUE;
     } while (lax++ < 4);
 
-    impossible("Couldn't place lregion type %d!", rtype);
+    return FALSE;
 }
 
 STATIC_OVL boolean
@@ -402,11 +404,19 @@ fixup_special()
 	case LR_UPSTAIR:
 	case LR_DOWNSTAIR:
 	place_it:
-	    place_lregion(r->inarea.x1, r->inarea.y1,
+	    if (!place_lregion(r->inarea.x1, r->inarea.y1,
 			  r->inarea.x2, r->inarea.y2,
 			  r->delarea.x1, r->delarea.y1,
 			  r->delarea.x2, r->delarea.y2,
-			  r->rtype, &lev);
+			  r->rtype, &lev)) {
+		/* Couldn't place it in inarea, try again with
+		 * the whole level. */
+		place_lregion(0, 0, 0, 0,
+				r->delarea.x1, r->delarea.y1,
+				r->delarea.x2, r->delarea.y2,
+				r->rtype, &lev);
+	    }
+	    impossible("Couldn't place lregion type %d!", r->rtype);
 	    break;
 
 	case LR_TELE:
