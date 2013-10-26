@@ -411,12 +411,13 @@ fixup_special()
 			  r->rtype, &lev)) {
 		/* Couldn't place it in inarea, try again with
 		 * the whole level. */
-		place_lregion(0, 0, 0, 0,
+		if (!place_lregion(0, 0, 0, 0,
 				r->delarea.x1, r->delarea.y1,
 				r->delarea.x2, r->delarea.y2,
-				r->rtype, &lev);
+				r->rtype, &lev)) {
+			impossible("Couldn't place lregion type %d!", r->rtype);
+		}
 	    }
-	    impossible("Couldn't place lregion type %d!", r->rtype);
 	    break;
 
 	case LR_TELE:
