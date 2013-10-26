@@ -476,7 +476,7 @@ handle_varstring_method()
      long l = vd->var_type;
      long a = ((l & SPOVAR_ARRAY) == SPOVAR_ARRAY);
      long rval;
-     if (rval = method_defined(idx, l, &mth)) {
+     if ((rval = method_defined(idx, l, &mth))) {
           yylval.meth.varstr = strdup(yytext);
           yylval.meth.cfunc = mth;
           long rvala = ((rval & SPOVAR_ARRAY) == SPOVAR_ARRAY);

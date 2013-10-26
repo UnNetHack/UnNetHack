@@ -782,7 +782,7 @@ remove_boundary_syms()
     boolean has_bounds = FALSE;
     for (x = 0; x < COLNO-1; x++)
 	for (y = 0; y < ROWNO-1; y++)
-	    if ((levl[x][y].typ == CROSSWALL)) {
+	    if (levl[x][y].typ == CROSSWALL) {
 		has_bounds = TRUE;
 		break;
 	    }
@@ -3213,7 +3213,7 @@ spo_object(coder)
 		tmpobj.name.str = strdup(OV_s(parm));
 	    break;
 	case SP_O_V_CORPSENM:
-	    if ((OV_typ(parm) == SPOVAR_MONST)) {
+	    if (OV_typ(parm) == SPOVAR_MONST) {
 		char monclass = SP_MONST_CLASS(OV_i(parm));
 		int monid = SP_MONST_PM(OV_i(parm));
 		if (monid >= 0 && monid < NUMMONS) {
