@@ -145,6 +145,19 @@ strkitten(s, c)		/* append a character to a string (in place) */
     return s;
 }
 
+/* replace (in place) characters below space in the string */
+void
+sanitizestr(s)
+char *s;
+{
+    if (!s) return;
+    while (*s) {
+	if (*s <= ' ') *s = ' ';
+	s++;
+    }
+}
+
+
 char *
 s_suffix(s)		/* return a name converted to possessive */
     const char *s;

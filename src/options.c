@@ -1844,6 +1844,7 @@ boolean tinitial, tfrom_file;
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
 			nmcpy(catname, op, PL_PSIZ);
+		sanitizestr(catname);
 		return;
 	}
 
@@ -1852,6 +1853,7 @@ boolean tinitial, tfrom_file;
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
 			nmcpy(dogname, op, PL_PSIZ);
+		sanitizestr(dogname);
 		return;
 	}
 
@@ -1873,6 +1875,7 @@ boolean tinitial, tfrom_file;
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
 			nmcpy(horsename, op, PL_PSIZ);
+		sanitizestr(horsename);
 		return;
 	}
 
@@ -2222,6 +2225,7 @@ boolean tinitial, tfrom_file;
 		}
 goodfruit:
 		nmcpy(pl_fruit, op, PL_FSIZ);
+		sanitizestr(pl_fruit);
 	/* OBJ_NAME(objects[SLIME_MOLD]) won't work after initialization */
 		if (!*pl_fruit)
 		    nmcpy(pl_fruit, "slime mold", PL_FSIZ);
