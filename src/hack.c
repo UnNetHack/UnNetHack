@@ -1412,6 +1412,13 @@ domove()
                   nomul(0, 0);
                   return;
                 }
+		if (Strangled) {
+			pline("You stop exploring, because the pressure on your "
+			      "%s is a more pressing matter.", body_part(NECK));
+			flags.move = 0;
+			nomul(0, 0);
+			return;
+		}
 		u.tx = u.ux;
 		u.ty = u.uy;
 		if (!findtravelpath(unexplored)) {
