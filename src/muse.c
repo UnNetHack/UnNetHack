@@ -1971,6 +1971,10 @@ struct obj *obj;
 		return (boolean)(!obj->cursed && !is_unicorn(mon->data));
 	    if (typ == FROST_HORN || typ == FIRE_HORN)
 		return (obj->spe > 0);
+	    if ((typ == SKELETON_KEY) || (typ == CREDIT_CARD) || (typ == LOCK_PICK)) {
+		return (!nohands(mon->data) && !verysmall(mon->data) && !mindless(mon->data));
+	    }
+
 	    break;
 	case FOOD_CLASS:
 	    if (typ == CORPSE)
