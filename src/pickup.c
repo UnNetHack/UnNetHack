@@ -1786,7 +1786,6 @@ gotit:
     return (timepassed);
 }
 
-#if 0 /* DEFERRED */
 boolean
 shopclutter()
 {
@@ -1806,7 +1805,6 @@ shopclutter()
 	return FALSE;
     }	
 }
-#endif
 
 /* Actually tip over and empty a container. Bags of tricks
  * with charges behave as though applied. Traps are still
@@ -1823,6 +1821,10 @@ int
 tip_container(cobj)
 struct obj *cobj;
 {
+    /* tipping in shops is buggy, thus temporarily disallowed */
+    if (*u.ushops && shop_keeper(*u.ushops) &&
+	 inhishop(shop_keeper(*u.ushops))) return shopclutter();
+
     You("tip %s over.", the(xname(cobj)));
 
     if (cobj->otyp == BAG_OF_TRICKS && cobj->spe > 0) {
@@ -2762,6 +2764,7 @@ BOOLEAN_P destroy_after;
 	    return ret;
 	}
 
+#if 0 /* DEFERRED */
         /* make sure floor container contents are billed properly when tipping */
         if (!destroy_after) {
             struct monst *shkp;
@@ -2782,6 +2785,7 @@ BOOLEAN_P destroy_after;
                 picked_container(container);
             }
         }
+#endif
 
 	for (otmp = container->cobj; otmp; otmp = otmp2)
 	{
