@@ -2022,15 +2022,23 @@ const char *str;
 	} else if ((orefl = which_armor(mon, W_ARM)) &&
 		(orefl->otyp == CHROMATIC_DRAGON_SCALES || orefl->otyp == CHROMATIC_DRAGON_SCALE_MAIL ||
 		 orefl->otyp == SILVER_DRAGON_SCALES || orefl->otyp == SILVER_DRAGON_SCALE_MAIL)) {
-	    if (str)
+	    if (str) {
 		pline(str, s_suffix(mon_nam(mon)), "armor");
+		if (orefl->otyp == SILVER_DRAGON_SCALES)
+		    identify_dragon(orefl->otyp - GRAY_DRAGON_SCALES);
+		if (orefl->otyp == SILVER_DRAGON_SCALE_MAIL)
+		    identify_dragon(orefl->otyp - GRAY_DRAGON_SCALE_MAIL);
+	    }
 	    return TRUE;
 	} else if (mon->data == &mons[PM_SILVER_DRAGON] ||
 		mon->data == &mons[PM_TIAMAT] ||
 		mon->data == &mons[PM_CHROMATIC_DRAGON]) {
 	    /* Silver dragons only reflect when mature; babies do not */
-	    if (str)
+	    if (str) {
 		pline(str, s_suffix(mon_nam(mon)), "scales");
+		if (mon->data == &mons[PM_SILVER_DRAGON])
+		    identify_dragon(monsndx(mon->data) - PM_GRAY_DRAGON);
+	    }
 	    return TRUE;
 	}
 	return FALSE;
@@ -2059,13 +2067,18 @@ const char *fmt, *str;
 	    }
 	    return TRUE;
 	} else if (EReflecting & W_ARM) {
-	    if (fmt && str)
+	    if (fmt && str) {
 	    	pline(fmt, str, "armor");
+		makeknown(uarm->otyp);
+	    }
 	    return TRUE;
 	} else if ((youmonst.data == &mons[PM_SILVER_DRAGON]) ||
 		   (youmonst.data == &mons[PM_CHROMATIC_DRAGON])) {
-	    if (fmt && str)
+	    if (fmt && str) {
 	    	pline(fmt, str, "scales");
+		if (youmonst.data == &mons[PM_SILVER_DRAGON])
+		    identify_dragon(monsndx(youmonst.data) - PM_GRAY_DRAGON);
+	    }
 	    return TRUE;
 	}
 	return FALSE;
