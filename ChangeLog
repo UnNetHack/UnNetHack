@@ -42,6 +42,7 @@
 	  removing a random intrinsic, 20% chance if hallucinating, 50% otherwise
 	* Elven/vampiric payers do not regenerate health while touching iron/silver with
 	  bare skin (respectively), unless the iron/silver object is their quest artifact
+	* Let intelligent monsters pick up and use keys (idea by Christian Stegen)
 
 	* New config option for customizing monster letter in UTF8graphics:
 	  - MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke
