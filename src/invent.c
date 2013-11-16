@@ -2058,11 +2058,13 @@ struct obj *obj;
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'V', 0, ATR_NONE,
 				"Try to invoke a unique power of this object", MENU_UNSELECTED);
 	/* w: hold in hands, works on everything but with different
-	   advice text; not mentioned for things that are already
-	   wielded */
+	   advice text */
 	any.a_void = (genericptr_t)dowield;
-	if (obj == uwep) {}
-	else if (obj->oclass == WEAPON_CLASS || obj->otyp == PICK_AXE ||
+	if (obj == uwep) {
+		any.a_void = (genericptr_t)dounwield;
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'w', 0, ATR_NONE,
+				"Unwield your weapon", MENU_UNSELECTED);
+	} else if (obj->oclass == WEAPON_CLASS || obj->otyp == PICK_AXE ||
 			obj->otyp == UNICORN_HORN)
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'w', 0, ATR_NONE,
 				"Wield this as your weapon", MENU_UNSELECTED);

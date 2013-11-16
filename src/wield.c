@@ -52,6 +52,8 @@
 
 STATIC_DCL int FDECL(ready_weapon, (struct obj *));
 
+static int wield(boolean prompt_for_obj);
+
 /* used by will_weld() */
 /* probably should be renamed */
 #define erodeable_wep(optr)	((optr)->oclass == WEAPON_CLASS \
@@ -229,10 +231,26 @@ static NEARDATA const char ready_objs[] =
 static NEARDATA const char bullets[] =	/* (note: different from dothrow.c) */
 	{ ALL_CLASSES, ALLOW_NONE, GEM_CLASS, WEAPON_CLASS, 0 };
 
+/** Unwield a weapon. */
+int
+dounwield()
+{
+	return wield(FALSE);
+}
+
+/** Wield an item as weapon. */
 int
 dowield()
 {
-	register struct obj *wep, *oldwep;
+	return wield(TRUE);
+}
+
+/* Main method for wielding and unwielding. */
+static int
+wield(prompt_for_obj)
+boolean prompt_for_obj;
+{
+	register struct obj *wep=&zeroobj, *oldwep;
 	int result;
 
 	/* May we attempt this? */
@@ -243,18 +261,20 @@ dowield()
 	}
 
 	/* Prompt for a new weapon */
-	if (!(wep = getobj(wield_objs, "wield")))
-		/* Cancelled */
-		return (0);
-	else if (wep == uwep) {
-	    You("are already wielding that!");
-	    if (is_weptool(wep)) unweapon = FALSE;	/* [see setuwep()] */
-		return (0);
-	} else if (welded(uwep)) {
-		weldmsg(uwep);
-		/* previously interrupted armor removal mustn't be resumed */
-		reset_remarm();
-		return (0);
+	if (prompt_for_obj) {
+		if (!(wep = getobj(wield_objs, "wield")))
+			/* Cancelled */
+			return (0);
+		else if (wep == uwep) {
+			You("are already wielding that!");
+			if (is_weptool(wep)) unweapon = FALSE;	/* [see setuwep()] */
+			return (0);
+		} else if (welded(uwep)) {
+			weldmsg(uwep);
+			/* previously interrupted armor removal mustn't be resumed */
+			reset_remarm();
+			return (0);
+		}
 	}
 
 	/* Handle no object, or object in other slot */
