@@ -1985,20 +1985,27 @@ struct obj *obj;
 			inhishop(mtmp) && obj->unpaid)
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'p', 0, ATR_NONE,
 				"Buy this unpaid item", MENU_UNSELECTED);
-	/* P: Put on an accessory */
+	/* P: Put on an accessory, don't show if accessory is not worn.
+	 * Note: don't use (!is_worn(obj)) because is_worn will e.g. also
+	 * return true for a ring that is wielded. */
 	any.a_void = (genericptr_t)doputon;
-	if (obj->oclass == RING_CLASS || obj->otyp == MEAT_RING)
+	if ((obj->oclass == RING_CLASS || obj->otyp == MEAT_RING) &&
+			(!(obj->owornmask & W_RING))) {
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'P', 0, ATR_NONE,
 				"Put this ring on", MENU_UNSELECTED);
-	else if (obj->oclass == AMULET_CLASS)
+	} else if ((obj->oclass == AMULET_CLASS) &&
+			(!(obj->owornmask & W_AMUL))) {
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'P', 0, ATR_NONE,
 				"Put this amulet on", MENU_UNSELECTED);
-	else if (obj->otyp == TOWEL || obj->otyp == BLINDFOLD)
+	} else if ((obj->otyp == TOWEL || obj->otyp == BLINDFOLD) &&
+			(!(obj->owornmask & W_TOOL))) {
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'P', 0, ATR_NONE,
 				"Use this to blindfold yourself", MENU_UNSELECTED);
-	else if (obj->otyp == LENSES)
+	} else if ((obj->otyp == LENSES) &&
+			(!(obj->owornmask & W_TOOL))) {
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'P', 0, ATR_NONE,
 				"Put these lenses on", MENU_UNSELECTED);
+	}
 	/* q: drink item; strangely, this one seems to have no exceptions */
 	any.a_void = (genericptr_t)dodrink;
 	if (obj->oclass == POTION_CLASS)
