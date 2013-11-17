@@ -2048,6 +2048,17 @@ struct obj *obj;
 	if ((obj->owornmask & (W_RING | W_AMUL | W_TOOL)))
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'R', 0, ATR_NONE,
 				"Remove this accessory", MENU_UNSELECTED);
+	/* S: Sacrifice object */
+	any.a_void = (genericptr_t)dosacrifice;
+	if (IS_ALTAR(levl[u.ux][u.uy].typ) && !u.uswallow) {
+		if (obj->otyp == CORPSE)
+			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'S', 0, ATR_NONE,
+					"Sacrifice this corpse at this altar", MENU_UNSELECTED);
+		else if (obj->otyp == AMULET_OF_YENDOR ||
+				obj->otyp == FAKE_AMULET_OF_YENDOR)
+			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'S', 0, ATR_NONE,
+					"Sacrifice this amulet at this altar", MENU_UNSELECTED);
+	}
 	/* t: throw item, works on everything */
 	any.a_void = (genericptr_t)dothrow;
 	add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 't', 0, ATR_NONE,
@@ -2102,19 +2113,6 @@ struct obj *obj;
 	if (obj->oclass == WAND_CLASS)
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'z', 0, ATR_NONE,
 				"Zap this wand to release its magic", MENU_UNSELECTED);
-	/* S: Sacrifice object (should be > but that causes problems) */
-#if 0 /* TODO */
-	any.a_void = (genericptr_t)doterrain;
-	if (IS_ALTAR(levl[u.ux][u.uy].typ) && !u.uswallow) {
-		if (obj->otyp == CORPSE)
-			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'S', 0, ATR_NONE,
-					"Sacrifice this corpse at this altar", MENU_UNSELECTED);
-		else if (obj->otyp == AMULET_OF_YENDOR ||
-				obj->otyp == FAKE_AMULET_OF_YENDOR)
-			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'S', 0, ATR_NONE,
-					"Sacrifice this amulet at this altar", MENU_UNSELECTED);
-	}
-#endif
 
 	Sprintf(prompt, "Do what with %s?", the(cxname(obj)));
 	end_menu(win, prompt);
