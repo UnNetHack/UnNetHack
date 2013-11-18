@@ -71,11 +71,14 @@ char *argv[];
 	char *startdir = (char *)0;
 #endif
 
-
 	if (!dir) dir = getenv("NETHACKDIR");
 	if (!dir) dir = getenv("HACKDIR");
+#ifdef FILE_AREAS
+	if (!dir) dir = FILE_AREA_LEVL;
+#endif
 #if defined(EXEPATH)
 	if (!dir) dir = exepath(argv[0]);
+	if (!dir) printf("5 %s\n", dir);
 #endif
 	if (argc == 1 || (argc == 2 && !strcmp(argv[1], "-"))) {
 	    Fprintf(stderr,
@@ -177,11 +180,19 @@ int
 create_savefile()
 {
 	int fd;
+	char savefile[BUFSIZ];
+#ifdef FILE_AREAS
+	strcpy(savefile, FILE_AREA_SAVE);
+	strcat(savefile, "/");
+	strcat(savefile, savename);
+#else
+	strcpy(savefile, savename);
+#endif
 
 #if defined(MICRO) || defined(WIN32) || defined(MSDOS)
-	fd = open(savename, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK);
+	fd = open(savefile, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK);
 #else
-	fd = creat(savename, FCMASK);
+	fd = creat(savefile, FCMASK);
 #endif
 	return fd;
 }
