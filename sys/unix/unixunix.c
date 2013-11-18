@@ -8,6 +8,7 @@
 
 #include <errno.h>
 #include <sys/stat.h>
+#include <limits.h>
 #if defined(NO_FILE_LINKS) || defined(SUNOS4) || defined(POSIX_TYPES)
 #include <fcntl.h>
 #endif
@@ -186,22 +187,37 @@ getlock()
 		if(iflags.window_inited) {
 		    c = yn("There is already a game in progress under your name.  Destroy old game?");
 		} else {
-		    (void) printf("\nThere is already a game in progress under your name.");
-		    (void) printf("  Destroy old game? [yn] ");
+		    (void) printf("\nThere is already a game in progress under your name.\n\n");
+		    (void) printf("Destroy old game [y], try to recover it [r] or cancel [n]? ");
 		    (void) fflush(stdout);
 		    c = getchar();
 		    (void) putchar(c);
 		    (void) fflush(stdout);
 		    while (getchar() != '\n') ; /* eat rest of line and newline */
 		}
-		if(c == 'y' || c == 'Y')
+		if (c =='r') {
+			if (restore_savefile(lock, FILE_AREA_LEVL) == 0) {
+				const char *msg = "Automatical recovery of save file successful! "
+							"Press any key to continue ...\n";
+					fflush(stdout);
+				if (iflags.window_inited) {
+					pline(msg);
+				} else {
+					printf("\n\n");
+					printf(msg);
+					fflush(stdout);
+					c = getchar();
+				}
+				goto gotlock;
+			}
+		} else if (c == 'y' || c == 'Y') {
 			if(eraseoldlocks())
 				goto gotlock;
 			else {
 				unlock_file_area(HLOCK_AREA, HLOCK);
 				error("Couldn't destroy old game.");
 			}
-		else {
+		} else {
 			unlock_file_area(HLOCK_AREA, HLOCK);
 			error("%s", "");
 		}

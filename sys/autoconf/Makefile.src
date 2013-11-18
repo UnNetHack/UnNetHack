@@ -278,7 +278,7 @@ $(GAME):	$(SYSTEM)
 
 Sysunix:	$(HOBJ) Makefile
 	@echo "Loading ..."
-	@$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LIBS)
+	$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LIBS)
 	@touch Sysunix
 
 Syswinnt:	$(HOBJ) @EXTRA_UNSHARE@ Makefile
@@ -536,6 +536,8 @@ topl.o: $(srcdir)/../win/tty/topl.c $(HACK_H) ../include/tcap.h
 wintty.o: $(srcdir)/../win/tty/wintty.c $(HACK_H) ../include/dlb.h \
 		../include/patchlevel.h ../include/tcap.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/tty/wintty.c
+recover.o: $(srcdir)/../util/recover.c $(HACK_H)
+	$(CC) $(CFLAGS) -DNO_MAIN -c $(srcdir)/../util/recover.c
 cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/wincurs.h
 	$(CC) $(CFLAGS) -c ../win/curses/cursmain.c
 curswins.o: ../win/curses/curswins.c $(HACK_H) ../include/func_tab.h \
