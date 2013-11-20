@@ -97,8 +97,7 @@
 # define is_rat(ptr)		((ptr) == &mons[PM_SEWER_RAT] || \
 				 (ptr) == &mons[PM_GIANT_RAT] || \
 				 (ptr) == &mons[PM_RABID_RAT] || \
-				 (ptr) == &mons[PM_ENORMOUS_RAT] || \
-				 (ptr) == &mons[PM_RODENT_OF_UNUSUAL_SIZE])
+				 (ptr) == &mons[PM_ENORMOUS_RAT])
 #else /* CONVICT */
 # define is_rat(ptr)		((ptr) == &mons[PM_SEWER_RAT] || \
 				 (ptr) == &mons[PM_GIANT_RAT] || \
