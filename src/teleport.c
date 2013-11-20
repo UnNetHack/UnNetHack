@@ -1095,6 +1095,13 @@ register struct trap *ttmp;
 	    return;
 	}
 
+	/* Prevent the player from using non Quest portals. */
+	if (!In_endgame(&u.uz) && u.uhave.amulet &&
+			(!at_dgn_entrance("The Quest") && !In_quest(&u.uz))) {
+	    pline("The Amulet of Yendor drains the energy of this portal!");
+	    return;
+	}
+
 	target_level = ttmp->dst;
 	schedule_goto(&target_level, FALSE, FALSE, 1,
 		      "You feel dizzy for a moment, but the sensation passes.",
