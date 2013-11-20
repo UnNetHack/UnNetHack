@@ -16,7 +16,7 @@ LINK=$(CC)
 SYSUNIXSRC = $(srcdir)/../sys/share/ioctl.c $(srcdir)/../sys/share/unixtty.c \
 	$(srcdir)/../sys/unix/unixmain.c $(srcdir)/../sys/unix/unixunix.c \
 	$(srcdir)/../sys/unix/unixres.c
-SYSUNIXOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
+SYSUNIXOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o recover.o
 # for Microsoft Window systems
 SYSMSWINSRC = $(srcdir)/../sys/winnt/nttty.c $(srcdir)/../sys/winnt/winnt.c \
 	$(srcdir)/../sys/share/pcsys.c $(srcdir)/../sys/share/pcunix.c \

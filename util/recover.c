@@ -172,7 +172,7 @@ const char *directory;
 
 	set_levelfile_name(lev);
 	if (directory) {
-		snprintf(levelfile, "%s/%s", directory, lock);
+		snprintf(levelfile, BUFSIZ, "%s/%s", directory, lock);
 	} else {
 		strcpy(levelfile, lock);
 	}
@@ -190,7 +190,7 @@ create_savefile()
 	int fd;
 	char savefile[BUFSIZ];
 #ifdef FILE_AREAS
-	snprintf(savefile, "%s/%s", FILE_AREA_SAVE, savename);
+	snprintf(savefile, BUFSIZ, "%s/%s", FILE_AREA_SAVE, savename);
 #else
 	strcpy(savefile, savename);
 #endif
