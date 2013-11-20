@@ -447,7 +447,13 @@ struct obj *otmp;
     "CATS have all the answers.",
 #endif
     "Report bugs to <bhaak@gmx.net>.",
-    "Invitation: Visit the NetHack web site at http://www.nethack.org!"
+    "Invitation: Visit the NetHack web site at http://www.nethack.org!",
+
+    /* testimonials */
+    "Thanks for playing UnNetHack.  As usual, you've been a real pantload!", /* Space Quest 4 death message, paraphrased */
+    "Can't ascend NetHack? UnNetHack is the easy variant for people who suck!",
+    "\"UnNetHack is the continuation of NetHack by other means\" Rod von Yendowiz",
+    "\"UnNetHack is the last survivor of the NetHack Variant Wars\" Sigmund wan Leiber",
     };
 
     if (Blind) {
