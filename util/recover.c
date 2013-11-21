@@ -78,7 +78,6 @@ char *argv[];
 #endif
 #if defined(EXEPATH)
 	if (!dir) dir = exepath(argv[0]);
-	if (!dir) printf("5 %s\n", dir);
 #endif
 	if (argc == 1 || (argc == 2 && !strcmp(argv[1], "-"))) {
 	    Fprintf(stderr,
