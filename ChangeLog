@@ -40,7 +40,7 @@
 	  random potions out of a sink can have any BUC, depending on luck
 	* Eating a disenchanter corpse cures hallucination and has a chance of
 	  removing a random intrinsic, 20% chance if hallucinating, 50% otherwise
-	* Elven/vampiric payers do not regenerate health while touching iron/silver with
+	* Elven/vampiric players do not regenerate health while touching iron/silver with
 	  bare skin (respectively), unless the iron/silver object is their quest artifact
 	* Let intelligent monsters pick up and use keys (idea by Christian Stegen)
 
