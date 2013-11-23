@@ -27,9 +27,9 @@ extern char *viz_rmax;			/* max could see indices */
  *  couldsee()	- Returns true if the hero has a clear line of sight to
  *		  the location.
  */
-#define cansee(x,y)	(viz_array[y][x] & IN_SIGHT)
-#define couldsee(x,y)	(viz_array[y][x] & COULD_SEE)
-#define templit(x,y)	(viz_array[y][x] & TEMP_LIT)
+#define cansee(x,y)	(isok(x,y) && (viz_array[y][x] & IN_SIGHT))
+#define couldsee(x,y)	(isok(x,y) && (viz_array[y][x] & COULD_SEE))
+#define templit(x,y)	(isok(x,y) && (viz_array[y][x] & TEMP_LIT))
 
 /*
  *  The following assume the monster is not blind.
