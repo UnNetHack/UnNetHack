@@ -445,7 +445,11 @@ give_up:	/* Quit */
 		static const char *conduct_names[] = {
 			"ascet", "atheist", "blindfolded", "hallucinating",
 			"illiterate", "nudist", "pacifist", "vegan",
-			"vegetarian", "death dropless", "Heaven or Hell", "Quit"
+			"vegetarian", "death dropless",
+#ifdef ELBERETH
+			"Elberethless",
+#endif
+			"Heaven or Hell", "Quit"
 		};
 #define NUM_CONDUCT_OPTIONS SIZE(conduct_names)
 		static boolean *conduct_bools[NUM_CONDUCT_OPTIONS];
@@ -459,8 +463,14 @@ give_up:	/* Quit */
 		conduct_bools[7] = &flags.vegan;
 		conduct_bools[8] = &flags.vegetarian;
 		conduct_bools[9] = &flags.deathdropless;
+#ifdef ELBERETH
+		conduct_bools[10] = &flags.elberethignore;
+		conduct_bools[11] = &flags.heaven_or_hell;
+		conduct_bools[12] = 0;
+#else
 		conduct_bools[10] = &flags.heaven_or_hell;
 		conduct_bools[11] = 0;
+#endif
 		int conduct_settings[NUM_CONDUCT_OPTIONS];
 
 		winid tmpwin = create_nhwindow(NHW_MENU);
@@ -503,7 +513,12 @@ give_up:	/* Quit */
 		flags.vegan          = conduct_settings[7];
 		flags.vegetarian     = conduct_settings[8];
 		flags.deathdropless  = conduct_settings[9];
+#ifdef ELBERETH
+		flags.elberethignore = conduct_settings[10];
+		flags.heaven_or_hell = conduct_settings[11];
+#else
 		flags.heaven_or_hell = conduct_settings[10];
+#endif
 	}
 
 	(void)  root_plselection_prompt(plbuf, QBUFSZ - 1,

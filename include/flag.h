@@ -36,6 +36,9 @@ struct flag {
 	boolean  deathdropless;	/* disable monsters dropping random items */
 	boolean  debug;		/* in debugging mode */
 #define wizard	 flags.debug
+#ifdef ELBERETH
+	boolean  elberethignore; /* Elbereth ignores requests for protection */
+#endif
 	boolean  end_own;	/* list all own scores */
 	boolean  explore;	/* in exploration mode */
 	boolean  tutorial;      /* in tutorial mode */

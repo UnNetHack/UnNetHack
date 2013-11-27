@@ -150,6 +150,7 @@
 	  - Allow exact numbers in STATUSCOLOR settings (from NAO)
 	  - Permanent hallucination conduct option: perma_hallu
 	  - Disable death drops conduct option: deathdropless
+	  - Disable Elbereth conduct option: elberethignore
 	  - New options:
 	    - wound_message -- Healers can receive Crawl-style damage
 		messages indicating the current health of their foes

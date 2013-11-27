@@ -1613,12 +1613,16 @@ boolean want_disp;
 #ifdef ELBERETH_CONDUCT
 #ifdef ELBERETH
 	/* no point displaying the conduct if Elbereth doesn't do anything */
-	if (u.uconduct.elbereths) {
+	if (flags.elberethignore) {
+	    you_have_been("ignored by Elbereth");
+	} else {
+	    if (u.uconduct.elbereths) {
 		Sprintf(buf, "engraved Elbereth %ld time%s",
 			u.uconduct.elbereths, plur(u.uconduct.elbereths));
 		you_have_X(buf);
-	} else {
+	    } else {
 		you_have_never("engraved Elbereth");
+	    }
 	}
 #endif /* ELBERETH */
 #endif /* ELBERETH_CONDUCT */

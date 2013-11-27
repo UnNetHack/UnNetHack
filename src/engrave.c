@@ -537,7 +537,12 @@ doengrave()
 int
 doengrave_elbereth()
 {
-	return engrave("Elbereth", TRUE);
+	if (flags.elberethignore) {
+	    You_feel("Varda would not appreciate that.");
+	    return 1;
+	} else {
+	    return engrave("Elbereth", TRUE);
+	}
 }
 
 static

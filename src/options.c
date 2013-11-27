@@ -93,6 +93,9 @@ static struct Bool_Opt
 #else
 	{"DECgraphics", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+#ifdef ELBERETH
+	{"elberethignore", &flags.elberethignore, FALSE, SET_IN_FILE},
+#endif
 	{"eight_bit_tty", &iflags.wc_eight_bit_input, FALSE, SET_IN_FILE},	/*WC*/
 #if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
 	{"extmenu", &iflags.extmenu, FALSE, SET_IN_GAME},
