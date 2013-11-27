@@ -586,7 +586,7 @@ int thrown;
 		tmp = rnd(4);	/* bonus for martial arts */
 	    else
 		tmp = rnd(2);
-	    valid_weapon_attack = (tmp > 1);
+	    valid_weapon_attack = (tmp > 0);
 	    /* blessed gloves give bonuses when fighting 'bare-handed' */
 	    if (uarmg && uarmg->blessed && (is_undead(mdat) || is_demon(mdat)))
 		tmp += rnd(4);
@@ -707,8 +707,8 @@ int thrown;
 		} else {
 		    tmp = dmgval(obj, mon);
 		    /* a minimal hit doesn't exercise proficiency */
-		    valid_weapon_attack = (tmp > 1);
-		    if (!valid_weapon_attack || mon == u.ustuck || u.twoweap) {
+		    valid_weapon_attack = (tmp > 0);
+		    if (tmp <= 1 || mon == u.ustuck || u.twoweap) {
 			;	/* no special bonuses */
 		    } else if (mon->mflee && Role_if(PM_ROGUE) && !Upolyd) {
 			You("strike %s from behind!", mon_nam(mon));
