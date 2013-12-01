@@ -49,7 +49,9 @@ extern int NDECL(dothrow); /**/
 extern int NDECL(doeat); /**/
 extern int NDECL(done2); /**/
 extern int NDECL(doengrave); /**/
+#ifdef ELBERETH
 extern int NDECL(doengrave_elbereth); /**/
+#endif
 extern int NDECL(dopickup); /**/
 extern int NDECL(ddoinv); /**/
 extern int NDECL(dotypeinv); /**/
@@ -1668,7 +1670,9 @@ boolean want_disp;
 
 static const struct func_tab cmdlist[] = {
 	{C('d'), FALSE, dokick, NULL}, /* "D" is for door!...?  Msg is in dokick.c */
+#ifdef ELBERETH
 	{C('e'), TRUE, doengrave_elbereth, NULL},
+#endif
 #ifdef WIZARD
 	{C('f'), TRUE, wiz_map, NULL},
 	{C('g'), TRUE, wiz_genesis, NULL},

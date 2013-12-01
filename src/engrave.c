@@ -534,6 +534,8 @@ doengrave()
 {
 	return engrave(NULL, FALSE);
 }
+
+#ifdef ELBERETH
 int
 doengrave_elbereth()
 {
@@ -544,6 +546,7 @@ doengrave_elbereth()
 	    return engrave("Elbereth", TRUE);
 	}
 }
+#endif
 
 static
 int
