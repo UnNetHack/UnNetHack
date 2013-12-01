@@ -835,6 +835,11 @@ register const char *let,*word;
 	boolean prezero = FALSE;
 	long dummymask;
 
+	/* return the inventory menu item if selected */
+	if (otmp = getnextgetobj()) {
+		return otmp;
+	}
+
 	if(nextgetobj) return nextgetobj;
 
 	if(*let == ALLOW_COUNT) let++, allowcnt = 1;
