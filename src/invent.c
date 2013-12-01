@@ -840,8 +840,6 @@ register const char *let,*word;
 		return otmp;
 	}
 
-	if(nextgetobj) return nextgetobj;
-
 	if(*let == ALLOW_COUNT) let++, allowcnt = 1;
 
 	if(*let == COIN_CLASS) let++, usegold = TRUE
