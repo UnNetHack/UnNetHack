@@ -35,6 +35,8 @@ REGION:(00,00,74,20),lit,"ordinary"
 # Non diggable walls
 NON_DIGGABLE:(00,00,74,20)
 NON_PASSWALL:(00,00,74,20)
+# Branch location
+BRANCH:(00,04,74,16),(0,0,0,0)
 # Doors
 DOOR:locked,(04,03)
 DOOR:locked,(10,03)
