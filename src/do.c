@@ -1348,7 +1348,7 @@ boolean at_stairs, falling, portal;
 				LR_DOWNTELE, (d_level *) 0);
 	    if (falling) {
 		if (Punished) ballfall();
-		selftouch("Falling, you");
+		if (!Flying) selftouch("Falling, you");
 	    }
 	}
 
