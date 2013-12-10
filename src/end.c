@@ -251,7 +251,9 @@ register struct monst *mtmp;
 	    Strcat(buf, ", while helpless");
 	}
 	killer = buf;
-	if (mtmp->data->mlet == S_WRAITH)
+	if (mtmp->data ==&mons[PM_NAZGUL])
+		u.ugrave_arise = PM_BARROW_WIGHT;
+	else if (mtmp->data->mlet == S_WRAITH)
 		u.ugrave_arise = PM_WRAITH;
 	else if (mtmp->data->mlet == S_MUMMY && urace.mummynum != NON_PM)
 		u.ugrave_arise = urace.mummynum;
