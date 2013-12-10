@@ -541,7 +541,7 @@ doengrave_elbereth()
 {
 	if (flags.elberethignore) {
 	    You_feel("Varda would not appreciate that.");
-	    return 1;
+	    return 0;
 	} else {
 	    return engrave("Elbereth", TRUE);
 	}
