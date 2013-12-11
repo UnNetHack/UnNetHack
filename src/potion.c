@@ -192,7 +192,7 @@ boolean talk;
 	    }
 	} else if (old && !xtime) {
 	    /* clearing temporary blindness without toggling blindness */
-	    if (talk) {
+	    if (talk && !u.incloud) {
 		if (!haseyes(youmonst.data)) {
 		    strange_feeling((struct obj *)0, (char *)0);
 		} else if (Blindfolded) {
