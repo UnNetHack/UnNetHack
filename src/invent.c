@@ -836,7 +836,7 @@ register const char *let,*word;
 	long dummymask;
 
 	/* return the inventory menu item if selected */
-	if (otmp = getnextgetobj()) {
+	if ((otmp = getnextgetobj())) {
 		return otmp;
 	}
 
