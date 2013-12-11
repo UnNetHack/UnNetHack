@@ -188,9 +188,7 @@ boolean talk;
 		if (Hallucination)
 		    pline("Far out!  Everything is all cosmic again!");
 		else
-		    if (!(xtime == 1L)){            /* Possible Bugfix? */
-			You("can see again.");
-			}
+		    You("can see again.");
 	    }
 	} else if (old && !xtime) {
 	    /* clearing temporary blindness without toggling blindness */
