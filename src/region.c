@@ -947,6 +947,7 @@ genericptr_t p2;
     reg = (NhRegion *) p1;
     dam = (size_t) reg->arg;
     if (p2 == NULL) {		/* This means *YOU* Bozo! */
+	u.incloud = TRUE;
 	if (nonliving(youmonst.data) || Breathless)
 	    return FALSE;
 	if (!Blind)

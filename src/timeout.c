@@ -336,6 +336,7 @@ nh_timeout()
 		case BLINDED:
 			Blinded = 1;
 			make_blinded(0L, TRUE);
+			u.incloud = FALSE;	/* stinking cloud boolean */
 			stop_occupation();
 			break;
 		case INVIS:

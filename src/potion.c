@@ -184,7 +184,7 @@ boolean talk;
 	if (u.usleep) talk = FALSE;
 
 	if (can_see_now && !u_could_see) {	/* regaining sight */
-	    if (talk) {
+	    if (talk && !u.incloud) {
 		if (Hallucination)
 		    pline("Far out!  Everything is all cosmic again!");
 		else

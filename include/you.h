@@ -447,6 +447,7 @@ struct you {
 	xchar	skill_record[P_SKILL_LIMIT];	/* skill advancements */
 	struct skills weapon_skills[P_NUM_SKILLS];
 	boolean twoweap;		/* KMH -- Using two-weapon combat */
+	boolean incloud;		/* for blindness messages in stinking clouds */
 
 };	/* end of `struct you' */
 
