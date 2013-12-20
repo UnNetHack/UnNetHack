@@ -43,6 +43,8 @@
 	* Elven/vampiric players do not regenerate health while touching iron/silver with
 	  bare skin (respectively), unless the iron/silver object is their quest artifact
 	* Let intelligent monsters pick up and use keys (idea by Christian Stegen)
+	* Players killed by a Nazgul will arise as a Barrow Wight in bones files (a slight 
+	  change from the original mythology, we know)
 
 	* New config option for customizing monster letter in UTF8graphics:
 	  - MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke
@@ -221,6 +223,7 @@
 	    lighting shops
 	  - Blasts or potions of acid destroy iron bars
 	  - Metallivores can eat through iron bars
+	  - Fix extraneous/erroneous "You can see again" messages when remaining in a Stinking Cloud
 
 	* vanilla bug fixes:
 	  - Prevent the Book of the Dead from being destroyed when the
