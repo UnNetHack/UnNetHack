@@ -1,3 +1,13 @@
+2014-XX-XX  UnNetHack 5.X.X
+	* Players killed by Nazgul will arise as Barrow Wights in bones files
+	  (a slight change from the original mythology, we know)
+
+	* item changes:
+	  - Decreased weight of all mithril armor, especially ones of elven make
+
+	* bug fixes
+	  - Fixed erroneous messages when remaining in stinking clouds
+
 2013-12-08  UnNetHack 5.1.0
 	* Mind flayer attacks only cause physical damage and int drain
 	* Wands and spells of digging are no longer restricted on maze levels
@@ -8,7 +18,7 @@
 	* Player vampire gets a charisma bonus when wearing an opera cloak (by L)
 	* Some monster vampires get an opera cloak (from Slash'Em)
 	* Automatically identify potions of sickness, hallucination, and speed
-	  when inhaling their vapors.
+	  when inhaling their vapors
 	* Poison gas blasts leave a trail of stinking clouds (from UnNetHackPlus)
 	* Magical traps (except for magic portals and anti-magic fields) can be disarmed
 	  with a wand of cancellation (based on the patch by Malcolm Ryan)
@@ -43,8 +53,6 @@
 	* Elven/vampiric players do not regenerate health while touching iron/silver with
 	  bare skin (respectively), unless the iron/silver object is their quest artifact
 	* Let intelligent monsters pick up and use keys (idea by Christian Stegen)
-	* Players killed by a Nazgul will arise as a Barrow Wight in bones files (a slight 
-	  change from the original mythology, we know)
 
 	* New config option for customizing monster letter in UTF8graphics:
 	  - MONSTERSYMBOL='horse':U+0127 # latin small letter h with stroke
@@ -61,7 +69,6 @@
 	  - Reading a Scroll of Light while confused summons some (black) lights
 	  - Reading a non-blessed scroll of punishment while confused summons a Punisher. BE CAREFUL
 	  - A horn of plenty has a *small* chance to produce potions of [vampire] blood
-	  - Decreased the weight of all mithril armor, especially the ones of elven make.
 	  
 	* artifact changes:
 	  - From SporkHack:
@@ -224,7 +231,6 @@
 	    lighting shops
 	  - Blasts or potions of acid destroy iron bars
 	  - Metallivores can eat through iron bars
-	  - Fix extraneous/erroneous "You can see again" messages when remaining in a Stinking Cloud
 
 	* vanilla bug fixes:
 	  - Prevent the Book of the Dead from being destroyed when the
