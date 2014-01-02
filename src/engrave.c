@@ -775,11 +775,11 @@ boolean fingers;
 			}
 			break;
 		    case WAN_POLYMORPH:
-			if(oep)  {
+			if (oep)  {
 			    if (!Blind) {
 				type = (xchar)0;	/* random */
 				(void) random_engraving(buf);
-				eknown = TRUE;
+				doknown = TRUE;
 			    }
 			    dengr = TRUE;
 			}
