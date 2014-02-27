@@ -93,6 +93,7 @@ static const char *random_mesg[] = {
 	"The engraving you have just started reading is the engraving you have just finished reading",
 	"Elvis has left the dungeon.",
 	"For truth, justice, and the Yendorian way!",
+	"This engraving, no verb",        /* Douglas Hofstadter */
 	
 	/* From dNetHack */
 	"[REDACTED]", "[DATA EXPUNGED]", "[DATA PLUNGED]", /* SCP Foundation */
