@@ -1915,6 +1915,7 @@ const int size; /* number of engravings in array */
 	xchar sx, sy;
 	char const *engraving = engravings[rn2(size)];
 
+	int trycount=0;
 	do {
 		if (Inhell || nroom <= 1) {
 			/* random placement in Gehennom or levels with no rooms */
@@ -1932,9 +1933,11 @@ const int size; /* number of engravings in array */
 			    sy = somey(some_room);
 			}
 		}
-	} while (occupied(sx, sy));
+	} while (occupied(sx, sy) && (++trycount < 1000));
 
-	make_engr_at(sx, sy, engraving, 0L, BURN);
+	if (trycount < 1000) {
+		make_engr_at(sx, sy, engraving, 0L, BURN);
+	}
 }
 
 /*
