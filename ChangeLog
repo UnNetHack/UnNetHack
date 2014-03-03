@@ -8,6 +8,10 @@
 	* bug fixes
 	  - Fixed erroneous messages when remaining in stinking clouds
 
+	* vanilla bug fixes:
+	  - C343-439: Running NetHack in a terminal window with more than 255
+	              rows or columns produces display errors.
+
 2013-12-08  UnNetHack 5.1.0
 	* Mind flayer attacks only cause physical damage and int drain
 	* Wands and spells of digging are no longer restricted on maze levels

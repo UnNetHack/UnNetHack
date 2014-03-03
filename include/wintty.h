@@ -53,8 +53,8 @@ struct WinDesc {
 
 /* descriptor for tty-based displays -- all the per-display data */
 struct DisplayDesc {
-    uchar rows, cols;		/* width and height of tty display */
-    uchar curx, cury;		/* current cursor position on the screen */
+    short rows, cols;		/* width and height of tty display */
+    short curx, cury;		/* current cursor position on the screen */
 #ifdef TEXTCOLOR
     int color;			/* current color */
 #endif
