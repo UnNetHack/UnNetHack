@@ -29,7 +29,7 @@ struct WinDesc {
     int flags;			/* window flags */
     xchar type;			/* type of window */
     boolean active;		/* true if window is active */
-    uchar offx, offy;		/* offset from topleft of display */
+    short offx, offy;		/* offset from topleft of display */
     long rows, cols;		/* dimensions */
     long curx, cury;		/* current cursor position */
     long maxrow, maxcol;	/* the maximum size used -- for MENU wins */
