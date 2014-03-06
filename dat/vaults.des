@@ -129,8 +129,8 @@ ROOM:"rndvault", random, random, random, random {
   OBJECT:random,random
   [75%]: OBJECT:random,random
   [50%]: OBJECT:random,random
-  [25%]: OBJECT:random,random
-  [10%]: OBJECT:random,random
+  [25%]: OBJECT:random,random,cursed
+  [10%]: OBJECT:random,random,blessed
 }
 
 
