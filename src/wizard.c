@@ -531,7 +531,7 @@ void
 intervene()
 {
 	int which = Is_astralevel(&u.uz) ? rnd(4) : rn2(7);
-	/* cases 0 and 5 don't apply on the Astral level */
+	/* cases 0, 5, and 6 don't apply on the Astral level */
 	switch (which) {
 	    case 0:
 	    case 1:	You_feel("vaguely nervous.");
