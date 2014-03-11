@@ -11,6 +11,7 @@
 	* vanilla bug fixes:
 	  - C343-439: Running NetHack in a terminal window with more than 255
 	              rows or columns produces display errors.
+	  - C343-320: Reading a Scroll of Mail no longer violates illiterate conduct
 
 2013-12-08  UnNetHack 5.1.0
 	* Mind flayer attacks only cause physical damage and int drain
