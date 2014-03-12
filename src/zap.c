@@ -706,32 +706,39 @@ register struct obj *obj;
 				mtmp->mconf = 1;
 			}
 
-			switch (obj->where) {
-			    case OBJ_INVENT:
-				useup(obj);
-				break;
-			    case OBJ_FLOOR:
-				/* in case MON_AT+enexto for invisible mon */
-				x = obj->ox,  y = obj->oy;
-				/* not useupf(), which charges */
-				if (obj->quan > 1L)
-				    obj = splitobj(obj, 1L);
-				delobj(obj);
-				newsym(x, y);
-				break;
-			    case OBJ_MINVENT:
-				m_useup(obj->ocarry, obj);
-				break;
-			    case OBJ_CONTAINED:
-				obj_extract_self(obj);
-				obfree(obj, (struct obj *) 0);
-				break;
-			    default:
-				panic("revive");
-			}
+			remove_corpse(obj);
 		}
 	}
 	return mtmp;
+}
+
+void
+remove_corpse(corpse)
+struct obj *corpse;
+{
+    xchar x, y;
+    switch (corpse->where) {
+	case OBJ_INVENT:
+	    useup(corpse);
+	    break;
+	case OBJ_FLOOR:
+	    x = corpse->ox,  y = corpse->oy;
+	    /* not useupf(), which charges */
+	    if (corpse->quan > 1L)
+		corpse = splitobj(corpse, 1L);
+	    delobj(corpse);
+	    newsym(x, y);
+	    break;
+	case OBJ_MINVENT:
+	    m_useup(corpse->ocarry, corpse);
+	    break;
+	case OBJ_CONTAINED:
+	    obj_extract_self(corpse);
+	    obfree(corpse, (struct obj *) 0);
+	    break;
+	default:
+	    panic("remove_corpse");
+    }
 }
 
 STATIC_OVL void
@@ -769,15 +776,8 @@ struct monst *mon;
 	    if (youseeit) Strcpy(corpse, corpse_xname(otmp, TRUE));
 
 	    /* for a merged group, only one is revived; should this be fixed? */
-	    if ((mtmp2 = revive(otmp)) != 0) {
+	    if ((mtmp2 = revive_corpse(otmp)) != 0) {
 		++res;
-		if (youseeit) {
-		    if (!once++) Strcpy(owner,
-					(mon == &youmonst) ? "Your" :
-					s_suffix(Monnam(mon)));
-		    pline("%s %s suddenly comes alive!", owner, corpse);
-		} else if (canseemon(mtmp2))
-		    pline("%s suddenly appears!", Amonnam(mtmp2));
 	    }
 	}
 	return res;
@@ -1654,7 +1654,7 @@ struct obj *obj, *otmp;
 		if (obj->otyp == EGG)
 			revive_egg(obj);
 		else
-			res = !!revive(obj);
+			res = !!revive_corpse(obj);
 		break;
 	case WAN_OPENING:
 	case SPE_KNOCK:

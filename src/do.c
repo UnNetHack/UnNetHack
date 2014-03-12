@@ -1672,13 +1672,13 @@ deferred_goto()
 
 /*
  * Return TRUE if we created a monster for the corpse.  If successful, the
- * corpse is gone.
+ * corpse is gone. Otherwise, the corpse may or may not be gone.
  */
 boolean
 revive_corpse(corpse)
 struct obj *corpse;
 {
-    struct monst *mtmp, *mcarry;
+    struct monst *mtmp = 0, *mcarry;
     boolean is_uwep, chewed;
     xchar where;
     char *cname, cname_buf[BUFSZ];
@@ -1698,6 +1698,27 @@ struct obj *corpse;
 	/* container_where is the outermost container's location even if nested */
 	if (container_where == OBJ_MINVENT && mtmp2) mcarry = mtmp2;
     }
+
+    if (corpse->odrained && 
+	    !is_rider(&mons[corpse->corpsenm]) &&
+	    corpse->corpsenm != PM_WIZARD_OF_YENDOR &&
+	    (corpse->oeaten > drainlevel(corpse)) == !!rn2(3)) {
+	/* 2/3 chance of failing to revive a drained corpse (1/3 for partially drained) */
+	boolean showmsg = cansee(corpse->ox, corpse->oy) && 
+		(where == OBJ_INVENT || where == OBJ_FLOOR);
+	if (rn2(2)) {
+	    remove_corpse(corpse);
+	    if (showmsg) {
+		pline("%s drained %s stirs briefly, then evaporates into dust.",
+			where == OBJ_INVENT ? "Your" : "The", cname);
+	    }
+	} else if (showmsg) {
+	    pline("%s drained %s stirs with life, but doesn't have enough blood to survive.", 
+		    where == OBJ_INVENT ? "Your" : "The", cname);
+	}
+	return FALSE;
+    }
+
     mtmp = revive(corpse);	/* corpse is gone if successful */
 
     if (mtmp) {
@@ -1728,23 +1749,23 @@ struct obj *corpse;
 		}
 		break;
 	   case OBJ_CONTAINED:
-	   	if (container_where == OBJ_MINVENT && cansee(mtmp->mx, mtmp->my) &&
+		if (container_where == OBJ_MINVENT && cansee(mtmp->mx, mtmp->my) &&
 		    mcarry && canseemon(mcarry) && container) {
-		        char sackname[BUFSZ];
-		        Sprintf(sackname, "%s %s", s_suffix(mon_nam(mcarry)),
+			char sackname[BUFSZ];
+			Sprintf(sackname, "%s %s", s_suffix(mon_nam(mcarry)),
 				xname(container)); 
-	   		pline("%s writhes out of %s!", Amonnam(mtmp), sackname);
-	   	} else if (container_where == OBJ_INVENT && container) {
-		        char sackname[BUFSZ];
-		        Strcpy(sackname, an(xname(container)));
-	   		pline("%s %s out of %s in your pack!",
-	   			Blind ? Something : Amonnam(mtmp),
+			pline("%s writhes out of %s!", Amonnam(mtmp), sackname);
+		} else if (container_where == OBJ_INVENT && container) {
+			char sackname[BUFSZ];
+			Strcpy(sackname, an(xname(container)));
+			pline("%s %s out of %s in your pack!",
+				Blind ? Something : Amonnam(mtmp),
 				locomotion(mtmp->data,"writhes"),
-	   			sackname);
-	   	} else if (container_where == OBJ_FLOOR && container &&
-		            cansee(mtmp->mx, mtmp->my)) {
-		        char sackname[BUFSZ];
-		        Strcpy(sackname, an(xname(container)));
+				sackname);
+		} else if (container_where == OBJ_FLOOR && container &&
+			    cansee(mtmp->mx, mtmp->my)) {
+			char sackname[BUFSZ];
+			Strcpy(sackname, an(xname(container)));
 			pline("%s escapes from %s!", Amonnam(mtmp), sackname);
 		}
 		break;

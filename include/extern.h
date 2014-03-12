@@ -2626,6 +2626,7 @@ E void FDECL(destroy_item, (int,int));
 E int FDECL(destroy_mitem, (struct monst *,int,int));
 E int FDECL(resist, (struct monst *,CHAR_P,int,int));
 E void FDECL(makewish, (BOOLEAN_P));
+E void FDECL(remove_corpse, (struct obj *));
 
 /* ### livelog.c ### */
 #ifdef LIVELOGFILE
