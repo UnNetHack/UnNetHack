@@ -1,6 +1,8 @@
 2014-XX-XX  UnNetHack 5.X.X
 	* Players killed by Nazgul will arise as Barrow Wights in bones files
 	  (a slight change from the original mythology, we know)
+	* Reviving drained corpses sometimes won't work, and may destroy 
+	  the corpse. Partially drained corpses are more likely to revive.
 
 	* item changes:
 	  - Decreased weight of all mithril armor, especially ones of elven make
