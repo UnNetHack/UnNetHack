@@ -749,8 +749,11 @@ die:
 	 * smiling... :-)  -3.
 	 */
 	if (moves <= 1 && how < PANICKED)	/* You die... --More-- */
-	    pline("Do not pass go.  Do not collect 200 %s.", currency(200L));
-
+	    if (Hallucination) {
+			pline("Don't do drugs.");
+		} else {
+			pline("Do not pass go.  Do not collect 200 %s.", currency(200L));
+		}
 	if (have_windows) wait_synch();	/* flush screen output */
 #ifndef NO_SIGNAL
 	(void) signal(SIGINT, (SIG_RET_TYPE) done_intr);
