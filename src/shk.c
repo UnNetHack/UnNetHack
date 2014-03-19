@@ -769,7 +769,8 @@ register char *enterstring;
 #endif
 	    } else {
 		should_block = (Fast && (sobj_at(PICK_AXE, u.ux, u.uy) ||
-				      sobj_at(DWARVISH_MATTOCK, u.ux, u.uy)));
+					 sobj_at(DWARVISH_MATTOCK, u.ux, u.uy) ||
+					 sobj_at(CRYSTAL_PICK, u.ux, u.uy)));
 	    }
 	    if (should_block) (void) dochug(shkp);  /* shk gets extra move */
 	}
@@ -3497,12 +3498,15 @@ register struct monst *shkp;
 		    uondoor = (u.ux == eshkp->shd.x && u.uy == eshkp->shd.y);
 		    if(uondoor) {
 			badinv = (!Is_blackmarket(&u.uz) &&
-				  (carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK) ||
+				  (carrying(PICK_AXE) ||
+				   carrying(DWARVISH_MATTOCK) ||
+				   carrying(CRYSTAL_PICK) ||
 #ifdef CONVICT
 				  eshkp->pbanned ||
 #endif /* CONVICT */
 				   (Fast && (sobj_at(PICK_AXE, u.ux, u.uy) ||
-				   sobj_at(DWARVISH_MATTOCK, u.ux, u.uy)))));
+				             sobj_at(DWARVISH_MATTOCK, u.ux, u.uy) ||
+				             sobj_at(CRYSTAL_PICK, u.ux, u.uy)))));
 			if(satdoor && badinv)
 			    return(0);
 			avoid = !badinv;
@@ -4282,7 +4286,9 @@ register xchar x, y;
 		&& (x == sx-1 || x == sx+1 || y == sy-1 || y == sy+1)
 		&& (Invis ||
 		 (!Is_blackmarket(&u.uz) &&
-		  (carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK)))
+		  (carrying(PICK_AXE) ||
+		   carrying(DWARVISH_MATTOCK) ||
+		   carrying(CRYSTAL_PICK)))
 #ifdef STEED
 			|| u.usteed
 #endif
