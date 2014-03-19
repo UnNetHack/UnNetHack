@@ -2008,6 +2008,7 @@ struct alt_spellings {
 	{ "crystall ball", CRYSTAL_BALL },
 	{ "crystall orb", CRYSTAL_BALL },
 	{ "crystal orb", CRYSTAL_BALL },
+	{ "crystall pick", CRYSTAL_PICK },
 	{ (const char *)0, 0 },
 };
 
