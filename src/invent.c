@@ -1942,7 +1942,9 @@ struct obj *obj;
 	else if (obj->otyp == LAND_MINE || obj->otyp == BEARTRAP)
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'a', 0, ATR_NONE,
 				"Arm this trap", MENU_UNSELECTED);
-	else if (obj->otyp == PICK_AXE || obj->otyp == DWARVISH_MATTOCK)
+	else if (obj->otyp == PICK_AXE ||
+			obj->otyp == DWARVISH_MATTOCK ||
+			obj->otyp == CRYSTAL_PICK)
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'a', 0, ATR_NONE,
 				"Dig with this digging tool", MENU_UNSELECTED);
 	else if (obj->oclass == WAND_CLASS)
