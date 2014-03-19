@@ -9,6 +9,8 @@
 
 	* bug fixes
 	  - Fixed erroneous messages when remaining in stinking clouds
+	  - Shopkeeper stopping player from entering a shop when having crystal
+	    picks in the inventory
 
 	* vanilla bug fixes:
 	  - C343-439: Running NetHack in a terminal window with more than 255

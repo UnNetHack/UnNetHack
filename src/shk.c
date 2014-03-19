@@ -713,27 +713,42 @@ register char *enterstring;
 	/* can't do anything about blocking if teleported in */
 	if (!inside_shop(u.ux, u.uy) && !(Is_blackmarket(&u.uz))) {
 	    boolean should_block;
-	    int cnt;
+	    int cnt,types=0;
 	    const char *tool;
 	    struct obj *pick = carrying(PICK_AXE),
-		       *mattock = carrying(DWARVISH_MATTOCK);
+		       *mattock = carrying(DWARVISH_MATTOCK),
+		       *crystal_pick = carrying(CRYSTAL_PICK);
 
-	    if (pick || mattock) {
+	    if (pick || mattock || crystal_pick) {
 		cnt = 1;	/* so far */
-		if (pick && mattock) {	/* carrying both types */
-		    tool = "digging tool";
-		    cnt = 2;	/* `more than 1' is all that matters */
-		} else if (pick) {
-		    tool = "pick-axe";
-		    /* hack: `pick' already points somewhere into inventory */
-		    while ((pick = pick->nobj) != 0)
-			if (pick->otyp == PICK_AXE) ++cnt;
-		} else {	/* assert(mattock != 0) */
-		    tool = "mattock";
-		    while ((mattock = mattock->nobj) != 0)
-			if (mattock->otyp == DWARVISH_MATTOCK) ++cnt;
-		    /* [ALI] Shopkeeper identifies mattock(s) */
-		    if (!Blind) makeknown(DWARVISH_MATTOCK);
+		if (pick) {
+			tool = "pick-axe";
+			types++;
+			/* hack: `pick' already points somewhere into inventory */
+			while ((pick = pick->nobj) != 0) {
+				if (pick->otyp == PICK_AXE) ++cnt;
+			}
+		}
+		if (crystal_pick) {
+			tool = "crystal pick";
+			types++;
+			while ((crystal_pick = crystal_pick->nobj) != 0) {
+				if (crystal_pick->otyp == CRYSTAL_PICK) ++cnt;
+			}
+		}
+		if (mattock) {
+			tool = "mattock";
+			types++;
+			while ((mattock = mattock->nobj) != 0) {
+				if (mattock->otyp == DWARVISH_MATTOCK) ++cnt;
+			}
+			/* [ALI] Shopkeeper identifies mattock(s) */
+			if (!Blind && (types == 1)) makeknown(DWARVISH_MATTOCK);
+		}
+		if (types > 1) {
+			/* carrying multiple types */
+			tool = "digging tool";
+			cnt = 2; /* `more than 1' is all that matters */
 		}
 		verbalize(NOTANGRY(shkp) ?
 			  "Will you please leave your %s%s outside?" :
