@@ -1072,7 +1072,9 @@ int mode;
 	    if (sobj_at(BOULDER,ux,uy) && !In_sokoban(&u.uz)) {
 		if (!Passes_walls &&
 		    !(tunnels(youmonst.data) && !needspick(youmonst.data)) &&
-		    !carrying(PICK_AXE) && !carrying(DWARVISH_MATTOCK) &&
+		    !carrying(PICK_AXE) &&
+		    !carrying(DWARVISH_MATTOCK) &&
+		    !carrying(CRYSTAL_PICK) &&
 		    !((obj = carrying(WAN_DIGGING)) &&
 		      !objects[obj->otyp].oc_name_known))
 		    return FALSE;
