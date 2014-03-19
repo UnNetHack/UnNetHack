@@ -3765,6 +3765,8 @@ register int dx,dy;
 		    if (IS_STWALL(levl[sx][sy].typ) &&
 			  !(levl[sx][sy].wall_info & W_NONDIGGABLE)) {
 			levl[sx][sy].typ = LAVAPOOL;
+			levl[sx][sy].lit = 1;
+			unblock_point(sx, sy);
 			if (cansee(sx, sy)) {
 			    pline("%s melts the wall!", The(fltxt));
 			    newsym(sx, sy);
