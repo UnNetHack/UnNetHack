@@ -705,8 +705,13 @@ peffects(otmp)
 		    }
 		}
 		if(Hallucination) {
+			if(!flags.perma_hallu){
 			You("are shocked back to your senses!");
 			(void) make_hallucinated(0L,FALSE,0L);
+			}
+			else {
+			You("feel less groovy for a harsh second.");
+			}
 		}
 		break;
 	case POT_CONFUSION:
