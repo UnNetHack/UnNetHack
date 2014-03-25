@@ -91,14 +91,19 @@ int
 rne(x)
 register int x;
 {
-	register int n, utmp;
+	int i;
 
-	utmp = (u.ulevel < 15) ? 5 : u.ulevel/3;
-	n = 1;
+	int utmp = (u.ulevel < 15) ? 5 : u.ulevel/3;
+	int r[MAXULEV/3];
+	for (i=0; i < MAXULEV/3; i++) {
+		r[i] = rnf(2,x+2);
+	}
 	/* Slightly higher probabilities for higher n than in NetHack 3.4.3
 	 * p(n) = \left(\frac{2}{x+2}\right)^{n-1} \frac{x}{x+2} */
-	while (n < utmp && rnf(2,x+2))
+	int n = 1;
+	while (n < utmp && r[n-1]) {
 		n++;
+	}
 	return n;
 
 	/* was:
