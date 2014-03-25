@@ -643,7 +643,7 @@ initoptions()
 	int i;
 
 	/* initialize the random number generator */
-	setrandom();
+	setrandom(0);
 
 	/* for detection of configfile options specified multiple times */
 	iflags.opt_booldup = iflags.opt_compdup = (int *)0;

@@ -468,9 +468,9 @@ gsl_rng *rng_state = NULL;
 #endif
 
 void
-setrandom()
+setrandom(unsigned int seed)
 {
-	int random_seed=0;
+	unsigned int random_seed=0;
 #ifdef DEV_RANDOM
 	FILE *fptr = NULL;
 
@@ -478,10 +478,20 @@ setrandom()
 	if (fptr) fread(&random_seed, sizeof(int),1,fptr);
 	fclose(fptr);
 #endif
+	time_t current_time = time((time_t *)0);
+	int starting_seed = (unsigned int) (time((time_t *)0)) + random_seed;
+
+	if (seed != 0) {
+		seed = starting_seed;
+	}
+
+	/* save seed in the dummy level 0 */
+	level_info[0].seed = seed;
+
 #ifdef USE_MERSENNE_TWISTER
 	if (rng_state != NULL) { gsl_rng_free(rng_state); }
 	rng_state = gsl_rng_alloc(gsl_rng_mt19937);
-	gsl_rng_set(rng_state, (int) (time((time_t *)0)) + random_seed);
+	gsl_rng_set(rng_state, seed);
 #else
 	/* the types are different enough here that sweeping the different
 	 * routine names into one via #defines is even more confusing
