@@ -205,6 +205,8 @@ rndmonnum()	/* select a random, common monster type */
 	ptr = rndmonst();
 	if (ptr) return(monsndx(ptr));
 
+	use_mon_rng++;
+
 	/* Plan B: get any common proper monster */
 	int count = 0;
 	do {
@@ -219,6 +221,8 @@ rndmonnum()	/* select a random, common monster type */
 		ptr = &mons[i];
 		count++;
 	} while(ptr->geno & G_NOGEN); 
+
+	use_mon_rng--;
 
 	return(i);
 }
@@ -622,10 +626,12 @@ boolean artif;
 		    case STATUE:
 			/* possibly overridden by mkcorpstat() */
 			otmp->corpsenm = rndmonnum();
+			use_mon_rng++;
 			if (!verysmall(&mons[otmp->corpsenm]) &&
 				rn2(level_difficulty()/2 + 10) > 10)
 			    (void) add_to_container(otmp,
 						    mkobj(SPBOOK_CLASS,FALSE));
+			use_mon_rng--;
 		}
 		break;
 	case COIN_CLASS:

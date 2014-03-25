@@ -549,6 +549,8 @@ E struct realtime_data {
 E int mailckfreq;
 #endif
 
+E int use_mon_rng;
+
 E boolean curses_stupid_hack;
 
 #undef E

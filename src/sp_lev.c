@@ -3157,7 +3157,9 @@ spo_monster(coder)
     tmpmons.coord = OV_i(coord);
     tmpmons.has_invent = OV_i(has_inv);
 
+    use_mon_rng++;
     create_monster(&tmpmons, coder->croom);
+    use_mon_rng--;
 
     Free(tmpmons.name.str);
     Free(tmpmons.appear_as.str);

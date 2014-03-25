@@ -7,11 +7,16 @@
 
 isaac_ctx default_rng;
 isaac_ctx mon_rng;
+int use_mon_rng=0;
 int
 RND(int x)
 {
 
-	return (isaac_next_uint32(&default_rng) % x);
+	if (use_mon_rng) {
+		return (isaac_next_uint32(&mon_rng) % x);
+	} else {
+		return (isaac_next_uint32(&default_rng) % x);
+	}
 }
 
 void
@@ -24,6 +29,7 @@ set_random_state(unsigned int x)
 		x >>= 8;
 	}
 
+	isaac_init(&mon_rng,seed,8);
 	isaac_init(&default_rng,seed,8);
 }
 
