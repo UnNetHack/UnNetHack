@@ -699,7 +699,7 @@ void
 init_level_seeds()
 {
 	int i;
-	setrandom(level_info[0].seed);
+	set_random_state(level_info[0].seed);
 	for (i=1; i<MAXLINFO; i++) {
 		level_info[i].seed = RND(INT_MAX);
 	}

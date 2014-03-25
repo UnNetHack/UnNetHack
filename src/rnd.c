@@ -3,24 +3,29 @@
 
 #include "hack.h"
 
-#ifdef USE_MERSENNE_TWISTER
-extern gsl_rng *rng_state;
-#define RND(x)	(int)(gsl_rng_get(rng_state) % (long)(x))
+#include "isaac.h"
 
-#else
-/* "Rand()"s definition is determined by [OS]conf.h */
-#if defined(LINT) && defined(UNIX)	/* rand() is long... */
-extern int NDECL(rand);
-#define RND(x)	(rand() % x)
-#else /* LINT */
-# if defined(UNIX) || defined(RANDOM)
-#define RND(x)	(int)(Rand() % (long)(x))
-# else
-/* Good luck: the bottom order bits are cyclic. */
-#define RND(x)	(int)((Rand()>>3) % (x))
-# endif
-#endif /* LINT */
-#endif /* USE_MERSENNE_TWISTER */
+isaac_ctx default_rng;
+isaac_ctx mon_rng;
+int
+RND(int x)
+{
+
+	return (isaac_next_uint32(&default_rng) % x);
+}
+
+void
+set_random_state(unsigned int x)
+{
+	unsigned char seed[8];
+	int i;
+	for (i=0; i<8; i++) {
+		seed[i]= (unsigned char)(x & 0xFF);
+		x >>= 8;
+	}
+
+	isaac_init(&default_rng,seed,8);
+}
 
 int
 rn2(x)		/**< 0 <= rn2(x) < x */

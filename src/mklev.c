@@ -1239,7 +1239,7 @@ mklev()
 {
 	struct mkroom *croom;
 
-	setrandom(level_info[ledger_no(&u.uz)].seed);
+	set_random_state(level_info[ledger_no(&u.uz)].seed);
 
 	init_mapseen(&u.uz);
 	if(getbones()) return;

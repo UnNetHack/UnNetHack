@@ -302,9 +302,6 @@
 /* Allow user-defined mapping from messages to sounds) */
 #undef USER_SOUNDS
 
-/* Using Mersenne Twister as RNG */
-#undef USE_MERSENNE_TWISTER
-
 /* Enable UTF-8 glyphs in TTY */
 #undef UTF8_GLYPHS
 

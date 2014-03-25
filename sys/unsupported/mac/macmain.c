@@ -56,7 +56,7 @@ main (void)
 	if (y_maze_max % 2)
 		y_maze_max--;
 
-	setrandom();
+	init_random(0);
 	initoptions();
 	init_nhwindows(&argc, (char **)&hname);
 
