@@ -1789,6 +1789,9 @@ find_ac()
 	if(uarmf) uac -= ARM_BONUS(uarmf);
 	if(uarms) uac -= ARM_BONUS(uarms);
 	if(uarmg) uac -= ARM_BONUS(uarmg);
+	if(Role_if(PM_MONK) && !uarm){
+  		if(Confusion) uac += 1;
+  	}
 #ifdef TOURIST
 	if(uarmu) uac -= ARM_BONUS(uarmu);
 #endif
