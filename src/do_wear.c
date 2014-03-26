@@ -1791,7 +1791,7 @@ find_ac()
 	if(uarmg) uac -= ARM_BONUS(uarmg);
 	if(Role_if(PM_MONK) && !uarm){
   		if(Confusion) uac += 1;
-  	}
+  	} //Drunken Boxing
 #ifdef TOURIST
 	if(uarmu) uac -= ARM_BONUS(uarmu);
 #endif
