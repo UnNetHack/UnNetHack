@@ -393,7 +393,7 @@ nh_timeout()
 			     * to this number must be thoroughly play tested.
 			     */
 			    if ((inv_weight() > -500)) {
-				You("make a lot of noise!");
+				(Hallucination) ? You("forget the rules to Charades") : You("make a lot of noise!");
 				wake_nearby();
 			    }
 			}
@@ -783,7 +783,7 @@ struct obj *obj;
 		    pline("Batteries have not been invented yet.");
 		break;
 	    case OBJ_FLOOR:
-		You("see a lantern getting dim.");
+		(Hallucination) ? You("feel a strange urge to give a lantern a hug.") : You("see a lantern getting dim.");
 		break;
 	    case OBJ_MINVENT:
 		pline("%s lantern is getting dim.",
@@ -855,7 +855,7 @@ long timeout;
 				    whose);
 				break;
 			    case OBJ_FLOOR:
-				You("see a burning potion of oil go out.");
+				(Hallucination) ? You("missed a great opportunity to try a flaming shot.") : You("see a burning potion of oil go out.");
 				need_newsym = TRUE;
 				break;
 			}
@@ -916,7 +916,7 @@ long timeout;
 				    break;
 				case OBJ_FLOOR:
 				    if (obj->otyp == BRASS_LANTERN)
-					You("see a lantern run out of power.");
+					(Hallucination) ? You("feel like the floor is less happy now.") : You("see a lantern run out of power.");
 				    else
 					You("see %s go out.",
 					    an(xname(obj)));
