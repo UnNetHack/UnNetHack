@@ -814,33 +814,40 @@ boolean atme;
 	case SPE_CONE_OF_COLD:
 	case SPE_FIREBALL:
 	    if (role_skill >= P_SKILLED) {
-	        if (throwspell()) {
-		    cc.x=u.dx;cc.y=u.dy;
-		    n=rnd(8)+1;
-		    while(n--) {
-			if(!u.dx && !u.dy && !u.dz) {
-			    if ((damage = zapyourself(pseudo, TRUE)) != 0) {
-				char buf[BUFSZ];
-				Sprintf(buf, "zapped %sself with a spell", uhim());
-				losehp(damage, buf, NO_KILLER_PREFIX);
+		if (yn("Cast advanced spell?") == 'y') {
+		    if (throwspell()) {
+			cc.x=u.dx;cc.y=u.dy;
+			n=rnd(8)+1;
+			while(n--) {
+			    if(!u.dx && !u.dy && !u.dz) {
+				if ((damage = zapyourself(pseudo, TRUE)) != 0) {
+				    char buf[BUFSZ];
+				    Sprintf(buf, "zapped %sself with a spell", uhim());
+				    losehp(damage, buf, NO_KILLER_PREFIX);
+				}
+			    } else {
+				explode(u.dx, u.dy,
+					pseudo->otyp - SPE_MAGIC_MISSILE + 10,
+					u.ulevel/2 + 1 + spell_damage_bonus(), 0,
+					    (pseudo->otyp == SPE_CONE_OF_COLD) ?
+						    EXPL_FROSTY : EXPL_FIERY);
 			    }
-			} else {
-			    explode(u.dx, u.dy,
-				    pseudo->otyp - SPE_MAGIC_MISSILE + 10,
-				    u.ulevel/2 + 1 + spell_damage_bonus(), 0,
-					(pseudo->otyp == SPE_CONE_OF_COLD) ?
-						EXPL_FROSTY : EXPL_FIERY);
+			    u.dx = cc.x+rnd(3)-2; u.dy = cc.y+rnd(3)-2;
+			    if (!isok(u.dx,u.dy) || !cansee(u.dx,u.dy) ||
+				IS_STWALL(levl[u.dx][u.dy].typ) || u.uswallow) {
+				/* Spell is reflected back to center */
+				u.dx = cc.x;
+				u.dy = cc.y;
+			    }
 			}
-			u.dx = cc.x+rnd(3)-2; u.dy = cc.y+rnd(3)-2;
-			if (!isok(u.dx,u.dy) || !cansee(u.dx,u.dy) ||
-			    IS_STWALL(levl[u.dx][u.dy].typ) || u.uswallow) {
-			    /* Spell is reflected back to center */
-			    u.dx = cc.x;
-			    u.dy = cc.y;
-		        }
 		    }
+		    break;
+		} else if (pseudo->otyp == SPE_FIREBALL ||
+			   pseudo->otyp == SPE_CONE_OF_COLD) {
+		    /* not using advanced spell when skilled
+		       returns up to half the magical energy */
+		    u.uen += rnd(energy/2);
 		}
-		break;
 	    } /* else fall through... */
 
 	/* these spells are all duplicates of wand effects */
