@@ -2048,6 +2048,10 @@ boolean
 ureflects (fmt, str)
 const char *fmt, *str;
 {
+	/* prevent uarm from being null when reflecting due to being poly'd */
+	boolean is_reflecting_dragon = (youmonst.data == &mons[PM_SILVER_DRAGON] ||
+					youmonst.data == &mons[PM_CHROMATIC_DRAGON]);
+
 	/* Check from outermost to innermost objects */
 	if (EReflecting & W_ARMS) {
 	    if (fmt && str) {
@@ -2066,14 +2070,13 @@ const char *fmt, *str;
 	    	makeknown(AMULET_OF_REFLECTION);
 	    }
 	    return TRUE;
-	} else if (EReflecting & W_ARM) {
+	} else if ((EReflecting & W_ARM) && !is_reflecting_dragon) {
 	    if (fmt && str) {
 	    	pline(fmt, str, "armor");
 		makeknown(uarm->otyp);
 	    }
 	    return TRUE;
-	} else if ((youmonst.data == &mons[PM_SILVER_DRAGON]) ||
-		   (youmonst.data == &mons[PM_CHROMATIC_DRAGON])) {
+	} else if (is_reflecting_dragon) {
 	    if (fmt && str) {
 	    	pline(fmt, str, "scales");
 		if (youmonst.data == &mons[PM_SILVER_DRAGON])
