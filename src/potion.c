@@ -962,7 +962,10 @@ peffects(otmp)
 		    } else if (u.ualign.type == A_NEUTRAL)
 			adjalign(-3);
 		    exercise(A_CON, FALSE);
-		    if (!Unchanging) {
+		    if (Race_if(PM_VAMPIRE)) {
+			if (!Unchanging) rehumanize();
+			break;
+		    } else if (!Unchanging) {
 			int successful_polymorph = FALSE;
 			if (otmp->blessed)
 				successful_polymorph = polymon(PM_VAMPIRE_LORD);
