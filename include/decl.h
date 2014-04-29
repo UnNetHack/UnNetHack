@@ -555,6 +555,9 @@ E gsl_rng *rngstate;
 #endif
 
 
+
+E boolean curses_stupid_hack;
+
 #undef E
 
 #endif /* DECL_H */

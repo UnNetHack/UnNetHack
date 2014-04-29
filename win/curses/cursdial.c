@@ -235,7 +235,7 @@ int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_
         prompt_width = map_width - 2;
     }
 
-    if (iflags.wc_popup_dialog)
+    if (iflags.wc_popup_dialog || curses_stupid_hack)
     {
         askwin = curses_create_window(prompt_width, prompt_height, UP);
         for (count = 0; count < prompt_height; count++)
@@ -254,6 +254,8 @@ int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_
         free(linestr);
         curs_set(1);
     }
+
+    curses_stupid_hack = 0;
 
     while (1)
     {
