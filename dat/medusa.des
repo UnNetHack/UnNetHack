@@ -455,29 +455,87 @@ OBJECT:('%',"egg"), (05,04), montype:"guivre"
 [50%]: OBJECT: ('%',"egg"), (05,04), montype:"guivre"
 [25%]: OBJECT: ('%',"egg"), (05,04), montype:"guivre"
 #
-MONSTER:(';',"giant eel"),random
+LOOP [2] {
 MONSTER:(';',"giant eel"),random
 MONSTER:(';',"jellyfish"),random
-MONSTER:(';',"jellyfish"),random
+}
+LOOP [14] {
 MONSTER:'S',random
-MONSTER:'S',random
-MONSTER:'S',random
-MONSTER:'S',random
-MONSTER:'S',random
-MONSTER:'S',random
-MONSTER:'S',random
-MONSTER:'S',random
-MONSTER:'S',random
-MONSTER:'S',random
-MONSTER:'S',random
-MONSTER:'S',random
-MONSTER:'S',random
-MONSTER:'S',random
-MONSTER:('N',"black naga hatchling"), random
-MONSTER:('N',"black naga hatchling"), random
-MONSTER:('N',"black naga hatchling"), random
+}
+LOOP [4] {
 MONSTER:('N',"black naga hatchling"), random
 MONSTER:('N',"black naga"), random
-MONSTER:('N',"black naga"), random
-MONSTER:('N',"black naga"), random
-MONSTER:('N',"black naga"), random
+}
+
+#
+#  The "fill" level for levels below Medusa's Island
+#
+LEVEL: "medufill"
+FLAGS: mazelevel, noflip
+INIT_MAP: mines, '.', ' ', true, true, unlit, true, '}'
+TELEPORT_REGION: levregion(11,01,59,19), levregion(01,01,02,02)
+NOMAP
+# show some water using gaps in the walls
+LOOP [10] {
+  SPILL: random, '}', north, 0
+  SPILL: random, '}', south, 0
+  SPILL: random, '}', east, 0
+  SPILL: random, '}', west, 0
+}
+# chance of spillage, or maybe a river?
+IF [50%] {
+  IF [60%] {
+    SPILL: random, '}', north, 5
+  }
+  IF [60%] {
+    SPILL: random, '}', south, 5
+  }
+  IF [60%] {
+    SPILL: random, '}', east, 5
+  }
+  IF [60%] {
+    SPILL: random, '}', west, 5
+  }
+} ELSE {
+  IF [20%] {
+    IF [50%] {
+      TERRAIN: grow(north|west, randline (30,00)-(50,19), 10), '}'
+    } ELSE {
+      TERRAIN: grow(north|west, randline (50,00)-(30,19), 10), '}'
+    }
+  }
+}
+#
+#  always put stairs relatively far apart
+#
+IF [50%] {
+  # Option 1: Up Left, Down Right
+  STAIR: levregion(01,01,20,20), levregion(40,10,44,12), up
+  STAIR: levregion(50,01,70,20), levregion(45,10,49,12), down
+} ELSE {
+  # Option 2: Up Right, Down Left
+  STAIR: levregion(50,01,70,20), levregion(45,10,49,12), up
+  STAIR: levregion(01,01,20,20), levregion(40,10,44,12), down
+}
+#
+$object = OBJECT: { '(', '/', '=', '+', ')', '[', '?', '*', '%' }
+SHUFFLE: $object
+OBJECT: $object[0], random
+OBJECT: $object[0], random
+OBJECT: $object[1], random
+OBJECT: $object[2], random
+OBJECT: $object[3], random
+OBJECT: $object[4], random
+OBJECT: random, random
+OBJECT: random, random
+LOOP [1d7] {
+  OBJECT: '$', random
+}
+#
+LOOP [4d4] {
+  MONSTER: random, random
+}
+#
+LOOP [12] {
+  TRAP: random, random
+}
