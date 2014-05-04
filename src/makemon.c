@@ -364,7 +364,7 @@ register struct monst *mtmp;
 			/* note: you can't use a mattock with a shield */
 			if (rn2(2)) (void)mongets(mtmp, DWARVISH_MATTOCK);
 			else {
-				(void)mongets(mtmp, AXE);
+				(void)mongets(mtmp, rn2(2) ? AXE : DWARVISH_SPEAR);
 				(void)mongets(mtmp, DWARVISH_ROUNDSHIELD);
 			}
 			(void)mongets(mtmp, DWARVISH_IRON_HELM);
