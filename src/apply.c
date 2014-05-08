@@ -341,6 +341,7 @@ struct obj *obj;
 {
 	You(whistle_str, obj->cursed ? "shrill" : "high");
 	wake_nearby();
+	if (obj->otyp == TIN_WHISTLE) makeknown_msg(obj->otyp);
 }
 
 STATIC_OVL void
@@ -371,6 +372,7 @@ struct obj *obj;
 		}
 		if (pet_cnt > 0) makeknown(obj->otyp);
 	}
+	makeknown_msg(obj->otyp);
 }
 
 boolean
