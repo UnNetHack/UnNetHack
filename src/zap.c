@@ -1818,19 +1818,24 @@ bhitpile(obj,fhito,tx,ty)
 
 /*
  * zappable - returns 1 if zap is available, 0 otherwise.
- *	      it removes a charge from the wand if zappable.
- * added by GAN 11/03/86
+ *            it removes a charge from the wand.
  */
 int
 zappable(wand)
 register struct obj *wand;
 {
-	if(wand->spe < 0 || (wand->spe == 0 && rn2(121)))
+	int zap_it = 1;
+	if (wand->spe < 0) {
 		return 0;
-	if(wand->spe == 0)
-		You("wrest one last charge from the worn-out wand.");
+	}
+	if (wand->spe == 0) {
+		int prob = 6 + (wand->cursed ? 1 : (wand->blessed ? -1 : 0));
+		if ((zap_it = rnf(1,prob))) {
+			You("wrest one last charge from the worn-out wand.");
+		}
+	}
 	wand->spe--;
-	return 1;
+	return zap_it;
 }
 
 /*
