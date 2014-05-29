@@ -2746,7 +2746,7 @@ do_break_wand(obj)
 	}
 	goto discard_broken_wand;
     case WAN_COLD:
-	if (expltype == EXPL_MAGICAL) expltype = EXPL_FROSTY;
+	expltype = EXPL_FROSTY;
 	dmg *= 2;
 	explode(u.ux, u.uy,
 		(obj->otyp - WAN_COLD), dmg, WAND_CLASS, expltype);
