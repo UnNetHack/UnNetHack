@@ -3,6 +3,8 @@
 	  (a slight change from the original mythology, we know)
 	* Reviving drained corpses sometimes won't work, and may destroy 
 	  the corpse. Partially drained corpses are more likely to revive.
+	* Wand wresting happens always when an empty wand is zapped with a chance
+	  depending on BUC state if an effect is produced
 
 	* item changes:
 	  - Decreased weight of all mithril armor, especially ones of elven make

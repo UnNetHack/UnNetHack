@@ -389,6 +389,7 @@ struct obj *instr;
 		You("produce %s.", Hallucination ? "elevator music" : "soft music");
 		put_monsters_to_sleep(u.ulevel * 5);
 		exercise(A_DEX, TRUE);
+		makeknown_msg(MAGIC_FLUTE);
 		break;
 	    } /* else FALLTHRU */
 	case WOODEN_FLUTE:		/* May charm snakes */
@@ -415,7 +416,7 @@ struct obj *instr;
 		    buzz((instr->otyp == FROST_HORN) ? AD_COLD-1 : AD_FIRE-1,
 			 rn1(6,6), u.ux, u.uy, u.dx, u.dy);
 		}
-		makeknown(instr->otyp);
+		makeknown_msg(instr->otyp);
 		break;
 	    } /* else FALLTHRU */
 	case TOOLED_HORN:		/* Awaken or scare monsters */
@@ -435,6 +436,7 @@ struct obj *instr;
 		pline("%s very attractive music.", Tobjnam(instr, "produce"));
 		charm_monsters((u.ulevel - 1) / 3 + 1);
 		exercise(A_DEX, TRUE);
+		makeknown_msg(MAGIC_HARP);
 		break;
 	    } /* else FALLTHRU */
 	case WOODEN_HARP:		/* May calm Nymph */
@@ -453,7 +455,7 @@ struct obj *instr;
 		do_earthquake((u.ulevel - 1) / 3 + 1);
 		/* shake up monsters in a much larger radius... */
 		awaken_monsters(ROWNO * COLNO);
-		makeknown(DRUM_OF_EARTHQUAKE);
+		makeknown_msg(DRUM_OF_EARTHQUAKE);
 		break;
 	    } /* else FALLTHRU */
 	case LEATHER_DRUM:		/* Awaken monsters */
