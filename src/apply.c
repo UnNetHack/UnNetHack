@@ -2723,6 +2723,9 @@ do_break_wand(obj)
 	goto wanexpl;
     case WAN_FIRE:
 	expltype = EXPL_FIERY;
+	dmg *= 2;
+	explode(u.ux, u.uy,
+		(obj->otyp - WAN_FIRE), dmg, WAND_CLASS, expltype);
 	/* make fire trap if you broke a wand of fire */
 	if ((obj->spe > 2) && rn2(obj->spe - 2) && !u.uswallow &&
 	    !On_stairs(u.ux, u.uy) && (!IS_FURNITURE(levl[u.ux][u.uy].typ) &&
@@ -2739,10 +2742,12 @@ do_break_wand(obj)
 			    }
 		    }
 	}
-	break;
+	goto discard_broken_wand;
     case WAN_COLD:
 	if (expltype == EXPL_MAGICAL) expltype = EXPL_FROSTY;
 	dmg *= 2;
+	explode(u.ux, u.uy,
+		(obj->otyp - WAN_COLD), dmg, WAND_CLASS, expltype);
 	/* make ice trap if you broke a wand of cold */
 	if ((obj->spe > 2) && rn2(obj->spe - 2) && !u.uswallow &&
 	    !On_stairs(u.ux, u.uy) && (!IS_FURNITURE(levl[u.ux][u.uy].typ) &&
@@ -2759,7 +2764,7 @@ do_break_wand(obj)
 			    }
 		    }
 	}
-	break;
+	goto discard_broken_wand;
     case WAN_MAGIC_MISSILE:
     wanexpl:
 	explode(u.ux, u.uy,
