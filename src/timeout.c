@@ -1719,7 +1719,7 @@ obj_is_local(obj)
 	case OBJ_CONTAINED:	return obj_is_local(obj->ocontainer);
 	case OBJ_MINVENT:	return mon_is_local(obj->ocarry);
     }
-    panic("obj_is_local");
+    panic("obj_is_local: %s, %d", cxname(obj), obj->where);
     return FALSE;
 }
 

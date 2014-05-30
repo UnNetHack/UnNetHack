@@ -291,6 +291,13 @@ panic VA_DECL(const char *, str)
 	    iflags.window_inited = 0; /* they're gone; force raw_print()ing */
 	}
 
+	{
+	    char buf[BUFSZ];
+	    Vsprintf(buf,str,VA_ARGS);
+	    raw_print(buf);
+	    paniclog("panic", buf);
+	}
+
 	raw_print(program_state.gameover ?
 		  "Postgame wrapup disrupted." :
 		  !program_state.something_worth_saving ?
@@ -319,12 +326,6 @@ panic VA_DECL(const char *, str)
 	    (void) dosave0();
 	}
 #endif
-	{
-	    char buf[BUFSZ];
-	    Vsprintf(buf,str,VA_ARGS);
-	    raw_print(buf);
-	    paniclog("panic", buf);
-	}
 #ifdef WIN32
 	interject(INTERJECT_PANIC);
 #endif
