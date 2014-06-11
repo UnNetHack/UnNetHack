@@ -17,8 +17,7 @@
     util, and OS/2-specific ones in sys\os2.  All the .h files belong in
     include, the documentation in doc, and assorted data files in dat.  There
     are also some necessary files in sys\share (pc*.c, random.c, dgn_*.*,
-    lev_*.*).  A more detailed explanation of the directory structure is found
-    in file Files, which should be in the top directory.
+    lev_*.*). 
 
     If you downloaded or ftp'd the sources from a UNIX system, the lines may
     end in UNIX-style newlines instead of the carriage return and line feed

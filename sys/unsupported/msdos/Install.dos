@@ -85,11 +85,6 @@ II. To compile your copy of NetHack on a DOS machine:
                                           |    |      |   |  
                                        share msdos   tty share
 
-    Check the file "Files" in your top level directory for an exact
-    listing of what files are in which directory.  In order for the
-    Makefiles to work, all the source files must be in the proper
-    locations.
-
     If you downloaded or ftp'd the sources from a UNIX system, the lines
     will probably end in UNIX-style newlines, instead of the carriage
     return and line feed pairs used by DOS.  Some programs have trouble

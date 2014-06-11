@@ -565,7 +565,7 @@ PACKAGE_STRING='UNNETHACK 5.1.0'
 PACKAGE_BUGREPORT='bhaak@gmx.net'
 PACKAGE_URL=''
 
-ac_unique_file="Files"
+ac_unique_file="unnethack.doxygen"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>

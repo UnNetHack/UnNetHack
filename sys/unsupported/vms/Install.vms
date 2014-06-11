@@ -57,10 +57,7 @@
     You must arrange things in this structure or the supplied procedures
     and instructions in this file will not work properly.  Several DCL
     command files are present in the [.sys.vms] subdirectory and won't
-    work as intended if they're moved elsewhere.  The file called Files
-    in the top directory contains lists of everything that should be in
-    each subdirectory, including things that are constructed as NetHack
-    is being built.
+    work as intended if they're moved elsewhere.  
 
 3.  Prior to beginning compilation, go to the [.include] subdirectory and
     edit vmsconf.h according to its comments.  You should set Local_WIZARD

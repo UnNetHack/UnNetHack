@@ -90,8 +90,6 @@ goto :fini
 
 :err_data
 echo A required file ..\..\dat\data.bas seems to be missing.
-echo Check "Files." in the root directory for your NetHack distribution
-echo and make sure that all required files exist.
 goto :fini
 
 :err_dir
