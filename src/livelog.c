@@ -5,11 +5,7 @@
 
 #ifdef LIVELOGFILE
 
-#ifdef SHORT_FILENAMES
-#include "patchlev.h"
-#else
 #include "patchlevel.h"
-#endif
 
 /* Encodes the current xlog "achieve" status to an integer */
 long

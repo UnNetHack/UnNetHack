@@ -7,20 +7,12 @@
  * description of the window interface.  
  */
 
-#ifdef MSDOS			/* from compiler */
-#define SHORT_FILENAMES
-#endif
-
 #include "hack.h"
 #include "winlisp.h"
 #include "func_tab.h"
 
 #include "dlb.h"
-#ifdef SHORT_FILENAMES
-#include "patchlev.h"
-#else
 #include "patchlevel.h"
-#endif
 
 #define CMD_KEY 0
 #define CMD_EXT 1

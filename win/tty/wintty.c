@@ -10,11 +10,7 @@
 
 #include "hack.h"
 #include "dlb.h"
-#ifdef SHORT_FILENAMES
-#include "patchlev.h"
-#else
 #include "patchlevel.h"
-#endif
 
 #ifdef TTY_GRAPHICS
 
