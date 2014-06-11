@@ -19,11 +19,14 @@ compile
 /dat/nhdat
 /dat/options
 /dat/oracles
+/dat/pet_mark.xbm
 /dat/quest.dat
 /dat/quest_levs
 /dat/rumors
 /dat/spec_levs
 /dat/vaults.dat
+/dat/UnNetHack.ad
+/dat/x11tiles
 
 # /doc/
 /doc/Makefile
@@ -37,6 +40,7 @@ compile
 /include/lev_comp.h
 /include/onames.h
 /include/pm.h
+/include/tile.h
 /include/vis_tab.h
 /include/win32api.h
 
@@ -65,6 +69,7 @@ compile
 /util/makedefs
 /util/recover
 /util/tilemap
+/util/tile2x11
 
 # /win/
 /win/*/*.o
