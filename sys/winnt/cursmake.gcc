@@ -677,12 +677,6 @@ $(INCL)/pm.h : $(U)makedefs.exe
 $(SRC)/monstr.c: $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -m)
 
-$(INCL)/vis_tab.h: $(U)makedefs.exe
-	$(subst /,\,$(U)makedefs -z)
-
-$(SRC)/vis_tab.c: $(U)makedefs.exe
-	$(subst /,\,$(U)makedefs -z)
-
 #==========================================
 # uudecode utility and uuencoded targets
 #==========================================

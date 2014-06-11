@@ -367,7 +367,7 @@ VOBJ21 = $(O)shk.o      $(O)shknam.o   $(O)sit.o      $(O)sounds.o
 VOBJ22 = $(O)sp_lev.o   $(O)spell.o    $(O)steal.o    $(O)steed.o   
 VOBJ23 = $(O)teleport.o $(O)timeout.o  $(O)topten.o   $(O)track.o   
 VOBJ24 = $(O)trap.o     $(O)u_init.o   $(O)uhitm.o    $(O)vault.o   
-VOBJ25 = $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o   $(O)were.o    
+VOBJ25 = $(O)vision.o   $(O)weapon.o   $(O)were.o    
 VOBJ26 = $(O)wield.o    $(O)windows.o  $(O)wizard.o   $(O)worm.o    
 VOBJ27 = $(O)worn.o     $(O)write.o    $(O)zap.o     
 
@@ -526,8 +526,8 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
 	echo sp_levs done > $(O)sp_lev.tag
 
 $(O)utility.tag: $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
-		$(SRC)\monstr.c		$(SRC)\vis_tab.c  \
-		$(U)lev_comp.exe	$(INCL)\vis_tab.h \
+		$(SRC)\monstr.c	 \
+		$(U)lev_comp.exe \
 		$(U)dgn_comp.exe
              @echo utilities made >$@
 	     @echo utilities made.
@@ -672,12 +672,6 @@ $(INCL)\pm.h : $(U)makedefs.exe
 
 $(SRC)\monstr.c: $(U)makedefs.exe
 	$(U)makedefs -m
-
-$(INCL)\vis_tab.h: $(U)makedefs.exe
-	$(U)makedefs -z
-
-$(SRC)\vis_tab.c: $(U)makedefs.exe
-	$(U)makedefs -z
 
 #==========================================
 # uudecode utility and uuencoded targets
@@ -1054,8 +1048,6 @@ spotless: clean
 	if exist $(INCL)\date.h    del $(INCL)\date.h
 	if exist $(INCL)\onames.h  del $(INCL)\onames.h
 	if exist $(INCL)\pm.h      del $(INCL)\pm.h
-	if exist $(INCL)\vis_tab.h del $(INCL)\vis_tab.h
-	if exist $(SRC)\vis_tab.c  del $(SRC)\vis_tab.c
 	if exist $(SRC)\tile.c     del $(SRC)\tile.c
 	if exist $(U)*.lnk         del $(U)*.lnk
 	if exist $(U)*.map         del $(U)*.map
@@ -1097,7 +1089,6 @@ spotless: clean
 	if exist $(DAT)\wizard?.lev	del $(DAT)\wizard?.lev
 	if exist $(O)sp_lev.tag	        del $(O)sp_lev.tag
 	if exist $(SRC)\monstr.c        del $(SRC)\monstr.c
-	if exist $(SRC)\vis_tab.c       del $(SRC)\vis_tab.c
 	if exist $(U)recover.exe        del $(U)recover.exe
 	if exist nhdat.			del nhdat.
 	if exist $(O)obj.tag            del $(O)obj.tag
@@ -1300,7 +1291,6 @@ $(O)qt_clust.o: ..\win\Qt\qt_clust.cpp $(INCL)\qt_clust.h
 $(O)qttableview.o: ..\win\Qt\qttableview.cpp $(INCL)\qttableview.h
 	$(CXX) $(CXXFLAGS) -Fo$@ ..\win\Qt\qttableview.cpp
 $(O)monstr.o: monstr.c $(CONFIG_H)
-$(O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)\vis_tab.h
 $(O)allmain.o: allmain.c $(HACK_H)
 $(O)alloc.o: alloc.c $(CONFIG_H)
 $(O)apply.o: apply.c $(HACK_H) $(INCL)\edog.h
@@ -1405,7 +1395,7 @@ $(O)u_init.o: u_init.c $(HACK_H)
 $(O)uhitm.o: uhitm.c $(HACK_H)
 $(O)vault.o: vault.c $(HACK_H) $(INCL)\vault.h
 $(O)version.o: version.c $(HACK_H) $(INCL)\date.h $(INCL)\patchlevel.h
-$(O)vision.o: vision.c $(HACK_H) $(INCL)\vis_tab.h
+$(O)vision.o: vision.c $(HACK_H)
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
 $(O)wield.o: wield.c $(HACK_H)

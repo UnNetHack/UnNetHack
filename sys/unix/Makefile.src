@@ -359,7 +359,7 @@ SYSCSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
 	../sys/unix/unixunix.c ../sys/unix/unixres.c ../sys/be/bemain.c
 
 # generated source files (tile.c is handled separately via WINxxxSRC)
-GENCSRC = monstr.c vis_tab.c	#tile.c
+GENCSRC = monstr.c #tile.c
 
 # all windowing-system-dependent .c (for dependencies and such)
 WINCSRC = $(WINTTYSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
@@ -373,7 +373,7 @@ VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(GENCSRC)
 CSOURCES = $(HACKCSRC) $(SYSSRC) $(WINCSRC) $(GENCSRC)
 
 
-# all .h files except date.h, onames.h, pm.h, and vis_tab.h which would
+# all .h files except date.h, onames.h, and pm.h which would
 # cause dependency loops if run through "make depend"
 # and dgn_comp.h, dgn_file.h, lev_comp.h, special level & dungeon files.
 #
@@ -387,7 +387,7 @@ HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h color.h \
 	trampoli.h trap.h unixconf.h vault.h vision.h vmsconf.h wintty.h \
 	winX.h winprocs.h wintype.h you.h youprop.h
 
-HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h\
+HSOURCES = $(HACKINCL) date.h onames.h pm.h \
 		lev_comp.h dgn_comp.h dgn_file.h
 
 # the following .o's _must_ be made before any others (for makedefs)
@@ -407,7 +407,7 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
 	role.o rumors.o save.o shk.o shknam.o sit.o sounds.o sp_lev.o spell.o \
 	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o \
-	tutorial.o u_init.o uhitm.o vault.o vision.o vis_tab.o weapon.o \
+	tutorial.o u_init.o uhitm.o vault.o vision.o weapon.o \
 	were.o wield.o windows.o wizard.o worm.o worn.o write.o zap.o \
 	$(RANDOBJ) $(SYSOBJ) $(WINOBJ) version.o \
 	livelog.o
@@ -508,10 +508,6 @@ $(MAKEDEFS): ../util/makedefs.c  $(CONFIG_H) ../include/permonst.h \
 	@( cd ../util ; $(MAKE) ../include/pm.h )
 monstr.c: $(MAKEDEFS)
 	@( cd ../util ; $(MAKE) ../src/monstr.c )
-../include/vis_tab.h: $(MAKEDEFS)
-	@( cd ../util ; $(MAKE) ../include/vis_tab.h )
-# makedefs -z makes both vis_tab.h and vis_tab.c, but writes the .h first
-vis_tab.c: ../include/vis_tab.h
 tile.c: ../win/share/tilemap.c $(HACK_H)
 	@( cd ../util ; $(MAKE) ../src/tile.c )
 
@@ -551,7 +547,7 @@ clean:
 spotless: clean
 	-rm -f a.out core $(GAME) Sys*
 	-rm -f ../include/date.h ../include/onames.h ../include/pm.h
-	-rm -f monstr.c ../include/vis_tab.h vis_tab.c tile.c *.moc
+	-rm -f monstr.c tile.c *.moc
 	-rm -f ../win/gnome/gn_rip.h
 
 
@@ -740,7 +736,6 @@ qt_clust.o: ../win/Qt/qt_clust.cpp ../include/qt_clust.h
 qttableview.o: ../win/Qt/qttableview.cpp ../include/qttableview.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt/qttableview.cpp
 monstr.o: monstr.c $(CONFIG_H)
-vis_tab.o: vis_tab.c $(CONFIG_H) ../include/vis_tab.h
 allmain.o: allmain.c $(HACK_H)
 alloc.o: alloc.c $(CONFIG_H)
 apply.o: apply.c $(HACK_H) ../include/edog.h
@@ -848,7 +843,7 @@ u_init.o: u_init.c $(HACK_H)
 uhitm.o: uhitm.c $(HACK_H)
 vault.o: vault.c $(HACK_H) ../include/vault.h
 version.o: version.c $(HACK_H) ../include/date.h ../include/patchlevel.h
-vision.o: vision.c $(HACK_H) ../include/vis_tab.h
+vision.o: vision.c $(HACK_H)
 weapon.o: weapon.c $(HACK_H)
 were.o: were.c $(HACK_H)
 wield.o: wield.c $(HACK_H)

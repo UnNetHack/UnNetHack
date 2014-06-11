@@ -387,7 +387,7 @@ VOBJ21 = $(O)shk.o      $(O)shknam.o   $(O)sit.o      $(O)sounds.o
 VOBJ22 = $(O)sp_lev.o   $(O)spell.o    $(O)steal.o    $(O)steed.o
 VOBJ23 = $(O)teleport.o $(O)timeout.o  $(O)topten.o   $(O)track.o
 VOBJ24 = $(O)trap.o     $(O)u_init.o   $(O)uhitm.o    $(O)vault.o
-VOBJ25 = $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o   $(O)were.o
+VOBJ25 = $(O)vision.o   $(O)weapon.o   $(O)were.o
 VOBJ26 = $(O)wield.o    $(O)windows.o  $(O)wizard.o   $(O)worm.o
 VOBJ27 = $(O)worn.o     $(O)write.o    $(O)zap.o
 VOBJ28 = $(O)dump.o     $(O)livelog.o  $(O)tutorial.o
@@ -563,7 +563,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	$(subst /,\,echo sp_levs done > $(O)sp_lev.tag)
 
 $(O)utility.tag: $(INCL)/date.h $(INCL)/onames.h $(INCL)/pm.h \
-	 $(SRC)/monstr.c $(SRC)/vis_tab.c $(U)lev_comp.exe $(INCL)/vis_tab.h \
+	 $(SRC)/monstr.c $(U)lev_comp.exe $(INCL)/vis_tab.h \
 	 $(U)dgn_comp.exe $(TILEUTIL16)
 	$(subst /,\,@echo utilities made >$@)
 	@echo utilities made.
@@ -678,12 +678,6 @@ $(INCL)/pm.h : $(U)makedefs.exe
 
 $(SRC)/monstr.c: $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -m)
-
-$(INCL)/vis_tab.h: $(U)makedefs.exe
-	$(subst /,\,$(U)makedefs -z)
-
-$(SRC)/vis_tab.c: $(U)makedefs.exe
-	$(subst /,\,$(U)makedefs -z)
 
 #==========================================
 # uudecode utility and uuencoded targets

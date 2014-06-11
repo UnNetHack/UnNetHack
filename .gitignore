@@ -41,7 +41,6 @@ compile
 /include/onames.h
 /include/pm.h
 /include/tile.h
-/include/vis_tab.h
 /include/win32api.h
 
 # /src/
@@ -52,7 +51,6 @@ compile
 /src/Sysunix
 /src/config.h-t
 /src/hack.h-t
-/src/vis_tab.c
 /src/monstr.c
 /src/tile.c
 
