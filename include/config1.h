@@ -151,7 +151,6 @@
 # else
 #  ifdef VAXC	/* must use CC/DEFINE=ANCIENT_VAXC for vaxc v2.2 or older */
 #   ifdef ANCIENT_VAXC	/* vaxc v2.2 and earlier [lots of warnings to come] */
-#    define KR1ED	/* simulate defined() */
 #    define USE_VARARGS
 #   else		/* vaxc v2.3,2.4,or 3.x, or decc in vaxc mode */
 #     if defined(USE_PROTOTYPES) /* this breaks 2.2 (*forces* use of ANCIENT)*/
@@ -183,22 +182,6 @@
 # ifdef ULTRIX_CC20
 #  undef ULTRIX_CC20
 # endif
-#endif
-
-#ifdef KR1ED		/* For compilers which cannot handle defined() */
-#define defined(x) (-x-1 != -1)
-/* Because:
- * #define FOO => FOO={} => defined( ) => (-1 != - - 1) => 1
- * #define FOO 1 or on command-line -DFOO
- *	=> defined(1) => (-1 != - 1 - 1) => 1
- * if FOO isn't defined, FOO=0. But some compilers default to 0 instead of 1
- * for -DFOO, oh well.
- *	=> defined(0) => (-1 != - 0 - 1) => 0
- *
- * But:
- * defined("") => (-1 != - "" - 1)
- *   [which is an unavoidable catastrophe.]
- */
 #endif
 
 #endif	/* CONFIG1_H */

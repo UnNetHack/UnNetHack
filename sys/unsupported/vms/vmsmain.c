@@ -245,7 +245,7 @@ char *argv[];
 		switch(argv[0][1]){
 		case 'D':
 #ifdef WIZARD
-			if(!strcmpi(nh_getenv("USER"), WIZARD_NAME)) {
+			if(!strcmpi(nh_getenv("USER"), WIZARD)) {
 				wizard = TRUE;
 				break;
 			}
@@ -443,7 +443,7 @@ wd_message()
 #ifdef WIZARD
 	if (wiz_error_flag) {
 		pline("Only user \"%s\" may access debug (wizard) mode.",
-			WIZARD_NAME);
+			WIZARD);
 		pline("Entering discovery mode instead.");
 	} else
 #endif

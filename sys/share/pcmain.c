@@ -302,11 +302,7 @@ char *argv[];
 				/* accepts any suffix */
 #ifdef WIZARD
 	if (wizard) {
-# ifdef KR1ED
-		if(!strcmp(plname, WIZARD_NAME))
-# else
 		if(!strcmp(plname, WIZARD))
-# endif
 			Strcpy(plname, "wizard");
 		else {
 			wizard = FALSE;

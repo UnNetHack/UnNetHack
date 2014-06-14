@@ -155,12 +155,7 @@
  */
 
 #ifndef WIZARD		/* allow for compile-time or Makefile changes */
-# ifndef KR1ED
 #  define WIZARD  "wizard" /* the person allowed to use the -D option */
-# else
-#  define WIZARD
-#  define WIZARD_NAME "wizard"
-# endif
 #endif
 
 #define LOGFILE "logfile"	/* larger file for debugging purposes */

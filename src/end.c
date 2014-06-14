@@ -313,11 +313,7 @@ panic VA_DECL(const char *, str)
 # else
 	if (!wizard)
 	    raw_printf("Report error to \"%s\"%s.",
-#  ifdef WIZARD_NAME	/*(KR1ED)*/
-			WIZARD_NAME,
-#  else
 			WIZARD,
-#  endif
 			!program_state.something_worth_saving ? "" :
 			" and it may be possible to rebuild.");
 # endif

@@ -526,11 +526,7 @@ wd_message()
 #ifdef WIZARD
 	if (wiz_error_flag) {
 		pline("Only user \"%s\" may access debug (wizard) mode.",
-# ifndef KR1ED
 			WIZARD);
-# else
-			WIZARD_NAME);
-# endif
 		pline("Entering discovery mode instead.");
 	} else
 #endif
