@@ -590,9 +590,6 @@ REGION:(00,00,70,18),lit,"ordinary"
 # when falling down on this level, never end up in the fog maze
 TELEPORT_REGION:(00,00,70,18),(02,03,68,15),down
 
-# Stairs up, not in the fog maze
-STAIR:(00,00,70,18),(02,03,68,15),up
-STAIR:random,down
 # Objects
 LOOP [15] {
   OBJECT:random,random
@@ -608,6 +605,11 @@ LOOP [28] {
 }
 
 MAZEWALK:(4, 2), south
+
+# Stairs up, not in the fog maze
+STAIR:(00,00,70,18),(02,03,68,15),up
+STAIR:random,down
+
 
 # The Mandelbrot
 
