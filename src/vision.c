@@ -836,7 +836,7 @@ block_point(x,y)
      * was out of night-vision range of the hero.  Suddenly the hero should
      * see the lit room.
      */
-    if (viz_array[y][x]) vision_full_recalc = 1;
+    if (isok(x,y) && (viz_array[y][x])) vision_full_recalc = 1;
 }
 
 /*
@@ -852,7 +852,7 @@ unblock_point(x,y)
 
     /* recalc light sources here? */
 
-    if (viz_array[y][x]) vision_full_recalc = 1;
+    if (isok(x,y) && (viz_array[y][x])) vision_full_recalc = 1;
 }
 
 
