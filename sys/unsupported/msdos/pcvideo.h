@@ -16,9 +16,7 @@
 #include "portio.h"
 
 # ifdef SCREEN_BIOS
-#  if !defined(PC9800)
 # define MONO_CHECK		/* Video BIOS can do the check       */ 
-#  endif
 # endif
 
 # ifdef SCREEN_DJGPPFAST
@@ -28,32 +26,14 @@
 /*
  * PC interrupts
  */
-# ifdef PC9800
-#define CRT_BIOS	0x18
-#define DOS_EXT_FUNC	0xdc
-#define DIRECT_CON_IO	0x10
-# else
 #define VIDEO_BIOS  0x10
-# endif
 #define DOSCALL	    0x21
 
 
 /*
  * Video BIOS functions
  */
-# if defined(PC9800)
-#define SENSEMODE	0x0b	/* Sense CRT Mode */
-
-#define PUTCHAR		0x00	/* Put Character */
-#define SETATT		0x02	/* Set Attribute */
-#define SETCURPOS	0x03	/* Set Cursor Position */
-#define CURSOR_RIGHT	0x08	/* Move Cursor Right */
-#define CURSOR_LEFT	0x09	/* Move Cursor Left */
-#define SCREEN_CLEAR	0x0a	/* Clear Screen */
-#define LINE_CLEAR	0x0b	/* Clear Line */
-# else
 #define SETCURPOS   0x02    /* Set Cursor Position */
-# endif
 
 #define GETCURPOS   0x03    /* Get Cursor Position */
 #define GETMODE     0x0f    /* Get Video Mode */
@@ -168,27 +148,6 @@ struct overview_planar_cell_struct {
 #define ATTRIB_VGA_NORMAL     CLR_GRAY	/* Normal attribute */
 #define ATTRIB_VGA_INTENSE    13	/* Intense White 94/06/07 palette chg*/
 # endif /*SCREEN_VGA || SCREEN_8514*/
-
-# if defined(PC9800)
-static unsigned char attr98[CLR_MAX] = {
-	0xe1,  /*  0 white            */
-	0x21,  /*  1 blue             */
-	0x81,  /*  2 green            */
-	0xa1,  /*  3 cyan             */
-	0x41,  /*  4 red              */
-	0x61,  /*  5 magenta          */
-	0xc1,  /*  6 yellow           */
-	0xe1,  /*  7 white            */
-	0xe1,  /*  8 white            */
-	0x25,  /*  9 reversed blue    */
-	0x85,  /* 10 reversed green   */
-	0xa5,  /* 11 reversed cyan    */
-	0x45,  /* 12 reversed red     */
-	0x65,  /* 13 reversed magenta */
-	0xc5,  /* 14 reversed yellow  */
-	0xe5,  /* 15 reversed white   */
-};
-# endif
 
 # ifdef SIMULATE_CURSOR
 #define CURSOR_HEIGHT    3	/* this should go - MJA */

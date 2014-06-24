@@ -316,10 +316,6 @@ struct symdef defsyms[MAXPCHARS] = {
 
 #ifdef ASCIIGRAPH
 
-#ifdef PC9800
-void NDECL((*ibmgraphics_mode_callback)) = 0;	/* set in tty_start_screen() */
-#endif /* PC9800 */
-
 #ifdef CURSES_GRAPHICS
 void NDECL((*cursesgraphics_mode_callback)) = 0;
 #endif
@@ -739,10 +735,6 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
 };
 #endif
 
-#ifdef PC9800
-void NDECL((*ascgraphics_mode_callback)) = 0;	/* set in tty_start_screen() */
-#endif
-
 /*
  * Convert the given character to an object class.  If the character is not
  * recognized, then MAXOCLASSES is returned.  Used in detect.c invent.c,
@@ -799,9 +791,6 @@ int gr_set_flag;
 	default:
 	case ASCII_GRAPHICS:
 	    assign_graphics((glyph_t *)0, 0, MAXPCHARS, 0);
-#ifdef PC9800
-	    if (ascgraphics_mode_callback) (*ascgraphics_mode_callback)();
-#endif
 	    break;
 #ifdef ASCIIGRAPH
 	case IBM_GRAPHICS:
@@ -818,9 +807,6 @@ int gr_set_flag;
         iflags.cursesgraphics = FALSE;
 #endif
 	    assign_graphics(ibm_graphics, SIZE(ibm_graphics), MAXPCHARS, 0);
-#ifdef PC9800
-	    if (ibmgraphics_mode_callback) (*ibmgraphics_mode_callback)();
-#endif
 	    break;
 #endif /* ASCIIGRAPH */
 #ifdef TERMLIB

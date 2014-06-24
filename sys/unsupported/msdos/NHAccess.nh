@@ -34,8 +34,6 @@ OPTIONS=rawio,BIOS,!IBMgraphics
 # playing music instruments in NetHack.  To use this feature, if available,
 # uncomment the following line:
 #OPTIONS=soundcard:autodetect
-# If your machine is NEC PC-9800, use:
-#OPTIONS=rawio,BIOS,video:default
 #
 #
 # General options.  You might also set "silent" so as not to attract
@@ -124,11 +122,3 @@ SAVE=;n
 #          048 035 064 042                         \
 #          047 045 092 058 058 092 045 047         \
 #          047 045 092 058 032 058 092 045 047
-
-# =================================================
-# *** VIDEOCOLORS AND VIDEOSHADES ***
-#
-# While playing on NEC PC-9800, default game display may be difficult to
-# read.  Try following setting.
-#
-#OPTIONS=videocolors:4-2-6-1-5-3-4-2-6-1-5-3,videoshades:normal-normal-normal

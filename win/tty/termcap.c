@@ -519,9 +519,6 @@ tty_decgraphics_termcap_fixup()
 	 * reasonably be using the UK character set.
 	 */
 	if (iflags.DECgraphics) xputs("\033)0");
-#ifdef PC9800
-	init_hilite();
-#endif
 
 #if defined(ASCIIGRAPH) && !defined(NO_TERMS)
 	/* some termcaps suffer from the bizarre notion that resetting
@@ -550,47 +547,11 @@ tty_decgraphics_termcap_fixup()
 }
 #endif	/* TERMLIB */
 
-#if defined(ASCIIGRAPH) && defined(PC9800)
-extern void NDECL((*ibmgraphics_mode_callback));    /* defined in drawing.c */
-#endif
-
-#ifdef PC9800
-extern void NDECL((*ascgraphics_mode_callback));    /* defined in drawing.c */
-static void NDECL(tty_ascgraphics_hilite_fixup);
-
-static void
-tty_ascgraphics_hilite_fixup()
-{
-    register int c;
-
-    for (c = 0; c < CLR_MAX / 2; c++)
-	if (c != CLR_BLACK) {
-		hilites[c|BRIGHT] = (char *) alloc(sizeof("\033[1;3%dm"));
-		Sprintf(hilites[c|BRIGHT], "\033[1;3%dm", c);
-		if (iflags.wc2_newcolors || (c != CLR_GRAY)) {
-			hilites[c] = (char *) alloc(sizeof("\033[0;3%dm"));
-			Sprintf(hilites[c], "\033[0;3%dm", c);
-		}
-	}
-}
-#endif /* PC9800 */
-
 void
 tty_start_screen()
 {
 	xputs(TI);
 	xputs(VS);
-#ifdef PC9800
-    if (!iflags.IBMgraphics && !iflags.DECgraphics)
-	    tty_ascgraphics_hilite_fixup();
-    /* set up callback in case option is not set yet but toggled later */
-    ascgraphics_mode_callback = tty_ascgraphics_hilite_fixup;
-# ifdef ASCIIGRAPH
-    if (iflags.IBMgraphics) init_hilite();
-    /* set up callback in case option is not set yet but toggled later */
-    ibmgraphics_mode_callback = init_hilite;
-# endif
-#endif /* PC9800 */
 
 #ifdef TERMLIB
 	if (iflags.DECgraphics) tty_decgraphics_termcap_fixup();

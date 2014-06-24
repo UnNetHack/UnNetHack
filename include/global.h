@@ -248,11 +248,7 @@ typedef xchar	boolean;		/* 0 or 1 */
 #  define PORT_ID	"Mac"
 # endif
 # ifdef MSDOS
-#  ifdef PC9800
-#  define PORT_ID	"PC-9800"
-#  else
 #  define PORT_ID	"PC"
-#  endif
 #  ifdef DJGPP
 #  define PORT_SUB_ID	"djgpp"
 #  else

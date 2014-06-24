@@ -185,4 +185,3 @@ Alt-u    untrap         - untrap something.
 Alt-v    version        - list compile time options for this version of NetHack.
 Alt-w    wipe           - wipe off your face.
 
-If you are playing on NEC PC-9800, use the GRPH key instead of the ALT key.

@@ -30,8 +30,6 @@ OPTIONS=rawio,BIOS,IBMgraphics
 # uncomment the following line:
 #OPTIONS=soundcard:autodetect
 
-# If your machine is NEC PC-9800, use:
-#OPTIONS=rawio,BIOS,video:default
 # If you use an Atari and want tty use:
 #OPTIONS=windowtype:tty,rawio,BIOS
 
@@ -157,11 +155,6 @@ OPTIONS=time,noshowexp,number_pad:2,lit_corridor
 
 # =================================================
 # *** VIDEOCOLORS AND VIDEOSHADES ***
-#
-# While playing on NEC PC-9800, default game display may be difficult to
-# read.  Try following setting.
-#
-#OPTIONS=videocolors:4-2-6-1-5-3-4-2-6-1-5-3,videoshades:normal-normal-normal
 #
 # DEC Rainbows will hang if rawio is set, so they should instead use:
 #OPTIONS=BIOS,DECgraphics

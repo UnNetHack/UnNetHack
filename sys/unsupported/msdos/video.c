@@ -402,9 +402,6 @@ tty_end_screen()
 
 	if (!iflags.grmode) {
 		txt_clear_screen();
-#  ifdef PC9800
-		fputs("\033[>1l", stdout);
-#  endif
 #  ifdef SCREEN_VGA
 	} else if (iflags.usevga) {
 		vga_tty_end_screen();
@@ -470,9 +467,6 @@ int *wid, *hgt;
 void
 tty_start_screen()
 {
-#  ifdef PC9800
-	fputs("\033[>1h", stdout);
-#  endif
 	if (iflags.num_pad) tty_number_pad(1);	/* make keypad send digits */
 }
 

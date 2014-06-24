@@ -32,11 +32,7 @@
 /*
  * BIOS interrupts
  */
-#ifdef PC9800
-#define KEYBRD_BIOS 0x18
-#else
 #define KEYBRD_BIOS 0x16
-#endif
 
 /*
  * Keyboard BIOS functions
@@ -85,13 +81,8 @@ tgetch()
 /*
  *  Keyboard translation tables.
  */
-#ifdef PC9800
-#define KEYPADLO	0x38
-#define KEYPADHI	0x50
-#else
 #define KEYPADLO	0x47
 #define KEYPADHI	0x53
-#endif
 
 #define PADKEYS 	(KEYPADHI - KEYPADLO + 1)
 #define iskeypad(x)	(KEYPADLO <= (x) && (x) <= KEYPADHI)
@@ -104,33 +95,6 @@ tgetch()
 static const struct pad {
 	char normal, shift, cntrl;
 } keypad[PADKEYS] = {
-#ifdef PC9800
-			{'>', '>', '>'},		/* Ins */
-			{'<', '<', '<'},		/* Del */
-			{'k', 'K', C('k')},		/* Up */
-			{'h', 'H', C('h')},		/* Left */
-			{'l', 'L', C('l')},		/* Right */
-			{'j', 'J', C('j')},		/* Down */
-			{ 0 ,  0 ,  0 },		/* HomeClr */
-			{'?', '?', '?' },		/* Help */
-			{'m', C('p'), C('p')},		/* - */
-			{'/', '/', '/'},		/* / */
-			{'y', 'Y', C('y')},		/* 7 */
-			{'k', 'K', C('k')},		/* 8 */
-			{'u', 'U', C('u')},		/* 9 */
-			{'*', '*', '*'},		/* * */
-			{'h', 'H', C('h')},		/* 4 */
-			{'g', 'g', 'g'},		/* 5 */
-			{'l', 'L', C('l')},		/* 6 */
-			{'p', 'P', C('p')},		/* + */
-			{'b', 'B', C('b')},		/* 1 */
-			{'j', 'J', C('j')},		/* 2 */
-			{'n', 'N', C('n')},		/* 3 */
-			{'=', '=', '='},		/* = */
-			{'i', 'I', C('i')},		/* 0 */
-			{',', ':', ':'}, 		/* , */
-			{'.', '.', '.'} 		/* . */
-#else
 			{'y', 'Y', C('y')},		/* 7 */
 			{'k', 'K', C('k')},		/* 8 */
 			{'u', 'U', C('u')},		/* 9 */
@@ -144,35 +108,7 @@ static const struct pad {
 			{'n', 'N', C('n')},		/* 3 */
 			{'i', 'I', C('i')},		/* Ins */
 			{'.', ':', ':'}			/* Del */
-#endif
 }, numpad[PADKEYS] = {
-#ifdef PC9800
-			{'>', '>', '>'},		/* Ins */
-			{'<', '<', '<'},		/* Del */
-			{'8', M('8'), '8'},		/* Up */
-			{'4', M('4'), '4'},		/* Left */
-			{'6', M('6'), '6'},		/* Right */
-			{'2', M('2'), '2'},		/* Down */
-			{ 0 ,  0 ,  0 },		/* HomeClr */
-			{'?', '?', '?'},		/* Help */
-			{'m', C('p'), C('p')},		/* - */
-			{'/', '/', '/'},		/* / */
-			{'7', M('7'), '7'},		/* 7 */
-			{'8', M('8'), '8'},		/* 8 */
-			{'9', M('9'), '9'},		/* 9 */
-			{'*', '*', '*'},		/* * */
-			{'4', M('4'), '4'},		/* 4 */
-			{'g', 'G', 'g'},		/* 5 */
-			{'6', M('6'), '6'},		/* 6 */
-			{'p', 'P', C('p')},		/* + */
-			{'1', M('1'), '1'},		/* 1 */
-			{'2', M('2'), '2'},		/* 2 */
-			{'3', M('3'), '3'},		/* 3 */
-			{'=', '=', '='},		/* = */
-			{'i', 'I', C('i')},		/* 0 */
-			{',', ':', ':'},		/* , */
-			{'.', '.', '.'} 		/* . */
-#else
 			{'7', M('7'), '7'},		/* 7 */
 			{'8', M('8'), '8'},		/* 8 */
 			{'9', M('9'), '9'},		/* 9 */
@@ -186,7 +122,6 @@ static const struct pad {
 			{'3', M('3'), '3'},		/* 3 */
 			{'0', M('0'), '0'},		/* Ins */
 			{'.', ':', ':'}			/* Del */
-#endif
 };
 
 /*
@@ -197,23 +132,12 @@ static const struct pad {
  * scan code table to translate the scan code into a letter, then set the
  * "meta" bit for it.  -3.
  */
-#ifdef PC9800
-#define SCANLO		0x5
-#else
 #define SCANLO		0x10
-#endif /* PC9800 */
 
 static const char scanmap[] = { 	/* ... */
-#ifdef PC9800
-			 0,  0,  0,  0,  0,  0, '-','^','\\','\b',
-	'\t','q','w','e','r','t','y','u','i','o','p','@','[', '\n',
-	'a','s','d','f','g','h','j','k','l',';',':', ']',
-	'z','x','c','v','b','N','m',',','.','/'	/* ... */
-#else
 	'q','w','e','r','t','y','u','i','o','p','[',']', '\n',
 	0, 'a','s','d','f','g','h','j','k','l',';','\'', '`',
 	0, '\\', 'z','x','c','v','b','n','m',',','.','?'	/* ... */
-#endif /* PC9800 */
 };
 
 #define inmap(x)	(SCANLO <= (x) && (x) < SCANLO + SIZE(scanmap))
@@ -230,16 +154,9 @@ static const char numeric_scanmap[] = { 	/* ... */
 /*
  * BIOSgetch gets keys directly with a BIOS call.
  */
-#ifdef PC9800
-#define SHIFT		0x1
-#define KANA		0x4
-#define GRPH		0x8
-#define CTRL		0x10
-#else
 #define SHIFT		(0x1 | 0x2)
 #define CTRL		0x4
 #define ALT		0x8
-#endif /* PC9800 */
 
 static char
 BIOSgetch()
@@ -279,13 +196,7 @@ BIOSgetch()
 	}
 #endif
 	/* Translate unassigned Alt-letters */
-#ifdef PC9800
-	if (shift & KANA)
-		return 0;
-	if ((shift & GRPH) && (ch >= 0x80)) {
-#else
 	if ((shift & ALT) && !ch) {
-#endif
 #if 0
 		pline("Scan code: %d 0x%03X", scan, scan);
 #endif
@@ -312,10 +223,6 @@ DOSgetch()
 	intdos(&regs, &regs);
 	ch = regs.h.al;
 
-#ifdef PC9800
-	if (ch < 0)	/* KANA letters and GRPH-shifted letters(?) */
-		ch = 0; /* munch it */
-#else
 	/*
 	 * The extended codes for Alt-shifted letters, and unshifted keypad
 	 * and function keys, correspond to the scan codes.  So we can still
@@ -334,7 +241,6 @@ DOSgetch()
 			if (isprint(ch)) ch = M(ch);
 		} else ch = 0;		/* munch it */
 	}
-#endif
 	return (ch);
 }
 

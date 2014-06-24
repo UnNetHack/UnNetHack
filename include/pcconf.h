@@ -66,11 +66,6 @@
 /* #define SCREEN_DJGPPFAST */	/* Use djgpp fast screen routines	*/
 # endif
 
-
-/* # define PC9800 */	/* Allows NetHack to run on NEC PC-9800 machines */
-			/* Yamamoto Keizo */
-
-
 /*
  * PC video hardware support options (for graphical tile support)
  *
@@ -78,7 +73,7 @@
  *
  */
 # ifndef SUPPRESS_GRAPHICS
-#  if (defined(SCREEN_BIOS) || defined(SCREEN_DJGPPFAST)) && !defined(PC9800)
+#  if (defined(SCREEN_BIOS) || defined(SCREEN_DJGPPFAST))
 #   ifdef USE_TILES
 #define SCREEN_VGA	/* Include VGA	  graphics routines in the build */
 #   endif
