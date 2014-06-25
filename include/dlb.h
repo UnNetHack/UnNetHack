@@ -63,14 +63,7 @@ typedef struct dlb_handle {
 #endif
 } dlb;
 
-#if defined(ULTRIX_PROTO) && !defined(__STDC__)
- /* buggy old Ultrix compiler wants this for the (*dlb_fread_proc)
-    and (*dlb_fgets_proc) prototypes in struct dlb_procs (dlb.c);
-    we'll use it in all the declarations for consistency */
-#define DLB_P struct dlb_handle *
-#else
 #define DLB_P dlb *
-#endif
 
 boolean NDECL(dlb_init);
 void NDECL(dlb_cleanup);

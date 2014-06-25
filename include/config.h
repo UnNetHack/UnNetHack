@@ -9,7 +9,7 @@
 /*
  * Section 1:	Operating and window systems selection.
  *		Select the version of the OS you are using.
- *		For "UNIX" select BSD, ULTRIX, SYSV, or HPUX in unixconf.h.
+ *		For "UNIX" select BSD, SYSV, or HPUX in unixconf.h.
  *		A "VMS" option is not needed since the VMS C-compilers
  *		provide it (no need to change sec#1, vmsconf.h handles it).
  */
@@ -27,13 +27,6 @@
 /* #define MINIMAL_TERM */
 			/* if a terminal handles highlighting or tabs poorly,
 			   try this define, used in pager.c and termcap.c */
-/* #define ULTRIX_CC20 */
-			/* define only if using cc v2.0 on a DECstation */
-/* #define ULTRIX_PROTO */
-			/* define for Ultrix 4.0 (or higher) on a DECstation;
-			 * if you get compiler errors, don't define this. */
-			/* Hint: if you're not developing code, don't define
-			   ULTRIX_PROTO. */
 
 #include "config1.h"	/* should auto-detect MSDOS, MAC, AMIGA, and WIN32 */
 

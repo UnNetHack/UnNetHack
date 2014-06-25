@@ -1631,7 +1631,7 @@ int retryct;
 		    HUP raw_printf(
 			    "Waiting for access to %s.  (%d retries left).",
 			    filename, retryct);
-# if defined(SYSV) || defined(ULTRIX) || defined(VMS)
+# if defined(SYSV) || defined(VMS)
 		    (void)
 # endif
 			sleep(1);

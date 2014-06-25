@@ -1160,7 +1160,7 @@ register unsigned int len;
 {
 	register int rlen;
 
-#if defined(BSD) || defined(ULTRIX)
+#if defined(BSD)
 	rlen = read(fd, buf, (int) len);
 	if(rlen != len){
 #else /* e.g. SYSV, __TURBOC__ */

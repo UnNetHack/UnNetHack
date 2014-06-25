@@ -63,7 +63,7 @@ struct termio termio;
 #include	<signal.h>
 #endif
 
-#if defined(TIOCGWINSZ) && (defined(BSD) || defined(ULTRIX) || defined(AIX_31) || defined(_BULL_SOURCE) || defined(SVR4))
+#if defined(TIOCGWINSZ) && (defined(BSD) || defined(AIX_31) || defined(_BULL_SOURCE) || defined(SVR4))
 #define USE_WIN_IOCTL
 #include "tcap.h"	/* for LI and CO */
 #endif
@@ -90,10 +90,7 @@ void
 getwindowsz()
 {
 #ifdef USE_WIN_IOCTL
-    /*
-     * ttysize is found on Suns and BSD
-     * winsize is found on Suns, BSD, and Ultrix
-     */
+    /* ttysize and winsize are found on Suns and BSD */
     struct winsize ttsz;
 
     if (ioctl(fileno(stdin), (int)TIOCGWINSZ, (char *)&ttsz) != -1) {

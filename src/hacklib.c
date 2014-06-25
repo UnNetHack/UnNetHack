@@ -489,7 +489,7 @@ setrandom()
 #ifdef RANDOM	/* srandom() from sys/share/random.c */
 	srandom((unsigned int) time((time_t *)0));
 #else
-# if defined(__APPLE__) || defined(BSD) || defined(LINUX) || defined(ULTRIX) || defined(CYGWIN32) /* system srandom() */
+# if defined(__APPLE__) || defined(BSD) || defined(LINUX) || defined(CYGWIN32) /* system srandom() */
 #  if defined(BSD) && !defined(POSIX_TYPES)
 #   if defined(SUNOS4)
 	(void)
@@ -514,7 +514,7 @@ getlt()
 {
 	time_t date = current_epoch();
 
-#if (defined(ULTRIX) && !(defined(ULTRIX_PROTO) || defined(NHSTDC))) || (defined(BSD) && !defined(POSIX_TYPES))
+#if defined(BSD) && !defined(POSIX_TYPES)
 	return(localtime((long *)(&date)));
 #else
 	return(localtime(&date));
@@ -553,7 +553,7 @@ time_t date;
 	if (date == 0)
 		lt = getlt();
 	else
-#if (defined(ULTRIX) && !(defined(ULTRIX_PROTO) || defined(NHSTDC))) || defined(BSD)
+#if defined(NHSTDC))) || defined(BSD)
 		lt = localtime((long *)(&date));
 #else
 		lt = localtime(&date);
@@ -575,7 +575,7 @@ time_t date;
 	if (date == 0)
 		lt = getlt();
 	else
-#if (defined(ULTRIX) && !(defined(ULTRIX_PROTO) || defined(NHSTDC))) || (defined(BSD) && !defined(POSIX_TYPES))
+#if defined(BSD) && !defined(POSIX_TYPES)
 		lt = localtime((long *)(&date));
 #else
 		lt = localtime(&date);

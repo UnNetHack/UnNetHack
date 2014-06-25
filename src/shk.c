@@ -3795,7 +3795,7 @@ boolean cant_mollify;
 		    verbalize("Out of my way, scum!");
 		    wait_synch();
 #if defined(UNIX) || defined(VMS)
-# if defined(SYSV) || defined(ULTRIX) || defined(VMS)
+# if defined(SYSV) || defined(VMS)
 		    (void)
 # endif
 			sleep(1);

@@ -15,7 +15,7 @@
 #endif
 
 #if !defined(_BULL_SOURCE) && !defined(__sgi) && !defined(_M_UNIX)
-# if !defined(SUNOS4) && !(defined(ULTRIX) && defined(__GNUC__))
+# if !defined(SUNOS4)
 #  if defined(POSIX_TYPES) || defined(SVR4) || defined(HPUX)
 extern struct passwd *FDECL(getpwuid,(uid_t));
 #  else

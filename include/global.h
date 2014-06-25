@@ -135,20 +135,8 @@ typedef xchar	boolean;		/* 0 or 1 */
 #  define ALIGNTYP_P int
 # endif
 #endif
-#if defined(ULTRIX_PROTO) && !defined(__STDC__)
-/* The ultrix 2.0 and 2.1 compilers (on Ultrix 4.0 and 4.2 respectively) can't
- * handle "struct obj *" constructs in prototypes.  Their bugs are different,
- * but both seem to work if we put "void*" in the prototype instead.  This
- * gives us minimal prototype checking but avoids the compiler bugs.
- *
- * OBJ_P and MONST_P should _only_ be used for declaring function pointers.
- */
-#define OBJ_P void*
-#define MONST_P void*
-#else
 #define OBJ_P struct obj*
 #define MONST_P struct monst*
-#endif
 
 #define SIZE(x) (int)(sizeof(x) / sizeof(x[0]))
 
