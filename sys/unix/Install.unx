@@ -147,9 +147,8 @@ Notes:
     character, and then hangs indefinitely, gets a segmentation fault, or
     traps you in a single room on the first level, you might try changing
     the schar and uchar definitions in config.h to short ints.  This problem
-    is known to occur on the AT&T 3B series, Silicon Graphics Irises, and
-    IBM systems (PC/RT & RS/6000) running AIX, and may occur on other
-    computers as well.
+    is known to occur on the AT&T 3B series, Silicon Graphics Irises and 
+    may occur on other computers as well.
 
     This problem is really most likely caused by having a non-__STDC__
     compiler with char's unsigned by default.  Since some such compilers
@@ -165,16 +164,6 @@ Notes:
     (SGI machines running IRIX 4.0.x have a compiler close enough to
     standard to suit NetHack, so you may merely use the suggested flags
     in the Makefiles.)
-
-    Note that at least RS/6000's seem to like changing the default to
-    signed better but there is also a problem:  The lexers created by
-    the standard lex program in AIX may come out faulty when this switch
-    is used (known to happen at least in AIX 3.1.3), so you may have to
-    use an alternative, like flex, which is available at major archive
-    sites (see notes 10 and 11).
-
-    By AIX 3.2.5, this whole problem should be taken care of automatically
-    (but AIX_31 should still be defined in unixconf.h for other reasons).
 
 9.  Under SCO UNIX, you may have all sorts of complaints about
     include/obj.h.  Go to the file and uncomment the marked line, working

@@ -8,20 +8,6 @@
  * This file contains the Dungeon Compiler code
  */
 
-/* In case we're using bison in AIX.  This definition must be
- * placed before any other C-language construct in the file
- * excluding comments and preprocessor directives (thanks IBM
- * for this wonderful feature...).
- *
- * Note: some cpps barf on this 'undefined control' (#pragma).
- * Addition of the leading space seems to prevent barfage for now,
- * and AIX will still see the directive in its non-standard locale.
- */
-
-#ifdef _AIX
- #pragma alloca		/* keep leading space! */
-#endif
-
 #include "config.h"
 #include "date.h"
 #include "dgn_file.h"

@@ -267,7 +267,7 @@ register char *s;
 
 	while((lp=index(s, '.')) || (lp=index(s, '/')) || (lp=index(s,' ')))
 		*lp = '_';
-#if defined(SYSV) && !defined(AIX_31) && !defined(SVR4) && !defined(LINUX) && !defined(__APPLE__)
+#if defined(SYSV) && !defined(SVR4) && !defined(LINUX) && !defined(__APPLE__)
 	/* avoid problems with 14 character file name limit */
 # ifdef COMPRESS
 	/* leave room for .e from error and .Z from compress appended to

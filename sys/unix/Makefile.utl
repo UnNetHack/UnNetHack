@@ -54,18 +54,6 @@
 # (as long as it claims to be __STDC__ but isn't)
 # CFLAGS = -DAPOLLO -O -I../include
 
-# flags for AIX 3.1 cc on IBM RS/6000 to define
-# a suitable subset of standard libraries
-# (note that there is more info regarding the "-qchars=signed"
-# switch in file Install.unx note 8)
-# CFLAGS = -D_NO_PROTO -D_XOPEN_SOURCE -O -I../include -qchars=signed
-# and for AIX 3.2:
-# CFLAGS = -D_NO_PROTO -D_XOPEN_SOURCE -D_ALL_SOURCE -O -I../include -qchars=signed
-
-# flags for A/UX 2.01 using native cc or c89
-# gcc predefines AUX so that's not needed there
-# CFLAGS = -ZS -D_POSIX_SOURCE -O -I../include -DAUX
-
 # flags for IRIX 4.0.x using native cc
 # SGI cc 3.10 will fail to compile makedefs with -O
 # CFLAGS = -I../include -D__STDC__ -woff 100,293

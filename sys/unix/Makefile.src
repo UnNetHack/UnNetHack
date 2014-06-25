@@ -97,22 +97,6 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
 # CFLAGS = -mshort -O2 -fomit-frame-pointer -I../include
 # LFLAGS = -mshort -s
 
-# flags for AIX 3.1 cc on IBM RS/6000 to define
-# a suitable subset of standard libraries
-# (note that there is more info regarding the "-qchars=signed"
-# switch in file Install.unx note 8)
-# CFLAGS = -D_NO_PROTO -D_XOPEN_SOURCE -O -I../include -qchars=signed
-#
-# Some of our subroutines are complex enough that this is required for full
-# optimization under AIX 3.2 (I don't know about 3.1).
-#
-# CFLAGS = -D_NO_PROTO -D_XOPEN_SOURCE -D_ALL_SOURCE -O -I../include -qchars=signed -qmaxmem=5000
-
-# flags for A/UX 2.01 using native cc or c89
-# gcc predefines AUX so that's not needed there
-# Remember to use -lcurses for WINLIB below !
-# CFLAGS = -ZS -D_POSIX_SOURCE -O -I../include -DAUX
-
 # flags for IRIX 4.0.x using native cc
 # The include files are __STDC__, but have bugs involving const
 # CFLAGS = -O -I../include -D__STDC__ -Dconst= -woff 100,293

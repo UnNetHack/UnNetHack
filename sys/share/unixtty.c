@@ -29,7 +29,7 @@
 #  define termstruct	termios
 # else
 #  include <termio.h>
-#  if defined(TCSETS) && !defined(AIX_31)
+#  if defined(TCSETS)
 #   define termstruct	termios
 #  else
 #   define termstruct	termio
@@ -68,7 +68,7 @@
 #  define GTTY(x)	(tcgetattr(0, x))
 #  define STTY(x)	(tcsetattr(0, TCSADRAIN, x))
 # else
-#  if defined(TCSETS) && !defined(AIX_31)
+#  if defined(TCSETS)
 #   define GTTY(x)	(ioctl(0, TCGETS, x))
 #   define STTY(x)	(ioctl(0, TCSETSW, x))
 #  else

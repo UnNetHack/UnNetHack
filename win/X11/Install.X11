@@ -160,13 +160,6 @@ Notes for Sun's OpenWindows:
 	of the possibilities mentioned for standard X11 should work.
 
 
-Notes for AIX 3.2:
-    1.  AIX 3.2 includes the Athena Widget Toolkit library (and other things)
-	under the /usr/lpp/X11/Xamples tree, so you will have to add
-	-L/usr/lpp/X11/Xamples/lib to LFLAGS.  If you can't find libXaw.a on
-	your first build, go into /usr/lib/X11/Xamples, read the README file,
-	and build the library.
-
 Notes for XFree86 - (on linux and BSD386 platforms)
 
     1.  Edit src/Makefile for linux/BSD386. Even though you use the 

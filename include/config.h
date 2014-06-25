@@ -281,9 +281,7 @@ typedef signed char	schar;
  *
  *	typedef unsigned short int uchar;
  */
-#ifndef _AIX32		/* identical typedef in system file causes trouble */
 typedef unsigned char	uchar;
-#endif
 
 /* Type used for outputting DECgraphics and IBMgraphics characters into
  * HTML dumps or for holding unicode codepoints. */

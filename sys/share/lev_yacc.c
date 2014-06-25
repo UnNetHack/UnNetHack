@@ -365,19 +365,6 @@
  * It may handle special mazes & special room-levels
  */
 
-/* In case we're using bison in AIX.  This definition must be
- * placed before any other C-language construct in the file
- * excluding comments and preprocessor directives (thanks IBM
- * for this wonderful feature...).
- *
- * Note: some cpps barf on this 'undefined control' (#pragma).
- * Addition of the leading space seems to prevent barfage for now,
- * and AIX will still see the directive.
- */
-#ifdef _AIX
- #pragma alloca		/* keep leading space! */
-#endif
-
 #include "hack.h"
 #include "sp_lev.h"
 
@@ -642,8 +629,6 @@ YYID (i)
 #    define YYSTACK_ALLOC __builtin_alloca
 #   elif defined __BUILTIN_VA_ARG_INCR
 #    include <alloca.h> /* INFRINGES ON USER NAME SPACE */
-#   elif defined _AIX
-#    define YYSTACK_ALLOC __alloca
 #   elif defined _MSC_VER
 #    include <malloc.h> /* INFRINGES ON USER NAME SPACE */
 #    define alloca _alloca

@@ -12,12 +12,6 @@
 # ifdef HPUX
 #include <bsdtty.h>
 # else
-#  if defined(AIX_31) && !defined(_ALL_SOURCE)
-#   define _ALL_SOURCE	/* causes struct winsize to be present */
-#   ifdef _AIX32
-#    include <sys/ioctl.h>
-#   endif
-#  endif
 #  if defined(_BULL_SOURCE)
 #   include <termios.h>
 struct termios termio;
@@ -40,15 +34,12 @@ struct ltchars ltchars0 = { -1, -1, -1, -1, -1, -1 }; /* turn all off */
 # ifdef POSIX_TYPES
 #include <termios.h>
 struct termios termio;
-#  if defined(BSD) || defined(_AIX32)
-#   if defined(_AIX32) && !defined(_ALL_SOURCE)
-#    define _ALL_SOURCE
-#   endif
+#  if defined(BSD)
 #include <sys/ioctl.h>
 #  endif
 # else
 #include <termio.h>	/* also includes part of <sgtty.h> */
-#  if defined(TCSETS) && !defined(AIX_31)
+#  if defined(TCSETS)
 struct termios termio;
 #  else
 struct termio termio;
@@ -63,7 +54,7 @@ struct termio termio;
 #include	<signal.h>
 #endif
 
-#if defined(TIOCGWINSZ) && (defined(BSD) || defined(AIX_31) || defined(_BULL_SOURCE) || defined(SVR4))
+#if defined(TIOCGWINSZ) && (defined(BSD) || defined(_BULL_SOURCE) || defined(SVR4))
 #define USE_WIN_IOCTL
 #include "tcap.h"	/* for LI and CO */
 #endif
@@ -116,7 +107,7 @@ getioctls()
 # ifdef POSIX_TYPES
 	(void) tcgetattr(fileno(stdin), &termio);
 # else
-#  if defined(TCSETS) && !defined(AIX_31)
+#  if defined(TCSETS)
 	(void) ioctl(fileno(stdin), (int) TCGETS, &termio);
 #  else
 	(void) ioctl(fileno(stdin), (int) TCGETA, &termio);
@@ -138,7 +129,7 @@ setioctls()
 # ifdef POSIX_TYPES
 	(void) tcsetattr(fileno(stdin), TCSADRAIN, &termio);
 # else
-#  if defined(TCSETS) && !defined(AIX_31)
+#  if defined(TCSETS)
 	(void) ioctl(fileno(stdin), (int) TCSETSW, &termio);
 #  else
 	(void) ioctl(fileno(stdin), (int) TCSETAW, &termio);

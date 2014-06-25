@@ -40,9 +40,6 @@
 /* #define HISX */	/* Bull Unix for XPS Machines */
 /* #define BOS */	/* Bull Open Software - Unix for DPX/2 Machines */
 /* #define UNIXPC */	/* use in addition to SYSV for AT&T 7300/3B1 */
-/* #define AIX_31 */	/* In AIX 3.1 (IBM RS/6000) use BSD ioctl's to gain
-			 * job control (note that AIX is SYSV otherwise)
-			 * Also define this for AIX 3.2 */
 
 #define TERMINFO	/* uses terminfo rather than termcap */
 			/* Should be defined for most SYSV, SVR4 (including
@@ -72,7 +69,6 @@
 /* #define MICROPORT_286_BUG */ /* changes needed in termcap.c to get it to
 				   run with Microport Sys V/AT version 2.4.
 				   By Jay Maynard */
-/* #define AIXPS_2BUG */	/* avoid a problem with little_to_big() optimization */
 
 /* #define RANDOM */		/* if neither random/srandom nor lrand48/srand48
 				   is available from your system */
@@ -246,7 +242,7 @@
  * BSD systems are normally the only ones that can suspend processes.
  * Suspending NetHack processes cleanly should be easy to add to other systems
  * that have SIGTSTP in the Berkeley sense.  Currently the only such systems
- * known to work are HPUX and AIX 3.1; other systems will probably require
+ * known to work are HPUX; other systems will probably require
  * tweaks to unixtty.c and ioctl.c.
  *
  * POSIX defines a slightly different type of job control, which should be
@@ -254,7 +250,7 @@
  * various recent SYSV versions (with possibly tweaks to unixtty.c again).
  */
 #ifndef POSIX_JOB_CONTROL
-# if defined(BSD) || defined(HPUX) || defined(AIX_31)
+# if defined(BSD) || defined(HPUX)
 #  define BSD_JOB_CONTROL
 # else
 #  if defined(SVR4)
