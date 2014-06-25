@@ -38,12 +38,6 @@ STATIC_DCL int FDECL(do_improvisation,(struct obj *));
 STATIC_DCL int NDECL(atconsole);
 STATIC_DCL void FDECL(speaker,(struct obj *,char *));
 #endif
-#ifdef VPIX_MUSIC
-extern int sco_flag_console;	/* will need changing if not _M_UNIX */
-STATIC_DCL void NDECL(playinit);
-STATIC_DCL void FDECL(playstring, (char *,size_t));
-STATIC_DCL void FDECL(speaker,(struct obj *,char *));
-#endif
 #ifdef PCMUSIC
 void FDECL( pc_speaker, ( struct obj *, char * ) );
 #endif
@@ -354,7 +348,7 @@ do_improvisation(instr)
 struct obj *instr;
 {
 	int damage, do_spec = !Confusion;
-#if defined(MAC) || defined(AMIGA) || defined(VPIX_MUSIC) || defined (PCMUSIC)
+#if defined(MAC) || defined(AMIGA) || defined (PCMUSIC)
 	struct obj itmp;
 
 	itmp = *instr;
@@ -367,14 +361,10 @@ struct obj *instr;
 # ifdef AMIGA
 	amii_speaker(&itmp, "Cw", AMII_OKAY_VOLUME);
 # endif
-# ifdef VPIX_MUSIC
-	if (sco_flag_console)
-	    speaker(&itmp, "C");
-# endif
 #ifdef PCMUSIC
 	  pc_speaker ( &itmp, "C");
 #endif
-#endif /* MAC || AMIGA || VPIX_MUSIC || PCMUSIC */
+#endif /* MAC || AMIGA || PCMUSIC */
 
 	if (!do_spec)
 	    pline("What you produce is quite far from music...");
@@ -511,10 +501,6 @@ struct obj *instr;
 #ifdef UNIX386MUSIC
 	/* if user is at the console, play through the console speaker */
 	if (atconsole())
-	    speaker(instr, buf);
-#endif
-#ifdef VPIX_MUSIC
-	if (sco_flag_console)
 	    speaker(instr, buf);
 #endif
 #ifdef MAC
@@ -674,84 +660,5 @@ char	*buf;
     }
 }
 #endif /* UNIX386MUSIC */
-
-#ifdef VPIX_MUSIC
-
-# if 0
-#include <sys/types.h>
-#include <sys/console.h>
-#include <sys/vtkd.h>
-# else
-#define KIOC ('K' << 8)
-#define KDMKTONE (KIOC | 8)
-# endif
-
-#define noDEBUG
-
-STATIC_OVL void tone(hz, ticks)
-/* emit tone of frequency hz for given number of ticks */
-unsigned int hz, ticks;
-{
-    ioctl(0,KDMKTONE,hz|((ticks*10)<<16));
-# ifdef DEBUG
-    printf("TONE: %6d %6d\n",hz,ticks * 10);
-# endif
-    nap(ticks * 10);
-}
-
-STATIC_OVL void rest(ticks)
-/* rest for given number of ticks */
-int	ticks;
-{
-    nap(ticks * 10);
-# ifdef DEBUG
-    printf("REST:        %6d\n",ticks * 10);
-# endif
-}
-
-
-#include "interp.c"	/* from snd86unx.shr */
-
-
-STATIC_OVL void
-speaker(instr, buf)
-struct obj *instr;
-char	*buf;
-{
-    /* emit a prefix to modify instrumental `timbre' */
-    playinit();
-    switch (instr->otyp)
-    {
-	case WOODEN_FLUTE:
-	case MAGIC_FLUTE:
-	    playstring(">ol", 1); /* up one octave & lock */
-	    break;
-	case TOOLED_HORN:
-	case FROST_HORN:
-	case FIRE_HORN:
-	    playstring("<<ol", 2); /* drop two octaves & lock */
-	    break;
-	case BUGLE:
-	    playstring("ol", 2); /* octave lock */
-	    break;
-	case WOODEN_HARP:
-	case MAGIC_HARP:
-	    playstring("l8mlol", 4); /* fast, legato, octave lock */
-	    break;
-    }
-    playstring( buf, strlen(buf));
-}
-
-# ifdef DEBUG
-main(argc,argv)
-char *argv[];
-{
-    if (argc == 2) {
-	playinit();
-	playstring(argv[1], strlen(argv[1]));
-    }
-}
-# endif
-#endif	/* VPIX_MUSIC */
 
 /*music.c*/

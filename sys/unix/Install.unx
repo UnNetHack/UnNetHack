@@ -165,16 +165,6 @@ Notes:
     standard to suit NetHack, so you may merely use the suggested flags
     in the Makefiles.)
 
-9.  Under SCO UNIX, you may have all sorts of complaints about
-    include/obj.h.  Go to the file and uncomment the marked line, working
-    around the fact that SCO's system include files preempt a major
-    NetHack structure name.  Also, there are difficulties with SCO's cc
-    that thus far have been solved only by changing compilers; one report
-    says gcc-NetHack works, and another says rcc-NetHack can be made to
-    work by defining NOTSTDC, applying note 8, and compiling with -tinfo
-    and -xenix.  The cc problems are old enough that a new, working
-    version may have been released by this time.
-
 10. Xenix/286's lex generates a faulty lexical analyser from lev_comp.l.
     The beta-release of flex 2.3 (available from uunet, osu-cis,
     prep.ai.mit.edu, etc.) can be used to generate the lexer.

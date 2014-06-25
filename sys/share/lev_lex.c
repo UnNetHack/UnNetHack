@@ -721,7 +721,7 @@ int NDECL(yylex);
 #  define VOIDYYPUT
 # endif
 # if !defined(VOIDYYPUT) && defined(POSIX_TYPES)
-#  if !defined(BOS) && !defined(HISX) && !defined(_M_UNIX) && !defined(VMS)
+#  if !defined(BOS) && !defined(HISX) && !defined(VMS)
 #   define VOIDYYPUT
 #  endif
 # endif

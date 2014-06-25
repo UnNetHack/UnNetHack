@@ -250,7 +250,7 @@
 /*
  * Uncomment the following line if your compiler falsely claims to be
  * a standard C compiler (i.e., defines __STDC__ without cause).
- * Examples are Apollo's cc (in some versions) and possibly SCO UNIX's rcc.
+ * Example is Apollo's cc (in some versions)
  */
 /* #define NOTSTDC */			/* define for lying compilers */
 
