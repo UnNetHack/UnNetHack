@@ -20,13 +20,10 @@
 
 /* define exactly one of the following four choices */
 /* #define BSD 1 */	/* define for 4.n/Free/Open/Net BSD  */
-			/* also for relatives like SunOS 4.x, DG/UX, and */
+			/* also for relatives like SunOS 4.x and */
 			/* older versions of Linux */
 #define SYSV		/* define for System V, Solaris 2.x, newer versions */
 			/* of Linux */
-/* #define HPUX */	/* Hewlett-Packard's Unix, version 6.5 or higher */
-			/* use SYSV for < v6.5 */
-
 
 /* define any of the following that are appropriate */
 #define SVR4		/* use in addition to SYSV for System V Release 4 */
@@ -176,7 +173,7 @@
 #   endif
 #  endif
 #else
-# if (defined(SYSV) || defined(DGUX) || defined(HPUX)) && !defined(LINUX)
+# if defined(SYSV) && !defined(LINUX)
 #  if defined(M_XENIX)
 #define DEF_MAILREADER	"/usr/bin/mail"
 #  else
@@ -247,7 +244,7 @@
  * various recent SYSV versions (with possibly tweaks to unixtty.c again).
  */
 #ifndef POSIX_JOB_CONTROL
-# if defined(BSD) || defined(HPUX)
+# if defined(BSD)
 #  define BSD_JOB_CONTROL
 # else
 #  if defined(SVR4)
@@ -290,7 +287,7 @@
 #endif
 
 #if defined(BSD)
-# if !defined(DGUX) && !defined(SUNOS4)
+# if !defined(SUNOS4)
 #define memcpy(d, s, n)		bcopy(s, d, n)
 #define memcmp(s1, s2, n)	bcmp(s2, s1, n)
 # endif

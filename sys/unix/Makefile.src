@@ -71,9 +71,6 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
 #
 # CC = gcc -ansi
 #
-#	For HP/UX 10.20 with GCC:
-# CC = gcc -D_POSIX_SOURCE
-#
 #	For cross-compiling, eg. with gcc on Linux (see also CXX further down):
 # CC = arm-linux-gcc
 #

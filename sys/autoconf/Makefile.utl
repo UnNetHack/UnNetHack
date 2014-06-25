@@ -32,9 +32,6 @@ CC = @CC@ -DAUTOCONF
 #
 # CC = gcc -ansi
 #
-#	For HP/UX 10.20 with GCC:
-# CC = gcc -D_POSIX_SOURCE
-#
 # if your make doesn't define a default SHELL properly, you may need
 #    the line below (Atari users will need a bourne work-alike)
 # SHELL = /bin/sh

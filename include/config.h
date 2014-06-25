@@ -9,7 +9,7 @@
 /*
  * Section 1:	Operating and window systems selection.
  *		Select the version of the OS you are using.
- *		For "UNIX" select BSD, SYSV, or HPUX in unixconf.h.
+ *		For "UNIX" select BSD, or SYSV in unixconf.h.
  */
 
 #define UNIX		/* delete if no fork(), exec() available */

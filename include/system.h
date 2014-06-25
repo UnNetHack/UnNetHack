@@ -225,9 +225,6 @@ E void NDECL(abort);
 E void FDECL(_exit, (int));
 E int FDECL(system, (const char *));
 #endif
-#if defined(HPUX) && !defined(_POSIX_SOURCE)
-E long NDECL(fork);
-#endif
 
 #ifdef POSIX_TYPES
 /* The POSIX string.h is required to define all the mem* and str* functions */
@@ -253,11 +250,6 @@ E char *memset();
 #  endif
 # endif
 #else
-# ifdef HPUX
-E int FDECL(memcmp, (char *,char *,int));
-E void *FDECL(memcpy, (char *,char *,int));
-E void *FDECL(memset, (char*,int,int));
-# endif
 #endif
 #endif /* POSIX_TYPES */
 
@@ -282,17 +274,9 @@ E char *FDECL(memset, (char*,int,int));
 #if defined(SYSV)
 E unsigned sleep();
 #endif
-#if defined(HPUX)
-E unsigned int FDECL(sleep, (unsigned int));
-#endif
 
 E char *FDECL(getenv, (const char *));
 E char *getlogin();
-#if defined(HPUX) && !defined(_POSIX_SOURCE)
-E long NDECL(getuid);
-E long NDECL(getgid);
-E long NDECL(getpid);
-#else
 # ifdef POSIX_TYPES
 E pid_t NDECL(getpid);
 E uid_t NDECL(getuid);
@@ -302,12 +286,8 @@ E gid_t NDECL(getgid);
 E int NDECL(getpid);
 #  endif
 # endif	/*?POSIX_TYPES*/
-#endif	/*?(HPUX && !_POSIX_SOURCE)*/
 
 /* add more architectures as needed */
-#if defined(HPUX)
-#define seteuid(x) setreuid(-1, (x));
-#endif
 
 /*# string(s).h #*/
 #if !defined(_XtIntrinsic_h) && !defined(POSIX_TYPES)
@@ -322,7 +302,7 @@ E char	*FDECL(strcat, (char *,const char *));
 E char	*FDECL(strncat, (char *,const char *,size_t));
 E char	*FDECL(strpbrk, (const char *,const char *));
 
-# if defined(SYSV) || defined(MICRO) || defined(MAC) || defined(HPUX)
+# if defined(SYSV) || defined(MICRO) || defined(MAC)
 E char	*FDECL(strchr, (const char *,int));
 E char	*FDECL(strrchr, (const char *,int));
 # else /* BSD */
@@ -335,11 +315,7 @@ E int	FDECL(strncmp, (const char *,const char *,size_t));
 # if defined(MICRO) || defined(MAC)
 E size_t FDECL(strlen, (const char *));
 # else
-# ifdef HPUX
-E unsigned int	FDECL(strlen, (char *));
-#  else
 E int	FDECL(strlen, (const char *));
-#  endif /* HPUX */
 # endif /* MICRO */
 #endif
 
@@ -369,7 +345,7 @@ E int	FDECL(strlen, (const char *));
 #endif
 
 #ifndef SPRINTF_PROTO
-# if defined(POSIX_TYPES) || defined(DGUX) || defined(NeXT) || !defined(BSD)
+# if defined(POSIX_TYPES) || defined(NeXT) || !defined(BSD)
 E  int FDECL(sprintf, (char *,const char *,...));
 # else
 #  define OLD_SPRINTF
@@ -407,10 +383,8 @@ E int FDECL(tgetflag, (const char *));
 E char *FDECL(tgetstr, (const char *,char **));
 E char *FDECL(tgoto, (const char *,int,int));
 #else
-# if ! (defined(HPUX) && defined(_POSIX_SOURCE))
 E int FDECL(tgetent, (char *,const char *));
 E void FDECL(tputs, (const char *,int,int (*)()));
-# endif
 E int FDECL(tgetnum, (const char *));
 E int FDECL(tgetflag, (const char *));
 E char *FDECL(tgetstr, (const char *,char **));
@@ -428,7 +402,7 @@ E genericptr_t FDECL(malloc, (size_t));
 E struct tm *FDECL(localtime, (const time_t *));
 # endif
 
-# if (defined(BSD) && defined(POSIX_TYPES)) || defined(SYSV) || defined(MICRO) || defined(MAC) || (defined(HPUX) && defined(_POSIX_SOURCE))
+# if (defined(BSD) && defined(POSIX_TYPES)) || defined(SYSV) || defined(MICRO) || defined(MAC)
 E time_t FDECL(time, (time_t *));
 # else
 E long FDECL(time, (time_t *));

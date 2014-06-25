@@ -9,9 +9,6 @@
 #include "hack.h"
 
 #if defined(BSD_JOB_CONTROL) || defined(_BULL_SOURCE)
-# ifdef HPUX
-#include <bsdtty.h>
-# else
 #  if defined(_BULL_SOURCE)
 #   include <termios.h>
 struct termios termio;
@@ -26,7 +23,6 @@ struct termios termio;
 #    include <sgtty.h>
 #   endif
 #  endif
-# endif
 struct ltchars ltchars;
 struct ltchars ltchars0 = { -1, -1, -1, -1, -1, -1 }; /* turn all off */
 #else
