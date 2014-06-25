@@ -10,8 +10,6 @@
  * Section 1:	Operating and window systems selection.
  *		Select the version of the OS you are using.
  *		For "UNIX" select BSD, SYSV, or HPUX in unixconf.h.
- *		A "VMS" option is not needed since the VMS C-compilers
- *		provide it (no need to change sec#1, vmsconf.h handles it).
  */
 
 #define UNIX		/* delete if no fork(), exec() available */

@@ -16,11 +16,6 @@
 #include "win32api.h"
 #endif
 
-#ifdef VMS
-extern int FDECL(vms_creat, (const char *,unsigned));
-extern int FDECL(vms_open, (const char *,int,unsigned));
-#endif	/* VMS */
-
 int FDECL(restore_savefile, (char *, const char *));
 static void FDECL(set_levelfile_name, (int));
 static int FDECL(open_levelfile, (int, const char *));
@@ -39,15 +34,11 @@ static void nhce_message(FILE*, const char*, ...);
 #ifdef UNIX
 #define SAVESIZE	(PL_NSIZ + 13)	/* save/99999player.e */
 #else
-# ifdef VMS
-#define SAVESIZE	(PL_NSIZ + 22)	/* [.save]<uid>player.e;1 */
-# else
 #  ifdef WIN32
 #define SAVESIZE	(PL_NSIZ + 40)  /* username-player.NetHack-saved-game */
 #  else
 #define SAVESIZE	FILENAME	/* from macconf.h or pcconf.h */
 #  endif
-# endif
 #endif
 
 #if defined(EXEPATH)
@@ -107,7 +98,7 @@ char *argv[];
 		}
 		argno++;
 	}
-#if defined(SECURE) && !defined(VMS)
+#if defined(SECURE)
 	if (dir
 # ifdef HACKDIR
 		&& strcmp(dir, HACKDIR)
@@ -116,7 +107,7 @@ char *argv[];
 		(void) setgid(getgid());
 		(void) setuid(getuid());
 	}
-#endif	/* SECURE && !VMS */
+#endif	/* SECURE */
 
 #ifdef HACKDIR
 	if (!dir) dir = HACKDIR;
@@ -156,9 +147,6 @@ int lev;
 	tf = rindex(lock, '.');
 	if (!tf) tf = lock + strlen(lock);
 	(void) sprintf(tf, ".%d", lev);
-#ifdef VMS
-	(void) strcat(tf, ";1");
-#endif
 }
 
 static int

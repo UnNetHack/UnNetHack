@@ -160,10 +160,6 @@ typedef xchar	boolean;		/* 0 or 1 */
  * Please don't change the order.  It does matter.
  */
 
-#ifdef VMS
-#include "vmsconf.h"
-#endif
-
 #ifdef UNIX
 #include "unixconf.h"
 #endif
@@ -256,9 +252,6 @@ typedef xchar	boolean;		/* 0 or 1 */
 # ifdef UNIX
 #  define PORT_ID	"Unix"
 # endif
-# ifdef VMS
-#  define PORT_ID	"VMS"
-# endif
 # ifdef WIN32
 #  define PORT_ID	"Windows"
 #  ifndef PORT_SUB_ID
@@ -268,20 +261,6 @@ typedef xchar	boolean;		/* 0 or 1 */
 #    define PORT_SUB_ID	"tty"
 #   endif
 #  endif
-# endif
-#endif
-
-#ifdef VMS
-/* vms_exit() (sys/vms/vmsmisc.c) expects the non-VMS EXIT_xxx values below.
- * these definitions allow all systems to be treated uniformly, provided
- * main() routines do not terminate with return(), whose value is not
- * so massaged.
- */
-# ifdef EXIT_SUCCESS
-#  undef EXIT_SUCCESS
-# endif
-# ifdef EXIT_FAILURE
-#  undef EXIT_FAILURE
 # endif
 #endif
 

@@ -707,7 +707,7 @@ initoptions()
 # endif
 	}
 #endif /* UNIX && TTY_GRAPHICS */
-#if defined(UNIX) || defined(VMS)
+#if defined(UNIX)
 # ifdef TTY_GRAPHICS
 	/* detect whether a "vt" terminal can handle alternate charsets */
 	if ((opts = nh_getenv("TERM")) &&
@@ -716,7 +716,7 @@ initoptions()
 		switch_graphics(DEC_GRAPHICS);
 	}
 # endif
-#endif /* UNIX || VMS */
+#endif /* UNIX */
 
 #ifdef MAC_GRAPHICS_ENV
 	switch_graphics(MAC_GRAPHICS);
@@ -4475,9 +4475,6 @@ static const char *opt_intro[] = {
 	"or use `NETHACKOPTIONS=\"<options>\"' in your environment",
 #endif
 	"(<options> is a list of options separated by commas)",
-#ifdef VMS
-	"-- for example, $ DEFINE NETHACKOPTIONS \"noautopickup,fruit:kumquat\"",
-#endif
 	"or press \"O\" while playing and use the menu.",
 	"",
  "Boolean options (which can be negated by prefixing them with '!' or \"no\"):",

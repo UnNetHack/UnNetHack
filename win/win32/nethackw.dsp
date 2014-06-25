@@ -892,10 +892,6 @@ SOURCE=..\include\vision.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\vmsconf.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\winami.h
 # End Source File
 # Begin Source File

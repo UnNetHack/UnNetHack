@@ -28,7 +28,7 @@
 /* some old <sys/types.h> may not define off_t and size_t; if your system is
  * one of these, define them by hand below
  */
-#if (defined(VMS) && !defined(__GNUC__)) || defined(MAC)
+#if defined(MAC)
 #include <types.h>
 #else
 # ifndef AMIGA
@@ -36,7 +36,7 @@
 # endif
 #endif
 
-#if (defined(MICRO) && !defined(TOS)) || defined(ANCIENT_VAXC)
+#if (defined(MICRO) && !defined(TOS))
 # if !defined(_SIZE_T) && !defined(__size_t) /* __size_t for CSet/2 */
 #  define _SIZE_T
 #  if !((defined(MSDOS) || defined(OS2)) && defined(_SIZE_T_DEFINED)) /* MSC 5.1 */
@@ -51,9 +51,6 @@ typedef unsigned int	size_t;
 #include <time.h>	/* time_t is not in <sys/types.h> */
 #endif
 
-#if defined(VMS)
-# define off_t long
-#endif
 #if defined(AZTEC) || defined(THINKC4) || defined(__TURBOC__)
 typedef long	off_t;
 #endif
@@ -220,35 +217,6 @@ E char *FDECL(getcwd, (char *,int));
 # endif /* !_DCC */
 #endif
 
-#ifdef VMS
-# ifndef abs
-E int FDECL(abs, (int));
-# endif
-E int FDECL(atexit, (void (*)(void)));
-E int FDECL(atoi, (const char *));
-E int FDECL(chdir, (const char *));
-E int FDECL(chown, (const char *,unsigned,unsigned));
-# ifdef __DECC_VER
-E int FDECL(chmod, (const char *,mode_t));
-E mode_t FDECL(umask, (mode_t));
-# else
-E int FDECL(chmod, (const char *,int));
-E int FDECL(umask, (int));
-# endif
-/* #include <unixio.h> */
-E int FDECL(close, (int));
-E int VDECL(creat, (const char *,unsigned,...));
-E int FDECL(delete, (const char *));
-E int FDECL(fstat, ( /*_ int, stat_t * _*/ ));
-E int FDECL(isatty, (int));	/* 1==yes, 0==no, -1==error */
-E long FDECL(lseek, (int,long,int));
-E int VDECL(open, (const char *,int,unsigned,...));
-E int FDECL(read, (int,genericptr_t,unsigned));
-E int FDECL(rename, (const char *,const char *));
-E int FDECL(stat, ( /*_ const char *,stat_t * _*/ ));
-E int FDECL(write, (int,const genericptr,unsigned));
-#endif
-
 #endif	/* __SASC_60 */
 
 /* both old & new versions of Ultrix want these, but real BSD does not */
@@ -265,8 +233,8 @@ E long NDECL(fork);
 /* The POSIX string.h is required to define all the mem* and str* functions */
 #include <string.h>
 #else
-#if defined(SYSV) || defined(VMS) || defined(MAC) || defined(SUNOS4)
-# if defined(NHSTDC) || (defined(VMS) && !defined(ANCIENT_VAXC))
+#if defined(SYSV) || defined(MAC) || defined(SUNOS4)
+# if defined(NHSTDC)
 #  if !(defined(SUNOS4) && defined(__STDC__))
 				/* Solaris unbundled cc (acc) */
 E int FDECL(memcmp, (const void *,const void *,size_t));
@@ -317,9 +285,6 @@ E unsigned sleep();
 #if defined(HPUX)
 E unsigned int FDECL(sleep, (unsigned int));
 #endif
-#ifdef VMS
-E int FDECL(sleep, (unsigned));
-#endif
 
 E char *FDECL(getenv, (const char *));
 E char *getlogin();
@@ -332,17 +297,9 @@ E long NDECL(getpid);
 E pid_t NDECL(getpid);
 E uid_t NDECL(getuid);
 E gid_t NDECL(getgid);
-#  ifdef VMS
-E pid_t NDECL(getppid);
-#  endif
 # else	/*!POSIX_TYPES*/
 #  ifndef getpid		/* Borland C defines getpid() as a macro */
 E int NDECL(getpid);
-#  endif
-#  ifdef VMS
-E int NDECL(getppid);
-E unsigned NDECL(getuid);
-E unsigned NDECL(getgid);
 #  endif
 # endif	/*?POSIX_TYPES*/
 #endif	/*?(HPUX && !_POSIX_SOURCE)*/
@@ -365,7 +322,7 @@ E char	*FDECL(strcat, (char *,const char *));
 E char	*FDECL(strncat, (char *,const char *,size_t));
 E char	*FDECL(strpbrk, (const char *,const char *));
 
-# if defined(SYSV) || defined(MICRO) || defined(MAC) || defined(VMS) || defined(HPUX)
+# if defined(SYSV) || defined(MICRO) || defined(MAC) || defined(HPUX)
 E char	*FDECL(strchr, (const char *,int));
 E char	*FDECL(strrchr, (const char *,int));
 # else /* BSD */
@@ -375,7 +332,7 @@ E char	*FDECL(rindex, (const char *,int));
 
 E int	FDECL(strcmp, (const char *,const char *));
 E int	FDECL(strncmp, (const char *,const char *,size_t));
-# if defined(MICRO) || defined(MAC) || defined(VMS)
+# if defined(MICRO) || defined(MAC)
 E size_t FDECL(strlen, (const char *));
 # else
 # ifdef HPUX
@@ -471,17 +428,12 @@ E genericptr_t FDECL(malloc, (size_t));
 E struct tm *FDECL(localtime, (const time_t *));
 # endif
 
-# if (defined(BSD) && defined(POSIX_TYPES)) || defined(SYSV) || defined(MICRO) || defined(VMS) || defined(MAC) || (defined(HPUX) && defined(_POSIX_SOURCE))
+# if (defined(BSD) && defined(POSIX_TYPES)) || defined(SYSV) || defined(MICRO) || defined(MAC) || (defined(HPUX) && defined(_POSIX_SOURCE))
 E time_t FDECL(time, (time_t *));
 # else
 E long FDECL(time, (time_t *));
 # endif
 #endif /* LEGACY_CODE */
-
-#ifdef VMS
-	/* used in makedefs.c, but missing from gcc-vms's <time.h> */
-E char *FDECL(ctime, (const time_t *));
-#endif
 
 
 #ifdef MICRO

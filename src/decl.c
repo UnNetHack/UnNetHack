@@ -10,7 +10,7 @@ int NDECL((*occupation));
 /* from xxxmain.c */
 const char *hname = 0;		/* name of the game (argv[0] of main) */
 int hackpid = 0;		/* current process id */
-#if defined(UNIX) || defined(VMS)
+#if defined(UNIX)
 int locknum = 0;		/* max num of simultaneous users */
 #endif
 #ifdef DEF_PAGER

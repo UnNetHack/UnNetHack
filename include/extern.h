@@ -1946,7 +1946,7 @@ E int FDECL(doconsult, (struct monst *));
 /* ### save.c ### */
 
 E int NDECL(dosave);
-#if defined(UNIX) || defined(VMS) || defined(__EMX__) || defined(WIN32)
+#if defined(UNIX) || defined(__EMX__) || defined(WIN32)
 E void FDECL(hangup, (int));
 #endif
 E int NDECL(dosave0);
@@ -2386,78 +2386,6 @@ E void FDECL(unblock_point, (int,int));
 E boolean FDECL(clear_path, (int,int,int,int));
 E void FDECL(do_clear_area, (int,int,int,
 			     void (*)(int,int,genericptr_t),genericptr_t));
-
-#ifdef VMS
-
-/* ### vmsfiles.c ### */
-
-E int FDECL(vms_link, (const char *,const char *));
-E int FDECL(vms_unlink, (const char *));
-E int FDECL(vms_creat, (const char *,unsigned int));
-E int FDECL(vms_open, (const char *,int,unsigned int));
-E boolean FDECL(same_dir, (const char *,const char *));
-E int FDECL(c__translate, (int));
-E char *FDECL(vms_basename, (const char *));
-
-/* ### vmsmail.c ### */
-
-E unsigned long NDECL(init_broadcast_trapping);
-E unsigned long NDECL(enable_broadcast_trapping);
-E unsigned long NDECL(disable_broadcast_trapping);
-# if 0
-E struct mail_info *NDECL(parse_next_broadcast);
-# endif /*0*/
-
-/* ### vmsmain.c ### */
-
-E int FDECL(main, (int, char **));
-# ifdef CHDIR
-E void FDECL(chdirx, (const char *,BOOLEAN_P));
-# endif /* CHDIR */
-
-/* ### vmsmisc.c ### */
-
-E void NDECL(vms_abort);
-E void FDECL(vms_exit, (int));
-
-/* ### vmstty.c ### */
-
-E int NDECL(vms_getchar);
-E void NDECL(gettty);
-E void FDECL(settty, (const char *));
-E void FDECL(shuttty, (const char *));
-E void NDECL(setftty);
-E void NDECL(intron);
-E void NDECL(introff);
-E void VDECL(error, (const char *,...)) PRINTF_F(1,2);
-#ifdef TIMED_DELAY
-E void FDECL(msleep, (unsigned));
-#endif
-
-/* ### vmsunix.c ### */
-
-E void NDECL(getlock);
-E void FDECL(regularize, (char *));
-E int NDECL(vms_getuid);
-E boolean FDECL(file_is_stmlf, (int));
-E int FDECL(vms_define, (const char *,const char *,int));
-E int FDECL(vms_putenv, (const char *));
-E char *NDECL(verify_termcap);
-# if defined(CHDIR) || defined(SHELL) || defined(SECURE)
-E void NDECL(privoff);
-E void NDECL(privon);
-# endif
-# ifdef SHELL
-E int NDECL(dosh);
-# endif
-# if defined(SHELL) || defined(MAIL)
-E int FDECL(vms_doshell, (const char *,BOOLEAN_P));
-# endif
-# ifdef SUSPEND
-E int NDECL(dosuspend);
-# endif
-
-#endif /* VMS */
 
 /* ### weapon.c ### */
 

@@ -114,7 +114,7 @@
 #endif
 
 /*
- * On the VMS and unix, this option controls whether a delay is done by
+ * On unix, this option controls whether a delay is done by
  * the clock, or whether it is done by excess output.  On the PC, however,
  * there is always a clock to use for the delay.  The TIMED_DELAY option
  * on MSDOS (without the termcap routines) is used to determine whether to
@@ -123,7 +123,7 @@
  * in the music code to wait between different notes.  So it is needed in that
  * case as well.
 
- * Whereas on the VMS and unix, flags.nap is a run-time option controlling
+ * Whereas on nix, flags.nap is a run-time option controlling
  * whether there is a delay by clock or by excess output, on MSDOS it is
  * simply a flag to turn on or off napping for visual effects at run-time.
  */

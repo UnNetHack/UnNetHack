@@ -63,10 +63,6 @@ static char sccsid[] = "@(#)uudecode.c	5.5 (Berkeley) 7/6/88";
  */
 #include <stdio.h>
 
-#ifdef VMS
-#  include <types.h>
-#  include <stat.h>
-#else
 #  if !defined(MSDOS) && !defined(WIN32)
 #    include <pwd.h>
 #  endif
@@ -74,7 +70,6 @@ static char sccsid[] = "@(#)uudecode.c	5.5 (Berkeley) 7/6/88";
 #  include <sys/stat.h>
 #  include <string.h>
 #  include <stdlib.h>
-#endif
 
 static void decode(FILE *, FILE *);
 static void outdec(char *, FILE *, int);

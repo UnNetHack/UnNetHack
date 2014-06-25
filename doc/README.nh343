@@ -56,7 +56,6 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     n.  A 'sys/msdos' subdirectory, which contains files specific to MS-DOS.
     o.  A 'sys/os2' subdirectory, which contains files specific to OS/2.
     p.  A 'sys/unix' subdirectory, which contains files specific to UNIX.
-    q.  A 'sys/vms' subdirectory, which contains files specific to VMS.
     r.  A 'sys/wince' subdirectory, which contains files specific to Windows CE.
     s.  A 'sys/winnt' subdirectory, which contains files specific to Windows NT.
     t.  A 'win' directory, which contains subdirectories for files that

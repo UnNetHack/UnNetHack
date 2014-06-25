@@ -135,47 +135,4 @@
 # define _GNU_SOURCE
 #endif
 
-#ifdef VMS	/* really old compilers need special handling, detected here */
-# undef UNIX
-# ifdef __DECC
-#  ifndef __DECC_VER	/* buggy early versions want widened prototypes */
-#   define NOTSTDC	/* except when typedefs are involved		*/
-#   define USE_VARARGS
-#  else
-#   define NHSTDC
-#   define USE_STDARG
-#   define POSIX_TYPES
-#   define _DECC_V4_SOURCE	/* avoid some incompatible V5.x changes */
-#  endif
-#  undef __HIDE_FORBIDDEN_NAMES /* need non-ANSI library support functions */
-# else
-#  ifdef VAXC	/* must use CC/DEFINE=ANCIENT_VAXC for vaxc v2.2 or older */
-#   ifdef ANCIENT_VAXC	/* vaxc v2.2 and earlier [lots of warnings to come] */
-#    define USE_VARARGS
-#   else		/* vaxc v2.3,2.4,or 3.x, or decc in vaxc mode */
-#     if defined(USE_PROTOTYPES) /* this breaks 2.2 (*forces* use of ANCIENT)*/
-#      define __STDC__ 0 /* vaxc is not yet ANSI compliant, but close enough */
-#      define signed	/* well, almost close enough */
-#include <stddef.h>
-#      define UNWIDENED_PROTOTYPES
-#     endif
-#     define USE_STDARG
-#   endif
-#  endif /*VAXC*/
-# endif /*__DECC*/
-# ifdef VERYOLD_VMS	/* v4.5 or earlier; no longer available for testing */
-#  define USE_OLDARGS	/* <varargs.h> is there, vprintf & vsprintf aren't */
-#  ifdef USE_VARARGS
-#   undef USE_VARARGS
-#  endif
-#  ifdef USE_STDARG
-#   undef USE_STDARG
-#  endif
-# endif
-#endif /*VMS*/
-
-#ifdef vax
-/* just in case someone thinks a DECstation is a vax. It's not, it's a mips */
-#endif
-
 #endif	/* CONFIG1_H */

@@ -861,11 +861,11 @@ dowhatdoes()
 	char bufr[BUFSZ];
 	char q, *reslt;
 
-#if defined(UNIX) || defined(VMS)
+#if defined(UNIX)
 	introff();
 #endif
 	q = yn_function("What command?", (char *)0, '\0');
-#if defined(UNIX) || defined(VMS)
+#if defined(UNIX)
 	intron();
 #endif
 	reslt = dowhatdoes_core(q, bufr);

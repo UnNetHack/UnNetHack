@@ -131,9 +131,6 @@ static const char * const shktools[] = {
 #ifdef TOS
     "Nivram",
 #endif
-#ifdef VMS
-    "Lez-tneg", "Ytnu-haled", "Niknar",
-#endif
     0
 };
 

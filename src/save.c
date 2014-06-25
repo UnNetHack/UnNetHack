@@ -44,7 +44,7 @@ static long nulls[10];
 #define nulls nul
 #endif
 
-#if defined(UNIX) || defined(VMS) || defined(__EMX__) || defined(WIN32)
+#if defined(UNIX) || defined(__EMX__) || defined(WIN32)
 #define HUP	if (!program_state.done_hup)
 #else
 #define HUP
@@ -77,7 +77,7 @@ dosave()
 	} else {
 		clear_nhwindow(WIN_MESSAGE);
 		pline("Saving...");
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
+#if defined(UNIX) | defined(__EMX__)
 		program_state.done_hup = 0;
 #endif
 		if(dosave0()) {
@@ -96,7 +96,7 @@ dosave()
 }
 
 
-#if defined(UNIX) || defined(VMS) || defined (__EMX__) || defined(WIN32)
+#if defined(UNIX) || defined (__EMX__) || defined(WIN32)
 /*ARGSUSED*/
 void
 hangup(sig_unused)  /* called as signal() handler, so sent at least one arg */
@@ -105,18 +105,11 @@ int sig_unused;
 # ifdef NOSAVEONHANGUP
 	(void) signal(SIGINT, SIG_IGN);
 	clearlocks();
-#  ifndef VMS
 	terminate(EXIT_FAILURE);
-#  endif
 # else	/* SAVEONHANGUP */
 	if (!program_state.done_hup++) {
 	    if (program_state.something_worth_saving)
 		(void) dosave0();
-#  ifdef VMS
-	    /* don't call exit when already within an exit handler;
-	       that would cancel any other pending user-mode handlers */
-	    if (!program_state.exiting)
-#  endif
 	    {
 		clearlocks();
 		terminate(EXIT_FAILURE);
@@ -145,7 +138,7 @@ dosave0()
 		return 0;
 	fq_save = fqname(SAVEF, SAVEPREFIX, 1);	/* level files take 0 */
 
-#if defined(UNIX) || defined(VMS)
+#if defined(UNIX)
 	(void) signal(SIGHUP, SIG_IGN);
 #endif
 #ifndef NO_SIGNAL
@@ -676,7 +669,7 @@ register int fd;
 
     if (outbufp) {
 	if (write(fd, outbuf, outbufp) != outbufp) {
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
+#if defined(UNIX) || defined(__EMX__)
 	    if (program_state.done_hup)
 		terminate(EXIT_FAILURE);
 	    else
@@ -701,7 +694,7 @@ register unsigned num;
 	if (count_only) return;
 #endif
 	if ((unsigned) write(fd, loc, num) != num) {
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
+#if defined(UNIX) || defined(__EMX__)
 	    if (program_state.done_hup)
 		terminate(EXIT_FAILURE);
 	    else
@@ -806,7 +799,7 @@ register unsigned num;
 	}
 
 	if (failed) {
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
+#if defined(UNIX) || defined(__EMX__)
 	    if (program_state.done_hup)
 		terminate(EXIT_FAILURE);
 	    else

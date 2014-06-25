@@ -36,15 +36,8 @@ static char bc_up_buf[24];
 /* `ospeed' to baud rate conversion table, adapted from GNU termcap-1.2 */
 static short baud_rates[] = {
 	0,   50,   75,  110,  135,  150,
-# ifdef VMS
-	    300,  600, 1200, 1800, 2000, 2400, 3600, 4800, 7200,
-# else		/* assume Unix */
       200,  300,  600, 1200, 1800,       2400,       4800,
-# endif
      9600, -192, -384,		/* negative is used as `100 * abs(entry)' */
-# ifdef VMS
-     -576, -768, -1152,
-# endif
 };
 #endif	/* !NO_DELAY_PADDING */
 

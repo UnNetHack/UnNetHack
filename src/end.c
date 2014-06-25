@@ -30,7 +30,7 @@ static struct val_list { struct valuable_data *list; int size; } valuables[] = {
 
 #ifndef NO_SIGNAL
 STATIC_PTR void FDECL(done_intr, (int));
-# if defined(UNIX) || defined(VMS) || defined (__EMX__)
+# if defined(UNIX) || defined (__EMX__)
 static void FDECL(done_hangup, (int));
 # endif
 #endif
@@ -145,18 +145,14 @@ done2()
 		}
 		return 0;
 	}
-#if defined(WIZARD) && (defined(UNIX) || defined(VMS) || defined(LATTICE))
+#if defined(WIZARD) && (defined(UNIX) || defined(LATTICE))
 	if(wizard) {
 	    int c;
-# ifdef VMS
-	    const char *tmp = "Enter debugger?";
-# else
 #  ifdef LATTICE
 	    const char *tmp = "Create SnapShot?";
 #  else
 	    const char *tmp = "Dump core?";
 #  endif
-# endif
 	    if ((c = ynq(tmp)) == 'y') {
 		(void) signal(SIGINT, (SIG_RET_TYPE) done1);
 		exit_nhwindows((char *)0);
@@ -179,13 +175,13 @@ int sig_unused;
 {
 	done_stopprint++;
 	(void) signal(SIGINT, SIG_IGN);
-# if defined(UNIX) || defined(VMS)
+# if defined(UNIX)
 	(void) signal(SIGQUIT, SIG_IGN);
 # endif
 	return;
 }
 
-# if defined(UNIX) || defined(VMS) || defined(__EMX__)
+# if defined(UNIX) || defined(__EMX__)
 static void
 done_hangup(sig)	/* signal() handler */
 int sig;
@@ -328,7 +324,7 @@ panic VA_DECL(const char *, str)
 #ifdef LIVELOGFILE
 	livelog_game_action("panicked");
 #endif
-#if defined(WIZARD) && (defined(UNIX) || defined(VMS) || defined(LATTICE) || defined(WIN32))
+#if defined(WIZARD) && (defined(UNIX) || defined(LATTICE) || defined(WIN32))
 	if (wizard)
 	    NH_abort();	/* generate core dump */
 #endif
@@ -757,7 +753,7 @@ die:
 	if (have_windows) wait_synch();	/* flush screen output */
 #ifndef NO_SIGNAL
 	(void) signal(SIGINT, (SIG_RET_TYPE) done_intr);
-# if defined(UNIX) || defined(VMS) || defined (__EMX__)
+# if defined(UNIX) || defined (__EMX__)
 	(void) signal(SIGQUIT, (SIG_RET_TYPE) done_intr);
 	(void) signal(SIGHUP, (SIG_RET_TYPE) done_hangup);
 # endif
