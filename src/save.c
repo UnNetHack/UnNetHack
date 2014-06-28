@@ -469,9 +469,6 @@ int fd;
 xchar lev;
 int mode;
 {
-#ifdef TOS
-	short tlev;
-#endif
 
 	/* if we're tearing down the current level without saving anything
 	   (which happens upon entrance to the endgame or after an aborted
@@ -492,12 +489,7 @@ int mode;
 	if (lev >= 0 && lev <= maxledgerno())
 	    level_info[lev].flags |= VISITED;
 	bwrite(fd,(genericptr_t) &hackpid,sizeof(hackpid));
-#ifdef TOS
-	tlev=lev; tlev &= 0x00ff;
-	bwrite(fd,(genericptr_t) &tlev,sizeof(tlev));
-#else
 	bwrite(fd,(genericptr_t) &lev,sizeof(lev));
-#endif
 #ifdef RLECOMP
 	{
 	    /* perform run-length encoding of rm structs */
@@ -1253,11 +1245,6 @@ STATIC_OVL void
 copyfile(from, to)
 char *from, *to;
 {
-# ifdef TOS
-
-	if (_copyfile(from, to))
-		panic("Can't copy %s to %s", from, to);
-# else
 	char buf[BUFSIZ];	/* this is system interaction, therefore
 				 * BUFSIZ instead of NetHack's BUFSZ */
 	int nfrom, nto, fdfrom, fdto;
@@ -1274,7 +1261,6 @@ char *from, *to;
 	} while (nfrom == BUFSIZ);
 	(void) close(fdfrom);
 	(void) close(fdto);
-# endif /* TOS */
 }
 
 void

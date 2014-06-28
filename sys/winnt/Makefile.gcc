@@ -1115,8 +1115,6 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 # That means that there is some irrelevant stuff
 # in here, but maintenance should be easier.
 #
-$(O)tos.o: ../sys/atari/tos.c $(HACK_H) $(INCL)/tcap.h
-	$(cc) $(CFLAGS) -o$@ ../sys/atari/tos.c
 $(O)pcmain.o: ../sys/share/pcmain.c $(HACK_H) $(INCL)/dlb.h \
 		$(INCL)/win32api.h
 	$(cc) $(CFLAGS) -o$@ ../sys/share/pcmain.c
@@ -1216,14 +1214,6 @@ $(O)gnworn.o: ../win/gnome/gnworn.c ../win/gnome/gnworn.h ../win/gnome/gnglyph.h
 	$(cc) $(CFLAGS) $(GNOMEINC) -o$@ ../win/gnome/gnworn.c
 $(O)gnyesno.o: ../win/gnome/gnyesno.c ../win/gnome/gnbind.h ../win/gnome/gnyesno.h
 	$(cc) $(CFLAGS) $(GNOMEINC) -o$@ ../win/gnome/gnyesno.c
-$(O)wingem.o: ../win/gem/wingem.c $(HACK_H) $(INCL)/func_tab.h $(INCL)/dlb.h \
-		$(INCL)/patchlevel.h $(INCL)/wingem.h
-	$(cc) $(CFLAGS) -o$@ ../win/gem/wingem.c
-$(O)wingem1.o: ../win/gem/wingem1.c $(INCL)/gem_rsc.h $(INCL)/load_img.h \
-		$(INCL)/gr_rect.h $(INCL)/wintype.h $(INCL)/wingem.h
-	$(cc) $(CFLAGS) -o$@ ../win/gem/wingem1.c
-$(O)load_img.o: ../win/gem/load_img.c $(INCL)/load_img.h
-	$(cc) $(CFLAGS) -o$@ ../win/gem/load_img.c
 $(O)gr_rect.o: ../win/gem/gr_rect.c $(INCL)/gr_rect.h
 	$(cc) $(CFLAGS) -o$@ ../win/gem/gr_rect.c
 $(O)tile.o: tile.c $(HACK_H)
@@ -1346,7 +1336,7 @@ $(O)vision.o: vision.c $(HACK_H) $(INCL)/vis_tab.h
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
 $(O)wield.o: wield.c $(HACK_H)
-$(O)windows.o: windows.c $(HACK_H) $(INCL)/wingem.h $(INCL)/winGnome.h
+$(O)windows.o: windows.c $(HACK_H) $(INCL)/winGnome.h
 $(O)wizard.o: wizard.c $(HACK_H) $(INCL)/qtext.h $(INCL)/epri.h
 $(O)worm.o: worm.c $(HACK_H) $(INCL)/lev.h
 $(O)worn.o: worn.c $(HACK_H)

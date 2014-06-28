@@ -30,10 +30,6 @@ OPTIONS=rawio,BIOS,IBMgraphics
 # uncomment the following line:
 #OPTIONS=soundcard:autodetect
 
-# If you use an Atari and want tty use:
-#OPTIONS=windowtype:tty,rawio,BIOS
-
-
 # Some options to set personal preferences.  Uncomment and change these to
 # suit your personal preference.  If several people are to use the same
 # configuration, options like these should not be set.

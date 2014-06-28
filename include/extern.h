@@ -1381,9 +1381,7 @@ E void FDECL(mplayer_talk, (struct monst *));
 #  ifndef WIN32
 E int NDECL(tgetch);
 #  endif
-#  ifndef TOS
 E char NDECL(switchar);
-#  endif
 # ifndef __GO32__
 E long FDECL(freediskspace, (char *));
 #  ifdef MSDOS
@@ -1398,25 +1396,12 @@ E long FDECL(filesize, (char *));
 E char *NDECL(foundfile_buffer);
 # endif /* __GO32__ */
 E void FDECL(chdrive, (char *));
-# ifndef TOS
 E void NDECL(disable_ctrlP);
 E void NDECL(enable_ctrlP);
-# endif
 # if defined(MICRO) && !defined(WINNT)
 E void NDECL(get_scr_size);
-#  ifndef TOS
 E void FDECL(gotoxy, (int,int));
-#  endif
 # endif
-# ifdef TOS
-E int FDECL(_copyfile, (char *,char *));
-E int NDECL(kbhit);
-E void NDECL(set_colors);
-E void NDECL(restore_colors);
-#  ifdef SUSPEND
-E int NDECL(dosuspend);
-#  endif
-# endif /* TOS */
 # ifdef WIN32
 E char *FDECL(get_username, (int *));
 E void FDECL(nt_regularize, (char *));

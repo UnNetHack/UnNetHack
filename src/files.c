@@ -53,7 +53,7 @@ extern int errno;
 #define uncompress(file)	uncompress_area(NULL, file)
 #endif
 
-#if defined(MSDOS) || defined(OS2) || defined(TOS) || defined(WIN32)
+#if defined(MSDOS) || defined(OS2) || defined(WIN32)
 # ifndef GNUDOS
 #include <sys\stat.h>
 # else

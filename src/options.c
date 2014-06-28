@@ -486,10 +486,6 @@ static struct Comp_Opt
 
 static boolean need_redraw; /* for doset() */
 
-#if defined(TOS) && defined(TEXTCOLOR)
-extern boolean colors_changed;	/* in tos.c */
-#endif
-
 #ifdef VIDEOSHADES
 extern char *shade[3];		  /* in sys/msdos/video.c */
 extern int ttycolors[CLR_MAX];	  /* in sys/msdos/video.c, win/tty/termcap.c */
@@ -3248,15 +3244,6 @@ goodfruit:
 #ifdef TEXTCOLOR
 			else if ((boolopt[i].addr) == &iflags.use_color) {
 			    need_redraw = TRUE;
-# ifdef TOS
-			    if ((boolopt[i].addr) == &iflags.use_color
-				&& iflags.BIOS) {
-				if (colors_changed)
-				    restore_colors();
-				else
-				    set_colors();
-			    }
-# endif
 			}
 #endif
 

@@ -18,9 +18,6 @@
 #define P_WAIT		0
 #define P_NOWAIT	1
 #endif
-#ifdef TOS
-#include <osbind.h>
-#endif
 #if defined(MSDOS) && !defined(__GO32__)
 #define findfirst findfirst_file
 #define findnext findnext_file
@@ -47,9 +44,7 @@ extern unsigned short __far __cdecl _movefpaused;
 
 #ifdef MFLOPPY
 STATIC_DCL boolean NDECL(record_exists);
-# ifndef TOS
 STATIC_DCL boolean NDECL(comspec_exists);
-# endif
 #endif
 
 #ifdef WIN32CON
@@ -66,11 +61,7 @@ flushout()
 }
 
 static const char *COMSPEC =
-# ifdef TOS
-"SHELL";
-# else
 "COMSPEC";
-# endif
 
 #define getcomspec() nh_getenv(COMSPEC)
 
@@ -87,14 +78,7 @@ dosh()
 	int grmode = iflags.grmode;
 #endif
 	if ((comspec = getcomspec())) {
-#  ifndef TOS	/* TOS has a variety of shells */
 		suspend_nhwindows("To return to NetHack, enter \"exit\" at the system prompt.\n");
-#  else
-#   if defined(MSDOS) && defined(NO_TERMS)
-		grmode = iflags.grmode;
-#   endif
-		suspend_nhwindows((char *)0);
-#  endif /* TOS */
 #  ifndef NOCWD_ASSUMPTIONS
 		chdirx(orgdir, 0);
 #  endif
@@ -117,11 +101,6 @@ dosh()
 			raw_printf("Can't spawn \"%s\"!", comspec);
 			getreturn("to continue");
 		}
-#  ifdef TOS
-/* Some shells (e.g. Gulam) turn the cursor off when they exit */
-		if (iflags.BIOS)
-			(void)Cursconf(1, -1);
-#  endif
 #  ifndef NOCWD_ASSUMPTIONS
 		chdirx(hackdir, 0);
 #  endif
@@ -165,10 +144,8 @@ int mode;
 	char from[PATHLEN], to[PATHLEN], last[13];
 	char *frompath, *topath;
 	char *foundfile;
-#  ifndef TOS
 	int status;
 	char copy[8], *comspec;
-#  endif
 
 	if (!ramdisk)
 		return;
@@ -180,23 +157,10 @@ int mode;
 	last[0] = '\0';
 	Sprintf(from, "%s%s", frompath, allbones);
 	topath = (mode == TOPERM) ? permbones : levels;
-#  ifdef TOS
-	eraseall(topath, allbones);
-#  endif
 	if (findfirst(from))
 		do {
-#  ifdef TOS
-			Sprintf(from, "%s%s", frompath, foundfile);
-			Sprintf(to, "%s%s", topath, foundfile);
-			if (_copyfile(from, to))
-				goto error_copying;
-#  endif
 			Strcpy(last, foundfile);
 		} while (findnext());
-#  ifdef TOS
-	else
-		return;
-#  else
 	if (last[0]) {
 		Sprintf(copy, "%cC copy",switchar());
 
@@ -211,7 +175,6 @@ int mode;
 			to, "> nul", (char *)0);
 	} else
 		return;
-#  endif /* TOS */
 
 	/* See if the last file got there.  If so, remove the ramdisk bones
 	 * files.
@@ -223,18 +186,13 @@ int mode;
 		return;
 	}
 
-#  ifdef TOS
-error_copying:
-#  endif
 	/* Last file didn't get there.
 	 */
 	Sprintf(to, "%s%s", topath, allbones);
 	msmsg("Can't copy \"%s\" to \"%s\" -- ", from, to);
-#  ifndef TOS
 	if (status < 0)
 	    msmsg("can't spawn \"%s\"!", comspec);
 	else
-#  endif
 	    msmsg((freediskspace(topath) < filesize(from)) ?
 	    "insufficient disk space." : "bad path(s)?");
 	if (mode == TOPERM) {
@@ -320,9 +278,6 @@ record_exists()
 }
 #endif /* MFLOPPY */
 
-# ifdef TOS
-#define comspec_exists() 1
-# else
 #  ifdef MFLOPPY
 /* Return 1 if the comspec was found */
 STATIC_OVL boolean
@@ -339,7 +294,6 @@ comspec_exists()
 	return FALSE;
 }
 #  endif /* MFLOPPY */
-# endif
 
 
 # ifdef MFLOPPY
@@ -399,11 +353,7 @@ const char *str;
 #ifdef WIN32
 	if (!getreturn_enabled) return;
 #endif
-#ifdef TOS
-	msmsg("Hit <Return> %s.", str);
-#else
 	msmsg("Hit <Enter> %s.", str);
-#endif
 	while (Getchar() != '\n') ;
 	return;
 }
@@ -427,15 +377,7 @@ msmsg VA_DECL(const char *, fmt)
 /*
  * Follow the PATH, trying to fopen the file.
  */
-#ifdef TOS
-# ifdef __MINT__
-#define PATHSEP ':'
-# else
-#define PATHSEP ','
-# endif
-#else
 #define PATHSEP ';'
-#endif
 
 FILE *
 fopenp(name, mode)
@@ -495,9 +437,6 @@ int code;
 
 /* Chdir back to original directory
  */
-#ifdef TOS
-extern boolean run_from_desktop;	/* set in pcmain.c */
-#endif
 
 static void msexit()
 {
@@ -506,25 +445,15 @@ static void msexit()
 #endif
 
 	flushout();
-#ifndef TOS
 # ifndef WIN32
 	enable_ctrlP(); 	/* in case this wasn't done */
 # endif
-#endif
 #ifdef MFLOPPY
 	if (ramdisk) copybones(TOPERM);
 #endif
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 	chdir(orgdir);		/* chdir, not chdirx */
 	chdrive(orgdir);
-#endif
-#ifdef TOS
-	if (run_from_desktop)
-	    getreturn("to continue"); /* so the user can read the score list */
-# ifdef TEXTCOLOR
-	if (colors_changed)
-		restore_colors();
-# endif
 #endif
 #ifdef WIN32CON
 	/* Only if we started from the GUI, not the command prompt,

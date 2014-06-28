@@ -36,7 +36,7 @@
 # endif
 #endif
 
-#if (defined(MICRO) && !defined(TOS))
+#if defined(MICRO)
 # if !defined(_SIZE_T) && !defined(__size_t) /* __size_t for CSet/2 */
 #  define _SIZE_T
 #  if !((defined(MSDOS) || defined(OS2)) && defined(_SIZE_T_DEFINED)) /* MSC 5.1 */
@@ -45,7 +45,7 @@ typedef unsigned int	size_t;
 #   endif
 #  endif
 # endif
-#endif	/* MICRO && !TOS */
+#endif	/* MICRO */
 
 #if defined(__TURBOC__) || defined(MAC)
 #include <time.h>	/* time_t is not in <sys/types.h> */
@@ -254,11 +254,6 @@ E char *memset();
 #endif /* POSIX_TYPES */
 
 #if defined(MICRO) && !defined(LATTICE)
-# if defined(TOS) && defined(__GNUC__)
-E int FDECL(memcmp, (const void *,const void *,size_t));
-E void *FDECL(memcpy, (void *,const void *,size_t));
-E void *FDECL(memset, (void *,int,size_t));
-# else
 #  if defined(AZTEC_50) || defined(NHSTDC) || defined(WIN32)
 E int  FDECL(memcmp, (const void *, const void *, size_t));
 E void *FDECL(memcpy, (void *, const void *, size_t));
@@ -268,7 +263,6 @@ E int FDECL(memcmp, (char *,char *,unsigned int));
 E char *FDECL(memcpy, (char *,char *,unsigned int));
 E char *FDECL(memset, (char*,int,int));
 #  endif /* AZTEC_50 || NHSTDC */
-# endif /* TOS */
 #endif /* MICRO */
 
 #if defined(SYSV)
@@ -335,7 +329,7 @@ E int	FDECL(strlen, (const char *));
 #if (defined(SUNOS4) && defined(__STDC__))
 #define SPRINTF_PROTO
 #endif
-#if defined(TOS) || defined(AZTEC_50) || defined(__sgi) || defined(__GNUC__)
+#if defined(AZTEC_50) || defined(__sgi) || defined(__GNUC__)
 	/* problem with prototype mismatches */
 #define SPRINTF_PROTO
 #endif

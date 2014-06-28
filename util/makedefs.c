@@ -805,9 +805,6 @@ static const char *window_opts[] = {
 #ifdef AMIGA_INTUITION
 		"Amiga Intuition",
 #endif
-#ifdef GEM_GRAPHICS
-		"Gem",
-#endif
 #ifdef MSWIN_GRAPHICS
 		"mswin",
 #endif

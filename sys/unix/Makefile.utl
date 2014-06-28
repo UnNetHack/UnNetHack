@@ -26,10 +26,8 @@
 # CC = gcc -ansi
 #
 # if your make doesn't define a default SHELL properly, you may need
-#    the line below (Atari users will need a bourne work-alike)
+#    the line below
 # SHELL = /bin/sh
-# for Atari
-# SHELL=E:/GEMINI2/MUPFEL.TTP
 
 # flags may have to be changed as required
 # flags for 286 Xenix:
@@ -39,13 +37,6 @@
 # flags for 286 Microport SysV-AT
 # CFLAGS = -DDUMB -Ml -I../include
 # LFLAGS = -Ml
-
-# flags for Atari GCC (3.2.1)
-# CFLAGS = -O -I../include
-# LFLAGS = -s
-# flags for Atari GCC (3.3)
-# CFLAGS = -mshort -O2 -I../include
-# LFLAGS = -mshort -s
 
 # flags for Apollos using their native cc
 # (as long as it claims to be __STDC__ but isn't)

@@ -172,10 +172,6 @@ typedef xchar	boolean;		/* 0 or 1 */
 #include "pcconf.h"
 #endif
 
-#ifdef TOS
-#include "tosconf.h"
-#endif
-
 #ifdef AMIGA
 #include "amiconf.h"
 #endif
@@ -246,9 +242,6 @@ typedef xchar	boolean;		/* 0 or 1 */
 # ifdef OS2
 #  define PORT_ID	"OS/2"
 # endif
-# ifdef TOS
-#  define PORT_ID	"ST"
-# endif
 # ifdef UNIX
 #  define PORT_ID	"Unix"
 # endif
@@ -276,7 +269,7 @@ typedef xchar	boolean;		/* 0 or 1 */
 #  define USE_TILES		/* glyph2tile[] will be available */
 # endif
 #endif
-#if defined(AMII_GRAPHICS) || defined(GEM_GRAPHICS)
+#if defined(AMII_GRAPHICS)
 # ifndef USE_TILES
 #  define USE_TILES
 # endif

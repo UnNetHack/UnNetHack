@@ -92,11 +92,6 @@ WINGNOMEOBJ = gnaskstr.o gnbind.o gnglyph.o gnmain.o gnmap.o gnmenu.o \
       gnmesg.o gnopts.o gnplayer.o gnsignal.o gnstatus.o gntext.o \
       gnyesno.o gnworn.o nhwin.a
 #
-# Files for a Gem port
-WINGEMSRC = $(srcdir)/../win/gem/wingem.c $(srcdir)/../win/gem/wingem1.c $(srcdir)/../win/gem/load_img.c \
-	$(srcdir)/../win/gem/gr_rect.c
-WINGEMOBJ = wingem.o wingem1.o load_img.o gr_rect.o nhwin.a
-#
 # Files for a BeOS InterfaceKit port -- not ready for prime time
 WINBESRC =
 WINBEOBJ =
@@ -141,9 +136,6 @@ WINKDELIB = -lkdecore -lkdeui -lXext
 #
 # libraries for Gnome
 WINGNOMELIB = -lgnomeui -lgnome -lart_lgpl -lgtk -lgdk -lpopt
-#
-# libraries for Gem port
-WINGEMLIB = -le_gem -lgem
 #
 # libraries for BeOS
 WINBELIB = -lbe
@@ -213,7 +205,7 @@ SYSCSRC = $(srcdir)/../sys/share/nhlan.c $(srcdir)/../sys/share/ioctl.c \
 	$(srcdir)/../sys/share/pcmain.c $(srcdir)/../sys/share/pcsys.c \
 	$(srcdir)/../sys/share/pctty.c $(srcdir)/../sys/share/pcunix.c \
 	$(srcdir)/../sys/share/random.c $(srcdir)/../sys/share/unixtty.c \
-	$(srcdir)/../sys/atari/tos.c $(srcdir)/../sys/be/bemain.c \
+	$(srcdir)/../sys/be/bemain.c \
 	$(srcdir)/../sys/unix/unixmain.c $(srcdir)/../sys/unix/unixres.c \
 	$(srcdir)/../sys/unix/unixunix.c $(srcdir)/../sys/winnt/nttty.c \
 	$(srcdir)/../sys/winnt/winnt.c
@@ -222,7 +214,7 @@ SYSCSRC = $(srcdir)/../sys/share/nhlan.c $(srcdir)/../sys/share/ioctl.c \
 GENCSRC = monstr.c #tile.c
 
 # all windowing-system-dependent .c (for dependencies and such)
-WINCSRC = $(WINTTYSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC) \
+WINCSRC = $(WINTTYSRC) $(WINX11SRC) $(WINGNOMESRC) \
 	$(WINPROXYSRC) $(WINGLSRC) $(WINMSSRC) $(WINDUMMYSRC) tile.c
 # all windowing-system-dependent .cpp (for dependencies and such)
 WINCXXSRC = $(WINQTSRC) $(WINBESRC)
@@ -244,7 +236,7 @@ HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h color.h \
 	global.h autoconf.h hack.h lev.h macconf.h mfndpos.h micro.h mkroom.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
 	os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h region.h rm.h \
-	sp_lev.h spell.h system.h tcap.h timeout.h tosconf.h tradstdc.h \
+	sp_lev.h spell.h system.h tcap.h timeout.h tradstdc.h \
 	trampoli.h trap.h unixconf.h vault.h vision.h wintty.h \
 	winX.h winprocs.h wintype.h you.h youprop.h
 
@@ -295,11 +287,6 @@ Sysatt:	$(HOBJ) Makefile
 	@echo "Loading ..."
 	@$(LD) $(LFLAGS) /lib/crt0s.o /lib/shlib.ifile -o $(GAME) $(HOBJ)
 	@touch Sysatt
-
-Systos:	$(HOBJ) Makefile
-	@echo "Loading ..."
-	@$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB)
-	@touch Systos
 
 SysV-AT:	DUMB.Setup $(HOBJ) Makefile
 	@echo "Loading ..."
@@ -469,7 +456,7 @@ depend: ../sys/autoconf/depend.awk \
 $(CONFIG_H): ../include/config.h ../include/config1.h ../include/tradstdc.h \
 		../include/global.h ../include/coord.h \
 		../include/system.h ../include/unixconf.h ../include/os2conf.h \
-		../include/micro.h ../include/pcconf.h ../include/tosconf.h \
+		../include/micro.h ../include/pcconf.h \
 		../include/amiconf.h ../include/macconf.h ../include/beconf.h \
 		../include/wceconf.h ../include/ntconf.h ../include/nhlan.h \
 		../include/autoconf.h
@@ -507,8 +494,6 @@ ioctl.o: $(srcdir)/../sys/share/ioctl.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../sys/share/ioctl.c
 unixtty.o: $(srcdir)/../sys/share/unixtty.c $(HACK_H)
 	$(CC) $(CFLAGS) -c $(srcdir)/../sys/share/unixtty.c
-tos.o: $(srcdir)/../sys/atari/tos.c $(HACK_H) ../include/tcap.h
-	$(CC) $(CFLAGS) -c $(srcdir)/../sys/atari/tos.c
 bemain.o: $(srcdir)/../sys/be/bemain.c $(HACK_H) ../include/dlb.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../sys/be/bemain.c
 unixmain.o: $(srcdir)/../sys/unix/unixmain.c $(HACK_H) ../include/dlb.h
@@ -629,15 +614,6 @@ gnworn.o: $(srcdir)/../win/gnome/gnworn.c ../win/gnome/gnworn.h \
 		../win/gnome/gnglyph.h ../win/gnome/gnsignal.h \
 		../win/gnome/gnomeprv.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c $(srcdir)/../win/gnome/gnworn.c
-wingem.o: $(srcdir)/../win/gem/wingem.c $(HACK_H) ../include/func_tab.h \
-		../include/dlb.h ../include/patchlevel.h ../include/wingem.h
-	$(CC) $(CFLAGS) -c $(srcdir)/../win/gem/wingem.c
-wingem1.o: $(srcdir)/../win/gem/wingem1.c ../include/gem_rsc.h \
-		../include/load_img.h ../include/gr_rect.h \
-		../include/wintype.h ../include/wingem.h
-	$(CC) $(CFLAGS) -c $(srcdir)/../win/gem/wingem1.c
-load_img.o: $(srcdir)/../win/gem/load_img.c ../include/load_img.h
-	$(CC) $(CFLAGS) -c $(srcdir)/../win/gem/load_img.c
 gr_rect.o: $(srcdir)/../win/gem/gr_rect.c ../include/gr_rect.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/gem/gr_rect.c
 mswproc.o: $(srcdir)/../win/win32/mswproc.c $(HACK_H) ../include/dlb.h \
@@ -842,7 +818,7 @@ vision.o: $(srcdir)/vision.c $(HACK_H)
 weapon.o: $(srcdir)/weapon.c $(HACK_H)
 were.o: $(srcdir)/were.c $(HACK_H)
 wield.o: $(srcdir)/wield.c $(HACK_H)
-windows.o: $(srcdir)/windows.c $(HACK_H) ../include/wingem.h \
+windows.o: $(srcdir)/windows.c $(HACK_H) \
 		../include/winGnome.h ../include/winlisp.h
 wizard.o: $(srcdir)/wizard.c $(HACK_H) ../include/qtext.h ../include/epri.h
 worm.o: $(srcdir)/worm.c $(HACK_H) ../include/lev.h

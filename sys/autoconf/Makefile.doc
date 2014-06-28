@@ -5,9 +5,6 @@
 VPATH=@srcdir@
 srcdir=@srcdir@
 
-# for Atari
-# SHELL=E:/GEMINI2/MUPFEL.TTP
-
 GUIDEBOOK = Guidebook		# regular ASCII file
 #GUIDEBOOK = Guidebook.ps	# PostScript file
 #GUIDEBOOK = Guidebook.dvi	# TeX device-independent file

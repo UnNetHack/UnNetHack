@@ -76,8 +76,6 @@ CNF_SHARE_QTND = x11tiles rip.xpm nhsplash.xpm
 CNF_SHARE_X11ND = x11tiles UnNetHack.ad pet_mark.xbm
 #CNF_SHARE_X11ND = x11tiles UnNetHack.ad pet_mark.xbm
 # CNF_SHARE_X11ND = x11tiles UnNetHack.ad pet_mark.xbm rip.xpm
-# for Atari/Gem
-CNF_SHARE_GEMND = nh16.img title.img GEM_RSC.RSC rip.img
 # for BeOS
 CNF_SHARE_BEND = beostiles
 # for SDL/GL window port
@@ -101,8 +99,6 @@ CNF_SHARE_DAT = $(CNF_SHARE_DATD) $(CNF_SHARE_DATND)
 # Some versions of make use the SHELL environment variable as the shell
 # for running commands.  We need this to be a Bourne shell.
 # SHELL = /bin/sh
-# for Atari
-# SHELL=E:/GEMINI2/MUPFEL.TTP
 
 # Commands for setting the owner and group on files during installation.
 # Some systems fail with one or the other when installing over NFS or for

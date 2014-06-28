@@ -184,7 +184,7 @@ DLBOBJ = $(O)dlb.o
 CONFIG_H = $(INCL)\config.h $(INCL)\config1.h $(INCL)\tradstdc.h \
 		$(INCL)\global.h $(INCL)\coord.h \
 		$(INCL)\system.h $(INCL)\unixconf.h $(INCL)\os2conf.h \
-		$(INCL)\micro.h $(INCL)\pcconf.h $(INCL)\tosconf.h \
+		$(INCL)\micro.h $(INCL)\pcconf.h \
 		$(INCL)\amiconf.h $(INCL)\macconf.h $(INCL)\beconf.h \
 		$(INCL)\ntconf.h $(INCL)\nhlan.h $(INCL)\wceconf.h
 
@@ -650,8 +650,6 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 # means that there is some irrelevant stuff
 # in here, but maintenance should be easier.
 #
-$(O)tos.o: ..\sys\atari\tos.c $(HACK_H) $(INCL)\tcap.h
-	$(CC) $(CFLAGSU) -Fo$@ ..\sys\atari\tos.c
 $(O)pcmain.o: ..\sys\share\pcmain.c $(HACK_H) $(INCL)\dlb.h \
 		$(INCL)\win32api.h
 	$(CC) $(CFLAGSU) -Fo$@ ..\sys\share\pcmain.c
@@ -746,14 +744,6 @@ $(O)gntext.o: ..\win\gnome\gntext.c ..\win\gnome\gntext.h ..\win\gnome\gnmain.h 
 	$(CC) $(CFLAGSU) $(GNOMEINC) -c ..\win\gnome\gntext.c
 $(O)gnyesno.o: ..\win\gnome\gnyesno.c ..\win\gnome\gnbind.h ..\win\gnome\gnyesno.h
 	$(CC) $(CFLAGSU) $(GNOMEINC) -c ..\win\gnome\gnyesno.c
-$(O)wingem.o: ..\win\gem\wingem.c $(HACK_H) $(INCL)\func_tab.h $(INCL)\dlb.h \
-		$(INCL)\patchlevel.h $(INCL)\wingem.h
-	$(CC) $(CFLAGSU) -Fo$@ ..\win\gem\wingem.c
-$(O)wingem1.o: ..\win\gem\wingem1.c $(INCL)\gem_rsc.h $(INCL)\load_img.h \
-		$(INCL)\wintype.h $(INCL)\wingem.h
-	$(CC) $(CFLAGSU) -Fo$@ ..\win\gem\wingem1.c
-$(O)load_img.o: ..\win\gem\load_img.c $(INCL)\load_img.h
-	$(CC) $(CFLAGSU) -Fo$@ ..\win\gem\load_img.c
 $(O)tile.o: $(SRC)\tile.c $(HACK_H)
 $(O)qt_win.o: ..\win\Qt\qt_win.cpp $(HACK_H) $(INCL)\func_tab.h \
 		$(INCL)\dlb.h $(INCL)\patchlevel.h $(INCL)\qt_win.h \
@@ -871,7 +861,7 @@ $(O)vision.o: $(SRC)\vision.c $(HACK_H) $(INCL)\vis_tab.h
 $(O)weapon.o: $(SRC)\weapon.c $(HACK_H)
 $(O)were.o: $(SRC)\were.c $(HACK_H)
 $(O)wield.o: $(SRC)\wield.c $(HACK_H)
-$(O)windows.o: $(SRC)\windows.c $(HACK_H) $(INCL)\wingem.h $(INCL)\winGnome.h
+$(O)windows.o: $(SRC)\windows.c $(HACK_H) $(INCL)\winGnome.h
 $(O)wizard.o: $(SRC)\wizard.c $(HACK_H) $(INCL)\qtext.h
 $(O)worm.o: $(SRC)\worm.c $(HACK_H) $(INCL)\lev.h
 $(O)worn.o: $(SRC)\worn.c $(HACK_H)

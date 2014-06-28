@@ -788,9 +788,6 @@ boolean ghostly;
 	int hpid;
 	xchar dlvl;
 	int x, y;
-#ifdef TOS
-	short tlev;
-#endif
 
 	if (ghostly)
 	    clear_id_mapping();
@@ -806,12 +803,7 @@ boolean ghostly;
 	/* First some sanity checks */
 	mread(fd, (genericptr_t) &hpid, sizeof(hpid));
 /* CHECK:  This may prevent restoration */
-#ifdef TOS
-	mread(fd, (genericptr_t) &tlev, sizeof(tlev));
-	dlvl=tlev&0x00ff;
-#else
 	mread(fd, (genericptr_t) &dlvl, sizeof(dlvl));
-#endif
 	if ((pid && pid != hpid) || (lev && dlvl != lev)) {
 	    char trickbuf[BUFSZ];
 

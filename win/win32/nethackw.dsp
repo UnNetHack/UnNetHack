@@ -704,10 +704,6 @@ SOURCE=..\include\lev.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\load_img.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\macconf.h
 # End Source File
 # Begin Source File
@@ -893,10 +889,6 @@ SOURCE=..\include\vision.h
 # Begin Source File
 
 SOURCE=..\include\winami.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\wingem.h
 # End Source File
 # Begin Source File
 

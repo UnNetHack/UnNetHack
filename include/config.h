@@ -18,8 +18,6 @@
 
 /* #define OS2 */	/* define for OS/2 */
 
-/* #define TOS */	/* define for Atari ST/TT */
-
 /* #define STUPID */	/* avoid some complicated expressions if
 			   your C compiler chokes on them */
 /* #define MINIMAL_TERM */
@@ -64,12 +62,6 @@
 #ifdef AMIGA
 # define AMII_GRAPHICS			/* (optional) */
 # define DEFAULT_WINDOW_SYS "amii"	/* "amii", "amitile" or "tty" */
-#endif
-
-/* Atari supports GEM_GRAPHICS and/or TTY_GRAPHICS */
-#ifdef TOS
-# define GEM_GRAPHICS			/* Atari GEM interface (optional) */
-# define DEFAULT_WINDOW_SYS "Gem"	/* "Gem" or "tty" */
 #endif
 
 #ifdef __BEOS__

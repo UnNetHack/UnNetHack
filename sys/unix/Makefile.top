@@ -43,8 +43,6 @@ SHELLDIR = $(PREFIX)/games
 VARDATND = 
 # VARDATND = x11tiles NetHack.ad pet_mark.xbm
 # VARDATND = x11tiles NetHack.ad pet_mark.xbm rip.xpm
-# for Atari/Gem
-# VARDATND = nh16.img title.img GEM_RSC.RSC rip.img
 # for BeOS
 # VARDATND = beostiles
 # for Gnome
@@ -56,8 +54,6 @@ VARDAT = $(VARDATD) $(VARDATND)
 # Some versions of make use the SHELL environment variable as the shell
 # for running commands.  We need this to be a Bourne shell.
 # SHELL = /bin/sh
-# for Atari
-# SHELL=E:/GEMINI2/MUPFEL.TTP
 
 # Commands for setting the owner and group on files during installation.
 # Some systems fail with one or the other when installing over NFS or for

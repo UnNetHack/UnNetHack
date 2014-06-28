@@ -14,13 +14,12 @@
 # MAKE = make
 
 # This makefile replaces the previous Makefile.unix, Makefile.xenix,
-# Makefile.3B2, Makefile.att, and Makefile.tos.
+# Makefile.3B2, Makefile.att
 # Set SYSTEM to one of:
 #	'Sysunix'	-- generic UNIX
 #	'Sys3B2'	-- AT&T 3B2, 3B5, etc.
 #	'Sysatt'	-- AT&T UNIXPC, 7300, 3B1
 #	'SysV-AT'	-- Microport 286 UNIX (put -DDUMB in CFLAGS)
-#	'Systos'	-- Atari
 #	'SysBe'		-- BeOS
 SYSTEM = Sysunix
 
@@ -28,12 +27,7 @@ SYSTEM = Sysunix
 # Make sure that your bourne shell is specified here, as you have to spawn
 # some of the commands (eg. depend) in bourne shell for them to work.
 #
-# For Systos users compiling on the ST, you'll either need a bourne shell
-# clone or you'll need to do make depend, etc. by hand. In either case,
-# the line below probably needs changing
 SHELL=/bin/sh
-# for Atari
-# SHELL=E:/GEMINI2/MUPFEL.TTP
 
 # Normally, the C compiler driver is used for linking:
 LINK=$(CC)
@@ -45,11 +39,6 @@ LINK=$(CC)
 SYSSRC = ../sys/share/ioctl.c ../sys/share/unixtty.c ../sys/unix/unixmain.c \
 	../sys/unix/unixunix.c ../sys/unix/unixres.c
 SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
-#
-# for Systos
-# SYSSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
-#	../sys/share/pctty.c ../sys/share/pcunix.c
-# SYSOBJ = tos.o pcmain.o pcsys.o pctty.o pcunix.o
 #
 # for BeOS
 #SYSSRC = ../sys/be/bemain.c ../sys/share/unixtty.c ../sys/share/ioctl.c
@@ -86,13 +75,6 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
 # flags for 286 Microport SysV-AT
 # CFLAGS = -DDUMB -Ml -I../include
 # LFLAGS = -Ml
-
-# flags for Atari gcc (3.2.1)
-# CFLAGS = -O -I../include
-# LFLAGS = -s
-# flags for Atari gcc (3.3)
-# CFLAGS = -mshort -O2 -fomit-frame-pointer -I../include
-# LFLAGS = -mshort -s
 
 # flags for IRIX 4.0.x using native cc
 # The include files are __STDC__, but have bugs involving const
@@ -195,11 +177,6 @@ WINGNOMEOBJ = gnaskstr.o gnbind.o gnglyph.o gnmain.o gnmap.o gnmenu.o \
 	gnmesg.o gnopts.o gnplayer.o gnsignal.o gnstatus.o gntext.o \
 	gnyesno.o gnworn.o tile.o
 #
-# Files for a Gem port
-WINGEMSRC = ../win/gem/wingem.c ../win/gem/wingem1.c ../win/gem/load_img.c \
-	../win/gem/gr_rect.c tile.c
-WINGEMOBJ = wingem.o wingem1.o load_img.o gr_rect.o tile.o
-#
 # Files for a BeOS InterfaceKit port -- not ready for prime time
 WINBESRC =
 WINBEOBJ =
@@ -215,7 +192,6 @@ WINOBJ = $(WINTTYOBJ)
 # on some systems the termcap library is in -ltermcap or -lcurses
 # on 386 Xenix, the -ltermlib tputs() seems not to work; use -lcurses instead
 # Sysatt uses shared library in lieu of this option
-# Systos needs -lcurses16 if you use -mshort
 # AIX 3.1 on RS/6000 likes -lcurses if TERMINFO defined in unixconf.h
 # and -ltermcap otherwise
 # Linux uses -lncurses (newer) or -ltermcap (older)
@@ -250,9 +226,6 @@ WINKDELIB = -lkdecore -lkdeui -lXext
 #
 # libraries for Gnome
 WINGNOMELIB = -lgnomeui -lgnome -lart_lgpl -lgtk -lgdk -lpopt
-#
-# libraries for Gem port
-WINGEMLIB = -le_gem -lgem
 #
 # libraries for BeOS 
 WINBELIB = -lbe
@@ -290,7 +263,7 @@ LIBS =
 GAME     = unnethack
 # GAME     = nethack.prg
 
-# if you defined RANDOM in unixconf.h/tosconf.h since your system did not come
+# if you defined RANDOM since your system did not come
 # with a reasonable random number generator
 # RANDOBJ = random.o
 RANDOBJ =
@@ -304,7 +277,7 @@ AWK	= nawk
 # Nothing below this line should have to be changed.
 #
 # Other things that have to be reconfigured are in config.h,
-# {unixconf.h, pcconf.h, tosconf.h}, and possibly system.h
+# {unixconf.h, pcconf.h}, and possibly system.h
 
 MAKEDEFS = ../util/makedefs
 
@@ -334,7 +307,7 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	         livelog.c
 
 # all operating-system-dependent .c (for dependencies and such)
-SYSCSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
+SYSCSRC = ../sys/share/pcmain.c ../sys/share/pcsys.c \
 	../sys/share/pctty.c ../sys/share/pcunix.c ../sys/share/random.c \
 	../sys/share/ioctl.c ../sys/share/unixtty.c ../sys/unix/unixmain.c \
 	../sys/unix/unixunix.c ../sys/unix/unixres.c ../sys/be/bemain.c
@@ -343,7 +316,7 @@ SYSCSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
 GENCSRC = monstr.c #tile.c
 
 # all windowing-system-dependent .c (for dependencies and such)
-WINCSRC = $(WINTTYSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
+WINCSRC = $(WINTTYSRC) $(WINX11SRC) $(WINGNOMESRC)
 # all windowing-system-dependent .cpp (for dependencies and such)
 WINCXXSRC = $(WINQTSRC) $(WINBESRC)
 
@@ -364,7 +337,7 @@ HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h color.h \
 	global.h hack.h lev.h macconf.h mfndpos.h micro.h mkroom.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
 	os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h region.h rm.h \
-	sp_lev.h spell.h system.h tcap.h timeout.h tosconf.h tradstdc.h \
+	sp_lev.h spell.h system.h tcap.h timeout.h tradstdc.h \
 	trampoli.h trap.h unixconf.h vault.h vision.h wintty.h \
 	winX.h winprocs.h wintype.h you.h youprop.h
 
@@ -411,11 +384,6 @@ Sysatt:	$(HOBJ) Makefile
 	@echo "Loading ..."
 	@$(LD) $(LFLAGS) /lib/crt0s.o /lib/shlib.ifile -o $(GAME) $(HOBJ)
 	@touch Sysatt
-
-Systos:	$(HOBJ) Makefile
-	@echo "Loading ..."
-	@$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB)
-	@touch Systos
 
 SysV-AT:	DUMB.Setup $(HOBJ) Makefile
 	@echo "Loading ..."
@@ -554,7 +522,7 @@ depend: ../sys/unix/depend.awk \
 $(CONFIG_H): ../include/config.h ../include/config1.h ../include/tradstdc.h \
 		../include/global.h ../include/coord.h \
 		../include/system.h ../include/unixconf.h ../include/os2conf.h \
-		../include/micro.h ../include/pcconf.h ../include/tosconf.h \
+		../include/micro.h ../include/pcconf.h \
 		../include/amiconf.h ../include/macconf.h ../include/beconf.h \
 		../include/wceconf.h ../include/ntconf.h ../include/nhlan.h
 	touch $(CONFIG_H)
@@ -574,8 +542,6 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/align.h \
 		../include/winprocs.h ../include/wintty.h ../include/trampoli.h
 	touch $(HACK_H)
 #
-tos.o: ../sys/atari/tos.c $(HACK_H) ../include/tcap.h
-	$(CC) $(CFLAGS) -c ../sys/atari/tos.c
 pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h \
 		#../include/win32api.h
 	$(CC) $(CFLAGS) -c ../sys/share/pcmain.c
@@ -696,14 +662,6 @@ gnyesno.o: ../win/gnome/gnyesno.c ../win/gnome/gnbind.h ../win/gnome/gnyesno.h
 gnworn.o: ../win/gnome/gnworn.c ../win/gnome/gnworn.h ../win/gnome/gnglyph.h \
 		../win/gnome/gnsignal.h ../win/gnome/gnomeprv.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnworn.c
-wingem.o: ../win/gem/wingem.c $(HACK_H) ../include/func_tab.h ../include/dlb.h \
-		../include/patchlevel.h ../include/wingem.h
-	$(CC) $(CFLAGS) -c ../win/gem/wingem.c
-wingem1.o: ../win/gem/wingem1.c ../include/gem_rsc.h ../include/load_img.h \
-		../include/gr_rect.h ../include/wintype.h ../include/wingem.h
-	$(CC) $(CFLAGS) -c ../win/gem/wingem1.c
-load_img.o: ../win/gem/load_img.c ../include/load_img.h
-	$(CC) $(CFLAGS) -c ../win/gem/load_img.c
 gr_rect.o: ../win/gem/gr_rect.c ../include/gr_rect.h
 	$(CC) $(CFLAGS) -c ../win/gem/gr_rect.c
 tile.o: tile.c $(HACK_H)
@@ -828,7 +786,7 @@ vision.o: vision.c $(HACK_H)
 weapon.o: weapon.c $(HACK_H)
 were.o: were.c $(HACK_H)
 wield.o: wield.c $(HACK_H)
-windows.o: windows.c $(HACK_H) ../include/wingem.h ../include/winGnome.h \
+windows.o: windows.c $(HACK_H) ../include/winGnome.h \
 	../include/winlisp.h
 wizard.o: wizard.c $(HACK_H) ../include/epri.h
 worm.o: worm.c $(HACK_H) ../include/lev.h

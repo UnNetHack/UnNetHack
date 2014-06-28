@@ -88,24 +88,6 @@
 #endif
 
 /*
- * Atari auto-detection
- */
-
-#ifdef atarist
-# undef UNIX
-# ifndef TOS
-# define TOS
-# endif
-#else
-# ifdef __MINT__
-#  undef UNIX
-#  ifndef TOS
-#  define TOS
-#  endif
-# endif
-#endif
-
-/*
  * Windows NT Autodetection
  */
 #ifdef _WIN32_WCE

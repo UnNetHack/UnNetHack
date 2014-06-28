@@ -38,13 +38,6 @@
 
 SHARED_DCL char orgdir[PATHLEN];	/* also used in pcsys.c, amidos.c */
 
-#ifdef TOS
-boolean run_from_desktop = TRUE;	/* should we pause before exiting?? */
-# ifdef __GNUC__
-long _stksize = 16*1024;
-# endif
-#endif
-
 #ifdef AMIGA
 extern int bigscreen;
 void NDECL( preserve_icon );
@@ -130,13 +123,6 @@ char *argv[];
 	startup();
 #endif
 
-#ifdef TOS
-	long clock_time;
-	if (*argv[0]) { 		/* only a CLI can give us argv[0] */
-		hname = argv[0];
-		run_from_desktop = FALSE;
-	} else
-#endif
 		hname = "UnNetHack";      /* used for syntax messages */
 
 	choose_windows(DEFAULT_WINDOW_SYS);
@@ -199,10 +185,6 @@ char *argv[];
 	}
 #endif
 
-#if defined(TOS) && defined(TEXTCOLOR)
-	if (iflags.BIOS && iflags.use_color)
-		set_colors();
-#endif
 	if (!hackdir[0])
 #if !defined(LATTICE) && !defined(AMIGA)
 		Strcpy(hackdir, orgdir);
@@ -262,10 +244,6 @@ char *argv[];
 	/*
 	 * It seems you really want to play.
 	 */
-#ifdef TOS
-	if (comp_times((long)time(&clock_time)))
-		error("Your clock is incorrectly set!");
-#endif
 	u.uhp = 1;	/* prevent RIP on early quits */
 	u.ux = 0;	/* prevent flush_screen() */
 

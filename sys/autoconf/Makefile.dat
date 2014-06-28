@@ -7,10 +7,6 @@ srcdir=@srcdir@
 
 EXEEXT = @EXEEXT@
 
-# for Atari
-# SHELL=E:/GEMINI2/MUPFEL.TTP
-# UUDECODE=uudecode
-
 VARDAT = data rumors quest.dat oracles options vaults.dat
 LEVCOMP_FLAGS=
 
