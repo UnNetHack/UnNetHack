@@ -64,14 +64,6 @@
 # define DEFAULT_WINDOW_SYS "amii"	/* "amii", "amitile" or "tty" */
 #endif
 
-#ifdef __BEOS__
-#define BEOS_GRAPHICS /* (optional) */
-#define DEFAULT_WINDOW_SYS "BeOS"  /* "tty" */
-#ifndef HACKDIR	/* override the default hackdir below */
-# define HACKDIR "/boot/apps/UnNetHack"
-#endif
-#endif
-
 #ifdef QT_GRAPHICS
 # define DEFAULT_WC_TILED_MAP   /* Default to tiles if users doesn't say wc_ascii_map */
 # define USER_SOUNDS		/* Use sounds */

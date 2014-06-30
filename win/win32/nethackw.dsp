@@ -608,10 +608,6 @@ SOURCE=..\include\attrib.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\beconf.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\bitmfile.h
 # End Source File
 # Begin Source File
@@ -857,10 +853,6 @@ SOURCE=..\include\tile2x11.h
 # Begin Source File
 
 SOURCE=..\include\timeout.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\tosconf.h
 # End Source File
 # Begin Source File
 

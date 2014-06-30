@@ -42,9 +42,7 @@
 #endif
 
 #ifdef __MWERKS__	/* defined by Metrowerks' Codewarrior compiler */
-# ifndef __BEOS__	/* BeOS */
 #  define MAC
-# endif
 # define NEED_VARARGS
 # define USE_STDARG
 #endif
@@ -52,10 +50,6 @@
 #if defined(MAC) || defined(__BEOS__)
 # define DLB
 # undef UNIX
-#endif
-
-#ifdef __BEOS__
-# define NEED_VARARGS
 #endif
 
 

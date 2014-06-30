@@ -24,9 +24,6 @@ all:	$(VARDAT) spec_levs quest_levs dungeon
 ../util/tile2x11:
 	(cd ../util ; make tile2x11)
 
-../util/tile2beos:
-	(cd ../util ; make tile2beos)
-
 ../util/tile2png:
 	(cd ../util ; make tile2png)
 
@@ -76,11 +73,6 @@ x11big3dtiles:	../util/tile2x11 ../win/share/mon3d.txt \
 
 x11big3dtiles.map:	x11tiles.map
 	cp x11tiles.map x11big3dtiles.map
-
-beostiles: ../util/tile2beos $(srcdir)/../win/share/monsters.txt $(srcdir)/../win/share/objects.txt \
-			$(srcdir)/../win/share/other.txt
-	../util/tile2beos $(srcdir)/../win/share/monsters.txt $(srcdir)/../win/share/objects.txt \
-			$(srcdir)/../win/share/other.txt
 
 gltile16.png: ../util/tile2png $(srcdir)/../win/share/monsters.txt $(srcdir)/../win/share/objects.txt \
 				$(srcdir)/../win/share/other.txt
@@ -346,7 +338,7 @@ dungeon: $(srcdir)/dungeon.def ../util/makedefs ../util/dgn_comp
 
 spotless:
 	-rm -f spec_levs quest_levs *.lev $(VARDAT) dungeon dungeon.pdf vaults.dat
-	-rm -f nhdat x11tiles beostiles pet_mark.xbm rip.xpm mapbg.xpm
+	-rm -f nhdat x11tiles pet_mark.xbm rip.xpm mapbg.xpm
 	-rm -f rip.img GEM_RSC.RSC title.img nh16.img UnNetHack.ad
 	-rm -f options guioptions ttyoptions
 	-rm -f rip.bmp mnselcnt.bmp mnunsel.bmp tiles.bmp unnethack.ico splash.bmp mnsel.bmp petmark.bmp

@@ -65,14 +65,6 @@ CC = @CC@ -DAUTOCONF
 # CFLAGS = -O2 -b i486-linuxaout -fomit-frame-pointer -I../include -I$(srcdir)/../include
 # LFLAGS = -b i486-linuxaout -L/usr/X11R6/lib
 
-# flags for BeOS using the command line
-# remember to uncomment flex and bison below
-#   BeOS on a Mac/BeBox:
-#CC = mwcc
-#CFLAGS = -I../include -I$(srcdir)/../include
-#   BeOS on Intel:
-# the default values are fine
-
 # flags for debugging:
 # CFLAGS = -g -I../include -I$(srcdir)/../include
 
@@ -309,9 +301,6 @@ tile2bmp$(EXEEXT): tile2bmp.o $(TEXT_IO)
 xpm2img.ttp: xpm2img.o bitmfile.o
 	$(CC) $(LFLAGS) -o xpm2img.ttp xpm2img.o bitmfile.o $(LIBS)
 
-tile2beos: tile2beos.o $(TEXT_IO)
-	$(CC) $(LFLAGS) -o tile2beos tile2beos.o $(TEXT_IO) -lbe
-
 tilemap: $(srcdir)/../win/share/tilemap.c $(HACK_H)
 	$(CC) $(CFLAGS) $(LFLAGS) -o tilemap $(srcdir)/../win/share/tilemap.c $(LIBS)
 $(srcdir)/../src/tile.c: tilemap
@@ -353,9 +342,6 @@ xpm2img.o: $(srcdir)/../win/gem/xpm2img.c $(HACK_H) ../include/bitmfile.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/gem/xpm2img.c
 bitmfile.o: $(srcdir)/../win/gem/bitmfile.c ../include/bitmfile.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/gem/bitmfile.c
-
-tile2beos.o: $(srcdir)/../win/BeOS/tile2beos.cpp $(HACK_H) ../include/tile.h
-	$(CXX) $(CFLAGS) -c $(srcdir)/../win/BeOS/tile2beos.cpp
 
 # using dependencies like
 #	../src/foo::

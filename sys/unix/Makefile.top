@@ -43,8 +43,6 @@ SHELLDIR = $(PREFIX)/games
 VARDATND = 
 # VARDATND = x11tiles NetHack.ad pet_mark.xbm
 # VARDATND = x11tiles NetHack.ad pet_mark.xbm rip.xpm
-# for BeOS
-# VARDATND = beostiles
 # for Gnome
 # VARDATND = x11tiles pet_mark.xbm rip.xpm mapbg.xpm
 
@@ -128,10 +126,6 @@ nhtiles.bmp: $(GAME)
 x11tiles: $(GAME)
 	( cd util ; $(MAKE) tile2x11 )
 	( cd dat ; $(MAKE) x11tiles )
-
-beostiles: $(GAME)
-	( cd util ; $(MAKE) tile2beos )
-	( cd dat ; $(MAKE) beostiles )
 
 NetHack.ad: $(GAME)
 	( cd dat ; $(MAKE) NetHack.ad )

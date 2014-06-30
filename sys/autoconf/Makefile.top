@@ -76,8 +76,6 @@ CNF_SHARE_QTND = x11tiles rip.xpm nhsplash.xpm
 CNF_SHARE_X11ND = x11tiles UnNetHack.ad pet_mark.xbm
 #CNF_SHARE_X11ND = x11tiles UnNetHack.ad pet_mark.xbm
 # CNF_SHARE_X11ND = x11tiles UnNetHack.ad pet_mark.xbm rip.xpm
-# for BeOS
-CNF_SHARE_BEND = beostiles
 # for SDL/GL window port
 CNF_SHARE_GLND = gltile16.png gltile32.png gltile64.png gllogo.png glrip.png \
                  glfont8.png glfont14.png glfont20.png glfont22.png
@@ -186,10 +184,6 @@ tiles.bmp: $(GAME)
 x11tiles: $(GAME)
 	( cd util ; $(MAKE) tile2x11 )
 	( cd dat ; $(MAKE) x11tiles )
-
-beostiles: $(GAME)
-	( cd util ; $(MAKE) tile2beos )
-	( cd dat ; $(MAKE) beostiles )
 
 UnNetHack.ad: $(GAME)
 	( cd dat ; $(MAKE) UnNetHack.ad )

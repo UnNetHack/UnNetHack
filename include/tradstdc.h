@@ -189,9 +189,6 @@ typedef genericptr genericptr_t;	/* (void *) or (char *) */
 #if defined(macintosh) && (defined(__SC__) || defined(__MRC__))
 #define WIDENED_PROTOTYPES
 #endif
-#if defined(__MWERKS__) && defined(__BEOS__)
-#define UNWIDENED_PROTOTYPES
-#endif
 #if defined(WIN32)
 #define UNWIDENED_PROTOTYPES
 #endif

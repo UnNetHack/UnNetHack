@@ -808,9 +808,6 @@ static const char *window_opts[] = {
 #ifdef MSWIN_GRAPHICS
 		"mswin",
 #endif
-#ifdef BEOS_GRAPHICS
-		"BeOS InterfaceKit",
-#endif
 		0
 	};
 

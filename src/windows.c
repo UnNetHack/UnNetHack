@@ -21,10 +21,6 @@ extern struct window_procs Qt_procs;
 #ifdef MAC
 extern struct window_procs mac_procs;
 #endif
-#ifdef BEOS_GRAPHICS
-extern struct window_procs beos_procs;
-extern void NDECL(be_win_init);
-#endif
 #ifdef AMIGA_INTUITION
 extern struct window_procs amii_procs;
 extern struct window_procs amiv_procs;
@@ -71,9 +67,6 @@ struct win_choices {
 #endif
 #ifdef MAC
     { &mac_procs, 0 },
-#endif
-#ifdef BEOS_GRAPHICS
-    { &beos_procs, be_win_init },
 #endif
 #ifdef AMIGA_INTUITION
     { &amii_procs, ami_wininit_data },		/* Old font version of the game */
