@@ -53,7 +53,7 @@ extern int errno;
 #define uncompress(file)	uncompress_area(NULL, file)
 #endif
 
-#if defined(MSDOS) || defined(OS2) || defined(WIN32)
+#if defined(MSDOS) || defined(WIN32)
 # ifndef GNUDOS
 #include <sys\stat.h>
 # else
@@ -2483,23 +2483,9 @@ const char *dir;
 #if defined(MICRO) || defined(WIN32)
 	char tmp[PATHLEN];
 
-# ifdef OS2_CODEVIEW   /* explicit path on opening for OS/2 */
-	/* how does this work when there isn't an explicit path or fopenp
-	 * for later access to the file via fopen_datafile? ? */
-	(void) strncpy(tmp, dir, PATHLEN - 1);
-	tmp[PATHLEN-1] = '\0';
-	if ((strlen(tmp) + 1 + strlen(RECORD)) < (PATHLEN - 1)) {
-		append_slash(tmp);
-		Strcat(tmp, RECORD);
-	}
-#  ifndef FILE_AREAS
-	fq_record = tmp;
-#  endif
-# else
 	Strcpy(tmp, RECORD);
-#  ifndef FILE_AREAS
+# ifndef FILE_AREAS
 	fq_record = fqname(RECORD, SCOREPREFIX, 0);
-#  endif
 # endif
 
 # ifdef FILE_AREAS

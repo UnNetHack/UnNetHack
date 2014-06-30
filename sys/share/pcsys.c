@@ -25,7 +25,7 @@
 #endif
 
 
-#if defined(MICRO) || defined(WIN32) || defined(OS2)
+#if defined(MICRO) || defined(WIN32)
 void FDECL(nethack_exit,(int));
 #else
 #define nethack_exit exit
@@ -413,21 +413,10 @@ const char *name, *mode;
 				pp++;
 		}
 	}
-#ifdef OS2_CODEVIEW /* one more try for hackdir */
-	(void) strncpy(buf, hackdir, BUFSZ);
-	buf[BUFSZ-1] = '\0';
-	if ((strlen(name) + 1 + strlen(buf)) < BUFSZ - 1) {
-		append_slash(buf);
-		Strcat(buf,name);
-	} else 
-		impossible("fopenp() buffer too small for complete filename!");
-	if(fp = fopen(buf,mode))
-		return fp;
-#endif
 	return (FILE *)0;
 }
 
-#if defined(MICRO) || defined(WIN32) || defined(OS2)
+#if defined(MICRO) || defined(WIN32)
 void nethack_exit(code)
 int code;
 {
@@ -467,4 +456,4 @@ static void msexit()
 #endif
 	return;
 }
-#endif /* MICRO || WIN32 || OS2 */
+#endif /* MICRO || WIN32 */

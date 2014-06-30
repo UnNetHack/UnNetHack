@@ -16,8 +16,6 @@
 
 /* #define MSDOS */	/* in case it's not auto-detected */
 
-/* #define OS2 */	/* define for OS/2 */
-
 /* #define STUPID */	/* avoid some complicated expressions if
 			   your C compiler chokes on them */
 /* #define MINIMAL_TERM */

@@ -115,20 +115,10 @@
 /* generic pointer, always a macro; genericptr_t is usually a typedef */
 # define genericptr	void *
 
-# if defined(OS2_CSET2)
-/* Cover for Ultrix on a DECstation with 2.0 compiler, which coredumps on
- *   typedef void * genericptr_t;
- *   extern void a(void(*)(int, genericptr_t));
- * Using the #define is OK for other compiler versions too.
- */
-/* And IBM CSet/2.  The redeclaration of free hoses the compile. */
-#  define genericptr_t	genericptr
-# else
-#  if !defined(NHSTDC) && !defined(MAC)
-#   define const
-#   define signed
-#   define volatile
-#  endif
+# if !defined(NHSTDC) && !defined(MAC)
+#  define const
+#  define signed
+#  define volatile
 # endif
 
 /*

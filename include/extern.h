@@ -1376,7 +1376,7 @@ E void FDECL(mplayer_talk, (struct monst *));
 
 #if defined(MICRO) || defined(WIN32)
 
-/* ### msdos.c,os2.c,tos.c,winnt.c ### */
+/* ### msdos.c,winnt.c ### */
 
 #  ifndef WIN32
 E int NDECL(tgetch);

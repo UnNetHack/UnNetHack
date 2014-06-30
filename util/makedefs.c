@@ -84,19 +84,11 @@ static	const char	SCCS_Id[] = "@(#)makedefs.c\t3.4\t2002/02/03";
 #  endif /* __SC__ || __MRC__ */
 #   define DATA_IN_TEMPLATE	":dat:%s"
 # else /* neither AMIGA nor MAC */
-#  ifdef OS2
-#   define INCLUDE_TEMPLATE	"..\\include\\%s"
-#   define SOURCE_TEMPLATE	"..\\src\\%s"
-#   define DGN_TEMPLATE		"..\\dat\\%s"  /* where dungeon.pdf file goes */
-#   define DATA_TEMPLATE	"..\\dat\\%s"
-#   define DATA_IN_TEMPLATE	"..\\dat\\%s"
-#  else /* not AMIGA, MAC, or OS2 */
 #   define INCLUDE_TEMPLATE	"../include/%s"
 #   define SOURCE_TEMPLATE	"../src/%s"
 #   define DGN_TEMPLATE		"../dat/%s"  /* where dungeon.pdf file goes */
 #   define DATA_TEMPLATE	"../dat/%s"
 #   define DATA_IN_TEMPLATE	"../dat/%s"
-#  endif /* else !OS2 */
 # endif /* else !MAC */
 #endif	/* else !AMIGA */
 

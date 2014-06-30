@@ -164,10 +164,6 @@ typedef xchar	boolean;		/* 0 or 1 */
 #include "unixconf.h"
 #endif
 
-#ifdef OS2
-#include "os2conf.h"
-#endif
-
 #ifdef MSDOS
 #include "pcconf.h"
 #endif
@@ -230,9 +226,6 @@ typedef xchar	boolean;		/* 0 or 1 */
 #  define PORT_SUB_ID	"non-overlaid"
 #   endif
 #  endif
-# endif
-# ifdef OS2
-#  define PORT_ID	"OS/2"
 # endif
 # ifdef UNIX
 #  define PORT_ID	"Unix"

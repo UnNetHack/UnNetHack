@@ -632,10 +632,6 @@ SOURCE=..\include\decl.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\def_os2.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\dgn_file.h
 # End Source File
 # Begin Source File
@@ -769,10 +765,6 @@ SOURCE=..\include\obj.h
 # Begin Source File
 
 SOURCE=..\include\objclass.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\os2conf.h
 # End Source File
 # Begin Source File
 

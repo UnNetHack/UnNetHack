@@ -46,7 +46,7 @@ void NDECL( preserve_icon );
 STATIC_DCL void FDECL(process_options,(int argc,char **argv));
 STATIC_DCL void NDECL(nhusage);
 
-#if defined(MICRO) || defined(WIN32) || defined(OS2)
+#if defined(MICRO) || defined(WIN32)
 extern void FDECL(nethack_exit,(int));
 #else
 #define nethack_exit exit
@@ -423,9 +423,6 @@ not_recovered:
 
 #ifndef NO_SIGNAL
 	(void) signal(SIGINT, SIG_IGN);
-#endif
-#ifdef OS2
-	gettty(); /* somehow ctrl-P gets turned back on during startup ... */
 #endif
 	return;
 }
