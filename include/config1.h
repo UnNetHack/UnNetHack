@@ -104,10 +104,8 @@
 # define USE_STDARG
 # define NEED_VARARGS
 
-#ifndef WIN_CE
 # define STRNCMPI
 # define STRCMPI
-#endif
 
 #endif
 

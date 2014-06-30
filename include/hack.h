@@ -344,10 +344,6 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
  * calling convention under WINCE which is not the default
  * in that environment.
  */
-#if defined(WIN_CE)
-# define CFDECLSPEC __cdecl
-#else
 # define CFDECLSPEC
-#endif
  
 #endif /* HACK_H */
