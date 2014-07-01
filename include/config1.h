@@ -9,29 +9,6 @@
 # define __MSC		/* increase Borland C compatibility in libraries */
 #endif
 
-/*
- * Mac Stuff.
- */
-#ifdef macintosh	/*	Auto-defined symbol for MPW compilers (sc and mrc) */
-# define MAC
-#endif
-
-#ifdef THINK_C		/* Think C auto-defined symbol */
-# define MAC
-# define NEED_VARARGS
-#endif
-
-#ifdef __MWERKS__	/* defined by Metrowerks' Codewarrior compiler */
-#  define MAC
-# define NEED_VARARGS
-# define USE_STDARG
-#endif
-
-#if defined(MAC)
-# define DLB
-# undef UNIX
-#endif
-
 #ifdef __SASC_60
 # define NEARDATA __near /* put some data close */
 #else

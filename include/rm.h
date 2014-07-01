@@ -260,7 +260,6 @@ extern const struct symdef def_warnsyms[WARNCOUNT];
 #define ASCII_GRAPHICS	0	/* regular characters: '-', '+', &c */
 #define IBM_GRAPHICS	1	/* PC graphic characters */
 #define DEC_GRAPHICS	2	/* VT100 line drawing characters */
-#define MAC_GRAPHICS	3	/* Macintosh drawing characters */
 #define CURS_GRAPHICS	4	/* Portable curses drawing characters */
 #define UTF8_GRAPHICS	5	/* UTF8 characters */
 

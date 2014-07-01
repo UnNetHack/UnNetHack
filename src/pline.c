@@ -119,10 +119,8 @@ pline VA_DECL(const char *, line)
 	    raw_print(line);
 	    return;
 	}
-#ifndef MAC
 	if (no_repeat && !strcmp(line, toplines))
 	    return;
-#endif /* MAC */
 	if (vision_full_recalc) vision_recalc(0);
 	if (u.ux) flush_screen(1);		/* %% */
 	if (typ == MSGTYP_NOSHOW) return;

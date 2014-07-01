@@ -342,17 +342,6 @@ do_improvisation(instr)
 struct obj *instr;
 {
 	int damage, do_spec = !Confusion;
-#if defined(MAC)
-	struct obj itmp;
-
-	itmp = *instr;
-	/* if won't yield special effect, make sound of mundane counterpart */
-	if (!do_spec || instr->spe <= 0)
-	    while (objects[itmp.otyp].oc_magic) itmp.otyp -= 1;
-# ifdef MAC
-	mac_speaker(&itmp, "C");
-# endif
-#endif /* MAC */
 
 	if (!do_spec)
 	    pline("What you produce is quite far from music...");
@@ -485,9 +474,6 @@ struct obj *instr;
 	/* if user is at the console, play through the console speaker */
 	if (atconsole())
 	    speaker(instr, buf);
-#endif
-#ifdef MAC
-	mac_speaker ( instr , buf ) ;
 #endif
 	/* Check if there was the Stronghold drawbridge near
 	 * and if the tune conforms to what we're waiting for.

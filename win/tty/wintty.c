@@ -14,13 +14,6 @@
 
 #ifdef TTY_GRAPHICS
 
-#ifdef MAC
-# define MICRO /* The Mac is a MICRO only for this file, not in general! */
-# ifdef THINK_C
-extern void msmsg(const char *,...);
-# endif
-#endif
-
 
 #ifndef NO_TERMS
 #include "tcap.h"
@@ -90,10 +83,6 @@ struct window_procs tty_procs = {
     tty_delay_output,
 #ifdef CHANGE_COLOR	/* the Mac uses a palette device */
     tty_change_color,
-#ifdef MAC
-    tty_change_background,
-    set_tty_font_name,
-#endif
     tty_get_color_string,
 #endif
 

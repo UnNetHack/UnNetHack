@@ -688,22 +688,6 @@ SOURCE=..\include\lev.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\macconf.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\macpopup.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\mactty.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\macwin.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\mail.h
 # End Source File
 # Begin Source File
@@ -737,10 +721,6 @@ SOURCE=..\include\monst.h
 # Begin Source File
 
 SOURCE=..\include\monsym.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\mttypriv.h
 # End Source File
 # Begin Source File
 

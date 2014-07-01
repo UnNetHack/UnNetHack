@@ -45,7 +45,7 @@
 # define USE_VARARGS
 #endif
 
-#if defined(NHSTDC) || defined(MAC)
+#if defined(NHSTDC) 
 # if !defined(USE_VARARGS) && !defined(USE_OLDARGS) && !defined(USE_STDARG)
 #   define USE_STDARG
 # endif
@@ -88,7 +88,7 @@
 #endif
 #endif /* NEED_VARARGS */
 
-#if defined(NHSTDC) || defined(MAC)
+#if defined(NHSTDC)
 
 /*
  * Used for robust ANSI parameter forward declarations:
@@ -115,7 +115,7 @@
 /* generic pointer, always a macro; genericptr_t is usually a typedef */
 # define genericptr	void *
 
-# if !defined(NHSTDC) && !defined(MAC)
+# if !defined(NHSTDC)
 #  define const
 #  define signed
 #  define volatile
@@ -170,9 +170,6 @@ typedef genericptr genericptr_t;	/* (void *) or (char *) */
  * prototypes for the ANSI compilers so people quit trying to fix the
  * prototypes to match the standard and thus lose the typechecking.
  */
-#if defined(macintosh) && (defined(__SC__) || defined(__MRC__))
-#define WIDENED_PROTOTYPES
-#endif
 #if defined(WIN32)
 #define UNWIDENED_PROTOTYPES
 #endif

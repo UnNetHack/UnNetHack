@@ -9,11 +9,7 @@
 #ifdef DLB
 
 /* implementations */
-#ifdef MAC
-# define DLBRSRC	/* use Mac resources */
-#else
 # define DLBLIB		/* use a set of external files */
-#endif
 
 #ifdef DLBLIB
 /* directory structure in memory */

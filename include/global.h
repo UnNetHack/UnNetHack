@@ -164,10 +164,6 @@ typedef xchar	boolean;		/* 0 or 1 */
 #include "unixconf.h"
 #endif
 
-#ifdef MAC
-#include "macconf.h"
-#endif
-
 #ifdef WIN32
 #include "ntconf.h"
 #endif
@@ -201,9 +197,6 @@ typedef xchar	boolean;		/* 0 or 1 */
 
 /* Displayable name of this port; don't redefine if defined in *conf.h */
 #ifndef PORT_ID
-# ifdef MAC
-#  define PORT_ID	"Mac"
-# endif
 # ifdef UNIX
 #  define PORT_ID	"Unix"
 # endif

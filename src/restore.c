@@ -531,9 +531,6 @@ STATIC_OVL int
 restlevelfile(fd, ltmp)
 register int fd;
 xchar ltmp;
-#if defined(macintosh) && (defined(__SC__) || defined(__MRC__))
-# pragma unused(fd)
-#endif
 {
 	register int nfd;
 	char whynot[BUFSZ];
@@ -797,10 +794,6 @@ boolean ghostly;
 		uchar	len;
 		struct rm r;
 		
-#if defined(MAC)
-		/* Suppress warning about used before set */
-		(void) memset((genericptr_t) &r, 0, sizeof(r));
-#endif
 		i = 0; j = 0; len = 0;
 		while(i < ROWNO) {
 		    while(j < COLNO) {

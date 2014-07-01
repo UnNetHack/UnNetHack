@@ -32,9 +32,7 @@ boolean counting;   /* Count window is active */
 #define MAP_WIN     3
 #define NHWIN_MAX   4
 #define MESG_HISTORY_MAX   200
-#if !defined(__APPLE__) || !defined(NCURSES_VERSION)
 # define USE_DARKGRAY /* Allow "bright" black; delete if not visible */
-#endif	/* !__APPLE__ && !PDCURSES */
 #define CURSES_DARK_GRAY    17
 #define MAP_SCROLLBARS
 #ifdef PDCURSES

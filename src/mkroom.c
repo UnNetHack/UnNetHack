@@ -75,7 +75,6 @@ mkshop()
 
 	/* first determine shoptype */
 	if(wizard){
-#ifndef MAC
 		ep = nh_getenv("SHOPTYPE");
 		if(ep){
 			for (i=0; shtypes[i].name; i++) {
@@ -145,11 +144,8 @@ mkshop()
 			else
 				i = -1;
 		}
-#endif
 	}
-#ifndef MAC
 gottype:
-#endif
 #endif
 	for(sroom = &rooms[0]; ; sroom++){
 		if(sroom->hx < 0) return;

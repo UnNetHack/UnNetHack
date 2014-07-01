@@ -28,7 +28,7 @@ static long final_fpos;
 #define ENTRYMAX	100	/* must be >= 10 */
 
 #ifndef AUTOCONF
-#if !defined(MICRO) && !defined(MAC) && !defined(WIN32)
+#if !defined(MICRO) && !defined(WIN32)
 #define PERS_IS_UID		/* delete for PERSMAX per name; now per uid */
 #endif
 #endif /* AUTOCONF_H */

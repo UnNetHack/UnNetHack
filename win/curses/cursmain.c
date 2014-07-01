@@ -113,11 +113,7 @@ void curses_init_nhwindows(int* argcp, char** argv)
     orig_cursor = curs_set(0);
     keypad(stdscr, TRUE);
 #ifdef NCURSES_VERSION
-# ifdef __APPLE__
- ESCDELAY = 25;
-# else
     set_escdelay(25);
-# endif /* __APPLE__ */
 #endif  /* NCURSES_VERSION */
 #ifdef PDCURSES
 # ifdef DEF_GAME_NAME

@@ -12,11 +12,9 @@
 #endif
 
 /* might display need graphics code? */
-#if !defined(MAC)
 # if defined(TERMLIB)
 #  define ASCIIGRAPH
 # endif
-#endif
 
 #ifndef DECL_H
 extern struct tc_gbl_data {   /* also declared in decl.h; defined in decl.c */

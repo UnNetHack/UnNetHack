@@ -527,109 +527,6 @@ static glyph_t dec_graphics[MAXPCHARS] = {
 };
 #endif  /* TERMLIB */
 
-#ifdef MAC_GRAPHICS_ENV
-static glyph_t mac_graphics[MAXPCHARS] = {
-/* 0*/	g_FILLER(S_stone),
-	0xba,	/* S_vwall */
-	0xcd,	/* S_hwall */
-	0xc9,	/* S_tlcorn */
-	0xbb,	/* S_trcorn */
-	0xc8,	/* S_blcorn */
-	0xbc,	/* S_brcorn */
-	0xce,	/* S_crwall */
-	0xca,	/* S_tuwall */
-	0xcb,	/* S_tdwall */
-/*10*/	0xb9,	/* S_tlwall */
-	0xcc,	/* S_trwall */
-	0xb0,	/* S_ndoor */
-	0xee,	/* S_vodoor */
-	0xee,	/* S_hodoor */
-	0xef,	/* S_vcdoor */
-	0xef,	/* S_hcdoor */
-	0xf0,	/* S_bars:	equivalency symbol */
-	0xf1,	/* S_tree:	plus-or-minus */
-	0xf1,	/* S_deadtree:	plus-or-minus */
-	g_FILLER(S_Room),
-	g_FILLER(S_stone), /* S_darkroom */
-/*20*/	0xB0,	/* S_corr */
-	g_FILLER(S_litcorr),
-	g_FILLER(S_upstair),
-	g_FILLER(S_dnstair),
-	g_FILLER(S_upladder),
-	g_FILLER(S_dnladder),
-	g_FILLER(S_altar),
-	0xef,	/* S_grave:	same as open door */
-	g_FILLER(S_throne),
-	g_FILLER(S_sink),
-/*30*/	g_FILLER(S_fountain),
-	0xe0,	/* S_pool */
-	g_FILLER(S_ice),
-	g_FILLER(S_bog),
-	g_FILLER(S_lava),
-	g_FILLER(S_vodbridge),
-	g_FILLER(S_hodbridge),
-	g_FILLER(S_vcdbridge),
-	g_FILLER(S_hcdbridge),
-	g_FILLER(S_air),
-	g_FILLER(S_cloud),
-	g_FILLER(S_icewall),
-	g_FILLER(S_crystalicewall),
-/*40*/	g_FILLER(S_water),
-	g_FILLER(S_arrow_trap),
-	g_FILLER(S_dart_trap),
-	g_FILLER(S_falling_rock_trap),
-	g_FILLER(S_squeaky_board),
-	g_FILLER(S_bear_trap),
-	g_FILLER(S_land_mine),
-	g_FILLER(S_rolling_boulder_trap),
-/*50*/	g_FILLER(S_sleeping_gas_trap),
-	g_FILLER(S_rust_trap),
-	g_FILLER(S_fire_trap),
-	g_FILLER(S_pit),
-	g_FILLER(S_spiked_pit),
-	g_FILLER(S_hole),
-	g_FILLER(S_trap_door),
-	g_FILLER(S_teleportation_trap),
-	g_FILLER(S_level_teleporter),
-	g_FILLER(S_magic_portal),
-/*60*/	g_FILLER(S_web),
-	g_FILLER(S_statue_trap),
-	g_FILLER(S_magic_trap),
-	g_FILLER(S_anti_magic_trap),
-	g_FILLER(S_ice_trap),
-	g_FILLER(S_polymorph_trap),
-	g_FILLER(S_vbeam),
-	g_FILLER(S_hbeam),
-	g_FILLER(S_lslant),
-	g_FILLER(S_rslant),
-/*70*/	g_FILLER(S_digbeam),
-	g_FILLER(S_flashbeam),
-	g_FILLER(S_boomleft),
-	g_FILLER(S_boomright),
-	g_FILLER(S_ss1),
-	g_FILLER(S_ss2),
-	g_FILLER(S_ss3),
-	g_FILLER(S_ss4),
-	g_FILLER(S_sw_tl),
-	g_FILLER(S_sw_tc),
-/*80*/	g_FILLER(S_sw_tr),
-	g_FILLER(S_sw_ml),
-	g_FILLER(S_sw_mr),
-	g_FILLER(S_sw_bl),
-	g_FILLER(S_sw_bc),
-	g_FILLER(S_sw_br),
-	g_FILLER(S_explode1),
-	g_FILLER(S_explode2),
-	g_FILLER(S_explode3),
-	g_FILLER(S_explode4),
-/*90*/	g_FILLER(S_explode5),
-	g_FILLER(S_explode6),
-	g_FILLER(S_explode7),
-	g_FILLER(S_explode8),
-	g_FILLER(S_explode9)
-};
-#endif	/* MAC_GRAPHICS_ENV */
-
 #ifdef UTF8_GLYPHS
 /* Probably best to only use characters from this list
  * http://en.wikipedia.org/wiki/WGL4 */
@@ -823,11 +720,6 @@ int gr_set_flag;
 	    if (decgraphics_mode_callback) (*decgraphics_mode_callback)();
 	    break;
 #endif /* TERMLIB */
-#ifdef MAC_GRAPHICS_ENV
-	case MAC_GRAPHICS:
-	    assign_graphics(mac_graphics, SIZE(mac_graphics), MAXPCHARS, 0);
-	    break;
-#endif
 #ifdef CURSES_GRAPHICS
     case CURS_GRAPHICS:
 	    assign_graphics((glyph_t *)0, 0, MAXPCHARS, 0);

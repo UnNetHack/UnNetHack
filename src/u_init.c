@@ -1232,7 +1232,7 @@ register struct trobj *trop;
 			obj->was_in_starting_inventory = TRUE;
 		}
 
-#if !defined(PYRAMID_BUG) && !defined(MAC)
+#if !defined(PYRAMID_BUG)
 		if(--trop->trquan) continue;	/* make a similar object */
 #else
 		if(trop->trquan) {		/* check if zero first */

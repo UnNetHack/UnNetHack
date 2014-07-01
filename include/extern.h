@@ -989,46 +989,6 @@ E int FDECL(artifact_door, (int,int));
 E  int FDECL(doopen_indir,(int,int));
 #endif
 
-#ifdef MAC
-/* These declarations are here because the main code calls them. */
-
-/* ### macfile.c ### */
-
-E int FDECL(maccreat, (const char *,long));
-E int FDECL(macopen, (const char *,int,long));
-E int FDECL(macclose, (int));
-E int FDECL(macread, (int,void *,unsigned));
-E int FDECL(macwrite, (int,void *,unsigned));
-E long FDECL(macseek, (int,long,short));
-E int FDECL(macunlink, (const char *));
-
-/* ### macsnd.c ### */
-
-E void FDECL(mac_speaker, (struct obj *,char *));
-
-/* ### macunix.c ### */
-
-E void FDECL(regularize, (char *));
-E void NDECL(getlock);
-
-/* ### macwin.c ### */
-
-E void FDECL(lock_mouse_cursor, (Boolean));
-E int NDECL(SanePositions);
-
-/* ### mttymain.c ### */
-
-E void FDECL(getreturn, (char *));
-E void VDECL(msmsg, (const char *,...));
-E void NDECL(gettty);
-E void NDECL(setftty);
-E void FDECL(settty, (const char *));
-E int NDECL(tgetch);
-E void FDECL(cmov, (int x, int y));
-E void FDECL(nocmov, (int x, int y));
-
-#endif /* MAC */
-
 /* ### mail.c ### */
 
 #ifdef MAIL

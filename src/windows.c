@@ -18,9 +18,6 @@ extern void NDECL(win_X11_init);
 #ifdef QT_GRAPHICS
 extern struct window_procs Qt_procs;
 #endif
-#ifdef MAC
-extern struct window_procs mac_procs;
-#endif
 #ifdef WIN32_GRAPHICS
 extern struct window_procs win32_procs;
 #endif
@@ -59,9 +56,6 @@ struct win_choices {
 #endif
 #ifdef QT_GRAPHICS
     { &Qt_procs, 0 },
-#endif
-#ifdef MAC
-    { &mac_procs, 0 },
 #endif
 #ifdef WIN32_GRAPHICS
     { &win32_procs, 0 },

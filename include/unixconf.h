@@ -304,7 +304,7 @@
 #endif
 
 /* Use the high quality random number routines. */
-#if defined(BSD) || defined(LINUX) || defined(CYGWIN32) || defined(RANDOM) || defined(__APPLE__)
+#if defined(BSD) || defined(LINUX) || defined(CYGWIN32) || defined(RANDOM)
 #define Rand()	random()
 #else
 #define Rand()	lrand48()

@@ -56,10 +56,6 @@ struct window_procs {
     void NDECL((*win_delay_output));
 #ifdef CHANGE_COLOR
     void FDECL((*win_change_color), (int,long,int));
-#ifdef MAC
-    void FDECL((*win_change_background), (int));
-    short FDECL((*win_set_font_name), (winid, char *));
-#endif
     char * NDECL((*win_get_color_string));
 #endif
 
@@ -124,10 +120,6 @@ extern NEARDATA struct window_procs windowprocs;
 #define delay_output (*windowprocs.win_delay_output)
 #ifdef CHANGE_COLOR
 #define change_color (*windowprocs.win_change_color)
-#ifdef MAC
-#define change_background (*windowprocs.win_change_background)
-#define set_font_name (*windowprocs.win_set_font_name)
-#endif
 #define get_color_string (*windowprocs.win_get_color_string)
 #endif
 

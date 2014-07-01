@@ -18,7 +18,7 @@
 
 #include <ctype.h>
 
-#if (!defined(MAC) && !defined(O_WRONLY) && !defined(AZTEC_C)) || defined(USE_FCNTL)
+#if (!defined(O_WRONLY) && !defined(AZTEC_C)) || defined(USE_FCNTL)
 #include <fcntl.h>
 #endif
 
@@ -89,7 +89,7 @@ char whereis_file[255]=WHEREIS_FILE;
 #  if defined(WIN32)
 #define SAVESIZE	(PL_NSIZ + 40)	/* username-player.NetHack-saved-game */
 #  else
-#define SAVESIZE	FILENAME	/* from macconf.h or pcconf.h */
+#define SAVESIZE	FILENAME	/* from pcconf.h */
 #  endif
 #endif
 
@@ -120,10 +120,6 @@ STATIC_DCL FILE *NDECL(fopen_wizkit_file);
 static int lockptr;
 #define Close close
 #define DeleteFile unlink
-#endif
-
-#ifdef MAC
-# define unlink macunlink
 #endif
 
 #ifdef USER_SOUNDS
@@ -429,11 +425,7 @@ char errbuf[];
 # ifdef FILE_AREAS
 	fd = creat_area(FILE_AREA_LEVL, lock, FCMASK);
 # else
-# ifdef MAC
-	fd = maccreat(fq_lock, LEVL_TYPE);
-# else
 	fd = creat(fq_lock, FCMASK);
-# endif
 # endif	/* FILE_AREAS */
 #endif /* MICRO || WIN32 */
 
@@ -471,16 +463,12 @@ char errbuf[];
 #ifdef FILE_AREAS
 	fd = open_area(FILE_AREA_LEVL, lock, O_RDONLY | O_BINARY, 0);
 #else
-# ifdef MAC
-	fd = macopen(fq_lock, O_RDONLY | O_BINARY, LEVL_TYPE);
-# else
 #  ifdef HOLD_LOCKFILE_OPEN
 	if (lev == 0)
 		fd = open_levelfile_exclusively(fq_lock, lev, O_RDONLY | O_BINARY );
 	else
 #  endif
 	fd = open(fq_lock, O_RDONLY | O_BINARY, 0);
-# endif
 #endif	/* FILE_AREAS */
 
 	/* for failure, return an explanation that our caller can use;
@@ -776,11 +764,7 @@ char errbuf[];
 # ifdef FILE_AREAS
 	fd = creat_area(FILE_AREA_BONES, file, FCMASK);
 # else
-# ifdef MAC
-	fd = maccreat(file, BONE_TYPE);
-# else
 	fd = creat(file, FCMASK);
-# endif
 # endif	/* FILE_AREAS */
 #endif
 	if (fd < 0 && errbuf) /* failure explanation */
@@ -870,11 +854,7 @@ char **bonesid;
 #else
 	fq_bones = fqname(bones, BONESPREFIX, 0);
 	uncompress(fq_bones);	/* no effect if nonexistent */
-# ifdef MAC
-	fd = macopen(fq_bones, O_RDONLY | O_BINARY, BONE_TYPE);
-# else
 	fd = open(fq_bones, O_RDONLY | O_BINARY, 0);
-# endif
 #endif	/* FILE_AREAS */
 	return fd;
 }
@@ -961,11 +941,7 @@ int fd;
 void
 set_error_savefile()
 {
-#  ifdef MAC
-	Strcat(SAVEF, "-e");
-#  else
 	Strcat(SAVEF, ".e");
-#  endif
 }
 #endif
 
@@ -991,11 +967,7 @@ create_savefile()
 # if defined(MICRO) || defined(WIN32)
 	fd = open(fq_save, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK);
 # else
-#  ifdef MAC
-	fd = maccreat(fq_save, SAVE_TYPE);
-#  else
 	fd = creat(fq_save, FCMASK);
-#  endif
 # endif /* MICRO */
 #endif  /* FILE_AREAS */
 
@@ -1014,11 +986,7 @@ open_savefile()
 #else
 	const char *fq_save;
 	fq_save = fqname(SAVEF, SAVEPREFIX, 0);
-# ifdef MAC
-	fd = macopen(fq_save, O_RDONLY | O_BINARY, SAVE_TYPE);
-# else
 	fd = open(fq_save, O_RDONLY | O_BINARY, 0);
-# endif
 #endif	/* FILE_AREAS */
 	return fd;
 }
@@ -1358,7 +1326,7 @@ compress_area(filearea, filename)
 const char *filearea, *filename;
 {
 #ifndef COMPRESS
-#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
+#if defined(__MWERKS__)
 # pragma unused(filename)
 #endif
 #else
@@ -1373,7 +1341,7 @@ uncompress_area(filearea, filename)
 const char *filearea, *filename;
 {
 #ifndef COMPRESS
-#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
+#if defined(__MWERKS__)
 # pragma unused(filename)
 #endif
 #else
@@ -1403,7 +1371,7 @@ make_lockname(filename, lockname)
 const char *filename;
 char *lockname;
 {
-#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
+#if defined(__MWERKS__)
 # pragma unused(filename,lockname)
 	return (char*)0;
 #else
@@ -1440,7 +1408,7 @@ int whichprefix;
 int retryct;
 #endif
 {
-#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
+#if defined(__MWERKS__)
 # pragma unused(filename, retryct)
 #endif
 #ifndef USE_FCNTL
@@ -1587,9 +1555,6 @@ int retryct;
 void
 unlock_file(filename)
 const char *filename;
-#if defined(macintosh) && (defined(__SC__) || defined(__MRC__))
-# pragma unused(filename)
-#endif
 {
 #ifndef USE_FCNTL
 	char locknambuf[BUFSZ];
@@ -1647,30 +1612,22 @@ const char* configfile =
 #ifdef UNIX
 			".unnethackrc";
 #else
-# if defined(MAC)
-			"UnNetHack Defaults";
-# else
 #  if defined(WIN32)
 			"defaults.unh";
 #  else
 			"UnNetHack.cnf";
 #  endif
-# endif
 #endif
 
 const char *oldconfigfile =
 #ifdef UNIX
 			".nethackrc";
 #else
-# if defined(MAC)
-			"NetHack Defaults";
-# else
 #  if defined(WIN32)
 			"defaults.nh";
 #  else
 			"NetHack.cnf";
 #  endif
-# endif
 #endif
 
 
@@ -1719,7 +1676,7 @@ const char *filename;
 		}
 	}
 
-#if defined(MICRO) || defined(MAC) || defined(WIN32)
+#if defined(MICRO) || defined(WIN32)
 	if ((fp = fopenp(fqname(configfile, CONFIGPREFIX, 0), "r")) != (FILE *)0)
 		return(fp);
 	/* try .nethackrc? */
@@ -1743,17 +1700,6 @@ const char *filename;
 		if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
 			return(fp);
 	}
-# if defined(__APPLE__)
-	/* try an alternative */
-	if (envp) {
-		Sprintf(tmp_config, "%s/%s", envp, "Library/Preferences/NetHack Defaults");
-		if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
-			return(fp);
-		Sprintf(tmp_config, "%s/%s", envp, "Library/Preferences/NetHack Defaults.txt");
-		if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
-			return(fp);
-	}
-# endif
 	if (errno != ENOENT) {
 	    char *details;
 
@@ -1866,7 +1812,7 @@ char		*tmp_ramdisk;
 char		*tmp_levels;
 boolean		recursive;
 {
-#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
+#if defined(__MWERKS__)
 # pragma unused(tmp_ramdisk,tmp_levels)
 #endif
 	char		*bufp, *altp;
@@ -2203,7 +2149,7 @@ fopen_wizkit_file()
 #endif
 	}
 
-#if defined(MICRO) || defined(MAC) || defined(WIN32)
+#if defined(MICRO) || defined(WIN32)
 	if ((fp = fopenp(fqname(wizkit, CONFIGPREFIX, 0), "r"))
 								!= (FILE *)0)
 		return(fp);
@@ -2273,7 +2219,7 @@ void
 check_recordfile(dir)
 const char *dir;
 {
-#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
+#if defined(__MWERKS__)
 # pragma unused(dir)
 #endif
 	int fd;
@@ -2336,18 +2282,6 @@ const char *dir;
 	} else		/* open succeeded */
 	    (void) close(fd);
 #else /* MICRO || WIN32*/
-
-# ifdef MAC
-	/* Create the "record" file, if necessary */
-	fq_record = fqname(RECORD, SCOREPREFIX, 0);
-	fd = macopen (fq_record, O_RDWR | O_CREAT, TEXT_TYPE);
-	if (fd != -1) macclose (fd);
-
-	/* Create the logfile, if necessary */
-	fq_record = fqname(LOGFILE, SCOREPREFIX, 0);
-	fd = macopen (fq_record, O_RDWR | O_CREAT, LOGF_TYPE);
-	if (fd != -1) macclose (fd);
-# endif /* MAC */
 
 #endif /* MICRO || WIN32*/
 }

@@ -28,11 +28,7 @@
 /* some old <sys/types.h> may not define off_t and size_t; if your system is
  * one of these, define them by hand below
  */
-#if defined(MAC)
-#include <types.h>
-#else
 #include <sys/types.h>
-#endif
 
 #if defined(MICRO)
 # if !defined(_SIZE_T) && !defined(__size_t) /* __size_t for CSet/2 */
@@ -41,7 +37,7 @@ typedef unsigned int	size_t;
 # endif
 #endif	/* MICRO */
 
-#if defined(__TURBOC__) || defined(MAC)
+#if defined(__TURBOC__)
 #include <time.h>	/* time_t is not in <sys/types.h> */
 #endif
 
@@ -152,17 +148,6 @@ E int FDECL(unlink, (const char *));
 
 #endif /* AZTEC_50 && __GNUC__ */
 
-#ifdef MAC
-#ifndef __CONDITIONALMACROS__	/* universal headers */
-E int FDECL(close, (int));		/* unistd.h */
-E int FDECL(read, (int, char *, int));	/* unistd.h */
-E int FDECL(chdir, (const char *));	/* unistd.h */
-E char *FDECL(getcwd, (char *,int));	/* unistd.h */
-#endif
-
-E int FDECL(open, (const char *,int));
-#endif
-
 #if defined(MICRO)
 E int FDECL(close, (int));
 #ifndef __EMX__
@@ -199,7 +184,7 @@ E int FDECL(system, (const char *));
 /* The POSIX string.h is required to define all the mem* and str* functions */
 #include <string.h>
 #else
-#if defined(SYSV) || defined(MAC) || defined(SUNOS4)
+#if defined(SYSV) || defined(SUNOS4)
 # if defined(NHSTDC)
 #  if !(defined(SUNOS4) && defined(__STDC__))
 				/* Solaris unbundled cc (acc) */
@@ -265,7 +250,7 @@ E char	*FDECL(strcat, (char *,const char *));
 E char	*FDECL(strncat, (char *,const char *,size_t));
 E char	*FDECL(strpbrk, (const char *,const char *));
 
-# if defined(SYSV) || defined(MICRO) || defined(MAC)
+# if defined(SYSV) || defined(MICRO)
 E char	*FDECL(strchr, (const char *,int));
 E char	*FDECL(strrchr, (const char *,int));
 # else /* BSD */
@@ -275,7 +260,7 @@ E char	*FDECL(rindex, (const char *,int));
 
 E int	FDECL(strcmp, (const char *,const char *));
 E int	FDECL(strncmp, (const char *,const char *,size_t));
-# if defined(MICRO) || defined(MAC)
+# if defined(MICRO)
 E size_t FDECL(strlen, (const char *));
 # else
 E int	FDECL(strlen, (const char *));
@@ -365,7 +350,7 @@ E genericptr_t FDECL(malloc, (size_t));
 E struct tm *FDECL(localtime, (const time_t *));
 # endif
 
-# if (defined(BSD) && defined(POSIX_TYPES)) || defined(SYSV) || defined(MICRO) || defined(MAC)
+# if (defined(BSD) && defined(POSIX_TYPES)) || defined(SYSV) || defined(MICRO)
 E time_t FDECL(time, (time_t *));
 # else
 E long FDECL(time, (time_t *));

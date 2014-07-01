@@ -20,7 +20,7 @@
 			/* if a terminal handles highlighting or tabs poorly,
 			   try this define, used in pager.c and termcap.c */
 
-#include "config1.h"	/* should auto-detect MAC, and WIN32 */
+#include "config1.h"	/* should auto-detect WIN32 */
 
 #ifdef AUTOCONF
 # include "autoconf_paths.h"
@@ -47,19 +47,10 @@
  *	tty, X11, mac, Qt, Gem, Gnome, lisp
  */
 
-/* MAC also means MAC windows */
-#ifdef MAC
-# ifndef	AUX
-#  define DEFAULT_WINDOW_SYS "mac"
-# endif
-#endif
-
 #ifdef QT_GRAPHICS
 # define DEFAULT_WC_TILED_MAP   /* Default to tiles if users doesn't say wc_ascii_map */
 # define USER_SOUNDS		/* Use sounds */
-# ifndef __APPLE__
 #  define USER_SOUNDS_REGEX
-# endif
 # define USE_XPM		/* Use XPM format for images (required) */
 # define GRAPHIC_TOMBSTONE	/* Use graphical tombstone (rip.ppm) */
 # ifndef DEFAULT_WINDOW_SYS
@@ -175,9 +166,7 @@
  */
 #define INSURANCE	/* allow crashed game recovery */
 
-#ifndef MAC
 # define CHDIR		/* delete if no chdir() available */
-#endif
 
 #ifdef CHDIR
 /*
@@ -318,9 +307,7 @@ typedef long glyph_t;
 #define ELBERETH	/* Engraving the E-word repels monsters */
 /* I/O */
 #define REDO		/* support for redoing last command - DGK */
-#if !defined(MAC)
 # define CLIPPING	/* allow smaller screens -- ERS */
-#endif
 
 #define EXP_ON_BOTL	/* Show experience on bottom line */
 /* #define SCORE_ON_BOTL */	/* added by Gary Erickson (erickson@ucivax) */

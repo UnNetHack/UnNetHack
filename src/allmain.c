@@ -675,17 +675,6 @@ display_gamewindows()
     WIN_MAP = create_nhwindow(NHW_MAP);
     WIN_INVEN = create_nhwindow(NHW_MENU);
 
-#ifdef MAC
-    /*
-     * This _is_ the right place for this - maybe we will
-     * have to split display_gamewindows into create_gamewindows
-     * and show_gamewindows to get rid of this ifdef...
-     */
-	if ( ! strcmp ( windowprocs . name , "mac" ) ) {
-	    SanePositions ( ) ;
-	}
-#endif
-
     /*
      * The mac port is not DEPENDENT on the order of these
      * displays, but it looks a lot better this way...

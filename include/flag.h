@@ -62,9 +62,6 @@ struct flag {
 	boolean  nap;		/* `timed_delay' option for display effects */
 	boolean  nopick;	/* do not pickup objects (as when running) */
 	boolean  null;		/* OK to send nulls to the terminal */
-#ifdef MAC
-	boolean  page_wait;	/* put up a --More-- after a page of messages */
-#endif
 	boolean  perm_invent;	/* keep full inventories up until dismissed */
 	boolean  pickup;	/* whether you pickup or move and look */
 	boolean  pickup_dropped;	/* don't auto-pickup items you dropped */
@@ -249,11 +246,6 @@ struct instance_flags {
 #if defined(MICRO) || defined(WIN32)
 	boolean  rawio;		/* whether can use rawio (IOCTL call) */
 #endif
-#ifdef MAC_GRAPHICS_ENV
-	boolean  MACgraphics;	/* use Macintosh extended character set, as
-				   as defined in the special font HackFont */
-	unsigned  use_stone;		/* use the stone ppats */
-#endif
 #if defined(WIN32)
 	boolean hassound;	/* has a sound card */
 	boolean usesound;	/* use the sound card */
@@ -384,12 +376,6 @@ struct instance_flags {
 #endif
 #define hilite_pet wc_hilite_pet
 #define use_inverse wc_inverse
-#ifdef MAC_GRAPHICS_ENV
-#define large_font obsolete
-#endif
-#ifdef MAC
-#define popup_dialog wc_popup_dialog
-#endif
 #define preload_tiles wc_preload_tiles
 
 extern NEARDATA struct flag flags;

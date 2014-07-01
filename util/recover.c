@@ -32,7 +32,7 @@ void FDECL(copy_bytes, (int,int));
 #  ifdef WIN32
 #define SAVESIZE	(PL_NSIZ + 40)  /* username-player.NetHack-saved-game */
 #  else
-#define SAVESIZE	FILENAME	/* from macconf.h or pcconf.h */
+#define SAVESIZE	FILENAME	/* from pcconf.h */
 #  endif
 #endif
 
