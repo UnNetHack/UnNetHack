@@ -768,9 +768,6 @@ boolean ghostly;
 	if (ghostly)
 	    clear_id_mapping();
 
-#if defined(MSDOS)
-	setmode(fd, O_BINARY);
-#endif
 	/* Load the old fruit info.  We have to do it first, so the
 	 * information is available when restoring the objects.
 	 */

@@ -53,12 +53,8 @@ extern int errno;
 #define uncompress(file)	uncompress_area(NULL, file)
 #endif
 
-#if defined(MSDOS) || defined(WIN32)
-# ifndef GNUDOS
+#if defined(WIN32)
 #include <sys\stat.h>
-# else
-#include <sys/stat.h>
-# endif
 #endif
 #ifndef O_BINARY	/* used for micros, no-op for others */
 # define O_BINARY 0
@@ -120,11 +116,8 @@ static char wizkit[WIZKIT_MAX];
 STATIC_DCL FILE *NDECL(fopen_wizkit_file);
 #endif
 
-#if defined(WIN32) || defined(MSDOS)
+#if defined(WIN32)
 static int lockptr;
-# ifdef MSDOS
-#define Delay(a) msleep(a)
-# endif
 #define Close close
 #define DeleteFile unlink
 #endif
@@ -1414,7 +1407,7 @@ char *lockname;
 # pragma unused(filename,lockname)
 	return (char*)0;
 #else
-# if defined(UNIX) || defined(WIN32) || defined(MSDOS)
+# if defined(UNIX) || defined(WIN32)
 #  ifdef NO_FILE_LINKS
 	Strcpy(lockname, LOCKDIR);
 	Strcat(lockname, "/");
@@ -1427,7 +1420,7 @@ char *lockname;
 # else
 	lockname[0] = '\0';
 	return (char*)0;
-# endif  /* UNIX ||  WIN32 || MSDOS */
+# endif  /* UNIX ||  WIN32  */
 #endif
 }
 
@@ -1551,7 +1544,7 @@ int retryct;
 	}
 #endif  /* UNIX */
 
-#if (defined(WIN32) || defined(MSDOS)) && !defined(USE_FCNTL)
+#if defined(WIN32) && !defined(USE_FCNTL)
 #define OPENFAILURE(fd) (fd < 0)
     lockptr = -1;
     while (--retryct && OPENFAILURE(lockptr)) {
@@ -1572,7 +1565,7 @@ int retryct;
 	nesting--;
 	return FALSE;
     }
-#endif /* WIN32 || MSDOS */
+#endif /* WIN32 */
 	return TRUE;
 }
 
@@ -1625,11 +1618,11 @@ const char *filename;
 
 # endif  /* UNIX */
 
-# if defined(WIN32) || defined(MSDOS)
+# if defined(WIN32)
 		if (lockptr) Close(lockptr);
 		DeleteFile(lockname);
 		lockptr = 0;
-# endif /* WIN32 || MSDOS */
+# endif /* WIN32 */
 #endif /* USE_FCNTL */
 	}
 
@@ -1657,7 +1650,7 @@ const char* configfile =
 # if defined(MAC)
 			"UnNetHack Defaults";
 # else
-#  if defined(MSDOS) || defined(WIN32)
+#  if defined(WIN32)
 			"defaults.unh";
 #  else
 			"UnNetHack.cnf";
@@ -1672,7 +1665,7 @@ const char *oldconfigfile =
 # if defined(MAC)
 			"NetHack Defaults";
 # else
-#  if defined(MSDOS) || defined(WIN32)
+#  if defined(WIN32)
 			"defaults.nh";
 #  else
 			"NetHack.cnf";
@@ -1680,17 +1673,6 @@ const char *oldconfigfile =
 # endif
 #endif
 
-
-#ifdef MSDOS
-/* conflict with speed-dial under windows
- * for XXX.cnf file so support of NetHack.cnf
- * is for backward compatibility only.
- * Preferred name (and first tried) is now defaults.nh but
- * the game will try the old name if there
- * is no defaults.nh.
- */
-const char *backward_compat_configfile = "nethack.cnf"; 
-#endif
 
 #ifndef MFLOPPY
 #define fopenp fopen
@@ -1743,11 +1725,6 @@ const char *filename;
 	/* try .nethackrc? */
 	else if ((fp = fopenp(fqname(oldconfigfile, CONFIGPREFIX, 0), "r")) != (FILE *)0)
 		return(fp);
-# ifdef MSDOS
-	else if ((fp = fopenp(fqname(backward_compat_configfile,
-					CONFIGPREFIX, 0), "r")) != (FILE *)0)
-		return(fp);
-# endif
 #else
 	/* constructed full path names don't need fqname() */
 	envp = nh_getenv("HOME");

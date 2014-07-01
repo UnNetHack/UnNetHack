@@ -77,8 +77,6 @@ STATIC_VAR char tgotobuf[20];
 #define tgoto(fmt, x, y)	(Sprintf(tgotobuf, fmt, y+1, x+1), tgotobuf)
 #endif /* TERMLIB */
 
-#ifndef MSDOS
-
 STATIC_DCL void NDECL(init_ttycolor);
 
 boolean colorflag = FALSE;			/* colors are initialized */
@@ -187,7 +185,6 @@ convert_uchars(bufp,list,size)
     }
     /*NOTREACHED*/
 }
-#endif /* !MSDOS */
 
 #ifdef OVLB
 
@@ -203,9 +200,7 @@ int *wid, *hgt;
 #endif
 
 #ifdef TEXTCOLOR
-# ifndef MSDOS
 	init_ttycolor();
-# endif
 #endif
 
 #ifdef TERMLIB

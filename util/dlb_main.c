@@ -131,19 +131,7 @@ Write(out,buf,len)
     char *buf;
     long len;
 {
-#if defined(MSDOS) && !defined(__DJGPP__)
-    unsigned short slen;
-
-    if (len > 65534) {
-	printf("%d Length specified for write() too large for 16 bit env.",
-		len);
-	xexit(EXIT_FAILURE);
-    }
-    slen = (unsigned short)len;
-    if (write(out,buf,slen) != slen) {
-#else
     if (write(out,buf,len) != len) {
-#endif
 	printf("Write Error in '%s'\n",library_file);
 	xexit(EXIT_FAILURE);
     }

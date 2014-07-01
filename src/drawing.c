@@ -903,7 +903,7 @@ static const glyph_t r_oc_syms[MAXOCLASSES] = {
 static const uchar IBM_r_oc_syms[MAXOCLASSES] = {	/* a la EPYX Rogue */
 /* 0*/	'\0',
 	ILLOBJ_SYM,
-#  if defined(MSDOS) || ( defined(WIN32) && !defined(MSWIN_GRAPHICS) )
+#  if ( defined(WIN32) && !defined(MSWIN_GRAPHICS) )
 	0x18,			/* weapon: up arrow */
 /*	0x0a, */ ARMOR_SYM,	/* armor:  Vert rect with o */
 /*	0x09, */ RING_SYM,	/* ring:   circle with arrow */
@@ -958,9 +958,6 @@ boolean is_rlevel;
 	    monsyms[i] = def_monsyms[i];
 # if defined(ASCIIGRAPH) && !defined(MSWIN_GRAPHICS)
 	if (iflags.IBMgraphics
-#  if defined(USE_TILES) && defined(MSDOS)
-		&& !iflags.grmode
-#  endif
 		)
 	    monsyms[S_HUMAN] = 0x01; /* smiley face */
 # endif
@@ -975,9 +972,6 @@ boolean is_rlevel;
 
 # ifdef ASCIIGRAPH
 	if (!iflags.IBMgraphics
-#  if defined(USE_TILES) && defined(MSDOS)
-		|| iflags.grmode
-#  endif
 				) {
 # endif
 	    showsyms[S_vodoor]  = showsyms[S_hodoor]  = showsyms[S_ndoor] = '+';
@@ -1035,18 +1029,12 @@ boolean is_rlevel;
 	for (i = 0; i < MAXOCLASSES; i++) {
 #ifdef ASCIIGRAPH
 	    if (iflags.IBMgraphics
-# if defined(USE_TILES) && defined(MSDOS)
-		&& !iflags.grmode
-# endif
 		)
 		oc_syms[i] = IBM_r_oc_syms[i];
 	    else
 #endif /* ASCIIGRAPH */
 		oc_syms[i] = r_oc_syms[i];
 	}
-#if defined(MSDOS) && defined(USE_TILES)
-	if (iflags.grmode) tileview(FALSE);
-#endif
     } else {
 	(void) memcpy((genericptr_t)showsyms,
 		      (genericptr_t)save_showsyms, sizeof showsyms);
@@ -1054,9 +1042,6 @@ boolean is_rlevel;
 		      (genericptr_t)save_oc_syms, sizeof oc_syms);
 	(void) memcpy((genericptr_t)monsyms,
 		      (genericptr_t)save_monsyms, sizeof monsyms);
-#if defined(MSDOS) && defined(USE_TILES)
-	if (iflags.grmode) tileview(TRUE);
-#endif
     }
 }
 #endif /* REINCARNATION */

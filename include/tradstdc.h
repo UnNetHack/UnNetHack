@@ -88,7 +88,7 @@
 #endif
 #endif /* NEED_VARARGS */
 
-#if defined(NHSTDC) || defined(MSDOS) || defined(MAC)
+#if defined(NHSTDC) || defined(MAC)
 
 /*
  * Used for robust ANSI parameter forward declarations:
@@ -106,7 +106,7 @@
 
 # define FDECL(f,p)	f p
 
-# if defined(MSDOS) || defined(USE_STDARG)
+# if defined(USE_STDARG)
 #  define VDECL(f,p)	f p
 # else
 #  define VDECL(f,p)	f()
@@ -170,9 +170,6 @@ typedef genericptr genericptr_t;	/* (void *) or (char *) */
  * prototypes for the ANSI compilers so people quit trying to fix the
  * prototypes to match the standard and thus lose the typechecking.
  */
-#if defined(MSDOS) && !defined(__GO32__)
-#define UNWIDENED_PROTOTYPES
-#endif
 #if defined(macintosh) && (defined(__SC__) || defined(__MRC__))
 #define WIDENED_PROTOTYPES
 #endif

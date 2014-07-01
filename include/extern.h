@@ -1384,15 +1384,9 @@ E int NDECL(tgetch);
 E char NDECL(switchar);
 # ifndef __GO32__
 E long FDECL(freediskspace, (char *));
-#  ifdef MSDOS
-E int FDECL(findfirst_file, (char *));
-E int NDECL(findnext_file);
-E long FDECL(filesize_nh, (char *));
-#  else
 E int FDECL(findfirst, (char *));
 E int NDECL(findnext);
 E long FDECL(filesize, (char *));
-#  endif /* MSDOS */
 E char *NDECL(foundfile_buffer);
 # endif /* __GO32__ */
 E void FDECL(chdrive, (char *));
@@ -2051,10 +2045,6 @@ E void FDECL(play_sound_for_message, (const char *));
 
 /* ### sys/msdos/sound.c ### */
 
-#ifdef MSDOS
-E int FDECL(assign_soundcard, (char *));
-#endif
-
 /* ### sp_lev.c ### */
 
 E boolean FDECL(check_room, (xchar *,xchar *,xchar *,xchar *,BOOLEAN_P));
@@ -2345,14 +2335,6 @@ E void FDECL(append_port_id, (char *));
 
 /* ### video.c ### */
 
-#ifdef MSDOS
-E int FDECL(assign_video, (char *));
-# ifdef NO_TERMS
-E void NDECL(gr_init);
-E void NDECL(gr_finish);
-# endif
-E void FDECL(tileview,(BOOLEAN_P));
-#endif
 #ifdef VIDEOSHADES
 E int FDECL(assign_videoshades, (char *));
 E int FDECL(assign_videocolors, (char *));

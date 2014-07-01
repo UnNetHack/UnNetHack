@@ -110,8 +110,6 @@ struct text_color_option {
 };
 #endif
 
-#ifndef MSDOS
 extern int ttycolors[CLR_MAX];
-#endif
 
 #endif /* COLOR_H */

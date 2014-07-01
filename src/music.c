@@ -38,9 +38,6 @@ STATIC_DCL int FDECL(do_improvisation,(struct obj *));
 STATIC_DCL int NDECL(atconsole);
 STATIC_DCL void FDECL(speaker,(struct obj *,char *));
 #endif
-#ifdef PCMUSIC
-void FDECL( pc_speaker, ( struct obj *, char * ) );
-#endif
 
 /*
  * Wake every monster in range...
@@ -345,7 +342,7 @@ do_improvisation(instr)
 struct obj *instr;
 {
 	int damage, do_spec = !Confusion;
-#if defined(MAC) || defined (PCMUSIC)
+#if defined(MAC)
 	struct obj itmp;
 
 	itmp = *instr;
@@ -355,10 +352,7 @@ struct obj *instr;
 # ifdef MAC
 	mac_speaker(&itmp, "C");
 # endif
-#ifdef PCMUSIC
-	  pc_speaker ( &itmp, "C");
-#endif
-#endif /* MAC || PCMUSIC */
+#endif /* MAC */
 
 	if (!do_spec)
 	    pline("What you produce is quite far from music...");
@@ -494,9 +488,6 @@ struct obj *instr;
 #endif
 #ifdef MAC
 	mac_speaker ( instr , buf ) ;
-#endif
-#ifdef PCMUSIC
-	pc_speaker ( instr, buf );
 #endif
 	/* Check if there was the Stronghold drawbridge near
 	 * and if the tune conforms to what we're waiting for.

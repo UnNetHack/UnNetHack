@@ -254,18 +254,13 @@ struct instance_flags {
 				   as defined in the special font HackFont */
 	unsigned  use_stone;		/* use the stone ppats */
 #endif
-#if defined(MSDOS) || defined(WIN32)
+#if defined(WIN32)
 	boolean hassound;	/* has a sound card */
 	boolean usesound;	/* use the sound card */
 	boolean usepcspeaker;	/* use the pc speaker */
 	boolean tile_view;
 	boolean over_view;
 	boolean traditional_view;
-#endif
-#ifdef MSDOS
-	boolean hasvga;		/* has a vga adapter */
-	boolean usevga;		/* use the vga adapter */
-	boolean grmode;		/* currently in graphics mode */
 #endif
 #ifdef LAN_FEATURES
 	boolean lan_mail;	/* mail is initialized */

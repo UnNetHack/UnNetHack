@@ -5,28 +5,8 @@
 #ifndef CONFIG1_H
 #define CONFIG1_H
 
-/*
- * MS DOS - compilers
- *
- * Microsoft C auto-defines MSDOS,
- * Borland C   auto-defines __MSDOS__,
- * DJGPP       auto-defines MSDOS.
- */
-
-/* #define MSDOS */	/* use if not defined by compiler or cases below */
-
-#ifdef __MSDOS__	/* for Borland C */
-# ifndef MSDOS
-# define MSDOS
-# endif
-#endif
-
 #ifdef __TURBOC__
 # define __MSC		/* increase Borland C compatibility in libraries */
-#endif
-
-#ifdef MSDOS
-# undef UNIX
 #endif
 
 /*
@@ -65,23 +45,14 @@
 /*
  * Windows NT Autodetection
  */
-#ifdef _WIN32_WCE
-#define WIN_CE
-# ifndef WIN32
-# define WIN32
-# endif
-#endif
-
 #ifdef WIN32
 # undef UNIX
-# undef MSDOS
 # define NHSTDC
 # define USE_STDARG
 # define NEED_VARARGS
 
 # define STRNCMPI
 # define STRCMPI
-
 #endif
 
 

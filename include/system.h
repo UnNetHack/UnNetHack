@@ -37,9 +37,7 @@
 #if defined(MICRO)
 # if !defined(_SIZE_T) && !defined(__size_t) /* __size_t for CSet/2 */
 #  define _SIZE_T
-#  if !(defined(MSDOS) && defined(_SIZE_T_DEFINED)) /* MSC 5.1 */
 typedef unsigned int	size_t;
-#  endif
 # endif
 #endif	/* MICRO */
 

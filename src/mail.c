@@ -26,11 +26,6 @@
  *	- Do something to the text when the scroll is enchanted or cancelled.
  *	- Make the daemon always appear at a stairwell, and have it find a
  *	  path to the hero.
- *
- * Note by Olaf Seibert: On the Amiga, we usually don't get mail.  So we go
- *			 through most of the effects at 'random' moments.
- * Note by Paul Winner:  The MSDOS port also 'fakes' the mail daemon at
- *			 random intervals.
  */
 
 STATIC_DCL boolean FDECL(md_start,(coord *));
@@ -421,9 +416,6 @@ ckmailstatus()
 {
 	if (u.uswallow || !flags.biff) return;
 	if (mustgetmail < 0) {
-#if defined(MSDOS)
-	    mustgetmail=(moves<2000)?(100+rn2(2000)):(2000+rn2(3000));
-#endif
 	    return;
 	}
 	if (--mustgetmail <= 0) {

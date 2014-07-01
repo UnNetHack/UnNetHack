@@ -13,7 +13,7 @@
 
 /* might display need graphics code? */
 #if !defined(MAC)
-# if defined(TERMLIB) || defined(MSDOS)
+# if defined(TERMLIB)
 #  define ASCIIGRAPH
 # endif
 #endif

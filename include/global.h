@@ -164,10 +164,6 @@ typedef xchar	boolean;		/* 0 or 1 */
 #include "unixconf.h"
 #endif
 
-#ifdef MSDOS
-#include "pcconf.h"
-#endif
-
 #ifdef MAC
 #include "macconf.h"
 #endif
@@ -207,18 +203,6 @@ typedef xchar	boolean;		/* 0 or 1 */
 #ifndef PORT_ID
 # ifdef MAC
 #  define PORT_ID	"Mac"
-# endif
-# ifdef MSDOS
-#  define PORT_ID	"PC"
-#  ifdef DJGPP
-#  define PORT_SUB_ID	"djgpp"
-#  else
-#   ifdef OVERLAY
-#  define PORT_SUB_ID	"overlaid"
-#   else
-#  define PORT_SUB_ID	"non-overlaid"
-#   endif
-#  endif
 # endif
 # ifdef UNIX
 #  define PORT_ID	"Unix"

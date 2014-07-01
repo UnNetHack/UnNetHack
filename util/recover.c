@@ -65,7 +65,7 @@ char *argv[];
 	if (argc == 1 || (argc == 2 && !strcmp(argv[1], "-"))) {
 	    Fprintf(stderr,
 		"Usage: %s [ -d directory ] base1 [ base2 ... ]\n", argv[0]);
-#if defined(WIN32) || defined(MSDOS)
+#if defined(WIN32)
 	    if (dir) {
 	    	Fprintf(stderr, "\t(Unless you override it with -d, recover will look \n");
 	    	Fprintf(stderr, "\t in the %s directory on your system)\n", dir);
@@ -149,7 +149,7 @@ const char *directory;
 	} else {
 		strcpy(levelfile, lock);
 	}
-#if defined(MICRO) || defined(WIN32) || defined(MSDOS)
+#if defined(MICRO) || defined(WIN32)
 	fd = open(levelfile, O_RDONLY | O_BINARY);
 #else
 	fd = open(levelfile, O_RDONLY, 0);
@@ -168,7 +168,7 @@ create_savefile()
 	strcpy(savefile, savename);
 #endif
 
-#if defined(MICRO) || defined(WIN32) || defined(MSDOS)
+#if defined(MICRO) || defined(WIN32)
 	fd = open(savefile, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK);
 #else
 	fd = creat(savefile, FCMASK);

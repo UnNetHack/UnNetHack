@@ -51,12 +51,7 @@ int explcolors[] = {
 #endif
 
 #ifdef ROGUE_COLOR
-# if defined(USE_TILES) && defined(MSDOS)
-#define HAS_ROGUE_IBM_GRAPHICS (iflags.IBMgraphics && !iflags.grmode && \
-	Is_rogue_level(&u.uz))
-# else
 #define HAS_ROGUE_IBM_GRAPHICS (iflags.IBMgraphics && Is_rogue_level(&u.uz))
-# endif
 #endif
 
 /** Returns the correct monster glyph.

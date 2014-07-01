@@ -21,9 +21,6 @@ gettty(){
 	kill_char = 21;		/* cntl-U */
 	iflags.cbreak = TRUE;
 	disable_ctrlP();	/* turn off ^P processing */
-#if defined(MSDOS) && defined(NO_TERMS)
-	gr_init();
-#endif
 }
 
 /* reset terminal to original state */
@@ -31,9 +28,6 @@ void
 settty(s)
 const char *s;
 {
-#if defined(MSDOS) && defined(NO_TERMS)
-	gr_finish();
-#endif
 	end_screen();
 	if(s) raw_print(s);
 	enable_ctrlP();		/* turn on ^P processing */

@@ -61,10 +61,6 @@ int fd;
 	/* This problem occurs enough times we need to give the player
 	 * some more information about what causes it, and how to fix.
 	 */
-#  ifdef MSDOS
-	    pline("Make sure that your system's date and time are correct.");
-	    pline("They must be more current than NetHack.EXE's date/time stamp.");
-#  endif /* MSDOS */
 	return(0);
     }
 #  endif  /* MICRO */
@@ -103,9 +99,6 @@ getlock()
 	register int fd, c, ci, ct, ern;
 	char tbuf[BUFSZ];
 	const char *fq_lock;
-# if defined(MSDOS) && defined(NO_TERMS)
-	int grmode = iflags.grmode;
-# endif
 	/* we ignore QUIT and INT at this point */
 	if (!lock_file(HLOCK, LOCKPREFIX, 10)) {
 		wait_synch();
@@ -160,10 +153,6 @@ getlock()
 	  c = yn("Do you want to destroy the old game?");
 # endif
 	} else {
-# if defined(MSDOS) && defined(NO_TERMS)
-		grmode = iflags.grmode;
-		if (grmode) gr_finish();
-# endif
 		c = 'n';
 		ct = 0;
 # ifdef SELF_RECOVER
@@ -254,9 +243,6 @@ gotlock:
 			error("cannot close lock (%s)", fq_lock);
 		}
 	}
-# if defined(MSDOS) && defined(NO_TERMS)
-	if (grmode) gr_init();
-# endif
 }	
 #endif /* PC_LOCKING */
 

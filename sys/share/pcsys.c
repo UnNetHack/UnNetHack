@@ -18,11 +18,6 @@
 #define P_WAIT		0
 #define P_NOWAIT	1
 #endif
-#if defined(MSDOS) && !defined(__GO32__)
-#define findfirst findfirst_file
-#define findnext findnext_file
-#define filesize filesize_nh
-#endif
 
 
 #if defined(MICRO) || defined(WIN32)
@@ -74,9 +69,6 @@ dosh()
 # ifndef __GO32__
 	int spawnstat;
 # endif
-#if defined(MSDOS) && defined(NO_TERMS)
-	int grmode = iflags.grmode;
-#endif
 	if ((comspec = getcomspec())) {
 		suspend_nhwindows("To return to NetHack, enter \"exit\" at the system prompt.\n");
 #  ifndef NOCWD_ASSUMPTIONS
@@ -105,9 +97,6 @@ dosh()
 		chdirx(hackdir, 0);
 #  endif
 		get_scr_size(); /* maybe the screen mode changed (TH) */
-#  if defined(MSDOS) && defined(NO_TERMS)
-		if (grmode) gr_init();
-#  endif
 		resume_nhwindows();
 	} else
 		pline("Can't find %s.",COMSPEC);
@@ -363,10 +352,6 @@ void
 msmsg VA_DECL(const char *, fmt)
 	VA_START(fmt);
 	VA_INIT(fmt, const char *);
-# if defined(MSDOS) && defined(NO_TERMS)
-	if (iflags.grmode)
-		gr_finish();
-# endif
 	Vprintf(fmt, VA_ARGS);
 	flushout();
 	VA_END();

@@ -13,11 +13,7 @@
 
 #include <ctype.h>
 
-#if !defined(GNUDOS)
 #include <sys\stat.h>
-#else
-#include <sys/stat.h>
-#endif
 
 #ifdef WIN32
 #include "win32api.h"			/* for GetModuleFileName */
@@ -120,7 +116,6 @@ char *argv[];
 
 	choose_windows(DEFAULT_WINDOW_SYS);
 
-#if !defined(GNUDOS)
 	/* Save current directory and make sure it gets restored when
 	 * the game is exited.
 	 */
@@ -129,7 +124,6 @@ char *argv[];
 # ifndef NO_SIGNAL
 	signal(SIGINT, (SIG_RET_TYPE) nethack_exit);	/* restore original directory */
 # endif
-#endif /* !GNUDOS */
 
 	dir = nh_getenv("NETHACKDIR");
 	if (dir == (char *)0)
@@ -235,13 +229,8 @@ char *argv[];
 	chdirx(hackdir,1);
 #endif
 
-#ifdef MSDOS
-	process_options(argc, argv);
-	init_nhwindows(&argc,argv);
-#else
 	init_nhwindows(&argc,argv);
 	process_options(argc, argv);
-#endif
 
 #ifdef WIN32CON
 	toggle_mouse_support();	/* must come after process_options */

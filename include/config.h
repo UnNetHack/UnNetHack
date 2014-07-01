@@ -14,15 +14,13 @@
 
 #define UNIX		/* delete if no fork(), exec() available */
 
-/* #define MSDOS */	/* in case it's not auto-detected */
-
 /* #define STUPID */	/* avoid some complicated expressions if
 			   your C compiler chokes on them */
 /* #define MINIMAL_TERM */
 			/* if a terminal handles highlighting or tabs poorly,
 			   try this define, used in pager.c and termcap.c */
 
-#include "config1.h"	/* should auto-detect MSDOS, MAC, and WIN32 */
+#include "config1.h"	/* should auto-detect MAC, and WIN32 */
 
 #ifdef AUTOCONF
 # include "autoconf_paths.h"

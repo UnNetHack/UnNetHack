@@ -628,9 +628,6 @@ static const char *build_opts[] = {
 		"menu colors via pmatch",
 # endif
 #endif
-#ifdef GNUDOS
-		"MSDOS protected mode",
-#endif
 #ifdef NEWS
 		"news file",
 #endif
