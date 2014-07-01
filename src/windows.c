@@ -15,15 +15,8 @@ extern struct window_procs curses_procs;
 extern struct window_procs X11_procs;
 extern void NDECL(win_X11_init);
 #endif
-#ifdef QT_GRAPHICS
-extern struct window_procs Qt_procs;
-#endif
 #ifdef WIN32_GRAPHICS
 extern struct window_procs win32_procs;
-#endif
-#ifdef GNOME_GRAPHICS
-#include "winGnome.h"
-extern struct window_procs Gnome_procs;
 #endif
 #ifdef MSWIN_GRAPHICS
 extern struct window_procs mswin_procs;
@@ -54,14 +47,8 @@ struct win_choices {
 #ifdef X11_GRAPHICS
     { &X11_procs, win_X11_init },
 #endif
-#ifdef QT_GRAPHICS
-    { &Qt_procs, 0 },
-#endif
 #ifdef WIN32_GRAPHICS
     { &win32_procs, 0 },
-#endif
-#ifdef GNOME_GRAPHICS
-    { &Gnome_procs, 0 },
 #endif
 #ifdef MSWIN_GRAPHICS
     { &mswin_procs, 0 },

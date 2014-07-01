@@ -732,12 +732,6 @@ static const char *window_opts[] = {
 #ifdef X11_GRAPHICS
 		"X11",
 #endif
-#ifdef QT_GRAPHICS
-		"Qt",
-#endif
-#ifdef GNOME_GRAPHICS
-		"Gnome",
-#endif
 #ifdef MSWIN_GRAPHICS
 		"mswin",
 #endif

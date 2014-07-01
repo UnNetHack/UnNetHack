@@ -38,18 +38,6 @@ pet_mark.xbm: ../win/X11/pet_mark.xbm
 rip.xpm: ../win/X11/rip.xpm
 	cp ../win/X11/rip.xpm rip.xpm
 
-mapbg.xpm: ../win/gnome/mapbg.xpm
-	cp ../win/gnome/mapbg.xpm mapbg.xpm
-
-nhsplash.xpm: ../win/Qt/nhsplash.xpm
-	cp ../win/Qt/nhsplash.xpm nhsplash.xpm
-
-nethack.icns: ../win/Qt/nhicns.uu
-	$(UUDECODE) ../win/Qt/nhicns.uu
-
-Info.plist: ../win/Qt/Info.pli
-	cp ../win/Qt/Info.pli Info.plist
-
 ../util/tile2img.ttp:
 	(cd ../util ; make tile2img.ttp)
 

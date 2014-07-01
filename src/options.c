@@ -169,7 +169,6 @@ static struct Bool_Opt
 	{"conducts_vegan", &flags.vegan, FALSE, SET_IN_FILE }, 
 	{"conducts_vegetarian", &flags.vegetarian, FALSE, SET_IN_FILE }, 
 	{"null", &flags.null, TRUE, SET_IN_FILE},
-	{"page_wait", (boolean *)0, FALSE, SET_IN_FILE},
 #ifdef PARANOID
 	{"paranoid_hit", &iflags.paranoid_hit, TRUE, SET_IN_FILE},
 	{"paranoid_quit", &iflags.paranoid_quit, TRUE, SET_IN_FILE},

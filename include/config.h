@@ -35,8 +35,6 @@
 /* #define TTY_GRAPHICS */	/* good old tty based graphics */
 /* #define CURSES_GRAPHICS */	/* Proper curses interface */
 /* #define X11_GRAPHICS */	/* X11 interface */
-/* #define QT_GRAPHICS */	/* Qt interface */
-/* #define GNOME_GRAPHICS */	/* Gnome interface */
 /* #define MSWIN_GRAPHICS */	/* Windows NT, CE, Graphics */
 /* #define LISP_GRAPHICS */	/* lisp interface */
 
@@ -46,25 +44,6 @@
  *
  *	tty, X11, mac, Qt, Gem, Gnome, lisp
  */
-
-#ifdef QT_GRAPHICS
-# define DEFAULT_WC_TILED_MAP   /* Default to tiles if users doesn't say wc_ascii_map */
-# define USER_SOUNDS		/* Use sounds */
-#  define USER_SOUNDS_REGEX
-# define USE_XPM		/* Use XPM format for images (required) */
-# define GRAPHIC_TOMBSTONE	/* Use graphical tombstone (rip.ppm) */
-# ifndef DEFAULT_WINDOW_SYS
-#  define DEFAULT_WINDOW_SYS "Qt"
-# endif
-#endif
-
-#ifdef GNOME_GRAPHICS
-# define USE_XPM		/* Use XPM format for images (required) */
-# define GRAPHIC_TOMBSTONE	/* Use graphical tombstone (rip.ppm) */
-# ifndef DEFAULT_WINDOW_SYS
-#  define DEFAULT_WINDOW_SYS "Gnome"
-# endif
-#endif
 
 #ifdef MSWIN_GRAPHICS
 # ifdef TTY_GRAPHICS

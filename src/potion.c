@@ -300,8 +300,7 @@ long mask;	/* nonzero if resistance status should change by mask */
 		see_traps();
 	    }
 
-	    /* for perm_inv and anything similar
-	    (eg. Qt windowport's equipped items display) */
+	    /* for perm_inv and anything similar */
 	    update_inventory();
 
 	    flags.botl = 1;

@@ -1226,59 +1226,7 @@ $(O)wintext.o: ..\win\X11\wintext.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
 $(O)winval.o: ..\win\X11\winval.c $(HACK_H) $(INCL)\winX.h
 	@$(CC) $(CFLAGS) -Fo$@ ..\win\X11\winval.c
 $(O)tile.o: $(SRC)\tile.c $(HACK_H)
-$(O)gnaskstr.o: ..\win\gnome\gnaskstr.c ..\win\gnome\gnaskstr.h \
-		..\win\gnome\gnmain.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnaskstr.c
-$(O)gnbind.o: ..\win\gnome\gnbind.c ..\win\gnome\gnbind.h ..\win\gnome\gnmain.h \
-		..\win\gnome\gnaskstr.h ..\win\gnome\gnyesno.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnbind.c
-$(O)gnglyph.o: ..\win\gnome\gnglyph.c ..\win\gnome\gnglyph.h $(INCL)\tile2x11.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnglyph.c
-$(O)gnmain.o: ..\win\gnome\gnmain.c ..\win\gnome\gnmain.h ..\win\gnome\gnsignal.h \
-		..\win\gnome\gnbind.h ..\win\gnome\gnopts.h $(HACK_H) \
-		$(INCL)\date.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmain.c
-$(O)gnmap.o: ..\win\gnome\gnmap.c ..\win\gnome\gnmap.h ..\win\gnome\gnglyph.h \
-		..\win\gnome\gnsignal.h $(HACK_H)
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmap.c
-$(O)gnmenu.o: ..\win\gnome\gnmenu.c ..\win\gnome\gnmenu.h ..\win\gnome\gnmain.h \
-		..\win\gnome\gnbind.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmenu.c
-$(O)gnmesg.o: ..\win\gnome\gnmesg.c ..\win\gnome\gnmesg.h ..\win\gnome\gnsignal.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmesg.c
-$(O)gnopts.o: ..\win\gnome\gnopts.c ..\win\gnome\gnopts.h ..\win\gnome\gnglyph.h \
-		..\win\gnome\gnmain.h ..\win\gnome\gnmap.h $(HACK_H)
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnopts.c
-$(O)gnplayer.o: ..\win\gnome\gnplayer.c ..\win\gnome\gnplayer.h \
-		..\win\gnome\gnmain.h $(HACK_H)
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnplayer.c
-$(O)gnsignal.o: ..\win\gnome\gnsignal.c ..\win\gnome\gnsignal.h \
-		..\win\gnome\gnmain.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnsignal.c
-$(O)gnstatus.o: ..\win\gnome\gnstatus.c ..\win\gnome\gnstatus.h \
-		..\win\gnome\gnsignal.h ..\win\gnome\gn_xpms.h \
-		..\win\gnome\gnomeprv.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnstatus.c
-$(O)gntext.o: ..\win\gnome\gntext.c ..\win\gnome\gntext.h ..\win\gnome\gnmain.h \
-		..\win\gnome\gn_rip.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gntext.c
-$(O)gnworn.o: ..\win\gnome\gnworn.c ..\win\gnome\gnworn.h ..\win\gnome\gnglyph.h \
-		..\win\gnome\gnsignal.h ..\win\gnome\gnomeprv.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnworn.c
-$(O)gnyesno.o: ..\win\gnome\gnyesno.c ..\win\gnome\gnbind.h ..\win\gnome\gnyesno.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnyesno.c
-$(O)gr_rect.o: ..\win\gem\gr_rect.c $(INCL)\gr_rect.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\gem\gr_rect.c
 $(O)tile.o: tile.c $(HACK_H)
-$(O)qt_win.o: ..\win\Qt\qt_win.cpp $(HACK_H) $(INCL)\func_tab.h \
-		$(INCL)\dlb.h $(INCL)\patchlevel.h $(INCL)\tile2x11.h \
-		$(INCL)\qt_win.h $(INCL)\qt_clust.h $(INCL)\qt_kde0.h \
-		$(INCL)\qt_xpms.h qt_win.moc qt_kde0.moc qttableview.moc
-	$(CXX) $(CXXFLAGS) -Fo$@ ..\win\Qt\qt_win.cpp
-$(O)qt_clust.o: ..\win\Qt\qt_clust.cpp $(INCL)\qt_clust.h
-	$(CXX) $(CXXFLAGS) -Fo$@ ..\win\Qt\qt_clust.cpp
-$(O)qttableview.o: ..\win\Qt\qttableview.cpp $(INCL)\qttableview.h
-	$(CXX) $(CXXFLAGS) -Fo$@ ..\win\Qt\qttableview.cpp
 $(O)monstr.o: monstr.c $(CONFIG_H)
 $(O)allmain.o: allmain.c $(HACK_H)
 $(O)alloc.o: alloc.c $(CONFIG_H)
@@ -1388,7 +1336,7 @@ $(O)vision.o: vision.c $(HACK_H)
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
 $(O)wield.o: wield.c $(HACK_H)
-$(O)windows.o: windows.c $(HACK_H) $(INCL)\winGnome.h
+$(O)windows.o: windows.c $(HACK_H)
 $(O)wizard.o: wizard.c $(HACK_H) $(INCL)\qtext.h $(INCL)\epri.h
 $(O)worm.o: worm.c $(HACK_H) $(INCL)\lev.h
 $(O)worn.o: worn.c $(HACK_H)

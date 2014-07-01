@@ -2261,9 +2261,6 @@ E int FDECL(remove_area, (const char *, const char *));
 /* ### unixres.c ### */
 
 #ifdef UNIX
-# ifdef GNOME_GRAPHICS 
-E int FDECL(hide_privileges, (BOOLEAN_P));
-# endif
 #endif /* UNIX */
 
 /* ### vault.c ### */

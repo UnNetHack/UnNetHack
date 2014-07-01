@@ -39,10 +39,6 @@ const
 extern int errno;
 #endif
 
-#if defined(UNIX) && defined(QT_GRAPHICS)
-#include <dirent.h>
-#endif
-
 #if defined(UNIX) 
 #include <signal.h>
 #endif
@@ -1039,89 +1035,9 @@ restore_saved_game()
 	return fd;
 }
 
-#if defined(UNIX) && defined(QT_GRAPHICS)
-/*ARGSUSED*/
-static char*
-plname_from_file(filename)
-const char* filename;
-{
-#ifdef STORE_PLNAME_IN_FILE
-    int fd;
-    char* result = 0;
-
-    Strcpy(SAVEF,filename);
-#ifdef COMPRESS_EXTENSION
-    SAVEF[strlen(SAVEF)-strlen(COMPRESS_EXTENSION)] = '\0';
-#endif
-    uncompress(SAVEF);
-    if ((fd = open_savefile()) >= 0) {
-	if (uptodate(fd, filename)) {
-	    char tplname[PL_NSIZ];
-	    mread(fd, (genericptr_t) tplname, PL_NSIZ);
-	    result = strdup(tplname);
-	}
-	(void) close(fd);
-    }
-    compress(SAVEF);
-
-    return result;
-#else
-# if defined(UNIX) && defined(QT_GRAPHICS)
-    /* Name not stored in save file, so we have to extract it from
-       the filename, which loses information
-       (eg. "/", "_", and "." characters are lost. */
-    int k;
-    int uid;
-    char name[64]; /* more than PL_NSIZ */
-#ifdef COMPRESS_EXTENSION
-#define EXTSTR COMPRESS_EXTENSION
-#else
-#define EXTSTR ""
-#endif
-    if ( sscanf( filename, "%*[^/]/%d%63[^.]" EXTSTR, &uid, name ) == 2 ) {
-#undef EXTSTR
-    /* "_" most likely means " ", which certainly looks nicer */
-	for (k=0; name[k]; k++)
-	    if ( name[k]=='_' )
-		name[k]=' ';
-	return strdup(name);
-    } else
-# endif
-    {
-	return 0;
-    }
-#endif
-}
-#endif /* defined(UNIX) && defined(QT_GRAPHICS) */
-
 char**
 get_saved_games()
 {
-#if defined(UNIX) && defined(QT_GRAPHICS)
-    int myuid=getuid();
-    struct dirent **namelist;
-    int n = scandir("save", &namelist, 0, alphasort);;
-    if ( n > 0 ) {
-	int i,j=0;
-	char** result = (char**)alloc((n+1)*sizeof(char*)); /* at most */
-	for (i=0; i<n; i++) {
-	    int uid;
-	    char name[64]; /* more than PL_NSIZ */
-	    if ( sscanf( namelist[i]->d_name, "%d%63s", &uid, name ) == 2 ) {
-		if ( uid == myuid ) {
-		    char filename[BUFSZ];
-		    char* r;
-		    Sprintf(filename,"save/%d%s",uid,name);
-		    r = plname_from_file(filename);
-		    if ( r )
-			result[j++] = r;
-		}
-	    }
-	}
-	result[j++] = 0;
-	return result;
-    } else
-#endif
     {
 	return 0;
     }
@@ -2020,24 +1936,6 @@ boolean		recursive;
 		sounddir = (char *)strdup(bufp);
 	} else if (match_varname(buf, "SOUND", 5)) {
 		add_sound_mapping(bufp);
-#endif
-#ifdef QT_GRAPHICS
-	/* These should move to wc_ options */
-	} else if (match_varname(buf, "QT_TILEWIDTH", 12)) {
-		extern char *qt_tilewidth;
-		if (qt_tilewidth == NULL)	
-			qt_tilewidth=(char *)strdup(bufp);
-	} else if (match_varname(buf, "QT_TILEHEIGHT", 13)) {
-		extern char *qt_tileheight;
-		if (qt_tileheight == NULL)	
-			qt_tileheight=(char *)strdup(bufp);
-	} else if (match_varname(buf, "QT_FONTSIZE", 11)) {
-		extern char *qt_fontsize;
-		if (qt_fontsize == NULL)
-			qt_fontsize=(char *)strdup(bufp);
-	} else if (match_varname(buf, "QT_COMPACT", 10)) {
-		extern int qt_compact_mode;
-		qt_compact_mode = atoi(bufp);
 #endif
 	} else
 		return 0;

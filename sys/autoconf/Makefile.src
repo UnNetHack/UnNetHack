@@ -39,17 +39,6 @@ LFLAGS = @LFLAGS@ #-fbounds-check
 # Same as above, but for XCurses
 #CFLAGS = -O -DXCURSES -I../include -I/usr/local/include/pdcurses
 
-
-# Only used for the Gnome interface.
-GNOMEINC=`gnome-config gnome --cflags` -I$(srcdir)/../win/gnome
-
-# QT windowing system
-QTLIBDIR=$(QTDIR)/lib
-QTINCDIR=$(QTDIR)/include
-QTBINDIR=$(QTDIR)/bin
-KDELIBDIR=/usr/lib
-KDEINCDIR=/usr/include/kde
-
 CXXFLAGS = $(CFLAGS) -I. -I$(QTINCDIR)
 CXX=g++
 
@@ -74,23 +63,6 @@ WINX11SRC = $(srcdir)/../win/X11/Window.c $(srcdir)/../win/X11/dialogs.c $(srcdi
 	$(srcdir)/../win/X11/winval.c
 WINX11OBJ = Window.o dialogs.o winX.o winmap.o winmenu.o winmesg.o \
 	winmisc.o winstat.o wintext.o winval.o nhwin.a
-#
-# Files for a Qt port
-#
-WINQTSRC = $(srcdir)/../win/Qt/qt_win.cpp $(srcdir)/../win/Qt/qt_clust.cpp $(srcdir)/../win/Qt/qttableview.cpp
-WINQTOBJ = qt_win.o qt_clust.o qttableview.o nhwin.a
-#
-# Files for a Gnome port
-#
-WINGNOMESRC = $(srcdir)/../win/gnome/gnaskstr.c $(srcdir)/../win/gnome/gnbind.c \
-      $(srcdir)/../win/gnome/gnglyph.c $(srcdir)/../win/gnome/gnmain.c $(srcdir)/../win/gnome/gnmap.c \
-      $(srcdir)/../win/gnome/gnmenu.c $(srcdir)/../win/gnome/gnmesg.c $(srcdir)/../win/gnome/gnopts.c \
-      $(srcdir)/../win/gnome/gnplayer.c $(srcdir)/../win/gnome/gnsignal.c \
-      $(srcdir)/../win/gnome/gnstatus.c $(srcdir)/../win/gnome/gntext.c $(srcdir)/../win/gnome/gnyesno.c \
-      $(srcdir)/../win/gnome/gnworn.c
-WINGNOMEOBJ = gnaskstr.o gnbind.o gnglyph.o gnmain.o gnmap.o gnmenu.o \
-      gnmesg.o gnopts.o gnplayer.o gnsignal.o gnstatus.o gntext.o \
-      gnyesno.o gnworn.o nhwin.a
 
 # files for a native MS-Windows port
 # (tile.c is included in the defn. for WINCSRC, below)
@@ -121,14 +93,6 @@ WINTTYLIB = @WINTTYLIB@
 WINCURSESLIB = @WINCURSESLIB@
 WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
 
-# libraries for Qt
-WINQTLIB = -L$(QTLIBDIR) -lqt
-#
-# libraries for KDE (with Qt)
-WINKDELIB = -lkdecore -lkdeui -lXext
-#
-# libraries for Gnome
-WINGNOMELIB = -lgnomeui -lgnome -lart_lgpl -lgtk -lgdk -lpopt
 # libraries for native MS-Windows
 WINMSLIB = -lcomctl32 -lgdi32
 
@@ -204,10 +168,9 @@ SYSCSRC = $(srcdir)/../sys/share/nhlan.c $(srcdir)/../sys/share/ioctl.c \
 GENCSRC = monstr.c #tile.c
 
 # all windowing-system-dependent .c (for dependencies and such)
-WINCSRC = $(WINTTYSRC) $(WINX11SRC) $(WINGNOMESRC) \
-	$(WINPROXYSRC) $(WINGLSRC) $(WINMSSRC) $(WINDUMMYSRC) tile.c
+WINCSRC = $(WINTTYSRC) $(WINX11SRC) $(WINPROXYSRC) $(WINGLSRC) $(WINMSSRC) $(WINDUMMYSRC) tile.c
 # all windowing-system-dependent .cpp (for dependencies and such)
-WINCXXSRC = $(WINQTSRC) $(WINBESRC)
+WINCXXSRC = 
 
 # .c files for this version (for date.h)
 VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(GENCSRC)
@@ -334,16 +297,6 @@ objects.o:
 	$(CC) $(CFLAGS) -c $(srcdir)/objects.c
 	@rm -f $(MAKEDEFS)
 
-# Qt windowport meta-object-compiler output
-qt_kde0.moc: ../include/qt_kde0.h
-	$(QTBINDIR)/moc -o qt_kde0.moc ../include/qt_kde0.h
-
-qt_win.moc: ../include/qt_win.h
-	$(QTBINDIR)/moc -o qt_win.moc ../include/qt_win.h
-
-qttableview.moc: ../include/qttableview.h
-	$(QTDIR)/bin/moc -o qttableview.moc ../include/qttableview.h
-
 # Microsoft Window's native port resources
 ../dat/tiles.bmp:
 	(cd ../util; make tile2bmp$(EXEEXT))
@@ -376,9 +329,6 @@ monstr.c: $(MAKEDEFS)
 	@( cd ../util ; $(MAKE) ../src/monstr.c )
 tile.c: $(srcdir)/../win/share/tilemap.c $(HACK_H)
 	@( cd ../util ; $(MAKE) ../src/tile.c )
-
-$(srcdir)/../win/gnome/gn_rip.h: $(srcdir)/../win/X11/rip.xpm
-	cp $(srcdir)/../win/X11/rip.xpm $(srcdir)/../win/gnome/gn_rip.h
 
 #	date.h should be remade any time any of the source or include code
 #	is modified.  Unfortunately, this would make the contents of this
@@ -414,7 +364,6 @@ spotless: clean
 	-rm -f a.out core $(GAME) Sys* @EXTRA_UNSHARE@
 	-rm -f ../include/date.h ../include/onames.h ../include/pm.h
 	-rm -f monstr.c tile.c *.moc
-	-rm -f $(srcdir)/../win/gnome/gn_rip.h
 	-rm -f ../include/filename.h
 	-rm -f Makefile
 
@@ -549,55 +498,6 @@ wintext.o: $(srcdir)/../win/X11/wintext.c $(HACK_H) ../include/winX.h \
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/X11/wintext.c
 winval.o: $(srcdir)/../win/X11/winval.c $(HACK_H) ../include/winX.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/X11/winval.c
-gnaskstr.o: $(srcdir)/../win/gnome/gnaskstr.c ../win/gnome/gnaskstr.h \
-		../win/gnome/gnmain.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c $(srcdir)/../win/gnome/gnaskstr.c
-gnbind.o: $(srcdir)/../win/gnome/gnbind.c ../win/gnome/gnbind.h \
-		../win/gnome/gnmain.h ../win/gnome/gnmenu.h \
-		../win/gnome/gnaskstr.h ../win/gnome/gnyesno.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c $(srcdir)/../win/gnome/gnbind.c
-gnglyph.o: $(srcdir)/../win/gnome/gnglyph.c ../win/gnome/gnglyph.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c $(srcdir)/../win/gnome/gnglyph.c
-gnmain.o: $(srcdir)/../win/gnome/gnmain.c ../win/gnome/gnmain.h \
-		../win/gnome/gnsignal.h ../win/gnome/gnbind.h \
-		../win/gnome/gnopts.h $(HACK_H) ../include/date.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c $(srcdir)/../win/gnome/gnmain.c
-gnmap.o: $(srcdir)/../win/gnome/gnmap.c ../win/gnome/gnmap.h \
-		../win/gnome/gnglyph.h ../win/gnome/gnsignal.h $(HACK_H)
-	$(CC) $(CFLAGS) $(GNOMEINC) -c $(srcdir)/../win/gnome/gnmap.c
-gnmenu.o: $(srcdir)/../win/gnome/gnmenu.c ../win/gnome/gnmenu.h \
-		../win/gnome/gnmain.h ../win/gnome/gnbind.h \
-		../include/func_tab.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c $(srcdir)/../win/gnome/gnmenu.c
-gnmesg.o: $(srcdir)/../win/gnome/gnmesg.c ../win/gnome/gnmesg.h \
-		../win/gnome/gnsignal.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c $(srcdir)/../win/gnome/gnmesg.c
-gnopts.o: $(srcdir)/../win/gnome/gnopts.c ../win/gnome/gnopts.h \
-		../win/gnome/gnglyph.h ../win/gnome/gnmain.h \
-		../win/gnome/gnmap.h $(HACK_H)
-	$(CC) $(CFLAGS) $(GNOMEINC) -c $(srcdir)/../win/gnome/gnopts.c
-gnplayer.o: $(srcdir)/../win/gnome/gnplayer.c ../win/gnome/gnplayer.h \
-		../win/gnome/gnmain.h $(HACK_H)
-	$(CC) $(CFLAGS) $(GNOMEINC) -c $(srcdir)/../win/gnome/gnplayer.c
-gnsignal.o: $(srcdir)/../win/gnome/gnsignal.c ../win/gnome/gnsignal.h \
-		../win/gnome/gnmain.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c $(srcdir)/../win/gnome/gnsignal.c
-gnstatus.o: $(srcdir)/../win/gnome/gnstatus.c ../win/gnome/gnstatus.h \
-		../win/gnome/gnsignal.h ../win/gnome/gn_xpms.h \
-		../win/gnome/gnomeprv.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c $(srcdir)/../win/gnome/gnstatus.c
-gntext.o: $(srcdir)/../win/gnome/gntext.c ../win/gnome/gntext.h \
-		../win/gnome/gnmain.h ../win/gnome/gn_rip.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c $(srcdir)/../win/gnome/gntext.c
-gnyesno.o: $(srcdir)/../win/gnome/gnyesno.c ../win/gnome/gnbind.h \
-		../win/gnome/gnyesno.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c $(srcdir)/../win/gnome/gnyesno.c
-gnworn.o: $(srcdir)/../win/gnome/gnworn.c ../win/gnome/gnworn.h \
-		../win/gnome/gnglyph.h ../win/gnome/gnsignal.h \
-		../win/gnome/gnomeprv.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c $(srcdir)/../win/gnome/gnworn.c
-gr_rect.o: $(srcdir)/../win/gem/gr_rect.c ../include/gr_rect.h
-	$(CC) $(CFLAGS) -c $(srcdir)/../win/gem/gr_rect.c
 mswproc.o: $(srcdir)/../win/win32/mswproc.c $(HACK_H) ../include/dlb.h \
 		../include/func_tab.h ../win/win32/winMS.h \
 		../win/win32/mhmap.h ../win/win32/mhstatus.h \
@@ -669,16 +569,6 @@ winlisp.o:	$(srcdir)/../win/lisp/winlisp.o $(HACK_H) \
 		$(srcdir)/../include/dlb.h $(srcdir)/../include/patchlevel.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/lisp/winlisp.c
 tile.o: tile.c $(HACK_H)
-qt_win.o: $(srcdir)/../win/Qt/qt_win.cpp $(HACK_H) ../include/func_tab.h \
-		../include/dlb.h ../include/date.h ../include/patchlevel.h \
-		../include/tile2x11.h ../include/qt_win.h \
-		../include/qt_clust.h ../include/qt_kde0.h \
-		../include/qt_xpms.h qt_win.moc qt_kde0.moc qttableview.moc
-	$(CXX) $(CXXFLAGS) -c $(srcdir)/../win/Qt/qt_win.cpp
-qt_clust.o: $(srcdir)/../win/Qt/qt_clust.cpp ../include/qt_clust.h
-	$(CXX) $(CXXFLAGS) -c $(srcdir)/../win/Qt/qt_clust.cpp
-qttableview.o: $(srcdir)/../win/Qt/qttableview.cpp ../include/qttableview.h
-	$(CXX) $(CXXFLAGS) -c $(srcdir)/../win/Qt/qttableview.cpp
 monstr.o: monstr.c $(CONFIG_H)
 allmain.o: $(srcdir)/allmain.c $(HACK_H) ../include/patchlevel.h
 alloc.o: $(srcdir)/alloc.c $(CONFIG_H)
@@ -800,8 +690,7 @@ vision.o: $(srcdir)/vision.c $(HACK_H)
 weapon.o: $(srcdir)/weapon.c $(HACK_H)
 were.o: $(srcdir)/were.c $(HACK_H)
 wield.o: $(srcdir)/wield.c $(HACK_H)
-windows.o: $(srcdir)/windows.c $(HACK_H) \
-		../include/winGnome.h ../include/winlisp.h
+windows.o: $(srcdir)/windows.c $(HACK_H) ../include/winlisp.h
 wizard.o: $(srcdir)/wizard.c $(HACK_H) ../include/qtext.h ../include/epri.h
 worm.o: $(srcdir)/worm.c $(HACK_H) ../include/lev.h
 worn.o: $(srcdir)/worn.c $(HACK_H)

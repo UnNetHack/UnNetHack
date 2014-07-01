@@ -292,14 +292,8 @@ txt2ppm: $(PPMWRITERS) $(TEXT_IO)
 tile2x11: tile2x11.o $(TEXT_IO)
 	$(CC) $(LFLAGS) -o tile2x11 tile2x11.o $(TEXT_IO) $(LIBS)
 
-tile2img.ttp: tile2img.o bitmfile.o $(TEXT_IO)
-	$(CC) $(LFLAGS) -o tile2img.ttp tile2img.o bitmfile.o $(TEXT_IO) $(LIBS)
-
 tile2bmp$(EXEEXT): tile2bmp.o $(TEXT_IO)
 	$(CC) $(LFLAGS) -o $@ tile2bmp.o $(TEXT_IO)
-
-xpm2img.ttp: xpm2img.o bitmfile.o
-	$(CC) $(LFLAGS) -o xpm2img.ttp xpm2img.o bitmfile.o $(LIBS)
 
 tilemap: $(srcdir)/../win/share/tilemap.c $(HACK_H)
 	$(CC) $(CFLAGS) $(LFLAGS) -o tilemap $(srcdir)/../win/share/tilemap.c $(LIBS)
@@ -334,14 +328,6 @@ tile2bmp.o: $(srcdir)/../win/share/tile2bmp.c $(HACK_H) ../include/tile.h
 tile2x11.o: $(srcdir)/../win/X11/tile2x11.c $(HACK_H) ../include/tile.h \
 						../include/tile2x11.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/X11/tile2x11.c
-
-tile2img.o: $(srcdir)/../win/gem/tile2img.c $(HACK_H) ../include/tile.h \
-						../include/bitmfile.h
-	$(CC) $(CFLAGS) -c $(srcdir)/../win/gem/tile2img.c
-xpm2img.o: $(srcdir)/../win/gem/xpm2img.c $(HACK_H) ../include/bitmfile.h
-	$(CC) $(CFLAGS) -c $(srcdir)/../win/gem/xpm2img.c
-bitmfile.o: $(srcdir)/../win/gem/bitmfile.c ../include/bitmfile.h
-	$(CC) $(CFLAGS) -c $(srcdir)/../win/gem/bitmfile.c
 
 # using dependencies like
 #	../src/foo::

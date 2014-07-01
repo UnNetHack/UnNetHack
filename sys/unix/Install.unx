@@ -4,8 +4,7 @@
 
 0.  Read this entire file before starting, and come back to the Notes
     below if you have any problems.  If you are trying to use X11,
-    also read all of win/X11/Install.X11, or read win/Qt/Install.Qt
-    if you are using Qt or KDE under X11.  For help in controlling
+    also read all of win/X11/Install.X11.  For help in controlling
     and running the game after it is installed, see the '?' command
     within the game and doc/Guidebook (non-installers want to know
     about those things too).
