@@ -324,7 +324,7 @@ register int trouble;
 		    }
 		    if (u.uhpmax < u.ulevel * 5 + 11) u.uhpmax += rnd(5);
 		    if (u.uhpmax <= 5) u.uhpmax = 5+1;
-			check_uhpmax();
+		    check_uhpmax();
 		    u.uhp = u.uhpmax;
 		    flags.botl = 1;
 		    break;
@@ -964,10 +964,7 @@ pleased(g_align)
 	    } else {
 		u.uhpmax += 5;
 		if (Upolyd) u.mhmax += 5;
-		if (heaven_or_hell_mode) {
-			u.uhpmax = 1;
-			if (Upolyd) u.mhmax = 1;
-		}
+		check_uhpmax();
 	    }
 	    u.uhp = u.uhpmax;
 	    if (Upolyd) u.mh = u.mhmax;

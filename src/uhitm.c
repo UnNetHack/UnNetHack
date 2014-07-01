@@ -2657,6 +2657,10 @@ uchar aatyp;
 		/* monster gets stronger with your heat! */
 		    mon->mhp += tmp / 2;
 		    if (mon->mhpmax < mon->mhp) mon->mhpmax = mon->mhp;
+		    if (heaven_or_hell_mode && !hell_and_hell_mode) {
+			mon->mhpmax = 1;
+			mon->mhp = 1;
+		    }
 		/* at a certain point, the monster will reproduce! */
 		    if(mon->mhpmax > ((int) (mon->m_lev+1) * 8))
 			(void)split_mon(mon, &youmonst);

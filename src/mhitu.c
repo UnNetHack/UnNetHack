@@ -1456,6 +1456,7 @@ dopois:
 			}
 			if (u.uhp > u.uhpmax) u.uhp = u.uhpmax;
 		    }
+		    check_uhpmax();
 		    if (!rn2(3)) exercise(A_STR, TRUE);
 		    if (!rn2(3)) exercise(A_CON, TRUE);
 		    if (Sick) make_sick(0L, (char *) 0, FALSE, SICK_ALL);
