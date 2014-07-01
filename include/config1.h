@@ -47,23 +47,11 @@
 # define USE_STDARG
 #endif
 
-#if defined(MAC) || defined(__BEOS__)
+#if defined(MAC)
 # define DLB
 # undef UNIX
 #endif
 
-
-/*
- * Amiga setup.
- */
-#ifdef AZTEC_C	/* Manx auto-defines this */
-# ifdef MCH_AMIGA	/* Manx auto-defines this for AMIGA */
-#  ifndef AMIGA
-#define AMIGA		/* define for Commodore-Amiga */
-#  endif		/* (SAS/C auto-defines AMIGA) */
-#define AZTEC_50	/* define for version 5.0 of manx */
-# endif
-#endif
 #ifdef __SASC_60
 # define NEARDATA __near /* put some data close */
 #else
@@ -72,13 +60,6 @@
 # else
 # define NEARDATA
 # endif
-#endif
-#ifdef AMIGA
-# define NEED_VARARGS
-# undef UNIX
-# define DLB
-# define HACKDIR "NetHack:"
-# define NO_MACRO_CPATH
 #endif
 
 /*

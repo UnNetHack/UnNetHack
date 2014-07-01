@@ -421,7 +421,7 @@ ckmailstatus()
 {
 	if (u.uswallow || !flags.biff) return;
 	if (mustgetmail < 0) {
-#if defined(AMIGA) || defined(MSDOS)
+#if defined(MSDOS)
 	    mustgetmail=(moves<2000)?(100+rn2(2000)):(2000+rn2(3000));
 #endif
 	    return;
@@ -442,10 +442,6 @@ struct obj *otmp;
     static char *junk[] = {
     "Please disregard previous letter.",
     "Welcome to UnNetHack.",
-#ifdef AMIGA
-    "Only Amiga makes it possible.",
-    "CATS have all the answers.",
-#endif
     "Report bugs to <bhaak@gmx.net>.",
     "Invitation: Visit the NetHack web site at http://www.nethack.org!",
 

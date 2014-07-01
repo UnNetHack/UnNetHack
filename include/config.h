@@ -22,7 +22,7 @@
 			/* if a terminal handles highlighting or tabs poorly,
 			   try this define, used in pager.c and termcap.c */
 
-#include "config1.h"	/* should auto-detect MSDOS, MAC, AMIGA, and WIN32 */
+#include "config1.h"	/* should auto-detect MSDOS, MAC, and WIN32 */
 
 #ifdef AUTOCONF
 # include "autoconf_paths.h"
@@ -46,7 +46,7 @@
  * Define the default window system.  This should be one that is compiled
  * into your system (see defines above).  Known window systems are:
  *
- *	tty, X11, mac, amii, BeOS, Qt, Gem, Gnome, lisp
+ *	tty, X11, mac, Qt, Gem, Gnome, lisp
  */
 
 /* MAC also means MAC windows */
@@ -54,12 +54,6 @@
 # ifndef	AUX
 #  define DEFAULT_WINDOW_SYS "mac"
 # endif
-#endif
-
-/* Amiga supports AMII_GRAPHICS and/or TTY_GRAPHICS */
-#ifdef AMIGA
-# define AMII_GRAPHICS			/* (optional) */
-# define DEFAULT_WINDOW_SYS "amii"	/* "amii", "amitile" or "tty" */
 #endif
 
 #ifdef QT_GRAPHICS

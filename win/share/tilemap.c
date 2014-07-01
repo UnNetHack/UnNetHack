@@ -299,15 +299,11 @@ int main()
 
 #define TILE_FILE	"tile.c"
 
-#ifdef AMIGA
-# define SOURCE_TEMPLATE	"NH:src/%s"
-#else
 # ifdef MAC
 #   define SOURCE_TEMPLATE	":src:%s"
 # else
 #   define SOURCE_TEMPLATE	"../src/%s"
 # endif
-#endif
 
 short tilemap[MAX_GLYPH];
 int lastmontile, lastobjtile, lastothtile;

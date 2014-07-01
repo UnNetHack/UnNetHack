@@ -168,10 +168,6 @@ typedef xchar	boolean;		/* 0 or 1 */
 #include "pcconf.h"
 #endif
 
-#ifdef AMIGA
-#include "amiconf.h"
-#endif
-
 #ifdef MAC
 #include "macconf.h"
 #endif
@@ -209,9 +205,6 @@ typedef xchar	boolean;		/* 0 or 1 */
 
 /* Displayable name of this port; don't redefine if defined in *conf.h */
 #ifndef PORT_ID
-# ifdef AMIGA
-#  define PORT_ID	"Amiga"
-# endif
 # ifdef MAC
 #  define PORT_ID	"Mac"
 # endif
@@ -252,11 +245,6 @@ typedef xchar	boolean;		/* 0 or 1 */
 #if defined(X11_GRAPHICS) || defined(QT_GRAPHICS) || defined(GNOME_GRAPHICS) || defined(MSWIN_GRAPHICS)
 # ifndef USE_TILES
 #  define USE_TILES		/* glyph2tile[] will be available */
-# endif
-#endif
-#if defined(AMII_GRAPHICS)
-# ifndef USE_TILES
-#  define USE_TILES
 # endif
 #endif
 

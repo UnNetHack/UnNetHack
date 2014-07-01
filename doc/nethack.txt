@@ -55,7 +55,7 @@ DESCRIPTION
        in your home directory and named .nethackrc on  Unix  sys-
        tems.   On  other  systems,  the default may be different,
        usually NetHack.cnf.  On  DOS  or  Windows,  the  name  is
-       defaults.nh, while on the Macintosh or BeOS, it is NetHack
+       defaults.nh, while on the Macintosh it is NetHack
        Defaults.  The configuration file's location may be speci-
        fied  by  setting NETHACKOPTIONS to a string consisting of
        an @ character followed by the filename.

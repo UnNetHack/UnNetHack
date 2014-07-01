@@ -40,9 +40,7 @@
 #define Fprintf	(void) fprintf
 #define Fclose	(void) fclose
 #define Unlink	(void) unlink
-#if !defined(AMIGA) || defined(AZTEC_C)
 #define rewind(fp) fseek((fp),0L,SEEK_SET)	/* guarantee a return value */
-#endif
 
 #if defined(UNIX) && !defined(LINT) && !defined(GCC_WARN)
 static	const char	SCCS_Id[] = "@(#)makedefs.c\t3.4\t2002/02/03";
@@ -64,14 +62,6 @@ static	const char	SCCS_Id[] = "@(#)makedefs.c\t3.4\t2002/02/03";
 #define QTXT_I_FILE	"quest.txt"
 #define QTXT_O_FILE	"quest.dat"
 	/* locations for those files */
-#ifdef AMIGA
-# define FILE_PREFIX
-# define INCLUDE_TEMPLATE	"NH:include/t.%s"
-# define SOURCE_TEMPLATE	"NH:src/%s"
-# define DGN_TEMPLATE		"NH:dat/%s"  /* where dungeon.pdf file goes */
-# define DATA_TEMPLATE		"NH:slib/%s"
-# define DATA_IN_TEMPLATE	"NH:dat/%s"
-#else /* not AMIGA */
 # if defined(MAC) && !defined(__MACH__)
     /* MacOS 9 or earlier */
 #   define INCLUDE_TEMPLATE	":include:%s"
@@ -83,14 +73,13 @@ static	const char	SCCS_Id[] = "@(#)makedefs.c\t3.4\t2002/02/03";
 #   define DATA_TEMPLATE	":lib:%s"
 #  endif /* __SC__ || __MRC__ */
 #   define DATA_IN_TEMPLATE	":dat:%s"
-# else /* neither AMIGA nor MAC */
+# else /* !MAC */
 #   define INCLUDE_TEMPLATE	"../include/%s"
 #   define SOURCE_TEMPLATE	"../src/%s"
 #   define DGN_TEMPLATE		"../dat/%s"  /* where dungeon.pdf file goes */
 #   define DATA_TEMPLATE	"../dat/%s"
 #   define DATA_IN_TEMPLATE	"../dat/%s"
 # endif /* else !MAC */
-#endif	/* else !AMIGA */
 
 static const char
     *Dont_Edit_Code =
@@ -542,15 +531,6 @@ do_date()
 	Fprintf(ofp,"#define VERSION_ID \\\n \"%s\"\n",
 		version_id_string(buf, cbuf));
 	Fprintf(ofp,"\n");
-#ifdef AMIGA
-	{
-	struct tm *tm = localtime((time_t *) &clocktim);
-	Fprintf(ofp,"#define AMIGA_VERSION_STRING ");
-	Fprintf(ofp,"\"\\0$VER: UnNetHack %d.%d.%d (%d.%d.%d)\"\n",
-		VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
-		tm->tm_mday, tm->tm_mon+1, tm->tm_year+1900);
-	}
-#endif
 	Fclose(ofp);
 	return;
 }
@@ -577,9 +557,6 @@ build_savebones_compat_string()
 }
 
 static const char *build_opts[] = {
-#ifdef AMIGA_WBENCH
-		"Amiga WorkBench support",
-#endif
 #ifdef ANSI_DEFAULT
 		"ANSI default terminal",
 #endif
@@ -793,9 +770,6 @@ static const char *window_opts[] = {
 #endif
 #ifdef MAC
 		"Mac",
-#endif
-#ifdef AMIGA_INTUITION
-		"Amiga Intuition",
 #endif
 #ifdef MSWIN_GRAPHICS
 		"mswin",

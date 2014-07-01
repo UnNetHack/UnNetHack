@@ -90,8 +90,7 @@
 # define RANDOM		/* have Berkeley random(3) */
 
 # define MAIL		/* Allows for fake mail daemon to deliver mail */
-			/* in the MSDOS version.  (For AMIGA MAIL see  */
-			/* amiconf.h).	In the future this will be the */
+			/* in the MSDOS version.  In the future this will be the */
 			/* hook for mail reader implementation.        */
 
 /* The following is needed for prototypes of certain functions */
@@ -208,9 +207,7 @@
 # define rindex strrchr
 #endif
 
-#ifndef AMIGA
 #include <time.h>
-#endif
 
 #ifdef RANDOM
 /* Use the high quality random number routines. */

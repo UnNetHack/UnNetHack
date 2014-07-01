@@ -939,14 +939,14 @@ E void FDECL(identify_dragon, (int));
 
 /* ### ioctl.c ### */
 
-#if defined(UNIX) || defined(__BEOS__)
+#if defined(UNIX)
 E void NDECL(getwindowsz);
 E void NDECL(getioctls);
 E void NDECL(setioctls);
 # ifdef SUSPEND
 E int NDECL(dosuspend);
 # endif /* SUSPEND */
-#endif /* UNIX || __BEOS__ */
+#endif /* UNIX */
 
 /* ### light.c ### */
 
@@ -1599,9 +1599,7 @@ E void NDECL(gameDiskPrompt);
 # endif
 E void FDECL(append_slash, (char *));
 E void FDECL(getreturn, (const char *));
-# ifndef AMIGA
 E void VDECL(msmsg, (const char *,...));
-# endif
 E FILE *FDECL(fopenp, (const char *,const char *));
 #endif /* MICRO || WIN32 */
 
@@ -2272,14 +2270,14 @@ E void NDECL(port_help);
 
 /* ### unixtty.c ### */
 
-#if defined(UNIX) || defined(__BEOS__)
+#if defined(UNIX)
 E void NDECL(gettty);
 E void FDECL(settty, (const char *));
 E void NDECL(setftty);
 E void NDECL(intron);
 E void NDECL(introff);
 E void VDECL(error, (const char *,...)) PRINTF_F(1,2);
-#endif /* UNIX || __BEOS__ */
+#endif /* UNIX */
 
 /* ### unixunix.c ### */
 

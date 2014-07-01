@@ -137,10 +137,6 @@ int fd;
 	return;
 }
 
-#ifdef AMIGA
-const char amiga_version_string[] = AMIGA_VERSION_STRING;
-#endif
-
 unsigned long
 get_feature_notice_ver(str)
 char *str;

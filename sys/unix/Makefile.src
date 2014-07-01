@@ -20,7 +20,6 @@
 #	'Sys3B2'	-- AT&T 3B2, 3B5, etc.
 #	'Sysatt'	-- AT&T UNIXPC, 7300, 3B1
 #	'SysV-AT'	-- Microport 286 UNIX (put -DDUMB in CFLAGS)
-#	'SysBe'		-- BeOS
 SYSTEM = Sysunix
 
 #
@@ -39,10 +38,6 @@ LINK=$(CC)
 SYSSRC = ../sys/share/ioctl.c ../sys/share/unixtty.c ../sys/unix/unixmain.c \
 	../sys/unix/unixunix.c ../sys/unix/unixres.c
 SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
-#
-# for BeOS
-#SYSSRC = ../sys/be/bemain.c ../sys/share/unixtty.c ../sys/share/ioctl.c
-#SYSOBJ = bemain.o unixtty.o ioctl.o
 
 
 # if you are using gcc as your compiler:
@@ -92,17 +87,6 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
 #   OR compile backwards compatible a.out format
 # CFLAGS = -O2 -b i486-linuxaout -fomit-frame-pointer -I../include
 # LFLAGS = -b i486-linuxaout -L/usr/X11R6/lib
-
-# flags for BeOS
-#   on a Mac/BeBox:
-#CC = mwcc
-#CFLAGS = -r -I../include
-#LINK = mwld
-#LFLAGS = -map nethack.xMAP
-#   on Intel:
-#CFLAGS = -O -I../include
-#LINK = gcc
-#LFLAGS = -Xlinker -soname=_APP_
 
 # Compile with PDCurses installed in a separate directory that doesn't
 # conflict with the system curses/ncurses library
@@ -176,13 +160,6 @@ WINGNOMESRC = ../win/gnome/gnaskstr.c ../win/gnome/gnbind.c \
 WINGNOMEOBJ = gnaskstr.o gnbind.o gnglyph.o gnmain.o gnmap.o gnmenu.o \
 	gnmesg.o gnopts.o gnplayer.o gnsignal.o gnstatus.o gntext.o \
 	gnyesno.o gnworn.o tile.o
-#
-# Files for a BeOS InterfaceKit port -- not ready for prime time
-WINBESRC =
-WINBEOBJ =
-#WINBESRC = ../win/BeOS/winbe.cpp ../win/BeOS/NHWindow.cpp \
-#	../win/BeOS/NHMenuWindow.cpp ../win/BeOS/NHMapWindow.cpp tile.c
-#WINBEOBJ = winbe.o NHWindow.o NHMenuWindow.o NHMapWindow.o tile.o
 
 #
 #
@@ -226,9 +203,6 @@ WINKDELIB = -lkdecore -lkdeui -lXext
 #
 # libraries for Gnome
 WINGNOMELIB = -lgnomeui -lgnome -lart_lgpl -lgtk -lgdk -lpopt
-#
-# libraries for BeOS 
-WINBELIB = -lbe
 
 WINLIB = $(WINTTYLIB)
 
@@ -331,7 +305,7 @@ CSOURCES = $(HACKCSRC) $(SYSSRC) $(WINCSRC) $(GENCSRC)
 # cause dependency loops if run through "make depend"
 # and dgn_comp.h, dgn_file.h, lev_comp.h, special level & dungeon files.
 #
-HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h color.h \
+HACKINCL = align.h artifact.h artilist.h attrib.h color.h \
 	config.h config1.h coord.h decl.h display.h dlb.h dungeon.h \
 	edog.h emin.h engrave.h epri.h eshk.h extern.h flag.h func_tab.h \
 	global.h hack.h lev.h macconf.h mfndpos.h micro.h mkroom.h \
@@ -389,13 +363,6 @@ SysV-AT:	DUMB.Setup $(HOBJ) Makefile
 	@echo "Loading ..."
 	@$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB)
 	@touch SysV-AT
-
-SysBe: $(HOBJ) Makefile
-	@echo "Loading ..."
-	@$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LIBS)
-	@xres -o $(GAME) ../win/BeOS/unnethack.rsrc
-	@mimeset -f $(GAME)
-	@touch SysBe
 
 DUMB.Setup:	../include/extern.h
 	cp ../include/extern.h ../include/extern.h.BAK
@@ -523,7 +490,7 @@ $(CONFIG_H): ../include/config.h ../include/config1.h ../include/tradstdc.h \
 		../include/global.h ../include/coord.h \
 		../include/system.h ../include/unixconf.h \
 		../include/micro.h ../include/pcconf.h \
-		../include/amiconf.h ../include/macconf.h \
+		../include/macconf.h \
 		../include/ntconf.h ../include/nhlan.h
 	touch $(CONFIG_H)
 # hack.h timestamp

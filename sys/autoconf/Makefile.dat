@@ -254,10 +254,6 @@ title.img:
 	# cp $(srcdir)/../win/gem/title.img title.img
 	$(UUDECODE) $(srcdir)/../win/gem/title.uu
 
-GEM_RSC.RSC:
-	# cp $(srcdir)/../win/gem/GEM_RSC.RSC GEM_RSC.RSC
-	$(UUDECODE) $(srcdir)/../win/gem/gem_rsc.uu
-
 data:	data.base ../util/makedefs
 	../util/makedefs -d
 

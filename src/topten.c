@@ -1136,14 +1136,6 @@ char **argv;
 		return;
 	}
 
-#ifdef	AMIGA
-	{
-	    extern winid amii_rawprwin;
-	    init_nhwindows(&argc, argv);
-	    amii_rawprwin = create_nhwindow(NHW_TEXT);
-	}
-#endif
-
 	/* If the score list isn't after a game, we never went through
 	 * initialization. */
 	if (wiz1_level.dlevel == 0) {
@@ -1171,11 +1163,7 @@ char **argv;
 #else
 		player0 = plname;
 		if (!*player0)
-# ifdef AMIGA
-			player0 = "all";	/* single user system */
-# else
 			player0 = "hackplayer";
-# endif
 		playerct = 1;
 		players = &player0;
 #endif
@@ -1238,14 +1226,6 @@ char **argv;
 	    raw_printf("Player types are: [-p role] [-r race]");
 	}
 	free_ttlist(tt_head);
-#ifdef	AMIGA
-	{
-	    extern winid amii_rawprwin;
-	    display_nhwindow(amii_rawprwin, 1);
-	    destroy_nhwindow(amii_rawprwin);
-	    amii_rawprwin = WIN_ERR;
-	}
-#endif
 }
 
 STATIC_OVL int

@@ -50,7 +50,7 @@ void FDECL(do_vanquished, (int, BOOLEAN_P));
 STATIC_DCL void FDECL(list_genocided, (int, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL boolean FDECL(should_query_disclose_option, (int,char *));
 
-#if defined(__BEOS__) || defined(MICRO) || defined(WIN32)
+#if defined(MICRO) || defined(WIN32)
 extern void FDECL(nethack_exit,(int));
 #else
 #define nethack_exit exit
@@ -58,9 +58,6 @@ extern void FDECL(nethack_exit,(int));
 
 #define done_stopprint program_state.stopprint
 
-#ifdef AMIGA
-# define NH_abort()	Abort(0)
-#else
 # ifdef SYSV
 # define NH_abort()	(void) abort()
 # else
@@ -70,7 +67,6 @@ extern void FDECL(nethack_exit,(int));
 # define NH_abort()	abort()
 #  endif
 # endif
-#endif
 
 /*
  * The order of these needs to match the macros in hack.h.

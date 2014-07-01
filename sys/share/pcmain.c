@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* main.c - MSDOS, OS/2, ST, Amiga, and NT NetHack */
+/* main.c - MSDOS and NT NetHack */
 
 #include "hack.h"
 #include "dlb.h"
@@ -13,12 +13,10 @@
 
 #include <ctype.h>
 
-#if !defined(AMIGA) && !defined(GNUDOS)
+#if !defined(GNUDOS)
 #include <sys\stat.h>
 #else
-# ifdef GNUDOS
 #include <sys/stat.h>
-# endif
 #endif
 
 #ifdef WIN32
@@ -37,11 +35,6 @@
 
 
 SHARED_DCL char orgdir[PATHLEN];	/* also used in pcsys.c, amidos.c */
-
-#ifdef AMIGA
-extern int bigscreen;
-void NDECL( preserve_icon );
-#endif
 
 STATIC_DCL void FDECL(process_options,(int argc,char **argv));
 STATIC_DCL void NDECL(nhusage);
@@ -127,7 +120,7 @@ char *argv[];
 
 	choose_windows(DEFAULT_WINDOW_SYS);
 
-#if !defined(AMIGA) && !defined(GNUDOS)
+#if !defined(GNUDOS)
 	/* Save current directory and make sure it gets restored when
 	 * the game is exited.
 	 */
@@ -136,7 +129,7 @@ char *argv[];
 # ifndef NO_SIGNAL
 	signal(SIGINT, (SIG_RET_TYPE) nethack_exit);	/* restore original directory */
 # endif
-#endif /* !AMIGA && !GNUDOS */
+#endif /* !GNUDOS */
 
 	dir = nh_getenv("NETHACKDIR");
 	if (dir == (char *)0)
@@ -163,18 +156,6 @@ char *argv[];
 		chdirx (dir, 1);
 #endif
 	}
-#ifdef AMIGA
-# ifdef CHDIR
-	/*
-	 * If we're dealing with workbench, change the directory.  Otherwise
-	 * we could get "Insert disk in drive 0" messages. (Must be done
-	 * before initoptions())....
-	 */
-	if(argc == 0)
-		chdirx(HACKDIR, 1);
-# endif
-	ami_wininit_data();
-#endif
 	initoptions();
 
 #ifdef NOCWD_ASSUMPTIONS
@@ -186,7 +167,7 @@ char *argv[];
 #endif
 
 	if (!hackdir[0])
-#if !defined(LATTICE) && !defined(AMIGA)
+#if !defined(LATTICE)
 		Strcpy(hackdir, orgdir);
 #else
 		Strcpy(hackdir, HACKDIR);
@@ -268,9 +249,7 @@ char *argv[];
 
 #ifdef MFLOPPY
 	set_lock_and_bones();
-# ifndef AMIGA
 	copybones(FROMPERM);
-# endif
 #endif
 
 	if (!*plname)
@@ -314,10 +293,6 @@ char *argv[];
 # endif
 	getlock();
 #else   /* What follows is !PC_LOCKING */
-# ifdef AMIGA /* We'll put the bones & levels in the user specified directory -jhsa */
-	Strcat(lock,plname);
-	Strcat(lock,".99");
-# else
 #  ifndef MFLOPPY
 	/* I'm not sure what, if anything, is left here, but MFLOPPY has
 	 * conflicts with set_lock_and_bones() in files.c.
@@ -327,7 +302,6 @@ char *argv[];
 	regularize(lock);	/* is this necessary? */
 				/* not compatible with full path a la AMIGA */
 #  endif
-# endif
 #endif	/* PC_LOCKING */
 
 	/* Set up level 0 file to keep the game state.
@@ -481,7 +455,6 @@ char *argv[];
 			} else
 				raw_print("Player name expected after -u");
 			break;
-#ifndef AMIGA
 		case 'I':
 		case 'i':
 			if (!strncmpi(argv[0]+1, "IBM", 3))
@@ -492,7 +465,6 @@ char *argv[];
 			if (!strncmpi(argv[0]+1, "DEC", 3))
 				switch_graphics(DEC_GRAPHICS);
 			break;
-#endif
 		case 'g':
 			if (argv[0][2]) {
 			    if ((i = str2gend(&argv[0][2])) >= 0)
@@ -527,21 +499,10 @@ char *argv[];
 			}
 			break;
 #ifdef MFLOPPY
-# ifndef AMIGA
 		/* Player doesn't want to use a RAM disk
 		 */
 		case 'R':
 			ramdisk = FALSE;
-			break;
-# endif
-#endif
-#ifdef AMIGA
-			/* interlaced and non-interlaced screens */
-		case 'L':
-			bigscreen = 1;
-			break;
-		case 'l':
-			bigscreen = -1;
 			break;
 #endif
 		case '@':
@@ -585,16 +546,9 @@ nhusage()
 #ifdef NEWS
 	ADD_USAGE(" [-n]");
 #endif
-#ifndef AMIGA
 	ADD_USAGE(" [-I] [-i] [-d]");
-#endif
 #ifdef MFLOPPY
-# ifndef AMIGA
 	ADD_USAGE(" [-R]");
-# endif
-#endif
-#ifdef AMIGA
-	ADD_USAGE(" [-[lL]]");
 #endif
 	if (!iflags.window_inited)
 		raw_printf("%s\n",buf1);
@@ -609,20 +563,14 @@ chdirx(dir, wr)
 char *dir;
 boolean wr;
 {
-# ifdef AMIGA
-	static char thisdir[] = "";
-# else
 	static char thisdir[] = ".";
-# endif
 	if(dir && chdir(dir) < 0) {
 		error("Cannot chdir to %s.", dir);
 	}
 
-# ifndef AMIGA
 	/* Change the default drive as well.
 	 */
 	chdrive(dir);
-# endif
 
 	/* warn the player if we can't write the record file */
 	/* perhaps we should also test whether . is writable */

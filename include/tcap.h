@@ -12,7 +12,7 @@
 #endif
 
 /* might display need graphics code? */
-#if !defined(AMIGA) && !defined(MAC)
+#if !defined(MAC)
 # if defined(TERMLIB) || defined(MSDOS)
 #  define ASCIIGRAPH
 # endif

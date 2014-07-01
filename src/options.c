@@ -44,11 +44,6 @@ static struct Bool_Opt
 	boolean	*addr, initvalue;
 	int optflags;
 } boolopt[] = {
-#ifdef AMIGA
-	{"altmeta", &flags.altmeta, TRUE, DISP_IN_GAME},
-#else
-	{"altmeta", (boolean *)0, TRUE, DISP_IN_GAME},
-#endif
 	{"ascii_map",     &iflags.wc_ascii_map, !PREFER_TILED, SET_IN_GAME},	/*WC*/
 #ifdef MFLOPPY
 	{"asksavedisk", &flags.asksavedisk, FALSE, SET_IN_GAME},
@@ -62,7 +57,7 @@ static struct Bool_Opt
 	{"autopickup", &flags.pickup, TRUE, SET_IN_GAME},
 	{"autoquiver", &flags.autoquiver, FALSE, SET_IN_GAME},
 	{"autounlock", &flags.autounlock, TRUE, SET_IN_GAME},
-#if defined(MICRO) && !defined(AMIGA)
+#if defined(MICRO) 
 	{"BIOS", &iflags.BIOS, FALSE, SET_IN_FILE},
 #else
 	{"BIOS", (boolean *)0, FALSE, SET_IN_FILE},
@@ -109,11 +104,6 @@ static struct Bool_Opt
 #endif
 	{"female", &flags.female, FALSE, DISP_IN_GAME},
 	{"fixinv", &flags.invlet_constant, TRUE, SET_IN_GAME},
-#ifdef AMIFLUSH
-	{"flush", &flags.amiflush, FALSE, SET_IN_GAME},
-#else
-	{"flush", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 	{"fullscreen", &iflags.wc2_fullscreen, FALSE, SET_IN_FILE},
 	{"guicolor", &iflags.wc2_guicolor, TRUE, SET_IN_GAME},
 	{"heaven_or_hell", &flags.heaven_or_hell, FALSE, SET_IN_FILE},
@@ -218,7 +208,7 @@ static struct Bool_Opt
 #ifdef QWERTZ
 	{"qwertz_layout", &iflags.qwertz_layout, FALSE, SET_IN_GAME},
 #endif
-#if defined(MICRO) && !defined(AMIGA)
+#if defined(MICRO)
 	{"rawio", &iflags.rawio, FALSE, DISP_IN_GAME},
 #else
 	{"rawio", (boolean *)0, FALSE, SET_IN_FILE},
@@ -1795,7 +1785,7 @@ boolean tinitial, tfrom_file;
 	if (flags.hell_and_hell)
 		flags.heaven_or_hell = TRUE;
 
-#if defined(MICRO) && !defined(AMIGA)
+#if defined(MICRO)
 	/* included for compatibility with old NetHack.cnf files */
 	if (match_optname(opts, "IBM_", 4, FALSE)) {
 		iflags.BIOS = !negated;
@@ -2165,21 +2155,15 @@ boolean tinitial, tfrom_file;
 		    }
 		    while (cnt-- > 0) {
 			if (*pt && *pt != '/') {
-# ifdef AMIGA
-			    rgb <<= 4;
-# else
 			    rgb <<= 8;
-# endif
 			    tmp = *(pt++);
 			    if (isalpha(tmp)) {
 				tmp = (tmp + 9) & 0xf;	/* Assumes ASCII... */
 			    } else {
 				tmp &= 0xf;	/* Digits in ASCII too... */
 			    }
-# ifndef AMIGA
 			    /* Add an extra so we fill f -> ff and 0 -> 00 */
 			    rgb += tmp << 4;
-# endif
 			    rgb += tmp;
 			}
 		    }

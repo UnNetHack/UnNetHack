@@ -40,10 +40,6 @@ static char *progname = default_progname;
 static const char *library_file = DLBFILE;
 static const char *list_file = LIBLISTFILE;
 
-#ifdef AMIGA
-static char origdir[255]="";
-#endif
-
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
@@ -252,12 +248,6 @@ main(argc, argv)
 		break;
 	    case 'C':
 		if (ap == argc) usage();
-#ifdef AMIGA
-		if(!getcwd(origdir,sizeof(origdir))){
-		    printf("Can't get current directory.\n");
-		    xexit(EXIT_FAILURE);
-		}
-#endif
 		if(chdir(argv[ap++])){
 		    printf("Can't chdir to %s\n",argv[--ap]);
 		    xexit(EXIT_FAILURE);
@@ -551,17 +541,9 @@ xexit(retcd)
     int retcd;
 {
 #ifdef DLB
-#ifdef AMIGA
-    if (origdir[0]) chdir(origdir);
-#endif
 #endif
     exit(retcd);
 }
 
-
-#ifdef AMIGA
-#include "date.h"
-const char amiga_version_string[] = AMIGA_VERSION_STRING;
-#endif
 
 /*dlb_main.c*/

@@ -735,8 +735,7 @@ with another key, modifies it by setting the `meta' [8th, or `high']
 bit), you can invoke many extended commands by meta-ing the first
 letter of the command.
 .\" In {\it NT, OS/2, PC\/ {\rm and} ST NetHack},
-.\" the `Alt' key can be used in this fashion;
-.\" on the Amiga set the {\it altmeta\/} option to get this behavior.
+.\" the `Alt' key can be used in this fashion.
 In NT, OS/2, and PC NetHack, the `Alt' key
 can be used in this fashion.
 .lp M-?
@@ -1918,15 +1917,15 @@ object classes rather than a character prompt, and then a menu of matching
 objects for selection.
 .lp menu_deselect_all
 Menu character accelerator to deselect all items in a menu.
-Implemented by the Amiga, Gem, X11 and tty ports.
+Implemented by the X11 and tty ports.
 Default '-'.
 .lp menu_deselect_page
 Menu character accelerator to deselect all items on this page of a menu.
-Implemented by the Amiga, Gem and tty ports.
+Implemented by the tty port.
 Default '\e'.
 .lp menu_first_page
 Menu character accelerator to jump to the first page in a menu.
-Implemented by the Amiga, Gem and tty ports.
+Implemented by the tty port.
 Default '^'.
 .lp menu_headings
 Controls how the headings in a menu are highlighted.
@@ -1934,35 +1933,35 @@ Values are 'bold', 'inverse', or 'underline'.
 Not all ports can actually display all three types.
 .lp menu_invert_all
 Menu character accelerator to invert all items in a menu.
-Implemented by the Amiga, Gem, X11 and tty ports.
+Implemented by the X11 and tty ports.
 Default '@'.
 .lp menu_invert_page
 Menu character accelerator to invert all items on this page of a menu.
-Implemented by the Amiga, Gem and tty ports.
+Implemented by tty port.
 Default '~'.
 .lp menu_last_page
 Menu character accelerator to jump to the last page in a menu.
-Implemented by the Amiga, Gem and tty ports.
+Implemented by tty port.
 Default '|'.
 .lp menu_next_page
 Menu character accelerator to goto the next menu page.
-Implemented by the Amiga, Gem and tty ports.
+Implemented by tty port.
 Default '>'.
 .lp menu_previous_page 
 Menu character accelerator to goto the previous menu page.
-Implemented by the Amiga, Gem and tty ports.
+Implemented by tty port.
 Default '<'.
 .lp menu_search
 Menu character accelerator to search for a menu item.
-Implemented by the Amiga, Gem and X11 ports.
+Implemented by X11 port.
 Default ':'.
 .lp menu_select_all
 Menu character accelerator to select all items in a menu.
-Implemented by the Amiga, Gem, X11 and tty ports.
+Implemented by the X11 and tty ports.
 Default '.'.
 .lp menu_select_page
 Menu character accelerator to select all items on this page of a menu.
-Implemented by the Amiga, Gem and tty ports.
+Implemented by tty port.
 Default ','.
 .lp monsters
 Set the characters used to display monster classes (default
@@ -2339,15 +2338,11 @@ Select an alternate keystroke handler dll to load (Win32 tty NetHack only).
 The name of the handler is specified without the .dll extension and without any
 path information.
 Cannot be set with the `O' command.
-.lp altmeta
-(default on, AMIGA NetHack only).
 .lp "BIOS    "
 Use BIOS calls to update the screen
 display quickly and to read the keyboard (allowing the use of arrow
 keys to move) on machines with an IBM PC compatible BIOS ROM (default off,
 OS/2, PC, and ST NetHack only).
-.lp flush
-(default off, AMIGA NetHack only).
 .lp "MACgraphics"
 (default on, Mac NetHack only).
 .lp page_wait

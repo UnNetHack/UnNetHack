@@ -2059,14 +2059,6 @@ genericptr_t ptr;
 
 /*flexhack.skl*/
 
-#ifdef	AMIGA
-long *alloc(n)
-	unsigned n;
-{
-	return ((long *)malloc (n));
-}
-#endif
-
 /* routine to switch to another input file; needed for flex */
 void init_yyin( input_f )
 FILE *input_f;

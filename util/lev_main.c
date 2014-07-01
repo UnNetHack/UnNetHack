@@ -34,10 +34,6 @@
 # define SpinCursor(x)
 #endif
 
-#if defined(AMIGA) && defined(DLB)
-# define PREFIX "NH:slib/"
-#endif
-
 #ifndef O_WRONLY
 #include <fcntl.h>
 #endif

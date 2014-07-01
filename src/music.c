@@ -41,9 +41,6 @@ STATIC_DCL void FDECL(speaker,(struct obj *,char *));
 #ifdef PCMUSIC
 void FDECL( pc_speaker, ( struct obj *, char * ) );
 #endif
-#ifdef AMIGA
-void FDECL( amii_speaker, ( struct obj *, char *, int ) );
-#endif
 
 /*
  * Wake every monster in range...
@@ -348,7 +345,7 @@ do_improvisation(instr)
 struct obj *instr;
 {
 	int damage, do_spec = !Confusion;
-#if defined(MAC) || defined(AMIGA) || defined (PCMUSIC)
+#if defined(MAC) || defined (PCMUSIC)
 	struct obj itmp;
 
 	itmp = *instr;
@@ -358,13 +355,10 @@ struct obj *instr;
 # ifdef MAC
 	mac_speaker(&itmp, "C");
 # endif
-# ifdef AMIGA
-	amii_speaker(&itmp, "Cw", AMII_OKAY_VOLUME);
-# endif
 #ifdef PCMUSIC
 	  pc_speaker ( &itmp, "C");
 #endif
-#endif /* MAC || AMIGA || PCMUSIC */
+#endif /* MAC || PCMUSIC */
 
 	if (!do_spec)
 	    pline("What you produce is quite far from music...");
@@ -488,12 +482,7 @@ struct obj *instr;
 	    (void)mungspaces(buf);
 	    /* convert to uppercase and change any "H" to the expected "B" */
 	    for (s = buf; *s; s++) {
-#ifndef AMIGA
 		*s = highc(*s);
-#else
-		/* The AMIGA supports two octaves of notes */
-		if (*s == 'h') *s = 'b';
-#endif
 		if (*s == 'H') *s = 'B';
 	    }
 	}
@@ -508,19 +497,6 @@ struct obj *instr;
 #endif
 #ifdef PCMUSIC
 	pc_speaker ( instr, buf );
-#endif
-#ifdef AMIGA
-	{
-		char nbuf[ 20 ];
-		int i;
-		for( i = 0; buf[i] && i < 5; ++i )
-		{
-			nbuf[ i*2 ] = buf[ i ];
-			nbuf[ (i*2)+1 ] = 'h';
-		}
-		nbuf[ i*2 ] = 0;
-		amii_speaker ( instr , nbuf, AMII_OKAY_VOLUME ) ;
-	}
 #endif
 	/* Check if there was the Stronghold drawbridge near
 	 * and if the tune conforms to what we're waiting for.
