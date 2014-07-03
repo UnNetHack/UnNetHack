@@ -11,11 +11,7 @@
 #include "tcap.h"
 
 
-#ifdef MICROPORT_286_BUG
-#define Tgetstr(key) (tgetstr(key,tbuf))
-#else
 #define Tgetstr(key) (tgetstr(key,&tbufptr))
-#endif /* MICROPORT_286_BUG **/
 
 static char * FDECL(s_atr2str, (int));
 static char * FDECL(e_atr2str, (int));

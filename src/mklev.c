@@ -742,16 +742,10 @@ clear_level_structures()
 	    lev = &levl[x][0];
 	    for(y=0; y<ROWNO; y++) {
 		*lev++ = zerorm;
-#ifdef MICROPORT_BUG
-		level.objects[x][y] = (struct obj *)0;
-		level.monsters[x][y] = (struct monst *)0;
-#endif
 	    }
 	}
-#ifndef MICROPORT_BUG
 	(void) memset((genericptr_t)level.objects, 0, sizeof(level.objects));
 	(void) memset((genericptr_t)level.monsters, 0, sizeof(level.monsters));
-#endif
 	level.objlist = (struct obj *)0;
 	level.buriedobjlist = (struct obj *)0;
 	level.monlist = (struct monst *)0;
