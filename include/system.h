@@ -139,17 +139,13 @@ E int FDECL(unlink, (const char *));
 
 #if defined(MICRO)
 E int FDECL(close, (int));
-#ifndef __EMX__
 E int FDECL(read, (int,genericptr_t,unsigned int));
-#endif
 E int FDECL(open, (const char *,int,...));
 E int FDECL(dup2, (int, int));
 E int FDECL(setmode, (int,int));
 E int NDECL(kbhit);
-#  ifndef __EMX__
 E int FDECL(chdir, (char *));
 E char *FDECL(getcwd, (char *,int));
-#  endif
 #endif
 
 /* both old & new versions of Ultrix want these, but real BSD does not */

@@ -1168,15 +1168,7 @@ register int	mmflags;
 	    if (uwep && uwep->oartifact == ART_EXCALIBUR)
 		mtmp->mpeaceful = mtmp->mtame = FALSE;
 	}
-#ifndef DCC30_BUG
 	if (mndx == PM_LONG_WORM && (mtmp->wormno = get_wormno()) != 0)
-#else
-	/* DICE 3.0 doesn't like assigning and comparing mtmp->wormno in the
-	 * same expression.
-	 */
-	if (mndx == PM_LONG_WORM &&
-		(mtmp->wormno = get_wormno(), mtmp->wormno != 0))
-#endif
 	{
 	    /* we can now create worms with tails - 11/91 */
 	    initworm(mtmp, rn2(5));

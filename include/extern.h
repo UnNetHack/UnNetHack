@@ -1862,7 +1862,7 @@ E int FDECL(doconsult, (struct monst *));
 /* ### save.c ### */
 
 E int NDECL(dosave);
-#if defined(UNIX) || defined(__EMX__) || defined(WIN32)
+#if defined(UNIX) || defined(WIN32)
 E void FDECL(hangup, (int));
 #endif
 E int NDECL(dosave0);

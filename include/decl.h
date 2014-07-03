@@ -180,7 +180,7 @@ E struct linfo level_info[MAXLINFO];
 E struct sinfo {
 	int gameover;		/* self explanatory? */
 	int stopprint;		/* inhibit further end of game disclosure */
-#if defined(UNIX) || defined (__EMX__) || defined(WIN32)
+#if defined(UNIX) || defined(WIN32)
 	int done_hup;		/* SIGHUP or moral equivalent received
 				 * -- no more screen output */
 #endif

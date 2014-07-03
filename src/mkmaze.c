@@ -1018,12 +1018,7 @@ bound_digging()
 	for (x = 0; x < COLNO; x++)
 	  for (y = 0; y < ROWNO; y++)
 	    if (y <= ymin || y >= ymax || x <= xmin || x >= xmax) {
-#ifdef DCC30_BUG
-		lev = &levl[x][y];
-		lev->wall_info |= W_NONDIGGABLE;
-#else
 		levl[x][y].wall_info |= W_NONDIGGABLE;
-#endif
 	    }
 }
 

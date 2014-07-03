@@ -30,7 +30,7 @@ static struct val_list { struct valuable_data *list; int size; } valuables[] = {
 
 #ifndef NO_SIGNAL
 STATIC_PTR void FDECL(done_intr, (int));
-# if defined(UNIX) || defined (__EMX__)
+# if defined(UNIX)
 static void FDECL(done_hangup, (int));
 # endif
 #endif
@@ -177,7 +177,7 @@ int sig_unused;
 	return;
 }
 
-# if defined(UNIX) || defined(__EMX__)
+# if defined(UNIX) 
 static void
 done_hangup(sig)	/* signal() handler */
 int sig;
@@ -749,7 +749,7 @@ die:
 	if (have_windows) wait_synch();	/* flush screen output */
 #ifndef NO_SIGNAL
 	(void) signal(SIGINT, (SIG_RET_TYPE) done_intr);
-# if defined(UNIX) || defined (__EMX__)
+# if defined(UNIX)
 	(void) signal(SIGQUIT, (SIG_RET_TYPE) done_intr);
 	(void) signal(SIGHUP, (SIG_RET_TYPE) done_hangup);
 # endif
