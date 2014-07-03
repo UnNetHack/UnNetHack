@@ -45,11 +45,7 @@ static struct Bool_Opt
 	int optflags;
 } boolopt[] = {
 	{"ascii_map",     &iflags.wc_ascii_map, !PREFER_TILED, SET_IN_GAME},	/*WC*/
-#ifdef MFLOPPY
-	{"asksavedisk", &flags.asksavedisk, FALSE, SET_IN_GAME},
-#else
 	{"asksavedisk", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 	{"autodig", &flags.autodig, FALSE, SET_IN_GAME},
 #ifdef AUTO_OPEN
 	{"autoopen", &iflags.autoopen, TRUE, SET_IN_GAME},
@@ -67,11 +63,6 @@ static struct Bool_Opt
 	{"checkpoint", &flags.ins_chkpt, TRUE, SET_IN_FILE},
 #else
 	{"checkpoint", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
-#ifdef MFLOPPY
-	{"checkspace", &iflags.checkspace, TRUE, SET_IN_GAME},
-#else
-	{"checkspace", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"cmdassist", &iflags.cmdassist, TRUE, SET_IN_GAME},
 	{"color", &iflags.wc_color, TRUE, SET_IN_GAME},		/*WC*/

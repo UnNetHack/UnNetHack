@@ -15,9 +15,6 @@
  */
 
 struct flag {
-#ifdef	MFLOPPY
-	boolean  asksavedisk;
-#endif
 	boolean  autodig;       /* MRKR: Automatically dig */
 	boolean  autoquiver;	/* Automatically fill quiver */
 	boolean  autounlock;	/* Automatically apply unlocking tool */
@@ -234,11 +231,6 @@ struct instance_flags {
 #endif
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	boolean use_status_colors; /* use color in status line; only if wc_color */
-#endif
-#ifdef MFLOPPY
-	boolean  checkspace;	/* check disk space before writing files */
-				/* (in iflags to allow restore after moving
-				 * to >2GB partition) */
 #endif
 #ifdef MICRO
 	boolean  BIOS;		/* use IBM or ST BIOS calls when appropriate */

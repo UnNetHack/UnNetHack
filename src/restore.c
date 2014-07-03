@@ -28,7 +28,7 @@ STATIC_DCL void FDECL(freefruitchn, (struct fruit *));
 STATIC_DCL void FDECL(ghostfruit, (struct obj *));
 STATIC_DCL boolean FDECL(restgamestate, (int, unsigned int *, unsigned int *));
 STATIC_DCL void FDECL(restlevelstate, (unsigned int, unsigned int));
-STATIC_DCL int FDECL(restlevelfile, (int,XCHAR_P));
+STATIC_DCL int FDECL(restlevelfile, (XCHAR_P));
 STATIC_DCL void FDECL(reset_oattached_mids, (BOOLEAN_P));
 
 /*
@@ -526,10 +526,8 @@ unsigned int stuckid, steedid;	/* STEED */
 #endif
 }
 
-/*ARGSUSED*/	/* fd used in MFLOPPY only */
 STATIC_OVL int
-restlevelfile(fd, ltmp)
-register int fd;
+restlevelfile(ltmp)
 xchar ltmp;
 {
 	register int nfd;
@@ -541,39 +539,6 @@ xchar ltmp;
 		   save file if file creation is now failing... */
 		panic("restlevelfile: %s", whynot);
 	}
-#ifdef MFLOPPY
-	if (!savelev(nfd, ltmp, COUNT_SAVE)) {
-
-		/* The savelev can't proceed because the size required
-		 * is greater than the available disk space.
-		 */
-		pline("Not enough space on `%s' to restore your game.",
-			levels);
-
-		/* Remove levels and bones that may have been created.
-		 */
-		(void) close(nfd);
-		eraseall(levels, alllevels);
-		eraseall(levels, allbones);
-
-		/* Perhaps the person would like to play without a
-		 * RAMdisk.
-		 */
-		if (ramdisk) {
-			/* PlaywoRAMdisk may not return, but if it does
-			 * it is certain that ramdisk will be 0.
-			 */
-			playwoRAMdisk();
-			/* Rewind save file and try again */
-			(void) lseek(fd, (off_t)0, 0);
-			(void) uptodate(fd, (char *)0);	/* skip version */
-			return dorecover(fd);	/* 0 or 1 */
-		} else {
-			pline("Be seeing you...");
-			terminate(EXIT_SUCCESS);
-		}
-	}
-#endif
 	bufon(nfd);
 	savelev(nfd, ltmp, WRITE_SAVE | FREE_SAVE);
 	bclose(nfd);
@@ -607,7 +572,7 @@ register int fd;
 #ifdef INSURANCE
 	savestateinlock();
 #endif
-	rtmp = restlevelfile(fd, ledger_no(&u.uz));
+	rtmp = restlevelfile(ledger_no(&u.uz));
 	if (rtmp < 2) return(rtmp);  /* dorecover called recursively */
 
 	/* these pointers won't be valid while we're processing the
@@ -652,7 +617,7 @@ register int fd;
 		}
 		mark_synch();
 #endif
-		rtmp = restlevelfile(fd, ltmp);
+		rtmp = restlevelfile(ltmp);
 		if (rtmp < 2) return(rtmp);  /* dorecover called recursively */
 	}
 
@@ -677,9 +642,6 @@ register int fd;
 	substitute_tiles(&u.uz);
 #endif
 	restlevelstate(stuckid, steedid);
-#ifdef MFLOPPY
-	gameDiskPrompt();
-#endif
 	max_rank_sz(); /* to recompute mrank_sz (botl.c) */
 
 	/* this comes after inventory has been loaded */

@@ -688,18 +688,12 @@ E FILE *FDECL(fopen_datafile, (const char *,const char *,int));
 #endif
 E boolean FDECL(uptodate, (int,const char *));
 E void FDECL(store_version, (int));
-#ifdef MFLOPPY
-E void NDECL(set_lock_and_bones);
-#endif
 E void FDECL(set_levelfile_name, (char *,int));
 E int FDECL(create_levelfile, (int,char *));
 E int FDECL(open_levelfile, (int,char *));
 E void FDECL(delete_levelfile, (int));
 E void NDECL(clearlocks);
 E int FDECL(create_bonesfile, (d_level*,char **, char *));
-#ifdef MFLOPPY
-E void NDECL(cancel_bonesfile);
-#endif
 E void FDECL(commit_bonesfile, (d_level *));
 E int FDECL(open_bonesfile, (d_level*,char **));
 E int FDECL(delete_bonesfile, (d_level*));
@@ -1544,13 +1538,6 @@ E void FDECL(chdirx, (char *,BOOLEAN_P));
 #if defined(MICRO) || defined(WIN32)
 E void NDECL(flushout);
 E int NDECL(dosh);
-# ifdef MFLOPPY
-E void FDECL(eraseall, (const char *,const char *));
-E void FDECL(copybones, (int));
-E void NDECL(playwoRAMdisk);
-E int FDECL(saveDiskPrompt, (int));
-E void NDECL(gameDiskPrompt);
-# endif
 E void FDECL(append_slash, (char *));
 E void FDECL(getreturn, (const char *));
 E void VDECL(msmsg, (const char *,...));
@@ -1890,13 +1877,7 @@ E int NDECL(dosave0);
 #ifdef INSURANCE
 E void NDECL(savestateinlock);
 #endif
-#ifdef MFLOPPY
-E boolean FDECL(savelev, (int,XCHAR_P,int));
-E boolean FDECL(swapin_file, (int));
-E void NDECL(co_false);
-#else
 E void FDECL(savelev, (int,XCHAR_P,int));
-#endif
 E void FDECL(bufon, (int));
 E void FDECL(bufoff, (int));
 E void FDECL(bflush, (int));

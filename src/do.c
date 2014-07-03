@@ -1029,15 +1029,6 @@ currentlevel_rewrite()
 		return -1;
 	}
 
-#ifdef MFLOPPY
-	if (!savelev(fd, ledger_no(&u.uz), COUNT_SAVE)) {
-		(void) close(fd);
-		delete_levelfile(ledger_no(&u.uz));
-		pline("UnNetHack is out of disk space for making levels!");
-		You("can save, quit, or continue playing.");
-		return -1;
-	}
-#endif
 	return fd;
 }
 

@@ -686,10 +686,6 @@ newgame()
 {
 	int i;
 
-#ifdef MFLOPPY
-	gameDiskPrompt();
-#endif
-
 	flags.ident = 1;
 
 	for (i = 0; i < NUMMONS; i++)

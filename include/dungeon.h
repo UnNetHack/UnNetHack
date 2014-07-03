@@ -172,15 +172,6 @@ struct linfo {
  * same time.  However they _mean_ different things.
  */
 
-#ifdef MFLOPPY
-# define FROMPERM	 1	/* for ramdisk use */
-# define TOPERM		 2	/* for ramdisk use */
-# define ACTIVE		 1
-# define SWAPPED	 2
-	int	where;
-	long	time;
-	long	size;
-#endif /* MFLOPPY */
 };
 
 /* types and structures for dungeon map recording
