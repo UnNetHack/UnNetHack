@@ -14,16 +14,6 @@
 char *FDECL(fmt_ptr, (const genericptr,char *));
 #endif
 
-#ifdef MONITOR_HEAP
-#undef alloc
-#undef free
-extern void FDECL(free,(genericptr_t));
-static void NDECL(heapmon_init);
-
-static FILE *heaplog = 0;
-static boolean tried_heaplog = FALSE;
-#endif
-
 long *FDECL(alloc,(unsigned int));
 extern void VDECL(panic, (const char *,...)) PRINTF_F(1,2);
 
@@ -46,15 +36,13 @@ register unsigned int lth;
 	register genericptr_t ptr;
 
 	ptr = malloc(lth);
-#ifndef MONITOR_HEAP
 	if (!ptr) panic("Memory allocation failure; cannot get %u bytes", lth);
-#endif
 	return((long *) ptr);
 #endif
 }
 
 
-#if defined(MONITOR_HEAP) || defined(WIZARD)
+#if defined(WIZARD)
 
 # if defined(MICRO) || defined(WIN32)
 /* we actually want to know which systems have an ANSI run-time library
@@ -86,59 +74,5 @@ char *buf;
 }
 
 #endif
-
-#ifdef MONITOR_HEAP
-
-/* If ${NH_HEAPLOG} is defined and we can create a file by that name,
-   then we'll log the allocation and release information to that file. */
-static void
-heapmon_init()
-{
-	char *logname = getenv("NH_HEAPLOG");
-
-	if (logname && *logname)
-		heaplog = fopen(logname, "w");
-	tried_heaplog = TRUE;
-}
-
-long *
-nhalloc(lth, file, line)
-unsigned int lth;
-const char *file;
-int line;
-{
-	long *ptr = alloc(lth);
-	char ptr_address[20];
-
-	if (!tried_heaplog) heapmon_init();
-	if (heaplog)
-		(void) fprintf(heaplog, "+%5u %s %4d %s\n", lth,
-				fmt_ptr((genericptr_t)ptr, ptr_address),
-				line, file);
-	/* potential panic in alloc() was deferred til here */
-	if (!ptr) panic("Cannot get %u bytes, line %d of %s",
-			lth, line, file);
-
-	return ptr;
-}
-
-void
-nhfree(ptr, file, line)
-genericptr_t ptr;
-const char *file;
-int line;
-{
-	char ptr_address[20];
-
-	if (!tried_heaplog) heapmon_init();
-	if (heaplog)
-		(void) fprintf(heaplog, "-      %s %4d %s\n",
-				fmt_ptr((genericptr_t)ptr, ptr_address),
-				line, file);
-
-	free(ptr);
-}
-
-#endif /* MONITOR_HEAP */
 
 /*alloc.c*/

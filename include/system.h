@@ -100,9 +100,7 @@ E void FDECL(exit, (int));
    int and we die.  We must use __STDC__ instead of NHSTDC because
    the former is naturally what flex tests for. */
 # if defined(__STDC__) || !defined(FLEX_SCANNER)
-#   ifndef MONITOR_HEAP
 E void FDECL(free, (genericptr_t));
-#   endif
 # endif
 #if !defined(__SASC_60) && !defined(_DCC) && !defined(__SC__)
 E void FDECL(perror, (const char *));
