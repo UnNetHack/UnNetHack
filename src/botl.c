@@ -558,13 +558,11 @@ bot2()
 		Strcat(nb = eos(nb), " Frozen");
 #endif
 	}
-#ifdef ELBERETH
 	if(!Blind && sengr_at("Elbereth", u.ux, u.uy))
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	     	add_colored_text("Elbereth", newbot2);
 #else
 		Strcat(nb = eos(nb), " Elbereth");
-#endif
 #endif
 #ifdef DUMP_LOG
 }

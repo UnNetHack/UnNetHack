@@ -87,12 +87,8 @@ struct prop {
 #	define W_ARMS	    0x00000008L /* Shield */
 #	define W_ARMG	    0x00000010L /* Gloves/gauntlets */
 #	define W_ARMF	    0x00000020L /* Footwear */
-#ifdef TOURIST
 #	define W_ARMU	    0x00000040L /* Undershirt */
 #	define W_ARMOR	     (W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU)
-#else
-#	define W_ARMOR	     (W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF)
-#endif
 	/* Weapons and artifacts */
 #	define W_WEP	    0x00000100L /* Wielded weapon */
 #	define W_QUIVER     0x00000200L /* Quiver for (f)iring ammo */
@@ -105,9 +101,7 @@ struct prop {
 #	define W_RINGR	    0x00040000L /* Right ring */
 #	define W_RING	    (W_RINGL | W_RINGR)
 #	define W_TOOL	    0x00080000L /* Eyewear */
-#ifdef STEED
 #	define W_SADDLE     0x00100000L	/* KMH -- For riding monsters */
-#endif
 #	define W_BALL	    0x00200000L /* Punishment ball */
 #	define W_CHAIN	    0x00400000L /* Punishment chain */
 
@@ -141,8 +135,6 @@ struct prop {
 #define WORN_BOOTS	W_ARMF
 #define WORN_AMUL	W_AMUL
 #define WORN_BLINDF	W_TOOL
-#ifdef TOURIST
 #define WORN_SHIRT	W_ARMU
-#endif
 
 #endif /* PROP_H */

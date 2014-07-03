@@ -158,9 +158,7 @@ NEARDATA struct obj *invent = (struct obj *)0,
 	*uwep = (struct obj *)0, *uarm = (struct obj *)0,
 	*uswapwep = (struct obj *)0,
 	*uquiver = (struct obj *)0, /* quiver */
-#ifdef TOURIST
 	*uarmu = (struct obj *)0, /* under-wear, so to speak */
-#endif
 	*uskin = (struct obj *)0, /* dragon armor, if a dragon */
 	*uarmc = (struct obj *)0, *uarmh = (struct obj *)0,
 	*uarms = (struct obj *)0, *uarmg = (struct obj *)0,
@@ -219,9 +217,7 @@ NEARDATA char wolfname[PL_PSIZ] = DUMMY;
 NEARDATA char crocodilename[PL_PSIZ] = DUMMY;
 /* ...and 'preferred_pet', just below, can now be 'e'. */
 #endif
-#ifdef CONVICT
 NEARDATA char ratname[PL_PSIZ] = DUMMY;
-#endif /* CONVICT */
 
 char preferred_pet;	/* '\0', 'c', 'd', 'n' (none) */
 /* monsters that went down/up together with @ */

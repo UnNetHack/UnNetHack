@@ -14,9 +14,7 @@ equipname(otmp)
 register struct obj *otmp;
 {
 	return (
-#ifdef TOURIST
 		(otmp == uarmu) ? "shirt" :
-#endif
 		(otmp == uarmf) ? "boots" :
 		(otmp == uarms) ? "shield" :
 		(otmp == uarmg) ? "gloves" :
@@ -196,9 +194,7 @@ boolean unchain_ball;	/* whether to unpunish or just unwield */
 	    else if (obj == uarmg) (void) Gloves_off();
 	    else if (obj == uarmh) (void) Helmet_off();
 	    else if (obj == uarms) (void) Shield_off();
-#ifdef TOURIST
 	    else if (obj == uarmu) (void) Shirt_off();
-#endif
 	    /* catchall -- should never happen */
 	    else setworn((struct obj *)0, obj->owornmask & W_ARMOR);
 	} else if (obj->owornmask & W_AMUL) {
@@ -300,10 +296,8 @@ nothing_to_steal:
 	    otmp = uwep;
 	/* can't steal armor while wearing cloak - so steal the cloak. */
 	else if(otmp == uarm && uarmc) otmp = uarmc;
-#ifdef TOURIST
 	else if(otmp == uarmu && uarmc) otmp = uarmc;
 	else if(otmp == uarmu && uarm) otmp = uarm;
-#endif
 gotobj:
 	if(otmp->o_id == stealoid) return(0);
 
@@ -527,12 +521,10 @@ boolean verbosely;
 	    update_mon_intrinsics(mon, obj, FALSE, TRUE);
 	 /* obj_no_longer_held(obj); -- done by place_object */
 	    if (obj->owornmask & W_WEP) setmnotwielded(mon, obj);
-#ifdef STEED
 	/* don't charge for an owned saddle on dead steed */
 	} else if (mon->mtame && (obj->owornmask & W_SADDLE) && 
 		!obj->unpaid && costly_spot(omx, omy)) {
 	    obj->no_charge = 1;
-#endif
 	}
 	obj->owornmask = 0L;
     }

@@ -839,7 +839,6 @@ boolean want_disp;
 	dump_title(buf);
 	dump_list_start();
 
-#ifdef ELBERETH
 	if (u.uevent.uhand_of_elbereth) {
 	    static const char * const hofe_titles[3] = {
 				"the Hand of Elbereth",
@@ -848,7 +847,6 @@ boolean want_disp;
 	    };
 	    you_are(hofe_titles[u.uevent.uhand_of_elbereth - 1]);
 	}
-#endif
 
 	/* heaven or hell modes */
 	if (heaven_or_hell_mode) {
@@ -918,11 +916,9 @@ boolean want_disp;
 			if (u.usick_type & SICK_NONVOMITABLE)
 				you_are("sick from illness");
 		}
-#ifdef CONVICT
 		if (Punished) {
 			you_are("punished");
 		}
-#endif /* CONVICT */
 	}
 	if (Stoned) you_are("turning to stone");
 	if (Slimed) you_are("turning into slime");
@@ -933,14 +929,12 @@ boolean want_disp;
 	}
 	if (Fumbling) enl_msg("You fumble", "", "d", "");
 	if (Wounded_legs
-#ifdef STEED
 	    && !u.usteed
-#endif
 			  ) {
 		Sprintf(buf, "wounded %s", makeplural(body_part(LEG)));
 		you_have(buf);
 	}
-#if defined(WIZARD) && defined(STEED)
+#if defined(WIZARD)
 	if (Wounded_legs && u.usteed && (wizard || final)) {
 	    Strcpy(buf, x_monnam(u.usteed, ARTICLE_YOUR, (char *)0, 
 		    SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION, FALSE));
@@ -1012,7 +1006,6 @@ boolean want_disp;
 	if (Breathless) you_can("survive without air");
 	else if (Amphibious) you_can("breathe water");
 	if (Passes_walls) you_can("walk through walls");
-#ifdef STEED
 	/* If you die while dismounting, u.usteed is still set.  Since several
 	 * places in the done() sequence depend on u.usteed, just detect this
 	 * special case. */
@@ -1020,7 +1013,6 @@ boolean want_disp;
 	    Sprintf(buf, "riding %s", y_monnam(u.usteed));
 	    you_are(buf);
 	}
-#endif
 	if (u.uswallow) {
 	    Sprintf(buf, "swallowed by %s", a_monnam(u.ustuck));
 #ifdef WIZARD
@@ -1527,7 +1519,6 @@ boolean want_disp;
 	}
 
 #ifdef ELBERETH_CONDUCT
-#ifdef ELBERETH
 	/* no point displaying the conduct if Elbereth doesn't do anything */
 	if (flags.elberethignore) {
 	    you_have_been("ignored by Elbereth");
@@ -1540,7 +1531,6 @@ boolean want_disp;
 		you_have_never("engraved Elbereth");
 	    }
 	}
-#endif /* ELBERETH */
 #endif /* ELBERETH_CONDUCT */
 
 	if ((wizard || final) && !u.uconduct.bones) {
@@ -1584,9 +1574,7 @@ boolean want_disp;
 
 static const struct func_tab cmdlist[] = {
 	{C('d'), FALSE, dokick, NULL}, /* "D" is for door!...?  Msg is in dokick.c */
-#ifdef ELBERETH
 	{C('e'), TRUE, doengrave_elbereth, NULL},
-#endif
 #ifdef WIZARD
 	{C('f'), TRUE, wiz_map, NULL},
 	{C('g'), TRUE, wiz_genesis, NULL},
@@ -1724,9 +1712,7 @@ struct ext_func_tab extcmdlist[] = {
 	{"overview", "show an overview of the dungeon", dooverview, TRUE},
 	{"pray", "pray to the gods for help", dopray, TRUE},
 	{"quit", "exit without saving current game", done2, TRUE},
-#ifdef STEED
 	{"ride", "ride (or stop riding) a monster", doride, FALSE},
-#endif
 	{"rub", "rub a lamp or a stone", dorub, FALSE},
 #ifdef DUMP_LOG
 	{"screenshot", "output current map to a html file", dump_screenshot, FALSE},

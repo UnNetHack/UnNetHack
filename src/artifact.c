@@ -669,7 +669,6 @@ touch_artifact(obj,mon)
 	if (yours) pline("%s your grasp!", Tobjnam(obj, "evade"));
 	return 0;
     }
-#ifdef CONVICT
     /* This is a kludge, but I'm not sure where else to put it */
     if (oart == &artilist[ART_IRON_BALL_OF_LIBERATION]) {
 	if (Role_if(PM_CONVICT) && ((!obj->oerodeproof) || (obj->owt != 300))) {
@@ -681,7 +680,6 @@ touch_artifact(obj,mon)
 	    unpunish(); /* Remove a mundane heavy iron ball */
 	}
     }
-#endif /* CONVICT */
 
     return 1;
 }
@@ -1658,7 +1656,6 @@ arti_invoke(obj)
 					8+4*bcsign(obj), rn1(3,4));
 	    break;
 	}
-#ifdef CONVICT
 	case PHASING:   /* Walk through walls and stone like a xorn */
         if (Passes_walls) goto nothing_special;
 	    if (oart == &artilist[ART_IRON_BALL_OF_LIBERATION]) {
@@ -1686,7 +1683,6 @@ arti_invoke(obj)
         incr_itimeout(&Phasing, (50 + rnd(100)));
         obj->age += Phasing; /* Time begins after phasing ends */
         break;
-#endif /* CONVICT */
 	  }
 	}
     } else {

@@ -206,10 +206,8 @@ boolean
 can_reach_floor()
 {
 	return (boolean)(!u.uswallow &&
-#ifdef STEED
 			/* Restricted/unskilled riders can't reach the floor */
 			!(u.usteed && P_SKILL(P_RIDING) < P_BASIC) &&
-#endif
 			 (!Levitation ||
 			  Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)));
 }
@@ -291,7 +289,6 @@ xchar x, y;
 	return((struct engr *) 0);
 }
 
-#ifdef ELBERETH
 /* Decide whether a particular string is engraved at a specified
  * location; a case-insensitive substring match used.
  * Ignore headstones, in case the player names herself "Elbereth".
@@ -306,7 +303,6 @@ sengr_at(s, x, y)
 	return (ep && ep->engr_type != HEADSTONE &&
 		ep->engr_time <= moves && strstri(ep->engr_txt, s) != 0);
 }
-#endif /* ELBERETH */
 
 #ifdef ELBERETH_CONDUCT
 /** Return the number of distinct times Elbereth is engraved at
@@ -536,7 +532,6 @@ doengrave()
 	return engrave(NULL, FALSE);
 }
 
-#ifdef ELBERETH
 int
 doengrave_elbereth()
 {
@@ -547,7 +542,6 @@ doengrave_elbereth()
 	    return engrave("Elbereth", TRUE);
 	}
 }
-#endif
 
 static
 int

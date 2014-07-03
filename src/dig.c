@@ -266,14 +266,12 @@ dig()
 		    You("fumble and drop your %s.", xname(uwep));
 		    dropx(uwep);
 		} else {
-#ifdef STEED
 		    if (u.usteed)
 			Your("%s %s and %s %s!",
 			     xname(uwep),
 			     otense(uwep, "bounce"), otense(uwep, "hit"),
 			     mon_nam(u.usteed));
 		    else
-#endif
 			pline("Ouch!  Your %s %s and %s you!",
 			      xname(uwep),
 			      otense(uwep, "bounce"), otense(uwep, "hit"));

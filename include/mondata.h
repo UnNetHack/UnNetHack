@@ -93,16 +93,10 @@
 #define is_bat(ptr)		((ptr) == &mons[PM_BAT] || \
 				 (ptr) == &mons[PM_GIANT_BAT] || \
 				 (ptr) == &mons[PM_VAMPIRE_BAT])
-#ifdef CONVICT
 # define is_rat(ptr)		((ptr) == &mons[PM_SEWER_RAT] || \
 				 (ptr) == &mons[PM_GIANT_RAT] || \
 				 (ptr) == &mons[PM_RABID_RAT] || \
 				 (ptr) == &mons[PM_ENORMOUS_RAT])
-#else /* CONVICT */
-# define is_rat(ptr)		((ptr) == &mons[PM_SEWER_RAT] || \
-				 (ptr) == &mons[PM_GIANT_RAT] || \
-				 (ptr) == &mons[PM_RABID_RAT])
-#endif /* CONVICT */
 #define is_bird(ptr)		((ptr)->mlet == S_BAT && !is_bat(ptr))
 #define is_giant(ptr)		(((ptr)->mflags2 & M2_GIANT) != 0L)
 #define is_golem(ptr)		((ptr)->mlet == S_GOLEM)
@@ -271,13 +265,8 @@
 				   ((ptr)->mlet != S_GOLEM || (ptr) == &mons[PM_FLESH_GOLEM]) && \
 				   (!is_undead(ptr) || is_vampire(ptr)))
 
-#ifdef CONVICT
 #define befriend_with_obj(ptr, obj) ((obj)->oclass == FOOD_CLASS && \
 				     (is_domestic(ptr) || (is_rat(ptr) && Role_if(PM_CONVICT))))
-#else
-#define befriend_with_obj(ptr, obj) ((obj)->oclass == FOOD_CLASS && \
-				     is_domestic(ptr))
-#endif
 
 #define is_rockbreaker(ptr)	(((ptr)->msound == MS_LEADER || \
 				  is_blkmktstaff((ptr)) || \

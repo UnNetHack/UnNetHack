@@ -323,7 +323,6 @@ mattacku(mtmp)
 	    if(u.uinvulnerable) return (0); /* stomachs can't hurt you! */
 	}
 
-#ifdef STEED
 	else if (u.usteed) {
 		if (mtmp == u.usteed)
 			/* Your steed won't attack you */
@@ -341,7 +340,6 @@ mattacku(mtmp)
 			return (!!(mattackm(u.usteed, mtmp) & MM_DEF_DIED));
 		}
 	}
-#endif
 
 	if (u.uundetected && !range2 && foundyou && !u.uswallow) {
 		u.uundetected = 0;
@@ -733,10 +731,8 @@ int attk;
 		 */
 		if (uarm)
 		    (void)rust_dmg(uarm, xname(uarm), hurt, TRUE, &youmonst);
-#ifdef TOURIST
 		else if (uarmu)
 		    (void)rust_dmg(uarmu, xname(uarmu), hurt, TRUE, &youmonst);
-#endif
 		break;
 	    case 2:
 		if (!uarms || !rust_dmg(uarms, xname(uarms), hurt, FALSE, &youmonst))
@@ -777,9 +773,7 @@ struct attack *mattk;
 {
 	struct obj *obj = (uarmc ? uarmc : uarm);
 
-#ifdef TOURIST
 	if (!obj) obj = uarmu;
-#endif
 	if (mattk->adtyp == AD_DRIN) obj = uarmh;
 
 	/* if your cloak/armor is greased, monster slips off; this
@@ -826,11 +820,9 @@ struct monst *mon;
 
 	/* armor types for shirt, gloves, shoes, and shield don't currently
 	   provide any magic cancellation but we might as well be complete */
-#ifdef TOURIST
 	armor = (mon == &youmonst) ? uarmu : which_armor(mon, W_ARMU);
 	if (armor && armpro < objects[armor->otyp].a_can)
 	    armpro = objects[armor->otyp].a_can;
-#endif
 	armor = (mon == &youmonst) ? uarmg : which_armor(mon, W_ARMG);
 	if (armor && armpro < objects[armor->otyp].a_can)
 	    armpro = objects[armor->otyp].a_can;
@@ -841,12 +833,10 @@ struct monst *mon;
 	if (armor && armpro < objects[armor->otyp].a_can)
 	    armpro = objects[armor->otyp].a_can;
 
-#ifdef STEED
 	/* this one is really a stretch... */
 	armor = (mon == &youmonst) ? 0 : which_armor(mon, W_SADDLE);
 	if (armor && armpro < objects[armor->otyp].a_can)
 	    armpro = objects[armor->otyp].a_can;
-#endif
 
 	return armpro;
 }
@@ -1159,9 +1149,7 @@ dopois:
 		 * [FIXME: why can't a flying attacker overcome this?]
 		 */
 		  if (
-#ifdef STEED
 			u.usteed ||
-#endif
 				    Levitation || Flying) {
 		    pline("%s tries to reach your %s %s!", Monnam(mtmp),
 			  sidestr, body_part(LEG));
@@ -1432,9 +1420,7 @@ dopois:
 		}
 		/* this condition must match the one in sounds.c for MS_NURSE */
 		if ((!(uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
-#ifdef TOURIST
 		   && !uarmu
-#endif
 		   && !uarm && !uarmh && !uarms && !uarmg && !uarmc && !uarmf) {
 		    boolean goaway = FALSE;
 		    pline("%s hits!  (I hope you don't mind.)", Monnam(mtmp));
@@ -1674,11 +1660,9 @@ dopois:
 						} else if (uarm) {
 							if (!oresist_disintegration(uarm))
 								destroyme = uarm;
-#ifdef TOURIST
 						} else if (uarmu) {
 							if (!oresist_disintegration(uarmu))
 								destroyme = uarmu;
-#endif
 						} else
 							touched = 1;
 						break;
@@ -1790,7 +1774,6 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 		place_monster(mtmp, u.ux, u.uy);
 		u.ustuck = mtmp;
 		newsym(mtmp->mx,mtmp->my);
-#ifdef STEED
 		if (is_animal(mtmp->data) && u.usteed) {
 			char buf[BUFSZ];
 			/* Too many quirks presently if hero and steed
@@ -1802,7 +1785,6 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 				Monnam(mtmp), buf);
 			dismount_steed(DISMOUNT_ENGULFED);
 		} else
-#endif
 		pline("%s engulfs you!", Monnam(mtmp));
 		stop_occupation();
 		reset_occupations();	/* behave as if you had moved */
@@ -1957,9 +1939,7 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 			/* no shield or suit, you're dead; wipe out cloak
 			   and/or shirt in case of life-saving or bones */
 			if (uarmc) (void) destroy_arm(uarmc);
-#ifdef TOURIST
 			if (uarmu) (void) destroy_arm(uarmu);
-#endif
 			You("are disintegrated!");
 			tmp = u.uhp;
 			if (Half_physical_damage) tmp *= 2; /* sorry */
@@ -2485,9 +2465,7 @@ register struct monst *mon;
 	}
 
 	if (!uarmc && !uarmf && !uarmg && !uarms && !uarmh
-#ifdef TOURIST
 								&& !uarmu
-#endif
 									)
 		pline("%s murmurs sweet nothings into your ear.",
 			Blind ? (fem ? "She" : "He") : Monnam(mon));
@@ -2502,10 +2480,8 @@ register struct monst *mon;
 		mayberem(uarmg, "gloves");
 	mayberem(uarms, "shield");
 	mayberem(uarmh, "helmet");
-#ifdef TOURIST
 	if(!uarmc && !uarm)
 		mayberem(uarmu, "shirt");
-#endif
 
 	if (uarm || uarmc) {
 		verbalize("You're such a %s; I wish...",
@@ -2710,9 +2686,7 @@ const char *str;
 			(obj == uarmc || obj == uarms) ? "it's in the way" :
 			(obj == uarmf) ? "let me rub your feet" :
 			(obj == uarmg) ? "they're too clumsy" :
-#ifdef TOURIST
 			(obj == uarmu) ? "let me massage you" :
-#endif
 			/* obj == uarmh */
 			hairbuf);
 	}

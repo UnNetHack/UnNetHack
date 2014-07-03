@@ -5,8 +5,6 @@
 #include "hack.h"
 
 
-#ifdef STEED
-
 /* Monsters that might be ridden */
 static NEARDATA const char steeds[] = {
 	S_QUADRUPED, S_UNICORN, S_ANGEL, S_CENTAUR, S_DRAGON, S_JABBERWOCK, '\0'
@@ -655,7 +653,5 @@ int x, y;
     if (mon->data == &mons[PM_GIANT_TURTLE] && (!mon->minvis || See_invisible))
 	block_point(x,y);
 }
-
-#endif /* STEED */
 
 /*steed.c*/

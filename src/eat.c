@@ -931,10 +931,8 @@ register int pm;
 		    char buf[BUFSZ];
 		    You_cant("resist the temptation to mimic %s.",
 			Hallucination ? "an orange" : "a pile of gold");
-#ifdef STEED
                     /* A pile of gold can't ride. */
 		    if (u.usteed) dismount_steed(DISMOUNT_FELL);
-#endif
 		    nomul(-tmp, "pretending to be a pile of gold");
 		    Sprintf(buf, Hallucination ?
 			"You suddenly dread being peeled and mimic %s again!" :
@@ -1326,9 +1324,7 @@ struct obj *obj;
 		    what = "you lose control of",  where = "yourself";
 		else
 		    what = "you slap against the", where =
-#ifdef STEED
 			   (u.usteed) ? "saddle" :
-#endif
 			   surface(u.ux,u.uy);
 		pline_The("world spins and %s %s.", what, where);
 		flags.soundok = 0;
@@ -1562,18 +1558,14 @@ struct obj *otmp;
 			  "Mmm, tripe... not bad!");
 		else {
 		    pline("Yak - dog food!");
-#ifdef CONVICT
 		    if (Role_if(PM_CONVICT))
 			pline("At least it's not prison food.");
-#endif /* CONVICT */
 		    more_experienced(1,1,0);
 		    newexplevel();
 		    /* not cannibalism, but we use similar criteria
 		       for deciding whether to be sickened by this meal */
 		    if (rn2(2) && !CANNIBAL_ALLOWED())
-#ifdef CONVICT
 		    if (!Role_if(PM_CONVICT))
-#endif /* CONVICT */
 			make_vomiting((long)rn1(victual.reqtime, 14), FALSE);
 		}
 		break;
@@ -1612,11 +1604,9 @@ struct obj *otmp;
 #endif
 		if (otmp->otyp == EGG && stale_egg(otmp)) {
 		    pline("Ugh.  Rotten egg.");	/* perhaps others like it */
-#ifdef CONVICT
 		if (Role_if(PM_CONVICT) && (rn2(8) > u.ulevel)) {
 		    You_feel("a slight stomach ache.");	/* prisoners are used to bad food */
 		} else
-#endif /* CONVICT */
 		    make_vomiting(Vomiting+d(10,4), TRUE);
 		} else
  give_feedback:
@@ -2095,9 +2085,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	    You("cannot eat that!");
 	    return 0;
 	} else if ((otmp->owornmask & (W_ARMOR|W_TOOL|W_AMUL
-#ifdef STEED
 			|W_SADDLE
-#endif
 			)) != 0) {
 	    /* let them eat rings */
 	    You_cant("eat %s you're wearing.", something);
@@ -2369,10 +2357,8 @@ gethungry()	/* as time goes by - called by moveloop() and domove() */
 	if ((!u.usleep || !rn2(10))	/* slow metabolic rate while asleep */
 		&& (carnivorous(youmonst.data) || herbivorous(youmonst.data) ||
 		    is_vampire(youmonst.data))
-#ifdef CONVICT
 		/* Convicts can last twice as long at hungry and below */
 		&& (!Role_if(PM_CONVICT) || (moves % 2) || (u.uhs < HUNGRY))
-#endif /* CONVICT */
 		&& !Slow_digestion)
 	    u.uhunger--;		/* ordinary food consumption */
 
@@ -2647,9 +2633,7 @@ floorfood(verb,corpsecheck)	/* get food from floor or pack */
 
 	/* if we can't touch floor objects then use invent food only */
 	if (!can_reach_floor() ||
-#ifdef STEED
 		(feeding && u.usteed) || /* can't eat off floor while riding */
-#endif
 		((is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) &&
 		    (Wwalking || is_clinger(youmonst.data) ||
 			(Flying && !Breathless))))

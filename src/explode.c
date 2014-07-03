@@ -128,10 +128,8 @@ int expltype;
 		}
 		/* can be both you and mtmp if you're swallowed */
 		mtmp = m_at(i+x-1, j+y-1);
-#ifdef STEED
 		if (!mtmp && i+x-1 == u.ux && j+y-1 == u.uy)
 			mtmp = u.usteed;
-#endif
 		if (mtmp) {
 		    if (mtmp->mhp < 1) explmask[i][j] = 2;
 		    else switch(adtyp) {
@@ -234,10 +232,8 @@ int expltype;
 		    		type, &shopdamage);
 
 		mtmp = m_at(i+x-1, j+y-1);
-#ifdef STEED
 		if (!mtmp && i+x-1 == u.ux && j+y-1 == u.uy)
 			mtmp = u.usteed;
-#endif
 		if (!mtmp) continue;
 		if (u.uswallow && mtmp == u.ustuck) {
 			if (is_animal(u.ustuck->data))

@@ -36,7 +36,6 @@
 #define BY_PAPER	2
 #define BY_OTHER	9
 
-#ifdef STEED
 /* Macros for why you are no longer riding */
 #define DISMOUNT_GENERIC	0
 #define DISMOUNT_FELL		1
@@ -46,7 +45,6 @@
 #define DISMOUNT_BONES		5
 #define DISMOUNT_BYCHOICE	6
 #define DISMOUNT_VANISHED	7
-#endif
 
 /* Special returns from mapglyph() */
 #define MG_CORPSE	0x01

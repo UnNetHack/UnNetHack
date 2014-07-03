@@ -683,13 +683,11 @@ register char *enterstring;
 		    return;
 	    }
 	}
-#ifdef CONVICT
 	/* Visible striped prison shirt */
 	if (!Is_blackmarket(&u.uz) && 
 		(uarmu && (uarmu->otyp == STRIPED_SHIRT)) && !uarm && !uarmc) {
 	    eshkp->pbanned = TRUE;
 	}
-#endif /* CONVICT */
  
 	rt = rooms[*enterstring - ROOMOFFSET].rtype;
 
@@ -701,9 +699,7 @@ register char *enterstring;
 	} else if (eshkp->robbed) {
 	    pline("%s mutters imprecations against shoplifters.", shkname(shkp));
 	} else {
-#ifdef CONVICT
         if (!eshkp->pbanned || inside_shop(u.ux, u.uy))
-#endif /* CONVICT */
 	    verbalize("%s, %s!  Welcome%s to %s %s!",
 		      Hello(shkp), plname,
 		      eshkp->visitct++ ? " again" : "",
@@ -755,18 +751,14 @@ register char *enterstring;
 			  "Leave the %s%s outside.",
 			  tool, plur(cnt));
 		should_block = TRUE;
-#ifdef STEED
 	    } else if (u.usteed) {
 		verbalize(NOTANGRY(shkp) ?
 			  "Will you please leave %s outside?" :
 			  "Leave %s outside.", y_monnam(u.usteed));
 		should_block = TRUE;
-#endif
-#ifdef CONVICT
 	    } else if (eshkp->pbanned) {
 	    verbalize("I don't sell to your kind here.");
 		should_block = TRUE;
-#endif
 	    } else {
 		should_block = (Fast && (sobj_at(PICK_AXE, u.ux, u.uy) ||
 					 sobj_at(DWARVISH_MATTOCK, u.ux, u.uy) ||
@@ -1784,9 +1776,7 @@ int croaked;	/* -1: escaped dungeon; 0: quit; 1: died */
 		else {
 		    numsk++;
 		    taken |= inherits(mtmp, numsk, croaked);
-#ifdef CONVICT
 		    ESHK(mtmp)->pbanned = FALSE; /* Un-ban for bones levels */
-#endif /* CONVICT */
 		}
 	    }
 	}
@@ -2091,12 +2081,10 @@ register struct monst *shkp;	/* if angry, impose a surcharge */
 		} else if (!(obj->o_id % 4)) /* arbitrarily impose surcharge */
 		    tmp += tmp / 3L;
 	}
-#ifdef TOURIST
 	if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV/2))
 	    || (uarmu && !uarm && !uarmc))	/* touristy shirt visible */
 		tmp += tmp / 3L;
 	else
-#endif
 	if (uarmh && uarmh->otyp == DUNCE_CAP)
 		tmp += tmp / 3L;
 
@@ -2119,17 +2107,9 @@ register struct monst *shkp;	/* if angry, impose a surcharge */
 	      obj->oclass==SPBOOK_CLASS  || obj->oclass==WAND_CLASS     ||
 	      obj->otyp==LUCKSTONE       || obj->otyp==LOADSTONE        || 
 	      objects[obj->otyp].oc_magic) {
-#ifdef CONVICT
 	    tmp *= Role_if(PM_CONVICT) ? 20 : 25;
-#else
-	    tmp *= 25;
-#endif
 	  } else {
-#ifdef CONVICT
 	    tmp *= Role_if(PM_CONVICT) ? 12 : 15;
-#else
-	    tmp *= 15;
-#endif
 	  }
 	}
 #endif /* BLACKMARKET */
@@ -2237,12 +2217,10 @@ register struct monst *shkp;
 {
 	long tmp = getprice(obj, TRUE) * obj->quan;
 
-#ifdef TOURIST
 	if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV/2))
 	    || (uarmu && !uarm && !uarmc))	/* touristy shirt visible */
 		tmp /= 3L;
 	else
-#endif
 	if (uarmh && uarmh->otyp == DUNCE_CAP)
 		tmp /= 3L;
 	else
@@ -3472,9 +3450,7 @@ register struct monst *shkp;
 #define	GDIST(x,y)	(dist2(x,y,gx,gy))
 
 		if ((!Is_blackmarket(&u.uz) && (Invis 
-#ifdef STEED
 			|| u.usteed
-#endif
 			                          ) && !inside_shop(u.ux, u.uy)))
 		{
 		    avoid = FALSE;
@@ -3485,9 +3461,7 @@ register struct monst *shkp;
 				  (carrying(PICK_AXE) ||
 				   carrying(DWARVISH_MATTOCK) ||
 				   carrying(CRYSTAL_PICK) ||
-#ifdef CONVICT
 				  eshkp->pbanned ||
-#endif /* CONVICT */
 				   (Fast && (sobj_at(PICK_AXE, u.ux, u.uy) ||
 				             sobj_at(DWARVISH_MATTOCK, u.ux, u.uy) ||
 				             sobj_at(CRYSTAL_PICK, u.ux, u.uy)))));
@@ -4114,9 +4088,7 @@ boolean altusage; /* some items have an "alternate" use with different cost */
 		tmp -= tmp / 5L;
 	} else if (otmp->otyp == CAN_OF_GREASE ||
 		   otmp->otyp == TINNING_KIT
-#ifdef TOURIST
 		   || otmp->otyp == EXPENSIVE_CAMERA
-#endif
 		   ) {
 		tmp /= 10L;
 	} else if (otmp->otyp == POT_OIL) {
@@ -4273,9 +4245,7 @@ register xchar x, y;
 		  (carrying(PICK_AXE) ||
 		   carrying(DWARVISH_MATTOCK) ||
 		   carrying(CRYSTAL_PICK)))
-#ifdef STEED
 			|| u.usteed
-#endif
 	  )) {
 		pline("%s%s blocks your way!", shkname(shkp),
 				Invis ? " senses your motion and" : "");

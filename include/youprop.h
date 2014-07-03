@@ -235,12 +235,8 @@
 				 !is_floater(youmonst.data))
 
 #define EFlying			u.uprops[FLYING].extrinsic
-#ifdef STEED
 # define Flying			(EFlying || is_flyer(youmonst.data) || \
 				 (u.usteed && is_flyer(u.usteed->data)))
-#else
-# define Flying			(EFlying || is_flyer(youmonst.data))
-#endif
 	/* May touch surface; does not override any others */
 
 #define Wwalking		(u.uprops[WWALKING].extrinsic && \
@@ -250,14 +246,9 @@
 
 #define HSwimming		u.uprops[SWIMMING].intrinsic
 #define ESwimming		u.uprops[SWIMMING].extrinsic	/* [Tom] */
-#ifdef STEED
 # define Swimming		(HSwimming || ESwimming || \
 				 is_swimmer(youmonst.data) || \
 				 (u.usteed && is_swimmer(u.usteed->data)))
-#else
-# define Swimming		(HSwimming || ESwimming || \
-				 is_swimmer(youmonst.data))
-#endif
 	/* Get wet, don't go under water unless if amphibious */
 
 #define HMagical_breathing	u.uprops[MAGICAL_BREATHING].intrinsic
@@ -278,9 +269,7 @@
 #define EPasses_walls		u.uprops[PASSES_WALLS].extrinsic
 #define Passes_walls		(HPasses_walls || EPasses_walls || \
 				 passes_walls(youmonst.data))
-#ifdef CONVICT
 # define Phasing            u.uprops[PASSES_WALLS].intrinsic
-#endif /* CONVICT */
 
 /*** Physical attributes ***/
 #define HSlow_digestion		u.uprops[SLOW_DIGESTION].intrinsic

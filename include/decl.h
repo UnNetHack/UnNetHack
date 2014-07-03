@@ -239,9 +239,7 @@ E NEARDATA char monkeyname[];
 E NEARDATA char wolfname[];
 E NEARDATA char crocodilename[];
 #endif
-#ifdef CONVICT
 E NEARDATA char ratname[];
-#endif /* CONVICT */
 E char preferred_pet;
 E const char *occtxt;			/* defined when occupation != NULL */
 E const char *nomovemsg;
@@ -299,9 +297,7 @@ E uchar monsyms[MAXMCLASSES];		/* current class symbols */
 #include "obj.h"
 E NEARDATA struct obj *invent,
 	*uarm, *uarmc, *uarmh, *uarms, *uarmg, *uarmf,
-#ifdef TOURIST
 	*uarmu,				/* under-wear, so to speak */
-#endif
 	*uskin, *uamul, *uleft, *uright, *ublindf,
 	*uwep, *uswapwep, *uquiver;
 

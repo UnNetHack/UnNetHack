@@ -910,9 +910,7 @@ register const char *let,*word;
 		if ((taking_off(word) &&
 		    (!(otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL))
 		     || (otmp==uarm && uarmc)
-#ifdef TOURIST
 		     || (otmp==uarmu && (uarm || uarmc))
-#endif
 		    ))
 		|| (putting_on(word) &&
 		     (otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL)))
@@ -1001,10 +999,8 @@ register const char *let,*word;
 			|| otmp->otyp == TIN
 			|| otmp->otyp == CAN_OF_GREASE
 			|| otmp->otyp == CANDY_BAR
-#ifdef TOURIST
 			|| otmp->otyp == T_SHIRT
 			|| otmp->otyp == CREDIT_CARD
-#endif
 			|| otmp->otyp == MAGIC_MARKER
 #ifdef GOLDOBJ
 			|| otmp->oclass == COIN_CLASS
@@ -1250,9 +1246,7 @@ boolean
 wearing_armor()
 {
 	return((boolean)(uarm || uarmc || uarmf || uarmg || uarmh || uarms
-#ifdef TOURIST
 		|| uarmu
-#endif
 		));
 }
 
@@ -1261,9 +1255,7 @@ is_worn(otmp)
 register struct obj *otmp;
 {
     return((boolean)(!!(otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL |
-#ifdef STEED
 			W_SADDLE |
-#endif
 			W_WEP | W_SWAPWEP | W_QUIVER))));
 }
 
@@ -1858,9 +1850,7 @@ struct obj *obj;
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'a', 0, ATR_NONE,
 				"Use the can to grease an item", MENU_UNSELECTED);
 	else if (obj->otyp == LOCK_PICK ||
-#ifdef TOURIST
 			obj->otyp == CREDIT_CARD ||
-#endif
 			obj->otyp == SKELETON_KEY)
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'a', 0, ATR_NONE,
 				"Use this tool to pick a lock", MENU_UNSELECTED);
@@ -1912,11 +1902,9 @@ struct obj *obj;
 				"Dip something into this potion", MENU_UNSELECTED);
 	}
 #endif
-#ifdef TOURIST
 	else if (obj->otyp == EXPENSIVE_CAMERA)
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'a', 0, ATR_NONE,
 				"Take a photograph", MENU_UNSELECTED);
-#endif
 	else if (obj->otyp == TOWEL)
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'a', 0, ATR_NONE,
 				"Clean yourself off with this towel", MENU_UNSELECTED);
@@ -3126,16 +3114,10 @@ doprarm()
 	if(!wearing_armor())
 		You("are not wearing any armor.");
 	else {
-#ifdef TOURIST
 		char lets[8];
-#else
-		char lets[7];
-#endif
 		register int ct = 0;
 
-#ifdef TOURIST
 		if(uarmu) lets[ct++] = obj_to_let(uarmu);
-#endif
 		if(uarm) lets[ct++] = obj_to_let(uarm);
 		if(uarmc) lets[ct++] = obj_to_let(uarmc);
 		if(uarmh) lets[ct++] = obj_to_let(uarmh);
@@ -3180,9 +3162,7 @@ tool_in_use(obj)
 struct obj *obj;
 {
 	if ((obj->owornmask & (W_TOOL
-#ifdef STEED
 			| W_SADDLE
-#endif
 			)) != 0L) return TRUE;
 	if (obj->oclass != TOOL_CLASS) return FALSE;
 	return (boolean)(obj == uwep || obj->lamplit ||

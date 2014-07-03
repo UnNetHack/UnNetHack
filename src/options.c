@@ -79,9 +79,7 @@ static struct Bool_Opt
 #else
 	{"DECgraphics", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
-#ifdef ELBERETH
 	{"elberethignore", &flags.elberethignore, FALSE, SET_IN_FILE},
-#endif
 	{"eight_bit_tty", &iflags.wc_eight_bit_input, FALSE, SET_IN_FILE},	/*WC*/
 #if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
 	{"extmenu", &iflags.extmenu, FALSE, SET_IN_GAME},
@@ -391,10 +389,8 @@ static struct Comp_Opt
 						12, DISP_IN_GAME },
 	{ "race",     "your starting race (e.g., Human, Elf)",
 						PL_CSIZ, DISP_IN_GAME },
-#ifdef CONVICT
 	{ "ratname",  "the name of your (first) rat (e.g., ratname:Squeak)",
 						PL_PSIZ, DISP_IN_GAME },
-#endif /* CONVICT */
 	{ "role",     "your starting role (e.g., Barbarian, Valkyrie)",
 						PL_CSIZ, DISP_IN_GAME },
 	{ "runmode", "display frequency when `running' or `travelling'",
@@ -1815,7 +1811,6 @@ boolean tinitial, tfrom_file;
 		return;
 	}
 
-#ifdef CONVICT
 	fullname = "ratname";
 	if (match_optname(opts, fullname, 3, TRUE)) {
 		if (negated) bad_negation(fullname, FALSE);
@@ -1823,7 +1818,6 @@ boolean tinitial, tfrom_file;
 			nmcpy(ratname, op, PL_PSIZ);
 		return;
 	}
-#endif /* CONVICT */
 
 	fullname = "nameempty";
 	if (match_optname(opts, fullname, sizeof("nameempty")-1, TRUE)) {
@@ -4056,10 +4050,8 @@ char *buf;
 	     }
 	else if (!strcmp(optname, "race"))
 		Sprintf(buf, "%s", rolestring(flags.initrace, races, noun));
-#ifdef CONVICT
 	else if (!strcmp(optname, "ratname")) 
 		Sprintf(buf, "%s", ratname[0] ? catname : none );
-#endif /* CONVICT */
 	else if (!strcmp(optname, "role"))
 		Sprintf(buf, "%s", rolestring(flags.initrole, roles, name.m));
 	else if (!strcmp(optname, "runmode"))

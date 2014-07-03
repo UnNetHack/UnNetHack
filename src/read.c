@@ -63,7 +63,6 @@ doread()
 	    }
 	    useup(scroll);
 	    return(1);
-#ifdef TOURIST
 	} else if (scroll->otyp == T_SHIRT) {
 	    static const char *shirt_msgs[] = { /* Scott Bigham */
     "I explored the Dungeons of Doom and all I got was this lousy T-shirt!",
@@ -196,7 +195,6 @@ doread()
 				(int)(!(scroll->o_id % 3)), (int)((scroll->o_id * 7) % 10));
 		u.uconduct.literate++;
 		return 1;
-#endif	/* TOURIST */
 	} else if ((scroll->otyp == TIN) ||
 		   (scroll->otyp == CAN_OF_GREASE) ||
 		   (scroll->otyp == CANDY_BAR)) {
@@ -511,9 +509,7 @@ int curse_bless;
 		break;
 	    case MAGIC_MARKER:
 	    case TINNING_KIT:
-#ifdef TOURIST
 	    case EXPENSIVE_CAMERA:
-#endif
 		if (is_cursed) stripspe(obj);
 		else if (rechrg && obj->otyp == MAGIC_MARKER) {	/* previously recharged */
 		    obj->recharged = 1;	/* override increment done above */
@@ -2101,9 +2097,7 @@ void
 punish(sobj)
 register struct obj	*sobj;
 {
-#ifdef CONVICT
 	struct obj *otmp;
-#endif /* CONVICT */
 	/* KMH -- Punishment is still okay when you are riding */
 	You("are being punished for your misbehavior!");
 	if(Punished){
@@ -2117,7 +2111,6 @@ register struct obj	*sobj;
 		return;
 	}
 	setworn(mkobj(CHAIN_CLASS, TRUE), W_CHAIN);
-#ifdef CONVICT
     if (((otmp = carrying(HEAVY_IRON_BALL)) != 0) &&(otmp->oartifact ==
      ART_IRON_BALL_OF_LIBERATION)) {
         setworn(otmp, W_BALL);
@@ -2125,9 +2118,6 @@ register struct obj	*sobj;
     } else {
 	setworn(mkobj(BALL_CLASS, TRUE), W_BALL);
     }
-#else
-	setworn(mkobj(BALL_CLASS, TRUE), W_BALL);
-#endif /* CONVICT */
 	uball->spe = 1;		/* special ball (see save) */
 
 	/*

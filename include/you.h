@@ -46,9 +46,7 @@ struct u_event {
 
 	Bitfield(invoked,1);		/* invoked Gate to the Sanctum level */
 	Bitfield(gehennom_entered,1);	/* entered Gehennom via Valley */
-#ifdef ELBERETH
 	Bitfield(uhand_of_elbereth,2);	/* became Hand of Elbereth */
-#endif
 	Bitfield(udemigod,1);		/* killed the wiz */
 	Bitfield(ascended,1);		/* has offered the Amulet */
 };
@@ -432,11 +430,9 @@ struct you {
 	long	usleep;		/* sleeping; monstermove you last started */
 	int uinvault;
 	struct monst *ustuck;
-#ifdef STEED
 	struct monst *usteed;
 	long ugallop;
 	int urideturns;
-#endif
 	int	umortality;		/* how many times you died */
 	int ugrave_arise; /* you die and become something aside from a ghost */
 	time_t	ubirthday;		/* real world time when game began */

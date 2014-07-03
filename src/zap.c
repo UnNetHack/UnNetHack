@@ -26,9 +26,7 @@ STATIC_DCL boolean FDECL(zap_updown, (struct obj *));
 STATIC_DCL int FDECL(zhitm, (struct monst *,int,int,struct obj **));
 STATIC_DCL void FDECL(zhitu, (int,int,const char *,XCHAR_P,XCHAR_P));
 STATIC_DCL void FDECL(revive_egg, (struct obj *));
-#ifdef STEED
 STATIC_DCL boolean FDECL(zap_steed, (struct obj *));
-#endif
 
 STATIC_DCL int FDECL(zap_hit, (int,int));
 STATIC_DCL void FDECL(backfire, (struct obj *));
@@ -247,7 +245,6 @@ struct obj *otmp;
 				else pline("%s opens its mouth!", Monnam(mtmp));
 			}
 			expels(mtmp, mtmp->data, TRUE);
-#ifdef STEED
 		} else if (!!(obj = which_armor(mtmp, W_SADDLE))) {
 			mtmp->misc_worn_check &= ~obj->owornmask;
 			update_mon_intrinsics(mtmp, obj, FALSE, FALSE);
@@ -256,7 +253,6 @@ struct obj *otmp;
 			place_object(obj, mtmp->mx, mtmp->my);
 			/* call stackobj() if we ever drop anything that can merge */
 			newsym(mtmp->mx, mtmp->my);
-#endif
 		}
 		break;
 	case SPE_HEALING:
@@ -2168,9 +2164,7 @@ boolean ordinary;
 		case WAN_LIGHT:	/* (broken wand) */
 		 /* assert( !ordinary ); */
 		    damage = d(obj->spe, 25);
-#ifdef TOURIST
 		case EXPENSIVE_CAMERA:
-#endif
 		    damage += rnd(25);
 		    if (!resists_blnd(&youmonst)) {
 			You(are_blinded_by_the_flash);
@@ -2243,7 +2237,6 @@ boolean ordinary;
 	return(damage);
 }
 
-#ifdef STEED
 /* you've zapped a wand downwards while riding
  * Return TRUE if the steed was hit by the wand.
  * Return FALSE if the steed was not hit by the wand.
@@ -2304,7 +2297,6 @@ struct obj *obj;	/* wand or spell */
 	}
 	return steedhit;
 }
-#endif
 
 /*
  * cancel a monster (possibly the hero).  inventory is cancelled only
@@ -2649,12 +2641,10 @@ register struct	obj	*obj;
 	boolean disclose = FALSE, was_unkn = !objects[otyp].oc_name_known;
 
 	exercise(A_WIS, TRUE);
-#ifdef STEED
 	if (u.usteed && (objects[otyp].oc_dir != NODIR) &&
 	    !u.dx && !u.dy && (u.dz > 0) && zap_steed(obj)) {
 		disclose = TRUE;
 	} else
-#endif
 	if (objects[otyp].oc_dir == IMMEDIATE) {
 	    obj_zapped = FALSE;
 
@@ -3200,10 +3190,8 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 			tmp = MAGIC_COOKIE;
 			if ((otmp2 = which_armor(mon, W_ARMC)) != 0)
 			    m_useup(mon, otmp2);
-#ifdef TOURIST
 			if ((otmp2 = which_armor(mon, W_ARMU)) != 0)
 			    m_useup(mon, otmp2);
-#endif
 		    }
 		    type = -1;	/* no saving throw wanted */
 		    break;	/* not ordinary damage */
@@ -3337,9 +3325,7 @@ xchar sx, sy;
 		/* no shield or suit, you're dead; wipe out cloak
 		   and/or shirt in case of life-saving or bones */
 		if (uarmc) (void) destroy_arm(uarmc);
-#ifdef TOURIST
 		if (uarmu) (void) destroy_arm(uarmu);
-#endif
 	    } else if (nonliving(youmonst.data) || is_demon(youmonst.data)) {
 		shieldeff(sx, sy);
 		You("seem unaffected.");
@@ -3597,9 +3583,7 @@ register int dx,dy;
 	if (mon) {
 	    if (type == ZT_SPELL(ZT_FIRE)) break;
 	    if (type >= 0) mon->mstrategy &= ~STRAT_WAITMASK;
-#ifdef STEED
 	    buzzmonst:
-#endif
 	    if (zap_hit(find_mac(mon), spell_type)) {
 		if (mon_reflects(mon, (char *)0)) {
 		    if(cansee(mon->mx,mon->my)) {
@@ -3705,12 +3689,10 @@ register int dx,dy;
 	    }
 	} else if (sx == u.ux && sy == u.uy && range >= 0) {
 	    nomul(0, 0);
-#ifdef STEED
 	    if (u.usteed && !rn2(3) && !mon_reflects(u.usteed, (char *)0)) {
 		    mon = u.usteed;
 		    goto buzzmonst;
 	    } else
-#endif
 	    if (zap_hit((int) u.uac, 0)) {
 		range -= 2;
 		pline("%s hits you!", The(fltxt));

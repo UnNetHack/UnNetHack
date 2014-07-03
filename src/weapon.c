@@ -44,9 +44,7 @@ STATIC_VAR NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
 	PN_CLERIC_SPELL,     PN_ESCAPE_SPELL,
 	PN_MATTER_SPELL,
 	PN_BARE_HANDED,   PN_TWO_WEAPONS,
-#ifdef STEED
 	PN_RIDING
-#endif
 };
 
 /* note: entry [0] isn't used */
@@ -1171,10 +1169,8 @@ struct obj *obj;
 	if (!obj)
 		/* Not using a weapon */
 		return (P_BARE_HANDED_COMBAT);
-#ifdef CONVICT
 	if ((obj->otyp == HEAVY_IRON_BALL) && Role_if(PM_CONVICT))
 		return objects[obj->otyp].oc_skill;
-#endif /* CONVICT */
 	if (obj->oclass != WEAPON_CLASS && obj->oclass != TOOL_CLASS &&
 	    obj->oclass != GEM_CLASS)
 		/* Not a weapon, weapon-tool, or ammo */
@@ -1243,7 +1239,6 @@ struct obj *weapon;
 	bonus = ((bonus + 2) * (martial_bonus() ? 2 : 1)) / 2;
     }
 
-#ifdef STEED
 	/* KMH -- It's harder to hit while you are riding */
 	if (u.usteed) {
 		switch (P_SKILL(P_RIDING)) {
@@ -1255,7 +1250,6 @@ struct obj *weapon;
 		}
 		if (u.twoweap) bonus -= 2;
 	}
-#endif
 
     return bonus;
 }
@@ -1312,7 +1306,6 @@ struct obj *weapon;
 	bonus = ((bonus + 1) * (martial_bonus() ? 3 : 1)) / 2;
     }
 
-#ifdef STEED
 	/* KMH -- Riding gives some thrusting damage */
 	if (u.usteed && type != P_TWO_WEAPON_COMBAT) {
 		switch (P_SKILL(P_RIDING)) {
@@ -1323,7 +1316,6 @@ struct obj *weapon;
 		    case P_EXPERT:      bonus += 2; break;
 		}
 	}
-#endif
 
     return bonus;
 }
@@ -1380,10 +1372,8 @@ const struct def_skill *class_skill;
 	    P_SKILL(P_BARE_HANDED_COMBAT) = P_BASIC;
 
 	/* Roles that start with a horse know how to ride it */
-#ifdef STEED
 	if (urole.petnum == PM_PONY)
 	    P_SKILL(P_RIDING) = P_BASIC;
-#endif
 
 	/*
 	 * Make sure we haven't missed setting the max on a skill
