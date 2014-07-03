@@ -319,12 +319,8 @@ struct obj {
 				 (obj)->otyp == TOUCHSTONE)
 
 /* misc */
-#ifdef KOPS
 #define is_flimsy(otmp)		(objects[(otmp)->otyp].oc_material <= LEATHER || \
 				 (otmp)->otyp == RUBBER_HOSE)
-#else
-#define is_flimsy(otmp)		(objects[(otmp)->otyp].oc_material <= LEATHER)
-#endif
 #ifdef WEBB_DISINT
 # define oresist_disintegration(obj) \
 		(objects[obj->otyp].oc_oprop == DISINT_RES || \

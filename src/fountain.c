@@ -492,7 +492,6 @@ register struct obj *obj;
 	dryup(u.ux, u.uy, TRUE);
 }
 
-#ifdef SINKS
 void
 breaksink(x,y)
 int x, y;
@@ -605,6 +604,5 @@ drinksink()
 			rn2(3) ? (rn2(2) ? "cold" : "warm") : "hot");
 	}
 }
-#endif /* SINKS */
 
 /*fountain.c*/

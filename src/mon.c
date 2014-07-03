@@ -1603,7 +1603,6 @@ uchar adtyp;
 	if (tmp == PM_MAIL_DAEMON) mvitals[tmp].mvflags |= G_GENOD;
 #endif
 
-#ifdef KOPS
 	if (mtmp->data->mlet == S_KOP) {
 	    /* Dead Kops may come back. */
 	    switch(rnd(5)) {
@@ -1617,7 +1616,6 @@ uchar adtyp;
 			break;
 	    }
 	}
-#endif
 
 #ifdef BLACKMARKET
 	if (Is_blackmarket(&u.uz) && tmp == PM_ONE_EYED_SAM) {
@@ -2140,9 +2138,7 @@ xkilled(mtmp, dest)
 			!(mvitals[mndx].mvflags & G_NOCORPSE)
 		    /* disable death drop for puddings */
 		    && mdat->mlet != S_PUDDING
-#ifdef KOPS
 		    && mdat->mlet != S_KOP
-#endif
 		   ) {
 			int typ;
 

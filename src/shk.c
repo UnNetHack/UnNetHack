@@ -13,11 +13,9 @@
 #define PAY_SKIP  (-1)
 #define PAY_BROKE (-2)
 
-#ifdef KOPS
 STATIC_DCL void FDECL(makekops, (coord *));
 STATIC_DCL void FDECL(call_kops, (struct monst *,BOOLEAN_P));
 STATIC_DCL void FDECL(kops_gone, (BOOLEAN_P));
-#endif /* KOPS */
 
 #define IS_SHOP(x)	(rooms[x].rtype >= SHOPBASE)
 
@@ -308,7 +306,6 @@ register struct monst *shkp;
 	return(total);
 }
 
-#ifdef KOPS
 STATIC_OVL void
 call_kops(shkp, nearshop)
 register struct monst *shkp;
@@ -393,7 +390,6 @@ register boolean nearshop;
 	    makekops(&mm);
 	}
 }
-#endif	/* KOPS */
 
 #ifdef BLACKMARKET
 void 
@@ -423,9 +419,7 @@ register struct monst *mtmp;
 		pline("%s calls for help!", noit_Monnam(mtmp));
 		mesg_given = TRUE;
 		bars_around_portal(FALSE);
-#ifdef KOPS
 		call_kops(mtmp, FALSE);
-#endif /* KOPS */
 	    }
 	    wakeup(mt);
 	}
@@ -543,11 +537,7 @@ boolean newlev;
 	    else
 #endif
 
-#ifdef KOPS
 	    call_kops(shkp, (!newlev && levl[u.ux0][u.uy0].edge));
-#else
-	    (void) angry_guards(FALSE);
-#endif
 	}
 }
 
@@ -575,12 +565,8 @@ xchar x, y;
 	    else
 #endif
 
-#ifdef KOPS
 	    /*[might want to set 2nd arg based on distance from shop doorway]*/
 	    call_kops(shkp, FALSE);
-#else
-	    (void) angry_guards(FALSE);
-#endif
 	}
 }
 
@@ -1038,11 +1024,7 @@ register boolean killkops;
 	(void) mnearto(shkp, x, y, TRUE);
 	level.flags.has_shop = 1;
 	if (killkops) {
-#ifdef KOPS
 		kops_gone(TRUE);
-#else
-		You_feel("vaguely apprehensive.");
-#endif
 		pacify_guards();
 	}
 	after_shk_move(shkp);
@@ -1152,9 +1134,7 @@ register boolean silentkops;
 		pline("%s calms down.", Monnam(shkp));
 
 	if(!angry_shk_exists()) {
-#ifdef KOPS
 		kops_gone(silentkops);
-#endif
 		pacify_guards();
 	}
 }
@@ -3601,7 +3581,6 @@ register int fall;
     }
 }
 
-#ifdef KOPS
 /* modified by M. Campostrini (campo@sunthpi3.difi.unipi.it) */
 /* to allow for multiple choices of kops */
 STATIC_OVL void
@@ -3648,7 +3627,6 @@ coord *mm;
 	}
 	free((genericptr_t)mc);
 }
-#endif	/* KOPS */
 
 void
 pay_for_damage(dmgstr, cant_mollify)
@@ -4025,7 +4003,6 @@ struct monst *shkp;
 		pline("%s talks about the problem of shoplifters.",shkname(shkp));
 }
 
-#ifdef KOPS
 STATIC_OVL void
 kops_gone(silent)
 register boolean silent;
@@ -4044,7 +4021,6 @@ register boolean silent;
 	    pline_The("Kop%s (disappointed) vanish%s into thin air.",
 		      plur(cnt), cnt == 1 ? "es" : "");
 }
-#endif	/* KOPS */
 
 STATIC_OVL long
 cost_per_charge(shkp, otmp, altusage)

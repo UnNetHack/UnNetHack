@@ -820,16 +820,12 @@ register struct monst *mtmp;
 	    }
 	    break;
 	case MS_SEDUCE:
-#ifdef SEDUCE
 	    if (ptr->mlet != S_NYMPH &&
 		could_seduce(mtmp, &youmonst, (struct attack *)0) == 1) {
 			(void) doseduce(mtmp);
 			break;
 	    }
 	    switch ((poly_gender() != (int) mtmp->female) ? rn2(3) : 0)
-#else
-	    switch ((poly_gender() == 0) ? rn2(3) : 0)
-#endif
 	    {
 		case 2:
 			verbl_msg = "Hello, sailor.";
@@ -841,7 +837,6 @@ register struct monst *mtmp;
 			pline_msg = "cajoles you.";
 	    }
 	    break;
-#ifdef KOPS
 	case MS_ARREST:
 	    if (mtmp->mpeaceful)
 		verbalize("Just the facts, %s.",
@@ -855,7 +850,6 @@ register struct monst *mtmp;
 		verbl_msg = arrest_msg[rn2(3)];
 	    }
 	    break;
-#endif
 	case MS_BRIBE:
         if (monsndx(ptr) == PM_PRISON_GUARD) {
             long gdemand = 500 * u.ulevel;

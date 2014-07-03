@@ -747,10 +747,8 @@ E void FDECL(gush, (int,int,genericptr_t));
 E void FDECL(dryup, (XCHAR_P,XCHAR_P, BOOLEAN_P));
 E void NDECL(drinkfountain);
 E void FDECL(dipfountain, (struct obj *));
-#ifdef SINKS
 E void FDECL(breaksink, (int,int));
 E void NDECL(drinksink);
-#endif
 
 /* ### hack.c ### */
 
@@ -1050,9 +1048,7 @@ E int FDECL(magic_negation, (struct monst *));
 E int FDECL(gazemu, (struct monst *,struct attack *));
 E void FDECL(mdamageu, (struct monst *,int));
 E int FDECL(could_seduce, (struct monst *,struct monst *,struct attack *));
-#ifdef SEDUCE
 E int FDECL(doseduce, (struct monst *));
-#endif
 E void FDECL(maybe_freeze_u, (int*));
 E void FDECL(spore_dies, (struct monst *));
 

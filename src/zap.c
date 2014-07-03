@@ -521,9 +521,7 @@ coord *cc;
 		/* most cancelled monsters return to normal,
 		   but some need to stay cancelled */
 		if (!dmgtype(mtmp2->data, AD_SEDU)
-#ifdef SEDUCE
 				&& !dmgtype(mtmp2->data, AD_SSEX)
-#endif
 		    ) mtmp2->mcan = 0;
 		mtmp2->mcansee = 1;	/* set like in makemon */
 		mtmp2->mblinded = 0;
@@ -2984,10 +2982,8 @@ boolean *obj_destroyed;			/**< has object been deallocated? Pointer to boolean, 
 		   (is_pool(bhitpos.x, bhitpos.y) ||
 		   is_lava(bhitpos.x, bhitpos.y)))
 		    break;
-#ifdef SINKS
 		if(IS_SINK(typ) && weapon != FLASHED_LIGHT)
 		    break;	/* physical objects fall onto sink */
-#endif
 	    }
 	    /* limit range of ball so hero won't make an invalid move */
 	    if (weapon == THROWN_WEAPON && range > 0 &&
@@ -3075,12 +3071,10 @@ int dx, dy;
 		tmp_at(bhitpos.x, bhitpos.y);
 		delay_output();
 		if(ct % 5 != 0) i++;
-#ifdef SINKS
 		if(IS_SINK(levl[bhitpos.x][bhitpos.y].typ)) {
 			pline("Klonk!");
 			break;	/* boomerang falls on sink */
 		}
-#endif
 	}
 	tmp_at(DISP_END, 0);	/* do not leave last symbol */
 	return (struct monst *)0;

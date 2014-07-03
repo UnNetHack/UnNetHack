@@ -439,10 +439,8 @@ m_throw(mon, x, y, dx, dy, range, obj)
 			/* missile might hit iron bars */
 			|| (levl[bhitpos.x+dx][bhitpos.y+dy].typ == IRONBARS &&
 			hits_bars(&singleobj, bhitpos.x, bhitpos.y, dx, dy, !rn2(5), 0))
-#ifdef SINKS
 			/* Thrown objects "sink" */
 			|| IS_SINK(levl[bhitpos.x][bhitpos.y].typ)
-#endif
 								) {
 		    if (singleobj) /* hits_bars might have destroyed it */
 			(void) drop_throw(singleobj, 0, bhitpos.x, bhitpos.y);

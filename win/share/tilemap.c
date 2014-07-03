@@ -15,7 +15,7 @@ void FDECL(process_substitutions, (FILE *));
 
 #if defined(MICRO) || defined(WIN32)
 #undef exit
-#if !defined(MSDOS) && !defined(WIN32)
+#if !defined(WIN32)
 extern void FDECL(exit, (int));
 #endif
 #endif
@@ -39,12 +39,6 @@ struct conditionals {
 	{ MON_GLYPH, PM_SHOCKING_SPHERE, "beholder" },
 	{ MON_GLYPH, PM_BABY_SILVER_DRAGON, "baby shimmering dragon" },
 	{ MON_GLYPH, PM_SILVER_DRAGON, "shimmering dragon" },
-#ifndef KOPS
-	{ MON_GLYPH, PM_VORPAL_JABBERWOCK, "Keystone Kop" },
-	{ MON_GLYPH, PM_VORPAL_JABBERWOCK, "Kop Sergeant" },
-	{ MON_GLYPH, PM_VORPAL_JABBERWOCK, "Kop Lieutenant" },
-	{ MON_GLYPH, PM_VORPAL_JABBERWOCK, "Kop Kaptain" },
-#endif
 #ifndef WEBB_DISINT
 	{ MON_GLYPH, PM_DISENCHANTER, "disintegrator" },
 #endif
@@ -65,9 +59,6 @@ struct conditionals {
 	/* commented out in monst.c at present */
 	{ MON_GLYPH, PM_TIAMAT, "Goblin King" },
 	{ MON_GLYPH, PM_NEANDERTHAL, "High-elf" },
-#ifndef KOPS
-	{ OBJ_GLYPH, CLUB, "rubber hose" },
-#endif
 	/* objects commented out in objects.c at present */
 	{ OBJ_GLYPH, SILVER_DRAGON_SCALE_MAIL, "shimmering dragon scale mail" },
 	{ OBJ_GLYPH, SILVER_DRAGON_SCALES, "shimmering dragon scales" },
@@ -173,12 +164,6 @@ int set, entry;
 			if (*defsyms[i].explanation)
 				return defsyms[i].explanation;
 			else {
-				/* if SINKS are turned off, this
-				 * string won't be there (and can't be there
-				 * to prevent symbol-identification and
-				 * special-level mimic appearances from
-				 * thinking the items exist)
-				 */
 				switch (i) {
 				    case S_sink:
 					    Sprintf(buf, "sink");

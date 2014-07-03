@@ -9,9 +9,7 @@
 STATIC_DCL void NDECL(maybe_wail);
 STATIC_DCL int NDECL(moverock);
 STATIC_DCL int FDECL(still_chewing,(XCHAR_P,XCHAR_P));
-#ifdef SINKS
 STATIC_DCL void NDECL(dosinkfall);
-#endif
 STATIC_DCL boolean FDECL(findtravelpath, (boolean(*)(int, int)));
 STATIC_DCL boolean FDECL(monstinroom, (struct permonst *,int));
 STATIC_DCL void FDECL(move_update, (BOOLEAN_P));
@@ -761,7 +759,6 @@ register xchar ox, oy;
 	newsym(ox, oy);
 }
 
-#ifdef SINKS
 static NEARDATA const char fell_on_sink[] = "fell onto a sink";
 
 STATIC_OVL void
@@ -814,7 +811,6 @@ dosinkfall()
 	}
 	HLevitation--;
 }
-#endif
 
 boolean
 may_dig(x,y)
@@ -2263,10 +2259,8 @@ stillinswamp:
 	    }
 	}
 	check_special_room(FALSE);
-#ifdef SINKS
 	if(IS_SINK(levl[u.ux][u.uy].typ) && Levitation)
 		dosinkfall();
-#endif
 	if (!in_steed_dismounting) { /* if dismounting, we'll check again later */
 		struct trap *trap = t_at(u.ux, u.uy);
 		boolean pit;
@@ -2658,10 +2652,8 @@ dopickup()
 		if (IS_THRONE(lev->typ)) 
 		   pline("It must weigh%s a ton!",
 			 lev->looted ? " almost" : "");
-#ifdef SINKS
 		else if (IS_SINK(lev->typ)) 
 		   pline_The("plumbing connects it to the floor.");
-#endif
 		else if (IS_GRAVE(lev->typ))
 		   You("don't need a gravestone.  Yet.");
 		else if (IS_FOUNTAIN(lev->typ))

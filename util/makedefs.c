@@ -357,16 +357,12 @@ make_version()
 #ifdef REINCARNATION
 			| (1L <<  1)
 #endif
-#ifdef SINKS
 			| (1L <<  2)
-#endif
 #ifdef BLACKMARKET
 			| (1L <<  3)
 #endif
 		/* monsters (5..9) */
-#ifdef KOPS
 			| (1L <<  6)
-#endif
 #ifdef MAIL
 			| (1L <<  7)
 #endif
@@ -568,9 +564,7 @@ static const char *build_opts[] = {
 #ifdef INSURANCE
 		"insurance files for recovering from crashes",
 #endif
-#ifdef KOPS
 		"Keystone Kops",
-#endif
 #ifdef HOLD_LOCKFILE_OPEN
 		"exclusive lock on level 0 file",
 #endif
@@ -637,15 +631,11 @@ static const char *build_opts[] = {
 #  endif
 # endif
 #endif
-#ifdef SEDUCE
 		"seduction",
-#endif
 #ifdef SHELL
 		"shell command",
 #endif
-#ifdef SINKS
 		"sinks",
-#endif
 #ifdef SUSPEND
 		"suspend command",
 #endif
@@ -919,9 +909,6 @@ h_filter(line)
     if (*line == '#') return TRUE;	/* ignore comment lines */
     if (sscanf(line, "----- %s", tag) == 1) {
 	skip = FALSE;
-#ifndef SINKS
-	if (!strcmp(tag, "SINKS")) skip = TRUE;
-#endif
     } else if (skip && !strncmp(line, "-----", 5))
 	skip = FALSE;
     return skip;
