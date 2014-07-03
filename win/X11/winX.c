@@ -1968,20 +1968,6 @@ nh_XtPopdown(w)
 void
 win_X11_init()
 {
-#ifdef OPENWINBUG
-    /* With the OpenWindows 3.0 libraries and the SunOS 4.1.2 ld, these
-     * two routines will not be found when linking.  An apparently correct
-     * executable is produced, along with nasty messages and a failure code
-     * returned to make.  The routines are in the static libXmu.a and
-     * libXmu.sa.4.0, but not in libXmu.so.4.0.  Rather than fiddle with
-     * static linking, we do this.
-     */
-    if (rn2(2) > 2) {
-	/* i.e., FALSE that an optimizer probably can't find */
-	get_wmShellWidgetClass();
-	get_applicationShellWidgetClass();
-    }
-#endif
     return;
 }
 

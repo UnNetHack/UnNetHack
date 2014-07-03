@@ -9,7 +9,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <limits.h>
-#if defined(NO_FILE_LINKS) || defined(SUNOS4) || defined(POSIX_TYPES)
+#if defined(NO_FILE_LINKS) || defined(POSIX_TYPES)
 #include <fcntl.h>
 #endif
 #include <signal.h>

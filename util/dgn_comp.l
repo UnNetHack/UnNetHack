@@ -40,11 +40,6 @@ int NDECL(yylex);
 #   define VOIDYYPUT
 #  endif
 # endif
-# if !defined(VOIDYYPUT) && defined(WEIRD_LEX)
-#  if defined(SUNOS4) && defined(__STDC__) && (WEIRD_LEX > 1)
-#   define VOIDYYPUT
-#  endif
-# endif
 # if defined(VOIDYYPUT) && defined(__osf__)
 #  undef VOIDYYPUT
 # endif

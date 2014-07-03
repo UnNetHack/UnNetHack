@@ -20,8 +20,7 @@
 
 /* define exactly one of the following four choices */
 /* #define BSD 1 */	/* define for 4.n/Free/Open/Net BSD  */
-			/* also for relatives like SunOS 4.x and */
-			/* older versions of Linux */
+			/* also for relatives like older versions of Linux */
 #define SYSV		/* define for System V, Solaris 2.x, newer versions */
 			/* of Linux */
 
@@ -30,7 +29,6 @@
 			/* including Solaris 2+ */
 #define NETWORK		/* if running on a networked system */
 			/* e.g. Suns sharing a playground through NFS */
-/* #define SUNOS4 */	/* SunOS 4.x */
 /* #define LINUX */	/* Another Unix clone */
 /* #define CYGWIN32 */	/* Unix on Win32 -- use with case sensitive defines */
 /* #define GENIX */	/* Yet Another Unix Clone */
@@ -57,9 +55,6 @@
 			 * Linux, Solaris 2.x
 			 */
 
-/* #define OPENWINBUG */	/* avoid a problem using OpenWindows 3.0 for
-				   X11 on SunOS 4.1.x, x>= 2.  Do not define
-				   for other X11 implementations. */
 /* #define PYRAMID_BUG */	/* avoid a bug on the Pyramid */
 /* #define BSD_43_BUG */	/* for real 4.3BSD cc's without schain botch fix */
 /* #define MICROPORT_BUG */	/* problems with large arrays in structs */
@@ -287,13 +282,8 @@
 #endif
 
 #if defined(BSD)
-# if !defined(SUNOS4)
 #define memcpy(d, s, n)		bcopy(s, d, n)
 #define memcmp(s1, s2, n)	bcmp(s2, s1, n)
-# endif
-# ifdef SUNOS4
-#include <memory.h>
-# endif
 #else	/* therefore SYSV */
 # ifndef index	/* some systems seem to do this for you */
 #define index	strchr
@@ -311,7 +301,7 @@
 #endif
 
 #ifdef TIMED_DELAY
-# if defined(SUNOS4) || defined(LINUX) || defined(BSD)
+# if defined(LINUX) || defined(BSD)
 # define msleep(k) usleep((k)*1000)
 # endif
 #endif

@@ -107,7 +107,7 @@
 # define IS_7BIT(x)	(FALSE)
 # define STRIPHI	0		/* should actually be done on BSD */
 # define OSPEED(x)	(x).sg_ospeed
-# if defined(bsdi) || defined(__386BSD) || defined(SUNOS4)
+# if defined(bsdi) || defined(__386BSD)
 #  define GTTY(x)	(ioctl(0, TIOCGETP, (char *)x))
 #  define STTY(x)	(ioctl(0, TIOCSETP, (char *)x))
 # else
