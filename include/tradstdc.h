@@ -5,17 +5,13 @@
 #ifndef TRADSTDC_H
 #define TRADSTDC_H
 
-#ifdef NOVOID
-#define void int
-#endif
-
 /*
  * Borland C provides enough ANSI C compatibility in its Borland C++
  * mode to warrant this.  But it does not set __STDC__ unless it compiles
  * in its ANSI keywords only mode, which prevents use of <dos.h> and
  * far pointer use.
  */
-#if (defined(__STDC__) || defined(__TURBOC__)) && !defined(NOTSTDC)
+#if defined(__STDC__) || defined(__TURBOC__)
 #define NHSTDC
 #endif
 
