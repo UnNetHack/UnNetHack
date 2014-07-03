@@ -18,7 +18,6 @@
 # Set SYSTEM to one of:
 #	'Sysunix'	-- generic UNIX
 #	'Sys3B2'	-- AT&T 3B2, 3B5, etc.
-#	'Sysatt'	-- AT&T UNIXPC, 7300, 3B1
 SYSTEM = Sysunix
 
 #
@@ -45,10 +44,6 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
 #		a non-ANSI <sys/ioctl.h> -- either run fixincludes on it or use
 #		-traditional in CFLAGS
 # CC = gcc
-#
-#	For Bull DPX/2 systems at B.O.S. 2.0 or higher use the following:
-#
-# CC = gcc -ansi -D_BULL_SOURCE -D_XOPEN_SOURCE -D_POSIX_SOURCE
 #
 #	If you are using GCC 2.2.2 or higher on a DPX/2, just use:
 #

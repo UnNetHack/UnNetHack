@@ -757,7 +757,7 @@ d_level *lev;
 #ifdef FILE_AREAS
 	ret = rename_area(FILE_AREA_BONES, tempname, bones);
 #else
-# if (defined(SYSV) && !defined(SVR4)) || defined(GENIX)
+# if defined(SYSV) && !defined(SVR4)
 	/* old SYSVs don't have rename.  Some SVR3's may, but since they
 	 * also have link/unlink, it doesn't matter. :-)
 	 */

@@ -5,7 +5,7 @@
 #define E extern
 #endif
 
-#if defined(BOS) || defined(NHSTDC)
+#if defined(NHSTDC)
 #define DIMENSION_P int
 #else
 # ifdef WIDENED_PROTOTYPES

@@ -1681,12 +1681,7 @@ register struct obj *obj;
 		}
 		if (obj->odiluted) {
 			obj->odiluted = 0;
-#ifdef UNIXPC
-			obj->blessed = FALSE;
-			obj->cursed = FALSE;
-#else
 			obj->blessed = obj->cursed = FALSE;
-#endif
 			obj->otyp = POT_WATER;
 		} else obj->odiluted++;
 		update_inventory();

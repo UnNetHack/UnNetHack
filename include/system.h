@@ -70,10 +70,10 @@ typedef unsigned int	size_t;
 # if !defined(__SC__) && !defined(LINUX)
 E  long NDECL(random);
 # endif
-# if (!defined(bsdi) && !defined(__FreeBSD__) && !defined(__NetBSD__)) || defined(RANDOM)
+# if (!defined(__FreeBSD__) && !defined(__NetBSD__)) || defined(RANDOM)
 E void FDECL(srandom, (unsigned int));
 # else
-#  if !defined(bsdi) && !defined(__FreeBSD__) && !defined(__NetBSD__)
+#  if !defined(__FreeBSD__) && !defined(__NetBSD__)
 E int FDECL(srandom, (unsigned int));
 #  endif
 # endif
@@ -118,13 +118,9 @@ E   void FDECL(qsort, (genericptr_t,size_t,size_t,
 #if !defined(__GNUC__)
 /* may already be defined */
 
-# ifndef bsdi
 E long FDECL(lseek, (int,long,int));
-# endif
 # if defined(POSIX_TYPES)
-#  ifndef bsdi
 E int FDECL(write, (int, const void *,unsigned));
-#  endif
 # else
 #  ifndef __MWERKS__	/* metrowerks defines write via universal headers */
 E int FDECL(write, (int,genericptr_t,unsigned));
@@ -252,7 +248,7 @@ E int	FDECL(strlen, (const char *));
 #if defined(__DECC) || defined(WIN32)
 #define SPRINTF_PROTO
 #endif
-#if defined(__sgi) || defined(__GNUC__)
+#if defined(__GNUC__)
 	/* problem with prototype mismatches */
 #define SPRINTF_PROTO
 #endif

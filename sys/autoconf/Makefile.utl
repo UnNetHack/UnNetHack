@@ -26,10 +26,6 @@ CC = @CC@ -DAUTOCONF
 #
 #	For Bull DPX/2 systems at B.O.S. 2.0 or higher use the following:
 #
-# CC = gcc -ansi -D_BULL_SOURCE -D_XOPEN_SOURCE -D_POSIX_SOURCE
-# 
-#	If you are using GCC 2.2.2 or higher on a DPX/2, just use:
-#
 # CC = gcc -ansi
 #
 # if your make doesn't define a default SHELL properly, you may need

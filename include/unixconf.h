@@ -31,10 +31,6 @@
 			/* e.g. Suns sharing a playground through NFS */
 /* #define LINUX */	/* Another Unix clone */
 /* #define CYGWIN32 */	/* Unix on Win32 -- use with case sensitive defines */
-/* #define GENIX */	/* Yet Another Unix Clone */
-/* #define HISX */	/* Bull Unix for XPS Machines */
-/* #define BOS */	/* Bull Open Software - Unix for DPX/2 Machines */
-/* #define UNIXPC */	/* use in addition to SYSV for AT&T 7300/3B1 */
 
 #define TERMINFO	/* uses terminfo rather than termcap */
 			/* Should be defined for most SYSV, SVR4 (including
@@ -172,11 +168,7 @@
 #  if defined(M_XENIX)
 #define DEF_MAILREADER	"/usr/bin/mail"
 #  else
-#   ifdef __sgi
-#define DEF_MAILREADER	"/usr/sbin/Mail"
-#   else
 #define DEF_MAILREADER	"/usr/bin/mailx"
-#   endif
 #  endif
 # else
 #define DEF_MAILREADER	"/bin/mail"
@@ -218,7 +210,7 @@
 # endif
 #endif /* _AUX_SOURCE */
 
-#if defined(LINUX) || defined(bsdi)
+#if defined(LINUX)
 # ifndef POSIX_TYPES
 #  define POSIX_TYPES
 # endif

@@ -1756,15 +1756,7 @@ struct mkroom	*croom;
 		set_malign(mtmp);
 	    }
 	    if (m->asleep >= 0) {
-#ifdef UNIXPC
-		/* optimizer bug strikes again */
-		if (m->asleep)
-			mtmp->msleeping = 1;
-		else
-			mtmp->msleeping = 0;
-#else
 		mtmp->msleeping = m->asleep;
-#endif
 	    }
 
 	    if (m->seentraps) mtmp->mtrapseen = m->seentraps;

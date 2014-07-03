@@ -107,13 +107,8 @@
 # define IS_7BIT(x)	(FALSE)
 # define STRIPHI	0		/* should actually be done on BSD */
 # define OSPEED(x)	(x).sg_ospeed
-# if defined(bsdi) || defined(__386BSD)
-#  define GTTY(x)	(ioctl(0, TIOCGETP, (char *)x))
-#  define STTY(x)	(ioctl(0, TIOCSETP, (char *)x))
-# else
-#  define GTTY(x)	(gtty(0, x))
-#  define STTY(x)	(stty(0, x))
-# endif
+# define GTTY(x)	(gtty(0, x))
+# define STTY(x)	(stty(0, x))
 # define GTTY2(x)	(ioctl(0, TIOCGETC, (char *)x))
 # define STTY2(x)	(ioctl(0, TIOCSETC, (char *)x))
 # define nonesuch	-1
@@ -121,7 +116,7 @@ struct tchars inittyb2, curttyb2;
 
 #endif	/* V7 */
 
-#if defined(TTY_GRAPHICS) && (!defined(SYSV) || defined(UNIXPC) || defined(SVR4))
+#if defined(TTY_GRAPHICS) && (!defined(SYSV) || defined(SVR4))
 # ifndef LINT
 extern			/* it is defined in libtermlib (libtermcap) */
 # endif

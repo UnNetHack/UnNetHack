@@ -14,12 +14,10 @@
 #include <fcntl.h>
 #endif
 
-#if !defined(_BULL_SOURCE) && !defined(__sgi)
-# if defined(POSIX_TYPES) || defined(SVR4)
+#if defined(POSIX_TYPES) || defined(SVR4)
 extern struct passwd *FDECL(getpwuid,(uid_t));
-# else
+#else
 extern struct passwd *FDECL(getpwuid,(int));
-# endif
 #endif
 extern struct passwd *FDECL(getpwnam,(const char *));
 #ifdef CHDIR

@@ -22,7 +22,7 @@
 #include "wintty.h"
 
 #ifdef CLIPPING		/* might want SIGWINCH */
-# if defined(BSD) || defined(_BULL_SOURCE)
+# if defined(BSD)
 #include <signal.h>
 # endif
 #endif

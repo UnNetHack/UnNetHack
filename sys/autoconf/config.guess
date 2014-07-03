@@ -1360,10 +1360,6 @@ main ()
 #endif
 #endif
 
-#if defined (__386BSD__)
-  printf ("i386-pc-bsd\n"); exit (0);
-#endif
-
 #if defined (sequent)
 #if defined (i386)
   printf ("i386-sequent-dynix\n"); exit (0);

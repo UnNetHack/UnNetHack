@@ -8,21 +8,12 @@
 
 #include "hack.h"
 
-#if defined(BSD_JOB_CONTROL) || defined(_BULL_SOURCE)
-#  if defined(_BULL_SOURCE)
-#   include <termios.h>
-struct termios termio;
-#   undef TIMEOUT		/* defined in you.h and sys/tty.h */
-#   include <sys/tty.h>		/* define winsize */
-#   include <sys/ttold.h>	/* define struct ltchars */
-#   include <sys/bsdioctl.h>	/* define TIOGWINSZ */
-#  else
+#if defined(BSD_JOB_CONTROL)
 #   ifdef LINUX
 #    include <bsd/sgtty.h>
 #   else
 #    include <sgtty.h>
 #   endif
-#  endif
 struct ltchars ltchars;
 struct ltchars ltchars0 = { -1, -1, -1, -1, -1, -1 }; /* turn all off */
 #else
@@ -50,7 +41,7 @@ struct termio termio;
 #include	<signal.h>
 #endif
 
-#if defined(TIOCGWINSZ) && (defined(BSD) || defined(_BULL_SOURCE) || defined(SVR4))
+#if defined(TIOCGWINSZ) && (defined(BSD) || defined(SVR4))
 #define USE_WIN_IOCTL
 #include "tcap.h"	/* for LI and CO */
 #endif

@@ -47,13 +47,11 @@ static int gethint = -1;
 #include <pwd.h>
 #ifdef LEGACY_CODE
 /* DON'T trust all Unices to declare getpwuid() in <pwd.h> */
-#  if !defined(_BULL_SOURCE) && !defined(__sgi)
 /* DO trust all SVR4 to typedef uid_t in <sys/types.h> (probably to a long) */
-#   if defined(POSIX_TYPES) || defined(SVR4)
+#  if defined(POSIX_TYPES) || defined(SVR4)
 extern struct passwd *FDECL(getpwuid,(uid_t));
-#   else
+#  else
 extern struct passwd *FDECL(getpwuid,(int));
-#   endif
 #  endif
 #endif /* LEGACY_CODE */
 static struct stat omstat,nmstat;
