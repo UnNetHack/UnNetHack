@@ -248,7 +248,7 @@ md_stop(stopp, startp)
 }
 
 /* Let the mail daemon have a larger vocabulary. */
-static NEARDATA const char *mail_text[] = {
+static const char *mail_text[] = {
     "Gangway!",
     "Look out!",
     "Pardon me!"

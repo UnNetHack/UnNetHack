@@ -163,7 +163,7 @@ static char NDECL(popch);
  */
 #define BSIZE 20
 static char pushq[BSIZE], saveq[BSIZE];
-static NEARDATA int phead, ptail, shead, stail;
+static int phead, ptail, shead, stail;
 
 static char
 popch() {
@@ -1284,7 +1284,7 @@ int typ;
     int n;
     register struct obj *obj;
     char allowall[2];
-    static NEARDATA const char callable[] = {
+    static const char callable[] = {
 	SCROLL_CLASS, POTION_CLASS, WAND_CLASS, RING_CLASS, AMULET_CLASS,
 	GEM_CLASS, SPBOOK_CLASS, ARMOR_CLASS, TOOL_CLASS, 0 };
 
@@ -2486,7 +2486,7 @@ register int x, y;
 	return x >= 1 && x <= COLNO-1 && y >= 0 && y <= ROWNO-1;
 }
 
-static NEARDATA int last_multi;
+static int last_multi;
 
 /*
  * convert a MAP window position into a movecmd

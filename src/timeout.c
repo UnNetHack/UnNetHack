@@ -16,7 +16,7 @@ STATIC_DCL void FDECL(lantern_message, (struct obj *));
 STATIC_DCL void FDECL(cleanup_burn, (genericptr_t,long));
 
 /* He is being petrified - dialogue by inmet!tower */
-static NEARDATA const char * const stoned_texts[] = {
+static const char * const stoned_texts[] = {
 	"You are slowing down.",		/* 5 */
 	"Your limbs are stiffening.",		/* 4 */
 	"Your limbs have turned to stone.",	/* 3 */
@@ -61,7 +61,7 @@ phasing_dialogue()
 }
 
 /* He is getting sicker and sicker prior to vomiting */
-static NEARDATA const char * const vomiting_texts[] = {
+static const char * const vomiting_texts[] = {
 	"are feeling mildly nauseated.",	/* 14 */
 	"feel slightly confused.",		/* 11 */
 	"can't seem to think straight.",	/* 8 */
@@ -93,7 +93,7 @@ vomiting_dialogue()
 	exercise(A_CON, FALSE);
 }
 
-static NEARDATA const char * const choke_texts[] = {
+static const char * const choke_texts[] = {
 	"You find it hard to breathe.",
 	"You're gasping for air.",
 	"You can no longer breathe.",
@@ -101,7 +101,7 @@ static NEARDATA const char * const choke_texts[] = {
 	"You suffocate."
 };
 
-static NEARDATA const char * const choke_texts2[] = {
+static const char * const choke_texts2[] = {
 	"Your %s is becoming constricted.",
 	"Your blood is having trouble reaching your brain.",
 	"The pressure on your %s increases.",
@@ -129,7 +129,7 @@ choke_dialogue()
 	exercise(A_STR, FALSE);
 }
 
-static NEARDATA const char * const slime_texts[] = {
+static const char * const slime_texts[] = {
 	"You are turning a little %s.",           /* 5 */
 	"Your limbs are getting oozy.",              /* 4 */
 	"Your skin begins to peel away.",            /* 3 */

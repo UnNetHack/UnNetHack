@@ -11,7 +11,7 @@ STATIC_DCL void NDECL(shuffle_all);
 STATIC_DCL boolean FDECL(interesting_to_discover,(int));
 STATIC_DCL void FDECL(swap_armor,(int, int, int));
 
-static NEARDATA short disco[NUM_OBJECTS] = DUMMY;
+static short disco[NUM_OBJECTS] = DUMMY;
 
 #ifdef USE_TILES
 STATIC_DCL void NDECL(shuffle_tiles);

@@ -94,7 +94,7 @@ E void FDECL(exit, (int));
 # if defined(__STDC__) || !defined(FLEX_SCANNER)
 E void FDECL(free, (genericptr_t));
 # endif
-#if !defined(_DCC) && !defined(__SC__)
+#if !defined(__SC__)
 E void FDECL(perror, (const char *));
 #endif
 #endif
@@ -146,12 +146,10 @@ E int FDECL(open, (const char *,int,...));
 E int FDECL(dup2, (int, int));
 E int FDECL(setmode, (int,int));
 E int NDECL(kbhit);
-# if !defined(_DCC)
 #  ifndef __EMX__
 E int FDECL(chdir, (char *));
 E char *FDECL(getcwd, (char *,int));
 #  endif
-# endif /* !_DCC */
 #endif
 
 /* both old & new versions of Ultrix want these, but real BSD does not */

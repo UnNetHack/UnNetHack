@@ -34,7 +34,7 @@
 # define OBJECT(obj,bits,prp,sym,prob,dly,wt,cost,sdam,ldam,oc1,oc2,nut,color) \
 	{obj}
 
-NEARDATA struct objdescr obj_descr[] = {
+struct objdescr obj_descr[] = {
 #else
 /* second pass -- object definitions */
 
@@ -49,7 +49,7 @@ NEARDATA struct objdescr obj_descr[] = {
 #  define HARDGEM(n) (0)
 # endif
 
-NEARDATA struct objclass objects[] = {
+struct objclass objects[] = {
 #endif
 /* dummy object[0] -- description [2nd arg] *must* be NULL */
 	OBJECT(OBJ("strange object",(char *)0), BITS(1,0,0,0,0,0,0,0,0,0,0,P_NONE,0),

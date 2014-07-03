@@ -33,9 +33,6 @@
 # endif
 #endif
 #ifndef SKIP_ERRNO
-# ifdef _DCC
-const
-# endif
 extern int errno;
 #endif
 
@@ -2070,9 +2067,6 @@ const char *dir;
 # if defined(FILE_AREAS)
 	    if ((fd = open_area(NH_RECORD_AREA, tmp, O_CREAT|O_RDWR,
 	      S_IREAD|S_IWRITE)) < 0) {
-# elif defined(_DCC)
-	    /* DICE doesn't use the third argument */
-	    if ((fd = open(fq_record, O_CREAT|O_RDWR)) < 0) {
 # else
 	    if ((fd = open(fq_record, O_CREAT|O_RDWR, S_IREAD|S_IWRITE)) < 0) {
 # endif

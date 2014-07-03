@@ -6,8 +6,8 @@
 #include "config.h"
 #include "objclass.h"
 #include "flag.h"
-NEARDATA struct flag flags;	/* provide linkage */
-NEARDATA struct instance_flags iflags;	/* provide linkage */
+struct flag flags;	/* provide linkage */
+struct instance_flags iflags;	/* provide linkage */
 #define static
 #else
 #include "hack.h"
@@ -3106,21 +3106,21 @@ goodfruit:
 }
 
 
-static NEARDATA const char *menutype[] = {
+static const char *menutype[] = {
 	"traditional", "combination", "partial", "full"
 };
 
-static NEARDATA const char *burdentype[] = {
+static const char *burdentype[] = {
 	"unencumbered", "burdened", "stressed",
 	"strained", "overtaxed", "overloaded"
 };
 
-static NEARDATA const char *runmodes[] = {
+static const char *runmodes[] = {
 	"teleport", "run", "walk", "crawl"
 };
 
 #ifdef SORTLOOT
-static NEARDATA const char *sortltype[] = {
+static const char *sortltype[] = {
 	"none", "loot", "full"
 };
 #endif

@@ -6,7 +6,7 @@
 
 
 /* Monsters that might be ridden */
-static NEARDATA const char steeds[] = {
+static const char steeds[] = {
 	S_QUADRUPED, S_UNICORN, S_ANGEL, S_CENTAUR, S_DRAGON, S_JABBERWOCK, '\0'
 };
 

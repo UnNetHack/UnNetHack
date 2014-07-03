@@ -60,7 +60,7 @@ STATIC_VAR char tbuf[512];
 #endif
 
 #ifdef TEXTCOLOR
-char NEARDATA *hilites[CLR_MAX]; /* terminal escapes for the various colors */
+char *hilites[CLR_MAX]; /* terminal escapes for the various colors */
 #endif
 
 #ifdef OVLB

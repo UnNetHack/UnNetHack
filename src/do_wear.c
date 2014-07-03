@@ -4,15 +4,15 @@
 
 #include "hack.h"
 
-STATIC_OVL NEARDATA long takeoff_mask = 0L;
-static NEARDATA long taking_off = 0L;
+STATIC_OVL long takeoff_mask = 0L;
+static long taking_off = 0L;
 
-static NEARDATA int todelay;
+static int todelay;
 static boolean cancelled_don = FALSE;
 
-static NEARDATA const char see_yourself[] = "see yourself";
-static NEARDATA const char unknown_type[] = "Unknown type of %s (%d)";
-static NEARDATA const char c_armor[]  = "armor",
+static const char see_yourself[] = "see yourself";
+static const char unknown_type[] = "Unknown type of %s (%d)";
+static const char c_armor[]  = "armor",
 			   c_suit[]   = "suit",
 			   c_shirt[]  = "shirt",
 			   c_cloak[]  = "cloak",
@@ -25,7 +25,7 @@ static NEARDATA const char c_armor[]  = "armor",
 			   c_axe[]    = "axe",
 			   c_that_[]  = "that";
 
-static NEARDATA const long takeoff_order[] = { WORN_BLINDF, W_WEP,
+static const long takeoff_order[] = { WORN_BLINDF, W_WEP,
 	WORN_SHIELD, WORN_GLOVES, LEFT_RING, RIGHT_RING, WORN_CLOAK,
 	WORN_HELMET, WORN_AMUL, WORN_ARMOR,
 	WORN_SHIRT,
@@ -1187,8 +1187,8 @@ cancel_don()
 	taking_off = 0L;
 }
 
-static NEARDATA const char clothes[] = {ARMOR_CLASS, 0};
-static NEARDATA const char accessories[] = {RING_CLASS, AMULET_CLASS, TOOL_CLASS, FOOD_CLASS, 0};
+static const char clothes[] = {ARMOR_CLASS, 0};
+static const char accessories[] = {RING_CLASS, AMULET_CLASS, TOOL_CLASS, FOOD_CLASS, 0};
 
 /* the 'T' command */
 int

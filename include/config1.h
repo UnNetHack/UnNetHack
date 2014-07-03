@@ -5,12 +5,6 @@
 #ifndef CONFIG1_H
 #define CONFIG1_H
 
-#ifdef _DCC
-# define NEARDATA __near /* put some data close */
-#else
-# define NEARDATA
-#endif
-
 /*
  * Windows NT Autodetection
  */

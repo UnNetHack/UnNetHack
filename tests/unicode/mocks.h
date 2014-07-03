@@ -1,6 +1,4 @@
 
-#define NEARDATA
-
 #include "objects.c"
 #include "monst.c"
 

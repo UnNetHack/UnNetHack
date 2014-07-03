@@ -71,7 +71,7 @@ extern void FDECL(nethack_exit,(int));
 /*
  * The order of these needs to match the macros in hack.h.
  */
-static NEARDATA const char *deaths[] = {		/* the array of death */
+static const char *deaths[] = {		/* the array of death */
 	"died", "choked", "poisoned", "starvation", "drowning",
 	"burning", "dissolving under the heat and pressure",
 	"crushed", "turned to stone", "turned into slime",
@@ -85,7 +85,7 @@ static NEARDATA const char *deaths[] = {		/* the array of death */
 #endif
 };
 
-static NEARDATA const char *ends[] = {		/* "when you..." */
+static const char *ends[] = {		/* "when you..." */
 	"died", "choked", "were poisoned", "starved", "drowned",
 	"burned", "dissolved in the lava",
 	"were crushed", "turned to stone", "turned into slime",

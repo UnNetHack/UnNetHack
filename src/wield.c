@@ -222,11 +222,11 @@ register struct obj *obj;
 
 /*** Commands to change particular slot(s) ***/
 
-static NEARDATA const char wield_objs[] =
+static const char wield_objs[] =
 	{ ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, TOOL_CLASS, 0 };
-static NEARDATA const char ready_objs[] =
+static const char ready_objs[] =
 	{ ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, 0 };
-static NEARDATA const char bullets[] =	/* (note: different from dothrow.c) */
+static const char bullets[] =	/* (note: different from dothrow.c) */
 	{ ALL_CLASSES, ALLOW_NONE, GEM_CLASS, WEAPON_CLASS, 0 };
 
 /** Unwield a weapon. */

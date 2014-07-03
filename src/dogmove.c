@@ -45,7 +45,7 @@ register struct monst *mon;
 	return (struct obj *)0;
 }
 
-static NEARDATA const char nofetch[] = { BALL_CLASS, CHAIN_CLASS, ROCK_CLASS, 0 };
+static const char nofetch[] = { BALL_CLASS, CHAIN_CLASS, ROCK_CLASS, 0 };
 
 STATIC_OVL boolean FDECL(cursed_object_at, (int, int));
 

@@ -54,8 +54,8 @@ static struct bucket *id_map = 0;
 #include "quest.h"
 
 boolean restoring = FALSE;
-static NEARDATA struct fruit *oldfruit;
-static NEARDATA long omoves;
+static struct fruit *oldfruit;
+static long omoves;
 
 #define Is_IceBox(o) ((o)->otyp == ICE_BOX ? TRUE : FALSE)
 
@@ -1003,11 +1003,11 @@ boolean ghostly;
 #ifndef ZEROCOMP_BUFSIZ
 #define ZEROCOMP_BUFSIZ BUFSZ
 #endif
-static NEARDATA unsigned char inbuf[ZEROCOMP_BUFSIZ];
-static NEARDATA unsigned short inbufp = 0;
-static NEARDATA unsigned short inbufsz = 0;
-static NEARDATA short inrunlength = -1;
-static NEARDATA int mreadfd;
+static unsigned char inbuf[ZEROCOMP_BUFSIZ];
+static unsigned short inbufp = 0;
+static unsigned short inbufsz = 0;
+static short inrunlength = -1;
+static int mreadfd;
 
 static int
 mgetc()

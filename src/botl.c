@@ -149,7 +149,7 @@ char *newbot2;
 
 #endif
 
-STATIC_OVL NEARDATA int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
+STATIC_OVL int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
 
 /* convert experience level (1..30) to rank index (0..8) */
 int

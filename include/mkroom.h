@@ -36,8 +36,8 @@ struct shclass {
 	const char * const *shknms;	/* list of shopkeeper names for this type */
 };
 
-extern NEARDATA struct mkroom rooms[(MAXNROFROOMS+1)*2];
-extern NEARDATA struct mkroom* subrooms;
+extern struct mkroom rooms[(MAXNROFROOMS+1)*2];
+extern struct mkroom* subrooms;
 /* the normal rooms on the current level are described in rooms[0..n] for
  * some n<MAXNROFROOMS
  * the vault, if any, is described by rooms[n+1]
@@ -47,7 +47,7 @@ extern NEARDATA struct mkroom* subrooms;
 
 extern struct mkroom *dnstairs_room, *upstairs_room, *sstairs_room;
 
-extern NEARDATA coord doors[DOORMAX];
+extern coord doors[DOORMAX];
 
 /* values for rtype in the room definition structure */
 #define OROOM		 0	/* ordinary room */

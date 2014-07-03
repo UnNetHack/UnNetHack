@@ -686,13 +686,13 @@ toofar:
 	return(tmp == 2);
 }
 
-static NEARDATA const char practical[] = { WEAPON_CLASS, ARMOR_CLASS, GEM_CLASS, FOOD_CLASS, 0 };
-static NEARDATA const char magical[] = {
+static const char practical[] = { WEAPON_CLASS, ARMOR_CLASS, GEM_CLASS, FOOD_CLASS, 0 };
+static const char magical[] = {
 	AMULET_CLASS, POTION_CLASS, SCROLL_CLASS, WAND_CLASS, RING_CLASS,
 	SPBOOK_CLASS, 0 };
-static NEARDATA const char indigestion[] = { BALL_CLASS, ROCK_CLASS, 0 };
-static NEARDATA const char boulder_class[] = { ROCK_CLASS, 0 };
-static NEARDATA const char gem_class[] = { GEM_CLASS, 0 };
+static const char indigestion[] = { BALL_CLASS, ROCK_CLASS, 0 };
+static const char boulder_class[] = { ROCK_CLASS, 0 };
+static const char gem_class[] = { GEM_CLASS, 0 };
 
 boolean
 itsstuck(mtmp)

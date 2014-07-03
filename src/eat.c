@@ -57,14 +57,14 @@ char msgbuf[BUFSZ];
 /* also used to see if you're allowed to eat cats and dogs */
 #define CANNIBAL_ALLOWED() (Role_if(PM_CAVEMAN) || Race_if(PM_ORC) || Race_if(PM_VAMPIRE))
 
-STATIC_OVL NEARDATA const char comestibles[] = { FOOD_CLASS, 0 };
+STATIC_OVL const char comestibles[] = { FOOD_CLASS, 0 };
 
 #ifdef ASTRAL_ESCAPE
-STATIC_OVL NEARDATA const char sacrifice_types[] = { AMULET_CLASS, FOOD_CLASS, 0 };
+STATIC_OVL const char sacrifice_types[] = { AMULET_CLASS, FOOD_CLASS, 0 };
 #endif
 
 /* Gold must come first for getobj(). */
-STATIC_OVL NEARDATA const char allobj[] = {
+STATIC_OVL const char allobj[] = {
 	COIN_CLASS, WEAPON_CLASS, ARMOR_CLASS, POTION_CLASS, SCROLL_CLASS,
 	WAND_CLASS, RING_CLASS, AMULET_CLASS, FOOD_CLASS, TOOL_CLASS,
 	GEM_CLASS, ROCK_CLASS, BALL_CLASS, CHAIN_CLASS, SPBOOK_CLASS, 0 };
@@ -151,12 +151,12 @@ static const struct { const char *txt; int nut; } tintxts[] = {
 };
 #define TTSZ	SIZE(tintxts)
 
-static NEARDATA struct {
+static struct {
 	struct	obj *tin;
 	int	usedtime, reqtime;
 } tin;
 
-static NEARDATA struct {
+static struct {
 	struct	obj *piece;	/* the thing being eaten, or last thing that
 				 * was partially eaten, unless that thing was
 				 * a tin, which uses the tin structure above,

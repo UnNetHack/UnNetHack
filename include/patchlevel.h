@@ -317,7 +317,7 @@
  *  refine the overlay manager, rearrange the OVLx breakdown for better
  *	efficiency, rename the overlay macros, and split off the overlay
  *	instructions to Install.ovl
- *  introduce NEARDATA for better Amiga efficiency
+ *  introduce for better Amiga efficiency
  *  support for more VMS versions (courtesy Joshua Delahunty and Pat Rankin)
  *  more const fixes
  *  better support for common graphics (DEC VT and IBM)

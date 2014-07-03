@@ -507,11 +507,11 @@ int mode;
 #ifndef ZEROCOMP_BUFSIZ
 # define ZEROCOMP_BUFSIZ BUFSZ
 #endif
-static NEARDATA unsigned char outbuf[ZEROCOMP_BUFSIZ];
-static NEARDATA unsigned short outbufp = 0;
-static NEARDATA short outrunlength = -1;
-static NEARDATA int bwritefd;
-static NEARDATA boolean compressing = FALSE;
+static unsigned char outbuf[ZEROCOMP_BUFSIZ];
+static unsigned short outbufp = 0;
+static short outrunlength = -1;
+static int bwritefd;
+static boolean compressing = FALSE;
 
 /*dbg()
 {

@@ -17,7 +17,7 @@
 
 boolean	known;
 
-static NEARDATA const char readable[] =
+static const char readable[] =
 		   { COIN_CLASS, ALL_CLASSES, SCROLL_CLASS, SPBOOK_CLASS, 0 };
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 

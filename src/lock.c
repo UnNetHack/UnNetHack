@@ -8,7 +8,7 @@ STATIC_PTR int NDECL(picklock);
 STATIC_PTR int NDECL(forcelock);
 
 /* at most one of `door' and `box' should be non-null at any given time */
-STATIC_VAR NEARDATA struct xlock_s {
+STATIC_VAR struct xlock_s {
 	struct rm  *door;
 	struct obj *box;
 	int picktyp, chance, usedtime;

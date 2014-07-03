@@ -1026,10 +1026,10 @@ register struct trobj *trop;
 			}
 			obj = mksobj(otyp, TRUE, FALSE);
 		} else {	/* UNDEF_TYP */
-			static NEARDATA short nocreate = STRANGE_OBJECT;
-			static NEARDATA short nocreate2 = STRANGE_OBJECT;
-			static NEARDATA short nocreate3 = STRANGE_OBJECT;
-			static NEARDATA short nocreate4 = STRANGE_OBJECT;
+			static short nocreate = STRANGE_OBJECT;
+			static short nocreate2 = STRANGE_OBJECT;
+			static short nocreate3 = STRANGE_OBJECT;
+			static short nocreate4 = STRANGE_OBJECT;
 		/*
 		 * For random objects, do not create certain overly powerful
 		 * items: wand of wishing, ring of levitation, or the

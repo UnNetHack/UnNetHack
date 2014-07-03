@@ -8,9 +8,9 @@
 
 extern boolean notonhead;
 
-static NEARDATA boolean vis, far_noise;
-static NEARDATA long noisetime;
-static NEARDATA struct obj *otmp;
+static boolean vis, far_noise;
+static long noisetime;
+static struct obj *otmp;
 
 static const char brief_feeling[] =
 	"have a %s feeling for a moment, then it passes.";

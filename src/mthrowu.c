@@ -13,7 +13,7 @@ STATIC_DCL int FDECL(drop_throw,(struct obj *,BOOLEAN_P,int,int));
 /*
  * Keep consistent with breath weapons in zap.c, and AD_* in monattk.h.
  */
-STATIC_OVL NEARDATA const char *breathwep[] = {
+STATIC_OVL const char *breathwep[] = {
 				"fragments",
 				"fire",
 				"frost",

@@ -368,8 +368,8 @@ struct instance_flags {
 #define use_inverse wc_inverse
 #define preload_tiles wc_preload_tiles
 
-extern NEARDATA struct flag flags;
-extern NEARDATA struct instance_flags iflags;
+extern struct flag flags;
+extern struct instance_flags iflags;
 
 /* runmode options */
 #define RUN_TPORT	0	/* don't update display until movement stops */

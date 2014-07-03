@@ -30,7 +30,7 @@ STATIC_DCL int FDECL(enhance_skill, (boolean));
 
 STATIC_DCL void FDECL(give_may_advance_msg, (int));
 
-STATIC_VAR NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
+STATIC_VAR const short skill_names_indices[P_NUM_SKILLS] = {
 	0,                DAGGER,         KNIFE,        AXE,
 	PICK_AXE,         SHORT_SWORD,    BROADSWORD,   LONG_SWORD,
 	TWO_HANDED_SWORD, SCIMITAR,       PN_SABER,     CLUB,
@@ -48,7 +48,7 @@ STATIC_VAR NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
 };
 
 /* note: entry [0] isn't used */
-STATIC_VAR NEARDATA const char * const odd_skill_names[] = {
+STATIC_VAR const char * const odd_skill_names[] = {
     "no skill",
     "bare hands",		/* use barehands_or_martial[] instead */
     "two weapon combat",
@@ -66,7 +66,7 @@ STATIC_VAR NEARDATA const char * const odd_skill_names[] = {
     "matter spells",
 };
 /* indexed vis `is_martial() */
-STATIC_VAR NEARDATA const char * const barehands_or_martial[] = {
+STATIC_VAR const char * const barehands_or_martial[] = {
     "bare handed combat", "martial arts"
 };
 
@@ -98,7 +98,7 @@ STATIC_DCL void FDECL(skill_advance, (int));
 			barehands_or_martial[martial_bonus()] : \
 			odd_skill_names[-skill_names_indices[type]])
 
-static NEARDATA const char kebabable[] = {
+static const char kebabable[] = {
 	S_XORN, S_DRAGON, S_JABBERWOCK, S_NAGA, S_GIANT, '\0'
 };
 
@@ -321,7 +321,7 @@ int x;
 	return (struct obj *)0;
 }
 
-static NEARDATA const int rwep[] =
+static const int rwep[] =
 {	DWARVISH_SPEAR, SILVER_SPEAR, ELVEN_SPEAR, SPEAR, ORCISH_SPEAR,
 	JAVELIN, SHURIKEN, YA, SILVER_ARROW, ELVEN_ARROW, ARROW,
 	ORCISH_ARROW, CROSSBOW_BOLT, SILVER_DAGGER, ELVEN_DAGGER, DAGGER,
@@ -330,7 +330,7 @@ static NEARDATA const int rwep[] =
 	/* note: CREAM_PIE should NOT be #ifdef KOPS */
 };
 
-static NEARDATA const int pwep[] =
+static const int pwep[] =
 {	HALBERD, BARDICHE, SPETUM, BILL_GUISARME, VOULGE, RANSEUR, GUISARME,
 	GLAIVE, LUCERN_HAMMER, BEC_DE_CORBIN, FAUCHARD, PARTISAN, LANCE
 };
@@ -444,7 +444,7 @@ register struct monst *mtmp;
 }
 
 /* Weapons in order of preference */
-static const NEARDATA short hwep[] = {
+static const short hwep[] = {
 	  CORPSE,  /* cockatrice corpse */
 	  TSURUGI, RUNESWORD, DWARVISH_MATTOCK, TWO_HANDED_SWORD, BATTLE_AXE,
 	  KATANA, UNICORN_HORN, CRYSKNIFE, TRIDENT, LONG_SWORD,

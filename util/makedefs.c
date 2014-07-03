@@ -1708,7 +1708,7 @@ char *str;
 }
 
 #ifdef STRICT_REF_DEF
-NEARDATA struct flag flags;
+struct flag flags;
 # ifdef ATTRIB_H
 struct attribs attrmax, attrmin;
 # endif

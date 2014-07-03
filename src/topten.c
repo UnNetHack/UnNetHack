@@ -76,7 +76,7 @@ STATIC_DCL void FDECL(nsb_unmung_line,(char*));
 #endif
 
 /* must fit with end.c; used in rip.c */
-NEARDATA const char * const killed_by_prefix[] = {
+const char * const killed_by_prefix[] = {
 	"killed by ", "choked on ", "poisoned by ", "died of ", "drowned in ",
 	"burned by ", "dissolved in ", "crushed to death by ", "petrified by ",
 	"turned to slime by ", "killed by ", 
@@ -453,9 +453,6 @@ int how;
  * corruption of *rfile somewhere.  Until I figure this out, just cut out
  * topten support entirely - at least then the game exits cleanly.  --AC
  */
-#ifdef _DCC
-	return;
-#endif
 
 /* If we are in the midst of a panic, cut out topten entirely.
  * topten uses alloc() several times, which will lead to

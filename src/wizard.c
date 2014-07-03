@@ -21,7 +21,7 @@ STATIC_DCL boolean FDECL(you_have, (int));
 STATIC_DCL long FDECL(target_on, (int,struct monst *));
 STATIC_DCL long FDECL(strategy, (struct monst *));
 
-static NEARDATA const int nasties[] = {
+static const int nasties[] = {
 	PM_COCKATRICE, PM_ETTIN, PM_STALKER, PM_MINOTAUR, PM_RED_DRAGON,
 	PM_BLACK_DRAGON, PM_GREEN_DRAGON, PM_OWLBEAR, PM_PURPLE_WORM,
 	PM_ROCK_TROLL, PM_XAN, PM_GREMLIN, PM_UMBER_HULK, PM_VAMPIRE_LORD,
@@ -33,7 +33,7 @@ static NEARDATA const int nasties[] = {
 	PM_DISENCHANTER, PM_EVIL_EYE
 	};
 
-static NEARDATA const unsigned wizapp[] = {
+static const unsigned wizapp[] = {
 	PM_HUMAN, PM_WATER_DEMON, PM_VAMPIRE,
 	PM_RED_DRAGON, PM_TROLL, PM_UMBER_HULK,
 	PM_XORN, PM_XAN, PM_COCKATRICE,

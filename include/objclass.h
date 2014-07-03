@@ -117,8 +117,8 @@ struct objdescr {
 	const char *oc_descr;		/* description when name unknown */
 };
 
-extern NEARDATA struct objclass objects[];
-extern NEARDATA struct objdescr obj_descr[];
+extern struct objclass objects[];
+extern struct objdescr obj_descr[];
 
 /*
  * All objects have a class. Make sure that all classes have a corresponding

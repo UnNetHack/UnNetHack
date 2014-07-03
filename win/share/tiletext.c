@@ -154,14 +154,6 @@ pixel (*pixels)[TILE_X];
 		Fprintf(stderr, "didn't find expected '}'\n");
 		return FALSE;
 	}
-#ifdef _DCC
-	/* DICE again... it doesn't seem to eat whitespace after the } like
-	 * it should, so we have to do so manually.
-	 */
-	while ((*c = fgetc(txtfile)) != EOF && isspace(*c))
-		;
-	ungetc(*c, txtfile);
-#endif
 	return TRUE;
 }
 
