@@ -19,7 +19,6 @@
 #	'Sysunix'	-- generic UNIX
 #	'Sys3B2'	-- AT&T 3B2, 3B5, etc.
 #	'Sysatt'	-- AT&T UNIXPC, 7300, 3B1
-#	'SysV-AT'	-- Microport 286 UNIX (put -DDUMB in CFLAGS)
 SYSTEM = Sysunix
 
 #
@@ -66,10 +65,6 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
 # flags for 286 Xenix:
 # CFLAGS = -Ml2t16 -O -LARGE -I../include
 # LFLAGS = -Ml -F 4000 -SEG 512
-
-# flags for 286 Microport SysV-AT
-# CFLAGS = -DDUMB -Ml -I../include
-# LFLAGS = -Ml
 
 # flags for IRIX 4.0.x using native cc
 # The include files are __STDC__, but have bugs involving const
@@ -323,31 +318,6 @@ Sysatt:	$(HOBJ) Makefile
 	@echo "Loading ..."
 	@$(LD) $(LFLAGS) /lib/crt0s.o /lib/shlib.ifile -o $(GAME) $(HOBJ)
 	@touch Sysatt
-
-SysV-AT:	DUMB.Setup $(HOBJ) Makefile
-	@echo "Loading ..."
-	@$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB)
-	@touch SysV-AT
-
-DUMB.Setup:	../include/extern.h
-	cp ../include/extern.h ../include/extern.h.BAK
-	cat ../include/extern.h | \
-		sed -e '/^E\ int\ /!b' \
-			-e '/[^;/ 	]$$/N' \
-			-e '/[(][*]occupation[)]/b' \
-			-e '/[(][*]afternmv[)]/b' \
-			-e '/float_down/b' \
-			-e '/done1/b' \
-			-e '/identify/b' \
-			-e '/Hear_again/b' \
-			-e '/hangup/b' \
-			-e 's/^\(.*\)$$/\/\* \1 \/\*\*\//' | \
-		sed -e '/^E\ void\ /!b' \
-			-e '/[^;/ 	]$$/N' \
-			-e 's/^\(.*\)$$/\/\* \1 \/\*\*\//' \
-				>../include/extern.DUMB
-	cp ../include/extern.DUMB ../include/extern.h
-	@touch DUMB.Setup
 
 all:	$(GAME)
 

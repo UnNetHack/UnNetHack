@@ -642,14 +642,7 @@ letknow:
 		/* seems we found a good place to leave him alone */
 		egrd->gddone = 1;
 		if(ACCESSIBLE(typ)) goto newpos;
-#ifdef STUPID
-		if (typ == SCORR)
-		    crm->typ = CORR;
-		else
-		    crm->typ = DOOR;
-#else
 		crm->typ = (typ == SCORR) ? CORR : DOOR;
-#endif
 		if(crm->typ == DOOR) crm->doormask = D_NODOOR;
 		goto proceed;
 	    }

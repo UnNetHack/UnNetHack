@@ -41,10 +41,6 @@ CC = @CC@ -DAUTOCONF
 # CFLAGS = -Ml2t16 -O -LARGE -I../include -I$(srcdir)/../include
 # LFLAGS = -Ml -F 4000 -SEG 512
 
-# flags for 286 Microport SysV-AT
-# CFLAGS = -DDUMB -Ml -I../include -I$(srcdir)/../include
-# LFLAGS = -Ml
-
 # flags for Apollos using their native cc
 # (as long as it claims to be __STDC__ but isn't)
 # CFLAGS = -DAPOLLO -O -I../include -I$(srcdir)/../include

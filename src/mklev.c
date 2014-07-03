@@ -523,14 +523,7 @@ register int type;
 		    level_difficulty() >= 5 && !rn2(25))
 		    levl[x][y].doormask |= D_TRAPPED;
 	    } else
-#ifdef STUPID
-		if (shdoor)
-			levl[x][y].doormask = D_ISOPEN;
-		else
-			levl[x][y].doormask = D_NODOOR;
-#else
 		levl[x][y].doormask = (shdoor ? D_ISOPEN : D_NODOOR);
-#endif
 	    if(levl[x][y].doormask & D_TRAPPED) {
 		struct monst *mtmp;
 

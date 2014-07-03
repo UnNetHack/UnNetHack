@@ -5,10 +5,6 @@
 #ifndef TRADSTDC_H
 #define TRADSTDC_H
 
-#if defined(DUMB) && !defined(NOVOID)
-#define NOVOID
-#endif
-
 #ifdef NOVOID
 #define void int
 #endif

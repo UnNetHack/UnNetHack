@@ -241,31 +241,6 @@ Sysatt:	$(HOBJ) Makefile
 	@$(LD) $(LFLAGS) /lib/crt0s.o /lib/shlib.ifile -o $(GAME) $(HOBJ)
 	@touch Sysatt
 
-SysV-AT:	DUMB.Setup $(HOBJ) Makefile
-	@echo "Loading ..."
-	@$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB)
-	@touch SysV-AT
-
-DUMB.Setup:	../include/extern.h
-	cp ../include/extern.h ../include/extern.h.BAK
-	cat ../include/extern.h | \
-		sed -e '/^E\ int\ /!b' \
-			-e '/[^;/ 	]$$/N' \
-			-e '/[(][*]occupation[)]/b' \
-			-e '/[(][*]afternmv[)]/b' \
-			-e '/float_down/b' \
-			-e '/done1/b' \
-			-e '/identify/b' \
-			-e '/Hear_again/b' \
-			-e '/hangup/b' \
-			-e 's/^\(.*\)$$/\/\* \1 \/\*\*\//' | \
-		sed -e '/^E\ void\ /!b' \
-			-e '/[^;/ 	]$$/N' \
-			-e 's/^\(.*\)$$/\/\* \1 \/\*\*\//' \
-				>../include/extern.DUMB
-	cp ../include/extern.DUMB ../include/extern.h
-	@touch DUMB.Setup
-
 .SUFFIXES:	.dll .o
 
 .o.dll:
