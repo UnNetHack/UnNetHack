@@ -18,7 +18,7 @@
 
 #include <ctype.h>
 
-#if (!defined(O_WRONLY) && !defined(AZTEC_C)) || defined(USE_FCNTL)
+#if !defined(O_WRONLY) || defined(USE_FCNTL)
 #include <fcntl.h>
 #endif
 
@@ -2070,9 +2070,8 @@ const char *dir;
 # if defined(FILE_AREAS)
 	    if ((fd = open_area(NH_RECORD_AREA, tmp, O_CREAT|O_RDWR,
 	      S_IREAD|S_IWRITE)) < 0) {
-# elif defined(AZTEC_C) || defined(_DCC)
-	    /* Aztec doesn't use the third argument */
-	    /* DICE doesn't like it */
+# elif defined(_DCC)
+	    /* DICE doesn't use the third argument */
 	    if ((fd = open(fq_record, O_CREAT|O_RDWR)) < 0) {
 # else
 	    if ((fd = open(fq_record, O_CREAT|O_RDWR, S_IREAD|S_IWRITE)) < 0) {

@@ -5,18 +5,10 @@
 #ifndef CONFIG1_H
 #define CONFIG1_H
 
-#ifdef __TURBOC__
-# define __MSC		/* increase Borland C compatibility in libraries */
-#endif
-
-#ifdef __SASC_60
+#ifdef _DCC
 # define NEARDATA __near /* put some data close */
 #else
-# ifdef _DCC
-# define NEARDATA __near /* put some data close */
-# else
 # define NEARDATA
-# endif
 #endif
 
 /*

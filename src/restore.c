@@ -1077,7 +1077,7 @@ register unsigned int len;
 #if defined(BSD)
 	rlen = read(fd, buf, (int) len);
 	if(rlen != len){
-#else /* e.g. SYSV, __TURBOC__ */
+#else /* e.g. SYSV */
 	rlen = read(fd, buf, (unsigned) len);
 	if((unsigned)rlen != len){
 #endif

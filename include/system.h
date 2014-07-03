@@ -37,21 +37,13 @@ typedef unsigned int	size_t;
 # endif
 #endif	/* MICRO */
 
-#if defined(__TURBOC__)
-#include <time.h>	/* time_t is not in <sys/types.h> */
-#endif
-
-#if defined(AZTEC) || defined(THINKC4) || defined(__TURBOC__)
-typedef long	off_t;
-#endif
-
 #endif /* !__cplusplus && !__GO32__ */
 
 /* You may want to change this to fit your system, as this is almost
  * impossible to get right automatically.
  * This is the type of signal handling functions.
  */
-#if (defined(_MSC_VER) || defined(__TURBOC__) || defined(__SC__) || defined(WIN32))
+#if (defined(_MSC_VER) || defined(__SC__) || defined(WIN32))
 # define SIG_RET_TYPE void (__cdecl *)(int)
 #endif
 #ifndef SIG_RET_TYPE
@@ -102,7 +94,7 @@ E void FDECL(exit, (int));
 # if defined(__STDC__) || !defined(FLEX_SCANNER)
 E void FDECL(free, (genericptr_t));
 # endif
-#if !defined(__SASC_60) && !defined(_DCC) && !defined(__SC__)
+#if !defined(_DCC) && !defined(__SC__)
 E void FDECL(perror, (const char *));
 #endif
 #endif
@@ -115,7 +107,7 @@ E void FDECL(qsort, (genericptr_t,size_t,size_t,
 # if defined(BSD)
 E  int qsort();
 # else
-#  if !defined(LATTICE) && !defined(AZTEC_50)
+#  if !defined(LATTICE)
 E   void FDECL(qsort, (genericptr_t,size_t,size_t,
 		       int(*)(const genericptr,const genericptr)));
 #  endif
@@ -123,14 +115,13 @@ E   void FDECL(qsort, (genericptr_t,size_t,size_t,
 #endif
 #endif /* NeXT */
 
-#ifndef __SASC_60
-#if !defined(AZTEC_50) && !defined(__GNUC__)
+#if !defined(__GNUC__)
 /* may already be defined */
 
 # ifndef bsdi
 E long FDECL(lseek, (int,long,int));
 # endif
-# if defined(POSIX_TYPES) || defined(__TURBOC__)
+# if defined(POSIX_TYPES)
 #  ifndef bsdi
 E int FDECL(write, (int, const void *,unsigned));
 #  endif
@@ -144,7 +135,7 @@ E int FDECL(write, (int,genericptr_t,unsigned));
 E int FDECL(unlink, (const char *));
 # endif
 
-#endif /* AZTEC_50 && __GNUC__ */
+#endif /*  __GNUC__ */
 
 #if defined(MICRO)
 E int FDECL(close, (int));
@@ -156,20 +147,12 @@ E int FDECL(dup2, (int, int));
 E int FDECL(setmode, (int,int));
 E int NDECL(kbhit);
 # if !defined(_DCC)
-#  if defined(__TURBOC__)
-E int FDECL(chdir, (const char *));
-#  else
-#   ifndef __EMX__
-E int FDECL(chdir, (char *));
-#   endif
-#  endif
 #  ifndef __EMX__
+E int FDECL(chdir, (char *));
 E char *FDECL(getcwd, (char *,int));
 #  endif
 # endif /* !_DCC */
 #endif
-
-#endif	/* __SASC_60 */
 
 /* both old & new versions of Ultrix want these, but real BSD does not */
 #ifdef MICRO
@@ -203,7 +186,7 @@ E char *memset();
 #endif /* POSIX_TYPES */
 
 #if defined(MICRO) && !defined(LATTICE)
-#  if defined(AZTEC_50) || defined(NHSTDC) || defined(WIN32)
+#  if defined(NHSTDC) || defined(WIN32)
 E int  FDECL(memcmp, (const void *, const void *, size_t));
 E void *FDECL(memcpy, (void *, const void *, size_t));
 E void *FDECL(memset, (void *, int, size_t));
@@ -211,7 +194,7 @@ E void *FDECL(memset, (void *, int, size_t));
 E int FDECL(memcmp, (char *,char *,unsigned int));
 E char *FDECL(memcpy, (char *,char *,unsigned int));
 E char *FDECL(memset, (char*,int,int));
-#  endif /* AZTEC_50 || NHSTDC */
+#  endif /* NHSTDC */
 #endif /* MICRO */
 
 #if defined(SYSV)
@@ -272,10 +255,10 @@ E int	FDECL(strlen, (const char *));
  * If your system defines sprintf, et al, in stdio.h, add to the initial
  * #if.
  */
-#if defined(__DECC) || defined(__SASC_60) || defined(WIN32)
+#if defined(__DECC) || defined(WIN32)
 #define SPRINTF_PROTO
 #endif
-#if defined(AZTEC_50) || defined(__sgi) || defined(__GNUC__)
+#if defined(__sgi) || defined(__GNUC__)
 	/* problem with prototype mismatches */
 #define SPRINTF_PROTO
 #endif
@@ -296,7 +279,6 @@ E  char *sprintf();
 # undef SPRINTF_PROTO
 #endif
 
-#ifndef __SASC_60
 #ifdef NEED_VARARGS
 # if defined(USE_STDARG) || defined(USE_VARARGS)
 #  if !defined(SVR4) && !defined(apollo)
@@ -310,7 +292,6 @@ E int FDECL(vprintf, (const char *, va_list));
 #  define vsprintf	sprintf
 # endif
 #endif /* NEED_VARARGS */
-#endif
 
 
 #ifdef MICRO

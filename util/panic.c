@@ -10,10 +10,6 @@
 #define NEED_VARARGS
 #include "config.h"
 
-#ifdef AZTEC
-#define abort() exit()
-#endif
-
 /*VARARGS1*/
 boolean panicking;
 void VDECL(panic, (char *,...));

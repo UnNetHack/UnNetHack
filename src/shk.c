@@ -2928,9 +2928,6 @@ int
 doinvbill(mode)
 int mode;		/* 0: deliver count 1: paged */
 {
-#ifdef	__SASC
-	void sasc_bug(struct obj *, unsigned);
-#endif
 	struct monst *shkp;
 	struct eshk *eshkp;
 	struct bill_x *bp, *end_bp;
@@ -2983,12 +2980,7 @@ int mode;		/* 0: deliver count 1: paged */
 		obj->unpaid = 0;		/* ditto */
 		/* Why 'x'?  To match `I x', more or less. */
 		buf_p = xprname(obj, (char *)0, 'x', FALSE, thisused, uquan);
-#ifdef __SASC
-				/* SAS/C 6.2 can't cope for some reason */
-		sasc_bug(obj,save_unpaid);
-#else
 		obj->unpaid = save_unpaid;
-#endif
 		putstr(datawin, 0, buf_p);
 	    }
 	}
@@ -4276,12 +4268,5 @@ struct obj *obj;
 	    return strcpy(buf, s_suffix(mon_nam(obj->ocarry)));
 	return (char *)0;
 }
-
-#ifdef __SASC
-void
-sasc_bug(struct obj *op, unsigned x){
-	op->unpaid=x;
-}
-#endif
 
 /*shk.c*/

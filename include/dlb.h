@@ -131,7 +131,7 @@ long FDECL(dlb_ftell, (DLB_P));
 #else
 #define WRTMODE "w+"
 #endif
-#if defined(MICRO) || defined(THINK_C) || defined(__MWERKS__) || defined(WIN32)
+#if defined(MICRO) || defined(__MWERKS__) || defined(WIN32)
 # define RDBMODE "rb"
 # define WRBMODE "w+b"
 #else

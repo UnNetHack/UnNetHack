@@ -181,7 +181,7 @@
 #include "tradstdc.h"
 
 /*
- * type schar: small signed integers (8 bits suffice) (eg. TOS)
+ * type schar: small signed integers (8 bits suffice)
  *
  *	typedef char	schar;
  *
@@ -189,11 +189,7 @@
  *
  *	typedef short int schar;
  */
-#ifdef AZTEC
-# define schar	char
-#else
 typedef signed char	schar;
-#endif
 
 /*
  * type uchar: small unsigned integers (8 bits suffice - but 7 bits do not)

@@ -29,9 +29,6 @@ int  NDECL (yywrap);
 void FDECL (init_yyin, (FILE *));
 void FDECL (init_yyout, (FILE *));
 
-#ifdef AZTEC_36
-FILE *FDECL (freopen, (char *,char *,FILE *));
-#endif
 #define Fprintf (void)fprintf
 
 #if defined(__BORLANDC__) && !defined(_WIN32)
