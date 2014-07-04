@@ -124,11 +124,6 @@ static char *FDECL(eos, (char *));
 /* input, output, tmp */
 static FILE *ifp, *ofp, *tfp;
 
-#if defined(__BORLANDC__) && !defined(_WIN32)
-extern unsigned _stklen = STKSIZ;
-#endif
-
-
 #ifdef MACsansMPWTOOL
 int
 main(void)

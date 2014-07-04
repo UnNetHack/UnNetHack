@@ -7,9 +7,6 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#if defined(__BORLANDC__)
-LANGUAGE LANG_ENGLISH,SUBLANG_ENGLISH_US
-#endif
 #define APSTUDIO_HIDDEN_SYMBOLS
 #include "windows.h"
 #undef APSTUDIO_HIDDEN_SYMBOLS
@@ -216,9 +213,6 @@ END
 
 2 TEXTINCLUDE DISCARDABLE 
 BEGIN
-    "#if defined(__BORLANDC__)\r\n"
-    "LANGUAGE LANG_ENGLISH,SUBLANG_ENGLISH_US\r\n"
-    "#endif\r\n"
     "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
     "#include ""windows.h""\r\n"
     "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"

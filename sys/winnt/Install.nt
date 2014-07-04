@@ -211,9 +211,6 @@ Compiling
     For Microsoft compiler: 
         nmake install
 
-    For Borland compiler:
-        make /f Makefile.bcc install
-
     For GCC:
         mingw32-make -f Makefile.gcc install
 
@@ -235,9 +232,6 @@ Notes:
 
     For Microsoft compiler: 
         nmake
-
-    For Borland compiler:
-        make /f Makefile.bcc
 
     For GCC:
         mingw32-make -f Makefile.gcc

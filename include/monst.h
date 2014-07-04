@@ -33,9 +33,7 @@
 #define MINV_NOLET 0x01
 #define MINV_ALL   0x02
 
-#ifndef ALIGN_H
 #include "align.h"
-#endif
 
 struct monst {
 	struct monst *nmon;

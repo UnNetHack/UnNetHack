@@ -31,9 +31,6 @@ void FDECL (init_yyout, (FILE *));
 
 #define Fprintf (void)fprintf
 
-#if defined(__BORLANDC__) && !defined(_WIN32)
-extern unsigned _stklen = STKSIZ;
-#endif
 int
 main(argc, argv)
 int argc;

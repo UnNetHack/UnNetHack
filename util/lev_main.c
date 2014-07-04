@@ -44,9 +44,6 @@
 #define Free(ptr)		if(ptr) free((genericptr_t) (ptr))
 #define Write(fd, item, size)	if (write(fd, (genericptr_t)(item), size) != size) return FALSE;
 
-#if defined(__BORLANDC__) && !defined(_WIN32)
-extern unsigned _stklen = STKSIZ;
-#endif
 #define MAX_ERRORS	25
 
 extern int  NDECL (yyparse);
