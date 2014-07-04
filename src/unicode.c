@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)end.c	3.5	2011/01/19	*/
 /* Copyright (c) Patric Mueller.			*/
 /* NetHack may be freely redistributed.  See license for details. */
 

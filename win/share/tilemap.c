@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)tilemap.c	3.4	2000/06/04	*/
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*

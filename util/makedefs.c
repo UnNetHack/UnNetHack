@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)makedefs.c	3.4	2002/08/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
 /* Copyright (c) Dean Luick, 1990.				  */
@@ -454,7 +453,6 @@ do_date()
 		perror(filename);
 		exit(EXIT_FAILURE);
 	}
-	Fprintf(ofp,"/*\tSCCS Id: @(#)date.h\t3.4\t2002/02/03 */\n\n");
 	Fprintf(ofp, "%s", Dont_Edit_Code);
 
 	(void) time((time_t *)&clocktim);
@@ -1242,7 +1240,6 @@ do_permonst()
 		perror(filename);
 		exit(EXIT_FAILURE);
 	}
-	Fprintf(ofp,"/*\tSCCS Id: @(#)pm.h\t3.4\t2002/02/03 */\n\n");
 	Fprintf(ofp, "%s", Dont_Edit_Code);
 	Fprintf(ofp,"#ifndef PM_H\n#define PM_H\n");
 
@@ -1554,7 +1551,6 @@ do_objs()
 		perror(filename);
 		exit(EXIT_FAILURE);
 	}
-	Fprintf(ofp,"/*\tSCCS Id: @(#)onames.h\t3.4\t2002/02/03 */\n\n");
 	Fprintf(ofp, "%s", Dont_Edit_Code);
 	Fprintf(ofp,"#ifndef ONAMES_H\n#define ONAMES_H\n\n");
 

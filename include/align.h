@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)align.h	3.4	1991/12/29	*/
 /* Copyright (c) Mike Stephenson, Izchak Miller  1991.		  */
 /* NetHack may be freely redistributed.  See license for details. */
 

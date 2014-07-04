@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)monflag.h	3.4	1996/05/04	*/
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

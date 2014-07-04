@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)mhmenu.c	3.4	2002/03/06	*/
 /* Copyright (c) Alex Kompel, 2002                                */
 /* NetHack may be freely redistributed.  See license for details. */
 

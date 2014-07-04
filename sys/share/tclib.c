@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)tclib.c	3.4	1996/02/25	*/
 /* Copyright (c) Robert Patrick Rankin, 1995			  */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)winX.c	3.4	1999/12/21	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

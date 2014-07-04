@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)epri.h	3.4	1997/05/01	*/
 /* Copyright (c) Izchak Miller, 1989.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

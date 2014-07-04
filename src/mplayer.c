@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)mplayer.c	3.4	1997/02/04	*/
 /*	Copyright (c) Izchak Miller, 1992.			  */
 /* NetHack may be freely redistributed.  See license for details. */
 

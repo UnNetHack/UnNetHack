@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)winmisc.c	3.4	2000/05/21	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

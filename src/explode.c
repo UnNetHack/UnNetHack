@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)explode.c	3.4	2002/11/10	*/
 /*	Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 

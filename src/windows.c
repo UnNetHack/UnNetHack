@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)windows.c	3.4	1996/05/19	*/
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 

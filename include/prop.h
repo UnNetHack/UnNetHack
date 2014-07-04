@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)prop.h	3.4	1999/07/07	*/
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

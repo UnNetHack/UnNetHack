@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)tile2x11.h 3.4	1995/01/25	*/
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef TILE2X11_H
