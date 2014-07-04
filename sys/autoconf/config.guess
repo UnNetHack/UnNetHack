@@ -1335,19 +1335,6 @@ main ()
   printf ("m68k-hp-bsd\n"); exit (0);
 #endif
 
-#if defined (NeXT)
-#if !defined (__ARCHITECTURE__)
-#define __ARCHITECTURE__ "m68k"
-#endif
-  int version;
-  version=`(hostinfo | sed -n 's/.*NeXT Mach \([0-9]*\).*/\1/p') 2>/dev/null`;
-  if (version < 4)
-    printf ("%s-next-nextstep%d\n", __ARCHITECTURE__, version);
-  else
-    printf ("%s-next-openstep%d\n", __ARCHITECTURE__, version);
-  exit (0);
-#endif
-
 #if defined (MULTIMAX) || defined (n16)
 #if defined (UMAXV)
   printf ("ns32k-encore-sysv\n"); exit (0);

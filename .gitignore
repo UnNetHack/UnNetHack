@@ -71,3 +71,7 @@ compile
 
 # /win/
 /win/*/*.o
+
+# Eclipse
+.cproject
+.project

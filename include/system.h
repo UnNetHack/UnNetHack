@@ -99,21 +99,10 @@ E void FDECL(perror, (const char *));
 #endif
 #endif
 #endif /* LEGACY_CODE */
-#ifndef NeXT
 #ifdef POSIX_TYPES
 E void FDECL(qsort, (genericptr_t,size_t,size_t,
 		     int(*)(const genericptr,const genericptr)));
-#else
-# if defined(BSD)
-E  int qsort();
-# else
-#  if !defined(LATTICE)
-E   void FDECL(qsort, (genericptr_t,size_t,size_t,
-		       int(*)(const genericptr,const genericptr)));
-#  endif
-# endif
 #endif
-#endif /* NeXT */
 
 #if !defined(__GNUC__)
 /* may already be defined */
@@ -209,31 +198,27 @@ E int NDECL(getpid);
 #if !defined(_XtIntrinsic_h) && !defined(POSIX_TYPES)
 /* <X11/Intrinsic.h> #includes <string[s].h>; so does defining POSIX_TYPES */
 
-#if defined(NeXT) && defined(__GNUC__)
-#include <strings.h>
-#else
 E char	*FDECL(strcpy, (char *,const char *));
 E char	*FDECL(strncpy, (char *,const char *,size_t));
 E char	*FDECL(strcat, (char *,const char *));
 E char	*FDECL(strncat, (char *,const char *,size_t));
 E char	*FDECL(strpbrk, (const char *,const char *));
 
-# if defined(SYSV) || defined(MICRO)
+#if defined(SYSV) || defined(MICRO)
 E char	*FDECL(strchr, (const char *,int));
 E char	*FDECL(strrchr, (const char *,int));
-# else /* BSD */
+#else /* BSD */
 E char	*FDECL(index, (const char *,int));
 E char	*FDECL(rindex, (const char *,int));
-# endif
+#endif
 
 E int	FDECL(strcmp, (const char *,const char *));
 E int	FDECL(strncmp, (const char *,const char *,size_t));
-# if defined(MICRO)
+#if defined(MICRO)
 E size_t FDECL(strlen, (const char *));
-# else
+#else
 E int	FDECL(strlen, (const char *));
-# endif /* MICRO */
-#endif
+#endif /* MICRO */
 
 #endif	/* !_XtIntrinsic_h_ && !POSIX_TYPES */
 
@@ -258,7 +243,7 @@ E int	FDECL(strlen, (const char *));
 #endif
 
 #ifndef SPRINTF_PROTO
-# if defined(POSIX_TYPES) || defined(NeXT) || !defined(BSD)
+# if defined(POSIX_TYPES) || !defined(BSD)
 E  int FDECL(sprintf, (char *,const char *,...));
 # else
 #  define OLD_SPRINTF

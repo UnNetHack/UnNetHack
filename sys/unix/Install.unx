@@ -174,15 +174,6 @@ Notes:
     and lev_comp.h to include and dgn_lex.c, dgn_yacc.c, lev_lex.c, and
     lev_yacc.c to util.
 
-*   Yes, Virginia, you compile NetHack for a NeXT as if it ran UNIX instead
-    of Mach.  Just tell NetHack you're a BSD system (Mach is extremely
-    close to BSD UNIX for traditional system calls, so this is also a
-    likely thing to try for any other programs you want to compile).
-
-    If you get errors when starting nethack warning that "Setuid execution is 
-    not allowed", you might want to re-install using the setgid option instead
-    (see Note 7 above, and the setgid comment in the toplevel Makefile).
-
 *   If you are using Solaris 2.x (aka SunOS 5.x) you shouldn't have to
     do any system configuration -- this is the default.  In case it is
     messed up, follow these instructions.
