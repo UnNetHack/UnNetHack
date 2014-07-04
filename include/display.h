@@ -6,13 +6,8 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#ifndef VISION_H
 #include "vision.h"
-#endif
-
-#ifndef MONDATA_H
 #include "mondata.h"	/* for mindless() */
-#endif
 
 #ifndef INVISIBLE_OBJECTS
 #define vobj_at(x,y) (level.objects[x][y])

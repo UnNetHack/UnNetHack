@@ -9,18 +9,14 @@
 
 #define PATHLEN		64	/* maximum pathlength */
 #define FILENAME	80	/* maximum filename length (conservative) */
-#ifndef MICRO_H
 #include "micro.h"		/* contains necessary externs for [os_name].c */
-#endif
 
 
 /* ===================================================
  *  The remaining code shouldn't need modification.
  */
 
-#ifndef SYSTEM_H
 #include "system.h"
-#endif
 
 #ifdef __DJGPP__
 #include <unistd.h> /* close(), etc. */

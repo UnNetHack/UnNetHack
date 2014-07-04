@@ -5,9 +5,7 @@
 #ifndef HACK_H
 #define HACK_H
 
-#ifndef CONFIG_H
 #include "config.h"
-#endif
 
 /*	For debugging beta code.	*/
 #ifdef BETA

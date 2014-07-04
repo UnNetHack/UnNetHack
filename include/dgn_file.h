@@ -5,9 +5,7 @@
 #ifndef DGN_FILE_H
 #define DGN_FILE_H
 
-#ifndef ALIGN_H
 #include "align.h"
-#endif
 
 /*
  * Structures manipulated by the dungeon loader & compiler

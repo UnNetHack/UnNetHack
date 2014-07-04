@@ -5,7 +5,7 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-#ifdef MENU_COLOR
+#ifdef MENU_COLOR 
 # ifdef MENU_COLOR_REGEX
 #  include <regex.h>
 # endif

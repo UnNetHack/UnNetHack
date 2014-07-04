@@ -314,10 +314,7 @@ E struct engr *head_engr;
 E struct you u;
 
 #include "onames.h"
-#ifndef PM_H		/* (pm.h has already been included via youprop.h) */
 #include "pm.h"
-#endif
-
 
 #define PM_BABY_GRAY_DRAGON   PM_BABY_TATZELWORM
 #define PM_BABY_SILVER_DRAGON PM_BABY_AMPHITERE
