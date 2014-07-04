@@ -17,18 +17,6 @@
 
 #include "system.h"
 
-#ifdef __DJGPP__
-#include <unistd.h> /* close(), etc. */
-/* lock() in io.h interferes with lock[] in decl.h */
-#define lock djlock
-#include <io.h>
-#undef lock
-#include <pc.h> /* kbhit() */
-#define PC_LOCKING
-#define HOLD_LOCKFILE_OPEN
-#define SELF_RECOVER		/* NetHack itself can recover games */
-#endif
-
 #ifdef PC_LOCKING
 #define HLOCK "NHPERM"
 #endif
@@ -81,9 +69,6 @@
 #endif
 
 #ifdef TIMED_DELAY
-# ifdef __DJGPP__
-# define msleep(k) (void) usleep((k)*1000)
-# endif
 # ifdef __SC__
 # define msleep(k) (void) usleep((long)((k)*1000))
 # endif

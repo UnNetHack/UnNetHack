@@ -224,14 +224,14 @@ E void FDECL(genl_outrip, (winid,int));
 
 #ifdef NO_TERMS
 # if defined(WIN32CON)
-#  if defined(SCREEN_BIOS) || defined(SCREEN_DJGPPFAST) || defined(WIN32CON)
+#  if defined(SCREEN_BIOS) || defined(WIN32CON)
 #   undef putchar
 #   undef putc
 #   undef puts
 #   define putchar(x) xputc(x)	/* these are in video.c, nttty.c */
 #   define putc(x) xputc(x)
 #   define puts(x) xputs(x)
-#  endif/*SCREEN_BIOS || SCREEN_DJGPPFAST || WIN32CON */
+#  endif/*SCREEN_BIOS || WIN32CON */
 #  ifdef POSITIONBAR
 E void FDECL(video_update_positionbar, (char *));
 #  endif

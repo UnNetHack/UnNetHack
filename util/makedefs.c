@@ -600,9 +600,6 @@ static const char *build_opts[] = {
 # ifdef SCREEN_BIOS
 		"screen control via BIOS",
 # endif
-# ifdef SCREEN_DJGPPFAST
-		"screen control via DJGPP fast",
-# endif
 # ifdef SCREEN_VGA
 		"screen control via VGA graphics",
 # endif

@@ -300,7 +300,7 @@ extern coord bhitpos;	/* place where throw or zap hits or stops */
 /* negative armor class is randomly weakened to prevent invulnerability */
 #define AC_VALUE(AC)	((AC) >= 0 ? (AC) : -rnd(-(AC)))
 
-#if defined(MICRO) && !defined(__DJGPP__)
+#if defined(MICRO)
 #define getuid() 1
 #define getlogin() ((char *)0)
 #endif /* MICRO */

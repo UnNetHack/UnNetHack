@@ -500,10 +500,6 @@ case $basic_machine in
 		basic_machine=m88k-motorola
 		os=-sysv3
 		;;
-	djgpp)
-		basic_machine=i586-pc
-		os=-msdosdjgpp
-		;;
 	dpx20 | dpx20-*)
 		basic_machine=rs6000-bull
 		os=-bosx

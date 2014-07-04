@@ -305,12 +305,7 @@ const char *directory;
 }
 
 #ifdef EXEPATH
-# ifdef __DJGPP__
-#define PATH_SEPARATOR '/'
-# else
 #define PATH_SEPARATOR '\\'
-# endif
-
 #define EXEPATHBUFSZ 256
 char exepathbuf[EXEPATHBUFSZ];
 

@@ -8,9 +8,6 @@
 #if !defined(O_WRONLY)
 #include <fcntl.h>
 #endif
-#if defined(__DJGPP__)
-#include <string.h>
-#endif
 
 static void FDECL(xexit, (int));
 

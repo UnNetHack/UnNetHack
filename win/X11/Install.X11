@@ -2,10 +2,8 @@
 This document describes the installation of NetHack with an X11 interface.
 
 There are no explicit UNIX dependencies in this code, but we have only
-tested it under UNIX, using X11R4, X11R5, or X11R6.  We have two reports
-that the code also works under DesqView/X on MS-DOS with djgpp, but you
-will have to add dependencies for the X code to that makefile before you
-can use it.  Other X11R4+ platforms may work as well, with some tweaking
+tested it under UNIX, using X11R4, X11R5, or X11R6.  Other X11R4+ 
+platforms may work as well, with some tweaking
 likely.  Follow WIN* in sys/unix/Makefile.src for compilation hints.
 
 (If you try to compile it with X11R3 or earlier, you will get many errors,

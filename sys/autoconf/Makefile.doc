@@ -56,7 +56,7 @@ DGNMANCREATE = cp dgn_comp.6
 RCVRMANCREATE = cp recover.6
 DLBMANCREATE = cp dlb.6
 # manual installation for most SYSV-style systems
-# and for man files readable in less (eg dos DJGPP+GNU)
+# and for man files readable in less
 # GAMEMANCREATE = groff -Wall -mtty-char -Tascii -man $(GAME).6 >
 # LEVMANCREATE = groff -Wall -mtty-char -Tascii -man lev_comp.6 >
 # DGNMANCREATE = groff -Wall -mtty-char -Tascii -man dgn_comp.6 >
