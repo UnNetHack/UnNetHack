@@ -56,16 +56,6 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
 # if you're debugging and want gcc to check as much as possible, use:
 # CC = gcc -W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN
 
-# flags may have to be changed as required
-# flags for 286 Xenix:
-# CFLAGS = -Ml2t16 -O -LARGE -I../include
-# LFLAGS = -Ml -F 4000 -SEG 512
-
-# flags for IRIX 4.0.x using native cc
-# The include files are __STDC__, but have bugs involving const
-# CFLAGS = -O -I../include -D__STDC__ -Dconst= -woff 100,293
-# LFLAGS = -s
-
 # flags for BSD/OS 2.0
 # CFLAGS = -O -I../include -I/usr/X11/include
 # LFLAGS = -L/usr/X11/lib
@@ -90,8 +80,7 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
 CFLAGS = -O -I../include
 LFLAGS = 
 
-# The Qt and Be window systems are written in C++, while the rest of
-# NetHack is standard C.  If using Qt, uncomment the LINK line here to get
+# NetHack is standard C.  If using C++, uncomment the LINK line here to get
 # the C++ libraries linked in.
 CXXFLAGS = $(CFLAGS) -I. -I$(QTDIR)/include
 CXX=g++
@@ -164,10 +153,6 @@ WINLIB = $(WINTTYLIB)
 # any other strange libraries your system needs (for Sysunix only -- the more
 # specialized targets should already be right)
 #
-# on HP-UX 8.x, the malloc(3x) routines in libmalloc.a seem to align things
-# better than the malloc(3) ones in libc.a
-# LIBS = -lmalloc
-#
 # DPX/2's also use the malloc(3x) routines.  In addition, if you are building
 # for X11, you must include libinet.a.
 # LIBS = -lmalloc -linet
@@ -182,9 +167,6 @@ WINLIB = $(WINTTYLIB)
 #
 # Solaris 2.x seems to work with the following
 # LIBS = -lsocket -lnsl
-#
-# IRIX 4.0.x needs -lsun if NIS (YP) is being used for passwd file lookup
-# LIBS = -lsun
 #
 LIBS =
 
@@ -308,11 +290,6 @@ Sys3B2:	$(HOBJ) Makefile
 	@echo "Loading ..."
 	@$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) -lmalloc
 	@touch Sys3B2
-
-Sysatt:	$(HOBJ) Makefile
-	@echo "Loading ..."
-	@$(LD) $(LFLAGS) /lib/crt0s.o /lib/shlib.ifile -o $(GAME) $(HOBJ)
-	@touch Sysatt
 
 all:	$(GAME)
 

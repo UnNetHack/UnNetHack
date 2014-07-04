@@ -34,11 +34,6 @@ STATIC_DCL void FDECL(calm_nymphs,(int));
 STATIC_DCL void FDECL(charm_monsters,(int));
 STATIC_DCL int FDECL(do_improvisation,(struct obj *));
 
-#ifdef UNIX386MUSIC
-STATIC_DCL int NDECL(atconsole);
-STATIC_DCL void FDECL(speaker,(struct obj *,char *));
-#endif
-
 /*
  * Wake every monster in range...
  */
@@ -469,6 +464,7 @@ struct obj *instr;
 	}
 	You("extract a strange sound from %s!", the(xname(instr)));
 #ifdef UNIX386MUSIC
+	/* UNIX386MUSIC unsupported but left here for reference. */
 	/* if user is at the console, play through the console speaker */
 	if (atconsole())
 	    speaker(instr, buf);
@@ -549,6 +545,7 @@ struct obj *instr;
 }
 
 #ifdef UNIX386MUSIC
+	/* UNIX386MUSIC unsupported but left here for reference. */
 /*
  * Play audible music on the machine's speaker if appropriate.
  */
