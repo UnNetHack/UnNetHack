@@ -366,7 +366,3 @@ spotless: clean
 	-rm -f makedefs$(EXEEXT) lev_comp$(EXEEXT) dgn_comp$(EXEEXT) recover$(EXEEXT) dlb$(EXEEXT) uudecode$(EXEEXT)
 	-rm -f gif2txt txt2ppm tile2x11$(EXEEXT) tile2img.ttp xpm2img.ttp tilemap$(EXEEXT) tile2bmp$(EXEEXT)
 	-rm -f Makefile
-
-tileedit: tileedit.cpp $(TEXT_IO)
-	$(QTDIR)/bin/moc -o tileedit.moc tileedit.h
-	$(CC) -o tileedit -I../include -I$(srcdir)/../include -I$(QTDIR)/include -L$(QTDIR)/lib tileedit.cpp $(TEXT_IO) -lqt

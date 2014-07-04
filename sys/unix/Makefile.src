@@ -64,9 +64,6 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o
 #   compile normally
 # CFLAGS = -O2 -fomit-frame-pointer -I../include
 # LFLAGS = -L/usr/X11R6/lib
-#   OR compile backwards compatible a.out format
-# CFLAGS = -O2 -b i486-linuxaout -fomit-frame-pointer -I../include
-# LFLAGS = -b i486-linuxaout -L/usr/X11R6/lib
 
 # Compile with PDCurses installed in a separate directory that doesn't
 # conflict with the system curses/ncurses library
@@ -82,7 +79,7 @@ LFLAGS =
 
 # NetHack is standard C.  If using C++, uncomment the LINK line here to get
 # the C++ libraries linked in.
-CXXFLAGS = $(CFLAGS) -I. -I$(QTDIR)/include
+CXXFLAGS = $(CFLAGS) -I.
 CXX=g++
 #LINK=g++
 #	For cross-compiling, eg. with gcc on Linux (see also CC further up):

@@ -40,7 +40,7 @@
  * Define the default window system.  This should be one that is compiled
  * into your system (see defines above).  Known window systems are:
  *
- *	tty, X11, mac, Qt, Gem, Gnome, lisp
+ *	tty, X11, lisp
  */
 
 #ifdef MSWIN_GRAPHICS
