@@ -33,13 +33,10 @@
 /* #define CURSES_GRAPHICS */	/* Proper curses interface */
 /* #define X11_GRAPHICS */	/* X11 interface */
 /* #define MSWIN_GRAPHICS */	/* Windows NT, CE, Graphics */
-/* #define LISP_GRAPHICS */	/* lisp interface */
 
 /*
  * Define the default window system.  This should be one that is compiled
- * into your system (see defines above).  Known window systems are:
- *
- *	tty, X11, lisp
+ * into your system (see defines above).
  */
 
 #ifdef MSWIN_GRAPHICS

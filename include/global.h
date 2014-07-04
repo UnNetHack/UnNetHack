@@ -67,9 +67,7 @@
  * since otherwise comparisons with signed quantities are done incorrectly
  */
 typedef schar	xchar;
-#ifndef SKIP_BOOLEAN
 typedef xchar	boolean;		/* 0 or 1 */
-#endif
 
 #ifndef TRUE		/* defined in some systems' native include files */
 #define TRUE	((boolean)1)
@@ -103,9 +101,7 @@ typedef xchar	boolean;		/* 0 or 1 */
 # define UCHAR_P uchar
 # define XCHAR_P xchar
 # define SHORT_P short
-#ifndef SKIP_BOOLEAN
 # define BOOLEAN_P boolean
-#endif
 # define ALIGNTYP_P aligntyp
 #else
 # ifdef WIDENED_PROTOTYPES

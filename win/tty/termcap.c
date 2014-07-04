@@ -1123,11 +1123,6 @@ int color;
 	if (windowprocs.name != NULL &&
 	    !strcmpi(windowprocs.name, "X11")) return TRUE;
 #endif
-#ifdef LISP_GRAPHICS
-	/* XXX has_color() should be added to windowprocs */
-	if (windowprocs.name != NULL &&
-	    !strcmpi(windowprocs.name, "lisp")) return TRUE;
-#endif
 #ifdef CURSES_GRAPHICS
     /* XXX has_color() should be added to windowprocs */
     /* iflags.wc_color is set to false and the option disabled if the
