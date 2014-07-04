@@ -18,10 +18,6 @@
 #include "tcap.h"
 #endif
 
-#ifndef MPWTOOL
-# define SpinCursor(x)
-#endif
-
 #ifndef O_WRONLY
 #include <fcntl.h>
 #endif
@@ -992,7 +988,6 @@ char c;
 {
 	int val;
 
-	SpinCursor(3);
 	val = what_map_char(c);
 	if(val == INVALID_TYPE) {
 	    val = ERR;
@@ -1010,7 +1005,6 @@ char *s;
 {
 	register int i;
 
-	SpinCursor(3);
 	for(i=0; room_types[i].name; i++)
 	    if (!strcmp(s, room_types[i].name))
 		return ((int) room_types[i].type);
@@ -1026,7 +1020,6 @@ char *s;
 {
 	register int i;
 
-	SpinCursor(3);
 	for (i=0; trap_types[i].name; i++)
 	    if(!strcmp(s,trap_types[i].name))
 		return trap_types[i].type;
@@ -1043,7 +1036,6 @@ char c;
 {
 	register int i, class;
 
-	SpinCursor(3);
 	class = c ? def_char_to_monclass(c) : 0;
 	if (class == MAXMCLASSES) return ERR;
 
@@ -1072,7 +1064,6 @@ char c;		/* class */
 	int i, class;
 	const char *objname;
 
-	SpinCursor(3);
 	class = (c > 0) ? def_char_to_objclass(c) : 0;
 	if (class == MAXOCLASSES) return ERR;
 
@@ -1138,7 +1129,6 @@ char
 what_map_char(c)
 char c;
 {
-	SpinCursor(3);
 	switch(c) {
 		  case ' '  : return(STONE);
 		  case '#'  : return(CORR);

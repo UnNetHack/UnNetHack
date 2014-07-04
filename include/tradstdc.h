@@ -113,19 +113,6 @@
 #  define volatile
 # endif
 
-/*
- * Suppress `const' if necessary and not handled elsewhere.
- * Don't use `#if defined(xxx) && !defined(const)'
- * because some compilers choke on `defined(const)'.
- * This has been observed with Lattice, MPW, and High C.
- */
-# if defined(apollo)
-	/* the system header files don't use `const' properly */
-#  ifndef const
-#   define const
-#  endif
-# endif
-
 #else /* NHSTDC */	/* a "traditional" C  compiler */
 
 # define NDECL(f)	f()

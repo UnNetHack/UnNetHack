@@ -22,10 +22,6 @@
 /* version information */
 #include "patchlevel.h"
 
-#ifndef MPWTOOL
-# define SpinCursor(x)
-#endif
-
 #define Fprintf	(void) fprintf
 #define Fclose	(void) fclose
 #define Unlink	(void) unlink
@@ -899,8 +895,6 @@ h_filter(line)
     static boolean skip = FALSE;
     char tag[sizeof in_line];
 
-    SpinCursor(3);
-
     if (*line == '#') return TRUE;	/* ignore comment lines */
     if (sscanf(line, "----- %s", tag) == 1) {
 	skip = FALSE;
@@ -974,7 +968,6 @@ do_oracles()
 	    (void) fputs(xcrypt(special_oracle[i]), tfp);
 	    (void) fputc('\n', tfp);
 	}
-	SpinCursor(3);
 
 	oracle_cnt = 1;
 	(void) fputs("---\n", tfp);
@@ -982,7 +975,6 @@ do_oracles()
 	in_oracle = FALSE;
 
 	while (fgets(in_line, sizeof in_line, ifp)) {
-	    SpinCursor(3);
 
 	    if (h_filter(in_line)) continue;
 	    if (!strncmp(in_line, "-----", 5)) {
@@ -1109,7 +1101,6 @@ do_dungeon()
 	Fprintf(ofp,"%s",Dont_Edit_Data);
 
 	while (fgets(in_line, sizeof in_line, ifp) != 0) {
-	    SpinCursor(3);
 
 	    rcnt++;
 	    if(in_line[0] == '#') continue;	/* discard comments */
@@ -1232,9 +1223,6 @@ do_monstr()
     Fprintf(ofp,"#include \"config.h\"\n");
     Fprintf(ofp,"\nconst int monstr[] = {\n");
     for (ptr = &mons[0], j = 0; ptr->mlet; ptr++) {
-
-	SpinCursor(3);
-
 	i = mstrength(ptr);
 	Fprintf(ofp,"%2d,%c", i, (++j & 15) ? ' ' : '\n');
     }
@@ -1276,8 +1264,6 @@ do_permonst()
 		Fprintf(ofp,"\n#define\tPM_PLAYERMON\t(-1)");
 
 	for (i = 0; mons[i].mlet; i++) {
-		SpinCursor(3);
-
 		Fprintf(ofp,"\n#define\tPM_");
 		if (mons[i].mlet == S_HUMAN &&
 				!strncmp(mons[i].mname, "were", 4))
@@ -1524,8 +1510,6 @@ do_questtxt()
 	in_msg = FALSE;
 
 	while (fgets(in_line, 80, ifp) != 0) {
-	    SpinCursor (3);
-
 	    qt_line++;
 	    if(qt_control(in_line)) do_qt_control(in_line);
 	    else if(qt_comment(in_line)) continue;
@@ -1589,8 +1573,6 @@ do_objs()
 	Fprintf(ofp,"#ifndef ONAMES_H\n#define ONAMES_H\n\n");
 
 	for(i = 0; !i || objects[i].oc_class != ILLOBJ_CLASS; i++) {
-		SpinCursor(3);
-
 		objects[i].oc_name_idx = objects[i].oc_descr_idx = i;	/* init */
 		if (!(objnam = tmpdup(OBJ_NAME(objects[i])))) continue;
 
@@ -1662,8 +1644,6 @@ do_objs()
 	Fprintf(ofp, "\n/* Artifacts (unique objects) */\n\n");
 
 	for (i = 1; artifact_names[i]; i++) {
-		SpinCursor(3);
-
 		for (c = objnam = tmpdup(artifact_names[i]); *c; c++)
 		    if (*c >= 'a' && *c <= 'z') *c -= (char)('a' - 'A');
 		    else if (*c < 'A' || *c > 'Z') *c = '_';
