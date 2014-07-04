@@ -32,9 +32,7 @@ struct attack {
 
 #define WT_HUMAN	1450
 
-#ifndef ALIGN_H
 #include "align.h"
-#endif
 #include "monattk.h"
 #include "monflag.h"
 

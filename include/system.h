@@ -82,23 +82,6 @@ E long lrand48();
 E void srand48();
 #endif /* BSD || RANDOM */
 
-#ifdef LEGACY_CODE
-#if !defined(BSD)
-			/* real BSD wants all these to return int */
-# ifndef MICRO
-E void FDECL(exit, (int));
-# endif /* MICRO */
-/* If flex thinks that we're not __STDC__ it declares free() to return
-   int and we die.  We must use __STDC__ instead of NHSTDC because
-   the former is naturally what flex tests for. */
-# if defined(__STDC__) || !defined(FLEX_SCANNER)
-E void FDECL(free, (genericptr_t));
-# endif
-#if !defined(__SC__)
-E void FDECL(perror, (const char *));
-#endif
-#endif
-#endif /* LEGACY_CODE */
 #ifdef POSIX_TYPES
 E void FDECL(qsort, (genericptr_t,size_t,size_t,
 		     int(*)(const genericptr,const genericptr)));
@@ -290,19 +273,6 @@ E genericptr_t FDECL(malloc, (size_t));
 #endif
 
 /* time functions */
-
-#ifdef LEGACY_CODE
-# ifndef LATTICE
-E struct tm *FDECL(localtime, (const time_t *));
-# endif
-
-# if (defined(BSD) && defined(POSIX_TYPES)) || defined(SYSV) || defined(MICRO)
-E time_t FDECL(time, (time_t *));
-# else
-E long FDECL(time, (time_t *));
-# endif
-#endif /* LEGACY_CODE */
-
 
 #ifdef MICRO
 # ifdef abs
