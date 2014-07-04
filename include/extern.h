@@ -1328,13 +1328,11 @@ E void FDECL(mplayer_talk, (struct monst *));
 E int NDECL(tgetch);
 #  endif
 E char NDECL(switchar);
-# ifndef __GO32__
 E long FDECL(freediskspace, (char *));
 E int FDECL(findfirst, (char *));
 E int NDECL(findnext);
 E long FDECL(filesize, (char *));
 E char *NDECL(foundfile_buffer);
-# endif /* __GO32__ */
 E void FDECL(chdrive, (char *));
 E void NDECL(disable_ctrlP);
 E void NDECL(enable_ctrlP);
@@ -1733,7 +1731,7 @@ E void FDECL(qt_com_firstline, (int, char*));
 
 /* ### random.c ### */
 
-#if defined(RANDOM) && !defined(__GO32__) /* djgpp has its own random */
+#if defined(RANDOM)
 E void FDECL(srandom, (unsigned));
 E char *FDECL(initstate, (unsigned,char *,int));
 E char *FDECL(setstate, (char *));

@@ -11,13 +11,7 @@
 
 #include <ctype.h>
 #include <fcntl.h>
-#if !defined(MSDOS) && !defined(WIN_CE) 	/* already done */
 #include <process.h>
-#endif
-#ifdef __GO32__
-#define P_WAIT		0
-#define P_NOWAIT	1
-#endif
 
 
 #if defined(MICRO) || defined(WIN32)
@@ -61,17 +55,12 @@ dosh()
 {
 	extern char orgdir[];
 	char *comspec;
-# ifndef __GO32__
 	int spawnstat;
-# endif
 	if ((comspec = getcomspec())) {
 		suspend_nhwindows("To return to NetHack, enter \"exit\" at the system prompt.\n");
 #  ifndef NOCWD_ASSUMPTIONS
 		chdirx(orgdir, 0);
 #  endif
-#  ifdef __GO32__
-		if (system(comspec) < 0) {  /* wsu@eecs.umich.edu */
-#  else
 #   ifdef MOVERLAY
        /* Free the cache memory used by overlays, close .exe */
 	_movefpause |= __MOVE_PAUSE_DISK;
@@ -84,7 +73,6 @@ dosh()
 #   endif
 
 		if ( spawnstat < 0) {
-#  endif
 			raw_printf("Can't spawn \"%s\"!", comspec);
 			getreturn("to continue");
 		}

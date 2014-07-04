@@ -7,10 +7,6 @@
 #include "config.h"
 #include "tile.h"
 
-#ifdef __GO32__
-#include <unistd.h>
-#endif
-
 static char pixels[TILE_Y][TILE_X];
 
 static char *tilefiles[] = {	"../win/share/monsters.txt",
