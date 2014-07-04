@@ -41,10 +41,6 @@ STATIC_PTR int NDECL(wiz_wish);
 STATIC_PTR int NDECL(wiz_identify);
 STATIC_PTR int NDECL(wiz_map);
 STATIC_PTR int NDECL(wiz_genesis);
-#if 0
-STATIC_PTR int NDECL(wiz_where);
-STATIC_PTR int NDECL(wiz_detect);
-#endif
 STATIC_PTR int NDECL(wiz_panic);
 STATIC_PTR int NDECL(wiz_polyself);
 STATIC_PTR int NDECL(wiz_level_tele);
@@ -524,26 +520,6 @@ wiz_genesis()
 	else		pline("Unavailable command '^G'.");
 	return 0;
 }
-
-#if 0
-/* ^O command - display dungeon layout */
-STATIC_PTR int
-wiz_where()
-{
-	if (wizard) (void) print_dungeon(FALSE, (schar *)0, (xchar *)0);
-	else	    pline("Unavailable command '^O'.");
-	return 0;
-}
-
-/* ^E command - detect unseen (secret doors, traps, hidden monsters) */
-STATIC_PTR int
-wiz_detect()
-{
-	if(wizard)  (void) findit();
-	else	    pline("Unavailable command '^E'.");
-	return 0;
-}
-#endif
 
 /* ^V command - level teleport, or tutorial review */
 STATIC_PTR int

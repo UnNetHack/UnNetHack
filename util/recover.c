@@ -302,9 +302,6 @@ const char *directory;
 	}
 
 	Close(sfd);
-
-#if 0 /* OBSOLETE, HackWB is no longer in use */
-#endif
 	return(0);
 }
 

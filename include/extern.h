@@ -9,9 +9,6 @@
 
 /* ### alloc.c ### */
 
-#if 0
-E long *FDECL(alloc, (unsigned int));
-#endif
 E char *FDECL(fmt_ptr, (const genericptr,char *));
 
 /* This next pre-processor directive covers almost the entire file,
@@ -262,13 +259,6 @@ E void FDECL(bury_objs, (int,int));
 E void FDECL(unearth_objs, (int,int));
 E void FDECL(rot_organic, (genericptr_t, long));
 E void FDECL(rot_corpse, (genericptr_t, long));
-#if 0
-E void FDECL(bury_monst, (struct monst *));
-E void NDECL(bury_you);
-E void NDECL(unearth_you);
-E void NDECL(escape_tomb);
-E void FDECL(bury_obj, (struct obj *));
-#endif
 
 /* ### display.c ### */
 
@@ -592,9 +582,6 @@ E void FDECL(lesshungry, (int));
 E boolean NDECL(is_fainted);
 E void NDECL(reset_faint);
 E void NDECL(violated_vegetarian);
-#if 0
-E void NDECL(sync_hunger);
-#endif
 E void FDECL(newuhs, (BOOLEAN_P));
 E struct obj *FDECL(floorfood, (const char *,int));
 E void NDECL(vomit);
@@ -819,9 +806,6 @@ E void NDECL(setrandom);
 E int NDECL(getyear);
 E int NDECL(getmonth);
 E int NDECL(getmday);
-#if 0
-E char *FDECL(yymmdd, (time_t));
-#endif
 E long FDECL(yyyymmdd, (time_t));
 E int NDECL(phase_of_the_moon);
 E boolean NDECL(friday_13th);

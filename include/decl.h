@@ -28,9 +28,6 @@ E int bases[MAXOCLASSES];
 
 E int multi;
 E char multi_txt[BUFSZ];
-#if 0
-E int warnlevel;
-#endif
 E int nroom;
 E int nsubroom;
 E int occtime;

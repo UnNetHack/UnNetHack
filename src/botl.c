@@ -159,16 +159,6 @@ int xlev;
 	return (xlev <= 2) ? 0 : (xlev <= 30) ? ((xlev + 2) / 4) : 8;
 }
 
-#if 0	/* not currently needed */
-/* convert rank index (0..8) to experience level (1..30) */
-int
-rank_to_xlev(rank)
-int rank;
-{
-	return (rank <= 0) ? 1 : (rank <= 8) ? ((rank * 4) - 2) : 30;
-}
-#endif
-
 const char *
 rank_of(lev, monnum, female)
 	int lev;

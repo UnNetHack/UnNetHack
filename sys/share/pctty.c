@@ -16,7 +16,8 @@ char erase_char, kill_char;
  * Called by startup() in termcap.c and after returning from ! or ^Z
  */
 void
-gettty(){
+gettty()
+{
 	erase_char = '\b';
 	kill_char = 21;		/* cntl-U */
 	iflags.cbreak = TRUE;

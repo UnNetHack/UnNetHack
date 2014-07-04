@@ -440,9 +440,6 @@ const char *in_str;
 		{ "grey elf",		PM_GREY_ELF },
 		{ "gray elf",		PM_GREY_ELF },
 		{ "elf lord",		PM_ELF_LORD },
-#if 0	/* OBSOLETE */
-		{ "high elf",		PM_HIGH_ELF },
-#endif
 		{ "olog hai",		PM_OLOG_HAI },
 		{ "arch lich",		PM_ARCH_LICH },
 	    /* Some irregular plurals */

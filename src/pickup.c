@@ -19,9 +19,6 @@ STATIC_DCL boolean FDECL(query_classes, (char *,boolean *,boolean *,
 STATIC_DCL void FDECL(check_here, (BOOLEAN_P));
 STATIC_DCL boolean FDECL(n_or_more, (struct obj *));
 STATIC_DCL boolean FDECL(all_but_uchain, (struct obj *));
-#if 0 /* not used */
-STATIC_DCL boolean FDECL(allow_cat_no_uchain, (struct obj *));
-#endif
 STATIC_DCL int FDECL(autopick, (struct obj*, int, menu_item **));
 STATIC_DCL int FDECL(count_categories, (struct obj *,int));
 STATIC_DCL long FDECL(carry_count,
@@ -347,21 +344,6 @@ struct obj *obj;
     else
 	return FALSE;
 }
-
-#if 0 /* not used */
-/* query_objlist callback: return TRUE if valid category (class), no uchain */
-STATIC_OVL boolean
-allow_cat_no_uchain(obj)
-struct obj *obj;
-{
-    if ((obj != uchain) &&
-	(((index(valid_menu_classes,'u') != (char *)0) && obj->unpaid) ||
-	(index(valid_menu_classes, obj->oclass) != (char *)0)))
-	return TRUE;
-    else
-	return FALSE;
-}
-#endif
 
 /* query_objlist callback: return TRUE if valid class and worn */
 boolean

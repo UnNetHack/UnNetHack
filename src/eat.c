@@ -2472,21 +2472,6 @@ reset_faint()	/* call when a faint must be prematurely terminated */
 	if(is_fainted()) nomul(0, 0);
 }
 
-#if 0
-void
-sync_hunger()
-{
-
-	if(is_fainted()) {
-
-		flags.soundok = 0;
-		nomul(-10+(u.uhunger/10), "fainted from lack of food");
-		nomovemsg = "You regain consciousness.";
-		afternmv = unfaint;
-	}
-}
-#endif
-
 void
 newuhs(incr)		/* compute and comment on your (new?) hunger status */
 boolean incr;

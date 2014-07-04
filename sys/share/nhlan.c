@@ -42,8 +42,6 @@ void init_lan_features()
 #ifdef LAN_MAIL
 	lan_mail_init();
 #endif
-#ifdef LAN_SHARED_BONES
-#endif
 }
 /*
  * The get_lan_username() call is a required call, since some of

@@ -253,20 +253,6 @@ const struct Role roles[] = {
 	10, 8, 0, 1,  9, A_INT, SPE_DETECT_TREASURE, -4
 },
 {	{"Ranger", 0}, {
-#if 0	/* OBSOLETE */
-	{"Edhel",       "Elleth"},
-	{"Edhel",       "Elleth"},      /* elf-maid */
-	{"Ohtar",       "Ohtie"},       /* warrior */
-	{"Kano",			/* commander (Q.) ['a] */
-			"Kanie"},	/* educated guess, until further research- SAC */
-	{"Arandur",			/* king's servant, minister (Q.) - guess */
-			"Aranduriel"},	/* educated guess */
-	{"Hir",         "Hiril"},       /* lord, lady (S.) ['ir] */
-	{"Aredhel",     "Arwen"},       /* noble elf, maiden (S.) */
-	{"Ernil",       "Elentariel"},  /* prince (S.), elf-maiden (Q.) */
-	{"Elentar",     "Elentari"},	/* Star-king, -queen (Q.) */
-	"Solonor Thelandira", "Aerdrie Faenya", "Lolth", /* Elven */
-#endif
 	{"Tenderfoot",    0},
 	{"Lookout",       0},
 	{"Trailblazer",   0},

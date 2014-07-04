@@ -535,30 +535,6 @@ getmday()
 	return(getlt()->tm_mday);
 }
 
-#if 0
-/* This routine is no longer used since in 2000 it will yield "100mmdd". */
-char *
-yymmdd(date)
-time_t date;
-{
-	Static char datestr[10];
-	struct tm *lt;
-
-	if (date == 0)
-		lt = getlt();
-	else
-#if defined(NHSTDC))) || defined(BSD)
-		lt = localtime((long *)(&date));
-#else
-		lt = localtime(&date);
-#endif
-
-	Sprintf(datestr, "%02d%02d%02d",
-		lt->tm_year, lt->tm_mon + 1, lt->tm_mday);
-	return(datestr);
-}
-#endif
-
 long
 yyyymmdd(date)
 time_t date;

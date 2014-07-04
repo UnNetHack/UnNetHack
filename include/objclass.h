@@ -151,11 +151,6 @@ extern struct objdescr obj_descr[];
 #define BURNING_OIL	(MAXOCLASSES+1) /* Can be used as input to explode. */
 #define MON_EXPLODE	(MAXOCLASSES+2) /* Exploding monster (e.g. gas spore) */
 
-#if 0	/* moved to decl.h so that makedefs.c won't see them */
-extern const char def_oc_syms[MAXOCLASSES];	/* default class symbols */
-extern uchar oc_syms[MAXOCLASSES];		/* current class symbols */
-#endif
-
 /* Default definitions of all object-symbols (must match classes above). */
 
 #define ILLOBJ_SYM	']'	/* also used for mimics */

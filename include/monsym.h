@@ -75,11 +75,6 @@
 
 #define MAXMCLASSES 62	/* number of monster classes */
 
-#if 0	/* moved to decl.h so that makedefs.c won't see them */
-extern const char def_monsyms[MAXMCLASSES];	/* default class symbols */
-extern uchar monsyms[MAXMCLASSES];		/* current class symbols */
-#endif
-
 /*
  * Default characters for monsters.  These correspond to the monster classes
  * above.

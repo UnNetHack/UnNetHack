@@ -28,21 +28,9 @@ void FDECL(add_mon_to_reg, (NhRegion *,struct monst *));
 void FDECL(remove_mon_from_reg, (NhRegion *,struct monst *));
 boolean FDECL(mon_in_region, (NhRegion *,struct monst *));
 
-#if 0
-NhRegion *FDECL(clone_region, (NhRegion *));
-#endif
 void FDECL(free_region, (NhRegion *));
 void FDECL(add_region, (NhRegion *));
 void FDECL(remove_region, (NhRegion *));
-
-#if 0
-void FDECL(replace_mon_regions, (struct monst *,struct monst *));
-void FDECL(remove_mon_from_regions, (struct monst *));
-NhRegion *FDECL(create_msg_region, (XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,
-				    const char *,const char *));
-boolean FDECL(enter_force_field, (genericptr,genericptr));
-NhRegion *FDECL(create_force_field, (XCHAR_P,XCHAR_P,int,int));
-#endif
 
 static void FDECL(reset_region_mids, (NhRegion *));
 

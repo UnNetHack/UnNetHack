@@ -70,13 +70,6 @@ char circle_start[] = {
 
 /*------ global variables ------*/
 
-#if 0	/* (moved to decl.c) */
-/* True if we need to run a full vision recalculation. */
-boolean	vision_full_recalc = 0;
-
-/* Pointers to the current vision array. */
-char	**viz_array;
-#endif
 char	*viz_rmin, *viz_rmax;		/* current vision cs bounds */
 
 
