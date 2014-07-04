@@ -2,6 +2,9 @@
 *.swo
 compile
 
+# SBT
+target/
+
 # /
 /Makefile
 /config.log
