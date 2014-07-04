@@ -335,10 +335,4 @@ extern coord bhitpos;	/* place where throw or zap hits or stops */
 # define STATIC_PTR static
 #endif
 
-/* The function argument to qsort() requires a particular
- * calling convention under WINCE which is not the default
- * in that environment.
- */
-# define CFDECLSPEC
- 
 #endif /* HACK_H */
