@@ -31,9 +31,7 @@ int occtime = 0;
 int x_maze_max, y_maze_max;	/* initialized in main, used in mkmaze.c */
 int otg_temp;			/* used by object_to_glyph() [otg] */
 
-#ifdef REDO
 int in_doagain = 0;
-#endif
 
 /*
  *	The following structure will be initialized at startup time with

@@ -345,9 +345,7 @@ make_version()
 	 */
 	version.feature_set = (unsigned long)(0L
 		/* levels and/or topology (0..4) */
-#ifdef REINCARNATION
 			| (1L <<  1)
-#endif
 			| (1L <<  2)
 #ifdef BLACKMARKET
 			| (1L <<  3)
@@ -593,19 +591,13 @@ static const char *build_opts[] = {
 # endif
 #endif
 		"pickup thrown objects",
-#ifdef REDO
 		"redo command",
-#endif
-#ifdef REINCARNATION
 		"rogue level",
-#endif
 		"saddles and riding",
 #ifdef SCORE_ON_BOTL
 		"score on status line",
 #endif
-#ifdef CLIPPING
 		"screen clipping",
-#endif
 #ifdef NO_TERMS
 # ifdef SCREEN_BIOS
 		"screen control via BIOS",
@@ -654,9 +646,7 @@ static const char *build_opts[] = {
 #ifdef PREFIXES_IN_USE
 		"variable playground",
 #endif
-#ifdef WALLIFIED_MAZE
 		"walled mazes",
-#endif
 #ifdef WIN_EDGE
 		"win_edge",
 #endif
@@ -1050,11 +1040,7 @@ static	struct deflist {
 	const char	*defname;
 	boolean	true_or_false;
 } deflist[] = {
-#ifdef REINCARNATION
 	      {	"REINCARNATION", TRUE },
-#else
-	      {	"REINCARNATION", FALSE },
-#endif
 	      { 0, 0 } };
 
 static int

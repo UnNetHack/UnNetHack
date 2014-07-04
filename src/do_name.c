@@ -149,9 +149,7 @@ const char *goal;
     }
     cx = cc->x;
     cy = cc->y;
-#ifdef CLIPPING
     cliparound(cx, cy);
-#endif
     curs(WIN_MAP, cx,cy);
     flush_screen(0);
     for (;;) {
@@ -292,9 +290,7 @@ const char *goal;
 	    break;
 	}
     nxtc:	;
-#ifdef CLIPPING
 	cliparound(cx, cy);
-#endif
 	curs(WIN_MAP,cx,cy);
 	flush_screen(0);
     }
@@ -555,30 +551,22 @@ int
 ddocall()
 {
 	register struct obj *obj;
-#ifdef REDO
 	char	ch;
-#endif
 	char allowall[2];
 
 	switch(
-#ifdef REDO
 		ch =
-#endif
 		ynq("Name an individual object?")) {
 	case 'q':
 		break;
 	case 'y':
-#ifdef REDO
 		savech(ch);
-#endif
 		allowall[0] = ALL_CLASSES; allowall[1] = '\0';
 		obj = getobj(allowall, "name");
 		if(obj) do_oname(obj);
 		break;
 	default :
-#ifdef REDO
 		savech(ch);
-#endif
 		obj = getobj(callable, "call");
 		if (obj) {
 			/* behave as if examining it in inventory;
@@ -1248,7 +1236,6 @@ rndmonnam()
 	return mons[name].mname;
 }
 
-#ifdef REINCARNATION
 const char *
 roguename() /* Name of a Rogue player */
 {
@@ -1266,7 +1253,6 @@ roguename() /* Name of a Rogue player */
 	return rn2(3) ? (rn2(2) ? "Michael Toy" : "Kenneth Arnold")
 		: "Glenn Wichman";
 }
-#endif /* REINCARNATION */
 
 static const char * const hcolors[] = {
 	"ultraviolet", "infrared", "bluish-orange",

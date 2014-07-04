@@ -14,14 +14,9 @@ STATIC_DCL long FDECL(mm_aggression, (struct monst *,struct monst *));
 STATIC_DCL int NDECL(pick_animal);
 STATIC_DCL void FDECL(kill_eggs, (struct obj *));
 
-#ifdef REINCARNATION
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
 	 (Is_rogue_level(&u.uz) || \
 	   (level.flags.graveyard && is_undead(mdat) && rn2(3)))
-#else
-#define LEVEL_SPECIFIC_NOCORPSE(mdat) \
-	   (level.flags.graveyard && is_undead(mdat) && rn2(3))
-#endif
 
 
 #if 0
@@ -1115,15 +1110,10 @@ nexttry:	/* eels prefer the water, but if there is no water nearby,
 		(levl[nx][ny].doormask & D_LOCKED && !(flag & UNLOCKDOOR))) &&
 	       !thrudoor) continue;
 	    if(nx != x && ny != y && (nodiag ||
-#ifdef REINCARNATION
 	       ((IS_DOOR(nowtyp) &&
 		 ((levl[x][y].doormask & ~D_BROKEN) || Is_rogue_level(&u.uz))) ||
 		(IS_DOOR(ntyp) &&
 		 ((levl[nx][ny].doormask & ~D_BROKEN) || Is_rogue_level(&u.uz))))
-#else
-	       ((IS_DOOR(nowtyp) && (levl[x][y].doormask & ~D_BROKEN)) ||
-		(IS_DOOR(ntyp) && (levl[nx][ny].doormask & ~D_BROKEN)))
-#endif
 	       ))
 		continue;
 	    if(nx != 0 && ny != 0 && canseemon(mon) && quantumlock)

@@ -157,11 +157,6 @@ extern void NDECL(load_keyboard_handler);
 #define ALLOCA_HACK	/* used in util/panic.c */
 #endif
 
-#ifndef REDO
-#undef	Getchar
-#define Getchar nhgetch
-#endif
-
 #ifdef _MSC_VER
 #if 0
 #pragma warning(disable:4018)	/* signed/unsigned mismatch */

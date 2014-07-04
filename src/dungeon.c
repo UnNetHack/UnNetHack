@@ -723,9 +723,7 @@ struct level_map {
 	{ "medusa",	&medusa_level },
 	{ "oracle",	&oracle_level },
 	{ "orcus",	&orcus_level },
-#ifdef REINCARNATION
 	{ "rogue",	&rogue_level },
-#endif
 	{ "sanctum",	&sanctum_level },
 	{ "valley",	&valley_level },
 	{ "water",	&water_level },
@@ -1252,9 +1250,7 @@ int x, y;
 {
 	u.ux = x;
 	u.uy = y;
-#ifdef CLIPPING
 	cliparound(u.ux, u.uy);
-#endif
 	/* ridden steed always shares hero's location */
 	if (u.usteed) u.usteed->mx = u.ux, u.usteed->my = u.uy;
 }

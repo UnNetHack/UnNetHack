@@ -424,12 +424,8 @@ schar filling;
 
 	for (x = x1; x <= x2; x++)
 		for (y = y1; y <= y2; y++) {
-#ifndef WALLIFIED_MAZE
-			levl[x][y].typ = STONE;
-#else
 			levl[x][y].typ =
 				(y < 2 || ((x % 2) && (y % 2))) ? STONE : filling;
-#endif
 		}
 }
 
@@ -2681,11 +2677,9 @@ lev_init *linit;
     case LVLINIT_SHEOL:
 	mksheol(linit);
 	break;
-#ifdef REINCARNATION
     case LVLINIT_ROGUE:
 	makeroguerooms();
 	break;
-#endif
     case LVLINIT_MINES:
 	if (linit->lit == -1) linit->lit = rn2(2);
 	if (linit->filling > -1) lvlfill_solid(linit->filling, 0);
@@ -4670,11 +4664,7 @@ spo_mazewalk(coder)
     if (!isok(x,y)) return;
 
     if (OV_i(ftyp) < 1) {
-#ifndef WALLIFIED_MAZE
-	OV_i(ftyp) = CORR;
-#else
 	OV_i(ftyp) = ROOM;
-#endif
     }
 
     /* don't use move() - it doesn't use W_NORTH, etc. */

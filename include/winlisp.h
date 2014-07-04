@@ -46,9 +46,7 @@ E char FDECL(lisp_message_menu, (char, int, const char *mesg));
 E void NDECL(lisp_update_inventory);
 E void NDECL(lisp_mark_synch);
 E void NDECL(lisp_wait_synch);
-#ifdef CLIPPING
 E void FDECL(lisp_cliparound, (int, int));
-#endif
 #ifdef POSITIONBAR
 E void FDECL(lisp_update_positionbar, (char *));
 #endif

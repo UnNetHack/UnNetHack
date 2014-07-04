@@ -1045,17 +1045,13 @@ register const char *let,*word;
 				word, buf);
 		}
 		check_tutorial_message(QT_T_CHOOSEITEM);
-#ifdef REDO
 		if (in_doagain)
 		    ilet = readchar();
 		else
-#endif
 		    ilet = yn_function(qbuf, (char *)0, '\0');
 		if(ilet == '0') prezero = TRUE;
 		while(digit(ilet) && allowcnt) {
-#ifdef REDO
 			if (ilet != '?' && ilet != '*')	savech(ilet);
-#endif
 			cnt = 10*cnt + (ilet - '0');
 			allowcnt = 2;	/* signal presence of cnt */
 			ilet = readchar();
@@ -1145,23 +1141,17 @@ register const char *let,*word;
 #ifdef GOLDOBJ
 		flags.botl = 1; /* May have changed the amount of money */
 #endif
-#ifdef REDO
 		savech(ilet);
-#endif
 		for (otmp = invent; otmp; otmp = otmp->nobj)
 			if (otmp->invlet == ilet) break;
 		if(!otmp) {
 			You("don't have that object.");
-#ifdef REDO
 			if (in_doagain) return((struct obj *) 0);
-#endif
 			continue;
 		} else if (cnt < 0 || otmp->quan < cnt) {
 			You("don't have that many!  You have only %ld.",
 			    otmp->quan);
-#ifdef REDO
 			if (in_doagain) return((struct obj *) 0);
-#endif
 			continue;
 		}
 		break;
@@ -2713,9 +2703,7 @@ dotypeinv()
 
 	    if(class_count > 1) {
 		c = yn_function(prompt, types, '\0');
-#ifdef REDO
 		savech(c);
-#endif
 		if(c == '\0') {
 			clear_nhwindow(WIN_MESSAGE);
 			return 0;

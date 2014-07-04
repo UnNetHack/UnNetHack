@@ -241,21 +241,13 @@ typedef long glyph_t;
  */
 
 #ifndef AUTOCONF
-/* dungeon levels */
-#define WALLIFIED_MAZE	/* Fancy mazes - Jean-Christophe Collet */
-#define REINCARNATION	/* Special Rogue-like levels */
 
 /* I/O */
-#define REDO		/* support for redoing last command - DGK */
-# define CLIPPING	/* allow smaller screens -- ERS */
-
 #define EXP_ON_BOTL	/* Show experience on bottom line */
 /* #define SCORE_ON_BOTL */	/* added by Gary Erickson (erickson@ucivax) */
 #endif /* AUTOCONF */
 
-#ifdef REDO
 # define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
-#endif
 
 /* #define REALTIME_ON_BOTL */  /* Show elapsed time on bottom line.  Note:
                                  * this breaks savefile compatibility. */
@@ -306,7 +298,6 @@ typedef long glyph_t;
 
 #define STATUS_COLORS /* Shachaf & Oren Ben-Kiki */
 
-#define DUNGEON_GROWTH /* Makes the dungeons feel a bit more living - Pasi Kallinen*/
 /*#define GOLDOBJ */	/* Gold is kept on obj chains - Helge Hafting */
 /*#define AUTOPICKUP_EXCEPTIONS */ /* exceptions to autopickup */
 #define DUMP_LOG        /* Dump game end information to a file */

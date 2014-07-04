@@ -386,9 +386,7 @@ E int FDECL(X11_select_menu, (winid, int, MENU_ITEM_P **));
 E void NDECL(X11_update_inventory);
 E void NDECL(X11_mark_synch);
 E void NDECL(X11_wait_synch);
-#ifdef CLIPPING
 E void FDECL(X11_cliparound, (int, int));
-#endif
 E void FDECL(X11_print_glyph, (winid,XCHAR_P,XCHAR_P,int));
 E void FDECL(X11_raw_print, (const char *));
 E void FDECL(X11_raw_print_bold, (const char *));

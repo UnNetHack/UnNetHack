@@ -94,9 +94,7 @@ struct window_procs mswin_procs = {
     mswin_update_inventory,
     mswin_mark_synch,
     mswin_wait_synch,
-#ifdef CLIPPING
     mswin_cliparound,
-#endif
 #ifdef POSITIONBAR
     donull,
 #endif
@@ -786,14 +784,12 @@ void mswin_clear_nhwindow(winid wid)
         (wid < MAXWINDOWS) &&
         (GetNHApp()->windowlist[wid].win != NULL))
     {
-#ifdef REINCARNATION
 		if( GetNHApp()->windowlist[wid].type == NHW_MAP ) {
 			if( Is_rogue_level(&u.uz) ) 
 				mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), ROGUE_LEVEL_MAP_MODE);
 			else 
 				mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), iflags.wc_map_mode);
 		}
-#endif
 
 		SendMessage( 
 			 GetNHApp()->windowlist[wid].win, 
@@ -1204,7 +1200,6 @@ void mswin_wait_synch()
 /*
 cliparound(x, y)-- Make sure that the user is more-or-less centered on the
                    screen if the playing area is larger than the screen.
-                -- This function is only defined if CLIPPING is defined.
 */
 void mswin_cliparound(int x, int y)
 {

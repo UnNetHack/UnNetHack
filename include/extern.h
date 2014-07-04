@@ -168,11 +168,9 @@ E int NDECL(wiz_wish);
 #endif /* USE_TRAMPOLI */
 E void NDECL(reset_occupations);
 E void FDECL(set_occupation, (int (*)(void),const char *,int));
-#ifdef REDO
 E char NDECL(pgetchar);
 E void FDECL(pushch, (CHAR_P));
 E void FDECL(savech, (CHAR_P));
-#endif
 #ifdef WIZARD
 E void NDECL(add_debug_extended_commands);
 #endif /* WIZARD */
@@ -367,9 +365,7 @@ E char *FDECL(distant_monnam, (struct monst *,int,char *));
 E const char *NDECL(rndmonnam);
 E const char *FDECL(hcolor, (const char *));
 E const char *NDECL(rndcolor);
-#ifdef REINCARNATION
 E const char *NDECL(roguename);
-#endif
 E struct obj *FDECL(realloc_obj,
 		(struct obj *, int, genericptr_t, int, const char *));
 E char *FDECL(coyotename, (struct monst *,char *));
@@ -479,9 +475,7 @@ E int FDECL(def_char_to_monclass, (CHAR_P));
 #if !defined(MAKEDEFS_C) && !defined(LEV_LEX_C)
 E void FDECL(assign_graphics, (glyph_t *,int,int,int));
 E void FDECL(switch_graphics, (int));
-#ifdef REINCARNATION
 E void FDECL(assign_rogue_graphics, (BOOLEAN_P));
-#endif
 E void FDECL(assign_utf8graphics_symbol, (int, glyph_t));
 
 /* ### dump.c ### */
@@ -668,11 +662,9 @@ E void FDECL(splatter_burning_oil, (int, int));
 
 /* ### extralev.c ### */
 
-#ifdef REINCARNATION
 E void NDECL(makeroguerooms);
 E void FDECL(corr, (int,int));
 E void NDECL(makerogueghost);
-#endif
 
 /* ### files.c ### */
 
@@ -752,10 +744,8 @@ E void NDECL(drinksink);
 
 /* ### hack.c ### */
 
-#ifdef DUNGEON_GROWTH
 E void FDECL(catchup_dgn_growths, (int));
 E void FDECL(dgn_growths, (BOOLEAN_P,BOOLEAN_P));
-#endif
 E boolean FDECL(revive_nasty, (int,int,const char*));
 E void FDECL(movobj, (struct obj *,XCHAR_P,XCHAR_P));
 E boolean FDECL(may_dig, (XCHAR_P,XCHAR_P));

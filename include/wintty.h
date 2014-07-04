@@ -161,9 +161,7 @@ E void FDECL(update_topl, (const char *));
 E void FDECL(putsyms, (const char*));
 
 /* ### wintty.c ### */
-#ifdef CLIPPING
 E void NDECL(setclipped);
-#endif
 E void FDECL(docorner, (int, int));
 E void NDECL(end_glyphout);
 E void FDECL(g_putch, (int));
@@ -198,9 +196,7 @@ E char FDECL(tty_message_menu, (CHAR_P,int,const char *));
 E void NDECL(tty_update_inventory);
 E void NDECL(tty_mark_synch);
 E void NDECL(tty_wait_synch);
-#ifdef CLIPPING
 E void FDECL(tty_cliparound, (int, int));
-#endif
 #ifdef POSITIONBAR
 E void FDECL(tty_update_positionbar, (char *));
 #endif

@@ -463,12 +463,10 @@ int curses_convert_glyph(int ch, int glyph)
 {
     int symbol;
     
-#ifdef REINCARNATION
     if (Is_rogue_level(&u.uz))
     {
         return ch;
     }
-#endif
     
     /* Save some processing time by returning if the glyph represents
     an object that we don't have custom characters for */

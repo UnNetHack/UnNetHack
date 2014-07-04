@@ -434,9 +434,7 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	role_init();	/* Reset the initial role, race, gender, and alignment */
 	mread(fd, (genericptr_t) &u, sizeof(struct you));
 	init_uasmon();
-#ifdef CLIPPING
 	cliparound(u.ux, u.uy);
-#endif
 	if(u.uhp <= 0 && (!Upolyd || u.mh <= 0)) {
 	    u.ux = u.uy = 0;	/* affects pline() [hence You()] */
 	    You("were not healthy enough to survive restoration.");
@@ -629,9 +627,7 @@ register int fd;
 
 	if (!wizard && !discover)
 		(void) delete_savefile();
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) assign_rogue_graphics(TRUE);
-#endif
 #ifdef USE_TILES
 	substitute_tiles(&u.uz);
 #endif
@@ -898,9 +894,7 @@ boolean ghostly;
 	relink_timers(ghostly);
 	relink_light_sources(ghostly);
 	reset_oattached_mids(ghostly);
-#ifdef DUNGEON_GROWTH
 	if (!ghostly) catchup_dgn_growths((monstermoves - omoves) / 5);
-#endif
 	if (ghostly)
 	    clear_id_mapping();
 }

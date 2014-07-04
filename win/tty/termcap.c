@@ -211,10 +211,8 @@ int *wid, *hgt;
 	{
 #  ifdef MICRO
 		get_scr_size();
-#   ifdef CLIPPING
 		if(CO < COLNO || LI < ROWNO+3)
 			setclipped();
-#   endif
 #  endif
 		HO = "\033[H";
 /*		nh_CD = "\033[J"; */
@@ -317,10 +315,8 @@ int *wid, *hgt;
 		if (!LI || !CO)			/* if we don't override it */
 			get_scr_size();
 # endif
-# ifdef CLIPPING
 	if(CO < COLNO || LI < ROWNO+3)
 		setclipped();
-# endif
 	nh_ND = Tgetstr("nd");
 	if(tgetflag("os"))
 		error("UnNetHack can't have OS.");

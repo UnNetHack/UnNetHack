@@ -101,9 +101,7 @@ STATIC_DCL void NDECL(view_init);
 STATIC_DCL void FDECL(view_from,(int,int,char **,char *,char *,int,
 			     void (*)(int,int,genericptr_t),genericptr_t));
 STATIC_DCL void FDECL(get_unused_cs, (char ***,char **,char **));
-#ifdef REINCARNATION
 STATIC_DCL void FDECL(rogue_vision, (char **,char *,char *));
-#endif
 
 /* Macro definitions that I can't find anywhere. */
 #define sign(z) ((z) < 0 ? -1 : ((z) ? 1 : 0 ))
@@ -282,7 +280,6 @@ get_unused_cs(rows, rmin, rmax)
 }
 
 
-#ifdef REINCARNATION
 /*
  * rogue_vision()
  *
@@ -346,7 +343,6 @@ rogue_vision(next, rmin, rmax)
 	}
     }
 }
-#endif /* REINCARNATION */
 
 /*#define EXTEND_SPINE*/	/* possibly better looking wall-angle */
 
@@ -564,11 +560,9 @@ vision_recalc(control)
 	/* skip the normal update loop */
 	goto skip;
     }
-#ifdef REINCARNATION
     else if (Is_rogue_level(&u.uz)) {
 	rogue_vision(next_array,next_rmin,next_rmax);
     }
-#endif
     else {
 	int has_night_vision = 1;	/* hero has night vision */
 

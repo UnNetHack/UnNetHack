@@ -43,9 +43,7 @@ struct window_procs dummy_procs = {
     dummy_update_inventory,
     dummy_mark_synch,
     dummy_wait_synch,
-#ifdef CLIPPING
     dummy_cliparound,
-#endif
 #ifdef POSITIONBAR
     donull,
 #endif
@@ -626,7 +624,6 @@ void dummy_wait_synch()
 /*
 cliparound(x, y)-- Make sure that the user is more-or-less centered on the
                    screen if the playing area is larger than the screen.
-                -- This function is only defined if CLIPPING is defined.
 */
 void dummy_cliparound(int x, int y)
 {

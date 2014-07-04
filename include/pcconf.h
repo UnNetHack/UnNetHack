@@ -54,11 +54,6 @@
 
 #include <fcntl.h>
 
-#ifndef REDO
-# undef Getchar
-# define Getchar nhgetch
-#endif
-
 
 /* Sanity check, do not modify these blocks. */
 

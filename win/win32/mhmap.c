@@ -544,10 +544,8 @@ void onPaint(HWND hWnd)
 		paint_rt.bottom = min(data->yPos + (ps.rcPaint.bottom - data->map_orig.y)/data->yScrTile+1, ROWNO);
 
 		if( data->bAsciiMode
-#ifdef REINCARNATION
 		    || Is_rogue_level(&u.uz) 
 			/* You enter a VERY primitive world! */
-#endif
 			) {
 			HGDIOBJ oldFont;
 

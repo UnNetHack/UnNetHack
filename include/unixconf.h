@@ -244,9 +244,6 @@
 
 #include "system.h"
 
-#ifndef REDO
-#define Getchar nhgetch
-#endif
 #define tgetch getchar
 
 #ifndef AUTOCONF

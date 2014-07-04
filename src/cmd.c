@@ -148,8 +148,6 @@ int xtime;
 	return;
 }
 
-#ifdef REDO
-
 static char NDECL(popch);
 
 /* Provide a means to redo the last command.  The flag `in_doagain' is set
@@ -210,7 +208,6 @@ char ch;
 	}
 	return;
 }
-#endif /* REDO */
 
 STATIC_PTR int
 doextcmd()	/* here after # - now read a full-word command */
@@ -2067,7 +2064,6 @@ register char *cmd;
 		flags.move = FALSE;
 		return;
 	}
-#ifdef REDO
 	if (*cmd == DOAGAIN && !in_doagain && saveq[0]) {
 		in_doagain = TRUE;
 		stail = 0;
@@ -2077,9 +2073,6 @@ register char *cmd;
 	}
 	/* Special case of *cmd == ' ' handled better below */
 	if(!*cmd || *cmd == (char)0377)
-#else
-	if(!*cmd || *cmd == (char)0377 || (!iflags.rest_on_space && *cmd == ' '))
-#endif
 	{
 		nhbell();
 		flags.move = FALSE;
@@ -2348,16 +2341,12 @@ const char *s;
 	/* saved direction of the previous call of getdir() */
 	static char saved_dirsym = '\0';
 
-#ifdef REDO
 	if(in_doagain || *readchar_queue)
 	    dirsym = readchar();
 	else
-#endif
 	    dirsym = yn_function ((s && *s != '^') ? s : "In what direction?",
 					(char *)0, '\0');
-#ifdef REDO
 	savech(dirsym);
-#endif
 	if (dirsym == last_cmd_char) {
 		/* in here dirsym is not representing a direction
 		 * but the same sym used before for calling the
@@ -2621,14 +2610,12 @@ parse()
 	if (foo == '\033') {   /* esc cancels count (TH) */
 	    clear_nhwindow(WIN_MESSAGE);
 	    multi = last_multi = 0;
-# ifdef REDO
 	} else if (foo == DOAGAIN || in_doagain) {
 	    multi = last_multi;
 	} else {
 	    last_multi = multi;
 	    savech(0);	/* reset input queue */
 	    savech((char)foo);
-# endif
 	}
 
 	if (multi) {
@@ -2642,9 +2629,7 @@ parse()
 	if (foo == 'g' || foo == 'G' || foo == 'm' || foo == 'M' ||
 	    foo == 'F' || (iflags.num_pad && (foo == '5' || foo == '-'))) {
 	    foo = readchar();
-#ifdef REDO
 	    savech((char)foo);
-#endif
 	    in_line[1] = foo;
 	    in_line[2] = 0;
 	}
@@ -2677,11 +2662,7 @@ readchar()
 	if ( *readchar_queue )
 	    sym = *readchar_queue++;
 	else
-#ifdef REDO
 	    sym = in_doagain ? Getchar() : nh_poskey(&x, &y, &mod);
-#else
-	    sym = Getchar();
-#endif
 
 #ifdef UNIX
 # ifdef NR_OF_EOFS

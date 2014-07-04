@@ -697,24 +697,16 @@ register const char *s;
 
 	level.flags.is_maze_lev = TRUE;
 
-#ifndef WALLIFIED_MAZE
-	for(x = 2; x < x_maze_max; x++)
-		for(y = 2; y < y_maze_max; y++)
-			levl[x][y].typ = STONE;
-#else
 	for(x = 2; x <= x_maze_max; x++)
 		for(y = 2; y <= y_maze_max; y++)
 			levl[x][y].typ = ((x % 2) && (y % 2)) ? STONE : HWALL;
-#endif
 
 	maze0xy(&mm);
 	walkfrom((int) mm.x, (int) mm.y, 0);
 	/* put a boulder at the maze center */
 	(void) mksobj_at(BOULDER, (int) mm.x, (int) mm.y, TRUE, FALSE);
 
-#ifdef WALLIFIED_MAZE
 	wallification(2, 2, x_maze_max, y_maze_max);
-#endif
 	mazexy(&mm);
 	mkstairs(mm.x, mm.y, 1, (struct mkroom *)0);		/* up */
 	if (!Invocation_lev(&u.uz)) {
@@ -811,11 +803,7 @@ schar typ;
 	int q, a, dir, pos;
 	int dirs[4];
 
-#ifndef WALLIFIED_MAZE
-	if (!typ) typ = CORR;
-#else
 	if (!typ) typ = ROOM;
-#endif
 
 	pos = 1;
 	mazex[pos] = (char) x;
@@ -859,11 +847,7 @@ schar typ;
 	register int q,a,dir;
 	int dirs[4];
 
-#ifndef WALLIFIED_MAZE
-	if (!typ) typ = CORR;
-#else
 	if (!typ) typ = ROOM;
-#endif
 
 	if(!IS_DOOR(levl[x][y].typ)) {
 	    /* might still be on edge of MAP, so don't overwrite */
@@ -914,11 +898,7 @@ mazexy(cc)	/* find random point in generated corridors,
 	    cc->y = 3 + 2*rn2((y_maze_max>>1) - 1);
 	    cpt++;
 	} while (cpt < 100 && levl[cc->x][cc->y].typ !=
-#ifdef WALLIFIED_MAZE
 		 ROOM
-#else
-		 CORR
-#endif
 		);
 	if (cpt >= 100) {
 		register int x, y;
@@ -928,11 +908,7 @@ mazexy(cc)	/* find random point in generated corridors,
 			cc->x = 3 + 2 * x;
 			cc->y = 3 + 2 * y;
 			if (levl[cc->x][cc->y].typ ==
-#ifdef WALLIFIED_MAZE
 			    ROOM
-#else
-			    CORR
-#endif
 			   ) return;
 		    }
 		panic("mazexy: can't find a place!");
@@ -950,7 +926,7 @@ bound_digging()
  * so the boundary would be breached
  *
  * we can't bound unconditionally on one beyond the last line, because
- * that provides a window of abuse for WALLIFIED_MAZE special levels
+ * that provides a window of abuse for special levels
  */
 {
 	register int x,y;

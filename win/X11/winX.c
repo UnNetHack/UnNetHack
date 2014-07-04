@@ -100,9 +100,7 @@ struct window_procs X11_procs = {
     X11_update_inventory,
     X11_mark_synch,
     X11_wait_synch,
-#ifdef CLIPPING
     X11_cliparound,
-#endif
 #ifdef POSITIONBAR
     donull,
 #endif

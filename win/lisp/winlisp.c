@@ -163,9 +163,7 @@ cmd_index_t cmd_index[] = { {"gowest", CMD_KEY, 'h'},
 			    {"showamulet", CMD_KEY, '"'},
 			    {"showtool", CMD_KEY, '('},
 			    {"attributes", CMD_KEY, C('x')},
-#ifdef REDO
 			    {"again", CMD_KEY, DOAGAIN},
-#endif /* REDO */
 
 			    /* wizard commands */
 			    {"wiz_detect", CMD_KEY, C('e')},
@@ -250,9 +248,7 @@ struct window_procs lisp_procs = {
   lisp_update_inventory,
   lisp_mark_synch,
   lisp_wait_synch,
-#ifdef CLIPPING
   lisp_cliparound,
-#endif
 #ifdef POSITIONBAR
   lisp_update_positionbar,
 #endif
@@ -1900,7 +1896,6 @@ lisp_print_glyph(window, x, y, glyph)
 		lisp_int (window));
 }
 
-#ifdef CLIPPING
 void
 lisp_cliparound(x, y)
      int x;
@@ -1912,7 +1907,6 @@ lisp_cliparound(x, y)
 
   /*   lisp_cmd ("cliparound", lisp_int (x); lisp_int (y)); */
 }
-#endif
 
 void lisp_start_screen() { return; } /* called from setftty() in unixtty.c */
 void lisp_end_screen() {return; }    /* called from settty() in unixtty.c */

@@ -1112,9 +1112,7 @@ struct monst *mtmp;
 				unsolid(mtmp->data) || !rn2(10))
 		       && dist2(mtmp->mx,mtmp->my,mtmp->mux,mtmp->muy) <= 2
 		       && mtmp->mcansee && haseyes(mtmp->data)
-#ifdef REINCARNATION
 		       && !Is_rogue_level(&u.uz)
-#endif
 		       && (!In_endgame(&u.uz) || Is_earthlevel(&u.uz))) {
 		    m.offensive = obj;
 		    m.has_offense = MUSE_SCR_EARTH;
@@ -1846,9 +1844,7 @@ struct monst *mtmp;
 	pline("For some reason, %s presence is known to you.",
 		s_suffix(noit_mon_nam(mtmp)));
 	cls();
-#ifdef CLIPPING
 	cliparound(mtmp->mx, mtmp->my);
-#endif
 	show_glyph(mtmp->mx, mtmp->my, mon_to_glyph(mtmp));
 	display_self();
 	You_feel("aggravated at %s.", noit_mon_nam(mtmp));

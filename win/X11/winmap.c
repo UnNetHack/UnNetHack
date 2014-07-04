@@ -135,14 +135,12 @@ X11_print_glyph(window, x, y, glyph)
     }
 }
 
-#ifdef CLIPPING
 /*
  * The is the tty clip call.  Since X can resize at any time, we can't depend
  * on this being defined.
  */
 /*ARGSUSED*/
 void X11_cliparound(x, y) int x, y; { }
-#endif /* CLIPPING */
 
 /* End global functions ==================================================== */
 

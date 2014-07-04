@@ -133,9 +133,7 @@ typedef xchar	boolean;		/* 0 or 1 */
 #define LARGEST_INT	32767
 
 
-#ifdef REDO
 #define Getchar pgetchar
-#endif
 
 
 #include "coord.h"

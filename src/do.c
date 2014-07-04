@@ -1166,10 +1166,8 @@ boolean at_stairs, falling, portal;
 		level_info[ledger_no(&u.uz)].flags = 0;
 	}	
 
-#ifdef REINCARNATION
 	if (Is_rogue_level(newlevel) || Is_rogue_level(&u.uz))
 		assign_rogue_graphics(Is_rogue_level(newlevel));
-#endif
 #ifdef USE_TILES
 	substitute_tiles(newlevel);
 #endif
@@ -1450,10 +1448,8 @@ boolean at_stairs, falling, portal;
 	    if (mesg) pline("%s", mesg);
 	}
 
-#ifdef REINCARNATION
 	if (new && Is_rogue_level(&u.uz))
 	    You("enter what seems to be an older, more primitive world.");
-#endif
 	if (new && Hallucination &&
 	    Role_if(PM_ARCHEOLOGIST) &&
 	    Is_juiblex_level(&u.uz))

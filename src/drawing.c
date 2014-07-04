@@ -751,8 +751,6 @@ glyph_t value;
 #endif
 }
 
-#ifdef REINCARNATION
-
 /*
  * saved display symbols for objects & features.
  */
@@ -932,6 +930,5 @@ boolean is_rlevel;
 		      (genericptr_t)save_monsyms, sizeof monsyms);
     }
 }
-#endif /* REINCARNATION */
 
 /*drawing.c*/
