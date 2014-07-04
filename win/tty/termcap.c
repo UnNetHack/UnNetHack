@@ -42,9 +42,7 @@ STATIC_VAR char *MB, *MH;
 STATIC_VAR char *MD;     /* may already be in use below */
 #endif
 #ifdef TERMLIB
-# ifdef TEXTCOLOR
 STATIC_VAR char *MD;
-# endif
 STATIC_VAR int SG;
 #ifdef OVLB
 STATIC_OVL char PC = '\0';
@@ -54,9 +52,7 @@ STATIC_DCL char PC;
 STATIC_VAR char tbuf[512];
 #endif
 
-#ifdef TEXTCOLOR
 char *hilites[CLR_MAX]; /* terminal escapes for the various colors */
-#endif
 
 #ifdef OVLB
 static char *KS = (char *)0, *KE = (char *)0;	/* keypad sequences */
@@ -194,9 +190,7 @@ int *wid, *hgt;
 	char *tbufptr, *pc;
 #endif
 
-#ifdef TEXTCOLOR
 	init_ttycolor();
-#endif
 
 #ifdef TERMLIB
 
@@ -241,7 +235,6 @@ int *wid, *hgt;
 		AE = "\017";
 #  endif
 		TE = VS = VE = nullstr;
-#  ifdef TEXTCOLOR
 		for (i = 0; i < CLR_MAX / 2; i++)
 		    if (i != CLR_BLACK) {
 			hilites[i|BRIGHT] = (char *) alloc(sizeof("\033[1;3%dm"));
@@ -256,7 +249,6 @@ int *wid, *hgt;
 				Sprintf(hilites[i], "\033[0;3%dm", i);
 			    }
 		    }
-#  endif
 		*wid = CO;
 		*hgt = LI;
 		CL = "\033[2J";		/* last thing set */
@@ -374,12 +366,8 @@ int *wid, *hgt;
 	AS = Tgetstr("as");
 	AE = Tgetstr("ae");
 	nh_CD = Tgetstr("cd");
-# ifdef TEXTCOLOR
 	MD = Tgetstr("md");
-# endif
-# ifdef TEXTCOLOR
 	init_hilite();
-# endif
 	*wid = CO;
 	*hgt = LI;
 	if (!(CL = Tgetstr("cl")))	/* last thing set */
@@ -1094,8 +1082,6 @@ term_end_raw_bold()
 }
 
 
-#ifdef TEXTCOLOR
-
 void
 term_end_color()
 {
@@ -1132,8 +1118,6 @@ int color;
 #endif
 	return hilites[color] != (char *)0;
 }
-
-#endif /* TEXTCOLOR */
 
 #endif /* OVLB */
 

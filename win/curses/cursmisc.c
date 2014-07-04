@@ -82,7 +82,6 @@ int curses_read_char()
 
 void curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
 {
-#ifdef TEXTCOLOR
     int curses_color;
 
     /* Map color disabled */
@@ -162,7 +161,6 @@ void curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
             wattroff(win, attr);
         }
     }
-#endif  /* TEXTCOLOR */
 }
 
 

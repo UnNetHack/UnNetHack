@@ -261,9 +261,7 @@ char** argv;
     ttyDisplay->curx = ttyDisplay->cury = 0;
     ttyDisplay->inmore = ttyDisplay->inread = ttyDisplay->intr = 0;
     ttyDisplay->dismiss_more = 0;
-#ifdef TEXTCOLOR
     ttyDisplay->color = NO_COLOR;
-#endif
     ttyDisplay->attrs = 0;
 
     /* set up the default windows */
@@ -2537,12 +2535,10 @@ end_glyphout()
 	graph_off();
     }
 #endif
-#ifdef TEXTCOLOR
     if(ttyDisplay->color != NO_COLOR) {
 	term_end_color();
 	ttyDisplay->color = NO_COLOR;
     }
-#endif
 }
 
 #ifndef WIN32
@@ -2656,7 +2652,6 @@ tty_print_glyph(window, x, y, glyph)
     }
 #endif
 
-#ifdef TEXTCOLOR
     if (color != ttyDisplay->color) {
 	if(ttyDisplay->color != NO_COLOR)
 	    term_end_color();
@@ -2664,7 +2659,6 @@ tty_print_glyph(window, x, y, glyph)
 	if(color != NO_COLOR)
 	    term_start_color(color);
     }
-#endif /* TEXTCOLOR */
 
     /* must be after color check; term_end_color may turn off inverse too */
     if (((special & MG_PET) && iflags.hilite_pet) ||
@@ -2690,13 +2684,11 @@ tty_print_glyph(window, x, y, glyph)
 
     if (reverse_on) {
     	term_end_attr(ATR_INVERSE);
-#ifdef TEXTCOLOR
 	/* turn off color as well, ATR_INVERSE may have done this already */
 	if(ttyDisplay->color != NO_COLOR) {
 	    term_end_color();
 	    ttyDisplay->color = NO_COLOR;
 	}
-#endif
     }
 
     wins[window]->curx++;	/* one character over */

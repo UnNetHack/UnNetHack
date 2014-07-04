@@ -360,9 +360,7 @@ struct instance_flags {
 #ifdef TTY_GRAPHICS
 #define eight_bit_tty wc_eight_bit_input
 #endif
-#ifdef TEXTCOLOR
 #define use_color wc_color
-#endif
 #define hilite_pet wc_hilite_pet
 #define use_inverse wc_inverse
 #define preload_tiles wc_preload_tiles

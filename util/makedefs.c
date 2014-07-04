@@ -361,9 +361,7 @@ make_version()
 			| (1L << 12)
 #endif
 		/* flag bits and/or other global variables (15..26) */
-#ifdef TEXTCOLOR
 			| (1L << 17)
-#endif
 #ifdef INSURANCE
 			| (1L << 18)
 #endif
@@ -522,9 +520,7 @@ static const char *build_opts[] = {
 #ifdef BLACKMARKET
 		"blackmarket level",
 #endif
-#ifdef TEXTCOLOR
 		"color",
-#endif
 #ifdef COM_COMPL
 		"command line completion",
 #endif

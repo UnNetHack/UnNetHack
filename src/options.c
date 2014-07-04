@@ -645,9 +645,7 @@ initoptions()
 	/* this detects the IBM-compatible console on most 386 boxes */
 	if ((opts = nh_getenv("TERM")) && !strncmp(opts, "AT", 2)) {
 		switch_graphics(IBM_GRAPHICS);
-# ifdef TEXTCOLOR
 		iflags.use_color = TRUE;
-# endif
 	}
 #endif /* UNIX && TTY_GRAPHICS */
 #if defined(UNIX)
@@ -3086,11 +3084,9 @@ goodfruit:
 			    need_redraw = TRUE;
 			}
 #endif
-#ifdef TEXTCOLOR
 			else if ((boolopt[i].addr) == &iflags.use_color) {
 			    need_redraw = TRUE;
 			}
-#endif
 
 			return;
 		}

@@ -39,16 +39,11 @@ struct text_buffer {
  */
 struct text_map_info_t {
     unsigned char   text[ROWNO][COLNO]; /* Actual displayed screen. */
-#ifdef TEXTCOLOR
     unsigned char   colors[ROWNO][COLNO];	/* Color of each character. */
     GC		    color_gcs[CLR_MAX],		/* GC for each color */
 		    inv_color_gcs[CLR_MAX];	/* GC for each inverse color */
 #define copy_gc     color_gcs[NO_COLOR]
 #define inv_copy_gc inv_color_gcs[NO_COLOR]
-#else
-    GC		    copy_gc,			/* Drawing GC */
-		    inv_copy_gc;		/* Inverse drawing GC */
-#endif
 };
 
 struct tile_map_info_t {

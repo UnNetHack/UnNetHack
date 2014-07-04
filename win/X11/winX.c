@@ -966,13 +966,11 @@ char** argv;
 
     /* We don't need to realize the top level widget. */
 
-#ifdef TEXTCOLOR
     /* add new color converter to deal with overused colormaps */
     XtSetTypeConverter(XtRString, XtRPixel, nhCvtStringToPixel,
 		       (XtConvertArgList)nhcolorConvertArgs,
 		       XtNumber(nhcolorConvertArgs),
 		       XtCacheByDisplay, nhFreePixel);
-#endif /* TEXTCOLOR */
 
     /* Register the actions mentioned in "actions". */
     XtAppAddActions(app_context, actions, XtNumber(actions));

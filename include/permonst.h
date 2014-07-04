@@ -56,9 +56,7 @@ struct permonst {
 	unsigned long	mflags1,		/* boolean bitflags */
 			mflags2;		/* more boolean bitflags */
 	unsigned short	mflags3;		/* yet more boolean bitflags */
-# ifdef TEXTCOLOR
 	uchar		mcolor;			/* color to use */
-# endif
 };
 
 extern struct permonst

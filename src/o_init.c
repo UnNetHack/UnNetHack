@@ -109,13 +109,9 @@ init_objects()
 {
 register int i, first, last, sum;
 register char oclass;
-#ifdef TEXTCOLOR
 # define COPY_OBJ_DESCR(o_dst,o_src) \
 			o_dst.oc_descr_idx = o_src.oc_descr_idx,\
 			o_dst.oc_color = o_src.oc_color
-#else
-# define COPY_OBJ_DESCR(o_dst,o_src) o_dst.oc_descr_idx = o_src.oc_descr_idx
-#endif
 
 	/* bug fix to prevent "initialization error" abort on Intel Xenix.
 	 * reported by mikew@semike

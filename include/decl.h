@@ -275,9 +275,7 @@ E const int shield_static[];
 E struct spell spl_book[];	/* sized in decl.c */
 
 #include "color.h"
-#ifdef TEXTCOLOR
 E const int zapcolors[];
-#endif
 
 E const char def_oc_syms[MAXOCLASSES];	/* default class symbols */
 E uchar oc_syms[MAXOCLASSES];		/* current class symbols */

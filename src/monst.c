@@ -17,15 +17,11 @@
 #ifdef C
 #undef C
 #endif
-#ifdef TEXTCOLOR
 #include "color.h"
 #define C(color)	color
 #define HI_DOMESTIC	CLR_WHITE	/* use for player + friendlies */
 #define HI_SHOPKEEPER	CLR_YELLOW	/* use for entities who buy and sell */
 #define HI_LORD		CLR_MAGENTA
-#else
-#define C(color)
-#endif
 
 void NDECL(monst_init);
 /*

@@ -102,9 +102,7 @@ X11_print_glyph(window, x, y, glyph)
 	register unsigned char *ch_ptr;
 	int			color,och;
 	unsigned		special;
-#ifdef TEXTCOLOR
 	register unsigned char *co_ptr;
-#endif
 	/* map glyph to character and color */
         mapglyph(glyph, &och, &color, &special, x, y);
 	ch = (uchar)och;
@@ -112,17 +110,11 @@ X11_print_glyph(window, x, y, glyph)
 	/* Only update if we need to. */
 	ch_ptr = &map_info->mtype.text_map->text[y][x];
 
-#ifdef TEXTCOLOR
 	co_ptr = &map_info->mtype.text_map->colors[y][x];
 	if (*ch_ptr != ch || *co_ptr != color)
-#else
-	if (*ch_ptr != ch)
-#endif
 	{
 	    *ch_ptr = ch;
-#ifdef TEXTCOLOR
 	    *co_ptr = color;
-#endif
 	    update_bbox = TRUE;
 	} else
 	    update_bbox = FALSE;
@@ -775,7 +767,6 @@ get_text_gc(wp, font)
     XtSetArg(arg[0], XtNbackground, &bgpixel);
     XtGetValues(wp->w, arg, ONE);
 
-#ifdef TEXTCOLOR
 #define set_color_gc(nh_color, resource_name)			\
 	    set_gc(wp->w, font, resource_name, bgpixel,		\
 		&map_info->mtype.text_map->color_gcs[nh_color],	\
@@ -797,11 +788,6 @@ get_text_gc(wp, font)
     set_color_gc(CLR_BRIGHT_MAGENTA, XtNbright_magenta);
     set_color_gc(CLR_BRIGHT_CYAN, XtNbright_cyan);
     set_color_gc(CLR_WHITE,	XtNwhite);
-#else
-    set_gc(wp->w, font, XtNforeground, bgpixel,
-		&map_info->mtype.text_map->copy_gc,
-		&map_info->mtype.text_map->inv_copy_gc);
-#endif
 }
 
 
@@ -887,10 +873,8 @@ clear_map_window(wp)
 	/* Fill text with spaces, and update */
 	(void) memset((genericptr_t) map_info->mtype.text_map->text, ' ',
 			sizeof(map_info->mtype.text_map->text));
-#ifdef TEXTCOLOR
 	(void) memset((genericptr_t) map_info->mtype.text_map->colors, NO_COLOR,
 			sizeof(map_info->mtype.text_map->colors));
-#endif
     }
 
     /* force a full update */
@@ -1248,7 +1232,6 @@ map_update(wp, start_row, stop_row, start_col, stop_col, inverted)
     } else {
 	struct text_map_info_t *text_map = map_info->mtype.text_map;
 
-#ifdef TEXTCOLOR
 	if (iflags.use_color) {
 	    register char *c_ptr;
 	    char *t_ptr;
@@ -1282,7 +1265,6 @@ map_update(wp, start_row, stop_row, start_col, stop_col, inverted)
 		} /* col loop */
 	    } /* row loop */
 	} else
-#endif /* TEXTCOLOR */
 	{
 	    int win_row, win_xstart;
 
@@ -1337,10 +1319,8 @@ init_text(wp)
 	(struct text_map_info_t *) alloc(sizeof(struct text_map_info_t));
 
     (void) memset((genericptr_t) text_map->text, ' ', sizeof(text_map->text));
-#ifdef TEXTCOLOR
     (void) memset((genericptr_t) text_map->colors, NO_COLOR,
 			sizeof(text_map->colors));
-#endif
 
     get_char_info(wp);
     get_text_gc(wp, WindowFont(wp->w));
@@ -1523,17 +1503,12 @@ destroy_map_window(wp)
 
 	/* Free allocated GCs. */
 	if (!map_info->is_tile) {
-#ifdef TEXTCOLOR
 	    int i;
 
 	    for (i = 0; i < CLR_MAX; i++) {
 		XtReleaseGC(wp->w, text_map->color_gcs[i]);
 		XtReleaseGC(wp->w, text_map->inv_color_gcs[i]);
 	    }
-#else
-	    XtReleaseGC(wp->w, text_map->copy_gc);
-	    XtReleaseGC(wp->w, text_map->inv_copy_gc);
-#endif
 	}
 	/* free alloc'ed text information */
 	free((genericptr_t)text_map),   map_info->mtype.text_map = 0;

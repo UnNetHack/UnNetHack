@@ -553,7 +553,6 @@ void curses_create_main_windows()
 
 void curses_init_nhcolors()
 {
-#ifdef TEXTCOLOR
     if (has_colors())
     {
         use_default_colors();
@@ -628,7 +627,6 @@ void curses_init_nhcolors()
             }
         }
     }
-#endif
 }
 
 
@@ -1245,7 +1243,6 @@ void curses_display_splash_window()
 
 void curses_cleanup()
 {
-#ifdef TEXTCOLOR
     if (has_colors() && can_change_color())
     {
         init_color(COLOR_YELLOW, orig_yellow.r, orig_yellow.g,
@@ -1278,6 +1275,5 @@ void curses_cleanup()
 # endif
         }
     }
-#endif
 }
 
