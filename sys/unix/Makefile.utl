@@ -25,19 +25,6 @@
 	#    the line below
 	# SHELL = /bin/sh
 
-	# flags may have to be changed as required
-	# flags for 286 Xenix:
-	# CFLAGS = -Ml2t16 -O -LARGE -I../include
-	# LFLAGS = -Ml -F 4000 -SEG 512
-
-	# flags for Apollos using their native cc
-	# (as long as it claims to be __STDC__ but isn't)
-	# CFLAGS = -DAPOLLO -O -I../include
-
-	# flags for IRIX 4.0.x using native cc
-	# SGI cc 3.10 will fail to compile makedefs with -O
-	# CFLAGS = -I../include -D__STDC__ -woff 100,293
-
 	# flags for Linux
 	#   compile normally
 	# CFLAGS = -O2 -fomit-frame-pointer -I../include

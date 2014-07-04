@@ -2229,11 +2229,6 @@ E int FDECL(remove_area, (const char *, const char *));
 #endif
 #endif /* UNIX */
 
-/* ### unixres.c ### */
-
-#ifdef UNIX
-#endif /* UNIX */
-
 /* ### vault.c ### */
 
 E boolean FDECL(grddead, (struct monst *));

@@ -1131,10 +1131,6 @@ $(O)unixmain.o: ../sys/unix/unixmain.c $(HACK_H) $(INCL)/dlb.h
 	$(cc) $(CFLAGS) -o$@ ../sys/unix/unixmain.c
 $(O)unixunix.o: ../sys/unix/unixunix.c $(HACK_H)
 	$(cc) $(CFLAGS) -o$@ ../sys/unix/unixunix.c
-$(O)unixres.o: ../sys/unix/unixres.c $(CONFIG_H)
-	$(cc) $(CFLAGS) -o$@ ../sys/unix/unixres.c
-$(O)bemain.o: ../sys/be/bemain.c $(HACK_H) $(INCL)/dlb.h
-	$(cc) $(CFLAGS) -o$@ ../sys/be/bemain.c
 $(O)getline.o: ../win/tty/getline.c $(HACK_H) $(INCL)/func_tab.h
 	$(cc) $(CFLAGS) -o$@ ../win/tty/getline.c
 $(O)termcap.o: ../win/tty/termcap.c $(HACK_H) $(INCL)/tcap.h
