@@ -30,8 +30,6 @@ Package=<4>
     Project_Dep_Name tiles
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name uudecode
-    End Project Dependency
 }}}
 
 ###############################################################################
@@ -182,18 +180,6 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name tile2bmp
     End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "uudecode"=.\build\uudecode.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
 }}}
 
 ###############################################################################

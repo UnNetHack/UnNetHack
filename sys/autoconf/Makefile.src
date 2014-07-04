@@ -276,7 +276,6 @@ objects.o:
 	(cd ../dat; $(MAKE) tiles.bmp)
 
 winres.o: $(srcdir)/../win/win32/winhack.rc ../dat/tiles.bmp
-	(cd ../util; make uudecode$(EXEEXT))
 	(cd ../dat; $(MAKE) mnsel.bmp mnselcnt.bmp mnunsel.bmp rip.bmp)
 	(cd ../dat; $(MAKE) petmark.bmp UnNetHack.ico splash.bmp)
 	$(WINDRES) -o$@ --include-dir=../dat -DNODEBUG -i \

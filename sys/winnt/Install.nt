@@ -352,7 +352,6 @@ Setting Up
       + recover files
       + tile2bmp files
       + tilemap files
-      + uudecode files
 
     On the Visual C menus, choose:
         Project | Set Active Project | NetHackW

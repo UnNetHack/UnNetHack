@@ -45,9 +45,6 @@ all:	$(VARDAT) spec_levs quest_levs dungeon
 ../util/tile2bmp$(EXEEXT):
 	(cd ../util ; make tile2bmp$(EXEEXT))
 
-../util/uudecode$(EXEEXT):
-	(cd ../util ; make uudecode$(EXEEXT))
-
 x11tiles: ../util/tile2x11 $(srcdir)/../win/share/monsters.txt $(srcdir)/../win/share/objects.txt \
 				$(srcdir)/../win/share/other.txt
 	../util/tile2x11 $(srcdir)/../win/share/monsters.txt $(srcdir)/../win/share/objects.txt \
@@ -197,27 +194,6 @@ tiles.bmp: ../util/tile2bmp$(EXEEXT) $(srcdir)/../win/share/monsters.txt \
 #		$(srcdir)/../win/share/objects.txt \
 #		$(srcdir)/../win/share/other.txt
 
-mnsel.bmp: ../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/mnsel.uu
-	../util/uudecode $(srcdir)/../win/win32/mnsel.uu
-
-mnselcnt.bmp: ../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/mnselcnt.uu
-	../util/uudecode $(srcdir)/../win/win32/mnselcnt.uu
-
-mnunsel.bmp: ../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/mnunsel.uu
-	../util/uudecode $(srcdir)/../win/win32/mnunsel.uu
-
-rip.bmp: ../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/rip.uu
-	../util/uudecode $(srcdir)/../win/win32/rip.uu
-
-petmark.bmp: ../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/petmark.uu
-	../util/uudecode $(srcdir)/../win/win32/petmark.uu
-
-UnNetHack.ico: ../util/uudecode$(EXEEXT) $(srcdir)/../sys/winnt/nhico.uu
-	../util/uudecode $(srcdir)/../sys/winnt/nhico.uu
-
-splash.bmp: ../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/splash.uu
-	../util/uudecode $(srcdir)/../win/win32/splash.uu
-
 UnNetHack.ad: $(srcdir)/../win/X11/UnNetHack.ad
 	cp $(srcdir)/../win/X11/UnNetHack.ad UnNetHack.ad
 
@@ -238,9 +214,6 @@ nh16.img: ../util/tile2img.ttp $(srcdir)/../win/share/monsters.txt \
 
 rip.img: ../util/xpm2img.ttp
 	../util/xpm2img.ttp $(srcdir)/../win/X11/rip.xpm rip.img
-title.img:
-	# cp $(srcdir)/../win/gem/title.img title.img
-	$(UUDECODE) $(srcdir)/../win/gem/title.uu
 
 data:	data.base ../util/makedefs
 	../util/makedefs -d

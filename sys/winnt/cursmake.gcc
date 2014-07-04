@@ -677,54 +677,6 @@ $(SRC)/monstr.c: $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -m)
 
 #==========================================
-# uudecode utility and uuencoded targets
-#==========================================
-
-$(U)uudecode.exe: $(O)uudecode.o
-	@$(link) $(LFLAGSU) -o$@ $(O)uudecode.o
-
-$(O)uudecode.o: $(SSYS)/uudecode.c
-
-$(NTSYS)/NetHack.ico : $(U)uudecode.exe $(NTSYS)/nhico.uu
-	$(subst /,\,$(U)uudecode.exe $(NTSYS)/nhico.uu)
-	$(subst /,\,copy NetHack.ico $@)
-	del NetHack.ico
-
-$(WIN32)/NetHack.ico : $(NTSYS)/NetHack.ico
-	$(subst /,\,copy $< $@)
-
-$(WIN32)/mnsel.bmp: $(U)uudecode.exe $(WIN32)/mnsel.uu
-	$(subst /,\,$(U)uudecode.exe $(WIN32)/mnsel.uu)
-	$(subst /,\,copy mnsel.bmp $@)
-	del mnsel.bmp
-
-$(WIN32)/mnselcnt.bmp: $(U)uudecode.exe $(WIN32)/mnselcnt.uu
-	$(subst /,\,$(U)uudecode.exe $(WIN32)/mnselcnt.uu)
-	$(subst /,\,copy mnselcnt.bmp $@)
-	del mnselcnt.bmp
-
-$(WIN32)/mnunsel.bmp: $(U)uudecode.exe $(WIN32)/mnunsel.uu
-	$(subst /,\,$(U)uudecode.exe $(WIN32)/mnunsel.uu)
-	$(subst /,\,copy mnunsel.bmp $@)
-	del mnunsel.bmp
-
-$(WIN32)/petmark.bmp: $(U)uudecode.exe $(WIN32)/petmark.uu
-	$(subst /,\,$(U)uudecode.exe $(WIN32)/petmark.uu)
-	$(subst /,\,copy petmark.bmp $@)
-	del petmark.bmp
-
-$(WIN32)/rip.bmp: $(U)uudecode.exe $(WIN32)/rip.uu
-	$(subst /,\,$(U)uudecode.exe $(WIN32)/rip.uu)
-	$(subst /,\,copy rip.bmp $@)
-	del rip.bmp
-
-$(WIN32)/splash.bmp: $(U)uudecode.exe $(WIN32)/splash.uu
-	$(subst /,\,$(U)uudecode.exe $(WIN32)/splash.uu)
-	$(subst /,\,copy splash.bmp $@)
-	del splash.bmp
-
-
-#==========================================
 # Level Compiler Stuff
 #==========================================
 

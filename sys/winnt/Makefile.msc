@@ -673,55 +673,6 @@ $(SRC)\monstr.c: $(U)makedefs.exe
 	$(U)makedefs -m
 
 #==========================================
-# uudecode utility and uuencoded targets
-#==========================================
-
-$(U)uudecode.exe: $(O)uudecode.o
-	@$(link) $(LFLAGSU) -out:$@ $(O)uudecode.o
-
-$(O)uudecode.o: $(SSYS)\uudecode.c
-
-$(NTSYS)\NetHack.ico : $(U)uudecode.exe $(NTSYS)\nhico.uu 
-	chdir $(NTSYS)
-	..\..\util\uudecode.exe nhico.uu
-	chdir ..\..\src
-
-$(WIN32)\NetHack.ico : $(U)uudecode.exe $(NTSYS)\nhico.uu 
-	chdir $(WIN32)
-	..\..\util\uudecode.exe ../../sys/winnt/nhico.uu
-	chdir ..\..\src
-
-$(WIN32)\mnsel.bmp: $(U)uudecode.exe $(WIN32)\mnsel.uu
-	chdir $(WIN32)
-	..\..\util\uudecode.exe mnsel.uu
-	chdir ..\..\src
-
-$(WIN32)\mnselcnt.bmp: $(U)uudecode.exe $(WIN32)\mnselcnt.uu
-	chdir $(WIN32)
-	..\..\util\uudecode.exe mnselcnt.uu
-	chdir ..\..\src
-
-$(WIN32)\mnunsel.bmp: $(U)uudecode.exe $(WIN32)\mnunsel.uu
-	chdir $(WIN32)
-	..\..\util\uudecode.exe mnunsel.uu
-	chdir ..\..\src
-
-$(WIN32)\petmark.bmp: $(U)uudecode.exe $(WIN32)\petmark.uu
-	chdir $(WIN32)
-	..\..\util\uudecode.exe petmark.uu
-	chdir ..\..\src
-
-$(WIN32)\rip.bmp: $(U)uudecode.exe $(WIN32)\rip.uu
-	chdir $(WIN32)
-	..\..\util\uudecode.exe rip.uu
-	chdir ..\..\src
-
-$(WIN32)\splash.bmp: $(U)uudecode.exe $(WIN32)\splash.uu
-	chdir $(WIN32)
-	..\..\util\uudecode.exe splash.uu
-	chdir ..\..\src
-
-#==========================================
 # Level Compiler Stuff
 #==========================================
 
