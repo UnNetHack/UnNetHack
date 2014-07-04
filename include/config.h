@@ -230,15 +230,6 @@ typedef long glyph_t;
 
 /* #define STRNCMPI */	/* compiler/library has the strncmpi function */
 
-/*
- * Things will be faster if you can use MACRO_CPATH.  Some cpps, however
- * cannot deal with the size of the functions that have been macroized.
- */
-
-# ifndef NO_MACRO_CPATH
-#  define MACRO_CPATH	/* use clear_path macros instead of functions */
-# endif
-
 #define EXOTIC_PETS      /* Rob Ellwood  June 2002 */
 
 /*
