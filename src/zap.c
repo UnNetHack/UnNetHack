@@ -776,7 +776,7 @@ struct monst *mon;
 	    if (youseeit) Strcpy(corpse, corpse_xname(otmp, TRUE));
 
 	    /* for a merged group, only one is revived; should this be fixed? */
-	    if ((mtmp2 = revive_corpse(otmp)) != 0) {
+	    if (revive_corpse(otmp)) {
 		++res;
 	    }
 	}

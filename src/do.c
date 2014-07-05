@@ -1671,8 +1671,9 @@ deferred_goto()
 }
 
 /*
- * Return TRUE if we created a monster for the corpse.  If successful, the
- * corpse is gone. Otherwise, the corpse may or may not be gone.
+ * Tries to create a monster for the corpse.
+ *
+ * Returns TRUE if the corpse is gone afterwards.
  */
 boolean
 revive_corpse(corpse)
@@ -1712,11 +1713,12 @@ struct obj *corpse;
 		pline("%s drained %s stirs briefly, then evaporates into dust.",
 			where == OBJ_INVENT ? "Your" : "The", cname);
 	    }
+	    return TRUE;
 	} else if (showmsg) {
 	    pline("%s drained %s stirs with life, but doesn't have enough blood to survive.", 
 		    where == OBJ_INVENT ? "Your" : "The", cname);
+	    return FALSE;
 	}
-	return FALSE;
     }
 
     mtmp = revive(corpse);	/* corpse is gone if successful */
