@@ -1051,11 +1051,7 @@ E void FDECL(makecorridors, (int));
 E void FDECL(add_door, (int,int,struct mkroom *));
 E void NDECL(mkpoolroom);
 E void NDECL(mklev);
-#ifdef SPECIALIZATION
-E void FDECL(topologize, (struct mkroom *,BOOLEAN_P));
-#else
 E void FDECL(topologize, (struct mkroom *));
-#endif
 E void FDECL(place_branch, (branch *,XCHAR_P,XCHAR_P));
 E boolean FDECL(occupied, (XCHAR_P,XCHAR_P));
 E int FDECL(okdoor, (XCHAR_P,XCHAR_P));

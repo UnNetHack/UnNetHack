@@ -186,11 +186,7 @@ gottype:
 	sroom->rtype = SHOPBASE + i;
 
 	/* set room bits before stocking the shop */
-#ifdef SPECIALIZATION
-	topologize(sroom, FALSE); /* doesn't matter - this is a special room */
-#else
 	topologize(sroom);
-#endif
 
 	/* stock the room with a shopkeeper and artifacts */
 	stock_room(i, sroom);

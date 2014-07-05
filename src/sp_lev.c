@@ -2412,11 +2412,7 @@ struct mkroom *mkr;
 	}
 
 	if (okroom) {
-#ifdef SPECIALIZATION
-		topologize(aroom,FALSE);		/* set roomno */
-#else
 		topologize(aroom);			/* set roomno */
-#endif
 		aroom->needfill = r->filled;
 		aroom->needjoining = r->joined;
 	        return aroom;
@@ -4598,11 +4594,7 @@ spo_region(coder)
     } else {
 	add_room(dx1, dy1, dx2, dy2,
 		 OV_i(rlit), OV_i(rtype), TRUE);
-#ifdef SPECIALIZATION
-	topologize(troom,FALSE);              /* set roomno */
-#else
 	topologize(troom);                    /* set roomno */
-#endif
     }
 
     if (in_mk_rndvault && prefilled) troom->needfill = 1;

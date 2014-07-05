@@ -1861,10 +1861,6 @@ register struct monst *mtmp;
 	roomno = levl[mx][my].roomno - ROOMOFFSET;
 	if (roomno >= 0)
 		rt = rooms[roomno].rtype;
-#ifdef SPECIALIZATION
-	else if (IS_ROOM(typ))
-		rt = OROOM,  roomno = 0;
-#endif
 	else	rt = 0;	/* roomno < 0 case for GCC_WARN */
 
 	if (OBJ_AT(mx, my)) {

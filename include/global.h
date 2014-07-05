@@ -86,9 +86,6 @@ typedef xchar	boolean;		/* 0 or 1 */
 # define ZEROCOMP	/* zero-run compression of everything - Olaf Seibert */
 #endif
 
-/* #define SPECIALIZATION */	/* do "specialized" version of new topology */
-
-
 #ifdef BITFIELDS
 #define Bitfield(x,n)	unsigned x:n
 #else
