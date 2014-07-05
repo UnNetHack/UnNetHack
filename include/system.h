@@ -46,9 +46,7 @@ typedef unsigned int	size_t;
 # define SIG_RET_TYPE void (__cdecl *)(int)
 #endif
 #ifndef SIG_RET_TYPE
-# if defined(NHSTDC) || defined(POSIX_TYPES) || defined(__DECC)
 #  define SIG_RET_TYPE void (*)()
-# endif
 #endif
 #ifndef SIG_RET_TYPE
 # if defined(SVR3) || defined(SVR4)
@@ -127,35 +125,17 @@ E int FDECL(system, (const char *));
 #include <string.h>
 #else
 #if defined(SYSV)
-# if defined(NHSTDC)
 E int FDECL(memcmp, (const void *,const void *,size_t));
 E void *FDECL(memcpy, (void *, const void *, size_t));
 E void *FDECL(memset, (void *, int, size_t));
-# else
-#  ifndef memcmp	/* some systems seem to macro these back to b*() */
-E int memcmp();
-#  endif
-#  ifndef memcpy
-E char *memcpy();
-#  endif
-#  ifndef memset
-E char *memset();
-#  endif
-# endif
 #else
 #endif
 #endif /* POSIX_TYPES */
 
 #if defined(MICRO) && !defined(LATTICE)
-#  if defined(NHSTDC) || defined(WIN32)
 E int  FDECL(memcmp, (const void *, const void *, size_t));
 E void *FDECL(memcpy, (void *, const void *, size_t));
 E void *FDECL(memset, (void *, int, size_t));
-#  else
-E int FDECL(memcmp, (char *,char *,unsigned int));
-E char *FDECL(memcpy, (char *,char *,unsigned int));
-E char *FDECL(memset, (char*,int,int));
-#  endif /* NHSTDC */
 #endif /* MICRO */
 
 #if defined(SYSV)

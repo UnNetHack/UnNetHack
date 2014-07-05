@@ -1531,11 +1531,7 @@ boolean want_disp;
 }
 
 #ifndef M
-# ifndef NHSTDC
-#  define M(c)		(0x80 | (c))
-# else
 #  define M(c)		((c) - 128)
-# endif /* NHSTDC */
 #endif
 #ifndef C
 #define C(c)		(0x1f & (c))

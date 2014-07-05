@@ -460,11 +460,7 @@ do_date()
 	Fprintf(ofp,"#define BUILD_DATE \"%s\"\n", cbuf);
 	Fprintf(ofp,"#define BUILD_TIME (%ldL)\n", clocktim);
 	Fprintf(ofp,"\n");
-#ifdef NHSTDC
 	ul_sfx = "UL";
-#else
-	ul_sfx = "L";
-#endif
 	Fprintf(ofp,"#define VERSION_NUMBER 0x%08lx%s\n",
 		version.incarnation, ul_sfx);
 	Fprintf(ofp,"#define VERSION_FEATURES 0x%08lx%s\n",

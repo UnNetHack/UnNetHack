@@ -103,11 +103,7 @@
 #define M1_CARNIVORE	0x20000000L	/* eats corpses */
 #define M1_HERBIVORE	0x40000000L	/* eats fruits */
 #define M1_OMNIVORE	0x60000000L	/* eats both */
-#ifdef NHSTDC
 #define M1_METALLIVORE	0x80000000UL	/* eats metal */
-#else
-#define M1_METALLIVORE	0x80000000L	/* eats metal */
-#endif
 
 #define M2_NOPOLY	0x00000001L	/* players mayn't poly into one */
 #define M2_UNDEAD	0x00000002L	/* is walking dead */
@@ -140,11 +136,7 @@
 #define M2_GREEDY	0x10000000L	/* likes gold */
 #define M2_JEWELS	0x20000000L	/* likes gems */
 #define M2_COLLECT	0x40000000L	/* picks up weapons and food */
-#ifdef NHSTDC
 #define M2_MAGIC	0x80000000UL	/* picks up magic items */
-#else
-#define M2_MAGIC	0x80000000L	/* picks up magic items */
-#endif
 
 #define M3_WANTSAMUL	0x0001		/* would like to steal the amulet */
 #define M3_WANTSBELL	0x0002		/* wants the bell */

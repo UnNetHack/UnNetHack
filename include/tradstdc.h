@@ -5,16 +5,6 @@
 #define TRADSTDC_H
 
 /*
- * Borland C provides enough ANSI C compatibility in its Borland C++
- * mode to warrant this.  But it does not set __STDC__ unless it compiles
- * in its ANSI keywords only mode, which prevents use of <dos.h> and
- * far pointer use.
- */
-#if defined(__STDC__)
-#define NHSTDC
-#endif
-
-/*
  * ANSI X3J11 detection.
  * Makes substitutes for compatibility with the old C standard.
  */
@@ -32,11 +22,9 @@
 /* #define USE_VARARGS */	/* use <varargs.h> instead of <stdarg.h> */
 /* #define USE_OLDARGS */	/* don't use any variable argument facilites */
 
-#if defined(NHSTDC) 
 # if !defined(USE_VARARGS) && !defined(USE_OLDARGS) && !defined(USE_STDARG)
 #   define USE_STDARG
 # endif
-#endif
 
 #ifdef NEED_VARARGS		/* only define these if necessary */
 #ifdef USE_STDARG
@@ -75,8 +63,6 @@
 #endif
 #endif /* NEED_VARARGS */
 
-#if defined(NHSTDC)
-
 /*
  * Used for robust ANSI parameter forward declarations:
  * int VDECL(sprintf, (char *, const char *, ...));
@@ -102,34 +88,6 @@
 /* generic pointer, always a macro; genericptr_t is usually a typedef */
 # define genericptr	void *
 
-# if !defined(NHSTDC)
-#  define const
-#  define signed
-#  define volatile
-# endif
-
-#else /* NHSTDC */	/* a "traditional" C  compiler */
-
-# define NDECL(f)	f()
-# define FDECL(f,p)	f()
-# define VDECL(f,p)	f()
-
-# if defined(POSIX_TYPES) || defined(__DECC)
-#  define genericptr	void *
-# endif
-# ifndef genericptr
-#  define genericptr	char *
-# endif
-
-/*
- * Traditional C compilers don't have "signed", "const", or "volatile".
- */
-# define signed
-# define const
-# define volatile
-
-#endif /* NHSTDC */
-
 
 #ifndef genericptr_t
 typedef genericptr genericptr_t;	/* (void *) or (char *) */
@@ -149,9 +107,7 @@ typedef genericptr genericptr_t;	/* (void *) or (char *) */
 #endif
 
 #ifndef UNWIDENED_PROTOTYPES
-# if defined(NHSTDC) 
 # define WIDENED_PROTOTYPES
-# endif
 #endif
 
 /*

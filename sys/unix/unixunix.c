@@ -18,10 +18,6 @@ extern void NDECL(linux_mapon);
 extern void NDECL(linux_mapoff);
 #endif
 
-#ifndef NHSTDC
-extern int errno;
-#endif
-
 extern int FDECL(restore_savefile, (char *, const char *));
 
 static struct stat buf;

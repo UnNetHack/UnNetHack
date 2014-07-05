@@ -19,10 +19,6 @@
 #define ALLOW_BARS	0x10000000L	/* may pass thru iron bars */
 #define ALLOW_SANCT	0x20000000L	/* enters temples */
 #define ALLOW_SSM	0x40000000L	/* ignores scare monster */
-#ifdef NHSTDC
 #define NOGARLIC	0x80000000UL	/* hates garlic */
-#else
-#define NOGARLIC	0x80000000L	/* hates garlic */
-#endif
 
 #endif /* MFNDPOS_H */
