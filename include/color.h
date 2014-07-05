@@ -83,7 +83,6 @@ struct menucoloring {
 };
 #endif /* MENU_COLOR */
 
-#ifdef STATUS_COLORS
 struct color_option {
     int color;
     int attr_bits;
@@ -107,7 +106,6 @@ struct text_color_option {
 	struct color_option color_option;
 	const struct text_color_option *next;
 };
-#endif
 
 extern int ttycolors[CLR_MAX];
 

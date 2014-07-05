@@ -144,9 +144,7 @@ E void NDECL(term_end_color);
 E void FDECL(term_start_color,(int color));
 E int FDECL(has_color,(int color));
 
-#ifdef STATUS_COLORS
 E boolean FDECL(parse_status_color_options, (char *));
-#endif /* STATUS_COLOR */
 
 /* ### topl.c ### */
 

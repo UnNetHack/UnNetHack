@@ -228,11 +228,7 @@ static struct Bool_Opt
 	{"sparkle", &flags.sparkle, TRUE, SET_IN_GAME},
 	/* not removed for backwards compatibilty */
 	{"standout", &flags.standout, TRUE, SET_IN_FILE}, 
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	{"statuscolors", &iflags.use_status_colors, TRUE, SET_IN_GAME},
-#else
-	{"statuscolors", (boolean *)0, TRUE, SET_IN_GAME},
-#endif
 	{"splash_screen",     &iflags.wc_splash_screen, TRUE, DISP_IN_GAME},	/*WC*/
 	{"tiled_map",     &iflags.wc_tiled_map, PREFER_TILED, DISP_IN_GAME},	/*WC*/
 	{"time", &flags.time, TRUE, SET_IN_GAME},
@@ -983,8 +979,6 @@ const char *optn;
 	return 1;
 }
 
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-
 struct name_value {
 	char *name;
 	int value;
@@ -1146,8 +1140,6 @@ char *start;
 	return ok;
 }
 
-
-#endif /* STATUS_COLORS */
 
 void
 set_duplicate_opt_detection(on_or_off)
@@ -2644,12 +2636,10 @@ goodfruit:
 
 	fullname = "statuscolor";
 	if (match_optname(opts, fullname, 11, TRUE)) {
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
 			if (!parse_status_color_options(op))
 				badoption(opts);
-#endif
 	    return;
 	}
 

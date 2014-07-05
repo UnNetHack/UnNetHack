@@ -17,7 +17,7 @@ static char * FDECL(e_atr2str, (int));
 
 void FDECL(cmov, (int, int));
 void FDECL(nocmov, (int, int));
-#if defined(TEXTCOLOR) && defined(TERMLIB)
+#if defined(TERMLIB)
 # ifdef OVLB
 #  if !defined(UNIX) || !defined(TERMINFO)
 static void FDECL(analyze_seq, (char *, int *, int *));
@@ -383,7 +383,7 @@ int *wid, *hgt;
 void
 tty_shutdown()
 {
-#if defined(TEXTCOLOR) && defined(TERMLIB)
+#if defined(TERMLIB)
 	kill_hilite();
 #endif
 	/* we don't attempt to clean up individual termcap variables [yet?] */
@@ -779,7 +779,7 @@ cl_eos()			/* free after Robert Viduya */
 	}
 }
 
-#if defined(TEXTCOLOR) && defined(TERMLIB)
+#if defined(TERMLIB)
 # if defined(UNIX) && defined(TERMINFO)
 /*
  * Sets up color highlighting, using terminfo(4) escape sequences.
@@ -995,7 +995,7 @@ kill_hilite()
 	}
 	return;
 }
-#endif /* TEXTCOLOR */
+#endif
 
 
 static char nulstr[] = "";
@@ -1009,7 +1009,7 @@ int n;
 		    if(nh_US) return nh_US;
 	    case ATR_BOLD:
 	    case ATR_BLINK:
-#if defined(TERMLIB) && defined(TEXTCOLOR)
+#if defined(TERMLIB)
 		    if (MD) return MD;
 #endif
 		    return nh_HI;

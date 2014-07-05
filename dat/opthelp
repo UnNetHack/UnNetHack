@@ -80,7 +80,6 @@ showexp    display your accumulated experience points             [FALSE]
 Boolean option if SCORE_ON_BOTL was set at compile time:
 showscore  display your approximate accumulated score             [FALSE]
 
-Boolean options if TEXTCOLOR was set at compile time:
 color      use different colors for objects on screen   [TRUE for micros]
 hilite_pet display pets in a highlighted manner                   [FALSE]
 

@@ -14,7 +14,6 @@ int orig_cursor;	/* Preserve initial cursor state */
 boolean counting;   /* Count window is active */
 
 
-#define TEXTCOLOR   /* Allow color */
 #define NHW_END 19
 #define OFF 0
 #define ON 1

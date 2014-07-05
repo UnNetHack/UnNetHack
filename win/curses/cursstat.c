@@ -23,7 +23,6 @@ typedef struct nhs
     const char *id;
 } nhstat;
 
-#ifdef STATUS_COLORS
 extern const struct text_color_option *text_colors;
 extern const struct percent_color_option *hp_colors;
 extern const struct percent_color_option *pw_colors;
@@ -35,7 +34,6 @@ struct color_option percentage_color_of(int value, int max,
  const struct percent_color_option *color_options);
 
 static boolean stat_colored(const char *id);
-#endif
 
 static void init_stats(void);
 
@@ -2553,7 +2551,6 @@ is NO_COLOR unless the statuscolors patch is in use. */
 
 static void set_stat_color(nhstat *stat)
 {
-#ifdef STATUS_COLORS
     struct color_option stat_color;
     int count;
     int attr = A_NORMAL;
@@ -2578,10 +2575,6 @@ static void set_stat_color(nhstat *stat)
         stat->stat_color = NO_COLOR;
         stat->stat_attr = A_NORMAL;
     }
-#else
-    stat->stat_color = NO_COLOR;
-    stat->stat_attr = A_NORMAL;
-#endif  /* STATUS_COLORS */
 }
 
 
@@ -2591,7 +2584,6 @@ static void set_stat_color(nhstat *stat)
 static void color_stat(nhstat stat, int onoff)
 {
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
-#ifdef STATUS_COLORS
     struct color_option stat_color;
     int color, attr, hp, hpmax, count;
     char buf[BUFSIZ];
@@ -2679,15 +2671,12 @@ static void color_stat(nhstat stat, int onoff)
 
     stat.stat_color = color;
     stat.stat_attr = attr;
-#endif  /* STATUS_COLORS */
     
     if ((stat.stat_color == NO_COLOR) && (stat.stat_attr == A_NORMAL))
     {
         if (stat.highlight_turns > 0)
         {
-#ifdef STATUS_COLORS
             if (iflags.use_status_colors)
-#endif
             curses_toggle_color_attr(win, stat.highlight_color,
              A_NORMAL, onoff);
         }
@@ -2695,9 +2684,7 @@ static void color_stat(nhstat stat, int onoff)
         return;
     }
 
-#ifdef STATUS_COLORS
     if (iflags.use_status_colors)
-#endif
     curses_toggle_color_attr(win, stat.stat_color, stat.stat_attr,
         onoff);
 }
@@ -2705,7 +2692,6 @@ static void color_stat(nhstat stat, int onoff)
 
 /* Determine if a stat is configured via statuscolors. */
 
-#ifdef STATUS_COLORS
 static boolean stat_colored(const char *id)
 {
     struct text_color_option *cur_option = 
@@ -2723,5 +2709,4 @@ static boolean stat_colored(const char *id)
     
     return FALSE;
 }
-#endif  /* STATUS_COLORS */
 
