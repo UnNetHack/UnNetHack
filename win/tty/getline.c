@@ -59,7 +59,7 @@ getlin_hook_proc hook;
 		(void) fflush(stdout);
 		Sprintf(toplines, "%s ", query);
 		Strcat(toplines, obufp);
-		if((c = Getchar()) == EOF) {
+		if((c = pgetchar()) == EOF) {
 #ifndef NEWAUTOCOMP
 			*bufp = 0;
 #endif /* not NEWAUTOCOMP */

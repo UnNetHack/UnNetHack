@@ -121,7 +121,7 @@ const char *str;
 	if (!getreturn_enabled) return;
 #endif
 	msmsg("Hit <Enter> %s.", str);
-	while (Getchar() != '\n') ;
+	while (pgetchar() != '\n') ;
 	return;
 }
 
