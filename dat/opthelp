@@ -54,7 +54,6 @@ wound_message  healers can see how badly monsters are damaged     [TRUE]
 
 There are further boolean options controlled by compilation flags.
 
-Boolean option if INSURANCE was set at compile time:
 checkpoint save game state after each level change, for possible  [TRUE]
            recovery after program crash
 

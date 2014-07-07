@@ -300,7 +300,6 @@ register int fd, mode;
 	bflush(fd);
 }
 
-#ifdef INSURANCE
 void
 savestateinlock()
 {
@@ -371,7 +370,6 @@ savestateinlock()
 	}
 	havestate = flags.ins_chkpt;
 }
-#endif
 
 void
 savelev(fd,lev,mode)

@@ -562,9 +562,7 @@ register int fd;
 		return(0);
 	}
 	restlevelstate(stuckid, steedid);
-#ifdef INSURANCE
 	savestateinlock();
-#endif
 	rtmp = restlevelfile(ledger_no(&u.uz));
 	if (rtmp < 2) return(rtmp);  /* dorecover called recursively */
 

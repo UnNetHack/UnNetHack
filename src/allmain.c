@@ -719,9 +719,7 @@ newgame()
 	}
 	}
 
-#ifdef INSURANCE
 	save_currentstate();
-#endif
 	program_state.something_worth_saving++;	/* useful data now exists */
 
 #if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)

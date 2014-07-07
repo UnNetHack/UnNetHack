@@ -362,9 +362,7 @@ make_version()
 #endif
 		/* flag bits and/or other global variables (15..26) */
 			| (1L << 17)
-#ifdef INSURANCE
 			| (1L << 18)
-#endif
 			| (1L << 19)
 #ifdef EXP_ON_BOTL
 			| (1L << 20)
@@ -540,9 +538,7 @@ static const char *build_opts[] = {
 #ifdef GOLDOBJ
 		"gold object in inventories",
 #endif
-#ifdef INSURANCE
 		"insurance files for recovering from crashes",
-#endif
 		"Keystone Kops",
 #ifdef HOLD_LOCKFILE_OPEN
 		"exclusive lock on level 0 file",

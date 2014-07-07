@@ -315,9 +315,7 @@ E void FDECL(obj_no_longer_held, (struct obj *));
 E int NDECL(doddrop);
 E int NDECL(dodown);
 E int NDECL(doup);
-#ifdef INSURANCE
 E void NDECL(save_currentstate);
-#endif
 E void FDECL(goto_level, (d_level *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(schedule_goto, (d_level *,BOOLEAN_P,BOOLEAN_P,int,
 			     const char *,const char *));
@@ -673,9 +671,7 @@ E int FDECL(open_bonesfile, (d_level*,char **));
 E int FDECL(delete_bonesfile, (d_level*));
 E void NDECL(compress_bonesfile);
 E void NDECL(set_savefile_name);
-#ifdef INSURANCE
 E void FDECL(save_savefile_name, (int));
-#endif
 #if defined(WIZARD) && !defined(MICRO)
 E void NDECL(set_error_savefile);
 #endif
@@ -1833,9 +1829,7 @@ E int NDECL(dosave);
 E void FDECL(hangup, (int));
 #endif
 E int NDECL(dosave0);
-#ifdef INSURANCE
 E void NDECL(savestateinlock);
-#endif
 E void FDECL(savelev, (int,XCHAR_P,int));
 E void FDECL(bufon, (int));
 E void FDECL(bufoff, (int));

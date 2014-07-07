@@ -1019,7 +1019,6 @@ currentlevel_rewrite()
 	return fd;
 }
 
-#ifdef INSURANCE
 void
 save_currentstate()
 {
@@ -1037,7 +1036,6 @@ save_currentstate()
 	/* write out non-level state */
 	savestateinlock();
 }
-#endif
 
 /*
 static boolean
@@ -1504,9 +1502,7 @@ boolean at_stairs, falling, portal;
 		You("annotated this level: %s", annotation);
 	}
 
-#ifdef INSURANCE
 	save_currentstate();
-#endif
 
 	/* assume this will always return TRUE when changing level */
 	(void) in_out_region(u.ux, u.uy);

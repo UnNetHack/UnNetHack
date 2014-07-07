@@ -28,8 +28,7 @@ DESCRIPTION
      the  directory  specified  by  the game administrator during
      compilation (usually /usr/games/lib/nethackdir).
 
-     For recovery to be possible, nethack must have been compiled
-     with  the  INSURANCE  option, and the run-time option check-
+     For recovery to be possible the run-time option check-
      point must also have been on.  NetHack normally  writes  out
      files  for levels as the player leaves them, so they will be
      ready for return visits.  When checkpointing,  NetHack  also

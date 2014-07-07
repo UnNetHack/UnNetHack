@@ -58,11 +58,7 @@ static struct Bool_Opt
 	{"BIOS", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"bones", &flags.bones, TRUE, SET_IN_FILE},
-#ifdef INSURANCE
 	{"checkpoint", &flags.ins_chkpt, TRUE, SET_IN_FILE},
-#else
-	{"checkpoint", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 	{"cmdassist", &iflags.cmdassist, TRUE, SET_IN_GAME},
 	{"color", &iflags.wc_color, TRUE, SET_IN_GAME},		/*WC*/
 	{"confirm",&flags.confirm, TRUE, SET_IN_GAME},

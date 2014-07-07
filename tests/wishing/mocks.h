@@ -176,9 +176,6 @@ void obj_no_longer_held(struct obj *obj) {}
 //E int NDECL(doddrop);
 //E int NDECL(dodown);
 //E int NDECL(doup);
-//#ifdef INSURANCE
-//E void NDECL(save_currentstate);
-//#endif
 //E void FDECL(goto_level, (d_level *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 //E void FDECL(schedule_goto, (d_level *,BOOLEAN_P,BOOLEAN_P,int,
 //                             const char *,const char *));

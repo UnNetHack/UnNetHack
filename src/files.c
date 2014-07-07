@@ -863,14 +863,12 @@ set_savefile_name()
 # endif	/* MICRO */
 }
 
-#ifdef INSURANCE
 void
 save_savefile_name(fd)
 int fd;
 {
 	(void) write(fd, (genericptr_t) SAVEF, sizeof(SAVEF));
 }
-#endif
 
 
 #if defined(WIZARD) && !defined(MICRO)

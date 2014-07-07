@@ -30,9 +30,6 @@ int fd;
 	time_t date;
 
 	if(fstat(fd, &buf)) return(0);			/* cannot get status */
-#ifndef INSURANCE
-	if(buf.st_size != sizeof(int)) return(0);	/* not an xlock file */
-#endif
 #if defined(BSD) && !defined(POSIX_TYPES)
 	(void) time((long *)(&date));
 #else
