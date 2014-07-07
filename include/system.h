@@ -218,7 +218,7 @@ E  char *sprintf();
 
 #ifdef NEED_VARARGS
 # if defined(USE_STDARG) || defined(USE_VARARGS)
-#  if !defined(SVR4) && !defined(apollo)
+#  if !defined(SVR4)
 E int FDECL(vsprintf, (char *, const char *, va_list));
 E int FDECL(vfprintf, (FILE *, const char *, va_list));
 E int FDECL(vprintf, (const char *, va_list));
