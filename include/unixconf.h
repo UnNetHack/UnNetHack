@@ -101,9 +101,7 @@
  * "extra output" method is used, but not all systems provide access to
  * a fine-grained timer.
  */
-#ifndef AUTOCONF
 /* #define TIMED_DELAY */	/* usleep() */
-#endif
 #endif
 
 /*
@@ -242,9 +240,7 @@
 
 #define tgetch getchar
 
-#ifndef AUTOCONF
 #define SHELL		/* do not delete the '!' command */
-#endif
 
 #if defined(POSIX_TYPES) || defined(__GNUC__)
 #include <stdlib.h>
