@@ -19,11 +19,6 @@
 
 #include "config1.h"	/* should auto-detect WIN32 */
 
-#ifdef AUTOCONF
-# include "autoconf_paths.h"
-# include "autoconf.h"
-#endif
-
 
 /* Windowing systems...
  * Define all of those you want supported in your binary.
@@ -113,7 +108,6 @@
  *	compression.
  */
 
-#ifndef AUTOCONF
 #ifdef UNIX
 /* path and file name extension for compression program */
 /* #define COMPRESS "/usr/bin/compress" */	/* Lempel-Ziv compression */
@@ -125,7 +119,6 @@
 
 #ifndef COMPRESS
 # define INTERNAL_COMP	/* control use of NetHack's compression routines */
-#endif
 #endif
 
 /*
@@ -239,12 +232,9 @@ typedef long glyph_t;
  * complexity of the game but also to the size of the load module.
  */
 
-#ifndef AUTOCONF
-
 /* I/O */
 #define EXP_ON_BOTL	/* Show experience on bottom line */
 /* #define SCORE_ON_BOTL */	/* added by Gary Erickson (erickson@ucivax) */
-#endif /* AUTOCONF */
 
 # define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
 
@@ -275,8 +265,6 @@ typedef long glyph_t;
  * Enable any of these at your own risk -- there are almost certainly
  * bugs left here.
  */
-
-#ifndef AUTOCONF
 
 #define RANDOMIZED_PLANES /* Elemental Planes order is randomized - Patric Mueller (4 Jan 2009) */
 #define BLACKMARKET	/* Massimo Campostrini (campo@sunthpi3.difi.unipi.it) */
@@ -309,8 +297,6 @@ typedef long glyph_t;
 #define AUTO_OPEN	/* open doors by walking into them - Stefano Busti */
 
 /* #define WHEREIS_FILE "./whereis/%n.whereis" */ /* Write out player's current location to player.whereis */
-
-#endif /* AUTOCONF */
 
 #ifdef TTY_GRAPHICS
 # define WIN_EDGE	/* windows aligned left&top */
