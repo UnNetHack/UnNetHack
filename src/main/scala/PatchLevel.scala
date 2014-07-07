@@ -1,19 +1,22 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Conversion to Scala copyright (c) 2014 Sheldon Young. */
+
+object PatchLevel {
 
 /* UnNetHack 5.1.0 */
-#define GAME_SHORT_NAME	"UNH"
-#define VERSION_MAJOR	5
-#define VERSION_MINOR	1
+val GAME_SHORT_NAME = "UNH"
+val VERSION_MAJOR = 5
+val VERSION_MINOR = 1
 /*
  * PATCHLEVEL is updated for each release.
  */
-#define PATCHLEVEL	0
+val PATCHLEVEL = 0
 /*
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL	0
+val EDITLEVEL = 0
 
 /*
  * UnNetHack follows a more modern approach regarding version numbers:
@@ -28,16 +31,13 @@
  * and are considered only bugfix releases. Therefore the revision number isn't
  * included into VERSION_COMPATIBILITY.
  */
-/* #define VERSION_REVISION	1 */
+/* val VERSION_REVISION = 1 */
 
-#define COPYRIGHT_BANNER_A \
-"UnNetHack 5, Copyright 2009-2013"
+val COPYRIGHT_BANNER_A = "UnNetHack 5, Copyright 2009-2013"
 
-#define COPYRIGHT_BANNER_B \
-"    Based on NetHack, Copyright 1985-2003 by Stichting Mathematisch"
+val COPYRIGHT_BANNER_B = "    Based on NetHack, Copyright 1985-2003 by Stichting Mathematisch"
 
-#define COPYRIGHT_BANNER_C \
-"         Centrum and M. Stephenson.  See license for details."
+val COPYRIGHT_BANNER_C = "         Centrum and M. Stephenson.  See license for details."
 
 /*
  * If two or more successive releases have compatible data files, define
@@ -48,6 +48,5 @@
  * PP = patch level, ee = edit level, L = literal suffix "L",
  * with all four numbers specified as two hexadecimal digits.
  */
-/* #define VERSION_COMPATIBILITY 0x05000000L */	/* 5.0.0-e0 */
-
-/*patchlevel.h*/
+/* val VERSION_COMPATIBILITY = 0x05000000L */	/* 5.0.0-e0 */
+}
