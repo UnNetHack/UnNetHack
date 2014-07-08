@@ -101,9 +101,6 @@ getlock()
 	/* we ignore QUIT and INT at this point */
 	if (!lock_file(HLOCK, LOCKPREFIX, 10)) {
 		wait_synch();
-# if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-		chdirx(orgdir, 0);
-# endif
 		error("Quitting.");
 	}
 
@@ -113,9 +110,6 @@ getlock()
 	fq_lock = fqname(lock, LEVELPREFIX, 1);
 	if((fd = open(fq_lock,0)) == -1) {
 		if(errno == ENOENT) goto gotlock;    /* no such file */
-# if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-		chdirx(orgdir, 0);
-# endif
 # if defined(WIN32) || defined(HOLD_LOCKFILE_OPEN)
 #  if defined(HOLD_LOCKFILE_OPEN)
  		if(errno == EACCES) {
@@ -185,9 +179,6 @@ getlock()
 			goto gotlock;
 		} else {
 			unlock_file(HLOCK);
-#  if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-			chdirx(orgdir, 0);
-#  endif
 			error("Couldn't destroy old game.");
 		}
 # else /*SELF_RECOVER*/
@@ -198,17 +189,11 @@ getlock()
 			goto gotlock;
 		} else {
 			unlock_file(HLOCK);
-#  if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-			chdirx(orgdir, 0);
-#  endif
 			error("Couldn't recover old game.");
 		}
 # endif /*SELF_RECOVER*/
 	else {
 		unlock_file(HLOCK);
-# if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-		chdirx(orgdir, 0);
-# endif
 		error("%s", "Cannot start a new game.");
 	}
 
@@ -217,9 +202,6 @@ gotlock:
 	if (fd == -1) ern = errno;
 	unlock_file(HLOCK);
 	if(fd == -1) {
-# if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-		chdirx(orgdir, 0);
-# endif
 # if defined(WIN32)
 		error("cannot creat file (%s.)\n%s\n%s\"%s\" exists?\n", 
 				fq_lock, strerror(ern), " Are you sure that the directory",
@@ -230,15 +212,9 @@ gotlock:
 	} else {
 		if(write(fd, (char *) &hackpid, sizeof(hackpid))
 		    != sizeof(hackpid)){
-# if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-			chdirx(orgdir, 0);
-# endif
 			error("cannot write lock (%s)", fq_lock);
 		}
 		if(close(fd) == -1) {
-# if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-			chdirx(orgdir, 0);
-# endif
 			error("cannot close lock (%s)", fq_lock);
 		}
 	}
