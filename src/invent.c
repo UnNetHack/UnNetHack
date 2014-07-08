@@ -1737,11 +1737,7 @@ boolean dot;		/* append period; (dot && cost => Iu) */
 long cost;		/* cost (for inventory of unpaid or expended items) */
 long quan;		/* if non-0, print this quantity, not obj->quan */
 {
-#ifdef LINT	/* handle static char li[BUFSZ]; */
-    char li[BUFSZ];
-#else
     static char li[BUFSZ];
-#endif
     boolean use_invlet = flags.invlet_constant && let != CONTAINED_SYM;
     long savequan = 0;
 
