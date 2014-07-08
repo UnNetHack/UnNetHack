@@ -36,9 +36,6 @@ struct window_procs curses_procs = {
     curses_mark_synch,
     curses_wait_synch,
     curses_cliparound,
-#ifdef POSITIONBAR
-    donull,
-#endif
     curses_print_glyph,
     curses_raw_print,
     curses_raw_print_bold,

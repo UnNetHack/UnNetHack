@@ -202,18 +202,6 @@ doprev_message()
 		-- Display previous messages.  Used by the ^P command.
 		-- On the tty-port this scrolls WIN_MESSAGE back one line.
 
-update_positionbar(char *features)
-		-- Optional, POSITIONBAR must be defined. Provide some 
-		   additional information for use in a horizontal
-		   position bar (most useful on clipped displays).
-		   Features is a series of char pairs.  The first char
-		   in the pair is a symbol and the second char is the
-		   column where it is currently located.
-		   A '<' is used to mark an upstairs, a '>'
-		   for a downstairs, and an '@' for the current player
-		   location. A zero char marks the end of the list.
-			
-
 C.  Window Utility Routines
 
 init_nhwindows(int* argcp, char** argv)

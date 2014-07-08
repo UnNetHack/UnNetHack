@@ -36,9 +36,6 @@ struct window_procs {
     void NDECL((*win_mark_synch));
     void NDECL((*win_wait_synch));
     void FDECL((*win_cliparound), (int, int));
-#ifdef POSITIONBAR
-    void FDECL((*win_update_positionbar), (char *));
-#endif
     void FDECL((*win_print_glyph), (winid,XCHAR_P,XCHAR_P,int));
     void FDECL((*win_raw_print), (const char *));
     void FDECL((*win_raw_print_bold), (const char *));
@@ -99,9 +96,6 @@ extern struct window_procs windowprocs;
 #define mark_synch (*windowprocs.win_mark_synch)
 #define wait_synch (*windowprocs.win_wait_synch)
 #define cliparound (*windowprocs.win_cliparound)
-#ifdef POSITIONBAR
-#define update_positionbar (*windowprocs.win_update_positionbar)
-#endif
 #define print_glyph (*windowprocs.win_print_glyph)
 #define raw_print (*windowprocs.win_raw_print)
 #define raw_print_bold (*windowprocs.win_raw_print_bold)

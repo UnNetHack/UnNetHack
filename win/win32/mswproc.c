@@ -95,9 +95,6 @@ struct window_procs mswin_procs = {
     mswin_mark_synch,
     mswin_wait_synch,
     mswin_cliparound,
-#ifdef POSITIONBAR
-    donull,
-#endif
     mswin_print_glyph,
     mswin_raw_print,
     mswin_raw_print_bold,

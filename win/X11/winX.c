@@ -100,9 +100,6 @@ struct window_procs X11_procs = {
     X11_mark_synch,
     X11_wait_synch,
     X11_cliparound,
-#ifdef POSITIONBAR
-    donull,
-#endif
     X11_print_glyph,
     X11_raw_print,
     X11_raw_print_bold,

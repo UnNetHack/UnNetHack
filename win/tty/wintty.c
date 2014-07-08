@@ -61,9 +61,6 @@ struct window_procs tty_procs = {
     tty_mark_synch,
     tty_wait_synch,
     tty_cliparound,
-#ifdef POSITIONBAR
-    tty_update_positionbar,
-#endif
     tty_print_glyph,
     tty_raw_print,
     tty_raw_print_bold,
@@ -2802,14 +2799,6 @@ win_tty_init()
 # endif
     return;
 }
-
-#ifdef POSITIONBAR
-void
-tty_update_positionbar(posbar)
-char *posbar;
-{
-}
-#endif
 
 /*
  * Allocate a copy of the given string.  If null, return a string of

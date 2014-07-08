@@ -181,9 +181,6 @@ E void NDECL(tty_update_inventory);
 E void NDECL(tty_mark_synch);
 E void NDECL(tty_wait_synch);
 E void FDECL(tty_cliparound, (int, int));
-#ifdef POSITIONBAR
-E void FDECL(tty_update_positionbar, (char *));
-#endif
 E void FDECL(tty_print_glyph, (winid,XCHAR_P,XCHAR_P,int));
 E void FDECL(tty_raw_print, (const char *));
 E void FDECL(tty_raw_print_bold, (const char *));
@@ -217,9 +214,6 @@ E void FDECL(genl_outrip, (winid,int));
 #   define putc(x) xputc(x)
 #   define puts(x) xputs(x)
 #  endif/*SCREEN_BIOS || WIN32CON */
-#  ifdef POSITIONBAR
-E void FDECL(video_update_positionbar, (char *));
-#  endif
 # endif
 #endif/*NO_TERMS*/
 

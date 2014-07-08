@@ -43,9 +43,6 @@ struct window_procs dummy_procs = {
     dummy_mark_synch,
     dummy_wait_synch,
     dummy_cliparound,
-#ifdef POSITIONBAR
-    donull,
-#endif
     dummy_print_glyph,
     dummy_raw_print,
     dummy_raw_print_bold,

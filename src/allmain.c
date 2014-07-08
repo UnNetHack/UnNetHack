@@ -9,9 +9,6 @@
 #include <signal.h>
 #endif
 
-#ifdef POSITIONBAR
-STATIC_DCL void NDECL(do_positionbar);
-#endif
 STATIC_DCL void FDECL(interrupt_multi, (const char *,int,int));
 
 static int prev_hp_notify;
@@ -183,9 +180,6 @@ moveloop()
 
     for(;;) {
 	get_nh_event();
-#ifdef POSITIONBAR
-	do_positionbar();
-#endif
 
 	didmove = flags.move;
 	if(didmove) {
@@ -782,62 +776,6 @@ boolean new_game;	/* false => restoring an old game */
 		You("annotated this level: %s", annotation);
 	}
 }
-
-#ifdef POSITIONBAR
-STATIC_DCL void
-do_positionbar()
-{
-	static char pbar[COLNO];
-	char *p;
-	
-	p = pbar;
-	/* up stairway */
-	if (upstair.sx &&
-	   (glyph_to_cmap(level.locations[upstair.sx][upstair.sy].glyph) ==
-	    S_upstair ||
- 	    glyph_to_cmap(level.locations[upstair.sx][upstair.sy].glyph) ==
-	    S_upladder)) {
-		*p++ = '<';
-		*p++ = upstair.sx;
-	}
-	if (sstairs.sx &&
-	   (glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph) ==
-	    S_upstair ||
- 	    glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph) ==
-	    S_upladder)) {
-		*p++ = '<';
-		*p++ = sstairs.sx;
-	}
-
-	/* down stairway */
-	if (dnstair.sx &&
-	   (glyph_to_cmap(level.locations[dnstair.sx][dnstair.sy].glyph) ==
-	    S_dnstair ||
- 	    glyph_to_cmap(level.locations[dnstair.sx][dnstair.sy].glyph) ==
-	    S_dnladder)) {
-		*p++ = '>';
-		*p++ = dnstair.sx;
-	}
-	if (sstairs.sx &&
-	   (glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph) ==
-	    S_dnstair ||
- 	    glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph) ==
-	    S_dnladder)) {
-		*p++ = '>';
-		*p++ = sstairs.sx;
-	}
-
-	/* hero location */
-	if (u.ux) {
-		*p++ = '@';
-		*p++ = u.ux;
-	}
-	/* fence post */
-	*p = 0;
-
-	update_positionbar(pbar);
-}
-#endif
 
 #if defined(REALTIME_ON_BOTL) || defined (RECORD_REALTIME)
 time_t
