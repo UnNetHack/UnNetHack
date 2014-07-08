@@ -267,7 +267,6 @@ struct instance_flags {
 	boolean wc_hilite_pet;		/* hilight pets                        */
 	boolean wc_ascii_map;		/* show map using traditional ascii    */
 	boolean wc_tiled_map;		/* show map using tiles                */
-	boolean wc_preload_tiles;	/* preload tiles into memory           */
 	int	wc_tile_width;		/* tile width                          */
 	int	wc_tile_height;		/* tile height                         */
 	char	*wc_tile_file;		/* name of tile file;overrides default */
@@ -359,7 +358,6 @@ struct instance_flags {
 #define use_color wc_color
 #define hilite_pet wc_hilite_pet
 #define use_inverse wc_inverse
-#define preload_tiles wc_preload_tiles
 
 extern struct flag flags;
 extern struct instance_flags iflags;

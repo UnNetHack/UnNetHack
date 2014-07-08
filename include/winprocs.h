@@ -134,7 +134,6 @@ extern struct window_procs windowprocs;
 #define WC_HILITE_PET	 0x02L		/* 02 supports hilite pet                    */
 #define WC_ASCII_MAP	 0x04L		/* 03 supports an ascii map                  */
 #define WC_TILED_MAP	 0x08L		/* 04 supports a tiled map                   */
-#define WC_PRELOAD_TILES 0x10L		/* 05 supports pre-loading tiles             */
 #define WC_TILE_WIDTH	 0x20L		/* 06 prefer this width of tile              */
 #define WC_TILE_HEIGHT	 0x40L		/* 07 prefer this height of tile             */
 #define WC_TILE_FILE	 0x80L		/* 08 alternative tile file name             */

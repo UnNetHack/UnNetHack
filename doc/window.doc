@@ -485,7 +485,6 @@ to support:
   |  map_mode          | WC_MAP_MODE        | wc_map_mode        |int     |
   |  player_selection  | WC_PLAYER_SELECTION| wc_player_selection|int     |
   |  popup_dialog      | WC_POPUP_DIALOG    | wc_popup_dialog    |boolean |
-  |  preload_tiles     | WC_PRELOAD_TILES   | wc_preload_tiles   |boolean |
   |  scroll_amount     | WC_SCROLL_AMOUNT   | wc_scroll_amount   |int     |
   |  scroll_margin     | WC_SCROLL_MARGIN   | wc_scroll_margin   |int     |
   |  splash_screen     | WC_SPLASH_SCREEN   | wc_splash_screen   |boolean |
@@ -541,7 +540,6 @@ map_mode	-- port should display the map in the manner specified.
 player_selection
 		-- dialog or prompts for choosing character.
 popup_dialog	-- port should pop up dialog boxes for input.
-preload_tiles	-- port should preload tiles into memory.
 scroll_amount   -- scroll this amount when scroll_margin is reached.
 scroll_margin	-- port should scroll the display when the hero or cursor
 		   is this number of cells away from the edge of the window.

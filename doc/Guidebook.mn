@@ -2288,12 +2288,6 @@ Allow use of the mouse for input and travel.
 NetHack should pop up dialog boxes, or use prompts for character selection.
 .lp popup_dialog	
 NetHack should pop up dialog boxes for input.
-.lp preload_tiles
-NetHack should preload tiles into memory.
-For example, in the protected mode MSDOS version, control whether tiles
-get pre-loaded into RAM at the start of the game.  Doing so
-enhances performance of the tile graphics, but uses more memory. (default on).
-Cannot be set with the `O' command.
 .lp scroll_amount
 NetHack should scroll the display by this number of cells
 when the hero reaches the scroll_margin.

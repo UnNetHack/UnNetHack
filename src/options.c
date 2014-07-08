@@ -171,7 +171,6 @@ static struct Bool_Opt
 	{"popup_dialog",  &iflags.wc_popup_dialog, FALSE, SET_IN_GAME},	/*WC*/
 #endif  /* CURSES_GRAPHICS */
 	{"prayconfirm", &flags.prayconfirm, TRUE, SET_IN_GAME},
-	{"preload_tiles", &iflags.wc_preload_tiles, TRUE, DISP_IN_GAME},	/*WC*/
 	{"pushweapon", &flags.pushweapon, FALSE, SET_IN_FILE},
 #ifdef QUIVER_FIRED
 	{"quiver_fired", &iflags.quiver_fired, TRUE, SET_IN_GAME},
@@ -4547,7 +4546,6 @@ struct wc_Opt wc_options[] = {
 	{"hilite_pet", WC_HILITE_PET},
 	{"popup_dialog", WC_POPUP_DIALOG},
 	{"player_selection", WC_PLAYER_SELECTION},
-	{"preload_tiles", WC_PRELOAD_TILES},
 	{"tiled_map", WC_TILED_MAP},
 	{"tile_file", WC_TILE_FILE},
 	{"tile_width", WC_TILE_WIDTH},

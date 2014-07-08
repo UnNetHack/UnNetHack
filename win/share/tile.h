@@ -38,9 +38,9 @@ extern int NDECL(fclose_text_file);
 extern void NDECL(init_colormap);
 extern void NDECL(merge_colormap);
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(MICRO)
 #undef exit
-# if !defined(MSDOS) && !defined(WIN32)
+# if !defined(WIN32)
 extern void FDECL(exit, (int));
 # endif
 #endif

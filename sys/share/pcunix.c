@@ -5,13 +5,12 @@
 
 #include "hack.h"
 #include "wintty.h"
-
-#include	<sys/stat.h>
-#if defined(WIN32) || defined(MSDOS)
-#include	<errno.h>
+#include <sys/stat.h>
+#if defined(WIN32)
+#include <errno.h>
 #endif
 
-#if defined(WIN32) || defined(MSDOS)
+#if defined(WIN32)
 extern char orgdir[];
 # ifdef WIN32
 extern void NDECL(backsp);
@@ -20,10 +19,6 @@ extern void NDECL(clear_screen);
 #endif
 
 #ifdef OVLB
-
-#if 0
-static struct stat buf;
-#endif
 
 # ifdef WANT_GETHDATE
 static struct stat hbuf;

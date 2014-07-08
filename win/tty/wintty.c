@@ -797,7 +797,7 @@ tty_askname()
 				ttyDisplay->curx--;
 #endif
 #if defined(MICRO) || defined(WIN32CON)
-# if defined(WIN32CON) || defined(MSDOS)
+# if defined(WIN32CON)
 				backsp();       /* \b is visible on NT */
 				(void) putchar(' ');
 				backsp();
