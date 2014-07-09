@@ -48,10 +48,6 @@ struct window_procs curses_procs = {
     curses_get_ext_cmd,
     curses_number_pad,
     curses_delay_output,
-#ifdef CHANGE_COLOR	/* only a Mac option currently */
-    donull,
-    donull,
-#endif
     curses_start_screen,
     curses_end_screen,
     genl_outrip,

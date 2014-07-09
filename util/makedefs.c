@@ -69,11 +69,7 @@ static char	in_line[256], filename[60];
 char *file_prefix="";
 #endif
 
-#ifdef MACsansMPWTOOL
-int FDECL(main, (void));
-#else
 int FDECL(main, (int,char **));
-#endif
 void FDECL(do_makedefs, (char *));
 void NDECL(do_objs);
 void NDECL(do_data);
@@ -119,30 +115,6 @@ static char *FDECL(eos, (char *));
 /* input, output, tmp */
 static FILE *ifp, *ofp, *tfp;
 
-#ifdef MACsansMPWTOOL
-int
-main(void)
-{
-    const char *def_options = "odemvpqrhz";
-    char buf[100];
-    int len;
-
-    printf("Enter options to run: [%s] ", def_options);
-    fflush(stdout);
-    fgets(buf, 100, stdin);
-    len = strlen(buf);
-    if (len <= 1)
-	Strcpy(buf, def_options);
-    else
-	buf[len-1] = 0;			/* remove return */
-
-    do_makedefs(buf);
-    exit(EXIT_SUCCESS);
-    return 0;
-}
-
-#else /* ! MAC */
-
 int
 main(argc, argv)
 int	argc;
@@ -169,8 +141,6 @@ char	*argv[];
 	/*NOTREACHED*/
 	return 0;
 }
-
-#endif
 
 void
 do_makedefs(options)
@@ -514,7 +484,6 @@ static const char *build_opts[] = {
 #ifdef BLACKMARKET
 		"blackmarket level",
 #endif
-		"color",
 #ifdef COM_COMPL
 		"command line completion",
 #endif
@@ -530,16 +499,12 @@ static const char *build_opts[] = {
 #ifdef REALTIME_ON_BOTL
 		"elapsed time on status line",
 #endif
-		"dungeon map overview patch",
-		"Elbereth",
 #ifdef EXP_ON_BOTL
 		"experience points on status line",
 #endif
 #ifdef GOLDOBJ
 		"gold object in inventories",
 #endif
-		"insurance files for recovering from crashes",
-		"Keystone Kops",
 #ifdef HOLD_LOCKFILE_OPEN
 		"exclusive lock on level 0 file",
 #endif
@@ -576,10 +541,6 @@ static const char *build_opts[] = {
 #  endif
 # endif
 #endif
-		"pickup thrown objects",
-		"redo command",
-		"rogue level",
-		"saddles and riding",
 #ifdef SCORE_ON_BOTL
 		"score on status line",
 #endif
@@ -597,11 +558,9 @@ static const char *build_opts[] = {
 #  endif
 # endif
 #endif
-		"seduction",
 #ifdef SHELL
 		"shell command",
 #endif
-		"sinks",
 #ifdef SUSPEND
 		"suspend command",
 #endif
@@ -615,7 +574,6 @@ static const char *build_opts[] = {
 #ifdef TIMED_DELAY
 		"timed wait for display effects",
 #endif
-		"tourists",
 #ifdef UTF8_GLYPHS
 		"UTF-8 glyphs",
 #endif
@@ -629,7 +587,6 @@ static const char *build_opts[] = {
 #ifdef PREFIXES_IN_USE
 		"variable playground",
 #endif
-		"walled mazes",
 #ifdef WIN_EDGE
 		"win_edge",
 #endif

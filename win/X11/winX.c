@@ -112,10 +112,6 @@ struct window_procs X11_procs = {
     X11_get_ext_cmd,
     X11_number_pad,
     X11_delay_output,
-#ifdef CHANGE_COLOR	/* only a Mac option currently */
-    donull,
-    donull,
-#endif
     /* other defs that really should go away (they're tty specific) */
     X11_start_screen,
     X11_end_screen,

@@ -193,10 +193,6 @@ E void FDECL(tty_getlin, (const char *,char *));
 E int NDECL(tty_get_ext_cmd);
 E void FDECL(tty_number_pad, (int));
 E void NDECL(tty_delay_output);
-#ifdef CHANGE_COLOR
-E void FDECL(tty_change_color,(int color,long rgb,int reverse));
-E char * NDECL(tty_get_color_string);
-#endif
 
 /* other defs that really should go away (they're tty specific) */
 E void NDECL(tty_start_screen);

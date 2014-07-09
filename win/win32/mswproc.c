@@ -107,10 +107,6 @@ struct window_procs mswin_procs = {
     mswin_get_ext_cmd,
     mswin_number_pad,
     mswin_delay_output,
-#ifdef CHANGE_COLOR	/* only a Mac option currently */
-	mswin,
-	mswin_change_background,
-#endif
     /* other defs that really should go away (they're tty specific) */
     mswin_start_screen,
     mswin_end_screen,

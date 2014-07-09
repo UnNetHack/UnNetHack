@@ -55,10 +55,6 @@ struct window_procs dummy_procs = {
     dummy_get_ext_cmd,
     dummy_number_pad,
     dummy_delay_output,
-#ifdef CHANGE_COLOR	/* only a Mac option currently */
-    donull,
-    donull,
-#endif
     /* other defs that really should go away (they're tty specific) */
     dummy_start_screen,
     dummy_end_screen,
