@@ -2,9 +2,10 @@
 
 UnNetHackButLess is a port of UnNetHack to Scala with additional modernization.  
 
-[UnNetHack]([https://github.com/UnNetHack/UnNetHack UnNetHack)
-is used as a basis for the project because it keeps the flavor of vanilla 
-NetHack while still being actively maintained and enhanced.  It a fork of 
+[UnNetHack](https://github.com/UnNetHack/UnNetHack UnNetHack) is used as a
+basis for the project because it keeps the flavor of vanilla 
+[NetHack](http://nethack.org) while still being actively maintained and enhanced.  
+It a fork of 
 NetHack and originally based on NetHack version 3.4.3.  It features more randomness, 
 more levels, more challenges and more fun than vanilla NetHack.  Patric Mueller, 
 the creator of UnNetHack describes it as "how NetHack would look today if the 
@@ -58,6 +59,5 @@ rec.games.roguelike.nethack.
 # History
 
 The process of modernizing NetHack began in June 2014 by Sheldon Young.
-
 
  -- Good luck, and happy Hacking
