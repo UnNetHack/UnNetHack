@@ -2118,37 +2118,6 @@ tty_display_file(fname, complain)
 const char *fname;
 boolean complain;
 {
-#ifdef DEF_PAGER			/* this implies that UNIX is defined */
-    {
-	/* use external pager; this may give security problems */
-#ifdef FILE_AREAS
-	register int fd = open_area(farea, fname, 0, 0);
-#else
-	register int fd = open(fname, 0);
-#endif
-
-	if(fd < 0) {
-	    if(complain) pline("Cannot open %s.", fname);
-	    else docrt();
-	    return;
-	}
-	if(child(1)) {
-	    /* Now that child() does a setuid(getuid()) and a chdir(),
-	       we may not be able to open file fname anymore, so make
-	       it stdin. */
-	    (void) close(0);
-	    if(dup(fd)) {
-		if(complain) raw_printf("Cannot open %s as stdin.", fname);
-	    } else {
-		(void) execlp(catmore, "page", (char *)0);
-		if(complain) raw_printf("Cannot exec %s.", catmore);
-	    }
-	    if(complain) sleep(10); /* want to wait_synch() but stdin is gone */
-	    terminate(EXIT_FAILURE);
-	}
-	(void) close(fd);
-    }
-#else	/* DEF_PAGER */
     {
 	dlb *f;
 	char buf[BUFSZ];
@@ -2193,7 +2162,6 @@ boolean complain;
 	    (void) dlb_fclose(f);
 	}
     }
-#endif /* DEF_PAGER */
 }
 
 void

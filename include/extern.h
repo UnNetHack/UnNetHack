@@ -2172,7 +2172,7 @@ E void FDECL(msleep, (unsigned));
 # ifdef SHELL
 E int NDECL(dosh);
 # endif /* SHELL */
-# if defined(SHELL) || defined(DEF_PAGER) || defined(DEF_MAILREADER)
+# if defined(SHELL) || defined(DEF_MAILREADER)
 E int FDECL(child, (int));
 # endif
 #ifdef FILE_AREAS

@@ -12,9 +12,6 @@ int hackpid = 0;		/* current process id */
 #if defined(UNIX)
 int locknum = 0;		/* max num of simultaneous users */
 #endif
-#ifdef DEF_PAGER
-char *catmore = 0;		/* default pager */
-#endif
 
 int bases[MAXOCLASSES] = DUMMY;
 

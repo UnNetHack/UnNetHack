@@ -181,7 +181,6 @@ ENVIRONMENT
        HOME                 Your home directory.
        SHELL                Your shell.
        TERM                 The type of your terminal.
-       HACKPAGER or PAGER   Replacement for default pager.
        MAIL                 Mailbox file.
        MAILREADER           Replacement for default reader
                             (probably        /bin/mail         or

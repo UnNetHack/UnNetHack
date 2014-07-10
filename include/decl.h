@@ -14,9 +14,6 @@ E int hackpid;
 #if defined(UNIX)
 E int locknum;
 #endif
-#ifdef DEF_PAGER
-E char *catmore;
-#endif	/* DEF_PAGER */
 
 E char SAVEF[];
 #ifdef MICRO
