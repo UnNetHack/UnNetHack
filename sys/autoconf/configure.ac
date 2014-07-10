@@ -406,7 +406,6 @@ NETHACK_ARG(menu-color,[TTY graphics menu color],MENU_COLOR,yes)
 if test "$enable_tty_graphics" != "no"; then
 NETHACK_ARG(status-color,[TTY graphics status color],STATUS_COLORS,yes)
 fi
-NETHACK_ARG(auto-open,[Open doors by walking into them],AUTO_OPEN,yes)
 # NETHACK_ARG(noartifactwish,[Prevent wishing for special artifacts],
 #  NOARTIFACTWISH,no)
 # NETHACK_ARG(no-bones,[Disable loading and saving bones levels],NO_BONES,no)
@@ -434,8 +433,6 @@ NETHACK_ARG(sortloot,[Sort item lists alphabetically by description.],SORTLOOT,y
 #NETHACK_ARG(shout,[Shouting and pet commands (not implemented)],SHOUT,no)
 # NETHACK_ARG(display-layers,[Support transparent tilesets],DISPLAY_LAYERS,yes)
 NETHACK_ARG(goldobj,[Gold is kept on object chains (experimental)],GOLDOBJ,no)
-NETHACK_ARG(autopickup-exceptions,[Exceptions to autopickup],
-  AUTOPICKUP_EXCEPTIONS,yes)
 NETHACK_ARG(quiver-fired,[Firing without anything quivered will ask you what to quiver],QUIVER_FIRED,yes)
 NETHACK_ARG(qwertz,[QWERTZ keyboard layout support],QWERTZ,yes)
 NETHACK_ARG(simple-mail,[simple mail dgamelaunch support],SIMPLE_MAIL,no)

@@ -1053,9 +1053,7 @@ freedynamicdata()
 	if (iflags.wc_font_menu) free(iflags.wc_font_menu);
 	if (iflags.wc_font_status) free(iflags.wc_font_status);
 	if (iflags.wc_tile_file) free(iflags.wc_tile_file);
-#ifdef AUTOPICKUP_EXCEPTIONS
 	free_autopickup_exceptions();
-#endif
 
 #endif	/* FREE_ALL_MEMORY */
 #ifdef USE_MERSENNE_TWISTER

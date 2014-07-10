@@ -73,7 +73,6 @@ System:  gcc-3.2, XFree86-libs-4.2.1, ncurses-5.2, glibc-2.3.2 (GLIBC_2.3)
               seems to reside on newer Linux's.
               define COMPRESS_EXTENSION as ".gz"
               define DLB
-	      define AUTOPICKUP_EXCEPTIONS
 
     unixconf.h: define LINUX
                 define TIMED_DELAY

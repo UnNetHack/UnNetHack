@@ -942,9 +942,7 @@ E boolean FDECL(doorlock, (struct obj *,int,int));
 E int NDECL(doopen);
 E int NDECL(doclose);
 E int FDECL(artifact_door, (int,int));
-#ifdef AUTO_OPEN
 E  int FDECL(doopen_indir,(int,int));
-#endif
 
 /* ### mail.c ### */
 
@@ -1461,10 +1459,8 @@ E void FDECL(set_duplicate_opt_detection, (int));
 E void FDECL(set_wc_option_mod_status, (unsigned long, int));
 E void FDECL(set_wc2_option_mod_status, (unsigned long, int));
 E void FDECL(set_option_mod_status, (const char *,int));
-#ifdef AUTOPICKUP_EXCEPTIONS
 E int FDECL(add_autopickup_exception, (const char *));
 E void NDECL(free_autopickup_exceptions);
-#endif /* AUTOPICKUP_EXCEPTIONS */
 #ifdef MENU_COLOR
 E boolean FDECL(add_menu_coloring, (char *));
 #endif /* MENU_COLOR */

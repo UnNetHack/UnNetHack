@@ -468,13 +468,11 @@ E char *fqn_prefix[PREFIX_COUNT];
 E char *fqn_prefix_names[PREFIX_COUNT];
 #endif
 
-#ifdef AUTOPICKUP_EXCEPTIONS
 struct autopickup_exception {
 	char *pattern;
 	boolean grab;
 	struct autopickup_exception *next;
 };
-#endif /* AUTOPICKUP_EXCEPTIONS */
 
 struct _plinemsg {
 	xchar msgtype;

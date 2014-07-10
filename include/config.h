@@ -282,15 +282,12 @@ typedef long glyph_t;
 #endif
 
 /*#define GOLDOBJ */	/* Gold is kept on obj chains - Helge Hafting */
-/*#define AUTOPICKUP_EXCEPTIONS */ /* exceptions to autopickup */
 #define DUMP_LOG        /* Dump game end information to a file */
 /* #define DUMP_FN "/tmp/%n.nh" */      /* Fixed dumpfile name, if you want
                                          * to prevent definition by users */
 #define DUMP_TEXT_LOG   /* Dump game end information in a plain text form */
 /*#define DUMP_HTML_LOG*/   /* Dump game end information to a html file */
 #define DUMPMSGS 30     /* Number of latest messages in the dump file  */
-
-#define AUTO_OPEN	/* open doors by walking into them - Stefano Busti */
 
 /* #define WHEREIS_FILE "./whereis/%n.whereis" */ /* Write out player's current location to player.whereis */
 

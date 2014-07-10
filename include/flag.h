@@ -328,11 +328,9 @@ struct instance_flags {
 	boolean  show_dgn_name; /* show dungeon names instead of Dlvl: on bottom line */
 	int	 runmode;	/* update screen display during run moves */
 	int	 pilesize;	/* how many items to list automatically */
-#ifdef AUTOPICKUP_EXCEPTIONS
 	struct autopickup_exception *autopickup_exceptions[2];
 #define AP_LEAVE 0
 #define AP_GRAB	 1
-#endif
 #ifdef WIN32CON
 #define MAX_ALTKEYHANDLER 25
 	char	 altkeyhandler[MAX_ALTKEYHANDLER];
@@ -340,9 +338,7 @@ struct instance_flags {
 #ifdef REALTIME_ON_BOTL
 	boolean  showrealtime; /* show actual elapsed time */
 #endif
-#ifdef AUTO_OPEN
 	boolean  autoopen;	/* open doors by walking into them */
-#endif
 	boolean  dark_room;	/* show shadows in lit rooms */
 	boolean  vanilla_ui_behavior;	/* fall back to vanilla behavior */
 	boolean  show_annotation;	/* level annotation when entering level */

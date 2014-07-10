@@ -6,9 +6,6 @@
 /* Exceptions to autopickup */
 #undef AUTOPICKUP_EXCEPTIONS
 
-/* Open doors by walking into them */
-#undef AUTO_OPEN
-
 /* Blackmarket */
 #undef BLACKMARKET
 

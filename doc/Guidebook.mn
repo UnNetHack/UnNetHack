@@ -2082,12 +2082,7 @@ Default is on.
 .lp pickup_types
 Specify the object types to be picked up when
 .op autopickup
-is on.  Default is all types.  If your copy of the game has the experimental
-compile time option AUTOPICKUP_EXCEPTIONS included, you may be able to use 
-.op autopickup_exception
-configuration file lines to further refine
-.op autopickup
-behavior.
+is on.  Default is all types.  
 .lp pilesize
 Allows setting the number of items that trigger the "Things that are here".
 The minimum value allowed is 1, which will tell you about one object
