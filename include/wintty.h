@@ -100,7 +100,7 @@ E void NDECL(tty_shutdown);
 #endif
 E void FDECL(xputc, (CHAR_P));
 E void FDECL(xputs, (const char *));
-#if defined(SCREEN_VGA) || defined(SCREEN_8514)
+#if defined(SCREEN_VGA)
 E void FDECL(xputg, (int, int, unsigned));
 #endif
 E void NDECL(cl_end);
@@ -108,13 +108,6 @@ E void NDECL(clear_screen);
 E void NDECL(home);
 E void NDECL(standoutbeg);
 E void NDECL(standoutend);
-# if 0
-E void NDECL(revbeg);
-E void NDECL(boldbeg);
-E void NDECL(blinkbeg);
-E void NDECL(dimbeg);
-E void NDECL(m_end);
-# endif
 E void NDECL(backsp);
 E void NDECL(graph_on);
 E void NDECL(graph_off);

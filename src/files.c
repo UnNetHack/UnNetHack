@@ -1177,9 +1177,6 @@ compress_area(filearea, filename)
 const char *filearea, *filename;
 {
 #ifndef COMPRESS
-#if defined(__MWERKS__)
-# pragma unused(filename)
-#endif
 #else
 	docompress_file(filearea, filename, FALSE);
 #endif
@@ -1192,9 +1189,6 @@ uncompress_area(filearea, filename)
 const char *filearea, *filename;
 {
 #ifndef COMPRESS
-#if defined(__MWERKS__)
-# pragma unused(filename)
-#endif
 #else
 	docompress_file(filearea, filename, TRUE);
 #endif
@@ -1222,10 +1216,6 @@ make_lockname(filename, lockname)
 const char *filename;
 char *lockname;
 {
-#if defined(__MWERKS__)
-# pragma unused(filename,lockname)
-	return (char*)0;
-#else
 # if defined(UNIX) || defined(WIN32)
 #  ifdef NO_FILE_LINKS
 	Strcpy(lockname, LOCKDIR);
@@ -1240,7 +1230,6 @@ char *lockname;
 	lockname[0] = '\0';
 	return (char*)0;
 # endif  /* UNIX ||  WIN32  */
-#endif
 }
 
 #endif /* FILE_AREAS */
@@ -1259,9 +1248,6 @@ int whichprefix;
 int retryct;
 #endif
 {
-#if defined(__MWERKS__)
-# pragma unused(filename, retryct)
-#endif
 #ifndef USE_FCNTL
 	char locknambuf[BUFSZ];
 	const char *lockname;
@@ -1659,9 +1645,6 @@ char		*tmp_ramdisk;
 char		*tmp_levels;
 boolean		recursive;
 {
-#if defined(__MWERKS__)
-# pragma unused(tmp_ramdisk,tmp_levels)
-#endif
 	char		*bufp, *altp;
 	uchar   translate[MAXPCHARS];
 	int   len;
@@ -2007,9 +1990,6 @@ void
 check_recordfile(dir)
 const char *dir;
 {
-#if defined(__MWERKS__)
-# pragma unused(dir)
-#endif
 	int fd;
 #ifndef FILE_AREAS
 	const char *fq_record;

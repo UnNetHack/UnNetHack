@@ -91,9 +91,7 @@ E long FDECL(lseek, (int,long,int));
 # if defined(POSIX_TYPES)
 E int FDECL(write, (int, const void *,unsigned));
 # else
-#  ifndef __MWERKS__	/* metrowerks defines write via universal headers */
 E int FDECL(write, (int,genericptr_t,unsigned));
-#  endif
 # endif
 
 # ifndef __SC__
