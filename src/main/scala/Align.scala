@@ -18,14 +18,14 @@ class align {
 /* bounds for "record" -- respect initial alignments of 10 */
 def ALIGNLIM = (10L + (moves / 200L))
 
-val A_NONE = -128	/* the value range of type */
+val A_NONE: aligntyp = -128	/* the value range of type */
 
-val A_CHAOTIC = -1
-val A_NEUTRAL = 0
-val A_LAWFUL = 1
+val A_CHAOTIC: aligntyp = -1
+val A_NEUTRAL: aligntyp = 0
+val A_LAWFUL: aligntyp = 1
 
-val A_COALIGNED = 1
-val A_OPALIGNED = -1
+val A_COALIGNED: aligntyp = 1
+val A_OPALIGNED: aligntyp = -1
 
 val AM_NONE = 0
 val AM_CHAOTIC = 1
