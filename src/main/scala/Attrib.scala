@@ -1,43 +1,42 @@
 /* Copyright 1988, Mike Stephenson				  */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Conversion to Scala copyright (c) 2014 Sheldon Young. */
 
 /*	attrib.h - Header file for character class processing. */
+object Attrib {
 
-#ifndef ATTRIB_H
-#define ATTRIB_H
+val A_STR = 0
+val A_INT = 1
+val A_WIS = 2
+val A_DEX = 3
+val A_CON = 4
+val A_CHA = 5
 
-#define A_STR	0
-#define A_INT	1
-#define A_WIS	2
-#define A_DEX	3
-#define A_CON	4
-#define A_CHA	5
+val A_MAX = 6	/* used in rn2() selection of attrib */
 
-#define A_MAX	6	/* used in rn2() selection of attrib */
-
-#define ABASE(x)	(u.acurr.a[x])
-#define ABON(x)		(u.abon.a[x])
-#define AEXE(x)		(u.aexe.a[x])
-#define ACURR(x)	(acurr(x))
-#define ACURRSTR	(acurrstr())
+def ABASE(x: Int) =	(u.acurr.a(x))
+def ABON(x: Int) =	(u.abon.a(x))
+def AEXE(x: Int) =	(u.aexe.a(x))
+def ACURR(x: Int) =	(acurr(x))
+def ACURRSTR = 	(acurrstr())
 /* should be: */
-/* #define ACURR(x) (ABON(x) + ATEMP(x) + (Upolyd  ? MBASE(x) : ABASE(x)) */
-#define MCURR(x)	(u.macurr.a[x])
-#define AMAX(x)		(u.amax.a[x])
-#define MMAX(x)		(u.mamax.a[x])
+/* def ACURR(x: Int) = (ABON(x) + ATEMP(x) + (Upolyd  ? MBASE(x) : ABASE(x)) */
+def MCURR(x: Int) =	(u.macurr.a(x))
+def AMAX(x: Int) =	(u.amax.a(x))
+def MMAX(x: Int) =	(u.mamax.a(x))
 
-#define ATEMP(x)	(u.atemp.a[x])
-#define ATIME(x)	(u.atime.a[x])
+def ATEMP(x: Int) =	(u.atemp.a(x))
+def ATIME(x: Int) =	(u.atime.a(x))
 
 /* KMH -- Conveniences when dealing with strength constants */
-#define STR18(x)	(18+(x))	/* 18/xx */
-#define STR19(x)	(100+(x))	/* For 19 and above */
+def STR18(x: Int) = (18+(x))	/* 18/xx */
+def STR19(x: Int) = (100+(x))	/* For 19 and above */
 
-struct	attribs {
-	schar	a[A_MAX];
-};
+class attribs {
+	var a = new Array[schar](A_MAX)
+}
 
-#define ATTRMAX(x) ((x == A_STR && Upolyd && strongmonst(youmonst.data)) ? STR18(100) : urace.attrmax[x])
-#define ATTRMIN(x) (urace.attrmin[x])
+// MOTODO #define ATTRMAX(x) ((x == A_STR && Upolyd && strongmonst(youmonst.data)) ? STR18(100) : urace.attrmax(x))
+// MOTODO #define ATTRMIN(x) (urace.attrmin(x))
 
-#endif /* ATTRIB_H */
+}
