@@ -680,11 +680,7 @@ int suppress;
  */
 boolean called;
 {
-#ifdef LINT	/* static char buf[BUFSZ]; */
-	char buf[BUFSZ];
-#else
 	static char buf[BUFSZ];
-#endif
 	struct permonst *mdat = mtmp->data;
 	boolean do_hallu, do_invis, do_it, do_saddle;
 	boolean name_at_start, has_adjectives;

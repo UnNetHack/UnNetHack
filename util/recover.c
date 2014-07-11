@@ -86,16 +86,6 @@ char *argv[];
 		}
 		argno++;
 	}
-#if defined(SECURE)
-	if (dir
-# ifdef HACKDIR
-		&& strcmp(dir, HACKDIR)
-# endif
-		) {
-		(void) setgid(getgid());
-		(void) setuid(getuid());
-	}
-#endif	/* SECURE */
 
 #ifdef HACKDIR
 	if (!dir) dir = HACKDIR;

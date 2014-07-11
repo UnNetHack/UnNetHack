@@ -6,7 +6,7 @@
 #ifdef MAIL
 #include <fcntl.h>
 #include <errno.h>
-#include "mail.h"
+import Mail._
 
 /*
  * Notify user when new mail has arrived.  Idea by Merlyn Leroy.

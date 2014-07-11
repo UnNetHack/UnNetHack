@@ -530,13 +530,8 @@ moverock()
 	    }
 
 	    {
-#ifdef LINT /* static long lastmovetime; */
-		long lastmovetime;
-		lastmovetime = 0;
-#else
 		/* note: reset to zero after save/restore cycle */
 		static long lastmovetime;
-#endif
 		if (!u.usteed) {
 		  if (moves > lastmovetime+2 || moves < lastmovetime)
 		    pline("With %s effort you move %s.",

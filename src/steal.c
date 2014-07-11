@@ -25,12 +25,8 @@ register struct obj *otmp;
 long		/* actually returns something that fits in an int */
 somegold()
 {
-#ifdef LINT	/* long conv. ok */
-	return(0L);
-#else
 	return (long)( (u.ugold < 100) ? u.ugold :
 		(u.ugold > 10000) ? rnd(10000) : rnd((int) u.ugold) );
-#endif
 }
 
 void
@@ -68,12 +64,8 @@ long		/* actually returns something that fits in an int */
 somegold(umoney)
 long umoney;
 {
-#ifdef LINT	/* long conv. ok */
-	return(0L);
-#else
 	return (long)( (umoney < 100) ? umoney :
 		(umoney > 10000) ? rnd(10000) : rnd((int) umoney) );
-#endif
 }
 
 /*

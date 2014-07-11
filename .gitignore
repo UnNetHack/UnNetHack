@@ -1,14 +1,8 @@
 *.swp
 *.swo
-compile
 
-# /
-/Makefile
-/config.log
-/config.status
-/tags
-/TAGS
-/.svn
+# SBT
+target/
 
 # /dat/
 /dat/Makefile
@@ -29,12 +23,9 @@ compile
 /dat/x11tiles
 
 # /doc/
-/doc/Makefile
 /doc/Guidebook.txt
 
 # /include/
-/include/autoconf.h
-/include/autoconf_paths.h
 /include/date.h
 /include/dgn_comp.h
 /include/lev_comp.h
@@ -44,33 +35,16 @@ compile
 /include/win32api.h
 
 # /src/
-/src/*.o
-/src/nhwin.a
-/src/unnethack
-/src/Makefile
-/src/Sysunix
 /src/config.h-t
 /src/hack.h-t
 /src/monstr.c
 /src/tile.c
 
 # /util/
-/util/*.o
-/util/Makefile
-/util/dgn_comp
 /util/dgn_lex.c
 /util/dgn_yacc.c
-/util/dlb
-/util/lev_comp
 /util/lev_lex.c
 /util/lev_yacc.c
-/util/makedefs
-/util/recover
-/util/tilemap
-/util/tile2x11
-
-# /win/
-/win/*/*.o
 
 # Eclipse
 .cproject

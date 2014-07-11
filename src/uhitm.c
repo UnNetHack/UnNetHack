@@ -2033,11 +2033,7 @@ register struct attack *mattk;
           && (!touch_disintegrates(mdef->data) || Disint_resistance)
 #endif
         ) {
-#ifdef LINT	/* static char msgbuf[BUFSZ]; */
-		char msgbuf[BUFSZ];
-#else
 		static char msgbuf[BUFSZ];
-#endif
 		start_engulf(mdef);
 		switch(mattk->adtyp) {
 		    case AD_DGST:

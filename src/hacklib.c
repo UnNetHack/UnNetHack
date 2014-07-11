@@ -52,11 +52,7 @@ NetHack, except that rounddiv may call panic().
 	char *		get_formatted_time		(time_t, const char *)
 	char *		iso8601		(time_t)
 =*/
-#ifdef LINT
-# define Static		/* pacify lint */
-#else
 # define Static static
-#endif
 
 boolean
 digit(c)		/* is 'c' a digit? */

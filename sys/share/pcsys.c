@@ -192,18 +192,11 @@ int code;
 
 static void msexit()
 {
-#ifdef CHDIR
-	extern char orgdir[];
-#endif
 
 	flushout();
 # ifndef WIN32
 	enable_ctrlP(); 	/* in case this wasn't done */
 # endif
-#if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-	chdir(orgdir);		/* chdir, not chdirx */
-	chdrive(orgdir);
-#endif
 #ifdef WIN32CON
 	/* Only if we started from the GUI, not the command prompt,
 	 * we need to get one last return, so the score board does

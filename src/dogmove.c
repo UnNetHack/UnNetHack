@@ -170,12 +170,8 @@ boolean devour;
 	/* It's a reward if it's DOGFOOD and the player dropped/threw it. */
 	/* We know the player had it if invlet is set -dlc */
 	if(dogfood(mtmp,obj) == DOGFOOD && obj->invlet)
-#ifdef LINT
-	    edog->apport = 0;
-#else
 	    edog->apport += (int)(200L/
 		((long)edog->dropdist + monstermoves - edog->droptime));
-#endif
 	if (mtmp->data == &mons[PM_RUST_MONSTER] && obj->oerodeproof) {
 	    /* The object's rustproofing is gone now */
 	    obj->oerodeproof = 0;

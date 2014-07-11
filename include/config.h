@@ -15,11 +15,6 @@
 
 #include "config1.h"	/* should auto-detect WIN32 */
 
-#ifdef AUTOCONF
-# include "autoconf_paths.h"
-# include "autoconf.h"
-#endif
-
 
 /* Windowing systems...
  * Define all of those you want supported in your binary.
@@ -106,7 +101,6 @@
  *	compression.
  */
 
-#ifndef AUTOCONF
 #ifdef UNIX
 /* path and file name extension for compression program */
 /* #define COMPRESS "/usr/bin/compress" */	/* Lempel-Ziv compression */
@@ -119,7 +113,6 @@
 #ifndef COMPRESS
 # define INTERNAL_COMP	/* control use of NetHack's compression routines */
 #endif
-#endif
 
 /*
  *	Data librarian.  Defining DLB places most of the support files into
@@ -127,33 +120,6 @@
  *	for detailed configuration.
  */
 /* #define DLB */	/* not supported on all platforms */
-
-# define CHDIR		/* delete if no chdir() available */
-
-#ifdef CHDIR
-/*
- * If you define HACKDIR, then this will be the default playground;
- * otherwise it will be the current directory.
- */
-# ifndef HACKDIR
-#  define HACKDIR "/usr/games/lib/unnethackdir"
-# endif
-
-/*
- * Some system administrators are stupid enough to make Hack suid root
- * or suid daemon, where daemon has other powers besides that of reading or
- * writing Hack files.	In such cases one should be careful with chdir's
- * since the user might create files in a directory of his choice.
- * Of course SECURE is meaningful only if HACKDIR is defined.
- */
-/* #define SECURE */	/* do setuid(getuid()) after chdir() */
-
-/*
- * If it is desirable to limit the number of people that can play Hack
- * simultaneously, define HACKDIR, SECURE and MAX_NR_OF_PLAYERS.
- * #define MAX_NR_OF_PLAYERS 6
- */
-#endif /* CHDIR */
 
 
 
@@ -225,12 +191,9 @@ typedef long glyph_t;
  * complexity of the game but also to the size of the load module.
  */
 
-#ifndef AUTOCONF
-
 /* I/O */
 #define EXP_ON_BOTL	/* Show experience on bottom line */
 /* #define SCORE_ON_BOTL */	/* added by Gary Erickson (erickson@ucivax) */
-#endif /* AUTOCONF */
 
 # define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
 
@@ -262,8 +225,6 @@ typedef long glyph_t;
  * bugs left here.
  */
 
-#ifndef AUTOCONF
-
 #define RANDOMIZED_PLANES /* Elemental Planes order is randomized - Patric Mueller (4 Jan 2009) */
 #define BLACKMARKET	/* Massimo Campostrini (campo@sunthpi3.difi.unipi.it) */
 
@@ -290,8 +251,6 @@ typedef long glyph_t;
 #define DUMPMSGS 30     /* Number of latest messages in the dump file  */
 
 /* #define WHEREIS_FILE "./whereis/%n.whereis" */ /* Write out player's current location to player.whereis */
-
-#endif /* AUTOCONF */
 
 #ifdef TTY_GRAPHICS
 # define WIN_EDGE	/* windows aligned left&top */

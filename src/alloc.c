@@ -21,23 +21,11 @@ long *
 alloc(lth)
 register unsigned int lth;
 {
-#ifdef LINT
-/*
- * a ridiculous definition, suppressing
- *	"possible pointer alignment problem" for (long *) malloc()
- * from lint
- */
-	long dummy = ftell(stderr);
-
-	if(lth) dummy = 0;	/* make sure arg is used */
-	return(&dummy);
-#else
 	register genericptr_t ptr;
 
 	ptr = malloc(lth);
 	if (!ptr) panic("Memory allocation failure; cannot get %u bytes", lth);
 	return((long *) ptr);
-#endif
 }
 
 

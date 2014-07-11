@@ -127,9 +127,6 @@ char *argv[];
 			fqn_prefix[prefcnt] = fqn_prefix[0];
 		}
 #endif
-#ifdef CHDIR
-		chdirx (dir, 1);
-#endif
 	}
 	initoptions();
 
@@ -173,9 +170,6 @@ char *argv[];
 		 */
 		if (!strncmp(argv[1], "-s", 2)) {
 #if !defined(MSWIN_GRAPHICS)
-# if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-			chdirx(hackdir,0);
-# endif
 			prscore(argc, argv);
 #else
 			raw_printf("-s is not supported for the Graphical Interface\n");
@@ -206,9 +200,6 @@ char *argv[];
 	/* chdir shouldn't be called before this point to keep the
 	 * code parallel to other ports.
 	 */
-#if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-	chdirx(hackdir,1);
-#endif
 
 	init_nhwindows(&argc,argv);
 	process_options(argc, argv);
@@ -506,27 +497,6 @@ nhusage()
 #undef ADD_USAGE
 }
 
-#ifdef CHDIR
-void
-chdirx(dir, wr)
-char *dir;
-boolean wr;
-{
-	static char thisdir[] = ".";
-	if(dir && chdir(dir) < 0) {
-		error("Cannot chdir to %s.", dir);
-	}
-
-	/* Change the default drive as well.
-	 */
-	chdrive(dir);
-
-	/* warn the player if we can't write the record file */
-	/* perhaps we should also test whether . is writable */
-	/* unfortunately the access system-call is worthless */
-	if (wr) check_recordfile(dir ? dir : thisdir);
-}
-#endif /* CHDIR */
 #endif /*OVL1*/
 #ifdef OVLB
 

@@ -2706,9 +2706,7 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 	if(!mhp) mhp = 4;
 
 	/* new hp: same fraction of max as before */
-#ifndef LINT
 	mtmp->mhp = (int)(((long)hpn*(long)mhp)/(long)hpd);
-#endif
 	if(mtmp->mhp < 0) mtmp->mhp = hpn;	/* overflow */
 /* Unlikely but not impossible; a 1HD creature with 1HP that changes into a
    0HD creature will require this statement */
@@ -2716,9 +2714,7 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 
 /* and the same for maximum hit points */
 	hpn = mtmp->mhpmax;
-#ifndef LINT
 	mtmp->mhpmax = (int)(((long)hpn*(long)mhp)/(long)hpd);
-#endif
 	if(mtmp->mhpmax < 0) mtmp->mhpmax = hpn;	/* overflow */
 	if (!mtmp->mhpmax) mtmp->mhpmax = 1;
 
