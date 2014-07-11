@@ -12,11 +12,10 @@ const char * FDECL(tilename, (int, int));
 void NDECL(init_tilemap);
 void FDECL(process_substitutions, (FILE *));
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 #undef exit
-#if !defined(WIN32)
+#else
 extern void FDECL(exit, (int));
-#endif
 #endif
 
 #define MON_GLYPH 1

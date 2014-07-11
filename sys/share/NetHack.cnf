@@ -19,7 +19,7 @@
 # The three options on this line should be used for most setups.  
 # If your machine isn't very IBM-compatible, and NetHack doesn't work, 
 # try commenting out this line.
-OPTIONS=rawio,BIOS,IBMgraphics
+OPTIONS=rawio,IBMgraphics
 
 # To use VGA graphical tiles on an MS-DOS PC with VGA or better,uncomment 
 # this:
@@ -153,5 +153,5 @@ OPTIONS=time,noshowexp,number_pad:2,lit_corridor
 # *** VIDEOCOLORS AND VIDEOSHADES ***
 #
 # DEC Rainbows will hang if rawio is set, so they should instead use:
-#OPTIONS=BIOS,DECgraphics
+#OPTIONS=DECgraphics
 

@@ -27,7 +27,7 @@
 # define O_BINARY 0
 #endif
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 # define OMASK FCMASK
 #else
 # define OMASK 0644
@@ -1649,9 +1649,6 @@ struct attribs attrmax, attrmin;
 const char *configfile;
 char lock[ARBITRARY_SIZE];
 char SAVEF[ARBITRARY_SIZE];
-# ifdef MICRO
-char SAVEP[ARBITRARY_SIZE];
-# endif
 /* termcap.c */
 struct tc_lcl_data tc_lcl_data;
 char *hilites[CLR_MAX];

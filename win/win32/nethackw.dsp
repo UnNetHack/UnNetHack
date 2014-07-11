@@ -692,10 +692,6 @@ SOURCE=..\include\mfndpos.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\micro.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\mkroom.h
 # End Source File
 # Begin Source File
@@ -737,10 +733,6 @@ SOURCE=..\include\objclass.h
 # Begin Source File
 
 SOURCE=..\include\patchlevel.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\pcconf.h
 # End Source File
 # Begin Source File
 

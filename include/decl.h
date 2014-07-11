@@ -16,9 +16,6 @@ E int locknum;
 #endif
 
 E char SAVEF[];
-#ifdef MICRO
-E char SAVEP[];
-#endif
 
 E int bases[MAXOCLASSES];
 

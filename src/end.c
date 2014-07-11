@@ -49,7 +49,7 @@ void FDECL(do_vanquished, (int, BOOLEAN_P));
 STATIC_DCL void FDECL(list_genocided, (int, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL boolean FDECL(should_query_disclose_option, (int,char *));
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 extern void FDECL(nethack_exit,(int));
 #else
 #define nethack_exit exit
@@ -290,7 +290,7 @@ panic VA_DECL(const char *, str)
 		  !program_state.something_worth_saving ?
 		  "Program initialization has failed." :
 		  "Suddenly, the dungeon collapses.");
-#if defined(WIZARD) && !defined(MICRO)
+#if defined(WIZARD)
 # if defined(NOTIFY_NETHACK_BUGS)
 	if (!wizard)
 	    raw_printf("Report the following error to \"%s\".",

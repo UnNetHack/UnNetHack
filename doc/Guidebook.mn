@@ -2322,11 +2322,6 @@ Select an alternate keystroke handler dll to load (Win32 tty NetHack only).
 The name of the handler is specified without the .dll extension and without any
 path information.
 Cannot be set with the `O' command.
-.lp "BIOS    "
-Use BIOS calls to update the screen
-display quickly and to read the keyboard (allowing the use of arrow
-keys to move) on machines with an IBM PC compatible BIOS ROM (default off,
-OS/2, PC, and ST NetHack only).
 .lp "rawio   "
 Force raw (non-cbreak) mode for faster output and more
 bulletproof input (MS-DOS sometimes treats `^P' as a printer toggle

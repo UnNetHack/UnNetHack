@@ -540,12 +540,6 @@ static const char *build_opts[] = {
 #endif
 		"screen clipping",
 #ifdef NO_TERMS
-# ifdef SCREEN_BIOS
-		"screen control via BIOS",
-# endif
-# ifdef SCREEN_VGA
-		"screen control via VGA graphics",
-# endif
 # ifndef MSWIN_GRAPHICS
 #  ifdef WIN32CON
 		"screen control via WIN32 console I/O",
@@ -561,7 +555,7 @@ static const char *build_opts[] = {
 #ifdef TERMINFO
 		"terminal info library",
 #else
-# if defined(TERMLIB) || ((!defined(MICRO) && !defined(WIN32)) && defined(TTY_GRAPHICS))
+# if defined(TERMLIB) || (!defined(WIN32) && defined(TTY_GRAPHICS))
 		"terminal capability library",
 # endif
 #endif

@@ -30,7 +30,7 @@ SHARED_DCL char orgdir[PATHLEN];	/* also used in pcsys.c, amidos.c */
 STATIC_DCL void FDECL(process_options,(int argc,char **argv));
 STATIC_DCL void NDECL(nhusage);
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 extern void FDECL(nethack_exit,(int));
 #else
 #define nethack_exit exit

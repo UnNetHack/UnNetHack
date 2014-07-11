@@ -13,7 +13,7 @@
 #include <process.h>
 
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 void FDECL(nethack_exit,(int));
 #else
 #define nethack_exit exit
@@ -34,7 +34,7 @@ extern unsigned short __far __cdecl _movefpaused;
 extern int GUILaunched;    /* from nttty.c */
 #endif
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 
 void
 flushout()
@@ -87,7 +87,7 @@ dosh()
 # endif /* SHELL */
 
 
-#endif /* MICRO */
+#endif
 
 /*
  * Add a backslash to any name not ending in /, \ or :	 There must
@@ -179,7 +179,7 @@ const char *name, *mode;
 	return (FILE *)0;
 }
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 void nethack_exit(code)
 int code;
 {
@@ -216,4 +216,4 @@ static void msexit()
 #endif
 	return;
 }
-#endif /* MICRO || WIN32 */
+#endif /* WIN32 */

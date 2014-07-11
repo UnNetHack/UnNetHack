@@ -202,11 +202,6 @@ int *wid, *hgt;
 		error("Can't get TERM.");
 #else
 	{
-#  ifdef MICRO
-		get_scr_size();
-		if(CO < COLNO || LI < ROWNO+3)
-			setclipped();
-#  endif
 		HO = "\033[H";
 /*		nh_CD = "\033[J"; */
 		CE = "\033[K";		/* the ANSI termcap */
@@ -218,11 +213,7 @@ int *wid, *hgt;
 		UP = "\033[A";
 		nh_ND = "\033[C";
 		XD = "\033[B";
-#  ifdef MICRO	/* backspaces are non-destructive */
-		BC = "\b";
-#  else
 		BC = "\033[D";
-#  endif
 		nh_HI = SO = "\033[1m";
 		nh_US = "\033[4m";
 		MR = "\033[7m";
@@ -230,20 +221,14 @@ int *wid, *hgt;
 		/* strictly, SE should be 2, and nh_UE should be 24,
 		   but we can't trust all ANSI emulators to be
 		   that complete.  -3. */
-#  ifndef MICRO
 		AS = "\016";
 		AE = "\017";
-#  endif
 		TE = VS = VE = nullstr;
 		for (i = 0; i < CLR_MAX / 2; i++)
 		    if (i != CLR_BLACK) {
 			hilites[i|BRIGHT] = (char *) alloc(sizeof("\033[1;3%dm"));
 			Sprintf(hilites[i|BRIGHT], "\033[1;3%dm", i);
 			if (iflags.wc2_newcolors || (i != CLR_GRAY))
-#   ifdef MICRO
-			    if (i == CLR_BLUE) hilites[CLR_BLUE] = hilites[CLR_BLUE|BRIGHT];
-			    else
-#   endif
 			    {
 				hilites[i] = (char *) alloc(sizeof("\033[0;3%dm"));
 				Sprintf(hilites[i], "\033[0;3%dm", i);
@@ -291,15 +276,8 @@ int *wid, *hgt;
 	 * the kernel has values for either we should use them rather than
 	 * the values from TERMCAP ...
 	 */
-# ifndef MICRO
 	if (!CO) CO = tgetnum("co");
 	if (!LI) LI = tgetnum("li");
-# else
-		CO = tgetnum("co");
-		LI = tgetnum("li");
-		if (!LI || !CO)			/* if we don't override it */
-			get_scr_size();
-# endif
 	if(CO < COLNO || LI < ROWNO+3)
 		setclipped();
 	nh_ND = Tgetstr("nd");
@@ -696,19 +674,14 @@ graph_off() {
 #endif /* OVL0 */
 #ifdef OVL1
 
-#if !defined(MICRO)
 static const short tmspc10[] = {		/* from termcap */
 	0, 2000, 1333, 909, 743, 666, 500, 333, 166, 83, 55, 41, 20, 10, 5
 };
-#endif
 
 /* delay 50 ms */
 void
 tty_delay_output()
 {
-#if defined(MICRO)
-	register int i;
-#endif
 #ifdef TIMED_DELAY
 	if (flags.nap) {
 		(void) fflush(stdout);
@@ -716,13 +689,6 @@ tty_delay_output()
 		return;
 	}
 #endif
-#if defined(MICRO)
-	/* simulate the delay with "cursor here" */
-	for (i = 0; i < 3; i++) {
-		cmov(ttyDisplay->curx, ttyDisplay->cury);
-		(void) fflush(stdout);
-	}
-#else /* MICRO */
 	/* BUG: if the padding character is visible, as it is on the 5620
 	   then this looks terrible. */
 	if(flags.null)
@@ -744,7 +710,6 @@ tty_delay_output()
 			i -= cmlen*tmspc10[ospeed];
 		}
 	}
-#endif /* MICRO */
 }
 
 #endif /* OVL1 */
@@ -877,11 +842,7 @@ int *fg, *bg;
 	register int c, code;
 	int len;
 
-#   ifdef MICRO
-	*fg = CLR_GRAY; *bg = CLR_BLACK;
-#   else
 	*fg = *bg = NO_COLOR;
-#   endif
 
 	c = (str[0] == '\233') ? 1 : 2;	 /* index of char beyond esc prefix */
 	len = strlen(str) - 1;		 /* length excluding attrib suffix */
@@ -892,11 +853,7 @@ int *fg, *bg;
 	while (c < len) {
 	    if ((code = atoi(&str[c])) == 0) { /* reset */
 		/* this also catches errors */
-#   ifdef MICRO
-		*fg = CLR_GRAY; *bg = CLR_BLACK;
-#   else
 		*fg = *bg = NO_COLOR;
-#   endif
 	    } else if (code == 1) { /* bold */
 		*fg |= BRIGHT;
 #   if 0
@@ -945,9 +902,6 @@ init_hilite()
 	for (c = 0; c < SIZE(hilites); c++)
 	    /* avoid invisibility */
 	    if ((backg & ~BRIGHT) != c) {
-#   ifdef MICRO
-		if (c == CLR_BLUE) continue;
-#   endif
 		if (c == foreg)
 		    hilites[c] = (char *)0;
 		else if (c != hi_foreg || backg != hi_backg) {
@@ -961,10 +915,6 @@ init_hilite()
 		}
 	    }
 
-#   ifdef MICRO
-	/* brighten low-visibility colors */
-	hilites[CLR_BLUE] = hilites[CLR_BLUE|BRIGHT];
-#   endif
 }
 # endif /* UNIX */
 

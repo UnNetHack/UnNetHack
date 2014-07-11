@@ -50,11 +50,6 @@ static struct Bool_Opt
 	{"autopickup", &flags.pickup, TRUE, SET_IN_GAME},
 	{"autoquiver", &flags.autoquiver, FALSE, SET_IN_GAME},
 	{"autounlock", &flags.autounlock, TRUE, SET_IN_GAME},
-#if defined(MICRO) 
-	{"BIOS", &iflags.BIOS, FALSE, SET_IN_FILE},
-#else
-	{"BIOS", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 	{"bones", &flags.bones, TRUE, SET_IN_FILE},
 	{"checkpoint", &flags.ins_chkpt, TRUE, SET_IN_FILE},
 	{"cmdassist", &iflags.cmdassist, TRUE, SET_IN_GAME},
@@ -117,11 +112,7 @@ static struct Bool_Opt
 	{"mail", (boolean *)0, TRUE, SET_IN_FILE},
 #endif
 #ifdef MENU_COLOR
-# ifdef MICRO
-	{"menucolors", &iflags.use_menu_color, TRUE,  SET_IN_FILE},
-# else
 	{"menucolors", &iflags.use_menu_color, FALSE, SET_IN_FILE},
-# endif
 #else
 	{"menucolors", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
@@ -176,11 +167,7 @@ static struct Bool_Opt
 #ifdef QWERTZ
 	{"qwertz_layout", &iflags.qwertz_layout, FALSE, SET_IN_GAME},
 #endif
-#if defined(MICRO)
-	{"rawio", &iflags.rawio, FALSE, DISP_IN_GAME},
-#else
 	{"rawio", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 	{"rest_on_space", &iflags.rest_on_space, FALSE, SET_IN_FILE},
 	{"safe_pet", &flags.safe_dog, TRUE, SET_IN_GAME},
 #ifdef WIZARD
@@ -766,12 +753,8 @@ STATIC_OVL void
 rejectoption(optname)
 const char *optname;
 {
-#ifdef MICRO
-	pline("\"%s\" settable only from %s.", optname, configfile);
-#else
 	pline("%s can be set only from NETHACKOPTIONS or %s.", optname,
 			configfile);
-#endif
 }
 
 STATIC_OVL void
@@ -1703,14 +1686,6 @@ boolean tinitial, tfrom_file;
     }
 	if (flags.hell_and_hell)
 		flags.heaven_or_hell = TRUE;
-
-#if defined(MICRO)
-	/* included for compatibility with old NetHack.cnf files */
-	if (match_optname(opts, "IBM_", 4, FALSE)) {
-		iflags.BIOS = !negated;
-		return;
-	}
-#endif /* MICRO */
 
 	/* compound options */
 
@@ -3096,7 +3071,7 @@ map_menu_cmd(ch)
 }
 
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 # define OPTIONS_HEADING "OPTIONS"
 #else
 # define OPTIONS_HEADING "NETHACKOPTIONS"
@@ -4184,9 +4159,7 @@ static const char *opt_intro[] = {
 	"",
 #define CONFIG_SLOT 3	/* fill in next value at run-time */
 	(char *)0,
-#if !defined(MICRO)
 	"or use `NETHACKOPTIONS=\"<options>\"' in your environment",
-#endif
 	"(<options> is a list of options separated by commas)",
 	"or press \"O\" while playing and use the menu.",
 	"",

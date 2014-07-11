@@ -31,7 +31,7 @@ void FDECL(copy_bytes, (int,int));
 #  ifdef WIN32
 #define SAVESIZE	(PL_NSIZ + 40)  /* username-player.NetHack-saved-game */
 #  else
-#define SAVESIZE	FILENAME	/* from pcconf.h */
+#define SAVESIZE	FILENAME
 #  endif
 #endif
 
@@ -145,7 +145,7 @@ const char *directory;
 	} else {
 		strcpy(levelfile, lock);
 	}
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 	fd = open(levelfile, O_RDONLY | O_BINARY);
 #else
 	fd = open(levelfile, O_RDONLY, 0);
@@ -164,7 +164,7 @@ create_savefile()
 	strcpy(savefile, savename);
 #endif
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 	fd = open(savefile, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK);
 #else
 	fd = creat(savefile, FCMASK);

@@ -672,7 +672,7 @@ E int FDECL(delete_bonesfile, (d_level*));
 E void NDECL(compress_bonesfile);
 E void NDECL(set_savefile_name);
 E void FDECL(save_savefile_name, (int));
-#if defined(WIZARD) && !defined(MICRO)
+#if defined(WIZARD)
 E void NDECL(set_error_savefile);
 #endif
 E int NDECL(create_savefile);
@@ -1283,13 +1283,10 @@ E struct monst *FDECL(mk_mplayer, (struct permonst *,XCHAR_P,
 E void FDECL(create_mplayers, (int,BOOLEAN_P));
 E void FDECL(mplayer_talk, (struct monst *));
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 
-/* ### msdos.c,winnt.c ### */
+/* ### winnt.c ### */
 
-#  ifndef WIN32
-E int NDECL(tgetch);
-#  endif
 E char NDECL(switchar);
 E long FDECL(freediskspace, (char *));
 E int FDECL(findfirst, (char *));
@@ -1299,17 +1296,11 @@ E char *NDECL(foundfile_buffer);
 E void FDECL(chdrive, (char *));
 E void NDECL(disable_ctrlP);
 E void NDECL(enable_ctrlP);
-# if defined(MICRO) && !defined(WINNT)
-E void NDECL(get_scr_size);
-E void FDECL(gotoxy, (int,int));
-# endif
-# ifdef WIN32
 E char *FDECL(get_username, (int *));
 E void FDECL(nt_regularize, (char *));
 E int NDECL((*nt_kbhit));
 E void FDECL(Delay, (int));
-# endif /* WIN32 */
-#endif /* MICRO || WIN32 */
+#endif /* WIN32 */
 
 /* ### mthrowu.c ### */
 
@@ -1478,26 +1469,21 @@ E void FDECL(checkfile, (char *,struct permonst *,BOOLEAN_P,BOOLEAN_P));
 
 /* ### pcmain.c ### */
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 # ifdef CHDIR
 E void FDECL(chdirx, (char *,BOOLEAN_P));
 # endif /* CHDIR */
-#endif /* MICRO || WIN32 */
 
 /* ### pcsys.c ### */
-
-#if defined(MICRO) || defined(WIN32)
 E void NDECL(flushout);
 E int NDECL(dosh);
 E void FDECL(append_slash, (char *));
 E void FDECL(getreturn, (const char *));
 E void VDECL(msmsg, (const char *,...));
 E FILE *FDECL(fopenp, (const char *,const char *));
-#endif /* MICRO || WIN32 */
 
 /* ### pctty.c ### */
 
-#if defined(MICRO) || defined(WIN32)
 E void NDECL(gettty);
 E void FDECL(settty, (const char *));
 E void NDECL(setftty);
@@ -1505,13 +1491,10 @@ E void VDECL(error, (const char *,...));
 #if defined(TIMED_DELAY) && defined(_MSC_VER)
 E void FDECL(msleep, (unsigned));
 #endif
-#endif /* MICRO || WIN32 */
+#endif /* WIN32 */
 
 /* ### pcunix.c ### */
 
-#if defined(MICRO)
-E void FDECL(regularize, (char *));
-#endif /* MICRO */
 #if defined(PC_LOCKING)
 E void NDECL(getlock);
 #endif
@@ -2202,9 +2185,6 @@ E char *FDECL(version_string, (char *));
 E char *FDECL(getversionstring, (char *));
 E int NDECL(doversion);
 E int NDECL(doextversion);
-#ifdef MICRO
-E boolean FDECL(comp_times, (long));
-#endif
 E boolean FDECL(check_version, (struct version_info *,
 				const char *,BOOLEAN_P));
 E unsigned long FDECL(get_feature_notice_ver, (char *));

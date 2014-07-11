@@ -225,13 +225,8 @@ struct instance_flags {
 	boolean  win_edge;	/* are the menus aligned left&top */
 #endif
 	boolean use_status_colors; /* use color in status line; only if wc_color */
-#ifdef MICRO
-	boolean  BIOS;		/* use IBM or ST BIOS calls when appropriate */
-#endif
-#if defined(MICRO) || defined(WIN32)
-	boolean  rawio;		/* whether can use rawio (IOCTL call) */
-#endif
 #if defined(WIN32)
+	boolean  rawio;		/* whether can use rawio (IOCTL call) */
 	boolean hassound;	/* has a sound card */
 	boolean usesound;	/* use the sound card */
 	boolean usepcspeaker;	/* use the pc speaker */

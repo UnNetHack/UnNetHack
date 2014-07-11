@@ -141,8 +141,8 @@ YTABH   = y_tab.h
 LEXYYC  = lexyy.c
 
 #
-# Optional high-quality BSD random number generation routines
-# (see pcconf.h). Set to nothing if not used.
+# Optional high-quality BSD random number generation routines.
+# Set to nothing if not used.
 #
 
 RANDOM  = $(OBJ)/random.o
@@ -425,7 +425,6 @@ endif
 CONFIG_H = $(INCL)/config.h $(INCL)/config1.h $(INCL)/tradstdc.h \
 	       $(INCL)/global.h $(INCL)/coord.h \
 	       $(INCL)/system.h $(INCL)/unixconf.h \
-	       $(INCL)/micro.h $(INCL)/pcconf.h \
 	       $(INCL)/ntconf.h $(INCL)/nhlan.h
 
 HACK_H = $(INCL)/hack.h $(CONFIG_H) $(INCL)/align.h \

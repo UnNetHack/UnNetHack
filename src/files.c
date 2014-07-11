@@ -75,14 +75,11 @@ char whereis_file[255]=WHEREIS_FILE;
 #  if defined(WIN32)
 #define SAVESIZE	(PL_NSIZ + 40)	/* username-player.NetHack-saved-game */
 #  else
-#define SAVESIZE	FILENAME	/* from pcconf.h */
+#define SAVESIZE	FILENAME
 #  endif
 #endif
 
 char SAVEF[SAVESIZE];	/* holds relative path of save file from playground */
-#ifdef MICRO
-char SAVEP[SAVESIZE];	/* holds path of directory for save file */
-#endif
 
 #ifdef HOLD_LOCKFILE_OPEN
 struct level_ftrack {
@@ -370,7 +367,7 @@ char errbuf[];
 	fq_lock = fqname(lock, LEVELPREFIX, 0);
 #endif
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 	/* Use O_TRUNC to force the file to be shortened if it already
 	 * exists and is currently longer.
 	 */
@@ -386,13 +383,13 @@ char errbuf[];
 #  endif
 	fd = open(fq_lock, O_WRONLY |O_CREAT | O_TRUNC | O_BINARY, FCMASK);
 # endif
-#else	/* MICRO */
+#els
 # ifdef FILE_AREAS
 	fd = creat_area(FILE_AREA_LEVL, lock, FCMASK);
 # else
 	fd = creat(fq_lock, FCMASK);
 # endif	/* FILE_AREAS */
-#endif /* MICRO || WIN32 */
+#endif /* WIN32 */
 
 	if (fd >= 0)
 	    level_info[lev].flags |= LFILE_EXISTS;
@@ -704,7 +701,7 @@ char errbuf[];
 	file = fqname(file, BONESPREFIX, 0);
 #endif
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 	/* Use O_TRUNC to force the file to be shortened if it already
 	 * exists and is currently longer.
 	 */
@@ -835,15 +832,6 @@ set_savefile_name()
 #if defined(WIN32)
 	char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
 #endif
-# if defined(MICRO)
-	Strcpy(SAVEF, SAVEP);
-	{
-		int i = strlen(SAVEP);
-		(void)strncat(SAVEF, plname, 8);
-		regularize(SAVEF+i);
-	}
-	Strcat(SAVEF, ".sav");
-# else
 #  ifndef FILE_AREAS
 #  if defined(WIN32)
 	/* Obtain the name of the logged on user and incorporate
@@ -860,7 +848,6 @@ set_savefile_name()
 	Sprintf(SAVEF, "%d%s", (int)getuid(), plname);
 	regularize(SAVEF);      /* avoid . or / in name */
 #  endif
-# endif	/* MICRO */
 }
 
 void
@@ -871,7 +858,7 @@ int fd;
 }
 
 
-#if defined(WIZARD) && !defined(MICRO)
+#if defined(WIZARD)
 /* change pre-existing savefile name to indicate an error savefile */
 void
 set_error_savefile()
@@ -891,19 +878,14 @@ create_savefile()
 	int fd;
 
 #ifdef FILE_AREAS
-# ifdef MICRO
-	fd = open_area(FILE_AREA_SAVE, SAVEF,
-	  O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK);
-# else
 	fd = creat_area(FILE_AREA_SAVE, SAVEF, FCMASK);
-# endif
 #else	/* FILE_AREAS */
 	fq_save = fqname(SAVEF, SAVEPREFIX, 0);
-# if defined(MICRO) || defined(WIN32)
+# if defined(WIN32)
 	fd = open(fq_save, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK);
 # else
 	fd = creat(fq_save, FCMASK);
-# endif /* MICRO */
+# endif
 #endif  /* FILE_AREAS */
 
 	return fd;
@@ -1511,7 +1493,7 @@ const char *filename;
 		}
 	}
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 	if ((fp = fopenp(fqname(configfile, CONFIGPREFIX, 0), "r")) != (FILE *)0)
 		return(fp);
 	/* try .nethackrc? */
@@ -1702,21 +1684,6 @@ boolean		recursive;
 	} else if (match_varname(buf, "TROUBLEDIR", 4)) {
 		adjust_prefix(bufp, TROUBLEPREFIX);
 #else /*NOCWD_ASSUMPTIONS*/
-# ifdef MICRO
-	} else if (match_varname(buf, "HACKDIR", 4)) {
-		(void) strncpy(hackdir, bufp, PATHLEN-1);
-	} else if (match_varname(buf, "LEVELS", 4)) {
-		(void) strncpy(tmp_levels, bufp, PATHLEN-1);
-
-	} else if (match_varname(buf, "SAVE", 4)) {
-		char *ptr;
-		if ((ptr = index(bufp, ';')) != 0) {
-			*ptr = '\0';
-		}
-
-		(void) strncpy(SAVEP, bufp, SAVESIZE-1);
-		append_slash(SAVEP);
-# endif /* MICRO */
 #endif /*NOCWD_ASSUMPTIONS*/
 
 	} else if (match_varname(buf, "NAME", 4)) {
@@ -1847,7 +1814,7 @@ const char *filename;
 #define tmp_levels	(char *)0
 #define tmp_ramdisk	(char *)0
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 #undef tmp_levels
 	char	tmp_levels[PATHLEN];
 #endif
@@ -1856,7 +1823,7 @@ const char *filename;
 
 	if (!(fp = fopen_config_file(filename))) return;
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 	tmp_levels[0] = 0;
 #endif
 	/* begin detection of duplicate configfile options */
@@ -1873,9 +1840,6 @@ const char *filename;
 	/* turn off detection of duplicate configfile options */
 	set_duplicate_opt_detection(0);
 
-#if defined(MICRO) && !defined(NOCWD_ASSUMPTIONS)
-	/* should be superseded by fqn_prefix[] */
-#endif /* MICRO */
 	return;
 }
 
@@ -1918,7 +1882,7 @@ fopen_wizkit_file()
 #endif
 	}
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 	if ((fp = fopenp(fqname(wizkit, CONFIGPREFIX, 0), "r"))
 								!= (FILE *)0)
 		return(fp);
@@ -2017,7 +1981,7 @@ const char *dir;
 	    wait_synch();
 	}
 #endif  /* !UNIX */
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 	char tmp[PATHLEN];
 
 	Strcpy(tmp, RECORD);
@@ -2043,9 +2007,7 @@ const char *dir;
 		(void) close(fd);
 	} else		/* open succeeded */
 	    (void) close(fd);
-#else /* MICRO || WIN32*/
-
-#endif /* MICRO || WIN32*/
+#endif /*  WIN32*/
 }
 
 /* ----------  END SCOREBOARD CREATION ----------- */

@@ -5,11 +5,6 @@
 #include "lev.h"
 #include "tcap.h" /* for TERMLIB and ASCIIGRAPH */
 
-#if defined(MICRO)
-extern int dotcnt;	/* shared with save */
-extern int dotrow;	/* shared with save */
-#endif
-
 #ifdef USE_TILES
 extern void FDECL(substitute_tiles, (d_level *));       /* from tile.c */
 #endif
@@ -574,19 +569,6 @@ register int fd;
 	u.ustuck = (struct monst *)0;
 	u.usteed = (struct monst *)0;
 
-#ifdef MICRO
-	clear_nhwindow(WIN_MAP);
-	clear_nhwindow(WIN_MESSAGE);
-	You("return to level %d in %s%s.",
-		depth(&u.uz), dungeons[u.uz.dnum].dname,
-		flags.debug ? " while in debug mode" :
-		flags.explore ? " while in explore mode" : "");
-	curs(WIN_MAP, 1, 1);
-	dotcnt = 0;
-	dotrow = 2;
-	if (strncmpi("X11", windowprocs.name, 3))
-    	  putstr(WIN_MAP, 0, "Restoring:");
-#endif
 	while(1) {
 #ifdef ZEROCOMP
 		if(mread(fd, (genericptr_t) &ltmp, sizeof ltmp) < 0)
@@ -595,17 +577,6 @@ register int fd;
 #endif
 			break;
 		getlev(fd, 0, ltmp, FALSE);
-#ifdef MICRO
-		curs(WIN_MAP, 1+dotcnt++, dotrow);
-		if (dotcnt >= (COLNO - 1)) {
-			dotrow++;
-			dotcnt = 0;
-		}
-		if (strncmpi("X11", windowprocs.name, 3)){
-		  putstr(WIN_MAP, 0, ".");
-		}
-		mark_synch();
-#endif
 		rtmp = restlevelfile(ltmp);
 		if (rtmp < 2) return(rtmp);  /* dorecover called recursively */
 	}

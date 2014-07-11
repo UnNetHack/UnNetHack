@@ -115,7 +115,7 @@ boolean GFlag = FALSE;
 boolean HE_resets_AS;	/* see termcap.c */
 #endif
 
-#if defined(MICRO) || defined(WIN32CON)
+#if defined(WIN32CON)
 static const char to_continue[] = "to continue";
 #define getret() getreturn(to_continue)
 #else
@@ -792,14 +792,10 @@ tty_askname()
 #ifdef WIN32CON
 				ttyDisplay->curx--;
 #endif
-#if defined(MICRO) || defined(WIN32CON)
-# if defined(WIN32CON)
+#if defined(WIN32CON)
 				backsp();       /* \b is visible on NT */
 				(void) putchar(' ');
 				backsp();
-# else
-				msmsg("\b \b");
-# endif
 #else
 				(void) putchar('\b');
 				(void) putchar(' ');
@@ -813,11 +809,7 @@ tty_askname()
 		if(c < 'A' || (c > 'Z' && c < 'a') || c > 'z') c = '_';
 #endif
 		if (ct < (int)(sizeof plname) - 1) {
-#if defined(MICRO)
-			msmsg("%c", c);
-#else
 			(void) putchar(c);
-#endif
 			plname[ct++] = c;
 #ifdef WIN32CON
 			ttyDisplay->curx++;
@@ -837,7 +829,7 @@ tty_get_nh_event()
     return;
 }
 
-#if !defined(MICRO) && !defined(WIN32CON)
+#if !defined(WIN32CON)
 STATIC_OVL void
 getret()
 {
@@ -2661,7 +2653,7 @@ tty_raw_print(str)
     const char *str;
 {
     if(ttyDisplay) ttyDisplay->rawprint++;
-#if defined(MICRO) || defined(WIN32CON)
+#if defined(WIN32CON)
     msmsg("%s\n", str);
 #else
     puts(str); (void) fflush(stdout);
@@ -2674,13 +2666,13 @@ tty_raw_print_bold(str)
 {
     if(ttyDisplay) ttyDisplay->rawprint++;
     term_start_raw_bold();
-#if defined(MICRO) || defined(WIN32CON)
+#if defined(WIN32CON)
     msmsg("%s", str);
 #else
     (void) fputs(str, stdout);
 #endif
     term_end_raw_bold();
-#if defined(MICRO) || defined(WIN32CON)
+#if defined(WIN32CON)
     msmsg("\n");
 #else
     puts("");

@@ -100,9 +100,6 @@ E void NDECL(tty_shutdown);
 #endif
 E void FDECL(xputc, (CHAR_P));
 E void FDECL(xputs, (const char *));
-#if defined(SCREEN_VGA)
-E void FDECL(xputg, (int, int, unsigned));
-#endif
 E void NDECL(cl_end);
 E void NDECL(clear_screen);
 E void NDECL(home);
@@ -195,14 +192,12 @@ E void FDECL(genl_outrip, (winid,int));
 
 #ifdef NO_TERMS
 # if defined(WIN32CON)
-#  if defined(SCREEN_BIOS) || defined(WIN32CON)
 #   undef putchar
 #   undef putc
 #   undef puts
 #   define putchar(x) xputc(x)	/* these are in video.c, nttty.c */
 #   define putc(x) xputc(x)
 #   define puts(x) xputs(x)
-#  endif/*SCREEN_BIOS || WIN32CON */
 # endif
 #endif/*NO_TERMS*/
 

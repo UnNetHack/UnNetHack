@@ -6,9 +6,7 @@
 #ifndef TCAP_H
 #define TCAP_H
 
-#ifndef MICRO
 # define TERMLIB	/* include termcap code */
-#endif
 
 /* might display need graphics code? */
 # if defined(TERMLIB)

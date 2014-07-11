@@ -29,13 +29,6 @@
  */
 #include <sys/types.h>
 
-#if defined(MICRO)
-# if !defined(_SIZE_T) && !defined(__size_t) /* __size_t for CSet/2 */
-#  define _SIZE_T
-typedef unsigned int	size_t;
-# endif
-#endif	/* MICRO */
-
 #endif /* !__cplusplus */
 
 /* You may want to change this to fit your system, as this is almost
@@ -100,23 +93,7 @@ E int FDECL(unlink, (const char *));
 
 #endif /*  __GNUC__ */
 
-#if defined(MICRO)
-E int FDECL(close, (int));
-E int FDECL(read, (int,genericptr_t,unsigned int));
-E int FDECL(open, (const char *,int,...));
-E int FDECL(dup2, (int, int));
-E int FDECL(setmode, (int,int));
-E int NDECL(kbhit);
-E int FDECL(chdir, (char *));
-E char *FDECL(getcwd, (char *,int));
-#endif
-
 /* both old & new versions of Ultrix want these, but real BSD does not */
-#ifdef MICRO
-E void NDECL(abort);
-E void FDECL(_exit, (int));
-E int FDECL(system, (const char *));
-#endif
 
 #ifdef POSIX_TYPES
 /* The POSIX string.h is required to define all the mem* and str* functions */
@@ -129,12 +106,6 @@ E void *FDECL(memset, (void *, int, size_t));
 #else
 #endif
 #endif /* POSIX_TYPES */
-
-#if defined(MICRO) && !defined(LATTICE)
-E int  FDECL(memcmp, (const void *, const void *, size_t));
-E void *FDECL(memcpy, (void *, const void *, size_t));
-E void *FDECL(memset, (void *, int, size_t));
-#endif /* MICRO */
 
 #if defined(SYSV)
 E unsigned sleep();
@@ -164,7 +135,7 @@ E char	*FDECL(strcat, (char *,const char *));
 E char	*FDECL(strncat, (char *,const char *,size_t));
 E char	*FDECL(strpbrk, (const char *,const char *));
 
-#if defined(SYSV) || defined(MICRO)
+#if defined(SYSV)
 E char	*FDECL(strchr, (const char *,int));
 E char	*FDECL(strrchr, (const char *,int));
 #else /* BSD */
@@ -174,11 +145,7 @@ E char	*FDECL(rindex, (const char *,int));
 
 E int	FDECL(strcmp, (const char *,const char *));
 E int	FDECL(strncmp, (const char *,const char *,size_t));
-#if defined(MICRO)
-E size_t FDECL(strlen, (const char *));
-#else
 E int	FDECL(strlen, (const char *));
-#endif /* MICRO */
 
 #endif	/* !_XtIntrinsic_h_ && !POSIX_TYPES */
 
@@ -229,38 +196,18 @@ E int FDECL(vprintf, (const char *, va_list));
 #endif /* NEED_VARARGS */
 
 
-#ifdef MICRO
-E int FDECL(tgetent, (const char *,const char *));
-E void FDECL(tputs, (const char *,int,int (*)()));
-E int FDECL(tgetnum, (const char *));
-E int FDECL(tgetflag, (const char *));
-E char *FDECL(tgetstr, (const char *,char **));
-E char *FDECL(tgoto, (const char *,int,int));
-#else
 E int FDECL(tgetent, (char *,const char *));
 E void FDECL(tputs, (const char *,int,int (*)()));
 E int FDECL(tgetnum, (const char *));
 E int FDECL(tgetflag, (const char *));
 E char *FDECL(tgetstr, (const char *,char **));
 E char *FDECL(tgoto, (const char *,int,int));
-#endif
 
 #ifdef ALLOC_C
 E genericptr_t FDECL(malloc, (size_t));
 #endif
 
 /* time functions */
-
-#ifdef MICRO
-# ifdef abs
-# undef abs
-# endif
-E int FDECL(abs, (int));
-# ifdef atoi
-# undef atoi
-# endif
-E int FDECL(atoi, (const char *));
-#endif
 
 #undef E
 

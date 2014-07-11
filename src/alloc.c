@@ -43,7 +43,7 @@ register unsigned int lth;
 
 #if defined(WIZARD)
 
-# if defined(MICRO) || defined(WIN32)
+# if defined(WIN32)
 /* we actually want to know which systems have an ANSI run-time library
  * to know which support the new %p format for printing pointers.
  * due to the presence of things like gcc, we assume microcomputers 
