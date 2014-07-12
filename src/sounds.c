@@ -306,17 +306,6 @@ dosounds()
 	}
 	return;
     }
-#ifdef BLACKMARKET
-    if (!Is_blackmarket(&u.uz) && at_dgn_entrance("One-eyed Sam's Market") &&
-        !rn2(200)) {
-      static const char *blkmar_msg[3] = {
-        "You hear someone complaining about the prices.",
-        "Somebody whispers: \"Food rations? Only 900 zorkmids.\"",
-        "You feel like searching for more gold.",
-      };
-      pline("%s", blkmar_msg[rn2(2)+hallu]);
-    }
-#endif /* BLACKMARKET */
 }
 
 static const char * const h_sounds[] = {
@@ -920,23 +909,6 @@ register struct monst *mtmp;
 					    : soldier_foe_msg[rn2(3)];
 	    }
 	    break;
-#ifdef BLACKMARKET
-	case MS_ONEEYEDSAM:
-	    if (!mtmp->mpeaceful)
-		verbl_msg = "You worthless piece of scum!";
-	    else
-	    if (Role_if(PM_CONVICT))
-		verbl_msg = "We offer a special discount for our friends on this side of the law.";
-	    else
-	    {
-		static const char * const one_eyed_sam_msg[3] = {
-		    "Psst! If you smuggle me the Amulet of Yendor we can split the profit!",
-		    "Today's special: Buy two items and get the third for full price!",
-		    "Go ahead and steal something. I could use a bit of fun."};
-		verbl_msg = one_eyed_sam_msg[rn2(3)];
-	    }
-	    break;
-#endif /* BLACKMARKET */
 	case MS_RIDER:
 		if (ptr == &mons[PM_DEATH] && !rn2(10))
 			pline_msg = "is busy reading a copy of Sandman #8.";

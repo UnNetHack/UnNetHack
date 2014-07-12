@@ -733,9 +733,6 @@ boolean called;
 	 * none of this applies.
 	 */
 	if (mtmp->isshk && !do_hallu 
-#ifdef BLACKMARKET
-		&& mtmp->data != &mons[PM_ONE_EYED_SAM]
-#endif /* BLACKMARKET */
 		) {
 	    if (adjective && article == ARTICLE_THE) {
 		/* pathological case: "the angry Asidonhopo the blue dragon"

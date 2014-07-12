@@ -113,7 +113,7 @@ STATIC_OVL xchar
 observable_depth(lev)
 d_level *lev;
 {
-#ifdef RANDOMIZED_PLANES	/* if we ever randomize the order of the elemental planes, we
+	/* if we ever randomize the order of the elemental planes, we
 	   must use a constant external representation in the record file */
 	if (In_endgame(lev)) {
 	    if (Is_astralevel(lev))	 return -5;
@@ -123,7 +123,6 @@ d_level *lev;
 	    else if (Is_earthlevel(lev)) return -1;
 	    else			 return 0;	/* ? */
 	} else
-#endif
 	    return depth(lev);
 }
 

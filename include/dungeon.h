@@ -121,18 +121,11 @@ typedef struct branch {
 #define Is_nemesis(x)		(on_level(x, &nemesis_level))
 #define Is_knox(x)		(on_level(x, &knox_level))
 #define Is_nymph_level(x)	(on_level(x, &nymph_level))
-#ifdef ADVENT_CALENDAR
-#define Is_advent_calendar(x)		(on_level(x, &advcal_level))
-#endif
 #ifdef RECORD_ACHIEVE
 #define Is_mineend_level(x)     (on_level(x, &mineend_level))
 #define Is_sokoend_level(x)     (on_level(x, &sokoend_level))
 #endif
-#ifdef BLACKMARKET
-#define Is_blackmarket(x)       (on_level(x, &blackmarket_level))
-#else
 #define Is_blackmarket(x)       (FALSE)
-#endif /* BLACKMARKET */
 #define Is_minetown_level(x)	(on_level(x, &minetown_level))
 #define Is_town_level(x)	(on_level(x, &town_level))
 #define Is_moria_level(x)	(on_level(x, &moria_level))

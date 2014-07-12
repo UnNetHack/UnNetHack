@@ -1047,10 +1047,6 @@ register xchar x, y;
 }
 */
 
-#ifdef BLACKMARKET
-d_level new_dlevel = {0, 0};
-#endif
-
 void
 goto_level(newlevel, at_stairs, falling, portal)
 d_level *newlevel;
@@ -1073,24 +1069,13 @@ boolean at_stairs, falling, portal;
 		newlevel->dlevel = dunlevs_in_dungeon(newlevel);
 	if (newdungeon && In_endgame(newlevel)) { /* 1st Endgame Level !!! */
 		if (u.uhave.amulet) {
-#ifdef RANDOMIZED_PLANES
-			pline("Well done, mortal!");
-			pline("But now thou must face the final Test...");
-			pline("Prove thyself worthy or perish!");
-		    assign_level(newlevel, get_first_elemental_plane());
-#else
 		    assign_level(newlevel, &earth_level);
-#endif
 		}
 		else return;
 	}
 	new_ledger = ledger_no(newlevel);
 	if (new_ledger <= 0)
 		done(ESCAPED);	/* in fact < 0 is impossible */
-
-#ifdef BLACKMARKET
-	assign_level(&new_dlevel, newlevel);
-#endif
 
 	/* Prevent the player from going past the first quest level unless
 	 * (s)he has been given the go-ahead by the leader.
@@ -1468,16 +1453,6 @@ boolean at_stairs, falling, portal;
 			u.uevent.qcalled = TRUE;
 		}
 	}
-
-#ifdef ADVENT_CALENDAR
-	if ((getmonth()==12) && (getmday() < 25)) {
-		if (mk_advcal_portal())
-			You("smell chocolate!");
-	}
-	if (Is_advent_calendar(&u.uz)) {
-		fill_advent_calendar(FALSE);
-	}
-#endif
 
 	/* once Croesus is dead, his alarm doesn't work any more */
 	if (Is_knox(&u.uz) && (new || !mvitals[PM_CROESUS].died)) {

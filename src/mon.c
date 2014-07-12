@@ -1530,12 +1530,6 @@ uchar adtyp;
 	    }
 	}
 
-#ifdef BLACKMARKET
-	if (Is_blackmarket(&u.uz) && tmp == PM_ONE_EYED_SAM) {
-	    bars_around_portal(TRUE);
-	}
-#endif /* BLACKMARKET */
-
 	if(mtmp->iswiz) wizdead();
 	if(mtmp->data->msound == MS_NEMESIS) nemdead();
         
@@ -2334,13 +2328,6 @@ setmangry(mtmp)
 register struct monst *mtmp;
 {
 	mtmp->mstrategy &= ~STRAT_WAITMASK;
-#ifdef BLACKMARKET
-	/* Even if the black marketeer is already angry he may not have called
-	 * for his assistants if he or his staff have not been assaulted yet.
-	 */
-	if (is_blkmktstaff(mtmp->data) && !mtmp->mpeaceful)
-	    blkmar_guards(mtmp);
-#endif /* BLACKMARKET */
 	if(!mtmp->mpeaceful) return;
 	if(mtmp->mtame) return;
 	mtmp->mpeaceful = 0;
@@ -2354,18 +2341,6 @@ register struct monst *mtmp;
 		    pline("%s gets angry!", Monnam(mtmp));
 		else if (flags.verbose && flags.soundok) growl(mtmp);
 	}
-
-#ifdef BLACKMARKET
-	/* Don't misbehave in the Black Market or else... */
-	if (Is_blackmarket(&u.uz)) {
-	    if (is_blkmktstaff(mtmp->data) || 
-		/* non-tame named monsters are presumably
-		 * black marketeer's assistants */
-		    (NAME(mtmp) && *NAME(mtmp))) {
-		blkmar_guards(mtmp);
-	    }
-	}
-#endif /* BLACKMARKET */
 
 	/* attacking your own quest leader will anger his or her guardians */
 	if (!flags.mon_moving &&	/* should always be the case here */

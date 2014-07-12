@@ -41,9 +41,7 @@ struct conditionals {
 	{ MON_GLYPH, PM_DISENCHANTER, "disintegrator" },
 #endif
 	{ MON_GLYPH, PM_VAMPIRE_LORD, "vampire mage" },
-#ifndef BLACKMARKET
 	{ MON_GLYPH, PM_SHOPKEEPER, "black marketeer" },
-#endif
 
 #ifndef CHARON /* not supported yet */
 	{ MON_GLYPH, PM_CROESUS, "Charon" },

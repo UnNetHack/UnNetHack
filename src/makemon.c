@@ -1441,9 +1441,6 @@ rndmonst()
 		if (upper && !isupper(def_monsyms[(int)(ptr->mlet)])) continue;
 		if (elemlevel && wrong_elem_type(ptr)) continue;
 		if (uncommon(mndx)) continue;
-#ifdef BLACKMARKET	/* SWD: pets are not allowed in the black market */
-		if (is_domestic(ptr) && Is_blackmarket(&u.uz)) continue;
-#endif
 		if (prohibited_by_generation_flags(ptr)) continue;
 		ct = (int)(ptr->geno & G_FREQ) + align_shift(ptr);
 		/* Boost Sheol-Only(tm) monster generation in Sheol. */

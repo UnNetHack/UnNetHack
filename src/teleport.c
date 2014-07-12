@@ -843,11 +843,7 @@ level_tele()
 			newlevel.dlevel = destlev;
 			if (In_endgame(&newlevel) && !In_endgame(&u.uz)) {
 				Sprintf(buf,
-#ifdef RANDOMIZED_PLANES
-				    "Destination is first elemental plane");
-#else
 				    "Destination is earth level");
-#endif
 				if (!u.uhave.amulet) {
 					struct obj *obj;
 					obj = mksobj(AMULET_OF_YENDOR,
@@ -857,11 +853,7 @@ level_tele()
 						Strcat(buf, " with the amulet");
 					}
 				}
-#ifdef RANDOMIZED_PLANES
-				assign_level(&newlevel, get_first_elemental_plane());
-#else
 				assign_level(&newlevel, &earth_level);
-#endif
 				pline("%s.", buf);
 			}
 			force_dest = TRUE;
@@ -908,9 +900,6 @@ level_tele()
 	     * we let negative values requests fall into the "heaven" loop.
 	     */
 	    if ((Is_knox(&u.uz)
-#ifdef BLACKMARKET
-		    || Is_blackmarket(&u.uz)
-#endif
 	    ) && newlev > 0) {
 		You("%s", shudder_for_moment);
 		return;
@@ -1378,19 +1367,6 @@ int in_sight;
 			seetrap(trap);
 		    }
 		    return 0;
-#ifdef BLACKMARKET
-	      	} else if (mtmp->mtame &&
-			(Is_blackmarket(&trap->dst) || Is_blackmarket(&u.uz))) {
-		    if (in_sight) {
-			pline("%s seems to shimmer for a moment.",
-				Monnam(mtmp));
-			seetrap(trap);
-		    }
-		    return 0;
-		} else if (Is_blackmarket(&u.uz) &&
-			mtmp->data == &mons[PM_ONE_EYED_SAM]) {
-		    return 0;
-#endif /* BLACKMARKET */
 		} else {
 		    assign_level(&tolevel, &trap->dst);
 		    migrate_typ = MIGR_PORTAL;
@@ -1481,9 +1457,6 @@ random_teleport_level()
 	    cur_depth = (int)depth(&u.uz);
 
 	if (!rn2(5) || Is_knox(&u.uz)
-#ifdef BLACKMARKET
-		|| Is_blackmarket(&u.uz)
-#endif
 		)
 	    return cur_depth;
 
@@ -1551,13 +1524,6 @@ boolean give_feedback;
 		You("are no longer inside %s!", mon_nam(mtmp));
 	    unstuck(mtmp);
 	    (void) rloc(mtmp, FALSE);
-#ifdef BLACKMARKET
-	} else if (((mtmp->data == &mons[PM_BLACK_MARKETEER] && rn2(5)) ||
-		    (mtmp->data == &mons[PM_ONE_EYED_SAM] && rn2(13))) &&
-		   enexto_core_range(&cc, u.ux, u.uy, mtmp->data,0,
-		                     rnf(1,10) ? 4 : 3)) {
-	    rloc_to(mtmp, cc.x, cc.y);
-#endif
 	} else if (is_rider(mtmp->data) && rn2(13) &&
 		   enexto(&cc, u.ux, u.uy, mtmp->data))
 	    rloc_to(mtmp, cc.x, cc.y);

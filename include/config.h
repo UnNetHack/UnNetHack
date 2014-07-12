@@ -225,10 +225,6 @@ typedef long glyph_t;
  * bugs left here.
  */
 
-#define RANDOMIZED_PLANES /* Elemental Planes order is randomized - Patric Mueller (4 Jan 2009) */
-#define BLACKMARKET	/* Massimo Campostrini (campo@sunthpi3.difi.unipi.it) */
-
-
 #if defined(TTY_GRAPHICS) || defined(MSWIN_GRAPHICS) || \
  defined(CURSES_GRAPHICS)
 # define MENU_COLOR
@@ -256,8 +252,6 @@ typedef long glyph_t;
 # define WIN_EDGE	/* windows aligned left&top */
 # define VIDEOSHADES    /* Slash'Em like colors */
 #endif
-
-#define ADVENT_CALENDAR
 
 /* End of Section 5 */
 

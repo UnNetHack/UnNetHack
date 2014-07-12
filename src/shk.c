@@ -326,17 +326,6 @@ register boolean nearshop;
 		  (mvitals[PM_KOP_LIEUTENANT].mvflags & G_GONE) &&
 		  (mvitals[PM_KOP_KAPTAIN].mvflags & G_GONE));
 
-#ifdef BLACKMARKET
-      if (Is_blackmarket(&u.uz)) {
-	nokops = ((mvitals[PM_SOLDIER].mvflags & G_GONE) &&
-		  (mvitals[PM_SERGEANT].mvflags & G_GONE) &&
-		  (mvitals[PM_LIEUTENANT].mvflags & G_GONE) &&
-		  (mvitals[PM_CAPTAIN].mvflags & G_GONE));
- 
-	Strcpy(kopname, "guards");
-      }
-#endif /* defined(BLACKMARKET) */
- 
 	if(!angry_guards(!flags.soundok) && nokops) {
 	    if(flags.verbose && flags.soundok)
 		pline("But no one seems to respond to it.");
@@ -349,9 +338,6 @@ register boolean nearshop;
 	    coord mm;
 
 	    if (nearshop)
-#ifdef BLACKMARKET                
-	    if (!Is_blackmarket(&u.uz)) 
-#endif /* BLACKMARKET */
 		{
 		/* Create swarm around you, if you merely "stepped out" */
 		if (flags.verbose)
@@ -364,24 +350,8 @@ register boolean nearshop;
 	    if (flags.verbose)
 		 pline_The("%s are after you!", kopname);
 	    /* Create swarm near down staircase (hinders return to level) */
-#ifdef BLACKMARKET            
-	    if (Is_blackmarket(&u.uz)) {
-	      struct trap *trap = ftrap;
-	      while (trap) {
-		if (trap->ttyp == MAGIC_PORTAL) {
-		  mm.x = trap->tx;
-		  mm.y = trap->ty;
-		}
-		trap = trap->ntrap;
-	      }
-	    } else {
 	    mm.x = xdnstair;
 	    mm.y = ydnstair;
-	    }            
-#else /* BLACKMARKET */
-	    mm.x = xdnstair;
-	    mm.y = ydnstair;
-#endif /* BLACKMARKET */
 	    makekops(&mm);
 	    /* Create swarm near shopkeeper (hinders return to shop) */
 	    mm.x = shkp->mx;
@@ -389,91 +359,6 @@ register boolean nearshop;
 	    makekops(&mm);
 	}
 }
-
-#ifdef BLACKMARKET
-void 
-blkmar_guards(mtmp)
-register struct monst *mtmp;
-{
-    register struct monst *mt;
-    boolean mesg_given = FALSE;	/* Only give message if assistants peaceful */
-    static boolean rlock = FALSE; /* Prevent recursive calls (via wakeup) */
-
-    if (rlock)  return;
-    rlock = TRUE;
-
-    /* allow black marketeer to leave his shop */
-    hot_pursuit(mtmp);
-
-    /* wake up assistants */
-    for (mt = fmon; mt; mt = mt->nmon) {
-	if (DEADMONSTER(mt)) continue;
-	/* non-tame named monsters are presumably
-	 * black marketeer's assistants */
-	else if (mt->mpeaceful && 
-		((!mt->mtame && NAME(mt) && *NAME(mt) && 
-		  mt->mpeaceful && mt != mtmp) ||
-		 mt->data == &mons[PM_ONE_EYED_SAM])) {
-	    if (!mesg_given) {
-		pline("%s calls for help!", noit_Monnam(mtmp));
-		mesg_given = TRUE;
-		bars_around_portal(FALSE);
-		call_kops(mtmp, FALSE);
-	    }
-	    wakeup(mt);
-	}
-	/* All for one and one for all */
-	else if (mt->isshk && mt->data == &mons[PM_BLACK_MARKETEER])
-	    hot_pursuit(mt);
-    }
-    rlock = FALSE;
-}
-
-/* look for a portal on the level and add or 
- * remove iron bars on every adjacent square */
-void 
-bars_around_portal(removebars)
-boolean removebars;
-{
-    int x, y, dx, dy;
-    boolean sawit = FALSE;
-    struct trap *trap = ftrap;
-    while (trap) {
-	if (trap->ttyp == MAGIC_PORTAL) break;
-	trap = trap->ntrap;
-    }
-    if (!trap) return;
-    if (trap->tx == u.ux && trap->ty == u.uy) return;
-    for (dx = -1; dx <= 1; dx++)
-	for (dy = -1; dy <= 1; dy++) {
-	    if (!dx && !dy) continue;
-	    x = trap->tx + dx;
-	    y = trap->ty + dy;
-	    if (removebars) {
-		if (levl[x][y].typ == IRONBARS) {
-		    dissolve_bars(x,y);
-		    if (cansee(x,y)) 
-			sawit = TRUE;
-		}
-	    } else {
-		if (!IS_ROCK(levl[x][y].typ) && levl[x][y].typ != IRONBARS) {
-		    levl[x][y].typ = IRONBARS;
-		    newsym(x, y);
-		    if (cansee(x,y)) 
-			sawit = TRUE;
-		}
-	    }
-	}
-    if (sawit) {
-	if (removebars)
-	    pline("The iron bars rise back into the ceiling.");
-	else
-	    pline("Iron bars drop from the ceiling around the magic portal!");
-    }
-
-}
-
-#endif /* BLACKMARKET */
 
 /* x,y is strictly inside shop */
 char
@@ -530,12 +415,6 @@ boolean newlev;
 
 	if (rob_shop(shkp)) {
 
-#ifdef BLACKMARKET
-	    if (Is_blackmarket(&u.uz))
-		blkmar_guards(shkp);
-	    else
-#endif
-
 	    call_kops(shkp, (!newlev && levl[u.ux0][u.uy0].edge));
 	}
 }
@@ -557,12 +436,6 @@ xchar x, y;
 	    return;
 
 	if (rob_shop(shkp)) {
-
-#ifdef BLACKMARKET
-	    if (Is_blackmarket(&u.uz))
-		blkmar_guards(shkp);
-	    else
-#endif
 
 	    /*[might want to set 2nd arg based on distance from shop doorway]*/
 	    call_kops(shkp, FALSE);
@@ -1413,13 +1286,7 @@ proceed:
 #endif
 		    make_happy_shk(shkp, FALSE);
 		} else {
-#ifdef BLACKMARKET
-			/* Blackmarket shopkeeper are not easily pacified */
-			int peace_offering = (shkp->data == &mons[PM_BLACK_MARKETEER]) ?
-				5000L : 1000L;
-#else
 			int peace_offering = 1000L;
-#endif
 		    /* shopkeeper is angry, but has not been robbed --
 		     * door broken, attacked, etc. */
 		    pline("%s is after your hide, not your money!",
@@ -2077,21 +1944,6 @@ register struct monst *shkp;	/* if angry, impose a surcharge */
 	else if (obj->oartifact) tmp *= 4L;
 	/* anger surcharge should match rile_shk's */
 	if (shkp && ESHK(shkp)->surcharge) tmp += (tmp + 2L) / 3L;
-
-#ifdef BLACKMARKET
-	/* KMH, balance patch -- healthstone replaces rotting/health */
-	if (Is_blackmarket(&u.uz)) {
-	  if (obj->oclass==RING_CLASS    || obj->oclass==AMULET_CLASS   ||
-	      obj->oclass==POTION_CLASS  || obj->oclass==SCROLL_CLASS   ||
-	      obj->oclass==SPBOOK_CLASS  || obj->oclass==WAND_CLASS     ||
-	      obj->otyp==LUCKSTONE       || obj->otyp==LOADSTONE        || 
-	      objects[obj->otyp].oc_magic) {
-	    tmp *= Role_if(PM_CONVICT) ? 20 : 25;
-	  } else {
-	    tmp *= Role_if(PM_CONVICT) ? 12 : 15;
-	  }
-	}
-#endif /* BLACKMARKET */
 
 	return tmp;
 }
@@ -3591,18 +3443,6 @@ coord *mm;
 
 	cnt = abs(depth(&u.uz)) + rnd(5);
 
-#ifdef BLACKMARKET
-	if (Is_blackmarket(&u.uz)) {
-	  kop_pm[0] = PM_SOLDIER;
-	  kop_pm[1] = PM_SERGEANT;
-	  kop_pm[2] = PM_LIEUTENANT;
-	  kop_pm[3] = PM_CAPTAIN;
-	  kop_pm[4] = 0;
-  
-	  cnt = 7 + rnd(10);
-	}
-#endif /* BLACKMARKET */
- 
 	kop_cnt[0] = cnt;
 	kop_cnt[1] = (cnt / 3) + 1;   /* at least one sarge */
 	kop_cnt[2] = (cnt / 6);       /* maybe a lieutenant */

@@ -54,9 +54,6 @@ STATIC_DCL boolean FDECL(place_level, (int, struct proto_dungeon *));
 STATIC_DCL const char *FDECL(br_string, (int));
 STATIC_DCL void FDECL(print_branch, (winid, int, int, int, BOOLEAN_P, struct lchoice *));
 #endif
-#ifdef RANDOMIZED_PLANES
-STATIC_DCL void NDECL(shuffle_planes);
-#endif
 
 mapseen *mapseenchn = (struct mapseen *)0;
 /*STATIC_DCL void FDECL(free_mapseen, (mapseen *));*/
@@ -271,49 +268,6 @@ const char *s;
 	if (mptr->custom && !strcmpi(s, mptr->custom)) break;
     return mptr;
 }
-
-#ifdef RANDOMIZED_PLANES
-/**
- * Returns the next plane to go to.
- *
- * Returns NULL if on Astral Plane or not in endgame.
- */
-s_level *
-get_next_elemental_plane(lev)
-d_level *lev;
-{
-	if (!In_endgame(lev)) {
-		pline("get_next_elemental_plane not in Endgame.");
-		return (s_level *)0;
-	}
-
-	s_level *curr = find_level("astral"),
-	        *plane = (s_level *)0;
-	for (curr = sp_levchn; curr; curr = curr->next) {
-	    if (on_level(lev, &(curr->dlevel))) {
-	    	return plane;
-	    }
-	    plane = curr;
-	}
-	return (s_level *)0;
-}
-
-/**
- * Returns the first elemental plane of the endgame.
- */
-d_level *
-get_first_elemental_plane()
-{
-	s_level *curr,
-	        *dummy = find_level("dummy");
-	for (curr = find_level("astral"); curr; curr = curr->next) {
-	    if (curr->next == dummy) {
-		return &curr->dlevel;
-	    }
-	}
-	return (d_level *)0;
-}
-#endif
 
 /* Find the branch that links the named dungeon. */
 STATIC_OVL int
@@ -716,9 +670,6 @@ struct level_map {
 	{ "juiblex",	&juiblex_level },
 	{ "knox",	&knox_level },
 	{ "nymph",	&nymph_level },
-#ifdef BLACKMARKET        
-	{ "blkmar",     &blackmarket_level },
-#endif /* BLACKMARKET */
 	{ "medusa",	&medusa_level },
 	{ "oracle",	&oracle_level },
 	{ "orcus",	&orcus_level },
@@ -974,22 +925,6 @@ init_dungeons()		/* initialize the "dungeon" structs */
 				if (br) br->end1.dnum = n_dgns;
 				/* adjust the branch's position on the list */
 				insert_branch(br, TRUE);
-#ifdef ADVENT_CALENDAR
-			} else if (lev_map->lev_spec == &advcal_level) {
-				branch *br;
-				/*
-				 * Kludge to allow floating Knox entrance.  We
-				 * specify a floating entrance by the fact that
-				 * its entrance (end1) has a bogus dnum, namely
-				 * n_dgns.
-				 */
-				for (br = branches; br; br = br->next)
-				    if (on_level(&br->end2, &advcal_level)) break;
-
-				if (br) br->end1.dnum = n_dgns;
-				/* adjust the branch's position on the list */
-				insert_branch(br, TRUE);
-#endif
 			}
 		}
 	}
@@ -1002,9 +937,7 @@ init_dungeons()		/* initialize the "dungeon" structs */
 	tower_dnum = dname_to_dnum("Vlad's Tower");
 	mall_dnum = dname_to_dnum("Town");
 /*
-#ifdef BLACKMARKET
 	blackmarket_dnum = dname_to_dnum("The Black Market");
-#endif
 */
 	sheol_dnum = dname_to_dnum("Sheol");
 
@@ -1021,44 +954,10 @@ init_dungeons()		/* initialize the "dungeon" structs */
 	       so that it's hidden from <ctrl/O> feedback. */
 	}
 
-#ifdef RANDOMIZED_PLANES
-	shuffle_planes();
-#endif
-
 #ifdef DEBUG
 	dumpit();
 #endif
 }
-
-#ifdef RANDOMIZED_PLANES
-void
-shuffle_planes() /* randomizes order of elemental planes */
-{
-	/* original order */
-	s_level *dummy  = find_level("dummy") ,
-	        *earth  = find_level("earth") ,
-		*air    = find_level("air"),
-		*fire   = find_level("fire"),
-		*water  = find_level("water"),
-		*astral = find_level("astral");
-	s_level *array[] = { water, fire, air, earth };
-	int j, pos;
-	s_level *tmp;
-
-	/* Fisher-Yates shuffle aka Knuth shuffle */
-	for(j = 3; j > 0; j--) { 
-		pos = rn2(j+1); 
-		tmp = array[pos]; array[pos] = array[j]; array[j] = tmp; 
-	}
-
-	/* reorder planes */
-	astral->next = array[3];
-	for(j = 3; j > 0; j--) { 
-		array[j]->next = array[j-1];
-	}
-	array[0]->next = dummy;
-}
-#endif
 
 xchar
 dunlev(lev)	/* return the level number for lev in *this* dungeon */
@@ -1798,11 +1697,7 @@ xchar *rdgn;
 		Sprintf(eos(buf), " (tune %s)", tune);
 	    if (bymenu) {
 	    	/* If other floating branches are added, this will need to change */
-#ifdef ADVENT_CALENDAR
-	    	if ((i != advcal_level.dnum) && (i != knox_level.dnum)) {
-#else
 	    	if (i != knox_level.dnum) {
-#endif
 			lchoices.lev[lchoices.idx] = slev->dlevel.dlevel;
 			lchoices.dgn[lchoices.idx] = i;
 		} else {
@@ -2184,18 +2079,11 @@ recalc_mapseen()
 	for (x = 0; x < sizeof(mptr->rooms); x++) {
 		if (mptr->rooms[x] & MSR_SEEN) {
 			if (rooms[x].rtype >= SHOPBASE) {
-#ifdef BLACKMARKET
-				/* don't record the large single shop room on the blackmarket level */
-				if (rooms[x].rtype != BLACKSHOP) {
-#endif
 				if (!mptr->feat.nshop)
 					mptr->feat.shoptype = rooms[x].rtype;
 				else if (mptr->feat.shoptype != rooms[x].rtype)
 					mptr->feat.shoptype = 0;
 				mptr->feat.nshop = min(mptr->feat.nshop + 1, 3);
-#ifdef BLACKMARKET
-				}
-#endif
 			} else if (rooms[x].rtype == TEMPLE)
 				/* altar and temple alignment handled below */
 				mptr->feat.ntemple = min(mptr->feat.ntemple + 1, 3);

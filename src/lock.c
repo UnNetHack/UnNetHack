@@ -440,12 +440,8 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
 		    xlock.box = 0;
 
 		    /* ALI - Artifact doors */
-#ifdef ADVENT_CALENDAR
-		    if (key) {
-#else
 		    xlock.key = pick->oartifact;
 		    if (key && xlock.key != key) {
-#endif
 			if (picktyp == SKELETON_KEY) {
 			    Your("key doesn't seem to fit.");
 			    return(0);
@@ -990,10 +986,6 @@ int x, y;
 {
     /*int i;*/
 
-#ifdef ADVENT_CALENDAR
-    /* on the advent calendar level all doors are indestructible */
-    if (Is_advent_calendar(&u.uz)) return A_NONE;
-#endif
 /*
     for(i = 0; i < doorindex; i++) {
 	if (x == doors[i].x && y == doors[i].y)

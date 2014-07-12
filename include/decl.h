@@ -62,16 +62,10 @@ E struct dgn_topology {		/* special dungeon levels for speed */
     d_level	d_qstart_level, d_qlocate_level, d_nemesis_level;
     d_level	d_knox_level;
     d_level	d_nymph_level;
-#ifdef ADVENT_CALENDAR
-    d_level	d_advcal_level;
-#endif
 #ifdef RECORD_ACHIEVE
     d_level	d_mineend_level;
     d_level	d_sokoend_level;
 #endif
-#ifdef BLACKMARKET
-    d_level     d_blackmarket_level;
-#endif /* BLACKMARKET */
     d_level	d_minetown_level;
     d_level	d_town_level;
     d_level	d_moria_level;
@@ -108,16 +102,10 @@ E struct dgn_topology {		/* special dungeon levels for speed */
 #define nemesis_level		(dungeon_topology.d_nemesis_level)
 #define knox_level		(dungeon_topology.d_knox_level)
 #define nymph_level		(dungeon_topology.d_nymph_level)
-#ifdef ADVENT_CALENDAR
-# define advcal_level		(dungeon_topology.d_advcal_level)
-#endif
 #ifdef RECORD_ACHIEVE
 #define mineend_level           (dungeon_topology.d_mineend_level)
 #define sokoend_level           (dungeon_topology.d_sokoend_level)
 #endif
-#ifdef BLACKMARKET
-#define blackmarket_level	(dungeon_topology.d_blackmarket_level)
-#endif /* BLACKMARKET */
 #define minetown_level		(dungeon_topology.d_minetown_level)
 #define town_level		(dungeon_topology.d_town_level)
 #define moria_level		(dungeon_topology.d_moria_level)

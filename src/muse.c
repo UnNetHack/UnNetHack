@@ -1383,9 +1383,6 @@ struct monst *mtmp;
 	    	    	if (isok(x, y) && !closed_door(x, y) &&
 	    	    			!IS_ROCK(levl[x][y].typ) &&
 	    	    			!IS_AIR(levl[x][y].typ) &&
-#ifdef BLACKMARKET
-	    	    			!(Is_blackmarket(&u.uz) && rn2(2)) &&
-#endif
 	    	    			(((x == mmx) && (y == mmy)) ?
 	    	    			    !otmp->blessed : !otmp->cursed) &&
 					(x != u.ux || y != u.uy)) {

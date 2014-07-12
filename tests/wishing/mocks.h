@@ -224,10 +224,8 @@ struct obj* realloc_obj(struct obj *obj, int number1, genericptr_t generic, int 
 //E void NDECL(init_dungeons);
 //E s_level *FDECL(find_level, (const char *));
 //E s_level *FDECL(Is_special, (d_level *));
-//#ifdef RANDOMIZED_PLANES
 //E s_level *FDECL(get_next_elemental_plane, (d_level *));
 //E d_level *NDECL(get_first_elemental_plane);
-//#endif
 //E branch *FDECL(Is_branchlev, (d_level *));
 //E xchar FDECL(ledger_no, (d_level *));
 //E xchar NDECL(maxledgerno);
@@ -478,11 +476,9 @@ boolean costly_spot(XCHAR_P x, XCHAR_P y) { return FALSE; }
 long get_cost_of_shop_item(struct obj *obj) { return 0; }
 //E boolean FDECL(block_door, (XCHAR_P,XCHAR_P));
 //E boolean FDECL(block_entry, (XCHAR_P,XCHAR_P));
-//#ifdef BLACKMARKET
 //E void FDECL(blkmar_guards, (struct monst *));
 //E void NDECL(set_black_marketeer_angry);
 //E void FDECL(bars_around_portal, (BOOLEAN_P));
-//#endif /* BLACKMARKET */
 char* shk_your(char *buf, struct obj *obj) { return "shk_your"; }
 char* Shk_Your(char *buf, struct obj *obj) { return "Shk_Your"; }
 

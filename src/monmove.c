@@ -909,9 +909,6 @@ not_special:
 	    !mtmp->mpeaceful) minr--;
 	/* guards shouldn't get too distracted */
 	if(!mtmp->mpeaceful && (is_mercenary(ptr) 
-#ifdef BLACKMARKET
-		    || is_blkmktstaff(ptr))
-#endif /* BLACKMARKET */
 		) minr = 1;
 
 	if((likegold || likegems || likeobjs || likemagic || likerock || breakrock || conceals)

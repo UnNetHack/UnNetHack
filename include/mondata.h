@@ -272,10 +272,4 @@
 				  is_rider((ptr))) && \
 				 !mtmp->mpeaceful)
 
-#ifdef BLACKMARKET
-#define is_blkmktstaff(ptr)	(Is_blackmarket(&u.uz) && \
-				 ((ptr) == &mons[PM_BLACK_MARKETEER] || \
-				  (ptr) == &mons[PM_ONE_EYED_SAM]))
-#endif /* BLACKMARKET */
-
 #endif /* MONDATA_H */

@@ -316,9 +316,6 @@ make_version()
 		/* levels and/or topology (0..4) */
 			| (1L <<  1)
 			| (1L <<  2)
-#ifdef BLACKMARKET
-			| (1L <<  3)
-#endif
 		/* monsters (5..9) */
 			| (1L <<  6)
 #ifdef MAIL
@@ -474,9 +471,6 @@ build_savebones_compat_string()
 static const char *build_opts[] = {
 #ifdef ANSI_DEFAULT
 		"ANSI default terminal",
-#endif
-#ifdef BLACKMARKET
-		"blackmarket level",
 #endif
 #ifdef COM_COMPL
 		"command line completion",

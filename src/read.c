@@ -847,11 +847,7 @@ maybe_tame(mtmp, sobj)
 struct monst *mtmp;
 struct obj *sobj;
 {
-#ifdef BLACKMARKET                            
-	if (sobj->cursed || Is_blackmarket(&u.uz)) {
-#else
 	if (sobj->cursed) {
-#endif
 	    setmangry(mtmp);
 	} else {
 	    if (mtmp->isshk)
@@ -1529,9 +1525,6 @@ register struct obj	*sobj;
 	    	    	if (isok(x, y) && !closed_door(x, y) &&
 	    	    			!IS_ROCK(levl[x][y].typ) &&
 	    	    			!IS_AIR(levl[x][y].typ) &&
-#ifdef BLACKMARKET
-	    	    			!(Is_blackmarket(&u.uz) && rn2(2)) &&
-#endif
 					(x != u.ux || y != u.uy)) {
 				boulder_created += drop_boulder_on_monster(x, y, confused, TRUE);
 	    	    	}
