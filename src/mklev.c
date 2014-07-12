@@ -1697,11 +1697,9 @@ mkinvokearea()
     newsym(u.ux, u.uy);
     vision_full_recalc = 1;	/* everything changed */
 
-#ifdef RECORD_ACHIEVE
     achieve.perform_invocation = 1;
 #ifdef LIVELOGFILE
     livelog_achieve_update();
-#endif
 #endif
 }
 

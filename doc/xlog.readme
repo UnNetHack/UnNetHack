@@ -105,16 +105,9 @@ The file sys/unix/Makefile.top is modified to add xlogfile to the install
 target.  If you are using a different system, you may need to either initially
 create xlogfile, or modify your makefiles appropriately.
 
-Also included in this patch is an option to display the actual elapsed time
-(the time that RECORD_REALTIME logs) on the status line.  It is disabled
-by default, so to enable it you can uncomment the definition of
-REALTIME_ON_BOTL in config.h (and then set the flag showrealtime in either
-nethackrc or via the options menu.)  
-
 The REALTIME_ON_BOTL option does not depend on XLOGFILE being defined; I
 just added it to the same patch because they share most of the same code.
-It does break savefile compatibility for the same reasons that
-RECORD_REALTIME does.
+It does break savefile compatibility.
 
 Breakdown of files changed:
 include/config.h

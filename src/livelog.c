@@ -92,9 +92,7 @@ char *livelog_prefix() {
 			"dnum=%d:dname=%s:dlev=%d:maxlvl=%d:"
 			"dlev_name=%s:"
 			"hp=%d:maxhp=%d:deaths=%d:"
-#ifdef RECORD_REALTIME
 			"realtime=%ld:"
-#endif
 			"conduct=0x%lx:"
 			"role=%s:race=%s:"
 			"gender=%s:align=%s:"
@@ -113,9 +111,7 @@ char *livelog_prefix() {
 			u.uz.dnum, dungeons[u.uz.dnum].dname, depth(&u.uz), deepest_lev_reached(TRUE),
 			lev ? lev->proto : "", /* proto level name if special level */
 			u.uhp, u.uhpmax, u.umortality,
-#ifdef RECORD_REALTIME
 			(long)realtime_data.realtime,
-#endif
 			encodeconduct(),
 			urole.filecode, urace.filecode,
 			genders[flags.female].filecode, aligns[1-u.ualign.type].filecode,

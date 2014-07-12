@@ -63,9 +63,7 @@ STATIC_DCL void FDECL(free_ttlist, (struct toptenentry *));
 STATIC_DCL int FDECL(classmon, (char *,BOOLEAN_P));
 STATIC_DCL int FDECL(score_wanted,
 		(BOOLEAN_P, int,struct toptenentry *,int,const char **,int));
-#ifdef RECORD_ACHIEVE
 STATIC_DCL long FDECL(encodeachieve, (void));
-#endif
 STATIC_DCL long FDECL(encode_xlogflags, (void));
 #ifdef NO_SCAN_BRACK
 STATIC_DCL void FDECL(nsb_mung_line,(char*));
@@ -356,38 +354,24 @@ struct toptenentry *tt;
 
   (void)fprintf(rfile, SEP "flags=0x%lx", encode_xlogflags());
 
-#ifdef RECORD_CONDUCT
   (void)fprintf(rfile, SEP "conduct=0x%lx", encodeconduct());
-#endif
 
-#ifdef RECORD_TURNS
   (void)fprintf(rfile, SEP "turns=%ld", moves);
-#endif
 
-#ifdef RECORD_ACHIEVE
   (void)fprintf(rfile, SEP "achieve=0x%lx", encodeachieve());
-#endif
 
   (void)fprintf(rfile, SEP "event=%ld", encode_uevent());
   (void)fprintf(rfile, SEP "carried=%ld", encode_carried());
 
-#ifdef RECORD_REALTIME
   (void)fprintf(rfile, SEP "realtime=%ld", (long)realtime_data.realtime);
-#endif
 
-#ifdef RECORD_START_END_TIME
   (void)fprintf(rfile, SEP "starttime=%ld", (long)u.ubirthday);
   (void)fprintf(rfile, SEP "endtime=%ld", (long)u.udeathday);
-#endif
 
-#ifdef RECORD_GENDER0
   (void)fprintf(rfile, SEP "gender0=%s", genders[flags.initgend].filecode);
-#endif
 
-#ifdef RECORD_ALIGN0
   (void)fprintf(rfile, SEP "align0=%s", 
           aligns[1 - u.ualignbase[A_ORIGINAL]].filecode);
-#endif
   (void)fprintf(rfile, SEP "elbereths=%ld", u.uconduct.elbereths);
 
   (void)fprintf(rfile, SEP "xplevel=%d", u.ulevel); /* XP level */
@@ -1024,7 +1008,6 @@ encode_xlogflags(void)
 	return e;
 }
 
-#ifdef RECORD_CONDUCT
 long
 encodeconduct(void)
 {
@@ -1045,9 +1028,7 @@ encodeconduct(void)
 
        return e;
 }
-#endif
 
-#ifdef RECORD_ACHIEVE
 long
 encodeachieve(void)
 {
@@ -1086,7 +1067,6 @@ encodeachieve(void)
 
   return r;
 }
-#endif
 
 /*
  * print selected parts of score list.

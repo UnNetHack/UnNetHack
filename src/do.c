@@ -1318,10 +1318,8 @@ boolean at_stairs, falling, portal;
 
 	initrack();
 
-#ifdef RECORD_ACHIEVE
 #ifdef LIVELOGFILE
 	livelog_achieve_update();
-#endif
 #endif
 
 	if ((mtmp = m_at(u.ux, u.uy)) != 0
@@ -1381,11 +1379,9 @@ boolean at_stairs, falling, portal;
 	    else
 		pline("It is freezing here.  You feel cold wind...");
 
-#ifdef RECORD_ACHIEVE
 	achieve.enter_gehennom = 1;
 #ifdef LIVELOGFILE
 	livelog_achieve_update();
-#endif
 #endif
 	}
 	else if (In_hell(&u.uz0) &&

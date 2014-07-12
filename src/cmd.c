@@ -1510,7 +1510,6 @@ boolean want_disp;
 	    you_have_X(buf);
 	}
 
-#ifdef RECORD_ACHIEVE
 	if ((wizard || final) && !u.uconduct.sokoban) {
 		you_have_never("used any Sokoban shortcuts");
 	} else if (wizard || final) {
@@ -1518,7 +1517,6 @@ boolean want_disp;
 			u.uconduct.sokoban, plur(u.uconduct.sokoban));
 		you_have_X(buf);
 	}
-#endif
 
 	dump_list_end();
 	dump("", "");
@@ -2828,12 +2826,10 @@ boolean paranoid;
 void
 sokoban_trickster()
 {
-#ifdef RECORD_ACHIEVE
 	if (!achieve.finish_sokoban) {
 		/* not yet found the sokoban prize */
 		u.uconduct.sokoban += 1;
 	}
-#endif
 }
 
 /*cmd.c*/

@@ -531,9 +531,7 @@ void obj_stop_timers(struct obj *obj) {}
 //E void FDECL(relink_timers, (BOOLEAN_P));
 
 /* ### topten.c ### */
-//#ifdef RECORD_CONDUCT
 //E long FDECL(encodeconduct, (void));
-//#endif
 //E void FDECL(topten, (int));
 //E void FDECL(prscore, (int,char **));
 struct obj* tt_oname(struct obj *obj) { return NULL; }

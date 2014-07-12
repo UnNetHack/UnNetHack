@@ -716,8 +716,6 @@ newgame()
 	save_currentstate();
 	program_state.something_worth_saving++;	/* useful data now exists */
 
-#if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
-
 	/* Start the timer here */
 	realtime_data.realtime = (time_t)0L;
 
@@ -726,8 +724,6 @@ newgame()
 #else
 	(void) time(&realtime_data.restoretime);
 #endif
-
-#endif /* RECORD_REALTIME || REALTIME_ON_BOTL */
 
 	/* Success! */
 	welcome(TRUE);
@@ -777,7 +773,6 @@ boolean new_game;	/* false => restoring an old game */
 	}
 }
 
-#if defined(REALTIME_ON_BOTL) || defined (RECORD_REALTIME)
 time_t
 get_realtime(void)
 {
@@ -816,7 +811,6 @@ get_realtime(void)
 	return time_spent_playing;
 }
 #undef MAX_IDLE_TIME_IN_SECONDS
-#endif /* REALTIME_ON_BOTL || RECORD_REALTIME */
 
 /** Interrupt a multiturn action if current_points is equal to max_points. */
 STATIC_DCL

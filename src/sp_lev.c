@@ -1967,7 +1967,6 @@ struct mkroom	*croom;
 	    }
 	}
 
-#ifdef RECORD_ACHIEVE
 	/* Nasty hack here: try to determine if this is the Mines 
 	 * "prize" and then set record_achieve_special (maps to corpsenm)
 	 * for the object.  That field will later be checked to find out if
@@ -1975,7 +1974,6 @@ struct mkroom	*croom;
 	if(otmp->otyp == LUCKSTONE && Is_mineend_level(&u.uz)) {
 		otmp->record_achieve_special = 1;
 	}
-#endif
 
 	stackobj(otmp);
 

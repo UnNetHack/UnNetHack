@@ -62,10 +62,8 @@ E struct dgn_topology {		/* special dungeon levels for speed */
     d_level	d_qstart_level, d_qlocate_level, d_nemesis_level;
     d_level	d_knox_level;
     d_level	d_nymph_level;
-#ifdef RECORD_ACHIEVE
     d_level	d_mineend_level;
     d_level	d_sokoend_level;
-#endif
     d_level	d_minetown_level;
     d_level	d_town_level;
     d_level	d_moria_level;
@@ -102,10 +100,8 @@ E struct dgn_topology {		/* special dungeon levels for speed */
 #define nemesis_level		(dungeon_topology.d_nemesis_level)
 #define knox_level		(dungeon_topology.d_knox_level)
 #define nymph_level		(dungeon_topology.d_nymph_level)
-#ifdef RECORD_ACHIEVE
 #define mineend_level           (dungeon_topology.d_mineend_level)
 #define sokoend_level           (dungeon_topology.d_sokoend_level)
-#endif
 #define minetown_level		(dungeon_topology.d_minetown_level)
 #define town_level		(dungeon_topology.d_town_level)
 #define moria_level		(dungeon_topology.d_moria_level)
@@ -472,7 +468,6 @@ E struct _plinemsg *pline_msg;
 #define MSGTYP_NOSHOW	2
 #define MSGTYP_STOP	3
 
-#ifdef RECORD_ACHIEVE
 struct u_achieve {
         Bitfield(get_bell,1);        /* You have obtained the bell of 
                                       * opening */
@@ -495,16 +490,13 @@ struct u_achieve {
 };
 
 E struct u_achieve achieve;
-#endif
 
-#if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
 E struct realtime_data {
   time_t realtime;    /* Amount of actual playing time up until the last time
                        * the game was restored. */
   time_t restoretime; /* The time that the game was started or restored. */
   time_t last_displayed_time; /* Last time displayed on the status line */
 } realtime_data;
-#endif /* RECORD_REALTIME || REALTIME_ON_BOTL */
 
 #ifdef SIMPLE_MAIL
 E int mailckfreq;

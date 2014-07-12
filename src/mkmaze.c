@@ -463,9 +463,7 @@ fixup_special()
 					if (otmp->spe < 0) { otmp->spe = 0; }
 
 					price++;
-#ifdef RECORD_ACHIEVE
 					if (otmp) otmp->record_achieve_special = 1;
-#endif
 				}
 			}
 		}

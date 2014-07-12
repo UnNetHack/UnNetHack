@@ -590,11 +590,7 @@ boolean playing; /**< True if game is running.  */
 	        urace.adj,
 	        genders[flags.female].filecode,
 	        align_str(u.ualign.type),
-#ifdef RECORD_CONDUCT
 	        encodeconduct(),
-#else
-	        0L,
-#endif
 	        u.uhave.amulet ? 1 : 0,
 	        u.uevent.ascended ? 2 : killer ? 1 : 0,
 	        playing);
