@@ -38,5 +38,5 @@ val AM_SPLEV_CO = 3
 val AM_SPLEV_NONCO = 7
 
 // MOTODO def Amask2align(x: Int) = (aligntyp) if (!x) A_NONE else if (x == AM_LAWFUL)  A_LAWFUL else ((int)x) - 2))
-def Align2amask(x: aligntyp) = if (x == A_NONE) AM_NONE else if (x == A_LAWFUL) AM_LAWFUL else (x) + 2
+def Align2amask(x: aligntyp) = if (x == A_NONE) AM_NONE else if (x == A_LAWFUL) AM_LAWFUL else (x + 2)
 }

@@ -50,10 +50,8 @@ extern int errno;
 # define O_BINARY 0
 #endif
 
-#ifdef PREFIXES_IN_USE
 #define FQN_NUMBUF 4
 static char fqn_filename_buffer[FQN_NUMBUF][FQN_MAX_FILENAME];
-#endif
 
 #if !defined(WIN32)
 char bones[] = "bonesnn.xxx";
@@ -123,9 +121,7 @@ STATIC_DCL char *FDECL(make_lockname, (const char *,char *));
 STATIC_DCL FILE *FDECL(fopen_config_file, (const char *));
 STATIC_DCL int FDECL(get_uchars, (FILE *,char *,char *,uchar *,BOOLEAN_P,int,const char *));
 int FDECL(parse_config_line, (FILE *,char *,char *,char *, BOOLEAN_P));
-#ifdef NOCWD_ASSUMPTIONS
 STATIC_DCL void FDECL(adjust_prefix, (char *, int));
-#endif
 #ifdef SELF_RECOVER
 STATIC_DCL boolean FDECL(copy_bytes, (int, int));
 #endif
@@ -242,17 +238,11 @@ int bufsz;
 	return callerbuf;
 }
 
-#ifndef PREFIXES_IN_USE
-/*ARGSUSED*/
-#endif
 const char *
 fqname(basename, whichprefix, buffnum)
 const char *basename;
 int whichprefix, buffnum;
 {
-#ifndef PREFIXES_IN_USE
-	return basename;
-#else
 	if (!basename || whichprefix < 0 || whichprefix >= PREFIX_COUNT)
 		return basename;
 	if (!fqn_prefix[whichprefix])
@@ -270,7 +260,6 @@ int whichprefix, buffnum;
 	}
 	Strcpy(fqn_filename_buffer[buffnum], fqn_prefix[whichprefix]);
 	return strcat(fqn_filename_buffer[buffnum], basename);
-#endif
 }
 
 /* reasonbuf must be at least BUFSZ, supplied by caller */
@@ -279,7 +268,6 @@ int
 validate_prefix_locations(reasonbuf)
 char *reasonbuf;
 {
-#if defined(NOCWD_ASSUMPTIONS)
 	FILE *fp;
 	const char *filename;
 	int prefcnt, failcount = 0;
@@ -311,7 +299,6 @@ char *reasonbuf;
 	if (failcount)
 		return 0;
 	else
-#endif
 	return 1;
 }
 
@@ -1593,7 +1580,6 @@ gi_error:
     /*NOTREACHED*/
 }
 
-#ifdef NOCWD_ASSUMPTIONS
 STATIC_OVL void
 adjust_prefix(bufp, prefixid)
 char *bufp;
@@ -1610,7 +1596,6 @@ int prefixid;
 		append_slash(fqn_prefix[prefixid]);
 	}
 }
-#endif
 
 #define match_varname(INP,NAM,LEN) match_optname(INP, NAM, LEN, TRUE)
 
@@ -1659,7 +1644,6 @@ boolean		recursive;
 			plnamesuffix();	/* set the character class */
 	} else if (match_varname(buf, "AUTOPICKUP_EXCEPTION", 5)) {
 		add_autopickup_exception(bufp);
-#ifdef NOCWD_ASSUMPTIONS
 	} else if (match_varname(buf, "HACKDIR", 4)) {
 		adjust_prefix(bufp, HACKPREFIX);
 	} else if (match_varname(buf, "LEVELDIR", 4) ||
@@ -1679,8 +1663,6 @@ boolean		recursive;
 		adjust_prefix(bufp, CONFIGPREFIX);
 	} else if (match_varname(buf, "TROUBLEDIR", 4)) {
 		adjust_prefix(bufp, TROUBLEPREFIX);
-#else /*NOCWD_ASSUMPTIONS*/
-#endif /*NOCWD_ASSUMPTIONS*/
 
 	} else if (match_varname(buf, "NAME", 4)) {
 	    (void) strncpy(plname, bufp, PL_NSIZ-1);
@@ -2016,7 +1998,6 @@ paniclog(type, reason)
 const char *type;	/* panic, impossible, trickery */
 const char *reason;	/* explanation */
 {
-#ifdef PANICLOG
 	FILE *lfile;
 	char buf[BUFSZ];
 
@@ -2032,7 +2013,6 @@ const char *reason;	/* explanation */
 		}
 		program_state.in_paniclog = 0;
 	}
-#endif /* PANICLOG */
 	return;
 }
 

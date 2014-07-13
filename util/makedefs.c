@@ -565,9 +565,7 @@ static const char *build_opts[] = {
 		"user sounds via pmatch",
 # endif
 #endif
-#ifdef PREFIXES_IN_USE
 		"variable playground",
-#endif
 #ifdef WIN_EDGE
 		"win_edge",
 #endif

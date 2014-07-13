@@ -57,9 +57,6 @@ dosh()
 	int spawnstat;
 	if ((comspec = getcomspec())) {
 		suspend_nhwindows("To return to NetHack, enter \"exit\" at the system prompt.\n");
-#  ifndef NOCWD_ASSUMPTIONS
-		chdirx(orgdir, 0);
-#  endif
 #   ifdef MOVERLAY
        /* Free the cache memory used by overlays, close .exe */
 	_movefpause |= __MOVE_PAUSE_DISK;
@@ -75,9 +72,6 @@ dosh()
 			raw_printf("Can't spawn \"%s\"!", comspec);
 			getreturn("to continue");
 		}
-#  ifndef NOCWD_ASSUMPTIONS
-		chdirx(hackdir, 0);
-#  endif
 		get_scr_size(); /* maybe the screen mode changed (TH) */
 		resume_nhwindows();
 	} else

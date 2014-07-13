@@ -28,11 +28,6 @@
  * -----------------------------------------------------------------
  */
 
-#define NOCWD_ASSUMPTIONS	/* Always define this. There are assumptions that
-                                   it is defined for WIN32.
-				   Allow paths to be specified for HACKDIR,
-				   LEVELDIR, SAVEDIR, BONESDIR, DATADIR,
-				   SCOREDIR, LOCKDIR, CONFIGDIR, and TROUBLEDIR */
 #define NO_TERMS
 #define ASCIIGRAPH
 

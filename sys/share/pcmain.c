@@ -89,9 +89,7 @@ char *argv[];
 #if defined(WIN32)
 	char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
 #endif
-#ifdef NOCWD_ASSUMPTIONS
 	char failbuf[BUFSZ];
-#endif
 
 	hname = "UnNetHack";      /* used for syntax messages */
 
@@ -116,7 +114,6 @@ char *argv[];
 	if (dir != (char *)0) {
 		(void) strncpy(hackdir, dir, PATHLEN - 1);
 		hackdir[PATHLEN-1] = '\0';
-#ifdef NOCWD_ASSUMPTIONS
 		{
 		    int prefcnt;
 
@@ -126,17 +123,14 @@ char *argv[];
 		    for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++)
 			fqn_prefix[prefcnt] = fqn_prefix[0];
 		}
-#endif
 	}
 	initoptions();
 
-#ifdef NOCWD_ASSUMPTIONS
 	if (!validate_prefix_locations(failbuf)) {
 		raw_printf("Some invalid directory locations were specified:\n\t%s\n",
 				failbuf);
 		 nethack_exit(EXIT_FAILURE);
 	}
-#endif
 
 	if (!hackdir[0])
 #if !defined(LATTICE)
