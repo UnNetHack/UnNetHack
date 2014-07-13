@@ -221,7 +221,6 @@ typedef long glyph_t;
  */
 #endif
 
-/*#define GOLDOBJ */	/* Gold is kept on obj chains - Helge Hafting */
 #define DUMP_LOG        /* Dump game end information to a file */
 /* #define DUMP_FN "/tmp/%n.nh" */      /* Fixed dumpfile name, if you want
                                          * to prevent definition by users */

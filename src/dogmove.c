@@ -290,11 +290,7 @@ int udist;
 	/* if we are carrying sth then we drop it (perhaps near @) */
 	/* Note: if apport == 1 then our behaviour is independent of udist */
 	/* Use udist+1 so steed won't cause divide by zero */
-#ifndef GOLDOBJ
 	if(DROPPABLES(mtmp) || mtmp->mgold) {
-#else
-	if(DROPPABLES(mtmp)) {
-#endif
 	    if (!rn2(udist+1) || !rn2(edog->apport))
 		if(rn2(10) < edog->apport){
 		    relobj(mtmp, (int)mtmp->minvis, TRUE);

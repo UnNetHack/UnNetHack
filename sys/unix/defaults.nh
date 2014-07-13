@@ -19,13 +19,8 @@ OPTIONS=pickup_types:$"?!=/
 # Valid values are: unencumbered, burdened, stressed, strained, or overtaxed
 OPTIONS=pickup_burden:burdened
 
-# German keyboard layout users can uncomment following option
-# to swap the 'y' and 'z' keys:
-OPTIONS=!qwertz_layout
-
 # Show descriptive dungeon names on bottom status line
 OPTIONS=show_dgn_name
-
 
 ## Interface settings
 # display color for different monsters, objects, and dungeon features

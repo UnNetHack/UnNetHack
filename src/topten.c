@@ -382,11 +382,7 @@ struct toptenentry *tt;
                                        hell_and_hell_mode ? "hah" :
                                        heaven_or_hell_mode ? "hoh" :
                                        "normal"));
-#ifndef GOLDOBJ
   (void)fprintf(rfile, SEP "gold=%ld", u.ugold); /* hidden_gold() is not needed anymore */
-#else
-  (void)fprintf(rfile, SEP "gold=%ld", money_cnt(invent));
-#endif
 
   (void)fprintf(rfile, "\n");
 

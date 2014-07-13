@@ -86,7 +86,7 @@ val W_ARMS = 0x00000008L /* Shield */
 val W_ARMG = 0x00000010L /* Gloves/gauntlets */
 val W_ARMF = 0x00000020L /* Footwear */
 val W_ARMU = 0x00000040L /* Undershirt */
-#	define W_ARMOR	     (W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU)
+val W_ARMOR = (W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU)
 	/* Weapons and artifacts */
 val W_WEP = 0x00000100L /* Wielded weapon */
 val W_QUIVER = 0x00000200L /* Quiver for (f)iring ammo */

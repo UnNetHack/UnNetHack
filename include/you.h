@@ -416,11 +416,7 @@ struct you {
 	int ugangr;			/* if the gods are angry at you */
 	int ugifts;			/* number of artifacts bestowed */
 	int ublessed, ublesscnt;	/* blessing/duration from #pray */
-#ifndef GOLDOBJ
 	long	ugold, ugold0;
-#else
-	long	umoney0;
-#endif
 	long	uexp, urexp;
 	long	urscore;	/**< the current score */
 	long	ucleansed;	/* to record moves when player was cleansed */

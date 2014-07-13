@@ -164,9 +164,6 @@ static struct Bool_Opt
 #ifdef QUIVER_FIRED
 	{"quiver_fired", &iflags.quiver_fired, TRUE, SET_IN_GAME},
 #endif
-#ifdef QWERTZ
-	{"qwertz_layout", &iflags.qwertz_layout, FALSE, SET_IN_GAME},
-#endif
 	{"rawio", (boolean *)0, FALSE, SET_IN_FILE},
 	{"rest_on_space", &iflags.rest_on_space, FALSE, SET_IN_FILE},
 	{"safe_pet", &flags.safe_dog, TRUE, SET_IN_GAME},
@@ -835,12 +832,8 @@ char *op;
     char *sp, buf[BUFSZ];
 
     num = 0;
-#ifndef GOLDOBJ
     if (!index(op, GOLD_SYM))
 	buf[num++] = COIN_CLASS;
-#else
-    /*  !!!! probably unnecessary with gold as normal inventory */
-#endif
 
     for (sp = op; *sp; sp++) {
 	oc_sym = def_char_to_objclass(*sp);
@@ -1808,18 +1801,6 @@ boolean tinitial, tfrom_file;
 		} else badoption(opts);
 		return;
 	}
-
-#ifdef QWERTZ
-	fullname = "qwertz_layout";
-	if (match_optname(opts, fullname, 6, FALSE)) {
-		if (negated)
-			sdir=qykbd_dir;
-		else
-			sdir=qzkbd_dir;
-		iflags.qwertz_layout=!negated;
-		return;
-	}
-#endif
 
 	fullname = "runmode";
 	if (match_optname(opts, fullname, 4, TRUE)) {

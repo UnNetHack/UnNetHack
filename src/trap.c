@@ -2937,7 +2937,6 @@ boolean *lostsome;
 		    /* else continue */
 		}
 	    }
-#ifndef GOLDOBJ
 	    if (!otmp) {
 		/* Nothing available left to drop; try gold */
 		if (u.ugold) {
@@ -2958,9 +2957,6 @@ boolean *lostsome;
 		/* We can't even drop gold! */
 		return (FALSE);
 	    }
-#else
-	    if (!otmp) return (FALSE); /* nothing to drop! */	
-#endif
 	    if (otmp->owornmask) remove_worn_item(otmp, FALSE);
 	    *lostsome = TRUE;
 	    dropx(otmp);

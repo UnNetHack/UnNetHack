@@ -33,7 +33,7 @@ def STR18(x: Int) = (18+(x))	/* 18/xx */
 def STR19(x: Int) = (100+(x))	/* For 19 and above */
 
 class attribs {
-	var a = new Array[schar](A_MAX)
+	val a = new Array[schar](A_MAX)
 }
 
 // MOTODO #define ATTRMAX(x) ((x == A_STR && Upolyd && strongmonst(youmonst.data)) ? STR18(100) : urace.attrmax(x))

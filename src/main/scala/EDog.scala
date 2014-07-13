@@ -20,7 +20,7 @@ val TABU = 7
 class edog {
 	var uroptime =  0			/* moment dog dropped object */
 	var dropdist = 0		/* dist of drpped obj from @ */
-	var int apport = 0			/* amount of training */
+	var apport = 0			/* amount of training */
 	var whistletime = 0		/* last time he whistled */
 	var hungrytime = 0		/* will get hungry at this time */
 	var ogoal = new coord()		/* previous goal location */

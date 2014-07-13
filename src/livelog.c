@@ -121,11 +121,7 @@ char *livelog_prefix() {
 			 hell_and_hell_mode ? "hah" :
 			 heaven_or_hell_mode ? "hoh" :
 			 "normal"),
-#ifndef GOLDOBJ
 			(u.ugold + hidden_gold())
-#else
-			(money_cnt(invent) + hidden_gold())
-#endif
 			);
 	return prefixbuf;
 }

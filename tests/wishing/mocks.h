@@ -343,9 +343,6 @@ char* in_rooms(XCHAR_P x, XCHAR_P y, int number) { return NULL; }
 //E int NDECL(max_capacity);
 //E boolean FDECL(check_capacity, (const char *));
 //E int NDECL(inv_cnt);
-//#ifdef GOLDOBJ
-//E long FDECL(money_cnt, (struct obj *));
-//#endif
 
 /* ### invent.c ### */
 int merged(struct obj **obj1, struct obj **obj2) { return 0; }
@@ -390,9 +387,6 @@ void obj_split_light_source(struct obj *obj1, struct obj *obj2) {}
 //E void FDECL(set_mimic_sym, (struct monst *));
 //E int FDECL(mbirth_limit, (int));
 //E void FDECL(mimic_hit_msg, (struct monst *, SHORT_P));
-//#ifdef GOLDOBJ
-//E void FDECL(mkmonmoney, (struct monst *, long));
-//#endif
 //E int FDECL(bagotricks, (struct obj *));
 //E boolean FDECL(propagate, (int, BOOLEAN_P,BOOLEAN_P));
 //E void FDECL(create_camera_demon, (struct obj *,int,int));
@@ -419,10 +413,6 @@ void discover_object(int number, BOOLEAN_P bool1, BOOLEAN_P bool2) {}
 //E void NDECL(dragons_init);
 
 /* ### shk.c ### */
-//#ifdef GOLDOBJ
-//E long FDECL(money2mon, (struct monst *, long));
-//E void FDECL(money2u, (struct monst *, long));
-//#endif
 //E char *FDECL(shkname, (struct monst *));
 //E void FDECL(shkgone, (struct monst *));
 //E void FDECL(set_residency, (struct monst *,BOOLEAN_P));

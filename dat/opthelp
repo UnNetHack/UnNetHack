@@ -91,9 +91,6 @@ quiver_fired   when using the f (fire) command and no ammunition
                is quivered, prompt for ammunition to quiver, then 
                fire it.                                           [TRUE]
 
-Boolean option if QWERTZ was set at compile time:
-qwertz_layout  swap the y and z keys                              [FALSE]
-
 Boolean option if WIN_EDGE was set at compile time (tty interface only):
 win_edge       align menus and text windows left instead of right [FALSE]
 

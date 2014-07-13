@@ -95,7 +95,6 @@ boolean quietly;
 
 	for (otmp = invent; otmp; otmp = otmp2) {
 	    otmp2 = otmp->nobj;
-#ifndef GOLDOBJ
 	    if (otmp->oclass == COIN_CLASS) {
 		/* in_use gold is created by some menu operations */
 		if (!otmp->in_use) {
@@ -105,7 +104,6 @@ boolean quietly;
 		otmp->in_use = FALSE;
 		dealloc_obj(otmp);
 	    } else
-#endif /* GOLDOBJ */
 	    if (otmp->in_use) {
 		if (!quietly) pline("Finishing off %s...", xname(otmp));
 		useup(otmp);

@@ -44,7 +44,6 @@ int shotlimit;
 	boolean twoweap;
 
 	/* ask "in what direction?" */
-#ifndef GOLDOBJ
 	if (!getdir((char *)0)) {
 		if (obj->oclass == COIN_CLASS) {
 		    u.ugold += obj->quan;
@@ -55,24 +54,6 @@ int shotlimit;
 	}
 
 	if(obj->oclass == COIN_CLASS) return(throw_gold(obj));
-#else
-	if (!getdir((char *)0)) {
-	    /* obj might need to be merged back into the singular gold object */
-	    freeinv(obj);
-	    addinv(obj);
-	    return(0);
-	}
-
-        /*
-	  Throwing money is usually for getting rid of it when
-          a leprechaun approaches, or for bribing an oncoming 
-          angry monster.  So throw the whole object.
-
-          If the money is in quiver, throw one coin at a time,
-          possibly using a sling.
-        */
-	if(obj->oclass == COIN_CLASS && obj != uquiver) return(throw_gold(obj));
-#endif
 
 	if(!canletgo(obj,"throw"))
 		return(0);
@@ -1850,34 +1831,22 @@ throw_gold(obj)
 struct obj *obj;
 {
 	int range, odx, ody;
-#ifndef GOLDOBJ
 	long zorks = obj->quan;
-#endif
 	register struct monst *mon;
 
 	if(!u.dx && !u.dy && !u.dz) {
-#ifndef GOLDOBJ
 		u.ugold += obj->quan;
 		flags.botl = 1;
 		dealloc_obj(obj);
-#endif
 		You("cannot throw gold at yourself.");
 		return(0);
 	}
-#ifdef GOLDOBJ
-        freeinv(obj);
-#endif
 	if(u.uswallow) {
 		pline(is_animal(u.ustuck->data) ?
 			"%s in the %s's entrails." : "%s into %s.",
-#ifndef GOLDOBJ
 			"The gold disappears", mon_nam(u.ustuck));
 		u.ustuck->mgold += zorks;
 		dealloc_obj(obj);
-#else
-			"The money disappears", mon_nam(u.ustuck));
-		add_to_minv(u.ustuck, obj);
-#endif
 		return(1);
 	}
 

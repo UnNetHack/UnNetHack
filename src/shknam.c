@@ -447,8 +447,7 @@ struct mkroom	*sroom;
 
   shkmoney = 1000L + 30L*(long)rnd(100);	/* initial capital */
   						/* [CWC] Lets not create the money yet until we see if the
-  							 shk is a black marketeer, else we'll have to create
-  						   another money object, if GOLDOBJ is defined */
+  							 shk is a black marketeer */
 
 	if (shp->shknms == shkrings)
 	    (void) mongets(shk, TOUCHSTONE);
@@ -458,11 +457,7 @@ struct mkroom	*sroom;
 	if (Is_town_level(&u.uz))
 		shkmoney /= 4;
 
-#ifndef GOLDOBJ
 	shk->mgold = shkmoney;	
-#else
-	mkmonmoney(shk, shkmoney);
-#endif
 
 	return(sh);
 }

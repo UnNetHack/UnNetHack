@@ -1788,13 +1788,8 @@ eatspecial() /* called after eating non-food */
 	victual.piece = (struct obj *)0;
 	victual.eating = 0;
 	if (otmp->oclass == COIN_CLASS) {
-#ifdef GOLDOBJ
-		if (carried(otmp))
-		    useupall(otmp);
-#else
 		if (otmp->where == OBJ_FREE)
 		    dealloc_obj(otmp);
-#endif
 		else
 		    useupf(otmp, otmp->quan);
 		return;

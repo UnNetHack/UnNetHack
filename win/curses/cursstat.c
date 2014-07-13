@@ -557,30 +557,18 @@ void curses_update_stats(boolean redraw)
     }
     
     /* Gold */
-#ifndef GOLDOBJ
     if (prevau.value != u.ugold)    /* Gold changed */
     {
         if (u.ugold > prevau.value)
         {
-#else
-    if (prevau.value != money_cnt(invent))  /* Gold changed */
-    {
-        if (money_cnt(invent) > prevau.value)
-        {
-#endif
             prevau.highlight_color = HI_GOLD;
         }
         else
         {
             prevau.highlight_color = STAT_DOWN_COLOR;
         }
-#ifndef GOLDOBJ
         prevau.value = u.ugold;
         sprintf(buf,"%ld", u.ugold);
-#else
-        prevau.value = money_cnt(invent);
-        sprintf(buf,"%ld", money_cnt(invent));
-#endif
         free(prevau.txt);
         prevau.txt = curses_copy_of(buf);
         prevau.highlight_turns = 5;
@@ -1850,13 +1838,8 @@ static void init_stats()
     set_stat_color(&prevdepth);
     
     /* Gold */
-#ifndef GOLDOBJ
     sprintf(buf,"%ld", u.ugold);
     prevau.value = u.ugold;
-#else
-    sprintf(buf,"%ld", money_cnt(invent));
-    prevau.value = money_cnt(invent);
-#endif
     prevau.txt = curses_copy_of(buf);
     prevau.display = TRUE;
     prevau.highlight_turns = 0;

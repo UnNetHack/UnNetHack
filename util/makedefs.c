@@ -324,9 +324,6 @@ make_version()
 		/* objects (10..14) */
 			| (1L << 10)
 			| (1L << 11)
-#ifdef GOLDOBJ
-			| (1L << 12)
-#endif
 		/* flag bits and/or other global variables (15..26) */
 			| (1L << 17)
 			| (1L << 18)
@@ -489,9 +486,6 @@ static const char *build_opts[] = {
 #endif
 #ifdef EXP_ON_BOTL
 		"experience points on status line",
-#endif
-#ifdef GOLDOBJ
-		"gold object in inventories",
 #endif
 #ifdef HOLD_LOCKFILE_OPEN
 		"exclusive lock on level 0 file",
