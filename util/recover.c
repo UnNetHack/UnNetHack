@@ -52,9 +52,7 @@ char *argv[];
 
 	if (!dir) dir = getenv("NETHACKDIR");
 	if (!dir) dir = getenv("HACKDIR");
-#ifdef FILE_AREAS
 	if (!dir) dir = FILE_AREA_LEVL;
-#endif
 #if defined(EXEPATH)
 	if (!dir) dir = exepath(argv[0]);
 #endif
@@ -148,11 +146,7 @@ create_savefile()
 {
 	int fd;
 	char savefile[BUFSIZ];
-#ifdef FILE_AREAS
 	snprintf(savefile, BUFSIZ, "%s/%s", FILE_AREA_SAVE, savename);
-#else
-	strcpy(savefile, savename);
-#endif
 
 #if defined(WIN32)
 	fd = open(savefile, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK);

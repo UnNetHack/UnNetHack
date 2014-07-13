@@ -150,7 +150,6 @@ eos(s)
  * actual port functions, rather than duplicating them here, if other ports
  * follow suit.
  */
-#ifdef FILE_AREAS
 #ifdef UNIX
 FILE *
 fopen_datafile_area(filearea, filename, mode)
@@ -173,14 +172,6 @@ const char *filearea, *filename, *mode;
     return fp;
 }
 #endif
-#else	/* FILE_AREAS */
-FILE *
-fopen_datafile(filename, mode)
-const char *filename, *mode;
-{
-    return fopen(filename, mode);
-}
-#endif	/* FILE_AREAS */
 
 #endif	/* DLBLIB */
 #endif	/* DLB */

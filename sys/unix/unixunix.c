@@ -69,18 +69,10 @@ eraseoldlocks()
 	for(i = 1; i <= MAXDUNGEON*MAXLEVEL + 1; i++) {
 		/* try to remove all */
 		set_levelfile_name(lock, i);
-#ifdef FILE_AREAS
 		(void) remove_area(FILE_AREA_LEVL, lock);
-#else
-		(void) unlink(fqname(lock, LEVELPREFIX, 0));
-#endif
 	}
 	set_levelfile_name(lock, 0);
-#ifdef FILE_AREAS
 	if (remove_area(FILE_AREA_LEVL, lock))
-#else
-	if (unlink(fqname(lock, LEVELPREFIX, 0)))
-#endif
 		return(0);				/* cannot remove it */
 	return(1);					/* success! */
 }
@@ -89,9 +81,6 @@ void
 getlock()
 {
 	register int i = 0, fd, c;
-#ifndef FILE_AREAS
-	const char *fq_lock;
-#endif
 
 #ifdef TTY_GRAPHICS
 	/* idea from rpick%ucqais@uccba.uc.edu
@@ -107,11 +96,7 @@ getlock()
 #endif
 
 	/* we ignore QUIT and INT at this point */
-#ifndef FILE_AREAS
-	if (!lock_file(HLOCK, LOCKPREFIX, 10)) {
-#else
 	if (!lock_file_area(HLOCK_AREA, HLOCK, 10)) {
-#endif
 		wait_synch();
 		error("%s", "");
 	}
@@ -125,22 +110,11 @@ getlock()
 		do {
 			lock[0] = 'a' + i++;
 
-#ifndef FILE_AREAS
-			fq_lock = fqname(lock, LEVELPREFIX, 0);
-			if((fd = open(fq_lock, 0, 0)) == -1) {
-#else
 			if((fd = open_area(FILE_AREA_LEVL, lock, 0, 0)) == -1) {
-#endif
 			    if(errno == ENOENT) goto gotlock; /* no such file */
-#ifndef FILE_AREAS
-			    perror(fq_lock);
-			    unlock_file(HLOCK);
-			    error("Cannot open %s", fq_lock);
-#else
 			    perror(lock);
 			    unlock_file_area(HLOCK_AREA, HLOCK);
 			    error("Cannot open %s", lock);
-#endif
 			}
 
 			if(veryold(fd) /* closes fd if true */
@@ -152,22 +126,11 @@ getlock()
 		unlock_file_area(HLOCK_AREA, HLOCK);
 		error("Too many hacks running now.");
 	} else {
-#ifndef FILE_AREAS
-		fq_lock = fqname(lock, LEVELPREFIX, 0);
-		if((fd = open(fq_lock, 0, 0)) == -1) {
-#else
 		if((fd = open_area(FILE_AREA_LEVL, lock, 0, 0)) == -1) {
-#endif
 			if(errno == ENOENT) goto gotlock;    /* no such file */
-#ifndef FILE_AREAS
-			perror(fq_lock);
-			unlock_file(HLOCK);
-			error("Cannot open %s", fq_lock);
-#else
 			perror(lock);
 			unlock_file_area(HLOCK_AREA, HLOCK);
 			error("Cannot open %s", lock);
-#endif
 		}
 
 		if(veryold(fd) /* closes fd if true */ && eraseoldlocks())
@@ -213,36 +176,20 @@ getlock()
 	}
 
 gotlock:
-#ifndef FILE_AREAS
-	fd = creat(fq_lock, FCMASK);
-#else
 	fd = creat_area(FILE_AREA_LEVL, lock, FCMASK);
-#endif
 	unlock_file_area(HLOCK_AREA, HLOCK);
 	if(fd == -1) {
-#ifndef FILE_AREAS
-		error("cannot creat lock file (%s).", fq_lock);
-#else
 		error("cannot creat lock file (%s in %s).", lock,
 		  FILE_AREA_LEVL);
-#endif
 	} else {
 		if(write(fd, (genericptr_t) &hackpid, sizeof(hackpid))
 		    != sizeof(hackpid)){
-#ifndef FILE_AREAS
-			error("cannot write lock (%s)", fq_lock);
-#else
 			error("cannot write lock (%s in %s)", lock,
 			  FILE_AREA_LEVL);
-#endif
 		}
 		if(close(fd) == -1) {
-#ifndef FILE_AREAS
-			error("cannot close lock (%s)", fq_lock);
-#else
 			error("cannot close lock (%s in %s)", lock,
 			  FILE_AREA_LEVL);
-#endif
 		}
 	}
 }
@@ -347,8 +294,6 @@ int wt;
 	return(0);
 }
 #endif
-
-#ifdef FILE_AREAS
 
 /*
  * Unix file areas are directories with trailing slashes.
@@ -480,4 +425,3 @@ FILE *stream;
 
 /* ----------  END FILE LOCKING HANDLING ----------- */
 
-#endif	/* FILE_AREAS */

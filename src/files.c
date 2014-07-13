@@ -38,10 +38,6 @@ extern int errno;
 #endif
 
 /* ALI: For compatibility */
-#ifndef FILE_AREAS
-#define compress(file)		compress_area(NULL, file)
-#define uncompress(file)	uncompress_area(NULL, file)
-#endif
 
 #if defined(WIN32)
 #include <sys\stat.h>
@@ -114,9 +110,6 @@ STATIC_DCL char *NDECL(set_bonestemp_name);
 #ifdef COMPRESS
 STATIC_DCL void FDECL(redirect, (const char *,const char *,const char *, FILE *,BOOLEAN_P));
 STATIC_DCL void FDECL(docompress_file, (const char *,const char *,BOOLEAN_P));
-#endif
-#ifndef FILE_AREAS
-STATIC_DCL char *FDECL(make_lockname, (const char *,char *));
 #endif
 STATIC_DCL FILE *FDECL(fopen_config_file, (const char *));
 STATIC_DCL int FDECL(get_uchars, (FILE *,char *,char *,uchar *,BOOLEAN_P,int,const char *));
@@ -344,38 +337,18 @@ int lev;
 char errbuf[];
 {
 	int fd;
-#ifndef FILE_AREAS
-	const char *fq_lock;
-#endif
 
 	if (errbuf) *errbuf = '\0';
 	set_levelfile_name(lock, lev);
-#ifndef FILE_AREAS
-	fq_lock = fqname(lock, LEVELPREFIX, 0);
-#endif
 
 #if defined(WIN32)
 	/* Use O_TRUNC to force the file to be shortened if it already
 	 * exists and is currently longer.
 	 */
-# ifdef FILE_AREAS
 	fd = open_area(FILE_AREA_LEVL, lock,
 	  O_WRONLY |O_CREAT | O_TRUNC | O_BINARY, FCMASK);
-# else
-#  ifdef HOLD_LOCKFILE_OPEN
-	if (lev == 0)
-		fd = open_levelfile_exclusively(fq_lock, lev,
-				O_WRONLY |O_CREAT | O_TRUNC | O_BINARY);
-	else
-#  endif
-	fd = open(fq_lock, O_WRONLY |O_CREAT | O_TRUNC | O_BINARY, FCMASK);
-# endif
 #els
-# ifdef FILE_AREAS
 	fd = creat_area(FILE_AREA_LEVL, lock, FCMASK);
-# else
-	fd = creat(fq_lock, FCMASK);
-# endif	/* FILE_AREAS */
 #endif /* WIN32 */
 
 	if (fd >= 0)
@@ -395,25 +368,10 @@ int lev;
 char errbuf[];
 {
 	int fd;
-#ifndef FILE_AREAS
-	const char *fq_lock;
-#endif
 
 	if (errbuf) *errbuf = '\0';
 	set_levelfile_name(lock, lev);
-#ifndef FILE_AREAS
-	fq_lock = fqname(lock, LEVELPREFIX, 0);
-#endif
-#ifdef FILE_AREAS
 	fd = open_area(FILE_AREA_LEVL, lock, O_RDONLY | O_BINARY, 0);
-#else
-#  ifdef HOLD_LOCKFILE_OPEN
-	if (lev == 0)
-		fd = open_levelfile_exclusively(fq_lock, lev, O_RDONLY | O_BINARY );
-	else
-#  endif
-	fd = open(fq_lock, O_RDONLY | O_BINARY, 0);
-#endif	/* FILE_AREAS */
 
 	/* for failure, return an explanation that our caller can use;
 	   settle for `lock' instead of `fq_lock' because the latter
@@ -437,14 +395,7 @@ int lev;
 	 */
 	if (lev == 0 || (level_info[lev].flags & LFILE_EXISTS)) {
 		set_levelfile_name(lock, lev);
-#ifdef FILE_AREAS
 		(void) remove_area(FILE_AREA_LEVL, lock);
-#else
-# ifdef HOLD_LOCKFILE_OPEN
-		if (lev == 0) really_close();
-# endif
-		(void) unlink(fqname(lock, LEVELPREFIX, 0));
-#endif
 		level_info[lev].flags &= ~LFILE_EXISTS;
 	}
 }
@@ -680,26 +631,15 @@ char errbuf[];
 	if (errbuf) *errbuf = '\0';
 	*bonesid = set_bonesfile_name(bones, lev);
 	file = set_bonestemp_name();
-#ifndef FILE_AREAS
-	file = fqname(file, BONESPREFIX, 0);
-#endif
 
 #if defined(WIN32)
 	/* Use O_TRUNC to force the file to be shortened if it already
 	 * exists and is currently longer.
 	 */
-# ifdef FILE_AREAS
 	fd = open_area(FILE_AREA_BONES, file,
 	  O_WRONLY |O_CREAT | O_TRUNC | O_BINARY, FCMASK);
-# else
-	fd = open(file, O_WRONLY |O_CREAT | O_TRUNC | O_BINARY, FCMASK);
-# endif
 #else
-# ifdef FILE_AREAS
 	fd = creat_area(FILE_AREA_BONES, file, FCMASK);
-# else
-	fd = creat(file, FCMASK);
-# endif	/* FILE_AREAS */
 #endif
 	if (fd < 0 && errbuf) /* failure explanation */
 	    Sprintf(errbuf,
@@ -714,42 +654,16 @@ void
 commit_bonesfile(lev)
 d_level *lev;
 {
-#ifndef FILE_AREAS
-	const char *fq_bones;
-#endif
 	const char *tempname;
 	int ret;
 
 	(void) set_bonesfile_name(bones, lev);
-#ifndef FILE_AREAS
-	fq_bones = fqname(bones, BONESPREFIX, 0);
-#endif
 	tempname = set_bonestemp_name();
-#ifndef FILE_AREAS
-	tempname = fqname(tempname, BONESPREFIX, 1);
-#endif
 
-#ifdef FILE_AREAS
 	ret = rename_area(FILE_AREA_BONES, tempname, bones);
-#else
-# if defined(SYSV) && !defined(SVR4)
-	/* old SYSVs don't have rename.  Some SVR3's may, but since they
-	 * also have link/unlink, it doesn't matter. :-)
-	 */
-	(void) unlink(fq_bones);
-	ret = link(tempname, fq_bones);
-	ret += unlink(tempname);
-# else
-	ret = rename(tempname, fq_bones);
-# endif
-#endif	/* FILE_AREAS */
 #ifdef WIZARD
 	if (wizard && ret != 0)
-#ifdef FILE_AREAS
 		pline("couldn't rename %s to %s.", tempname, bones);
-#else
-		pline("couldn't rename %s to %s.", tempname, fq_bones);
-#endif
 #endif
 }
 
@@ -759,20 +673,11 @@ open_bonesfile(lev, bonesid)
 d_level *lev;
 char **bonesid;
 {
-#ifndef FILE_AREAS
-	const char *fq_bones;
-#endif
 	int fd;
 
 	*bonesid = set_bonesfile_name(bones, lev);
-#ifdef FILE_AREAS
 	uncompress_area(FILE_AREA_BONES, bones);  /* no effect if nonexistent */
 	fd = open_area(FILE_AREA_BONES, bones, O_RDONLY | O_BINARY, 0);
-#else
-	fq_bones = fqname(bones, BONESPREFIX, 0);
-	uncompress(fq_bones);	/* no effect if nonexistent */
-	fd = open(fq_bones, O_RDONLY | O_BINARY, 0);
-#endif	/* FILE_AREAS */
 	return fd;
 }
 
@@ -782,11 +687,7 @@ delete_bonesfile(lev)
 d_level *lev;
 {
 	(void) set_bonesfile_name(bones, lev);
-#ifdef FILE_AREAS
 	return !(remove_area(FILE_AREA_BONES, bones) < 0);
-#else
-	return !(unlink(fqname(bones, BONESPREFIX, 0)) < 0);
-#endif
 }
 
 
@@ -795,11 +696,7 @@ d_level *lev;
 void
 compress_bonesfile()
 {
-#ifdef FILE_AREAS
 	compress_area(FILE_AREA_BONES, bones);
-#else
-	compress(fqname(bones, BONESPREFIX, 0));
-#endif
 }
 
 /* ----------  END BONES FILE HANDLING ----------- */
@@ -815,22 +712,8 @@ set_savefile_name()
 #if defined(WIN32)
 	char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
 #endif
-#  ifndef FILE_AREAS
-#  if defined(WIN32)
-	/* Obtain the name of the logged on user and incorporate
-	 * it into the name. */
-	Sprintf(fnamebuf, "%s-%s", get_username(0), plname);
-	(void)fname_encode("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.",
-				'%', fnamebuf, encodedfnamebuf, BUFSZ);
-	Sprintf(SAVEF, "%s.NetHack-saved-game", encodedfnamebuf);
-#  else
-	Sprintf(SAVEF, "save/%d%s", (int)getuid(), plname);
-	regularize(SAVEF+5);	/* avoid . or / in name */
-#  endif /* WIN32 */
-#  else
 	Sprintf(SAVEF, "%d%s", (int)getuid(), plname);
 	regularize(SAVEF);      /* avoid . or / in name */
-#  endif
 }
 
 void
@@ -855,21 +738,9 @@ set_error_savefile()
 int
 create_savefile()
 {
-#ifndef FILE_AREAS
-	const char *fq_save;
-#endif
 	int fd;
 
-#ifdef FILE_AREAS
 	fd = creat_area(FILE_AREA_SAVE, SAVEF, FCMASK);
-#else	/* FILE_AREAS */
-	fq_save = fqname(SAVEF, SAVEPREFIX, 0);
-# if defined(WIN32)
-	fd = open(fq_save, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK);
-# else
-	fd = creat(fq_save, FCMASK);
-# endif
-#endif  /* FILE_AREAS */
 
 	return fd;
 }
@@ -881,13 +752,7 @@ open_savefile()
 {
 	int fd;
 
-#ifdef FILE_AREAS
 	fd = open_area(FILE_AREA_SAVE, SAVEF, O_RDONLY | O_BINARY, 0);
-#else
-	const char *fq_save;
-	fq_save = fqname(SAVEF, SAVEPREFIX, 0);
-	fd = open(fq_save, O_RDONLY | O_BINARY, 0);
-#endif	/* FILE_AREAS */
 	return fd;
 }
 
@@ -896,11 +761,7 @@ open_savefile()
 int
 delete_savefile()
 {
-#ifdef FILE_AREAS
 	(void) remove_area(FILE_AREA_SAVE, SAVEF);
-#else
-	(void) unlink(fqname(SAVEF, SAVEPREFIX, 0));
-#endif
 	return 0;	/* for restore_saved_game() (ex-xxxmain.c) test */
 }
 
@@ -909,26 +770,13 @@ delete_savefile()
 int
 restore_saved_game()
 {
-#ifndef FILE_AREAS
-	const char *fq_save;
-#endif
 	int fd;
 
 	set_savefile_name();
-#ifndef FILE_AREAS
-	fq_save = fqname(SAVEF, SAVEPREFIX, 0);
-
-	uncompress(fq_save);
-#else
 	uncompress_area(FILE_AREA_SAVE, SAVEF);
-#endif
 	if ((fd = open_savefile()) < 0) return fd;
 
-#ifndef FILE_AREAS
-	if (!uptodate(fd, fq_save)) {
-#else
 	if (!uptodate(fd, SAVEF)) {
-#endif
 	    (void) close(fd),  fd = -1;
 	    (void) delete_savefile();
 	}
@@ -968,11 +816,7 @@ const char *filearea, *filename, *mode;
 FILE *stream;
 boolean uncomp;
 {
-#ifndef FILE_AREAS
-	if (freopen(filename, mode, stream) == (FILE *)0) {
-#else
 	if (freopen_area(filearea, filename, mode, stream) == (FILE *)0) {
-#endif
 		(void) fprintf(stderr, "redirect of %s for %scompress failed\n",
 			filename, uncomp ? "un" : "");
 		terminate(EXIT_FAILURE);
@@ -1097,17 +941,9 @@ boolean uncomp;
 	if (i == 0) {
 	    /* (un)compress succeeded: remove file left behind */
 	    if (uncomp)
-#ifndef FILE_AREAS
-		(void) unlink(cfn);
-#else
 		(void) remove_area(filearea, cfn);
-#endif
 	    else
-#ifndef FILE_AREAS
-		(void) unlink(filename);
-#else
 		(void) remove_area(filearea, filename);
-#endif
 	} else {
 	    /* (un)compress failed; remove the new, bad file */
 	    if (uncomp) {
@@ -1174,44 +1010,12 @@ struct flock sflock; /* for unlocking, same as above */
 
 #define HUP	if (!program_state.done_hup)
 
-#ifndef FILE_AREAS
-
-STATIC_OVL char *
-make_lockname(filename, lockname)
-const char *filename;
-char *lockname;
-{
-# if defined(UNIX) || defined(WIN32)
-#  ifdef NO_FILE_LINKS
-	Strcpy(lockname, LOCKDIR);
-	Strcat(lockname, "/");
-	Strcat(lockname, filename);
-#  else
-	Strcpy(lockname, filename);
-#  endif
-	Strcat(lockname, "_lock");
-	return lockname;
-# else
-	lockname[0] = '\0';
-	return (char*)0;
-# endif  /* UNIX ||  WIN32  */
-}
-
-#endif /* FILE_AREAS */
-
 /* lock a file */
 boolean
-#ifdef FILE_AREAS
 lock_file(filearea, filename, retryct)
 const char *filearea;
 const char *filename;
 int retryct;
-#else
-lock_file(filename, whichprefix, retryct)
-const char *filename;
-int whichprefix;
-int retryct;
-#endif
 {
 #ifndef USE_FCNTL
 	char locknambuf[BUFSZ];
@@ -1230,11 +1034,7 @@ int retryct;
 	lockname = fqname(lockname, LOCKPREFIX, 2);
 # endif
 #endif
-#ifdef FILE_AREAS
 	filename = make_file_name(filearea, filename);
-#else
-	filename = fqname(filename, whichprefix, 0);
-#endif
 
 #ifdef USE_FCNTL
 	lockfd = open(filename,O_RDWR);
@@ -1339,7 +1139,6 @@ int retryct;
 	return TRUE;
 }
 
-#ifdef FILE_AREAS
 /*
  * lock a file
  */
@@ -1350,7 +1149,6 @@ int retryct;
 {
 	return lock_file(filearea, filename, retryct);
 }
-#endif
 
 
 /* unlock file, which must be currently locked by lock_file */
@@ -1396,7 +1194,6 @@ const char *filename;
 	nesting--;
 }
 
-#ifdef FILE_AREAS
 /* unlock file, which must be currently locked by lock_file_area */
 void
 unlock_file_area(filearea, filename)
@@ -1404,7 +1201,6 @@ const char *filearea, *filename;
 {
 	unlock_file(filename);
 }
-#endif
 
 /* ----------  END FILE LOCKING HANDLING ----------- */
 
@@ -1931,31 +1727,15 @@ check_recordfile(dir)
 const char *dir;
 {
 	int fd;
-#ifndef FILE_AREAS
-	const char *fq_record;
-#endif
 
 #if defined(UNIX)
-# ifdef FILE_AREAS
 	fd = open_area(NH_RECORD_AREA, RECORD, O_RDWR, 0);
-# else
-	fq_record = fqname(RECORD, SCOREPREFIX, 0);
-	fd = open(fq_record, O_RDWR, 0);
-# endif
 	if (fd >= 0) {
 	    (void) close(fd);	/* RECORD is accessible */
-#  ifdef FILE_AREAS
 	} else if ((fd = open_area(NH_RECORD_AREA, RECORD, O_CREAT|O_RDWR, FCMASK)) >= 0) {
-#  else
-	} else if ((fd = open(fq_record, O_CREAT|O_RDWR, FCMASK)) >= 0) {
-#  endif
 	    (void) close(fd);	/* RECORD newly created */
 	} else {
-# ifdef FILE_AREAS
 	    raw_printf("Warning: cannot write scoreboard file %s", RECORD);
-# else
-	    raw_printf("Warning: cannot write scoreboard file %s", fq_record);
-# endif
 	    wait_synch();
 	}
 #endif  /* !UNIX */
@@ -1963,22 +1743,11 @@ const char *dir;
 	char tmp[PATHLEN];
 
 	Strcpy(tmp, RECORD);
-# ifndef FILE_AREAS
-	fq_record = fqname(RECORD, SCOREPREFIX, 0);
-# endif
 
-# ifdef FILE_AREAS
 	if ((fd = open_area(NH_RECORD_AREA, tmp, O_RDWR)) < 0) {
-# else
-	if ((fd = open(fq_record, O_RDWR)) < 0) {
-# endif
 	    /* try to create empty record */
-# if defined(FILE_AREAS)
 	    if ((fd = open_area(NH_RECORD_AREA, tmp, O_CREAT|O_RDWR,
 	      S_IREAD|S_IWRITE)) < 0) {
-# else
-	    if ((fd = open(fq_record, O_CREAT|O_RDWR, S_IREAD|S_IWRITE)) < 0) {
-# endif
 	raw_printf("Warning: cannot write record %s", tmp);
 		wait_synch();
 	    } else

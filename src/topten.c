@@ -502,11 +502,7 @@ int how;
 #endif
 
 #ifdef LOGFILE		/* used for debugging (who dies of what, where) */
-#ifdef FILE_AREAS
 	if (lock_file_area(LOGAREA, LOGFILE, 10)) {
-#else
-	if (lock_file(LOGFILE, SCOREPREFIX, 10)) {
-#endif
 	    if(!(lfile = fopen_datafile_area(LOGAREA, LOGFILE, "a", SCOREPREFIX))) {
 		HUP raw_print("Cannot open log file!");
 	    } else {
@@ -518,11 +514,7 @@ int how;
 #endif /* LOGFILE */
 
 #ifdef XLOGFILE
-#ifdef FILE_AREAS
 	if (lock_file_area(LOGAREA, XLOGFILE, 10)) {
-#else
-	if (lock_file(XLOGFILE, SCOREPREFIX, 10)) {
-#endif
 		if(!(xlfile = fopen_datafile_area(LOGAREA, XLOGFILE, "a", SCOREPREFIX))) {
 			HUP raw_print("Cannot open extended log file!");
 		} else {
@@ -551,11 +543,7 @@ int how;
 	    goto showwin;
 	}
 
-#ifdef FILE_AREAS
 	if (!lock_file_area(NH_RECORD_AREA, RECORD, 60))
-#else
-	if (!lock_file(RECORD, SCOREPREFIX, 60))
-#endif
 		goto destroywin;
 
 #ifdef UPDATE_RECORD_IN_PLACE
