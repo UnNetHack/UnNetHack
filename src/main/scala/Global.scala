@@ -2,6 +2,8 @@
 /* NetHack may be freely redistributed.  See license for details. */
 /* Conversion to Scala copyright (c) 2014 Sheldon Young. */
 
+import Config._
+
 object Global {
 
 val BETA = true /* if a beta-test copy	[MRS] */
@@ -52,8 +54,6 @@ val HISTORY = "history" /* file giving nethack's history */
 val LICENSE = "license" /* file with license information */
 val OPTIONFILE = "opthelp" /* file explaining runtime options */
 val OPTIONS_USED = "options" /* compile-time options, for #version */
-
-val LEV_EXT = ".lev"		/* extension for special level files */
 
 /* Assorted definitions that may depend on selections in config.h. */
 
