@@ -1,70 +1,19 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Conversion to Scala copyright (c) 2014 Sheldon Young. */
 
-#ifndef CONFIG_H /* make sure the compiler does not see the typedefs twice */
-#define CONFIG_H
-
+object Config {
 
 /*
- * Section 1:	Operating and window systems selection.
- *		Select the version of the OS you are using.
- *		For "UNIX" select BSD, or SYSV in unixconf.h.
+ * Section 1:	Window systems selection.
  */
-
-#define UNIX		/* delete if no fork(), exec() available */
-
-#include "config1.h"	/* should auto-detect WIN32 */
-
-
-/* Windowing systems...
- * Define all of those you want supported in your binary.
- * Some combinations make no sense.  See the installation document.
- */
-/* #define TTY_GRAPHICS */	/* good old tty based graphics */
-/* #define CURSES_GRAPHICS */	/* Proper curses interface */
-/* #define X11_GRAPHICS */	/* X11 interface */
-/* #define MSWIN_GRAPHICS */	/* Windows NT, CE, Graphics */
 
 /*
  * Define the default window system.  This should be one that is compiled
- * into your system (see defines above).
+ * into your system.
  */
 
-#ifdef MSWIN_GRAPHICS
-# ifdef TTY_GRAPHICS
-# undef TTY_GRAPHICS
-# endif
-# ifndef DEFAULT_WINDOW_SYS
-#  define DEFAULT_WINDOW_SYS "mswin"
-# endif
-# define HACKDIR "\\unnethack"
-#endif
-
-#ifdef CURSES_GRAPHICS
-# ifndef DEFAULT_WINDOW_SYS
-#  define DEFAULT_WINDOW_SYS "curses"
-# endif
-#endif
-
-#ifndef DEFAULT_WINDOW_SYS
-# define DEFAULT_WINDOW_SYS "tty"
-#endif
-
-#ifdef X11_GRAPHICS
-/*
- * There are two ways that X11 tiles may be defined.  (1) using a custom
- * format loaded by NetHack code, or (2) using the XPM format loaded by
- * the free XPM library.  The second option allows you to then use other
- * programs to generate tiles files.  For example, the PBMPlus tools
- * would allow:
- *  xpmtoppm <x11tiles.xpm | pnmscale 1.25 | ppmquant 90 >x11tiles_big.xpm
- */
-/* # define USE_XPM */		/* Disable if you do not have the XPM library */
-# ifdef USE_XPM
-#  define GRAPHIC_TOMBSTONE	/* Use graphical tombstone (rip.xpm) */
-# endif
-#endif
-
+val DEFAULT_WINDOW_SYS = "curses"
 
 /*
  * Section 2:	Some global parameters and filenames.
@@ -74,16 +23,14 @@
  *		playground.
  */
 
-#ifndef WIZARD		/* allow for compile-time or Makefile changes */
-#  define WIZARD  "wizard" /* the person allowed to use the -D option */
-#endif
+val WIZARD = "wizard" /* the person allowed to use the -D option */
 
-#define LOGFILE "logfile"	/* larger file for debugging purposes */
-#define LOGAREA FILE_AREA_VAR
+val LOGFILE = "logfile"	/* larger file for debugging purposes */
+val LOGAREA = FILE_AREA_VAR
 /* #define XLOGFILE "xlogfile" */ /* even larger logfile */
-#define NEWS "news"		/* the file containing the latest hack news */
-#define NEWS_AREA FILE_AREA_SHARE
-#define PANICLOG "paniclog"	/* log of panic and impossible events */
+val NEWS = "news"		/* the file containing the latest hack news */
+val NEWS_AREA = FILE_AREA_SHARE
+val PANICLOG = "paniclog"	/* log of panic and impossible events */
 /* #define LIVELOGFILE "livelog" */ /* live game progress log file */
 
 /* #define LIVELOG_SHOUT */
@@ -106,8 +53,8 @@
 /* #define COMPRESS "/usr/bin/compress" */	/* Lempel-Ziv compression */
 /* #define COMPRESS_EXTENSION ".Z"	*/	/* compress's extension */
 /* An example of one alternative you might want to use: */
-#define COMPRESS "/bin/gzip"	/* FSF gzip compression */
-#define COMPRESS_EXTENSION ".gz"		/* normal gzip extension */
+val COMPRESS = "/bin/gzip"	/* FSF gzip compression */
+val COMPRESS_EXTENSION = ".gz"		/* normal gzip extension */
 #endif
 
 #ifndef COMPRESS
@@ -121,67 +68,25 @@
  */
 /* #define DLB */	/* not supported on all platforms */
 
-
-
 /*
  * Section 3:	Definitions that may vary with system type.
- *		For example, both schar and uchar should be short ints on
- *		the AT&T 3B2/3B5/etc. family.
  */
-
-#include "tradstdc.h"
 
 /*
  * type schar: small signed integers (8 bits suffice)
- *
- *	typedef char	schar;
- *
- *	will do when you have signed characters; otherwise use
- *
- *	typedef short int schar;
  */
-typedef signed char	schar;
+type schar = Byte
 
 /*
  * type uchar: small unsigned integers (8 bits suffice - but 7 bits do not)
- *
- *	typedef unsigned char	uchar;
- *
- *	will be satisfactory if you have an "unsigned char" type;
- *	otherwise use
- *
- *	typedef unsigned short int uchar;
  */
-typedef unsigned char	uchar;
+type uchar = Short // MONOTE No unsigned type on the JVM
 
 /* Type used for outputting DECgraphics and IBMgraphics characters into
  * HTML dumps or for holding unicode codepoints. */
-#if HAVE_INTTYPES_H
-# include <inttypes.h>
-#else
-# if HAVE_STDINT_H
-#  include <stdint.h>
-# endif
-#endif
-#ifdef UINT32_MAX
-typedef uint32_t glyph_t;
-#else
-/* Fallback that should work on most systems */
-typedef long glyph_t;
-#endif
-
-/*
- * Various structures have the option of using bitfields to save space.
- * If your C compiler handles bitfields well (e.g., it can initialize structs
- * containing bitfields), you can define BITFIELDS.  Otherwise, the game will
- * allocate a separate character for each bitfield.  (The bitfields used never
- * have more than 7 bits, and most are only 1 bit.)
- */
-#define BITFIELDS	/* Good bitfield handling */
+type glypth_t = Int
 
 /* #define STRNCMPI */	/* compiler/library has the strncmpi function */
-
-#define EXOTIC_PETS      /* Rob Ellwood  June 2002 */
 
 /*
  * Section 4:  THE FUN STUFF!!!
@@ -195,7 +100,7 @@ typedef long glyph_t;
 #define EXP_ON_BOTL	/* Show experience on bottom line */
 /* #define SCORE_ON_BOTL */	/* added by Gary Erickson (erickson@ucivax) */
 
-# define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
+val DOAGAIN = '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
 
 /* #define REALTIME_ON_BOTL */  /* Show elapsed time on bottom line.  Note:
                                  * this breaks savefile compatibility. */
@@ -208,9 +113,6 @@ typedef long glyph_t;
  * bugs left here.
  */
 
-#if defined(TTY_GRAPHICS) || defined(MSWIN_GRAPHICS) || \
- defined(CURSES_GRAPHICS)
-# define MENU_COLOR
 /*# define MENU_COLOR_REGEX*/
 /*# define MENU_COLOR_REGEX_POSIX */
 /* if MENU_COLOR_REGEX is defined, use regular expressions (regex.h,
@@ -219,14 +121,13 @@ typedef long glyph_t;
  * otherwise use pmatch() to match menu color lines.
  * pmatch() provides basic globbing: '*' and '?' wildcards.
  */
-#endif
 
 #define DUMP_LOG        /* Dump game end information to a file */
 /* #define DUMP_FN "/tmp/%n.nh" */      /* Fixed dumpfile name, if you want
                                          * to prevent definition by users */
 #define DUMP_TEXT_LOG   /* Dump game end information in a plain text form */
 /*#define DUMP_HTML_LOG*/   /* Dump game end information to a html file */
-#define DUMPMSGS 30     /* Number of latest messages in the dump file  */
+val DUMPMSGS = 30     /* Number of latest messages in the dump file  */
 
 /* #define WHEREIS_FILE "./whereis/%n.whereis" */ /* Write out player's current location to player.whereis */
 
@@ -250,10 +151,6 @@ typedef long glyph_t;
                                     * killed - Patric Mueller (15 Aug 2009) */
 #define ADJSPLIT /* splittable #adjust - Sam Dennis, conditionalized by Jukka Lahtinen */
 #define TUTORIAL_MODE /* Alex Smith */
-#define ELBERETH_CONDUCT /* Track the number of times the player engraves Elbereth. - Ray Kulhanek */
 #define SHOW_WEIGHT
 /* End of Section 6 */
-
-#include "global.h"	/* Define everything else according to choices above */
-
-#endif /* CONFIG_H */
+}

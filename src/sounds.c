@@ -628,7 +628,6 @@ register struct monst *mtmp;
 		break;
 	    } /* else FALLTHRU */
 	case MS_GROWL:
-#ifdef EXOTIC_PETS
 	    if (mtmp->mtame &&
 		   (mtmp->data == &mons[PM_MONKEY] ||
 		    mtmp->data == &mons[PM_APE] ||
@@ -643,7 +642,6 @@ register struct monst *mtmp;
 			pline_msg = "hoots.";
 		}
 	    } else
-#endif
 	    pline_msg = mtmp->mpeaceful ? "snarls." : "growls!";
 	    break;
 	case MS_ROAR:

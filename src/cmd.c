@@ -1487,7 +1487,6 @@ boolean want_disp;
 			" for any artifacts");
 	}
 
-#ifdef ELBERETH_CONDUCT
 	/* no point displaying the conduct if Elbereth doesn't do anything */
 	if (flags.elberethignore) {
 	    you_have_been("ignored by Elbereth");
@@ -1500,7 +1499,6 @@ boolean want_disp;
 		you_have_never("engraved Elbereth");
 	    }
 	}
-#endif /* ELBERETH_CONDUCT */
 
 	if ((wizard || final) && !u.uconduct.bones) {
 	    you_have_never("encountered a bones level");

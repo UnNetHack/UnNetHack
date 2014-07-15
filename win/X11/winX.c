@@ -115,11 +115,7 @@ struct window_procs X11_procs = {
     /* other defs that really should go away (they're tty specific) */
     X11_start_screen,
     X11_end_screen,
-#ifdef GRAPHIC_TOMBSTONE
     X11_outrip,
-#else
-    genl_outrip,
-#endif
     genl_preference_update,
 };
 
@@ -825,7 +821,6 @@ void X11_number_pad(state) int state; { return; } /* called from options.c */
 void X11_start_screen() { return; } /* called from setftty() in unixtty.c */
 void X11_end_screen() { return; }   /* called from settty() in unixtty.c */
 
-#ifdef GRAPHIC_TOMBSTONE
 void X11_outrip(window, how)
     winid window;
     int how;
@@ -843,7 +838,6 @@ void X11_outrip(window, how)
 
     calculate_rip_text(how);
 }
-#endif
 
 /* init and exit nhwindows ------------------------------------------------- */
 
@@ -857,9 +851,7 @@ static XtActionsRec actions[] = {
     {"dismiss_text",	dismiss_text},	/* button action for text widget */
     {"delete_text",	delete_text},	/* delete action for text widget */
     {"key_dismiss_text",key_dismiss_text},/* key action for text widget */
-#ifdef GRAPHIC_TOMBSTONE
     {"rip_dismiss_text",rip_dismiss_text},/* action for rip in text widget */
-#endif
     {"menu_key",	menu_key},	/* action for menu accelerators */
     {"yn_key",		yn_key},	/* action for yn accelerators */
     {"yn_delete",	yn_delete},	/* action for yn delete-window */
@@ -896,7 +888,6 @@ static XtResource resources[] = {
       XtOffset(AppResources *,pet_mark_bitmap), XtRString, "pet_mark.xbm" },
     { "pet_mark_color", "Pet_mark_color", XtRPixel, sizeof(XtRPixel),
       XtOffset(AppResources *,pet_mark_color), XtRString, "Red" },
-#ifdef GRAPHIC_TOMBSTONE
     { "tombstone", "Tombstone", XtRString, sizeof(String),
       XtOffset(AppResources *,tombstone), XtRString, "rip.xpm" },
     { "tombtext_x", "Tombtext_x", XtRInt, sizeof(int),
@@ -907,7 +898,6 @@ static XtResource resources[] = {
       XtOffset(AppResources *,tombtext_dx), XtRString, "0" },
     { "tombtext_dy", "Tombtext_dy", XtRInt, sizeof(int),
       XtOffset(AppResources *,tombtext_dy), XtRString, "13" },
-#endif
 };
 
 void

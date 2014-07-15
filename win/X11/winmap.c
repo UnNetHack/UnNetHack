@@ -39,9 +39,7 @@
 #include "dlb.h"
 #include "winX.h"
 
-#ifdef USE_XPM
 #include <X11/xpm.h>
-#endif
 
 
 /* from tile.c */
@@ -228,20 +226,8 @@ static boolean
 init_tiles(wp)
     struct xwindow *wp;
 {
-#ifdef USE_XPM
     XpmAttributes attributes;
     int errorcode;
-#else
-    FILE *fp = (FILE *)0;
-    x11_header header;
-    unsigned char *cp, *colormap = (unsigned char *)0;
-    unsigned char *tb, *tile_bytes = (unsigned char *)0;
-    int size;
-    XColor *colors = (XColor *)0;
-    int i, x, y;
-    int bitmap_pad;
-    int ddepth;
-#endif
     char buf[BUFSZ];
     Display *dpy = XtDisplay(toplevel);
     Screen *screen = DefaultScreenOfDisplay(dpy);
@@ -261,7 +247,6 @@ init_tiles(wp)
     (void) memset((genericptr_t) tile_info, 0,
 				sizeof(struct tile_map_info_t));
 
-#ifdef USE_XPM
     attributes.valuemask = XpmCloseness;
     attributes.closeness = 25000;
 
@@ -317,166 +302,6 @@ init_tiles(wp)
     }
     tile_width = image_width / TILES_PER_ROW;
     tile_height = image_height / (tile_count / TILES_PER_ROW);
-#else
-    /* any less than 16 colours makes tiles useless */
-    ddepth = DefaultDepthOfScreen(screen);
-    if (ddepth < 4) {
-	X11_raw_print("need a screen depth of at least 4");
-	result = FALSE;
-	goto tiledone;
-    }
-
-    fp = fopen_datafile(appResources.tile_file, RDBMODE, FALSE);
-    if (!fp) {
-	X11_raw_print("can't open tile file");
-	result = FALSE;
-	goto tiledone;
-    }
-
-    if (fread((char *) &header, sizeof(header), 1, fp) != 1) {
-	X11_raw_print("read of header failed");
-	result = FALSE;
-	goto tiledone;
-    }
-
-    if (header.version != 2) {
-	Sprintf(buf, "Wrong tile file version, expected 2, got %lu",
-		header.version);
-	X11_raw_print(buf);
-	result = FALSE;
-	goto tiledone;
-    }
-
-# ifdef VERBOSE
-    fprintf(stderr, "X11 tile file:\n    version %ld\n    ncolors %ld\n    tile width %ld\n    tile height %ld\n    per row %ld\n    ntiles %ld\n",
-	header.version,
-	header.ncolors,
-	header.tile_width,
-	header.tile_height,
-	header.per_row,
-	header.ntiles);
-# endif
-
-    size = 3*header.ncolors;
-    colormap = (unsigned char *) alloc((unsigned)size);
-    if (fread((char *) colormap, 1, size, fp) != size) {
-	X11_raw_print("read of colormap failed");
-	result = FALSE;
-	goto tiledone;
-    }
-
-/* defined in decl.h - these are _not_ good defines to have */
-#undef red
-#undef green
-#undef blue
-
-    colors = (XColor *) alloc(sizeof(XColor) * (unsigned)header.ncolors);
-    for (i = 0; i < header.ncolors; i++) {
-	cp = colormap + (3 * i);
-	colors[i].red   = cp[0] * 256;
-	colors[i].green = cp[1] * 256;
-	colors[i].blue  = cp[2] * 256;
-	colors[i].flags = 0;
-	colors[i].pixel = 0;
-
-	if (!XAllocColor(dpy, DefaultColormapOfScreen(screen), &colors[i]) &&
-	    !nhApproxColor(screen, DefaultColormapOfScreen(screen),
-			   (char *)0, &colors[i])) {
-	    Sprintf(buf, "%dth out of %ld color allocation failed",
-		    i, header.ncolors);
-	    X11_raw_print(buf);
-	    result = FALSE;
-	    goto tiledone;
-	}
-    }
-
-    size = header.tile_height * header.tile_width;
-    /*
-     * This alloc() and the one below require 32-bit ints, since tile_bytes
-     * is currently ~200k and alloc() takes an int
-     */
-    tile_count = header.ntiles;
-    if ((tile_count % header.per_row) != 0) {
-	tile_count += header.per_row - (tile_count % header.per_row);
-    }
-    tile_bytes = (unsigned char *) alloc((unsigned)tile_count*size);
-    if (fread((char *) tile_bytes, size, tile_count, fp) != tile_count) {
-	X11_raw_print("read of tile bytes failed");
-	result = FALSE;
-	goto tiledone;
-    }
-
-    if (header.ntiles < total_tiles_used) {
-	Sprintf(buf, "tile file incomplete, expecting %d tiles, found %lu",
-		total_tiles_used, header.ntiles);
-	X11_raw_print(buf);
-	result = FALSE;
-	goto tiledone;
-    }
-
-
-    if (appResources.double_tile_size) {
-	tile_width  = 2*header.tile_width;
-	tile_height = 2*header.tile_height;
-    } else {
-	tile_width  = header.tile_width;
-	tile_height = header.tile_height;
-    }
-
-    image_height = tile_height * tile_count / header.per_row;
-    image_width  = tile_width * header.per_row;
-
-    /* calculate bitmap_pad */
-    if (ddepth > 16)
-	bitmap_pad = 32;
-    else if (ddepth > 8)
-	bitmap_pad = 16;
-    else
-	bitmap_pad = 8;
-
-    tile_image = XCreateImage(dpy, DefaultVisualOfScreen(screen),
-		ddepth,			/* depth */
-		ZPixmap,		/* format */
-		0,			/* offset */
-		0,			/* data */
-		image_width,		/* width */
-		image_height,		/* height */
-		bitmap_pad,		/* bit pad */
-		0);			/* bytes_per_line */
-
-    if (!tile_image)
-	impossible("init_tiles: insufficient memory to create image");
-
-    /* now we know the physical memory requirements, we can allocate space */
-    tile_image->data =
-	(char *) alloc((unsigned)tile_image->bytes_per_line * image_height);
-
-    if (appResources.double_tile_size) {
-	unsigned long *expanded_row =
-	    (unsigned long *)alloc(sizeof(unsigned long)*(unsigned)image_width);
-
-	tb = tile_bytes;
-	for (y = 0; y < image_height; y++) {
-	    for (x = 0; x < image_width/2; x++)
-		expanded_row[2*x] =
-			    expanded_row[(2*x)+1] = colors[*tb++].pixel;
-
-	    for (x = 0; x < image_width; x++)
-		XPutPixel(tile_image, x, y, expanded_row[x]);
-
-	    y++;	/* duplicate row */
-	    for (x = 0; x < image_width; x++)
-		XPutPixel(tile_image, x, y, expanded_row[x]);
-	}
-	free((genericptr_t)expanded_row);
-
-    } else {
-
-	for (tb = tile_bytes, y = 0; y < image_height; y++)
-	    for (x = 0; x < image_width; x++, tb++)
-		XPutPixel(tile_image, x, y, colors[*tb].pixel);
-    }
-#endif /* USE_XPM */
 
     /* fake an inverted tile by drawing a border around the edges */
 #ifdef USE_WHITE
@@ -510,12 +335,6 @@ init_tiles(wp)
 #endif /* USE_WHITE */
 
 tiledone:
-#ifndef USE_XPM
-    if (fp) (void) fclose(fp);
-    if (colormap) free((genericptr_t)colormap);
-    if (tile_bytes) free((genericptr_t)tile_bytes);
-    if (colors) free((genericptr_t)colors);
-#endif
 
     if (result) {				/* succeeded */
 	map_info->square_height = tile_height;

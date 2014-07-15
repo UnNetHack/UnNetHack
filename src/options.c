@@ -111,11 +111,7 @@ static struct Bool_Opt
 #else
 	{"mail", (boolean *)0, TRUE, SET_IN_FILE},
 #endif
-#ifdef MENU_COLOR
 	{"menucolors", &iflags.use_menu_color, FALSE, SET_IN_FILE},
-#else
-	{"menucolors", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 #ifdef WIZARD
 	/* for menu debugging only*/
 	{"menu_tab_sep", &iflags.menu_tab_sep, FALSE, SET_IN_GAME},
@@ -259,10 +255,8 @@ static struct Comp_Opt
 	{ "conducts", "the kind of conducts you want to adhere to",
 						1, /* not needed */
 						DISP_IN_GAME },
-#ifdef EXOTIC_PETS
 	{ "crocodilename", "the name of your (first) crocodile (e.g., crocodilename:TickTock)",
 						PL_PSIZ, DISP_IN_GAME },
-#endif
 	{ "disclose", "the kinds of information to disclose at end of game",
 						sizeof(flags.end_disclose) * 2,
 						SET_IN_GAME },
@@ -318,10 +312,8 @@ static struct Comp_Opt
 	{ "menu_select_all", "select all items in a menu", 4, SET_IN_FILE },
 	{ "menu_select_page", "select all items on this page of a menu",
 						4, SET_IN_FILE },
-#ifdef EXOTIC_PETS
 	{ "monkeyname", "the name of your (first) monkey (e.g., monkeyname:Bonzo)",
 						PL_PSIZ, DISP_IN_GAME },
-#endif
 	{ "monsters", "the symbols to use for monsters",
 						MAXMCLASSES, SET_IN_FILE },
 	{ "msghistory", "number of top line messages to save",
@@ -390,10 +382,8 @@ static struct Comp_Opt
 	{ "windowcolors",  "the foreground/background colors of windows",	/*WC*/
 						80, DISP_IN_GAME },
 	{ "windowtype", "windowing system to use", WINTYPELEN, DISP_IN_GAME },
-#ifdef EXOTIC_PETS
 	{ "wolfname", "the name of your (first) wolf (e.g., wolfname:Gnasher)",
 						PL_PSIZ, DISP_IN_GAME },
-#endif
 	{ (char *)0, (char *)0, 0, 0 }
 };
 
@@ -1189,12 +1179,9 @@ static const struct {
    {"lightmagenta", CLR_BRIGHT_MAGENTA},
    {"lightcyan", CLR_BRIGHT_CYAN},
    {"white", CLR_WHITE}
-#ifdef MENU_COLOR
    ,{"none", NO_COLOR}
-#endif
 };
 
-#ifdef MENU_COLOR
 extern struct menucoloring *menu_colorings;
 
 static const struct {
@@ -1300,7 +1287,6 @@ char *str;
 	return TRUE;
     }
 }
-#endif /* MENU_COLOR */
 
 /* parse '"monster name":color' and change monster info accordingly */
 boolean
@@ -1697,12 +1683,10 @@ boolean tinitial, tfrom_file;
 			case 'F':
 			    preferred_pet = 'c';
 			    break;
-#ifdef EXOTIC_PETS
 			case 'e':	/* exotic */
 			case 'E':
 			    preferred_pet = 'e';
 			    break;
-#endif
 			case 'n':	/* no pet */
 			case 'N':
 			    preferred_pet = 'n';
@@ -1824,12 +1808,10 @@ boolean tinitial, tfrom_file;
 	/* menucolor:"regex_string"=color */
 	fullname = "menucolor";
 	if (match_optname(opts, fullname, 9, TRUE)) {
-#ifdef MENU_COLOR
 	    if (negated) bad_negation(fullname, FALSE);
 	    else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
 		if (!add_menu_coloring(op))
 		    badoption(opts);
-#endif
 	    return;
 	}
 
@@ -1843,7 +1825,6 @@ boolean tinitial, tfrom_file;
 		return;
 	}
 
-#ifdef EXOTIC_PETS
 	fullname = "monkeyname";
 	if (match_optname(opts, fullname, 6, TRUE)) {
 		if (negated) bad_negation(fullname, FALSE);
@@ -1867,7 +1848,6 @@ boolean tinitial, tfrom_file;
 			nmcpy(crocodilename, op, PL_PSIZ);
 		return;
 	}
-#endif
 
 	fullname = "msghistory";
 	if (match_optname(opts, fullname, 3, TRUE)) {
@@ -3746,10 +3726,8 @@ char *buf;
 			flags.pacifist ? "+" : "-", "pacifist",
 			flags.vegan ? "+" : "-", "vegan",
 			flags.vegetarian ? "+" : "-", "vegetarian");
-#ifdef EXOTIC_PETS
 	else if (!strcmp(optname, "crocodilename")) 
 		Sprintf(buf, "%s", crocodilename[0] ? crocodilename : none);
-#endif
 	else if (!strcmp(optname, "disclose")) {
 		for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
 			char topt[2];
@@ -3854,10 +3832,8 @@ char *buf;
 		Sprintf(buf, "%s", to_be_done);
 	else if (!strcmp(optname, "menu_select_page"))
 		Sprintf(buf, "%s", to_be_done);
-#ifdef EXOTIC_PETS
 	else if (!strcmp(optname, "monkeyname")) 
 		Sprintf(buf, "%s", monkeyname[0] ? monkeyname : none);
-#endif
 	else if (!strcmp(optname, "monsters"))
 		Sprintf(buf, "%s", to_be_done);
 	else if (!strcmp(optname, "msghistory"))
@@ -4001,10 +3977,8 @@ char *buf;
 			iflags.wc_backgrnd_status  ? iflags.wc_backgrnd_status : defbrief,
 			iflags.wc_foregrnd_text    ? iflags.wc_foregrnd_text : defbrief,
 			iflags.wc_backgrnd_text    ? iflags.wc_backgrnd_text : defbrief);
-#ifdef EXOTIC_PETS
 	else if (!strcmp(optname, "wolfname")) 
 		Sprintf(buf, "%s", wolfname[0] ? wolfname : none);
-#endif
 	else {
 	    for (i = 0; i < PREFIX_COUNT; ++i)
 		if (!strcmp(optname, fqn_prefix_names[i]) && fqn_prefix[i])

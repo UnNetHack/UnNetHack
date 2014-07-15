@@ -1,11 +1,9 @@
 #ifndef CURSDIAL_H
 #define CURSDIAL_H
 
-#ifdef MENU_COLOR
 # ifdef MENU_COLOR_REGEX
 #  include <regex.h>
 # endif
-#endif
 
 
 /* Global declarations */

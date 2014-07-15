@@ -155,9 +155,7 @@ struct text_info_t {
 		extra_height;	/* Sum of top and bottom border widths. */
     boolean	blocked;	/*  */
     boolean	destroy_on_ack; /* Destroy this window when acknowleged. */
-#ifdef GRAPHIC_TOMBSTONE
     boolean	is_rip;		/* This window needs a tombstone. */
-#endif
 };
 
 
@@ -233,13 +231,11 @@ typedef struct {
     int     message_lines;	/* number of lines to attempt to show */
     String  pet_mark_bitmap;	/* X11 bitmap file used to mark pets */
     Pixel   pet_mark_color;	/* color of pet mark */
-#ifdef GRAPHIC_TOMBSTONE
     String  tombstone;		/* name of XPM file for tombstone */
     int     tombtext_x;		/* x-coord of center of first tombstone text */
     int     tombtext_y;		/* y-coord of center of first tombstone text */
     int     tombtext_dx;	/* x-displacement between tombstone line */
     int     tombtext_dy;	/* y-displacement between tombstone line */
-#endif
 } AppResources;
 
 E AppResources appResources;
@@ -317,9 +313,7 @@ E void NDECL(check_turn_events);
 E void FDECL(delete_text, (Widget, XEvent*, String*, Cardinal*));
 E void FDECL(dismiss_text,(Widget, XEvent*, String*, Cardinal*));
 E void FDECL(key_dismiss_text,(Widget, XEvent*, String*, Cardinal*));
-#ifdef GRAPHIC_TOMBSTONE
 E void FDECL(rip_dismiss_text,(Widget, XEvent*, String*, Cardinal*));
-#endif
 E void FDECL(add_to_text_window,(struct xwindow*, int, const char*));
 E void FDECL(display_text_window,(struct xwindow*, BOOLEAN_P));
 E void FDECL(create_text_window,(struct xwindow*));
@@ -329,9 +323,7 @@ E void FDECL(append_text_buffer,(struct text_buffer*, const char*, BOOLEAN_P)); 
 E void FDECL(init_text_buffer,(struct text_buffer*));
 E void FDECL(clear_text_buffer,(struct text_buffer*));
 E void FDECL(free_text_buffer,(struct text_buffer*));
-#ifdef GRAPHIC_TOMBSTONE
 E void FDECL(calculate_rip_text, (int));
-#endif
 
 
 /* ### winval.c ### */
@@ -386,10 +378,6 @@ E void NDECL(X11_delay_output);
 E void NDECL(X11_start_screen);
 E void NDECL(X11_end_screen);
 
-#ifdef GRAPHIC_TOMBSTONE
 E void FDECL(X11_outrip, (winid,int));
-#else
-E void FDECL(genl_outrip, (winid,int));
-#endif
 
 #endif /* WINX_H */

@@ -1512,9 +1512,7 @@ boolean		recursive;
 		}
 
 	} else if (match_varname(buf, "MENUCOLOR", 9)) {
-#ifdef MENU_COLOR
 	    (void) add_menu_coloring(bufp);
-#endif
 	} else if (match_varname(buf, "MONSTERCOLOR", 12)) {
 	    return parse_monster_color(bufp);
 	} else if (match_varname(buf, "MONSTERSYMBOL", 13)) {

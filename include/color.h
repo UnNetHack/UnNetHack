@@ -4,11 +4,9 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-#ifdef MENU_COLOR 
 # ifdef MENU_COLOR_REGEX
 #  include <regex.h>
 # endif
-#endif
 
 /*
  * The color scheme used is tailored for an IBM PC.  It consists of the
@@ -42,9 +40,7 @@
 #define CLR_BRIGHT_CYAN		14
 #define CLR_WHITE		15
 #define CLR_MAX			16
-#ifdef MENU_COLOR
 # define CLR_UNDEFINED		CLR_MAX
-#endif
 
 /* The "half-way" point for tty based color systems.  This is used in */
 /* the tty color setup code.  (IMHO, it should be removed - dean).    */
@@ -67,7 +63,6 @@
 #define DRAGON_SILVER	CLR_BRIGHT_CYAN
 #define HI_ZAP		CLR_BRIGHT_BLUE
 
-#ifdef MENU_COLOR
 struct menucoloring {
 # ifdef MENU_COLOR_REGEX
 #  ifdef MENU_COLOR_REGEX_POSIX
@@ -81,7 +76,6 @@ struct menucoloring {
     int color, attr;
     struct menucoloring *next;
 };
-#endif /* MENU_COLOR */
 
 struct color_option {
     int color;

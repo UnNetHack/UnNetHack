@@ -373,7 +373,7 @@ val xdir: Array[schar] = Array( -1,-1, 0, 1, 1, 1, 0,-1, 0, 0 )
 val ydir: Array[schar] = Array(  0,-1,-1,-1, 0, 1, 1, 1, 0, 0 )
 val zdir: Array[schar] = Array(  0, 0, 0, 0, 0, 0, 0, 0, 1,-1 )
 
-var tbx = 0, tby: schar = 0	/* mthrowu: target */
+var tbx, tby: schar = 0	/* mthrowu: target */
 
 /* for xname handling of multiple shot missile volleys:
    number of shots, index of current one, validity check, shoot vs throw */
@@ -404,9 +404,9 @@ var in_steed_dismounting = false
 val bhitpos = new coord()
 val doors = new Array[coord](DOORMAX)
 
-val rooms = new Array[mkroom](MAXNROFROOMS+1)*2)
+val rooms = new Array[mkroom]((MAXNROFROOMS+1)*2)
 // MOTODO: subrooms uses pointer math to point into rooms array
-val subrooms: mkroom = &rooms[MAXNROFROOMS+1]
+// val subrooms: mkroom = &rooms[MAXNROFROOMS+1]
 var upstairs_room, dnstairs_room, sstairs_room: mkroom = null
 
 var head_engr: engr = null
@@ -416,7 +416,7 @@ var ftrap: ftrap = null
 var youmonst = new monst()
 var upermonst = new permonst()
 var flags = new flag()
-var iflags = new instance_flags(0
+var iflags = new instance_flags()
 var u = new you()
 
 var invent: obj = null
@@ -437,7 +437,7 @@ var uball: obj = null
 /*
  *  This must be the same order as used for buzz() in zap.c.
  */
-val zapcolors: Array[Int] = Array(
+val zapcolors = List(
     HI_ZAP,		/* 0 - missile */
     CLR_ORANGE,		/* 1 - fire */
     CLR_WHITE,		/* 2 - frost */
@@ -446,13 +446,13 @@ val zapcolors: Array[Int] = Array(
     CLR_WHITE,		/* 5 - lightning */
     CLR_YELLOW,		/* 6 - poison gas */
     CLR_RED,		/* 7 - lava */
-    CLR_GREEN,		/* 8 - acid */
+    CLR_GREEN		/* 8 - acid */
 )
 
-val shield_static: Array[Int] = Array(
+val shield_static = Array(
     S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,	/* 7 per row */
     S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,
-    S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,
+    S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4
 )
 
 val spl_book = new Array[Spell](MAXSPELL + 1)
@@ -472,8 +472,8 @@ var zeroobj = new obj()
 
 /* originally from dog.c */
 var dogname: String = null
-var catname[P: String = null
-var horsename[: String = null
+var catname: String = null
+var horsename: String = null
 
 var monkeyname: String = null
 var wolfname: String = null
@@ -490,6 +490,7 @@ var migrating_mons: monst = null
 val mvitals = new Array[mvital](NUMMONS)
 
 /* originally from end.c */
+/*** MOTODO 
 #ifdef DUMP_LOG
 #ifdef DUMP_FN
 char dump_fn[] = DUMP_FN;
@@ -497,6 +498,7 @@ char dump_fn[] = DUMP_FN;
 char dump_fn[PL_PSIZ] = DUMMY;
 #endif
 #endif /* DUMP_LOG */
+***/
 
 var c_obj_colors = List(
 	"black",		/* CLR_BLACK */
@@ -514,7 +516,7 @@ var c_obj_colors = List(
 	"bright blue",		/* CLR_BRIGHT_BLUE */
 	"bright magenta",	/* CLR_BRIGHT_MAGENTA */
 	"bright cyan",		/* CLR_BRIGHT_CYAN */
-	"white",		/* CLR_WHITE */
+	"white"			/* CLR_WHITE */
 )
 
 var menu_colorings: menucoloring = null
@@ -530,11 +532,11 @@ val materialnm = List(
 
 /* Vision */
 var vision_full_recalc = false
-char	 **viz_array = 0;/* used in cansee() and couldsee() macros */
+val viz_array: Array[Array[Char]] = null /* used in cansee() and couldsee() */
 
 /* Global windowing data, defined here for multi-window-system support */
-var WIN_MESSAGE = WIN_ERR, WIN_STATUS = WIN_ERR
-var WIN_MAP = WIN_ERR, WIN_INVEN = WIN_ERR
+var WIN_MESSAGE, WIN_STATUS = WIN_ERR
+var WIN_MAP, WIN_INVEN = WIN_ERR
 var toplines = new Array[Char](TBUFSZ)
 /* Windowing stuff that's really tty oriented, but present for all ports */
 val tc_gbl_data = new tc_gbl_data()	/* AS,AE, LI,CO */

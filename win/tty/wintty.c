@@ -102,9 +102,7 @@ char defmorestr[] = "--More--";
 /** Track if the player is still selecting his character. */
 boolean in_character_selection = FALSE;
 
-#ifdef MENU_COLOR
 extern struct menucoloring *menu_colorings;
-#endif
 
 static boolean clipping = FALSE;	/* clipping on? */
 static int clipx = 0, clipxmax = 0;
@@ -1241,7 +1239,6 @@ char *str;
 	*dest = '\0'; /* terminate string with null terminator */
 }
 
-#ifdef MENU_COLOR
 boolean
 get_menu_coloring(line, color, attr)
 const char *line;
@@ -1279,7 +1276,6 @@ int *color, *attr;
     if (foundattr && !foundcolor) *color = NO_COLOR;
     return foundcolor || foundattr;
 }
-#endif /* MENU_COLOR */
 
 STATIC_OVL void
 process_menu_window(window, cw)
@@ -1357,10 +1353,8 @@ struct WinDesc *cw;
 		for (page_lines = 0, curr = page_start;
 			curr != page_end;
 			page_lines++, curr = curr->next) {
-#ifdef MENU_COLOR
 		    int color = NO_COLOR, attr = ATR_NONE;
 		    boolean menucolr = FALSE;
-#endif
 		    if (curr->selector)
 			*rp++ = curr->selector;
 
@@ -1414,13 +1408,11 @@ struct WinDesc *cw;
 		    }
 #endif
 
-#ifdef MENU_COLOR
 		   if (iflags.use_menu_color && iflags.use_color &&
 		       (menucolr = get_menu_coloring(curr->str, &color,&attr))) {
 		       term_start_attr(attr);
 		       if (color != NO_COLOR) term_start_color(color);
 		   } else
-#endif
 		    term_start_attr(curr->attr);
 		    for (n = 0, cp = curr->str;
 #ifndef WIN32CON
@@ -1431,12 +1423,10 @@ struct WinDesc *cw;
 			  cp++, n++, ttyDisplay->curx++)
 #endif
 			    (void) putchar(*cp);
-#ifdef MENU_COLOR
 		   if (iflags.use_menu_color && iflags.use_color && menucolr) {
 		       if (color != NO_COLOR) term_end_color();
 		       term_end_attr(attr);
 		   } else
-#endif
 		    term_end_attr(curr->attr);
 		}
 	    } else {

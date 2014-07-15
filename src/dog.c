@@ -38,7 +38,6 @@ pet_type()
 	    return (PM_KITTEN);
 	else if (preferred_pet == 'd')
 	    return (PM_LITTLE_DOG);
-#ifdef EXOTIC_PETS
 	else if (Role_if(PM_ROGUE) &&
 	         ((preferred_pet == 'e') || (!rn2(3))))
 		return (PM_MONKEY);
@@ -48,7 +47,6 @@ pet_type()
 	else if (Role_if(PM_TOURIST) &&
 	          ((preferred_pet == 'e') || (!rn2(3))))
 		return (PM_BABY_CROCODILE);
-#endif
 	else
 	    return (rn2(2) ? PM_KITTEN : PM_LITTLE_DOG);
 }
@@ -148,7 +146,6 @@ makedog()
 		petname = dogname;
 	else if (pettype == PM_PONY)
 		petname = horsename;
-#ifdef EXOTIC_PETS
 	else if (pettype == PM_MONKEY)
 		petname = monkeyname;
 	else if ((pettype == PM_WOLF) ||
@@ -156,7 +153,6 @@ makedog()
 		petname = wolfname;
 	else if (pettype == PM_BABY_CROCODILE)
 		petname = crocodilename;
-#endif
 	else if (pettype == PM_SEWER_RAT)
 		petname = ratname;
 	else
@@ -180,7 +176,6 @@ makedog()
 
 	if(!mtmp) return((struct monst *) 0); /* pets were genocided */
 
-#ifdef EXOTIC_PETS
 	/*  Keep the exotic pets from being higher-level than normal starting
 	    pets.  (makedog is only called once, during game setup, so this
 	    is the place to put it.)                                           */
@@ -192,7 +187,6 @@ makedog()
 		mtmp->m_lev  = 1;
 		mtmp->mhpmax = mtmp->mhp = d(1,8);
 	}
-#endif
 
 	/* Horses already wear a saddle */
 	if (pettype == PM_PONY && !!(otmp = mksobj(SADDLE, TRUE, FALSE))) {
