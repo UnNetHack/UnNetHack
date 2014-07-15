@@ -428,18 +428,14 @@ bot2()
 	Sprintf(nb = eos(nb), " AC:%-2d", u.uac);
 	if (Upolyd)
 		Sprintf(nb = eos(nb), " HD:%d", mons[u.umonnum].mlevel);
-#ifdef EXP_ON_BOTL
 	else if(flags.showexp)
 		Sprintf(nb = eos(nb), " Xp:%u/%-1ld", u.ulevel,u.uexp);
-#endif
 	else
 		Sprintf(nb = eos(nb), " Exp:%u", u.ulevel);
 
-#ifdef SHOW_WEIGHT
     if (flags.showweight)
         Sprintf(nb = eos(nb), " Wt:%ld/%ld", (long)(inv_weight()+weight_cap()),
                 (long)weight_cap());
-#endif
 
 
 	if(flags.time)

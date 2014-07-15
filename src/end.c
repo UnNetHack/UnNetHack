@@ -79,9 +79,7 @@ static const char *deaths[] = {		/* the array of death */
 	"disintegrated",
 #endif
 	"panic", "trickery",
-#ifdef ASTRAL_ESCAPE
 	"quit", "escaped", "defied the gods and escaped", "ascended"
-#endif
 };
 
 static const char *ends[] = {		/* "when you..." */
@@ -93,9 +91,7 @@ static const char *ends[] = {		/* "when you..." */
 	"were disintegrated",
 #endif
 	"panicked", "were tricked",
-#ifdef ASTRAL_ESCAPE
 	"quit", "escaped", "defied the gods and escaped", "ascended"
-#endif
 };
 
 extern const char * const killed_by_prefix[];	/* from topten.c */
@@ -788,9 +784,7 @@ die:
 			Strcpy(kilbuf, "quit while already on Charon's boat");
 		}
 	}
-#ifdef ASTRAL_ESCAPE
 	if (how == ESCAPED || how == DEFIED || how == PANICKED)
-#endif
 		killer_format = NO_KILLER_PREFIX;
 
 	if (how != PANICKED) {
@@ -831,9 +825,7 @@ die:
 	    u.urscore += 50L * (long)(deepest - 1);
 	    if (deepest > 20)
 		u.urscore += 1000L * (long)((deepest > 30) ? 10 : deepest - 20);
-#ifdef ASTRAL_ESCAPE
 	    if (how == ASCENDED || how == DEFIED) u.urscore *= 2L;
-#endif
 	}
 
 	if (bones_ok) {
@@ -914,9 +906,7 @@ die:
 	dump_blockquote_start();
 	dump_line("", pbuf);
 
-#ifdef ASTRAL_ESCAPE
 	if (how == ESCAPED || how == DEFIED || how == ASCENDED) {
-#endif
 	    register struct monst *mtmp;
 	    register struct obj *otmp;
 	    register struct val_list *val;
@@ -957,11 +947,9 @@ die:
 	    }
 		Sprintf(eos(pbuf), "%s with %ld point%s,",
 			how==ASCENDED ? "went to your reward" :
-#ifdef ASTRAL_ESCAPE
 					(how==DEFIED ?
 					"defied the Gods and escaped" :
 					"escaped from the dungeon"),
-#endif
 			u.urscore, plur(u.urscore));
 	    dump_line("", pbuf);
 	    if (!done_stopprint) {

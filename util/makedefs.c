@@ -328,9 +328,7 @@ make_version()
 			| (1L << 17)
 			| (1L << 18)
 			| (1L << 19)
-#ifdef EXP_ON_BOTL
 			| (1L << 20)
-#endif
 #ifdef SCORE_ON_BOTL
 			| (1L << 21)
 #endif
@@ -481,9 +479,7 @@ static const char *build_opts[] = {
 #ifdef REALTIME_ON_BOTL
 		"elapsed time on status line",
 #endif
-#ifdef EXP_ON_BOTL
 		"experience points on status line",
-#endif
 #ifdef HOLD_LOCKFILE_OPEN
 		"exclusive lock on level 0 file",
 #endif
@@ -555,9 +551,7 @@ static const char *build_opts[] = {
 # endif
 #endif
 		"variable playground",
-#ifdef WIN_EDGE
 		"win_edge",
-#endif
 #ifdef ZEROCOMP
 		"zero-compressed save files",
 #endif

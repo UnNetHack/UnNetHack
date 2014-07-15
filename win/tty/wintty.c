@@ -1721,17 +1721,13 @@ tty_display_nhwindow(window, blocking)
 	cw->offx = (uchar) (int)
 	    max((int) 10, (int) (ttyDisplay->cols - cw->maxcol - 1));
 	if(cw->type == NHW_MENU
-#ifdef WIN_EDGE
 	    || iflags.win_edge
-#endif
 	)
 	    cw->offy = 0;
 	if(ttyDisplay->toplin == 1)
 	    tty_display_nhwindow(WIN_MESSAGE, TRUE);
 	if(cw->offx == 10 || cw->maxrow >= (int) ttyDisplay->rows
-#ifdef WIN_EDGE
 	    || iflags.win_edge
-#endif
 	) {
 	    cw->offx = 0;
 	    if(cw->offy) {

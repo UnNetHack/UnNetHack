@@ -61,9 +61,7 @@ struct flag {
 
 	boolean  pushweapon;	/* When wielding, push old weapon into second slot */
 	boolean  safe_dog;	/* give complete protection to the dog */
-#ifdef EXP_ON_BOTL
 	boolean  showexp;	/* show experience points */
-#endif
 	boolean  invweight;
 	boolean  showweight;
 #ifdef SCORE_ON_BOTL
@@ -216,9 +214,7 @@ struct instance_flags {
 	boolean  extmenu;	/* extended commands use menu interface */
 #endif
 	boolean use_menu_color;	/* use color in menus; only if wc_color */
-#ifdef WIN_EDGE
 	boolean  win_edge;	/* are the menus aligned left&top */
-#endif
 	boolean use_status_colors; /* use color in status line; only if wc_color */
 #if defined(WIN32)
 	boolean  rawio;		/* whether can use rawio (IOCTL call) */

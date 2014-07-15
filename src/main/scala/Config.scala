@@ -71,7 +71,6 @@ type glypth_t = Int
  */
 
 /* I/O */
-#define EXP_ON_BOTL	/* Show experience on bottom line */
 /* #define SCORE_ON_BOTL */	/* added by Gary Erickson (erickson@ucivax) */
 
 val DOAGAIN = '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
@@ -96,19 +95,17 @@ val DOAGAIN = '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
  * pmatch() provides basic globbing: '*' and '?' wildcards.
  */
 
+/***
+MOTODO: Do we want this kind of logging?
 #define DUMP_LOG        /* Dump game end information to a file */
 /* #define DUMP_FN "/tmp/%n.nh" */      /* Fixed dumpfile name, if you want
                                          * to prevent definition by users */
 #define DUMP_TEXT_LOG   /* Dump game end information in a plain text form */
 /*#define DUMP_HTML_LOG*/   /* Dump game end information to a html file */
+***/
 val DUMPMSGS = 30     /* Number of latest messages in the dump file  */
 
 /* #define WHEREIS_FILE "./whereis/%n.whereis" */ /* Write out player's current location to player.whereis */
-
-#ifdef TTY_GRAPHICS
-# define WIN_EDGE	/* windows aligned left&top */
-# define VIDEOSHADES    /* Slash'Em like colors */
-#endif
 
 /* End of Section 5 */
 
@@ -119,12 +116,7 @@ val DUMPMSGS = 30     /* Number of latest messages in the dump file  */
  * They come from patches that have been unconditionally incorporated
  * into UnNetHack.
  */
-#define WEBB_DISINT /* Disintegrator - Nicholas Webb */
-#define ASTRAL_ESCAPE /* Allow escape from Astral plane (with the Amulet) - CWC */
 /* #define LIVELOG_BONES_KILLER */ /* Report if a ghost of a former player is
                                     * killed - Patric Mueller (15 Aug 2009) */
-#define ADJSPLIT /* splittable #adjust - Sam Dennis, conditionalized by Jukka Lahtinen */
-#define TUTORIAL_MODE /* Alex Smith */
-#define SHOW_WEIGHT
 /* End of Section 6 */
 }

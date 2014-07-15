@@ -1311,10 +1311,8 @@ dosacrifice()
     }
 
     if (otmp->otyp == AMULET_OF_YENDOR) {
-#ifdef ASTRAL_ESCAPE
 	/* There's now an atheist option to win the game */
 	u.uconduct.gnostic++;
-#endif
 	if (!Is_astralevel(&u.uz)) {
 	    if (Hallucination)
 		    You_feel("homesick.");
@@ -1424,9 +1422,7 @@ dosacrifice()
     } /* real Amulet */
 
     if (otmp->otyp == FAKE_AMULET_OF_YENDOR) {
-#ifdef ASTRAL_ESCAPE
 	u.uconduct.gnostic++;
-#endif
 	    if (flags.soundok)
 		You_hear("a nearby thunderclap.");
 	    if (!otmp->known) {
@@ -2015,7 +2011,6 @@ int dx,dy;
     return FALSE;
 }
 
-#ifdef ASTRAL_ESCAPE
 int
 invoke_amulet(otmp)
     struct obj *otmp;
@@ -2102,6 +2097,5 @@ invoke_amulet(otmp)
 	} /* fake Amulet */
 	return 0;
 }
-#endif
 
 /*pray.c*/

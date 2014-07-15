@@ -96,11 +96,7 @@ static struct Bool_Opt
 	{"IBMgraphics", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"ignintr", &flags.ignintr, FALSE, SET_IN_GAME},
-#ifdef SHOW_WEIGHT
 	{"invweight", &flags.invweight, FALSE, SET_IN_GAME},
-#else
-	{"invweight", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 	{"large_font", &iflags.obsolete, FALSE, SET_IN_FILE},	/* OBSOLETE */
 	{"legacy", &flags.legacy, TRUE, SET_IN_FILE},
 	{"lit_corridor", &flags.lit_corridor, TRUE, SET_IN_FILE},
@@ -175,11 +171,7 @@ static struct Bool_Opt
 	{"showbuc", &iflags.show_buc, TRUE, SET_IN_GAME},
 	{"showdmg", &iflags.showdmg, FALSE, SET_IN_GAME},
 	{"show_dgn_name", &iflags.show_dgn_name, TRUE, SET_IN_GAME},
-#ifdef EXP_ON_BOTL
 	{"showexp", &flags.showexp, FALSE, SET_IN_GAME},
-#else
-	{"showexp", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 	{"showrace", &iflags.showrace, FALSE, SET_IN_GAME},
 #ifdef REALTIME_ON_BOTL
 	{"showrealtime", &iflags.showrealtime, FALSE, SET_IN_GAME},
@@ -189,11 +181,7 @@ static struct Bool_Opt
 #else
 	{"showscore", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
-#ifdef SHOW_WEIGHT
 	{"showweight", &flags.showweight, FALSE, SET_IN_GAME},
-#else
-	{"showweight", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 	{"silent", &flags.silent, TRUE, SET_IN_GAME},
 	{"softkeyboard", &iflags.wc2_softkeyboard, FALSE, SET_IN_FILE},
 	{"sortpack", &flags.sortpack, TRUE, SET_IN_GAME},
@@ -219,11 +207,7 @@ static struct Bool_Opt
 	{"UTF8graphics", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"use_inverse",   &iflags.wc_inverse, TRUE, SET_IN_GAME},		/*WC*/
-#ifdef WIN_EDGE
 	{"win_edge", &iflags.win_edge, FALSE, SET_IN_GAME},
-#else
-	{"win_edge", (boolean *)0, TRUE, SET_IN_FILE},
-#endif
 	{"wound_message", &flags.wounds, TRUE, SET_IN_GAME},
 	{"vanilla_ui_behavior", &iflags.vanilla_ui_behavior, FALSE, SET_IN_FILE},
 	{"verbose", &flags.verbose, TRUE, SET_IN_GAME},
@@ -372,10 +356,8 @@ static struct Comp_Opt
 	{ "traps",    "the symbols to use in drawing traps",
 						MAXTCHARS+1, SET_IN_FILE },
 	{ "vary_msgcount", "show more old messages at a time", 20, DISP_IN_GAME }, /*WC*/
-#ifdef VIDEOSHADES
 	{ "videocolors", "color mappings for internal screen routines",
 						40, DISP_IN_GAME },
-#endif
 #ifdef WIN32CON
 	{"subkeyvalue", "override keystroke value", 7, SET_IN_FILE},
 #endif
@@ -394,10 +376,8 @@ static struct Comp_Opt
 
 static boolean need_redraw; /* for doset() */
 
-#ifdef VIDEOSHADES
 extern char *shade[3];		  /* in sys/msdos/video.c */
 extern int ttycolors[CLR_MAX];	  /* in sys/msdos/video.c, win/tty/termcap.c */
-#endif
 
 static char def_inv_order[MAXOCLASSES] = {
 	COIN_CLASS, AMULET_CLASS, WEAPON_CLASS, ARMOR_CLASS, FOOD_CLASS,
@@ -2540,7 +2520,6 @@ goodfruit:
 		return;
 	}
 	
-#ifdef VIDEOSHADES
 	/* videocolors:string */
 	fullname = "videocolors";
 	if (match_optname(opts, fullname, 6, TRUE) ||
@@ -2556,7 +2535,6 @@ goodfruit:
 			badoption(opts);
 		return;
 	}
-#endif /* VIDEOSHADES */
 
 	/* WINCAP
 	 * map_mode:[tiles|ascii4x6|ascii6x8|ascii8x8|ascii16x8|ascii7x12|ascii8x12|
@@ -2900,15 +2878,11 @@ goodfruit:
 			if (initial) return;
 
 			if ((boolopt[i].addr) == &flags.time
-#ifdef EXP_ON_BOTL
 			 || (boolopt[i].addr) == &flags.showexp
-#endif
 #ifdef SCORE_ON_BOTL
 			 || (boolopt[i].addr) == &flags.showscore
 #endif
-#ifdef SHOW_WEIGHT
              || (boolopt[i].addr) == &flags.showweight
-#endif
 			    )
 			    flags.botl = TRUE;
 
@@ -3948,7 +3922,6 @@ char *buf;
 		if (iflags.wc_vary_msgcount) Sprintf(buf, "%d",iflags.wc_vary_msgcount);
 		else Strcpy(buf, defopt);
 	}
-#ifdef VIDEOSHADES
 	else if (!strcmp(optname, "videocolors"))
 		Sprintf(buf, "%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d",
 			ttycolors[CLR_RED], ttycolors[CLR_GREEN],
@@ -3959,7 +3932,6 @@ char *buf;
 			ttycolors[CLR_YELLOW], ttycolors[CLR_BRIGHT_BLUE],
 			ttycolors[CLR_BRIGHT_MAGENTA], 
 			ttycolors[CLR_BRIGHT_CYAN], ttycolors[CLR_WHITE]);
-#endif /* VIDEOSHADES */
 	else if (!strcmp(optname,"windowborders"))
 		Sprintf(buf, "%s", iflags.wc2_windowborders == 1     ? "1=on" :
 				   iflags.wc2_windowborders == 2             ? "2=off" :

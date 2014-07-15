@@ -104,7 +104,6 @@ init_ttycolor()
 
 static int FDECL(convert_uchars,(char *, uchar *, int));
 
-#ifdef VIDEOSHADES
 /*
  * OPTIONS=videocolors:1-2-3-4-5-6-7-8-9-10-11-12-13-14-15
  * Left to right assignments for:
@@ -132,7 +131,6 @@ int assign_videocolors(char *colorvals)
 	free((genericptr_t)tmpcolor);
 	return 1;
 }
-#endif
 
 static int
 convert_uchars(bufp,list,size)
@@ -776,13 +774,8 @@ extern char *tparm();
 #endif
 
 #  ifdef COLOR_BLACK	/* trust include file */
-#ifndef VIDEOSHADES
-#undef COLOR_BLACK
-#endif
 #  else
-#ifdef VIDEOSHADES
 #define COLOR_BLACK   0
-#endif
 #define COLOR_BLUE    1
 #define COLOR_GREEN   2
 #define COLOR_CYAN    3
@@ -791,9 +784,6 @@ extern char *tparm();
 #define COLOR_YELLOW  6
 #define COLOR_WHITE   7
 #  endif
-#ifndef VIDEOSHADES
-#define COLOR_BLACK COLOR_BLUE
-#endif
 
 const int ti_map[8] = {
 	COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,

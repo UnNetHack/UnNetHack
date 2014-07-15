@@ -610,7 +610,6 @@ init_ttycolor()
 						FOREGROUND_INTENSITY;
 }
 
-#ifdef VIDEOSHADES
 static int FDECL(convert_uchars,(char *, uchar *, int));
 
 /*
@@ -683,7 +682,6 @@ convert_uchars(bufp,list,size)
     }
     /*NOTREACHED*/
 }
-#endif /* !VIDEOSHADES */
 
 
 int
