@@ -69,9 +69,6 @@ System:  gcc-3.2, XFree86-libs-4.2.1, ncurses-5.2, glibc-2.3.2 (GLIBC_2.3)
 3.  Edit include/config.h and include/unixconf.h
     config.h: define X11_GRAPHICS window support.
               define USE_XPM support.
-              define COMPRESS as /bin/gzip as that is where it
-              seems to reside on newer Linux's.
-              define COMPRESS_EXTENSION as ".gz"
               define DLB
 
     unixconf.h: define LINUX

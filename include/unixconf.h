@@ -147,15 +147,6 @@
 
 
 
-#ifdef COMPRESS
-/* Some implementations of compress need a 'quiet' option.
- * If you've got one of these versions, put -q here.
- * You can also include any other strange options your compress needs.
- * If you have a normal compress, just leave it commented out.
- */
-/* #define COMPRESS_OPTIONS "-q" */
-#endif
-
 #define FCMASK	0660	/* file creation mask */
 
 /* fcntl(2) is a POSIX-portable call for manipulating file descriptors.

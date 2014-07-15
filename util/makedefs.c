@@ -472,9 +472,6 @@ static const char *build_opts[] = {
 #ifdef COM_COMPL
 		"command line completion",
 #endif
-#ifdef COMPRESS
-		"data file compression",
-#endif
 #ifdef DLB
 		"data librarian",
 #endif

@@ -74,10 +74,8 @@ def strcmpi(a: String,b: String) = strncmpi((a),(b),-1)
 /* comment out to test effects of each #define -- these will probably
  * disappear eventually
  */
-#ifdef INTERNAL_COMP
 # define RLECOMP	/* run-length compression of levl array - JLee */
 # define ZEROCOMP	/* zero-run compression of everything - Olaf Seibert */
-#endif
 ***/
 
 type CHAR_P = char
