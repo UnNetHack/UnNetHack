@@ -3,6 +3,7 @@
 /* Conversion to Scala copyright (c) 2014 Sheldon Young. */
 
 import Config._
+import Coord._
 
 object Decl {
 

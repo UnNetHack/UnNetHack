@@ -37,17 +37,4 @@ panic VA_DECL(char *,str)
 	return;
 }
 
-#ifdef ALLOCA_HACK
-/*
- * In case bison-generated foo_yacc.c tries to use alloca(); if we don't
- * have it then just use malloc() instead.  This may not work on some
- * systems, but they should either use yacc or get a real alloca routine.
- */
-long *alloca(cnt)
-unsigned cnt;
-{
-	return cnt ? alloc(cnt) : (long *)0;
-}
-#endif
-
 /*panic.c*/

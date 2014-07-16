@@ -7,6 +7,7 @@ import Global.xchar
 object Coord {
 
 class coord(var x: xchar, var y: xchar) {
+  def this() = this(0, 0)
 }
 
 }

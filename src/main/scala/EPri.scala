@@ -4,6 +4,7 @@
 
 import Align._
 import Coord._
+import Config._
 
 object EPri {
 

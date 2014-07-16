@@ -99,18 +99,6 @@
 
 #define MAIL			/* Deliver mail during the game */
 
-/* The Andrew Message System does mail a little differently from normal
- * UNIX.  Mail is deposited in the user's own directory in ~/Mailbox
- * (another directory).  MAILBOX is the element that will be added on to
- * the user's home directory path to generate the Mailbox path - just in
- * case other Andrew sites do it differently from CMU.
- *
- *		dan lovinger
- *		dl2n+@andrew.cmu.edu (dec 19 1989)
- */
-
-/* #define AMS */		/* use Andrew message system for mail */
-
 /* NO_MAILREADER is for kerberos authenticating filesystems where it is
  * essentially impossible to securely exec child processes, like mail
  * readers, when the game is running under a special token.
@@ -122,30 +110,20 @@
 
 #ifdef	MAIL
 # if defined(BSD)
-#  ifdef AMS
-#define AMS_MAILBOX	"/Mailbox"
-#  else
 #   if defined(__FreeBSD__) || defined(__OpenBSD__)
 #define DEF_MAILREADER	"/usr/bin/mail"
 #   else
 #define DEF_MAILREADER	"/usr/ucb/Mail"
 #   endif
-#  endif
 #else
 # if defined(SYSV) && !defined(LINUX)
-#  if defined(M_XENIX)
-#define DEF_MAILREADER	"/usr/bin/mail"
-#  else
 #define DEF_MAILREADER	"/usr/bin/mailx"
-#  endif
 # else
 #define DEF_MAILREADER	"/bin/mail"
 # endif
 #endif
 
 #endif	/* MAIL */
-
-
 
 #define FCMASK	0660	/* file creation mask */
 
@@ -159,15 +137,6 @@
 /*
  * The remainder of the file should not need to be changed.
  */
-
-#ifdef _AUX_SOURCE
-# ifdef AUX /* gcc ? */
-#  define _SYSV_SOURCE
-#  define _BSD_SOURCE
-#else
-#  define AUX
-# endif
-#endif /* _AUX_SOURCE */
 
 #if defined(LINUX)
 # ifndef POSIX_TYPES
@@ -202,30 +171,10 @@
 #define SUSPEND		/* let ^Z suspend the game */
 #endif
 
-
-#if defined(BSD)
-#include <sys/time.h>
-#else
-#include <time.h>
-#endif
-
 #define HLOCK	"perm"	/* an empty file used for locking purposes */
 #define HLOCK_AREA	FILE_AREA_VAR
 
-#include "system.h"
-
 #define tgetch getchar
-
-#define SHELL		/* do not delete the '!' command */
-
-#if defined(POSIX_TYPES) || defined(__GNUC__)
-#include <stdlib.h>
-#include <unistd.h>
-#endif
-
-#if defined(POSIX_TYPES) || defined(__GNUC__) || defined(BSD)
-#include <sys/wait.h>
-#endif
 
 #if defined(BSD)
 #define memcpy(d, s, n)		bcopy(s, d, n)
@@ -250,14 +199,6 @@
 # if defined(LINUX) || defined(BSD)
 # define msleep(k) usleep((k)*1000)
 # endif
-#endif
-
-#ifdef hc	/* older versions of the MetaWare High-C compiler define this */
-# ifdef __HC__
-#  undef __HC__
-# endif
-# define __HC__ hc
-# undef hc
 #endif
 
 #endif /* UNIXCONF_H */

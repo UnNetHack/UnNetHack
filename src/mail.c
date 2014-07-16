@@ -48,9 +48,6 @@ static struct stat omstat,nmstat;
 static char *mailbox = (char *)0;
 static long laststattime;
 
-# if !defined(MAILPATH) && defined(AMS)	/* Just a placeholder for AMS */
-#  define MAILPATH "/dev/null"
-# endif
 # if !defined(MAILPATH) && (defined(LINUX) || defined(__osf__))
 #  define MAILPATH "/var/spool/mail/"
 # endif
@@ -69,22 +66,10 @@ getmailstatus()
 {
 	if(!mailbox && !(mailbox = nh_getenv("MAIL"))) {
 #  ifdef MAILPATH
-#   ifdef AMS
-	        struct passwd ppasswd;
-
-		(void) memcpy(&ppasswd, getpwuid(getuid()), sizeof(struct passwd));
-		if (ppasswd.pw_dir) {
-		     mailbox = (char *) alloc((unsigned) strlen(ppasswd.pw_dir)+sizeof(AMS_MAILBOX));
-		     Strcpy(mailbox, ppasswd.pw_dir);
-		     Strcat(mailbox, AMS_MAILBOX);
-		} else
-		  return;
-#   else
 		const char *pw_name = getpwuid(getuid())->pw_name;
 		mailbox = (char *) alloc(sizeof(MAILPATH)+strlen(pw_name));
 		Strcpy(mailbox, MAILPATH);
 		Strcat(mailbox, pw_name);
-#  endif /* AMS */
 #  else
 		return;
 #  endif
@@ -556,9 +541,7 @@ struct obj *otmp;
 		terminate(EXIT_FAILURE);
 	}
 # else
-#  ifndef AMS				/* AMS mailboxes are directories */
 	display_file(mailbox, TRUE);
-#  endif /* AMS */
 # endif /* DEF_MAILREADER */
 
 	/* get new stat; not entirely correct: there is a small time

@@ -4,11 +4,8 @@
 #ifndef NTCONF_H
 #define NTCONF_H
 
-/* #define SHELL */	/* nt use of pcsys routines caused a hang */
-
 #define RANDOM		/* have Berkeley random(3) */
 
-#define EXEPATH			/* Allow .exe location to be used as HACKDIR */
 #define TRADITIONAL_GLYPHMAP	/* Store glyph mappings at level change time */
 #ifdef WIN32CON
 #define LAN_FEATURES		/* Include code for lan-aware features. Untested in 3.4.0*/
@@ -18,8 +15,6 @@
 				/* without first receiving confirmation. */
 
 #define HOLD_LOCKFILE_OPEN	/* Keep an exclusive lock on the .0 file */
-
-#define SELF_RECOVER		/* Allow the game itself to recover from an aborted game */
 
 //#define USER_SOUNDS
 /*
@@ -122,13 +117,6 @@ extern void FDECL(map_subkeyvalue, (char *));
 extern void NDECL(load_keyboard_handler);
 #endif
 
-#include <fcntl.h>
-#include <io.h>
-#include <direct.h>
-#ifndef CURSES_GRAPHICS
-# include <conio.h>
-#endif
-#undef kbhit		/* Use our special NT kbhit */
 #define kbhit (*nt_kbhit)
 
 #ifdef LAN_FEATURES
@@ -136,10 +124,6 @@ extern void NDECL(load_keyboard_handler);
 #define LAN_RO_PLAYGROUND	/* not implemented in 3.3.0 */
 #define LAN_SHARED_BONES	/* not implemented in 3.3.0 */
 #include "nhlan.h"
-#endif
-
-#ifndef alloca
-#define ALLOCA_HACK	/* used in util/panic.c */
 #endif
 
 #ifdef _MSC_VER

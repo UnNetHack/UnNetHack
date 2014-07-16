@@ -228,8 +228,8 @@ def FEATURE_NOTICE_VER_MAJ = (flags.suppress_alert >> 24)
 def FEATURE_NOTICE_VER_MIN = (((0x0000000000FF0000L & flags.suppress_alert)) >> 16)
 def FEATURE_NOTICE_VER_PATCH = (((0x000000000000FF00L & flags.suppress_alert)) >>  8)
 
-def max(a: Long,b: Long) = if(a > b) else a : b
-def min(x: Long,y: Long) = if(x < y) else x : y
+def max(a: Long,b: Long) = if(a > b) a else b
+def min(x: Long,y: Long) = if(x < y) x else y
 def plur(x: Long) = if(x == 1) "" else "s"
 
 def ARM_BONUS(obj: obj) = (objects(obj.otyp).a_ac + obj.spe +

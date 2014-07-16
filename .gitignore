@@ -1,6 +1,3 @@
-*.swp
-*.swo
-
 # SBT
 target/
 
@@ -35,8 +32,6 @@ target/
 /include/win32api.h
 
 # /src/
-/src/config.h-t
-/src/hack.h-t
 /src/monstr.c
 /src/tile.c
 
@@ -49,3 +44,10 @@ target/
 # Eclipse
 .cproject
 .project
+
+# IntelliJ IDEA
+.idea
+
+# vi
+*.swp
+*.swo

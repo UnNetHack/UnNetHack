@@ -44,10 +44,6 @@ extern boolean getreturn_enabled;	/* from sys/share/pcsys.c */
 extern void NDECL(mswin_destroy_reg);
 #endif
 
-#ifdef EXEPATH
-STATIC_DCL char *FDECL(exepath,(char *));
-#endif
-
 #ifdef OVL0
 int FDECL(main, (int,char **));
 #endif
@@ -107,10 +103,6 @@ char *argv[];
 	dir = nh_getenv("NETHACKDIR");
 	if (dir == (char *)0)
 		dir = nh_getenv("HACKDIR");
-#ifdef EXEPATH
-	if (dir == (char *)0)
-		dir = exepath(argv[0]);
-#endif
 	if (dir != (char *)0) {
 		(void) strncpy(hackdir, dir, PATHLEN - 1);
 		hackdir[PATHLEN-1] = '\0';
@@ -505,37 +497,5 @@ port_help()
 # endif /* WIN32 */
 #endif /* PORT_HELP */
 
-#ifdef EXEPATH
-#define PATH_SEPARATOR '\\'
-#define EXEPATHBUFSZ 256
-char exepathbuf[EXEPATHBUFSZ];
-
-char *exepath(str)
-char *str;
-{
-	char *tmp, *tmp2;
-	int bsize;
-
-	if (!str) return (char *)0;
-	bsize = EXEPATHBUFSZ;
-	tmp = exepathbuf;
-# ifndef WIN32
-	Strcpy (tmp, str);
-# else
-	#ifdef UNICODE
-	{
-		TCHAR wbuf[BUFSZ];
-		GetModuleFileName((HANDLE)0, wbuf, BUFSZ);
-		WideCharToMultiByte(CP_ACP, 0, wbuf, -1, tmp, bsize, NULL, NULL);
-	}
-	#else
-		*(tmp + GetModuleFileName((HANDLE)0, tmp, bsize)) = '\0';
-	#endif
-# endif
-	tmp2 = strrchr(tmp, PATH_SEPARATOR);
-	if (tmp2) *tmp2 = '\0';
-	return tmp;
-}
-#endif /* EXEPATH */
 #endif /*OVLB*/
 /*pcmain.c*/

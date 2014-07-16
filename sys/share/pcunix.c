@@ -96,25 +96,12 @@ getlock()
 	(void) close(fd);
 
 	if(iflags.window_inited) { 
-# ifdef SELF_RECOVER
 	  c = yn("There are files from a game in progress under your name. Recover?");
-# else
-	  pline("There is already a game in progress under your name.");
-	  pline("You may be able to use \"recover %s\" to get it back.\n",tbuf);
-	  c = yn("Do you want to destroy the old game?");
-# endif
 	} else {
 		c = 'n';
 		ct = 0;
-# ifdef SELF_RECOVER
 		msmsg(
 		"There are files from a game in progress under your name. Recover? [yn]");
-# else
-		msmsg("\nThere is already a game in progress under your name.\n");
-		msmsg("If this is unexpected, you may be able to use \n");
-		msmsg("\"recover %s\" to get it back.",tbuf);
-		msmsg("\nDo you want to destroy the old game? [yn] ");
-# endif
 		while ((ci=nhgetch()) != '\n') {
 		    if (ct > 0) {
 			msmsg("\b \b");
@@ -129,17 +116,6 @@ getlock()
 		}
 	}
 	if(c == 'y' || c == 'Y')
-# ifndef SELF_RECOVER
-		if(eraseoldlocks()) {
-#  if defined(WIN32CON)
-			clear_screen();		/* display gets fouled up otherwise */
-#  endif
-			goto gotlock;
-		} else {
-			unlock_file(HLOCK);
-			error("Couldn't destroy old game.");
-		}
-# else /*SELF_RECOVER*/
 		if(recover_savefile()) {
 #  if defined(WIN32CON)
 			clear_screen();		/* display gets fouled up otherwise */
@@ -149,7 +125,6 @@ getlock()
 			unlock_file(HLOCK);
 			error("Couldn't recover old game.");
 		}
-# endif /*SELF_RECOVER*/
 	else {
 		unlock_file(HLOCK);
 		error("%s", "Cannot start a new game.");

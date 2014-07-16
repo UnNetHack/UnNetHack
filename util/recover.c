@@ -35,10 +35,6 @@ void FDECL(copy_bytes, (int,int));
 #  endif
 #endif
 
-#if defined(EXEPATH)
-char *FDECL(exepath, (char *));
-#endif
-
 char savename[SAVESIZE]; /* holds relative path of save file from playground */
 
 #ifndef NO_MAIN
@@ -53,9 +49,6 @@ char *argv[];
 	if (!dir) dir = getenv("NETHACKDIR");
 	if (!dir) dir = getenv("HACKDIR");
 	if (!dir) dir = FILE_AREA_LEVL;
-#if defined(EXEPATH)
-	if (!dir) dir = exepath(argv[0]);
-#endif
 	if (argc == 1 || (argc == 2 && !strcmp(argv[1], "-"))) {
 	    Fprintf(stderr,
 		"Usage: %s [ -d directory ] base1 [ base2 ... ]\n", argv[0]);
@@ -287,30 +280,5 @@ const char *directory;
 	Close(sfd);
 	return(0);
 }
-
-#ifdef EXEPATH
-#define PATH_SEPARATOR '\\'
-#define EXEPATHBUFSZ 256
-char exepathbuf[EXEPATHBUFSZ];
-
-char *exepath(str)
-char *str;
-{
-	char *tmp, *tmp2;
-	int bsize;
-
-	if (!str) return (char *)0;
-	bsize = EXEPATHBUFSZ;
-	tmp = exepathbuf;
-#if !defined(WIN32)
-	strcpy (tmp, str);
-#else
-	*(tmp + GetModuleFileName((HANDLE)0, tmp, bsize)) = '\0';
-#endif
-	tmp2 = strrchr(tmp, PATH_SEPARATOR);
-	if (tmp2) *tmp2 = '\0';
-	return tmp;
-}
-#endif /* EXEPATH */
 
 /*recover.c*/

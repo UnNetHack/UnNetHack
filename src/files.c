@@ -111,9 +111,7 @@ STATIC_DCL FILE *FDECL(fopen_config_file, (const char *));
 STATIC_DCL int FDECL(get_uchars, (FILE *,char *,char *,uchar *,BOOLEAN_P,int,const char *));
 int FDECL(parse_config_line, (FILE *,char *,char *,char *, BOOLEAN_P));
 STATIC_DCL void FDECL(adjust_prefix, (char *, int));
-#ifdef SELF_RECOVER
 STATIC_DCL boolean FDECL(copy_bytes, (int, int));
-#endif
 #ifdef HOLD_LOCKFILE_OPEN
 STATIC_DCL int FDECL(open_levelfile_exclusively, (const char *, int, int));
 #endif
@@ -1609,8 +1607,6 @@ const char *reason;	/* explanation */
 
 /* ----------  END PANIC/IMPOSSIBLE LOG ----------- */
 
-#ifdef SELF_RECOVER
-
 /* ----------  BEGIN INTERNAL RECOVER ----------- */
 boolean
 recover_savefile()
@@ -1765,6 +1761,5 @@ int ifd, ofd;
 }
 
 /* ----------  END INTERNAL RECOVER ----------- */
-#endif /*SELF_RECOVER*/
 
 /*files.c*/
