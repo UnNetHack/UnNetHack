@@ -94,6 +94,7 @@ static const char *random_mesg[] = {
 	"Elvis has left the dungeon.",
 	"For truth, justice, and the Yendorian way!",
 	"This engraving, no verb",        /* Douglas Hofstadter */
+	"You will curse my name to the heavens and the heavens will side with me"  /* War of Omens */
 	
 	/* From dNetHack */
 	"[REDACTED]", "[DATA EXPUNGED]", "[DATA PLUNGED]", /* SCP Foundation */

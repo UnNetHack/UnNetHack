@@ -1233,6 +1233,8 @@ static const char * const bogusmons[] = {
 	"mainstream media",
 	"Demonhead Mobster Kingpin",		/* Problem Sleuth */
 	"courtesan angel", "fractal bee",
+	"Weasel King",
+	"Yarakeen",                        /*  War of Omens  */
 
 	/* bogus UnNetHack monsters */
 	"weeping angle",
