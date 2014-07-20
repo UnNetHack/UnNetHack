@@ -263,9 +263,12 @@ doaltarobj(obj)  /* obj is an object dropped on an altar */
 		int bcucount = 0;
 		struct obj *otmp;
 		for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
-			if (otmp->blessed || otmp->cursed)
+			if ((otmp->blessed || otmp->cursed) && otmp->oclass != COIN_CLASS) {
 				bcucount++;
-			if (!Hallucination) otmp->bknown = 1;
+				if (!Hallucination) otmp->bknown = 1;
+			} else {
+				otmp->bknown = 1;
+			}
 		}
 		if (bcucount == 1) {
 			pline("Looking inside %s, you see a colored flash.",

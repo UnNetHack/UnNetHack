@@ -16,6 +16,7 @@
 	  - Fixed improper explosion behavior for wand of fire and wand of cold (reported by Stenno)
 	  - Fixed crash when drained troll corpse evaporated but rot timer was
 	    still set on invalid pointer
+	  - Correctly identify uncursed items in bags dropped on altars when hallucinating
 
 	* vanilla bug fixes:
 	  - C343-439: Running NetHack in a terminal window with more than 255
