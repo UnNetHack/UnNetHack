@@ -4,6 +4,11 @@
 
 import Config._
 import Coord._
+import Dungeon._
+import Global._
+import Hack._
+import PerMonst._
+import You._
 
 object Decl {
 

@@ -9,8 +9,10 @@ package object root {
 	implicit def int2Boolean(a: Int): Boolean = (a != 0)
 
 	//
-	// C functions
+	// C functions and types
 	//
+
+	type time_t = Int
 
 	def atoi(s: String): Int = s.toInt
 
