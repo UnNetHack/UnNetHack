@@ -457,7 +457,7 @@ val zapcolors = List(
     CLR_GREEN		/* 8 - acid */
 )
 
-val shield_static = Array(
+val shield_static = List(
     S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,	/* 7 per row */
     S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,
     S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4

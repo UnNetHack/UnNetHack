@@ -10,10 +10,10 @@ val REPAIR_DELAY = 5	/* minimum delay between shop damage & repair */
 val BILLSZ = 200
 
 class bill_x {
-	unsigned bo_id;
-	boolean useup;
-	long price;		/* price per unit */
-	long bquan;		/* amount used up */
+	var bo_id = 0
+	var useup = false
+	var price = 0		/* price per unit */
+	var bquan = 0		/* amount used up */
 }
 
 class eshk {

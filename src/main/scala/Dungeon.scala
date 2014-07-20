@@ -2,6 +2,9 @@
 /* NetHack may be freely redistributed.  See license for details. */
 /* Conversion to Scala copyright (c) 2014 Sheldon Young. */
 
+import Config._
+import Global._
+
 object Dungeon {
 
 class d_flags {	/* dungeon/level type flags */
@@ -14,8 +17,8 @@ class d_flags {	/* dungeon/level type flags */
 }
 
 class d_level {	/* basic dungeon level element */
-	var dnum: xchar = 0		/* dungeon number */
-	var dlevel: xchar = 0		/* level number */
+	var dnum: xchar = _		/* dungeon number */
+	var dlevel: xchar = _		/* level number */
 } 
 
 class s_level {	/* special dungeon level element */
@@ -23,7 +26,7 @@ class s_level {	/* special dungeon level element */
 	var dlevel = new d_level()		/* dungeon & level numbers */
 	var proto: String = null	/* name of prototype file (eg. "tower") */
 	var boneid: Char = 0		/* character to id level in bones files */
-	var rndlevs: uchar = 0	/* no. of randomly available similar levels */
+	var rndlevs: uchar = _	/* no. of randomly available similar levels */
 	var flags = new d_flags()		/* type flags */
 }
 

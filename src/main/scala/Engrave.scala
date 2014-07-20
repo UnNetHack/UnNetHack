@@ -2,15 +2,17 @@
 /* NetHack may be freely redistributed.  See license for details. */
 /* Conversion to Scala copyright (c) 2014 Sheldon Young. */
 
+import Global._
+
 object Engrave {
 
 class engr {
 	var nxt_engr: engr = null
 	var engr_txt: String = null
-	var engr_x, engr_y: xchar = 0
+	var engr_x, engr_y: xchar = _
 	var engr_lth = 0	/* for save & restore; not length of text */
-	var engr_time = 0;	/* moment engraving was (will be) finished */
-	var engr_type: xchar = 0
+	var engr_time = 0	/* moment engraving was (will be) finished */
+	var engr_type: xchar = _
 val DUST = 1
 val ENGRAVE = 2
 val BURN = 3

@@ -2,8 +2,9 @@
 /* NetHack may be freely redistributed.  See license for details. */
 /* Conversion to Scala copyright (c) 2014 Sheldon Young. */
 
+import Align._
 import Config._
-import Pm._
+//import Pm._
 
 object PerMonst {
 
@@ -34,7 +35,7 @@ val NATTK = 6
 val WT_HUMAN = 1450
 
 class permonst {
-	var 	mname: String = null			/* full name */
+	var mname: String = null			/* full name */
 	var	mlet = '\0'				/* symbol */
 	var	unicode_codepoint: glyph_t = null	/* unicode codepoint for utf8graphics */
 	var	mlevel: schar = 0			/* base monster level */

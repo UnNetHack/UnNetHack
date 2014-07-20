@@ -4,6 +4,8 @@
 
 import Align._
 import Attrib._
+import Config._
+import Global._
 import Monst._
 import Skills._
 
@@ -253,18 +255,17 @@ val ROLE_ALIGNS = 3	/* number of permitted player alignments */
  */
 /*** Unified structure specifying conduct information ***/
 class Conduct {
-	const char *name;		/* pacifism/nudism/...	*/
-	const char *noun;		/* pacifist/nudist/...	*/
-	const char *adj;		/* peaceful/nude/...	*/
+	var name: String = null		/* pacifism/nudism/...	*/
+	var noun: String = null		/* pacifist/nudist/...	*/
+	var adj: String = null		/* peaceful/nude/...	*/
 
-	boolean highscore;		/* conduct appears in the highscore */
+	var highscore = false		  /* conduct appears in the highscore */
 
-	const char *prefix;		/* "You "	*/
-	const char *presenttxt;		/* "have been "	*/
-	const char *pasttxt;		/* "were "	*/
-	const char *suffix;		/* "a pacifist"	*/
-	const char *failtxt;		/* "pretended to be a pacifist" */
-
+	var prefix: String = null		  /* "You "	*/
+	var presenttxt: String = null	/* "have been "	*/
+	var pasttxt: String = null		/* "were "	*/
+	var suffix: String = null		  /* "a pacifist"	*/
+	var failtxt: String = null		/* "pretended to be a pacifist" */
 }
 
 /*
@@ -422,7 +423,7 @@ val LUCKMIN = -10
 	val weapon_skills = new Array[skills](P_NUM_SKILLS)
 	var twoweap = false		/* KMH -- Using two-weapon combat */
 	var incloud = false		/* used for blindness in stinking clouds */
-}	/* end of `struct you' */
+}
 
 def Upolyd: Boolean = (u.umonnum != u.umonster)
 }
