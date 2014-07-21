@@ -5,6 +5,7 @@
 import Align.A_NONE
 import Config._
 import PerMonst._
+import Prop._
 
 object Artifact {
 

@@ -2,11 +2,13 @@
 /* NetHack may be freely redistributed.  See license for details. */
 /* Conversion to Scala copyright (c) 2014 Sheldon Young. */
 
+import C2Scala._
 import Config._
 import Coord._
 import Dungeon._
 import Global._
 import Hack._
+import Obj._
 import PerMonst._
 import You._
 
@@ -391,8 +393,8 @@ val digging = new dig_info()
 
 val dungeons = new Array[dungeon](MAXDUNGEON)	/* ini'ed by init_dungeon() */
 val sp_levchn = new s_level()
-val upstair = new stairway( 0, 0 ); val dnstair = new stairway( 0, 0 )
-val upladder = new stairway( 0, 0 ); val dnladder = new stairway( 0, 0 )
+val upstair = new stairway(); val dnstair = new stairway()
+val upladder = new stairway(); val dnladder = new stairway()
 val sstairs = new stairway( 0, 0 )
 val updest = new dest_area( 0, 0, 0, 0, 0, 0, 0, 0 )
 val dndest = new dest_area( 0, 0, 0, 0, 0, 0, 0, 0 )

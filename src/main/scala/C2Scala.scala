@@ -1,7 +1,7 @@
-/** Ease the translation from C to Scala.  All of this needs go away as soon as possible. */
 /* Copyright (c) 2014 Sheldon Young */
 
-package object root {
+/** Ease the translation from C to Scala.  All of this needs go away as soon as possible. */
+object C2Scala {
 
 	val NULL = null
 
