@@ -2348,7 +2348,7 @@ Set the color palette for PC systems using NO_TERMS
 The order of colors is red, green, brown, blue, magenta, cyan,
 bright.white, bright.red, bright.green, yellow, bright.blue,
 bright.magenta, and bright.cyan.
-Other systems compiled with TTY_GRAPHICS and VIDEOSHADES allow defining 
+Other systems compiled with TTY_GRAPHICS allow defining 
 three more colors. The order of colors is red, green, brown, blue, 
 magenta, cyan, gray, black, bright.red, bright.green, yellow, 
 bright.blue, bright.magenta, bright.cyan and white.

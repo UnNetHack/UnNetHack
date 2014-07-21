@@ -1184,10 +1184,8 @@ char *str;
     int i, c = CLR_UNDEFINED, a = ATR_UNDEFINED;
     struct menucoloring *tmp;
     char *tmps, *cs = strchr(str, '=');
-#ifdef MENU_COLOR_REGEX_POSIX
     int errnum;
     char errbuf[80];
-#endif
     const char *err = (char *)0;
 
     if (!cs || !str) return FALSE;
@@ -1233,27 +1231,12 @@ char *str;
     }
 
     tmp = (struct menucoloring *)alloc(sizeof(struct menucoloring));
-#ifdef MENU_COLOR_REGEX
-#ifdef MENU_COLOR_REGEX_POSIX
     errnum = regcomp(&tmp->match, tmps, REG_EXTENDED | REG_NOSUB);
     if (errnum != 0)
     {
 	regerror(errnum, &tmp->match, errbuf, sizeof(errbuf));
 	err = errbuf;
     }
-#else
-    re_syntax_options = RE_SYNTAX_POSIX_EXTENDED;
-    tmp->match.translate = 0;
-    tmp->match.fastmap = 0;
-    tmp->match.buffer = 0;
-    tmp->match.allocated = 0;
-    tmp->match.regs_allocated = REGS_FIXED;
-    err = re_compile_pattern(tmps, strlen(tmps), &tmp->match);
-#endif
-#else
-    tmp->match = (char *)alloc(strlen(tmps)+1);
-    (void) memcpy((genericptr_t)tmp->match, (genericptr_t)tmps, strlen(tmps)+1);
-#endif
     if (err) {
 	raw_printf("\nMenucolor regex error: %s\n", err);
 	wait_synch();

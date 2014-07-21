@@ -4,9 +4,7 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-# ifdef MENU_COLOR_REGEX
 #  include <regex.h>
-# endif
 
 /*
  * The color scheme used is tailored for an IBM PC.  It consists of the
@@ -15,7 +13,7 @@
  * much, so it is used as the "default" foreground color of the screen.
  */
 
-#if !defined(VIDEOSHADES) || defined(WIN32CON)
+#if defined(WIN32CON)
 #define CLR_BLACK		0
 #else
 # define CLR_BLACK		8
@@ -27,7 +25,7 @@
 #define CLR_MAGENTA		5
 #define CLR_CYAN		6
 #define CLR_GRAY		7 /* low-intensity white */
-#if !defined(VIDEOSHADES) || defined(WIN32CON)
+#if defined(WIN32CON)
 #define NO_COLOR		8
 #else
 # define NO_COLOR		0
@@ -40,7 +38,7 @@
 #define CLR_BRIGHT_CYAN		14
 #define CLR_WHITE		15
 #define CLR_MAX			16
-# define CLR_UNDEFINED		CLR_MAX
+#define CLR_UNDEFINED		CLR_MAX
 
 /* The "half-way" point for tty based color systems.  This is used in */
 /* the tty color setup code.  (IMHO, it should be removed - dean).    */
@@ -64,15 +62,7 @@
 #define HI_ZAP		CLR_BRIGHT_BLUE
 
 struct menucoloring {
-# ifdef MENU_COLOR_REGEX
-#  ifdef MENU_COLOR_REGEX_POSIX
     regex_t match;
-#  else
-    struct re_pattern_buffer match;
-#  endif
-# else
-    char *match;
-# endif
     int color, attr;
     struct menucoloring *next;
 };
