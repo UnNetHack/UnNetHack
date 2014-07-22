@@ -3,8 +3,9 @@
 /* Conversion to Scala copyright (c) 2014 Sheldon Young. */
 
 import Align._
+import C2Scala._
 import Config._
-//import Pm._
+import Pm._
 
 object PerMonst {
 
@@ -21,7 +22,8 @@ object PerMonst {
  */
 
 class attack(var aatyp: uchar, var adtyp: uchar, var damn: uchar, var damd: uchar) {
-	def this() = this(0, 0, 0, 0)
+  def this(aatyp: Int, adtyp: Int, damn: Int, damd: Int) = this(aatyp.toByte, adtyp.toByte, damn.toByte, damd.toByte)
+  def this() = this(0, 0, 0, 0)
 }
 
 /*	Max # of attacks for any given monster.
@@ -37,7 +39,7 @@ val WT_HUMAN = 1450
 class permonst {
 	var mname: String = null			/* full name */
 	var	mlet = '\0'				/* symbol */
-	var	unicode_codepoint: glyph_t = null	/* unicode codepoint for utf8graphics */
+	var	unicode_codepoint: glyph_t = _	/* unicode codepoint for utf8graphics */
 	var	mlevel: schar = 0			/* base monster level */
 	var	mmove: schar = 0			/* move speed */
 	var	ac: schar = 0				/* (base) armor class */

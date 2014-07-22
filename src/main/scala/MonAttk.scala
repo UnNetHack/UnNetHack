@@ -107,5 +107,4 @@ val MM_MISS = 0x0	/* aggressor missed */
 val MM_HIT = 0x1	/* aggressor hit defender */
 val MM_DEF_DIED = 0x2	/* defender died */
 val MM_AGR_DIED = 0x4	/* aggressor died */
-
 }

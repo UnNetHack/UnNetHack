@@ -17,6 +17,7 @@ import Obj._
 import ObjClass._
 import ONames._
 import PerMonst._
+import Pm._
 import QText._
 import Quest._
 import Rm._
@@ -384,6 +385,7 @@ val disclosure_options = "iavgc"
 
 val level_info = new Array[linfo](MAXLINFO)
 
+val MAXLINFO = (MAXDUNGEON * MAXLEVEL)
 val program_state = new sinfo()
 
 /* 'rogue'-like direction commands (cmd.c) */
@@ -395,9 +397,19 @@ val zdir: Array[Int] = Array(  0, 0, 0, 0, 0, 0, 0, 0, 1,-1 )
 
 var tbx, tby: schar = _	/* mthrowu: target */
 
-/* for xname handling of multiple shot missile volleys:
+class multishot(var n: Int, var i: Int, var o: Int, var s: Boolean) {}
+
+class dig_info {            /* apply.c, hack.c */
+    var effort = 0
+    val level = new d_level()
+    val pos = new coord()
+    var lastdigtime = 0
+    var down, chew, warned, quiet = false
+  }
+
+  /* for xname handling of multiple shot missile volleys:
    number of shots, index of current one, validity check, shoot vs throw */
-val m_shot = new multishot( 0, 0, STRANGE_OBJECT, FALSE )
+val m_shot = new multishot(0, 0, STRANGE_OBJECT, false)
 
 val digging = new dig_info()
 

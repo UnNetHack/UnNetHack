@@ -13,8 +13,8 @@ val WRITE_SAVE = 0x2
 val FREE_SAVE = 0x4
 
 /* operations of the various saveXXXchn & co. routines */
-def perform_bwrite(mode: Int) = (mode != 0) & (COUNT_SAVE|WRITE_SAVE)
-def release_data(mode: Int) = (mode != 0) & FREE_SAVE
+def perform_bwrite(mode: Int) = (mode & (COUNT_SAVE|WRITE_SAVE)) != 0
+def release_data(mode: Int) = (mode & FREE_SAVE) != 0
 
 /* The following are used in mkmaze.c */
 class container {

@@ -9,6 +9,7 @@ import Global._
 import ObjClass._
 import ONames._
 import Monst._
+import Skills._
 
 object Obj {
 

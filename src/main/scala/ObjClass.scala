@@ -83,13 +83,6 @@ def is_damageable(otmp: obj) = (is_rustprone(otmp) || is_flammable(otmp) ||
 	var oc_subtyp: schar = _
 def oc_skill	= oc_subtyp   /* Skills of weapons, spellbooks, tools, gems */
 def oc_armcat	= oc_subtyp   /* for armor */
-val ARM_SHIELD = 1	/* needed for special wear function */
-val ARM_HELM = 2
-val ARM_GLOVES = 3
-val ARM_BOOTS = 4
-val ARM_CLOAK = 5
-val ARM_SHIRT = 6
-val ARM_SUIT = 0
 
 	var oc_oprop: uchar = _		/* property (invis, &c.) conveyed */
 	var oc_class: Char = 0		/* object class */
@@ -108,10 +101,18 @@ def oc_hitbon	= oc_oc1		/* weapons: "to hit" bonus */
 
 def a_ac	=	oc_oc1	/* armor class, used in ARM_BONUS in do.c */
 def a_can	=	oc_oc2		/* armor: used in mhitu.c */
-def_level=	oc_oc2		/* books: spell level */
+def level=	oc_oc2		/* books: spell level */
 
 	var oc_nutrition = 0	/* food value */
 }
+
+val ARM_SHIELD = 1	/* needed for special wear function */
+val ARM_HELM = 2
+val ARM_GLOVES = 3
+val ARM_BOOTS = 4
+val ARM_CLOAK = 5
+val ARM_SHIRT = 6
+val ARM_SUIT = 0
 
 class objdescr {
 	var oc_name: String = null		/* actual name */

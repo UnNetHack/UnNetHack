@@ -73,12 +73,6 @@ val WARN_OF_MON = 65
 val DETECT_MONSTERS = 66
 val LAST_PROP = DETECT_MONSTERS
 
-/*** Where the properties come from ***/
-/* Definitions were moved here from obj.h and you.h */
-class prop {
-	/*** Properties conveyed by objects ***/
-	var extrinsic = 0
-	/* Armor */
 val W_ARM = 0x00000001L /* Body armor */
 val W_ARMC = 0x00000002L /* Cloak */
 val W_ARMH = 0x00000004L /* Helmet/hat */
@@ -87,13 +81,13 @@ val W_ARMG = 0x00000010L /* Gloves/gauntlets */
 val W_ARMF = 0x00000020L /* Footwear */
 val W_ARMU = 0x00000040L /* Undershirt */
 val W_ARMOR = (W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU)
-	/* Weapons and artifacts */
+/* Weapons and artifacts */
 val W_WEP = 0x00000100L /* Wielded weapon */
 val W_QUIVER = 0x00000200L /* Quiver for (f)iring ammo */
 val W_SWAPWEP = 0x00000400L /* Secondary weapon */
 val W_ART = 0x00001000L /* Carrying artifact (not really worn) */
 val W_ARTI = 0x00002000L /* Invoked artifact  (not really worn) */
-	/* Amulets, rings, tools, and other items */
+/* Amulets, rings, tools, and other items */
 val W_AMUL = 0x00010000L /* Amulet */
 val W_RINGL = 0x00020000L /* Left ring */
 val W_RINGR = 0x00040000L /* Right ring */
@@ -102,6 +96,13 @@ val W_TOOL = 0x00080000L /* Eyewear */
 val W_SADDLE = 0x00100000L	/* KMH -- For riding monsters */
 val W_BALL = 0x00200000L /* Punishment ball */
 val W_CHAIN = 0x00400000L /* Punishment chain */
+
+  /*** Where the properties come from ***/
+/* Definitions were moved here from obj.h and you.h */
+class prop {
+	/*** Properties conveyed by objects ***/
+	var extrinsic = 0
+	/* Armor */
 
 	/*** Property is blocked by an object ***/
 	var blocked = 0					/* Same assignments as extrinsic */

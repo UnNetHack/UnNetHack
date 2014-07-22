@@ -12,6 +12,7 @@ object C2Scala {
 	// C functions and types
 	//
 
+  type glyph_t = Int
 	type regex_t = scala.util.matching.Regex
   type size_t = Int
 	type time_t = Int
