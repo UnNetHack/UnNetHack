@@ -1,4 +1,4 @@
-name := "UnNetHack"
+name := "Mohack"
 
 version := "5.1.0"
 

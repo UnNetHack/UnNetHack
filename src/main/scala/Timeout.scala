@@ -35,7 +35,7 @@ type timeout_proc = (Object,Int) => Unit
     var tid = 0		/* timer ID */
     var kind: Short = 0			/* kind of use */
     var func_index: Short = 0		/* what to call when we time out */
-    var arg: genericptr_t = null		/* pointer to timeout argument */
+    var arg: Object = null		/* pointer to timeout argument */
     var needs_fixup = false	/* does arg need to be patched? */
   }
 }

@@ -9,6 +9,7 @@ import Coord._
 import Decl._
 import Dungeon._
 import Engrave._
+import Flag._
 import Global._
 import MkRoom._
 import Monst._

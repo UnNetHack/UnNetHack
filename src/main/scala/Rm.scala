@@ -4,6 +4,7 @@
 
 import Config._
 import Coord._
+import Decl._
 import Global._
 import Monst._
 import Obj._
@@ -380,6 +381,10 @@ class rm {
 	var roomno: Byte = 0	/* room # for special rooms */
 	var edge = false	/* marks boundaries for special rooms*/
 	var stepped_on = false	/* player has stepped on this square */
+
+// MONOTE: Was a #define, had global scope
+def blessedftn = horizontal  /* a fountain that grants attribs */
+def disturbed =	horizontal  /* a grave that has been disturbed */
 }
 
 def SET_TYPLIT(x: Int,y: Int,ttyp: LevelLocationType,llit: Int) = {
@@ -478,10 +483,7 @@ def wall_info	= flags
 def ladder	= flags
 def drawbridgemask = flags
 def looted	= flags
-deficedpool	= flags
-
-def blessedftn = horizontal  /* a fountain that grants attribs */
-def disturbed =	horizontal  /* a grave that has been disturbed */
+def icedpool	= flags
 
 class damage {
 	var next: damage = null
