@@ -796,9 +796,7 @@ boolean with_price;
 		 * printed to avoid ambiguity between an item whose curse
 		 * status is unknown, and an item known to be uncursed.
 		 */
-#ifdef MAIL
 			&& obj->otyp != SCR_MAIL
-#endif
 			&& obj->otyp != FAKE_AMULET_OF_YENDOR
 			&& obj->otyp != AMULET_OF_YENDOR
 			&& !Role_if(PM_PRIEST)))
@@ -1053,11 +1051,7 @@ register struct obj *otmp;
 {
     /* check fundamental ID hallmarks first */
     if (!otmp->known || !otmp->dknown ||
-#ifdef MAIL
 	    (!otmp->bknown && otmp->otyp != SCR_MAIL) ||
-#else
-	    !otmp->bknown ||
-#endif
 	    !objects[otmp->otyp].oc_name_known)	/* ?redundant? */
 	return TRUE;
     if (otmp->oartifact && undiscovered_artifact(otmp->oartifact))
@@ -2814,9 +2808,7 @@ typfnd:
 		case HEAVY_IRON_BALL: case IRON_CHAIN: case STATUE:
 			/* otmp->cobj already done in mksobj() */
 				break;
-#ifdef MAIL
 		case SCR_MAIL: otmp->spe = 1; break;
-#endif
 		case WAN_WISHING:
 #ifdef WIZARD
 			if (!wizard) {
@@ -2861,9 +2853,7 @@ typfnd:
 		case FIGURINE:
 			if (!(mons[mntmp].geno & G_UNIQ)
 			    && !is_human(&mons[mntmp])
-#ifdef MAIL
 			    && mntmp != PM_MAIL_DAEMON
-#endif
 							)
 				otmp->corpsenm = mntmp;
 			break;

@@ -18,9 +18,7 @@ struct flag {
 	boolean  autoquiver;	/* Automatically fill quiver */
 	boolean  autounlock;	/* Automatically apply unlocking tool */
 	boolean  beginner;
-#ifdef MAIL
 	boolean  biff;		/* enable checking for mail */
-#endif
 	boolean  hint;		/* enable Unclippy the helpful hint daemon */
 	boolean  botl;		/* partially redo status line */
 	boolean  botlx;		/* print an entirely new bottom line */
@@ -32,9 +30,6 @@ struct flag {
 	boolean  end_own;	/* list all own scores */
 	boolean  explore;	/* in exploration mode */
 	boolean  tutorial;      /* in tutorial mode */
-#ifdef OPT_DISPMAP
-	boolean  fast_map;	/* use optimized, less flexible map display */
-#endif
 #define discover flags.explore
 	boolean  female;
 	boolean  forcefight;
@@ -200,9 +195,7 @@ struct instance_flags {
 	boolean	autoexplore;	/* in autoexplore */
 	boolean travel1;	/* first travel step */
 	coord	travelcc;	/* coordinates for travel_cache */
-#ifdef SIMPLE_MAIL
 	boolean simplemail;	/* simple mail format $NAME:$MESSAGE */
-#endif
 #ifdef WIZARD
 	boolean  sanity_check;	/* run sanity checks */
 	boolean  mon_polycontrol;	/* debug: control monster polymorphs */
@@ -243,9 +236,7 @@ struct instance_flags {
 	boolean paranoid_trap; /* Ask for 'yes' before walking into known traps */
 	boolean paranoid_lava; /* Ask for 'yes' before walking into lava */
 	boolean paranoid_water; /* Ask for 'yes' before walking into water */
-#ifdef QUIVER_FIRED
 	boolean quiver_fired;	/* quiver with f command */
-#endif
 /*
  * Window capability support.
  */

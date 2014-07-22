@@ -86,7 +86,6 @@ timed_delay    on unix and VMS, use a timer instead of sending
                extra screen output when attempting to pause for
                lib, whether or not to pause for visual effect.    [TRUE]
 
-Boolean option if QUIVER_FIRED was set at compile time:
 quiver_fired   when using the f (fire) command and no ammunition
                is quivered, prompt for ammunition to quiver, then 
                fire it.                                           [TRUE]

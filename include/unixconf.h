@@ -108,7 +108,6 @@
 
 /* #define NO_MAILREADER */	/* have mail daemon just tell player of mail */
 
-#ifdef	MAIL
 # if defined(BSD)
 #   if defined(__FreeBSD__) || defined(__OpenBSD__)
 #define DEF_MAILREADER	"/usr/bin/mail"
@@ -122,8 +121,6 @@
 #define DEF_MAILREADER	"/bin/mail"
 # endif
 #endif
-
-#endif	/* MAIL */
 
 #define FCMASK	0660	/* file creation mask */
 

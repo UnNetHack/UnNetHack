@@ -86,10 +86,8 @@ experience(mtmp, nk)	/* return # of exp points for mtmp after nk killed */
 /*	Dungeon fern spores give no experience */
 	if(is_fern_spore(mtmp->data)) tmp = 0;
 
-#ifdef MAIL
 	/* Mail daemons put up no fight. */
 	if(mtmp->data == &mons[PM_MAIL_DAEMON]) tmp = 1;
-#endif
 
 	return(tmp);
 }

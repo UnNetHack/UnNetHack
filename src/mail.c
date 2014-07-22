@@ -3,7 +3,6 @@
 
 #include "hack.h"
 
-#ifdef MAIL
 #include <fcntl.h>
 #include <errno.h>
 import Mail._
@@ -429,12 +428,8 @@ struct obj *otmp;
 void
 ckmailstatus()
 {
-#ifdef SIMPLE_MAIL
 	if (mailckfreq == 0)
 	  mailckfreq = (iflags.simplemail ? 5 : 10);
-#else
-	mailckfreq = 10;
-#endif
 
 	if(!mailbox || u.uswallow || !flags.biff
 		    || moves < laststattime + mailckfreq)
@@ -473,7 +468,6 @@ struct obj *otmp;
 #ifdef DEF_MAILREADER
 	register const char *mr = 0;
 #endif /* DEF_MAILREADER */
-#ifdef SIMPLE_MAIL
 	if (iflags.simplemail)
 	{
 		FILE* mb = fopen(mailbox, "r");
@@ -530,7 +524,6 @@ struct obj *otmp;
 		unlink(mailbox);
 		return;
 	}
-# endif /* SIMPLE_MAIL */
 # ifdef DEF_MAILREADER			/* This implies that UNIX is defined */
 	display_nhwindow(WIN_MESSAGE, FALSE);
 	if(!(mr = nh_getenv("MAILREADER")))
@@ -549,10 +542,8 @@ struct obj *otmp;
 	getmailstatus();
 	return;
 
-#ifdef SIMPLE_MAIL
 bail:
 	pline("It appears to be all gibberish."); /* bail out _professionally_ */
-#endif
 }
 
 # endif /* UNIX */
@@ -611,13 +602,11 @@ struct obj *otmp;
 		"Pressing 'v' lets you explore faster.",
 		"Unlocked doors will open when you walk into them.",
 
-#ifdef SIMPLE_MAIL
 		/* public server hints */
 		"If you need advice, #shout, somebody might mail you help.",
 		"Visit IRC channel #unnethack on freenode.",
 		"Visit http://un.nethack.nu/ for dumps of your games.",
 		"To opt out of these hints, put OPTIONS=nohint into your options.",
-#endif
 	};
 
 	pline("\"%s\"", hint[rn2(SIZE(hint))]);
@@ -641,7 +630,5 @@ maybe_hint()
 		flags.hint = FALSE;
 	}
 }
-
-#endif /* MAIL */
 
 /*mail.c*/

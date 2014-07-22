@@ -827,9 +827,7 @@ SCROLL((char *)0,               "MAPIRO MAHAMA DIROMAT",1,   0, 100), /* Wizardr
 SCROLL((char *)0,               "VAS CORP BET MANI",    1,   0, 100), /* Ultima */
 
 	/* these must come last because they have special descriptions */
-#ifdef MAIL
 SCROLL("mail",                  "stamped",          0,   0,   0),
-#endif
 SCROLL("blank paper",           "unlabeled",        0,  28,  60),
 #undef SCROLL
 

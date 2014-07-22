@@ -641,9 +641,7 @@ boolean fade_scrolls;
 	    grease_protect(target,(char *)0,victim);
 	} else if (target->oclass == SCROLL_CLASS) {
 	    if(fade_scrolls && target->otyp != SCR_BLANK_PAPER
-#ifdef MAIL
 	    && target->otyp != SCR_MAIL
-#endif
 					)
 	    {
 		if (!Blind) {

@@ -74,11 +74,7 @@ static struct Bool_Opt
 #else
 	{"extmenu", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
-#ifdef OPT_DISPMAP
-	{"fast_map", &flags.fast_map, TRUE, SET_IN_GAME},
-#else
 	{"fast_map", (boolean *)0, TRUE, SET_IN_FILE},
-#endif
 	{"female", &flags.female, FALSE, DISP_IN_GAME},
 	{"fixinv", &flags.invlet_constant, TRUE, SET_IN_GAME},
 	{"fullscreen", &iflags.wc2_fullscreen, FALSE, SET_IN_FILE},
@@ -102,11 +98,7 @@ static struct Bool_Opt
 	{"lit_corridor", &flags.lit_corridor, TRUE, SET_IN_FILE},
 	{"lootabc", &iflags.lootabc, FALSE, SET_IN_GAME},
 	{"Macgraphics", (boolean *)0, FALSE, SET_IN_FILE},
-#ifdef MAIL
 	{"mail", &flags.biff, TRUE, SET_IN_GAME},
-#else
-	{"mail", (boolean *)0, TRUE, SET_IN_FILE},
-#endif
 	{"menucolors", &iflags.use_menu_color, FALSE, SET_IN_FILE},
 #ifdef WIZARD
 	/* for menu debugging only*/
@@ -153,9 +145,7 @@ static struct Bool_Opt
 #endif  /* CURSES_GRAPHICS */
 	{"prayconfirm", &flags.prayconfirm, TRUE, SET_IN_GAME},
 	{"pushweapon", &flags.pushweapon, FALSE, SET_IN_FILE},
-#ifdef QUIVER_FIRED
 	{"quiver_fired", &iflags.quiver_fired, TRUE, SET_IN_GAME},
-#endif
 	{"rawio", (boolean *)0, FALSE, SET_IN_FILE},
 	{"rest_on_space", &iflags.rest_on_space, FALSE, SET_IN_FILE},
 	{"safe_pet", &flags.safe_dog, TRUE, SET_IN_GAME},

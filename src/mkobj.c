@@ -545,9 +545,7 @@ boolean artif;
 		    otmp->age = MAX_OIL_IN_FLASK;	/* amount of oil */
 		/* fall through */
 	case SCROLL_CLASS:
-#ifdef MAIL
 		if (otmp->otyp != SCR_MAIL)
-#endif
 			blessorcurse(otmp, 4);
 		break;
 	case SPBOOK_CLASS:

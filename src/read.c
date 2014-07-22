@@ -291,16 +291,12 @@ doread()
 	if (scroll->otyp != SPE_BOOK_OF_THE_DEAD &&
 		scroll->otyp != SPE_BLANK_PAPER &&
 		scroll->otyp != SCR_BLANK_PAPER 
-#ifdef MAIL
 		&& scroll->otyp != SCR_MAIL
-#endif
 		)
 	    violated(CONDUCT_ILLITERACY);
 
 	confused = (Confusion != 0);
-#ifdef MAIL
 	if (scroll->otyp == SCR_MAIL) confused = FALSE;
-#endif
 	if(scroll->oclass == SPBOOK_CLASS) {
 	    return(study_book(scroll));
 	}
@@ -919,7 +915,6 @@ register struct obj	*sobj;
 	if (objects[sobj->otyp].oc_magic)
 		exercise(A_WIS, TRUE);		/* just for trying */
 	switch(sobj->otyp) {
-#ifdef MAIL
 	case SCR_MAIL:
 		known = TRUE;
 		if (sobj->spe == MAIL_HINT)
@@ -931,7 +926,6 @@ register struct obj	*sobj;
 		 */
 		else readmail(sobj);
 		break;
-#endif
 	case SCR_ENCHANT_ARMOR:
 	    {
 		register schar s;

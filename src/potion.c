@@ -1683,9 +1683,7 @@ register struct obj *obj;
 		return TRUE;
 	    case SCROLL_CLASS:
 		if (obj->otyp != SCR_BLANK_PAPER && obj->otyp != SCR_FLOOD
-#ifdef MAIL
 		    && obj->otyp != SCR_MAIL
-#endif
 		    ) {
 			if (!Blind) {
 				boolean oq1 = obj->quan == 1L;

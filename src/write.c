@@ -16,11 +16,9 @@ register struct obj *otmp;
 		return(10 * objects[otmp->otyp].oc_level);
 
 	switch (otmp->otyp) {
-# ifdef MAIL
 	case SCR_MAIL:
 		return(2);
 /*		break; */
-# endif
 	case SCR_LIGHT:
 	case SCR_GOLD_DETECTION:
 	case SCR_FOOD_DETECTION:
@@ -231,9 +229,7 @@ found:
 	}
 	new_obj->blessed = (curseval > 0);
 	new_obj->cursed = (curseval < 0);
-#ifdef MAIL
 	if (new_obj->otyp == SCR_MAIL) new_obj->spe = 1;
-#endif
 	new_obj = hold_another_object(new_obj, "Oops!  %s out of your grasp!",
 					       The(aobjnam(new_obj, "slip")),
 					       (const char *)0);

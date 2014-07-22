@@ -46,9 +46,6 @@ struct conditionals {
 #ifndef CHARON /* not supported yet */
 	{ MON_GLYPH, PM_CROESUS, "Charon" },
 #endif
-#ifndef MAIL
-	{ MON_GLYPH, PM_FAMINE, "mail daemon" },
-#endif
 	/* commented out in monst.c at present */
 	{ MON_GLYPH, PM_SHAMAN_KARNOV, "Earendil" },
 	{ MON_GLYPH, PM_SHAMAN_KARNOV, "Elwing" },
@@ -61,9 +58,6 @@ struct conditionals {
 	/* allow slime mold to look like slice of pizza, since we
 	 * don't know what a slime mold should look like when renamed anyway
 	 */
-#ifndef MAIL
-	{ OBJ_GLYPH, SCR_STINKING_CLOUD+21, "stamped / mail" },
-#endif
 	{ 0, 0, 0}
 };
 
