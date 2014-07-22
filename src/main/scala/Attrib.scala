@@ -2,7 +2,9 @@
 /* NetHack may be freely redistributed.  See license for details. */
 /* Conversion to Scala copyright (c) 2014 Sheldon Young. */
 
+import Attrib._
 import Config._
+import Decl._
 
 /*	attrib.h - Header file for character class processing. */
 object Attrib {
@@ -19,8 +21,8 @@ val A_MAX = 6	/* used in rn2() selection of attrib */
 def ABASE(x: Int) =	(u.acurr.a(x))
 def ABON(x: Int) =	(u.abon.a(x))
 def AEXE(x: Int) =	(u.aexe.a(x))
-def ACURR(x: Int) =	(acurr(x))
-def ACURRSTR = 	(acurrstr())
+def ACURR(x: Int) =	acurr(x)
+def ACURRSTR = 	acurrstr()
 /* should be: */
 /* def ACURR(x: Int) = (ABON(x) + ATEMP(x) + (Upolyd  ? MBASE(x) : ABASE(x)) */
 def MCURR(x: Int) =	(u.macurr.a(x))
@@ -40,5 +42,4 @@ class attribs {
 
 // MOTODO #define ATTRMAX(x) ((x == A_STR && Upolyd && strongmonst(youmonst.data)) ? STR18(100) : urace.attrmax(x))
 // MOTODO #define ATTRMIN(x) (urace.attrmin(x))
-
 }

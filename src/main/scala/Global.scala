@@ -2,7 +2,11 @@
 /* NetHack may be freely redistributed.  See license for details. */
 /* Conversion to Scala copyright (c) 2014 Sheldon Young. */
 
+import Align._
+import C2Scala._
 import Config._
+import Obj._
+import Monst._
 
 object Global {
 
@@ -78,11 +82,11 @@ def strcmpi(a: String,b: String) = strncmpi((a),(b),-1)
 # define ZEROCOMP	/* zero-run compression of everything - Olaf Seibert */
 ***/
 
-type CHAR_P = char
+type CHAR_P = Char
 type SCHAR_P = schar
 type UCHAR_P = uchar
 type XCHAR_P = xchar
-type SHORT_P = short
+type SHORT_P = Short
 type BOOLEAN_P = boolean
 type ALIGNTYP_P = aligntyp
 type OBJ_P = obj

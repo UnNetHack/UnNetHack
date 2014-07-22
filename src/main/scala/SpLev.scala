@@ -299,7 +299,7 @@ def SP_MAPCHAR_PACK(typ: Int,lit: Int) = ((( lit ) << 8) + typ.toChar)
 class opvar {
     var spovartyp: xchar = _ /* one of SPOVAR_foo */
     val vardata = new {  // MONOTE Was a union
-      var str: String = nulil
+      var str: String = null
       var l = 0
     }
 }

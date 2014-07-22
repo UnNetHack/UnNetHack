@@ -5,6 +5,7 @@
 import Align._
 import Coord._
 import Config._
+import Dungeon._
 
 object EPri {
 

@@ -4,15 +4,19 @@
 
 import Align._
 import Attrib._
+import C2Scala._
 import Config._
+import Decl._
+import Dungeon._
 import Global._
 import Monst._
+import Prop._
 import Skills._
 
 object You {
 /*** Substructures ***/
 
-class RoleName(val m: String, val f: String) {
+class RoleName() {
 	var m: String = null	/* name when character is male */
 	var f: String = null	/* when female; null if same as male */
 }

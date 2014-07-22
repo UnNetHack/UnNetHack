@@ -4,13 +4,26 @@
 
 import C2Scala._
 import Config._
+import Color._
 import Coord._
+import Decl._
 import Dungeon._
+import Engrave._
 import Global._
-import Hack._
+import MkRoom._
+import Monst._
 import Obj._
+import ObjClass._
+import ONames._
 import PerMonst._
+import QText._
+import Quest._
+import Rm._
+import Rm.DungeonCharacters._
+import Spell._
+import Trap._
 import You._
+import WinType._
 
 object Decl {
 
@@ -231,18 +244,14 @@ val SUPPRESS_HALLUCINATION = 0x04
 val SUPPRESS_SADDLE = 0x08
 val EXACT_NAME = 0x0F
 
-/*** MOTODO
-#ifndef TCAP_H
-struct tc_gbl_data {	/* also declared in tcap.h */
-    char *tc_AS, *tc_AE;	/* graphics start and end (tty font swapping) */
-    int   tc_LI,  tc_CO;	/* lines and columns */
-} tc_gbl_data;
-#define AS tc_gbl_data.tc_AS
-#define AE tc_gbl_data.tc_AE
-#define LI tc_gbl_data.tc_LI
-#define CO tc_gbl_data.tc_CO
-#endif
-***/
+class tc_gbl_data {	/* also declared in tcap.h */
+  var tc_AS, tc_AE: String = null	/* graphics start and end (tty font swapping) */
+  var tc_LI, tc_CO = 0	/* lines and columns */
+}
+def AS = tc_gbl_data.tc_AS
+def AE = tc_gbl_data.tc_AE
+def LI = tc_gbl_data.tc_LI
+def CO = tc_gbl_data.tc_CO
 
 /* Some systems want to use full pathnames for some subsets of file names,
  * rather than assuming that they're all in the current directory.  This
@@ -379,11 +388,11 @@ val program_state = new sinfo()
 /* 'rogue'-like direction commands (cmd.c) */
 val sdir = "hykulnjb><"
 val ndir = "47896321><"	/* number pad mode */
-val xdir: Array[schar] = Array( -1,-1, 0, 1, 1, 1, 0,-1, 0, 0 )
-val ydir: Array[schar] = Array(  0,-1,-1,-1, 0, 1, 1, 1, 0, 0 )
-val zdir: Array[schar] = Array(  0, 0, 0, 0, 0, 0, 0, 0, 1,-1 )
+val xdir: Array[Int] = Array( -1,-1, 0, 1, 1, 1, 0,-1, 0, 0 )
+val ydir: Array[Int] = Array(  0,-1,-1,-1, 0, 1, 1, 1, 0, 0 )
+val zdir: Array[Int] = Array(  0, 0, 0, 0, 0, 0, 0, 0, 1,-1 )
 
-var tbx, tby: schar = 0	/* mthrowu: target */
+var tbx, tby: schar = _	/* mthrowu: target */
 
 /* for xname handling of multiple shot missile volleys:
    number of shots, index of current one, validity check, shoot vs throw */
@@ -395,9 +404,9 @@ val dungeons = new Array[dungeon](MAXDUNGEON)	/* ini'ed by init_dungeon() */
 val sp_levchn = new s_level()
 val upstair = new stairway(); val dnstair = new stairway()
 val upladder = new stairway(); val dnladder = new stairway()
-val sstairs = new stairway( 0, 0 )
-val updest = new dest_area( 0, 0, 0, 0, 0, 0, 0, 0 )
-val dndest = new dest_area( 0, 0, 0, 0, 0, 0, 0, 0 )
+val sstairs = new stairway()
+val updest = new dest_area()
+val dndest = new dest_area()
 val inv_pos = new coord()
 
 var in_mklev = false
@@ -422,7 +431,7 @@ var upstairs_room, dnstairs_room, sstairs_room: mkroom = null
 var head_engr: engr = null
 
 var level: dlevel_t = null		/* level map */
-var ftrap: ftrap = null
+var ftrap: trap = null
 var youmonst = new monst()
 var upermonst = new permonst()
 var flags = new flag()
@@ -465,7 +474,7 @@ val shield_static = List(
     S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4
 )
 
-val spl_book = new Array[Spell](MAXSPELL + 1)
+val spl_book = new Array[spell](MAXSPELL + 1)
 
 var moves = 1L
 var monstermoves = 1L
@@ -497,7 +506,7 @@ var mydogs: monst = null
 /* monsters that are moving to another dungeon level */
 var migrating_mons: monst = null
 
-val mvitals = new Array[mvital](NUMMONS)
+val mvitals = new Array[mvitals](NUMMONS)
 
 /* originally from end.c */
 /*** MOTODO 
@@ -548,7 +557,6 @@ val viz_array: Array[Array[Char]] = null /* used in cansee() and couldsee() */
 var WIN_MESSAGE, WIN_STATUS = WIN_ERR
 var WIN_MAP, WIN_INVEN = WIN_ERR
 var toplines = new Array[Char](TBUFSZ)
-/* Windowing stuff that's really tty oriented, but present for all ports */
 val tc_gbl_data = new tc_gbl_data()	/* AS,AE, LI,CO */
 
 val fqn_prefix = new Array[String](PREFIX_COUNT)

@@ -2,7 +2,9 @@
 /* NetHack may be freely redistributed.  See license for details. */
 /* Conversion to Scala copyright (c) 2014 Sheldon Young. */
 
+import Align._
 import Config._
+import Decl._
 import Global._
 
 object Dungeon {

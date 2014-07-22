@@ -26,10 +26,10 @@ val DEFAULT_WINDOW_SYS = "curses"
 val WIZARD = "wizard" /* the person allowed to use the -D option */
 
 val LOGFILE = "logfile"	/* larger file for debugging purposes */
-val LOGAREA = FILE_AREA_VAR
+// MOTODO val LOGAREA = FILE_AREA_VAR
 /* #define XLOGFILE "xlogfile" */ /* even larger logfile */
 val NEWS = "news"		/* the file containing the latest hack news */
-val NEWS_AREA = FILE_AREA_SHARE
+// MOTODO val NEWS_AREA = FILE_AREA_SHARE
 val PANICLOG = "paniclog"	/* log of panic and impossible events */
 /* #define LIVELOGFILE "livelog" */ /* live game progress log file */
 

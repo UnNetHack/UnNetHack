@@ -2,8 +2,13 @@
 /* NetHack may be freely redistributed.  See license for details. */
 /* Conversion to Scala copyright (c) 2014 Sheldon Young. */
 
+import C2Scala._
 import Config._
+import Decl._
 import Global._
+import ObjClass._
+import ONames._
+import Monst._
 
 object Obj {
 
@@ -102,7 +107,7 @@ val OATTACHED_UNUSED3 = 3
 
 	var corpsenm = 0	/* type of corpse is mons[corpsenm] */
 def leashmon = corpsenm		/* gets m_id of attached pet */
-def spestudied = orpsenm	/* # of times a spellbook has been studied */
+def spestudied = corpsenm	/* # of times a spellbook has been studied */
 def fromsink = corpsenm		/* a potion from a sink */
 
 	var record_achieve_special: xchar = _

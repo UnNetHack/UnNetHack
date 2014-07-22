@@ -12,6 +12,8 @@ object C2Scala {
 	// C functions and types
 	//
 
+	type regex_t = scala.util.matching.Regex
+  type size_t = Int
 	type time_t = Int
 
 	def atoi(s: String): Int = s.toInt

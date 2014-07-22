@@ -2,7 +2,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 /* Conversion to Scala copyright (c) 2014 Sheldon Young. */
 
-import Config._
+import Obj._
 
 object Hack {
 
@@ -207,8 +207,8 @@ val MENU_COMBINATION = 1
 val MENU_PARTIAL = 2
 val MENU_FULL = 3
 
-val MENU_SELECTED = TRUE
-val MENU_UNSELECTED = FALSE
+val MENU_SELECTED = true
+val MENU_UNSELECTED = false
 
 val MENU_DEFCNT = 1
 

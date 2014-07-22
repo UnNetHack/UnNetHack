@@ -3,6 +3,8 @@
 /* Conversion to Scala copyright (c) 2014 Sheldon Young. */
 
 import Coord._
+import Config._
+import Dungeon._
 
 object EShk {
 val REPAIR_DELAY = 5	/* minimum delay between shop damage & repair */

@@ -2,6 +2,9 @@
 /* NetHack may be freely redistributed.  See license for details. */
 /* Conversion to Scala copyright (c) 2014 Sheldon Young. */
 
+import Decl._
+import Global._
+
 object Skills {
 
 /* Much of this code was taken from you.h.  It is now
