@@ -3,7 +3,9 @@
 /* Conversion to Scala copyright (c) 2014 Sheldon Young. */
 
 import Align._
+import MonAttk._
 import MonFlag._
+import MonSym._
 import PerMonst._
 import Pm._
 import You._
@@ -44,9 +46,9 @@ def needspick(ptr: permonst) =		((ptr.mflags1 & M1_NEEDPICK) != 0L)
 def hides_under(ptr: permonst) =	((ptr.mflags1 & M1_CONCEAL) != 0L)
 def is_hider(ptr: permonst) =		((ptr.mflags1 & M1_HIDE) != 0L)
 def haseyes(ptr: permonst) =		((ptr.mflags1 & M1_NOEYES) == 0L)
-def eyecount(ptr: permonst) =		(if(!haseyes(ptr)) 0 else 
-			 (ptr == mons(PM_CYCLOPS) || 
-			  if(ptr == mons(PM_FLOATING_EYE)) 1 else 2)
+def eyecount(ptr: permonst) =		if(!haseyes(ptr)) 0 else 
+			 (if(ptr == mons(PM_CYCLOPS) || 
+			  ptr == mons(PM_FLOATING_EYE)) 1 else 2)
 def nohands(ptr: permonst) =		((ptr.mflags1 & M1_NOHANDS) != 0L)
 def nolimbs(ptr: permonst) =		((ptr.mflags1 & M1_NOLIMBS) == M1_NOLIMBS)
 def notake(ptr: permonst) =		((ptr.mflags1 & M1_NOTAKE) != 0L)
@@ -98,7 +100,7 @@ def your_race(ptr: permonst) =		((ptr.mflags2 & urace.selfmask) != 0L)
 def is_bat(ptr: permonst) =		(ptr == mons(PM_BAT) || 
 			 ptr == mons(PM_GIANT_BAT) || 
 			 ptr == mons(PM_VAMPIRE_BAT))
-def is_rat(ptr: permonst =	(ptr == mons(PM_SEWER_RAT) || 
+def is_rat(ptr: permonst) =	(ptr == mons(PM_SEWER_RAT) || 
 			 ptr == mons(PM_GIANT_RAT) || 
 			 ptr == mons(PM_RABID_RAT) || 
 			 ptr == mons(PM_ENORMOUS_RAT))
@@ -121,7 +123,7 @@ def extra_nasty(ptr: permonst) =	((ptr.mflags2 & M2_NASTY) != 0L)
 def strongmonst(ptr: permonst) =	((ptr.mflags2 & M2_STRONG) != 0L)
 def can_breathe(ptr: permonst) =	attacktype(ptr, AT_BREA)
 def cantwield(ptr: permonst) =		(nohands(ptr) || verysmall(ptr))
-def could_twoweap(ptr: permonst) =	(ptr.mattk[1].aatyp == AT_WEAP)
+def could_twoweap(ptr: permonst) =	(ptr.mattk(1).aatyp == AT_WEAP)
 def cantweararm(ptr: permonst) =	(breakarm(ptr) || sliparm(ptr))
 def throws_rocks(ptr: permonst) =	((ptr.mflags2 & M2_ROCKTHROW) != 0L)
 def type_is_pname(ptr: permonst) =	((ptr.mflags2 & M2_PNAME) != 0L)
@@ -168,7 +170,7 @@ def is_eye(ptr: permonst) =		((ptr == mons(PM_FLOATING_EYE)) ||
 
 /* this returns the light's range, or 0 if none; if we add more light emitting
 monsters, we'll likely have to add a new light range field to mons[] */
-def emits_light(ptr: permonst) =	((ptr.mlet == S_LIGHT || 
+def emits_light(ptr: permonst) =	(if(ptr.mlet == S_LIGHT || 
 			  ptr == mons(PM_FLAMING_SPHERE) || 
 			  ptr == mons(PM_SHOCKING_SPHERE) || 
 			  ptr == mons(PM_WAX_GOLEM) || 
@@ -177,7 +179,7 @@ def emits_light(ptr: permonst) =	((ptr.mlet == S_LIGHT ||
 			  ptr == mons(PM_BLAZING_FERN_SPORE) || 
 			  (!strcmp(ptr.mname, "glowing dragon")) || 
 			  (!strcmp(ptr.mname, "baby glowing dragon")) || 
-			  if(ptr == mons(PM_FIRE_VORTEX)) 1 else 
+			  ptr == mons(PM_FIRE_VORTEX)) 1 else 
 			 if(ptr == mons(PM_FIRE_ELEMENTAL)) 1 else 0)
 /*	[note: the light ranges above were reduced to 1 for performance...] */
 def likes_lava(ptr: permonst) =		(ptr == mons(PM_FIRE_ELEMENTAL) || 
