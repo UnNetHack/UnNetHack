@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)dig.c	3.4	2003/03/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,7 +5,7 @@
 #include "edog.h"
 /* #define DEBUG */	/* turn on for diagnostics */
 
-static NEARDATA boolean did_dig_msg;
+static boolean did_dig_msg;
 
 STATIC_DCL boolean NDECL(rm_waslit);
 STATIC_DCL void FDECL(mkcavepos, (XCHAR_P,XCHAR_P,int,BOOLEAN_P,BOOLEAN_P));
@@ -266,14 +265,12 @@ dig()
 		    You("fumble and drop your %s.", xname(uwep));
 		    dropx(uwep);
 		} else {
-#ifdef STEED
 		    if (u.usteed)
 			Your("%s %s and %s %s!",
 			     xname(uwep),
 			     otense(uwep, "bounce"), otense(uwep, "hit"),
 			     mon_nam(u.usteed));
 		    else
-#endif
 			pline("Ouch!  Your %s %s and %s you!",
 			      xname(uwep),
 			      otense(uwep, "bounce"), otense(uwep, "hit"));
@@ -545,11 +542,9 @@ int ttyp;
 	    SET_FOUNTAIN_WARNED(x,y);		/* force dryup */
 	    dryup(x, y, madeby_u);
 	    return;
-#ifdef SINKS
 	} else if (IS_SINK(lev->typ)) {
 	    breaksink(x, y);
 	    return;
-#endif
 	} else if (lev->typ == DRAWBRIDGE_DOWN ||
 		   (is_drawbridge_wall(x, y) >= 0)) {
 	    int bx = x, by = y;
@@ -1535,107 +1530,6 @@ long timeout;	/* unused */
 	if (on_floor) newsym(x, y);
 	else if (in_invent) update_inventory();
 }
-
-#if 0
-void
-bury_monst(mtmp)
-struct monst *mtmp;
-{
-#ifdef DEBUG
-	pline("bury_monst: %s", mon_nam(mtmp));
-#endif
-	if(canseemon(mtmp)) {
-	    if(is_flyer(mtmp->data) || is_floater(mtmp->data)) {
-		pline_The("%s opens up, but %s is not swallowed!",
-			surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
-		return;
-	    } else
-	        pline_The("%s opens up and swallows %s!",
-			surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
-	}
-
-	mtmp->mburied = TRUE;
-	wakeup(mtmp);			/* at least give it a chance :-) */
-	newsym(mtmp->mx, mtmp->my);
-}
-
-void
-bury_you()
-{
-#ifdef DEBUG
-	pline("bury_you");
-#endif
-    if (!Levitation && !Flying) {
-	if(u.uswallow)
-	    You_feel("a sensation like falling into a trap!");
-	else
-	    pline_The("%s opens beneath you and you fall in!",
-		  surface(u.ux, u.uy));
-
-	u.uburied = TRUE;
-	if(!Strangled && !Breathless) Strangled = 6;
-	under_ground(1);
-    }
-}
-
-void
-unearth_you()
-{
-#ifdef DEBUG
-	pline("unearth_you");
-#endif
-	u.uburied = FALSE;
-	under_ground(0);
-	if(!uamul || uamul->otyp != AMULET_OF_STRANGULATION)
-		Strangled = 0;
-	vision_recalc(0);
-}
-
-void
-escape_tomb()
-{
-#ifdef DEBUG
-	pline("escape_tomb");
-#endif
-	if ((Teleportation || can_teleport(youmonst.data)) &&
-	    (Teleport_control || rn2(3) < Luck+2)) {
-		You("attempt a teleport spell.");
-		(void) dotele();	/* calls unearth_you() */
-	} else if(u.uburied) { /* still buried after 'port attempt */
-		boolean good;
-
-		if(amorphous(youmonst.data) || Passes_walls ||
-		   noncorporeal(youmonst.data) || unsolid(youmonst.data) ||
-		   (tunnels(youmonst.data) && !needspick(youmonst.data))) {
-
-		    You("%s up through the %s.",
-			(tunnels(youmonst.data) && !needspick(youmonst.data)) ?
-			 "try to tunnel" : (amorphous(youmonst.data)) ?
-			 "ooze" : "phase", surface(u.ux, u.uy));
-
-		    if(tunnels(youmonst.data) && !needspick(youmonst.data))
-			good = dighole(TRUE);
-		    else good = TRUE;
-		    if(good) unearth_you();
-		}
-	}
-}
-
-void
-bury_obj(otmp)
-struct obj *otmp;
-{
-
-#ifdef DEBUG
-	pline("bury_obj");
-#endif
-	if(cansee(otmp->ox, otmp->oy))
-	   pline_The("objects on the %s tumble into a hole!",
-		surface(otmp->ox, otmp->oy));
-
-	bury_objs(otmp->ox, otmp->oy);
-}
-#endif
 
 #ifdef DEBUG
 int

@@ -553,7 +553,6 @@ void curses_create_main_windows()
 
 void curses_init_nhcolors()
 {
-#ifdef TEXTCOLOR
     if (has_colors())
     {
         use_default_colors();
@@ -628,7 +627,6 @@ void curses_init_nhcolors()
             }
         }
     }
-#endif
 }
 
 
@@ -646,11 +644,9 @@ void curses_choose_character()
     char pbuf[QBUFSZ];
     char choice[QBUFSZ];
     char tmpchoice[QBUFSZ];
-#ifdef TUTORIAL_MODE
 	winid win;
 	anything any;
 	menu_item *selected = 0;
-#endif
 
 	prompt = build_plselection_prompt(pbuf, QBUFSZ, flags.initrole,
 	 flags.initrace, flags.initgend, flags.initalign);
@@ -723,7 +719,6 @@ void curses_choose_character()
     {
         flags.randomall = TRUE;
     }
-#ifdef TUTORIAL_MODE
     else if (pick4u == 't') /* Tutorial mode in UnNetHack */
     {
 	    clear();
@@ -779,7 +774,6 @@ void curses_choose_character()
 	    selected = 0;
 	    flags.tutorial = 1;
 	}
-#endif
     
     clear();
     refresh();
@@ -1245,7 +1239,6 @@ void curses_display_splash_window()
 
 void curses_cleanup()
 {
-#ifdef TEXTCOLOR
     if (has_colors() && can_change_color())
     {
         init_color(COLOR_YELLOW, orig_yellow.r, orig_yellow.g,
@@ -1278,6 +1271,5 @@ void curses_cleanup()
 # endif
         }
     }
-#endif
 }
 

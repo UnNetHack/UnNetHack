@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)apply.c	3.4	2003/11/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,9 +8,7 @@ static const char tools[] = { COIN_CLASS, TOOL_CLASS, WEAPON_CLASS, WAND_CLASS, 
 static const char tools_too[] = { COIN_CLASS, ALL_CLASSES, TOOL_CLASS, POTION_CLASS,
 				  WEAPON_CLASS, WAND_CLASS, GEM_CLASS, 0 };
 
-#ifdef TOURIST
 STATIC_DCL int FDECL(use_camera, (struct obj *));
-#endif
 STATIC_DCL int FDECL(use_towel, (struct obj *));
 STATIC_DCL boolean FDECL(its_dead, (int,int,int *,struct obj*));
 STATIC_DCL int FDECL(use_stethoscope, (struct obj *));
@@ -41,13 +38,8 @@ STATIC_DCL boolean FDECL(figurine_location_checks,
 STATIC_DCL boolean NDECL(uhave_graystone);
 STATIC_DCL void FDECL(add_class, (char *, CHAR_P));
 
-#ifdef	AMIGA
-void FDECL( amii_speaker, ( struct obj *, char *, int ) );
-#endif
-
 static const char no_elbow_room[] = "don't have enough elbow-room to maneuver.";
 
-#ifdef TOURIST
 STATIC_OVL int
 use_camera(obj)
 	struct obj *obj;
@@ -85,7 +77,6 @@ use_camera(obj)
 	}
 	return 1;
 }
-#endif
 
 STATIC_OVL int
 use_towel(obj)
@@ -251,7 +242,6 @@ use_stethoscope(obj)
 	last_used_move = moves;
 	last_used_movement = youmonst.movement;
 
-#ifdef STEED
 	if (u.usteed && u.dz > 0) {
 		if (interference) {
 			pline("%s interferes.", Monnam(u.ustuck));
@@ -260,7 +250,6 @@ use_stethoscope(obj)
 			mstatusline(u.usteed);
 		return res;
 	} else
-#endif
 	if (u.uswallow && (u.dx || u.dy || u.dz)) {
 		mstatusline(u.ustuck);
 		return res;
@@ -456,13 +445,11 @@ struct obj *obj;
 	if(!get_adjacent_loc((char *)0, (char *)0, u.ux, u.uy, &cc)) return;
 
 	if((cc.x == u.ux) && (cc.y == u.uy)) {
-#ifdef STEED
 		if (u.usteed && u.dz > 0) {
 		    mtmp = u.usteed;
 		    spotmon = 1;
 		    goto got_target;
 		}
-#endif
 		pline("Leash yourself?  Very funny...");
 		return;
 	}
@@ -473,9 +460,7 @@ struct obj *obj;
 	}
 
 	spotmon = canspotmon(mtmp);
-#ifdef STEED
  got_target:
-#endif
 
 	if(!mtmp->mtame) {
 	    if(!spotmon)
@@ -553,10 +538,8 @@ next_to_u()
 			}
 		}
 	}
-#ifdef STEED
 	/* no pack mules for the Amulet */
 	if (u.usteed && mon_has_amulet(u.usteed)) return FALSE;
-#endif
 	return(TRUE);
 }
 
@@ -783,9 +766,6 @@ struct obj **optr;
 	You("ring %s.", the(xname(obj)));
 
 	if (Underwater || (u.uswallow && ordinary)) {
-#ifdef	AMIGA
-	    amii_speaker( obj, "AhDhGqEqDhEhAqDqFhGw", AMII_MUFFLED_VOLUME );
-#endif
 	    pline("But the sound is muffled.");
 
 	} else if (invoking && ordinary) {
@@ -794,9 +774,6 @@ struct obj **optr;
 	    learno = TRUE;	/* help player figure out why */
 
 	} else if (ordinary) {
-#ifdef	AMIGA
-	    amii_speaker( obj, "ahdhgqeqdhehaqdqfhgw", AMII_MUFFLED_VOLUME );
-#endif
 	    if (obj->cursed && !rn2(4) &&
 		    /* note: once any of them are gone, we stop all of them */
 		    !(mvitals[PM_WOOD_NYMPH].mvflags & G_GONE) &&
@@ -844,9 +821,6 @@ struct obj **optr;
 	    } else  if (invoking) {
 		pline("%s an unsettling shrill sound...",
 		      Tobjnam(obj, "issue"));
-#ifdef	AMIGA
-		amii_speaker( obj, "aefeaefeaefeaefeaefe", AMII_LOUDER_VOLUME );
-#endif
 		obj->age = moves;
 		learno = TRUE;
 		wakem = TRUE;
@@ -854,9 +828,6 @@ struct obj **optr;
 	    } else if (obj->blessed) {
 		int res = 0;
 
-#ifdef	AMIGA
-		amii_speaker( obj, "ahahahDhEhCw", AMII_SOFT_VOLUME );
-#endif
 		if (uchain) {
 		    unpunish();
 		    res = 1;
@@ -871,9 +842,6 @@ struct obj **optr;
 		}
 
 	    } else {  /* uncursed */
-#ifdef	AMIGA
-		amii_speaker( obj, "AeFeaeFeAefegw", AMII_OKAY_VOLUME );
-#endif
 		if (findit() != 0) learno = TRUE;
 		else pline("%s", nothing_happens);
 	    }
@@ -1198,7 +1166,7 @@ light_cocktail(obj)
 	    begin_burn(obj, FALSE);
 }
 
-static NEARDATA const char cuddly[] = { TOOL_CLASS, GEM_CLASS, 0 };
+static const char cuddly[] = { TOOL_CLASS, GEM_CLASS, 0 };
 
 int
 dorub()
@@ -1304,23 +1272,19 @@ int magic; /* 0=Physical, otherwise skill level */
 		const char *bp = body_part(LEG);
 
 		if (wl == BOTH_SIDES) bp = makeplural(bp);
-#ifdef STEED
 		if (u.usteed)
 		    pline("%s is in no shape for jumping.", Monnam(u.usteed));
 		else
-#endif
 		Your("%s%s %s in no shape for jumping.",
 		     (wl == LEFT_SIDE) ? "left " :
 			(wl == RIGHT_SIDE) ? "right " : "",
 		     bp, (wl == BOTH_SIDES) ? "are" : "is");
 		return 0;
 	}
-#ifdef STEED
 	else if (u.usteed && u.utrap) {
 		pline("%s is stuck in a trap.", Monnam(u.usteed));
 		return (0);
 	}
-#endif
 
 	pline("Where do you want to jump?");
 	cc.x = u.ux;
@@ -1791,8 +1755,8 @@ struct obj **optr;
 	*optr = 0;
 }
 
-static NEARDATA const char lubricables[] = { ALL_CLASSES, ALLOW_NONE, 0 };
-static NEARDATA const char need_to_remove_outer_armor[] =
+static const char lubricables[] = { ALL_CLASSES, ALLOW_NONE, 0 };
+static const char need_to_remove_outer_armor[] =
 			"need to remove your %s to grease your %s.";
 
 STATIC_OVL void
@@ -1825,7 +1789,6 @@ struct obj *obj;
 			You(need_to_remove_outer_armor, buf, xname(otmp));
 			return;
 		}
-#ifdef TOURIST
 		if ((otmp->owornmask & WORN_SHIRT) && (uarmc || uarm)) {
 			Strcpy(buf, uarmc ? xname(uarmc) : "");
 			if (uarmc && uarm) Strcat(buf, " and ");
@@ -1833,7 +1796,6 @@ struct obj *obj;
 			You(need_to_remove_outer_armor, buf, xname(otmp));
 			return;
 		}
-#endif
 		consume_obj_charge(obj, TRUE);
 
 		if (otmp != &zeroobj) {
@@ -1885,9 +1847,7 @@ struct obj *tstone;
     static const char scritch[] = "\"scritch, scritch\"";
     static const char allowall[3] = { COIN_CLASS, ALL_CLASSES, 0 };
     static const char justgems[3] = { ALLOW_NONE, GEM_CLASS, 0 };
-#ifndef GOLDOBJ
     struct obj goldobj;
-#endif
 
     /* in case it was acquired while blinded */
     if (!Blind) tstone->dknown = 1;
@@ -1898,14 +1858,12 @@ struct obj *tstone;
     Sprintf(stonebuf, "rub on the stone%s", plur(tstone->quan));
     if ((obj = getobj(choices, stonebuf)) == 0)
 	return;
-#ifndef GOLDOBJ
     if (obj->oclass == COIN_CLASS) {
 	u.ugold += obj->quan;	/* keep botl up to date */
 	goldobj = *obj;
 	dealloc_obj(obj);
 	obj = &goldobj;
     }
-#endif
 
     if (obj == tstone && obj->quan == 1) {
 	You_cant("rub %s on itself.", the(xname(obj)));
@@ -1922,9 +1880,7 @@ struct obj *tstone;
 	else
 	    pline("A sharp crack shatters %s%s.",
 		  (obj->quan > 1) ? "one of " : "", the(xname(obj)));
-#ifndef GOLDOBJ
      /* assert(obj != &goldobj); */
-#endif
 	useup(obj);
 	return;
     }
@@ -2069,7 +2025,6 @@ struct obj *otmp;
 	    trapinfo.time_needed += (tmp > 12) ? 1 : (tmp > 7) ? 2 : 4;
 	/*[fumbling and/or confusion and/or cursed object check(s)
 	   should be incorporated here instead of in set_trap]*/
-#ifdef STEED
 	if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
 	    boolean chance;
 
@@ -2099,7 +2054,6 @@ struct obj *otmp;
 		return;
 	    }
 	}
-#endif
 	You("begin setting %s %s.",
 	    shk_your(buf, otmp),
 	    defsyms[trap_to_defsym(what_trap(ttyp))].explanation);
@@ -2191,18 +2145,14 @@ struct obj *obj;
     } else if ((!u.dx && !u.dy) || (u.dz > 0)) {
 	int dam;
 
-#ifdef STEED
 	/* Sometimes you hit your steed by mistake */
 	if (u.usteed && !rn2(proficient + 2)) {
 	    You("whip %s!", mon_nam(u.usteed));
 	    kick_steed();
 	    return 1;
 	}
-#endif
 	if (Levitation
-#ifdef STEED
 			|| u.usteed
-#endif
 		) {
 	    /* Have a shot at snaring something on the floor */
 	    otmp = level.objects[u.ux][u.uy];
@@ -2961,10 +2911,8 @@ STATIC_OVL int
 do_flip_coin(obj)
 struct obj *obj;
 {
-#ifndef GOLDOBJ
     u.ugold += obj->quan;
     dealloc_obj(obj);
-#endif
 
     if (nohands(youmonst.data)) {
 	pline("And how would you flip the coin without hands?");
@@ -2978,11 +2926,7 @@ struct obj *obj;
     }
 
     You("flip %s coin.",
-#ifndef GOLDOBJ
 	(u.ugold > 1)
-#else
-	(obj->quan > 1)
-#endif
 	? "a" : "the");
 
     if (!Fumbling && !Glib && !Blind &&
@@ -3002,12 +2946,7 @@ struct obj *obj;
 	struct obj *gold;
 	You("try to catch the coin but it slips from your %s.",
 	    makeplural(body_part(HAND)));
-#ifndef GOLDOBJ
 	gold = mkgoldobj(1);
-#else
-	if (obj->quan > 1) gold = splitobj(obj, 1L);
-	else gold = obj;
-#endif
 	dropx(gold);
     }
     return 1;
@@ -3089,9 +3028,7 @@ doapply()
 		use_grease(obj);
 		break;
 	case LOCK_PICK:
-#ifdef TOURIST
 	case CREDIT_CARD:
-#endif
 	case SKELETON_KEY:
 		(void) pick_lock(obj,0,0,FALSE);
 		break;
@@ -3105,11 +3042,9 @@ doapply()
 	case LEASH:
 		use_leash(obj);
 		break;
-#ifdef STEED
 	case SADDLE:
 		res = use_saddle(obj);
 		break;
-#endif
 	case MAGIC_WHISTLE:
 		use_magic_whistle(obj);
 		break;
@@ -3162,11 +3097,9 @@ doapply()
 	case POT_OIL:
 		light_cocktail(obj);
 		break;
-#ifdef TOURIST
 	case EXPENSIVE_CAMERA:
 		res = use_camera(obj);
 		break;
-#endif
 	case TOWEL:
 		res = use_towel(obj);
 		break;
@@ -3377,9 +3310,7 @@ unfixable_trouble_count(is_horn)
 	if (Stoned) unfixable_trbl++;
 	if (Strangled) unfixable_trbl++;
 	if (Wounded_legs
-#ifdef STEED
 		    && !u.usteed
-#endif
 				) unfixable_trbl++;
 	if (Slimed) unfixable_trbl++;
 	/* lycanthropy is not desirable, but it doesn't actually make you feel

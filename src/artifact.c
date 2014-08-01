@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)artifact.c 3.4	2003/08/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -669,7 +668,6 @@ touch_artifact(obj,mon)
 	if (yours) pline("%s your grasp!", Tobjnam(obj, "evade"));
 	return 0;
     }
-#ifdef CONVICT
     /* This is a kludge, but I'm not sure where else to put it */
     if (oart == &artilist[ART_IRON_BALL_OF_LIBERATION]) {
 	if (Role_if(PM_CONVICT) && ((!obj->oerodeproof) || (obj->owt != 300))) {
@@ -681,7 +679,6 @@ touch_artifact(obj,mon)
 	    unpunish(); /* Remove a mundane heavy iron ball */
 	}
     }
-#endif /* CONVICT */
 
     return 1;
 }
@@ -1421,26 +1418,11 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 		}
 	}
 	/* WAC -- 1/6 chance of cancellation with foobane weapons */
-#ifdef BLACKMARKET
-	if (otmp->oartifact == ART_ORCRIST ||
-	    otmp->oartifact == ART_DEMONBANE ||
-	    otmp->oartifact == ART_THIEFBANE) {
-		if (!mdef->mcan && dieroll < 4) {
-		    if (realizes_damage) {
-			pline("%s %s!", The(distant_name(otmp, xname)), Blind ?
-				"roars deafeningly" : "shines brilliantly");
-			pline("It strikes %s!", hittee);
-		    }
-		    cancel_monst(mdef, otmp, youattack, TRUE, magr == mdef);
-		    return TRUE;
-		}
-	}
-#endif
 	return FALSE;
 }
 
-static NEARDATA const char recharge_type[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
-static NEARDATA const char invoke_types[] = { ALL_CLASSES, 0 };
+static const char recharge_type[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
+static const char invoke_types[] = { ALL_CLASSES, 0 };
 		/* #invoke: an "ugly check" filters out most objects */
 
 int
@@ -1463,13 +1445,11 @@ arti_invoke(obj)
     if(!oart || !oart->inv_prop) {
 	if(obj->otyp == CRYSTAL_BALL)
 	    use_crystal_ball(obj);
-#ifdef ASTRAL_ESCAPE
 	else if(obj->otyp == AMULET_OF_YENDOR ||
 	        obj->otyp == FAKE_AMULET_OF_YENDOR)
 			/* The Amulet is not technically an artifact
 			 * in the usual sense... */
 			return invoke_amulet(obj);
-#endif
 	else
 	    pline("%s", nothing_happens);
 	return 1;
@@ -1559,12 +1539,6 @@ arti_invoke(obj)
 	    anything any;
 
 	    any.a_void = 0;	/* set all bits to zero */
- #ifdef BLACKMARKET           
-	    if (Is_blackmarket(&u.uz) && *u.ushops) {
-		You("feel very disoriented for a moment.");
-		break;
-	    }
- #endif
 	    start_menu(tmpwin);
 	    /* use index+1 (cant use 0) as identifier */
 	    for (i = num_ok_dungeons = 0; i < n_dgns; i++) {
@@ -1658,7 +1632,6 @@ arti_invoke(obj)
 					8+4*bcsign(obj), rn1(3,4));
 	    break;
 	}
-#ifdef CONVICT
 	case PHASING:   /* Walk through walls and stone like a xorn */
         if (Passes_walls) goto nothing_special;
 	    if (oart == &artilist[ART_IRON_BALL_OF_LIBERATION]) {
@@ -1686,7 +1659,6 @@ arti_invoke(obj)
         incr_itimeout(&Phasing, (50 + rnd(100)));
         obj->age += Phasing; /* Time begins after phasing ends */
         break;
-#endif /* CONVICT */
 	  }
 	}
     } else {

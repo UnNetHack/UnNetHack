@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)polyself.c	3.4	2003/01/08	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -210,25 +209,15 @@ newman()
 	 *   gain)
 	 * 9 - rn2(19): random change of -9 to +9 hit points
 	 */
-#ifndef LINT
 	u.uhpmax = ((u.uhpmax - 10) * (long)u.ulevel / oldlvl + 10) +
 		(9 - rn2(19));
-#endif
 
-#ifdef LINT
-	u.uhp = u.uhp + tmp;
-#else
 	u.uhp = u.uhp * (long)u.uhpmax/tmp;
-#endif
 
 	tmp = u.uenmax;
-#ifndef LINT
 	u.uenmax = u.uenmax * (long)u.ulevel / oldlvl + 9 - rn2(19);
-#endif
 	if (u.uenmax < 0) u.uenmax = 0;
-#ifndef LINT
 	u.uen = (tmp ? u.uen * (long)u.uenmax / tmp : u.uenmax);
-#endif
 
 	check_uhpmax();
 
@@ -509,14 +498,7 @@ int	mntmp;
 
 	if (u.ulevel < mlvl) {
 	/* Low level characters can't become high level monsters for long */
-#ifdef DUMB
-		/* DRS/NS 2.2.6 messes up -- Peter Kendell */
-		int mtd = u.mtimedone, ulv = u.ulevel;
-
-		u.mtimedone = mtd * ulv / mlvl;
-#else
 		u.mtimedone = u.mtimedone * u.ulevel / mlvl;
-#endif
 	}
 
 	if (uskin && mntmp != armor_to_dragon(uskin->otyp))
@@ -545,7 +527,6 @@ int	mntmp;
 
 	if (!sticky && !u.uswallow && u.ustuck && sticks(youmonst.data)) u.ustuck = 0;
 	else if (sticky && !sticks(youmonst.data)) uunstick();
-#ifdef STEED
 	if (u.usteed) {
 	    if (touch_petrifies(u.usteed->data) &&
 	    		!Stone_resistance && rnl(3)) {
@@ -558,7 +539,6 @@ int	mntmp;
  	    }
 	    if (!can_ride(u.usteed)) dismount_steed(DISMOUNT_POLY);
 	}
-#endif
 
 	if (flags.verbose) {
 	    static const char use_thec[] = "Use the command #%s to %s.";
@@ -661,12 +641,10 @@ break_armor()
 		useup(otmp);
 	    }
 	}
-#ifdef TOURIST
 	if (uarmu) {
 		Your("shirt rips to shreds!");
 		useup(uarmu);
 	}
-#endif
     } else if (sliparm(youmonst.data)) {
 	if (((otmp = uarm) != 0) && (racial_exception(&youmonst, otmp) < 1)) {
 		if (donning(otmp)) cancel_don();
@@ -681,7 +659,6 @@ break_armor()
 		(void) Cloak_off();
 		dropx(otmp);
 	}
-#ifdef TOURIST
 	if ((otmp = uarmu) != 0) {
 		if (is_whirly(youmonst.data))
 			You("seep right through your shirt!");
@@ -689,7 +666,6 @@ break_armor()
 		setworn((struct obj *)0, otmp->owornmask & W_ARMU);
 		dropx(otmp);
 	}
-#endif
     }
     if (has_horns(youmonst.data)) {
 	if ((otmp = uarmh) != 0) {
@@ -1218,7 +1194,7 @@ mbodypart(mon, part)
 struct monst *mon;
 int part;
 {
-	static NEARDATA const char
+	static const char
 	*humanoid_parts[] = { "arm", "eye", "face", "finger",
 		"fingertip", "foot", "hand", "handed", "head", "leg",
 		"light headed", "neck", "spine", "toe", "hair",

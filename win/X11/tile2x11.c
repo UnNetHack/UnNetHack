@@ -126,7 +126,6 @@ process_file(fname)
 }
 
 
-#ifdef USE_XPM
 static int
 xpm_write(fp)
 FILE *fp;
@@ -166,7 +165,6 @@ FILE *fp;
 
     return fprintf(fp, "};\n") >= 0;
 }
-#endif	/* USE_XPM */
 
 int
 main(argc, argv)
@@ -206,29 +204,10 @@ main(argc, argv)
 	header.ntiles += header.per_row - (header.ntiles % header.per_row);
     }
 
-#ifdef USE_XPM
     if (xpm_write(fp) == 0) {
 	Fprintf(stderr, "can't write XPM file\n");
 	exit(1);
     }
-#else
-    if (fwrite((char *)&header, sizeof(x11_header), 1, fp) == 0) {
-	Fprintf(stderr, "can't open output header\n");
-	exit(1);
-    }
-
-    if (fwrite((char *)x11_colormap, 1, header.ncolors*3, fp) == 0) {
-	Fprintf(stderr, "can't write output colormap\n");
-	exit(1);
-    }
-
-    if (fwrite((char *)tile_bytes, 1,
-	(int) header.ntiles*header.tile_width*header.tile_height, fp) == 0) {
-
-	Fprintf(stderr, "can't write tile bytes\n");
-	exit(1);
-    }
-#endif
 
     fclose(fp);
     return 0;

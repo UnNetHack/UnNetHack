@@ -30,17 +30,6 @@ echo           ..\..\src\Makefile-orig
 copy Makefile.msc ..\..\src\Makefile >nul
 echo Microsoft Makefile copied ok.
 
-echo Copying Borland Makefile - Makefile.bcc to ..\..\src\Makefile.bcc
-if NOT exist ..\..\src\Makefile.bcc goto :dobor
-copy ..\..\src\Makefile.bcc ..\..\src\Makefile.bcc-orig >nul
-echo      Your existing 
-echo           ..\..\src\Makefile.bcc 
-echo      has been renamed to 
-echo           ..\..\src\Makefile.bcc-orig
-:dobor
-copy Makefile.bcc ..\..\src\Makefile.bcc >nul
-echo Borland Makefile copied ok.
-
 echo Copying MinGW Makefile - Makefile.gcc to ..\..\src\Makefile.gcc
 if NOT exist ..\..\src\Makefile.gcc goto :dogcc
 copy ..\..\src\Makefile.gcc ..\..\src\Makefile.gcc-orig >nul
@@ -76,7 +65,6 @@ copy ..\..\win\win32\tile2bmp.dsp  ..\..\build >nul
 copy ..\..\win\win32\tiles.dsp     ..\..\build >nul
 copy ..\..\win\win32\tiles.mak     ..\..\build >nul
 copy ..\..\win\win32\tilemap.dsp   ..\..\build >nul
-copy ..\..\win\win32\uudecode.dsp   ..\..\build >nul
 copy ..\..\win\win32\nethackw.dsp   ..\..\build >nul
 
 goto :done
@@ -90,8 +78,6 @@ goto :fini
 
 :err_data
 echo A required file ..\..\dat\data.bas seems to be missing.
-echo Check "Files." in the root directory for your NetHack distribution
-echo and make sure that all required files exist.
 goto :fini
 
 :err_dir

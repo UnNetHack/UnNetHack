@@ -19,11 +19,7 @@ static int parse_escape_sequence(void);
 /* Macros for Control and Alt keys */
 
 #ifndef M
-# ifndef NHSTDC
-#  define M(c)		(0x80 | (c))
-# else
 #  define M(c)		((c) - 128)
-# endif /* NHSTDC */
 #endif
 #ifndef C
 #define C(c)		(0x1f & (c))
@@ -82,7 +78,6 @@ int curses_read_char()
 
 void curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
 {
-#ifdef TEXTCOLOR
     int curses_color;
 
     /* Map color disabled */
@@ -162,7 +157,6 @@ void curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
             wattroff(win, attr);
         }
     }
-#endif  /* TEXTCOLOR */
 }
 
 
@@ -463,12 +457,10 @@ int curses_convert_glyph(int ch, int glyph)
 {
     int symbol;
     
-#ifdef REINCARNATION
     if (Is_rogue_level(&u.uz))
     {
         return ch;
     }
-#endif
     
     /* Save some processing time by returning if the glyph represents
     an object that we don't have custom characters for */
@@ -601,21 +593,13 @@ void curses_posthousekeeping()
 }
 
 
-#ifdef FILE_AREAS
 void curses_view_file(const char* filearea, const char *filename, boolean must_exist)
-#else
-void curses_view_file(const char *filename, boolean must_exist)
-#endif
 {
     winid wid;
     anything *identifier;
     char buf[BUFSZ];
     menu_item *selected = NULL;
-#ifdef FILE_AREAS
     dlb *fp = dlb_fopen_area(filearea, filename, "r");
-#else
-    dlb *fp = dlb_fopen(filename, "r");
-#endif
     
     if ((fp == NULL) && (must_exist))
     {
@@ -1003,9 +987,9 @@ static int parse_escape_sequence(void)
 functions, which causes a compiler error if TTY_GRAPHICS is not
 defined.  Adding stub functions to avoid this. */
 
-#if defined(STATUS_COLORS) && !defined(TTY_GRAPHICS)
+#if !defined(TTY_GRAPHICS)
 extern void term_start_color(int color) {}
 extern void term_start_attr(int attr) {}
 extern void term_end_color() {}
 extern void term_end_attr(int attr) {}
-#endif  /* STATUS_COLORS && !TTY_GRAPGICS */
+#endif  /* !TTY_GRAPGICS */

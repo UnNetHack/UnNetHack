@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)lock.c	3.4	2000/02/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,7 +7,7 @@ STATIC_PTR int NDECL(picklock);
 STATIC_PTR int NDECL(forcelock);
 
 /* at most one of `door' and `box' should be non-null at any given time */
-STATIC_VAR NEARDATA struct xlock_s {
+STATIC_VAR struct xlock_s {
 	struct rm  *door;
 	struct obj *box;
 	int picktyp, chance, usedtime;
@@ -61,10 +60,8 @@ lock_action()
 	/* otherwise we're trying to unlock it */
 	else if (xlock.picktyp == LOCK_PICK)
 		return actions[4];	/* "picking the lock" */
-#ifdef TOURIST
 	else if (xlock.picktyp == CREDIT_CARD)
 		return actions[4];	/* same as lock_pick */
-#endif
 	else if (xlock.door)
 		return actions[0];	/* "unlocking the door" */
 	else
@@ -246,9 +243,7 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
 
 	    if (nohands(youmonst.data)) {
 		const char *what = (picktyp == LOCK_PICK) ? "pick" : "key";
-#ifdef TOURIST
 		if (picktyp == CREDIT_CARD) what = "card";
-#endif
 		if (picktyp == STETHOSCOPE) what = "stethoscope";
 
 		pline(no_longer, "hold the", what);
@@ -272,9 +267,7 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
 	}
 
 	if ((picktyp != LOCK_PICK && picktyp != STETHOSCOPE &&
-#ifdef TOURIST
 	    picktyp != CREDIT_CARD &&
-#endif
 	    picktyp != SKELETON_KEY)) {
 		warning("picking lock with object %d?", picktyp);
 		return(0);
@@ -344,19 +337,15 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
 				You_cant("fix its broken lock with %s.", doname(pick));
 				return 0;
 		    }
-#ifdef TOURIST
 		    else if (picktyp == CREDIT_CARD && !otmp->olocked) {
 			/* credit cards are only good for unlocking */
 			You_cant("do that with %s.", doname(pick));
 			return 0;
 		    }
-#endif
 		    switch(picktyp) {
-#ifdef TOURIST
 			case CREDIT_CARD:
 			    ch = ACURR(A_DEX) + 20*Role_if(PM_ROGUE);
 			    break;
-#endif
 			case LOCK_PICK:
 			    ch = 4*ACURR(A_DEX) + 25*Role_if(PM_ROGUE);
 			    break;
@@ -392,12 +381,10 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
 	    if ((mtmp = m_at(cc.x, cc.y)) && canseemon(mtmp)
 			&& mtmp->m_ap_type != M_AP_FURNITURE
 			&& mtmp->m_ap_type != M_AP_OBJECT) {
-#ifdef TOURIST
 		if (picktyp == CREDIT_CARD &&
 		    (mtmp->isshk || mtmp->data == &mons[PM_ORACLE]))
 		    verbalize("No checks, no credit, no problem.");
 		else
-#endif
 		    pline("I don't think %s would appreciate that.", mon_nam(mtmp));
 		return(0);
 	    }
@@ -421,13 +408,11 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
 		    pline("This door is broken.");
 		    return(0);
 		default:
-#ifdef TOURIST
 		    /* credit cards are only good for unlocking */
 		    if(picktyp == CREDIT_CARD && !(door->doormask & D_LOCKED)) {
 			You_cant("lock a door with a credit card.");
 			return(0);
 		    }
-#endif
 		    /* ALI - Artifact doors */
 		    key = artifact_door(cc.x, cc.y);
 		
@@ -440,11 +425,9 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
 		    if(c == 'n') return(0);
 
 		    switch(picktyp) {
-#ifdef TOURIST
 			case CREDIT_CARD:
 			    ch = 2*ACURR(A_DEX) + 20*Role_if(PM_ROGUE);
 			    break;
-#endif
 			case LOCK_PICK:
 			    ch = 3*ACURR(A_DEX) + 30*Role_if(PM_ROGUE);
 			    break;
@@ -457,12 +440,8 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
 		    xlock.box = 0;
 
 		    /* ALI - Artifact doors */
-#ifdef ADVENT_CALENDAR
-		    if (key) {
-#else
 		    xlock.key = pick->oartifact;
 		    if (key && xlock.key != key) {
-#endif
 			if (picktyp == SKELETON_KEY) {
 			    Your("key doesn't seem to fit.");
 			    return(0);
@@ -492,9 +471,7 @@ doforce()		/* try to force a chest with your weapon */
 	   (objects[uwep->otyp].oc_skill < P_DAGGER) ||
 	   (objects[uwep->otyp].oc_skill > P_LANCE) ||
 	   uwep->otyp == FLAIL || uwep->otyp == AKLYS
-#ifdef KOPS
 	   || uwep->otyp == RUBBER_HOSE
-#endif
 	  ) {
 	    You_cant("force anything without a %sweapon.",
 		  (uwep) ? "proper " : "");
@@ -549,7 +526,6 @@ doforce()		/* try to force a chest with your weapon */
 int
 doopen()		/* try to open a door */
 {
-#ifdef AUTO_OPEN
 	return doopen_indir(0, 0);
 }
 
@@ -557,7 +533,6 @@ int
 doopen_indir(x, y)		/* try to open a door in direction u.dx/u.dy */
 	int x, y;		/* if true, prompt for direction */
 {
-#endif /* AUTO_OPEN */
 	coord cc;
 	register struct rm *door;
 	struct monst *mtmp;
@@ -572,13 +547,11 @@ doopen_indir(x, y)		/* try to open a door in direction u.dx/u.dy */
 	    return 0;
 	}
 
-#ifdef AUTO_OPEN
 	if (x > 0 && y > 0) {
 	    cc.x = x;
 	    cc.y = y;
 	}
 	else
-#endif
 	if(!get_adjacent_loc((char *)0, (char *)0, u.ux, u.uy, &cc)) return(0);
 
 	if((cc.x == u.ux) && (cc.y == u.uy)) return(0);
@@ -739,17 +712,13 @@ doclose()		/* try to close a door */
 
 	if(door->doormask == D_ISOPEN) {
 	    if(verysmall(youmonst.data)
-#ifdef STEED
 		&& !u.usteed
-#endif
 		) {
 		 pline("You're too small to push the door closed.");
 		 return(0);
 	    }
 	    if (
-#ifdef STEED
 		 u.usteed ||
-#endif
 		rn2(25) < (ACURRSTR+ACURR(A_DEX)+ACURR(A_CON))/3) {
 		pline_The("door closes.");
 		door->doormask = D_CLOSED;
@@ -844,7 +813,6 @@ int x, y;
 	switch(otmp->otyp) {
 	case WAN_LOCKING:
 	case SPE_WIZARD_LOCK:
-#ifdef REINCARNATION
 	    if (Is_rogue_level(&u.uz)) {
 	    	boolean vis = cansee(x,y);
 		/* Can't have real locking in Rogue, so just hide doorway */
@@ -862,7 +830,6 @@ int x, y;
 		newsym(x,y);
 		return TRUE;
 	    }
-#endif
 	    if (obstructed(x,y)) return FALSE;
 	    /* Don't allow doors to close over traps.  This is for pits */
 	    /* & trap doors, but is it ever OK for anything else? */
@@ -1019,10 +986,6 @@ int x, y;
 {
     /*int i;*/
 
-#ifdef ADVENT_CALENDAR
-    /* on the advent calendar level all doors are indestructible */
-    if (Is_advent_calendar(&u.uz)) return A_NONE;
-#endif
 /*
     for(i = 0; i < doorindex; i++) {
 	if (x == doors[i].x && y == doors[i].y)

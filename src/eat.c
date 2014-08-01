@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)eat.c	3.4	2003/02/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -57,14 +56,12 @@ char msgbuf[BUFSZ];
 /* also used to see if you're allowed to eat cats and dogs */
 #define CANNIBAL_ALLOWED() (Role_if(PM_CAVEMAN) || Race_if(PM_ORC) || Race_if(PM_VAMPIRE))
 
-STATIC_OVL NEARDATA const char comestibles[] = { FOOD_CLASS, 0 };
+STATIC_OVL const char comestibles[] = { FOOD_CLASS, 0 };
 
-#ifdef ASTRAL_ESCAPE
-STATIC_OVL NEARDATA const char sacrifice_types[] = { AMULET_CLASS, FOOD_CLASS, 0 };
-#endif
+STATIC_OVL const char sacrifice_types[] = { AMULET_CLASS, FOOD_CLASS, 0 };
 
 /* Gold must come first for getobj(). */
-STATIC_OVL NEARDATA const char allobj[] = {
+STATIC_OVL const char allobj[] = {
 	COIN_CLASS, WEAPON_CLASS, ARMOR_CLASS, POTION_CLASS, SCROLL_CLASS,
 	WAND_CLASS, RING_CLASS, AMULET_CLASS, FOOD_CLASS, TOOL_CLASS,
 	GEM_CLASS, ROCK_CLASS, BALL_CLASS, CHAIN_CLASS, SPBOOK_CLASS, 0 };
@@ -151,12 +148,12 @@ static const struct { const char *txt; int nut; } tintxts[] = {
 };
 #define TTSZ	SIZE(tintxts)
 
-static NEARDATA struct {
+static struct {
 	struct	obj *tin;
 	int	usedtime, reqtime;
 } tin;
 
-static NEARDATA struct {
+static struct {
 	struct	obj *piece;	/* the thing being eaten, or last thing that
 				 * was partially eaten, unless that thing was
 				 * a tin, which uses the tin structure above,
@@ -931,10 +928,8 @@ register int pm;
 		    char buf[BUFSZ];
 		    You_cant("resist the temptation to mimic %s.",
 			Hallucination ? "an orange" : "a pile of gold");
-#ifdef STEED
                     /* A pile of gold can't ride. */
 		    if (u.usteed) dismount_steed(DISMOUNT_FELL);
-#endif
 		    nomul(-tmp, "pretending to be a pile of gold");
 		    Sprintf(buf, Hallucination ?
 			"You suddenly dread being peeled and mimic %s again!" :
@@ -1326,9 +1321,7 @@ struct obj *obj;
 		    what = "you lose control of",  where = "yourself";
 		else
 		    what = "you slap against the", where =
-#ifdef STEED
 			   (u.usteed) ? "saddle" :
-#endif
 			   surface(u.ux,u.uy);
 		pline_The("world spins and %s %s.", what, where);
 		flags.soundok = 0;
@@ -1562,18 +1555,14 @@ struct obj *otmp;
 			  "Mmm, tripe... not bad!");
 		else {
 		    pline("Yak - dog food!");
-#ifdef CONVICT
 		    if (Role_if(PM_CONVICT))
 			pline("At least it's not prison food.");
-#endif /* CONVICT */
 		    more_experienced(1,1,0);
 		    newexplevel();
 		    /* not cannibalism, but we use similar criteria
 		       for deciding whether to be sickened by this meal */
 		    if (rn2(2) && !CANNIBAL_ALLOWED())
-#ifdef CONVICT
 		    if (!Role_if(PM_CONVICT))
-#endif /* CONVICT */
 			make_vomiting((long)rn1(victual.reqtime, 14), FALSE);
 		}
 		break;
@@ -1610,18 +1599,11 @@ struct obj *otmp;
 		    }
 		} else
 #endif
-#ifdef MAC	/* KMH -- Why should Unix have all the fun? */
-		if (otmp->otyp == APPLE) {
-			pline("Delicious!  Must be a Macintosh!");
-		} else
-#endif
 		if (otmp->otyp == EGG && stale_egg(otmp)) {
 		    pline("Ugh.  Rotten egg.");	/* perhaps others like it */
-#ifdef CONVICT
 		if (Role_if(PM_CONVICT) && (rn2(8) > u.ulevel)) {
 		    You_feel("a slight stomach ache.");	/* prisoners are used to bad food */
 		} else
-#endif /* CONVICT */
 		    make_vomiting(Vomiting+d(10,4), TRUE);
 		} else
  give_feedback:
@@ -1804,13 +1786,8 @@ eatspecial() /* called after eating non-food */
 	victual.piece = (struct obj *)0;
 	victual.eating = 0;
 	if (otmp->oclass == COIN_CLASS) {
-#ifdef GOLDOBJ
-		if (carried(otmp))
-		    useupall(otmp);
-#else
 		if (otmp->where == OBJ_FREE)
 		    dealloc_obj(otmp);
-#endif
 		else
 		    useupf(otmp, otmp->quan);
 		return;
@@ -2100,9 +2077,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	    You("cannot eat that!");
 	    return 0;
 	} else if ((otmp->owornmask & (W_ARMOR|W_TOOL|W_AMUL
-#ifdef STEED
 			|W_SADDLE
-#endif
 			)) != 0) {
 	    /* let them eat rings */
 	    You_cant("eat %s you're wearing.", something);
@@ -2374,10 +2349,8 @@ gethungry()	/* as time goes by - called by moveloop() and domove() */
 	if ((!u.usleep || !rn2(10))	/* slow metabolic rate while asleep */
 		&& (carnivorous(youmonst.data) || herbivorous(youmonst.data) ||
 		    is_vampire(youmonst.data))
-#ifdef CONVICT
 		/* Convicts can last twice as long at hungry and below */
 		&& (!Role_if(PM_CONVICT) || (moves % 2) || (u.uhs < HUNGRY))
-#endif /* CONVICT */
 		&& !Slow_digestion)
 	    u.uhunger--;		/* ordinary food consumption */
 
@@ -2490,21 +2463,6 @@ reset_faint()	/* call when a faint must be prematurely terminated */
 {
 	if(is_fainted()) nomul(0, 0);
 }
-
-#if 0
-void
-sync_hunger()
-{
-
-	if(is_fainted()) {
-
-		flags.soundok = 0;
-		nomul(-10+(u.uhunger/10), "fainted from lack of food");
-		nomovemsg = "You regain consciousness.";
-		afternmv = unfaint;
-	}
-}
-#endif
 
 void
 newuhs(incr)		/* compute and comment on your (new?) hunger status */
@@ -2652,9 +2610,7 @@ floorfood(verb,corpsecheck)	/* get food from floor or pack */
 
 	/* if we can't touch floor objects then use invent food only */
 	if (!can_reach_floor() ||
-#ifdef STEED
 		(feeding && u.usteed) || /* can't eat off floor while riding */
-#endif
 		((is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) &&
 		    (Wwalking || is_clinger(youmonst.data) ||
 			(Flying && !Breathless))))
@@ -2694,7 +2650,6 @@ floorfood(verb,corpsecheck)	/* get food from floor or pack */
 		}
 	    }
 	}
-#ifdef ASTRAL_ESCAPE
 	if (sacrificing) {
 		for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere) {
 			if(otmp->otyp == AMULET_OF_YENDOR || otmp->otyp == FAKE_AMULET_OF_YENDOR) {
@@ -2709,7 +2664,6 @@ floorfood(verb,corpsecheck)	/* get food from floor or pack */
 				}
 			}
 		}
-#endif
 
 	/* Is there some food (probably a heavy corpse) here on the ground? */
 	for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere) {
@@ -2732,14 +2686,9 @@ floorfood(verb,corpsecheck)	/* get food from floor or pack */
 	/* We cannot use ALL_CLASSES since that causes getobj() to skip its
 	 * "ugly checks" and we need to check for inedible items.
 	 */
-#ifdef ASTRAL_ESCAPE
 	otmp = getobj(sacrificing ? (const char *)sacrifice_types : 
 					feeding ? (const char *)allobj :
 					(const char *)comestibles, verb);
-#else
-	otmp = getobj(feeding ? (const char *)allobj :
-				(const char *)comestibles, verb);
-#endif
 	if (corpsecheck && otmp)
 		/* Kludge to allow Amulet of Yendor to be sacrificed on non-High altars */
 		if (otmp->otyp != AMULET_OF_YENDOR && otmp->otyp != FAKE_AMULET_OF_YENDOR) 

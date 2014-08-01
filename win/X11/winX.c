@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)winX.c	3.4	1999/12/21	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,10 +9,6 @@
 
 #ifndef SYSV
 #define PRESERVE_NO_SYSV	/* X11 include files may define SYSV */
-#endif
-
-#ifdef MSDOS			/* from compiler */
-#define SHORT_FILENAMES
 #endif
 
 #include <X11/Intrinsic.h>
@@ -29,11 +24,7 @@
 #include <X11/Xos.h>
 
 /* for color support */
-#ifdef SHORT_FILENAMES
-#include <X11/IntrinsP.h>
-#else
 #include <X11/IntrinsicP.h>
-#endif
 
 #ifdef PRESERVE_NO_SYSV
 # ifdef SYSV
@@ -42,18 +33,10 @@
 # undef PRESERVE_NO_SYSV
 #endif
 
-#ifdef SHORT_FILENAMES
-#undef SHORT_FILENAMES	/* hack.h will reset via global.h if necessary */
-#endif
-
 #include "hack.h"
 #include "winX.h"
 #include "dlb.h"
-#ifdef SHORT_FILENAMES
-#include "patchlev.h"
-#else
 #include "patchlevel.h"
-#endif
 
 /* Should be defined in <X11/Intrinsic.h> but you never know */
 #ifndef XtSpecificationRelease
@@ -116,12 +99,7 @@ struct window_procs X11_procs = {
     X11_update_inventory,
     X11_mark_synch,
     X11_wait_synch,
-#ifdef CLIPPING
     X11_cliparound,
-#endif
-#ifdef POSITIONBAR
-    donull,
-#endif
     X11_print_glyph,
     X11_raw_print,
     X11_raw_print_bold,
@@ -134,18 +112,10 @@ struct window_procs X11_procs = {
     X11_get_ext_cmd,
     X11_number_pad,
     X11_delay_output,
-#ifdef CHANGE_COLOR	/* only a Mac option currently */
-    donull,
-    donull,
-#endif
     /* other defs that really should go away (they're tty specific) */
     X11_start_screen,
     X11_end_screen,
-#ifdef GRAPHIC_TOMBSTONE
     X11_outrip,
-#else
-    genl_outrip,
-#endif
     genl_preference_update,
 };
 
@@ -851,7 +821,6 @@ void X11_number_pad(state) int state; { return; } /* called from options.c */
 void X11_start_screen() { return; } /* called from setftty() in unixtty.c */
 void X11_end_screen() { return; }   /* called from settty() in unixtty.c */
 
-#ifdef GRAPHIC_TOMBSTONE
 void X11_outrip(window, how)
     winid window;
     int how;
@@ -869,7 +838,6 @@ void X11_outrip(window, how)
 
     calculate_rip_text(how);
 }
-#endif
 
 /* init and exit nhwindows ------------------------------------------------- */
 
@@ -883,9 +851,7 @@ static XtActionsRec actions[] = {
     {"dismiss_text",	dismiss_text},	/* button action for text widget */
     {"delete_text",	delete_text},	/* delete action for text widget */
     {"key_dismiss_text",key_dismiss_text},/* key action for text widget */
-#ifdef GRAPHIC_TOMBSTONE
     {"rip_dismiss_text",rip_dismiss_text},/* action for rip in text widget */
-#endif
     {"menu_key",	menu_key},	/* action for menu accelerators */
     {"yn_key",		yn_key},	/* action for yn accelerators */
     {"yn_delete",	yn_delete},	/* action for yn delete-window */
@@ -922,7 +888,6 @@ static XtResource resources[] = {
       XtOffset(AppResources *,pet_mark_bitmap), XtRString, "pet_mark.xbm" },
     { "pet_mark_color", "Pet_mark_color", XtRPixel, sizeof(XtRPixel),
       XtOffset(AppResources *,pet_mark_color), XtRString, "Red" },
-#ifdef GRAPHIC_TOMBSTONE
     { "tombstone", "Tombstone", XtRString, sizeof(String),
       XtOffset(AppResources *,tombstone), XtRString, "rip.xpm" },
     { "tombtext_x", "Tombtext_x", XtRInt, sizeof(int),
@@ -933,7 +898,6 @@ static XtResource resources[] = {
       XtOffset(AppResources *,tombtext_dx), XtRString, "0" },
     { "tombtext_dy", "Tombtext_dy", XtRInt, sizeof(int),
       XtOffset(AppResources *,tombtext_dy), XtRString, "13" },
-#endif
 };
 
 void
@@ -985,13 +949,11 @@ char** argv;
 
     /* We don't need to realize the top level widget. */
 
-#ifdef TEXTCOLOR
     /* add new color converter to deal with overused colormaps */
     XtSetTypeConverter(XtRString, XtRPixel, nhCvtStringToPixel,
 		       (XtConvertArgList)nhcolorConvertArgs,
 		       XtNumber(nhcolorConvertArgs),
 		       XtCacheByDisplay, nhFreePixel);
-#endif /* TEXTCOLOR */
 
     /* Register the actions mentioned in "actions". */
     XtAppAddActions(app_context, actions, XtNumber(actions));
@@ -1336,12 +1298,8 @@ dismiss_file(w, event, params, num_params)
 }
 
 void
-#ifdef FILE_AREAS
 X11_display_file(farea, str, complain)
     const char *farea;
-#else
-X11_display_file(str, complain)
-#endif
     const char *str;
     boolean complain;
 {
@@ -1359,11 +1317,7 @@ X11_display_file(str, complain)
     int charcount;
 
     /* Use the port-independent file opener to see if the file exists. */
-#ifdef FILE_AREAS
     fp = dlb_fopen_area(farea, str, RDTMODE);
-#else
-    fp = dlb_fopen(str, RDTMODE);
-#endif
 
     if (!fp) {
 	if(complain) pline("Cannot open %s.  Sorry.", str);
@@ -1397,11 +1351,7 @@ X11_display_file(str, complain)
     textlines = (char *) alloc((unsigned int) charcount);
     textlines[0] = '\0';
 
-#ifdef FILE_AREAS
     fp = dlb_fopen_area(farea, str, RDTMODE);
-#else
-    fp = dlb_fopen(str, RDTMODE);
-#endif
 
     while (dlb_fgets(line, LLEN, fp)) {
 	(void) strcat(textlines, line);
@@ -1984,20 +1934,6 @@ nh_XtPopdown(w)
 void
 win_X11_init()
 {
-#ifdef OPENWINBUG
-    /* With the OpenWindows 3.0 libraries and the SunOS 4.1.2 ld, these
-     * two routines will not be found when linking.  An apparently correct
-     * executable is produced, along with nasty messages and a failure code
-     * returned to make.  The routines are in the static libXmu.a and
-     * libXmu.sa.4.0, but not in libXmu.so.4.0.  Rather than fiddle with
-     * static linking, we do this.
-     */
-    if (rn2(2) > 2) {
-	/* i.e., FALSE that an optimizer probably can't find */
-	get_wmShellWidgetClass();
-	get_applicationShellWidgetClass();
-    }
-#endif
     return;
 }
 

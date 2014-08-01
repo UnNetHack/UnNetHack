@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)getline.c	3.4	2002/10/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,9 +5,7 @@
 
 #ifdef TTY_GRAPHICS
 
-#if !defined(MAC)
 #define NEWAUTOCOMP
-#endif
 
 #include "wintty.h"
 #include "func_tab.h"
@@ -62,10 +59,7 @@ getlin_hook_proc hook;
 		(void) fflush(stdout);
 		Sprintf(toplines, "%s ", query);
 		Strcat(toplines, obufp);
-		if((c = Getchar()) == EOF) {
-#ifndef NEWAUTOCOMP
-			*bufp = 0;
-#endif /* not NEWAUTOCOMP */
+		if((c = pgetchar()) == EOF) {
 			break;
 		}
 		if (c == '\033') {
@@ -118,46 +112,28 @@ getlin_hook_proc hook;
 		}
 		if(c == erase_char || c == '\b') {
 			if(bufp != obufp) {
-#ifdef NEWAUTOCOMP
 				char *i;
 
-#endif /* NEWAUTOCOMP */
 				bufp--;
-#ifndef NEWAUTOCOMP
-				putsyms("\b \b");/* putsym converts \b */
-#else /* NEWAUTOCOMP */
 				putsyms("\b");
 				for (i = bufp; *i; ++i) putsyms(" ");
 				for (; i > bufp; --i) putsyms("\b");
 				*bufp = 0;
-#endif /* NEWAUTOCOMP */
 			} else	tty_nhbell();
-#if defined(apollo)
-		} else if(c == '\n' || c == '\r') {
-#else
 		} else if(c == '\n') {
-#endif
-#ifndef NEWAUTOCOMP
-			*bufp = 0;
-#endif /* not NEWAUTOCOMP */
 			break;
 		} else if(' ' <= (unsigned char) c && c != '\177' &&
 			    (bufp-obufp < BUFSZ-1 && bufp-obufp < COLNO)) {
 				/* avoid isprint() - some people don't have it
 				   ' ' is not always a printing char */
-#ifdef NEWAUTOCOMP
 			char *i = eos(bufp);
 
-#endif /* NEWAUTOCOMP */
 			*bufp = c;
 			bufp[1] = 0;
 			putsyms(bufp);
 			bufp++;
 			if (hook && (*hook)(obufp)) {
 			    putsyms(bufp);
-#ifndef NEWAUTOCOMP
-			    bufp = eos(bufp);
-#else /* NEWAUTOCOMP */
 			    /* pointer and cursor left where they were */
 			    for (i = bufp; *i; ++i) putsyms("\b");
 			} else if (i > bufp) {
@@ -166,20 +142,12 @@ getlin_hook_proc hook;
 			    /* erase rest of prior guess */
 			    for (; i > bufp; --i) putsyms(" ");
 			    for (; s > bufp; --s) putsyms("\b");
-#endif /* NEWAUTOCOMP */
 			}
 		} else if(c == kill_char || c == '\177') { /* Robert Viduya */
 				/* this test last - @ might be the kill_char */
-#ifndef NEWAUTOCOMP
-			while(bufp != obufp) {
-				bufp--;
-				putsyms("\b \b");
-			}
-#else /* NEWAUTOCOMP */
 			for (; *bufp; ++bufp) putsyms(" ");
 			for (; bufp != obufp; --bufp) putsyms("\b \b");
 			*bufp = 0;
-#endif /* NEWAUTOCOMP */
 		} else
 			tty_nhbell();
 	}
@@ -260,26 +228,20 @@ tty_get_ext_cmd()
 	if (iflags.extmenu) return extcmd_via_menu();
 	/* maybe a runtime option? */
 	/* hooked_tty_getlin("#", buf, flags.cmd_comp ? ext_cmd_getlin_hook : (getlin_hook_proc) 0); */
-#ifdef REDO
 	hooked_tty_getlin("#", buf, in_doagain ? (getlin_hook_proc)0
 		: ext_cmd_getlin_hook);
-#else
-	hooked_tty_getlin("#", buf, ext_cmd_getlin_hook);
-#endif
 	(void) mungspaces(buf);
 	if (buf[0] == 0 || buf[0] == '\033') return -1;
 
 	for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++)
 		if (!strcmpi(buf, extcmdlist[i].ef_txt)) break;
 
-#ifdef REDO
 	if (!in_doagain) {
 	    int j;
 	    for (j = 0; buf[j]; j++)
 		savech(buf[j]);
 	    savech('\n');
 	}
-#endif
 
 	if (extcmdlist[i].ef_txt == (char *)0) {
 		pline("%s: unknown extended command.", buf);

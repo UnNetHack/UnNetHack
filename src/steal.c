@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)steal.c	3.4	2003/12/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,9 +13,7 @@ equipname(otmp)
 register struct obj *otmp;
 {
 	return (
-#ifdef TOURIST
 		(otmp == uarmu) ? "shirt" :
-#endif
 		(otmp == uarmf) ? "boots" :
 		(otmp == uarms) ? "shield" :
 		(otmp == uarmg) ? "gloves" :
@@ -24,16 +21,11 @@ register struct obj *otmp;
 		(otmp == uarmh) ? "helmet" : "armor");
 }
 
-#ifndef GOLDOBJ
 long		/* actually returns something that fits in an int */
 somegold()
 {
-#ifdef LINT	/* long conv. ok */
-	return(0L);
-#else
 	return (long)( (u.ugold < 100) ? u.ugold :
 		(u.ugold > 10000) ? rnd(10000) : rnd((int) u.ugold) );
-#endif
 }
 
 void
@@ -64,78 +56,6 @@ register struct monst *mtmp;
 	    flags.botl = 1;
 	}
 }
-
-#else /* !GOLDOBJ */
-
-long		/* actually returns something that fits in an int */
-somegold(umoney)
-long umoney;
-{
-#ifdef LINT	/* long conv. ok */
-	return(0L);
-#else
-	return (long)( (umoney < 100) ? umoney :
-		(umoney > 10000) ? rnd(10000) : rnd((int) umoney) );
-#endif
-}
-
-/*
-Find the first (and hopefully only) gold object in a chain.
-Used when leprechaun (or you as leprechaun) looks for
-someone else's gold.  Returns a pointer so the gold may
-be seized without further searching.
-May search containers too.
-Deals in gold only, as leprechauns don't care for lesser coins.
-*/
-struct obj *
-findgold(chain)
-register struct obj *chain;
-{
-        while (chain && chain->otyp != GOLD_PIECE) chain = chain->nobj;
-        return chain;
-}
-
-/* 
-Steal gold coins only.  Leprechauns don't care for lesser coins.
-*/
-void
-stealgold(mtmp)
-register struct monst *mtmp;
-{
-	register struct obj *fgold = g_at(u.ux, u.uy);
-	register struct obj *ygold;
-	register long tmp;
-
-        /* skip lesser coins on the floor */        
-        while (fgold && fgold->otyp != GOLD_PIECE) fgold = fgold->nexthere; 
-
-        /* Do you have real gold? */
-        ygold = findgold(invent);
-
-	if (fgold && ( !ygold || fgold->quan > ygold->quan || !rn2(5))) {
-            obj_extract_self(fgold);
-	    add_to_minv(mtmp, fgold);
-	    newsym(u.ux, u.uy);
-	    pline("%s quickly snatches some gold from between your %s!",
-		    Monnam(mtmp), makeplural(body_part(FOOT)));
-	    if(!ygold || !rn2(5)) {
-		if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
-		monflee(mtmp, 0, FALSE, FALSE);
-	    }
-	} else if(ygold) {
-            const int gold_price = objects[GOLD_PIECE].oc_cost;
-	    tmp = (somegold(money_cnt(invent)) + gold_price - 1) / gold_price;
-	    tmp = min(tmp, ygold->quan);
-            if (tmp < ygold->quan) ygold = splitobj(ygold, tmp);
-            freeinv(ygold);
-            add_to_minv(mtmp, ygold);
-	    Your("purse feels lighter.");
-	    if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
-	    monflee(mtmp, 0, FALSE, FALSE);
-	    flags.botl = 1;
-	}
-}
-#endif /* GOLDOBJ */
 
 /* steal armor after you finish taking it off */
 unsigned int stealoid;		/* object to be stolen */
@@ -196,9 +116,7 @@ boolean unchain_ball;	/* whether to unpunish or just unwield */
 	    else if (obj == uarmg) (void) Gloves_off();
 	    else if (obj == uarmh) (void) Helmet_off();
 	    else if (obj == uarms) (void) Shield_off();
-#ifdef TOURIST
 	    else if (obj == uarmu) (void) Shirt_off();
-#endif
 	    /* catchall -- should never happen */
 	    else setworn((struct obj *)0, obj->owornmask & W_ARMOR);
 	} else if (obj->owornmask & W_AMUL) {
@@ -300,10 +218,8 @@ nothing_to_steal:
 	    otmp = uwep;
 	/* can't steal armor while wearing cloak - so steal the cloak. */
 	else if(otmp == uarm && uarmc) otmp = uarmc;
-#ifdef TOURIST
 	else if(otmp == uarmu && uarmc) otmp = uarmc;
 	else if(otmp == uarmu && uarm) otmp = uarm;
-#endif
 gotobj:
 	if(otmp->o_id == stealoid) return(0);
 
@@ -435,13 +351,11 @@ register struct obj *otmp;
 {
     int freed_otmp;
 
-#ifndef GOLDOBJ
     if (otmp->oclass == COIN_CLASS) {
 	mtmp->mgold += otmp->quan;
 	obfree(otmp, (struct obj *)0);
 	freed_otmp = 1;
     } else {
-#endif
     boolean snuff_otmp = FALSE;
     /* don't want hidden light source inside the monster; assumes that
        engulfers won't have external inventories; whirly monsters cause
@@ -461,9 +375,7 @@ register struct obj *otmp;
     freed_otmp = add_to_minv(mtmp, otmp);
     /* and we had to defer this until object is in mtmp's inventory */
     if (snuff_otmp) snuff_light_source(mtmp->mx, mtmp->my);
-#ifndef GOLDOBJ
     }
-#endif
     return freed_otmp;
 }
 
@@ -527,12 +439,10 @@ boolean verbosely;
 	    update_mon_intrinsics(mon, obj, FALSE, TRUE);
 	 /* obj_no_longer_held(obj); -- done by place_object */
 	    if (obj->owornmask & W_WEP) setmnotwielded(mon, obj);
-#ifdef STEED
 	/* don't charge for an owned saddle on dead steed */
 	} else if (mon->mtame && (obj->owornmask & W_SADDLE) && 
 		!obj->unpaid && costly_spot(omx, omy)) {
 	    obj->no_charge = 1;
-#endif
 	}
 	obj->owornmask = 0L;
     }
@@ -608,7 +518,6 @@ boolean is_pet;		/* If true, pet should keep wielded/worn items */
 	    keepobj = otmp->nobj;
 	    (void) add_to_minv(mtmp, otmp);
 	}
-#ifndef GOLDOBJ
 	if (mtmp->mgold) {
 		register long g = mtmp->mgold;
 		(void) mkgold(g, omx, omy);
@@ -617,7 +526,6 @@ boolean is_pet;		/* If true, pet should keep wielded/worn items */
 				g, plur(g));
 		mtmp->mgold = 0L;
 	}
-#endif
 	
 	if (show & cansee(omx, omy))
 		newsym(omx, omy);

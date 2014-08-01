@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)objnam.c	3.4	2003/12/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -70,7 +69,7 @@ register const char *pref;
 static char *
 nextobuf()
 {
-	static char NEARDATA bufs[NUMOBUF][BUFSZ];
+	static char bufs[NUMOBUF][BUFSZ];
 	static int bufidx = 0;
 
 	bufidx = (bufidx + 1) % NUMOBUF;
@@ -797,9 +796,7 @@ boolean with_price;
 		 * printed to avoid ambiguity between an item whose curse
 		 * status is unknown, and an item known to be uncursed.
 		 */
-#ifdef MAIL
 			&& obj->otyp != SCR_MAIL
-#endif
 			&& obj->otyp != FAKE_AMULET_OF_YENDOR
 			&& obj->otyp != AMULET_OF_YENDOR
 			&& !Role_if(PM_PRIEST)))
@@ -833,9 +830,7 @@ plus:
 		if (!is_weptool(obj))
 		    add_erosion_words(obj, prefix, dump_ID_flag);
 		if(obj->owornmask & (W_TOOL /* blindfold */
-#ifdef STEED
 				| W_SADDLE
-#endif
 				)) {
 			Strcat(bp, " (being worn)");
 			break;
@@ -1024,13 +1019,11 @@ ring:
 			memmove(tmp + 1, tmp + 2, strlen(tmp + 2) + 1);
 		}
 	}
- #ifdef SHOW_WEIGHT
        /* [max] weight inventory */
      if ((obj->otyp != BOULDER) || !throws_rocks (youmonst.data))
        if ((obj->otyp < LUCKSTONE) && (obj->otyp != CHEST) && (obj->otyp != LARGE_BOX) &&
            (obj->otyp != ICE_BOX) && (!Hallucination && flags.invweight))
                  Sprintf (eos(bp), " {%d}", obj->owt);
- #endif
 
 	return(bp);
 }
@@ -1056,17 +1049,9 @@ boolean
 not_fully_identified(otmp)
 register struct obj *otmp;
 {
-#ifdef GOLDOBJ
-    /* gold doesn't have any interesting attributes [yet?] */
-    if (otmp->oclass == COIN_CLASS) return FALSE;	/* always fully ID'd */
-#endif
     /* check fundamental ID hallmarks first */
     if (!otmp->known || !otmp->dknown ||
-#ifdef MAIL
 	    (!otmp->bknown && otmp->otyp != SCR_MAIL) ||
-#else
-	    !otmp->bknown ||
-#endif
 	    !objects[otmp->otyp].oc_name_known)	/* ?redundant? */
 	return TRUE;
     if (otmp->oartifact && undiscovered_artifact(otmp->oartifact))
@@ -1173,9 +1158,7 @@ register struct obj *otmp;
 char *FDECL((*func), (OBJ_P));
 {
 	long savequan;
-#ifdef SHOW_WEIGHT
     unsigned saveowt;
-#endif
 	char *nam;
 
 	/* Note: using xname for corpses will not give the monster type */
@@ -1184,15 +1167,11 @@ char *FDECL((*func), (OBJ_P));
 
 	savequan = otmp->quan;
 	otmp->quan = 1L;
-#ifdef SHOW_WEIGHT
     saveowt = otmp->owt;
     otmp->owt = weight(otmp);
-#endif
 	nam = (*func)(otmp);
 	otmp->quan = savequan;
-#ifdef SHOW_WEIGHT
     otmp->owt = saveowt;
-#endif
 	return nam;
 }
 
@@ -1765,7 +1744,7 @@ struct o_range {
 };
 
 /* wishable subranges of objects */
-STATIC_OVL NEARDATA const struct o_range o_ranges[] = {
+STATIC_OVL const struct o_range o_ranges[] = {
 	{ "bag",	TOOL_CLASS,   SACK,	      BAG_OF_TRICKS },
 	{ "lamp",	TOOL_CLASS,   OIL_LAMP,	      MAGIC_LAMP },
 	{ "candle",	TOOL_CLASS,   TALLOW_CANDLE,  WAX_CANDLE },
@@ -1777,10 +1756,8 @@ STATIC_OVL NEARDATA const struct o_range o_ranges[] = {
 	{ "boots",	ARMOR_CLASS,  LOW_BOOTS,      LEVITATION_BOOTS },
 	{ "shoes",	ARMOR_CLASS,  LOW_BOOTS,      IRON_SHOES },
 	{ "cloak",	ARMOR_CLASS,  MUMMY_WRAPPING, CLOAK_OF_DISPLACEMENT },
-#ifdef TOURIST
 	{ "shirt",	ARMOR_CLASS,  HAWAIIAN_SHIRT, T_SHIRT
 	 },
-#endif
 	{ "dragon scales",
 			ARMOR_CLASS,  GRAY_DRAGON_SCALES, YELLOW_DRAGON_SCALES },
 	{ "dragon scale mail",
@@ -1995,10 +1972,8 @@ struct alt_spellings {
 	{ "mattock", DWARVISH_MATTOCK },
 	{ "amulet of poison resistance", AMULET_VERSUS_POISON },
 	{ "stone", ROCK },
-#ifdef TOURIST
 	{ "camera", EXPENSIVE_CAMERA },
 	{ "tee shirt", T_SHIRT },
-#endif
 	{ "can", TIN },
 	{ "can opener", TIN_OPENER },
 	{ "kelp", KELP_FROND },
@@ -2392,19 +2367,11 @@ boolean from_user;
 #endif
 						) cnt=5000;
 		if (cnt < 1) cnt=1;
-#ifndef GOLDOBJ
 		if (from_user)
 		    pline("%d gold piece%s.", cnt, plur(cnt));
 		u.ugold += cnt;
 		flags.botl=1;
 		return (&zeroobj);
-#else
-                otmp = mksobj(GOLD_PIECE, FALSE, FALSE);
-		otmp->quan = cnt;
-                otmp->owt = weight(otmp);
-		flags.botl=1;
-		return (otmp);
-#endif
 	}
 	if (strlen(bp) == 1 &&
 	   (i = def_char_to_objclass(*bp)) < MAXOCLASSES && i > ILLOBJ_CLASS
@@ -2638,7 +2605,6 @@ srch:
 			newsym(u.ux, u.uy);
 			return(&zeroobj);
 		}
-# ifdef SINKS
 		if(!BSTRCMP(bp, p-4, "sink")) {
 			levl[u.ux][u.uy].typ = SINK;
 			level.flags.nsinks++;
@@ -2646,7 +2612,6 @@ srch:
 			newsym(u.ux, u.uy);
 			return &zeroobj;
 		}
-# endif
 		if(!BSTRCMP(bp, p-4, "pool")) {
 			levl[u.ux][u.uy].typ = POOL;
 			del_engr_at(u.ux, u.uy);
@@ -2843,9 +2808,7 @@ typfnd:
 		case HEAVY_IRON_BALL: case IRON_CHAIN: case STATUE:
 			/* otmp->cobj already done in mksobj() */
 				break;
-#ifdef MAIL
 		case SCR_MAIL: otmp->spe = 1; break;
-#endif
 		case WAN_WISHING:
 #ifdef WIZARD
 			if (!wizard) {
@@ -2890,9 +2853,7 @@ typfnd:
 		case FIGURINE:
 			if (!(mons[mntmp].geno & G_UNIQ)
 			    && !is_human(&mons[mntmp])
-#ifdef MAIL
 			    && mntmp != PM_MAIL_DAEMON
-#endif
 							)
 				otmp->corpsenm = mntmp;
 			break;

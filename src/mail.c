@@ -1,13 +1,11 @@
-/*	SCCS Id: @(#)mail.c	3.4	2002/01/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-#ifdef MAIL
 #include <fcntl.h>
 #include <errno.h>
-#include "mail.h"
+import Mail._
 
 /*
  * Notify user when new mail has arrived.  Idea by Merlyn Leroy.
@@ -26,11 +24,6 @@
  *	- Do something to the text when the scroll is enchanted or cancelled.
  *	- Make the daemon always appear at a stairwell, and have it find a
  *	  path to the hero.
- *
- * Note by Olaf Seibert: On the Amiga, we usually don't get mail.  So we go
- *			 through most of the effects at 'random' moments.
- * Note by Paul Winner:  The MSDOS port also 'fakes' the mail daemon at
- *			 random intervals.
  */
 
 STATIC_DCL boolean FDECL(md_start,(coord *));
@@ -42,7 +35,7 @@ int mailckfreq = 0;
 
 extern char *viz_rmin, *viz_rmax;	/* line-of-sight limits (vision.c) */
 
-# if !defined(UNIX) && !defined(VMS) && !defined(LAN_MAIL)
+# if !defined(UNIX) && !defined(LAN_MAIL)
 int mustgetmail = -1;
 # endif
 static int gethint = -1;
@@ -50,36 +43,20 @@ static int gethint = -1;
 # ifdef UNIX
 #include <sys/stat.h>
 #include <pwd.h>
-#ifdef LEGACY_CODE
-/* DON'T trust all Unices to declare getpwuid() in <pwd.h> */
-#  if !defined(_BULL_SOURCE) && !defined(__sgi) && !defined(_M_UNIX)
-#   if !defined(SUNOS4) && !(defined(ULTRIX) && defined(__GNUC__))
-/* DO trust all SVR4 to typedef uid_t in <sys/types.h> (probably to a long) */
-#    if defined(POSIX_TYPES) || defined(SVR4) || defined(HPUX)
-extern struct passwd *FDECL(getpwuid,(uid_t));
-#    else
-extern struct passwd *FDECL(getpwuid,(int));
-#    endif
-#   endif
-#  endif
-#endif /* LEGACY_CODE */
 static struct stat omstat,nmstat;
 static char *mailbox = (char *)0;
 static long laststattime;
 
-# if !defined(MAILPATH) && defined(AMS)	/* Just a placeholder for AMS */
-#  define MAILPATH "/dev/null"
-# endif
 # if !defined(MAILPATH) && (defined(LINUX) || defined(__osf__))
 #  define MAILPATH "/var/spool/mail/"
 # endif
 # if !defined(MAILPATH) && defined(__FreeBSD__)
 #  define MAILPATH "/var/mail/"
 # endif
-# if !defined(MAILPATH) && (defined(BSD) || defined(ULTRIX))
+# if !defined(MAILPATH) && defined(BSD)
 #  define MAILPATH "/usr/spool/mail/"
 # endif
-# if !defined(MAILPATH) && (defined(SYSV) || defined(HPUX))
+# if !defined(MAILPATH) && defined(SYSV)
 #  define MAILPATH "/usr/mail/"
 # endif
 
@@ -88,22 +65,10 @@ getmailstatus()
 {
 	if(!mailbox && !(mailbox = nh_getenv("MAIL"))) {
 #  ifdef MAILPATH
-#   ifdef AMS
-	        struct passwd ppasswd;
-
-		(void) memcpy(&ppasswd, getpwuid(getuid()), sizeof(struct passwd));
-		if (ppasswd.pw_dir) {
-		     mailbox = (char *) alloc((unsigned) strlen(ppasswd.pw_dir)+sizeof(AMS_MAILBOX));
-		     Strcpy(mailbox, ppasswd.pw_dir);
-		     Strcat(mailbox, AMS_MAILBOX);
-		} else
-		  return;
-#   else
 		const char *pw_name = getpwuid(getuid())->pw_name;
 		mailbox = (char *) alloc(sizeof(MAILPATH)+strlen(pw_name));
 		Strcpy(mailbox, MAILPATH);
 		Strcat(mailbox, pw_name);
-#  endif /* AMS */
 #  else
 		return;
 #  endif
@@ -255,7 +220,7 @@ md_stop(stopp, startp)
 }
 
 /* Let the mail daemon have a larger vocabulary. */
-static NEARDATA const char *mail_text[] = {
+static const char *mail_text[] = {
     "Gangway!",
     "Look out!",
     "Pardon me!"
@@ -414,16 +379,13 @@ give_up:
 	pline("Hark!  \"%s.\"", info->display_txt);
 }
 
-# if !defined(UNIX) && !defined(VMS) && !defined(LAN_MAIL)
+# if !defined(UNIX) && !defined(LAN_MAIL)
 
 void
 ckmailstatus()
 {
 	if (u.uswallow || !flags.biff) return;
 	if (mustgetmail < 0) {
-#if defined(AMIGA) || defined(MSDOS) || defined(TOS)
-	    mustgetmail=(moves<2000)?(100+rn2(2000)):(2000+rn2(3000));
-#endif
 	    return;
 	}
 	if (--mustgetmail <= 0) {
@@ -442,10 +404,6 @@ struct obj *otmp;
     static char *junk[] = {
     "Please disregard previous letter.",
     "Welcome to UnNetHack.",
-#ifdef AMIGA
-    "Only Amiga makes it possible.",
-    "CATS have all the answers.",
-#endif
     "Report bugs to <bhaak@gmx.net>.",
     "Invitation: Visit the NetHack web site at http://www.nethack.org!",
 
@@ -463,19 +421,15 @@ struct obj *otmp;
 
 }
 
-# endif /* !UNIX && !VMS && !LAN_MAIL */
+# endif /* !UNIX && !LAN_MAIL */
 
 # ifdef UNIX
 
 void
 ckmailstatus()
 {
-#ifdef SIMPLE_MAIL
 	if (mailckfreq == 0)
 	  mailckfreq = (iflags.simplemail ? 5 : 10);
-#else
-	mailckfreq = 10;
-#endif
 
 	if(!mailbox || u.uswallow || !flags.biff
 		    || moves < laststattime + mailckfreq)
@@ -514,7 +468,6 @@ struct obj *otmp;
 #ifdef DEF_MAILREADER
 	register const char *mr = 0;
 #endif /* DEF_MAILREADER */
-#ifdef SIMPLE_MAIL
 	if (iflags.simplemail)
 	{
 		FILE* mb = fopen(mailbox, "r");
@@ -571,7 +524,6 @@ struct obj *otmp;
 		unlink(mailbox);
 		return;
 	}
-# endif /* SIMPLE_MAIL */
 # ifdef DEF_MAILREADER			/* This implies that UNIX is defined */
 	display_nhwindow(WIN_MESSAGE, FALSE);
 	if(!(mr = nh_getenv("MAILREADER")))
@@ -582,9 +534,7 @@ struct obj *otmp;
 		terminate(EXIT_FAILURE);
 	}
 # else
-#  ifndef AMS				/* AMS mailboxes are directories */
 	display_file(mailbox, TRUE);
-#  endif /* AMS */
 # endif /* DEF_MAILREADER */
 
 	/* get new stat; not entirely correct: there is a small time
@@ -592,67 +542,11 @@ struct obj *otmp;
 	getmailstatus();
 	return;
 
-#ifdef SIMPLE_MAIL
 bail:
 	pline("It appears to be all gibberish."); /* bail out _professionally_ */
-#endif
 }
 
 # endif /* UNIX */
-
-# ifdef VMS
-
-extern NDECL(struct mail_info *parse_next_broadcast);
-
-volatile int broadcasts = 0;
-
-void
-ckmailstatus()
-{
-    struct mail_info *brdcst;
-
-    if (u.uswallow || !flags.biff) return;
-
-    while (broadcasts > 0) {	/* process all trapped broadcasts [until] */
-	broadcasts--;
-	if ((brdcst = parse_next_broadcast()) != 0) {
-	    newmail(brdcst);
-	    break;		/* only handle one real message at a time */
-	}
-    }
-}
-
-void
-readmail(otmp)
-struct obj *otmp;
-{
-#  ifdef SHELL	/* can't access mail reader without spawning subprocess */
-    const char *txt, *cmd;
-    char *p, buf[BUFSZ], qbuf[BUFSZ];
-    int len;
-
-    /* there should be a command hidden beyond the object name */
-    txt = otmp->onamelth ? ONAME(otmp) : "";
-    len = strlen(txt);
-    cmd = (len + 1 < otmp->onamelth) ? txt + len + 1 : (char *) 0;
-    if (!cmd || !*cmd) cmd = "SPAWN";
-
-    Sprintf(qbuf, "System command (%s)", cmd);
-    getlin(qbuf, buf);
-    if (*buf != '\033') {
-	for (p = eos(buf); p > buf; *p = '\0')
-	    if (*--p != ' ') break;	/* strip trailing spaces */
-	if (*buf) cmd = buf;		/* use user entered command */
-	if (!strcmpi(cmd, "SPAWN") || !strcmp(cmd, "!"))
-	    cmd = (char *) 0;		/* interactive escape */
-
-	vms_doshell(cmd, TRUE);
-	(void) sleep(1);
-    }
-#  endif /* SHELL */
-}
-
-# endif /* VMS */
 
 # ifdef LAN_MAIL
 
@@ -708,13 +602,11 @@ struct obj *otmp;
 		"Pressing 'v' lets you explore faster.",
 		"Unlocked doors will open when you walk into them.",
 
-#ifdef SIMPLE_MAIL
 		/* public server hints */
 		"If you need advice, #shout, somebody might mail you help.",
 		"Visit IRC channel #unnethack on freenode.",
 		"Visit http://un.nethack.nu/ for dumps of your games.",
 		"To opt out of these hints, put OPTIONS=nohint into your options.",
-#endif
 	};
 
 	pline("\"%s\"", hint[rn2(SIZE(hint))]);
@@ -738,7 +630,5 @@ maybe_hint()
 		flags.hint = FALSE;
 	}
 }
-
-#endif /* MAIL */
 
 /*mail.c*/

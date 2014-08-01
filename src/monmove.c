@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)monmove.c	3.4	2002/04/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -49,7 +48,6 @@ register struct monst *mtmp;
 	if(mtmp->mpeaceful && in_town(u.ux+u.dx, u.uy+u.dy) &&
 	   mtmp->mcansee && m_canseeu(mtmp) && !rn2(3)) {
 
-#ifdef CONVICT
 	if(Role_if(PM_CONVICT) && !Upolyd) {
 		verbalize("%s yells: Hey!  You are the one from the wanted poster!",
 			Amonnam(mtmp));
@@ -57,7 +55,6 @@ register struct monst *mtmp;
 		stop_occupation();
 		return;
 	}
-#endif /* CONVICT */
 	    if(picking_lock(&x, &y) && IS_DOOR(levl[x][y].typ) &&
 	       (levl[x][y].doormask & D_LOCKED)) {
 
@@ -87,23 +84,6 @@ dochugw(mtmp)
 	register int x = mtmp->mx, y = mtmp->my;
 	boolean already_saw_mon = !occupation ? 0 : canspotmon(mtmp);
 	int rd = dochug(mtmp);
-#if 0
-	/* part of the original warning code which was replaced in 3.3.1 */
-	int dd;
-
-	if(Warning && !rd && !mtmp->mpeaceful &&
-			(dd = distu(mtmp->mx,mtmp->my)) < distu(x,y) &&
-			dd < 100 && !canseemon(mtmp)) {
-	    /* Note: this assumes we only want to warn against the monster to
-	     * which the weapon does extra damage, as there is no "monster
-	     * which the weapon warns against" field.
-	     */
-	    if (spec_ability(uwep, SPFX_WARN) && spec_dbon(uwep, mtmp, 1))
-		warnlevel = 100;
-	    else if ((int) (mtmp->m_lev / 4) > warnlevel)
-		warnlevel = (mtmp->m_lev / 4);
-	}
-#endif /* 0 */
 
 	/* a similar check is in monster_nearby() in hack.c */
 	/* check whether hero notices monster and stops current activity */
@@ -142,10 +122,8 @@ struct monst *mtmp;
 		return(FALSE);
 
 	return (boolean)(sobj_at(SCR_SCARE_MONSTER, x, y)
-#ifdef ELBERETH
 			 || (!flags.elberethignore
 			     && sengr_at("Elbereth", x, y))
-#endif
 			 || (is_vampire(mtmp->data)
 			     && IS_ALTAR(levl[x][y].typ)));
 }
@@ -322,9 +300,6 @@ register struct monst *mtmp;
 	register struct permonst *mdat;
 	register int tmp=0;
 	int inrange, nearby, scared;
-#ifdef GOLDOBJ
-        struct obj *ygold = 0, *lepgold = 0;
-#endif
 	struct monst* currmon;
 
 /*	Pre-movement adjustments	*/
@@ -459,9 +434,7 @@ register struct monst *mtmp;
 
 	/* Demonic Blackmail! */
 	if(nearby && mdat->msound == MS_BRIBE &&
-#ifdef CONVICT
        (monsndx(mdat) != PM_PRISON_GUARD) &&
-#endif /* CONVICT */
 	   mtmp->mpeaceful && !mtmp->mtame && !u.uswallow) {
 		if (mtmp->mux != u.ux || mtmp->muy != u.uy) {
 			pline("%s whispers at thin air.",
@@ -480,7 +453,6 @@ register struct monst *mtmp;
 		} else if(demon_talk(mtmp)) return(1);	/* you paid it off */
 	}
 
-#ifdef CONVICT
 	/* Prison guard extortion */
     if(nearby && (monsndx(mdat) == PM_PRISON_GUARD) && !mtmp->mpeaceful
 	 && !mtmp->mtame && !u.uswallow && (!mtmp->mspec_used)) {
@@ -498,7 +470,6 @@ register struct monst *mtmp;
             mtmp->mspec_used = 1000;
         }
     }
-#endif /* CONVICT */
 
 	/* the watch will look around and see if you are up to no good :-) */
 	if (mdat == &mons[PM_WATCHMAN] || mdat == &mons[PM_WATCH_CAPTAIN])
@@ -594,20 +565,9 @@ toofar:
 
 /*	Now the actual movement phase	*/
 
-#ifndef GOLDOBJ
 	if(!nearby || mtmp->mflee || scared ||
 	   mtmp->mconf || mtmp->mstun || (mtmp->minvis && !rn2(3)) ||
 	   (mdat->mlet == S_LEPRECHAUN && !u.ugold && (mtmp->mgold || rn2(2))) ||
-#else
-        if (mdat->mlet == S_LEPRECHAUN) {
-	    ygold = findgold(invent);
-	    lepgold = findgold(mtmp->minvent);
-	}
-
-	if(!nearby || mtmp->mflee || scared ||
-	   mtmp->mconf || mtmp->mstun || (mtmp->minvis && !rn2(3)) ||
-	   (mdat->mlet == S_LEPRECHAUN && !ygold && (lepgold || rn2(2))) ||
-#endif
 	   (is_wanderer(mdat) && !rn2(4)) || (Conflict && !mtmp->iswiz) ||
 	   (!mtmp->mcansee && !rn2(4)) || mtmp->mpeaceful) {
 		/* Possibly cast an undirected spell if not attacking you */
@@ -694,13 +654,13 @@ toofar:
 	return(tmp == 2);
 }
 
-static NEARDATA const char practical[] = { WEAPON_CLASS, ARMOR_CLASS, GEM_CLASS, FOOD_CLASS, 0 };
-static NEARDATA const char magical[] = {
+static const char practical[] = { WEAPON_CLASS, ARMOR_CLASS, GEM_CLASS, FOOD_CLASS, 0 };
+static const char magical[] = {
 	AMULET_CLASS, POTION_CLASS, SCROLL_CLASS, WAND_CLASS, RING_CLASS,
 	SPBOOK_CLASS, 0 };
-static NEARDATA const char indigestion[] = { BALL_CLASS, ROCK_CLASS, 0 };
-static NEARDATA const char boulder_class[] = { ROCK_CLASS, 0 };
-static NEARDATA const char gem_class[] = { GEM_CLASS, 0 };
+static const char indigestion[] = { BALL_CLASS, ROCK_CLASS, 0 };
+static const char boulder_class[] = { ROCK_CLASS, 0 };
+static const char gem_class[] = { GEM_CLASS, 0 };
 
 boolean
 itsstuck(mtmp)
@@ -771,9 +731,7 @@ register int after;
 	/* Not necessary if m_move called from this file, but necessary in
 	 * other calls of m_move (ex. leprechauns dodging)
 	 */
-#ifdef REINCARNATION
 	if (!Is_rogue_level(&u.uz))
-#endif
 	    can_tunnel = tunnels(ptr);
 	can_open = !(nohands(ptr) || verysmall(ptr));
 	can_unlock = ((can_open && m_carrying(mtmp, SKELETON_KEY)) ||
@@ -829,14 +787,12 @@ register int after;
 	    mmoved = 0;
 	}
 
-#ifdef MAIL
 	if(ptr == &mons[PM_MAIL_DAEMON]) {
 	    if(flags.soundok && canseemon(mtmp))
 		verbalize("I'm late!");
 	    mongone(mtmp);
 	    return(2);
 	}
-#endif
 
 	/* teleport if that lies in our nature */
 	if(ptr == &mons[PM_TENGU] && !rn2(5) && !mtmp->mcan &&
@@ -858,9 +814,6 @@ not_special:
 	if (mtmp->mconf || (u.uswallow && mtmp == u.ustuck))
 		appr = 0;
 	else {
-#ifdef GOLDOBJ
-		struct obj *lepgold, *ygold;
-#endif
 		boolean should_see = (couldsee(omx, omy) &&
 				      (levl[gx][gy].lit ||
 				       !levl[omx][omy].lit) &&
@@ -876,12 +829,7 @@ not_special:
 			appr = 0;
 
 		if(monsndx(ptr) == PM_LEPRECHAUN && (appr == 1) &&
-#ifndef GOLDOBJ
 		   (mtmp->mgold > u.ugold))
-#else
-		   ( (lepgold = findgold(mtmp->minvent)) && 
-                   (lepgold->quan > ((ygold = findgold(invent)) ? ygold->quan : 0L)) ))
-#endif
 			appr = -1;
 
 		if (!should_see && can_track(ptr)) {
@@ -896,9 +844,7 @@ not_special:
 	}
 
 	if ((!mtmp->mpeaceful || !rn2(10))
-#ifdef REINCARNATION
 				    && (!Is_rogue_level(&u.uz))
-#endif
 							    ) {
 	    boolean in_line = lined_up(mtmp) &&
 		(distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <=
@@ -939,9 +885,6 @@ not_special:
 	    !mtmp->mpeaceful) minr--;
 	/* guards shouldn't get too distracted */
 	if(!mtmp->mpeaceful && (is_mercenary(ptr) 
-#ifdef BLACKMARKET
-		    || is_blkmktstaff(ptr))
-#endif /* BLACKMARKET */
 		) minr = 1;
 
 	if((likegold || likegems || likeobjs || likemagic || likerock || breakrock || conceals)
@@ -1418,9 +1361,6 @@ register struct monst *mtmp;
 {
 	boolean notseen, gotu;
 	register int disp, mx = mtmp->mux, my = mtmp->muy;
-#ifdef GOLDOBJ
-	long umoney = money_cnt(invent);
-#endif
 
 	/*
 	 * do cheapest and/or most likely tests first
@@ -1438,11 +1378,7 @@ register struct monst *mtmp;
 	if (notseen || Underwater) {
 	    /* Xorns can smell valuable metal like gold, treat as seen */
 	    if ((mtmp->data == &mons[PM_XORN]) &&
-#ifndef GOLDOBJ
 			u.ugold
-#else
-			umoney
-#endif
 			&& !Underwater)
 		disp = 0;
 	    else
@@ -1455,12 +1391,6 @@ register struct monst *mtmp;
 	/* without something like the following, invis. and displ.
 	   are too powerful */
 	gotu = notseen ? !rn2(3) : Displaced ? !rn2(4) : FALSE;
-
-#if 0		/* this never worked as intended & isn't needed anyway */
-	/* If invis but not displaced, staying around gets you 'discovered' */
-	gotu |= (!Displaced && u.dx == 0 && u.dy == 0);
-#endif
-
 	if (!gotu) {
 	    register int try_cnt = 0;
 	    do {
@@ -1492,31 +1422,22 @@ struct monst *mtmp;
 
 	if (!amorphous(mtmp->data)) return FALSE;
 	if (mtmp == &youmonst) {
-#ifndef GOLDOBJ
 		if (u.ugold > 100L) return FALSE;
-#endif
 		chain = invent;
 	} else {
-#ifndef GOLDOBJ
 		if (mtmp->mgold > 100L) return FALSE;
-#endif
 		chain = mtmp->minvent;
 	}
 	for (obj = chain; obj; obj = obj->nobj) {
 		int typ = obj->otyp;
 
-#ifdef GOLDOBJ
-                if (typ == COIN_CLASS && obj->quan > 100L) return FALSE;
-#endif
 		if (obj->oclass != GEM_CLASS &&
 		    !(typ >= ARROW && typ <= BOOMERANG) &&
 		    !(typ >= DAGGER && typ <= CRYSKNIFE) &&
 		    typ != SLING &&
 		    !is_cloak(obj) && typ != FEDORA &&
 		    !is_gloves(obj) && typ != LEATHER_JACKET &&
-#ifdef TOURIST
 		    typ != CREDIT_CARD && !is_shirt(obj) &&
-#endif
 		    !(typ == CORPSE && verysmall(&mons[obj->corpsenm])) &&
 		    typ != FORTUNE_COOKIE && typ != CANDY_BAR &&
 		    typ != PANCAKE && typ != LEMBAS_WAFER &&

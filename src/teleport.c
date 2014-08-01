@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)teleport.c	3.4	2003/08/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -36,9 +35,7 @@ unsigned gpflags;
 	 * oh well.
 	 */
 	if (mtmp != &youmonst && x == u.ux && y == u.uy
-#ifdef STEED
 			&& (!u.usteed || mtmp != u.usteed)
-#endif
 			)
 	    is_badpos = 1;
 
@@ -114,9 +111,7 @@ unsigned gpflags;
 	 * oh well.
 	 */
 	if (mtmp != &youmonst && x == u.ux && y == u.uy
-#ifdef STEED
 			&& (!u.usteed || mtmp != u.usteed)
-#endif
 			)
 		return FALSE;
 
@@ -536,13 +531,11 @@ boolean allow_drag;
 	}
 	initrack(); /* teleports mess up tracking monsters without this */
 	update_player_regions();
-#ifdef STEED
 	/* Move your steed, too */
 	if (u.usteed) {
 		u.usteed->mx = nux;
 		u.usteed->my = nuy;
 	}
-#endif
 	/*
 	 *  Make sure the hero disappears from the old location.  This will
 	 *  not happen if she is teleported within sight of her previous
@@ -596,10 +589,8 @@ boolean force_it;
 {
 	register struct obj *otmp;
 
-#ifdef STEED
 	if (mtmp == u.usteed)
 		return (FALSE);
-#endif
 
 	if (mtmp->mleashed) {
 	    otmp = get_mleash(mtmp);
@@ -645,9 +636,7 @@ tele()
 	(
 #endif
 	 (u.uhave.amulet || On_W_tower_level(&u.uz)
-#ifdef STEED
 	  || (u.usteed && mon_has_amulet(u.usteed))
-#endif
 	 )
 #ifdef WIZARD
 	 && (!wizard) )
@@ -664,14 +653,10 @@ tele()
 	    if (unconscious()) {
 		pline("Being unconscious, you cannot control your teleport.");
 	    } else {
-#ifdef STEED
 		    char buf[BUFSZ];
 		    if (u.usteed) Sprintf(buf," and %s", mon_nam(u.usteed));
-#endif
 		    pline("To what position do you%s want to be teleported?",
-#ifdef STEED
 				u.usteed ? buf :
-#endif
 			   "");
 		    cc.x = u.ux;
 		    cc.y = u.uy;
@@ -858,11 +843,7 @@ level_tele()
 			newlevel.dlevel = destlev;
 			if (In_endgame(&newlevel) && !In_endgame(&u.uz)) {
 				Sprintf(buf,
-#ifdef RANDOMIZED_PLANES
-				    "Destination is first elemental plane");
-#else
 				    "Destination is earth level");
-#endif
 				if (!u.uhave.amulet) {
 					struct obj *obj;
 					obj = mksobj(AMULET_OF_YENDOR,
@@ -872,11 +853,7 @@ level_tele()
 						Strcat(buf, " with the amulet");
 					}
 				}
-#ifdef RANDOMIZED_PLANES
-				assign_level(&newlevel, get_first_elemental_plane());
-#else
 				assign_level(&newlevel, &earth_level);
-#endif
 				pline("%s.", buf);
 			}
 			force_dest = TRUE;
@@ -923,9 +900,6 @@ level_tele()
 	     * we let negative values requests fall into the "heaven" loop.
 	     */
 	    if ((Is_knox(&u.uz)
-#ifdef BLACKMARKET
-		    || Is_blackmarket(&u.uz)
-#endif
 	    ) && newlev > 0) {
 		You("%s", shudder_for_moment);
 		return;
@@ -1254,12 +1228,10 @@ boolean suppress_impossible;
 {
 	register int x, y, trycount;
 
-#ifdef STEED
 	if (mtmp == u.usteed) {
 	    tele();
 	    return TRUE;
 	}
-#endif
 
 	if (mtmp->iswiz && mtmp->mx) {	/* Wizard, not just arriving */
 	    if (!In_W_tower(u.ux, u.uy, &u.uz))
@@ -1395,19 +1367,6 @@ int in_sight;
 			seetrap(trap);
 		    }
 		    return 0;
-#ifdef BLACKMARKET
-	      	} else if (mtmp->mtame &&
-			(Is_blackmarket(&trap->dst) || Is_blackmarket(&u.uz))) {
-		    if (in_sight) {
-			pline("%s seems to shimmer for a moment.",
-				Monnam(mtmp));
-			seetrap(trap);
-		    }
-		    return 0;
-		} else if (Is_blackmarket(&u.uz) &&
-			mtmp->data == &mons[PM_ONE_EYED_SAM]) {
-		    return 0;
-#endif /* BLACKMARKET */
 		} else {
 		    assign_level(&tolevel, &trap->dst);
 		    migrate_typ = MIGR_PORTAL;
@@ -1498,9 +1457,6 @@ random_teleport_level()
 	    cur_depth = (int)depth(&u.uz);
 
 	if (!rn2(5) || Is_knox(&u.uz)
-#ifdef BLACKMARKET
-		|| Is_blackmarket(&u.uz)
-#endif
 		)
 	    return cur_depth;
 
@@ -1568,13 +1524,6 @@ boolean give_feedback;
 		You("are no longer inside %s!", mon_nam(mtmp));
 	    unstuck(mtmp);
 	    (void) rloc(mtmp, FALSE);
-#ifdef BLACKMARKET
-	} else if (((mtmp->data == &mons[PM_BLACK_MARKETEER] && rn2(5)) ||
-		    (mtmp->data == &mons[PM_ONE_EYED_SAM] && rn2(13))) &&
-		   enexto_core_range(&cc, u.ux, u.uy, mtmp->data,0,
-		                     rnf(1,10) ? 4 : 3)) {
-	    rloc_to(mtmp, cc.x, cc.y);
-#endif
 	} else if (is_rider(mtmp->data) && rn2(13) &&
 		   enexto(&cc, u.ux, u.uy, mtmp->data))
 	    rloc_to(mtmp, cc.x, cc.y);

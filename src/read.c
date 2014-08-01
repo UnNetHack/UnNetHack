@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)read.c	3.4	2003/10/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -17,22 +16,16 @@
 
 boolean	known;
 
-static NEARDATA const char readable[] =
+static const char readable[] =
 		   { COIN_CLASS, ALL_CLASSES, SCROLL_CLASS, SPBOOK_CLASS, 0 };
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
 static void FDECL(wand_explode, (struct obj *));
-#if 0
-static void NDECL(do_class_genocide);
-#endif
 static void FDECL(stripspe,(struct obj *));
 static void FDECL(p_glow1,(struct obj *));
 static void FDECL(p_glow2,(struct obj *,const char *));
 static void FDECL(randomize,(int *, int));
 static void FDECL(forget_single_object, (int));
-#if 0
-static void FDECL(forget, (int));
-#endif
 static void FDECL(maybe_tame, (struct monst *,struct obj *));
 
 STATIC_PTR void FDECL(do_flood, (int,int,genericptr_t));
@@ -63,7 +56,6 @@ doread()
 	    }
 	    useup(scroll);
 	    return(1);
-#ifdef TOURIST
 	} else if (scroll->otyp == T_SHIRT) {
 	    static const char *shirt_msgs[] = { /* Scott Bigham */
     "I explored the Dungeons of Doom and all I got was this lousy T-shirt!",
@@ -196,7 +188,6 @@ doread()
 				(int)(!(scroll->o_id % 3)), (int)((scroll->o_id * 7) % 10));
 		u.uconduct.literate++;
 		return 1;
-#endif	/* TOURIST */
 	} else if ((scroll->otyp == TIN) ||
 		   (scroll->otyp == CAN_OF_GREASE) ||
 		   (scroll->otyp == CANDY_BAR)) {
@@ -220,11 +211,9 @@ doread()
 			You("read:");
 		pline("\"1 Zorkmid. 857 GUE. In Frobs We Trust.\"");
 		u.uconduct.literate++;
-#ifndef GOLDOBJ
 		/* Give it back to them, then */
 		u.ugold = scroll->quan;
 		dealloc_obj(scroll);
-#endif
 		return 1;
 	} else if (scroll->oartifact == ART_ORB_OF_FATE) {
 		if (Blind)
@@ -302,16 +291,12 @@ doread()
 	if (scroll->otyp != SPE_BOOK_OF_THE_DEAD &&
 		scroll->otyp != SPE_BLANK_PAPER &&
 		scroll->otyp != SCR_BLANK_PAPER 
-#ifdef MAIL
 		&& scroll->otyp != SCR_MAIL
-#endif
 		)
 	    violated(CONDUCT_ILLITERACY);
 
 	confused = (Confusion != 0);
-#ifdef MAIL
 	if (scroll->otyp == SCR_MAIL) confused = FALSE;
-#endif
 	if(scroll->oclass == SPBOOK_CLASS) {
 	    return(study_book(scroll));
 	}
@@ -511,9 +496,7 @@ int curse_bless;
 		break;
 	    case MAGIC_MARKER:
 	    case TINNING_KIT:
-#ifdef TOURIST
 	    case EXPENSIVE_CAMERA:
-#endif
 		if (is_cursed) stripspe(obj);
 		else if (rechrg && obj->otyp == MAGIC_MARKER) {	/* previously recharged */
 		    obj->recharged = 1;	/* override increment done above */
@@ -677,21 +660,6 @@ forget_single_object(obj_id)
 
 	/* clear & free object names from matching inventory items too? */
 }
-
-
-#if 0	/* here if anyone wants it.... */
-/* Forget everything known about a particular object class. */
-static void
-forget_objclass(oclass)
-	int oclass;
-{
-	int i;
-
-	for (i=bases[oclass];
-		i < NUM_OBJECTS && objects[i].oc_class==oclass; i++)
-	    forget_single_object(i);
-}
-#endif
 
 
 /* randomize the given list of numbers  0 <= i < count */
@@ -873,11 +841,7 @@ maybe_tame(mtmp, sobj)
 struct monst *mtmp;
 struct obj *sobj;
 {
-#ifdef BLACKMARKET                            
-	if (sobj->cursed || Is_blackmarket(&u.uz)) {
-#else
 	if (sobj->cursed) {
-#endif
 	    setmangry(mtmp);
 	} else {
 	    if (mtmp->isshk)
@@ -951,7 +915,6 @@ register struct obj	*sobj;
 	if (objects[sobj->otyp].oc_magic)
 		exercise(A_WIS, TRUE);		/* just for trying */
 	switch(sobj->otyp) {
-#ifdef MAIL
 	case SCR_MAIL:
 		known = TRUE;
 		if (sobj->spe == MAIL_HINT)
@@ -963,7 +926,6 @@ register struct obj	*sobj;
 		 */
 		else readmail(sobj);
 		break;
-#endif
 	case SCR_ENCHANT_ARMOR:
 	    {
 		register schar s;
@@ -1220,10 +1182,6 @@ register struct obj	*sobj;
 		} else {
 		    for (obj = invent; obj; obj = obj->nobj) {
 			long wornmask;
-#ifdef GOLDOBJ
-			/* gold isn't subject to cursing and blessing */
-			if (obj->oclass == COIN_CLASS) continue;
-#endif
 			wornmask = (obj->owornmask & ~(W_BALL|W_ART|W_ARTI));
 			if (wornmask && !sobj->blessed) {
 			    /* handle a couple of special cases; we don't
@@ -1536,9 +1494,7 @@ register struct obj	*sobj;
 	case SCR_EARTH:
 	    /* TODO: handle steeds */
 	    if (
-#ifdef REINCARNATION
 		!Is_rogue_level(&u.uz) && 
-#endif
 	    	 (!In_endgame(&u.uz) || Is_earthlevel(&u.uz))) {
 	    	register int x, y;
 		int boulder_created = 0;
@@ -1557,9 +1513,6 @@ register struct obj	*sobj;
 	    	    	if (isok(x, y) && !closed_door(x, y) &&
 	    	    			!IS_ROCK(levl[x][y].typ) &&
 	    	    			!IS_AIR(levl[x][y].typ) &&
-#ifdef BLACKMARKET
-	    	    			!(Is_blackmarket(&u.uz) && rn2(2)) &&
-#endif
 					(x != u.ux || y != u.uy)) {
 				boulder_created += drop_boulder_on_monster(x, y, confused, TRUE);
 	    	    	}
@@ -1711,7 +1664,6 @@ do_it:
 	if (Punished && !on && !Blind)
 	    move_bc(1, 0, uball->ox, uball->oy, uchain->ox, uchain->oy);
 
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) {
 	    /* Can't use do_clear_area because MAX_RADIUS is too small */
 	    /* rogue lighting must light the entire room */
@@ -1726,7 +1678,6 @@ do_it:
 	    }
 	    /* hallways remain dark on the rogue level */
 	} else
-#endif
 	    do_clear_area(u.ux,u.uy,
 		(obj && obj->oclass==SCROLL_CLASS && obj->blessed) ? 9 : 5,
 		set_lit, (genericptr_t)(on ? &is_lit : (char *)0));
@@ -2101,9 +2052,7 @@ void
 punish(sobj)
 register struct obj	*sobj;
 {
-#ifdef CONVICT
 	struct obj *otmp;
-#endif /* CONVICT */
 	/* KMH -- Punishment is still okay when you are riding */
 	You("are being punished for your misbehavior!");
 	if(Punished){
@@ -2117,7 +2066,6 @@ register struct obj	*sobj;
 		return;
 	}
 	setworn(mkobj(CHAIN_CLASS, TRUE), W_CHAIN);
-#ifdef CONVICT
     if (((otmp = carrying(HEAVY_IRON_BALL)) != 0) &&(otmp->oartifact ==
      ART_IRON_BALL_OF_LIBERATION)) {
         setworn(otmp, W_BALL);
@@ -2125,9 +2073,6 @@ register struct obj	*sobj;
     } else {
 	setworn(mkobj(BALL_CLASS, TRUE), W_BALL);
     }
-#else
-	setworn(mkobj(BALL_CLASS, TRUE), W_BALL);
-#endif /* CONVICT */
 	uball->spe = 1;		/* special ball (see save) */
 
 	/*

@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)fountain.c	3.4	2003/03/23	*/
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -442,34 +441,12 @@ register struct obj *obj;
 			break;
 		case 28: /* Strange feeling */
 			pline("An urge to take a bath overwhelms you.");
-#ifndef GOLDOBJ
 			if (u.ugold > 10) {
 			    u.ugold -= somegold() / 10;
 			    You("lost some of your gold in the fountain!");
 			    CLEAR_FOUNTAIN_LOOTED(u.ux,u.uy);
 			    exercise(A_WIS, FALSE);
 			}
-#else
-			{
-			    long money = money_cnt(invent);
-			    struct obj *otmp;
-                            if (money > 10) {
-				/* Amount to loose.  Might get rounded up as fountains don't pay change... */
-			        money = somegold(money) / 10; 
-			        for (otmp = invent; otmp && money > 0; otmp = otmp->nobj) if (otmp->oclass == COIN_CLASS) {
-				    int denomination = objects[otmp->otyp].oc_cost;
-				    long coin_loss = (money + denomination - 1) / denomination;
-                                    coin_loss = min(coin_loss, otmp->quan);
-				    otmp->quan -= coin_loss;
-				    money -= coin_loss * denomination;				  
-				    if (!otmp->quan) delobj(otmp);
-				}
-			        You("lost some of your money in the fountain!");
-				CLEAR_FOUNTAIN_LOOTED(u.ux,u.uy);
-			        exercise(A_WIS, FALSE);
-                            }
-			}
-#endif
 			break;
 		case 29: /* You see coins */
 
@@ -492,7 +469,6 @@ register struct obj *obj;
 	dryup(u.ux, u.uy, TRUE);
 }
 
-#ifdef SINKS
 void
 breaksink(x,y)
 int x, y;
@@ -605,6 +581,5 @@ drinksink()
 			rn2(3) ? (rn2(2) ? "cold" : "warm") : "hot");
 	}
 }
-#endif /* SINKS */
 
 /*fountain.c*/

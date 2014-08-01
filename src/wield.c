@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)wield.c	3.4	2003/01/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -105,9 +104,7 @@ register struct obj *obj;
 		unweapon = (obj->oclass == WEAPON_CLASS) ?
 				is_launcher(obj) || is_ammo(obj) ||
 				is_missile(obj) || (is_pole(obj)
-#ifdef STEED
 				&& !u.usteed
-#endif
 				) : !is_weptool(obj);
 	} else
 		unweapon = TRUE;	/* for "bare hands" message */
@@ -224,11 +221,11 @@ register struct obj *obj;
 
 /*** Commands to change particular slot(s) ***/
 
-static NEARDATA const char wield_objs[] =
+static const char wield_objs[] =
 	{ ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, TOOL_CLASS, 0 };
-static NEARDATA const char ready_objs[] =
+static const char ready_objs[] =
 	{ ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, 0 };
-static NEARDATA const char bullets[] =	/* (note: different from dothrow.c) */
+static const char bullets[] =	/* (note: different from dothrow.c) */
 	{ ALL_CLASSES, ALLOW_NONE, GEM_CLASS, WEAPON_CLASS, 0 };
 
 /** Unwield a weapon. */
@@ -285,9 +282,7 @@ boolean prompt_for_obj;
 	else if (wep == uquiver)
 		setuqwep((struct obj *) 0);
 	else if (wep->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL
-#ifdef STEED
 			| W_SADDLE
-#endif
 			)) {
 		You("cannot wield that!");
 		return (0);
@@ -384,9 +379,7 @@ dowieldquiver()
 		      !is_plural(uwep) ? "That is" : "They are");
 		return(0);
 	} else if (newquiver->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL
-#ifdef STEED
 			| W_SADDLE
-#endif
 			)) {
 		You("cannot ready that!");
 		return (0);
@@ -648,9 +641,7 @@ boolean fade_scrolls;
 	    grease_protect(target,(char *)0,victim);
 	} else if (target->oclass == SCROLL_CLASS) {
 	    if(fade_scrolls && target->otyp != SCR_BLANK_PAPER
-#ifdef MAIL
 	    && target->otyp != SCR_MAIL
-#endif
 					)
 	    {
 		if (!Blind) {

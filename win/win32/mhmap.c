@@ -544,10 +544,8 @@ void onPaint(HWND hWnd)
 		paint_rt.bottom = min(data->yPos + (ps.rcPaint.bottom - data->map_orig.y)/data->yScrTile+1, ROWNO);
 
 		if( data->bAsciiMode
-#ifdef REINCARNATION
 		    || Is_rogue_level(&u.uz) 
 			/* You enter a VERY primitive world! */
-#endif
 			) {
 			HGDIOBJ oldFont;
 
@@ -813,7 +811,6 @@ void nhcoord2display(PNHMapWindow data, int x, int y, LPRECT lpOut)
 void nhglyph2charcolor(short g, uchar* ch, int* color)
 {
 	int offset;
-#ifdef TEXTCOLOR
 
 #define zap_color(n)  *color = iflags.use_color ? zapcolors[n] : NO_COLOR
 #define cmap_color(n) *color = iflags.use_color ? defsyms[n].color : NO_COLOR
@@ -821,17 +818,6 @@ void nhglyph2charcolor(short g, uchar* ch, int* color)
 #define mon_color(n)  *color = iflags.use_color ? mons[n].mcolor : NO_COLOR
 #define pet_color(n)  *color = iflags.use_color ? mons[n].mcolor : NO_COLOR
 #define warn_color(n) *color = iflags.use_color ? def_warnsyms[n].color : NO_COLOR
-
-# else /* no text color */
-
-#define zap_color(n)
-#define cmap_color(n)
-#define obj_color(n)
-#define mon_color(n)
-#define pet_color(c)
-#define warn_color(c)
-	*color = CLR_WHITE;
-#endif
 
 	if ((offset = (g - GLYPH_WARNING_OFF)) >= 0) { 	  /* a warning flash */
 		*ch = warnsyms[offset];

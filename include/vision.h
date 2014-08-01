@@ -1,16 +1,9 @@
-/*	SCCS Id: @(#)vision.h	3.4	1995/01/26	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990. */
 /* NetHack may be freely redistributed.  See license for details.	*/
 
 #ifndef VISION_H
 #define VISION_H
 
-#if 0	/* (moved to decl.h) */
-extern boolean vision_full_recalc;	/* TRUE if need vision recalc */
-extern char **viz_array;		/* could see/in sight row pointers */
-extern char *viz_rmin;			/* min could see indices */
-extern char *viz_rmax;			/* max could see indices */
-#endif
 #define COULD_SEE 0x1		/* location could be seen, if it were lit */
 #define IN_SIGHT  0x2		/* location can be seen */
 #define TEMP_LIT  0x4		/* location is temporarily lit */

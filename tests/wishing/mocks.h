@@ -1,6 +1,4 @@
 
-#define NEARDATA
-
 #include "objects.c"
 #include "monst.c"
 
@@ -178,9 +176,6 @@ void obj_no_longer_held(struct obj *obj) {}
 //E int NDECL(doddrop);
 //E int NDECL(dodown);
 //E int NDECL(doup);
-//#ifdef INSURANCE
-//E void NDECL(save_currentstate);
-//#endif
 //E void FDECL(goto_level, (d_level *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 //E void FDECL(schedule_goto, (d_level *,BOOLEAN_P,BOOLEAN_P,int,
 //                             const char *,const char *));
@@ -229,10 +224,8 @@ struct obj* realloc_obj(struct obj *obj, int number1, genericptr_t generic, int 
 //E void NDECL(init_dungeons);
 //E s_level *FDECL(find_level, (const char *));
 //E s_level *FDECL(Is_special, (d_level *));
-//#ifdef RANDOMIZED_PLANES
 //E s_level *FDECL(get_next_elemental_plane, (d_level *));
 //E d_level *NDECL(get_first_elemental_plane);
-//#endif
 //E branch *FDECL(Is_branchlev, (d_level *));
 //E xchar FDECL(ledger_no, (d_level *));
 //E xchar NDECL(maxledgerno);
@@ -318,10 +311,6 @@ int eaten_stat(int number1, struct obj *obj) { return 0; }
 //E boolean FDECL(maybe_finished_meal, (BOOLEAN_P));
 
 /* ### hack.c ### */
-//#ifdef DUNGEON_GROWTH
-//E void FDECL(catchup_dgn_growths, (int));
-//E void FDECL(dgn_growths, (BOOLEAN_P,BOOLEAN_P));
-//#endif
 //E boolean FDECL(revive_nasty, (int,int,const char*));
 //E void FDECL(movobj, (struct obj *,XCHAR_P,XCHAR_P));
 //E boolean FDECL(may_dig, (XCHAR_P,XCHAR_P));
@@ -354,9 +343,6 @@ char* in_rooms(XCHAR_P x, XCHAR_P y, int number) { return NULL; }
 //E int NDECL(max_capacity);
 //E boolean FDECL(check_capacity, (const char *));
 //E int NDECL(inv_cnt);
-//#ifdef GOLDOBJ
-//E long FDECL(money_cnt, (struct obj *));
-//#endif
 
 /* ### invent.c ### */
 int merged(struct obj **obj1, struct obj **obj2) { return 0; }
@@ -401,9 +387,6 @@ void obj_split_light_source(struct obj *obj1, struct obj *obj2) {}
 //E void FDECL(set_mimic_sym, (struct monst *));
 //E int FDECL(mbirth_limit, (int));
 //E void FDECL(mimic_hit_msg, (struct monst *, SHORT_P));
-//#ifdef GOLDOBJ
-//E void FDECL(mkmonmoney, (struct monst *, long));
-//#endif
 //E int FDECL(bagotricks, (struct obj *));
 //E boolean FDECL(propagate, (int, BOOLEAN_P,BOOLEAN_P));
 //E void FDECL(create_camera_demon, (struct obj *,int,int));
@@ -430,10 +413,6 @@ void discover_object(int number, BOOLEAN_P bool1, BOOLEAN_P bool2) {}
 //E void NDECL(dragons_init);
 
 /* ### shk.c ### */
-//#ifdef GOLDOBJ
-//E long FDECL(money2mon, (struct monst *, long));
-//E void FDECL(money2u, (struct monst *, long));
-//#endif
 //E char *FDECL(shkname, (struct monst *));
 //E void FDECL(shkgone, (struct monst *));
 //E void FDECL(set_residency, (struct monst *,BOOLEAN_P));
@@ -487,11 +466,9 @@ boolean costly_spot(XCHAR_P x, XCHAR_P y) { return FALSE; }
 long get_cost_of_shop_item(struct obj *obj) { return 0; }
 //E boolean FDECL(block_door, (XCHAR_P,XCHAR_P));
 //E boolean FDECL(block_entry, (XCHAR_P,XCHAR_P));
-//#ifdef BLACKMARKET
 //E void FDECL(blkmar_guards, (struct monst *));
 //E void NDECL(set_black_marketeer_angry);
 //E void FDECL(bars_around_portal, (BOOLEAN_P));
-//#endif /* BLACKMARKET */
 char* shk_your(char *buf, struct obj *obj) { return "shk_your"; }
 char* Shk_Your(char *buf, struct obj *obj) { return "Shk_Your"; }
 
@@ -544,9 +521,7 @@ void obj_stop_timers(struct obj *obj) {}
 //E void FDECL(relink_timers, (BOOLEAN_P));
 
 /* ### topten.c ### */
-//#ifdef RECORD_CONDUCT
 //E long FDECL(encodeconduct, (void));
-//#endif
 //E void FDECL(topten, (int));
 //E void FDECL(prscore, (int,char **));
 struct obj* tt_oname(struct obj *obj) { return NULL; }

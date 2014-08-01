@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)panic.c	3.4	1994/03/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,13 +8,6 @@
 
 #define NEED_VARARGS
 #include "config.h"
-
-#ifdef AZTEC
-#define abort() exit()
-#endif
-#ifdef VMS
-extern void NDECL(vms_abort);
-#endif
 
 /*VARARGS1*/
 boolean panicking;
@@ -34,7 +26,7 @@ panic VA_DECL(char *,str)
 	(void) fputs(" ERROR:  ", stderr);
 	Vfprintf(stderr, str, VA_ARGS);
 	(void) fflush(stderr);
-#if defined(UNIX) || defined(VMS)
+#if defined(UNIX)
 # ifdef SYSV
 		(void)
 # endif
@@ -44,18 +36,5 @@ panic VA_DECL(char *,str)
 	exit(EXIT_FAILURE);		/* redundant */
 	return;
 }
-
-#ifdef ALLOCA_HACK
-/*
- * In case bison-generated foo_yacc.c tries to use alloca(); if we don't
- * have it then just use malloc() instead.  This may not work on some
- * systems, but they should either use yacc or get a real alloca routine.
- */
-long *alloca(cnt)
-unsigned cnt;
-{
-	return cnt ? alloc(cnt) : (long *)0;
-}
-#endif
 
 /*panic.c*/

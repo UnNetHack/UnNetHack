@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)ball.c	3.4	2003/02/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -673,9 +672,7 @@ xchar x, y;
 		register long side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
 		pline(pullmsg, "bear trap");
 		set_wounded_legs(side, rn1(1000, 500));
-#ifdef STEED
 		if (!u.usteed)
-#endif
 		{
 		    Your("%s %s is severely damaged.",
 					(side == LEFT_SIDE) ? "left" : "right",

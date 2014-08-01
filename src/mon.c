@@ -1,11 +1,7 @@
-/*	SCCS Id: @(#)mon.c	3.4	2003/12/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* If you're using precompiled headers, you don't want this either */
-#ifdef MICROPORT_BUG
-#define MKROOM_H
-#endif
 
 #include "hack.h"
 #include "mfndpos.h"
@@ -17,28 +13,10 @@ STATIC_DCL long FDECL(mm_aggression, (struct monst *,struct monst *));
 STATIC_DCL int NDECL(pick_animal);
 STATIC_DCL void FDECL(kill_eggs, (struct obj *));
 
-#ifdef REINCARNATION
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
 	 (Is_rogue_level(&u.uz) || \
 	   (level.flags.graveyard && is_undead(mdat) && rn2(3)))
-#else
-#define LEVEL_SPECIFIC_NOCORPSE(mdat) \
-	   (level.flags.graveyard && is_undead(mdat) && rn2(3))
-#endif
 
-
-#if 0
-/* part of the original warning code which was replaced in 3.3.1 */
-#define warnDelay 10
-long lastwarntime;
-int lastwarnlev;
-
-const char *warnings[] = {
-	"white", "pink", "red", "ruby", "purple", "black"
-};
-
-STATIC_DCL void NDECL(warn_effects);
-#endif /* 0 */
 
 STATIC_DCL struct obj *FDECL(make_corpse,(struct monst *));
 STATIC_DCL void FDECL(m_detach, (struct monst *, struct permonst *));
@@ -113,9 +91,7 @@ int mndx, mode;
 	case PM_HUNTER:      mndx = mode ? PM_RANGER    : PM_HUMAN; break;
 	case PM_THUG:        mndx = mode ? PM_ROGUE     : PM_HUMAN; break;
 	case PM_ROSHI:       mndx = mode ? PM_SAMURAI   : PM_HUMAN; break;
-#ifdef TOURIST
 	case PM_GUIDE:       mndx = mode ? PM_TOURIST   : PM_HUMAN; break;
-#endif
 	case PM_APPRENTICE:  mndx = mode ? PM_WIZARD    : PM_HUMAN; break;
 	case PM_WARRIOR:     mndx = mode ? PM_VALKYRIE  : PM_HUMAN; break;
 	default:
@@ -353,57 +329,6 @@ register struct monst *mtmp;
 	return obj;
 }
 
-#if 0
-/* part of the original warning code which was replaced in 3.3.1 */
-STATIC_OVL void
-warn_effects()
-{
-    if (warnlevel == 100) {
-	if(!Blind && uwep &&
-	    (warnlevel > lastwarnlev || moves > lastwarntime + warnDelay)) {
-	    Your("%s %s!", aobjnam(uwep, "glow"),
-		hcolor(NH_LIGHT_BLUE));
-	    lastwarnlev = warnlevel;
-	    lastwarntime = moves;
-	}
-	warnlevel = 0;
-	return;
-    }
-
-    if (warnlevel >= SIZE(warnings))
-	warnlevel = SIZE(warnings)-1;
-    if (!Blind &&
-	    (warnlevel > lastwarnlev || moves > lastwarntime + warnDelay)) {
-	const char *which, *what, *how;
-	long rings = (EWarning & (LEFT_RING|RIGHT_RING));
-
-	if (rings) {
-	    what = Hallucination ? "mood ring" : "ring";
-	    how = "glows";	/* singular verb */
-	    if (rings == LEFT_RING) {
-		which = "left ";
-	    } else if (rings == RIGHT_RING) {
-		which = "right ";
-	    } else {		/* both */
-		which = "";
-		what = (const char *) makeplural(what);
-		how = "glow";	/* plural verb */
-	    }
-	    Your("%s%s %s %s!", which, what, how, hcolor(warnings[warnlevel]));
-	} else {
-	    if (Hallucination)
-		Your("spider-sense is tingling...");
-	    else
-		You_feel("apprehensive as you sense a %s flash.",
-		    warnings[warnlevel]);
-	}
-
-	lastwarntime = moves;
-	lastwarnlev = warnlevel;
-    }
-}
-#endif /* 0 */
-
 /* check mtmp and water/lava for compatibility, 0 (survived), 1 (died) */
 int
 minliquid(mtmp)
@@ -417,12 +342,10 @@ register struct monst *mtmp;
     inswamp = is_swamp(mtmp->mx,mtmp->my) && grounded;
     infountain = IS_FOUNTAIN(levl[mtmp->mx][mtmp->my].typ);
 
-#ifdef STEED
 	/* Flying and levitation keeps our steed out of the liquid */
 	/* (but not water-walking or swimming) */
 	if (mtmp == u.usteed && (Flying || Levitation))
 		return (0);
-#endif
 
     /* Gremlin multiplying won't go on forever since the hit points
      * keep going down, and when it gets to 1 hit point the clone
@@ -535,14 +458,12 @@ struct monst *mon;
     else if (mon->mspeed == MFAST)
 	mmove = (4 * mmove + 2) / 3;
 
-#ifdef STEED
     if (mon == u.usteed) {
 	if (u.ugallop && flags.mv) {
 	    /* average movement is 1.50 times normal */
 	    mmove = ((rn2(2) ? 4 : 5) * mmove) / 3;
 	}
     }
-#endif
 
     return mmove;
 }
@@ -590,10 +511,6 @@ movemon()
 {
     register struct monst *mtmp, *nmtmp;
     register boolean somebody_can_move = FALSE;
-#if 0
-    /* part of the original warning code which was replaced in 3.3.1 */
-    warnlevel = 0;
-#endif
 
     /*
     Some of you may remember the former assertion here that
@@ -658,11 +575,6 @@ movemon()
 	if(dochugw(mtmp))		/* otherwise just move the monster */
 	    continue;
     }
-#if 0
-    /* part of the original warning code which was replaced in 3.3.1 */
-    if(warnlevel > 0)
-	warn_effects();
-#endif
 
     if (any_light_source())
 	vision_full_recalc = 1;	/* in case a mon moved with a light source */
@@ -879,13 +791,8 @@ mpickgold(mtmp)
 
     if ((gold = g_at(mtmp->mx, mtmp->my)) != 0) {
 	mat_idx = objects[gold->otyp].oc_material;
-#ifndef GOLDOBJ
 	mtmp->mgold += gold->quan;
 	delobj(gold);
-#else
-        obj_extract_self(gold);
-        add_to_minv(mtmp, gold);
-#endif
 	if (cansee(mtmp->mx, mtmp->my) ) {
 	    if (flags.verbose && !mtmp->isgd)
 		pline("%s picks up some %s.", Monnam(mtmp),
@@ -1030,10 +937,8 @@ struct obj *otmp;
 		(otyp != BELL_OF_OPENING || !is_covetous(mdat)))
 	    return FALSE;
 
-#ifdef STEED
 	/* Steeds don't pick up stuff (to avoid shop abuse) */
 	if (mtmp == u.usteed) return (FALSE);
-#endif
 	if (mtmp->isshk) return(TRUE); /* no limit */
 	if (mtmp->mpeaceful && !mtmp->mtame) return(FALSE);
 	/* otherwise players might find themselves obligated to violate
@@ -1126,15 +1031,10 @@ nexttry:	/* eels prefer the water, but if there is no water nearby,
 		(levl[nx][ny].doormask & D_LOCKED && !(flag & UNLOCKDOOR))) &&
 	       !thrudoor) continue;
 	    if(nx != x && ny != y && (nodiag ||
-#ifdef REINCARNATION
 	       ((IS_DOOR(nowtyp) &&
 		 ((levl[x][y].doormask & ~D_BROKEN) || Is_rogue_level(&u.uz))) ||
 		(IS_DOOR(ntyp) &&
 		 ((levl[nx][ny].doormask & ~D_BROKEN) || Is_rogue_level(&u.uz))))
-#else
-	       ((IS_DOOR(nowtyp) && (levl[x][y].doormask & ~D_BROKEN)) ||
-		(IS_DOOR(ntyp) && (levl[nx][ny].doormask & ~D_BROKEN)))
-#endif
 	       ))
 		continue;
 	    if(nx != 0 && ny != 0 && canseemon(mon) && quantumlock)
@@ -1402,9 +1302,7 @@ register struct monst *mtmp, *mtmp2;
     relmon(mtmp);
 
     /* finish adding its replacement */
-#ifdef STEED
     if (mtmp == u.usteed) ; else	/* don't place steed onto the map */
-#endif
     place_monster(mtmp2, mtmp2->mx, mtmp2->my);
     if (mtmp2->wormno)	    /* update level.monsters[wseg->wx][wseg->wy] */
 	place_wsegs(mtmp2); /* locations to mtmp2 not mtmp. */
@@ -1419,9 +1317,7 @@ register struct monst *mtmp, *mtmp2;
     mtmp2->nmon = fmon;
     fmon = mtmp2;
     if (u.ustuck == mtmp) u.ustuck = mtmp2;
-#ifdef STEED
     if (u.usteed == mtmp) u.usteed = mtmp2;
-#endif
     if (mtmp2->isshk) replshk(mtmp,mtmp2);
 
     /* discard the old monster */
@@ -1569,11 +1465,9 @@ uchar adtyp;
 #endif
 	if (mtmp->mhp > 0) return;
 
-#ifdef STEED
 	/* Player is thrown from his steed when it dies */
 	if (mtmp == u.usteed)
 		dismount_steed(DISMOUNT_GENERIC);
-#endif
 
 	/* extinguish monster's armor */
 	if ((otmp = which_armor(mtmp, W_ARM)) && (Is_glowing_dragon_armor(otmp->otyp)))
@@ -1612,12 +1506,9 @@ uchar adtyp;
 	/* if it's a (possibly polymorphed) quest leader, mark him as dead */
 	if (mtmp->m_id == quest_status.leader_m_id)
 	    quest_status.leader_is_dead = TRUE;
-#ifdef MAIL
 	/* if the mail daemon dies, no more mail delivery.  -3. */
 	if (tmp == PM_MAIL_DAEMON) mvitals[tmp].mvflags |= G_GENOD;
-#endif
 
-#ifdef KOPS
 	if (mtmp->data->mlet == S_KOP) {
 	    /* Dead Kops may come back. */
 	    switch(rnd(5)) {
@@ -1631,23 +1522,14 @@ uchar adtyp;
 			break;
 	    }
 	}
-#endif
-
-#ifdef BLACKMARKET
-	if (Is_blackmarket(&u.uz) && tmp == PM_ONE_EYED_SAM) {
-	    bars_around_portal(TRUE);
-	}
-#endif /* BLACKMARKET */
 
 	if(mtmp->iswiz) wizdead();
 	if(mtmp->data->msound == MS_NEMESIS) nemdead();
         
-#ifdef RECORD_ACHIEVE
 	if(mtmp->data == &mons[PM_MEDUSA])
 		achieve.killed_medusa = 1;
 #ifdef LIVELOGFILE
 		livelog_achieve_update();
-#endif
 #endif
 
 	if(glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
@@ -1863,20 +1745,16 @@ mongone(mdef)
 register struct monst *mdef;
 {
 	mdef->mhp = 0;	/* can skip some inventory bookkeeping */
-#ifdef STEED
 	/* Player is thrown from his steed when it disappears */
 	if (mdef == u.usteed)
 		dismount_steed(DISMOUNT_GENERIC);
-#endif
 
 	/* drop special items like the Amulet so that a dismissed Kop or nurse
 	   can't remove them from the game */
 	mdrop_special_objs(mdef);
 	/* release rest of monster's inventory--it is removed from game */
 	discard_minvent(mdef);
-#ifndef GOLDOBJ
 	mdef->mgold = 0L;
-#endif
 	m_detach(mdef, mdef->data);
 }
 
@@ -1888,9 +1766,7 @@ register struct monst *mdef;
 	struct obj *otmp, *obj, *oldminvent;
 	xchar x = mdef->mx, y = mdef->my;
 	boolean wasinside = FALSE;
-#ifndef GOLDOBJ
 	long mgold=0;
-#endif
 
 	/* we have to make the statue before calling mondead, to be able to
 	 * put inventory in it, and we have to check for lifesaving before
@@ -1931,11 +1807,9 @@ register struct monst *mdef;
 		    }
 		}
 	
-#ifndef GOLDOBJ
 		/* fix SC343-8 and C343-94 */
 		mgold = mdef->mgold;
 		mdef->mgold = 0;
-#endif
 		/* defer statue creation until after inventory removal
 		   so that saved monster traits won't retain any stale
 		   item-conferred attributes */
@@ -1946,7 +1820,6 @@ register struct monst *mdef;
 		    oldminvent = obj->nobj;
 		    (void) add_to_container(otmp, obj);
 		}
-#ifndef GOLDOBJ
 		if (mgold) {
 			struct obj *au;
 			au = mksobj(GOLD_PIECE, FALSE, FALSE);
@@ -1954,7 +1827,6 @@ register struct monst *mdef;
 			au->owt = weight(au);
 			(void) add_to_container(otmp, au);
 		}
-#endif
 		/* Archeologists should not break unique statues */
 		if (mdef->data->geno & G_UNIQ)
 			otmp->spe = 1;
@@ -2139,12 +2011,10 @@ xkilled(mtmp, dest)
 	if((dest & 2) || LEVEL_SPECIFIC_NOCORPSE(mdat))
 		goto cleanup;
 
-#ifdef MAIL
 	if(mdat == &mons[PM_MAIL_DAEMON]) {
 		stackobj(mksobj_at(SCR_MAIL, x, y, FALSE, FALSE));
 		redisp = TRUE;
 	}
-#endif
 	if((!accessible(x, y) && !is_pool(x, y)) ||
 	   (x == u.ux && y == u.uy)) {
 	    /* might be mimic in wall or corpse in lava or on player's spot */
@@ -2156,9 +2026,7 @@ xkilled(mtmp, dest)
 			!(mvitals[mndx].mvflags & G_NOCORPSE)
 		    /* disable death drop for puddings */
 		    && mdat->mlet != S_PUDDING
-#ifdef KOPS
 		    && mdat->mlet != S_KOP
-#endif
 		   ) {
 			int typ;
 
@@ -2267,14 +2135,12 @@ mnexto(mtmp)	/* Make monster mtmp next to you (if possible) */
 {
 	coord mm;
 
-#ifdef STEED
 	if (mtmp == u.usteed) {
 		/* Keep your steed in sync with you instead */
 		mtmp->mx = u.ux;
 		mtmp->my = u.uy;
 		return;
 	}
-#endif
 
 	if(!enexto(&mm, u.ux, u.uy, mtmp->data)) return;
 	rloc_to(mtmp, mm.x, mm.y);
@@ -2443,13 +2309,6 @@ setmangry(mtmp)
 register struct monst *mtmp;
 {
 	mtmp->mstrategy &= ~STRAT_WAITMASK;
-#ifdef BLACKMARKET
-	/* Even if the black marketeer is already angry he may not have called
-	 * for his assistants if he or his staff have not been assaulted yet.
-	 */
-	if (is_blkmktstaff(mtmp->data) && !mtmp->mpeaceful)
-	    blkmar_guards(mtmp);
-#endif /* BLACKMARKET */
 	if(!mtmp->mpeaceful) return;
 	if(mtmp->mtame) return;
 	mtmp->mpeaceful = 0;
@@ -2463,18 +2322,6 @@ register struct monst *mtmp;
 		    pline("%s gets angry!", Monnam(mtmp));
 		else if (flags.verbose && flags.soundok) growl(mtmp);
 	}
-
-#ifdef BLACKMARKET
-	/* Don't misbehave in the Black Market or else... */
-	if (Is_blackmarket(&u.uz)) {
-	    if (is_blkmktstaff(mtmp->data) || 
-		/* non-tame named monsters are presumably
-		 * black marketeer's assistants */
-		    (NAME(mtmp) && *NAME(mtmp))) {
-		blkmar_guards(mtmp);
-	    }
-	}
-#endif /* BLACKMARKET */
 
 	/* attacking your own quest leader will anger his or her guardians */
 	if (!flags.mon_moving &&	/* should always be the case here */
@@ -2815,9 +2662,7 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 	if(!mhp) mhp = 4;
 
 	/* new hp: same fraction of max as before */
-#ifndef LINT
 	mtmp->mhp = (int)(((long)hpn*(long)mhp)/(long)hpd);
-#endif
 	if(mtmp->mhp < 0) mtmp->mhp = hpn;	/* overflow */
 /* Unlikely but not impossible; a 1HD creature with 1HP that changes into a
    0HD creature will require this statement */
@@ -2825,9 +2670,7 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 
 /* and the same for maximum hit points */
 	hpn = mtmp->mhpmax;
-#ifndef LINT
 	mtmp->mhpmax = (int)(((long)hpn*(long)mhp)/(long)hpd);
-#endif
 	if(mtmp->mhpmax < 0) mtmp->mhpmax = hpn;	/* overflow */
 	if (!mtmp->mhpmax) mtmp->mhpmax = 1;
 
@@ -2870,15 +2713,7 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 			unstuck(mtmp);
 	}
 
-#ifndef DCC30_BUG
 	if (mdat == &mons[PM_LONG_WORM] && (mtmp->wormno = get_wormno()) != 0) {
-#else
-	/* DICE 3.0 doesn't like assigning and comparing mtmp->wormno in the
-	 * same expression.
-	 */
-	if (mdat == &mons[PM_LONG_WORM] &&
-		(mtmp->wormno = get_wormno(), mtmp->wormno != 0)) {
-#endif
 	    /* we can now create worms with tails - 11/91 */
 	    initworm(mtmp, rn2(5));
 	    if (count_wsegs(mtmp))

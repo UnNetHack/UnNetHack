@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)lev_main.c	3.4	2002/03/27	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,30 +17,6 @@
 #include "tcap.h"
 #endif
 
-#ifdef MAC
-# if defined(__SC__) || defined(__MRC__)
-#  define MPWTOOL
-#  define PREFIX ":dungeon:"	/* place output files here */
-#  include <CursorCtl.h>
-# else
-#  if !defined(__MACH__)
-#   define PREFIX ":lib:"	/* place output files here */
-#  endif
-# endif
-#endif
-
-#ifdef WIN_CE
-#define PREFIX "\\nethack\\dat\\"
-#endif
-
-#ifndef MPWTOOL
-# define SpinCursor(x)
-#endif
-
-#if defined(AMIGA) && defined(DLB)
-# define PREFIX "NH:slib/"
-#endif
-
 #ifndef O_WRONLY
 #include <fcntl.h>
 #endif
@@ -52,7 +27,7 @@
 # define O_BINARY 0
 #endif
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 # define OMASK FCMASK
 #else
 # define OMASK 0644
@@ -64,9 +39,6 @@
 #define Free(ptr)		if(ptr) free((genericptr_t) (ptr))
 #define Write(fd, item, size)	if (write(fd, (genericptr_t)(item), size) != size) return FALSE;
 
-#if defined(__BORLANDC__) && !defined(_WIN32)
-extern unsigned _stklen = STKSIZ;
-#endif
 #define MAX_ERRORS	25
 
 extern int  NDECL (yyparse);
@@ -248,10 +220,6 @@ static struct {
 	{ "music shop",	 INSTRUMENTSHOP },
 	{ "candle shop", CANDLESHOP },
 	{ "pet shop",	 PETSHOP },	/* Stephen White */
-#ifdef BLACKMARKET
-	{ "black market", BLACKSHOP },
-	{ "black market foyer", BLACKFOYER },
-#endif /* BLACKMARKET */
 	{ 0, 0 }
 };
 
@@ -289,38 +257,6 @@ char **argv;
 	FILE *fin;
 	int i;
 	boolean errors_encountered = FALSE;
-#if defined(MAC) && (defined(THINK_C) || defined(__MWERKS__))
-	static char *mac_argv[] = {	"lev_comp",	/* dummy argv[0] */
-				":dat:Arch.des",
-				":dat:Barb.des",
-				":dat:Caveman.des",
-				":dat:Healer.des",
-				":dat:Knight.des",
-				":dat:Monk.des",
-				":dat:Priest.des",
-				":dat:Ranger.des",
-				":dat:Rogue.des",
-				":dat:Samurai.des",
-				":dat:Tourist.des",
-				":dat:Valkyrie.des",
-				":dat:Wizard.des",
-				":dat:bigroom.des",
-				":dat:castle.des",
-				":dat:endgame.des",
-				":dat:gehennom.des",
-				":dat:knox.des",
-				":dat:medusa.des",
-				":dat:mines.des",
-				":dat:oracle.des",
-				":dat:sheol.des",
-				":dat:sokoban.des",
-				":dat:tower.des",
-				":dat:yendor.des"
-				};
-
-	argc = SIZE(mac_argv);
-	argv = mac_argv;
-#endif
 	/* Note:  these initializers don't do anything except guarantee that
 		we're linked properly.
 	*/
@@ -1047,7 +983,6 @@ char c;
 {
 	int val;
 
-	SpinCursor(3);
 	val = what_map_char(c);
 	if(val == INVALID_TYPE) {
 	    val = ERR;
@@ -1065,7 +1000,6 @@ char *s;
 {
 	register int i;
 
-	SpinCursor(3);
 	for(i=0; room_types[i].name; i++)
 	    if (!strcmp(s, room_types[i].name))
 		return ((int) room_types[i].type);
@@ -1081,7 +1015,6 @@ char *s;
 {
 	register int i;
 
-	SpinCursor(3);
 	for (i=0; trap_types[i].name; i++)
 	    if(!strcmp(s,trap_types[i].name))
 		return trap_types[i].type;
@@ -1098,7 +1031,6 @@ char c;
 {
 	register int i, class;
 
-	SpinCursor(3);
 	class = c ? def_char_to_monclass(c) : 0;
 	if (class == MAXMCLASSES) return ERR;
 
@@ -1127,7 +1059,6 @@ char c;		/* class */
 	int i, class;
 	const char *objname;
 
-	SpinCursor(3);
 	class = (c > 0) ? def_char_to_objclass(c) : 0;
 	if (class == MAXOCLASSES) return ERR;
 
@@ -1193,7 +1124,6 @@ char
 what_map_char(c)
 char c;
 {
-	SpinCursor(3);
 	switch(c) {
 		  case ' '  : return(STONE);
 		  case '#'  : return(CORR);
@@ -1209,12 +1139,7 @@ char c;
 		  case '{'  : return(FOUNTAIN);
 		  case '\\' : return(THRONE);
 		  case 'K'  :
-#ifdef SINKS
 		      return(SINK);
-#else
-		      lc_warning("Sinks ('K') are not allowed in this version!  Ignoring...");
-		      return(ROOM);
-#endif
 		  case '}'  : return(MOAT);
 		  case 'P'  : return(POOL);
 		  case 'L'  : return(LAVAPOOL);
@@ -1720,18 +1645,9 @@ struct attribs attrmax, attrmin;
 const char *configfile;
 char lock[ARBITRARY_SIZE];
 char SAVEF[ARBITRARY_SIZE];
-# ifdef MICRO
-char SAVEP[ARBITRARY_SIZE];
-# endif
 /* termcap.c */
 struct tc_lcl_data tc_lcl_data;
-# ifdef TEXTCOLOR
-#  ifdef TOS
-const char *hilites[CLR_MAX];
-#  else
-char NEARDATA *hilites[CLR_MAX];
-#  endif
-# endif
+char *hilites[CLR_MAX];
 /* trap.c */
 const char *traps[TRAPNUM];
 /* window.c */

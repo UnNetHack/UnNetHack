@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)timeout.c	3.4	2002/12/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,9 +5,7 @@
 #include "lev.h"	/* for checking save modes */
 
 STATIC_DCL void NDECL(stoned_dialogue);
-#ifdef CONVICT
 STATIC_DCL void NDECL(phasing_dialogue);
-#endif /* CONVICT */
 STATIC_DCL void NDECL(vomiting_dialogue);
 STATIC_DCL void NDECL(choke_dialogue);
 STATIC_DCL void NDECL(slime_dialogue);
@@ -18,7 +15,7 @@ STATIC_DCL void FDECL(lantern_message, (struct obj *));
 STATIC_DCL void FDECL(cleanup_burn, (genericptr_t,long));
 
 /* He is being petrified - dialogue by inmet!tower */
-static NEARDATA const char * const stoned_texts[] = {
+static const char * const stoned_texts[] = {
 	"You are slowing down.",		/* 5 */
 	"Your limbs are stiffening.",		/* 4 */
 	"Your limbs have turned to stone.",	/* 3 */
@@ -42,7 +39,6 @@ stoned_dialogue()
 	exercise(A_DEX, FALSE);
 }
 
-#ifdef CONVICT
 STATIC_OVL void
 phasing_dialogue()
 {
@@ -62,10 +58,9 @@ phasing_dialogue()
         stop_occupation();
     }
 }
-#endif /* CONVICT */
 
 /* He is getting sicker and sicker prior to vomiting */
-static NEARDATA const char * const vomiting_texts[] = {
+static const char * const vomiting_texts[] = {
 	"are feeling mildly nauseated.",	/* 14 */
 	"feel slightly confused.",		/* 11 */
 	"can't seem to think straight.",	/* 8 */
@@ -97,7 +92,7 @@ vomiting_dialogue()
 	exercise(A_CON, FALSE);
 }
 
-static NEARDATA const char * const choke_texts[] = {
+static const char * const choke_texts[] = {
 	"You find it hard to breathe.",
 	"You're gasping for air.",
 	"You can no longer breathe.",
@@ -105,7 +100,7 @@ static NEARDATA const char * const choke_texts[] = {
 	"You suffocate."
 };
 
-static NEARDATA const char * const choke_texts2[] = {
+static const char * const choke_texts2[] = {
 	"Your %s is becoming constricted.",
 	"Your blood is having trouble reaching your brain.",
 	"The pressure on your %s increases.",
@@ -133,7 +128,7 @@ choke_dialogue()
 	exercise(A_STR, FALSE);
 }
 
-static NEARDATA const char * const slime_texts[] = {
+static const char * const slime_texts[] = {
 	"You are turning a little %s.",           /* 5 */
 	"Your limbs are getting oozy.",              /* 4 */
 	"Your skin begins to peel away.",            /* 3 */
@@ -237,9 +232,7 @@ nh_timeout()
 		u.luckturn = moves;
 	    }
 	}
-#ifdef CONVICT
     if(Phasing) phasing_dialogue();
-#endif /* CONVICT */
 	if(u.uinvulnerable) return; /* things past this point could kill you */
 	if(Stoned) stoned_dialogue();
 	if(Slimed) slime_dialogue();
@@ -265,12 +258,10 @@ nh_timeout()
 	    }
 	}
 
-#ifdef STEED
 	if (u.ugallop) {
 	    if (--u.ugallop == 0L && u.usteed)
 	    	pline("%s stops galloping.", Monnam(u.usteed));
 	}
-#endif
 
 	for(upp = u.uprops; upp < u.uprops+SIZE(u.uprops); upp++)
 	    if((upp->intrinsic & TIMEOUT) && !(--upp->intrinsic & TIMEOUT)) {
@@ -676,9 +667,7 @@ slip_or_trip()
 	const char *what, *pronoun;
 	char buf[BUFSZ];
 	boolean on_foot = TRUE;
-#ifdef STEED
 	if (u.usteed) on_foot = FALSE;
-#endif
 
 	if (otmp && on_foot && !u.uinwater && is_pool(u.ux, u.uy)) otmp = 0;
 
@@ -706,11 +695,9 @@ slip_or_trip()
 	    }
 	} else if (rn2(3) && is_ice(u.ux, u.uy)) {
 	    pline("%s %s%s on the ice.",
-#ifdef STEED
 		u.usteed ? upstart(x_monnam(u.usteed,
 				u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
 				(char *)0, SUPPRESS_SADDLE, FALSE)) :
-#endif
 		"You", rn2(2) ? "slip" : "slide", on_foot ? "" : "s");
 	} else {
 	    if (on_foot) {
@@ -731,7 +718,6 @@ slip_or_trip()
 			break;
 		}
 	    }
-#ifdef STEED
 	    else {
 		switch (rn2(4)) {
 		  case 1:
@@ -749,7 +735,6 @@ slip_or_trip()
 		}
 		dismount_steed(DISMOUNT_FELL);
 	    }
-#endif
 	}
 }
 

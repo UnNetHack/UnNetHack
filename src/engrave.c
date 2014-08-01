@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)engrave.c	3.4	2001/11/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -27,9 +26,7 @@ static const char *random_mesg[] = {
 	"Madam, in Eden, I'm Adam.", /* A palindrome */
 	"Two thumbs up!", /* Siskel & Ebert */
 	"Hello, World!", /* The First C Program */
-#ifdef MAIL
 	"You've got mail!", /* AOL */
-#endif
 	"As if!", /* Clueless */
 	/* From Slash'Em */
 	/* [Tom] added these */
@@ -207,10 +204,8 @@ boolean
 can_reach_floor()
 {
 	return (boolean)(!u.uswallow &&
-#ifdef STEED
 			/* Restricted/unskilled riders can't reach the floor */
 			!(u.usteed && P_SKILL(P_RIDING) < P_BASIC) &&
-#endif
 			 (!Levitation ||
 			  Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)));
 }
@@ -292,7 +287,6 @@ xchar x, y;
 	return((struct engr *) 0);
 }
 
-#ifdef ELBERETH
 /* Decide whether a particular string is engraved at a specified
  * location; a case-insensitive substring match used.
  * Ignore headstones, in case the player names herself "Elbereth".
@@ -307,9 +301,7 @@ sengr_at(s, x, y)
 	return (ep && ep->engr_type != HEADSTONE &&
 		ep->engr_time <= moves && strstri(ep->engr_txt, s) != 0);
 }
-#endif /* ELBERETH */
 
-#ifdef ELBERETH_CONDUCT
 /** Return the number of distinct times Elbereth is engraved at
  * the specified location. Case insensitive.  Counts an engraving
  * as being present even if it's still being written: if you're
@@ -337,7 +329,6 @@ nengr_at(x, y)
 
 	return count;
 }
-#endif /* ELBERETH_CONDUCT */
 
 void
 u_wipe_engr(cnt)
@@ -497,7 +488,7 @@ freehand()
 		return(1);*/
 }
 
-static NEARDATA const char styluses[] =
+static const char styluses[] =
 	{ ALL_CLASSES, ALLOW_NONE, TOOL_CLASS, WEAPON_CLASS, WAND_CLASS,
 	  GEM_CLASS, RING_CLASS, 0 };
 
@@ -537,7 +528,6 @@ doengrave()
 	return engrave(NULL, FALSE);
 }
 
-#ifdef ELBERETH
 int
 doengrave_elbereth()
 {
@@ -548,7 +538,6 @@ doengrave_elbereth()
 	    return engrave("Elbereth", TRUE);
 	}
 }
-#endif
 
 static
 int
@@ -1273,7 +1262,6 @@ boolean fingers;
 
 	(void) strncat(buf, ebuf, (BUFSZ - (int)strlen(buf) - 1));
 
-#ifdef ELBERETH_CONDUCT
 	{
 		unsigned ecount1, ecount0 = nengr_at(u.ux, u.uy);
 		make_engr_at(u.ux, u.uy, buf, (moves - multi), type);
@@ -1281,9 +1269,6 @@ boolean fingers;
 		if (ecount1 > ecount0)
 			u.uconduct.elbereths += (ecount1 - ecount0);
 	}
-#else
-	make_engr_at(u.ux, u.uy, buf, (moves - multi), type);
-#endif
 
 	if (post_engr_text[0]) pline("%s", post_engr_text);
 

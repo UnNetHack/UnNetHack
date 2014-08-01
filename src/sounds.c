@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)sounds.c	3.4	2002/05/06	*/
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -31,9 +30,6 @@ dosounds()
 {
     register struct mkroom *sroom;
     register int hallu, vx, vy;
-#if defined(AMIGA) && defined(AZTEC_C_WORKAROUND)
-    int xx;
-#endif
     struct monst *mtmp;
 
     if (!flags.soundok || u.uswallow || Underwater) return;
@@ -129,15 +125,8 @@ dosounds()
 			for (vy = sroom->ly; vy <= sroom->hy; vy++)
 			    if (g_at(vx, vy))
 				gold_in_vault = TRUE;
-#if defined(AMIGA) && defined(AZTEC_C_WORKAROUND)
-		    /* Bug in aztec assembler here. Workaround below */
-		    xx = ROOM_INDEX(sroom) + ROOMOFFSET;
-		    xx = (xx != vault_occupied(u.urooms));
-		    if(xx)
-#else
 		    if (vault_occupied(u.urooms) !=
 			 (ROOM_INDEX(sroom) + ROOMOFFSET))
-#endif /* AZTEC_C_WORKAROUND */
 		    {
 			if (gold_in_vault)
 			    You_hear(!hallu ? "someone counting money." :
@@ -317,17 +306,6 @@ dosounds()
 	}
 	return;
     }
-#ifdef BLACKMARKET
-    if (!Is_blackmarket(&u.uz) && at_dgn_entrance("One-eyed Sam's Market") &&
-        !rn2(200)) {
-      static const char *blkmar_msg[3] = {
-        "You hear someone complaining about the prices.",
-        "Somebody whispers: \"Food rations? Only 900 zorkmids.\"",
-        "You feel like searching for more gold.",
-      };
-      pline("%s", blkmar_msg[rn2(2)+hallu]);
-    }
-#endif /* BLACKMARKET */
 }
 
 static const char * const h_sounds[] = {
@@ -650,7 +628,6 @@ register struct monst *mtmp;
 		break;
 	    } /* else FALLTHRU */
 	case MS_GROWL:
-#ifdef EXOTIC_PETS
 	    if (mtmp->mtame &&
 		   (mtmp->data == &mons[PM_MONKEY] ||
 		    mtmp->data == &mons[PM_APE] ||
@@ -665,7 +642,6 @@ register struct monst *mtmp;
 			pline_msg = "hoots.";
 		}
 	    } else
-#endif
 	    pline_msg = mtmp->mpeaceful ? "snarls." : "growls!";
 	    break;
 	case MS_ROAR:
@@ -821,27 +797,21 @@ register struct monst *mtmp;
 		case PM_ARCHEOLOGIST:
     pline_msg = "describes a recent article in \"Spelunker Today\" magazine.";
 		    break;
-#ifdef TOURIST
 		case PM_TOURIST:
 		    verbl_msg = "Aloha.";
 		    break;
-#endif
 		default:
 		    pline_msg = "discusses dungeon exploration.";
 		    break;
 	    }
 	    break;
 	case MS_SEDUCE:
-#ifdef SEDUCE
 	    if (ptr->mlet != S_NYMPH &&
 		could_seduce(mtmp, &youmonst, (struct attack *)0) == 1) {
 			(void) doseduce(mtmp);
 			break;
 	    }
 	    switch ((poly_gender() != (int) mtmp->female) ? rn2(3) : 0)
-#else
-	    switch ((poly_gender() == 0) ? rn2(3) : 0)
-#endif
 	    {
 		case 2:
 			verbl_msg = "Hello, sailor.";
@@ -853,7 +823,6 @@ register struct monst *mtmp;
 			pline_msg = "cajoles you.";
 	    }
 	    break;
-#ifdef KOPS
 	case MS_ARREST:
 	    if (mtmp->mpeaceful)
 		verbalize("Just the facts, %s.",
@@ -867,9 +836,7 @@ register struct monst *mtmp;
 		verbl_msg = arrest_msg[rn2(3)];
 	    }
 	    break;
-#endif
 	case MS_BRIBE:
-#ifdef CONVICT
         if (monsndx(ptr) == PM_PRISON_GUARD) {
             long gdemand = 500 * u.ulevel;
             long goffer = 0;
@@ -891,7 +858,6 @@ register struct monst *mtmp;
                 verbl_msg = "Out of my way, scum!"; /* still a jerk */
             }
         } else
-#endif /* CONVICT */
 	    if (mtmp->mpeaceful && !mtmp->mtame) {
 		(void) demon_talk(mtmp);
 		break;
@@ -912,18 +878,12 @@ register struct monst *mtmp;
 		verbl_msg = Role_if(PM_HEALER) ?
 			  "Doc, I can't help you unless you cooperate." :
 			  "Please undress so I can examine you.";
-#ifdef TOURIST
 	    else if (uarmu)
 		verbl_msg = "Take off your shirt, please.";
-#endif
 	    else verbl_msg = "Relax, this won't hurt a bit.";
 	    break;
 	case MS_GUARD:
-#ifndef GOLDOBJ
 	    if (u.ugold)
-#else
-	    if (money_cnt(invent))
-#endif
 		verbl_msg = "Please drop that gold and follow me.";
 	    else
 		verbl_msg = "Please follow me.";
@@ -943,25 +903,6 @@ register struct monst *mtmp;
 					    : soldier_foe_msg[rn2(3)];
 	    }
 	    break;
-#ifdef BLACKMARKET
-	case MS_ONEEYEDSAM:
-	    if (!mtmp->mpeaceful)
-		verbl_msg = "You worthless piece of scum!";
-	    else
-#ifdef CONVICT
-	    if (Role_if(PM_CONVICT))
-		verbl_msg = "We offer a special discount for our friends on this side of the law.";
-	    else
-#endif /* CONVICT */
-	    {
-		static const char * const one_eyed_sam_msg[3] = {
-		    "Psst! If you smuggle me the Amulet of Yendor we can split the profit!",
-		    "Today's special: Buy two items and get the third for full price!",
-		    "Go ahead and steal something. I could use a bit of fun."};
-		verbl_msg = one_eyed_sam_msg[rn2(3)];
-	    }
-	    break;
-#endif /* BLACKMARKET */
 	case MS_RIDER:
 		if (ptr == &mons[PM_DEATH] && !rn2(10))
 			pline_msg = "is busy reading a copy of Sandman #8.";
@@ -1045,10 +986,8 @@ dochat()
 	return(0);
     }
 
-#ifdef STEED
     if (u.usteed && u.dz > 0)
 	return (domonnoise(u.usteed));
-#endif
     if (u.dz) {
 	pline("They won't hear you %s there.", u.dz < 0 ? "up" : "down");
 	return(0);
@@ -1097,7 +1036,6 @@ dochat()
 	monflee(mtmp, rn1(20,10), TRUE, FALSE);
     }
 
-#ifdef CONVICT
     if (Role_if(PM_CONVICT) && is_rat(mtmp->data) && !mtmp->mpeaceful &&
      !mtmp->mtame) {
         You("attempt to soothe the %s with chittering sounds.",
@@ -1115,7 +1053,6 @@ dochat()
         }
         return 0;
     }
-#endif /* CONVICT */
     return domonnoise(mtmp);
 }
 

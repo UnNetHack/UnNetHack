@@ -1,4 +1,3 @@
-/*   SCCS Id: @(#)thintile.c   3.4     1995/11/26                     */
 /*   Copyright (c) NetHack Development Team 1995                    */
 /*   NetHack may be freely redistributed.  See license for details. */
 
@@ -6,10 +5,6 @@
 
 #include "config.h"
 #include "tile.h"
-
-#ifdef __GO32__
-#include <unistd.h>
-#endif
 
 static char pixels[TILE_Y][TILE_X];
 

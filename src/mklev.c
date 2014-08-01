@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)mklev.c	3.4	2001/11/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -20,9 +19,7 @@
 
 
 STATIC_DCL void FDECL(mkfount,(int,struct mkroom *));
-#ifdef SINKS
 STATIC_DCL void FDECL(mksink,(struct mkroom *));
-#endif
 STATIC_DCL void FDECL(mkaltar,(struct mkroom *));
 STATIC_DCL void FDECL(mkgrave,(struct mkroom *));
 STATIC_DCL void NDECL(makevtele);
@@ -34,7 +31,7 @@ STATIC_DCL boolean FDECL(place_niche,(struct mkroom *,int*,int*,int*));
 STATIC_DCL void FDECL(makeniche,(int));
 STATIC_DCL void NDECL(make_niches);
 
-STATIC_PTR int FDECL( CFDECLSPEC do_comp,(const genericptr,const genericptr));
+STATIC_PTR int FDECL( do_comp,(const genericptr,const genericptr));
 
 STATIC_DCL void FDECL(dosdoor,(XCHAR_P,XCHAR_P,struct mkroom *,int));
 STATIC_DCL void FDECL(join,(int,int,BOOLEAN_P));
@@ -56,25 +53,17 @@ static boolean made_branch;	/* used only during level creation */
 
 /* Args must be (const genericptr) so that qsort will always be happy. */
 
-STATIC_PTR int CFDECLSPEC
+STATIC_PTR int 
 do_comp(vx,vy)
 const genericptr vx;
 const genericptr vy;
 {
-#ifdef LINT
-/* lint complains about possible pointer alignment problems, but we know
-   that vx and vy are always properly aligned. Hence, the following
-   bogus definition:
-*/
-	return (vx == vy) ? 0 : -1;
-#else
 	register const struct mkroom *x, *y;
 
 	x = (const struct mkroom *)vx;
 	y = (const struct mkroom *)vy;
 	if(x->lx < y->lx) return(-1);
 	return(x->lx > y->lx);
-#endif /* LINT */
 }
 
 STATIC_OVL void
@@ -108,7 +97,7 @@ gotit:
 void
 sort_rooms()
 {
-#if defined(SYSV) || defined(DGUX)
+#if defined(SYSV)
 	qsort((genericptr_t) rooms, (unsigned)nroom, sizeof(struct mkroom), do_comp);
 #else
 	qsort((genericptr_t) rooms, nroom, sizeof(struct mkroom), do_comp);
@@ -523,14 +512,7 @@ register int type;
 		    level_difficulty() >= 5 && !rn2(25))
 		    levl[x][y].doormask |= D_TRAPPED;
 	    } else
-#ifdef STUPID
-		if (shdoor)
-			levl[x][y].doormask = D_ISOPEN;
-		else
-			levl[x][y].doormask = D_NODOOR;
-#else
 		levl[x][y].doormask = (shdoor ? D_ISOPEN : D_NODOOR);
-#endif
 	    if(levl[x][y].doormask & D_TRAPPED) {
 		struct monst *mtmp;
 
@@ -579,7 +561,7 @@ int *dy, *xx, *yy;
 }
 
 /* there should be one of these per trap, in the same order as trap.h */
-static NEARDATA const char *trap_engravings[TRAPNUM] = {
+static const char *trap_engravings[TRAPNUM] = {
 			(char *)0, (char *)0, (char *)0, (char *)0, (char *)0,
 			(char *)0, (char *)0, (char *)0, (char *)0, (char *)0,
 			(char *)0, (char *)0, (char *)0, (char *)0,
@@ -751,16 +733,10 @@ clear_level_structures()
 	    lev = &levl[x][0];
 	    for(y=0; y<ROWNO; y++) {
 		*lev++ = zerorm;
-#ifdef MICROPORT_BUG
-		level.objects[x][y] = (struct obj *)0;
-		level.monsters[x][y] = (struct monst *)0;
-#endif
 	    }
 	}
-#ifndef MICROPORT_BUG
 	(void) memset((genericptr_t)level.objects, 0, sizeof(level.objects));
 	(void) memset((genericptr_t)level.monsters, 0, sizeof(level.monsters));
-#endif
 	level.objlist = (struct obj *)0;
 	level.buriedobjlist = (struct obj *)0;
 	level.monlist = (struct monst *)0;
@@ -825,11 +801,7 @@ makelevel()
 	    register s_level *slev = Is_special(&u.uz);
 
 	    /* check for special levels */
-#ifdef REINCARNATION
 	    if (slev && !Is_rogue_level(&u.uz))
-#else
-	    if (slev)
-#endif
 	    {
 		    makemaz(slev->proto);
 		    return;
@@ -871,12 +843,10 @@ makelevel()
 
 	/* otherwise, fall through - it's a "regular" level. */
 
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) {
 		makeroguerooms();
 		makerogueghost();
 	} else
-#endif
 		makerooms();
 	/*sort_rooms();*/ /* messes up roomno order. */
 
@@ -913,9 +883,7 @@ makelevel()
 	branchp = Is_branchlev(&u.uz);	/* possible dungeon branch */
 	room_threshold = branchp ? 4 : 3; /* minimum number of rooms needed
 					     to allow a random special room */
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) goto skip0;
-#endif
 	makecorridors(0);
 	make_niches();
 
@@ -977,9 +945,7 @@ makelevel()
 	   !(mvitals[PM_COCKATRICE].mvflags & G_GONE)) mkroom(COCKNEST);
     }
 
-#ifdef REINCARNATION
 skip0:
-#endif
 	/* Place multi-dungeon branch. */
 	place_branch(branchp, 0, 0);
 
@@ -1012,13 +978,9 @@ skip0:
 		    if (somexyspace(croom, &pos, 0))
 			(void) mkgold(0L, pos.x, pos.y);
 		}
-#ifdef REINCARNATION
 		if(Is_rogue_level(&u.uz)) goto skip_nonrogue;
-#endif
 		if(!rn2(10)) mkfount(0,croom);
-#ifdef SINKS
 		if(!rn2(60)) mksink(croom);
-#endif
 		if(!rn2(60)) mkaltar(croom);
 		i = 80 - (depth(&u.uz) * 2);
 		if (i < 2) i = 2;
@@ -1061,9 +1023,7 @@ skip0:
 		    }
 		}
 
-#ifdef REINCARNATION
 	skip_nonrogue:
-#endif
 		if(!rn2(3)) {
 		    if (somexyspace(croom, &pos, 0))
 			(void) mkobj_at(0, pos.x,pos.y, TRUE);
@@ -1109,9 +1069,7 @@ mineralize(kelp_pool, kelp_moat, goldprob, gemprob, skip_lvl_checks)
 	/* determine if it is even allowed;
 	   almost all special levels are excluded */
 	if (!skip_lvl_checks && (In_hell(&u.uz) || In_V_tower(&u.uz) ||
-#ifdef REINCARNATION
 		Is_rogue_level(&u.uz) ||
-#endif
 		level.flags.arboreal ||
 		((sp = Is_special(&u.uz)) != 0 && !Is_oracle_level(&u.uz)
 					&& (!In_mines(&u.uz) || sp->flags.town)
@@ -1254,53 +1212,28 @@ mklev()
 	    level.flags.graveyard = 1;
 	if (!level.flags.is_maze_lev) {
 	    for (croom = &rooms[0]; croom != &rooms[nroom]; croom++)
-#ifdef SPECIALIZATION
-		topologize(croom, FALSE);
-#else
 		topologize(croom);
-#endif
 	}
 	set_wall_state();
 }
 
 void
-#ifdef SPECIALIZATION
-topologize(croom, do_ordinary)
-register struct mkroom *croom;
-boolean do_ordinary;
-#else
 topologize(croom)
 register struct mkroom *croom;
-#endif
 {
 	register int x, y, roomno = (croom - rooms) + ROOMOFFSET;
 	register int lowx = croom->lx, lowy = croom->ly;
 	register int hix = croom->hx, hiy = croom->hy;
-#ifdef SPECIALIZATION
-	register schar rtype = croom->rtype;
-#endif
 	register int subindex, nsubrooms = croom->nsubrooms;
 
 	/* skip the room if already done; i.e. a shop handled out of order */
 	/* also skip if this is non-rectangular (it _must_ be done already) */
 	if ((int) levl[lowx][lowy].roomno == roomno || croom->irregular)
 	    return;
-#ifdef SPECIALIZATION
-# ifdef REINCARNATION
-	if (Is_rogue_level(&u.uz))
-	    do_ordinary = TRUE;		/* vision routine helper */
-# endif
-	if ((rtype != OROOM) || do_ordinary)
-#endif
 	{
 	    /* do innards first */
 	    for(x = lowx; x <= hix; x++)
 		for(y = lowy; y <= hiy; y++)
-#ifdef SPECIALIZATION
-		    if (rtype == OROOM)
-			levl[x][y].roomno = NO_ROOM;
-		    else
-#endif
 			levl[x][y].roomno = roomno;
 	    /* top and bottom edges */
 	    for(x = lowx-1; x <= hix+1; x++)
@@ -1323,11 +1256,7 @@ register struct mkroom *croom;
 	}
 	/* subrooms */
 	for (subindex = 0; subindex < nsubrooms; subindex++)
-#ifdef SPECIALIZATION
-		topologize(croom->sbrooms[subindex], (rtype != OROOM));
-#else
 		topologize(croom->sbrooms[subindex]);
-#endif
 }
 
 /* Find an unused room for a branch location. */
@@ -1509,7 +1438,6 @@ coord *tm;
 
 	if (num > 0 && num < TRAPNUM) {
 	    kind = num;
-#ifdef REINCARNATION
 	} else if (Is_rogue_level(&u.uz)) {
 	    switch (rn2(7)) {
 		default: kind = BEAR_TRAP; break; /* 0 */
@@ -1520,7 +1448,6 @@ coord *tm;
 		case 5: kind = SLP_GAS_TRAP; break;
 		case 6: kind = RUST_TRAP; break;
 	    }
-#endif
 	} else if (Inhell && !Insheol && !rn2(5)) {
 	    /* bias the frequency of fire traps in Gehennom */
 	    kind = FIRE_TRAP;
@@ -1639,7 +1566,6 @@ register struct mkroom *croom;
 	level.flags.nfountains++;
 }
 
-#ifdef SINKS
 STATIC_OVL void
 mksink(croom)
 register struct mkroom *croom;
@@ -1654,7 +1580,6 @@ register struct mkroom *croom;
 
 	level.flags.nsinks++;
 }
-#endif /* SINKS */
 
 
 STATIC_OVL void
@@ -1772,11 +1697,9 @@ mkinvokearea()
     newsym(u.ux, u.uy);
     vision_full_recalc = 1;	/* everything changed */
 
-#ifdef RECORD_ACHIEVE
     achieve.perform_invocation = 1;
 #ifdef LIVELOGFILE
     livelog_achieve_update();
-#endif
 #endif
 }
 
@@ -1951,59 +1874,5 @@ place_random_engravings()
 		case 42: place_random_engraving(hhgtg_engravings, SIZE(hhgtg_engravings)); break;
 	}
 }
-
-#ifdef ADVENT_CALENDAR
-/**
- * The portal to the Advent Calender is special. 
- * It does not only lead to a floating branch like knox portal.
- * It also may appear upon reentering a existing level if it is the
- * right time of the year.
- */
-boolean
-mk_advcal_portal()
-{
-	extern int n_dgns;		/* from dungeon.c */
-	d_level *source;
-	branch *br;
-
-	/* made_branch remains unchanged when entering a already created
-	 * level. This leads to the branch inserted in the dungeon level
-	 * list but no portal created, the branch is unreachable.
-	 *
-	 * Technically this is a bug but nobody anticipated a branch
-	 * that could be inserted after level creation.
-	 */
-	if (made_branch) return FALSE;
-
-	br = dungeon_branch("Advent Calendar");
-	if (on_level(&advcal_level, &br->end1)) {
-	    source = &br->end2;
-	} else {
-	    /* disallow branch on a level with one branch already */
-	    if(Is_branchlev(&u.uz))
-		return FALSE;
-	    source = &br->end1;
-	}
-
-	/* Already set. */
-	if (source->dnum < n_dgns) return FALSE;
-
-	if (! (u.uz.dnum == oracle_level.dnum	    /* in main dungeon */
-		&& !at_dgn_entrance("The Quest")    /* but not Quest's entry */
-		&& depth(&u.uz) < depth(&medusa_level))) /* and above Medusa */
-	    return FALSE;
-
-	/* Adjust source to be current level and re-insert branch. */
-	*source = u.uz;
-	insert_branch(br, TRUE);
-
-#ifdef DEBUG
-	pline("Made advent calendar portal.");
-#endif
-	place_branch(br, 0, 0);
-
-	return TRUE;
-}
-#endif
 
 /*mklev.c*/

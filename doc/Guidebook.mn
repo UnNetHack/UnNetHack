@@ -735,8 +735,7 @@ with another key, modifies it by setting the `meta' [8th, or `high']
 bit), you can invoke many extended commands by meta-ing the first
 letter of the command.
 .\" In {\it NT, OS/2, PC\/ {\rm and} ST NetHack},
-.\" the `Alt' key can be used in this fashion;
-.\" on the Amiga set the {\it altmeta\/} option to get this behavior.
+.\" the `Alt' key can be used in this fashion.
 In NT, OS/2, and PC NetHack, the `Alt' key
 can be used in this fashion.
 .lp M-?
@@ -1722,11 +1721,6 @@ the value is examined; the string ``random'' is an exception.
 .lp checkpoint
 Save game state after each level change, for possible recovery after
 program crash (default on).
-.lp checkspace
-Check free disk space before writing files to disk (default on).
-You may have to turn this off if you have more than 2 GB free space
-on the partition used for your save and level files.
-Only applies when MFLOPPY was defined during compilation.
 .lp cmdassist
 Have the game provide some additional command assistance for 
 new players if it detects some anticipated mistakes (default on).
@@ -1918,15 +1912,15 @@ object classes rather than a character prompt, and then a menu of matching
 objects for selection.
 .lp menu_deselect_all
 Menu character accelerator to deselect all items in a menu.
-Implemented by the Amiga, Gem, X11 and tty ports.
+Implemented by the X11 and tty ports.
 Default '-'.
 .lp menu_deselect_page
 Menu character accelerator to deselect all items on this page of a menu.
-Implemented by the Amiga, Gem and tty ports.
+Implemented by the tty port.
 Default '\e'.
 .lp menu_first_page
 Menu character accelerator to jump to the first page in a menu.
-Implemented by the Amiga, Gem and tty ports.
+Implemented by the tty port.
 Default '^'.
 .lp menu_headings
 Controls how the headings in a menu are highlighted.
@@ -1934,35 +1928,35 @@ Values are 'bold', 'inverse', or 'underline'.
 Not all ports can actually display all three types.
 .lp menu_invert_all
 Menu character accelerator to invert all items in a menu.
-Implemented by the Amiga, Gem, X11 and tty ports.
+Implemented by the X11 and tty ports.
 Default '@'.
 .lp menu_invert_page
 Menu character accelerator to invert all items on this page of a menu.
-Implemented by the Amiga, Gem and tty ports.
+Implemented by tty port.
 Default '~'.
 .lp menu_last_page
 Menu character accelerator to jump to the last page in a menu.
-Implemented by the Amiga, Gem and tty ports.
+Implemented by tty port.
 Default '|'.
 .lp menu_next_page
 Menu character accelerator to goto the next menu page.
-Implemented by the Amiga, Gem and tty ports.
+Implemented by tty port.
 Default '>'.
 .lp menu_previous_page 
 Menu character accelerator to goto the previous menu page.
-Implemented by the Amiga, Gem and tty ports.
+Implemented by tty port.
 Default '<'.
 .lp menu_search
 Menu character accelerator to search for a menu item.
-Implemented by the Amiga, Gem and X11 ports.
+Implemented by X11 port.
 Default ':'.
 .lp menu_select_all
 Menu character accelerator to select all items in a menu.
-Implemented by the Amiga, Gem, X11 and tty ports.
+Implemented by the X11 and tty ports.
 Default '.'.
 .lp menu_select_page
 Menu character accelerator to select all items on this page of a menu.
-Implemented by the Amiga, Gem and tty ports.
+Implemented by tty port.
 Default ','.
 .lp monsters
 Set the characters used to display monster classes (default
@@ -2088,12 +2082,7 @@ Default is on.
 .lp pickup_types
 Specify the object types to be picked up when
 .op autopickup
-is on.  Default is all types.  If your copy of the game has the experimental
-compile time option AUTOPICKUP_EXCEPTIONS included, you may be able to use 
-.op autopickup_exception
-configuration file lines to further refine
-.op autopickup
-behavior.
+is on.  Default is all types.  
 .lp pilesize
 Allows setting the number of items that trigger the "Things that are here".
 The minimum value allowed is 1, which will tell you about one object
@@ -2106,9 +2095,6 @@ something pushes the old item into your alternate weapon slot (default off).
 .lp quiver_fired
 Using the 'f' (fire) command when nothing is quivered, prompts for ammunition 
 to quiver, then fires it (default on).
-.lp qwertz_layout
-If QWERTZ was set in config.h at compile-time this option can be used to swap
-the y and z keys. This is useful for some keyboard layouts.
 .lp race
 Selects your race (for example, ``race:human'').  Default is random.
 Cannot be set with the `O' command.
@@ -2294,12 +2280,6 @@ Allow use of the mouse for input and travel.
 NetHack should pop up dialog boxes, or use prompts for character selection.
 .lp popup_dialog	
 NetHack should pop up dialog boxes for input.
-.lp preload_tiles
-NetHack should preload tiles into memory.
-For example, in the protected mode MSDOS version, control whether tiles
-get pre-loaded into RAM at the start of the game.  Doing so
-enhances performance of the tile graphics, but uses more memory. (default on).
-Cannot be set with the `O' command.
 .lp scroll_amount
 NetHack should scroll the display by this number of cells
 when the hero reaches the scroll_margin.
@@ -2339,19 +2319,6 @@ Select an alternate keystroke handler dll to load (Win32 tty NetHack only).
 The name of the handler is specified without the .dll extension and without any
 path information.
 Cannot be set with the `O' command.
-.lp altmeta
-(default on, AMIGA NetHack only).
-.lp "BIOS    "
-Use BIOS calls to update the screen
-display quickly and to read the keyboard (allowing the use of arrow
-keys to move) on machines with an IBM PC compatible BIOS ROM (default off,
-OS/2, PC, and ST NetHack only).
-.lp flush
-(default off, AMIGA NetHack only).
-.lp "MACgraphics"
-(default on, Mac NetHack only).
-.lp page_wait
-(default on, Mac NetHack only).
 .lp "rawio   "
 Force raw (non-cbreak) mode for faster output and more
 bulletproof input (MS-DOS sometimes treats `^P' as a printer toggle
@@ -2381,7 +2348,7 @@ Set the color palette for PC systems using NO_TERMS
 The order of colors is red, green, brown, blue, magenta, cyan,
 bright.white, bright.red, bright.green, yellow, bright.blue,
 bright.magenta, and bright.cyan.
-Other systems compiled with TTY_GRAPHICS and VIDEOSHADES allow defining 
+Other systems compiled with TTY_GRAPHICS allow defining 
 three more colors. The order of colors is red, green, brown, blue, 
 magenta, cyan, gray, black, bright.red, bright.green, yellow, 
 bright.blue, bright.magenta, bright.cyan and white.

@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)uhitm.c	3.4	2003/02/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,9 +8,7 @@ STATIC_DCL void FDECL(steal_it, (struct monst *, struct attack *));
 STATIC_DCL boolean FDECL(hitum, (struct monst *,int,struct attack *));
 STATIC_DCL boolean FDECL(hmon_hitmon, (struct monst *,struct obj *,int));
 STATIC_DCL void FDECL(noisy_hit,(struct monst*,struct obj*,int));
-#ifdef STEED
 STATIC_DCL int FDECL(joust, (struct monst *,struct obj *));
-#endif
 STATIC_DCL void NDECL(demonpet);
 STATIC_DCL boolean FDECL(m_slips_free, (struct monst *mtmp,struct attack *mattk));
 STATIC_DCL int FDECL(explum, (struct monst *,struct attack *));
@@ -67,10 +64,8 @@ int attk;
 		}
 		if ((target = which_armor(mdef, W_ARM)) != (struct obj *)0) {
 		    (void)rust_dmg(target, xname(target), hurt, TRUE, mdef);
-#ifdef TOURIST
 		} else if ((target = which_armor(mdef, W_ARMU)) != (struct obj *)0) {
 		    (void)rust_dmg(target, xname(target), hurt, TRUE, mdef);
-#endif
 		}
 		break;
 	    case 2:
@@ -265,7 +260,6 @@ register struct monst *mtmp;
 	if (is_orc(mtmp->data) && maybe_polyd(is_elf(youmonst.data),
 			Race_if(PM_ELF)))
 	    tmp++;
-#ifdef CONVICT
     /* Adding iron ball as a weapon skill gives a -4 penalty for
     unskilled vs no penalty for non-weapon objects.  Add 4 to
     compensate. */
@@ -274,7 +268,6 @@ register struct monst *mtmp;
                     penalty for unskilled vs no penalty for non-
                     weapon objects. */
     }
-#endif /* CONVICT */
 	if(Role_if(PM_MONK) && !Upolyd) {
 	    if (uarm) {
 		Your("armor is rather cumbersome...");
@@ -566,9 +559,7 @@ int thrown;
 #endif
 	boolean valid_weapon_attack = FALSE;
 	boolean unarmed = !uwep && !uarm && !uarms;
-#ifdef STEED
 	int jousting = 0;
-#endif
 	int wtype;
 	struct obj *monwep;
 	char yourbuf[BUFSZ];
@@ -666,11 +657,7 @@ int thrown;
 	    } 
 
 	    if(obj->oclass == WEAPON_CLASS || is_weptool(obj) ||
-#ifdef CONVICT
 	       obj->oclass == GEM_CLASS || obj->otyp == HEAVY_IRON_BALL) {
-#else
-	       obj->oclass == GEM_CLASS) {
-#endif /* CONVICT */
 
 		/* is it not a melee weapon? */
 		if (/* if you strike with a bow... */
@@ -679,9 +666,7 @@ int thrown;
 		    (!thrown && (is_missile(obj) || is_ammo(obj))) ||
 		    /* or use a pole at short range and not mounted... */
 		    (!thrown &&
-#ifdef STEED
 		     !u.usteed &&
-#endif
 		     is_pole(obj)) ||
 		    /* or throw a missile without the proper bow... */
 		    (is_ammo(obj) && !ammo_and_launcher(obj, uwep))) {
@@ -757,14 +742,12 @@ int thrown;
 				&& hates_silver(mdat)) {
 			silvermsg = TRUE; silverobj = TRUE;
 		    }
-#ifdef STEED
 		    if (u.usteed && !thrown && tmp > 0 &&
 			    weapon_type(obj) == P_LANCE && mon != u.ustuck) {
 			jousting = joust(mon, obj);
 			/* exercise skill even for minimal damage hits */
 			if (jousting) valid_weapon_attack = TRUE;
 		    }
-#endif
 		    if (thrown && (is_ammo(obj) || is_missile(obj))) {
 			if (ammo_and_launcher(obj, uwep)) {
 			    if (uwep->oartifact == ART_LONGBOW_OF_DIANA)
@@ -820,7 +803,6 @@ int thrown;
 			}
 			tmp = 1;
 			break;
-#ifdef TOURIST
 		    case EXPENSIVE_CAMERA:
 			You("succeed in destroying %s camera.  Congratulations!",
 			        shk_your(yourbuf, obj));
@@ -829,7 +811,6 @@ int thrown;
 			return(TRUE);
 			/*NOTREACHED*/
 			break;
-#endif
 		    case CORPSE:		/* fixed by polder@cs.vu.nl */
 			if (touch_petrifies(&mons[obj->corpsenm])) {
 			    static const char withwhat[] = "corpse";
@@ -1089,7 +1070,6 @@ int thrown;
 		}
 	} else
 #endif
-#ifdef STEED
 	if (jousting) {
 	    tmp += d(2, (obj == uwep) ? 10 : 2);	/* [was in dmgval()] */
 	    You("joust %s%s",
@@ -1111,7 +1091,6 @@ int thrown;
 	    }
 	    hittxt = TRUE;
 	} else
-#endif
 
 	/* VERY small chance of stunning opponent if unarmed. */
 	if (unarmed && tmp > 1 && !thrown && !obj && !Upolyd) {
@@ -1357,9 +1336,7 @@ struct attack *mattk;
 	    /* grabbing attacks the body */
 	    obj = which_armor(mdef, W_ARMC);		/* cloak */
 	    if (!obj) obj = which_armor(mdef, W_ARM);	/* suit */
-#ifdef TOURIST
 	    if (!obj) obj = which_armor(mdef, W_ARMU);	/* shirt */
-#endif
 	}
 
 	/* if your cloak/armor is greased, monster slips off; this
@@ -1665,38 +1642,18 @@ register struct attack *mattk;
 		    minstapetrify(mdef, TRUE);
 		tmp = 0;
 		break;
-#ifdef SEDUCE
 	    case AD_SSEX:
-#endif
 	    case AD_SEDU:
 	    case AD_SITM:
 		steal_it(mdef, mattk);
 		tmp = 0;
 		break;
 	    case AD_SGLD:
-#ifndef GOLDOBJ
 		if (mdef->mgold) {
 		    u.ugold += mdef->mgold;
 		    mdef->mgold = 0;
 		    Your("purse feels heavier.");
 		}
-#else
-                /* This you as a leprechaun, so steal
-                   real gold only, no lesser coins */
-	        {
-		    struct obj *mongold = findgold(mdef->minvent);
-	            if (mongold) {
-		        obj_extract_self(mongold);  
-		        if (merge_choice(invent, mongold) || inv_cnt() < 52) {
-			    addinv(mongold);
-			    Your("purse feels heavier.");
-			} else {
-                            You("grab %s's gold, but find no room in your knapsack.", mon_nam(mdef));
-			    dropy(mongold);
-		        }
-		    }
-	        }
-#endif
 		exercise(A_DEX, TRUE);
 		tmp = 0;
 		break;
@@ -2058,11 +2015,7 @@ register struct attack *mattk;
           && (!touch_disintegrates(mdef->data) || Disint_resistance)
 #endif
         ) {
-#ifdef LINT	/* static char msgbuf[BUFSZ]; */
-		char msgbuf[BUFSZ];
-#else
 		static char msgbuf[BUFSZ];
-#endif
 		start_engulf(mdef);
 		switch(mattk->adtyp) {
 		    case AD_DGST:
@@ -2286,13 +2239,11 @@ use_weapon:
 			break;
 		case AT_CLAW:
 			if (i==0 && uwep && !cantwield(youmonst.data)) goto use_weapon;
-#ifdef SEDUCE
 			/* succubi/incubi are humanoid, but their _second_
 			 * attack is AT_CLAW, not their first...
 			 */
 			if (i==1 && uwep && (u.umonnum == PM_SUCCUBUS ||
 				u.umonnum == PM_INCUBUS)) goto use_weapon;
-#endif
 		case AT_BITE:
 			/* [ALI] Vampires are also smart. They avoid biting
 			   monsters if doing so would be fatal */

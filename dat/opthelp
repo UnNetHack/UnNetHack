@@ -8,7 +8,6 @@ autopickup     automatically pick up objects you move over        [TRUE]
 autoquiver     when firing with an empty quiver, select some
                suitable inventory weapon to fill the quiver       [FALSE]
 autounlock     automatically apply unlocking tool                 [TRUE]
-BIOS           allow the use of IBM ROM BIOS calls                [FALSE]
 cmdassist      give help for errors on direction & other commands [TRUE]
 confirm        ask before hitting tame or peaceful monsters       [TRUE]
 DECgraphics    use DEC/VT line-drawing characters for the dungeon [FALSE]
@@ -54,15 +53,11 @@ wound_message  healers can see how badly monsters are damaged     [TRUE]
 
 There are further boolean options controlled by compilation flags.
 
-Boolean option if INSURANCE was set at compile time:
 checkpoint save game state after each level change, for possible  [TRUE]
            recovery after program crash
 
 Boolean option if NEWS was set at compile time:
 news       print any news from game administrator on startup      [TRUE]
-
-Boolean option if MFLOPPY was set at compile time:
-checkspace check free disk space before writing files to disk     [TRUE]
 
 Boolean option if SHOW_BORN was set at compile time:
 showborn   show numbers of created monsters after the number
@@ -83,28 +78,17 @@ showexp    display your accumulated experience points             [FALSE]
 Boolean option if SCORE_ON_BOTL was set at compile time:
 showscore  display your approximate accumulated score             [FALSE]
 
-Boolean options if TEXTCOLOR was set at compile time:
 color      use different colors for objects on screen   [TRUE for micros]
 hilite_pet display pets in a highlighted manner                   [FALSE]
 
 Boolean option if TIMED_DELAY was set at compile time (tty interface only):
 timed_delay    on unix and VMS, use a timer instead of sending
                extra screen output when attempting to pause for
-               display effect.  on MSDOS without the termcap
                lib, whether or not to pause for visual effect.    [TRUE]
 
-Boolean option if QUIVER_FIRED was set at compile time:
 quiver_fired   when using the f (fire) command and no ammunition
                is quivered, prompt for ammunition to quiver, then 
                fire it.                                           [TRUE]
-
-Boolean option if QWERTZ was set at compile time:
-qwertz_layout  swap the y and z keys                              [FALSE]
-
-Boolean option if USE_TILES was set at compile time (MSDOS protected mode only):
-preload_tiles  control whether tiles get pre-loaded into RAM at the
-               start of the game.  Doing so enhances performance
-               of the tile graphics, but uses more memory.        [TRUE]
 
 Boolean option if WIN_EDGE was set at compile time (tty interface only):
 win_edge       align menus and text windows left instead of right [FALSE]
@@ -208,8 +192,7 @@ gender     Your starting gender (gender:male or gender:female).
 horsename  the name of your first horse  [NONE]
 menu_*     create single character accelerators for menu commands.  Below
            is a list of all commands.  Each is followed by a list of window-
-           ports that implement them:  'x' is X11, 't' is tty, 'g' is Gem,
-           'a' is Amiga.
+           ports that implement them:  'x' is X11, 't' is tty
            menu_deselect_all  deselect all items in a menu [-](gxta)
            menu_deselect_page deselect all items on this page of a menu [\](gta)
            menu_first_page    jump to the first page in a menu [^](gta)

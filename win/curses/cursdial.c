@@ -49,9 +49,7 @@ typedef enum menu_op_type
     INVERT
 } menu_op;
 
-#ifdef MENU_COLOR
 extern struct menucoloring *menu_colorings;
-#endif
 
 static nhmenu *get_menu(winid wid);
 
@@ -1015,11 +1013,9 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
     nhmenu_item *menu_item_ptr;
     int count, curletter, entry_cols, start_col, num_lines, footer_x;
     boolean first_accel = TRUE;
-#ifdef MENU_COLOR
     int color = NO_COLOR;
     int attr = A_NORMAL;
     boolean menu_color = FALSE;
-#endif /* MENU_COLOR */
     
     /* Cycle through entries until we are on the correct page */
 
@@ -1100,7 +1096,6 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
                 mvwprintw(win, menu_item_ptr->line_num + 1, 3, ") ");
             }
         }
-#ifdef MENU_COLOR
 		if (iflags.use_menu_color && iflags.use_color &&
 		    (menu_color = get_menu_coloring
 		 ((char *)menu_item_ptr->str, &color, &attr)))
@@ -1114,7 +1109,6 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
     		    menu_item_ptr->attr = menu_item_ptr->attr|attr;
     		}
 		}
-#endif /* MENU_COLOR */
         curses_toggle_color_attr(win, NONE, menu_item_ptr->attr, ON);
         entry_cols = menu->width;
         start_col = 1;
@@ -1136,12 +1130,10 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
                  entry_cols, count + 1));
              }
         }
-#ifdef MENU_COLOR
 	if (menu_color && (color != NO_COLOR))
     {
         curses_toggle_color_attr(win, color, NONE, OFF);
     }
-#endif /* MENU_COLOR */
         curses_toggle_color_attr(win, NONE, menu_item_ptr->attr, OFF);
         menu_item_ptr = menu_item_ptr->next_item;
     }
@@ -1566,7 +1558,6 @@ static void menu_clear_selections(nhmenu *menu)
 /* This is to get the color of a menu item if the menucolor patch is
  applied */
 
-#ifdef MENU_COLOR
 static boolean get_menu_coloring(char *str, int *color, int *attr)
 {
     struct menucoloring *tmpmc;
@@ -1574,16 +1565,7 @@ static boolean get_menu_coloring(char *str, int *color, int *attr)
 
     if (iflags.use_menu_color && iflags.use_color)
 	for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
-# ifdef MENU_COLOR_REGEX
-#  ifdef MENU_COLOR_REGEX_POSIX
 	    if (regexec(&tmpmc->match, str, 0, NULL, 0) == 0) {
-#  else
-
-	    if (re_search(&tmpmc->match, str, strlen(str), 0, 9999, 0) >= 0) {
-#  endif
-# else
-	    if (pmatch(tmpmc->match, str)) {
-# endif
 		if (!foundcolor && tmpmc->color != CLR_UNDEFINED) {
 		    *color = tmpmc->color;
 		    foundcolor = TRUE;
@@ -1598,7 +1580,6 @@ static boolean get_menu_coloring(char *str, int *color, int *attr)
     if (foundattr && !foundcolor) *color = NO_COLOR;
     return foundcolor || foundattr;
 }
-#endif /* MENU_COLOR */
 
 
 /* Get the maximum height for a menu */

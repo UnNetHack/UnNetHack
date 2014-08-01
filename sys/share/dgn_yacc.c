@@ -31,7 +31,6 @@ extern int YYPARSE_DECL();
 static int yygrowstack(void);
 #define YYPREFIX "yy"
 #line 2 "dgn_comp.y"
-/*	SCCS Id: @(#)dgn_comp.c	3.4	1996/06/22	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /*	Copyright (c) 1990 by M. Stephenson				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -39,20 +38,6 @@ static int yygrowstack(void);
 /*
  * This file contains the Dungeon Compiler code
  */
-
-/* In case we're using bison in AIX.  This definition must be
- * placed before any other C-language construct in the file
- * excluding comments and preprocessor directives (thanks IBM
- * for this wonderful feature...).
- *
- * Note: some cpps barf on this 'undefined control' (#pragma).
- * Addition of the leading space seems to prevent barfage for now,
- * and AIX will still see the directive in its non-standard locale.
- */
-
-#ifdef _AIX
- #pragma alloca		/* keep leading space! */
-#endif
 
 #include "config.h"
 #include "date.h"
@@ -72,13 +57,6 @@ void NDECL(init_level);
 void NDECL(output_dgn);
 
 #define Free(ptr)		free((genericptr_t)ptr)
-
-#ifdef AMIGA
-# undef	printf
-#ifndef	LATTICE
-# define    memset(addr,val,len)    setmem(addr,len,val)
-#endif
-#endif
 
 #define ERR		(-1)
 

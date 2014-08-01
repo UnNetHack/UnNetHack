@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)drawing.c	3.4	1999/12/02	*/
 /* Copyright (c) NetHack Development Team 1992.			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,11 +9,7 @@
 #undef C
 #endif
 
-#ifdef TEXTCOLOR
 #define C(n) n
-#else
-#define C(n)
-#endif
 
 #define g_FILLER(symbol) 0
 
@@ -235,11 +230,7 @@ struct symdef defsyms[MAXPCHARS] = {
 	{'_', "altar",		C(CLR_GRAY)},	/* altar */
 	{'|', "grave",		C(CLR_GRAY)},   /* grave */
 	{'\\', "opulent throne",C(HI_GOLD)},	/* throne */
-#ifdef SINKS
 	{'#', "sink",		C(CLR_GRAY)},	/* sink */
-#else
-	{'#', "",		C(CLR_GRAY)},	/* sink */
-#endif
 /*30*/	{'{', "fountain",	C(CLR_BLUE)},	/* fountain */
 	{'}', "water",		C(CLR_BLUE)},	/* pool */
 	{'.', "ice",		C(CLR_CYAN)},	/* ice */
@@ -315,10 +306,6 @@ struct symdef defsyms[MAXPCHARS] = {
 #undef C
 
 #ifdef ASCIIGRAPH
-
-#ifdef PC9800
-void NDECL((*ibmgraphics_mode_callback)) = 0;	/* set in tty_start_screen() */
-#endif /* PC9800 */
 
 #ifdef CURSES_GRAPHICS
 void NDECL((*cursesgraphics_mode_callback)) = 0;
@@ -531,109 +518,6 @@ static glyph_t dec_graphics[MAXPCHARS] = {
 };
 #endif  /* TERMLIB */
 
-#ifdef MAC_GRAPHICS_ENV
-static glyph_t mac_graphics[MAXPCHARS] = {
-/* 0*/	g_FILLER(S_stone),
-	0xba,	/* S_vwall */
-	0xcd,	/* S_hwall */
-	0xc9,	/* S_tlcorn */
-	0xbb,	/* S_trcorn */
-	0xc8,	/* S_blcorn */
-	0xbc,	/* S_brcorn */
-	0xce,	/* S_crwall */
-	0xca,	/* S_tuwall */
-	0xcb,	/* S_tdwall */
-/*10*/	0xb9,	/* S_tlwall */
-	0xcc,	/* S_trwall */
-	0xb0,	/* S_ndoor */
-	0xee,	/* S_vodoor */
-	0xee,	/* S_hodoor */
-	0xef,	/* S_vcdoor */
-	0xef,	/* S_hcdoor */
-	0xf0,	/* S_bars:	equivalency symbol */
-	0xf1,	/* S_tree:	plus-or-minus */
-	0xf1,	/* S_deadtree:	plus-or-minus */
-	g_FILLER(S_Room),
-	g_FILLER(S_stone), /* S_darkroom */
-/*20*/	0xB0,	/* S_corr */
-	g_FILLER(S_litcorr),
-	g_FILLER(S_upstair),
-	g_FILLER(S_dnstair),
-	g_FILLER(S_upladder),
-	g_FILLER(S_dnladder),
-	g_FILLER(S_altar),
-	0xef,	/* S_grave:	same as open door */
-	g_FILLER(S_throne),
-	g_FILLER(S_sink),
-/*30*/	g_FILLER(S_fountain),
-	0xe0,	/* S_pool */
-	g_FILLER(S_ice),
-	g_FILLER(S_bog),
-	g_FILLER(S_lava),
-	g_FILLER(S_vodbridge),
-	g_FILLER(S_hodbridge),
-	g_FILLER(S_vcdbridge),
-	g_FILLER(S_hcdbridge),
-	g_FILLER(S_air),
-	g_FILLER(S_cloud),
-	g_FILLER(S_icewall),
-	g_FILLER(S_crystalicewall),
-/*40*/	g_FILLER(S_water),
-	g_FILLER(S_arrow_trap),
-	g_FILLER(S_dart_trap),
-	g_FILLER(S_falling_rock_trap),
-	g_FILLER(S_squeaky_board),
-	g_FILLER(S_bear_trap),
-	g_FILLER(S_land_mine),
-	g_FILLER(S_rolling_boulder_trap),
-/*50*/	g_FILLER(S_sleeping_gas_trap),
-	g_FILLER(S_rust_trap),
-	g_FILLER(S_fire_trap),
-	g_FILLER(S_pit),
-	g_FILLER(S_spiked_pit),
-	g_FILLER(S_hole),
-	g_FILLER(S_trap_door),
-	g_FILLER(S_teleportation_trap),
-	g_FILLER(S_level_teleporter),
-	g_FILLER(S_magic_portal),
-/*60*/	g_FILLER(S_web),
-	g_FILLER(S_statue_trap),
-	g_FILLER(S_magic_trap),
-	g_FILLER(S_anti_magic_trap),
-	g_FILLER(S_ice_trap),
-	g_FILLER(S_polymorph_trap),
-	g_FILLER(S_vbeam),
-	g_FILLER(S_hbeam),
-	g_FILLER(S_lslant),
-	g_FILLER(S_rslant),
-/*70*/	g_FILLER(S_digbeam),
-	g_FILLER(S_flashbeam),
-	g_FILLER(S_boomleft),
-	g_FILLER(S_boomright),
-	g_FILLER(S_ss1),
-	g_FILLER(S_ss2),
-	g_FILLER(S_ss3),
-	g_FILLER(S_ss4),
-	g_FILLER(S_sw_tl),
-	g_FILLER(S_sw_tc),
-/*80*/	g_FILLER(S_sw_tr),
-	g_FILLER(S_sw_ml),
-	g_FILLER(S_sw_mr),
-	g_FILLER(S_sw_bl),
-	g_FILLER(S_sw_bc),
-	g_FILLER(S_sw_br),
-	g_FILLER(S_explode1),
-	g_FILLER(S_explode2),
-	g_FILLER(S_explode3),
-	g_FILLER(S_explode4),
-/*90*/	g_FILLER(S_explode5),
-	g_FILLER(S_explode6),
-	g_FILLER(S_explode7),
-	g_FILLER(S_explode8),
-	g_FILLER(S_explode9)
-};
-#endif	/* MAC_GRAPHICS_ENV */
-
 #ifdef UTF8_GLYPHS
 /* Probably best to only use characters from this list
  * http://en.wikipedia.org/wiki/WGL4 */
@@ -739,10 +623,6 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
 };
 #endif
 
-#ifdef PC9800
-void NDECL((*ascgraphics_mode_callback)) = 0;	/* set in tty_start_screen() */
-#endif
-
 /*
  * Convert the given character to an object class.  If the character is not
  * recognized, then MAXOCLASSES is returned.  Used in detect.c invent.c,
@@ -799,9 +679,6 @@ int gr_set_flag;
 	default:
 	case ASCII_GRAPHICS:
 	    assign_graphics((glyph_t *)0, 0, MAXPCHARS, 0);
-#ifdef PC9800
-	    if (ascgraphics_mode_callback) (*ascgraphics_mode_callback)();
-#endif
 	    break;
 #ifdef ASCIIGRAPH
 	case IBM_GRAPHICS:
@@ -818,9 +695,6 @@ int gr_set_flag;
         iflags.cursesgraphics = FALSE;
 #endif
 	    assign_graphics(ibm_graphics, SIZE(ibm_graphics), MAXPCHARS, 0);
-#ifdef PC9800
-	    if (ibmgraphics_mode_callback) (*ibmgraphics_mode_callback)();
-#endif
 	    break;
 #endif /* ASCIIGRAPH */
 #ifdef TERMLIB
@@ -837,11 +711,6 @@ int gr_set_flag;
 	    if (decgraphics_mode_callback) (*decgraphics_mode_callback)();
 	    break;
 #endif /* TERMLIB */
-#ifdef MAC_GRAPHICS_ENV
-	case MAC_GRAPHICS:
-	    assign_graphics(mac_graphics, SIZE(mac_graphics), MAXPCHARS, 0);
-	    break;
-#endif
 #ifdef CURSES_GRAPHICS
     case CURS_GRAPHICS:
 	    assign_graphics((glyph_t *)0, 0, MAXPCHARS, 0);
@@ -876,8 +745,6 @@ glyph_t value;
 	}
 #endif
 }
-
-#ifdef REINCARNATION
 
 /*
  * saved display symbols for objects & features.
@@ -917,7 +784,7 @@ static const glyph_t r_oc_syms[MAXOCLASSES] = {
 static const uchar IBM_r_oc_syms[MAXOCLASSES] = {	/* a la EPYX Rogue */
 /* 0*/	'\0',
 	ILLOBJ_SYM,
-#  if defined(MSDOS) || defined(OS2) || ( defined(WIN32) && !defined(MSWIN_GRAPHICS) )
+#  if ( defined(WIN32) && !defined(MSWIN_GRAPHICS) )
 	0x18,			/* weapon: up arrow */
 /*	0x0a, */ ARMOR_SYM,	/* armor:  Vert rect with o */
 /*	0x09, */ RING_SYM,	/* ring:   circle with arrow */
@@ -972,9 +839,6 @@ boolean is_rlevel;
 	    monsyms[i] = def_monsyms[i];
 # if defined(ASCIIGRAPH) && !defined(MSWIN_GRAPHICS)
 	if (iflags.IBMgraphics
-#  if defined(USE_TILES) && defined(MSDOS)
-		&& !iflags.grmode
-#  endif
 		)
 	    monsyms[S_HUMAN] = 0x01; /* smiley face */
 # endif
@@ -989,9 +853,6 @@ boolean is_rlevel;
 
 # ifdef ASCIIGRAPH
 	if (!iflags.IBMgraphics
-#  if defined(USE_TILES) && defined(MSDOS)
-		|| iflags.grmode
-#  endif
 				) {
 # endif
 	    showsyms[S_vodoor]  = showsyms[S_hodoor]  = showsyms[S_ndoor] = '+';
@@ -1049,18 +910,12 @@ boolean is_rlevel;
 	for (i = 0; i < MAXOCLASSES; i++) {
 #ifdef ASCIIGRAPH
 	    if (iflags.IBMgraphics
-# if defined(USE_TILES) && defined(MSDOS)
-		&& !iflags.grmode
-# endif
 		)
 		oc_syms[i] = IBM_r_oc_syms[i];
 	    else
 #endif /* ASCIIGRAPH */
 		oc_syms[i] = r_oc_syms[i];
 	}
-#if defined(MSDOS) && defined(USE_TILES)
-	if (iflags.grmode) tileview(FALSE);
-#endif
     } else {
 	(void) memcpy((genericptr_t)showsyms,
 		      (genericptr_t)save_showsyms, sizeof showsyms);
@@ -1068,11 +923,7 @@ boolean is_rlevel;
 		      (genericptr_t)save_oc_syms, sizeof oc_syms);
 	(void) memcpy((genericptr_t)monsyms,
 		      (genericptr_t)save_monsyms, sizeof monsyms);
-#if defined(MSDOS) && defined(USE_TILES)
-	if (iflags.grmode) tileview(TRUE);
-#endif
     }
 }
-#endif /* REINCARNATION */
 
 /*drawing.c*/

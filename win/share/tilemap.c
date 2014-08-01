@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)tilemap.c	3.4	2000/06/04	*/
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -13,11 +12,10 @@ const char * FDECL(tilename, (int, int));
 void NDECL(init_tilemap);
 void FDECL(process_substitutions, (FILE *));
 
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 #undef exit
-#if !defined(MSDOS) && !defined(WIN32)
+#else
 extern void FDECL(exit, (int));
-#endif
 #endif
 
 #define MON_GLYPH 1
@@ -39,62 +37,27 @@ struct conditionals {
 	{ MON_GLYPH, PM_SHOCKING_SPHERE, "beholder" },
 	{ MON_GLYPH, PM_BABY_SILVER_DRAGON, "baby shimmering dragon" },
 	{ MON_GLYPH, PM_SILVER_DRAGON, "shimmering dragon" },
-#ifndef KOPS
-	{ MON_GLYPH, PM_VORPAL_JABBERWOCK, "Keystone Kop" },
-	{ MON_GLYPH, PM_VORPAL_JABBERWOCK, "Kop Sergeant" },
-	{ MON_GLYPH, PM_VORPAL_JABBERWOCK, "Kop Lieutenant" },
-	{ MON_GLYPH, PM_VORPAL_JABBERWOCK, "Kop Kaptain" },
-#endif
 #ifndef WEBB_DISINT
 	{ MON_GLYPH, PM_DISENCHANTER, "disintegrator" },
 #endif
 	{ MON_GLYPH, PM_VAMPIRE_LORD, "vampire mage" },
-#ifndef BLACKMARKET
 	{ MON_GLYPH, PM_SHOPKEEPER, "black marketeer" },
-#endif
 
 #ifndef CHARON /* not supported yet */
 	{ MON_GLYPH, PM_CROESUS, "Charon" },
 #endif
-#ifndef MAIL
-	{ MON_GLYPH, PM_FAMINE, "mail daemon" },
-#endif
-#ifndef TOURIST
-	{ MON_GLYPH, PM_SAMURAI, "tourist" },
-#endif
 	/* commented out in monst.c at present */
 	{ MON_GLYPH, PM_SHAMAN_KARNOV, "Earendil" },
 	{ MON_GLYPH, PM_SHAMAN_KARNOV, "Elwing" },
-#ifndef TOURIST
-	{ MON_GLYPH, PM_LORD_SATO, "Twoflower" },
-#endif
 	/* commented out in monst.c at present */
 	{ MON_GLYPH, PM_TIAMAT, "Goblin King" },
 	{ MON_GLYPH, PM_NEANDERTHAL, "High-elf" },
-#ifndef TOURIST
-	{ MON_GLYPH, PM_ROSHI, "guide" },
-#endif
-#ifndef KOPS
-	{ OBJ_GLYPH, CLUB, "rubber hose" },
-#endif
 	/* objects commented out in objects.c at present */
 	{ OBJ_GLYPH, SILVER_DRAGON_SCALE_MAIL, "shimmering dragon scale mail" },
 	{ OBJ_GLYPH, SILVER_DRAGON_SCALES, "shimmering dragon scales" },
-#ifndef TOURIST
-	{ OBJ_GLYPH, LEATHER_JACKET, "Hawaiian shirt" },
-	{ OBJ_GLYPH, LEATHER_JACKET, "T-shirt" },
-	{ OBJ_GLYPH, LOCK_PICK, "credit card" },
-	{ OBJ_GLYPH, MAGIC_LAMP, "expensive camera" },
-#endif
-#ifndef STEED
-	{ OBJ_GLYPH, TOWEL, "saddle" },
-#endif
 	/* allow slime mold to look like slice of pizza, since we
 	 * don't know what a slime mold should look like when renamed anyway
 	 */
-#ifndef MAIL
-	{ OBJ_GLYPH, SCR_STINKING_CLOUD+21, "stamped / mail" },
-#endif
 	{ 0, 0, 0}
 };
 
@@ -191,12 +154,6 @@ int set, entry;
 			if (*defsyms[i].explanation)
 				return defsyms[i].explanation;
 			else {
-				/* if SINKS are turned off, this
-				 * string won't be there (and can't be there
-				 * to prevent symbol-identification and
-				 * special-level mimic appearances from
-				 * thinking the items exist)
-				 */
 				switch (i) {
 				    case S_sink:
 					    Sprintf(buf, "sink");
@@ -299,15 +256,7 @@ int main()
 
 #define TILE_FILE	"tile.c"
 
-#ifdef AMIGA
-# define SOURCE_TEMPLATE	"NH:src/%s"
-#else
-# ifdef MAC
-#   define SOURCE_TEMPLATE	":src:%s"
-# else
 #   define SOURCE_TEMPLATE	"../src/%s"
-# endif
-#endif
 
 short tilemap[MAX_GLYPH];
 int lastmontile, lastobjtile, lastothtile;

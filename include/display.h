@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)display.h	3.4	1999/11/30	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,13 +5,8 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#ifndef VISION_H
 #include "vision.h"
-#endif
-
-#ifndef MONDATA_H
 #include "mondata.h"	/* for mindless() */
-#endif
 
 #ifndef INVISIBLE_OBJECTS
 #define vobj_at(x,y) (level.objects[x][y])
@@ -196,12 +190,8 @@
  * Display the hero.  It is assumed that all checks necessary to determine
  * _if_ the hero can be seen have already been done.
  */
-#ifdef STEED
 #define maybe_display_usteed	(u.usteed && mon_visible(u.usteed)) ? \
 					ridden_mon_to_glyph(u.usteed) :
-#else
-#define maybe_display_usteed	/* empty */
-#endif
 
 #define display_self()							\
     show_glyph(u.ux, u.uy,						\

@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)unixtty.c	3.4	1990/22/02 */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -15,7 +14,7 @@
  * The distinctions here are not BSD - rest but rather USG - rest, as
  * BSD still has the old sgttyb structure, but SYSV has termio. Thus:
  */
-#if (defined(BSD) || defined(ULTRIX)) && !defined(POSIX_TYPES)
+#if defined(BSD) && !defined(POSIX_TYPES)
 # define V7
 #else
 # define USG
@@ -29,7 +28,7 @@
 #  define termstruct	termios
 # else
 #  include <termio.h>
-#  if defined(TCSETS) && !defined(AIX_31)
+#  if defined(TCSETS)
 #   define termstruct	termios
 #  else
 #   define termstruct	termio
@@ -68,7 +67,7 @@
 #  define GTTY(x)	(tcgetattr(0, x))
 #  define STTY(x)	(tcsetattr(0, TCSADRAIN, x))
 # else
-#  if defined(TCSETS) && !defined(AIX_31)
+#  if defined(TCSETS)
 #   define GTTY(x)	(ioctl(0, TCGETS, x))
 #   define STTY(x)	(ioctl(0, TCSETSW, x))
 #  else
@@ -79,7 +78,7 @@
 #  define GTTY2(x)	1
 #  define STTY2(x)	1
 # ifdef POSIX_TYPES
-#  if defined(BSD) && !defined(__DGUX__)
+#  if defined(BSD)
 #   define nonesuch	_POSIX_VDISABLE
 #  else
 #   define nonesuch	(fpathconf(0, _PC_VDISABLE))
@@ -107,13 +106,8 @@
 # define IS_7BIT(x)	(FALSE)
 # define STRIPHI	0		/* should actually be done on BSD */
 # define OSPEED(x)	(x).sg_ospeed
-# if defined(bsdi) || defined(__386BSD) || defined(SUNOS4)
-#  define GTTY(x)	(ioctl(0, TIOCGETP, (char *)x))
-#  define STTY(x)	(ioctl(0, TIOCSETP, (char *)x))
-# else
-#  define GTTY(x)	(gtty(0, x))
-#  define STTY(x)	(stty(0, x))
-# endif
+# define GTTY(x)	(gtty(0, x))
+# define STTY(x)	(stty(0, x))
 # define GTTY2(x)	(ioctl(0, TIOCGETC, (char *)x))
 # define STTY2(x)	(ioctl(0, TIOCSETC, (char *)x))
 # define nonesuch	-1
@@ -121,10 +115,8 @@ struct tchars inittyb2, curttyb2;
 
 #endif	/* V7 */
 
-#if defined(TTY_GRAPHICS) && ((!defined(SYSV) && !defined(HPUX)) || defined(UNIXPC) || defined(SVR4))
-# ifndef LINT
+#if defined(TTY_GRAPHICS) && (!defined(SYSV) || defined(SVR4))
 extern			/* it is defined in libtermlib (libtermcap) */
-# endif
 	short ospeed;	/* terminal baudrate; set by gettty */
 #else
 short	ospeed = 0;	/* gets around "not defined" error message */
@@ -217,11 +209,7 @@ void
 setftty()
 {
 register int ef = 0;			/* desired value of flags & ECHO */
-#ifdef LINT	/* cf = CBRKON(CBRKMASK); const expr to initialize is ok */
-register int cf = 0;
-#else
 register int cf = CBRKON(CBRKMASK);	/* desired value of flags & CBREAK */
-#endif
 register int change = 0;
 	iflags.cbreak = ON;
 	iflags.echo = OFF;
@@ -307,74 +295,6 @@ introff()		/* disable kbd interrupts if required*/
 #endif
 }
 
-#ifdef _M_UNIX		/* SCO UNIX (3.2.4), from Andreas Arens */
-# include <sys/console.h>
-
-# define BSIZE (E_TABSZ*2)
-# define LDIOC ('D'<<8)		/* POSIX prevents definition */
-
-# include <sys/emap.h>
-
-int sco_flag_console = 0;
-int sco_map_valid = -1;
-unsigned char sco_chanmap_buf[BSIZE];
-
-void NDECL(sco_mapon);
-void NDECL(sco_mapoff);
-void NDECL(check_sco_console);
-void NDECL(init_sco_cons);
-
-void
-sco_mapon()
-{
-# ifdef TTY_GRAPHICS
-	if (!strcmp(windowprocs.name, "tty") && sco_flag_console) {
-		if (sco_map_valid != -1) {
-			ioctl(0,LDSMAP,sco_chanmap_buf);
-		}
-		sco_map_valid = -1;
-	}
-# endif
-}
-
-void
-sco_mapoff()
-{
-# ifdef TTY_GRAPHICS
-	if (!strcmp(windowprocs.name, "tty") && sco_flag_console) {
-		sco_map_valid = ioctl(0,LDGMAP,sco_chanmap_buf);
-		if (sco_map_valid != -1) {
-			ioctl(0,LDNMAP,(char *)0);
-		}
-	}
-# endif
-}
-
-void
-check_sco_console()
-{
-	if (isatty(0) && ioctl(0,CONS_GET,0) != -1) {
-		sco_flag_console = 1;
-	}
-}
-
-void
-init_sco_cons()
-{
-# ifdef TTY_GRAPHICS
-	if (!strcmp(windowprocs.name, "tty") && sco_flag_console) {
-		atexit(sco_mapon);
-		sco_mapoff();
-		switch_graphics(IBM_GRAPHICS);
-#  ifdef TEXTCOLOR
-		if (has_colors())
-			iflags.use_color = TRUE;
-#  endif
-	}
-# endif
-}
-#endif	/* _M_UNIX */
-
 
 #ifdef __linux__		/* via Jesse Thilo and Ben Gertzfield */
 # include <sys/vt.h>
@@ -423,17 +343,14 @@ init_linux_cons()
 	if (!strcmp(windowprocs.name, "tty") && linux_flag_console) {
 		atexit(linux_mapon);
 		linux_mapoff();
-#  ifdef TEXTCOLOR
 		if (has_colors())
 			iflags.use_color = TRUE;
-#  endif
 	}
 # endif
 }
 #endif	/* __linux__ */
 
 
-#ifndef __begui__	/* the Be GUI will define its own error proc */
 /* fatal error */
 /*VARARGS1*/
 void
@@ -447,4 +364,3 @@ error VA_DECL(const char *,s)
 	VA_END();
 	exit(EXIT_FAILURE);
 }
-#endif /* !__begui__ */

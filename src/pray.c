@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)pray.c	3.4	2003/03/23	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,9 +9,7 @@ STATIC_DCL struct obj *NDECL(worst_cursed_item);
 STATIC_DCL void FDECL(fix_worst_trouble,(int));
 STATIC_DCL void FDECL(angrygods,(ALIGNTYP_P));
 STATIC_DCL void FDECL(at_your_feet, (const char *));
-#ifdef ELBERETH
 STATIC_DCL void NDECL(gcrownu);
-#endif	/*ELBERETH*/
 STATIC_DCL void FDECL(pleased,(ALIGNTYP_P));
 STATIC_DCL void FDECL(godvoice,(ALIGNTYP_P,const char*));
 STATIC_DCL void FDECL(god_zaps_you,(ALIGNTYP_P));
@@ -179,20 +176,16 @@ in_trouble()
 		Cursed_obj(uarmf, FUMBLE_BOOTS))
 	    return TROUBLE_FUMBLING;
 	if (worst_cursed_item()) return TROUBLE_CURSED_ITEMS;
-#ifdef STEED
 	if (u.usteed) {	/* can't voluntarily dismount from a cursed saddle */
 	    otmp = which_armor(u.usteed, W_SADDLE);
 	    if (Cursed_obj(otmp, SADDLE)) return TROUBLE_SADDLE;
 	}
-#endif
 
 	if (Blinded > 1 && haseyes(youmonst.data)) return(TROUBLE_BLIND);
 	for(i=0; i<A_MAX; i++)
 	    if(ABASE(i) < AMAX(i)) return(TROUBLE_POISONED);
 	if(Wounded_legs
-#ifdef STEED
 		    && !u.usteed
-#endif
 				) return (TROUBLE_WOUNDED_LEGS);
 	if(u.uhs >= HUNGRY) return(TROUBLE_HUNGRY);
 	if(HStun) return (TROUBLE_STUNNED);
@@ -231,10 +224,8 @@ worst_cursed_item()
 	otmp = uarmh;
     } else if (uarmf && uarmf->cursed) {		/* boots */
 	otmp = uarmf;
-#ifdef TOURIST
     } else if (uarmu && uarmu->cursed) {		/* shirt */
 	otmp = uarmu;
-#endif
     } else if (uamul && uamul->cursed) {		/* amulet */
 	otmp = uamul;
     } else if (uleft && uleft->cursed) {		/* left ring */
@@ -267,7 +258,7 @@ register int trouble;
 	int i;
 	struct obj *otmp = 0;
 	const char *what = (const char *)0;
-	static NEARDATA const char leftglow[] = "left ring softly glows",
+	static const char leftglow[] = "left ring softly glows",
 				   rightglow[] = "right ring softly glows";
 
 	switch (trouble) {
@@ -443,7 +434,6 @@ decurse:
 			}
 			(void) make_hallucinated(0L,FALSE,0L);
 			break;
-#ifdef STEED
 	    case TROUBLE_SADDLE:
 		    otmp = which_armor(u.usteed, W_SADDLE);
 		    uncurse(otmp);
@@ -455,7 +445,6 @@ decurse:
 			otmp->bknown = TRUE;
 		    }
 		    break;
-#endif
 	}
 }
 
@@ -520,9 +509,7 @@ aligntyp resp_god;
 	    if (uarm && !(EReflecting & W_ARM) &&
 	    		!(EDisint_resistance & W_ARM) && !uarmc)
 		(void) destroy_arm(uarm);
-#ifdef TOURIST
 	    if (uarmu && !uarm && !uarmc) (void) destroy_arm(uarmu);
-#endif
 	    if (!Disint_resistance)
 		fry_by_god(resp_god);
 	    else {
@@ -638,7 +625,6 @@ at_your_feet(str)
 	}
 }
 
-#ifdef ELBERETH
 STATIC_OVL void
 gcrownu()
 {
@@ -822,7 +808,6 @@ gcrownu()
     update_inventory();
     return;
 }
-#endif	/*ELBERETH*/
 
 STATIC_OVL void
 pleased(g_align)
@@ -1022,12 +1007,10 @@ pleased(g_align)
 	case 7:
 	case 8:
 	case 9:		/* KMH -- can occur during full moons */
-#ifdef ELBERETH
 	    if (u.ualign.record >= PIOUS && !u.uevent.uhand_of_elbereth) {
 		gcrownu();
 		break;
 	    } /* else FALLTHRU */
-#endif	/*ELBERETH*/
 	case 6:	{
 	    struct obj *otmp;
 	    int sp_no, trycnt = u.ulevel + 1;
@@ -1059,9 +1042,7 @@ pleased(g_align)
 
 	u.ublesscnt = rnz(350);
 	kick_on_butt = u.uevent.udemigod ? 1 : 0;
-#ifdef ELBERETH
 	if (u.uevent.uhand_of_elbereth) kick_on_butt++;
-#endif
 	if (kick_on_butt) u.ublesscnt += kick_on_butt * rnz(1000);
 
 	return;
@@ -1131,7 +1112,7 @@ gods_upset(g_align)
 	angrygods(g_align);
 }
 
-static NEARDATA const char sacrifice_types[] = { FOOD_CLASS, AMULET_CLASS, 0 };
+static const char sacrifice_types[] = { FOOD_CLASS, AMULET_CLASS, 0 };
 
 STATIC_OVL void
 consume_offering(otmp)
@@ -1330,10 +1311,8 @@ dosacrifice()
     }
 
     if (otmp->otyp == AMULET_OF_YENDOR) {
-#ifdef ASTRAL_ESCAPE
 	/* There's now an atheist option to win the game */
 	u.uconduct.gnostic++;
-#endif
 	if (!Is_astralevel(&u.uz)) {
 	    if (Hallucination)
 		    You_feel("homesick.");
@@ -1361,11 +1340,9 @@ dosacrifice()
 	    } else { /* super big win */
 		adjalign(10);
 
-#ifdef RECORD_ACHIEVE
 		achieve.ascended = 1;
 #ifdef LIVELOGFILE
 		livelog_achieve_update();
-#endif
 #endif
 
 		pline("%s sings, and you are bathed in radiance...",
@@ -1445,9 +1422,7 @@ dosacrifice()
     } /* real Amulet */
 
     if (otmp->otyp == FAKE_AMULET_OF_YENDOR) {
-#ifdef ASTRAL_ESCAPE
 	u.uconduct.gnostic++;
-#endif
 	    if (flags.soundok)
 		You_hear("a nearby thunderclap.");
 	    if (!otmp->known) {
@@ -2036,7 +2011,6 @@ int dx,dy;
     return FALSE;
 }
 
-#ifdef ASTRAL_ESCAPE
 int
 invoke_amulet(otmp)
     struct obj *otmp;
@@ -2123,6 +2097,5 @@ invoke_amulet(otmp)
 	} /* fake Amulet */
 	return 0;
 }
-#endif
 
 /*pray.c*/

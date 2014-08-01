@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)mhitm.c	3.4	2003/01/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,9 +7,9 @@
 
 extern boolean notonhead;
 
-static NEARDATA boolean vis, far_noise;
-static NEARDATA long noisetime;
-static NEARDATA struct obj *otmp;
+static boolean vis, far_noise;
+static long noisetime;
+static struct obj *otmp;
 
 static const char brief_feeling[] =
 	"have a %s feeling for a moment, then it passes.";
@@ -109,9 +108,6 @@ fightm(mtmp)		/* have monsters fight each other */
 {
 	register struct monst *mon, *nmon;
 	int result, has_u_swallowed;
-#ifdef LINT
-	nmon = 0;
-#endif
 	/* perhaps the monster will resist Conflict */
 	if(resist(mtmp, RING_CLASS, 0, 0))
 	    return(0);
@@ -337,12 +333,10 @@ mattackm(magr, mdef)
 		break;
 
 	    case AT_ENGL:
-#ifdef STEED
 		if (u.usteed && (mdef == u.usteed)) {
 		    strike = 0;
 		    break;
 		} 
-#endif
 		/* Engulfing attacks are directed at the hero if
 		 * possible. -dlc
 		 */
@@ -672,7 +666,6 @@ defdisintagr(magr, mdef, mattk)
 					mass += otch->owt;
 					m_useup(magr,otch);
 				} 
-#ifdef TOURIST
 				if (!(magr->misc_worn_check & (W_ARMC|W_ARM)) &&
 						(otch = which_armor(magr,W_ARMU)) &&
 						(!oresist_disintegration(otch))) {
@@ -682,7 +675,6 @@ defdisintagr(magr, mdef, mattk)
 					mass += otch->owt;
 					m_useup(magr,otch);
 				}
-#endif
 				break;
 			case (W_ARMG):
 				if (otmp) {
@@ -1072,9 +1064,7 @@ mdamagem(magr, mdef, mattk)
 		    mdef->mstrategy &= ~STRAT_WAITFORU;
 		    (void) rloc(mdef, FALSE);
 		    if (vis && !canspotmon(mdef)
-#ifdef STEED
 		    	&& mdef != u.usteed
-#endif
 		    	)
 			pline("%s suddenly disappears!", mdef_Monnam);
 		}
@@ -1090,17 +1080,13 @@ mdamagem(magr, mdef, mattk)
 			if (vis && canspotmon(magr) && flags.verbose)
 			    pline("%s is glancing at you with a hungry stare.", Monnam(magr));
 		    } else {
-#ifdef STEED
 			if (u.usteed == mdef) {
 			    pline("%s vanishes from underneath you.", Monnam(mdef));
 			    dismount_steed(DISMOUNT_VANISHED);
 			} else {
-#endif
 			    if (vis && canspotmon(mdef) && flags.verbose)
 				pline("%s vanishes before your eyes.", Monnam(mdef));
-#ifdef STEED
 			}
-#endif
 			int nlev;
 			d_level flev;
 			nlev = random_teleport_level();
@@ -1227,25 +1213,12 @@ mdamagem(magr, mdef, mattk)
 		break;
 	    case AD_SGLD:
 		tmp = 0;
-#ifndef GOLDOBJ
 		if (magr->mcan || !mdef->mgold) break;
 		/* technically incorrect; no check for stealing gold from
 		 * between mdef's feet...
 		 */
 		magr->mgold += mdef->mgold;
 		mdef->mgold = 0;
-#else
-                if (magr->mcan) break;
-		/* technically incorrect; no check for stealing gold from
-		 * between mdef's feet...
-		 */
-                {
-		    struct obj *gold = findgold(mdef->minvent);
-		    if (!gold) break;
-                    obj_extract_self(gold);
-		    add_to_minv(magr, gold);
-                }
-#endif
 		mdef->mstrategy &= ~STRAT_WAITFORU;
 		if (vis) {
 		    Strcpy(buf, Monnam(magr));
@@ -1274,9 +1247,7 @@ mdamagem(magr, mdef, mattk)
 			/* Automatic kill if drained past level 0 */
 		}
 		break;
-#ifdef SEDUCE
 	    case AD_SSEX:
-#endif
 	    case AD_SITM:	/* for now these are the same */
 	    case AD_SEDU:
 		if (magr->mcan) break;
@@ -1293,12 +1264,10 @@ mdamagem(magr, mdef, mattk)
 			Strcpy(mdefnambuf, x_monnam(mdef, ARTICLE_THE, (char *)0, 0, FALSE));
 
 			otmp = obj;
-#ifdef STEED
 			if (u.usteed == mdef &&
 					otmp == which_armor(mdef, W_SADDLE))
 				/* "You can no longer ride <steed>." */
 				dismount_steed(DISMOUNT_POLY);
-#endif
 			obj_extract_self(otmp);
 			if (otmp->owornmask) {
 				mdef->misc_worn_check &= ~otmp->owornmask;
@@ -1418,11 +1387,9 @@ mdamagem(magr, mdef, mattk)
 			} else if ((otch = which_armor(mdef, W_ARM))) {
 				if (oresist_disintegration(otch))
 					otch = 0;
-#ifdef TOURIST
 			} else if ((otch = which_armor(mdef, W_ARMU))) {
 				if (oresist_disintegration(otch))
 					otch = 0;
-#endif
 			} else {
 				recip_dam = minstadisintegrate(mdef);
 			}

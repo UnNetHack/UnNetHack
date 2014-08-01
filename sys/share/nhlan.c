@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)nhlan.c	3.4	1999/11/21	*/
 /* Copyright (c) Michael Allison, 1997                  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -41,8 +40,6 @@ void init_lan_features()
 	lan_username();
 #ifdef LAN_MAIL
 	lan_mail_init();
-#endif
-#ifdef LAN_SHARED_BONES
 #endif
 }
 /*

@@ -5,11 +5,7 @@
 
 #ifdef LIVELOGFILE
 
-#ifdef SHORT_FILENAMES
-#include "patchlev.h"
-#else
 #include "patchlevel.h"
-#endif
 
 /* Encodes the current xlog "achieve" status to an integer */
 long
@@ -71,11 +67,7 @@ boolean livelog_start() {
 /* Locks the live log file and writes 'buffer' */
 void livelog_write_string(char* buffer) {
 	FILE* livelogfile;
-#ifdef FILE_AREAS
 	if (lock_file_area(LOGAREA, LIVELOGFILE, 10)) {
-#else
-	if (lock_file(LIVELOGFILE, SCOREPREFIX, 10)) {
-#endif
 		if(!(livelogfile = fopen_datafile_area(LOGAREA, LIVELOGFILE, "a", SCOREPREFIX))) {
 			pline("Cannot open live log file!");
 		} else {
@@ -96,9 +88,7 @@ char *livelog_prefix() {
 			"dnum=%d:dname=%s:dlev=%d:maxlvl=%d:"
 			"dlev_name=%s:"
 			"hp=%d:maxhp=%d:deaths=%d:"
-#ifdef RECORD_REALTIME
 			"realtime=%ld:"
-#endif
 			"conduct=0x%lx:"
 			"role=%s:race=%s:"
 			"gender=%s:align=%s:"
@@ -117,9 +107,7 @@ char *livelog_prefix() {
 			u.uz.dnum, dungeons[u.uz.dnum].dname, depth(&u.uz), deepest_lev_reached(TRUE),
 			lev ? lev->proto : "", /* proto level name if special level */
 			u.uhp, u.uhpmax, u.umortality,
-#ifdef RECORD_REALTIME
 			(long)realtime_data.realtime,
-#endif
 			encodeconduct(),
 			urole.filecode, urace.filecode,
 			genders[flags.female].filecode, aligns[1-u.ualign.type].filecode,
@@ -133,11 +121,7 @@ char *livelog_prefix() {
 			 hell_and_hell_mode ? "hah" :
 			 heaven_or_hell_mode ? "hoh" :
 			 "normal"),
-#ifndef GOLDOBJ
 			(u.ugold + hidden_gold())
-#else
-			(money_cnt(invent) + hidden_gold())
-#endif
 			);
 	return prefixbuf;
 }

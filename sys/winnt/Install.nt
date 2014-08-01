@@ -169,11 +169,6 @@ Setting Up
                                           |    |          |
                                        share  winnt      win32 
  
-    Check the file "Files" in your top level directory for an exact
-    listing of what file is in which directory.  In order for the
-    Makefiles to work, all the source files must be in the proper
-    locations.
-
     If you downloaded or ftp'd the sources from a UNIX system, the lines
     will probably end in UNIX-style newlines, instead of the carriage
     return and line feed pairs used by Windows.  Some programs have
@@ -216,9 +211,6 @@ Compiling
     For Microsoft compiler: 
         nmake install
 
-    For Borland compiler:
-        make /f Makefile.bcc install
-
     For GCC:
         mingw32-make -f Makefile.gcc install
 
@@ -240,9 +232,6 @@ Notes:
 
     For Microsoft compiler: 
         nmake
-
-    For Borland compiler:
-        make /f Makefile.bcc
 
     For GCC:
         mingw32-make -f Makefile.gcc
@@ -324,12 +313,6 @@ Setting Up
     "binary" directory will house everything you need to play the game
     after building is complete.
 
-    Check the file "Files" in your top level directory for an exact
-    listing of what file is in which directory.  In order for the build
-    process to work, all the source files must be in the proper
-    locations.  Remember that nhsetup.bat moves/copies many files around
-    to their intended locations for building NetHack.
-
     If you downloaded or ftp'd the sources from a UNIX system, the lines
     will probably end in UNIX-style newlines, instead of the carriage
     return and line feed pairs used by Windows.  Visual C project files
@@ -363,7 +346,6 @@ Setting Up
       + recover files
       + tile2bmp files
       + tilemap files
-      + uudecode files
 
     On the Visual C menus, choose:
         Project | Set Active Project | NetHackW

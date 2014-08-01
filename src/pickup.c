@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)pickup.c	3.4	2003/07/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,19 +8,11 @@
 #include "hack.h"
 
 STATIC_DCL void FDECL(simple_look, (struct obj *,BOOLEAN_P));
-#ifndef GOLDOBJ
 STATIC_DCL boolean FDECL(query_classes, (char *,boolean *,boolean *,
 		const char *,struct obj *,BOOLEAN_P,BOOLEAN_P,int *));
-#else
-STATIC_DCL boolean FDECL(query_classes, (char *,boolean *,boolean *,
-		const char *,struct obj *,BOOLEAN_P,int *));
-#endif
 STATIC_DCL void FDECL(check_here, (BOOLEAN_P));
 STATIC_DCL boolean FDECL(n_or_more, (struct obj *));
 STATIC_DCL boolean FDECL(all_but_uchain, (struct obj *));
-#if 0 /* not used */
-STATIC_DCL boolean FDECL(allow_cat_no_uchain, (struct obj *));
-#endif
 STATIC_DCL int FDECL(autopick, (struct obj*, int, menu_item **));
 STATIC_DCL int FDECL(count_categories, (struct obj *,int));
 STATIC_DCL long FDECL(carry_count,
@@ -88,7 +79,6 @@ boolean here;		/* flag for type of obj list linkage */
 	}
 }
 
-#ifndef GOLDOBJ
 int
 collect_obj_classes(ilets, otmp, here, incl_gold, filter, itemcount)
 char ilets[];
@@ -96,24 +86,13 @@ register struct obj *otmp;
 boolean here, incl_gold;
 boolean FDECL((*filter),(OBJ_P));
 int *itemcount;
-#else
-int
-collect_obj_classes(ilets, otmp, here, filter, itemcount)
-char ilets[];
-register struct obj *otmp;
-boolean here;
-boolean FDECL((*filter),(OBJ_P));
-int *itemcount;
-#endif
 {
 	register int iletct = 0;
 	register char c;
 
 	*itemcount = 0;
-#ifndef GOLDOBJ
 	if (incl_gold)
 	    ilets[iletct++] = def_oc_syms[COIN_CLASS];
-#endif
 	ilets[iletct] = '\0'; /* terminate ilets so that index() will work */
 	while (otmp) {
 	    c = def_oc_syms[(int)otmp->oclass];
@@ -138,7 +117,6 @@ int *itemcount;
  *	"?/a" or "a?/" or "/a?",&c picks all '?' even though no '/'
  *	    (ie, treated as if it had just been "?a").
  */
-#ifndef GOLDOBJ
 STATIC_OVL boolean
 query_classes(oclasses, one_at_a_time, everything, action, objs,
 	      here, incl_gold, menu_on_demand)
@@ -148,17 +126,6 @@ const char *action;
 struct obj *objs;
 boolean here, incl_gold;
 int *menu_on_demand;
-#else
-STATIC_OVL boolean
-query_classes(oclasses, one_at_a_time, everything, action, objs,
-	      here, menu_on_demand)
-char oclasses[];
-boolean *one_at_a_time, *everything;
-const char *action;
-struct obj *objs;
-boolean here;
-int *menu_on_demand;
-#endif
 {
 	char ilets[20], inbuf[BUFSZ];
 	int iletct, oclassct;
@@ -170,9 +137,7 @@ int *menu_on_demand;
 	oclasses[oclassct = 0] = '\0';
 	*one_at_a_time = *everything = m_seen = FALSE;
 	iletct = collect_obj_classes(ilets, objs, here,
-#ifndef GOLDOBJ
 				     incl_gold,
-#endif
 				     (boolean FDECL((*),(OBJ_P))) 0, &itemcount);
 	if (iletct == 0) {
 		return FALSE;
@@ -348,21 +313,6 @@ struct obj *obj;
 	return FALSE;
 }
 
-#if 0 /* not used */
-/* query_objlist callback: return TRUE if valid category (class), no uchain */
-STATIC_OVL boolean
-allow_cat_no_uchain(obj)
-struct obj *obj;
-{
-    if ((obj != uchain) &&
-	(((index(valid_menu_classes,'u') != (char *)0) && obj->unpaid) ||
-	(index(valid_menu_classes, obj->oclass) != (char *)0)))
-	return TRUE;
-    else
-	return FALSE;
-}
-#endif
-
 /* query_objlist callback: return TRUE if valid class and worn */
 boolean
 is_worn_by_type(otmp)
@@ -528,9 +478,7 @@ menu_pickup:
 		if (!query_classes(oclasses, &selective, &all_of_a_type,
 				   "pick up", objchain,
 				   traverse_how == BY_NEXTHERE,
-#ifndef GOLDOBJ
 				   FALSE,
-#endif
 				   &via_menu)) {
 		    if (!via_menu) return (0);
 		    n = query_objlist("Pick up what?",
@@ -599,7 +547,6 @@ end_query:
 	return (n_tried > 0);
 }
 
-#ifdef AUTOPICKUP_EXCEPTIONS
 boolean
 is_autopickup_exception(obj, grab)
 struct obj *obj;
@@ -618,7 +565,6 @@ boolean grab;	 /* forced pickup, rather than forced leave behind? */
 	}
 	return FALSE;
 }
-#endif /* AUTOPICKUP_EXCEPTIONS */
 
 /*
  * Pick from the given list using flags.pickup_types.  Return the number
@@ -640,38 +586,24 @@ menu_item **pick_list;	/* list of objects and counts to pick up */
 
 	/* first count the number of eligible items */
 	for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow)) {
-#ifndef AUTOPICKUP_EXCEPTIONS
-	    if ((!*otypes || index(otypes, curr->oclass) ||
-	         (flags.pickup_thrown && curr->was_thrown)) &&
-	        (flags.pickup_dropped || !curr->was_dropped) &&
-	        !Is_sokoprize(curr))
-#else
 	    if ((!*otypes || index(otypes, curr->oclass) ||
 	         (flags.pickup_thrown && curr->was_thrown) ||
 		 is_autopickup_exception(curr, TRUE)) &&
 	        ((flags.pickup_dropped || !curr->was_dropped) &&
 	         !is_autopickup_exception(curr, FALSE) &&
 	         !Is_sokoprize(curr)))
-#endif
 		n++;
 	}
 
 	if (n) {
 	    *pick_list = pi = (menu_item *) alloc(sizeof(menu_item) * n);
 	    for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow))
-#ifndef AUTOPICKUP_EXCEPTIONS
-		if ((!*otypes || index(otypes, curr->oclass) ||
-	             (flags.pickup_thrown && curr->was_thrown)) &&
-	            (flags.pickup_dropped || !curr->was_dropped) &&
-	            !Is_sokoprize(curr)) {
-#else
 	    if ((!*otypes || index(otypes, curr->oclass) ||
 		 (flags.pickup_thrown && curr->was_thrown) ||
 		 is_autopickup_exception(curr, TRUE)) &&
 	        ((flags.pickup_dropped || !curr->was_dropped) &&
 	         !is_autopickup_exception(curr, FALSE) &&
 	         !Is_sokoprize(curr))) {
-#endif
 		    pi[n].item.a_obj = curr;
 		    pi[n].count = curr->quan;
 		    n++;
@@ -1051,9 +983,6 @@ int *wt_before, *wt_after;
 	    is_gold = obj->oclass == COIN_CLASS;
     int wt, iw, ow, oow;
     long qq, savequan;
-#ifdef GOLDOBJ
-    long umoney = money_cnt(invent);
-#endif
     unsigned saveowt;
     const char *verb, *prefx1, *prefx2, *suffx;
     char obj_nambuf[BUFSZ], where[BUFSZ];
@@ -1071,14 +1000,8 @@ int *wt_before, *wt_after;
     if (adjust_wt)
 	wt -= (container->otyp == BAG_OF_HOLDING) ?
 		(int)DELTA_CWT(container, obj) : (int)obj->owt;
-#ifndef GOLDOBJ
     if (is_gold)	/* merged gold might affect cumulative weight */
 	wt -= (GOLD_WT(u.ugold) + GOLD_WT(count) - GOLD_WT(u.ugold + count));
-#else
-    /* This will go with silver+copper & new gold weight */
-    if (is_gold)	/* merged gold might affect cumulative weight */
-	wt -= (GOLD_WT(umoney) + GOLD_WT(count) - GOLD_WT(umoney + count));
-#endif
     if (count != savequan) {
 	obj->quan = savequan;
 	obj->owt = saveowt;
@@ -1091,30 +1014,17 @@ int *wt_before, *wt_after;
 
     /* see how many we can lift */
     if (is_gold) {
-#ifndef GOLDOBJ
 	iw -= (int)GOLD_WT(u.ugold);
 	if (!adjust_wt) {
 	    qq = GOLD_CAPACITY((long)iw, u.ugold);
 	} else {
 	    oow = 0;
 	    qq = 50L - (u.ugold % 100L) - 1L;
-#else
-	iw -= (int)GOLD_WT(umoney);
-	if (!adjust_wt) {
-	    qq = GOLD_CAPACITY((long)iw, umoney);
-	} else {
-	    oow = 0;
-	    qq = 50L - (umoney % 100L) - 1L;
-#endif
 	    if (qq < 0L) qq += 100L;
 	    for ( ; qq <= count; qq += 100L) {
 		obj->quan = qq;
 		obj->owt = (unsigned)GOLD_WT(qq);
-#ifndef GOLDOBJ
 		ow = (int)GOLD_WT(u.ugold + qq);
-#else
-		ow = (int)GOLD_WT(umoney + qq);
-#endif
 		ow -= (container->otyp == BAG_OF_HOLDING) ?
 			(int)DELTA_CWT(container, obj) : (int)obj->owt;
 		if (iw + ow >= 0) break;
@@ -1125,11 +1035,7 @@ int *wt_before, *wt_after;
 	}
 	if (qq < 0L) qq = 0L;
 	else if (qq > count) qq = count;
-#ifndef GOLDOBJ
 	wt = iw + (int)GOLD_WT(u.ugold + qq);
-#else
-	wt = iw + (int)GOLD_WT(umoney + qq);
-#endif
     } else if (count > 1 || count < obj->quan) {
 	/*
 	 * Ugh. Calc num to lift by changing the quan of of the
@@ -1181,11 +1087,7 @@ int *wt_before, *wt_after;
     }
 
     if (!container) Strcpy(where, "here");  /* slightly shorter form */
-#ifndef GOLDOBJ
     if (invent || u.ugold) {
-#else
-    if (invent || umoney) {
-#endif
 	prefx1 = "you cannot ";
 	prefx2 = "";
 	suffx  = " any more";
@@ -1224,12 +1126,8 @@ boolean telekinesis;
     *cnt_p = carry_count(obj, container, *cnt_p, telekinesis, &old_wt, &new_wt);
     if (*cnt_p < 1L) {
 	result = -1;	/* nothing lifted */
-#ifndef GOLDOBJ
     } else if (obj->oclass != COIN_CLASS && inv_cnt() >= 52 &&
 		!merge_choice(invent, obj)) {
-#else
-    } else if (inv_cnt() >= 52 && !merge_choice(invent, obj)) {
-#endif
 	Your("knapsack cannot accommodate any more items.");
 	result = -1;	/* nothing lifted */
     } else {
@@ -1307,10 +1205,8 @@ long count;
 boolean telekinesis;	/* not picking it up directly by hand */
 {
 	int res, nearload;
-#ifndef GOLDOBJ
 	const char *where = (obj->ox == u.ux && obj->oy == u.uy) ?
 			    "here" : "there";
-#endif
 
 	if (obj->quan < count) {
 	    impossible("pickup_object: count %ld > quan %ld?",
@@ -1330,7 +1226,6 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	    return 0;
 	} else if (obj->oartifact && !touch_artifact(obj,&youmonst)) {
 	    return 0;
-#ifndef GOLDOBJ
 	} else if (obj->oclass == COIN_CLASS) {
 	    /* Special consideration for gold pieces... */
 	    long iw = (long)max_capacity() - GOLD_WT(u.ugold);
@@ -1373,7 +1268,6 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	    flags.botl = 1;
 	    if (flags.run) nomul(0, 0);
 	    return 1;
-#endif
 	} else if (obj->otyp == CORPSE) {
 	    if ( (touch_petrifies(&mons[obj->corpsenm])) && !uarmg
 				&& !Stone_resistance && !telekinesis) {
@@ -1414,10 +1308,6 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	if ((res = lift_object(obj, (struct obj *)0, &count, telekinesis)) <= 0)
 	    return res;
 
-#ifdef GOLDOBJ
-        /* Whats left of the special case for gold :-) */
-	if (obj->oclass == COIN_CLASS) flags.botl = 1;
-#endif
 	if (obj->quan != count && obj->otyp != LOADSTONE)
 	    obj = splitobj(obj, count);
 
@@ -1446,7 +1336,7 @@ boolean telekinesis;	/* not picking it up directly by hand */
  * pointer to the object where otmp ends up.  This may be different
  * from otmp because of merging.
  *
- * Gold never reaches this routine unless GOLDOBJ is defined.
+ * Gold never reaches this routine.
  */
 struct obj *
 pick_obj(otmp)
@@ -1554,11 +1444,9 @@ boolean tip;
 {
 	if (!can_reach_floor()) {
 	    if (!tip) {
-#ifdef STEED
 		if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
 		    rider_cant_reach(); /* not skilled enough to reach */
 		else
-#endif
 		    You("cannot reach the %s.", surface(x, y));
 	    }
 		return FALSE;
@@ -1680,22 +1568,9 @@ lootcont:
 	}
 	if (any) c = 'y';
     } else if (Confusion) {
-#ifndef GOLDOBJ
 	if (u.ugold){
 	    long contribution = rnd((int)min(LARGEST_INT,u.ugold));
 	    struct obj *goldob = mkgoldobj(contribution);
-#else
-	struct obj *goldob;
-	/* Find a money object to mess with */
-	for (goldob = invent; goldob; goldob = goldob->nobj) {
-	    if (goldob->oclass == COIN_CLASS) break;
-	}
-	if (goldob){
-	    long contribution = rnd((int)min(LARGEST_INT, goldob->quan));
-	    if (contribution < goldob->quan)
-		goldob = splitobj(goldob, contribution);
-	    freeinv(goldob);
-#endif
 	    if (IS_THRONE(levl[u.ux][u.uy].typ)){
 		struct obj *coffers;
 		int pass;
@@ -1713,7 +1588,6 @@ gotit:
 		    struct monst *mon = makemon(courtmon(),
 					    u.ux, u.uy, NO_MM_FLAGS);
 		    if (mon) {
-#ifndef GOLDOBJ
 			mon->mgold += goldob->quan;
 			delobj(goldob);
 			pline("The exchequer accepts your contribution.");
@@ -1723,16 +1597,6 @@ gotit:
 		}
 	    } else {
 		dropx(goldob);
-#else
-			add_to_minv(mon, goldob);
-			pline("The exchequer accepts your contribution.");
-		    } else {
-			dropy(goldob);
-		    }
-		}
-	    } else {
-		dropy(goldob);
-#endif
 		pline("Ok, now there is loot here.");
 	    }
 	}
@@ -1882,20 +1746,12 @@ dotip()
 	    You("tip your %s to %s.", xname(uarmh),
 		Hallucination ? the(rndmonnam()) : shkname(shkp));
 	} else {
-#ifndef GOLDOBJ
 	    if (u.ugold >= 10) {
-#else
-	    if (money_cnt(invent) >= 10) {
-#endif
 		int gratuity = rnd(10);
 		You("tip %s for providing a pleasant shopping experience.",
 		    Hallucination ? the(rndmonnam()) : shkname(shkp));
-#ifndef GOLDOBJ
 		u.ugold -= gratuity;
 		shkp->mgold += gratuity;
-#else
-		money2mon(shkp, gratuity);
-#endif
 	    } else {
 		pline("Unfortunately, you do not have enough money to tip %s.",
 		    Hallucination ? the(rndmonnam()) : shkname(shkp));
@@ -1947,7 +1803,6 @@ boolean *prev_loot;
 {
     int c = -1;
     int timepassed = 0;
-#ifdef STEED
     struct obj *otmp;
     char qbuf[QBUFSZ];
 
@@ -1986,7 +1841,6 @@ boolean *prev_loot;
 		return (0);
 	}
     }
-#endif	/* STEED */
     /* 3.4.0 introduced the ability to pick things up from within swallower's stomach */
     if (u.uswallow) {
 	int count = passed_info ? *passed_info : 0;
@@ -2024,7 +1878,7 @@ mbag_explodes(obj, depthin)
 
 /* A variable set in use_container(), to be used by the callback routines   */
 /* in_container(), and out_container() from askchain() and use_container(). */
-static NEARDATA struct obj *current_container;
+static struct obj *current_container;
 #define Icebox (current_container->otyp == ICE_BOX)
 
 /* Returns: -1 to stop, 1 item was inserted, 0 item was not inserted. */
@@ -2267,9 +2121,7 @@ register struct obj *obj;
 	      otmp, count);
 
 	if (is_gold) {
-#ifndef GOLDOBJ
 		dealloc_obj(obj);
-#endif
 		bot();	/* update character's gold piece count immediately */
 	}
 	return 1;
@@ -2303,7 +2155,7 @@ observe_quantum_cat(box, past)
 struct obj *box;
 boolean past;
 {
-    static NEARDATA const char sc[] = "Schroedinger's Cat";
+    static const char sc[] = "Schroedinger's Cat";
     struct obj *deadcat;
     struct monst *livecat;
     xchar ox, oy;
@@ -2347,7 +2199,7 @@ open_coffin(box, past)
 struct obj *box;
 boolean past;
 {
-    /* static NEARDATA const char sc[] = "Schroedinger's Cat"; */
+    /* static const char sc[] = "Schroedinger's Cat"; */
     /* Would be nice to name the vampire and put the name on the coffin. But not today. */
     struct monst *vampire;
     xchar ox, oy;
@@ -2380,9 +2232,7 @@ register struct obj *obj;
 register int held;
 {
 	struct obj *curr, *otmp;
-#ifndef GOLDOBJ
 	struct obj *u_gold = (struct obj *)0;
-#endif
 	boolean one_by_one, allflag, quantum_cat = FALSE,
 		loot_out = FALSE, loot_in = FALSE;
 	char select[MAXOCLASSES+1];
@@ -2454,11 +2304,7 @@ register int held;
 		    int t;
 		    char menuprompt[BUFSZ];
 		    boolean outokay = (cnt != 0);
-#ifndef GOLDOBJ
 		    boolean inokay = (invent != 0) || (u.ugold != 0);
-#else
-		    boolean inokay = (invent != 0);
-#endif
 		    if (!outokay && !inokay) {
 			pline("%s", emptymsg);
 			You("don't have anything to put in.");
@@ -2493,9 +2339,7 @@ ask_again2:
 		    if (query_classes(select, &one_by_one, &allflag,
 				      "take out", current_container->cobj,
 				      FALSE,
-#ifndef GOLDOBJ
 				      FALSE,
-#endif
 				      &menu_on_request)) {
 			if (askchain((struct obj **)&current_container->cobj,
 				     (one_by_one ? (char *)0 : select),
@@ -2523,11 +2367,7 @@ ask_again2:
 	    pline("%s", emptymsg);		/* <whatever> is empty. */
 	}
 
-#ifndef GOLDOBJ
 	if (!invent && u.ugold == 0) {
-#else
-	if (!invent) {
-#endif
 	    /* nothing to put in, but some feedback is necessary */
 	    You("don't have anything to put in.");
 	    return used;
@@ -2558,7 +2398,6 @@ ask_again2:
 	 * putting things in an ice chest.
 	 */
 	if (loot_in) {
-#ifndef GOLDOBJ
 	    if (u.ugold) {
 		/*
 		 * Hack: gold is not in the inventory, so make a gold object
@@ -2571,7 +2410,6 @@ ask_again2:
 		u_gold->nobj = invent;
 		invent = u_gold;
 	    }
-#endif
 	    add_valid_menu_class(0);	  /* reset */
 	    if (flags.menu_style != MENU_TRADITIONAL) {
 		used |= menu_loot(0, current_container, TRUE) > 0;
@@ -2580,9 +2418,7 @@ ask_again2:
 		menu_on_request = 0;
 		if (query_classes(select, &one_by_one, &allflag, "put in",
 				   invent, FALSE,
-#ifndef GOLDOBJ
 				   (u.ugold != 0L),
-#endif
 				   &menu_on_request)) {
 		    (void) askchain((struct obj **)&invent,
 				    (one_by_one ? (char *)0 : select), allflag,
@@ -2595,7 +2431,6 @@ ask_again2:
 	    }
 	}
 
-#ifndef GOLDOBJ
 	if (u_gold && invent && invent->oclass == COIN_CLASS) {
 	    /* didn't stash [all of] it */
 	    u_gold = invent;
@@ -2603,7 +2438,6 @@ ask_again2:
 	    u_gold->in_use = FALSE;
 	    dealloc_obj(u_gold);
 	}
-#endif
 	return used;
 }
 

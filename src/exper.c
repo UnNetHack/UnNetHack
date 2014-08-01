@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)exper.c	3.4	2002/11/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -39,9 +38,6 @@ int
 experience(mtmp, nk)	/* return # of exp points for mtmp after nk killed */
 	register struct	monst *mtmp;
 	register int	nk;
-#if defined(macintosh) && (defined(__SC__) || defined(__MRC__))
-# pragma unused(nk)
-#endif
 {
 	register struct permonst *ptr = mtmp->data;
 	int	i, tmp, tmp2;
@@ -90,10 +86,8 @@ experience(mtmp, nk)	/* return # of exp points for mtmp after nk killed */
 /*	Dungeon fern spores give no experience */
 	if(is_fern_spore(mtmp->data)) tmp = 0;
 
-#ifdef MAIL
 	/* Mail daemons put up no fight. */
 	if(mtmp->data == &mons[PM_MAIL_DAEMON]) tmp = 1;
-#endif
 
 	return(tmp);
 }

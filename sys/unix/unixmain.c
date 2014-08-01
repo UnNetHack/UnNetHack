@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)unixmain.c	3.4	1997/01/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,26 +13,15 @@
 #include <fcntl.h>
 #endif
 
-#if !defined(_BULL_SOURCE) && !defined(__sgi) && !defined(_M_UNIX)
-# if !defined(SUNOS4) && !(defined(ULTRIX) && defined(__GNUC__))
-#  if defined(POSIX_TYPES) || defined(SVR4) || defined(HPUX)
+#if defined(POSIX_TYPES) || defined(SVR4)
 extern struct passwd *FDECL(getpwuid,(uid_t));
-#  else
+#else
 extern struct passwd *FDECL(getpwuid,(int));
-#  endif
-# endif
 #endif
 extern struct passwd *FDECL(getpwnam,(const char *));
-#ifdef CHDIR
-static void FDECL(chdirx, (const char *,BOOLEAN_P));
-#endif /* CHDIR */
 static boolean NDECL(whoami);
 static void FDECL(process_options, (int, char **));
 
-#ifdef _M_UNIX
-extern void NDECL(check_sco_console);
-extern void NDECL(init_sco_cons);
-#endif
 #ifdef __linux__
 extern void NDECL(check_linux_console);
 extern void NDECL(init_linux_cons);
@@ -50,47 +38,12 @@ int argc;
 char *argv[];
 {
 	register int fd;
-#ifdef CHDIR
-	register char *dir;
-#endif
 	boolean exact_username;
-#ifdef SIMPLE_MAIL
 	char* e_simple = NULL;
-#endif
-#if defined(__APPLE__)
-	/* special hack to change working directory to a resource fork when
-	   running from finder --sam */
-#define MAC_PATH_VALUE ".app/Contents/MacOS/"
-	char mac_cwd[1024], *mac_exe = argv[0], *mac_tmp;
-	int arg0_len = strlen(mac_exe), mac_tmp_len, mac_lhs_len=0;
-	getcwd(mac_cwd, 1024);
-	if(mac_exe[0] == '/' && !strcmp(mac_cwd, "/")) {
-	    if((mac_exe = strrchr(mac_exe, '/')))
-		mac_exe++;
-	    else
-		mac_exe = argv[0];
-	    mac_tmp_len = (strlen(mac_exe) * 2) + strlen(MAC_PATH_VALUE);
-	    if(mac_tmp_len <= arg0_len) {
-		mac_tmp = malloc(mac_tmp_len + 1);
-		sprintf(mac_tmp, "%s%s%s", mac_exe, MAC_PATH_VALUE, mac_exe);
-		if(!strcmp(argv[0] + (arg0_len - mac_tmp_len), mac_tmp)) {
-		    mac_lhs_len = (arg0_len - mac_tmp_len) + strlen(mac_exe) + 5;
-		    if(mac_lhs_len > mac_tmp_len - 1)
-			mac_tmp = realloc(mac_tmp, mac_lhs_len);
-		    strncpy(mac_tmp, argv[0], mac_lhs_len);
-		    mac_tmp[mac_lhs_len] = '\0';
-		    chdir(mac_tmp);
-		}
-		free(mac_tmp);
-	    }
-	}
-#endif
 
-#ifdef SIMPLE_MAIL
 	/* figure this out early */
 	e_simple = nh_getenv("SIMPLEMAIL");
 	iflags.simplemail = (e_simple ? 1 : 0);
-#endif
 
 	hname = argv[0];
 	hackpid = getpid();
@@ -98,46 +51,13 @@ char *argv[];
 
 	choose_windows(DEFAULT_WINDOW_SYS);
 
-#ifdef CHDIR			/* otherwise no chdir() */
-	/*
-	 * See if we must change directory to the playground.
-	 * (Perhaps hack runs suid and playground is inaccessible
-	 *  for the player.)
-	 * The environment variable HACKDIR is overridden by a
-	 *  -d command line option (must be the first option given)
-	 */
-	dir = nh_getenv("NETHACKDIR");
-	if (!dir) dir = nh_getenv("HACKDIR");
-#endif
 	if(argc > 1) {
-#ifdef CHDIR
-	    if (!strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
-		/* avoid matching "-dec" for DECgraphics; since the man page
-		 * says -d directory, hope nobody's using -desomething_else
-		 */
-		argc--;
-		argv++;
-		dir = argv[0]+2;
-		if(*dir == '=' || *dir == ':') dir++;
-		if(!*dir && argc > 1) {
-			argc--;
-			argv++;
-			dir = argv[0];
-		}
-		if(!*dir)
-		    error("Flag -d must be followed by a directory name.");
-	    }
-	    if (argc > 1)
-#endif /* CHDIR */
 
 	    /*
 	     * Now we know the directory containing 'record' and
 	     * may do a prscore().  Exclude `-style' - it's a Qt option.
 	     */
 	    if (!strncmp(argv[1], "-s", 2) && strncmp(argv[1], "-style", 6)) {
-#ifdef CHDIR
-		chdirx(dir,0);
-#endif
 		prscore(argc, argv);
 		exit(EXIT_SUCCESS);
 	    }
@@ -147,22 +67,13 @@ char *argv[];
 	 * Change directories before we initialize the window system so
 	 * we can find the tile file.
 	 */
-#ifdef CHDIR
-	chdirx(dir,1);
-#endif
 
-#ifdef _M_UNIX
-	check_sco_console();
-#endif
 #ifdef __linux__
 	check_linux_console();
 #endif
 	initoptions();
 	init_nhwindows(&argc,argv);
 	exact_username = whoami();
-#ifdef _M_UNIX
-	init_sco_cons();
-#endif
 #ifdef __linux__
 	init_linux_cons();
 #endif
@@ -182,13 +93,7 @@ char *argv[];
 
 	process_options(argc, argv);	/* command line options */
 
-#ifdef DEF_PAGER
-	if(!(catmore = nh_getenv("HACKPAGER")) && !(catmore = nh_getenv("PAGER")))
-		catmore = DEF_PAGER;
-#endif
-#ifdef MAIL
 	getmailstatus();
-#endif
 #ifdef WIZARD
 	if (wizard)
 		Strcpy(plname, "wizard");
@@ -254,13 +159,7 @@ char *argv[];
 		 */
 		boolean remember_wiz_mode = wizard;
 #endif
-#ifndef FILE_AREAS
-		const char *fq_save = fqname(SAVEF, SAVEPREFIX, 1);
-
-		(void) chmod(fq_save,0);	/* disallow parallel restores */
-#else
 		(void) chmod_area(FILE_AREA_SAVE, SAVEF, 0);
-#endif
 		(void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #ifdef NEWS
 		if(iflags.news) {
@@ -282,13 +181,8 @@ char *argv[];
 			if(yn("Do you want to keep the save file?") == 'n')
 			    (void) delete_savefile();
 			else {
-#ifndef FILE_AREAS
-			    (void) chmod(fq_save,FCMASK); /* back to readable */
-			    compress_area(NULL, fq_save);
-#else
 			    (void) chmod_area(FILE_AREA_SAVE, SAVEF, FCMASK);
 			    compress_area(FILE_AREA_SAVE, SAVEF);
-#endif
 			}
 		}
 		flags.move = 0;
@@ -425,64 +319,6 @@ char *argv[];
 #endif
 }
 
-#ifdef CHDIR
-static void
-chdirx(dir, wr)
-const char *dir;
-boolean wr;
-{
-	if (dir					/* User specified directory? */
-# ifdef HACKDIR
-	       && strcmp(dir, HACKDIR)		/* and not the default? */
-# endif
-		) {
-# ifdef SECURE
-	    (void) setgid(getgid());
-	    (void) setuid(getuid());		/* Ron Wessels */
-# endif
-	} else {
-	    /* non-default data files is a sign that scores may not be
-	     * compatible, or perhaps that a binary not fitting this
-	     * system's layout is being used.
-	     */
-# ifdef VAR_PLAYGROUND
-	    int len = strlen(VAR_PLAYGROUND);
-
-	    fqn_prefix[SCOREPREFIX] = (char *)alloc(len+2);
-	    Strcpy(fqn_prefix[SCOREPREFIX], VAR_PLAYGROUND);
-	    if (fqn_prefix[SCOREPREFIX][len-1] != '/') {
-		fqn_prefix[SCOREPREFIX][len] = '/';
-		fqn_prefix[SCOREPREFIX][len+1] = '\0';
-	    }
-# endif
-	}
-
-# ifdef HACKDIR
-	if (dir == (const char *)0)
-	    dir = HACKDIR;
-# endif
-
-	if (dir && chdir(dir) < 0) {
-	    perror(dir);
-	    error("Cannot chdir to %s.", dir);
-	}
-
-	/* warn the player if we can't write the record file */
-	/* perhaps we should also test whether . is writable */
-	/* unfortunately the access system-call is worthless */
-	if (wr) {
-# ifdef VAR_PLAYGROUND
-	    fqn_prefix[LEVELPREFIX] = fqn_prefix[SCOREPREFIX];
-	    fqn_prefix[SAVEPREFIX] = fqn_prefix[SCOREPREFIX];
-	    fqn_prefix[BONESPREFIX] = fqn_prefix[SCOREPREFIX];
-	    fqn_prefix[LOCKPREFIX] = fqn_prefix[SCOREPREFIX];
-	    fqn_prefix[TROUBLEPREFIX] = fqn_prefix[SCOREPREFIX];
-# endif
-	    check_recordfile(dir);
-	}
-}
-#endif /* CHDIR */
-
 static boolean
 whoami() {
 	/*
@@ -526,11 +362,7 @@ wd_message()
 #ifdef WIZARD
 	if (wiz_error_flag) {
 		pline("Only user \"%s\" may access debug (wizard) mode.",
-# ifndef KR1ED
 			WIZARD);
-# else
-			WIZARD_NAME);
-# endif
 		pline("Entering discovery mode instead.");
 	} else
 #endif

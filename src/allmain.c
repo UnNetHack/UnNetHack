@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)allmain.c	3.4	2003/04/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,9 +9,6 @@
 #include <signal.h>
 #endif
 
-#ifdef POSITIONBAR
-STATIC_DCL void NDECL(do_positionbar);
-#endif
 STATIC_DCL void FDECL(interrupt_multi, (const char *,int,int));
 
 static int prev_hp_notify;
@@ -98,14 +94,9 @@ can_regenerate()
     if (is_elf(youmonst.data)) {
 	if (uwep && is_iron(uwep) &&
 		!is_quest_artifact(uwep) && !uarmg) return 0;
-#ifdef TOURIST
 	if (uarm && is_iron(uarm) && !uarmu) return 0;
 	if (uarmu && is_iron(uarmu)) return 0;
 	if (uarmc && is_iron(uarmc) && !uarmu && !uarm) return 0;
-#else
-	if (uarm && is_iron(uarm)) return 0;
-	if (uarmc && is_iron(uarmc) && !uarm) return 0;
-#endif
 	if (uarmh && is_iron(uarmh) &&
 		!is_quest_artifact(uarmh)) return 0;
 	if (uarms && is_iron(uarms) && !uarmg) return 0;
@@ -113,13 +104,8 @@ can_regenerate()
 	if (uarmf && is_iron(uarmf)) return 0;
 	if (uleft && is_iron(uleft)) return 0;
 	if (uright && is_iron(uright)) return 0;
-#ifdef TOURIST
 	if (uamul && is_iron(uamul) &&
 		!is_quest_artifact(uamul) && !uarmu && !uarm) return 0;
-#else
-	if (uamul && is_iron(uamul) &&
-		!is_quest_artifact(uamul) && !uarm) return 0;
-#endif
 	if (ublindf && is_iron(ublindf)) return 0;
 	if (uchain && is_iron(uchain)) return 0;
 	if (uswapwep && is_iron(uswapwep) && u.twoweap) return 0;
@@ -136,7 +122,7 @@ can_regenerate()
 void
 moveloop()
 {
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
     char ch;
     int abort_lev;
 #endif
@@ -194,9 +180,6 @@ moveloop()
 
     for(;;) {
 	get_nh_event();
-#ifdef POSITIONBAR
-	do_positionbar();
-#endif
 
 	didmove = flags.move;
 	if(didmove) {
@@ -273,12 +256,10 @@ moveloop()
 			}
 
 		    /* calculate how much time passed. */
-#ifdef STEED
 		    if (u.usteed && u.umoved) {
 			/* your speed doesn't augment steed's speed */
 			moveamt = mcalcmove(u.usteed);
 		    } else
-#endif
 		    {
 			moveamt = youmonst.data->mmove;
 
@@ -316,9 +297,7 @@ moveloop()
 		    if(Glib) glibr();
 		    nh_timeout();
 		    run_regions();
-#ifdef DUNGEON_GROWTH
 		    dgn_growths(TRUE, TRUE);
-#endif
 		    if (u.ublesscnt)  u.ublesscnt--;
 		    if(flags.time && !flags.run)
 			flags.botl = 1;
@@ -407,11 +386,9 @@ moveloop()
 				if (!next_to_u()) {
 				    check_leash(old_ux, old_uy);
 				}
-#ifdef REDO
 				/* clear doagain keystrokes */
 				pushch(0);
 				savech(0);
-#endif
 			    }
 			}
 			/* delayed change may not be valid anymore */
@@ -516,14 +493,12 @@ moveloop()
 	    if (vision_full_recalc) vision_recalc(0);	/* vision! */
 	}
 
-#ifdef ELBERETH
 	/* check changes of Elbereth at current player location */
 	is_on_elbereth = sengr_at("Elbereth", u.ux, u.uy);
 	if (was_on_elbereth != is_on_elbereth) {
 		was_on_elbereth = is_on_elbereth;
 		flags.botlx = 1;
 	}
-#endif
 
 #ifdef REALTIME_ON_BOTL
 	if (iflags.showrealtime) {
@@ -557,15 +532,13 @@ moveloop()
 	flags.move = 1;
 
 	if(multi >= 0 && occupation) {
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 	    abort_lev = 0;
 	    if (kbhit()) {
-		if ((ch = Getchar()) == ABORT)
+		if ((ch = pgetchar()) == ABORT)
 		    abort_lev++;
-# ifdef REDO
 		else
 		    pushch(ch);
-# endif /* REDO */
 	    }
 	    if (!abort_lev && (*occupation)() == 0)
 #else
@@ -573,14 +546,14 @@ moveloop()
 #endif
 		occupation = 0;
 	    if(
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 		   abort_lev ||
 #endif
 		   monster_nearby()) {
 		stop_occupation();
 		reset_eat();
 	    }
-#if defined(MICRO) || defined(WIN32)
+#if defined(WIN32)
 	    if (!(++occtime % 7))
 		display_nhwindow(WIN_MAP, FALSE);
 #endif
@@ -597,10 +570,8 @@ moveloop()
 	    sanity_check();
 #endif
 
-#ifdef CLIPPING
 	/* just before rhack */
 	cliparound(u.ux, u.uy);
-#endif
 
 	u.umoved = FALSE;
 
@@ -621,10 +592,8 @@ moveloop()
 		rhack(save_cm);
 	    }
 	} else if (multi == 0) {
-#ifdef MAIL
 	    ckmailstatus();
 	    maybe_hint();
-#endif
             maybe_tutorial();
 	    rhack((char *)0);
 	}
@@ -655,10 +624,8 @@ stop_occupation()
 /* fainting stops your occupation, there's no reason to sync.
 		sync_hunger();
 */
-#ifdef REDO
 		nomul(0, 0);
 		pushch(0);
-#endif
 	}
 }
 
@@ -670,17 +637,6 @@ display_gamewindows()
     WIN_STATUS = create_nhwindow(NHW_STATUS);
     WIN_MAP = create_nhwindow(NHW_MAP);
     WIN_INVEN = create_nhwindow(NHW_MENU);
-
-#ifdef MAC
-    /*
-     * This _is_ the right place for this - maybe we will
-     * have to split display_gamewindows into create_gamewindows
-     * and show_gamewindows to get rid of this ifdef...
-     */
-	if ( ! strcmp ( windowprocs . name , "mac" ) ) {
-	    SanePositions ( ) ;
-	}
-#endif
 
     /*
      * The mac port is not DEPENDENT on the order of these
@@ -696,10 +652,6 @@ void
 newgame()
 {
 	int i;
-
-#ifdef MFLOPPY
-	gameDiskPrompt();
-#endif
 
 	flags.ident = 1;
 
@@ -742,7 +694,6 @@ newgame()
 	if(MON_AT(u.ux, u.uy)) mnexto(m_at(u.ux, u.uy));
 	(void) makedog();
 	docrt();
-#ifdef CONVICT
 	if (Role_if(PM_CONVICT)) {
 		setworn(mkobj(CHAIN_CLASS, TRUE), W_CHAIN);
 		setworn(mkobj(BALL_CLASS, TRUE), W_BALL);
@@ -750,27 +701,18 @@ newgame()
 		placebc();
 		newsym(u.ux,u.uy);
 	}
-#endif /* CONVICT */
 
 	if (flags.legacy) {
 		flush_screen(1);
-#ifdef CONVICT
 	if (Role_if(PM_CONVICT)) {
 		com_pager(199);
 	} else {
 		com_pager(1);
 	}
-#else
-		com_pager(1);
-#endif /* CONVICT */
 	}
 
-#ifdef INSURANCE
 	save_currentstate();
-#endif
 	program_state.something_worth_saving++;	/* useful data now exists */
-
-#if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
 
 	/* Start the timer here */
 	realtime_data.realtime = (time_t)0L;
@@ -780,8 +722,6 @@ newgame()
 #else
 	(void) time(&realtime_data.restoretime);
 #endif
-
-#endif /* RECORD_REALTIME || REALTIME_ON_BOTL */
 
 	/* Success! */
 	welcome(TRUE);
@@ -831,63 +771,6 @@ boolean new_game;	/* false => restoring an old game */
 	}
 }
 
-#ifdef POSITIONBAR
-STATIC_DCL void
-do_positionbar()
-{
-	static char pbar[COLNO];
-	char *p;
-	
-	p = pbar;
-	/* up stairway */
-	if (upstair.sx &&
-	   (glyph_to_cmap(level.locations[upstair.sx][upstair.sy].glyph) ==
-	    S_upstair ||
- 	    glyph_to_cmap(level.locations[upstair.sx][upstair.sy].glyph) ==
-	    S_upladder)) {
-		*p++ = '<';
-		*p++ = upstair.sx;
-	}
-	if (sstairs.sx &&
-	   (glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph) ==
-	    S_upstair ||
- 	    glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph) ==
-	    S_upladder)) {
-		*p++ = '<';
-		*p++ = sstairs.sx;
-	}
-
-	/* down stairway */
-	if (dnstair.sx &&
-	   (glyph_to_cmap(level.locations[dnstair.sx][dnstair.sy].glyph) ==
-	    S_dnstair ||
- 	    glyph_to_cmap(level.locations[dnstair.sx][dnstair.sy].glyph) ==
-	    S_dnladder)) {
-		*p++ = '>';
-		*p++ = dnstair.sx;
-	}
-	if (sstairs.sx &&
-	   (glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph) ==
-	    S_dnstair ||
- 	    glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph) ==
-	    S_dnladder)) {
-		*p++ = '>';
-		*p++ = sstairs.sx;
-	}
-
-	/* hero location */
-	if (u.ux) {
-		*p++ = '@';
-		*p++ = u.ux;
-	}
-	/* fence post */
-	*p = 0;
-
-	update_positionbar(pbar);
-}
-#endif
-
-#if defined(REALTIME_ON_BOTL) || defined (RECORD_REALTIME)
 time_t
 get_realtime(void)
 {
@@ -926,7 +809,6 @@ get_realtime(void)
 	return time_spent_playing;
 }
 #undef MAX_IDLE_TIME_IN_SECONDS
-#endif /* REALTIME_ON_BOTL || RECORD_REALTIME */
 
 /** Interrupt a multiturn action if current_points is equal to max_points. */
 STATIC_DCL

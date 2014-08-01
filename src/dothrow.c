@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)dothrow.c	3.4	2003/12/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -21,10 +20,10 @@ STATIC_DCL void FDECL(sho_obj_return_to_u, (struct obj *obj));
 STATIC_DCL boolean FDECL(mhurtle_step, (genericptr_t,int,int));
 
 
-static NEARDATA const char toss_objs[] =
+static const char toss_objs[] =
 	{ ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, WEAPON_CLASS, 0 };
 /* different default choices when wielding a sling (gold must be included) */
-static NEARDATA const char bullets[] =
+static const char bullets[] =
 	{ ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, GEM_CLASS, 0 };
 
 struct obj *thrownobj = 0;	/* tracks an object until it lands */
@@ -45,7 +44,6 @@ int shotlimit;
 	boolean twoweap;
 
 	/* ask "in what direction?" */
-#ifndef GOLDOBJ
 	if (!getdir((char *)0)) {
 		if (obj->oclass == COIN_CLASS) {
 		    u.ugold += obj->quan;
@@ -56,24 +54,6 @@ int shotlimit;
 	}
 
 	if(obj->oclass == COIN_CLASS) return(throw_gold(obj));
-#else
-	if (!getdir((char *)0)) {
-	    /* obj might need to be merged back into the singular gold object */
-	    freeinv(obj);
-	    addinv(obj);
-	    return(0);
-	}
-
-        /*
-	  Throwing money is usually for getting rid of it when
-          a leprechaun approaches, or for bribing an oncoming 
-          angry monster.  So throw the whole object.
-
-          If the money is in quiver, throw one coin at a time,
-          possibly using a sling.
-        */
-	if(obj->oclass == COIN_CLASS && obj != uquiver) return(throw_gold(obj));
-#endif
 
 	if(!canletgo(obj,"throw"))
 		return(0);
@@ -316,16 +296,12 @@ dofire()
 		if (!flags.autoquiver) {
 			/* Don't automatically fill the quiver */
 			You("have no ammunition readied!");
-#ifdef QUIVER_FIRED
 			if (iflags.quiver_fired)
 			  dowieldquiver(); /* quiver_fired */
 			if (!uquiver)
-#endif
 			  return(dothrow());
 		}
-#ifdef QUIVER_FIRED
 		else { /* quiver_fired */
-#endif
 		autoquiver();
 		if (!uquiver) {
 			You("have nothing appropriate for your quiver!");
@@ -334,9 +310,7 @@ dofire()
 			You("fill your quiver:");
 			prinv((char *)0, uquiver, 0L);
 		}
-#ifdef QUIVER_FIRED
 		} /* quiver_fired */
-#endif
 	}
 
 	/*
@@ -1490,24 +1464,17 @@ register struct obj   *obj;
 	    potionhit(mon, obj, TRUE);
 	    return 1;
 
-#ifdef EXOTIC_PETS
 	} else if ((befriend_with_obj(mon->data, obj)) ||
 	           (mon->mtame && dogfood(mon, obj) <= ACCFOOD) ||
 	           (obj->oclass == FOOD_CLASS &&
 	           ((Role_if(PM_ROGUE) &&
 	              mon->data == &mons[PM_MONKEY] &&
 	             (obj->otyp == BANANA || !rn2(2))) ||
-# ifdef TOURIST
 	            (Role_if(PM_TOURIST) && 
 	             (mon->data == &mons[PM_CROCODILE] ||
 	              mon->data == &mons[PM_BABY_CROCODILE])) ||
-# endif
 	            ((Role_if(PM_RANGER) || Role_if(PM_CAVEMAN)) &&
 	              mon->data == &mons[PM_WINTER_WOLF_CUB])))) {
-#else
-	} else if (befriend_with_obj(mon->data, obj) ||
-		   (mon->mtame && dogfood(mon, obj) <= ACCFOOD)) {
-#endif
 	    if (tamedog(mon, obj))
 		return 1;           	/* obj is gone */
 	    else {
@@ -1548,11 +1515,11 @@ register struct obj *obj;
 	boolean is_buddy = sgn(mon->data->maligntyp) == sgn(u.ualign.type);
 	boolean is_gem = objects[obj->otyp].oc_material == GEMSTONE;
 	int ret = 0;
-	static NEARDATA const char nogood[] = " is not interested in your junk.";
-	static NEARDATA const char acceptgift[] = " accepts your gift.";
-	static NEARDATA const char maybeluck[] = " hesitatingly";
-	static NEARDATA const char noluck[] = " graciously";
-	static NEARDATA const char addluck[] = " gratefully";
+	static const char nogood[] = " is not interested in your junk.";
+	static const char acceptgift[] = " accepts your gift.";
+	static const char maybeluck[] = " hesitatingly";
+	static const char noluck[] = " graciously";
+	static const char addluck[] = " gratefully";
 
 	Strcpy(buf,Monnam(mon));
 	mon->mpeaceful = 1;
@@ -1741,12 +1708,10 @@ boolean from_invent;
 			}
 			/* monster breathing isn't handled... [yet?] */
 			break;
-#ifdef TOURIST
 		case EXPENSIVE_CAMERA: {
 		    create_camera_demon(obj, x, y);
 		    break;
 		}
-#endif
 		case EGG:
 			/* breaking your own eggs is bad luck */
 			if (hero_caused && obj->spe && obj->corpsenm >= LOW_PM)
@@ -1763,8 +1728,8 @@ boolean from_invent;
 		struct monst *shkp = shop_keeper(*o_shop);
 
 		if (shkp) {		/* (implies *o_shop != '\0') */
-		    static NEARDATA long lastmovetime = 0L;
-		    static NEARDATA boolean peaceful_shk = FALSE;
+		    static long lastmovetime = 0L;
+		    static boolean peaceful_shk = FALSE;
 		    /*  We want to base shk actions on her peacefulness
 			at start of this turn, so that "simultaneous"
 			multiple breakage isn't drastically worse than
@@ -1794,9 +1759,7 @@ struct obj *obj;
 		obj->oclass != GEM_CLASS)
 	    return 1;
 	switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
-#ifdef TOURIST
 		case EXPENSIVE_CAMERA:
-#endif
 		case POT_WATER:		/* really, all potions */
 		case EGG:
 		case CREAM_PIE:
@@ -1827,9 +1790,7 @@ boolean in_view;
 		case LENSES:
 		case MIRROR:
 		case CRYSTAL_BALL:
-#ifdef TOURIST
 		case EXPENSIVE_CAMERA:
-#endif
 			to_pieces = " into a thousand pieces";
 			/*FALLTHRU*/
 		case POT_WATER:		/* really, all potions */
@@ -1859,34 +1820,22 @@ throw_gold(obj)
 struct obj *obj;
 {
 	int range, odx, ody;
-#ifndef GOLDOBJ
 	long zorks = obj->quan;
-#endif
 	register struct monst *mon;
 
 	if(!u.dx && !u.dy && !u.dz) {
-#ifndef GOLDOBJ
 		u.ugold += obj->quan;
 		flags.botl = 1;
 		dealloc_obj(obj);
-#endif
 		You("cannot throw gold at yourself.");
 		return(0);
 	}
-#ifdef GOLDOBJ
-        freeinv(obj);
-#endif
 	if(u.uswallow) {
 		pline(is_animal(u.ustuck->data) ?
 			"%s in the %s's entrails." : "%s into %s.",
-#ifndef GOLDOBJ
 			"The gold disappears", mon_nam(u.ustuck));
 		u.ustuck->mgold += zorks;
 		dealloc_obj(obj);
-#else
-			"The money disappears", mon_nam(u.ustuck));
-		add_to_minv(u.ustuck, obj);
-#endif
 		return(1);
 	}
 

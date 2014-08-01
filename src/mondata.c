@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)mondata.c	3.4	2003/06/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -440,9 +439,6 @@ const char *in_str;
 		{ "grey elf",		PM_GREY_ELF },
 		{ "gray elf",		PM_GREY_ELF },
 		{ "elf lord",		PM_ELF_LORD },
-#if 0	/* OBSOLETE */
-		{ "high elf",		PM_HIGH_ELF },
-#endif
 		{ "olog hai",		PM_OLOG_HAI },
 		{ "arch lich",		PM_ARCH_LICH },
 	    /* Some irregular plurals */
@@ -543,9 +539,7 @@ static const short grownups[][2] = {
 	{PM_ORC, PM_ORC_CAPTAIN}, {PM_HILL_ORC, PM_ORC_CAPTAIN},
 	{PM_MORDOR_ORC, PM_ORC_CAPTAIN}, {PM_URUK_HAI, PM_ORC_CAPTAIN},
 	{PM_SEWER_RAT, PM_GIANT_RAT},
-#ifdef CONVICT
 	{PM_GIANT_RAT, PM_ENORMOUS_RAT},
-#endif	/* CONVICT */
 	{PM_CAVE_SPIDER, PM_GIANT_SPIDER},
 	{PM_OGRE, PM_OGRE_LORD}, {PM_OGRE_LORD, PM_OGRE_KING},
 	{PM_ELF, PM_ELF_LORD}, {PM_WOODLAND_ELF, PM_ELF_LORD},
@@ -595,11 +589,9 @@ static const short grownups[][2] = {
 	{PM_BLAZING_FERN_SPROUT, PM_BLAZING_FERN},
 	{PM_DUNGEON_FERN_SPROUT, PM_DUNGEON_FERN},
 	{PM_SWAMP_FERN_SPROUT, PM_SWAMP_FERN},
-#ifdef KOPS
 	{PM_KEYSTONE_KOP, PM_KOP_SERGEANT},
 	{PM_KOP_SERGEANT, PM_KOP_LIEUTENANT},
 	{PM_KOP_LIEUTENANT, PM_KOP_KAPTAIN},
-#endif
 	{NON_PM, NON_PM}
 };
 
@@ -607,27 +599,11 @@ int
 little_to_big(montype)
 int montype;
 {
-#ifndef AIXPS2_BUG
 	register int i;
 
 	for (i = 0; grownups[i][0] >= LOW_PM; i++)
 		if(montype == grownups[i][0]) return grownups[i][1];
 	return montype;
-#else
-/* AIX PS/2 C-compiler 1.1.1 optimizer does not like the above for loop,
- * and causes segmentation faults at runtime.  (The problem does not
- * occur if -O is not used.)
- * lehtonen@cs.Helsinki.FI (Tapio Lehtonen) 28031990
- */
-	int i;
-	int monvalue;
-
-	monvalue = montype;
-	for (i = 0; grownups[i][0] >= LOW_PM; i++)
-		if(montype == grownups[i][0]) monvalue = grownups[i][1];
-
-	return monvalue;
-#endif
 }
 
 int

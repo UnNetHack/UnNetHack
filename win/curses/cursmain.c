@@ -35,12 +35,7 @@ struct window_procs curses_procs = {
     curses_update_inventory,
     curses_mark_synch,
     curses_wait_synch,
-#ifdef CLIPPING
     curses_cliparound,
-#endif
-#ifdef POSITIONBAR
-    donull,
-#endif
     curses_print_glyph,
     curses_raw_print,
     curses_raw_print_bold,
@@ -53,10 +48,6 @@ struct window_procs curses_procs = {
     curses_get_ext_cmd,
     curses_number_pad,
     curses_delay_output,
-#ifdef CHANGE_COLOR	/* only a Mac option currently */
-    donull,
-    donull,
-#endif
     curses_start_screen,
     curses_end_screen,
     genl_outrip,
@@ -88,7 +79,6 @@ void curses_init_nhwindows(int* argcp, char** argv)
 #else
     base_term = initscr();
 #endif
-#ifdef TEXTCOLOR
     if (has_colors())
     {
         start_color();
@@ -101,23 +91,13 @@ void curses_init_nhwindows(int* argcp, char** argv)
         iflags.wc2_guicolor = FALSE;
         set_wc2_option_mod_status(WC2_GUICOLOR, SET_IN_FILE);    
     }
-#else
-    iflags.use_color = FALSE;
-    set_option_mod_status("color", SET_IN_FILE);    
-    iflags.wc2_guicolor = FALSE;
-    set_wc2_option_mod_status(WC2_GUICOLOR, SET_IN_FILE);    
-#endif
     noecho();
     raw();
     meta(stdscr, TRUE);
     orig_cursor = curs_set(0);
     keypad(stdscr, TRUE);
 #ifdef NCURSES_VERSION
-# ifdef __APPLE__
- ESCDELAY = 25;
-# else
     set_escdelay(25);
-# endif /* __APPLE__ */
 #endif  /* NCURSES_VERSION */
 #ifdef PDCURSES
 # ifdef DEF_GAME_NAME
@@ -340,17 +320,10 @@ void curses_putstr(winid wid, int attr, const char *text)
 /* Display the file named str.  Complain about missing files
                    iff complain is TRUE.
 */
-#ifdef FILE_AREAS
 void curses_display_file(const char *filearea,const char *filename,BOOLEAN_P must_exist)
 {
     curses_view_file(filearea, filename, must_exist);
 }
-#else
-void curses_display_file(const char *filename,BOOLEAN_P must_exist)
-{
-    curses_view_file(filename, must_exist);
-}
-#endif
 
 /* Start using window as a menu.  You must call start_menu()
    before add_menu().  After calling start_menu() you may not
@@ -478,7 +451,6 @@ void curses_wait_synch()
 /*
 cliparound(x, y)-- Make sure that the user is more-or-less centered on the
                    screen if the playing area is larger than the screen.
-                -- This function is only defined if CLIPPING is defined.
 */
 void curses_cliparound(int x, int y)
 {

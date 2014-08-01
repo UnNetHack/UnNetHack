@@ -1,15 +1,9 @@
-/*	SCCS Id: @(#)restore.c	3.4	2003/09/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 #include "lev.h"
 #include "tcap.h" /* for TERMLIB and ASCIIGRAPH */
-
-#if defined(MICRO)
-extern int dotcnt;	/* shared with save */
-extern int dotrow;	/* shared with save */
-#endif
 
 #ifdef USE_TILES
 extern void FDECL(substitute_tiles, (d_level *));       /* from tile.c */
@@ -28,7 +22,7 @@ STATIC_DCL void FDECL(freefruitchn, (struct fruit *));
 STATIC_DCL void FDECL(ghostfruit, (struct obj *));
 STATIC_DCL boolean FDECL(restgamestate, (int, unsigned int *, unsigned int *));
 STATIC_DCL void FDECL(restlevelstate, (unsigned int, unsigned int));
-STATIC_DCL int FDECL(restlevelfile, (int,XCHAR_P));
+STATIC_DCL int FDECL(restlevelfile, (XCHAR_P));
 STATIC_DCL void FDECL(reset_oattached_mids, (BOOLEAN_P));
 
 /*
@@ -51,16 +45,11 @@ static int n_ids_mapped = 0;
 static struct bucket *id_map = 0;
 
 
-#ifdef AMII_GRAPHICS
-void FDECL( amii_setpens, (int) );	/* use colors from save file */
-extern int amii_numcolors;
-#endif
-
 #include "quest.h"
 
 boolean restoring = FALSE;
-static NEARDATA struct fruit *oldfruit;
-static NEARDATA long omoves;
+static struct fruit *oldfruit;
+static long omoves;
 
 #define Is_IceBox(o) ((o)->otyp == ICE_BOX ? TRUE : FALSE)
 
@@ -106,7 +95,6 @@ boolean quietly;
 
 	for (otmp = invent; otmp; otmp = otmp2) {
 	    otmp2 = otmp->nobj;
-#ifndef GOLDOBJ
 	    if (otmp->oclass == COIN_CLASS) {
 		/* in_use gold is created by some menu operations */
 		if (!otmp->in_use) {
@@ -116,7 +104,6 @@ boolean quietly;
 		otmp->in_use = FALSE;
 		dealloc_obj(otmp);
 	    } else
-#endif /* GOLDOBJ */
 	    if (otmp->in_use) {
 		if (!quietly) pline("Finishing off %s...", xname(otmp));
 		useup(otmp);
@@ -437,14 +424,9 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	if (remember_discover) discover = remember_discover;
 
 	role_init();	/* Reset the initial role, race, gender, and alignment */
-#ifdef AMII_GRAPHICS
-	amii_setpens(amii_numcolors);	/* use colors from save file */
-#endif
 	mread(fd, (genericptr_t) &u, sizeof(struct you));
 	init_uasmon();
-#ifdef CLIPPING
 	cliparound(u.ux, u.uy);
-#endif
 	if(u.uhp <= 0 && (!Upolyd || u.mh <= 0)) {
 	    u.ux = u.uy = 0;	/* affects pline() [hence You()] */
 	    You("were not healthy enough to survive restoration.");
@@ -476,10 +458,8 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	restore_oracles(fd);
 	if (u.ustuck)
 		mread(fd, (genericptr_t) stuckid, sizeof (*stuckid));
-#ifdef STEED
 	if (u.usteed)
 		mread(fd, (genericptr_t) steedid, sizeof (*steedid));
-#endif
 	mread(fd, (genericptr_t) pl_tutorial, sizeof pl_tutorial);
 	mread(fd, (genericptr_t) pl_character, sizeof pl_character);
 
@@ -491,13 +471,9 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	restnames(fd);
 	restore_waterlevel(fd);
 
-#ifdef RECORD_ACHIEVE
 	mread(fd, (genericptr_t) &achieve, sizeof achieve);
-#endif
-#if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
 	mread(fd, (genericptr_t) &realtime_data.realtime, 
 	      sizeof realtime_data.realtime);
-#endif
   
 	/* must come after all mons & objs are restored */
 	relink_timers(FALSE);
@@ -523,7 +499,6 @@ unsigned int stuckid, steedid;	/* STEED */
 		if (!mtmp) panic("Cannot find the monster ustuck.");
 		u.ustuck = mtmp;
 	}
-#ifdef STEED
 	if (steedid) {
 		for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
 			if (mtmp->m_id == steedid) break;
@@ -531,17 +506,11 @@ unsigned int stuckid, steedid;	/* STEED */
 		u.usteed = mtmp;
 		remove_monster(mtmp->mx, mtmp->my);
 	}
-#endif
 }
 
-/*ARGSUSED*/	/* fd used in MFLOPPY only */
 STATIC_OVL int
-restlevelfile(fd, ltmp)
-register int fd;
+restlevelfile(ltmp)
 xchar ltmp;
-#if defined(macintosh) && (defined(__SC__) || defined(__MRC__))
-# pragma unused(fd)
-#endif
 {
 	register int nfd;
 	char whynot[BUFSZ];
@@ -552,45 +521,6 @@ xchar ltmp;
 		   save file if file creation is now failing... */
 		panic("restlevelfile: %s", whynot);
 	}
-#ifdef MFLOPPY
-	if (!savelev(nfd, ltmp, COUNT_SAVE)) {
-
-		/* The savelev can't proceed because the size required
-		 * is greater than the available disk space.
-		 */
-		pline("Not enough space on `%s' to restore your game.",
-			levels);
-
-		/* Remove levels and bones that may have been created.
-		 */
-		(void) close(nfd);
-# ifdef AMIGA
-		clearlocks();
-# else
-		eraseall(levels, alllevels);
-		eraseall(levels, allbones);
-
-		/* Perhaps the person would like to play without a
-		 * RAMdisk.
-		 */
-		if (ramdisk) {
-			/* PlaywoRAMdisk may not return, but if it does
-			 * it is certain that ramdisk will be 0.
-			 */
-			playwoRAMdisk();
-			/* Rewind save file and try again */
-			(void) lseek(fd, (off_t)0, 0);
-			(void) uptodate(fd, (char *)0);	/* skip version */
-			return dorecover(fd);	/* 0 or 1 */
-		} else {
-# endif
-			pline("Be seeing you...");
-			terminate(EXIT_SUCCESS);
-# ifndef AMIGA
-		}
-# endif
-	}
-#endif
 	bufon(nfd);
 	savelev(nfd, ltmp, WRITE_SAVE | FREE_SAVE);
 	bclose(nfd);
@@ -621,10 +551,8 @@ register int fd;
 		return(0);
 	}
 	restlevelstate(stuckid, steedid);
-#ifdef INSURANCE
 	savestateinlock();
-#endif
-	rtmp = restlevelfile(fd, ledger_no(&u.uz));
+	rtmp = restlevelfile(ledger_no(&u.uz));
 	if (rtmp < 2) return(rtmp);  /* dorecover called recursively */
 
 	/* these pointers won't be valid while we're processing the
@@ -633,33 +561,8 @@ register int fd;
 	 * place_monster() on other levels
 	 */
 	u.ustuck = (struct monst *)0;
-#ifdef STEED
 	u.usteed = (struct monst *)0;
-#endif
 
-#ifdef MICRO
-# ifdef AMII_GRAPHICS
-	{
-	extern struct window_procs amii_procs;
-	if(windowprocs.win_init_nhwindows== amii_procs.win_init_nhwindows){
-	    extern winid WIN_BASE;
-	    clear_nhwindow(WIN_BASE);	/* hack until there's a hook for this */
-	}
-	}
-# else
-	clear_nhwindow(WIN_MAP);
-# endif
-	clear_nhwindow(WIN_MESSAGE);
-	You("return to level %d in %s%s.",
-		depth(&u.uz), dungeons[u.uz.dnum].dname,
-		flags.debug ? " while in debug mode" :
-		flags.explore ? " while in explore mode" : "");
-	curs(WIN_MAP, 1, 1);
-	dotcnt = 0;
-	dotrow = 2;
-	if (strncmpi("X11", windowprocs.name, 3))
-    	  putstr(WIN_MAP, 0, "Restoring:");
-#endif
 	while(1) {
 #ifdef ZEROCOMP
 		if(mread(fd, (genericptr_t) &ltmp, sizeof ltmp) < 0)
@@ -668,18 +571,7 @@ register int fd;
 #endif
 			break;
 		getlev(fd, 0, ltmp, FALSE);
-#ifdef MICRO
-		curs(WIN_MAP, 1+dotcnt++, dotrow);
-		if (dotcnt >= (COLNO - 1)) {
-			dotrow++;
-			dotcnt = 0;
-		}
-		if (strncmpi("X11", windowprocs.name, 3)){
-		  putstr(WIN_MAP, 0, ".");
-		}
-		mark_synch();
-#endif
-		rtmp = restlevelfile(fd, ltmp);
+		rtmp = restlevelfile(ltmp);
 		if (rtmp < 2) return(rtmp);  /* dorecover called recursively */
 	}
 
@@ -697,16 +589,11 @@ register int fd;
 
 	if (!wizard && !discover)
 		(void) delete_savefile();
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) assign_rogue_graphics(TRUE);
-#endif
 #ifdef USE_TILES
 	substitute_tiles(&u.uz);
 #endif
 	restlevelstate(stuckid, steedid);
-#ifdef MFLOPPY
-	gameDiskPrompt();
-#endif
 	max_rank_sz(); /* to recompute mrank_sz (botl.c) */
 
 	/* this comes after inventory has been loaded */
@@ -749,16 +636,12 @@ register int fd;
 	clear_nhwindow(WIN_MESSAGE);
 	program_state.something_worth_saving++;	/* useful data now exists */
 
-#if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
-
 /* Start the timer here (realtime has already been set) */
 #if defined(BSD) && !defined(POSIX_TYPES)
 	(void) time((long *)&realtime_data.restoretime);
 #else
 	(void) time(&realtime_data.restoretime);
 #endif
-
-#endif /* RECORD_REALTIME || REALTIME_ON_BOTL */
 
 	/* Success! */
 	welcome(FALSE);
@@ -788,16 +671,10 @@ boolean ghostly;
 	int hpid;
 	xchar dlvl;
 	int x, y;
-#ifdef TOS
-	short tlev;
-#endif
 
 	if (ghostly)
 	    clear_id_mapping();
 
-#if defined(MSDOS) || defined(OS2)
-	setmode(fd, O_BINARY);
-#endif
 	/* Load the old fruit info.  We have to do it first, so the
 	 * information is available when restoring the objects.
 	 */
@@ -806,12 +683,7 @@ boolean ghostly;
 	/* First some sanity checks */
 	mread(fd, (genericptr_t) &hpid, sizeof(hpid));
 /* CHECK:  This may prevent restoration */
-#ifdef TOS
-	mread(fd, (genericptr_t) &tlev, sizeof(tlev));
-	dlvl=tlev&0x00ff;
-#else
 	mread(fd, (genericptr_t) &dlvl, sizeof(dlvl));
-#endif
 	if ((pid && pid != hpid) || (lev && dlvl != lev)) {
 	    char trickbuf[BUFSZ];
 
@@ -832,10 +704,6 @@ boolean ghostly;
 		uchar	len;
 		struct rm r;
 		
-#if defined(MAC)
-		/* Suppress warning about used before set */
-		(void) memset((genericptr_t) &r, 0, sizeof(r));
-#endif
 		i = 0; j = 0; len = 0;
 		while(i < ROWNO) {
 		    while(j < COLNO) {
@@ -984,9 +852,7 @@ boolean ghostly;
 	relink_timers(ghostly);
 	relink_light_sources(ghostly);
 	reset_oattached_mids(ghostly);
-#ifdef DUNGEON_GROWTH
 	if (!ghostly) catchup_dgn_growths((monstermoves - omoves) / 5);
-#endif
 	if (ghostly)
 	    clear_id_mapping();
 }
@@ -1089,11 +955,11 @@ boolean ghostly;
 #ifndef ZEROCOMP_BUFSIZ
 #define ZEROCOMP_BUFSIZ BUFSZ
 #endif
-static NEARDATA unsigned char inbuf[ZEROCOMP_BUFSIZ];
-static NEARDATA unsigned short inbufp = 0;
-static NEARDATA unsigned short inbufsz = 0;
-static NEARDATA short inrunlength = -1;
-static NEARDATA int mreadfd;
+static unsigned char inbuf[ZEROCOMP_BUFSIZ];
+static unsigned short inbufp = 0;
+static unsigned short inbufsz = 0;
+static short inrunlength = -1;
+static int mreadfd;
 
 static int
 mgetc()
@@ -1160,10 +1026,10 @@ register unsigned int len;
 {
 	register int rlen;
 
-#if defined(BSD) || defined(ULTRIX)
+#if defined(BSD)
 	rlen = read(fd, buf, (int) len);
 	if(rlen != len){
-#else /* e.g. SYSV, __TURBOC__ */
+#else /* e.g. SYSV */
 	rlen = read(fd, buf, (unsigned) len);
 	if((unsigned)rlen != len){
 #endif

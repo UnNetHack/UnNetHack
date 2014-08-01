@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)save.c	3.4	2003/11/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,17 +8,8 @@
 #ifndef NO_SIGNAL
 #include <signal.h>
 #endif
-#if !defined(LSC) && !defined(O_WRONLY) && !defined(AZTEC_C)
+#if !defined(LSC) && !defined(O_WRONLY)
 #include <fcntl.h>
-#endif
-
-#ifdef MFLOPPY
-long bytes_counted;
-static int count_only;
-#endif
-
-#ifdef MICRO
-int dotcnt, dotrow;	/* also used in restore */
 #endif
 
 #ifdef ZEROCOMP
@@ -33,32 +23,23 @@ STATIC_DCL void FDECL(savetrapchn, (int,struct trap *,int));
 STATIC_DCL void FDECL(savegamestate, (int,int));
 void FDECL(save_mongen_override, (int,struct mon_gen_override *, int));
 void FDECL(save_lvl_sounds, (int,struct lvl_sounds *, int));
-#ifdef MFLOPPY
-STATIC_DCL void FDECL(savelev0, (int,XCHAR_P,int));
-STATIC_DCL boolean NDECL(swapout_oldest);
-STATIC_DCL void FDECL(copyfile, (char *,char *));
-#endif /* MFLOPPY */
 #ifdef GCC_WARN
 static long nulls[10];
 #else
 #define nulls nul
 #endif
 
-#if defined(UNIX) || defined(VMS) || defined(__EMX__) || defined(WIN32)
+#if defined(UNIX) || defined(WIN32)
 #define HUP	if (!program_state.done_hup)
 #else
 #define HUP
 #endif
 
-#ifdef MENU_COLOR
 extern struct menucoloring *menu_colorings;
-#endif
 
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 extern const struct percent_color_option *hp_colors;
 extern const struct percent_color_option *pw_colors;
 extern const struct text_color_option *text_colors;
-#endif
 
 #ifdef USE_MERSENNE_TWISTER
 extern gsl_rng *rng_state;
@@ -77,7 +58,7 @@ dosave()
 	} else {
 		clear_nhwindow(WIN_MESSAGE);
 		pline("Saving...");
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
+#if defined(UNIX)
 		program_state.done_hup = 0;
 #endif
 		if(dosave0()) {
@@ -96,7 +77,7 @@ dosave()
 }
 
 
-#if defined(UNIX) || defined(VMS) || defined (__EMX__) || defined(WIN32)
+#if defined(UNIX) || defined(WIN32)
 /*ARGSUSED*/
 void
 hangup(sig_unused)  /* called as signal() handler, so sent at least one arg */
@@ -105,18 +86,11 @@ int sig_unused;
 # ifdef NOSAVEONHANGUP
 	(void) signal(SIGINT, SIG_IGN);
 	clearlocks();
-#  ifndef VMS
 	terminate(EXIT_FAILURE);
-#  endif
 # else	/* SAVEONHANGUP */
 	if (!program_state.done_hup++) {
 	    if (program_state.something_worth_saving)
 		(void) dosave0();
-#  ifdef VMS
-	    /* don't call exit when already within an exit handler;
-	       that would cancel any other pending user-mode handlers */
-	    if (!program_state.exiting)
-#  endif
 	    {
 		clearlocks();
 		terminate(EXIT_FAILURE);
@@ -145,15 +119,11 @@ dosave0()
 		return 0;
 	fq_save = fqname(SAVEF, SAVEPREFIX, 1);	/* level files take 0 */
 
-#if defined(UNIX) || defined(VMS)
+#if defined(UNIX)
 	(void) signal(SIGHUP, SIG_IGN);
 #endif
 #ifndef NO_SIGNAL
 	(void) signal(SIGINT, SIG_IGN);
-#endif
-
-#if defined(MICRO) && defined(MFLOPPY)
-	if (!saveDiskPrompt(0)) return 0;
 #endif
 
 	HUP if (iflags.window_inited) {
@@ -190,49 +160,12 @@ dosave0()
 	if(iflags.window_inited)
 	    HUP clear_nhwindow(WIN_MESSAGE);
 
-#ifdef MICRO
-	dotcnt = 0;
-	dotrow = 2;
-	curs(WIN_MAP, 1, 1);
-	if (strncmpi("X11", windowprocs.name, 3))
-	  putstr(WIN_MAP, 0, "Saving:");
-#endif
-#ifdef MFLOPPY
-	/* make sure there is enough disk space */
-	if (iflags.checkspace) {
-	    long fds, needed;
-
-	    savelev(fd, ledger_no(&u.uz), COUNT_SAVE);
-	    savegamestate(fd, COUNT_SAVE);
-	    needed = bytes_counted;
-
-	    for (ltmp = 1; ltmp <= maxledgerno(); ltmp++)
-		if (ltmp != ledger_no(&u.uz) && level_info[ltmp].where)
-		    needed += level_info[ltmp].size + (sizeof ltmp);
-	    fds = freediskspace(fq_save);
-	    if (needed > fds) {
-		HUP {
-		    There("is insufficient space on SAVE disk.");
-		    pline("Require %ld bytes but only have %ld.", needed, fds);
-		}
-		flushout();
-		(void) close(fd);
-		(void) delete_savefile();
-		return 0;
-	    }
-
-	    co_false();
-	}
-#endif /* MFLOPPY */
-
 	store_version(fd);
 #ifdef STORE_PLNAME_IN_FILE
 	bwrite(fd, (genericptr_t) plname, PL_NSIZ);
 #endif
 	ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
-#ifdef STEED
 	usteed_id = (u.usteed ? u.usteed->m_id : 0);
-#endif
 
 	savelev(fd, ledger_no(&u.uz), WRITE_SAVE | FREE_SAVE);
 	savegamestate(fd, WRITE_SAVE | FREE_SAVE);
@@ -248,24 +181,11 @@ dosave0()
 	 * may mislead place_monster() on other levels
 	 */
 	u.ustuck = (struct monst *)0;
-#ifdef STEED
 	u.usteed = (struct monst *)0;
-#endif
 
 	for(ltmp = (xchar)1; ltmp <= maxledgerno(); ltmp++) {
 		if (ltmp == ledger_no(&uz_save)) continue;
 		if (!(level_info[ltmp].flags & LFILE_EXISTS)) continue;
-#ifdef MICRO
-		curs(WIN_MAP, 1 + dotcnt++, dotrow);
-		if (dotcnt >= (COLNO - 1)) {
-			dotrow++;
-			dotcnt = 0;
-		}
-		if (strncmpi("X11", windowprocs.name, 3)){
-		  putstr(WIN_MAP, 0, ".");
-		}
-		mark_synch();
-#endif
 		ofd = open_levelfile(ltmp, whynot);
 		if (ofd < 0) {
 		    HUP pline("%s", whynot);
@@ -298,14 +218,9 @@ savegamestate(fd, mode)
 register int fd, mode;
 {
 	int uid;
-#if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
 	time_t realtime;
-#endif
 
 
-#ifdef MFLOPPY
-	count_only = (mode & COUNT_SAVE);
-#endif
 	uid = getuid();
 	bwrite(fd, (genericptr_t) &uid, sizeof uid);
 	bwrite(fd, (genericptr_t) &flags, sizeof(struct flag));
@@ -337,10 +252,8 @@ register int fd, mode;
 	save_oracles(fd, mode);
 	if(ustuck_id)
 	    bwrite(fd, (genericptr_t) &ustuck_id, sizeof ustuck_id);
-#ifdef STEED
 	if(usteed_id)
 	    bwrite(fd, (genericptr_t) &usteed_id, sizeof usteed_id);
-#endif
         bwrite(fd, (genericptr_t) pl_tutorial, sizeof pl_tutorial);
 	bwrite(fd, (genericptr_t) pl_character, sizeof pl_character);
 	bwrite(fd, (genericptr_t) pl_fruit, sizeof pl_fruit);
@@ -349,18 +262,13 @@ register int fd, mode;
 	savenames(fd, mode);
 	save_waterlevel(fd, mode);
 
-#ifdef RECORD_ACHIEVE
 	bwrite(fd, (genericptr_t) &achieve, sizeof achieve);
-#endif
-#if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
 	realtime = get_realtime();
 	bwrite(fd, (genericptr_t) &realtime, sizeof realtime);
-#endif
 
 	bflush(fd);
 }
 
-#ifdef INSURANCE
 void
 savestateinlock()
 {
@@ -424,61 +332,20 @@ savestateinlock()
 		    bwrite(fd, (genericptr_t) plname, PL_NSIZ);
 #endif
 		    ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
-#ifdef STEED
 		    usteed_id = (u.usteed ? u.usteed->m_id : 0);
-#endif
 		    savegamestate(fd, WRITE_SAVE);
 		}
 		bclose(fd);
 	}
 	havestate = flags.ins_chkpt;
 }
-#endif
 
-#ifdef MFLOPPY
-boolean
-savelev(fd, lev, mode)
-int fd;
-xchar lev;
-int mode;
-{
-	if (mode & COUNT_SAVE) {
-		bytes_counted = 0;
-		savelev0(fd, lev, COUNT_SAVE);
-		/* probably bytes_counted will be filled in again by an
-		 * immediately following WRITE_SAVE anyway, but we'll
-		 * leave it out of checkspace just in case */
-		if (iflags.checkspace) {
-			while (bytes_counted > freediskspace(levels))
-				if (!swapout_oldest())
-					return FALSE;
-		}
-	}
-	if (mode & (WRITE_SAVE | FREE_SAVE)) {
-		bytes_counted = 0;
-		savelev0(fd, lev, mode);
-	}
-	if (mode != FREE_SAVE) {
-		level_info[lev].where = ACTIVE;
-		level_info[lev].time = moves;
-		level_info[lev].size = bytes_counted;
-	}
-	return TRUE;
-}
-
-STATIC_OVL void
-savelev0(fd,lev,mode)
-#else
 void
 savelev(fd,lev,mode)
-#endif
 int fd;
 xchar lev;
 int mode;
 {
-#ifdef TOS
-	short tlev;
-#endif
 
 	/* if we're tearing down the current level without saving anything
 	   (which happens upon entrance to the endgame or after an aborted
@@ -493,18 +360,10 @@ int mode;
 	}
 
 	if(fd < 0) panic("Save on bad file!");	/* impossible */
-#ifdef MFLOPPY
-	count_only = (mode & COUNT_SAVE);
-#endif
 	if (lev >= 0 && lev <= maxledgerno())
 	    level_info[lev].flags |= VISITED;
 	bwrite(fd,(genericptr_t) &hackpid,sizeof(hackpid));
-#ifdef TOS
-	tlev=lev; tlev &= 0x00ff;
-	bwrite(fd,(genericptr_t) &tlev,sizeof(tlev));
-#else
 	bwrite(fd,(genericptr_t) &lev,sizeof(lev));
-#endif
 #ifdef RLECOMP
 	{
 	    /* perform run-length encoding of rm structs */
@@ -612,11 +471,11 @@ int mode;
 #ifndef ZEROCOMP_BUFSIZ
 # define ZEROCOMP_BUFSIZ BUFSZ
 #endif
-static NEARDATA unsigned char outbuf[ZEROCOMP_BUFSIZ];
-static NEARDATA unsigned short outbufp = 0;
-static NEARDATA short outrunlength = -1;
-static NEARDATA int bwritefd;
-static NEARDATA boolean compressing = FALSE;
+static unsigned char outbuf[ZEROCOMP_BUFSIZ];
+static unsigned short outbufp = 0;
+static short outrunlength = -1;
+static int bwritefd;
+static boolean compressing = FALSE;
 
 /*dbg()
 {
@@ -627,11 +486,6 @@ STATIC_OVL void
 bputc(c)
 int c;
 {
-#ifdef MFLOPPY
-    bytes_counted++;
-    if (count_only)
-      return;
-#endif
     if (outbufp >= sizeof outbuf) {
 	(void) write(bwritefd, outbuf, sizeof outbuf);
 	outbufp = 0;
@@ -670,13 +524,10 @@ register int fd;
     if (outrunlength >= 0) {	/* flush run */
 	flushoutrun(outrunlength);
     }
-#ifdef MFLOPPY
-    if (count_only) outbufp = 0;
-#endif
 
     if (outbufp) {
 	if (write(fd, outbuf, outbufp) != outbufp) {
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
+#if defined(UNIX)
 	    if (program_state.done_hup)
 		terminate(EXIT_FAILURE);
 	    else
@@ -696,12 +547,8 @@ register unsigned num;
     register unsigned char *bp = (unsigned char *)loc;
 
     if (!compressing) {
-#ifdef MFLOPPY
-	bytes_counted += num;
-	if (count_only) return;
-#endif
 	if ((unsigned) write(fd, loc, num) != num) {
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
+#if defined(UNIX)
 	    if (program_state.done_hup)
 		terminate(EXIT_FAILURE);
 	    else
@@ -783,11 +630,6 @@ register unsigned num;
 {
 	boolean failed;
 
-#ifdef MFLOPPY
-	bytes_counted += num;
-	if (count_only) return;
-#endif
-
 #ifdef UNIX
 	if (buffering) {
 	    if(fd != bw_fd)
@@ -798,15 +640,15 @@ register unsigned num;
 #endif /* UNIX */
 	{
 /* lint wants the 3rd arg of write to be an int; lint -p an unsigned */
-#if defined(BSD) || defined(ULTRIX)
+#if defined(BSD)
 	    failed = (write(fd, loc, (int)num) != (int)num);
-#else /* e.g. SYSV, __TURBOC__ */
+#else /* e.g. SYSV */
 	    failed = (write(fd, loc, num) != num);
 #endif
 	}
 
 	if (failed) {
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
+#if defined(UNIX)
 	    if (program_state.done_hup)
 		terminate(EXIT_FAILURE);
 	    else
@@ -1059,8 +901,6 @@ register int fd, mode;
 	    ffruit = 0;
 }
 
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-
 void
 free_percent_color_options(list_head)
 const struct percent_color_option *list_head;
@@ -1087,7 +927,6 @@ free_status_colors()
 	free_percent_color_options(pw_colors); pw_colors = NULL;
 	free_text_color_options(text_colors); text_colors = NULL;
 }
-#endif
 
 /* also called by prscore(); this probably belongs in dungeon.c... */
 void
@@ -1100,7 +939,6 @@ free_dungeons()
 	return;
 }
 
-#ifdef MENU_COLOR
 void
 free_menu_coloring()
 {
@@ -1108,30 +946,21 @@ free_menu_coloring()
 
     while (tmp) {
 	struct menucoloring *tmp2 = tmp->next;
-# ifdef MENU_COLOR_REGEX
 	(void) regfree(&tmp->match);
-# else
-	free(tmp->match);
-# endif
 	free(tmp);
 	tmp = tmp2;
     }
 }
-#endif /* MENU_COLOR */
 
 void
 freedynamicdata()
 {
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	free_status_colors();
-#endif
 	unload_qtlist();
 	free_invbuf();	/* let_to_name (invent.c) */
 	free_youbuf();	/* You_buf,&c (pline.c) */
 	msgpline_free();
-#ifdef MENU_COLOR
 	free_menu_coloring();
-#endif
 	tmp_at(DISP_FREEMEM, 0);	/* temporary display effects */
 #ifdef FREE_ALL_MEMORY
 # define freeobjchn(X)	(saveobjchn(0, X, FREE_SAVE),  X = 0)
@@ -1185,9 +1014,7 @@ freedynamicdata()
 	if (iflags.wc_font_menu) free(iflags.wc_font_menu);
 	if (iflags.wc_font_status) free(iflags.wc_font_status);
 	if (iflags.wc_tile_file) free(iflags.wc_tile_file);
-#ifdef AUTOPICKUP_EXCEPTIONS
 	free_autopickup_exceptions();
-#endif
 
 #endif	/* FREE_ALL_MEMORY */
 #ifdef USE_MERSENNE_TWISTER
@@ -1195,102 +1022,5 @@ freedynamicdata()
 #endif
 	return;
 }
-
-#ifdef MFLOPPY
-boolean
-swapin_file(lev)
-int lev;
-{
-	char to[PATHLEN], from[PATHLEN];
-
-	Sprintf(from, "%s%s", permbones, alllevels);
-	Sprintf(to, "%s%s", levels, alllevels);
-	set_levelfile_name(from, lev);
-	set_levelfile_name(to, lev);
-	if (iflags.checkspace) {
-		while (level_info[lev].size > freediskspace(to))
-			if (!swapout_oldest())
-				return FALSE;
-	}
-# ifdef WIZARD
-	if (wizard) {
-		pline("Swapping in `%s'.", from);
-		wait_synch();
-	}
-# endif
-	copyfile(from, to);
-	(void) unlink(from);
-	level_info[lev].where = ACTIVE;
-	return TRUE;
-}
-
-STATIC_OVL boolean
-swapout_oldest() {
-	char to[PATHLEN], from[PATHLEN];
-	int i, oldest;
-	long oldtime;
-
-	if (!ramdisk)
-		return FALSE;
-	for (i = 1, oldtime = 0, oldest = 0; i <= maxledgerno(); i++)
-		if (level_info[i].where == ACTIVE
-		&& (!oldtime || level_info[i].time < oldtime)) {
-			oldest = i;
-			oldtime = level_info[i].time;
-		}
-	if (!oldest)
-		return FALSE;
-	Sprintf(from, "%s%s", levels, alllevels);
-	Sprintf(to, "%s%s", permbones, alllevels);
-	set_levelfile_name(from, oldest);
-	set_levelfile_name(to, oldest);
-# ifdef WIZARD
-	if (wizard) {
-		pline("Swapping out `%s'.", from);
-		wait_synch();
-	}
-# endif
-	copyfile(from, to);
-	(void) unlink(from);
-	level_info[oldest].where = SWAPPED;
-	return TRUE;
-}
-
-STATIC_OVL void
-copyfile(from, to)
-char *from, *to;
-{
-# ifdef TOS
-
-	if (_copyfile(from, to))
-		panic("Can't copy %s to %s", from, to);
-# else
-	char buf[BUFSIZ];	/* this is system interaction, therefore
-				 * BUFSIZ instead of NetHack's BUFSZ */
-	int nfrom, nto, fdfrom, fdto;
-
-	if ((fdfrom = open(from, O_RDONLY | O_BINARY, FCMASK)) < 0)
-		panic("Can't copy from %s !?", from);
-	if ((fdto = open(to, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK)) < 0)
-		panic("Can't copy to %s", to);
-	do {
-		nfrom = read(fdfrom, buf, BUFSIZ);
-		nto = write(fdto, buf, nfrom);
-		if (nto != nfrom)
-			panic("Copyfile failed!");
-	} while (nfrom == BUFSIZ);
-	(void) close(fdfrom);
-	(void) close(fdto);
-# endif /* TOS */
-}
-
-void
-co_false()	    /* see comment in bones.c */
-{
-    count_only = FALSE;
-    return;
-}
-
-#endif /* MFLOPPY */
 
 /*save.c*/

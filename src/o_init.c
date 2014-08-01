@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)o_init.c	3.4	1999/12/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,7 +10,7 @@ STATIC_DCL void NDECL(shuffle_all);
 STATIC_DCL boolean FDECL(interesting_to_discover,(int));
 STATIC_DCL void FDECL(swap_armor,(int, int, int));
 
-static NEARDATA short disco[NUM_OBJECTS] = DUMMY;
+static short disco[NUM_OBJECTS] = DUMMY;
 
 #ifdef USE_TILES
 STATIC_DCL void NDECL(shuffle_tiles);
@@ -110,13 +109,9 @@ init_objects()
 {
 register int i, first, last, sum;
 register char oclass;
-#ifdef TEXTCOLOR
 # define COPY_OBJ_DESCR(o_dst,o_src) \
 			o_dst.oc_descr_idx = o_src.oc_descr_idx,\
 			o_dst.oc_color = o_src.oc_color
-#else
-# define COPY_OBJ_DESCR(o_dst,o_src) o_dst.oc_descr_idx = o_src.oc_descr_idx
-#endif
 
 	/* bug fix to prevent "initialization error" abort on Intel Xenix.
 	 * reported by mikew@semike

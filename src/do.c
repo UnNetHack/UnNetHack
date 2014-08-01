@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)do.c	3.4	2003/12/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -7,9 +6,7 @@
 #include "hack.h"
 #include "lev.h"
 
-#ifdef SINKS
 STATIC_DCL void FDECL(dosinkring, (struct obj *));
-#endif /* SINKS */
 
 STATIC_PTR int FDECL(drop, (struct obj *));
 STATIC_PTR int NDECL(wipeoff);
@@ -21,18 +18,14 @@ STATIC_DCL void NDECL(final_level);
 STATIC_DCL boolean NDECL(unique_item_check);
 STATIC_DCL void NDECL(levelport_monsters);
 
-static NEARDATA const char drop_types[] =
+static const char drop_types[] =
 	{ ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, 0 };
 
 /* 'd' command: drop one inventory item */
 int
 dodrop()
 {
-#ifndef GOLDOBJ
 	int result, i = (invent || u.ugold) ? 0 : (SIZE(drop_types) - 1);
-#else
-	int result, i = (invent) ? 0 : (SIZE(drop_types) - 1);
-#endif
 
 	if (*u.ushops) sellobj_state(SELL_DELIBERATE);
 	result = drop(getobj(&drop_types[i], "drop"));
@@ -280,7 +273,6 @@ doaltarobj(obj)  /* obj is an object dropped on an altar */
 	}
 }
 
-#ifdef SINKS
 /** Transforms the sink at the player's position into
  * a fountain, throne, altar or grave. */
 STATIC_OVL
@@ -505,7 +497,6 @@ giveback:
 	} else
 		useup(obj);
 }
-#endif
 
 /* some common tests when trying to drop or throw items */
 boolean
@@ -542,14 +533,12 @@ register const char *word;
 					body_part(HAND));
 		return(FALSE);
 	}
-#ifdef STEED
 	if (obj->owornmask & W_SADDLE) {
 		if (*word)
 			You("cannot %s %s you are sitting on.", word,
 				something);
 		return (FALSE);
 	}
-#endif
 	return(TRUE);
 }
 
@@ -589,22 +578,14 @@ register struct obj *obj;
 				mbodypart(u.ustuck, STOMACH));
 		}
 	} else {
-#ifdef SINKS
 	    if((obj->oclass == RING_CLASS || obj->otyp == MEAT_RING) &&
 			IS_SINK(levl[u.ux][u.uy].typ)) {
 		dosinkring(obj);
 		return(1);
 	    }
-#endif
 	    if (!can_reach_floor()) {
 		if(flags.verbose) You("drop %s.", doname(obj));
-#ifndef GOLDOBJ
 		if (obj->oclass != COIN_CLASS || obj == invent) freeinv(obj);
-#else
-		/* Ensure update when we drop gold objects */
-		if (obj->oclass == COIN_CLASS) flags.botl = 1;
-		freeinv(obj);
-#endif
 		hitfloor(obj);
 		return(1);
 	    }
@@ -623,16 +604,8 @@ register struct obj *obj;
 {
 	/* Tipped objects aren't considered carried, even if
 	 * their container is, so don't freeinv() it. */
-#ifndef GOLDOBJ
 	if ((carried(obj) && obj->oclass != COIN_CLASS)
 		|| obj == invent) freeinv(obj);
-#else
-	if (carried(obj)) {
-            /* Ensure update when we drop gold objects */
-            if (obj->oclass == COIN_CLASS) flags.botl = 1;
-            freeinv(obj);
-	}
-#endif
 	if (!u.uswallow) {
 	    if (ship_object(obj, u.ux, u.uy, FALSE)) return;
 	    if (IS_ALTAR(levl[u.ux][u.uy].typ))
@@ -750,14 +723,11 @@ int retry;
     int n, i, n_dropped = 0;
     long cnt;
     struct obj *otmp, *otmp2;
-#ifndef GOLDOBJ
     struct obj *u_gold = 0;
-#endif
     menu_item *pick_list;
     boolean all_categories = TRUE;
     boolean drop_everything = FALSE;
 
-#ifndef GOLDOBJ
     if (u.ugold) {
 	/* Hack: gold is not in the inventory, so make a gold object
 	   and put it at the head of the inventory list. */
@@ -768,7 +738,6 @@ int retry;
 	u_gold->nobj = invent;
 	invent = u_gold;
     }
-#endif
     if (retry) {
 	all_categories = (retry == -2);
     } else if (flags.menu_style == MENU_FULL) {
@@ -821,11 +790,9 @@ int retry;
 			/* same kludge as getobj(), for canletgo()'s use */
 			otmp->corpsenm = (int) cnt;	/* don't split */
 		    } else {
-#ifndef GOLDOBJ
 			if (otmp->oclass == COIN_CLASS)
 			    (void) splitobj(otmp, otmp->quan - cnt);
 			else
-#endif
 			    otmp = splitobj(otmp, cnt);
 		    }
 		}
@@ -836,7 +803,6 @@ int retry;
     }
 
  drop_done:
-#ifndef GOLDOBJ
     if (u_gold && invent && invent->oclass == COIN_CLASS) {
 	/* didn't drop [all of] it */
 	u_gold = invent;
@@ -845,12 +811,11 @@ int retry;
 	dealloc_obj(u_gold);
 	update_inventory();
     }
-#endif
     return n_dropped;
 }
 
 /* on a ladder, used in goto_level */
-static NEARDATA boolean at_ladder = FALSE;
+static boolean at_ladder = FALSE;
 
 int
 dodown()
@@ -860,7 +825,6 @@ dodown()
 		    (u.ux == sstairs.sx && u.uy == sstairs.sy && !sstairs.up)),
 		ladder_down = (u.ux == xdnladder && u.uy == ydnladder);
 
-#ifdef STEED
 	if (u.usteed && !u.usteed->mcanmove) {
 		pline("%s won't move!", Monnam(u.usteed));
 		return(0);
@@ -868,7 +832,6 @@ dodown()
 		pline("%s is still eating.", Monnam(u.usteed));
 		return(0);
 	} else
-#endif
 	if (Levitation) {
 	    if ((HLevitation & I_SPECIAL) || (ELevitation & W_ARTI)) {
 		/* end controlled levitation */
@@ -971,7 +934,6 @@ doup()
 		You_cant("go up here.");
 		return(0);
 	}
-#ifdef STEED
 	if (u.usteed && !u.usteed->mcanmove) {
 		pline("%s won't move!", Monnam(u.usteed));
 		return(0);
@@ -979,7 +941,6 @@ doup()
 		pline("%s is still eating.", Monnam(u.usteed));
 		return(0);
 	} else
-#endif
 	if(u.ustuck) {
 		You("are %s, and cannot go up.",
 			!u.uswallow ? "being held" : is_animal(u.ustuck->data) ?
@@ -1032,19 +993,9 @@ currentlevel_rewrite()
 		return -1;
 	}
 
-#ifdef MFLOPPY
-	if (!savelev(fd, ledger_no(&u.uz), COUNT_SAVE)) {
-		(void) close(fd);
-		delete_levelfile(ledger_no(&u.uz));
-		pline("UnNetHack is out of disk space for making levels!");
-		You("can save, quit, or continue playing.");
-		return -1;
-	}
-#endif
 	return fd;
 }
 
-#ifdef INSURANCE
 void
 save_currentstate()
 {
@@ -1062,7 +1013,6 @@ save_currentstate()
 	/* write out non-level state */
 	savestateinlock();
 }
-#endif
 
 /*
 static boolean
@@ -1073,10 +1023,6 @@ register xchar x, y;
 			 levl[x][y].typ != CORR) || MON_AT(x, y));
 }
 */
-
-#ifdef BLACKMARKET
-d_level new_dlevel = {0, 0};
-#endif
 
 void
 goto_level(newlevel, at_stairs, falling, portal)
@@ -1100,24 +1046,13 @@ boolean at_stairs, falling, portal;
 		newlevel->dlevel = dunlevs_in_dungeon(newlevel);
 	if (newdungeon && In_endgame(newlevel)) { /* 1st Endgame Level !!! */
 		if (u.uhave.amulet) {
-#ifdef RANDOMIZED_PLANES
-			pline("Well done, mortal!");
-			pline("But now thou must face the final Test...");
-			pline("Prove thyself worthy or perish!");
-		    assign_level(newlevel, get_first_elemental_plane());
-#else
 		    assign_level(newlevel, &earth_level);
-#endif
 		}
 		else return;
 	}
 	new_ledger = ledger_no(newlevel);
 	if (new_ledger <= 0)
 		done(ESCAPED);	/* in fact < 0 is impossible */
-
-#ifdef BLACKMARKET
-	assign_level(&new_dlevel, newlevel);
-#endif
 
 	/* Prevent the player from going past the first quest level unless
 	 * (s)he has been given the go-ahead by the leader.
@@ -1190,10 +1125,8 @@ boolean at_stairs, falling, portal;
 		level_info[ledger_no(&u.uz)].flags = 0;
 	}	
 
-#ifdef REINCARNATION
 	if (Is_rogue_level(newlevel) || Is_rogue_level(&u.uz))
 		assign_rogue_graphics(Is_rogue_level(newlevel));
-#endif
 #ifdef USE_TILES
 	substitute_tiles(newlevel);
 #endif
@@ -1298,14 +1231,10 @@ boolean at_stairs, falling, portal;
 		    You("fly down along the %s.",
 			at_ladder ? "ladder" : "stairs");
 		else if (u.dz &&
-#ifdef CONVICT
 		    (near_capacity() > UNENCUMBERED || (Punished &&
 		    ((uwep != uball) || ((P_SKILL(P_FLAIL) < P_BASIC))
             || !Role_if(PM_CONVICT)))
 		     || Fumbling)) {
-#else
-		    (near_capacity() > UNENCUMBERED || Punished || Fumbling)) {
-#endif /* CONVICT */
 		    You("fall down the %s.", at_ladder ? "ladder" : "stairs");
 		    if (Punished) {
 			drag_down();
@@ -1319,12 +1248,10 @@ boolean at_stairs, falling, portal;
 			    freeinv(uball);
 			}
 		    }
-#ifdef STEED
 		    /* falling off steed has its own losehp() call */
 		    if (u.usteed)
 			dismount_steed(DISMOUNT_FELL);
 		    else
-#endif
 			losehp(rnd(3), "falling downstairs", KILLED_BY);
 		    selftouch("Falling, you");
 		} else if (u.dz && at_ladder)
@@ -1368,16 +1295,12 @@ boolean at_stairs, falling, portal;
 
 	initrack();
 
-#ifdef RECORD_ACHIEVE
 #ifdef LIVELOGFILE
 	livelog_achieve_update();
 #endif
-#endif
 
 	if ((mtmp = m_at(u.ux, u.uy)) != 0
-#ifdef STEED
 		&& mtmp != u.usteed
-#endif
 		) {
 	    /* There's a monster at your target destination; it might be one
 	       which accompanied you--see mon_arrive(dogmove.c)--or perhaps
@@ -1427,20 +1350,15 @@ boolean at_stairs, falling, portal;
 	    if (Is_valley(&u.uz)) {
 		You("arrive at the Valley of the Dead...");
 		pline_The("odor of burnt flesh and decay pervades the air.");
-#ifdef MICRO
-		display_nhwindow(WIN_MESSAGE, FALSE);
-#endif
 		You_hear("groans and moans everywhere.");
 	    } else if (!In_sheol(&u.uz))
 		pline("It is hot here.  You smell smoke...");
 	    else
 		pline("It is freezing here.  You feel cold wind...");
 
-#ifdef RECORD_ACHIEVE
 	achieve.enter_gehennom = 1;
 #ifdef LIVELOGFILE
 	livelog_achieve_update();
-#endif
 #endif
 	}
 	else if (In_hell(&u.uz0) &&
@@ -1482,10 +1400,8 @@ boolean at_stairs, falling, portal;
 	    if (mesg) pline("%s", mesg);
 	}
 
-#ifdef REINCARNATION
 	if (new && Is_rogue_level(&u.uz))
 	    You("enter what seems to be an older, more primitive world.");
-#endif
 	if (new && Hallucination &&
 	    Role_if(PM_ARCHEOLOGIST) &&
 	    Is_juiblex_level(&u.uz))
@@ -1511,16 +1427,6 @@ boolean at_stairs, falling, portal;
 		}
 	}
 
-#ifdef ADVENT_CALENDAR
-	if ((getmonth()==12) && (getmday() < 25)) {
-		if (mk_advcal_portal())
-			You("smell chocolate!");
-	}
-	if (Is_advent_calendar(&u.uz)) {
-		fill_advent_calendar(FALSE);
-	}
-#endif
-
 	/* once Croesus is dead, his alarm doesn't work any more */
 	if (Is_knox(&u.uz) && (new || !mvitals[PM_CROESUS].died)) {
 		You("penetrated a high security area!");
@@ -1541,9 +1447,7 @@ boolean at_stairs, falling, portal;
 		You("annotated this level: %s", annotation);
 	}
 
-#ifdef INSURANCE
 	save_currentstate();
-#endif
 
 	/* assume this will always return TRUE when changing level */
 	(void) in_out_region(u.ux, u.uy);
@@ -1832,7 +1736,7 @@ int
 dowipe()
 {
 	if(u.ucreamed)  {
-		static NEARDATA char buf[39];
+		static char buf[39];
 
 		Sprintf(buf, "wiping off your %s", body_part(FACE));
 		set_occupation(wipeoff, buf, 0);
@@ -1876,9 +1780,7 @@ heal_legs()
 			flags.botl = 1;
 		}
 
-#ifdef STEED
 		if (!u.usteed)
-#endif
 		{
 			/* KMH, intrinsics patch */
 			if((EWounded_legs & BOTH_SIDES) == BOTH_SIDES) {

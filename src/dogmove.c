@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)dogmove.c	3.4	2002/09/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -45,7 +44,7 @@ register struct monst *mon;
 	return (struct obj *)0;
 }
 
-static NEARDATA const char nofetch[] = { BALL_CLASS, CHAIN_CLASS, ROCK_CLASS, 0 };
+static const char nofetch[] = { BALL_CLASS, CHAIN_CLASS, ROCK_CLASS, 0 };
 
 STATIC_OVL boolean FDECL(cursed_object_at, (int, int));
 
@@ -171,12 +170,8 @@ boolean devour;
 	/* It's a reward if it's DOGFOOD and the player dropped/threw it. */
 	/* We know the player had it if invlet is set -dlc */
 	if(dogfood(mtmp,obj) == DOGFOOD && obj->invlet)
-#ifdef LINT
-	    edog->apport = 0;
-#else
 	    edog->apport += (int)(200L/
 		((long)edog->dropdist + monstermoves - edog->droptime));
-#endif
 	if (mtmp->data == &mons[PM_RUST_MONSTER] && obj->oerodeproof) {
 	    /* The object's rustproofing is gone now */
 	    obj->oerodeproof = 0;
@@ -260,9 +255,7 @@ register struct edog *edog;
 	    } else if (monstermoves > edog->hungrytime + 750 || mtmp->mhp < 1) {
  dog_died:
 		if (mtmp->mleashed
-#ifdef STEED
 		    && mtmp != u.usteed
-#endif
 		    )
 		    Your("leash goes slack.");
 		else if (cansee(mtmp->mx, mtmp->my))
@@ -297,11 +290,7 @@ int udist;
 	/* if we are carrying sth then we drop it (perhaps near @) */
 	/* Note: if apport == 1 then our behaviour is independent of udist */
 	/* Use udist+1 so steed won't cause divide by zero */
-#ifndef GOLDOBJ
 	if(DROPPABLES(mtmp) || mtmp->mgold) {
-#else
-	if(DROPPABLES(mtmp)) {
-#endif
 	    if (!rn2(udist+1) || !rn2(edog->apport))
 		if(rn2(10) < edog->apport){
 		    relobj(mtmp, (int)mtmp->minvis, TRUE);
@@ -312,9 +301,7 @@ int udist;
 	} else {
 	    if((obj=level.objects[omx][omy]) && !index(nofetch,obj->oclass)
 			&& !Is_sokoprize(obj)
-#ifdef MAIL
 			&& obj->otyp != SCR_MAIL
-#endif
 									){
 		int edible = dogfood(mtmp, obj);
 
@@ -363,11 +350,9 @@ int after, udist, whappr;
 	xchar otyp;
 	int appr;
 
-#ifdef STEED
 	/* Steeds don't move on their own will */
 	if (mtmp == u.usteed)
 		return (-2);
-#endif
 
 	omx = mtmp->mx;
 	omy = mtmp->my;
@@ -533,7 +518,6 @@ register int after;	/* this is extra fast monster movement */
 	if (has_edog && dog_hunger(mtmp, edog)) return(2);	/* starved */
 
 	udist = distu(omx,omy);
-#ifdef STEED
 	/* Let steeds eat and maybe throw rider during Conflict */
 	if (mtmp == u.usteed) {
 	    if (Conflict && !resist(mtmp, RING_CLASS, 0, 0)) {
@@ -542,7 +526,6 @@ register int after;	/* this is extra fast monster movement */
 	    }
 	    udist = 1;
 	} else
-#endif
 	/* maybe we tamed him while being swallowed --jgm */
 	if (!udist) return(0);
 

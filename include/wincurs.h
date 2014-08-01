@@ -14,7 +14,6 @@ int orig_cursor;	/* Preserve initial cursor state */
 boolean counting;   /* Count window is active */
 
 
-#define TEXTCOLOR   /* Allow color */
 #define NHW_END 19
 #define OFF 0
 #define ON 1
@@ -32,9 +31,7 @@ boolean counting;   /* Count window is active */
 #define MAP_WIN     3
 #define NHWIN_MAX   4
 #define MESG_HISTORY_MAX   200
-#if !defined(__APPLE__) || !defined(NCURSES_VERSION)
 # define USE_DARKGRAY /* Allow "bright" black; delete if not visible */
-#endif	/* !__APPLE__ && !PDCURSES */
 #define CURSES_DARK_GRAY    17
 #define MAP_SCROLLBARS
 #ifdef PDCURSES
@@ -86,11 +83,7 @@ extern void curses_curs(winid wid, int x, int y);
 
 extern void curses_putstr(winid wid, int attr, const char *text);
 
-#ifdef FILE_AREAS
 extern void curses_display_file(const char *filearea,const char *filename,BOOLEAN_P must_exist);
-#else
-extern void curses_display_file(const char *filename,BOOLEAN_P must_exist);
-#endif
 
 extern void curses_start_menu(winid wid);
 
@@ -218,11 +211,7 @@ extern void curses_prehousekeeping(void);
 
 extern void curses_posthousekeeping(void);
 
-#ifdef FILE_AREAS
 extern void curses_view_file(const char *filearea, const char *filename, boolean must_exist);
-#else
-extern void curses_view_file(const char *filename, boolean must_exist);
-#endif
 
 extern void curses_rtrim(char *str);
 

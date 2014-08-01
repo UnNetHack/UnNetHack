@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)end.c	3.4	2003/03/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -30,7 +29,7 @@ static struct val_list { struct valuable_data *list; int size; } valuables[] = {
 
 #ifndef NO_SIGNAL
 STATIC_PTR void FDECL(done_intr, (int));
-# if defined(UNIX) || defined(VMS) || defined (__EMX__)
+# if defined(UNIX)
 static void FDECL(done_hangup, (int));
 # endif
 #endif
@@ -50,7 +49,7 @@ void FDECL(do_vanquished, (int, BOOLEAN_P));
 STATIC_DCL void FDECL(list_genocided, (int, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL boolean FDECL(should_query_disclose_option, (int,char *));
 
-#if defined(__BEOS__) || defined(MICRO) || defined(WIN32) || defined(OS2)
+#if defined(WIN32)
 extern void FDECL(nethack_exit,(int));
 #else
 #define nethack_exit exit
@@ -58,9 +57,6 @@ extern void FDECL(nethack_exit,(int));
 
 #define done_stopprint program_state.stopprint
 
-#ifdef AMIGA
-# define NH_abort()	Abort(0)
-#else
 # ifdef SYSV
 # define NH_abort()	(void) abort()
 # else
@@ -70,12 +66,11 @@ extern void FDECL(nethack_exit,(int));
 # define NH_abort()	abort()
 #  endif
 # endif
-#endif
 
 /*
  * The order of these needs to match the macros in hack.h.
  */
-static NEARDATA const char *deaths[] = {		/* the array of death */
+static const char *deaths[] = {		/* the array of death */
 	"died", "choked", "poisoned", "starvation", "drowning",
 	"burning", "dissolving under the heat and pressure",
 	"crushed", "turned to stone", "turned into slime",
@@ -84,12 +79,10 @@ static NEARDATA const char *deaths[] = {		/* the array of death */
 	"disintegrated",
 #endif
 	"panic", "trickery",
-#ifdef ASTRAL_ESCAPE
 	"quit", "escaped", "defied the gods and escaped", "ascended"
-#endif
 };
 
-static NEARDATA const char *ends[] = {		/* "when you..." */
+static const char *ends[] = {		/* "when you..." */
 	"died", "choked", "were poisoned", "starved", "drowned",
 	"burned", "dissolved in the lava",
 	"were crushed", "turned to stone", "turned into slime",
@@ -98,9 +91,7 @@ static NEARDATA const char *ends[] = {		/* "when you..." */
 	"were disintegrated",
 #endif
 	"panicked", "were tricked",
-#ifdef ASTRAL_ESCAPE
 	"quit", "escaped", "defied the gods and escaped", "ascended"
-#endif
 };
 
 extern const char * const killed_by_prefix[];	/* from topten.c */
@@ -145,18 +136,10 @@ done2()
 		}
 		return 0;
 	}
-#if defined(WIZARD) && (defined(UNIX) || defined(VMS) || defined(LATTICE))
+#if defined(WIZARD) && defined(UNIX)
 	if(wizard) {
 	    int c;
-# ifdef VMS
-	    const char *tmp = "Enter debugger?";
-# else
-#  ifdef LATTICE
-	    const char *tmp = "Create SnapShot?";
-#  else
 	    const char *tmp = "Dump core?";
-#  endif
-# endif
 	    if ((c = ynq(tmp)) == 'y') {
 		(void) signal(SIGINT, (SIG_RET_TYPE) done1);
 		exit_nhwindows((char *)0);
@@ -164,10 +147,8 @@ done2()
 	    } else if (c == 'q') done_stopprint++;
 	}
 #endif
-#ifndef LINT
 	killer = 0;
 	done(QUIT);
-#endif
 	return 0;
 }
 
@@ -179,13 +160,13 @@ int sig_unused;
 {
 	done_stopprint++;
 	(void) signal(SIGINT, SIG_IGN);
-# if defined(UNIX) || defined(VMS)
+# if defined(UNIX)
 	(void) signal(SIGQUIT, SIG_IGN);
 # endif
 	return;
 }
 
-# if defined(UNIX) || defined(VMS) || defined(__EMX__)
+# if defined(UNIX) 
 static void
 done_hangup(sig)	/* signal() handler */
 int sig;
@@ -303,7 +284,7 @@ panic VA_DECL(const char *, str)
 		  !program_state.something_worth_saving ?
 		  "Program initialization has failed." :
 		  "Suddenly, the dungeon collapses.");
-#if defined(WIZARD) && !defined(MICRO)
+#if defined(WIZARD)
 # if defined(NOTIFY_NETHACK_BUGS)
 	if (!wizard)
 	    raw_printf("Report the following error to \"%s\".",
@@ -313,11 +294,7 @@ panic VA_DECL(const char *, str)
 # else
 	if (!wizard)
 	    raw_printf("Report error to \"%s\"%s.",
-#  ifdef WIZARD_NAME	/*(KR1ED)*/
-			WIZARD_NAME,
-#  else
 			WIZARD,
-#  endif
 			!program_state.something_worth_saving ? "" :
 			" and it may be possible to rebuild.");
 # endif
@@ -332,7 +309,7 @@ panic VA_DECL(const char *, str)
 #ifdef LIVELOGFILE
 	livelog_game_action("panicked");
 #endif
-#if defined(WIZARD) && (defined(UNIX) || defined(VMS) || defined(LATTICE) || defined(WIN32))
+#if defined(WIZARD) && (defined(UNIX) || defined(WIN32))
 	if (wizard)
 	    NH_abort();	/* generate core dump */
 #endif
@@ -739,11 +716,9 @@ die:
 	   it's gone prior to inventory disclosure and creation of bones data */
 	inven_inuse(TRUE);
 
-#ifdef RECORD_REALTIME
 	/* Update the realtime counter to reflect the playtime of the current
 	 * game. */
 	realtime_data.realtime = get_realtime();
-#endif /* RECORD_REALTIME */
 
 	/* Sometimes you die on the first move.  Life's not fair.
 	 * On those rare occasions you get hosed immediately, go out
@@ -761,7 +736,7 @@ die:
 	if (have_windows) wait_synch();	/* flush screen output */
 #ifndef NO_SIGNAL
 	(void) signal(SIGINT, (SIG_RET_TYPE) done_intr);
-# if defined(UNIX) || defined(VMS) || defined (__EMX__)
+# if defined(UNIX)
 	(void) signal(SIGQUIT, (SIG_RET_TYPE) done_intr);
 	(void) signal(SIGHUP, (SIG_RET_TYPE) done_hangup);
 # endif
@@ -809,9 +784,7 @@ die:
 			Strcpy(kilbuf, "quit while already on Charon's boat");
 		}
 	}
-#ifdef ASTRAL_ESCAPE
 	if (how == ESCAPED || how == DEFIED || how == PANICKED)
-#endif
 		killer_format = NO_KILLER_PREFIX;
 
 	if (how != PANICKED) {
@@ -839,13 +812,8 @@ die:
 	    long tmp;
 	    int deepest = deepest_lev_reached(FALSE);
 
-#ifndef GOLDOBJ
 	    umoney = u.ugold;
 	    tmp = u.ugold0;
-#else
-	    umoney = money_cnt(invent);
-	    tmp = u.umoney0;
-#endif
 	    umoney += hidden_gold();	/* accumulate gold from containers */
 	    tmp = umoney - tmp;		/* net gain */
 
@@ -857,9 +825,7 @@ die:
 	    u.urscore += 50L * (long)(deepest - 1);
 	    if (deepest > 20)
 		u.urscore += 1000L * (long)((deepest > 30) ? 10 : deepest - 20);
-#ifdef ASTRAL_ESCAPE
 	    if (how == ASCENDED || how == DEFIED) u.urscore *= 2L;
-#endif
 	}
 
 	if (bones_ok) {
@@ -874,11 +840,7 @@ die:
 
 	/* update gold for the rip output, which can't use hidden_gold()
 	   (containers will be gone by then if bones just got saved...) */
-#ifndef GOLDOBJ
 	u.ugold = umoney;
-#else
-	done_money = umoney;
-#endif
 
 #ifdef DUMP_LOG
 	dumpoverview();
@@ -891,10 +853,8 @@ die:
 	dump_html("<div class=\"nh_game_information\">\n", "");
 	dump_line("  Started: ", get_formatted_time(u.ubirthday, DUMP_DATE_FORMAT));
 	dump_line("  Ended:   ", get_formatted_time(u.udeathday, DUMP_DATE_FORMAT));
-#ifdef RECORD_REALTIME
 	Sprintf(pbuf, "  Play time: %s", iso8601_duration(realtime_data.realtime));
 	dump_line(pbuf,"");
-#endif
 	dump_html("</div>\n", "");
 	dump("", "");
 
@@ -946,9 +906,7 @@ die:
 	dump_blockquote_start();
 	dump_line("", pbuf);
 
-#ifdef ASTRAL_ESCAPE
 	if (how == ESCAPED || how == DEFIED || how == ASCENDED) {
-#endif
 	    register struct monst *mtmp;
 	    register struct obj *otmp;
 	    register struct val_list *val;
@@ -989,11 +947,9 @@ die:
 	    }
 		Sprintf(eos(pbuf), "%s with %ld point%s,",
 			how==ASCENDED ? "went to your reward" :
-#ifdef ASTRAL_ESCAPE
 					(how==DEFIED ?
 					"defied the Gods and escaped" :
 					"escaped from the dungeon"),
-#endif
 			u.urscore, plur(u.urscore));
 	    dump_line("", pbuf);
 	    if (!done_stopprint) {
@@ -1213,9 +1169,6 @@ void
 terminate(status)
 int status;
 {
-#ifdef MAC
-	getreturn("to exit");
-#endif
 	/* don't bother to try to release memory if we're in panic mode, to
 	   avoid trouble in case that happens to be due to memory problems */
 	if (!program_state.panicking) {

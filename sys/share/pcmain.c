@@ -1,8 +1,7 @@
-/*	SCCS Id: @(#)pcmain.c	3.4	2002/08/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* main.c - MSDOS, OS/2, ST, Amiga, and NT NetHack */
+/* main.c -NT NetHack */
 
 #include "hack.h"
 #include "dlb.h"
@@ -13,20 +12,10 @@
 
 #include <ctype.h>
 
-#if !defined(AMIGA) && !defined(GNUDOS)
 #include <sys\stat.h>
-#else
-# ifdef GNUDOS
-#include <sys/stat.h>
-# endif
-#endif
 
 #ifdef WIN32
 #include "win32api.h"			/* for GetModuleFileName */
-#endif
-
-#ifdef __DJGPP__
-#include <unistd.h>			/* for getcwd() prototype */
 #endif
 
 #ifdef OVL0
@@ -38,22 +27,10 @@
 
 SHARED_DCL char orgdir[PATHLEN];	/* also used in pcsys.c, amidos.c */
 
-#ifdef TOS
-boolean run_from_desktop = TRUE;	/* should we pause before exiting?? */
-# ifdef __GNUC__
-long _stksize = 16*1024;
-# endif
-#endif
-
-#ifdef AMIGA
-extern int bigscreen;
-void NDECL( preserve_icon );
-#endif
-
 STATIC_DCL void FDECL(process_options,(int argc,char **argv));
 STATIC_DCL void NDECL(nhusage);
 
-#if defined(MICRO) || defined(WIN32) || defined(OS2)
+#if defined(WIN32)
 extern void FDECL(nethack_exit,(int));
 #else
 #define nethack_exit exit
@@ -67,25 +44,11 @@ extern boolean getreturn_enabled;	/* from sys/share/pcsys.c */
 extern void NDECL(mswin_destroy_reg);
 #endif
 
-#ifdef EXEPATH
-STATIC_DCL char *FDECL(exepath,(char *));
-#endif
-
 #ifdef OVL0
 int FDECL(main, (int,char **));
 #endif
 
 extern void FDECL(pcmain, (int,char **));
-
-
-#if defined(__BORLANDC__) && !defined(_WIN32)
-void NDECL( startup );
-# ifdef OVLB
-unsigned _stklen = STKSIZ;
-# else
-extern unsigned _stklen;
-# endif
-#endif
 
 #ifdef OVL0
 /* If the graphics version is built, we don't need a main; it is skipped
@@ -122,26 +85,12 @@ char *argv[];
 #if defined(WIN32)
 	char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
 #endif
-#ifdef NOCWD_ASSUMPTIONS
 	char failbuf[BUFSZ];
-#endif
 
-#if defined(__BORLANDC__) && !defined(_WIN32)
-	startup();
-#endif
-
-#ifdef TOS
-	long clock_time;
-	if (*argv[0]) { 		/* only a CLI can give us argv[0] */
-		hname = argv[0];
-		run_from_desktop = FALSE;
-	} else
-#endif
-		hname = "UnNetHack";      /* used for syntax messages */
+	hname = "UnNetHack";      /* used for syntax messages */
 
 	choose_windows(DEFAULT_WINDOW_SYS);
 
-#if !defined(AMIGA) && !defined(GNUDOS)
 	/* Save current directory and make sure it gets restored when
 	 * the game is exited.
 	 */
@@ -150,19 +99,13 @@ char *argv[];
 # ifndef NO_SIGNAL
 	signal(SIGINT, (SIG_RET_TYPE) nethack_exit);	/* restore original directory */
 # endif
-#endif /* !AMIGA && !GNUDOS */
 
 	dir = nh_getenv("NETHACKDIR");
 	if (dir == (char *)0)
 		dir = nh_getenv("HACKDIR");
-#ifdef EXEPATH
-	if (dir == (char *)0)
-		dir = exepath(argv[0]);
-#endif
 	if (dir != (char *)0) {
 		(void) strncpy(hackdir, dir, PATHLEN - 1);
 		hackdir[PATHLEN-1] = '\0';
-#ifdef NOCWD_ASSUMPTIONS
 		{
 		    int prefcnt;
 
@@ -172,39 +115,17 @@ char *argv[];
 		    for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++)
 			fqn_prefix[prefcnt] = fqn_prefix[0];
 		}
-#endif
-#ifdef CHDIR
-		chdirx (dir, 1);
-#endif
 	}
-#ifdef AMIGA
-# ifdef CHDIR
-	/*
-	 * If we're dealing with workbench, change the directory.  Otherwise
-	 * we could get "Insert disk in drive 0" messages. (Must be done
-	 * before initoptions())....
-	 */
-	if(argc == 0)
-		chdirx(HACKDIR, 1);
-# endif
-	ami_wininit_data();
-#endif
 	initoptions();
 
-#ifdef NOCWD_ASSUMPTIONS
 	if (!validate_prefix_locations(failbuf)) {
 		raw_printf("Some invalid directory locations were specified:\n\t%s\n",
 				failbuf);
 		 nethack_exit(EXIT_FAILURE);
 	}
-#endif
 
-#if defined(TOS) && defined(TEXTCOLOR)
-	if (iflags.BIOS && iflags.use_color)
-		set_colors();
-#endif
 	if (!hackdir[0])
-#if !defined(LATTICE) && !defined(AMIGA)
+#if !defined(LATTICE)
 		Strcpy(hackdir, orgdir);
 #else
 		Strcpy(hackdir, HACKDIR);
@@ -235,9 +156,6 @@ char *argv[];
 		 */
 		if (!strncmp(argv[1], "-s", 2)) {
 #if !defined(MSWIN_GRAPHICS)
-# if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-			chdirx(hackdir,0);
-# endif
 			prscore(argc, argv);
 #else
 			raw_printf("-s is not supported for the Graphical Interface\n");
@@ -262,37 +180,18 @@ char *argv[];
 	/*
 	 * It seems you really want to play.
 	 */
-#ifdef TOS
-	if (comp_times((long)time(&clock_time)))
-		error("Your clock is incorrectly set!");
-#endif
 	u.uhp = 1;	/* prevent RIP on early quits */
 	u.ux = 0;	/* prevent flush_screen() */
 
 	/* chdir shouldn't be called before this point to keep the
 	 * code parallel to other ports.
 	 */
-#if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-	chdirx(hackdir,1);
-#endif
 
-#ifdef MSDOS
-	process_options(argc, argv);
-	init_nhwindows(&argc,argv);
-#else
 	init_nhwindows(&argc,argv);
 	process_options(argc, argv);
-#endif
 
 #ifdef WIN32CON
 	toggle_mouse_support();	/* must come after process_options */
-#endif
-
-#ifdef MFLOPPY
-	set_lock_and_bones();
-# ifndef AMIGA
-	copybones(FROMPERM);
-# endif
 #endif
 
 	if (!*plname)
@@ -302,11 +201,7 @@ char *argv[];
 				/* accepts any suffix */
 #ifdef WIZARD
 	if (wizard) {
-# ifdef KR1ED
-		if(!strcmp(plname, WIZARD_NAME))
-# else
 		if(!strcmp(plname, WIZARD))
-# endif
 			Strcpy(plname, "wizard");
 		else {
 			wizard = FALSE;
@@ -340,20 +235,12 @@ char *argv[];
 # endif
 	getlock();
 #else   /* What follows is !PC_LOCKING */
-# ifdef AMIGA /* We'll put the bones & levels in the user specified directory -jhsa */
-	Strcat(lock,plname);
-	Strcat(lock,".99");
-# else
-#  ifndef MFLOPPY
 	/* I'm not sure what, if anything, is left here, but MFLOPPY has
 	 * conflicts with set_lock_and_bones() in files.c.
 	 */
 	Strcpy(lock,plname);
 	Strcat(lock,".99");
 	regularize(lock);	/* is this necessary? */
-				/* not compatible with full path a la AMIGA */
-#  endif
-# endif
 #endif	/* PC_LOCKING */
 
 	/* Set up level 0 file to keep the game state.
@@ -370,9 +257,6 @@ char *argv[];
 		write(fd, (genericptr_t) &hackpid, sizeof(hackpid));
 		close(fd);
 	}
-#ifdef MFLOPPY
-	level_info[0].where = ACTIVE;
-#endif
 
 	/*
 	 * Initialisation of the boundaries of the mazes
@@ -450,9 +334,6 @@ not_recovered:
 #ifndef NO_SIGNAL
 	(void) signal(SIGINT, SIG_IGN);
 #endif
-#ifdef OS2
-	gettty(); /* somehow ctrl-P gets turned back on during startup ... */
-#endif
 	return;
 }
 
@@ -510,7 +391,6 @@ char *argv[];
 			} else
 				raw_print("Player name expected after -u");
 			break;
-#ifndef AMIGA
 		case 'I':
 		case 'i':
 			if (!strncmpi(argv[0]+1, "IBM", 3))
@@ -521,7 +401,6 @@ char *argv[];
 			if (!strncmpi(argv[0]+1, "DEC", 3))
 				switch_graphics(DEC_GRAPHICS);
 			break;
-#endif
 		case 'g':
 			if (argv[0][2]) {
 			    if ((i = str2gend(&argv[0][2])) >= 0)
@@ -555,24 +434,6 @@ char *argv[];
 			    	flags.initrace = i;
 			}
 			break;
-#ifdef MFLOPPY
-# ifndef AMIGA
-		/* Player doesn't want to use a RAM disk
-		 */
-		case 'R':
-			ramdisk = FALSE;
-			break;
-# endif
-#endif
-#ifdef AMIGA
-			/* interlaced and non-interlaced screens */
-		case 'L':
-			bigscreen = 1;
-			break;
-		case 'l':
-			bigscreen = -1;
-			break;
-#endif
 		case '@':
 			flags.randomall = 1;
 			break;
@@ -614,17 +475,7 @@ nhusage()
 #ifdef NEWS
 	ADD_USAGE(" [-n]");
 #endif
-#ifndef AMIGA
 	ADD_USAGE(" [-I] [-i] [-d]");
-#endif
-#ifdef MFLOPPY
-# ifndef AMIGA
-	ADD_USAGE(" [-R]");
-# endif
-#endif
-#ifdef AMIGA
-	ADD_USAGE(" [-[lL]]");
-#endif
 	if (!iflags.window_inited)
 		raw_printf("%s\n",buf1);
 	else
@@ -632,83 +483,19 @@ nhusage()
 #undef ADD_USAGE
 }
 
-#ifdef CHDIR
-void
-chdirx(dir, wr)
-char *dir;
-boolean wr;
-{
-# ifdef AMIGA
-	static char thisdir[] = "";
-# else
-	static char thisdir[] = ".";
-# endif
-	if(dir && chdir(dir) < 0) {
-		error("Cannot chdir to %s.", dir);
-	}
-
-# ifndef AMIGA
-	/* Change the default drive as well.
-	 */
-	chdrive(dir);
-# endif
-
-	/* warn the player if we can't write the record file */
-	/* perhaps we should also test whether . is writable */
-	/* unfortunately the access system-call is worthless */
-	if (wr) check_recordfile(dir ? dir : thisdir);
-}
-#endif /* CHDIR */
 #endif /*OVL1*/
 #ifdef OVLB
 
 #ifdef PORT_HELP
-# if defined(MSDOS) || defined(WIN32)
+# if defined(WIN32)
 void
 port_help()
 {
     /* display port specific help file */
     display_file( PORT_HELP, 1 );
 }
-# endif /* MSDOS || WIN32 */
+# endif /* WIN32 */
 #endif /* PORT_HELP */
 
-#ifdef EXEPATH
-# ifdef __DJGPP__
-#define PATH_SEPARATOR '/'
-# else
-#define PATH_SEPARATOR '\\'
-# endif
-
-#define EXEPATHBUFSZ 256
-char exepathbuf[EXEPATHBUFSZ];
-
-char *exepath(str)
-char *str;
-{
-	char *tmp, *tmp2;
-	int bsize;
-
-	if (!str) return (char *)0;
-	bsize = EXEPATHBUFSZ;
-	tmp = exepathbuf;
-# ifndef WIN32
-	Strcpy (tmp, str);
-# else
-	#ifdef UNICODE
-	{
-		TCHAR wbuf[BUFSZ];
-		GetModuleFileName((HANDLE)0, wbuf, BUFSZ);
-		WideCharToMultiByte(CP_ACP, 0, wbuf, -1, tmp, bsize, NULL, NULL);
-	}
-	#else
-		*(tmp + GetModuleFileName((HANDLE)0, tmp, bsize)) = '\0';
-	#endif
-# endif
-	tmp2 = strrchr(tmp, PATH_SEPARATOR);
-	if (tmp2) *tmp2 = '\0';
-	return tmp;
-}
-#endif /* EXEPATH */
 #endif /*OVLB*/
 /*pcmain.c*/

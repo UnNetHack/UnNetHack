@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)do_name.c	3.4	2003/01/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -149,14 +148,9 @@ const char *goal;
     }
     cx = cc->x;
     cy = cc->y;
-#ifdef CLIPPING
     cliparound(cx, cy);
-#endif
     curs(WIN_MAP, cx,cy);
     flush_screen(0);
-#ifdef MAC
-    lock_mouse_cursor(TRUE);
-#endif
     for (;;) {
 	c = nh_poskey(&tx, &ty, &sidx);
 	if (c == '\033') {
@@ -295,15 +289,10 @@ const char *goal;
 	    break;
 	}
     nxtc:	;
-#ifdef CLIPPING
 	cliparound(cx, cy);
-#endif
 	curs(WIN_MAP,cx,cy);
 	flush_screen(0);
     }
-#ifdef MAC
-    lock_mouse_cursor(FALSE);
-#endif
     if (msg_given) clear_nhwindow(WIN_MESSAGE);
     cc->x = cx;
     cc->y = cy;
@@ -363,18 +352,14 @@ do_mname()
 	cy = cc.y;
 
 	if (cx == u.ux && cy == u.uy) {
-#ifdef STEED
 	    if (u.usteed && canspotmon(u.usteed))
 		mtmp = u.usteed;
 	    else {
-#endif
 		pline("This %s creature is called %s and cannot be renamed.",
 		beautiful(),
 		plname);
 		return(0);
-#ifdef STEED
 	    }
-#endif
 	} else
 	    mtmp = m_at(cx, cy);
 
@@ -557,7 +542,7 @@ const char *name;
 	return obj;
 }
 
-static NEARDATA const char callable[] = {
+static const char callable[] = {
 	SCROLL_CLASS, POTION_CLASS, WAND_CLASS, RING_CLASS, AMULET_CLASS,
 	GEM_CLASS, SPBOOK_CLASS, ARMOR_CLASS, TOOL_CLASS, 0 };
 
@@ -565,30 +550,22 @@ int
 ddocall()
 {
 	register struct obj *obj;
-#ifdef REDO
 	char	ch;
-#endif
 	char allowall[2];
 
 	switch(
-#ifdef REDO
 		ch =
-#endif
 		ynq("Name an individual object?")) {
 	case 'q':
 		break;
 	case 'y':
-#ifdef REDO
 		savech(ch);
-#endif
 		allowall[0] = ALL_CLASSES; allowall[1] = '\0';
 		obj = getobj(allowall, "name");
 		if(obj) do_oname(obj);
 		break;
 	default :
-#ifdef REDO
 		savech(ch);
-#endif
 		obj = getobj(callable, "call");
 		if (obj) {
 			/* behave as if examining it in inventory;
@@ -703,11 +680,7 @@ int suppress;
  */
 boolean called;
 {
-#ifdef LINT	/* static char buf[BUFSZ]; */
-	char buf[BUFSZ];
-#else
 	static char buf[BUFSZ];
-#endif
 	struct permonst *mdat = mtmp->data;
 	boolean do_hallu, do_invis, do_it, do_saddle;
 	boolean name_at_start, has_adjectives;
@@ -723,9 +696,7 @@ boolean called;
 	do_it = !canspotmon(mtmp) && 
 	    article != ARTICLE_YOUR &&
 	    !program_state.gameover &&
-#ifdef STEED
 	    mtmp != u.usteed &&
-#endif
 	    !(u.uswallow && mtmp == u.ustuck) &&
 	    !(suppress & SUPPRESS_IT);
 	do_saddle = !(suppress & SUPPRESS_SADDLE);
@@ -762,9 +733,6 @@ boolean called;
 	 * none of this applies.
 	 */
 	if (mtmp->isshk && !do_hallu 
-#ifdef BLACKMARKET
-		&& mtmp->data != &mons[PM_ONE_EYED_SAM]
-#endif /* BLACKMARKET */
 		) {
 	    if (adjective && article == ARTICLE_THE) {
 		/* pathological case: "the angry Asidonhopo the blue dragon"
@@ -789,11 +757,9 @@ boolean called;
 	    Strcat(strcat(buf, adjective), " ");
 	if (do_invis)
 	    Strcat(buf, "invisible ");
-#ifdef STEED
 	if (do_saddle && (mtmp->misc_worn_check & W_SADDLE) &&
 	    !Blind && !Hallucination)
 	    Strcat(buf, "saddled ");
-#endif
 	if (buf[0] != 0)
 	    has_adjectives = TRUE;
 	else
@@ -947,10 +913,8 @@ struct monst *mtmp;
 
 	prefix = mtmp->mtame ? ARTICLE_YOUR : ARTICLE_THE;
 	suppression_flag = (mtmp->mnamelth
-#ifdef STEED
 			    /* "saddled" is redundant when mounted */
 			    || mtmp == u.usteed
-#endif
 			    ) ? SUPPRESS_SADDLE : 0;
 
 	return x_monnam(mtmp, prefix, (char *)0, suppression_flag, FALSE);
@@ -1266,7 +1230,6 @@ rndmonnam()
 	return mons[name].mname;
 }
 
-#ifdef REINCARNATION
 const char *
 roguename() /* Name of a Rogue player */
 {
@@ -1284,9 +1247,8 @@ roguename() /* Name of a Rogue player */
 	return rn2(3) ? (rn2(2) ? "Michael Toy" : "Kenneth Arnold")
 		: "Glenn Wichman";
 }
-#endif /* REINCARNATION */
 
-static NEARDATA const char * const hcolors[] = {
+static const char * const hcolors[] = {
 	"ultraviolet", "infrared", "bluish-orange",
 	"reddish-green", "dark white", "light black", "sky blue-pink",
 	"salty", "sweet", "sour", "bitter", "umami",

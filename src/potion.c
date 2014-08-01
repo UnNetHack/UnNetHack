@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)potion.c	3.4	2002/10/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,8 +5,8 @@
 
 boolean notonhead = FALSE;
 
-static NEARDATA int nothing, unkn;
-static NEARDATA const char beverages[] = { POTION_CLASS, 0 };
+static int nothing, unkn;
+static const char beverages[] = { POTION_CLASS, 0 };
 
 STATIC_DCL long FDECL(itimeout, (long));
 STATIC_DCL long FDECL(itimeout_incr, (long,int));
@@ -88,11 +87,9 @@ boolean talk;
 	}
 	if (xtime && !old) {
 		if (talk) {
-#ifdef STEED
 			if (u.usteed)
 				You("wobble in the saddle.");
 			else
-#endif
 			You("%s...", stagger(youmonst.data, "stagger"));
 		}
 	}
@@ -300,8 +297,7 @@ long mask;	/* nonzero if resistance status should change by mask */
 		see_traps();
 	    }
 
-	    /* for perm_inv and anything similar
-	    (eg. Qt windowport's equipped items display) */
+	    /* for perm_inv and anything similar */
 	    update_inventory();
 
 	    flags.botl = 1;
@@ -350,7 +346,6 @@ dodrink()
 			return 1;
 		}
 	}
-#ifdef SINKS
 	/* Or a kitchen sink? */
 	if (IS_SINK(levl[u.ux][u.uy].typ)) {
 		if (yn("Drink from the sink?") == 'y') {
@@ -358,7 +353,6 @@ dodrink()
 			return 1;
 		}
 	}
-#endif
 
 	/* Or are you surrounded by water? */
 	if (Underwater) {
@@ -612,10 +606,8 @@ peffects(otmp)
 		else {
 		    if (Levitation || Is_airlevel(&u.uz)||Is_waterlevel(&u.uz))
 			You("are motionlessly suspended.");
-#ifdef STEED
 		    else if (u.usteed)
 			You("are frozen in place!");
-#endif
 		    else
 			Your("%s are frozen to the %s!",
 			     makeplural(body_part(FOOT)), surface(u.ux, u.uy));
@@ -748,9 +740,7 @@ peffects(otmp)
 		break;
 	case POT_SPEED:
 		if(Wounded_legs && !otmp->cursed
-#ifdef STEED
 		   && !u.usteed	/* heal_legs() would heal steeds legs */
-#endif
 						) {
 			heal_legs();
 			unkn++;
@@ -783,11 +773,7 @@ peffects(otmp)
 			    const char *riseup ="rise up, through the %s!";
 			    if(ledger_no(&u.uz) == 1) {
 			        You(riseup, ceiling(u.ux,u.uy));
-#ifdef RANDOMIZED_PLANES
-				goto_level(get_first_elemental_plane(), FALSE, FALSE, FALSE);
-#else
 				goto_level(&earth_level, FALSE, FALSE, FALSE);
-#endif
 			    } else {
 			        register int newlev = depth(&u.uz)-1;
 				d_level newlevel;
@@ -1690,21 +1676,14 @@ register struct obj *obj;
 		}
 		if (obj->odiluted) {
 			obj->odiluted = 0;
-#ifdef UNIXPC
-			obj->blessed = FALSE;
-			obj->cursed = FALSE;
-#else
 			obj->blessed = obj->cursed = FALSE;
-#endif
 			obj->otyp = POT_WATER;
 		} else obj->odiluted++;
 		update_inventory();
 		return TRUE;
 	    case SCROLL_CLASS:
 		if (obj->otyp != SCR_BLANK_PAPER && obj->otyp != SCR_FLOOD
-#ifdef MAIL
 		    && obj->otyp != SCR_MAIL
-#endif
 		    ) {
 			if (!Blind) {
 				boolean oq1 = obj->quan == 1L;
@@ -1794,11 +1773,9 @@ dodip()
 		if (yn(qbuf) == 'y') {
 		    if (Levitation) {
 			floating_above(tmp);
-#ifdef STEED
 		    } else if (u.usteed && !is_swimmer(u.usteed->data) &&
 			    P_SKILL(P_RIDING) < P_BASIC) {
 			rider_cant_reach(); /* not skilled enough to reach */
-#endif
 		    } else {
 			(void) get_wet(obj);
 			if (obj->otyp == POT_ACID) useup(obj);

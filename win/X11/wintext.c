@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)wintext.c	3.4	1996/04/05	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -32,9 +31,7 @@
 #include "winX.h"
 #include "xwindow.h"
 
-#ifdef GRAPHIC_TOMBSTONE
 #include <X11/xpm.h>
-#endif
 
 
 #define TRANSIENT_TEXT	/* text window is a transient window (no positioning) */
@@ -44,14 +41,12 @@ static const char text_translations[] =
      <BtnDown>: dismiss_text()\n\
      <Key>: key_dismiss_text()";
 
-#ifdef GRAPHIC_TOMBSTONE
 static const char rip_translations[] =
     "#override\n\
      <BtnDown>: rip_dismiss_text()\n\
      <Key>: rip_dismiss_text()";
 
 static Widget FDECL(create_ripout_widget, (Widget));
-#endif
 
 /*ARGSUSED*/
 void
@@ -116,7 +111,6 @@ key_dismiss_text(w, event, params, num_params)
     if (ch) dismiss_text(w, event, params, num_params);
 }
 
-#ifdef GRAPHIC_TOMBSTONE
 /* Dismiss from clicking on rip image. */
 void
 rip_dismiss_text(w, event, params, num_params)
@@ -127,7 +121,6 @@ rip_dismiss_text(w, event, params, num_params)
 {
     dismiss_text(XtParent(w), event, params, num_params);
 }
-#endif
 
 
 /* ARGSUSED */
@@ -191,12 +184,10 @@ display_text_window(wp, blocking)
 	width += 20;
     }
 
-#ifdef GRAPHIC_TOMBSTONE
     if (text_info->is_rip) {
 	Widget rip = create_ripout_widget(XtParent(wp->w));
 	XtSetArg(args[num_args], XtNfromVert, rip);	num_args++;
     }
-#endif
 
     if (width > (Dimension) XtScreen(wp->w)->width) { /* too wide for screen */
 	/* Back off some amount - we really need to back off the scrollbar */
@@ -259,9 +250,7 @@ create_text_window(wp)
     text_info->extra_height   = 0;
     text_info->blocked	      = FALSE;
     text_info->destroy_on_ack = TRUE;	/* Ok to destroy before display */
-#ifdef GRAPHIC_TOMBSTONE
     text_info->is_rip	      = FALSE;
-#endif
 
     num_args = 0;
     XtSetArg(args[num_args], XtNallowShellResize, True); num_args++;
@@ -437,8 +426,6 @@ free_text_buffer(tb)
 }
 
 
-#ifdef GRAPHIC_TOMBSTONE
-
 static void FDECL(rip_exposed, (Widget,XtPointer,XtPointer));
 
 static XImage* rip_image=0;
@@ -468,11 +455,7 @@ calculate_rip_text(int how)
 
 	/* Put $ on stone */
 	Sprintf(rip_line[GOLD_LINE], "%ld Au",
-#ifndef GOLDOBJ
 		u.ugold);
-#else
-		done_money);
-#endif
 	/* Put together death description */
 	switch (killer_format) {
 		default: impossible("bad killer format?");
@@ -620,7 +603,5 @@ create_ripout_widget(Widget parent)
 
     return imageport;
 }
-
-#endif /* GRAPHIC_TOMBSTONE */
 
 /*wintext.c*/

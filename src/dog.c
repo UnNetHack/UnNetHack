@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)dog.c	3.4	2002/09/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -39,19 +38,15 @@ pet_type()
 	    return (PM_KITTEN);
 	else if (preferred_pet == 'd')
 	    return (PM_LITTLE_DOG);
-#ifdef EXOTIC_PETS
 	else if (Role_if(PM_ROGUE) &&
 	         ((preferred_pet == 'e') || (!rn2(3))))
 		return (PM_MONKEY);
 	else if ((Role_if(PM_RANGER) || Role_if(PM_CAVEMAN)) &&
 	         ((preferred_pet == 'e') || (!rn2(3))))
 		return (rn2(4) ? PM_WOLF : PM_WINTER_WOLF_CUB);
-# ifdef TOURIST
 	else if (Role_if(PM_TOURIST) &&
 	          ((preferred_pet == 'e') || (!rn2(3))))
 		return (PM_BABY_CROCODILE);
-# endif
-#endif
 	else
 	    return (rn2(2) ? PM_KITTEN : PM_LITTLE_DOG);
 }
@@ -139,9 +134,7 @@ struct monst *
 makedog()
 {
 	register struct monst *mtmp;
-#ifdef STEED
 	register struct obj *otmp;
-#endif
 	const char *petname;
 	int   pettype;
 	static int petname_used = 0;
@@ -153,7 +146,6 @@ makedog()
 		petname = dogname;
 	else if (pettype == PM_PONY)
 		petname = horsename;
-#ifdef EXOTIC_PETS
 	else if (pettype == PM_MONKEY)
 		petname = monkeyname;
 	else if ((pettype == PM_WOLF) ||
@@ -161,11 +153,8 @@ makedog()
 		petname = wolfname;
 	else if (pettype == PM_BABY_CROCODILE)
 		petname = crocodilename;
-#endif
-#ifdef CONVICT
 	else if (pettype == PM_SEWER_RAT)
 		petname = ratname;
-#endif /* CONVICT */
 	else
 		petname = catname;
 
@@ -180,16 +169,13 @@ makedog()
 		}
 	}
 
-#ifdef CONVICT
 	if (!*petname && pettype == PM_SEWER_RAT) {
 	    if(Role_if(PM_CONVICT)) petname = "Nicodemus"; /* Rats of NIMH */
     }
-#endif /* CONVICT */
 	mtmp = makemon(&mons[pettype], u.ux, u.uy, MM_EDOG);
 
 	if(!mtmp) return((struct monst *) 0); /* pets were genocided */
 
-#ifdef EXOTIC_PETS
 	/*  Keep the exotic pets from being higher-level than normal starting
 	    pets.  (makedog is only called once, during game setup, so this
 	    is the place to put it.)                                           */
@@ -201,9 +187,7 @@ makedog()
 		mtmp->m_lev  = 1;
 		mtmp->mhpmax = mtmp->mhp = d(1,8);
 	}
-#endif
 
-#ifdef STEED
 	/* Horses already wear a saddle */
 	if (pettype == PM_PONY && !!(otmp = mksobj(SADDLE, TRUE, FALSE))) {
 	    if (mpickobj(mtmp, otmp))
@@ -214,7 +198,6 @@ makedog()
 	    otmp->leashmon = mtmp->m_id;
 	    update_mon_intrinsics(mtmp, otmp, TRUE, TRUE);
 	}
-#endif
 
 	if (!*petname && pettype == PM_KITTEN && !rn2(100)) {
 		if (mtmp->female) petname = "Shiva"; /* RIP 1 Oct 1998 - 6 Sep 2009 */
@@ -282,11 +265,7 @@ boolean with_you;
 	num_segs = mtmp->wormno;
 	/* baby long worms have no tail so don't use is_longworm() */
 	if ((mtmp->data == &mons[PM_LONG_WORM]) &&
-#ifdef DCC30_BUG
-	    (mtmp->wormno = get_wormno(), mtmp->wormno != 0))
-#else
 	    (mtmp->wormno = get_wormno()) != 0)
-#endif
 	{
 	    initworm(mtmp, num_segs);
 	    /* tail segs are not yet initialized or displayed */
@@ -305,10 +284,8 @@ boolean with_you;
 	mtmp->mtrack[0].x = mtmp->mtrack[0].y = 0;
 	mtmp->mtrack[1].x = mtmp->mtrack[1].y = 0;
 
-#ifdef STEED
 	if (mtmp == u.usteed)
 	    return;	/* don't place steed on the map */
-#endif
 	if (with_you) {
 	    /* When a monster accompanies you, sometimes it will arrive
 	       at your intended destination and you'll end up next to
@@ -431,7 +408,6 @@ boolean with_you;
 		}
 		corpse = mkcorpstat(CORPSE, (struct monst *)0, mtmp->data,
 				xlocale, ylocale, FALSE);
-#ifndef GOLDOBJ
 		if (mtmp->mgold) {
 		    if (xlocale == 0 && ylocale == 0 && corpse) {
 			(void) get_obj_location(corpse, &xlocale, &ylocale, 0);
@@ -439,7 +415,6 @@ boolean with_you;
 		    }
 		    mtmp->mgold = 0L;
 		}
-#endif
 		mongone(mtmp);
 	    }
 	}
@@ -535,28 +510,21 @@ boolean pets_only;	/* true for ascension or final escape */
 	register struct obj *obj;
 	int num_segs;
 	boolean stay_behind;
-#ifdef BLACKMARKET
-	extern d_level new_dlevel;	/* in do.c */
-#endif /* BLACKMARKET */
 
 	for (mtmp = fmon; mtmp; mtmp = mtmp2) {
 	    mtmp2 = mtmp->nmon;
 	    if (DEADMONSTER(mtmp)) continue;
 	    if (pets_only && !mtmp->mtame) continue;
 	    if (((monnear(mtmp, u.ux, u.uy) && levl_follower(mtmp)) ||
-#ifdef STEED
 			(mtmp == u.usteed) ||
-#endif
 		/* the wiz will level t-port from anywhere to chase
 		   the amulet; if you don't have it, will chase you
 		   only if in range. -3. */
 			(u.uhave.amulet && mtmp->iswiz))
 		&& ((!mtmp->msleeping && mtmp->mcanmove)
-#ifdef STEED
 		    /* eg if level teleport or new trap, steed has no control
 		       to avoid following */
 		    || (mtmp == u.usteed)
-#endif
 		    )
 		/* monster won't follow if it hasn't noticed you yet */
 		&& !(mtmp->mstrategy & STRAT_WAITFORU)) {
@@ -565,14 +533,6 @@ boolean pets_only;	/* true for ascension or final escape */
 			if (canseemon(mtmp))
 			    pline("%s is still eating.", Monnam(mtmp));
 			stay_behind = TRUE;
-#ifdef BLACKMARKET                
-		} else if (mtmp->mtame && 
-		    (Is_blackmarket(&new_dlevel) || Is_blackmarket(&u.uz))) {
-			pline("%s can't follow you %s.",
-			      Monnam(mtmp), Is_blackmarket(&u.uz) ?
-			      "through the portal" : "into the Black Market");
-			stay_behind = TRUE;
-#endif /* BLACKMARKET */
 		} else if (mon_has_amulet(mtmp)) {
 			if (canseemon(mtmp))
 			    pline("%s seems very disoriented for a moment.",
@@ -583,9 +543,7 @@ boolean pets_only;	/* true for ascension or final escape */
 			    pline("%s is still trapped.", Monnam(mtmp));
 			stay_behind = TRUE;
 		}
-#ifdef STEED
 		if (mtmp == u.usteed) stay_behind = FALSE;
-#endif
 		if (stay_behind) {
 			if (mtmp->mleashed) {
 				pline("%s leash suddenly comes loose.",
@@ -818,13 +776,11 @@ register struct obj *obj;
 						&& mtmp->data->mlet == S_DOG)
 		return((struct monst *)0);
 
-#ifdef CONVICT
 	if (Role_if(PM_CONVICT) && (is_domestic(mtmp->data) && obj)) {
 		/* Domestic animals are wary of the Convict */
 		pline("%s still looks wary of you.", Monnam(mtmp));
 		return((struct monst *)0);
 	}
-#endif
 	/* If we cannot tame it, at least it's no longer afraid. */
 	mtmp->mflee = 0;
 	mtmp->mfleetim = 0;

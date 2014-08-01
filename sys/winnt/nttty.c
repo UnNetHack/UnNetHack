@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)nttty.c	3.4	$Date: 2003/11/15 00:39:32 $   */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -114,9 +113,7 @@ KEYHANDLERNAME pKeyHandlerName;
 #endif
 boolean colorflag = FALSE;	/* colors are initialized */
 int ttycolors[CLR_MAX];
-# ifdef TEXTCOLOR
 static void NDECL(init_ttycolor);
-# endif
 static void NDECL(really_move_cursor);
 
 #define MAX_OVERRIDES	256
@@ -138,18 +135,10 @@ static COORD cursor = {0,0};
 void
 gettty()
 {
-#ifndef TEXTCOLOR
-	int k;
-#endif
 	erase_char = '\b';
 	kill_char = 21;		/* cntl-U */
 	iflags.cbreak = TRUE;
-#ifdef TEXTCOLOR
 	init_ttycolor();
-#else
-	for(k=0; k < CLR_MAX; ++k)
-		ttycolors[k] = 7;
-#endif
 }
 
 /* reset terminal to original state */
@@ -574,7 +563,6 @@ tty_delay_output()
 	}
 }
 
-# ifdef TEXTCOLOR
 /*
  * CLR_BLACK		0
  * CLR_RED		1
@@ -621,9 +609,7 @@ init_ttycolor()
 	ttycolors[CLR_WHITE] = FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED|\
 						FOREGROUND_INTENSITY;
 }
-# endif /* TEXTCOLOR */
 
-#ifdef VIDEOSHADES
 static int FDECL(convert_uchars,(char *, uchar *, int));
 
 /*
@@ -696,22 +682,12 @@ convert_uchars(bufp,list,size)
     }
     /*NOTREACHED*/
 }
-#endif /* !VIDEOSHADES */
 
 
 int
 has_color(int color)
 {
-# ifdef TEXTCOLOR
     return 1;
-# else
-    if (color == CLR_BLACK)
-    	return 1;
-    else if (color == CLR_WHITE)
-	return 1;
-    else
-	return 0;
-# endif 
 }
 
 void
@@ -774,23 +750,17 @@ term_start_raw_bold(void)
 void
 term_start_color(int color)
 {
-#ifdef TEXTCOLOR
         if (color >= 0 && color < CLR_MAX) {
 	    foreground = (background != 0 && (color == CLR_GRAY || color == CLR_WHITE)) ?
 			ttycolors[0] : ttycolors[color];
 	}
-#else
-	foreground = DEFTEXTCOLOR;
-#endif
 	attr = (foreground | background);
 }
 
 void
 term_end_color(void)
 {
-#ifdef TEXTCOLOR
 	foreground = DEFTEXTCOLOR;
-#endif
 	attr = (foreground | background);
 }
 

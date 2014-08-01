@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)pager.c	3.4	2003/08/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -83,7 +82,6 @@ lookat(x, y, buf, monbuf)
 	if (Role_if(PM_WIZARD) && Race_if(PM_GNOME) && !Upolyd)
 	    pm = &mons[PM_WIZARD];
 
-#ifdef STEED
 	if (u.usteed) {
 	    char steedbuf[BUFSZ];
 
@@ -91,7 +89,6 @@ lookat(x, y, buf, monbuf)
 	    /* assert((sizeof buf >= strlen(buf)+strlen(steedbuf)+1); */
 	    Strcat(buf, steedbuf);
 	}
-#endif
 	/* When you see yourself normally, no explanation is appended
 	   (even if you could also see yourself via other means).
 	   Sensing self while blind or swallowed is treated as if it
@@ -861,11 +858,11 @@ dowhatdoes()
 	char bufr[BUFSZ];
 	char q, *reslt;
 
-#if defined(UNIX) || defined(VMS)
+#if defined(UNIX)
 	introff();
 #endif
 	q = yn_function("What command?", (char *)0, '\0');
-#if defined(UNIX) || defined(VMS)
+#if defined(UNIX)
 	intron();
 #endif
 	reslt = dowhatdoes_core(q, bufr);

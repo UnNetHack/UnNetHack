@@ -31,13 +31,13 @@ new machine.  The basic steps in porting the program are:
 
 	2.  Modify the appropriate include files to customize NetHack to
 	    your system.  You may need to add a new OS-specific "*conf.h"
-	    file (see unixconf.h, pcconf.h, tosconf.h, etc. as examples).
+	    file (see unixconf.h as examples).
 
 	3.  If your machine uses a new OS instead of a variant of existing
 	    OSes, add a new sys subdirectory.  Add, if required, a OS-
 	    specific copy of "main.c", "tty.c" and "unix.c".  Possibly
-	    add an OS-specific library (see "msdos.c" and "tos.c" as
-	    examples) to provide functions NetHack wants and your OS lacks.
+	    add an OS-specific library (see "msdos.c" as
+	    example) to provide functions NetHack wants and your OS lacks.
 
 	4.  If your machine uses a new windowing system, follow doc/window.doc
 	    carefully.  Put files implementing these routines in a win or

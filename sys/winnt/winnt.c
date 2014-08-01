@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)winnt.c	 3.4	 $Date: 2003/10/26 15:58:22 $		  */
 /* Copyright (c) NetHack PC Development Team 1993, 1994 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,9 +11,7 @@
 #define NEED_VARARGS
 #include "hack.h"
 #include <dos.h>
-#ifndef __BORLANDC__
 #include <direct.h>
-#endif
 #include <ctype.h>
 #include "win32api.h"
 #ifdef WIN32CON

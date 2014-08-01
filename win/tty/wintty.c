@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)wintty.c	3.4	2002/09/27	*/
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,20 +9,9 @@
 
 #include "hack.h"
 #include "dlb.h"
-#ifdef SHORT_FILENAMES
-#include "patchlev.h"
-#else
 #include "patchlevel.h"
-#endif
 
 #ifdef TTY_GRAPHICS
-
-#ifdef MAC
-# define MICRO /* The Mac is a MICRO only for this file, not in general! */
-# ifdef THINK_C
-extern void msmsg(const char *,...);
-# endif
-#endif
 
 
 #ifndef NO_TERMS
@@ -32,20 +20,15 @@ extern void msmsg(const char *,...);
 
 #include "wintty.h"
 
-#ifdef CLIPPING		/* might want SIGWINCH */
-# if defined(BSD) || defined(ULTRIX) || defined(AIX_31) || defined(_BULL_SOURCE)
+# if defined(BSD)
 #include <signal.h>
 # endif
-#endif
 
 extern char mapped_menu_cmds[]; /* from options.c */
 
 /* Interface definition, for windows.c */
 struct window_procs tty_procs = {
     "tty",
-#ifdef MSDOS
-    WC_TILED_MAP|WC_ASCII_MAP|
-#endif
 #if defined(WIN32CON)
     WC_MOUSE_SUPPORT|
 #endif
@@ -77,12 +60,7 @@ struct window_procs tty_procs = {
     tty_update_inventory,
     tty_mark_synch,
     tty_wait_synch,
-#ifdef CLIPPING
     tty_cliparound,
-#endif
-#ifdef POSITIONBAR
-    tty_update_positionbar,
-#endif
     tty_print_glyph,
     tty_raw_print,
     tty_raw_print_bold,
@@ -95,14 +73,6 @@ struct window_procs tty_procs = {
     tty_get_ext_cmd,
     tty_number_pad,
     tty_delay_output,
-#ifdef CHANGE_COLOR	/* the Mac uses a palette device */
-    tty_change_color,
-#ifdef MAC
-    tty_change_background,
-    set_tty_font_name,
-#endif
-    tty_get_color_string,
-#endif
 
     /* other defs that really should go away (they're tty specific) */
     tty_start_screen,
@@ -122,7 +92,7 @@ struct DisplayDesc *ttyDisplay;	/* the tty display descriptor */
 
 extern void FDECL(cmov, (int,int)); /* from termcap.c */
 extern void FDECL(nocmov, (int,int)); /* from termcap.c */
-#if defined(UNIX) || defined(VMS)
+#if defined(UNIX)
 static char obuf[BUFSIZ];	/* BUFSIZ is defined in stdio.h */
 #endif
 
@@ -132,31 +102,18 @@ char defmorestr[] = "--More--";
 /** Track if the player is still selecting his character. */
 boolean in_character_selection = FALSE;
 
-#ifdef MENU_COLOR
 extern struct menucoloring *menu_colorings;
-#endif
 
-#ifdef CLIPPING
-# if defined(USE_TILES) && defined(MSDOS)
-boolean clipping = FALSE;	/* clipping on? */
-int clipx = 0, clipxmax = 0;
-# else
 static boolean clipping = FALSE;	/* clipping on? */
 static int clipx = 0, clipxmax = 0;
-# endif
 static int clipy = 0, clipymax = 0;
-#endif /* CLIPPING */
-
-#if defined(USE_TILES) && defined(MSDOS)
-extern void FDECL(adjust_cursor_flags, (struct WinDesc *));
-#endif
 
 #if defined(ASCIIGRAPH) && !defined(NO_TERMS)
 boolean GFlag = FALSE;
 boolean HE_resets_AS;	/* see termcap.c */
 #endif
 
-#if defined(MICRO) || defined(WIN32CON)
+#if defined(WIN32CON)
 static const char to_continue[] = "to continue";
 #define getret() getreturn(to_continue)
 #else
@@ -208,7 +165,7 @@ const char *mesg;
     /*NOTREACHED*/
 }
 
-#if defined(SIGWINCH) && defined(CLIPPING)
+#if defined(SIGWINCH)
 STATIC_OVL void
 winch()
 {
@@ -232,7 +189,6 @@ winch()
 	    WIN_STATUS = tty_create_nhwindow(NHW_STATUS);
 
 	    if(u.ux) {
-#ifdef CLIPPING
 		if(CO < COLNO || LI < ROWNO+3) {
 		    setclipped();
 		    tty_cliparound(u.ux, u.uy);
@@ -240,7 +196,6 @@ winch()
 		    clipping = FALSE;
 		    clipx = clipy = 0;
 		}
-#endif
 		i = ttyDisplay->toplin;
 		ttyDisplay->toplin = 0;
 		docrt();
@@ -280,7 +235,7 @@ char** argv;
      *  tty_startup() must be called before initoptions()
      *    due to ordering of graphics settings
      */
-#if defined(UNIX) || defined(VMS)
+#if defined(UNIX)
     setbuf(stdout,obuf);
 #endif
     gettty();
@@ -297,9 +252,7 @@ char** argv;
     ttyDisplay->curx = ttyDisplay->cury = 0;
     ttyDisplay->inmore = ttyDisplay->inread = ttyDisplay->intr = 0;
     ttyDisplay->dismiss_more = 0;
-#ifdef TEXTCOLOR
     ttyDisplay->color = NO_COLOR;
-#endif
     ttyDisplay->attrs = 0;
 
     /* set up the default windows */
@@ -308,7 +261,7 @@ char** argv;
 
     ttyDisplay->lastwin = WIN_ERR;
 
-#if defined(SIGWINCH) && defined(CLIPPING)
+#if defined(SIGWINCH)
     (void) signal(SIGWINCH, winch);
 #endif
 
@@ -446,9 +399,7 @@ give_up:	/* Quit */
 			"ascet", "atheist", "blindfolded", "hallucinating",
 			"illiterate", "nudist", "pacifist", "vegan",
 			"vegetarian", "death dropless",
-#ifdef ELBERETH
 			"Elberethless",
-#endif
 			"Heaven or Hell", "Quit"
 		};
 #define NUM_CONDUCT_OPTIONS SIZE(conduct_names)
@@ -463,14 +414,9 @@ give_up:	/* Quit */
 		conduct_bools[7] = &flags.vegan;
 		conduct_bools[8] = &flags.vegetarian;
 		conduct_bools[9] = &flags.deathdropless;
-#ifdef ELBERETH
 		conduct_bools[10] = &flags.elberethignore;
 		conduct_bools[11] = &flags.heaven_or_hell;
 		conduct_bools[12] = 0;
-#else
-		conduct_bools[10] = &flags.heaven_or_hell;
-		conduct_bools[11] = 0;
-#endif
 		int conduct_settings[NUM_CONDUCT_OPTIONS];
 
 		winid tmpwin = create_nhwindow(NHW_MENU);
@@ -513,12 +459,8 @@ give_up:	/* Quit */
 		flags.vegan          = conduct_settings[7];
 		flags.vegetarian     = conduct_settings[8];
 		flags.deathdropless  = conduct_settings[9];
-#ifdef ELBERETH
 		flags.elberethignore = conduct_settings[10];
 		flags.heaven_or_hell = conduct_settings[11];
-#else
-		flags.heaven_or_hell = conduct_settings[10];
-#endif
 	}
 
 	(void)  root_plselection_prompt(plbuf, QBUFSZ - 1,
@@ -848,14 +790,10 @@ tty_askname()
 #ifdef WIN32CON
 				ttyDisplay->curx--;
 #endif
-#if defined(MICRO) || defined(WIN32CON)
-# if defined(WIN32CON) || defined(MSDOS)
+#if defined(WIN32CON)
 				backsp();       /* \b is visible on NT */
 				(void) putchar(' ');
 				backsp();
-# else
-				msmsg("\b \b");
-# endif
 #else
 				(void) putchar('\b');
 				(void) putchar(' ');
@@ -864,21 +802,12 @@ tty_askname()
 			}
 			continue;
 		}
-#if defined(UNIX) || defined(VMS)
+#if defined(UNIX)
 		if(c != '-' && c != '@')
 		if(c < 'A' || (c > 'Z' && c < 'a') || c > 'z') c = '_';
 #endif
 		if (ct < (int)(sizeof plname) - 1) {
-#if defined(MICRO)
-# if defined(MSDOS)
-			if (iflags.grmode) {
-				(void) putchar(c);
-			} else
-# endif
-			msmsg("%c", c);
-#else
 			(void) putchar(c);
-#endif
 			plname[ct++] = c;
 #ifdef WIN32CON
 			ttyDisplay->curx++;
@@ -898,7 +827,7 @@ tty_get_nh_event()
     return;
 }
 
-#if !defined(MICRO) && !defined(WIN32CON)
+#if !defined(WIN32CON)
 STATIC_OVL void
 getret()
 {
@@ -995,11 +924,6 @@ tty_create_nhwindow(type)
 	/* status window, 2 or 3 lines long, full width, bottom of screen */
 	iflags.statuslines = (LI > ROWNO+3) ? 3 : 2;
 	newwin->offx = 0;
-#if defined(USE_TILES) && defined(MSDOS)
-	if (iflags.grmode) {
-		newwin->offy = ttyDisplay->rows-iflags.statuslines;
-	} else
-#endif
 	newwin->offy = min((int)ttyDisplay->rows-iflags.statuslines, ROWNO+iflags.statuslines-1);
 	newwin->rows = newwin->maxrow = iflags.statuslines;
 	newwin->cols = newwin->maxcol = min(ttyDisplay->cols, MAXCO);
@@ -1315,7 +1239,6 @@ char *str;
 	*dest = '\0'; /* terminate string with null terminator */
 }
 
-#ifdef MENU_COLOR
 boolean
 get_menu_coloring(line, color, attr)
 const char *line;
@@ -1330,15 +1253,7 @@ int *color, *attr;
 
     if (iflags.use_menu_color && iflags.use_color)
 	for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
-# ifdef MENU_COLOR_REGEX
-#  ifdef MENU_COLOR_REGEX_POSIX
 	    if (regexec(&tmpmc->match, str, 0, NULL, 0) == 0) {
-#  else
-	    if (re_search(&tmpmc->match, str, strlen(str), 0, 9999, 0) >= 0) {
-#  endif
-# else
-	    if (pmatch(tmpmc->match, str)) {
-# endif
 		if (!foundcolor && tmpmc->color != CLR_UNDEFINED) {
 		    *color = tmpmc->color;
 		    foundcolor = TRUE;
@@ -1353,7 +1268,6 @@ int *color, *attr;
     if (foundattr && !foundcolor) *color = NO_COLOR;
     return foundcolor || foundattr;
 }
-#endif /* MENU_COLOR */
 
 STATIC_OVL void
 process_menu_window(window, cw)
@@ -1431,10 +1345,8 @@ struct WinDesc *cw;
 		for (page_lines = 0, curr = page_start;
 			curr != page_end;
 			page_lines++, curr = curr->next) {
-#ifdef MENU_COLOR
 		    int color = NO_COLOR, attr = ATR_NONE;
 		    boolean menucolr = FALSE;
-#endif
 		    if (curr->selector)
 			*rp++ = curr->selector;
 
@@ -1488,13 +1400,11 @@ struct WinDesc *cw;
 		    }
 #endif
 
-#ifdef MENU_COLOR
 		   if (iflags.use_menu_color && iflags.use_color &&
 		       (menucolr = get_menu_coloring(curr->str, &color,&attr))) {
 		       term_start_attr(attr);
 		       if (color != NO_COLOR) term_start_color(color);
 		   } else
-#endif
 		    term_start_attr(curr->attr);
 		    for (n = 0, cp = curr->str;
 #ifndef WIN32CON
@@ -1505,12 +1415,10 @@ struct WinDesc *cw;
 			  cp++, n++, ttyDisplay->curx++)
 #endif
 			    (void) putchar(*cp);
-#ifdef MENU_COLOR
 		   if (iflags.use_menu_color && iflags.use_color && menucolr) {
 		       if (color != NO_COLOR) term_end_color();
 		       term_end_attr(attr);
 		   } else
-#endif
 		    term_end_attr(curr->attr);
 		}
 	    } else {
@@ -1805,17 +1713,13 @@ tty_display_nhwindow(window, blocking)
 	cw->offx = (uchar) (int)
 	    max((int) 10, (int) (ttyDisplay->cols - cw->maxcol - 1));
 	if(cw->type == NHW_MENU
-#ifdef WIN_EDGE
 	    || iflags.win_edge
-#endif
 	)
 	    cw->offy = 0;
 	if(ttyDisplay->toplin == 1)
 	    tty_display_nhwindow(WIN_MESSAGE, TRUE);
 	if(cw->offx == 10 || cw->maxrow >= (int) ttyDisplay->rows
-#ifdef WIN_EDGE
 	    || iflags.win_edge
-#endif
 	) {
 	    cw->offx = 0;
 	    if(cw->offy) {
@@ -1914,9 +1818,6 @@ register int x, y;	/* not xchar: perhaps xchar is unsigned and
 	panic(winpanicstr,  window);
     ttyDisplay->lastwin = window;
 
-#if defined(USE_TILES) && defined(MSDOS)
-    adjust_cursor_flags(cw);
-#endif
     cw->curx = --x;	/* column 0 is never used */
     cw->cury = y;
 #ifdef DEBUG
@@ -1937,12 +1838,10 @@ register int x, y;	/* not xchar: perhaps xchar is unsigned and
     x += cw->offx;
     y += cw->offy;
 
-#ifdef CLIPPING
     if(clipping && window == WIN_MAP) {
 	x -= clipx;
 	y -= clipy;
     }
-#endif
 
     if (y == cy && x == cx)
 	return;
@@ -2024,11 +1923,7 @@ const char *str;
 		register char *bp1 = cbuf;
 
 		do {
-#ifdef CLIPPING
 			if(*bp0 != ' ' || bp0[1] != ' ')
-#else
-			if(*bp0 != ' ' || bp0[1] != ' ' || bp0[2] != ' ')
-#endif
 				*bp1++ = *bp0;
 		} while(*bp0++);
 	} else
@@ -2184,57 +2079,18 @@ tty_putstr(window, attr, str)
 }
 
 void
-#ifdef FILE_AREAS
 tty_display_file(farea, fname, complain)
 const char *farea;
-#else
-tty_display_file(fname, complain)
-#endif
 const char *fname;
 boolean complain;
 {
-#ifdef DEF_PAGER			/* this implies that UNIX is defined */
-    {
-	/* use external pager; this may give security problems */
-#ifdef FILE_AREAS
-	register int fd = open_area(farea, fname, 0, 0);
-#else
-	register int fd = open(fname, 0);
-#endif
-
-	if(fd < 0) {
-	    if(complain) pline("Cannot open %s.", fname);
-	    else docrt();
-	    return;
-	}
-	if(child(1)) {
-	    /* Now that child() does a setuid(getuid()) and a chdir(),
-	       we may not be able to open file fname anymore, so make
-	       it stdin. */
-	    (void) close(0);
-	    if(dup(fd)) {
-		if(complain) raw_printf("Cannot open %s as stdin.", fname);
-	    } else {
-		(void) execlp(catmore, "page", (char *)0);
-		if(complain) raw_printf("Cannot exec %s.", catmore);
-	    }
-	    if(complain) sleep(10); /* want to wait_synch() but stdin is gone */
-	    terminate(EXIT_FAILURE);
-	}
-	(void) close(fd);
-    }
-#else	/* DEF_PAGER */
     {
 	dlb *f;
 	char buf[BUFSZ];
 	char *cr;
 
 	tty_clear_nhwindow(WIN_MESSAGE);
-#ifdef FILE_AREAS
 	f = dlb_fopen_area(farea, fname, "r");
-#else
-	f = dlb_fopen(fname, "r");
-#endif
 	if (!f) {
 	    if(complain) {
 		home();  tty_mark_synch();  tty_raw_print("");
@@ -2257,9 +2113,6 @@ boolean complain;
 	    }
 	    while (dlb_fgets(buf, BUFSZ, f)) {
 		if ((cr = index(buf, '\n')) != 0) *cr = 0;
-#ifdef MSDOS
-		if ((cr = index(buf, '\r')) != 0) *cr = 0;
-#endif
 		if (index(buf, '\t') != 0) (void) tabexpand(buf);
 		empty = FALSE;
 		tty_putstr(datawin, 0, buf);
@@ -2271,7 +2124,6 @@ boolean complain;
 	    (void) dlb_fclose(f);
 	}
     }
-#endif /* DEF_PAGER */
 }
 
 void
@@ -2577,25 +2429,15 @@ docorner(xmin, ymax)
 	return;
     }
 
-#if defined(SIGWINCH) && defined(CLIPPING)
+#if defined(SIGWINCH)
     if(ymax > LI) ymax = LI;		/* can happen if window gets smaller */
 #endif
     for (y = 0; y < ymax; y++) {
 	tty_curs(BASE_WINDOW, xmin,y);	/* move cursor */
 	cl_end();			/* clear to end of line */
-#ifdef CLIPPING
 	if (y<(int) cw->offy || y+clipy > ROWNO)
 		continue; /* only refresh board */
-#if defined(USE_TILES) && defined(MSDOS)
-	if (iflags.tile_view)
-		row_refresh((xmin/2)+clipx-((int)cw->offx/2),COLNO-1,y+clipy-(int)cw->offy);
-	else
-#endif
 	row_refresh(xmin+clipx-(int)cw->offx,COLNO-1,y+clipy-(int)cw->offy);
-#else
-	if (y<cw->offy || y > ROWNO) continue; /* only refresh board  */
-	row_refresh(xmin-(int)cw->offx,COLNO-1,y-(int)cw->offy);
-#endif
     }
 
     end_glyphout();
@@ -2616,12 +2458,10 @@ end_glyphout()
 	graph_off();
     }
 #endif
-#ifdef TEXTCOLOR
     if(ttyDisplay->color != NO_COLOR) {
 	term_end_color();
 	ttyDisplay->color = NO_COLOR;
     }
-#endif
 }
 
 #ifndef WIN32
@@ -2658,7 +2498,6 @@ int in_ch;
 }
 #endif /* !WIN32 */
 
-#ifdef CLIPPING
 void
 setclipped()
 {
@@ -2697,7 +2536,6 @@ int x, y;
 		(void) doredraw();
 	}
 }
-#endif /* CLIPPING */
 
 
 /*
@@ -2720,12 +2558,10 @@ tty_print_glyph(window, x, y, glyph)
     int	    color;
     unsigned special;
     
-#ifdef CLIPPING
     if(clipping) {
 	if(x <= clipx || y < clipy || x >= clipxmax || y >= clipymax)
 	    return;
     }
-#endif
     /* map glyph to character and color */
     mapglyph(glyph, &ch, &color, &special, x, y);
 
@@ -2739,7 +2575,6 @@ tty_print_glyph(window, x, y, glyph)
     }
 #endif
 
-#ifdef TEXTCOLOR
     if (color != ttyDisplay->color) {
 	if(ttyDisplay->color != NO_COLOR)
 	    term_end_color();
@@ -2747,7 +2582,6 @@ tty_print_glyph(window, x, y, glyph)
 	if(color != NO_COLOR)
 	    term_start_color(color);
     }
-#endif /* TEXTCOLOR */
 
     /* must be after color check; term_end_color may turn off inverse too */
     if (((special & MG_PET) && iflags.hilite_pet) ||
@@ -2761,11 +2595,6 @@ tty_print_glyph(window, x, y, glyph)
 	}
     }
 
-#if defined(USE_TILES) && defined(MSDOS)
-    if (iflags.grmode && iflags.tile_view)
-      xputg(glyph,ch,special);
-    else
-#endif
 #ifdef UTF8_GLYPHS
 	if (iflags.UTF8graphics) {
 		pututf8char(ch);
@@ -2778,13 +2607,11 @@ tty_print_glyph(window, x, y, glyph)
 
     if (reverse_on) {
     	term_end_attr(ATR_INVERSE);
-#ifdef TEXTCOLOR
 	/* turn off color as well, ATR_INVERSE may have done this already */
 	if(ttyDisplay->color != NO_COLOR) {
 	    term_end_color();
 	    ttyDisplay->color = NO_COLOR;
 	}
-#endif
     }
 
     wins[window]->curx++;	/* one character over */
@@ -2796,7 +2623,7 @@ tty_raw_print(str)
     const char *str;
 {
     if(ttyDisplay) ttyDisplay->rawprint++;
-#if defined(MICRO) || defined(WIN32CON)
+#if defined(WIN32CON)
     msmsg("%s\n", str);
 #else
     puts(str); (void) fflush(stdout);
@@ -2809,13 +2636,13 @@ tty_raw_print_bold(str)
 {
     if(ttyDisplay) ttyDisplay->rawprint++;
     term_start_raw_bold();
-#if defined(MICRO) || defined(WIN32CON)
+#if defined(WIN32CON)
     msmsg("%s", str);
 #else
     (void) fputs(str, stdout);
 #endif
     term_end_raw_bold();
-#if defined(MICRO) || defined(WIN32CON)
+#if defined(WIN32CON)
     msmsg("\n");
 #else
     puts("");
@@ -2898,17 +2725,6 @@ win_tty_init()
 # endif
     return;
 }
-
-#ifdef POSITIONBAR
-void
-tty_update_positionbar(posbar)
-char *posbar;
-{
-# ifdef MSDOS
-	video_update_positionbar(posbar);
-# endif
-}
-#endif
 
 /*
  * Allocate a copy of the given string.  If null, return a string of

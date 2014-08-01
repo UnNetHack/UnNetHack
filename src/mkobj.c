@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)mkobj.c	3.4	2002/10/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -49,7 +48,6 @@ const struct icp boxiprobs[] = {
 { 1, AMULET_CLASS}
 };
 
-#ifdef REINCARNATION
 const struct icp rogueprobs[] = {
 {12, WEAPON_CLASS},
 {12, ARMOR_CLASS},
@@ -59,7 +57,6 @@ const struct icp rogueprobs[] = {
 { 5, WAND_CLASS},
 { 5, RING_CLASS}
 };
-#endif
 
 const struct icp hellprobs[] = {
 {20, WEAPON_CLASS},
@@ -108,10 +105,8 @@ boolean artif;
 
 	if(oclass == RANDOM_CLASS) {
 		const struct icp *iprobs =
-#ifdef REINCARNATION
 				    (Is_rogue_level(&u.uz)) ?
 				    (const struct icp *)rogueprobs :
-#endif
 				    Inhell ? (const struct icp *)hellprobs :
 				    (const struct icp *)mkobjprobs;
 
@@ -502,9 +497,7 @@ boolean artif;
 		case OILSKIN_SACK:
 		case BAG_OF_HOLDING:	mkbox_cnts(otmp);
 					break;
-#ifdef TOURIST
 		case EXPENSIVE_CAMERA:
-#endif
 		case TINNING_KIT:
 		case MAGIC_MARKER:	otmp->spe = rn1(60,20);
 					break;
@@ -552,9 +545,7 @@ boolean artif;
 		    otmp->age = MAX_OIL_IN_FLASK;	/* amount of oil */
 		/* fall through */
 	case SCROLL_CLASS:
-#ifdef MAIL
 		if (otmp->otyp != SCR_MAIL)
-#endif
 			blessorcurse(otmp, 4);
 		break;
 	case SPBOOK_CLASS:
@@ -578,13 +569,7 @@ boolean artif;
 		/* simulate lacquered armor for samurai */
 		if (Role_if(PM_SAMURAI) && otmp->otyp == SPLINT_MAIL &&
 		    (moves <= 1 || In_quest(&u.uz))) {
-#ifdef UNIXPC
-			/* optimizer bitfield bug */
-			otmp->oerodeproof = 1;
-			otmp->rknown = 1;
-#else
 			otmp->oerodeproof = otmp->rknown = 1;
-#endif
 		}
 		break;
 	case WAND_CLASS:
@@ -709,9 +694,6 @@ void
 bless(otmp)
 register struct obj *otmp;
 {
-#ifdef GOLDOBJ
-	if (otmp->oclass == COIN_CLASS) return;
-#endif
 	otmp->cursed = 0;
 	otmp->blessed = 1;
 	if (carried(otmp) && confers_luck(otmp))
@@ -738,9 +720,6 @@ void
 curse(otmp)
 register struct obj *otmp;
 {
-#ifdef GOLDOBJ
-	if (otmp->oclass == COIN_CLASS) return;
-#endif
 	otmp->blessed = 0;
 	otmp->cursed = 1;
 	/* welded two-handed weapon interferes with some armor removal */

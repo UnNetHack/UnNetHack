@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)sp_lev.c	3.4	2001/09/06	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -69,8 +68,8 @@ extern int min_rx, max_rx, min_ry, max_ry; /* from mkmap.c */
 
 char SpLev_Map[COLNO][ROWNO];
 static aligntyp	ralign[3] = { AM_CHAOTIC, AM_NEUTRAL, AM_LAWFUL };
-static NEARDATA xchar xstart, ystart;
-static NEARDATA char xsize, ysize;
+static xchar xstart, ystart;
+static char xsize, ysize;
 
 STATIC_DCL void FDECL(set_wall_property, (XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,int));
 STATIC_DCL int NDECL(rnddoor);
@@ -424,12 +423,8 @@ schar filling;
 
 	for (x = x1; x <= x2; x++)
 		for (y = y1; y <= y2; y++) {
-#ifndef WALLIFIED_MAZE
-			levl[x][y].typ = STONE;
-#else
 			levl[x][y].typ =
 				(y < 2 || ((x % 2) && (y % 2))) ? STONE : filling;
-#endif
 		}
 }
 
@@ -1756,15 +1751,7 @@ struct mkroom	*croom;
 		set_malign(mtmp);
 	    }
 	    if (m->asleep >= 0) {
-#ifdef UNIXPC
-		/* optimizer bug strikes again */
-		if (m->asleep)
-			mtmp->msleeping = 1;
-		else
-			mtmp->msleeping = 0;
-#else
 		mtmp->msleeping = m->asleep;
-#endif
 	    }
 
 	    if (m->seentraps) mtmp->mtrapseen = m->seentraps;
@@ -1980,7 +1967,6 @@ struct mkroom	*croom;
 	    }
 	}
 
-#ifdef RECORD_ACHIEVE
 	/* Nasty hack here: try to determine if this is the Mines 
 	 * "prize" and then set record_achieve_special (maps to corpsenm)
 	 * for the object.  That field will later be checked to find out if
@@ -1988,7 +1974,6 @@ struct mkroom	*croom;
 	if(otmp->otyp == LUCKSTONE && Is_mineend_level(&u.uz)) {
 		otmp->record_achieve_special = 1;
 	}
-#endif
 
 	stackobj(otmp);
 
@@ -2425,11 +2410,7 @@ struct mkroom *mkr;
 	}
 
 	if (okroom) {
-#ifdef SPECIALIZATION
-		topologize(aroom,FALSE);		/* set roomno */
-#else
 		topologize(aroom);			/* set roomno */
-#endif
 		aroom->needfill = r->filled;
 		aroom->needjoining = r->joined;
 	        return aroom;
@@ -2689,11 +2670,9 @@ lev_init *linit;
     case LVLINIT_SHEOL:
 	mksheol(linit);
 	break;
-#ifdef REINCARNATION
     case LVLINIT_ROGUE:
 	makeroguerooms();
 	break;
-#endif
     case LVLINIT_MINES:
 	if (linit->lit == -1) linit->lit = rn2(2);
 	if (linit->filling > -1) lvlfill_solid(linit->filling, 0);
@@ -4613,11 +4592,7 @@ spo_region(coder)
     } else {
 	add_room(dx1, dy1, dx2, dy2,
 		 OV_i(rlit), OV_i(rtype), TRUE);
-#ifdef SPECIALIZATION
-	topologize(troom,FALSE);              /* set roomno */
-#else
 	topologize(troom);                    /* set roomno */
-#endif
     }
 
     if (in_mk_rndvault && prefilled) troom->needfill = 1;
@@ -4678,11 +4653,7 @@ spo_mazewalk(coder)
     if (!isok(x,y)) return;
 
     if (OV_i(ftyp) < 1) {
-#ifndef WALLIFIED_MAZE
-	OV_i(ftyp) = CORR;
-#else
 	OV_i(ftyp) = ROOM;
-#endif
     }
 
     /* don't use move() - it doesn't use W_NORTH, etc. */

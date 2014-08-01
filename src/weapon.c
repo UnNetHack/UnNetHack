@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)weapon.c	3.4	2002/11/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -30,7 +29,7 @@ STATIC_DCL int FDECL(enhance_skill, (boolean));
 
 STATIC_DCL void FDECL(give_may_advance_msg, (int));
 
-STATIC_VAR NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
+STATIC_VAR const short skill_names_indices[P_NUM_SKILLS] = {
 	0,                DAGGER,         KNIFE,        AXE,
 	PICK_AXE,         SHORT_SWORD,    BROADSWORD,   LONG_SWORD,
 	TWO_HANDED_SWORD, SCIMITAR,       PN_SABER,     CLUB,
@@ -44,13 +43,11 @@ STATIC_VAR NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
 	PN_CLERIC_SPELL,     PN_ESCAPE_SPELL,
 	PN_MATTER_SPELL,
 	PN_BARE_HANDED,   PN_TWO_WEAPONS,
-#ifdef STEED
 	PN_RIDING
-#endif
 };
 
 /* note: entry [0] isn't used */
-STATIC_VAR NEARDATA const char * const odd_skill_names[] = {
+STATIC_VAR const char * const odd_skill_names[] = {
     "no skill",
     "bare hands",		/* use barehands_or_martial[] instead */
     "two weapon combat",
@@ -68,7 +65,7 @@ STATIC_VAR NEARDATA const char * const odd_skill_names[] = {
     "matter spells",
 };
 /* indexed vis `is_martial() */
-STATIC_VAR NEARDATA const char * const barehands_or_martial[] = {
+STATIC_VAR const char * const barehands_or_martial[] = {
     "bare handed combat", "martial arts"
 };
 
@@ -100,7 +97,7 @@ STATIC_DCL void FDECL(skill_advance, (int));
 			barehands_or_martial[martial_bonus()] : \
 			odd_skill_names[-skill_names_indices[type]])
 
-static NEARDATA const char kebabable[] = {
+static const char kebabable[] = {
 	S_XORN, S_DRAGON, S_JABBERWOCK, S_NAGA, S_GIANT, '\0'
 };
 
@@ -323,7 +320,7 @@ int x;
 	return (struct obj *)0;
 }
 
-static NEARDATA const int rwep[] =
+static const int rwep[] =
 {	DWARVISH_SPEAR, SILVER_SPEAR, ELVEN_SPEAR, SPEAR, ORCISH_SPEAR,
 	JAVELIN, SHURIKEN, YA, SILVER_ARROW, ELVEN_ARROW, ARROW,
 	ORCISH_ARROW, CROSSBOW_BOLT, SILVER_DAGGER, ELVEN_DAGGER, DAGGER,
@@ -332,7 +329,7 @@ static NEARDATA const int rwep[] =
 	/* note: CREAM_PIE should NOT be #ifdef KOPS */
 };
 
-static NEARDATA const int pwep[] =
+static const int pwep[] =
 {	HALBERD, BARDICHE, SPETUM, BILL_GUISARME, VOULGE, RANSEUR, GUISARME,
 	GLAIVE, LUCERN_HAMMER, BEC_DE_CORBIN, FAUCHARD, PARTISAN, LANCE
 };
@@ -346,16 +343,12 @@ register struct monst *mtmp;
 	register struct obj *otmp;
 	int i;
 
-#ifdef KOPS
 	char mlet = mtmp->data->mlet;
-#endif
 
 	propellor = &zeroobj;
 	Oselect(EGG); /* cockatrice egg */
-#ifdef KOPS
 	if(mlet == S_KOP)	/* pies are first choice for Kops */
 	    Oselect(CREAM_PIE);
-#endif
 	if(throws_rocks(mtmp->data))	/* ...boulders for giants */
 	    Oselect(BOULDER);
 
@@ -450,7 +443,7 @@ register struct monst *mtmp;
 }
 
 /* Weapons in order of preference */
-static const NEARDATA short hwep[] = {
+static const short hwep[] = {
 	  CORPSE,  /* cockatrice corpse */
 	  TSURUGI, RUNESWORD, DWARVISH_MATTOCK, TWO_HANDED_SWORD, BATTLE_AXE,
 	  KATANA, UNICORN_HORN, CRYSKNIFE, TRIDENT, LONG_SWORD,
@@ -459,9 +452,7 @@ static const NEARDATA short hwep[] = {
 	  ORCISH_SHORT_SWORD, MACE, AXE, DWARVISH_SPEAR, SILVER_SPEAR,
 	  ELVEN_SPEAR, SPEAR, ORCISH_SPEAR, FLAIL, BULLWHIP, QUARTERSTAFF,
 	  JAVELIN, AKLYS, CLUB, PICK_AXE,
-#ifdef KOPS
 	  RUBBER_HOSE,
-#endif /* KOPS */
 	  WAR_HAMMER, SILVER_DAGGER, ELVEN_DAGGER, DAGGER, ORCISH_DAGGER,
 	  ATHAME, SCALPEL, KNIFE, WORM_TOOTH
 	};
@@ -480,12 +471,6 @@ register struct monst *mtmp;
 		if (otmp->oclass == WEAPON_CLASS &&
 		    otmp->oartifact &&
 		    touch_artifact(otmp,mtmp)) {
-#ifdef BLACKMARKET
-			/* let black marketeer wield their artifact weapon
-			   in any case. */
-			if (is_blkmktstaff(mtmp->data))
-			    return otmp;
-#endif
 			if ((strong && !wearing_shield) ||
 			    !objects[otmp->otyp].oc_bimanual)
 				return otmp;
@@ -1171,10 +1156,8 @@ struct obj *obj;
 	if (!obj)
 		/* Not using a weapon */
 		return (P_BARE_HANDED_COMBAT);
-#ifdef CONVICT
 	if ((obj->otyp == HEAVY_IRON_BALL) && Role_if(PM_CONVICT))
 		return objects[obj->otyp].oc_skill;
-#endif /* CONVICT */
 	if (obj->oclass != WEAPON_CLASS && obj->oclass != TOOL_CLASS &&
 	    obj->oclass != GEM_CLASS)
 		/* Not a weapon, weapon-tool, or ammo */
@@ -1243,7 +1226,6 @@ struct obj *weapon;
 	bonus = ((bonus + 2) * (martial_bonus() ? 2 : 1)) / 2;
     }
 
-#ifdef STEED
 	/* KMH -- It's harder to hit while you are riding */
 	if (u.usteed) {
 		switch (P_SKILL(P_RIDING)) {
@@ -1255,7 +1237,6 @@ struct obj *weapon;
 		}
 		if (u.twoweap) bonus -= 2;
 	}
-#endif
 
     return bonus;
 }
@@ -1312,7 +1293,6 @@ struct obj *weapon;
 	bonus = ((bonus + 1) * (martial_bonus() ? 3 : 1)) / 2;
     }
 
-#ifdef STEED
 	/* KMH -- Riding gives some thrusting damage */
 	if (u.usteed && type != P_TWO_WEAPON_COMBAT) {
 		switch (P_SKILL(P_RIDING)) {
@@ -1323,7 +1303,6 @@ struct obj *weapon;
 		    case P_EXPERT:      bonus += 2; break;
 		}
 	}
-#endif
 
     return bonus;
 }
@@ -1380,10 +1359,8 @@ const struct def_skill *class_skill;
 	    P_SKILL(P_BARE_HANDED_COMBAT) = P_BASIC;
 
 	/* Roles that start with a horse know how to ride it */
-#ifdef STEED
 	if (urole.petnum == PM_PONY)
 	    P_SKILL(P_RIDING) = P_BASIC;
-#endif
 
 	/*
 	 * Make sure we haven't missed setting the max on a skill

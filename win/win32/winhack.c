@@ -12,7 +12,7 @@
 #include "mhmain.h"
 #include "mhmap.h"
 
-#if !defined(__BORLANDC__) && !defined(__MINGW32__)
+#if !defined(__MINGW32__)
 #include <shlwapi.h>
 #else /* Borland redefines "boolean" in shlwapi.h so just use the little bit we need */
 typedef struct _DLLVERSIONINFO
@@ -60,11 +60,6 @@ static HRESULT GetComCtlVersion(LPDWORD pdwMajor, LPDWORD pdwMinor);
 
 // Global Variables:
 NHWinApp _nethack_app;
-
-#ifdef __BORLANDC__
-#define _stricmp(s1,s2)     stricmp(s1,s2)
-#define _strdup(s1)         strdup(s1)
-#endif
 
 // Foward declarations of functions included in this code module:
 extern void FDECL(pcmain, (int,char **));

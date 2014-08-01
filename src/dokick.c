@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)dokick.c	3.4	2003/12/04	*/
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,8 +8,8 @@
 #define martial()	(martial_bonus() || is_bigfoot(youmonst.data) || \
 		(uarmf && uarmf->otyp == KICKING_BOOTS))
 
-static NEARDATA struct rm *maploc;
-static NEARDATA const char *gate_str;
+static struct rm *maploc;
+static const char *gate_str;
 
 extern boolean notonhead;	/* for long worms */
 
@@ -22,7 +21,7 @@ STATIC_DCL char *FDECL(kickstr, (char *));
 STATIC_DCL void FDECL(otransit_msg, (struct obj *, BOOLEAN_P, long));
 STATIC_DCL void FDECL(drop_to, (coord *,SCHAR_P));
 
-static NEARDATA struct obj *kickobj;
+static struct obj *kickobj;
 
 static const char kick_passes_thru[] = "kick passes harmlessly through";
 
@@ -261,11 +260,7 @@ register struct obj *gold;
 	boolean msg_given = FALSE;
 #ifdef WEBB_DISINT
 	if (touch_disintegrates(mtmp->data) && !mtmp->mcan && mtmp->mhp >6 &&
-# ifdef GOLDOBJ
-	   !oresist_disintegration(gold)
-# else
 			rn2(20)
-# endif
 	) {
 		if(cansee(mtmp->mx, mtmp->my))
 			pline_The("%s %s!", xname(gold), vtense(xname(gold),"disintegrate"));
@@ -285,9 +280,6 @@ register struct obj *gold;
 		    msg_given = TRUE;
 		}
 	} else {
-#ifdef GOLDOBJ
-                long value = gold->quan * objects[gold->otyp].oc_cost;
-#endif
 		mtmp->msleeping = 0;
 		mtmp->meating = 0;
 		if(!rn2(4)) setmangry(mtmp); /* not always pleasing */
@@ -295,18 +287,12 @@ register struct obj *gold;
 		/* greedy monsters catch gold */
 		if (cansee(mtmp->mx, mtmp->my))
 		    pline("%s catches the gold.", Monnam(mtmp));
-#ifndef GOLDOBJ
 		mtmp->mgold += gold->quan;
-#endif
 		if (mtmp->isshk) {
 			long robbed = ESHK(mtmp)->robbed;
 
 			if (robbed) {
-#ifndef GOLDOBJ
 				robbed -= gold->quan;
-#else
-				robbed -= value;
-#endif
 				if (robbed < 0) robbed = 0;
 				pline_The("amount %scovers %s recent losses.",
 				      !robbed ? "" : "partially ",
@@ -316,11 +302,7 @@ register struct obj *gold;
 					make_happy_shk(mtmp, FALSE);
 			} else {
 				if(mtmp->mpeaceful) {
-#ifndef GOLDOBJ
 				    ESHK(mtmp)->credit += gold->quan;
-#else
-				    ESHK(mtmp)->credit += value;
-#endif
 				    You("have %ld %s in credit.",
 					ESHK(mtmp)->credit,
 					currency(ESHK(mtmp)->credit));
@@ -354,21 +336,14 @@ register struct obj *gold;
 			} else if (mtmp->data == &mons[PM_GUARD]) {
 			   goldreqd = 5000L;
 			   lawful_bribery_alignment(-2);
-#ifdef CONVICT
 			} else if (mtmp->data == &mons[PM_PRISON_GUARD]) {
 			   goldreqd = 200L;
 			   lawful_bribery_alignment(-2);
-#endif /* CONVICT */
 			}
 
 			if (goldreqd) {
-#ifndef GOLDOBJ
 			   if (gold->quan > goldreqd +
 				(u.ugold + u.ulevel*rn2(5))/ACURR(A_CHA))
-#else
-			   if (value > goldreqd +
-				(money_cnt(invent) + u.ulevel*rn2(5))/ACURR(A_CHA))
-#endif
 			    mtmp->mpeaceful = TRUE;
 			}
 		     }
@@ -377,11 +352,7 @@ register struct obj *gold;
 		     else verbalize("That's not enough, coward!");
 		}
 
-#ifndef GOLDOBJ
 		dealloc_obj(gold);
-#else
-		add_to_minv(mtmp, gold);
-#endif
 		return TRUE;
 	}
 
@@ -677,9 +648,7 @@ char *buf;
 	else if (IS_THRONE(maploc->typ)) what = "a throne";
 	else if (IS_FOUNTAIN(maploc->typ)) what = "a fountain";
 	else if (IS_GRAVE(maploc->typ)) what = "a headstone";
-#ifdef SINKS
 	else if (IS_SINK(maploc->typ)) what = "a sink";
-#endif
 	else if (IS_ALTAR(maploc->typ)) what = "an altar";
 	else if (IS_DRAWBRIDGE(maploc->typ)) what = "a drawbridge";
 	else if (maploc->typ == STAIRS) what = "the stairs";
@@ -704,7 +673,6 @@ dokick()
 	} else if (verysmall(youmonst.data)) {
 		You("are too small to do any kicking.");
 		no_kick = TRUE;
-#ifdef STEED
 	} else if (u.usteed) {
 		if (yn_function("Kick your steed?", ynchars, 'y') == 'y') {
 		    You("kick %s.", mon_nam(u.usteed));
@@ -713,7 +681,6 @@ dokick()
 		} else {
 		    return 0;
 		}
-#endif
 	} else if (Wounded_legs) {
 		/* note: jump() has similar code */
 		long wl = (EWounded_legs & BOTH_SIDES);
@@ -1056,7 +1023,6 @@ dokick()
 		    }
 		    return(1);
 		}
-#ifdef SINKS
 		if(IS_SINK(maploc->typ)) {
 		    int gend = poly_gender();
 		    short washerndx = (gend == 1 || (gend == 2 && rn2(2))) ?
@@ -1109,7 +1075,6 @@ dokick()
 		    }
 		    goto ouch;
 		}
-#endif
 		if (maploc->typ == STAIRS || maploc->typ == LADDER ||
 			IS_STWALL(maploc->typ) ||
 			IS_ANY_ICEWALL(maploc->typ)) {
@@ -1470,9 +1435,7 @@ boolean shop_floor_obj;
 	    const char *result;
 
 	    if (objects[otmp->otyp].oc_material == GLASS
-#ifdef TOURIST
 		|| otmp->otyp == EXPENSIVE_CAMERA
-#endif
 		) {
 		if (otmp->otyp == MIRROR)
 		    change_luck(-2);

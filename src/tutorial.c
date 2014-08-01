@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)tutorial.c	3.4	2009/09/05	*/
 /*	Copyright 2009, Alex Smith		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -396,10 +395,8 @@ maybe_tutorial()
     for (otmp = invent; otmp; otmp = otmp->nobj) {
       if (otmp->bknown && otmp->cursed)
         if (check_tutorial_message(QT_T_EQUIPCURSE)) return;
-#ifdef MAIL
       if (otmp->otyp == SCR_MAIL)
         if (check_tutorial_message(QT_T_MAILSCROLL)) return;
-#endif
       if (otmp->oartifact)
         if (check_tutorial_message(QT_T_ARTIFACT)) return;
       if (otmp->unpaid)
@@ -411,9 +408,7 @@ maybe_tutorial()
           /* fall through */
         case SCROLL_CLASS:
           if (otmp->otyp == SCR_BLANK_PAPER) break;
-#ifdef MAIL
           if (otmp->otyp == SCR_MAIL) break;
-#endif
           /* fall through */
         case WAND_CLASS:
         case SPBOOK_CLASS:

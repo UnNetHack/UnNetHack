@@ -1,13 +1,8 @@
-/*	SCCS Id: @(#)dlb.c	3.4	1997/07/29	*/
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "config.h"
 #include "dlb.h"
-
-#ifdef __DJGPP__
-#include <string.h>
-#endif
 
 #define DATAPREFIX 4
 
@@ -31,16 +26,8 @@ typedef struct dlb_procs {
 } dlb_procs_t;
 
 /* without extern.h via hack.h, these haven't been declared for us */
-#ifdef FILE_AREAS
 extern FILE *FDECL(fopen_datafile_area, (const char *,const char *,
                                                       const char *,int));
-#else
-/*
- * If FILE_AREAS is not defined, then fopen_datafile_area
- * is a macro defined in terms of fopen_datafile.
- */
-extern FILE *FDECL(fopen_datafile, (const char *,const char *,int));
-#endif
 
 #ifdef DLBLIB
 /*
@@ -361,7 +348,7 @@ lib_dlb_fgets(buf, len, dp)
     }
     *bp = '\0';
 
-#if defined(MSDOS) || defined(WIN32)
+#if defined(WIN32)
     if ((bp = index(buf, '\r')) != 0) {
 	*bp++ = '\n';
 	*bp = '\0';
@@ -460,13 +447,8 @@ dlb_cleanup()
 }
 
 dlb *
-#ifndef FILE_AREAS
-dlb_fopen(name, mode)
-    const char *name, *mode;
-#else
 dlb_fopen_area(area, name, mode)
     const char *area, *name, *mode;
-#endif
 {
     FILE *fp;
     dlb *dp;
@@ -476,11 +458,7 @@ dlb_fopen_area(area, name, mode)
     dp = (dlb *) alloc(sizeof(dlb));
     if (do_dlb_fopen(dp, name, mode))
     	dp->fp = (FILE *) 0;
-#ifndef FILE_AREAS
-    else if ((fp = fopen_datafile(name, mode, DATAPREFIX)) != 0)
-#else
     else if ((fp = fopen_datafile_area(area, name, mode, DATAPREFIX)) != 0)
-#endif
 	dp->fp = fp;
     else {
 	/* can't find anything */

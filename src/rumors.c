@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)rumors.c	3.4	1996/04/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -288,9 +287,6 @@ int
 oracle_id(oracl)
 register struct monst *oracl;
 {
-#ifdef GOLDOBJ
-    long umoney = money_cnt(invent);
-#endif
     char qbuf[QBUFSZ];
     /* cost based on experience level similar to major consultations */
     long identify_cost = 300 + 100 * u.ulevel;
@@ -300,20 +296,12 @@ register struct monst *oracl;
 	identify_cost, currency((long)identify_cost));
 
     if (yn(qbuf) == 'y') {
-#ifndef GOLDOBJ
 	if (u.ugold < (long)identify_cost) {
-#else
-	if (umoney < (long)identify_cost) {
-#endif
 	    pline("%s divines that you are short on cash.", Monnam(oracl));
 	    return 0;
 	}
-#ifndef GOLDOBJ
 	u.ugold -= (long)identify_cost;
 	oracl->mgold += (long)identify_cost;
-#else
-        money2mon(oracl, (long)identify_cost);
-#endif
 	flags.botl = 1;
 	identify_pack(1);
 	return 1;
@@ -326,9 +314,6 @@ int
 doconsult(oracl)
 register struct monst *oracl;
 {
-#ifdef GOLDOBJ
-        long umoney = money_cnt(invent);
-#endif
 	int u_pay, minor_cost = 50, major_cost = 500 + 50 * u.ulevel;
 	int add_xpts;
 	char qbuf[QBUFSZ];
@@ -341,11 +326,7 @@ register struct monst *oracl;
 	} else if (!oracl->mpeaceful) {
 		pline("%s is in no mood for consultations.", Monnam(oracl));
 		return 0;
-#ifndef GOLDOBJ
 	} else if (!u.ugold) {
-#else
-	} else if (!umoney) {
-#endif
 		You("have no money.");
 		return 0;
 	}
@@ -358,42 +339,25 @@ register struct monst *oracl;
 	    case 'q':
 		return 0;
 	    case 'y':
-#ifndef GOLDOBJ
 		if (u.ugold < (long)minor_cost) {
-#else
-		if (umoney < (long)minor_cost) {
-#endif
 		    You("don't even have enough money for that!");
 		    return 0;
 		}
 		u_pay = minor_cost;
 		break;
 	    case 'n':
-#ifndef GOLDOBJ
 		if (u.ugold <= (long)minor_cost ||	/* don't even ask */
-#else
-		if (umoney <= (long)minor_cost ||	/* don't even ask */
-#endif
 		    (oracle_cnt == 1 || oracle_flg < 0)) return 0;
 		Sprintf(qbuf,
 			"\"Then dost thou desire a major one?\" (%d %s)",
 			major_cost, currency((long)major_cost));
 		if (yn(qbuf) != 'y') return 0;
-#ifndef GOLDOBJ
 		u_pay = (u.ugold < (long)major_cost ? (int)u.ugold
 						    : major_cost);
-#else
-		u_pay = (umoney < (long)major_cost ? (int)umoney
-						    : major_cost);
-#endif
 		break;
 	}
-#ifndef GOLDOBJ
 	u.ugold -= (long)u_pay;
 	oracl->mgold += (long)u_pay;
-#else
-        money2mon(oracl, (long)u_pay);
-#endif
 	flags.botl = 1;
 	add_xpts = 0;	/* first oracle of each type gives experience points */
 	if (u_pay == minor_cost) {

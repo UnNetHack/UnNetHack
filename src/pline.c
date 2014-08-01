@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)pline.c	3.4	1999/11/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -119,10 +118,8 @@ pline VA_DECL(const char *, line)
 	    raw_print(line);
 	    return;
 	}
-#ifndef MAC
 	if (no_repeat && !strcmp(line, toplines))
 	    return;
-#endif /* MAC */
 	if (vision_full_recalc) vision_recalc(0);
 	if (u.ux) flush_screen(1);		/* %% */
 	if (typ == MSGTYP_NOSHOW) return;
@@ -419,9 +416,7 @@ register struct monst *mtmp;
 				", swallowed you" :
 				", engulfed you") :
 				", holding you");
-#ifdef STEED
 	if (mtmp == u.usteed)	  Strcat(info, ", carrying you");
-#endif
 #ifdef WIZARD
 	if (wizard &&
 	    mtmp->isshk && ESHK(mtmp)->cheapskate) {
@@ -486,9 +481,7 @@ ustatusline()
 	    }	/* note: "goop" == "glop"; variation is intentional */
 	}
 	if (Stunned)		Strcat(info, ", stunned");
-#ifdef STEED
 	if (!u.usteed)
-#endif
 	if (Wounded_legs) {
 	    const char *what = body_part(LEG);
 	    if ((Wounded_legs & BOTH_SIDES) == BOTH_SIDES)

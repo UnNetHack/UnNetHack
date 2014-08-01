@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)botl.c	3.4	1996/07/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -17,8 +16,6 @@ const char * const enc_stat[] = {
 
 STATIC_DCL void NDECL(bot1);
 STATIC_DCL void NDECL(bot2);
-
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 
 extern const struct percent_color_option *hp_colors;
 extern const struct percent_color_option *pw_colors;
@@ -147,9 +144,7 @@ char *newbot2;
 	end_color_option(color_option);
 }
 
-#endif
-
-STATIC_OVL NEARDATA int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
+STATIC_OVL int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
 
 /* convert experience level (1..30) to rank index (0..8) */
 int
@@ -158,16 +153,6 @@ int xlev;
 {
 	return (xlev <= 2) ? 0 : (xlev <= 30) ? ((xlev + 2) / 4) : 8;
 }
-
-#if 0	/* not currently needed */
-/* convert rank index (0..8) to experience level (1..30) */
-int
-rank_to_xlev(rank)
-int rank;
-{
-	return (rank <= 0) ? 1 : (rank <= 8) ? ((rank * 4) - 2) : 30;
-}
-#endif
 
 const char *
 rank_of(lev, monnum, female)
@@ -250,17 +235,10 @@ long
 botl_score()
 {
     int deepest = deepest_lev_reached(FALSE);
-#ifndef GOLDOBJ
     long ugold = u.ugold + hidden_gold();
 
     if ((ugold -= u.ugold0) < 0L) ugold = 0L;
     return ugold + u.urscore + (long)(50 * (deepest - 1))
-#else
-    long umoney = money_cnt(invent) + hidden_gold();
-
-    if ((umoney -= u.umoney0) < 0L) umoney = 0L;
-    return umoney + u.urscore + (long)(50 * (deepest - 1))
-#endif
 			  + (long)(deepest > 30 ? 10000 :
 				   deepest > 20 ? 1000*(deepest - 20) : 0);
 }
@@ -278,12 +256,9 @@ bot1()
 #endif
 	char *nb;
 	int i=0,j;
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	int save_botlx = flags.botlx;
-#endif
 
 	Strcpy(newbot1, "");
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	if (flags.hitpointbar) {
 		flags.botlx = 0;
 		curs(WIN_STATUS, 1, 0);
@@ -293,7 +268,6 @@ bot1()
 		curs(WIN_STATUS, 1, 0);
 		putstr(WIN_STATUS, 0, newbot1);
 	}
-#endif
 	Strcat(newbot1, plname);
 	if('a' <= newbot1[i] && newbot1[i] <= 'z') newbot1[i] += 'A'-'a';
 	newbot1[10] = '\0';
@@ -314,7 +288,6 @@ bot1()
 	} else
 		Sprintf(nb = eos(nb), "%s", rank());
 
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	if (flags.hitpointbar) {
 		int bar_length = strlen(newbot1)-1;
 		char tmp[MAXCO];
@@ -342,7 +315,6 @@ bot1()
 
 		Strcat(newbot1, "]");
 	}
-#endif
 
 	Sprintf(nb = eos(nb),"  ");
 	i = mrank_sz + 15;
@@ -429,9 +401,7 @@ bot2()
 	register char *nb;
 	int hp, hpmax;
 	int cap = near_capacity();
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	int save_botlx = flags.botlx;
-#endif
 
 	hp = Upolyd ? u.mh : u.uhp;
 	hpmax = Upolyd ? u.mhmax : u.uhpmax;
@@ -439,14 +409,9 @@ bot2()
 	if(hp < 0) hp = 0;
 	(void) describe_level(newbot2);
 	Sprintf(nb = eos(newbot2), "%c:%-2ld", oc_syms[COIN_CLASS],
-#ifndef GOLDOBJ
 		u.ugold
-#else
-		money_cnt(invent)
-#endif
 	       );
 
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	Strcat(nb = eos(newbot2), " HP:");
 	curs(WIN_STATUS, 1, 1);
 	putstr(WIN_STATUS, 0, newbot2);
@@ -454,34 +419,23 @@ bot2()
 
 	Sprintf(nb = eos(nb), "%d(%d)", hp, hpmax);
 	apply_color_option(percentage_color_of(hp, hpmax, hp_colors), newbot2, 2);
-#else
-	Sprintf(nb = eos(nb), " HP:%d(%d)", hp, hpmax);
-#endif
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	Strcat(nb = eos(nb), " Pw:");
 	curs(WIN_STATUS, 1, 1);
 	putstr(WIN_STATUS, 0, newbot2);
 
 	Sprintf(nb = eos(nb), "%d(%d)", u.uen, u.uenmax);
 	apply_color_option(percentage_color_of(u.uen, u.uenmax, pw_colors), newbot2, 2);
-#else
-	Sprintf(nb = eos(nb), " Pw:%d(%d)", u.uen, u.uenmax);
-#endif
 	Sprintf(nb = eos(nb), " AC:%-2d", u.uac);
 	if (Upolyd)
 		Sprintf(nb = eos(nb), " HD:%d", mons[u.umonnum].mlevel);
-#ifdef EXP_ON_BOTL
 	else if(flags.showexp)
 		Sprintf(nb = eos(nb), " Xp:%u/%-1ld", u.ulevel,u.uexp);
-#endif
 	else
 		Sprintf(nb = eos(nb), " Exp:%u", u.ulevel);
 
-#ifdef SHOW_WEIGHT
     if (flags.showweight)
         Sprintf(nb = eos(nb), " Wt:%ld/%ld", (long)(inv_weight()+weight_cap()),
                 (long)weight_cap());
-#endif
 
 
 	if(flags.time)
@@ -496,76 +450,30 @@ bot2()
 #endif
 
 	if(strcmp(hu_stat[u.uhs], "        "))
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 		add_colored_text(hu_stat[u.uhs], newbot2);
-#else
-		Sprintf(nb = eos(nb), " %s", hu_stat[u.uhs]);
-#endif
 	if(Confusion)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 		add_colored_text("Conf", newbot2);
-#else
-		Strcat(nb = eos(nb), " Conf");
-#endif
 	if(Sick) {
 		if (u.usick_type & SICK_VOMITABLE)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 			add_colored_text("FoodPois", newbot2);
-#else
-			Strcat(nb = eos(nb), " FoodPois");
-#endif
 		if (u.usick_type & SICK_NONVOMITABLE)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 			add_colored_text("Ill", newbot2);
-#else
-			Strcat(nb = eos(nb), " Ill");
-#endif
 	}
 	if(Blind)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	     	add_colored_text("Blind", newbot2);
-#else
-		Strcat(nb = eos(nb), " Blind");
-#endif
 	if(Stunned)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	     	add_colored_text("Stun", newbot2);
-#else
-		Strcat(nb = eos(nb), " Stun");
-#endif
 	if(Hallucination)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	     	add_colored_text("Hallu", newbot2);
-#else
-		Strcat(nb = eos(nb), " Hallu");
-#endif
 	if(Slimed)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	     	add_colored_text("Slime", newbot2);
-#else
-		Strcat(nb = eos(nb), " Slime");
-#endif
 	if(cap > UNENCUMBERED)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 		add_colored_text(enc_stat[cap], newbot2);
-#else
-		Sprintf(nb = eos(nb), " %s", enc_stat[cap]);
-#endif
 	if (u.ufeetfrozen > 0) {
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	     	add_colored_text("Frozen", newbot2);
-#else
-		Strcat(nb = eos(nb), " Frozen");
-#endif
 	}
-#ifdef ELBERETH
 	if(!Blind && sengr_at("Elbereth", u.ux, u.uy))
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	     	add_colored_text("Elbereth", newbot2);
-#else
-		Strcat(nb = eos(nb), " Elbereth");
-#endif
-#endif
 #ifdef DUMP_LOG
 }
 STATIC_OVL void

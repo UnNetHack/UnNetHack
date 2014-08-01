@@ -1,20 +1,9 @@
-/*	SCCS Id: @(#)topten.c	3.4	2000/01/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 #include "dlb.h"
-#ifdef SHORT_FILENAMES
-#include "patchlev.h"
-#else
 #include "patchlevel.h"
-#endif
-
-#ifdef VMS
- /* We don't want to rewrite the whole file, because that entails	 */
- /* creating a new version which requires that the old one be deletable. */
-# define UPDATE_RECORD_IN_PLACE
-#endif
 
 /*
  * Updating in place can leave junk at the end of the file in some
@@ -37,11 +26,9 @@ static long final_fpos;
 #define POINTSMIN	1	/* must be > 0 */
 #define ENTRYMAX	100	/* must be >= 10 */
 
-#ifndef AUTOCONF
-#if !defined(MICRO) && !defined(MAC) && !defined(WIN32)
+#if !defined(WIN32)
 #define PERS_IS_UID		/* delete for PERSMAX per name; now per uid */
 #endif
-#endif /* AUTOCONF_H */
 struct toptenentry {
 	struct toptenentry *tt_next;
 #ifdef UPDATE_RECORD_IN_PLACE
@@ -76,9 +63,7 @@ STATIC_DCL void FDECL(free_ttlist, (struct toptenentry *));
 STATIC_DCL int FDECL(classmon, (char *,BOOLEAN_P));
 STATIC_DCL int FDECL(score_wanted,
 		(BOOLEAN_P, int,struct toptenentry *,int,const char **,int));
-#ifdef RECORD_ACHIEVE
 STATIC_DCL long FDECL(encodeachieve, (void));
-#endif
 STATIC_DCL long FDECL(encode_xlogflags, (void));
 #ifdef NO_SCAN_BRACK
 STATIC_DCL void FDECL(nsb_mung_line,(char*));
@@ -86,7 +71,7 @@ STATIC_DCL void FDECL(nsb_unmung_line,(char*));
 #endif
 
 /* must fit with end.c; used in rip.c */
-NEARDATA const char * const killed_by_prefix[] = {
+const char * const killed_by_prefix[] = {
 	"killed by ", "choked on ", "poisoned by ", "died of ", "drowned in ",
 	"burned by ", "dissolved in ", "crushed to death by ", "petrified by ",
 	"turned to slime by ", "killed by ", 
@@ -94,9 +79,7 @@ NEARDATA const char * const killed_by_prefix[] = {
 	"disintegrated by ",
 #endif
 	"turned to slime by ", "killed by ",
-#ifdef ASTRAL_ESCAPE
    "",
-#endif
    "", "", "", ""
 };
 
@@ -126,7 +109,7 @@ STATIC_OVL xchar
 observable_depth(lev)
 d_level *lev;
 {
-#ifdef RANDOMIZED_PLANES	/* if we ever randomize the order of the elemental planes, we
+	/* if we ever randomize the order of the elemental planes, we
 	   must use a constant external representation in the record file */
 	if (In_endgame(lev)) {
 	    if (Is_astralevel(lev))	 return -5;
@@ -136,7 +119,6 @@ d_level *lev;
 	    else if (Is_earthlevel(lev)) return -1;
 	    else			 return 0;	/* ? */
 	} else
-#endif
 	    return depth(lev);
 }
 
@@ -290,9 +272,7 @@ encode_uevent()
   if (u.uevent.ascended)            c |= 0x00100UL; /* someone needs to use this variable */
 
   /* notable other events */
-#ifdef ELBERETH
   if (u.uevent.uhand_of_elbereth)   c |= 0x00200UL; /* was crowned */
-#endif
 
   /* boss kills */
   if (quest_status.killed_nemesis)  c |= 0x00400UL; /* defeated quest nemesis */
@@ -372,38 +352,24 @@ struct toptenentry *tt;
 
   (void)fprintf(rfile, SEP "flags=0x%lx", encode_xlogflags());
 
-#ifdef RECORD_CONDUCT
   (void)fprintf(rfile, SEP "conduct=0x%lx", encodeconduct());
-#endif
 
-#ifdef RECORD_TURNS
   (void)fprintf(rfile, SEP "turns=%ld", moves);
-#endif
 
-#ifdef RECORD_ACHIEVE
   (void)fprintf(rfile, SEP "achieve=0x%lx", encodeachieve());
-#endif
 
   (void)fprintf(rfile, SEP "event=%ld", encode_uevent());
   (void)fprintf(rfile, SEP "carried=%ld", encode_carried());
 
-#ifdef RECORD_REALTIME
   (void)fprintf(rfile, SEP "realtime=%ld", (long)realtime_data.realtime);
-#endif
 
-#ifdef RECORD_START_END_TIME
   (void)fprintf(rfile, SEP "starttime=%ld", (long)u.ubirthday);
   (void)fprintf(rfile, SEP "endtime=%ld", (long)u.udeathday);
-#endif
 
-#ifdef RECORD_GENDER0
   (void)fprintf(rfile, SEP "gender0=%s", genders[flags.initgend].filecode);
-#endif
 
-#ifdef RECORD_ALIGN0
   (void)fprintf(rfile, SEP "align0=%s", 
           aligns[1 - u.ualignbase[A_ORIGINAL]].filecode);
-#endif
   (void)fprintf(rfile, SEP "elbereths=%ld", u.uconduct.elbereths);
 
   (void)fprintf(rfile, SEP "xplevel=%d", u.ulevel); /* XP level */
@@ -414,11 +380,7 @@ struct toptenentry *tt;
                                        hell_and_hell_mode ? "hah" :
                                        heaven_or_hell_mode ? "hoh" :
                                        "normal"));
-#ifndef GOLDOBJ
   (void)fprintf(rfile, SEP "gold=%ld", u.ugold); /* hidden_gold() is not needed anymore */
-#else
-  (void)fprintf(rfile, SEP "gold=%ld", money_cnt(invent));
-#endif
 
   (void)fprintf(rfile, "\n");
 
@@ -461,14 +423,6 @@ int how;
 	FILE *xlfile;
 #endif /* XLOGFILE */
 
-/* Under DICE 3.0, this crashes the system consistently, apparently due to
- * corruption of *rfile somewhere.  Until I figure this out, just cut out
- * topten support entirely - at least then the game exits cleanly.  --AC
- */
-#ifdef _DCC
-	return;
-#endif
-
 /* If we are in the midst of a panic, cut out topten entirely.
  * topten uses alloc() several times, which will lead to
  * problems if the panic was the result of an alloc() failure.
@@ -480,15 +434,12 @@ int how;
 	    toptenwin = create_nhwindow(NHW_TEXT);
 	}
 
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
+#if defined(UNIX)
 #define HUP	if (!program_state.done_hup)
 #else
 #define HUP
 #endif
 
-#ifdef TOS
-	restore_colors();	/* make sure the screen is black on white */
-#endif
 	/* create a new 'topten' entry */
 	t0_used = FALSE;
 	t0 = newttentry();
@@ -545,11 +496,7 @@ int how;
 #endif
 
 #ifdef LOGFILE		/* used for debugging (who dies of what, where) */
-#ifdef FILE_AREAS
 	if (lock_file_area(LOGAREA, LOGFILE, 10)) {
-#else
-	if (lock_file(LOGFILE, SCOREPREFIX, 10)) {
-#endif
 	    if(!(lfile = fopen_datafile_area(LOGAREA, LOGFILE, "a", SCOREPREFIX))) {
 		HUP raw_print("Cannot open log file!");
 	    } else {
@@ -561,11 +508,7 @@ int how;
 #endif /* LOGFILE */
 
 #ifdef XLOGFILE
-#ifdef FILE_AREAS
 	if (lock_file_area(LOGAREA, XLOGFILE, 10)) {
-#else
-	if (lock_file(XLOGFILE, SCOREPREFIX, 10)) {
-#endif
 		if(!(xlfile = fopen_datafile_area(LOGAREA, XLOGFILE, "a", SCOREPREFIX))) {
 			HUP raw_print("Cannot open extended log file!");
 		} else {
@@ -594,11 +537,7 @@ int how;
 	    goto showwin;
 	}
 
-#ifdef FILE_AREAS
 	if (!lock_file_area(NH_RECORD_AREA, RECORD, 60))
-#else
-	if (!lock_file(RECORD, SCOREPREFIX, 60))
-#endif
 		goto destroywin;
 
 #ifdef UPDATE_RECORD_IN_PLACE
@@ -846,13 +785,11 @@ boolean so;
 		Sprintf(eos(linebuf), "-%s ", t1->plalign);
 	else
 		Strcat(linebuf, " ");
-#ifdef ASTRAL_ESCAPE
 	if (!strncmp("defied", t1->death, 6)) {
 	    Sprintf(eos(linebuf), "defied the Gods and escaped the dungeon %s",
 		    !strncmp(" (", t1->death + 7, 2) ? t1->death + 7 + 2 : "");
 	    second_line = FALSE;
 	} else if (!strncmp("escaped", t1->death, 7)) {
-#endif
 	    Sprintf(eos(linebuf), "escaped the dungeon %s[max level %d]",
 		    !strncmp(" (", t1->death + 7, 2) ? t1->death + 7 + 2 : "",
 		    t1->maxlvl);
@@ -1051,7 +988,6 @@ encode_xlogflags(void)
 	return e;
 }
 
-#ifdef RECORD_CONDUCT
 long
 encodeconduct(void)
 {
@@ -1072,9 +1008,7 @@ encodeconduct(void)
 
        return e;
 }
-#endif
 
-#ifdef RECORD_ACHIEVE
 long
 encodeachieve(void)
 {
@@ -1113,7 +1047,6 @@ encodeachieve(void)
 
   return r;
 }
-#endif
 
 /*
  * print selected parts of score list.
@@ -1149,14 +1082,6 @@ char **argv;
 		return;
 	}
 
-#ifdef	AMIGA
-	{
-	    extern winid amii_rawprwin;
-	    init_nhwindows(&argc, argv);
-	    amii_rawprwin = create_nhwindow(NHW_TEXT);
-	}
-#endif
-
 	/* If the score list isn't after a game, we never went through
 	 * initialization. */
 	if (wiz1_level.dlevel == 0) {
@@ -1184,11 +1109,7 @@ char **argv;
 #else
 		player0 = plname;
 		if (!*player0)
-# ifdef AMIGA
-			player0 = "all";	/* single user system */
-# else
 			player0 = "hackplayer";
-# endif
 		playerct = 1;
 		players = &player0;
 #endif
@@ -1251,14 +1172,6 @@ char **argv;
 	    raw_printf("Player types are: [-p role] [-r race]");
 	}
 	free_ttlist(tt_head);
-#ifdef	AMIGA
-	{
-	    extern winid amii_rawprwin;
-	    display_nhwindow(amii_rawprwin, 1);
-	    destroy_nhwindow(amii_rawprwin);
-	    amii_rawprwin = WIN_ERR;
-	}
-#endif
 }
 
 STATIC_OVL int

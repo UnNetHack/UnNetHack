@@ -1,14 +1,11 @@
-/*	SCCS Id: @(#)steed.c	3.4	2003/01/10	*/
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
 
-#ifdef STEED
-
 /* Monsters that might be ridden */
-static NEARDATA const char steeds[] = {
+static const char steeds[] = {
 	S_QUADRUPED, S_UNICORN, S_ANGEL, S_CENTAUR, S_DRAGON, S_JABBERWOCK, '\0'
 };
 
@@ -655,7 +652,5 @@ int x, y;
     if (mon->data == &mons[PM_GIANT_TURTLE] && (!mon->minvis || See_invisible))
 	block_point(x,y);
 }
-
-#endif /* STEED */
 
 /*steed.c*/

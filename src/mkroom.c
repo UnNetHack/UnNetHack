@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)mkroom.c	3.4	2001/09/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -75,7 +74,6 @@ mkshop()
 
 	/* first determine shoptype */
 	if(wizard){
-#ifndef MAC
 		ep = nh_getenv("SHOPTYPE");
 		if(ep){
 			for (i=0; shtypes[i].name; i++) {
@@ -145,11 +143,8 @@ mkshop()
 			else
 				i = -1;
 		}
-#endif
 	}
-#ifndef MAC
 gottype:
-#endif
 #endif
 	for(sroom = &rooms[0]; ; sroom++){
 		if(sroom->hx < 0) return;
@@ -191,11 +186,7 @@ gottype:
 	sroom->rtype = SHOPBASE + i;
 
 	/* set room bits before stocking the shop */
-#ifdef SPECIALIZATION
-	topologize(sroom, FALSE); /* doesn't matter - this is a special room */
-#else
 	topologize(sroom);
-#endif
 
 	/* stock the room with a shopkeeper and artifacts */
 	stock_room(i, sroom);

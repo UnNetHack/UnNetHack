@@ -23,7 +23,6 @@ typedef struct nhs
     const char *id;
 } nhstat;
 
-#ifdef STATUS_COLORS
 extern const struct text_color_option *text_colors;
 extern const struct percent_color_option *hp_colors;
 extern const struct percent_color_option *pw_colors;
@@ -35,7 +34,6 @@ struct color_option percentage_color_of(int value, int max,
  const struct percent_color_option *color_options);
 
 static boolean stat_colored(const char *id);
-#endif
 
 static void init_stats(void);
 
@@ -559,30 +557,18 @@ void curses_update_stats(boolean redraw)
     }
     
     /* Gold */
-#ifndef GOLDOBJ
     if (prevau.value != u.ugold)    /* Gold changed */
     {
         if (u.ugold > prevau.value)
         {
-#else
-    if (prevau.value != money_cnt(invent))  /* Gold changed */
-    {
-        if (money_cnt(invent) > prevau.value)
-        {
-#endif
             prevau.highlight_color = HI_GOLD;
         }
         else
         {
             prevau.highlight_color = STAT_DOWN_COLOR;
         }
-#ifndef GOLDOBJ
         prevau.value = u.ugold;
         sprintf(buf,"%ld", u.ugold);
-#else
-        prevau.value = money_cnt(invent);
-        sprintf(buf,"%ld", money_cnt(invent));
-#endif
         free(prevau.txt);
         prevau.txt = curses_copy_of(buf);
         prevau.highlight_turns = 5;
@@ -804,7 +790,6 @@ void curses_update_stats(boolean redraw)
     }
 
     /* Experience */
-#ifdef EXP_ON_BOTL
     if (prevexp.display != flags.showexp)   /* Setting has changed */
     {
         prevexp.display = flags.showexp;
@@ -865,7 +850,6 @@ void curses_update_stats(boolean redraw)
     }
     
     prevexp.value = u.uexp; /* Track it even when it's not displayed */
-#endif  /* EXP_ON_BOTL */
 
     /* Level */
     if (u.mtimedone)    /* Currently polymorphed - show monster HD */
@@ -1594,7 +1578,6 @@ void curses_decrement_highlight()
             unhighlight = TRUE;
         }
     }
-#ifdef EXP_ON_BOTL
     if (prevexp.highlight_turns > 0)
     {
         prevexp.highlight_turns--;
@@ -1603,7 +1586,6 @@ void curses_decrement_highlight()
             unhighlight = TRUE;
         }
     }
-#endif
     if (prevtime.highlight_turns > 0)
     {
         prevtime.highlight_turns--;
@@ -1852,13 +1834,8 @@ static void init_stats()
     set_stat_color(&prevdepth);
     
     /* Gold */
-#ifndef GOLDOBJ
     sprintf(buf,"%ld", u.ugold);
     prevau.value = u.ugold;
-#else
-    sprintf(buf,"%ld", money_cnt(invent));
-    prevau.value = money_cnt(invent);
-#endif
     prevau.txt = curses_copy_of(buf);
     prevau.display = TRUE;
     prevau.highlight_turns = 0;
@@ -1935,7 +1912,6 @@ static void init_stats()
     set_stat_color(&prevac);
 
     /* Experience */
-#ifdef EXP_ON_BOTL
     prevexp.value = u.uexp;
     sprintf(buf, "%ld", u.uexp);
     prevexp.txt = curses_copy_of(buf);
@@ -1944,7 +1920,6 @@ static void init_stats()
     prevexp.label = NULL;
     prevexp.id = "xp";
     set_stat_color(&prevexp);
-#endif
 
     /* Level */
     prevlevel.label = NULL;
@@ -2223,14 +2198,12 @@ static void set_labels(int label_width)
             }
             prevac.label = curses_copy_of("AC:");
             
-#ifdef EXP_ON_BOTL            
             /* Experience */
             if (prevexp.label)
             {
                 free (prevexp.label);
             }
             prevexp.label = curses_copy_of("XP:");
-#endif            
 
             /* Level */            
             if (prevlevel.label)
@@ -2357,14 +2330,12 @@ static void set_labels(int label_width)
             }
             prevac.label = curses_copy_of("AC:");
             
-#ifdef EXP_ON_BOTL            
             /* Experience */
             if (prevexp.label)
             {
                 free (prevexp.label);
             }
             prevexp.label = curses_copy_of("XP:");
-#endif            
 
             /* Level */            
             if (prevlevel.label)
@@ -2491,14 +2462,12 @@ static void set_labels(int label_width)
             }
             prevac.label = curses_copy_of("Armor Class:   ");
             
-#ifdef EXP_ON_BOTL            
             /* Experience */
             if (prevexp.label)
             {
                 free (prevexp.label);
             }
             prevexp.label = curses_copy_of("Experience:    ");
-#endif            
 
             /* Level */            
             if (prevlevel.label)
@@ -2553,7 +2522,6 @@ is NO_COLOR unless the statuscolors patch is in use. */
 
 static void set_stat_color(nhstat *stat)
 {
-#ifdef STATUS_COLORS
     struct color_option stat_color;
     int count;
     int attr = A_NORMAL;
@@ -2578,10 +2546,6 @@ static void set_stat_color(nhstat *stat)
         stat->stat_color = NO_COLOR;
         stat->stat_attr = A_NORMAL;
     }
-#else
-    stat->stat_color = NO_COLOR;
-    stat->stat_attr = A_NORMAL;
-#endif  /* STATUS_COLORS */
 }
 
 
@@ -2591,7 +2555,6 @@ static void set_stat_color(nhstat *stat)
 static void color_stat(nhstat stat, int onoff)
 {
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
-#ifdef STATUS_COLORS
     struct color_option stat_color;
     int color, attr, hp, hpmax, count;
     char buf[BUFSIZ];
@@ -2679,15 +2642,12 @@ static void color_stat(nhstat stat, int onoff)
 
     stat.stat_color = color;
     stat.stat_attr = attr;
-#endif  /* STATUS_COLORS */
     
     if ((stat.stat_color == NO_COLOR) && (stat.stat_attr == A_NORMAL))
     {
         if (stat.highlight_turns > 0)
         {
-#ifdef STATUS_COLORS
             if (iflags.use_status_colors)
-#endif
             curses_toggle_color_attr(win, stat.highlight_color,
              A_NORMAL, onoff);
         }
@@ -2695,9 +2655,7 @@ static void color_stat(nhstat stat, int onoff)
         return;
     }
 
-#ifdef STATUS_COLORS
     if (iflags.use_status_colors)
-#endif
     curses_toggle_color_attr(win, stat.stat_color, stat.stat_attr,
         onoff);
 }
@@ -2705,7 +2663,6 @@ static void color_stat(nhstat stat, int onoff)
 
 /* Determine if a stat is configured via statuscolors. */
 
-#ifdef STATUS_COLORS
 static boolean stat_colored(const char *id)
 {
     struct text_color_option *cur_option = 
@@ -2723,5 +2680,4 @@ static boolean stat_colored(const char *id)
     
     return FALSE;
 }
-#endif  /* STATUS_COLORS */
 

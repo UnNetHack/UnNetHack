@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)mhmenu.c	3.4	2002/03/06	*/
 /* Copyright (c) Alex Kompel, 2002                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -63,9 +62,7 @@ typedef struct mswin_nethack_menu_window {
 
 extern short glyph2tile[];
 
-#ifdef MENU_COLOR
 extern struct menucoloring *menu_colorings;
-#endif
 
 static WNDPROC wndProcListViewOrig = NULL;
 static WNDPROC editControlWndProc = NULL;
@@ -87,7 +84,6 @@ static void SelectMenuItem(HWND hwndList, PNHMenuWindow data, int item, int coun
 static void reset_menu_count(HWND hwndList, PNHMenuWindow data);
 static BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch);
 
-#ifdef MENU_COLOR
 /* map nethack color to RGB */
 COLORREF nhcolor_to_RGB(int c)
 {
@@ -123,15 +119,7 @@ int *color, *attr;
 
     if (iflags.use_menu_color && iflags.use_color)
 	for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
-# ifdef MENU_COLOR_REGEX
-#  ifdef MENU_COLOR_REGEX_POSIX
 	    if (regexec(&tmpmc->match, str, 0, NULL, 0) == 0) {
-#  else
-	    if (re_search(&tmpmc->match, str, strlen(str), 0, 9999, 0) >= 0) {
-#  endif
-# else
-	    if (pmatch(tmpmc->match, str)) {
-# endif
 		if (!foundcolor && tmpmc->color != CLR_UNDEFINED) {
 		    *color = tmpmc->color;
 		    foundcolor = TRUE;
@@ -146,7 +134,6 @@ int *color, *attr;
     if (foundattr && !foundcolor) *color = NO_COLOR;
     return foundcolor || foundattr;
 }
-#endif /* MENU_COLOR */
 
 /*-----------------------------------------------------------------------------*/
 HWND mswin_init_menu_window (int type) {
@@ -833,10 +820,8 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int column;
 	int use_attr = ATR_NONE;
 
-#ifdef MENU_COLOR
 	int color = NO_COLOR, attr = ATR_NONE;
 	boolean menucolr = FALSE;
-#endif
 
 	lpdis = (LPDRAWITEMSTRUCT) lParam; 
 
@@ -848,7 +833,6 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     item = &data->menu.items[lpdis->itemID];
 	use_attr = item->attr;
 
-#ifdef MENU_COLOR
 	if (iflags.use_menu_color && iflags.use_color) {
 		menucolr = get_menu_coloring(item->str, &color, &attr);
 	}
@@ -856,7 +840,6 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	if (menucolr) {
 		use_attr = attr;
 	}
-#endif
 
 	tileDC = CreateCompatibleDC(lpdis->hDC);
 	saveFont = SelectObject(lpdis->hDC, mswin_get_font(NHW_MENU, use_attr, lpdis->hDC, FALSE));
@@ -865,11 +848,9 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	OldFg = SetTextColor(lpdis->hDC, 
 		menu_fg_brush ? menu_fg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_FG_MENU)); 
 
-#ifdef MENU_COLOR
 	if (menucolr && color != NO_COLOR) {
 		SetTextColor(lpdis->hDC, nhcolor_to_RGB(color));
 	}
-#endif
 
     GetTextMetrics(lpdis->hDC, &tm);
 

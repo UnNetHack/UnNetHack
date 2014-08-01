@@ -30,18 +30,11 @@ int NDECL(yylex);
 	 * Digital UNIX is difficult and still has int in spite of all
 	 * other signs.
 	 */
-# if defined(NeXT) || defined(SVR4) || defined(_AIX32)
+# if defined(SVR4)
 #  define VOIDYYPUT
 # endif
 # if !defined(VOIDYYPUT) && defined(POSIX_TYPES)
-#  if !defined(BOS) && !defined(HISX) && !defined(_M_UNIX) && !defined(VMS)
 #   define VOIDYYPUT
-#  endif
-# endif
-# if !defined(VOIDYYPUT) && defined(WEIRD_LEX)
-#  if defined(SUNOS4) && defined(__STDC__) && (WEIRD_LEX > 1)
-#   define VOIDYYPUT
-#  endif
 # endif
 # if defined(VOIDYYPUT) && defined(__osf__)
 #  undef VOIDYYPUT

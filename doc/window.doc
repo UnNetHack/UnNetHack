@@ -43,10 +43,8 @@ Only NHW_MENU type windows can be used for menus.
 
 NHW_TEXT windows are used to display a large amount of textual data.
 This is the type of window one would use for displaying a help file,
-for example.  In the tty window-port, windows of type NHW_TEXT can
-page using the DEF_PAGER, if DEF_PAGER is defined.  There exists an
-assumption that the font for text windows is monospaced.  The help
-files are all formatted accordingly.
+for example.  assumption that the font for text windows is monospaced.  
+The help files are all formatted accordingly.
 
 "window" is always of type winid.  This is currently implemented as an
 integer, but doesn't necessarily have to be done that way.  There are
@@ -182,17 +180,10 @@ player_selection()
 		   player_selection() offers a Quit option, it is its
 		   responsibility to clean up and terminate the process.
 		   You need to fill in pl_character[0].
-#ifdef FILE_AREAS
 display_file(area, str, boolean complain)
-#else
-display_file(str, boolean complain)
-#endif
 		-- Display the file named str.  Complain about missing files
-		   iff complain is TRUE. If FILE_AREAS is defined then the
-		   file should be found in the named area. Note that vanilla
-		   does not define FILE_AREAS and therefore window ports
-		   defined in this way will be compatible with both Slash'EM
-		   and vanilla NetHack.
+		   iff complain is TRUE. The file should be found in the 
+                   named area. 
 update_inventory()
 		-- Indicate to the window port that the inventory has been
 		   changed.
@@ -201,18 +192,6 @@ update_inventory()
 doprev_message()
 		-- Display previous messages.  Used by the ^P command.
 		-- On the tty-port this scrolls WIN_MESSAGE back one line.
-
-update_positionbar(char *features)
-		-- Optional, POSITIONBAR must be defined. Provide some 
-		   additional information for use in a horizontal
-		   position bar (most useful on clipped displays).
-		   Features is a series of char pairs.  The first char
-		   in the pair is a symbol and the second char is the
-		   column where it is currently located.
-		   A '<' is used to mark an upstairs, a '>'
-		   for a downstairs, and an '@' for the current player
-		   location. A zero char marks the end of the list.
-			
 
 C.  Window Utility Routines
 
@@ -497,7 +476,6 @@ to support:
   |  map_mode          | WC_MAP_MODE        | wc_map_mode        |int     |
   |  player_selection  | WC_PLAYER_SELECTION| wc_player_selection|int     |
   |  popup_dialog      | WC_POPUP_DIALOG    | wc_popup_dialog    |boolean |
-  |  preload_tiles     | WC_PRELOAD_TILES   | wc_preload_tiles   |boolean |
   |  scroll_amount     | WC_SCROLL_AMOUNT   | wc_scroll_amount   |int     |
   |  scroll_margin     | WC_SCROLL_MARGIN   | wc_scroll_margin   |int     |
   |  splash_screen     | WC_SPLASH_SCREEN   | wc_splash_screen   |boolean |
@@ -553,7 +531,6 @@ map_mode	-- port should display the map in the manner specified.
 player_selection
 		-- dialog or prompts for choosing character.
 popup_dialog	-- port should pop up dialog boxes for input.
-preload_tiles	-- port should preload tiles into memory.
 scroll_amount   -- scroll this amount when scroll_margin is reached.
 scroll_margin	-- port should scroll the display when the hero or cursor
 		   is this number of cells away from the edge of the window.

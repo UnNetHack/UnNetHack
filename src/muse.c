@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)muse.c	3.4	2002/12/23	*/
 /*	Copyright (C) 1990 by Ken Arromdee			   */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -945,9 +944,7 @@ struct monst *mtmp;
 
 	if(is_animal(pm) || attacktype(pm, AT_EXPL) || mindless(mtmp->data)
 			|| pm->mlet == S_GHOST
-# ifdef KOPS
 			|| pm->mlet == S_KOP
-# endif
 		) return 0;
     try_again:
 	switch (rn2(8 + (difficulty > 3) + (difficulty > 6) +
@@ -1017,9 +1014,7 @@ struct monst *mtmp;
 	if (u.uswallow) return FALSE;
 	if (in_your_sanctuary(mtmp, 0, 0)) return FALSE;
 	if (dmgtype(mtmp->data, AD_HEAL) && !uwep
-#ifdef TOURIST
 	    && !uarmu
-#endif
 	    && !uarm && !uarmh && !uarms && !uarmg && !uarmc && !uarmf)
 		return FALSE;
 
@@ -1116,9 +1111,7 @@ struct monst *mtmp;
 				unsolid(mtmp->data) || !rn2(10))
 		       && dist2(mtmp->mx,mtmp->my,mtmp->mux,mtmp->muy) <= 2
 		       && mtmp->mcansee && haseyes(mtmp->data)
-#ifdef REINCARNATION
 		       && !Is_rogue_level(&u.uz)
-#endif
 		       && (!In_endgame(&u.uz) || Is_earthlevel(&u.uz))) {
 		    m.offensive = obj;
 		    m.has_offense = MUSE_SCR_EARTH;
@@ -1390,9 +1383,6 @@ struct monst *mtmp;
 	    	    	if (isok(x, y) && !closed_door(x, y) &&
 	    	    			!IS_ROCK(levl[x][y].typ) &&
 	    	    			!IS_AIR(levl[x][y].typ) &&
-#ifdef BLACKMARKET
-	    	    			!(Is_blackmarket(&u.uz) && rn2(2)) &&
-#endif
 	    	    			(((x == mmx) && (y == mmy)) ?
 	    	    			    !otmp->blessed : !otmp->cursed) &&
 					(x != u.ux || y != u.uy)) {
@@ -1488,9 +1478,7 @@ struct monst *mtmp;
 
 	if(is_animal(pm) || attacktype(pm, AT_EXPL) || mindless(mtmp->data)
 			|| pm->mlet == S_GHOST
-# ifdef KOPS
 			|| pm->mlet == S_KOP
-# endif
 		) return 0;
 	if (difficulty > 7 && !rn2(35)) return WAN_DEATH;
 	switch (rn2(9 - (difficulty < 4) + 4 * (difficulty > 6))) {
@@ -1852,9 +1840,7 @@ struct monst *mtmp;
 	pline("For some reason, %s presence is known to you.",
 		s_suffix(noit_mon_nam(mtmp)));
 	cls();
-#ifdef CLIPPING
 	cliparound(mtmp->mx, mtmp->my);
-#endif
 	show_glyph(mtmp->mx, mtmp->my, mon_to_glyph(mtmp));
 	display_self();
 	You_feel("aggravated at %s.", noit_mon_nam(mtmp));
@@ -1879,9 +1865,7 @@ struct monst *mtmp;
 
 	if(is_animal(pm) || attacktype(pm, AT_EXPL) || mindless(mtmp->data)
 			|| pm->mlet == S_GHOST
-# ifdef KOPS
 			|| pm->mlet == S_KOP
-# endif
 		) return 0;
 	/* Unlike other rnd_item functions, we only allow _weak_ monsters
 	 * to have this item; after all, the item will be used to strengthen

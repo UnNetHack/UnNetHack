@@ -686,7 +686,6 @@ static char *yy_last_accepting_cpos;
 #define YY_MORE_ADJ 0
 char *yytext;
 #define INITIAL 0
-/*	SCCS Id: @(#)lev_lex.c	3.4	2002/03/27	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -717,18 +716,11 @@ int NDECL(yylex);
 	 * Digital UNIX is difficult and still has int in spite of all
 	 * other signs.
 	 */
-# if defined(NeXT) || defined(SVR4) || defined(_AIX32)
+# if defined(SVR4)
 #  define VOIDYYPUT
 # endif
 # if !defined(VOIDYYPUT) && defined(POSIX_TYPES)
-#  if !defined(BOS) && !defined(HISX) && !defined(_M_UNIX) && !defined(VMS)
 #   define VOIDYYPUT
-#  endif
-# endif
-# if !defined(VOIDYYPUT) && defined(WEIRD_LEX)
-#  if defined(SUNOS4) && defined(__STDC__) && (WEIRD_LEX > 1)
-#   define VOIDYYPUT
-#  endif
 # endif
 # if defined(VOIDYYPUT) && defined(__osf__)
 #  undef VOIDYYPUT
@@ -2058,14 +2050,6 @@ genericptr_t ptr;
 	}
 
 /*flexhack.skl*/
-
-#ifdef	AMIGA
-long *alloc(n)
-	unsigned n;
-{
-	return ((long *)malloc (n));
-}
-#endif
 
 /* routine to switch to another input file; needed for flex */
 void init_yyin( input_f )

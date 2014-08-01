@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)makemon.c	3.4	2003/09/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,11 +5,9 @@
 #include "epri.h"
 #include "emin.h"
 #include "edog.h"
-#ifdef REINCARNATION
 #include <ctype.h>
-#endif
 
-STATIC_VAR NEARDATA struct monst zeromonst;
+STATIC_VAR struct monst zeromonst;
 
 /* this assumes that a human quest leader or nemesis is an archetype
    of the corresponding role; that isn't so for some roles (tourist
@@ -81,40 +78,10 @@ register int x, y, n;
 	coord mm;
 	register int cnt = rnd(n);
 	struct monst *mon;
-#if defined(__GNUC__) && (defined(HPUX) || defined(DGUX))
-	/* There is an unresolved problem with several people finding that
-	 * the game hangs eating CPU; if interrupted and restored, the level
-	 * will be filled with monsters.  Of those reports giving system type,
-	 * there were two DG/UX and two HP-UX, all using gcc as the compiler.
-	 * hcroft@hpopb1.cern.ch, using gcc 2.6.3 on HP-UX, says that the
-	 * problem went away for him and another reporter-to-newsgroup
-	 * after adding this debugging code.  This has almost got to be a
-	 * compiler bug, but until somebody tracks it down and gets it fixed,
-	 * might as well go with the "but it went away when I tried to find
-	 * it" code.
-	 */
-	int cnttmp,cntdiv;
 
-	cnttmp = cnt;
-# ifdef DEBUG
-	pline("init group call x=%d,y=%d,n=%d,cnt=%d.", x, y, n, cnt);
-# endif
-	cntdiv = ((u.ulevel < 3) ? 4 : (u.ulevel < 5) ? 2 : 1);
-#endif
 	/* Tuning: cut down on swarming at low character levels [mrs] */
 	cnt /= (u.ulevel < 3) ? 4 : (u.ulevel < 5) ? 2 : 1;
-#if defined(__GNUC__) && (defined(HPUX) || defined(DGUX))
-	if (cnt != (cnttmp/cntdiv)) {
-		pline("cnt=%d using %d, cnttmp=%d, cntdiv=%d", cnt,
-			(u.ulevel < 3) ? 4 : (u.ulevel < 5) ? 2 : 1,
-			cnttmp, cntdiv);
-	}
-#endif
 	if(!cnt) cnt++;
-#if defined(__GNUC__) && (defined(HPUX) || defined(DGUX))
-	if (cnt < 0) cnt = 1;
-	if (cnt > 10) cnt = 10;
-#endif
 
 	mm.x = x;
 	mm.y = y;
@@ -181,9 +148,7 @@ register struct monst *mtmp;
 	register int mm = monsndx(ptr);
 	struct obj *otmp;
 
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) return;
-#endif
 /*
  *	first a few special cases:
  *
@@ -227,9 +192,7 @@ register struct monst *mtmp;
 			case PM_LIEUTENANT:
 			  w1 = rn2(2) ? BROADSWORD : LONG_SWORD;
 			  break;
-#ifdef CONVICT
 			case PM_PRISON_GUARD:
-#endif /* CONVICT */
 			case PM_CAPTAIN:
 			case PM_WATCH_CAPTAIN:
 			  w1 = rn2(2) ? LONG_SWORD : SILVER_SABER;
@@ -280,14 +243,12 @@ register struct monst *mtmp;
 			if(!rn2(2)) curse(otmp);
 			(void) mpickobj(mtmp, otmp);
 		    }
-#ifdef CONVICT
 		} else if (mm == PM_MINER) {
 		    (void)mongets(mtmp, PICK_AXE);
 		    otmp = mksobj(BRASS_LANTERN, TRUE, FALSE);
 			(void) mpickobj(mtmp, otmp);
             begin_burn(otmp, FALSE);
 		}
-#endif /* CONVICT */
 		break;
 
 	    case S_ANGEL:
@@ -309,9 +270,7 @@ register struct monst *mtmp;
 		    if (uarms) m_inityour(mtmp,uarms);
 		    if (uarmg) m_inityour(mtmp,uarmg);
 		    if (uarmf) m_inityour(mtmp,uarmf);
-#ifdef TOURIST
 		    if (uarmu) m_inityour(mtmp,uarmu);
-#endif
 		    /* same chance for an amulet of reflection as other
 		       angelic beings have for a shield of reflection */
 		    if (!rn2(4)) (void)mongets(mtmp, AMULET_OF_REFLECTION);
@@ -375,14 +334,12 @@ register struct monst *mtmp;
 		    }
 		}
 		break;
-# ifdef KOPS
 	    case S_KOP:		/* create Keystone Kops with cream pies to
 				 * throw. As suggested by KAA.	   [MRS]
 				 */
 		if (!rn2(4)) m_initthrow(mtmp, CREAM_PIE, 2);
 		if (!rn2(3)) (void)mongets(mtmp,(rn2(2)) ? CLUB : RUBBER_HOSE);
 		break;
-# endif
 	    case S_ORC:
 		if(rn2(2)) (void)mongets(mtmp, ORCISH_HELM);
 		switch (mm != PM_ORC_CAPTAIN ? mm :
@@ -519,22 +476,6 @@ register struct monst *mtmp;
 		(void) mongets(mtmp, rnd_offensive_item(mtmp));
 }
 
-#ifdef GOLDOBJ
-/*
- *   Makes up money for monster's inventory.
- *   This will change with silver & copper coins
- */
-void 
-mkmonmoney(mtmp, amount)
-struct monst *mtmp;
-long amount;
-{
-    struct obj *gold = mksobj(GOLD_PIECE, FALSE, FALSE);
-    gold->quan = amount;
-    add_to_minv(mtmp, gold);
-}
-#endif
-
 STATIC_OVL void
 m_initinv(mtmp)
 register struct	monst	*mtmp;
@@ -543,9 +484,7 @@ register struct	monst	*mtmp;
 	register struct obj *otmp;
 	register struct permonst *ptr = mtmp->data;
 	int i;
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) return;
-#endif
 /*
  *	Soldiers get armour & rations - armour approximates their ac.
  *	Nymphs may get mirror or potion of object detection.
@@ -558,9 +497,7 @@ register struct	monst	*mtmp;
 
 		    switch(monsndx(ptr)) {
 			case PM_GUARD: mac = -1; break;
-#ifdef CONVICT
 			case PM_PRISON_GUARD: mac = -2; break;
-#endif /* CONVICT */
 			case PM_SOLDIER: mac = 3; break;
 			case PM_SERGEANT: mac = 0; break;
 			case PM_LIEUTENANT: mac = -2; break;
@@ -602,9 +539,7 @@ register struct	monst	*mtmp;
 			mac += 1 + mongets(mtmp, LEATHER_CLOAK);
 
 		    if(ptr != &mons[PM_GUARD] &&
-#ifdef CONVICT
 			ptr != &mons[PM_PRISON_GUARD] &&
-#endif /* CONVICT */
 			ptr != &mons[PM_WATCHMAN] &&
 			ptr != &mons[PM_WATCH_CAPTAIN]) {
 			if (!rn2(3)) (void) mongets(mtmp, K_RATION);
@@ -646,11 +581,7 @@ register struct	monst	*mtmp;
 					     rn2(3) ? CLOAK_OF_PROTECTION :
 						 CLOAK_OF_MAGIC_RESISTANCE);
 		    (void) mongets(mtmp, SMALL_SHIELD);
-#ifndef GOLDOBJ
 		    mtmp->mgold = (long)rn1(10,20);
-#else
-		    mkmonmoney(mtmp,(long)rn1(10,20));
-#endif
 		} else if (quest_mon_represents_role(ptr,PM_MONK)) {
 		    (void) mongets(mtmp, rn2(11) ? ROBE :
 					     CLOAK_OF_MAGIC_RESISTANCE);
@@ -704,11 +635,7 @@ register struct	monst	*mtmp;
 		}
 		break;
 	    case S_LEPRECHAUN:
-#ifndef GOLDOBJ
 		mtmp->mgold = (long) d(level_difficulty(), 30);
-#else
-		mkmonmoney(mtmp, (long) d(level_difficulty(), 30));
-#endif
 		break;
 	    case S_VAMPIRE:
 		/* some vampires get an opera cloak */
@@ -804,14 +731,9 @@ register struct	monst	*mtmp;
 		(void) mongets(mtmp, rnd_defensive_item(mtmp));
 	if ((int) mtmp->m_lev > rn2(100))
 		(void) mongets(mtmp, rnd_misc_item(mtmp));
-#ifndef GOLDOBJ
 	if (likes_gold(ptr) && !mtmp->mgold && !rn2(5))
 		mtmp->mgold =
 		      (long) d(level_difficulty(), mtmp->minvent ? 5 : 10);
-#else
-	if (likes_gold(ptr) && !findgold(mtmp->minvent) && !rn2(5))
-		mkmonmoney(mtmp, (long) d(level_difficulty(), mtmp->minvent ? 5 : 10));
-#endif
 }
 
 /* Note: for long worms, always call cutworm (cutworm calls clone_mon) */
@@ -853,9 +775,7 @@ xchar x, y;	/* clone's preferred location or 0 (near mon) */
 
 	m2->minvent = (struct obj *) 0; /* objects don't clone */
 	m2->mleashed = FALSE;
-#ifndef GOLDOBJ
 	m2->mgold = 0L;
-#endif
 	/* Max HP the same, but current HP halved for both.  The caller
 	 * might want to override this by halving the max HP also.
 	 * When current HP is odd, the original keeps the extra point.
@@ -1210,15 +1130,7 @@ register int	mmflags;
 	    if (uwep && uwep->oartifact == ART_EXCALIBUR)
 		mtmp->mpeaceful = mtmp->mtame = FALSE;
 	}
-#ifndef DCC30_BUG
 	if (mndx == PM_LONG_WORM && (mtmp->wormno = get_wormno()) != 0)
-#else
-	/* DICE 3.0 doesn't like assigning and comparing mtmp->wormno in the
-	 * same expression.
-	 */
-	if (mndx == PM_LONG_WORM &&
-		(mtmp->wormno = get_wormno(), mtmp->wormno != 0))
-#endif
 	{
 	    /* we can now create worms with tails - 11/91 */
 	    initworm(mtmp, rn2(5));
@@ -1373,8 +1285,8 @@ STATIC_OVL int
 align_shift(ptr)
 register struct permonst *ptr;
 {
-    static NEARDATA long oldmoves = 0L;	/* != 1, starting value of moves */
-    static NEARDATA s_level *lev;
+    static long oldmoves = 0L;	/* != 1, starting value of moves */
+    static s_level *lev;
     register int alshift;
 
     if(oldmoves != moves) {
@@ -1446,7 +1358,7 @@ struct mon_gen_override *override;
     return NULL;
 }
 
-static NEARDATA struct {
+static struct {
 	int choice_count;
 	char mchoices[SPECIAL_PM];	/* value range is 0..127 */
 } rndmonst_state = { -1, {0} };
@@ -1466,9 +1378,7 @@ rndmonst()
 	if (rndmonst_state.choice_count < 0) {	/* need to recalculate */
 	    int minmlev, maxmlev;
 	    boolean elemlevel;
-#ifdef REINCARNATION
 	    boolean upper;
-#endif
 
 	    rndmonst_state.choice_count = 0;
 	    /* look for first common monster */
@@ -1485,9 +1395,7 @@ rndmonst()
 	    } /* else `mndx' now ready for use below */
 	    minmlev = min_monster_difficulty();
 	    maxmlev = max_monster_difficulty();
-#ifdef REINCARNATION
 	    upper = Is_rogue_level(&u.uz);
-#endif
 	    elemlevel = In_endgame(&u.uz) && !Is_astralevel(&u.uz);
 
 /*
@@ -1499,14 +1407,9 @@ rndmonst()
 		rndmonst_state.mchoices[mndx] = 0;
 		if (tooweak(mndx, minmlev) || toostrong(mndx, maxmlev))
 		    continue;
-#ifdef REINCARNATION
 		if (upper && !isupper(def_monsyms[(int)(ptr->mlet)])) continue;
-#endif
 		if (elemlevel && wrong_elem_type(ptr)) continue;
 		if (uncommon(mndx)) continue;
-#ifdef BLACKMARKET	/* SWD: pets are not allowed in the black market */
-		if (is_domestic(ptr) && Is_blackmarket(&u.uz)) continue;
-#endif
 		if (prohibited_by_generation_flags(ptr)) continue;
 		ct = (int)(ptr->geno & G_FREQ) + align_shift(ptr);
 		/* Boost Sheol-Only(tm) monster generation in Sheol. */
@@ -1900,7 +1803,7 @@ struct monst *mtmp;
 		mtmp->malign = abs(mal);
 }
 
-static NEARDATA char syms[] = {
+static char syms[] = {
 	MAXOCLASSES, MAXOCLASSES+1, RING_CLASS, WAND_CLASS, WEAPON_CLASS,
 	FOOD_CLASS, COIN_CLASS, SCROLL_CLASS, POTION_CLASS, ARMOR_CLASS,
 	AMULET_CLASS, TOOL_CLASS, ROCK_CLASS, GEM_CLASS, SPBOOK_CLASS,
@@ -1924,10 +1827,6 @@ register struct monst *mtmp;
 	roomno = levl[mx][my].roomno - ROOMOFFSET;
 	if (roomno >= 0)
 		rt = rooms[roomno].rtype;
-#ifdef SPECIALIZATION
-	else if (IS_ROOM(typ))
-		rt = OROOM,  roomno = 0;
-#endif
 	else	rt = 0;	/* roomno < 0 case for GCC_WARN */
 
 	if (OBJ_AT(mx, my)) {

@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)zap.c	3.4	2003/08/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,8 +10,8 @@
  */
 #define MAGIC_COOKIE 1000
 
-static NEARDATA boolean obj_zapped;
-static NEARDATA int poly_zapped;
+static boolean obj_zapped;
+static int poly_zapped;
 
 extern boolean notonhead;	/* for long worms */
 
@@ -26,9 +25,7 @@ STATIC_DCL boolean FDECL(zap_updown, (struct obj *));
 STATIC_DCL int FDECL(zhitm, (struct monst *,int,int,struct obj **));
 STATIC_DCL void FDECL(zhitu, (int,int,const char *,XCHAR_P,XCHAR_P));
 STATIC_DCL void FDECL(revive_egg, (struct obj *));
-#ifdef STEED
 STATIC_DCL boolean FDECL(zap_steed, (struct obj *));
-#endif
 
 STATIC_DCL int FDECL(zap_hit, (int,int));
 STATIC_DCL void FDECL(backfire, (struct obj *));
@@ -247,7 +244,6 @@ struct obj *otmp;
 				else pline("%s opens its mouth!", Monnam(mtmp));
 			}
 			expels(mtmp, mtmp->data, TRUE);
-#ifdef STEED
 		} else if (!!(obj = which_armor(mtmp, W_SADDLE))) {
 			mtmp->misc_worn_check &= ~obj->owornmask;
 			update_mon_intrinsics(mtmp, obj, FALSE, FALSE);
@@ -256,7 +252,6 @@ struct obj *otmp;
 			place_object(obj, mtmp->mx, mtmp->my);
 			/* call stackobj() if we ever drop anything that can merge */
 			newsym(mtmp->mx, mtmp->my);
-#endif
 		}
 		break;
 	case SPE_HEALING:
@@ -384,11 +379,7 @@ struct monst *mtmp;
 	mstatusline(mtmp);
 	if (notonhead) return;	/* don't show minvent for long worm tail */
 
-#ifndef GOLDOBJ
 	if (mtmp->minvent || mtmp->mgold) {
-#else
-	if (mtmp->minvent) {
-#endif
 	    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
 		otmp->dknown = 1;	/* treat as "seen" */
 	    (void) display_minventory(mtmp, MINV_ALL, (char *)0);
@@ -525,9 +516,7 @@ coord *cc;
 		/* most cancelled monsters return to normal,
 		   but some need to stay cancelled */
 		if (!dmgtype(mtmp2->data, AD_SEDU)
-#ifdef SEDUCE
 				&& !dmgtype(mtmp2->data, AD_SSEX)
-#endif
 		    ) mtmp2->mcan = 0;
 		mtmp2->mcansee = 1;	/* set like in makemon */
 		mtmp2->mblinded = 0;
@@ -1108,9 +1097,7 @@ polyuse(objhdr, mat, minwt)
 	otmp2 = otmp->nexthere;
 	if (otmp == uball || otmp == uchain) continue;
 	if (obj_resists(otmp, 0, 0)) continue;	/* preserve unique objects */
-#ifdef MAIL
 	if (otmp->otyp == SCR_MAIL) continue;
-#endif
 
 	if (((int) objects[otmp->otyp].oc_material == mat) ==
 		(rn2(minwt + 1) != 0)) {
@@ -1228,9 +1215,7 @@ struct obj *obj;
 {
 	long i;
 
-#ifdef MAIL
 	if (obj->otyp == SCR_MAIL) return;
-#endif
 	obj_zapped = TRUE;
 
 	if(poly_zapped < 0) {
@@ -1313,7 +1298,6 @@ poly_obj(obj, id)
 	/* preserve inventory letter if in inventory */
 	if (obj_location == OBJ_INVENT)
 	    otmp->invlet = obj->invlet;
-#ifdef MAIL
 	/* You can't send yourself 100 mail messages and then
 	 * polymorph them into useful scrolls
 	 */
@@ -1321,7 +1305,6 @@ poly_obj(obj, id)
 		otmp->otyp = SCR_MAIL;
 		otmp->spe = 1;
 	}
-#endif
 
 	/* avoid abusing eggs laid by you */
 	if (obj->otyp == EGG && obj->spe) {
@@ -1632,9 +1615,7 @@ struct obj *obj, *otmp;
 	case WAN_CANCELLATION:
 	case SPE_CANCELLATION:
 		cancel_item(obj);
-#ifdef TEXTCOLOR
 		newsym(obj->ox,obj->oy);	/* might change color */
-#endif
 		break;
 	case SPE_DRAIN_LIFE:
 		(void) drain_item(obj);
@@ -1896,7 +1877,7 @@ struct obj *otmp;
 	useup(otmp);
 }
 
-static NEARDATA const char zap_syms[] = { WAND_CLASS, 0 };
+static const char zap_syms[] = { WAND_CLASS, 0 };
 
 int
 dozap()
@@ -2168,9 +2149,7 @@ boolean ordinary;
 		case WAN_LIGHT:	/* (broken wand) */
 		 /* assert( !ordinary ); */
 		    damage = d(obj->spe, 25);
-#ifdef TOURIST
 		case EXPENSIVE_CAMERA:
-#endif
 		    damage += rnd(25);
 		    if (!resists_blnd(&youmonst)) {
 			You(are_blinded_by_the_flash);
@@ -2243,7 +2222,6 @@ boolean ordinary;
 	return(damage);
 }
 
-#ifdef STEED
 /* you've zapped a wand downwards while riding
  * Return TRUE if the steed was hit by the wand.
  * Return FALSE if the steed was not hit by the wand.
@@ -2304,7 +2282,6 @@ struct obj *obj;	/* wand or spell */
 	}
 	return steedhit;
 }
-#endif
 
 /*
  * cancel a monster (possibly the hero).  inventory is cancelled only
@@ -2649,12 +2626,10 @@ register struct	obj	*obj;
 	boolean disclose = FALSE, was_unkn = !objects[otyp].oc_name_known;
 
 	exercise(A_WIS, TRUE);
-#ifdef STEED
 	if (u.usteed && (objects[otyp].oc_dir != NODIR) &&
 	    !u.dx && !u.dy && (u.dz > 0) && zap_steed(obj)) {
 		disclose = TRUE;
 	} else
-#endif
 	if (objects[otyp].oc_dir == IMMEDIATE) {
 	    obj_zapped = FALSE;
 
@@ -2994,10 +2969,8 @@ boolean *obj_destroyed;			/**< has object been deallocated? Pointer to boolean, 
 		   (is_pool(bhitpos.x, bhitpos.y) ||
 		   is_lava(bhitpos.x, bhitpos.y)))
 		    break;
-#ifdef SINKS
 		if(IS_SINK(typ) && weapon != FLASHED_LIGHT)
 		    break;	/* physical objects fall onto sink */
-#endif
 	    }
 	    /* limit range of ball so hero won't make an invalid move */
 	    if (weapon == THROWN_WEAPON && range > 0 &&
@@ -3085,12 +3058,10 @@ int dx, dy;
 		tmp_at(bhitpos.x, bhitpos.y);
 		delay_output();
 		if(ct % 5 != 0) i++;
-#ifdef SINKS
 		if(IS_SINK(levl[bhitpos.x][bhitpos.y].typ)) {
 			pline("Klonk!");
 			break;	/* boomerang falls on sink */
 		}
-#endif
 	}
 	tmp_at(DISP_END, 0);	/* do not leave last symbol */
 	return (struct monst *)0;
@@ -3200,10 +3171,8 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 			tmp = MAGIC_COOKIE;
 			if ((otmp2 = which_armor(mon, W_ARMC)) != 0)
 			    m_useup(mon, otmp2);
-#ifdef TOURIST
 			if ((otmp2 = which_armor(mon, W_ARMU)) != 0)
 			    m_useup(mon, otmp2);
-#endif
 		    }
 		    type = -1;	/* no saving throw wanted */
 		    break;	/* not ordinary damage */
@@ -3337,9 +3306,7 @@ xchar sx, sy;
 		/* no shield or suit, you're dead; wipe out cloak
 		   and/or shirt in case of life-saving or bones */
 		if (uarmc) (void) destroy_arm(uarmc);
-#ifdef TOURIST
 		if (uarmu) (void) destroy_arm(uarmu);
-#endif
 	    } else if (nonliving(youmonst.data) || is_demon(youmonst.data)) {
 		shieldeff(sx, sy);
 		You("seem unaffected.");
@@ -3597,9 +3564,7 @@ register int dx,dy;
 	if (mon) {
 	    if (type == ZT_SPELL(ZT_FIRE)) break;
 	    if (type >= 0) mon->mstrategy &= ~STRAT_WAITMASK;
-#ifdef STEED
 	    buzzmonst:
-#endif
 	    if (zap_hit(find_mac(mon), spell_type)) {
 		if (mon_reflects(mon, (char *)0)) {
 		    if(cansee(mon->mx,mon->my)) {
@@ -3649,9 +3614,7 @@ register int dx,dy;
 			    else
 				hit(fltxt, mon, "!");
 			}
-#ifndef GOLDOBJ
 			mon->mgold = 0L;
-#endif
 
 /* note: worn amulet of life saving must be preserved in order to operate */
 #ifndef oresist_disintegration
@@ -3705,12 +3668,10 @@ register int dx,dy;
 	    }
 	} else if (sx == u.ux && sy == u.uy && range >= 0) {
 	    nomul(0, 0);
-#ifdef STEED
 	    if (u.usteed && !rn2(3) && !mon_reflects(u.usteed, (char *)0)) {
 		    mon = u.usteed;
 		    goto buzzmonst;
 	    } else
-#endif
 	    if (zap_hit((int) u.uac, 0)) {
 		range -= 2;
 		pline("%s hits you!", The(fltxt));

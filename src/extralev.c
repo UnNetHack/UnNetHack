@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)extralev.c	3.4	2001/09/06	*/
 /*	Copyright 1988, 1989 by Ken Arromdee				*/
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -7,8 +6,6 @@
  */
 
 #include "hack.h"
-
-#ifdef REINCARNATION
 
 struct rogueroom {
 	xchar rlx, rly;
@@ -22,7 +19,7 @@ struct rogueroom {
 #define LEFT 4
 #define RIGHT 8
 
-static NEARDATA struct rogueroom r[3][3];
+static struct rogueroom r[3][3];
 STATIC_DCL void FDECL(roguejoin,(int,int,int,int,int));
 STATIC_DCL void FDECL(roguecorr,(int,int,int));
 STATIC_DCL void FDECL(miniwalk,(int,int));
@@ -337,6 +334,5 @@ makerogueghost()
 		ghostobj->known = TRUE;
 	}
 }
-#endif /* REINCARNATION */
 
 /*extralev.c*/

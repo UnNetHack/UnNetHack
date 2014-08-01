@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)winX.h	3.4	1996/08/18	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,15 +12,7 @@
 #define E extern
 #endif
 
-#if defined(BOS) || defined(NHSTDC)
 #define DIMENSION_P int
-#else
-# ifdef WIDENED_PROTOTYPES
-#define DIMENSION_P unsigned int
-# else
-#define DIMENSION_P Dimension
-# endif
-#endif
 
 /*
  * Generic text buffer.
@@ -40,16 +31,11 @@ struct text_buffer {
  */
 struct text_map_info_t {
     unsigned char   text[ROWNO][COLNO]; /* Actual displayed screen. */
-#ifdef TEXTCOLOR
     unsigned char   colors[ROWNO][COLNO];	/* Color of each character. */
     GC		    color_gcs[CLR_MAX],		/* GC for each color */
 		    inv_color_gcs[CLR_MAX];	/* GC for each inverse color */
 #define copy_gc     color_gcs[NO_COLOR]
 #define inv_copy_gc inv_color_gcs[NO_COLOR]
-#else
-    GC		    copy_gc,			/* Drawing GC */
-		    inv_copy_gc;		/* Inverse drawing GC */
-#endif
 };
 
 struct tile_map_info_t {
@@ -169,9 +155,7 @@ struct text_info_t {
 		extra_height;	/* Sum of top and bottom border widths. */
     boolean	blocked;	/*  */
     boolean	destroy_on_ack; /* Destroy this window when acknowleged. */
-#ifdef GRAPHIC_TOMBSTONE
     boolean	is_rip;		/* This window needs a tombstone. */
-#endif
 };
 
 
@@ -247,13 +231,11 @@ typedef struct {
     int     message_lines;	/* number of lines to attempt to show */
     String  pet_mark_bitmap;	/* X11 bitmap file used to mark pets */
     Pixel   pet_mark_color;	/* color of pet mark */
-#ifdef GRAPHIC_TOMBSTONE
     String  tombstone;		/* name of XPM file for tombstone */
     int     tombtext_x;		/* x-coord of center of first tombstone text */
     int     tombtext_y;		/* y-coord of center of first tombstone text */
     int     tombtext_dx;	/* x-displacement between tombstone line */
     int     tombtext_dy;	/* y-displacement between tombstone line */
-#endif
 } AppResources;
 
 E AppResources appResources;
@@ -331,9 +313,7 @@ E void NDECL(check_turn_events);
 E void FDECL(delete_text, (Widget, XEvent*, String*, Cardinal*));
 E void FDECL(dismiss_text,(Widget, XEvent*, String*, Cardinal*));
 E void FDECL(key_dismiss_text,(Widget, XEvent*, String*, Cardinal*));
-#ifdef GRAPHIC_TOMBSTONE
 E void FDECL(rip_dismiss_text,(Widget, XEvent*, String*, Cardinal*));
-#endif
 E void FDECL(add_to_text_window,(struct xwindow*, int, const char*));
 E void FDECL(display_text_window,(struct xwindow*, BOOLEAN_P));
 E void FDECL(create_text_window,(struct xwindow*));
@@ -343,9 +323,7 @@ E void FDECL(append_text_buffer,(struct text_buffer*, const char*, BOOLEAN_P)); 
 E void FDECL(init_text_buffer,(struct text_buffer*));
 E void FDECL(clear_text_buffer,(struct text_buffer*));
 E void FDECL(free_text_buffer,(struct text_buffer*));
-#ifdef GRAPHIC_TOMBSTONE
 E void FDECL(calculate_rip_text, (int));
-#endif
 
 
 /* ### winval.c ### */
@@ -373,11 +351,7 @@ E void FDECL(X11_display_nhwindow, (winid, BOOLEAN_P));
 E void FDECL(X11_destroy_nhwindow, (winid));
 E void FDECL(X11_curs, (winid,int,int));
 E void FDECL(X11_putstr, (winid, int, const char *));
-#ifdef FILE_AREAS
 E void FDECL(X11_display_file, (const char *, const char *, BOOLEAN_P));
-#else
-E void FDECL(X11_display_file, (const char *, BOOLEAN_P));
-#endif
 E void FDECL(X11_start_menu, (winid));
 E void FDECL(X11_add_menu, (winid,int,const ANY_P *,
 			CHAR_P, CHAR_P, int, const char *, BOOLEAN_P));
@@ -386,9 +360,7 @@ E int FDECL(X11_select_menu, (winid, int, MENU_ITEM_P **));
 E void NDECL(X11_update_inventory);
 E void NDECL(X11_mark_synch);
 E void NDECL(X11_wait_synch);
-#ifdef CLIPPING
 E void FDECL(X11_cliparound, (int, int));
-#endif
 E void FDECL(X11_print_glyph, (winid,XCHAR_P,XCHAR_P,int));
 E void FDECL(X11_raw_print, (const char *));
 E void FDECL(X11_raw_print_bold, (const char *));
@@ -406,10 +378,6 @@ E void NDECL(X11_delay_output);
 E void NDECL(X11_start_screen);
 E void NDECL(X11_end_screen);
 
-#ifdef GRAPHIC_TOMBSTONE
 E void FDECL(X11_outrip, (winid,int));
-#else
-E void FDECL(genl_outrip, (winid,int));
-#endif
 
 #endif /* WINX_H */

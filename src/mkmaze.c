@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)mkmaze.c	3.4	2002/04/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -382,16 +381,7 @@ fixup_special()
 		lev = u.uz;
 		lev.dlevel = atoi(r->rname.str);
 	    } else {
-#ifdef RANDOMIZED_PLANES
-		s_level *sp;
-		if (strcmp("random_plane", r->rname.str)==0) {
-			sp = get_next_elemental_plane(&u.uz);
-		} else {
-			sp = find_level(r->rname.str);
-		}
-#else
 		s_level *sp = find_level(r->rname.str);
-#endif
 		if (sp) {
 			lev = sp->dlevel;
 		} else {
@@ -473,9 +463,7 @@ fixup_special()
 					if (otmp->spe < 0) { otmp->spe = 0; }
 
 					price++;
-#ifdef RECORD_ACHIEVE
 					if (otmp) otmp->record_achieve_special = 1;
-#endif
 				}
 			}
 		}
@@ -542,10 +530,6 @@ fixup_special()
 		    mtmp2 = mtmp->nmon;
 		    if(mtmp->isshk) mongone(mtmp);
 	    }
-#ifdef ADVENT_CALENDAR
-    } else if (Is_advent_calendar(&u.uz)) {
-    	fill_advent_calendar(TRUE);
-#endif
     }
 
     if(lev_message) {
@@ -564,71 +548,6 @@ fixup_special()
 	free((genericptr_t) lregions),  lregions = 0;
     num_lregions = 0;
 }
-
-#ifdef ADVENT_CALENDAR
-void
-fill_advent_calendar(init)
-boolean init;
-{
-    int door_nr=1;
-    char buf[4];
-    int x,y;
-    int in_x,in_y,out_x,out_y;
-
-    for(x = 1; x < COLNO; x++) {
-        for(y = 1; y < ROWNO; y++) {
-            if (door_nr < 25 && isok(x,y) && IS_DOOR(levl[x][y].typ)) {
-                if (y < 10) {
-                    out_x = x; out_y = y+1; in_x = x; in_y = y-1;
-                } else {
-                    out_x = x; out_y = y-1; in_x = x; in_y = y+1;
-                }
-                if (init) {
-                    sprintf(buf, "%d", door_nr);
-                    /* place number in front of the door */
-                    make_engr_at(out_x, out_y, buf, 0L, MARK);
-		    if (door_nr == 24) {
-		    	int object = CANDY_BAR;
-		    	/* Christmas present! */
-		    	switch(rn2(15)) {
-				case  0: object = BAG_OF_HOLDING; break;
-				case  1: object = OILSKIN_SACK; break;
-				case  2: object = FIRE_HORN; break;
-				case  3: object = FROST_HORN; break;
-				case  4: object = MAGIC_FLUTE; break;
-				case  5: object = MAGIC_HARP; break;
-				case  6: object = DRUM_OF_EARTHQUAKE; break;
-				case  7: object = MAGIC_WHISTLE; break;
-				case  8: object = MAGIC_LAMP; break;
-				case  9: object = UNICORN_HORN; break;
-				case 10: object = BAG_OF_TRICKS; break;
-				case 11: object = EXPENSIVE_CAMERA; break;
-				case 12: object = HORN_OF_PLENTY; break;
-				case 13: object = STETHOSCOPE; break;
-				case 14: object = TINNING_KIT; break;
-			}
-		    	mksobj_at(object, in_x, in_y, TRUE, TRUE);
-		    } else if (rn2(4)) {
-		    	mksobj_at((rn2(4)) ? CANDY_BAR : FORTUNE_COOKIE, in_x, in_y, FALSE, FALSE);
-		    } else {
-                    	mkobj_at((rn2(4)) ? RING_CLASS : TOOL_CLASS, in_x, in_y, FALSE);
-		    }
-		}
-		if (levl[x][y].doormask & D_LOCKED && getmonth()==12) {
-		    if (getmday() == 24 && door_nr == 24) {
-		        You_hear("a little bell ringing!");
-		        levl[x][y].doormask = D_CLOSED;
-		    } else if (getmday() == door_nr) {
-			You_hear("a door unlocking!");
-		        levl[x][y].doormask = D_CLOSED;
-		    }
-                }
-	    	door_nr++;
-            }
-        }
-    }
-}
-#endif
 
 void
 makemaz(s)
@@ -697,24 +616,16 @@ register const char *s;
 
 	level.flags.is_maze_lev = TRUE;
 
-#ifndef WALLIFIED_MAZE
-	for(x = 2; x < x_maze_max; x++)
-		for(y = 2; y < y_maze_max; y++)
-			levl[x][y].typ = STONE;
-#else
 	for(x = 2; x <= x_maze_max; x++)
 		for(y = 2; y <= y_maze_max; y++)
 			levl[x][y].typ = ((x % 2) && (y % 2)) ? STONE : HWALL;
-#endif
 
 	maze0xy(&mm);
 	walkfrom((int) mm.x, (int) mm.y, 0);
 	/* put a boulder at the maze center */
 	(void) mksobj_at(BOULDER, (int) mm.x, (int) mm.y, TRUE, FALSE);
 
-#ifdef WALLIFIED_MAZE
 	wallification(2, 2, x_maze_max, y_maze_max);
-#endif
 	mazexy(&mm);
 	mkstairs(mm.x, mm.y, 1, (struct mkroom *)0);		/* up */
 	if (!Invocation_lev(&u.uz)) {
@@ -795,62 +706,6 @@ register const char *s;
 		mktrap(0,1,(struct mkroom *) 0, (coord*) 0);
 }
 
-#ifdef MICRO
-/* Make the mazewalk iterative by faking a stack.  This is needed to
- * ensure the mazewalk is successful in the limited stack space of
- * the program.  This iterative version uses the minimum amount of stack
- * that is totally safe.
- */
-void
-walkfrom(x,y,typ)
-int x,y;
-schar typ;
-{
-#define CELLS (ROWNO * COLNO) / 4		/* a maze cell is 4 squares */
-	char mazex[CELLS + 1], mazey[CELLS + 1];	/* char's are OK */
-	int q, a, dir, pos;
-	int dirs[4];
-
-#ifndef WALLIFIED_MAZE
-	if (!typ) typ = CORR;
-#else
-	if (!typ) typ = ROOM;
-#endif
-
-	pos = 1;
-	mazex[pos] = (char) x;
-	mazey[pos] = (char) y;
-	while (pos) {
-		x = (int) mazex[pos];
-		y = (int) mazey[pos];
-		if(!IS_DOOR(levl[x][y].typ)) {
-		    /* might still be on edge of MAP, so don't overwrite */
-		    levl[x][y].typ = typ;
-		    levl[x][y].flags = 0;
-		    SpLev_Map[x][y] = 1;
-		}
-		q = 0;
-		for (a = 0; a < 4; a++)
-			if(okay(x, y, a)) dirs[q++]= a;
-		if (!q)
-			pos--;
-		else {
-			dir = dirs[rn2(q)];
-			move(&x, &y, dir);
-			levl[x][y].typ = typ;
-			SpLev_Map[x][y] = 1;
-			move(&x, &y, dir);
-			SpLev_Map[x][y] = 1;
-			pos++;
-			if (pos > CELLS)
-				panic("Overflow in walkfrom");
-			mazex[pos] = (char) x;
-			mazey[pos] = (char) y;
-		}
-	}
-}
-#else
-
 void
 walkfrom(x,y,typ)
 int x,y;
@@ -859,11 +714,7 @@ schar typ;
 	register int q,a,dir;
 	int dirs[4];
 
-#ifndef WALLIFIED_MAZE
-	if (!typ) typ = CORR;
-#else
 	if (!typ) typ = ROOM;
-#endif
 
 	if(!IS_DOOR(levl[x][y].typ)) {
 	    /* might still be on edge of MAP, so don't overwrite */
@@ -886,7 +737,6 @@ schar typ;
 		walkfrom(x,y, typ);
 	}
 }
-#endif /* MICRO */
 
 STATIC_OVL void
 move(x,y,dir)
@@ -914,11 +764,7 @@ mazexy(cc)	/* find random point in generated corridors,
 	    cc->y = 3 + 2*rn2((y_maze_max>>1) - 1);
 	    cpt++;
 	} while (cpt < 100 && levl[cc->x][cc->y].typ !=
-#ifdef WALLIFIED_MAZE
 		 ROOM
-#else
-		 CORR
-#endif
 		);
 	if (cpt >= 100) {
 		register int x, y;
@@ -928,11 +774,7 @@ mazexy(cc)	/* find random point in generated corridors,
 			cc->x = 3 + 2 * x;
 			cc->y = 3 + 2 * y;
 			if (levl[cc->x][cc->y].typ ==
-#ifdef WALLIFIED_MAZE
 			    ROOM
-#else
-			    CORR
-#endif
 			   ) return;
 		    }
 		panic("mazexy: can't find a place!");
@@ -950,7 +792,7 @@ bound_digging()
  * so the boundary would be breached
  *
  * we can't bound unconditionally on one beyond the last line, because
- * that provides a window of abuse for WALLIFIED_MAZE special levels
+ * that provides a window of abuse for special levels
  */
 {
 	register int x,y;
@@ -1018,12 +860,7 @@ bound_digging()
 	for (x = 0; x < COLNO; x++)
 	  for (y = 0; y < ROWNO; y++)
 	    if (y <= ymin || y >= ymax || x <= xmin || x >= xmax) {
-#ifdef DCC30_BUG
-		lev = &levl[x][y];
-		lev->wall_info |= W_NONDIGGABLE;
-#else
 		levl[x][y].wall_info |= W_NONDIGGABLE;
-#endif
 	    }
 }
 

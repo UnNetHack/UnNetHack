@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)display.c	3.4	2003/02/19	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1076,10 +1075,8 @@ see_monsters()
 	newsym(mon->mx,mon->my);
 	if (mon->wormno) see_wsegs(mon);
     }
-#ifdef STEED
     /* when mounted, hero's location gets caught by monster loop */
     if (!u.usteed)
-#endif
     newsym(u.ux, u.uy);
 }
 
@@ -2176,21 +2173,6 @@ do_twall:
 			}
 			break;
 		    case WM_T_BL:
-#if 0	/* older method, fixed */
-			if (only(seenv, SV4|SV5)) {
-			    col = T_tlcorn;
-			} else if ((seenv & (SV0|SV1|SV2)) &&
-					only(seenv, SV0|SV1|SV2|SV6|SV7)) {
-			    col = T_hwall;
-			} else if (seenv & SV3 ||
-			    ((seenv & (SV0|SV1|SV2)) && (seenv & (SV4|SV5)))) {
-			    col = T_tdwall;
-			} else {
-			    if (seenv != SV6)
-				t_warn(lev);
-			    col = T_stone;
-			}
-#endif	/* 0 */
 			if (only(seenv, SV4|SV5))
 			    col = T_tlcorn;
 			else if ((seenv & (SV0|SV1|SV2|SV7)) &&
@@ -2202,21 +2184,6 @@ do_twall:
 			    col = T_tdwall;
 			break;
 		    case WM_T_BR:
-#if 0	/* older method, fixed */
-			if (only(seenv, SV5|SV6)) {
-			    col = T_trcorn;
-			} else if ((seenv & (SV0|SV1|SV2)) &&
-					    only(seenv, SV0|SV1|SV2|SV3|SV4)) {
-			    col = T_hwall;
-			} else if (seenv & SV7 ||
-			    ((seenv & (SV0|SV1|SV2)) && (seenv & (SV5|SV6)))) {
-			    col = T_tdwall;
-			} else {
-			    if (seenv != SV4)
-				t_warn(lev);
-			    col = T_stone;
-			}
-#endif	/* 0 */
 			if (only(seenv, SV5|SV6))
 			    col = T_trcorn;
 			else if ((seenv & (SV0|SV1|SV2|SV3)) &&

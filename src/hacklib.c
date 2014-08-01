@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)hacklib.c	3.4	2002/12/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Robert Patrick Rankin, 1991		  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -53,11 +52,7 @@ NetHack, except that rounddiv may call panic().
 	char *		get_formatted_time		(time_t, const char *)
 	char *		iso8601		(time_t)
 =*/
-#ifdef LINT
-# define Static		/* pacify lint */
-#else
 # define Static static
-#endif
 
 boolean
 digit(c)		/* is 'c' a digit? */
@@ -458,9 +453,6 @@ fuzzymatch(s1, s2, ignore_chars, caseblind)
  *	- determination of what files are "very old"
  */
 
-#if defined(AMIGA) && !defined(AZTEC_C) && !defined(__SASC_60) && !defined(_DCC) && !defined(__GNUC__)
-extern struct tm *FDECL(localtime,(time_t *));
-#endif
 static struct tm *NDECL(getlt);
 
 #ifdef USE_MERSENNE_TWISTER
@@ -489,11 +481,8 @@ setrandom()
 #ifdef RANDOM	/* srandom() from sys/share/random.c */
 	srandom((unsigned int) time((time_t *)0));
 #else
-# if defined(__APPLE__) || defined(BSD) || defined(LINUX) || defined(ULTRIX) || defined(CYGWIN32) /* system srandom() */
+# if defined(BSD) || defined(LINUX) || defined(CYGWIN32) /* system srandom() */
 #  if defined(BSD) && !defined(POSIX_TYPES)
-#   if defined(SUNOS4)
-	(void)
-#   endif
 		srandom((int) (time((long *)0) + random_seed));
 #  else
 		srandom((int) (time((time_t *)0)) + random_seed);
@@ -514,7 +503,7 @@ getlt()
 {
 	time_t date = current_epoch();
 
-#if (defined(ULTRIX) && !(defined(ULTRIX_PROTO) || defined(NHSTDC))) || (defined(BSD) && !defined(POSIX_TYPES))
+#if defined(BSD) && !defined(POSIX_TYPES)
 	return(localtime((long *)(&date)));
 #else
 	return(localtime(&date));
@@ -541,30 +530,6 @@ getmday()
 	return(getlt()->tm_mday);
 }
 
-#if 0
-/* This routine is no longer used since in 2000 it will yield "100mmdd". */
-char *
-yymmdd(date)
-time_t date;
-{
-	Static char datestr[10];
-	struct tm *lt;
-
-	if (date == 0)
-		lt = getlt();
-	else
-#if (defined(ULTRIX) && !(defined(ULTRIX_PROTO) || defined(NHSTDC))) || defined(BSD)
-		lt = localtime((long *)(&date));
-#else
-		lt = localtime(&date);
-#endif
-
-	Sprintf(datestr, "%02d%02d%02d",
-		lt->tm_year, lt->tm_mon + 1, lt->tm_mday);
-	return(datestr);
-}
-#endif
-
 long
 yyyymmdd(date)
 time_t date;
@@ -575,7 +540,7 @@ time_t date;
 	if (date == 0)
 		lt = getlt();
 	else
-#if (defined(ULTRIX) && !(defined(ULTRIX_PROTO) || defined(NHSTDC))) || (defined(BSD) && !defined(POSIX_TYPES))
+#if defined(BSD) && !defined(POSIX_TYPES)
 		lt = localtime((long *)(&date));
 #else
 		lt = localtime(&date);

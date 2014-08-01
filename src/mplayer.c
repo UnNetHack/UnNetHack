@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)mplayer.c	3.4	1997/02/04	*/
 /*	Copyright (c) Izchak Miller, 1992.			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -205,11 +204,9 @@ register boolean special;
 		case PM_SAMURAI:
 		    if (rn2(2)) weapon = KATANA;
 		    break;
-#ifdef TOURIST
 		case PM_TOURIST:
 		    /* Defaults are just fine */
 		    break;
-#endif
 		case PM_VALKYRIE:
 		    if (rn2(2)) weapon = WAR_HAMMER;
 		    if (rn2(2)) armor = rnd_class(PLATE_MAIL, CHAIN_MAIL);
@@ -261,11 +258,7 @@ register boolean special;
 		    (void)mongets(mtmp, rnd_class(DILITHIUM_CRYSTAL, JADE));
 		/* To get the gold "right" would mean a player can double his */
 		/* gold supply by killing one mplayer.  Not good. */
-#ifndef GOLDOBJ
 		mtmp->mgold = rn2(1000);
-#else
-		mkmonmoney(mtmp, rn2(1000));
-#endif
 		quan = rn2(10);
 		while(quan--)
 		    (void) mpickobj(mtmp, mkobj(RANDOM_CLASS, FALSE));

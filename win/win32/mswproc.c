@@ -94,12 +94,7 @@ struct window_procs mswin_procs = {
     mswin_update_inventory,
     mswin_mark_synch,
     mswin_wait_synch,
-#ifdef CLIPPING
     mswin_cliparound,
-#endif
-#ifdef POSITIONBAR
-    donull,
-#endif
     mswin_print_glyph,
     mswin_raw_print,
     mswin_raw_print_bold,
@@ -112,10 +107,6 @@ struct window_procs mswin_procs = {
     mswin_get_ext_cmd,
     mswin_number_pad,
     mswin_delay_output,
-#ifdef CHANGE_COLOR	/* only a Mac option currently */
-	mswin,
-	mswin_change_background,
-#endif
     /* other defs that really should go away (they're tty specific) */
     mswin_start_screen,
     mswin_end_screen,
@@ -786,14 +777,12 @@ void mswin_clear_nhwindow(winid wid)
         (wid < MAXWINDOWS) &&
         (GetNHApp()->windowlist[wid].win != NULL))
     {
-#ifdef REINCARNATION
 		if( GetNHApp()->windowlist[wid].type == NHW_MAP ) {
 			if( Is_rogue_level(&u.uz) ) 
 				mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), ROGUE_LEVEL_MAP_MODE);
 			else 
 				mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), iflags.wc_map_mode);
 		}
-#endif
 
 		SendMessage( 
 			 GetNHApp()->windowlist[wid].win, 
@@ -1204,7 +1193,6 @@ void mswin_wait_synch()
 /*
 cliparound(x, y)-- Make sure that the user is more-or-less centered on the
                    screen if the playing area is larger than the screen.
-                -- This function is only defined if CLIPPING is defined.
 */
 void mswin_cliparound(int x, int y)
 {
@@ -1763,11 +1751,7 @@ void mswin_outrip(winid wid, int how)
 	putstr(wid, 0, buf);
 
 	/* Put $ on stone */
-#ifndef GOLDOBJ
 	Sprintf(buf, "%ld Au", u.ugold);
-#else
-	Sprintf(buf, "%ld Au", done_money);
-#endif
 	buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
 	putstr(wid, 0, buf);
 

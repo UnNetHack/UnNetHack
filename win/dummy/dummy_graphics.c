@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)gnbind.c	3.4	2000/07/16	*/
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -43,12 +42,7 @@ struct window_procs dummy_procs = {
     dummy_update_inventory,
     dummy_mark_synch,
     dummy_wait_synch,
-#ifdef CLIPPING
     dummy_cliparound,
-#endif
-#ifdef POSITIONBAR
-    donull,
-#endif
     dummy_print_glyph,
     dummy_raw_print,
     dummy_raw_print_bold,
@@ -61,10 +55,6 @@ struct window_procs dummy_procs = {
     dummy_get_ext_cmd,
     dummy_number_pad,
     dummy_delay_output,
-#ifdef CHANGE_COLOR	/* only a Mac option currently */
-    donull,
-    donull,
-#endif
     /* other defs that really should go away (they're tty specific) */
     dummy_start_screen,
     dummy_end_screen,
@@ -626,7 +616,6 @@ void dummy_wait_synch()
 /*
 cliparound(x, y)-- Make sure that the user is more-or-less centered on the
                    screen if the playing area is larger than the screen.
-                -- This function is only defined if CLIPPING is defined.
 */
 void dummy_cliparound(int x, int y)
 {

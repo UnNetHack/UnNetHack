@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)winstat.c	3.4	1996/04/05	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -425,7 +424,6 @@ update_val(attr_rec, new_value)
 	/* special case: exp can be enabled & disabled */
 	else if (attr_rec == &shown_stats[F_EXP]) {
 	    static boolean flagexp = TRUE;
-#ifdef EXP_ON_BOTL
 
 	    if (flags.showexp && !flagexp) {
 		set_name(attr_rec->w, shown_stats[F_EXP].name);
@@ -437,14 +435,6 @@ update_val(attr_rec, new_value)
 		flagexp = flags.showexp;
 	    }
 	    if (!flagexp) return;
-#else
-	    if (flagexp) {
-		set_name(attr_rec->w, "");
-		set_value(attr_rec->w, "");
-		flagexp = FALSE;
-	    }
-	    return;	/* don't show it at all */
-#endif
 	}
 
 	/* special case: score can be enabled & disabled */
@@ -598,11 +588,7 @@ update_fancy_status(wp)
 
 	    case F_NAME:	val = (long) 0L; break;	/* special */
 	    case F_DLEVEL:	val = (long) 0L; break;	/* special */
-#ifndef GOLDOBJ
 	    case F_GOLD:	val = (long) u.ugold; break;
-#else
-	    case F_GOLD:	val = money_cnt(invent); break;
-#endif
 	    case F_HP:		val = (long) (u.mtimedone ?
 					      (u.mh  > 0 ? u.mh  : 0):
 					      (u.uhp > 0 ? u.uhp : 0)); break;
@@ -614,11 +600,7 @@ update_fancy_status(wp)
 	    case F_LEVEL:	val = (long) (u.mtimedone ?
 						mons[u.umonnum].mlevel :
 						u.ulevel);		break;
-#ifdef EXP_ON_BOTL
 	    case F_EXP:		val = flags.showexp ? u.uexp : 0L; break;
-#else
-	    case F_EXP:		val = 0L; break;
-#endif
 	    case F_ALIGN:	val = (long) u.ualign.type; break;
 	    case F_TIME:	val = flags.time ? (long) moves : 0L;	break;
 #ifdef SCORE_ON_BOTL

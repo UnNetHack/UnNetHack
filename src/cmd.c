@@ -1,4 +1,3 @@
-/*	SCCS Id: @(#)cmd.c	3.4	2003/02/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,7 +9,7 @@
  * Some systems may have getchar() return EOF for various reasons, and
  * we should not quit before seeing at least NR_OF_EOFS consecutive EOFs.
  */
-#if defined(SYSV) || defined(DGUX) || defined(HPUX)
+#if defined(SYSV)
 #define NR_OF_EOFS	20
 #endif
 
@@ -24,92 +23,6 @@
  */
 extern int NDECL(wiz_debug_cmd);
 #endif
-
-#ifdef DUMB	/* stuff commented out in extern.h, but needed here */
-extern int NDECL(doapply); /**/
-extern int NDECL(dorub); /**/
-extern int NDECL(dojump); /**/
-extern int NDECL(doextlist); /**/
-extern int NDECL(dodrop); /**/
-extern int NDECL(doddrop); /**/
-extern int NDECL(dodown); /**/
-extern int NDECL(doup); /**/
-extern int NDECL(donull); /**/
-extern int NDECL(dowipe); /**/
-extern int NDECL(do_mname); /**/
-extern int NDECL(ddocall); /**/
-extern int NDECL(dotakeoff); /**/
-extern int NDECL(doremring); /**/
-extern int NDECL(dowear); /**/
-extern int NDECL(doputon); /**/
-extern int NDECL(doddoremarm); /**/
-extern int NDECL(dokick); /**/
-extern int NDECL(dofire); /**/
-extern int NDECL(dothrow); /**/
-extern int NDECL(doeat); /**/
-extern int NDECL(done2); /**/
-extern int NDECL(doengrave); /**/
-#ifdef ELBERETH
-extern int NDECL(doengrave_elbereth); /**/
-#endif
-extern int NDECL(dopickup); /**/
-extern int NDECL(ddoinv); /**/
-extern int NDECL(dotypeinv); /**/
-extern int NDECL(dolook); /**/
-extern int NDECL(doprgold); /**/
-extern int NDECL(doprwep); /**/
-extern int NDECL(doprarm); /**/
-extern int NDECL(doprring); /**/
-extern int NDECL(dopramulet); /**/
-extern int NDECL(doprtool); /**/
-extern int NDECL(dosuspend); /**/
-extern int NDECL(doforce); /**/
-extern int NDECL(doopen); /**/
-extern int NDECL(doclose); /**/
-extern int NDECL(dosh); /**/
-extern int NDECL(dodiscovered); /**/
-extern int NDECL(doset); /**/
-extern int NDECL(dotogglepickup); /**/
-extern int NDECL(dowhatis); /**/
-extern int NDECL(doquickwhatis); /**/
-extern int NDECL(dowhatdoes); /**/
-extern int NDECL(dohelp); /**/
-extern int NDECL(dohistory); /**/
-extern int NDECL(doloot); /**/
-extern int NDECL(dodrink); /**/
-extern int NDECL(dodip); /**/
-extern int NDECL(dosacrifice); /**/
-extern int NDECL(dopray); /**/
-extern int NDECL(doturn); /**/
-extern int NDECL(doredraw); /**/
-extern int NDECL(doread); /**/
-extern int NDECL(dosave); /**/
-extern int NDECL(dosearch); /**/
-extern int NDECL(doidtrap); /**/
-extern int NDECL(dopay); /**/
-extern int NDECL(dosit); /**/
-extern int NDECL(dotalk); /**/
-extern int NDECL(docast); /**/
-extern int NDECL(dovspell); /**/
-extern int NDECL(dotele); /**/
-extern int NDECL(dountrap); /**/
-extern int NDECL(doversion); /**/
-extern int NDECL(doextversion); /**/
-extern int NDECL(doswapweapon); /**/
-extern int NDECL(dowield); /**/
-extern int NDECL(dowieldquiver); /**/
-extern int NDECL(dozap); /**/
-extern int NDECL(doorganize); /**/
-extern int NDECL(dovanquished); /**/
-
-#ifdef DUMP_LOG
-extern int NDECL(dump_screenshot); /**/
-#endif
-#ifdef LIVELOG_SHOUT
-extern int NDECL(doshout); /**/
-#endif
-
-#endif /* DUMB */
 
 static int NDECL((*timed_occ_fn));
 
@@ -127,10 +40,6 @@ STATIC_PTR int NDECL(wiz_wish);
 STATIC_PTR int NDECL(wiz_identify);
 STATIC_PTR int NDECL(wiz_map);
 STATIC_PTR int NDECL(wiz_genesis);
-#if 0
-STATIC_PTR int NDECL(wiz_where);
-STATIC_PTR int NDECL(wiz_detect);
-#endif
 STATIC_PTR int NDECL(wiz_panic);
 STATIC_PTR int NDECL(wiz_polyself);
 STATIC_PTR int NDECL(wiz_level_tele);
@@ -145,9 +54,6 @@ STATIC_PTR int NDECL(wiz_showkills);	/* showborn patch */
 #ifdef SHOW_BORN
 extern void FDECL(list_vanquished, (int, BOOLEAN_P, BOOLEAN_P)); /* showborn patch */
 #endif /* SHOW_BORN */
-#if defined(__BORLANDC__) && !defined(_WIN32)
-extern void FDECL(show_borlandc_stats, (winid));
-#endif
 #ifdef DEBUG_MIGRATING_MONS
 STATIC_PTR int NDECL(wiz_migrate_mons);
 #endif
@@ -237,8 +143,6 @@ int xtime;
 	return;
 }
 
-#ifdef REDO
-
 static char NDECL(popch);
 
 /* Provide a means to redo the last command.  The flag `in_doagain' is set
@@ -249,7 +153,7 @@ static char NDECL(popch);
  */
 #define BSIZE 20
 static char pushq[BSIZE], saveq[BSIZE];
-static NEARDATA int phead, ptail, shead, stail;
+static int phead, ptail, shead, stail;
 
 static char
 popch() {
@@ -299,7 +203,6 @@ char ch;
 	}
 	return;
 }
-#endif /* REDO */
 
 STATIC_PTR int
 doextcmd()	/* here after # - now read a full-word command */
@@ -617,26 +520,6 @@ wiz_genesis()
 	return 0;
 }
 
-#if 0
-/* ^O command - display dungeon layout */
-STATIC_PTR int
-wiz_where()
-{
-	if (wizard) (void) print_dungeon(FALSE, (schar *)0, (xchar *)0);
-	else	    pline("Unavailable command '^O'.");
-	return 0;
-}
-
-/* ^E command - detect unseen (secret doors, traps, hidden monsters) */
-STATIC_PTR int
-wiz_detect()
-{
-	if(wizard)  (void) findit();
-	else	    pline("Unavailable command '^E'.");
-	return 0;
-}
-#endif
-
 /* ^V command - level teleport, or tutorial review */
 STATIC_PTR int
 wiz_level_tele()
@@ -925,7 +808,6 @@ boolean want_disp;
 	dump_title(buf);
 	dump_list_start();
 
-#ifdef ELBERETH
 	if (u.uevent.uhand_of_elbereth) {
 	    static const char * const hofe_titles[3] = {
 				"the Hand of Elbereth",
@@ -934,7 +816,6 @@ boolean want_disp;
 	    };
 	    you_are(hofe_titles[u.uevent.uhand_of_elbereth - 1]);
 	}
-#endif
 
 	/* heaven or hell modes */
 	if (heaven_or_hell_mode) {
@@ -1004,11 +885,9 @@ boolean want_disp;
 			if (u.usick_type & SICK_NONVOMITABLE)
 				you_are("sick from illness");
 		}
-#ifdef CONVICT
 		if (Punished) {
 			you_are("punished");
 		}
-#endif /* CONVICT */
 	}
 	if (Stoned) you_are("turning to stone");
 	if (Slimed) you_are("turning into slime");
@@ -1019,14 +898,12 @@ boolean want_disp;
 	}
 	if (Fumbling) enl_msg("You fumble", "", "d", "");
 	if (Wounded_legs
-#ifdef STEED
 	    && !u.usteed
-#endif
 			  ) {
 		Sprintf(buf, "wounded %s", makeplural(body_part(LEG)));
 		you_have(buf);
 	}
-#if defined(WIZARD) && defined(STEED)
+#if defined(WIZARD)
 	if (Wounded_legs && u.usteed && (wizard || final)) {
 	    Strcpy(buf, x_monnam(u.usteed, ARTICLE_YOUR, (char *)0, 
 		    SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION, FALSE));
@@ -1098,7 +975,6 @@ boolean want_disp;
 	if (Breathless) you_can("survive without air");
 	else if (Amphibious) you_can("breathe water");
 	if (Passes_walls) you_can("walk through walls");
-#ifdef STEED
 	/* If you die while dismounting, u.usteed is still set.  Since several
 	 * places in the done() sequence depend on u.usteed, just detect this
 	 * special case. */
@@ -1106,7 +982,6 @@ boolean want_disp;
 	    Sprintf(buf, "riding %s", y_monnam(u.usteed));
 	    you_are(buf);
 	}
-#endif
 	if (u.uswallow) {
 	    Sprintf(buf, "swallowed by %s", a_monnam(u.ustuck));
 #ifdef WIZARD
@@ -1378,7 +1253,7 @@ int typ;
     int n;
     register struct obj *obj;
     char allowall[2];
-    static NEARDATA const char callable[] = {
+    static const char callable[] = {
 	SCROLL_CLASS, POTION_CLASS, WAND_CLASS, RING_CLASS, AMULET_CLASS,
 	GEM_CLASS, SPBOOK_CLASS, ARMOR_CLASS, TOOL_CLASS, 0 };
 
@@ -1612,8 +1487,6 @@ boolean want_disp;
 			" for any artifacts");
 	}
 
-#ifdef ELBERETH_CONDUCT
-#ifdef ELBERETH
 	/* no point displaying the conduct if Elbereth doesn't do anything */
 	if (flags.elberethignore) {
 	    you_have_been("ignored by Elbereth");
@@ -1626,8 +1499,6 @@ boolean want_disp;
 		you_have_never("engraved Elbereth");
 	    }
 	}
-#endif /* ELBERETH */
-#endif /* ELBERETH_CONDUCT */
 
 	if ((wizard || final) && !u.uconduct.bones) {
 	    you_have_never("encountered a bones level");
@@ -1637,7 +1508,6 @@ boolean want_disp;
 	    you_have_X(buf);
 	}
 
-#ifdef RECORD_ACHIEVE
 	if ((wizard || final) && !u.uconduct.sokoban) {
 		you_have_never("used any Sokoban shortcuts");
 	} else if (wizard || final) {
@@ -1645,7 +1515,6 @@ boolean want_disp;
 			u.uconduct.sokoban, plur(u.uconduct.sokoban));
 		you_have_X(buf);
 	}
-#endif
 
 	dump_list_end();
 	dump("", "");
@@ -1658,11 +1527,7 @@ boolean want_disp;
 }
 
 #ifndef M
-# ifndef NHSTDC
-#  define M(c)		(0x80 | (c))
-# else
 #  define M(c)		((c) - 128)
-# endif /* NHSTDC */
 #endif
 #ifndef C
 #define C(c)		(0x1f & (c))
@@ -1670,9 +1535,7 @@ boolean want_disp;
 
 static const struct func_tab cmdlist[] = {
 	{C('d'), FALSE, dokick, NULL}, /* "D" is for door!...?  Msg is in dokick.c */
-#ifdef ELBERETH
 	{C('e'), TRUE, doengrave_elbereth, NULL},
-#endif
 #ifdef WIZARD
 	{C('f'), TRUE, wiz_map, NULL},
 	{C('g'), TRUE, wiz_genesis, NULL},
@@ -1810,9 +1673,7 @@ struct ext_func_tab extcmdlist[] = {
 	{"overview", "show an overview of the dungeon", dooverview, TRUE},
 	{"pray", "pray to the gods for help", dopray, TRUE},
 	{"quit", "exit without saving current game", done2, TRUE},
-#ifdef STEED
 	{"ride", "ride (or stop riding) a monster", doride, FALSE},
-#endif
 	{"rub", "rub a lamp or a stone", dorub, FALSE},
 #ifdef DUMP_LOG
 	{"screenshot", "output current map to a html file", dump_screenshot, FALSE},
@@ -2107,10 +1968,6 @@ wiz_show_stats()
 	Sprintf(buf, template, "Total", total_mon_count, total_mon_size);
 	putstr(win, 0, buf);
 
-#if defined(__BORLANDC__) && !defined(_WIN32)
-	show_borlandc_stats(win);
-#endif
-
 	display_nhwindow(win, FALSE);
 	destroy_nhwindow(win);
 	return 0;
@@ -2174,7 +2031,6 @@ register char *cmd;
 		flags.move = FALSE;
 		return;
 	}
-#ifdef REDO
 	if (*cmd == DOAGAIN && !in_doagain && saveq[0]) {
 		in_doagain = TRUE;
 		stail = 0;
@@ -2184,9 +2040,6 @@ register char *cmd;
 	}
 	/* Special case of *cmd == ' ' handled better below */
 	if(!*cmd || *cmd == (char)0377)
-#else
-	if(!*cmd || *cmd == (char)0377 || (!iflags.rest_on_space && *cmd == ' '))
-#endif
 	{
 		nhbell();
 		flags.move = FALSE;
@@ -2309,18 +2162,9 @@ register char *cmd;
 	} else {
 	    register const struct func_tab *tlist;
 	    int res, NDECL((*func));
-#ifdef QWERTZ
-	    unsigned char cmdchar = *cmd & 0xff;
-#endif
 
 	    for (tlist = cmdlist; tlist->f_char; tlist++) {
-#ifdef QWERTZ
-		if(C(cmdchar)==C('y') && iflags.qwertz_layout)
-			cmdchar+='z'-'y';
-		if (cmdchar != (tlist->f_char & 0xff)) continue;
-#else
 		if ((*cmd & 0xff) != (tlist->f_char & 0xff)) continue;
-#endif
 		check_tutorial_command(*cmd & 0xff);
 
 		if (u.uburied && !tlist->can_if_buried) {
@@ -2455,16 +2299,12 @@ const char *s;
 	/* saved direction of the previous call of getdir() */
 	static char saved_dirsym = '\0';
 
-#ifdef REDO
 	if(in_doagain || *readchar_queue)
 	    dirsym = readchar();
 	else
-#endif
 	    dirsym = yn_function ((s && *s != '^') ? s : "In what direction?",
 					(char *)0, '\0');
-#ifdef REDO
 	savech(dirsym);
-#endif
 	if (dirsym == last_cmd_char) {
 		/* in here dirsym is not representing a direction
 		 * but the same sym used before for calling the
@@ -2586,7 +2426,7 @@ register int x, y;
 	return x >= 1 && x <= COLNO-1 && y >= 0 && y <= ROWNO-1;
 }
 
-static NEARDATA int last_multi;
+static int last_multi;
 
 /*
  * convert a MAP window position into a movecmd
@@ -2696,11 +2536,7 @@ click_to_cmd(x, y, mod)
 STATIC_OVL char *
 parse()
 {
-#ifdef LINT	/* static char in_line[COLNO]; */
-	char in_line[COLNO];
-#else
 	static char in_line[COLNO];
-#endif
 	register int foo;
 	boolean prezero = FALSE;
 
@@ -2728,14 +2564,12 @@ parse()
 	if (foo == '\033') {   /* esc cancels count (TH) */
 	    clear_nhwindow(WIN_MESSAGE);
 	    multi = last_multi = 0;
-# ifdef REDO
 	} else if (foo == DOAGAIN || in_doagain) {
 	    multi = last_multi;
 	} else {
 	    last_multi = multi;
 	    savech(0);	/* reset input queue */
 	    savech((char)foo);
-# endif
 	}
 
 	if (multi) {
@@ -2749,9 +2583,7 @@ parse()
 	if (foo == 'g' || foo == 'G' || foo == 'm' || foo == 'M' ||
 	    foo == 'F' || (iflags.num_pad && (foo == '5' || foo == '-'))) {
 	    foo = readchar();
-#ifdef REDO
 	    savech((char)foo);
-#endif
 	    in_line[1] = foo;
 	    in_line[2] = 0;
 	}
@@ -2784,11 +2616,7 @@ readchar()
 	if ( *readchar_queue )
 	    sym = *readchar_queue++;
 	else
-#ifdef REDO
-	    sym = in_doagain ? Getchar() : nh_poskey(&x, &y, &mod);
-#else
-	    sym = Getchar();
-#endif
+	    sym = in_doagain ? pgetchar() : nh_poskey(&x, &y, &mod);
 
 #ifdef UNIX
 # ifdef NR_OF_EOFS
@@ -2801,7 +2629,7 @@ readchar()
 	   */
 	    do {
 		clearerr(stdin);	/* omit if clearerr is undefined */
-		sym = Getchar();
+		sym = pgetchar();
 	    } while (--cnt && sym == EOF);
 	}
 # endif /* NR_OF_EOFS */
@@ -2987,12 +2815,10 @@ boolean paranoid;
 void
 sokoban_trickster()
 {
-#ifdef RECORD_ACHIEVE
 	if (!achieve.finish_sokoban) {
 		/* not yet found the sokoban prize */
 		u.uconduct.sokoban += 1;
 	}
-#endif
 }
 
 /*cmd.c*/
