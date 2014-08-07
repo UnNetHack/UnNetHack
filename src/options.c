@@ -293,6 +293,11 @@ static struct Bool_Opt
 	{"wound_message", &flags.wounds, TRUE, SET_IN_GAME},
 	{"vanilla_ui_behavior", &iflags.vanilla_ui_behavior, FALSE, SET_IN_FILE},
 	{"verbose", &flags.verbose, TRUE, SET_IN_GAME},
+#ifdef USE_TILES
+	{"vt_tiledata", &iflags.vt_nethack, FALSE, SET_IN_GAME},
+#else
+	{"vt_tiledata", (boolean *)0, FALSE, SET_IN_FILE},
+#endif
 	{"wraptext", &iflags.wc2_wraptext, FALSE, SET_IN_GAME},
 	{(char *)0, (boolean *)0, FALSE, 0}
 };

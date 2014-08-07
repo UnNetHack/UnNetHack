@@ -16,6 +16,10 @@
 #include "patchlevel.h"
 #endif
 
+#ifdef USE_TILES
+extern short glyph2tile[];
+#endif
+
 #ifdef TTY_GRAPHICS
 
 #ifdef MAC
@@ -196,6 +200,38 @@ static const char default_menu_cmds[] = {
 	0	/* null terminator */
 };
 
+#define TILE_ANSI_COMMAND 'z'
+
+#define AVTC_GLYPH_START 0
+#define AVTC_GLYPH_END 1
+#define AVTC_SELECT_WINDOW 2
+#define AVTC_INLINE_SYNC 3
+
+#ifdef USE_TILES
+
+int vt_tile_current_window = -2;
+
+static
+void
+print_vt_code(i, c)
+int i, c;
+{
+	if (iflags.vt_nethack) {
+		if (c >= 0) {
+			if (i == AVTC_SELECT_WINDOW) {
+				if (c == vt_tile_current_window) return;
+				vt_tile_current_window = c;
+			}
+			printf("\033[%d;%d%c", i, c, TILE_ANSI_COMMAND);
+		} else {
+			printf("\033[%d%c", i, TILE_ANSI_COMMAND);
+		}
+	}
+}
+#else
+# define print_vt_code(i, c) ;
+# error no USE_TILES defined!
+#endif /* USE_TILES */
 
 /* clean up and quit */
 STATIC_OVL void
@@ -1136,6 +1172,8 @@ tty_clear_nhwindow(window)
 	panic(winpanicstr,  window);
     ttyDisplay->lastwin = window;
 
+    print_vt_code(AVTC_SELECT_WINDOW, window);
+
     switch(cw->type) {
     case NHW_MESSAGE:
 	if(ttyDisplay->toplin) {
@@ -1476,6 +1514,7 @@ struct WinDesc *cw;
 			    /* map glyph to character and color */
 			    mapglyph(curr->glyph, &character, &glyph_color, &special, 0, 0);
 
+			    print_vt_code(AVTC_GLYPH_START, glyph2tile[curr->glyph]);
 			    if (glyph_color != NO_COLOR) term_start_color(glyph_color);
 #ifdef UTF8_GLYPHS
 			    pututf8char(character);
@@ -1483,6 +1522,7 @@ struct WinDesc *cw;
 			    putchar(character);
 #endif
 			    if (glyph_color != NO_COLOR) term_end_color();
+			    print_vt_code(AVTC_GLYPH_END, -1);
 			    putchar(' ');
 			    ttyDisplay->curx +=2;
 		    }
@@ -1774,6 +1814,8 @@ tty_display_nhwindow(window, blocking)
     ttyDisplay->lastwin = window;
     ttyDisplay->rawprint = 0;
 
+    print_vt_code(AVTC_SELECT_WINDOW, window);
+
     switch(cw->type) {
     case NHW_MESSAGE:
 	if(ttyDisplay->toplin == 1) {
@@ -1845,6 +1887,8 @@ tty_dismiss_nhwindow(window)
     if(window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
 	panic(winpanicstr,  window);
 
+    print_vt_code(AVTC_SELECT_WINDOW, window);
+
     switch(cw->type) {
     case NHW_MESSAGE:
 	if (ttyDisplay->toplin)
@@ -1913,6 +1957,8 @@ register int x, y;	/* not xchar: perhaps xchar is unsigned and
     if(window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
 	panic(winpanicstr,  window);
     ttyDisplay->lastwin = window;
+
+    print_vt_code(AVTC_SELECT_WINDOW, window);
 
 #if defined(USE_TILES) && defined(MSDOS)
     adjust_cursor_flags(cw);
@@ -1986,6 +2032,8 @@ tty_putsym(window, x, y, ch)
 
     if(window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
 	panic(winpanicstr,  window);
+
+    print_vt_code(AVTC_SELECT_WINDOW, window);
 
     switch(cw->type) {
     case NHW_STATUS:
@@ -2062,6 +2110,8 @@ tty_putstr(window, attr, str)
 	str = compress_str(str);
 
     ttyDisplay->lastwin = window;
+
+    print_vt_code(AVTC_SELECT_WINDOW, window);
 
     switch(cw->type) {
     case NHW_MESSAGE:
@@ -2729,8 +2779,12 @@ tty_print_glyph(window, x, y, glyph)
     /* map glyph to character and color */
     mapglyph(glyph, &ch, &color, &special, x, y);
 
+    print_vt_code(AVTC_SELECT_WINDOW, window);
+
     /* Move the cursor. */
     tty_curs(window, x,y);
+
+    print_vt_code(AVTC_GLYPH_START, glyph2tile[glyph]);
 
 #ifndef NO_TERMS
     if (ul_hack && ch == '_') {		/* non-destructive underscore */
@@ -2787,6 +2841,8 @@ tty_print_glyph(window, x, y, glyph)
 #endif
     }
 
+    print_vt_code(AVTC_GLYPH_END, -1);
+
     wins[window]->curx++;	/* one character over */
     ttyDisplay->curx++;		/* the real cursor moved too */
 }
@@ -2827,6 +2883,7 @@ int
 tty_nhgetch()
 {
     int i;
+    int tmp;
 #ifdef UNIX
     /* kludge alert: Some Unix variants return funny values if getc()
      * is called, interrupted, and then called again.  There
@@ -2837,6 +2894,7 @@ tty_nhgetch()
     char nestbuf;
 #endif
 
+    print_vt_code(AVTC_INLINE_SYNC, -1);
     (void) fflush(stdout);
     /* Note: if raw_print() and wait_synch() get called to report terminal
      * initialization problems, then wins[] and ttyDisplay might not be
@@ -2856,6 +2914,11 @@ tty_nhgetch()
     if (!i) i = '\033'; /* map NUL to ESC since nethack doesn't expect NUL */
     if (ttyDisplay && ttyDisplay->toplin == 1)
 	ttyDisplay->toplin = 2;
+#ifdef USE_TILES
+    tmp = vt_tile_current_window;
+    vt_tile_current_window++;
+    print_vt_code(AVTC_SELECT_WINDOW, tmp);
+#endif
     return i;
 }
 

@@ -294,6 +294,9 @@ struct instance_flags {
 	boolean paranoid_trap; /* Ask for 'yes' before walking into known traps */
 	boolean paranoid_lava; /* Ask for 'yes' before walking into lava */
 	boolean paranoid_water; /* Ask for 'yes' before walking into water */
+#ifdef USE_TILES
+	boolean vt_nethack;
+#endif
 #ifdef QUIVER_FIRED
 	boolean quiver_fired;	/* quiver with f command */
 #endif

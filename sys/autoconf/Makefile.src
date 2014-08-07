@@ -266,7 +266,7 @@ HOBJ = $(FIRSTOBJ) allmain.o apply.o artifact.o attrib.o ball.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
 	role.o rumors.o save.o shk.o shknam.o sit.o sounds.o sp_lev.o spell.o \
-	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o tutorial.o \
+	steal.o steed.o teleport.o tile.o timeout.o topten.o track.o trap.o tutorial.o \
 	u_init.o uhitm.o unicode.o vault.o vision.o vis_tab.o weapon.o were.o wield.o \
 	windows.o wizard.o worm.o worn.o write.o zap.o \
 	$(RANDOBJ) $(SYSOBJ) $(WINOBJ) version.o \
