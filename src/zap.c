@@ -759,10 +759,9 @@ unturn_dead(mon)
 struct monst *mon;
 {
 	struct obj *otmp, *otmp2;
-	struct monst *mtmp2;
-	char owner[BUFSZ], corpse[BUFSZ];
+	char corpse[BUFSZ];
 	boolean youseeit;
-	int once = 0, res = 0;
+	int res = 0;
 
 	youseeit = (mon == &youmonst) ? TRUE : canseemon(mon);
 	otmp2 = (mon == &youmonst) ? invent : mon->minvent;
