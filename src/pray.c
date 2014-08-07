@@ -197,7 +197,7 @@ in_trouble()
 	if(u.uhs >= HUNGRY) return(TROUBLE_HUNGRY);
 	if(HStun) return (TROUBLE_STUNNED);
 	if(HConfusion) return (TROUBLE_CONFUSED);
-	if(Hallucination) return(TROUBLE_HALLUCINATION);
+	if(Hallucination && !flags.perma_hallu) return(TROUBLE_HALLUCINATION);
 	return(0);
 }
 
