@@ -1239,6 +1239,16 @@ register int	mmflags;
 		m_initweap(mtmp);	/* equip with weapons / armor */
 	    m_initinv(mtmp);  /* add on a few special items incl. more armor */
 	    m_dowear(mtmp, TRUE);
+
+	    /* domestic animals may get a saddle */
+	    if (!rn2(100) && can_saddle(mtmp) && is_domestic(ptr)) {
+		struct obj *otmp = mksobj(SADDLE, FALSE, FALSE);
+		(void) mpickobj(mtmp, otmp);
+		mtmp->misc_worn_check |= W_SADDLE;
+		otmp->owornmask = W_SADDLE;
+		otmp->leashmon = mtmp->m_id;
+		update_mon_intrinsics(mtmp, otmp, TRUE, FALSE);
+	    }
 	} else {
 	    /* no initial inventory is allowed */
 	    if (mtmp->minvent) discard_minvent(mtmp);
