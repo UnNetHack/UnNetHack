@@ -690,6 +690,7 @@ die:
 
 	clearlocks();
 
+#if 0 // LEVEL_STAT
 	if (have_windows) display_nhwindow(WIN_MESSAGE, FALSE);
 
 	if (strcmp(flags.end_disclose, "none") && how != PANICKED)
@@ -911,6 +912,7 @@ die:
 	}
 
 	if(done_stopprint) { raw_print(""); raw_print(""); }
+#endif
 	terminate(EXIT_SUCCESS);
 }
 

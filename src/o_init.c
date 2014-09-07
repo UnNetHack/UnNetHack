@@ -61,6 +61,7 @@ d_level *dlev;
 	    OBJ_NAME(objects[first]) == (char *)0) {
 		raw_printf("Not enough gems? - first=%d j=%d LAST_GEM=%d",
 			first, j, LAST_GEM);
+		abort(); // LEVEL_STAT
 		wait_synch();
 	    }
 	for (j = first; j <= LAST_GEM; j++)

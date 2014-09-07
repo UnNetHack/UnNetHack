@@ -476,6 +476,7 @@ fixup_special()
     }
 
     if(lev_message) {
+#if LEVEL_STAT
 	char *str, *nl;
 	for(str = lev_message; (nl = index(str, '\n')) != 0; str = nl+1) {
 	    *nl = '\0';
@@ -483,6 +484,7 @@ fixup_special()
 	}
 	if(*str)
 	    pline("%s", str);
+#endif
 	free((genericptr_t)lev_message);
 	lev_message = 0;
     }

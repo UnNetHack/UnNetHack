@@ -391,6 +391,8 @@ int what;		/* should be a long */
 	struct obj *objchain;
 	int traverse_how;
 
+	return 0; // LEVEL_STAT
+
 	if (what < 0)		/* pick N of something */
 	    count = -what;
 	else			/* pick anything */
