@@ -457,32 +457,24 @@ extern struct tm *FDECL(localtime,(time_t *));
 #endif
 static struct tm *NDECL(getlt);
 
+int random_seed;
+
 void
 setrandom()
 {
+	random_seed=0;
+	FILE *fptr = NULL;
+
+	fptr = fopen("/dev/urandom","r");
+	if (fptr) fread(&random_seed, sizeof(int),1,fptr);
+	fclose(fptr);
 	/* the types are different enough here that sweeping the different
 	 * routine names into one via #defines is even more confusing
 	 */
-#ifdef RANDOM	/* srandom() from sys/share/random.c */
-	srandom((unsigned int) time((time_t *)0));
-#else
-# if defined(__APPLE__) || defined(BSD) || defined(LINUX) || defined(ULTRIX) || defined(CYGWIN32) /* system srandom() */
-#  if defined(BSD) && !defined(POSIX_TYPES)
-#   if defined(SUNOS4)
-	(void)
-#   endif
-		srandom((int) time((long *)0));
-#  else
-		srandom((int) time((time_t *)0));
-#  endif
-# else
-#  ifdef UNIX	/* system srand48() */
-	srand48((long) time((time_t *)0));
-#  else		/* poor quality system routine */
-	srand((int) time((time_t *)0));
-#  endif
-# endif
-#endif
+	int current_time = time((time_t *)0);
+	random_seed = (int)current_time + random_seed;
+
+	srandom(random_seed);
 }
 
 static struct tm *
