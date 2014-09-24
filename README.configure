@@ -1,7 +1,7 @@
 == Compilation instructions for UnNetHack ==
 
 Windows user need to install an development environment using Cygwin[2].
-Install the packages i686-w64-mingw32-gcc, flex, bison, and make.
+Install the packages i686-w64-mingw32-gcc, flex, bison, make, and binutils.
 
 
 On Linux and MacOSX for a single-user installation (a Linux Debian
