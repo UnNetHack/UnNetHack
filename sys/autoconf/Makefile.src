@@ -264,7 +264,7 @@ HOBJ = $(FIRSTOBJ) allmain.o apply.o artifact.o attrib.o ball.o \
 	mkmaze.o mkobj.o mkroom.o mksheol.o mon.o mondata.o monmove.o monstr.o \
 	mplayer.o mthrowu.o muse.o music.o o_init.o objnam.o options.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
-	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
+	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o rnd_isaac.o \
 	role.o rumors.o save.o shk.o shknam.o sit.o sounds.o sp_lev.o spell.o \
 	steal.o steed.o teleport.o tile.o timeout.o topten.o track.o trap.o tutorial.o \
 	u_init.o uhitm.o unicode.o vault.o vision.o vis_tab.o weapon.o were.o wield.o \
@@ -820,6 +820,7 @@ region.o: $(srcdir)/region.c $(HACK_H) ../include/lev.h
 restore.o: $(srcdir)/restore.c $(HACK_H) ../include/lev.h ../include/tcap.h
 rip.o: $(srcdir)/rip.c $(HACK_H)
 rnd.o: $(srcdir)/rnd.c $(HACK_H)
+rnd_isaac.o: $(srcdir)/rnd_isaac.c $(HACK_H) ../include/isaac.h
 role.o: $(srcdir)/role.c $(HACK_H)
 rumors.o: $(srcdir)/rumors.c $(HACK_H) ../include/lev.h ../include/dlb.h
 save.o: $(srcdir)/save.c $(HACK_H) ../include/lev.h

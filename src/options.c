@@ -445,6 +445,8 @@ static struct Comp_Opt
 	{ "scroll_amount", "amount to scroll map when scroll_margin is reached",
 						20, DISP_IN_GAME }, /*WC*/
 	{ "scroll_margin", "scroll map when this far from the edge", 20, DISP_IN_GAME }, /*WC*/
+	{ "seed", "game seed for repeatable dungeon layout",
+						20, DISP_IN_GAME },
 #ifdef SORTLOOT
 	{ "sortloot", "sort object selection lists by description", 4, SET_IN_GAME },
 #endif
@@ -643,7 +645,7 @@ initoptions()
 	int i;
 
 	/* initialize the random number generator */
-	setrandom();
+	init_random(0);
 
 	/* for detection of configfile options specified multiple times */
 	iflags.opt_booldup = iflags.opt_compdup = (int *)0;
@@ -2692,6 +2694,17 @@ goodfruit:
 			op++;
 		}
 		if (badopt) badoption(opts);
+		return;
+	}
+
+	fullname = "seed";
+	if (match_optname(opts, fullname, sizeof("seed")-1, TRUE)) {
+		if (negated) {
+			bad_negation(fullname, FALSE);
+			return;
+		} else if (!(op = string_for_opt(opts, FALSE))) return;
+		unsigned int seed = atoi(op);
+		init_random(seed);
 		return;
 	}
 

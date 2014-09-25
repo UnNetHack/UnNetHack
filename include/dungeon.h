@@ -167,6 +167,7 @@ struct linfo {
 #define VISITED		0x01	/* hero has visited this level */
 #define FORGOTTEN	0x02	/* hero will forget this level when reached */
 #define LFILE_EXISTS	0x04	/* a level file exists for this level */
+	unsigned int	seed;	/* level seed */
 /*
  * Note:  VISITED and LFILE_EXISTS are currently almost always set at the
  * same time.  However they _mean_ different things.

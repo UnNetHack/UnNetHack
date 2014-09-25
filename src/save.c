@@ -60,10 +60,6 @@ extern const struct percent_color_option *pw_colors;
 extern const struct text_color_option *text_colors;
 #endif
 
-#ifdef USE_MERSENNE_TWISTER
-extern gsl_rng *rng_state;
-#endif
-
 /* need to preserve these during save to avoid accessing freed memory */
 static unsigned ustuck_id = 0, usteed_id = 0;
 
@@ -1190,9 +1186,6 @@ freedynamicdata()
 #endif
 
 #endif	/* FREE_ALL_MEMORY */
-#ifdef USE_MERSENNE_TWISTER
-	gsl_rng_free(rng_state);
-#endif
 	return;
 }
 

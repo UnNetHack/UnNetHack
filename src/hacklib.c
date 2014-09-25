@@ -35,7 +35,6 @@ NetHack, except that rounddiv may call panic().
 	int		strncmpi	(const char *, const char *, int)
 	char *		strstri		(const char *, const char *)
 	boolean		fuzzymatch	(const char *,const char *,const char *,boolean)
-	void		setrandom	(void)
 	int		getyear		(void)
 	int		getmonth	(void)
 	int		getmday		(void)
@@ -463,50 +462,27 @@ extern struct tm *FDECL(localtime,(time_t *));
 #endif
 static struct tm *NDECL(getlt);
 
-#ifdef USE_MERSENNE_TWISTER
-gsl_rng *rng_state = NULL;
-#endif
-
 void
-setrandom()
+init_random(unsigned int seed)
 {
-	int random_seed=0;
-#ifdef DEV_RANDOM
-	FILE *fptr = NULL;
+	unsigned int random_seed=0;
 
-	fptr = fopen(DEV_RANDOM,"r");
-	if (fptr) fread(&random_seed, sizeof(int),1,fptr);
-	fclose(fptr);
+	if (seed == 0) {
+#ifdef DEV_RANDOM
+		FILE *fptr = NULL;
+
+		fptr = fopen(DEV_RANDOM,"r");
+		if (fptr) fread(&random_seed, sizeof(int),1,fptr);
+		fclose(fptr);
 #endif
-#ifdef USE_MERSENNE_TWISTER
-	if (rng_state != NULL) { gsl_rng_free(rng_state); }
-	rng_state = gsl_rng_alloc(gsl_rng_mt19937);
-	gsl_rng_set(rng_state, (int) (time((time_t *)0)) + random_seed);
-#else
-	/* the types are different enough here that sweeping the different
-	 * routine names into one via #defines is even more confusing
-	 */
-#ifdef RANDOM	/* srandom() from sys/share/random.c */
-	srandom((unsigned int) time((time_t *)0));
-#else
-# if defined(__APPLE__) || defined(BSD) || defined(LINUX) || defined(ULTRIX) || defined(CYGWIN32) /* system srandom() */
-#  if defined(BSD) && !defined(POSIX_TYPES)
-#   if defined(SUNOS4)
-	(void)
-#   endif
-		srandom((int) (time((long *)0) + random_seed));
-#  else
-		srandom((int) (time((time_t *)0)) + random_seed);
-#  endif
-# else
-#  ifdef UNIX	/* system srand48() */
-	srand48((long) time((time_t *)0));
-#  else		/* poor quality system routine */
-	srand((int) time((time_t *)0));
-#  endif
-# endif
-#endif
-#endif /* USE_MERSENNE_TWISTER */
+		time_t current_time = time((time_t *)0);
+		seed = (unsigned int) (time((time_t *)0)) + random_seed;
+	}
+
+	/* save seed in the dummy level 0 */
+	level_info[0].seed = seed;
+
+	set_random_state(seed);
 }
 
 static struct tm *

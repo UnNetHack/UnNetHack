@@ -3,24 +3,35 @@
 
 #include "hack.h"
 
-#ifdef USE_MERSENNE_TWISTER
-extern gsl_rng *rng_state;
-#define RND(x)	(int)(gsl_rng_get(rng_state) % (long)(x))
+#include "isaac.h"
 
-#else
-/* "Rand()"s definition is determined by [OS]conf.h */
-#if defined(LINT) && defined(UNIX)	/* rand() is long... */
-extern int NDECL(rand);
-#define RND(x)	(rand() % x)
-#else /* LINT */
-# if defined(UNIX) || defined(RANDOM)
-#define RND(x)	(int)(Rand() % (long)(x))
-# else
-/* Good luck: the bottom order bits are cyclic. */
-#define RND(x)	(int)((Rand()>>3) % (x))
-# endif
-#endif /* LINT */
-#endif /* USE_MERSENNE_TWISTER */
+isaac_ctx default_rng;
+isaac_ctx mon_rng;
+int use_mon_rng=0;
+int
+RND(int x)
+{
+
+	if (use_mon_rng) {
+		return (isaac_next_uint32(&mon_rng) % x);
+	} else {
+		return (isaac_next_uint32(&default_rng) % x);
+	}
+}
+
+void
+set_random_state(unsigned int x)
+{
+	unsigned char seed[8];
+	int i;
+	for (i=0; i<8; i++) {
+		seed[i]= (unsigned char)(x & 0xFF);
+		x >>= 8;
+	}
+
+	isaac_init(&mon_rng,seed,8);
+	isaac_init(&default_rng,seed,8);
+}
 
 int
 rn2(x)		/**< 0 <= rn2(x) < x */
@@ -86,14 +97,19 @@ int
 rne(x)
 register int x;
 {
-	register int n, utmp;
+	int i;
 
-	utmp = (u.ulevel < 15) ? 5 : u.ulevel/3;
-	n = 1;
+	int utmp = (u.ulevel < 15) ? 5 : u.ulevel/3;
+	int r[MAXULEV/3];
+	for (i=0; i < MAXULEV/3; i++) {
+		r[i] = rnf(2,x+2);
+	}
 	/* Slightly higher probabilities for higher n than in NetHack 3.4.3
 	 * p(n) = \left(\frac{2}{x+2}\right)^{n-1} \frac{x}{x+2} */
-	while (n < utmp && rnf(2,x+2))
+	int n = 1;
+	while (n < utmp && r[n-1]) {
 		n++;
+	}
 	return n;
 
 	/* was:

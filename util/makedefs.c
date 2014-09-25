@@ -698,9 +698,6 @@ static const char *build_opts[] = {
 #ifdef MAIL
 		"mail daemon",
 #endif
-#ifdef USE_MERSENNE_TWISTER
-		"Mersenne Twister rng",
-#endif
 #ifdef MENU_COLOR
 # ifdef MENU_COLOR_REGEX
 		"menu colors via regular expressions",

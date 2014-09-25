@@ -971,6 +971,10 @@ boolean want_disp;
 		Sprintf(buf, " %d", level_difficulty());
 		enl_msg("Level difficulty ", "is", "was", buf);
 	}
+	if (wizard) {
+		Sprintf(buf, " %u", level_info[0].seed);
+		enl_msg("Seed ", "is", "was", buf);
+	}
 #endif
 
 	/*** Resistances to troubles ***/

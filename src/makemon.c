@@ -961,15 +961,9 @@ boolean ghostly;
 	return result;
 }
 
-/*
- * called with [x,y] = coordinates;
- *	[0,0] means anyplace
- *	[u.ux,u.uy] means: near player (if !in_mklev)
- *
- *	In case we make a monster group, only return the one at [x,y].
- */
+static
 struct monst *
-makemon(ptr, x, y, mmflags)
+_makemon(ptr, x, y, mmflags)
 register struct permonst *ptr;
 register int	x, y;
 register int	mmflags;
@@ -1274,6 +1268,25 @@ register int	mmflags;
 	return(mtmp);
 }
 
+/*
+ * called with [x,y] = coordinates;
+ *	[0,0] means anyplace
+ *	[u.ux,u.uy] means: near player (if !in_mklev)
+ *
+ *	In case we make a monster group, only return the one at [x,y].
+ */
+struct monst *
+makemon(ptr, x, y, mmflags)
+register struct permonst *ptr;
+register int	x, y;
+register int	mmflags;
+{
+	use_mon_rng++;
+	struct monst *mtmp = _makemon(ptr, x, y, mmflags);
+	use_mon_rng--;
+	return mtmp;
+}
+
 int
 mbirth_limit(mndx)
 int mndx;
@@ -1461,17 +1474,19 @@ static NEARDATA struct {
 	char mchoices[SPECIAL_PM];	/* value range is 0..127 */
 } rndmonst_state = { -1, {0} };
 
-/* select a random monster type */
+
+static
 struct permonst *
-rndmonst()
+_rndmonst()
 {
 	register struct permonst *ptr;
 	register int mndx, ct;
 
 	if (level.mon_gen &&
 	    (rn2(100) < level.mon_gen->override_chance) &&
-	    ((ptr = get_override_mon(level.mon_gen)) != 0))
+	    ((ptr = get_override_mon(level.mon_gen)) != 0)) {
 	    return ptr;
+	}
 
 	if (rndmonst_state.choice_count < 0) {	/* need to recalculate */
 	    int minmlev, maxmlev;
@@ -1552,6 +1567,16 @@ rndmonst()
 	    return (struct permonst *)0;
 	}
 	return &mons[mndx];
+}
+
+/* select a random monster type */
+struct permonst *
+rndmonst()
+{
+	use_mon_rng++;
+	struct permonst *tmp = _rndmonst();
+	use_mon_rng--;
+	return tmp;
 }
 
 /* called when you change level (experience or dungeon depth) or when

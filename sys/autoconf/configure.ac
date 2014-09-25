@@ -381,12 +381,6 @@ if test $host_os != mingw32; then
   else
 	AC_MSG_RESULT(not found);
   fi
-
-  dnl check for GNU Scientific Library for Mersenne Twister RNG
-  dnl http://www.gnu.org/software/gsl/manual/html_node/Autoconf-Macros.html
-  AC_CHECK_LIB([gsl],[gsl_blas_dgemm],
-		[LFLAGS="$LDFLAGS -lgsl";
-		 AC_DEFINE(USE_MERSENNE_TWISTER, [], [Using Mersenne Twister as RNG])])
 fi
 
 dnl  ----- Check for compile-time options

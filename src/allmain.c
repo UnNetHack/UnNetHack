@@ -6,6 +6,8 @@
 
 #include "hack.h"
 
+#include <limits.h>
+
 #ifndef NO_SIGNAL
 #include <signal.h>
 #endif
@@ -692,6 +694,18 @@ display_gamewindows()
     display_nhwindow(WIN_MAP, FALSE);
 }
 
+static
+void
+init_level_seeds()
+{
+	int i;
+	set_random_state(level_info[0].seed);
+	for (i=1; i<MAXLINFO; i++) {
+		level_info[i].seed = RND(INT_MAX);
+	}
+}
+
+
 void
 newgame()
 {
@@ -705,6 +719,8 @@ newgame()
 
 	for (i = 0; i < NUMMONS; i++)
 		mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;
+
+	init_level_seeds();
 
 	init_objects();		/* must be before u_init() */
 
