@@ -5,7 +5,7 @@
 /* UnNetHack 5.0.0 */
 #define GAME_SHORT_NAME	"UNH"
 #define VERSION_MAJOR	5
-#define VERSION_MINOR	1
+#define VERSION_MINOR	3
 /*
  * PATCHLEVEL is updated for each release.
  */
@@ -29,7 +29,7 @@
  * and are considered only bugfix releases. Therefore the revision number isn't
  * included into VERSION_COMPATIBILITY.
  */
-/* #define VERSION_REVISION	1 */
+#define VERSION_REVISION	1
 
 #define COPYRIGHT_BANNER_A \
 "UnNetHack 5, Copyright 2009-2013"
