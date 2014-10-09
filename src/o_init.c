@@ -396,7 +396,8 @@ register int oindx;
     }
 }
 
-void makeknown_msg(int otyp)
+void
+makeknown_msg(int otyp)
 {
     boolean was_known, now_known;
     char oclass = objects[otyp].oc_class;

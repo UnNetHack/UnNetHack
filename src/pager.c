@@ -573,7 +573,7 @@ do_look(quick)
 
 	/* Check for monsters */
 	for (i = 0; i < MAXMCLASSES; i++) {
-	    if (sym == (from_screen ? monsyms[i] : def_monsyms[i]) &&
+	    if (sym == (glyph_t)(from_screen ? monsyms[i] : def_monsyms[i]) &&
 		monexplain[i]) {
 		need_to_look = TRUE;
 		if (!found) {
@@ -589,8 +589,8 @@ do_look(quick)
 	   playing a character which isn't normally displayed by that
 	   symbol; firstmatch is assumed to already be set for '@' */
 	if ((from_screen ?
-		(sym == monsyms[S_HUMAN] && cc.x == u.ux && cc.y == u.uy) :
-		(sym == def_monsyms[S_HUMAN] && !iflags.showrace)) &&
+		(sym == (glyph_t)monsyms[S_HUMAN] && cc.x == u.ux && cc.y == u.uy) :
+		(sym == (glyph_t)def_monsyms[S_HUMAN] && !iflags.showrace)) &&
 	    !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
 	    found += append_str(out_str, "you");	/* tack on "or you" */
 
@@ -611,7 +611,7 @@ do_look(quick)
 
 	/* Now check for objects */
 	for (i = 1; i < MAXOCLASSES; i++) {
-	    if (sym == (from_screen ? oc_syms[i] : def_oc_syms[i])) {
+	    if (sym == (glyph_t)(from_screen ? oc_syms[i] : def_oc_syms[i])) {
 		need_to_look = TRUE;
 		if (from_screen && i == VENOM_CLASS) {
 		    skipped_venom++;

@@ -1618,7 +1618,7 @@ lev_by_name(nam)
 const char *nam;
 {
     schar lev = 0;
-    s_level *slev;
+    s_level *slev = NULL;
     mapseen *mseen;
     d_level dlev;
     const char *p;
@@ -2362,10 +2362,8 @@ dumpoverview()
 }
 #endif
 
-STATIC_OVL char *
-seen_string(x, obj)
-xchar x;
-const char *obj;
+static char *
+seen_string(xchar x, const char *obj)
 {
 	/* players are computer scientists: 0, 1, 2, n */
 	switch(x) {
@@ -2454,13 +2452,14 @@ int rtype;
 	((var) != 1 ? "s" : "")); }
 #define ADDTOBUF(nam, var) { if (var) Sprintf(eos(buf), "%s " nam, COMMA); }
 
-STATIC_OVL void
-print_mapseen(win, mptr, printdun, dump, final)
-winid win;
-mapseen *mptr;
-boolean printdun;
-boolean dump; /**< if information should be dumped to file */
-boolean final; /**< if game is finished */
+static void
+print_mapseen(
+winid win,
+mapseen *mptr,
+boolean printdun,
+boolean dump, /**< if information should be dumped to file */
+boolean final  /**< if game is finished */
+)
 {
 	char buf[BUFSZ];
 	int i, depthstart;
@@ -2624,7 +2623,7 @@ d_level *lev;
 {
 	mapseen *mptr;
 
-	if (!(mptr = find_mapseen(&u.uz))) {
+	if (!(mptr = find_mapseen(lev))) {
 		return NULL;
 	} else {
 		return mptr->custom;

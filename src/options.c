@@ -1674,7 +1674,7 @@ boolean negated;
 	boolean badopt = FALSE;
 	int i;
 	char *op;
-	int fullname_len = strlen(fullname);
+	size_t fullname_len = strlen(fullname);
 
 	op = string_for_opt(opts, TRUE);
 	if (op && negated) {

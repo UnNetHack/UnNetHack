@@ -196,6 +196,7 @@ E void NDECL(sanity_check);
 E char FDECL(yn_function, (const char *, const char *, CHAR_P));
 E char FDECL(paranoid_yn, (const char *, BOOLEAN_P));
 E void NDECL(sokoban_trickster);
+E void FDECL(list_vanquished, (BOOLEAN_P, BOOLEAN_P));
 E void NDECL(list_vanquishedonly);
 
 /* ### dbridge.c ### */
@@ -1505,6 +1506,7 @@ E void FDECL(discover_object, (int,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(undiscover_object, (int));
 E int NDECL(dodiscovered);
 E void NDECL(dragons_init);
+E void FDECL(makeknown_msg, (int));
 
 /* ### objects.c ### */
 

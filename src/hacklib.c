@@ -475,7 +475,6 @@ init_random(unsigned int seed)
 		if (fptr) fread(&random_seed, sizeof(int),1,fptr);
 		fclose(fptr);
 #endif
-		time_t current_time = time((time_t *)0);
 		seed = (unsigned int) (time((time_t *)0)) + random_seed;
 	}
 

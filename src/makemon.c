@@ -2066,7 +2066,7 @@ struct obj *bag;
 	boolean gotone = TRUE;
 	int cnt;
 	struct monst *mtmp;
-	struct obj *otmp;
+	struct obj *otmp = NULL;
 
 	consume_obj_charge(bag, TRUE);
 
