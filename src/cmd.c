@@ -825,7 +825,7 @@ wiz_show_wmodes()
 /* #showkills command */
 STATIC_PTR int wiz_showkills()		/* showborn patch */
 {
-	list_vanquished('y', FALSE, TRUE);
+	list_vanquished('y', FALSE);
 	return 0;
 }
 
