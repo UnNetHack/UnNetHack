@@ -7,6 +7,8 @@
 #include "hack.h"
 #include "lev.h"
 
+#include <limits.h>
+
 #ifdef SINKS
 STATIC_DCL void FDECL(dosinkring, (struct obj *));
 #endif /* SINKS */
@@ -1188,7 +1190,8 @@ boolean at_stairs, falling, portal;
 	if (!persistent_level) {
 		delete_levelfile(ledger_no(&u.uz));
 		level_info[ledger_no(&u.uz)].flags = 0;
-	}	
+		level_info[ledger_no(&u.uz)].seed = rn2(INT_MAX);
+	}
 
 #ifdef REINCARNATION
 	if (Is_rogue_level(newlevel) || Is_rogue_level(&u.uz))
