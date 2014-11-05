@@ -5,6 +5,8 @@
 #include "hack.h"
 
 static void FDECL(getpos_help, (BOOLEAN_P,const char *));
+static void call_object(int, char *);
+static void call_input(int, char *);
 
 extern const char what_is_an_unknown_object[];		/* from pager.c */
 
@@ -611,9 +613,8 @@ void
 docall(obj)
 register struct obj *obj;
 {
-	char buf[BUFSZ], qbuf[QBUFSZ];
+	char qbuf[QBUFSZ];
 	struct obj otemp;
-	register char **str1;
 
 	if (!obj->dknown) return; /* probably blind */
 	check_tutorial_message(QT_T_CALLITEM);
@@ -621,18 +622,55 @@ register struct obj *obj;
 	otemp.quan = 1L;
 	otemp.onamelth = 0;
 	otemp.oxlth = 0;
-	if (objects[otemp.otyp].oc_class == POTION_CLASS && otemp.fromsink)
+	if (objects[otemp.otyp].oc_class == POTION_CLASS && otemp.fromsink) {
 	    /* kludge, meaning it's sink water */
 	    Sprintf(qbuf,"Call a stream of %s fluid:",
 		    OBJ_DESCR(objects[otemp.otyp]));
-	else
+	} else {
 	    Sprintf(qbuf, "Call %s:", an(xname(&otemp)));
-	getlin(qbuf, buf);
-	if(!*buf || *buf == '\033')
-		return;
+	}
+	call_input(obj->otyp, qbuf);
+}
 
+void
+docall_input(int obj_otyp)
+{
+	char qbuf[QBUFSZ];
+	struct obj otemp = {0};
+
+	otemp.otyp = obj_otyp;
+	otemp.oclass = objects[obj_otyp].oc_class;
+	otemp.quan = 1L;
+	otemp.onamelth = 0;
+	otemp.oxlth = 0;
+	Sprintf(qbuf, "Call %s:", an(xname(&otemp)));
+	call_input(obj_otyp, qbuf);
+}
+
+/* Using input from player to name an object type. */
+static void
+call_input(int obj_otyp, char *prompt)
+{
+	char buf[BUFSZ];
+
+	getlin(prompt, buf);
+
+	if(!*buf || *buf == '\033') {
+		flags.last_broken_otyp = obj_otyp;
+		return;
+	} else {
+		flags.last_broken_otyp = STRANGE_OBJECT;
+	}
+
+	call_object(obj_otyp, buf);
+}
+
+static void
+call_object(int obj_otyp, char *buf)
+{
+	register char **str1;
 	/* clear old name */
-	str1 = &(objects[obj->otyp].oc_uname);
+	str1 = &(objects[obj_otyp].oc_uname);
 	if(*str1) free((genericptr_t)*str1);
 
 	/* strip leading and trailing spaces; uncalls item if all spaces */
@@ -642,11 +680,11 @@ register struct obj *obj;
 		/* strip name first, for the update_inventory() call
 		   from undiscover_object() */
 		*str1 = (char *)0;
-		undiscover_object(obj->otyp);
+		undiscover_object(obj_otyp);
 	    }
 	} else {
 	    *str1 = strcpy((char *) alloc((unsigned)strlen(buf)+1), buf);
-	    discover_object(obj->otyp, FALSE, TRUE); /* possibly add to disco[] */
+	    discover_object(obj_otyp, FALSE, TRUE); /* possibly add to disco[] */
 	}
 }
 

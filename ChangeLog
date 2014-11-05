@@ -11,6 +11,9 @@
 	* item changes:
 	  - Decreased weight of all mithril armor, especially ones of elven make
 
+	* user interface improvements:
+	  - Added naming last broken object to #name menu (idea from AceHack/NH4)
+
 	* bug fixes
 	  - Fixed erroneous messages when remaining in stinking clouds
 	  - Shopkeeper stopping player from entering a shop when having crystal
