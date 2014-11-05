@@ -1402,6 +1402,15 @@ int typ;
       any.a_int = 4;
       add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'd', 'f', ATR_NONE, "Annotate the current level", MENU_UNSELECTED);
 
+      if ((flags.last_broken_otyp != STRANGE_OBJECT) &&
+          (!objects[flags.last_broken_otyp].oc_name_known)){
+		char buf[BUFSZ];
+		Sprintf(buf, "Name %s (last broken object)",
+				an(obj_typename(flags.last_broken_otyp)));
+		any.a_int = 5;
+		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'e', 'V', ATR_NONE, buf, MENU_UNSELECTED);
+      }
+
       any.a_int = 0;
       add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 'q', ATR_NONE, "", MENU_UNSELECTED);
 
@@ -1442,6 +1451,9 @@ int typ;
 	break;
     case 3:
 	donamelevel();
+	break;
+    case 4:
+	docall_input(flags.last_broken_otyp);
 	break;
     }
     return 0;
