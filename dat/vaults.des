@@ -226,6 +226,18 @@ ROOM:"ordinary", unlit, random, random, random {
   OBJECT:('(', "oil lamp"), random, lit
 }
 
+# potentially spooky
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+ROOM:"ordinary", unlit, random, random, random {
+  IF [time.night] {
+  GRAVE:random
+  [20%]: GRAVE:random, random
+		IF [level.depth>10] {
+		MONSTER: '&', random
+		}
+  }
+}
 
 # temple of the gods
 LEVEL:"vlt-%04i"
@@ -1097,6 +1109,8 @@ ROOM:"rndvault", random, random, random, random {
   IF [50%] { MONSTER: ('F', "blazing fern"), random, hostile }
   IF [50%] { MONSTER: ('F', "swamp fern"), random, hostile }
 }
+
+
 
 # Ozymandias' Tomb
 LEVEL:"vlt-%04i"
