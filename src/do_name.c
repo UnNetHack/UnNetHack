@@ -1272,6 +1272,8 @@ static const char * const bogusmons[] = {
 	"Demonhead Mobster Kingpin",		/* Problem Sleuth */
 	"courtesan angel", "fractal bee",
 	"Weasel King",
+	"GLaDOS", "dangerous mute lunatic", /* Portal */
+	"skag", "thresher", "LoaderBot", "varkid"  /* Borderlands */
 	"Yarakeen",                        /*  War of Omens  */
 
 	/* bogus UnNetHack monsters */
