@@ -7,6 +7,8 @@
 	  depending on BUC state if an effect is produced
 	* Reproducible dungeon layout. Set OPTIONS=seed:number to get the same
 	  dungeon layout.
+	* Vault Guards get angry if you eat gold in front of them. (From Nethack 
+		 Development Code - used with permission)
 
 	* item changes:
 	  - Decreased weight of all mithril armor, especially ones of elven make
