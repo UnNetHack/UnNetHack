@@ -6,6 +6,10 @@
 #define VAULT_H
 
 #define FCSIZ	(ROWNO+COLNO)
+#define GD_EATGOLD	0x01
+#define GD_DESTROYGOLD	0x02
+
+
 struct fakecorridor {
 	xchar fx,fy,ftyp;
 };
