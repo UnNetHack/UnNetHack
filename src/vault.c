@@ -485,12 +485,15 @@ register struct monst *grd;
 			abs(egrd->ogy - grd->my) > 1)
 		return(-1);	/* teleported guard - treat as monster */
 		
-		if(egrd->witness) {
+#ifdef MEXTRA
+	if (egrd->witness) {
 		verbalize("How dare you %s that gold, scoundrel!",
 			(egrd->witness & GD_EATGOLD) ? "consume" : "destroy");
 		egrd->witness = 0;
 		grd->mpeaceful = 0;
 		return(-1);
+	}
+#endif
 		
 	if(egrd->fcend == 1) {
 	    if(u_in_vault &&
@@ -832,6 +835,7 @@ gd_sound()  /* prevent "You hear footsteps.." when inappropriate */
 	else return((boolean)(grd == (struct monst *)0));
 }
 
+#ifdef MEXTRA
 void
 vault_gd_watching(activity)
 unsigned int activity;
@@ -843,5 +847,6 @@ unsigned int activity;
 			EGD(guard)->witness = activity;
 	}
 }
+#endif
 
 /*vault.c*/

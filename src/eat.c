@@ -1813,7 +1813,9 @@ eatspecial() /* called after eating non-food */
 #endif
 		else
 		    useupf(otmp, otmp->quan);
+#ifdef MEXTRA
 			vault_gd_watching(GD_EATGOLD);
+#endif
 		return;
 	}
 	if (otmp->oclass == POTION_CLASS) {
