@@ -334,6 +334,11 @@ TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 
+# Binding of Isaac
+[10%]: GRAVE: random, "Isaac - Sacrificed by Mother"
+[30%]: GRAVE: random, "Guppy - Beloved by Flies"
+
+
 # Random chests
 OBJECT:('(',"chest"),(62,8)
 OBJECT:('(',"chest"),(62,10)
