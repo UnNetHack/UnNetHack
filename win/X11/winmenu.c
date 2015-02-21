@@ -583,9 +583,10 @@ X11_start_menu(window)
 
 /*ARGSUSED*/
 void
-X11_add_menu(window, glyph, identifier, ch, gch, attr, str, preselected)
+X11_add_menu(window, glyph, cnt, identifier, ch, gch, attr, str, preselected)
     winid window;
     int glyph;			/* unused (for now) */
+    int cnt;		/* max number of times this item can be selected */
     const anything *identifier;
     char ch;
     char gch;			/* group accelerator (0 = no group) */
