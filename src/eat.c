@@ -518,6 +518,8 @@ register int pm;
 		if ((!flags.perma_hallu && Hallucination)) {
 		    (void) make_hallucinated(0L, FALSE, 0L);
 		    pline("The world seems less enchanting.");
+		} if (!!flags.perma_hallu)
+			pline("The world briefly seems less enchanting.");
 		}
 		break;
 	    case PM_DEATH:
