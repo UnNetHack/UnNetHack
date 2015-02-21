@@ -25,6 +25,7 @@
 	    still set on invalid pointer
 	  - Correctly identify uncursed items in bags dropped on altars when hallucinating
 	  - Prevent potential endless when praying and using perma hallucination
+	  - Fixed crash with a configured nameempty option (found and fixed by tertium)
 
 	* vanilla bug fixes:
 	  - C343-439: Running NetHack in a terminal window with more than 255
