@@ -373,6 +373,10 @@ register struct monst *mtmp;
 		    } else {
 			(void)mongets(mtmp, !rn2(3) ? PICK_AXE : DAGGER);
 		    }
+			if (!In_mines(&u.uz) && rn2(7)) {
+				/* outside the mines, dwarves sometimes have booze */
+				mongets(mtmp, POT_BOOZE);
+			}
 		}
 		break;
 # ifdef KOPS
