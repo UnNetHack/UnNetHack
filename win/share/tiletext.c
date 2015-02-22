@@ -108,10 +108,11 @@ pixel (*pixels)[TILE_X];
 	     */
 	    p = tilename(tile_set, tile_set_indx);
 	    if (p && strcmp(p, buf)) {
-		Fprintf(stderr, "warning: for tile %d (numbered %d) of %s,\n",
+		Fprintf(stderr, "error: for tile %d (numbered %d) of %s,\n",
 				tile_set_indx, i, text_sets[tile_set-1]);
 		Fprintf(stderr, "\tfound '%s' while expecting '%s'\n",
 				buf, p);
+		exit(101);
 	    }
 	}
 	tile_set_indx++;
