@@ -6,6 +6,7 @@
 
 #include "hack.h"
 #include "dlb.h"
+#include "date.h"
 
 #include <sys/stat.h>
 #include <signal.h>
@@ -139,6 +140,10 @@ char *argv[];
 		chdirx(dir,0);
 #endif
 		prscore(argc, argv);
+		exit(EXIT_SUCCESS);
+	    }
+	    if (!strncmp(argv[1], "--version", 9)) {
+		printf("%s\n", VERSION_ID);
 		exit(EXIT_SUCCESS);
 	    }
 	}
