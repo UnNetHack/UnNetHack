@@ -2695,6 +2695,8 @@ do_break_wand(obj)
 	pline("Suddenly, and without warning, nothing happens.");
 	goto discard_broken_wand;
     case WAN_WISHING:
+	pline("You really wish you hadn't done that.");  //Potentially add a chance to create a throne? 
+	goto discard_broken_wand;
     case WAN_LOCKING:
     case WAN_PROBING:
     case WAN_ENLIGHTENMENT:
