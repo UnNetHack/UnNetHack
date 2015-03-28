@@ -1786,10 +1786,11 @@ process_menu_window(winid window, struct WinDesc *cw)
 {
     tty_menu_item *page_start, *page_end, *curr;
     long count;
-    int n, curr_page, page_lines;
+    int n, curr_page, page_lines, resp_len;
     boolean finished, counting, reset_count;
     char *cp, *rp, resp[QBUFSZ], gacc[QBUFSZ],
-         *msave, *morestr;
+         *msave, *morestr, really_morc;
+#define MENU_EXPLICIT_CHOICE 0x7f   /* pseudo menu manipulation char */
 
     curr_page = page_lines = 0;
     page_start = page_end = 0;
@@ -1976,6 +1977,8 @@ process_menu_window(winid window, struct WinDesc *cw)
                 page_lines = 0;
             }
             *rp = 0;
+            /* remember how many explicit menu choices there are */
+            resp_len = (int)strlen(resp);
 
             /* corner window - clear extra lines from last page */
             if (cw->offx) {
@@ -2009,7 +2012,16 @@ process_menu_window(winid window, struct WinDesc *cw)
             xwaitforspace(resp);
         }
 
-        morc = map_menu_cmd(morc);
+        really_morc = morc; /* (only used with MENU_EXPLICIT_CHOICE */
+        if ((rp = index(resp, morc)) != 0 && rp < resp + resp_len) {
+            /* explicit menu selection; don't override it if it also
+               happens to match a mapped menu command (such as ':' to
+               look inside a container vs ':' to search) */
+            morc = MENU_EXPLICIT_CHOICE;
+        } else {
+            morc = map_menu_cmd(morc);
+        }
+
         switch (morc) {
         case '0':
             /* special case: '0' is also the default ball class */
@@ -2122,6 +2134,9 @@ process_menu_window(winid window, struct WinDesc *cw)
                 invert_all(window, page_start, page_end, 0);
             }
             break;
+        case MENU_EXPLICIT_CHOICE:
+            morc = really_morc;
+        /* fall through*/
         default:
             if (cw->how == PICK_NONE || !index(resp, morc)) {
                 /* unacceptable input received */
