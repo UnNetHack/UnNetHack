@@ -17,7 +17,7 @@ ballfall()
 	gets_hit = (((uball->ox != u.ux) || (uball->oy != u.uy)) &&
 		    ((uwep == uball)? FALSE : (boolean)rn2(5)));
 	if (carried(uball)) {
-		pline("Startled, you drop the iron ball.");
+		pline(Hallucination ? "Wow, you really dropped the ball." : "Startled, you drop the iron ball.");
 		if (uwep == uball)
 			setuwep((struct obj *)0);
 		if (uswapwep == uball)
