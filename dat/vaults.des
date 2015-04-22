@@ -1133,9 +1133,16 @@ ENGRAVING: (6,4), burn, "Look on my works, ye mighty, and despair"
 [50%]: TRAP: "hole", (3,2)
 [80%]: TRAP: "hole", (5,3)
 [30%]: TRAP: "hole", (3,6)
-[75%]: TRAP: "web", (1,1)
-[75%]: TRAP: "web", (1,6)
-TRAP: "web", (7,6)
+IF [ level.depth >= 7 ] {
+  # for consistency with random web traps' depth limit
+  [75%]: TRAP: "web", (1,1)
+  [75%]: TRAP: "web", (1,6)
+  TRAP: "web", (7,6)
+} ELSE {
+  [75%]: TRAP: "falling rock", (1,1)
+  [75%]: TRAP: "falling rock", (1,6)
+  TRAP: "falling rock", (7,6)
+}
 CONTAINER:"chest", (7,1), trapped { }
 TRAP: "statue", (7,3)
 TRAP: "statue", (7,7)
