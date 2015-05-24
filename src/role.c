@@ -1505,11 +1505,18 @@ role_init()
 	    mons[urole.neminum].mflags3 |= M3_WANTSARTI | M3_WAITFORU;
 	}
 
+	/* Determine a valid Pantheon. This is here to ensure the same RNG for
+	 * all Roles, including the Priest. */
+	int pantheon = randrole();
+	while (!roles[pantheon].lgod) {
+		pantheon = randrole();
+	}
 	/* Fix up the god names */
-	if (flags.pantheon == -1) {		/* new game */
-	    flags.pantheon = flags.initrole;	/* use own gods */
-	    while (!roles[flags.pantheon].lgod)	/* unless they're missing */
-		flags.pantheon = randrole();
+	if (flags.pantheon == -1) { /* new game */
+		flags.pantheon = flags.initrole; /* use own gods */
+		if (!roles[flags.pantheon].lgod) { /* if they're missing */
+			flags.pantheon = pantheon;
+		}
 	}
 	if (!urole.lgod) {
 	    urole.lgod = roles[flags.pantheon].lgod;
