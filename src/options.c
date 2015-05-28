@@ -3181,6 +3181,10 @@ goodfruit:
 			    if (!initial && Is_rogue_level(&u.uz))
 				assign_rogue_graphics(FALSE);
 # endif
+			    if (!initial && Is_moria_level(&u.uz)) {
+				assign_moria_graphics(FALSE);
+			    }
+
 			    need_redraw = TRUE;
 # ifdef TERMLIB
 			    if ((boolopt[i].addr) == &iflags.DECgraphics)
@@ -3211,6 +3215,9 @@ goodfruit:
 			    if (!initial && Is_rogue_level(&u.uz))
 				assign_rogue_graphics(TRUE);
 # endif
+			    if (!initial && Is_moria_level(&u.uz)) {
+				assign_moria_graphics(TRUE);
+			    }
 			}
 #endif /* TERMLIB || ASCIIGRAPH || MAC_GRAPHICS_ENV */
 

@@ -700,6 +700,7 @@ register int fd;
 #ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) assign_rogue_graphics(TRUE);
 #endif
+	if (Is_moria_level(&u.uz)) { assign_moria_graphics(TRUE); }
 #ifdef USE_TILES
 	substitute_tiles(&u.uz);
 #endif

@@ -487,6 +487,7 @@ E void FDECL(switch_graphics, (int));
 E void FDECL(assign_rogue_graphics, (BOOLEAN_P));
 #endif
 E void FDECL(assign_utf8graphics_symbol, (int, glyph_t));
+E void FDECL(assign_moria_graphics, (BOOLEAN_P));
 
 /* ### dump.c ### */
 

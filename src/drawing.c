@@ -877,14 +877,36 @@ glyph_t value;
 #endif
 }
 
-#ifdef REINCARNATION
-
 /*
  * saved display symbols for objects & features.
  */
 static uchar save_oc_syms[MAXOCLASSES]  = DUMMY;
 static glyph_t save_showsyms[MAXPCHARS] = DUMMY;
 static uchar save_monsyms[MAXPCHARS]    = DUMMY;
+
+void
+save_syms()
+{
+	(void) memcpy((genericptr_t)save_showsyms,
+	              (genericptr_t)showsyms, sizeof showsyms);
+	(void) memcpy((genericptr_t)save_oc_syms,
+	              (genericptr_t)oc_syms, sizeof oc_syms);
+	(void) memcpy((genericptr_t)save_monsyms,
+	              (genericptr_t)monsyms, sizeof monsyms);
+}
+
+void
+restore_syms()
+{
+	(void) memcpy((genericptr_t)showsyms,
+	              (genericptr_t)save_showsyms, sizeof showsyms);
+	(void) memcpy((genericptr_t)oc_syms,
+	              (genericptr_t)save_oc_syms, sizeof oc_syms);
+	(void) memcpy((genericptr_t)monsyms,
+	              (genericptr_t)save_monsyms, sizeof monsyms);
+}
+
+#ifdef REINCARNATION
 
 static const glyph_t r_oc_syms[MAXOCLASSES] = {
 /* 0*/	'\0',
@@ -960,12 +982,7 @@ boolean is_rlevel;
     if (is_rlevel) {
 	register int i;
 
-	(void) memcpy((genericptr_t)save_showsyms,
-		      (genericptr_t)showsyms, sizeof showsyms);
-	(void) memcpy((genericptr_t)save_oc_syms,
-		      (genericptr_t)oc_syms, sizeof oc_syms);
-	(void) memcpy((genericptr_t)save_monsyms,
-		      (genericptr_t)monsyms, sizeof monsyms);
+	save_syms();
 
 	/* Use a loop: char != uchar on some machines. */
 	for (i = 0; i < MAXMCLASSES; i++)
@@ -1019,60 +1036,42 @@ boolean is_rlevel;
 	    showsyms[S_upstair] = 0xf0; /* Greek Xi */
 	    showsyms[S_dnstair] = 0xf0;
 #ifndef MSWIN_GRAPHICS
-	    showsyms[S_arrow_trap] = 0x04; /* diamond (cards) */
-	    showsyms[S_dart_trap] = 0x04;
-	    showsyms[S_falling_rock_trap] = 0x04;
-	    showsyms[S_squeaky_board] = 0x04;
-	    showsyms[S_bear_trap] = 0x04;
-	    showsyms[S_land_mine] = 0x04;
-	    showsyms[S_rolling_boulder_trap] = 0x04;
-	    showsyms[S_sleeping_gas_trap] = 0x04;
-	    showsyms[S_rust_trap] = 0x04;
-	    showsyms[S_fire_trap] = 0x04;
-	    showsyms[S_pit] = 0x04;
-	    showsyms[S_spiked_pit] = 0x04;
-	    showsyms[S_hole] = 0x04;
-	    showsyms[S_trap_door] = 0x04;
-	    showsyms[S_teleportation_trap] = 0x04;
-	    showsyms[S_level_teleporter] = 0x04;
-	    showsyms[S_magic_portal] = 0x04;
-	    showsyms[S_web] = 0x04;
-	    showsyms[S_statue_trap] = 0x04;
-	    showsyms[S_magic_trap] = 0x04;
-	    showsyms[S_anti_magic_trap] = 0x04;
-	    showsyms[S_ice_trap] = 0x04;
-	    showsyms[S_polymorph_trap] = 0x04;
 #endif
 	}
 #endif /* ASCIIGRAPH */
 
-	for (i = 0; i < MAXOCLASSES; i++) {
-#ifdef ASCIIGRAPH
-	    if (iflags.IBMgraphics
-# if defined(USE_TILES) && defined(MSDOS)
-		&& !iflags.grmode
-# endif
-		)
-		oc_syms[i] = IBM_r_oc_syms[i];
-	    else
-#endif /* ASCIIGRAPH */
-		oc_syms[i] = r_oc_syms[i];
-	}
-#if defined(MSDOS) && defined(USE_TILES)
-	if (iflags.grmode) tileview(FALSE);
-#endif
     } else {
-	(void) memcpy((genericptr_t)showsyms,
-		      (genericptr_t)save_showsyms, sizeof showsyms);
-	(void) memcpy((genericptr_t)oc_syms,
-		      (genericptr_t)save_oc_syms, sizeof oc_syms);
-	(void) memcpy((genericptr_t)monsyms,
-		      (genericptr_t)save_monsyms, sizeof monsyms);
-#if defined(MSDOS) && defined(USE_TILES)
-	if (iflags.grmode) tileview(TRUE);
-#endif
+	restore_syms();
     }
 }
 #endif /* REINCARNATION */
+
+void
+assign_moria_graphics(is_moria)
+boolean is_moria;
+{
+	/* Adjust graphics display characters on Moria levels */
+
+	if (is_moria) {
+		save_syms();
+
+		showsyms[S_vwall]   = '#';
+		showsyms[S_hwall]   = '#';
+		showsyms[S_tlcorn]  = '#';
+		showsyms[S_trcorn]  = '#';
+		showsyms[S_blcorn]  = '#';
+		showsyms[S_brcorn]  = '#';
+		showsyms[S_crwall]  = '#';
+		showsyms[S_tuwall]  = '#';
+		showsyms[S_tdwall]  = '#';
+		showsyms[S_tlwall]  = '#';
+		showsyms[S_trwall]  = '#';
+
+		showsyms[S_corr]    = '#';
+		showsyms[S_litcorr] = '#';
+	} else {
+		restore_syms();
+	}
+}
 
 /*drawing.c*/
