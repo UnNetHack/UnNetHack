@@ -462,19 +462,26 @@ extern struct tm *FDECL(localtime,(time_t *));
 #endif
 static struct tm *NDECL(getlt);
 
+static int
+get_int_from_dev_random()
+{
+	unsigned int random_seed=0;
+#ifdef DEV_RANDOM
+	FILE *fptr = NULL;
+
+	fptr = fopen(DEV_RANDOM,"r");
+	if (fptr) fread(&random_seed, sizeof(int),1,fptr);
+	fclose(fptr);
+#endif
+	return random_seed;
+}
+
 void
 init_random(unsigned int seed)
 {
-	unsigned int random_seed=0;
+	unsigned int random_seed=get_int_from_dev_random();
 
 	if (seed == 0) {
-#ifdef DEV_RANDOM
-		FILE *fptr = NULL;
-
-		fptr = fopen(DEV_RANDOM,"r");
-		if (fptr) fread(&random_seed, sizeof(int),1,fptr);
-		fclose(fptr);
-#endif
 		seed = (unsigned int) (time((time_t *)0)) + random_seed;
 	}
 
@@ -482,6 +489,14 @@ init_random(unsigned int seed)
 	level_info[0].seed = seed;
 
 	set_random_state(seed);
+}
+
+void
+reseed_random()
+{
+	unsigned int random_seed=0;
+	random_seed = (unsigned int)(time((time_t *)0)) + get_int_from_dev_random();
+	set_random_state(random_seed);
 }
 
 static struct tm *

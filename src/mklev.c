@@ -1263,6 +1263,8 @@ mklev()
 #endif
 	}
 	set_wall_state();
+
+	reseed_random();
 }
 
 void

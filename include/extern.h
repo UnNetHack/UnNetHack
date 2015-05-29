@@ -841,6 +841,7 @@ E char *FDECL(strstri, (const char *,const char *));
 #endif
 E boolean FDECL(fuzzymatch, (const char *,const char *,const char *,BOOLEAN_P));
 E void FDECL(init_random, (unsigned int));
+E void NDECL(reseed_random);
 E void FDECL(set_random_state, (unsigned int));
 E int NDECL(getyear);
 E int NDECL(getmonth);
