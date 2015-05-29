@@ -419,6 +419,7 @@ struct toptenentry *tt;
 #else
   (void)fprintf(rfile, SEP "gold=%ld", money_cnt(invent));
 #endif
+  (void)fprintf(rfile, SEP "rngseed=%u", level_info[0].seed);
 
   (void)fprintf(rfile, "\n");
 
