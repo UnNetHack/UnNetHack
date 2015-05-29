@@ -9,7 +9,7 @@
 /*
  * PATCHLEVEL is updated for each release.
  */
-#define PATCHLEVEL	0
+#define PATCHLEVEL	1
 /*
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
@@ -29,7 +29,7 @@
  * and are considered only bugfix releases. Therefore the revision number isn't
  * included into VERSION_COMPATIBILITY.
  */
-#define VERSION_REVISION	1
+/*#define VERSION_REVISION	1*/
 
 #define COPYRIGHT_BANNER_A \
 "UnNetHack 5, Copyright 2009-2013"
@@ -49,7 +49,7 @@
  * PP = patch level, ee = edit level, L = literal suffix "L",
  * with all four numbers specified as two hexadecimal digits.
  */
-/* #define VERSION_COMPATIBILITY 0x05000000L */	/* 5.0.0-e0 */
+#define VERSION_COMPATIBILITY 0x05030000L	/* 5.0.0-e0 */
 
 
 /*****************************************************************************/
