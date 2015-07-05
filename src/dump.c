@@ -11,6 +11,12 @@
 #  include <utime.h>
 #  include <errno.h>
 # endif
+
+# ifdef UNIX /* DUMP-patch dump filename chmod() */
+#  include <sys/types.h>
+#  include <sys/stat.h>
+# endif
+
 extern char msgs[][BUFSZ];
 extern int lastmsg;
 void FDECL(do_vanquished, (int, BOOLEAN_P));
@@ -30,30 +36,70 @@ static
 char*
 get_dump_filename()
 {
-  int new_dump_fn_len = strlen(dump_fn)+strlen(plname)+5; /* space for ".html" */
-  char *new_dump_fn = (char *) alloc((unsigned)(new_dump_fn_len+1));
-  char rplname[BUFSZ];
-  /* backwards compatibility, replace %n with %s */
-  char *p = (char *) strstr(dump_fn, "%n");
-  if (p) { *(p+1) = 's'; }
+	static char buf[BUFSIZ+1+5];
+	char *f, *p, *end;
+	int ispercent = 0;
 
-  p = (char *) strstr(dump_fn, "%s");
+	buf[0] = '\0';
 
-  if (p) {
-    /* replace %s with player name */
-    strcpy(rplname, plname);
-    regularize(rplname);
-    sprintf(new_dump_fn, dump_fn, plname);
-  } else {
-    strcpy(new_dump_fn, dump_fn);
-  }
-  return new_dump_fn;
+	if (!dump_fn[0]) return NULL;
+
+	f = dump_fn;
+	p = buf;
+	end = buf + sizeof(buf) - 10;
+
+	while (*f) {
+		if (ispercent) {
+			switch (*f) {
+				case 't': /* starttime */
+					snprintf (p, end + 1 - p, "%ld", u.ubirthday);
+					while (*p != '\0') {
+						p++;
+					}
+					break;
+				case 'N': /* first character of player name */
+					*p = plname[0];
+					p++;
+					*p = '\0';
+					break;
+				case 'n': /* player name */
+				case 's': /* for backwards compatibility */
+					snprintf(p, end + 1 - p, "%s", plname);
+					while (*p != '\0') {
+						p++;
+					}
+					break;
+				default:
+					*p = *f;
+					if (p < end) {
+						p++;
+					}
+			}
+			ispercent = 0;
+		} else {
+			if (*f == '%') {
+				ispercent = 1;
+			} else {
+				*p = *f;
+				if (p < end) {
+					p++;
+				}
+			}
+		}
+		f++;
+	}
+	*p = '\0';
+
+	return buf;
 }
 
 void
 dump_init()
 {
   if (dump_fn[0]) {
+#ifdef UNIX
+    mode_t dumpmode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+#endif
     char *new_dump_fn = get_dump_filename();
 
 #ifdef DUMP_TEXT_LOG
@@ -62,6 +108,10 @@ dump_init()
     if (!dump_fp) {
 	pline("Can't open %s for output.", new_dump_fn);
 	pline("Dump file not created.");
+#ifdef UNIX
+    } else {
+	chmod(new_dump_fn, dumpmode);
+#endif
     }
 #endif
 #ifdef DUMP_HTML_LOG
@@ -70,9 +120,12 @@ dump_init()
     if (!html_dump_fp) {
 	pline("Can't open %s for output.", new_dump_fn);
 	pline("Html dump file not created.");
+#ifdef UNIX
+    } else {
+	chmod(html_dump_path, dumpmode);
+#endif
     }
 #endif
-    if (new_dump_fn) free(new_dump_fn);
   }
 }
 #endif
