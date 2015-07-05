@@ -42,7 +42,6 @@ TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 TRAP: random, random
-
 #IF (hero.name == "Isaac") {
 #	TRAP:"trap door", random
 #}
@@ -130,7 +129,6 @@ TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 TRAP: random, random
-
 #IF (hero.name == "Isaac") {
 #	TRAP:"trap door", random
 #}
