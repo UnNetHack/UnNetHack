@@ -11,8 +11,8 @@ AC_CONFIG_AUX_DIR(sys/autoconf)
 
 dnl  ----- Precious variables
 AC_ARG_VAR(CC, [C compiler])
-AC_ARG_VAR(CHGRP, [sets GAMEUID (set this to true as a no op)])
-AC_ARG_VAR(CHOWN, [sets GAMEGRP (set this to true as a no op)])
+AC_ARG_VAR(CHGRP, [sets GAMEGRP (set this to true as a no op)])
+AC_ARG_VAR(CHOWN, [sets GAMEUID (set this to true as a no op)])
 AC_ARG_VAR(CHMOD, [sets file modes (set this to true as a no op)])
 AC_ARG_VAR(ZLIB_CFLAGS, [Compiler flags to find zlib header files])
 AC_ARG_VAR(ZLIB_LIBS, [Linker flags to find zlib library files])
@@ -492,8 +492,8 @@ NETHACK_ARG_WITH_PARAM(wizmode,[enable wizard mode for the specified user],WIZAR
 if test "$CHOWN" != "true"; then
     AC_MSG_CHECKING([for owner of installed files])
     AC_ARG_WITH([owner], [AS_HELP_STRING([--with-owner=USER],
-	    [Set the owner of installed files (default=games)])],
-	    [], [with_owner=games])
+	    [Set the owner of installed files (default=root)])],
+	    [], [with_owner=root])
     if test "$with_owner" != "no" ; then
 	NETHACK_COMMAND_IFELSE(
 		[find . -user "$with_owner" -prune -print > /dev/null],
@@ -509,8 +509,8 @@ fi
 if test "$CHGRP" != "true"; then
     AC_MSG_CHECKING([for group of installed files])
     AC_ARG_WITH([group], [AS_HELP_STRING([--with-group=GROUP],
-	    [Set the group of installed files (default=bin)])],
-	    [], [with_group=bin])
+	    [Set the group of installed files (default=games)])],
+	    [], [with_group=games])
     if test "$with_group" != "no" ; then
 	NETHACK_COMMAND_IFELSE(
 		[find . -group "$with_group" -prune -print > /dev/null],

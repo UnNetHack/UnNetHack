@@ -1529,8 +1529,8 @@ Optional Packages:
   --with-compression=PROGRAM
                           Set the program to compress data files
                           (default=auto)
-  --with-owner=USER       Set the owner of installed files (default=games)
-  --with-group=GROUP      Set the group of installed files (default=bin)
+  --with-owner=USER       Set the owner of installed files (default=root)
+  --with-group=GROUP      Set the group of installed files (default=games)
   --with-gamesdir=DIR     Location of other files which may be modified
                           (default=LOCALSTATEDIR/unnethack)
   --with-bonesdir=DIR     Location of bones files (rw)
@@ -1545,8 +1545,8 @@ Optional Packages:
 
 Some influential environment variables:
   CC          C compiler
-  CHGRP       sets GAMEUID (set this to true as a no op)
-  CHOWN       sets GAMEGRP (set this to true as a no op)
+  CHGRP       sets GAMEGRP (set this to true as a no op)
+  CHOWN       sets GAMEUID (set this to true as a no op)
   CHMOD       sets file modes (set this to true as a no op)
   ZLIB_CFLAGS Compiler flags to find zlib header files
   ZLIB_LIBS   Linker flags to find zlib library files
@@ -7245,7 +7245,7 @@ $as_echo_n "checking for owner of installed files... " >&6; }
 if test "${with_owner+set}" = set; then :
   withval=$with_owner;
 else
-  with_owner=games
+  with_owner=root
 fi
 
     if test "$with_owner" != "no" ; then
@@ -7284,7 +7284,7 @@ $as_echo_n "checking for group of installed files... " >&6; }
 if test "${with_group+set}" = set; then :
   withval=$with_group;
 else
-  with_group=bin
+  with_group=games
 fi
 
     if test "$with_group" != "no" ; then
