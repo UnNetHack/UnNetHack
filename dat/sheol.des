@@ -42,9 +42,9 @@ TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 TRAP: random, random
-#IF (hero.name == "Isaac") {
-#	TRAP:"trap door", random
-#}
+IF [hero.name == "Isaac"] {
+	TRAP:"trap door", random
+}
 
 # Middle level
 LEVEL: "sheolmid"
@@ -129,9 +129,9 @@ TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 TRAP: random, random
-#IF (hero.name == "Isaac") {
-#	TRAP:"trap door", random
-#}
+IF [hero.name == "Isaac"] {
+	TRAP:"trap door", random
+}
 
 MONSTER: random, random
 MONSTER: random, random
