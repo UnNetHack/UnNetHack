@@ -29,6 +29,7 @@
 	  - Fixed crash with a configured nameempty option (found and fixed by tertium)
 	  - Fixed crash in X11 inventory
 	  - Fixed possible endless loop in autotravel on the Rogue level
+	  - Fixed lava breath related crash at the edges of the map
 
 	* vanilla bug fixes:
 	  - C343-439: Running NetHack in a terminal window with more than 255
