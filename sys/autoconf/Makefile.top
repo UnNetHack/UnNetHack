@@ -251,6 +251,7 @@ dofiles:
 		cp $(srcdir)/doc/Guidebook.txt $(DESTDIR)$(FILE_AREA_DOC); \
 	fi
 	cp $(srcdir)/dat/license $(DESTDIR)$(FILE_AREA_DOC)
+	cp $(srcdir)/dat/unnethack_dump.css $(DESTDIR)$(FILE_AREA_UNSHARE)
 	@HOST_UNIX@-rm -f $(DESTDIR)$(SHELLDIR)/$(SCRIPT)
 	@HOST_UNIX@sed -e 's;/usr/games/lib/nethackdir;$(FILE_AREA_UNSHARE);' \
 	@HOST_UNIX@	-e 's;HACKDIR/nethack;HACKDIR/$(GAME);' \
