@@ -131,7 +131,7 @@ WINSRC = @WINSRC@
 WINOBJ = @WINOBJ@
 WINTTYLIB = @WINTTYLIB@
 WINCURSESLIB = @WINCURSESLIB@
-WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
+WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11 -lXpm
 
 # libraries for Qt
 WINQTLIB = -L$(QTLIBDIR) -lqt

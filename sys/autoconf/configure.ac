@@ -236,6 +236,8 @@ if test "$enable_x11_graphics" != "no"; then
     if test $have_libXaw != yes; then
       AC_MSG_ERROR([Need X Athena Widgets Library for X11 graphics])
     fi
+    AC_SEARCH_LIBS([XpmReadFileToImage], [Xpm], [USE_XPM="1"], [AC_MSG_ERROR([Need libXpm for X11 graphics])])
+
     CFLAGS="${CFLAGS} ${LIBXAW_CFLAGS}"
     WINSRC="${WINSRC} \$(WINX11SRC)"
     WINOBJ="${WINOBJ} \$(WINX11OBJ)"
