@@ -1399,10 +1399,18 @@ boolean at_stairs, falling, portal;
 	    else
 		mnexto(mtmp);
 
-	    if ((mtmp = m_at(u.ux, u.uy)) != 0) {
-		impossible("mnexto failed (do.c)?");
-		(void) rloc(mtmp, FALSE);
-	    }
+            if ((mtmp = m_at(u.ux, u.uy)) != 0) {
+                /* there was an unconditional impossible("mnexto failed (do.c)")
+                   here, but it's not impossible and we're prepared to cope
+                   with the situation, so only say something when debugging */
+                if (wizard)
+                    pline("(monster in hero's way)");
+                if (!rloc(mtmp, TRUE))
+                    /* no room to move it; send it away, to return later */
+                    migrate_to_level(mtmp, ledger_no(&u.uz), MIGR_RANDOM,
+                                     (coord *) 0);
+            }
+
 	}
 
 	/* initial movement of bubbles just before vision_recalc */
