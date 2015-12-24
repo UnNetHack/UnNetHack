@@ -1020,8 +1020,10 @@ ring:
 		/* turn [(n:n)] wand charges into [n:n] */
 		if ((tmp = strstr(bp, "[("))) {
 			char *tmp2 = strstr(tmp, ")]");
-			memmove(tmp2, tmp2 + 1, strlen(tmp2 + 1) + 1);
-			memmove(tmp + 1, tmp + 2, strlen(tmp + 2) + 1);
+			if (tmp2) {
+				memmove(tmp2, tmp2 + 1, strlen(tmp2 + 1) + 1);
+				memmove(tmp + 1, tmp + 2, strlen(tmp + 2) + 1);
+			}
 		}
 	}
  #ifdef SHOW_WEIGHT
