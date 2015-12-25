@@ -338,6 +338,28 @@ struct attack *alt_attk_buf;
         *alt_attk_buf = *attk;
         attk = alt_attk_buf;
         attk->adtyp = AD_PHYS;
+
+    /* make drain-energy damage be somewhat in proportion to energy */
+    } else if (attk->adtyp == AD_DREN && mdef == &youmonst) {
+        int ulev = max(u.ulevel, 6);
+
+        *alt_attk_buf = *attk;
+        attk = alt_attk_buf;
+        /* 3.6.0 used 4d6 but since energy drain came out of max energy
+           once current energy was gone, that tended to have a severe
+           effect on low energy characters; it's now 2d6 with ajustments */
+        if (u.uen <= 5 * ulev && attk->damn > 1) {
+            attk->damn -= 1; /* low energy: 2d6 -> 1d6 */
+            if (u.uenmax <= 2 * ulev && attk->damd > 3) {
+                attk->damd -= 3; /* very low energy: 1d6 -> 1d3 */
+            }
+        } else if (u.uen > 12 * ulev) {
+            attk->damn += 1; /* high energy: 2d6 -> 3d6 */
+            if (u.uenmax > 20 * ulev) {
+                attk->damd += 3; /* very high energy: 3d6 -> 3d9 */
+            }
+            /* note: 3d9 is slightly higher than previous 4d6 */
+        }
     }
 
     return attk;
@@ -1648,8 +1670,9 @@ do_stone:
 
     case AD_DREN:
         hitmsg(mtmp, mattk);
-        if (uncancelled && !rn2(4))
+        if (uncancelled && !rn2(4)) { /* 25% chance */
             drain_en(dmg);
+        }
         dmg = 0;
         break;
 
@@ -2174,6 +2197,13 @@ struct attack  *mattk;
 
     case AD_DISE:
         if (!diseasemu(mtmp->data)) tmp = 0;
+        break;
+
+    case AD_DREN:
+        /* AC magic cancellation doesn't help when engulfed */
+        if (!mtmp->mcan && rn2(4)) { /* 75% chance */
+            drain_en(tmp);
+        }
         break;
 
     case AD_DISN:
