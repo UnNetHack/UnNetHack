@@ -759,8 +759,10 @@ newsym(x,y)
 	else if (!lev->waslit || (iflags.dark_room && iflags.use_color)) {
 	    if (lev->glyph == cmap_to_glyph(S_litcorr) && lev->typ == CORR)
 		show_glyph(x, y, lev->glyph = cmap_to_glyph(S_corr));
+#ifdef REINCARNATION
 	    else if (!Is_rogue_level(&u.uz) && lev->glyph == cmap_to_glyph(S_room) && lev->typ == ROOM)
 		show_glyph(x, y, lev->glyph = cmap_to_glyph(DARKROOMSYM));
+#endif
 	    else
 		goto show_mem;
 	} else {
