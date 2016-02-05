@@ -1478,7 +1478,7 @@ int enhance_skill(boolean want_dump)
 
 /*
  * Change from restricted to unrestricted, allowing P_BASIC as max.  This
- * function may be called with with P_NONE.  Used in pray.c.
+ * function may be called with with P_NONE.  Used in pray.c as well as below.
  */
 void
 unrestrict_weapon_skill(skill)

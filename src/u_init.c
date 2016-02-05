@@ -302,7 +302,8 @@ static const struct def_skill Skill_B[] = {
     { P_SPEAR, P_SKILLED },
     { P_TRIDENT, P_SKILLED },
     { P_BOW, P_BASIC },
-    { P_ATTACK_SPELL, P_SKILLED },
+    { P_ATTACK_SPELL, P_BASIC },
+    { P_ESCAPE_SPELL, P_BASIC }, /* special spell is haste self */
     { P_RIDING, P_BASIC },
     { P_TWO_WEAPON_COMBAT, P_BASIC },
     { P_BARE_HANDED_COMBAT, P_MASTER },
@@ -517,7 +518,8 @@ static const struct def_skill Skill_S[] = {
     { P_LANCE, P_SKILLED },
     { P_BOW, P_EXPERT },
     { P_SHURIKEN, P_EXPERT },
-    { P_ATTACK_SPELL, P_SKILLED },
+    { P_ATTACK_SPELL, P_BASIC },
+    { P_DIVINATION_SPELL, P_BASIC }, /* special spell is clairvoyance */
     { P_CLERIC_SPELL, P_SKILLED },
     { P_RIDING, P_SKILLED },
     { P_TWO_WEAPON_COMBAT, P_EXPERT },
