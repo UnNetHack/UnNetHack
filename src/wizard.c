@@ -120,7 +120,7 @@ mon_has_special(struct monst *mtmp)
 
     for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
         if (otmp->otyp == AMULET_OF_YENDOR ||
-             is_quest_artifact(otmp) ||
+             any_quest_artifact(otmp) ||
              otmp->otyp == BELL_OF_OPENING ||
              otmp->otyp == CANDELABRUM_OF_INVOCATION ||
              otmp->otyp == SPE_BOOK_OF_THE_DEAD) {
@@ -170,7 +170,7 @@ mon_has_arti(struct monst *mtmp, short int otyp)
             if (otmp->otyp == otyp) {
                 return 1;
             }
-        } else if (is_quest_artifact(otmp)) {
+        } else if (any_quest_artifact(otmp)) {
             return 1;
         }
     }
@@ -206,7 +206,7 @@ on_ground(short int otyp)
             if (otmp->otyp == otyp) {
                 return otmp;
             }
-        } else if (is_quest_artifact(otmp)) {
+        } else if (any_quest_artifact(otmp)) {
             return otmp;
         }
     }
