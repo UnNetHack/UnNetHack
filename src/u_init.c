@@ -800,6 +800,7 @@ u_init()
         knows_object(TOUCHSTONE);
         skill_init(Skill_A);
         break;
+
     case PM_BARBARIAN:
         if (rn2(100) >= 50) {   /* see above comment */
             Barbarian[B_MAJOR].trotyp = BATTLE_AXE;
@@ -813,11 +814,13 @@ u_init()
         knows_class(ARMOR_CLASS);
         skill_init(Skill_B);
         break;
+
     case PM_CAVEMAN:
         Cave_man[C_AMMO].trquan = rn1(11, 10);  /* 10..20 */
         ini_inv(Cave_man);
         skill_init(Skill_C);
         break;
+
     case PM_CONVICT:
         ini_inv(Convict);
         knows_object(SKELETON_KEY);
@@ -829,6 +832,7 @@ u_init()
         urace.hatemask |= urace.lovemask;   /* Hated by the race's allies */
         urace.lovemask = 0; /* Convicts are pariahs of their race */
         break;
+
     case PM_HEALER:
         u.umoney0 = rn1(1000, 1001);
         ini_inv(Healer);
@@ -836,21 +840,20 @@ u_init()
         knows_object(POT_FULL_HEALING);
         skill_init(Skill_H);
         break;
+
     case PM_KNIGHT:
         ini_inv(Knight);
         knows_class(WEAPON_CLASS); /* all weapons */
         knows_class(ARMOR_CLASS);
-        /* give knights chess-like mobility
-         * -- idea from wooledge@skybridge.scl.cwru.edu */
+        /* give knights chess-like mobility--idea from wooledge@..cwru.edu */
         HJumping |= FROMOUTSIDE;
         skill_init(Skill_K);
         break;
-    case PM_MONK:
-        switch (rn2(90) / 30) {
-        case 0: Monk[M_BOOK].trotyp = SPE_HEALING; break;
-        case 1: Monk[M_BOOK].trotyp = SPE_PROTECTION; break;
-        case 2: Monk[M_BOOK].trotyp = SPE_SLEEP; break;
-        }
+
+    case PM_MONK: {
+        static short M_spell[] = { SPE_HEALING, SPE_PROTECTION, SPE_SLEEP };
+
+        Monk[M_BOOK].trotyp = M_spell[rn2(90) / 30]; /* [0..2] */
         ini_inv(Monk);
         if(!rn2(5)) ini_inv(Magicmarker);
         else if(!rn2(10)) ini_inv(Lamp);
@@ -859,6 +862,8 @@ u_init()
         knows_object(SHURIKEN);
         skill_init(Skill_Mon);
         break;
+    }
+
     case PM_PRIEST:
         if (Race_switch == PM_ELF) Priest[PRI_MACE].trotyp = CLUB;
         ini_inv(Priest);
@@ -874,6 +879,7 @@ u_init()
          * role in their YAAP.
          */
         break;
+
     case PM_RANGER:
         Ranger[RAN_TWO_ARROWS].trquan = rn1(10, 50);
         Ranger[RAN_ZERO_ARROWS].trquan = rn1(10, 30);
@@ -881,6 +887,7 @@ u_init()
         knows_class(WEAPON_CLASS); /* bows, arrows, spears only */
         skill_init(Skill_Ran);
         break;
+
     case PM_ROGUE:
         Rogue[R_DAGGERS].trquan = rn1(10, 6);
         u.umoney0 = 0;
@@ -890,6 +897,7 @@ u_init()
         knows_class(WEAPON_CLASS); /* daggers only */
         skill_init(Skill_R);
         break;
+
     case PM_SAMURAI:
         Samurai[S_ARROWS].trquan = rn1(20, 26);
         ini_inv(Samurai);
@@ -900,6 +908,7 @@ u_init()
         knows_class(ARMOR_CLASS);
         skill_init(Skill_S);
         break;
+
     case PM_TOURIST:
         Tourist[T_DARTS].trquan = rn1(43, 21); /* 63 darts ought to be enough for anybody. */
         u.umoney0 = rnd(1000);
@@ -910,6 +919,7 @@ u_init()
         else if(!rn2(25)) ini_inv(Magicmarker);
         skill_init(Skill_T);
         break;
+
     case PM_VALKYRIE:
         ini_inv(Valkyrie);
         if (!rn2(6)) {
@@ -919,6 +929,7 @@ u_init()
         knows_class(ARMOR_CLASS);
         skill_init(Skill_V);
         break;
+
     case PM_WIZARD:
         ini_inv(Wizard);
         if(!rn2(5)) ini_inv(Magicmarker);
@@ -938,9 +949,11 @@ u_init()
 
     /*** Race-specific initializations ***/
     switch (Race_switch) {
+
     case PM_HUMAN:
         /* Nothing special */
         break;
+
 
     case PM_ELF:
         /*
