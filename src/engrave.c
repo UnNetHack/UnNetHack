@@ -92,6 +92,7 @@ static const char *random_mesg[] = {
 	"This engraving is false!",
 	"The engraving you have just started reading is the engraving you have just finished reading",
 	"Elvis has left the dungeon.",
+	"Lorem ipsum dolor sit amet.", /* Typesetting */
 	"For truth, justice, and the Yendorian way!",
 	"This engraving, no verb",        /* Douglas Hofstadter */
 	"You will curse my name to the heavens and the heavens will side with me"  /* War of Omens */
