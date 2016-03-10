@@ -1506,7 +1506,6 @@ static const char *epitaphs[] = {
 
 	/* from UnNetHack */
 	"Hack 1984-1985",
-	"NetHack 1987-2003",
 
 	/* from UnNetHackPlus */
 	"SporkHack 2007-2010",
