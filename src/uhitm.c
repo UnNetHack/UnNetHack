@@ -1174,9 +1174,15 @@ int thrown;
 		if (canseemon(mon)) pline("%s %s reality!", Monnam(mon),
 			level.flags.noteleport ? "tries to warp" : "warps");
 		if (!level.flags.noteleport) {
-		    tele(); coord cc;
+		    if (rnd(13)<=4){   /* The 4/13 chance is intentional */
+		    new_tele(1); coord cc;                      
 		    enexto(&cc, u.ux, u.uy, &mons[PM_URANIUM_IMP]);
 		    rloc_to(mon, cc.x, cc.y);
+		    } else {
+		    tele(); coord cc;
+		    enexto(&cc, u.ux, u.uy, &mons[PM_URANIUM_IMP]);
+		    rloc_to(mon, cc.x, cc.y);	
+		    } 
 		}
 	    }
 	    return TRUE;
