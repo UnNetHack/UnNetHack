@@ -621,8 +621,9 @@ boolean force_it;
 }
 
 void
-tele()
+new_tele(Uncontrolled)
 {
+	boolean Uncontrolled;
 	coord cc;
 
 	/* Disable teleportation in stronghold && Vlad's Tower */
@@ -656,14 +657,16 @@ tele()
 		You_feel("disoriented for a moment.");
 		return;
 	}
-	if ((Teleport_control && !Stunned)
+	if ((Teleport_control && !Stunned && !Uncontrolled)
 #ifdef WIZARD
 			    || wizard
 #endif
 					) {
 	    if (unconscious()) {
 		pline("Being unconscious, you cannot control your teleport.");
-	    } else {
+	    } else if (Uncontrolled) {
+	    	pline("The teleportation is too chaotic to control!");
+	    }	else {
 #ifdef STEED
 		    char buf[BUFSZ];
 		    if (u.usteed) Sprintf(buf," and %s", mon_nam(u.usteed));
@@ -689,7 +692,11 @@ tele()
 
 	(void) safe_teleds(FALSE);
 }
-
+void
+tele()
+{
+	new_tele(0);
+}
 int
 dotele()
 {
