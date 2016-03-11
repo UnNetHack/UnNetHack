@@ -622,8 +622,8 @@ boolean force_it;
 
 void
 new_tele(Uncontrolled)
+boolean Uncontrolled;
 {
-	boolean Uncontrolled;
 	coord cc;
 
 	/* Disable teleportation in stronghold && Vlad's Tower */
