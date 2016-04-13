@@ -796,7 +796,7 @@ struct attack *mattk;
 		  (obj->greased || objects[obj->otyp].oc_name_known) ?
 			xname(obj) : cloak_simple_name(obj));
 
-	    if (obj->greased && !rn2(2)) {
+	    if (obj->greased && rn2(2)) {
 		pline_The("grease wears off.");
 		obj->greased = 0;
 		update_inventory();
@@ -2240,7 +2240,7 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 	    case AD_SPOR:
 		/* release a spore if the player is nearby */
 		if (is_fern(mtmp->data) && !mtmp->mcan && distu(mtmp->mx, mtmp->my) <= 96 &&
-			!is_fern_sprout(mtmp->data) ? !rn2(2) : !rn2(4)) {
+			!is_fern_sprout(mtmp->data) ? rn2(2) : !rn2(4)) {
 		    coord mm;
 		    mm.x = mtmp->mx; mm.y = mtmp->my;
 		    enexto(&mm, mm.x, mm.y, &mons[PM_FERN_SPORE]);
@@ -2328,7 +2328,7 @@ register struct obj *obj;
 		    if (vis)
 			pline("Somehow, %s weapon is not affected.",
 						s_suffix(mon_nam(mon)));
-		    if (obj->greased && !rn2(2)) obj->greased = 0;
+		    if (obj->greased && rn2(2)) obj->greased = 0;
 		} else {
 		    if (vis)
 			pline("%s %s%s!",
@@ -2698,7 +2698,7 @@ const char *str;
 	if (rn2(20) < ACURR(A_CHA)) {
 		Sprintf(qbuf,"\"Shall I remove your %s, %s?\"",
 			str,
-			(!rn2(2) ? "lover" : !rn2(2) ? "dear" : "sweetheart"));
+			(rn2(2) ? "lover" : rn2(2) ? "dear" : "sweetheart"));
 		if (yn(qbuf) == 'n') return;
 	} else {
 		char hairbuf[BUFSZ];
@@ -2787,7 +2787,7 @@ register struct attack *mattk;
 	/* These affect the enemy even if you were "killed" (rehumanized) */
 	switch(olduasmon->mattk[i].adtyp) {
 	    case AD_ACID:
-		if (!rn2(2)) {
+		if (rn2(2)) {
 		    pline("%s is splashed by your acid!", Monnam(mtmp));
 		    if (resists_acid(mtmp)) {
 			pline("%s is not affected.", Monnam(mtmp));
