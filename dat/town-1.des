@@ -13,6 +13,7 @@ ROOM: "ordinary", lit, random, random, (76,17)
 {
 STAIR: $place[0], down
 ENGRAVING: $place[1], mark, "Welcome to the town of Angband!"
+SINK: $place[2]
 FOUNTAIN: ( 6,12)
 FOUNTAIN: (39, 9)
 FOUNTAIN: (68, 3)

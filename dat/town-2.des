@@ -15,6 +15,7 @@ FOUNTAIN: (55,9)
 FOUNTAIN: (22,8)
 STAIR:$place[0],down
 ENGRAVING: $place[1], mark, "Welcome to the city of Angband!"
+SINK: $place[2]
 #
 #       The Shops
 #
