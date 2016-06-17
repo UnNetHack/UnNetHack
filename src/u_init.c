@@ -1159,6 +1159,8 @@ register struct trobj *trop;
                    || otyp == RIN_AGGRAVATE_MONSTER
                    || otyp == RIN_HUNGER
                    || otyp == WAN_NOTHING
+                   /* orcs start with poison resistance */
+                   || (otyp == RIN_POISON_RESISTANCE && Race_if(PM_ORC))
                    /* Monks don't use weapons */
                    || (otyp == SCR_ENCHANT_WEAPON &&
                        Role_if(PM_MONK))
