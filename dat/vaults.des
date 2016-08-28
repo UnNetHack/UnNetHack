@@ -1148,3 +1148,30 @@ TRAP: "statue", (7,3)
 TRAP: "statue", (7,7)
 OBJECT:('`',"statue"),(7,3),montype:('d', "werejackal")
 OBJECT:('`',"statue"),(7,7),montype:('@', "elvenking")
+
+# Pacman
+LEVEL:"vlt-%04i"
+FLAGS:rndvault
+GEOMETRY:random
+MAP
+--------------------
+|....|........|....|
+|.--.|.------.|.--.|
+|.|..............|.|
+|.|.--.|-FF-|.--.|.|
+|......|    |......|
+|.|.--.|----|.--.|.|
+|.|..............|.|
+|.--.|.------.|.--.|
+|....|........|....|
+--------------------
+ENDMAP
+OBJECT:"apple",random
+OBJECT:"pear",random
+OBJECT:"banana",random
+OBJECT:"orange",random
+OBJECT:"melon",random
+MONSTER:" ",random,"Inky"
+MONSTER:" ",random,"Blinky"
+MONSTER:" ",random,"Pinky"
+MONSTER:" ",random,"Clyde"
