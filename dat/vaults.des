@@ -1171,7 +1171,7 @@ OBJECT:"pear",random
 OBJECT:"banana",random
 OBJECT:"orange",random
 OBJECT:"melon",random
-MONSTER:" ",random,"Inky"
-MONSTER:" ",random,"Blinky"
-MONSTER:" ",random,"Pinky"
-MONSTER:" ",random,"Clyde"
+MONSTER:"ghost",random,"Inky"
+MONSTER:"ghost",random,"Blinky"
+MONSTER:"ghost",random,"Pinky"
+MONSTER:"ghost",random,"Clyde"
