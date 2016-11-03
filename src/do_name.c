@@ -1284,7 +1284,15 @@ static const char * const bogusmons[] = {
 	"robot unicorn",
 	
 	/* Welcome to Night Vale*/
-	"John Peters, you know, the farmer"
+	"John Peters, you know, the farmer",
+	
+	/* Fallen London and Sunless Sea */
+	"Lorn Fluke",
+	"sorrow spider", "spider council",
+	"chair of the department of antiquarian esquivalience",
+	"the Starveling Cat",
+	"the Tree of Ages"
+	
 };
 
 
