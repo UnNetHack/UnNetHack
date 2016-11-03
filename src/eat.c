@@ -469,7 +469,11 @@ boolean allowmsg;
 		if (allowmsg) {
 			if (Upolyd)
 				You("have a bad feeling deep inside.");
-			You("cannibal!  You will regret this!");
+			if (Hallucination) {
+				You("feel unaccountably peckish.");      /* Fallen London */
+			} else {
+				You("cannibal!  You will regret this!");
+			}
 		}
 		HAggravate_monster |= FROMOUTSIDE;
 		change_luck(-rn1(4,2));		/* -5..-2 */
