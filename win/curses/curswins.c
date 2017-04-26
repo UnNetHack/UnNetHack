@@ -546,13 +546,13 @@ void curses_clear_nhwin(winid wid)
 {
     WINDOW *win = curses_get_nhwin(wid);
     boolean border = curses_window_has_border(wid);
-
+    
     if (wid == MAP_WIN)
     {
         clearok(win, TRUE); /* Redraw entire screen when refreshed */
         clear_map();
     }
-
+        
     werase(win);
 
     if (border)
@@ -561,6 +561,24 @@ void curses_clear_nhwin(winid wid)
     }
 }
 
+/* Change colour of window border to alert player to something */
+void curses_alert_win_border(winid wid, boolean onoff)
+{
+    WINDOW *win = curses_get_nhwin(wid);
+    if (!curses_window_has_border(wid)) return;
+    if (onoff) curses_toggle_color_attr(win, ALERT_BORDER_COLOR, NONE, ON);
+    box(win, 0, 0);
+    if (onoff) curses_toggle_color_attr(win, ALERT_BORDER_COLOR, NONE, OFF);
+    wrefresh(win);
+}
+
+
+void curses_alert_main_borders(boolean onoff)
+{
+    curses_alert_win_border(MAP_WIN, onoff);
+    curses_alert_win_border(MESSAGE_WIN, onoff);
+    curses_alert_win_border(STATUS_WIN, onoff);
+}
 
 /* Return true if given wid is a main NetHack window */
 

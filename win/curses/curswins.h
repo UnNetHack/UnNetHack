@@ -37,6 +37,10 @@ void curses_puts(winid wid, int attr, const char *text);
 
 void curses_clear_nhwin(winid wid);
 
+void curses_alert_win_border(winid wid, boolean onoff);
+
+void curses_alert_main_borders(boolean onoff);
+
 void curses_draw_map(int sx, int sy, int ex, int ey);
 
 boolean curses_map_borders(int *sx, int *sy, int *ex, int *ey, int ux,

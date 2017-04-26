@@ -6,6 +6,8 @@
 
 void curses_message_win_puts(const char *message, boolean recursed);
 
+int curses_block(boolean require_tab);
+
 int curses_more(void);
 
 void curses_clear_unhighlight_message_window(void);

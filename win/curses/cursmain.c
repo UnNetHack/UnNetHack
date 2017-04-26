@@ -278,13 +278,20 @@ void curses_display_nhwindow(winid wid, BOOLEAN_P block)
       (void) curses_more();
     }
 
+    if ((wid == MESSAGE_WIN) && block)
+    {
+      if (u.uhp != -1 && program_state.gameover != 1)
+          (void) curses_block(TRUE);
+      /* don't bug player with TAB prompt on "Saving..." or endgame*/
+      else (void) curses_more();
+    }
+
     if (curses_is_menu(wid) || curses_is_text(wid))
     {
         curses_end_menu(wid, "");
         curses_select_menu(wid, PICK_NONE, &selected);
         return;
     }
-
 }
 
 

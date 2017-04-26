@@ -21,6 +21,7 @@ boolean counting;   /* Count window is active */
 #define NONE -1
 #define KEY_ESC 0x1b
 #define DIALOG_BORDER_COLOR CLR_MAGENTA
+#define ALERT_BORDER_COLOR CLR_RED
 #define SCROLLBAR_COLOR CLR_MAGENTA
 #define SCROLLBAR_BACK_COLOR CLR_BLACK
 #define HIGHLIGHT_COLOR CLR_WHITE
@@ -182,6 +183,10 @@ extern void curses_puts(winid wid, int attr, const char *text);
 
 extern void curses_clear_nhwin(winid wid);
 
+extern void curses_alert_win_border(winid wid, boolean onoff);
+
+extern void curses_alert_main_borders(boolean onoff);
+
 extern void curses_draw_map(int sx, int sy, int ex, int ey);
 
 extern boolean curses_map_borders(int *sx, int *sy, int *ex, int *ey,
@@ -286,6 +291,8 @@ extern void curses_cleanup(void);
 /* cursmesg.c */
 
 extern void curses_message_win_puts(const char *message, boolean recursed);
+
+extern int curses_block(boolean require_tab); /* for MSGTYPE=STOP */
 
 extern int curses_more(void);
 

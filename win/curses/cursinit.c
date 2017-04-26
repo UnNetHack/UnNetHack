@@ -14,6 +14,8 @@
 #define SLASHEM_CURSES      2
 #define UNNETHACK_CURSES    3
 #define SPORKHACK_CURSES    4
+#define GRUNTHACK_CURSES    5
+#define DNETHACK_CURSES     6
 
 /* array to save initial terminal colors for later restoration */
 
@@ -106,7 +108,33 @@ nhrgb orig_hiwhite;
 #define SPORKHACK_SPLASH_G \
 "        | |                                                  "
 #define SPORKHACK_SPLASH_H \
-"        |_|                                                  "
+"        |_|                                                 "
+
+#define GRUNTHACK_SPLASH_A \
+" ______                      _    _    _               _    "
+#define GRUNTHACK_SPLASH_B \
+"/  ____)                    | |  | |  | |             | |   "
+#define GRUNTHACK_SPLASH_C \
+"| / ___  _ __  _   _  _ __  | |_ | |__| |  __ _   ___ | |  _"
+#define GRUNTHACK_SPLASH_D \
+"| | L  \\| '__)| | | || '_ \\ | __)|  __  | / _` | / __)| |/ /"
+#define GRUNTHACK_SPLASH_E \
+"| l__) || |   | |_| || | | || |_ | |  | || (_| || (__ |   < "
+#define GRUNTHACK_SPLASH_F \
+"\\______/|_|   \\___,_||_| |_| \\__)|_|  |_| \\__,_| \\___)|_|\\_\\"
+
+#define DNETHACK_SPLASH_A \
+"     _  _   _        _    _    _               _    "
+#define DNETHACK_SPLASH_B \
+"    | || \\ | |      | |  | |  | |             | |   "
+#define DNETHACK_SPLASH_C \
+"  __| ||  \\| |  ___ | |_ | |__| |  __ _   ___ | | __"
+#define DNETHACK_SPLASH_D \
+" / _` || . ` | / _ \\| __||  __  | / _` | / __|| |/ /"
+#define DNETHACK_SPLASH_E \
+"| (_| || |\\  ||  __/| |_ | |  | || (_| || (__ |   < "
+#define DNETHACK_SPLASH_F \
+" \\__,_||_| \\_| \\___| \\__||_|  |_| \\__,_| \\___||_|\\_\\"
 
 
 /* Create the "main" nonvolitile windows used by nethack */
@@ -1158,8 +1186,18 @@ void curses_display_splash_window()
         which_variant = SPORKHACK_CURSES;
     }
 
-    curses_toggle_color_attr(stdscr, CLR_WHITE, A_NORMAL, ON);
+    if (strncmp("GruntHack", COPYRIGHT_BANNER_A, 9) == 0)
+    {
+        which_variant = GRUNTHACK_CURSES;
+    }
 
+    if (strncmp("dNethack", COPYRIGHT_BANNER_A, 8) == 0)
+    {
+        which_variant = DNETHACK_CURSES;
+    }
+
+
+    curses_toggle_color_attr(stdscr, CLR_WHITE, A_NORMAL, ON);
     if (iflags.wc_splash_screen)
     {
         switch (which_variant)
@@ -1208,6 +1246,28 @@ void curses_display_splash_window()
                 mvaddstr(y_start + 7, x_start, SPORKHACK_SPLASH_H);
                 y_start += 9;
                 break;
+            case GRUNTHACK_CURSES:
+            {
+                mvaddstr(y_start, x_start, GRUNTHACK_SPLASH_A);
+                mvaddstr(y_start + 1, x_start, GRUNTHACK_SPLASH_B);
+                mvaddstr(y_start + 2, x_start, GRUNTHACK_SPLASH_C);
+                mvaddstr(y_start + 3, x_start, GRUNTHACK_SPLASH_D);
+                mvaddstr(y_start + 4, x_start, GRUNTHACK_SPLASH_E);
+                mvaddstr(y_start + 5, x_start, GRUNTHACK_SPLASH_F);
+                y_start += 7;
+                break;
+            }
+            case DNETHACK_CURSES:
+            {
+                mvaddstr(y_start, x_start, DNETHACK_SPLASH_A);
+                mvaddstr(y_start + 1, x_start, DNETHACK_SPLASH_B);
+                mvaddstr(y_start + 2, x_start, DNETHACK_SPLASH_C);
+                mvaddstr(y_start + 3, x_start, DNETHACK_SPLASH_D);
+                mvaddstr(y_start + 4, x_start, DNETHACK_SPLASH_E);
+                mvaddstr(y_start + 5, x_start, DNETHACK_SPLASH_F);
+                y_start += 7;
+                break;
+            }
             default:
             {
                 impossible("which_variant number %d out of range",

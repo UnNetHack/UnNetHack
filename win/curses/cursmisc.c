@@ -42,7 +42,7 @@ int curses_read_char()
 
     if (ch == 0)
     {
-        ch = '\033'; /* map NUL to ESC since nethack doesn't expect NUL */
+        ch = DOESCAPE; /* map NUL to ESC since nethack doesn't expect NUL */
     }
 
 #if defined(ALT_0) && defined(ALT_9)    /* PDCurses, maybe others */    
@@ -65,7 +65,7 @@ int curses_read_char()
     /* Handle resize events via get_nh_event, not this code */
     if (ch == KEY_RESIZE)
     {
-        ch = '\033'; /* NetHack doesn't know what to do with KEY_RESIZE */
+        ch = DOESCAPE; /* NetHack doesn't know what to do with KEY_RESIZE */
     }
 #endif
 
@@ -679,7 +679,7 @@ int curses_get_count(int first_digit)
     
     ungetch(current_char);
     
-    if (current_char == '\033')    /* Cancelled with escape */
+    if (current_char == DOESCAPE)    /* Cancelled with escape */
     {
         current_count = -1;
     }

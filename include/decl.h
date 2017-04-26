@@ -256,6 +256,8 @@ E const char sdir[], ndir[];
 #endif
 E const schar xdir[], ydir[], zdir[];
 
+#define DOESCAPE '\033'
+
 E NEARDATA schar tbx, tby;		/* set in mthrowu.c */
 
 E NEARDATA struct multishot { int n, i; short o; boolean s; } m_shot;
