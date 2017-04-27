@@ -321,8 +321,7 @@ curses_ext_cmd()
     
     startx = 0;
     starty = 0;
-    if (iflags.wc_popup_dialog) /* Prompt in popup window */
-    {
+    if (iflags.wc_popup_dialog) { /* Prompt in popup window */
         int x0, y0, w, h; /* bounding coords of popup */
         extwin2 = curses_create_window(25, 1, UP);
         wrefresh(extwin2);
@@ -331,9 +330,7 @@ curses_ext_cmd()
         getmaxyx(extwin2,h,w);
         extwin = newwin(1, w-2, y0+1, x0+1);
         if (w - 4 < maxlen) maxlen = w - 4;
-    }
-    else
-    {
+    } else {
         curses_get_window_xy(MESSAGE_WIN, &winx, &winy);
         curses_get_window_size(MESSAGE_WIN, &messageh, &messagew);
 
