@@ -364,7 +364,7 @@ int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_
 int curses_ext_cmd()
 {
     int count, letter, prompt_width, startx, starty, winx, winy;
-    int messageh, messagew;
+    int messageh, messagew, maxlen = BUFSZ - 1;
     int ret = -1;
     char cur_choice[BUFSZ];
     int matches = 0;
@@ -386,6 +386,7 @@ int curses_ext_cmd()
         getbegyx(extwin2,y0,x0);
         getmaxyx(extwin2,h,w);
         extwin = newwin(1, w-2, y0+1, x0+1);
+        if (w - 4 < maxlen) maxlen = w - 4;
     }
     else
     {
@@ -400,6 +401,7 @@ int curses_ext_cmd()
         
         winy += messageh - 1;
         extwin = newwin(1, messagew-2, winy, winx);
+        if (messagew - 4 < maxlen) maxlen = messagew - 4;
         pline("#");
     }
 
@@ -423,7 +425,7 @@ int curses_ext_cmd()
              + strlen(cur_choice));
             curses_toggle_color_attr(extwin, NONE, A_UNDERLINE, OFF);
             mvwprintw(extwin, starty,
-                      strlen(extcmdlist[ret].ef_txt) + 2, "         ");
+                      strlen(extcmdlist[ret].ef_txt) + 2, "          ");
         }
 
         wrefresh(extwin);
@@ -465,7 +467,7 @@ int curses_ext_cmd()
             }
         }
         
-        if (letter != '*' && prompt_width < BUFSZ -1) {
+        if (letter != '*' && prompt_width < maxlen) {
             cur_choice[prompt_width] = letter;
             cur_choice[prompt_width + 1] = '\0';
             ret = -1;
