@@ -661,7 +661,11 @@ void curses_init_nhcolors()
 #ifdef USE_DARKGRAY
                 if (COLORS > 16)
                 {
+                    color_content(CURSES_DARK_GRAY, &orig_darkgray.r,
+                     &orig_darkgray.g, &orig_darkgray.b);
                     init_color(CURSES_DARK_GRAY, 300, 300, 300);
+                    /* just override black colorpair entry here */
+                    init_pair(1, CURSES_DARK_GRAY, -1);
                 }
 #endif
             }
