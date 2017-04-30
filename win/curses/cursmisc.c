@@ -110,12 +110,10 @@ void curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
             {
                 wattron(win, A_BOLD);
             }
-        else
-#else
-        {
-            color = CLR_BLUE;
         }
+        else
 #endif  /* USE_DARKGRAY */
+            color = CLR_BLUE;
     }
     curses_color = color + 1;
     if (COLORS < 16)
