@@ -18,7 +18,7 @@ int curses_ext_cmd(void);
 
 void curses_create_nhmenu(winid wid);
 
-void curses_add_nhmenu_item(winid wid, const ANY_P *identifier,
+void curses_add_nhmenu_item(winid wid, int glyph, const ANY_P *identifier,
  CHAR_P accelerator, CHAR_P group_accel, int attr, const char *str,
  BOOLEAN_P presel);
 

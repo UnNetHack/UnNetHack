@@ -529,7 +529,7 @@ void curses_puts(winid wid, int attr, const char *text)
         }
         identifier = malloc(sizeof(anything));
         identifier->a_void = NULL;
-        curses_add_nhmenu_item(wid, identifier, 0, 0, attr, text,
+        curses_add_nhmenu_item(wid, NO_GLYPH, identifier, 0, 0, attr, text,
          FALSE);
     }
     else

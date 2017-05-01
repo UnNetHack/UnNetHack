@@ -13,6 +13,7 @@
 typedef struct nhmi
 {
     winid wid;  /* NetHack window id */
+    int glyph;  /* Menu glyphs */
     anything identifier; /* Value returned if item selected */
     CHAR_P accelerator;  /* Character used to select item from menu */
     CHAR_P group_accel; /* Group accelerator for menu item, if any */
@@ -565,7 +566,7 @@ void curses_create_nhmenu(winid wid)
 
 /* Add a menu item to the given menu window */
 
-void curses_add_nhmenu_item(winid wid, const ANY_P *identifier,
+void curses_add_nhmenu_item(winid wid, int glyph, const ANY_P *identifier,
  CHAR_P accelerator, CHAR_P group_accel, int attr, const char *str,
  BOOLEAN_P presel)
 {
@@ -582,6 +583,7 @@ void curses_add_nhmenu_item(winid wid, const ANY_P *identifier,
     curses_rtrim((char *) new_str);
     new_item = malloc(sizeof(nhmenu_item));
     new_item->wid = wid;
+    new_item->glyph = glyph;
     new_item->identifier = *identifier;
     new_item->accelerator = accelerator;
     new_item->group_accel = group_accel;
@@ -1129,6 +1131,26 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
                 mvwprintw(win, menu_item_ptr->line_num + 1, 3, ") ");
             }
         }
+        entry_cols = menu->width;
+        start_col = 1;
+
+        if (menu_item_ptr->identifier.a_void != NULL)
+        {
+            entry_cols -= 4;
+            start_col += 4;
+        }        
+        if (menu_item_ptr->glyph != NO_GLYPH)
+        {
+            /* stuff to display the glyph at line_num+1, start_col goes here */
+            unsigned special; /*notused */
+            mapglyph(menu_item_ptr->glyph, &curletter, &color, &special, 0, 0);
+            curses_toggle_color_attr(win, color, NONE, ON);
+            mvwaddch(win, menu_item_ptr->line_num + 1, start_col, curletter);
+            curses_toggle_color_attr(win, color, NONE, OFF);
+            mvwaddch(win, menu_item_ptr->line_num + 1, start_col + 1, ' ');
+            entry_cols -= 2;
+            start_col += 2;
+        }
 #ifdef MENU_COLOR
 		if (iflags.use_menu_color && iflags.use_color &&
 		    (menu_color = get_menu_coloring
@@ -1145,14 +1167,6 @@ static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num)
 		}
 #endif /* MENU_COLOR */
         curses_toggle_color_attr(win, NONE, menu_item_ptr->attr, ON);
-        entry_cols = menu->width;
-        start_col = 1;
-
-        if (menu_item_ptr->identifier.a_void != NULL)
-        {
-            entry_cols -= 4;
-            start_col += 4;
-        }        
         
         num_lines = curses_num_lines(menu_item_ptr->str, entry_cols);
         
