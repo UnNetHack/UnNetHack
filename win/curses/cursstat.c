@@ -37,6 +37,12 @@ struct color_option percentage_color_of(int value, int max,
 static boolean stat_colored(const char *id);
 #endif
 
+static void handle_status_problem(nhstat *, int, const char *, int *, int *,
+                                  int, boolean);
+
+static void handle_stat_change(nhstat *, int, int, int *, int *,
+                               int, boolean);
+
 static int decrement_highlight(nhstat *);
 
 static void init_stats(void);
@@ -83,6 +89,148 @@ static nhstat prevencumb;
 
 extern const char *hu_stat[]; /* from eat.c */
 extern const char *enc_stat[]; /* from botl.c */
+
+/* Handles numerical stat changes of various kinds.
+   type is generally STAT_OTHER (generic "do nothing special"),
+   but is used if the stat needs to be handled in a special way. */
+
+static void handle_stat_change(nhstat *stat, int new, int type,
+                               int *sx, int *sy, int sx_start,
+                               boolean horiz)
+{
+    char buf[BUFSZ];
+    WINDOW *win = curses_get_nhwin(STATUS_WIN);
+
+    /* Turncount isn't highlighted, or it would be highlighted constantly.
+       Also note that these colors can be ignored if statuscolors is enabled
+       in color_stat() */
+    if (new != stat->value && type != STAT_TIME)
+    {
+        /* Less AC is better */
+        if ((type == STAT_AC && new < stat->value) ||
+         (type != STAT_AC && new > stat->value))
+        {
+            if (type == STAT_GOLD)
+            {
+                stat->highlight_color = HI_GOLD;
+            }
+            else
+            {
+                stat->highlight_color = STAT_UP_COLOR;
+            }
+        }
+        else
+        {
+            stat->highlight_color = STAT_DOWN_COLOR;
+        }
+        stat->value = new;
+
+        /* Strength might be displayed differently */
+        if (type == STAT_STR && new > 18)
+        {
+            if (new > 118)
+            {
+                sprintf(buf, "%d", new - 100);
+            }
+            else if (new == 118)
+            {
+                sprintf(buf, "%d/**");
+            }
+            else
+            {
+                sprintf(buf, "18/%02d", new - 18);
+            }
+        }
+        else
+        {
+            sprintf(buf, "%d", new);
+        }
+
+        free(stat->txt);
+        stat->txt = curses_copy_of(buf);
+        stat->highlight_turns = 5;
+        if (type == STAT_HPEN)
+        {
+            stat->highlight_turns = 3;
+        }
+    }
+
+    if (stat->label)
+    {
+        mvwaddstr(win, *sy, *sx, stat->label);
+        *sx += strlen(stat->label);
+    }
+
+    color_stat(*stat, ON);
+    mvwaddstr(win, *sy, *sx, stat->txt);
+    color_stat(*stat, OFF);
+
+    if (type == STAT_HPEN)
+    {
+        *sx += strlen(stat->txt);
+    }
+    else if (horiz)
+    {
+        *sx += strlen(stat->txt) + 1;
+    }
+    else
+    {
+        *sx = sx_start;
+        *sy += 1;
+    }
+}
+
+static void handle_status_problem(nhstat *stat, int new, const char *str,
+                                  int *sx, int *sy, int sx_start,
+                                  boolean horiz)
+{
+    WINDOW *win = curses_get_nhwin(STATUS_WIN);
+
+    if (new != stat->value)
+    {
+        stat->highlight_color = STAT_DOWN_COLOR;
+        if (stat->txt != NULL)
+        {
+            free(stat->txt);
+        }
+        if (new)
+        {
+            stat->txt = curses_copy_of(str);
+        }
+        else
+        {
+            stat->txt = NULL;
+        }
+        if (stat->value == 0)
+        {
+            stat->highlight_turns = 5;
+        }
+        stat->value = new;
+    }
+
+    if (stat->label != NULL)
+    {
+        mvwaddstr(win, *sy, *sx, stat->label);
+        *sx += strlen(stat->label);
+    }
+
+    if (stat->txt != NULL)
+    {
+        color_stat(*stat, ON);
+        mvwaddstr(win, *sy, *sx, stat->txt);
+        color_stat(*stat, OFF);
+
+        if (horiz)
+        {
+            *sx += strlen(stat->txt) + 1;
+        }
+        else
+        {
+            sx = sx_start;
+            *sy += 1; /* ++ would increase the pointer addr */
+        }
+    }
+}
 
 /* Update the status win - this is called when NetHack would normally
 write to the status window, so we know somwthing has changed.  We
@@ -161,7 +309,12 @@ void curses_update_stats(boolean redraw)
     curses_clear_nhwin(STATUS_WIN);
     
     /* Line 1 */
-    
+
+    /* Improve when this code is workable, this is a bit awkward at the moment */
+
+#define statchange(stat,new,type) handle_stat_change(stat, new, type, &sx, &sy, \
+                                                     sx_start, horiz)
+
     /* Player name and title */
     strcpy(buf, plname);
     if ('a' <= buf[0] && buf[0] <= 'z') buf[0] += 'A'-'a';
@@ -233,252 +386,12 @@ void curses_update_stats(boolean redraw)
     }
 
     /* Strength */
-    if (ACURR(A_STR) != prevstr.value)  /* Strength changed */
-    {
-        
-        if (ACURR(A_STR) > prevstr.value)
-        {
-            prevstr.highlight_color = STAT_UP_COLOR;
-        }
-        else
-        {
-            prevstr.highlight_color = STAT_DOWN_COLOR;
-        }
-        prevstr.value = ACURR(A_STR);
-        if (ACURR(A_STR) > 118)
-        {
-            sprintf(buf, "%d", ACURR(A_STR) - 100);
-        }
-        else if (ACURR(A_STR)==118)
-        {
-            sprintf(buf, "18/**");
-        }
-        else if(ACURR(A_STR) > 18)
-        {
-            sprintf(buf, "18/%02d", ACURR(A_STR) - 18);
-        }
-        else
-        {
-            sprintf(buf, "%d", ACURR(A_STR));
-        }
-        free(prevstr.txt);
-        prevstr.txt = curses_copy_of(buf);
-        prevstr.highlight_turns = 5;
-    }
-
-    if (prevstr.label != NULL)
-    {
-        mvwaddstr(win, sy, sx, prevstr.label);
-        sx += strlen(prevstr.label);
-    }
-    
-    color_stat(prevstr, ON);
-    mvwaddstr(win, sy, sx, prevstr.txt);
-    color_stat(prevstr, OFF);
-    
-    if (horiz)
-    {
-        sx += strlen(prevstr.txt) + 1;
-    }
-    else
-    {
-        sx = sx_start;
-        sy++;
-    }
-
-    /* Intelligence */
-    if (ACURR(A_INT) != prevint.value)  /* Intelligence changed */
-    {
-        
-        if (ACURR(A_INT) > prevint.value)
-        {
-            prevint.highlight_color = STAT_UP_COLOR;
-        }
-        else
-        {
-            prevint.highlight_color = STAT_DOWN_COLOR;
-        }
-        prevint.value = ACURR(A_INT);
-        sprintf(buf, "%d", ACURR(A_INT)); 
-        free(prevint.txt);
-        prevint.txt = curses_copy_of(buf);
-        prevint.highlight_turns = 5;
-    }
-
-    if (prevint.label != NULL)
-    {
-        mvwaddstr(win, sy, sx, prevint.label);
-        sx += strlen(prevint.label);
-    }
-    
-    color_stat(prevint, ON);
-    mvwaddstr(win, sy, sx, prevint.txt);
-    color_stat(prevint, OFF);
-    
-    if (horiz)
-    {
-        sx += strlen(prevint.txt) + 1;
-    }
-    else
-    {
-        sx = sx_start;
-        sy++;
-    }
-
-    /* Wisdom */
-    if (ACURR(A_WIS) != prevwis.value)  /* Wisdom changed */
-    {
-        
-        if (ACURR(A_WIS) > prevwis.value)
-        {
-            prevwis.highlight_color = STAT_UP_COLOR;
-        }
-        else
-        {
-            prevwis.highlight_color = STAT_DOWN_COLOR;
-        }
-        prevwis.value = ACURR(A_WIS);
-        sprintf(buf, "%d", ACURR(A_WIS)); 
-        free(prevwis.txt);
-        prevwis.txt = curses_copy_of(buf);
-        prevwis.highlight_turns = 5;
-    }
-
-    if (prevwis.label != NULL)
-    {
-        mvwaddstr(win, sy, sx, prevwis.label);
-        sx += strlen(prevwis.label);
-    }
-    
-    color_stat(prevwis, ON);
-    mvwaddstr(win, sy, sx, prevwis.txt);
-    color_stat(prevwis, OFF);
-    
-    if (horiz)
-    {
-        sx += strlen(prevwis.txt) + 1;
-    }
-    else
-    {
-        sx = sx_start;
-        sy++;
-    }
-
-    /* Dexterity */
-    if (ACURR(A_DEX) != prevdex.value)  /* Dexterity changed */
-    {
-        
-        if (ACURR(A_DEX) > prevdex.value)
-        {
-            prevdex.highlight_color = STAT_UP_COLOR;
-        }
-        else
-        {
-            prevdex.highlight_color = STAT_DOWN_COLOR;
-        }
-        prevdex.value = ACURR(A_DEX);
-        sprintf(buf, "%d", ACURR(A_DEX));
-        free(prevdex.txt);
-        prevdex.txt = curses_copy_of(buf);
-        prevdex.highlight_turns = 5;
-    }
-
-    if (prevdex.label != NULL)
-    {
-        mvwaddstr(win, sy, sx, prevdex.label);
-        sx += strlen(prevdex.label);
-    }
-    
-    color_stat(prevdex, ON);
-    mvwaddstr(win, sy, sx, prevdex.txt);
-    color_stat(prevdex, OFF);
-    
-    if (horiz)
-    {
-        sx += strlen(prevdex.txt) + 1;
-    }
-    else
-    {
-        sx = sx_start;
-        sy++;
-    }
-
-    /* Constitution */
-    if (ACURR(A_CON) != prevcon.value)  /* Constitution changed */
-    {
-        
-        if (ACURR(A_CON) > prevcon.value)
-        {
-            prevcon.highlight_color = STAT_UP_COLOR;
-        }
-        else
-        {
-            prevcon.highlight_color = STAT_DOWN_COLOR;
-        }
-        prevcon.value = ACURR(A_CON);
-        sprintf(buf, "%d", ACURR(A_CON));
-        free(prevcon.txt);
-        prevcon.txt = curses_copy_of(buf);
-        prevcon.highlight_turns = 5;
-    }
-
-    if (prevcon.label != NULL)
-    {
-        mvwaddstr(win, sy, sx, prevcon.label);
-        sx += strlen(prevcon.label);
-    }
-    
-    color_stat(prevcon, ON);
-    mvwaddstr(win, sy, sx, prevcon.txt);
-    color_stat(prevcon, OFF);
-    
-    if (horiz)
-    {
-        sx += strlen(prevcon.txt) + 1;
-    }
-    else
-    {
-        sx = sx_start;
-        sy++;
-    }
-
-    /* Charisma */
-    if (ACURR(A_CHA) != prevcha.value)  /* Charisma changed */
-    {
-        if (ACURR(A_CHA) > prevcha.value)
-        {
-            prevcha.highlight_color = STAT_UP_COLOR;
-        }
-        else
-        {
-            prevcha.highlight_color = STAT_DOWN_COLOR;
-        }
-        prevcha.value = ACURR(A_CHA);
-        sprintf(buf, "%d", ACURR(A_CHA));
-        free(prevcha.txt);
-        prevcha.txt = curses_copy_of(buf);
-        prevcha.highlight_turns = 5;
-    }
-
-    if (prevcha.label != NULL)
-    {
-        mvwaddstr(win, sy, sx, prevcha.label);
-        sx += strlen(prevcha.label);
-    }
-    
-    color_stat(prevcha, ON);
-    mvwaddstr(win, sy, sx, prevcha.txt);
-    color_stat(prevcha, OFF);
-    
-    if (horiz)
-    {
-        sx += strlen(prevcha.txt) + 1;
-    }
-    else
-    {
-        sx = sx_start;
-        sy ++;
-    }
+    statchange(&prevstr, ACURR(A_STR), STAT_STR);
+    statchange(&prevint, ACURR(A_INT), STAT_OTHER);
+    statchange(&prevwis, ACURR(A_WIS), STAT_OTHER);
+    statchange(&prevdex, ACURR(A_DEX), STAT_OTHER);
+    statchange(&prevcon, ACURR(A_CON), STAT_OTHER);
+    statchange(&prevcha, ACURR(A_CHA), STAT_OTHER);
     
     /* Alignment */
     if (prevalign.alignment != u.ualign.type)   /* Alignment changed */
@@ -562,248 +475,29 @@ void curses_update_stats(boolean redraw)
     
     /* Gold */
 #ifndef GOLDOBJ
-    if (prevau.value != u.ugold)    /* Gold changed */
-    {
-        if (u.ugold > prevau.value)
-        {
+    statchange(&prevau, u.ugold, STAT_GOLD);
 #else
-    if (prevau.value != money_cnt(invent))  /* Gold changed */
-    {
-        if (money_cnt(invent) > prevau.value)
-        {
+    statchange(&prevau, money_cnt(invent), STAT_GOLD);
 #endif
-            prevau.highlight_color = HI_GOLD;
-        }
-        else
-        {
-            prevau.highlight_color = STAT_DOWN_COLOR;
-        }
-#ifndef GOLDOBJ
-        prevau.value = u.ugold;
-        sprintf(buf,"%ld", u.ugold);
-#else
-        prevau.value = money_cnt(invent);
-        sprintf(buf,"%ld", money_cnt(invent));
-#endif
-        free(prevau.txt);
-        prevau.txt = curses_copy_of(buf);
-        prevau.highlight_turns = 5;
-    }
-    
-    if (prevau.label != NULL)
-    {
-        mvwaddstr(win, sy, sx, prevau.label);
-        sx += strlen(prevau.label);
-    }
-    
-    color_stat(prevau, ON);
-    mvwaddstr(win, sy, sx, prevau.txt);
-    color_stat(prevau, OFF);
-
-    if (horiz)
-    {
-        sx += strlen(prevau.txt) + 1;
-    }
-    else
-    {
-        sx = sx_start;
-        sy++;
-    }
-
 
     /* Hit Points */
-	    
+
     if (u.mtimedone)    /* Currently polymorphed - show monster HP */
     {
-	    hp = u.mh;
-	    hpmax = u.mhmax;
-	}
-	else    /* Not polymorphed */
-	{
-	    hp = u.uhp;
-	    hpmax = u.uhpmax;
-	}
-    
-	if (hp != prevhp.value)
-	{
-	    if (hp > prevhp.value)
-	    {
-	        prevhp.highlight_color = STAT_UP_COLOR;
-	    }
-	    else
-	    {
-            prevhp.highlight_color = STAT_DOWN_COLOR;
-	    }
-        prevhp.value = hp;
-        if (prevhp.value < 0)
-        {
-            prevhp.value = 0;
-        }
-        sprintf(buf, "%ld", prevhp.value);
-        free(prevhp.txt);
-        prevhp.txt = curses_copy_of(buf);
-        prevhp.highlight_turns = 3;
-	}
-
-    if (prevhp.label != NULL)
+        hp = u.mh;
+        hpmax = u.mhmax;
+    }
+    else    /* Not polymorphed */
     {
-        mvwaddstr(win, sy, sx, prevhp.label);
-        sx += strlen(prevhp.label);
+        hp = u.uhp;
+        hpmax = u.uhpmax;
     }
 
-    color_stat(prevhp, ON);
-    mvwaddstr(win, sy, sx, prevhp.txt);
-    color_stat(prevhp, OFF);
-
-    sx += strlen(prevhp.txt);
-
-    /* Max Hit Points */
-
-	if (hpmax != prevmhp.value)  /* Not polymorphed */
-	{
-	    if (hpmax > prevmhp.value)
-	    {
-	        prevmhp.highlight_color = STAT_UP_COLOR;
-	    }
-	    else
-	    {
-            prevmhp.highlight_color = STAT_DOWN_COLOR;
-	    }
-        prevmhp.value = hpmax;
-        sprintf(buf, "%d", hpmax);
-        free(prevmhp.txt);
-        prevmhp.txt = curses_copy_of(buf);
-        prevmhp.highlight_turns = 3;
-	}
-
-    if (prevmhp.label != NULL)
-    {
-        mvwaddstr(win, sy, sx, prevmhp.label);
-        sx += strlen(prevmhp.label);
-    }
-
-    color_stat(prevmhp, ON);
-    mvwaddstr(win, sy, sx, prevmhp.txt);
-    color_stat(prevmhp, OFF);
-
-    if (horiz)
-    {
-        color_stat(prevmhp, ON);
-        sx += strlen(prevmhp.txt) + 1;
-        color_stat(prevmhp, OFF);
-    }
-    else
-    {
-        sx = sx_start;
-        sy++;
-    }
-
-    /* Power */
-    if (u.uen != prevpow.value)
-	{
-	    if (u.uen > prevpow.value)
-	    {
-	        prevpow.highlight_color = STAT_UP_COLOR;
-	    }
-	    else
-	    {
-            prevpow.highlight_color = STAT_DOWN_COLOR;
-	    }
-        prevpow.value = u.uen;
-        sprintf(buf, "%d", u.uen);
-        free(prevpow.txt);
-        prevpow.txt = curses_copy_of(buf);
-        prevpow.highlight_turns = 3;
-	}
-
-    if (prevpow.label != NULL)
-    {
-        mvwaddstr(win, sy, sx, prevpow.label);
-        sx += strlen(prevpow.label);
-    }
-
-    color_stat(prevpow, ON);
-    mvwaddstr(win, sy, sx, prevpow.txt);
-    color_stat(prevpow, OFF);
-    
-    sx += strlen(prevpow.txt);
-
-    /* Max Power */
-    if (u.uenmax != prevmpow.value)
-	{
-	    if (u.uenmax > prevmpow.value)
-	    {
-	        prevmpow.highlight_color = STAT_UP_COLOR;
-	    }
-	    else
-	    {
-            prevmpow.highlight_color = STAT_DOWN_COLOR;
-	    }
-        prevmpow.value = u.uenmax;
-        sprintf(buf, "%d", u.uenmax);
-        free(prevmpow.txt);
-        prevmpow.txt = curses_copy_of(buf);
-        prevmpow.highlight_turns = 3;
-	}
-
-    if (prevmpow.label != NULL)
-    {
-        mvwaddstr(win, sy, sx, prevmpow.label);
-        sx += strlen(prevmpow.label);
-    }
-
-    color_stat(prevmpow, ON);
-    mvwaddstr(win, sy, sx, prevmpow.txt);
-    color_stat(prevmpow, OFF);
-    
-    if (horiz)
-    {
-        sx += strlen(prevmpow.txt) + 1;
-    }
-    else
-    {
-        sx = sx_start;
-        sy++;
-    }
-
-
-    /* Armor Class */
-    if (u.uac != prevac.value)
-	{
-	    if (u.uac > prevac.value)   /* Lower is better for AC */
-	    {
-	        prevac.highlight_color = STAT_DOWN_COLOR;
-	    }
-	    else
-	    {
-            prevac.highlight_color = STAT_UP_COLOR;
-	    }
-        prevac.value = u.uac;
-        sprintf(buf, "%d", u.uac);
-        free(prevac.txt);
-        prevac.txt = curses_copy_of(buf);
-        prevac.highlight_turns = 5;
-	}
-
-    if (prevac.label != NULL)
-    {
-        mvwaddstr(win, sy, sx, prevac.label);
-        sx += strlen(prevac.label);
-    }
-
-    color_stat(prevac, ON);
-    mvwaddstr(win, sy, sx, prevac.txt);
-    color_stat(prevac, OFF);
-    
-    if (horiz)
-    {
-        sx += strlen(prevac.txt) + 1;
-    }
-    else
-    {
-        sx = sx_start;
-        sy++;
-    }
+    statchange(&prevhp, hp, STAT_HPEN);
+    statchange(&prevmhp, hpmax, STAT_OTHER);
+    statchange(&prevpow, u.uen, STAT_HPEN);
+    statchange(&prevmpow, u.uenmax, STAT_OTHER);
+    statchange(&prevac, u.uac, STAT_AC);
 
     /* Experience */
 #ifdef EXP_ON_BOTL
@@ -974,32 +668,7 @@ void curses_update_stats(boolean redraw)
     }
     if (prevtime.display)
     {
-        if (moves != prevtime.value)
-	    {
-            sprintf(buf, "%ld", moves);
-            free(prevtime.txt);
-            prevtime.txt = curses_copy_of(buf);
-	    }
-
-        if (prevtime.label != NULL)
-        {
-            mvwaddstr(win, sy, sx, prevtime.label);
-            sx += strlen(prevtime.label);
-        }
-
-        color_stat(prevtime, ON);
-        mvwaddstr(win, sy, sx, prevtime.txt);
-        color_stat(prevtime, OFF);
-
-        if (horiz)
-        {
-            sx += strlen(prevtime.txt) + 1;
-        }
-        else
-        {
-            sx = sx_start;
-            sy++;
-        }
+        statchange(&prevtime, moves, STAT_TIME);
     }
     
     /* Score */
@@ -1010,41 +679,7 @@ void curses_update_stats(boolean redraw)
     }
     if (prevscore.display)
     {
-        if (botl_score() != prevscore.value)
-	    {
-	        if (botl_score() > prevscore.value)
-	        {
-	            prevscore.highlight_color = STAT_UP_COLOR;
-	        }
-	        else    /* Not sure this is possible */
-	        {
-                prevscore.highlight_color = STAT_DOWN_COLOR;
-	        }
-            sprintf(buf, "%ld", botl_score());
-            free(prevscore.txt);
-            prevscore.txt = curses_copy_of(buf);
-            prevscore.highlight_turns = 3;
-	    }
-
-        if (prevscore.label != NULL)
-        {
-            mvwaddstr(win, sy, sx, prevscore.label);
-            sx += strlen(prevscore.label);
-        }
-
-        color_stat(prevscore, ON);
-        mvwaddstr(win, sy, sx, prevscore.txt);
-        color_stat(prevscore, OFF);
-
-        if (horiz)
-        {
-            sx += strlen(prevscore.txt) + 1;
-        }
-        else
-        {
-            sx = sx_start;
-            sy++;
-        }
+        statchange(&prevscore, botl_score(), STAT_OTHER);
     }
     
     prevscore.value = botl_score(); /* Track it even when it's not displayed */
@@ -1100,306 +735,18 @@ void curses_update_stats(boolean redraw)
         }
     }
 
+#define statusproblem(stat,new,str) handle_status_problem(stat, new, str, &sx, &sy, \
+                                                          sx_start, horiz)
+
     /* Confusion */
-    if (Confusion != prevconf.value)
-	{
-	    prevconf.highlight_color = STAT_DOWN_COLOR;
-        if (prevconf.txt != NULL)
-        {
-            free(prevconf.txt);
-        }
-        if (Confusion)
-        {
-            prevconf.txt = curses_copy_of("Conf");
-        }
-        else
-        {
-            prevconf.txt = NULL;
-        }
-        if (prevconf.value == 0)
-        {
-            prevconf.highlight_turns = 5;
-	    }
-        prevconf.value = Confusion;
-	}
+    statusproblem(&prevconf, Confusion, "Conf");
+    statusproblem(&prevblind, Blind, "Blind");
+    statusproblem(&prevstun, Stunned, "Stun");
+    statusproblem(&prevhallu, Hallucination, "Hallu");
 
-    if (prevconf.label != NULL)
-    {
-        mvwaddstr(win, sy, sx, prevconf.label);
-        sx += strlen(prevconf.label);
-    }
-
-    if (prevconf.txt != NULL)
-    {
-        color_stat(prevconf, ON);
-        mvwaddstr(win, sy, sx, prevconf.txt);
-        color_stat(prevconf, OFF);
-    }
-
-    if (prevconf.txt != NULL)
-    {
-        if (horiz)
-        {
-            sx += strlen(prevconf.txt) + 1;
-        }
-        else
-        {
-            sx = sx_start;
-            sy++;
-        }
-    }
-
-    /* Blindness */
-    if (Blind != prevblind.value)
-	{
-	    prevblind.highlight_color = STAT_DOWN_COLOR;
-        if (prevblind.txt != NULL)
-        {
-            free(prevblind.txt);
-        }
-        if (Blind)
-        {
-            prevblind.txt = curses_copy_of("Blind");
-        }
-        else
-        {
-            prevblind.txt = NULL;
-        }
-        if (prevblind.value == 0)
-        {
-            prevblind.highlight_turns = 5;
-	    }
-        prevblind.value = Blind;
-	}
-
-    if (prevblind.label != NULL)
-    {
-        mvwaddstr(win, sy, sx, prevblind.label);
-        sx += strlen(prevblind.label);
-    }
-
-    if (prevblind.txt != NULL)
-    {
-        color_stat(prevblind, ON);
-        mvwaddstr(win, sy, sx, prevblind.txt);
-        color_stat(prevblind, OFF);
-    }
-
-    if (prevblind.txt != NULL)
-    {
-        if (horiz)
-        {
-            sx += strlen(prevblind.txt) + 1;
-        }
-        else
-        {
-            sx = sx_start;
-            sy++;
-        }
-    }
-
-    /* Stun */
-    if (Stunned != prevstun.value)
-	{
-	    prevstun.highlight_color = STAT_DOWN_COLOR;
-        if (prevstun.txt != NULL)
-        {
-            free(prevstun.txt);
-        }
-        if (Stunned)
-        {
-            prevstun.txt = curses_copy_of("Stun");
-        }
-        else
-        {
-            prevstun.txt = NULL;
-        }
-        if (prevstun.value == 0)
-        {
-            prevstun.highlight_turns = 5;
-	    }
-        prevstun.value = Stunned;
-	}
-
-    if (prevstun.label != NULL)
-    {
-        mvwaddstr(win, sy, sx, prevstun.label);
-        sx += strlen(prevstun.label);
-    }
-
-    if (prevstun.txt != NULL)
-    {
-        color_stat(prevstun, ON);
-        mvwaddstr(win, sy, sx, prevstun.txt);
-        color_stat(prevstun, OFF);
-    }
-
-    if (prevstun.txt != NULL)
-    {
-        if (horiz)
-        {
-            sx += strlen(prevstun.txt) + 1;
-        }
-        else
-        {
-            sx = sx_start;
-            sy++;
-        }
-    }
-
-    /* Hallucination */
-    if (Hallucination != prevhallu.value)
-	{
-	    prevhallu.highlight_color = STAT_DOWN_COLOR;
-        if (prevhallu.txt != NULL)
-        {
-            free(prevhallu.txt);
-        }
-        if (Hallucination)
-        {
-            prevhallu.txt = curses_copy_of("Hallu");
-        }
-        else
-        {
-            prevhallu.txt = NULL;
-        }
-        if (prevhallu.value == 0)
-        {
-            prevhallu.highlight_turns = 5;
-	    }
-        prevhallu.value = Hallucination;
-	}
-
-    if (prevhallu.label != NULL)
-    {
-        mvwaddstr(win, sy, sx, prevhallu.label);
-        sx += strlen(prevhallu.label);
-    }
-
-    if (prevhallu.txt != NULL)
-    {
-        color_stat(prevhallu, ON);
-        mvwaddstr(win, sy, sx, prevhallu.txt);
-        color_stat(prevhallu, OFF);
-    }
-
-    if (prevhallu.txt != NULL)
-    {
-        if (horiz)
-        {
-            sx += strlen(prevhallu.txt) + 1;
-        }
-        else
-        {
-            sx = sx_start;
-            sy++;
-        }
-    }
-
-    /* Sick */
-    if (Sick != prevsick.value)
-	{
-	    prevsick.highlight_color = STAT_DOWN_COLOR;
-        if (prevsick.txt != NULL)
-        {
-            free(prevsick.txt);
-        }
-        if (Sick)
-        {
-            if (u.usick_type & SICK_VOMITABLE)
-            {
-                prevsick.txt = curses_copy_of("FoodPois");
-            }
-            else      
-            {
-                prevsick.txt = curses_copy_of("Ill");
-            }
-        }
-        else
-        {
-            prevsick.txt = NULL;
-        }
-        if (prevsick.value == 0)
-        {
-            prevsick.highlight_turns = 5;
-	    }
-        prevsick.value = Sick;
-	}
-
-    if (prevsick.label != NULL)
-    {
-        mvwaddstr(win, sy, sx, prevsick.label);
-        sx += strlen(prevsick.label);
-    }
-
-    if (prevsick.txt != NULL)
-    {
-        color_stat(prevsick, ON);
-        mvwaddstr(win, sy, sx, prevsick.txt);
-        color_stat(prevsick, OFF);
-    }
-
-    if (prevsick.txt != NULL)
-    {
-        if (horiz)
-        {
-            sx += strlen(prevsick.txt) + 1;
-        }
-        else
-        {
-            sx = sx_start;
-            sy++;
-        }
-    }
-
-    /* Slime */
-    if (Slimed != prevslime.value)
-	{
-	    prevslime.highlight_color = STAT_DOWN_COLOR;
-        if (prevslime.txt != NULL)
-        {
-            free(prevslime.txt);
-        }
-        if (Slimed)
-        {
-            prevslime.txt = curses_copy_of("Slime");
-        }
-        else
-        {
-            prevslime.txt = NULL;
-        }
-        if (prevslime.value == 0)
-        {
-            prevslime.highlight_turns = 5;
-	    }
-        prevslime.value = Slimed;
-	}
-
-    if (prevslime.label != NULL)
-    {
-        mvwaddstr(win, sy, sx, prevslime.label);
-        sx += strlen(prevslime.label);
-    }
-
-    if (prevslime.txt != NULL)
-    {
-        color_stat(prevslime, ON);
-        mvwaddstr(win, sy, sx, prevslime.txt);
-        color_stat(prevslime, OFF);
-    }
-
-    if (prevslime.txt != NULL)
-    {
-        if (horiz)
-        {
-            sx += strlen(prevslime.txt) + 1;
-        }
-        else
-        {
-            sx = sx_start;
-            sy++;
-        }
-    }
+    /* TODO: allow all 3 kinds of sickness seperately: FoodPois, Ill, Zombie */
+    statusproblem(&prevsick, Sick, (u.usick_type & SICK_VOMITABLE) ? "FoodPois" : "Ill");
+    statusproblem(&prevslime, Slimed, "Slime");
 
     /* Encumberance */
     enc = near_capacity();
