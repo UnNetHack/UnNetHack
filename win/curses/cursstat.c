@@ -32,27 +32,19 @@ extern const struct percent_color_option *pw_colors;
 extern struct color_option text_color_of(const char *text,
                                          const struct text_color_option
                                          *color_options);
-
 struct color_option percentage_color_of(int value, int max,
                                         const struct percent_color_option
                                         *color_options);
-
 static boolean stat_colored(const char *id);
 #endif
 
 static void handle_status_problem(nhstat *, int, const char *, int *, int *,
                                   int, boolean);
-
 static void handle_stat_change(nhstat *, int, int, int *, int *, int, boolean);
-
 static int decrement_highlight(nhstat *);
-
 static void init_stats(void);
-
 static void set_labels(int label_width);
-
 static void set_stat_color(nhstat *stat);
-
 static void color_stat(nhstat stat, int onoff);
 
 static nhstat prevname;

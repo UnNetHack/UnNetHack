@@ -33,17 +33,12 @@ typedef struct nhchar {
 } nethack_char;
 
 static boolean map_clipped;     /* Map window smaller than 80x21 */
-
 static nethack_window nhwins[NHWIN_MAX];        /* NetHack window array */
-
 static nethack_char map[ROWNO][COLNO];  /* Map window contents */
-
 static nethack_wid *nhwids = NULL;      /* NetHack wid array */
 
 static boolean is_main_window(winid wid);
-
 static void write_char(WINDOW * win, int x, int y, nethack_char ch);
-
 static void clear_map(void);
 
 /* Create a window with the specified size and orientation */

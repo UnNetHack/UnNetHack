@@ -54,29 +54,18 @@ extern struct menucoloring *menu_colorings;
 #endif
 
 static nhmenu *get_menu(winid wid);
-
 static char menu_get_accel(boolean first);
-
 static void menu_determine_pages(nhmenu *menu);
-
 static boolean menu_is_multipage(nhmenu *menu, int width, int height);
-
 static void menu_win_size(nhmenu *menu);
-
 static void menu_display_page(nhmenu *menu, WINDOW * win, int page_num);
-
 static int menu_get_selections(WINDOW * win, nhmenu *menu, int how);
-
 static void menu_select_deselect(WINDOW * win, nhmenu_item *item,
                                  menu_op operation);
-
 static int menu_operation(WINDOW * win, nhmenu *menu, menu_op operation,
                           int page_num);
-
 static void menu_clear_selections(nhmenu *menu);
-
 static boolean get_menu_coloring(char *str, int *color, int *attr);
-
 static int menu_max_height(void);
 
 static nhmenu *nhmenus = NULL;  /* NetHack menu array */
