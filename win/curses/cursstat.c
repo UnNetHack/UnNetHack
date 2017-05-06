@@ -37,6 +37,8 @@ struct color_option percentage_color_of(int value, int max,
 static boolean stat_colored(const char *id);
 #endif
 
+static int decrement_highlight(nhstat *);
+
 static void init_stats(void);
 
 static void set_labels(int label_width);
@@ -1458,235 +1460,59 @@ void curses_update_stats(boolean redraw)
     wrefresh(win);
 }
 
+/* Decrement a single highlight, return 1 if decremented to zero */
+
+static int decrement_highlight(nhstat *stat)
+{
+    if (stat->highlight_turns > 0)
+    {
+        stat->highlight_turns--;
+        if (stat->highlight_turns == 0)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 /* Decrement the highlight_turns for all stats.  Call curses_update_stats
 if needed to unhighlight a stat */
 
 void curses_decrement_highlight()
 {
-    boolean unhighlight = FALSE;
-    
-    if (prevname.highlight_turns > 0)
-    {
-        prevname.highlight_turns--;
-        if (prevname.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevdepth.highlight_turns > 0)
-    {
-        prevdepth.highlight_turns--;
-        if (prevdepth.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevstr.highlight_turns > 0)
-    {
-        prevstr.highlight_turns--;
-        if (prevstr.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevint.highlight_turns > 0)
-    {
-        prevint.highlight_turns--;
-        if (prevint.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevwis.highlight_turns > 0)
-    {
-        prevwis.highlight_turns--;
-        if (prevwis.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevdex.highlight_turns > 0)
-    {
-        prevdex.highlight_turns--;
-        if (prevdex.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevcon.highlight_turns > 0)
-    {
-        prevcon.highlight_turns--;
-        if (prevcon.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevcha.highlight_turns > 0)
-    {
-        prevcha.highlight_turns--;
-        if (prevcha.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevalign.highlight_turns > 0)
-    {
-        prevalign.highlight_turns--;
-        if (prevalign.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevau.highlight_turns > 0)
-    {
-        prevau.highlight_turns--;
-        if (prevau.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevhp.highlight_turns > 0)
-    {
-        prevhp.highlight_turns--;
-        if (prevhp.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevmhp.highlight_turns > 0)
-    {
-        prevmhp.highlight_turns--;
-        if (prevmhp.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevlevel.highlight_turns > 0)
-    {
-        prevlevel.highlight_turns--;
-        if (prevlevel.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevpow.highlight_turns > 0)
-    {
-        prevpow.highlight_turns--;
-        if (prevpow.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevmpow.highlight_turns > 0)
-    {
-        prevmpow.highlight_turns--;
-        if (prevmpow.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevac.highlight_turns > 0)
-    {
-        prevac.highlight_turns--;
-        if (prevac.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
+    int unhighlight = 0;
+    unhighlight |= decrement_highlight(&prevname);
+    unhighlight |= decrement_highlight(&prevdepth);
+    unhighlight |= decrement_highlight(&prevstr);
+    unhighlight |= decrement_highlight(&prevint);
+    unhighlight |= decrement_highlight(&prevwis);
+    unhighlight |= decrement_highlight(&prevdex);
+    unhighlight |= decrement_highlight(&prevcon);
+    unhighlight |= decrement_highlight(&prevcha);
+    unhighlight |= decrement_highlight(&prevalign);
+    unhighlight |= decrement_highlight(&prevau);
+    unhighlight |= decrement_highlight(&prevhp);
+    unhighlight |= decrement_highlight(&prevmhp);
+    unhighlight |= decrement_highlight(&prevlevel);
+    unhighlight |= decrement_highlight(&prevpow);
+    unhighlight |= decrement_highlight(&prevmpow);
+    unhighlight |= decrement_highlight(&prevac);
 #ifdef EXP_ON_BOTL
-    if (prevexp.highlight_turns > 0)
-    {
-        prevexp.highlight_turns--;
-        if (prevexp.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
+    unhighlight |= decrement_highlight(&prevexp);
 #endif
-    if (prevtime.highlight_turns > 0)
-    {
-        prevtime.highlight_turns--;
-        if (prevtime.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
+    unhighlight |= decrement_highlight(&prevtime);
 #ifdef SCORE_ON_BOTL
-    if (prevscore.highlight_turns > 0)
-    {
-        prevscore.highlight_turns--;
-        if (prevscore.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
+    unhighlight |= decrement_highlight(&prevscore);
 #endif
-    if (prevhunger.highlight_turns > 0)
-    {
-        prevhunger.highlight_turns--;
-        if (prevhunger.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevconf.highlight_turns > 0)
-    {
-        prevconf.highlight_turns--;
-        if (prevconf.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevblind.highlight_turns > 0)
-    {
-        prevblind.highlight_turns--;
-        if (prevblind.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevstun.highlight_turns > 0)
-    {
-        prevstun.highlight_turns--;
-        if (prevstun.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevhallu.highlight_turns > 0)
-    {
-        prevhallu.highlight_turns--;
-        if (prevhallu.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevsick.highlight_turns > 0)
-    {
-        prevsick.highlight_turns--;
-        if (prevsick.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevslime.highlight_turns > 0)
-    {
-        prevslime.highlight_turns--;
-        if (prevslime.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    if (prevencumb.highlight_turns > 0)
-    {
-        prevencumb.highlight_turns--;
-        if (prevencumb.highlight_turns == 0)
-        {
-            unhighlight = TRUE;
-        }
-    }
-    
+    unhighlight |= decrement_highlight(&prevhunger);
+    unhighlight |= decrement_highlight(&prevconf);
+    unhighlight |= decrement_highlight(&prevblind);
+    unhighlight |= decrement_highlight(&prevstun);
+    unhighlight |= decrement_highlight(&prevhallu);
+    unhighlight |= decrement_highlight(&prevsick);
+    unhighlight |= decrement_highlight(&prevslime);
+    unhighlight |= decrement_highlight(&prevencumb);
+
     if (unhighlight)
     {
         curses_update_stats(FALSE);
