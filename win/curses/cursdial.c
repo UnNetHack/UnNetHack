@@ -868,6 +868,9 @@ menu_win_size(nhmenu *menu)
         } else {
             /* Add space for accelerator */
             curentrywidth = strlen(menu_item_ptr->str) + 4;
+            if (menu_item_ptr->glyph != NO_GLYPH
+                        && iflags.use_menu_glyphs)
+                curentrywidth += 2;
         }
         if (curentrywidth > maxentrywidth) {
             maxentrywidth = curentrywidth;
