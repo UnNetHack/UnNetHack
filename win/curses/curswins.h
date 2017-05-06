@@ -1,19 +1,21 @@
+/* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
+
 #ifndef CURSWIN_H
-#define CURSWIN_H
+# define CURSWIN_H
 
 
 /* Global declarations */
 
 WINDOW *curses_create_window(int width, int height, orient orientation);
 
-void curses_destroy_win(WINDOW *win);
+void curses_destroy_win(WINDOW * win);
 
 void curses_refresh_nethack_windows(void);
 
 WINDOW *curses_get_nhwin(winid wid);
 
 void curses_add_nhwin(winid wid, int height, int width, int y, int x,
- orient orientation, boolean border);
+                      orient orientation, boolean border);
 
 void curses_add_wid(winid wid);
 
@@ -43,8 +45,7 @@ void curses_alert_main_borders(boolean onoff);
 
 void curses_draw_map(int sx, int sy, int ex, int ey);
 
-boolean curses_map_borders(int *sx, int *sy, int *ex, int *ey, int ux,
- int uy);
+boolean curses_map_borders(int *sx, int *sy, int *ex, int *ey, int ux, int uy);
 
 
-#endif  /* CURSWIN_H */
+#endif /* CURSWIN_H */
