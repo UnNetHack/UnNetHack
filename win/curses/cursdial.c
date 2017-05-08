@@ -87,6 +87,8 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
     maxwidth = term_cols - 2;
 
     if (iflags.window_inited) {
+        if (!iflags.wc_popup_dialog)
+            return curses_message_win_getline(prompt, answer, buffer);
         curses_get_window_size(MAP_WIN, &map_height, &map_width);
         if ((prompt_width + 2) > map_width)
             maxwidth = map_width - 2;

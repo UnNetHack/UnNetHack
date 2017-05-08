@@ -4,6 +4,8 @@
 #include "hack.h"
 #include "wincurs.h"
 #include "cursmesg.h"
+#include <ctype.h>
+
 
 /* Message window routines for curses interface */
 
@@ -17,6 +19,8 @@ typedef struct nhpm {
 } nhprev_mesg;
 
 static void scroll_window(winid wid);
+static void unscroll_window(winid wid);
+static void directional_scroll(winid wid, int nlines);
 static void mesg_add_line(char *mline);
 static nhprev_mesg *get_msg_line(boolean reverse, int mindex);
 
@@ -118,8 +122,9 @@ curses_message_win_puts(const char *message, boolean recursed)
             curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
         }
         wrefresh(win);
-        curses_message_win_puts(curses_str_remainder(message, (width - 2), 1),
+        curses_message_win_puts(tmpstr = curses_str_remainder(message, (width - 2), 1),
                                 TRUE);
+        free(tmpstr);
     } else {
         mvwprintw(win, my, mx, "%s", message);
         curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
@@ -336,11 +341,178 @@ curses_count_window(const char *count_text)
     wrefresh(countwin);
 }
 
+	/* Gets a "line" (buffer) of input. */
+void
+curses_message_win_getline(const char *prompt, char *answer, int buffer)
+{
+    int height, width; /* of window */
+    char *tmpbuf, *p_answer; /* combined prompt + answer */
+    int nlines, maxlines, i; /* prompt + answer */
+    int promptline;
+    int promptx;
+    char **linestarts; /* pointers to start of each line */
+    char *tmpstr; /* for free() */
+    int maxy, maxx; /* linewrap / scroll */
+    int ch;
+
+    WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
+    int border_space = 0;
+    int len = 0; /* of answer string */
+    boolean border = curses_window_has_border(MESSAGE_WIN);
+    int orig_cursor = curs_set(0);
+
+    curses_get_window_size(MESSAGE_WIN, &height, &width);
+    if (border) {
+        border_space = 1;
+        if (mx < 1) mx = 1;
+        if (my < 1) my = 1;
+    }
+    maxy = height - 1 + border_space;
+    maxx = width - 1 + border_space;
+
+    tmpbuf = (char *)malloc(strlen(prompt) + buffer + 2);
+    maxlines = buffer / width * 2; /* can still be overflowed by the sufficiently determined */
+    linestarts = (char **)malloc(sizeof(char*) * maxlines);
+    strcpy(tmpbuf, prompt);
+    strcat(tmpbuf, " ");
+    p_answer = tmpbuf + strlen(tmpbuf);
+    linestarts[0] = tmpbuf;
+
+    if (mx > border_space) { /* newline */
+        if (my >= maxy) scroll_window(MESSAGE_WIN);
+        else my++;
+        mx = border_space;
+    }
+
+    curses_toggle_color_attr(win, NONE, A_BOLD, ON);
+
+    nlines = curses_num_lines(tmpbuf,width);
+    for (i = 0; i < nlines-1; i++) {
+        tmpstr = curses_break_str(linestarts[i],width-1,1);
+        linestarts[i+1] = linestarts[i] + strlen(tmpstr);
+        if (*linestarts[i+1] == ' ') linestarts[i+1]++;
+        mvwaddstr(win,my,mx,tmpstr);
+        free(tmpstr);
+        if (++my >= maxy) {
+            scroll_window(MESSAGE_WIN);
+            my--;
+        }
+    }
+    mvwaddstr(win,my,mx,linestarts[nlines-1]);
+    mx = promptx = strlen(linestarts[nlines-1]) + border_space;
+    promptline = nlines - 1;
+
+    while(1) {
+        mx = strlen(linestarts[nlines - 1]) + border_space;
+        if (mx > maxx) {
+            if (nlines < maxlines) {
+                tmpstr = curses_break_str(linestarts[nlines - 1], width - 1, 1);
+                mx = strlen(tmpstr) + border_space;
+                mvwprintw(win, my, mx, "%*c", maxx - mx + 1, ' ');
+                if (++my > maxy) {
+                    scroll_window(MESSAGE_WIN);
+                    my--;
+                }
+                mx = border_space;
+                linestarts[nlines] = linestarts[nlines - 1] + strlen(tmpstr);
+                if (*linestarts[nlines] == ' ') linestarts[nlines]++;
+                mvwaddstr(win, my, mx, linestarts[nlines]);
+                mx = strlen(linestarts[nlines]) + border_space;
+                nlines++;
+                free(tmpstr);
+            } else {
+                p_answer[--len] = '\0';
+                mvwaddch(win, my, --mx, ' ');
+            }
+        }
+        wmove(win, my, mx);
+        curs_set(1);
+        wrefresh(win);
+        ch = getch();
+        curs_set(0);
+        switch(ch) {
+        case '\033': /* DOESCAPE */
+            /* blank the input but don't exit */
+            while(nlines  - 1 > promptline) {
+                if (nlines-- > height) {
+                    unscroll_window(MESSAGE_WIN);
+                    tmpstr = curses_break_str(linestarts[nlines - height], width - 1, 1);
+                    mvwaddstr(win, border_space, border_space, tmpstr);
+                    free(tmpstr);
+                } else {
+                    mx = border_space;
+                    mvwprintw(win, my, mx, "%*c", maxx - mx, ' ');
+                    my--;
+                }
+            }
+            mx = promptx;
+            mvwprintw(win, my, mx, "%*c", maxx - mx, ' ');
+            *p_answer = '\0';
+            len = 0;
+            break;
+        case ERR: /* should not happen */
+            *answer = '\0';
+            free(tmpbuf);
+            free(linestarts);
+            curs_set(orig_cursor);
+            curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
+            return;
+        case '\r':
+        case '\n':
+            free(linestarts);
+            strncpy(answer, p_answer, buffer);
+            strcpy(toplines, tmpbuf);
+            mesg_add_line((char *) tmpbuf);
+            free(tmpbuf);
+            curs_set(orig_cursor);
+            curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
+            return;
+        case '\b':
+        case KEY_BACKSPACE:
+            if (len < 1) {
+                len = 1;
+                mx = promptx;
+            }
+            p_answer[--len] = '\0';
+            mvwaddch(win, my, --mx, ' ');
+            /* try to unwrap back to the previous line if there is one */
+            if (nlines > 1 && strlen(linestarts[nlines - 2]) < width) {
+                mvwaddstr(win, my - 1, border_space, linestarts[nlines - 2]);
+                if (nlines-- > height) {
+                    unscroll_window(MESSAGE_WIN);
+                    tmpstr = curses_break_str(linestarts[nlines - height], width - 1, 1);
+                    mvwaddstr(win, border_space, border_space, tmpstr);
+                    free(tmpstr);
+                } else {
+                    /* clean up the leftovers on the next line, if we didn't scroll it away */
+                    mvwprintw(win, my--, border_space, "%*c", strlen(linestarts[nlines]), ' ');
+                }
+            }
+            break;
+        default:
+            p_answer[len++] = ch;
+            if (len >= buffer) len = buffer-1;
+            else mvwaddch(win, my, mx, ch);
+            p_answer[len] = '\0';
+        }
+    }
+}
 
 /* Scroll lines upward in given window, or clear window if only one line. */
-
 static void
 scroll_window(winid wid)
+{
+    directional_scroll(wid,1);
+}
+
+static void
+unscroll_window(winid wid)
+{
+    directional_scroll(wid,-1);
+}
+
+static void
+directional_scroll(winid wid, int nlines)
 {
     int wh, ww, s_top, s_bottom;
     boolean border = curses_window_has_border(wid);
@@ -360,7 +532,7 @@ scroll_window(winid wid)
     }
     scrollok(win, TRUE);
     wsetscrreg(win, s_top, s_bottom);
-    scroll(win);
+    wscrl(win, nlines);
     scrollok(win, FALSE);
     if (wid == MESSAGE_WIN) {
         if (border)
