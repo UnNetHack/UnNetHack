@@ -371,10 +371,12 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
     maxx = width - 1 + border_space;
 
     tmpbuf = (char *)malloc(strlen(prompt) + buffer + 2);
-    maxlines = buffer / width * 2; /* can still be overflowed by the sufficiently determined */
-    linestarts = (char **)malloc(sizeof(char*) * maxlines);
+    maxlines = buffer / width * 2;
     strcpy(tmpbuf, prompt);
     strcat(tmpbuf, " ");
+    nlines = curses_num_lines(tmpbuf,width);
+    maxlines += nlines * 2;
+    linestarts = (char **)malloc(sizeof(char*) * maxlines);
     p_answer = tmpbuf + strlen(tmpbuf);
     linestarts[0] = tmpbuf;
 
@@ -386,7 +388,6 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
 
     curses_toggle_color_attr(win, NONE, A_BOLD, ON);
 
-    nlines = curses_num_lines(tmpbuf,width);
     for (i = 0; i < nlines-1; i++) {
         tmpstr = curses_break_str(linestarts[i],width-1,1);
         linestarts[i+1] = linestarts[i] + strlen(tmpstr);
