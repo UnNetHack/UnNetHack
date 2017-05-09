@@ -516,7 +516,7 @@ curses_create_main_windows()
     curses_refresh_nethack_windows();
 
     if (iflags.window_inited) {
-        curses_update_stats(TRUE);
+        curses_update_stats();
     } else {
         iflags.window_inited = TRUE;
     }
@@ -543,17 +543,31 @@ curses_init_nhcolors()
         {
             int i;
 
-            for (i = 0; i < 16; i++) {
-                int clr_remap[16] = {
-                    COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
-                        COLOR_BLUE,
-                    COLOR_MAGENTA, COLOR_CYAN, -1, COLOR_WHITE,
-                    COLOR_RED + 8, COLOR_GREEN + 8, COLOR_YELLOW + 8,
-                        COLOR_BLUE + 8,
-                    COLOR_MAGENTA + 8, COLOR_CYAN + 8, COLOR_WHITE + 8
-                };
+            int clr_remap[16] = {
+                COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
+                COLOR_BLUE,
+                COLOR_MAGENTA, COLOR_CYAN, -1, COLOR_WHITE,
+                COLOR_RED + 8, COLOR_GREEN + 8, COLOR_YELLOW + 8,
+                COLOR_BLUE + 8,
+                COLOR_MAGENTA + 8, COLOR_CYAN + 8, COLOR_WHITE + 8
+            };
+
+            for (i = 0; i < (COLORS >= 16 ? 16 : 8); i++) {
                 init_pair(17 + (i * 2) + 0, clr_remap[i], COLOR_RED);
                 init_pair(17 + (i * 2) + 1, clr_remap[i], COLOR_BLUE);
+            }
+
+            boolean hicolor = FALSE;
+            if (COLORS >= 16)
+                hicolor = TRUE;
+
+            /* Work around the crazy definitions above for more background colors... */
+            for (i = 0; i < (COLORS >= 16 ? 16 : 8); i++) {
+                init_pair((hicolor ? 49 : 9) + i, clr_remap[i], COLOR_GREEN);
+                init_pair((hicolor ? 33 : 33) + i, clr_remap[i], COLOR_YELLOW);
+                init_pair((hicolor ? 81 : 41) + i, clr_remap[i], COLOR_MAGENTA);
+                init_pair((hicolor ? 97 : 49) + i, clr_remap[i], COLOR_CYAN);
+                init_pair((hicolor ? 113 : 57) + i, clr_remap[i], COLOR_WHITE);
             }
         }
 

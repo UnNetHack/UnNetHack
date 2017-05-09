@@ -266,8 +266,7 @@ extern void curses_del_menu(winid wid);
 
 /* cursstat.c */
 
-extern void curses_update_stats(boolean redraw);
-
+extern void curses_update_stats(void);
 extern void curses_decrement_highlight(void);
 
 

@@ -5,16 +5,16 @@
 
 /* Used by handle_stat_change to handle some stats differently. Not an enum
    because this is how NetHack code generally handles them. */
-# define STAT_OTHER  0
-# define STAT_STR    1
-# define STAT_GOLD   2
-# define STAT_HPEN   3          /* HP or Pw */
-# define STAT_AC     4
-# define STAT_TIME   5
+# define STAT_OTHER   0
+# define STAT_STR     1
+# define STAT_GOLD    2
+# define STAT_AC      4
+# define STAT_TIME    5
+# define STAT_TROUBLE 6
 
 /* Global declarations */
 
-void curses_update_stats(boolean redraw);
+void curses_update_stats();
 void curses_decrement_highlight(void);
 
 

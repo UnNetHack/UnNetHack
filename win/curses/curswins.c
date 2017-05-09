@@ -341,7 +341,7 @@ curses_putch(winid wid, int x, int y, int ch, int color, int attr)
     static boolean map_initted = FALSE;
 
     if (wid == STATUS_WIN) {
-        curses_update_stats(FALSE);
+        curses_update_stats();
     }
 
     if (wid != MAP_WIN) {
@@ -458,7 +458,7 @@ curses_puts(winid wid, int attr, const char *text)
     }
 
     if (wid == STATUS_WIN) {
-        curses_update_stats(FALSE);     /* We will do the write ourselves */
+        curses_update_stats();     /* We will do the write ourselves */
         return;
     }
 
