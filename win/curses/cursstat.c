@@ -349,7 +349,7 @@ hpen_color_attr(boolean is_hp, int cur, int max)
     status_color = percentage_color_of(cur, max, is_hp ? hp_colors : pw_colors);
 
     int count;
-    for (count = 0; (1 << count) <= stat_color.attr_bits; count++) {
+    for (count = 0; (1 << count) <= status_color.attr_bits; count++) {
         if (count != ATR_NONE && (status_color.attr_bits & (1 << count)))
             attr |= curses_convert_attr(count);
     }
