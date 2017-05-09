@@ -128,27 +128,26 @@ get_trouble_color(const char *stat)
 #ifdef STATUS_COLORS
             /* Check if we have a color enabled with statuscolors */
             if (!iflags.use_status_colors)
-                return CLR_GRAY; /* no color configured */
+                return curses_color_attr(CLR_GRAY, 0); /* no color configured */
 
-            struct text_color_option *cur_option;
-            for (cur_option = text_colors; cur_option; cur_option = cur_option->next) {
-                if (strcmpi(cur_option->text, clr->id) == 0) {
-                    /* We found the option, now make a curses attribute out of it */
-                    struct color_option status_color;
-                    status_color = text_color_of(clr->id, cur_option);
+            struct color_option stat_color;
 
-                    int count;
-                    for (count = 0; (1 << count) <= status_color.attr_bits; count++) {
-                        if (count != ATR_NONE && (status_color.attr_bits & (1 << count)))
-                            attr |= curses_convert_attr(count);
-                    }
+            stat_color = text_color_of(clr->id, text_colors);
+            if (stat_color.color == NO_COLOR && !stat_color.attr_bits)
+                return curses_color_attr(CLR_GRAY, 0);
 
-                    return attr;
-                }
+            if (stat_color.color != NO_COLOR)
+                res = curses_color_attr(stat_color.color, 0);
+
+            res = curses_color_attr(stat_color.color, 0);
+            int count;
+            for (count = 0; (1 << count) <= stat_color.attr_bits; count++) {
+                if (count != ATR_NONE &&
+                    (stat_color.attr_bits & (1 << count)))
+                    res |= curses_convert_attr(count);
             }
 
-            /* No color configured, use gray */
-            return curses_color_attr(CLR_GRAY, 0);
+            return res;
 #else
             return curses_color_attr(clr->color, 0);
 #endif
@@ -338,19 +337,24 @@ curses_color_attr(int nh_color, int bg_color)
     return cattr;
 }
 
+/* Returns a complete curses attribute. Used to color HP/Pw text. */
 #ifdef STATUS_COLORS
 static attr_t
 hpen_color_attr(boolean is_hp, int cur, int max)
 {
+    struct color_option stat_color;
+    int count;
+    attr_t attr = 0;
     if (!iflags.use_status_colors)
         return curses_color_attr(CLR_GRAY);
 
-    struct color_option status_color;
-    status_color = percentage_color_of(cur, max, is_hp ? hp_colors : pw_colors);
+    stat_color = percentage_color_of(cur, max, is_hp ? hp_colors : pw_colors);
 
-    int count;
-    for (count = 0; (1 << count) <= status_color.attr_bits; count++) {
-        if (count != ATR_NONE && (status_color.attr_bits & (1 << count)))
+    if (stat_color.color != NO_COLOR)
+        attr |= curses_color_attr(stat_color.color, 0);
+
+    for (count = 0; (1 << count) <= stat_color.attr_bits; count++) {
+        if (count != ATR_NONE && (stat_color.attr_bits & (1 << count)))
             attr |= curses_convert_attr(count);
     }
 
@@ -358,9 +362,27 @@ hpen_color_attr(boolean is_hp, int cur, int max)
 }
 #endif
 
+/* Return color for the HP bar.
+   With status colors ON, this respect its configuration (defaulting to gray), but
+   only obeys the color (no weird attributes for the HP bar).
+   With status colors OFF, this returns reasonable defaults which are also used
+   for the HP/Pw text itself. */
 static int
 hpen_color(boolean is_hp, int cur, int max)
 {
+#ifdef STATUS_COLORS
+    if (iflags.use_status_colors) {
+        struct color_option stat_color;
+        stat_color = percentage_color_of(cur, max, is_hp ? hp_colors : pw_colors);
+
+        if (stat_color.color == NO_COLOR)
+            return CLR_GRAY;
+        else
+            return stat_color.color;
+    } else
+        return CLR_GRAY;
+#endif
+
     int color = CLR_GRAY;
     if (cur == max)
         color = CLR_GRAY;
@@ -396,17 +418,11 @@ draw_bar(boolean is_hp, int cur, int max, const char *title)
 
     /* Colors */
     attr_t fillattr, attr;
-#ifdef STATUS_COLORS
-    attr = hpen_color_attr(is_hp, cur, max);
-    attr &= ~A_REVERSE;
-    fillattr = (attr | A_REVERSE);
-#else
     int color = hpen_color(is_hp, cur, max);
     int invcolor = color & 7;
 
     fillattr = curses_color_attr(color, invcolor);
     attr = curses_color_attr(color, 0);
-#endif
 
     /* Figure out how much of the bar to fill */
     int fill = 0;
@@ -505,22 +521,26 @@ draw_horizontal(void)
 #endif
 
     /* HP/Pw use special coloring rules */
+    attr_t hpattr, pwattr;
+#ifdef STATUS_COLORS
+    hpattr = hpen_color_attr(TRUE, hp, hpmax);
+    pwattr = hpen_color_attr(FALSE, u.uen, u.uenmax);
+#else
     int hpcolor, pwcolor;
-    attr_t attr;
     hpcolor = hpen_color(TRUE, hp, hpmax);
     pwcolor = hpen_color(FALSE, u.uen, u.uenmax);
-
+    hpattr = curses_color_attr(hpcolor, 0);
+    pwattr = curses_color_attr(pwcolor, 0);
+#endif
     wprintw(win, " HP:");
-    attr = curses_color_attr(hpcolor, 0);
-    wattron(win, attr);
+    wattron(win, hpattr);
     wprintw(win, "%d(%d)", hp, hpmax);
-    wattroff(win, attr);
+    wattroff(win, hpattr);
 
     wprintw(win, " Pw:");
-    attr = curses_color_attr(pwcolor, 0);
-    wattron(win, attr);
+    wattron(win, pwattr);
     wprintw(win, "%d(%d)", u.uen, u.uenmax);
-    wattroff(win, attr);
+    wattroff(win, pwattr);
 
     print_statdiff(" AC:", &prevac, u.uac, STAT_AC);
 
@@ -661,23 +681,28 @@ draw_vertical(void)
     wmove(win, y++, x);
 
     /* HP/Pw use special coloring rules */
+    attr_t hpattr, pwattr;
+#ifdef STATUS_COLORS
+    hpattr = hpen_color_attr(TRUE, hp, hpmax);
+    pwattr = hpen_color_attr(FALSE, u.uen, u.uenmax);
+#else
     int hpcolor, pwcolor;
-    attr_t attr;
     hpcolor = hpen_color(TRUE, hp, hpmax);
     pwcolor = hpen_color(FALSE, u.uen, u.uenmax);
+    hpattr = curses_color_attr(hpcolor, 0);
+    pwattr = curses_color_attr(pwcolor, 0);
+#endif
 
     wprintw(win,   "Hit Points:    ");
-    attr = curses_color_attr(hpcolor, 0);
-    wattron(win, attr);
+    wattron(win, hpattr);
     wprintw(win, "%d/%d", hp, hpmax);
-    wattroff(win, attr);
+    wattroff(win, hpattr);
     wmove(win, y++, x);
 
     wprintw(win,   "Magic Power:   ");
-    attr = curses_color_attr(pwcolor, 0);
-    wattron(win, attr);
+    wattron(win, pwattr);
     wprintw(win, "%d/%d", u.uen, u.uenmax);
-    wattroff(win, attr);
+    wattroff(win, pwattr);
     wmove(win, y++, x);
 
     print_statdiff("Armor Class:   ", &prevac, u.uac, STAT_AC);
