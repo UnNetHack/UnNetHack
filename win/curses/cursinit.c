@@ -172,8 +172,8 @@ set_window_position(int *winx, int *winy, int *winw, int *winh, int orientation,
         *w -= (*winw + border_space);
     }
 
-    *winx = *w + border_space;
-    *winy = *h + border_space;
+    *winx = *w + border_space + *x;
+    *winy = *h + border_space + *y;
 
     /* Set window position */
     if (orientation != ALIGN_RIGHT) {
