@@ -346,7 +346,7 @@ hpen_color_attr(boolean is_hp, int cur, int max)
     int count;
     attr_t attr = 0;
     if (!iflags.use_status_colors)
-        return curses_color_attr(CLR_GRAY);
+        return curses_color_attr(CLR_GRAY, 0);
 
     stat_color = percentage_color_of(cur, max, is_hp ? hp_colors : pw_colors);
 
@@ -534,7 +534,7 @@ draw_horizontal(void)
 #endif
     wprintw(win, " HP:");
     wattron(win, hpattr);
-    wprintw(win, "%d(%d)", hp, hpmax);
+    wprintw(win, "%d(%d)", (hp < 0) ? 0 : hp, hpmax);
     wattroff(win, hpattr);
 
     wprintw(win, " Pw:");
@@ -573,7 +573,7 @@ draw_horizontal(void)
     statprob(Stunned, "Stun");
     statprob(Hallucination, "Hallu");
     statprob((u.usick_type & SICK_VOMITABLE), "FoodPois");
-    statprob((u.usick_type & (SICK_NONVOMITABLE|SICK_ZOMBIE)), "Ill");
+    statprob((u.usick_type & SICK_NONVOMITABLE), "Ill");
     statprob(Slimed, "Slime");
 
     /* Encumbrance */
@@ -695,7 +695,7 @@ draw_vertical(void)
 
     wprintw(win,   "Hit Points:    ");
     wattron(win, hpattr);
-    wprintw(win, "%d/%d", hp, hpmax);
+    wprintw(win, "%d/%d", (hp < 0) ? 0 : hp, hpmax);
     wattroff(win, hpattr);
     wmove(win, y++, x);
 
@@ -750,7 +750,7 @@ draw_vertical(void)
     statprob(Stunned, "Stun");
     statprob(Hallucination, "Hallu");
     statprob((u.usick_type & SICK_VOMITABLE), "FoodPois");
-    statprob((u.usick_type & (SICK_NONVOMITABLE|SICK_ZOMBIE)), "Ill");
+    statprob((u.usick_type & SICK_NONVOMITABLE), "Ill");
     statprob(Slimed, "Slime");
 
     /* Encumbrance */
