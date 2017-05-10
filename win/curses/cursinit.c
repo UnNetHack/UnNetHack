@@ -143,7 +143,8 @@ nhrgb orig_hiwhite;
 
 
 /* win* is size and placement of window to change, x/y/w/h is baseline which can
-   decrease depending on alignment of win* in orientation. */
+   decrease depending on alignment of win* in orientation.
+   Negative minh/minw: as much as possible, but at least as much as specified. */
 static void
 set_window_position(int *winx, int *winy, int *winw, int *winh, int orientation,
                     int *x, int *y, int *w, int *h, int border_space,
@@ -154,15 +155,19 @@ set_window_position(int *winx, int *winy, int *winw, int *winh, int orientation,
 
     /* Set window height/width */
     if (orientation == ALIGN_TOP || orientation == ALIGN_BOTTOM) {
-        if (minh == -1)
+        if (minh < 0) {
             *winh = (*h - ROWNO - border_space);
-        else
+            if (-minh > *winh)
+                *winh = -minh;
+        } else
             *winh = minh;
         *h -= (*winh + border_space);
     } else {
-        if (minw == -1)
+        if (minw < 0) {
             *winw = (*w - COLNO - border_space);
-        else
+            if (-minw > *winw)
+                *winw = -minw;
+        } else
             *winw = minw;
         *w -= (*winw + border_space);
     }
@@ -278,7 +283,7 @@ curses_create_main_windows()
                         border_space, 2, 26);
     set_window_position(&message_x, &message_y, &message_width, &message_height,
                         message_orientation, &map_x, &map_y, &map_width, &map_height,
-                        border_space, -1, -1);
+                        border_space, -1, -25);
 
     if (map_width > COLNO) {
         map_width = COLNO;
