@@ -19,6 +19,10 @@
 #define GRUNTHACK_CURSES    5
 #define DNETHACK_CURSES     6
 
+static void set_window_position(int *, int *, int *, int *, int,
+                                int *, int *, int *, int *, int,
+                                int, int);
+
 /* array to save initial terminal colors for later restoration */
 
 typedef struct nhrgb_type {
@@ -138,23 +142,52 @@ nhrgb orig_hiwhite;
 " \\__,_||_| \\_| \\___| \\__||_|  |_| \\__,_| \\___||_|\\_\\"
 
 
+/* win* is size and placement of window to change, x/y/w/h is baseline which can
+   decrease depending on alignment of win* in orientation. */
+static void
+set_window_position(int *winx, int *winy, int *winw, int *winh, int orientation,
+                    int *x, int *y, int *w, int *h, int border_space,
+                    int minh, int minw)
+{
+    *winw = *w;
+    *winh = *h;
+
+    /* Set window height/width */
+    if (orientation == ALIGN_TOP || orientation == ALIGN_BOTTOM) {
+        if (minh == -1)
+            *winh = (*h - ROWNO - border_space);
+        else
+            *winh = minh;
+        *h -= (*winh + border_space);
+    } else {
+        if (minw == -1)
+            *winw = (*w - COLNO - border_space);
+        else
+            *winw = minw;
+        *w -= (*winw + border_space);
+    }
+
+    *winx = *w + border_space;
+    *winy = *h + border_space;
+
+    /* Set window position */
+    if (orientation != ALIGN_RIGHT) {
+        *winx = *x;
+        if (orientation == ALIGN_LEFT)
+            *x += *winw + border_space;
+    }
+    if (orientation != ALIGN_BOTTOM) {
+        *winy = *y;
+        if (orientation == ALIGN_TOP)
+            *y += *winh + border_space;
+    }
+}
+
 /* Create the "main" nonvolitile windows used by nethack */
 
 void
 curses_create_main_windows()
 {
-    int message_x = 0;
-    int message_y = 0;
-    int status_x = 0;
-    int status_y = 0;
-    int map_x = 0;
-    int map_y = 0;
-    int message_height = 0;
-    int message_width = 0;
-    int status_height = 0;
-    int status_width = 0;
-    int map_height = 0;
-    int map_width = 0;
     int min_message_height = 1;
     int message_orientation = 0;
     int status_orientation = 0;
@@ -222,271 +255,30 @@ curses_create_main_windows()
         }
     }
 
-    /* Determine window placement and size - 16 possible combos
-       If anyone wants to try to generalize this, be my guest! */
-    if ((status_orientation == ALIGN_TOP) && (message_orientation == ALIGN_TOP)) {
-        status_x = 0;
-        status_y = 0;
-        status_width = (term_cols - border_space);
-        status_height = 2;
-        message_x = 0;
-        message_y = status_y + (status_height + border_space);
-        message_width = (term_cols - border_space);
-        message_height =
-            term_rows - (status_height + ROWNO + (border_space * 3));
-        if (message_height < min_message_height) {
-            message_height = min_message_height;
-        }
-        map_x = 0;
-        map_y = message_y + (message_height + border_space);
-        map_width = (term_cols - border_space);
-        map_height =
-            term_rows - (status_height + message_height + (border_space * 3));
-    } else if ((status_orientation == ALIGN_TOP) &&
-               (message_orientation == ALIGN_RIGHT)) {
-        status_x = 0;
-        status_y = 0;
-        status_height = 2;
-        message_height = (term_rows - border_space);
-        message_width = term_cols - (COLNO + (border_space * 2));
-        status_width = term_cols - (message_width + (border_space * 2));
-        message_x = status_x + (status_width + border_space);
-        message_y = 0;
-        map_x = 0;
-        map_y = status_y + (status_height + border_space);
-        map_width = status_width;
-        map_height = term_rows - (status_height + (border_space * 2));
-    } else if ((status_orientation == ALIGN_TOP) &&
-               (message_orientation == ALIGN_BOTTOM)) {
-        status_x = 0;
-        status_y = 0;
-        status_width = (term_cols - border_space);
-        status_height = 2;
-        map_x = 0;
-        map_y = status_y + (status_height + border_space);
-        map_width = (term_cols - border_space);
-        message_height =
-            term_rows - (status_height + ROWNO + (border_space * 3));
-        if (message_height < min_message_height) {
-            message_height = min_message_height;
-        }
-        map_height =
-            term_rows - (status_height + message_height + (border_space * 3));
-        message_x = 0;
-        message_y = map_y + (map_height + border_space);
-        message_width = (term_cols - border_space);
-    } else if ((status_orientation == ALIGN_TOP) &&
-               (message_orientation == ALIGN_LEFT)) {
-        message_x = 0;
-        message_y = 0;
-        message_height = (term_rows - border_space);
-        message_width = term_cols - (COLNO + (border_space * 2));
-        status_x = message_x + (message_width + border_space);
-        status_y = 0;
-        status_height = 2;
-        status_width = term_cols - (message_width + (border_space * 2));
-        map_x = status_x;
-        map_y = status_y + (status_height + border_space);
-        map_height = term_rows - (status_height + (border_space * 2));
-        map_width = status_width;
-    }
-    if ((status_orientation == ALIGN_RIGHT) &&
-        (message_orientation == ALIGN_TOP)) {
-        status_width = 26;
-        status_height = (term_rows - border_space);
-        status_x = term_cols - (status_width + border_space);
-        status_y = 0;
-        message_x = 0;
-        message_y = 0;
-        message_width = term_cols - (status_width + (border_space * 2));
-        message_height = term_rows - (ROWNO + (border_space * 2));
-        if (message_height < min_message_height) {
-            message_height = min_message_height;
-        }
-        map_x = 0;
-        map_y = message_y + (message_height + border_space);
-        map_width = term_cols - (status_width + (border_space * 2));
-        map_height = term_rows - (message_height + (border_space * 2));
-    } else if ((status_orientation == ALIGN_RIGHT) &&
-               (message_orientation == ALIGN_RIGHT)) {
-        map_x = 0;
-        map_y = 0;
-        map_height = (term_rows - border_space);
-        status_width = 26;
-        message_width = term_cols - (COLNO + status_width + (border_space * 3));
-        map_width =
-            term_cols - (status_width + message_width + (border_space * 3));
-        message_x = map_x + (map_width + border_space);
-        message_y = 0;
-        message_height = (term_rows - border_space);
-        status_x = message_x + (message_width + border_space);
-        status_y = 0;
-        status_height = (term_rows - border_space);
-    } else if ((status_orientation == ALIGN_RIGHT) &&
-               (message_orientation == ALIGN_BOTTOM)) {
-        map_x = 0;
-        map_y = 0;
-        status_width = 26;
-        map_width = term_cols - (status_width + (border_space * 2));
-        message_height = term_rows - (ROWNO + (border_space * 2));
-        if (message_height < min_message_height) {
-            message_height = min_message_height;
-        }
-        map_height = term_rows - (message_height + (border_space * 2));
-        message_x = 0;
-        message_y = map_y + (map_height + border_space);
-        message_width = map_width;
-        status_x = map_x + (map_width + border_space);
-        status_y = 0;
-        status_height = (term_rows - border_space);
-    } else if ((status_orientation == ALIGN_RIGHT) &&
-               (message_orientation == ALIGN_LEFT)) {
-        status_x = 0;
-        status_y = 0;
-        status_height = (term_rows - border_space);
-        status_width = 26;
-        message_width = term_cols - (status_width + COLNO + (border_space * 3));
-        map_x = status_x + (status_width + border_space);
-        map_y = 0;
-        map_height = (term_rows - border_space);
-        map_width =
-            term_cols - (status_width + message_width + (border_space * 3));
-        message_x = map_x + (map_width + border_space);
-        message_y = 0;
-        message_height = (term_rows - border_space);
-    }
-    if ((status_orientation == ALIGN_BOTTOM) &&
-        (message_orientation == ALIGN_TOP)) {
-        message_x = 0;
-        message_y = 0;
-        message_width = (term_cols - border_space);
-        status_height = 2;
-        message_height =
-            term_rows - (status_height + ROWNO + (border_space * 3));
-        if (message_height < min_message_height) {
-            message_height = min_message_height;
-        }
-        map_x = 0;
-        map_y = message_y + (message_height + border_space);
-        map_width = (term_cols - border_space);
-        map_height =
-            term_rows - (status_height + message_height + (border_space * 3));
-        status_x = 0;
-        status_y = map_y + (map_height + border_space);
-        status_width = (term_cols - border_space);
-    } else if ((status_orientation == ALIGN_BOTTOM) &&
-               (message_orientation == ALIGN_RIGHT)) {
-        map_x = 0;
-        map_y = 0;
-        status_height = 2;
-        map_height = term_rows - (status_height + (border_space * 2));
-        message_width = term_cols - (COLNO + (border_space * 2));
-        map_width = term_cols - (message_width + (border_space * 2));
-        status_x = 0;
-        status_y = map_y + (map_height + border_space);
-        status_width = map_width;
-        message_x = map_x + (map_width + border_space);
-        message_y = 0;
-        message_height = (term_rows - border_space);
-    } else if ((status_orientation == ALIGN_BOTTOM) &&
-               (message_orientation == ALIGN_BOTTOM)) {
-        map_x = 0;
-        map_y = 0;
-        message_x = 0;
-        status_x = 0;
-        message_width = (term_cols - border_space);
-        status_height = 2;
-        message_height =
-            term_rows - (status_height + ROWNO + (border_space * 3));
-        if (message_height < min_message_height) {
-            message_height = min_message_height;
-        }
-        map_width = (term_cols - border_space);
-        map_height =
-            term_rows - (status_height + message_height + (border_space * 3));
-        message_y = map_y + (map_height + border_space);
-        status_y = message_y + (message_height + border_space);
-        status_width = (term_cols - border_space);
-    } else if ((status_orientation == ALIGN_BOTTOM) &&
-               (message_orientation == ALIGN_LEFT)) {
-        message_x = 0;
-        message_y = 0;
-        message_height = (term_rows - border_space);
-        message_width = term_cols - (COLNO + (border_space * 2));
-        status_height = 2;
-        map_x = message_x + (message_width + border_space);
-        map_y = 0;
-        map_height = term_rows - (status_height + (border_space * 2));
-        map_width = term_cols - (message_width + (border_space * 2));
-        status_x = map_x;
-        status_y = map_y + (map_height + border_space);
-        status_width = term_cols - (message_width + (border_space * 2));
-    }
-    if ((status_orientation == ALIGN_LEFT) &&
-        (message_orientation == ALIGN_TOP)) {
-        status_x = 0;
-        status_y = 0;
-        status_height = (term_rows - border_space);
-        status_width = 26;
-        message_x = status_x + (status_width + border_space);
-        message_y = 0;
-        message_height = term_rows - (ROWNO + (border_space * 2));
-        if (message_height < min_message_height) {
-            message_height = min_message_height;
-        }
-        message_width = term_cols - (status_width + (border_space * 2));
-        map_x = message_x;
-        map_y = message_y + (message_height + border_space);
-        map_height = term_rows - (message_height + (border_space * 2));
-        map_width = term_cols - (status_width + (border_space * 2));
-    } else if ((status_orientation == ALIGN_LEFT) &&
-               (message_orientation == ALIGN_RIGHT)) {
-        message_x = 0;
-        message_y = 0;
-        message_height = (term_rows - border_space);
-        status_width = 26;
-        message_width = term_cols - (status_width + COLNO + (border_space * 3));
-        map_x = message_x + (message_width + border_space);
-        map_y = 0;
-        map_height = (term_rows - border_space);
-        map_width =
-            term_cols - (status_width + message_width + (border_space * 3));
-        status_x = map_x + (map_width + border_space);
-        status_y = 0;
-        status_height = (term_rows - border_space);
-    } else if ((status_orientation == ALIGN_LEFT) &&
-               (message_orientation == ALIGN_BOTTOM)) {
-        status_x = 0;
-        status_y = 0;
-        status_height = (term_rows - border_space);
-        status_width = 26;
-        map_x = status_x + (status_width + border_space);
-        map_y = 0;
-        message_height = term_rows - (ROWNO + (border_space * 2));
-        if (message_height < min_message_height) {
-            message_height = min_message_height;
-        }
-        map_height = term_rows - (message_height + (border_space * 2));
-        map_width = term_cols - (status_width + (border_space * 2));
-        message_x = status_x + (status_width + border_space);
-        message_y = map_y + (map_height + border_space);
-        message_width = map_width;
-    } else if ((status_orientation == ALIGN_LEFT) &&
-               (message_orientation == ALIGN_LEFT)) {
-        status_x = 0;
-        status_y = 0;
-        status_height = (term_rows - border_space);
-        status_width = 26;
-        message_x = status_x + (status_width + border_space);
-        message_y = 0;
-        message_height = status_height;
-        message_width = term_cols - (COLNO + status_width + (border_space * 3));
-        map_x = message_x + (message_width + border_space);
-        map_y = 0;
-        map_height = message_height;
-        map_width =
-            term_cols - (status_width + message_width + (border_space * 3));
-    }
+    /* Figure out window positions and placements. Status and message area can be aligned
+       based on configuration. The priority alignment-wise is: status > msgarea > game.
+       Define everything as taking as much space as possible and shrink/move based on
+       alignment positions. */
+    int message_x = 0;
+    int message_y = 0;
+    int status_x = 0;
+    int status_y = 0;
+    int map_x = 0;
+    int map_y = 0;
+
+    int message_height = 0;
+    int message_width = 0;
+    int status_height = 0;
+    int status_width = 0;
+    int map_height = (term_rows - border_space);
+    int map_width = (term_cols - border_space);
+
+    set_window_position(&status_x, &status_y, &status_width, &status_height,
+                        status_orientation, &map_x, &map_y, &map_width, &map_height,
+                        border_space, 2, 26);
+    set_window_position(&message_x, &message_y, &message_width, &message_height,
+                        message_orientation, &map_x, &map_y, &map_width, &map_height,
+                        border_space, -1, -1);
 
     if (map_width > COLNO) {
         map_width = COLNO;

@@ -50,7 +50,6 @@ extern const struct percent_color_option *hp_colors;
 extern const struct percent_color_option *pw_colors;
 #endif
 
-static nhstat prevname;
 static nhstat prevdepth;
 static nhstat prevstr;
 static nhstat prevint;
@@ -58,7 +57,6 @@ static nhstat prevwis;
 static nhstat prevdex;
 static nhstat prevcon;
 static nhstat prevcha;
-static nhstat prevalign;
 static nhstat prevau;
 static nhstat prevhp;
 static nhstat prevmhp;
@@ -72,14 +70,6 @@ static nhstat prevtime;
 #ifdef SCORE_ON_BOTL
 static nhstat prevscore;
 #endif
-static nhstat prevhunger;
-static nhstat prevconf;
-static nhstat prevblind;
-static nhstat prevstun;
-static nhstat prevhallu;
-static nhstat prevsick;
-static nhstat prevslime;
-static nhstat prevencumb;
 
 #define COMPACT_LABELS  1
 #define NORMAL_LABELS   2
