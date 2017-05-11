@@ -989,8 +989,7 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num)
             entry_cols -= 4;
             start_col += 4;
         }
-        if (menu_item_ptr->glyph != NO_GLYPH) {
-            /* stuff to display the glyph at line_num+1, start_col goes here */
+        if (menu_item_ptr->glyph != NO_GLYPH && iflags.use_menu_glyphs) {
             unsigned special;   /*notused */
 
             mapglyph(menu_item_ptr->glyph, &curletter, &color, &special, 0, 0);
