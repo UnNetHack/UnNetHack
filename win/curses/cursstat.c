@@ -25,7 +25,7 @@ typedef struct nhs {
 } nhstat;
 
 static attr_t get_trouble_color(const char *);
-static void statusproblem(int, const char *);
+static void draw_trouble_str(const char *);
 static void print_statdiff(const char *append, nhstat *, int, int);
 static void get_playerrank(char *);
 static attr_t curses_color_attr(int nh_color, int bg_color);
@@ -33,6 +33,8 @@ static int hpen_color(boolean, int, int);
 static void draw_bar(boolean, int, int, const char *);
 static void draw_horizontal(void);
 static void draw_vertical(void);
+static void curses_add_statuses(WINDOW *, boolean, int *, int *);
+static void curses_add_status(WINDOW *, boolean, int *, int *, const char *, int);
 static int decrement_highlight(nhstat *, boolean);
 static void decrement_highlights(boolean);
 static void init_stats(void);
@@ -213,11 +215,8 @@ print_statdiff(const char *append, nhstat *stat, int new, int type)
 }
 
 static void
-statusproblem(int trouble, const char *str)
+draw_trouble_str(const char *str)
 {
-    if (!trouble)
-        return;
-
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
 
     /* For whatever reason, hunger states have trailing spaces. Get rid of them. */
@@ -548,29 +547,8 @@ draw_horizontal(void)
 
     if (flags.time)
         print_statdiff(" T:", &prevtime, moves, STAT_TIME);
-#define statprob(stat, str)                   \
-    if (stat) {                               \
-        waddch(win, ' ');                     \
-        statusproblem(stat, str);             \
-    }
 
-    /* Hunger */
-    statprob(u.uhs != 1, hu_stat[u.uhs]);
-
-    /* General troubles */
-    statprob(Confusion, "Conf");
-    statprob(Blind, "Blind");
-    statprob(Stunned, "Stun");
-    statprob(Hallucination, "Hallu");
-    statprob((u.usick_type & SICK_VOMITABLE), "FoodPois");
-    statprob((u.usick_type & SICK_NONVOMITABLE), "Ill");
-    statprob(Slimed, "Slime");
-
-    /* Encumbrance */
-    int enc = near_capacity();
-    statprob(enc > UNENCUMBERED, enc_stat[enc]);
-#undef statprob
-
+    curses_add_statuses(win, FALSE, NULL, NULL);
     wclrtoeol(win);
 }
 
@@ -723,30 +701,54 @@ draw_vertical(void)
     }
 #endif /* SCORE_ON_BOTL */
 
-    /* Troubles. Uses a macro to avoid major repetition */
+    curses_add_statuses(win, TRUE, &x, &y);
+}
 
-#define statprob(stat, str)                   \
-    if (stat) {                               \
-        statusproblem(stat, str);             \
-        wmove(win, y++, x);                   \
-    }
+static void
+curses_add_statuses(WINDOW *win, boolean vertical, int *x, int *y)
+{
+#define statprob(str, trouble)                                  \
+    curses_add_status(win, vertical, x, y, str, trouble)
 
     /* Hunger */
-    statprob(u.uhs != 1, hu_stat[u.uhs]);
+    statprob(hu_stat[u.uhs], u.uhs != 1); /* 1 is NOT_HUNGRY (not defined here) */
 
     /* General troubles */
-    statprob(Confusion, "Conf");
-    statprob(Blind, "Blind");
-    statprob(Stunned, "Stun");
-    statprob(Hallucination, "Hallu");
-    statprob((u.usick_type & SICK_VOMITABLE), "FoodPois");
-    statprob((u.usick_type & SICK_NONVOMITABLE), "Ill");
-    statprob(Slimed, "Slime");
+    statprob("Conf",     Confusion);
+    statprob("Blind",    Blind);
+    statprob("Stun",     Stunned);
+    statprob("Hallu",    Hallucination);
+    statprob("Ill",      (u.usick_type & (SICK_NONVOMITABLE|SICK_ZOMBIE)));
+    statprob("FoodPois", (u.usick_type & SICK_VOMITABLE));
+    statprob("Slime",    Slimed);
 
     /* Encumbrance */
     int enc = near_capacity();
-    statprob(enc > UNENCUMBERED, enc_stat[enc]);
+    statprob(enc_stat[enc], enc > UNENCUMBERED);
 #undef statprob
+}
+
+static void
+curses_add_status(WINDOW *win, boolean vertical, int *x, int *y,
+                  const char *str, int trouble)
+{
+    /* If vertical is TRUE here with no x/y, that's an error. But handle
+       it gracefully since NH3 doesn't recover well in crashes. */
+    if (!x || !y)
+        vertical = FALSE;
+
+    if (!trouble)
+        return;
+
+    if (!vertical)
+        waddch(win, ' ');
+
+    draw_trouble_str(str);
+
+    if (vertical) {
+        wmove(win, *y, *x);
+        *y += 1; /* ++ advances the pointer addr */
+    }
 }
 
 void
