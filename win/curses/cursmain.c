@@ -517,7 +517,8 @@ void curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph)
     {
         attr = iflags.wc2_petattr;
     }
-    if ((special & MG_DETECT) && iflags.use_inverse)
+    if (((special & MG_DETECT)
+         || (special & MG_INVERSE)) && iflags.use_inverse)
 	{
 	    attr = A_REVERSE;
 	}
