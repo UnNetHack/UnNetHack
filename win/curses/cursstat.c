@@ -9,19 +9,11 @@
 
 /* Private declarations */
 
+/* Used to track previous value of things, to highlight changes. */
 typedef struct nhs {
     long value;
-    char *txt;
-    aligntyp alignment;
-    boolean display;
     int highlight_turns;
     int highlight_color;
-    int stat_color;
-    int stat_attr;
-    int x;
-    int y;
-    char *label;
-    const char *id;
 } nhstat;
 
 static attr_t get_trouble_color(const char *);
@@ -37,7 +29,6 @@ static void curses_add_statuses(WINDOW *, boolean, int *, int *);
 static void curses_add_status(WINDOW *, boolean, int *, int *, const char *, int);
 static int decrement_highlight(nhstat *, boolean);
 static void decrement_highlights(boolean);
-static void init_stats(void);
 
 #ifdef STATUS_COLORS
 static attr_t hpen_color_attr(boolean, int, int);
@@ -52,6 +43,9 @@ extern const struct percent_color_option *hp_colors;
 extern const struct percent_color_option *pw_colors;
 #endif
 
+/* Whether or not we have printed status window content at least once.
+   Used to ensure that prev* doesn't end up highlighted on game start. */
+static boolean first = TRUE;
 static nhstat prevdepth;
 static nhstat prevstr;
 static nhstat prevint;
@@ -754,34 +748,12 @@ curses_add_status(WINDOW *win, boolean vertical, int *x, int *y,
 void
 curses_update_stats(void)
 {
-    char buf[BUFSZ];
-    int count, enc, sx_start, hp, hpmax, labels, swidth, sheight, sx_end, sy_end,
-        orient;
+    int orient;
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
-    static int prev_labels = -1;
-    static boolean first = TRUE;
-    static boolean horiz;
+    boolean horiz;
     int sx = 0;
     int sy = 0;
     boolean border = curses_window_has_border(STATUS_WIN);
-
-    curses_get_window_size(STATUS_WIN, &sheight, &swidth);
-
-    if (border) {
-        sx++;
-        sy++;
-        swidth--;
-        sheight--;
-    }
-
-    sx_end = swidth - 1;
-    sy_end = sheight - 1;
-    sx_start = sx;
-
-    if (first) {
-        init_stats();
-        first = FALSE;
-    }
 
     orient = curses_get_window_orientation(STATUS_WIN);
 
@@ -793,6 +765,15 @@ curses_update_stats(void)
         draw_horizontal();
     else
         draw_vertical();
+
+    if (first) {
+        first = FALSE;
+
+        /* Zero highlight timers and re-run the status update. */
+        decrement_highlights(TRUE);
+        curses_update_stats();
+        return;
+    }
 
     if (border)
         box(win, 0, 0);
@@ -857,42 +838,4 @@ void
 curses_decrement_highlight()
 {
     decrement_highlights(FALSE);
-}
-
-
-/* Initializes the prev(whatever) values */
-static void
-init_stats()
-{
-    prevdepth.value = depth(&u.uz);
-    prevstr.value = ACURR(A_STR);
-    prevdex.value = ACURR(A_DEX);
-    prevcon.value = ACURR(A_CON);
-    prevint.value = ACURR(A_INT);
-    prevwis.value = ACURR(A_WIS);
-    prevcha.value = ACURR(A_CHA);
-#ifndef GOLDOBJ
-    prevau.value = u.ugold;
-#else
-    prevau.value = money_cnt(invent);
-#endif
-    int hp = u.uhp;
-    int hpmax = u.uhpmax;
-    if (Upolyd) {
-        hp = u.mh;
-        hpmax = u.mhmax;
-    }
-    prevhp.value = hp;
-    prevmhp.value = hpmax;
-    prevlevel.value = (Upolyd ? mons[u.umonnum].mlevel : u.ulevel);
-    prevpow.value = u.uen;
-    prevmpow.value = u.uenmax;
-    prevac.value = u.uac;
-#ifdef EXP_ON_BOTL
-    prevexp.value = u.uexp;
-#endif
-    prevtime.value = moves;
-#ifdef SCORE_ON_BOTL
-    prevscore.value = botl_score();
-#endif
 }

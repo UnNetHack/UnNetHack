@@ -31,7 +31,8 @@ boolean counting;   /* Count window is active */
 #define MESSAGE_WIN 1
 #define STATUS_WIN  2
 #define MAP_WIN     3
-#define NHWIN_MAX   4
+#define INV_WIN     4
+#define NHWIN_MAX   5
 #define MESG_HISTORY_MAX   200
 #if !defined(__APPLE__) || !defined(NCURSES_VERSION)
 # define USE_DARKGRAY /* Allow "bright" black; delete if not visible */
