@@ -28,7 +28,6 @@ static void draw_vertical(int, int, int, int);
 static void curses_add_statuses(WINDOW *, boolean, int *, int *);
 static void curses_add_status(WINDOW *, boolean, int *, int *, const char *, int);
 static int decrement_highlight(nhstat *, boolean);
-static void decrement_highlights(boolean);
 
 #ifdef STATUS_COLORS
 static attr_t hpen_color_attr(boolean, int, int);
@@ -464,7 +463,7 @@ curses_update_stats(void)
         first = FALSE;
 
         /* Zero highlight timers. This will call curses_update_status again if needed */
-        decrement_highlights(TRUE);
+        curses_decrement_highlights(TRUE);
     }
 }
 
@@ -758,10 +757,9 @@ decrement_highlight(nhstat *stat, boolean zero)
 }
 
 /* Decrement the highlight_turns for all stats.  Call curses_update_stats
-if needed to unhighlight a stat */
-
-static void
-decrement_highlights(boolean zero)
+   if needed to unhighlight a stat */
+void
+curses_decrement_highlights(boolean zero)
 {
     int unhighlight = 0;
 
@@ -785,11 +783,4 @@ decrement_highlights(boolean zero)
 
     if (unhighlight)
         curses_update_stats();
-}
-
-
-void
-curses_decrement_highlight()
-{
-    decrement_highlights(FALSE);
 }

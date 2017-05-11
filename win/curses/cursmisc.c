@@ -529,7 +529,7 @@ void
 curses_posthousekeeping()
 {
     curs_set(0);
-    curses_decrement_highlight();
+    curses_decrement_highlights(FALSE);
     curses_clear_unhighlight_message_window();
 }
 
