@@ -23,8 +23,8 @@ static void get_playerrank(char *);
 static attr_t curses_color_attr(int nh_color, int bg_color);
 static int hpen_color(boolean, int, int);
 static void draw_bar(boolean, int, int, const char *);
-static void draw_horizontal(void);
-static void draw_vertical(void);
+static void draw_horizontal(int, int, int, int);
+static void draw_vertical(int, int, int, int);
 static void curses_add_statuses(WINDOW *, boolean, int *, int *);
 static void curses_add_status(WINDOW *, boolean, int *, int *, const char *, int);
 static int decrement_highlight(nhstat *, boolean);
@@ -426,40 +426,67 @@ draw_bar(boolean is_hp, int cur, int max, const char *title)
 }
 
 /* Update the status win - this is called when NetHack would normally
-write to the status window, so we know somwthing has changed.  We
-override the write and update what needs to be updated ourselves. */
-static void
-draw_horizontal(void)
+   write to the status window, so we know somwthing has changed.  We
+   override the write and update what needs to be updated ourselves. */
+void
+curses_update_stats(void)
 {
-    char buf[BUFSZ];
-    char rank[BUFSZ];
+    int orient;
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
+    boolean horiz;
+    boolean border = curses_window_has_border(STATUS_WIN);
 
-    /* The area we're allowed to print on. Excludes borders */
-    int x, y, h, w;
+    /* Starting x/y. Passed to draw_horizontal/draw_vertical to keep track of
+       window positioning. */
+    int x = 0;
+    int y = 0;
 
-    /* Starting x/y */
-    x = 0;
-    y = 0;
-
-    /* Starting height/width */
-    curses_get_window_size(STATUS_WIN, &h, &w);
-
-    boolean border = FALSE;
+    /* Don't start at border position if applicable */
     if (curses_window_has_border(STATUS_WIN)) {
         x++;
         y++;
-        h--;
-        w--;
-        border = TRUE;
     }
 
+    /* Get HP values. */
     int hp = u.uhp;
     int hpmax = u.uhpmax;
     if (Upolyd) {
         hp = u.mh;
         hpmax = u.mhmax;
     }
+
+    orient = curses_get_window_orientation(STATUS_WIN);
+
+    horiz = FALSE;
+    if ((orient != ALIGN_RIGHT) && (orient != ALIGN_LEFT))
+        horiz = TRUE;
+
+    if (orient != ALIGN_RIGHT && orient != ALIGN_LEFT)
+        draw_horizontal(x, y, hp, hpmax);
+    else
+        draw_vertical(x, y, hp, hpmax);
+
+    if (first) {
+        first = FALSE;
+
+        /* Zero highlight timers and re-run the status update. */
+        decrement_highlights(TRUE);
+        curses_update_stats();
+        return;
+    }
+
+    if (border)
+        box(win, 0, 0);
+
+    wrefresh(win);
+}
+
+static void
+draw_horizontal(int x, int y, int hp, int hpmax)
+{
+    char buf[BUFSZ];
+    char rank[BUFSZ];
+    WINDOW *win = curses_get_nhwin(STATUS_WIN);
 
     /* Line 1 */
     wmove(win, y, x);
@@ -550,37 +577,11 @@ draw_horizontal(void)
 /* Personally I never understood the point of a vertical status bar. But removing the
    option would be silly, so keep the functionality. */
 static void
-draw_vertical(void)
+draw_vertical(int x, int y, int hp, int hpmax)
 {
     char buf[BUFSZ];
     char rank[BUFSZ];
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
-
-    /* The area we're allowed to print on. Excludes borders */
-    int x, y, h, w;
-
-    /* Starting x/y */
-    x = 0;
-    y = 0;
-
-    /* Starting height/width */
-    curses_get_window_size(STATUS_WIN, &h, &w);
-
-    boolean border = FALSE;
-    if (curses_window_has_border(STATUS_WIN)) {
-        x++;
-        y++;
-        h--;
-        w--;
-        border = TRUE;
-    }
-
-    int hp = u.uhp;
-    int hpmax = u.uhpmax;
-    if (Upolyd) {
-        hp = u.mh;
-        hpmax = u.mhmax;
-    }
 
     /* Clear the window */
     werase(win);
@@ -591,14 +592,20 @@ draw_vertical(void)
     get_playerrank(rank);
     int ranklen = strlen(rank);
     int namelen = strlen(plname);
-    if ((ranklen + namelen) > 19) {
+    int maxlen = 19;
+#ifdef STATUS_COLORS
+    if (!iflags.hitpointbar)
+        maxlen += 2; /* With no hitpointbar, we can fit more since there's no "[]" */
+#endif
+
+    if ((ranklen + namelen) > maxlen) {
         /* The result doesn't fit. Strip name if >10 characters, then strip title */
         if (namelen > 10) {
-            while (namelen > 10 && (ranklen + namelen) > 19)
+            while (namelen > 10 && (ranklen + namelen) > maxlen)
                 namelen--;
         }
 
-        while ((ranklen + namelen) > 19)
+        while ((ranklen + namelen) > maxlen)
             ranklen--; /* Still doesn't fit, strip rank */
     }
     sprintf(buf, "%-*s the %-*s", namelen, plname, ranklen, rank);
@@ -743,40 +750,6 @@ curses_add_status(WINDOW *win, boolean vertical, int *x, int *y,
         wmove(win, *y, *x);
         *y += 1; /* ++ advances the pointer addr */
     }
-}
-
-void
-curses_update_stats(void)
-{
-    int orient;
-    WINDOW *win = curses_get_nhwin(STATUS_WIN);
-    boolean horiz;
-    boolean border = curses_window_has_border(STATUS_WIN);
-
-    orient = curses_get_window_orientation(STATUS_WIN);
-
-    horiz = FALSE;
-    if ((orient != ALIGN_RIGHT) && (orient != ALIGN_LEFT))
-        horiz = TRUE;
-
-    if (orient != ALIGN_RIGHT && orient != ALIGN_LEFT)
-        draw_horizontal();
-    else
-        draw_vertical();
-
-    if (first) {
-        first = FALSE;
-
-        /* Zero highlight timers and re-run the status update. */
-        decrement_highlights(TRUE);
-        curses_update_stats();
-        return;
-    }
-
-    if (border)
-        box(win, 0, 0);
-
-    wrefresh(win);
 }
 
 /* Decrement a single highlight, return 1 if decremented to zero. zero is TRUE if we're
