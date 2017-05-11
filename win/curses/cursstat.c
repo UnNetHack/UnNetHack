@@ -455,19 +455,17 @@ curses_update_stats(void)
     else
         draw_vertical(x, y, hp, hpmax);
 
-    if (first) {
-        first = FALSE;
-
-        /* Zero highlight timers and re-run the status update. */
-        decrement_highlights(TRUE);
-        curses_update_stats();
-        return;
-    }
-
     if (border)
         box(win, 0, 0);
 
     wrefresh(win);
+
+    if (first) {
+        first = FALSE;
+
+        /* Zero highlight timers. This will call curses_update_status again if needed */
+        decrement_highlights(TRUE);
+    }
 }
 
 static void
