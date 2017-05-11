@@ -751,8 +751,6 @@ curses_update_stats(void)
     int orient;
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
     boolean horiz;
-    int sx = 0;
-    int sy = 0;
     boolean border = curses_window_has_border(STATUS_WIN);
 
     orient = curses_get_window_orientation(STATUS_WIN);
