@@ -73,29 +73,28 @@ extern const char *enc_stat[];  /* from botl.c */
    anyway */
 
 struct statcolor {
-    const char *id; /* Identifier for statuscolors */
     const char *txt; /* For status problems */
     int color; /* Default color assuming STATUS_COLORS isn't enabled */
 };
 
 static const struct statcolor default_colors[] = {
-    {"satiated", "Satiated", CLR_YELLOW},
-    {"hungry", "Hungry", CLR_YELLOW},
-    {"weak", "Weak", CLR_ORANGE},
-    {"fainted", "Fainted", CLR_BRIGHT_MAGENTA},
-    {"fainting", "Fainting", CLR_BRIGHT_MAGENTA},
-    {"burdened", "Burdened", CLR_RED},
-    {"stressed", "Stressed", CLR_RED},
-    {"strained", "Strained", CLR_ORANGE},
-    {"overtaxed", "Overtaxed", CLR_ORANGE},
-    {"overloaded", "Overloaded", CLR_BRIGHT_MAGENTA},
-    {"conf", "Conf", CLR_BRIGHT_BLUE},
-    {"blind", "Blind", CLR_BRIGHT_BLUE},
-    {"stun", "Stun", CLR_BRIGHT_BLUE},
-    {"hallu", "Hallu", CLR_BRIGHT_BLUE},
-    {"ill", "Ill", CLR_BRIGHT_MAGENTA},
-    {"foodpois", "FoodPois", CLR_BRIGHT_MAGENTA},
-    {"slime", "Slime", CLR_BRIGHT_MAGENTA},
+    {"Satiated", CLR_YELLOW},
+    {"Hungry", CLR_YELLOW},
+    {"Weak", CLR_ORANGE},
+    {"Fainted", CLR_BRIGHT_MAGENTA},
+    {"Fainting", CLR_BRIGHT_MAGENTA},
+    {"Burdened", CLR_RED},
+    {"Stressed", CLR_RED},
+    {"Strained", CLR_ORANGE},
+    {"Overtaxed", CLR_ORANGE},
+    {"Overloaded", CLR_BRIGHT_MAGENTA},
+    {"Conf", CLR_BRIGHT_BLUE},
+    {"Blind", CLR_BRIGHT_BLUE},
+    {"Stun", CLR_BRIGHT_BLUE},
+    {"Hallu", CLR_BRIGHT_BLUE},
+    {"Ill", CLR_BRIGHT_MAGENTA},
+    {"FoodPois", CLR_BRIGHT_MAGENTA},
+    {"Slime", CLR_BRIGHT_MAGENTA},
     {NULL, NULL, NO_COLOR},
 };
 
@@ -113,7 +112,7 @@ get_trouble_color(const char *stat)
 
             struct color_option stat_color;
 
-            stat_color = text_color_of(clr->id, text_colors);
+            stat_color = text_color_of(clr->txt, text_colors);
             if (stat_color.color == NO_COLOR && !stat_color.attr_bits)
                 return curses_color_attr(CLR_GRAY, 0);
 
