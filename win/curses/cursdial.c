@@ -65,7 +65,6 @@ static void menu_select_deselect(WINDOW * win, nhmenu_item *item,
 static int menu_operation(WINDOW * win, nhmenu *menu, menu_op operation,
                           int page_num);
 static void menu_clear_selections(nhmenu *menu);
-static boolean get_menu_coloring(char *str, int *color, int *attr);
 static int menu_max_height(void);
 
 static nhmenu *nhmenus = NULL;  /* NetHack menu array */
@@ -1377,7 +1376,7 @@ menu_clear_selections(nhmenu *menu)
  applied */
 
 #ifdef MENU_COLOR
-static boolean
+boolean
 get_menu_coloring(char *str, int *color, int *attr)
 {
     struct menucoloring *tmpmc;

@@ -65,6 +65,11 @@ struct window_procs curses_procs = {
     curses_preference_update,
 };
 
+/* Track if we're performing an update to the permanent window.
+   Needed since we aren't using the normal menu functions to handle
+   the inventory window. */
+static int inv_update = 0;
+
 /*  
 init_nhwindows(int* argcp, char** argv)
                 -- Initialize the windows used by NetHack.  This can also
@@ -152,7 +157,6 @@ curses_init_nhwindows(int *argcp, char **argv)
     curses_init_mesg_history();
     curses_display_splash_window();
 }
-
 
 /* Do a window-port specific player type selection. If player_selection()
    offers a Quit option, it is its responsibility to clean up and terminate
@@ -374,6 +378,9 @@ curses_display_file(const char *filename,BOOLEAN_P must_exist)
 void
 curses_start_menu(winid wid)
 {
+    if (inv_update)
+        return;
+
     curses_create_nhmenu(wid);
 }
 
@@ -415,6 +422,13 @@ curses_add_menu(winid wid, int glyph, int cnt, const ANY_P * identifier,
 {
     int curses_attr = curses_convert_attr(attr);
 
+    if (inv_update) {
+        curses_add_inv(inv_update, glyph, accelerator, curses_attr,
+                       str, identifier);
+        inv_update++;
+        return;
+    }
+
     curses_add_nhmenu_item(wid, glyph, identifier, accelerator, group_accel,
                            curses_attr, str, presel);
 }
@@ -431,6 +445,9 @@ end_menu(window, prompt)
 void
 curses_end_menu(winid wid, const char *prompt)
 {
+    if (inv_update)
+        return;
+
     curses_finalize_nhmenu(wid, prompt);
 }
 
@@ -462,17 +479,25 @@ int select_menu(winid window, int how, menu_item **selected)
 int
 curses_select_menu(winid wid, int how, MENU_ITEM_P ** selected)
 {
+    if (inv_update)
+        return 0;
+
     return curses_display_nhmenu(wid, how, selected);
 }
 
-/*
-    -- Indicate to the window port that the inventory has been changed.
-    -- Merely calls display_inventory() for window-ports that leave the 
-        window up, otherwise empty.
-*/
 void
-curses_update_inventory()
+curses_update_inventory(void)
 {
+    if (!flags.perm_invent)
+        return;
+
+    /* Update inventory sidebar. NetHack uses normal menu functions
+       when drawing the inventory, and we don't want to change the
+       underlying code. So instead, track if an inventory update is
+       being performed with a static variable. */
+    inv_update = 1;
+    curses_update_inv();
+    inv_update = 0;
 }
 
 /*

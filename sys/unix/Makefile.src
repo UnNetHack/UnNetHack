@@ -184,9 +184,9 @@ WINTTYOBJ = getline.o termcap.o topl.o wintty.o
 WINCURSESSRC = ../win/curses/cursmain.c ../win/curses/curswins.c \
 	../win/curses/cursmisc.c ../win/curses/cursdial.c \
 	../win/curses/cursstat.c ../win/curses/cursinit.c \
-	../win/curses/cursmesg.c
+	../win/curses/cursmesg.c ../win/curses/cursinvt.c
 WINCURSESOBJ = cursmain.o curswins.o cursmisc.o cursdial.o cursstat.o \
-	cursinit.o cursmesg.o
+	cursinit.o cursmesg.o cursinvt.o
 #
 # files for an X11 port
 # (tile.c is a generated source file)
@@ -651,6 +651,9 @@ cursinit.o: ../win/curses/cursinit.c $(HACK_H) ../include/wincurs.h \
 cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursmesg.h
 	$(CC) $(CFLAGS) -c ../win/curses/cursmesg.c
+cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursinvt.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursinvt.c
 Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
 		$(CONFIG_H)
 	$(CC) $(CFLAGS) -c ../win/X11/Window.c

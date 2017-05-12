@@ -20,7 +20,6 @@ static attr_t get_trouble_color(const char *);
 static void draw_trouble_str(const char *);
 static void print_statdiff(const char *append, nhstat *, int, int);
 static void get_playerrank(char *);
-static attr_t curses_color_attr(int nh_color, int bg_color);
 static int hpen_color(boolean, int, int);
 static void draw_bar(boolean, int, int, const char *);
 static void draw_horizontal(int, int, int, int);
@@ -216,7 +215,7 @@ draw_trouble_str(const char *str)
 
 /* Returns a ncurses attribute for foreground and background.
    This should probably be in cursinit.c or something. */
-static attr_t
+attr_t
 curses_color_attr(int nh_color, int bg_color)
 {
     int color = nh_color + 1;
@@ -430,7 +429,7 @@ curses_update_stats(void)
     int y = 0;
 
     /* Don't start at border position if applicable */
-    if (curses_window_has_border(STATUS_WIN)) {
+    if (border) {
         x++;
         y++;
     }

@@ -459,6 +459,9 @@ curses_puts(winid wid, int attr, const char *text)
 
     if (wid == STATUS_WIN) {
         curses_update_stats();     /* We will do the write ourselves */
+        /* Inventory updating isn't performed on redraws, so
+           also update inventory here... */
+        curses_update_inventory();
         return;
     }
 
@@ -527,7 +530,7 @@ curses_alert_main_borders(boolean onoff)
 static boolean
 is_main_window(winid wid)
 {
-    if ((wid == MESSAGE_WIN) || (wid == MAP_WIN) || (wid == STATUS_WIN)) {
+    if ((wid == MESSAGE_WIN) || (wid == MAP_WIN) || (wid == STATUS_WIN) || wid == INV_WIN) {
         return TRUE;
     } else {
         return FALSE;
