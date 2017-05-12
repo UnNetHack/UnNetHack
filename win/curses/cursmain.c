@@ -488,8 +488,14 @@ curses_select_menu(winid wid, int how, MENU_ITEM_P ** selected)
 void
 curses_update_inventory(void)
 {
-    if (!flags.perm_invent)
+    /* Don't do anything if perm_invent is off unless we
+       changed the option. */
+    if (!flags.perm_invent) {
+        WINDOW *win = curses_get_nhwin(INV_WIN);
+        if (win)
+            curses_create_main_windows();
         return;
+    }
 
     /* Update inventory sidebar. NetHack uses normal menu functions
        when drawing the inventory, and we don't want to change the

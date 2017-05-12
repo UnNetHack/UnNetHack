@@ -14,8 +14,13 @@ curses_update_inv(void)
     WINDOW *win = curses_get_nhwin(INV_WIN);
 
     /* Check if the inventory window is enabled in first place */
-    if (!win)
+    if (!win) {
+        /* It's not. Re-initialize the main windows if the
+           option was enabled. */
+        if (flags.perm_invent)
+            curses_create_main_windows();
         return;
+    }
 
     boolean border = curses_window_has_border(INV_WIN);
 
