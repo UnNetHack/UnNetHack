@@ -331,12 +331,11 @@ curses_create_main_windows()
     if (map_height > ROWNO)
         map_height = ROWNO;
 
-    if (curses_window_exists(STATUS_WIN)) {
+    if (curses_get_nhwin(STATUS_WIN)) {
         curses_del_nhwin(STATUS_WIN);
         curses_del_nhwin(MESSAGE_WIN);
         curses_del_nhwin(MAP_WIN);
-        if (flags.perm_invent)
-            curses_del_nhwin(INV_WIN);
+        curses_del_nhwin(INV_WIN);
 
         clear();
     }
@@ -347,8 +346,9 @@ curses_create_main_windows()
     curses_add_nhwin(MESSAGE_WIN, message_height, message_width, message_y,
                      message_x, message_orientation, borders);
 
-    curses_add_nhwin(INV_WIN, inv_height, inv_width, inv_y, inv_x,
-                     ALIGN_RIGHT, borders);
+    if (flags.perm_invent)
+        curses_add_nhwin(INV_WIN, inv_height, inv_width, inv_y, inv_x,
+                         ALIGN_RIGHT, borders);
 
     curses_add_nhwin(MAP_WIN, map_height, map_width, map_y, map_x, 0, borders);
 
@@ -358,7 +358,8 @@ curses_create_main_windows()
 
     if (iflags.window_inited) {
         curses_update_stats();
-        curses_update_inventory();
+        if (flags.perm_invent)
+            curses_update_inventory();
     } else {
         iflags.window_inited = TRUE;
     }
@@ -921,7 +922,6 @@ curses_init_options()
 
     /* Remove a few options that are irrelevant to this windowport */
     set_option_mod_status("DECgraphics", SET_IN_FILE);
-    set_option_mod_status("perm_invent", SET_IN_FILE);
     set_option_mod_status("eight_bit_tty", SET_IN_FILE);
 
     /* Make sure that DECgraphics is not set to true via the config
