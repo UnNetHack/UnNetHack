@@ -227,7 +227,14 @@ curses_last_messages()
         my = 0;
     }
 
-    pline("%s", toplines);
+    nhprev_mesg *mesg;
+    int i;
+    for (i = (num_messages - 1); i > 0; i--) {
+        mesg = get_msg_line(TRUE, i);
+        if (mesg && mesg->str && strcmp(mesg->str, ""))
+            curses_message_win_puts(mesg->str, TRUE);
+    }
+    curses_message_win_puts(toplines, TRUE);
 }
 
 
