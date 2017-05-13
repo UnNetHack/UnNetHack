@@ -423,8 +423,7 @@ curses_add_menu(winid wid, int glyph, int cnt, const ANY_P * identifier,
     int curses_attr = curses_convert_attr(attr);
 
     if (inv_update) {
-        curses_add_inv(inv_update, glyph, accelerator, curses_attr,
-                       str, identifier);
+        curses_add_inv(inv_update, glyph, accelerator, curses_attr, str);
         inv_update++;
         return;
     }

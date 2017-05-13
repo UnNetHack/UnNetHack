@@ -59,7 +59,7 @@ curses_update_inv(void)
 /* Adds an inventory item. */
 void
 curses_add_inv(int y, int glyph, CHAR_P accelerator, attr_t attr,
-               const char *str, const ANY_P *identifier)
+               const char *str)
 {
     WINDOW *win = curses_get_nhwin(INV_WIN);
 
@@ -82,12 +82,12 @@ curses_add_inv(int y, int glyph, CHAR_P accelerator, attr_t attr,
     if (accelerator && glyph != NO_GLYPH && iflags.use_menu_glyphs) {
         unsigned dummy = 0; /* Not used */
         int color = 0;
-        int curletter = 0;
-        mapglyph_obj(glyph, &curletter, &color, &dummy,
-                     u.ux, u.uy, identifier->a_obj);
+        int symbol = 0;
+        mapglyph(glyph, &symbol, &color, &dummy,
+                     u.ux, u.uy);
         attr = curses_color_attr(color, 0);
         wattron(win, attr);
-        wprintw(win, "%c ", curletter);
+        wprintw(win, "%c ", symbol);
         wattroff(win, attr);
     }
 

@@ -276,8 +276,7 @@ extern void curses_decrement_highlight(void);
 /* cursinvt.c */
 
 extern void curses_update_inv(void);
-extern void curses_add_inv(int, int, CHAR_P, attr_t, const char *,
-                           const ANY_P *);
+extern void curses_add_inv(int, int, CHAR_P, attr_t, const char *);
 
 /* cursinit.c */
 

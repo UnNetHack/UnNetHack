@@ -704,7 +704,7 @@ curses_add_statuses(WINDOW *win, boolean vertical, int *x, int *y)
     statprob("Blind",    Blind);
     statprob("Stun",     Stunned);
     statprob("Hallu",    Hallucination);
-    statprob("Ill",      (u.usick_type & (SICK_NONVOMITABLE|SICK_ZOMBIE)));
+    statprob("Ill",      (u.usick_type & SICK_NONVOMITABLE));
     statprob("FoodPois", (u.usick_type & SICK_VOMITABLE));
     statprob("Slime",    Slimed);
 
