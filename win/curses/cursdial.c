@@ -1002,7 +1002,7 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num)
 #ifdef MENU_COLOR
         if (iflags.use_menu_color && iflags.use_color
             && (menu_color
-                = get_menu_coloring ((char *) menu_item_ptr->str, &color,
+                = curses_get_menu_coloring ((char *) menu_item_ptr->str, &color,
                                      &attr))) {
             if (color != NO_COLOR) {
                 curses_toggle_color_attr(win, color, NONE, ON);
@@ -1377,7 +1377,7 @@ menu_clear_selections(nhmenu *menu)
 
 #ifdef MENU_COLOR
 boolean
-get_menu_coloring(char *str, int *color, int *attr)
+curses_get_menu_coloring(char *str, int *color, int *attr)
 {
     struct menucoloring *tmpmc;
 

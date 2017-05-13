@@ -379,7 +379,7 @@ draw_bar(boolean is_hp, int cur, int max, const char *title)
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
 
 #ifdef STATUS_COLORS
-    if (!iflags.hitpointbar) {
+    if (iflags.vanilla_ui_behavior) { /* no hitpointbar */
         wprintw(win, "%s", !title ? "---" : title);
         return;
     }
@@ -586,7 +586,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
     int namelen = strlen(plname);
     int maxlen = 19;
 #ifdef STATUS_COLORS
-    if (!iflags.hitpointbar)
+    if (iflags.vanilla_ui_behavior) /* no hp bar */
         maxlen += 2; /* With no hitpointbar, we can fit more since there's no "[]" */
 #endif
 
