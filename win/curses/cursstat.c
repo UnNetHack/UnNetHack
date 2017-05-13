@@ -188,7 +188,7 @@ print_statdiff(const char *append, nhstat *stat, int new, int type)
         else if (new == 118)
             wprintw(win, "18/**");
         else
-            wprintw(win, "18/%d", new - 18);
+            wprintw(win, "18/%02d", new - 18);
     } else
         wprintw(win, "%d", new);
 
