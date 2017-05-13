@@ -138,7 +138,7 @@ get_trouble_color(const char *stat)
                     status_color = text_color_of(clr->id, cur_option);
 
                     int count;
-                    for (count = 0; (1 << count) <= stat_color.attr_bits; count++) {
+                    for (count = 0; (1 << count) <= status_color.attr_bits; count++) {
                         if (count != ATR_NONE && (status_color.attr_bits & (1 << count)))
                             attr |= curses_convert_attr(count);
                     }
@@ -254,12 +254,11 @@ curses_color_attr(int nh_color, int bg_color)
 
     if (!nh_color) {
 #ifdef USE_DARKGRAY
-        if (iflags.wc2_darkgray) {
-            if (!can_change_color() || COLORS <= 16)
-                cattr |= A_BOLD;
-        } else
+        if (!can_change_color() || COLORS <= 16)
+            cattr |= A_BOLD;
+#else
+        color = COLOR_BLUE;
 #endif
-            color = COLOR_BLUE;
     }
 
     if (COLORS < 16 && color > 8) {
