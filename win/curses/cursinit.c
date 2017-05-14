@@ -291,12 +291,16 @@ curses_create_main_windows()
         message_orientation == ALIGN_RIGHT)
         msg_vertical = TRUE;
 
+    int statusheight = 3;
+    if (iflags.classic_status)
+        statusheight = 2;
+
     /* Vertical windows have priority. Otherwise, priotity is:
        status > inv > msg */
     if (status_vertical)
         set_window_position(&status_x, &status_y, &status_width, &status_height,
                             status_orientation, &map_x, &map_y, &map_width, &map_height,
-                            border_space, 2, 26);
+                            border_space, statusheight, 26);
 
     if (flags.perm_invent) {
         /* Take up all width unless msgbar is also vertical. */
@@ -318,7 +322,7 @@ curses_create_main_windows()
     if (!status_vertical)
         set_window_position(&status_x, &status_y, &status_width, &status_height,
                             status_orientation, &map_x, &map_y, &map_width, &map_height,
-                            border_space, 2, 26);
+                            border_space, statusheight, 26);
 
     if (!msg_vertical)
         set_window_position(&message_x, &message_y, &message_width, &message_height,
@@ -923,6 +927,9 @@ curses_init_options()
     /* Remove a few options that are irrelevant to this windowport */
     set_option_mod_status("DECgraphics", SET_IN_FILE);
     set_option_mod_status("eight_bit_tty", SET_IN_FILE);
+
+    /* Add those that are */
+    set_option_mod_status("classic_status", SET_IN_GAME);
 
     /* Make sure that DECgraphics is not set to true via the config
        file, as this will cause display issues.  We can't disable it in

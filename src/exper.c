@@ -4,10 +4,9 @@
 
 #include "hack.h"
 
-STATIC_DCL long FDECL(newuexp, (int));
 STATIC_DCL int FDECL(enermod, (int));
 
-STATIC_OVL long
+long
 newuexp(lev)
 int lev;
 {
