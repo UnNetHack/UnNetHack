@@ -232,6 +232,7 @@ curses_num_lines(const char *str, int width)
     char tmpstr[BUFSZ];
 
     strncpy(substr, str, BUFSZ-1);
+    substr[BUFSZ-1] = '\0';
 
     while (strlen(substr) > width) {
         last_space = 0;
