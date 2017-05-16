@@ -1126,8 +1126,6 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
                 if (count > 0) {
                     count_letter = curletter;
                 }
-                dismiss = TRUE;
-                break;
             }                
         }
 
@@ -1255,13 +1253,6 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
             if (menu_item_ptr->identifier.a_void != NULL) {
                 if (menu_item_ptr->selected) {
                     num_selected++;
-                    
-                    if (menu_item_ptr->accelerator == count_letter)
-                    {
-                        menu_item_ptr->count = count;
-                        count = 0;
-                        count_letter = '\0';
-                    }
                 }
             }
             menu_item_ptr = menu_item_ptr->next_item;
