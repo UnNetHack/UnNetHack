@@ -28,6 +28,7 @@ compile
 # /doc/
 /doc/Makefile
 /doc/Guidebook.txt
+/doc/Guidebook
 
 # /include/
 /include/autoconf.h

@@ -987,9 +987,10 @@ curses_init_options()
 void
 curses_display_splash_window()
 {
-    int x_start = 1;
-    int y_start = 6;
+    int x_start;
+    int y_start;
     int which_variant = NETHACK_CURSES; /* Default to NetHack */
+    curses_get_window_xy(MAP_WIN, &x_start, &y_start);
 
     if ((term_cols < 70) || (term_rows < 20)) {
         iflags.wc_splash_screen = FALSE;        /* No room for s.s. */
