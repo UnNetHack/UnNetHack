@@ -23,9 +23,11 @@ static void get_playerrank(char *);
 static int hpen_color(boolean, int, int);
 static void draw_bar(boolean, int, int, const char *);
 static void draw_horizontal(int, int, int, int);
+static void draw_horizontal_new(int, int, int, int);
 static void draw_vertical(int, int, int, int);
-static void curses_add_statuses(WINDOW *, boolean, int *, int *);
-static void curses_add_status(WINDOW *, boolean, int *, int *, const char *, int);
+static void curses_add_statuses(WINDOW *, boolean, boolean, int *, int *);
+static void curses_add_status(WINDOW *, boolean, boolean, int *, int *,
+                              const char *, int);
 static int decrement_highlight(nhstat *, boolean);
 
 #ifdef STATUS_COLORS
@@ -200,16 +202,9 @@ draw_trouble_str(const char *str)
 {
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
 
-    /* For whatever reason, hunger states have trailing spaces. Get rid of them. */
-    char buf[BUFSZ];
-    Strcpy(buf, str);
-    int i;
-    for (i = 0; (buf[i] != ' ' && buf[i] != '\0'); i++) ;
-
-    buf[i] = '\0';
-    attr_t attr = get_trouble_color(buf);
+    attr_t attr = get_trouble_color(str);
     wattron(win, attr);
-    wprintw(win, "%s", buf);
+    wprintw(win, "%s", str);
     wattroff(win, attr);
 }
 
@@ -425,10 +420,40 @@ draw_bar(boolean is_hp, int cur, int max, const char *title)
 void
 curses_update_stats(void)
 {
-    int orient;
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
-    boolean horiz;
+    int orient = curses_get_window_orientation(STATUS_WIN);
+
+    boolean horiz = FALSE;
+    if ((orient != ALIGN_RIGHT) && (orient != ALIGN_LEFT))
+        horiz = TRUE;
+
     boolean border = curses_window_has_border(STATUS_WIN);
+
+    /* Figure out if we have proper window dimensions for horizontal statusbar. */
+    if (horiz) {
+        /* correct y */
+        int cy = 3;
+        if (iflags.classic_status)
+            cy = 2;
+
+        /* actual y (and x) */
+        int ax = 0;
+        int ay = 0;
+        getmaxyx(win, ay, ax);
+        if (border)
+            ay -= 2;
+
+        if (cy != ay) {
+            curses_create_main_windows();
+            curses_last_messages();
+            doredraw();
+
+            /* Reset XP highlight (since classic_status and new show different numbers) */
+            prevexp.highlight_turns = 0;
+            curses_update_stats();
+            return;
+        }
+    }
 
     /* Starting x/y. Passed to draw_horizontal/draw_vertical to keep track of
        window positioning. */
@@ -448,12 +473,6 @@ curses_update_stats(void)
         hp = u.mh;
         hpmax = u.mhmax;
     }
-
-    orient = curses_get_window_orientation(STATUS_WIN);
-
-    horiz = FALSE;
-    if ((orient != ALIGN_RIGHT) && (orient != ALIGN_LEFT))
-        horiz = TRUE;
 
     if (orient != ALIGN_RIGHT && orient != ALIGN_LEFT)
         draw_horizontal(x, y, hp, hpmax);
@@ -476,6 +495,11 @@ curses_update_stats(void)
 static void
 draw_horizontal(int x, int y, int hp, int hpmax)
 {
+    if (!iflags.classic_status) {
+        /* Draw new-style statusbar */
+        draw_horizontal_new(x, y, hp, hpmax);
+        return;
+    }
     char buf[BUFSZ];
     char rank[BUFSZ];
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
@@ -561,10 +585,137 @@ draw_horizontal(int x, int y, int hp, int hpmax)
     if (flags.time)
         print_statdiff(" T:", &prevtime, moves, STAT_TIME);
 
-    curses_add_statuses(win, FALSE, NULL, NULL);
-    wclrtoeol(win);
+    curses_add_statuses(win, FALSE, FALSE, NULL, NULL);
 }
 
+static void
+draw_horizontal_new(int x, int y, int hp, int hpmax)
+{
+    char buf[BUFSZ];
+    char rank[BUFSZ];
+    WINDOW *win = curses_get_nhwin(STATUS_WIN);
+
+    /* Line 1 */
+    wmove(win, y, x);
+
+    get_playerrank(rank);
+    char race[BUFSZ];
+    Strcpy(race, urace.adj);
+    race[0] = highc(race[0]);
+    wprintw(win, "%s the %s %s%s%s", plname,
+            (u.ualign.type == A_CHAOTIC ? "Chaotic" :
+             u.ualign.type == A_NEUTRAL ? "Neutral" : "Lawful"),
+            Upolyd ? "" : race, Upolyd ? "" : " ",
+            rank);
+
+    wclrtoeol(win);
+
+    /* Line 2 */
+    y++;
+    wmove(win, y, x);
+    wprintw(win, "HP:");
+    draw_bar(TRUE, hp, hpmax, NULL);
+    print_statdiff(" AC:", &prevac, u.uac, STAT_AC);
+    if (Upolyd)
+        print_statdiff(" HD:", &prevlevel, mons[u.umonnum].mlevel, STAT_OTHER);
+#ifdef EXP_ON_BOTL
+    else if (flags.showexp) {
+        /* Ensure that Xp have proper highlight on level change. */
+        int levelchange = 0;
+        if (prevlevel.value != u.ulevel) {
+            if (prevlevel.value < u.ulevel)
+                levelchange = 1;
+            else
+                levelchange = 2;
+        }
+        print_statdiff(" Xp:", &prevlevel, u.ulevel, STAT_OTHER);
+        /* use waddch, we don't want to highlight the '/' */
+        waddch(win, '(');
+
+        /* Figure out amount of Xp needed to next level */
+        int xp_left = 0;
+        if (u.ulevel < 29)
+            xp_left = (newuexp(u.ulevel) - u.uexp);
+
+        if (levelchange) {
+            prevexp.value = (xp_left + 1);
+            if (levelchange == 2)
+                prevexp.value = (xp_left - 1);
+        }
+        print_statdiff("", &prevexp, xp_left, STAT_AC);
+        waddch(win, ')');
+#endif
+    } else
+        print_statdiff(" Exp:", &prevlevel, u.ulevel, STAT_OTHER);
+
+    waddch(win, ' ');
+    describe_level(buf);
+
+    wprintw(win, "%s", buf);
+    wclrtoeol(win);
+
+
+    /* Line 3 */
+    y++;
+    wmove(win, y, x);
+    wprintw(win, "Pw:");
+    draw_bar(FALSE, u.uen, u.uenmax, NULL);
+
+#ifndef GOLDOBJ
+    print_statdiff(" $", &prevau, u.ugold, STAT_GOLD);
+#else
+    print_statdiff(" $", &prevau, money_cnt(invent), STAT_GOLD);
+#endif
+
+#ifdef SCORE_ON_BOTL
+    if (flags.showscore)
+        print_statdiff(" S:", &prevscore, botl_score(), STAT_OTHER);
+#endif /* SCORE_ON_BOTL */
+
+    if (flags.time)
+        print_statdiff(" T:", &prevtime, moves, STAT_TIME);
+
+    wclrtoeol(win);
+    curses_add_statuses(win, TRUE, FALSE, &x, &y);
+
+    /* Right-aligned attributes */
+    int stat_length = 6; /* " Dx:xx" */
+    int str_length = 6;
+    if (ACURR(A_STR) > 18 && ACURR(A_STR) < 119)
+        str_length = 9;
+
+    getmaxyx(win, y, x);
+
+    /* We want to deal with top line of y. getmaxx would do what we want, but it only
+       exist for compatibility reasons and might not exist at all in some versions. */
+    y = 0;
+    if (curses_window_has_border(STATUS_WIN)) {
+        x--;
+        y++;
+    }
+
+    x -= stat_length;
+    int orig_x = x;
+    wmove(win, y, x);
+    print_statdiff(" Co:", &prevcon, ACURR(A_CON), STAT_OTHER);
+    x -= stat_length;
+    wmove(win, y, x);
+    print_statdiff(" Dx:", &prevdex, ACURR(A_DEX), STAT_OTHER);
+    x -= str_length;
+    wmove(win, y, x);
+    print_statdiff(" St:", &prevstr, ACURR(A_STR), STAT_STR);
+
+    x = orig_x;
+    y++;
+    wmove(win, y, x);
+    print_statdiff(" Ch:", &prevcha, ACURR(A_CHA), STAT_OTHER);
+    x -= stat_length;
+    wmove(win, y, x);
+    print_statdiff(" Wi:", &prevwis, ACURR(A_WIS), STAT_OTHER);
+    x -= str_length;
+    wmove(win, y, x);
+    print_statdiff(" In:", &prevint, ACURR(A_INT), STAT_OTHER);
+}
 
 /* Personally I never understood the point of a vertical status bar. But removing the
    option would be silly, so keep the functionality. */
@@ -694,14 +845,28 @@ draw_vertical(int x, int y, int hp, int hpmax)
     }
 #endif /* SCORE_ON_BOTL */
 
-    curses_add_statuses(win, TRUE, &x, &y);
+    curses_add_statuses(win, FALSE, TRUE, &x, &y);
 }
 
 static void
-curses_add_statuses(WINDOW *win, boolean vertical, int *x, int *y)
+curses_add_statuses(WINDOW *win, boolean align_right,
+                    boolean vertical, int *x, int *y)
 {
+    if (align_right) {
+        /* Right-aligned statuses. Since add_status decrease one x more
+           (to separate them with spaces), add 1 to x unless we have borders
+           (which would offset what add_status does) */
+        int mx = *x;
+        int my = *y;
+        getmaxyx(win, my, mx);
+        if (!curses_window_has_border(STATUS_WIN))
+            mx++;
+
+        *x = mx;
+    }
+
 #define statprob(str, trouble)                                  \
-    curses_add_status(win, vertical, x, y, str, trouble)
+    curses_add_status(win, align_right, vertical, x, y, str, trouble)
 
     /* Hunger */
     statprob(hu_stat[u.uhs], u.uhs != 1); /* 1 is NOT_HUNGRY (not defined here) */
@@ -722,8 +887,8 @@ curses_add_statuses(WINDOW *win, boolean vertical, int *x, int *y)
 }
 
 static void
-curses_add_status(WINDOW *win, boolean vertical, int *x, int *y,
-                  const char *str, int trouble)
+curses_add_status(WINDOW *win, boolean align_right, boolean vertical,
+                  int *x, int *y, const char *str, int trouble)
 {
     /* If vertical is TRUE here with no x/y, that's an error. But handle
        it gracefully since NH3 doesn't recover well in crashes. */
@@ -733,10 +898,22 @@ curses_add_status(WINDOW *win, boolean vertical, int *x, int *y,
     if (!trouble)
         return;
 
-    if (!vertical)
+    if (!vertical && !align_right)
         waddch(win, ' ');
 
-    draw_trouble_str(str);
+    /* For whatever reason, hunger states have trailing spaces. Get rid of them. */
+    char buf[BUFSZ];
+    Strcpy(buf, str);
+    int i;
+    for (i = 0; (buf[i] != ' ' && buf[i] != '\0'); i++) ;
+
+    buf[i] = '\0';
+    if (align_right) {
+        *x -= (strlen(buf) + 1); /* add spacing */
+        wmove(win, *y, *x);
+    }
+
+    draw_trouble_str(buf);
 
     if (vertical) {
         wmove(win, *y, *x);

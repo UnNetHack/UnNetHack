@@ -78,6 +78,9 @@ static struct Bool_Opt
 #else
 	{"checkspace", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+#ifdef CURSES_GRAPHICS
+	{"classic_status", &iflags.classic_status, TRUE, SET_IN_FILE},
+#endif
 	{"cmdassist", &iflags.cmdassist, TRUE, SET_IN_GAME},
 	{"color", &iflags.wc_color, TRUE, SET_IN_GAME},		/*WC*/
 	{"confirm",&flags.confirm, TRUE, SET_IN_GAME},

@@ -201,7 +201,8 @@ struct flag {
 struct instance_flags {
 	boolean  cbreak;	/* in cbreak mode, rogue format */
 #ifdef CURSES_GRAPHICS
-	boolean  cursesgraphics; /* Use portable curses extended characters */
+	boolean  classic_status;	/* What kind of horizontal statusbar to use */
+	boolean  cursesgraphics;	/* Use portable curses extended characters */
 #endif
 	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
 	boolean  echo;		/* 1 to echo characters */
