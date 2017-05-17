@@ -421,6 +421,10 @@ void
 curses_update_stats(void)
 {
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
+
+    /* Clear the window */
+    werase(win);
+
     int orient = curses_get_window_orientation(STATUS_WIN);
 
     boolean horiz = FALSE;
@@ -529,8 +533,6 @@ draw_horizontal(int x, int y, int hp, int hpmax)
         print_statdiff(" S:", &prevscore, botl_score(), STAT_OTHER);
 #endif /* SCORE_ON_BOTL */
 
-    wclrtoeol(win);
-
 
     /* Line 2 */
     y++;
@@ -608,8 +610,6 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
             Upolyd ? "" : race, Upolyd ? "" : " ",
             rank);
 
-    wclrtoeol(win);
-
     /* Line 2 */
     y++;
     wmove(win, y, x);
@@ -652,8 +652,6 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
     describe_level(buf);
 
     wprintw(win, "%s", buf);
-    wclrtoeol(win);
-
 
     /* Line 3 */
     y++;
@@ -675,7 +673,6 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
     if (flags.time)
         print_statdiff(" T:", &prevtime, moves, STAT_TIME);
 
-    wclrtoeol(win);
     curses_add_statuses(win, TRUE, FALSE, &x, &y);
 
     /* Right-aligned attributes */
@@ -725,9 +722,6 @@ draw_vertical(int x, int y, int hp, int hpmax)
     char buf[BUFSZ];
     char rank[BUFSZ];
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
-
-    /* Clear the window */
-    werase(win);
 
     /* Print title and dungeon branch */
     wmove(win, y++, x);
