@@ -18,7 +18,7 @@ STATIC_DCL boolean FDECL(putting_on, (const char *));
 STATIC_PTR int FDECL(ckunpaid,(struct obj *));
 STATIC_PTR int FDECL(ckvalidcat,(struct obj *));
 static char FDECL(display_pickinv,
-		 (const char *,BOOLEAN_P, long *, BOOLEAN_P));
+		 (const char *,BOOLEAN_P, long *, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
 STATIC_DCL void NDECL(dounpaid);
 STATIC_DCL struct obj *FDECL(find_unpaid,(struct obj *,struct obj **));
@@ -1117,7 +1117,7 @@ register const char *let,*word;
 			allowed_choices = altlets;
 		    ilet = display_pickinv(allowed_choices, TRUE,
 					   allowcnt ? &ctmp : (long *)0
-					   , TRUE
+					   , TRUE, FALSE
 					   );
 		    if(!ilet) continue;
 		    if (allowcnt && ctmp >= 0) {
@@ -2247,11 +2247,12 @@ struct obj *obj2;
  * any count returned from the menu selection is placed here.
  */
 static char
-display_pickinv(lets, want_reply, out_cnt, want_disp)
+display_pickinv(lets, want_reply, out_cnt, want_disp, want_dump)
 register const char *lets;
 boolean want_reply;
 long* out_cnt;
 boolean want_disp;
+boolean want_dump;
 {
 	struct obj *otmp;
 #ifdef SORTLOOT
@@ -2276,7 +2277,7 @@ boolean want_disp;
 	} else
 	    win = WIN_INVEN;
 	}
-	dump_title("Your inventory");
+	if (want_dump) dump_title("Your inventory");
 
 	/*
 	Exit early if no inventory -- but keep going if we are doing
@@ -2297,11 +2298,13 @@ boolean want_disp;
 	    pline("Not carrying anything.");
 #endif
 	  }
+          if (want_dump) {
 #ifdef GOLDOBJ
 	    dump("  ", "Not carrying anything");
 #else
 	    dump("  Not carrying anything", u.ugold ? " except gold." : ".");
 #endif
+          }
 	    return 0;
 	}
 
@@ -2321,7 +2324,7 @@ boolean want_disp;
 			  xprname(otmp, (char *)0, lets[0], TRUE, 0L, 0L));
 		    if (out_cnt) *out_cnt = -1L;	/* select all */
 		  }
-		  {
+		  if(want_dump) {
 		    char letbuf[7];
 		    sprintf(letbuf, "  %c - ", lets[0]);
 		    dump_object(lets[0], otmp,
@@ -2375,7 +2378,8 @@ nextclass:
 	      if (want_disp)
 			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings,
 			       let_to_name(*invlet, FALSE), MENU_UNSELECTED);
-	      dump_subtitle(let_to_name(*invlet, FALSE));
+	      if (want_dump)
+                  dump_subtitle(let_to_name(*invlet, FALSE));
 	      classcount++;
 	    }
 	    any.a_char = ilet;
@@ -2383,7 +2387,8 @@ nextclass:
 		add_menu(win, obj_to_glyph(otmp), otmp->quan,
 			     &any, ilet, 0, ATR_NONE, doname(otmp),
 			     MENU_UNSELECTED);
-	    dump_object(ilet, otmp, doname(otmp));
+	    if (want_dump)
+	        dump_object(ilet, otmp, doname(otmp));
 	  }
 	}
 #else /* SORTLOOT */
@@ -2400,7 +2405,7 @@ nextclass:
 				classcount++;
 			    }
 			    any.a_char = ilet;
-			    {
+			    if (want_dump) {
 			      char letbuf[7];
 			      sprintf(letbuf, "  %c - ", ilet);
 			      dump_object(ilet, otmp, doname(otmp));
@@ -2436,7 +2441,7 @@ nextclass:
 	} else
 	    ret = !n ? '\0' : '\033';	/* cancelled */
 	} /* want_disp */
-	dump("", "");
+	if (want_dump) dump("", "");
 
 	return ret;
 }
@@ -2453,7 +2458,7 @@ display_inventory(lets, want_reply)
 register const char *lets;
 boolean want_reply;
 {
-	return display_pickinv(lets, want_reply, (long *)0, TRUE);
+	return display_pickinv(lets, want_reply, (long *)0, TRUE, FALSE);
 }
 
 /* See display_inventory. This is the same thing WITH dumpfile creation */
@@ -2462,7 +2467,7 @@ dump_inventory(lets, want_reply, want_disp)
 register const char *lets;
 boolean want_reply, want_disp;
 {
-  return display_pickinv(lets, want_reply, (long *)0, want_disp);
+  return display_pickinv(lets, want_reply, (long *)0, want_disp, TRUE);
 }
 
 /**
