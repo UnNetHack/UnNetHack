@@ -85,10 +85,10 @@ curses_add_inv(int y, int glyph, CHAR_P accelerator, attr_t attr,
         int symbol = 0;
         mapglyph(glyph, &symbol, &color, &dummy,
                  0, 0);
-        attr = curses_color_attr(color, 0);
-        wattron(win, attr);
+        attr_t glyphclr = curses_color_attr(color, 0);
+        wattron(win, glyphclr);
         wprintw(win, "%c ", symbol);
-        wattroff(win, attr);
+        wattroff(win, glyphclr);
     }
 
 #ifdef MENU_COLOR
