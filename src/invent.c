@@ -1117,7 +1117,7 @@ register const char *let,*word;
 			allowed_choices = altlets;
 		    ilet = display_pickinv(allowed_choices, TRUE,
 					   allowcnt ? &ctmp : (long *)0
-					   , TRUE, FALSE
+					   , FALSE, TRUE
 					   );
 		    if(!ilet) continue;
 		    if (allowcnt && ctmp >= 0) {
@@ -2247,7 +2247,7 @@ struct obj *obj2;
  * any count returned from the menu selection is placed here.
  */
 static char
-display_pickinv(lets, want_reply, out_cnt, want_disp, want_dump)
+display_pickinv(lets, want_reply, out_cnt, want_dump, want_disp)
 register const char *lets;
 boolean want_reply;
 long* out_cnt;
@@ -2324,9 +2324,7 @@ boolean want_dump;
 			  xprname(otmp, (char *)0, lets[0], TRUE, 0L, 0L));
 		    if (out_cnt) *out_cnt = -1L;	/* select all */
 		  }
-		  if(want_dump) {
-		    char letbuf[7];
-		    sprintf(letbuf, "  %c - ", lets[0]);
+                  if (want_dump) {
 		    dump_object(lets[0], otmp,
 			 xprname(otmp, (char *)0, lets[0], TRUE, 0L, 0L));
 		  }
@@ -2378,8 +2376,7 @@ nextclass:
 	      if (want_disp)
 			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings,
 			       let_to_name(*invlet, FALSE), MENU_UNSELECTED);
-	      if (want_dump)
-                  dump_subtitle(let_to_name(*invlet, FALSE));
+              if (want_dump) dump_subtitle(let_to_name(*invlet, FALSE));
 	      classcount++;
 	    }
 	    any.a_char = ilet;
@@ -2387,8 +2384,7 @@ nextclass:
 		add_menu(win, obj_to_glyph(otmp), otmp->quan,
 			     &any, ilet, 0, ATR_NONE, doname(otmp),
 			     MENU_UNSELECTED);
-	    if (want_dump)
-	        dump_object(ilet, otmp, doname(otmp));
+            if (want_dump) dump_object(ilet, otmp, doname(otmp));
 	  }
 	}
 #else /* SORTLOOT */
@@ -2398,7 +2394,7 @@ nextclass:
 			if (!flags.sortpack || otmp->oclass == *invlet) {
 			    if (flags.sortpack && !classcount) {
 				any.a_void = 0;		/* zero */
-				dump_subtitle(let_to_name(*invlet, FALSE));
+				if (want_dump) dump_subtitle(let_to_name(*invlet, FALSE));
 				if (want_disp)
 				add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings,
 				    let_to_name(*invlet, FALSE), MENU_UNSELECTED);
@@ -2458,7 +2454,7 @@ display_inventory(lets, want_reply)
 register const char *lets;
 boolean want_reply;
 {
-	return display_pickinv(lets, want_reply, (long *)0, TRUE, FALSE);
+	return display_pickinv(lets, want_reply, (long *)0, FALSE, TRUE);
 }
 
 /* See display_inventory. This is the same thing WITH dumpfile creation */
@@ -2467,7 +2463,7 @@ dump_inventory(lets, want_reply, want_disp)
 register const char *lets;
 boolean want_reply, want_disp;
 {
-  return display_pickinv(lets, want_reply, (long *)0, want_disp, TRUE);
+  return display_pickinv(lets, want_reply, (long *)0, TRUE, want_disp);
 }
 
 /**
