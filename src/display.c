@@ -1328,6 +1328,7 @@ row_refresh(start,stop,y)
     for (x = start; x <= stop; x++)
 	if (gbuf[y][x].glyph != cmap_to_glyph(S_stone))
 	    print_glyph(WIN_MAP,x,y,gbuf[y][x].glyph);
+    display_nhwindow(WIN_MAP,FALSE);
 }
 
 void

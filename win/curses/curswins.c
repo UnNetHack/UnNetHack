@@ -369,8 +369,9 @@ curses_putch(winid wid, int x, int y, int ch, int color, int attr)
 
         write_char(mapwin, x - sx, y - sy, nch);
     }
-
-    wrefresh(mapwin);
+    /* refresh after every character?
+     * Fair go, mate! Some of us are playing from Australia! */
+    /* wrefresh(mapwin); */
 }
 
 
