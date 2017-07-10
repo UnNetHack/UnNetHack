@@ -121,7 +121,6 @@ curses_message_win_puts(const char *message, boolean recursed)
         if (height > 1) {
             curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
         }
-        //wrefresh(win);
         curses_message_win_puts(tmpstr = curses_str_remainder(message, (width - 2), 1),
                                 TRUE);
         free(tmpstr);
@@ -154,7 +153,6 @@ curses_block(boolean require_tab)
         curses_clear_unhighlight_message_window();
     } else {
         mvwprintw(win, my, mx, "      ");
-        //wrefresh(win);
         if (!require_tab) {
             scroll_window(MESSAGE_WIN);
             turn_lines = 1;
