@@ -154,11 +154,12 @@ curses_destroy_win(WINDOW * win)
 void
 curses_refresh_nethack_windows()
 {
-    WINDOW *status_window, *message_window, *map_window;
+    WINDOW *status_window, *message_window, *map_window, *inv_window;
 
     status_window = curses_get_nhwin(STATUS_WIN);
     message_window = curses_get_nhwin(MESSAGE_WIN);
     map_window = curses_get_nhwin(MAP_WIN);
+    inv_window = curses_get_nhwin(INV_WIN);
 
     if ((moves <= 1) && !invent) {
         /* Main windows not yet displayed; refresh base window instead */
@@ -171,6 +172,10 @@ curses_refresh_nethack_windows()
         wnoutrefresh(map_window);
         touchwin(message_window);
         wnoutrefresh(message_window);
+        if (inv_window) {
+            touchwin(inv_window);
+            wnoutrefresh(inv_window);
+        }
         doupdate();
     }
 }
