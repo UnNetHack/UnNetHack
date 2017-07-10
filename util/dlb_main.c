@@ -22,8 +22,8 @@ static void xexit(int);
 #define LIBLISTFILE "dlb.lst"		/* default list file */
 
 /* library functions (from dlb.c) */
-extern boolean open_library(const char *,library *));
-extern void close_library(library *));
+extern boolean open_library(const char *,library *);
+extern void close_library(library *);
 
 char *eos(char *);	/* also used by dlb.c */
 FILE *fopen_datafile(const char *,const char *);
