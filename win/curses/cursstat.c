@@ -486,7 +486,7 @@ curses_update_stats(void)
     if (border)
         box(win, 0, 0);
 
-    wrefresh(win);
+    wnoutrefresh(win);
 
     if (first) {
         first = FALSE;

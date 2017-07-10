@@ -53,7 +53,7 @@ curses_update_inv(void)
     if (border)
         box(win, 0, 0);
 
-    wrefresh(win);
+    wnoutrefresh(win);
 }
 
 /* Adds an inventory item. */
