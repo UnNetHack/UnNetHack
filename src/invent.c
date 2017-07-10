@@ -7,25 +7,24 @@
 #define NOINVSYM	'#'
 #define CONTAINED_SYM	'>'	/* designator for inside a container */
 
-STATIC_DCL void NDECL(reorder_invent);
-STATIC_DCL boolean FDECL(mergable,(struct obj *,struct obj *));
-STATIC_DCL void FDECL(invdisp_nothing, (const char *,const char *));
-STATIC_DCL boolean FDECL(worn_wield_only, (struct obj *));
-STATIC_DCL boolean FDECL(only_here, (struct obj *));
-STATIC_DCL void FDECL(compactify,(char *));
-STATIC_DCL boolean FDECL(taking_off, (const char *));
-STATIC_DCL boolean FDECL(putting_on, (const char *));
-STATIC_PTR int FDECL(ckunpaid,(struct obj *));
-STATIC_PTR int FDECL(ckvalidcat,(struct obj *));
-static char FDECL(display_pickinv,
-		 (const char *,BOOLEAN_P, long *, BOOLEAN_P, BOOLEAN_P));
-STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
-STATIC_DCL void NDECL(dounpaid);
-STATIC_DCL struct obj *FDECL(find_unpaid,(struct obj *,struct obj **));
-STATIC_DCL void FDECL(menu_identify, (int));
-STATIC_DCL boolean FDECL(tool_in_use, (struct obj *));
-STATIC_DCL char FDECL(obj_to_let,(struct obj *));
-STATIC_DCL int FDECL(itemactions,(struct obj *));
+STATIC_DCL void reorder_invent(void);
+STATIC_DCL boolean mergable(struct obj *,struct obj *);
+STATIC_DCL void invdisp_nothing(const char *,const char *);
+STATIC_DCL boolean worn_wield_only(struct obj *);
+STATIC_DCL boolean only_here(struct obj *);
+STATIC_DCL void compactify(char *);
+STATIC_DCL boolean taking_off(const char *);
+STATIC_DCL boolean putting_on(const char *);
+STATIC_PTR int ckunpaid(struct obj *);
+STATIC_PTR int ckvalidcat(struct obj *);
+static char display_pickinv(const char *,BOOLEAN_P, long *, BOOLEAN_P, BOOLEAN_P);
+STATIC_DCL boolean this_type_only(struct obj *);
+STATIC_DCL void dounpaid(void);
+STATIC_DCL struct obj *find_unpaid(struct obj *,struct obj **);
+STATIC_DCL void menu_identify(int);
+STATIC_DCL boolean tool_in_use(struct obj *);
+STATIC_DCL char obj_to_let(struct obj *);
+STATIC_DCL int itemactions(struct obj *);
 
 static int lastinvnr = 51;	/* 0 ... 51 (never saved&restored) */
 
@@ -1276,12 +1275,12 @@ static NEARDATA const char removeables[] =
 int
 ggetobj(word, fn, mx, combo, resultflags)
 const char *word;
-int FDECL((*fn),(OBJ_P)), mx;
+int (*fn)(OBJ_P), mx;
 boolean combo;		/* combination menu flag */
 unsigned *resultflags;
 {
-	int FDECL((*ckfn),(OBJ_P)) = (int FDECL((*),(OBJ_P))) 0;
-	boolean FDECL((*filter),(OBJ_P)) = (boolean FDECL((*),(OBJ_P))) 0;
+	int (*ckfn)(OBJ_P) = (int (*)(OBJ_P)) 0;
+	boolean (*filter)(OBJ_P) = (boolean (*)(OBJ_P)) 0;
 	boolean takeoff, ident, allflag, m_seen;
 	int itemcount;
 #ifndef GOLDOBJ
@@ -1472,7 +1471,7 @@ askchain(objchn, olets, allflag, fn, ckfn, mx, word)
 struct obj **objchn;
 register int allflag, mx;
 register const char *olets, *word;	/* olets is an Obj Class char array */
-register int FDECL((*fn),(OBJ_P)), FDECL((*ckfn),(OBJ_P));
+register int (*fn)(OBJ_P), (*ckfn)(OBJ_P);
 {
 	struct obj *otmp, *otmp2, *otmpo;
 	register char sym, ilet;
@@ -1824,7 +1823,7 @@ struct obj *obj;
 {
 	winid win;
 	int n;
-	int NDECL((*feedback_fn)) = 0;
+	int (*feedback_fn)(void) = 0;
 	anything any;
 	menu_item *selected = 0;
 
@@ -2124,7 +2123,7 @@ struct obj *obj;
 
 	n = select_menu(win, PICK_ONE, &selected);
 	destroy_nhwindow(win);
-	if (n == 1) feedback_fn = (int NDECL((*)))selected[0].item.a_void;
+	if (n == 1) feedback_fn = (int (*)(void))selected[0].item.a_void;
 	if (n == 1) free((genericptr_t) selected);
 
 	if (!feedback_fn) return 0;
@@ -2703,7 +2702,7 @@ dotypeinv()
 #ifndef GOLDOBJ
 					      (u.ugold != 0),
 #endif
-					      (boolean FDECL((*),(OBJ_P))) 0, &itemcount);
+					      (boolean (*)(OBJ_P))0, &itemcount);
 	    if (unpaid_count) {
 		Strcat(types, "u");
 		class_count++;

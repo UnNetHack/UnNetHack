@@ -21,8 +21,6 @@ typedef signed char schar;
 #include "wintype.h"
 #undef genericptr_t
 
-#define NDECL(f)	f(void)
-#define FDECL(f,p)	f p
 #define CHAR_P char
 #define SCHAR_P schar
 #define UCHAR_P uchar
@@ -39,8 +37,6 @@ typedef signed char	xchar;
 #undef SHORT_P
 #undef BOOLEAN_P
 #undef ALIGNTYP_P
-#undef NDECL
-#undef FDECL
 
 static char nullstr[]="",  md[]="NetHack 3.4.3", strCancel[]="Cancel", strOk[]="Ok", strText[]="Text";
 

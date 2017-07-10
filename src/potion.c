@@ -9,14 +9,14 @@ boolean notonhead = FALSE;
 static NEARDATA int nothing, unkn;
 static NEARDATA const char beverages[] = { POTION_CLASS, 0 };
 
-STATIC_DCL long FDECL(itimeout, (long));
-STATIC_DCL long FDECL(itimeout_incr, (long,int));
-STATIC_DCL void NDECL(ghost_from_bottle);
-STATIC_OVL void NDECL(alchemy_init);
-STATIC_DCL short FDECL(mixtype, (struct obj *,struct obj *));
+STATIC_DCL long itimeout(long);
+STATIC_DCL long itimeout_incr(long,int);
+STATIC_DCL void ghost_from_bottle(void);
+STATIC_OVL void alchemy_init(void);
+STATIC_DCL short mixtype(struct obj *,struct obj *);
 
 #ifndef TESTING
-STATIC_DCL int FDECL(dip, (struct obj *,struct obj *));
+STATIC_DCL int dip(struct obj *,struct obj *);
 #endif
 
 /* force `val' to be within valid range for intrinsic timeout value */

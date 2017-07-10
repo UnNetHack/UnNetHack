@@ -33,7 +33,7 @@ register struct monst *mon;
 	}
 }
 
-STATIC_DCL int FDECL(counter_were,(int));
+STATIC_DCL int counter_were(int);
 
 STATIC_OVL int
 counter_were(pm)

@@ -47,14 +47,14 @@ long _stksize = 16*1024;
 
 #ifdef AMIGA
 extern int bigscreen;
-void NDECL( preserve_icon );
+void  preserve_icon (void);
 #endif
 
-STATIC_DCL void FDECL(process_options,(int argc,char **argv));
-STATIC_DCL void NDECL(nhusage);
+STATIC_DCL void process_options(int argc,char **argv));
+STATIC_DCL void nhusage(void);
 
 #if defined(MICRO) || defined(WIN32) || defined(OS2)
-extern void FDECL(nethack_exit,(int));
+extern void nethack_exit(int));
 #else
 #define nethack_exit exit
 #endif
@@ -64,22 +64,22 @@ extern boolean getreturn_enabled;	/* from sys/share/pcsys.c */
 #endif
 
 #if defined(MSWIN_GRAPHICS)
-extern void NDECL(mswin_destroy_reg);
+extern void mswin_destroy_reg(void);
 #endif
 
 #ifdef EXEPATH
-STATIC_DCL char *FDECL(exepath,(char *));
+STATIC_DCL char *exepath(char *));
 #endif
 
 #ifdef OVL0
-int FDECL(main, (int,char **));
+int main(int,char **);
 #endif
 
-extern void FDECL(pcmain, (int,char **));
+extern void pcmain(int,char **);
 
 
 #if defined(__BORLANDC__) && !defined(_WIN32)
-void NDECL( startup );
+void  startup (void);
 # ifdef OVLB
 unsigned _stklen = STKSIZ;
 # else

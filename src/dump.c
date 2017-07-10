@@ -19,7 +19,7 @@
 
 extern char msgs[][BUFSZ];
 extern int lastmsg;
-void FDECL(do_vanquished, (int, BOOLEAN_P));
+void do_vanquished(int, BOOLEAN_P);
 #endif 
 
 #ifdef DUMP_LOG

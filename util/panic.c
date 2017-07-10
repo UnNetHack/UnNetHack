@@ -14,12 +14,12 @@
 #define abort() exit()
 #endif
 #ifdef VMS
-extern void NDECL(vms_abort);
+extern void vms_abort(void);
 #endif
 
 /*VARARGS1*/
 boolean panicking;
-void VDECL(panic, (char *,...));
+void panic(char *,...);
 
 void
 panic VA_DECL(char *,str)

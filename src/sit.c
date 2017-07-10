@@ -5,7 +5,7 @@
 #include "hack.h"
 #include "artifact.h"
 
-STATIC_DCL void FDECL(curse_objects, (struct obj *, int, boolean));
+STATIC_DCL void curse_objects(struct obj *, int, boolean);
 
 void
 take_gold()

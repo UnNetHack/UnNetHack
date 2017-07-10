@@ -10,18 +10,18 @@
 #include <limits.h>
 
 #ifdef SINKS
-STATIC_DCL void FDECL(dosinkring, (struct obj *));
+STATIC_DCL void dosinkring(struct obj *);
 #endif /* SINKS */
 
-STATIC_PTR int FDECL(drop, (struct obj *));
-STATIC_PTR int NDECL(wipeoff);
+STATIC_PTR int drop(struct obj *);
+STATIC_PTR int wipeoff(void);
 
-STATIC_DCL int FDECL(menu_drop, (int));
-STATIC_DCL int NDECL(currentlevel_rewrite);
-STATIC_DCL void NDECL(final_level);
-/* static boolean FDECL(badspot, (XCHAR_P,XCHAR_P)); */
-STATIC_DCL boolean NDECL(unique_item_check);
-STATIC_DCL void NDECL(levelport_monsters);
+STATIC_DCL int menu_drop(int);
+STATIC_DCL int currentlevel_rewrite(void);
+STATIC_DCL void final_level(void);
+/* static boolean badspot(XCHAR_P,XCHAR_P); */
+STATIC_DCL boolean unique_item_check(void);
+STATIC_DCL void levelport_monsters(void);
 
 static NEARDATA const char drop_types[] =
 	{ ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, 0 };

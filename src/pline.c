@@ -12,7 +12,7 @@
 
 static boolean no_repeat = FALSE;
 
-static char *FDECL(You_buf, (int));
+static char *You_buf(int);
 
 #if defined(DUMP_LOG) && defined(DUMPMSGS)
 char msgs[DUMPMSGS][BUFSZ];
@@ -65,7 +65,7 @@ msgpline_type(msg)
  */
 
 #if defined(USE_STDARG) || defined(USE_VARARGS)
-static void FDECL(vpline, (const char *, va_list));
+static void vpline(const char *, va_list);
 
 void
 pline VA_DECL(const char *, line)
@@ -272,7 +272,7 @@ verbalize VA_DECL(const char *,line)
  */
 
 #if defined(USE_STDARG) || defined(USE_VARARGS)
-static void FDECL(vraw_printf,(const char *,va_list));
+static void vraw_printf(const char *,va_list);
 
 void
 raw_printf VA_DECL(const char *, line)
