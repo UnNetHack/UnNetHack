@@ -287,7 +287,9 @@ curses_display_nhwindow(winid wid, BOOLEAN_P block)
     }
 
     /* actually display the window */
-    wrefresh(curses_get_nhwin(wid));
+    wnoutrefresh(curses_get_nhwin(wid));
+    /* flush pending writes from other windows too */
+    doupdate();
     if ((wid == MAP_WIN) && block) {
         (void) curses_more();
     }
