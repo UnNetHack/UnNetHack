@@ -11,8 +11,8 @@
 /* this matches the categorizations shown by enlightenment */
 #define ALGN_SINNED	(-4)	/* worse than strayed */
 
-STATIC_DCL boolean FDECL(histemple_at,(struct monst *,XCHAR_P,XCHAR_P));
-STATIC_DCL boolean FDECL(has_shrine,(struct monst *));
+STATIC_DCL boolean histemple_at(struct monst *,XCHAR_P,XCHAR_P);
+STATIC_DCL boolean has_shrine(struct monst *);
 
 /*
  * Move for priests and shopkeepers.  Called from shk_move() and pri_move().

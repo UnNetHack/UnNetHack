@@ -12,10 +12,10 @@
 #include "edog.h"
 #include <ctype.h>
 
-STATIC_DCL boolean FDECL(restrap,(struct monst *));
-STATIC_DCL long FDECL(mm_aggression, (struct monst *,struct monst *));
-STATIC_DCL int NDECL(pick_animal);
-STATIC_DCL void FDECL(kill_eggs, (struct obj *));
+STATIC_DCL boolean restrap(struct monst *);
+STATIC_DCL long mm_aggression(struct monst *,struct monst *);
+STATIC_DCL int pick_animal(void);
+STATIC_DCL void kill_eggs(struct obj *);
 
 #ifdef REINCARNATION
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
@@ -37,15 +37,15 @@ const char *warnings[] = {
 	"white", "pink", "red", "ruby", "purple", "black"
 };
 
-STATIC_DCL void NDECL(warn_effects);
+STATIC_DCL void warn_effects(void);
 #endif /* 0 */
 
-STATIC_DCL struct obj *FDECL(make_corpse,(struct monst *));
-STATIC_DCL void FDECL(m_detach, (struct monst *, struct permonst *));
+STATIC_DCL struct obj *make_corpse(struct monst *);
+STATIC_DCL void m_detach(struct monst *, struct permonst *);
 #ifdef WEBB_DISINT
-STATIC_DCL void FDECL(lifesaved_monster, (struct monst *, uchar));
+STATIC_DCL void lifesaved_monster(struct monst *, uchar);
 #else
-STATIC_DCL void FDECL(lifesaved_monster, (struct monst *));
+STATIC_DCL void lifesaved_monster(struct monst *);
 #endif
 void
 remove_monster(x,y)

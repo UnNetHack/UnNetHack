@@ -155,19 +155,19 @@ static int yy_start = 0;	/* start state number */
  */
 static int yy_did_buffer_switch_on_eof;
 
-void FDECL(yyrestart, (FILE *));
+void yyrestart(FILE *);
 
-void FDECL(yy_switch_to_buffer, (YY_BUFFER_STATE));
-void NDECL(yy_load_buffer_state);
-YY_BUFFER_STATE FDECL(yy_create_buffer, (FILE *,int));
-void FDECL(yy_delete_buffer, (YY_BUFFER_STATE));
-void FDECL(yy_init_buffer, (YY_BUFFER_STATE,FILE *));
-void FDECL(yy_flush_buffer, (YY_BUFFER_STATE));
+void yy_switch_to_buffer(YY_BUFFER_STATE);
+void yy_load_buffer_state(void);
+YY_BUFFER_STATE yy_create_buffer(FILE *,int);
+void yy_delete_buffer(YY_BUFFER_STATE);
+void yy_init_buffer(YY_BUFFER_STATE,FILE *);
+void yy_flush_buffer(YY_BUFFER_STATE);
 #define YY_FLUSH_BUFFER yy_flush_buffer( yy_current_buffer )
 
-static genericptr_t FDECL(yy_flex_alloc, (yy_size_t));
-static genericptr_t FDECL(yy_flex_realloc2, (genericptr_t,yy_size_t,int));
-static void FDECL(yy_flex_free, (genericptr_t));
+static genericptr_t yy_flex_alloc(yy_size_t);
+static genericptr_t yy_flex_realloc2(genericptr_t,yy_size_t,int);
+static void yy_flex_free(genericptr_t);
 
 #define yy_new_buffer yy_create_buffer
 
@@ -193,10 +193,10 @@ typedef int yy_state_type;
 extern char *yytext;
 #define yytext_ptr yytext
 
-static yy_state_type NDECL(yy_get_previous_state);
-static yy_state_type FDECL(yy_try_NUL_trans, (yy_state_type));
-static int NDECL(yy_get_next_buffer);
-static void FDECL(yy_fatal_error, (const char *));
+static yy_state_type yy_get_previous_state(void);
+static yy_state_type yy_try_NUL_trans(yy_state_type);
+static int yy_get_next_buffer(void);
+static void yy_fatal_error(const char *);
 
 /* Done after the current pattern has been matched and before the
  * corresponding action - sets up yytext.
@@ -422,11 +422,11 @@ char *yytext;
  * yyunput is properly declared in flex.skel.
  */
 #if !defined(FLEX_SCANNER) && !defined(FLEXHACK_SCANNER)
-int FDECL(yyback, (int *,int));
-int NDECL(yylook);
-int NDECL(yyinput);
-int NDECL(yywrap);
-int NDECL(yylex);
+int yyback(int *,int);
+int yylook(void);
+int yyinput(void);
+int yywrap(void);
+int yylex(void);
 	/* Traditional lexes let yyunput() and yyoutput() default to int;
 	 * newer ones may declare them as void since they don't return
 	 * values.  For even more fun, the lex supplied as part of the
@@ -456,23 +456,23 @@ int NDECL(yylex);
 #  undef VOIDYYPUT
 # endif
 # ifdef VOIDYYPUT
-void FDECL(yyunput, (int));
-void FDECL(yyoutput, (int));
+void yyunput(int);
+void yyoutput(int);
 # else
-int FDECL(yyunput, (int));
-int FDECL(yyoutput, (int));
+int yyunput(int);
+int yyoutput(int);
 # endif
 #endif	/* !FLEX_SCANNER && !FLEXHACK_SCANNER */
 
 #ifdef FLEX_SCANNER
 #define YY_MALLOC_DECL \
-	       genericptr_t FDECL(malloc, (size_t)); \
-	       genericptr_t FDECL(realloc, (genericptr_t,size_t));
+	       genericptr_t malloc(size_t); \
+	       genericptr_t realloc(genericptr_t,size_t);
 #endif
 
 
-void FDECL(init_yyin, (FILE *));
-void FDECL(init_yyout, (FILE *));
+void init_yyin(FILE *);
+void init_yyout(FILE *);
 
 /* this doesn't always get put in dgn_comp.h
  * (esp. when using older versions of bison)
@@ -488,19 +488,19 @@ int line_number = 1;
  */
 
 #ifndef YY_SKIP_YYWRAP
-extern int NDECL(yywrap);
+extern int yywrap(void);
 #endif
 
 #ifndef YY_NO_UNPUT
-static void FDECL(yyunput, (int,char *));
+static void yyunput(int,char *);
 #endif
 
 #ifndef yytext_ptr
-static void FDECL(yy_flex_strncpy, (char *,const char *,int));
+static void yy_flex_strncpy(char *,const char *,int);
 #endif
 
 #ifndef YY_NO_INPUT
-static int NDECL(input);
+static int input(void);
 #endif
 
 /* Amount of stuff to slurp up with each read. */
@@ -575,7 +575,7 @@ static int NDECL(input);
 				(yytext[yyleng - 1] == '\n'); \
 	YY_USER_ACTION
 
-int NDECL(yylex);
+int yylex(void);
 int yylex()
 	{
 	register yy_state_type yy_current_state;
@@ -1329,7 +1329,7 @@ YY_BUFFER_STATE b;
 
 #ifndef YY_ALWAYS_INTERACTIVE
 #ifndef YY_NEVER_INTERACTIVE
-extern int FDECL(isatty, (int));
+extern int isatty(int);
 #endif
 #endif
 

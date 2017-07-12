@@ -118,21 +118,21 @@
 #include "hack.h"
 #include "region.h"
 
-STATIC_DCL void FDECL(display_monster,(XCHAR_P,XCHAR_P,struct monst *,int,XCHAR_P));
-STATIC_DCL int FDECL(swallow_to_glyph, (int, int));
-STATIC_DCL void FDECL(display_warning,(struct monst *));
+STATIC_DCL void display_monster(XCHAR_P,XCHAR_P,struct monst *,int,XCHAR_P);
+STATIC_DCL int swallow_to_glyph(int, int);
+STATIC_DCL void display_warning(struct monst *);
 
-STATIC_DCL int FDECL(check_pos, (int, int, int));
+STATIC_DCL int check_pos(int, int, int);
 #ifdef WA_VERBOSE
-STATIC_DCL boolean FDECL(more_than_one, (int, int, int, int, int));
+STATIC_DCL boolean more_than_one(int, int, int, int, int);
 #endif
-STATIC_DCL int FDECL(set_twall, (int,int, int,int, int,int, int,int));
-STATIC_DCL int FDECL(set_wall, (int, int, int));
-STATIC_DCL int FDECL(set_corn, (int,int, int,int, int,int, int,int));
-STATIC_DCL int FDECL(set_crosswall, (int, int));
-STATIC_DCL void FDECL(set_seenv, (struct rm *, int, int, int, int));
-STATIC_DCL void FDECL(t_warn, (struct rm *));
-STATIC_DCL int FDECL(wall_angle, (struct rm *));
+STATIC_DCL int set_twall(int,int, int,int, int,int, int,int);
+STATIC_DCL int set_wall(int, int, int);
+STATIC_DCL int set_corn(int,int, int,int, int,int, int,int);
+STATIC_DCL int set_crosswall(int, int);
+STATIC_DCL void set_seenv(struct rm *, int, int, int, int);
+STATIC_DCL void t_warn(struct rm *);
+STATIC_DCL int wall_angle(struct rm *);
 
 #ifdef INVISIBLE_OBJECTS
 /*
@@ -1428,7 +1428,7 @@ int *oclass;
 }
 
 #ifdef TTY_GRAPHICS
-extern const char * FDECL(compress_str, (const char *));
+extern const char * compress_str(const char *);
 #else
 const char*
 compress_str(str) /* copied from win/tty/wintty.c */
@@ -1767,8 +1767,8 @@ glyph_at(x, y)
 
 #ifdef WA_VERBOSE
 
-static const char *FDECL(type_to_name, (int));
-static void FDECL(error4, (int,int,int,int,int,int));
+static const char *type_to_name(int);
+static void error4(int,int,int,int,int,int);
 
 static int bad_count[MAX_TYPE]; /* count of positions flagged as bad */
 static const char *type_names[MAX_TYPE] = {

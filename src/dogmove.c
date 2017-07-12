@@ -9,14 +9,13 @@
 
 extern boolean notonhead;
 
-STATIC_DCL boolean FDECL(dog_hunger,(struct monst *,struct edog *));
-STATIC_DCL int FDECL(dog_invent,(struct monst *,struct edog *,int));
-STATIC_DCL int FDECL(dog_goal,(struct monst *,struct edog *,int,int,int));
+STATIC_DCL boolean dog_hunger(struct monst *,struct edog *);
+STATIC_DCL int dog_invent(struct monst *,struct edog *,int);
+STATIC_DCL int dog_goal(struct monst *,struct edog *,int,int,int);
 
-STATIC_DCL struct obj *FDECL(DROPPABLES, (struct monst *));
-STATIC_DCL boolean FDECL(can_reach_location,(struct monst *,XCHAR_P,XCHAR_P,
-    XCHAR_P,XCHAR_P));
-STATIC_DCL boolean FDECL(could_reach_item,(struct monst *, XCHAR_P,XCHAR_P));
+STATIC_DCL struct obj *DROPPABLES(struct monst *);
+STATIC_DCL boolean can_reach_location(struct monst *,XCHAR_P,XCHAR_P, XCHAR_P,XCHAR_P);
+STATIC_DCL boolean could_reach_item(struct monst *, XCHAR_P,XCHAR_P);
 
 STATIC_OVL struct obj *
 DROPPABLES(mon)
@@ -47,11 +46,11 @@ register struct monst *mon;
 
 static NEARDATA const char nofetch[] = { BALL_CLASS, CHAIN_CLASS, ROCK_CLASS, 0 };
 
-STATIC_OVL boolean FDECL(cursed_object_at, (int, int));
+STATIC_OVL boolean cursed_object_at(int, int);
 
 STATIC_VAR xchar gtyp, gx, gy;	/* type and position of dog's current goal */
 
-STATIC_PTR void FDECL(wantdoor, (int, int, genericptr_t));
+STATIC_PTR void wantdoor(int, int, genericptr_t);
 
 STATIC_OVL boolean
 cursed_object_at(x, y)

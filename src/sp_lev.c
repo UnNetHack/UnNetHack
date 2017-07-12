@@ -27,25 +27,24 @@
 #include "eshk.h"
 
 
-extern void FDECL(mkmap, (lev_init *));
+extern void mkmap(lev_init *);
 
-STATIC_DCL void FDECL(get_room_loc, (schar *, schar *, struct mkroom *));
-STATIC_DCL void FDECL(get_free_room_loc, (schar *, schar *, struct mkroom *, packed_coord));
-STATIC_DCL void FDECL(create_trap, (trap *, struct mkroom *));
-STATIC_DCL int FDECL(noncoalignment, (ALIGNTYP_P));
-STATIC_DCL void FDECL(create_monster, (monster *, struct mkroom *));
-STATIC_DCL void FDECL(create_object, (object *, struct mkroom *));
-STATIC_DCL void FDECL(create_altar, (altar *, struct mkroom *));
-STATIC_DCL boolean FDECL(search_door, (struct mkroom *, xchar *, xchar *,
-					XCHAR_P, int));
-STATIC_DCL void NDECL(fix_stair_rooms);
-STATIC_DCL void FDECL(create_corridor, (corridor *));
-STATIC_DCL void NDECL(count_features);
+STATIC_DCL void get_room_loc(schar *, schar *, struct mkroom *);
+STATIC_DCL void get_free_room_loc(schar *, schar *, struct mkroom *, packed_coord);
+STATIC_DCL void create_trap(trap *, struct mkroom *);
+STATIC_DCL int noncoalignment(ALIGNTYP_P);
+STATIC_DCL void create_monster(monster *, struct mkroom *);
+STATIC_DCL void create_object(object *, struct mkroom *);
+STATIC_DCL void create_altar(altar *, struct mkroom *);
+STATIC_DCL boolean search_door(struct mkroom *, xchar *, xchar *, XCHAR_P, int);
+STATIC_DCL void fix_stair_rooms(void);
+STATIC_DCL void create_corridor(corridor *);
+STATIC_DCL void count_features(void);
 
-STATIC_DCL boolean FDECL(create_subroom, (struct mkroom *, XCHAR_P, XCHAR_P,
-					XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
+STATIC_DCL boolean create_subroom(struct mkroom *, XCHAR_P, XCHAR_P, XCHAR_P,
+					XCHAR_P, XCHAR_P, XCHAR_P);
 
-long FDECL(opvar_array_length, (struct sp_coder *));
+long opvar_array_length(struct sp_coder *);
 
 #define LEFT	1
 #define H_LEFT	2
@@ -72,15 +71,15 @@ static aligntyp	ralign[3] = { AM_CHAOTIC, AM_NEUTRAL, AM_LAWFUL };
 static NEARDATA xchar xstart, ystart;
 static NEARDATA char xsize, ysize;
 
-STATIC_DCL void FDECL(set_wall_property, (XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,int));
-STATIC_DCL int NDECL(rnddoor);
-STATIC_DCL int NDECL(rndtrap);
-STATIC_DCL void FDECL(get_location, (schar *,schar *,int, struct mkroom *));
-STATIC_DCL void FDECL(light_region, (region *));
-STATIC_DCL void FDECL(maze1xy, (coord *,int));
-STATIC_DCL boolean FDECL(sp_level_loader, (dlb *, sp_lev *));
-STATIC_DCL void FDECL(create_door, (room_door *, struct mkroom *));
-STATIC_DCL struct mkroom *FDECL(build_room, (room *, struct mkroom *));
+STATIC_DCL void set_wall_property(XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,int);
+STATIC_DCL int rnddoor(void);
+STATIC_DCL int rndtrap(void);
+STATIC_DCL void get_location(schar *,schar *,int, struct mkroom *);
+STATIC_DCL void light_region(region *);
+STATIC_DCL void maze1xy(coord *,int);
+STATIC_DCL boolean sp_level_loader(dlb *, sp_lev *);
+STATIC_DCL void create_door(room_door *, struct mkroom *);
+STATIC_DCL struct mkroom *build_room(room *, struct mkroom *);
 
 char *lev_message = 0;
 lev_region *lregions = 0;
@@ -854,7 +853,7 @@ rndtrap()
  *	created underwater, or eels on dry land.
  */
 
-STATIC_DCL boolean FDECL(is_ok_location, (SCHAR_P, SCHAR_P, int));
+STATIC_DCL boolean is_ok_location(SCHAR_P, SCHAR_P, int);
 
 STATIC_OVL void
 get_location(x, y, humidity, croom)
@@ -4262,7 +4261,7 @@ selection_do_randline(x1,y1,x2,y2,rough, rec, ov)
 void
 selection_iterate(ov, func, arg)
      struct opvar *ov;
-     void FDECL((*func), (int,int,genericptr_t));
+     void (*func)(int,int,genericptr_t);
      genericptr_t arg;
 {
     int x,y;

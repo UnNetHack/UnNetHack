@@ -22,160 +22,160 @@
  * module you are trying to debug) or things are going to get rather
  * hard to link :-)
  */
-extern int NDECL(wiz_debug_cmd);
+extern int wiz_debug_cmd(void);
 #endif
 
 #ifdef DUMB	/* stuff commented out in extern.h, but needed here */
-extern int NDECL(doapply); /**/
-extern int NDECL(dorub); /**/
-extern int NDECL(dojump); /**/
-extern int NDECL(doextlist); /**/
-extern int NDECL(dodrop); /**/
-extern int NDECL(doddrop); /**/
-extern int NDECL(dodown); /**/
-extern int NDECL(doup); /**/
-extern int NDECL(donull); /**/
-extern int NDECL(dowipe); /**/
-extern int NDECL(do_mname); /**/
-extern int NDECL(ddocall); /**/
-extern int NDECL(dotakeoff); /**/
-extern int NDECL(doremring); /**/
-extern int NDECL(dowear); /**/
-extern int NDECL(doputon); /**/
-extern int NDECL(doddoremarm); /**/
-extern int NDECL(dokick); /**/
-extern int NDECL(dofire); /**/
-extern int NDECL(dothrow); /**/
-extern int NDECL(doeat); /**/
-extern int NDECL(done2); /**/
-extern int NDECL(doengrave); /**/
+extern int doapply(void); /**/
+extern int dorub(void); /**/
+extern int dojump(void); /**/
+extern int doextlist(void); /**/
+extern int dodrop(void); /**/
+extern int doddrop(void); /**/
+extern int dodown(void); /**/
+extern int doup(void); /**/
+extern int donull(void); /**/
+extern int dowipe(void); /**/
+extern int do_mname(void); /**/
+extern int ddocall(void); /**/
+extern int dotakeoff(void); /**/
+extern int doremring(void); /**/
+extern int dowear(void); /**/
+extern int doputon(void); /**/
+extern int doddoremarm(void); /**/
+extern int dokick(void); /**/
+extern int dofire(void); /**/
+extern int dothrow(void); /**/
+extern int doeat(void); /**/
+extern int done2(void); /**/
+extern int doengrave(void); /**/
 #ifdef ELBERETH
-extern int NDECL(doengrave_elbereth); /**/
+extern int doengrave_elbereth(void); /**/
 #endif
-extern int NDECL(dopickup); /**/
-extern int NDECL(ddoinv); /**/
-extern int NDECL(dotypeinv); /**/
-extern int NDECL(dolook); /**/
-extern int NDECL(doprgold); /**/
-extern int NDECL(doprwep); /**/
-extern int NDECL(doprarm); /**/
-extern int NDECL(doprring); /**/
-extern int NDECL(dopramulet); /**/
-extern int NDECL(doprtool); /**/
-extern int NDECL(dosuspend); /**/
-extern int NDECL(doforce); /**/
-extern int NDECL(doopen); /**/
-extern int NDECL(doclose); /**/
-extern int NDECL(dosh); /**/
-extern int NDECL(dodiscovered); /**/
-extern int NDECL(doset); /**/
-extern int NDECL(dotogglepickup); /**/
-extern int NDECL(dowhatis); /**/
-extern int NDECL(doquickwhatis); /**/
-extern int NDECL(dowhatdoes); /**/
-extern int NDECL(dohelp); /**/
-extern int NDECL(dohistory); /**/
-extern int NDECL(doloot); /**/
-extern int NDECL(dodrink); /**/
-extern int NDECL(dodip); /**/
-extern int NDECL(dosacrifice); /**/
-extern int NDECL(dopray); /**/
-extern int NDECL(doturn); /**/
-extern int NDECL(doredraw); /**/
-extern int NDECL(doread); /**/
-extern int NDECL(dosave); /**/
-extern int NDECL(dosearch); /**/
-extern int NDECL(doidtrap); /**/
-extern int NDECL(dopay); /**/
-extern int NDECL(dosit); /**/
-extern int NDECL(dotalk); /**/
-extern int NDECL(docast); /**/
-extern int NDECL(dovspell); /**/
-extern int NDECL(dotele); /**/
-extern int NDECL(dountrap); /**/
-extern int NDECL(doversion); /**/
-extern int NDECL(doextversion); /**/
-extern int NDECL(doswapweapon); /**/
-extern int NDECL(dowield); /**/
-extern int NDECL(dowieldquiver); /**/
-extern int NDECL(dozap); /**/
-extern int NDECL(doorganize); /**/
-extern int NDECL(dovanquished); /**/
+extern int dopickup(void); /**/
+extern int ddoinv(void); /**/
+extern int dotypeinv(void); /**/
+extern int dolook(void); /**/
+extern int doprgold(void); /**/
+extern int doprwep(void); /**/
+extern int doprarm(void); /**/
+extern int doprring(void); /**/
+extern int dopramulet(void); /**/
+extern int doprtool(void); /**/
+extern int dosuspend(void); /**/
+extern int doforce(void); /**/
+extern int doopen(void); /**/
+extern int doclose(void); /**/
+extern int dosh(void); /**/
+extern int dodiscovered(void); /**/
+extern int doset(void); /**/
+extern int dotogglepickup(void); /**/
+extern int dowhatis(void); /**/
+extern int doquickwhatis(void); /**/
+extern int dowhatdoes(void); /**/
+extern int dohelp(void); /**/
+extern int dohistory(void); /**/
+extern int doloot(void); /**/
+extern int dodrink(void); /**/
+extern int dodip(void); /**/
+extern int dosacrifice(void); /**/
+extern int dopray(void); /**/
+extern int doturn(void); /**/
+extern int doredraw(void); /**/
+extern int doread(void); /**/
+extern int dosave(void); /**/
+extern int dosearch(void); /**/
+extern int doidtrap(void); /**/
+extern int dopay(void); /**/
+extern int dosit(void); /**/
+extern int dotalk(void); /**/
+extern int docast(void); /**/
+extern int dovspell(void); /**/
+extern int dotele(void); /**/
+extern int dountrap(void); /**/
+extern int doversion(void); /**/
+extern int doextversion(void); /**/
+extern int doswapweapon(void); /**/
+extern int dowield(void); /**/
+extern int dowieldquiver(void); /**/
+extern int dozap(void); /**/
+extern int doorganize(void); /**/
+extern int dovanquished(void); /**/
 
 #ifdef DUMP_LOG
-extern int NDECL(dump_screenshot); /**/
+extern int dump_screenshot(void); /**/
 #endif
 #ifdef LIVELOG_SHOUT
-extern int NDECL(doshout); /**/
+extern int doshout(void); /**/
 #endif
 
 #endif /* DUMB */
 
-static int NDECL((*timed_occ_fn));
+static int (*timed_occ_fn)(void);
 
-STATIC_PTR int NDECL(doprev_message);
-STATIC_PTR int NDECL(timed_occupation);
-STATIC_PTR int NDECL(doextcmd);
-STATIC_PTR int NDECL(domonability);
-STATIC_PTR int NDECL(dooverview_or_wiz_where);
-STATIC_PTR int NDECL(dotravel);
-STATIC_PTR int NDECL(doautoexplore);
-STATIC_PTR int NDECL(doautofight);
+STATIC_PTR int doprev_message(void);
+STATIC_PTR int timed_occupation(void);
+STATIC_PTR int doextcmd(void);
+STATIC_PTR int domonability(void);
+STATIC_PTR int dooverview_or_wiz_where(void);
+STATIC_PTR int dotravel(void);
+STATIC_PTR int doautoexplore(void);
+STATIC_PTR int doautofight(void);
 # ifdef WIZARD
-int NDECL(wiz_show_rooms);
-STATIC_PTR int NDECL(wiz_wish);
-STATIC_PTR int NDECL(wiz_identify);
-STATIC_PTR int NDECL(wiz_map);
-STATIC_PTR int NDECL(wiz_genesis);
+int wiz_show_rooms(void);
+STATIC_PTR int wiz_wish(void);
+STATIC_PTR int wiz_identify(void);
+STATIC_PTR int wiz_map(void);
+STATIC_PTR int wiz_genesis(void);
 #if 0
-STATIC_PTR int NDECL(wiz_where);
-STATIC_PTR int NDECL(wiz_detect);
+STATIC_PTR int wiz_where(void);
+STATIC_PTR int wiz_detect(void);
 #endif
-STATIC_PTR int NDECL(wiz_panic);
-STATIC_PTR int NDECL(wiz_polyself);
-STATIC_PTR int NDECL(wiz_level_tele);
-STATIC_PTR int NDECL(wiz_level_change);
-STATIC_PTR int NDECL(wiz_show_seenv);
-STATIC_PTR int NDECL(wiz_show_vision);
-STATIC_PTR int NDECL(wiz_mon_polycontrol);
-STATIC_PTR int NDECL(wiz_show_wmodes);
-STATIC_PTR int NDECL(wiz_mazewalkmap);
+STATIC_PTR int wiz_panic(void);
+STATIC_PTR int wiz_polyself(void);
+STATIC_PTR int wiz_level_tele(void);
+STATIC_PTR int wiz_level_change(void);
+STATIC_PTR int wiz_show_seenv(void);
+STATIC_PTR int wiz_show_vision(void);
+STATIC_PTR int wiz_mon_polycontrol(void);
+STATIC_PTR int wiz_show_wmodes(void);
+STATIC_PTR int wiz_mazewalkmap(void);
 extern char SpLev_Map[COLNO][ROWNO];
-STATIC_PTR int NDECL(wiz_showkills);	/* showborn patch */
+STATIC_PTR int wiz_showkills(void);	/* showborn patch */
 #if defined(__BORLANDC__) && !defined(_WIN32)
-extern void FDECL(show_borlandc_stats, (winid));
+extern void show_borlandc_stats(winid);
 #endif
 #ifdef DEBUG_MIGRATING_MONS
-STATIC_PTR int NDECL(wiz_migrate_mons);
+STATIC_PTR int wiz_migrate_mons(void);
 #endif
-STATIC_DCL void FDECL(count_obj, (struct obj *, long *, long *, BOOLEAN_P, BOOLEAN_P));
-STATIC_DCL void FDECL(obj_chain, (winid, const char *, struct obj *, long *, long *));
-STATIC_DCL void FDECL(mon_invent_chain, (winid, const char *, struct monst *, long *, long *));
-STATIC_DCL void FDECL(mon_chain, (winid, const char *, struct monst *, long *, long *));
-STATIC_DCL void FDECL(contained, (winid, const char *, long *, long *));
-STATIC_PTR int NDECL(wiz_show_stats);
+STATIC_DCL void count_obj(struct obj *, long *, long *, BOOLEAN_P, BOOLEAN_P);
+STATIC_DCL void obj_chain(winid, const char *, struct obj *, long *, long *);
+STATIC_DCL void mon_invent_chain(winid, const char *, struct monst *, long *, long *);
+STATIC_DCL void mon_chain(winid, const char *, struct monst *, long *, long *);
+STATIC_DCL void contained(winid, const char *, long *, long *);
+STATIC_PTR int wiz_show_stats(void);
 #  ifdef PORT_DEBUG
-STATIC_DCL int NDECL(wiz_port_debug);
+STATIC_DCL int wiz_port_debug(void);
 #  endif
 # else
-extern int NDECL(tutorial_redisplay);
+extern int tutorial_redisplay(void);
 # endif
-STATIC_PTR int NDECL(enter_explore_mode);
-STATIC_PTR int NDECL(doattributes);
-STATIC_PTR int NDECL(doconduct); /**/
-STATIC_PTR boolean NDECL(minimal_enlightenment);
+STATIC_PTR int enter_explore_mode(void);
+STATIC_PTR int doattributes(void);
+STATIC_PTR int doconduct(void); /**/
+STATIC_PTR boolean minimal_enlightenment(void);
 
-STATIC_DCL void FDECL(enlght_line, (const char *,const char *,const char *));
-STATIC_DCL char *FDECL(enlght_combatinc, (const char *,int,int,char *));
+STATIC_DCL void enlght_line(const char *,const char *,const char *);
+STATIC_DCL char *enlght_combatinc(const char *,int,int,char *);
 #ifdef UNIX
-static void NDECL(end_of_input);
+static void end_of_input(void);
 #endif
 
 static const char* readchar_queue="";
 static char last_cmd_char='\0';
 
-STATIC_DCL char *NDECL(parse);
-STATIC_DCL boolean FDECL(help_dir, (CHAR_P,const char *));
+STATIC_DCL char *parse(void);
+STATIC_DCL boolean help_dir(CHAR_P,const char *);
 
 STATIC_PTR int
 doprev_message()
@@ -220,7 +220,7 @@ reset_occupations()
  */
 void
 set_occupation(fn, txt, xtime)
-int NDECL((*fn));
+int (*fn)(void);
 const char *txt;
 int xtime;
 {
@@ -236,7 +236,7 @@ int xtime;
 
 #ifdef REDO
 
-static char NDECL(popch);
+static char popch(void);
 
 /* Provide a means to redo the last command.  The flag `in_doagain' is set
  * to true while redoing the command.  This flag is tested in commands that
@@ -2321,7 +2321,7 @@ register char *cmd;
 	/* handle all other commands */
 	} else {
 	    register const struct func_tab *tlist;
-	    int res, NDECL((*func));
+	    int res, (*func)(void);
 #ifdef QWERTZ
 	    unsigned char cmdchar = *cmd & 0xff;
 #endif
@@ -2897,8 +2897,8 @@ doautofight()
 
 #ifdef PORT_DEBUG
 # ifdef WIN32CON
-extern void NDECL(win32con_debug_keystrokes);
-extern void NDECL(win32con_handler_info);
+extern void win32con_debug_keystrokes(void);
+extern void win32con_handler_info(void);
 # endif
 
 int
@@ -2911,13 +2911,13 @@ wiz_port_debug()
 	int num_menu_selections;
 	struct menu_selection_struct {
 		char *menutext;
-		void NDECL((*fn));
+		void (*fn)(void);
 	} menu_selections[] = {
 #ifdef WIN32CON
 		{"test win32 keystrokes", win32con_debug_keystrokes},
 		{"show keystroke handler information", win32con_handler_info},
 #endif
-		{(char *)0, (void NDECL((*)))0}		/* array terminator */
+		{(char *)0, (void (*))(void)0}		/* array terminator */
 	};
 
 	num_menu_selections = SIZE(menu_selections) - 1;

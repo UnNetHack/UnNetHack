@@ -5,7 +5,7 @@
 #include "hack.h"
 #include "edog.h"
 
-STATIC_DCL int NDECL(pet_type);
+STATIC_DCL int pet_type(void);
 
 void
 initedog(mtmp)

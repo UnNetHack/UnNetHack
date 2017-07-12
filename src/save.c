@@ -23,20 +23,20 @@ int dotcnt, dotrow;	/* also used in restore */
 #endif
 
 #ifdef ZEROCOMP
-STATIC_DCL void FDECL(bputc, (int));
+STATIC_DCL void bputc(int);
 #endif
-STATIC_DCL void FDECL(savelevchn, (int,int));
-STATIC_DCL void FDECL(savedamage, (int,int));
-STATIC_DCL void FDECL(saveobjchn, (int,struct obj *,int));
-STATIC_DCL void FDECL(savemonchn, (int,struct monst *,int));
-STATIC_DCL void FDECL(savetrapchn, (int,struct trap *,int));
-STATIC_DCL void FDECL(savegamestate, (int,int));
-void FDECL(save_mongen_override, (int,struct mon_gen_override *, int));
-void FDECL(save_lvl_sounds, (int,struct lvl_sounds *, int));
+STATIC_DCL void savelevchn(int,int);
+STATIC_DCL void savedamage(int,int);
+STATIC_DCL void saveobjchn(int,struct obj *,int);
+STATIC_DCL void savemonchn(int,struct monst *,int);
+STATIC_DCL void savetrapchn(int,struct trap *,int);
+STATIC_DCL void savegamestate(int,int);
+void save_mongen_override(int,struct mon_gen_override *, int);
+void save_lvl_sounds(int,struct lvl_sounds *, int);
 #ifdef MFLOPPY
-STATIC_DCL void FDECL(savelev0, (int,XCHAR_P,int));
-STATIC_DCL boolean NDECL(swapout_oldest);
-STATIC_DCL void FDECL(copyfile, (char *,char *));
+STATIC_DCL void savelev0(int,XCHAR_P,int);
+STATIC_DCL boolean swapout_oldest(void);
+STATIC_DCL void copyfile(char *,char *);
 #endif /* MFLOPPY */
 #ifdef GCC_WARN
 static long nulls[10];

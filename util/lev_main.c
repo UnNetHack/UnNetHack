@@ -69,48 +69,48 @@ extern unsigned _stklen = STKSIZ;
 #endif
 #define MAX_ERRORS	25
 
-extern int  NDECL (yyparse);
-extern void FDECL (init_yyin, (FILE *));
-extern void FDECL (init_yyout, (FILE *));
+extern int yyparse(void);
+extern void init_yyin(FILE *);
+extern void init_yyout(FILE *);
 
-int  FDECL (main, (int, char **));
-void FDECL (yyerror, (const char *));
-void FDECL (yywarning, (const char *));
-int  NDECL (yywrap);
-int FDECL(get_floor_type, (CHAR_P));
-int FDECL(get_room_type, (char *));
-int FDECL(get_trap_type, (char *));
-int FDECL(get_monster_id, (char *,CHAR_P));
-int FDECL(get_object_id, (char *,CHAR_P));
-boolean FDECL(check_monster_char, (CHAR_P));
-boolean FDECL(check_object_char, (CHAR_P));
-char FDECL(what_map_char, (CHAR_P));
-void FDECL(scan_map, (char *, sp_lev *));
-boolean FDECL(check_subrooms, (sp_lev *));
-boolean FDECL(write_level_file, (char *,sp_lev *));
+int  main(int, char **);
+void yyerror(const char *);
+void yywarning(const char *);
+int yywrap(void);
+int get_floor_type(CHAR_P);
+int get_room_type(char *);
+int get_trap_type(char *);
+int get_monster_id(char *,CHAR_P);
+int get_object_id(char *,CHAR_P);
+boolean check_monster_char(CHAR_P);
+boolean check_object_char(CHAR_P);
+char what_map_char(CHAR_P);
+void scan_map(char *, sp_lev *);
+boolean check_subrooms(sp_lev *);
+boolean write_level_file(char *,sp_lev *);
 
-struct lc_funcdefs *FDECL(funcdef_new,(long,char *));
-void FDECL(funcdef_free_all,(struct lc_funcdefs *));
-struct lc_funcdefs *FDECL(funcdef_defined,(struct lc_funcdefs *,char *, int));
+struct lc_funcdefs *funcdef_new(long,char *);
+void funcdef_free_all(struct lc_funcdefs *);
+struct lc_funcdefs *funcdef_defined(struct lc_funcdefs *,char *, int);
 
-struct lc_vardefs *FDECL(vardef_new,(long,char *));
-void FDECL(vardef_free_all,(struct lc_vardefs *));
-struct lc_vardefs *FDECL(vardef_defined,(struct lc_vardefs *,char *, int));
+struct lc_vardefs *vardef_new(long,char *);
+void vardef_free_all(struct lc_vardefs *);
+struct lc_vardefs *vardef_defined(struct lc_vardefs *,char *, int);
 
-void FDECL(splev_add_from, (sp_lev *, sp_lev *));
+void splev_add_from(sp_lev *, sp_lev *);
 
-extern void NDECL(monst_init);
-extern void NDECL(objects_init);
-extern void NDECL(decl_init);
+extern void monst_init(void);
+extern void objects_init(void);
+extern void decl_init(void);
 
-void FDECL(add_opcode, (sp_lev *, int, genericptr_t));
+void add_opcode(sp_lev *, int, genericptr_t);
 
-static boolean FDECL(write_common_data, (int,sp_lev *));
-static boolean FDECL(write_maze, (int,sp_lev *));
-static void NDECL(init_obj_classes);
+static boolean write_common_data(int,sp_lev *);
+static boolean write_maze(int,sp_lev *);
+static void init_obj_classes(void);
 
-void VDECL(lc_error, (const char *, ...));
-void VDECL(add_opvars, (sp_lev *, const char *, ...));
+void lc_error(const char *, ...);
+void add_opvars(sp_lev *, const char *, ...);
 
 static const struct {
     long functype;
