@@ -1781,6 +1781,9 @@ int croaked;	/* -1: escaped dungeon; 0: quit; 1: died */
 	    numsk++;
 	    resident = mtmp;
 	    taken = inherits(resident, numsk, croaked);
+#ifdef CONVICT
+	    ESHK(mtmp)->pbanned = FALSE; /* Un-ban for bones levels */
+#endif /* CONVICT */
 	}
 	for (mtmp = next_shkp(fmon, FALSE);
 		mtmp; mtmp = next_shkp(mtmp2, FALSE)) {
