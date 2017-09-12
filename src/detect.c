@@ -12,6 +12,9 @@
 
 extern boolean known;	/* from read.c */
 
+STATIC_DCL boolean NDECL(unconstrain_map);
+STATIC_DCL void NDECL(reconstrain_map);
+STATIC_DCL void FDECL(browse_map, (int, const char *));
 STATIC_DCL void FDECL(do_dknown_of, (struct obj *));
 STATIC_DCL boolean FDECL(check_map_spot, (int,int,CHAR_P,unsigned));
 STATIC_DCL boolean FDECL(clear_stale_map, (CHAR_P,unsigned));
@@ -19,6 +22,50 @@ STATIC_DCL void FDECL(sense_trap, (struct trap *,XCHAR_P,XCHAR_P,int));
 STATIC_DCL void FDECL(show_map_spot, (int,int));
 STATIC_PTR void FDECL(findone,(int,int,genericptr_t));
 STATIC_PTR void FDECL(openone,(int,int,genericptr_t));
+STATIC_DCL int FDECL(reveal_terrain_getglyph, (int, int, int,
+                                               unsigned, int, int));
+
+/* bring hero out from underwater or underground or being engulfed;
+   return True iff any change occurred */
+STATIC_OVL boolean
+unconstrain_map()
+{
+    boolean res = u.uinwater || u.uburied || u.uswallow;
+
+    /* bring Underwater, buried, or swallowed hero to normal map */
+    iflags.save_uinwater = u.uinwater, u.uinwater = 0;
+    iflags.save_uburied  = u.uburied,  u.uburied  = 0;
+    iflags.save_uswallow = u.uswallow, u.uswallow = 0;
+
+    return res;
+}
+
+/* put hero back underwater or underground or engulfed */
+STATIC_OVL void
+reconstrain_map()
+{
+    u.uinwater = iflags.save_uinwater, iflags.save_uinwater = 0;
+    u.uburied  = iflags.save_uburied,  iflags.save_uburied  = 0;
+    u.uswallow = iflags.save_uswallow, iflags.save_uswallow = 0;
+}
+
+/* use getpos()'s 'autodescribe' to view whatever is currently shown on map */
+STATIC_DCL void
+browse_map(ter_typ, ter_explain)
+int ter_typ;
+const char *ter_explain;
+{
+    coord dummy_pos; /* don't care whether player actually picks a spot */
+    boolean save_autodescribe;
+
+    dummy_pos.x = u.ux, dummy_pos.y = u.uy; /* starting spot for getpos() */
+    save_autodescribe = iflags.autodescribe;
+    iflags.autodescribe = TRUE;
+    iflags.terrainmode = ter_typ;
+    getpos(&dummy_pos, FALSE, ter_explain);
+    iflags.terrainmode = 0;
+    iflags.autodescribe = save_autodescribe;
+}
 
 /* Recursively search obj for an object in class oclass and return 1st found */
 struct obj *
@@ -1307,5 +1354,148 @@ sokoban_detect()
 	}
 }
 
+STATIC_DCL int
+reveal_terrain_getglyph(x, y, full, swallowed, default_glyph, which_subset)
+int x, y, full;
+unsigned swallowed;
+int default_glyph, which_subset;
+{
+    int glyph, levl_glyph;
+    uchar seenv;
+    boolean keep_traps = (which_subset & TER_TRP) !=0,
+            keep_objs = (which_subset & TER_OBJ) != 0,
+            keep_mons = (which_subset & TER_MON) != 0;
+    struct monst *mtmp;
+    struct trap *t;
+
+    /* for 'full', show the actual terrain for the entire level,
+       otherwise what the hero remembers for seen locations with
+       monsters, objects, and/or traps removed as caller dictates */
+    seenv = (full || level.flags.hero_memory)
+              ? levl[x][y].seenv : cansee(x, y) ? SVALL : 0;
+    if (full) {
+        levl[x][y].seenv = SVALL;
+        glyph = back_to_glyph(x, y);
+        levl[x][y].seenv = seenv;
+    } else {
+        levl_glyph = level.flags.hero_memory
+              ? levl[x][y].glyph
+              : seenv ? back_to_glyph(x, y): default_glyph;
+        /* glyph_at() returns the displayed glyph, which might
+           be a monster.  levl[][].glyph contains the remembered
+           glyph, which will never be a monster (unless it is
+           the invisible monster glyph, which is handled like
+           an object, replacing any object or trap at its spot) */
+        glyph = !swallowed ? glyph_at(x, y) : levl_glyph;
+        if (keep_mons && x == u.ux && y == u.uy && swallowed)
+            glyph = mon_to_glyph(u.ustuck);
+        else if (((glyph_is_monster(glyph)
+                   || glyph_is_warning(glyph)) && !keep_mons)
+                 || glyph_is_swallow(glyph))
+            glyph = levl_glyph;
+        if (((glyph_is_object(glyph) && !keep_objs)
+             || glyph_is_invisible(glyph))
+            && keep_traps && !covers_traps(x, y)) {
+            if ((t = t_at(x, y)) != 0 && t->tseen)
+                glyph = trap_to_glyph(t);
+        }
+        if ((glyph_is_object(glyph) && !keep_objs)
+            || (glyph_is_trap(glyph) && !keep_traps)
+            || glyph_is_invisible(glyph)) {
+            if (!seenv) {
+                glyph = default_glyph;
+            } else if (glyph_to_cmap(levl[x][y].glyph) == levl[x][y].typ) {
+                glyph = back_to_glyph(x, y);
+            } else {
+                /* look for a mimic here posing as furniture;
+                   if we don't find one, we'll have to fake it */
+                if ((mtmp = m_at(x, y)) != 0
+                    && mtmp->m_ap_type == M_AP_FURNITURE) {
+                    glyph = cmap_to_glyph(mtmp->mappearance);
+                } else {
+                    /* we have a topology type but we want a screen
+                       symbol in order to derive a glyph; some screen
+                       symbols need the flags field of levl[][] in
+                       addition to the type (to disambiguate STAIRS to
+                       S_upstair or S_dnstair, for example; current
+                       flags might not be intended for remembered type,
+                       but we've got no other choice) */
+                    schar save_typ = levl[x][y].typ;
+
+                    levl[x][y].typ = levl[x][y].styp;
+                    glyph = back_to_glyph(x, y);
+                    levl[x][y].typ = save_typ;
+                }
+            }
+        }
+    }
+    if (glyph == cmap_to_glyph(S_darkroom))
+        glyph = cmap_to_glyph(S_room); /* FIXME: dirty hack */
+    return glyph;
+}
+
+/* idea from crawl; show known portion of map without any monsters,
+   objects, or traps occluding the view of the underlying terrain */
+void
+reveal_terrain(full, which_subset)
+int full; /* wizard|explore modes allow player to request full map */
+int which_subset; /* when not full, whether to suppress objs and/or traps */
+{
+    if ((Hallucination || Stunned || Confusion) && !full) {
+        You("are too disoriented for this.");
+    } else {
+        int x, y, glyph, default_glyph;
+        char buf[BUFSZ];
+        /* there is a TER_MAP bit too; we always show map regardless of it */
+        boolean keep_traps = (which_subset & TER_TRP) !=0,
+                keep_objs = (which_subset & TER_OBJ) != 0,
+                keep_mons = (which_subset & TER_MON) != 0; /* not used */
+        unsigned swallowed = u.uswallow; /* before unconstrain_map() */
+
+        if (unconstrain_map())
+            docrt();
+        default_glyph = cmap_to_glyph(level.flags.arboreal ? S_tree : S_stone);
+
+        for (x = 1; x < COLNO; x++)
+            for (y = 0; y < ROWNO; y++) {
+                glyph = reveal_terrain_getglyph(x,y, full, swallowed,
+                                                default_glyph, which_subset);
+                show_glyph(x, y, glyph);
+            }
+
+        /* hero's location is not highlighted, but getpos() starts with
+           cursor there, and after moving it anywhere '@' moves it back */
+        flush_screen(1);
+        if (full) {
+            Strcpy(buf, "underlying terrain");
+        } else {
+            Strcpy(buf, "known terrain");
+            if (keep_traps)
+                Sprintf(eos(buf), "%s traps",
+                        (keep_objs || keep_mons) ? "," : " and");
+            if (keep_objs)
+                Sprintf(eos(buf), "%s%s objects",
+                        (keep_traps || keep_mons) ? "," : "",
+                        keep_mons ? "" : " and");
+            if (keep_mons)
+                Sprintf(eos(buf), "%s and monsters",
+                        (keep_traps || keep_objs) ? "," : "");
+        }
+        pline("Showing %s only...", buf);
+
+        /* allow player to move cursor around and get autodescribe feedback
+           based on what is visible now rather than what is on 'real' map */
+        which_subset |= TER_MAP; /* guarantee non-zero */
+        browse_map(which_subset, "anything of interest");
+
+        reconstrain_map();
+        docrt(); /* redraw the screen, restoring regular map */
+        if (Underwater)
+            under_water(2);
+        if (u.uburied)
+            under_ground(2);
+    }
+    return;
+}
 
 /*detect.c*/

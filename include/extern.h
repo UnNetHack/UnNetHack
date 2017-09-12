@@ -243,6 +243,7 @@ E void FDECL(find_trap, (struct trap *));
 E int FDECL(dosearch0, (int));
 E int NDECL(dosearch);
 E void NDECL(sokoban_detect);
+E void FDECL(reveal_terrain, (int, int));
 
 /* ### dig.c ### */
 

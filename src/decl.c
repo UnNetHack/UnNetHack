@@ -215,6 +215,8 @@ NEARDATA struct obj *billobjs = (struct obj *)0;
 
 /* used to zero all elements of a struct obj */
 NEARDATA struct obj zeroobj = DUMMY;
+/* used to zero out union any; initializer deliberately omitted */
+NEARDATA anything zeroany;
 
 /* originally from dog.c */
 NEARDATA char dogname[PL_PSIZ] = DUMMY;

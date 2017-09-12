@@ -221,10 +221,18 @@ struct instance_flags {
 	int      purge_monsters;	/* # of dead monsters still on fmon list */
 	int *opt_booldup;	/* for duplication of boolean opts in config file */
 	int *opt_compdup;	/* for duplication of compound opts in config file */
+	/* TODO: Backport autodescribe */
+	boolean autodescribe;     /* autodescribe mode in getpos() */
 	uchar	bouldersym;	/* symbol for boulder display */
 	boolean	autoexplore;	/* in autoexplore */
 	boolean travel1;	/* first travel step */
 	coord	travelcc;	/* coordinates for travel_cache */
+	int 	terrainmode; /* for getpos()'s autodescribe when #terrain is active */
+#define TER_MAP    0x01
+#define TER_TRP    0x02
+#define TER_OBJ    0x04
+#define TER_MON    0x08
+#define TER_DETECT 0x10    /* detect_foo magic rather than #terrain */
 #ifdef QWERTZ
 	boolean  qwertz_layout; /* swap y/z for this key layout */
 #endif
@@ -364,6 +372,9 @@ struct instance_flags {
 	boolean  show_buc;	/* always show BUC status */
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
 	boolean	 obsolete;	/* obsolete options can point at this, it isn't used */
+    Bitfield(save_uswallow, 1);
+    Bitfield(save_uinwater, 1);
+    Bitfield(save_uburied, 1);
 	boolean  rest_on_space; /* space means rest */
 	/* Items which belong in flags, but are here to allow save compatibility */
 	boolean  lootabc;	/* use "a/b/c" rather than "o/i/b" when looting */

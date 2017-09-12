@@ -516,6 +516,7 @@ struct levelflags {
 	Bitfield(hero_memory,1);	/* hero has memory */
 	Bitfield(shortsighted,1);	/* monsters are shortsighted */
 	Bitfield(graveyard,1);		/* has_morgue, but remains set */
+	Bitfield(sokoban_rules, 1); /* fill pits and holes w/ boulders */
 	Bitfield(is_maze_lev,1);
 	Bitfield(stormy,1);		/* thunderous clouds */
 
