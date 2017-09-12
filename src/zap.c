@@ -1614,10 +1614,20 @@ struct obj *obj, *otmp;
 		break;
 	case WAN_STRIKING:
 	case SPE_FORCE_BOLT:
-		if (obj->otyp == BOULDER)
+		if (obj->otyp == BOULDER) {
+			if (cansee(obj->ox, obj->oy))
+				pline_The("boulder falls apart.");
 			fracture_rock(obj);
-		else if (obj->otyp == STATUE)
-			(void) break_statue(obj);
+		} else if (obj->otyp == STATUE) {
+			if (break_statue(obj)) {
+				if (cansee(obj->ox, obj->oy)) {
+					if (Hallucination)
+						pline_The("%s shatters.", rndmonnam());
+					else
+						pline_The("statue shatters.");
+				}
+			}
+		}
 		else {
 			if (!flags.mon_moving)
 			    (void)hero_breaks(obj, obj->ox, obj->oy, FALSE);

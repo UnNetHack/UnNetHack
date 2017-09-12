@@ -510,7 +510,9 @@ int *fail_reason;
 	    if (historic) {
 		    You_feel("guilty that the historic statue is now gone.");
 		    adjalign(-1);
-	    }
+        }
+    } else if (Hallucination) {    /* They don't know it's a statue */
+	    pline_The("%s suddenly seems more animated.", rndmonnam());
 	} else if (cause == ANIMATE_SHATTER)
 	    pline("Instead of shattering, the statue suddenly %s!",
 		canspotmon(mon) ? "comes to life" : "disappears");

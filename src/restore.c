@@ -57,6 +57,7 @@ extern int amii_numcolors;
 #endif
 
 #include "quest.h"
+#include "display.h"
 
 boolean restoring = FALSE;
 static NEARDATA struct fruit *oldfruit;
@@ -93,6 +94,15 @@ find_lev_obj()
 		fobjtmp = otmp->nobj;
 		place_object(otmp, otmp->ox, otmp->oy);
 	}
+
+	/* statue patch: imagine we're loading a vanilla nh file */
+	for(x=0; x<COLNO; x++)
+          for(y=0; y<ROWNO; y++)
+            if ( level.objects[x][y] != 0 &&
+                 level.objects[x][y]->otyp == STATUE &&
+		 glyph_is_statue_vanilla(levl[x][y].glyph))  {
+              levl[x][y].glyph = obj_to_glyph(level.objects[x][y]);
+            }
 }
 
 /* Things that were marked "in_use" when the game was saved (ex. via the

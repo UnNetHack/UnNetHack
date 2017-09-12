@@ -109,7 +109,16 @@ unsigned *ospecial;
      *  Warning:  For speed, this makes an assumption on the order of
      *		  offsets.  The order is set in display.h.
      */
-    if ((offset = (glyph - GLYPH_WARNING_OFF)) >= 0) {	/* a warning flash */
+    if ((offset = (glyph - GLYPH_STATUE_OFF)) >= 0) {   /* a statue */
+	ch = get_monsym(offset);
+# ifdef ROGUE_COLOR
+	if (has_rogue_color)
+		color = CLR_RED;
+	else
+# endif
+	obj_color(STATUE);
+	special |= MG_STATUE;
+    } else if ((offset = (glyph - GLYPH_WARNING_OFF)) >= 0) {	/* a warning flash */
     	ch = warnsyms[offset];
 # ifdef ROGUE_COLOR
 	if (HAS_ROGUE_IBM_GRAPHICS)

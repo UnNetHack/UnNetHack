@@ -545,6 +545,8 @@ do_look(quick)
 		}
 	    } else if (glyph_is_trap(glyph)) {
 		sym = showsyms[trap_to_defsym(glyph_to_trap(glyph))];
+	    } else if (glyph_is_statue(glyph)) {
+	        sym = monsyms[(int)mons[glyph_to_mon(glyph)].mlet];
 	    } else if (glyph_is_object(glyph)) {
 		sym = oc_syms[(int)objects[glyph_to_obj(glyph)].oc_class];
 		if (sym == '`' && iflags.bouldersym && (int)glyph_to_obj(glyph) == BOULDER)
