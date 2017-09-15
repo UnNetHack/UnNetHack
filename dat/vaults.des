@@ -197,7 +197,7 @@ ROOM:"rndvault", random, random, random, random {
   $mon = MONSTER: { '@', "apprentice", "warrior", "ninja", "thug", "hunter", "acolyte", "abbot",
              "page", "attendant", "neanderthal", "chieftain", "student", "wizard", "valkyrie",
 	     "tourist", "samurai", "rogue", "ranger", "priestess", "priest", "monk",
-             "knight", "healer", "cavewoman", "caveman", "barbarian", "archeologist" }
+             "knight", "healer", "cavewoman", "caveman", "barbarian", "archeologist", "convict"}
   SHUFFLE: $mon
   LOOP [5d5] {
     [10%]: SHUFFLE: $mon
