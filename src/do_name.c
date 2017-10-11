@@ -1276,6 +1276,7 @@ static const char * const bogusmons[] = {
 	"skag", "thresher", "LoaderBot", "varkid"  /* Borderlands */
 	"Yarakeen", "Veil Warden",                       /*  War of Omens  */
 	"Trogdor the Burninator",                        /* Homestar Runner */
+	"Guy made of Bees", "Toot Oriole",               /* Kingdom of Loathing */
 
 	/* bogus UnNetHack monsters */
 	"weeping angle",
