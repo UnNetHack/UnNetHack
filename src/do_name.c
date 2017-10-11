@@ -1273,7 +1273,7 @@ static const char * const bogusmons[] = {
 	"courtesan angel", "fractal bee",
 	"Weasel King",
 	"GLaDOS", "dangerous mute lunatic", /* Portal */
-	"skag", "thresher", "LoaderBot", "varkid"  /* Borderlands */
+	"skag", "thresher", "LoaderBot", "varkid",  /* Borderlands */
 	"Yarakeen", "Veil Warden",                       /*  War of Omens  */
 	"Trogdor the Burninator",                        /* Homestar Runner */
 	"Guy made of Bees", "Toot Oriole",               /* Kingdom of Loathing */
