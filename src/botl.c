@@ -15,8 +15,8 @@ const char * const enc_stat[] = {
 	"Overloaded"
 };
 
-STATIC_DCL void NDECL(bot1);
-STATIC_DCL void NDECL(bot2);
+STATIC_DCL void bot1(void);
+STATIC_DCL void bot2(void);
 
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 

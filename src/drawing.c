@@ -317,11 +317,11 @@ struct symdef defsyms[MAXPCHARS] = {
 #ifdef ASCIIGRAPH
 
 #ifdef PC9800
-void NDECL((*ibmgraphics_mode_callback)) = 0;	/* set in tty_start_screen() */
+void (*ibmgraphics_mode_callback)(void) = 0;	/* set in tty_start_screen((void) */
 #endif /* PC9800 */
 
 #ifdef CURSES_GRAPHICS
-void NDECL((*cursesgraphics_mode_callback)) = 0;
+void (*cursesgraphics_mode_callback)(void) = 0;
 #endif
 
 static glyph_t ibm_graphics[MAXPCHARS] = {
@@ -427,7 +427,7 @@ static glyph_t ibm_graphics[MAXPCHARS] = {
 #endif  /* ASCIIGRAPH */
 
 #ifdef TERMLIB
-void NDECL((*decgraphics_mode_callback)) = 0;  /* set in tty_start_screen() */
+void (*decgraphics_mode_callback)(void) = 0;  /* set in tty_start_screen((void) */
 
 static glyph_t dec_graphics[MAXPCHARS] = {
 /* 0*/	g_FILLER(S_stone),
@@ -740,7 +740,7 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
 #endif
 
 #ifdef PC9800
-void NDECL((*ascgraphics_mode_callback)) = 0;	/* set in tty_start_screen() */
+void (*ascgraphics_mode_callback)(void) = 0;	/* set in tty_start_screen((void) */
 #endif
 
 /*

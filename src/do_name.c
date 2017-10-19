@@ -4,7 +4,7 @@
 
 #include "hack.h"
 
-static void FDECL(getpos_help, (BOOLEAN_P,const char *));
+static void getpos_help(BOOLEAN_P,const char *);
 static void call_object(int, char *);
 static void call_input(int, char *);
 

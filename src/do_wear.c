@@ -35,24 +35,24 @@ static NEARDATA const long takeoff_order[] = { WORN_BLINDF, W_WEP,
 #endif
 	WORN_BOOTS, W_SWAPWEP, W_QUIVER, 0L };
 
-STATIC_DCL void FDECL(on_msg, (struct obj *));
-STATIC_PTR int NDECL(Armor_on);
-STATIC_PTR int NDECL(Boots_on);
-STATIC_DCL int NDECL(Cloak_on);
-STATIC_PTR int NDECL(Helmet_on);
-STATIC_PTR int NDECL(Gloves_on);
-STATIC_PTR int NDECL(Shield_on);
+STATIC_DCL void on_msg(struct obj *);
+STATIC_PTR int Armor_on(void);
+STATIC_PTR int Boots_on(void);
+STATIC_DCL int Cloak_on(void);
+STATIC_PTR int Helmet_on(void);
+STATIC_PTR int Gloves_on(void);
+STATIC_PTR int Shield_on(void);
 #ifdef TOURIST
-STATIC_PTR int NDECL(Shirt_on);
+STATIC_PTR int Shirt_on(void);
 #endif
-STATIC_DCL void NDECL(Amulet_on);
-STATIC_DCL void FDECL(Ring_off_or_gone, (struct obj *, BOOLEAN_P));
-STATIC_PTR int FDECL(select_off, (struct obj *));
-STATIC_DCL struct obj *NDECL(do_takeoff);
-STATIC_PTR int NDECL(take_off);
-STATIC_DCL int FDECL(menu_remarm, (int));
-STATIC_DCL void FDECL(already_wearing, (const char*));
-STATIC_DCL void FDECL(already_wearing2, (const char*, const char*));
+STATIC_DCL void Amulet_on(void);
+STATIC_DCL void Ring_off_or_gone(struct obj *, BOOLEAN_P);
+STATIC_PTR int select_off(struct obj *);
+STATIC_DCL struct obj *do_takeoff(void);
+STATIC_PTR int take_off(void);
+STATIC_DCL int menu_remarm(int);
+STATIC_DCL void already_wearing(const char*);
+STATIC_DCL void already_wearing2(const char*, const char*);
 
 void
 off_msg(otmp)

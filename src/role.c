@@ -574,9 +574,9 @@ const struct Conduct conducts[] = {
 	"pretended to be a master thief"}
 };
 
-STATIC_DCL char * FDECL(promptsep, (char *, int));
-STATIC_DCL int FDECL(role_gendercount, (int));
-STATIC_DCL int FDECL(race_alignmentcount, (int));
+STATIC_DCL char * promptsep(char *, int);
+STATIC_DCL int role_gendercount(int);
+STATIC_DCL int race_alignmentcount(int);
 
 /* used by str2XXX() */
 static char NEARDATA randomstr[] = "random";

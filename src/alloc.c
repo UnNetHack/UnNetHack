@@ -11,21 +11,21 @@
 #include "config.h"
 
 #if defined(MONITOR_HEAP) || defined(WIZARD)
-char *FDECL(fmt_ptr, (const genericptr,char *));
+char *fmt_ptr(const genericptr,char *);
 #endif
 
 #ifdef MONITOR_HEAP
 #undef alloc
 #undef free
-extern void FDECL(free,(genericptr_t));
-static void NDECL(heapmon_init);
+extern void free(genericptr_t);
+static void heapmon_init(void);
 
 static FILE *heaplog = 0;
 static boolean tried_heaplog = FALSE;
 #endif
 
-long *FDECL(alloc,(unsigned int));
-extern void VDECL(panic, (const char *,...)) PRINTF_F(1,2);
+long *alloc(unsigned int);
+extern void panic(const char *,...) PRINTF_F(1,2);
 
 
 long *

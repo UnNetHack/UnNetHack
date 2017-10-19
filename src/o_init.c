@@ -5,16 +5,16 @@
 #include "hack.h"
 #include "lev.h"	/* save & restore info */
 
-STATIC_DCL void FDECL(setgemprobs, (d_level*));
-STATIC_DCL void FDECL(shuffle,(int,int,BOOLEAN_P));
-STATIC_DCL void NDECL(shuffle_all);
-STATIC_DCL boolean FDECL(interesting_to_discover,(int));
-STATIC_DCL void FDECL(swap_armor,(int, int, int));
+STATIC_DCL void setgemprobs(d_level*);
+STATIC_DCL void shuffle(int,int,BOOLEAN_P);
+STATIC_DCL void shuffle_all(void);
+STATIC_DCL boolean interesting_to_discover(int);
+STATIC_DCL void swap_armor(int, int, int);
 
 static NEARDATA short disco[NUM_OBJECTS] = DUMMY;
 
 #ifdef USE_TILES
-STATIC_DCL void NDECL(shuffle_tiles);
+STATIC_DCL void shuffle_tiles(void);
 extern short glyph2tile[];	/* from tile.c */
 
 /* Shuffle tile assignments to match descriptions, so a red potion isn't

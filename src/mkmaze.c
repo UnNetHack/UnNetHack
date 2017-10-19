@@ -12,18 +12,18 @@ extern lev_region *lregions;
 extern int num_lregions;
 extern char SpLev_Map[COLNO][ROWNO];
 
-STATIC_DCL boolean FDECL(iswall,(int,int));
-STATIC_DCL boolean FDECL(iswall_or_stone,(int,int));
-STATIC_DCL boolean FDECL(is_solid,(int,int));
-STATIC_DCL int FDECL(extend_spine, (int [3][3], int, int, int));
-STATIC_DCL boolean FDECL(okay,(int,int,int));
-STATIC_DCL void FDECL(maze0xy,(coord *));
-STATIC_DCL boolean FDECL(put_lregion_here,(XCHAR_P,XCHAR_P,XCHAR_P,
-   XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,BOOLEAN_P,d_level *, XCHAR_P));
-STATIC_DCL void NDECL(fixup_special);
-STATIC_DCL void FDECL(move, (int *,int *,int));
-STATIC_DCL void NDECL(setup_waterlevel);
-STATIC_DCL void NDECL(unsetup_waterlevel);
+STATIC_DCL boolean iswall(int,int);
+STATIC_DCL boolean iswall_or_stone(int,int);
+STATIC_DCL boolean is_solid(int,int);
+STATIC_DCL int extend_spine(int [3][3], int, int, int);
+STATIC_DCL boolean okay(int,int,int);
+STATIC_DCL void maze0xy(coord *);
+STATIC_DCL boolean put_lregion_here(XCHAR_P,XCHAR_P,XCHAR_P,
+   XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,BOOLEAN_P,d_level *, XCHAR_P);
+STATIC_DCL void fixup_special(void);
+STATIC_DCL void move(int *,int *,int);
+STATIC_DCL void setup_waterlevel(void);
+STATIC_DCL void unsetup_waterlevel(void);
 
 
 STATIC_OVL boolean
@@ -1073,9 +1073,9 @@ static int xmin, ymin, xmax, ymax;	/* level boundaries */
 #define bxmax (xmax - 1)
 #define bymax (ymax - 1)
 
-STATIC_DCL void NDECL(set_wportal);
-STATIC_DCL void FDECL(mk_bubble, (int,int,int));
-STATIC_DCL void FDECL(mv_bubble, (struct bubble *,int,int,BOOLEAN_P));
+STATIC_DCL void set_wportal(void);
+STATIC_DCL void mk_bubble(int,int,int);
+STATIC_DCL void mv_bubble(struct bubble *,int,int,BOOLEAN_P);
 
 void
 movebubbles()

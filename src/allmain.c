@@ -13,9 +13,9 @@
 #endif
 
 #ifdef POSITIONBAR
-STATIC_DCL void NDECL(do_positionbar);
+STATIC_DCL void do_positionbar(void);
 #endif
-STATIC_DCL void FDECL(interrupt_multi, (const char *,int,int));
+STATIC_DCL void interrupt_multi(const char *,int,int);
 
 static int prev_hp_notify;
 

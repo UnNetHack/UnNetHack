@@ -45,20 +45,20 @@
 #define GETKEYFLAGS 0x02    /* Get Keyboard Flags */
 /*#define KEY_DEBUG	 */   /* print values of unexpected key codes - devel*/
 
-void FDECL(get_cursor,(int *, int *));
+void get_cursor(int *, int *));
 
 #ifdef OVL0
 
 /* direct bios calls are used only when iflags.BIOS is set */
 
-static char NDECL(DOSgetch);
-static char NDECL(BIOSgetch);
+static char DOSgetch(void);
+static char BIOSgetch(void);
 #ifndef __GO32__
-static char * NDECL(getdta);
+static char * getdta(void);
 #endif
-static unsigned int FDECL(dos_ioctl, (int,int,unsigned));
+static unsigned int dos_ioctl(int,int,unsigned);
 #ifdef USE_TILES
-extern boolean FDECL(pckeys,(unsigned char, unsigned char));	/* pckeys.c */
+extern boolean pckeys(unsigned char, unsigned char));	/* pckeys.c */
 #endif
 
 int

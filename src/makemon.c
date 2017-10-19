@@ -19,14 +19,14 @@ STATIC_VAR NEARDATA struct monst zeromonst;
 		(mptr->mlet == S_HUMAN && Role_if(role_pm) && \
 		  (mptr->msound == MS_LEADER || mptr->msound == MS_NEMESIS))
 
-STATIC_DCL boolean FDECL(uncommon, (int));
-STATIC_DCL int FDECL(align_shift, (struct permonst *));
-STATIC_DCL boolean FDECL(wrong_elem_type, (struct permonst *));
-STATIC_DCL void FDECL(m_initgrp,(struct monst *,int,int,int));
-STATIC_DCL void FDECL(m_initthrow,(struct monst *,int,int));
-STATIC_DCL void FDECL(m_initweap,(struct monst *));
-STATIC_DCL void FDECL(m_inityour,(struct monst *,struct obj *));
-STATIC_DCL void FDECL(m_initinv,(struct monst *));
+STATIC_DCL boolean uncommon(int);
+STATIC_DCL int align_shift(struct permonst *);
+STATIC_DCL boolean wrong_elem_type(struct permonst *);
+STATIC_DCL void m_initgrp(struct monst *,int,int,int);
+STATIC_DCL void m_initthrow(struct monst *,int,int);
+STATIC_DCL void m_initweap(struct monst *);
+STATIC_DCL void m_inityour(struct monst *,struct obj *);
+STATIC_DCL void m_initinv(struct monst *);
 
 extern const int monstr[];
 

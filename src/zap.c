@@ -19,20 +19,20 @@ extern boolean notonhead;	/* for long worms */
 /* kludge to use mondied instead of killed */
 extern boolean m_using;
 
-STATIC_DCL void FDECL(costly_cancel, (struct obj *));
-STATIC_DCL void FDECL(polyuse, (struct obj*, int, int));
-STATIC_DCL void FDECL(create_polymon, (struct obj *, int));
-STATIC_DCL boolean FDECL(zap_updown, (struct obj *));
-STATIC_DCL int FDECL(zhitm, (struct monst *,int,int,struct obj **));
-STATIC_DCL void FDECL(zhitu, (int,int,const char *,XCHAR_P,XCHAR_P));
-STATIC_DCL void FDECL(revive_egg, (struct obj *));
+STATIC_DCL void costly_cancel(struct obj *);
+STATIC_DCL void polyuse(struct obj*, int, int);
+STATIC_DCL void create_polymon(struct obj *, int);
+STATIC_DCL boolean zap_updown(struct obj *);
+STATIC_DCL int zhitm(struct monst *,int,int,struct obj **);
+STATIC_DCL void zhitu(int,int,const char *,XCHAR_P,XCHAR_P);
+STATIC_DCL void revive_egg(struct obj *);
 #ifdef STEED
-STATIC_DCL boolean FDECL(zap_steed, (struct obj *));
+STATIC_DCL boolean zap_steed(struct obj *);
 #endif
 
-STATIC_DCL int FDECL(zap_hit, (int,int));
-STATIC_DCL void FDECL(backfire, (struct obj *));
-STATIC_DCL int FDECL(spell_hit_bonus, (int));
+STATIC_DCL int zap_hit(int,int);
+STATIC_DCL void backfire(struct obj *);
+STATIC_DCL int spell_hit_bonus(int);
 
 #define ZT_MAGIC_MISSILE	(AD_MAGM-1)
 #define ZT_FIRE			(AD_FIRE-1)
@@ -1784,7 +1784,7 @@ smell:
 int
 bhitpile(obj,fhito,tx,ty)
     struct obj *obj;
-    int FDECL((*fhito), (OBJ_P,OBJ_P));
+    int (*fhito)(OBJ_P,OBJ_P);
     int tx, ty;
 {
     int hitanything = 0;
@@ -2810,8 +2810,8 @@ struct monst *
 bhit(ddx,ddy,range,weapon,fhitm,fhito,obj,obj_destroyed)
 register int ddx,ddy,range;		/**< direction and range */
 int weapon;				/**< see values in hack.h */
-int FDECL((*fhitm), (MONST_P, OBJ_P)),	/**< fns called when mon/obj hit */
-    FDECL((*fhito), (OBJ_P, OBJ_P));
+int (*fhitm)(MONST_P, OBJ_P),	/**< fns called when mon/obj hit */
+    (*fhito)(OBJ_P, OBJ_P);
 struct obj *obj;			/**< object tossed/used */
 boolean *obj_destroyed;			/**< has object been deallocated? Pointer to boolean, may be NULL */
 {
