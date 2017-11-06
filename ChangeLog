@@ -13,7 +13,7 @@
 	* Config changes:
 	  - Switched from pmatch to regexp engine for AUTOPICKUP_EXCEPTIONS
 
-	* Port NetHack 3.6 improvements, non exhaustive list:
+	* Ported NetHack 3.6 improvements, non exhaustive list:
 	  - Automatic fuzzer for debugging
 	  - Statues as monster symbols
 	  - Improved internal monster extra structures
@@ -28,6 +28,9 @@
 	  - Regexp engine for string matching
 	  - Support changing key bindings with BIND
 	  - Menucolors management in options menu
+
+	* item changes:
+	  - Candle light radius is square root, not logarithmic anymore (from NetHack 3.7)
 
 	* artifact changes:
 	  - Removed artifact wish failure due to the number of existing artifacts
