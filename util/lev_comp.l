@@ -80,6 +80,8 @@ void FDECL(savetoken, (char *));
 void NDECL(newline);
 void FDECL(advancepos, (char *));
 
+extern char FDECL(core_func_retval, (int idx));
+
 /*
  * This doesn't always get put in lev_comp.h
  * (esp. when using older versions of bison).
