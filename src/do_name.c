@@ -1277,7 +1277,7 @@ static const char * const bogusmons[] = {
 	"Yarakeen", "Veil Warden",                       /*  War of Omens  */
 	"Trogdor the Burninator",                        /* Homestar Runner */
 	"Guy made of Bees", "Toot Oriole",               /* Kingdom of Loathing */
-	"Magnus the Warrior", "Taako the Wizard", "Merle the Cleric", /* The Adventure Zone */
+	"Magnus Burnsides the Fighter", "Taako the Wizard", "Merle Highchurch the Cleric", /* The Adventure Zone */
 
 	/* bogus UnNetHack monsters */
 	"weeping angle",
