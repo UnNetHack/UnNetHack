@@ -319,24 +319,53 @@ register struct obj *obj;
             obj->bknown = 1; /* ok to bypass set_bknown() */
         }
     }
+
     /* Also BUC one level deep inside containers */
-    if (Has_contents(obj)) {
-        int bcucount = 0;
-        struct obj *otmp;
+    if (Has_contents(obj) && !obj->olocked) {
+        int blessed = 0;
+        int cursed = 0;
+        struct obj * otmp;
+
+        obj->cknown = 1;
+
         for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
-            if ((otmp->blessed || otmp->cursed) && otmp->oclass != COIN_CLASS) {
-                bcucount++;
-                if (!Hallucination) otmp->bknown = 1;
-            } else {
+            if (otmp->blessed) {
+                blessed++;
+            }
+            if (otmp->cursed) {
+                cursed++;
+            }
+            if (!Hallucination) {
                 otmp->bknown = 1;
             }
         }
-        if (bcucount == 1) {
-            pline("Looking inside %s, you see a colored flash.",
-                  the(xname(obj)));
-        } else if (bcucount > 1) {
-            pline("Looking inside %s, you see colored flashes.",
-                  the(xname(obj)));
+        /* even when hallucinating, if you get no flashes at all, you know
+         * everything's uncursed, so save the player the trouble of manually
+         * naming them all */
+        if (Hallucination && blessed + cursed == 0) {
+            for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
+                otmp->bknown = 1;
+            }
+        }
+
+        if (blessed + cursed > 0) {
+            const char* color;
+            if (Hallucination && blessed + cursed > 1) {
+                color = "pretty multichromatic";
+            } else if (Hallucination) {
+                color = hcolor(NULL);
+            } else if (blessed == 0) {
+                color = hcolor(NH_BLACK);
+            } else if (cursed == 0) {
+                color = hcolor(NH_AMBER);
+            } else {
+                color = "colored";
+            }
+
+            pline("Looking inside %s, you see %s flash%s.",
+                  the(xname(obj)),
+                  (blessed + cursed == 1 ? an(color) : color),
+                  (blessed + cursed == 1 ? "" : "es"));
         }
     }
 }

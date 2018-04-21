@@ -91,6 +91,7 @@
 	  - New option "statuslines" to force 2 or 3 status lines
 	  - Pressing > or < autotravels to the stairs if not already on
 	    the right kind of stairs
+	  - Improved BUC identification in containers dropped on altars (from xNetHack)
 
 	* dungeon layout:
 	  - Backyard of watery castle get trap doors to ensure player can
