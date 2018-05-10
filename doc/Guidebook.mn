@@ -542,6 +542,9 @@ of the game, so your version might not have it.)
 E- - write in the dust with your fingers.  
 .ei
 .ed
+.lp ^E
+Write ``Elbereth'' onto the ground.
+Automatically uses a wield athame.
 .lp f
 Fire one of the objects placed in your quiver.  You may select
 ammunition with a previous `Q' command, or let the computer pick

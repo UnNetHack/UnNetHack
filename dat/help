@@ -106,6 +106,7 @@ Commands:
         e       Eat food.
         E       Engrave a message on the floor.
                 E- - write in the dust with your fingers.
+        ^E      Write "Elbereth" onto the ground.
         f       Fire ammunition from quiver.
         F       Followed by direction, fight a monster (even if you don't
                 sense it).
