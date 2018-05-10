@@ -84,6 +84,8 @@ STATIC_DCL long FDECL(encode_xlogflags, (void));
 STATIC_DCL void FDECL(nsb_mung_line,(char*));
 STATIC_DCL void FDECL(nsb_unmung_line,(char*));
 #endif
+static char* FDECL(killed_uniques, (void));
+static int FDECL(killed_with_mbirth_limit, (int));
 
 /* must fit with end.c; used in rip.c */
 NEARDATA const char * const killed_by_prefix[] = {
@@ -383,6 +385,10 @@ struct toptenentry *tt;
 #ifdef RECORD_ACHIEVE
   (void)fprintf(rfile, SEP "achieve=0x%lx", encodeachieve());
 #endif
+  (void)fprintf(rfile, SEP "killed_uniques=%s", killed_uniques());
+  (void)fprintf(rfile, SEP "killed_nazgul=%d", mvitals[PM_NAZGUL].died);
+  (void)fprintf(rfile, SEP "killed_erinyes=%d", mvitals[PM_ERINYS].died);
+  (void)fprintf(rfile, SEP "killed_weeping_archangels=%d", mvitals[PM_WEEPING_ARCHANGEL].died);
 
   (void)fprintf(rfile, SEP "event=%ld", encode_uevent());
   (void)fprintf(rfile, SEP "carried=%ld", encode_carried());
@@ -1115,6 +1121,26 @@ encodeachieve(void)
   return r;
 }
 #endif
+
+static char _killed_uniques[640]; /* 640 characters ought to be enough for anybody */
+static char*
+killed_uniques(void)
+{
+	_killed_uniques[0] = '\0';
+
+	for (int i = LOW_PM; i < NUMMONS; i++) {
+		if ((mons[i].geno & G_UNIQ) && mvitals[i].died) {
+			if (i == PM_LONG_WORM_TAIL) continue;
+			if (i == PM_HIGH_PRIEST) continue;
+			Sprintf(eos(_killed_uniques), "%s,", mons[i].mname);
+		}
+	}
+
+	int len;
+	if ((len=strlen(_killed_uniques))) { _killed_uniques[len-1] = '\0'; }
+
+	return _killed_uniques;
+}
 
 /*
  * print selected parts of score list.
