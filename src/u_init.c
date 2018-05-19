@@ -223,35 +223,40 @@ static struct trobj Money[] = {
 
 /* race-based substitutions for initial inventory;
    the weaker cloak for elven rangers is intentional--they shoot better */
-static struct inv_sub { short race_pm, item_otyp, subs_otyp; } inv_subs[] = {
-    { PM_ELF,   DAGGER,         ELVEN_DAGGER          },
-    { PM_ELF,   SPEAR,          ELVEN_SPEAR       },
-    { PM_ELF,   SHORT_SWORD,        ELVEN_SHORT_SWORD     },
-    { PM_ELF,   BOW,            ELVEN_BOW         },
-    { PM_ELF,   ARROW,          ELVEN_ARROW       },
-    { PM_ELF,   HELMET,         ELVEN_LEATHER_HELM    },
-    /* { PM_ELF,    SMALL_SHIELD,       ELVEN_SHIELD          }, */
-    { PM_ELF,   CLOAK_OF_DISPLACEMENT,  ELVEN_CLOAK       },
-    { PM_ELF,   CRAM_RATION,        LEMBAS_WAFER          },
-    { PM_ORC,   DAGGER,         ORCISH_DAGGER         },
-    { PM_ORC,   SPEAR,          ORCISH_SPEAR          },
-    { PM_ORC,   SHORT_SWORD,        ORCISH_SHORT_SWORD    },
-    { PM_ORC,   BOW,            ORCISH_BOW        },
-    { PM_ORC,   ARROW,          ORCISH_ARROW          },
-    { PM_ORC,   HELMET,         ORCISH_HELM       },
-    { PM_ORC,   SMALL_SHIELD,       ORCISH_SHIELD         },
-    { PM_ORC,   RING_MAIL,      ORCISH_RING_MAIL      },
-    { PM_ORC,   CHAIN_MAIL,     ORCISH_CHAIN_MAIL     },
-    { PM_DWARF, SPEAR,          DWARVISH_SPEAR        },
-    { PM_DWARF, SHORT_SWORD,        DWARVISH_SHORT_SWORD  },
-    { PM_DWARF, HELMET,         DWARVISH_IRON_HELM    },
-    /* { PM_DWARF, SMALL_SHIELD,        DWARVISH_ROUNDSHIELD  }, */
-    /* { PM_DWARF, PICK_AXE,        DWARVISH_MATTOCK      }, */
-    { PM_GNOME, BOW,            CROSSBOW          },
-    { PM_GNOME, ARROW,          CROSSBOW_BOLT         },
-    { PM_VAMPIRE,   POT_FRUIT_JUICE,    POT_BLOOD         },
-    { PM_VAMPIRE,   FOOD_RATION,        POT_VAMPIRE_BLOOD     },
-    { NON_PM,   STRANGE_OBJECT,     STRANGE_OBJECT        }
+static struct inv_sub {
+    short race_pm, item_otyp, subs_otyp;
+} inv_subs[] = {
+    { PM_ELF, DAGGER, ELVEN_DAGGER },
+    { PM_ELF, SPEAR, ELVEN_SPEAR },
+    { PM_ELF, SHORT_SWORD, ELVEN_SHORT_SWORD },
+    { PM_ELF, BOW, ELVEN_BOW },
+    { PM_ELF, ARROW, ELVEN_ARROW },
+    { PM_ELF, HELMET, ELVEN_LEATHER_HELM },
+    /* { PM_ELF, SMALL_SHIELD, ELVEN_SHIELD }, */
+    { PM_ELF, CLOAK_OF_DISPLACEMENT, ELVEN_CLOAK },
+    { PM_ELF, CRAM_RATION, LEMBAS_WAFER },
+    { PM_ORC, DAGGER, ORCISH_DAGGER },
+    { PM_ORC, SPEAR, ORCISH_SPEAR },
+    { PM_ORC, SHORT_SWORD, ORCISH_SHORT_SWORD },
+    { PM_ORC, BOW, ORCISH_BOW },
+    { PM_ORC, ARROW, ORCISH_ARROW },
+    { PM_ORC, HELMET, ORCISH_HELM },
+    { PM_ORC, SMALL_SHIELD, ORCISH_SHIELD },
+    { PM_ORC, RING_MAIL, ORCISH_RING_MAIL },
+    { PM_ORC, CHAIN_MAIL, ORCISH_CHAIN_MAIL },
+    { PM_ORC, CRAM_RATION, TRIPE_RATION },
+    { PM_ORC, LEMBAS_WAFER, TRIPE_RATION },
+    { PM_DWARF, SPEAR, DWARVISH_SPEAR },
+    { PM_DWARF, SHORT_SWORD, DWARVISH_SHORT_SWORD },
+    { PM_DWARF, HELMET, DWARVISH_IRON_HELM },
+    /* { PM_DWARF, SMALL_SHIELD, DWARVISH_ROUNDSHIELD }, */
+    /* { PM_DWARF, PICK_AXE, DWARVISH_MATTOCK }, */
+    { PM_DWARF, LEMBAS_WAFER, CRAM_RATION },
+    { PM_GNOME, BOW, CROSSBOW },
+    { PM_GNOME, ARROW, CROSSBOW_BOLT },
+    { PM_VAMPIRE, POT_FRUIT_JUICE, POT_BLOOD },
+    { PM_VAMPIRE, FOOD_RATION, POT_VAMPIRE_BLOOD },
+    { NON_PM, STRANGE_OBJECT, STRANGE_OBJECT }
 };
 
 static const struct def_skill Skill_A[] = {
@@ -996,19 +1001,10 @@ register struct trobj *trop;
     int otyp, i;
 
     while (trop->trclass) {
-        if (trop->trotyp != UNDEF_TYP) {
-            otyp = (int)trop->trotyp;
-            if (urace.malenum != PM_HUMAN) {
-                /* substitute specific items for generic ones */
-                for (i = 0; inv_subs[i].race_pm != NON_PM; ++i)
-                    if (inv_subs[i].race_pm == urace.malenum &&
-                        otyp == inv_subs[i].item_otyp) {
-                        otyp = inv_subs[i].subs_otyp;
-                        break;
-                    }
-            }
+        otyp = (int) trop->trotyp;
+        if (otyp != UNDEF_TYP) {
             obj = mksobj(otyp, TRUE, FALSE);
-        } else {    /* UNDEF_TYP */
+        } else { /* UNDEF_TYP */
             static NEARDATA short nocreate = STRANGE_OBJECT;
             static NEARDATA short nocreate2 = STRANGE_OBJECT;
             static NEARDATA short nocreate3 = STRANGE_OBJECT;
@@ -1084,6 +1080,24 @@ register struct trobj *trop;
             if (obj->oclass == RING_CLASS ||
                 obj->oclass == SPBOOK_CLASS)
                 nocreate4 = otyp;
+        }
+
+        if (urace.malenum != PM_HUMAN) {
+            /* substitute race-specific items; this used to be in
+               the 'if (otyp != UNDEF_TYP) { }' block above, but then
+               substitutions didn't occur for randomly generated items
+               (particularly food) which have racial substitutes */
+            for (i = 0; inv_subs[i].race_pm != NON_PM; ++i) {
+                if (inv_subs[i].race_pm == urace.malenum &&
+                    otyp == inv_subs[i].item_otyp) {
+                    debug_pline("ini_inv: substituting %s for %s%s",
+                                OBJ_NAME(objects[inv_subs[i].subs_otyp]),
+                                (trop->trotyp == UNDEF_TYP) ? "random " : "",
+                                OBJ_NAME(objects[otyp]));
+                    otyp = obj->otyp = inv_subs[i].subs_otyp;
+                    break;
+                }
+            }
         }
 
         if (trop->trclass == COIN_CLASS) {
