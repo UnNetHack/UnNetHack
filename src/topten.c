@@ -85,7 +85,6 @@ STATIC_DCL void FDECL(nsb_mung_line,(char*));
 STATIC_DCL void FDECL(nsb_unmung_line,(char*));
 #endif
 static char* FDECL(killed_uniques, (void));
-static int FDECL(killed_with_mbirth_limit, (int));
 
 /* must fit with end.c; used in rip.c */
 NEARDATA const char * const killed_by_prefix[] = {
