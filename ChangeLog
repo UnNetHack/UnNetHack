@@ -1,4 +1,6 @@
-2014-XX-XX  UnNetHack 5.X.X
+201X-XX-XX  UnNetHack 5.X.X
+	* Backyard of watery castle get trap doors to ensure player can
+	  descend to the VotD
 	* Players killed by Nazgul will arise as Barrow Wights in bones files
 	  (a slight change from the original mythology, we know)
 	* Reviving drained corpses sometimes won't work, and may destroy 
