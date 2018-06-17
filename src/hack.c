@@ -1149,10 +1149,34 @@ autotravel_weighting(x, y, distance)
 int x, y;
 unsigned distance;
 {
-	if (glyph_is_object(levl[x][y].glyph)) {
+	int glyph = levl[x][y].glyph;
+
+	if (glyph_is_object(glyph)) {
 		/* greedy for items */
 		return distance;
 	}
+
+	/* some dungeon features */
+	int cmap = glyph_to_cmap(glyph);
+	if (cmap == S_altar  ||
+	    cmap == S_throne ||
+	    cmap == S_sink   ||
+	    cmap == S_fountain) {
+		return distance;
+	}
+
+	/* stairs and ladders */
+	if (cmap == S_dnstair  || cmap == S_upstair  ||
+	    cmap == S_dnladder || cmap == S_upladder) {
+		return distance;
+	}
+
+	/* favor rooms, but not closed doors */
+	int roomno = levl[x][y].roomno;
+	if (roomno && !(cmap == S_hcdoor || cmap == S_vcdoor)) {
+		return distance * 2;
+	}
+
 	/* by default return distance multiplied by a large constant factor */
 	return distance*10;
 }
