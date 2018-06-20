@@ -1,6 +1,4 @@
 201X-XX-XX  UnNetHack 5.X.X
-	* Backyard of watery castle get trap doors to ensure player can
-	  descend to the VotD
 	* Players killed by Nazgul will arise as Barrow Wights in bones files
 	  (a slight change from the original mythology, we know)
 	* Reviving drained corpses sometimes won't work, and may destroy 
@@ -18,6 +16,11 @@
 
 	* user interface improvements:
 	  - Added naming last broken object to #name menu (idea from AceHack/NH4)
+
+	* dungeon layout:
+	  - Backyard of watery castle get trap doors to ensure player can
+	    descend to the VotD
+	  - Replaced lava with water on lava castle
 
 	* bug fixes
 	  - Fixed erroneous messages when remaining in stinking clouds
