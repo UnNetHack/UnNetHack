@@ -10,12 +10,16 @@
 	* Vault Guards get angry if you eat gold in front of them. (From Nethack 
 		 Development Code - used with permission)
 	* Several cosmetic changes - additional engravings, hallucinatory monsters, and funny messages.
+	* Picking up scrolls of scare monsters change BUC from blessed to
+	  uncursed to cursed
 
 	* item changes:
 	  - Decreased weight of all mithril armor, especially ones of elven make
 
 	* user interface improvements:
 	  - Added naming last broken object to #name menu (idea from AceHack/NH4)
+	  - Automatically identify scrolls of scare monster during pickup when
+	    turning to dust or changing known BUC state
 
 	* dungeon layout:
 	  - Backyard of watery castle get trap doors to ensure player can

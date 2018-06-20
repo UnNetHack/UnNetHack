@@ -1264,8 +1264,6 @@ boolean telekinesis;
 	}
     }
 
-    if (obj->otyp == SCR_SCARE_MONSTER && result <= 0 && !container)
-	obj->spe = 0;
     return result;
 }
 
@@ -1395,20 +1393,25 @@ boolean telekinesis;	/* not picking it up directly by hand */
 		return -1;
 	    }
 	} else  if (obj->otyp == SCR_SCARE_MONSTER) {
-	    if (obj->blessed) obj->blessed = 0;
-	    else if (!obj->spe && !obj->cursed) obj->spe = 1;
-	    else {
-		pline_The("scroll%s %s to dust as you %s %s up.",
-			plur(obj->quan), otense(obj, "turn"),
-			telekinesis ? "raise" : "pick",
-			(obj->quan == 1L) ? "it" : "them");
-		if (!(objects[SCR_SCARE_MONSTER].oc_name_known) &&
-				    !(objects[SCR_SCARE_MONSTER].oc_uname))
-		    docall(obj);
-		useupf(obj, obj->quan);
-		return 1;	/* tried to pick something up and failed, but
-				   don't want to terminate pickup loop yet   */
-	    }
+		if (obj->blessed) {
+			obj->blessed = 0;
+		} else if (!obj->cursed) {
+			obj->cursed = 1;
+		} else {
+			pline_The("scroll%s %s to dust as you %s %s up.",
+			          plur(obj->quan), otense(obj, "turn"),
+			          telekinesis ? "raise" : "pick",
+			          (obj->quan == 1L) ? "it" : "them");
+			makeknown(obj->otyp);
+			useupf(obj, obj->quan);
+			return 1; /* tried to pick something up and failed, but
+			             don't want to terminate pickup loop yet   */
+		}
+		/* BUC known but scroll still unknown */
+		if (obj->bknown && !objects[obj->otyp].oc_name_known) {
+			Your("%s %s briefly.", xname(obj), otense(obj, "vibrate"));
+			makeknown(obj->otyp);
+		}
 	}
 
 	if ((res = lift_object(obj, (struct obj *)0, &count, telekinesis)) <= 0)
