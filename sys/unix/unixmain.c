@@ -162,6 +162,10 @@ char *argv[];
 #ifdef __linux__
 	check_linux_console();
 #endif
+#ifdef UTF8_GLYPHS
+	check_utf8_console();
+#endif
+
 	initoptions();
 	init_nhwindows(&argc,argv);
 	exact_username = whoami();
@@ -170,6 +174,9 @@ char *argv[];
 #endif
 #ifdef __linux__
 	init_linux_cons();
+#endif
+#ifdef UTF8_GLYPHS
+	init_utf8_console();
 #endif
 
 	/*
