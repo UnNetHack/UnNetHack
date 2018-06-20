@@ -2960,7 +2960,7 @@ move_on:
 			    "it" : "them");
 		} else  qbuf[0] = '\0';		/* just to pacify lint */
 
-		switch (sell_response ? sell_response : ynaq(qbuf)) {
+		switch (sell_response ? sell_response : nyaq(qbuf)) {
 		 case 'q':  sell_response = 'n';
 		 case 'n':  if (container)
 				dropped_container(obj, shkp, FALSE);

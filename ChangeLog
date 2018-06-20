@@ -22,6 +22,7 @@
 	  - Automatically identify scrolls of scare monster during pickup when
 	    turning to dust or changing known BUC state
 	  - Don't autopickup unpaid items (from NetHack 3.6)
+	  - Change default of shopkeeper sell prompt to 'n' (idea by aosdict)
 
 	* dungeon layout:
 	  - Backyard of watery castle get trap doors to ensure player can
