@@ -620,6 +620,59 @@ boolean grab;	 /* forced pickup, rather than forced leave behind? */
 }
 #endif /* AUTOPICKUP_EXCEPTIONS */
 
+static
+boolean
+autopick_testobj(otmp, calc_costly)
+struct obj *otmp;
+boolean calc_costly;
+{
+    static boolean costly = FALSE;
+    const char *otypes = flags.pickup_types;
+    boolean pickit;
+
+    /* calculate 'costly' just once for a given autopickup operation */
+    if (calc_costly) {
+        costly = (otmp->where == OBJ_FLOOR
+                  && costly_spot(otmp->ox, otmp->oy));
+    }
+
+    /* first check: reject if an unpaid item in a shop */
+    if (costly && !otmp->no_charge) {
+        return FALSE;
+    }
+
+    /* check for pickup_types */
+    pickit = (!*otypes || index(otypes, otmp->oclass));
+
+#ifdef AUTOPICKUP_EXCEPTIONS
+    /* check for "always pick up */
+    if (!pickit) {
+        pickit = is_autopickup_exception(otmp, TRUE);
+    }
+
+    /* then for "never pick up */
+    if (pickit) {
+        pickit = !is_autopickup_exception(otmp, FALSE);
+    }
+#endif
+
+    /* pickup_thrown overrides pickup_types and exceptions */
+    if (!pickit) {
+        pickit = (flags.pickup_thrown && otmp->was_thrown);
+    }
+
+    /* don't pick up dropped items */
+    if (pickit) {
+        pickit = flags.pickup_dropped || !otmp->was_dropped;
+    }
+    /* never pick up sokoban prize */
+    if (Is_sokoprize(otmp)) {
+        pickit = FALSE;
+    }
+
+    return pickit;
+}
+
 /*
  * Pick from the given list using flags.pickup_types.  Return the number
  * of items picked (not counts).  Create an array that returns pointers
@@ -633,51 +686,31 @@ struct obj *olist;	/* the object list */
 int follow;		/* how to follow the object list */
 menu_item **pick_list;	/* list of objects and counts to pick up */
 {
-	menu_item *pi;	/* pick item */
-	struct obj *curr;
-	int n;
-	const char *otypes = flags.pickup_types;
+    menu_item *pi; /* pick item */
+    struct obj *curr;
+    int n;
+    boolean check_costly = TRUE;
 
-	/* first count the number of eligible items */
-	for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow)) {
-#ifndef AUTOPICKUP_EXCEPTIONS
-	    if ((!*otypes || index(otypes, curr->oclass) ||
-	         (flags.pickup_thrown && curr->was_thrown)) &&
-	        (flags.pickup_dropped || !curr->was_dropped) &&
-	        !Is_sokoprize(curr))
-#else
-	    if ((!*otypes || index(otypes, curr->oclass) ||
-	         (flags.pickup_thrown && curr->was_thrown) ||
-		 is_autopickup_exception(curr, TRUE)) &&
-	        ((flags.pickup_dropped || !curr->was_dropped) &&
-	         !is_autopickup_exception(curr, FALSE) &&
-	         !Is_sokoprize(curr)))
-#endif
-		n++;
-	}
+    /* first count the number of eligible items */
+    for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow)) {
+        if (autopick_testobj(curr, check_costly)) {
+            ++n;
+        }
+        check_costly = FALSE; /* only need to check once per autopickup */
+    }
 
-	if (n) {
-	    *pick_list = pi = (menu_item *) alloc(sizeof(menu_item) * n);
-	    for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow))
-#ifndef AUTOPICKUP_EXCEPTIONS
-		if ((!*otypes || index(otypes, curr->oclass) ||
-	             (flags.pickup_thrown && curr->was_thrown)) &&
-	            (flags.pickup_dropped || !curr->was_dropped) &&
-	            !Is_sokoprize(curr)) {
-#else
-	    if ((!*otypes || index(otypes, curr->oclass) ||
-		 (flags.pickup_thrown && curr->was_thrown) ||
-		 is_autopickup_exception(curr, TRUE)) &&
-	        ((flags.pickup_dropped || !curr->was_dropped) &&
-	         !is_autopickup_exception(curr, FALSE) &&
-	         !Is_sokoprize(curr))) {
-#endif
-		    pi[n].item.a_obj = curr;
-		    pi[n].count = curr->quan;
-		    n++;
-		}
-	}
-	return n;
+    if (n) {
+        *pick_list = pi = (menu_item *) alloc(sizeof (menu_item) * n);
+        for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow)) {
+            if (autopick_testobj(curr, FALSE)) {
+                pi[n].item.a_obj = curr;
+                pi[n].count = curr->quan;
+                n++;
+            }
+        }
+    }
+
+    return n;
 }
 
 
@@ -705,8 +738,9 @@ menu_item **pick_list;		/* return list of items picked */
 int how;			/* type of query */
 boolean FDECL((*allow), (OBJ_P));/* allow function */
 {
+	int i;
 #ifdef SORTLOOT
-	int i, j;
+	int j;
 #endif
 	int n;
 	winid win;
@@ -820,7 +854,6 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 
 	if (n > 0) {
 	    menu_item *mi;
-	    int i;
 
 	    /* fix up counts:  -1 means no count used => pick all */
 	    for (i = 0, mi = *pick_list; i < n; i++, mi++)
