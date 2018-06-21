@@ -28,10 +28,6 @@ NEARDATA struct instance_flags iflags;	/* provide linkage */
 extern int curses_read_attrs(char *attrs);
 #endif
 
-#ifdef UTF8_GRAPHICS
-extern int supports_utf8;
-#endif
-
 /*
  *  NOTE:  If you add (or delete) an option, please update the short
  *  options help (option_help()), the long options help (dat/opthelp),
@@ -704,18 +700,7 @@ initoptions()
 
 	for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++)
 		flags.end_disclose[i] = DISCLOSE_PROMPT_DEFAULT_NO;
-
-    /* set default characters */
-#ifdef UTF8_GLYPHS
-    if (supports_utf8) {
-        switch_graphics(UTF8_GRAPHICS);
-    } else {
-        switch_graphics(ASCII_GRAPHICS);
-    }
-#else
-    switch_graphics(ASCII_GRAPHICS);
-#endif
-
+	switch_graphics(ASCII_GRAPHICS);	/* set default characters */
 #if defined(UNIX) && defined(TTY_GRAPHICS)
 	/*
 	 * Set defaults for some options depending on what we can
