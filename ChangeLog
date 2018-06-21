@@ -12,6 +12,7 @@
 	* Several cosmetic changes - additional engravings, hallucinatory monsters, and funny messages.
 	* Picking up scrolls of scare monsters change BUC from blessed to
 	  uncursed to cursed
+	* Default to UTF8graphics on supporting terminals
 
 	* item changes:
 	  - Decreased weight of all mithril armor, especially ones of elven make
