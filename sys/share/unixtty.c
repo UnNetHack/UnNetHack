@@ -465,7 +465,7 @@ check_utf8_console()
     struct termios raw;
     raw.c_lflag &= ~(ECHO | ICANON);
     raw.c_cc[VMIN] = 0;
-    raw.c_cc[VTIME] = 3; /* timeout of 0.3 seconds */
+    raw.c_cc[VTIME] = 5; /* timeout of 0.5 seconds */
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) {
         perror("check_utf8_console set raw mode");
         exit(EXIT_FAILURE);
@@ -486,14 +486,12 @@ check_utf8_console()
              * in column 5 */
             supports_utf8 = c == '3' ? TRUE : FALSE;
 
-#if 0
             /* disable read timeout */
             raw.c_cc[VTIME] = 0;
             if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) {
                 perror("check_utf8_console after test");
                 exit(EXIT_FAILURE);
             }
-#endif
         }
         previous_char = c;
     }
