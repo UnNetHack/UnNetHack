@@ -89,6 +89,7 @@
 	  - Record number of normal, magical, and artifact wishes
 
 	* Other:
+	  - Port XP curve from FIQHack
 	  - Adjusted quantity formula when wishing for stackable items
 	  - 'Readable' Hawaiian shirt designs (by Michael Meyer)
 

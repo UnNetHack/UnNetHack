@@ -8,17 +8,56 @@
 
 STATIC_DCL int FDECL(enermod, (int));
 
+/* Return the experience points cutoff to level up to the next level.
+ * Oddly, the experience point values are offset by one from the levels they
+ * actually represent - newuexp(1) returns how many points are required to
+ * achieve experience level 2, etc. */
 long
-newuexp(lev)
-int lev;
+newuexp(int lev)
 {
     if (lev < 1) {
         /* for newuexp(u.ulevel - 1) when u.ulevel is 1 */
         return 0L;
     }
-    if (lev < 10) return (10L * (1L << lev));
-    if (lev < 20) return (10000L * (1L << (lev - 10)));
-    return (10000000L * ((long)(lev - 19)));
+
+    /* keep this synced with the status-drawing code in the clients */
+    switch (lev) {
+    case  0: return      0;
+    case  1: return     20; /* n^2 */
+    case  2: return     40;
+    case  3: return     80;
+    case  4: return    160;
+    case  5: return    320;
+    case  6: return    640;
+    case  7: return   1280;
+    case  8: return   2560;
+    case  9: return   5120;
+    case 10: return  10000; /* triangle numbers */
+    case 11: return  15000;
+    case 12: return  21000;
+    case 13: return  28000;
+    case 14: return  36000;
+    case 15: return  45000;
+    case 16: return  55000;
+    case 17: return  66000;
+    case 18: return  81000; /* n*n series */
+    case 19: return 100000;
+    case 20: return 142000;
+    case 21: return 188000;
+    case 22: return 238000;
+    case 23: return 292000;
+    case 24: return 350000;
+    case 25: return 412000;
+    case 26: return 478000;
+    case 27: return 548000;
+    case 28: return 622000;
+    case 29: return 700000;
+    case 30: return 800000; /* 100k per additional !oGL */
+    }
+
+    impossible("unknown level: %d", lev);
+
+    return 10000000;
 }
 
 STATIC_OVL int
