@@ -224,7 +224,8 @@ quantity	{ savetoken(yytext); return QUANTITY_ID; }
 buried		{ savetoken(yytext); return BURIED_ID; }
 eroded		{ savetoken(yytext); return ERODED_ID; }
 erodeproof	{ savetoken(yytext); return ERODEPROOF_ID; }
-trapped		{ savetoken(yytext); return TRAPPED_ID; }
+trapped		{ savetoken(yytext); yylval.i=1; return TRAPPED_STATE; }
+not_trapped	{ savetoken(yytext); yylval.i=0; return TRAPPED_STATE; }
 recharged	{ savetoken(yytext); return RECHARGED_ID; }
 invisible	{ savetoken(yytext); return INVIS_ID; }
 greased		{ savetoken(yytext); return GREASED_ID; }

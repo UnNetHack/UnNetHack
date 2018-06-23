@@ -42,6 +42,8 @@
 	  - Fixed crash in X11 inventory
 	  - Fixed possible endless loop in autotravel on the Rogue level
 	  - Fixed lava breath related crash at the edges of the map
+	  - The chest in the Castle containing the wishing wand can never be
+	    trapped (from 3.6.0)
 
 	* vanilla bug fixes:
 	  - C343-439: Running NetHack in a terminal window with more than 255
