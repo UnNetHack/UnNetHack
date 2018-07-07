@@ -630,7 +630,7 @@ boolean fingers;
 	 */
 
 	if (fingers) {
-		if (uwep && uwep->otyp == ATHAME) {
+		if (uwep && !uwep->cursed && uwep->otyp == ATHAME) {
 			otmp = uwep;
 		} else {
 			otmp = &zeroobj;
