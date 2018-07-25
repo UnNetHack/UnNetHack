@@ -75,9 +75,15 @@ curses_create_window(int width, int height, orient orientation)
     width += 2;                 /* leave room for bounding box */
     height += 2;
 
-    if ((width > term_cols) || (height > term_rows))
-        panic("curses_create_window: Terminal too small for dialog window");
+    if ((width > term_cols) || (height > term_rows)) {
+        impossible("curses_create_window: Terminal too small for dialog window");
+        width = term_cols;
+        height = term_rows;
+    }
     switch (orientation) {
+    default:
+        impossible("curses_create_window: Bad orientation");
+        /* fall through to centre */
     case CENTER:
         startx = (term_cols / 2) - (width / 2);
         starty = (term_rows / 2) - (height / 2);
@@ -115,9 +121,6 @@ curses_create_window(int width, int height, orient orientation)
         }
 
         starty = 0;
-        break;
-    default:
-        panic("curses_create_window: Bad orientation");
         break;
     }
 
@@ -187,7 +190,8 @@ WINDOW *
 curses_get_nhwin(winid wid)
 {
     if (!is_main_window(wid)) {
-        panic("curses_get_nhwin: wid out of range. Not a main window.");
+        impossible("curses_get_nhwin: wid %d out of range. Not a main window.", wid);
+        return NULL;
     }
 
     return nhwins[wid].curwin;
@@ -205,7 +209,8 @@ curses_add_nhwin(winid wid, int height, int width, int y, int x,
     int real_height = height;
 
     if (!is_main_window(wid)) {
-        panic("curses_add_nhwin: wid out of range. Not a main window.");
+        impossible("curses_add_nhwin: wid %d out of range. Not a main window.", wid);
+        return;
     }
 
     nhwins[wid].nhwin = wid;
@@ -297,7 +302,8 @@ curses_del_nhwin(winid wid)
     }
 
     if (!is_main_window(wid)) {
-        panic("curses_del_nhwin: wid out of range. Not a main window.");
+        impossible("curses_del_nhwin: wid %d out of range. Not a main window.", wid);
+        return;
     }
 
     nhwins[wid].curwin = NULL;
@@ -387,7 +393,10 @@ void
 curses_get_window_xy(winid wid, int *x, int *y)
 {
     if (!is_main_window(wid)) {
-        panic("curses_get_window_xy: wid out of range. Not a main window.");
+        impossible("curses_get_window_xy: wid %d out of range. Not a main window.", wid);
+        *x = 0;
+        *y = 0;
+        return;
     }
 
     *x = nhwins[wid].x;
@@ -439,8 +448,9 @@ int
 curses_get_window_orientation(winid wid)
 {
     if (!is_main_window(wid)) {
-        panic
-            ("curses_get_window_orientation: wid out of range. Not a main window.");
+        impossible
+            ("curses_get_window_orientation: wid %d out of range. Not a main window.", wid);
+        return CENTER;
     }
 
     return nhwins[wid].orientation;
@@ -475,7 +485,8 @@ curses_puts(winid wid, int attr, const char *text)
 
     if (curses_is_menu(wid) || curses_is_text(wid)) {
         if (!curses_menu_exists(wid)) {
-            panic("curses_puts: Attempted write to nonexistant window!");
+            impossible("curses_puts: Attempted write to nonexistant window %d!", wid);
+            return;
         }
         identifier = malloc(sizeof (anything));
         identifier->a_void = NULL;
