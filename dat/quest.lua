@@ -3653,39 +3653,46 @@ may be the last time you stand before %l.]],
       assignquest = {
          synopsis = "[Find %i, then continue to %ns lair.  Defeat %ni and return with %o.]",
          output = "text",
-         text = [["Yes, %p.  You are truly ready now.  Attend to me and I shall
-tell you of what has transpired:
+         text = [[
+"Yes, %p.  You are truly ready now.  Listen now to the story of our
+woes:
 
-"During one of the Great Meditations a short time ago, %n and
-a legion of elementals invaded %H.  Many %gP
-were killed, including the one bearing %o.
+"A few nights ago, %n led a surprise assault on
+%H, along with dozens of elementals.
+Our %gP fought bravely, but too many of them were slaughtered,
+including the one bearing %o.
+The %gP that remain are barely enough to defend this hall.
 
-Now, there are barely enough %gP left to keep the elementals
-at bay.
+"Travel through the wilderness until you reach
+%i, then, from there, descend into
+%ns lair.
+Defeat %n and bring back %o, and with them
+we will be able to reestablish %H as a center of
+spiritual guidance.
 
-"We need you to find %i, then, from there,
-travel to %ns lair.  If you can manage to defeat %n and
-return %o here, we can then drive off the legions
-of elementals that slay our students.
-
-"Go with %d as your guide, %p."]],
+"Go bravely with %d, %p."
+         ]],
       },
       badalign = {
-         synopsis = "[You must atone.  Come back when you are worthy of %d.]",
+         synopsis = "[You are losing your way.  Come back when your harmony is restored.]",
          output = "text",
-         text = [["This is terrible, %p.  You have deviated from the true path!
-You know that %d requires the most strident devotion of this
-order.  The %shood must stand for utmost piety.
+         text = [[
+"You seem troubled, %p.  It looks as though you are letting worldly
+concerns begin to turn you away from enlightenment and the %a way.
 
-"Go from here, atone for your sins against %d.  Return only when
-you have purified yourself."]],
+There is still some hope for you, though.  Go from here and meditate on
+your transgressions, and return once you have restored harmony with
+yourself and with %d."
+         ]],
       },
       badlevel = {
          synopsis = "[You are not ready to face %n.  Come back when you are %Ra.]",
          output = "text",
-         text = [["Alas, %p, it is not yet to be.  A mere %r could never
-withstand the might of %n.  Go forth, again into the world, and
-return when you have attained the post of %R."]],
+         text = [[
+"Though your progress is adequate, no %r can stand up to %n.
+You must continue your martial and mental training.  Return to us when
+you have attained the post of %R."
+         ]],
       },
       discourage = {
          "\"Submit to my will, %c, and I shall spare you.\"",
@@ -3700,25 +3707,28 @@ return when you have attained the post of %R."]],
          "\"With %o, nothing can stand in my way.\"",
       },
       encourage = {
-         "\"You can prevail, if you rely on %d.\"",
-         "\"Remember that %n has great magic at his command.\"",
-         "\"Be pure, my %S.\"",
-         "\"Beware, %i is surrounded by hordes of earth elementals.\"",
+         "\"Though unenlightened, %n is an incredibly dangerous martial artist.\"",
+         "\"In addition to his physical threats, %n is also a master of dark magic.\"",
+         "\"Keep you mind clear, my %S.\"",
+         "\"The path to %i is steep, and you will face many foes there.\"",
          "\"Remember your studies, and you will prevail!\"",
          "\"Acquire and wear %o if you can.  They will aid you against %n.\"",
-         "\"Call upon %d when your need is greatest.  You will be answered.\"",
-         "\"Remember to use the elementals' strength against them!\"",
-         "\"Do not lose faith, %p.  If you do so, %n will grow stronger.\"",
-         "\"Wear %o.  They will assist you in your efforts.\"",
+         "\"It will not do for you to be unfocused.  Meditate on your mission if you must.\"",
+         "\"We have some small amount of supplies here; take any that you may need.\"",
+         "\"%n may try to trick and distract you.  Be steadfast.\"",
+         "\"I must continue to hold this hall against the elementals while you are gone.\"",
       },
       firsttime = {
          synopsis = "[You have reached %H but something is wrong.  %lC needs your aid.]",
          output = "text",
-         text = [[You find yourself standing in sight of %H.
-Something is obviously wrong here.  Strange shapes lumber around
-outside %H!
+         text = [[
+You find yourself standing in sight of %H.
 
-You realize that %l needs your assistance!]],
+But what is this? The great gates are sealed shut, and ominous noises
+echo from the grounds around you.
+
+You must consult with %l at once!
+         ]],
       },
       goal_first = {
          synopsis = "[You are surrounded by brimstone, lava, and elementals.]",
@@ -3745,25 +3755,27 @@ as possible.]],
       },
       guardtalk_after = {
          "\"Greetings, honorable %r.  It is good to see you again.\"",
-         "\"Ah, %p!  Our deepest gratitude for all of your help.\"",
-         "\"Greetings, %s.  Perhaps you will take some time to meditate with us?\"",
+         "\"%l teaches us not to focus on earthly beauty.\"",
          "\"With this test behind you, may %d bring you enlightenment.\"",
-         "\"May %d be with you, %s.\"",
+         "\"Good day, %p.  The repair efforts have been going well.\"",
+         "\"Got any wands of enlightenment to spare?\"",
       },
       guardtalk_before = {
          "\"Greetings, honorable %r.  It is good to see you.\"",
-         "\"Ah, %p!  Surely you can help us in our hour of need.\"",
-         "\"Greetings, %s.  %lC has great need of your help.\"",
-         "\"Alas, it seems as if even %d has deserted us.\"",
-         "\"May %d be with you, %s.\"",
+         "\"Our beautiful monastery lies in shambles, %p.\"",
+         "\"Welcome back, %p.  Will you join me in meditation?\"",
+         "\"It will take long to repair the damage from the elementals.\"",
+         "\"Got any potions of enlightenment to spare?\"",
       },
       hasamulet = {
          synopsis = "[Take the Amulet to the Astral Plane and deliver it to %d.]",
          output = "text",
-         text = [["You have prevailed, %p!  %d is surely with you.  Now,
-you must take the Amulet, and sacrifice it on %ds altar on
-the Astral Plane.  I suspect that I shall never see you again in this
-life, but I hope to at %ds feet."]],
+         text = [[
+"You have prevailed, %p!  %d is surely with you.  Now,
+you must bring the Amulet up out of the dungeon, and sacrifice it on
+%ds altar on the Astral Plane, where you may reach true nirvana at last.
+All of us here will continue to keep you in our thoughts."
+         ]],
       },
       killed_nemesis = {
          synopsis = "[As %n dies, %nh threatens to return.]",
@@ -3776,20 +3788,26 @@ life, but I hope to at %ds feet."]],
 With that, %n expires.]],
       },
       leader_first = {
-         synopsis = "[%lC checks whether you are ready for the great challenge.]",
+         synopsis = "[%lC checks whether you are adequately prepared to help.]",
          output = "text",
-         text = [["Ah, %p, my %S.  You have returned to us at last.
-A great blow has befallen our order; perhaps you can help us.
-First, however, I must determine if you are prepared for this
-great challenge."]],
+         text = [[
+"Ah, %p, my %S.
+Hard times have fallen on our peaceful monastery, but you may be able to
+help.  But first, let us see how your training has continued while you
+have been away from us."
+         ]],
       },
       leader_last = {
-         synopsis = "[You are a heretic and have failed utterly.]",
+         synopsis = "[You are unenlightened and are expelled from the monastery.]",
          output = "text",
-         text = [["You are a heretic, %p!  How can you, %ra, deviate so from the
-teachings of %d?  Begone from this temple.  You are no longer
-%sa to this order.  We will pray to %d for other assistance,
-as you have failed us utterly."]],
+         text = [[
+"You are a disgrace, %p!  I can see that your mind has turned away from
+the path of enlightenment.  We will never defeat %n if you are our
+champion.
+
+You are no longer %sa here.  Return to the dungeon from whence you came,
+and never again return."
+         ]],
       },
       leader_next = {
          text = "\"Again, my %S, you stand before me.  Are you ready now to help us?\"",
@@ -3798,14 +3816,25 @@ as you have failed us utterly."]],
          text = "\"Once more, %p, you stand within the sanctum.  Are you ready now?\"",
       },
       locate_first = {
-         synopsis = "[You have reached %i.  %nC lurks further ahead.]",
+         synopsis = "[You are near %i.  %nC lurks further ahead.]",
          output = "text",
-         text = [[You remember the descriptions of %i, given
-to you by %l.  It is ahead that you will find
-%n's trail.]],
+         text = [[
+A high mountain path stretches upwards in front of you.
+Somewhere at its end, you will find %i,
+and in its depths %n surely lurks.
+         ]],
       },
       locate_next = {
-         text = "Again, you stand before %i.",
+         text = "Again, you near %i.",
+      },
+      lowlevel = {
+         synopsis = "[Are you sure you are ready?]",
+         output = "text",
+         text = [[
+"Oddly, %p, though you seem unready, I find myself wondering
+whether the experience I have looked for in you is perhaps not the true
+preparation you require.  Sending you forth now is a great risk,
+however.  Are you sure you are ready?""]],
       },
       nemesis_first = {
          synopsis = "[You are no %g.  You shall never regain %o.]",
@@ -3830,17 +3859,17 @@ after all.  Prepare to die, %r!  You shall never regain
          text = "Once again, you stand before %H.",
       },
       offeredit = {
-         synopsis = "[Keep %o.  %oH will help you recover the Amulet of Yendor.]",
+         synopsis = "[Keep %o.  They will help you recover the Amulet of Yendor.]",
          output = "text",
-         text = [["You have returned, %p.  And with %o, I see.
-Congratulations.
+         text = [[
+"Amazing work, %p! You have recovered %o!
 
-"I have been in meditation, and have received direction from
-a minion of %d.  %d commands that you retain
-%o.  With %oi, you must recover the Amulet
-of Yendor.
+"I have meditated on the use to which %o could best be put.
+The choice is clear: you must keep %o, and use them on your
+quest for the Amulet of Yendor.
 
-"Go forth, and let %d guide your steps."]],
+"I could not be more proud of you, %p.  Go with my blessing."
+         ]],
       },
       offeredit2 = {
          synopsis = "[Keep %o and return to %Z to search for the Amulet.]",
@@ -3850,15 +3879,15 @@ then returns his gaze to you.
 
 "%oC must remain with you.  Use %oi
 as you resume your search for the Amulet.
-%Z await your return through the magic portal
-that brought you here."]],
+As you know, you will find it somewhere in %Z, back through
+the magic portal.]],
       },
       othertime = {
          text = [[Again you face %H.  Your intuition hints that this
 may be the final time you come here.]],
       },
       posthanks = {
-         text = "\"Welcome back, %p.  How is your quest for the Amulet going?\"",
+         text = "\"Welcome back, %p.  Is there any small assistance we can provide you?\"",
       },
    },
    Pri = {
