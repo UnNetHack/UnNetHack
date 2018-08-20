@@ -549,8 +549,8 @@ const char *build_date;
 void
 do_date()
 {
-	long clocktim = 0;
-	char *c, cbuf[60], buf[BUFSZ];
+	time_t clocktim = 0;
+	char *c, cbuf[60], buf[BUFSZ], *source_date_epoch;
 	const char *ul_sfx;
 
 	filename[0]='\0';
@@ -565,13 +565,13 @@ do_date()
 	Fprintf(ofp,"/*\tSCCS Id: @(#)date.h\t3.4\t2002/02/03 */\n\n");
 	Fprintf(ofp, "%s", Dont_Edit_Code);
 
-#ifdef KR1ED
 	(void) time(&clocktim);
-	Strcpy(cbuf, ctime(&clocktim));
-#else
-	(void) time((time_t *)&clocktim);
-	Strcpy(cbuf, ctime((time_t *)&clocktim));
-#endif
+	source_date_epoch = getenv("SOURCE_DATE_EPOCH");
+	if (source_date_epoch) {
+		clocktim = strtoull(source_date_epoch, NULL, 10);
+	}
+	Strcpy(cbuf, asctime(gmtime(&clocktim)));
+
 	for (c = cbuf; *c; c++) if (*c == '\n') break;
 	*c = '\0';	/* strip off the '\n' */
 	Fprintf(ofp,"#define BUILD_DATE \"%s\"\n", cbuf);
@@ -601,7 +601,7 @@ do_date()
 	Fprintf(ofp,"\n");
 #ifdef AMIGA
 	{
-	struct tm *tm = localtime((time_t *) &clocktim);
+	struct tm *tm = gmtime((time_t *) &clocktim);
 	Fprintf(ofp,"#define AMIGA_VERSION_STRING ");
 	Fprintf(ofp,"\"\\0$VER: UnNetHack %d.%d.%d (%d.%d.%d)\"\n",
 		VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,

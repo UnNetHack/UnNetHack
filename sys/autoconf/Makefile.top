@@ -228,7 +228,8 @@ check-dlb: @OPTIONS_FILE@
 
 dlb: spec_levs
 	( cd util ; $(MAKE) dlb )
-	( cd dat ; ../util/dlb cf nhdat $(SHARE_DATDLB) $(UNSHARE_DATDLB) )
+	( cd dat ; LC_ALL=C ; ../util/dlb cf nhdat $(SHARE_DATDLB) $(UNSHARE_DATDLB) )
+
 
 # recover can be used when INSURANCE is defined in include/config.h
 # and the checkpoint option is true

@@ -1,4 +1,5 @@
 201X-XX-XX  UnNetHack 5.X.X
+	* Support SOURCE_DATE_EPOCH for reproducible builds (patch from Debian)
 	* Players killed by Nazgul will arise as Barrow Wights in bones files
 	  (a slight change from the original mythology, we know)
 	* Reviving drained corpses sometimes won't work, and may destroy 
