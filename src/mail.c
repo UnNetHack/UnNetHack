@@ -712,7 +712,6 @@ struct obj *otmp;
 		/* public server hints */
 		"If you need advice, #shout, somebody might mail you help.",
 		"Visit IRC channel #unnethack on freenode.",
-		"Visit http://un.nethack.nu/ for dumps of your games.",
 		"To opt out of these hints, put OPTIONS=nohint into your options.",
 #endif
 	};
