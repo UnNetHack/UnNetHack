@@ -2597,9 +2597,12 @@ Without thought, you ready your weapon, and mutter under your breath:
       goal_first = {
          synopsis = "[This is surely the lair of %n.]",
          output = "text",
-         text = [[The hairs on the nape of your neck lift as you sense an energy in the
-very air around you.  You fight down a primordial panic that seeks to
-make you turn and run.  This is surely the lair of %n.]],
+         text = [[
+Ahead, you can make out the glow of fire and the dark shapes of
+buildings.  The hairs on the nape of your neck lift as you sense an
+energy in the very air around you.  You fight down a primordial panic
+that seeks to make you turn and run.  This is surely the lair of %n.
+         ]],
       },
       goal_next = {
          text = "Yet again you feel the air around you heavy with malevolent magical energy.",
@@ -2685,8 +2688,10 @@ me and destroy all who once called you %s.  Now begone!"]],
       locate_first = {
          synopsis = "[You have located %i.]",
          output = "text",
-         text = [[The scent of water comes to you in the desert breeze.  You know that
-you have located %i.]],
+         text = [[
+As the sun sinks below the horizon, the scent of water comes to you in
+the desert breeze.  You know that you have located %i.
+         ]],
       },
       locate_next = {
          text = "Yet again you have a chance to infiltrate %i.",
