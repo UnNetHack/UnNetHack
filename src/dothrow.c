@@ -930,9 +930,6 @@ hurtle(int dx, int dy, int range, boolean verbose)
     }
     /* if we're in the midst of shooting multiple projectiles, stop */
     endmultishot(TRUE);
-    if (In_sokoban(&u.uz)) {
-        sokoban_trickster(); /* Sokoban guilt */
-    }
     uc.x = u.ux;
     uc.y = u.uy;
     /* this setting of cc is only correct if dx and dy are [-1,0,1] only */
