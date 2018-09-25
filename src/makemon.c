@@ -1389,8 +1389,10 @@ register int mmflags;
     if (is_dprince(ptr) && ptr->msound == MS_BRIBE) {
         mtmp->mpeaceful = mtmp->minvis = mtmp->perminvis = 1;
         mtmp->mavenge = 0;
-        if (uwep && uwep->oartifact == ART_EXCALIBUR)
+        if (uwep && (uwep->oartifact == ART_EXCALIBUR ||
+                     uwep->oartifact == ART_DEMONBANE)) {
             mtmp->mpeaceful = mtmp->mtame = FALSE;
+        }
     }
 #ifndef DCC30_BUG
     if (mndx == PM_LONG_WORM && (mtmp->wormno = get_wormno()) != 0)
