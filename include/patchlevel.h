@@ -5,11 +5,11 @@
 /* UnNetHack 5.0.0 */
 #define GAME_SHORT_NAME	"UNH"
 #define VERSION_MAJOR	5
-#define VERSION_MINOR	3
+#define VERSION_MINOR	2
 /*
  * PATCHLEVEL is updated for each release.
  */
-#define PATCHLEVEL	2
+#define PATCHLEVEL	0
 /*
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
@@ -49,7 +49,7 @@
  * PP = patch level, ee = edit level, L = literal suffix "L",
  * with all four numbers specified as two hexadecimal digits.
  */
-#define VERSION_COMPATIBILITY 0x05030000L	/* 5.0.0-e0 */
+#define VERSION_COMPATIBILITY 0x05020000L	/* 5.2.0-e0 */
 
 
 /*****************************************************************************/
