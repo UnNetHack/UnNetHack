@@ -34,6 +34,9 @@
 	  - Replaced lava with water on lava castle
 	  - Don't generate 1000 fountains in bigrm-13
 
+	* customizable colors:
+	  - Dark gray improved on terminals supporting 256 colors
+
 	* bug fixes
 	  - Fixed erroneous messages when remaining in stinking clouds
 	  - Shopkeeper stopping player from entering a shop when having crystal

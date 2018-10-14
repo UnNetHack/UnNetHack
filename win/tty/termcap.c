@@ -1004,7 +1004,9 @@ init_hilite()
 		hilites[c] = nh_HI;
 	hilites[CLR_GRAY] = hilites[NO_COLOR] = (char *)0;
 
-	if (tgetnum("Co") < 8
+    int colors = tgetnum("Co");
+    iflags.color_mode = colors;
+	if (colors < 8
 	    || ((setf = tgetstr("AF", (char **)0)) == (char *)0
 		 && (setf = tgetstr("Sf", (char **)0)) == (char *)0))
 		return;
@@ -1024,6 +1026,13 @@ init_hilite()
 	}
 	if (!iflags.wc2_newcolors)
 		hilites[CLR_BLACK] = hilites[CLR_BLUE];
+
+    if (iflags.wc2_newcolors && colors == 256) {
+        scratch = tparm(setf, 241); /* #626262 */
+        free((genericptr_t) hilites[CLR_BLACK]);
+        hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + 1);
+        Strcpy(hilites[CLR_BLACK], scratch);
+    }
 }
 
 # else /* UNIX && TERMINFO */
