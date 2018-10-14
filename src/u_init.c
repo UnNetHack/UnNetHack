@@ -1259,31 +1259,42 @@ register struct trobj *trop;
         if (otyp == OIL_LAMP)
             discover_object(POT_OIL, TRUE, FALSE);
 
-        if((obj->oclass == ARMOR_CLASS && !u.roleplay.nudist)) {
-            if (is_shield(obj) && !uarms) {
+        if ((obj->oclass == ARMOR_CLASS && !u.roleplay.nudist)) {
+            if (is_shield(obj) && !uarms && !(uwep && bimanual(uwep))) {
                 setworn(obj, W_ARMS);
-                if (uswapwep) setuswapwep((struct obj *) 0);
-            } else if (is_helmet(obj) && !uarmh)
+                /* 3.6.2: this used to unset uswapwep if it was set, but
+                   wearing a shield doesn't prevent having an alternate
+                   weapon ready to swap with the primary; just make sure we
+                   aren't two-weaponing (academic; no one starts that way) */
+                u.twoweap = FALSE;
+            } else if (is_helmet(obj) && !uarmh) {
                 setworn(obj, W_ARMH);
-            else if (is_gloves(obj) && !uarmg)
+            } else if (is_gloves(obj) && !uarmg) {
                 setworn(obj, W_ARMG);
-            else if (is_shirt(obj) && !uarmu)
+            } else if (is_shirt(obj) && !uarmu) {
                 setworn(obj, W_ARMU);
-            else if (is_cloak(obj) && !uarmc)
+            } else if (is_cloak(obj) && !uarmc) {
                 setworn(obj, W_ARMC);
-            else if (is_boots(obj) && !uarmf)
+            } else if (is_boots(obj) && !uarmf) {
                 setworn(obj, W_ARMF);
-            else if (is_suit(obj) && !uarm)
+            } else if (is_suit(obj) && !uarm) {
                 setworn(obj, W_ARM);
+            }
         }
 
         if (obj->oclass == WEAPON_CLASS || is_weptool(obj) ||
             otyp == TIN_OPENER || otyp == FLINT || otyp == ROCK) {
             if (is_ammo(obj) || is_missile(obj)) {
-                if (!uquiver) setuqwep(obj);
-            } else if ((!uwep) && !u.roleplay.pacifist) setuwep(obj);
-            else if (!uswapwep) setuswapwep(obj);
+                if (!uquiver) {
+                    setuqwep(obj);
+                }
+            } else if (!uwep && !u.roleplay.pacifist && (!uarms || !bimanual(obj))) {
+                setuwep(obj);
+            } else if (!uswapwep) {
+                setuswapwep(obj);
+            }
         }
+
         if (obj->oclass == SPBOOK_CLASS &&
             obj->otyp != SPE_BLANK_PAPER)
             initialspell(obj);
