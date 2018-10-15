@@ -30,6 +30,7 @@
 	  - Backyard of watery castle get trap doors to ensure player can
 	    descend to the VotD
 	  - Replaced lava with water on lava castle
+	  - Don't generate 1000 fountains in bigrm-13
 
 	* bug fixes
 	  - Fixed erroneous messages when remaining in stinking clouds
