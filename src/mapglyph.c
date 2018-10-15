@@ -163,7 +163,21 @@ unsigned *ospecial;
 	    else if (iflags.use_color &&
 		     (offset == S_upstair || offset == S_dnstair) &&
 		     (x == sstairs.sx && y == sstairs.sy))
-		color = CLR_YELLOW;
+            color = CLR_YELLOW;
+        /* color altars */
+        else if (iflags.use_color && offset == S_altar) {
+            if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)) {
+                color = CLR_WHITE + CLR_MAX*CLR_MAGENTA;
+            } else {
+                int altar_alignement = altar_align(x, y);
+                switch (altar_alignement) {
+                    case A_LAWFUL:  color = CLR_WHITE  + CLR_MAX*CLR_WHITE; break;
+                    case A_NEUTRAL: color = CLR_WHITE  + CLR_MAX*CLR_GRAY;  break;
+                    case A_CHAOTIC: color = CLR_WHITE  + CLR_MAX*CLR_BLACK; break;
+                    case A_NONE:    color = CLR_WHITE  + CLR_MAX*CLR_RED;   break;
+                }
+            }
+        }
 	    else
 #endif
 	    cmap_color(offset);

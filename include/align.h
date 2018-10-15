@@ -39,4 +39,6 @@ typedef struct	align {		/* alignment & record */
 #define Align2amask(x)	(((x) == A_NONE) ? AM_NONE \
 			 : ((x) == A_LAWFUL) ? AM_LAWFUL : (x) + 2)
 
+#define altar_align(x,y)	((aligntyp)Amask2align(levl[x][y].altarmask & AM_MASK))
+
 #endif /* ALIGN_H */
