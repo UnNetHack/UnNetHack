@@ -209,8 +209,15 @@ const char *pre, *str;
 #ifdef DUMP_LOG
   if (dump_fp)
     fprintf(dump_fp, "%s%s\n", pre, str);
-  if (html_dump_fp)
-    fprintf(html_dump_fp, "%s%s<br />\n", pre, str);
+  if (html_dump_fp) {
+      while (*pre != '\0') {
+          fprintf(html_dump_fp, "%s", html_escape_character(*pre++));
+      }
+      while (*str != '\0') {
+          fprintf(html_dump_fp, "%s", html_escape_character(*str++));
+      }
+    fprintf(html_dump_fp, "<br />\n");
+  }
 #endif
 }
 
@@ -219,16 +226,22 @@ extern boolean get_menu_coloring(const char *str, int *color, int *attr);
 #endif
 
 static char tmp_html_link[BUFSZ];
+static char tmp_html_link_name[BUFSZ];
 /** Return a link to nethackwiki . */
 char *
 html_link(link_name, name)
 const char *link_name;
 const char *name;
 {
-	snprintf(tmp_html_link, BUFSZ,
-		"<a href=\"http://nethackwiki.com/wiki/%s\">%s</a>",
-		link_name, name);
-	return tmp_html_link;
+    tmp_html_link_name[0] = '\0';
+    while (*name != '\0' && strlen(tmp_html_link_name) < BUFSZ - 10) {
+        sprintf(eos(tmp_html_link_name), "%s", html_escape_character(*name++));
+    }
+
+    snprintf(tmp_html_link, BUFSZ,
+            "<a href=\"http://nethackwiki.com/wiki/%s\">%s</a>",
+            link_name, tmp_html_link_name);
+    return tmp_html_link;
 }
 
 /** Dumps an object from the inventory. */
