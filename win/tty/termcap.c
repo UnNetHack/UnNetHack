@@ -66,6 +66,8 @@ STATIC_VAR char tbuf[512];
 const char *hilites[CLR_MAX];	/* terminal escapes for the various colors */
 # else
 char NEARDATA *hilites[CLR_MAX]; /* terminal escapes for the various colors */
+char NEARDATA *bgcolor[CLR_MAX]; /* terminal escapes for the various colors */
+static char *real_black = (char *)0;
 # endif
 #endif
 
@@ -1286,7 +1288,7 @@ static void
 init_hilite()
 {
     register int c;
-    char *setf, *scratch;
+    char *setf, *setb, *scratch;
 
     for (c = 0; c < SIZE(hilites); c++) {
         hilites[c] = nh_HI;
@@ -1295,10 +1297,11 @@ init_hilite()
 
     int colors = tgetnum("Co");
     iflags.color_mode = colors;
-    if (colors < 8
-            || ((setf = tgetstr("AF", (char **)0)) == (char *)0
-                && (setf = tgetstr("Sf", (char **)0)) == (char *)0))
+    if (colors < 8 ||
+            ((setf = tgetstr("AF", (char **)0)) == (char *)0 &&
+             (setf = tgetstr("Sf", (char **)0)) == (char *)0)) {
         return;
+    }
 
     for (c = 0; c < CLR_MAX / 2; c++) {
         scratch = tparm(setf, ti_map[c]);
@@ -1311,7 +1314,6 @@ init_hilite()
             Strcpy(hilites[c|BRIGHT], MD);
             Strcat(hilites[c|BRIGHT], scratch);
         }
-
     }
     if (!iflags.wc2_newcolors) {
         hilites[CLR_BLACK] = hilites[CLR_BLUE];
@@ -1328,6 +1330,10 @@ init_hilite()
             free((genericptr_t) hilites[CLR_BLACK]);
             hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + 1);
             Strcpy(hilites[CLR_BLACK], scratch);
+
+            scratch = tparm(setf, 16); /* #000000 */
+            real_black = (char *) alloc(strlen(scratch) + 1);
+            Strcpy(real_black, scratch);
         } else if (colors == 16777216) {
            init_color_rgb(CLR_BLACK, 0x626262);
         }
@@ -1384,6 +1390,54 @@ init_hilite()
         /* no customized color support, clear color definitions */
         for (c = 0; c < CLR_MAX; c++) {
             iflags.color_definitions[c] = 0;
+        }
+    }
+
+    /* background colors */
+    if (colors < 256 ||
+            ((setb = tgetstr("AB", (char **)0)) == (char *)0 &&
+             (setb = tgetstr("Sb", (char **)0)) == (char *)0)) {
+        return;
+    }
+
+    for (c = 0; c < SIZE(bgcolor); c++) {
+        bgcolor[c] = (char *)0;
+    }
+
+    int background_colors[5][2] = {
+        { CLR_WHITE,   251 }, /* #c6c6c6 */
+        { CLR_GRAY,    243 }, /* #767676 */
+        { CLR_BLACK,   235 }, /* #262626 */
+        { CLR_RED,     124 }, /* #af0000 */
+        { CLR_MAGENTA, 127 }, /* #af00af */
+    };
+
+    for (c = 0; c < SIZE(background_colors); c++) {
+        scratch = tparm(setb, background_colors[c][1]);
+        bgcolor[background_colors[c][0]] = (char *) alloc(strlen(scratch) + 1);
+        Strcpy(bgcolor[background_colors[c][0]], scratch);
+    }
+
+    if (colors == 256) {
+        for (c = 0; c < CLR_MAX; c++) {
+            if (iflags.color_definitions[c]) {
+                int i;
+                int color = -1;
+
+                for (i = 0; i < SIZE(color_definitions_256); i++) {
+                    if (iflags.color_definitions[c] == color_definitions_256[i].value) {
+                        color = color_definitions_256[i].index;
+                        break;
+                    }
+                }
+
+                if (color >= 0) {
+                    scratch = tparm(setf, color);
+                    free((genericptr_t) hilites[c]);
+                    hilites[c] = (char *) alloc(strlen(scratch) + 1);
+                    Strcpy(hilites[c], scratch);
+                }
+            }
         }
     }
 }
@@ -1641,10 +1695,21 @@ void
 term_start_color(color)
 int color;
 {
-	if (iflags.wc2_newcolors)
-		xputs(hilites[ttycolors[color]]);
-	else
-		xputs(hilites[color]);
+    int foreground = color % CLR_MAX;
+    int background = color / CLR_MAX;
+
+    if (iflags.wc2_newcolors) {
+        xputs(hilites[ttycolors[foreground]]);
+    } else {
+        xputs(hilites[foreground]);
+    }
+
+    if (iflags.color_mode >= 256 && bgcolor[ttycolors[background]]) {
+        if (ttycolors[foreground] == CLR_BLACK) {
+          xputs(real_black); /* #000000 */
+        }
+        xputs(bgcolor[ttycolors[background]]);
+    }
 }
 
 
@@ -1683,7 +1748,7 @@ int color;
     if (windowprocs.name != NULL &&
      !strcmpi(windowprocs.name, "curses")) return iflags.wc_color;
 #endif
-	return hilites[color] != (char *)0;
+	return hilites[color % CLR_MAX] != (char *)0;
 }
 
 #endif /* TEXTCOLOR */
