@@ -175,10 +175,6 @@ char *argv[];
 #ifdef __linux__
 	init_linux_cons();
 #endif
-#ifdef UTF8_GLYPHS
-	init_utf8_console();
-#endif
-
 	/*
 	 * It seems you really want to play.
 	 */

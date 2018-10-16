@@ -502,23 +502,4 @@ check_utf8_console()
         exit(EXIT_FAILURE);
     }
 }
-
-void
-init_utf8_console()
-{
-    /* select character set G0 */
-    raw_print("\x0f");
-
-    if (supports_utf8) {
-        /* select default character set for G0 */
-        raw_print("\x1b(B");
-        /* set character set as UTF-8 */
-        raw_print("\x1b%G");
-    } else {
-        /* disable Unicode, set default character set */
-        raw_print("\x1b%@");
-        /* select null mapping */
-        raw_print("\x1b(U");
-    }
-}
 #endif
