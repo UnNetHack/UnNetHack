@@ -2216,6 +2216,19 @@ register struct obj *obj;
 	    (void) add_to_container(current_container, obj);
 	    current_container->owt = weight(current_container);
 	}
+
+    /* blessed or uncursed scrolls of charging charge bag of tricks */
+    if ((current_container->otyp == BAG_OF_TRICKS) &&
+            obj->otyp == SCR_CHARGING && !obj->cursed) {
+        makeknown(obj->otyp);
+        makeknown(current_container->otyp);
+        pline("The %s digests the magic of the %s!", xname(current_container), xname(obj));
+        recharge(current_container, (obj->blessed ? 1 : 0));
+        if (current_container->spe > 0) {
+            current_container = NULL;
+        }
+    }
+
 	/* gold needs this, and freeinv() many lines above may cause
 	 * the encumbrance to disappear from the status, so just always
 	 * update status immediately.

@@ -14,6 +14,8 @@
 	* Picking up scrolls of scare monsters change BUC from blessed to
 	  uncursed to cursed
 	* Default to UTF8graphics on supporting terminals
+	* Putting blessed and uncursed scrolls of charging into a bag of
+	  tricks charges it
 
 	* item changes:
 	  - Decreased weight of all mithril armor, especially ones of elven make
