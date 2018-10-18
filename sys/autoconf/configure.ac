@@ -350,6 +350,7 @@ AC_CHECK_FUNCS(fcntl)
 
 dnl ------ Check for 32 bit datatype
 AX_DEFINE_INTEGER_BITS(uint32_t, unsigned int, unsigned long, unsigned long long)
+AX_DEFINE_INTEGER_BITS(uint64_t, unsigned int, unsigned long, unsigned long long)
 
 dnl  ----- Check for program needed to build Guidebook
 AC_CHECK_PROG(HAVE_NROFF, nroff, "yes", "no")

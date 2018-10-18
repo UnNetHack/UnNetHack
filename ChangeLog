@@ -36,6 +36,8 @@
 
 	* customizable colors:
 	  - Dark gray improved on terminals supporting 256 colors
+	  - Configurable system colors using RGB values
+	     For example, put "COLOR=light blue:5f00ff" into your config file
 
 	* bug fixes
 	  - Fixed erroneous messages when remaining in stinking clouds
