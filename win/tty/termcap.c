@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include <limits.h>
 
 #if defined (TTY_GRAPHICS) && !defined(NO_TERMS)
 
@@ -1243,6 +1244,31 @@ const int ti_map[8] = {
 	COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
 	COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE };
 
+typedef struct {
+   unsigned char r, g, b;
+} RGB;
+
+/** Calculate the color distance between two colors.
+ *
+ * Algorithm taken from https://www.compuphase.com/cmetric.htm
+ **/
+int
+color_distance(uint64_t rgb1, uint64_t rgb2)
+{
+    int r1 = (rgb1 >> 16) & 0xFF;
+    int g1 = (rgb1 >>  8) & 0xFF;
+    int b1 = (rgb1      ) & 0xFF;
+    int r2 = (rgb2 >> 16) & 0xFF;
+    int g2 = (rgb2 >>  8) & 0xFF;
+    int b2 = (rgb2      ) & 0xFF;
+
+    int rmean = ( r1 + r2 ) / 2;
+    int r = r1 - r2;
+    int g = g1 - g2;
+    int b = b1 - b2;
+    return ((((512+rmean)*r*r)>>8) + 4*g*g + (((767-rmean)*b*b)>>8));
+}
+
 static void
 init_hilite()
 {
@@ -1288,11 +1314,20 @@ init_hilite()
             if (iflags.color_definitions[c]) {
                 int i;
                 int color = -1;
+                int similar = INT_MAX;
+                int current;
 
                 for (i = 0; i < SIZE(color_definitions_256); i++) {
+                    /* look for an exact match */
                     if (iflags.color_definitions[c] == color_definitions_256[i].value) {
                         color = color_definitions_256[i].index;
                         break;
+                    }
+                    /* find a close color match */
+                    current = color_distance(iflags.color_definitions[c], color_definitions_256[i].value);
+                    if (current < similar) {
+                        color = color_definitions_256[i].index;
+                        similar = current;
                     }
                 }
 
