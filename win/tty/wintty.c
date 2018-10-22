@@ -3018,6 +3018,11 @@ tty_debug_show_colors()
     int colors = tgetnum("Co");
     snprintf(buf, BUFSZ, "%s %d %s", getenv("TERM"), colors, colorterm ? colorterm : "");
     putstr(tmpwin, 0, buf);
+    if (colorterm && !strcmpi(colorterm, "truecolor")) {
+        snprintf(buf, BUFSZ, "If the configured colors don't show, try setting OPTIONS=truecolor_separator:%c",
+                iflags.truecolor_separator == ';' ? ':' : ';');
+        putstr(tmpwin, 0, buf);
+    }
     putstr(tmpwin, 0, "");
 
     for (c = 0; c < CLR_MAX; c++) {

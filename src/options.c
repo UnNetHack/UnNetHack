@@ -490,6 +490,10 @@ static struct Comp_Opt
 	{ "wolfname", "the name of your (first) wolf (e.g., wolfname:Gnasher)",
 						PL_PSIZ, DISP_IN_GAME },
 #endif
+#ifdef TTY_GRAPHICS
+    { "truecolor_separator", "the character separator for truecolor escape sequences",
+        2, SET_IN_FILE },
+#endif
 	{ (char *)0, (char *)0, 0, 0 }
 };
 
@@ -740,6 +744,8 @@ initoptions()
 	    index(AS, '\016') && index(AE, '\017')) {
 		switch_graphics(DEC_GRAPHICS);
 	}
+
+    iflags.truecolor_separator = ';';
 # endif
 #endif /* UNIX || VMS */
 
@@ -2885,6 +2891,22 @@ goodfruit:
 		return;
 	}
 #endif /* SORTLOOT */
+
+#ifdef TTY_GRAPHICS
+    fullname = "truecolor_separator";
+    if (match_optname(opts, fullname, strlen(fullname), TRUE)) {
+        if (negated) {
+            bad_negation(fullname, FALSE);
+            return;
+        } else if (!(op = string_for_opt(opts, FALSE))) return;
+        if (strlen(op) > 1 || (*op) != ':' || (*op) != ';') {
+            badoption(opts);
+        } else {
+            iflags.truecolor_separator = (*op);
+        }
+        return;
+    }
+#endif
 
 	fullname = "suppress_alert";
 	if (match_optname(opts, fullname, 4, TRUE)) {

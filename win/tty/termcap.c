@@ -1269,43 +1269,68 @@ color_distance(uint64_t rgb1, uint64_t rgb2)
 }
 
 static void
+init_color_rgb(int color, uint64_t rgb)
+{
+    char *tc = "\e[38.2.255.255.255m";
+    int r = (rgb >> 16) & 0xFF;
+    int g = (rgb >>  8) & 0xFF;
+    int b = (rgb      ) & 0xFF;
+
+    free((genericptr_t) hilites[color]);
+    hilites[color] = (char *) alloc(strlen(tc) + 1);
+    char sep = iflags.truecolor_separator;
+    Sprintf(hilites[color], "\e[38%c2%c%d%c%d%c%dm", sep, sep, r, sep, g, sep, b);
+}
+
+static void
 init_hilite()
 {
-	register int c;
-	char *setf, *scratch;
+    register int c;
+    char *setf, *scratch;
 
-	for (c = 0; c < SIZE(hilites); c++)
-		hilites[c] = nh_HI;
-	hilites[CLR_GRAY] = hilites[NO_COLOR] = (char *)0;
+    for (c = 0; c < SIZE(hilites); c++) {
+        hilites[c] = nh_HI;
+    }
+    hilites[CLR_GRAY] = hilites[NO_COLOR] = (char *)0;
 
     int colors = tgetnum("Co");
     iflags.color_mode = colors;
-	if (colors < 8
-	    || ((setf = tgetstr("AF", (char **)0)) == (char *)0
-		 && (setf = tgetstr("Sf", (char **)0)) == (char *)0))
-		return;
+    if (colors < 8
+            || ((setf = tgetstr("AF", (char **)0)) == (char *)0
+                && (setf = tgetstr("Sf", (char **)0)) == (char *)0))
+        return;
 
-	for (c = 0; c < CLR_MAX / 2; c++) {
-	    scratch = tparm(setf, ti_map[c]);
-	    if (iflags.wc2_newcolors || (c != CLR_GRAY)) {
-		hilites[c] = (char *) alloc(strlen(scratch) + 1);
-		Strcpy(hilites[c], scratch);
-	    }
-	    if (c != CLR_BLACK) {
-		hilites[c|BRIGHT] = (char*) alloc(strlen(scratch)+strlen(MD)+1);
-		Strcpy(hilites[c|BRIGHT], MD);
-		Strcat(hilites[c|BRIGHT], scratch);
-	    }
+    for (c = 0; c < CLR_MAX / 2; c++) {
+        scratch = tparm(setf, ti_map[c]);
+        if (iflags.wc2_newcolors || (c != CLR_GRAY)) {
+            hilites[c] = (char *) alloc(strlen(scratch) + 1);
+            Strcpy(hilites[c], scratch);
+        }
+        if (c != CLR_BLACK) {
+            hilites[c|BRIGHT] = (char*) alloc(strlen(scratch)+strlen(MD)+1);
+            Strcpy(hilites[c|BRIGHT], MD);
+            Strcat(hilites[c|BRIGHT], scratch);
+        }
 
-	}
-	if (!iflags.wc2_newcolors)
-		hilites[CLR_BLACK] = hilites[CLR_BLUE];
+    }
+    if (!iflags.wc2_newcolors) {
+        hilites[CLR_BLACK] = hilites[CLR_BLUE];
+    }
 
-    if (iflags.wc2_newcolors && colors == 256) {
-        scratch = tparm(setf, 241); /* #626262 */
-        free((genericptr_t) hilites[CLR_BLACK]);
-        hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + 1);
-        Strcpy(hilites[CLR_BLACK], scratch);
+    char *colorterm = getenv("COLORTERM");
+    if (colorterm && !strcmpi(colorterm, "truecolor")) {
+        colors = iflags.color_mode = 16777216;
+    }
+
+    if (iflags.wc2_newcolors) {
+        if (colors == 256) {
+            scratch = tparm(setf, 241); /* #626262 */
+            free((genericptr_t) hilites[CLR_BLACK]);
+            hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + 1);
+            Strcpy(hilites[CLR_BLACK], scratch);
+        } else if (colors == 16777216) {
+           init_color_rgb(CLR_BLACK, 0x626262);
+        }
     }
 
     if (colors == 256) {
@@ -1338,6 +1363,21 @@ init_hilite()
                     hilites[c] = (char *) alloc(strlen(scratch) + 1);
                     Strcpy(hilites[c], scratch);
                 }
+            }
+        }
+    } else if (colors == 16777216) {
+        /* There is currently no reliable way to determine what kind of escape
+         * sequence is understood by the terminal.
+         *
+         * Most terminals seem to support the variant with semicolons, so for
+         * the time being this is taken as default unless configured
+         * differently.
+         *
+         * https://gist.github.com/XVilka/8346728
+         * */
+        for (c = 0; c < CLR_MAX; c++) {
+            if (iflags.color_definitions[c]) {
+                init_color_rgb(c, iflags.color_definitions[c]);
             }
         }
     } else {

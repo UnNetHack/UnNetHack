@@ -398,6 +398,7 @@ struct instance_flags {
 #endif
 #ifdef TEXTCOLOR
     uint64_t color_definitions[CLR_MAX];
+    char     truecolor_separator;
 #endif
 };
 

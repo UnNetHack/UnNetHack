@@ -40,6 +40,7 @@
 	     For example, put "COLOR=light blue:5f00ff" into your config file
 	  - Find a close match for an arbitrary RGB value in 256 color mode
 	  - New extended command: show_colors
+	  - 24 bit color support by detecting COLORTERM=truecolor
 
 	* bug fixes
 	  - Fixed erroneous messages when remaining in stinking clouds
