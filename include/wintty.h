@@ -224,6 +224,7 @@ E short FDECL(set_tty_font_name, (winid, char *));
 #endif
 E char * NDECL(tty_get_color_string);
 #endif
+E int NDECL(tty_debug_show_colors);
 
 /* other defs that really should go away (they're tty specific) */
 E void NDECL(tty_start_screen);

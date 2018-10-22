@@ -1587,6 +1587,7 @@ E void NDECL(free_autopickup_exceptions);
 #ifdef MENU_COLOR
 E boolean FDECL(add_menu_coloring, (char *));
 #endif /* MENU_COLOR */
+E const char * FDECL(clr2colorname, (int));
 
 /* ### pager.c ### */
 

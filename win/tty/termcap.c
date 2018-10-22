@@ -11,7 +11,6 @@
 
 #include "tcap.h"
 
-
 #ifdef MICROPORT_286_BUG
 #define Tgetstr(key) (tgetstr(key,tbuf))
 #else
@@ -1313,31 +1312,38 @@ init_hilite()
         for (c = 0; c < CLR_MAX; c++) {
             if (iflags.color_definitions[c]) {
                 int i;
-                int color = -1;
+                int color_index = -1;
                 int similar = INT_MAX;
                 int current;
 
                 for (i = 0; i < SIZE(color_definitions_256); i++) {
                     /* look for an exact match */
                     if (iflags.color_definitions[c] == color_definitions_256[i].value) {
-                        color = color_definitions_256[i].index;
+                        color_index = i;
                         break;
                     }
                     /* find a close color match */
                     current = color_distance(iflags.color_definitions[c], color_definitions_256[i].value);
                     if (current < similar) {
-                        color = color_definitions_256[i].index;
+                        color_index = i;
                         similar = current;
                     }
                 }
 
-                if (color >= 0) {
+                if (color_index >= 0) {
+                    iflags.color_definitions[c] = color_definitions_256[color_index].value;
+                    int color = color_definitions_256[color_index].index;
                     scratch = tparm(setf, color);
                     free((genericptr_t) hilites[c]);
                     hilites[c] = (char *) alloc(strlen(scratch) + 1);
                     Strcpy(hilites[c], scratch);
                 }
             }
+        }
+    } else {
+        /* no customized color support, clear color definitions */
+        for (c = 0; c < CLR_MAX; c++) {
+            iflags.color_definitions[c] = 0;
         }
     }
 }

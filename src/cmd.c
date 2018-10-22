@@ -177,6 +177,8 @@ static char last_cmd_char='\0';
 STATIC_DCL char *NDECL(parse);
 STATIC_DCL boolean FDECL(help_dir, (CHAR_P,const char *));
 
+static int debug_show_colors();
+
 STATIC_PTR int
 doprev_message()
 {
@@ -1833,6 +1835,7 @@ struct ext_func_tab extcmdlist[] = {
 #ifdef LIVELOG_SHOUT
 	{"shout", "shout something", doshout, FALSE},
 #endif
+    {"show_colors", "show available colors", debug_show_colors, TRUE},
 	{"sit", "sit down", dosit, FALSE},
 	{"tip", "empty a container of its contents", dotip, FALSE},
 	{"turn", "turn undead", doturn, TRUE},
@@ -3005,6 +3008,16 @@ sokoban_trickster()
 		/* not yet found the sokoban prize */
 		u.uconduct.sokoban += 1;
 	}
+#endif
+}
+
+static int
+debug_show_colors()
+{
+#ifdef TTY_GRAPHICS
+    if (!strncmpi(windowprocs.name, "tty", 3)) {
+        tty_debug_show_colors();
+    }
 #endif
 }
 

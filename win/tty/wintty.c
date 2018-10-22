@@ -1750,52 +1750,55 @@ struct WinDesc *cw;
     register char *cp;
 
     for (n = 0, i = 0; i < cw->maxrow; i++) {
-	if (!cw->offx && (n + cw->offy == ttyDisplay->rows - 1)) {
-	    tty_curs(window, 1, n);
-	    cl_end();
-	    dmore(cw, quitchars);
-	    if (morc == '\033') {
-		cw->flags |= WIN_CANCELLED;
-		break;
-	    }
-	    if (cw->offy) {
-		tty_curs(window, 1, 0);
-		cl_eos();
-	    } else
-		clear_screen();
-	    n = 0;
-	}
-	tty_curs(window, 1, n++);
-	if (cw->offx) cl_end();
-	if (cw->data[i]) {
-	    attr = cw->data[i][0] - 1;
-	    if (cw->offx) {
-		(void) putchar(' '); ++ttyDisplay->curx;
-	    }
-	    term_start_attr(attr);
-	    for (cp = &cw->data[i][1];
+        if (!cw->offx && (n + cw->offy == ttyDisplay->rows - 1)) {
+            tty_curs(window, 1, n);
+            cl_end();
+            dmore(cw, quitchars);
+            if (morc == '\033') {
+                cw->flags |= WIN_CANCELLED;
+                break;
+            }
+            if (cw->offy) {
+                tty_curs(window, 1, 0);
+                cl_eos();
+            } else
+                clear_screen();
+            n = 0;
+        }
+        tty_curs(window, 1, n++);
+        if (cw->offx) cl_end();
+        if (cw->data[i]) {
+            attr = cw->data[i][0] - 1;
+            int color = cw->data[i][1] - 1;
+            if (cw->offx) {
+                (void) putchar(' '); ++ttyDisplay->curx;
+            }
+            term_start_attr(attr);
+            if (color != NO_COLOR) { term_start_color(color); }
+            for (cp = &cw->data[i][2];
 #ifndef WIN32CON
-		    *cp && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
-		    cp++)
+                    *cp && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
+                    cp++)
 #else
-		    *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
-		    cp++, ttyDisplay->curx++)
+                *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
+            cp++, ttyDisplay->curx++)
 #endif
-		(void) putchar(*cp);
-	    term_end_attr(attr);
-	}
+                (void) putchar(*cp);
+            if (color != NO_COLOR) { term_end_color(); }
+            term_end_attr(attr);
+        }
     }
     if (i == cw->maxrow) {
-	char *msave;
-	tty_curs(BASE_WINDOW, (int)cw->offx + 1,
-		 (cw->type == NHW_TEXT) ? (int) ttyDisplay->rows - 1 : n);
-	cl_end();
-	msave = cw->morestr;
-	cw->morestr = "--End--";
-	dmore(cw, quitchars);
-	if (morc == '\033')
-	    cw->flags |= WIN_CANCELLED;
-	cw->morestr = msave;
+        char *msave;
+        tty_curs(BASE_WINDOW, (int)cw->offx + 1,
+                (cw->type == NHW_TEXT) ? (int) ttyDisplay->rows - 1 : n);
+        cl_end();
+        msave = cw->morestr;
+        cw->morestr = "--End--";
+        dmore(cw, quitchars);
+        if (morc == '\033')
+            cw->flags |= WIN_CANCELLED;
+        cw->morestr = msave;
     }
 }
 
@@ -2085,10 +2088,12 @@ const char *str;
 }
 
 void
-tty_putstr(window, attr, str)
+tty_putstr_extended(window, color, attr, str, newline)
     winid window;
+    int color;
     int attr;
     const char *str;
+    int newline;
 {
     register struct WinDesc *cw = 0;
     register char *ob;
@@ -2182,55 +2187,65 @@ tty_putstr(window, attr, str)
 	break;
     case NHW_MENU:
     case NHW_TEXT:
-	if(cw->type == NHW_TEXT && cw->cury == ttyDisplay->rows-1) {
-	    /* not a menu, so save memory and output 1 page at a time */
-	    cw->maxcol = ttyDisplay->cols; /* force full-screen mode */
-	    tty_display_nhwindow(window, TRUE);
-	    for(i=0; i<cw->maxrow; i++)
-		if(cw->data[i]){
-		    free((genericptr_t)cw->data[i]);
-		    cw->data[i] = 0;
-		}
-	    cw->maxrow = cw->cury = 0;
-	}
-	/* always grows one at a time, but alloc 12 at a time */
-	if(cw->cury >= cw->rows) {
-	    char **tmp;
-
-	    cw->rows += 12;
-	    tmp = (char **) alloc(sizeof(char *) * (unsigned)cw->rows);
-	    for(i=0; i<cw->maxrow; i++)
-		tmp[i] = cw->data[i];
-	    if(cw->data)
-		free((genericptr_t)cw->data);
-	    cw->data = tmp;
-
-	    for(i=cw->maxrow; i<cw->rows; i++)
-		cw->data[i] = 0;
-	}
-	if(cw->data[cw->cury])
-	    free((genericptr_t)cw->data[cw->cury]);
-	n0 = strlen(str) + 1;
-	ob = cw->data[cw->cury] = (char *)alloc((unsigned)n0 + 1);
-	*ob++ = (char)(attr + 1);	/* avoid nuls, for convenience */
-	Strcpy(ob, str);
-
-	if(n0 > cw->maxcol)
-	    cw->maxcol = n0;
-	if(++cw->cury > cw->maxrow)
-	    cw->maxrow = cw->cury;
-	if(n0 > CO) {
-	    /* attempt to break the line */
-	    for(i = CO-1; i && str[i] != ' ' && str[i] != '\n';)
-		i--;
-	    if(i) {
-		cw->data[cw->cury-1][++i] = '\0';
-		tty_putstr(window, attr, &str[i]);
-	    }
-
-	}
-	break;
+    if(cw->type == NHW_TEXT && cw->cury == ttyDisplay->rows-1) {
+        /* not a menu, so save memory and output 1 page at a time */
+        cw->maxcol = ttyDisplay->cols; /* force full-screen mode */
+        tty_display_nhwindow(window, TRUE);
+        for(i=0; i<cw->maxrow; i++)
+            if(cw->data[i]){
+                free((genericptr_t)cw->data[i]);
+                cw->data[i] = 0;
+            }
+        cw->maxrow = cw->cury = 0;
     }
+    /* always grows one at a time, but alloc 12 at a time */
+    if(cw->cury >= cw->rows) {
+        char **tmp;
+
+        cw->rows += 12;
+        tmp = (char **) alloc(sizeof(char *) * (unsigned)cw->rows);
+        for(i=0; i<cw->maxrow; i++)
+            tmp[i] = cw->data[i];
+        if(cw->data)
+            free((genericptr_t)cw->data);
+        cw->data = tmp;
+
+        for(i=cw->maxrow; i<cw->rows; i++)
+            cw->data[i] = 0;
+    }
+    if(cw->data[cw->cury])
+        free((genericptr_t)cw->data[cw->cury]);
+    n0 = strlen(str) + 1;
+    ob = cw->data[cw->cury] = (char *)alloc((unsigned)n0 + 2);
+    *ob++ = (char)(attr + 1);	/* avoid nuls, for convenience */
+    *ob++ = (char)(color + 1);	/* avoid nuls, for convenience */
+    Strcpy(ob, str);
+
+    if(n0 > cw->maxcol)
+        cw->maxcol = n0;
+    if(++cw->cury > cw->maxrow)
+        cw->maxrow = cw->cury;
+    if(n0 > CO) {
+        /* attempt to break the line */
+        for(i = CO-1; i && str[i] != ' ' && str[i] != '\n';)
+            i--;
+        if(i) {
+            cw->data[cw->cury-1][++i] = '\0';
+            tty_putstr(window, attr, &str[i]);
+        }
+
+    }
+    break;
+    }
+}
+
+void
+tty_putstr(window, attr, str)
+    winid window;
+    int attr;
+    const char *str;
+{
+    tty_putstr_extended(window, NO_COLOR, attr, str, TRUE);
 }
 
 void
@@ -2796,11 +2811,11 @@ tty_print_glyph(window, x, y, glyph)
 
 #ifdef TEXTCOLOR
     if (color != ttyDisplay->color) {
-	if(ttyDisplay->color != NO_COLOR)
-	    term_end_color();
-	ttyDisplay->color = color;
-	if(color != NO_COLOR)
-	    term_start_color(color);
+        if(ttyDisplay->color != NO_COLOR)
+            term_end_color();
+        ttyDisplay->color = color;
+        if(color != NO_COLOR)
+            term_start_color(color);
     }
 #endif /* TEXTCOLOR */
 
@@ -2986,6 +3001,40 @@ copy_of(s)
 {
     if (!s) s = "";
     return strcpy((char *) alloc((unsigned) (strlen(s) + 1)), s);
+}
+
+/** Show all available colors with names. */
+int
+tty_debug_show_colors()
+{
+    int i,c;
+    winid tmpwin;
+    winid win;
+    char buf[BUFSZ];
+
+    tmpwin = create_nhwindow(NHW_TEXT);
+    putstr(tmpwin, ATR_INVERSE, "Colors");
+    char *colorterm = getenv("COLORTERM");
+    int colors = tgetnum("Co");
+    snprintf(buf, BUFSZ, "%s %d %s", getenv("TERM"), colors, colorterm ? colorterm : "");
+    putstr(tmpwin, 0, buf);
+    putstr(tmpwin, 0, "");
+
+    for (c = 0; c < CLR_MAX; c++) {
+        sprintf(buf, " %2d %s ", c, clr2colorname(c));
+        while (strlen(buf) < 16) { strcat(buf, " "); }
+        if (iflags.color_definitions[c]) {
+            sprintf(eos(buf), " %06x ", iflags.color_definitions[c]);
+        }
+        while (strlen(buf) < 24) { strcat(buf, " "); }
+
+        tty_putstr_extended(tmpwin, c, ATR_INVERSE, buf, TRUE);
+    }
+
+    display_nhwindow(tmpwin, TRUE);
+    destroy_nhwindow(tmpwin);
+
+    return 0;
 }
 
 #endif /* TTY_GRAPHICS */
