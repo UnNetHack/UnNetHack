@@ -1075,26 +1075,27 @@ tty_create_nhwindow(type)
     }
 
     if(newwin->maxrow) {
-	newwin->data =
-		(char **) alloc(sizeof(char *) * (unsigned)newwin->maxrow);
-	newwin->datlen =
-		(short *) alloc(sizeof(short) * (unsigned)newwin->maxrow);
-	if(newwin->maxcol) {
-	    for (i = 0; i < newwin->maxrow; i++) {
-		newwin->data[i] = (char *) alloc((unsigned)newwin->maxcol);
-		newwin->datlen[i] = newwin->maxcol;
-	    }
-	} else {
-	    for (i = 0; i < newwin->maxrow; i++) {
-		newwin->data[i] = (char *) 0;
-		newwin->datlen[i] = 0;
-	    }
-	}
-	if(newwin->type == NHW_MESSAGE)
-	    newwin->maxrow = 0;
+        newwin->data =
+            (char **) alloc(sizeof(char *) * (unsigned)newwin->maxrow);
+        newwin->datlen =
+            (short *) alloc(sizeof(short) * (unsigned)newwin->maxrow);
+        if(newwin->maxcol) {
+            for (i = 0; i < newwin->maxrow; i++) {
+                newwin->data[i] = (char *) alloc((unsigned)newwin->maxcol);
+                newwin->datlen[i] = newwin->maxcol;
+            }
+        } else {
+            for (i = 0; i < newwin->maxrow; i++) {
+                newwin->data[i] = (char *) 0;
+                newwin->datlen[i] = 0;
+            }
+        }
+        if(newwin->type == NHW_MESSAGE)
+            newwin->maxrow = 0;
     } else {
-	newwin->data = (char **)0;
-	newwin->datlen = (short *)0;
+        newwin->data = (char **)0;
+        newwin->attributes = (int **)0;
+        newwin->datlen = (short *)0;
     }
 
     return newid;
@@ -1769,7 +1770,9 @@ struct WinDesc *cw;
         if (cw->offx) cl_end();
         if (cw->data[i]) {
             attr = cw->data[i][0] - 1;
+            int cur_attr = attr;
             int color = cw->data[i][1] - 1;
+            int *attributes = cw->attributes[i];
             if (cw->offx) {
                 (void) putchar(' '); ++ttyDisplay->curx;
             }
@@ -1783,9 +1786,20 @@ struct WinDesc *cw;
                 *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
             cp++, ttyDisplay->curx++)
 #endif
+            {
+                if (attributes) {
+                    int new_attr = attributes[ttyDisplay->curx-cw->offx];
+                    if (new_attr != cur_attr) {
+                        term_end_attr(cur_attr);
+                        term_start_attr(new_attr);
+                        cur_attr = new_attr;
+                    }
+                    if (color != NO_COLOR) { term_start_color(color); }
+                }
                 (void) putchar(*cp);
+            }
             if (color != NO_COLOR) { term_end_color(); }
-            term_end_attr(attr);
+            if (cur_attr = attr) { term_end_attr(attr); }
         }
     }
     if (i == cw->maxrow) {
@@ -2088,12 +2102,12 @@ const char *str;
 }
 
 void
-tty_putstr_extended(window, color, attr, str, newline)
+tty_putstr_extended(window, color, attr, str, attributes)
     winid window;
     int color;
     int attr;
     const char *str;
-    int newline;
+    const int *attributes;
 {
     register struct WinDesc *cw = 0;
     register char *ob;
@@ -2104,138 +2118,164 @@ tty_putstr_extended(window, color, attr, str, newline)
      * probably a panic message
      */
     if(window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0) {
-	tty_raw_print(str);
-	return;
+        tty_raw_print(str);
+        return;
     }
 
     if(str == (const char*)0 ||
-	((cw->flags & WIN_CANCELLED) && (cw->type != NHW_MESSAGE)))
-	return;
+            ((cw->flags & WIN_CANCELLED) && (cw->type != NHW_MESSAGE)))
+        return;
     if(cw->type != NHW_MESSAGE)
-	str = compress_str(str);
+        str = compress_str(str);
 
     ttyDisplay->lastwin = window;
 
     print_vt_code(AVTC_SELECT_WINDOW, window);
 
     switch(cw->type) {
-    case NHW_MESSAGE:
-	/* really do this later */
+        case NHW_MESSAGE:
+            /* really do this later */
 #if defined(USER_SOUNDS) && defined(WIN32CON)
-	play_sound_for_message(str);
+            play_sound_for_message(str);
 #endif
-	update_topl(str);
-	break;
+            update_topl(str);
+            break;
 
-    case NHW_STATUS:
-	ob = &cw->data[cw->cury][j = cw->curx];
-	if(flags.botlx) *ob = 0;
-	if(!cw->cury && (int)strlen(str) >= CO) {
-	    /* the characters before "St:" are unnecessary */
-	    nb = index(str, ':');
-	    if(nb && nb > str+2)
-		str = nb - 2;
-	}
-	nb = str;
-	for(i = cw->curx+1, n0 = cw->cols; i < n0; i++, nb++) {
-	    if(!*nb) {
-		if(*ob || flags.botlx) {
-		    /* last char printed may be in middle of line */
-		    tty_curs(WIN_STATUS, i, cw->cury);
-		    cl_end();
-		}
-		break;
-	    }
-	    if(*ob != *nb)
-		tty_putsym(WIN_STATUS, i, cw->cury, *nb);
-	    if(*ob) ob++;
-	}
-
-	(void) strncpy(&cw->data[cw->cury][j], str, cw->cols - j - 1);
-	cw->data[cw->cury][cw->cols-1] = '\0'; /* null terminate */
-	cw->cury = (cw->cury+1) % iflags.statuslines;
-	cw->curx = 0;
-	break;
-    case NHW_MAP:
-	tty_curs(window, cw->curx+1, cw->cury);
-	term_start_attr(attr);
-	while(*str && (int) ttyDisplay->curx < (int) ttyDisplay->cols-1) {
-	    (void) putchar(*str);
-	    str++;
-	    ttyDisplay->curx++;
-	}
-	cw->curx = 0;
-	cw->cury++;
-	term_end_attr(attr);
-	break;
-    case NHW_BASE:
-	tty_curs(window, cw->curx+1, cw->cury);
-	term_start_attr(attr);
-	while (*str) {
-	    if ((int) ttyDisplay->curx >= (int) ttyDisplay->cols-1) {
-		cw->curx = 0;
-		cw->cury++;
-		tty_curs(window, cw->curx+1, cw->cury);
-	    }
-	    (void) putchar(*str);
-	    str++;
-	    ttyDisplay->curx++;
-	}
-	cw->curx = 0;
-	cw->cury++;
-	term_end_attr(attr);
-	break;
-    case NHW_MENU:
-    case NHW_TEXT:
-    if(cw->type == NHW_TEXT && cw->cury == ttyDisplay->rows-1) {
-        /* not a menu, so save memory and output 1 page at a time */
-        cw->maxcol = ttyDisplay->cols; /* force full-screen mode */
-        tty_display_nhwindow(window, TRUE);
-        for(i=0; i<cw->maxrow; i++)
-            if(cw->data[i]){
-                free((genericptr_t)cw->data[i]);
-                cw->data[i] = 0;
+        case NHW_STATUS:
+            ob = &cw->data[cw->cury][j = cw->curx];
+            if(flags.botlx) *ob = 0;
+            if(!cw->cury && (int)strlen(str) >= CO) {
+                /* the characters before "St:" are unnecessary */
+                nb = index(str, ':');
+                if(nb && nb > str+2)
+                    str = nb - 2;
             }
-        cw->maxrow = cw->cury = 0;
-    }
-    /* always grows one at a time, but alloc 12 at a time */
-    if(cw->cury >= cw->rows) {
-        char **tmp;
+            nb = str;
+            for(i = cw->curx+1, n0 = cw->cols; i < n0; i++, nb++) {
+                if(!*nb) {
+                    if(*ob || flags.botlx) {
+                        /* last char printed may be in middle of line */
+                        tty_curs(WIN_STATUS, i, cw->cury);
+                        cl_end();
+                    }
+                    break;
+                }
+                if(*ob != *nb)
+                    tty_putsym(WIN_STATUS, i, cw->cury, *nb);
+                if(*ob) ob++;
+            }
 
-        cw->rows += 12;
-        tmp = (char **) alloc(sizeof(char *) * (unsigned)cw->rows);
-        for(i=0; i<cw->maxrow; i++)
-            tmp[i] = cw->data[i];
-        if(cw->data)
-            free((genericptr_t)cw->data);
-        cw->data = tmp;
+            (void) strncpy(&cw->data[cw->cury][j], str, cw->cols - j - 1);
+            cw->data[cw->cury][cw->cols-1] = '\0'; /* null terminate */
+            cw->cury = (cw->cury+1) % iflags.statuslines;
+            cw->curx = 0;
+            break;
+        case NHW_MAP:
+            tty_curs(window, cw->curx+1, cw->cury);
+            term_start_attr(attr);
+            while(*str && (int) ttyDisplay->curx < (int) ttyDisplay->cols-1) {
+                (void) putchar(*str);
+                str++;
+                ttyDisplay->curx++;
+            }
+            cw->curx = 0;
+            cw->cury++;
+            term_end_attr(attr);
+            break;
+        case NHW_BASE:
+            tty_curs(window, cw->curx+1, cw->cury);
+            term_start_attr(attr);
+            while (*str) {
+                if ((int) ttyDisplay->curx >= (int) ttyDisplay->cols-1) {
+                    cw->curx = 0;
+                    cw->cury++;
+                    tty_curs(window, cw->curx+1, cw->cury);
+                }
+                (void) putchar(*str);
+                str++;
+                ttyDisplay->curx++;
+            }
+            cw->curx = 0;
+            cw->cury++;
+            term_end_attr(attr);
+            break;
+        case NHW_MENU:
+        case NHW_TEXT:
+            if(cw->type == NHW_TEXT && cw->cury == ttyDisplay->rows-1) {
+                /* not a menu, so save memory and output 1 page at a time */
+                cw->maxcol = ttyDisplay->cols; /* force full-screen mode */
+                tty_display_nhwindow(window, TRUE);
+                for(i=0; i<cw->maxrow; i++)
+                    if(cw->data[i]){
+                        free((genericptr_t)cw->data[i]);
+                        cw->data[i] = 0;
+                    }
+                cw->maxrow = cw->cury = 0;
+            }
+            /* always grows one at a time, but alloc 12 at a time */
+            if(cw->cury >= cw->rows) {
+                char **tmp;
+                int **tmp_attr;
 
-        for(i=cw->maxrow; i<cw->rows; i++)
-            cw->data[i] = 0;
-    }
-    if(cw->data[cw->cury])
-        free((genericptr_t)cw->data[cw->cury]);
-    n0 = strlen(str) + 1;
-    ob = cw->data[cw->cury] = (char *)alloc((unsigned)n0 + 2);
-    *ob++ = (char)(attr + 1);	/* avoid nuls, for convenience */
-    *ob++ = (char)(color + 1);	/* avoid nuls, for convenience */
-    Strcpy(ob, str);
+                cw->rows += 12;
+                tmp = (char **) alloc(sizeof(char *) * (unsigned)cw->rows);
+                for (i=0; i<cw->maxrow; i++) {
+                    tmp[i] = cw->data[i];
+                }
+                if (cw->data) {
+                    free((genericptr_t)cw->data);
+                }
+                cw->data = tmp;
 
-    if(n0 > cw->maxcol)
-        cw->maxcol = n0;
-    if(++cw->cury > cw->maxrow)
-        cw->maxrow = cw->cury;
-    if(n0 > CO) {
-        /* attempt to break the line */
-        for(i = CO-1; i && str[i] != ' ' && str[i] != '\n';)
-            i--;
-        if(i) {
-            cw->data[cw->cury-1][++i] = '\0';
-            tty_putstr(window, attr, &str[i]);
-        }
+                tmp_attr = (int **) alloc(sizeof(int *) * (unsigned)cw->rows);
+                for (i=0; i<cw->maxrow; i++) {
+                    tmp_attr[i] = cw->attributes[i];
+                }
+                if (cw->attributes) {
+                    free((genericptr_t)cw->attributes);
+                }
+                cw->attributes = tmp_attr;
 
-    }
-    break;
+                for (i=cw->maxrow; i<cw->rows; i++) {
+                    cw->data[i] = 0;
+                    cw->attributes[i] = 0;
+                }
+            }
+            if (cw->data[cw->cury]) {
+                free((genericptr_t)cw->data[cw->cury]);
+            }
+            if (cw->attributes[cw->cury]) {
+                free((genericptr_t)cw->attributes[cw->cury]);
+            }
+            n0 = strlen(str) + 1;
+            ob = cw->data[cw->cury] = (char *)alloc((unsigned)n0 + 3);
+            /* avoid nuls, for convenience */
+            *ob++ = (char)(attr + 1);
+            *ob++ = (char)(color + 1);
+            Strcpy(ob, str);
+
+            if (attributes) {
+                cw->attributes[cw->cury] = (int *)alloc(n0 * sizeof(int));
+                for (i = 0; i < strlen(str); i++) {
+                    cw->attributes[cw->cury][i] = attributes[i];
+                }
+            }
+
+            if(n0 > cw->maxcol)
+                cw->maxcol = n0;
+            if(++cw->cury > cw->maxrow)
+                cw->maxrow = cw->cury;
+            if(n0 > CO) {
+                /* attempt to break the line */
+                for(i = CO-1; i && str[i] != ' ' && str[i] != '\n';)
+                    i--;
+                if(i) {
+                    cw->data[cw->cury-1][++i] = '\0';
+                    tty_putstr(window, attr, &str[i]);
+                }
+
+            }
+            break;
     }
 }
 
@@ -2245,7 +2285,7 @@ tty_putstr(window, attr, str)
     int attr;
     const char *str;
 {
-    tty_putstr_extended(window, NO_COLOR, attr, str, TRUE);
+    tty_putstr_extended(window, NO_COLOR, attr, str, NULL);
 }
 
 void
@@ -3011,6 +3051,7 @@ tty_debug_show_colors()
     winid tmpwin;
     winid win;
     char buf[BUFSZ];
+    int attributes[BUFSZ];
 
     tmpwin = create_nhwindow(NHW_TEXT);
     putstr(tmpwin, ATR_INVERSE, "Colors");
@@ -3029,11 +3070,20 @@ tty_debug_show_colors()
         sprintf(buf, " %2d %s ", c, clr2colorname(c));
         while (strlen(buf) < 16) { strcat(buf, " "); }
         if (iflags.color_definitions[c]) {
-            sprintf(eos(buf), " %06x ", iflags.color_definitions[c]);
+            sprintf(eos(buf), "  %06" PRIx64 " ", iflags.color_definitions[c]);
         }
-        while (strlen(buf) < 24) { strcat(buf, " "); }
+        while (strlen(buf) < 26) { strcat(buf, " "); }
+        sprintf(eos(buf), " %2d %s ", c, clr2colorname(c));
+        while (strlen(buf) < 42) { strcat(buf, " "); }
+        if (iflags.color_definitions[c]) {
+            sprintf(eos(buf), "  %06" PRIx64 " ", iflags.color_definitions[c]);
+        }
 
-        tty_putstr_extended(tmpwin, c, ATR_INVERSE, buf, TRUE);
+        for (i = 0; i < strlen(buf); i++) {
+            attributes[i] = (i < 26) ? ATR_INVERSE : ATR_NONE;
+        }
+
+        tty_putstr_extended(tmpwin, c, ATR_NONE, buf, attributes);
     }
 
     display_nhwindow(tmpwin, TRUE);

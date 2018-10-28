@@ -37,6 +37,7 @@ struct WinDesc {
 				/* tracking the ^P command */
     short *datlen;		/* allocation size for *data */
     char **data;		/* window data [row][column] */
+    int **attributes;		/* window data [row][column] */
     char *morestr;		/* string to display instead of default */
     tty_menu_item *mlist;	/* menu information (MENU) */
     tty_menu_item **plist;	/* menu page pointers (MENU) */
