@@ -3019,6 +3019,7 @@ debug_show_colors()
         tty_debug_show_colors();
     }
 #endif
+    return 0;
 }
 
 /*cmd.c*/

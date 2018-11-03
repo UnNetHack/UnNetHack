@@ -1530,22 +1530,26 @@ struct WinDesc *cw;
 #endif
 
 #ifdef MENU_COLOR
-		   if (iflags.use_menu_color && iflags.use_color &&
-		       (menucolr = get_menu_coloring(curr->str, &color,&attr))) {
-		       term_start_attr(attr);
-		       if (color != NO_COLOR) term_start_color(color);
-		   } else
+            if (iflags.use_menu_color && iflags.use_color &&
+                    (menucolr = get_menu_coloring(curr->str, &color,&attr))) {
+                term_start_attr(attr);
+                if (color != NO_COLOR) term_start_color(color);
+            } else
 #endif
-		    term_start_attr(curr->attr);
-		    for (n = 0, cp = curr->str;
+            {
+                term_start_attr(curr->attr);
+            }
+            for (n = 0, cp = curr->str;
 #ifndef WIN32CON
-			  *cp && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
-			  cp++, n++)
+                    *cp && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
+                    cp++, n++
 #else
-			  *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
-			  cp++, n++, ttyDisplay->curx++)
+                    *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
+                    cp++, n++, ttyDisplay->curx++
 #endif
-			    (void) putchar(*cp);
+                ) {
+                (void) putchar(*cp);
+            }
 #ifdef MENU_COLOR
 		   if (iflags.use_menu_color && iflags.use_color && menucolr) {
 		       if (color != NO_COLOR) term_end_color();
@@ -1791,7 +1795,7 @@ struct WinDesc *cw;
                     int new_attr = attributes[ttyDisplay->curx-cw->offx];
                     if (new_attr != cur_attr) {
                         term_end_attr(cur_attr);
-                        term_start_attr(new_attr);
+                        if (new_attr != ATR_NONE) { term_start_attr(new_attr); }
                         cur_attr = new_attr;
                     }
                     if (color != NO_COLOR) { term_start_color(color); }
@@ -1799,7 +1803,7 @@ struct WinDesc *cw;
                 (void) putchar(*cp);
             }
             if (color != NO_COLOR) { term_end_color(); }
-            if (cur_attr = attr) { term_end_attr(attr); }
+            if (cur_attr != ATR_NONE) { term_end_attr(attr); }
         }
     }
     if (i == cw->maxrow) {
@@ -3049,7 +3053,6 @@ tty_debug_show_colors()
 {
     int i,c;
     winid tmpwin;
-    winid win;
     char buf[BUFSZ];
     int attributes[BUFSZ];
 

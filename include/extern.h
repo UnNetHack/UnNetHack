@@ -198,6 +198,9 @@ E char FDECL(paranoid_yn, (const char *, BOOLEAN_P));
 E void NDECL(sokoban_trickster);
 E void FDECL(list_vanquished, (int, BOOLEAN_P));
 E void NDECL(list_vanquishedonly);
+#ifdef TTY_GRAPHICS
+E int tty_debug_show_colors();
+#endif
 
 /* ### dbridge.c ### */
 
