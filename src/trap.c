@@ -2408,6 +2408,7 @@ boolean byplayer;
 void
 float_up()
 {
+    flags.botl = TRUE;
 	if(u.utrap) {
 		if(u.utraptype == TT_PIT) {
 			u.utrap = 0;
@@ -2487,6 +2488,7 @@ long hmask, emask;     /* might cancel timeout */
 	HLevitation &= ~hmask;
 	ELevitation &= ~emask;
 	if(Levitation) return(0); /* maybe another ring/potion/boots */
+    flags.botl = TRUE;
 	if(u.uswallow) {
 	    You((Flying) ? "feel less buoyant, but you are still %s.":
 	                   "float down, but you are still %s.",

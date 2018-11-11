@@ -155,6 +155,7 @@ boolean talk;
 {
 	long old = Vomiting;
 
+    flags.botl = TRUE;
 	if(!xtime && old)
 	    if(talk) You_feel("much less nauseated now.");
 

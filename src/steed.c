@@ -352,6 +352,7 @@ mount_steed(mtmp, force)
 	u.usteed = mtmp;
 	remove_monster(mtmp->mx, mtmp->my);
 	teleds(mtmp->mx, mtmp->my, TRUE);
+    flags.botl = TRUE;
 	return (TRUE);
 }
 

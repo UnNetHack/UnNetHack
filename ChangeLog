@@ -27,6 +27,8 @@
 	  - Don't autopickup unpaid items (from NetHack 3.6)
 	  - Change default of shopkeeper sell prompt to 'n' (idea by aosdict)
 	  - Autoidentify wands of undead turning if engraving produces a message
+	  - Added stone, strangled, levitation, flying, and riding indicators
+	    to the status line
 
 	* dungeon layout:
 	  - Backyard of watery castle get trap doors to ensure player can

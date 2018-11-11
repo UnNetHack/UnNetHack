@@ -415,6 +415,17 @@ char *buf;
 	return ret;
 }
 
+static void
+add_text_to_botl(const char *text, char *botl)
+{
+#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
+    add_colored_text(text, botl);
+#else
+    abort();
+    Sprintf(botl = eos(botl), " %s", text);
+#endif
+}
+
 #ifdef DUMP_LOG
 void bot2str(newbot2)
 char* newbot2;
@@ -495,76 +506,59 @@ bot2()
 	}
 #endif
 
-	if(strcmp(hu_stat[u.uhs], "        "))
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-		add_colored_text(hu_stat[u.uhs], newbot2);
-#else
-		Sprintf(nb = eos(nb), " %s", hu_stat[u.uhs]);
-#endif
-	if(Confusion)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-		add_colored_text("Conf", newbot2);
-#else
-		Strcat(nb = eos(nb), " Conf");
-#endif
-	if(Sick) {
-		if (u.usick_type & SICK_VOMITABLE)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-			add_colored_text("FoodPois", newbot2);
-#else
-			Strcat(nb = eos(nb), " FoodPois");
-#endif
-		if (u.usick_type & SICK_NONVOMITABLE)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-			add_colored_text("Ill", newbot2);
-#else
-			Strcat(nb = eos(nb), " Ill");
-#endif
-	}
-	if(Blind)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-	     	add_colored_text("Blind", newbot2);
-#else
-		Strcat(nb = eos(nb), " Blind");
-#endif
-	if(Stunned)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-	     	add_colored_text("Stun", newbot2);
-#else
-		Strcat(nb = eos(nb), " Stun");
-#endif
-	if(Hallucination)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-	     	add_colored_text("Hallu", newbot2);
-#else
-		Strcat(nb = eos(nb), " Hallu");
-#endif
-	if(Slimed)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-	     	add_colored_text("Slime", newbot2);
-#else
-		Strcat(nb = eos(nb), " Slime");
-#endif
-	if(cap > UNENCUMBERED)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-		add_colored_text(enc_stat[cap], newbot2);
-#else
-		Sprintf(nb = eos(nb), " %s", enc_stat[cap]);
-#endif
-	if (u.ufeetfrozen > 0) {
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-	     	add_colored_text("Frozen", newbot2);
-#else
-		Strcat(nb = eos(nb), " Frozen");
-#endif
-	}
+    if (Stoned) {
+        add_text_to_botl("Stone", newbot2);
+    }
+    if (Slimed) {
+        add_text_to_botl("Slime", newbot2);
+    }
+    if (Strangled) {
+        add_text_to_botl("Strngl", newbot2);
+    }
+    if (Sick) {
+        if (u.usick_type & SICK_VOMITABLE)
+            add_text_to_botl("FoodPois", newbot2);
+        if (u.usick_type & SICK_NONVOMITABLE)
+            add_text_to_botl("Ill", newbot2);
+    }
+
+    if (strcmp(hu_stat[u.uhs], "        ")) {
+        add_text_to_botl(hu_stat[u.uhs], newbot2);
+    }
+    if (cap > UNENCUMBERED) {
+        add_text_to_botl(enc_stat[cap], newbot2);
+    }
+
+    if (Blind) {
+        add_text_to_botl("Blind", newbot2);
+    }
+    if (Stunned) {
+        add_text_to_botl("Stun", newbot2);
+    }
+    if (Confusion) {
+        add_text_to_botl("Conf", newbot2);
+    }
+    if (Hallucination) {
+        add_colored_text("Hallu", newbot2);
+    }
+
+    /* levitation and flying are mutually exclusive; riding is not */
+    if (Levitation) {
+        add_text_to_botl("Lev", newbot2);
+    } else if (Flying) {
+        add_text_to_botl("Fly", newbot2);
+    }
+    if (u.usteed) {
+        add_text_to_botl("Ride", newbot2);
+    }
+
+    if (u.ufeetfrozen > 0) {
+        add_text_to_botl("Frozen", newbot2);
+    }
 #ifdef ELBERETH
-	if(!Blind && sengr_at("Elbereth", u.ux, u.uy))
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-	     	add_colored_text("Elbereth", newbot2);
-#else
-		Strcat(nb = eos(nb), " Elbereth");
-#endif
+    if (!Blind && sengr_at("Elbereth", u.ux, u.uy)) {
+        add_text_to_botl("Elbereth", newbot2);
+    }
 #endif
 #ifdef DUMP_LOG
 }

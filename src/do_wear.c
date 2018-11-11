@@ -737,10 +737,11 @@ Amulet_on()
 		break;
 	    }
 	case AMULET_OF_STRANGULATION:
-		makeknown(AMULET_OF_STRANGULATION);
-		pline("It constricts your throat!");
-		Strangled = 6;
-		break;
+        makeknown(AMULET_OF_STRANGULATION);
+        Strangled = 6L;
+        flags.botl = TRUE;
+        pline("It constricts your throat!");
+        break;
 	case AMULET_OF_RESTFUL_SLEEP:
 		HSleeping = rnd(100);
 		break;
@@ -789,11 +790,17 @@ Amulet_off()
 		}
 		break;
 	case AMULET_OF_STRANGULATION:
-		if (Strangled) {
-			You("can breathe more easily!");
-			Strangled = 0;
-		}
-		break;
+        if (Strangled) {
+            Strangled = 0L;
+            flags.botl = TRUE;
+            You("can breathe more easily!");
+            if (Breathless) {
+                Your("%s is no longer constricted!", body_part(NECK));
+            } else {
+                You("can breathe more easily!");
+            }
+        }
+        break;
 	case AMULET_OF_RESTFUL_SLEEP:
 		setworn((struct obj *)0, W_AMUL);
 		if (!ESleeping)
@@ -913,6 +920,7 @@ register struct obj *obj;
 		    obj->known = 1;
 		    update_inventory();
 		}
+        flags.botl = TRUE;
 		break;
 	case RIN_INCREASE_ACCURACY:	/* KMH */
 		u.uhitinc += obj->spe;
