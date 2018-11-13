@@ -1578,6 +1578,10 @@ dump_screen()
     dump("", ptr);
     bot2str(buf);
     dump("", buf);
+    if (iflags.statuslines >= 3) {
+        bot3str(buf);
+        dump("", buf);
+    }
     dump_html("</pre>\n", "");
     dump("", "");
     dump("", "");

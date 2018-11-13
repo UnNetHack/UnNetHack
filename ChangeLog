@@ -29,6 +29,8 @@
 	  - Autoidentify wands of undead turning if engraving produces a message
 	  - Added stone, strangled, levitation, flying, and riding indicators
 	    to the status line
+	  - Status indicators on third statuslines
+	  - New option "statuslines" to force 2 or 3 status lines
 
 	* dungeon layout:
 	  - Backyard of watery castle get trap doors to ensure player can

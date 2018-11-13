@@ -461,6 +461,7 @@ static struct Comp_Opt
 	{ "soundcard", "type of sound card to use", 20, SET_IN_FILE },
 #endif
 	{ "statuscolor", "set status colors", PL_PSIZ, SET_IN_FILE },
+	{ "statuslines", "set number of status lines (2 or 3)", 20, SET_IN_GAME },
 	{ "suppress_alert", "suppress alerts about version-specific features",
 						8, SET_IN_FILE },
 	{ "tile_width", "width of tiles", 20, DISP_IN_GAME},	/*WC*/
@@ -2874,6 +2875,20 @@ goodfruit:
 	    return;
 	}
 
+    fullname = "statuslines";
+    if (match_optname(opts, fullname, 11, TRUE)) {
+        op = string_for_opt(opts, negated);
+        if (negated) {
+            bad_negation(fullname, FALSE);
+        } else if (strlen(op) == 1 && (*op == '2' || *op == '3')) {
+            iflags.statuslines = (*op == '2') ? 2 : 3;
+            docrt();
+        } else {
+            badoption(opts);
+        }
+        return;
+    }
+
 #ifdef SORTLOOT
 	fullname = "sortloot";
 	if (match_optname(opts, fullname, 4, TRUE)) {
@@ -4392,6 +4407,8 @@ char *buf;
 	else if (!strcmp(optname, "soundcard"))
 		Sprintf(buf, "%s", to_be_done);
 #endif
+	else if (!strcmp(optname, "statuslines"))
+		Sprintf(buf, "%d", iflags.statuslines);
 	else if (!strcmp(optname, "suppress_alert")) {
 	    if (flags.suppress_alert == 0L)
 		Strcpy(buf, none);

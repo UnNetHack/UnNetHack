@@ -145,6 +145,7 @@ E void NDECL(bot);
 #ifdef DUMP_LOG
 E void FDECL(bot1str, (char *));
 E void FDECL(bot2str, (char *));
+E void FDECL(bot3str, (char *));
 #endif
 
 /* ### cmd.c ### */

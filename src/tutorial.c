@@ -240,16 +240,6 @@ char c;
     check_tutorial_command_message = QT_T_LOOK_REMINDER;
 }
 
-/* These are #defined in every file that they're used!
-   There has to be a better way... */
-#define SATIATED        0
-#define NOT_HUNGRY      1
-#define HUNGRY          2
-#define WEAK            3
-#define FAINTING        4
-#define FAINTED         5
-#define STARVED         6
-
 /* Display tutorial messages based on the state of the character. */
 void
 maybe_tutorial()
