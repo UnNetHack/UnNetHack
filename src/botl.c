@@ -421,7 +421,6 @@ add_text_to_botl(const char *text, char *botl)
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
     add_colored_text(text, botl);
 #else
-    abort();
     Sprintf(botl = eos(botl), " %s", text);
 #endif
 }
