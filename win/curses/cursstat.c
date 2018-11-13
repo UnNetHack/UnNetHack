@@ -91,7 +91,8 @@ static const struct statcolor default_colors[] = {
     {"Ill", CLR_BRIGHT_MAGENTA},
     {"FoodPois", CLR_BRIGHT_MAGENTA},
     {"Slime", CLR_BRIGHT_MAGENTA},
-    {NULL, NULL, NO_COLOR},
+    {"Elbereth", CLR_GREEN},
+    {NULL, NO_COLOR},
 };
 
 static attr_t
@@ -159,7 +160,6 @@ get_playerrank(char *rank)
 static void
 print_statdiff(const char *append, nhstat *stat, int new, int type)
 {
-    char buf[BUFSZ];
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
 
     int color = CLR_GRAY;
@@ -880,6 +880,12 @@ curses_add_statuses(WINDOW *win, boolean align_right,
     /* Encumbrance */
     int enc = near_capacity();
     statprob(enc_stat[enc], enc > UNENCUMBERED);
+
+#ifdef ELBERETH
+    if (sengr_at("Elbereth", u.ux, u.uy)) {
+        statprob("Elbereth", !Blind);
+    }
+#endif
 #undef statprob
 }
 
