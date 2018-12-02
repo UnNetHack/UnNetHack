@@ -2218,7 +2218,7 @@ register struct obj *obj;
 	}
 
     /* blessed or uncursed scrolls of charging charge bag of tricks */
-    if ((current_container->otyp == BAG_OF_TRICKS) &&
+    if (current_container && (current_container->otyp == BAG_OF_TRICKS) &&
             obj->otyp == SCR_CHARGING && !obj->cursed) {
         makeknown(obj->otyp);
         makeknown(current_container->otyp);
