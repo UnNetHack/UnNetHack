@@ -63,6 +63,8 @@
 	  - Fixed lava breath related crash at the edges of the map
 	  - The chest in the Castle containing the wishing wand can never be
 	    trapped (from 3.6.0)
+	  - Picking up items with invweight shows weight of items including
+	    merged items in inventory (reported by aosdict)
 
 	* vanilla bug fixes:
 	  - C343-439: Running NetHack in a terminal window with more than 255
