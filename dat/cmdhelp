@@ -75,8 +75,8 @@ Y       Go northwest until you are on top of something
 ^Y      Go northwest until you are near something
 z       Zap a wand
 Z       Zap (cast) a spell
-<       Go up a staircase
->       Go down a staircase
+<       Go up a staircase or travel to a staircase leading up
+>       Go down a staircase or travel to a staircase leading down
 /       Show what type of thing a symbol corresponds to
 ?       Give a help message
 &       Tell what a command does
