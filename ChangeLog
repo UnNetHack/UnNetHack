@@ -33,6 +33,7 @@
 	  - Optimized placement of menu windows in TTY port
 	  - Mark vibrating square automatically as trap after being found
 	  - Show statues underlined in tty and curses
+	  - Add inventory weight/carrycap and n/52 items display (from xNetHack)
 
 	* bug fixes:
 	  - Fix over-escaping of characters on HTML dump map

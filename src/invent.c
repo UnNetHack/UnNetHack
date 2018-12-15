@@ -2634,6 +2634,22 @@ boolean want_dump;
                  xtra_choice, MENU_UNSELECTED);
         gotsomething = TRUE;
     }
+
+    /* Show weight total and item limit. Only for full invent display, not
+     * within getobj. */
+    if (!lets) {
+        char invheading[QBUFSZ];
+        int wcap = weight_cap();
+        Sprintf(invheading, "Inventory: %d/%d weight (%d/52 slots)",
+                inv_weight() + wcap, wcap, inv_cnt(FALSE));
+        if (want_disp) {
+            add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_BOLD, invheading, MENU_UNSELECTED);
+        }
+        if (want_dump) {
+            dump_subtitle(invheading);
+        }
+    }
+
 nextclass:
     classcount = 0;
     any.a_void = 0;     /* set all bits to zero */
