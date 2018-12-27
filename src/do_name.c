@@ -1278,6 +1278,7 @@ static const char * const bogusmons[] = {
 	"Trogdor the Burninator",                        /* Homestar Runner */
 	"Guy made of Bees", "Toot Oriole",               /* Kingdom of Loathing */
 	"Magnus Burnsides the Fighter", "Taako the Wizard", "Merle Highchurch the Cleric", /* The Adventure Zone */
+    "rubber duck", /* rubber ducks are a programmer's best friend */
 
 	/* bogus UnNetHack monsters */
 	"weeping angle",
@@ -1293,8 +1294,21 @@ static const char * const bogusmons[] = {
 	"sorrow spider", "spider council",
 	"chair of the department of antiquarian esquivalience",
 	"the Starveling Cat",
-	"the Tree of Ages"
-	
+	"the Tree of Ages",
+
+    /* from Slashem Extended */
+    "amphitheatre", /* evil patch idea by yasdorian */
+    "banana peel golem", /* evil patch idea from DCSS */
+    "dissolved undead potato",
+    "dragonbreath nymph"
+    "fart elemental", /* evil patch idea from DCSS */
+    "floating nose", /* evil patch idea by K2 */
+    "goldfish", /* evil patch idea from DCSS */
+    "kamikaze tribble", /* evil patch idea by jonadab */
+    "speedotrice", /* evil patch idea by jonadab */
+    "techno ant",
+    "drum stint reluctance",
+    "tackle deice",
 };
 
 
