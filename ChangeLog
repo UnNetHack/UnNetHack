@@ -65,6 +65,7 @@
 	    trapped (from 3.6.0)
 	  - Picking up items with invweight shows weight of items including
 	    merged items in inventory (reported by aosdict)
+	  - Added missing extrinsic to chromatic dragon armor
 
 	* vanilla bug fixes:
 	  - C343-439: Running NetHack in a terminal window with more than 255

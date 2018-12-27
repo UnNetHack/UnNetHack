@@ -633,6 +633,7 @@ Armor_on()
 			EAcid_resistance   |= W_ARM;
 			EStone_resistance  |= W_ARM;
 			EReflecting        |= W_ARM;
+            EAntimagic         |= W_ARM;
 			break;
 		default:
 			break;
@@ -657,6 +658,7 @@ Armor_off_sub()
 			EAcid_resistance   &= ~W_ARM;
 			EStone_resistance  &= ~W_ARM;
 			EReflecting        &= ~W_ARM;
+            EAntimagic         &= ~W_ARM;
 			break;
 		default:
 			break;
