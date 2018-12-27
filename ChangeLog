@@ -66,6 +66,7 @@
 	  - Picking up items with invweight shows weight of items including
 	    merged items in inventory (reported by aosdict)
 	  - Added missing extrinsic to chromatic dragon armor
+	  - Disallow wishing for any chromatic dragon related items
 
 	* vanilla bug fixes:
 	  - C343-439: Running NetHack in a terminal window with more than 255

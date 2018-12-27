@@ -2325,6 +2325,11 @@ boolean from_user;
 		}
 	}
 
+    /* disallow wishing for chromatic dragon stuff */
+    if (mntmp == PM_CHROMATIC_DRAGON && !wizard) {
+        mntmp = rn2(YELLOW_DRAGON_SCALES-GRAY_DRAGON_SCALES) + PM_GRAY_DRAGON;
+    }
+
 	/* first change to singular if necessary */
 	if (*bp) {
 		char *sng = makesingular(bp);
