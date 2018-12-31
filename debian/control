@@ -4,7 +4,9 @@ Priority: extra
 Maintainer: Patric Mueller <bhaak@gmx.net>
 Build-Depends: debhelper (>= 8.0.0), autotools-dev, flex, bison, libncurses5-dev
 Standards-Version: 3.8.4
-Homepage: http://sourceforge.net/apps/trac/unnethack/
+Homepage: https://unnethack.wordpress.com/
+Vcs-Git: https://github.com/UnNetHack/UnNetHack.git
+Vcs-Browser: https://github.com/unnethack/unnethack
 
 Package: unnethack
 Architecture: any
