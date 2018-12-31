@@ -477,7 +477,7 @@ if test "$enable_dump" != "no" ; then
 	fi
 fi
 
-if test "$enable_tty_graphics" != "no"; then
+if test "$enable_tty_graphics" != "no" -a "$host_os" != mingw32; then
 	NETHACK_ARG(utf8-glyphs,[Enable UTF-8 glyphs in TTY],UTF8_GLYPHS,yes)
 	if test "$enable_utf8_glyphs" != "no" ; then
 		dnl check for uint32_t

@@ -204,31 +204,31 @@ glrip.png:	../util/tile2png $(srcdir)/../win/gl/rip.txt
 tiles.bmp: ../util/tile2bmp$(EXEEXT) $(srcdir)/../win/share/monsters.txt \
 		$(srcdir)/../win/share/objects.txt \
 		$(srcdir)/../win/share/other.txt
-	../util/tile2bmp $@
+	../util/tile2bmp$(EXEEXT) $@
 #$(srcdir)/../win/share/monsters.txt \
 #		$(srcdir)/../win/share/objects.txt \
 #		$(srcdir)/../win/share/other.txt
 
 mnsel.bmp: ../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/mnsel.uu
-	../util/uudecode $(srcdir)/../win/win32/mnsel.uu
+	../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/mnsel.uu
 
 mnselcnt.bmp: ../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/mnselcnt.uu
-	../util/uudecode $(srcdir)/../win/win32/mnselcnt.uu
+	../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/mnselcnt.uu
 
 mnunsel.bmp: ../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/mnunsel.uu
-	../util/uudecode $(srcdir)/../win/win32/mnunsel.uu
+	../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/mnunsel.uu
 
 rip.bmp: ../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/rip.uu
-	../util/uudecode $(srcdir)/../win/win32/rip.uu
+	../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/rip.uu
 
 petmark.bmp: ../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/petmark.uu
-	../util/uudecode $(srcdir)/../win/win32/petmark.uu
+	../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/petmark.uu
 
 UnNetHack.ico: ../util/uudecode$(EXEEXT) $(srcdir)/../sys/winnt/nhico.uu
-	../util/uudecode $(srcdir)/../sys/winnt/nhico.uu
+	../util/uudecode$(EXEEXT) $(srcdir)/../sys/winnt/nhico.uu
 
 splash.bmp: ../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/splash.uu
-	../util/uudecode $(srcdir)/../win/win32/splash.uu
+	../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/splash.uu
 
 UnNetHack.ad: $(srcdir)/../win/X11/UnNetHack.ad
 	cp $(srcdir)/../win/X11/UnNetHack.ad UnNetHack.ad

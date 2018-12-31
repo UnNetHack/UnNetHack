@@ -15,8 +15,8 @@
 #define NEED_VARARGS /* Uses ... */
 #include "hack.h"
 #include "wintty.h"
-#include <sys\types.h>
-#include <sys\stat.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "win32api.h"
 
 void FDECL(cmov, (int, int));

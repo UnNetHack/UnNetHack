@@ -3054,6 +3054,7 @@ copy_of(s)
 int
 tty_debug_show_colors()
 {
+#ifdef TERMINFO
     int i,c;
     winid tmpwin;
     char buf[BUFSZ];
@@ -3094,6 +3095,7 @@ tty_debug_show_colors()
 
     display_nhwindow(tmpwin, TRUE);
     destroy_nhwindow(tmpwin);
+#endif
 
     return 0;
 }

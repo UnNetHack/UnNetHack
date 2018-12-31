@@ -54,11 +54,7 @@ extern int errno;
 #endif
 
 #if defined(MSDOS) || defined(OS2) || defined(TOS) || defined(WIN32)
-# ifndef GNUDOS
-#include <sys\stat.h>
-# else
-#include <sys/stat.h>
-# endif
+# include <sys/stat.h>
 #endif
 #ifndef O_BINARY	/* used for micros, no-op for others */
 # define O_BINARY 0

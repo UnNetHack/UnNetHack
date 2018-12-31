@@ -1,5 +1,6 @@
 *.swp
 *.swo
+*.exe
 compile
 
 # /
@@ -13,6 +14,7 @@ compile
 # /dat/
 /dat/Makefile
 /dat/*.lev
+/dat/*.bmp
 /dat/data
 /dat/dungeon.pdf
 /dat/dungeon
