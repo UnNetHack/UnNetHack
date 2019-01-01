@@ -1,6 +1,12 @@
 General information about UnNetHack
 ===================================
 
+This is release 5.2.0 of UnNetHack. This release updates the previous version
+with bugfixes and new features of the development version 5.3.1 (distribution
+packagers therefore don't need to package 5.2.0 if they already ship 5.3.1).
+
+This release is not bones and saves compatible with 5.1.0.
+
 UnNetHack is a fork of NetHack, originally based on NetHack version 3.4.3.
 
 It features more randomness, more levels, more challenges and more fun than
