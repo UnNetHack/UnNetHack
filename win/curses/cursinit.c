@@ -931,12 +931,17 @@ curses_init_options()
     /* Add those that are */
     set_option_mod_status("classic_status", SET_IN_GAME);
 
-    /* Make sure that DECgraphics is not set to true via the config
-       file, as this will cause display issues.  We can't disable it in
+    /* Make sure that FOOgraphics enables the correct graphic set,
+       otherwise this will cause display issues.  We can't disable them in
        options.c in case the game is compiled with both tty and curses. */
-    if (iflags.DECgraphics) {
+    if (iflags.IBMgraphics) {
+        switch_graphics(IBM_GRAPHICS);
+    } else if (iflags.DECgraphics || iflags.UTF8graphics || iflags.cursesgraphics) {
         switch_graphics(CURS_GRAPHICS);
+    } else {
+        switch_graphics(ASCII_GRAPHICS);
     }
+
 #ifdef PDCURSES
     /* PDCurses for SDL, win32 and OS/2 has the ability to set the
        terminal size programatically.  If the user does not specify a
@@ -952,17 +957,8 @@ curses_init_options()
 
     resize_term(iflags.wc2_term_rows, iflags.wc2_term_cols);
     getmaxyx(base_term, term_rows, term_cols);
-
-    /* This is needed for an odd bug with PDCurses-SDL */
-    switch_graphics(ASCII_GRAPHICS);
-    if (iflags.IBMgraphics) {
-        switch_graphics(IBM_GRAPHICS);
-    } else if (iflags.cursesgraphics) {
-        switch_graphics(CURS_GRAPHICS);
-    } else {
-        switch_graphics(ASCII_GRAPHICS);
-    }
 #endif /* PDCURSES */
+
     if (!iflags.wc2_windowborders) {
         iflags.wc2_windowborders = 3;   /* Set to auto if not specified */
     }
