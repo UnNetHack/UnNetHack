@@ -373,7 +373,7 @@ win32_release: $(GAME)
 	cp $(srcdir)/README $(DESTDIR)$(GAMEDIR)/README.txt
 	touch $(GAMEDIR)/News
 	cp $(srcdir)/dat/*.ttf $(DESTDIR)$(GAMEDIR)/
-	convert -verbose $(srcdir)/tilesets/untiles32x.png $(DESTDIR)$(GAMEDIR)/unchozo32b.bmp
+	convert -verbose $(srcdir)/tilesets/unchozo32b.png $(DESTDIR)$(GAMEDIR)/unchozo32b.bmp
 	vim -c "set fileformat=dos" -c w -c q $(DESTDIR)$(GAMEDIR)/News
 	vim -c "set fileformat=dos" -c w -c q $(DESTDIR)$(GAMEDIR)/defaults.nh
 	vim -c "set fileformat=dos" -c w -c q $(DESTDIR)$(GAMEDIR)/license
@@ -381,4 +381,4 @@ win32_release: $(GAME)
 	vim -c "set fileformat=dos" -c w -c q $(DESTDIR)$(GAMEDIR)/README.txt
 	vim -c "set fileformat=dos" -c w -c q $(DESTDIR)$(GAMEDIR)/Guidebook.txt
 	mv $(DESTDIR)$(GAMEDIR) $(UNNETHACK_WIN32_DIR)
-	cd $(UNNETHACK_WIN32_DIR) && zip -r $(DESTDIR)$(prefix)/$(UNNETHACK_WIN32_DIR).zip `echo * | sort -f`
+	cd $(UNNETHACK_WIN32_DIR) && zip -r $(UNNETHACK_WIN32_DIR).zip `echo * | sort -f`
