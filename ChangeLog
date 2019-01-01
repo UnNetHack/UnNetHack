@@ -1,4 +1,6 @@
-201X-XX-XX  UnNetHack 5.X.X
+20XX-XX-XX  UnNetHack 5.X.X
+
+2019-01-01  UnNetHack 5.2.0
 	* Support SOURCE_DATE_EPOCH for reproducible builds (patch from Debian)
 	* Players killed by Nazgul will arise as Barrow Wights in bones files
 	  (a slight change from the original mythology, we know)
