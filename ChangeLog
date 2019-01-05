@@ -6,21 +6,23 @@
 	  (a slight change from the original mythology, we know)
 	* Reviving drained corpses sometimes won't work, and may destroy 
 	  the corpse. Partially drained corpses are more likely to revive.
-	* Wand wresting happens always when an empty wand is zapped with a chance
-	  depending on BUC state if an effect is produced
 	* Reproducible dungeon layout. Set OPTIONS=seed:number to get the same
 	  dungeon layout.
 	* Vault Guards get angry if you eat gold in front of them. (From Nethack 
 		 Development Code - used with permission)
 	* Several cosmetic changes - additional engravings, hallucinatory monsters, and funny messages.
-	* Picking up scrolls of scare monsters change BUC from blessed to
-	  uncursed to cursed
 	* Default to UTF8graphics on supporting terminals
-	* Putting blessed and uncursed scrolls of charging into a bag of
-	  tricks charges it
 
 	* item changes:
 	  - Decreased weight of all mithril armor, especially ones of elven make
+	  - Wand wresting happens always when an empty wand is zapped with a
+	    chance depending on BUC state if an effect is produced
+	  - Putting blessed and uncursed scrolls of charging into a bag of
+	    tricks charges it
+	  - Picking up scrolls of scare monsters change BUC from blessed to
+	    uncursed to cursed
+	  - Picked up scrolls of scare monsters only turn to dust if they are
+	    cursed
 
 	* user interface improvements:
 	  - Added naming last broken object to #name menu (idea from AceHack/NH4)
