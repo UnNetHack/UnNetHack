@@ -1,6 +1,6 @@
 language: c
 
-script: "./configure && make all"
+script: "./configure --enable-dummy-graphics --enable-lisp-graphics --enable-curses-graphics --enable-x11-graphics --enable-tty-graphics && make all"
 
 compiler:
   - gcc
@@ -14,6 +14,4 @@ notifications:
     use_notice: true
     skip_join: true
   email:
-    recipients:
-      - bhaak@gmx.net
     on_success: always

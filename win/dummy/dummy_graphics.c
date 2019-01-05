@@ -459,12 +459,21 @@ void dummy_putstr(winid wid, int attr, const char *text)
 /* Display the file named str.  Complain about missing files
                    iff complain is TRUE.
 */
-void dummy_display_file(const char *filename,BOOLEAN_P must_exist)
+void
+#ifdef FILE_AREAS
+dummy_display_file(const char *farea, const char *filename, BOOLEAN_P must_exist)
+#else
+dummy_display_file(const char *filename, BOOLEAN_P must_exist)
+#endif
 {
 	printf("dummy_display_file(%s, %d)\n", filename, must_exist);
 	dlb *f;
 
+#ifdef FILE_AREAS
+	f = dlb_fopen_area(farea, filename, "r");
+#else
 	f = dlb_fopen(filename, "r");
+#endif
 	if (!f) {
 		if (must_exist) {
 			printf("Warning! Could not find file: %s\n",filename);

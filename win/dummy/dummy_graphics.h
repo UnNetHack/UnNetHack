@@ -21,7 +21,11 @@ void dummy_display_nhwindow(winid wid, BOOLEAN_P block);
 void dummy_destroy_nhwindow(winid wid);
 void dummy_curs(winid wid, int x, int y);
 void dummy_putstr(winid wid, int attr, const char *text);
-void dummy_display_file(const char *filename,BOOLEAN_P must_exist);
+#ifdef FILE_AREAS
+void dummy_display_file(const char *farea, const char *filename, BOOLEAN_P must_exist);
+#else
+void dummy_display_file(const char *filename, BOOLEAN_P must_exist);
+#endif
 void dummy_start_menu(winid wid);
 void dummy_add_menu(winid wid, int glyph, int cnt, const ANY_P * identifier,
 		CHAR_P accelerator, CHAR_P group_accel, int attr, 
