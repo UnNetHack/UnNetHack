@@ -450,7 +450,6 @@ fuzzymatch(s1, s2, ignore_chars, caseblind)
  * Time routines
  *
  * The time is used for:
- *	- seed for rand()
  *	- year on tombstone and yyyymmdd in record file
  *	- phase of the moon (various monsters react to NEW_MOON or FULL_MOON)
  *	- night and midnight (the undead are dangerous at midnight)
@@ -476,19 +475,23 @@ get_int_from_dev_random()
 	return random_seed;
 }
 
+/** Initialize random number generator. */
 void
 init_random(unsigned int seed)
 {
-	unsigned int random_seed=get_int_from_dev_random();
+    unsigned int random_seed=get_int_from_dev_random();
 
-	if (seed == 0) {
-		seed = (unsigned int) (time((time_t *)0)) + random_seed;
-	}
+    if (seed == 0) {
+        seed = (unsigned int) (time((time_t *)0)) + random_seed;
+    } else {
+        /* user has set seed in config */
+        level_info[0].flags |= PRE_SEEDED;
+    }
 
-	/* save seed in the dummy level 0 */
-	level_info[0].seed = seed;
+    /* save seed in the dummy level 0 */
+    level_info[0].seed = seed;
 
-	set_random_state(seed);
+    set_random_state(seed);
 }
 
 void

@@ -167,6 +167,8 @@ struct linfo {
 #define VISITED		0x01	/* hero has visited this level */
 #define FORGOTTEN	0x02	/* hero will forget this level when reached */
 #define LFILE_EXISTS	0x04	/* a level file exists for this level */
+#define PRE_SEEDED	0x08	/* dungeon was generated with user supplied seed */
+#define is_game_pre_seeded (level_info[0].flags & PRE_SEEDED)
 	unsigned int	seed;	/* level seed */
 /*
  * Note:  VISITED and LFILE_EXISTS are currently almost always set at the

@@ -1,5 +1,6 @@
 20XX-XX-XX  UnNetHack 5.X.X
 	* Use TAB as separator in xlogfile
+	* Add info about pre-seeded games to dumplog
 
 2019-01-01  UnNetHack 5.2.0
 	* Support SOURCE_DATE_EPOCH for reproducible builds (patch from Debian)

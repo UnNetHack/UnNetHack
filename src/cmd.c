@@ -970,9 +970,13 @@ boolean want_disp;
 		Sprintf(buf, " %d", level_difficulty());
 		enl_msg("Level difficulty ", "is", "was", buf);
 	}
-	if (wizard) {
-		Sprintf(buf, " %u", level_info[0].seed);
-		enl_msg("Seed ", "is", "was", buf);
+	if (wizard || final) {
+        Sprintf(buf, " %u", level_info[0].seed);
+        enl_msg("Seed ", "is", "was", buf);
+        Sprintf(buf, " %u", level_info[0].seed);
+        if (is_game_pre_seeded) {
+            enl_msg("You ", "are playing", "played", " a pre-seeded game");
+        }
 	}
 #endif
 
