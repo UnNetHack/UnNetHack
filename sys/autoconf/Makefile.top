@@ -349,6 +349,8 @@ spotless:
 	-rm -f Makefile include/autoconf.h include/autoconf_paths.h include/win32api.h
 
 distclean: spotless
+check:
+	(cd tests && make)
 
 include/autoconf_paths.h: Makefile
 	echo '#ifndef AUTOCONF_PATH_H'  >$@

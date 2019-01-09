@@ -1,6 +1,6 @@
 language: c
 
-script: "./configure --enable-dummy-graphics --enable-lisp-graphics --enable-curses-graphics --enable-x11-graphics --enable-tty-graphics && make all"
+script: "./configure --enable-dummy-graphics --enable-lisp-graphics --enable-curses-graphics --enable-x11-graphics --enable-tty-graphics && make all check"
 
 compiler:
   - gcc

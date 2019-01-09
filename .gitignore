@@ -55,6 +55,13 @@ compile
 /src/monstr.c
 /src/tile.c
 
+# /tests/
+tests/*/test_*.xml
+tests/options/test_base32
+tests/options/test_options
+tests/unicode/test_unicode
+tests/wishing/test_wishing
+
 # /util/
 /util/*.o
 /util/Makefile

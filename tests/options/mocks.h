@@ -6,12 +6,12 @@
 
 struct window_procs windowprocs;
 
-#include "../../src/hacklib.c"
-#include "../../src/decl.c"
-#include "../../src/drawing.c"
-#include "../../src/options.c"
-#include "../../src/rnd.c"
-#include "../../src/alloc.c"
+#include "hacklib.c"
+#include "decl.c"
+#include "drawing.c"
+#include "options.c"
+#include "rnd.c"
+#include "alloc.c"
 
 
 #include <stdarg.h>
@@ -28,6 +28,7 @@ void pline_The(const char *str,...) {}
 void You_cant(const char *str,...) {}
 void panic(const char *str,...) {}
 void terminate(int status) {}
+void docrt() {}
 
 int str2role(char *str) { return 0; }
 int str2race(char *str) { return 0; }

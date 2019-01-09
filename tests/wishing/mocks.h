@@ -10,6 +10,7 @@ struct window_procs windowprocs;
 #include "decl.c"
 #include "drawing.c"
 #include "options.c"
+#include "rnd_isaac.c"
 #include "rnd.c"
 #include "alloc.c"
 #include "mkobj.c"
@@ -18,6 +19,8 @@ struct window_procs windowprocs;
 #include "objnam.c"
 
 #include <stdarg.h>
+
+int isok(int x, int y) { return 1; }
 
 void raw_printf(const char *str,...) {}
 void impossible(const char *str,...) {}
@@ -31,6 +34,7 @@ void pline_The(const char *str,...) {}
 void You_cant(const char *str,...) {}
 void panic(const char *str,...) {}
 void terminate(int status) {}
+void docrt() {}
 
 int str2role(char *str) { return 0; }
 int str2race(char *str) { return 0; }
