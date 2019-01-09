@@ -247,8 +247,8 @@ struct toptenentry *tt;
 }
 
 #ifdef XLOGFILE
-#define SEP ":"
-#define SEPC ':'
+#define SEP "\t"
+#define SEPC '\t'
 
 /* copy a maximum of n-1 characters from src to dest, changing ':' and '\n'
  * to '_'; always null-terminate. */

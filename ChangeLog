@@ -1,4 +1,5 @@
 20XX-XX-XX  UnNetHack 5.X.X
+	* Use TAB as separator in xlogfile
 
 2019-01-01  UnNetHack 5.2.0
 	* Support SOURCE_DATE_EPOCH for reproducible builds (patch from Debian)
@@ -139,7 +140,7 @@
 	  - Reading a Scroll of Light while confused summons some (black) lights
 	  - Reading a non-blessed scroll of punishment while confused summons a Punisher. BE CAREFUL
 	  - A horn of plenty has a *small* chance to produce potions of [vampire] blood
-	  
+
 	* artifact changes:
 	  - From SporkHack:
 	    - All the weapons below warn against and have 20% instakill chance 
@@ -603,7 +604,6 @@
 	  - Amulet of Yendor may teleport away when dropped
 	  - Scrolls of gold detection: confused reading shows a random item class
 	  - Scrolls of genocide kill monster on level (uncursed) or globally (blessed) 
-
 
 	* Patches:
 	  - Astral Escape (via GruntHack from Chi)
