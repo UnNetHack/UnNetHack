@@ -348,6 +348,8 @@ spotless:
 	( cd doc ; $(MAKE) spotless )
 	-rm -f Makefile include/autoconf.h include/autoconf_paths.h include/win32api.h
 
+distclean: spotless
+
 include/autoconf_paths.h: Makefile
 	echo '#ifndef AUTOCONF_PATH_H'  >$@
 	echo '#undef AUTOCONF_PATH_H'  >>$@
@@ -367,6 +369,8 @@ UNNETHACK_RELEASE_ARCHIVE = $(DESTDIR)$(prefix)/$(UNNETHACK_RELEASE_ARCHIVE_PREF
 release_archive: $(GAME)
 	rm -f $(UNNETHACK_RELEASE_ARCHIVE)
 	git ls-files | tar cfz $(UNNETHACK_RELEASE_ARCHIVE) --mtime=now --transform 's,^,$(UNNETHACK_RELEASE_ARCHIVE_PREFIX)/,' -T -
+
+dist: release_archive
 
 win32_release: $(GAME)
 	cp $(srcdir)/ChangeLog  $(DESTDIR)$(GAMEDIR)/ChangeLog.txt
