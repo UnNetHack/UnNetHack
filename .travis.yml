@@ -6,6 +6,11 @@ compiler:
   - gcc
   - clang
 
+addons:
+  apt:
+    packages:
+      - check
+
 sudo: false
 
 notifications:
