@@ -12,6 +12,7 @@ struct window_procs windowprocs;
 #include "options.c"
 #include "rnd.c"
 #include "alloc.c"
+#include "base32.c"
 
 
 #include <stdarg.h>

@@ -11,6 +11,7 @@ struct window_procs windowprocs;
 #include "../../src/drawing.c"
 #include "../../src/options.c"
 #include "../../src/alloc.c"
+#include "base32.c"
 
 
 #include <stdarg.h>

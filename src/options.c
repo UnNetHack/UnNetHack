@@ -2800,16 +2800,24 @@ goodfruit:
 		return;
 	}
 
-	fullname = "seed";
-	if (match_optname(opts, fullname, sizeof("seed")-1, TRUE)) {
-		if (negated) {
-			bad_negation(fullname, FALSE);
-			return;
-		} else if (!(op = string_for_opt(opts, FALSE))) return;
-		unsigned int seed = atoi(op);
-		init_random(seed);
-		return;
-	}
+    fullname = "seed";
+    if (match_optname(opts, fullname, sizeof("seed")-1, TRUE)) {
+        if (negated) {
+            bad_negation(fullname, FALSE);
+            return;
+        } else if (!(op = string_for_opt(opts, FALSE))) {
+            return;
+        }
+        unsigned int seed;
+        /* base32 is marked by a leading u */
+        if (*op == 'u') {
+            seed = decode_base32(op);
+        } else {
+            seed = atoi(op);
+        }
+        init_random(seed);
+        return;
+    }
 
 #ifdef PARANOID
 	fullname = "conducts";

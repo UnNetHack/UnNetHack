@@ -255,6 +255,7 @@ HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h\
 FIRSTOBJ = monst.o objects.o alloc.o
 
 HOBJ = $(FIRSTOBJ) allmain.o apply.o artifact.o attrib.o ball.o \
+	base32.o \
 	bones.o botl.o cmd.o dbridge.o decl.o detect.o dig.o display.o dlb.o \
 	do.o do_name.o do_wear.o dog.o dogmove.o dokick.o dothrow.o \
 	drawing.o dump.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
@@ -737,6 +738,7 @@ artifact.o: $(srcdir)/artifact.c $(HACK_H) ../include/artifact.h \
 		../include/artilist.h
 attrib.o: $(srcdir)/attrib.c $(HACK_H)
 ball.o: $(srcdir)/ball.c $(HACK_H)
+base32.o: $(srcdir)/base32.c $(HACK_H)
 bones.o: $(srcdir)/bones.c $(HACK_H) ../include/lev.h
 botl.o: $(srcdir)/botl.c $(HACK_H)
 cmd.o: $(srcdir)/cmd.c $(HACK_H) ../include/func_tab.h

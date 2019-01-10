@@ -14,6 +14,7 @@ struct window_procs windowprocs;
 #include "alloc.c"
 #include "mkobj.c"
 #include "mondata.c"
+#include "base32.c"
 
 #include "objnam.c"
 

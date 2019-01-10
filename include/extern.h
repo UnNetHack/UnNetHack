@@ -2667,6 +2667,10 @@ E void FDECL(check_tutorial_command, (char));
 E int FDECL(check_tutorial_location, (int, int, BOOLEAN_P));
 E int FDECL(check_tutorial_oclass, (int));
 
+/* ### base32.c ### */
+long decode_base32(const char*);
+const char* encode_base32(unsigned long);
+
 /* ### unicode.c ### */
 E glyph_t FDECL(get_unicode_codepoint, (int));
 E int FDECL(pututf8char, (glyph_t));
