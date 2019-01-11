@@ -693,7 +693,7 @@ static const char * const ghostnames[] = {
 	/* Capitalize the names for aesthetics -dgk */
 	"Adri", "Andries", "Andreas", "Bert", "David", "Dirk", "Emile",
 	"Frans", "Fred", "Greg", "Hether", "Jay", "John", "Jon", "Karnov",
-	"Kay", "Kenny", "Kevin", "Maud", "Michiel", "Mike", "Peter", "Robert",
+	"Kay", "Kenny", "Kevin", "Maud", "Michiel", "Mike", "Peter", "Pipes", "Robert",
 	"Ron", "Tom", "Wilmar", "Nick Danger", "Phoenix", "Jiro", "Mizue",
 	"Stephan", "Lance Braccus", "Shadowhawk"
 };
