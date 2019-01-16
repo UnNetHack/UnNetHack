@@ -46,7 +46,8 @@ decode_base32(const char* str)
 {
     size_t len = strlen(str);
     unsigned long ret = 0;
-    for (int i=0; i<len; i++) {
+    int i;
+    for (i=0; i<len; i++) {
         if (str[i] == 'o' || str[i] == 'u') {
             /* ignore */
         } else if (str[i] >= '0' && str[i] <= '9') {
@@ -111,7 +112,8 @@ encode_base32(unsigned long input)
         input /= 32;
     }
     int len = strlen(base32_output);
-    for (int i=0; i<len/2; i++) {
+    int i;
+    for (i=0; i<len/2; i++) {
         char tmp = base32_output[i];
         base32_output[i] = base32_output[len-1-i];
         base32_output[len-1-i] = tmp;
