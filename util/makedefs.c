@@ -726,9 +726,6 @@ static const char *build_opts[] = {
 #ifdef REDO
 		"redo command",
 #endif
-#ifdef REINCARNATION
-		"rogue level",
-#endif
 #ifdef STEED
 		"saddles and riding",
 #endif
