@@ -23,6 +23,7 @@ STATIC_DCL coord * FDECL(shrine_pos, (int));
 STATIC_DCL struct permonst * NDECL(morguemon);
 STATIC_DCL struct permonst * NDECL(antholemon);
 STATIC_DCL struct permonst * NDECL(squadmon);
+STATIC_DCL struct permonst * NDECL(armorymon);
 STATIC_DCL void FDECL(save_room, (int,struct mkroom *));
 STATIC_DCL void FDECL(rest_room, (int,struct mkroom *));
 
@@ -310,25 +311,29 @@ struct mkroom *sroom;
 		/* don't place monster on explicitly placed throne */
 		if(type == COURT && IS_THRONE(levl[sx][sy].typ))
 		    continue;
-               /* armories don't contain as many monsters */
-		if (type != ARMORY || rn2(2)) mon = makemon(
-		    (type == COURT) ? courtmon() :
-		    (type == BARRACKS) ? squadmon() :
-		    (type == MORGUE) ? morguemon() :
-		    (type == BEEHIVE) ?
-			(sx == tx && sy == ty ? &mons[PM_QUEEN_BEE] :
-			 &mons[PM_KILLER_BEE]) :
-		    (type == LEMUREPIT) ?
-		        (!rn2(10) ? &mons[PM_HORNED_DEVIL] :
-		         &mons[PM_LEMURE]) :
-		    (type == LEPREHALL) ? &mons[PM_LEPRECHAUN] :
-		    (type == COCKNEST) ? &mons[PM_COCKATRICE] :
-                   (type == ARMORY) ? (rn2(3) ? (rn2(2) ? &mons[PM_RUST_MONSTER] :
-			&mons[PM_DISENCHANTER]) : &mons[PM_BROWN_PUDDING]) :
-		    (type == ANTHOLE) ? antholemon() :
-		    (struct permonst *) 0,
-		   sx, sy, NO_MM_FLAGS);
-               else mon = ((struct monst *)0);
+        mon = ((struct monst *)0);
+        if (type == ARMORY) {
+            /* armories don't contain as many monsters */
+            if (rnf(1,3)) {
+                mon = makemon(armorymon(), sx, sy, NO_MM_FLAGS);
+            }
+        } else {
+            mon = makemon(
+                    (type == COURT) ? courtmon() :
+                    (type == BARRACKS) ? squadmon() :
+                    (type == MORGUE) ? morguemon() :
+                    (type == BEEHIVE) ?
+                      (sx == tx && sy == ty ? &mons[PM_QUEEN_BEE] :
+                                              &mons[PM_KILLER_BEE]) :
+                    (type == LEMUREPIT) ?
+                      (!rn2(10) ? &mons[PM_HORNED_DEVIL] :
+                                  &mons[PM_LEMURE]) :
+                    (type == LEPREHALL) ? &mons[PM_LEPRECHAUN] :
+                    (type == COCKNEST) ? &mons[PM_COCKATRICE] :
+                    (type == ANTHOLE) ? antholemon() :
+                    (struct permonst *) 0,
+                    sx, sy, NO_MM_FLAGS);
+        }
 		if(mon) {
 			mon->msleeping = 1;
 			if (type==COURT && mon->mpeaceful) {
@@ -382,16 +387,22 @@ struct mkroom *sroom;
 			}
 			break;
 		    case ARMORY:
-			{
-				struct obj *otmp;
-				if (rn2(2))
-					otmp = mkobj_at(WEAPON_CLASS, sx, sy, FALSE);
-				else
-					otmp = mkobj_at(ARMOR_CLASS, sx, sy, FALSE);
-				otmp->spe = 0;
-				if (is_rustprone(otmp)) otmp->oeroded = rn2(4);
-				else if (is_rottable(otmp)) otmp->oeroded2 = rn2(4);
-			}
+            {
+                struct obj *otmp;
+                if (rnf(3,4)) {
+                    if (rn2(2)) {
+                        otmp = mkobj_at(WEAPON_CLASS, sx, sy, FALSE);
+                    } else {
+                        otmp = mkobj_at(ARMOR_CLASS, sx, sy, FALSE);
+                    }
+                    otmp->spe = 0;
+                    if (is_rustprone(otmp)) {
+                        otmp->oeroded = rn2(4);
+                    } else if (is_rottable(otmp)) {
+                        otmp->oeroded2 = rn2(4);
+                    }
+                }
+            }
 			break;
 		    case ANTHOLE:
 			if(!rn2(3))
@@ -490,6 +501,12 @@ antholemon()
 	}
 	return ((mvitals[mtyp].mvflags & G_GONE) ?
 			(struct permonst *)0 : &mons[mtyp]);
+}
+
+static struct permonst *
+armorymon()
+{
+    return (rnf(1,5) ? mkclass(S_RUSTMONST,0) : &mons[PM_BROWN_PUDDING]);
 }
 
 /** Create a special room with trees, fountains and nymphs.
