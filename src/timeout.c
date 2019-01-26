@@ -648,6 +648,15 @@ nh_timeout(void)
                 make_vomiting(0L, TRUE);
                 break;
             case SICK:
+                /* hero might be able to bounce back from food poisoning,
+                   but not other forms of illness */
+                if ((u.usick_type & SICK_NONVOMITABLE) == 0 && rn2(100) < ACURR(A_CON)) {
+                    You("have recovered from your illness.");
+                    make_sick(0, NULL, FALSE, SICK_ALL);
+                    exercise(A_CON, FALSE);
+                    adjattrib(A_CON, -1, 1);
+                    break;
+                }
                 urgent_pline("You die from your illness.");
                 if (kptr && kptr->name[0]) {
                     killer.format = kptr->format;
