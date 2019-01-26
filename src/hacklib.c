@@ -469,8 +469,10 @@ get_int_from_dev_random()
 	FILE *fptr = NULL;
 
 	fptr = fopen(DEV_RANDOM,"r");
-	if (fptr) fread(&random_seed, sizeof(int),1,fptr);
-	fclose(fptr);
+	if (fptr) {
+        fread(&random_seed, sizeof(int),1,fptr);
+        fclose(fptr);
+    }
 #endif
 	return random_seed;
 }
