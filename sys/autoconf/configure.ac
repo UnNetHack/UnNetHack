@@ -236,6 +236,8 @@ if test "$enable_x11_graphics" != "no"; then
     if test $have_libXaw != yes; then
       AC_MSG_ERROR([Need X Athena Widgets Library for X11 graphics])
     fi
+    AC_SEARCH_LIBS([XpmReadFileToImage], [Xpm], [USE_XPM="1"], [AC_MSG_ERROR([Need libXpm for X11 graphics])])
+
     CFLAGS="${CFLAGS} ${LIBXAW_CFLAGS}"
     WINSRC="${WINSRC} \$(WINX11SRC)"
     WINOBJ="${WINOBJ} \$(WINX11OBJ)"
@@ -350,6 +352,7 @@ AC_CHECK_FUNCS(fcntl)
 
 dnl ------ Check for 32 bit datatype
 AX_DEFINE_INTEGER_BITS(uint32_t, unsigned int, unsigned long, unsigned long long)
+AX_DEFINE_INTEGER_BITS(uint64_t, unsigned int, unsigned long, unsigned long long)
 
 dnl  ----- Check for program needed to build Guidebook
 AC_CHECK_PROG(HAVE_NROFF, nroff, "yes", "no")
@@ -474,7 +477,7 @@ if test "$enable_dump" != "no" ; then
 	fi
 fi
 
-if test "$enable_tty_graphics" != "no"; then
+if test "$enable_tty_graphics" != "no" -a "$host_os" != mingw32; then
 	NETHACK_ARG(utf8-glyphs,[Enable UTF-8 glyphs in TTY],UTF8_GLYPHS,yes)
 	if test "$enable_utf8_glyphs" != "no" ; then
 		dnl check for uint32_t

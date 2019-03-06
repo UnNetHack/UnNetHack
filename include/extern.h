@@ -145,6 +145,7 @@ E void NDECL(bot);
 #ifdef DUMP_LOG
 E void FDECL(bot1str, (char *));
 E void FDECL(bot2str, (char *));
+E void FDECL(bot3str, (char *));
 #endif
 
 /* ### cmd.c ### */
@@ -198,6 +199,9 @@ E char FDECL(paranoid_yn, (const char *, BOOLEAN_P));
 E void NDECL(sokoban_trickster);
 E void FDECL(list_vanquished, (int, BOOLEAN_P));
 E void NDECL(list_vanquishedonly);
+#ifdef TTY_GRAPHICS
+E int tty_debug_show_colors();
+#endif
 
 /* ### dbridge.c ### */
 
@@ -1587,6 +1591,7 @@ E void NDECL(free_autopickup_exceptions);
 #ifdef MENU_COLOR
 E boolean FDECL(add_menu_coloring, (char *));
 #endif /* MENU_COLOR */
+E const char * FDECL(clr2colorname, (int));
 
 /* ### pager.c ### */
 
@@ -2661,6 +2666,10 @@ E void FDECL(check_tutorial_farlook, (int, int));
 E void FDECL(check_tutorial_command, (char));
 E int FDECL(check_tutorial_location, (int, int, BOOLEAN_P));
 E int FDECL(check_tutorial_oclass, (int));
+
+/* ### base32.c ### */
+long decode_base32(const char*);
+const char* encode_base32(unsigned long);
 
 /* ### unicode.c ### */
 E glyph_t FDECL(get_unicode_codepoint, (int));

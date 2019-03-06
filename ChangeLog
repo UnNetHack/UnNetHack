@@ -1,22 +1,39 @@
-201X-XX-XX  UnNetHack 5.X.X
+20XX-XX-XX  UnNetHack 5.X.X
+	* Use TAB as separator in xlogfile
+	* Add info about pre-seeded games to dumplog
+	* Seed is encoded as Crockford base32 string
+
+	* dungeon layout:
+	  - Disable the rogue tribute level
+	  - Adjust monster distribution for dilapidated armories
+
+	* bug fixes:
+	  - Fix over-escaping of characters on HTML dump map
+	  - Fix crash when /dev/(u)random can't be opened
+
+2019-01-01  UnNetHack 5.2.0
 	* Support SOURCE_DATE_EPOCH for reproducible builds (patch from Debian)
 	* Players killed by Nazgul will arise as Barrow Wights in bones files
 	  (a slight change from the original mythology, we know)
 	* Reviving drained corpses sometimes won't work, and may destroy 
 	  the corpse. Partially drained corpses are more likely to revive.
-	* Wand wresting happens always when an empty wand is zapped with a chance
-	  depending on BUC state if an effect is produced
 	* Reproducible dungeon layout. Set OPTIONS=seed:number to get the same
 	  dungeon layout.
 	* Vault Guards get angry if you eat gold in front of them. (From Nethack 
 		 Development Code - used with permission)
 	* Several cosmetic changes - additional engravings, hallucinatory monsters, and funny messages.
-	* Picking up scrolls of scare monsters change BUC from blessed to
-	  uncursed to cursed
 	* Default to UTF8graphics on supporting terminals
 
 	* item changes:
 	  - Decreased weight of all mithril armor, especially ones of elven make
+	  - Wand wresting happens always when an empty wand is zapped with a
+	    chance depending on BUC state if an effect is produced
+	  - Putting blessed and uncursed scrolls of charging into a bag of
+	    tricks charges it
+	  - Picking up scrolls of scare monsters change BUC from blessed to
+	    uncursed to cursed
+	  - Picked up scrolls of scare monsters only turn to dust if they are
+	    cursed
 
 	* user interface improvements:
 	  - Added naming last broken object to #name menu (idea from AceHack/NH4)
@@ -24,11 +41,27 @@
 	    turning to dust or changing known BUC state
 	  - Don't autopickup unpaid items (from NetHack 3.6)
 	  - Change default of shopkeeper sell prompt to 'n' (idea by aosdict)
+	  - Autoidentify wands of undead turning if engraving produces a message
+	  - Added stone, strangled, levitation, flying, and riding indicators
+	    to the status line
+	  - Status indicators on third statuslines
+	  - New option "statuslines" to force 2 or 3 status lines
+	  - Pressing > or < autotravels to the stairs if not already on
+	    the right kind of stairs
 
 	* dungeon layout:
 	  - Backyard of watery castle get trap doors to ensure player can
 	    descend to the VotD
 	  - Replaced lava with water on lava castle
+	  - Don't generate 1000 fountains in bigrm-13
+
+	* customizable colors:
+	  - Dark gray improved on terminals supporting 256 colors
+	  - Configurable system colors using RGB values
+	     For example, put "COLOR=light blue:5f00ff" into your config file
+	  - Find a close match for an arbitrary RGB value in 256 color mode
+	  - New extended command: show_colors
+	  - 24 bit color support by detecting COLORTERM=truecolor
 
 	* bug fixes
 	  - Fixed erroneous messages when remaining in stinking clouds
@@ -45,6 +78,10 @@
 	  - Fixed lava breath related crash at the edges of the map
 	  - The chest in the Castle containing the wishing wand can never be
 	    trapped (from 3.6.0)
+	  - Picking up items with invweight shows weight of items including
+	    merged items in inventory (reported by aosdict)
+	  - Added missing extrinsic to chromatic dragon armor
+	  - Disallow wishing for any chromatic dragon related items
 
 	* vanilla bug fixes:
 	  - C343-439: Running NetHack in a terminal window with more than 255
@@ -113,7 +150,7 @@
 	  - Reading a Scroll of Light while confused summons some (black) lights
 	  - Reading a non-blessed scroll of punishment while confused summons a Punisher. BE CAREFUL
 	  - A horn of plenty has a *small* chance to produce potions of [vampire] blood
-	  
+
 	* artifact changes:
 	  - From SporkHack:
 	    - All the weapons below warn against and have 20% instakill chance 
@@ -577,7 +614,6 @@
 	  - Amulet of Yendor may teleport away when dropped
 	  - Scrolls of gold detection: confused reading shows a random item class
 	  - Scrolls of genocide kill monster on level (uncursed) or globally (blessed) 
-
 
 	* Patches:
 	  - Astral Escape (via GruntHack from Chi)

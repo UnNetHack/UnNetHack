@@ -14,6 +14,7 @@ struct window_procs windowprocs;
 #include "alloc.c"
 #include "mkobj.c"
 #include "mondata.c"
+#include "base32.c"
 
 #include "objnam.c"
 
@@ -31,6 +32,8 @@ void pline_The(const char *str,...) {}
 void You_cant(const char *str,...) {}
 void panic(const char *str,...) {}
 void terminate(int status) {}
+void docrt() {}
+int isok(int x, int y) { return 1; }
 
 int str2role(char *str) { return 0; }
 int str2race(char *str) { return 0; }
@@ -75,7 +78,7 @@ void kill_egg(struct obj *obj) {}
 void make_grave(int x, int y, const char *engraving) {}
 struct trap* maketrap(int x, int y, int typ) { return NULL; }
 void newsym(int x, int y) {}
-int title_to_mon(const char *str, int* number1, int* number2) { return 0; }
+int title_to_mon(const char *str, int* number1, int* number2) { return NON_PM; }
 
 void obfree(struct obj *obj1, struct obj *obj2) {}
 struct obj* oname(struct obj *obj, const char *str) { return NULL; }
@@ -87,7 +90,8 @@ boolean worm_known(struct monst *monst) { return FALSE; }
 struct obj* which_armor(struct monst *monst, long number) { return NULL; }
 int mon_has_amulet(struct monst *monst) { return 0; }
 
-
+uint32_t isaac_next_uint32(isaac_ctx *_ctx) { return 0; }
+void isaac_init(isaac_ctx *_ctx,const unsigned char *_seed,int _nseed) {}
 
 /* ### artifact.c ### */
 //E void NDECL(init_artifacts);

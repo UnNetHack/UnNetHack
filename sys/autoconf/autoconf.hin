@@ -330,4 +330,7 @@
 /* If not already defined, then define as a datatype of *exactly* 32 bits. */
 #undef uint32_t
 
+/* If not already defined, then define as a datatype of *exactly* 64 bits. */
+#undef uint64_t
+
 #endif /* AUTOCONF_H */

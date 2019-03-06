@@ -155,7 +155,7 @@ TRAP:"pit",(06,08)
 
 # A little help
 OBJECT:('?',"earth"),(01,09)
-OBJECT:('?',"earth"),(02,09)
+[50%]: OBJECT:('?',"earth"),(02,09)
 
 soko_loot()
 

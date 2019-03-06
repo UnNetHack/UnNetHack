@@ -9,6 +9,8 @@
 #ifndef FLAG_H
 #define FLAG_H
 
+#include "color.h"
+
 /*
  * Persistent flags that are saved and restored with the game.
  *
@@ -391,6 +393,13 @@ struct instance_flags {
 	boolean  vanilla_ui_behavior;	/* fall back to vanilla behavior */
 	boolean  show_annotation;	/* level annotation when entering level */
 	int  statuslines;	/* number of status lines */
+#ifdef TTY_GRAPHICS
+    int color_mode; /* number of available colors */
+#endif
+#ifdef TEXTCOLOR
+    uint64_t color_definitions[CLR_MAX];
+    char     truecolor_separator;
+#endif
 };
 
 /*

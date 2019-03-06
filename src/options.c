@@ -461,6 +461,7 @@ static struct Comp_Opt
 	{ "soundcard", "type of sound card to use", 20, SET_IN_FILE },
 #endif
 	{ "statuscolor", "set status colors", PL_PSIZ, SET_IN_FILE },
+	{ "statuslines", "set number of status lines (2 or 3)", 20, SET_IN_GAME },
 	{ "suppress_alert", "suppress alerts about version-specific features",
 						8, SET_IN_FILE },
 	{ "tile_width", "width of tiles", 20, DISP_IN_GAME},	/*WC*/
@@ -489,6 +490,10 @@ static struct Comp_Opt
 #ifdef EXOTIC_PETS
 	{ "wolfname", "the name of your (first) wolf (e.g., wolfname:Gnasher)",
 						PL_PSIZ, DISP_IN_GAME },
+#endif
+#ifdef TTY_GRAPHICS
+    { "truecolor_separator", "the character separator for truecolor escape sequences",
+        2, SET_IN_FILE },
 #endif
 	{ (char *)0, (char *)0, 0, 0 }
 };
@@ -740,6 +745,8 @@ initoptions()
 	    index(AS, '\016') && index(AE, '\017')) {
 		switch_graphics(DEC_GRAPHICS);
 	}
+
+    iflags.truecolor_separator = ';';
 # endif
 #endif /* UNIX || VMS */
 
@@ -1315,43 +1322,94 @@ int bool_or_comp;	/* 0 == boolean option, 1 == compound */
 }
 
 static const struct {
-   const char *name;
-   const int color;
+    const char *name;
+    const int color;
 } colornames[] = {
-   {"black", CLR_BLACK},
-   {"red", CLR_RED},
-   {"green", CLR_GREEN},
-   {"brown", CLR_BROWN},
-   {"blue", CLR_BLUE},
-   {"magenta", CLR_MAGENTA},
-   {"cyan", CLR_CYAN},
-   {"gray", CLR_GRAY},
-   {"orange", CLR_ORANGE},
-   {"lightgreen", CLR_BRIGHT_GREEN},
-   {"yellow", CLR_YELLOW},
-   {"lightblue", CLR_BRIGHT_BLUE},
-   {"lightmagenta", CLR_BRIGHT_MAGENTA},
-   {"lightcyan", CLR_BRIGHT_CYAN},
-   {"white", CLR_WHITE}
+    { "black", CLR_BLACK },
+    { "red", CLR_RED },
+    { "green", CLR_GREEN },
+    { "brown", CLR_BROWN },
+    { "blue", CLR_BLUE },
+    { "magenta", CLR_MAGENTA },
+    { "cyan", CLR_CYAN },
+    { "gray", CLR_GRAY },
+    { "orange", CLR_ORANGE },
+    { "light green", CLR_BRIGHT_GREEN },
+    { "yellow", CLR_YELLOW },
+    { "light blue", CLR_BRIGHT_BLUE },
+    { "light magenta", CLR_BRIGHT_MAGENTA },
+    { "light cyan", CLR_BRIGHT_CYAN },
+    { "white", CLR_WHITE },
 #ifdef MENU_COLOR
-   ,{"none", NO_COLOR}
+    {"none", NO_COLOR},
 #endif
+    { "no color", NO_COLOR },
+    { NULL, CLR_BLACK }, /* everything after this is an alias */
+    { "transparent", NO_COLOR },
+    { "purple", CLR_MAGENTA },
+    { "light purple", CLR_BRIGHT_MAGENTA },
+    { "bright purple", CLR_BRIGHT_MAGENTA },
+    { "grey", CLR_GRAY },
+    { "bright red", CLR_ORANGE },
+    { "bright green", CLR_BRIGHT_GREEN },
+    { "bright blue", CLR_BRIGHT_BLUE },
+    { "bright magenta", CLR_BRIGHT_MAGENTA },
+    { "bright cyan", CLR_BRIGHT_CYAN }
 };
+
+static const struct {
+    const char *name;
+    const int attr;
+} attrnames[] = {
+    { "none", ATR_NONE },
+    { "bold", ATR_BOLD },
+    { "dim", ATR_DIM },
+    { "underline", ATR_ULINE },
+    { "blink", ATR_BLINK },
+    { "inverse", ATR_INVERSE },
+    { NULL, ATR_NONE }, /* everything after this is an alias */
+    { "normal", ATR_NONE },
+    { "uline", ATR_ULINE }
+};
+
+const char *
+clr2colorname(clr)
+int clr;
+{
+    int i;
+
+    for (i = 0; i < SIZE(colornames); i++)
+        if (colornames[i].name && colornames[i].color == clr)
+            return colornames[i].name;
+    return (char *) 0;
+}
+
+int
+match_str2clr(str)
+char *str;
+{
+    int i, c = CLR_MAX;
+
+    /* allow "lightblue", "light blue", and "light-blue" to match "light blue"
+       (also junk like "_l i-gh_t---b l u e" but we won't worry about that);
+       also copes with trailing space; mungspaces removed any leading space */
+    for (i = 0; i < SIZE(colornames); i++)
+        if (colornames[i].name
+            && fuzzymatch(str, colornames[i].name, " -_", TRUE)) {
+            c = colornames[i].color;
+            break;
+        }
+    if (i == SIZE(colornames) && (*str >= '0' && *str <= '9'))
+        c = atoi(str);
+
+    if (c == CLR_MAX)
+        raw_printf("Unknown color '%s'", str);
+
+    return c;
+}
 
 #ifdef MENU_COLOR
 extern struct menucoloring *menu_colorings;
-
-static const struct {
-   const char *name;
-   const int attr;
-} attrnames[] = {
-     {"none", ATR_NONE},
-     {"bold", ATR_BOLD},
-     {"dim", ATR_DIM},
-     {"underline", ATR_ULINE},
-     {"blink", ATR_BLINK},
-     {"inverse", ATR_INVERSE}
-};
 
 /* parse '"regex_string"=color&attr' and add it to menucoloring */
 boolean
@@ -1374,12 +1432,12 @@ char *str;
     while (*tmps && isspace(*tmps)) tmps++;
 
     for (i = 0; i < SIZE(colornames); i++)
-	if (strstri(tmps, colornames[i].name) == tmps) {
-	    c = colornames[i].color;
-	    break;
-	}
+        if (colornames[i].name && strstri(tmps, colornames[i].name) == tmps) {
+            c = colornames[i].color;
+            break;
+        }
     if ((i == SIZE(colornames)) && (*tmps >= '0' && *tmps <='9'))
-	c = atoi(tmps);
+        c = atoi(tmps);
 
     if (c > CLR_UNDEFINED) return FALSE;
 
@@ -1388,7 +1446,7 @@ char *str;
 	tmps++;
 	while (*tmps && isspace(*tmps)) tmps++;
 	for (i = 0; i < SIZE(attrnames); i++)
-	    if (strstri(tmps, attrnames[i].name) == tmps) {
+	    if (attrnames[i].name && strstri(tmps, attrnames[i].name) == tmps) {
 		a = attrnames[i].attr;
 		break;
 	    }
@@ -1468,15 +1526,15 @@ char *str;
 	while (*tmps && isspace(*tmps)) tmps++;
 
 	/* determine color */
-	for (i = 0; i < SIZE(colornames); i++)
-		if (strstri(tmps, colornames[i].name) == tmps) {
-			c = colornames[i].color;
-			break;
-		}
-	if ((i == SIZE(colornames)) && (*tmps >= '0' && *tmps <='9'))
-		c = atoi(tmps);
+    for (i = 0; i < SIZE(colornames); i++)
+        if (colornames[i].name && strstri(tmps, colornames[i].name) == tmps) {
+            c = colornames[i].color;
+            break;
+        }
+    if ((i == SIZE(colornames)) && (*tmps >= '0' && *tmps <='9'))
+        c = atoi(tmps);
 
-	if (c > 15) return FALSE;
+    if (c > 15) return FALSE;
 
 	/* determine monster name */
 	*cs = '\0';
@@ -1683,6 +1741,33 @@ const char *str;
 	return FALSE;
 }
 
+/** Parse '"color_name":rgb_in_hex' and set color value in instance flags. */
+boolean
+parse_color_definition(str)
+const char *str;
+{
+    char color_name[BUFSZ];
+    char color_value[BUFSZ];
+
+    if (!parse_extended_option(str, color_name, color_value)) {
+        return FALSE;
+    }
+
+    int color = match_str2clr(color_name);
+    if (color >= CLR_MAX) {
+        return FALSE;
+    }
+
+    if (strlen(color_value) != 6) {
+        return FALSE;
+    }
+
+    char *ptr = color_value;
+    iflags.color_definitions[color] = strtol(ptr, (char **)(ptr+6), 16);
+
+    return TRUE;
+}
+
 void
 common_prefix_options_parser(fullname, opts, negated)
 const char *fullname;
@@ -1690,7 +1775,6 @@ char *opts;
 boolean negated;
 {
 	boolean badopt = FALSE;
-	int i;
 	char *op;
 	size_t fullname_len = strlen(fullname);
 
@@ -1702,6 +1786,7 @@ boolean negated;
 	/* "fullname" without a value means "all"
 	   and negated means "none" */
 	if (!op || !strcmpi(op, "all") || !strcmpi(op, "none")) {
+        int i;
 		if (op && !strcmpi(op, "none")) negated = TRUE;
 		boolean value = negated ? FALSE : TRUE;
 		/* set all boolean options starting with fullname */
@@ -2715,16 +2800,24 @@ goodfruit:
 		return;
 	}
 
-	fullname = "seed";
-	if (match_optname(opts, fullname, sizeof("seed")-1, TRUE)) {
-		if (negated) {
-			bad_negation(fullname, FALSE);
-			return;
-		} else if (!(op = string_for_opt(opts, FALSE))) return;
-		unsigned int seed = atoi(op);
-		init_random(seed);
-		return;
-	}
+    fullname = "seed";
+    if (match_optname(opts, fullname, sizeof("seed")-1, TRUE)) {
+        if (negated) {
+            bad_negation(fullname, FALSE);
+            return;
+        } else if (!(op = string_for_opt(opts, FALSE))) {
+            return;
+        }
+        unsigned int seed;
+        /* base32 is marked by a leading u */
+        if (*op == 'u') {
+            seed = decode_base32(op);
+        } else {
+            seed = atoi(op);
+        }
+        init_random(seed);
+        return;
+    }
 
 #ifdef PARANOID
 	fullname = "conducts";
@@ -2790,6 +2883,20 @@ goodfruit:
 	    return;
 	}
 
+    fullname = "statuslines";
+    if (match_optname(opts, fullname, 11, TRUE)) {
+        op = string_for_opt(opts, negated);
+        if (negated) {
+            bad_negation(fullname, FALSE);
+        } else if (strlen(op) == 1 && (*op == '2' || *op == '3')) {
+            iflags.statuslines = (*op == '2') ? 2 : 3;
+            docrt();
+        } else {
+            badoption(opts);
+        }
+        return;
+    }
+
 #ifdef SORTLOOT
 	fullname = "sortloot";
 	if (match_optname(opts, fullname, 4, TRUE)) {
@@ -2807,6 +2914,22 @@ goodfruit:
 		return;
 	}
 #endif /* SORTLOOT */
+
+#ifdef TTY_GRAPHICS
+    fullname = "truecolor_separator";
+    if (match_optname(opts, fullname, strlen(fullname), TRUE)) {
+        if (negated) {
+            bad_negation(fullname, FALSE);
+            return;
+        } else if (!(op = string_for_opt(opts, FALSE))) return;
+        if (strlen(op) > 1 || (*op) != ':' || (*op) != ';') {
+            badoption(opts);
+        } else {
+            iflags.truecolor_separator = (*op);
+        }
+        return;
+    }
+#endif
 
 	fullname = "suppress_alert";
 	if (match_optname(opts, fullname, 4, TRUE)) {
@@ -3957,7 +4080,6 @@ boolean setinitial,setfromfile;
 	int pick_cnt, pick_idx, opt_idx, pass;
 	int totalapes = 0, numapes[2] = {0,0};
 	menu_item *pick_list = (menu_item *)0;
-	anything any;
 	char apebuf[BUFSZ];
 	struct autopickup_exception *ape;
 	static const char *action_titles[] = {
@@ -4293,6 +4415,8 @@ char *buf;
 	else if (!strcmp(optname, "soundcard"))
 		Sprintf(buf, "%s", to_be_done);
 #endif
+	else if (!strcmp(optname, "statuslines"))
+		Sprintf(buf, "%d", iflags.statuslines);
 	else if (!strcmp(optname, "suppress_alert")) {
 	    if (flags.suppress_alert == 0L)
 		Strcpy(buf, none);

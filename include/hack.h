@@ -30,6 +30,17 @@
 #define EXT_ENCUMBER	4	/* Overtaxed */
 #define OVERLOADED	5	/* Overloaded */
 
+/* hunger states - see hu_stat in eat.c */
+enum hunger_state_types {
+    SATIATED = 0,
+    NOT_HUNGRY,
+    HUNGRY,
+    WEAK,
+    FAINTING,
+    FAINTED,
+    STARVED
+};
+
 /* Macros for how a rumor was delivered in outrumor() */
 #define BY_ORACLE	0
 #define BY_COOKIE	1

@@ -462,8 +462,7 @@ check_utf8_console()
     }
 
     /* set minimal raw mode */
-    struct termios raw;
-    raw.c_lflag &= ~(ECHO | ICANON);
+    struct termios raw = { 0 };
     raw.c_cc[VMIN] = 0;
     raw.c_cc[VTIME] = 3; /* timeout of 0.3 seconds */
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) {
@@ -488,8 +487,12 @@ check_utf8_console()
 
             /* disable read timeout */
             raw.c_cc[VTIME] = 0;
+            if (tcgetattr(STDIN_FILENO, &raw) == -1) {
+                perror("check_utf8_console failed getting raw settings");
+                exit(EXIT_FAILURE);
+            }
             if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) {
-                perror("check_utf8_console after test");
+                perror("check_utf8_console failed disabling timeout");
                 exit(EXIT_FAILURE);
             }
         }
@@ -500,25 +503,6 @@ check_utf8_console()
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &original) == -1) {
         perror("check_utf8_console restore terminal settings");
         exit(EXIT_FAILURE);
-    }
-}
-
-void
-init_utf8_console()
-{
-    /* select character set G0 */
-    raw_print("\x0f");
-
-    if (supports_utf8) {
-        /* select default character set for G0 */
-        raw_print("\x1b(B");
-        /* set character set as UTF-8 */
-        raw_print("\x1b%G");
-    } else {
-        /* disable Unicode, set default character set */
-        raw_print("\x1b%@");
-        /* select null mapping */
-        raw_print("\x1b(U");
     }
 }
 #endif

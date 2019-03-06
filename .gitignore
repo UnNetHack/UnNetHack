@@ -1,5 +1,6 @@
 *.swp
 *.swo
+*.exe
 compile
 
 # /
@@ -13,6 +14,7 @@ compile
 # /dat/
 /dat/Makefile
 /dat/*.lev
+/dat/*.bmp
 /dat/data
 /dat/dungeon.pdf
 /dat/dungeon
@@ -52,6 +54,13 @@ compile
 /src/vis_tab.c
 /src/monstr.c
 /src/tile.c
+
+# /tests/
+tests/*/test_*.xml
+tests/options/test_base32
+tests/options/test_options
+tests/unicode/test_unicode
+tests/wishing/test_wishing
 
 # /util/
 /util/*.o

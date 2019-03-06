@@ -348,6 +348,10 @@ spotless:
 	( cd doc ; $(MAKE) spotless )
 	-rm -f Makefile include/autoconf.h include/autoconf_paths.h include/win32api.h
 
+distclean: spotless
+check:
+	(cd tests && make)
+
 include/autoconf_paths.h: Makefile
 	echo '#ifndef AUTOCONF_PATH_H'  >$@
 	echo '#undef AUTOCONF_PATH_H'  >>$@
@@ -358,3 +362,29 @@ include/autoconf_paths.h: Makefile
 	echo '#define AUTOCONF_DATAROOTDIR "$(datarootdir)"' >>$@
 	echo '#define AUTOCONF_DOCDIR "$(docdir)"' >>$@
 	echo '#endif' >>$@
+
+RELEASEVERSION = $(shell grep VERSION_STRING include/date.h | cut -f 2 -d \")
+UNNETHACK_WIN32_DIR = $(DESTDIR)$(prefix)/unnethack-win32-$(RELEASEVERSION)
+UNNETHACK_RELEASE_ARCHIVE_PREFIX = unnethack-$(RELEASEVERSION)
+UNNETHACK_RELEASE_ARCHIVE = $(DESTDIR)$(prefix)/$(UNNETHACK_RELEASE_ARCHIVE_PREFIX).tar.gz
+
+release_archive: $(GAME)
+	rm -f $(UNNETHACK_RELEASE_ARCHIVE)
+	git ls-files | tar cfz $(UNNETHACK_RELEASE_ARCHIVE) --mtime=now --transform 's,^,$(UNNETHACK_RELEASE_ARCHIVE_PREFIX)/,' -T -
+
+dist: release_archive
+
+win32_release: $(GAME)
+	cp $(srcdir)/ChangeLog  $(DESTDIR)$(GAMEDIR)/ChangeLog.txt
+	cp $(srcdir)/README $(DESTDIR)$(GAMEDIR)/README.txt
+	touch $(GAMEDIR)/News
+	cp $(srcdir)/dat/*.ttf $(DESTDIR)$(GAMEDIR)/
+	convert -verbose $(srcdir)/tilesets/unchozo32b.png $(DESTDIR)$(GAMEDIR)/unchozo32b.bmp
+	vim -c "set fileformat=dos" -c w -c q $(DESTDIR)$(GAMEDIR)/News
+	vim -c "set fileformat=dos" -c w -c q $(DESTDIR)$(GAMEDIR)/defaults.nh
+	vim -c "set fileformat=dos" -c w -c q $(DESTDIR)$(GAMEDIR)/license
+	vim -c "set fileformat=dos" -c w -c q $(DESTDIR)$(GAMEDIR)/ChangeLog.txt
+	vim -c "set fileformat=dos" -c w -c q $(DESTDIR)$(GAMEDIR)/README.txt
+	vim -c "set fileformat=dos" -c w -c q $(DESTDIR)$(GAMEDIR)/Guidebook.txt
+	mv $(DESTDIR)$(GAMEDIR) $(UNNETHACK_WIN32_DIR)
+	cd $(UNNETHACK_WIN32_DIR) && zip -r $(UNNETHACK_WIN32_DIR).zip `echo * | sort -f`

@@ -10,8 +10,8 @@ struct window_procs windowprocs;
 #include "../../src/decl.c"
 #include "../../src/drawing.c"
 #include "../../src/options.c"
-#include "../../src/rnd.c"
 #include "../../src/alloc.c"
+#include "base32.c"
 
 
 #include <stdarg.h>
@@ -28,6 +28,7 @@ void pline_The(const char *str,...) {}
 void You_cant(const char *str,...) {}
 void panic(const char *str,...) {}
 void terminate(int status) {}
+void docrt() {}
 
 int str2role(char *str) { return 0; }
 int str2race(char *str) { return 0; }
@@ -51,3 +52,5 @@ void vision_recalc(int a) {}
 void choose_windows(const char *str) {}
 void reassign() {}
 
+void set_random_state(unsigned int a) { }
+int rnd(int a) { return 0; }

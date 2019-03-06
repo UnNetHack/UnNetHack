@@ -1767,10 +1767,15 @@ long quan;		/* if non-0, print this quantity, not obj->quan */
 #endif
     boolean use_invlet = flags.invlet_constant && let != CONTAINED_SYM;
     long savequan = 0;
+    unsigned save_owt = 0;
 
+    if (quan && obj && flags.invweight) {
+        save_owt = obj->owt;
+        obj->owt = obj->owt * quan / obj->quan;
+    }
     if (quan && obj) {
-	savequan = obj->quan;
-	obj->quan = quan;
+        savequan = obj->quan;
+        obj->quan = quan;
     }
 
     /*
@@ -1779,22 +1784,27 @@ long quan;		/* if non-0, print this quantity, not obj->quan */
      *	>  Then the object is contained and doesn't have an inventory letter.
      */
     if (cost != 0 || let == '*') {
-	/* if dot is true, we're doing Iu, otherwise Ix */
-	Sprintf(li, "%c - %-45s %6ld %s",
-		(dot && use_invlet ? obj->invlet : let),
-		(txt ? txt : doname(obj)), cost, currency(cost));
+        /* if dot is true, we're doing Iu, otherwise Ix */
+        Sprintf(li, "%c - %-45s %6ld %s",
+                (dot && use_invlet ? obj->invlet : let),
+                (txt ? txt : doname(obj)), cost, currency(cost));
 #ifndef GOLDOBJ
     } else if (obj && obj->oclass == COIN_CLASS) {
-	Sprintf(li, "%ld gold piece%s%s", obj->quan, plur(obj->quan),
-		(dot ? "." : ""));
+        Sprintf(li, "%ld gold piece%s%s", obj->quan, plur(obj->quan),
+                (dot ? "." : ""));
 #endif
     } else {
-	/* ordinary inventory display or pickup message */
-	Sprintf(li, "%c - %s%s",
-		(use_invlet ? obj->invlet : let),
-		(txt ? txt : doname(obj)), (dot ? "." : ""));
+        /* ordinary inventory display or pickup message */
+        Sprintf(li, "%c - %s%s",
+                (use_invlet ? obj->invlet : let),
+                (txt ? txt : doname(obj)), (dot ? "." : ""));
     }
-    if (savequan) obj->quan = savequan;
+    if (savequan) {
+        obj->quan = savequan;
+    }
+    if (save_owt) {
+        obj->owt = save_owt;
+    }
 
     return li;
 }

@@ -17,6 +17,7 @@ const char * const enc_stat[] = {
 
 STATIC_DCL void NDECL(bot1);
 STATIC_DCL void NDECL(bot2);
+STATIC_DCL void NDECL(bot3);
 
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 
@@ -113,9 +114,10 @@ int statusline; /* apply color on this statusline: 1 or 2 */
 }
 
 void
-add_colored_text(text, newbot2)
+add_colored_text(text, newbot2, statusline)
 const char *text;
 char *newbot2;
+int statusline;
 {
 	char *nb;
 	struct color_option color_option;
@@ -125,7 +127,7 @@ char *newbot2;
 	/* don't add anything if it can't be displayed.
 	 * Otherwise the color of invisible text may bleed into
 	 * the statusline. */
-	if (strlen(newbot2) >= min(MAXCO, CO)-1) return;
+	if (strlen(newbot2) >= (unsigned)min(MAXCO, CO)-1) return;
 
 	if (!iflags.use_status_colors) {
 		Sprintf(nb = eos(newbot2), " %s", text);
@@ -133,12 +135,12 @@ char *newbot2;
         }
 
 	Strcat(nb = eos(newbot2), " ");
-	curs(WIN_STATUS, 1, 1);
+	curs(WIN_STATUS, 1, statusline);
 	putstr(WIN_STATUS, 0, newbot2);
 
 	Strcat(nb = eos(nb), text);
-	curs(WIN_STATUS, 1, 1);
-       	color_option = text_color_of(text, text_colors);
+	curs(WIN_STATUS, 1, statusline);
+    color_option = text_color_of(text, text_colors);
 	start_color_option(color_option);
 	/* Trim the statusline to always have the end color
 	 * to have effect. */
@@ -415,6 +417,31 @@ char *buf;
 	return ret;
 }
 
+static void
+botl_text(int condition, const char *text, char *botl, int statusline)
+{
+    if (condition) {
+#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
+        add_colored_text(text, botl, statusline);
+#else
+        Sprintf(botl = eos(botl), " %s", text);
+#endif
+    }
+}
+
+static void
+botl_text_or_blanks(int condition, const char *text, char *botl, int statusline)
+{
+    if (condition) {
+        botl_text(condition, text, botl, statusline);
+    } else {
+        char *nb = eos(botl);
+        int i = strlen(text) + 1;
+        while (i-- > 0) { strcat(nb, " "); }
+    }
+}
+
+
 #ifdef DUMP_LOG
 void bot2str(newbot2)
 char* newbot2;
@@ -494,77 +521,34 @@ bot2()
 		        (currenttime % 3600) / 60);
 	}
 #endif
+    if (iflags.statuslines < 3) {
+        botl_text(Stoned,    "Stone",  newbot2, 1);
+        botl_text(Slimed,    "Slime",  newbot2, 1);
+        botl_text(Strangled, "Strngl", newbot2, 1);
+        botl_text(Sick && (u.usick_type & SICK_VOMITABLE),    "FoodPois", newbot2, 1);
+        botl_text(Sick && (u.usick_type & SICK_NONVOMITABLE), "Ill",      newbot2, 1);
+        botl_text(u.uhs != NOT_HUNGRY, hu_stat[u.uhs], newbot2, 1);
+        botl_text(cap > UNENCUMBERED, enc_stat[cap], newbot2, 1);
+        botl_text(Blind,         "Blind", newbot2, 1);
+        botl_text(Stunned,       "Stun",  newbot2, 1);
+        botl_text(Confusion,     "Conf",  newbot2, 1);
+        botl_text(Hallucination, "Hallu", newbot2, 1);
 
-	if(strcmp(hu_stat[u.uhs], "        "))
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-		add_colored_text(hu_stat[u.uhs], newbot2);
-#else
-		Sprintf(nb = eos(nb), " %s", hu_stat[u.uhs]);
-#endif
-	if(Confusion)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-		add_colored_text("Conf", newbot2);
-#else
-		Strcat(nb = eos(nb), " Conf");
-#endif
-	if(Sick) {
-		if (u.usick_type & SICK_VOMITABLE)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-			add_colored_text("FoodPois", newbot2);
-#else
-			Strcat(nb = eos(nb), " FoodPois");
-#endif
-		if (u.usick_type & SICK_NONVOMITABLE)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-			add_colored_text("Ill", newbot2);
-#else
-			Strcat(nb = eos(nb), " Ill");
-#endif
-	}
-	if(Blind)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-	     	add_colored_text("Blind", newbot2);
-#else
-		Strcat(nb = eos(nb), " Blind");
-#endif
-	if(Stunned)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-	     	add_colored_text("Stun", newbot2);
-#else
-		Strcat(nb = eos(nb), " Stun");
-#endif
-	if(Hallucination)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-	     	add_colored_text("Hallu", newbot2);
-#else
-		Strcat(nb = eos(nb), " Hallu");
-#endif
-	if(Slimed)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-	     	add_colored_text("Slime", newbot2);
-#else
-		Strcat(nb = eos(nb), " Slime");
-#endif
-	if(cap > UNENCUMBERED)
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-		add_colored_text(enc_stat[cap], newbot2);
-#else
-		Sprintf(nb = eos(nb), " %s", enc_stat[cap]);
-#endif
-	if (u.ufeetfrozen > 0) {
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-	     	add_colored_text("Frozen", newbot2);
-#else
-		Strcat(nb = eos(nb), " Frozen");
-#endif
-	}
+        /* levitation and flying are mutually exclusive; riding is not */
+        if (Levitation) {
+            botl_text(Levitation, "Lev", newbot2, 1);
+        } else {
+            botl_text(Flying, "Fly", newbot2, 1);
+        }
+
+        botl_text(u.usteed != NULL,  "Ride",   newbot2, 1);
+        botl_text(u.ufeetfrozen > 0, "Frozen", newbot2, 1);
+    }
+
 #ifdef ELBERETH
-	if(!Blind && sengr_at("Elbereth", u.ux, u.uy))
-#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
-	     	add_colored_text("Elbereth", newbot2);
-#else
-		Strcat(nb = eos(nb), " Elbereth");
-#endif
+    if (!Blind && sengr_at("Elbereth", u.ux, u.uy)) {
+        botl_text(1, "Elbereth", newbot2, 1);
+    }
 #endif
 #ifdef DUMP_LOG
 }
@@ -581,10 +565,63 @@ bot2()
 }
 
 void
+bot3str(char *newbot3)
+{
+    newbot3[0] = '\0';
+
+    int cap = near_capacity();
+    botl_text(cap > UNENCUMBERED, enc_stat[cap], newbot3, 2);
+    unsigned len = strlen(newbot3);
+    while (len < strlen(enc_stat[OVERLOADED]) + 1 ) {
+        strcat(newbot3, " ");
+        len++;
+    }
+
+    botl_text_or_blanks(u.uhs != NOT_HUNGRY, hu_stat[u.uhs], newbot3, 2);
+    botl_text_or_blanks(Stoned,    "Stone",  newbot3, 2);
+    botl_text_or_blanks(Slimed,    "Slime",  newbot3, 2);
+    botl_text_or_blanks(Strangled, "Strngl", newbot3, 2);
+    botl_text_or_blanks(Sick && (u.usick_type & SICK_VOMITABLE),    "FoodPois", newbot3, 2);
+    botl_text_or_blanks(Sick && (u.usick_type & SICK_NONVOMITABLE), "Ill",      newbot3, 2);
+    botl_text_or_blanks(Blind,         "Blind", newbot3, 2);
+    botl_text_or_blanks(Stunned,       "Stun",  newbot3, 2);
+    botl_text_or_blanks(Confusion,     "Conf",  newbot3, 2);
+    botl_text_or_blanks(Hallucination, "Hallu", newbot3, 2);
+
+    /* levitation and flying are mutually exclusive; riding is not */
+    if (Levitation) {
+        botl_text_or_blanks(Levitation, "Lev", newbot3, 2);
+    } else {
+        botl_text_or_blanks(Flying, "Fly", newbot3, 2);
+    }
+
+    if (CO > 90) {
+        botl_text_or_blanks(u.usteed != NULL,  "Ride",   newbot3, 2);
+        botl_text_or_blanks(u.ufeetfrozen > 0, "Frozen", newbot3, 2);
+    }
+}
+
+static void
+bot3()
+{
+    char newbot3[MAXCO];
+
+    if (iflags.statuslines >= 3) {
+        int save_botlx = flags.botlx;
+        bot3str(newbot3);
+
+        curs(WIN_STATUS, 1, 2);
+        putstr(WIN_STATUS, 0, newbot3);
+        flags.botlx = save_botlx;
+    }
+}
+
+void
 bot()
 {
 	bot1();
 	bot2();
+	bot3();
 	flags.botl = flags.botlx = 0;
 }
 

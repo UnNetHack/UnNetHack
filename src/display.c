@@ -1486,7 +1486,7 @@ dump_screen()
 	    if (unicode_codepoint > 127) {
 	      Sprintf(html_c, "&#%d;", unicode_codepoint);
 	    } else {
-	      Sprintf(html_c, "%s", html_escape_character(unicode_codepoint));
+	      Sprintf(html_c, "%c", unicode_codepoint);
 	    }
 	    dfeature = dfeature_at(x, y, dfeaturebuf);
 
@@ -1578,6 +1578,10 @@ dump_screen()
     dump("", ptr);
     bot2str(buf);
     dump("", buf);
+    if (iflags.statuslines >= 3) {
+        bot3str(buf);
+        dump("", buf);
+    }
     dump_html("</pre>\n", "");
     dump("", "");
     dump("", "");
