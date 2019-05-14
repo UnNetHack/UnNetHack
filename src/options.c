@@ -747,6 +747,12 @@ initoptions()
 	}
 
     iflags.truecolor_separator = ';';
+
+    /* Set color default to false if env variable NO_COLOR is present.
+     * see https://no-color.org/ */
+    if (nh_getenv("NO_COLOR")) {
+        iflags.use_color = FALSE;
+    }
 # endif
 #endif /* UNIX || VMS */
 

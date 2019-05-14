@@ -2,6 +2,7 @@
 	* Use TAB as separator in xlogfile
 	* Add info about pre-seeded games to dumplog
 	* Seed is encoded as Crockford base32 string
+	* Set color default to false if env variable NO_COLOR is present
 
 	* dungeon layout:
 	  - Disable the rogue tribute level
