@@ -5783,8 +5783,8 @@ to figure out how those ones work for yourself.
 It is written in the Book of %d:
 
     After the Creation, the cruel god Moloch rebelled
-    against the authority of Marduk the Creator.
-    Moloch stole from Marduk the most powerful of all
+    against the authority of %m the Creator.
+    Moloch stole from %m the most powerful of all
     the artifacts of the gods, the Amulet of Yendor,
     and he hid it in the dark cavities of Gehennom, the
     Under World, where he now lurks, and bides his time.
