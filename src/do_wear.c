@@ -857,7 +857,7 @@ register struct obj *obj;
 		if (!oldprop && !HRegeneration && !regenerates(youmonst.data)) {
 			if ((uhp() < uhpmax()) &&
 			    !objects[obj->otyp].oc_name_known) {
-				Your("wounds are rapidly healing!");
+				Your("wounds are %s", marathon_mode ? "unchanged." : "rapidly healing!");
 				makeknown(RIN_REGENERATION);
 			}
 		}
@@ -973,7 +973,7 @@ boolean gone;
 	case RIN_TELEPORT_CONTROL:
 	case RIN_POLYMORPH:
 	case RIN_POLYMORPH_CONTROL:
-	case RIN_FREE_ACTION:                
+	case RIN_FREE_ACTION:
 	case RIN_SLOW_DIGESTION:
 	case RIN_SUSTAIN_ABILITY:
 	case MEAT_RING:
@@ -986,7 +986,7 @@ boolean gone;
 		if (!See_invisible) {
 		    set_mimic_blocking(); /* do special mimic handling */
 		    see_monsters();
-#ifdef INVISIBLE_OBJECTS                
+#ifdef INVISIBLE_OBJECTS
 		    see_objects();
 #endif
 		}
@@ -1242,7 +1242,7 @@ dotakeoff()
 			      Is_dragon_scales(uskin->otyp) ?
 				"dragon scales are" : "dragon scale mail is");
 		else
-		    pline("Not wearing any armor.%s", (iflags.cmdassist && 
+		    pline("Not wearing any armor.%s", (iflags.cmdassist &&
 				(uleft || uright || uamul || ublindf)) ?
 			  "  Use 'R' command to remove accessories." : "");
 		return 0;
@@ -1496,7 +1496,7 @@ boolean noisy;
 	    if (noisy) already_wearing(an(c_shield));
 	    err++;
 	} else if (uwep && bimanual(uwep)) {
-	    if (noisy) 
+	    if (noisy)
 		You("cannot wear a shield while wielding a two-handed %s.",
 		    is_sword(uwep) ? c_sword :
 		    (uwep->otyp == BATTLE_AXE) ? c_axe : c_weapon);
@@ -1892,7 +1892,7 @@ struct monst *victim;
 	if (!otmph)
 	    otmph = (victim == &youmonst) ? uarmu : which_armor(victim, W_ARMU);
 #endif
-	
+
 	otmp = (victim == &youmonst) ? uarmh : which_armor(victim, W_ARMH);
 	if(otmp && (!otmph || !rn2(4))) otmph = otmp;
 	otmp = (victim == &youmonst) ? uarmg : which_armor(victim, W_ARMG);

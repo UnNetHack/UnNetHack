@@ -191,14 +191,16 @@ boolean incr;	/* true iff via incremental experience growth */
 	register int num;
 
 	if (!incr) You_feel("more experienced.");
-	num = newhp();
-	u.uhpmax += num;
-	u.uhp += num;
-	if (Upolyd) {
-	    num = rnd(8);
-	    u.mhmax += num;
-	    u.mh += num;
-	}
+    num = newhp();
+    if (!marathon_mode) {
+        u.uhpmax += num;
+        u.uhp += num;
+        if (Upolyd) {
+            num = rnd(8);
+            u.mhmax += num;
+            u.mh += num;
+        }
+    }
 	check_uhpmax();
 	if (u.ulevel < urole.xlev)
 	    num = rn1((int)ACURR(A_WIS)/2 + urole.enadv.lornd + urace.enadv.lornd,

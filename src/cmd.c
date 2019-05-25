@@ -1527,6 +1527,10 @@ boolean want_disp;
 		}
 	}
 
+    if (marathon_mode) {
+        you_have_been("playing in marathon mode");
+    }
+
 	if (flags.deathdropless)
 		you_have_been("ignoring all death drops");
 

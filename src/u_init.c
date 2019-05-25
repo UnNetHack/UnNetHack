@@ -638,6 +638,10 @@ u_init()
 		u.ulives = 0;
 	}
 
+    if (marathon_mode) {
+        u.uhp = u.uhpmax = 999;
+    }
+
 	init_uhunger();
 	for (i = 0; i <= MAXSPELL; i++) spl_book[i].sp_id = NO_SPELL;
 	u.ublesscnt = 300;			/* no prayers just yet */

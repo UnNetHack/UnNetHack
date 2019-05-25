@@ -812,13 +812,13 @@ peffects(otmp)
 			u.uexp = rndexp(TRUE);
 		break;
 	case POT_HEALING:
-		You_feel("better.");
+        You_feel("%s.", marathon_mode ? "refreshed" : "better");
 		healup(d(6 + 2 * bcsign(otmp), 4),
 		       !otmp->cursed ? 1 : 0, !!otmp->blessed, !otmp->cursed);
 		exercise(A_CON, TRUE);
 		break;
 	case POT_EXTRA_HEALING:
-		You_feel("much better.");
+        You_feel("much %s.", marathon_mode ? "more refreshed" : "better");
 		healup(d(6 + 2 * bcsign(otmp), 8),
 		       otmp->blessed ? 5 : !otmp->cursed ? 2 : 0,
 		       !otmp->cursed, TRUE);
@@ -827,7 +827,7 @@ peffects(otmp)
 		exercise(A_STR, TRUE);
 		break;
 	case POT_FULL_HEALING:
-		You_feel("completely healed.");
+        You_feel("completely %s.", marathon_mode ? "refreshed" : "healed");
 		healup(400, 4+4*bcsign(otmp), !otmp->cursed, TRUE);
 		/* Restore one lost level if blessed */
 		if (otmp->blessed && u.ulevel < u.ulevelmax) {
@@ -995,7 +995,7 @@ healup(nhp, nxtra, curesick, cureblind)
 	int nhp, nxtra;
 	register boolean curesick, cureblind;
 {
-	if (nhp) {
+	if (nhp && !marathon_mode) {
 		if (Upolyd) {
 			u.mh += nhp;
 			if (u.mh > u.mhmax) u.mh = (u.mhmax += nxtra);
@@ -1053,7 +1053,7 @@ boolean your_fault;
 	boolean isyou = (mon == &youmonst);
 	int distance;
 #ifdef WEBB_DISINT
-	boolean disint = (touch_disintegrates(mon->data) && 
+	boolean disint = (touch_disintegrates(mon->data) &&
 	                  !oresist_disintegration(obj) &&
 	                  !mon->mcan &&
 	                   mon->mhp>6);
@@ -1098,7 +1098,7 @@ boolean your_fault;
 	}
 
 	/* oil doesn't instantly evaporate */
-	if (obj->otyp != POT_OIL && cansee(mon->mx,mon->my) 
+	if (obj->otyp != POT_OIL && cansee(mon->mx,mon->my)
 #ifdef WEBB_DISINT
        && !disint
 #endif
@@ -1273,7 +1273,7 @@ boolean your_fault;
     }
 #ifdef WEBB_DISINT
     if (!disint)
-#endif 
+#endif
    {
 
 	/* Note: potionbreathe() does its own docall() */
@@ -1452,7 +1452,7 @@ register struct obj *obj;
 	}
 }
 
-/* new alchemy scheme based on color mixing 
+/* new alchemy scheme based on color mixing
  * YANI by Graham Cox <aca00gac@shef.ac.uk>
  * Implemented by Nephi Allred <zindorsky@hotmail.com> on 15 Apr 2003
  *
@@ -1589,7 +1589,7 @@ register struct obj *o1, *o2;
 		alchemy_init();
 		i1 = alchemy_table1[o1->otyp-POT_GAIN_ABILITY];
 		i2 = alchemy_table1[o2->otyp-POT_GAIN_ABILITY];
-		
+
 		/* check that both potions are of mixable types */
 		if (i1<0 || i2<0)
 			return 0;
@@ -1788,7 +1788,7 @@ dodip()
 		}
 	} else if (is_pool(u.ux,u.uy) || is_swamp(u.ux,u.uy)) {
 		tmp = waterbody_name(u.ux,u.uy);
-		Sprintf(qbuf, "Dip %s into the %s?", 
+		Sprintf(qbuf, "Dip %s into the %s?",
 				safe_qbuf("", sizeof("Dip  into the pool of water?"),
 					the(xname(obj)), the(simple_typename(obj->otyp)),
 					"this item"), tmp);
@@ -1931,7 +1931,7 @@ struct obj *potion, *obj;
 		/* Mixing potions is dangerous... */
 		/* Give a clue to what's going on ... */
 		if(potion->dknown && obj->dknown) {
-			You("mix the %s potion with the %s one ...", 
+			You("mix the %s potion with the %s one ...",
 				OBJ_DESCR(objects[potion->otyp]),
 				OBJ_DESCR(objects[obj->otyp]));
 		} else
@@ -2167,7 +2167,7 @@ struct obj *potion, *obj;
 		if (potion->quan > 1L) {
 		    singlepotion = splitobj(potion, 1L);
 		} else singlepotion = potion;
-		
+
 		if(singlepotion->unpaid && costly_spot(u.ux, u.uy)) {
 		    You("use it, you pay for it.");
 		    bill_dummy_object(singlepotion);

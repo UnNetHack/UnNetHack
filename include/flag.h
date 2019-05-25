@@ -192,7 +192,11 @@ struct flag {
 	/* Heaven or hell modes */
 	boolean heaven_or_hell; /* player and monsters have max 1 HP and player has 3 lives */
 	boolean hell_and_hell; /* like heaven_or_hell but only player has max 1 HP */
+
+	boolean marathon;	/* cannot heal, fixed high max hp */
 };
+
+#define marathon_mode flags.marathon
 
 /*
  * Flags that are set each time the game is started.

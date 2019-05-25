@@ -418,6 +418,7 @@ struct toptenentry *tt;
                                        flags.explore ? "explore" :
                                        hell_and_hell_mode ? "hah" :
                                        heaven_or_hell_mode ? "hoh" :
+                                       marathon_mode ? "marathon" :
                                        "normal"));
 #ifndef GOLDOBJ
   (void)fprintf(rfile, SEP "gold=%ld", u.ugold); /* hidden_gold() is not needed anymore */

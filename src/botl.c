@@ -409,7 +409,7 @@ char *buf;
 		char *dgn_name = dungeons[u.uz.dnum].dname;
 		if (!strncmpi(dgn_name, "The ", 4)) { dgn_name += 4; }
 		/* ports with more room may expand this one */
-		Sprintf(buf, "%s:%-2d ", 
+		Sprintf(buf, "%s:%-2d ",
 		        iflags.show_dgn_name ? dgn_name : "Dlvl",
 		        depth(&u.uz));
 		ret = 0;
@@ -479,10 +479,18 @@ bot2()
 	putstr(WIN_STATUS, 0, newbot2);
 	flags.botlx = 0;
 
-	Sprintf(nb = eos(nb), "%d(%d)", hp, hpmax);
+    if (marathon_mode) {
+        Sprintf(nb = eos(nb), "%d", hp);
+    } else {
+        Sprintf(nb = eos(nb), "%d(%d)", hp, hpmax);
+    }
 	apply_color_option(percentage_color_of(hp, hpmax, hp_colors), newbot2, 2);
 #else
-	Sprintf(nb = eos(nb), " HP:%d(%d)", hp, hpmax);
+    if (marathon_mode) {
+        Sprintf(nb = eos(nb), " HP:%d", hp);
+    } else {
+        Sprintf(nb = eos(nb), " HP:%d(%d)", hp, hpmax);
+    }
 #endif
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	Strcat(nb = eos(nb), " Pw:");
@@ -517,7 +525,7 @@ bot2()
 #ifdef REALTIME_ON_BOTL
 	if(iflags.showrealtime) {
 		time_t currenttime = get_realtime();
-		Sprintf(nb = eos(nb), " %ld:%2.2ld", currenttime / 3600, 
+		Sprintf(nb = eos(nb), " %ld:%2.2ld", currenttime / 3600,
 		        (currenttime % 3600) / 60);
 	}
 #endif

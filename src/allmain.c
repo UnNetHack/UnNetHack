@@ -97,6 +97,9 @@ hpnotify_format_str(char *str)
 boolean
 can_regenerate()
 {
+    if (marathon_mode) {
+        return 0;
+    }
     if (is_elf(youmonst.data)) {
 	if (uwep && is_iron(uwep) &&
 		!is_quest_artifact(uwep) && !uarmg) return 0;
@@ -338,44 +341,48 @@ moveloop()
 			/* for the moment at least, you're in tiptop shape */
 			wtcap = UNENCUMBERED;
 		    } else if (Upolyd && youmonst.data->mlet == S_EEL && !is_pool(u.ux,u.uy) && !Is_waterlevel(&u.uz)) {
-			if (u.mh > 1) {
-			    u.mh--;
-			    flags.botl = 1;
-			} else if (u.mh < 1)
-			    rehumanize();
-		    } else if (Upolyd && u.mh < u.mhmax) {
-			if (u.mh < 1)
-			    rehumanize();
-			else if (can_regenerate() && (Regeneration ||
-				    (wtcap < MOD_ENCUMBER && !(moves%20)))) {
-			    flags.botl = 1;
-			    u.mh++;
-			    interrupt_multi("Hit points", u.mh, u.mhmax);
-			}
-		    } else if (u.uhp < u.uhpmax && can_regenerate() &&
-			 (wtcap < MOD_ENCUMBER || !u.umoved || Regeneration)) {
-			if (u.ulevel > 9 && !(moves % 3)) {
-			    int heal, Con = (int) ACURR(A_CON);
+                if (u.mh > 1) {
+                    u.mh--;
+                    flags.botl = 1;
+                } else if (u.mh < 1)
+                    rehumanize();
+            } else if (Upolyd && u.mh < u.mhmax) {
+                if (u.mh < 1)
+                    rehumanize();
+                else if (can_regenerate() && (Regeneration ||
+                            (wtcap < MOD_ENCUMBER && !(moves%20)))) {
+                    flags.botl = 1;
+                    u.mh++;
+                    interrupt_multi("Hit points", u.mh, u.mhmax);
+                }
+            } else if (u.uhp < u.uhpmax && can_regenerate() &&
+                    (wtcap < MOD_ENCUMBER || !u.umoved || Regeneration)) {
+                if (u.ulevel > 9 && !(moves % 3)) {
+                    if (!marathon_mode) {
+                        int heal, Con = (int) ACURR(A_CON);
 
-			    if (Con <= 12) {
-				heal = 1;
-			    } else {
-				heal = rnd(Con);
-				if (heal > u.ulevel-9) heal = u.ulevel-9;
-			    }
-			    flags.botl = 1;
-			    u.uhp += heal;
-			    if(u.uhp > u.uhpmax)
-				u.uhp = u.uhpmax;
-			    interrupt_multi("Hit points", u.uhp, u.uhpmax);
-			} else if (Regeneration ||
-			     (u.ulevel <= 9 &&
-			      !(moves % ((MAXULEV+12) / (u.ulevel+2) + 1)))) {
-			    flags.botl = 1;
-			    u.uhp++;
-			    interrupt_multi("Hit points", u.uhp, u.uhpmax);
-			}
-		    }
+                        if (Con <= 12) {
+                            heal = 1;
+                        } else {
+                            heal = rnd(Con);
+                            if (heal > u.ulevel-9) heal = u.ulevel-9;
+                        }
+                        flags.botl = 1;
+                        u.uhp += heal;
+                        if(u.uhp > u.uhpmax)
+                            u.uhp = u.uhpmax;
+                        interrupt_multi("Hit points", u.uhp, u.uhpmax);
+                    }
+                } else if (Regeneration ||
+                        (u.ulevel <= 9 &&
+                         !(moves % ((MAXULEV+12) / (u.ulevel+2) + 1)))) {
+                    if (!marathon_mode) {
+                        flags.botl = 1;
+                        u.uhp++;
+                        interrupt_multi("Hit points", u.uhp, u.uhpmax);
+                    }
+                }
+            }
 
 		    /* moving around while encumbered is hard work */
 		    if (wtcap > MOD_ENCUMBER && u.umoved) {

@@ -3,6 +3,8 @@
 	* Add info about pre-seeded games to dumplog
 	* Seed is encoded as Crockford base32 string
 	* Set color default to false if env variable NO_COLOR is present
+	* Add Marathon mode (start game with 999 HP and never heal), enabled
+	  with OPTIONS=marathon
 
 	* dungeon layout:
 	  - Disable the rogue tribute level
@@ -16,11 +18,11 @@
 	* Support SOURCE_DATE_EPOCH for reproducible builds (patch from Debian)
 	* Players killed by Nazgul will arise as Barrow Wights in bones files
 	  (a slight change from the original mythology, we know)
-	* Reviving drained corpses sometimes won't work, and may destroy 
+	* Reviving drained corpses sometimes won't work, and may destroy
 	  the corpse. Partially drained corpses are more likely to revive.
 	* Reproducible dungeon layout. Set OPTIONS=seed:number to get the same
 	  dungeon layout.
-	* Vault Guards get angry if you eat gold in front of them. (From Nethack 
+	* Vault Guards get angry if you eat gold in front of them. (From Nethack
 		 Development Code - used with permission)
 	* Several cosmetic changes - additional engravings, hallucinatory monsters, and funny messages.
 	* Default to UTF8graphics on supporting terminals
@@ -115,7 +117,7 @@
 	* Tourists start with more darts to compensate for more training being
 	  needed to advance weapon skills
 	* Player can wish for up to 100 projectiles (from UnNetHackPlus)
-	* Increase range of properly fired missiles, and crossbow range no 
+	* Increase range of properly fired missiles, and crossbow range no
 	  longer depends on strength (from SporkHack)
 	* Require high strength for crossbow multishot, with a bonus for
 	  gnomes (from GruntHack)
@@ -154,7 +156,7 @@
 
 	* artifact changes:
 	  - From SporkHack:
-	    - All the weapons below warn against and have 20% instakill chance 
+	    - All the weapons below warn against and have 20% instakill chance
 	      against their target monsters.
 	    - Dragonbane is now a dwarvish spear that conveys fire, cold, shock,
 	      acid, poison, acid, and disintegration resistance while wielded.
@@ -252,7 +254,7 @@
 	    - showweight -- Display the weight of individial items in
 		your inventory (from SLASH'EM 0.7)
 	    - nameempty -- Automatically #name wands known to be empty
-		
+
 	* role differentiation:
 	  - Tourists get automatic type identification for shop items
 	  - Healers can see how wounded monsters are (by L)
@@ -293,7 +295,7 @@
 	  - Dragons auto-ID after being probed (from DynaHack)
 	  - You can level-port to levels based on their annotation
 	  - Rustproof/Erodeproof/Fixed is known by default (from DynaHack)
-	  
+
 	* bug fixes:
 	  - Fixed crash when player gets killed when entering a new level and
 	    a trap on the previous level causes a null pointer dereference
@@ -366,7 +368,7 @@
 	* new monsters:
 	  - chromatic dragons
 	  - wax golems (providing candles as death drop) (from Slash'Em)
-	
+
 	* new levels:
 	  - Sokoban levels (from GruntHack)
 
@@ -586,7 +588,7 @@
 	  - C343-231: Time is distorted while sinking into lava.
 
 	* user interface improvements:
-	  - Interrupt a multi turn action if hit points or magical energy is restored 
+	  - Interrupt a multi turn action if hit points or magical energy is restored
 
 
 2009-06-13  UnNetHack 3.5.1
@@ -614,7 +616,7 @@
 	* item behaviour changes:
 	  - Amulet of Yendor may teleport away when dropped
 	  - Scrolls of gold detection: confused reading shows a random item class
-	  - Scrolls of genocide kill monster on level (uncursed) or globally (blessed) 
+	  - Scrolls of genocide kill monster on level (uncursed) or globally (blessed)
 
 	* Patches:
 	  - Astral Escape (via GruntHack from Chi)
@@ -675,7 +677,7 @@
 	* Choice of Sokoban prize (from NetHack Brass)
 	* Quest nemesis don't respect Elbereth
 	* Unique demons don't respect Elbereth
-	* The Heart of Ahriman gives displacement and energy regeneration 
+	* The Heart of Ahriman gives displacement and energy regeneration
 	* Throne: no wishes
 	* Towel day support
 	* Death talks in CAPITAL LETTERS
