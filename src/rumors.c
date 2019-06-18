@@ -67,7 +67,7 @@ char *
 getrumor(truth, rumor_buf, exclude_cookie)
 int truth; /* 1=true, -1=false, 0=either */
 char *rumor_buf;
-boolean exclude_cookie; 
+boolean exclude_cookie;
 {
 	dlb	*rumors;
 	long tidbit, beginning;
@@ -101,11 +101,11 @@ boolean exclude_cookie;
 		switch (adjtruth = truth + rn2(2)) {
 		  case  2:	/*(might let a bogus input arg sneak thru)*/
 		  case  1:  beginning = true_rumor_start;
-			    tidbit = Rand() % true_rumor_size;
+			    tidbit = rn2(true_rumor_size);
 			break;
 		  case  0:	/* once here, 0 => false rather than "either"*/
 		  case -1:  beginning = false_rumor_start;
-			    tidbit = Rand() % false_rumor_size;
+			    tidbit = rn2(false_rumor_size);
 			break;
 		  default:
 			    warning("strange truth value for rumor");
