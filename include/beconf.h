@@ -13,7 +13,6 @@
 
 #define index strchr
 #define rindex strrchr
-#define Rand rand	/* Be should have a better rand function! */
 #define tgetch getchar
 #define FCMASK 0666
 #define PORT_ID "BeOS"

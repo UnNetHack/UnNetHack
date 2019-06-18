@@ -76,14 +76,6 @@
 
 #include <time.h>
 
-/* the high quality random number routines */
-
-#ifdef RANDOM
-# define Rand()	random()
-#else
-# define Rand()	rand()
-#endif
-
 /* file creation mask */
 
 #include <sys\types.h>

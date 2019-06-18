@@ -100,12 +100,6 @@ extern void FDECL(interject, (int));
 #define rindex	strrchr
 #include <time.h>
 #define USE_STDARG
-#ifdef RANDOM
-/* Use the high quality random number routines. */
-#define Rand()	random()
-#else
-#define Rand()	rand()
-#endif
 
 #define FCMASK	0660	/* file creation mask */
 #define regularize	nt_regularize

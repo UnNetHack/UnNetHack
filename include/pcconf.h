@@ -217,13 +217,6 @@
 #include <time.h>
 #endif
 
-#ifdef RANDOM
-/* Use the high quality random number routines. */
-# define Rand() random()
-#else
-# define Rand() rand()
-#endif
-
 #ifndef TOS
 # define FCMASK 0660	/* file creation mask */
 #endif

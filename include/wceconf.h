@@ -12,7 +12,7 @@
 #include <windows.h>
 
 /* Detect the targe device */
-#if defined(WIN32_PLATFORM_PSPC) 
+#if defined(WIN32_PLATFORM_PSPC)
 #	if _WIN32_WCE >= 300
 #		define WIN_CE_POCKETPC
 #	else
@@ -136,12 +136,6 @@
 #define index	strchr
 #define rindex	strrchr
 #define USE_STDARG
-#ifdef RANDOM
-/* Use the high quality random number routines. */
-#define Rand()	random()
-#else
-#define Rand()	rand()
-#endif
 
 #define FCMASK	0660	/* file creation mask */
 #define regularize	nt_regularize
@@ -224,8 +218,8 @@ extern void NDECL(toggle_mouse_support);
 
 extern int FDECL(set_win32_option, (const char *, const char *));
 
-/* 
- * 3.4.3 addition - Stuff to help the user with some common, yet significant errors 
+/*
+ * 3.4.3 addition - Stuff to help the user with some common, yet significant errors
  * Let's make it NOP for now
  */
 #define interject_assistance(_1,_2,_3,_4)
@@ -345,7 +339,7 @@ extern long   __cdecl ftell(FILE * f);
 # endif
 
 /* leave - Windows CE defines leave as part of exception handling (__leave)
-   It confilicts with existing sources and since we don't use exceptions it is safe 
+   It confilicts with existing sources and since we don't use exceptions it is safe
    to undefine it */
 # ifdef leave
 # undef leave

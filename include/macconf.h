@@ -69,7 +69,6 @@
 #define index strchr
 #define rindex strrchr
 
-#define Rand random
 extern void error(const char *,...);
 
 #if !defined(O_WRONLY)

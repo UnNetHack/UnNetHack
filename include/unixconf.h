@@ -316,13 +316,6 @@
 # endif
 #endif
 
-/* Use the high quality random number routines. */
-#if defined(BSD) || defined(LINUX) || defined(ULTRIX) || defined(CYGWIN32) || defined(RANDOM) || defined(__APPLE__)
-#define Rand()	random()
-#else
-#define Rand()	lrand48()
-#endif
-
 #ifdef TIMED_DELAY
 # if defined(SUNOS4) || defined(LINUX) || (defined(BSD) && !defined(ULTRIX))
 # define msleep(k) usleep((k)*1000)
