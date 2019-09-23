@@ -541,11 +541,15 @@ tutorial_redisplay()
   }
   end_menu(tempwin, "Which tutorial?");
   c = select_menu(tempwin, PICK_ONE, &s);
-  if (c <= 0) return 0;
+  if (c <= 0) {
+	  destroy_nhwindow(tempwin);
+	  return 0;
+  }
   i.a_int = s[0].item.a_int;
   free((genericptr_t)s);
   flush_screen(1);
   com_pager(i.a_int);  
+  destroy_nhwindow(tempwin);
   return 0;
 }
 
