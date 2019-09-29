@@ -5748,8 +5748,7 @@ holes; that way, you can complete a path leading to the next level.
 It's possible to complete all the puzzles here according to the
 traditional Sokoban rules; however, by taking NetHack physics, and the
 possibility to use magic, into account, you may find certain rather
-more ingenious ways to solve the puzzle. However, players who cheat
-too badly at the puzzles may find themselves having a run of bad luck.
+more ingenious ways to solve the puzzle.
 
 In order to help you solve the puzzles in an informed manner, you'll
 be magically informed of the map on each level of Sokoban, so the aim
