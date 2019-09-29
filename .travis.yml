@@ -10,6 +10,9 @@ addons:
   apt:
     packages:
       - check
+      - libx11-dev
+      - libxaw7-dev
+      - xfonts-utils
 
 sudo: false
 
