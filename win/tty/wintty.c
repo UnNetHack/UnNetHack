@@ -409,7 +409,7 @@ tty_player_selection()
 		 * bottom of the window.
 		 */
 		tty_clear_nhwindow(BASE_WINDOW);
-	    
+
 	    if (pick4u != 'y' && pick4u != 'n') {
 give_up:	/* Quit */
 		if (selected) free((genericptr_t) selected);
@@ -597,9 +597,9 @@ give_up:	/* Quit */
 					Strcpy(rolenamebuf, roles[i].name.m);
 					Strcat(rolenamebuf, "/");
 					Strcat(rolenamebuf, roles[i].name.f);
-				} else 
+				} else
 					Strcpy(rolenamebuf, roles[i].name.m);
-			}	
+			}
 			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, thisch,
 			    0, ATR_NONE, an(rolenamebuf), MENU_UNSELECTED);
 			lastch = thisch;
@@ -629,7 +629,7 @@ give_up:	/* Quit */
 	    (void)  root_plselection_prompt(plbuf, QBUFSZ - 1,
 			flags.initrole, flags.initrace, flags.initgend, flags.initalign);
 	}
-	
+
 	/* Select a race, if necessary */
 	/* force compatibility with role, try for compatibility with
 	 * pre-selected gender/alignment */
@@ -997,6 +997,7 @@ tty_create_nhwindow(type)
     struct WinDesc* newwin;
     int i;
     int newid;
+    int max_statuslines;
 
     if(maxwin == MAXWIN)
 	return WIN_ERR;
@@ -1029,10 +1030,13 @@ tty_create_nhwindow(type)
 	break;
     case NHW_STATUS:
 	/* status window, 2 or 3 lines long, full width, bottom of screen */
+    max_statuslines = (LI > ROWNO+3) ? 3 : 2;
     if (iflags.statuslines == 0) {
-        iflags.statuslines = (LI > ROWNO+3) ? 3 : 2;
+        iflags.statuslines = max_statuslines;
     }
-    int max_statuslines = 3;
+    if (iflags.statuslines > max_statuslines) {
+        iflags.statuslines = max_statuslines;
+    }
 	newwin->offx = 0;
 #if defined(USE_TILES) && defined(MSDOS)
 	if (iflags.grmode) {
@@ -2832,7 +2836,7 @@ tty_print_glyph(window, x, y, glyph)
     boolean reverse_on = FALSE;
     int	    color;
     unsigned special;
-    
+
 #ifdef CLIPPING
     if(clipping) {
 	if(x <= clipx || y < clipy || x >= clipxmax || y >= clipymax)

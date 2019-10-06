@@ -14,6 +14,7 @@
 	  - Fix over-escaping of characters on HTML dump map
 	  - Fix crash when /dev/(u)random can't be opened
 	  - Properly randomize rumors (found by Andrio Celos)
+	  - Fix map overdrawing statuslines on screens with 24 lines (found by Mandevil)
 
 2019-01-01  UnNetHack 5.2.0
 	* Support SOURCE_DATE_EPOCH for reproducible builds (patch from Debian)
