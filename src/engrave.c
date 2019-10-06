@@ -96,7 +96,7 @@ static const char *random_mesg[] = {
 	"For truth, justice, and the Yendorian way!",
 	"This engraving, no verb",        /* Douglas Hofstadter */
 	"You will curse my name to the heavens and the heavens will side with me"  /* War of Omens */
-	
+
 	/* From dNetHack */
 	"[REDACTED]", "[DATA EXPUNGED]", "[DATA PLUNGED]", /* SCP Foundation */
 	"[DATA EXPANDED]", "I am a toaster!",
@@ -104,9 +104,9 @@ static const char *random_mesg[] = {
 	"I SAW THE EYE. Over the horizon, like a rising sun!", /* Dresden Codak */
 	"Write down the coordinates, he said.", /* the Submachine series */
 	"...look for a green leaf...", "...bring it to the statue...",
-	"...you should arrive at the lab...", "...or somewhere nearby...", 
-	"Please disable the following security protocols: 2-18, 1-12, 1-0", 
-	"Our coil is broken, and we don't have a replacement. It's useless. It's so useless.", 
+	"...you should arrive at the lab...", "...or somewhere nearby...",
+	"Please disable the following security protocols: 2-18, 1-12, 1-0",
+	"Our coil is broken, and we don't have a replacement. It's useless. It's so useless.",
 };
 
 char *
@@ -326,11 +326,11 @@ nengr_at(x, y)
 	register struct engr *ep = engr_at(x, y);
 	unsigned count = 0;
 	const char *p;
-	
+
 	if (!ep || HEADSTONE == ep->engr_type)
 		return 0;
-	
-	p = ep->engr_txt;	
+
+	p = ep->engr_txt;
 	while (strstri(p, s)) {
 		count++;
 		p += 8;
@@ -375,7 +375,7 @@ register int x,y;
 	register struct engr *ep = engr_at(x,y);
 	register int	sensed = 0;
 	char buf[BUFSZ];
-	
+
 	/* Sensing an engraving does not require sight,
 	 * nor does it necessarily imply comprehension (literacy).
 	 */
@@ -834,6 +834,7 @@ boolean fingers;
 			}
 			if(!oep || (oep->engr_type != BURN))
 			    break;
+            /* fall through */
 		    case WAN_CANCELLATION:
 		    case WAN_MAKE_INVISIBLE:
 			if (oep && oep->engr_type != HEADSTONE) {
@@ -890,9 +891,9 @@ boolean fingers;
 			ptext = TRUE;
 			type  = BURN;
 			if(!objects[otmp->otyp].oc_name_known) {
-			if (flags.verbose)
-			    pline("This %s is a wand of fire!", xname(otmp));
-			    doknown = TRUE;
+                if (flags.verbose)
+                    pline("This %s is a wand of fire!", xname(otmp));
+                doknown = TRUE;
 			}
 			Strcpy(post_engr_text,
 				Blind ? "You feel the wand heat up." :
@@ -981,6 +982,7 @@ boolean fingers;
 		    break;
 		}
 #endif
+        /* fall through */
 	    case ILLOBJ_CLASS:
 		warning("You're engraving with an illegal object!");
 		break;
