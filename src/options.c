@@ -192,8 +192,8 @@ static struct Bool_Opt
 	{"conducts_illiterate", &flags.illiterate, FALSE, SET_IN_FILE },
 	{"conducts_pacifist", &flags.pacifist, FALSE, SET_IN_FILE },
 	{"conducts_nudist", &flags.nudist, FALSE, SET_IN_FILE },
-	{"conducts_vegan", &flags.vegan, FALSE, SET_IN_FILE }, 
-	{"conducts_vegetarian", &flags.vegetarian, FALSE, SET_IN_FILE }, 
+	{"conducts_vegan", &flags.vegan, FALSE, SET_IN_FILE },
+	{"conducts_vegetarian", &flags.vegetarian, FALSE, SET_IN_FILE },
 	{"null", &flags.null, TRUE, SET_IN_FILE},
 #ifdef MAC
 	{"page_wait", &flags.page_wait, TRUE, SET_IN_GAME},
@@ -270,7 +270,7 @@ static struct Bool_Opt
 	{"sound", &flags.soundok, TRUE, SET_IN_GAME},
 	{"sparkle", &flags.sparkle, TRUE, SET_IN_GAME},
 	/* not removed for backwards compatibilty */
-	{"standout", &flags.standout, TRUE, SET_IN_FILE}, 
+	{"standout", &flags.standout, TRUE, SET_IN_FILE},
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 	{"statuscolors", &iflags.use_status_colors, TRUE, SET_IN_GAME},
 #else
@@ -462,7 +462,9 @@ static struct Comp_Opt
 	{ "soundcard", "type of sound card to use", 20, SET_IN_FILE },
 #endif
 	{ "statuscolor", "set status colors", PL_PSIZ, SET_IN_FILE },
+#ifdef TTY_GRAPHICS
 	{ "statuslines", "set number of status lines (2 or 3)", 20, SET_IN_GAME },
+#endif
 	{ "suppress_alert", "suppress alerts about version-specific features",
 						8, SET_IN_FILE },
 	{ "tile_width", "width of tiles", 20, DISP_IN_GAME},	/*WC*/
@@ -662,7 +664,7 @@ initoptions()
 
 	/* for detection of configfile options specified multiple times */
 	iflags.opt_booldup = iflags.opt_compdup = (int *)0;
-	
+
 	for (i = 0; boolopt[i].name; i++) {
 		if (boolopt[i].addr)
 			*(boolopt[i].addr) = boolopt[i].initvalue;
@@ -1268,7 +1270,7 @@ int on_or_off;
 		optptr = iflags.opt_booldup;
 		for (k = 0; k < SIZE(boolopt); ++k)
 			*optptr++ = 0;
-			
+
 		if (iflags.opt_compdup)
 			impossible("iflags.opt_compdup already on (memory leak)");
 		iflags.opt_compdup = (int *)alloc(SIZE(compopt) * sizeof(int));
@@ -1281,7 +1283,7 @@ int on_or_off;
 		iflags.opt_booldup = (int *)0;
 		if (iflags.opt_compdup) free((genericptr_t) iflags.opt_compdup);
 		iflags.opt_compdup = (int *)0;
-	} 
+	}
 }
 
 STATIC_OVL void
@@ -1627,7 +1629,7 @@ char *codepoint;
 {
 	char *ptr, *endptr;
 	int num=0, base;
-	
+
 	/* parse codepoint */
 	if (!strncmpi(codepoint, "u+", 2) ||
 	    !strncmpi(codepoint, "0x", 2)) {
@@ -1673,7 +1675,7 @@ const char *str;
 			return TRUE;
 		}
 	}
-	
+
 	return FALSE;
 }
 
@@ -1703,7 +1705,7 @@ const char *str;
 			return TRUE;
 		}
 	}
-	
+
 	return FALSE;
 }
 
@@ -1744,7 +1746,7 @@ const char *str;
 			}
 		}
 	}
-	
+
 	return FALSE;
 }
 
@@ -2192,7 +2194,7 @@ boolean tinitial, tfrom_file;
 			wintype = NHW_MESSAGE;
 		else if (!strncmpi(fontopts, "text", 4) ||
 			 !strncmpi(fontopts, "_text", 5))
-			wintype = NHW_TEXT;			
+			wintype = NHW_TEXT;
 		else if (!strncmpi(fontopts, "menu", 4) ||
 			 !strncmpi(fontopts, "_menu", 5))
 			wintype = NHW_MENU;
@@ -2805,7 +2807,7 @@ goodfruit:
 			} else if (c == ' ') {
 				/* do nothing */
 			} else
-				badopt = TRUE;				
+				badopt = TRUE;
 			op++;
 		}
 		if (badopt) badoption(opts);
@@ -2895,19 +2897,22 @@ goodfruit:
 	    return;
 	}
 
+#ifdef TTY_GRAPHICS
     fullname = "statuslines";
     if (match_optname(opts, fullname, 11, TRUE)) {
         op = string_for_opt(opts, negated);
         if (negated) {
             bad_negation(fullname, FALSE);
         } else if (strlen(op) == 1 && (*op == '2' || *op == '3')) {
-            iflags.statuslines = (*op == '2') ? 2 : 3;
+            int max_statuslines = (LI > ROWNO+3) ? 3 : 2;
+            iflags.statuslines = (*op == '2') ? 2 : max_statuslines;
             docrt();
         } else {
             badoption(opts);
         }
         return;
     }
+#endif
 
 #ifdef SORTLOOT
 	fullname = "sortloot";
@@ -2950,7 +2955,7 @@ goodfruit:
 		else if (op) (void) feature_alert_opts(op,fullname);
 		return;
 	}
-	
+
 #ifdef VIDEOSHADES
 	/* videocolors:string */
 	fullname = "videocolors";
@@ -3527,7 +3532,7 @@ map_menu_cmd(ch)
 # define OPTIONS_HEADING "NETHACKOPTIONS"
 #endif
 
-static char fmtstr_doset_add_menu[] = "%s%-15s [%s]   "; 
+static char fmtstr_doset_add_menu[] = "%s%-15s [%s]   ";
 static char fmtstr_doset_add_menu_tab[] = "%s\t[%s]";
 
 STATIC_OVL void
@@ -3657,14 +3662,14 @@ doset()
 	if (biggest_name > 30) biggest_name = 30;
 	if (!iflags.menu_tab_sep)
 		Sprintf(fmtstr_doset_add_menu, "%%s%%-%ds [%%s]", biggest_name);
-	
+
 	/* deliberately put `name', `role', `race', `gender' first */
 	doset_add_menu(tmpwin, "name", 0);
 	doset_add_menu(tmpwin, "role", 0);
 	doset_add_menu(tmpwin, "race", 0);
 	doset_add_menu(tmpwin, "gender", 0);
 
-	for (pass = startpass; pass <= endpass; pass++) 
+	for (pass = startpass; pass <= endpass; pass++)
 	    for (i = 0; compopt[i].name; i++)
 		if (compopt[i].optflags == pass) {
  		    	if (!strcmp(compopt[i].name, "name") ||
@@ -3767,7 +3772,7 @@ boolean setinitial,setfromfile;
     int i;
     char buf[BUFSZ];
     boolean retval = FALSE;
-    
+
     /* Special handling of menustyle, pickup_burden, pickup_types,
      * disclose, runmode, msg_window, menu_headings, number_pad and sortloot
 #ifdef AUTOPICKUP_EXCEPTIONS
@@ -3945,7 +3950,7 @@ boolean setinitial,setfromfile;
 	}
 	destroy_nhwindow(tmpwin);
 	retval = TRUE;
-    } 
+    }
 #ifdef TTY_GRAPHICS
       else if (!strcmp("msg_window", optname)) {
 	/* by Christian W. Cooper */
@@ -4016,7 +4021,7 @@ boolean setinitial,setfromfile;
 	Sprintf(abuf, "Select %s window placement relative to the map:",
 		msg ? "message" : "status");
 	end_menu(tmpwin, abuf);
-	if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {		
+	if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
 		if (msg) iflags.wc_align_message = window_pick->item.a_int;
 		else iflags.wc_align_status = window_pick->item.a_int;
 		free((genericptr_t)window_pick);
@@ -4212,7 +4217,7 @@ char *buf;
 	else if (!strcmp(optname, "boulder"))
 		Sprintf(buf, "%c", iflags.bouldersym ?
 			iflags.bouldersym : oc_syms[(int)objects[BOULDER].oc_class]);
-	else if (!strcmp(optname, "catname")) 
+	else if (!strcmp(optname, "catname"))
 		Sprintf(buf, "%s", catname[0] ? catname : none );
 	else if (!strcmp(optname, "conducts"))
 		Sprintf(buf, "%s%s %s%s %s%s %s%s %s%s %s%s %s%s %s%s",
@@ -4225,7 +4230,7 @@ char *buf;
 			flags.vegan ? "+" : "-", "vegan",
 			flags.vegetarian ? "+" : "-", "vegetarian");
 #ifdef EXOTIC_PETS
-	else if (!strcmp(optname, "crocodilename")) 
+	else if (!strcmp(optname, "crocodilename"))
 		Sprintf(buf, "%s", crocodilename[0] ? crocodilename : none);
 #endif
 	else if (!strcmp(optname, "disclose")) {
@@ -4239,7 +4244,7 @@ char *buf;
 			Strcat(buf, topt);
 		}
 	}
-	else if (!strcmp(optname, "dogname")) 
+	else if (!strcmp(optname, "dogname"))
 		Sprintf(buf, "%s", dogname[0] ? dogname : none );
 #ifdef DUMP_LOG
 	else if (!strcmp(optname, "dumpfile"))
@@ -4282,11 +4287,11 @@ char *buf;
 		if (iflags.wc_fontsiz_text) Sprintf(buf, "%d",iflags.wc_fontsiz_text);
 		else Strcpy(buf, defopt);
 	}
-	else if (!strcmp(optname, "fruit")) 
+	else if (!strcmp(optname, "fruit"))
 		Sprintf(buf, "%s", pl_fruit);
 	else if (!strcmp(optname, "gender"))
 		Sprintf(buf, "%s", rolestring(flags.initgend, genders, adj));
-	else if (!strcmp(optname, "horsename")) 
+	else if (!strcmp(optname, "horsename"))
 		Sprintf(buf, "%s", horsename[0] ? horsename : none);
 	else if (!strcmp(optname, "map_mode"))
 		Sprintf(buf, "%s",
@@ -4302,7 +4307,7 @@ char *buf;
 			iflags.wc_map_mode == MAP_MODE_ASCII10x18 ? "ascii10x18" :
 			iflags.wc_map_mode == MAP_MODE_ASCII_FIT_TO_SCREEN ?
 			"fit_to_screen" : defopt);
-	else if (!strcmp(optname, "menustyle")) 
+	else if (!strcmp(optname, "menustyle"))
 		Sprintf(buf, "%s", menutype[(int)flags.menu_style] );
 	else if (!strcmp(optname, "menu_deselect_all"))
 		Sprintf(buf, "%s", to_be_done);
@@ -4333,7 +4338,7 @@ char *buf;
 	else if (!strcmp(optname, "menu_select_page"))
 		Sprintf(buf, "%s", to_be_done);
 #ifdef EXOTIC_PETS
-	else if (!strcmp(optname, "monkeyname")) 
+	else if (!strcmp(optname, "monkeyname"))
 		Sprintf(buf, "%s", monkeyname[0] ? monkeyname : none);
 #endif
 	else if (!strcmp(optname, "monsters"))
@@ -4348,7 +4353,7 @@ char *buf;
 #endif
 	else if (!strcmp(optname, "name"))
 		Sprintf(buf, "%s", plname);
-	else if (!strcmp(optname, "nameempty")) 
+	else if (!strcmp(optname, "nameempty"))
 		Sprintf(buf, "%s", iflags.nameempty ? iflags.nameempty : none );
 	else if (!strcmp(optname, "number_pad"))
 		Sprintf(buf, "%s",
@@ -4361,7 +4366,7 @@ char *buf;
 		Sprintf(buf, "%s", ocl);
 	     }
 #ifdef CHANGE_COLOR
-	else if (!strcmp(optname, "palette")) 
+	else if (!strcmp(optname, "palette"))
 		Sprintf(buf, "%s", get_color_string());
 #endif
 #ifdef PARANOID
@@ -4374,7 +4379,7 @@ char *buf;
 			iflags.paranoid_lava ? "+" : "-", "lava",
 			iflags.paranoid_water ? "+" : "-", "water");
 #endif
-	else if (!strcmp(optname, "pettype")) 
+	else if (!strcmp(optname, "pettype"))
 		Sprintf(buf, "%s", (preferred_pet == 'c') ? "cat" :
 				(preferred_pet == 'd') ? "dog" :
 				(preferred_pet == 'e') ? "exotic" :
@@ -4391,7 +4396,7 @@ char *buf;
 	else if (!strcmp(optname, "race"))
 		Sprintf(buf, "%s", rolestring(flags.initrace, races, noun));
 #ifdef CONVICT
-	else if (!strcmp(optname, "ratname")) 
+	else if (!strcmp(optname, "ratname"))
 		Sprintf(buf, "%s", ratname[0] ? catname : none );
 #endif /* CONVICT */
 	else if (!strcmp(optname, "role"))
@@ -4427,8 +4432,10 @@ char *buf;
 	else if (!strcmp(optname, "soundcard"))
 		Sprintf(buf, "%s", to_be_done);
 #endif
+#ifdef TTY_GRAPHICS
 	else if (!strcmp(optname, "statuslines"))
 		Sprintf(buf, "%d", iflags.statuslines);
+#endif
 	else if (!strcmp(optname, "suppress_alert")) {
 	    if (flags.suppress_alert == 0L)
 		Strcpy(buf, none);
@@ -4484,11 +4491,11 @@ char *buf;
 		Sprintf(buf, "%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d",
 			ttycolors[CLR_RED], ttycolors[CLR_GREEN],
 			ttycolors[CLR_BROWN], ttycolors[CLR_BLUE],
-			ttycolors[CLR_MAGENTA], ttycolors[CLR_CYAN], 
+			ttycolors[CLR_MAGENTA], ttycolors[CLR_CYAN],
 			ttycolors[CLR_GRAY], ttycolors[CLR_BLACK],
 			ttycolors[CLR_ORANGE], ttycolors[CLR_BRIGHT_GREEN],
 			ttycolors[CLR_YELLOW], ttycolors[CLR_BRIGHT_BLUE],
-			ttycolors[CLR_BRIGHT_MAGENTA], 
+			ttycolors[CLR_BRIGHT_MAGENTA],
 			ttycolors[CLR_BRIGHT_CYAN], ttycolors[CLR_WHITE]);
 # endif /* MSDOS */
 #endif /* VIDEOSHADES */
@@ -4511,7 +4518,7 @@ char *buf;
 			iflags.wc_backgrnd_text    ? iflags.wc_backgrnd_text : defbrief);
 #ifdef PREFIXES_IN_USE
 #ifdef EXOTIC_PETS
-	else if (!strcmp(optname, "wolfname")) 
+	else if (!strcmp(optname, "wolfname"))
 		Sprintf(buf, "%s", wolfname[0] ? wolfname : none);
 #endif
 	else {
