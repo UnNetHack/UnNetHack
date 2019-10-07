@@ -297,16 +297,23 @@ xchar x, y;
 /* Decide whether a particular string is engraved at a specified
  * location; a case-insensitive substring match used.
  * Ignore headstones, in case the player names herself "Elbereth".
+ *
+ * Returns the type of engraving.
  */
 int
 sengr_at(s, x, y)
-	const char *s;
-	xchar x, y;
+    const char *s;
+    xchar x, y;
 {
-	register struct engr *ep = engr_at(x,y);
+    register struct engr *ep = engr_at(x, y);
 
-	return (ep && ep->engr_type != HEADSTONE &&
-		ep->engr_time <= moves && strstri(ep->engr_txt, s) != 0);
+    if (ep && ep->engr_type != HEADSTONE && ep->engr_time <= moves) {
+        if (strstri(ep->engr_txt, s) != 0) {
+            return ep->engr_type;
+        }
+    }
+
+    return FALSE;
 }
 #endif /* ELBERETH */
 
