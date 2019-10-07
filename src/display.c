@@ -414,7 +414,7 @@ display_monster(x, y, mon, sightflags, worm_tail)
 		show_glyph(x,y, monnum_to_glyph(what_mon((int)mon->mappearance)));
 		break;
 	}
-	
+
     }
 
     /* If the mimic is unsucessfully mimicing something, display the monster */
@@ -732,7 +732,7 @@ newsym(x,y)
 	else if ((mon = m_at(x,y)) && mon_warning(mon) &&
 		 !is_worm_tail(mon)) {
 	        display_warning(mon);
-	}		
+	}
 
 	/*
 	 * If the location is remembered as being both dark (waslit is false)
@@ -1015,7 +1015,7 @@ under_water(mode)
 	    if (isok(x,y) && is_pool(x,y)) {
 		if (Blind && !(x == u.ux && y == u.uy))
 		    show_glyph(x,y,cmap_to_glyph(S_stone));
-		else	
+		else
 		    newsym(x,y);
 	    }
     lastx = u.ux;
@@ -1058,7 +1058,7 @@ under_ground(mode)
  * Loop through all of the monsters and update them.  Called when:
  *	+ going blind & telepathic
  *	+ regaining sight & telepathic
- *      + getting and losing infravision 
+ *      + getting and losing infravision
  *	+ hallucinating
  *	+ doing a full screen redraw
  *	+ see invisible times out or a ring of see invisible is taken off
@@ -1494,9 +1494,9 @@ dump_screen()
 		Strcpy(tmpbuf, "&nbsp;");
 	    else if (x == u.ux && y == u.uy)
 		Sprintf(tmpbuf, "<span title=\"you\" class=\"nh_inv_%d nh_player\">%s</span>", color, html_c);
-	    else if (special & (MG_PET|MG_DETECT))
+	    else if (special & MG_PET)
 		Sprintf(tmpbuf, "<span class=\"nh_inv_%d nh_pet\">%s</span>", color, html_c);
-	    else if (special & (MG_PET|MG_DETECT))
+	    else if (special & MG_DETECT)
 		Sprintf(tmpbuf, "<span class=\"nh_inv_%d\">%s</span>", color, html_c);
 	    else if (special & MG_INVERSE && dfeature != NULL)
 		Sprintf(tmpbuf, "<span title=\"%s\" class=\"nh_inv_%d\">%s</span>", dfeature, color, html_c);
