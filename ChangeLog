@@ -9,6 +9,7 @@
 	* dungeon layout:
 	  - Disable the rogue tribute level
 	  - Adjust monster distribution for dilapidated armories
+	  - Blackmarket: new entrance area for the classic design
 
 	* bug fixes:
 	  - Fix over-escaping of characters on HTML dump map

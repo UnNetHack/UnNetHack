@@ -11,7 +11,7 @@ STATIC_DCL void FDECL(mkshobj_at, (const struct shclass *,int,int));
 STATIC_DCL void FDECL(nameshk, (struct monst *,const char * const *));
 STATIC_DCL int  FDECL(shkinit, (const struct shclass *,struct mkroom *));
 #ifdef BLACKMARKET
-STATIC_DCL void FDECL(stock_blkmar, 
+STATIC_DCL void FDECL(stock_blkmar,
 		  (const struct shclass *, struct mkroom *, int));
 #endif /* BLACKMARKET */
 
@@ -190,7 +190,7 @@ static const char *shktins[] = {
     /* Sweden */
     "Trosa", "Torshalla", "Morgongava", "Uppsala", "Norrkoping",
     "Nybro", "Alingsas", "Vadstena", "Fagersta", "Skelleftea",
-    "Solleftea", "Ystad", "Avesta", "Sala", "Norrtälje",
+    "Solleftea", "Ystad", "Avesta", "Sala", "Norrtalje",
     0
 };
 
@@ -244,7 +244,7 @@ const struct shclass shtypes[] = {
 		/* shopkeeper will pay for corpses, but they aren't generated */
 		/* on the shop floor */
 		{0, -CORPSE}, {0, 0}}, shktins},
-	{"rare instruments", TOOL_CLASS, 1, D_SHOP, 
+	{"rare instruments", TOOL_CLASS, 1, D_SHOP,
 	    {{10, -TIN_WHISTLE	}, { 3, -MAGIC_WHISTLE	},
 	     {10, -WOODEN_FLUTE	}, { 3, -MAGIC_FLUTE	},
 	     {10, -TOOLED_HORN	}, { 3, -FROST_HORN	},
@@ -262,7 +262,7 @@ const struct shclass shtypes[] = {
 #ifdef STEED
 	    {67, -FIGURINE}, {5, -LEASH},{10, -TRIPE_RATION}, {5, -SADDLE},
 #else
-	    {72, -FIGURINE}, {5, -LEASH},{10, -TRIPE_RATION}, 
+	    {72, -FIGURINE}, {5, -LEASH},{10, -TRIPE_RATION},
 #endif
 	    {10, -TIN_WHISTLE}, {3, -MAGIC_WHISTLE}}, shkpet},
 	/* Shops below this point are "unique".  That is they must all have a
@@ -404,12 +404,12 @@ const char * const *nlp;
 	    int num_prefixes;
 	    const char *prefix = 0;
 	    /* One-eyed Sam's lackeys idolize her and took nicknames like hers */
-	    static const char *prefixes[] = { 
-		"One-armed", "Two-faced", "Three-fingered", "Cross-eyed", 
-		"Four-toed", "Iron-lunged", "Two-footed", "One-handed", 
-		"One-legged", "Barefoot", "Cold-blooded", "Cut-throat", 
-		"Evil-eyed", "Scar-faced", "Five-toothed", "Four-limbed", 
-		"Eight-fingered", "Color-blind", "Iron-bellied", 
+	    static const char *prefixes[] = {
+		"One-armed", "Two-faced", "Three-fingered", "Cross-eyed",
+		"Four-toed", "Iron-lunged", "Two-footed", "One-handed",
+		"One-legged", "Barefoot", "Cold-blooded", "Cut-throat",
+		"Evil-eyed", "Scar-faced", "Five-toothed", "Four-limbed",
+		"Eight-fingered", "Color-blind", "Iron-bellied",
 		"Silver-tongued", "Crazy-eyed",
 		0
 	    };
@@ -494,24 +494,24 @@ struct mkroom	*sroom;
 	if(MON_AT(sx, sy)) (void) rloc(m_at(sx, sy), FALSE); /* insurance */
 
 	/* now initialize the shopkeeper monster structure */
-	  
+
 #ifdef BLACKMARKET
 	shk = 0;
 	if (Is_blackmarket(&u.uz)) {
 	    if (sroom->rtype == BLACKSHOP)
 		shk = makemon(&mons[PM_ONE_EYED_SAM], sx, sy, NO_MM_FLAGS);
-	    else 
+	    else
 		shk = makemon(&mons[PM_BLACK_MARKETEER], sx, sy, NO_MM_FLAGS);
 	}
 	if (!shk) {
 	  if(!(shk = makemon(&mons[PM_SHOPKEEPER], sx, sy, NO_MM_FLAGS)))
 		return(-1);
-	}        
+	}
 #else  /* BLACKMARKET */
 	if(!(shk = makemon(&mons[PM_SHOPKEEPER], sx, sy, NO_MM_FLAGS)))
 		return(-1);
 #endif /* BLACKMARKET */
-  
+
 	shk->isshk = shk->mpeaceful = 1;
 	set_malign(shk);
 	shk->msleeping = 0;
@@ -543,7 +543,7 @@ struct mkroom	*sroom;
 	nameshk(shk, shp->shknms);
 
 #ifdef BLACKMARKET
-	if (Is_blackmarket(&u.uz)) 
+	if (Is_blackmarket(&u.uz))
 	    shkmoney = 7*shkmoney + rn2(3*shkmoney);
 #endif
 	/* it's a poor town */
@@ -551,7 +551,7 @@ struct mkroom	*sroom;
 		shkmoney /= 4;
 
 #ifndef GOLDOBJ
-	shk->mgold = shkmoney;	
+	shk->mgold = shkmoney;
 #else
 	mkmonmoney(shk, shkmoney);
 #endif
@@ -706,68 +706,71 @@ register int sh;
     goodcl[11] = 0;
 
     /* for (i=0; i < NUM_OBJECTS; i++) {
-      blkmar_gen[i] = 0;
-    } */
+       blkmar_gen[i] = 0;
+       } */
 
     total = 0;
     for (clp=goodcl; *clp!=0; clp++)  {
-      lastclp = clp;
-      first = bases[*clp];
-/* this assumes that luckstone & loadstone comes just after the gems */
-      next = (*clp==GEM_CLASS) ? (LOADSTONE+1) : bases[(*clp)+1];
-      total += next-first;
+        lastclp = clp;
+        first = bases[*clp];
+        /* this assumes that luckstone & loadstone comes just after the gems */
+        next = (*clp==GEM_CLASS) ? (LOADSTONE+1) : bases[(*clp)+1];
+        total += next-first;
     }
     if (total==0)  return;
 
     if (sroom->hx-sroom->lx<2)  return;
     clp = goodcl-1;
     partial = 0;
+    int blkmar_size = (sroom->hx-sroom->lx+1) * (sroom->hy-sroom->ly+1);
     for(sx = sroom->lx+1; sx <= sroom->hx; sx++) {
-      if (sx==sroom->lx+1 ||
-	  ((sx-sroom->lx-2)*total)/(sroom->hx-sroom->lx-1)>partial) {
-	clp++;
-	if (clp>lastclp)  clp = lastclp;
-	first = bases[*clp];
-	next = (*clp==GEM_CLASS) ? (LOADSTONE+1) : bases[(*clp)+1];
-	partial += next-first;
-      }
+        if (sx==sroom->lx+1 ||
+                ((sx-sroom->lx-2)*total)/(sroom->hx-sroom->lx-1)>partial) {
+            clp++;
+            if (clp>lastclp)  clp = lastclp;
+            first = bases[*clp];
+            next = (*clp==GEM_CLASS) ? (LOADSTONE+1) : bases[(*clp)+1];
+            partial += next-first;
+        }
 
-      for(sy = sroom->ly; sy <= sroom->hy; sy++) {
-	if((sx == sroom->lx && doors[sh].x == sx-1) ||
-	   (sx == sroom->hx && doors[sh].x == sx+1) ||
-	   (sy == sroom->ly && doors[sh].y == sy-1) ||
-	   (sy == sroom->hy && doors[sh].y == sy+1) || (rn2(3)))
-	  continue;
+        for(sy = sroom->ly; sy <= sroom->hy; sy++) {
+            if((sx == sroom->lx && doors[sh].x == sx-1) ||
+               (sx == sroom->hx && doors[sh].x == sx+1) ||
+               (sy == sroom->ly && doors[sh].y == sy-1) ||
+               (sy == sroom->hy && doors[sh].y == sy+1) ||
+               /* the Blackmarket has 400 items on average */
+               (!rnf(400, blkmar_size)))
+                continue;
 
-	for (i=0; i<50; i++) {
-	  typ = rn2(next-first) + first;
+            for (i=0; i<50; i++) {
+                typ = rn2(next-first) + first;
 
-/* forbidden objects  */
-	  if (typ==AMULET_OF_YENDOR || typ==CANDELABRUM_OF_INVOCATION ||
-	      typ==BELL_OF_OPENING  || typ==SPE_BOOK_OF_THE_DEAD ||
-	      objects[typ].oc_nowish || typ==0)
-	    continue;
+                /* forbidden objects  */
+                if (typ==AMULET_OF_YENDOR || typ==CANDELABRUM_OF_INVOCATION ||
+                    typ==BELL_OF_OPENING  || typ==SPE_BOOK_OF_THE_DEAD ||
+                    objects[typ].oc_nowish || typ==0)
+                    continue;
 
-	  otmp = mkobj_at(RANDOM_CLASS,sx,sy,TRUE);
-/* generate multiple copies with decreasing probabilities */
-/*        if (rn2(blkmar_gen[typ]+1) && i<49)  continue; */
+                otmp = mkobj_at(RANDOM_CLASS,sx,sy,TRUE);
+                /* generate multiple copies with decreasing probabilities */
+                /*        if (rn2(blkmar_gen[typ]+1) && i<49)  continue; */
 
-/*        otmp = mksobj_at(typ, sx, sy, TRUE, TRUE);
-	  blkmar_gen[typ]++;*/
+                /*        otmp = mksobj_at(typ, sx, sy, TRUE, TRUE);
+                          blkmar_gen[typ]++;*/
 
-/* prevent wishing abuse */
-	  if (typ==WAN_WISHING) {
-	    otmp->spe = 0;
-	    otmp->recharged = 1;
-	  }
-	  if (typ==MAGIC_LAMP) {
-	    otmp->spe = 0;
-	  }
+                /* prevent wishing abuse */
+                if (typ==WAN_WISHING) {
+                    otmp->spe = 0;
+                    otmp->recharged = 1;
+                }
+                if (typ==MAGIC_LAMP) {
+                    otmp->spe = 0;
+                }
 
-	  break;
-	}
-	
-      }
+                break;
+            }
+
+        }
     }
 
     /*
