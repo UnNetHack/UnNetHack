@@ -250,4 +250,9 @@ typedef struct mapseen  {
 	schar rooms[(MAXNROFROOMS+1)*2];
 } mapseen;
 
+enum monster_generation {
+  MIN_MONGEN_RATE = 70,
+  MAX_MONGEN_RATE = 10
+};
+
 #endif /* DUNGEON_H */

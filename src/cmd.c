@@ -177,6 +177,9 @@ static char last_cmd_char='\0';
 STATIC_DCL char *NDECL(parse);
 STATIC_DCL boolean FDECL(help_dir, (CHAR_P,const char *));
 
+/* allmain.c */
+extern int monclock;
+
 static int debug_show_colors();
 
 STATIC_PTR int
@@ -977,6 +980,11 @@ boolean want_disp;
             enl_msg("You ", "are playing", "played", " a pre-seeded game");
         }
 	}
+	if ((wizard || final) && (monclock > 0)) {
+        Sprintf(buf, "%2.2fx", (float)MIN_MONGEN_RATE/monclock);
+
+        enl_msg("Monster generation rate ", "is ", "was ", buf);
+	}
 #endif
 
 	/*** Resistances to troubles ***/
@@ -1034,7 +1042,7 @@ boolean want_disp;
 	}
 #if defined(WIZARD) && defined(STEED)
 	if (Wounded_legs && u.usteed && (wizard || final)) {
-	    Strcpy(buf, x_monnam(u.usteed, ARTICLE_YOUR, (char *)0, 
+	    Strcpy(buf, x_monnam(u.usteed, ARTICLE_YOUR, (char *)0,
 		    SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION, FALSE));
 	    *buf = highc(*buf);
 	    enl_msg(buf, " has", " had", " wounded legs");
@@ -1285,7 +1293,7 @@ minimal_enlightenment()
 
 	fmtstr = iflags.menu_tab_sep ? tabbed_fmtstr : untabbed_fmtstr;
 	deity_fmtstr = iflags.menu_tab_sep ?
-			tabbed_deity_fmtstr : untabbed_deity_fmtstr; 
+			tabbed_deity_fmtstr : untabbed_deity_fmtstr;
 	any.a_void = 0;
 	buf[0] = buf2[0] = '\0';
 	tmpwin = create_nhwindow(NHW_MENU);
@@ -2219,7 +2227,7 @@ register char *cmd;
 		/* This handles very old inconsistent DOS/Windows behaviour
 		 * in a new way: earlier, the keyboard handler mapped these,
 		 * which caused counts to be strange when entered from the
-		 * number pad. Now do not map them until here. 
+		 * number pad. Now do not map them until here.
 		 */
 		switch (*cmd) {
 		    case '5':       *cmd = 'g'; break;
@@ -2529,7 +2537,7 @@ const char *msg;
 		putstr(win, 0, buf);
 		putstr(win, 0, "");
 	}
-	if (letter(sym)) { 
+	if (letter(sym)) {
 	    sym = highc(sym);
 	    ctrl = (sym - 'A') + 1;
 	    if ((expl = dowhatdoes_core(ctrl, buf2))

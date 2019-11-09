@@ -5,6 +5,8 @@
 	* Set color default to false if env variable NO_COLOR is present
 	* Add Marathon mode (start game with 999 HP and never heal), enabled
 	  with OPTIONS=marathon
+	* Monster generation rate increases slower and more linearly with turn
+	  count
 
 	* dungeon layout:
 	  - Disable the rogue tribute level
