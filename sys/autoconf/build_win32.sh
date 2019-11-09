@@ -1,5 +1,9 @@
 #!/bin/bash -xe
 
+# packages for Debian
+# dpkg --add-architecture i386 && apt-get update
+# sudo apt-get install gcc-mingw-w64-i686 wine wine32 wine-binfmt imagemagick
+
 INSTALL=/tmp/unnethack_win32
 DESTDIR=/tmp/unnethack_destdir
 mkdir -p $DESTDIR $INSTALL

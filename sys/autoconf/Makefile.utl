@@ -194,13 +194,13 @@ makedefs.o: makedefs.c $(CONFIG_H) $(srcdir)/../include/permonst.h \
 		$(srcdir)/../include/dlb.h $(srcdir)/../include/patchlevel.h $(srcdir)/../include/qtext.h
 
 ../include/onames.h: makedefs
-	./makedefs -o
+	./makedefs$(EXEEXT) -o
 ../include/pm.h: makedefs
-	./makedefs -p
+	./makedefs$(EXEEXT) -p
 ../src/monstr.c: makedefs
-	./makedefs -m
+	./makedefs$(EXEEXT) -m
 ../include/vis_tab.h: makedefs
-	./makedefs -z
+	./makedefs$(EXEEXT) -z
 # makedefs -z makes both vis_tab.h and vis_tab.c, but writes the .h first
 ../src/vis_tab.c: ../include/vis_tab.h
 
@@ -339,12 +339,12 @@ tile2beos: tile2beos.o $(TEXT_IO)
 tilemap: $(srcdir)/../win/share/tilemap.c $(HACK_H)
 	$(CC) $(CFLAGS) $(LFLAGS) -o tilemap $(srcdir)/../win/share/tilemap.c $(LIBS)
 $(srcdir)/../src/tile.c: tilemap
-	./tilemap
+	./tilemap$(EXEEXT)
 #../include/tile.h: ../win/share/tile.h tilemap
-#	./tilemap
+#	./tilemap$(EXEEXT)
 
 ../include/tile.h: ../win/share/tile.h tilemap
-	./tilemap
+	./tilemap$(EXEEXT)
 	cp ../win/share/tile.h ../include/tile.h
 
 tiletext.o: $(srcdir)/../win/share/tiletext.c $(CONFIG_H) ../include/tile.h

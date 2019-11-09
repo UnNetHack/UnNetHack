@@ -424,7 +424,7 @@ $(srcdir)/../win/gnome/gn_rip.h: $(srcdir)/../win/X11/rip.xpm
 #	hack.h depends on makedefs' output, so we know makedefs will be
 #	up to date before being executed
 ../include/date.h:	$(VERSOURCES) $(HACK_H)
-	../util/makedefs -v
+	../util/makedefs$(EXEEXT) -v
 
 
 lint:

@@ -271,22 +271,22 @@ GEM_RSC.RSC:
 	$(UUDECODE) $(srcdir)/../win/gem/gem_rsc.uu
 
 data:	data.base ../util/makedefs
-	../util/makedefs -d
+	../util/makedefs$(EXEEXT) -d
 
 rumors:	rumors.tru rumors.fal ../util/makedefs
-	../util/makedefs -r
+	../util/makedefs$(EXEEXT) -r
 
 quest.dat:	quest.txt ../util/makedefs
-	../util/makedefs -q
+	../util/makedefs$(EXEEXT) -q
 
 oracles:	oracles.txt ../util/makedefs
-	../util/makedefs -h
+	../util/makedefs$(EXEEXT) -h
 
 vaults.dat:	spec_levs
 
 # note: 'options' should have already been made when include/date.h was created
 options:	../util/makedefs
-	../util/makedefs -v
+	../util/makedefs$(EXEEXT) -v
 
 
 spec_levs: ../util/lev_comp \
@@ -300,53 +300,53 @@ spec_levs: ../util/lev_comp \
 	sokoban.des tower.des yendor.des \
 	vaults.des
 	-rm -f vaults.dat
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/vaults.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/advcal.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/bigroom.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/blkmar.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/castle.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/dragons.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/endgame.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/gehennom.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/heck.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/knox.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/medusa.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/nymph.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/town-?.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/moria.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/mines.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/oracle.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/sokoban.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/sheol.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/tower.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/yendor.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/vaults.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/advcal.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/bigroom.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/blkmar.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/castle.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/dragons.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/endgame.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/gehennom.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/heck.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/knox.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/medusa.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/nymph.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/town-?.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/moria.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/mines.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/oracle.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/sokoban.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/sheol.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/tower.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/yendor.des
 	touch spec_levs
 
 quest_levs: ../util/lev_comp \
 	Arch.des Barb.des Caveman.des Convict.des Healer.des Knight.des \
 	Monk.des Priest.des Ranger.des Rogue.des Samurai.des \
 	Tourist.des Valkyrie.des Wizard.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Arch.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Barb.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Caveman.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Convict.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Healer.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Knight.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Monk.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Priest.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Ranger.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Rogue.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Samurai.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/Arch.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/Barb.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/Caveman.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/Convict.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/Healer.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/Knight.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/Monk.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/Priest.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/Ranger.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/Rogue.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/Samurai.des
 	@if egrep -s tourists options > /dev/null ; then \
-	echo ../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Tourist.des ; ../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Tourist.des ; \
+	echo ../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/Tourist.des ; ../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/Tourist.des ; \
 	else rm -f Tou-goal.lev Tou-fil?.lev Tou-loca.lev Tou-strt.lev ; fi
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Valkyrie.des
-	../util/lev_comp $(LEVCOMP_FLAGS) $(srcdir)/Wizard.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/Valkyrie.des
+	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/Wizard.des
 	touch quest_levs
 
 dungeon: $(srcdir)/dungeon.def ../util/makedefs ../util/dgn_comp
-	../util/makedefs -e
-	../util/dgn_comp dungeon.pdf
+	../util/makedefs$(EXEEXT) -e
+	../util/dgn_comp$(EXEEXT) dungeon.pdf
 
 spotless:
 	-rm -f spec_levs quest_levs *.lev $(VARDAT) dungeon dungeon.pdf vaults.dat
