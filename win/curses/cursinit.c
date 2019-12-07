@@ -1139,3 +1139,48 @@ curses_cleanup()
     }
 #endif
 }
+
+
+/** Show all available colors with names. */
+int
+curses_debug_show_colors()
+{
+    int i,c;
+    winid tmpwin;
+    char buf[BUFSZ];
+
+    tmpwin = create_nhwindow(NHW_TEXT);
+    WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
+    putstr(tmpwin, ATR_INVERSE, "Colors");
+    char *colorterm = getenv("COLORTERM");
+    int colors = tgetnum("Co");
+    snprintf(buf, BUFSZ, "%s %d %s", getenv("TERM"), colors, colorterm ? colorterm : "");
+    putstr(tmpwin, 0, buf);
+    putstr(tmpwin, 0, "");
+
+    for (c = 0; c < CLR_MAX; c++) {
+        sprintf(buf, " %2d %s ", c, clr2colorname(c));
+        while (strlen(buf) < 18) { strcat(buf, " "); }
+#if 0
+        // disabled until the curses port supports setting colors
+        if (iflags.color_definitions[c]) {
+            sprintf(eos(buf), "  %06" PRIx64 " ", iflags.color_definitions[c]);
+        } else {
+            sprintf(eos(buf), "  ------");
+        }
+#endif
+
+        int attr = A_NORMAL;
+        if (c != NO_COLOR) {
+            attr = curses_color_attr(c, 0);
+        }
+        curses_puts(tmpwin, attr, buf);
+        sprintf(eos(buf), "-");
+        curses_puts(tmpwin, attr | A_REVERSE, buf);
+    }
+
+    display_nhwindow(tmpwin, TRUE);
+    destroy_nhwindow(tmpwin);
+
+    return 0;
+}

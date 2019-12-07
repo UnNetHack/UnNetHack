@@ -3105,6 +3105,11 @@ debug_show_colors()
         tty_debug_show_colors();
     }
 #endif
+#ifdef CURSES_GRAPHICS
+    if (!strncmpi(windowprocs.name, "curses", 6)) {
+        curses_debug_show_colors();
+    }
+#endif
     return 0;
 }
 
