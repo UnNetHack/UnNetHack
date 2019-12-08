@@ -37,7 +37,6 @@ static NEARDATA const long takeoff_order[] = { WORN_BLINDF, W_WEP,
 
 STATIC_DCL void FDECL(on_msg, (struct obj *));
 STATIC_PTR int NDECL(Armor_on);
-STATIC_PTR int NDECL(Boots_on);
 STATIC_DCL int NDECL(Cloak_on);
 STATIC_PTR int NDECL(Helmet_on);
 STATIC_PTR int NDECL(Gloves_on);
@@ -84,7 +83,6 @@ register struct obj *otmp;
  * The Type_off() functions call setworn() themselves.
  */
 
-STATIC_PTR
 int
 Boots_on()
 {
@@ -1193,6 +1191,50 @@ register struct obj *otmp;
     return result;
 }
 
+/* check whether the target object is currently being taken off,
+   so that stop_donning() and steal() can vary messages and doname()
+   can vary "(being worn)" suffix */
+boolean
+doffing(otmp)
+struct obj *otmp;
+{
+    long what = taking_off;
+    boolean result = FALSE;
+
+    /* 'T' (or 'R' used for armor) sets g.afternmv, 'A' sets takeoff.what */
+    if (otmp == uarm)
+        result = (afternmv == Armor_off || what == WORN_ARMOR);
+    else if (otmp == uarmu)
+        result = (afternmv == Shirt_off || what == WORN_SHIRT);
+    else if (otmp == uarmc)
+        result = (afternmv == Cloak_off || what == WORN_CLOAK);
+    else if (otmp == uarmf)
+        result = (afternmv == Boots_off || what == WORN_BOOTS);
+    else if (otmp == uarmh)
+        result = (afternmv == Helmet_off || what == WORN_HELMET);
+    else if (otmp == uarmg)
+        result = (afternmv == Gloves_off || what == WORN_GLOVES);
+    else if (otmp == uarms)
+        result = (afternmv == Shield_off || what == WORN_SHIELD);
+    /* these 1-turn items don't need 'g.afternmv' checks */
+    else if (otmp == uamul)
+        result = (what == WORN_AMUL);
+    else if (otmp == uleft)
+        result = (what == LEFT_RING);
+    else if (otmp == uright)
+        result = (what == RIGHT_RING);
+    else if (otmp == ublindf)
+        result = (what == WORN_BLINDF);
+    else if (otmp == uwep)
+        result = (what == W_WEP);
+    else if (otmp == uswapwep)
+        result = (what == W_SWAPWEP);
+    else if (otmp == uquiver)
+        result = (what == W_QUIVER);
+
+    return result;
+}
+
 void
 cancel_don()
 {
@@ -1207,6 +1249,49 @@ cancel_don()
     multi = 0;
     todelay = 0;
     taking_off = 0L;
+}
+
+/* called by steal() during theft from hero; interrupt donning/doffing */
+int
+stop_donning(stolenobj)
+struct obj *stolenobj; /* no message if stolenobj is already being doffing */
+{
+    char buf[BUFSZ];
+    struct obj *otmp;
+    boolean putting_on;
+    int result = 0;
+
+    for (otmp = invent; otmp; otmp = otmp->nobj)
+        if ((otmp->owornmask & W_ARMOR) && donning(otmp))
+            break;
+    /* at most one item will pass donning() test at any given time */
+    if (!otmp)
+        return 0;
+
+    /* donning() returns True when doffing too; doffing() is more specific */
+    putting_on = !doffing(otmp);
+    /* cancel_don() looks at afternmv; it can also cancel doffing */
+    cancel_don();
+    /* don't want <armor>_on() or <armor>_off() being called
+       by unmul() since the on or off action isn't completing */
+    afternmv = (int NDECL((*))) 0;
+    if (putting_on || otmp != stolenobj) {
+        Sprintf(buf, "You stop %s %s.",
+                putting_on ? "putting on" : "taking off",
+                thesimpleoname(otmp));
+    } else {
+        buf[0] = '\0';   /* silently stop doffing stolenobj */
+        result = -multi; /* remember this before calling unmul() */
+    }
+    unmul(buf);
+    /* while putting on, item becomes worn immediately but side-effects are
+       deferred until the delay expires; when interrupted, make it unworn
+       (while taking off, item stays worn until the delay expires; when
+       interrupted, leave it worn) */
+    if (putting_on)
+        remove_worn_item(otmp, FALSE);
+
+    return result;
 }
 
 static NEARDATA const char clothes[] = {ARMOR_CLASS, 0};

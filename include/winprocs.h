@@ -42,7 +42,7 @@ struct window_procs {
 #ifdef POSITIONBAR
     void FDECL((*win_update_positionbar), (char *));
 #endif
-    void FDECL((*win_print_glyph), (winid, XCHAR_P, XCHAR_P, int));
+    void FDECL((*win_print_glyph), (winid, XCHAR_P, XCHAR_P, int, int));
     void FDECL((*win_raw_print), (const char *));
     void FDECL((*win_raw_print_bold), (const char *));
     int NDECL((*win_nhgetch));
@@ -231,5 +231,10 @@ struct wc_Opt {
     const char *wc_name;
     unsigned long wc_bit;
 };
+
+/* Macro for the currently active Window Port whose function
+   pointers have been loaded */
+#define WINDOWPORT(wn) \
+    (windowprocs.name && !strncmpi((wn), windowprocs.name, strlen((wn))))
 
 #endif /* WINPROCS_H */

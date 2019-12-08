@@ -13,7 +13,6 @@ extern long bytes_counted;
 STATIC_DCL boolean FDECL(no_bones_level, (d_level *));
 STATIC_DCL void FDECL(goodfruit, (int));
 STATIC_DCL void FDECL(resetobjs, (struct obj *, BOOLEAN_P));
-STATIC_DCL void FDECL(drop_upon_death, (struct monst *, struct obj *));
 
 STATIC_OVL boolean
 no_bones_level(lev)
@@ -58,28 +57,64 @@ resetobjs(ochain, restore)
 struct obj *ochain;
 boolean restore;
 {
-    struct obj *otmp;
+    struct obj *otmp, *nobj;
 
-    for (otmp = ochain; otmp; otmp = otmp->nobj) {
-        if (otmp->cobj)
+    for (otmp = ochain; otmp; otmp = nobj) {
+        nobj = otmp->nobj;
+        if (otmp->cobj) {
             resetobjs(otmp->cobj, restore);
+        }
+        if (otmp->in_use) {
+            obj_extract_self(otmp);
+            dealloc_obj(otmp);
+            continue;
+        }
 
-        if (((otmp->otyp != CORPSE || otmp->corpsenm < SPECIAL_PM)
-             && otmp->otyp != STATUE)
-            && (!otmp->oartifact ||
-                (restore && (exist_artifact(otmp->otyp, ONAME(otmp))
-                             || is_quest_artifact(otmp))))) {
-            otmp->oartifact = 0;
-            otmp->onamelth = 0;
-            *ONAME(otmp) = '\0';
-        } else if (otmp->oartifact && restore)
-            artifact_exists(otmp, ONAME(otmp), TRUE);
-        if (!restore) {
+        if (restore) {
+            /* artifact bookkeeping needs to be done during
+               restore; other fixups are done while saving */
+            if (otmp->oartifact) {
+                if (exist_artifact(otmp->otyp, safe_oname(otmp))
+                    || is_quest_artifact(otmp)) {
+                    /* prevent duplicate--revert to ordinary obj */
+                    otmp->oartifact = 0;
+                    if (has_oname(otmp)) {
+                        free_oname(otmp);
+                    }
+                } else {
+                    artifact_exists(otmp, safe_oname(otmp), TRUE);
+                }
+            } else if (has_oname(otmp)) {
+                sanitize_name(ONAME(otmp));
+            }
+            /* 3.6.3: set no_charge for partly eaten food in shop;
+               all other items become goods for sale if in a shop */
+            if (otmp->oclass == FOOD_CLASS && otmp->oeaten) {
+                struct obj *top;
+                char *p;
+                xchar ox, oy;
+
+                for (top = otmp; top->where == OBJ_CONTAINED;
+                     top = top->ocontainer)
+                    continue;
+                otmp->no_charge = (top->where == OBJ_FLOOR
+                                   && get_obj_location(top, &ox, &oy, 0)
+                                   /* can't use costly_spot() since its
+                                      result depends upon hero's location */
+                                   && inside_shop(ox, oy)
+                                   && *(p = in_rooms(ox, oy, SHOPBASE))
+                                   && tended_shop(&rooms[*p - ROOMOFFSET]));
+            }
+        } else {
             /* do not zero out o_ids for ghost levels anymore */
 
-            if(objects[otmp->otyp].oc_uses_known) otmp->known = 0;
+            if (objects[otmp->otyp].oc_uses_known) {
+                otmp->known = 0;
+            }
             otmp->dknown = otmp->bknown = 0;
             otmp->rknown = 0;
+            otmp->lknown = 0;
+            otmp->cknown = 0;
             otmp->invlet = 0;
             otmp->no_charge = 0;
             otmp->was_thrown = 0;
@@ -118,8 +153,7 @@ boolean restore;
             } else if (otmp->oartifact == ART_THIEFBANE) {
                 /* Guaranteed artifacts become ordinary objects */
                 otmp->oartifact = 0;
-                otmp->onamelth = 0;
-                *ONAME(otmp) = '\0';
+                free_oname(otmp);
             }
         }
     }
@@ -164,10 +198,40 @@ int prob2;
 #endif
 }
 
-STATIC_OVL void
-drop_upon_death(mtmp, cont)
-struct monst *mtmp;
-struct obj *cont;
+/* while loading bones, strip out text possibly supplied by old player
+   that might accidentally or maliciously disrupt new player's display */
+void
+sanitize_name(namebuf)
+char *namebuf;
+{
+    int c;
+    boolean strip_8th_bit = (WINDOWPORT("tty")
+                             && !iflags.wc_eight_bit_input);
+
+    /* it's tempting to skip this for single-user platforms, since
+       only the current player could have left these bones--except
+       things like "hearse" and other bones exchange schemes make
+       that assumption false */
+    while (*namebuf) {
+        c = *namebuf & 0177;
+        if (c < ' ' || c == '\177') {
+            /* non-printable or undesirable */
+            *namebuf = '.';
+        } else if (c != *namebuf) {
+            /* expected to be printable if user wants such things */
+            if (strip_8th_bit)
+                *namebuf = '_';
+        }
+        ++namebuf;
+    }
+}
+
+/* called by savebones(); also by finish_paybill(shk.c) */
+void
+drop_upon_death(mtmp, cont, x, y)
+struct monst *mtmp; /* monster if hero turned into one (other than ghost) */
+struct obj *cont; /* container if hero is turned into a statue */
+int x, y;
 {
     struct obj *otmp;
     int inventory_count=count_objects(invent);
@@ -188,17 +252,17 @@ struct obj *cont;
         otmp->owornmask = 0;
         /* lamps don't go out when dropped */
         if ((cont || artifact_light(otmp)) && obj_is_burning(otmp))
-            end_burn(otmp, TRUE);   /* smother in statue */
+            end_burn(otmp, TRUE); /* smother in statue */
 
-        if(otmp->otyp == SLIME_MOLD) goodfruit(otmp->spe);
+        if (otmp->otyp == SLIME_MOLD) goodfruit(otmp->spe);
 
-        if(rn2(5)) curse(otmp);
+        if (rn2(5)) curse(otmp);
         if (mtmp)
             (void) add_to_minv(mtmp, otmp);
         else if (cont)
             (void) add_to_container(cont, otmp);
         else
-            place_object(otmp, u.ux, u.uy);
+            place_object(otmp, x, y);
     }
     if (cont) cont->owt = weight(cont);
 }
@@ -305,17 +369,17 @@ make_bones:
         otmp = mk_named_object(STATUE, &mons[u.umonnum],
                                u.ux, u.uy, plname);
 
-        drop_upon_death((struct monst *)0, otmp);
+        drop_upon_death((struct monst *)0, otmp, u.ux, u.uy);
         if (!otmp) return;  /* couldn't make statue */
         mtmp = (struct monst *)0;
     } else if (Race_if(PM_VAMPIRE)) {
         /* don't let vampires rise as some other monsters */
-        drop_upon_death((struct monst *)0, (struct obj *)0);
+        drop_upon_death((struct monst *)0, (struct obj *)0, u.ux, u.uy);
         mtmp = (struct monst *)0;
         u.ugrave_arise = NON_PM;
     } else if (u.ugrave_arise < LOW_PM) {
         /* drop everything */
-        drop_upon_death((struct monst *)0, (struct obj *)0);
+        drop_upon_death((struct monst *)0, (struct obj *)0, u.ux, u.uy);
         /* trick makemon() into allowing monster creation
          * on your location
          */
@@ -332,7 +396,7 @@ make_bones:
         mtmp = makemon(&mons[u.ugrave_arise], u.ux, u.uy, NO_MM_FLAGS);
         in_mklev = FALSE;
         if (!mtmp) {
-            drop_upon_death((struct monst *)0, (struct obj *)0);
+            drop_upon_death((struct monst *)0, (struct obj *)0, u.ux, u.uy);
             return;
         }
         mtmp = christen_monst(mtmp, plname);
@@ -340,7 +404,7 @@ make_bones:
         Your("body rises from the dead as %s...",
              an(mons[u.ugrave_arise].mname));
         display_nhwindow(WIN_MESSAGE, FALSE);
-        drop_upon_death(mtmp, (struct obj *)0);
+        drop_upon_death(mtmp, (struct obj *)0, u.ux, u.uy);
         m_dowear(mtmp, TRUE);
     }
     if (mtmp) {

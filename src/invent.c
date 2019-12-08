@@ -8,7 +8,6 @@
 #define CONTAINED_SYM   '>' /* designator for inside a container */
 
 STATIC_DCL void NDECL(reorder_invent);
-STATIC_DCL boolean FDECL(mergable, (struct obj *, struct obj *));
 STATIC_DCL void FDECL(invdisp_nothing, (const char *, const char *));
 STATIC_DCL boolean FDECL(worn_wield_only, (struct obj *));
 STATIC_DCL boolean FDECL(only_here, (struct obj *));
@@ -169,8 +168,9 @@ struct obj **potmp, **pobj;
         /* temporary special case for gold objects!!!! */
         if (otmp->oclass == COIN_CLASS) otmp->owt = weight(otmp);
         else otmp->owt += obj->owt;
-        if(!otmp->onamelth && obj->onamelth)
+        if (!has_oname(otmp) && has_oname(obj)) {
             otmp = *potmp = oname(otmp, ONAME(obj));
+        }
         obj_extract_self(obj);
 
         /* really should merge the timeouts */
@@ -441,7 +441,7 @@ const char *drop_fmt, *drop_arg, *hold_msg;
         if (drop_arg) drop_arg = strcpy(buf, drop_arg);
 
         obj = addinv(obj);
-        if (inv_cnt() > 52
+        if (inv_cnt(FALSE) > 52
             || ((obj->otyp != LOADSTONE || !obj->cursed)
                 && near_capacity() > prev_encumbr)) {
             if (drop_fmt) pline(drop_fmt, drop_arg);
@@ -538,7 +538,7 @@ struct obj *obj;
         set_moreluck();
         flags.botl = 1;
     } else if (obj->otyp == FIGURINE && obj->timed) {
-        (void) stop_timer(FIG_TRANSFORM, (genericptr_t) obj);
+        (void) stop_timer(FIG_TRANSFORM, obj_to_any(obj));
     }
 }
 
@@ -603,6 +603,26 @@ register int n, x, y;
         if(otmp->otyp == n)
             return(otmp);
     return((struct obj *)0);
+}
+
+/* sobj_at(&c) traversal -- find next object of specified type */
+struct obj *
+nxtobj(obj, type, by_nexthere)
+struct obj *obj;
+int type;
+boolean by_nexthere;
+{
+    register struct obj *otmp;
+
+    otmp = obj; /* start with the object after this one */
+    do {
+        otmp = !by_nexthere ? otmp->nobj : otmp->nexthere;
+        if (!otmp) {
+            break;
+        }
+    } while (otmp->otyp != type);
+
+    return otmp;
 }
 
 struct obj *
@@ -1182,6 +1202,28 @@ register struct obj *otmp;
                                            W_WEP | W_SWAPWEP | W_QUIVER))));
 }
 
+/* extra xprname() input that askchain() can't pass through safe_qbuf() */
+STATIC_VAR struct xprnctx {
+    char let;
+    boolean dot;
+} safeq_xprn_ctx;
+
+/* safe_qbuf() -> short_oname() callback */
+STATIC_PTR char *
+safeq_xprname(obj)
+struct obj *obj;
+{
+    return xprname(obj, (char *) 0, safeq_xprn_ctx.let, safeq_xprn_ctx.dot, 0L, 0L);
+}
+
+/* alternate safe_qbuf() -> short_oname() callback */
+STATIC_PTR char *
+safeq_shortxprname(obj)
+struct obj *obj;
+{
+    return xprname(obj, ansimpleoname(obj), safeq_xprn_ctx.let, safeq_xprn_ctx.dot, 0L, 0L);
+}
+
 static NEARDATA const char removeables[] =
 { ARMOR_CLASS, WEAPON_CLASS, RING_CLASS, AMULET_CLASS, TOOL_CLASS, 0 };
 
@@ -1364,17 +1406,22 @@ register int FDECL((*fn), (OBJ_P)), FDECL((*ckfn), (OBJ_P));
     struct obj *otmp, *otmp2, *otmpo;
     register char sym, ilet;
     register int cnt = 0, dud = 0, tmp;
-    boolean takeoff, nodot, ident, ininv;
-    char qbuf[QBUFSZ];
+    boolean takeoff, nodot, ident, take_out, put_in, first, ininv, bycat;
+    char qbuf[QBUFSZ], qpfx[QBUFSZ];
 
     takeoff = taking_off(word);
     ident = !strcmp(word, "identify");
+    take_out = !strcmp(word, "take out");
+    put_in = !strcmp(word, "put in");
     nodot = (!strcmp(word, "nodot") || !strcmp(word, "drop") ||
              ident || takeoff);
     ininv = (*objchn == invent);
-    /* Changed so the askchain is interrogated in the order specified.
-     * For example, if a person specifies =/ then first all rings will be
-     * asked about followed by all wands -dgk
+
+    first = TRUE;
+    /*
+     * Interrogate in the object class order specified.
+     * For example, if a person specifies =/ then first all rings
+     * will be asked about followed by all wands.  -dgk
      */
 nextclass:
     ilet = 'a'-1;
@@ -1388,23 +1435,25 @@ nextclass:
         if (ident && !not_fully_identified(otmp)) continue;
         if (ckfn && !(*ckfn)(otmp)) continue;
         if (!allflag) {
-            char *name;
-            char simple_name[BUFSZ];
-            char this_item[BUFSZ];
-            if (ininv) {
-                name = xprname(otmp, (char *)0, ilet, !nodot, 0L, 0L);
-                Sprintf(simple_name, "%c - %s", ilet, the(simple_typename(otmp->otyp)));
-                Sprintf(this_item, "%c - this item", ilet);
+            safeq_xprn_ctx.let = ilet;
+            safeq_xprn_ctx.dot = !nodot;
+            *qpfx = '\0';
+            if (first) {
+                /* traditional_loot() skips prompting when only one
+                   class of objects is involved, so prefix the first
+                   object being queried here with an explanation why */
+                if (take_out || put_in)
+                    Sprintf(qpfx, "%s: ", word), *qpfx = highc(*qpfx);
+                first = FALSE;
             }
             /* make sure a overly long named item doesn't buffer overflow
              * qbuf when using the traditional menu style */
-            Strcpy(qbuf, safe_qbuf("", sizeof("?"),
-                                   !ininv ? doname(otmp) : name,
-                                   !ininv ? the(simple_typename(otmp->otyp)) : simple_name,
-                                   !ininv ? "this item" : this_item));
-            Strcat(qbuf, "?");
-            sym = (takeoff || ident || otmp->quan < 2L) ?
-                  nyaq(qbuf) : nyNaq(qbuf);
+            (void) safe_qbuf(qbuf, qpfx, "?", otmp,
+                             ininv ? safeq_xprname : doname,
+                             ininv ? safeq_shortxprname : ansimpleoname,
+                             "item");
+            sym = (takeoff || ident || otmp->quan < 2L) ? nyaq(qbuf)
+                                                        : nyNaq(qbuf);
         }
         else sym = 'y';
 
@@ -1429,6 +1478,7 @@ nextclass:
         switch(sym) {
         case 'a':
             allflag = 1;
+            /* fall through */
         case 'y':
             tmp = (*fn)(otmp);
             if(tmp < 0) {
@@ -1440,8 +1490,10 @@ nextclass:
             }
             cnt += tmp;
             if(--mx == 0) goto ret;
+            /* fall through */
         case 'n':
             if(nodot) dud++;
+            /* fall through */
         default:
             break;
         case 'q':
@@ -2450,6 +2502,42 @@ int type;
     return count;
 }
 
+/* count everything inside a container, or just shop-owned items inside */
+long
+count_contents(container, nested, quantity, everything, newdrop)
+struct obj *container;
+boolean nested, /* include contents of any nested containers */
+    quantity,   /* count all vs count separate stacks */
+    everything, /* all objects vs only unpaid objects */
+    newdrop;    /* on floor, but hero-owned items haven't been marked
+                 * no_charge yet and shop-owned items are still marked
+                 * unpaid -- used when asking the player whether to sell */
+{
+    struct obj *otmp, *topc;
+    boolean shoppy = FALSE;
+    long count = 0L;
+
+    if (!everything && !newdrop) {
+        xchar x, y;
+
+        for (topc = container; topc->where == OBJ_CONTAINED; topc = topc->ocontainer) {
+            continue;
+        }
+        if (topc->where == OBJ_FLOOR && get_obj_location(topc, &x, &y, 0)) {
+            shoppy = costly_spot(x, y);
+        }
+    }
+    for (otmp = container->cobj; otmp; otmp = otmp->nobj) {
+        if (nested && Has_contents(otmp)) {
+            count += count_contents(otmp, nested, quantity, everything, newdrop);
+        }
+        if (everything || otmp->unpaid || (shoppy && !otmp->no_charge)) {
+            count += quantity ? otmp->quan : 1L;
+        }
+    }
+    return count;
+}
+
 STATIC_OVL void
 dounpaid()
 {
@@ -2473,7 +2561,7 @@ dounpaid()
 
         pline("%s", xprname(otmp, distant_name(otmp, doname),
                             marker ? otmp->invlet : CONTAINED_SYM,
-                            TRUE, unpaid_cost(otmp), 0L));
+                            TRUE, unpaid_cost(otmp, FALSE), 0L));
         return;
     }
 
@@ -2493,7 +2581,7 @@ dounpaid()
                         classcount++;
                     }
 
-                    totcost += cost = unpaid_cost(otmp);
+                    totcost += cost = unpaid_cost(otmp, FALSE);
                     /* suppress "(unpaid)" suffix */
                     save_unpaid = otmp->unpaid;
                     otmp->unpaid = 0;
@@ -2519,7 +2607,7 @@ dounpaid()
             if (Has_contents(otmp)) {
                 marker = (struct obj *) 0; /* haven't found any */
                 while (find_unpaid(otmp->cobj, &marker)) {
-                    totcost += cost = unpaid_cost(marker);
+                    totcost += cost = unpaid_cost(marker, FALSE);
                     save_unpaid = marker->unpaid;
                     marker->unpaid = 0; /* suppress "(unpaid)" suffix */
                     putstr(win, 0,
@@ -2782,7 +2870,7 @@ boolean picked_some;
         }
         if (dfeature && !drift && !strcmp(dfeature, surface(u.ux, u.uy)))
             dfeature = 0;       /* ice already identifed */
-        if (!can_reach_floor()) {
+        if (!can_reach_floor(TRUE)) {
             pline("But you can't reach it!");
             return(0);
         }
@@ -2892,14 +2980,17 @@ struct obj *obj;
     return;
 }
 
-STATIC_OVL boolean
+boolean
 mergable(otmp, obj) /* returns TRUE if obj  & otmp can be merged */
 register struct obj *otmp, *obj;
 {
+    int objnamelth = 0, otmpnamelth = 0;
+
     if (obj->otyp != otmp->otyp) return FALSE;
 
     /* coins of the same kind will always merge */
     if (obj->oclass == COIN_CLASS) return TRUE;
+
     if (obj->unpaid != otmp->unpaid ||
         obj->spe != otmp->spe || obj->dknown != otmp->dknown ||
         (obj->bknown != otmp->bknown && !Role_if(PM_PRIEST)) ||
@@ -2950,15 +3041,18 @@ register struct obj *otmp, *obj;
         return FALSE;
 
     /* if they have names, make sure they're the same */
-    if ( (obj->onamelth != otmp->onamelth &&
-          ((obj->onamelth && otmp->onamelth) || obj->otyp == CORPSE)
-          ) ||
-         (obj->onamelth && otmp->onamelth &&
-          strncmp(ONAME(obj), ONAME(otmp), (int)obj->onamelth)))
+    objnamelth = strlen(safe_oname(obj));
+    otmpnamelth = strlen(safe_oname(otmp));
+    if ((objnamelth != otmpnamelth && ((objnamelth && otmpnamelth) || obj->otyp == CORPSE))
+        || (objnamelth && otmpnamelth && strncmp(ONAME(obj), ONAME(otmp), objnamelth))) {
         return FALSE;
+    }
 
     /* for the moment, any additional information is incompatible */
-    if (obj->oxlth || otmp->oxlth) return FALSE;
+    if (has_omonst(obj) || has_omid(obj) || has_olong(obj) || has_omonst(otmp)
+        || has_omid(otmp) || has_olong(otmp)) {
+        return FALSE;
+    }
 
     if(obj->oartifact != otmp->oartifact) return FALSE;
 

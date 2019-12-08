@@ -438,10 +438,6 @@ int curse_bless;
         /* didn't explode, so increment the recharge count */
         obj->recharged = (unsigned)(n + 1);
 
-        /* if the name of the wand matches the nameempty option, remove name now */
-        if (iflags.nameempty && !strncmp(ONAME(obj), iflags.nameempty, (int)obj->onamelth))
-            obj->onamelth = 0;
-
         /* now handle the actual recharging */
         if (is_cursed) {
             stripspe(obj);
@@ -922,7 +918,7 @@ genericptr_t poolcnt;
         /* Put a pool at x, y */
         levl[x][y].typ = POOL;
         del_engr_at(x, y);
-        water_damage(level.objects[x][y], FALSE, TRUE);
+        water_damage(level.objects[x][y], (char *)0, FALSE, TRUE);
 
         if ((mtmp = m_at(x, y)) != 0) {
             (void) minliquid(mtmp);
@@ -1457,6 +1453,7 @@ id:
             /* do_mapping() already reveals secret passages */
         }
         known = TRUE;
+        /* fall through */
     case SPE_MAGIC_MAPPING:
         if (level.flags.nommap) {
             Your("%s spins as %s blocks the spell!", body_part(HEAD), something);
@@ -2148,18 +2145,27 @@ unpunish()
  * one, the disoriented creature becomes a zombie
  */
 boolean
-cant_create(mtype, revival)
+cant_revive(mtype, revival, from_obj)
 int *mtype;
 boolean revival;
+struct obj *from_obj;
 {
-
     /* SHOPKEEPERS can be revived now */
-    if (*mtype==PM_GUARD || (*mtype==PM_SHOPKEEPER && !revival)
-        || *mtype==PM_ALIGNED_PRIEST || *mtype==PM_ANGEL) {
+    if ((*mtype == PM_GUARD) ||
+        (*mtype == PM_SHOPKEEPER && !revival) ||
+        (*mtype == PM_HIGH_PRIEST) ||
+        (*mtype == PM_ALIGNED_PRIEST) ||
+        (*mtype == PM_ANGEL)) {
         *mtype = PM_HUMAN_ZOMBIE;
         return TRUE;
-    } else if (*mtype==PM_LONG_WORM_TAIL) { /* for create_particular() */
+    } else if (*mtype == PM_LONG_WORM_TAIL) { /* for create_particular() */
         *mtype = PM_LONG_WORM;
+        return TRUE;
+    } else if (unique_corpstat(&mons[*mtype])
+               && (!from_obj || !has_omonst(from_obj))) {
+        /* unique corpses (from bones or wizard mode wish) or
+           statues (bones or any wish) end up as shapechangers */
+        *mtype = PM_DOPPELGANGER;
         return TRUE;
     }
     return FALSE;
@@ -2227,7 +2233,7 @@ create_particular()
     if (tries == 5) {
         pline("%s", thats_enough_tries);
     } else {
-        (void) cant_create(&which, FALSE);
+        (void) cant_revive(&which, FALSE, (struct obj *) 0);
         whichpm = &mons[which];
         for (i = 0; i < quan; i++) {
             if (monclass != MAXMCLASSES)

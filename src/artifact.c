@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)artifact.c 3.4 2003/08/11  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -372,6 +371,20 @@ register struct obj *otmp;
             return FALSE;
         }
         return (mask > 0);  /* straight cast will fail */
+    }
+    return FALSE;
+}
+
+/* used for monsters */
+boolean
+defends_when_carried(adtyp, otmp)
+int adtyp;
+struct obj *otmp;
+{
+    register const struct artifact *weap;
+
+    if ((weap = get_artifact(otmp))) {
+        return (boolean) (weap->cary.adtyp == adtyp);
     }
     return FALSE;
 }
@@ -839,8 +852,17 @@ winid tmpwin;       /* supplied by dodiscover() */
     char buf[BUFSZ];
 
     for (i = 0; i < NROFARTIFACTS; i++) {
-        if (artidisco[i] == 0) break; /* empty slot implies end of list */
-        if (i == 0) putstr(tmpwin, iflags.menu_headings, "Artifacts");
+        if (artidisco[i] == 0) {
+            break; /* empty slot implies end of list */
+        }
+
+        if (tmpwin == WIN_ERR) {
+            continue; /* for WIN_ERR, we just count */
+        }
+
+        if (i == 0) {
+            putstr(tmpwin, iflags.menu_headings, "Artifacts");
+        }
         m = artidisco[i];
         otyp = artilist[m].otyp;
         Sprintf(buf, "  %s [%s %s]", artiname(m),

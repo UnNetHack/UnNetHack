@@ -8,7 +8,14 @@
 	* Monster generation rate increases slower and more linearly with turn
 	  count
 	* Enable GOLDOBJ unconditionally and remove obsolete code
-	* Add automatic fuzzer for debugging
+	* Port NetHack 3.6 improvements, non exhaustive list:
+	  - Automatic fuzzer for debugging
+	  - Statues as monster symbols
+	  - Improved internal monster extra structures
+	  - Improved container menu
+	  - Wet towel handling
+	  - Vibrating square implemented as trap
+	  - Improved role/race/gender/alignment selection
 
 	* dungeon layout:
 	  - Disable the rogue tribute level

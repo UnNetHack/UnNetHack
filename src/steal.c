@@ -7,7 +7,6 @@
 STATIC_PTR int NDECL(stealarm);
 
 STATIC_DCL const char *FDECL(equipname, (struct obj *));
-STATIC_DCL void FDECL(mdrop_obj, (struct monst *, struct obj *, BOOLEAN_P));
 
 STATIC_OVL const char *
 equipname(otmp)
@@ -202,7 +201,7 @@ char *objnambuf;
        so this will cause it to be removed now */
     if (occupation) (void) maybe_finished_meal(FALSE);
 
-    if (!invent || (inv_cnt() == 1 && uskin)) {
+    if (!invent || (inv_cnt(FALSE) == 1 && uskin)) {
 nothing_to_steal:
         /* Not even a thousand men in armor can strip a naked man. */
         if(Blind)
@@ -285,7 +284,7 @@ cant_take:
             /* the fewer items you have, the less likely the thief
                is going to stick around to try again (0) instead of
                running away (1) */
-            return !rn2(inv_cnt() / 5 + 2);
+            return !rn2(inv_cnt(FALSE) / 5 + 2);
         }
     }
 
@@ -390,8 +389,16 @@ register struct monst *mtmp;
 register struct obj *otmp;
 {
     int freed_otmp;
-
     boolean snuff_otmp = FALSE;
+
+    /* if monster is acquiring a thrown or kicked object, the throwing
+       or kicking code shouldn't continue to track and place it */
+    if (otmp == thrownobj) {
+        thrownobj = 0;
+    } else if (otmp == kickedobj) {
+        kickedobj = 0;
+    }
+
     /* don't want hidden light source inside the monster; assumes that
        engulfers won't have external inventories; whirly monsters cause
        the light to be extinguished rather than letting it shine thru */
@@ -459,7 +466,7 @@ struct monst *mtmp;
 }
 
 /* drop one object taken from a (possibly dead) monster's inventory */
-STATIC_OVL void
+void
 mdrop_obj(mon, obj, verbosely)
 struct monst *mon;
 struct obj *obj;

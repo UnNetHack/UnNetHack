@@ -48,6 +48,153 @@ const char *new_str;
     return 1;
 }
 
+/* describe a hidden monster; used for look_at during extended monster
+   detection and for probing; also when looking at self */
+void
+mhidden_description(mon, altmon, outbuf)
+struct monst *mon;
+boolean altmon; /* for probing: if mimicking a monster, say so */
+char *outbuf;
+{
+    struct obj *otmp;
+    boolean fakeobj, isyou = (mon == &youmonst);
+    int x = isyou ? u.ux : mon->mx;
+    int y = isyou ? u.uy : mon->my;
+    int glyph = (level.flags.hero_memory && !isyou) ? levl[x][y].glyph : glyph_at(x, y);
+
+    *outbuf = '\0';
+    if (M_AP_TYPE(mon) == M_AP_FURNITURE || M_AP_TYPE(mon) == M_AP_OBJECT) {
+        Strcpy(outbuf, ", mimicking ");
+        if (M_AP_TYPE(mon) == M_AP_FURNITURE) {
+            Strcat(outbuf, an(defsyms[mon->mappearance].explanation));
+        } else if (M_AP_TYPE(mon) == M_AP_OBJECT &&
+                   /* remembered glyph, not glyph_at() which is 'mon' */
+                   glyph_is_object(glyph)) {
+ objfrommap:
+            otmp = (struct obj *) 0;
+            fakeobj = object_from_map(glyph, x, y, &otmp);
+            Strcat(outbuf, (otmp && otmp->otyp != STRANGE_OBJECT) ?
+                            ansimpleoname(otmp) : an(obj_descr[STRANGE_OBJECT].oc_name));
+            if (fakeobj) {
+                otmp->where = OBJ_FREE; /* object_from_map set to OBJ_FLOOR */
+                dealloc_obj(otmp);
+            }
+        } else {
+            Strcat(outbuf, something);
+        }
+    } else if (M_AP_TYPE(mon) == M_AP_MONSTER) {
+        if (altmon) {
+            Sprintf(outbuf, ", masquerading as %s", an(mons[mon->mappearance].mname));
+        }
+    } else if (isyou ? u.uundetected : mon->mundetected) {
+        Strcpy(outbuf, ", hiding");
+        if (hides_under(mon->data)) {
+            Strcat(outbuf, " under ");
+            /* remembered glyph, not glyph_at() which is 'mon' */
+            if (glyph_is_object(glyph)) {
+                goto objfrommap;
+            }
+            Strcat(outbuf, something);
+        } else if (is_hider(mon->data)) {
+            Sprintf(eos(outbuf), " on the %s",
+                    (is_flyer(mon->data) ||
+                     mon->data->mlet == S_PIERCER) ? "ceiling" : surface(x, y)); /* trapper */
+        } else {
+            if (mon->data->mlet == S_EEL && is_pool(x, y)) {
+                Strcat(outbuf, " in murky water");
+            }
+        }
+    }
+}
+
+/* extracted from lookat(); also used by namefloorobj() */
+boolean
+object_from_map(glyph, x, y, obj_p)
+int glyph, x, y;
+struct obj **obj_p;
+{
+    boolean fakeobj = FALSE, mimic_obj = FALSE;
+    struct monst *mtmp;
+    struct obj *otmp;
+    int glyphotyp = glyph_to_obj(glyph);
+
+    *obj_p = (struct obj *) 0;
+    /* TODO: check inside containers in case glyph came from detection */
+    if ((otmp = sobj_at(glyphotyp, x, y)) == 0) {
+        for (otmp = level.buriedobjlist; otmp; otmp = otmp->nobj) {
+            if (otmp->ox == x && otmp->oy == y && otmp->otyp == glyphotyp) {
+                break;
+            }
+        }
+    }
+
+    /* there might be a mimic here posing as an object */
+    mtmp = m_at(x, y);
+    if (mtmp && is_obj_mappear(mtmp, (unsigned) glyphotyp)) {
+        otmp = 0;
+        mimic_obj = TRUE;
+    } else {
+        mtmp = 0;
+    }
+
+    if (!otmp || otmp->otyp != glyphotyp) {
+        /* this used to exclude STRANGE_OBJECT; now caller deals with it */
+        otmp = mksobj(glyphotyp, FALSE, FALSE);
+        if (!otmp) {
+            return FALSE;
+        }
+        fakeobj = TRUE;
+        if (otmp->oclass == COIN_CLASS) {
+            otmp->quan = 2L; /* to force pluralization */
+        } else if (otmp->otyp == SLIME_MOLD) {
+            otmp->spe = current_fruit; /* give it a type */
+        }
+        if (mtmp && has_mcorpsenm(mtmp)) {
+            /* mimic as corpse/statue */
+            if (otmp->otyp == SLIME_MOLD) {
+                /* override context.current_fruit to avoid
+                     look, use 'O' to make new named fruit, look again
+                   giving different results when current_fruit changes */
+                otmp->spe = MCORPSENM(mtmp);
+            } else {
+                otmp->corpsenm = MCORPSENM(mtmp);
+            }
+        } else if (otmp->otyp == CORPSE && glyph_is_body(glyph)) {
+            otmp->corpsenm = glyph - GLYPH_BODY_OFF;
+        } else if (otmp->otyp == STATUE && glyph_is_statue(glyph)) {
+            otmp->corpsenm = glyph - GLYPH_STATUE_OFF;
+        }
+        if (otmp->otyp == LEASH) {
+            otmp->leashmon = 0;
+        }
+        /* extra fields needed for shop price with doname() formatting */
+        otmp->where = OBJ_FLOOR;
+        otmp->ox = x, otmp->oy = y;
+        otmp->no_charge = (otmp->otyp == STRANGE_OBJECT && costly_spot(x, y));
+    }
+    /* if located at adjacent spot, mark it as having been seen up close
+       (corpse type will be known even if dknown is 0, so we don't need a
+       touch check for cockatrice corpse--we're looking without touching) */
+    if (otmp && distu(x, y) <= 2 && !Blind && !Hallucination &&
+        /* redundant: we only look for an object which matches current
+           glyph among floor and buried objects; when !Blind, any buried
+           object's glyph will have been replaced by whatever is present
+           on the surface as soon as we moved next to its spot */
+        (fakeobj || otmp->where == OBJ_FLOOR) && /* not buried */
+        /* terrain mode views what's already known, doesn't learn new stuff */
+        !iflags.terrainmode) {
+        /* so don't set dknown when in terrain mode */
+        otmp->dknown = 1; /* if a pile, clearly see the top item only */
+    }
+    if (fakeobj && mtmp && mimic_obj &&
+        (otmp->dknown || (M_AP_FLAG(mtmp) & M_AP_F_DKNOWN))) {
+        mtmp->m_ap_type |= M_AP_F_DKNOWN;
+        otmp->dknown = 1;
+    }
+    *obj_p = otmp;
+    return fakeobj; /* when True, caller needs to dealloc *obj_p */
+}
+
 /*
  * Return the name of the glyph found at (x,y).
  * If not hallucinating and the glyph is a monster, also monster data.

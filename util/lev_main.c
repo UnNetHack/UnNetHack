@@ -383,7 +383,7 @@ yyerror(s)
 const char *s;
 {
 	char *e = ((char *)s + strlen(s) - 1);
-	(void) fprintf(stderr, "%s: line %d, pos %ld : %s",
+	(void) fprintf(stderr, "%s: line %d, pos %zu : %s",
 		       fname, line_number,
 		       token_start_pos-strlen(curr_token), s);
 	if (*e != '.' && *e != '!')

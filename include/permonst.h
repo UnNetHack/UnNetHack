@@ -39,28 +39,28 @@ struct attack {
 #include "monflag.h"
 
 struct permonst {
-    const char  *mname;         /* full name */
-    char mlet;                  /* symbol */
-    glyph_t unicode_codepoint;      /* unicode codepoint for utf8graphics */
-    schar mlevel,               /* base monster level */
-          mmove,            /* move speed */
-          ac,           /* (base) armor class */
-          mr;           /* (base) magic resistance */
-    aligntyp maligntyp;         /* basic monster alignment */
-    unsigned short geno;            /* creation/geno mask value */
-    struct  attack mattk[NATTK];        /* attacks matrix */
-    unsigned short cwt,             /* weight of corpse */
-                   cnutrit; /* its nutritional value */
-    short pxlth;                /* length of extension */
-    uchar msound;               /* noise it makes (6 bits) */
-    uchar msize;                /* physical size (3 bits) */
-    uchar mresists;             /* resistances */
-    uchar mconveys;             /* conveyed by eating */
-    unsigned long mflags1,          /* boolean bitflags */
-                  mflags2;  /* more boolean bitflags */
-    unsigned short mflags3;         /* yet more boolean bitflags */
+    const char  *mname;          /* full name */
+    char mlet;                   /* symbol */
+    glyph_t unicode_codepoint;   /* unicode codepoint for utf8graphics */
+    schar mlevel,                /* base monster level */
+          mmove,                 /* move speed */
+          ac,                    /* (base) armor class */
+          mr;                    /* (base) magic resistance */
+    aligntyp maligntyp;          /* basic monster alignment */
+    unsigned short geno;         /* creation/geno mask value */
+    struct  attack mattk[NATTK]; /* attacks matrix */
+    unsigned short cwt,          /* weight of corpse */
+                   cnutrit;      /* its nutritional value */
+    short pxlth;                 /* length of extension */
+    uchar msound;                /* noise it makes (6 bits) */
+    uchar msize;                 /* physical size (3 bits) */
+    uchar mresists;              /* resistances */
+    uchar mconveys;              /* conveyed by eating */
+    uint32_t mflags1;            /* boolean bitflags */
+    uint64_t mflags2;            /* more boolean bitflags */
+    uint16_t mflags3;            /* yet more boolean bitflags */
 # ifdef TEXTCOLOR
-    uchar mcolor;               /* color to use */
+    uchar mcolor;                /* color to use */
 # endif
 };
 

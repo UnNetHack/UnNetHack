@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)explode.c  3.4 2002/11/10  */
 /*  Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,11 +17,18 @@ static int expl[3][3] = {
  * they don't supply enough information--was it a player or a monster that
  * did it, and with a wand, spell, or breath weapon?  Object types share both
  * these disadvantages....
+ *
+ * Important note about Half_physical_damage:
+ *      Unlike losehp(), explode() makes the Half_physical_damage adjustments
+ *      itself, so the caller should never have done that ahead of time.
+ *      It has to be done this way because the damage value is applied to
+ *      things beside the player. Care is taken within explode() to ensure
+ *      that Half_physical_damage only affects the damage applied to the hero.
  */
 void
 explode(x, y, type, dam, olet, expltype)
 int x, y;
-int type; /* the same as in zap.c */
+int type; /* the same as in zap.c; passes -(wand typ) for some WAND_CLASS */
 int dam;
 char olet;
 int expltype;
@@ -31,16 +37,41 @@ int expltype;
     boolean starting = 1;
     boolean visible, any_shield;
     int uhurt = 0; /* 0=unhurt, 1=items damaged, 2=you and items damaged */
-    const char *str;
+    const char *str = (const char *) 0;
     int idamres, idamnonres;
-    struct monst *mtmp;
+    struct monst *mtmp, *mdef = 0;
     uchar adtyp;
     int explmask[3][3];
     /* 0=normal explosion, 1=do shieldeff, 2=do nothing */
     boolean shopdamage = FALSE;
     boolean generic = FALSE;
+    boolean physical_dmg = FALSE;
+    boolean do_hallu = FALSE;
+    boolean inside_engulfer;
+    boolean grabbed;
+    boolean grabbing;
+    coord grabxy;
+    char hallu_buf[BUFSZ], killr_buf[BUFSZ];
+    short exploding_wand_typ = 0;
 
-    if (olet == WAND_CLASS)     /* retributive strike */
+    if (olet == WAND_CLASS) { /* retributive strike */
+        /* 'type' is passed as (wand's object type * -1); save
+           object type and convert 'type' itself to zap-type */
+        if (type < 0) {
+            type = -type;
+            exploding_wand_typ = (short) type;
+            /* most attack wands produce specific explosions;
+               other types produce a generic magical explosion */
+            if (objects[type].oc_dir == RAY && type != WAN_DIGGING && type != WAN_SLEEP) {
+                type -= WAN_MAGIC_MISSILE;
+                if (type < 0 || type > 9) {
+                    impossible("explode: wand has bad zap type (%d).", type);
+                    type = 0;
+                }
+            } else {
+                type = 0;
+            }
+        }
         switch (Role_switch) {
         case PM_PRIEST:
         case PM_MONK:
@@ -51,10 +82,52 @@ int expltype;
             break;
         default:  break;
         }
+    }
+
+    /* muse_unslime: SCR_FIRE */
+    if (expltype < 0) {
+        /* hero gets credit/blame for killing this monster, not others */
+        mdef = m_at(x, y);
+        expltype = -expltype;
+    }
+    /* if hero is engulfed and caused the explosion, only hero and
+       engulfer will be affected */
+    inside_engulfer = (u.uswallow && type >= 0);
+    /* held but not engulfed implies holder is reaching into second spot
+       so might get hit by double damage */
+    grabbed = grabbing = FALSE;
+    if (u.ustuck && !u.uswallow) {
+        if (Upolyd && sticks(youmonst.data))
+            grabbing = TRUE;
+        else
+            grabbed = TRUE;
+        grabxy.x = u.ustuck->mx;
+        grabxy.y = u.ustuck->my;
+    } else
+        grabxy.x = grabxy.y = 0; /* lint suppression */
+    /* FIXME:
+     *  It is possible for a grabber to be outside the explosion
+     *  radius and reaching inside to hold the hero.  If so, it ought
+     *  to take damage (the extra half of double damage).  It is also
+     *  possible for poly'd hero to be outside the radius and reaching
+     *  in to hold a monster.  Hero should take damage in that situation.
+     *
+     *  Probably the simplest way to handle this would be to expand
+     *  the radius used when collecting targets but exclude everything
+     *  beyond the regular radius which isn't reaching inside.  Then
+     *  skip harm to gear of any extended targets when inflicting damage.
+     */
 
     if (olet == MON_EXPLODE) {
+        /* when explode() is called recursively, killer.name might change so
+           we need to retain a copy of the current value for this explosion */
+#if NEXT_VERSION
+        str = strcpy(killr_buf, killer.name);
+#else
         str = killer;
+#endif
         killer = 0;     /* set again later as needed */
+        do_hallu = (Hallucination && (strstri(str, "'s explosion") || strstri(str, "s' explosion")));
         adtyp = AD_PHYS;
     } else
         switch (abs(type) % 10) {
@@ -64,6 +137,7 @@ int expltype;
         case 1: str =   olet == BURNING_OIL ?   "burning oil" :
                       olet == SCROLL_CLASS ?  "tower of flame" :
                       "fireball";
+            /* fire damage, not physical damage */
             adtyp = AD_FIRE;
             break;
         case 2: str = "ball of cold";
@@ -86,7 +160,8 @@ int expltype;
         }
 
     any_shield = visible = FALSE;
-    for (i=0; i<3; i++) for (j=0; j<3; j++) {
+    for (i=0; i<3; i++) {
+        for (j=0; j<3; j++) {
             if (!isok(i+x-1, j+y-1)) {
                 explmask[i][j] = 2;
                 continue;
@@ -120,21 +195,24 @@ int expltype;
                     break;
                 case AD_ACID:
                     explmask[i][j] = !!Acid_resistance;
+                    physical_dmg = TRUE;
                     break;
                 default:
                     impossible("explosion type %d?", adtyp);
                     break;
                 }
             }
-            /* can be both you and mtmp if you're swallowed */
+            /* can be both you and mtmp if you're swallowed or riding */
             mtmp = m_at(i+x-1, j+y-1);
 #ifdef STEED
             if (!mtmp && i+x-1 == u.ux && j+y-1 == u.uy)
                 mtmp = u.usteed;
 #endif
             if (mtmp) {
-                if (mtmp->mhp < 1) explmask[i][j] = 2;
-                else switch(adtyp) {
+                if (DEADMONSTER(mtmp)) {
+                    explmask[i][j] = 2;
+                } else {
+                    switch(adtyp) {
                     case AD_PHYS:
                         break;
                     case AD_MAGM:
@@ -148,8 +226,10 @@ int expltype;
                         break;
                     case AD_DISN:
                         explmask[i][j] |= (olet == WAND_CLASS) ?
-                                          (nonliving(mtmp->data) || is_demon(mtmp->data)) :
-                                          resists_disint(mtmp);
+                                          (nonliving(mtmp->data) ||
+                                           is_demon(mtmp->data) ||
+                                           is_vampshifter(mtmp))
+                                          : resists_disint(mtmp);
                         break;
                     case AD_ELEC:
                         explmask[i][j] |= resists_elec(mtmp);
@@ -164,31 +244,35 @@ int expltype;
                         impossible("explosion type %d?", adtyp);
                         break;
                     }
+                }
             }
-            if (mtmp && cansee(i+x-1, j+y-1) && !canspotmon(mtmp))
+            if (mtmp && cansee(i+x-1, j+y-1) && !canspotmon(mtmp)) {
                 map_invisible(i+x-1, j+y-1);
-            else if (!mtmp && glyph_is_invisible(levl[i+x-1][j+y-1].glyph)) {
-                unmap_object(i+x-1, j+y-1);
-                newsym(i+x-1, j+y-1);
+            } else if (!mtmp) {
+                unmap_invisible(i+x-1, j+y-1);
             }
             if (cansee(i+x-1, j+y-1)) visible = TRUE;
             if (explmask[i][j] == 1) any_shield = TRUE;
         }
+    }
 
     if (visible) {
         /* Start the explosion */
-        for (i=0; i<3; i++) for (j=0; j<3; j++) {
+        for (i=0; i<3; i++) {
+            for (j=0; j<3; j++) {
                 if (explmask[i][j] == 2) continue;
                 tmp_at(starting ? DISP_BEAM : DISP_CHANGE,
                        explosion_to_glyph(expltype, expl[i][j]));
                 tmp_at(i+x-1, j+y-1);
                 starting = 0;
             }
+        }
         curs_on_u();    /* will flush screen and output */
 
         if (any_shield && flags.sparkle) { /* simulate shield effect */
             for (k = 0; k < SHIELD_COUNT; k++) {
-                for (i=0; i<3; i++) for (j=0; j<3; j++) {
+                for (i=0; i<3; i++) {
+                    for (j=0; j<3; j++) {
                         if (explmask[i][j] == 1)
                             /*
                              * Bypass tmp_at() and send the shield glyphs
@@ -198,16 +282,19 @@ int expltype;
                             show_glyph(i+x-1, j+y-1,
                                        cmap_to_glyph(shield_static[k]));
                     }
+                }
                 curs_on_u(); /* will flush screen and output */
                 delay_output();
             }
 
             /* Cover last shield glyph with blast symbol. */
-            for (i=0; i<3; i++) for (j=0; j<3; j++) {
+            for (i=0; i<3; i++) {
+                for (j=0; j<3; j++) {
                     if (explmask[i][j] == 1)
                         show_glyph(i+x-1, j+y-1,
                                    explosion_to_glyph(expltype, expl[i][j]));
                 }
+            }
 
         } else {        /* delay a little bit. */
             delay_output();
@@ -220,18 +307,26 @@ int expltype;
             str = "explosion";
             generic = TRUE;
         }
-        if (flags.soundok) You_hear("a blast.");
+        if (!Deaf && olet != SCROLL_CLASS) {
+            You_hear("a blast.");
+        }
     }
 
-    if (dam)
-        for (i=0; i<3; i++) for (j=0; j<3; j++) {
+    if (dam) {
+        for (i=0; i<3; i++) {
+            for (j=0; j<3; j++) {
                 if (explmask[i][j] == 2) continue;
-                if (i+x-1 == u.ux && j+y-1 == u.uy)
+                if (i+x-1 == u.ux && j+y-1 == u.uy) {
                     uhurt = (explmask[i][j] == 1) ? 1 : 2;
+                /* for inside_engulfer, only <u.ux,u.uy> is affected */
+                } else if (inside_engulfer) {
+                    continue;
+                }
                 idamres = idamnonres = 0;
-                if (type >= 0)
+                if (type >= 0 && !u.uswallow) {
                     (void)zap_over_floor((xchar)(i+x-1), (xchar)(j+y-1),
-                                         type, &shopdamage);
+                                         type, &shopdamage, exploding_wand_typ);
+                }
 
                 mtmp = m_at(i+x-1, j+y-1);
 #ifdef STEED
@@ -239,8 +334,22 @@ int expltype;
                     mtmp = u.usteed;
 #endif
                 if (!mtmp) continue;
+
+                if (do_hallu) {
+                    /* replace "gas spore" with a different description
+                       for each target (we can't distinguish personal names
+                       like "Barney" here in order to suppress "the" below,
+                       so avoid any which begins with a capital letter) */
+                    do {
+                        Sprintf(hallu_buf, "%s explosion", s_suffix(rndmonnam()));
+                    } while (*hallu_buf != lowc(*hallu_buf));
+                    str = hallu_buf;
+                }
+
                 if (u.uswallow && mtmp == u.ustuck) {
-                    if (is_animal(u.ustuck->data))
+                    const char *adj = (char *) 0;
+
+                    if (is_animal(u.ustuck->data)) {
                         pline("%s gets %s!",
                               Monnam(u.ustuck),
                               (adtyp == AD_FIRE) ? "heartburn" :
@@ -251,7 +360,7 @@ int expltype;
                               (adtyp == AD_DRST) ? "poisoned" :
                               (adtyp == AD_ACID) ? "an upset stomach" :
                               "fried");
-                    else
+                    } else {
                         pline("%s gets slightly %s!",
                               Monnam(u.ustuck),
                               (adtyp == AD_FIRE) ? "toasted" :
@@ -262,6 +371,7 @@ int expltype;
                               (adtyp == AD_DRST) ? "intoxicated" :
                               (adtyp == AD_ACID) ? "burned" :
                               "fried");
+                    }
                 } else if (cansee(i+x-1, j+y-1)) {
                     if(mtmp->m_ap_type) seemimic(mtmp);
                     if(!is_vegetation(mtmp->data)) /* vegetation is immune */
@@ -285,12 +395,22 @@ int expltype;
                     int mdam = dam;
 
                     if (resist(mtmp, olet, 0, FALSE)) {
-                        if (cansee(i+x-1, j+y-1))
+                        /* inside_engulfer: <i+x-1,j+y-1> == <u.ux,u.uy> */
+                        if (cansee(i+x-1, j+y-1) || inside_engulfer) {
                             pline("%s resists the %s!", Monnam(mtmp), str);
-                        mdam = dam/2;
+                        }
+                        mdam = (dam + 1) / 2;
                     }
-                    if (mtmp == u.ustuck)
+                    /* if grabber is reaching into hero's spot and
+                       hero's spot is within explosion radius, grabber
+                       gets hit by double damage */
+                    if (grabbed && (mtmp == u.ustuck) && (distu(x, y) <= 2)) {
                         mdam *= 2;
+                    }
+                    /* being resistant to opposite type of damage makes
+                       target more vulnerable to current type of damage
+                       (when target is also resistant to current type,
+                       we won't get here) */
                     if (resists_cold(mtmp) && adtyp == AD_FIRE)
                         mdam *= 2;
                     else if (resists_fire(mtmp) && adtyp == AD_COLD)
@@ -303,25 +423,60 @@ int expltype;
                     if (mtmp->mhp > 0)
                         showdmg(mdam + idamres + idamnonres, FALSE);
                 }
-                if (mtmp->mhp <= 0) {
-                    /* KMH -- Don't blame the player for pets killing gas spores */
-                    if (!flags.mon_moving) killed(mtmp);
-                    else monkilled(mtmp, "", (int)adtyp);
-                } else if (!flags.mon_moving) setmangry(mtmp);
+                if (DEADMONSTER(mtmp)) {
+                    int xkflg = ((adtyp == AD_FIRE && completelyburns(mtmp->data)) ? XKILL_NOCORPSE : 0);
+
+                    if (!flags.mon_moving) {
+                        xkilled(mtmp, XKILL_GIVEMSG | xkflg);
+                    } else if (mdef && mtmp == mdef) {
+                        /* 'mdef' killed self trying to cure being turned
+                         * into slime due to some action by the player.
+                         * Hero gets the credit (experience) and most of
+                         * the blame (possible loss of alignment and/or
+                         * luck and/or telepathy depending on mtmp) but
+                         * doesn't break pacifism.  xkilled()'s message
+                         * would be "you killed <mdef>" so give our own.
+                         */
+                        if (cansee(mtmp->mx, mtmp->my) || canspotmon(mtmp))
+                            pline("%s is %s!", Monnam(mtmp),
+                                  xkflg ? "burned completely"
+                                        : nonliving(mtmp->data) ? "destroyed"
+                                                                : "killed");
+                        xkilled(mtmp, XKILL_NOMSG | XKILL_NOCONDUCT | xkflg);
+                    } else {
+                        if (xkflg)
+                            adtyp = AD_RBRE; /* no corpse */
+                        monkilled(mtmp, "", (int) adtyp);
+                    }
+                } else if (!flags.mon_moving) {
+                    setmangry(mtmp);
+                }
             }
+        }
+    }
 
     /* Do your injury last */
     if (uhurt) {
-        if ((type >= 0 || adtyp == AD_PHYS) &&  /* gas spores */
-            flags.verbose && olet != SCROLL_CLASS)
+        /* give message for any monster-induced explosion
+           or player-induced one other than scroll of fire */
+        if (flags.verbose && (type < 0 || olet != SCROLL_CLASS)) {
+            if (do_hallu) { /* (see explanation above) */
+                do {
+                    Sprintf(hallu_buf, "%s explosion", s_suffix(rndmonnam()));
+                } while (*hallu_buf != lowc(*hallu_buf));
+                str = hallu_buf;
+            }
             You("are caught in the %s!", str);
+            iflags.last_msg = PLNMSG_CAUGHT_IN_EXPLOSION;
+        }
         /* do property damage first, in case we end up leaving bones */
         if (adtyp == AD_FIRE) burn_away_slime();
         if (Invulnerable) {
             damu = 0;
             You("are unharmed!");
-        } else if (Half_physical_damage && adtyp == AD_PHYS)
-            damu = (damu+1) / 2;
+        } else if (adtyp == AD_PHYS || physical_dmg) {
+            damu = Maybe_Half_Phys(damu);
+        }
         if (adtyp == AD_FIRE) (void) burnarmor(&youmonst);
         destroy_item(SCROLL_CLASS, (int) adtyp);
         destroy_item(SPBOOK_CLASS, (int) adtyp);
@@ -331,6 +486,14 @@ int expltype;
 
         ugolemeffects((int) adtyp, damu);
         if (uhurt == 2) {
+            /* if poly'd hero is grabbing another victim, hero takes
+               double damage (note: don't rely on u.ustuck here because
+               that victim might have been killed when hit by the blast) */
+            if (grabbing && dist2((int) grabxy.x, (int) grabxy.y, x, y) <= 2) {
+                damu *= 2;
+            }
+            /* hero does not get same fire-resistant vs cold and
+               cold-resistant vs fire double damage as monsters [why not?] */
             if (Upolyd)
                 u.mh  -= damu;
             else
@@ -344,9 +507,11 @@ int expltype;
                 rehumanize();
             } else {
                 if (olet == MON_EXPLODE) {
-                    /* killer handled by caller */
-                    if (str != killer_buf && !generic)
+                    if (generic) { /* explosion was unseen; str=="explosion", */
+                        ;          /* killer.name=="gas spore's explosion"    */
+                    } else if (str != killer_buf && str != hallu_buf) {
                         Strcpy(killer_buf, str);
+                    }
                     killer_format = KILLED_BY_AN;
                 } else if (type >= 0 && olet != SCROLL_CLASS) {
                     killer_format = NO_KILLER_PREFIX;
@@ -359,6 +524,13 @@ int expltype;
                 } else {
                     killer_format = KILLED_BY;
                     Strcpy(killer_buf, str);
+                }
+                if (iflags.last_msg == PLNMSG_CAUGHT_IN_EXPLOSION ||
+                    iflags.last_msg == PLNMSG_TOWER_OF_FLAME) {
+                    /*seffects()*/
+                    pline("It is fatal.");
+                } else {
+                    pline_The("%s is fatal.", str);
                 }
                 killer = killer_buf;
                 /* Known BUG: BURNING suppresses corpse in bones data,
@@ -379,37 +551,40 @@ int expltype;
     /* explosions are noisy */
     i = dam * dam;
     if (i < 50) i = 50; /* in case random damage is very small */
+    if (inside_engulfer) {
+        i = (i + 3) / 4;
+    }
     wake_nearto(x, y, i);
 }
 
 struct scatter_chain {
     struct scatter_chain *next; /* pointer to next scatter item */
-    struct obj *obj;        /* pointer to the object    */
-    xchar ox;           /* location of          */
-    xchar oy;           /*  item            */
-    schar dx;           /* direction of         */
-    schar dy;           /*  travel          */
-    int range;          /* range of object      */
-    boolean stopped;        /* flag for in-motion/stopped   */
+    struct obj *obj;            /* pointer to the object        */
+    xchar ox;                   /* location of                  */
+    xchar oy;                   /*      item                    */
+    schar dx;                   /* direction of                 */
+    schar dy;                   /*      travel                  */
+    int range;                  /* range of object              */
+    boolean stopped;            /* flag for in-motion/stopped   */
 };
 
 /*
  * scflags:
- *  VIS_EFFECTS Add visual effects to display
- *  MAY_HITMON  Objects may hit monsters
- *  MAY_HITYOU  Objects may hit hero
- *  MAY_HIT     Objects may hit you or monsters
- *  MAY_DESTROY Objects may be destroyed at random
- *  MAY_FRACTURE    Stone objects can be fractured (statues, boulders)
+ *      VIS_EFFECTS     Add visual effects to display
+ *      MAY_HITMON      Objects may hit monsters
+ *      MAY_HITYOU      Objects may hit hero
+ *      MAY_HIT         Objects may hit you or monsters
+ *      MAY_DESTROY     Objects may be destroyed at random
+ *      MAY_FRACTURE    Stone objects can be fractured (statues, boulders)
  */
 
 /* returns number of scattered objects */
 long
 scatter(sx, sy, blastforce, scflags, obj)
-int sx, sy;              /* location of objects to scatter */
-int blastforce;             /* force behind the scattering  */
+int sx, sy;           /* location of objects to scatter */
+int blastforce;       /* force behind the scattering    */
 unsigned int scflags;
-struct obj *obj;            /* only scatter this obj        */
+struct obj *obj;      /* only scatter this obj          */
 {
     register struct obj *otmp;
     register int tmp;
@@ -423,7 +598,19 @@ struct obj *obj;            /* only scatter this obj        */
     struct scatter_chain *schain = (struct scatter_chain *)0;
     long total = 0L;
 
+    if (individual_object && (obj->ox != sx || obj->oy != sy)) {
+        impossible("scattered object <%d,%d> not at scatter site <%d,%d>", obj->ox, obj->oy, sx, sy);
+    }
+
     while ((otmp = individual_object ? obj : level.objects[sx][sy]) != 0) {
+        if (otmp == uball || otmp == uchain) {
+            boolean waschain = (otmp == uchain);
+            pline_The("chain shatters!");
+            unpunish();
+            if (waschain) {
+                continue;
+            }
+        }
         if (otmp->quan > 1L) {
             qtmp = otmp->quan - 1;
             if (qtmp > LARGEST_INT) qtmp = LARGEST_INT;
@@ -440,7 +627,11 @@ struct obj *obj;            /* only scatter this obj        */
             && ((otmp->otyp == BOULDER) || (otmp->otyp == STATUE))
             && rn2(10)) {
             if (otmp->otyp == BOULDER) {
-                pline("%s apart.", Tobjnam(otmp, "break"));
+                if (cansee(sx, sy)) {
+                    pline("%s apart.", Tobjnam(otmp, "break"));
+                } else {
+                    You_hear("stone breaking.");
+                }
                 fracture_rock(otmp);
                 place_object(otmp, sx, sy);
                 if ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
@@ -453,10 +644,15 @@ struct obj *obj;            /* only scatter this obj        */
 
                 if ((trap = t_at(sx, sy)) && trap->ttyp == STATUE_TRAP)
                     deltrap(trap);
-                pline("%s.", Tobjnam(otmp, "crumble"));
+                if (cansee(sx, sy)) {
+                    pline("%s.", Tobjnam(otmp, "crumble"));
+                } else {
+                    You_hear("stone crumbling.");
+                }
                 (void) break_statue(otmp);
                 place_object(otmp, sx, sy); /* put fragments on floor */
             }
+            newsym(sx, sy); /* in case it's beyond radius of 'farthest' */
             used_up = TRUE;
 
             /* 1 in 10 chance of destruction of obj; glass, egg destruction */
@@ -520,8 +716,11 @@ struct obj *obj;            /* only scatter this obj        */
                         hitvalu = 8 + stmp->obj->spe;
                         if (bigmonst(youmonst.data)) hitvalu++;
                         hitu = thitu(hitvalu,
-                                     dmgval(stmp->obj, &youmonst),
-                                     stmp->obj, (char *)0);
+                                    dmgval(stmp->obj, &youmonst),
+                                     &stmp->obj, (char *) 0);
+                        if (!stmp->obj) {
+                            stmp->stopped = TRUE;
+                        }
                         if (hitu) {
                             stmp->range -= 3;
                             stop_occupation();
@@ -542,15 +741,21 @@ struct obj *obj;            /* only scatter this obj        */
         int x, y;
 
         stmp2 = stmp->next;
-        x = stmp->ox; y = stmp->oy;
+        x = stmp->ox;
+        y = stmp->oy;
         if (stmp->obj) {
-            if ( x!=sx || y!=sy )
+            if (x != sx || y != sy )
                 total += stmp->obj->quan;
             place_object(stmp->obj, x, y);
             stackobj(stmp->obj);
         }
         free((genericptr_t)stmp);
         newsym(x, y);
+    }
+
+    newsym(sx, sy);
+    if (sx == u.ux && sy == u.uy && u.uundetected && hides_under(youmonst.data)) {
+        (void) hideunder(&youmonst);
     }
 
     return total;
@@ -570,12 +775,30 @@ struct obj *obj;            /* only scatter this obj        */
  * For now, just perform a "regular" explosion.
  */
 void
-splatter_burning_oil(x, y)
+splatter_burning_oil(x, y, diluted_oil)
 int x, y;
+boolean diluted_oil;
 {
+    int dmg = d(diluted_oil ? 3 : 4, 4);
+
 /* ZT_SPELL(ZT_FIRE) = ZT_SPELL(AD_FIRE-1) = 10+(2-1) = 11 */
 #define ZT_SPELL_O_FIRE 11 /* value kludge, see zap.c */
-    explode(x, y, ZT_SPELL_O_FIRE, d(4, 4), BURNING_OIL, EXPL_FIERY);
+    explode(x, y, ZT_SPELL_O_FIRE, dmg, BURNING_OIL, EXPL_FIERY);
+}
+
+/* lit potion of oil is exploding; extinguish it as a light source before
+   possibly killing the hero and attempting to save bones */
+void
+explode_oil(obj, x, y)
+struct obj *obj;
+int x, y;
+{
+    boolean diluted_oil = obj->odiluted;
+
+    if (!obj->lamplit)
+        impossible("exploding unlit oil");
+    end_burn(obj, TRUE);
+    splatter_burning_oil(x, y, diluted_oil);
 }
 
 /*explode.c*/

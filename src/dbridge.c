@@ -58,6 +58,17 @@ int x, y;
 }
 
 boolean
+is_pool_or_lava(x, y)
+int x, y;
+{
+    if (is_pool(x, y) || is_lava(x, y)) {
+        return TRUE;
+    } else {
+        return FALSE;
+    }
+}
+
+boolean
 is_any_icewall(x, y)
 int x, y;
 {
@@ -89,10 +100,46 @@ int x, y;
 
     if (!isok(x, y)) return FALSE;
     ltyp = levl[x][y].typ;
-    if (ltyp == BOG
-        || (ltyp == DRAWBRIDGE_UP
-            && (levl[x][y].drawbridgemask & DB_UNDER) == DB_BOG)) return TRUE;
+    if (ltyp == BOG ||
+            (ltyp == DRAWBRIDGE_UP && (db_under_typ(&levl[x][y]) == BOG))) {
+        return TRUE;
+    }
     return FALSE;
+}
+
+boolean
+is_moat(x, y)
+int x, y;
+{
+    schar ltyp;
+
+    if (!isok(x, y)) {
+        return FALSE;
+    }
+    ltyp = levl[x][y].typ;
+    if (!Is_juiblex_level(&u.uz) &&
+            (ltyp == MOAT ||
+             (ltyp == DRAWBRIDGE_UP && db_under_typ(&levl[x][y]) == MOAT))) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+schar
+db_under_typ(struct rm *lev)
+{
+    switch (lev->drawbridgemask & DB_UNDER) {
+    case DB_ICE:
+        return ICE;
+    case DB_LAVA:
+        return LAVAPOOL;
+    case DB_MOAT:
+        return MOAT;
+    case DB_BOG:
+        return BOG;
+    default:
+        return STONE;
+    }
 }
 
 /*

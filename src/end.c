@@ -5,7 +5,6 @@
 #define NEED_VARARGS    /* comment line for pre-compiled headers */
 
 #include "hack.h"
-#include "eshk.h"
 #ifndef NO_SIGNAL
 #include <signal.h>
 #endif
@@ -219,7 +218,7 @@ register struct monst *mtmp;
         killer_format = KILLED_BY;
     }
     /* _the_ <invisible> <distorted> ghost of Dudley */
-    if (mtmp->data == &mons[PM_GHOST] && mtmp->mnamelth) {
+    if (mtmp->data == &mons[PM_GHOST] && has_mname(mtmp)) {
         Strcat(buf, "the ");
         killer_format = KILLED_BY;
     }
@@ -230,7 +229,7 @@ register struct monst *mtmp;
 
     if(mtmp->data == &mons[PM_GHOST]) {
         Strcat(buf, "ghost");
-        if (mtmp->mnamelth) Sprintf(eos(buf), " of %s", NAME(mtmp));
+        if (has_mname(mtmp)) Sprintf(eos(buf), " of %s", MNAME(mtmp));
     } else if(mtmp->isshk) {
         Sprintf(eos(buf), "%s %s, the shopkeeper",
                 (mtmp->female ? "Ms." : "Mr."), shkname(mtmp));
@@ -242,8 +241,8 @@ register struct monst *mtmp;
         Strcat(buf, killer);
     } else {
         Strcat(buf, mtmp->data->mname);
-        if (mtmp->mnamelth)
-            Sprintf(eos(buf), " called %s", NAME(mtmp));
+        if (has_mname(mtmp))
+            Sprintf(eos(buf), " called %s", MNAME(mtmp));
     }
 
     if (multi) {
@@ -848,9 +847,11 @@ die:
     killer_format = NO_KILLER_PREFIX;
 
     if (how != PANICKED) {
+        boolean silently = done_stopprint ? TRUE : FALSE;
+
         /* these affect score and/or bones, but avoid them during panic */
-        taken = paybill((how == ESCAPED) ? -1 : (how != QUIT));
-        paygd();
+        taken = paybill((how == ESCAPED) ? -1 : (how != QUIT), silently);
+        paygd(silently);
         clearpriests();
     } else taken = FALSE;   /* lint; assert( !bones_ok ); */
 
@@ -1046,7 +1047,9 @@ die:
                     makeknown(otmp->otyp);
                     otmp->known = 1; /* for fake amulets */
                     otmp->dknown = 1; /* seen it (blindness fix) */
-                    otmp->onamelth = 0;
+                    if (has_oname(otmp)) {
+                        free_oname(otmp);
+                    }
                     otmp->quan = count;
                     Sprintf(pbuf, "%8ld %s (worth %ld %s),",
                             count, xname(otmp),

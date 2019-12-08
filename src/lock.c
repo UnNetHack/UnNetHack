@@ -224,6 +224,27 @@ reset_pick()
     xlock.box = 0;
 }
 
+/* level change or object deletion; context may no longer be valid */
+void
+maybe_reset_pick(container)
+struct obj *container; /* passed from obfree() */
+{
+    /*
+     * If a specific container, only clear context if it is for that
+     * particular container (which is being deleted).  Other stuff on
+     * the current dungeon level remains valid.
+     * However if 'container' is Null, clear context if not carrying
+     * xlock.box (which might be Null if context is for a door).
+     * Used for changing levels, where a floor container or a door is
+     * being left behind and won't be valid on the new level but a
+     * carried container will still be.  There might not be any context,
+     * in which case redundantly clearing it is harmless.
+     */
+    if (container ? (container == xlock.box) : (!xlock.box || !carried(xlock.box))) {
+        reset_pick();
+    }
+}
+
 int
 pick_lock(pick, rx, ry, explicit) /* pick a lock with a given object */
 register struct obj *pick;
@@ -254,7 +275,7 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
             pline(no_longer, "hold the", what);
             reset_pick();
             return 0;
-        } else if (xlock.box && !can_reach_floor()) {
+        } else if (xlock.box && !can_reach_floor(TRUE)) {
             pline(no_longer, "reach the", "lock");
             reset_pick();
             return 0;
@@ -292,6 +313,7 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
      * a)pply > just to open a safe, when a)pply . works in all other cases? */
     if ((cc.x == u.ux && cc.y == u.uy) || picktyp == STETHOSCOPE) { /* pick lock on a container */
         const char *verb;
+        char qsfx[QBUFSZ];
         boolean it;
         int count;
 
@@ -313,7 +335,7 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
         for(otmp = level.objects[cc.x][cc.y]; otmp; otmp = otmp->nexthere)
             if (Is_box(otmp)) {
                 ++count;
-                if (!can_reach_floor()) {
+                if (!can_reach_floor(TRUE)) {
                     You_cant("reach %s from up here.", the(xname(otmp)));
                     return 0;
                 }
@@ -323,10 +345,10 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
                 else if (!otmp->olocked) verb = "lock", it = 1;
                 else if (picktyp != LOCK_PICK) verb = "unlock", it = 1;
                 else verb = "pick";
-                Sprintf(qbuf, "There is %s here, %s %s?",
-                        safe_qbuf("", sizeof("There is  here, unlock its lock?"),
-                                  doname(otmp), an(simple_typename(otmp->otyp)), "a box"),
-                        verb, it ? "it" : "its lock");
+                /* "There is <a box> here; <verb> <it|its lock>?" */
+                Sprintf(qsfx, " here; %s %s?", verb, it ? "it" : "its lock");
+                (void) safe_qbuf(qbuf, "There is ", qsfx, otmp, doname,
+                                 ansimpleoname, "a box");
 
                 c = ynq(qbuf);
                 if(c == 'q') return(0);
@@ -521,10 +543,8 @@ doforce()       /* try to force a chest with your weapon */
                       doname(otmp), otmp->obroken ? "broken" : "unlocked");
                 continue;
             }
-            Sprintf(qbuf, "There is %s here, force its lock?",
-                    safe_qbuf("", sizeof("There is  here, force its lock?"),
-                              doname(otmp), an(simple_typename(otmp->otyp)),
-                              "a box"));
+            (void) safe_qbuf(qbuf, "There is ", " here; force its lock?",
+                             otmp, doname, ansimpleoname, "a box");
 
             c = ynq(qbuf);
             if(c == 'q') return(0);
@@ -699,6 +719,10 @@ doclose()       /* try to close a door */
         return(1);
     }
 
+    if (!isok(x, y)) {
+        goto nodoor;
+    }
+
     if ((mtmp = m_at(x, y))              &&
         mtmp->m_ap_type == M_AP_FURNITURE   &&
         (mtmp->mappearance == S_hcdoor ||
@@ -712,11 +736,13 @@ doclose()       /* try to close a door */
     door = &levl[x][y];
 
     if(!IS_DOOR(door->typ)) {
-        if (door->typ == DRAWBRIDGE_DOWN)
+        if (door->typ == DRAWBRIDGE_DOWN) {
             There("is no obvious way to close the drawbridge.");
-        else
+        } else {
+ nodoor:
             You("%s no door there.",
                 Blind ? "feel" : "see");
+        }
         return(0);
     }
 
@@ -1015,21 +1041,15 @@ struct obj *otmp;
 
 int
 artifact_door(x, y)
-int x, y;
+int x UNUSED;
+int y UNUSED;
 {
-    /*int i;*/
-
 #ifdef ADVENT_CALENDAR
     /* on the advent calendar level all doors are indestructible */
     if (Is_advent_calendar(&u.uz)) return A_NONE;
 #endif
-/*
-    for(i = 0; i < doorindex; i++) {
-    if (x == doors[i].x && y == doors[i].y)
-        return doors[i].arti_key;
-    }
- */
-    return 0;
+
+    return FALSE;
 }
 
 /*lock.c*/

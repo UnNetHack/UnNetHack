@@ -6,9 +6,6 @@
 #include "permonst.h"
 #include "monsym.h"
 #include "dungeon.h"    /* prerequisite for eshk,vault,epri */
-#include "eshk.h"
-#include "vault.h"
-#include "epri.h"
 
 #define NO_ATTK {0, 0, 0, 0}
 
@@ -46,7 +43,7 @@ void NDECL(monst_init);
     {nam, sym, 0, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, C(col)}
 /* LVL() and SIZ() collect several fields to cut down on # of args for MON() */
 #define LVL(lvl, mov, ac, mr, aln) lvl, mov, ac, mr, aln
-#define SIZ(wt, nut, pxl, snd, siz) wt, nut, pxl, snd, siz
+#define SIZ(wt, nut, pxl, snd, siz) wt, nut, 0, snd, siz
 /* ATTK() and A() are to avoid braces and commas within args to MON() */
 #define ATTK(at, ad, n, d) {at, ad, n, d}
 #define A(a1, a2, a3, a4, a5, a6) {a1, a2, a3, a4, a5, a6}
@@ -2599,7 +2596,7 @@ struct permonst _mons2[] = {
         LVL(12, 18, 0, 50, 0), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 4, 4), ATTK(AT_WEAP, AD_PHYS, 4, 4),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(WT_HUMAN, 400, sizeof(struct eshk), MS_SELL, MZ_HUMAN), 0, 0,
+        SIZ(WT_HUMAN, 400, 0, MS_SELL, MZ_HUMAN), 0, 0,
         M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_PEACEFUL|M2_STRONG|M2_COLLECT|M2_MAGIC,
         M3_INFRAVISIBLE, HI_SHOPKEEPER),
@@ -2608,7 +2605,7 @@ struct permonst _mons2[] = {
         LVL(20, 20, -5, 40, -2), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 4, 10), NO_ATTK, NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(WT_HUMAN, 400, sizeof(struct eshk), MS_SELL, MZ_HUMAN),
+        SIZ(WT_HUMAN, 400, 0, MS_SELL, MZ_HUMAN),
         MR_SLEEP|MR_STONE,
         MR_SLEEP, M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_PEACEFUL|M2_STRONG|M2_COLLECT|M2_MAGIC,
@@ -2617,7 +2614,7 @@ struct permonst _mons2[] = {
         LVL(25, 24, -8, 50, -2), (G_NOGEN|G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 4, 10), NO_ATTK, NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(WT_HUMAN, 400, sizeof(struct eshk), MS_ONEEYEDSAM, MZ_HUMAN),
+        SIZ(WT_HUMAN, 400, 0, MS_ONEEYEDSAM, MZ_HUMAN),
         MR_FIRE|MR_COLD|MR_POISON|MR_SLEEP|MR_ELEC|MR_STONE,
         MR_SLEEP, M1_HUMANOID|M1_OMNIVORE|M1_FLY,
         M2_NOPOLY|M2_HUMAN|M2_PEACEFUL|M2_STRONG|M2_COLLECT|M2_MAGIC|

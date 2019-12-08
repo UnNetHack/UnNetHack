@@ -376,7 +376,7 @@ int what;       /* should be a long */
         }
 
         /* no pickup if levitating & not on air or water level */
-        if (!can_reach_floor()) {
+        if (!can_reach_floor(TRUE)) {
             if ((multi && !flags.run) || (autopickup && !flags.pickup))
                 read_engr_at(u.ux, u.uy);
             return (0);
@@ -517,9 +517,9 @@ menu_pickup:
 
             if (!all_of_a_type) {
                 char qbuf[BUFSZ];
-                Sprintf(qbuf, "Pick up %s?",
-                        safe_qbuf("", sizeof("Pick up ?"), doname(obj),
-                                  an(simple_typename(obj->otyp)), "something"));
+
+                (void) safe_qbuf(qbuf, "Pick up ", "?", obj, doname,
+                                 ansimpleoname, something);
                 switch ((obj->quan < 2L) ? ynaq(qbuf) : ynNaq(qbuf)) {
                 case 'q': goto end_query; /* out 2 levels */
                 case 'n': continue;
@@ -583,7 +583,6 @@ boolean grab;    /* forced pickup, rather than forced leave behind? */
 }
 #endif /* AUTOPICKUP_EXCEPTIONS */
 
-static
 boolean
 autopick_testobj(otmp, calc_costly)
 struct obj *otmp;
@@ -1194,7 +1193,7 @@ boolean telekinesis;
     *cnt_p = carry_count(obj, container, *cnt_p, telekinesis, &old_wt, &new_wt);
     if (*cnt_p < 1L) {
         result = -1; /* nothing lifted */
-    } else if (inv_cnt() >= 52 && !merge_choice(invent, obj)) {
+    } else if (inv_cnt(FALSE) >= 52 && !merge_choice(invent, obj)) {
         Your("knapsack cannot accommodate any more items.");
         result = -1; /* nothing lifted */
     } else {
@@ -1215,9 +1214,12 @@ boolean telekinesis;
                        (next_encumbr > HVY_ENCUMBER) ? overloadmsg :
                        (next_encumbr > MOD_ENCUMBER) ? nearloadmsg :
                        moderateloadmsg);
-                Sprintf(eos(qbuf), " %s. Continue?",
-                        safe_qbuf(qbuf, sizeof(" . Continue?"),
-                                  doname(obj), an(simple_typename(obj->otyp)), "something"));
+
+                if (container)
+                    (void) strsubst(qbuf, "lifting", "removing");
+                Strcat(qbuf, " ");
+                (void) safe_qbuf(qbuf, qbuf, ".  Continue?", obj, doname,
+                                 ansimpleoname, something);
                 obj->quan = savequan;
                 switch (ynq(qbuf)) {
                 case 'q':  result = -1; break;
@@ -1230,32 +1232,6 @@ boolean telekinesis;
     }
 
     return result;
-}
-
-/* To prevent qbuf overflow in prompts use planA only
- * if it fits, or planB if PlanA doesn't fit,
- * finally using the fallback as a last resort.
- * last_restort is expected to be very short.
- */
-const char *
-safe_qbuf(qbuf, padlength, planA, planB, last_resort)
-const char *qbuf, *planA, *planB, *last_resort;
-unsigned padlength;
-{
-    /* convert size_t (or int for ancient systems) to ordinary unsigned */
-    unsigned len_qbuf = (unsigned)strlen(qbuf),
-             len_planA = (unsigned)strlen(planA),
-             len_planB = (unsigned)strlen(planB),
-             len_lastR = (unsigned)strlen(last_resort);
-    unsigned textleft = QBUFSZ - (len_qbuf + padlength);
-
-    if (len_lastR >= textleft) {
-        impossible("safe_qbuf: last_resort too large at %u characters.",
-                   len_lastR);
-        return "";
-    }
-    return (len_planA < textleft) ? planA :
-           (len_planB < textleft) ? planB : last_resort;
 }
 
 /*
@@ -1469,7 +1445,7 @@ able_to_loot(x, y, tip)
 int x, y;
 boolean tip;
 {
-    if (!can_reach_floor()) {
+    if (!can_reach_floor(TRUE)) {
         if (!tip) {
 #ifdef STEED
             if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
@@ -1549,10 +1525,9 @@ lootcont:
             if (Is_container(cobj)) {
                 /* don't ask if there is only one lootable object */
                 if (container_count != 1 || iflags.vanilla_ui_behavior) {
-                    Sprintf(qbuf, "There is %s here, loot it?",
-                            safe_qbuf("", sizeof("There is  here, loot it?"),
-                                      doname(cobj), an(simple_typename(cobj->otyp)),
-                                      "a container"));
+                    safe_qbuf(qbuf, "There is ", " here, loot it?",
+                              cobj, doname, ansimpleoname,
+                              "a container");
                     c = ynq(qbuf);
                     if (c == 'q') return (timepassed);
                     if (c == 'n') continue;
@@ -1801,15 +1776,16 @@ dotip()
             nobj = cobj->nexthere;
 
             if (Is_container(cobj)) {
-                Sprintf(qbuf, "There is %s here; tip it?",
-                        safe_qbuf("", sizeof("There is  here, tip it?"),
-                                  doname(cobj), an(simple_typename(cobj->otyp)),
-                                  "a container"));
+                safe_qbuf(qbuf, "There is ", " here, tip it?",
+                          cobj,
+                          doname, ansimpleoname, "container");
                 c = ynq(qbuf);
                 if (c == 'q') return 0;
                 if (c == 'n') continue;
 
-                return tip_container(cobj);
+                tip_container(cobj);
+                /* can only tip one container at a time */
+                return 1;
             }
         }
     }
@@ -2030,8 +2006,9 @@ register struct obj *obj;
         obj->age = monstermoves - obj->age; /* actual age */
         /* stop any corpse timeouts when frozen */
         if (obj->otyp == CORPSE && obj->timed) {
-            long rot_alarm = stop_timer(ROT_CORPSE, (genericptr_t)obj);
-            (void) stop_timer(REVIVE_MON, (genericptr_t)obj);
+            long rot_alarm = stop_timer(ROT_CORPSE, obj_to_any(obj));
+
+            (void) stop_timer(REVIVE_MON, obj_to_any(obj));
             /* mark a non-reviving corpse as such */
             if (rot_alarm) obj->norevive = 1;
         }
@@ -2349,9 +2326,8 @@ register int held;
                 quantum_cat ? "now " : "");
 
     if (cnt || flags.menu_style == MENU_FULL) {
-        Strcpy(qbuf, "Do you want to take something out of ");
-        Sprintf(eos(qbuf), "%s?",
-                safe_qbuf(qbuf, 1, yname(obj), ysimple_name(obj), "it"));
+        (void) safe_qbuf(qbuf, "Do you want to take something out of ", "?", obj,
+                yname, ysimple_name, "it");
         if (flags.menu_style != MENU_TRADITIONAL) {
             if (flags.menu_style == MENU_FULL) {
                 int t;
@@ -2427,7 +2403,7 @@ ask_again2:
     if (flags.menu_style != MENU_FULL) {
         Sprintf(qbuf, "Do you wish to put %s in?", something);
         Strcpy(pbuf, ynqchars);
-        if (flags.menu_style == MENU_TRADITIONAL && invent && inv_cnt() > 0)
+        if (flags.menu_style == MENU_TRADITIONAL && invent && inv_cnt(TRUE) > 0)
             Strcat(pbuf, "m");
         switch (yn_function(qbuf, pbuf, 'n')) {
         case 'y':
@@ -2626,7 +2602,7 @@ BOOLEAN_P destroy_after;
     /* trying to empty a locked container may damage its contents */
     if (!destroy_after && container->olocked) {
         ret = !!container->cobj;
-        container_impact_dmg(container);
+        container_impact_dmg(container, u.ux, u.uy);
         return ret;
     }
 
@@ -2673,8 +2649,8 @@ BOOLEAN_P destroy_after;
             place_object(otmp, u.ux, u.uy);
         } else {
             if (!u.uswallow) {
-                if (!can_reach_floor()) {
-                    hitfloor(otmp);
+                if (!can_reach_floor(TRUE)) {
+                    hitfloor(otmp, TRUE);
                 } else {
                     if (!IS_ALTAR(ltyp)) pline("%s spill%s %sto the %s.",
                                                Doname2(otmp), (otmp->otyp == LENSES || is_gloves(otmp)

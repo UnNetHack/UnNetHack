@@ -212,7 +212,11 @@ void
 livelog_bones_killed(mtmp)
 struct monst *mtmp;
 {
-    char *name = NAME(mtmp);
+    char *name = (char *)0;
+
+    if (has_mname(mtmp)) {
+        name = MNAME(mtmp);
+    }
 
     if (name &&
         mtmp->former_rank && strlen(mtmp->former_rank) > 0) {

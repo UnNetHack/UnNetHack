@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)extern.h   3.4 2003/03/10  */
 /* Copyright (c) Steve Creps, 1988.               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,7 +11,7 @@
 #if 0
 E long *FDECL(alloc, (unsigned int));
 #endif
-E char *FDECL(fmt_ptr, (const genericptr, char *));
+E char *FDECL(fmt_ptr, (const genericptr));
 
 /* This next pre-processor directive covers almost the entire file,
  * interrupted only occasionally to pick up specific functions as needed. */
@@ -50,7 +49,7 @@ E boolean FDECL(catch_lit, (struct obj *));
 E void FDECL(fix_attributes_and_properties, (struct obj *, int));
 E boolean FDECL(tinnable, (struct obj *));
 E void NDECL(reset_trapset);
-E void FDECL(fig_transform, (genericptr_t, long));
+E void FDECL(fig_transform, (ANY_P *, long));
 E int FDECL(unfixable_trouble_count, (BOOLEAN_P));
 
 /* ### artifact.c ### */
@@ -69,6 +68,7 @@ E boolean FDECL(confers_luck, (struct obj *));
 E boolean FDECL(arti_reflects, (struct obj *));
 E boolean FDECL(restrict_name, (struct obj *, const char *, BOOLEAN_P));
 E boolean FDECL(defends, (int, struct obj *));
+E boolean FDECL(defends_when_carried, (int, struct obj *));
 E boolean FDECL(protects, (int, struct obj *));
 E void FDECL(set_artifact_intrinsic, (struct obj *, BOOLEAN_P, long));
 E int FDECL(touch_artifact, (struct obj *, struct monst *));
@@ -123,9 +123,12 @@ E boolean FDECL(drag_ball, (XCHAR_P, XCHAR_P,
                             int *, xchar *, xchar *, xchar *, xchar *, boolean *, BOOLEAN_P));
 E void FDECL(drop_ball, (XCHAR_P, XCHAR_P));
 E void NDECL(drag_down);
+E void NDECL(bc_sanity_check);
 
 /* ### bones.c ### */
 
+E void FDECL(sanitize_name, (char *));
+E void FDECL(drop_upon_death, (struct monst *, struct obj *, int, int));
 E boolean NDECL(can_make_bones);
 E void FDECL(savebones, (struct obj *));
 E int NDECL(getbones);
@@ -178,6 +181,7 @@ E void FDECL(savech, (CHAR_P));
 #ifdef WIZARD
 E void NDECL(add_debug_extended_commands);
 #endif /* WIZARD */
+E void FDECL(reset_commands, (BOOLEAN_P));
 E void FDECL(rhack, (char *));
 E int NDECL(doextlist);
 E int NDECL(extcmd_via_menu);
@@ -186,12 +190,15 @@ E void FDECL(show_conduct, (int, BOOLEAN_P));
 E int FDECL(xytod, (SCHAR_P, SCHAR_P));
 E void FDECL(dtoxy, (coord *, int));
 E int FDECL(movecmd, (CHAR_P));
+E int NDECL(dxdy_moveok);
 E int FDECL(getdir, (const char *));
 E void NDECL(confdir);
+E const char *FDECL(directionname, (int));
 E int FDECL(isok, (int, int));
 E int FDECL(get_adjacent_loc, (const char *, const char *, XCHAR_P, XCHAR_P, coord *));
 E const char *FDECL(click_to_cmd, (int, int, int));
 E char NDECL(readchar);
+E int do_stair_travel(char);
 #ifdef WIZARD
 E void NDECL(sanity_check);
 #endif
@@ -211,10 +218,13 @@ E int curses_debug_show_colors();
 
 E boolean FDECL(is_pool, (int, int));
 E boolean FDECL(is_lava, (int, int));
+E boolean FDECL(is_pool_or_lava, (int, int));
 E boolean FDECL(is_ice, (int, int));
+E boolean FDECL(is_moat, (int, int));
 E boolean FDECL(is_swamp, (int, int));
 E boolean FDECL(is_icewall, (int, int));
 E boolean FDECL(is_any_icewall, (int, int));
+E schar FDECL(db_under_typ, (struct rm *lev));
 E int FDECL(is_drawbridge_wall, (int, int));
 E boolean FDECL(is_db_wall, (int, int));
 E boolean FDECL(find_drawbridge, (int *, int*));
@@ -254,25 +264,33 @@ E void NDECL(sokoban_detect);
 
 /* ### dig.c ### */
 
+E int FDECL(dig_typ, (struct obj *, XCHAR_P, XCHAR_P));
 E boolean NDECL(is_digging);
 #ifdef USE_TRAMPOLI
 E int NDECL(dig);
 #endif
 E int NDECL(holetime);
-E schar FDECL(fillholetyp, (int, int));
 E boolean FDECL(dig_check, (struct monst *, BOOLEAN_P, int, int));
 E void FDECL(digactualhole, (int, int, struct monst *, int));
-E boolean FDECL(dighole, (BOOLEAN_P));
+E boolean FDECL(dighole, (BOOLEAN_P, BOOLEAN_P, coord *));
 E int FDECL(use_pick_axe, (struct obj *));
 E int FDECL(use_pick_axe2, (struct obj *));
 E boolean FDECL(mdig_tunnel, (struct monst *));
+E void FDECL(draft_message, (BOOLEAN_P));
 E void FDECL(watch_dig, (struct monst *, XCHAR_P, XCHAR_P, BOOLEAN_P));
 E void NDECL(zap_dig);
 E struct obj *FDECL(bury_an_obj, (struct obj *, boolean *));
 E void FDECL(bury_objs, (int, int));
 E void FDECL(unearth_objs, (int, int));
-E void FDECL(rot_organic, (genericptr_t, long));
-E void FDECL(rot_corpse, (genericptr_t, long));
+E void FDECL(rot_organic, (ANY_P *, long));
+E void FDECL(rot_corpse, (ANY_P *, long));
+E struct obj *FDECL(buried_ball, (coord *));
+E void NDECL(buried_ball_to_punishment);
+E void NDECL(buried_ball_to_freedom);
+E schar FDECL(fillholetyp, (int, int, BOOLEAN_P));
+E void FDECL(liquid_flow,
+             (XCHAR_P, XCHAR_P, SCHAR_P, struct trap *, const char *));
+E boolean FDECL(conjoined_pits, (struct trap *, struct trap *, BOOLEAN_P));
 #if 0
 E void FDECL(bury_monst, (struct monst *));
 E void NDECL(bury_you);
@@ -291,10 +309,13 @@ E void FDECL(map_background, (XCHAR_P, XCHAR_P, int));
 E void FDECL(map_trap, (struct trap *, int));
 E void FDECL(map_object, (struct obj *, int));
 E void FDECL(map_invisible, (XCHAR_P, XCHAR_P));
+E boolean FDECL(unmap_invisible, (int, int));
 E void FDECL(unmap_object, (int, int));
 E void FDECL(map_location, (int, int, int));
+E void FDECL(feel_newsym, (XCHAR_P, XCHAR_P));
 E void FDECL(feel_location, (XCHAR_P, XCHAR_P));
 E void FDECL(newsym, (int, int));
+E void FDECL(newsym_force, (int, int));
 E void FDECL(shieldeff, (XCHAR_P, XCHAR_P));
 E void FDECL(tmp_at, (int, int));
 E void FDECL(swallowed, (int));
@@ -319,6 +340,8 @@ E int FDECL(back_to_glyph, (XCHAR_P, XCHAR_P));
 E int FDECL(zapdir_to_glyph, (int, int, int));
 E int FDECL(glyph_at, (XCHAR_P, XCHAR_P));
 E void NDECL(set_wall_state);
+E void FDECL(unset_seenv, (struct rm *, int, int, int, int));
+E int FDECL(warning_of, (struct monst *));
 
 /* ### do.c ### */
 
@@ -333,6 +356,7 @@ E void FDECL(doaltarobj, (struct obj *));
 E boolean FDECL(canletgo, (struct obj *, const char *));
 E void FDECL(dropx, (struct obj *));
 E void FDECL(dropy, (struct obj *));
+E void FDECL(dropz, (struct obj *, BOOLEAN_P));
 E void FDECL(obj_no_longer_held, (struct obj *));
 E int NDECL(doddrop);
 E int NDECL(dodown);
@@ -345,16 +369,21 @@ E void FDECL(schedule_goto, (d_level *, BOOLEAN_P, BOOLEAN_P, int,
                              const char *, const char *));
 E void NDECL(deferred_goto);
 E boolean FDECL(revive_corpse, (struct obj *));
-E void FDECL(revive_mon, (genericptr_t, long));
+E void FDECL(revive_mon, (ANY_P *, long));
 E int NDECL(donull);
 E int NDECL(dowipe);
 E void FDECL(set_wounded_legs, (long, int));
-E void NDECL(heal_legs);
+E void FDECL(heal_legs, (int));
 
 /* ### do_name.c ### */
 
 E void FDECL(do_oname, (struct obj *));
 E int FDECL(getpos, (coord *, BOOLEAN_P, const char *));
+E void FDECL(new_mname, (struct monst *, int));
+E void FDECL(free_mname, (struct monst *));
+E void FDECL(new_oname, (struct obj *, int));
+E void FDECL(free_oname, (struct obj *));
+E const char *FDECL(safe_oname, (struct obj *));
 E struct monst *FDECL(christen_monst, (struct monst *, const char *));
 E int NDECL(do_mname);
 E struct obj *FDECL(oname, (struct obj *, const char *));
@@ -368,21 +397,29 @@ E char *FDECL(mon_nam, (struct monst *));
 E char *FDECL(noit_mon_nam, (struct monst *));
 E char *FDECL(Monnam, (struct monst *));
 E char *FDECL(noit_Monnam, (struct monst *));
+E char *FDECL(noname_monnam, (struct monst *, int));
 E char *FDECL(m_monnam, (struct monst *));
 E char *FDECL(y_monnam, (struct monst *));
 E char *FDECL(Adjmonnam, (struct monst *, const char *));
 E char *FDECL(Amonnam, (struct monst *));
 E char *FDECL(a_monnam, (struct monst *));
 E char *FDECL(distant_monnam, (struct monst *, int, char *));
+E char *FDECL(mon_nam_too, (struct monst *, struct monst *));
 E const char *NDECL(rndmonnam);
 E const char *FDECL(hcolor, (const char *));
 E const char *NDECL(rndcolor);
+E const char *FDECL(hliquid, (const char *));
 #ifdef REINCARNATION
 E const char *NDECL(roguename);
 #endif
 E struct obj *FDECL(realloc_obj,
                     (struct obj *, int, genericptr_t, int, const char *));
 E char *FDECL(coyotename, (struct monst *, char *));
+E char *FDECL(rndorcname, (char *));
+E struct monst *FDECL(christen_orc, (struct monst *, const char *,
+                                     const char *));
+E const char *FDECL(noveltitle, (int *));
+E const char *FDECL(lookup_novel, (const char *, int *));
 
 /* ### do_wear.c ### */
 
@@ -398,11 +435,14 @@ E int NDECL(take_off);
 E void FDECL(off_msg, (struct obj *));
 E void NDECL(set_wear);
 E boolean FDECL(donning, (struct obj *));
+E boolean FDECL(doffing, (struct obj *));
 E void NDECL(cancel_don);
+E int FDECL(stop_donning, (struct obj *));
 E int NDECL(Armor_off);
 E int NDECL(Armor_gone);
 E int NDECL(Helmet_off);
 E int NDECL(Gloves_off);
+E int NDECL(Boots_on);
 E int NDECL(Boots_off);
 E int NDECL(Cloak_off);
 E int NDECL(Shield_off);
@@ -435,6 +475,8 @@ E void FDECL(adj_abon, (struct obj *, SCHAR_P));
 
 /* ### dog.c ### */
 
+E void FDECL(newedog, (struct monst *));
+E void FDECL(free_edog, (struct monst *));
 E void FDECL(initedog, (struct monst *));
 E struct monst *FDECL(make_familiar, (struct obj *, XCHAR_P, XCHAR_P, BOOLEAN_P));
 E struct monst *NDECL(makedog);
@@ -445,7 +487,7 @@ E void FDECL(mon_catchup_elapsed_time, (struct monst *, long));
 E void FDECL(keepdogs, (BOOLEAN_P));
 E void FDECL(migrate_to_level, (struct monst *, XCHAR_P, XCHAR_P, coord *));
 E int FDECL(dogfood, (struct monst *, struct obj *));
-E struct monst *FDECL(tamedog, (struct monst *, struct obj *));
+E boolean FDECL(tamedog, (struct monst *, struct obj *));
 E void FDECL(abuse_dog, (struct monst *));
 E void FDECL(wary_dog, (struct monst *, BOOLEAN_P));
 
@@ -457,14 +499,16 @@ E int FDECL(dog_move, (struct monst *, int));
 #ifdef USE_TRAMPOLI
 E void FDECL(wantdoor, (int, int, genericptr_t));
 #endif
+E void FDECL(finish_meating, (struct monst *));
 
 /* ### dokick.c ### */
 
 E boolean FDECL(ghitm, (struct monst *, struct obj *));
-E void FDECL(container_impact_dmg, (struct obj *));
+E void FDECL(container_impact_dmg, (struct obj *, XCHAR_P, XCHAR_P));
 E int NDECL(dokick);
 E boolean FDECL(ship_object, (struct obj *, XCHAR_P, XCHAR_P, BOOLEAN_P));
 E void NDECL(obj_delivery);
+E void FDECL(deliver_obj_to_mon, (struct monst *mtmp, int, unsigned long));
 E schar FDECL(down_gate, (XCHAR_P, XCHAR_P));
 E void FDECL(impact_drop, (struct obj *, XCHAR_P, XCHAR_P, XCHAR_P));
 
@@ -472,14 +516,17 @@ E void FDECL(impact_drop, (struct obj *, XCHAR_P, XCHAR_P, XCHAR_P));
 
 E int NDECL(dothrow);
 E int NDECL(dofire);
-E void FDECL(hitfloor, (struct obj *));
+E void FDECL(endmultishot, (BOOLEAN_P));
+E void FDECL(hitfloor, (struct obj *, BOOLEAN_P));
 E void FDECL(hurtle, (int, int, int, BOOLEAN_P));
 E void FDECL(mhurtle, (struct monst *, int, int, int));
+E boolean FDECL(throwing_weapon, (struct obj *));
 E void FDECL(throwit, (struct obj *, long, BOOLEAN_P));
 E int FDECL(omon_adj, (struct monst *, struct obj *, BOOLEAN_P));
 E int FDECL(thitmonst, (struct monst *, struct obj *));
 E int FDECL(hero_breaks, (struct obj *, XCHAR_P, XCHAR_P, BOOLEAN_P));
 E int FDECL(breaks, (struct obj *, XCHAR_P, XCHAR_P));
+E void FDECL(breakobj, (struct obj *, XCHAR_P, XCHAR_P, BOOLEAN_P, BOOLEAN_P));
 E boolean FDECL(breaktest, (struct obj *));
 E boolean FDECL(walk_path, (coord *, coord *, boolean (*)(genericptr_t, int, int), genericptr_t));
 E boolean FDECL(hurtle_step, (genericptr_t, int, int));
@@ -562,6 +609,7 @@ E boolean FDECL(Is_botlevel, (d_level *));
 E boolean FDECL(Can_fall_thru, (d_level *));
 E boolean FDECL(Can_dig_down, (d_level *));
 E boolean FDECL(Can_rise_up, (int, int, d_level *));
+E boolean FDECL(has_ceiling, (d_level *));
 E boolean FDECL(In_quest, (d_level *));
 E boolean FDECL(In_mines, (d_level *));
 E boolean FDECL(In_sheol, (d_level *));
@@ -587,7 +635,10 @@ E int NDECL(dooverview);
 E void FDECL(forget_mapseen, (int));
 E void FDECL(init_mapseen, (d_level *));
 E void NDECL(recalc_mapseen);
+E void FDECL(mapseen_temple, (struct monst *));
 E void FDECL(recbranch_mapseen, (d_level *, d_level *));
+E void FDECL(room_discovered, (int));
+E void FDECL(overview_stats, (winid, const char *, long *, long *));
 E void FDECL(remdun_mapseen, (int));
 E char *FDECL(get_annotation, (d_level *));
 E const char *FDECL(get_generic_level_description, (d_level *));
@@ -624,6 +675,9 @@ E boolean FDECL(bite_monster, (struct monst *mon));
 E void NDECL(fix_petrification);
 E void FDECL(consume_oeaten, (struct obj *, int));
 E boolean FDECL(maybe_finished_meal, (BOOLEAN_P));
+E void FDECL(set_tin_variety, (struct obj *, int));
+E int FDECL(tin_variety_txt, (char *, int *));
+E boolean FDECL(Popeye, (int));
 
 /* ### end.c ### */
 
@@ -645,7 +699,8 @@ E int NDECL(num_genocides);
 
 E char *FDECL(random_engraving, (char *));
 E void FDECL(wipeout_text, (char *, int, unsigned));
-E boolean NDECL(can_reach_floor);
+E boolean FDECL(can_reach_floor, (BOOLEAN_P));
+E void FDECL(cant_reach_floor, (int, int, BOOLEAN_P, BOOLEAN_P));
 E const char *FDECL(surface, (int, int));
 E const char *FDECL(ceiling, (int, int));
 E struct engr *FDECL(engr_at, (XCHAR_P, XCHAR_P));
@@ -662,6 +717,7 @@ E int NDECL(doengrave);
 E int NDECL(doengrave_elbereth);
 E void FDECL(save_engravings, (int, int));
 E void FDECL(rest_engravings, (int));
+E void FDECL(engr_stats, (const char *, char *, long *, long *));
 E void FDECL(del_engr, (struct engr *));
 E void FDECL(rloc_engr, (struct engr *));
 E void FDECL(make_grave, (int, int, const char *));
@@ -680,7 +736,8 @@ E long FDECL(rndexp, (BOOLEAN_P));
 
 E void FDECL(explode, (int, int, int, int, CHAR_P, int));
 E long FDECL(scatter, (int, int, int, unsigned int, struct obj *));
-E void FDECL(splatter_burning_oil, (int, int));
+E void FDECL(splatter_burning_oil, (int, int, BOOLEAN_P));
+E void FDECL(explode_oil, (struct obj *, int, int));
 
 /* ### extralev.c ### */
 
@@ -780,15 +837,21 @@ E void NDECL(drinksink);
 E void FDECL(catchup_dgn_growths, (int));
 E void FDECL(dgn_growths, (BOOLEAN_P, BOOLEAN_P));
 #endif
+E anything *FDECL(uint_to_any, (unsigned));
+E anything *FDECL(long_to_any, (long));
+E anything *FDECL(monst_to_any, (struct monst *));
+E anything *FDECL(obj_to_any, (struct obj *));
 E boolean FDECL(revive_nasty, (int, int, const char*));
 E void FDECL(movobj, (struct obj *, XCHAR_P, XCHAR_P));
 E boolean FDECL(may_dig, (XCHAR_P, XCHAR_P));
 E boolean FDECL(may_passwall, (XCHAR_P, XCHAR_P));
 E boolean FDECL(bad_rock, (struct permonst *, XCHAR_P, XCHAR_P));
+E int FDECL(cant_squeeze_thru, (struct monst *));
 E boolean FDECL(invocation_pos, (XCHAR_P, XCHAR_P));
 E boolean FDECL(test_move, (int, int, int, int, int));
 E void NDECL(domove);
 E void NDECL(invocation_message);
+E void NDECL(switch_terrain);
 E void FDECL(wounds_message, (struct monst *));
 E char *FDECL(mon_wounds, (struct monst *));
 E void FDECL(spoteffects, (BOOLEAN_P));
@@ -811,7 +874,7 @@ E int NDECL(near_capacity);
 E int FDECL(calc_capacity, (int));
 E int NDECL(max_capacity);
 E boolean FDECL(check_capacity, (const char *));
-E int NDECL(inv_cnt);
+E int FDECL(inv_cnt, (BOOLEAN_P));
 E long FDECL(money_cnt, (struct obj *));
 
 /* ### hacklib.c ### */
@@ -823,14 +886,17 @@ E char FDECL(lowc, (CHAR_P));
 E char *FDECL(lcase, (char *));
 E char *FDECL(upstart, (char *));
 E char *FDECL(mungspaces, (char *));
+E char *FDECL(trimspaces, (char *));
 E char *FDECL(eos, (char *));
 E void FDECL(sanitizestr, (char *));
 E char *FDECL(strkitten, (char *, CHAR_P));
+E void FDECL(copynchars, (char *, const char *, int));
 E char *FDECL(s_suffix, (const char *));
 E char *FDECL(xcrypt, (const char *, char *));
 E boolean FDECL(onlyspace, (const char *));
 E char *FDECL(tabexpand, (char *));
 E char *FDECL(visctrl, (CHAR_P));
+E char *FDECL(strsubst, (char *, const char *, const char *));
 E const char *FDECL(ordin, (int));
 E char *FDECL(sitoa, (int));
 E int FDECL(sgn, (int));
@@ -870,6 +936,11 @@ E char *FDECL(iso8601, (time_t));
 E char *FDECL(iso8601_duration, (long));
 E char *FDECL(get_formatted_time, (time_t, const char *));
 E time_t NDECL(current_epoch);
+E void FDECL(strbuf_init, (strbuf_t *));
+E void FDECL(strbuf_append, (strbuf_t *, const char *));
+E void FDECL(strbuf_reserve, (strbuf_t *, int));
+E void FDECL(strbuf_empty, (strbuf_t *));
+E void FDECL(strbuf_nl_to_crlf, (strbuf_t *));
 
 /* ### invent.c ### */
 
@@ -892,6 +963,7 @@ E void FDECL(freeinv, (struct obj *));
 E void FDECL(delallobj, (int, int));
 E void FDECL(delobj, (struct obj *));
 E struct obj *FDECL(sobj_at, (int, int, int));
+E struct obj *FDECL(nxtobj, (struct obj *, int, BOOLEAN_P));
 E struct obj *FDECL(carrying, (int));
 E boolean NDECL(have_lizard);
 E struct obj *FDECL(o_on, (unsigned int, struct obj *));
@@ -922,6 +994,7 @@ E int NDECL(dolook);
 E boolean FDECL(will_feel_cockatrice, (struct obj *, BOOLEAN_P));
 E void FDECL(feel_cockatrice, (struct obj *, BOOLEAN_P));
 E void FDECL(stackobj, (struct obj *));
+E boolean FDECL(mergable, (struct obj *, struct obj *));
 E int NDECL(doprgold);
 E int NDECL(doprwep);
 E int NDECL(doprarm);
@@ -938,6 +1011,7 @@ E int FDECL(count_objects, (struct obj *));
 E int FDECL(count_unidentified, (struct obj *));
 E int FDECL(count_unpaid, (struct obj *));
 E int FDECL(count_buc, (struct obj *, int));
+E long FDECL(count_contents, (struct obj *, BOOLEAN_P, BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
 E void FDECL(carry_obj_effects, (struct obj *));
 E const char *FDECL(currency, (long));
 E void FDECL(silly_thing, (const char *, struct obj *));
@@ -962,13 +1036,17 @@ E int NDECL(dosuspend);
 
 /* ### light.c ### */
 
-E void FDECL(new_light_source, (XCHAR_P, XCHAR_P, int, int, genericptr_t));
-E void FDECL(del_light_source, (int, genericptr_t));
+E void FDECL(new_light_source, (XCHAR_P, XCHAR_P, int, int, ANY_P *));
+E void FDECL(del_light_source, (int, ANY_P *));
 E void FDECL(do_light_sources, (char **));
+E void FDECL(show_transient_light, (struct obj *, int, int));
+E void NDECL(transient_light_cleanup);
 E struct monst *FDECL(find_mid, (unsigned, unsigned));
 E void FDECL(save_light_sources, (int, int, int));
 E void FDECL(restore_light_sources, (int));
+E void FDECL(light_stats, (const char *, char *, long *, long *));
 E void FDECL(relink_light_sources, (BOOLEAN_P));
+E void NDECL(light_sources_sanity_check);
 E void FDECL(obj_move_light_source, (struct obj *, struct obj *));
 E boolean NDECL(any_light_source);
 E void FDECL(snuff_light_source, (int, int));
@@ -976,7 +1054,10 @@ E boolean FDECL(obj_sheds_light, (struct obj *));
 E boolean FDECL(obj_is_burning, (struct obj *));
 E void FDECL(obj_split_light_source, (struct obj *, struct obj *));
 E void FDECL(obj_merge_light_sources, (struct obj *, struct obj *));
+E void FDECL(obj_adjust_light_radius, (struct obj *, int));
 E int FDECL(candle_light_range, (struct obj *));
+E int FDECL(arti_light_radius, (struct obj *));
+E const char *FDECL(arti_light_description, (struct obj *));
 #ifdef WIZARD
 E int NDECL(wiz_light_sources);
 #endif
@@ -990,6 +1071,7 @@ E int NDECL(picklock);
 E boolean FDECL(picking_lock, (int *, int *));
 E boolean FDECL(picking_at, (int, int));
 E void NDECL(reset_pick);
+E void FDECL(maybe_reset_pick, (struct obj *));
 E int FDECL(pick_lock, (struct obj *, int, int, BOOLEAN_P));
 E int NDECL(doforce);
 E boolean FDECL(boxlock, (struct obj *, struct obj *));
@@ -1055,19 +1137,29 @@ E void NDECL(maybe_hint);
 
 /* ### makemon.c ### */
 
+E void NDECL(mon_sanity_check);
+E void FDECL(dealloc_monst, (struct monst *));
 E boolean FDECL(is_home_elemental, (struct permonst *));
 E struct monst *FDECL(clone_mon, (struct monst *, XCHAR_P, XCHAR_P));
+E int FDECL(monhp_per_lvl, (struct monst *));
+E void FDECL(newmonhp, (struct monst *, int));
+E struct mextra *NDECL(newmextra);
+E void FDECL(copy_mextra, (struct monst *, struct monst *));
+E void FDECL(dealloc_mextra, (struct monst *));
 E struct monst *FDECL(makemon, (struct permonst *, int, int, int));
 E boolean FDECL(create_critters, (int, struct permonst *));
 E struct permonst *NDECL(rndmonst);
 E void FDECL(reset_rndmonst, (int));
 E struct permonst *FDECL(mkclass, (CHAR_P, int));
+E struct permonst *FDECL(mkclass_aligned, (CHAR_P, int, ALIGNTYP_P));
 E int FDECL(adj_lev, (struct permonst *));
 E struct permonst *FDECL(grow_up, (struct monst *, struct monst *));
 E int FDECL(mongets, (struct monst *, int));
 E int FDECL(golemhp, (int));
 E boolean FDECL(peace_minded, (struct permonst *));
 E void FDECL(set_malign, (struct monst *));
+E void FDECL(newmcorpsenm, (struct monst *));
+E void FDECL(freemcorpsenm, (struct monst *));
 E void FDECL(set_mimic_sym, (struct monst *));
 E int FDECL(mbirth_limit, (int));
 E void FDECL(mimic_hit_msg, (struct monst *, SHORT_P));
@@ -1078,10 +1170,12 @@ E void FDECL(create_camera_demon, (struct obj *, int, int));
 E int NDECL(min_monster_difficulty);
 E int NDECL(max_monster_difficulty);
 E boolean FDECL(prohibited_by_generation_flags, (struct permonst *));
+E boolean FDECL(usmellmon, (struct permonst *));
 
 /* ### mapglyph.c ### */
 
 E void FDECL(mapglyph, (int, glyph_t *, int *, unsigned *, int, int));
+extern glyph_t get_monsym(int glyph);
 
 /* ### mcastu.c ### */
 
@@ -1092,7 +1186,6 @@ E int FDECL(buzzmu, (struct monst *, struct attack *));
 
 E int FDECL(fightm, (struct monst *));
 E int FDECL(mattackm, (struct monst *, struct monst *));
-E int FDECL(noattacks, (struct permonst *));
 E int FDECL(sleep_monst, (struct monst *, int, int));
 E void FDECL(slept_monst, (struct monst *));
 E long FDECL(attk_protection, (int));
@@ -1118,7 +1211,10 @@ E void FDECL(spore_dies, (struct monst *));
 
 /* ### minion.c ### */
 
-E void FDECL(msummon, (struct monst *));
+E void FDECL(newemin, (struct monst *));
+E void FDECL(free_emin, (struct monst *));
+E int FDECL(monster_census, (BOOLEAN_P));
+E int FDECL(msummon, (struct monst *));
 E void FDECL(summon_minion, (ALIGNTYP_P, BOOLEAN_P));
 E int FDECL(demon_talk, (struct monst *));
 E long FDECL(bribe, (struct monst *));
@@ -1127,6 +1223,8 @@ E int FDECL(dlord, (ALIGNTYP_P));
 E int NDECL(llord);
 E int FDECL(ndemon, (ALIGNTYP_P));
 E int NDECL(lminion);
+E void FDECL(lose_guardian_angel, (struct monst *));
+E void NDECL(gain_guardian_angel);
 
 /* ### mklev.c ### */
 
@@ -1189,11 +1287,27 @@ E void FDECL(fill_advent_calendar, (boolean));
 
 /* ### mkobj.c ### */
 
+E struct oextra *NDECL(newoextra);
+E void FDECL(copy_oextra, (struct obj *, struct obj *));
+E void FDECL(dealloc_oextra, (struct obj *));
+E void FDECL(newomonst, (struct obj *));
+E void FDECL(free_omonst, (struct obj *));
+E void FDECL(newomid, (struct obj *));
+E void FDECL(free_omid, (struct obj *));
+E void FDECL(newolong, (struct obj *));
+E void FDECL(free_olong, (struct obj *));
+E void FDECL(new_omailcmd, (struct obj *, const char *));
+E void FDECL(free_omailcmd, (struct obj *));
 E struct obj *FDECL(mkobj_at, (CHAR_P, int, int, BOOLEAN_P));
+E void FDECL(costly_alteration, (struct obj *, int));
 E struct obj *FDECL(mksobj_at, (int, int, int, BOOLEAN_P, BOOLEAN_P));
+E struct obj *FDECL(mksobj_migr_to_species, (int, unsigned, BOOLEAN_P, BOOLEAN_P));
 E struct obj *FDECL(mkobj, (CHAR_P, BOOLEAN_P));
 E int NDECL(rndmonnum);
+E boolean FDECL(bogon_is_pname, (CHAR_P));
 E struct obj *FDECL(splitobj, (struct obj *, long));
+E struct obj *FDECL(unsplitobj, (struct obj *));
+E void NDECL(clear_splitobjs);
 E void FDECL(replace_object, (struct obj *, struct obj *));
 E void FDECL(bill_dummy_object, (struct obj *));
 E struct obj *FDECL(mksobj, (int, BOOLEAN_P, BOOLEAN_P));
@@ -1209,12 +1323,14 @@ E struct obj *FDECL(mk_named_object,
                     (int, struct permonst *, int, int, const char *));
 E struct obj *FDECL(rnd_treefruit_at, (int, int));
 E void FDECL(rnd_treesticks_at, (int, int));
+E void FDECL(set_corpsenm, (struct obj *, int));
 E void FDECL(start_corpse_timeout, (struct obj *));
 E void FDECL(bless, (struct obj *));
 E void FDECL(unbless, (struct obj *));
 E void FDECL(curse, (struct obj *));
 E void FDECL(uncurse, (struct obj *));
 E void FDECL(blessorcurse, (struct obj *, int));
+E void FDECL(set_bknown, (struct obj *, unsigned));
 E boolean FDECL(is_flammable, (struct obj *));
 E boolean FDECL(is_rottable, (struct obj *));
 E void FDECL(place_object, (struct obj *, int, int));
@@ -1234,6 +1350,12 @@ E int do_stair_travel(char);
 #ifdef WIZARD
 E void NDECL(obj_sanity_check);
 #endif
+E struct obj *FDECL(obj_nexto, (struct obj *));
+E struct obj *FDECL(obj_nexto_xy, (struct obj *, int, int, BOOLEAN_P));
+E struct obj *FDECL(obj_absorb, (struct obj **, struct obj **));
+E struct obj *FDECL(obj_meld, (struct obj **, struct obj **));
+E void FDECL(pudding_merge_message, (struct obj *, struct obj *));
+E struct obj *FDECL(init_dummyobj, (struct obj *, SHORT_P, long));
 
 /* ### mkroom.c ### */
 
@@ -1254,6 +1376,7 @@ E struct permonst *NDECL(courtmon);
 E void FDECL(save_rooms, (int));
 E void FDECL(rest_rooms, (int));
 E struct mkroom *FDECL(search_special, (SCHAR_P));
+E int FDECL(cmap_to_type, (int));
 
 /* #### mksheol.c ### */
 
@@ -1279,10 +1402,11 @@ E boolean FDECL(can_carry, (struct monst *, struct obj *));
 E int FDECL(mfndpos, (struct monst *, coord *, long *, long));
 E boolean FDECL(monnear, (struct monst *, int, int));
 E void NDECL(dmonsfree);
+E void FDECL(elemental_clog, (struct monst *));
 E int FDECL(mcalcmove, (struct monst*));
 E void NDECL(mcalcdistress);
 E void FDECL(replmon, (struct monst *, struct monst *));
-E void FDECL(relmon, (struct monst *));
+E void FDECL(relmon, (struct monst *, struct monst **));
 E struct obj *FDECL(mlifesaver, (struct monst *));
 E boolean FDECL(corpse_chance, (struct monst *, struct monst *, BOOLEAN_P));
 #ifdef WEBB_DISINT
@@ -1297,6 +1421,7 @@ E void FDECL(unstuck, (struct monst *));
 E void FDECL(killed, (struct monst *));
 E void FDECL(xkilled, (struct monst *, int));
 E void FDECL(mon_to_stone, (struct monst*));
+E void FDECL(m_into_limbo, (struct monst *));
 E void FDECL(mnexto, (struct monst *));
 E boolean FDECL(mnearto, (struct monst *, XCHAR_P, XCHAR_P, BOOLEAN_P));
 E void FDECL(poisontell, (int));
@@ -1310,6 +1435,7 @@ E void FDECL(seemimic, (struct monst *));
 E void NDECL(rescham);
 E void NDECL(restartcham);
 E void FDECL(restore_cham, (struct monst *));
+E boolean FDECL(hideunder, (struct monst *));
 E void FDECL(mon_animal_list, (BOOLEAN_P));
 E int FDECL(newcham, (struct monst *, struct permonst *, BOOLEAN_P, BOOLEAN_P));
 E int FDECL(can_be_hatched, (int));
@@ -1320,12 +1446,14 @@ E void FDECL(kill_monster_on_level, (int));
 E void FDECL(golemeffects, (struct monst *, int, int));
 E boolean FDECL(angry_guards, (BOOLEAN_P));
 E void NDECL(pacify_guards);
+E void FDECL(decide_to_shapeshift, (struct monst *, int));
 
 /* ### mondata.c ### */
 
-E void FDECL(set_mon_data, (struct monst *, struct permonst *, int));
+E void FDECL(set_mon_data, (struct monst *, struct permonst *));
 E struct attack *FDECL(attacktype_fordmg, (struct permonst *, int, int));
 E boolean FDECL(attacktype, (struct permonst *, int));
+E boolean FDECL(noattacks, (struct permonst *));
 E boolean FDECL(poly_when_stoned, (struct permonst *));
 E boolean FDECL(resists_drli, (struct monst *));
 E boolean FDECL(resists_magm, (struct monst *));
@@ -1333,20 +1461,23 @@ E boolean FDECL(resists_blnd, (struct monst *));
 E boolean FDECL(can_blnd, (struct monst *, struct monst *, UCHAR_P, struct obj *));
 E boolean FDECL(ranged_attk, (struct permonst *));
 E boolean FDECL(hates_silver, (struct permonst *));
+E boolean FDECL(mon_hates_silver, (struct monst *));
 E boolean FDECL(passes_bars, (struct permonst *));
 E boolean FDECL(can_track, (struct permonst *));
 E boolean FDECL(breakarm, (struct permonst *));
 E boolean FDECL(sliparm, (struct permonst *));
 E boolean FDECL(sticks, (struct permonst *));
+E boolean FDECL(cantvomit, (struct permonst *));
 E int FDECL(num_horns, (struct permonst *));
 /* E boolean FDECL(canseemon, (struct monst *)); */
 E struct attack *FDECL(dmgtype_fromattack, (struct permonst *, int, int));
 E boolean FDECL(dmgtype, (struct permonst *, int));
 E int FDECL(max_passive_dmg, (struct monst *, struct monst *));
+E boolean FDECL(same_race, (struct permonst *, struct permonst *));
 E int FDECL(monsndx, (struct permonst *));
 E int FDECL(name_to_mon, (const char *));
 E int FDECL(gender, (struct monst *));
-E int FDECL(pronoun_gender, (struct monst *));
+E int FDECL(pronoun_gender, (struct monst *, BOOLEAN_P));
 E boolean FDECL(levl_follower, (struct monst *));
 E int FDECL(little_to_big, (int));
 E int FDECL(big_to_little, (int));
@@ -1354,11 +1485,13 @@ E const char *FDECL(locomotion, (const struct permonst *, const char *));
 E const char *FDECL(stagger, (const struct permonst *, const char *));
 E const char *FDECL(on_fire, (struct permonst *, struct attack *));
 E const struct permonst *FDECL(raceptr, (struct monst *));
+E boolean FDECL(olfaction, (struct permonst *));
 
 /* ### monmove.c ### */
 
 E boolean FDECL(itsstuck, (struct monst *));
 E boolean FDECL(mb_trapped, (struct monst *));
+E boolean FDECL(mon_has_key, (struct monst *, BOOLEAN_P));
 E void FDECL(mon_regen, (struct monst *, BOOLEAN_P));
 E int FDECL(dochugw, (struct monst *));
 E boolean FDECL(onscary, (int, int, struct monst *));
@@ -1369,6 +1502,7 @@ E boolean FDECL(closed_door, (int, int));
 E boolean FDECL(accessible, (int, int));
 E void FDECL(set_apparxy, (struct monst *));
 E boolean FDECL(can_ooze, (struct monst *));
+E boolean FDECL(can_fog, (struct monst *));
 
 /* ### monst.c ### */
 
@@ -1438,14 +1572,15 @@ E void FDECL(Delay, (int));
 
 /* ### mthrowu.c ### */
 
-E int FDECL(thitu, (int, int, struct obj *, const char *));
+E int FDECL(thitu, (int, int, struct obj **, const char *));
 E int FDECL(ohitmon, (struct monst *, struct obj *, int, BOOLEAN_P));
 E void FDECL(thrwmu, (struct monst *));
 E int FDECL(spitmu, (struct monst *, struct attack *));
 E int FDECL(breamu, (struct monst *, struct attack *));
-E boolean FDECL(linedup, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
+E boolean FDECL(linedup, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, int));
 E boolean FDECL(lined_up, (struct monst *));
 E struct obj *FDECL(m_carrying, (struct monst *, int));
+E void FDECL(m_useupall, (struct monst *, struct obj *));
 E void FDECL(m_useup, (struct monst *, struct obj *));
 E void FDECL(m_throw, (struct monst *, int, int, int, int, int, struct obj *));
 E boolean FDECL(hits_bars, (struct obj **, int, int, int, int, int, int));
@@ -1469,6 +1604,7 @@ E int FDECL(rnd_misc_item, (struct monst *));
 E boolean FDECL(searches_for_item, (struct monst *, struct obj *));
 E boolean FDECL(mon_reflects, (struct monst *, const char *));
 E boolean FDECL(ureflects, (const char *, const char *));
+E void FDECL(mcureblindness, (struct monst *, BOOLEAN_P));
 E boolean FDECL(munstone, (struct monst *, BOOLEAN_P));
 
 /* ### music.c ### */
@@ -1526,12 +1662,14 @@ E void NDECL(objects_init);
 E char *FDECL(obj_typename, (int));
 E char *FDECL(simple_typename, (int));
 E char *FDECL(dump_typename, (int));
+E char *FDECL(safe_typename, (int));
 E boolean FDECL(obj_is_pname, (struct obj *));
 E char *FDECL(distant_name, (struct obj *, char *(*)(OBJ_P)));
 E char *FDECL(fruitname, (BOOLEAN_P));
 E char *FDECL(xname, (struct obj *));
 E char *FDECL(mshot_xname, (struct obj *));
 E boolean FDECL(the_unique_obj, (struct obj *obj));
+E boolean FDECL(erosion_matters, (struct obj *));
 E char *FDECL(doname, (struct obj *));
 E char *FDECL(doname_with_price, (struct obj *));
 E boolean FDECL(not_fully_identified, (struct obj *));
@@ -1541,12 +1679,15 @@ E char *FDECL(cxname, (struct obj *));
 E char *FDECL(cxname2, (struct obj *));
 #endif
 E char *FDECL(killer_xname, (struct obj *));
+E char *FDECL(short_oname, (struct obj *, char *(*)(OBJ_P), char *(*)(OBJ_P), unsigned));
 E const char *FDECL(singular, (struct obj *, char *(*)(OBJ_P)));
 E char *FDECL(an, (const char *));
 E char *FDECL(An, (const char *));
 E char *FDECL(The, (const char *));
 E char *FDECL(the, (const char *));
 E char *FDECL(aobjnam, (struct obj *, const char *));
+E char *FDECL(yobjnam, (struct obj *, const char *));
+E char *FDECL(Yobjnam2, (struct obj *, const char *));
 E char *FDECL(Tobjnam, (struct obj *, const char *));
 E char *FDECL(otense, (struct obj *, const char *));
 E char *FDECL(vtense, (const char *, const char *));
@@ -1555,12 +1696,19 @@ E char *FDECL(yname, (struct obj *));
 E char *FDECL(Yname2, (struct obj *));
 E char *FDECL(ysimple_name, (struct obj *));
 E char *FDECL(Ysimple_name2, (struct obj *));
+E char *FDECL(simpleonames, (struct obj *));
+E char *FDECL(ansimpleoname, (struct obj *));
+E char *FDECL(thesimpleoname, (struct obj *));
+E char *FDECL(bare_artifactname, (struct obj *));
 E char *FDECL(makeplural, (const char *));
 E char *FDECL(makesingular, (const char *));
 E struct obj *FDECL(readobjnam, (char *, struct obj *, BOOLEAN_P));
 E int FDECL(rnd_class, (int, int));
 E const char *FDECL(cloak_simple_name, (struct obj *));
+E const char *FDECL(helm_simple_name, (struct obj *));
 E const char *FDECL(mimic_obj_name, (struct monst *));
+E char *FDECL(safe_qbuf, (char *, const char *, const char *, struct obj *,
+                          char *(*)(OBJ_P), char *(*)(OBJ_P), const char *));
 
 /* ### options.c ### */
 
@@ -1597,6 +1745,8 @@ E const char * FDECL(clr2colorname, (int));
 
 /* ### pager.c ### */
 
+E void FDECL(mhidden_description, (struct monst *, BOOLEAN_P, char *));
+E boolean FDECL(object_from_map, (int,int,int,struct obj **));
 E int NDECL(dowhatis);
 E int NDECL(doquickwhatis);
 E int NDECL(doidtrap);
@@ -1682,9 +1832,8 @@ E int NDECL(doloot);
 E int NDECL(dotip);
 E int FDECL(use_container, (struct obj *, int));
 E int FDECL(loot_mon, (struct monst *, int *, boolean *));
-E const char *FDECL(safe_qbuf, (const char *, unsigned,
-                                const char *, const char *, const char *));
 E boolean FDECL(is_autopickup_exception, (struct obj *, BOOLEAN_P));
+E boolean FDECL(autopick_testobj, (struct obj *, BOOLEAN_P));
 
 /* ### pline.c ### */
 
@@ -1698,6 +1847,7 @@ E void VDECL(Your, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(You_feel, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(You_cant, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(You_hear, (const char *, ...)) PRINTF_F(1, 2);
+E void VDECL(You_see, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(pline_The, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(There, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(verbalize, (const char *, ...)) PRINTF_F(1, 2);
@@ -1713,6 +1863,7 @@ E void NDECL(self_invis_message);
 
 E void NDECL(init_uasmon);
 E void NDECL(set_uasmon);
+E void NDECL(float_vs_flight);
 E void NDECL(change_sex);
 E void FDECL(polyself, (BOOLEAN_P));
 E int FDECL(polymon, (int));
@@ -1740,6 +1891,8 @@ E void FDECL(make_confused, (long, BOOLEAN_P));
 E void FDECL(make_stunned, (long, BOOLEAN_P));
 E void FDECL(make_blinded, (long, BOOLEAN_P));
 E void FDECL(make_sick, (long, const char *, BOOLEAN_P, int));
+E void FDECL(make_slimed, (long, const char *));
+E void FDECL(make_stoned, (long, const char *, int, const char *));
 E void FDECL(make_vomiting, (long, BOOLEAN_P));
 E boolean FDECL(make_hallucinated, (long, BOOLEAN_P, long));
 E int NDECL(dodrink);
@@ -1783,12 +1936,15 @@ E int NDECL(in_trouble);
 E int FDECL(move_special, (struct monst *, BOOLEAN_P, SCHAR_P, BOOLEAN_P, BOOLEAN_P,
                            XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
 E char FDECL(temple_occupied, (char *));
+E boolean FDECL(inhistemple, (struct monst *));
 E int FDECL(pri_move, (struct monst *));
 E void FDECL(priestini, (d_level *, struct mkroom *, int, int, BOOLEAN_P));
+E aligntyp FDECL(mon_aligntyp, (struct monst *));
 E char *FDECL(priestname, (struct monst *, char *));
 E boolean FDECL(p_coaligned, (struct monst *));
 E struct monst *FDECL(findpriest, (CHAR_P));
 E void FDECL(intemple, (int));
+E void FDECL(forget_temple_entry, (struct monst *));
 E void FDECL(priest_talk, (struct monst *));
 E struct monst *FDECL(mk_roamer, (struct permonst *, ALIGNTYP_P,
                                   XCHAR_P, XCHAR_P, BOOLEAN_P));
@@ -1798,6 +1954,9 @@ E void FDECL(ghod_hitsu, (struct monst *));
 E void NDECL(angry_priest);
 E void NDECL(clearpriests);
 E void FDECL(restpriest, (struct monst *, BOOLEAN_P));
+E void FDECL(newepri, (struct monst *));
+E void FDECL(free_epri, (struct monst *));
+E char *FDECL(piousness, (BOOLEAN_P, const char *));
 
 /* ### quest.c ### */
 
@@ -1850,7 +2009,7 @@ E void FDECL(litroom, (BOOLEAN_P, struct obj *));
 E void FDECL(do_genocide, (int, BOOLEAN_P));
 E void FDECL(punish, (struct obj *));
 E void NDECL(unpunish);
-E boolean FDECL(cant_create, (int *, BOOLEAN_P));
+E boolean FDECL(cant_revive, (int *, BOOLEAN_P, struct obj *));
 #ifdef WIZARD
 E boolean NDECL(create_particular);
 #endif
@@ -1980,8 +2139,11 @@ E void NDECL(freedynamicdata);
 
 /* ### shk.c ### */
 
+E void FDECL(neweshk, (struct monst *));
+E void FDECL(free_eshk, (struct monst *));
 E long FDECL(money2mon, (struct monst *, long));
 E void FDECL(money2u, (struct monst *, long));
+E char *FDECL(Shknam, (struct monst *));
 E char *FDECL(shkname, (struct monst *));
 E void FDECL(shkgone, (struct monst *));
 E void FDECL(set_residency, (struct monst *, BOOLEAN_P));
@@ -1991,26 +2153,30 @@ E char FDECL(inside_shop, (XCHAR_P, XCHAR_P));
 E void FDECL(u_left_shop, (char *, BOOLEAN_P));
 E void FDECL(remote_burglary, (XCHAR_P, XCHAR_P));
 E void FDECL(u_entered_shop, (char *));
+E void FDECL(pick_pick, (struct obj *));
 E boolean FDECL(same_price, (struct obj *, struct obj *));
 E void NDECL(shopper_financial_report);
 E int FDECL(inhishop, (struct monst *));
 E struct monst *FDECL(shop_keeper, (CHAR_P));
 E boolean FDECL(tended_shop, (struct mkroom *));
+E boolean FDECL(is_unpaid, (struct obj *));
 E void FDECL(delete_contents, (struct obj *));
 E void FDECL(obfree, (struct obj *, struct obj *));
 E void FDECL(home_shk, (struct monst *, BOOLEAN_P));
 E void FDECL(make_happy_shk, (struct monst *, BOOLEAN_P));
+E void FDECL(make_happy_shoppers, (BOOLEAN_P));
 E void FDECL(hot_pursuit, (struct monst *));
 E void FDECL(make_angry_shk, (struct monst *, XCHAR_P, XCHAR_P));
 E int NDECL(dopay);
-E boolean FDECL(paybill, (int));
+E boolean FDECL(paybill, (int, BOOLEAN_P));
 E void NDECL(finish_paybill);
 E struct obj *FDECL(find_oid, (unsigned));
 E long FDECL(contained_cost, (struct obj *, struct monst *, long, BOOLEAN_P, BOOLEAN_P));
 E long FDECL(contained_gold, (struct obj *));
 E void FDECL(picked_container, (struct obj *));
-E long FDECL(unpaid_cost, (struct obj *));
-E void FDECL(bill_box_content, (struct obj *, BOOLEAN_P));
+E void FDECL(alter_cost, (struct obj *, long));
+E long FDECL(unpaid_cost, (struct obj *, BOOLEAN_P));
+E boolean FDECL(billable, (struct monst **, struct obj *, CHAR_P, BOOLEAN_P));
 E void FDECL(addtobill, (struct obj *, BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
 E void FDECL(append_honorific, (char *));
 E void FDECL(splitbill, (struct obj *, struct obj *));
@@ -2035,6 +2201,7 @@ E void FDECL(check_unpaid_usage, (struct obj *, BOOLEAN_P));
 E void FDECL(check_unpaid, (struct obj *));
 E void FDECL(costly_gold, (XCHAR_P, XCHAR_P, long));
 E long FDECL(get_cost_of_shop_item, (struct obj *));
+E int FDECL(oid_price_adjustment, (struct obj *, unsigned));
 E boolean FDECL(block_door, (XCHAR_P, XCHAR_P));
 E boolean FDECL(block_entry, (XCHAR_P, XCHAR_P));
 #ifdef BLACKMARKET
@@ -2051,6 +2218,7 @@ E void FDECL(stock_room, (int, struct mkroom *));
 E boolean FDECL(saleable, (struct monst *, struct obj *));
 E int FDECL(get_shop_item, (int));
 E void NDECL(shop_selection_init);
+E boolean FDECL(is_izchak, (struct monst *, BOOLEAN_P));
 
 /* ### sit.c ### */
 
@@ -2091,6 +2259,7 @@ E boolean FDECL(load_special, (const char *));
 
 /* ### spell.c ### */
 
+E void FDECL(book_cursed, (struct obj *));
 #ifdef USE_TRAMPOLI
 E int NDECL(learn);
 #endif
@@ -2118,6 +2287,7 @@ E void FDECL(remove_worn_item, (struct obj *, BOOLEAN_P));
 E int FDECL(steal, (struct monst *, char *));
 E int FDECL(mpickobj, (struct monst *, struct obj *));
 E void FDECL(stealamulet, (struct monst *));
+E void FDECL(mdrop_obj, (struct monst *, struct obj *, BOOLEAN_P));
 E void FDECL(mdrop_special_objs, (struct monst *));
 E void FDECL(relobj, (struct monst *, int, BOOLEAN_P));
 E struct obj *FDECL(findgold, (struct obj *));
@@ -2128,6 +2298,7 @@ E struct obj *FDECL(findgold, (struct obj *));
 E void NDECL(rider_cant_reach);
 E boolean FDECL(can_saddle, (struct monst *));
 E int FDECL(use_saddle, (struct obj *));
+E void FDECL(put_saddle_on_mon, (struct obj *, struct monst *));
 E boolean FDECL(can_ride, (struct monst *));
 E int NDECL(doride);
 E boolean FDECL(mount_steed, (struct monst *, BOOLEAN_P));
@@ -2152,7 +2323,7 @@ E int NDECL(dotele);
 E void NDECL(level_tele);
 E void FDECL(domagicportal, (struct trap *));
 E void FDECL(tele_trap, (struct trap *));
-E void FDECL(level_tele_trap, (struct trap *));
+E void FDECL(level_tele_trap, (struct trap *, unsigned));
 E void FDECL(rloc_to, (struct monst *, int, int));
 E boolean FDECL(rloc, (struct monst *, BOOLEAN_P));
 E boolean FDECL(tele_restrict, (struct monst *));
@@ -2178,24 +2349,30 @@ E void FDECL(substitute_tiles, (d_level *));
 E void NDECL(burn_away_slime);
 E void NDECL(nh_timeout);
 E void FDECL(fall_asleep, (int, BOOLEAN_P));
-E void FDECL(attach_egg_hatch_timeout, (struct obj *));
+E void FDECL(attach_egg_hatch_timeout, (struct obj *, long));
 E void FDECL(attach_fig_transform_timeout, (struct obj *));
 E void FDECL(kill_egg, (struct obj *));
-E void FDECL(hatch_egg, (genericptr_t, long));
+E void FDECL(hatch_egg, (ANY_P *, long));
 E void FDECL(learn_egg_type, (int));
-E void FDECL(burn_object, (genericptr_t, long));
+E void FDECL(burn_object, (ANY_P *, long));
 E void FDECL(begin_burn, (struct obj *, BOOLEAN_P));
 E void FDECL(end_burn, (struct obj *, BOOLEAN_P));
 E void NDECL(do_storms);
-E boolean FDECL(start_timer, (long, SHORT_P, SHORT_P, genericptr_t));
-E long FDECL(stop_timer, (SHORT_P, genericptr_t));
+E boolean FDECL(start_timer, (long, SHORT_P, SHORT_P, ANY_P *));
+E long FDECL(stop_timer, (SHORT_P, ANY_P *));
+E long FDECL(peek_timer, (SHORT_P, ANY_P *));
 E void NDECL(run_timers);
 E void FDECL(obj_move_timers, (struct obj *, struct obj *));
 E void FDECL(obj_split_timers, (struct obj *, struct obj *));
 E void FDECL(obj_stop_timers, (struct obj *));
+E boolean FDECL(obj_has_timer, (struct obj *, SHORT_P));
+E void FDECL(spot_stop_timers, (XCHAR_P, XCHAR_P, SHORT_P));
+E long FDECL(spot_time_expires, (XCHAR_P, XCHAR_P, SHORT_P));
+E long FDECL(spot_time_left, (XCHAR_P, XCHAR_P, SHORT_P));
 E boolean FDECL(obj_is_local, (struct obj *));
 E void FDECL(save_timers, (int, int, int));
 E void FDECL(restore_timers, (int, int, BOOLEAN_P, long));
+E void FDECL(timer_stats, (const char *, char *, long *, long *));
 E void FDECL(relink_timers, (BOOLEAN_P));
 #ifdef WIZARD
 E int NDECL(wiz_timeout_queue);
@@ -2227,8 +2404,11 @@ E void FDECL(fall_through, (BOOLEAN_P));
 E struct monst *FDECL(animate_statue, (struct obj *, XCHAR_P, XCHAR_P, int, int *));
 E struct monst *FDECL(activate_statue_trap,
                       (struct trap *, XCHAR_P, XCHAR_P, BOOLEAN_P));
+E void FDECL(set_utrap, (unsigned, unsigned));
+E void FDECL(reset_utrap, (BOOLEAN_P));
 E void FDECL(dotrap, (struct trap *, unsigned));
 E void FDECL(seetrap, (struct trap *));
+E void FDECL(feeltrap, (struct trap *));
 E int FDECL(mintrap, (struct monst *));
 E void FDECL(instapetrify, (const char *));
 E void FDECL(minstapetrify, (struct monst *, BOOLEAN_P));
@@ -2242,17 +2422,24 @@ E void NDECL(float_up);
 E void FDECL(fill_pit, (int, int));
 E int FDECL(float_down, (long, long));
 E int FDECL(fire_damage, (struct obj *, BOOLEAN_P, BOOLEAN_P, XCHAR_P, XCHAR_P));
-E boolean FDECL(water_damage, (struct obj *, BOOLEAN_P, BOOLEAN_P));
+E boolean FDECL(water_damage, (struct obj *, const char*, BOOLEAN_P, BOOLEAN_P));
+E void FDECL(water_damage_chain, (struct obj *, BOOLEAN_P));
 E boolean NDECL(drown);
 E void FDECL(drain_en, (int));
 E int NDECL(dountrap);
+E void FDECL(cnv_trap_obj, (int, int, struct trap *, BOOLEAN_P));
 E int FDECL(untrap, (BOOLEAN_P));
+E boolean FDECL(openholdingtrap, (struct monst *, boolean *));
+E boolean FDECL(closeholdingtrap, (struct monst *, boolean *));
+E boolean FDECL(openfallingtrap, (struct monst *, BOOLEAN_P, boolean *));
 E boolean FDECL(chest_trap, (struct obj *, int, BOOLEAN_P));
 E void FDECL(deltrap, (struct trap *));
 E boolean FDECL(delfloortrap, (struct trap *));
 E struct trap *FDECL(t_at, (int, int));
 E void FDECL(b_trapped, (const char *, int));
 E boolean NDECL(unconscious);
+E boolean FDECL(uteetering_at_seen_pit, (struct trap *));
+E boolean FDECL(uescaped_shaft, (struct trap *));
 E boolean NDECL(lava_effects);
 E boolean NDECL(swamp_effects);
 E void FDECL(blow_up_landmine, (struct trap *));
@@ -2270,6 +2457,7 @@ E void FDECL(check_caitiff, (struct monst *));
 E schar FDECL(find_roll_to_hit, (struct monst *));
 E boolean FDECL(attack, (struct monst *));
 E boolean FDECL(hmon, (struct monst *, struct obj *, int));
+E boolean FDECL(shade_miss, (struct monst *, struct monst *, struct obj *, boolean, boolean));
 E int FDECL(damageum, (struct monst *, struct attack *));
 E void FDECL(missum, (struct monst *, struct attack *));
 E int FDECL(passive, (struct monst *, BOOLEAN_P, int, UCHAR_P));
@@ -2336,13 +2524,19 @@ E int FDECL(hide_privileges, (BOOLEAN_P));
 
 /* ### vault.c ### */
 
+E void FDECL(newegd, (struct monst *));
+E void FDECL(free_egd, (struct monst *));
 E boolean FDECL(grddead, (struct monst *));
+E struct monst *NDECL(findgd);
+E void NDECL(vault_summon_gd);
 E char FDECL(vault_occupied, (char *));
+E void FDECL(uleftvault, (struct monst *));
 E void NDECL(invault);
 E int FDECL(gd_move, (struct monst *));
-E void NDECL(paygd);
+E void FDECL(paygd, (BOOLEAN_P));
 E long NDECL(hidden_gold);
 E boolean NDECL(gd_sound);
+E void FDECL(vault_gd_watching, (unsigned int));
 
 /* ### version.c ### */
 
@@ -2474,8 +2668,10 @@ E struct obj *FDECL(select_rwep, (struct monst *));
 E struct obj *FDECL(select_hwep, (struct monst *));
 E void FDECL(possibly_unwield, (struct monst *, BOOLEAN_P));
 E int FDECL(mon_wield_item, (struct monst *));
+E void FDECL(mwepgone, (struct monst *));
 E int NDECL(abon);
 E int NDECL(dbon);
+E void FDECL(dry_a_towel, (struct obj *, int, BOOLEAN_P));
 E int NDECL(enhance_weapon_skill);
 #ifdef DUMP_LOG
 E void NDECL(dump_weapon_skill);
@@ -2494,10 +2690,13 @@ E boolean NDECL(can_advance_something);
 /* ### were.c ### */
 
 E void FDECL(were_change, (struct monst *));
+E int FDECL(counter_were, (int));
+E int FDECL(were_beastie, (int));
 E void FDECL(new_were, (struct monst *));
 E int FDECL(were_summon, (struct permonst *, BOOLEAN_P, int *, char *));
 E void NDECL(you_were);
 E void FDECL(you_unwere, (BOOLEAN_P));
+E void FDECL(set_ulycn, (int));
 
 /* ### wield.c ### */
 
@@ -2557,11 +2756,14 @@ E void FDECL(see_wsegs, (struct monst *));
 E void FDECL(detect_wsegs, (struct monst *, BOOLEAN_P));
 E void FDECL(save_worm, (int, int));
 E void FDECL(rest_worm, (int));
-E void FDECL(place_wsegs, (struct monst *));
+E void FDECL(place_wsegs, (struct monst *, struct monst *));
+E void FDECL(sanity_check_worm, (struct monst *));
 E void FDECL(remove_worm, (struct monst *));
 E void FDECL(place_worm_tail_randomly, (struct monst *, XCHAR_P, XCHAR_P));
+E int FDECL(size_wseg, (struct monst *));
 E int FDECL(count_wsegs, (struct monst *));
 E boolean FDECL(worm_known, (struct monst *));
+E int FDECL(wseg_at, (struct monst *, int, int));
 E void FDECL(flip_worm_segs_vertical, (struct monst *, int));
 E void FDECL(flip_worm_segs_horizontal, (struct monst *, int));
 
@@ -2569,6 +2771,8 @@ E void FDECL(flip_worm_segs_horizontal, (struct monst *, int));
 
 E void FDECL(setworn, (struct obj *, long));
 E void FDECL(setnotworn, (struct obj *));
+E struct obj *FDECL(wearmask_to_obj, (long));
+E long FDECL(wearslot, (struct obj *));
 E void FDECL(mon_set_minvis, (struct monst *));
 E void FDECL(mon_adjust_speed, (struct monst *, int, struct obj *));
 E void FDECL(update_mon_intrinsics,
@@ -2579,6 +2783,8 @@ E struct obj *FDECL(which_armor, (struct monst *, long));
 E void FDECL(mon_break_armor, (struct monst *, BOOLEAN_P));
 E void FDECL(bypass_obj, (struct obj *));
 E void NDECL(clear_bypasses);
+E void FDECL(bypass_objlist, (struct obj *, BOOLEAN_P));
+E struct obj *FDECL(nxt_unbypassed_obj, (struct obj *));
 E int FDECL(racial_exception, (struct monst *, struct obj *));
 
 /* ### write.c ### */
@@ -2592,35 +2798,41 @@ E void FDECL(probe_monster, (struct monst *));
 E boolean FDECL(get_obj_location, (struct obj *, xchar *, xchar *, int));
 E boolean FDECL(get_mon_location, (struct monst *, xchar *, xchar *, int));
 E struct monst *FDECL(get_container_location, (struct obj *obj, int *, int *));
-E struct monst *FDECL(montraits, (struct obj *, coord *));
-E struct monst *FDECL(revive, (struct obj *));
+E struct monst *FDECL(montraits, (struct obj *, coord *, BOOLEAN_P));
+E struct monst *FDECL(revive, (struct obj *, BOOLEAN_P));
 E int FDECL(unturn_dead, (struct monst *));
 E void FDECL(cancel_item, (struct obj *));
-E boolean FDECL(drain_item, (struct obj *));
+E boolean FDECL(drain_item, (struct obj *, BOOLEAN_P));
 E struct obj *FDECL(poly_obj, (struct obj *, int));
 E boolean FDECL(obj_resists, (struct obj *, int, int));
 E boolean FDECL(obj_shudders, (struct obj *));
 E void FDECL(do_osshock, (struct obj *));
 E int FDECL(bhito, (struct obj *, struct obj *));
-E int FDECL(bhitpile, (struct obj *, int (*)(OBJ_P, OBJ_P), int, int));
+E int FDECL(bhitpile, (struct obj *, int (*)(OBJ_P, OBJ_P), int, int, SCHAR_P));
 E int FDECL(zappable, (struct obj *));
 E void FDECL(zapnodir, (struct obj *));
 E int NDECL(dozap);
 E int FDECL(zapyourself, (struct obj *, BOOLEAN_P));
+E void FDECL(ubreatheu, (struct attack *));
+E int FDECL(lightdamage, (struct obj *, BOOLEAN_P, int));
+E boolean FDECL(flashburn, (long));
 E boolean FDECL(cancel_monst, (struct monst *, struct obj *,
                                BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
 E void FDECL(weffects, (struct obj *));
-E int NDECL(spell_damage_bonus);
+E int FDECL(spell_damage_bonus, (int));
 E const char *FDECL(exclam, (int force));
 E void FDECL(hit, (const char *, struct monst *, const char *));
 E void FDECL(miss, (const char *, struct monst *));
 E struct monst *FDECL(bhit, (int, int, int, int, int (*)(MONST_P, OBJ_P),
                              int (*)(OBJ_P, OBJ_P), struct obj *, boolean *));
-E struct monst *FDECL(boomhit, (int, int));
-E int FDECL(burn_floor_paper, (int, int, BOOLEAN_P, BOOLEAN_P));
+E struct monst *FDECL(boomhit, (struct obj *, int, int));
+E int FDECL(zhitm, (struct monst *, int, int, struct obj **));
+E int FDECL(burn_floor_objects, (int, int, BOOLEAN_P, BOOLEAN_P));
 E void FDECL(buzz, (int, int, XCHAR_P, XCHAR_P, int, int));
-E void FDECL(melt_ice, (XCHAR_P, XCHAR_P));
-E int FDECL(zap_over_floor, (XCHAR_P, XCHAR_P, int, boolean *));
+E void FDECL(dobuzz, (int, int, XCHAR_P, XCHAR_P, int, int, BOOLEAN_P));
+E void FDECL(melt_ice, (XCHAR_P, XCHAR_P, const char *));
+E void FDECL(melt_ice_away, (ANY_P *, long));
+E int FDECL(zap_over_floor, (XCHAR_P, XCHAR_P, int, boolean *, SHORT_P));
 E void FDECL(fracture_rock, (struct obj *));
 E boolean FDECL(break_statue, (struct obj *));
 E void FDECL(destroy_item, (int, int));

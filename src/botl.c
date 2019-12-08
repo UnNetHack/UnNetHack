@@ -545,7 +545,7 @@ bot2()
 #ifdef ELBERETH
     int engr_type;
     if ((engr_type = sengr_at("Elbereth", u.ux, u.uy))) {
-        boolean feelable_engraving = (engr_type == ENGRAVE || engr_type == BURN) && can_reach_floor();
+        boolean feelable_engraving = (engr_type == ENGRAVE || engr_type == BURN) && can_reach_floor(FALSE);
         if (!Blind || feelable_engraving) {
             botl_text(1, "Elbereth", newbot2, 1);
         }

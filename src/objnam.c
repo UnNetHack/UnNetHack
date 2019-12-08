@@ -12,6 +12,8 @@
 STATIC_DCL char *FDECL(strprepend, (char *, const char *));
 static boolean FDECL(wishymatch, (const char *, const char *, BOOLEAN_P));
 static char *NDECL(nextobuf);
+STATIC_DCL void FDECL(releaseobuf, (char *));
+static char *FDECL(minimal_xname, (struct obj *));
 static void FDECL(add_erosion_words, (struct obj *, char *, BOOLEAN_P));
 #ifdef SORTLOOT
 char * FDECL(xname2, (struct obj *, boolean));
@@ -67,14 +69,30 @@ register const char *pref;
 }
 
 /* manage a pool of BUFSZ buffers, so callers don't have to */
-static char *
+static char NEARDATA obufs[NUMOBUF][BUFSZ];
+static int obufidx = 0;
+
+/* manage a pool of BUFSZ buffers, so callers don't have to */
+STATIC_OVL char *
 nextobuf()
 {
-    static char NEARDATA bufs[NUMOBUF][BUFSZ];
-    static int bufidx = 0;
+    obufidx = (obufidx + 1) % NUMOBUF;
+    return obufs[obufidx];
+}
 
-    bufidx = (bufidx + 1) % NUMOBUF;
-    return bufs[bufidx];
+/* put the most recently allocated buffer back if possible */
+STATIC_OVL void
+releaseobuf(bufp)
+char *bufp;
+{
+    /* caller may not know whether bufp is the most recently allocated
+       buffer; if it isn't, do nothing; note that because of the somewhat
+       obscure PREFIX handling for object name formatting by xname(),
+       the pointer our caller has and is passing to us might be into the
+       middle of an obuf rather than the address returned by nextobuf() */
+    if (bufp >= obufs[obufidx]
+        && bufp < obufs[obufidx] + sizeof obufs[obufidx]) /* obufs[][BUFSZ] */
+        obufidx = (obufidx - 1 + NUMOBUF) % NUMOBUF;
 }
 
 char *
@@ -182,14 +200,41 @@ int otyp;
     return p;
 }
 
+/* typename for debugging feedback where data involved might be suspect */
+char *
+safe_typename(otyp)
+int otyp;
+{
+    unsigned save_nameknown;
+    char *res = 0;
+
+    if (otyp < STRANGE_OBJECT || otyp >= NUM_OBJECTS
+        || !OBJ_NAME(objects[otyp])) {
+        res = nextobuf();
+        Sprintf(res, "glorkum[%d]", otyp);
+    } else {
+        /* force it to be treated as fully discovered */
+        save_nameknown = objects[otyp].oc_name_known;
+        objects[otyp].oc_name_known = 1;
+        res = simple_typename(otyp);
+        objects[otyp].oc_name_known = save_nameknown;
+    }
+    return res;
+}
+
 boolean
 obj_is_pname(obj)
 register struct obj *obj;
 {
-    return((boolean)(obj->dknown && obj->known && obj->onamelth &&
-                     /* Since there aren't any objects which are both
-                        artifacts and unique, the last check is redundant. */
-                     obj->oartifact && !objects[obj->otyp].oc_unique));
+    if (!obj->oartifact || !has_oname(obj)) {
+        return FALSE;
+    }
+    if (!program_state.gameover && !iflags.override_ID) {
+        if (not_fully_identified(obj)) {
+            return FALSE;
+        }
+    }
+    return TRUE;
 }
 
 /* Give the name of an object seen at a distance.  Unlike xname/doname,
@@ -295,6 +340,7 @@ boolean ignore_oquan;
     case WEAPON_CLASS:
         if (is_poisonable(obj) && obj->opoisoned)
             Strcpy(buf, "poisoned ");
+        /* fall through */
     case VENOM_CLASS:
     case TOOL_CLASS:
         if (typ == LENSES)
@@ -505,7 +551,7 @@ boolean ignore_oquan;
 #endif
     if (obj->quan != 1L) Strcpy(buf, makeplural(buf));
 
-    if (obj->onamelth && obj->dknown) {
+    if (has_oname(obj) && obj->dknown) {
         Strcat(buf, " named ");
 nameit:
         Strcat(buf, ONAME(obj));
@@ -513,6 +559,59 @@ nameit:
 
     if (!strncmpi(buf, "the ", 4)) buf += 4;
     return(buf);
+}
+
+/* similar to simple_typename but minimal_xname operates on a particular
+   object rather than its general type; it formats the most basic info:
+     potion                     -- if description not known
+     brown potion               -- if oc_name_known not set
+     potion of object detection -- if discovered
+ */
+static char *
+minimal_xname(obj)
+struct obj *obj;
+{
+    char *bufp;
+    struct obj bareobj;
+    struct objclass saveobcls;
+    int otyp = obj->otyp;
+
+    /* suppress user-supplied name */
+    saveobcls.oc_uname = objects[otyp].oc_uname;
+    objects[otyp].oc_uname = 0;
+    /* suppress actual name if object's description is unknown */
+    saveobcls.oc_name_known = objects[otyp].oc_name_known;
+    if (!obj->dknown) {
+        objects[otyp].oc_name_known = 0;
+    }
+
+    /* caveat: this makes a lot of assumptions about which fields
+       are required in order for xname() to yield a sensible result */
+    bareobj = zeroobj;
+    bareobj.otyp = otyp;
+    bareobj.oclass = obj->oclass;
+    bareobj.dknown = obj->dknown;
+    /* suppress known except for amulets (needed for fakes and real A-of-Y) */
+    bareobj.known = (obj->oclass == AMULET_CLASS)
+                        ? obj->known
+                        /* default is "on" for types which don't use it */
+                        : !objects[otyp].oc_uses_known;
+    bareobj.quan = 1L;         /* don't want plural */
+    bareobj.corpsenm = NON_PM; /* suppress statue and figurine details */
+    /* but suppressing fruit details leads to "bad fruit #0"
+       [perhaps we should force "slime mold" rather than use xname?] */
+    if (obj->otyp == SLIME_MOLD) {
+        bareobj.spe = obj->spe;
+    }
+
+    bufp = distant_name(&bareobj, xname); /* xname(&bareobj) */
+    if (!strncmp(bufp, "uncursed ", 9)) {
+        bufp += 9; /* Role_if(PM_PRIEST) */
+    }
+
+    objects[otyp].oc_uname = saveobcls.oc_uname;
+    objects[otyp].oc_name_known = saveobcls.oc_name_known;
+    return bufp;
 }
 
 /* xname() output augmented for multishot missile feedback */
@@ -587,6 +686,31 @@ boolean in_final_dump;
                 obj->rknown ? "" : "]");
 }
 
+/* used to prevent rust on items where rust makes no difference */
+boolean
+erosion_matters(obj)
+struct obj *obj;
+{
+    switch (obj->oclass) {
+    case TOOL_CLASS:
+        /* it's possible for a rusty weptool to be polymorphed into some
+           non-weptool iron tool, in which case the rust implicitly goes
+           away, but it's also possible for it to be polymorphed into a
+           non-iron tool, in which case rust also implicitly goes away,
+           so there's no particular reason to try to handle the first
+           instance differently [this comment belongs in poly_obj()...] */
+        return is_weptool(obj) ? TRUE : FALSE;
+    case WEAPON_CLASS:
+    case ARMOR_CLASS:
+    case BALL_CLASS:
+    case CHAIN_CLASS:
+        return TRUE;
+    default:
+        break;
+    }
+    return FALSE;
+}
+
 static char *
 doname_base(obj, with_price)
 register struct obj *obj;
@@ -619,7 +743,7 @@ boolean with_price;
 
     if (!dump_ID_flag)
         ; /* early exit */
-    else if (exist_artifact(obj->otyp, (tmp = ONAME(obj)))) {
+    else if (exist_artifact(obj->otyp, (tmp = (char *)safe_oname(obj)))) {
         if (do_dknown || do_known) {
             Sprintf(eos(bp), " [%s]", tmp);
         }
@@ -975,7 +1099,7 @@ ring:
     if(obj->owornmask & W_QUIVER) Strcat(bp, " (in quiver)");
     if(obj->unpaid) {
         xchar ox, oy;
-        long quotedprice = unpaid_cost(obj);
+        long quotedprice = unpaid_cost(obj, TRUE);
         struct monst *shkp = (struct monst *)0;
 
         if (Has_contents(obj) &&
@@ -1134,38 +1258,150 @@ struct obj *obj;
 {
     struct obj save_obj;
     unsigned save_ocknown;
-    char *buf, *save_ocuname;
+    char *buf, *save_ocuname, *save_oname = (char *) 0;
+
+    /* bypass object twiddling for artifacts */
+    if (obj->oartifact) {
+        return bare_artifactname(obj);
+    }
 
     /* remember original settings for core of the object;
        oname and oattached extensions don't matter here--since they
        aren't modified they don't need to be saved and restored */
     save_obj = *obj;
+    if (has_oname(obj)) {
+        save_oname = ONAME(obj);
+    }
     /* killer name should be more specific than general xname; however, exact
        info like blessed/cursed and rustproof makes things be too verbose */
     obj->known = obj->dknown = 1;
     obj->bknown = obj->rknown = obj->greased = 0;
     /* if character is a priest[ess], bknown will get toggled back on */
-    obj->blessed = obj->cursed = 0;
+    if (obj->otyp != POT_WATER) {
+        obj->blessed = obj->cursed = 0;
+    } else {
+        obj->bknown = 1; /* describe holy/unholy water as such */
+    }
     /* "killed by poisoned <obj>" would be misleading when poison is
        not the cause of death and "poisoned by poisoned <obj>" would
        be redundant when it is, so suppress "poisoned" prefix */
     obj->opoisoned = 0;
     /* strip user-supplied name; artifacts keep theirs */
-    if (!obj->oartifact) obj->onamelth = 0;
+    if (!obj->oartifact && save_oname) {
+        ONAME(obj) = (char *) 0;
+    }
     /* temporarily identify the type of object */
     save_ocknown = objects[obj->otyp].oc_name_known;
     objects[obj->otyp].oc_name_known = 1;
     save_ocuname = objects[obj->otyp].oc_uname;
-    objects[obj->otyp].oc_uname = 0;    /* avoid "foo called bar" */
+    objects[obj->otyp].oc_uname = 0; /* avoid "foo called bar" */
 
-    buf = xname(obj);
-    if (obj->quan == 1L) buf = obj_is_pname(obj) ? the(buf) : an(buf);
+    /* format the object */
+    if (obj->otyp == CORPSE) {
+        buf = nextobuf();
+        Strcpy(buf, corpse_xname(obj, TRUE));
+    } else if (obj->otyp == SLIME_MOLD) {
+        /* concession to "most unique deaths competition" in the annual
+           devnull tournament, suppress player supplied fruit names because
+           those can be used to fake other objects and dungeon features */
+        buf = nextobuf();
+        Sprintf(buf, "deadly slime mold%s", plur(obj->quan));
+    } else {
+        buf = xname(obj);
+    }
+    /* apply an article if appropriate; caller should always use KILLED_BY */
+    if (obj->quan == 1L && !strstri(buf, "'s ") && !strstri(buf, "s' ")) {
+        buf = (obj_is_pname(obj) || the_unique_obj(obj)) ? the(buf) : an(buf);
+    }
 
     objects[obj->otyp].oc_name_known = save_ocknown;
     objects[obj->otyp].oc_uname = save_ocuname;
-    *obj = save_obj;    /* restore object's core settings */
+    *obj = save_obj; /* restore object's core settings */
+    if (!obj->oartifact && save_oname) {
+        ONAME(obj) = save_oname;
+    }
 
     return buf;
+}
+
+/* xname,doname,&c with long results reformatted to omit some stuff */
+char *
+short_oname(obj, func, altfunc, lenlimit)
+struct obj *obj;
+char *FDECL((*func), (OBJ_P)),    /* main formatting routine */
+     *FDECL((*altfunc), (OBJ_P)); /* alternate for shortest result */
+unsigned lenlimit;
+{
+    struct obj save_obj;
+    char unamebuf[12], onamebuf[12], *save_oname, *save_uname, *outbuf;
+
+    outbuf = (*func)(obj);
+    if ((unsigned) strlen(outbuf) <= lenlimit)
+        return outbuf;
+
+    /* shorten called string to fairly small amount */
+    save_uname = objects[obj->otyp].oc_uname;
+    if (save_uname && strlen(save_uname) >= sizeof unamebuf) {
+        (void) strncpy(unamebuf, save_uname, sizeof unamebuf - 4);
+        Strcpy(unamebuf + sizeof unamebuf - 4, "...");
+        objects[obj->otyp].oc_uname = unamebuf;
+        releaseobuf(outbuf);
+        outbuf = (*func)(obj);
+        objects[obj->otyp].oc_uname = save_uname; /* restore called string */
+        if ((unsigned) strlen(outbuf) <= lenlimit)
+            return outbuf;
+    }
+
+    /* shorten named string to fairly small amount */
+    save_oname = has_oname(obj) ? ONAME(obj) : 0;
+    if (save_oname && strlen(save_oname) >= sizeof onamebuf) {
+        (void) strncpy(onamebuf, save_oname, sizeof onamebuf - 4);
+        Strcpy(onamebuf + sizeof onamebuf - 4, "...");
+        ONAME(obj) = onamebuf;
+        releaseobuf(outbuf);
+        outbuf = (*func)(obj);
+        ONAME(obj) = save_oname; /* restore named string */
+        if ((unsigned) strlen(outbuf) <= lenlimit)
+            return outbuf;
+    }
+
+    /* shorten both called and named strings;
+       unamebuf and onamebuf have both already been populated */
+    if (save_uname && strlen(save_uname) >= sizeof unamebuf && save_oname
+        && strlen(save_oname) >= sizeof onamebuf) {
+        objects[obj->otyp].oc_uname = unamebuf;
+        ONAME(obj) = onamebuf;
+        releaseobuf(outbuf);
+        outbuf = (*func)(obj);
+        if ((unsigned) strlen(outbuf) <= lenlimit) {
+            objects[obj->otyp].oc_uname = save_uname;
+            ONAME(obj) = save_oname;
+            return outbuf;
+        }
+    }
+
+    /* still long; strip several name-lengthening attributes;
+       called and named strings are still in truncated form */
+    save_obj = *obj;
+    obj->bknown = obj->rknown = obj->greased = 0;
+    obj->oeroded = obj->oeroded2 = 0;
+    releaseobuf(outbuf);
+    outbuf = (*func)(obj);
+    if (altfunc && (unsigned) strlen(outbuf) > lenlimit) {
+        /* still long; use the alternate function (usually one of
+           the jackets around minimal_xname()) */
+        releaseobuf(outbuf);
+        outbuf = (*altfunc)(obj);
+    }
+    /* restore the object */
+    *obj = save_obj;
+    if (save_oname)
+        ONAME(obj) = save_oname;
+    if (save_uname)
+        objects[obj->otyp].oc_uname = save_uname;
+
+    /* use whatever we've got, whether it's too long or not */
+    return outbuf;
 }
 
 /*
@@ -1316,6 +1552,43 @@ register const char *verb;
         Strcat(bp, otense(otmp, verb));
     }
     return(bp);
+}
+
+/* combine yname and aobjnam eg "your count cxname(otmp)" */
+char *
+yobjnam(obj, verb)
+struct obj *obj;
+const char *verb;
+{
+    char *s = aobjnam(obj, verb);
+
+    /* leave off "your" for most of your artifacts, but prepend
+     * "your" for unique objects and "foo of bar" quest artifacts */
+    if (!carried(obj) || !obj_is_pname(obj)
+        || obj->oartifact >= ART_HEART_OF_AHRIMAN) {
+        char *outbuf = shk_your(nextobuf(), obj);
+        size_t outbuf_len = strlen(outbuf);
+        if ((outbuf[outbuf_len] != ' ') && (outbuf_len < BUFSZ-2) &&
+            (s[0] && s[0] != ' ')) {
+            strncat(outbuf, " ", 1);
+        }
+        int space_left = BUFSZ - 1 - strlen(outbuf);
+
+        s = strncat(outbuf, s, space_left);
+    }
+    return s;
+}
+
+/* combine Yname2 and aobjnam eg "Your count cxname(otmp)" */
+char *
+Yobjnam2(obj, verb)
+struct obj *obj;
+const char *verb;
+{
+    register char *s = yobjnam(obj, verb);
+
+    *s = highc(*s);
+    return s;
 }
 
 /* like aobjnam, but prepend "The", not count, and use xname */
@@ -1520,6 +1793,73 @@ struct obj *obj;
 
     *s = highc(*s);
     return s;
+}
+
+/* "scroll" or "scrolls" */
+char *
+simpleonames(obj)
+struct obj *obj;
+{
+    char *simpleoname = minimal_xname(obj);
+
+    if (obj->quan != 1L) {
+        simpleoname = makeplural(simpleoname);
+    }
+    return simpleoname;
+}
+
+/* "a scroll" or "scrolls"; "a silver bell" or "the Bell of Opening" */
+char *
+ansimpleoname(obj)
+struct obj *obj;
+{
+    char *simpleoname = simpleonames(obj);
+    int otyp = obj->otyp;
+
+    /* prefix with "the" if a unique item, or a fake one imitating same,
+       has been formatted with its actual name (we let typename() handle
+       any `known' and `dknown' checking necessary) */
+    if (otyp == FAKE_AMULET_OF_YENDOR) {
+        otyp = AMULET_OF_YENDOR;
+    }
+    if (objects[otyp].oc_unique
+        && !strcmp(simpleoname, OBJ_NAME(objects[otyp]))) {
+        return the(simpleoname);
+    }
+
+    /* simpleoname is singular if quan==1, plural otherwise */
+    if (obj->quan == 1L) {
+        simpleoname = an(simpleoname);
+    }
+    return simpleoname;
+}
+
+/* "the scroll" or "the scrolls" */
+char *
+thesimpleoname(obj)
+struct obj *obj;
+{
+    char *simpleoname = simpleonames(obj);
+
+    return the(simpleoname);
+}
+
+/* artifact's name without any object type or known/dknown/&c feedback */
+char *
+bare_artifactname(obj)
+struct obj *obj;
+{
+    char *outbuf;
+
+    if (obj->oartifact) {
+        outbuf = nextobuf();
+        Strcpy(outbuf, artiname(obj->oartifact));
+        if (!strncmp(outbuf, "The ", 4))
+            outbuf[0] = lowc(outbuf[0]);
+    } else {
+        outbuf = xname(obj);
+    }
+    return outbuf;
 }
 
 static const char *wrp[] = {
@@ -2652,7 +2992,7 @@ srch:
             del_engr_at(u.ux, u.uy);
             pline("A pool.");
             /* Must manually make kelp! */
-            water_damage(level.objects[u.ux][u.uy], FALSE, TRUE);
+            water_damage(level.objects[u.ux][u.uy], (char *)0, FALSE, TRUE);
             newsym(u.ux, u.uy);
             return &zeroobj;
         }
@@ -2902,13 +3242,7 @@ typfnd:
             if (mntmp == PM_CHROMATIC_DRAGON && !wizard) {
                 mntmp = rn2(YELLOW_DRAGON_SCALES-GRAY_DRAGON_SCALES) + PM_GRAY_DRAGON;
             }
-            if (mntmp != NON_PM) {
-                otmp->corpsenm = mntmp;
-                if (!dead_species(mntmp, TRUE))
-                    attach_egg_hatch_timeout(otmp);
-                else
-                    kill_egg(otmp);
-            }
+            set_corpsenm(otmp, mntmp);
             break;
         case STATUE: otmp->corpsenm = mntmp;
             if (Has_contents(otmp) && verysmall(&mons[mntmp]))
@@ -3118,6 +3452,26 @@ struct obj *cloak;
     return "cloak";
 }
 
+/* helm vs hat for messages */
+const char *
+helm_simple_name(helmet)
+struct obj *helmet;
+{
+    /*
+     *  There is some wiggle room here; the result has been chosen
+     *  for consistency with the "protected by hard helmet" messages
+     *  given for various bonks on the head:  headgear that provides
+     *  such protection is a "helm", that which doesn't is a "hat".
+     *
+     *      elven leather helm / leather hat    -> hat
+     *      dwarvish iron helm / hard hat       -> helm
+     *  The rest are completely straightforward:
+     *      fedora, cornuthaum, dunce cap       -> hat
+     *      all other types of helmets          -> helm
+     */
+    return (helmet && !is_metallic(helmet)) ? "hat" : "helm";
+}
+
 const char *
 mimic_obj_name(mtmp)
 struct monst *mtmp;
@@ -3128,6 +3482,86 @@ struct monst *mtmp;
         return obj_descr[idx].oc_name;
     }
     return "whatcha-may-callit";
+}
+
+/*
+ * Construct a query prompt string, based around an object name, which is
+ * guaranteed to fit within [QBUFSZ].  Takes an optional prefix, three
+ * choices for filling in the middle (two object formatting functions and a
+ * last resort literal which should be very short), and an optional suffix.
+ */
+char *
+safe_qbuf(qbuf, qprefix, qsuffix, obj, func, altfunc, lastR)
+char *qbuf; /* output buffer */
+const char *qprefix, *qsuffix;
+struct obj *obj;
+char *FDECL((*func), (OBJ_P)), *FDECL((*altfunc), (OBJ_P));
+const char *lastR;
+{
+    char *bufp, *endp;
+    /* convert size_t (or int for ancient systems) to ordinary unsigned */
+    unsigned len, lenlimit,
+        len_qpfx = (unsigned) (qprefix ? strlen(qprefix) : 0),
+        len_qsfx = (unsigned) (qsuffix ? strlen(qsuffix) : 0),
+        len_lastR = (unsigned) strlen(lastR);
+
+    lenlimit = QBUFSZ - 1;
+    endp = qbuf + lenlimit;
+    /* sanity check, aimed mainly at paniclog (it's conceivable for
+       the result of short_oname() to be shorter than the length of
+       the last resort string, but we ignore that possibility here) */
+    if (len_qpfx > lenlimit)
+        impossible("safe_qbuf: prefix too long (%u characters).", len_qpfx);
+    else if (len_qpfx + len_qsfx > lenlimit)
+        impossible("safe_qbuf: suffix too long (%u + %u characters).",
+                   len_qpfx, len_qsfx);
+    else if (len_qpfx + len_lastR + len_qsfx > lenlimit)
+        impossible("safe_qbuf: filler too long (%u + %u + %u characters).",
+                   len_qpfx, len_lastR, len_qsfx);
+
+    /* the output buffer might be the same as the prefix if caller
+       has already partially filled it */
+    if (qbuf == qprefix) {
+        /* prefix is already in the buffer */
+        *endp = '\0';
+    } else if (qprefix) {
+        /* put prefix into the buffer */
+        (void) strncpy(qbuf, qprefix, lenlimit);
+        *endp = '\0';
+    } else {
+        /* no prefix; output buffer starts out empty */
+        qbuf[0] = '\0';
+    }
+    len = (unsigned) strlen(qbuf);
+
+    if (len + len_lastR + len_qsfx > lenlimit) {
+        /* too long; skip formatting, last resort output is truncated */
+        if (len < lenlimit) {
+            (void) strncpy(&qbuf[len], lastR, lenlimit - len);
+            *endp = '\0';
+            len = (unsigned) strlen(qbuf);
+            if (qsuffix && len < lenlimit) {
+                (void) strncpy(&qbuf[len], qsuffix, lenlimit - len);
+                *endp = '\0';
+                /* len = (unsigned) strlen(qbuf); */
+            }
+        }
+    } else {
+        /* suffix and last resort are guaranteed to fit */
+        len += len_qsfx; /* include the pending suffix */
+        /* format the object */
+        bufp = short_oname(obj, func, altfunc, lenlimit - len);
+        if (len + strlen(bufp) <= lenlimit)
+            Strcat(qbuf, bufp); /* formatted name fits */
+        else
+            Strcat(qbuf, lastR); /* use last resort */
+        releaseobuf(bufp);
+
+        if (qsuffix)
+            Strcat(qbuf, qsuffix);
+    }
+    /* assert( strlen(qbuf) < QBUFSZ ); */
+    return qbuf;
 }
 
 /*objnam.c*/

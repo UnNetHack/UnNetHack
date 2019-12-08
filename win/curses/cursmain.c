@@ -564,7 +564,8 @@ print_glyph(window, x, y, glyph)
                    a 1-1 map between glyphs and distinct things on the map).
 */
 void
-curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph)
+curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph,
+                   int bg_glyph UNUSED)
 {
     int ch, color;
     unsigned int special;

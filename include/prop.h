@@ -37,8 +37,10 @@
 #define CONFUSION       28
 #define SICK            29
 #define BLINDED         30
+#define DEAF          -100
 #define SLEEPING        31
-#define WOUNDED_LEGS        32
+#define WOUNDED_LEGS    32
+#define SLEEPY        -101
 #define STONED          33
 #define STRANGLED       34
 #define HALLUC          35
@@ -97,6 +99,7 @@ struct prop {
 #   define W_WEP        0x00000100L /* Wielded weapon */
 #   define W_QUIVER     0x00000200L /* Quiver for (f)iring ammo */
 #   define W_SWAPWEP    0x00000400L /* Secondary weapon */
+#   define W_WEAPONS (W_WEP | W_SWAPWEP | W_QUIVER)
 #   define W_ART        0x00001000L /* Carrying artifact (not really worn) */
 #   define W_ARTI       0x00002000L /* Invoked artifact  (not really worn) */
     /* Amulets, rings, tools, and other items */
@@ -124,7 +127,8 @@ struct prop {
 #   define FROMOUTSIDE  0x04000000L /* By corpses, prayer, thrones, etc. */
 #   define INTRINSIC    (FROMOUTSIDE|FROMRACE|FROMEXPER)
     /* Control flags */
-#   define I_SPECIAL    0x10000000L /* Property is controllable */
+#   define FROMFORM     0x10000000L  /* Polyd; conferred by monster form */
+#   define I_SPECIAL    0x20000000L /* Property is controllable */
 };
 
 /*** Definitions for backwards compatibility ***/

@@ -5,7 +5,6 @@
 #include "hack.h"
 #include "mfndpos.h"
 #include "artifact.h"
-#include "epri.h"
 
 extern boolean notonhead;
 
@@ -38,6 +37,18 @@ register struct monst *mtmp;
             return(TRUE);
     }
     return(FALSE);
+}
+
+/* check whether a monster is carrying a locking/unlocking tool */
+boolean
+mon_has_key(mon, for_unlocking)
+struct monst *mon;
+boolean for_unlocking; /* true => credit card ok, false => not ok */
+{
+    if (for_unlocking && m_carrying(mon, CREDIT_CARD)) {
+        return TRUE;
+    }
+    return m_carrying(mon, SKELETON_KEY) || m_carrying(mon, LOCK_PICK);
 }
 
 STATIC_OVL void
@@ -1464,13 +1475,16 @@ found_you:
     mtmp->muy = my;
 }
 
-boolean
-can_ooze(mtmp)
+/*
+ * Inventory prevents passage under door.
+ * Used by can_ooze() and can_fog().
+ */
+static boolean
+stuff_prevents_passage(mtmp)
 struct monst *mtmp;
 {
     struct obj *chain, *obj;
 
-    if (!amorphous(mtmp->data)) return FALSE;
     if (mtmp == &youmonst) {
         chain = invent;
     } else {
@@ -1479,38 +1493,75 @@ struct monst *mtmp;
     for (obj = chain; obj; obj = obj->nobj) {
         int typ = obj->otyp;
 
-        if (typ == COIN_CLASS && obj->quan > 100L) return FALSE;
+        if (typ == COIN_CLASS && obj->quan > 100L) {
+            return TRUE;
+        }
 
         if (obj->oclass != GEM_CLASS &&
-            !(typ >= ARROW && typ <= BOOMERANG) &&
-            !(typ >= DAGGER && typ <= CRYSKNIFE) &&
-            typ != SLING &&
-            !is_cloak(obj) && typ != FEDORA &&
-            !is_gloves(obj) && typ != LEATHER_JACKET &&
-#ifdef TOURIST
-            typ != CREDIT_CARD && !is_shirt(obj) &&
-#endif
-            !(typ == CORPSE && verysmall(&mons[obj->corpsenm])) &&
-            typ != FORTUNE_COOKIE && typ != CANDY_BAR &&
-            typ != PANCAKE && typ != LEMBAS_WAFER &&
-            typ != LUMP_OF_ROYAL_JELLY &&
-            obj->oclass != AMULET_CLASS &&
-            obj->oclass != RING_CLASS &&
-#ifdef WIZARD
-            obj->oclass != VENOM_CLASS &&
-#endif
-            typ != SACK && typ != BAG_OF_HOLDING &&
-            typ != BAG_OF_TRICKS && !Is_candle(obj) &&
-            typ != OILSKIN_SACK && typ != LEASH &&
-            typ != STETHOSCOPE && typ != BLINDFOLD && typ != TOWEL &&
-            typ != TIN_WHISTLE && typ != MAGIC_WHISTLE &&
-            typ != MAGIC_MARKER && typ != TIN_OPENER &&
-            typ != SKELETON_KEY && typ != LOCK_PICK
-            ) return FALSE;
-        if (Is_container(obj) && obj->cobj) return FALSE;
+                !(typ >= ARROW && typ <= BOOMERANG) &&
+                !(typ >= DAGGER && typ <= CRYSKNIFE) &&
+                typ != SLING &&
+                !is_cloak(obj) &&
+                typ != FEDORA &&
+                !is_gloves(obj) &&
+                typ != LEATHER_JACKET &&
+                typ != CREDIT_CARD &&
+                !is_shirt(obj) &&
+                !(typ == CORPSE && verysmall(&mons[obj->corpsenm])) &&
+                typ != FORTUNE_COOKIE &&
+                typ != CANDY_BAR &&
+                typ != PANCAKE &&
+                typ != LEMBAS_WAFER &&
+                typ != LUMP_OF_ROYAL_JELLY &&
+                obj->oclass != AMULET_CLASS &&
+                obj->oclass != RING_CLASS &&
+                obj->oclass != VENOM_CLASS &&
+                typ != SACK &&
+                typ != BAG_OF_HOLDING &&
+                typ != BAG_OF_TRICKS &&
+                !Is_candle(obj) &&
+                typ != OILSKIN_SACK &&
+                typ != LEASH &&
+                typ != STETHOSCOPE &&
+                typ != BLINDFOLD &&
+                typ != TOWEL &&
+                typ != TIN_WHISTLE &&
+                typ != MAGIC_WHISTLE &&
+                typ != MAGIC_MARKER &&
+                typ != TIN_OPENER &&
+                typ != SKELETON_KEY &&
+                typ != LOCK_PICK) {
+            return TRUE;
+        }
+        if (Is_container(obj) && obj->cobj) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
 
+boolean
+can_ooze(mtmp)
+struct monst *mtmp;
+{
+    if (!amorphous(mtmp->data) || stuff_prevents_passage(mtmp)) {
+        return FALSE;
     }
     return TRUE;
+}
+
+/* monster can change form into a fog if necessary */
+boolean
+can_fog(mtmp)
+struct monst *mtmp;
+{
+    if (!(mvitals[PM_FOG_CLOUD].mvflags & G_GENOD) &&
+            is_vampshifter(mtmp) &&
+            !Protection_from_shape_changers &&
+            !stuff_prevents_passage(mtmp)) {
+        return TRUE;
+    }
+    return FALSE;
 }
 
 static void

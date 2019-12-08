@@ -147,6 +147,98 @@ register struct obj *obj;
     update_inventory();
 }
 
+/* return item worn in slot indiciated by wornmask; needed by poly_obj() */
+struct obj *
+wearmask_to_obj(wornmask)
+long wornmask;
+{
+    const struct worn *wp;
+
+    for (wp = worn; wp->w_mask; wp++) {
+        if (wp->w_mask & wornmask) {
+            return *wp->w_obj;
+        }
+    }
+    return (struct obj *) 0;
+}
+
+/* return a bitmask of the equipment slot(s) a given item might be worn in */
+long
+wearslot(obj)
+struct obj *obj;
+{
+    int otyp = obj->otyp;
+    /* practically any item can be wielded or quivered; it's up to
+       our caller to handle such things--we assume "normal" usage */
+    long res = 0L; /* default: can't be worn anywhere */
+
+    switch (obj->oclass) {
+    case AMULET_CLASS:
+        res = W_AMUL; /* WORN_AMUL */
+        break;
+    case RING_CLASS:
+        res = W_RINGL | W_RINGR; /* W_RING, BOTH_SIDES */
+        break;
+    case ARMOR_CLASS:
+        switch (objects[otyp].oc_armcat) {
+        case ARM_SUIT:
+            res = W_ARM;
+            break; /* WORN_ARMOR */
+        case ARM_SHIELD:
+            res = W_ARMS;
+            break; /* WORN_SHIELD */
+        case ARM_HELM:
+            res = W_ARMH;
+            break; /* WORN_HELMET */
+        case ARM_GLOVES:
+            res = W_ARMG;
+            break; /* WORN_GLOVES */
+        case ARM_BOOTS:
+            res = W_ARMF;
+            break; /* WORN_BOOTS */
+        case ARM_CLOAK:
+            res = W_ARMC;
+            break; /* WORN_CLOAK */
+        case ARM_SHIRT:
+            res = W_ARMU;
+            break; /* WORN_SHIRT */
+        }
+        break;
+    case WEAPON_CLASS:
+        res = W_WEP | W_SWAPWEP;
+        if (objects[otyp].oc_merge) {
+            res |= W_QUIVER;
+        }
+        break;
+    case TOOL_CLASS:
+        if (otyp == BLINDFOLD || otyp == TOWEL || otyp == LENSES) {
+            res = W_TOOL; /* WORN_BLINDF */
+        } else if (is_weptool(obj) || otyp == TIN_OPENER) {
+            res = W_WEP | W_SWAPWEP;
+        } else if (otyp == SADDLE) {
+            res = W_SADDLE;
+        }
+        break;
+    case FOOD_CLASS:
+        if (obj->otyp == MEAT_RING) {
+            res = W_RINGL | W_RINGR;
+        }
+        break;
+    case GEM_CLASS:
+        res = W_QUIVER;
+        break;
+    case BALL_CLASS:
+        res = W_BALL;
+        break;
+    case CHAIN_CLASS:
+        res = W_CHAIN;
+        break;
+    default:
+        break;
+    }
+    return res;
+}
+
 void
 mon_set_minvis(mon)
 struct monst *mon;
@@ -295,7 +387,7 @@ boolean on, silently;
             if (which <= 8) { /* 1 thru 8 correspond to MR_xxx mask values */
                 /* FIRE,COLD,SLEEP,DISINT,SHOCK,POISON,ACID,STONE */
                 mask = (uchar) (1 << (which - 1));
-                mon->mintrinsics |= (unsigned short) mask;
+                mon->mextrinsics |= (unsigned short) mask;
             }
             break;
         }
@@ -331,7 +423,7 @@ boolean on, silently;
                         (int) objects[otmp->otyp].oc_oprop == which)
                         break;
                 if (!otmp)
-                    mon->mintrinsics &= ~((unsigned short) mask);
+                    mon->mextrinsics &= ~((unsigned short) mask);
             }
             break;
         default:
@@ -562,11 +654,35 @@ which_armor(mon, flag)
 struct monst *mon;
 long flag;
 {
-    register struct obj *obj;
+    if (mon == &youmonst) {
+        switch (flag) {
+        case W_ARM:
+            return uarm;
+        case W_ARMC:
+            return uarmc;
+        case W_ARMH:
+            return uarmh;
+        case W_ARMS:
+            return uarms;
+        case W_ARMG:
+            return uarmg;
+        case W_ARMF:
+            return uarmf;
+        case W_ARMU:
+            return uarmu;
+        default:
+            impossible("bad flag in which_armor");
+            return 0;
+        }
+    }
 
-    for(obj = mon->minvent; obj; obj = obj->nobj)
-        if (obj->owornmask & flag) return obj;
-    return((struct obj *)0);
+    struct obj *obj;
+    for (obj = mon->minvent; obj; obj = obj->nobj) {
+        if (obj->owornmask & flag) {
+            return obj;
+        }
+    }
+    return (struct obj *)0;
 }
 
 /* remove an item of armor and then drop it */
@@ -633,6 +749,37 @@ struct obj *obj;
 {
     obj->bypass = 1;
     flags.bypasses = TRUE;
+}
+
+/* set or clear the bypass bit in a list of objects */
+void
+bypass_objlist(objchain, on)
+struct obj *objchain;
+boolean on; /* TRUE => set, FALSE => clear */
+{
+    if (on && objchain) {
+        flags.bypasses = TRUE;
+    }
+    while (objchain) {
+        objchain->bypass = on ? 1 : 0;
+        objchain = objchain->nobj;
+    }
+}
+
+/* return the first object without its bypass bit set; set that bit
+   before returning so that successive calls will find further objects */
+struct obj *
+nxt_unbypassed_obj(objchain)
+struct obj *objchain;
+{
+    while (objchain) {
+        if (!objchain->bypass) {
+            bypass_obj(objchain);
+            break;
+        }
+        objchain = objchain->nobj;
+    }
+    return objchain;
 }
 
 void

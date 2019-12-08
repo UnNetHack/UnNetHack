@@ -571,7 +571,7 @@ fill_advent_calendar(init)
 boolean init;
 {
     int door_nr=1;
-    char buf[4];
+    char buf[BUFSZ];
     int x, y;
     int in_x, in_y, out_x, out_y;
 

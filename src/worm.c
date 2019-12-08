@@ -1,12 +1,11 @@
-/*  SCCS Id: @(#)worm.c 3.4 1995/01/28  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 #include "lev.h"
 
-#define newseg()        (struct wseg *) alloc(sizeof(struct wseg))
-#define dealloc_seg(wseg)   free((genericptr_t) (wseg))
+#define newseg() (struct wseg *) alloc(sizeof(struct wseg))
+#define dealloc_seg(wseg) free((genericptr_t) (wseg))
 
 /* worm segment structure */
 struct wseg {
@@ -88,8 +87,9 @@ get_wormno()
     register int new_wormno = 1;
 
     while (new_wormno < MAX_NUM_WORMS) {
-        if (!wheads[new_wormno])
+        if (!wheads[new_wormno]) {
             return new_wormno; /* found an empty wtails[] slot at new_wormno */
+        }
         new_wormno++;
     }
 
@@ -224,7 +224,6 @@ struct monst *worm;
     new_seg->nseg = (struct wseg *) 0;
     seg->nseg     = new_seg;        /* attach it to the end of the list */
     wheads[wnum]  = new_seg;        /* move the end pointer */
-
 
     if (wgrowtime[wnum] <= moves) {
         if (!wgrowtime[wnum])
@@ -392,49 +391,54 @@ struct obj *weap;
 
     /*
      *  At this point, the old worm is correct.  Any new worm will have
-     *  it's head at "curr" and its tail at "new_tail".
+     *  it's head at "curr" and its tail at "new_tail".  The old worm
+     *  must be at least level 3 in order to produce a new worm.
      */
+    new_worm = 0;
+    new_wnum = (worm->m_lev >= 3 && !rn2(3)) ? get_wormno() : 0;
+    if (new_wnum) {
+        remove_monster(x, y); /* clone_mon puts new head here */
+        /* clone_mon() will fail if enough long worms have been
+           created to have them be marked as extinct or if the hit
+           that cut the current one has dropped it down to 1 HP */
+        new_worm = clone_mon(worm, x, y);
+    }
 
     /* Sometimes the tail end dies. */
-    if (rn2(3) || !(new_wnum = get_wormno())) {
+    if (!new_worm) {
+        place_worm_seg(worm, x, y); /* place the "head" segment back */
         cutoff(worm, new_tail);
         return;
     }
 
-    remove_monster(x, y);       /* clone_mon puts new head here */
-    if (!(new_worm = clone_mon(worm, x, y))) {
-        cutoff(worm, new_tail);
-        return;
-    }
-    new_worm->wormno = new_wnum;    /* affix new worm number */
+    new_worm->wormno = new_wnum; /* affix new worm number */
+    new_worm->mcloned = 0;       /* treat second worm as a normal monster */
 
-    /* Devalue the monster level of both halves of the worm. */
-    worm->m_lev = ((unsigned)worm->m_lev <= 3) ?
-                  (unsigned)worm->m_lev : max((unsigned)worm->m_lev - 2, 3);
+    /* Devalue the monster level of both halves of the worm.
+       Note: m_lev is always at least 3 in order to get this far. */
+    worm->m_lev = max((unsigned) worm->m_lev - 2, 3);
     new_worm->m_lev = worm->m_lev;
 
-    /* Calculate the mhp on the new_worm for the (lower) monster level. */
-    new_worm->mhpmax = new_worm->mhp = d((int)new_worm->m_lev, 8);
-
-    /* Calculate the mhp on the old worm for the (lower) monster level. */
-    if (worm->m_lev > 3) {
-        worm->mhpmax = d((int)worm->m_lev, 8);
-        if (worm->mhpmax < worm->mhp) worm->mhp = worm->mhpmax;
+    /* Calculate the lower-level mhp; use <N>d8 for long worms.
+       Can't use newmonhp() here because it would reset m_lev. */
+    new_worm->mhpmax = new_worm->mhp = d((int) new_worm->m_lev, 8);
+    worm->mhpmax = d((int) worm->m_lev, 8); /* new maxHP for old worm */
+    if (worm->mhpmax < worm->mhp) {
+        worm->mhp = worm->mhpmax;
     }
 
-    wtails[new_wnum] = new_tail;    /* We've got all the info right now */
-    wheads[new_wnum] = curr;        /* so we can do this faster than    */
-    wgrowtime[new_wnum] = 0L;       /* trying to call initworm().       */
+    wtails[new_wnum] = new_tail; /* We've got all the info right now */
+    wheads[new_wnum] = curr;     /* so we can do this faster than    */
+    wgrowtime[new_wnum] = 0L;    /* trying to call initworm().       */
 
     /* Place the new monster at all the segment locations. */
-    place_wsegs(new_worm);
+    place_wsegs(new_worm, worm);
 
     if (flags.mon_moving)
         pline("%s is cut in half.", Monnam(worm));
     else
         You("cut %s in half.", mon_nam(worm));
 }
-
 
 /*
  *  see_wsegs()
@@ -574,8 +578,8 @@ int fd;
  *  Place the segments of the given worm.  Called from restore.c
  */
 void
-place_wsegs(worm)
-struct monst *worm;
+place_wsegs(worm, oldworm)
+struct monst *worm, *oldworm;
 {
     struct wseg *curr = wtails[worm->wormno];
 
@@ -585,7 +589,45 @@ struct monst *worm;
     }
 
     while (curr != wheads[worm->wormno]) {
-        place_worm_seg(worm, curr->wx, curr->wy);
+        xchar x = curr->wx;
+        xchar y = curr->wy;
+
+        if (oldworm) {
+            if (m_at(x,y) == oldworm) {
+                remove_monster(x, y);
+            } else {
+                warning("placing worm seg <%i,%i> over another mon", x, y);
+            }
+        }
+        place_worm_seg(worm, x, y);
+        curr = curr->nseg;
+    }
+}
+
+void
+sanity_check_worm(worm)
+struct monst *worm;
+{
+    struct wseg *curr;
+
+    if (!worm) {
+        panic("no worm!");
+    }
+    if (!worm->wormno) {
+        panic("not a worm?!");
+    }
+
+    curr = wtails[worm->wormno];
+
+    while (curr != wheads[worm->wormno]) {
+        if (curr->wx) {
+            if (!isok(curr->wx, curr->wy)) {
+                panic("worm seg not isok");
+            }
+            if (level.monsters[curr->wx][curr->wy] != worm) {
+                panic("worm not at seg location");
+            }
+        }
         curr = curr->nseg;
     }
 }
@@ -610,8 +652,11 @@ register struct monst *worm;
     }
 
     while (curr) {
-        remove_monster(curr->wx, curr->wy);
-        newsym(curr->wx, curr->wy);
+        if (curr->wx) {
+            remove_monster(curr->wx, curr->wy);
+            newsym(curr->wx, curr->wy);
+            curr->wx = 0;
+        }
         curr = curr->nseg;
     }
 }
@@ -693,11 +738,11 @@ register xchar *nx, *ny;
     *nx = x;
     *ny = y;
 
-    *nx += (x > 1 ?         /* extreme left ? */
-            (x < COLNO ?     /* extreme right ? */
+    *nx += (x > 1 ?           /* extreme left ? */
+            (x < COLNO ?      /* extreme right ? */
              (rn2(3) - 1)     /* neither so +1, 0, or -1 */
-             :   -rn2(2))/* 0, or -1 */
-            :    rn2(2));   /* 0, or 1 */
+             :   -rn2(2))     /* 0, or -1 */
+            :    rn2(2));     /* 0, or 1 */
 
     *ny += (*nx == x ?          /* same kind of thing with y */
             (y > 1 ?
@@ -712,6 +757,14 @@ register xchar *nx, *ny;
                   (rn2(3) - 1)
                   :   -rn2(2))
                  :   rn2(2)));
+}
+
+/* for size_monst(cmd.c) to support #stats */
+int
+size_wseg(worm)
+struct monst *worm;
+{
+    return (int) (count_wsegs(worm) * sizeof (struct wseg));
 }
 
 /*  count_wsegs()
@@ -788,6 +841,89 @@ struct monst *worm;
         curr = curr->nseg;
     }
     return FALSE;
+}
+
+/* would moving from <x1,y1> to <x2,y2> involve passing between two
+   consecutive segments of the same worm? */
+boolean
+worm_cross(x1, y1, x2, y2)
+int x1, y1, x2, y2;
+{
+    struct monst *worm;
+    struct wseg *curr, *wnxt;
+
+    /*
+     * With digits representing relative sequence number of the segments,
+     * returns true when testing between @ and ? (passes through worm's
+     * body), false between @ and ! (stays on same side of worm).
+     *  .w1?..
+     *  ..@2..
+     *  .65!3.
+     *  ...4..
+     */
+
+    if (distmin(x1, y1, x2, y2) != 1) {
+        impossible("worm_cross checking for non-adjacent location?");
+        return FALSE;
+    }
+    /* attempting to pass between worm segs is only relevant for diagonal */
+    if (x1 == x2 || y1 == y2) {
+        return FALSE;
+    }
+
+    /* is the same monster at <x1,y2> and at <x2,y1>? */
+    worm = m_at(x1, y2);
+    if (!worm || m_at(x2, y1) != worm) {
+        return FALSE;
+    }
+
+    /* same monster is at both adjacent spots, so must be a worm; we need
+       to figure out if the two spots are occupied by consecutive segments */
+    for (curr = wtails[worm->wormno]; curr; curr = wnxt) {
+        wnxt = curr->nseg;
+        if (!wnxt) {
+            break; /* no next segment; can't continue */
+        }
+
+        /* we don't know which of <x1,y2> or <x2,y1> we'll hit first, but
+           whichever it is, they're consecutive iff next seg is the other */
+        if (curr->wx == x1 && curr->wy == y2) {
+            return (boolean) (wnxt->wx == x2 && wnxt->wy == y1);
+        }
+        if (curr->wx == x2 && curr->wy == y1) {
+            return (boolean) (wnxt->wx == x1 && wnxt->wy == y2);
+        }
+    }
+
+    /* should never reach here... */
+    return FALSE;
+}
+
+/* construct an index number for a worm tail segment */
+int
+wseg_at(worm, x, y)
+struct monst *worm;
+int x, y;
+{
+    int res = 0;
+
+    if (worm && worm->wormno && m_at(x, y) == worm) {
+        struct wseg *curr;
+        int i, n;
+        xchar wx = (xchar) x, wy = (xchar) y;
+
+        for (i = 0, curr = wtails[worm->wormno]; curr; curr = curr->nseg) {
+            if (curr->wx == wx && curr->wy == wy) {
+                break;
+            }
+            ++i;
+        }
+        for (n = i; curr; curr = curr->nseg) {
+            ++n;
+        }
+        res = n - i;
+    }
+    return res;
 }
 
 void

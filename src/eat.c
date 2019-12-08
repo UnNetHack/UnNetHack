@@ -42,11 +42,17 @@ STATIC_DCL void NDECL(eatspecial);
 STATIC_DCL void FDECL(eataccessory, (struct obj *));
 STATIC_DCL const char *FDECL(foodword, (struct obj *));
 STATIC_DCL boolean FDECL(maybe_cannibal, (int, BOOLEAN_P));
+STATIC_DCL int FDECL(tin_variety, (struct obj *, BOOLEAN_P));
 
 char msgbuf[BUFSZ];
 
 /* also used to see if you're allowed to eat cats and dogs */
 #define CANNIBAL_ALLOWED() (Role_if(PM_CAVEMAN) || Race_if(PM_ORC) || Race_if(PM_VAMPIRE))
+
+/* Rider corpses are treated as non-rotting so that attempting to eat one
+   will be sure to reach the stage of eating where that meal is fatal */
+#define nonrotting_corpse(mnum) \
+    ((mnum) == PM_LIZARD || (mnum) == PM_LICHEN || is_rider(&mons[mnum]))
 
 STATIC_OVL NEARDATA const char comestibles[] = { FOOD_CLASS, 0 };
 
@@ -117,28 +123,32 @@ init_uhunger()
     u.uhs = NOT_HUNGRY;
 }
 
-static const struct { const char *txt; int nut; } tintxts[] = {
-    {"deep fried",   60},
-    {"pickled",  40},
-    {"soup made from", 20},
-    {"pureed",  500},
+/* tin types [SPINACH_TIN = -1, overrides corpsenm, nut==600] */
+static const struct {
+    const char *txt;                      /* description */
+    int nut;                              /* nutrition */
+} tintxts[] = {
+    { "deep fried",               60 },
+    { "pickled",                  40 },
+    { "soup made from",           20 },
+    { "pureed",                  500 },
 #define ROTTEN_TIN 4
-    {"rotten",  -50},
+    {"rotten",                   -50 },
 #define HOMEMADE_TIN 5
-    {"homemade",     50},
-    {"stir fried",   80},
-    {"candied",      100},
-    {"boiled",       50},
-    {"dried",        55},
+    { "homemade",                 50 },
+    { "stir fried",               80 },
+    { "candied",                 100 },
+    { "boiled",                   50 },
+    { "dried",                    55 },
 #define SZECHUAN_TIN 10
-    {"szechuan",     70},
+    {"szechuan",                  70 },
 #define FRENCH_FRIED_TIN 11
-    {"french fried", 55},
-    {"sauteed",      95},
-    {"broiled",      80},
-    {"smoked",       50},
+    {"french fried",              55 },
+    {"sauteed",                   95 },
+    {"broiled",                   80 },
+    {"smoked",                    50 },
 #define DELICIOUS_SOUP_TIN 15
-    {"delicious soup made from", 200},
+    {"delicious soup made from", 200 },
     {"", 0}
 };
 #define TTSZ    SIZE(tintxts)
@@ -332,14 +342,14 @@ register struct obj *otmp;
 
     if (carried(otmp)) {
         freeinv(otmp);
-        if (inv_cnt() >= 52) {
+        if (inv_cnt(FALSE) >= 52) {
             sellobj_state(SELL_DONTSELL);
             dropy(otmp);
             sellobj_state(SELL_NORMAL);
         } else {
-            otmp->oxlth++;  /* hack to prevent merge */
+            otmp->nomerge = 1; /* used to prevent merge */
             otmp = addinv(otmp);
-            otmp->oxlth--;
+            otmp->nomerge = 0;
         }
     }
     return(otmp);
@@ -907,21 +917,21 @@ register int pm;
             HSee_invisible |= FROMOUTSIDE;
         }
         newsym(u.ux, u.uy);
-    /* fall into next case */
+    /* fall through */
     case PM_YELLOW_LIGHT:
-    /* fall into next case */
+    /* fall through */
     case PM_GIANT_BAT:
         make_stunned(HStun + 30, FALSE);
-    /* fall into next case */
+    /* fall through */
     case PM_BAT:
         make_stunned(HStun + 30, FALSE);
         break;
     case PM_GIANT_MIMIC:
         tmp += 10;
-    /* fall into next case */
+    /* fall through */
     case PM_LARGE_MIMIC:
         tmp += 20;
-    /* fall into next case */
+    /* fall through */
     case PM_SMALL_MIMIC:
         tmp += 20;
         if (youmonst.data->mlet != S_MIMIC && !Unchanging) {
@@ -995,7 +1005,7 @@ register int pm;
         else {
             pline("For some reason, that tasted bland.");
         }
-    /* fall through to default case */
+    /* fall through */
     default: {
         register struct permonst *ptr = &mons[pm];
         int i, count;
@@ -1088,6 +1098,68 @@ const char* verb;           /* if 0, the verb is "open" */
         if(tin.tin->quan > 1L) tin.tin = splitobj(tin.tin, 1L);
         bill_dummy_object(tin.tin);
     }
+}
+
+void
+set_tin_variety(obj, forcetype)
+struct obj *obj;
+int forcetype;
+{
+    register int r;
+
+    if (forcetype == SPINACH_TIN
+        || (forcetype == HEALTHY_TIN
+            && (obj->corpsenm == NON_PM /* empty or already spinach */
+                || !vegetarian(&mons[obj->corpsenm])))) { /* replace meat */
+        obj->corpsenm = NON_PM; /* not based on any monster */
+        obj->spe = 1;           /* spinach */
+        return;
+    } else if (forcetype == HEALTHY_TIN) {
+        r = tin_variety(obj, FALSE);
+        if (r < 0 || r >= TTSZ) {
+            r = ROTTEN_TIN; /* shouldn't happen */
+        }
+        while ((r == ROTTEN_TIN && !obj->cursed)) {
+            r = rn2(TTSZ - 1);
+        }
+    } else if (forcetype >= 0 && forcetype < TTSZ - 1) {
+        r = forcetype;
+    } else {               /* RANDOM_TIN */
+        r = rn2(TTSZ - 1); /* take your pick */
+        if (r == ROTTEN_TIN && nonrotting_corpse(obj->corpsenm)) {
+            r = HOMEMADE_TIN; /* lizards don't rot */
+        }
+    }
+    obj->spe = -(r + 1); /* offset by 1 to allow index 0 */
+}
+
+STATIC_OVL int
+tin_variety(obj, disp)
+struct obj *obj;
+boolean disp; /* we're just displaying so leave things alone */
+{
+    register int r;
+
+    if (obj->spe == 1) {
+        r = SPINACH_TIN;
+    } else if (obj->cursed) {
+        r = ROTTEN_TIN; /* always rotten if cursed */
+    } else if (obj->spe < 0) {
+        r = -(obj->spe);
+        --r; /* get rid of the offset */
+    } else {
+        r = rn2(TTSZ - 1);
+    }
+
+    if (!disp && r == HOMEMADE_TIN && !obj->blessed && !rn2(7)) {
+        r = ROTTEN_TIN; /* some homemade tins go bad */
+    }
+
+    if (r == ROTTEN_TIN && nonrotting_corpse(obj->corpsenm)) {
+        r = HOMEMADE_TIN; /* lizards don't rot */
+    }
+
+    return r;
 }
 
 STATIC_PTR
@@ -1585,7 +1657,7 @@ struct obj *otmp;
             make_vomiting((long)rn1(victual.reqtime, 5), FALSE);
             break;
         }
-    /* Fall through otherwise */
+    /* fall through */
     default:
         if (otmp->otyp==SLIME_MOLD && !otmp->cursed
             && otmp->spe == current_fruit)
@@ -1805,9 +1877,7 @@ eatspecial() /* called after eating non-food */
             useupall(otmp);
         else
             useupf(otmp, otmp->quan);
-#ifdef MEXTRA
         vault_gd_watching(GD_EATGOLD);
-#endif
         return;
     }
     if (otmp->oclass == POTION_CLASS) {
@@ -1906,7 +1976,9 @@ register struct obj *otmp;
                 done(POISONING);
             }
         }
-        if(!otmp->cursed) heal_legs();
+        if (!otmp->cursed) {
+            heal_legs(0);
+        }
         break;
     case EGG:
         if (touch_petrifies(&mons[otmp->corpsenm])) {
@@ -2651,7 +2723,7 @@ int corpsecheck;     /* 0, no check, 1, corpses, 2, tinnable corpses */
     boolean sacrificing = (!strcmp(verb, "sacrifice"));
 
     /* if we can't touch floor objects then use invent food only */
-    if (!can_reach_floor() ||
+    if (!can_reach_floor(TRUE) ||
 #ifdef STEED
         (feeding && u.usteed) || /* can't eat off floor while riding */
 #endif
@@ -2841,6 +2913,51 @@ boolean stopping;
         if (stopping) occupation = 0;   /* for do_reset_eat */
         (void) eatfood(); /* calls done_eating() to use up victual.piece */
         return TRUE;
+    }
+    return FALSE;
+}
+
+/* Tin of <something> to the rescue?  Decide whether current occupation
+   is an attempt to eat a tin of something capable of saving hero's life.
+   We don't care about consumption of non-tinned food here because special
+   effects there take place on first bite rather than at end of occupation.
+   [Popeye the Sailor gets out of trouble by eating tins of spinach. :-] */
+boolean
+Popeye(threat)
+int threat;
+{
+    struct obj *otin;
+    int mndx;
+
+    if (occupation != opentin) {
+        return FALSE;
+    }
+    otin = tin.tin;
+    /* make sure hero still has access to tin */
+    if (!carried(otin) &&
+            (!obj_here(otin, u.ux, u.uy) || !can_reach_floor(TRUE))) {
+        return FALSE;
+    }
+    /* unknown tin is assumed to be helpful */
+    if (!otin->known) {
+        return TRUE;
+    }
+    /* known tin is helpful if it will stop life-threatening problem */
+    mndx = otin->corpsenm;
+    switch (threat) {
+    /* note: not used; hunger code bypasses stop_occupation() when eating */
+    case HUNGER:
+        return (boolean) (mndx != NON_PM || otin->spe == 1);
+    /* flesh from lizards and acidic critters stops petrification */
+    case STONED:
+        return (boolean) (mndx >= LOW_PM && (mndx == PM_LIZARD || acidic(&mons[mndx])));
+    /* no tins can cure these (yet?) */
+    case SLIMED:
+    case SICK:
+    case VOMITING:
+        break;
+    default:
+        break;
     }
     return FALSE;
 }

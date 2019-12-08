@@ -7,7 +7,6 @@
  */
 
 #include "hack.h"
-#include "edog.h"
 
 extern const int monstr[];
 
@@ -68,7 +67,6 @@ struct obj *obj;
         static const char *empty = "The potion turns out to be empty.";
         const char *potion_descr;
         struct monst *mtmp;
-#define POTION_OCCUPANT_CHANCE(n) (13 + 2*(n))  /* also in potion.c */
 
         potion_descr = OBJ_DESCR(objects[obj->otyp]);
         if (potion_descr && !strcmp(potion_descr, "milky")) {
@@ -125,7 +123,7 @@ struct obj *obj;
     }
     /* same probability for blowing up a cursed wand as in dozap()
      * for the player */
-    if (obj->oclass == WAND_CLASS && obj->cursed && !rn2(30)) {
+    if (obj->oclass == WAND_CLASS && obj->cursed && !rn2(WAND_BACKFIRE_CHANCE)) {
         int dam = d(obj->spe+2, 6);
 
         if (flags.soundok) {
@@ -2084,6 +2082,20 @@ const char *fmt, *str;
     return FALSE;
 }
 
+/* cure mon's blindness (use_defensive, dog_eat, meatobj) */
+void
+mcureblindness(mon, verbose)
+struct monst *mon;
+boolean verbose;
+{
+    if (!mon->mcansee) {
+        mon->mcansee = 1;
+        mon->mblinded = 0;
+        if (verbose && haseyes(mon->data)) {
+            pline("%s can see again.", Monnam(mon));
+        }
+    }
+}
 
 /* TRUE if the monster ate something */
 boolean

@@ -8,6 +8,7 @@
 #ifndef CONFIG_H
 #include "config.h"
 #endif
+#include "lint.h"
 
 /*  For debugging beta code.    */
 #ifdef BETA
@@ -29,6 +30,18 @@
 #define HVY_ENCUMBER    3   /* Strained */
 #define EXT_ENCUMBER    4   /* Overtaxed */
 #define OVERLOADED  5   /* Overloaded */
+
+/* weight increment of heavy iron ball */
+#define IRON_BALL_W_INCR 160
+
+/* number of turns it takes for vault guard to show up */
+#define VAULT_GUARD_TIME 30
+
+#define SHOP_DOOR_COST 400L /* cost of a destroyed shop door */
+#define SHOP_BARS_COST 300L /* cost of iron bars */
+#define SHOP_HOLE_COST 200L /* cost of making hole/trapdoor */
+#define SHOP_WALL_COST 200L /* cost of destroying a wall */
+#define SHOP_WALL_DMG  (10L * ACURRSTR) /* damaging a wall */
 
 /* hunger states - see hu_stat in eat.c */
 enum hunger_state_types {
@@ -65,12 +78,36 @@ enum hunger_state_types {
 #define MG_DETECT   0x04
 #define MG_PET      0x08
 #define MG_RIDDEN   0x10
-#define MG_INVERSE  0x20 /* use inverse video */
+#define MG_STATUE   0x20
+#define MG_INVERSE  0x40 /* use inverse video */
 
 /* sellobj_state() states */
 #define SELL_NORMAL (0)
 #define SELL_DELIBERATE (1)
 #define SELL_DONTSELL   (2)
+
+/* alteration types--keep in synch with costly_alteration(mkobj.c) */
+enum cost_alteration_types {
+    COST_CANCEL  =  0, /* standard cancellation */
+    COST_DRAIN   =  1, /* drain life upon an object */
+    COST_UNCHRG  =  2, /* cursed charging */
+    COST_UNBLSS  =  3, /* unbless (devalues holy water) */
+    COST_UNCURS  =  4, /* uncurse (devalues unholy water) */
+    COST_DECHNT  =  5, /* disenchant weapons or armor */
+    COST_DEGRD   =  6, /* removal of rustproofing, dulling via engraving */
+    COST_DILUTE  =  7, /* potion dilution */
+    COST_ERASE   =  8, /* scroll or spellbook blanking */
+    COST_BURN    =  9, /* dipped into flaming oil */
+    COST_NUTRLZ  = 10, /* neutralized via unicorn horn */
+    COST_DSTROY  = 11, /* wand breaking (bill first, useup later) */
+    COST_SPLAT   = 12, /* cream pie to own face (ditto) */
+    COST_BITE    = 13, /* start eating food */
+    COST_OPEN    = 14, /* open tin */
+    COST_BRKLCK  = 15, /* break box/chest's lock */
+    COST_RUST    = 16, /* rust damage */
+    COST_ROT     = 17, /* rotting attack */
+    COST_CORRODE = 18 /* acid damage */
+};
 
 /*
  * This is the way the game ends.  If these are rearranged, the arrays
@@ -101,6 +138,12 @@ enum hunger_state_types {
 #endif
 #endif
 
+typedef struct strbuf {
+    int    len;
+    char * str;
+    char   buf[256];
+} strbuf_t;
+
 #include "align.h"
 #include "dungeon.h"
 #include "monsym.h"
@@ -108,17 +151,31 @@ enum hunger_state_types {
 #include "objclass.h"
 #include "youprop.h"
 #include "wintype.h"
+#include "context.h"
 #include "decl.h"
 #include "timeout.h"
 
 NEARDATA extern coord bhitpos;  /* place where throw or zap hits or stops */
 
 /* types of calls to bhit() */
-#define ZAPPED_WAND 0
-#define THROWN_WEAPON   1
-#define KICKED_WEAPON   2
-#define FLASHED_LIGHT   3
-#define INVIS_BEAM  4
+enum bhit_call_types {
+    ZAPPED_WAND = 0,
+    THROWN_WEAPON,
+    THROWN_TETHERED_WEAPON,
+    KICKED_WEAPON,
+    FLASHED_LIGHT,
+    INVIS_BEAM
+};
+
+
+/* attack mode for hmon() */
+enum hmon_atkmode_types {
+    HMON_MELEE   = 0, /* hand-to-hand */
+    HMON_THROWN  = 1, /* normal ranged (or spitting while poly'd) */
+    HMON_KICKED  = 2, /* alternate ranged */
+    HMON_APPLIED = 3, /* polearm, treated as ranged */
+    HMON_DRAGGED = 4  /* attached iron ball, pulled into mon */
+};
 
 #include "trap.h"
 #include "flag.h"
@@ -148,19 +205,50 @@ NEARDATA extern coord bhitpos;  /* place where throw or zap hits or stops */
 #define NO_SPELL    0
 
 /* flags to control makemon() */
-#define NO_MM_FLAGS   0x00  /* use this rather than plain 0 */
-#define NO_MINVENT    0x01  /* suppress minvent when creating mon */
-#define MM_NOWAIT     0x02  /* don't set STRAT_WAITMASK flags */
-#define MM_EDOG       0x04  /* add edog structure */
-#define MM_EMIN       0x08  /* add emin structure */
-#define MM_ANGRY      0x10  /* monster is created angry */
-#define MM_NONAME     0x20  /* monster is not christened */
-#define MM_NOCOUNTBIRTH   0x40  /* don't increment born counter (for revival) */
-#define MM_IGNOREWATER    0x80  /* ignore water when positioning */
-#define MM_ADJACENTOK     0x100 /* it is acceptable to use adjacent coordinates */
+/* goodpos() uses some plus has some of its own */
+#define NO_MM_FLAGS     0x00000 /* use this rather than plain 0 */
+#define NO_MINVENT      0x00001 /* suppress minvent when creating mon */
+#define MM_NOWAIT       0x00002 /* don't set STRAT_WAITMASK flags */
+#define MM_NOCOUNTBIRTH 0x00004 /* don't increment born count (for revival) */
+#define MM_IGNOREWATER  0x00008 /* ignore water when positioning */
+#define MM_ADJACENTOK   0x00010 /* acceptable to use adjacent coordinates */
+#define MM_ANGRY        0x00020 /* monster is created angry */
+#define MM_NONAME       0x00040 /* monster is not christened */
+#define MM_EGD          0x00100 /* add egd structure */
+#define MM_EPRI         0x00200 /* add epri structure */
+#define MM_ESHK         0x00400 /* add eshk structure */
+#define MM_EMIN         0x00800 /* add emin structure */
+#define MM_EDOG         0x01000 /* add edog structure */
+#define MM_ASLEEP       0x02000 /* monsters should be generated asleep */
+#define MM_NOGRP        0x04000 /* suppress creation of monster groups */
+/* if more MM_ flag masks are added, skip or renumber the GP_ one(s) */
+#define GP_ALLOW_XY     0x08000 /* [actually used by enexto() to decide whether
+                                 * to make an extra call to goodpos()]          */
+
+/* flags for make_corpse() and mkcorpstat() */
+#define CORPSTAT_NONE   0x00
+#define CORPSTAT_INIT   0x01 /* pass init flag to mkcorpstat */
+#define CORPSTAT_BURIED 0x02 /* bury the corpse or statue */
+
+/* flags for decide_to_shift() */
+#define SHIFT_SEENMSG 0x01 /* put out a message if in sight */
+#define SHIFT_MSG 0x02     /* always put out a message */
+
+/* flags for deliver_obj_to_mon */
+#define DF_NONE     0x00
+#define DF_RANDOM   0x01
+#define DF_ALL      0x04
 
 /* special mhpmax value when loading bones monster to flag as extinct or genocided */
 #define DEFUNCT_MONSTER (-100)
+
+/* macro form of adjustments of physical damage based on Half_physical_damage.
+ * Can be used on-the-fly with the 1st parameter to losehp() if you don't
+ * need to retain the dmg value beyond that call scope.
+ * Take care to ensure it doesn't get used more than once in other instances.
+ */
+#define Maybe_Half_Phys(dmg) \
+        ((Half_physical_damage) ? (((dmg) + 1) / 2) : (dmg))
 
 /* flags for special ggetobj status returns */
 #define ALL_FINISHED      0x01  /* called routine already finished the job */
@@ -200,9 +288,14 @@ NEARDATA extern coord bhitpos;  /* place where throw or zap hits or stops */
 #define PICK_RIGID  1
 
 /* Flags to control dotrap() in trap.c */
-#define NOWEBMSG    0x01    /* suppress stumble into web message */
-#define FORCEBUNGLE 0x02    /* adjustments appropriate for bungling */
-#define RECURSIVETRAP   0x04    /* trap changed into another type this same turn */
+#define FORCETRAP 0x01     /* triggering not left to chance */
+#define NOWEBMSG 0x02      /* suppress stumble into web message */
+#define FORCEBUNGLE 0x04   /* adjustments appropriate for bungling */
+#define RECURSIVETRAP 0x08 /* trap changed into another type this same turn */
+#define TOOKPLUNGE 0x10    /* used '>' to enter pit below you */
+#define VIASITTING 0x20    /* #sit while at trap location (affects message) */
+#define FAILEDUNTRAP 0x40  /* trap activated by failed untrap attempt */
+
 
 /* Flags to control test_move in hack.c */
 #define DO_MOVE     0   /* really doing the move */
@@ -242,6 +335,13 @@ NEARDATA extern coord bhitpos;  /* place where throw or zap hits or stops */
 #define EXPL_FROSTY 6
 #define EXPL_MAX    7
 
+/* flags for xkilled() [note: meaning of first bit used to be reversed,
+   1 to give message and 0 to suppress] */
+#define XKILL_GIVEMSG   0
+#define XKILL_NOMSG     1
+#define XKILL_NOCORPSE  2
+#define XKILL_NOCONDUCT 4
+
 /* Macros for messages referring to hands, eyes, feet, etc... */
 #define ARM 0
 #define EYE 1
@@ -262,6 +362,18 @@ NEARDATA extern coord bhitpos;  /* place where throw or zap hits or stops */
 #define LUNG 16
 #define NOSE 17
 #define STOMACH 18
+
+/* indices for some special tin types */
+#define SPINACH_TIN  (-1)
+#define RANDOM_TIN   (-2)
+#define HEALTHY_TIN  (-3)
+
+/* Some misc definitions */
+#define POTION_OCCUPANT_CHANCE(n) (13 + 2 * (n))
+#define WAND_BACKFIRE_CHANCE 30
+#define BALL_IN_MON (u.uswallow && uball && uball->where == OBJ_FREE)
+#define CHAIN_IN_MON (u.uswallow && uchain && uchain->where == OBJ_FREE)
+#define NODIAG(monnum) ((monnum) == PM_GRID_BUG)
 
 /* Flags to control menus */
 #define MENUTYPELEN sizeof("traditional ")
@@ -359,6 +471,16 @@ NEARDATA extern coord bhitpos;  /* place where throw or zap hits or stops */
 # define CFDECLSPEC __cdecl
 #else
 # define CFDECLSPEC
+#endif
+
+#ifdef DEBUG
+# ifdef WIZARD
+#define debug_pline  if (wizard) pline
+# else
+#define debug_pline  pline
+# endif
+#else
+# define debug_pline if (0) pline
 #endif
 
 #endif /* HACK_H */

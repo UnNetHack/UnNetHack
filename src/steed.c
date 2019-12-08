@@ -165,6 +165,20 @@ struct obj *otmp;
     return 1;
 }
 
+void
+put_saddle_on_mon(saddle, mtmp)
+struct obj *saddle;
+struct monst *mtmp;
+{
+    if (!can_saddle(mtmp) || which_armor(mtmp, W_SADDLE))
+        return;
+    if (mpickobj(mtmp, saddle))
+        panic("merged saddle?");
+    mtmp->misc_worn_check |= W_SADDLE;
+    saddle->owornmask = W_SADDLE;
+    saddle->leashmon = mtmp->m_id;
+    update_mon_intrinsics(mtmp, saddle, TRUE, FALSE);
+}
 
 /*** Riding the monster ***/
 
@@ -498,8 +512,10 @@ int reason;         /* Player was thrown off etc. */
     switch (reason) {
     case DISMOUNT_THROWN:
         verb = "are thrown";
+        /* fall through */
     case DISMOUNT_FELL:
         You("%s off of %s!", verb, mon_nam(mtmp));
+        /* fall through */
     case DISMOUNT_VANISHED:
         if (!have_spot) have_spot = landing_spot(&cc, reason, 1);
         losehp(rn1(10, 10), "riding accident", KILLED_BY_AN);
@@ -531,7 +547,7 @@ int reason;         /* Player was thrown off etc. */
             You("can't. There isn't anywhere for you to stand.");
             return;
         }
-        if (!mtmp->mnamelth) {
+        if (!has_mname(mtmp)) {
             pline("You've been through the dungeon on %s with no name.",
                   an(mtmp->data->mname));
             if (Hallucination)

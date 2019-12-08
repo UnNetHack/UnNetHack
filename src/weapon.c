@@ -677,6 +677,19 @@ register struct monst *mon;
     return 0;
 }
 
+/* force monster to stop wielding current weapon, if any */
+void
+mwepgone(mon)
+struct monst *mon;
+{
+    struct obj *mwep = MON_WEP(mon);
+
+    if (mwep) {
+        setmnotwielded(mon, mwep);
+        mon->weapon_check = NEED_WEAPON;
+    }
+}
+
 int
 abon()      /* attack bonus for strength & dexterity */
 {
@@ -730,6 +743,36 @@ dbon()      /* damage bonus for strength */
     return dbon;
 }
 
+/* decrease a towel's wetness */
+void
+dry_a_towel(obj, amt, verbose)
+struct obj *obj;
+int amt; /* positive: new value; negative: decrement by -amt; zero: no-op */
+boolean verbose;
+{
+    int newspe = (amt <= 0) ? obj->spe + amt : amt;
+
+    /* new state is only reported if it's a decrease */
+    if (newspe < obj->spe) {
+        if (verbose) {
+            if (carried(obj)) {
+                pline("%s dries%s.", Yobjnam2(obj, (const char *) 0),
+                      !newspe ? " out" : "");
+            } else if (mcarried(obj) && canseemon(obj->ocarry)) {
+                pline("%s %s drie%s.", s_suffix(Monnam(obj->ocarry)),
+                      xname(obj), !newspe ? " out" : "");
+            }
+        }
+    }
+    newspe = min(newspe, 7);
+    obj->spe = max(newspe, 0);
+
+    /* if hero is wielding this towel and it is now dry, give "you begin
+       bashing with your towel" message on next attack with it */
+    if (obj == uwep) {
+        unweapon = !is_wet_towel(obj);
+    }
+}
 
 /* copy the skill level name into the given buffer */
 STATIC_OVL char *

@@ -292,6 +292,21 @@ raise_dead:
     return;
 }
 
+/* 'book' has just become cursed; if we're reading it and realize it is
+   now cursed, interrupt */
+void
+book_cursed(book)
+struct obj *book;
+{
+#ifdef NEXT_VERSION
+    if (occupation == learn &&
+            context.spbook.book == book &&
+            book->cursed && book->bknown && multi >= 0) {
+        stop_occupation();
+    }
+#endif
+}
+
 STATIC_PTR int
 learn()
 {
@@ -828,7 +843,7 @@ boolean atme;
                         } else {
                             explode(u.dx, u.dy,
                                     pseudo->otyp - SPE_MAGIC_MISSILE + 10,
-                                    u.ulevel/2 + 1 + spell_damage_bonus(), 0,
+                                    spell_damage_bonus(u.ulevel/2 + 1), 0,
                                     (pseudo->otyp == SPE_CONE_OF_COLD) ?
                                     EXPL_FROSTY : EXPL_FIERY);
                         }

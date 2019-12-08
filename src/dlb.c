@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)dlb.c  3.4 1997/07/29  */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -472,6 +471,11 @@ const char *area, *name, *mode;
     dlb *dp;
 
     if (!dlb_initialized) return (dlb *) 0;
+
+    /* only support reading; ignore possible binary flag */
+    if (!mode || mode[0] != 'r') {
+        return (dlb *) 0;
+    }
 
     dp = (dlb *) alloc(sizeof(dlb));
     if (do_dlb_fopen(dp, name, mode))

@@ -791,4 +791,72 @@ drag_down()
     }
 }
 
+void
+bc_sanity_check()
+{
+    int otyp, freeball, freechain;
+    const char *onam;
+
+    if (Punished && (!uball || !uchain)) {
+        impossible("Punished without %s%s%s?",
+                   !uball ? "iron ball" : "",
+                   (!uball && !uchain) ? " and " : "",
+                   !uchain ? "attached chain" : "");
+    } else if (!Punished && (uball || uchain)) {
+        impossible("Attached %s%s%s without being Punished?",
+                   uchain ? "chain" : "",
+                   (uchain && uball) ? " and " : "",
+                   uball ? "iron ball" : "");
+    }
+    /* ball is free when swallowed, when changing levels or during air bubble
+       management on Plane of Water (both of which start and end in between
+       sanity checking cycles, so shouldn't be relevant), other times? */
+    freechain = (!uchain || uchain->where == OBJ_FREE);
+    freeball = (!uball || uball->where == OBJ_FREE
+                /* lie to simplify the testing logic */
+                || (freechain && uball->where == OBJ_INVENT));
+    if (uball &&
+        (uball->otyp != HEAVY_IRON_BALL ||
+         (uball->where != OBJ_FLOOR && uball->where != OBJ_INVENT && uball->where != OBJ_FREE) ||
+         (freeball ^ freechain) ||
+         (uball->owornmask & W_BALL) == 0L ||
+         (uball->owornmask & ~(W_BALL | W_WEAPONS)) != 0L)) {
+        otyp = uball->otyp;
+        onam = safe_typename(otyp);
+        impossible("uball: type %d (%s), where %d, wornmask=0x%08lx", otyp, onam, uball->where, uball->owornmask);
+    }
+    /* similar check to ball except can't be in inventory */
+    if (uchain &&
+        (uchain->otyp != IRON_CHAIN ||
+         (uchain->where != OBJ_FLOOR && uchain->where != OBJ_FREE) ||
+         (freechain ^ freeball) ||
+         /* [could simplify this to owornmask != W_CHAIN] */
+         (uchain->owornmask & W_CHAIN) == 0L ||
+         (uchain->owornmask & ~W_CHAIN) != 0L)) {
+        otyp = uchain->otyp;
+        onam = safe_typename(otyp);
+        impossible("uchain: type %d (%s), where %d, wornmask=0x%08lx", otyp, onam, uchain->where, uchain->owornmask);
+    }
+    if (uball && uchain && !(freeball && freechain)) {
+        int bx, by, cx, cy, bdx, bdy, cdx, cdy;
+
+        /* non-free chain should be under or next to the hero;
+           non-free ball should be on or next to the chain or else carried */
+        cx = uchain->ox, cy = uchain->oy;
+        cdx = cx - u.ux, cdy = cy - u.uy;
+        cdx = abs(cdx), cdy = abs(cdy);
+        if (uball->where == OBJ_INVENT) { /* carried(uball) */
+            bx = u.ux, by = u.uy; /* get_obj_location() */
+        } else {
+            bx = uball->ox, by = uball->oy;
+        }
+        bdx = bx - cx, bdy = by - cy;
+        bdx = abs(bdx), bdy = abs(bdy);
+        if (cdx > 1 || cdy > 1 || bdx > 1 || bdy > 1) {
+            impossible( "b&c distance: you@<%d,%d>, chain@<%d,%d>, ball@<%d,%d>", u.ux, u.uy, cx, cy, bx, by);
+        }
+    }
+    /* [check bc_order too?] */
+}
+
 /*ball.c*/

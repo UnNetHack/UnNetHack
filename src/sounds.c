@@ -3,7 +3,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "edog.h"
 #ifdef USER_SOUNDS
 # ifdef USER_SOUNDS_REGEX
 #include <regex.h>
@@ -1064,6 +1063,17 @@ dochat()
 
     tx = u.ux+u.dx; ty = u.uy+u.dy;
     mtmp = m_at(tx, ty);
+
+    if ((!mtmp || mtmp->mundetected) &&
+        (otmp = vobj_at(tx, ty)) && otmp->otyp == STATUE) {
+        /* Talking to a statue */
+        if (!Blind) {
+            pline_The("%s seems not to notice you.",
+                      /* if hallucinating, you can't tell it's a statue */
+                      Hallucination ? rndmonnam() : "statue");
+        }
+        return 0;
+    }
 
     if (!mtmp || mtmp->mundetected ||
         mtmp->m_ap_type == M_AP_FURNITURE ||

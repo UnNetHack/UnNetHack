@@ -21,6 +21,7 @@ NEARDATA int bases[MAXOCLASSES] = DUMMY;
 
 NEARDATA int multi = 0;
 char multi_txt[BUFSZ] = DUMMY;
+const char *multi_reason = NULL;
 #if 0
 NEARDATA int warnlevel = 0;     /* used by movemon and dochugw */
 #endif
@@ -39,7 +40,7 @@ NEARDATA int in_doagain = 0;
  *  The following structure will be initialized at startup time with
  *  the level numbers of some "important" things in the game.
  */
-struct dgn_topology dungeon_topology = {DUMMY};
+struct dgn_topology dungeon_topology = { 0 };
 
 #include "quest.h"
 struct q_score quest_status = DUMMY;
@@ -125,13 +126,14 @@ NEARDATA struct dig_info digging;
 
 NEARDATA dungeon dungeons[MAXDUNGEON];  /* ini'ed by init_dungeon() */
 NEARDATA s_level *sp_levchn;
-NEARDATA stairway upstair = { 0, 0 }, dnstair = { 0, 0 };
-NEARDATA stairway upladder = { 0, 0 }, dnladder = { 0, 0 };
-NEARDATA stairway sstairs = { 0, 0 };
-NEARDATA dest_area updest = { 0, 0, 0, 0, 0, 0, 0, 0 };
-NEARDATA dest_area dndest = { 0, 0, 0, 0, 0, 0, 0, 0 };
-NEARDATA coord inv_pos = { 0, 0 };
+NEARDATA stairway upstair = { 0 }, dnstair = { 0 };
+NEARDATA stairway upladder = { 0 }, dnladder = { 0 };
+NEARDATA stairway sstairs = { 0 };
+NEARDATA dest_area updest = { 0 };
+NEARDATA dest_area dndest = { 0 };
+NEARDATA coord inv_pos = { 0 };
 
+NEARDATA boolean defer_see_monsters = FALSE;
 NEARDATA boolean in_mklev = FALSE;
 NEARDATA boolean in_mk_rndvault = FALSE;
 NEARDATA boolean rndvault_failed = FALSE;
@@ -139,7 +141,10 @@ NEARDATA boolean stoned = FALSE;    /* done to monsters hit by 'c' */
 NEARDATA boolean unweapon = FALSE;
 NEARDATA boolean mrg_to_wielded = FALSE;
 /* weapon picked is merged with wielded one */
-NEARDATA struct obj *current_wand = 0;  /* wand currently zapped/applied */
+/* some objects need special handling during destruction or placement */
+NEARDATA struct obj *current_wand = 0; /* wand currently zapped/applied */
+NEARDATA struct obj *thrownobj = 0;    /* object in flight due to throwing */
+NEARDATA struct obj *kickedobj = 0;    /* object in flight due to kicking */
 
 NEARDATA boolean in_steed_dismounting = FALSE;
 
@@ -156,6 +161,9 @@ dlevel_t level;     /* level map */
 struct trap *ftrap = (struct trap *)0;
 NEARDATA struct monst youmonst = DUMMY;
 NEARDATA struct permonst upermonst = DUMMY;
+/* > to be replaced with context */
+NEARDATA struct polearm_info polearm;
+/* < to be replaced with context */
 NEARDATA struct flag flags = DUMMY;
 NEARDATA struct instance_flags iflags = DUMMY;
 NEARDATA struct you u = DUMMY;
@@ -212,7 +220,9 @@ NEARDATA struct obj *migrating_objs = (struct obj *)0;
 NEARDATA struct obj *billobjs = (struct obj *)0;
 
 /* used to zero all elements of a struct obj */
-NEARDATA struct obj zeroobj = DUMMY;
+struct obj zeroobj = DUMMY;           /* used to zero out a struct obj */
+const struct monst zeromonst = DUMMY; /* used to zero out a struct monst */
+const anything zeroany = DUMMY;       /* used to zero out union any */
 
 /* originally from dog.c */
 NEARDATA char dogname[PL_PSIZ] = DUMMY;

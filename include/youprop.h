@@ -117,6 +117,11 @@
                              (flags.perma_hallu))
 
 /* Timeout, plus a worn mask */
+
+#define HDeaf FALSE
+#define EDeaf FALSE
+#define Deaf (!flags.soundok) /* just a workaround until proper Deaf support lands */
+
 #define HFumbling       u.uprops[FUMBLING].intrinsic
 #define EFumbling       u.uprops[FUMBLING].extrinsic
 #define Fumbling        (HFumbling || EFumbling)
@@ -223,8 +228,13 @@
 #define Teleport_control    (HTeleport_control || ETeleport_control || \
                              control_teleport(youmonst.data))
 
+/* HLevitation has I_SPECIAL set if levitating due to blessed potion
+   which allows player to use the '>' command to end levitation early */
 #define HLevitation     u.uprops[LEVITATION].intrinsic
 #define ELevitation     u.uprops[LEVITATION].extrinsic
+/* BLevitation has I_SPECIAL set if trapped in the floor,
+   FROMOUTSIDE set if inside solid rock (or in water on Plane of Water) */
+#define BLevitation u.uprops[LEVITATION].blocked
 #define Levitation      (HLevitation || ELevitation || \
                          is_floater(youmonst.data))
 /* Can't touch surface, can't go under water; overrides all others */
@@ -234,7 +244,11 @@
                          (ELevitation & ~W_ARTI) == 0L && \
                          !is_floater(youmonst.data))
 
+#define HFlying         u.uprops[FLYING].intrinsic
 #define EFlying         u.uprops[FLYING].extrinsic
+/* BFlying has I_SPECIAL set if levitating or trapped in the floor or both,
+   FROMOUTSIDE set if inside solid rock (or in water on Plane of Water) */
+#define BFlying         u.uprops[FLYING].blocked
 #ifdef STEED
 # define Flying         (EFlying || is_flyer(youmonst.data) || \
                          (u.usteed && is_flyer(u.usteed->data)))
@@ -243,8 +257,8 @@
 #endif
 /* May touch surface; does not override any others */
 
-#define Wwalking        (u.uprops[WWALKING].extrinsic && \
-                         !Is_waterlevel(&u.uz))
+#define EWwalking u.uprops[WWALKING].extrinsic
+#define Wwalking (EWwalking && !Is_waterlevel(&u.uz))
 /* Don't get wet, can't go under water; overrides others except levitation */
 /* Wwalking is meaningless on water level */
 
@@ -344,5 +358,14 @@
 
 #define Lifesaved       u.uprops[LIFESAVED].extrinsic
 
+/*
+ * Some pseudo-properties.
+ */
+
+/* unconscious() includes u.usleep but not is_fainted(); the multi test is
+   redundant but allows the function calls to be skipped most of the time */
+#define Unaware (multi < 0 && (unconscious() || is_fainted()))
+
+#define Hate_silver (u.ulycn >= LOW_PM || hates_silver(youmonst.data))
 
 #endif /* YOUPROP_H */

@@ -5,7 +5,6 @@
 #include "hack.h"
 
 #include "mfndpos.h"
-#include "edog.h"
 
 extern boolean notonhead;
 
@@ -195,7 +194,7 @@ boolean devour;
                 obj = splitobj(obj, obj->quan - 1L);
 
                 freeinv(obj);
-                if (inv_cnt() >= 52 && !merge_choice(invent, obj))
+                if (inv_cnt(FALSE) >= 52 && !merge_choice(invent, obj))
                     dropy(obj);
                 else
                     obj = addinv(obj); /* unlikely but a merge is possible */
@@ -887,6 +886,19 @@ genericptr_t distance;
         gx = x;
         gy = y;
         *(int*)distance = ndist;
+    }
+}
+
+void
+finish_meating(mtmp)
+struct monst *mtmp;
+{
+    mtmp->meating = 0;
+    if (M_AP_TYPE(mtmp) && mtmp->mappearance && mtmp->cham == NON_PM) {
+        /* was eating a mimic and now appearance needs resetting */
+        mtmp->m_ap_type = 0;
+        mtmp->mappearance = 0;
+        newsym(mtmp->mx, mtmp->my);
     }
 }
 

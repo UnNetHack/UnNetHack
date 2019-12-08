@@ -452,10 +452,10 @@ print_glyph(window, x, y, glyph)
                    port wants (symbol, font, color, attributes, ...there's
                    a 1-1 map between glyphs and distinct things on the map).
 */
-void dummy_print_glyph(winid wid,XCHAR_P x,XCHAR_P y,int glyph)
+void dummy_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bg_glyph)
 {
     if (wid != -1) {
-        dummy_printf("winid %d; x %d, y %d, glyph: %d\n", wid, x, y, glyph);
+        dummy_printf("winid %d; x %d, y %d, glyph: %d, bg_glyph: %d\n", wid, x, y, glyph, bg_glyph);
     }
 }
 

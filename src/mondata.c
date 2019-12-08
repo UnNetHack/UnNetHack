@@ -1,29 +1,43 @@
-/*  SCCS Id: @(#)mondata.c  3.4 2003/06/02  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "eshk.h"
-#include "epri.h"
 
-/*  These routines provide basic data for any type of monster. */
+/*
+ *      These routines provide basic data for any type of monster.
+ */
 
+/* set up an individual monster's base type (initial creation, shapechange) */
 void
-set_mon_data(mon, ptr, flag)
+set_mon_data(mon, ptr)
 struct monst *mon;
 struct permonst *ptr;
-int flag;
 {
-    mon->data = ptr;
-    if (flag == -1) return;     /* "don't care" */
+    int new_speed, old_speed = mon->data ? mon->data->mmove : 0;
 
-    if (flag == 1)
-        mon->mintrinsics |= (ptr->mresists & 0x00FF);
-    else
-        mon->mintrinsics = (ptr->mresists & 0x00FF);
+    mon->data = ptr;
+    mon->mnum = (short) monsndx(ptr);
+
+    if (mon->movement) { /* used to adjust poly'd hero as well as monsters */
+        new_speed = ptr->mmove;
+        /* prorate unused movement if new form is slower so that
+           it doesn't get extra moves leftover from previous form;
+           if new form is faster, leave unused movement as is */
+        if (new_speed < old_speed) {
+            /*
+             * Some static analysis warns that this might divide by 0
+               mon->movement = new_speed * mon->movement / old_speed;
+             * so add a redundant test to suppress that.
+             */
+            mon->movement *= new_speed;
+            if (old_speed > 0) /* old > new and new >= 0, so always True */
+                mon->movement /= old_speed;
+        }
+    }
     return;
 }
 
+/* does monster-type have any attack for a specific type of damage? */
 struct attack *
 attacktype_fordmg(ptr, atyp, dtyp)
 struct permonst *ptr;
@@ -38,6 +52,7 @@ int atyp, dtyp;
     return (struct attack *)0;
 }
 
+/* does monster-type have a particular type of attack */
 boolean
 attacktype(ptr, atyp)
 struct permonst *ptr;
@@ -46,17 +61,41 @@ int atyp;
     return attacktype_fordmg(ptr, atyp, AD_ANY) ? TRUE : FALSE;
 }
 
+/* returns True if monster doesn't attack, False if it does */
+boolean
+noattacks(ptr)
+struct permonst *ptr;
+{
+    int i;
+    struct attack *mattk = ptr->mattk;
+
+    for (i = 0; i < NATTK; i++) {
+        /* AT_BOOM "passive attack" (gas spore's explosion upon death)
+           isn't an attack as far as our callers are concerned */
+        if (mattk[i].aatyp == AT_BOOM) {
+            continue;
+        }
+
+        if (mattk[i].aatyp) {
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+/* does monster-type transform into something else when petrified? */
 boolean
 poly_when_stoned(ptr)
 struct permonst *ptr;
 {
+    /* non-stone golems turn into stone golems unless latter is genocided */
     return((boolean)(is_golem(ptr) && ptr != &mons[PM_STONE_GOLEM] &&
                      !(mvitals[PM_STONE_GOLEM].mvflags & G_GENOD)));
     /* allow G_EXTINCT */
 }
 
+/* returns True if monster is drain-life resistant */
 boolean
-resists_drli(mon)   /* returns TRUE if monster is drain-life resistant */
+resists_drli(mon)
 struct monst *mon;
 {
     struct permonst *ptr = mon->data;
@@ -226,6 +265,14 @@ struct permonst *ptr;
     return FALSE;
 }
 
+/* True if specific monster is especially affected by silver weapons */
+boolean
+mon_hates_silver(mon)
+struct monst *mon;
+{
+    return (boolean) (is_vampshifter(mon) || hates_silver(mon->data));
+}
+
 boolean
 hates_silver(ptr)
 register struct permonst *ptr;
@@ -281,6 +328,19 @@ register struct permonst *ptr;
 {
     return((boolean)(dmgtype(ptr, AD_STCK) || dmgtype(ptr, AD_WRAP) ||
                      attacktype(ptr, AT_HUGS)));
+}
+
+/* some monster-types can't vomit */
+boolean
+cantvomit(ptr)
+struct permonst *ptr;
+{
+    /* rats and mice are incapable of vomiting;
+       which other creatures have the same limitation? */
+    if (ptr->mlet == S_RODENT && ptr != &mons[PM_ROCK_MOLE] && ptr != &mons[PM_WOODCHUCK]) {
+        return TRUE;
+    }
+    return FALSE;
 }
 
 /* number of horns this type of monster has on its head */
@@ -353,6 +413,111 @@ register struct monst *mdef, *magr;
             return dmg;
         }
     return 0;
+}
+
+/* determine whether two monster types are from the same species */
+boolean
+same_race(pm1, pm2)
+struct permonst *pm1, *pm2;
+{
+    char let1 = pm1->mlet, let2 = pm2->mlet;
+
+    if (pm1 == pm2)
+        return TRUE; /* exact match */
+    /* player races have their own predicates */
+    if (is_human(pm1))
+        return is_human(pm2);
+    if (is_elf(pm1))
+        return is_elf(pm2);
+    if (is_dwarf(pm1))
+        return is_dwarf(pm2);
+    if (is_gnome(pm1))
+        return is_gnome(pm2);
+    if (is_orc(pm1))
+        return is_orc(pm2);
+    /* other creatures are less precise */
+    if (is_giant(pm1))
+        return is_giant(pm2); /* open to quibbling here */
+    if (is_golem(pm1))
+        return is_golem(pm2); /* even moreso... */
+    if (is_mind_flayer(pm1))
+        return is_mind_flayer(pm2);
+    if (let1 == S_KOBOLD || pm1 == &mons[PM_KOBOLD_ZOMBIE]
+        || pm1 == &mons[PM_KOBOLD_MUMMY])
+        return (let2 == S_KOBOLD || pm2 == &mons[PM_KOBOLD_ZOMBIE]
+                || pm2 == &mons[PM_KOBOLD_MUMMY]);
+    if (let1 == S_OGRE)
+        return (let2 == S_OGRE);
+    if (let1 == S_NYMPH)
+        return (let2 == S_NYMPH);
+    if (let1 == S_CENTAUR)
+        return (let2 == S_CENTAUR);
+    if (is_unicorn(pm1))
+        return is_unicorn(pm2);
+    if (let1 == S_DRAGON)
+        return (let2 == S_DRAGON);
+    if (let1 == S_NAGA)
+        return (let2 == S_NAGA);
+    /* other critters get steadily messier */
+    if (is_rider(pm1))
+        return is_rider(pm2); /* debatable */
+    if (is_minion(pm1))
+        return is_minion(pm2); /* [needs work?] */
+    /* tengu don't match imps (first test handled case of both being tengu) */
+    if (pm1 == &mons[PM_TENGU] || pm2 == &mons[PM_TENGU])
+        return FALSE;
+    if (let1 == S_IMP)
+        return (let2 == S_IMP);
+    /* and minor demons (imps) don't match major demons */
+    else if (let2 == S_IMP)
+        return FALSE;
+    if (is_demon(pm1))
+        return is_demon(pm2);
+    if (is_undead(pm1)) {
+        if (let1 == S_ZOMBIE)
+            return (let2 == S_ZOMBIE);
+        if (let1 == S_MUMMY)
+            return (let2 == S_MUMMY);
+        if (let1 == S_VAMPIRE)
+            return (let2 == S_VAMPIRE);
+        if (let1 == S_LICH)
+            return (let2 == S_LICH);
+        if (let1 == S_WRAITH)
+            return (let2 == S_WRAITH);
+        if (let1 == S_GHOST)
+            return (let2 == S_GHOST);
+    } else if (is_undead(pm2))
+        return FALSE;
+
+    /* check for monsters which grow into more mature forms */
+    if (let1 == let2) {
+        int m1 = monsndx(pm1), m2 = monsndx(pm2), prv, nxt;
+
+        /* we know m1 != m2 (very first check above); test all smaller
+           forms of m1 against m2, then all larger ones; don't need to
+           make the corresponding tests for variants of m2 against m1 */
+        for (prv = m1, nxt = big_to_little(m1); nxt != prv;
+             prv = nxt, nxt = big_to_little(nxt))
+            if (nxt == m2)
+                return TRUE;
+        for (prv = m1, nxt = little_to_big(m1); nxt != prv;
+             prv = nxt, nxt = little_to_big(nxt))
+            if (nxt == m2)
+                return TRUE;
+    }
+    /* not caught by little/big handling */
+    if (pm1 == &mons[PM_GARGOYLE] || pm1 == &mons[PM_WINGED_GARGOYLE])
+        return (pm2 == &mons[PM_GARGOYLE]
+                || pm2 == &mons[PM_WINGED_GARGOYLE]);
+    if (pm1 == &mons[PM_KILLER_BEE] || pm1 == &mons[PM_QUEEN_BEE])
+        return (pm2 == &mons[PM_KILLER_BEE] || pm2 == &mons[PM_QUEEN_BEE]);
+
+    if (is_longworm(pm1))
+        return is_longworm(pm2); /* handles tail */
+    /* [currently there's no reason to bother matching up
+        assorted bugs and blobs with their closest variants] */
+    /* didn't match */
+    return FALSE;
 }
 
 int
@@ -504,10 +669,16 @@ register struct monst *mtmp;
 /* Like gender(), but lower animals and such are still "it". */
 /* This is the one we want to use when printing messages. */
 int
-pronoun_gender(mtmp)
+pronoun_gender(mtmp, override_vis)
 register struct monst *mtmp;
+boolean override_vis; /* if True then 'no it' unless neuter */
 {
-    if (is_neuter(mtmp->data) || !canspotmon(mtmp)) return 2;
+    if (!override_vis && !canspotmon(mtmp)) {
+        return 2;
+    }
+    if (is_neuter(mtmp->data)) {
+        return 2;
+    }
     return (humanoid(mtmp->data) || (mtmp->data->geno & G_UNIQ) ||
             type_is_pname(mtmp->data)) ? (int)mtmp->female : 2;
 }
@@ -740,6 +911,30 @@ struct attack *mattk;
         break;
     }
     return what;
+}
+
+/*
+ * Returns:
+ *      True if monster is presumed to have a sense of smell.
+ *      False if monster definitely does not have a sense of smell.
+ *
+ * Do not base this on presence of a head or nose, since many
+ * creatures sense smells other ways (feelers, forked-tongues, etc.)
+ * We're assuming all insects can smell at a distance too.
+ */
+boolean
+olfaction(mdat)
+struct permonst *mdat;
+{
+    if (is_golem(mdat)
+        || mdat->mlet == S_EYE /* spheres  */
+        || mdat->mlet == S_JELLY || mdat->mlet == S_PUDDING
+        || mdat->mlet == S_BLOB || mdat->mlet == S_VORTEX
+        || mdat->mlet == S_ELEMENTAL
+        || mdat->mlet == S_FUNGUS /* mushrooms and fungi */
+        || mdat->mlet == S_LIGHT)
+        return FALSE;
+    return TRUE;
 }
 
 /*mondata.c*/

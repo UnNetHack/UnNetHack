@@ -8,8 +8,10 @@
 #define TRAP_H
 
 union vlaunchinfo {
-    short v_launch_otyp;    /* type of object to be triggered */
-    coord v_launch2;    /* secondary launch point (for boulders) */
+    short v_launch_otyp; /* type of object to be triggered */
+    coord v_launch2;     /* secondary launch point (for boulders) */
+    uchar v_conjoined;   /* conjoined pit locations */
+    short v_tnote;       /* boards: 12 notes */
 };
 
 struct trap {
@@ -30,6 +32,8 @@ struct trap {
     union vlaunchinfo vl;
 #define launch_otyp vl.v_launch_otyp
 #define launch2     vl.v_launch2
+#define conjoined vl.v_conjoined
+#define tnote vl.v_tnote
 };
 
 extern struct trap *ftrap;
@@ -49,30 +53,37 @@ extern struct trap *ftrap;
 /* Note: if adding/removing a trap, adjust trap_engravings[] in mklev.c */
 
 /* unconditional traps */
-#define NO_TRAP     0
-#define ARROW_TRAP  1
-#define DART_TRAP   2
-#define ROCKTRAP    3
-#define SQKY_BOARD  4
-#define BEAR_TRAP   5
-#define LANDMINE    6
-#define ROLLING_BOULDER_TRAP    7
-#define SLP_GAS_TRAP    8
-#define RUST_TRAP   9
-#define FIRE_TRAP   10
-#define PIT     11
-#define SPIKED_PIT  12
-#define HOLE        13
-#define TRAPDOOR    14
-#define TELEP_TRAP  15
-#define LEVEL_TELEP 16
-#define MAGIC_PORTAL    17
-#define WEB     18
-#define STATUE_TRAP 19
-#define MAGIC_TRAP  20
-#define ANTI_MAGIC  21
-#define ICE_TRAP    22
-#define POLY_TRAP   23
-#define TRAPNUM 24
+enum trap_types {
+    NO_TRAP      =  0,
+    ARROW_TRAP,
+    DART_TRAP,
+    ROCKTRAP,
+    SQKY_BOARD,
+    BEAR_TRAP,
+    LANDMINE,
+    ROLLING_BOULDER_TRAP,
+    SLP_GAS_TRAP,
+    RUST_TRAP,
+    FIRE_TRAP,
+    PIT,
+    SPIKED_PIT,
+    HOLE,
+    TRAPDOOR,
+    TELEP_TRAP,
+    LEVEL_TELEP,
+    MAGIC_PORTAL,
+    WEB,
+    STATUE_TRAP,
+    MAGIC_TRAP,
+    ANTI_MAGIC,
+    ICE_TRAP,
+    POLY_TRAP,
+    VIBRATING_SQUARE,
+
+    TRAPNUM
+};
+
+#define is_pit(ttyp) ((ttyp) == PIT || (ttyp) == SPIKED_PIT)
+#define is_hole(ttyp)  ((ttyp) == HOLE || (ttyp) == TRAPDOOR)
 
 #endif /* TRAP_H */

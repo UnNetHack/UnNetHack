@@ -42,7 +42,7 @@ dosit()
     }
 #endif
 
-    if(!can_reach_floor())  {
+    if(!can_reach_floor(FALSE))  {
         if (Levitation)
             You("tumble in place.");
         else
@@ -179,7 +179,7 @@ in_water:
                 check_uhpmax();
                 make_blinded(0L, TRUE);
                 make_sick(0L, (char *) 0, FALSE, SICK_ALL);
-                heal_legs();
+                heal_legs(0);
                 flags.botl = 1;
                 break;
             case 5:
@@ -291,7 +291,8 @@ in_water:
         uegg->owt = weight(uegg);
         uegg->corpsenm = egg_type_from_parent(u.umonnum, FALSE);
         uegg->known = uegg->dknown = 1;
-        attach_egg_hatch_timeout(uegg);
+        /* this sets hatch timers if appropriate */
+        set_corpsenm(uegg, egg_type_from_parent(u.umonnum, FALSE));
         You("lay an egg.");
         dropy(uegg);
         stackobj(uegg);
@@ -401,16 +402,19 @@ attrcurse()         /* remove a random INTRINSIC ability */
             You_feel("warmer.");
             break;
     }
+             /* fall through */
     case 2: if (HTeleportation & INTRINSIC) {
             HTeleportation &= ~INTRINSIC;
             You_feel("less jumpy.");
             break;
     }
+             /* fall through */
     case 3: if (HPoison_resistance & INTRINSIC) {
             HPoison_resistance &= ~INTRINSIC;
             You_feel("a little sick!");
             break;
     }
+             /* fall through */
     case 4: if (HTelepat & INTRINSIC) {
             HTelepat &= ~INTRINSIC;
             if (Blind && !Blind_telepat)
@@ -418,43 +422,51 @@ attrcurse()         /* remove a random INTRINSIC ability */
             Your("senses fail!");
             break;
     }
+             /* fall through */
     case 5: if (HCold_resistance & INTRINSIC) {
             HCold_resistance &= ~INTRINSIC;
             You_feel("cooler.");
             break;
     }
+             /* fall through */
     case 6: if (HInvis & INTRINSIC) {
             HInvis &= ~INTRINSIC;
             You_feel("paranoid.");
             break;
     }
+             /* fall through */
     case 7: if (HSee_invisible & INTRINSIC) {
             HSee_invisible &= ~INTRINSIC;
             You("%s!", Hallucination ? "tawt you taw a puttie tat"
                 : "thought you saw something");
             break;
     }
+             /* fall through */
     case 8: if (HFast & INTRINSIC) {
             HFast &= ~INTRINSIC;
             You_feel("slower.");
             break;
     }
+             /* fall through */
     case 9: if (HStealth & INTRINSIC) {
             HStealth &= ~INTRINSIC;
             You_feel("clumsy.");
             break;
     }
+             /* fall through */
     case 10: if (HProtection & INTRINSIC) {
             HProtection &= ~INTRINSIC;
             You_feel("vulnerable.");
             u.ublessed = 0; /* fix for C343-189 */
             break;
     }
+             /* fall through */
     case 11: if (HAggravate_monster & INTRINSIC) {
             HAggravate_monster &= ~INTRINSIC;
             You_feel("less attractive.");
             break;
     }
+             /* fall through */
     default: break;
     }
 }

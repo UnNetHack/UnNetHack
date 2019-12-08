@@ -243,13 +243,18 @@ struct Gender {
 /* increment to 3 if you allow neuter roles */
 
 extern const struct Gender genders[];   /* table of available genders */
-#define uhe()   (genders[flags.female ? 1 : 0].he)
-#define uhim()  (genders[flags.female ? 1 : 0].him)
-#define uhis()  (genders[flags.female ? 1 : 0].his)
-#define mhe(mtmp)   (genders[pronoun_gender(mtmp)].he)
-#define mhim(mtmp)  (genders[pronoun_gender(mtmp)].him)
-#define mhis(mtmp)  (genders[pronoun_gender(mtmp)].his)
-
+/* pronouns for the hero */
+#define uhe()      (genders[flags.female ? 1 : 0].he)
+#define uhim()     (genders[flags.female ? 1 : 0].him)
+#define uhis()     (genders[flags.female ? 1 : 0].his)
+/* corresponding pronouns for monsters; yields "it" when mtmp can't be seen */
+#define mhe(mtmp)  (genders[pronoun_gender(mtmp, FALSE)].he)
+#define mhim(mtmp) (genders[pronoun_gender(mtmp, FALSE)].him)
+#define mhis(mtmp) (genders[pronoun_gender(mtmp, FALSE)].his)
+/* override "it" if reason is lack of visibility rather than neuter species */
+#define noit_mhe(mtmp)  (genders[pronoun_gender(mtmp, TRUE)].he)
+#define noit_mhim(mtmp) (genders[pronoun_gender(mtmp, TRUE)].him)
+#define noit_mhis(mtmp) (genders[pronoun_gender(mtmp, TRUE)].his)
 
 /*** Unified structure specifying alignment information ***/
 struct Align {
@@ -262,6 +267,17 @@ struct Align {
 #define ROLE_ALIGNS 3   /* number of permitted player alignments */
 
 extern const struct Align aligns[]; /* table of available alignments */
+
+enum utraptypes {
+    TT_BEARTRAP   = 0,
+    TT_PIT,
+    TT_WEB,
+    TT_LAVA,
+    TT_INFLOOR,
+    TT_BURIEDBALL,
+    TT_SWAMP,
+    TT_ICE,
+};
 
 /*
  * The following structure contains information about a conduct
@@ -326,13 +342,6 @@ struct you {
     unsigned utrap;     /* trap timeout */
     unsigned utraptype; /* defined if utrap nonzero */
     unsigned ufeetfrozen;   /* feet frozen, works similarly to utrap */
-#define TT_BEARTRAP 0
-#define TT_PIT      1
-#define TT_WEB      2
-#define TT_LAVA     3
-#define TT_INFLOOR  4
-#define TT_SWAMP    5
-#define TT_ICE      6
     char urooms[5];     /* rooms (roomno + 3) occupied now */
     char urooms0[5];    /* ditto, for previous position */
     char uentered[5];       /* rooms (roomno + 3) entered this turn */

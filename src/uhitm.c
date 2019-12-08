@@ -566,6 +566,9 @@ int thrown;
 #endif
     boolean valid_weapon_attack = FALSE;
     boolean unarmed = !uwep && !uarm && !uarms;
+    boolean hand_to_hand = (thrown == HMON_MELEE ||
+                            /* not grapnels; applied implies uwep */
+                            (thrown == HMON_APPLIED && is_pole(uwep)));
 #ifdef STEED
     int jousting = 0;
 #endif
@@ -790,7 +793,7 @@ int thrown;
                 else
                     setuwep((struct obj *)0);
                 freeinv(obj);
-                potionhit(mon, obj, TRUE);
+                potionhit(mon, obj, hand_to_hand ? POTHIT_HERO_BASH : POTHIT_HERO_THROW);
                 if (mon->mhp <= 0) return FALSE; /* killed */
                 hittxt = TRUE;
                 /* in case potion effect causes transformation */
@@ -1354,6 +1357,46 @@ struct obj *obj;
     return FALSE;
 }
 
+/* used for hero vs monster and monster vs monster; also handles
+   monster vs hero but that won't happen because hero can't be a shade */
+boolean
+shade_miss(magr, mdef, obj, thrown, verbose)
+struct monst *magr, *mdef;
+struct obj *obj;
+boolean thrown, verbose;
+{
+    const char *what, *whose, *target;
+    boolean youagr = (magr == &youmonst), youdef = (mdef == &youmonst);
+
+    /* we're using dmgval() for zero/not-zero, not for actual damage amount */
+    if (mdef->data != &mons[PM_SHADE] || (obj && dmgval(obj, mdef))) {
+        return FALSE;
+    }
+
+    if (verbose &&
+        ((youdef || cansee(mdef->mx, mdef->my) || sensemon(mdef)) ||
+         (magr == &youmonst && distu(mdef->mx, mdef->my) <= 2))) {
+        static const char harmlessly_thru[] = " harmlessly through ";
+
+        what = (!obj || shade_aware(obj)) ? "attack" : cxname(obj);
+        target = youdef ? "you" : mon_nam(mdef);
+        if (!thrown) {
+            whose = youagr ? "Your" : s_suffix(Monnam(magr));
+            pline("%s %s %s%s%s.", whose, what, vtense(what, "pass"), harmlessly_thru, target);
+        } else {
+            /* note: not pline_The() */
+            pline("%s %s%s%s.", The(what), vtense(what, "pass"), harmlessly_thru, target);
+        }
+        if (!youdef && !canspotmon(mdef)) {
+            map_invisible(mdef->mx, mdef->my);
+        }
+    }
+    if (!youdef) {
+        mdef->msleeping = 0;
+    }
+    return TRUE;
+}
+
 /* check whether slippery clothing protects from hug or wrap attack */
 /* [currently assumes that you are the attacker] */
 STATIC_OVL boolean
@@ -1693,7 +1736,7 @@ physical:
             struct obj *mongold = findgold(mdef->minvent);
             if (mongold) {
                 obj_extract_self(mongold);
-                if (merge_choice(invent, mongold) || inv_cnt() < 52) {
+                if (merge_choice(invent, mongold) || inv_cnt(FALSE) < 52) {
                     addinv(mongold);
                     Your("purse feels heavier.");
                 } else {
@@ -2754,7 +2797,7 @@ struct attack *mattk;       /* null means we find one internally */
         break;
     case AD_ENCH:
         if (!mon->mcan) {
-            if (drain_item(obj) && carried(obj) &&
+            if (drain_item(obj, TRUE) && carried(obj) &&
                 (obj->known || obj->oclass == ARMOR_CLASS)) {
                 Your("%s less effective.", aobjnam(obj, "seem"));
             }

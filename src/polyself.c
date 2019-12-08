@@ -62,7 +62,31 @@ void
 set_uasmon()
 {
     set_mon_data(&youmonst, ((u.umonnum == u.umonster) ?
-                             &upermonst : &mons[u.umonnum]), 0);
+                             &upermonst : &mons[u.umonnum]));
+}
+
+/* Levitation overrides Flying; set or clear BFlying|I_SPECIAL */
+void
+float_vs_flight()
+{
+    boolean stuck_in_floor = (u.utrap && u.utraptype != TT_PIT);
+
+#if 0 // TODO
+    /* floating overrides flight; so does being trapped in the floor */
+    if ((HLevitation || ELevitation)
+        || ((HFlying || EFlying) && stuck_in_floor))
+        BFlying |= I_SPECIAL;
+    else
+        BFlying &= ~I_SPECIAL;
+    /* being trapped on the ground (bear trap, web, molten lava survived
+       with fire resistance, former lava solidified via cold, tethered
+       to a buried iron ball) overrides floating--the floor is reachable */
+    if ((HLevitation || ELevitation) && stuck_in_floor)
+        BLevitation |= I_SPECIAL;
+    else
+        BLevitation &= ~I_SPECIAL;
+    g.context.botl = TRUE;
+#endif
 }
 
 /** Returns true if the player monster is genocided. */
@@ -361,11 +385,11 @@ made_change:
     new_light = Upolyd ? emits_light(youmonst.data) : 0;
     if (old_light != new_light) {
         if (old_light)
-            del_light_source(LS_MONSTER, (genericptr_t)&youmonst);
+            del_light_source(LS_MONSTER, monst_to_any(&youmonst));
         if (new_light == 1) ++new_light;  /* otherwise it's undetectable */
         if (new_light)
             new_light_source(u.ux, u.uy, new_light,
-                             LS_MONSTER, (genericptr_t)&youmonst);
+                             LS_MONSTER, monst_to_any(&youmonst));
     }
     if (is_pool(u.ux, u.uy) && was_floating && !(Levitation || Flying) &&
         !breathless(youmonst.data) && !amphibious(youmonst.data) &&
@@ -787,7 +811,7 @@ rehumanize()
     }
 
     if (emits_light(youmonst.data))
-        del_light_source(LS_MONSTER, (genericptr_t)&youmonst);
+        del_light_source(LS_MONSTER, monst_to_any(&youmonst));
     polyman("return to %s form!", urace.adj);
 
     if (u.uhp < 1) {

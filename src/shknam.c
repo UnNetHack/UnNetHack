@@ -1,12 +1,11 @@
-/*  SCCS Id: @(#)shknam.c   3.4 2003/01/09  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* shknam.c -- initialize a shop */
 
 #include "hack.h"
-#include "eshk.h"
 
+STATIC_DCL boolean FDECL(stock_room_goodpos, (struct mkroom *, int, int, int, int));
 STATIC_DCL void FDECL(mkshobj_at, (const struct shclass *, int, int));
 STATIC_DCL void FDECL(nameshk, (struct monst *, const char * const *));
 STATIC_DCL int  FDECL(shkinit, (const struct shclass *, struct mkroom *));
@@ -14,6 +13,17 @@ STATIC_DCL int  FDECL(shkinit, (const struct shclass *, struct mkroom *));
 STATIC_DCL void FDECL(stock_blkmar,
                       (const struct shclass *, struct mkroom *, int));
 #endif /* BLACKMARKET */
+
+/*
+ *  Name prefix codes:
+ *      dash          -  female, personal name
+ *      underscore    _  female, general name
+ *      plus          +  male, personal name
+ *      vertical bar  |  male, general name (implied for most of shktools)
+ *      equals        =  gender not specified, personal name
+ *
+ *  Personal names do not receive the honorific prefix "Mr." or "Ms.".
+ */
 
 static const char * const shkliquors[] = {
     /* Ukraine */
@@ -299,9 +309,9 @@ shop_selection_init()
         panic("shop probabilities total to %d!", shop_prob);
 }
 
+/* make an object of the appropriate type for a shop square */
 STATIC_OVL void
 mkshobj_at(shp, sx, sy)
-/* make an object of the appropriate type for a shop square */
 const struct shclass *shp;
 int sx, sy;
 {
@@ -372,12 +382,9 @@ const char * const *nlp;
         for (trycnt = 0; trycnt < 50; trycnt++) {
             if (nlp == shktools) {
                 shname = shktools[rn2(names_avail)];
-                shk->female = (*shname == '_');
-                if (shk->female) shname++;
+                shk->female = 0; /* reversed below for '_' prefix */
             } else if (nlp == shkmusic) {
                 shname = shkmusic[rn2(names_avail)];
-                shk->female = (*shname == '_');
-                if (shk->female) shname++;
             } else if (name_wanted < names_avail) {
                 shname = nlp[name_wanted];
             } else if ((i = rn2(names_avail)) != 0) {
@@ -388,7 +395,13 @@ const char * const *nlp;
                     continue;
                 continue;   /* next `trycnt' iteration */
             } else {
-                shname = shk->female ? "Lucrezia" : "Dirk";
+                shname = shk->female ? "-Lucrezia" : "+Dirk";
+            }
+
+            if (*shname == '_' || *shname == '-') {
+                shk->female = 1;
+            } else if (*shname == '|' || *shname == '+') {
+                shk->female = 0;
             }
 
             /* is name already in use on this level? */
@@ -437,13 +450,38 @@ const char * const *nlp;
     ESHK(shk)->shknam[PL_NSIZ-1] = 0;
 }
 
+void
+neweshk(mtmp)
+struct monst *mtmp;
+{
+    if (!mtmp->mextra)
+        mtmp->mextra = newmextra();
+    if (!ESHK(mtmp))
+        ESHK(mtmp) = (struct eshk *) alloc(sizeof(struct eshk));
+    (void) memset((genericptr_t) ESHK(mtmp), 0, sizeof(struct eshk));
+    ESHK(mtmp)->bill_p = (struct bill_x *) 0;
+}
+
+void
+free_eshk(mtmp)
+struct monst *mtmp;
+{
+    if (mtmp->mextra && ESHK(mtmp)) {
+        free((genericptr_t) ESHK(mtmp));
+        ESHK(mtmp) = (struct eshk *) 0;
+    }
+    mtmp->isshk = 0;
+}
+
+/* create a new shopkeeper in the given room */
 STATIC_OVL int
-shkinit(shp, sroom) /* create a new shopkeeper in the given room */
-const struct shclass    *shp;
-struct mkroom   *sroom;
+shkinit(shp, sroom)
+const struct shclass *shp;
+struct mkroom *sroom;
 {
     register int sh, sx, sy;
     struct monst *shk;
+    struct eshk *eshkp;
     long shkmoney; /* Temporary placeholder for Shopkeeper's initial capital */
 
     /* place the shopkeeper in the given room */
@@ -452,8 +490,9 @@ struct mkroom   *sroom;
     sy = doors[sh].y;
 
     /* check that the shopkeeper placement is sane */
-    if(sroom->irregular) {
+    if (sroom->irregular) {
         int rmno = (sroom - rooms) + ROOMOFFSET;
+
         if (isok(sx-1, sy) && !levl[sx-1][sy].edge &&
             (int) levl[sx-1][sy].roomno == rmno) sx--;
         else if (isok(sx+1, sy) && !levl[sx+1][sy].edge &&
@@ -499,40 +538,47 @@ shk_failed:
 #ifdef BLACKMARKET
     shk = 0;
     if (Is_blackmarket(&u.uz)) {
-        if (sroom->rtype == BLACKSHOP)
-            shk = makemon(&mons[PM_ONE_EYED_SAM], sx, sy, NO_MM_FLAGS);
-        else
-            shk = makemon(&mons[PM_BLACK_MARKETEER], sx, sy, NO_MM_FLAGS);
+        if (sroom->rtype == BLACKSHOP) {
+            shk = makemon(&mons[PM_ONE_EYED_SAM], sx, sy, MM_ESHK);
+        } else {
+            shk = makemon(&mons[PM_BLACK_MARKETEER], sx, sy, MM_ESHK);
+        }
     }
     if (!shk) {
-        if(!(shk = makemon(&mons[PM_SHOPKEEPER], sx, sy, NO_MM_FLAGS)))
+        if(!(shk = makemon(&mons[PM_SHOPKEEPER], sx, sy, MM_ESHK))) {
             return(-1);
+        }
     }
 #else  /* BLACKMARKET */
-    if(!(shk = makemon(&mons[PM_SHOPKEEPER], sx, sy, NO_MM_FLAGS)))
+    if(!(shk = makemon(&mons[PM_SHOPKEEPER], sx, sy, MM_ESHK))) {
         return(-1);
+    }
 #endif /* BLACKMARKET */
 
+    eshkp = ESHK(shk); /* makemon(...,MM_ESHK) allocates this */
     shk->isshk = shk->mpeaceful = 1;
     set_malign(shk);
     shk->msleeping = 0;
-    shk->mtrapseen = ~0;    /* we know all the traps already */
-    ESHK(shk)->shoproom = (sroom - rooms) + ROOMOFFSET;
+    shk->mtrapseen = ~0; /* we know all the traps already */
+    eshkp->shoproom = (sroom - rooms) + ROOMOFFSET;
     sroom->resident = shk;
-    ESHK(shk)->shoptype = sroom->rtype;
-    assign_level(&(ESHK(shk)->shoplevel), &u.uz);
-    ESHK(shk)->shd = doors[sh];
-    ESHK(shk)->shk.x = sx;
-    ESHK(shk)->shk.y = sy;
-    ESHK(shk)->robbed = 0L;
-    ESHK(shk)->credit = 0L;
-    ESHK(shk)->debit = 0L;
-    ESHK(shk)->loan = 0L;
-    ESHK(shk)->visitct = 0;
-    ESHK(shk)->following = 0;
-    ESHK(shk)->cheapskate = (rn2(3)==0) ? TRUE : FALSE;
-    ESHK(shk)->billct = 0;
-    ESHK(shk)->bill_p = &ESHK(shk)->bill[0];
+    eshkp->shoptype = sroom->rtype;
+    assign_level(&eshkp->shoplevel, &u.uz);
+    eshkp->shd = doors[sh];
+    eshkp->shk.x = sx;
+    eshkp->shk.y = sy;
+    eshkp->robbed = 0L;
+    eshkp->credit = 0L;
+    eshkp->debit = 0L;
+    eshkp->loan = 0L;
+    eshkp->following = 0L;
+    eshkp->surcharge = 0L;
+    eshkp->dismiss_kops = FALSE;
+    eshkp->visitct = 0;
+    eshkp->cheapskate = (rn2(3)==0) ? TRUE : FALSE;
+    eshkp->billct = 0;
+    eshkp->bill_p = (struct bill_x *) 0;
+    eshkp->customer[0] = '\0';
 
     shkmoney = 1000L + 30L*(long)rnd(100);  /* initial capital */
     /* [CWC] Lets not create the money yet until we see if the
@@ -590,6 +636,26 @@ shk_failed:
     return(sh);
 }
 
+STATIC_OVL boolean
+stock_room_goodpos(sroom, rmno, sh, sx, sy)
+struct mkroom *sroom;
+int rmno, sh, sx,sy;
+{
+    if (sroom->irregular) {
+        if (levl[sx][sy].edge ||
+                (int)levl[sx][sy].roomno != rmno ||
+                distmin(sx, sy, doors[sh].x, doors[sh].y) <= 1) {
+            return FALSE;
+        }
+    } else if ((sx == sroom->lx && doors[sh].x == sx-1) ||
+               (sx == sroom->hx && doors[sh].x == sx+1) ||
+               (sy == sroom->ly && doors[sh].y == sy-1) ||
+               (sy == sroom->hy && doors[sh].y == sy+1)) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
 /* stock a newly-created room with objects */
 void
 stock_room(shp_indx, sroom)
@@ -602,7 +668,7 @@ register struct mkroom *sroom;
      * shop-style placement (all squares except a row nearest the first
      * door get objects).
      */
-    register int sx, sy, sh;
+    int sx, sy, sh;
     char buf[BUFSZ];
     int rmno = (sroom - rooms) + ROOMOFFSET;
     const struct shclass *shp = &shtypes[shp_indx];
@@ -611,8 +677,7 @@ register struct mkroom *sroom;
     if ((sh = shkinit(shp, sroom)) < 0)
         return;
 
-    /* make sure no doorways without doors, and no */
-    /* trapped doors, in shops.            */
+    /* make sure no doorways without doors, and no trapped doors, in shops */
     sx = doors[sroom->fdoor].x;
     sy = doors[sroom->fdoor].y;
 
@@ -646,18 +711,12 @@ register struct mkroom *sroom;
     }
 #endif /* BLACKMARKET */
 
-    for(sx = sroom->lx; sx <= sroom->hx; sx++)
-        for(sy = sroom->ly; sy <= sroom->hy; sy++) {
-            if(sroom->irregular) {
-                if (levl[sx][sy].edge || (int) levl[sx][sy].roomno != rmno ||
-                    distmin(sx, sy, doors[sh].x, doors[sh].y) <= 1)
-                    continue;
-            } else if((sx == sroom->lx && doors[sh].x == sx-1) ||
-                      (sx == sroom->hx && doors[sh].x == sx+1) ||
-                      (sy == sroom->ly && doors[sh].y == sy-1) ||
-                      (sy == sroom->hy && doors[sh].y == sy+1)) continue;
-            if (!IS_ROOM(levl[sx][sy].typ)) continue;
-            mkshobj_at(shp, sx, sy);
+    for (sx = sroom->lx; sx <= sroom->hx; sx++)
+        for (sy = sroom->ly; sy <= sroom->hy; sy++) {
+            if (stock_room_goodpos(sroom, rmno, sh, sx,sy)) {
+                if (!IS_ROOM(levl[sx][sy].typ)) continue;
+                mkshobj_at(shp, sx, sy);
+            }
         }
 
     /*
@@ -809,6 +868,104 @@ int type;
         continue;
 
     return shp->iprobs[i].itype;
+}
+
+/* version of shkname() for beginning of sentence */
+char *
+Shknam(mtmp)
+struct monst *mtmp;
+{
+    char *nam = shkname(mtmp);
+
+    /* 'nam[]' is almost certainly already capitalized, but be sure */
+    nam[0] = highc(nam[0]);
+    return nam;
+}
+
+/* shopkeeper's name, without any visibility constraint; if hallucinating,
+   will yield some other shopkeeper's name (not necessarily one residing
+   in the current game's dungeon, or who keeps same type of shop) */
+char *
+shkname(mtmp)
+struct monst *mtmp;
+{
+    char *nam;
+    unsigned save_isshk = mtmp->isshk;
+
+    mtmp->isshk = 0; /* don't want mon_nam() calling shkname() */
+    /* get a modifiable name buffer along with fallback result */
+    nam = noit_mon_nam(mtmp);
+    mtmp->isshk = save_isshk;
+
+    if (!mtmp->isshk) {
+        impossible("shkname: \"%s\" is not a shopkeeper.", nam);
+    } else if (!has_eshk(mtmp)) {
+        panic("shkname: shopkeeper \"%s\" lacks 'eshk' data.", nam);
+    } else {
+        const char *shknm = ESHK(mtmp)->shknam;
+
+        if (Hallucination && !program_state.gameover) {
+            const char *const *nlp;
+            int num;
+
+            /* count the number of non-unique shop types;
+               pick one randomly, ignoring shop generation probabilities;
+               pick a name at random from that shop type's list */
+            for (num = 0; num < SIZE(shtypes); num++)
+                if (shtypes[num].prob == 0) {
+                    break;
+                }
+            if (num > 0) {
+                nlp = shtypes[rn2(num)].shknms;
+                for (num = 0; nlp[num]; num++) {
+                    continue;
+                }
+                if (num > 0) {
+                    shknm = nlp[rn2(num)];
+                }
+            }
+        }
+        /* strip prefix if present */
+        if (!letter(*shknm)) {
+            ++shknm;
+        }
+        Strcpy(nam, shknm);
+    }
+    return nam;
+}
+
+boolean
+shkname_is_pname(mtmp)
+struct monst *mtmp;
+{
+    const char *shknm = ESHK(mtmp)->shknam;
+
+    return (boolean) (*shknm == '-' || *shknm == '+' || *shknm == '=');
+}
+
+boolean
+is_izchak(shkp, override_hallucination)
+struct monst *shkp;
+boolean override_hallucination;
+{
+    const char *shknm;
+
+    if (Hallucination && !override_hallucination) {
+        return FALSE;
+    }
+    if (!shkp->isshk) {
+        return FALSE;
+    }
+    /* outside of town, Izchak becomes just an ordinary shopkeeper */
+    if (!in_town(shkp->mx, shkp->my)) {
+        return FALSE;
+    }
+    shknm = ESHK(shkp)->shknam;
+    /* skip "+" prefix */
+    if (!letter(*shknm)) {
+        ++shknm;
+    }
+    return (boolean) !strcmp(shknm, "Izchak");
 }
 
 /*shknam.c*/

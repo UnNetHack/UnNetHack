@@ -3,7 +3,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "epri.h"
 
 STATIC_PTR int NDECL(prayer_done);
 STATIC_DCL struct obj *NDECL(worst_cursed_item);
@@ -292,7 +291,7 @@ register int trouble;
         break;
     case TROUBLE_STARVING:
         losestr(-1);
-    /* fall into... */
+        /* fall through */
     case TROUBLE_HUNGRY:
         Your("%s feels content.", body_part(STOMACH));
         init_uhunger();
@@ -417,7 +416,7 @@ decurse:
         break;
     }
     case TROUBLE_WOUNDED_LEGS:
-        heal_legs();
+        heal_legs(0);
         break;
     case TROUBLE_STUNNED:
         make_stunned(0L, TRUE);
@@ -1270,7 +1269,7 @@ dosacrifice()
             if (carried(otmp)) useup(otmp);
             else useupf(otmp, 1L);
             return(1);
-        } else if (otmp->oxlth && otmp->oattached == OATTACHED_MONST
+        } else if (has_omonst(otmp)
                    && ((mtmp = get_mtraits(otmp, FALSE)) != (struct monst *)0)
                    && mtmp->mtame) {
             /* mtmp is a temporary pointer to a tame monster's attributes,

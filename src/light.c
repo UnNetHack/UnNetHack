@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)light.c    3.4 1997/04/10  */
 /* Copyright (c) Dean Luick, 1994                   */
 /* NetHack may be freely redistributed.  See license for details.   */
 
@@ -58,7 +57,7 @@ void
 new_light_source(x, y, range, type, id)
 xchar x, y;
 int range, type;
-genericptr_t id;
+anything *id;
 {
     light_source *ls;
 
@@ -67,14 +66,14 @@ genericptr_t id;
         return;
     }
 
-    ls = (light_source *) alloc(sizeof(light_source));
+    ls = (light_source *) alloc(sizeof *ls);
 
     ls->next = light_base;
     ls->x = x;
     ls->y = y;
     ls->range = range;
     ls->type = type;
-    ls->id = id;
+    ls->id = *id;
     ls->flags = 0;
     light_base = ls;
 
@@ -88,37 +87,44 @@ genericptr_t id;
 void
 del_light_source(type, id)
 int type;
-genericptr_t id;
+anything *id;
 {
     light_source *curr, *prev;
-    genericptr_t tmp_id;
+    anything tmp_id;
 
+    tmp_id = zeroany;
     /* need to be prepared for dealing a with light source which
        has only been partially restored during a level change
        (in particular: chameleon vs prot. from shape changers) */
     switch (type) {
-    case LS_OBJECT: tmp_id = (genericptr_t)(((struct obj *)id)->o_id);
+    case LS_OBJECT:
+        tmp_id.a_uint = id->a_obj->o_id;
         break;
-    case LS_MONSTER:    tmp_id = (genericptr_t)(((struct monst *)id)->m_id);
+    case LS_MONSTER:
+        tmp_id.a_uint = id->a_monst->m_id;
         break;
-    default:        tmp_id = 0;
+    default:
+        tmp_id.a_uint = 0;
         break;
     }
 
     for (prev = 0, curr = light_base; curr; prev = curr, curr = curr->next) {
-        if (curr->type != type) continue;
-        if (curr->id == ((curr->flags & LSF_NEEDS_FIXUP) ? tmp_id : id)) {
-            if (prev)
+        if (curr->type != type) {
+            continue;
+        }
+        if (curr->id.a_obj == ((curr->flags & LSF_NEEDS_FIXUP) ? tmp_id.a_obj : id->a_obj)) {
+            if (prev) {
                 prev->next = curr->next;
-            else
+            } else {
                 light_base = curr->next;
+            }
 
             free((genericptr_t)curr);
             vision_full_recalc = 1;
             return;
         }
     }
-    impossible("del_light_source: not found type=%d, id=0x%lx", type, (long)id);
+    impossible("del_light_source: not found type=%d, id=%s", type, fmt_ptr(id->a_obj));
 }
 
 /* Mark locations that are temporarily lit via mobile light sources. */
@@ -142,11 +148,13 @@ char **cs_rows;
          * vision recalc.
          */
         if (ls->type == LS_OBJECT) {
-            if (get_obj_location((struct obj *) ls->id, &ls->x, &ls->y, 0))
+            if (get_obj_location(ls->id.a_obj, &ls->x, &ls->y, 0)) {
                 ls->flags |= LSF_SHOW;
+            }
         } else if (ls->type == LS_MONSTER) {
-            if (get_mon_location((struct monst *) ls->id, &ls->x, &ls->y, 0))
+            if (get_mon_location(ls->id.a_monst, &ls->x, &ls->y, 0)) {
                 ls->flags |= LSF_SHOW;
+            }
         }
 
         /* minor optimization: don't bother with duplicate light sources */
@@ -178,12 +186,12 @@ char **cs_rows;
                 if (ls->x == u.ux && ls->y == u.uy) {
                     /*
                      * If the light source is located at the hero, then
-                     * we can use the COULD_SEE bits already calcualted
+                     * we can use the COULD_SEE bits already calculated
                      * by the vision system.  More importantly than
                      * this optimization, is that it allows the vision
                      * system to correct problems with clear_path().
                      * The function clear_path() is a simple LOS
-                     * path checker that doesn't go out of its way
+                     * path checker that doesn't go out of its way to
                      * make things look "correct".  The vision system
                      * does this.
                      */
@@ -201,8 +209,89 @@ char **cs_rows;
     }
 }
 
+/* lit 'obj' has been thrown or kicked and is passing through x,y on the
+   way to its destination; show its light so that hero has a chance to
+   remember terrain, objects, and monsters being revealed */
+void
+show_transient_light(obj, x, y)
+struct obj *obj;
+int x, y;
+{
+    light_source *ls;
+    struct monst *mon;
+    int radius_squared;
+
+    /* caller has verified obj->lamplit and that hero is not Blind;
+       validate light source and obtain its radius (for monster sightings) */
+    for (ls = light_base; ls; ls = ls->next) {
+        if (ls->type != LS_OBJECT) {
+            continue;
+        }
+        if (ls->id.a_obj == obj) {
+            break;
+        }
+    }
+    if (!ls || obj->where != OBJ_FREE) {
+        impossible("transient light %s %s is not %s?",
+                   obj->lamplit ? "lit" : "unlit",
+                   xname(obj),
+                   !ls ? "a light source" : "free");
+    } else {
+        /* "expensive" but rare */
+        place_object(obj, bhitpos.x, bhitpos.y); /* temporarily put on map */
+        vision_recalc(0);
+        flush_screen(0);
+        delay_output();
+        remove_object(obj); /* take back off of map */
+
+        radius_squared = ls->range * ls->range;
+        for (mon = fmon; mon; mon = mon->nmon) {
+            if (DEADMONSTER(mon)) {
+                continue;
+            }
+            /* light range is the radius of a circle and we're limiting
+               canseemon() to a square exclosing that circle, but setting
+               mtemplit 'erroneously' for a seen monster is not a problem;
+               it just flags monsters for another canseemon() check when
+               'obj' has reached its destination after missile traversal */
+            if (dist2(mon->mx, mon->my, x, y) <= radius_squared &&
+                canseemon(mon)) {
+                mon->mtemplit = 1;
+            }
+            /* [what about worm tails?] */
+        }
+    }
+}
+
+/* draw "remembered, unseen monster" glyph at locations where a monster
+   was flagged for being visible during transient light movement but can't
+   be seen now */
+void
+transient_light_cleanup()
+{
+    struct monst *mon;
+    int mtempcount = 0;
+
+    for (mon = fmon; mon; mon = mon->nmon) {
+        if (DEADMONSTER(mon)) {
+            continue;
+        }
+        if (mon->mtemplit) {
+            mon->mtemplit = 0;
+            ++mtempcount;
+            if (!canseemon(mon)) {
+                map_invisible(mon->mx, mon->my);
+            }
+        }
+    }
+    if (mtempcount) {
+        vision_recalc(0);
+        flush_screen(0);
+    }
+}
+
 /* (mon->mx == 0) implies migrating */
-#define mon_is_local(mon)   ((mon)->mx > 0)
+#define mon_is_local(mon) ((mon)->mx > 0)
 
 struct monst *
 find_mid(nid, fmflags)
@@ -244,16 +333,16 @@ int fd, mode, range;
 
     if (release_data(mode)) {
         for (prev = &light_base; (curr = *prev) != 0; ) {
-            if (!curr->id) {
+            if (!curr->id.a_monst) {
                 impossible("save_light_sources: no id! [range=%d]", range);
                 is_global = 0;
             } else
                 switch (curr->type) {
                 case LS_OBJECT:
-                    is_global = !obj_is_local((struct obj *)curr->id);
+                    is_global = !obj_is_local(curr->id.a_obj);
                     break;
                 case LS_MONSTER:
-                    is_global = !mon_is_local((struct monst *)curr->id);
+                    is_global = !mon_is_local(curr->id.a_monst);
                     break;
                 default:
                     is_global = 0;
@@ -294,6 +383,23 @@ int fd;
     }
 }
 
+/* to support '#stats' wizard-mode command */
+void
+light_stats(hdrfmt, hdrbuf, count, size)
+const char *hdrfmt;
+char *hdrbuf;
+long *count, *size;
+{
+    light_source *ls;
+
+    Sprintf(hdrbuf, hdrfmt, (long) sizeof (light_source));
+    *count = *size = 0L;
+    for (ls = light_base; ls; ls = ls->next) {
+        ++*count;
+        *size += (long) sizeof *ls;
+    }
+}
+
 /* Relink all lights that are so marked. */
 void
 relink_light_sources(ghostly)
@@ -307,22 +413,25 @@ boolean ghostly;
         if (ls->flags & LSF_NEEDS_FIXUP) {
             if (ls->type == LS_OBJECT || ls->type == LS_MONSTER) {
                 if (ghostly) {
-                    if (!lookup_id_mapping((size_t)ls->id, &nid))
+                    if (!lookup_id_mapping(ls->id.a_uint, &nid)) {
                         impossible("relink_light_sources: no id mapping");
-                } else
-                    nid = (size_t) ls->id;
+                    }
+                } else {
+                    nid = ls->id.a_uint;
+                }
                 if (ls->type == LS_OBJECT) {
                     which = 'o';
-                    ls->id = (genericptr_t) find_oid(nid);
+                    ls->id.a_obj = find_oid(nid);
                 } else {
                     which = 'm';
-                    ls->id = (genericptr_t) find_mid(nid, FM_EVERYWHERE);
+                    ls->id.a_monst = find_mid(nid, FM_EVERYWHERE);
                 }
-                if (!ls->id)
-                    impossible("relink_light_sources: cant find %c_id %d",
-                               which, nid);
-            } else
+                if (!ls->id.a_monst) {
+                    impossible("relink_light_sources: cant find %c_id %d", which, nid);
+                }
+            } else {
                 impossible("relink_light_sources: bad type (%d)", ls->type);
+            }
 
             ls->flags &= ~LSF_NEEDS_FIXUP;
         }
@@ -343,16 +452,16 @@ boolean write_it;
     light_source *ls;
 
     for (ls = light_base; ls; ls = ls->next) {
-        if (!ls->id) {
+        if (!ls->id.a_monst) {
             impossible("maybe_write_ls: no id! [range=%d]", range);
             continue;
         }
         switch (ls->type) {
         case LS_OBJECT:
-            is_global = !obj_is_local((struct obj *)ls->id);
+            is_global = !obj_is_local(ls->id.a_obj);
             break;
         case LS_MONSTER:
-            is_global = !mon_is_local((struct monst *)ls->id);
+            is_global = !mon_is_local(ls->id.a_monst);
             break;
         default:
             is_global = 0;
@@ -370,35 +479,68 @@ boolean write_it;
     return count;
 }
 
+void
+light_sources_sanity_check()
+{
+    light_source *ls;
+    struct monst *mtmp;
+    struct obj *otmp;
+    unsigned int auint;
+
+    for (ls = light_base; ls; ls = ls->next) {
+        if (!ls->id.a_monst) {
+            panic("insane light source: no id!");
+        }
+        if (ls->type == LS_OBJECT) {
+            otmp = (struct obj *) ls->id.a_obj;
+            auint = otmp->o_id;
+            if (find_oid(auint) != otmp)
+                panic("insane light source: can't find obj #%u!", auint);
+        } else if (ls->type == LS_MONSTER) {
+            mtmp = (struct monst *) ls->id.a_monst;
+            auint = mtmp->m_id;
+            if (find_mid(auint, FM_EVERYWHERE) != mtmp) {
+                panic("insane light source: can't find mon #%u!", auint);
+            }
+        } else {
+            panic("insane light source: bad ls type %d", ls->type);
+        }
+    }
+}
+
 /* Write a light source structure to disk. */
 STATIC_OVL void
 write_ls(fd, ls)
 int fd;
 light_source *ls;
 {
-    genericptr_t arg_save;
+    anything arg_save;
     struct obj *otmp;
     struct monst *mtmp;
 
     if (ls->type == LS_OBJECT || ls->type == LS_MONSTER) {
-        if (ls->flags & LSF_NEEDS_FIXUP)
+        if (ls->flags & LSF_NEEDS_FIXUP) {
             bwrite(fd, (genericptr_t)ls, sizeof(light_source));
-        else {
+        } else {
             /* replace object pointer with id for write, then put back */
             arg_save = ls->id;
             if (ls->type == LS_OBJECT) {
-                otmp = (struct obj *)ls->id;
-                ls->id = (genericptr_t)otmp->o_id;
+                otmp = ls->id.a_obj;
+                ls->id = zeroany;
+                ls->id.a_uint = otmp->o_id;
 #ifdef DEBUG
-                if (find_oid((unsigned)ls->id) != otmp)
-                    panic("write_ls: can't find obj #%u!", (unsigned)ls->id);
+                if (find_oid((unsigned) ls->id.a_uint) != otmp) {
+                    impossible("write_ls: can't find obj #%u!", ls->id.a_uint);
+                }
 #endif
             } else { /* ls->type == LS_MONSTER */
-                mtmp = (struct monst *)ls->id;
-                ls->id = (genericptr_t)mtmp->m_id;
+                mtmp = (struct monst *) ls->id.a_monst;
+                ls->id = zeroany;
+                ls->id.a_uint = mtmp->m_id;
 #ifdef DEBUG
-                if (find_mid((unsigned)ls->id, FM_EVERYWHERE) != mtmp)
-                    panic("write_ls: can't find mon #%u!", (unsigned)ls->id);
+                if (find_mid((unsigned) ls->id.a_uint, FM_EVERYWHERE) != mtmp) {
+                    impossible("write_ls: can't find mon #%u!", ls->id.a_uint);
+                }
 #endif
             }
             ls->flags |= LSF_NEEDS_FIXUP;
@@ -418,9 +560,11 @@ struct obj *src, *dest;
 {
     light_source *ls;
 
-    for (ls = light_base; ls; ls = ls->next)
-        if (ls->type == LS_OBJECT && ls->id == (genericptr_t) src)
-            ls->id = (genericptr_t) dest;
+    for (ls = light_base; ls; ls = ls->next) {
+        if (ls->type == LS_OBJECT && ls->id.a_obj == src) {
+            ls->id.a_obj = dest;
+        }
+    }
     src->lamplit = 0;
     dest->lamplit = 1;
 }
@@ -429,7 +573,7 @@ struct obj *src, *dest;
 boolean
 any_light_source()
 {
-    return light_base != (light_source *) 0;
+    return (boolean) (light_base != (light_source *) 0);
 }
 
 /*
@@ -450,7 +594,7 @@ int x, y;
            updated with the last vision update?  [Is that recent enough???]
          */
         if (ls->type == LS_OBJECT && ls->x == x && ls->y == y) {
-            obj = (struct obj *) ls->id;
+            obj = ls->id.a_obj;
             if (obj_is_burning(obj)) {
                 /* The only way to snuff Sunsword is to unwield it.  Darkness
                  * scrolls won't affect it.  (If we got here because it was
@@ -495,7 +639,7 @@ struct obj *src, *dest;
     light_source *ls, *new_ls;
 
     for (ls = light_base; ls; ls = ls->next)
-        if (ls->type == LS_OBJECT && ls->id == (genericptr_t) src) {
+        if (ls->type == LS_OBJECT && ls->id.a_obj == src) {
             /*
              * Insert the new source at beginning of list.  This will
              * never interfere us walking down the list - we are already
@@ -509,10 +653,10 @@ struct obj *src, *dest;
                 new_ls->range = candle_light_range(dest);
                 vision_full_recalc = 1; /* in case range changed */
             }
-            new_ls->id = (genericptr_t) dest;
+            new_ls->id.a_obj = dest;
             new_ls->next = light_base;
             light_base = new_ls;
-            dest->lamplit = 1;  /* now an active light source */
+            dest->lamplit = 1; /* now an active light source */
         }
 }
 
@@ -525,14 +669,33 @@ struct obj *src, *dest;
     light_source *ls;
 
     /* src == dest implies adding to candelabrum */
-    if (src != dest) end_burn(src, TRUE);       /* extinguish candles */
+    if (src != dest) end_burn(src, TRUE); /* extinguish candles */
 
     for (ls = light_base; ls; ls = ls->next)
-        if (ls->type == LS_OBJECT && ls->id == (genericptr_t) dest) {
+        if (ls->type == LS_OBJECT && ls->id.a_obj == dest) {
             ls->range = candle_light_range(dest);
             vision_full_recalc = 1; /* in case range changed */
             break;
         }
+}
+
+/* light source `obj' is being made brighter or dimmer */
+void
+obj_adjust_light_radius(obj, new_radius)
+struct obj *obj;
+int new_radius;
+{
+    light_source *ls;
+
+    for (ls = light_base; ls; ls = ls->next)
+        if (ls->type == LS_OBJECT && ls->id.a_obj == obj) {
+            if (new_radius != ls->range) {
+                vision_full_recalc = 1;
+            }
+            ls->range = new_radius;
+            return;
+        }
+    impossible("obj_adjust_light_radius: can't find %s", xname(obj));
 }
 
 /* Candlelight is proportional to the number of candles;
@@ -576,17 +739,56 @@ struct obj *obj;
     return radius;
 }
 
-#ifdef WIZARD
-extern char *FDECL(fmt_ptr, (const genericptr, char *));  /* from alloc.c */
+/* light emitting artifact's range depends upon its curse/bless state */
+int
+arti_light_radius(obj)
+struct obj *obj;
+{
+    /*
+     * Used by begin_burn() when setting up a new light source
+     * (obj->lamplit will already be set by this point) and
+     * also by bless()/unbless()/uncurse()/curse() to decide
+     * whether to call obj_adjust_light_radius().
+     */
 
+    /* sanity check [simplifies usage by bless()/curse()/&c] */
+    if (!obj->lamplit || !artifact_light(obj)) {
+        return 0;
+    }
+
+    /* cursed radius of 1 is not noticeable for an item that's
+       carried by the hero but is if it's carried by a monster
+       or left lit on the floor (not applicable for Sunsword) */
+    return (obj->blessed ? 3 : !obj->cursed ? 2 : 1);
+}
+
+/* adverb describing lit artifact's light; depends on curse/bless state */
+const char *
+arti_light_description(obj)
+struct obj *obj;
+{
+    switch (arti_light_radius(obj)) {
+    case 3:
+        return "brilliantly"; /* blessed */
+    case 2:
+        return "brightly"; /* uncursed */
+    case 1:
+        return "dimly"; /* cursed */
+    default:
+        break;
+    }
+    return "strangely";
+}
+
+#ifdef WIZARD
 int
 wiz_light_sources()
 {
     winid win;
-    char buf[BUFSZ], arg_address[20];
+    char buf[BUFSZ];
     light_source *ls;
 
-    win = create_nhwindow(NHW_MENU);    /* corner text window */
+    win = create_nhwindow(NHW_MENU); /* corner text window */
     if (win == WIN_ERR) return 0;
 
     Sprintf(buf, "Mobile light sources: hero @ (%2d,%2d)", u.ux, u.uy);
@@ -601,15 +803,15 @@ wiz_light_sources()
                     ls->x, ls->y, ls->range, ls->flags,
                     (ls->type == LS_OBJECT ? "obj" :
                      ls->type == LS_MONSTER ?
-                     (mon_is_local((struct monst *)ls->id) ? "mon" :
-                      ((struct monst *)ls->id == &youmonst) ? "you" :
-                      "<m>") : /* migrating monster */
+                     (mon_is_local(ls->id.a_monst) ? "mon" :
+                      (ls->id.a_monst == &youmonst) ? "you" : "<m>") : /* migrating monster */
                      "???"),
-                    fmt_ptr(ls->id, arg_address));
+                    fmt_ptr(ls->id.a_void));
             putstr(win, 0, buf);
         }
-    } else
+    } else {
         putstr(win, 0, "<none>");
+    }
 
 
     display_nhwindow(win, FALSE);

@@ -268,7 +268,7 @@ int force;
                 case THRONE:
                     if (cansee(x, y))
                         pline_The("throne falls into a chasm.");
-                /* Falls into next case */
+                /* fall through */
                 case ROOM:
                 case CORR: /* Try to make a pit */
 do_pit:             chasm = maketrap(x, y, PIT);
@@ -308,7 +308,7 @@ do_pit:             chasm = maketrap(x, y, PIT);
                                     else {
                                         You("destroy %s!", mtmp->mtame ?
                                             x_monnam(mtmp, ARTICLE_THE, "poor",
-                                                     mtmp->mnamelth ? SUPPRESS_SADDLE : 0, FALSE) :
+                                                has_mname(mtmp)? SUPPRESS_SADDLE : 0, FALSE) :
                                             mon_nam(mtmp));
                                     }
                                     xkilled(mtmp, 0);
@@ -391,7 +391,8 @@ struct obj *instr;
             exercise(A_DEX, TRUE);
             makeknown_msg(MAGIC_FLUTE);
             break;
-        } /* else FALLTHRU */
+        }
+        /* fall through */
     case WOODEN_FLUTE:      /* May charm snakes */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
         pline("%s.", Tobjnam(instr, do_spec ? "trill" : "toot"));
@@ -418,7 +419,8 @@ struct obj *instr;
             }
             makeknown_msg(instr->otyp);
             break;
-        } /* else FALLTHRU */
+        }
+        /* fall through */
     case TOOLED_HORN:       /* Awaken or scare monsters */
         You("produce a frightful, grave sound.");
         awaken_monsters(u.ulevel * 30);
@@ -438,7 +440,8 @@ struct obj *instr;
             exercise(A_DEX, TRUE);
             makeknown_msg(MAGIC_HARP);
             break;
-        } /* else FALLTHRU */
+        }
+        /* fall through */
     case WOODEN_HARP:       /* May calm Nymph */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
         pline("%s %s.", The(xname(instr)),
@@ -457,7 +460,8 @@ struct obj *instr;
             awaken_monsters(ROWNO * COLNO);
             makeknown_msg(DRUM_OF_EARTHQUAKE);
             break;
-        } /* else FALLTHRU */
+        }
+        /* fall through */
     case LEATHER_DRUM:      /* Awaken monsters */
         You("beat a deafening row!");
         awaken_monsters(u.ulevel * 40);

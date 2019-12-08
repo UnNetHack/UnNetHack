@@ -11,19 +11,16 @@
 
 #define pm_resistance(ptr, typ)  (((ptr)->mresists & (typ)) != 0)
 
-#define resists_fire(mon)   (((mon)->mintrinsics & MR_FIRE) != 0)
-#define resists_cold(mon)   (((mon)->mintrinsics & MR_COLD) != 0)
-#define resists_sleep(mon)  (((mon)->mintrinsics & MR_SLEEP) != 0)
-#define resists_disint(mon) (((mon)->mintrinsics & MR_DISINT) != 0)
-#define resists_elec(mon)   (((mon)->mintrinsics & MR_ELEC) != 0)
-#define resists_poison(mon) (((mon)->mintrinsics & MR_POISON) != 0)
-#define resists_acid(mon)   (((mon)->mintrinsics & MR_ACID) != 0)
-#define resists_ston(mon)   (((mon)->mintrinsics & MR_STONE) != 0)
+#define resists_fire(mon)   ((((mon)->data->mresists | (mon)->mextrinsics) & MR_FIRE) != 0)
+#define resists_cold(mon)   ((((mon)->data->mresists | (mon)->mextrinsics) & MR_COLD) != 0)
+#define resists_sleep(mon)  ((((mon)->data->mresists | (mon)->mextrinsics) & MR_SLEEP) != 0)
+#define resists_disint(mon) ((((mon)->data->mresists | (mon)->mextrinsics) & MR_DISINT) != 0)
+#define resists_elec(mon)   ((((mon)->data->mresists | (mon)->mextrinsics) & MR_ELEC) != 0)
+#define resists_poison(mon) ((((mon)->data->mresists | (mon)->mextrinsics) & MR_POISON) != 0)
+#define resists_acid(mon)   ((((mon)->data->mresists | (mon)->mextrinsics) & MR_ACID) != 0)
+#define resists_ston(mon)   ((((mon)->data->mresists | (mon)->mextrinsics) & MR_STONE) != 0)
 
-#define is_lminion(mon)     (is_minion((mon)->data) && \
-                             (mon)->data->maligntyp >= A_COALIGNED && \
-                             ((mon)->data != &mons[PM_ANGEL] || \
-                              EPRI(mon)->shralign > 0))
+#define is_lminion(mon)     (is_minion((mon)->data) && mon_aligntyp(mon) == A_LAWFUL)
 
 #define is_flyer(ptr)       (((ptr)->mflags1 & M1_FLY) != 0L)
 #define is_floater(ptr)     ((ptr)->mlet == S_EYE)
@@ -61,6 +58,7 @@
 #define slithy(ptr)     (((ptr)->mflags1 & M1_SLITHY) != 0L)
 #define is_wooden(ptr)      ((ptr) == &mons[PM_WOOD_GOLEM])
 #define thick_skinned(ptr)  (((ptr)->mflags1 & M1_THICK_HIDE) != 0L)
+#define slimeproof(ptr)     ((ptr) == &mons[PM_GREEN_SLIME] || flaming(ptr) || noncorporeal(ptr))
 #define lays_eggs(ptr)      (((ptr)->mflags1 & M1_OVIPAROUS) != 0L)
 #define regenerates(ptr)    (((ptr)->mflags1 & M1_REGEN) != 0L)
 #define noregen(ptr)        (((ptr)->mflags3 & M3_NOREGEN) != 0L)
@@ -77,6 +75,7 @@
 #define herbivorous(ptr)    (((ptr)->mflags1 & M1_HERBIVORE) != 0L)
 #define metallivorous(ptr)  (((ptr)->mflags1 & M1_METALLIVORE) != 0L)
 #define polyok(ptr)     (((ptr)->mflags2 & M2_NOPOLY) == 0L)
+#define is_shapeshifter(ptr) (((ptr)->mflags2 & M2_SHAPESHIFTER) != 0L)
 #define is_undead(ptr)      (((ptr)->mflags2 & M2_UNDEAD) != 0L)
 #define is_were(ptr)        (((ptr)->mflags2 & M2_WERE) != 0L)
 #define is_vampire(ptr)     ((ptr)->mlet == S_VAMPIRE || \
@@ -149,6 +148,8 @@
 #define infravisible(ptr)   ((ptr->mflags3 & M3_INFRAVISIBLE))
 #define is_mplayer(ptr)     (((ptr) >= &mons[PM_ARCHEOLOGIST]) && \
                              ((ptr) <= &mons[PM_WIZARD]))
+#define is_watch(ptr)       ((ptr) == &mons[PM_WATCHMAN] || \
+                             (ptr) == &mons[PM_WATCH_CAPTAIN])
 #define is_rider(ptr)       ((ptr) == &mons[PM_DEATH] || \
                              (ptr) == &mons[PM_FAMINE] || \
                              (ptr) == &mons[PM_PESTILENCE])
@@ -172,6 +173,13 @@
 #define is_eye(ptr)     (((ptr) == &mons[PM_FLOATING_EYE]) || \
                          ((ptr) == &mons[PM_EVIL_EYE]))
 #endif
+
+/* return TRUE if the monster tends to revive */
+#define is_reviver(ptr) (is_rider(ptr) || (ptr)->mlet == S_TROLL)
+/* monsters whose corpses and statues need special handling;
+   note that high priests and the Wizard of Yendor are flagged
+   as unique even though they really aren't; that's ok here */
+#define unique_corpstat(ptr) (((ptr)->geno & G_UNIQ) != 0)
 
 /* this returns the light's range, or 0 if none; if we add more light emitting
    monsters, we'll likely have to add a new light range field to mons[] */
@@ -225,6 +233,10 @@
                              (ptr)->mlet == S_FUNGUS || \
                              (ptr) == &mons[PM_OCHRE_JELLY])
 #define stationary(ptr)     ((ptr)->mflags3 & M3_STATIONARY)
+
+/* no corpse (ie, blank scrolls) if killed by fire */
+#define completelyburns(ptr) \
+    ((ptr) == &mons[PM_PAPER_GOLEM] || (ptr) == &mons[PM_STRAW_GOLEM])
 
 /* Used for conduct with corpses, tins, and digestion attacks */
 /* G_NOCORPSE monsters might still be swallowed as a purple worm */

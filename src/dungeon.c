@@ -1364,6 +1364,13 @@ d_level *lev;
                       sstairs.sx && sstairs.up));
 }
 
+boolean
+has_ceiling(lev)
+d_level *lev;
+{
+    return !level.flags.sky;
+}
+
 /*
  * It is expected that the second argument of get_level is a depth value,
  * either supplied by the user (teleport control) or randomly generated.
@@ -2069,6 +2076,54 @@ int fd;
     return load;
 }
 
+/* to support '#stats' wizard-mode command */
+void
+overview_stats(win, statsfmt, total_count, total_size)
+winid win;
+const char *statsfmt;
+long *total_count, *total_size;
+{
+    char buf[BUFSZ], hdrbuf[QBUFSZ];
+    long ocount, osize, bcount, bsize, acount, asize;
+    struct cemetery *ce;
+    mapseen *mptr = find_mapseen(&u.uz);
+
+    ocount = bcount = acount = osize = bsize = asize = 0L;
+    for (mptr = mapseenchn; mptr; mptr = mptr->next) {
+        ++ocount;
+        osize += (long) sizeof *mptr;
+#if NEXT_VERSION
+        for (ce = mptr->final_resting_place; ce; ce = ce->next) {
+            ++bcount;
+            bsize += (long) sizeof *ce;
+        }
+#endif
+        if (mptr->custom_lth) {
+            ++acount;
+            asize += (long) (mptr->custom_lth + 1);
+        }
+    }
+
+    Sprintf(hdrbuf, "general, size %ld", (long) sizeof (mapseen));
+    Sprintf(buf, statsfmt, hdrbuf, ocount, osize);
+    putstr(win, 0, buf);
+    if (bcount) {
+#if NEXT_VERSION
+        Sprintf(hdrbuf, "cemetery, size %ld",
+                (long) sizeof (struct cemetery));
+        Sprintf(buf, statsfmt, hdrbuf, bcount, bsize);
+        putstr(win, 0, buf);
+#endif
+    }
+    if (acount) {
+        Sprintf(hdrbuf, "annotations, text");
+        Sprintf(buf, statsfmt, hdrbuf, acount, asize);
+        putstr(win, 0, buf);
+    }
+    *total_count += ocount + bcount + acount;
+    *total_size += osize + bsize + asize;
+}
+
 /* Remove all mapseen objects for a particular dnum.
  * Useful during quest expulsion to remove quest levels.
  */
@@ -2273,6 +2328,33 @@ recalc_mapseen()
             }
         }
     }
+}
+
+/*ARGUSED*/
+/* valley and sanctum levels get automatic annotation once temple is entered */
+void
+mapseen_temple(priest)
+struct monst *priest UNUSED; /* currently unused; might be useful someday */
+{
+    mapseen *mptr = find_mapseen(&u.uz);
+
+    if (Is_valley(&u.uz)) {
+        mptr->feat.valley = 1;
+    } else if (Is_sanctum(&u.uz)) {
+        mptr->feat.msanctum = 1;
+    }
+}
+
+/* room entry message has just been delivered so learn room even if blind */
+void
+room_discovered(roomno)
+int roomno UNUSED;
+{
+#if 0
+    mapseen *mptr = find_mapseen(&u.uz);
+
+    mptr->msrooms[roomno].seen = 1;
+#endif
 }
 
 int

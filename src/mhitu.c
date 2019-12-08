@@ -4,7 +4,6 @@
 
 #include "hack.h"
 #include "artifact.h"
-#include "edog.h"
 
 STATIC_VAR NEARDATA struct obj *otmp;
 
@@ -1544,14 +1543,17 @@ do_stone:
             break;
         }
         switch (rn2(20)) {
-        case 19: case 18: case 17:
+        case 19:
+        case 18:
+        case 17:
             if (!Antimagic) {
                 killer_format = KILLED_BY_AN;
                 killer = "touch of death";
                 done(DIED);
                 dmg = 0;
                 break;
-            } /* else FALLTHRU */
+            }
+            /* fall through */
         default: /* case 16: ... case 5: */
             You_feel("your life force draining away...");
             permdmg = 1;    /* actual damage done below */
@@ -1608,7 +1610,7 @@ do_stone:
         if (uncancelled) {
             struct obj *obj = some_armor(&youmonst);
 
-            if (drain_item(obj)) {
+            if (drain_item(obj, FALSE)) {
                 Your("%s less effective.", aobjnam(obj, "seem"));
             }
 
@@ -2422,10 +2424,10 @@ register struct monst *mon;
         nring = ring->nobj;
         if (ring->otyp != RIN_ADORNMENT) continue;
         if (fem) {
-            if (rn2(20) < ACURR(A_CHA)) {
-                Sprintf(qbuf, "\"That %s looks pretty.  May I have it?\"",
-                        safe_qbuf("", sizeof("\"That  looks pretty.  May I have it?\""),
-                                  xname(ring), simple_typename(ring->otyp), "ring"));
+            if (!Deaf && (rn2(20) < ACURR(A_CHA))) {
+                (void) safe_qbuf(qbuf, "\"That ",
+                                 " looks pretty.  May I have it?\"", ring,
+                                 xname, simpleonames, "ring");
                 makeknown(RIN_ADORNMENT);
                 if (yn(qbuf) == 'n') continue;
             } else pline("%s decides she'd like your %s, and takes it.",
@@ -2444,11 +2446,10 @@ register struct monst *mon;
                 && uright->otyp==RIN_ADORNMENT)
                 break;
             if (ring==uleft || ring==uright) continue;
-            if (rn2(20) < ACURR(A_CHA)) {
-                Sprintf(qbuf, "\"That %s looks pretty.  Would you wear it for me?\"",
-                        safe_qbuf("",
-                                  sizeof("\"That  looks pretty.  Would you wear it for me?\""),
-                                  xname(ring), simple_typename(ring->otyp), "ring"));
+            if (!Deaf && (rn2(20) < ACURR(A_CHA))) {
+                (void) safe_qbuf(qbuf, "\"That ",
+                                 " looks pretty.  Would you wear it for me?\"",
+                                 ring, xname, simpleonames, "ring");
                 makeknown(RIN_ADORNMENT);
                 if (yn(qbuf) == 'n') continue;
             } else {
@@ -2799,7 +2800,7 @@ register struct attack *mattk;
     }
     case AD_ENCH:       /* KMH -- remove enchantment (disenchanter) */
         if (otmp) {
-            (void) drain_item(otmp);
+            (void) drain_item(otmp, TRUE);
             /* No message */
         }
         return (1);
@@ -2919,7 +2920,6 @@ boolean youseeit;
     }
 }
 
-#include "edog.h"
 struct monst *
 cloneu()
 {

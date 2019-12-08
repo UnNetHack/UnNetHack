@@ -13,6 +13,7 @@ STATIC_DCL long FDECL(itimeout, (long));
 STATIC_DCL long FDECL(itimeout_incr, (long, int));
 STATIC_DCL void NDECL(ghost_from_bottle);
 STATIC_OVL void NDECL(alchemy_init);
+STATIC_DCL boolean FDECL(H2Opotion_dip, (struct obj *, struct obj *, BOOLEAN_P, const char *));
 STATIC_DCL short FDECL(mixtype, (struct obj *, struct obj *));
 
 #ifndef TESTING
@@ -148,6 +149,34 @@ int type;
         u.usick_cause[0] = 0;
 }
 
+/* start or stop petrification */
+void
+make_stoned(xtime, msg, killedby, killername)
+long xtime;
+const char *msg;
+int killedby;
+const char *killername;
+{
+    long old = Stoned;
+
+#if 0   /* tell player even if hero is unconscious */
+    if (Unaware)
+        msg = 0;
+#endif
+    set_itimeout(&Stoned, xtime);
+    if ((xtime != 0L) ^ (old != 0L)) {
+        flags.botl = TRUE;
+        if (msg)
+            pline("%s", msg);
+    }
+#if NEXT_VERSION
+    if (!Stoned)
+        dealloc_killer(find_delayed_killer(STONED));
+    else if (!old)
+        delayed_killer(STONED, killedby, killername);
+#endif
+}
+
 void
 make_vomiting(xtime, talk)
 long xtime;
@@ -160,6 +189,36 @@ boolean talk;
         if(talk) You_feel("much less nauseated now.");
 
     set_itimeout(&Vomiting, xtime);
+}
+
+void
+make_slimed(xtime, msg)
+long xtime;
+const char *msg;
+{
+    long old = Slimed;
+
+#if 0   /* tell player even if hero is unconscious */
+    if (Unaware)
+        msg = 0;
+#endif
+    set_itimeout(&Slimed, xtime);
+    if ((xtime != 0L) ^ (old != 0L)) {
+        flags.botl = TRUE;
+        if (msg) {
+            pline("%s", msg);
+        }
+    }
+    if (!Slimed) {
+#if NEXT_VERSION
+        dealloc_killer(find_delayed_killer(SLIMED));
+#endif
+        /* fake appearance is set late in turn-to-slime countdown */
+        if (U_AP_TYPE == M_AP_MONSTER && youmonst.mappearance == PM_GREEN_SLIME) {
+            youmonst.m_ap_type = M_AP_NOTHING;
+            youmonst.mappearance = 0;
+        }
+    }
 }
 
 static const char vismsg[] = "vision seems to %s for a moment but is %s now.";
@@ -377,8 +436,6 @@ dodrink()
     otmp = getobj(beverages, "drink");
     if(!otmp) return(0);
     otmp->in_use = TRUE;        /* you've opened the stopper */
-
-#define POTION_OCCUPANT_CHANCE(n) (13 + 2*(n))  /* also in muse.c */
 
     potion_descr = OBJ_DESCR(objects[otmp->otyp]);
     if (potion_descr) {
@@ -753,10 +810,11 @@ register struct obj *otmp;
            && !u.usteed /* heal_legs() would heal steeds legs */
 #endif
            ) {
-            heal_legs();
+            heal_legs(0);
             unkn++;
             break;
-        } /* and fall through */
+        }
+        /* fall through */
     case SPE_HASTE_SELF:
         if(!Very_fast) /* wwf@doe.carleton.ca */
             You("are suddenly moving %sfaster.",
@@ -1042,15 +1100,112 @@ bottlename()
     return bottlenames[rn2(SIZE(bottlenames))];
 }
 
-void
-potionhit(mon, obj, your_fault)
-register struct monst *mon;
-register struct obj *obj;
-boolean your_fault;
+/* handle item dipped into water potion or steed saddle splashed by same */
+STATIC_OVL boolean
+H2Opotion_dip(potion, targobj, useeit, objphrase)
+struct obj *potion, *targobj;
+boolean useeit;
+const char *objphrase; /* "Your widget glows" or "Steed's saddle glows" */
 {
-    register const char *botlnam = bottlename();
+    void FDECL((*func), (OBJ_P)) = 0;
+    const char *glowcolor = 0;
+#define COST_alter (-2)
+#define COST_none (-1)
+    int costchange = COST_none;
+    boolean altfmt = FALSE, res = FALSE;
+
+    if (!potion || potion->otyp != POT_WATER) {
+        return FALSE;
+    }
+
+    if (potion->blessed) {
+        if (targobj->cursed) {
+            func = uncurse;
+            glowcolor = NH_AMBER;
+            costchange = COST_UNCURS;
+        } else if (!targobj->blessed) {
+            func = bless;
+            glowcolor = NH_LIGHT_BLUE;
+            costchange = COST_alter;
+            altfmt = TRUE; /* "with a <color> aura" */
+        }
+    } else if (potion->cursed) {
+        if (targobj->blessed) {
+            func = unbless;
+            glowcolor = "brown";
+            costchange = COST_UNBLSS;
+        } else if (!targobj->cursed) {
+            func = curse;
+            glowcolor = NH_BLACK;
+            costchange = COST_alter;
+            altfmt = TRUE;
+        }
+    } else {
+        /* dipping into uncursed water; carried() check skips steed saddle */
+        if (carried(targobj)) {
+            if (water_damage(targobj, 0, FALSE, TRUE) != ER_NOTHING) {
+                res = TRUE;
+            }
+        }
+    }
+    if (func) {
+        /* give feedback before altering the target object;
+           this used to set obj->bknown even when not seeing
+           the effect; now hero has to see the glow, and bknown
+           is cleared instead of set if perception is distorted */
+        if (useeit) {
+            glowcolor = hcolor(glowcolor);
+            if (altfmt) {
+                pline("%s with %s aura.", objphrase, an(glowcolor));
+            } else {
+                pline("%s %s.", objphrase, glowcolor);
+            }
+            iflags.last_msg = PLNMSG_OBJ_GLOWS;
+            targobj->bknown = !Hallucination;
+        } else {
+            /* didn't see what happened:  forget the BUC state if that was
+               known unless the bless/curse state of the water is known;
+               without this, hero would know the new state even without
+               seeing the glow; priest[ess] will immediately relearn it */
+            if (!potion->bknown || !potion->dknown) {
+                targobj->bknown = 0;
+            }
+            /* [should the bknown+dknown exception require that water
+               be discovered or at least named?] */
+        }
+        /* potions of water are the only shop goods whose price depends
+           on their curse/bless state */
+        if (targobj->unpaid && targobj->otyp == POT_WATER) {
+            if (costchange == COST_alter) {
+                /* added blessing or cursing; update shop
+                   bill to reflect item's new higher price */
+                alter_cost(targobj, 0L);
+            } else if (costchange != COST_none) {
+                /* removed blessing or cursing; you
+                   degraded it, now you'll have to buy it... */
+                costly_alteration(targobj, costchange);
+            }
+        }
+        /* finally, change curse/bless state */
+        (*func)(targobj);
+        res = TRUE;
+    }
+    return res;
+}
+
+void
+potionhit(mon, obj, how)
+struct monst *mon;
+struct obj *obj;
+int how;
+{
+    const char *botlnam = bottlename();
     boolean isyou = (mon == &youmonst);
     int distance;
+    int tx, ty;
+    struct obj *saddle = (struct obj *) 0;
+    boolean hit_saddle = FALSE;
+    boolean your_fault = (how <= POTHIT_HERO_THROW);
 #ifdef WEBB_DISINT
     boolean disint = (touch_disintegrates(mon->data) &&
                       !oresist_disintegration(obj) &&
@@ -1059,14 +1214,28 @@ boolean your_fault;
 #endif
 
     if (isyou) {
+        tx = u.ux, ty = u.uy;
         distance = 0;
         pline_The("%s crashes on your %s and breaks into shards.",
                   botlnam, body_part(HEAD));
         if (!heaven_or_hell_mode) {
-            losehp(rnd(2), "thrown potion", KILLED_BY_AN);
-        } else
+            const char *message = (how == POTHIT_OTHER_THROW) ? "propelled potion" /* scatter */
+                                                              : "thrown potion";
+            losehp(Maybe_Half_Phys(rnd(2)), message, KILLED_BY_AN);
+        } else {
             You_feel("as if something protected you.");
+        }
     } else {
+        tx = mon->mx, ty = mon->my;
+        /* sometimes it hits the saddle */
+        if (((mon->misc_worn_check & W_SADDLE) &&
+             (saddle = which_armor(mon, W_SADDLE))) &&
+            (!rn2(10) ||
+             (obj->otyp == POT_WATER &&
+              ((rnl(10) > 7 && obj->cursed) ||
+               (rnl(10) < 4 && obj->blessed) || !rn2(3))))) {
+            hit_saddle = TRUE;
+        }
         distance = distu(mon->mx, mon->my);
 #ifdef WEBB_DISINT
         if (!cansee(mon->mx, mon->my)) pline(disint ? "Vip!" : "Crash!");
@@ -1077,10 +1246,12 @@ boolean your_fault;
             char *mnam = mon_nam(mon);
             char buf[BUFSZ];
 
-            if(has_head(mon->data)) {
-                Sprintf(buf, "%s %s",
-                        s_suffix(mnam),
-                        (notonhead ? "body" : "head"));
+            if (hit_saddle && saddle) {
+                Sprintf(buf, "%s saddle",
+                        s_suffix(x_monnam(mon, ARTICLE_THE, (char *) 0,
+                                          (SUPPRESS_IT | SUPPRESS_SADDLE), FALSE)));
+            } else if (has_head(mon->data)) {
+                Sprintf(buf, "%s %s", s_suffix(mnam), (notonhead ? "body" : "head"));
             } else {
                 Strcpy(buf, mnam);
             }
@@ -1092,23 +1263,21 @@ boolean your_fault;
                       botlnam, buf);
 #endif
         }
-        if(rn2(5) && mon->mhp > 1)
+        if (rn2(5) && mon->mhp > 1 && !hit_saddle) {
             mon->mhp--;
+        }
     }
 
-    /* oil doesn't instantly evaporate */
-    if (obj->otyp != POT_OIL && cansee(mon->mx, mon->my)
-#ifdef WEBB_DISINT
-        && !disint
-#endif
-        )
+    /* oil doesn't instantly evaporate; Neither does a saddle hit */
+    if (obj->otyp != POT_OIL && !hit_saddle && cansee(tx, ty) && !disint) {
         pline("%s.", Tobjnam(obj, "evaporate"));
+    }
 
     if (isyou) {
         switch (obj->otyp) {
         case POT_OIL:
             if (obj->lamplit)
-                splatter_burning_oil(u.ux, u.uy);
+                explode_oil(obj, u.ux, u.uy);
             break;
         case POT_POLYMORPH:
             You_feel("a little %s.", Hallucination ? "normal" : "strange");
@@ -1118,25 +1287,56 @@ boolean your_fault;
             if (!Acid_resistance) {
                 pline("This burns%s!", obj->blessed ? " a little" :
                       obj->cursed ? " a lot" : "");
-                losehp(d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8),
-                       "potion of acid", KILLED_BY_AN);
+                int dmg = d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8);
+                losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
             }
             break;
         }
-    } else {
-        boolean angermon = TRUE;
+    } else if (hit_saddle && saddle) {
+        char *mnam, buf[BUFSZ], saddle_glows[BUFSZ];
+        boolean affected = FALSE;
+        boolean useeit = !Blind && canseemon(mon) && cansee(tx, ty);
 
-        if (!your_fault) angermon = FALSE;
+        mnam = x_monnam(mon, ARTICLE_THE, (char *) 0, (SUPPRESS_IT | SUPPRESS_SADDLE), FALSE);
+        Sprintf(buf, "%s", upstart(s_suffix(mnam)));
+
+        switch (obj->otyp) {
+        case POT_WATER:
+            Sprintf(saddle_glows, "%s %s", buf, aobjnam(saddle, "glow"));
+            affected = H2Opotion_dip(obj, saddle, useeit, saddle_glows);
+            break;
+        case POT_POLYMORPH:
+            /* Do we allow the saddle to polymorph? */
+            break;
+        }
+        if (useeit && !affected) {
+            pline("%s %s wet.", buf, aobjnam(saddle, "get"));
+        }
+    } else {
+        boolean angermon = your_fault;
+        boolean cureblind = FALSE;
+
 #ifdef WEBB_DISINT
         if (!disint)
 #endif
         {
             switch (obj->otyp) {
-            case POT_HEALING:
-            case POT_EXTRA_HEALING:
             case POT_FULL_HEALING:
-                if (mon->data == &mons[PM_PESTILENCE]) goto do_illness;
-            /*FALLTHRU*/
+                cureblind = TRUE;
+                /* fall through */
+            case POT_EXTRA_HEALING:
+                if (!obj->cursed) {
+                    cureblind = TRUE;
+                }
+                /* fall through */
+            case POT_HEALING:
+                if (obj->blessed) {
+                    cureblind = TRUE;
+                }
+                if (mon->data == &mons[PM_PESTILENCE]) {
+                    goto do_illness;
+                }
+                /* fall through */
             case POT_RESTORE_ABILITY:
             case POT_GAIN_ABILITY:
 do_healing:
@@ -1146,11 +1346,15 @@ do_healing:
                     if (canseemon(mon))
                         pline("%s looks sound and hale again.", Monnam(mon));
                 }
+                if (cureblind) {
+                    mcureblindness(mon, canseemon(mon));
+                }
                 break;
             case POT_SICKNESS:
                 if (mon->data == &mons[PM_PESTILENCE]) goto do_healing;
                 if (dmgtype(mon->data, AD_DISE) ||
                     dmgtype(mon->data, AD_PEST) || /* won't happen, see prior goto */
+                    /* most common case */
                     resists_poison(mon)) {
                     if (canseemon(mon))
                         pline("%s looks unharmed.", Monnam(mon));
@@ -1169,10 +1373,15 @@ do_illness:
             case POT_BOOZE:
                 if(!resist(mon, POTION_CLASS, 0, NOTELL)) mon->mconf = TRUE;
                 break;
-            case POT_INVISIBILITY:
+            case POT_INVISIBILITY: {
+                boolean sawit = canspotmon(mon);
                 angermon = FALSE;
                 mon_set_minvis(mon);
+                if (sawit && !canspotmon(mon) && cansee(mon->mx, mon->my)) {
+                    map_invisible(mon->mx, mon->my);
+                }
                 break;
+            }
             case POT_SLEEPING:
                 /* wakeup() doesn't rouse victims of temporary sleep */
                 if (sleep_monst(mon, rnd(12), POTION_CLASS)) {
@@ -1194,7 +1403,7 @@ do_illness:
                 mon_adjust_speed(mon, 1, obj);
                 break;
             case POT_BLINDNESS:
-                if(haseyes(mon->data)) {
+                if (haseyes(mon->data)) {
                     register int btmp = 64 + rn2(32) +
                                         rn2(32) * !resist(mon, POTION_CLASS, 0, NOTELL);
                     btmp += mon->mblinded;
@@ -1203,16 +1412,23 @@ do_illness:
                 }
                 break;
             case POT_WATER:
-                if (is_undead(mon->data) || is_demon(mon->data) ||
-                    is_were(mon->data)) {
+                if (is_undead(mon->data) ||
+                     is_demon(mon->data) ||
+                     is_were(mon->data) ||
+                     is_vampshifter(mon)) {
                     if (obj->blessed) {
                         pline("%s %s in pain!", Monnam(mon),
                               is_silent(mon->data) ? "writhes" : "shrieks");
+                        if (!is_silent(mon->data)) {
+                            wake_nearto(tx, ty, mon->data->mlevel * 10);
+                        }
                         mon->mhp -= d(2, 6);
                         /* should only be by you */
-                        if (mon->mhp < 1) killed(mon);
-                        else if (is_were(mon->data) && !is_human(mon->data))
+                        if (DEADMONSTER(mon)) {
+                            killed(mon);
+                        } else if (is_were(mon->data) && !is_human(mon->data)) {
                             new_were(mon); /* revert to human */
+                        }
                     } else if (obj->cursed) {
                         angermon = FALSE;
                         if (canseemon(mon))
@@ -1231,19 +1447,25 @@ do_illness:
                         pline("%s rusts.", Monnam(mon));
                     mon->mhp -= d(1, 6);
                     /* should only be by you */
-                    if (mon->mhp < 1) killed(mon);
+                    if (DEADMONSTER(mon)) {
+                        killed(mon);
+                    }
                 }
                 break;
             case POT_OIL:
-                if (obj->lamplit)
-                    splatter_burning_oil(mon->mx, mon->my);
+                if (obj->lamplit) {
+                    explode_oil(obj, tx, ty);
+                }
                 break;
             case POT_ACID:
                 if (!resists_acid(mon) && !resist(mon, POTION_CLASS, 0, NOTELL)) {
                     pline("%s %s in pain!", Monnam(mon),
                           is_silent(mon->data) ? "writhes" : "shrieks");
+                    if (!is_silent(mon->data)) {
+                        wake_nearto(tx, ty, mon->data->mlevel * 10);
+                    }
                     mon->mhp -= d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8);
-                    if (mon->mhp < 1) {
+                    if (DEADMONSTER(mon)) {
                         if (your_fault)
                             killed(mon);
                         else
@@ -1265,10 +1487,13 @@ do_illness:
             }
         }
 
-        if (angermon)
-            wakeup(mon);
-        else
-            mon->msleeping = 0;
+        /* target might have been killed */
+        if (!DEADMONSTER(mon)) {
+            if (angermon)
+                wakeup(mon);
+            else
+                mon->msleeping = 0;
+        }
     }
 #ifdef WEBB_DISINT
     if (!disint)
@@ -1277,19 +1502,26 @@ do_illness:
 
         /* Note: potionbreathe() does its own docall() */
         if ((distance==0 || ((distance < 3) && rn2(5))) &&
-            (!breathless(youmonst.data) || haseyes(youmonst.data)))
+            (!breathless(youmonst.data) || haseyes(youmonst.data))) {
             potionbreathe(obj);
-        else if (obj->dknown && !objects[obj->otyp].oc_name_known &&
-                 !objects[obj->otyp].oc_uname && cansee(mon->mx, mon->my))
+        } else if (obj->dknown && !objects[obj->otyp].oc_name_known &&
+                 !objects[obj->otyp].oc_uname && cansee(tx, ty)) {
             docall(obj);
+        }
     }
-    if(*u.ushops && obj->unpaid) {
-        register struct monst *shkp =
-            shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
+    if (*u.ushops && obj->unpaid) {
+        struct monst *shkp = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
 
-        if(!shkp)
+        /* neither of the first two cases should be able to happen;
+        only the hero should ever have an unpaid item, and only
+        when inside a tended shop */
+        if (!shkp) {
+            /* if shkp was killed, unpaid ought to cleared already */
             obj->unpaid = 0;
-        else {
+        } else if (flags.mon_moving) {
+            /* obj thrown by monster */
+            subfrombill(obj, shkp);
+        } else {
             (void)stolen_value(obj, u.ux, u.uy,
                                (boolean)shkp->mpeaceful, FALSE);
             subfrombill(obj, shkp);
@@ -1764,36 +1996,53 @@ register struct obj *obj;
 int
 dodip()
 {
+    static const char Dip_[] = "Dip ";
     register struct obj *potion, *obj;
-    const char *tmp;
     uchar here;
     char allowall[2];
-    char qbuf[QBUFSZ];
+    char qbuf[QBUFSZ], obuf[QBUFSZ];
+    const char *shortestname; /* last resort obj name for prompt */
 
     allowall[0] = ALL_CLASSES; allowall[1] = '\0';
     if(!(obj = getobj(allowall, "dip")))
         return(0);
 
+    shortestname = (is_plural(obj) || pair_of(obj)) ? "them" : "it";
+
+    /*
+     * Bypass safe_qbuf() since it doesn't handle varying suffix without
+     * an awful lot of support work.  Format the object once, even though
+     * the fountain and pool prompts offer a lot more room for it.
+     * 3.6.0 used thesimpleoname() unconditionally, which posed no risk
+     * of buffer overflow but drew bug reports because it omits user-
+     * supplied type name.
+     * getobj: "What do you want to dip <the object> into? [xyz or ?*] "
+     */
+    Strcpy(obuf, short_oname(obj, doname, thesimpleoname,
+                             /* 128 - (24 + 54 + 1) leaves 49 for <object> */
+                             QBUFSZ - sizeof "What do you want to dip \
+ into? [abdeghjkmnpqstvwyzBCEFHIKLNOQRTUWXZ#-# or ?*] "));
+
     here = levl[u.ux][u.uy].typ;
+
     /* Is there a fountain to dip into here? */
     if (IS_FOUNTAIN(here)) {
-        Sprintf(qbuf, "Dip %s into the fountain?",
-                safe_qbuf("", sizeof("Dip  into the fountain?"),
-                          the(xname(obj)), the(simple_typename(obj->otyp)),
-                          "this item"));
+        Sprintf(qbuf, "%s%s into the fountain?", Dip_,
+                flags.verbose ? obuf : shortestname);
+        /* "Dip <the object> into the fountain?" */
         if(yn(qbuf) == 'y') {
             dipfountain(obj);
             return(1);
         }
     } else if (is_pool(u.ux, u.uy) || is_swamp(u.ux, u.uy)) {
-        tmp = waterbody_name(u.ux, u.uy);
-        Sprintf(qbuf, "Dip %s into the %s?",
-                safe_qbuf("", sizeof("Dip  into the pool of water?"),
-                          the(xname(obj)), the(simple_typename(obj->otyp)),
-                          "this item"), tmp);
+        const char *pooltype = waterbody_name(u.ux, u.uy);
+
+        Sprintf(qbuf, "%s%s into the %s?", Dip_,
+                flags.verbose ? obuf : shortestname, pooltype);
+        /* "Dip <the object> into the {pool, moat, &c}?" */
         if (yn(qbuf) == 'y') {
             if (Levitation) {
-                floating_above(tmp);
+                floating_above(pooltype);
 #ifdef STEED
             } else if (u.usteed && !is_swimmer(u.usteed->data) &&
                        P_SKILL(P_RIDING) < P_BASIC) {
@@ -1807,12 +2056,12 @@ dodip()
         }
     }
 
-    Sprintf(qbuf, "dip %s into",
-            safe_qbuf("", sizeof("dip  into"),
-                      the(xname(obj)), the(simple_typename(obj->otyp)),
-                      "this item"));
-    if(!(potion = getobj(beverages, qbuf)))
+    /* "What do you want to dip <the object> into? [xyz or ?*] " */
+    Sprintf(qbuf, "dip %s into", flags.verbose ? obuf : shortestname);
+    potion = getobj(beverages, qbuf);
+    if (!potion) {
         return(0);
+    }
     if (potion == obj && potion->quan == 1L) {
         pline("That is a potion bottle, not a Klein bottle!");
         return 0;

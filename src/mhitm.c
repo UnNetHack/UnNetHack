@@ -4,7 +4,6 @@
 
 #include "hack.h"
 #include "artifact.h"
-#include "edog.h"
 
 extern boolean notonhead;
 
@@ -15,7 +14,6 @@ static NEARDATA struct obj *otmp;
 static const char brief_feeling[] =
     "have a %s feeling for a moment, then it passes.";
 
-STATIC_DCL char *FDECL(mon_nam_too, (char *, struct monst *, struct monst *));
 STATIC_DCL void FDECL(mrustm, (struct monst *, struct monst *, struct obj *));
 STATIC_DCL int FDECL(hitmm, (struct monst *, struct monst *, struct attack *));
 STATIC_DCL int FDECL(gazemm, (struct monst *, struct monst *, struct attack *));
@@ -35,23 +33,6 @@ STATIC_DCL int FDECL(passivemm, (struct monst *, struct monst *, BOOLEAN_P, int)
  * instead of a global variable.
  */
 static int dieroll;
-
-/* returns mon_nam(mon) relative to other_mon; normal name unless they're
-   the same, in which case the reference is to {him|her|it} self */
-STATIC_OVL char *
-mon_nam_too(outbuf, mon, other_mon)
-char *outbuf;
-struct monst *mon, *other_mon;
-{
-    Strcpy(outbuf, mon_nam(mon));
-    if (mon == other_mon)
-        switch (pronoun_gender(mon)) {
-        case 0: Strcpy(outbuf, "himself");  break;
-        case 1: Strcpy(outbuf, "herself");  break;
-        default:    Strcpy(outbuf, "itself"); break;
-        }
-    return outbuf;
-}
 
 STATIC_OVL void
 noises(magr, mattk)
@@ -88,7 +69,7 @@ struct attack *mattk;
         fmt = (could_seduce(magr, mdef, mattk) && !magr->mcan) ?
               "%s pretends to be friendly to" : "%s misses";
         Sprintf(buf, fmt, Monnam(magr));
-        pline("%s %s.", buf, mon_nam_too(mdef_name, mdef, magr));
+        pline("%s %s.", buf, mon_nam_too(mdef, magr));
     } else noises(magr, mattk);
 }
 
@@ -456,10 +437,11 @@ struct  attack *mattk;
                     Sprintf(buf, "%s squeezes", magr_name);
                     break;
                 }
+                /* fall through */
             default:
                 Sprintf(buf, "%s hits", magr_name);
             }
-            pline("%s %s.", buf, mon_nam_too(mdef_name, mdef, magr));
+            pline("%s %s.", buf, mon_nam_too(mdef, magr));
         }
     } else noises(magr, mattk);
     return(mdamagem(magr, mdef, mattk));
@@ -894,6 +876,7 @@ register struct attack  *mattk;
             return (MM_DEF_DIED | (grow_up(magr, mdef) ?
                                    0 : MM_AGR_DIED));
         }
+        break;
     case AD_WERE:
     case AD_HEAL:
     case AD_PHYS:
@@ -1453,7 +1436,7 @@ post_stone: if (mdef->mhp > 0) return 0;
         if (mattk->adtyp == AD_DGST) {
             /* various checks similar to dog_eat and meatobj.
              * after monkilled() to provide better message ordering */
-            if (mdef->cham != CHAM_ORDINARY) {
+            if (mdef->cham != NON_PM) {
                 (void) newcham(magr, (struct permonst *)0, FALSE, TRUE);
             } else if (mdef->data == &mons[PM_GREEN_SLIME]) {
                 (void) newcham(magr, &mons[PM_GREEN_SLIME], FALSE, TRUE);
@@ -1469,18 +1452,6 @@ post_stone: if (mdef->mhp > 0) return 0;
         return (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
     }
     return(MM_HIT);
-}
-
-int
-noattacks(ptr)          /* returns 1 if monster doesn't attack */
-struct  permonst *ptr;
-{
-    int i;
-
-    for(i = 0; i < NATTK; i++)
-        if(ptr->mattk[i].aatyp) return(0);
-
-    return(1);
 }
 
 /* `mon' is hit by a sleep attack; return 1 if it's affected, 0 otherwise */
@@ -1625,7 +1596,7 @@ int mdead;
         break;
     case AD_ENCH:       /* KMH -- remove enchantment (disenchanter) */
         if (mhit && !mdef->mcan && otmp) {
-            (void) drain_item(otmp);
+            (void) drain_item(otmp, FALSE);
             /* No message */
         }
         break;

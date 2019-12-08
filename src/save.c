@@ -27,7 +27,9 @@ STATIC_DCL void FDECL(bputc, (int));
 #endif
 STATIC_DCL void FDECL(savelevchn, (int, int));
 STATIC_DCL void FDECL(savedamage, (int, int));
+STATIC_DCL void FDECL(saveobj, (int, struct obj *));
 STATIC_DCL void FDECL(saveobjchn, (int, struct obj *, int));
+STATIC_DCL void FDECL(savemon, (int, struct monst *));
 STATIC_DCL void FDECL(savemonchn, (int, struct monst *, int));
 STATIC_DCL void FDECL(savetrapchn, (int, struct trap *, int));
 STATIC_DCL void FDECL(savegamestate, (int, int));
@@ -950,6 +952,45 @@ register struct lvl_sounds *or;
     }
 }
 
+STATIC_OVL void
+saveobj(fd, otmp)
+int fd;
+struct obj *otmp;
+{
+    int buflen, zerobuf = 0;
+
+    buflen = (int) sizeof (struct obj);
+    bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
+    bwrite(fd, (genericptr_t) otmp, buflen);
+    if (otmp->oextra) {
+        buflen = ONAME(otmp) ? (int) strlen(ONAME(otmp)) + 1 : 0;
+        bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
+        if (buflen > 0)
+            bwrite(fd, (genericptr_t) ONAME(otmp), buflen);
+
+        /* defer to savemon() for this one */
+        if (OMONST(otmp))
+            savemon(fd, OMONST(otmp));
+        else
+            bwrite(fd, (genericptr_t) &zerobuf, sizeof zerobuf);
+
+        buflen = OMID(otmp) ? (int) sizeof (unsigned) : 0;
+        bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
+        if (buflen > 0)
+            bwrite(fd, (genericptr_t) OMID(otmp), buflen);
+
+        /* TODO: post 3.6.x, get rid of this */
+        buflen = OLONG(otmp) ? (int) sizeof (long) : 0;
+        bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
+        if (buflen > 0)
+            bwrite(fd, (genericptr_t) OLONG(otmp), buflen);
+
+        buflen = OMAILCMD(otmp) ? (int) strlen(OMAILCMD(otmp)) + 1 : 0;
+        bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
+        if (buflen > 0)
+            bwrite(fd, (genericptr_t) OMAILCMD(otmp), buflen);
+    }
+}
 
 STATIC_OVL void
 saveobjchn(fd, otmp, mode)
@@ -957,30 +998,96 @@ register int fd, mode;
 register struct obj *otmp;
 {
     register struct obj *otmp2;
-    unsigned int xl;
     int minusone = -1;
 
-    while(otmp) {
+    while (otmp) {
         otmp2 = otmp->nobj;
         if (perform_bwrite(mode)) {
-            xl = otmp->oxlth + otmp->onamelth;
-            bwrite(fd, (genericptr_t) &xl, sizeof(int));
-            bwrite(fd, (genericptr_t) otmp, xl + sizeof(struct obj));
+            saveobj(fd, otmp);
         }
         if (Has_contents(otmp))
             saveobjchn(fd, otmp->cobj, mode);
         if (release_data(mode)) {
-            if (otmp->oclass == FOOD_CLASS) food_disappears(otmp);
-            if (otmp->oclass == SPBOOK_CLASS) book_disappears(otmp);
+            /*
+             * If these are on the floor, the discarding could be
+             * due to game save, or we could just be changing levels.
+             * Always invalidate the pointer, but ensure that we have
+             * the o_id in order to restore the pointer on reload.
+             */
+#if NEXT_VERSION
+            if (otmp == context.victual.piece) {
+                context.victual.o_id = otmp->o_id;
+                context.victual.piece = (struct obj *) 0;
+            }
+            if (otmp == context.tin.tin) {
+                context.tin.o_id = otmp->o_id;
+                context.tin.tin = (struct obj *) 0;
+            }
+            if (otmp == context.spbook.book) {
+                context.spbook.o_id = otmp->o_id;
+                context.spbook.book = (struct obj *) 0;
+            }
+#endif
             otmp->where = OBJ_FREE; /* set to free so dealloc will work */
-            otmp->timed = 0; /* not timed any more */
-            otmp->lamplit = 0; /* caller handled lights */
+            otmp->nobj = NULL;      /* nobj saved into otmp2 */
+            otmp->cobj = NULL;      /* contents handled above */
+            otmp->timed = 0;        /* not timed any more */
+            otmp->lamplit = 0;      /* caller handled lights */
             dealloc_obj(otmp);
         }
         otmp = otmp2;
     }
     if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t) &minusone, sizeof(int));
+        bwrite(fd, (genericptr_t) &minusone, sizeof (int));
+}
+
+STATIC_OVL void
+savemon(fd, mtmp)
+int fd;
+struct monst *mtmp;
+{
+    int buflen;
+
+    mtmp->mtemplit = 0; /* normally clear; if set here then a panic save
+                         * is being written while bhit() was executing */
+    buflen = (int) sizeof (struct monst);
+    bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
+    bwrite(fd, (genericptr_t) mtmp, buflen);
+    if (mtmp->mextra) {
+        buflen = has_mname(mtmp) ? (int) strlen(MNAME(mtmp)) + 1 : 0;
+        bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
+        if (buflen > 0) {
+            bwrite(fd, (genericptr_t) MNAME(mtmp), buflen);
+        }
+        buflen = EGD(mtmp) ? (int) sizeof (struct egd) : 0;
+        bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
+        if (buflen > 0) {
+            bwrite(fd, (genericptr_t) EGD(mtmp), buflen);
+        }
+        buflen = EPRI(mtmp) ? (int) sizeof (struct epri) : 0;
+        bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
+        if (buflen > 0) {
+            bwrite(fd, (genericptr_t) EPRI(mtmp), buflen);
+        }
+        buflen = ESHK(mtmp) ? (int) sizeof (struct eshk) : 0;
+        bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+        if (buflen > 0) {
+            bwrite(fd, (genericptr_t) ESHK(mtmp), buflen);
+        }
+        buflen = EMIN(mtmp) ? (int) sizeof (struct emin) : 0;
+        bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+        if (buflen > 0) {
+            bwrite(fd, (genericptr_t) EMIN(mtmp), buflen);
+        }
+        buflen = EDOG(mtmp) ? (int) sizeof (struct edog) : 0;
+        bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+        if (buflen > 0) {
+            bwrite(fd, (genericptr_t) EDOG(mtmp), buflen);
+        }
+        /* mcorpsenm is inline int rather than pointer to something,
+           so doesn't need to be preceded by a length field */
+        bwrite(fd, (genericptr_t) &MCORPSENM(mtmp), sizeof MCORPSENM(mtmp));
+    }
 }
 
 STATIC_OVL void
@@ -989,28 +1096,30 @@ register int fd, mode;
 register struct monst *mtmp;
 {
     register struct monst *mtmp2;
-    unsigned int xl;
     int minusone = -1;
-    struct permonst *monbegin = &mons[0];
-
-    if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t) &monbegin, sizeof(monbegin));
 
     while (mtmp) {
         mtmp2 = mtmp->nmon;
         if (perform_bwrite(mode)) {
-            xl = mtmp->mxlth + mtmp->mnamelth;
-            bwrite(fd, (genericptr_t) &xl, sizeof(int));
-            bwrite(fd, (genericptr_t) mtmp, xl + sizeof(struct monst));
+            mtmp->mnum = monsndx(mtmp->data);
+            if (mtmp->ispriest)
+                forget_temple_entry(mtmp); /* EPRI() */
+            savemon(fd, mtmp);
         }
         if (mtmp->minvent)
             saveobjchn(fd, mtmp->minvent, mode);
-        if (release_data(mode))
+        if (release_data(mode)) {
+            if (mtmp == polearm.hitmon) {
+                polearm.m_id = mtmp->m_id;
+                polearm.hitmon = NULL;
+            }
+            mtmp->nmon = NULL;  /* nmon saved into mtmp2 */
             dealloc_monst(mtmp);
+        }
         mtmp = mtmp2;
     }
     if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t) &minusone, sizeof(int));
+        bwrite(fd, (genericptr_t) &minusone, sizeof (int));
 }
 
 STATIC_OVL void

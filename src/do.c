@@ -220,7 +220,7 @@ const char *verb;
             map_background(x, y, 0);
             newsym(x, y);
         }
-        return water_damage(obj, FALSE, FALSE);
+        return water_damage(obj, (char *)0, FALSE, FALSE);
     } else if (u.ux == x && u.uy == y &&
                (!u.utrap || u.utraptype != TT_PIT) &&
                (t = t_at(x, y)) != 0 && t->tseen &&
@@ -594,12 +594,12 @@ register struct obj *obj;
             return(1);
         }
 #endif
-        if (!can_reach_floor()) {
+        if (!can_reach_floor(TRUE)) {
             if(flags.verbose) You("drop %s.", doname(obj));
             /* Ensure update when we drop gold objects */
             if (obj->oclass == COIN_CLASS) flags.botl = 1;
             freeinv(obj);
-            hitfloor(obj);
+            hitfloor(obj, TRUE);
             return(1);
         }
         if (!IS_ALTAR(levl[u.ux][u.uy].typ) && flags.verbose)
@@ -630,9 +630,19 @@ register struct obj *obj;
     dropy(obj);
 }
 
+/* dropy - put dropped object at destination; called from lots of places */
 void
 dropy(obj)
-register struct obj *obj;
+struct obj *obj;
+{
+    dropz(obj, FALSE);
+}
+
+/* dropz - really put dropped object at its destination... */
+void
+dropz(obj, with_impact)
+struct obj *obj;
+boolean with_impact;
 {
     if (obj == uwep) setuwep((struct obj *)0);
     if (obj == uquiver) setuqwep((struct obj *)0);
@@ -1704,7 +1714,7 @@ struct obj *corpse;
         }
     }
 
-    mtmp = revive(corpse);  /* corpse is gone if successful */
+    mtmp = revive(corpse, FALSE); /* corpse is gone if successful */
 
     if (mtmp) {
         chewed = (mtmp->mhp < mtmp->mhpmax);
@@ -1768,10 +1778,10 @@ struct obj *corpse;
 /*ARGSUSED*/
 void
 revive_mon(arg, timeout)
-genericptr_t arg;
+anything *arg;
 long timeout;
 {
-    struct obj *body = (struct obj *) arg;
+    struct obj *body = arg->a_obj;
 
     /* if we succeed, the corpse is gone, otherwise, rot it away */
     if (!revive_corpse(body)) {
@@ -1848,16 +1858,21 @@ register int timex;
 }
 
 void
-heal_legs()
+heal_legs(how)
+int how; /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
 {
-    if(Wounded_legs) {
+    if (Wounded_legs) {
         if (ATEMP(A_DEX) < 0) {
             ATEMP(A_DEX)++;
             flags.botl = 1;
         }
 
+        /* when mounted, wounded legs applies to the steed;
+           during petrification countdown, "your limbs turn to stone"
+           before the final stages and that calls us (how==2) to cure
+           wounded legs, but we want to suppress the feel better message */
 #ifdef STEED
-        if (!u.usteed)
+        if (!u.usteed && how != 2)
 #endif
         {
             /* KMH, intrinsics patch */
@@ -1870,8 +1885,21 @@ heal_legs()
             }
         }
         HWounded_legs = EWounded_legs = 0;
+
+        /* Wounded_legs reduces carrying capacity, so we want
+           an encumbrance check when they're healed.  However,
+           while dismounting, first steed's legs get healed,
+           then hero is dropped to floor and a new encumbrance
+           check is made [in dismount_steed()].  So don't give
+           encumbrance feedback during the dismount stage
+           because it could seem to be shown out of order and
+           it might be immediately contradicted [able to carry
+           more when steed becomes healthy, then possible floor
+           feedback, then able to carry less when back on foot]. */
+        if (how == 0) {
+            (void) encumber_msg();
+        }
     }
-    (void)encumber_msg();
 }
 
 /* return true if any unique item is on the floor or in monsters' possession */

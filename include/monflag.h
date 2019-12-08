@@ -148,6 +148,7 @@
 #else
 #define M2_MAGIC    0x80000000L /* picks up magic items */
 #endif
+#define M2_SHAPESHIFTER 0x100000000L /* is a shapeshifting species */
 
 #define M3_WANTSAMUL    0x0001      /* would like to steal the amulet */
 #define M3_WANTSBELL    0x0002      /* wants the bell */

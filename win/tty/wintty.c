@@ -2825,10 +2825,11 @@ int x, y;
  */
 
 void
-tty_print_glyph(window, x, y, glyph)
+tty_print_glyph(window, x, y, glyph, bg_glyph)
 winid window;
 xchar x, y;
 int glyph;
+int bg_glyph UNUSED;
 {
     glyph_t ch;
     boolean reverse_on = FALSE;

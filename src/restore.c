@@ -21,7 +21,9 @@ static int NDECL(mgetc);
 STATIC_DCL void NDECL(find_lev_obj);
 STATIC_DCL void FDECL(restlevchn, (int));
 STATIC_DCL void FDECL(restdamage, (int, BOOLEAN_P));
+STATIC_DCL void FDECL(restobj, (int, struct obj *));
 STATIC_DCL struct obj *FDECL(restobjchn, (int, BOOLEAN_P, BOOLEAN_P));
+STATIC_OVL void FDECL(restmon, (int, struct monst *));
 STATIC_DCL struct monst *FDECL(restmonchn, (int, BOOLEAN_P));
 STATIC_DCL struct fruit *FDECL(loadfruitchn, (int));
 STATIC_DCL void FDECL(freefruitchn, (struct fruit *));
@@ -236,6 +238,60 @@ register int fd;
     return or;
 }
 
+/* restore one object */
+STATIC_OVL void
+restobj(fd, otmp)
+int fd;
+struct obj *otmp;
+{
+    int buflen;
+
+    mread(fd, (genericptr_t) otmp, sizeof(struct obj));
+
+    /* next object pointers are invalid; otmp->cobj needs to be left
+       as is--being non-null is key to restoring container contents */
+    otmp->nobj = otmp->nexthere = (struct obj *) 0;
+    /* non-null oextra needs to be reconstructed */
+    if (otmp->oextra) {
+        otmp->oextra = newoextra();
+
+        /* oname - object's name */
+        mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+        if (buflen > 0) { /* includes terminating '\0' */
+            new_oname(otmp, buflen);
+            mread(fd, (genericptr_t) ONAME(otmp), buflen);
+        }
+        /* omonst - corpse or statue might retain full monster details */
+        mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+        if (buflen > 0) {
+            newomonst(otmp);
+            /* this is actually a monst struct, so we
+               can just defer to restmon() here */
+            restmon(fd, OMONST(otmp));
+        }
+        /* omid - monster id number, connecting corpse to ghost */
+        mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+        if (buflen > 0) {
+            newomid(otmp);
+            mread(fd, (genericptr_t) OMID(otmp), buflen);
+        }
+        /* olong - temporary gold */
+        mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+        if (buflen > 0) {
+            newolong(otmp);
+            mread(fd, (genericptr_t) OLONG(otmp), buflen);
+        }
+        /* omailcmd - feedback mechanism for scroll of mail */
+        mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+        if (buflen > 0) {
+            char *omailcmd = (char *) alloc(buflen);
+
+            mread(fd, (genericptr_t) omailcmd, buflen);
+            new_omailcmd(otmp, omailcmd);
+            free((genericptr_t) omailcmd);
+        }
+    }
+}
 
 STATIC_OVL struct obj *
 restobjchn(fd, ghostly, frozen)
@@ -243,23 +299,28 @@ register int fd;
 boolean ghostly, frozen;
 {
     register struct obj *otmp, *otmp2 = 0;
-    register struct obj *first = (struct obj *)0;
-    int xl;
+    register struct obj *first = (struct obj *) 0;
+    int buflen;
 
-    while(1) {
-        mread(fd, (genericptr_t) &xl, sizeof(xl));
-        if(xl == -1) break;
-        otmp = newobj(xl);
-        if(!first) first = otmp;
-        else otmp2->nobj = otmp;
-        mread(fd, (genericptr_t) otmp,
-              (unsigned) xl + sizeof(struct obj));
+    while (1) {
+        mread(fd, (genericptr_t) &buflen, sizeof buflen);
+        if (buflen == -1)
+            break;
+
+        otmp = newobj();
+        restobj(fd, otmp);
+        if (!first)
+            first = otmp;
+        else
+            otmp2->nobj = otmp;
+
         if (ghostly) {
             unsigned nid = flags.ident++;
             add_id_mapping(otmp->o_id, nid);
             otmp->o_id = nid;
         }
-        if (ghostly && otmp->otyp == SLIME_MOLD) ghostfruit(otmp);
+        if (ghostly && otmp->otyp == SLIME_MOLD)
+            ghostfruit(otmp);
         /* Ghost levels get object age shifted from old player's clock
          * to new player's clock.  Assumption: new player arrived
          * immediately after old player died.
@@ -270,21 +331,115 @@ boolean ghostly, frozen;
         /* get contents of a container or statue */
         if (Has_contents(otmp)) {
             struct obj *otmp3;
+
             otmp->cobj = restobjchn(fd, ghostly, Is_IceBox(otmp));
             /* restore container back pointers */
             for (otmp3 = otmp->cobj; otmp3; otmp3 = otmp3->nobj)
                 otmp3->ocontainer = otmp;
-        }
-        if (otmp->bypass) otmp->bypass = 0;
+        } else if (SchroedingersBox(otmp)) {
+            struct obj *catcorpse;
 
+            /*
+             * TODO:  Remove this after 3.6.x save compatibility is dropped.
+             *
+             * As of 3.6.2, SchroedingersBox() always has a cat corpse in it.
+             * For 3.6.[01], it was empty and its weight was falsified
+             * to have the value it would have had if there was one inside.
+             * Put a non-rotting cat corpse in this box to convert to 3.6.2.
+             *
+             * [Note: after this fix up, future save/restore of this object
+             * will take the Has_contents() code path above.]
+             */
+            if ((catcorpse = mksobj(CORPSE, TRUE, FALSE)) != 0) {
+                otmp->spe = 1; /* flag for special SchroedingersBox */
+                set_corpsenm(catcorpse, PM_HOUSECAT);
+                (void) stop_timer(ROT_CORPSE, obj_to_any(catcorpse));
+                add_to_container(otmp, catcorpse);
+                otmp->owt = weight(otmp);
+            }
+        }
+        if (otmp->bypass)
+            otmp->bypass = 0;
+        if (!ghostly) {
+            /* fix the pointers */
+#ifdef NEXT_VERSION
+            if (otmp->o_id == context.victual.o_id) {
+                context.victual.piece = otmp;
+            }
+            if (otmp->o_id == context.tin.o_id) {
+                context.tin.tin = otmp;
+            }
+            if (otmp->o_id == context.spbook.o_id) {
+                context.spbook.book = otmp;
+            }
+#endif
+        }
         otmp2 = otmp;
     }
-    if(first && otmp2->nobj) {
+    if (first && otmp2->nobj) {
         impossible("Restobjchn: error reading objchn.");
         otmp2->nobj = 0;
     }
 
-    return(first);
+    return first;
+}
+
+/* restore one monster */
+STATIC_OVL void
+restmon(fd, mtmp)
+int fd;
+struct monst *mtmp;
+{
+    int buflen;
+
+    mread(fd, (genericptr_t) mtmp, sizeof(struct monst));
+
+    /* next monster pointer is invalid */
+    mtmp->nmon = (struct monst *) 0;
+    /* non-null mextra needs to be reconstructed */
+    if (mtmp->mextra) {
+        mtmp->mextra = newmextra();
+
+        /* mname - monster's name */
+        mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+        if (buflen > 0) { /* includes terminating '\0' */
+            new_mname(mtmp, buflen);
+            mread(fd, (genericptr_t) MNAME(mtmp), buflen);
+        }
+        /* egd - vault guard */
+        mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+        if (buflen > 0) {
+            newegd(mtmp);
+            mread(fd, (genericptr_t) EGD(mtmp), sizeof(struct egd));
+        }
+        /* epri - temple priest */
+        mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+        if (buflen > 0) {
+            newepri(mtmp);
+            mread(fd, (genericptr_t) EPRI(mtmp), sizeof(struct epri));
+        }
+        /* eshk - shopkeeper */
+        mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+        if (buflen > 0) {
+            neweshk(mtmp);
+            mread(fd, (genericptr_t) ESHK(mtmp), sizeof(struct eshk));
+        }
+        /* emin - minion */
+        mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+        if (buflen > 0) {
+            newemin(mtmp);
+            mread(fd, (genericptr_t) EMIN(mtmp), sizeof(struct emin));
+        }
+        /* edog - pet */
+        mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+        if (buflen > 0) {
+            newedog(mtmp);
+            mread(fd, (genericptr_t) EDOG(mtmp), sizeof(struct edog));
+        }
+        /* mcorpsenm - obj->corpsenm for mimic posing as corpse or
+           statue (inline int rather than pointer to something) */
+        mread(fd, (genericptr_t) &MCORPSENM(mtmp), sizeof MCORPSENM(mtmp));
+    } /* mextra */
 }
 
 STATIC_OVL struct monst *
@@ -293,31 +448,28 @@ register int fd;
 boolean ghostly;
 {
     register struct monst *mtmp, *mtmp2 = 0;
-    register struct monst *first = (struct monst *)0;
-    int xl;
-    struct permonst *monbegin;
-    boolean moved;
+    register struct monst *first = (struct monst *) 0;
+    int offset, buflen;
 
-    /* get the original base address */
-    mread(fd, (genericptr_t)&monbegin, sizeof(monbegin));
-    moved = (monbegin != mons);
+    while (1) {
+        mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+        if (buflen == -1)
+            break;
 
-    while(1) {
-        mread(fd, (genericptr_t) &xl, sizeof(xl));
-        if(xl == -1) break;
-        mtmp = newmonst(xl);
-        if(!first) first = mtmp;
-        else mtmp2->nmon = mtmp;
-        mread(fd, (genericptr_t) mtmp, (unsigned) xl + sizeof(struct monst));
+        mtmp = newmonst();
+        restmon(fd, mtmp);
+        if (!first)
+            first = mtmp;
+        else
+            mtmp2->nmon = mtmp;
+
         if (ghostly) {
             unsigned nid = flags.ident++;
             add_id_mapping(mtmp->m_id, nid);
             mtmp->m_id = nid;
         }
-        if (moved && mtmp->data) {
-            int offset = mtmp->data - monbegin; /*(ptrdiff_t)*/
-            mtmp->data = mons + offset;  /* new permonst location */
-        }
+        offset = mtmp->mnum;
+        mtmp->data = &mons[offset];
         if (ghostly) {
             int mndx = monsndx(mtmp->data);
             if (propagate(mndx, TRUE, ghostly) == 0) {
@@ -325,7 +477,7 @@ boolean ghostly;
                 mtmp->mhpmax = DEFUNCT_MONSTER;
             }
         }
-        if(mtmp->minvent) {
+        if (mtmp->minvent) {
             struct obj *obj;
             mtmp->minvent = restobjchn(fd, ghostly, FALSE);
             /* restore monster back pointer */
@@ -335,25 +487,34 @@ boolean ghostly;
         if (mtmp->mw) {
             struct obj *obj;
 
-            for(obj = mtmp->minvent; obj; obj = obj->nobj)
-                if (obj->owornmask & W_WEP) break;
-            if (obj) mtmp->mw = obj;
+            for (obj = mtmp->minvent; obj; obj = obj->nobj)
+                if (obj->owornmask & W_WEP)
+                    break;
+            if (obj)
+                mtmp->mw = obj;
             else {
                 MON_NOWEP(mtmp);
                 impossible("bad monster weapon restore");
             }
         }
 
-        if (mtmp->isshk) restshk(mtmp, ghostly);
-        if (mtmp->ispriest) restpriest(mtmp, ghostly);
+        if (mtmp->isshk)
+            restshk(mtmp, ghostly);
+        if (mtmp->ispriest)
+            restpriest(mtmp, ghostly);
 
+        if (!ghostly) {
+            if (mtmp->m_id == polearm.m_id) {
+                polearm.hitmon = mtmp;
+            }
+        }
         mtmp2 = mtmp;
     }
-    if(first && mtmp2->nmon) {
+    if (first && mtmp2->nmon) {
         impossible("Restmonchn: error reading monchn.");
         mtmp2->nmon = 0;
     }
-    return(first);
+    return first;
 }
 
 STATIC_OVL struct fruit *
@@ -453,6 +614,13 @@ unsigned int *stuckid, *steedid;    /* STEED */
     migrating_objs = restobjchn(fd, FALSE, FALSE);
     migrating_mons = restmonchn(fd, FALSE);
     mread(fd, (genericptr_t) mvitals, sizeof(mvitals));
+
+    /*
+     * There are some things after this that can have unintended display
+     * side-effects too early in the game.
+     * Disable see_monsters() here, re-enable it at the top of moveloop()
+     */
+    defer_see_monsters = TRUE;
 
     restore_dungeon(fd);
     restlevchn(fd);
@@ -914,7 +1082,9 @@ boolean ghostly;
         if (mtmp->isshk)
             set_residency(mtmp, FALSE);
         place_monster(mtmp, mtmp->mx, mtmp->my);
-        if (mtmp->wormno) place_wsegs(mtmp);
+        if (mtmp->wormno) {
+            place_wsegs(mtmp, NULL);
+        }
     }
     restdamage(fd, ghostly);
 
@@ -1054,24 +1224,24 @@ boolean ghostly;
     struct obj *otmp;
     unsigned oldid, nid;
     for (otmp = fobj; otmp; otmp = otmp->nobj) {
-        if (ghostly && otmp->oattached == OATTACHED_MONST && otmp->oxlth) {
-            struct monst *mtmp = (struct monst *)otmp->oextra;
+        if (ghostly && has_omonst(otmp)) {
+            struct monst *mtmp = OMONST(otmp);
 
             mtmp->m_id = 0;
             mtmp->mpeaceful = mtmp->mtame = 0; /* pet's owner died! */
         }
-        if (ghostly && otmp->oattached == OATTACHED_M_ID) {
-            (void) memcpy((genericptr_t)&oldid, (genericptr_t)otmp->oextra,
+        if (ghostly && has_omid(otmp)) {
+            (void) memcpy((genericptr_t) &oldid, (genericptr_t) OMID(otmp),
                           sizeof(oldid));
-            if (lookup_id_mapping(oldid, &nid))
-                (void) memcpy((genericptr_t)otmp->oextra, (genericptr_t)&nid,
+            if (lookup_id_mapping(oldid, &nid)) {
+                (void) memcpy((genericptr_t) OMID(otmp), (genericptr_t) &nid,
                               sizeof(nid));
-            else
-                otmp->oattached = OATTACHED_NOTHING;
+            } else {
+                free_omid(otmp);
+            }
         }
     }
 }
-
 
 #ifdef ZEROCOMP
 #define RLESC '\0'  /* Leading character for run of RLESC's */

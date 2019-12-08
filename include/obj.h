@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)obj.h  3.4 2002/01/07  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,6 +11,18 @@ union vptrs {
     struct obj *v_nexthere;     /* floor location lists */
     struct obj *v_ocontainer;       /* point back to container */
     struct monst *v_ocarry;     /* point back to carrying monst */
+};
+
+/****
+ *** oextra -- collection of all object extensions
+ ** (see the note at the bottom of this file before adding oextra fields)
+ */
+struct oextra {
+    char *oname;          /* ptr to name of object */
+    struct monst *omonst; /* ptr to attached monst struct */
+    unsigned *omid;       /* ptr to m_id */
+    long *olong;          /* ptr to misc long (temporary gold object) */
+    char *omailcmd;       /* response_cmd for mail deliver */
 };
 
 struct obj {
@@ -28,14 +39,15 @@ struct obj {
     unsigned owt;
     long quan;      /* number of items */
 
-    schar spe;      /* quality of weapon, armor or ring (+ or -)
-                       number of charges for wand ( >= -1 )
-                       marks your eggs, spinach tins
-                       royal coffers for a court ( == 2)
-                       tells which fruit a fruit is
-                       special for uball and amulet
-                       historic and gender for statues
-                       real mail, junk mail or hint for scrolls of mail */
+    schar spe;        /* quality of weapon, weptool, armor or ring (+ or -);
+                         number of charges for wand or charged tool ( >= -1 );
+                         number of candles attached to candelabrum;
+                         marks your eggs, tin variety and spinach tins;
+                         Schroedinger's Box (1) or royal coffers for a court (2);
+                         tells which fruit a fruit is;
+                         special for uball and amulet;
+                         scroll of mail (normal==0, bones or wishing==1, written==2);
+                         historic and gender for statues */
 #define STATUE_HISTORIC 0x01
 #define STATUE_MALE     0x02
 #define STATUE_FEMALE   0x04
@@ -44,66 +56,63 @@ struct obj {
 #define MAIL_HINT 2
     char oclass;        /* object class */
     char invlet;        /* designation in inventory */
-    int oartifact;  /* artifact array index */
-    int mysterious_reserved_int;    /* so I might add something cool in 3.6.1+ */
+    int oartifact;      /* artifact array index */
+    int mysterious_reserved_int; /* so I might add something cool in 3.6.1+ */
     xchar where;        /* where the object thinks it is */
-#define OBJ_FREE    0       /* object not attached to anything */
-#define OBJ_FLOOR   1       /* object on floor */
-#define OBJ_CONTAINED   2       /* object in a container */
-#define OBJ_INVENT  3       /* object in the hero's inventory */
-#define OBJ_MINVENT 4       /* object in a monster inventory */
-#define OBJ_MIGRATING   5       /* object sent off to another level */
-#define OBJ_BURIED  6       /* object buried */
-#define OBJ_ONBILL  7       /* object on shk bill */
-#define NOBJ_STATES 8
+#define OBJ_FREE       0 /* object not attached to anything */
+#define OBJ_FLOOR      1 /* object on floor */
+#define OBJ_CONTAINED  2 /* object in a container */
+#define OBJ_INVENT     3 /* object in the hero's inventory */
+#define OBJ_MINVENT    4 /* object in a monster inventory */
+#define OBJ_MIGRATING  5 /* object sent off to another level */
+#define OBJ_BURIED     6 /* object buried */
+#define OBJ_ONBILL     7 /* object on shk bill */
+#define NOBJ_STATES    8
     xchar timed;        /* # of fuses (timers) attached to this obj */
 
     Bitfield(cursed, 1);
     Bitfield(blessed, 1);
-    Bitfield(unpaid, 1); /* on some bill */
-    Bitfield(no_charge, 1);  /* if shk shouldn't charge for this */
-    Bitfield(known, 1);  /* exact nature known */
-    Bitfield(dknown, 1); /* color or text known */
-    Bitfield(bknown, 1); /* blessing or curse known */
-    Bitfield(rknown, 1); /* rustproof or not known */
+    Bitfield(unpaid, 1);      /* on some bill */
+    Bitfield(no_charge, 1);   /* if shk shouldn't charge for this */
+    Bitfield(known, 1);       /* exact nature known */
+    Bitfield(dknown, 1);      /* color or text known */
+    Bitfield(bknown, 1);      /* blessing or curse known */
+    Bitfield(rknown, 1);      /* rustproof or not known */
 
-    Bitfield(oeroded, 2);    /* rusted/burnt weapon/armor */
-    Bitfield(oeroded2, 2);   /* corroded/rotted weapon/armor */
+    Bitfield(oeroded, 2);     /* rusted/burnt weapon/armor */
+    Bitfield(oeroded2, 2);    /* corroded/rotted weapon/armor */
 #define greatest_erosion(otmp) (int)((otmp)->oeroded > (otmp)->oeroded2 ? (otmp)->oeroded : (otmp)->oeroded2)
 #define MAX_ERODE 3
-#define orotten oeroded     /* rotten food */
-#define odiluted oeroded    /* diluted potions */
+#define orotten oeroded       /* rotten food */
+#define odiluted oeroded      /* diluted potions */
 #define norevive oeroded2
     Bitfield(oerodeproof, 1); /* erodeproof weapon/armor */
-    Bitfield(olocked, 1);    /* object is locked */
-#define sokoprize olocked   /* special flag for sokoban prize */
-#define orecursive olocked  /* special flag for preventing recursive calls */
-    Bitfield(obroken, 1);    /* lock has been broken */
-    Bitfield(otrapped, 1);   /* container is trapped */
+    Bitfield(olocked, 1);     /* object is locked */
+#define sokoprize olocked     /* special flag for sokoban prize */
+#define orecursive olocked    /* special flag for preventing recursive calls */
+    Bitfield(obroken, 1);     /* lock has been broken */
+#define degraded_horn obroken /* unicorn horn will poly to non-magic */
+    Bitfield(otrapped, 1);    /* container is trapped */
     /* or accidental tripped rolling boulder trap */
-#define opoisoned otrapped  /* object (weapon) is coated with poison */
+#define opoisoned otrapped    /* object (weapon) is coated with poison */
 
-    Bitfield(recharged, 3);  /* number of times it's been recharged */
-    Bitfield(lamplit, 1);    /* a light-source -- can be lit */
-#ifdef INVISIBLE_OBJECTS
-    Bitfield(oinvis, 1); /* invisible */
-#endif
-    Bitfield(greased, 1);    /* covered with grease */
-    Bitfield(oattached, 2);  /* obj struct has special attachment */
-#define OATTACHED_NOTHING 0
-#define OATTACHED_MONST   1 /* monst struct in oextra */
-#define OATTACHED_M_ID    2 /* monst id in oextra */
-#define OATTACHED_UNUSED3 3
+    Bitfield(recharged, 3);   /* number of times it's been recharged */
+#define on_ice recharged      /* corpse on ice */
+    Bitfield(lamplit, 1);     /* a light-source -- can be lit */
+    Bitfield(globby, 1);      /* combines with like types on adjacent squares */
+    Bitfield(greased, 1);     /* covered with grease */
+    Bitfield(nomerge, 1);     /* set temporarily to prevent merging */
 
-    Bitfield(in_use, 1); /* for magic items before useup items */
-    Bitfield(bypass, 1); /* mark this as an object to be skipped by bhito() */
-    Bitfield(was_thrown, 1); /* thrown by the hero since last picked up */
-    Bitfield(odrained, 1);   /* drained corpse */
+    Bitfield(in_use, 1);      /* for magic items before useup items */
+    Bitfield(bypass, 1);      /* mark this as an object to be skipped by bhito() */
+    Bitfield(cknown, 1);      /* contents of container assumed to be known */
+    Bitfield(lknown, 1);      /* locked/unlocked status is known */
+    Bitfield(was_thrown, 1);  /* thrown by the hero since last picked up */
+    Bitfield(odrained, 1);    /* drained corpse */
     Bitfield(was_dropped, 1); /* dropped deliberately by the hero */
     Bitfield(was_in_starting_inventory, 1); /* hero started with this item */
-    /* 2 free bits */
 
-    int corpsenm;   /* type of corpse is mons[corpsenm] */
+    int corpsenm;           /* type of corpse is mons[corpsenm] */
 #define leashmon  corpsenm  /* gets m_id of attached pet */
 #define spestudied corpsenm /* # of times a spellbook has been studied */
 #define fromsink  corpsenm  /* a potion from a sink */
@@ -111,21 +120,30 @@ struct obj {
 #ifdef RECORD_ACHIEVE
     xchar record_achieve_special;
 #endif
-
-    unsigned oeaten;    /* nutrition left in food, if partly eaten */
-    long age;       /* creation date */
-
-    uchar onamelth;     /* length of name (following oxlth) */
-    short oxlth;        /* length of following data */
-    /* in order to prevent alignment problems oextra should
-       be (or follow) a long int */
+    int usecount;           /* overloaded for various things that tally */
+    unsigned oeaten;        /* nutrition left in food, if partly eaten */
+    long age;               /* creation date */
     long owornmask;
-    long oextra[1];     /* used for name of ordinary objects - length
-                           is flexible; amount for tmp gold objects */
+    struct oextra *oextra;  /* pointer to oextra struct */
 };
 
-#define newobj(xl)  (struct obj *)alloc((unsigned)(xl) + sizeof(struct obj))
-#define ONAME(otmp) (((char *)(otmp)->oextra) + (otmp)->oxlth)
+#define newobj() (struct obj *) alloc(sizeof(struct obj))
+
+/***
+ ** oextra referencing and testing macros
+ */
+
+#define ONAME(o) ((o)->oextra->oname)
+#define OMID(o) ((o)->oextra->omid)
+#define OMONST(o) ((o)->oextra->omonst)
+#define OLONG(o) ((o)->oextra->olong)
+#define OMAILCMD(o) ((o)->oextra->omailcmd)
+
+#define has_oname(o) ((o)->oextra && ONAME(o))
+#define has_omid(o) ((o)->oextra && OMID(o))
+#define has_omonst(o) ((o)->oextra && OMONST(o))
+#define has_olong(o) ((o)->oextra && OLONG(o))
+#define has_omailcmd(o) ((o)->oextra && OMAILCMD(o))
 
 /* Weapons and weapon-tools */
 /* KMH -- now based on skill categories.  Formerly:
@@ -166,15 +184,18 @@ struct obj {
                           otmp->oclass == GEM_CLASS) && \
                          objects[otmp->otyp].oc_skill >= -P_CROSSBOW && \
                          objects[otmp->otyp].oc_skill <= -P_BOW)
-#define ammo_and_launcher(otmp, ltmp) \
-    (is_ammo(otmp) && (ltmp) && \
-     objects[(otmp)->otyp].oc_skill == -objects[(ltmp)->otyp].oc_skill)
+#define matching_launcher(a, l) \
+    ((l) && objects[(a)->otyp].oc_skill == -objects[(l)->otyp].oc_skill)
+#define ammo_and_launcher(a, l) (is_ammo(a) && matching_launcher(a, l))
 #define is_missile(otmp)    ((otmp->oclass == WEAPON_CLASS || \
                               otmp->oclass == TOOL_CLASS) && \
                              objects[otmp->otyp].oc_skill >= -P_BOOMERANG && \
                              objects[otmp->otyp].oc_skill <= -P_DART)
 #define is_weptool(o)   ((o)->oclass == TOOL_CLASS && \
                          objects[(o)->otyp].oc_skill != P_NONE)
+        /* towel is not a weptool:  spe isn't an enchantment, cursed towel
+           doesn't weld to hand, and twoweapon won't work with one */
+#define is_wet_towel(o) ((o)->otyp == TOWEL && (o)->spe > 0)
 #define bimanual(otmp)  ((otmp->oclass == WEAPON_CLASS || \
                           otmp->oclass == TOOL_CLASS) && \
                          objects[otmp->otyp].oc_bimanual)
@@ -226,7 +247,7 @@ struct obj {
 #define stale_egg(egg)  ((monstermoves - (egg)->age) > (2*MAX_EGG_HATCH_TIME))
 #define ofood(o) ((o)->otyp == CORPSE || (o)->otyp == EGG || (o)->otyp == TIN)
 #define polyfodder(obj) (ofood(obj) && \
-                         pm_to_cham((obj)->corpsenm) != CHAM_ORDINARY)
+                         pm_to_cham((obj)->corpsenm) != NON_PM)
 #define mlevelgain(obj) (ofood(obj) && (obj)->corpsenm == PM_WRAITH)
 #define mhealup(obj)    (ofood(obj) && (obj)->corpsenm == PM_NURSE)
 #define drainlevel(corpse) (mons[(corpse)->corpsenm].cnutrit*4/5)
@@ -241,6 +262,7 @@ struct obj {
                          otmp->otyp == IRON_SAFE)
 #define Is_mbag(otmp)   (otmp->otyp == BAG_OF_HOLDING || \
                          otmp->otyp == BAG_OF_TRICKS)
+#define SchroedingersBox(o) ((o)->otyp == LARGE_BOX && (o)->spe == 1)
 
 #define Is_sokoprize(otmp)  ((otmp)->sokoprize && !Is_box(otmp))
 
@@ -329,9 +351,11 @@ struct obj {
 #define is_flimsy(otmp)     (objects[(otmp)->otyp].oc_material <= LEATHER)
 #endif
 #ifdef WEBB_DISINT
-# define oresist_disintegration(obj) \
+/* note: worn amulet of life saving must be preserved in order to operate */
+# define oresist_disintegration(obj)                                       \
     (objects[obj->otyp].oc_oprop == DISINT_RES || \
-     obj_resists(obj, 5, 50) || is_quest_artifact(obj) )
+     obj_resists(obj, 5, 50) || \
+     is_quest_artifact(obj))
 # define weight_dmg(i) {  \
         i = (i<=100) ? 1 : i/100; \
         i = rnd(i); \
@@ -342,9 +366,77 @@ struct obj {
 /* helpers, simple enough to be macros */
 #define is_plural(o)    ((o)->quan > 1 || \
                          (o)->oartifact == ART_EYES_OF_THE_OVERWORLD)
+#define pair_of(o) ((o)->otyp == LENSES || is_gloves(o) || is_boots(o))
 
 /* Flags for get_obj_location(). */
-#define CONTAINED_TOO   0x1
-#define BURIED_TOO  0x2
+#define CONTAINED_TOO 0x1
+#define BURIED_TOO    0x2
+
+/* object erosion types */
+#define ERODE_BURN    0
+#define ERODE_RUST    1
+#define ERODE_ROT     2
+#define ERODE_CORRODE 3
+
+/* erosion flags for erode_obj() */
+#define EF_NONE    0x0
+#define EF_GREASE  0x1 /* check for a greased object */
+#define EF_DESTROY 0x2 /* potentially destroy the object */
+#define EF_VERBOSE 0x4 /* print extra messages */
+#define EF_PAY     0x8 /* it's the player's fault */
+
+/* erosion return values for erode_obj(), water_damage() */
+#define ER_NOTHING   0 /* nothing happened */
+#define ER_GREASED   1 /* protected by grease */
+#define ER_DAMAGED   2 /* object was damaged in some way */
+#define ER_DESTROYED 3 /* object was destroyed */
+
+/* propeller method for potionhit() */
+#define POTHIT_HERO_BASH   0 /* wielded by hero */
+#define POTHIT_HERO_THROW  1 /* thrown by hero */
+#define POTHIT_MONST_THROW 2 /* thrown by a monster */
+#define POTHIT_OTHER_THROW 3 /* propelled by some other means [scatter()] */
+
+/*
+ *  Notes for adding new oextra structures:
+ *
+ *   1. Add the structure definition and any required macros in an
+ *          appropriate header file that precedes this one.
+ *   2. Add a pointer to your new struct to oextra struct in this file.
+ *   3. Add a referencing macro to this file after the newobj macro above
+ *      (see ONAME, OMONST, OMIN, OLONG, or OMAILCMD for examples).
+ *   4. Add a testing macro after the set of referencing macros
+ *      (see has_oname(), has_omonst(), has_omin(), has_olong(),
+ *      has_omailcmd() for examples).
+ *   5. Create newXX(otmp) function and possibly free_XX(otmp) function
+ *      in an appropriate new or existing source file and add a prototype
+ *      for it to include/extern.h.  The majority of these are currently
+ *      located in mkobj.c for convenience.
+ *
+ *      void FDECL(newXX, (struct obj *));
+ *          void FDECL(free_XX, (struct obj *));
+ *
+ *            void
+ *            newxx(otmp)
+ *            struct obj *otmp;
+ *            {
+ *                if (!otmp->oextra) otmp->oextra = newoextra();
+ *                if (!XX(otmp)) {
+ *                    XX(otmp) = (struct XX *)alloc(sizeof(struct xx));
+ *                    (void) memset((genericptr_t) XX(otmp),
+ *                               0, sizeof(struct xx));
+ *                }
+ *            }
+ *
+ *   6. Adjust size_obj() in src/cmd.c appropriately.
+ *   7. Adjust dealloc_oextra() in src/mkobj.c to clean up
+ *      properly during obj deallocation.
+ *   8. Adjust copy_oextra() in src/mkobj.c to make duplicate
+ *      copies of your struct or data onto another obj struct.
+ *   9. Adjust restobj() in src/restore.c to deal with your
+ *      struct or data during a restore.
+ *  10. Adjust saveobj() in src/save.c to deal with your
+ *      struct or data during a save.
+ */
 
 #endif /* OBJ_H */

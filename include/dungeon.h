@@ -148,18 +148,21 @@ typedef struct branch {
 
 /* monster and object migration codes */
 
-#define MIGR_NOWHERE          (-1)  /* failure flag for down_gate() */
-#define MIGR_RANDOM     0
-#define MIGR_APPROX_XY      1   /* approximate coordinates */
-#define MIGR_EXACT_XY       2   /* specific coordinates */
+#define MIGR_NOWHERE      (-1)/* failure flag for down_gate() */
+#define MIGR_RANDOM         0
+#define MIGR_APPROX_XY      1 /* approximate coordinates */
+#define MIGR_EXACT_XY       2 /* specific coordinates */
 #define MIGR_STAIRS_UP      3
 #define MIGR_STAIRS_DOWN    4
 #define MIGR_LADDER_UP      5
 #define MIGR_LADDER_DOWN    6
-#define MIGR_SSTAIRS        7   /* dungeon branch */
-#define MIGR_PORTAL     8   /* magic portal */
-#define MIGR_NEAR_PLAYER    9   /* mon: followers; obj: trap door */
-
+#define MIGR_SSTAIRS        7 /* dungeon branch */
+#define MIGR_PORTAL         8 /* magic portal */
+#define MIGR_NEAR_PLAYER    9 /* mon: followers; obj: trap door */
+#define MIGR_NOBREAK     1024 /* bitmask: don't break on delivery */
+#define MIGR_NOSCATTER   2048 /* don't scatter on delivery */
+#define MIGR_TO_SPECIES  4096 /* migrating to species as they are made */
+#define MIGR_LEFTOVERS   8192 /* grab remaining MIGR_TO_SPECIES objects */
 /* level information (saved via ledger number) */
 
 struct linfo {
@@ -228,6 +231,11 @@ typedef struct mapseen_feat {
     Bitfield(shoptype, 6);
 
     Bitfield(forgot, 1); /* player has forgotten about this level? */
+
+    Bitfield(valley, 1);
+    Bitfield(msanctum, 1);
+    Bitfield(ludios, 1);
+    Bitfield(roguelevel, 1);
 } mapseen_feat;
 
 /* for mapseen->rooms */

@@ -23,8 +23,6 @@
 
 #include "sp_lev.h"
 #include "rect.h"
-#include "epri.h"
-#include "eshk.h"
 
 
 extern void FDECL(mkmap, (lev_init *));
@@ -1725,15 +1723,15 @@ struct mkroom   *croom;
                     } else if (!is_neuter(mdat)) {
                         if(!rn2(10)) mtmp->female = !mtmp->female;
                     }
-                    set_mon_data(mtmp, mdat, 0);
+                    set_mon_data(mtmp, mdat);
                     if (emits_light(olddata) != emits_light(mtmp->data)) {
                         /* used to give light, now doesn't, or vice versa,
                            or light's range has changed */
                         if (emits_light(olddata))
-                            del_light_source(LS_MONSTER, (genericptr_t)mtmp);
+                            del_light_source(LS_MONSTER, monst_to_any(mtmp));
                         if (emits_light(mtmp->data))
                             new_light_source(mtmp->mx, mtmp->my, emits_light(mtmp->data),
-                                             LS_MONSTER, (genericptr_t)mtmp);
+                                             LS_MONSTER, monst_to_any(mtmp));
                     }
                     if (!mtmp->perminvis || pm_invisible(olddata))
                         mtmp->perminvis = pm_invisible(mdat);
@@ -1854,17 +1852,14 @@ struct mkroom   *croom;
     }
 
     /*  corpsenm is "empty" if -1, random if -2, otherwise specific */
-    if (o->corpsenm == NON_PM - 1) otmp->corpsenm = rndmonnum();
-    else if (o->corpsenm != NON_PM) otmp->corpsenm = o->corpsenm;
-
-    /* assume we wouldn't be given an egg corpsenm unless it was
-       hatchable */
-    if (otmp->otyp == EGG && otmp->corpsenm != NON_PM) {
-        if (dead_species(otmp->otyp, TRUE))
-            kill_egg(otmp); /* make sure nothing hatches */
-        else
-            attach_egg_hatch_timeout(otmp); /* attach new hatch timeout */
+    if (o->corpsenm != NON_PM) {
+        if (o->corpsenm == NON_PM - 1) {
+            set_corpsenm(otmp, rndmonnum());
+        } else {
+            set_corpsenm(otmp, o->corpsenm);
+        }
     }
+    /* set_corpsenm() took care of egg hatch and corpse timers */
 
     if (named)
         otmp = oname(otmp, o->name.str);
@@ -2381,6 +2376,7 @@ boolean prefilled;
         break;
     case GARDEN:
         level.flags.has_garden = TRUE;
+        break;
     case COURT:
         level.flags.has_court = TRUE;
         break;

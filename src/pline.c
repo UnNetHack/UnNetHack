@@ -4,11 +4,6 @@
 
 #define NEED_VARARGS /* Uses ... */ /* comment line for pre-compiled headers */
 #include "hack.h"
-#include "epri.h"
-#ifdef WIZARD
-#include "edog.h"
-#include "eshk.h"
-#endif
 
 static boolean no_repeat = FALSE;
 
@@ -262,6 +257,25 @@ You_hear VA_DECL(const char *, line)
 }
 
 /*VARARGS1*/
+void You_see
+VA_DECL(const char *, line)
+{
+    char *tmp;
+
+    VA_START(line);
+    VA_INIT(line, const char *);
+    if (Unaware) {
+        YouPrefix(tmp, "You dream that you see ", line);
+    } else if (Blind) { /* caller should have caught this... */
+        YouPrefix(tmp, "You sense ", line);
+    } else {
+        YouPrefix(tmp, "You see ", line);
+    }
+    vpline(strcat(tmp, line), VA_ARGS);
+    VA_END();
+}
+
+/*VARARGS1*/
 void
 verbalize VA_DECL(const char *, line)
 {
@@ -373,27 +387,13 @@ aligntyp alignment;
     return "unknown";
 }
 
+/* stethoscope or probing applied to monster -- one-line feedback */
 void
 mstatusline(mtmp)
-register struct monst *mtmp;
+struct monst *mtmp;
 {
-    aligntyp alignment;
+    aligntyp alignment = mon_aligntyp(mtmp);
     char info[BUFSZ], monnambuf[BUFSZ];
-
-    if (mtmp->ispriest || mtmp->data == &mons[PM_ALIGNED_PRIEST]
-        || mtmp->data == &mons[PM_ANGEL])
-        alignment = EPRI(mtmp)->shralign;
-    else
-        alignment = mtmp->data->maligntyp;
-    if (alignment == A_NONE) {
-        alignment = A_NONE;
-    } else if (alignment > 0) {
-        alignment = A_LAWFUL;
-    } else if (alignment < 0) {
-        alignment = A_CHAOTIC;
-    } else {
-        alignment = A_NEUTRAL;
-    }
 
     info[0] = 0;
     if (mtmp->mtame) {    Strcat(info, ", tame");
@@ -408,7 +408,32 @@ register struct monst *mtmp;
 #endif
     }
     else if (mtmp->mpeaceful) Strcat(info, ", peaceful");
+
+    if (mtmp->data == &mons[PM_LONG_WORM]) {
+        int segndx, nsegs = count_wsegs(mtmp);
+
+        /* the worm code internals don't consider the head of be one of
+           the worm's segments, but we count it as such when presenting
+           worm feedback to the player */
+        if (!nsegs) {
+            Strcat(info, ", single segment");
+        } else {
+            ++nsegs; /* include head in the segment count */
+            segndx = wseg_at(mtmp, bhitpos.x, bhitpos.y);
+            Sprintf(eos(info), ", %d%s of %d segments", segndx, ordin(segndx), nsegs);
+        }
+    }
+    if (mtmp->cham >= LOW_PM && mtmp->data != &mons[mtmp->cham]) {
+        /* don't reveal the innate form (chameleon, vampire, &c),
+           just expose the fact that this current form isn't it */
+        Strcat(info, ", shapechanger");
+    }
     if (mtmp->meating) Strcat(info, ", eating");
+    /* a stethoscope exposes mimic before getting here so this
+       won't be relevant for it, but wand of probing doesn't */
+    if (mtmp->mundetected || mtmp->m_ap_type) {
+        mhidden_description(mtmp, TRUE, eos(info));
+    }
     if (mtmp->mcan) Strcat(info, ", cancelled");
     if (mtmp->mconf) Strcat(info, ", confused");
     if (mtmp->mblinded || !mtmp->mcansee)
@@ -436,10 +461,10 @@ register struct monst *mtmp;
     if (mtmp->minvis) Strcat(info, ", invisible");
     if (mtmp == u.ustuck) Strcat(info,
                                  (sticks(youmonst.data)) ? ", held by you" :
-                                 u.uswallow ? (is_animal(u.ustuck->data) ?
-                                               ", swallowed you" :
-                                               ", engulfed you") :
-                                 ", holding you");
+                                 !u.uswallow ? ", holding you" :
+                                 attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_DGST) ? ", digesting you" :
+                                 (is_animal(u.ustuck->data) ?  ", swallowing you" :
+                                  ", engulfed you"));
 #ifdef STEED
     if (mtmp == u.usteed) Strcat(info, ", carrying you");
 #endif
@@ -476,6 +501,7 @@ register struct monst *mtmp;
     }
 }
 
+/* stethoscope or probing applied to hero -- one-line feedback */
 void
 ustatusline()
 {
@@ -532,17 +558,9 @@ ustatusline()
         Strcat(info, mon_nam(u.ustuck));
     }
 
-    pline("Status of %s (%s%s):  Level %d  HP %d(%d)  AC %d%s.",
+    pline("Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s.",
           plname,
-          (u.ualign.record >= 20) ? "piously " :
-          (u.ualign.record > 13) ? "devoutly " :
-          (u.ualign.record > 8) ? "fervently " :
-          (u.ualign.record > 3) ? "stridently " :
-          (u.ualign.record == 3) ? "" :
-          (u.ualign.record >= 1) ? "haltingly " :
-          (u.ualign.record == 0) ? "nominally " :
-          "insufficiently ",
-          align_str(u.ualign.type),
+          piousness(FALSE, align_str(u.ualign.type)),
           Upolyd ? mons[u.umonnum].mlevel : u.ulevel,
           Upolyd ? u.mh : u.uhp,
           Upolyd ? u.mhmax : u.uhpmax,

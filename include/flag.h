@@ -109,6 +109,7 @@ struct flag {
     /* 3: FH, 4: ff+, 5: ff-, 6: FF+, 7: FF- */
     /* 8: travel */
     unsigned long warntype; /* warn_of_mon monster type M2 */
+    unsigned startingpet_mid;
     int warnlevel;
     int djinni_count, ghost_count;  /* potion effect tuning */
     int pickup_burden;      /* maximum burden before prompt */
@@ -122,6 +123,8 @@ struct flag {
     char end_disclose[NUM_DISCLOSURE_OPTIONS + 1];      /* disclose various info
                                                            upon exit */
     char menu_style;        /* User interface style setting */
+    boolean made_fruit; /* don't easily let the user overflow the number of
+                           fruits */
 #ifdef AMII_GRAPHICS
     int numcols;
     unsigned short amii_dripens[ 20 ]; /* DrawInfo Pens currently there are 13 in v39 */
@@ -205,7 +208,37 @@ struct flag {
  */
 
 struct instance_flags {
+    /* stuff that really isn't option or platform related. They are
+     * set and cleared during the game to control the internal
+     * behaviour of various NetHack functions and probably warrant
+     * a structure of their own elsewhere some day.
+     */
     boolean debug_fuzzer;  /* fuzz testing */
+    boolean defer_plname;  /* X11 hack: askname() might not set g.plname */
+    boolean herecmd_menu;  /* use menu when mouseclick on yourself */
+    boolean invis_goldsym; /* gold symbol is ' '? */
+    int at_midnight;       /* only valid during end of game disclosure */
+    int at_night;          /* also only valid during end of game disclosure */
+    int failing_untrap;    /* move_into_trap() -> spoteffects() -> dotrap() */
+    int in_lava_effects;   /* hack for Boots_off() */
+    int last_msg;          /* indicator of last message player saw */
+    int override_ID;       /* true to force full identification of objects */
+    int parse_config_file_src;  /* hack for parse_config_line() */
+    int suppress_price;    /* controls doname() for unpaid objects */
+    int terrainmode; /* for getpos()'s autodescribe when #terrain is active */
+#define TER_MAP    0x01
+#define TER_TRP    0x02
+#define TER_OBJ    0x04
+#define TER_MON    0x08
+#define TER_DETECT 0x10    /* detect_foo magic rather than #terrain */
+    boolean getloc_travelmode;
+    int getloc_filter;     /* GFILTER_foo */
+    boolean getloc_usemenu;
+    boolean getloc_moveskip;
+
+    /* stuff that is related to options and/or user or platform preferences
+     */
+    boolean mention_walls;    /* give feedback when bumping walls */
     boolean cbreak;     /* in cbreak mode, rogue format */
 #ifdef CURSES_GRAPHICS
     boolean classic_status;     /* What kind of horizontal statusbar to use */
@@ -248,6 +281,7 @@ struct instance_flags {
 #if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
     boolean extmenu;    /* extended commands use menu interface */
 #endif
+    boolean use_background_glyph; /* use background glyph when appropriate */
 #ifdef MENU_COLOR
     boolean use_menu_color; /* use color in menus; only if wc_color */
 #endif
@@ -405,6 +439,7 @@ struct instance_flags {
     uint64_t color_definitions[CLR_MAX];
     char truecolor_separator;
 #endif
+    genericptr_t returning_missile; /* 'struct obj *'; Mjollnir or aklys */
 };
 
 /*
@@ -428,6 +463,24 @@ struct instance_flags {
 
 extern NEARDATA struct flag flags;
 extern NEARDATA struct instance_flags iflags;
+
+/* last_msg values
+ * Usage:
+ *  pline("some message");
+ *    pline: vsprintf + putstr + iflags.last_msg = PLNMSG_UNKNOWN;
+ *  iflags.last_msg = PLNMSG_some_message;
+ * and subsequent code can adjust the next message if it is affected
+ * by some_message.  The next message will clear iflags.last_msg.
+ */
+enum plnmsg_types {
+    PLNMSG_UNKNOWN = 0,         /* arbitrary */
+    PLNMSG_ONE_ITEM_HERE,       /* "you see <single item> here" */
+    PLNMSG_TOWER_OF_FLAME,      /* scroll of fire */
+    PLNMSG_CAUGHT_IN_EXPLOSION, /* explode() feedback */
+    PLNMSG_OBJ_GLOWS,           /* "the <obj> glows <color>" */
+    PLNMSG_OBJNAM_ONLY,         /* xname/doname only, for #tip */
+    PLNMSG_OK_DONT_DIE          /* overriding death in explore/wizard mode */
+};
 
 /* runmode options */
 #define RUN_TPORT   0   /* don't update display until movement stops */

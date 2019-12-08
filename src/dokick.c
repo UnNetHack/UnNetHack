@@ -3,7 +3,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "eshk.h"
 
 #define is_bigfoot(x)   ((x) == &mons[PM_SASQUATCH])
 #define martial()   (martial_bonus() || is_bigfoot(youmonst.data) || \
@@ -17,8 +16,9 @@ extern boolean notonhead;   /* for long worms */
 STATIC_DCL void FDECL(kickdmg, (struct monst *, BOOLEAN_P));
 STATIC_DCL void FDECL(kick_monster, (XCHAR_P, XCHAR_P));
 STATIC_DCL void FDECL(lawful_bribery_alignment, (SCHAR_P));
-STATIC_DCL int FDECL(kick_object, (XCHAR_P, XCHAR_P));
-STATIC_DCL char *FDECL(kickstr, (char *));
+static int FDECL(kick_object, (XCHAR_P, XCHAR_P, char *));
+static int FDECL(kick_object_core, (XCHAR_P, XCHAR_P));
+static char *FDECL(kickstr, (char *, const char *));
 STATIC_DCL void FDECL(otransit_msg, (struct obj *, BOOLEAN_P, long));
 STATIC_DCL void FDECL(drop_to, (coord *, SCHAR_P));
 
@@ -377,14 +377,14 @@ register schar penalty;
 /* container is kicked, dropped, thrown or otherwise impacted by player.
  * Assumes container is on floor.  Checks contents for possible damage. */
 void
-container_impact_dmg(obj)
+container_impact_dmg(obj, x, y)
 struct obj *obj;
+xchar x, y; /* coordinates where object was before the impact, not after */
 {
     struct monst *shkp;
     struct obj *otmp, *otmp2;
     long loss = 0L;
     boolean costly, insider;
-    xchar x = obj->ox, y = obj->oy;
 
     /* only consider normal containers */
     if (!Is_container(obj) || Is_mbag(obj)) return;
@@ -435,7 +435,26 @@ struct obj *obj;
 }
 
 STATIC_OVL int
-kick_object(x, y)
+kick_object(x, y, kickobjnam)
+xchar x, y;
+char *kickobjnam;
+{
+    int res = 0;
+
+    *kickobjnam = '\0';
+    /* if a pile, the "top" object gets kicked */
+    kickedobj = level.objects[x][y];
+    if (kickedobj) {
+        /* kick object; if doing is fatal, done() will clean up kickedobj */
+        Strcpy(kickobjnam, killer_xname(kickedobj)); /* matters iff res==0 */
+        res = kick_object_core(x, y);
+        kickedobj = (struct obj *) 0;
+    }
+    return res;
+}
+
+static int
+kick_object_core(x, y)
 xchar x, y;
 {
     int range;
@@ -547,7 +566,7 @@ xchar x, y;
 
         if(range < 2) pline("%s", kickobj->otyp == IRON_SAFE ? "CLANG!" : "THUD!");
 
-        container_impact_dmg(kickobj);
+        container_impact_dmg(kickobj, x, y);
 
         if (kickobj->otyp == IRON_SAFE) { /* can't kick these open or break 'em */
             return 1;
@@ -635,13 +654,16 @@ xchar x, y;
     return(1);
 }
 
-STATIC_OVL char *
-kickstr(buf)
+static char *
+kickstr(buf, kickobjnam)
 char *buf;
+const char *kickobjnam;
 {
     const char *what;
 
-    if (kickobj) what = distant_name(kickobj, doname);
+    if (*kickobjnam) {
+        what = kickobjnam;
+    }
     else if (maploc == &nowhere) what = "nothing";
     else if (IS_DOOR(maploc->typ)) what = "a door";
     else if (IS_TREE(maploc->typ)) what = "a tree";
@@ -671,8 +693,9 @@ dokick()
     int avrg_attrib;
     register struct monst *mtmp;
     boolean no_kick = FALSE;
-    char buf[BUFSZ];
+    char buf[BUFSZ], kickobjnam[BUFSZ];
 
+    kickobjnam[0] = '\0';
     if (nolimbs(youmonst.data) || slithy(youmonst.data)) {
         You("have no legs to kick with.");
         no_kick = TRUE;
@@ -784,7 +807,7 @@ dokick()
     /* their present order: monsters, pools, */
     /* objects, non-doors, doors.        */
 
-    if(MON_AT(x, y)) {
+    if (MON_AT(x, y)) {
         struct permonst *mdat;
 
         mtmp = m_at(x, y);
@@ -828,7 +851,7 @@ dokick()
     if (OBJ_AT(x, y) &&
         (!Levitation || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
          || sobj_at(BOULDER, x, y))) {
-        if(kick_object(x, y)) {
+        if (kick_object(x, y, kickobjnam)) {
             if(Is_airlevel(&u.uz))
                 hurtle(-u.dx, -u.dy, 1, TRUE); /* assume it's light */
             return(1);
@@ -1099,17 +1122,17 @@ ouch:
             exercise(A_DEX, FALSE);
             exercise(A_STR, FALSE);
             if (isok(x, y)) {
-                if (Blind) feel_location(x,y); /* we know we hit it */
-                if (is_drawbridge_wall(x,y) >= 0) {
+                if (Blind) feel_location(x, y); /* we know we hit it */
+                if (is_drawbridge_wall(x, y) >= 0) {
                     pline_The("drawbridge is unaffected.");
                     /* update maploc to refer to the drawbridge */
-                    (void) find_drawbridge(&x,&y);
+                    (void) find_drawbridge(&x, &y);
                     maploc = &levl[x][y];
                 }
             }
             if(!rn2(3)) set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
-            losehp(rnd(ACURR(A_CON) > 15 ? 3 : 5), kickstr(buf),
-                   KILLED_BY);
+            int dmg = rnd(ACURR(A_CON) > 15 ? 3 : 5);
+            losehp(Maybe_Half_Phys(dmg), kickstr(buf, kickobjnam), KILLED_BY);
             if(Is_airlevel(&u.uz) || Levitation)
                 hurtle(-u.dx, -u.dy, rn1(2, 4), TRUE); /* assume it's heavy */
             return(1);
@@ -1530,6 +1553,57 @@ obj_delivery()
                current position for rloco() to update */
             otmp->ox = otmp->oy = 0;
             rloco(otmp);
+        }
+    }
+}
+
+void
+deliver_obj_to_mon(mtmp, cnt, deliverflags)
+int cnt;
+struct monst *mtmp;
+unsigned long deliverflags;
+{
+    struct obj *otmp, *otmp2;
+    int where, maxobj = 1;
+    boolean at_crime_scene = In_mines(&u.uz);
+
+    if ((deliverflags & DF_RANDOM) && cnt > 1)
+        maxobj = rnd(cnt);
+    else if (deliverflags & DF_ALL)
+        maxobj = 0;
+    else
+        maxobj = 1;
+
+    cnt = 0;
+    for (otmp = migrating_objs; otmp; otmp = otmp2) {
+        otmp2 = otmp->nobj;
+        where = (int) (otmp->owornmask & 0x7fffL); /* destination code */
+        if ((where & MIGR_TO_SPECIES) == 0)
+            continue;
+
+        if ((mtmp->data->mflags2 & otmp->corpsenm) != 0) {
+            obj_extract_self(otmp);
+            otmp->owornmask = 0L;
+            otmp->ox = otmp->oy = 0;
+
+            /* special treatment for orcs and their kind */
+            if ((otmp->corpsenm & M2_ORC) != 0 && has_oname(otmp)) {
+                if (!has_mname(mtmp)) {
+                    if (at_crime_scene || !rn2(2))
+                        mtmp = christen_orc(mtmp,
+                                            at_crime_scene ? ONAME(otmp)
+                                                           : (char *) 0,
+                                            /* bought the stolen goods */
+                                            " the Fence");
+                }
+                free_oname(otmp);
+            }
+            otmp->corpsenm = 0;
+            (void) add_to_minv(mtmp, otmp);
+            cnt++;
+            if (maxobj && cnt >= maxobj)
+                break;
+            /* getting here implies DF_ALL */
         }
     }
 }

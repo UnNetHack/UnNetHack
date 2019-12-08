@@ -1508,7 +1508,7 @@ register int num, mazeflag;
 register struct mkroom *croom;
 coord *tm;
 {
-    register int kind;
+    int kind;
     coord m;
 
     /* no traps in pools */
@@ -1547,6 +1547,7 @@ coord *tm;
             /* reject "too hard" traps */
             switch (kind) {
             case MAGIC_PORTAL:
+            case VIBRATING_SQUARE:
                 kind = NO_TRAP; break;
             case ROLLING_BOULDER_TRAP:
             case SLP_GAS_TRAP:

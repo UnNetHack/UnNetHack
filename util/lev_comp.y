@@ -2474,7 +2474,7 @@ func_param_part		: any_var_or_arr ':' func_param_type
 				  curr_function->params = tmp;
 				  curr_function->n_params++;
 				  {
-                      long vt = SPOVAR_NULL;
+				      long vt = SPOVAR_NULL;
 				      switch (tmp->parmtype) {
 				      case 'i': vt = SPOVAR_INT; break;
 				      case 's': vt = SPOVAR_STRING; break;

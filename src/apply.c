@@ -3,7 +3,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "edog.h"
 
 static const char tools[] = { COIN_CLASS, TOOL_CLASS, WEAPON_CLASS, WAND_CLASS, 0 };
 static const char tools_too[] = { COIN_CLASS, ALL_CLASSES, TOOL_CLASS, POTION_CLASS,
@@ -165,7 +164,9 @@ struct obj* tobj;
     struct obj *otmp;
     struct trap *ttmp;
 
-    if (!can_reach_floor()) return FALSE;
+    if (!can_reach_floor(TRUE)) {
+        return FALSE;
+    }
 
     /* additional stethoscope messages from jyoung@apanix.apana.org.au */
     if (Hallucination && sobj_at(CORPSE, rx, ry)) {
@@ -271,7 +272,7 @@ register struct obj *obj;
     } else if (u.dz) {
         if (Underwater)
             You_hear("faint splashing.");
-        else if (u.dz < 0 || !can_reach_floor())
+        else if (u.dz < 0 || !can_reach_floor(TRUE))
             You_cant("reach the %s.",
                      (u.dz > 0) ? surface(u.ux, u.uy) : ceiling(u.ux, u.uy));
         else if (its_dead(u.ux, u.uy, &res, obj))
@@ -954,7 +955,7 @@ struct obj **optr;
     register struct obj *obj = *optr;
     register struct obj *otmp;
     const char *s = (obj->quan != 1) ? "candles" : "candle";
-    char qbuf[QBUFSZ];
+    char qbuf[QBUFSZ], qsfx[QBUFSZ], *q;
 
     if(u.uswallow) {
         You(no_elbow_room);
@@ -971,11 +972,16 @@ struct obj **optr;
         return;
     }
 
-    Sprintf(qbuf, "Attach %s", the(xname(obj)));
-    Sprintf(eos(qbuf), " to %s?",
-            safe_qbuf(qbuf, sizeof(" to ?"), the(xname(otmp)),
-                      the(simple_typename(otmp->otyp)), "it"));
-    if(yn(qbuf) == 'n') {
+    /* first, minimal candelabrum suffix for formatting candles */
+    Sprintf(qsfx, " to\033%s?", thesimpleoname(otmp));
+    /* next, format the candles as a prefix for the candelabrum */
+    (void) safe_qbuf(qbuf, "Attach ", qsfx, obj, yname, thesimpleoname, s);
+    /* strip temporary candelabrum suffix */
+    if ((q = strstri(qbuf, " to\033")) != 0) {
+        Strcpy(q, " to ");
+    }
+    /* last, format final "attach candles to candelabrum?" query */
+    if (yn(safe_qbuf(qbuf, qbuf, "?", otmp, yname, thesimpleoname, "it")) == 'n') {
         if (!obj->lamplit)
             You("try to light %s...", the(xname(obj)));
         use_lamp(obj);
@@ -1389,7 +1395,7 @@ int magic; /* 0=Physical, otherwise skill level */
         if (temp < 0) temp = -temp;
         if (range < temp)
             range = temp;
-        (void) walk_path(&uc, &cc, hurtle_step, (genericptr_t)&range);
+        (void) walk_path(&uc, &cc, hurtle_step, &range);
 
         /* A little Sokoban guilt... */
         if (In_sokoban(&u.uz))
@@ -1634,10 +1640,10 @@ int attr_point; /* number of attribute points per attribute we might fix */
  */
 void
 fig_transform(arg, timeout)
-genericptr_t arg;
+anything *arg;
 long timeout;
 {
-    struct obj *figurine = (struct obj *)arg;
+    struct obj *figurine = arg->a_obj;
     struct monst *mtmp;
     coord cc;
     boolean cansee_spot, silent, okay_spot;
@@ -1660,7 +1666,7 @@ long timeout;
         !figurine_location_checks(figurine, &cc, TRUE)) {
         /* reset the timer to try again later */
         (void) start_timer((long)rnd(5000), TIMER_OBJECT,
-                           FIG_TRANSFORM, (genericptr_t)figurine);
+                           FIG_TRANSFORM, obj_to_any(figurine));
         return;
     }
 
@@ -1786,7 +1792,7 @@ struct obj **optr;
          "toss the figurine into the air" :
          "set the figurine on the ground"));
     (void) make_familiar(obj, cc.x, cc.y, FALSE);
-    (void) stop_timer(FIG_TRANSFORM, (genericptr_t)obj);
+    (void) stop_timer(FIG_TRANSFORM, obj_to_any(obj));
     useup(obj);
     *optr = 0;
 }
@@ -2567,7 +2573,7 @@ struct obj *obj;
         if (select_menu(tmpwin, PICK_ONE, &selected) > 0 &&
             rn2(P_SKILL(typ) > P_SKILLED ? 20 : 2))
             tohit = selected[0].item.a_int - 1;
-        free((genericptr_t)selected);
+        free(selected);
         destroy_nhwindow(tmpwin);
     }
 
@@ -2638,9 +2644,8 @@ struct obj *obj;
     char confirm[QBUFSZ], the_wand[BUFSZ], buf[BUFSZ];
 
     Strcpy(the_wand, yname(obj));
-    Sprintf(confirm, "Are you really sure you want to break %s?",
-            safe_qbuf("", sizeof("Are you really sure you want to break ?"),
-                      the_wand, ysimple_name(obj), "the wand"));
+    safe_qbuf(confirm, "Are you really sure you want to break ", "?",
+            obj, yname, ysimple_name, "the wand");
     if (yn(confirm) == 'n' ) return 0;
 
     is_fragile = (!strcmp(OBJ_DESCR(objects[obj->otyp]), "balsa"));
@@ -2898,7 +2903,7 @@ wanexpl:
                    possible wand damage is assessed */
                 if (obj->otyp == WAN_TELEPORTATION &&
                     affects_objects && level.objects[x][y]) {
-                    (void) bhitpile(obj, bhito, x, y);
+                    (void) bhitpile(obj, bhito, x, y, 0);
                     if (flags.botl) bot(); /* potion effects */
                 }
                 damage = zapyourself(obj, FALSE);
@@ -2912,7 +2917,7 @@ wanexpl:
                 /* if (flags.botl) bot(); */
             }
             if (affects_objects && level.objects[x][y]) {
-                (void) bhitpile(obj, bhito, x, y);
+                (void) bhitpile(obj, bhito, x, y, 0);
                 if (flags.botl) bot(); /* potion effects */
             }
         }

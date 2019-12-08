@@ -11,18 +11,51 @@ typedef int winid;      /* a window identifier */
 typedef union any {
     genericptr_t a_void;
     struct obj *a_obj;
+    struct monst *a_monst;
     int a_int;
     char a_char;
     schar a_schar;
+    uchar a_uchar;
+    unsigned int a_uint;
+    long a_long;
+    unsigned long a_ulong;
+    int *a_iptr;
+    long *a_lptr;
+    unsigned long *a_ulptr;
+    unsigned *a_uptr;
+    const char *a_string;
+    int NDECL((*a_nfunc));
+    unsigned long a_mask32; /* used by status highlighting */
     /* add types as needed */
 } anything;
 #define ANY_P union any /* avoid typedef in prototypes */
-/* (buggy old Ultrix compiler) */
+                        /* (buggy old Ultrix compiler) */
+
+/* symbolic names for the data types housed in anything */
+enum any_types {
+    ANY_VOID = 1,
+    ANY_OBJ,         /* struct obj */
+    ANY_MONST,       /* struct monst (not used) */
+    ANY_INT,         /* int */
+    ANY_CHAR,        /* char */
+    ANY_UCHAR,       /* unsigned char */
+    ANY_SCHAR,       /* signed char */
+    ANY_UINT,        /* unsigned int */
+    ANY_LONG,        /* long */
+    ANY_ULONG,       /* unsigned long */
+    ANY_IPTR,        /* pointer to int */
+    ANY_UPTR,        /* pointer to unsigned int */
+    ANY_LPTR,        /* pointer to long */
+    ANY_ULPTR,       /* pointer to unsigned long */
+    ANY_STR,         /* pointer to null-terminated char string */
+    ANY_NFUNC,       /* pointer to function taking no args, returning int */
+    ANY_MASK32       /* 32-bit mask (stored as unsigned long) */
+};
 
 /* menu return list */
 typedef struct mi {
-    anything item;      /* identifier */
-    long count;         /* count */
+    anything item; /* identifier */
+    long count;    /* count */
 } menu_item;
 #define MENU_ITEM_P struct mi
 
@@ -68,7 +101,7 @@ typedef struct mi {
 #define MENU_SELECT_PAGE    ','
 #define MENU_UNSELECT_PAGE  '\\'
 #define MENU_INVERT_PAGE    '~'
-#define MENU_SEARCH     ':'
+#define MENU_SEARCH         ':'
 
 
 #endif /* WINTYPE_H */

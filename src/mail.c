@@ -1,12 +1,13 @@
-/*  SCCS Id: @(#)mail.c 3.4 2002/01/13  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
 #ifdef MAIL
-#include <fcntl.h>
-#include <errno.h>
+# ifdef SIMPLE_MAIL
+#  include <fcntl.h>
+#  include <errno.h>
+#endif /* SIMPLE_MAIL */
 #include "mail.h"
 
 /*
@@ -28,9 +29,9 @@
  *    path to the hero.
  *
  * Note by Olaf Seibert: On the Amiga, we usually don't get mail.  So we go
- *           through most of the effects at 'random' moments.
+ *                       through most of the effects at 'random' moments.
  * Note by Paul Winner:  The MSDOS port also 'fakes' the mail daemon at
- *           random intervals.
+ *                       random intervals.
  */
 
 STATIC_DCL boolean FDECL(md_start, (coord *));
@@ -385,21 +386,21 @@ struct mail_info *info;
 
     if (info->message_typ) {
         struct obj *obj = mksobj(SCR_MAIL, FALSE, FALSE);
-        if (info->message_typ == MSG_HINT) obj->spe = MAIL_HINT;
-        if (distu(md->mx, md->my) > 2)
-            verbalize("Catch!");
-        display_nhwindow(WIN_MESSAGE, FALSE);
+
+        if (info->message_typ == MSG_HINT) {
+            obj->spe = MAIL_HINT;
+        }
         if (info->object_nam) {
             obj = oname(obj, info->object_nam);
-            if (info->response_cmd) { /*(hide extension of the obj name)*/
-                int namelth = info->response_cmd - info->object_nam - 1;
-                if ( namelth <= 0 || namelth >= (int) obj->onamelth )
-                    warning("mail delivery screwed up");
-                else
-                    *(ONAME(obj) + namelth) = '\0';
-                /* Note: renaming object will discard the hidden command. */
-            }
         }
+        if (info->response_cmd) {
+            new_omailcmd(obj, info->response_cmd);
+        }
+        if (distu(md->mx, md->my) > 2) {
+            verbalize("Catch!");
+        }
+        display_nhwindow(WIN_MESSAGE, FALSE);
+
         obj = hold_another_object(obj, "Oops!",
                                   (const char *)0, (const char *)0);
     }

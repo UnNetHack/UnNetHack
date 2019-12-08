@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)extralev.c 3.4 2001/09/06  */
 /*  Copyright 1988, 1989 by Ken Arromdee                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -33,29 +32,29 @@ roguejoin(x1, y1, x2, y2, horiz)
 int x1, y1, x2, y2;
 int horiz;
 {
-    register int x, y, middle;
-#ifndef MAX
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-#endif
-#ifndef MIN
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-#endif
+    int x, y, middle;
     if (horiz) {
         middle = x1 + rn2(x2-x1+1);
-        for(x=MIN(x1, middle); x<=MAX(x1, middle); x++)
+        for (x = min(x1, middle); x <= max(x1, middle); x++) {
             corr(x, y1);
-        for(y=MIN(y1, y2); y<=MAX(y1, y2); y++)
+        }
+        for (y = min(y1, y2); y <= max(y1, y2); y++) {
             corr(middle, y);
-        for(x=MIN(middle, x2); x<=MAX(middle, x2); x++)
+        }
+        for (x = min(middle, x2); x <= max(middle, x2); x++) {
             corr(x, y2);
+        }
     } else {
         middle = y1 + rn2(y2-y1+1);
-        for(y=MIN(y1, middle); y<=MAX(y1, middle); y++)
+        for (y = min(y1, middle); y <= max(y1, middle); y++) {
             corr(x1, y);
-        for(x=MIN(x1, x2); x<=MAX(x1, x2); x++)
+        }
+        for (x = min(x1, x2); x <= max(x1, x2); x++) {
             corr(x, middle);
-        for(y=MIN(middle, y2); y<=MAX(middle, y2); y++)
+        }
+        for (y = min(middle, y2); y <= max(middle, y2); y++) {
             corr(x2, y);
+        }
     }
 }
 
@@ -69,15 +68,18 @@ int x, y, dir;
     if (dir==DOWN) {
         r[x][y].doortable &= ~DOWN;
         if (!r[x][y].real) {
-            fromx = r[x][y].rlx; fromy = r[x][y].rly;
-            fromx += 1 + 26*x; fromy += 7*y;
+            fromx = r[x][y].rlx;
+            fromy = r[x][y].rly;
+            fromx += 1 + 26*x;
+            fromy += 7*y;
         } else {
             fromx = r[x][y].rlx + rn2(r[x][y].dx);
             fromy = r[x][y].rly + r[x][y].dy;
-            fromx += 1 + 26*x; fromy += 7*y;
-            if (!IS_WALL(levl[fromx][fromy].typ))
-                impossible("down: no wall at %d,%d?", fromx,
-                           fromy);
+            fromx += 1 + 26*x;
+            fromy += 7*y;
+            if (!IS_WALL(levl[fromx][fromy].typ)) {
+                impossible("down: no wall at %d,%d?", fromx, fromy);
+            }
             dodoor(fromx, fromy, &rooms[r[x][y].nroom]);
             levl[fromx][fromy].doormask = D_NODOOR;
             fromy++;
@@ -89,14 +91,18 @@ int x, y, dir;
         y++;
         r[x][y].doortable &= ~UP;
         if (!r[x][y].real) {
-            tox = r[x][y].rlx; toy = r[x][y].rly;
-            tox += 1 + 26*x; toy += 7*y;
+            tox = r[x][y].rlx;
+            toy = r[x][y].rly;
+            tox += 1 + 26*x;
+            toy += 7*y;
         } else {
             tox = r[x][y].rlx + rn2(r[x][y].dx);
             toy = r[x][y].rly - 1;
-            tox += 1 + 26*x; toy += 7*y;
-            if (!IS_WALL(levl[tox][toy].typ))
+            tox += 1 + 26*x;
+            toy += 7*y;
+            if (!IS_WALL(levl[tox][toy].typ)) {
                 impossible("up: no wall at %d,%d?", tox, toy);
+            }
             dodoor(tox, toy, &rooms[r[x][y].nroom]);
             levl[tox][toy].doormask = D_NODOOR;
             toy--;
@@ -106,15 +112,18 @@ int x, y, dir;
     } else if (dir == RIGHT) {
         r[x][y].doortable &= ~RIGHT;
         if (!r[x][y].real) {
-            fromx = r[x][y].rlx; fromy = r[x][y].rly;
-            fromx += 1 + 26*x; fromy += 7*y;
+            fromx = r[x][y].rlx;
+            fromy = r[x][y].rly;
+            fromx += 1 + 26*x;
+            fromy += 7*y;
         } else {
             fromx = r[x][y].rlx + r[x][y].dx;
             fromy = r[x][y].rly + rn2(r[x][y].dy);
-            fromx += 1 + 26*x; fromy += 7*y;
-            if (!IS_WALL(levl[fromx][fromy].typ))
-                impossible("down: no wall at %d,%d?", fromx,
-                           fromy);
+            fromx += 1 + 26*x;
+            fromy += 7*y;
+            if (!IS_WALL(levl[fromx][fromy].typ)) {
+                impossible("down: no wall at %d,%d?", fromx, fromy);
+            }
             dodoor(fromx, fromy, &rooms[r[x][y].nroom]);
             levl[fromx][fromy].doormask = D_NODOOR;
             fromx++;
@@ -126,14 +135,18 @@ int x, y, dir;
         x++;
         r[x][y].doortable &= ~LEFT;
         if (!r[x][y].real) {
-            tox = r[x][y].rlx; toy = r[x][y].rly;
-            tox += 1 + 26*x; toy += 7*y;
+            tox = r[x][y].rlx;
+            toy = r[x][y].rly;
+            tox += 1 + 26*x;
+            toy += 7*y;
         } else {
             tox = r[x][y].rlx - 1;
             toy = r[x][y].rly + rn2(r[x][y].dy);
-            tox += 1 + 26*x; toy += 7*y;
-            if (!IS_WALL(levl[tox][toy].typ))
+            tox += 1 + 26*x;
+            toy += 7*y;
+            if (!IS_WALL(levl[tox][toy].typ)) {
                 impossible("left: no wall at %d,%d?", tox, toy);
+            }
             dodoor(tox, toy, &rooms[r[x][y].nroom]);
             levl[tox][toy].doormask = D_NODOOR;
             tox--;
@@ -216,7 +229,8 @@ makeroguerooms() {
 #define here r[x][y]
 
     nroom = 0;
-    for(y=0; y<3; y++) for(x=0; x<3; x++) {
+    for(y=0; y<3; y++) {
+        for(x=0; x<3; x++) {
             /* Note: we want to insure at least 1 room.  So, if the
              * first 8 are all dummies, force the last to be a room.
              */
@@ -239,9 +253,11 @@ makeroguerooms() {
             }
             here.doortable = 0;
         }
+    }
     miniwalk(rn2(3), rn2(3));
     nroom = 0;
-    for(y=0; y<3; y++) for(x=0; x<3; x++) {
+    for(y=0; y<3; y++) {
+        for(x=0; x<3; x++) {
             if (here.real) { /* Make a room */
                 int lowx, lowy, hix, hiy;
 
@@ -260,6 +276,7 @@ makeroguerooms() {
                          (boolean) !rn2(7), OROOM, FALSE);
             }
         }
+    }
 
     /* Now, add connecting corridors. */
     for(y=0; y<3; y++) for(x=0; x<3; x++) {
