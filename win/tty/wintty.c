@@ -1031,7 +1031,7 @@ tty_create_nhwindow(type)
     case NHW_STATUS:
 	/* status window, 2 or 3 lines long, full width, bottom of screen */
     max_statuslines = (LI > ROWNO+3) ? 3 : 2;
-    if (iflags.statuslines == 0) {
+    if (iflags.statuslines == 0 || iflags.statuslines > max_statuslines) {
         iflags.statuslines = max_statuslines;
     }
     if (iflags.statuslines > max_statuslines) {

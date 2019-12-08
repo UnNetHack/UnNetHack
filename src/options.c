@@ -2904,7 +2904,8 @@ goodfruit:
         if (negated) {
             bad_negation(fullname, FALSE);
         } else if (strlen(op) == 1 && (*op == '2' || *op == '3')) {
-            int max_statuslines = (LI > ROWNO+3) ? 3 : 2;
+            /* LI isn't initialized yet on startup */
+            int max_statuslines = (LI == 0 || LI > ROWNO+3) ? 3 : 2;
             iflags.statuslines = (*op == '2') ? 2 : max_statuslines;
             docrt();
         } else {
