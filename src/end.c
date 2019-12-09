@@ -15,7 +15,7 @@
 #define FIRST_GEM    DILITHIUM_CRYSTAL
 #define FIRST_AMULET AMULET_OF_ESP
 #define LAST_AMULET  AMULET_OF_YENDOR
- 
+
 struct valuable_data { long count; int typ; };
 
 static struct valuable_data
@@ -78,7 +78,7 @@ static NEARDATA const char *deaths[] = {		/* the array of death */
 	"died", "choked", "poisoned", "starvation", "drowning",
 	"burning", "dissolving under the heat and pressure",
 	"crushed", "turned to stone", "turned into slime",
-	"genocided", 
+	"genocided",
 #ifdef WEBB_DISINT
 	"disintegrated",
 #endif
@@ -92,7 +92,7 @@ static NEARDATA const char *ends[] = {		/* "when you..." */
 	"died", "choked", "were poisoned", "starved", "drowned",
 	"burned", "dissolved in the lava",
 	"were crushed", "turned to stone", "turned into slime",
-	"were genocided", 
+	"were genocided",
 #ifdef WEBB_DISINT
 	"were disintegrated",
 #endif
@@ -277,6 +277,7 @@ register struct monst *mtmp;
 /*VARARGS1*/
 void
 panic VA_DECL(const char *, str)
+{
 	VA_START(str);
 	VA_INIT(str, char *);
 

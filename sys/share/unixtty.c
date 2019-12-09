@@ -439,6 +439,7 @@ init_linux_cons()
 /*VARARGS1*/
 void
 error VA_DECL(const char *,s)
+{
 	VA_START(s);
 	VA_INIT(s, const char *);
 	if(settty_needed)

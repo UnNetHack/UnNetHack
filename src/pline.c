@@ -69,6 +69,7 @@ static void FDECL(vpline, (const char *, va_list));
 
 void
 pline VA_DECL(const char *, line)
+{
 	VA_START(line);
 	VA_INIT(line, char *);
 	vpline(line, VA_ARGS);
@@ -91,6 +92,7 @@ vpline(line, the_args) const char *line; va_list the_args; {
 
 void
 pline VA_DECL(const char *, line)
+{
 #endif	/* USE_STDARG | USE_VARARG */
 
 	char pbuf[BUFSZ];
@@ -135,6 +137,7 @@ pline VA_DECL(const char *, line)
 /*VARARGS1*/
 void
 Norep VA_DECL(const char *, line)
+{
 	VA_START(line);
 	VA_INIT(line, const char *);
 	no_repeat = TRUE;
@@ -177,6 +180,7 @@ free_youbuf()
 /*VARARGS1*/
 void
 You VA_DECL(const char *, line)
+{
 	char *tmp;
 	VA_START(line);
 	VA_INIT(line, const char *);
@@ -187,6 +191,7 @@ You VA_DECL(const char *, line)
 /*VARARGS1*/
 void
 Your VA_DECL(const char *,line)
+{
 	char *tmp;
 	VA_START(line);
 	VA_INIT(line, const char *);
@@ -197,6 +202,7 @@ Your VA_DECL(const char *,line)
 /*VARARGS1*/
 void
 You_feel VA_DECL(const char *,line)
+{
 	char *tmp;
 	VA_START(line);
 	VA_INIT(line, const char *);
@@ -208,6 +214,7 @@ You_feel VA_DECL(const char *,line)
 /*VARARGS1*/
 void
 You_cant VA_DECL(const char *,line)
+{
 	char *tmp;
 	VA_START(line);
 	VA_INIT(line, const char *);
@@ -218,6 +225,7 @@ You_cant VA_DECL(const char *,line)
 /*VARARGS1*/
 void
 pline_The VA_DECL(const char *,line)
+{
 	char *tmp;
 	VA_START(line);
 	VA_INIT(line, const char *);
@@ -228,6 +236,7 @@ pline_The VA_DECL(const char *,line)
 /*VARARGS1*/
 void
 There VA_DECL(const char *,line)
+{
 	char *tmp;
 	VA_START(line);
 	VA_INIT(line, const char *);
@@ -238,6 +247,7 @@ There VA_DECL(const char *,line)
 /*VARARGS1*/
 void
 You_hear VA_DECL(const char *,line)
+{
 	char *tmp;
 	VA_START(line);
 	VA_INIT(line, const char *);
@@ -254,6 +264,7 @@ You_hear VA_DECL(const char *,line)
 /*VARARGS1*/
 void
 verbalize VA_DECL(const char *,line)
+{
 	char *tmp;
 	if (!flags.soundok) return;
 	VA_START(line);
@@ -276,6 +287,7 @@ static void FDECL(vraw_printf,(const char *,va_list));
 
 void
 raw_printf VA_DECL(const char *, line)
+{
 	VA_START(line);
 	VA_INIT(line, char *);
 	vraw_printf(line, VA_ARGS);
@@ -294,6 +306,7 @@ vraw_printf(line, the_args) const char *line; va_list the_args; {
 
 void
 raw_printf VA_DECL(const char *, line)
+{
 #endif
 /* Do NOT use VA_START and VA_END in here... see above */
 
@@ -310,6 +323,7 @@ raw_printf VA_DECL(const char *, line)
 /*VARARGS1*/
 void
 impossible VA_DECL(const char *, s)
+{
 	char pbuf[2*BUFSZ];
 	VA_START(s);
 	VA_INIT(s, const char *);
@@ -329,6 +343,7 @@ impossible VA_DECL(const char *, s)
 
 void
 warning VA_DECL(const char *, s)
+{
 	char pbuf[2*BUFSZ];
 	VA_START(s);
 	VA_INIT(s, const char *);
