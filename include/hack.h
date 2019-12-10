@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.h	3.4	2001/04/12	*/
+/*  SCCS Id: @(#)hack.h 3.4 2001/04/12  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,26 +9,26 @@
 #include "config.h"
 #endif
 
-/*	For debugging beta code.	*/
+/*  For debugging beta code.    */
 #ifdef BETA
-#define Dpline	pline
+#define Dpline  pline
 #endif
 
-#define TELL		1
-#define NOTELL		0
-#define ON		1
-#define OFF		0
-#define BOLT_LIM	8 /* from this distance ranged attacks will be made */
-#define MAX_CARR_CAP	1000	/* so that boulders can be heavier */
+#define TELL        1
+#define NOTELL      0
+#define ON      1
+#define OFF     0
+#define BOLT_LIM    8 /* from this distance ranged attacks will be made */
+#define MAX_CARR_CAP    1000    /* so that boulders can be heavier */
 #define DUMMY { 0 }
 
 /* symbolic names for capacity levels */
-#define UNENCUMBERED	0
-#define SLT_ENCUMBER	1	/* Burdened */
-#define MOD_ENCUMBER	2	/* Stressed */
-#define HVY_ENCUMBER	3	/* Strained */
-#define EXT_ENCUMBER	4	/* Overtaxed */
-#define OVERLOADED	5	/* Overloaded */
+#define UNENCUMBERED    0
+#define SLT_ENCUMBER    1   /* Burdened */
+#define MOD_ENCUMBER    2   /* Stressed */
+#define HVY_ENCUMBER    3   /* Strained */
+#define EXT_ENCUMBER    4   /* Overtaxed */
+#define OVERLOADED  5   /* Overloaded */
 
 /* hunger states - see hu_stat in eat.c */
 enum hunger_state_types {
@@ -42,62 +42,62 @@ enum hunger_state_types {
 };
 
 /* Macros for how a rumor was delivered in outrumor() */
-#define BY_ORACLE	0
-#define BY_COOKIE	1
-#define BY_PAPER	2
-#define BY_OTHER	9
+#define BY_ORACLE   0
+#define BY_COOKIE   1
+#define BY_PAPER    2
+#define BY_OTHER    9
 
 #ifdef STEED
 /* Macros for why you are no longer riding */
-#define DISMOUNT_GENERIC	0
-#define DISMOUNT_FELL		1
-#define DISMOUNT_THROWN		2
-#define DISMOUNT_POLY		3
-#define DISMOUNT_ENGULFED	4
-#define DISMOUNT_BONES		5
-#define DISMOUNT_BYCHOICE	6
-#define DISMOUNT_VANISHED	7
+#define DISMOUNT_GENERIC    0
+#define DISMOUNT_FELL       1
+#define DISMOUNT_THROWN     2
+#define DISMOUNT_POLY       3
+#define DISMOUNT_ENGULFED   4
+#define DISMOUNT_BONES      5
+#define DISMOUNT_BYCHOICE   6
+#define DISMOUNT_VANISHED   7
 #endif
 
 /* Special returns from mapglyph() */
-#define MG_CORPSE	0x01
-#define MG_INVIS	0x02
-#define MG_DETECT	0x04
-#define MG_PET		0x08
-#define MG_RIDDEN	0x10
-#define MG_INVERSE	0x20 /* use inverse video */
+#define MG_CORPSE   0x01
+#define MG_INVIS    0x02
+#define MG_DETECT   0x04
+#define MG_PET      0x08
+#define MG_RIDDEN   0x10
+#define MG_INVERSE  0x20 /* use inverse video */
 
 /* sellobj_state() states */
-#define SELL_NORMAL	(0)
-#define SELL_DELIBERATE	(1)
-#define SELL_DONTSELL	(2)
+#define SELL_NORMAL (0)
+#define SELL_DELIBERATE (1)
+#define SELL_DONTSELL   (2)
 
 /*
  * This is the way the game ends.  If these are rearranged, the arrays
  * in end.c and topten.c will need to be changed.  Some parts of the
  * code assume that PANIC separates the deaths from the non-deaths.
  */
-#define DIED		 0
-#define CHOKING		 1
-#define POISONING	 2
-#define STARVING	 3
-#define DROWNING	 4
-#define BURNING		 5
-#define DISSOLVED	 6
-#define CRUSHING	 7
-#define STONING		 8
-#define TURNED_SLIME	 9
+#define DIED         0
+#define CHOKING      1
+#define POISONING    2
+#define STARVING     3
+#define DROWNING     4
+#define BURNING      5
+#define DISSOLVED    6
+#define CRUSHING     7
+#define STONING      8
+#define TURNED_SLIME     9
 #ifdef WEBB_DISINT
-# define GENOCIDED	10
-# define DISINTEGRATED	11
-# define MAX_SURVIVABLE_DEATH	11
-# define PANICKED	12
-# define TRICKED	13
-# define QUIT		14
-# define ESCAPED	15
+# define GENOCIDED  10
+# define DISINTEGRATED  11
+# define MAX_SURVIVABLE_DEATH   11
+# define PANICKED   12
+# define TRICKED    13
+# define QUIT       14
+# define ESCAPED    15
 #ifdef ASTRAL_ESCAPE
-#define DEFIED		16
-#define ASCENDED	17
+#define DEFIED      16
+#define ASCENDED    17
 #endif
 #endif
 
@@ -111,14 +111,14 @@ enum hunger_state_types {
 #include "decl.h"
 #include "timeout.h"
 
-NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
+NEARDATA extern coord bhitpos;  /* place where throw or zap hits or stops */
 
 /* types of calls to bhit() */
-#define ZAPPED_WAND	0
-#define THROWN_WEAPON	1
-#define KICKED_WEAPON	2
-#define FLASHED_LIGHT	3
-#define INVIS_BEAM	4
+#define ZAPPED_WAND 0
+#define THROWN_WEAPON   1
+#define KICKED_WEAPON   2
+#define FLASHED_LIGHT   3
+#define INVIS_BEAM  4
 
 #include "trap.h"
 #include "flag.h"
@@ -145,32 +145,32 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #include "extern.h"
 #endif /* USE_TRAMPOLI */
 
-#define NO_SPELL	0
+#define NO_SPELL    0
 
 /* flags to control makemon() */
-#define NO_MM_FLAGS	  0x00	/* use this rather than plain 0 */
-#define NO_MINVENT	  0x01	/* suppress minvent when creating mon */
-#define MM_NOWAIT	  0x02	/* don't set STRAT_WAITMASK flags */
-#define MM_EDOG		  0x04	/* add edog structure */
-#define MM_EMIN		  0x08	/* add emin structure */
-#define MM_ANGRY	  0x10  /* monster is created angry */
-#define MM_NONAME	  0x20  /* monster is not christened */
-#define MM_NOCOUNTBIRTH	  0x40  /* don't increment born counter (for revival) */
-#define MM_IGNOREWATER	  0x80	/* ignore water when positioning */
-#define MM_ADJACENTOK	  0x100 /* it is acceptable to use adjacent coordinates */
+#define NO_MM_FLAGS   0x00  /* use this rather than plain 0 */
+#define NO_MINVENT    0x01  /* suppress minvent when creating mon */
+#define MM_NOWAIT     0x02  /* don't set STRAT_WAITMASK flags */
+#define MM_EDOG       0x04  /* add edog structure */
+#define MM_EMIN       0x08  /* add emin structure */
+#define MM_ANGRY      0x10  /* monster is created angry */
+#define MM_NONAME     0x20  /* monster is not christened */
+#define MM_NOCOUNTBIRTH   0x40  /* don't increment born counter (for revival) */
+#define MM_IGNOREWATER    0x80  /* ignore water when positioning */
+#define MM_ADJACENTOK     0x100 /* it is acceptable to use adjacent coordinates */
 
 /* special mhpmax value when loading bones monster to flag as extinct or genocided */
-#define DEFUNCT_MONSTER	(-100)
+#define DEFUNCT_MONSTER (-100)
 
 /* flags for special ggetobj status returns */
-#define ALL_FINISHED	  0x01  /* called routine already finished the job */
+#define ALL_FINISHED      0x01  /* called routine already finished the job */
 
 /* flags to control query_objlist() */
-#define BY_NEXTHERE	  0x1	/* follow objlist by nexthere field */
-#define AUTOSELECT_SINGLE 0x2	/* if only 1 object, don't ask */
-#define USE_INVLET	  0x4	/* use object's invlet */
-#define INVORDER_SORT	  0x8	/* sort objects by packorder */
-#define SIGNAL_NOMENU	  0x10	/* return -1 rather than 0 if none allowed */
+#define BY_NEXTHERE   0x1   /* follow objlist by nexthere field */
+#define AUTOSELECT_SINGLE 0x2   /* if only 1 object, don't ask */
+#define USE_INVLET    0x4   /* use object's invlet */
+#define INVORDER_SORT     0x8   /* sort objects by packorder */
+#define SIGNAL_NOMENU     0x10  /* return -1 rather than 0 if none allowed */
 #define FEEL_COCKATRICE   0x20  /* engage cockatrice checks and react */
 
 /* Flags to control query_category() */
@@ -190,57 +190,57 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define ALL_TYPES_SELECTED -2
 
 /* Flags to control find_mid() */
-#define FM_FMON	       0x01	/* search the fmon chain */
-#define FM_MIGRATE     0x02	/* search the migrating monster chain */
-#define FM_MYDOGS      0x04	/* search mydogs */
+#define FM_FMON        0x01 /* search the fmon chain */
+#define FM_MIGRATE     0x02 /* search the migrating monster chain */
+#define FM_MYDOGS      0x04 /* search mydogs */
 #define FM_EVERYWHERE  (FM_FMON | FM_MIGRATE | FM_MYDOGS)
 
 /* Flags to control pick_[race,role,gend,align] routines in role.c */
-#define PICK_RANDOM	0
-#define PICK_RIGID	1
+#define PICK_RANDOM 0
+#define PICK_RIGID  1
 
 /* Flags to control dotrap() in trap.c */
-#define NOWEBMSG	0x01	/* suppress stumble into web message */
-#define FORCEBUNGLE	0x02	/* adjustments appropriate for bungling */
-#define RECURSIVETRAP	0x04	/* trap changed into another type this same turn */
+#define NOWEBMSG    0x01    /* suppress stumble into web message */
+#define FORCEBUNGLE 0x02    /* adjustments appropriate for bungling */
+#define RECURSIVETRAP   0x04    /* trap changed into another type this same turn */
 
 /* Flags to control test_move in hack.c */
-#define DO_MOVE		0	/* really doing the move */
-#define TEST_MOVE	1	/* test a normal move (move there next) */
-#define TEST_TRAV	2	/* test a future travel location */
-#define TEST_TRAP	3	/* check if a future travel location is a trap */
+#define DO_MOVE     0   /* really doing the move */
+#define TEST_MOVE   1   /* test a normal move (move there next) */
+#define TEST_TRAV   2   /* test a future travel location */
+#define TEST_TRAP   3   /* check if a future travel location is a trap */
 
 /*** some utility macros ***/
-#define yn(query) yn_function(query,ynchars, 'n')
-#define ynq(query) yn_function(query,ynqchars, 'q')
-#define ynaq(query) yn_function(query,ynaqchars, 'y')
-#define nyaq(query) yn_function(query,ynaqchars, 'n')
-#define nyNaq(query) yn_function(query,ynNaqchars, 'n')
-#define ynNaq(query) yn_function(query,ynNaqchars, 'y')
+#define yn(query) yn_function(query, ynchars, 'n')
+#define ynq(query) yn_function(query, ynqchars, 'q')
+#define ynaq(query) yn_function(query, ynaqchars, 'y')
+#define nyaq(query) yn_function(query, ynaqchars, 'n')
+#define nyNaq(query) yn_function(query, ynNaqchars, 'n')
+#define ynNaq(query) yn_function(query, ynNaqchars, 'y')
 
 /* Macros for scatter */
-#define VIS_EFFECTS	0x01	/* display visual effects */
-#define MAY_HITMON	0x02	/* objects may hit monsters */
-#define MAY_HITYOU	0x04	/* objects may hit you */
-#define MAY_HIT		(MAY_HITMON|MAY_HITYOU)
-#define MAY_DESTROY	0x08	/* objects may be destroyed at random */
-#define MAY_FRACTURE	0x10	/* boulders & statues may fracture */
+#define VIS_EFFECTS 0x01    /* display visual effects */
+#define MAY_HITMON  0x02    /* objects may hit monsters */
+#define MAY_HITYOU  0x04    /* objects may hit you */
+#define MAY_HIT     (MAY_HITMON|MAY_HITYOU)
+#define MAY_DESTROY 0x08    /* objects may be destroyed at random */
+#define MAY_FRACTURE    0x10    /* boulders & statues may fracture */
 
 /* Macros for launching objects */
-#define ROLL		0x01	/* the object is rolling */
-#define FLING		0x02	/* the object is flying thru the air */
-#define LAUNCH_UNSEEN	0x40	/* hero neither caused nor saw it */
-#define LAUNCH_KNOWN	0x80	/* the hero caused this by explicit action */
+#define ROLL        0x01    /* the object is rolling */
+#define FLING       0x02    /* the object is flying thru the air */
+#define LAUNCH_UNSEEN   0x40    /* hero neither caused nor saw it */
+#define LAUNCH_KNOWN    0x80    /* the hero caused this by explicit action */
 
 /* Macros for explosion types */
-#define EXPL_DARK	0
-#define EXPL_NOXIOUS	1
-#define EXPL_MUDDY	2
-#define EXPL_WET	3
-#define EXPL_MAGICAL	4
-#define EXPL_FIERY	5
-#define EXPL_FROSTY	6
-#define EXPL_MAX	7
+#define EXPL_DARK   0
+#define EXPL_NOXIOUS    1
+#define EXPL_MUDDY  2
+#define EXPL_WET    3
+#define EXPL_MAGICAL    4
+#define EXPL_FIERY  5
+#define EXPL_FROSTY 6
+#define EXPL_MAX    7
 
 /* Macros for messages referring to hands, eyes, feet, etc... */
 #define ARM 0
@@ -267,54 +267,54 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define MENUTYPELEN sizeof("traditional ")
 #define MENU_TRADITIONAL 0
 #define MENU_COMBINATION 1
-#define MENU_PARTIAL	 2
-#define MENU_FULL	 3
+#define MENU_PARTIAL     2
+#define MENU_FULL    3
 
-#define MENU_SELECTED	TRUE
+#define MENU_SELECTED   TRUE
 #define MENU_UNSELECTED FALSE
 
-#define MENU_DEFCNT	1
+#define MENU_DEFCNT 1
 
 /*
  * Option flags
  * Each higher number includes the characteristics of the numbers
  * below it.
  */
-#define SET_IN_FILE	0 /* config file option only */
-#define SET_VIA_PROG	1 /* may be set via extern program, not seen in game */
-#define DISP_IN_GAME	2 /* may be set via extern program, displayed in game */
-#define SET_IN_GAME	3 /* may be set via extern program or set in the game */
+#define SET_IN_FILE 0 /* config file option only */
+#define SET_VIA_PROG    1 /* may be set via extern program, not seen in game */
+#define DISP_IN_GAME    2 /* may be set via extern program, displayed in game */
+#define SET_IN_GAME 3 /* may be set via extern program or set in the game */
 
-#define FEATURE_NOTICE_VER(major,minor,patch) (((unsigned long)major << 24) | \
-	((unsigned long)minor << 16) | \
-	((unsigned long)patch << 8) | \
-	((unsigned long)0))
+#define FEATURE_NOTICE_VER(major, minor, patch) (((unsigned long)major << 24) | \
+                                                 ((unsigned long)minor << 16) | \
+                                                 ((unsigned long)patch << 8) | \
+                                                 ((unsigned long)0))
 
-#define FEATURE_NOTICE_VER_MAJ	  (flags.suppress_alert >> 24)
-#define FEATURE_NOTICE_VER_MIN	  (((unsigned long)(0x0000000000FF0000L & flags.suppress_alert)) >> 16)
+#define FEATURE_NOTICE_VER_MAJ    (flags.suppress_alert >> 24)
+#define FEATURE_NOTICE_VER_MIN    (((unsigned long)(0x0000000000FF0000L & flags.suppress_alert)) >> 16)
 #define FEATURE_NOTICE_VER_PATCH  (((unsigned long)(0x000000000000FF00L & flags.suppress_alert)) >>  8)
 
 #ifndef max
-#define max(a,b) ((a) > (b) ? (a) : (b))
+#define max(a, b) ((a) > (b) ? (a) : (b))
 #endif
 #ifndef min
-#define min(x,y) ((x) < (y) ? (x) : (y))
+#define min(x, y) ((x) < (y) ? (x) : (y))
 #endif
 #define plur(x) (((x) == 1) ? "" : "s")
 
-#define ARM_BONUS(obj)	(objects[(obj)->otyp].a_ac + (obj)->spe \
-			 /* extra AC point for racial armor */ \
-			 + (is_racial_armor(obj) ? 1 : 0) \
-			 - min((int)greatest_erosion(obj),objects[(obj)->otyp].a_ac))
+#define ARM_BONUS(obj)  (objects[(obj)->otyp].a_ac + (obj)->spe \
+                         /* extra AC point for racial armor */ \
+                         + (is_racial_armor(obj) ? 1 : 0) \
+                         - min((int)greatest_erosion(obj), objects[(obj)->otyp].a_ac))
 
-#define makeknown(x)	discover_object((x),TRUE,TRUE)
-#define distu(xx,yy)	dist2((int)(xx),(int)(yy),(int)u.ux,(int)u.uy)
-#define onlineu(xx,yy)	online2((int)(xx),(int)(yy),(int)u.ux,(int)u.uy)
+#define makeknown(x)    discover_object((x), TRUE, TRUE)
+#define distu(xx, yy)    dist2((int)(xx), (int)(yy), (int)u.ux, (int)u.uy)
+#define onlineu(xx, yy)  online2((int)(xx), (int)(yy), (int)u.ux, (int)u.uy)
 
-#define rn1(x,y)	(rn2(x)+(y))
+#define rn1(x, y)    (rn2(x)+(y))
 
 /* negative armor class is randomly weakened to prevent invulnerability */
-#define AC_VALUE(AC)	((AC) >= 0 ? (AC) : -rnd(-(AC)))
+#define AC_VALUE(AC)    ((AC) >= 0 ? (AC) : -rnd(-(AC)))
 
 #if defined(MICRO) && !defined(__DJGPP__)
 #define getuid() 1
@@ -331,18 +331,18 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #  define STATIC_VAR extern
 # endif
 
-#else	/* !OVERLAY || (!OVL0 && !OVL1 && !OVL2 && !OVL3 && !OVLB) */
+#else   /* !OVERLAY || (!OVL0 && !OVL1 && !OVL2 && !OVL3 && !OVLB) */
 # define STATIC_DCL static
 # define STATIC_OVL static
 # define STATIC_VAR static
 
 /* If not compiling an overlay, compile everything. */
-# define OVL0	/* highest priority */
+# define OVL0   /* highest priority */
 # define OVL1
 # define OVL2
-# define OVL3	/* lowest specified priority */
-# define OVLB	/* the base overlay segment */
-#endif	/* OVERLAY && (OVL0 || OVL1 || OVL2 || OVL3 || OVLB) */
+# define OVL3   /* lowest specified priority */
+# define OVLB   /* the base overlay segment */
+#endif  /* OVERLAY && (OVL0 || OVL1 || OVL2 || OVL3 || OVLB) */
 
 /* Macro for a few items that are only static if we're not overlaid.... */
 #if defined(USE_TRAMPOLI) || defined(USE_OVLx)
@@ -360,5 +360,5 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #else
 # define CFDECLSPEC
 #endif
- 
+
 #endif /* HACK_H */

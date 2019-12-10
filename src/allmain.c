@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)allmain.c	3.4	2003/04/02	*/
+/*  SCCS Id: @(#)allmain.c  3.4 2003/04/02  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -15,7 +15,7 @@
 #ifdef POSITIONBAR
 STATIC_DCL void NDECL(do_positionbar);
 #endif
-STATIC_DCL void FDECL(interrupt_multi, (const char *,int,int));
+STATIC_DCL void FDECL(interrupt_multi, (const char *, int, int));
 
 static int prev_hp_notify;
 enum monster_generation monclock;
@@ -36,52 +36,52 @@ hpnotify_format_str(char *str)
     end = buf + sizeof(buf) - 10;
 
     while (*f) {
-      if (ispercent) {
-	switch (*f) {
-	case 'a':
-	    snprintf (p, end + 1 - p, "%ld", (long)abs(uhp()-prev_hp_notify));
-	  while (*p != '\0')
-	    p++;
-	  break;
-        case 'c':
-	    snprintf (p, end + 1 - p, "%c", (prev_hp_notify > uhp() ? '-' : '+'));
-	  p++;
-	  break;
-	case 'm':
-	    snprintf (p, end + 1 - p, "%ld", (long)uhpmax());
-	  while (*p != '\0')
-	    p++;
-	  break;
-	case 'H':
-	    if (uhp() == uhpmax()) {
-	    snprintf (p, end + 1 - p, "%s", "max");
-	  } else {
-		snprintf (p, end + 1 - p, "%ld", (long)uhp());
-	  }
-	  while (*p != '\0')
-	    p++;
-	  break;
-	case 'h':
-	    snprintf (p, end + 1 - p, "%ld", (long)uhp());
-	  while (*p != '\0')
-	    p++;
-	  break;
-	default:
-	  *p = *f;
-	  if (p < end)
-	    p++;
-	}
-	ispercent = 0;
-      } else {
-	if (*f == '%')
-	  ispercent = 1;
-	else {
-	  *p = *f;
-	  if (p < end)
-	    p++;
-	}
-      }
-      f++;
+        if (ispercent) {
+            switch (*f) {
+            case 'a':
+                snprintf (p, end + 1 - p, "%ld", (long)abs(uhp()-prev_hp_notify));
+                while (*p != '\0')
+                    p++;
+                break;
+            case 'c':
+                snprintf (p, end + 1 - p, "%c", (prev_hp_notify > uhp() ? '-' : '+'));
+                p++;
+                break;
+            case 'm':
+                snprintf (p, end + 1 - p, "%ld", (long)uhpmax());
+                while (*p != '\0')
+                    p++;
+                break;
+            case 'H':
+                if (uhp() == uhpmax()) {
+                    snprintf (p, end + 1 - p, "%s", "max");
+                } else {
+                    snprintf (p, end + 1 - p, "%ld", (long)uhp());
+                }
+                while (*p != '\0')
+                    p++;
+                break;
+            case 'h':
+                snprintf (p, end + 1 - p, "%ld", (long)uhp());
+                while (*p != '\0')
+                    p++;
+                break;
+            default:
+                *p = *f;
+                if (p < end)
+                    p++;
+            }
+            ispercent = 0;
+        } else {
+            if (*f == '%')
+                ispercent = 1;
+            else {
+                *p = *f;
+                if (p < end)
+                    p++;
+            }
+        }
+        f++;
     }
     *p = '\0';
 
@@ -102,39 +102,39 @@ can_regenerate()
         return 0;
     }
     if (is_elf(youmonst.data)) {
-	if (uwep && is_iron(uwep) &&
-		!is_quest_artifact(uwep) && !uarmg) return 0;
+        if (uwep && is_iron(uwep) &&
+            !is_quest_artifact(uwep) && !uarmg) return 0;
 #ifdef TOURIST
-	if (uarm && is_iron(uarm) && !uarmu) return 0;
-	if (uarmu && is_iron(uarmu)) return 0;
-	if (uarmc && is_iron(uarmc) && !uarmu && !uarm) return 0;
+        if (uarm && is_iron(uarm) && !uarmu) return 0;
+        if (uarmu && is_iron(uarmu)) return 0;
+        if (uarmc && is_iron(uarmc) && !uarmu && !uarm) return 0;
 #else
-	if (uarm && is_iron(uarm)) return 0;
-	if (uarmc && is_iron(uarmc) && !uarm) return 0;
+        if (uarm && is_iron(uarm)) return 0;
+        if (uarmc && is_iron(uarmc) && !uarm) return 0;
 #endif
-	if (uarmh && is_iron(uarmh) &&
-		!is_quest_artifact(uarmh)) return 0;
-	if (uarms && is_iron(uarms) && !uarmg) return 0;
-	if (uarmg && is_iron(uarmg)) return 0;
-	if (uarmf && is_iron(uarmf)) return 0;
-	if (uleft && is_iron(uleft)) return 0;
-	if (uright && is_iron(uright)) return 0;
+        if (uarmh && is_iron(uarmh) &&
+            !is_quest_artifact(uarmh)) return 0;
+        if (uarms && is_iron(uarms) && !uarmg) return 0;
+        if (uarmg && is_iron(uarmg)) return 0;
+        if (uarmf && is_iron(uarmf)) return 0;
+        if (uleft && is_iron(uleft)) return 0;
+        if (uright && is_iron(uright)) return 0;
 #ifdef TOURIST
-	if (uamul && is_iron(uamul) &&
-		!is_quest_artifact(uamul) && !uarmu && !uarm) return 0;
+        if (uamul && is_iron(uamul) &&
+            !is_quest_artifact(uamul) && !uarmu && !uarm) return 0;
 #else
-	if (uamul && is_iron(uamul) &&
-		!is_quest_artifact(uamul) && !uarm) return 0;
+        if (uamul && is_iron(uamul) &&
+            !is_quest_artifact(uamul) && !uarm) return 0;
 #endif
-	if (ublindf && is_iron(ublindf)) return 0;
-	if (uchain && is_iron(uchain)) return 0;
-	if (uswapwep && is_iron(uswapwep) && u.twoweap) return 0;
+        if (ublindf && is_iron(ublindf)) return 0;
+        if (uchain && is_iron(uchain)) return 0;
+        if (uswapwep && is_iron(uswapwep) && u.twoweap) return 0;
     } else if (is_vampiric(youmonst.data)) {
-	if (uwep && is_silver(uwep) && !uarmg) return 0;
-	if (uarms && is_silver(uarms) &&
-		!is_quest_artifact(uarms) && !uarmg) return 0;
-	if (uleft && is_silver(uleft)) return 0;
-	if (uright && is_silver(uright)) return 0;
+        if (uwep && is_silver(uwep) && !uarmg) return 0;
+        if (uarms && is_silver(uarms) &&
+            !is_quest_artifact(uarms) && !uarmg) return 0;
+        if (uleft && is_silver(uleft)) return 0;
+        if (uright && is_silver(uright)) return 0;
     }
     return 1;
 }
@@ -176,10 +176,10 @@ moveloop()
 
     /* Note:  these initializers don't do anything except guarantee that
        we're linked properly.
-       */
+     */
     decl_init();
     monst_init();
-    monstr_init();	/* monster strengths */
+    monstr_init();  /* monster strengths */
     objects_init();
     dragons_init();
     doredraw(); /* partial workaround to http://sourceforge.net/apps/trac/unnethack/ticket/2 */
@@ -192,7 +192,7 @@ moveloop()
     (void) encumber_msg(); /* in case they auto-picked up something */
 
     u.uz0.dlevel = u.uz.dlevel;
-    youmonst.movement = NORMAL_SPEED;	/* give the hero some movement points */
+    youmonst.movement = NORMAL_SPEED;   /* give the hero some movement points */
     prev_hp_notify = uhp();
 #ifdef WHEREIS_FILE
     touch_whereis();
@@ -216,7 +216,7 @@ moveloop()
                 do {
                     monscanmove = movemon();
                     if (youmonst.movement > NORMAL_SPEED)
-                        break;	/* it's now your turn */
+                        break;  /* it's now your turn */
                 } while (monscanmove);
                 flags.mon_moving = FALSE;
 
@@ -227,7 +227,7 @@ moveloop()
                     /* both you and the monsters are out of steam this round */
                     /* set up for a new turn */
                     struct monst *mtmp;
-                    mcalcdistress();	/* adjust monsters' trap, blind, etc */
+                    mcalcdistress();    /* adjust monsters' trap, blind, etc */
 
                     /* reallocate movement rations to monsters */
                     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
@@ -287,7 +287,7 @@ moveloop()
                     {
                         moveamt = youmonst.data->mmove;
 
-                        if (Very_fast) {	/* speed boots or potion */
+                        if (Very_fast) {    /* speed boots or potion */
                             /* average movement is 1.67 times normal */
                             moveamt += NORMAL_SPEED / 2;
                             if (rn2(3) == 0) moveamt += NORMAL_SPEED / 2;
@@ -298,12 +298,12 @@ moveloop()
                     }
 
                     switch (wtcap) {
-                        case UNENCUMBERED: break;
-                        case SLT_ENCUMBER: moveamt -= (moveamt / 4); break;
-                        case MOD_ENCUMBER: moveamt -= (moveamt / 2); break;
-                        case HVY_ENCUMBER: moveamt -= ((moveamt * 3) / 4); break;
-                        case EXT_ENCUMBER: moveamt -= ((moveamt * 7) / 8); break;
-                        default: break;
+                    case UNENCUMBERED: break;
+                    case SLT_ENCUMBER: moveamt -= (moveamt / 4); break;
+                    case MOD_ENCUMBER: moveamt -= (moveamt / 2); break;
+                    case HVY_ENCUMBER: moveamt -= ((moveamt * 3) / 4); break;
+                    case EXT_ENCUMBER: moveamt -= ((moveamt * 7) / 8); break;
+                    default: break;
                     }
 
                     youmonst.movement += moveamt;
@@ -324,7 +324,7 @@ moveloop()
 #ifdef DUNGEON_GROWTH
                     dgn_growths(TRUE, TRUE);
 #endif
-                    if (u.ublesscnt)  u.ublesscnt--;
+                    if (u.ublesscnt) u.ublesscnt--;
                     if(flags.time && !flags.run)
                         flags.botl = 1;
 
@@ -338,7 +338,7 @@ moveloop()
                     if (u.uinvulnerable) {
                         /* for the moment at least, you're in tiptop shape */
                         wtcap = UNENCUMBERED;
-                    } else if (Upolyd && youmonst.data->mlet == S_EEL && !is_pool(u.ux,u.uy) && !Is_waterlevel(&u.uz)) {
+                    } else if (Upolyd && youmonst.data->mlet == S_EEL && !is_pool(u.ux, u.uy) && !Is_waterlevel(&u.uz)) {
                         if (u.mh > 1) {
                             u.mh--;
                             flags.botl = 1;
@@ -348,13 +348,13 @@ moveloop()
                         if (u.mh < 1)
                             rehumanize();
                         else if (can_regenerate() && (Regeneration ||
-                                    (wtcap < MOD_ENCUMBER && !(moves%20)))) {
+                                                      (wtcap < MOD_ENCUMBER && !(moves%20)))) {
                             flags.botl = 1;
                             u.mh++;
                             interrupt_multi("Hit points", u.mh, u.mhmax);
                         }
                     } else if (u.uhp < u.uhpmax && can_regenerate() &&
-                            (wtcap < MOD_ENCUMBER || !u.umoved || Regeneration)) {
+                               (wtcap < MOD_ENCUMBER || !u.umoved || Regeneration)) {
                         if (u.ulevel > 9 && !(moves % 3)) {
                             if (!marathon_mode) {
                                 int heal, Con = (int) ACURR(A_CON);
@@ -372,8 +372,8 @@ moveloop()
                                 interrupt_multi("Hit points", u.uhp, u.uhpmax);
                             }
                         } else if (Regeneration ||
-                                (u.ulevel <= 9 &&
-                                 !(moves % ((MAXULEV+12) / (u.ulevel+2) + 1)))) {
+                                   (u.ulevel <= 9 &&
+                                    !(moves % ((MAXULEV+12) / (u.ulevel+2) + 1)))) {
                             if (!marathon_mode) {
                                 flags.botl = 1;
                                 u.uhp++;
@@ -398,12 +398,12 @@ moveloop()
                     }
 
                     if ((u.uen < u.uenmax) &&
-                            ((wtcap < MOD_ENCUMBER &&
-                              (!(moves%((MAXULEV + 8 - u.ulevel) *
-                                        (Role_if(PM_WIZARD) ? 3 : 4) / 6))))
-                             || Energy_regeneration)) {
-                        u.uen += rn1((int)(ACURR(A_WIS) + ACURR(A_INT)) / 15 + 1,1);
-                        if (u.uen > u.uenmax)  u.uen = u.uenmax;
+                        ((wtcap < MOD_ENCUMBER &&
+                          (!(moves%((MAXULEV + 8 - u.ulevel) *
+                                    (Role_if(PM_WIZARD) ? 3 : 4) / 6))))
+                         || Energy_regeneration)) {
+                        u.uen += rn1((int)(ACURR(A_WIS) + ACURR(A_INT)) / 15 + 1, 1);
+                        if (u.uen > u.uenmax) u.uen = u.uenmax;
                         flags.botl = 1;
                         interrupt_multi("Magic energy", u.uen, u.uenmax);
                     }
@@ -425,12 +425,12 @@ moveloop()
                         }
                         /* delayed change may not be valid anymore */
                         if ((change == 1 && !Polymorph) ||
-                                (change == 2 && u.ulycn == NON_PM))
+                            (change == 2 && u.ulycn == NON_PM))
                             change = 0;
                         if(Polymorph && !rn2(100))
                             change = 1;
                         else if (u.ulycn >= LOW_PM && !Upolyd &&
-                                !rn2(80 - (20 * night())))
+                                 !rn2(80 - (20 * night())))
                             change = 2;
                         if (change && !Unchanging) {
                             if (multi >= 0) {
@@ -473,7 +473,7 @@ moveloop()
 
                     /* when immobile, count is in turns */
                     if(multi < 0) {
-                        if (++multi == 0) {	/* finished yet? */
+                        if (++multi == 0) { /* finished yet? */
                             unmul((char *)0);
                             /* if unmul caused a level change, take it now */
                             if (u.utotype) deferred_goto();
@@ -487,7 +487,7 @@ moveloop()
             /******************************************/
 
             if (u.utrap && u.utraptype == TT_LAVA) {
-                if (!is_lava(u.ux,u.uy))
+                if (!is_lava(u.ux, u.uy))
                     u.utrap = 0;
                 else if (!u.uinvulnerable) {
                     u.utrap -= 1<<8;
@@ -512,7 +512,7 @@ moveloop()
         find_ac();
         if(!flags.mv || Blind) {
             /* redo monsters if hallu or wearing a helm of telepathy */
-            if (Hallucination) {	/* update screen randomly */
+            if (Hallucination) {    /* update screen randomly */
                 see_monsters();
                 see_objects();
                 see_traps();
@@ -522,7 +522,7 @@ moveloop()
             } else if (Warning || Warn_of_mon)
                 see_monsters();
 
-            if (vision_full_recalc) vision_recalc(0);	/* vision! */
+            if (vision_full_recalc) vision_recalc(0);   /* vision! */
         }
 
 #ifdef ELBERETH
@@ -554,11 +554,11 @@ moveloop()
         }
 
         if (can_regen != can_regenerate()) {
-            if (!Hallucination){
+            if (!Hallucination) {
                 You_feel("%s.", (can_regen) ? "itchy" : "relief");
             } else {
                 You_feel("%s.", (can_regen) ? (is_elf(youmonst.data) ? "magnetic" :
-                            "tarnished") : "like you are no longer failing Organic Chemistry");
+                                               "tarnished") : "like you are no longer failing Organic Chemistry");
             }
             can_regen = can_regenerate();
         }
@@ -578,14 +578,14 @@ moveloop()
             }
             if (!abort_lev && (*occupation)() == 0)
 #else
-                if ((*occupation)() == 0)
+            if ((*occupation)() == 0)
 #endif
-                    occupation = 0;
+                occupation = 0;
             if(
 #if defined(MICRO) || defined(WIN32)
-                    abort_lev ||
+                abort_lev ||
 #endif
-                    monster_nearby()) {
+                monster_nearby()) {
                 stop_occupation();
                 reset_eat();
             }
@@ -597,8 +597,8 @@ moveloop()
         }
 
         if ((u.uhave.amulet || Clairvoyant) &&
-                !In_endgame(&u.uz) && !BClairvoyant &&
-                !(moves % 15) && !rn2(2))
+            !In_endgame(&u.uz) && !BClairvoyant &&
+            !(moves % 15) && !rn2(2))
             do_vicinity_map();
 
 #ifdef WIZARD
@@ -637,16 +637,16 @@ moveloop()
             maybe_tutorial();
             rhack((char *)0);
         }
-        if (u.utotype)		/* change dungeon level */
-            deferred_goto();	/* after rhack() */
+        if (u.utotype)      /* change dungeon level */
+            deferred_goto();    /* after rhack() */
         /* !flags.move here: multiple movement command stopped */
         else if (flags.time && (!flags.move || !flags.mv))
             flags.botl = 1;
 
-        if (vision_full_recalc) vision_recalc(0);	/* vision! */
+        if (vision_full_recalc) vision_recalc(0);   /* vision! */
         /* when running in non-tport mode, this gets done through domove() */
         if ((!flags.run || iflags.runmode == RUN_TPORT) &&
-                (multi && (!flags.travel ? !(multi % 7) : !(moves % 7L)))) {
+            (multi && (!flags.travel ? !(multi % 7) : !(moves % 7L)))) {
             if (flags.time && flags.run) flags.botl = 1;
             display_nhwindow(WIN_MAP, FALSE);
         }
@@ -656,19 +656,19 @@ moveloop()
 void
 stop_occupation()
 {
-	if(occupation) {
-		if (!maybe_finished_meal(TRUE))
-		    You("stop %s.", occtxt);
-		occupation = 0;
-		flags.botl = 1; /* in case u.uhs changed */
+    if(occupation) {
+        if (!maybe_finished_meal(TRUE))
+            You("stop %s.", occtxt);
+        occupation = 0;
+        flags.botl = 1; /* in case u.uhs changed */
 /* fainting stops your occupation, there's no reason to sync.
-		sync_hunger();
-*/
+        sync_hunger();
+ */
 #ifdef REDO
-		nomul(0, 0);
-		pushch(0);
+        nomul(0, 0);
+        pushch(0);
 #endif
-	}
+    }
 }
 
 void
@@ -686,9 +686,9 @@ display_gamewindows()
      * have to split display_gamewindows into create_gamewindows
      * and show_gamewindows to get rid of this ifdef...
      */
-	if ( ! strcmp ( windowprocs . name , "mac" ) ) {
-	    SanePositions ( ) ;
-	}
+    if ( !strcmp ( windowprocs.name, "mac" ) ) {
+        SanePositions ( );
+    }
 #endif
 
     /*
@@ -705,116 +705,116 @@ static
 void
 init_level_seeds()
 {
-	int i;
-	set_random_state(level_info[0].seed);
-	for (i=1; i<MAXLINFO; i++) {
-		level_info[i].seed = rn2(INT_MAX);
-	}
+    int i;
+    set_random_state(level_info[0].seed);
+    for (i=1; i<MAXLINFO; i++) {
+        level_info[i].seed = rn2(INT_MAX);
+    }
 }
 
 
 void
 newgame()
 {
-	int i;
+    int i;
 
 #ifdef MFLOPPY
-	gameDiskPrompt();
+    gameDiskPrompt();
 #endif
 
-	flags.ident = 1;
+    flags.ident = 1;
 
-	for (i = 0; i < NUMMONS; i++)
-		mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;
+    for (i = 0; i < NUMMONS; i++)
+        mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;
 
-	init_level_seeds();
+    init_level_seeds();
 
-	init_objects();		/* must be before u_init() */
+    init_objects();     /* must be before u_init() */
 
-	flags.pantheon = -1;	/* role_init() will reset this */
-	role_init();		/* must be before init_dungeons(), u_init(),
-				 * and init_artifacts() */
+    flags.pantheon = -1;    /* role_init() will reset this */
+    role_init();        /* must be before init_dungeons(), u_init(),
+                         * and init_artifacts() */
 
-	init_dungeons();	/* must be before u_init() to avoid rndmonst()
-				 * creating odd monsters for any tins and eggs
-				 * in hero's initial inventory */
-	init_artifacts();	/* before u_init() in case $WIZKIT specifies
-				 * any artifacts */
-	u_init();
+    init_dungeons();    /* must be before u_init() to avoid rndmonst()
+                         * creating odd monsters for any tins and eggs
+                         * in hero's initial inventory */
+    init_artifacts();   /* before u_init() in case $WIZKIT specifies
+                         * any artifacts */
+    u_init();
 
 #ifndef NO_SIGNAL
-	(void) signal(SIGINT, (SIG_RET_TYPE) done1);
+    (void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #endif
 #ifdef NEWS
-	if(iflags.news) display_file_area(NEWS_AREA, NEWS, FALSE);
+    if(iflags.news) display_file_area(NEWS_AREA, NEWS, FALSE);
 #endif
-	load_qtlist();	/* load up the quest text info */
-/*	quest_init();*/	/* Now part of role_init() */
+    load_qtlist();  /* load up the quest text info */
+/*  quest_init();*/ /* Now part of role_init() */
 
-	mklev();
-	u_on_upstairs();
-	vision_reset();		/* set up internals for level (after mklev) */
-	check_special_room(FALSE);
+    mklev();
+    u_on_upstairs();
+    vision_reset();     /* set up internals for level (after mklev) */
+    check_special_room(FALSE);
 
-	flags.botlx = 1;
+    flags.botlx = 1;
 
-	/* Move the monster from under you or else
-	 * makedog() will fail when it calls makemon().
-	 *			- ucsfcgl!kneller
-	 */
-	if(MON_AT(u.ux, u.uy)) mnexto(m_at(u.ux, u.uy));
-	(void) makedog();
-	docrt();
+    /* Move the monster from under you or else
+     * makedog() will fail when it calls makemon().
+     *          - ucsfcgl!kneller
+     */
+    if(MON_AT(u.ux, u.uy)) mnexto(m_at(u.ux, u.uy));
+    (void) makedog();
+    docrt();
 #ifdef CONVICT
-	if (Role_if(PM_CONVICT)) {
-		setworn(mkobj(CHAIN_CLASS, TRUE), W_CHAIN);
-		setworn(mkobj(BALL_CLASS, TRUE), W_BALL);
-		uball->spe = 1;
-		placebc();
-		newsym(u.ux,u.uy);
-	}
+    if (Role_if(PM_CONVICT)) {
+        setworn(mkobj(CHAIN_CLASS, TRUE), W_CHAIN);
+        setworn(mkobj(BALL_CLASS, TRUE), W_BALL);
+        uball->spe = 1;
+        placebc();
+        newsym(u.ux, u.uy);
+    }
 #endif /* CONVICT */
 
-	if (flags.legacy) {
-		flush_screen(1);
+    if (flags.legacy) {
+        flush_screen(1);
 #ifdef CONVICT
-	if (Role_if(PM_CONVICT)) {
-		com_pager(199);
-	} else {
-		com_pager(1);
-	}
+        if (Role_if(PM_CONVICT)) {
+            com_pager(199);
+        } else {
+            com_pager(1);
+        }
 #else
-		com_pager(1);
+        com_pager(1);
 #endif /* CONVICT */
-	}
+    }
 
 #ifdef INSURANCE
-	save_currentstate();
+    save_currentstate();
 #endif
-	program_state.something_worth_saving++;	/* useful data now exists */
+    program_state.something_worth_saving++; /* useful data now exists */
 
 #if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
 
-	/* Start the timer here */
-	realtime_data.realtime = (time_t)0L;
+    /* Start the timer here */
+    realtime_data.realtime = (time_t)0L;
 
 #if defined(BSD) && !defined(POSIX_TYPES)
-	(void) time((long *)&realtime_data.restoretime);
+    (void) time((long *)&realtime_data.restoretime);
 #else
-	(void) time(&realtime_data.restoretime);
+    (void) time(&realtime_data.restoretime);
 #endif
 
 #endif /* RECORD_REALTIME || REALTIME_ON_BOTL */
 
-	/* Success! */
-	welcome(TRUE);
-	return;
+    /* Success! */
+    welcome(TRUE);
+    return;
 }
 
 /* show "welcome [back] to unnethack" message at program startup */
 void
 welcome(new_game)
-boolean new_game;	/* false => restoring an old game */
+boolean new_game;   /* false => restoring an old game */
 {
     char buf[BUFSZ];
     boolean currentgend = Upolyd ? u.mfemale : flags.female;
@@ -831,82 +831,82 @@ boolean new_game;	/* false => restoring an old game */
      */
     *buf = '\0';
     if (new_game || u.ualignbase[A_ORIGINAL] != u.ualignbase[A_CURRENT])
-	Sprintf(eos(buf), " %s", align_str(u.ualignbase[A_ORIGINAL]));
+        Sprintf(eos(buf), " %s", align_str(u.ualignbase[A_ORIGINAL]));
     if (!urole.name.f &&
-	    (new_game ? (urole.allow & ROLE_GENDMASK) == (ROLE_MALE|ROLE_FEMALE) :
-	     currentgend != flags.initgend))
-	Sprintf(eos(buf), " %s", genders[currentgend].adj);
+        (new_game ? (urole.allow & ROLE_GENDMASK) == (ROLE_MALE|ROLE_FEMALE) :
+         currentgend != flags.initgend))
+        Sprintf(eos(buf), " %s", genders[currentgend].adj);
 
     role_name = (currentgend && urole.name.f) ? urole.name.f : urole.name.m;
     pline(new_game ? "%s %s, welcome to UnNetHack!  You are a%s %s %s."
-		   : "%s %s, the%s %s %s, welcome back to UnNetHack!",
-	  Hello((struct monst *) 0), plname, buf, urace.adj, role_name);
+          : "%s %s, the%s %s %s, welcome back to UnNetHack!",
+          Hello((struct monst *) 0), plname, buf, urace.adj, role_name);
 #ifdef LIVELOGFILE
     /* Start live reporting */
-	  livelog_start();
-	  livelog_game_started(new_game ? "started" : "resumed",
-	                       buf, urace.adj, role_name);
+    livelog_start();
+    livelog_game_started(new_game ? "started" : "resumed",
+                         buf, urace.adj, role_name);
 #endif
-	/* show level annotation when restoring the level */
-	if (!new_game && iflags.show_annotation &&
-	    (annotation = get_annotation(&u.uz))) {
-		You("annotated this level: %s", annotation);
-	}
+    /* show level annotation when restoring the level */
+    if (!new_game && iflags.show_annotation &&
+        (annotation = get_annotation(&u.uz))) {
+        You("annotated this level: %s", annotation);
+    }
 }
 
 #ifdef POSITIONBAR
 STATIC_DCL void
 do_positionbar()
 {
-	static char pbar[COLNO];
-	char *p;
+    static char pbar[COLNO];
+    char *p;
 
-	p = pbar;
-	/* up stairway */
-	if (upstair.sx &&
-	   (glyph_to_cmap(level.locations[upstair.sx][upstair.sy].glyph) ==
-	    S_upstair ||
- 	    glyph_to_cmap(level.locations[upstair.sx][upstair.sy].glyph) ==
-	    S_upladder)) {
-		*p++ = '<';
-		*p++ = upstair.sx;
-	}
-	if (sstairs.sx &&
-	   (glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph) ==
-	    S_upstair ||
- 	    glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph) ==
-	    S_upladder)) {
-		*p++ = '<';
-		*p++ = sstairs.sx;
-	}
+    p = pbar;
+    /* up stairway */
+    if (upstair.sx &&
+        (glyph_to_cmap(level.locations[upstair.sx][upstair.sy].glyph) ==
+         S_upstair ||
+         glyph_to_cmap(level.locations[upstair.sx][upstair.sy].glyph) ==
+         S_upladder)) {
+        *p++ = '<';
+        *p++ = upstair.sx;
+    }
+    if (sstairs.sx &&
+        (glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph) ==
+         S_upstair ||
+         glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph) ==
+         S_upladder)) {
+        *p++ = '<';
+        *p++ = sstairs.sx;
+    }
 
-	/* down stairway */
-	if (dnstair.sx &&
-	   (glyph_to_cmap(level.locations[dnstair.sx][dnstair.sy].glyph) ==
-	    S_dnstair ||
- 	    glyph_to_cmap(level.locations[dnstair.sx][dnstair.sy].glyph) ==
-	    S_dnladder)) {
-		*p++ = '>';
-		*p++ = dnstair.sx;
-	}
-	if (sstairs.sx &&
-	   (glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph) ==
-	    S_dnstair ||
- 	    glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph) ==
-	    S_dnladder)) {
-		*p++ = '>';
-		*p++ = sstairs.sx;
-	}
+    /* down stairway */
+    if (dnstair.sx &&
+        (glyph_to_cmap(level.locations[dnstair.sx][dnstair.sy].glyph) ==
+         S_dnstair ||
+         glyph_to_cmap(level.locations[dnstair.sx][dnstair.sy].glyph) ==
+         S_dnladder)) {
+        *p++ = '>';
+        *p++ = dnstair.sx;
+    }
+    if (sstairs.sx &&
+        (glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph) ==
+         S_dnstair ||
+         glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph) ==
+         S_dnladder)) {
+        *p++ = '>';
+        *p++ = sstairs.sx;
+    }
 
-	/* hero location */
-	if (u.ux) {
-		*p++ = '@';
-		*p++ = u.ux;
-	}
-	/* fence post */
-	*p = 0;
+    /* hero location */
+    if (u.ux) {
+        *p++ = '@';
+        *p++ = u.ux;
+    }
+    /* fence post */
+    *p = 0;
 
-	update_positionbar(pbar);
+    update_positionbar(pbar);
 }
 #endif
 
@@ -914,39 +914,39 @@ do_positionbar()
 time_t
 get_realtime(void)
 {
-	time_t current_time = 0;
-	/* Add maximally this many seconds per invocation to get somewhat
-	 * reasonable realtime values. */
+    time_t current_time = 0;
+    /* Add maximally this many seconds per invocation to get somewhat
+     * reasonable realtime values. */
 #define MAX_IDLE_TIME_IN_SECONDS 60
-	static time_t time_last_activity = 0;
-	static time_t time_spent_playing = 0;
+    static time_t time_last_activity = 0;
+    static time_t time_spent_playing = 0;
 
     /* Get current time */
 #if defined(BSD) && !defined(POSIX_TYPES)
-	(void) time((long *)&current_time);
+    (void) time((long *)&current_time);
 #else
-	(void) time(&current_time);
+    (void) time(&current_time);
 #endif
 
-	/* Initialize last_activity_time. */
-	if (time_last_activity == 0) {
-		time_last_activity = current_time;
-	}
+    /* Initialize last_activity_time. */
+    if (time_last_activity == 0) {
+        time_last_activity = current_time;
+    }
 
-	/* Since the timer isn't set until the game starts, this prevents us
-	 * from displaying nonsense on the bottom line before it does. */
-	if (realtime_data.restoretime == 0) {
-		time_spent_playing = realtime_data.realtime;
-	} else {
-		time_t idletime = current_time - time_last_activity;
-		time_last_activity = current_time;
-		/* Add time the player spent "thinking". */
-		time_spent_playing += (idletime > MAX_IDLE_TIME_IN_SECONDS) ? MAX_IDLE_TIME_IN_SECONDS : idletime;
-		/* Update realtime for livelog events. */
-		realtime_data.realtime = time_spent_playing;
-	}
+    /* Since the timer isn't set until the game starts, this prevents us
+     * from displaying nonsense on the bottom line before it does. */
+    if (realtime_data.restoretime == 0) {
+        time_spent_playing = realtime_data.realtime;
+    } else {
+        time_t idletime = current_time - time_last_activity;
+        time_last_activity = current_time;
+        /* Add time the player spent "thinking". */
+        time_spent_playing += (idletime > MAX_IDLE_TIME_IN_SECONDS) ? MAX_IDLE_TIME_IN_SECONDS : idletime;
+        /* Update realtime for livelog events. */
+        realtime_data.realtime = time_spent_playing;
+    }
 
-	return time_spent_playing;
+    return time_spent_playing;
 }
 #undef MAX_IDLE_TIME_IN_SECONDS
 #endif /* REALTIME_ON_BOTL || RECORD_REALTIME */
@@ -959,11 +959,11 @@ const char *points;
 int current_points;
 int max_points;
 {
-	if (multi > 0 &&
-	    current_points == max_points) {
-		nomul(0, 0);
-		if (flags.verbose) pline("%s restored.", points);
-	}
+    if (multi > 0 &&
+        current_points == max_points) {
+        nomul(0, 0);
+        if (flags.verbose) pline("%s restored.", points);
+    }
 }
 
 /*allmain.c*/

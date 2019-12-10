@@ -45,7 +45,7 @@
  * USE_STDARG means use the ANSI <stdarg.h> facilities (only ANSI compilers
  * should do this, and only if the library supports it).
  * USE_VARARGS means use the <varargs.h> facilities.  Again, this should only
- * be done if the library supports it.	ANSI is *not* required for this.
+ * be done if the library supports it.  ANSI is *not* required for this.
  * Otherwise, the kludgy old methods are used.
  * The defaults are USE_STDARG for ANSI compilers, and USE_OLDARGS for
  * others.
@@ -54,7 +54,7 @@
 /* #define USE_VARARGS */ /* use <varargs.h> instead of <stdarg.h> */
 /* #define USE_OLDARGS */ /* don't use any variable argument facilities */
 
-#if defined(apollo)		/* Apollos have stdarg(3) but not stdarg.h */
+#if defined(apollo)     /* Apollos have stdarg(3) but not stdarg.h */
 # define USE_VARARGS
 #endif
 
@@ -64,7 +64,7 @@
 # endif
 #endif
 
-#ifdef NEED_VARARGS		/* only define these if necessary */
+#ifdef NEED_VARARGS     /* only define these if necessary */
 /*
  * These have changed since 3.4.3.  VA_END() now provides an explicit
  * closing brace to complement VA_DECL()'s hidden opening brace, so code
@@ -73,12 +73,12 @@
  * would look less strange, where VA_DECL() appeared to introduce a
  * function whose opening brace was missing; there are now visible and
  * invisible braces at beginning and end.  Sample usage:
- void foo VA_DECL(int, arg)  --macro expansion has a hidden opening brace
- {  --new, explicit opening brace (actually introduces a nested block)
- VA_START(bar);
- ...code for foo...
- VA_END();  --expansion now provides a closing brace for the nested block
- }  --existing closing brace, still pairs with the hidden one in VA_DECL()
+   void foo VA_DECL(int, arg)  --macro expansion has a hidden opening brace
+   {  --new, explicit opening brace (actually introduces a nested block)
+   VA_START(bar);
+   ...code for foo...
+   VA_END();  --expansion now provides a closing brace for the nested block
+   }  --existing closing brace, still pairs with the hidden one in VA_DECL()
  * Reading the code--or using source browsing tools which match braces--
  * results in seeing a matched set of braces.  Usage of VA_END() is
  * potentially trickier, but nethack uses it in a straightforward manner.
@@ -93,7 +93,7 @@
     (typ1 var1, typ2 var2, ...)          \
     {                                    \
         va_list the_args;
-#define VA_INIT(var1,typ1)
+#define VA_INIT(var1, typ1)
 #define VA_NEXT(var1, typ1) (var1 = va_arg(the_args, typ1))
 #define VA_ARGS the_args
 #define VA_START(x) va_start(the_args, x)
@@ -102,7 +102,7 @@
     }
 #define VA_PASS1(a1) a1
 # if defined(ULTRIX_PROTO) && !defined(_VA_LIST_)
-#  define _VA_LIST_	/* prevents multiple def in stdio.h */
+#  define _VA_LIST_ /* prevents multiple def in stdio.h */
 # endif
 #else
 # ifdef USE_VARARGS
@@ -172,7 +172,7 @@ typedef const char *vA;
 #endif /* NEED_VARARGS */
 
 #if defined(NHSTDC) || defined(MSDOS) || defined(MAC) \
-        || defined(ULTRIX_PROTO) || defined(__BEOS__)
+    || defined(ULTRIX_PROTO) || defined(__BEOS__)
 
 /*
  * Used for robust ANSI parameter forward declarations:
@@ -186,14 +186,14 @@ typedef const char *vA;
  * trampoli.* mechanism conflicts with the ANSI <<f(void)>> syntax.
  */
 
-# define NDECL(f)	f(void) /* overridden later if USE_TRAMPOLI set */
+# define NDECL(f)   f(void) /* overridden later if USE_TRAMPOLI set */
 
-# define FDECL(f,p)	f p
+# define FDECL(f, p) f p
 
 # if defined(MSDOS) || defined(USE_STDARG)
-#  define VDECL(f,p)	f p
+#  define VDECL(f, p)    f p
 # else
-#  define VDECL(f,p)	f()
+#  define VDECL(f, p)    f()
 # endif
 
 /*
@@ -204,7 +204,7 @@ typedef const char *vA;
 # define VOID_ARGS void
 
 /* generic pointer, always a macro; genericptr_t is usually a typedef */
-# define genericptr	void *
+# define genericptr void *
 
 # if (defined(ULTRIX_PROTO) && !defined(__GNUC__)) || defined(OS2_CSET2)
 /* Cover for Ultrix on a DECstation with 2.0 compiler, which coredumps on
@@ -213,7 +213,7 @@ typedef const char *vA;
  * Using the #define is OK for other compiler versions too.
  */
 /* And IBM CSet/2.  The redeclaration of free hoses the compile. */
-#  define genericptr_t	genericptr
+#  define genericptr_t  genericptr
 # else
 #  if !defined(NHSTDC) && !defined(MAC)
 #   define const
@@ -229,26 +229,26 @@ typedef const char *vA;
  * This has been observed with Lattice, MPW, and High C.
  */
 # if (defined(ULTRIX_PROTO) && !defined(NHSTDC)) || defined(apollo)
-	/* the system header files don't use `const' properly */
+/* the system header files don't use `const' properly */
 #  ifndef const
 #   define const
 #  endif
 # endif
 
-#else /* NHSTDC */	/* a "traditional" C  compiler */
+#else /* NHSTDC */  /* a "traditional" C  compiler */
 
-# define NDECL(f)	f()
-# define FDECL(f,p)	f()
-# define VDECL(f,p)	f()
+# define NDECL(f)   f()
+# define FDECL(f, p) f()
+# define VDECL(f, p) f()
 
 # define VOID_ARGS /*empty*/
 
 # if defined(AMIGA) || defined(HPUX) || defined(POSIX_TYPES) \
     || defined(__DECC) || defined(__BORLANDC__)
-#  define genericptr	void *
+#  define genericptr    void *
 # endif
 # ifndef genericptr
-#  define genericptr	char *
+#  define genericptr    char *
 # endif
 
 /*
@@ -261,7 +261,7 @@ typedef const char *vA;
 #endif /* NHSTDC */
 
 #ifndef genericptr_t
-typedef genericptr genericptr_t;	/* (void *) or (char *) */
+typedef genericptr genericptr_t;    /* (void *) or (char *) */
 #endif
 
 
@@ -396,17 +396,17 @@ typedef genericptr genericptr_t;	/* (void *) or (char *) */
 # undef NDECL
 # undef FDECL
 # undef VDECL
-# define NDECL(f)	f()
-# define FDECL(f,p)	f()
-# define VDECL(f,p)	f()
+# define NDECL(f)   f()
+# define FDECL(f, p) f()
+# define VDECL(f, p) f()
 # undef VOID_ARGS
 # define VOID_ARGS /*empty*/
 #endif
 #endif
 
 
-	/* MetaWare High-C defaults to unsigned chars */
-	/* AIX 3.2 needs this also */
+/* MetaWare High-C defaults to unsigned chars */
+/* AIX 3.2 needs this also */
 #if defined(__HC__) || defined(_AIX32)
 # undef signed
 #endif
