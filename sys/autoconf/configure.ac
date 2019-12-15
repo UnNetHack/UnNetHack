@@ -135,44 +135,32 @@ OPTIONS_FILES=
 WINTTYLIB=
 if test "$enable_tty_graphics" != "no"; then
     if test $host_os = mingw32; then
-	AC_SUBST(EXTRA_UNSHARE,["nhdefkey.dll nh340key.dll nhraykey.dll"])
-	CFLAGS="$CFLAGS -DWIN32CON"
-	WINTTYLIB=""
-	WINSRC="${WINSRC} \$(WINTTYSRC)"
-	WINOBJ="${WINOBJ} \$(WINTTYOBJ)"
-	WINLIB="${WINLIB} \$(WINTTYLIB)"
-	AC_DEFINE(TTY_GRAPHICS, [], [Console output])
+        AC_SUBST(EXTRA_UNSHARE,["nhdefkey.dll nh340key.dll nhraykey.dll"])
+        CFLAGS="$CFLAGS -DWIN32CON"
+        WINTTYLIB=""
+        WINSRC="${WINSRC} \$(WINTTYSRC)"
+        WINOBJ="${WINOBJ} \$(WINTTYOBJ)"
+        WINLIB="${WINLIB} \$(WINTTYLIB)"
+        AC_DEFINE(TTY_GRAPHICS, [], [Console output])
     else
-	# For TTY, determine the termlib
-	# Check for termlib before termcap because Solaris termcap needs libucb.
-	TERMLIB_VARIANTS="ncurses curses termlib termcap terminfo"
-	for termlib in ${TERMLIB_VARIANTS}; do
-	    AC_CHECK_LIB(${termlib}, tgetent,
-	      [WINTTYLIB="-l${termlib}"
-	      WINSRC="${WINSRC} \$(WINTTYSRC)"
-	      WINOBJ="${WINOBJ} \$(WINTTYOBJ)"
-	      WINLIB="${WINLIB} \$(WINTTYLIB)"
-	      AC_DEFINE(TTY_GRAPHICS, [], [Console output])
-	      break])
-	done
-	if test -z "$termlib"; then
-	    if test "$enable_tty_graphics" = yes; then
-		AC_MSG_ERROR([Can't find tgetent (needed for tty graphics)])
-	    else
-		AC_MSG_WARN([Can't enable tty graphics (no tgetent)])
-		NETHACK_AUTO_WIN_DISABLE(tty)
-	    fi
-	fi
-	dnl  ----- Check for tparm in curses
-	AC_CHECK_HEADERS(ncurses.h curses.h termcap.h)
-	AC_CHECK_LIB(curses, tparm, AC_DEFINE(HAVE_TPARM, 1, [Define this if you have the tparm function in an included lib.]),
-	  [AC_CHECK_LIB(ncurses, tparm, AC_DEFINE(HAVE_TPARM, 1, [Define this if you have the tparm function in an included lib.])]))
-
+        dnl  ----- Check for tparm in curses
+        LIBS=
+        AC_CHECK_HEADERS(ncurses.h curses.h termcap.h)
+        AC_SEARCH_LIBS([tparm], [ncurses curses tinfo], AC_DEFINE(HAVE_TPARM, 1, [Define this if you have the tparm function in an included lib.]))
+        TERMLIB_VARIANTS="ncurses curses tinfo termlib termcap terminfo"
+        AC_SEARCH_LIBS([has_colors], ${TERMLIB_VARIANTS},
+                     [WINTTYLIB="${LIBS}"
+                      WINSRC="${WINSRC} \$(WINTTYSRC)"
+                      WINOBJ="${WINOBJ} \$(WINTTYOBJ)"
+                      WINLIB="${WINLIB} \$(WINTTYLIB)"
+                      AC_DEFINE(TTY_GRAPHICS, [], [Console output])],
+                      AC_MSG_ERROR([Can't find working curses library (needed for tty graphics)]))
     fi
 
     OPTIONS_FILE="options"
     OPTIONS_FILES="options"
 fi
+
 if test "$enable_tty_graphics" = "no" -a $host_os = mingw32; then
     LFLAGS="$LFLAGS -mwindows"
 fi
@@ -181,28 +169,21 @@ AC_SUBST(WINTTYLIB)
 
 WINCURSESLIB=
 if test "$enable_curses_graphics" != "no"; then
-	# For curses, determine the curses lib
-	CURSES_VARIANTS="ncurses curses"
-	for curseslib in ${CURSES_VARIANTS}; do
-	    AC_CHECK_LIB(${curseslib}, tgetent,
-	      [WINCURSESLIB="-l${curseslib}"
-	      WINSRC="${WINSRC} \$(WINCURSESSRC)"
-	      WINOBJ="${WINOBJ} \$(WINCURSESOBJ)"
-	      WINLIB="${WINLIB} \$(WINCURSESLIB)"
-	      AC_DEFINE(CURSES_GRAPHICS, [], [Curses interface])
-	      break])
-	done
-	if test -z "$curseslib"; then
-	    if test "$enable_curses_graphics" = yes; then
-		AC_MSG_ERROR([Can't find tgetent (needed for curses graphics)])
-	    else
-		AC_MSG_WARN([Can't enable curses graphics (no tgetent)])
-		NETHACK_AUTO_WIN_DISABLE(curses)
-	    fi
-	fi
+    # For curses, determine the curses lib
+    LIBS=
+    AC_CHECK_HEADERS(ncurses.h curses.h termcap.h)
+    AC_SEARCH_LIBS([tparm], [ncurses curses tinfo], AC_DEFINE(HAVE_TPARM, 1, [Define this if you have the tparm function in an included lib.]))
+    CURSES_VARIANTS="ncurses curses tinfo"
+    AC_SEARCH_LIBS([has_colors], ${CURSES_VARIANTS},
+                 [WINCURSESLIB="${LIBS}"
+                  WINSRC="${WINSRC} \$(WINCURSESSRC)"
+                  WINOBJ="${WINOBJ} \$(WINCURSESOBJ)"
+                  WINLIB="${WINLIB} \$(WINCURSESLIB)"
+                  AC_DEFINE(CURSES_GRAPHICS, [], [Console output])],
+                  AC_MSG_ERROR([Can't find working curses library (needed for curses graphics)]))
 
-	OPTIONS_FILE="options"
-	OPTIONS_FILES="options"
+    OPTIONS_FILE="options"
+    OPTIONS_FILES="options"
 fi
 AC_SUBST(WINCURSESLIB)
 

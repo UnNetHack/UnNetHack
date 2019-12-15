@@ -33,7 +33,7 @@
 /* Convict class */
 #undef CONVICT
 
-/* Curses interface */
+/* Console output */
 #undef CURSES_GRAPHICS
 
 /* Unix on win32 */
