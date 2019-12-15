@@ -721,7 +721,6 @@ infodir
 docdir
 oldincludedir
 includedir
-runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -866,7 +865,6 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
-runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1119,15 +1117,6 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
-  -runstatedir | --runstatedir | --runstatedi | --runstated \
-  | --runstate | --runstat | --runsta | --runst | --runs \
-  | --run | --ru | --r)
-    ac_prev=runstatedir ;;
-  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
-  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
-  | --run=* | --ru=* | --r=*)
-    runstatedir=$ac_optarg ;;
-
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1265,7 +1254,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir runstatedir
+		libdir localedir mandir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1418,7 +1407,6 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
-  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -4934,83 +4922,19 @@ OPTIONS_FILES=
 WINTTYLIB=
 if test "$enable_tty_graphics" != "no"; then
     if test $host_os = mingw32; then
-	EXTRA_UNSHARE="nhdefkey.dll nh340key.dll nhraykey.dll"
+        EXTRA_UNSHARE="nhdefkey.dll nh340key.dll nhraykey.dll"
 
-	CFLAGS="$CFLAGS -DWIN32CON"
-	WINTTYLIB=""
-	WINSRC="${WINSRC} \$(WINTTYSRC)"
-	WINOBJ="${WINOBJ} \$(WINTTYOBJ)"
-	WINLIB="${WINLIB} \$(WINTTYLIB)"
+        CFLAGS="$CFLAGS -DWIN32CON"
+        WINTTYLIB=""
+        WINSRC="${WINSRC} \$(WINTTYSRC)"
+        WINOBJ="${WINOBJ} \$(WINTTYOBJ)"
+        WINLIB="${WINLIB} \$(WINTTYLIB)"
 
 $as_echo "#define TTY_GRAPHICS /**/" >>confdefs.h
 
     else
-	# For TTY, determine the termlib
-	# Check for termlib before termcap because Solaris termcap needs libucb.
-	TERMLIB_VARIANTS="ncurses curses termlib termcap terminfo"
-	for termlib in ${TERMLIB_VARIANTS}; do
-	    as_ac_Lib=`$as_echo "ac_cv_lib_${termlib}''_tgetent" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for tgetent in -l${termlib}" >&5
-$as_echo_n "checking for tgetent in -l${termlib}... " >&6; }
-if eval \${$as_ac_Lib+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-l${termlib}  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char tgetent ();
-int
-main ()
-{
-return tgetent ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  eval "$as_ac_Lib=yes"
-else
-  eval "$as_ac_Lib=no"
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-eval ac_res=\$$as_ac_Lib
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  WINTTYLIB="-l${termlib}"
-	      WINSRC="${WINSRC} \$(WINTTYSRC)"
-	      WINOBJ="${WINOBJ} \$(WINTTYOBJ)"
-	      WINLIB="${WINLIB} \$(WINTTYLIB)"
-
-$as_echo "#define TTY_GRAPHICS /**/" >>confdefs.h
-
-	      break
-fi
-
-	done
-	if test -z "$termlib"; then
-	    if test "$enable_tty_graphics" = yes; then
-		as_fn_error $? "Can't find tgetent (needed for tty graphics)" "$LINENO" 5
-	    else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Can't enable tty graphics (no tgetent)" >&5
-$as_echo "$as_me: WARNING: Can't enable tty graphics (no tgetent)" >&2;}
-		enable_tty_graphics="no"
-    nethack_wins=`echo $nethack_wins | sed 's/tty //'`
-
-	    fi
-	fi
-		ac_ext=c
+                LIBS=
+        ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
@@ -5420,13 +5344,12 @@ fi
 
 done
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for tparm in -lcurses" >&5
-$as_echo_n "checking for tparm in -lcurses... " >&6; }
-if ${ac_cv_lib_curses_tparm+:} false; then :
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing tparm" >&5
+$as_echo_n "checking for library containing tparm... " >&6; }
+if ${ac_cv_search_tparm+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcurses  $LIBS"
+  ac_func_search_save_LIBS=$LIBS
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -5445,29 +5368,47 @@ return tparm ();
   return 0;
 }
 _ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_curses_tparm=yes
-else
-  ac_cv_lib_curses_tparm=no
+for ac_lib in '' ncurses curses tinfo; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_tparm=$ac_res
 fi
 rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
+    conftest$ac_exeext
+  if ${ac_cv_search_tparm+:} false; then :
+  break
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_curses_tparm" >&5
-$as_echo "$ac_cv_lib_curses_tparm" >&6; }
-if test "x$ac_cv_lib_curses_tparm" = xyes; then :
+done
+if ${ac_cv_search_tparm+:} false; then :
+
+else
+  ac_cv_search_tparm=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_tparm" >&5
+$as_echo "$ac_cv_search_tparm" >&6; }
+ac_res=$ac_cv_search_tparm
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
 
 $as_echo "#define HAVE_TPARM 1" >>confdefs.h
 
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for tparm in -lncurses" >&5
-$as_echo_n "checking for tparm in -lncurses... " >&6; }
-if ${ac_cv_lib_ncurses_tparm+:} false; then :
+fi
+
+        TERMLIB_VARIANTS="ncurses curses tinfo termlib termcap terminfo"
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing has_colors" >&5
+$as_echo_n "checking for library containing has_colors... " >&6; }
+if ${ac_cv_search_has_colors+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lncurses  $LIBS"
+  ac_func_search_save_LIBS=$LIBS
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -5477,40 +5418,61 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char tparm ();
+char has_colors ();
 int
 main ()
 {
-return tparm ();
+return has_colors ();
   ;
   return 0;
 }
 _ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_ncurses_tparm=yes
-else
-  ac_cv_lib_ncurses_tparm=no
+for ac_lib in '' ${TERMLIB_VARIANTS}; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_has_colors=$ac_res
 fi
 rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
+    conftest$ac_exeext
+  if ${ac_cv_search_has_colors+:} false; then :
+  break
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_ncurses_tparm" >&5
-$as_echo "$ac_cv_lib_ncurses_tparm" >&6; }
-if test "x$ac_cv_lib_ncurses_tparm" = xyes; then :
+done
+if ${ac_cv_search_has_colors+:} false; then :
 
-$as_echo "#define HAVE_TPARM 1" >>confdefs.h
-
+else
+  ac_cv_search_has_colors=no
 fi
-
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
 fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_has_colors" >&5
+$as_echo "$ac_cv_search_has_colors" >&6; }
+ac_res=$ac_cv_search_has_colors
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+  WINTTYLIB="${LIBS}"
+                      WINSRC="${WINSRC} \$(WINTTYSRC)"
+                      WINOBJ="${WINOBJ} \$(WINTTYOBJ)"
+                      WINLIB="${WINLIB} \$(WINTTYLIB)"
 
+$as_echo "#define TTY_GRAPHICS /**/" >>confdefs.h
+
+else
+  as_fn_error $? "Can't find working curses library (needed for tty graphics)" "$LINENO" 5
+fi
 
     fi
 
     OPTIONS_FILE="options"
     OPTIONS_FILES="options"
 fi
+
 if test "$enable_tty_graphics" = "no" -a $host_os = mingw32; then
     LFLAGS="$LFLAGS -mwindows"
 fi
@@ -5519,17 +5481,27 @@ fi
 
 WINCURSESLIB=
 if test "$enable_curses_graphics" != "no"; then
-	# For curses, determine the curses lib
-	CURSES_VARIANTS="ncurses curses"
-	for curseslib in ${CURSES_VARIANTS}; do
-	    as_ac_Lib=`$as_echo "ac_cv_lib_${curseslib}''_tgetent" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for tgetent in -l${curseslib}" >&5
-$as_echo_n "checking for tgetent in -l${curseslib}... " >&6; }
-if eval \${$as_ac_Lib+:} false; then :
+    # For curses, determine the curses lib
+    LIBS=
+    for ac_header in ncurses.h curses.h termcap.h
+do :
+  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+
+fi
+
+done
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing tparm" >&5
+$as_echo_n "checking for library containing tparm... " >&6; }
+if ${ac_cv_search_tparm+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-l${curseslib}  $LIBS"
+  ac_func_search_save_LIBS=$LIBS
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -5539,53 +5511,117 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char tgetent ();
+char tparm ();
 int
 main ()
 {
-return tgetent ();
+return tparm ();
   ;
   return 0;
 }
 _ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  eval "$as_ac_Lib=yes"
-else
-  eval "$as_ac_Lib=no"
+for ac_lib in '' ncurses curses tinfo; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_tparm=$ac_res
 fi
 rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
+    conftest$ac_exeext
+  if ${ac_cv_search_tparm+:} false; then :
+  break
 fi
-eval ac_res=\$$as_ac_Lib
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  WINCURSESLIB="-l${curseslib}"
-	      WINSRC="${WINSRC} \$(WINCURSESSRC)"
-	      WINOBJ="${WINOBJ} \$(WINCURSESOBJ)"
-	      WINLIB="${WINLIB} \$(WINCURSESLIB)"
+done
+if ${ac_cv_search_tparm+:} false; then :
+
+else
+  ac_cv_search_tparm=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_tparm" >&5
+$as_echo "$ac_cv_search_tparm" >&6; }
+ac_res=$ac_cv_search_tparm
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+$as_echo "#define HAVE_TPARM 1" >>confdefs.h
+
+fi
+
+    CURSES_VARIANTS="ncurses curses tinfo"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing has_colors" >&5
+$as_echo_n "checking for library containing has_colors... " >&6; }
+if ${ac_cv_search_has_colors+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char has_colors ();
+int
+main ()
+{
+return has_colors ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' ${CURSES_VARIANTS}; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_has_colors=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_has_colors+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_has_colors+:} false; then :
+
+else
+  ac_cv_search_has_colors=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_has_colors" >&5
+$as_echo "$ac_cv_search_has_colors" >&6; }
+ac_res=$ac_cv_search_has_colors
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+  WINCURSESLIB="${LIBS}"
+                  WINSRC="${WINSRC} \$(WINCURSESSRC)"
+                  WINOBJ="${WINOBJ} \$(WINCURSESOBJ)"
+                  WINLIB="${WINLIB} \$(WINCURSESLIB)"
 
 $as_echo "#define CURSES_GRAPHICS /**/" >>confdefs.h
 
-	      break
+else
+  as_fn_error $? "Can't find working curses library (needed for curses graphics)" "$LINENO" 5
 fi
 
-	done
-	if test -z "$curseslib"; then
-	    if test "$enable_curses_graphics" = yes; then
-		as_fn_error $? "Can't find tgetent (needed for curses graphics)" "$LINENO" 5
-	    else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Can't enable curses graphics (no tgetent)" >&5
-$as_echo "$as_me: WARNING: Can't enable curses graphics (no tgetent)" >&2;}
-		enable_curses_graphics="no"
-    nethack_wins=`echo $nethack_wins | sed 's/curses //'`
 
-	    fi
-	fi
-
-	OPTIONS_FILE="options"
-	OPTIONS_FILES="options"
+    OPTIONS_FILE="options"
+    OPTIONS_FILES="options"
 fi
 
 
