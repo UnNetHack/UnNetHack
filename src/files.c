@@ -217,7 +217,7 @@ int bufsz;
 	sp = s;
 	op = callerbuf;
 	*op = '\0';
-	
+
 	while (*sp) {
 		/* Do we have room for one more character or encoding? */
 		if ((bufsz - cnt) <= 4) return callerbuf;
@@ -271,11 +271,11 @@ int bufsz;
 			sp++;
 			for (k=0; k < 16; ++k) if (*sp == hexdigits[k]) break;
 			if (k >= 16) return callerbuf;	/* impossible, so bail */
-			calc = k << 4; 
+			calc = k << 4;
 			sp++;
 			for (k=0; k < 16; ++k) if (*sp == hexdigits[k]) break;
 			if (k >= 16) return callerbuf;	/* impossible, so bail */
-			calc += k; 
+			calc += k;
 			sp++;
 			*op++ = calc;
 			*op = '\0';
@@ -354,7 +354,7 @@ char *reasonbuf;
 				fqn_prefix[prefcnt], errno, details);
 			paniclog(panicbuf1, panicbuf2);
 			failcount++;
-		}	
+		}
 	}
 	if (failcount)
 		return 0;
@@ -1693,13 +1693,18 @@ int retryct;
 	    Delay(50);
 	}
     }
+
     if (!retryct) {
 	raw_printf("I give up.  Sorry.");
 	nesting--;
 	return FALSE;
     }
 #endif /* AMIGA || WIN32 || MSDOS */
-	return TRUE;
+
+#ifdef FILE_AREAS
+    free((char *)filename);
+#endif
+    return TRUE;
 }
 
 #ifdef FILE_AREAS
@@ -1822,7 +1827,7 @@ const char *oldconfigfile =
  * the game will try the old name if there
  * is no defaults.nh.
  */
-const char *backward_compat_configfile = "nethack.cnf"; 
+const char *backward_compat_configfile = "nethack.cnf";
 #endif
 
 #ifndef MFLOPPY
@@ -2021,7 +2026,7 @@ int prefixid;
 	char *ptr;
 
 	if (!bufp) return;
-	/* Backward compatibility, ignore trailing ;n */ 
+	/* Backward compatibility, ignore trailing ;n */
 	if ((ptr = index(bufp, ';')) != 0) *ptr = '\0';
 	if (strlen(bufp) > 0) {
 		fqn_prefix[prefixid] = (char *)alloc(strlen(bufp)+2);
@@ -2369,11 +2374,11 @@ boolean		recursive;
 	/* These should move to wc_ options */
 	} else if (match_varname(buf, "QT_TILEWIDTH", 12)) {
 		extern char *qt_tilewidth;
-		if (qt_tilewidth == NULL)	
+		if (qt_tilewidth == NULL)
 			qt_tilewidth=(char *)strdup(bufp);
 	} else if (match_varname(buf, "QT_TILEHEIGHT", 13)) {
 		extern char *qt_tileheight;
-		if (qt_tileheight == NULL)	
+		if (qt_tileheight == NULL)
 			qt_tileheight=(char *)strdup(bufp);
 	} else if (match_varname(buf, "QT_FONTSIZE", 11)) {
 		extern char *qt_fontsize;
@@ -2437,7 +2442,7 @@ const char *filename;
 		}
 	}
 	(void) fclose(fp);
-	
+
 	/* turn off detection of duplicate configfile options */
 	set_duplicate_opt_detection(0);
 
