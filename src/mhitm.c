@@ -1227,14 +1227,6 @@ post_stone: if (mdef->mhp > 0) return 0;
         break;
     case AD_SGLD:
         tmp = 0;
-#ifndef GOLDOBJ
-        if (magr->mcan || !mdef->mgold) break;
-        /* technically incorrect; no check for stealing gold from
-         * between mdef's feet...
-         */
-        magr->mgold += mdef->mgold;
-        mdef->mgold = 0;
-#else
         if (magr->mcan) break;
         /* technically incorrect; no check for stealing gold from
          * between mdef's feet...
@@ -1245,7 +1237,6 @@ post_stone: if (mdef->mhp > 0) return 0;
             obj_extract_self(gold);
             add_to_minv(magr, gold);
         }
-#endif
         mdef->mstrategy &= ~STRAT_WAITFORU;
         if (vis) {
             Strcpy(buf, Monnam(magr));

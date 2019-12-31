@@ -779,7 +779,6 @@ enable_show_born
 enable_show_extinct
 enable_sortloot
 enable_dungeon_growth
-enable_goldobj
 enable_autopickup_exceptions
 enable_quiver_fired
 enable_qwertz
@@ -1485,8 +1484,6 @@ Optional Features:
   --enable-sortloot       Sort item lists alphabetically by description.
                           (default=yes)
   --enable-dungeon-growth Dungeon growth (default=yes)
-  --enable-goldobj        Gold is kept on object chains (experimental)
-                          (default=no)
   --enable-autopickup-exceptions
                           Exceptions to autopickup (default=yes)
   --enable-quiver-fired   Firing without anything quivered will ask you what
@@ -7055,25 +7052,6 @@ _ACEOF
 
 #NETHACK_ARG(shout,[Shouting and pet commands (not implemented)],SHOUT,no)
 # NETHACK_ARG(display-layers,[Support transparent tilesets],DISPLAY_LAYERS,yes)
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable goldobj" >&5
-$as_echo_n "checking whether to enable goldobj... " >&6; }
-   # Check whether --enable-goldobj was given.
-if test "${enable_goldobj+set}" = set; then :
-  enableval=$enable_goldobj;
-else
-  enable_goldobj="no"
-fi
-
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_goldobj" >&5
-$as_echo "$enable_goldobj" >&6; }
-   if test "$enable_goldobj" != "no" ; then
-
-cat >>confdefs.h <<_ACEOF
-#define GOLDOBJ /**/
-_ACEOF
-
-   fi
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable autopickup-exceptions" >&5
 $as_echo_n "checking whether to enable autopickup-exceptions... " >&6; }
    # Check whether --enable-autopickup-exceptions was given.

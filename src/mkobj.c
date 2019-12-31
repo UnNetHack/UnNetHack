@@ -714,9 +714,8 @@ void
 bless(otmp)
 register struct obj *otmp;
 {
-#ifdef GOLDOBJ
     if (otmp->oclass == COIN_CLASS) return;
-#endif
+
     otmp->cursed = 0;
     otmp->blessed = 1;
     if (carried(otmp) && confers_luck(otmp))
@@ -743,9 +742,8 @@ void
 curse(otmp)
 register struct obj *otmp;
 {
-#ifdef GOLDOBJ
     if (otmp->oclass == COIN_CLASS) return;
-#endif
+
     otmp->blessed = 0;
     otmp->cursed = 1;
     /* welded two-handed weapon interferes with some armor removal */

@@ -178,11 +178,7 @@ register struct monst *mtmp;
     } while (demand < 3000);
 
     if (
-#ifndef GOLDOBJ
-        u.ugold == 0
-#else
         money_cnt(invent) == 0
-#endif
         ) {                           /* you have no gold */
         mtmp->mpeaceful = 0;
         set_malign(mtmp);
@@ -193,11 +189,7 @@ register struct monst *mtmp;
            and removed from the game (along with said Amulet...) */
         if (mon_has_amulet(mtmp))
             demand =
-#ifndef GOLDOBJ
-                u.ugold
-#else
                 money_cnt(invent)
-#endif
                 + (long)rn1(10000, 40);
 
         pline("%s demands %ld %s for safe passage.",
@@ -226,9 +218,7 @@ struct monst *mtmp;
 {
     char buf[BUFSZ];
     long offer;
-#ifdef GOLDOBJ
     long umoney = money_cnt(invent);
-#endif
 
     getlin("How much will you offer?", buf);
     if (sscanf(buf, "%ld", &offer) != 1) offer = 0L;
@@ -242,16 +232,6 @@ struct monst *mtmp;
     } else if (offer == 0L) {
         You("refuse.");
         return 0L;
-#ifndef GOLDOBJ
-    } else if (offer >= u.ugold) {
-        You("give %s all your gold.", mon_nam(mtmp));
-        offer = u.ugold;
-    } else {
-        You("give %s %ld %s.", mon_nam(mtmp), offer, currency(offer));
-    }
-    u.ugold -= offer;
-    mtmp->mgold += offer;
-#else
     } else if (offer >= umoney) {
         You("give %s all your gold.", mon_nam(mtmp));
         offer = umoney;
@@ -259,7 +239,6 @@ struct monst *mtmp;
         You("give %s %ld %s.", mon_nam(mtmp), offer, currency(offer));
     }
     (void) money2mon(mtmp, offer);
-#endif
     flags.botl = 1;
     return(offer);
 }

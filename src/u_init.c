@@ -222,12 +222,11 @@ static struct trobj Wishing[] = {
     { WAN_WISHING, 3, WAND_CLASS, 1, 0 },
     { 0, 0, 0, 0, 0 }
 };
-#ifdef GOLDOBJ
+
 static struct trobj Money[] = {
     { GOLD_PIECE, 0, COIN_CLASS, 1, 0 },
     { 0, 0, 0, 0, 0 }
 };
-#endif
 
 /* race-based substitutions for initial inventory;
    the weaker cloak for elven rangers is intentional--they shoot better */
@@ -708,11 +707,7 @@ u_init()
         break;
 #endif  /* CONVICT */
     case PM_HEALER:
-#ifndef GOLDOBJ
-        u.ugold = u.ugold0 = rn1(1000, 1001);
-#else
         u.umoney0 = rn1(1000, 1001);
-#endif
         ini_inv(Healer);
         if(!rn2(25)) ini_inv(Lamp);
         knows_object(POT_FULL_HEALING);
@@ -762,11 +757,7 @@ u_init()
         break;
     case PM_ROGUE:
         Rogue[R_DAGGERS].trquan = rn1(10, 6);
-#ifndef GOLDOBJ
-        u.ugold = u.ugold0 = 0;
-#else
         u.umoney0 = 0;
-#endif
         ini_inv(Rogue);
         if(!rn2(5)) ini_inv(Blindfold);
         knows_object(SACK);
@@ -783,11 +774,7 @@ u_init()
 #ifdef TOURIST
     case PM_TOURIST:
         Tourist[T_DARTS].trquan = rn1(43, 21); /* 63 darts ought to be enough for anybody. */
-#ifndef GOLDOBJ
-        u.ugold = u.ugold0 = rnd(1000);
-#else
         u.umoney0 = rnd(1000);
-#endif
         ini_inv(Tourist);
         if(!rn2(25)) ini_inv(Tinopener);
         else if(!rn2(25)) ini_inv(Leash);
@@ -925,12 +912,8 @@ u_init()
         read_wizkit();
 #endif
 
-#ifndef GOLDOBJ
-    u.ugold0 += hidden_gold();  /* in case sack has gold in it */
-#else
     if (u.umoney0) ini_inv(Money);
     u.umoney0 += hidden_gold(); /* in case sack has gold in it */
-#endif
 
     find_ac();          /* get initial ac value */
     init_attr(75);          /* init attribute values */
@@ -1153,12 +1136,10 @@ register struct trobj *trop;
                 nocreate4 = otyp;
         }
 
-#ifdef GOLDOBJ
         if (trop->trclass == COIN_CLASS) {
             /* no "blessed" or "identified" money */
             obj->quan = u.umoney0;
         } else {
-#endif
         obj->dknown = obj->bknown = obj->rknown = 1;
         if (objects[otyp].oc_uses_known) obj->known = 1;
         obj->cursed = 0;
@@ -1181,9 +1162,7 @@ register struct trobj *trop;
             obj->spe = trop->trspe;
         if (trop->trbless != UNDEF_BLESS)
             obj->blessed = trop->trbless;
-#ifdef GOLDOBJ
     }
-#endif
         /* defined after setting otyp+quan + blessedness */
         obj->owt = weight(obj);
         obj = addinv(obj);

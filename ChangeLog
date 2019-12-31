@@ -7,6 +7,7 @@
 	  with OPTIONS=marathon
 	* Monster generation rate increases slower and more linearly with turn
 	  count
+	* Enable GOLDOBJ unconditionally and remove obsolete code
 
 	* dungeon layout:
 	  - Disable the rogue tribute level

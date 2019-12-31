@@ -551,11 +551,7 @@ shk_failed:
     if (Is_town_level(&u.uz))
         shkmoney /= 4;
 
-#ifndef GOLDOBJ
-    shk->mgold = shkmoney;
-#else
     mkmonmoney(shk, shkmoney);
-#endif
 
 #ifdef BLACKMARKET
     /* One-eyed Sam already got her equipment in makemon */

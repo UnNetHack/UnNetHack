@@ -24,49 +24,6 @@ register struct obj *otmp;
         (otmp == uarmh) ? "helmet" : "armor");
 }
 
-#ifndef GOLDOBJ
-long        /* actually returns something that fits in an int */
-somegold()
-{
-#ifdef LINT /* long conv. ok */
-    return(0L);
-#else
-    return (long)( (u.ugold < 100) ? u.ugold :
-                   (u.ugold > 10000) ? rnd(10000) : rnd((int) u.ugold) );
-#endif
-}
-
-void
-stealgold(mtmp)
-register struct monst *mtmp;
-{
-    register struct obj *gold = g_at(u.ux, u.uy);
-    register long tmp;
-
-    if (gold && ( !u.ugold || gold->quan > u.ugold || !rn2(5))) {
-        mtmp->mgold += gold->quan;
-        delobj(gold);
-        newsym(u.ux, u.uy);
-        pline("%s quickly snatches some gold from between your %s!",
-              Monnam(mtmp), makeplural(body_part(FOOT)));
-        if(!u.ugold || !rn2(5)) {
-            if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
-            /* do not set mtmp->mavenge here; gold on the floor is fair game */
-            monflee(mtmp, 0, FALSE, FALSE);
-        }
-    } else if(u.ugold) {
-        u.ugold -= (tmp = somegold());
-        Your("purse feels lighter.");
-        mtmp->mgold += tmp;
-        if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
-        mtmp->mavenge = 1;
-        monflee(mtmp, 0, FALSE, FALSE);
-        flags.botl = 1;
-    }
-}
-
-#else /* !GOLDOBJ */
-
 long        /* actually returns something that fits in an int */
 somegold(umoney)
 long umoney;
@@ -135,7 +92,6 @@ register struct monst *mtmp;
         flags.botl = 1;
     }
 }
-#endif /* GOLDOBJ */
 
 /* steal armor after you finish taking it off */
 unsigned int stealoid;      /* object to be stolen */
@@ -435,13 +391,6 @@ register struct obj *otmp;
 {
     int freed_otmp;
 
-#ifndef GOLDOBJ
-    if (otmp->oclass == COIN_CLASS) {
-        mtmp->mgold += otmp->quan;
-        obfree(otmp, (struct obj *)0);
-        freed_otmp = 1;
-    } else {
-#endif
     boolean snuff_otmp = FALSE;
     /* don't want hidden light source inside the monster; assumes that
        engulfers won't have external inventories; whirly monsters cause
@@ -461,9 +410,7 @@ register struct obj *otmp;
     freed_otmp = add_to_minv(mtmp, otmp);
     /* and we had to defer this until object is in mtmp's inventory */
     if (snuff_otmp) snuff_light_source(mtmp->mx, mtmp->my);
-#ifndef GOLDOBJ
-}
-#endif
+
     return freed_otmp;
 }
 
@@ -608,16 +555,6 @@ boolean is_pet;     /* If true, pet should keep wielded/worn items */
         keepobj = otmp->nobj;
         (void) add_to_minv(mtmp, otmp);
     }
-#ifndef GOLDOBJ
-    if (mtmp->mgold) {
-        register long g = mtmp->mgold;
-        (void) mkgold(g, omx, omy);
-        if (is_pet && cansee(omx, omy) && flags.verbose)
-            pline("%s drops %ld gold piece%s.", Monnam(mtmp),
-                  g, plur(g));
-        mtmp->mgold = 0L;
-    }
-#endif
 
     if (show & cansee(omx, omy))
         newsym(omx, omy);

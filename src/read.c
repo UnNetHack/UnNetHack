@@ -220,11 +220,6 @@ doread()
             You("read:");
         pline("\"1 Zorkmid. 857 GUE. In Frobs We Trust.\"");
         u.uconduct.literate++;
-#ifndef GOLDOBJ
-        /* Give it back to them, then */
-        u.ugold = scroll->quan;
-        dealloc_obj(scroll);
-#endif
         return 1;
     } else if (scroll->oartifact == ART_ORB_OF_FATE) {
         if (Blind)
@@ -1219,10 +1214,9 @@ register struct obj *sobj;
         } else {
             for (obj = invent; obj; obj = obj->nobj) {
                 long wornmask;
-#ifdef GOLDOBJ
                 /* gold isn't subject to cursing and blessing */
                 if (obj->oclass == COIN_CLASS) continue;
-#endif
+
                 wornmask = (obj->owornmask & ~(W_BALL|W_ART|W_ARTI));
                 if (wornmask && !sobj->blessed) {
                     /* handle a couple of special cases; we don't

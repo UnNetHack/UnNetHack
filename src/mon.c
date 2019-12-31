@@ -879,13 +879,8 @@ register struct monst *mtmp;
 
     if ((gold = g_at(mtmp->mx, mtmp->my)) != 0) {
         mat_idx = objects[gold->otyp].oc_material;
-#ifndef GOLDOBJ
-        mtmp->mgold += gold->quan;
-        delobj(gold);
-#else
         obj_extract_self(gold);
         add_to_minv(mtmp, gold);
-#endif
         if (cansee(mtmp->mx, mtmp->my) ) {
             if (flags.verbose && !mtmp->isgd)
                 pline("%s picks up some %s.", Monnam(mtmp),
@@ -1873,9 +1868,6 @@ register struct monst *mdef;
     mdrop_special_objs(mdef);
     /* release rest of monster's inventory--it is removed from game */
     discard_minvent(mdef);
-#ifndef GOLDOBJ
-    mdef->mgold = 0L;
-#endif
     m_detach(mdef, mdef->data);
 }
 
@@ -1887,9 +1879,6 @@ register struct monst *mdef;
     struct obj *otmp, *obj, *oldminvent;
     xchar x = mdef->mx, y = mdef->my;
     boolean wasinside = FALSE;
-#ifndef GOLDOBJ
-    long mgold=0;
-#endif
 
     /* we have to make the statue before calling mondead, to be able to
      * put inventory in it, and we have to check for lifesaving before
@@ -1930,11 +1919,6 @@ register struct monst *mdef;
             }
         }
 
-#ifndef GOLDOBJ
-        /* fix SC343-8 and C343-94 */
-        mgold = mdef->mgold;
-        mdef->mgold = 0;
-#endif
         /* defer statue creation until after inventory removal
            so that saved monster traits won't retain any stale
            item-conferred attributes */
@@ -1945,15 +1929,6 @@ register struct monst *mdef;
             oldminvent = obj->nobj;
             (void) add_to_container(otmp, obj);
         }
-#ifndef GOLDOBJ
-        if (mgold) {
-            struct obj *au;
-            au = mksobj(GOLD_PIECE, FALSE, FALSE);
-            au->quan = mgold;
-            au->owt = weight(au);
-            (void) add_to_container(otmp, au);
-        }
-#endif
         /* Archeologists should not break unique statues */
         if (mdef->data->geno & G_UNIQ)
             otmp->spe = 1;

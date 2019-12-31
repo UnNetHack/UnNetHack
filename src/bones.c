@@ -200,15 +200,6 @@ struct obj *cont;
         else
             place_object(otmp, u.ux, u.uy);
     }
-#ifndef GOLDOBJ
-    if(u.ugold) {
-        long ugold = u.ugold;
-        if (mtmp) mtmp->mgold = ugold;
-        else if (cont) (void) add_to_container(cont, mkgoldobj(ugold));
-        else (void)mkgold(ugold, u.ux, u.uy);
-        u.ugold = ugold;    /* undo mkgoldobj()'s removal */
-    }
-#endif
     if (cont) cont->owt = weight(cont);
 }
 

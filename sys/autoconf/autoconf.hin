@@ -105,9 +105,6 @@
 /* Location of other files which may be modified */
 #undef FILE_AREA_VAR
 
-/* Gold is kept on object chains (experimental) */
-#undef GOLDOBJ
-
 /* Define to 1 if you have the <curses.h> header file. */
 #undef HAVE_CURSES_H
 

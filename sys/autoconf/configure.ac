@@ -431,7 +431,6 @@ NETHACK_ARG(sortloot,[Sort item lists alphabetically by description.],SORTLOOT,y
 NETHACK_ARG(dungeon-growth,[Dungeon growth],DUNGEON_GROWTH,yes)
 #NETHACK_ARG(shout,[Shouting and pet commands (not implemented)],SHOUT,no)
 # NETHACK_ARG(display-layers,[Support transparent tilesets],DISPLAY_LAYERS,yes)
-NETHACK_ARG(goldobj,[Gold is kept on object chains (experimental)],GOLDOBJ,no)
 NETHACK_ARG(autopickup-exceptions,[Exceptions to autopickup],
   AUTOPICKUP_EXCEPTIONS,yes)
 NETHACK_ARG(quiver-fired,[Firing without anything quivered will ask you what to quiver],QUIVER_FIRED,yes)

@@ -1885,9 +1885,6 @@ struct obj *tstone;
     static const char scritch[] = "\"scritch, scritch\"";
     static const char allowall[3] = { COIN_CLASS, ALL_CLASSES, 0 };
     static const char justgems[3] = { ALLOW_NONE, GEM_CLASS, 0 };
-#ifndef GOLDOBJ
-    struct obj goldobj;
-#endif
 
     /* in case it was acquired while blinded */
     if (!Blind) tstone->dknown = 1;
@@ -1898,14 +1895,6 @@ struct obj *tstone;
     Sprintf(stonebuf, "rub on the stone%s", plur(tstone->quan));
     if ((obj = getobj(choices, stonebuf)) == 0)
         return;
-#ifndef GOLDOBJ
-    if (obj->oclass == COIN_CLASS) {
-        u.ugold += obj->quan; /* keep botl up to date */
-        goldobj = *obj;
-        dealloc_obj(obj);
-        obj = &goldobj;
-    }
-#endif
 
     if (obj == tstone && obj->quan == 1) {
         You_cant("rub %s on itself.", the(xname(obj)));
@@ -1922,9 +1911,6 @@ struct obj *tstone;
         else
             pline("A sharp crack shatters %s%s.",
                   (obj->quan > 1) ? "one of " : "", the(xname(obj)));
-#ifndef GOLDOBJ
-        /* assert(obj != &goldobj); */
-#endif
         useup(obj);
         return;
     }
@@ -2963,11 +2949,6 @@ STATIC_OVL int
 do_flip_coin(obj)
 struct obj *obj;
 {
-#ifndef GOLDOBJ
-    u.ugold += obj->quan;
-    dealloc_obj(obj);
-#endif
-
     if (nohands(youmonst.data)) {
         pline("And how would you flip the coin without hands?");
         return 0;
@@ -2980,11 +2961,7 @@ struct obj *obj;
     }
 
     You("flip %s coin.",
-#ifndef GOLDOBJ
-        (u.ugold > 1)
-#else
         (obj->quan > 1)
-#endif
         ? "a" : "the");
 
     if (!Fumbling && !Glib && !Blind &&
@@ -3004,12 +2981,8 @@ struct obj *obj;
         struct obj *gold;
         You("try to catch the coin but it slips from your %s.",
             makeplural(body_part(HAND)));
-#ifndef GOLDOBJ
-        gold = mkgoldobj(1);
-#else
         if (obj->quan > 1) gold = splitobj(obj, 1L);
         else gold = obj;
-#endif
         dropx(gold);
     }
     return 1;

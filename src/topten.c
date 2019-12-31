@@ -420,11 +420,7 @@ struct toptenentry *tt;
                                          heaven_or_hell_mode ? "hoh" :
                                          marathon_mode ? "marathon" :
                                          "normal"));
-#ifndef GOLDOBJ
-    (void)fprintf(rfile, SEP "gold=%ld", u.ugold); /* hidden_gold() is not needed anymore */
-#else
     (void)fprintf(rfile, SEP "gold=%ld", money_cnt(invent));
-#endif
     (void)fprintf(rfile, SEP "rngseed=u%s", encode_base32(level_info[0].seed));
     (void)fprintf(rfile, SEP "user_seed=%u", is_game_pre_seeded ? 1 : 0);
 

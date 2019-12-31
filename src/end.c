@@ -839,13 +839,8 @@ die:
         long tmp;
         int deepest = deepest_lev_reached(FALSE);
 
-#ifndef GOLDOBJ
-        umoney = u.ugold;
-        tmp = u.ugold0;
-#else
         umoney = money_cnt(invent);
         tmp = u.umoney0;
-#endif
         umoney += hidden_gold();    /* accumulate gold from containers */
         tmp = umoney - tmp;     /* net gain */
 
@@ -874,11 +869,7 @@ die:
 
     /* update gold for the rip output, which can't use hidden_gold()
        (containers will be gone by then if bones just got saved...) */
-#ifndef GOLDOBJ
-    u.ugold = umoney;
-#else
     done_money = umoney;
-#endif
 
 #ifdef DUMP_LOG
     dumpoverview();
