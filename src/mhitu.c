@@ -2595,7 +2595,7 @@ register struct monst *mon;
               noit_Monnam(mon),
               Blind ? (fem ? "her" : "him") : mhim(mon));
     } else if (u.umonnum == PM_LEPRECHAUN)
-        pline("%s tries to take your money, but fails...",
+        pline("%s tries to take your gold, but fails...",
               noit_Monnam(mon));
     else {
         long cost;

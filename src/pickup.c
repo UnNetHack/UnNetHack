@@ -1787,7 +1787,7 @@ dotip()
                     Hallucination ? the(rndmonnam()) : shkname(shkp));
                 money2mon(shkp, gratuity);
             } else {
-                pline("Unfortunately, you do not have enough money to tip %s.",
+                pline("Unfortunately, you do not have enough gold to tip %s.",
                       Hallucination ? the(rndmonnam()) : shkname(shkp));
             }
         }

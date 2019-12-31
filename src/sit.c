@@ -22,7 +22,7 @@ take_gold()
     if (!lost_money)  {
         You_feel("a strange sensation.");
     } else {
-        You("notice you have no money!");
+        You("notice you have no gold!");
         flags.botl = 1;
     }
 }

@@ -303,9 +303,9 @@ fnd:
             verbalize("Please follow me.");
         else {
             if (!umoney)
-                verbalize("You have hidden money.");
-            verbalize("Most likely all your money was stolen from this vault.");
-            verbalize("Please drop that money and follow me.");
+                verbalize("You have hidden gold.");
+            verbalize("Most likely all your gold was stolen from this vault.");
+            verbalize("Please drop that gold and follow me.");
         }
         EGD(guard)->gdx = gx;
         EGD(guard)->gdy = gy;
@@ -486,8 +486,8 @@ register struct monst *grd;
                 verbalize("I repeat, %sfollow me!",
                           u_carry_gold ? (
                               !umoney ?
-                              "drop that hidden money and " :
-                              "drop that money and ") : "");
+                              "drop that hidden gold and " :
+                              "drop that gold and ") : "");
 
             if(egrd->warncnt == 7) {
                 m = grd->mx;
