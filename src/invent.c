@@ -1664,10 +1664,15 @@ long quan;      /* if non-0, print this quantity, not obj->quan */
                 (dot && use_invlet ? obj->invlet : let),
                 (txt ? txt : doname(obj)), cost, currency(cost));
     } else {
-        /* ordinary inventory display or pickup message */
-        Sprintf(li, "%c - %s%s",
-                (use_invlet ? obj->invlet : let),
-                (txt ? txt : doname(obj)), (dot ? "." : ""));
+        if  (obj && obj->oclass == COIN_CLASS) {
+            Sprintf(li, "%s%s",
+                    (txt ? txt : doname(obj)), (dot ? "." : ""));
+        } else {
+            /* ordinary inventory display or pickup message */
+            Sprintf(li, "%c - %s%s",
+                    (use_invlet ? obj->invlet : let),
+                    (txt ? txt : doname(obj)), (dot ? "." : ""));
+        }
     }
     if (savequan) {
         obj->quan = savequan;
