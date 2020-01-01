@@ -39,6 +39,9 @@
 /* Unix on win32 */
 #undef CYGWIN32
 
+/* Automatic fuzzing for debugging */
+#undef DEBUG_FUZZER
+
 /* The default windowing system */
 #undef DEFAULT_WINDOW_SYS
 

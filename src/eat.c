@@ -2471,6 +2471,11 @@ unfaint()
         u.uhs = FAINTING;
     stop_occupation();
     flags.botl = 1;
+    if (iflags.debug_fuzzer) {
+        /* keep the fuzzer from fainting repeatedly */
+        u.uhs = SATIATED;
+        u.uhunger = 2000;
+    }
     return 0;
 }
 

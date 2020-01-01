@@ -419,6 +419,9 @@ give_up:
 void
 ckmailstatus()
 {
+    if (iflags.debug_fuzzer) {
+        return;
+    }
     if (u.uswallow || !flags.biff) return;
     if (mustgetmail < 0) {
 #if defined(AMIGA) || defined(MSDOS) || defined(TOS)
@@ -513,6 +516,9 @@ struct obj *otmp;
 {
 #ifdef DEF_MAILREADER
     register const char *mr = 0;
+    if (iflags.debug_fuzzer) {
+        return;
+    }
 #endif /* DEF_MAILREADER */
 #ifdef SIMPLE_MAIL
     if (iflags.simplemail)

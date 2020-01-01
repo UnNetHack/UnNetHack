@@ -94,6 +94,9 @@ static struct Bool_Opt
     {"cursesgraphics", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
     {"dark_room", &iflags.dark_room, TRUE, SET_IN_GAME},
+#ifdef DEBUG_FUZZER
+    {"debug_fuzzer", &iflags.debug_fuzzer, FALSE, SET_IN_FILE},
+#endif
     {"deathdropless", &flags.deathdropless, FALSE, SET_IN_FILE},
 #if defined(TERMLIB) && !defined(MAC_GRAPHICS_ENV)
     {"DECgraphics", &iflags.DECgraphics, FALSE, SET_IN_GAME},
@@ -3575,6 +3578,10 @@ doset()
     int biggest_name = 0;
     boolean istty = !strncmpi(windowprocs.name, "tty", 3);
     boolean ismswin = !strncmpi(windowprocs.name, "mswin", 5);
+
+    if (iflags.debug_fuzzer) {
+        return 0;
+    }
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);

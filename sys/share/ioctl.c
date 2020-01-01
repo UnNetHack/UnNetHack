@@ -154,6 +154,10 @@ setioctls()
 int
 dosuspend()
 {
+    if (iflags.debug_fuzzer) {
+        return 0;
+    }
+
 # ifdef SIGTSTP
 	if(signal(SIGTSTP, SIG_IGN) == SIG_DFL) {
 		suspend_nhwindows((char *)0);

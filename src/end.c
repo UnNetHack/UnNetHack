@@ -130,6 +130,9 @@ int sig_unused;
 int
 done2()
 {
+    if (iflags.debug_fuzzer) {
+        return 0;
+    }
     if (paranoid_yn("Really quit?", iflags.paranoid_quit) == 'n') {
 #ifndef NO_SIGNAL
         (void) signal(SIGINT, (SIG_RET_TYPE) done1);
@@ -321,9 +324,11 @@ panic VA_DECL(const char *, str)
                    !program_state.something_worth_saving ? "" :
                    " and it may be possible to rebuild.");
 # endif
-    if (program_state.something_worth_saving) {
-        set_error_savefile();
-        (void) dosave0();
+    if (!iflags.debug_fuzzer) {
+        if (program_state.something_worth_saving) {
+            set_error_savefile();
+            (void) dosave0();
+        }
     }
 #endif
 #ifdef WIN32
@@ -333,8 +338,9 @@ panic VA_DECL(const char *, str)
     livelog_game_action("panicked");
 #endif
 #if defined(WIZARD) && (defined(UNIX) || defined(VMS) || defined(LATTICE) || defined(WIN32))
-    if (wizard)
+    if (wizard || iflags.debug_fuzzer) {
         NH_abort(); /* generate core dump */
+    }
 #endif
     VA_END();
     done(PANICKED);
@@ -594,6 +600,33 @@ int how;
 #endif
     }
 
+    if (iflags.debug_fuzzer) {
+        if (!(program_state.panicking || how == PANICKED)) {
+            savelife(how);
+            /* periodically restore characteristics and lost exp levels
+               or cure lycanthropy */
+            if (!rn2(10)) {
+                struct obj *potion = mksobj((u.ulycn > LOW_PM && !rn2(3))
+                                            ? POT_WATER : POT_RESTORE_ABILITY,
+                                            TRUE, FALSE);
+
+                bless(potion);
+                (void) peffects(potion); /* always -1 for restore ability */
+                /* not useup(); we haven't put this potion into inventory */
+                obfree(potion, (struct obj *) 0);
+            }
+            killer = 0;
+            killer_format = 0;
+
+            u.uhp = u.uhpmax = 1000;
+            u.uen = u.uenmax = 1000;
+            /* increase intrinsic damage */
+            u.udaminc += 1;
+
+            return;
+        }
+    }
+
     /* kilbuf: used to copy killer in case it comes from something like
      *  xname(), which would otherwise get overwritten when we call
      *  xname() when listing possessions
@@ -697,7 +730,7 @@ die:
 
 #ifdef DUMP_LOG
     /* D: Grab screen dump right here */
-    if (dump_fn[0]) {
+    if (dump_fn[0] && !program_state.panicking) {
         dump_init();
         Sprintf(pbuf, "%s, %s %s %s %s", plname,
                 aligns[1 - u.ualign.type].adj,
@@ -712,7 +745,7 @@ die:
         dump_screen();
     }
 # ifdef DUMPMSGS
-    if (lastmsg >= 0) {
+    if (lastmsg >= 0 && !program_state.panicking) {
         char tmpbuf[BUFSZ];
         int i, j;
         dump_title("Latest messages");

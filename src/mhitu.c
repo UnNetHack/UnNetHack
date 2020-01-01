@@ -1084,7 +1084,7 @@ dopois:
 
                 while(1) {
                     /* avoid looping on "die(y/n)?" */
-                    if (lifesaved && (discover || wizard)) {
+                    if (lifesaved && (discover || wizard || iflags.debug_fuzzer)) {
                         if (wore_amulet && !uamul) {
                             /* used up AMULET_OF_LIFE_SAVING; still
                                subject to dying from brainlessness */

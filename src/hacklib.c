@@ -715,6 +715,11 @@ long seconds;
 time_t
 current_epoch()
 {
+    if (iflags.debug_fuzzer) {
+        /* 100_000 moves makes the game run from 2020-01-01 to 2020-04-25 */
+        return (time_t)(moves*10 + 1577836800);
+    }
+
     time_t date;
 
 #if defined(BSD) && !defined(POSIX_TYPES)

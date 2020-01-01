@@ -205,6 +205,7 @@ struct flag {
  */
 
 struct instance_flags {
+    boolean debug_fuzzer;  /* fuzz testing */
     boolean cbreak;     /* in cbreak mode, rogue format */
 #ifdef CURSES_GRAPHICS
     boolean classic_status;     /* What kind of horizontal statusbar to use */

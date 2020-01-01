@@ -335,6 +335,9 @@ impossible VA_DECL(const char *, s)
     Vsprintf(pbuf, s, VA_ARGS);
     pbuf[BUFSZ-1] = '\0'; /* sanity */
     paniclog("impossible", pbuf);
+    if (iflags.debug_fuzzer) {
+        panic("%s", pbuf);
+    }
     pline("%s", pbuf);
     pline("Program in disorder; you probably should S)ave and restart the process.");
     program_state.in_impossible = 0;
@@ -351,6 +354,9 @@ warning VA_DECL(const char *, s)
     pbuf[BUFSZ-1] = '\0'; /* sanity */
     paniclog("warning", pbuf);
     pline("Warning: %s\n", pbuf);
+    if (iflags.debug_fuzzer) {
+        panic("Warning: %s", pbuf);
+    }
     VA_END();
 }
 

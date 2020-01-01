@@ -2968,6 +2968,9 @@ tty_nhgetch()
      */
     if (WIN_MESSAGE != WIN_ERR && wins[WIN_MESSAGE])
         wins[WIN_MESSAGE]->flags &= ~WIN_STOP;
+    if (iflags.debug_fuzzer) {
+        i = randomkey();
+    } else {
 #ifdef UNIX
     i = ((++nesting == 1) ? tgetch() :
          (read(fileno(stdin), (genericptr_t)&nestbuf, 1) == 1 ? (int)nestbuf :
@@ -2976,6 +2979,7 @@ tty_nhgetch()
 #else
     i = tgetch();
 #endif
+    }
     if (!i) i = '\033'; /* map NUL to ESC since nethack doesn't expect NUL */
     if (ttyDisplay && ttyDisplay->toplin == 1)
         ttyDisplay->toplin = 2;

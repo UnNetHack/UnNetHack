@@ -8,6 +8,7 @@
 	* Monster generation rate increases slower and more linearly with turn
 	  count
 	* Enable GOLDOBJ unconditionally and remove obsolete code
+	* Add automatic fuzzer for debugging
 
 	* dungeon layout:
 	  - Disable the rogue tribute level

@@ -800,6 +800,7 @@ enable_wizmode
 with_owner
 with_group
 enable_file_areas
+enable_debug_fuzzer
 with_gamesdir
 with_bonesdir
 with_savesdir
@@ -1519,6 +1520,7 @@ Optional Features:
   --enable-wizmode=USER   enable wizard mode for the specified user
                           (default=yes, default user=[wizard])
   --enable-file-areas     Place files in different directories (default=yes)
+  --enable-debug-fuzzer   Automatic fuzzing for debugging (default=no)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -7565,6 +7567,25 @@ $as_echo "$enable_file_areas" >&6; }
 
 cat >>confdefs.h <<_ACEOF
 #define FILE_AREAS /**/
+_ACEOF
+
+   fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable debug-fuzzer" >&5
+$as_echo_n "checking whether to enable debug-fuzzer... " >&6; }
+   # Check whether --enable-debug-fuzzer was given.
+if test "${enable_debug_fuzzer+set}" = set; then :
+  enableval=$enable_debug_fuzzer;
+else
+  enable_debug_fuzzer="no"
+fi
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_debug_fuzzer" >&5
+$as_echo "$enable_debug_fuzzer" >&6; }
+   if test "$enable_debug_fuzzer" != "no" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define DEBUG_FUZZER /**/
 _ACEOF
 
    fi

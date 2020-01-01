@@ -508,6 +508,7 @@ fi
 
 
 NETHACK_ARG(file-areas,[Place files in different directories],FILE_AREAS,yes)
+NETHACK_ARG(debug-fuzzer,[Automatic fuzzing for debugging],DEBUG_FUZZER,no)
 
 AC_DEFUN([NETHACK_DIR_SET],
   [

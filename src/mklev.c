@@ -1264,7 +1264,10 @@ mklev()
     }
     set_wall_state();
 
-    reseed_random();
+    if (!iflags.debug_fuzzer) {
+        /* deterministic game state is a feature with fuzzing */
+        reseed_random();
+    }
 }
 
 void
