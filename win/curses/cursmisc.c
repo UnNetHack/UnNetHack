@@ -4,6 +4,7 @@
 #include "hack.h"
 #include "wincurs.h"
 #include "cursmisc.h"
+#include "cursstat.h"
 #include "func_tab.h"
 #include "dlb.h"
 
@@ -552,7 +553,7 @@ curses_view_file(const char *filename, boolean must_exist)
 #else
     dlb *fp = dlb_fopen(filename, "r");
 #endif
-    
+
     if ((fp == NULL) && (must_exist)) {
         pline("Cannot open %s for reading!", filename);
     }

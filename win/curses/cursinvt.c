@@ -4,6 +4,7 @@
 #include "hack.h"
 #include "wincurs.h"
 #include "cursinvt.h"
+#include "cursdial.h"
 
 /* Permanent inventory for curses interface */
 
@@ -104,7 +105,7 @@ curses_add_inv(int y, int glyph, CHAR_P accelerator, attr_t attr,
             attr |= curses_color_attr(color, 0);
     }
 #endif
-    
+
     wattron(win, attr);
     wprintw(win, "%s", str);
     wattroff(win, attr);

@@ -45,6 +45,10 @@ static void NDECL(wd_message);
 static boolean wiz_error_flag = FALSE;
 #endif
 
+#ifdef UTF8_GLYPHS
+extern void check_utf8_console();
+#endif
+
 int
 main(argc,argv)
 int argc;

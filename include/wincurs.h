@@ -294,6 +294,7 @@ extern void curses_display_splash_window(void);
 
 extern void curses_cleanup(void);
 
+extern int curses_debug_show_colors(void);
 
 /* cursmesg.c */
 

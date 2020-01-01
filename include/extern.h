@@ -202,6 +202,9 @@ E void NDECL(list_vanquishedonly);
 #ifdef TTY_GRAPHICS
 E int tty_debug_show_colors();
 #endif
+#ifdef CURSES_GRAPHICS
+E int curses_debug_show_colors();
+#endif
 
 /* ### dbridge.c ### */
 
@@ -1230,6 +1233,7 @@ E void FDECL(add_to_buried, (struct obj *));
 E void FDECL(dealloc_obj, (struct obj *));
 E void FDECL(obj_ice_effects, (int, int, BOOLEAN_P));
 E long FDECL(peek_at_iced_corpse_age, (struct obj *));
+E int do_stair_travel(char);
 #ifdef WIZARD
 E void NDECL(obj_sanity_check);
 #endif
@@ -1570,6 +1574,7 @@ E boolean FDECL(parse_monster_color, (char *));
 E boolean FDECL(parse_symbol, (const char *));
 E boolean FDECL(parse_monster_symbol, (const char *));
 E boolean FDECL(parse_object_symbol, (const char *));
+E boolean parse_color_definition(const char *);
 E int NDECL(doset);
 E int NDECL(dotogglepickup);
 E void NDECL(option_help);
@@ -2157,7 +2162,8 @@ E boolean FDECL(enexto_core_range, (coord *,XCHAR_P,XCHAR_P,struct permonst *,un
 E int FDECL(epathto, (coord *,int,XCHAR_P,XCHAR_P,struct permonst *));
 E void FDECL(teleds, (int,int,BOOLEAN_P));
 E boolean FDECL(safe_teleds, (BOOLEAN_P));
-E boolean FDECL(teleport_pet, (struct monst *,BOOLEAN_P));
+E boolean FDECL(teleport_pet, (struct monst *, BOOLEAN_P));
+E void new_tele(boolean);
 E void NDECL(tele);
 E int NDECL(dotele);
 E void NDECL(level_tele);
@@ -2340,7 +2346,7 @@ E int FDECL(remove_area, (const char *, const char *));
 /* ### unixres.c ### */
 
 #ifdef UNIX
-# ifdef GNOME_GRAPHICS 
+# ifdef GNOME_GRAPHICS
 E int FDECL(hide_privileges, (BOOLEAN_P));
 # endif
 #endif /* UNIX */
@@ -2645,9 +2651,12 @@ E void FDECL(remove_corpse, (struct obj *));
 E boolean NDECL(livelog_start);
 E void NDECL(livelog_achieve_update);
 E void FDECL(livelog_wish, (char*));
-#ifdef LIVELOG_SHOUT
+# ifdef LIVELOG_SHOUT
 E int NDECL(doshout);
-#endif
+# endif
+# ifdef LIVELOG_BONES_KILLER
+E void livelog_bones_killed(struct monst *);
+# endif
 E void FDECL(livelog_shoplifting, (const char*, const char*, long));
 #endif
 E void FDECL(livelog_game_started, (const char*, const char*, const char*, const char*));

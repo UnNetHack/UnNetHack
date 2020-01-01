@@ -80,7 +80,13 @@ void FDECL(savetoken, (char *));
 void NDECL(newline);
 void FDECL(advancepos, (char *));
 
-extern char FDECL(core_func_retval, (int idx));
+extern void VDECL(lc_error, (const char *, ...));
+
+extern char FDECL(core_func_retval, (int));
+extern int FDECL(is_core_func, (char *));
+extern int FDECL(core_func_idx, (char *));
+
+extern void FDECL(yyerror, (const char *));
 
 /*
  * This doesn't always get put in lev_comp.h
