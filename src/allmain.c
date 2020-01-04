@@ -249,7 +249,7 @@ moveloop()
                      * it reaches the point it will be at as if you were post-Invocation.
                      *
                      * The rate increases linearly with turns.  The rule of thumb is that
-                     * at turn x the rate is approximately (x / 30.0000) times the normal
+                     * at turn x the rate is approximately (x / 30,000) times the normal
                      * rate.  Maximal rate is 7x the normal rate.
                      */
                     monclock = MIN_MONGEN_RATE;
