@@ -20,7 +20,7 @@
 extern char msgs[][BUFSZ];
 extern int lastmsg;
 void FDECL(do_vanquished, (int, BOOLEAN_P));
-#endif 
+#endif
 
 #ifdef DUMP_LOG
 FILE *dump_fp = (FILE *)0;  /**< file pointer for text dumps */
@@ -225,8 +225,8 @@ const char *pre, *str;
 extern boolean get_menu_coloring(const char *str, int *color, int *attr);
 #endif
 
-static char tmp_html_link[BUFSZ];
-static char tmp_html_link_name[BUFSZ];
+static char tmp_html_link[4*BUFSZ];
+static char tmp_html_link_name[2*BUFSZ];
 /** Return a link to nethackwiki . */
 char *
 html_link(link_name, name)
@@ -238,9 +238,10 @@ const char *name;
         sprintf(eos(tmp_html_link_name), "%s", html_escape_character(*name++));
     }
 
-    snprintf(tmp_html_link, BUFSZ,
-            "<a href=\"http://nethackwiki.com/wiki/%s\">%s</a>",
-            link_name, tmp_html_link_name);
+    snprintf(tmp_html_link, sizeof(tmp_html_link),
+             "<a href=\"http://nethackwiki.com/wiki/%s\">%s</a>",
+             link_name, tmp_html_link_name);
+
     return tmp_html_link;
 }
 
