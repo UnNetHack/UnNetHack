@@ -1750,6 +1750,10 @@ boolean want_disp;
         else if (prot > 0)
             you_are("protected");
     }
+    if (Half_gas_damage) {
+        enl_msg(You_, "take", "took", " reduced poison gas damage");
+    }
+    /* polymorph and other shape change */
     if (Protection_from_shape_changers)
         you_are("protected from shape changers");
     if (Polymorph) you_are("polymorphing");

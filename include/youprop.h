@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)youprop.h  3.4 1999/07/02  */
 /* Copyright (c) 1989 Mike Threepoint                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -371,5 +370,9 @@
 #define Unaware (multi < 0 && (unconscious() || is_fainted()))
 
 #define Hate_silver (u.ulycn >= LOW_PM || hates_silver(youmonst.data))
+
+/* _Hitchhikers_Guide_to_the_Galaxy_ on uses for 'towel': "wrap it round
+   your head to ward off noxious fumes" [we require it to be damp or wet] */
+#define Half_gas_damage (ublindf && ublindf->otyp == TOWEL && ublindf->spe > 0)
 
 #endif /* YOUPROP_H */

@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)dothrow.c  3.4 2003/12/04  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2175,7 +2174,8 @@ boolean from_invent;
             angry_priest();
         } else if (distu(x, y) <= 2) {
             if (!breathless(youmonst.data) || haseyes(youmonst.data)) {
-                if (obj->otyp != POT_WATER) {
+                /* wet towel protects both eyes and breathing */
+                if (obj->otyp != POT_WATER && !Half_gas_damage) {
                     if (!breathless(youmonst.data))
                         /* [what about "familiar odor" when known?] */
                         You("smell a peculiar odor...");

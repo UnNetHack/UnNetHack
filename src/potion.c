@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)potion.c   3.4 2002/10/02  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1701,7 +1700,13 @@ register struct obj *obj;
        remains in inventory where our caller expects it to be */
     obj->in_use = 1;
 
-    switch (obj->otyp) {
+    /* wearing a wet towel protects both eyes and breathing, even when
+       the breath effect might be beneficial; we still pass down to the
+       naming opportunity in case potion was thrown at hero by a monster */
+    switch (Half_gas_damage ? TOWEL : obj->otyp) {
+    case TOWEL:
+        pline("Some vapor passes harmlessly around you.");
+        break;
     case POT_RESTORE_ABILITY:
     case POT_GAIN_ABILITY:
         if (obj->cursed) {

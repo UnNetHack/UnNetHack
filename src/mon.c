@@ -3319,62 +3319,87 @@ int typ;
     pline("You%s.", poiseff[typ]);
 }
 
+/** Called when an attack or trap has poisoned hero */
 void
-poisoned(string, typ, pname, fatal)
-const char *string, *pname;
-int typ, fatal;
+poisoned(const char *reason,    /* controls what messages we display */
+         int typ,
+         const char *pkiller,   /* for score+log file if fatal */
+         int fatal)             /* if fatal is 0, limit damage to adjattrib */
 {
-    int i, plural, kprefix = KILLED_BY_AN;
+    int i, loss, plural, kprefix = KILLED_BY_AN;
     boolean thrown_weapon = (fatal < 0);
     int how;
+    boolean blast = !strcmp(reason, "blast");
 
-    if (thrown_weapon) fatal = -fatal;
-    if(strcmp(string, "blast") && !thrown_weapon) {
-        /* 'blast' has already given a 'poison gas' message */
-        /* so have "poison arrow", "poison dart", etc... */
-        plural = (string[strlen(string) - 1] == 's') ? 1 : 0;
-        /* avoid "The" Orcus's sting was poisoned... */
-        pline("%s%s %s poisoned!", isupper(*string) ? "" : "The ",
-              string, plural ? "were" : "was");
+    if (thrown_weapon) {
+        fatal = -fatal;
     }
 
-    if(Poison_resistance) {
-        if(!strcmp(string, "blast")) shieldeff(u.ux, u.uy);
+    /* inform player about being poisoned unless that's already been done;
+       "blast" has given a "blast of poison gas" message; "poison arrow",
+       "poison dart", etc have implicitly given poison messages too... */
+    if (!blast && !strstri(reason, "poison")) {
+        boolean plural = (reason[strlen(reason) - 1] == 's') ? 1 : 0;
+
+        /* avoid "The" Orcus's sting was poisoned... */
+        pline("%s%s %s poisoned!", isupper(*reason) ? "" : "The ",
+              reason, plural ? "were" : "was");
+    }
+
+    if (Poison_resistance) {
+        if (blast) {
+            shieldeff(u.ux, u.uy);
+        }
         pline_The("poison doesn't seem to affect you.");
         return;
     }
+
     /* suppress killer prefix if it already has one */
-    if ((i = name_to_mon(pname)) >= LOW_PM && mons[i].geno & G_UNIQ) {
+    i = name_to_mon(pkiller);
+    if (i >= LOW_PM && (mons[i].geno & G_UNIQ)) {
         kprefix = KILLED_BY;
-        if (!type_is_pname(&mons[i])) pname = the(pname);
-    } else if (!strncmpi(pname, "the ", 4) ||
-               !strncmpi(pname, "an ", 3) ||
-               !strncmpi(pname, "a ", 2)) {
+        if (!type_is_pname(&mons[i])) {
+            pkiller = the(pkiller);
+        }
+    } else if (!strncmpi(pkiller, "the ", 4) ||
+               !strncmpi(pkiller, "an ", 3) ||
+               !strncmpi(pkiller, "a ", 2)) {
         /*[ does this need a plural check too? ]*/
         kprefix = KILLED_BY;
     }
 
-    how = strstri(pname, "poison") ? DIED : POISONING;
-    i = rn2(fatal + 20*thrown_weapon);
-    if(i == 0 && typ != A_CHA) {
+    how = strstri(pkiller, "poison") ? DIED : POISONING;
+    i = !fatal ? 1 : rn2(fatal + (thrown_weapon ? 20 : 0));
+    if (i == 0 && typ != A_CHA) {
         /* used to be instantly fatal; now just gongs your maxhp for (3d6)/2
          * ...which is probably pretty close to fatal anyway for low-levels */
         pline_The("poison was extremely toxic!");
         i = d(4, 6);
         u.uhpmax -= i / 2;
-        losehp_how(i, pname, kprefix, how);
-    } else if(i <= 5) {
-        /* Check that a stat change was made */
-        if (adjattrib(typ, thrown_weapon ? -1 : -rn1(3, 3), 1))
-            pline("You%s!", poiseff[typ]);
+        losehp_how(i, pkiller, kprefix, how);
+    } else if (i > 5) {
+        boolean cloud = !strcmp(reason, "gas cloud");
+
+        /* HP damage; more likely--but less severe--with missiles */
+        loss = thrown_weapon ? rnd(6) : rn1(10, 6);
+        if ((blast || cloud) && Half_gas_damage) {
+            /* worn towel */
+            loss = (loss + 1) / 2;
+        }
+        losehp(loss, pkiller, kprefix); /* poison damage */
     } else {
-        i = thrown_weapon ? rnd(6) : rn1(10, 6);
-        if(Half_physical_damage) i = (i+1) / 2;
-        losehp(i, pname, kprefix);
+        /* attribute loss; if typ is A_STR, reduction in current and
+           maximum HP will occur once strength has dropped down to 3 */
+        loss = (thrown_weapon || !fatal) ? 1 : d(2, 2); /* was rn1(3,3) */
+        /* check that a stat change was made */
+        if (adjattrib(typ, -loss, 1)) {
+            poisontell(typ);
+        }
     }
-    if(u.uhp < 1) {
+
+    if (u.uhp < 1) {
         killer.format = kprefix;
-        Strcpy(killer.name, pname);
+        Strcpy(killer.name, pkiller);
         /* "Poisoned by a poisoned ___" is redundant */
         done(how);
     }
