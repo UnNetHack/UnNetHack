@@ -3136,6 +3136,8 @@ randomkey()
         c = '>';
     }
 
+    fuzzer_printf("key: %d, %c\n", c, c);
+
     return c;
 }
 
@@ -4599,7 +4601,13 @@ doautofight()
             if (!isok(u.ux+i, u.uy+j)) continue;
             mtmp = m_at(u.ux+i, u.uy+j);
             if (mtmp && canspotmon(mtmp) && !is_safepet(mtmp)) {
-                if (attack(mtmp)) return 1;
+                if (iflags.debug_fuzzer) { // TODO REMOVE ME
+                    FILE * fp = fopen ("/tmp/debug.txt", "a");
+                    fprintf(fp, "autoattacking monster %s at %dx%d\n", mtmp->data->mname, mtmp->mx, mtmp->my);
+                    fclose(fp);
+                }
+
+                //if (attack(mtmp)) return 1;
                 break;
             }
         }

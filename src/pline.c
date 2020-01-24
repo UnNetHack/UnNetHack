@@ -145,6 +145,9 @@ pline VA_DECL(const char *, line)
     if (u.ux) {
         flush_screen(1); /* %% */
     }
+
+    fuzzer_printf("pline: %s\n", line);
+
     if (typ == MSGTYP_NOSHOW) return;
     if (typ == MSGTYP_NOREP && !strcmp(line, prevmsg)) return;
     putmesg(line);
@@ -614,6 +617,24 @@ self_invis_message()
           Hallucination ? "Far out, man!  You" : "Gee!  All of a sudden, you",
           See_invisible ? "can see right through yourself" :
           "can't see yourself");
+}
+
+#include <stdio.h>
+#include <stdarg.h>
+
+void
+fuzzer_printf(const char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+
+    if (iflags.debug_fuzzer) {
+        FILE * fp = fopen ("/tmp/debug.txt", "a");
+        fprintf(fp, "%ld: moves: %ld; ", game_loop_counter, moves);
+        vfprintf(fp, fmt, args);
+        fclose(fp);
+    }
+    va_end(args);
 }
 
 /*pline.c*/

@@ -319,6 +319,9 @@ boolean resuming;
 
                     monstermoves++;
                     moves++;
+                    if (moves >= 199999) { printf("moves: %ld\n", moves); done(PANICKED); }
+                    if (wizard) { iflags.debug_fuzzer = FALSE; }
+                    //if (moves >= 169122) { iflags.debug_fuzzer = FALSE; wizard = TRUE; }
 
                     /********************************/
                     /* once-per-turn things go here */
@@ -516,6 +519,7 @@ boolean resuming;
         /* once-per-player-input things go here */
         /****************************************/
         game_loop_counter++;
+        //if (game_loop_counter == 95596) { iflags.debug_fuzzer = FALSE; wizard = TRUE; }
 
         find_ac();
         if(!flags.mv || Blind) {
@@ -742,6 +746,13 @@ newgame()
         mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;
 
     init_level_seeds();
+
+    FILE * fp = fopen ("/tmp/debug_fuzzer.txt", "a");
+    /* temporarily deactivate fuzzing for getting the real time */
+    iflags.debug_fuzzer = FALSE;
+    fprintf(fp, "time=%s\tseed:u%s\n", iso8601(0), encode_base32(level_info[0].seed));
+    iflags.debug_fuzzer = TRUE;
+    fclose(fp);
 
     init_objects();     /* must be before u_init() */
 
