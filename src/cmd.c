@@ -2373,6 +2373,21 @@ wiz_show_stats()
 }
 
 void
+trap_sanity_check()
+{
+    struct trap *trap = ftrap;
+    while (trap) {
+        if ((trap->tx < 0) || (trap->ty < 0)) {
+            impossible("trap out of bound: ttyp: %d, %dx%d", trap->ttyp, trap->tx, trap->ty);
+        }
+        if (trap->ttyp == NO_TRAP) {
+            impossible("trap typ NO_TRAP: ttyp: %d, %dx%d", trap->ttyp, trap->tx, trap->ty);
+        }
+        trap = trap->ntrap;
+    }
+}
+
+void
 sanity_check()
 {
     obj_sanity_check();
@@ -2380,6 +2395,7 @@ sanity_check()
     mon_sanity_check();
     light_sources_sanity_check();
     bc_sanity_check();
+    trap_sanity_check();
 }
 
 #ifdef DEBUG_MIGRATING_MONS
