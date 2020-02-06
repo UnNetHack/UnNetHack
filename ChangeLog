@@ -8,6 +8,7 @@
 	* Monster generation rate increases slower and more linearly with turn
 	  count
 	* Enable GOLDOBJ unconditionally and remove obsolete code
+	* Rename the Dark One to Anaraxis the Black (from xNetHack)
 	* Port NetHack 3.6 improvements, non exhaustive list:
 	  - Automatic fuzzer for debugging
 	  - Statues as monster symbols

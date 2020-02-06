@@ -379,7 +379,7 @@ const struct Role roles[] = {
         "Ptah", "Thoth", "Anhur", /* Egyptian */
         "Wiz", "the Lonely Tower", "the Tower of Darkness",
         PM_WIZARD, NON_PM, PM_KITTEN,
-        PM_NEFERET_THE_GREEN, PM_APPRENTICE, PM_DARK_ONE,
+        PM_NEFERET_THE_GREEN, PM_APPRENTICE, PM_ANARAXIS_THE_BLACK,
         ART_EYE_OF_THE_AETHIOPICA,
         MH_HUMAN|MH_ELF|MH_GNOME|MH_ORC|MH_VAMPIRE | ROLE_MALE|ROLE_FEMALE |
         ROLE_NEUTRAL|ROLE_CHAOTIC,
