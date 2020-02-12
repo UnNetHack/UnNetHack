@@ -2396,6 +2396,7 @@ sanity_check()
     light_sources_sanity_check();
     bc_sanity_check();
     trap_sanity_check();
+    sanity_check_shopkeepers();
 }
 
 #ifdef DEBUG_MIGRATING_MONS

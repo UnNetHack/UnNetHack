@@ -3450,12 +3450,14 @@ xchar x, y;
 
         switch (sell_response ? sell_response : nyaq(qbuf)) {
         case 'q':  sell_response = 'n';
+            /* fall through */
         case 'n':  if (container)
                 dropped_container(obj, shkp, FALSE);
             if (!obj->unpaid) obj->no_charge = 1;
             subfrombill(obj, shkp);
             break;
         case 'a':  sell_response = 'y';
+            /* fall through */
         case 'y':  if (container)
                 dropped_container(obj, shkp, TRUE);
             if (!obj->unpaid && !saleitem) obj->no_charge = 1;
@@ -4898,5 +4900,17 @@ sasc_bug(struct obj *op, unsigned x){
     op->unpaid=x;
 }
 #endif
+
+void
+sanity_check_shopkeepers()
+{
+    struct monst *mtmp;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (has_eshk(mtmp)) {
+            shop_debt(ESHK(mtmp));
+        }
+    }
+}
 
 /*shk.c*/

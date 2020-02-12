@@ -2214,6 +2214,7 @@ E void FDECL(bars_around_portal, (BOOLEAN_P));
 #endif /* BLACKMARKET */
 E char *FDECL(shk_your, (char *, struct obj *));
 E char *FDECL(Shk_Your, (char *, struct obj *));
+extern void sanity_check_shopkeepers();
 
 /* ### shknam.c ### */
 
