@@ -988,39 +988,17 @@ register const char *let, *word;
             allowcnt = 2;   /* signal presence of cnt */
             ilet = readchar();
         }
-        if(digit(ilet)) {
+        if (digit(ilet)) {
             pline("No count allowed with this command.");
             continue;
         }
-        if(index(quitchars, ilet)) {
+        if (index(quitchars, ilet)) {
             if(flags.verbose)
                 pline("%s", Never_mind);
             return((struct obj *)0);
         }
-        if(ilet == '-') {
+        if (ilet == '-') {
             return(allownone ? &zeroobj : (struct obj *) 0);
-        }
-        if(ilet == def_oc_syms[COIN_CLASS]) {
-            if (!usegold) {
-                if (!strncmp(word, "rub on ", 7)) {
-                    /* the dangers of building sentences... */
-                    You("cannot rub gold%s.", word + 3);
-                } else {
-                    You("cannot %s gold.", word);
-                }
-                return (struct obj *)0;
-            }
-            if(cnt == 0 && prezero) return((struct obj *)0);
-            /* Historic note: early Nethack had a bug which was
-             * first reported for Larn, where trying to drop 2^32-n
-             * gold pieces was allowed, and did interesting things
-             * to your money supply.  The LRS is the tax bureau
-             * from Larn.
-             */
-            if(cnt < 0) {
-                pline_The("LRS would be very interested to know you have that much.");
-                return (struct obj *)0;
-            }
         }
         if(ilet == '?' || ilet == '*') {
             char *allowed_choices = (ilet == '?') ? lets : (char *)0;
@@ -1045,7 +1023,37 @@ register const char *let, *word;
             }
             /* they typed a letter (not a space) at the prompt */
         }
-        if(allowcnt == 2 && !strcmp(word, "throw")) {
+        /* find the item which was picked */
+        for (otmp = invent; otmp; otmp = otmp->nobj) {
+            if (otmp->invlet == ilet) {
+                break;
+            }
+        }
+        if (otmp && otmp->oclass == COIN_CLASS) {
+            if (!usegold) {
+                if (!strncmp(word, "rub on ", 7)) {
+                    /* the dangers of building sentences... */
+                    You("cannot rub gold%s.", word + 3);
+                } else {
+                    You("cannot %s gold.", word);
+                }
+                return (struct obj *)0;
+            }
+            if (cnt == 0 && prezero) {
+                return (struct obj *)0;
+            }
+            /* Historic note: early Nethack had a bug which was
+             * first reported for Larn, where trying to drop 2^32-n
+             * gold pieces was allowed, and did interesting things
+             * to your money supply.  The LRS is the tax bureau
+             * from Larn.
+             */
+            if (cnt < 0) {
+                pline_The("LRS would be very interested to know you have that much.");
+                return (struct obj *)0;
+            }
+        }
+        if (allowcnt == 2 && !strcmp(word, "throw")) {
             /* permit counts for throwing gold, but don't accept
              * counts for other things since the throw code will
              * split off a single item anyway */
@@ -1972,14 +1980,16 @@ struct obj *obj;
         any.a_void = (genericptr_t)dounwield;
         add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'w', 0, ATR_NONE,
                  "Unwield your weapon", MENU_UNSELECTED);
-    } else if (obj->oclass == WEAPON_CLASS || obj->otyp == PICK_AXE ||
+    } else if (obj->oclass == WEAPON_CLASS ||
+               obj->otyp == PICK_AXE ||
+               obj->otyp == CRYSTAL_PICK ||
                obj->otyp == UNICORN_HORN)
         add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'w', 0, ATR_NONE,
                  "Wield this as your weapon", MENU_UNSELECTED);
     else if (obj->otyp == TIN_OPENER)
         add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'w', 0, ATR_NONE,
                  "Hold the tin opener to open tins", MENU_UNSELECTED);
-    else
+    else if (obj->oclass != COIN_CLASS)
         add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'w', 0, ATR_NONE,
                  "Hold this item in your hands", MENU_UNSELECTED);
     /* W: Equip this item */
