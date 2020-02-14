@@ -442,7 +442,9 @@ include_pop()
 int
 yywrap()
 {
-    if (doing_included_file >= 0) include_pop();
+    if (doing_included_file > 0) {
+        include_pop();
+    }
     return 1;
 }
 
