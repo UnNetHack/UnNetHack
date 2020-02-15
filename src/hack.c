@@ -3898,4 +3898,20 @@ struct obj *otmp;
     return 0L;
 }
 
+boolean
+MON_AT(int x, int y)
+{
+    assert_valid_coordinates(x, y);
+
+    return (level.monsters[x][y] != (struct monst *)0 && !(level.monsters[x][y])->mburied);
+}
+
+boolean
+OBJ_AT(int x, int y)
+{
+    assert_valid_coordinates(x, y);
+
+    return (level.objects[x][y] != (struct obj *)0);
+}
+
 /*hack.c*/

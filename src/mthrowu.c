@@ -1232,7 +1232,10 @@ boolean your_fault, from_invent;
 {
     struct obj *otmp = *obj_p;
     int obj_type = otmp->otyp;
+    assert_valid_coordinates(objx, objy);
+    assert_valid_coordinates(barsx, barsy);
     boolean unbreakable = (levl[barsx][barsy].wall_info & W_NONDIGGABLE) != 0;
+
 
     if (your_fault ? hero_breaks(otmp, objx, objy, from_invent) : breaks(otmp, objx, objy)) {
         *obj_p = 0; /* object is now gone */

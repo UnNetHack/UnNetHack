@@ -876,6 +876,8 @@ E int NDECL(max_capacity);
 E boolean FDECL(check_capacity, (const char *));
 E int FDECL(inv_cnt, (BOOLEAN_P));
 E long FDECL(money_cnt, (struct obj *));
+extern boolean MON_AT(int, int);
+extern boolean OBJ_AT(int, int);
 
 /* ### hacklib.c ### */
 

@@ -598,17 +598,17 @@ extern dlevel_t level;  /* structure describing the current level */
 #define trap_to_defsym(t) (S_arrow_trap+(t)-1)
 #define defsym_to_trap(d) ((d)-S_arrow_trap+1)
 
-#define OBJ_AT(x, y) (level.objects[x][y] != (struct obj *)0)
+#define assert_valid_coordinates(x, y) \
+    ((x < 0 || y < 0 || x >= COLNO || y >= ROWNO) ? abort() : TRUE)
 /*
  * Macros for encapsulation of level.monsters references.
  */
-#define MON_AT(x, y) (level.monsters[x][y] != (struct monst *)0 && \
-                      !(level.monsters[x][y])->mburied)
 #define MON_BURIED_AT(x, y)  (level.monsters[x][y] != (struct monst *)0 && \
                               (level.monsters[x][y])->mburied)
 #ifdef EXTRA_SANITY_CHECKS
 #define place_worm_seg(m, x, y) \
     do {                                                        \
+        assert_valid_coordinates(x, y);                         \
         if (level.monsters[x][y] && level.monsters[x][y] != m)  \
             impossible("place_worm_seg over mon");              \
         level.monsters[x][y] = m;                               \
