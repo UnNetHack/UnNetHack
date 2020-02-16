@@ -219,6 +219,8 @@ register int show;
     register int x = trap->tx, y = trap->ty;
     register int glyph = trap_to_glyph(trap);
 
+    assert_valid_coordinates(x, y);
+
     if (level.flags.hero_memory)
         levl[x][y].glyph = glyph;
     if (show) show_glyph(x, y, glyph);
@@ -237,6 +239,8 @@ register int show;
 {
     register int x = obj->ox, y = obj->oy;
     register int glyph = obj_to_glyph(obj);
+
+    assert_valid_coordinates(x, y);
 
     if (level.flags.hero_memory) {
         /* MRKR: While hallucinating, statues are seen as random monsters */
@@ -264,6 +268,8 @@ void
 map_invisible(x, y)
 register xchar x, y;
 {
+    assert_valid_coordinates(x, y);
+
     if (x != u.ux || y != u.uy) { /* don't display I at hero's location */
         if (level.flags.hero_memory)
             levl[x][y].glyph = GLYPH_INVISIBLE;
@@ -300,6 +306,8 @@ register int x, y;
 
     if (!level.flags.hero_memory) return;
 
+    assert_valid_coordinates(x, y);
+
     if ((trap = t_at(x, y)) != 0 && trap->tseen && !covers_traps(x, y))
         map_trap(trap, 0);
     else if (levl[x][y].seenv) {
@@ -315,6 +323,19 @@ register int x, y;
         levl[x][y].glyph = cmap_to_glyph(S_stone); /* default val */
 }
 
+/*
+ * vobj_at()
+ *
+ * Returns the head of the list of objects that the player can see
+ * at location (x,y).
+ */
+struct obj *
+vobj_at(int x, int y)
+{
+    assert_valid_coordinates(x, y);
+
+    return level.objects[x][y];
+}
 
 /*
  * map_location()
@@ -342,6 +363,7 @@ void
 map_location(x, y, show)
 int x, y, show;
 {
+    assert_valid_coordinates(x, y);
     _map_location(x, y, show);
 }
 
@@ -1922,6 +1944,8 @@ int
 back_to_glyph(x, y)
 xchar x, y;
 {
+    assert_valid_coordinates(x, y);
+
     int idx;
     struct rm *ptr = &(levl[x][y]);
 
@@ -2094,6 +2118,8 @@ STATIC_OVL int
 get_bk_glyph(x, y)
 xchar x, y;
 {
+    assert_valid_coordinates(x, y);
+
     int idx, bkglyph = NO_GLYPH;
     struct rm *lev = &levl[x][y];
 

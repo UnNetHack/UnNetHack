@@ -599,7 +599,7 @@ extern dlevel_t level;  /* structure describing the current level */
 #define defsym_to_trap(d) ((d)-S_arrow_trap+1)
 
 #define assert_valid_coordinates(x, y) \
-    ((x < 0 || y < 0 || x >= COLNO || y >= ROWNO) ? abort() : TRUE)
+    ((x < 0 || y < 0 || x >= COLNO || y >= ROWNO) ? impossible("Invalid coordinates (%dx%d)!", x, y) : TRUE)
 /*
  * Macros for encapsulation of level.monsters references.
  */

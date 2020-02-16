@@ -21,8 +21,10 @@ struct monst *mon;
 int rmtyp;
 {
     int rno = levl[mon->mx][mon->my].roomno;
-
-    return rooms[rno - ROOMOFFSET].rtype == rmtyp;
+    if (rno >= ROOMOFFSET) {
+        return rooms[rno - ROOMOFFSET].rtype == rmtyp;
+    }
+    return FALSE;
 }
 
 void
@@ -1025,6 +1027,9 @@ dochat()
     for (dx = -1; dx <= +1; dx++) {
         for (dy = -1; dy <= +1; dy++) {
             if (u.ux+dx == u.ux && u.uy+dy == u.uy) continue;
+            if (!isok(u.ux+dx, u.uy+dy)) {
+                continue;
+            }
             mtmp = m_at(u.ux+dx, u.uy+dy);
             if (mtmp && canspotmon(mtmp)) {
                 mon_count++;
@@ -1051,7 +1056,6 @@ dochat()
     }
 
     if (u.dx == 0 && u.dy == 0) {
-
         if (u.umonnum == PM_ETTIN) {
             You("discover that your other head makes boring conversation.");
             return(1);
@@ -1061,7 +1065,13 @@ dochat()
         }
     }
 
-    tx = u.ux+u.dx; ty = u.uy+u.dy;
+    tx = u.ux+u.dx;
+    ty = u.uy+u.dy;
+
+    if (!isok(tx, ty)) {
+        return 0;
+    }
+
     mtmp = m_at(tx, ty);
 
     if ((!mtmp || mtmp->mundetected) &&
