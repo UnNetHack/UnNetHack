@@ -982,7 +982,7 @@ u_init()
      */
     shambler->mflags1 = 0;
     for (i = 0; i < rnd(17); i++) {
-        shambler->mflags1 |= (1 << rn2(33));        /* trainwreck this way :D */
+        shambler->mflags1 |= (1 << rn2(31));        /* trainwreck this way :D */
     }
     shambler->mflags1 &= ~M1_UNSOLID;           /* no ghosts */
     shambler->mflags1 &= ~M1_WALLWALK;          /* no wall-walkers */
