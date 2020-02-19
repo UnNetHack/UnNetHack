@@ -102,7 +102,7 @@ pline VA_DECL(const char *, line)
 #if defined(DUMP_LOG) && defined(DUMPMSGS)
     if (DUMPMSGS > 0 && !program_state.gameover) {
         /* count identical messages */
-        if (!strncmp(msgs[lastmsg], line, BUFSZ)) {
+        if (lastmsg >= 0 && !strncmp(msgs[lastmsg], line, BUFSZ)) {
             msgs_count[lastmsg] += 1;
         } else {
             lastmsg = (lastmsg + 1) % DUMPMSGS;

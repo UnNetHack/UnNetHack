@@ -39,6 +39,7 @@
 	  - OPTIONS=truecolor_separator was incorrectly parsed
 	  - Bag of holding explosion also scatters contents of inserted container
 	  - Fix some bit shift warnings
+	  - Fix several out of bounds memory accesses
 
 2019-01-01  UnNetHack 5.2.0
 	* Support SOURCE_DATE_EPOCH for reproducible builds (patch from Debian)

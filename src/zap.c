@@ -3541,7 +3541,7 @@ boolean *obj_destroyed;                /**< has object been deallocated? Pointer
         /* iron bars will block anything big enough */
         if (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON) {
             if (typ == IRONBARS &&
-                 hits_bars(&obj, x-ddx, y-ddy, ddx, ddy, point_blank ? 0 : !rn2(5), 1)) {
+                 hits_bars(&obj, x-ddx, y-ddy, bhitpos.x, bhitpos.y, point_blank ? 0 : !rn2(5), 1)) {
                 /* caveat: obj might now be null... */
                 if (obj == NULL && obj_destroyed) { *obj_destroyed = TRUE; }
                 bhitpos.x -= ddx;

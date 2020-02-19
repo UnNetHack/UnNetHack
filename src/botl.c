@@ -124,6 +124,9 @@ int statusline;
 
     if (*text == '\0') return;
 
+    if ((min(MAXCO, CO)-1) < 0) {
+        return;
+    }
     /* don't add anything if it can't be displayed.
      * Otherwise the color of invisible text may bleed into
      * the statusline. */

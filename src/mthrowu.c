@@ -1159,9 +1159,9 @@ int type;
 
 /* TRUE iff thrown/kicked/rolled object doesn't pass through iron bars */
 boolean
-hits_bars(obj_p, x, y, dx, dy, always_hit, whodidit)
+hits_bars(obj_p, x, y, barsx, barsy, always_hit, whodidit)
 struct obj **obj_p; /* *obj_p will be set to NULL if object breaks */
-int x, y, dx, dy;
+int x, y, barsx, barsy;
 int always_hit; /* caller can force a hit for items which would fit through */
 int whodidit;   /* 1==hero, 0=other, -1==just check whether it'll pass thru */
 {
@@ -1218,7 +1218,7 @@ int whodidit;   /* 1==hero, 0=other, -1==just check whether it'll pass thru */
         }
 
     if (hits && whodidit != -1) {
-        hit_bars(obj_p, x, y, x + dx, y + dy, whodidit, FALSE);
+        hit_bars(obj_p, x, y, barsx, barsy, whodidit, FALSE);
     }
 
     return hits;

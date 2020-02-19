@@ -1127,18 +1127,19 @@ savetrapchn(fd, trap, mode)
 register int fd, mode;
 register struct trap *trap;
 {
+    static struct trap zerotrap;
     register struct trap *trap2;
 
     while (trap) {
         trap2 = trap->ntrap;
         if (perform_bwrite(mode))
-            bwrite(fd, (genericptr_t) trap, sizeof(struct trap));
+            bwrite(fd, trap, sizeof *trap);
         if (release_data(mode))
             dealloc_trap(trap);
         trap = trap2;
     }
     if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t)nulls, sizeof(struct trap));
+        bwrite(fd, &zerotrap, sizeof zerotrap);
 }
 
 /* save all the fruit names and ID's; this is used only in saving whole games
@@ -1150,19 +1151,20 @@ void
 savefruitchn(fd, mode)
 register int fd, mode;
 {
+    static struct fruit zerofruit;
     register struct fruit *f2, *f1;
 
     f1 = ffruit;
     while (f1) {
         f2 = f1->nextf;
         if (f1->fid >= 0 && perform_bwrite(mode))
-            bwrite(fd, (genericptr_t) f1, sizeof(struct fruit));
+            bwrite(fd, f1, sizeof *f1);
         if (release_data(mode))
             dealloc_fruit(f1);
         f1 = f2;
     }
     if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t)nulls, sizeof(struct fruit));
+        bwrite(fd, &zerofruit, sizeof zerofruit);
     if (release_data(mode))
         ffruit = 0;
 }

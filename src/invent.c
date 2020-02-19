@@ -2982,7 +2982,7 @@ struct obj *obj;
 
 boolean
 mergable(otmp, obj) /* returns TRUE if obj  & otmp can be merged */
-register struct obj *otmp, *obj;
+struct obj *otmp, *obj;
 {
     int objnamelth = 0, otmpnamelth = 0;
 
@@ -3292,9 +3292,13 @@ int
 doorganize()    /* inventory organizer by Del Lamb */
 {
     struct obj *obj, *otmp;
-    register int ix, cur;
-    register char let;
-    char alphabet[52+1], buf[52+1];
+    int ix, cur;
+    char let;
+#define GOLD_INDX   0
+#define GOLD_OFFSET 1
+#define OVRFLW_INDX (GOLD_OFFSET + 52) /* past gold and 2*26 letters */
+#define ALPHABET_SIZE 1 + 52 + 1 + 1
+    char alphabet[ALPHABET_SIZE], buf[ALPHABET_SIZE]; /* room for '$a-zA-Z#\0' */
     char qbuf[QBUFSZ];
 #ifdef ADJSPLIT
     char allowallcnt[3];
@@ -3303,10 +3307,18 @@ doorganize()    /* inventory organizer by Del Lamb */
 #endif
     const char *adj_type;
 
+    /* when no invent, or just gold in '$' slot, there's nothing to adjust */
+    if (!invent ||
+        (invent->oclass == COIN_CLASS && invent->invlet == GOLD_SYM && !invent->nobj)) {
+        You("aren't carrying anything %s.", !invent ? "to adjust" : "adjustable");
+        return 0;
+    }
+
     if (!flags.invlet_constant) reassign();
     /* get a pointer to the object the user wants to organize */
 #ifdef ADJSPLIT
-    allowallcnt[0] = ALLOW_COUNT; allowallcnt[1] = ALL_CLASSES;
+    allowallcnt[0] = ALLOW_COUNT;
+    allowallcnt[1] = ALL_CLASSES;
     allowallcnt[2] = '\0';
     if (!(obj = getobj(allowallcnt, "adjust"))) return(0);
 #else
@@ -3315,22 +3327,37 @@ doorganize()    /* inventory organizer by Del Lamb */
 #endif
 
     /* initialize the list with all upper and lower case letters */
-    for (let = 'a', ix = 0; let <= 'z';) alphabet[ix++] = let++;
-    for (let = 'A', ix = 26; let <= 'Z';) alphabet[ix++] = let++;
-    alphabet[52] = 0;
+    alphabet[GOLD_INDX] = (obj->oclass == COIN_CLASS) ? GOLD_SYM : ' ';
+    for (ix = GOLD_OFFSET, let = 'a'; let <= 'z';) {
+        alphabet[ix++] = let++;
+    }
+    for (let = 'A'; let <= 'Z';) {
+        alphabet[ix++] = let++;
+    }
+    alphabet[OVRFLW_INDX] = ' ';
+    alphabet[sizeof alphabet - 1] = '\0';
 
     /* blank out all the letters currently in use in the inventory */
     /* except those that will be merged with the selected object   */
     for (otmp = invent; otmp; otmp = otmp->nobj)
         if (otmp != obj && !mergable(otmp, obj)) {
-            if (otmp->invlet <= 'Z')
-                alphabet[(otmp->invlet) - 'A' + 26] = ' ';
-            else alphabet[(otmp->invlet) - 'a']      = ' ';
+            let = otmp->invlet;
+            if (let >= 'a' && let <= 'z') {
+                alphabet[GOLD_OFFSET + let - 'a'] = ' ';
+            } else if (let >= 'A' && let <= 'Z') {
+                alphabet[GOLD_OFFSET + let - 'A' + 26] = ' ';
+            /* overflow defaults to off, but it we find a stack using that
+               slot, switch to on -- the opposite of normal invlet handling */
+            } else if (let == NOINVSYM) {
+                alphabet[OVRFLW_INDX] = NOINVSYM;
+            }
         }
 
     /* compact the list by removing all the blanks */
-    for (ix = cur = 0; ix <= 52; ix++)
+    for (ix = cur = 0; ix <= sizeof alphabet-1; ix++) {
         if (alphabet[ix] != ' ') buf[cur++] = alphabet[ix];
+    }
+    buf[cur] = '\0';
 
     /* and by dashing runs of letters */
     if(cur > 5) compactify(buf);
