@@ -4589,9 +4589,12 @@ buzzmonst:
             boolean fireball;
 
 make_bounce:
-            bchance = (levl[sx][sy].typ == STONE) ? 10 :
-                (In_mines(&u.uz) && IS_WALL(levl[sx][sy].typ)) ? 20 : 75;
-            bounce = 0;
+            if (isok(sx, sy)) {
+                bchance = (levl[sx][sy].typ == STONE) ? 10 :
+                    (In_mines(&u.uz) && IS_WALL(levl[sx][sy].typ)) ? 20 : 75;
+            } else {
+                bchance = 75;
+            }
             if (type == ZT_SPELL(ZT_FIRE)) {
                 sx = lsx;
                 sy = lsy;

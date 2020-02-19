@@ -779,7 +779,7 @@ char *enterstring;
         }
     } else {
 #ifdef CONVICT
-        if (!eshkp->pbanned || inside_shop(u.ux, u.uy))
+        if (!eshkp->pbanned || inside_shop(u.ux, u.uy)) {
 #endif /* CONVICT */
         if (!Deaf && !muteshk(shkp)) {
             verbalize("%s, %s!  Welcome%s to %s %s!",
@@ -793,6 +793,9 @@ char *enterstring;
                 shtypes[rt - SHOPBASE].name,
                 eshkp->visitct++ ? " again" : "");
         }
+#ifdef CONVICT
+        }
+#endif /* CONVICT */
     }
     /* can't do anything about blocking if teleported in */
     if (!inside_shop(u.ux, u.uy) && !(Is_blackmarket(&u.uz))) {
@@ -3680,11 +3683,13 @@ remove_damage(shkp, croaked)
 register struct monst *shkp;
 register boolean croaked;
 {
-    register struct damage *tmp_dam, *tmp2_dam;
-    register boolean did_repair = FALSE, saw_door = FALSE;
-    register boolean saw_floor = FALSE, stop_picking = FALSE;
-    register boolean saw_untrap = FALSE;
-    uchar saw_walls = 0;
+    struct damage *tmp_dam, *tmp2_dam;
+    struct obj *shk_inv = shkp->minvent;
+    boolean did_repair = FALSE, saw_door = FALSE;
+    boolean saw_floor = FALSE, stop_picking = FALSE;
+    boolean doorway_trap = FALSE, skip_msg = FALSE;
+    int saw_walls = 0, saw_untrap = 0;
+    char trapmsg[BUFSZ];
 
     tmp_dam = level.damagelist;
     tmp2_dam = 0;
@@ -4506,35 +4511,54 @@ struct monst *shkp;
                       Hello(shkp), plname, eshk->customer);
             eshk->following = 0;
         } else {
-            verbalize("%s %s!  Didn't you forget to pay?",
-                      Hello(shkp), plname);
+            if (!Deaf && !muteshk(shkp)) {
+                verbalize("%s %s!  Didn't you forget to pay?",
+                        Hello(shkp), plname);
+            } else {
+                pline("%s taps you on the %s.", Shknam(shkp), body_part(ARM));
+            }
         }
     } else if (eshk->billct) {
         register long total = addupbill(shkp) + eshk->debit;
-        pline("%s says that your bill comes to %ld %s.",
-              shkname(shkp), total, currency(total));
+
+        pline("%s %s that your bill comes to %ld %s.",
+              Shknam(shkp),
+              (!Deaf && !muteshk(shkp)) ? "says" : "indicates",
+              total, currency(total));
     } else if (eshk->debit)
-        pline("%s reminds you that you owe %s %ld %s.",
-              shkname(shkp), mhim(shkp),
-              eshk->debit, currency(eshk->debit));
+        pline("%s %s that you owe %s %ld %s.",
+              Shknam(shkp),
+              (!Deaf && !muteshk(shkp)) ? "reminds you" : "indicates",
+              noit_mhim(shkp), eshk->debit, currency(eshk->debit));
     else if (eshk->credit)
         pline("%s encourages you to use your %ld %s of credit.",
-              shkname(shkp), eshk->credit, currency(eshk->credit));
+              Shknam(shkp), eshk->credit, currency(eshk->credit));
     else if (eshk->robbed)
-        pline("%s complains about a recent robbery.", shkname(shkp));
+        pline("%s %s about a recent robbery.",
+              Shknam(shkp),
+              (!Deaf && !muteshk(shkp)) ? "complains" : "indicates concern");
     else if ((shkmoney = money_cnt(shkp->minvent)) < 50)
-        pline("%s complains that business is bad.", shkname(shkp));
+        pline("%s %s that business is bad.",
+              Shknam(shkp),
+              (!Deaf && !muteshk(shkp)) ? "complains" : "indicates");
     else if (shkmoney > 4000)
-        pline("%s says that business is good.", shkname(shkp));
-    else if (strcmp(shkname(shkp), "Izchak") == 0)
-        pline(Izchak_speaks[rn2(SIZE(Izchak_speaks))], shkname(shkp));
-    else if (Role_if(PM_ARCHEOLOGIST) &&
+        pline("%s %s that business is good.",
+              Shknam(shkp),
+              (!Deaf && !muteshk(shkp)) ? "says" : "indicates");
+    else if (is_izchak(shkp, FALSE)) {
+        if (!Deaf && !muteshk(shkp)) {
+            pline(Izchak_speaks[rn2(SIZE(Izchak_speaks))], shkname(shkp));
+        }
+    } else if (Role_if(PM_ARCHEOLOGIST) &&
              inhishop(shkp) &&
              shk_has_leather_jackets(shkp))
         pline("%s says that he's selling these fine leather jackets.",
-              shkname(shkp));
-    else
-        pline("%s talks about the problem of shoplifters.", shkname(shkp));
+              Shknam(shkp));
+    else {
+        if (!Deaf && !muteshk(shkp)) {
+            pline("%s talks about the problem of shoplifters.", Shknam(shkp));
+        }
+    }
 }
 
 #ifdef KOPS
@@ -4571,30 +4595,33 @@ boolean altusage; /* some items have an "alternate" use with different cost */
 
     /* The idea is to make the exhaustive use of */
     /* an unpaid item more expensive than buying */
-    /* it outright.                  */
-    if (otmp->otyp == MAGIC_LAMP) {           /* 1 */
+    /* it outright.                              */
+    if (otmp->otyp == MAGIC_LAMP) { /* 1 */
         /* normal use (ie, as light source) of a magic lamp never
            degrades its value, but not charging anything would make
-           identifcation too easy; charge an amount comparable to
+           identification too easy; charge an amount comparable to
            what is charged for an ordinary lamp (don't bother with
            angry shk surchage) */
         if (!altusage) tmp = (long) objects[OIL_LAMP].oc_cost;
         else tmp += tmp / 3L;   /* djinni is being released */
-    } else if (otmp->otyp == MAGIC_MARKER) {      /* 20 - 80 */
+    } else if (otmp->otyp == MAGIC_MARKER) { /* 20 - 80 */
         /* no way to determine in advance   */
         /* how many charges will be wasted. */
         /* so, arbitrarily, one half of the */
-        /* price per use.           */
+        /* price per use.                   */
         tmp /= 2L;
-    } else if (otmp->otyp == BAG_OF_TRICKS ||     /* 1 - 20 */
-              otmp->otyp == HORN_OF_PLENTY) {
-        tmp /= 5L;
-    } else if (otmp->otyp == CRYSTAL_BALL ||      /* 1 - 5 */
-              otmp->otyp == OIL_LAMP ||  /* 1 - 10 */
-              otmp->otyp == BRASS_LANTERN ||
+    } else if (otmp->otyp == BAG_OF_TRICKS || /* 1 - 20 */
+               otmp->otyp == HORN_OF_PLENTY) {
+        /* altusage: emptying of all the contents at once */
+        if (!altusage) {
+            tmp /= 5L;
+        }
+    } else if (otmp->otyp == CRYSTAL_BALL || /* 1 - 5 */
+               otmp->otyp == OIL_LAMP || /* 1 - 10 */
+               otmp->otyp == BRASS_LANTERN ||
               (otmp->otyp >= MAGIC_FLUTE &&
                otmp->otyp <= DRUM_OF_EARTHQUAKE) || /* 5 - 9 */
-              otmp->oclass == WAND_CLASS) {  /* 3 - 11 */
+              (otmp->oclass == WAND_CLASS)) {  /* 3 - 11 */
         if (otmp->spe > 1) tmp /= 4L;
     } else if (otmp->oclass == SPBOOK_CLASS) {
         tmp -= tmp / 5L;
@@ -4623,6 +4650,7 @@ boolean altusage;
 {
     struct monst *shkp;
     const char *fmt, *arg1, *arg2;
+    char buf[BUFSZ];
     long tmp;
 
     if (!otmp->unpaid || !*u.ushops ||
@@ -4636,20 +4664,31 @@ boolean altusage;
     arg1 = arg2 = "";
     if (otmp->oclass == SPBOOK_CLASS) {
         fmt = "%sYou owe%s %ld %s.";
-        arg1 = rn2(2) ? "This is no free library, cad!  " : "";
+        Sprintf(buf, "This is no free library, %s!  ", cad(FALSE));
+        arg1 = rn2(2) ? buf : "";
         arg2 = ESHK(shkp)->debit > 0L ? " an additional" : "";
     } else if (otmp->otyp == POT_OIL) {
         fmt = "%s%sThat will cost you %ld %s (Yendorian Fuel Tax).";
+    } else if (altusage && (otmp->otyp == BAG_OF_TRICKS ||
+                            otmp->otyp == HORN_OF_PLENTY)) {
+        fmt = "%s%sEmptying that will cost you %ld %s.";
+        if (!rn2(3)) {
+            arg1 = "Whoa!  ";
+        }
+        if (!rn2(3)) {
+            arg1 = "Watch it!  ";
+        }
     } else {
         fmt = "%s%sUsage fee, %ld %s.";
         if (!rn2(3)) arg1 = "Hey!  ";
         if (!rn2(3)) arg2 = "Ahem.  ";
     }
 
-    if (shkp->mcanmove || !shkp->msleeping)
+    if (!Deaf && !muteshk(shkp)) {
         verbalize(fmt, arg1, arg2, tmp, currency(tmp));
+        exercise(A_WIS, TRUE); /* you just got info */
+    }
     ESHK(shkp)->debit += tmp;
-    exercise(A_WIS, TRUE);      /* you just got info */
 }
 
 /* for using charges of unpaid objects "used in the normal manner" */
@@ -4657,7 +4696,7 @@ void
 check_unpaid(otmp)
 struct obj *otmp;
 {
-    check_unpaid_usage(otmp, FALSE);        /* normal item use */
+    check_unpaid_usage(otmp, FALSE); /* normal item use */
 }
 
 void
@@ -4718,8 +4757,7 @@ register xchar x, y;
         */
        && ESHK(shkp)->shd.x == x && ESHK(shkp)->shd.y == y
        && shkp->mcanmove && !shkp->msleeping
-       && (ESHK(shkp)->debit || ESHK(shkp)->billct ||
-           ESHK(shkp)->robbed)) {
+       && (ESHK(shkp)->debit || ESHK(shkp)->billct || ESHK(shkp)->robbed)) {
         pline("%s%s blocks your way!", shkname(shkp),
               Invis ? " senses your motion and" : "");
         return(TRUE);
@@ -4770,6 +4808,7 @@ register xchar x, y;
     return(FALSE);
 }
 
+/* "your " or "Foobar's " (note the trailing space) */
 char *
 shk_your(buf, obj)
 char *buf;
@@ -4813,7 +4852,7 @@ char *buf;
 struct obj *obj;
 {
     if (obj->where == OBJ_MINVENT)
-        return strcpy(buf, s_suffix(mon_nam(obj->ocarry)));
+        return strcpy(buf, s_suffix(y_monnam(obj->ocarry)));
     return (char *)0;
 }
 

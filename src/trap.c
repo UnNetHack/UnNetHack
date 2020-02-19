@@ -1816,9 +1816,13 @@ schar dx, dy;
     while (distance-- > 0) {
         x += dx;
         y += dy;
-        typ = levl[x][y].typ;
-        if (!isok(x, y) || !ZAP_POS(typ) || closed_door(x, y))
+        if (!isok(x, y)) {
             return FALSE;
+        }
+        typ = levl[x][y].typ;
+        if (!ZAP_POS(typ) || closed_door(x, y)) {
+            return FALSE;
+        }
     }
     cc->x = x;
     cc->y = y;

@@ -4923,7 +4923,7 @@ redo_maploc:
                         if (levl[x][y].typ != STONE) isokp = FALSE;
                         if (levl[x][y].roomno != NO_ROOM) isokp = FALSE;
                     } else {
-                        mptyp = (mpmap->vardata.str[(y-ystart+1) * xsize + (x-xstart+1)] - 1);
+                        mptyp = (mpmap->vardata.str[(y-ystart) * xsize + (x-xstart+1)] - 1);
                         if (mptyp >= MAX_TYPE) continue;
                         if (isok(x, y)) {
                             if (levl[x][y].typ != STONE && levl[x][y].typ != mptyp) isokp = FALSE;

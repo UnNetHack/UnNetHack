@@ -1118,6 +1118,7 @@ boolean fingers;
             You("are not going to get anywhere trying to write in the %s with your dust.",
                 is_ice(u.ux, u.uy) ? "frost" : "dust");
         useup(otmp);
+        otmp = NULL; /* wand is now gone */
         ptext = FALSE;
     }
 

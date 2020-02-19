@@ -1034,6 +1034,13 @@ boolean ghostly;
     restore_light_sources(fd);
     fmon = restmonchn(fd, ghostly);
 
+    /* reset level.monsters for new level */
+    for (x = 0; x < COLNO; x++) {
+        for (y = 0; y < ROWNO; y++) {
+            level.monsters[x][y] = (struct monst *) 0;
+        }
+    }
+
     /* regenerate animals while on another level */
     if (u.uz.dlevel) {
         register struct monst *mtmp2;

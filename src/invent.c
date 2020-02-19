@@ -3454,9 +3454,12 @@ doorganize()    /* inventory organizer by Del Lamb */
     return(0);
 #ifdef ADJSPLIT
 cleansplit:
-    for (otmp = invent; otmp; otmp = otmp->nobj)
-        if (otmp != obj && otmp->invlet == obj->invlet)
-            merged( &otmp, &obj );
+    for (otmp = invent; otmp; otmp = otmp->nobj) {
+        if (otmp != obj && otmp->invlet == obj->invlet) {
+            merged(&otmp, &obj);
+            break;
+        }
+    }
 
     return 0;
 #endif

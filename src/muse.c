@@ -1395,10 +1395,11 @@ struct monst *mtmp;
                 }
             }
         }
+        boolean otmp_cursed = otmp->cursed;
         m_useup(mtmp, otmp);
         /* Attack the player */
-        if (distmin(mmx, mmy, u.ux, u.uy) == 1 && !otmp->cursed) {
-            drop_boulder_on_player(confused, !otmp->cursed, FALSE, TRUE);
+        if (distmin(mmx, mmy, u.ux, u.uy) == 1 && !otmp_cursed) {
+            drop_boulder_on_player(confused, !otmp_cursed, FALSE, TRUE);
         }
 
         return (mtmp->mhp <= 0) ? 1 : 2;

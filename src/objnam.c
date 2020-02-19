@@ -1957,12 +1957,12 @@ const char *oldstr;
                       !strcmp(spot-4, "ninja") ||
                       !strcmp(spot-4, "ronin") ||
                       !strcmp(spot-4, "shito") ||
-                      !strcmp(spot-7, "shuriken") ||
                       !strcmp(spot-4, "tengu") ||
                       !strcmp(spot-4, "manes"))) ||
         (len >= 6 && (!strcmp(spot-5, "ki-rin") ||
                       !strcmp(spot-5, "Nazgul"))) ||
-        (len >= 7 && !strcmp(spot-6, "gunyoki")))
+        (len >= 7 && !strcmp(spot-6, "gunyoki")) ||
+        (len >= 8 && !strcmp(spot-7, "shuriken")))
         goto bottom;
 
     /* man/men ("Wiped out all cavemen.") */
@@ -2066,7 +2066,7 @@ const char *oldstr;
         goto bottom;
     }
     if (len >= 5 && (!strcmp(spot-4, "matzo")
-                     || !strcmp(spot-5, "matza"))) {
+                     || !strcmp(spot-4, "matza"))) {
         Strcpy(spot, "ot");
         goto bottom;
     }
