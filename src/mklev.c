@@ -1511,6 +1511,11 @@ coord *tm;
 	/* no traps in pools */
 	if (tm && is_pool(tm->x,tm->y)) return;
 
+    /* no traps in swamps */
+    if (tm && is_swamp(tm->x, tm->y)) {
+        return;
+    }
+
 	if (num > 0 && num < TRAPNUM) {
 	    kind = num;
 #ifdef REINCARNATION
@@ -1958,7 +1963,7 @@ place_random_engravings()
 
 #ifdef ADVENT_CALENDAR
 /**
- * The portal to the Advent Calender is special. 
+ * The portal to the Advent Calender is special.
  * It does not only lead to a floating branch like knox portal.
  * It also may appear upon reentering a existing level if it is the
  * right time of the year.
