@@ -869,7 +869,7 @@ struct obj *sobj;
 #else
     if (sobj->cursed) {
 #endif
-        setmangry(mtmp);
+        setmangry(mtmp, FALSE);
     } else {
         if (mtmp->isshk)
             make_happy_shk(mtmp, FALSE);
@@ -918,7 +918,7 @@ genericptr_t poolcnt;
         /* Put a pool at x, y */
         levl[x][y].typ = POOL;
         del_engr_at(x, y);
-        water_damage(level.objects[x][y], (char *)0, FALSE, TRUE);
+        water_damage_chain(level.objects[x][y], FALSE);
 
         if ((mtmp = m_at(x, y)) != 0) {
             (void) minliquid(mtmp);

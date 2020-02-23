@@ -17,21 +17,25 @@
 #define MAP_Y_LIM   21
 
 /* Per level flags */
-#define NOTELEPORT  0x00000001L
-#define HARDFLOOR   0x00000002L
-#define NOMMAP      0x00000004L
-#define SHORTSIGHTED    0x00000008L
-#define ARBOREAL    0x00000010L
-#define NOFLIPX     0x00000020L
-#define NOFLIPY     0x00000040L
-#define MAZELEVEL   0x00000080L
-#define PREMAPPED   0x00000100L
-#define SHROUD      0x00000200L
-#define STORMY      0x00000400L
-#define GRAVEYARD   0x00000800L
-#define SKYMAP      0x00001000L
-#define SHEOL_LEV   0x00002000L
-#define FLAG_RNDVAULT   0x00004000L
+#define NOTELEPORT          0x00000001L
+#define HARDFLOOR           0x00000002L
+#define NOMMAP              0x00000004L
+#define SHORTSIGHTED        0x00000008L
+#define ARBOREAL            0x00000010L
+#define NOFLIPX             0x00000020L
+#define NOFLIPY             0x00000040L
+#define MAZELEVEL           0x00000080L
+#define PREMAPPED           0x00000100L /* premapped level & sokoban rules */
+#define SHROUD              0x00000200L
+#define STORMY              0x00000400L
+#define GRAVEYARD           0x00000800L
+#define ICEDPOOLS           0x00001000L /* for ice locations: ICED_POOL vs ICED_MOAT */
+#define SOLIDIFY            0x00002000L /* outer areas are nondiggable & nonpasswall */
+#define CORRMAZE            0x00004000L /* for maze levels only */
+#define CHECK_INACCESSIBLES 0x00008000L /* check for inaccessible areas and generate ways to escape from them */
+#define SKYMAP              0x00010000L
+#define SHEOL_LEV           0x00020000L
+#define FLAG_RNDVAULT       0x00040000L
 
 
 /* different level layout initializers */
@@ -264,12 +268,13 @@ enum corefuncs {
 
 #define SP_COORD_IS_RANDOM 0x01000000
 /* Humidity flags for get_location() and friends, used with SP_COORD_PACK_RANDOM() */
-#define DRY 0x1
-#define WET 0x2
-#define HOT 0x4
-#define SOLID   0x8
-#define ANY_LOC 0x10 /* even outside the level */
-#define NO_LOC_WARN 0x20 /* no complaints and set x & y to -1, if no loc */
+#define DRY          0x1
+#define WET          0x2
+#define HOT          0x4
+#define SOLID        0x8
+#define ANY_LOC      0x10 /* even outside the level */
+#define NO_LOC_WARN  0x20 /* no complaints and set x & y to -1, if no loc */
+#define SPACELOC     0x40 /* like DRY, but accepts furniture too */
 
 #define SP_COORD_X(l)   (l & 0xff)
 #define SP_COORD_Y(l)   ((l >> 16) & 0xff)
@@ -333,12 +338,14 @@ struct sp_coder {
     struct sp_frame *frame;
     int allow_flips;
     int premapped;
+    boolean solidify;
     struct mkroom *croom;
     struct mkroom *tmproomlist[MAX_NESTED_ROOMS+1];
     boolean failed_room[MAX_NESTED_ROOMS+1];
     int n_subroom;
     boolean exit_script;
     int lvl_is_joined;
+    boolean check_inaccessibles;
 
     int opcode;  /* current opcode */
     struct opvar *opdat; /* current push data (req. opcode == SPO_PUSH) */
@@ -376,12 +383,14 @@ typedef union str_or_len {
 } Str_or_Len;
 
 typedef struct {
-    xchar init_style;   /* one of LVLINIT_foo */
+    xchar init_style; /* one of LVLINIT_foo */
+    long flags;
+    schar filling;
+    boolean init_present, padding;
     char fg, bg;
     boolean smoothed, joined;
     xchar lit, walled;
-    long flags;
-    schar filling;
+    boolean icedpools;
 } lev_init;
 
 typedef struct {

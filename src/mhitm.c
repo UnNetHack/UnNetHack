@@ -985,8 +985,12 @@ physical:
             pline("%s is covered in acid!", Monnam(mdef));
             pline("It burns %s!", mon_nam(mdef));
         }
-        if (!rn2(30)) erode_armor(mdef, TRUE);
-        if (!rn2(6)) erode_obj(MON_WEP(mdef), TRUE, TRUE);
+        if (!rn2(30)) {
+            erode_armor(mdef, TRUE);
+        }
+        if (!rn2(6)) {
+            acid_damage(MON_WEP(mdef));
+        }
         break;
     case AD_RUST:
         if (magr->mcan) break;

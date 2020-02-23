@@ -440,6 +440,15 @@ unleash_all()       /* player is about to die (for bones) */
 
 #define MAXLEASHED  2
 
+boolean
+leashable(mtmp)
+struct monst *mtmp;
+{
+    return (boolean)(mtmp->mnum != PM_LONG_WORM &&
+                     !unsolid(mtmp->data) &&
+                     (!nolimbs(mtmp->data) || has_head(mtmp->data)));
+}
+
 /* ARGSUSED */
 STATIC_OVL void
 use_leash(obj)
@@ -2271,7 +2280,9 @@ struct obj *obj;
             } else {
                 pline("%s", msg_slipsfree);
             }
-            if (mtmp) wakeup(mtmp);
+            if (mtmp) {
+                wakeup(mtmp, TRUE);
+            }
         } else pline("%s", msg_snap);
 
     } else if (mtmp) {
@@ -2366,7 +2377,7 @@ struct obj *obj;
             } else {
                 pline("%s", msg_slipsfree);
             }
-            wakeup(mtmp);
+            wakeup(mtmp, TRUE);
         } else {
             if (mtmp->m_ap_type &&
                 !Protection_from_shape_changers && !sensemon(mtmp))

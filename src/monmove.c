@@ -1282,19 +1282,21 @@ postmov:
                 }
             }
             if (levl[mtmp->mx][mtmp->my].typ == IRONBARS) {
+                boolean is_diggable = !(levl[mtmp->mx][mtmp->my].wall_info & W_NONDIGGABLE);
                 if (dmgtype(ptr, AD_DISN)) {
                     if (canseeit)
                         pline("%s dissolves the iron bars.",
                               Monnam(mtmp));
                     dissolve_bars(mtmp->mx, mtmp->my);
-                }
-                else if (metallivorous(ptr)) {
-                    if (mdig_tunnel(mtmp)) return 2;
-                    if (canseeit)
-                        pline("%s chews through the iron bars.",
-                              Monnam(mtmp));
-                    else
+                } else if (metallivorous(ptr) && is_diggable) {
+                    if (mdig_tunnel(mtmp)) {
+                        return 2;
+                    }
+                    if (canseeit) {
+                        pline("%s chews through the iron bars.", Monnam(mtmp));
+                    } else {
                         You_hear("a crunching noise.");
+                    }
                 }
                 else if (flags.verbose && canseemon(mtmp))
                     Norep("%s %s %s the iron bars.", Monnam(mtmp),

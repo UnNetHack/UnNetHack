@@ -782,6 +782,7 @@ ALTAR:(31,03),align[0],shrine
 #
 LEVEL: "minetn-6"
 FLAGS:mazelevel,noflip
+#,inaccessibles
 INIT_MAP:mines,'.','-',true,true,lit,true
 GEOMETRY:center,top
 MAP

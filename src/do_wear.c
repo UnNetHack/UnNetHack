@@ -1998,7 +1998,7 @@ boolean acid_dmg;
     struct obj *otmph = some_armor(victim);
 
     if (otmph && (otmph != uarmf)) {
-        erode_obj(otmph, acid_dmg, FALSE);
+        erode_obj(otmph, xname(otmph), ERODE_CORRODE, EF_GREASE);
         if (carried(otmph)) update_inventory();
     }
 }

@@ -1143,7 +1143,7 @@ const char *objphrase; /* "Your widget glows" or "Steed's saddle glows" */
     } else {
         /* dipping into uncursed water; carried() check skips steed saddle */
         if (carried(targobj)) {
-            if (water_damage(targobj, 0, FALSE, TRUE) != ER_NOTHING) {
+            if (water_damage(targobj, 0, TRUE) != ER_NOTHING) {
                 res = TRUE;
             }
         }
@@ -1490,7 +1490,7 @@ do_illness:
         /* target might have been killed */
         if (!DEADMONSTER(mon)) {
             if (angermon)
-                wakeup(mon);
+                wakeup(mon, TRUE);
             else
                 mon->msleeping = 0;
         }

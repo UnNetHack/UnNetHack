@@ -439,7 +439,7 @@ invault()
         }
 #ifdef CONVICT
         if (Role_if(PM_CONVICT) && !Upolyd) {
-            setmangry(guard);
+            setmangry(guard, FALSE);
             verbalize("I saw your pic on the wanted poster!");
             if (!MON_WEP(guard)) {
                 guard->weapon_check = NEED_HTH_WEAPON;
@@ -486,7 +486,7 @@ invault()
                 verbalize("Oh, yes, of course.  Sorry to have disturbed you.");
                 mongone(guard);
             } else {
-                setmangry(guard);
+                setmangry(guard, FALSE);
                 verbalize("Back from the dead, are you?  I'll remedy that!");
                 /* don't want guard to waste next turn wielding a weapon */
                 if (!MON_WEP(guard)) {

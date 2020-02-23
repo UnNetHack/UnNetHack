@@ -206,6 +206,12 @@ struct flag {
  * These are not saved with the game.
  *
  */
+/* values for iflags.getpos_coords */
+#define GPCOORDS_NONE    'n'
+#define GPCOORDS_MAP     'm'
+#define GPCOORDS_COMPASS 'c'
+#define GPCOORDS_COMFULL 'f'
+#define GPCOORDS_SCREEN  's'
 
 struct instance_flags {
     /* stuff that really isn't option or platform related. They are
@@ -245,17 +251,18 @@ struct instance_flags {
     boolean cursesgraphics;     /* Use portable curses extended characters */
 #endif
     boolean DECgraphics;    /* use DEC VT-xxx extended character set */
-    boolean echo;       /* 1 to echo characters */
+    boolean echo;           /* 1 to echo characters */
     boolean IBMgraphics;    /* use IBM extended character set */
     boolean UTF8graphics;   /* use UTF-8 characters */
     unsigned msg_history;   /* hint: # of top lines to save */
-    boolean num_pad;    /* use numbers for movement commands */
-    boolean news;       /* print news */
+    int getpos_coords;      /* show coordinates when getting cursor position */
+    boolean num_pad;        /* use numbers for movement commands */
+    boolean news;           /* print news */
     boolean window_inited;  /* true if init_nhwindows() completed */
     boolean vision_inited;  /* true if vision is ready */
     boolean menu_tab_sep;   /* Use tabs to separate option menu fields */
-    boolean menu_requested;  /* Flag for overloaded use of 'm' prefix
-                              * on some non-move commands */
+    boolean menu_requested; /* Flag for overloaded use of 'm' prefix
+                             * on some non-move commands */
     uchar num_pad_mode;
     int menu_headings;  /* ATR for menu headings */
     int purge_monsters;         /* # of dead monsters still on fmon list */

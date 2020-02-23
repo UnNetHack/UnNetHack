@@ -2127,14 +2127,20 @@ struct obj *obj;
 boolean by_you;
 boolean stoning;
 {
-    int nutrit = (obj->otyp == CORPSE) ? dog_nutrition(mon, obj) : 0;
-    /* also sets meating */
+    boolean vis = canseemon(mon);
+    boolean tinned = obj->otyp == TIN;
+    boolean food = (obj->otyp == CORPSE) || tinned;
+    boolean acid = (obj->otyp == POT_ACID) || (food && acidic(&mons[obj->corpsenm]));
+    boolean lizard = food && obj->corpsenm == PM_LIZARD;
+    int nutrit = food ? dog_nutrition(mon, obj) : 0; /* also sets meating */
 
     /* give a "<mon> is slowing down" message and also remove
        intrinsic speed (comparable to similar effect on the hero) */
-    mon_adjust_speed(mon, -3, (struct obj *)0);
+    if (stoning) {
+        mon_adjust_speed(mon, -3, (struct obj *) 0);
+    }
 
-    if (canseemon(mon)) {
+    if (vis) {
         long save_quan = obj->quan;
 
         obj->quan = 1L;
@@ -2142,40 +2148,57 @@ boolean stoning;
               (obj->otyp == POT_ACID) ? "quaff" : "eat",
               distant_name(obj, doname));
         obj->quan = save_quan;
-    } else if (flags.soundok)
-        You_hear("%s.", (obj->otyp == POT_ACID) ? "drinking" : "chewing");
+    } else if (!Deaf) {
+        You_hear("%s.", (obj->oclass == POTION_CLASS) ? "drinking" : "chewing");
+    }
+
     m_useup(mon, obj);
-    if (((obj->otyp == POT_ACID) || acidic(&mons[obj->corpsenm])) &&
-        !resists_acid(mon)) {
+    /* obj is now gone */
+
+    if (acid && !tinned && !resists_acid(mon)) {
         mon->mhp -= rnd(15);
-        pline("%s has a very bad case of stomach acid.",
-              Monnam(mon));
+        if (vis) {
+            pline("%s has a very bad case of stomach acid.", Monnam(mon));
+        }
+        if (DEADMONSTER(mon)) {
+            pline("%s dies!", Monnam(mon));
+            if (by_you) {
+                /* hero gets credit (experience) and blame (possible loss
+                   of alignment and/or luck and/or telepathy depending on
+                   mon) for the kill but does not break pacifism conduct */
+                xkilled(mon, XKILL_NOMSG | XKILL_NOCONDUCT);
+            } else {
+                mondead(mon);
+            }
+            return;
+        }
     }
-    if (mon->mhp <= 0) {
-        pline("%s dies!", Monnam(mon));
-        if (by_you) xkilled(mon, 0);
-        else mondead(mon);
-        return;
-    }
-    if (stoning && canseemon(mon)) {
-        if (Hallucination)
+    if (stoning && vis) {
+        if (Hallucination) {
             pline("What a pity - %s just ruined a future piece of art!",
                   mon_nam(mon));
-        else
+        } else {
             pline("%s seems limber!", Monnam(mon));
+        }
     }
-    if (obj->otyp == CORPSE && obj->corpsenm == PM_LIZARD && mon->mconf) {
+    if (lizard && (mon->mconf || mon->mstun)) {
         mon->mconf = 0;
-        if (canseemon(mon))
+        mon->mstun = 0;
+        if (vis && !is_bat(mon->data) && mon->data != &mons[PM_STALKER]) {
             pline("%s seems steadier now.", Monnam(mon));
+        }
     }
     if (mon->mtame && !mon->isminion && nutrit > 0) {
         struct edog *edog = EDOG(mon);
 
-        if (edog->hungrytime < monstermoves) edog->hungrytime = monstermoves;
+        if (edog->hungrytime < monstermoves) {
+            edog->hungrytime = monstermoves;
+        }
         edog->hungrytime += nutrit;
         mon->mconf = 0;
     }
+    /* use up monster's next move */
+    mon->movement -= NORMAL_SPEED;
     mon->mlstmv = monstermoves; /* it takes a turn */
 }
 

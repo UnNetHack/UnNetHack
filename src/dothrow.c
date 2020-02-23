@@ -722,11 +722,11 @@ int x, y;
         } else {
             You("bump into %s.", mnam);
         }
-        wakeup(mon);
+        wakeup(mon, FALSE);
         if (!canspotmon(mon)) {
             map_invisible(mon->mx, mon->my);
         }
-        setmangry(mon);
+        setmangry(mon, FALSE);
         wake_nearto(x, y, 10);
         return FALSE;
     }
@@ -1591,7 +1591,7 @@ boolean maybe_wakeup;
     else
         miss(missile, mon);
     if (maybe_wakeup && !rn2(3)) {
-        wakeup(mon);
+        wakeup(mon, TRUE);
     }
     return;
 }
@@ -1824,7 +1824,7 @@ struct obj   *obj; /* thrownobj or kickedobj or uwep */
         } else {
             tmiss(obj, mon, TRUE);
             if (hmode == HMON_APPLIED) {
-                wakeup(mon);
+                wakeup(mon, TRUE);
             }
         }
 
@@ -1906,7 +1906,7 @@ struct obj   *obj; /* thrownobj or kickedobj or uwep */
         }
     } else if (guaranteed_hit) {
         /* this assumes that guaranteed_hit is due to swallowing */
-        wakeup(mon);
+        wakeup(mon, TRUE);
         if (obj->otyp == CORPSE && touch_petrifies(&mons[obj->corpsenm])) {
             if (is_animal(u.ustuck->data)) {
                 minstapetrify(u.ustuck, TRUE);

@@ -566,6 +566,19 @@ doforce()       /* try to force a chest with your weapon */
     return(1);
 }
 
+boolean
+stumble_on_door_mimic(x, y)
+int x, y;
+{
+    struct monst *mtmp = m_at(x, y);
+
+    if (mtmp && is_door_mappear(mtmp) && !Protection_from_shape_changers) {
+        stumble_onto_mimic(mtmp);
+        return TRUE;
+    }
+    return FALSE;
+}
+
 int
 doopen()        /* try to open a door */
 {

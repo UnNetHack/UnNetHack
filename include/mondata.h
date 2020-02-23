@@ -35,6 +35,9 @@
 #define needspick(ptr)      (((ptr)->mflags1 & M1_NEEDPICK) != 0L)
 #define hides_under(ptr)    (((ptr)->mflags1 & M1_CONCEAL) != 0L)
 #define is_hider(ptr)       (((ptr)->mflags1 & M1_HIDE) != 0L)
+#define ceiling_hider(ptr) \
+    (is_hider(ptr) && ((is_clinger(ptr) && (ptr)->mlet != S_MIMIC) || \
+                       is_flyer(ptr))) /* lurker above */
 #define haseyes(ptr)        (((ptr)->mflags1 & M1_NOEYES) == 0L)
 #define eyecount(ptr)       (!haseyes(ptr) ? 0 : \
                              ((ptr) == &mons[PM_CYCLOPS] || \

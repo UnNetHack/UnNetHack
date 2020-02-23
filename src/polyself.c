@@ -15,7 +15,6 @@
 STATIC_DCL void FDECL(polyman, (const char *, const char *));
 STATIC_DCL void NDECL(break_armor);
 STATIC_DCL void FDECL(drop_weapon, (int));
-STATIC_DCL void NDECL(uunstick);
 STATIC_DCL int FDECL(armor_to_dragon, (int));
 STATIC_DCL void NDECL(newman);
 
@@ -1080,7 +1079,7 @@ dogaze()
                             (adtyp == AD_CONF) ? "confuse" : "attack",
                             mon_nam(mtmp));
                     if (yn(qbuf) != 'y') continue;
-                    setmangry(mtmp);
+                    setmangry(mtmp, TRUE);
                 }
                 if (!mtmp->mcanmove || mtmp->mstun || mtmp->msleeping ||
                     !mtmp->mcansee || !haseyes(mtmp->data)) {
@@ -1217,9 +1216,13 @@ domindblast()
     return 1;
 }
 
-STATIC_OVL void
+void
 uunstick()
 {
+    if (!u.ustuck) {
+        warning("uunstick: no ustuck?");
+        return;
+    }
     pline("%s is no longer in your clutches.", Monnam(u.ustuck));
     u.ustuck = 0;
 }

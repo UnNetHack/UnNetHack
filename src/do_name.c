@@ -143,6 +143,85 @@ getpos_prevmon()
     return NULL;
 }
 
+char *
+dxdy_to_dist_descr(dx, dy, fulldir)
+int dx, dy;
+boolean fulldir;
+{
+    static char buf[30];
+    int dst;
+
+    if (!dx && !dy) {
+        Sprintf(buf, "here");
+    } else if ((dst = xytod(dx, dy)) != -1) {
+        /* explicit direction; 'one step' is implicit */
+        Sprintf(buf, "%s", directionname(dst));
+    } else {
+        static const char *dirnames[4][2] = {
+            { "n", "north" },
+            { "s", "south" },
+            { "w", "west" },
+            { "e", "east" } };
+        buf[0] = '\0';
+        /* 9999: protect buf[] against overflow caused by invalid values */
+        if (dy) {
+            if (abs(dy) > 9999) {
+                dy = sgn(dy) * 9999;
+            }
+            Sprintf(eos(buf), "%d%s%s", abs(dy), dirnames[(dy > 0)][fulldir], dx ? "," : "");
+        }
+        if (dx) {
+            if (abs(dx) > 9999) {
+                dx = sgn(dx) * 9999;
+            }
+            Sprintf(eos(buf), "%d%s", abs(dx), dirnames[2 + (dx > 0)][fulldir]);
+        }
+    }
+    return buf;
+}
+
+/* coordinate formatting for 'whatis_coord' option */
+char *
+coord_desc(x, y, outbuf, cmode)
+int x, y;
+char *outbuf, cmode;
+{
+    static char screen_fmt[16]; /* [12] suffices: "[%02d,%02d]" */
+    int dx, dy;
+
+    outbuf[0] = '\0';
+    switch (cmode) {
+    default:
+        break;
+    case GPCOORDS_COMFULL:
+    case GPCOORDS_COMPASS:
+        /* "east", "3s", "2n,4w" */
+        dx = x - u.ux;
+        dy = y - u.uy;
+        Sprintf(outbuf, "(%s)", dxdy_to_dist_descr(dx, dy, cmode == GPCOORDS_COMFULL));
+        break;
+    case GPCOORDS_MAP: /* x,y */
+        /* upper left corner of map is <1,0>;
+           with default COLNO,ROWNO lower right corner is <79,20> */
+        Sprintf(outbuf, "<%d,%d>", x, y);
+        break;
+    case GPCOORDS_SCREEN: /* y+2,x */
+        /* for normal map sizes, force a fixed-width formatting so that
+           /m, /M, /o, and /O output lines up cleanly; map sizes bigger
+           than Nx999 or 999xM will still work, but not line up like normal
+           when displayed in a column setting */
+        if (!*screen_fmt) {
+            Sprintf(screen_fmt, "[%%%sd,%%%sd]",
+                    (ROWNO-1 + 2 < 100) ? "02" :  "03",
+                    (COLNO-1 < 100) ? "02" : "03");
+        }
+        /* map line 0 is screen row 2;
+           map column 0 isn't used, map column 1 is screen column 1 */
+        Sprintf(outbuf, screen_fmt, y + 2, x);
+        break;
+    }
+    return outbuf;
+}
 
 int
 getpos(cc, force, goal)

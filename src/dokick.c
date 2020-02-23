@@ -128,7 +128,9 @@ register xchar x, y;
     bhitpos.x = x;
     bhitpos.y = y;
     if (attack_checks(mon, (struct obj *)0)) return;
-    setmangry(mon);
+
+    /* anger target even if wild miss will occur */
+    setmangry(mon, TRUE);
 
     /* Kick attacks by kicking monsters are normal attacks, not special.
      * This is almost always worthless, since you can either take one turn
@@ -272,7 +274,7 @@ register struct obj *gold;
 
     if(!likes_gold(mtmp->data) && !mtmp->isshk && !mtmp->ispriest
        && !is_mercenary(mtmp->data)) {
-        wakeup(mtmp);
+        wakeup(mtmp, TRUE);
     } else if (!mtmp->mcanmove) {
         /* too light to do real damage */
         if (canseemon(mtmp)) {
@@ -284,7 +286,10 @@ register struct obj *gold;
         long value = gold->quan * objects[gold->otyp].oc_cost;
         mtmp->msleeping = 0;
         mtmp->meating = 0;
-        if(!rn2(4)) setmangry(mtmp); /* not always pleasing */
+        if (!mtmp->isgd && !rn2(4)) {
+            /* not always pleasing */
+            setmangry(mtmp, TRUE);
+        }
 
         /* greedy monsters catch gold */
         if (cansee(mtmp->mx, mtmp->my))
@@ -931,7 +936,7 @@ dokick()
                 return(1);
             } else if (!rn2(4)) {
                 if(dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz)) {
-                    fall_through(FALSE);
+                    fall_through(FALSE, 0);
                     return(1);
                 } else goto ouch;
             }
@@ -951,7 +956,7 @@ dokick()
             if(!rn2(3)) goto ouch;
             /* make metal boots rust */
             if(uarmf && rn2(3))
-                if (!rust_dmg(uarmf, "metal boots", 1, FALSE, &youmonst)) {
+                if (water_damage(uarmf, "metal boots", TRUE) == ER_NOTHING) {
                     Your("boots get wet.");
                     /* could cause short-lived fumbling here */
                 }

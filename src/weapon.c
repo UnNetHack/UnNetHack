@@ -743,6 +743,38 @@ dbon()      /* damage bonus for strength */
     return dbon;
 }
 
+/* increase a towel's wetness */
+void
+wet_a_towel(obj, amt, verbose)
+struct obj *obj;
+int amt; /* positive: new value; negative: increment by -amt; zero: no-op */
+boolean verbose;
+{
+    int newspe = (amt <= 0) ? obj->spe - amt : amt;
+
+    /* new state is only reported if it's an increase */
+    if (newspe > obj->spe) {
+        if (verbose) {
+            const char *wetness = (newspe < 3) ?
+                                     (!obj->spe ? "damp" : "damper") :
+                                     (!obj->spe ? "wet" : "wetter");
+
+            if (carried(obj)) {
+                pline("%s gets %s.", Yobjnam2(obj, NULL), wetness);
+            } else if (mcarried(obj) && canseemon(obj->ocarry)) {
+                pline("%s %s gets %s.", s_suffix(Monnam(obj->ocarry)), xname(obj), wetness);
+            }
+        }
+    }
+    obj->spe = min(newspe, 7);
+
+    /* if hero is wielding this towel, don't give "you begin bashing
+       with your wet towel" message on next attack with it */
+    if (obj == uwep) {
+        unweapon = !is_wet_towel(obj);
+    }
+}
+
 /* decrease a towel's wetness */
 void
 dry_a_towel(obj, amt, verbose)

@@ -90,6 +90,7 @@ enum levl_typ_types {
 #define IS_CRYSTALICEWALL(typ) ((typ) == CRYSTALICEWALL)
 #define IS_ANY_ICEWALL(typ) (IS_ICEWALL(typ) || IS_CRYSTALICEWALL(typ))
 #define IS_DOOR(typ)    ((typ) == DOOR)
+#define IS_DOORJOIN(typ) (IS_ROCK(typ) || (typ) == IRONBARS)
 #define IS_TREE(typ)    ((typ) == TREE || \
                          (level.flags.arboreal && (typ) == STONE))
 #define IS_DEADTREE(typ) ((typ) == DEADTREE)
@@ -528,6 +529,8 @@ struct levelflags {
     Bitfield(arboreal, 1);      /* Trees replace rock */
     Bitfield(sky, 1);       /* map has sky instead of ceiling */
     Bitfield(sheol, 1);
+    Bitfield(corrmaze, 1);     /* Whether corridors are used for the maze
+                                  rather than ROOM */
 };
 
 struct mon_gen_tuple {

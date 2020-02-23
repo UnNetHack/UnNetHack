@@ -1848,4 +1848,42 @@ struct obj *otmp;
     return NULL;
 }
 
+/* Master Key is magic key if its bless/curse state meets our criteria:
+   not cursed for rogues or blessed for non-rogues */
+boolean
+is_magic_key(mon, obj)
+struct monst *mon; /* if null, non-rogue is assumed */
+struct obj *obj;
+{
+    if (!obj || obj->oartifact != ART_MASTER_KEY_OF_THIEVERY) {
+        return FALSE;
+    }
+    boolean is_rogue = (mon == &youmonst) ? Role_if(PM_ROGUE) : (mon && mon->data == &mons[PM_ROGUE]);
+    if (is_rogue ?  !obj->cursed : obj->blessed) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+/* figure out whether 'mon' (usually youmonst) is carrying the magic key */
+struct obj *
+has_magic_key(mon)
+struct monst *mon; /* if null, hero assumed */
+{
+    struct obj *o;
+    short key = artilist[ART_MASTER_KEY_OF_THIEVERY].otyp;
+
+    if (!mon) {
+        mon = &youmonst;
+    }
+    o = (mon == &youmonst) ? invent : mon->minvent;
+    while (o) {
+        if (is_magic_key(mon, o)) {
+            return o;
+        }
+        o = nxtobj(o, key, FALSE);
+    }
+    return (struct obj *) 0;
+}
+
 /*artifact.c*/

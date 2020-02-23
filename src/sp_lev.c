@@ -1,12 +1,11 @@
-/*  SCCS Id: @(#)sp_lev.c   3.4 2001/09/06  */
-/*  Copyright (c) 1989 by Jean-Christophe Collet */
+/* Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
  * This file contains the various functions that are related to the special
  * levels.
- * It contains also the special level loader.
  *
+ * It contains also the special level loader.
  */
 
 #include "hack.h"
@@ -54,18 +53,24 @@ long FDECL(opvar_array_length, (struct sp_coder *));
 #define TOP 1
 #define BOTTOM  5
 
+#define sq(x) ((x) * (x))
+
 #define XLIM    4
 #define YLIM    3
 
 #define Fread   (void)dlb_fread
 #define Fgetc   (schar)dlb_fgetc
+#define New(type) (type *) alloc(sizeof(type))
+#define NewTab(type, size) (type **) alloc(sizeof(type *) * (unsigned) size)
 #define Free(ptr)       if(ptr) free((genericptr_t) (ptr))
 
 extern struct engr *head_engr;
 
 extern int min_rx, max_rx, min_ry, max_ry; /* from mkmap.c */
 
+/* positions touched by level elements explicitly defined in the des-file */
 char SpLev_Map[COLNO][ROWNO];
+
 static aligntyp ralign[3] = { AM_CHAOTIC, AM_NEUTRAL, AM_LAWFUL };
 static NEARDATA xchar xstart, ystart;
 static NEARDATA char xsize, ysize;
@@ -84,12 +89,29 @@ char *lev_message = 0;
 lev_region *lregions = 0;
 int num_lregions = 0;
 
-struct obj *container_obj[MAX_CONTAINMENT];
-int container_idx = 0;
+static boolean splev_init_present = FALSE;
+static boolean icedpools = FALSE;
+static int mines_prize_count = 0, soko_prize_count = 0; /* achievements */
 
-struct monst *invent_carrying_monster = NULL;
+static struct obj *container_obj[MAX_CONTAINMENT];
+static int container_idx = 0;
+static struct monst *invent_carrying_monster = NULL;
 
 #define SPLEV_STACK_RESERVE 128
+
+void
+solidify_map()
+{
+    xchar x, y;
+
+    for (x = 0; x < COLNO; x++) {
+        for (y = 0; y < ROWNO; y++) {
+            if (IS_STWALL(levl[x][y].typ) && !SpLev_Map[x][y]) {
+                levl[x][y].wall_info |= (W_NONDIGGABLE | W_NONPASSWALL);
+            }
+        }
+    }
+}
 
 void
 splev_stack_init(st)
@@ -110,7 +132,7 @@ struct splevstack *st;
     if (st) {
         int i;
 
-        if (st->stackdata && st->depth)
+        if (st->stackdata && st->depth) {
             for (i = 0; i < st->depth; i++) {
                 switch (st->stackdata[i]->spovartyp) {
                 default:
@@ -125,13 +147,14 @@ struct splevstack *st;
                 case SPOVAR_VARIABLE:
                 case SPOVAR_STRING:
                 case SPOVAR_SEL:
-                    if (st->stackdata[i]->vardata.str) Free(st->stackdata[i]->vardata.str);
+                    Free(st->stackdata[i]->vardata.str);
                     st->stackdata[i]->vardata.str = NULL;
                     break;
                 }
                 Free(st->stackdata[i]);
                 st->stackdata[i] = NULL;
             }
+        }
 
         Free(st->stackdata);
         st->stackdata = NULL;
@@ -166,6 +189,7 @@ splev_stack_pop(st)
 struct splevstack *st;
 {
     struct opvar *ret = NULL;
+
     if (!st) return ret;
     if (!st->stackdata) panic("splev_stack_pop: no stackdata allocated?");
 
@@ -184,6 +208,7 @@ struct splevstack *st;
 {
     long i;
     struct opvar *tmp;
+
     if (!st) return NULL;
     if (!st->stackdata) panic("splev_stack_reverse: no stackdata allocated?");
     for (i = 0; i < (st->depth / 2); i++) {
@@ -212,6 +237,7 @@ char *s;
 {
     struct opvar *tmpov = (struct opvar *)alloc(sizeof(struct opvar));
     if (!tmpov) panic("could not alloc opvar struct");
+
     tmpov->spovartyp = SPOVAR_STRING;
     if (s) {
         int len = strlen(s);
@@ -281,13 +307,31 @@ struct opvar *ov;
     Free(ov);
 }
 
-#define opvar_free(ov) { if (ov) { opvar_free_x(ov); ov = NULL; } else impossible("opvar_free(), %s", __FUNCTION__); }
+/*
+ * Name of current function for use in messages:
+ * __func__     -- C99 standard;
+ * __FUNCTION__ -- gcc extension, starting before C99 and continuing after;
+ *                 picked up by other compilers (or vice versa?);
+ * __FUNC__     -- supported by Borland;
+ * nhFunc       -- slightly intrusive but fully portable nethack construct
+ *                 for any version of any compiler.
+ */
+#define opvar_free(ov)                                    \
+    do {                                                  \
+        if (ov) {                                         \
+            opvar_free_x(ov);                             \
+            ov = NULL;                                    \
+        } else {                                          \
+            impossible("opvar_free(), %s", __func__);     \
+        }                                                 \
+    } while (0)
 
 struct opvar *
 opvar_clone(ov)
 struct opvar *ov;
 {
     struct opvar *tmpov;
+
     if (!ov) panic("no opvar to clone");
     tmpov = (struct opvar *)alloc(sizeof(struct opvar));
     if (!tmpov) panic("could not alloc opvar struct");
@@ -304,7 +348,7 @@ struct opvar *ov;
     case SPOVAR_VARIABLE:
     case SPOVAR_STRING:
     case SPOVAR_SEL:
-        tmpov->vardata.str = strdup(ov->vardata.str);
+        tmpov->vardata.str = dupstr(ov->vardata.str);
         break;
     default: impossible("Unknown push value type (%i)!", ov->spovartyp);
     }
@@ -320,6 +364,7 @@ struct opvar *ov;
     struct splev_var *tmp;
     struct opvar *tmpov;
     struct opvar *array_idx = NULL;
+
     if (!coder || !ov) return NULL;
     if (ov->spovartyp != SPOVAR_VARIABLE) return ov;
     tmp = coder->frame->variables;
@@ -332,6 +377,7 @@ struct opvar *ov;
                 if (tmp->array_len < 1) panic("array len < 1");
                 OV_i(array_idx) = (OV_i(array_idx) % tmp->array_len);
                 tmpov = opvar_clone(tmp->data.arrayvalues[OV_i(array_idx)]);
+                opvar_free(array_idx);
                 return tmpov;
             } else {
                 tmpov = opvar_clone(tmp->data.value);
@@ -349,6 +395,7 @@ struct sp_coder *coder;
 char *name;
 {
     struct splev_var *tmp;
+
     if (!coder) return NULL;
     tmp = coder->frame->variables;
     while (tmp) {
@@ -365,11 +412,21 @@ xchar typ;
 {
     if (coder && coder->stack) {
         struct opvar *tmp = splev_stack_pop(coder->stack);
-        if (!tmp) panic("no value type %i in stack.", typ);
-        if (tmp->spovartyp == SPOVAR_VARIABLE)
-            tmp = opvar_var_conversion(coder, tmp);
-        if (tmp->spovartyp == typ)
+        struct opvar *ret = NULL;
+
+        if (!tmp) {
+            panic("no value type %i in stack.", typ);
+        }
+        if (tmp->spovartyp == SPOVAR_VARIABLE) {
+            ret = opvar_var_conversion(coder, tmp);
+            opvar_free(tmp);
+            tmp = ret;
+        }
+        if (tmp->spovartyp == typ) {
             return tmp;
+        } else {
+            opvar_free(tmp);
+        }
     }
     return NULL;
 }
@@ -380,25 +437,28 @@ struct sp_coder *coder;
 {
     if (coder && coder->stack) {
         struct opvar *tmp = splev_stack_pop(coder->stack);
-        if (tmp && tmp->spovartyp == SPOVAR_VARIABLE)
-            tmp = opvar_var_conversion(coder, tmp);
+        if (tmp && tmp->spovartyp == SPOVAR_VARIABLE) {
+            struct opvar *ret = opvar_var_conversion(coder, tmp);
+            opvar_free(tmp);
+            return ret;
+        }
         return tmp;
     }
     return NULL;
 }
-
-
 
 void
 variable_list_del(varlist)
 struct splev_var *varlist;
 {
     struct splev_var *tmp = varlist;
+
     if (!tmp) return;
     while (tmp) {
         Free(tmp->name);
         if ((tmp->svtyp & SPOVAR_ARRAY)) {
             long idx = tmp->array_len;
+
             while (idx-- > 0) {
                 opvar_free(tmp->data.arrayvalues[idx]);
             };
@@ -412,7 +472,6 @@ struct splev_var *varlist;
     }
 }
 
-
 void
 lvlfill_maze_grid(x1, y1, x2, y2, filling)
 int x1, y1, x2, y2;
@@ -420,15 +479,15 @@ schar filling;
 {
     int x, y;
 
-    for (x = x1; x <= x2; x++)
+    for (x = x1; x <= x2; x++) {
         for (y = y1; y <= y2; y++) {
-#ifndef WALLIFIED_MAZE
-            levl[x][y].typ = STONE;
-#else
-            levl[x][y].typ =
-                (y < 2 || ((x % 2) && (y % 2))) ? STONE : filling;
-#endif
+            if (level.flags.corrmaze) {
+                levl[x][y].typ = STONE;
+            } else {
+                levl[x][y].typ = (y < 2 || ((x % 2) && (y % 2))) ? STONE : filling;
+            }
         }
+    }
 }
 
 void
@@ -437,6 +496,7 @@ schar filling;
 schar lit;
 {
     int x, y;
+
     for (x = 2; x <= x_maze_max; x++)
         for (y = 0; y <= y_maze_max; y++) {
             SET_TYPLIT(x, y, filling, lit);
@@ -721,23 +781,32 @@ flip_level_rnd(int flp)
     flip_level(c);
 }
 
-
-
 /*
  * Make walls of the area (x1, y1, x2, y2) non diggable/non passwall-able
  */
-
 STATIC_OVL void
 set_wall_property(x1, y1, x2, y2, prop)
 xchar x1, y1, x2, y2;
 int prop;
 {
     register xchar x, y;
+    struct rm *lev;
 
-    for(y = max(y1, 0); y <= min(y2, ROWNO-1); y++)
-        for(x = max(x1, 0); x <= min(x2, COLNO-1); x++)
-            if(IS_STWALL(levl[x][y].typ) || IS_TREES(levl[x][y].typ))
-                levl[x][y].wall_info |= prop;
+    x1 = max(x1, 1);
+    x2 = min(x2, COLNO - 1);
+    y1 = max(y1, 0);
+    y2 = min(y2, ROWNO - 1);
+    for (y = y1; y <= y2; y++) {
+        for (x = x1; x <= x2; x++) {
+            lev = &levl[x][y];
+            if (IS_STWALL(lev->typ) || IS_TREES(lev->typ) ||
+                /* 3.6.2: made iron bars eligible to be flagged nondiggable
+                   (checked by chewing(hack.c) and zap_over_floor(zap.c)) */
+                 lev->typ == IRONBARS) {
+                lev->wall_info |= prop;
+            }
+        }
+    }
 }
 
 STATIC_OVL void
@@ -757,6 +826,7 @@ STATIC_OVL void
 count_features()
 {
     xchar x, y;
+
     level.flags.nfountains = level.flags.nsinks = 0;
     for (y = 0; y < ROWNO; y++)
         for (x = 0; x < COLNO; x++) {
@@ -778,6 +848,7 @@ remove_boundary_syms()
      */
     xchar x, y;
     boolean has_bounds = FALSE;
+
     for (x = 0; x < COLNO-1; x++)
         for (y = 0; y < ROWNO-1; y++)
             if (levl[x][y].typ == CROSSWALL) {
@@ -787,8 +858,91 @@ remove_boundary_syms()
     if (has_bounds) {
         for(x = 0; x < x_maze_max; x++)
             for(y = 0; y < y_maze_max; y++)
-                if ((levl[x][y].typ == CROSSWALL) && !SpLev_Map[x][y])
+                if ((levl[x][y].typ == CROSSWALL) && SpLev_Map[x][y]) {
                     levl[x][y].typ = ROOM;
+                }
+    }
+}
+/* used by sel_set_door() and link_doors_rooms() */
+static void
+set_door_orientation(x, y)
+int x, y;
+{
+    boolean wleft, wright, wup, wdown;
+
+    /* If there's a wall or door on either the left side or right
+     * side (or both) of this secret door, make it be horizontal.
+     *
+     * It is feasible to put SDOOR in a corner, tee, or crosswall
+     * position, although once the door is found and opened it won't
+     * make a lot sense (diagonal access required).  Still, we try to
+     * handle that as best as possible.  For top or bottom tee, using
+     * horizontal is the best we can do.  For corner or crosswall,
+     * either horizontal or vertical are just as good as each other;
+     * we produce horizontal for corners and vertical for crosswalls.
+     * For left or right tee, using vertical is best.
+     *
+     * A secret door with no adjacent walls is also feasible and makes
+     * even less sense.  It will be displayed as a vertical wall while
+     * hidden and become a vertical door when found.  Before resorting
+     * to that, we check for solid rock which hasn't been wallified
+     * yet (cf lower leftside of leader's room in Cav quest).
+     */
+    wleft  = (isok(x - 1, y) && (IS_WALL(levl[x - 1][y].typ) ||
+                                 IS_DOOR(levl[x - 1][y].typ) ||
+                                 levl[x - 1][y].typ == SDOOR));
+    wright = (isok(x + 1, y) && (IS_WALL(levl[x + 1][y].typ) ||
+                                 IS_DOOR(levl[x + 1][y].typ) ||
+                                 levl[x + 1][y].typ == SDOOR));
+    wup    = (isok(x, y - 1) && (IS_WALL(levl[x][y - 1].typ) ||
+                                 IS_DOOR(levl[x][y - 1].typ) ||
+                                 levl[x][y - 1].typ == SDOOR));
+    wdown  = (isok(x, y + 1) && (IS_WALL(levl[x][y + 1].typ) ||
+                                 IS_DOOR(levl[x][y + 1].typ) ||
+                                 levl[x][y + 1].typ == SDOOR));
+    if (!wleft && !wright && !wup && !wdown) {
+        /* out of bounds is treated as implicit wall; should be academic
+           because we don't expect to have doors so near the level's edge */
+        wleft  = (!isok(x - 1, y) || IS_DOORJOIN(levl[x - 1][y].typ));
+        wright = (!isok(x + 1, y) || IS_DOORJOIN(levl[x + 1][y].typ));
+        wup    = (!isok(x, y - 1) || IS_DOORJOIN(levl[x][y - 1].typ));
+        wdown  = (!isok(x, y + 1) || IS_DOORJOIN(levl[x][y + 1].typ));
+    }
+    levl[x][y].horizontal = ((wleft || wright) && !(wup && wdown)) ? 1 : 0;
+}
+
+static void
+maybe_add_door(x, y, droom)
+int x, y;
+struct mkroom *droom;
+{
+    if (droom->hx >= 0 && doorindex < DOORMAX && inside_room(droom, x, y)) {
+        add_door(x, y, droom);
+    }
+}
+
+static void
+link_doors_rooms()
+{
+    int x, y;
+    int tmpi, m;
+
+    for (y = 0; y < ROWNO; y++) {
+        for (x = 0; x < COLNO; x++) {
+            if (IS_DOOR(levl[x][y].typ) || levl[x][y].typ == SDOOR) {
+                /* in case this door was a '+' or 'S' from the
+                   MAP...ENDMAP section without an explicit DOOR
+                   directive, set/clear levl[][].horizontal for it */
+                set_door_orientation(x, y);
+
+                for (tmpi = 0; tmpi < nroom; tmpi++) {
+                    maybe_add_door(x, y, &rooms[tmpi]);
+                    for (m = 0; m < rooms[tmpi].nsubrooms; m++) {
+                        maybe_add_door(x, y, rooms[tmpi].sbrooms[m]);
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -796,6 +950,7 @@ void
 fill_rooms()
 {
     int tmpi;
+
     for (tmpi = 0; tmpi < nroom; tmpi++) {
         int m;
         if (rooms[tmpi].needfill)
@@ -813,6 +968,7 @@ STATIC_OVL int
 rnddoor()
 {
     int i = 1 << rn2(5);
+
     i >>= 1;
     return i;
 }
@@ -828,7 +984,8 @@ rndtrap()
     do {
         rtrap = rnd(TRAPNUM-1);
         switch (rtrap) {
-        case HOLE:      /* no random holes on special levels */
+        case HOLE: /* no random holes on special levels */
+        case VIBRATING_SQUARE:
         case MAGIC_PORTAL: rtrap = NO_TRAP;
             break;
         case TRAPDOOR: if (!Can_dig_down(&u.uz)) rtrap = NO_TRAP;
@@ -851,7 +1008,6 @@ rndtrap()
  *  The "humidity" flag is used to insure that engravings aren't
  *  created underwater, or eels on dry land.
  */
-
 STATIC_DCL boolean FDECL(is_ok_location, (SCHAR_P, SCHAR_P, int));
 
 STATIC_OVL void
@@ -875,10 +1031,10 @@ struct mkroom *croom;
         sy = ysize;
     }
 
-    if (*x >= 0) {          /* normal locations */
+    if (*x >= 0) { /* normal locations */
         *x += mx;
         *y += my;
-    } else {            /* random location */
+    } else { /* random location */
         do {
             if (croom) { /* handle irregular areas */
                 coord tmpc;
@@ -893,6 +1049,7 @@ struct mkroom *croom;
         } while (++cpt < 100);
         if (cpt >= 100) {
             register int xx, yy;
+
             /* last try */
             for (xx = 0; xx < sx; xx++)
                 for (yy = 0; yy < sy; yy++) {
@@ -938,6 +1095,9 @@ register int humidity;
             typ == CLOUD || typ == ICE || typ == CORR)
             return TRUE;
     }
+    if ((humidity & SPACELOC) && SPACE_POS(levl[x][y].typ)) {
+        return TRUE;
+    }
     if ((humidity & WET) && is_pool(x, y)) return TRUE;
     if ((humidity & HOT) && is_lava(x, y)) return TRUE;
     return FALSE;
@@ -972,6 +1132,7 @@ struct mkroom *croom;
 long crd;
 {
     unpacked_coord c;
+
     c = get_unpacked_coord(crd, humidity);
     *x = c.x;
     *y = c.y;
@@ -1104,7 +1265,6 @@ chk:
  * Create a new room.
  * This is still very incomplete...
  */
-
 boolean
 create_room(x, y, w, h, xal, yal, rtype, rlit)
 xchar x, y;
@@ -1283,7 +1443,6 @@ xchar rtype, rlit;
  * Create a subroom in room proom at pos x,y with width w & height h.
  * x & y are relative to the parent room.
  */
-
 STATIC_OVL boolean
 create_subroom(proom, x, y, w,  h, rtype, rlit)
 struct mkroom *proom;
@@ -1332,7 +1491,6 @@ xchar rtype, rlit;
  * Create a new door in a room.
  * It's placed on a wall (north, south, east or west).
  */
-
 STATIC_OVL void
 create_door(dd, broom)
 room_door *dd;
@@ -1465,13 +1623,12 @@ xchar walls;     /* any of W_NORTH | W_SOUTH | W_EAST | W_WEST (or W_ANY) */
 /*
  * Create a trap in a room.
  */
-
 STATIC_OVL void
 create_trap(t, croom)
 trap    *t;
 struct mkroom   *croom;
 {
-    schar x, y;
+    schar x = -1, y = -1;
     coord tm;
 
     if (croom)
@@ -1571,7 +1728,6 @@ struct mkroom* croom;
 /*
  * Create a monster in a room.
  */
-
 STATIC_OVL int
 noncoalignment(alignment)
 aligntyp alignment;
@@ -1582,6 +1738,54 @@ aligntyp alignment;
     if (!alignment)
         return(k ? -1 : 1);
     return(k ? -alignment : 0);
+}
+
+/* attempt to screen out locations where a mimic-as-boulder shouldn't occur */
+static boolean
+m_bad_boulder_spot(x, y)
+int x, y;
+{
+    struct rm *lev;
+
+    /* avoid trap locations */
+    if (t_at(x, y)) {
+        return TRUE;
+    }
+    /* try to avoid locations which already have a boulder (this won't
+       actually work; we get called before objects have been placed...) */
+    if (sobj_at(BOULDER, x, y)) {
+        return TRUE;
+    }
+    /* avoid closed doors */
+    lev = &levl[x][y];
+    if (IS_DOOR(lev->typ) && (lev->doormask & (D_CLOSED | D_LOCKED)) != 0) {
+        return TRUE;
+    }
+    /* spot is ok */
+    return FALSE;
+}
+
+static int
+pm_to_humidity(pm)
+struct permonst *pm;
+{
+    int loc = DRY;
+    if (!pm) {
+        return loc;
+    }
+    if (pm->mlet == S_EEL || amphibious(pm) || is_swimmer(pm)) {
+        loc = WET;
+    }
+    if (is_flyer(pm) || is_floater(pm)) {
+        loc |= (HOT | WET);
+    }
+    if (passes_walls(pm) || noncorporeal(pm)) {
+        loc |= SOLID;
+    }
+    if (flaming(pm)) {
+        loc |= HOT;
+    }
+    return loc;
 }
 
 STATIC_OVL void
@@ -1596,7 +1800,6 @@ struct mkroom   *croom;
     coord cc;
     struct permonst *pm;
     unsigned g_mvflags;
-
 
     if (m->class >= 0)
         class = (char) def_char_to_monclass((char)m->class);
@@ -1632,11 +1835,7 @@ struct mkroom   *croom;
         pm = (struct permonst *) 0;
 
     if (pm) {
-        int loc = DRY;
-        if (pm->mlet == S_EEL || amphibious(pm) || is_swimmer(pm)) loc = WET;
-        if (is_flyer(pm) || is_floater(pm)) loc |= (HOT | WET);
-        if (passes_walls(pm) || noncorporeal(pm)) loc |= SOLID;
-        if (flaming(pm)) loc |= HOT;
+        int loc = pm_to_humidity(pm);
         /* If water-liking monster, first try is without DRY */
         get_location_coord(&x, &y, loc|NO_LOC_WARN, croom, m->coord);
         if (x == -1 && y == -1) {
@@ -1658,12 +1857,15 @@ struct mkroom   *croom;
     else mtmp = makemon(pm, x, y, NO_MM_FLAGS);
 
     if (mtmp) {
+        x = mtmp->mx, y = mtmp->my; /* sanity precaution */
+        m->x = x, m->y = y;
         /* handle specific attributes for some special monsters */
         if (m->name.str) mtmp = christen_monst(mtmp, m->name.str);
 
         /*
-         * This is currently hardwired for mimics only.  It should
-         * eventually be expanded.
+         * This doesn't complain if an attempt is made to give a
+         * non-mimic/non-shapechanger an appearance or to give a
+         * shapechanger a non-monster shape, it just refuses to comply.
          */
         if (m->appear_as.str && ((mtmp->data->mlet == S_MIMIC) || mtmp->cham)) {
             int i;
@@ -1702,6 +1904,26 @@ struct mkroom   *croom;
                 } else {
                     mtmp->m_ap_type = M_AP_OBJECT;
                     mtmp->mappearance = i;
+                    /* try to avoid placing mimic boulder on a trap */
+                    if (i == BOULDER && m->x < 0 && m_bad_boulder_spot(x, y)) {
+                        int retrylimit = 10;
+
+                        remove_monster(x, y);
+                        do {
+                            x = m->x;
+                            y = m->y;
+                            get_location(&x, &y, DRY, croom);
+                            if (MON_AT(x, y) && enexto(&cc, x, y, pm)) {
+                                x = cc.x, y = cc.y;
+                            }
+                        } while (m_bad_boulder_spot(x, y) && --retrylimit > 0);
+                        place_monster(mtmp, x, y);
+                        /* if we didn't find a good spot
+                           then mimic something else */
+                        if (!retrylimit) {
+                            set_mimic_sym(mtmp);
+                        }
+                    }
                 }
                 break;
 
@@ -1712,32 +1934,49 @@ struct mkroom   *croom;
                     mndx = select_newcham_form(mtmp);
                 else
                     mndx = name_to_mon(m->appear_as.str);
-                if ((mndx != NON_PM) && (&mons[mndx] != mtmp->data)) {
+
+                if (mndx == NON_PM ||
+                     (is_vampshifter(mtmp) && !validvamp(mtmp, &mndx, S_HUMAN))) {
+                    impossible("create_monster: invalid %s (\"%s\")",
+                               (mtmp->data->mlet == S_MIMIC) ? "mimic appearance" :
+                               (mtmp->data == &mons[PM_WIZARD_OF_YENDOR]) ? "Wizard appearance" :
+                               is_vampshifter(mtmp) ? "vampire shape" : "chameleon shape",
+                               m->appear_as.str);
+                } else if (&mons[mndx] == mtmp->data) {
+                    /* explicitly forcing a mimic to appear as itself */
+                    mtmp->m_ap_type = M_AP_NOTHING;
+                    mtmp->mappearance = 0;
+                } else if (mtmp->data->mlet == S_MIMIC ||
+                           mtmp->data == &mons[PM_WIZARD_OF_YENDOR]) {
+                    /* this is ordinarily only used for Wizard clones
+                       and hasn't been exhaustively tested for mimics */
+                    mtmp->m_ap_type = M_AP_MONSTER;
+                    mtmp->mappearance = mndx;
+                } else {
+                    /* chameleon or vampire */
                     struct permonst *mdat = &mons[mndx];
                     struct permonst *olddata = mtmp->data;
-                    /* this code duplicated from newcham() */
-                    if(is_male(mdat)) {
-                        if(mtmp->female) mtmp->female = FALSE;
-                    } else if (is_female(mdat)) {
-                        if(!mtmp->female) mtmp->female = TRUE;
-                    } else if (!is_neuter(mdat)) {
-                        if(!rn2(10)) mtmp->female = !mtmp->female;
-                    }
+
+                    mgender_from_permonst(mtmp, mdat);
                     set_mon_data(mtmp, mdat);
                     if (emits_light(olddata) != emits_light(mtmp->data)) {
                         /* used to give light, now doesn't, or vice versa,
                            or light's range has changed */
-                        if (emits_light(olddata))
-                            del_light_source(LS_MONSTER, monst_to_any(mtmp));
-                        if (emits_light(mtmp->data))
-                            new_light_source(mtmp->mx, mtmp->my, emits_light(mtmp->data),
-                                             LS_MONSTER, monst_to_any(mtmp));
+                        if (emits_light(olddata)) {
+                            del_light_source(LS_MONSTER, (void *)mtmp);
+                        }
+                        if (emits_light(mtmp->data)) {
+                            new_light_source(mtmp->mx, mtmp->my,
+                                             emits_light(mtmp->data),
+                                             LS_MONSTER, (void *)mtmp);
+                        }
                     }
-                    if (!mtmp->perminvis || pm_invisible(olddata))
+                    if (!mtmp->perminvis || pm_invisible(olddata)) {
                         mtmp->perminvis = pm_invisible(mdat);
+                    }
                 }
+                break;
             }
-            break;
             default:
                 warning(
                     "create_monster: unimplemented mon appear type [%d,\"%s\"]",
@@ -1793,22 +2032,20 @@ struct mkroom   *croom;
             invent_carrying_monster = mtmp;
         }
     }
-
 }
 
 /*
  * Create an object in a room.
  */
-
 STATIC_OVL void
 create_object(o, croom)
-object  *o;
+object *o;
 struct mkroom   *croom;
 {
     struct obj *otmp;
     schar x, y;
     char c;
-    boolean named;  /* has a name been supplied in level description? */
+    boolean named; /* has a name been supplied in level description? */
 
     named = o->name.str ? TRUE : FALSE;
 
@@ -1877,7 +2114,9 @@ struct mkroom   *croom;
         otmp->obroken = 1;
         otmp->olocked = 0; /* obj generation may set */
     }
-    if (o->trapped) otmp->otrapped = 1;
+    if (o->trapped == 0 || o->trapped == 1) {
+        otmp->otrapped = o->trapped;
+    }
     if (o->greased) otmp->greased = 1;
 #ifdef INVISIBLE_OBJECTS
     if (o->invis) otmp->oinvis = 1;
@@ -1888,7 +2127,7 @@ struct mkroom   *croom;
         otmp->owt = weight(otmp);
     }
 
-    /* contents */
+    /* contents (of a container or monster's inventory) */
     if (o->containment & SP_OBJ_CONTENT) {
         if (!container_idx) {
             if (!invent_carrying_monster) {
@@ -1898,31 +2137,19 @@ struct mkroom   *croom;
                    they get generated outside the des-file. Maybe another data file that determines what
                    inventories monsters get by default?
                  */
+                ; /* ['otmp' remains on floor] */
             } else {
-                int c;
-                struct obj *objcheck = otmp;
-                int inuse = -1;
-                for (c = 0; c < container_idx; c++)
-                    if (container_obj[c] == objcheck)
-                        inuse = c;
                 remove_object(otmp);
-                if (mpickobj(invent_carrying_monster, otmp)) {
-                    if (inuse > -1) {
-                        impossible("container given to monster was merged or deallocated.");
-                        for (c = inuse; c < container_idx-1; c++)
-                            container_obj[c] = container_obj[c+1];
-                        container_obj[container_idx] = NULL;
-                        container_idx--;
-                    }
-                    /* we lost track of it. */
-                    return;
-                }
+                (void) mpickobj(invent_carrying_monster, otmp);
             }
         } else {
+            struct obj *cobj = container_obj[container_idx - 1];
+
             remove_object(otmp);
-            if (container_obj[container_idx-1])
-                (void) add_to_container(container_obj[container_idx-1], otmp);
-            else {
+            if (cobj) {
+                (void) add_to_container(cobj, otmp);
+                cobj->owt = weight(cobj);
+            } else {
                 obj_extract_self(otmp);
                 obfree(otmp, NULL);
                 return;
@@ -1953,17 +2180,21 @@ struct mkroom   *croom;
          * resistant (if they were, we'd have to reset the name as well as
          * setting corpsenm).
          */
-        for (wastyp = otmp->corpsenm; i < 1000; i++) {
+        for (wastyp = otmp->corpsenm; i < 1000; i++, wastyp = rndmonnum()) {
             /* makemon without rndmonst() might create a group */
-            was = makemon(&mons[wastyp], 0, 0, NO_MM_FLAGS);
+            was = makemon(&mons[wastyp], 0, 0, MM_NOCOUNTBIRTH);
             if (was) {
-                if (!resists_ston(was)) break;
+                if (!resists_ston(was)) {
+                    (void) propagate(wastyp, TRUE, FALSE);
+                    break;
+                }
                 mongone(was);
+                was = NULL;
             }
             wastyp = rndmonnum();
         }
         if (was) {
-            otmp->corpsenm = wastyp;
+            set_corpsenm(otmp, wastyp);
             while (was->minvent) {
                 obj = was->minvent;
                 obj->owornmask = 0;
@@ -1983,6 +2214,42 @@ struct mkroom   *croom;
     if (otmp->otyp == LUCKSTONE && Is_mineend_level(&u.uz)) {
         otmp->record_achieve_special = 1;
     }
+#if 0
+    if (o->id != -1) {
+        static const char prize_warning[] = "multiple prizes on %s level";
+
+        /* if this is a specific item of the right type and it is being
+           created on the right level, flag it as the designated item
+           used to detect a special achievement (to whit, reaching and
+           exploring the target level, although the exploration part
+           might be short-circuited if a monster brings object to hero) */
+        if (Is_mineend_level(&u.uz)) {
+            if (otmp->otyp == iflags.mines_prize_type) {
+                if (!mines_prize_count++) {
+                    /* Note: the first luckstone on lev will become the prize
+                             even if its not the explicit one, but random */
+                    otmp->record_achieve_special = MINES_PRIZE;
+                    /* prevent stacking; cleared when achievement is recorded */
+                    otmp->nomerge = 1;
+                }
+            }
+        } else if (Is_sokoend_level(&u.uz)) {
+            if (otmp->otyp == iflags.soko_prize_type1) {
+                otmp->record_achieve_special = SOKO_PRIZE1;
+                otmp->nomerge = 1; /* redundant; Sokoban prizes don't stack */
+                if (++soko_prize_count > 1) {
+                    impossible(prize_warning, "sokoban end");
+                }
+            } else if (otmp->otyp == iflags.soko_prize_type2) {
+                otmp->record_achieve_special = SOKO_PRIZE2;
+                otmp->nomerge = 1; /* redundant; Sokoban prizes don't stack */
+                if (++soko_prize_count > 1) {
+                    impossible(prize_warning, "sokoban end");
+                }
+            }
+        }
+    }
+#endif
 #endif
 
     stackobj(otmp);
@@ -1993,6 +2260,7 @@ struct mkroom   *croom;
 
     if (o->buried) {
         boolean dealloced;
+
         (void) bury_an_obj(otmp, &dealloced);
         if (dealloced && container_idx) {
             container_obj[container_idx-1] = NULL;
@@ -2003,13 +2271,12 @@ struct mkroom   *croom;
 /*
  * Create an altar in a room.
  */
-
 STATIC_OVL void
 create_altar(a, croom)
 altar       *a;
 struct mkroom   *croom;
 {
-    schar sproom, x, y;
+    schar sproom, x = -1, y = -1;
     aligntyp amask;
     boolean croom_is_temple = TRUE;
     int oldtyp;
@@ -2053,7 +2320,7 @@ struct mkroom   *croom;
 
     if (!croom_is_temple || !a->shrine) return;
 
-    if (a->shrine) {    /* Is it a shrine  or sanctum? */
+    if (a->shrine) { /* Is it a shrine  or sanctum? */
         priestini(&u.uz, croom, x, y, (a->shrine > 1));
         levl[x][y].altarmask |= AM_SHRINE;
         level.flags.has_temple = TRUE;
@@ -2086,7 +2353,6 @@ struct mkroom *croom;
 /*
  * Search for a door in a room on a specified wall.
  */
-
 STATIC_OVL boolean
 search_door(croom, x, y, wall, cnt)
 struct mkroom *croom;
@@ -2139,16 +2405,15 @@ int cnt;
 /*
  * Dig a corridor between two points.
  */
-
 boolean
 dig_corridor(org, dest, nxcor, ftyp, btyp)
 coord *org, *dest;
 boolean nxcor;
 schar ftyp, btyp;
 {
-    register int dx=0, dy=0, dix, diy, cct;
-    register struct rm *crm;
-    register int tx, ty, xx, yy;
+    int dx=0, dy=0, dix, diy, cct;
+    struct rm *crm;
+    int tx, ty, xx, yy;
 
     xx = org->x;  yy = org->y;
     tx = dest->x; ty = dest->y;
@@ -2178,7 +2443,7 @@ schar ftyp, btyp;
         yy += dy;
 
         if(xx >= COLNO-1 || xx <= 0 || yy <= 0 || yy >= ROWNO-1)
-            return FALSE;   /* impossible */
+            return FALSE; /* impossible */
 
         crm = &levl[xx][yy];
         if(crm->typ == btyp) {
@@ -2198,6 +2463,16 @@ schar ftyp, btyp;
         /* find next corridor position */
         dix = abs(xx-tx);
         diy = abs(yy-ty);
+
+#if 0
+        /* supposed to add some variance in corridors */
+        /* TODO: check this claim */
+        if ((dix > diy) && diy && !rn2(dix-diy+1)) {
+            dix = 0;
+        } else if ((diy > dix) && dix && !rn2(diy-dix+1)) {
+            diy = 0;
+        }
+#endif
 
         /* do we have to change direction ? */
         if(dy && dix > diy) {
@@ -2289,7 +2564,6 @@ fix_stair_rooms()
  * Basically we search for door coordinates or for endpoints coordinates
  * (from a distance).
  */
-
 STATIC_OVL void
 create_corridor(c)
 corridor    *c;
@@ -2297,7 +2571,6 @@ corridor    *c;
     coord org, dest;
 
     if (c->src.room == -1) {
-        /*sort_rooms();*/
         fix_stair_rooms();
         makecorridors(c->src.door);
         return;
@@ -2331,7 +2604,6 @@ corridor    *c;
 /*
  * Fill a room (shop, zoo, etc...) with appropriate stuff.
  */
-
 void
 fill_room(croom, prefilled)
 struct mkroom *croom;
@@ -2360,6 +2632,9 @@ boolean prefilled;
         case COURT:
         case ZOO:
         case BEEHIVE:
+        case ANTHOLE:
+        case COCKNEST:
+        case LEPREHALL:
         case LEMUREPIT:
         case MORGUE:
         case BARRACKS:
@@ -2499,7 +2774,6 @@ int x1, y1, x2, y2;
  * We want a place not 'touched' by the loader.  That is, a place in
  * the maze outside every part of the special level.
  */
-
 STATIC_OVL void
 maze1xy(m, humidity)
 coord *m;
@@ -2569,10 +2843,11 @@ fill_empty_maze()
 
             maze1xy(&mm, DRY);
             trytrap = rndtrap();
-            if (sobj_at(BOULDER, mm.x, mm.y))
-                while (trytrap == PIT || trytrap == SPIKED_PIT ||
-                       trytrap == TRAPDOOR || trytrap == HOLE)
+            if (sobj_at(BOULDER, mm.x, mm.y)) {
+                while (is_pit(trytrap) || is_hole(trytrap)) {
                     trytrap = rndtrap();
+                }
+            }
             (void) maketrap(mm.x, mm.y, trytrap);
         }
     }
@@ -2594,8 +2869,8 @@ sp_lev *lvl;
 
     lvl->opcodes = (_opcode *)alloc(sizeof(_opcode) * (lvl->n_opcodes));
     if (!lvl->opcodes) panic("sp lvl load opcodes alloc");
-    while (n_opcode < lvl->n_opcodes) {
 
+    while (n_opcode < lvl->n_opcodes) {
         Fread((genericptr_t) &lvl->opcodes[n_opcode].opcode, 1,
               sizeof(lvl->opcodes[n_opcode].opcode), fd);
         opcode = lvl->opcodes[n_opcode].opcode;
@@ -2606,9 +2881,10 @@ sp_lev *lvl;
             panic("sp_level_loader: impossible opcode %i.", opcode);
 
         if (opcode == SPO_PUSH) {
-            struct opvar *ov = (opdat = (struct opvar *)alloc(sizeof(struct opvar)));
             int nsize;
+            struct opvar *ov = (struct opvar *) alloc(sizeof(struct opvar));
 
+            opdat = ov;
             if (!ov) panic("push ov alloc");
             ov->spovartyp = SPO_NULL;
             ov->vardata.l = 0;
@@ -2697,6 +2973,7 @@ lev_init *linit;
     case LVLINIT_MINES:
         if (linit->lit == -1) linit->lit = rn2(2);
         if (linit->filling > -1) lvlfill_solid(linit->filling, 0);
+        linit->icedpools = icedpools;
         mkmap(linit);
         break;
     }
@@ -2708,6 +2985,7 @@ long execptr;
 {
     struct sp_frame *frame = (struct sp_frame *)alloc(sizeof(struct sp_frame));
     if (!frame) panic("could not create execution frame.");
+
     frame->next = NULL;
     frame->variables = NULL;
     frame->n_opcode = execptr;
@@ -2905,6 +3183,7 @@ spo_frame_push(coder)
 struct sp_coder *coder;
 {
     struct sp_frame *tmpframe = frame_new(coder->frame->n_opcode);
+
     tmpframe->next = coder->frame;
     coder->frame = tmpframe;
 }
@@ -2915,6 +3194,7 @@ struct sp_coder *coder;
 {
     if (coder->frame && coder->frame->next) {
         struct sp_frame *tmpframe = coder->frame->next;
+
         frame_del(coder->frame);
         coder->frame = tmpframe;
         coder->stack = coder->frame->stack;
@@ -2959,6 +3239,7 @@ spo_return(coder)
 struct sp_coder *coder;
 {
     struct opvar *params;
+
     if (!coder->frame || !coder->frame->next) panic("return: no frame.");
     if (!OV_pop_i(params)) return;
     if (OV_i(params) < 0) return;
@@ -2980,7 +3261,7 @@ struct sp_coder *coder;
 
 void
 spo_end_moninvent(coder)
-struct sp_coder *coder;
+struct sp_coder *coder UNUSED;
 {
     if (invent_carrying_monster)
         m_dowear(invent_carrying_monster, TRUE);
@@ -2989,7 +3270,7 @@ struct sp_coder *coder;
 
 void
 spo_pop_container(coder)
-struct sp_coder *coder;
+struct sp_coder *coder UNUSED;
 {
     if (container_idx > 0) {
         container_idx--;
@@ -3005,7 +3286,9 @@ struct sp_coder *coder;
     struct opvar *op;
     char *msg, *levmsg;
     int old_n, n;
+
     if (!OV_pop_s(op)) return;
+
     msg = string_subst(OV_s(op));
     if (!msg) return;
 
@@ -3062,12 +3345,13 @@ struct sp_coder *coder;
            (OV_i(varparam) >= 0) &&
            (OV_i(varparam) < SP_M_V_END)) {
         struct opvar *parm = NULL;
+
         OV_pop(parm);
         switch (OV_i(varparam)) {
         case SP_M_V_NAME:
             if ((OV_typ(parm) == SPOVAR_STRING) &&
                 !tmpmons.name.str)
-                tmpmons.name.str = strdup(OV_s(parm));
+                tmpmons.name.str = dupstr(OV_s(parm));
             break;
         case SP_M_V_APPEAR:
             if ((OV_typ(parm) == SPOVAR_INT) &&
@@ -3075,7 +3359,7 @@ struct sp_coder *coder;
                 tmpmons.appear = OV_i(parm);
                 opvar_free(parm);
                 OV_pop(parm);
-                tmpmons.appear_as.str = strdup(OV_s(parm));
+                tmpmons.appear_as.str = dupstr(OV_s(parm));
             }
             break;
         case SP_M_V_ASLEEP:
@@ -3179,7 +3463,6 @@ struct sp_coder *coder;
 
     struct opvar *varparam;
     struct opvar *id, *containment;
-
     object tmpobj;
 
     tmpobj.spe = -127;
@@ -3191,7 +3474,7 @@ struct sp_coder *coder;
     tmpobj.lit = 0;
     tmpobj.eroded = 0;
     tmpobj.locked = 0;
-    tmpobj.trapped = 0;
+    tmpobj.trapped = -1;
     tmpobj.recharged = 0;
     tmpobj.invis = 0;
     tmpobj.greased = 0;
@@ -3207,22 +3490,25 @@ struct sp_coder *coder;
            (OV_i(varparam) >= 0) &&
            (OV_i(varparam) < SP_O_V_END)) {
         struct opvar *parm;
+
         OV_pop(parm);
         switch (OV_i(varparam)) {
         case SP_O_V_NAME:
             if ((OV_typ(parm) == SPOVAR_STRING) &&
                 !tmpobj.name.str)
-                tmpobj.name.str = strdup(OV_s(parm));
+                tmpobj.name.str = dupstr(OV_s(parm));
             break;
         case SP_O_V_CORPSENM:
             if (OV_typ(parm) == SPOVAR_MONST) {
                 char monclass = SP_MONST_CLASS(OV_i(parm));
                 int monid = SP_MONST_PM(OV_i(parm));
-                if (monid >= 0 && monid < NUMMONS) {
+
+                if (monid >= LOW_PM && monid < NUMMONS) {
                     tmpobj.corpsenm = monid;
                     break; /* we're done! */
                 } else {
                     struct permonst *pm = (struct permonst *)0;
+
                     if (def_char_to_monclass(monclass) != MAXMCLASSES) {
                         pm = mkclass(def_char_to_monclass(monclass), G_NOGEN);
                     } else {
@@ -3344,6 +3630,10 @@ struct sp_coder *coder;
     if (flags & SHROUD) level.flags.hero_memory = 0;
     if (flags & STORMY) level.flags.stormy = 1;
     if (flags & GRAVEYARD) level.flags.graveyard = 1;
+    if (flags & ICEDPOOLS) { icedpools = TRUE; }
+    if (flags & SOLIDIFY) { coder->solidify = TRUE; }
+    if (flags & CORRMAZE) { level.flags.corrmaze = TRUE; }
+    if (flags & CHECK_INACCESSIBLES) { coder->check_inaccessibles = TRUE; }
     if (flags & SKYMAP) level.flags.sky = 1;
     if (flags & FLAG_RNDVAULT) coder->allow_flips = 0;
 
@@ -3365,6 +3655,8 @@ struct sp_coder *coder;
         !OV_pop_i(walled) ||
         !OV_pop_i(filling) ||
         !OV_pop_i(init_style)) return;
+
+    splev_init_present = TRUE;
 
     init_lev.init_style = OV_i(init_style);
     init_lev.fg = OV_i(fg);
@@ -3625,16 +3917,12 @@ struct sp_coder *coder;
     if (!OV_pop_i(up) ||
         !OV_pop_c(coord)) return;
 
-    if (coder->croom) {
-        get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
-        mkstairs(x, y, (char)OV_i(up), coder->croom);
-        SpLev_Map[x][y] = 1;
-    } else {
-        get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
-        if ((badtrap = t_at(x, y)) != 0) deltrap(badtrap);
-        mkstairs(x, y, (char)OV_i(up), coder->croom);
-        SpLev_Map[x][y] = 1;
+    get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
+    if ((badtrap = t_at(x, y)) != 0) {
+        deltrap(badtrap);
     }
+    mkstairs(x, y, (char) OV_i(up), coder->croom);
+    SpLev_Map[x][y] = 1;
 
     opvar_free(coord);
     opvar_free(up);
@@ -3764,7 +4052,9 @@ struct sp_coder *coder;
     struct opvar *coord, *amt;
     schar x, y;
     long amount;
+
     if (!OV_pop_c(coord) || !OV_pop_i(amt)) return;
+
     amount = OV_i(amt);
     get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
     if (amount == -1) amount = rnd(200);
@@ -3852,6 +4142,7 @@ struct opvar *s;
 {
     struct opvar *ov;
     int x, y;
+
     ov = selection_opvar(NULL);
     if (!ov) return NULL;
 
@@ -3901,7 +4192,9 @@ struct opvar *mc;
     schar mapc;
     xchar lit;
     struct opvar *ret = selection_opvar(NULL);
+
     if (!ov || !mc || !ret) return NULL;
+
     mapc = SP_MAPCHAR_TYP(OV_i(mc));
     lit = SP_MAPCHAR_LIT(OV_i(mc));
     for (x = 0; x < COLNO; x++)
@@ -3925,6 +4218,7 @@ struct opvar *ov;
 int percent;
 {
     int x, y;
+
     if (!ov) return;
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++)
@@ -3932,10 +4226,11 @@ int percent;
                 selection_setpoint(x, y, ov, 0);
 }
 
-int
-selection_rndcoord(ov, x, y)
+static int
+selection_rndcoord(ov, x, y, removeit)
 struct opvar *ov;
 schar *x, *y;
+boolean removeit;
 {
     int idx = 0;
     int c;
@@ -3953,6 +4248,9 @@ schar *x, *y;
                     if (!c) {
                         *x = dx;
                         *y = dy;
+                        if (removeit) {
+                            selection_setpoint(dx, dy, ov, 0);
+                        }
                         return 1;
                     }
                     c--;
@@ -3977,14 +4275,14 @@ int dir;
 
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++) {
-            c = 0;
-            if ((dir & W_WEST) && (x > 0) && (selection_getpoint(x-1, y, ov))) c++;
+            int c = 0;
+            if ((dir &  W_WEST) && (x > 0) && (selection_getpoint(x-1, y, ov))) c++;
             if ((dir & (W_WEST|W_NORTH)) && (x > 0) && (y > 0) && (selection_getpoint(x-1, y-1, ov))) c++;
-            if ((dir & W_NORTH) && (y > 0) && (selection_getpoint(x, y-1, ov))) c++;
+            if ((dir &  W_NORTH) && (y > 0) && (selection_getpoint(x, y-1, ov))) c++;
             if ((dir & (W_NORTH|W_EAST)) && (y > 0) && (x < COLNO-1) && (selection_getpoint(x+1, y-1, ov))) c++;
-            if ((dir & W_EAST) && (x < COLNO-1) && (selection_getpoint(x+1, y, ov))) c++;
+            if ((dir &  W_EAST) && (x < COLNO-1) && (selection_getpoint(x+1, y, ov))) c++;
             if ((dir & (W_EAST|W_SOUTH)) && (x < COLNO-1) && (y < ROWNO-1) && (selection_getpoint(x+1, y+1, ov))) c++;
-            if ((dir & W_SOUTH) && (y < ROWNO-1) && (selection_getpoint(x, y+1, ov))) c++;
+            if ((dir &  W_SOUTH) && (y < ROWNO-1) && (selection_getpoint(x, y+1, ov))) c++;
             if ((dir & (W_SOUTH|W_WEST)) && (y < ROWNO-1) && (x > 0) && (selection_getpoint(x-1, y+1, ov))) c++;
             if (c) tmp[x][y] = 1;
         }
@@ -3994,18 +4292,88 @@ int dir;
             if (tmp[x][y]) selection_setpoint(x, y, ov, 1);
 }
 
+static int FDECL((*selection_flood_check_func), (int, int));
+static schar floodfillchk_match_under_typ;
+
 void
-selection_floodfill(ov, x, y)
+set_selection_floodfillchk(f)
+int FDECL((*f), (int, int));
+{
+    selection_flood_check_func = f;
+}
+
+static int
+floodfillchk_match_under(x,y)
+int x,y;
+{
+    return (floodfillchk_match_under_typ == levl[x][y].typ);
+}
+
+static int
+floodfillchk_match_accessible(x, y)
+int x, y;
+{
+    return (ACCESSIBLE(levl[x][y].typ) ||
+            levl[x][y].typ == SDOOR ||
+            levl[x][y].typ == SCORR);
+}
+
+/* check whethere <x,y> is already in xs[],ys[] */
+static boolean
+sel_flood_havepoint(x, y, xs, ys, n)
+int x, y;
+xchar xs[], ys[];
+int n;
+{
+    xchar xx = (xchar) x, yy = (xchar) y;
+
+    while (n > 0) {
+        --n;
+        if (xs[n] == xx && ys[n] == yy) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+void
+selection_floodfill(ov, x, y, diagonals)
 struct opvar *ov;
 int x, y;
+boolean diagonals;
 {
     struct opvar *tmp = selection_opvar(NULL);
 #define SEL_FLOOD_STACK (COLNO*ROWNO)
-#define SEL_FLOOD(nx, ny) {if (idx<SEL_FLOOD_STACK) { dx[idx]=(nx); dy[idx]=(ny); idx++; } else panic("floodfill stack overrun");}
+#define SEL_FLOOD(nx, ny) \
+    do {                                      \
+        if (idx < SEL_FLOOD_STACK) {          \
+            dx[idx] = (nx);                   \
+            dy[idx] = (ny);                   \
+            idx++;                            \
+        } else {                              \
+            panic(floodfill_stack_overrun);   \
+        }                                     \
+    } while (0)
+#define SEL_FLOOD_CHKDIR(mx, my, sel) \
+    do {                                                        \
+        if (isok((mx), (my)) &&                                 \
+            (*selection_flood_check_func)((mx), (my)) &&        \
+            !selection_getpoint((mx), (my), (sel)) &&           \
+            !sel_flood_havepoint((mx), (my), dx, dy, idx)) {    \
+            SEL_FLOOD((mx), (my));                              \
+        }                                                       \
+    } while (0)
+
+    static const char floodfill_stack_overrun[] = "floodfill stack overrun";
     int idx = 0;
     xchar dx[SEL_FLOOD_STACK];
     xchar dy[SEL_FLOOD_STACK];
     schar under = levl[x][y].typ;
+
+    if (selection_flood_check_func == (int FDECL((*), (int, int))) 0) {
+        opvar_free(tmp);
+        return;
+    }
     SEL_FLOOD(x, y);
     do {
         idx--;
@@ -4015,13 +4383,20 @@ int x, y;
             selection_setpoint(x, y, ov, 1);
             selection_setpoint(x, y, tmp, 1);
         }
-        if (isok(x+1, y) && (levl[x+1][y].typ == under) && !selection_getpoint(x+1, y, tmp)) SEL_FLOOD(x+1, y);
-        if (isok(x-1, y) && (levl[x-1][y].typ == under) && !selection_getpoint(x-1, y, tmp)) SEL_FLOOD(x-1, y);
-        if (isok(x, y+1) && (levl[x][y+1].typ == under) && !selection_getpoint(x, y+1, tmp)) SEL_FLOOD(x, y+1);
-        if (isok(x, y-1) && (levl[x][y-1].typ == under) && !selection_getpoint(x, y-1, tmp)) SEL_FLOOD(x, y-1);
+        SEL_FLOOD_CHKDIR((x + 1), y, tmp);
+        SEL_FLOOD_CHKDIR((x - 1), y, tmp);
+        SEL_FLOOD_CHKDIR(x, (y + 1), tmp);
+        SEL_FLOOD_CHKDIR(x, (y - 1), tmp);
+        if (diagonals) {
+            SEL_FLOOD_CHKDIR((x + 1), (y + 1), tmp);
+            SEL_FLOOD_CHKDIR((x - 1), (y - 1), tmp);
+            SEL_FLOOD_CHKDIR((x - 1), (y + 1), tmp);
+            SEL_FLOOD_CHKDIR((x + 1), (y - 1), tmp);
+        }
     } while (idx > 0);
 #undef SEL_FLOOD
 #undef SEL_FLOOD_STACK
+#undef SEL_FLOOD_CHKDIR
     opvar_free(tmp);
 }
 
@@ -4030,7 +4405,8 @@ void
 selection_do_ellipse(ov, xc, yc, a, b, filled)
 struct opvar *ov;
 int xc, yc, a, b, filled;
-{                       /* e(x,y) = b^2*x^2 + a^2*y^2 - a^2*b^2 */
+{
+    /* e(x,y) = b^2*x^2 + a^2*y^2 - a^2*b^2 */
     int x = 0, y = b;
     long a2 = (long)a*a, b2 = (long)b*b;
     long crit1 = -(a2/4 + a%2 + b2);
@@ -4164,8 +4540,9 @@ long x, y, x2, y2, gtyp, mind, maxd, limit;
     }
 }
 
+/* bresenham line algo */
 void
-selection_do_line(x1, y1, x2, y2, ov) /* bresenham line algo */
+selection_do_line(x1, y1, x2, y2, ov)
 schar x1, y1, x2, y2;
 struct opvar *ov;
 {
@@ -4241,8 +4618,8 @@ struct opvar *ov;
         my = ((y1 + y2) / 2);
     } else {
         do {
-            dx = (rand() % rough) - (rough / 2);
-            dy = (rand() % rough) - (rough / 2);
+            dx = rn2(rough) - (rough / 2);
+            dy = rn2(rough) - (rough / 2);
             mx = ((x1 + x2) / 2) + dx;
             my = ((y1 + y2) / 2) + dy;
         } while ((mx > COLNO-1 || mx < 0 || my < 0 || my > ROWNO-1));
@@ -4257,7 +4634,6 @@ struct opvar *ov;
     selection_do_randline(x1, y1, mx, my, rough, rec, ov);
     selection_do_randline(mx, my, x2, y2, rough, rec, ov);
 }
-
 
 void
 selection_iterate(ov, func, arg)
@@ -4278,6 +4654,7 @@ int x, y;
 genericptr_t arg;
 {
     terrain terr;
+
     terr = (*(terrain *)arg);
     SET_TYPLIT(x, y, terr.ter, terr.tlit);
     /* handle doors and secret doors */
@@ -4307,30 +4684,19 @@ genericptr_t arg;
     xchar typ = (*(xchar *)arg);
     xchar x = dx;
     xchar y = dy;
-    struct mkroom *droom;
-    droom = &rooms[0];
+
     /*get_location(&x, &y, DRY, (struct mkroom *)0);*/
-    if (!IS_DOOR(levl[x][y].typ) && levl[x][y].typ != SDOOR)
+    if (!IS_DOOR(levl[x][y].typ) && levl[x][y].typ != SDOOR) {
         levl[x][y].typ = (typ & D_SECRET) ? SDOOR : DOOR;
+    }
     if (typ & D_SECRET) {
         typ &= ~D_SECRET;
         if (typ < D_CLOSED)
             typ = D_CLOSED;
     }
+    set_door_orientation(x, y); /* set/clear levl[x][y].horizontal */
     levl[x][y].doormask = typ;
-    /*SpLev_Map[x][y] = 1;*/
-
-    /* Now the complicated part, list it with each subroom */
-    /* The dog move and mail daemon routines use this */
-    while(droom->hx >= 0 && doorindex < DOORMAX) {
-        if(droom->hx >= x-1 && droom->lx <= x+1 &&
-           droom->hy >= y-1 && droom->ly <= y+1) {
-            /* Found it */
-            add_door(x, y, droom);
-        }
-        droom++;
-    }
-
+    SpLev_Map[x][y] = 1;
 }
 
 void
@@ -4418,6 +4784,132 @@ struct sp_coder *coder;
     opvar_free(chance);
 }
 
+static boolean
+generate_way_out_method(nx,ny, ov)
+int nx,ny;
+struct opvar *ov;
+{
+    const int escapeitems[] = {
+        PICK_AXE,
+        DWARVISH_MATTOCK,
+        CRYSTAL_PICK,
+        WAN_DIGGING,
+        WAN_TELEPORTATION,
+        SCR_TELEPORTATION,
+        RIN_TELEPORTATION
+    };
+    struct opvar *ov2 = selection_opvar((char *) 0), *ov3;
+    schar x, y;
+    boolean res = TRUE;
+
+    selection_floodfill(ov2, nx, ny, TRUE);
+    ov3 = opvar_clone(ov2);
+
+    /* try to make a door */
+    while (selection_rndcoord(ov3, &x, &y, TRUE)) {
+        if (isok(x+1, y) &&
+             !selection_getpoint(x+1, y, ov) && IS_WALL(levl[x+1][y].typ) &&
+            isok(x+2, y) &&
+              selection_getpoint(x+2, y, ov) && ACCESSIBLE(levl[x+2][y].typ)) {
+            levl[x+1][y].typ = DOOR;
+            goto gotitdone;
+        }
+        if (isok(x-1, y) &&
+             !selection_getpoint(x-1, y, ov) && IS_WALL(levl[x-1][y].typ) &&
+            isok(x-2, y) &&
+             selection_getpoint(x-2, y, ov) && ACCESSIBLE(levl[x-2][y].typ)) {
+            levl[x-1][y].typ = DOOR;
+            goto gotitdone;
+        }
+        if (isok(x, y+1) &&
+             !selection_getpoint(x, y+1, ov) && IS_WALL(levl[x][y+1].typ) &&
+            isok(x, y+2) &&
+             selection_getpoint(x, y+2, ov) && ACCESSIBLE(levl[x][y+2].typ)) {
+            levl[x][y+1].typ = DOOR;
+            goto gotitdone;
+        }
+        if (isok(x, y-1) &&
+             !selection_getpoint(x, y-1, ov) && IS_WALL(levl[x][y-1].typ) &&
+            isok(x, y-2) &&
+             selection_getpoint(x, y-2, ov) && ACCESSIBLE(levl[x][y-2].typ)) {
+            levl[x][y-1].typ = DOOR;
+            goto gotitdone;
+        }
+    }
+
+    /* try to make a hole or a trapdoor */
+    if (Can_fall_thru(&u.uz)) {
+        opvar_free(ov3);
+        ov3 = opvar_clone(ov2);
+        while (selection_rndcoord(ov3, &x, &y, TRUE)) {
+            if (maketrap(x,y, rn2(2) ? HOLE : TRAPDOOR)) {
+                goto gotitdone;
+            }
+        }
+    }
+
+    /* generate one of the escape items */
+    if (selection_rndcoord(ov2, &x, &y, FALSE)) {
+        mksobj_at(escapeitems[rn2(SIZE(escapeitems))], x, y, TRUE, FALSE);
+        goto gotitdone;
+    }
+
+    res = FALSE;
+ gotitdone:
+    opvar_free(ov2);
+    opvar_free(ov3);
+    return res;
+}
+
+static void
+ensure_way_out()
+{
+    struct opvar *ov = selection_opvar((char *) 0);
+    struct trap *ttmp = ftrap;
+    int x,y;
+    boolean ret = TRUE;
+
+    set_selection_floodfillchk(floodfillchk_match_accessible);
+
+    if (xupstair && !selection_getpoint(xupstair, yupstair, ov)) {
+        selection_floodfill(ov, xupstair, yupstair, TRUE);
+    }
+    if (xdnstair && !selection_getpoint(xdnstair, ydnstair, ov)) {
+        selection_floodfill(ov, xdnstair, ydnstair, TRUE);
+    }
+    if (xupladder && !selection_getpoint(xupladder, yupladder, ov)) {
+        selection_floodfill(ov, xupladder, yupladder, TRUE);
+    }
+    if (xdnladder && !selection_getpoint(xdnladder, ydnladder, ov)) {
+        selection_floodfill(ov, xdnladder, ydnladder, TRUE);
+    }
+
+    while (ttmp) {
+        if ((ttmp->ttyp == MAGIC_PORTAL || ttmp->ttyp == VIBRATING_SQUARE || is_hole(ttmp->ttyp)) &&
+             !selection_getpoint(ttmp->tx, ttmp->ty, ov)) {
+            selection_floodfill(ov, ttmp->tx, ttmp->ty, TRUE);
+        }
+        ttmp = ttmp->ntrap;
+    }
+
+    do {
+        ret = TRUE;
+        for (x = 0; x < COLNO; x++) {
+            for (y = 0; y < ROWNO; y++) {
+                if (ACCESSIBLE(levl[x][y].typ) && !selection_getpoint(x, y, ov)) {
+                    if (generate_way_out_method(x,y, ov)) {
+                        selection_floodfill(ov, x,y, TRUE);
+                    }
+                    ret = FALSE;
+                    goto outhere;
+                }
+            }
+        }
+    outhere: ;
+    } while (!ret);
+    opvar_free(ov);
+}
+
 void
 spo_spill(coder)
 struct sp_coder *coder;
@@ -4485,7 +4977,7 @@ struct sp_coder *coder;
     tmplregion->del_islev = OV_i(del_islev);
     tmplregion->rtype = OV_i(rtype);
     tmplregion->padding = OV_i(padding);
-    tmplregion->rname.str = strdup(OV_s(rname));
+    tmplregion->rname.str = dupstr(OV_s(rname));
 
     if(!tmplregion->in_islev) {
         get_location(&tmplregion->inarea.x1, &tmplregion->inarea.y1,
@@ -4516,6 +5008,7 @@ struct sp_coder *coder;
         if (!lregions) panic("lregions alloc");
     }
     (void) memcpy(&lregions[num_lregions-1], tmplregion, sizeof(lev_region));
+    free(tmplregion);
 
     opvar_free(dx1);
     opvar_free(dy1);
@@ -4645,6 +5138,7 @@ spo_drawbridge(coder)
 struct sp_coder *coder;
 {
     xchar x, y;
+    int dopen;
     struct opvar *dir, *db_open, *coord;
 
     if (!OV_pop_i(dir) ||
@@ -4652,8 +5146,12 @@ struct sp_coder *coder;
         !OV_pop_c(coord)) return;
 
     get_location_coord(&x, &y, DRY|WET|HOT, coder->croom, OV_i(coord));
-    if (!create_drawbridge(x, y, OV_i(dir), OV_i(db_open)))
+    if ((dopen = OV_i(db_open)) == -1) {
+        dopen = !rn2(2);
+    }
+    if (!create_drawbridge(x, y, OV_i(dir), dopen ? TRUE : FALSE)) {
         impossible("Cannot create drawbridge.");
+    }
     SpLev_Map[x][y] = 1;
 
     opvar_free(coord);
@@ -4680,11 +5178,7 @@ struct sp_coder *coder;
     if (!isok(x, y)) return;
 
     if (OV_i(ftyp) < 1) {
-#ifndef WALLIFIED_MAZE
-        OV_i(ftyp) = CORR;
-#else
-        OV_i(ftyp) = ROOM;
-#endif
+        OV_i(ftyp) = level.flags.corrmaze ? CORR : ROOM;
     }
 
     /* don't use move() - it doesn't use W_NORTH, etc. */
@@ -4786,7 +5280,7 @@ struct sp_coder *coder;
 void
 sel_set_wallify(x, y, arg)
 int x, y;
-genericptr_t arg;
+void *arg UNUSED;
 {
     wallify_map(x, y, x, y);
 }
@@ -4797,6 +5291,7 @@ struct sp_coder *coder;
 {
     struct opvar *typ, *r;
     int dx1, dy1, dx2, dy2;
+
     if (!OV_pop_i(typ)) return;
     switch (OV_i(typ)) {
     default:
@@ -4807,10 +5302,10 @@ struct sp_coder *coder;
         dy1 = (xchar)SP_REGION_Y1(OV_i(r));
         dx2 = (xchar)SP_REGION_X2(OV_i(r));
         dy2 = (xchar)SP_REGION_Y2(OV_i(r));
-        wallify_map(dx1 < 0 ? xstart : dx1,
-                    dy1 < 0 ? ystart : dy1,
-                    dx2 < 0 ? xstart+xsize : dx2,
-                    dy2 < 0 ? ystart+ysize : dy2);
+        wallify_map(dx1 < 0 ? (xstart - 1) : dx1,
+                    dy1 < 0 ? (ystart - 1) : dy1,
+                    dx2 < 0 ? (xstart + xsize + 1) : dx2,
+                    dy2 < 0 ? (ystart + ysize + 1) : dy2);
     }
     break;
     case 1:
@@ -4821,6 +5316,7 @@ struct sp_coder *coder;
     break;
     }
     opvar_free(r);
+    opvar_free(typ);
 }
 
 void
@@ -4864,16 +5360,16 @@ redo_maploc:
         break;
     case 1:
         switch((int) halign) {
-        case LEFT:      xstart = 3;                 break;
-        case H_LEFT:    xstart = 2+((x_maze_max-2-xsize)/4);    break;
-        case CENTER:    xstart = 2+((x_maze_max-2-xsize)/2);    break;
-        case H_RIGHT:   xstart = 2+((x_maze_max-2-xsize)*3/4);  break;
-        case RIGHT:     xstart = x_maze_max-xsize-1;        break;
+        case LEFT:    xstart = splev_init_present ? 1 : 3;   break;
+        case H_LEFT:  xstart = 2+((x_maze_max-2-xsize)/4);   break;
+        case CENTER:  xstart = 2+((x_maze_max-2-xsize)/2);   break;
+        case H_RIGHT: xstart = 2+((x_maze_max-2-xsize)*3/4); break;
+        case RIGHT:   xstart = x_maze_max-xsize-1;           break;
         }
         switch((int) valign) {
-        case TOP:       ystart = 3;                 break;
-        case CENTER:    ystart = 2+((y_maze_max-2-ysize)/2);    break;
-        case BOTTOM:    ystart = y_maze_max-ysize-1;        break;
+        case TOP:     ystart = 3;                          break;
+        case CENTER:  ystart = 2+((y_maze_max-2-ysize)/2); break;
+        case BOTTOM:  ystart = y_maze_max-ysize-1;         break;
         }
         if (!(xstart % 2)) xstart++;
         if (!(ystart % 2)) ystart++;
@@ -4953,6 +5449,7 @@ redo_maploc:
                 levl[x][y].horizontal = 0;
                 levl[x][y].roomno = 0;
                 levl[x][y].edge = 0;
+                SpLev_Map[x][y] = 1;
                 /*
                  *  Set secret doors to closed (why not trapped too?).  Set
                  *  the horizontal bit.
@@ -4969,10 +5466,13 @@ redo_maploc:
                                         levl[x-1][y].horizontal))
                         levl[x][y].horizontal = 1;
                 } else if(levl[x][y].typ == HWALL ||
-                          levl[x][y].typ == IRONBARS)
+                          levl[x][y].typ == IRONBARS) {
                     levl[x][y].horizontal = 1;
-                else if(levl[x][y].typ == LAVAPOOL)
+                } else if(levl[x][y].typ == LAVAPOOL) {
                     levl[x][y].lit = 1;
+                } else if (splev_init_present && levl[x][y].typ == ICE) {
+                    levl[x][y].icedpool = icedpools ? ICED_POOL : ICED_MOAT;
+                }
             }
         if (coder->lvl_is_joined && !in_mk_rndvault)
             remove_rooms(xstart, ystart, xstart+xsize, ystart+ysize);
@@ -4998,6 +5498,7 @@ sp_lev *lvl;
 {
     struct opvar *tmpa;
     long a;
+
     if (!OV_pop_i(tmpa)) return;
     a = sp_code_jmpaddr(coder->frame->n_opcode, (OV_i(tmpa) - 1));
     if ((a >= 0) && (a < lvl->n_opcodes) &&
@@ -5014,6 +5515,7 @@ sp_lev *lvl;
     struct opvar *oa, *oc;
     long a, c;
     int test = 0;
+
     if (!OV_pop_i(oa) || !OV_pop_i(oc)) return;
 
     a = sp_code_jmpaddr(coder->frame->n_opcode, (OV_i(oa) - 1));
@@ -5108,7 +5610,7 @@ copy_variable:
             tmpvar->array_len = tmp2->array_len;
             if (tmpvar->array_len) {
                 idx = tmpvar->array_len;
-                tmpvar->data.arrayvalues = (struct opvar **)malloc(sizeof(struct opvar *) * idx);
+                tmpvar->data.arrayvalues = (struct opvar **)alloc(sizeof(struct opvar *) * idx);
                 if (!tmpvar->data.arrayvalues) panic("tmpvar->data.arrayvalues alloc");
                 while (idx-- > 0) {
                     tmpvar->data.arrayvalues[idx] = opvar_clone(tmp2->data.arrayvalues[idx]);
@@ -5122,7 +5624,7 @@ copy_variable:
 create_new_array:
             idx = OV_i(arraylen);
             tmpvar->array_len = idx;
-            tmpvar->data.arrayvalues = (struct opvar **)malloc(sizeof(struct opvar *) * idx);
+            tmpvar->data.arrayvalues = (struct opvar **)alloc(sizeof(struct opvar *) * idx);
             if (!tmpvar->data.arrayvalues) panic("malloc tmpvar->data.arrayvalues");
             while (idx-- > 0) {
                 OV_pop(vvalue);
@@ -5203,8 +5705,6 @@ struct sp_coder *coder;
     opvar_free(vname);
 }
 
-
-
 /* Special level coder, creates the special level from the sp_lev codes.
  * Does not free the allocated memory.
  */
@@ -5221,12 +5721,21 @@ sp_lev *lvl;
     coder->frame = frame_new(0);
     coder->stack = NULL;
     coder->premapped = FALSE;
+    coder->solidify = FALSE;
+    coder->check_inaccessibles = FALSE;
     coder->allow_flips = 3;
     coder->croom = NULL;
     coder->n_subroom = 1;
     coder->exit_script = FALSE;
     coder->lvl_is_joined = 0;
     rndvault_failed = FALSE;
+
+    splev_init_present = FALSE;
+    icedpools = FALSE;
+    /* achievement tracking; static init would suffice except we need to
+       reset if #wizmakemap is used to recreate mines' end or sokoban end;
+       once either level is created, these values can be forgotten */
+    mines_prize_count = soko_prize_count = 0;
 
     if (wizard) {
         char *met = nh_getenv("SPCODER_MAX_RUNTIME");
@@ -5710,7 +6219,7 @@ sp_lev *lvl;
             struct opvar *pt;
             schar x, y;
             if (!OV_pop_typ(pt, SPOVAR_SEL)) panic("no selection for rndcoord");
-            if (selection_rndcoord(pt, &x, &y)) {
+            if (selection_rndcoord(pt, &x, &y, FALSE)) {
                 x -= xstart;
                 y -= ystart;
             }
@@ -5771,15 +6280,38 @@ next_opcode:
         coder->frame->n_opcode++;
     } /*while*/
 
+    link_doors_rooms();
     fill_rooms();
     remove_boundary_syms();
-    wallification(1, 0, COLNO-1, ROWNO-1);
+
+    if (coder->check_inaccessibles) {
+        ensure_way_out();
+    }
+    /* FIXME: Ideally, we want this call to only cover areas of the map
+     * which were not inserted directly by the special level file (see
+     * the insect legs on Baalzebub's level, for instance). Since that
+     * is currently not possible, we overload the corrmaze flag for this
+     * purpose.
+     */
+    if (!level.flags.corrmaze) {
+        wallification(1, 0, COLNO-1, ROWNO-1);
+    }
 
     flip_level_rnd(coder->allow_flips);
 
     count_features();
 
-    if (coder->premapped) sokoban_detect();
+    if (coder->solidify) {
+        solidify_map();
+    }
+
+    /* This must be done before sokoban_detect(),
+     * otherwise branch stairs won't be premapped. */
+    fixup_special();
+
+    if (coder->premapped) {
+        sokoban_detect();
+    }
 
     if (coder->frame) {
         struct sp_frame *tmpframe;
@@ -5789,6 +6321,7 @@ next_opcode:
             coder->frame = tmpframe;
         } while (coder->frame);
     }
+    Free(coder);
 
     return TRUE;
 }
@@ -5796,7 +6329,6 @@ next_opcode:
 /*
  * General loader
  */
-
 struct _sploader_cache {
     char *fname;
     sp_lev *lvl;

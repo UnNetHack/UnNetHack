@@ -143,7 +143,7 @@ struct obj *wep;    /* uwep for attack(), null for kick_monster() */
             if(!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data, AD_STCK))
                 u.ustuck = mtmp;
         }
-        wakeup(mtmp); /* always necessary; also un-mimics mimics */
+        wakeup(mtmp, TRUE); /* always necessary; also un-mimics mimics */
         return TRUE;
     }
 
@@ -189,7 +189,7 @@ struct obj *wep;    /* uwep for attack(), null for kick_monster() */
      */
     if ((mtmp->mundetected || mtmp->m_ap_type) && sensemon(mtmp)) {
         mtmp->mundetected = 0;
-        wakeup(mtmp);
+        wakeup(mtmp, TRUE);
     }
 
     if (flags.confirm && mtmp->mpeaceful
@@ -581,7 +581,7 @@ int thrown;
     unconventional[0] = '\0';
     saved_oname[0] = '\0';
 
-    wakeup(mon);
+    wakeup(mon, TRUE);
     if(!obj) {  /* attack with bare hands */
         if (mdat == &mons[PM_SHADE])
             tmp = 0;
@@ -948,7 +948,7 @@ int thrown;
                                 pline("%s %s over %s!",
                                       what, vtense(what, "splash"), whom);
                             }
-                            setmangry(mon);
+                            setmangry(mon, TRUE);
                             mon->mcansee = 0;
                             tmp = rn1(25, 21);
                             if(((int) mon->mblinded + tmp) > 127)
@@ -956,7 +956,7 @@ int thrown;
                             else mon->mblinded += tmp;
                         } else {
                             pline(obj->otyp==CREAM_PIE ? "Splat!" : "Splash!");
-                            setmangry(mon);
+                            setmangry(mon, TRUE);
                         }
                         if (thrown) obfree(obj, (struct obj *)0);
                         else useup(obj);
@@ -1823,11 +1823,11 @@ physical:
             pline("%s falls to pieces!", Monnam(mdef));
             xkilled(mdef, 0);
         }
-        hurtmarmor(mdef, AD_RUST);
+        erode_armor(mdef, ERODE_RUST);
         tmp = 0;
         break;
     case AD_CORR:
-        hurtmarmor(mdef, AD_CORR);
+        erode_armor(mdef, ERODE_CORRODE);
         tmp = 0;
         break;
     case AD_DCAY:
@@ -1836,7 +1836,7 @@ physical:
             pline("%s falls to pieces!", Monnam(mdef));
             xkilled(mdef, 0);
         }
-        hurtmarmor(mdef, AD_DCAY);
+        erode_armor(mdef, ERODE_ROT);
         tmp = 0;
         break;
     case AD_DRST:
@@ -2281,7 +2281,7 @@ register struct attack *mattk;
     else
         You("miss it.");
     if (!mdef->msleeping && mdef->mcanmove)
-        wakeup(mdef);
+        wakeup(mdef, TRUE);
 }
 
 STATIC_OVL boolean
@@ -2380,7 +2380,7 @@ use_weapon:
                     sum[i] = damageum(mon, mattk);
                     break;
                 }
-                wakeup(mon);
+                wakeup(mon, TRUE);
                 /* maybe this check should be in damageum()? */
                 if (mon->data == &mons[PM_SHADE] &&
                     !(mattk->aatyp == AT_KICK &&
@@ -2444,7 +2444,7 @@ use_weapon:
              * already grabbed in a previous attack
              */
             dhit = 1;
-            wakeup(mon);
+            wakeup(mon, TRUE);
             if (mon->data == &mons[PM_SHADE])
                 Your("hug passes harmlessly through %s.",
                      mon_nam(mon));
@@ -2464,13 +2464,13 @@ use_weapon:
 
         case AT_EXPL:   /* automatic hit if next to */
             dhit = -1;
-            wakeup(mon);
+            wakeup(mon, TRUE);
             sum[i] = explum(mon, mattk);
             break;
 
         case AT_ENGL:
             if((dhit = (tmp > rnd(20+i)))) {
-                wakeup(mon);
+                wakeup(mon, TRUE);
                 if (mon->data == &mons[PM_SHADE])
                     Your("attempt to surround %s is harmless.",
                          mon_nam(mon));
@@ -2578,7 +2578,7 @@ uchar aatyp;
         if (mhit) {
             if (aatyp == AT_KICK) {
                 if (uarmf && !rn2(6))
-                    (void)rust_dmg(uarmf, xname(uarmf), 3, TRUE, &youmonst);
+                    (void) erode_obj(uarmf, xname(uarmf), ERODE_CORRODE, EF_GREASE | EF_VERBOSE);
             } else if (aatyp == AT_WEAP || aatyp == AT_CLAW ||
                        aatyp == AT_MAGC || aatyp == AT_TUCH)
                 passive_obj(mon, (struct obj*)0, &(ptr->mattk[i]));
@@ -2612,7 +2612,7 @@ uchar aatyp;
         if(mhit && !mon->mcan) {
             if (aatyp == AT_KICK) {
                 if (uarmf)
-                    (void)rust_dmg(uarmf, xname(uarmf), 1, TRUE, &youmonst);
+                    (void) erode_obj(uarmf, xname(uarmf), ERODE_RUST, EF_GREASE | EF_VERBOSE);
             } else if (aatyp == AT_WEAP || aatyp == AT_CLAW ||
                        aatyp == AT_MAGC || aatyp == AT_TUCH)
                 passive_obj(mon, (struct obj*)0, &(ptr->mattk[i]));
@@ -2622,7 +2622,7 @@ uchar aatyp;
         if(mhit && !mon->mcan) {
             if (aatyp == AT_KICK) {
                 if (uarmf)
-                    (void)rust_dmg(uarmf, xname(uarmf), 3, TRUE, &youmonst);
+                    (void) erode_obj(uarmf, xname(uarmf), ERODE_CORRODE, EF_GREASE | EF_VERBOSE);
             } else if (aatyp == AT_WEAP || aatyp == AT_CLAW ||
                        aatyp == AT_MAGC || aatyp == AT_TUCH)
                 passive_obj(mon, (struct obj*)0, &(ptr->mattk[i]));
@@ -2782,17 +2782,17 @@ struct attack *mattk;       /* null means we find one internally */
 
     case AD_ACID:
         if(!rn2(6)) {
-            erode_obj(obj, TRUE, FALSE);
+            (void) erode_obj(obj, NULL, ERODE_CORRODE, EF_GREASE);
         }
         break;
     case AD_RUST:
         if(!mon->mcan) {
-            erode_obj(obj, FALSE, FALSE);
+            (void) erode_obj(obj, (char *) 0, ERODE_RUST, EF_GREASE);
         }
         break;
     case AD_CORR:
         if(!mon->mcan) {
-            erode_obj(obj, TRUE, FALSE);
+            (void) erode_obj(obj, (char *) 0, ERODE_CORRODE, EF_GREASE);
         }
         break;
     case AD_ENCH:
@@ -2847,7 +2847,7 @@ struct monst *mtmp;
     }
     if (what) pline(fmt, what);
 
-    wakeup(mtmp);   /* clears mimicking */
+    wakeup(mtmp, FALSE); /* clears mimicking */
 }
 
 STATIC_OVL void
@@ -2918,7 +2918,9 @@ struct obj *otmp;   /* source of flash */
                 }
             }
             if (mtmp->mhp > 0) {
-                if (!flags.mon_moving) setmangry(mtmp);
+                if (!flags.mon_moving) {
+                    setmangry(mtmp, TRUE);
+                }
                 if (tmp < 9 && !mtmp->isshk && rn2(4)) {
                     if (rn2(4))
                         monflee(mtmp, rnd(100), FALSE, TRUE);

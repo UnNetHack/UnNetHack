@@ -495,7 +495,7 @@ struct obj *otmp;
     }
     if (wake) {
         if (!DEADMONSTER(mtmp)) {
-            wakeup(mtmp);
+            wakeup(mtmp, helpful_gesture ? FALSE : TRUE);
             m_respond(mtmp);
             if (mtmp->isshk && !*u.ushops) hot_pursuit(mtmp);
         } else if (M_AP_TYPE(mtmp)) {
@@ -4024,7 +4024,9 @@ struct obj **ootmp; /* to return worn armor for caller to disintegrate */
             break;
         }
         tmp = d(nd, 6);
-        if (!rn2(6)) erode_obj(MON_WEP(mon), TRUE, TRUE);
+        if (!rn2(6)) {
+            acid_damage(MON_WEP(mon));
+        }
         if (!rn2(6)) erode_armor(mon, TRUE);
         break;
     }
@@ -4159,8 +4161,12 @@ xchar sx, sy;
             exercise(A_STR, FALSE);
         }
         /* using two weapons at once makes both of them more vulnerable */
-        if (!rn2(u.twoweap ? 3 : 6)) erode_obj(uwep, TRUE, TRUE);
-        if (u.twoweap && !rn2(3)) erode_obj(uswapwep, TRUE, TRUE);
+        if (!rn2(u.twoweap ? 3 : 6)) {
+            acid_damage(uwep);
+        }
+        if (u.twoweap && !rn2(3)) {
+            acid_damage(uswapwep);
+        }
         if (!rn2(6)) erode_armor(&youmonst, TRUE);
         break;
     }
@@ -5009,12 +5015,9 @@ def_case:
                 !Blind ? "see a puff" : "smell a whiff");
         }
     if ((mon = m_at(x, y)) != 0) {
-        /* TODO wakeup(mon, FALSE); */
-        /* Cannot use wakeup() which also angers the monster */
-        mon->msleeping = 0;
-        if (mon->m_ap_type) seemimic(mon);
+        wakeup(mon, FALSE);
         if (type >= 0) {
-            setmangry(mon);
+            setmangry(mon, TRUE);
             if (mon->ispriest && *in_rooms(mon->mx, mon->my, TEMPLE))
                 ghod_hitsu(mon);
             if (mon->isshk && !*u.ushops)

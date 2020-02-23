@@ -928,7 +928,7 @@ genericptr_t p2;
             }
             /* don't let Cthulhu meditate after being killed once
              * by the player */
-            wakeup(cthulhu);
+            wakeup(cthulhu, TRUE);
         }
 
     }
@@ -971,7 +971,9 @@ genericptr_t p2;
             !amphibious(mtmp->data) && !resists_poison(mtmp)) {
             if (cansee(mtmp->mx, mtmp->my))
                 pline("%s coughs!", Monnam(mtmp));
-            if (heros_fault(reg)) setmangry(mtmp);
+            if (heros_fault(reg)) {
+                setmangry(mtmp, TRUE);
+            }
             if (haseyes(mtmp->data) && mtmp->mcansee) {
                 mtmp->mblinded = 1;
                 mtmp->mcansee = 0;

@@ -449,7 +449,8 @@ int expltype;
                         monkilled(mtmp, "", (int) adtyp);
                     }
                 } else if (!flags.mon_moving) {
-                    setmangry(mtmp);
+                    /* all affected monsters, even if mdef is set */
+                    setmangry(mtmp, TRUE);
                 }
             }
         }

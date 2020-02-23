@@ -84,7 +84,8 @@ int title_to_mon(const char *str, int* number1, int* number2) { return NON_PM; }
 
 void obfree(struct obj *obj1, struct obj *obj2) {}
 struct obj* oname(struct obj *obj, const char *str) { return NULL; }
-boolean water_damage(struct obj *o, const char *str, BOOLEAN_P b1, BOOLEAN_P b2) { return FALSE; }
+int  water_damage(struct obj *o, const char *str, BOOLEAN_P b) { return FALSE; }
+void water_damage_chain(struct obj *o, BOOLEAN_P b) {}
 void reset_remarm() {}
 struct permonst* rndmonst() { return NULL; }
 

@@ -2988,7 +2988,7 @@ srch:
             del_engr_at(u.ux, u.uy);
             pline("A pool.");
             /* Must manually make kelp! */
-            water_damage(level.objects[u.ux][u.uy], (char *)0, FALSE, TRUE);
+            water_damage_chain(level.objects[u.ux][u.uy], TRUE);
             newsym(u.ux, u.uy);
             return &zeroobj;
         }
@@ -3426,6 +3426,29 @@ int i;
         j++;
     }
     return (const char *)0;
+}
+
+const char *
+suit_simple_name(suit)
+struct obj *suit;
+{
+    if (suit) {
+        if (Is_dragon_mail(suit->otyp)) {
+            return "dragon mail"; /* <color> dragon scale mail */
+        } else if (Is_dragon_scales(suit->otyp)) {
+            return "dragon scales";
+        }
+
+        const char *suitnm = OBJ_NAME(objects[suit->otyp]);
+        const char *esuitp = eos((char *) suitnm);
+        if (strlen(suitnm) > 5 && !strcmp(esuitp - 5, " mail")) {
+            return "mail"; /* most suits fall into this category */
+        } else if (strlen(suitnm) > 7 && !strcmp(esuitp - 7, " jacket")) {
+            return "jacket"; /* leather jacket */
+        }
+    }
+    /* "suit" is lame but "armor" is ambiguous and "body armor" is absurd */
+    return "suit";
 }
 
 const char *

@@ -1832,8 +1832,9 @@ xchar *rdgn;
                 else if (lchoices.menuletter == 'Z') lchoices.menuletter = 'a';
                 else lchoices.menuletter++;
                 lchoices.idx++;
-            } else
+            } else {
                 putstr(win, 0, buf);
+            }
 
             last_level = slev->dlevel.dlevel;
         }

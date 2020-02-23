@@ -717,12 +717,13 @@ int attk;
     while (1) {
         switch(rn2(5)) {
         case 0:
-            if (!uarmh || !rust_dmg(uarmh, xname(uarmh), hurt, FALSE, &youmonst))
+            if (!uarmh || (!water_damage(uarmh, xname(uarmh), FALSE) == ER_NOTHING)) {
                 continue;
+            }
             break;
         case 1:
             if (uarmc) {
-                (void)rust_dmg(uarmc, xname(uarmc), hurt, TRUE, &youmonst);
+                (void)water_damage(uarmc, xname(uarmc), FALSE);
                 break;
             }
             /* Note the difference between break and continue;
@@ -731,23 +732,26 @@ int attk;
              * something else did.
              */
             if (uarm)
-                (void)rust_dmg(uarm, xname(uarm), hurt, TRUE, &youmonst);
+                (void)water_damage(uarm, xname(uarm), FALSE);
 #ifdef TOURIST
             else if (uarmu)
-                (void)rust_dmg(uarmu, xname(uarmu), hurt, TRUE, &youmonst);
+                (void)water_damage(uarmu, xname(uarmu), FALSE);
 #endif
             break;
         case 2:
-            if (!uarms || !rust_dmg(uarms, xname(uarms), hurt, FALSE, &youmonst))
+            if (!uarms || (!water_damage(uarms, xname(uarms), FALSE) == ER_NOTHING)) {
                 continue;
+            }
             break;
         case 3:
-            if (!uarmg || !rust_dmg(uarmg, xname(uarmg), hurt, FALSE, &youmonst))
+            if (!uarmg || !water_damage(uarmg, xname(uarmg), FALSE) == ER_NOTHING) {
                 continue;
+            }
             break;
         case 4:
-            if (!uarmf || !rust_dmg(uarmf, xname(uarmf), hurt, FALSE, &youmonst))
+            if (!uarmf || !water_damage(uarmf, xname(uarmf), FALSE) == ER_NOTHING) {
                 continue;
+            }
             break;
         }
         break; /* Out of while loop */
@@ -2773,7 +2777,9 @@ register struct attack *mattk;
             }
         } else tmp = 0;
         if (!rn2(30)) erode_armor(mtmp, TRUE);
-        if (!rn2(6)) erode_obj(MON_WEP(mtmp), TRUE, TRUE);
+        if (!rn2(6)) {
+            acid_damage(MON_WEP(mtmp));
+        }
         goto assess_dmg;
     case AD_STON:     /* cockatrice */
     {
