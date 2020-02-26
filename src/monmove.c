@@ -456,7 +456,7 @@ dochug(struct monst *mtmp)
 
     /* some monsters teleport */
     if (mtmp->mflee && !rn2(40) && can_teleport(mdat) && !mtmp->iswiz &&
-        !level.flags.noteleport) {
+        !noteleport_level(mtmp)) {
         (void) rloc(mtmp, RLOC_MSG);
         return 0;
     }
@@ -1304,7 +1304,7 @@ look_for_obj:
         flag |= ALLOW_SANCT;
     }
     /* unicorn may not be able to avoid hero on a noteleport level */
-    if (is_unicorn(ptr) && !level.flags.noteleport) {
+    if (is_unicorn(ptr) && !noteleport_level(mtmp)) {
         flag |= NOTONL;
     }
     if (passes_walls(ptr)) {
@@ -1351,7 +1351,7 @@ look_for_obj:
             nidist > (couldsee(nix, niy) ? 144 : 36) && appr == 1) {
         appr = 0;
     }
-    if (is_unicorn(ptr) && level.flags.noteleport) {
+    if (is_unicorn(ptr) && noteleport_level(mtmp)) {
         /* on noteleport levels, perhaps we cannot avoid hero */
         for (i = 0; i < cnt; i++) {
             if (!(info[i] & NOTONL)) {

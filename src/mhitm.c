@@ -585,9 +585,9 @@ mattackm(struct monst *magr, struct monst *mdef)
             /* avoid mysterious force message by not using tele_restrict() */
             if (canseemon(mdef)) {
                 pline("%s %s reality!", Monnam(mdef),
-                      level.flags.noteleport ? "tries to warp" : "warps");
+                      noteleport_level(mdef) ? "tries to warp" : "warps");
             }
-            if (!level.flags.noteleport) {
+            if (!noteleport_level(mdef)) {
                 coord mm;
                 rloc(magr, RLOC_NOMSG);
                 enexto(&mm, magr->mx, magr->my, &mons[PM_URANIUM_IMP]);

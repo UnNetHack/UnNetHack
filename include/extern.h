@@ -2514,6 +2514,7 @@ extern void sys_early_init(void);
 
 /* ### teleport.c ### */
 
+extern boolean noteleport_level(struct monst *);
 extern boolean goodpos(coordxy, coordxy, struct monst *, unsigned);
 extern boolean enexto(coord *, coordxy, coordxy, struct permonst *);
 extern boolean enexto_core(coord *, coordxy, coordxy, struct permonst *, unsigned);

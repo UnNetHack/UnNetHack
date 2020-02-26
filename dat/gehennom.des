@@ -343,7 +343,7 @@ MONSTER:'M',random
 # The Juiblex level
 #
 LEVEL:"juiblex"
-FLAGS:noteleport,shortsighted,mazelevel
+FLAGS: shortsighted,mazelevel
 INIT_MAP:mines,'.','}',true,true,unlit,false
 # guarantee at least one open spot to ensure successful stair placement
 GEOMETRY:left,bottom
@@ -461,7 +461,7 @@ TRAP:"magic",random
 # The Orcus Level
 #
 LEVEL:"orcus-1"
-FLAGS: noteleport,shortsighted,mazelevel
+FLAGS: shortsighted,mazelevel
 INIT_MAP:mazegrid,'-'
 GEOMETRY:right,center
 # A ghost town
@@ -605,7 +605,7 @@ MONSTER:random,random
 # The New Orcus Level
 #
 LEVEL:"orcus-2"
-FLAGS: noteleport,shortsighted,hardfloor,mazelevel
+FLAGS: shortsighted,hardfloor,mazelevel
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 # A ghost town
@@ -766,7 +766,7 @@ MONSTER:random,random
 # The Asmodeus Level
 #
 LEVEL:"asmod-1"
-FLAGS: noteleport,mazelevel
+FLAGS: mazelevel
 INIT_MAP:mazegrid,'-'
 # First part
 GEOMETRY:half-left,center
@@ -854,7 +854,7 @@ TRAP:"magic", random
 # The New Asmodeus Level
 #
 LEVEL:"asmod-2"
-FLAGS: noteleport,hardfloor,mazelevel
+FLAGS: hardfloor,mazelevel
 INIT_MAP:solidfill,' '
 # First part
 GEOMETRY:half-left,center
@@ -1042,7 +1042,7 @@ MONSTER:('i',"imp"),(69,17)
 # The Baalzebub level
 #
 LEVEL:"baalz-1"
-FLAGS: noteleport,mazelevel
+FLAGS: mazelevel
 INIT_MAP:mazegrid,'-'
 GEOMETRY:right,center
 MAP
@@ -1108,7 +1108,7 @@ MONSTER:'V',random
 # The New Baalzebub level
 #
 LEVEL:"baalz-2"
-FLAGS: noteleport,hardfloor,mazelevel
+FLAGS: hardfloor,mazelevel
 GEOMETRY:center,center
 MAP
       }}   }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}                  

@@ -1475,9 +1475,9 @@ hmon_hitmon(struct monst *mon, struct obj *obj, int thrown, int dieroll)
         } else {
             if (canseemon(mon)) {
                 pline("%s %s reality!", Monnam(mon),
-                                      level.flags.noteleport ? "tries to warp" : "warps");
+                                      noteleport_level(mon) ? "tries to warp" : "warps");
             }
-            if (!level.flags.noteleport) {
+            if (!noteleport_level(mon)) {
                 /* The 4/13 chance is intentional */
                 boolean disable_teleport_control = rnf(4,13);
                 coord cc;

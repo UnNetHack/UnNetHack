@@ -98,6 +98,28 @@ badpos(coordxy x, coordxy y, struct monst *mtmp, unsigned int gpflags)
     return is_badpos;
 }
 
+/* teleporting is prevented on this level for this monster? */
+boolean
+noteleport_level(struct monst *mon)
+{
+    struct monst *mtmp;
+
+    /* demon court in Gehennom prevent others from teleporting */
+    if (In_hell(&u.uz) && !(is_dlord(mon->data) || is_dprince(mon->data))) {
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+            if (is_dlord(mtmp->data) || is_dprince(mtmp->data)) {
+                return TRUE;
+            }
+    }
+
+    /* natural no-teleport level */
+    if (level.flags.noteleport) {
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 /*
  * Is (x,y) a good position of mtmp?  If mtmp is NULL, then is (x,y) good
  * for an object?
@@ -725,7 +747,7 @@ tele(void)
     coord cc;
 
     /* Disable teleportation in stronghold && Vlad's Tower */
-    if (level.flags.noteleport) {
+    if (noteleport_level(&youmonst)) {
 #ifdef WIZARD
         if (!wizard) {
 #endif
@@ -1753,10 +1775,9 @@ mvault_tele(struct monst *mtmp)
 boolean
 tele_restrict(struct monst *mon)
 {
-    if (level.flags.noteleport) {
+    if (noteleport_level(mon)) {
         if (canseemon(mon)) {
-            pline("A mysterious force prevents %s from teleporting!",
-                  mon_nam(mon));
+            pline("A mysterious force prevents %s from teleporting!", mon_nam(mon));
         }
         return TRUE;
     }
@@ -2064,7 +2085,7 @@ u_teleport_mon(struct monst *mtmp, boolean give_feedback)
             pline("%s resists your magic!", Monnam(mtmp));
         }
         return FALSE;
-    } else if (level.flags.noteleport && u.uswallow && mtmp == u.ustuck) {
+    } else if (u.uswallow && mtmp == u.ustuck && noteleport_level(mtmp)) {
         if (give_feedback) {
             You("are no longer inside %s!", mon_nam(mtmp));
         }

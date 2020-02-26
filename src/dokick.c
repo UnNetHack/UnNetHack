@@ -291,10 +291,10 @@ doit:
             if (mon->mx != x || mon->my != y) {
                 (void) unmap_invisible(x, y);
                 pline("%s %s, %s evading your %skick.", Monnam(mon),
-                      (!level.flags.noteleport && can_teleport(mon->data)) ? "teleports" :
+                      (can_teleport(mon->data) && !noteleport_level(mon)) ? "teleports" :
                        is_floater(mon->data) ? "floats" :
                        is_flyer(mon->data) ? "swoops" :
-                       (nolimbs(mon->data) || slithy(mon->data)) ?  "slides" : "jumps",
+                       (nolimbs(mon->data) || slithy(mon->data)) ? "slides" : "jumps",
                       clumsy ? "easily" : "nimbly",
                       clumsy ? "clumsy " : "");
                 (void) passive(mon, uarmf, FALSE, 1, AT_KICK, FALSE);

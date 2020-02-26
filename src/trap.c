@@ -4126,7 +4126,7 @@ drown(void)
     if ((Teleportation || can_teleport(youmonst.data)) && !Unaware &&
          (Teleport_control || rn2(3) < Luck+2)) {
         You("attempt a teleport spell."); /* utcsri!carroll */
-        if (!level.flags.noteleport) {
+        if (!noteleport_level(&youmonst)) {
             (void) dotele(FALSE);
             if (!is_pool(u.ux, u.uy)) {
                 return TRUE;

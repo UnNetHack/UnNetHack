@@ -2037,7 +2037,7 @@ arti_invoke(struct obj *obj)
             break;
 
         case BIDIRECTIONAL_PORTAL:
-            if (level.flags.noteleport) {
+            if (noteleport_level(&youmonst)) {
                 /* no portal on noteleport levels */
                 pline("%s", nothing_happens);
                 break;
