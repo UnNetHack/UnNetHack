@@ -32,7 +32,7 @@
 /*#define VERSION_REVISION	1*/
 
 #define COPYRIGHT_BANNER_A \
-"UnNetHack 5, Copyright 2009-2019"
+"UnNetHack 5, Copyright 2009-2020"
 
 #define COPYRIGHT_BANNER_B \
 "    Based on NetHack, Copyright 1985-2003 by Stichting Mathematisch"
@@ -102,7 +102,7 @@
  *  Eliminated a few potentially fatal bugs including one for stone-to-flesh,
  *	trouble-fixing during prayer, riding down stairs while punished,
  *	polyd player demon summoning, throwing digging tools into shops, and
- *	a couple from having the vision system enabled at inappropriate times 
+ *	a couple from having the vision system enabled at inappropriate times
  *  Corrected some incorrect calculations in final scoring
  *  Enhanced config file processing and alert to duplication of entries
  *  Player selection prompt enhancements for TTY and X11
