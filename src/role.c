@@ -608,7 +608,7 @@ randrole_filtered()
 
     /* this doesn't rule out impossible combinations but attempts to
        honor all the filter masks */
-    for (i = 0; i < SIZE(roles); ++i) {
+    for (i = 0; i < SIZE(roles) - 1; ++i) { /* -1: avoid terminating element */
         if (ok_role(i, ROLE_NONE, ROLE_NONE, ROLE_NONE) &&
              ok_race(i, ROLE_RANDOM, ROLE_NONE, ROLE_NONE) &&
              ok_gend(i, ROLE_NONE, ROLE_RANDOM, ROLE_NONE) &&
@@ -1804,9 +1804,10 @@ boolean preselect;
  *  1 - The Rogue Leader is the Tourist Nemesis.
  *  2 - Priests start with a random alignment - convert the leader and
  *      guardians here.
- *  3 - Elves can have one of two different leaders, but can't work it
- *      out here because it requires hacking the level file data (see
- *      sp_lev.c).
+ *  3 - Priests also get their set of deities from a randomly chosen role.
+ *  4 - [obsolete] Elves can have one of two different leaders,
+ *      but can't work it out here because it requires hacking the
+ *      level file data (see sp_lev.c).
  *
  * This code also replaces quest_init().
  */
