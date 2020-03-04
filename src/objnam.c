@@ -54,18 +54,13 @@ STATIC_DCL const char *FDECL(Japanese_item_name, (int i));
 
 STATIC_OVL char *
 strprepend(s, pref)
-register char *s;
-register const char *pref;
+char *s;
+const char *pref;
 {
-    register int i = (int)strlen(pref);
+    char *prefixed = nextobuf();
 
-    if(i > PREFIX) {
-        warning("PREFIX too short (for %d).", i);
-        return(s);
-    }
-    s -= i;
-    (void) strncpy(s, pref, i); /* do not copy trailing 0 */
-    return(s);
+    snprintf(prefixed, BUFSZ, "%s%s", pref, s);
+    return prefixed;
 }
 
 /* manage a pool of BUFSZ buffers, so callers don't have to */
@@ -77,6 +72,7 @@ STATIC_OVL char *
 nextobuf()
 {
     obufidx = (obufidx + 1) % NUMOBUF;
+    obufs[obufidx][0] = '\0';
     return obufs[obufidx];
 }
 
@@ -302,7 +298,7 @@ boolean ignore_oquan;
     register const char *dn = OBJ_DESCR(*ocl);
     register const char *un = ocl->oc_uname;
 
-    buf = nextobuf() + PREFIX;  /* leave room for "17 -3 " */
+    buf = nextobuf();
     if (Role_if(PM_SAMURAI) && Japanese_item_name(typ))
         actualn = Japanese_item_name(typ);
 

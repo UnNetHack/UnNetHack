@@ -42,6 +42,7 @@
 	  - Fix several out of bounds memory accesses
 	  - Fix chatting at the edge of the map
 	  - Fix several potential memory corruption bugs
+	  - Prevent buffer underflow for strprepend() with corpses
 
 2019-01-01  UnNetHack 5.2.0
 	* Support SOURCE_DATE_EPOCH for reproducible builds (patch from Debian)
