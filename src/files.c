@@ -2711,8 +2711,8 @@ const char *reason; /* explanation */
         program_state.in_paniclog = 1;
         lfile = fopen_datafile(PANICLOG, "a", TROUBLEPREFIX);
         if (lfile) {
-            (void) fprintf(lfile, "%s %08ld, %ld %s: %s %s\n",
-                           version_string(buf), yyyymmdd((time_t)0L),
+            (void) fprintf(lfile, "%s %s, %ld %s: %s %s\n",
+                           version_string(buf), iso8601(0),
                            u.ubirthday, (plname[0] ? plname : "(none)"),
                            type, reason);
             (void) fclose(lfile);
