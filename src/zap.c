@@ -88,7 +88,6 @@ const char * const flash_types[] = {    /* also used in buzzmu(mcastu.c) */
     ""
 };
 
-#if 0
 /*
  * Recognizing unseen wands by zapping:  in 3.4.3 and earlier, zapping
  * most wand types while blind would add that type to the discoveries
@@ -114,7 +113,7 @@ const char * const flash_types[] = {    /* also used in buzzmu(mcastu.c) */
 
 /* wand discovery gets special handling when hero is blinded */
 void
-learnwand(obj)
+learn_wand(obj)
 struct obj *obj;
 {
     /* For a wand (or wand-like tool) zapped by the player, if the
@@ -146,7 +145,6 @@ struct obj *obj;
         update_inventory();
     }
 }
-#endif
 
 /* Routines for IMMEDIATE wands and spells. */
 /* bhitm: monster mtmp was hit by the effect of wand or spell otmp */
@@ -834,10 +832,7 @@ boolean by_hero;
             && uwep && uwep->oartifact == ART_TROLLSBANE)) {
         if (by_hero && cansee(x, y)) {
             pline("%s twitches feebly.",
-#if NEXT_VERSION
                 upstart(corpse_xname(corpse, (const char *) 0, CXN_PFX_THE)));
-#endif
-                upstart(corpse_xname(corpse, FALSE)));
         }
         return (struct monst *) 0;
     }
@@ -905,11 +900,7 @@ boolean by_hero;
             (void) shk_your(eos(buf), corpse);
             if (one_of)
                 corpse->quan++; /* force plural */
-#if NEXT_VERSION
             Strcat(buf, corpse_xname(corpse, (const char *) 0, CXN_NO_PFX));
-#else
-            Strcat(buf, corpse_xname(corpse, FALSE));
-#endif
             if (one_of) /* could be simplified to ''corpse->quan = 1L;'' */
                 corpse->quan--;
             pline("%s glows iridescently.", upstart(buf));
@@ -1039,7 +1030,7 @@ struct monst *mon;
         if (otmp->otyp != CORPSE) continue;
         /* save the name; the object is liable to go away */
         if (youseeit) {
-            Strcpy(corpse, corpse_xname(otmp, TRUE));
+            Strcpy(corpse, corpse_xname(otmp, NULL, CXN_SINGULAR));
             Shk_Your(owner, otmp); /* includes a trailing space */
         }
 
@@ -2568,9 +2559,8 @@ boolean ordinary;
                   : "You seem no deader than before.");
             break;
         }
-        Sprintf(buf, "shot %sself with a death ray", uhim());
-        killer = buf;
-        killer_format = NO_KILLER_PREFIX;
+        Sprintf(killer.name, "shot %sself with a death ray", uhim());
+        killer.format = NO_KILLER_PREFIX;
         You("irradiate yourself with pure energy!");
         You("die.");
         makeknown(obj->otyp);
@@ -4126,8 +4116,8 @@ xchar sx, sy;
             You("aren't affected.");
             break;
         }
-        killer_format = KILLED_BY_AN;
-        killer = fltxt;
+        killer.format = KILLED_BY_AN;
+        Strcpy(killer.name, fltxt ? fltxt : "");
         /* when killed by disintegration breath, don't leave corpse */
         u.ugrave_arise = (type == -ZT_BREATH(ZT_DEATH)) ? -3 : NON_PM;
 #ifdef WEBB_DISINT
@@ -5630,14 +5620,14 @@ retry:
      *  has been denied.  Wishing for "nothing" requires a separate
      *  value to remain distinct.
      */
-    otmp = readobjnam(buf, &nothing, TRUE);
+    otmp = readobjnam(buf, &nothing);
     if (!otmp) {
         pline("Nothing fitting that description exists in the game.");
         if (++tries < MAXWISHTRY) {
             goto retry;
         }
         pline("%s", thats_enough_tries);
-        otmp = readobjnam((char *)0, (struct obj *)0, TRUE);
+        otmp = readobjnam((char *)0, (struct obj *)0);
         if (!otmp) return;  /* for safety; should never happen */
     } else if (otmp == &nothing) {
         /* explicitly wished for "nothing", presumeably attempting

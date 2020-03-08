@@ -37,7 +37,9 @@ dosounds()
 #endif
     struct monst *mtmp;
 
-    if (!flags.soundok || u.uswallow || Underwater) return;
+    if (Deaf || !flags.acoustics || u.uswallow || Underwater) {
+        return;
+    }
 
     if (level.sounds && !rn2(level.sounds->freq)) {
         int idx = rn2(level.sounds->n_sounds);
@@ -149,6 +151,7 @@ dosounds()
                 }
                 /* fall into... (yes, even for hallucination) */
             }
+                /* fall through */
             case 0:
                 You_hear("the footsteps of a guard on patrol.");
                 break;
@@ -225,19 +228,21 @@ dosounds()
     if (level.flags.has_morgue && !rn2(200)) {
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
             if (DEADMONSTER(mtmp)) continue;
-            if (is_undead(mtmp->data) &&
-                mon_in_room(mtmp, MORGUE)) {
+            if ((is_undead(mtmp->data) || is_vampshifter(mtmp)) &&
+                 mon_in_room(mtmp, MORGUE)) {
+                const char *hair = body_part(HAIR); /* hair/fur/scales */
+
                 switch (rn2(2)+hallu) {
                 case 0:
                     You("suddenly realize it is unnaturally quiet.");
                     break;
                 case 1:
-                    pline_The("%s on the back of your %s stands up.",
-                              body_part(HAIR), body_part(NECK));
+                    pline_The("%s on the back of your %s %s up.", hair,
+                              body_part(NECK), vtense(hair, "stand"));
                     break;
                 case 2:
-                    pline_The("%s on your %s seems to stand up.",
-                              body_part(HAIR), body_part(HEAD));
+                    pline_The("%s on your %s %s to stand up.", hair,
+                              body_part(HEAD), vtense(hair, "seem"));
                     break;
                 }
                 return;
@@ -299,6 +304,62 @@ dosounds()
             You_hear("%s", shop_msg[rn2(2)+hallu]);
         }
         return;
+    }
+    if (level.flags.has_temple && !rn2(400) &&
+         !(Is_astralevel(&u.uz) || Is_sanctum(&u.uz))) {
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (DEADMONSTER(mtmp)) {
+                continue;
+            }
+            if (mtmp->ispriest && inhistemple(mtmp) &&
+                /* priest must be active */
+                 mtmp->mcanmove && !mtmp->msleeping &&
+                /* hero must be outside this temple */
+                 temple_occupied(u.urooms) != EPRI(mtmp)->shroom) {
+                break;
+            }
+        }
+        if (mtmp) {
+            /* Generic temple messages; no attempt to match topic or tone
+               to the pantheon involved, let alone to the specific deity.
+               These are assumed to be coming from the attending priest;
+               asterisk means that the priest must be capable of speech;
+               pound sign (octathorpe,&c--don't go there) means that the
+               priest and the altar must not be directly visible (we don't
+               care if telepathy or extended detection reveals that the
+               priest is not currently standing on the altar; he's mobile). */
+            static const char *const temple_msg[] = {
+                "*someone praising %s.", "*someone beseeching %s.",
+                "#an animal carcass being offered in sacrifice.",
+                "*a strident plea for donations.",
+            };
+            const char *msg;
+            int trycount = 0;
+            int ax = EPRI(mtmp)->shrpos.x;
+            int ay = EPRI(mtmp)->shrpos.y;
+            boolean speechless = (mtmp->data->msound <= MS_ANIMAL);
+            boolean in_sight = canseemon(mtmp) || cansee(ax, ay);
+
+            do {
+                msg = temple_msg[rn2(SIZE(temple_msg) - 1 + hallu)];
+                if (index(msg, '*') && speechless) {
+                    continue;
+                }
+                if (index(msg, '#') && in_sight) {
+                    continue;
+                }
+                break; /* msg is acceptable */
+            } while (++trycount < 50);
+            while (!letter(*msg)) {
+                ++msg; /* skip control flags */
+            }
+            if (index(msg, '%')) {
+                You_hear(msg, halu_gname(EPRI(mtmp)->shralign));
+            } else {
+                You_hear("%s", msg);
+            }
+            return;
+        }
     }
     if (Is_oracle_level(&u.uz) && !rn2(400)) {
         /* make sure the Oracle is still here */
@@ -496,18 +557,46 @@ register struct monst *mtmp;
     }
 }
 
+/** return TRUE if mon is a gecko or seems to look like one (hallucination) */
+static boolean
+mon_is_gecko(mon)
+struct monst *mon;
+{
+    int glyph;
+
+    /* return TRUE if it is actually a gecko */
+    if (mon->data == &mons[PM_GECKO]) {
+        return TRUE;
+    }
+    /* return FALSE if it is a long worm; we might be chatting to its tail
+       (not strictly needed; long worms are MS_SILENT so won't get here) */
+    if (mon->data == &mons[PM_LONG_WORM]) {
+        return FALSE;
+    }
+    /* result depends upon whether map spot shows a gecko, which will
+       be due to hallucination or to mimickery since mon isn't one */
+    glyph = glyph_at(mon->mx, mon->my);
+    return (boolean) (glyph_to_mon(glyph) == PM_GECKO);
+}
+
 static int
 domonnoise(mtmp)
 register struct monst *mtmp;
 {
-    register const char *pline_msg = 0, /* Monnam(mtmp) will be prepended */
-                        *verbl_msg = 0; /* verbalize() */
+    const char *pline_msg = 0; /* Monnam(mtmp) will be prepended */
+    const char *verbl_msg = 0; /* verbalize() */
+    const char *verbl_msg_mcan = 0; /* verbalize() if cancelled */
     struct permonst *ptr = mtmp->data;
     char verbuf[BUFSZ];
+    int msound = ptr->msound, gnomeplan = 0;
 
     /* presumably nearness and sleep checks have already been made */
-    if (!flags.soundok) return(0);
-    if (is_silent(ptr)) return(0);
+    if (Deaf) {
+        return 0;
+    }
+    if (is_silent(ptr)) {
+        return 0;
+    }
 
     /* Make sure its your role's quest quardian; adjust if not */
     if (ptr->msound == MS_GUARDIAN && ptr != &mons[urole.guardnum]) {
@@ -578,7 +667,7 @@ register struct monst *mtmp;
             } else
                 verbl_msg = "I only drink... potions.";
         } else {
-            int vampindex;
+            size_t vampindex = 0;;
             static const char * const vampmsg[] = {
                 /* These first two (0 and 1) are specially handled below */
                 "I vant to suck your %s!",
@@ -603,8 +692,9 @@ register struct monst *mtmp;
                     Sprintf(verbuf, vampmsg[vampindex],
                             Upolyd ? an(mons[u.umonnum].mname) : an(racenoun));
                     verbl_msg = verbuf;
-                } else
+                } else if (vampindex < SIZE(vampmsg)) {
                     verbl_msg = vampmsg[vampindex];
+                }
             }
         }
     }
@@ -649,7 +739,8 @@ register struct monst *mtmp;
             else
                 pline_msg = "mews.";
             break;
-        } /* else FALLTHRU */
+        }
+        /* fall through */
     case MS_GROWL:
 #ifdef EXOTIC_PETS
         if (mtmp->mtame &&
@@ -777,13 +868,15 @@ register struct monst *mtmp;
             }
             break;
         }
-    /* else FALLTHRU */
+        /* fall through */
     case MS_HUMANOID:
         if (!mtmp->mpeaceful) {
             if (In_endgame(&u.uz) && is_mplayer(ptr)) {
                 mplayer_talk(mtmp);
-                break;
-            } else return 0; /* no sound */
+            } else {
+                pline_msg = "threatens you.";
+            }
+            break;
         }
         /* Generic peaceful humanoid behaviour. */
         if (mtmp->mflee)
@@ -813,6 +906,19 @@ register struct monst *mtmp;
             pline_msg = "talks about spellcraft.";
         else if (ptr->mlet == S_CENTAUR)
             pline_msg = "discusses hunting.";
+        else if (is_gnome(ptr) && Hallucination && (gnomeplan = rn2(4)) % 2) {
+            /* skipped for rn2(4) result of 0 or 2;
+               gag from an early episode of South Park called "Gnomes";
+               initially, Tweek (introduced in that episode) is the only
+               one aware of the tiny gnomes after spotting them sneaking
+               about; they are embarked upon a three-step business plan;
+               a diagram of the plan shows:
+                         Phase 1         Phase 2      Phase 3
+                   Collect underpants       ?          Profit
+               and they never verbalize step 2 so we don't either */
+            verbl_msg = (gnomeplan == 1) ? "Phase one, collect underpants."
+                                         : "Phase three, profit!";
+        }
         else switch (monsndx(ptr)) {
             case PM_HOBBIT:
                 pline_msg = (mtmp->mhpmax - mtmp->mhp >= 10) ?
@@ -899,14 +1005,20 @@ register struct monst *mtmp;
         }
     /* fall through */
     case MS_CUSS:
-        if (!mtmp->mpeaceful)
+        if (!mtmp->mpeaceful) {
             cuss(mtmp);
+        } else if (is_lminion(mtmp)) {
+            verbl_msg = "It's not too late.";
+        } else {
+            verbl_msg = "We're all doomed.";
+        }
         break;
     case MS_SPELL:
         /* deliberately vague, since it's not actually casting any spell */
         pline_msg = "seems to mutter a cantrip.";
         break;
     case MS_NURSE:
+        verbl_msg_mcan = "I hate this job!";
         if (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep)))
             verbl_msg = "Put that weapon away before you hurt someone!";
         else if (uarmc || uarm || uarmh || uarms || uarmg || uarmf)
@@ -967,8 +1079,22 @@ register struct monst *mtmp;
         break;
     }
 
-    if (pline_msg) pline("%s %s", Monnam(mtmp), pline_msg);
-    else if (verbl_msg) verbalize("%s", verbl_msg);
+    if (pline_msg) {
+        pline("%s %s", Monnam(mtmp), pline_msg);
+    } else if (mtmp->mcan && verbl_msg_mcan) {
+        verbalize("%s", verbl_msg_mcan);
+    } else if (verbl_msg) {
+        if (ptr == &mons[PM_DEATH]) {
+            /* Death talks in CAPITAL LETTERS
+               and without quotation marks */
+            char tmpbuf[BUFSZ];
+
+            pline("%s", ucase(strcpy(tmpbuf, verbl_msg)));
+        } else {
+            verbalize("%s", verbl_msg);
+        }
+    }
+
     return(1);
 }
 
@@ -987,8 +1113,8 @@ dotalk()
 static int
 dochat()
 {
-    register struct monst *mtmp;
-    register int tx, ty;
+    struct monst *mtmp;
+    int tx, ty;
     struct obj *otmp;
     int mon_count = 0;
     int dx, dy;
@@ -1008,6 +1134,10 @@ dochat()
     if (Underwater) {
         Your("speech is unintelligible underwater.");
         return(0);
+    }
+    if (Deaf) {
+        pline("How can you hold a conversation when you cannot hear?");
+        return 0;
     }
 
     if (!Blind && (otmp = shop_object(u.ux, u.uy)) != (struct obj *)0) {
@@ -1047,8 +1177,14 @@ dochat()
     }
 
 #ifdef STEED
-    if (u.usteed && u.dz > 0)
-        return (domonnoise(u.usteed));
+    if (u.usteed && u.dz > 0) {
+        if (!u.usteed->mcanmove || u.usteed->msleeping) {
+            pline("%s seems not to notice you.", Monnam(u.usteed));
+            return 1;
+        } else {
+            return domonnoise(u.usteed);
+        }
+    }
 #endif
     if (u.dz) {
         pline("They won't hear you %s there.", u.dz < 0 ? "up" : "down");
@@ -1086,9 +1222,10 @@ dochat()
     }
 
     if (!mtmp || mtmp->mundetected ||
-        mtmp->m_ap_type == M_AP_FURNITURE ||
-        mtmp->m_ap_type == M_AP_OBJECT)
+         M_AP_TYPE(mtmp) == M_AP_FURNITURE ||
+         M_AP_TYPE(mtmp) == M_AP_OBJECT) {
         return(0);
+    }
 
     /* sleeping monsters won't talk, except priests (who wake up) */
     if ((!mtmp->mcanmove || mtmp->msleeping) && !mtmp->ispriest) {

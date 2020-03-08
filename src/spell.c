@@ -1013,6 +1013,70 @@ throwspell()
     }
 }
 
+/* add/hide/remove/unhide teleport-away on behalf of dotelecmd() to give
+   more control to behavior of ^T when used in wizard mode */
+int
+tport_spell(what)
+int what;
+{
+    static struct tport_hideaway {
+        struct spell savespell;
+        int tport_indx;
+    } save_tport;
+    int i;
+/* also defined in teleport.c */
+#define NOOP_SPELL  0
+#define HIDE_SPELL  1
+#define ADD_SPELL   2
+#define UNHIDESPELL 3
+#define REMOVESPELL 4
+
+    for (i = 0; i < MAXSPELL; i++) {
+        if (spellid(i) == SPE_TELEPORT_AWAY || spellid(i) == NO_SPELL) {
+            break;
+        }
+    }
+    if (i == MAXSPELL) {
+        impossible("tport_spell: spellbook full");
+        /* wizard mode ^T is not able to honor player's menu choice */
+
+    } else if (spellid(i) == NO_SPELL) {
+        if (what == HIDE_SPELL || what == REMOVESPELL) {
+            save_tport.tport_indx = MAXSPELL;
+
+        } else if (what == UNHIDESPELL) {
+            /*assert( save_tport.savespell.sp_id == SPE_TELEPORT_AWAY );*/
+            spl_book[save_tport.tport_indx] = save_tport.savespell;
+            save_tport.tport_indx = MAXSPELL; /* burn bridge... */
+
+        } else if (what == ADD_SPELL) {
+            save_tport.savespell = spl_book[i];
+            save_tport.tport_indx = i;
+            spl_book[i].sp_id = SPE_TELEPORT_AWAY;
+            spl_book[i].sp_lev = objects[SPE_TELEPORT_AWAY].oc_level;
+            spl_book[i].sp_know = KEEN;
+            return REMOVESPELL; /* operation needed to reverse */
+        }
+
+    } else { /* spellid(i) == SPE_TELEPORT_AWAY */
+        if (what == ADD_SPELL || what == UNHIDESPELL) {
+            save_tport.tport_indx = MAXSPELL;
+
+        } else if (what == REMOVESPELL) {
+            /*assert( i == save_tport.tport_indx );*/
+            spl_book[i] = save_tport.savespell;
+            save_tport.tport_indx = MAXSPELL;
+
+        } else if (what == HIDE_SPELL) {
+            save_tport.savespell = spl_book[i];
+            save_tport.tport_indx = i;
+            spl_book[i].sp_id = NO_SPELL;
+            return UNHIDESPELL; /* operation needed to reverse */
+        }
+    }
+    return NOOP_SPELL;
+}
+
 void
 losespells()
 {

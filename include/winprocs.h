@@ -102,7 +102,6 @@ extern NEARDATA struct window_procs windowprocs;
 #define end_menu (*windowprocs.win_end_menu)
 #define select_menu (*windowprocs.win_select_menu)
 #define message_menu (*windowprocs.win_message_menu)
-#define update_inventory (*windowprocs.win_update_inventory)
 #define mark_synch (*windowprocs.win_mark_synch)
 #define wait_synch (*windowprocs.win_wait_synch)
 #ifdef CLIPPING
@@ -236,5 +235,19 @@ struct wc_Opt {
    pointers have been loaded */
 #define WINDOWPORT(wn) \
     (windowprocs.name && !strncmpi((wn), windowprocs.name, strlen((wn))))
+
+/* role selection by player_selection(); this ought to be in the core... */
+#define RS_NAME    0
+#define RS_ROLE    1
+#define RS_RACE    2
+#define RS_GENDER  3
+#define RS_ALGNMNT 4
+#define RS_filter  5
+#define RS_menu_arg(x) (ROLE_RANDOM - ((x) + 1)) /* 0..5 -> -3..-8 */
+
+/* Choose_windows() may be called multiple times; these constants tell the
+ * init function whether the window system is coming or going. */
+#define WININIT      0
+#define WININIT_UNDO 1
 
 #endif /* WINPROCS_H */

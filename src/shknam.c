@@ -500,7 +500,7 @@ struct mkroom *sroom;
         else if (isok(sx, sy-1) && !levl[sx][sy-1].edge &&
                  (int) levl[sx][sy-1].roomno == rmno) sy--;
         else if (isok(sx, sy+1) && !levl[sx][sy+1].edge &&
-                 (int) levl[sx][sy+1].roomno == rmno) sx++;
+                 (int) levl[sx][sy+1].roomno == rmno) sy++;
         else goto shk_failed;
     }
     else if(sx == sroom->lx-1) sx++;

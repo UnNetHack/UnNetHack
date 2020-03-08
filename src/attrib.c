@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)attrib.c   3.4 2002/10/07  */
 /*  Copyright 1988, 1989, 1990, 1992, M. Stephenson       */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -17,6 +16,11 @@ const char  * const plusattr[] = {
 },
 * const minusattr[] = {
     "weak", "stupid", "foolish", "clumsy", "fragile", "repulsive"
+};
+/* also used by enlightenment for non-abbreviated status info */
+const char *const attrname[] = {
+    "strength", "intelligence", "wisdom",
+    "dexterity", "constitution", "charisma"
 };
 
 
@@ -96,12 +100,22 @@ hea_abil[] = { {     1, &(HPoison_resistance), "", "" },
                    {  17, &(HTeleport_control), "controlled", "uncontrolled" },
                    {   0, 0, 0, 0 } },
 
-/* Intrinsics conferred by race */
-    elf_abil[] = { {    4, &(HSleep_resistance), "awake", "tired" },
-                   {   0, 0, 0, 0 } },
+    /* Intrinsics conferred by race */
+    dwa_abil[] = { { 1, &HInfravision, "", "" },
+                   { 0, 0, 0, 0 } },
 
-    orc_abil[] = { {    1, &(HPoison_resistance), "", "" },
-                   {   0, 0, 0, 0 } };
+    elf_abil[] = { { 1, &HInfravision, "", "" },
+                   { 4, &(HSleep_resistance), "awake", "tired" },
+                   { 0, 0, 0, 0 } },
+
+    gno_abil[] = { { 1, &HInfravision, "", "" },
+                   { 0, 0, 0, 0 } },
+
+    orc_abil[] = { { 1, &HInfravision, "", "" },
+                   { 1, &(HPoison_resistance), "", "" },
+                   { 0, 0, 0, 0 } },
+
+    hum_abil[] = { { 0, 0, 0, 0 } };
 
 static long next_check = 600L;  /* arbitrary first setting */
 STATIC_DCL void NDECL(exerper);
@@ -667,7 +681,14 @@ newhp()
     else conplus = 4;
 
     hp += conplus;
-    return((hp <= 0) ? 1 : hp);
+
+    if (hp <= 0) {
+        hp = 1;
+    }
+    if (u.ulevel < MAXULEV) {
+        u.uhpinc[u.ulevel] = (xchar) hp;
+    }
+    return hp;
 }
 
 schar
@@ -763,5 +784,74 @@ uhpmax()
     return (Upolyd ? u.mhmax : u.uhpmax);
 }
 
+/* when wearing (or taking off) an unID'd item, this routine is used
+   to distinguish between observable +0 result and no-visible-effect
+   due to an attribute not being able to exceed maximum or minimum */
+boolean
+extremeattr(attrindx) /* does attrindx's value match its max or min? */
+int attrindx;
+{
+    /* Fixed_abil and racial MINATTR/MAXATTR aren't relevant here */
+    int lolimit = 3, hilimit = 25, curval = ACURR(attrindx);
+
+    /* upper limit for Str is 25 but its value is encoded differently */
+    if (attrindx == A_STR) {
+        hilimit = STR19(25); /* 125 */
+        /* lower limit for Str can also be 25 */
+        if (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER) {
+            lolimit = hilimit;
+        }
+    } else if (attrindx == A_CON) {
+        if (uwep && (artilist[uwep->oartifact].spfx & SPFX_CON)) {
+            lolimit = hilimit;
+        }
+    }
+    /* this exception is hypothetical; the only other worn item affecting
+       Int or Wis is another helmet so can't be in use at the same time */
+    if (attrindx == A_INT || attrindx == A_WIS) {
+        if (uarmh && uarmh->otyp == DUNCE_CAP) {
+            hilimit = lolimit = 6;
+        }
+    }
+
+    /* are we currently at either limit? */
+    return (curval == lolimit || curval == hilimit) ? TRUE : FALSE;
+}
+
+/* change hero's alignment type, possibly losing use of artifacts */
+void
+uchangealign(newalign, reason)
+int newalign;
+int reason; /* 0==conversion, 1==helm-of-OA on, 2==helm-of-OA off */
+{
+    aligntyp oldalign = u.ualign.type;
+
+    u.ublessed = 0; /* lose divine protection */
+    /* You/Your/pline message with call flush_screen(), triggering bot(),
+       so the actual data change needs to come before the message */
+    flags.botl = TRUE; /* status line needs updating */
+    if (reason == 0) {
+        /* conversion via altar */
+        u.ualignbase[A_CURRENT] = (aligntyp) newalign;
+        /* worn helm of opposite alignment might block change */
+        if (!uarmh || uarmh->otyp != HELM_OF_OPPOSITE_ALIGNMENT) {
+            u.ualign.type = u.ualignbase[A_CURRENT];
+        }
+        You("have a %ssense of a new direction.", (u.ualign.type != oldalign) ? "sudden " : "");
+    } else {
+        /* putting on or taking off a helm of opposite alignment */
+        u.ualign.type = (aligntyp) newalign;
+        if (reason == 1) {
+            Your("mind oscillates %s.", Hallucination ? "wildly" : "briefly");
+        } else if (reason == 2) {
+            Your("mind is %s.",
+                 Hallucination ? "much of a muchness" : "back in sync with your body");
+        }
+    }
+    if (u.ualign.type != oldalign) {
+        u.ualign.record = 0; /* slate is wiped clean */
+        retouch_equipment(0);
+    }
+}
 
 /*attrib.c*/

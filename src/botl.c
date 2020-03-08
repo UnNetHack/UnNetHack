@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)botl.c 3.4 1996/07/15  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -180,14 +179,16 @@ int lev;
 short monnum;
 boolean female;
 {
-    register struct Role *role;
+    register const struct Role *role;
     register int i;
 
 
     /* Find the role */
-    for (role = (struct Role *) roles; role->name.m; role++)
-        if (monnum == role->malenum || monnum == role->femalenum)
+    for (role = roles; role->name.m; role++) {
+        if (monnum == role->malenum || monnum == role->femalenum) {
             break;
+        }
+    }
     if (!role->name.m)
         role = &urole;
 
@@ -392,16 +393,17 @@ char *buf;
         Sprintf(buf, "%s ", dungeons[u.uz.dnum].dname);
     else if (In_quest(&u.uz))
         Sprintf(buf, "Home %d ", dunlev(&u.uz));
-    else if (In_endgame(&u.uz))
-        Sprintf(buf,
-                Is_astralevel(&u.uz) ? "Astral Plane " : "End Game ");
     else if (Is_blackmarket(&u.uz))
         Sprintf(buf, "Blackmarket ");
     else if (Is_town_level(&u.uz))
         Sprintf(buf, "Town ");
     else if (Is_minetown_level(&u.uz))
         Sprintf(buf, "Mine Town:%-2d ", depth(&u.uz));
-    else {
+    else if (In_endgame(&u.uz)) {
+        /* [3.6.2: this used to be "Astral Plane" or generic "End Game"] */
+        (void) endgame_level_name(buf, depth(&u.uz));
+        Strcat(buf, " ");
+    } else {
         char *dgn_name = dungeons[u.uz.dnum].dname;
         if (!strncmpi(dgn_name, "The ", 4)) { dgn_name += 4; }
         /* ports with more room may expand this one */

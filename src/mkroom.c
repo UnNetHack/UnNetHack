@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)mkroom.c   3.4 2001/09/06  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -38,12 +37,13 @@ register struct mkroom *sroom;
 {
     register int area = (sroom->hx - sroom->lx + 1)
                         * (sroom->hy - sroom->ly + 1);
+
     return((boolean)( area > 20 ));
 }
 
+/* make and stock a room of a given type */
 void
 mkroom(roomtype)
-/* make and stock a room of a given type */
 int roomtype;
 {
     if (roomtype >= SHOPBASE)
@@ -203,15 +203,15 @@ gottype:
     stock_room(i, sroom);
 }
 
+/* pick an unused room, preferably with only one door */
 struct mkroom *
 pick_room(strict)
-register boolean strict;
-/* pick an unused room, preferably with only one door */
+boolean strict;
 {
-    register struct mkroom *sroom;
-    register int i = nroom;
+    struct mkroom *sroom;
+    int i = nroom;
 
-    for(sroom = &rooms[rn2(nroom)]; i--; sroom++) {
+    for (sroom = &rooms[rn2(nroom)]; i--; sroom++) {
         if(sroom == &rooms[nroom])
             sroom = &rooms[0];
         if(sroom->hx < 0)
@@ -245,23 +245,41 @@ int type;
 }
 
 void
+mk_zoo_thronemon(x,y)
+int x,y;
+{
+    int i = rnd(level_difficulty());
+    int pm = (i > 9) ? PM_OGRE_KING :
+             (i > 5) ? PM_ELVENKING :
+             (i > 2) ? PM_DWARF_KING : PM_GNOME_KING;
+    struct monst *mon = makemon(&mons[pm], x, y, NO_MM_FLAGS);
+
+    if (mon) {
+        mon->msleeping = 1;
+        mon->mpeaceful = 0;
+        set_malign(mon);
+        /* Give him a sceptre to pound in judgment */
+        (void) mongets(mon, MACE);
+    }
+}
+
+void
 fill_zoo(sroom)
 struct mkroom *sroom;
 {
     struct monst *mon;
     register int sx, sy, i;
-    int sh, tx, ty, goldlim, type = sroom->rtype;
+    int sh, tx = 0, ty = 0, goldlim = 0, type = sroom->rtype;
     int rmno = (sroom - rooms) + ROOMOFFSET;
     coord mm;
 
-    tx = ty = goldlim = 0;
-
     sh = sroom->fdoor;
-    switch(type) {
+    switch (type) {
     case GARDEN:
         mkgarden(sroom);
         /* mkgarden() sets flags and we don't want other fillings */
         return;
+
     case COURT:
         if(level.flags.is_maze_lev) {
             for(tx = sroom->lx; tx <= sroom->hx; tx++)
@@ -270,13 +288,16 @@ struct mkroom *sroom;
                         goto throne_placed;
         }
         i = 100;
-        do {    /* don't place throne on top of stairs */
+        do {
+            /* don't place throne on top of stairs */
             (void) somexy(sroom, &mm);
-            tx = mm.x; ty = mm.y;
+            tx = mm.x;
+            ty = mm.y;
         } while (occupied((xchar)tx, (xchar)ty) && --i > 0);
 throne_placed:
-        /* TODO: try to ensure the enthroned monster is an M2_PRINCE */
+        mk_zoo_thronemon(tx, ty);
         break;
+
     case BEEHIVE:
         tx = sroom->lx + (sroom->hx - sroom->lx + 1)/2;
         ty = sroom->ly + (sroom->hy - sroom->ly + 1)/2;
@@ -285,24 +306,27 @@ throne_placed:
             if ((int) levl[tx][ty].roomno != rmno ||
                 levl[tx][ty].edge) {
                 (void) somexy(sroom, &mm);
-                tx = mm.x; ty = mm.y;
+                tx = mm.x;
+                ty = mm.y;
             }
         }
         break;
+
     case ZOO:
     case LEPREHALL:
         goldlim = 500 * level_difficulty();
         break;
     }
-    for(sx = sroom->lx; sx <= sroom->hx; sx++)
-        for(sy = sroom->ly; sy <= sroom->hy; sy++) {
-            if(sroom->irregular) {
+
+    for (sx = sroom->lx; sx <= sroom->hx; sx++) {
+        for (sy = sroom->ly; sy <= sroom->hy; sy++) {
+            if (sroom->irregular) {
                 if ((int) levl[sx][sy].roomno != rmno ||
                     levl[sx][sy].edge ||
                     (sroom->doorct &&
                      distmin(sx, sy, doors[sh].x, doors[sh].y) <= 1))
                     continue;
-            } else if(!SPACE_POS(levl[sx][sy].typ) ||
+            } else if (!SPACE_POS(levl[sx][sy].typ) ||
                       (sroom->doorct &&
                        ((sx == sroom->lx && doors[sh].x == sx-1) ||
                         (sx == sroom->hx && doors[sh].x == sx+1) ||
@@ -310,13 +334,14 @@ throne_placed:
                         (sy == sroom->hy && doors[sh].y == sy+1))))
                 continue;
             /* don't place monster on explicitly placed throne */
-            if(type == COURT && IS_THRONE(levl[sx][sy].typ))
+            if (type == COURT && IS_THRONE(levl[sx][sy].typ)) {
                 continue;
+            }
             mon = ((struct monst *)0);
             if (type == ARMORY) {
                 /* armories don't contain as many monsters */
                 if (rnf(1, 3)) {
-                    mon = makemon(armorymon(), sx, sy, NO_MM_FLAGS);
+                    mon = makemon(armorymon(), sx, sy, MM_ASLEEP);
                 }
             } else {
                 mon = makemon(
@@ -333,9 +358,9 @@ throne_placed:
                     (type == COCKNEST) ? &mons[PM_COCKATRICE] :
                     (type == ANTHOLE) ? antholemon() :
                     (struct permonst *) 0,
-                    sx, sy, NO_MM_FLAGS);
+                    sx, sy, MM_ASLEEP);
             }
-            if(mon) {
+            if (mon) {
                 mon->msleeping = 1;
                 if (type==COURT && mon->mpeaceful) {
                     mon->mpeaceful = 0;
@@ -411,19 +436,24 @@ throne_placed:
                 break;
             }
         }
+    }
+
     switch (type) {
     case COURT:
     {
         struct obj *chest;
         levl[tx][ty].typ = THRONE;
         (void) somexy(sroom, &mm);
-        (void) mkgold((long) rn1(50 * level_difficulty(), 10), mm.x, mm.y);
         /* the royal coffers */
         if (depth(&u.uz) > 15) {
             chest = mksobj_at(IRON_SAFE, mm.x, mm.y, TRUE, FALSE);
         } else {
             chest = mksobj_at(CHEST, mm.x, mm.y, TRUE, FALSE);
         }
+        struct obj *gold = mkgold(rn1(50 * level_difficulty(), 10), mm.x, mm.y);
+        obj_extract_self(gold);
+        add_to_container(chest, gold);
+        chest->owt = weight(chest);
         chest->spe = 2;   /* so it can be found later */
         level.flags.has_court = 1;
         break;
@@ -464,13 +494,13 @@ int mm_flags;
 
     while (cnt--) {
         mdat = morguemon();
-        if (enexto(&cc, mm->x, mm->y, mdat) &&
+        if (mdat && enexto(&cc, mm->x, mm->y, mdat) &&
             (!revive_corpses ||
              !(otmp = sobj_at(CORPSE, cc.x, cc.y)) ||
              !revive(otmp, FALSE)))
             (void) makemon(mdat, cc.x, cc.y, mm_flags);
     }
-    level.flags.graveyard = TRUE;   /* reduced chance for undead corpse */
+    level.flags.graveyard = TRUE; /* reduced chance for undead corpse */
 }
 
 STATIC_OVL struct permonst *
@@ -478,14 +508,24 @@ morguemon()
 {
     register int i = rn2(100), hd = rn2(level_difficulty());
 
-    if(hd > 10 && i < 10)
-        return((Inhell || In_endgame(&u.uz)) ? mkclass(S_DEMON, 0) :
-               &mons[ndemon(A_NONE)]);
-    if(hd > 8 && i > 85)
-        return(mkclass(S_VAMPIRE, 0));
+    if (hd > 10 && i < 10) {
+        if (Inhell || In_endgame(&u.uz)) {
+            return mkclass(S_DEMON, 0);
+        } else {
+            int ndemon_res = ndemon(A_NONE);
+            if (ndemon_res != NON_PM) {
+                return &mons[ndemon_res];
+            }
+            /* else do what? As is, it will drop to ghost/wraith/zombie */
+        }
+    }
 
-    return((i < 20) ? &mons[PM_GHOST]
-           : (i < 40) ? &mons[PM_WRAITH] : mkclass(S_ZOMBIE, 0));
+    if (hd > 8 && i > 85) {
+        return mkclass(S_VAMPIRE, 0);
+    }
+
+    return ((i < 20) ? &mons[PM_GHOST] :
+            (i < 40) ? &mons[PM_WRAITH] : mkclass(S_ZOMBIE, 0));
 }
 
 STATIC_OVL struct permonst *
@@ -607,11 +647,23 @@ shrine_pos(roomno)
 int roomno;
 {
     static coord buf;
+    int delta;
     struct mkroom *troom = &rooms[roomno - ROOMOFFSET];
 
-    buf.x = troom->lx + ((troom->hx - troom->lx) / 2);
-    buf.y = troom->ly + ((troom->hy - troom->ly) / 2);
-    return(&buf);
+    /* if width and height are odd, placement will be the exact center;
+       if either or both are even, center point is a hypothetical spot
+       between map locations and placement will be adjacent to that */
+    delta = troom->hx - troom->lx;
+    buf.x = troom->lx + delta / 2;
+    if ((delta % 2) && rn2(2)) {
+        buf.x++;
+    }
+    delta = troom->hy - troom->ly;
+    buf.y = troom->ly + delta / 2;
+    if ((delta % 2) && rn2(2)) {
+        buf.y++;
+    }
+    return &buf;
 }
 
 STATIC_OVL void
@@ -679,14 +731,14 @@ int
 somex(croom)
 register struct mkroom *croom;
 {
-    return rn2(croom->hx-croom->lx+1) + croom->lx;
+    return rn1(croom->hx - croom->lx + 1, croom->lx);
 }
 
 int
 somey(croom)
 register struct mkroom *croom;
 {
-    return rn2(croom->hy-croom->ly+1) + croom->ly;
+    return rn1(croom->hy - croom->ly + 1, croom->ly);
 }
 
 boolean

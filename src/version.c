@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)version.c  3.4 2003/12/06  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -39,6 +38,7 @@ char *buf;
     return buf;
 }
 
+/** the 'V' command */
 int
 doversion()
 {
@@ -48,6 +48,7 @@ doversion()
     return 0;
 }
 
+/** the '#version' command; also a choice for '?' */
 int
 doextversion()
 {

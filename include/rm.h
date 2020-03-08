@@ -246,6 +246,16 @@ enum screen_symbols {
 
 #define DARKROOMSYM (Is_rogue_level(&u.uz) ? S_stone : S_darkroom)
 
+#define is_cmap_trap(i) ((i) >= S_arrow_trap && (i) <= S_polymorph_trap)
+#define is_cmap_drawbridge(i) ((i) >= S_vodbridge && (i) <= S_hcdbridge)
+#define is_cmap_door(i) ((i) >= S_vodoor && (i) <= S_hcdoor)
+#define is_cmap_wall(i) ((i) >= S_stone && (i) <= S_trwall)
+#define is_cmap_room(i) ((i) >= S_room && (i) <= S_darkroom)
+#define is_cmap_corr(i) ((i) >= S_corr && (i) <= S_litcorr)
+#define is_cmap_furniture(i) ((i) >= S_upstair && (i) <= S_fountain)
+#define is_cmap_water(i) ((i) == S_pool || (i) == S_water)
+#define is_cmap_lava(i) ((i) == S_lava)
+
 struct symdef {
     uchar sym;
     const char  *explanation;
@@ -254,8 +264,20 @@ struct symdef {
 #endif
 };
 
+/* misc symbol definitions */
+#define SYM_BOULDER 0
+#define SYM_INVISIBLE 1
+#define SYM_PET_OVERRIDE 2
+#define SYM_HERO_OVERRIDE 3
+#define MAXOTHER 4
+
 extern struct symdef defsyms[MAXPCHARS];    /* defaults */
 extern glyph_t showsyms[MAXPCHARS];
+extern glyph_t primary_syms[];
+extern glyph_t rogue_syms[];
+extern glyph_t ov_primary_syms[];
+extern glyph_t ov_rogue_syms[];
+
 extern const struct symdef def_warnsyms[WARNCOUNT];
 
 /*
@@ -500,6 +522,21 @@ struct damage {
     schar typ;
 };
 
+/* for bones levels:  identify the dead character, who might have died on
+   an existing bones level; if so, most recent victim will be first in list */
+struct cemetery {
+    struct cemetery *next; /* next struct is previous dead character... */
+    /* "plname" + "-ROLe" + "-RACe" + "-GENder" + "-ALIgnment" + \0 */
+    char who[PL_NSIZ + 4 * (1 + 3) + 1];
+    /* death reason, same as in score/log file */
+    char how[100 + 1]; /* [DTHSZ+1] */
+    /* date+time in string of digits rather than binary */
+    char when[4 + 2 + 2 + 2 + 2 + 2 + 1]; /* "YYYYMMDDhhmmss\0" */
+    /* final resting place spot */
+    schar frpx, frpy;
+    boolean bonesknown;
+};
+
 struct levelflags {
     uchar nfountains;       /* number of fountains on level */
     uchar nsinks;           /* number of sinks on the level */
@@ -578,6 +615,7 @@ typedef struct
     struct obj      *buriedobjlist;
     struct monst    *monlist;
     struct damage   *damagelist;
+    struct cemetery *bonesinfo;
     struct levelflags flags;
     struct mon_gen_override *mon_gen;
     struct lvl_sounds   *sounds;

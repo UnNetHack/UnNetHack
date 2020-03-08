@@ -27,7 +27,7 @@ void pline(const char *str,...) {}
 void pline_The(const char *str,...) {}
 void You_cant(const char *str,...) {}
 void panic(const char *str,...) {}
-void terminate(int status) {}
+void nh_terminate(int status) { exit(0); }
 void docrt() {}
 
 int str2role(char *str) { return 0; }
@@ -54,3 +54,5 @@ void reassign() {}
 
 void set_random_state(unsigned int a) { }
 int rnd(int a) { return 0; }
+
+void reset_commands(BOOLEAN_P b) {}

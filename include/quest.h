@@ -21,10 +21,17 @@ struct q_score {            /* Quest "scorecard" */
     Bitfield(killed_nemesis, 1); /* set when the nemesis is killed */
     Bitfield(in_battle, 1);      /* set when nemesis fighting you */
 
-    Bitfield(cheater, 1);        /* set if cheating detected */
-    Bitfield(touched_artifact, 1);   /* for a special message */
-    Bitfield(offered_artifact, 1);   /* offered to leader */
-    Bitfield(got_thanks, 1);     /* final message from leader */
+    Bitfield(cheater, 1);          /* set if cheating detected */
+    Bitfield(touched_artifact, 1); /* for a special message */
+    Bitfield(offered_artifact, 1); /* offered to leader */
+    Bitfield(got_thanks, 1);       /* final message from leader */
+
+    /* used by questpgr code when messages want to use pronouns
+       (set up at game start instead of waiting until monster creation;
+       1 bit each would suffice--nobody involved is actually neuter) */
+    Bitfield(ldrgend, 2); /* leader's gender: 0=male, 1=female, 2=neuter */
+    Bitfield(nemgend, 2); /* nemesis's gender */
+    Bitfield(godgend, 2); /* deity's gender */
 
     /* keep track of leader presence/absence even if leader is
        polymorphed, raised from dead, etc */

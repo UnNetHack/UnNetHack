@@ -1671,10 +1671,16 @@ dmonsfree()
     for (mtmp = &fmon; *mtmp;) {
         freetmp = *mtmp;
         if (DEADMONSTER(freetmp) && !freetmp->isgd) {
+            count++;
+            if (count > iflags.purge_monsters) {
+                describe_level(buf);
+                impossible("dmonsfree: %d removed doesn't match %d pending on %s",
+                        count, iflags.purge_monsters, buf);
+            }
+
             *mtmp = freetmp->nmon;
             freetmp->nmon = NULL;
             dealloc_monst(freetmp);
-            count++;
         } else {
             mtmp = &(freetmp->nmon);
         }
@@ -1853,8 +1859,14 @@ struct monst *m;
             free((genericptr_t) x->egd);
         if (x->epri)
             free((genericptr_t) x->epri);
-        if (x->eshk)
+        if (x->eshk) {
+            struct mkroom *sroom = &rooms[x->eshk->shoproom - ROOMOFFSET];
+            /* remove mon as resident of a room */
+            if (sroom->resident == m) {
+                sroom->resident = NULL;
+            }
             free((genericptr_t) x->eshk);
+        }
         if (x->emin)
             free((genericptr_t) x->emin);
         if (x->edog)
@@ -2244,10 +2256,9 @@ boolean was_swallowed; /* digestion */
                 if (magr == &youmonst) {
                     There("is an explosion in your %s!",
                           body_part(STOMACH));
-                    Sprintf(killer_buf, "%s explosion",
+                    Sprintf(killer.name, "%s explosion",
                             s_suffix(mdat->mname));
-                    if (Half_physical_damage) tmp = (tmp+1) / 2;
-                    losehp(tmp, killer_buf, KILLED_BY_AN);
+                    losehp(Maybe_Half_Phys(tmp), killer.name, KILLED_BY_AN);
                 } else {
                     if (flags.soundok) You_hear("an explosion.");
                     magr->mhp -= tmp;
@@ -2263,9 +2274,8 @@ boolean was_swallowed; /* digestion */
                 return FALSE;
             }
 
-            Sprintf(killer_buf, "%s explosion", s_suffix(mdat->mname));
-            killer = killer_buf;
-            killer_format = KILLED_BY_AN;
+            Sprintf(killer.name, "%s explosion", s_suffix(mdat->mname));
+            killer.format = KILLED_BY_AN;
             explode(mon->mx, mon->my, -1, tmp, MON_EXPLODE, EXPL_NOXIOUS);
             return (FALSE);
         }
@@ -3246,8 +3256,8 @@ int typ, fatal;
         losehp(i, pname, kprefix);
     }
     if(u.uhp < 1) {
-        killer_format = kprefix;
-        killer = pname;
+        killer.format = kprefix;
+        Strcpy(killer.name, pname);
         /* "Poisoned by a poisoned ___" is redundant */
         done(how);
     }

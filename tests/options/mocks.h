@@ -28,7 +28,7 @@ void pline(const char *str,...) {}
 void pline_The(const char *str,...) {}
 void You_cant(const char *str,...) {}
 void panic(const char *str,...) {}
-void terminate(int status) {}
+void nh_terminate(int status) { exit(0); }
 void docrt() {}
 
 int str2role(char *str) { return 0; }
@@ -56,4 +56,6 @@ void reassign() {}
 uint32_t isaac_next_uint32(isaac_ctx *_ctx) { return 0; }
 void isaac_init(isaac_ctx *_ctx,const unsigned char *_seed,int _nseed) {}
 
-
+void reset_commands(BOOLEAN_P b) {}
+boolean is_pool(int i1, int i2) { return FALSE; }
+boolean is_lava(int i1, int i3) { return FALSE; }

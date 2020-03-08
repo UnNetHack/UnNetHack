@@ -61,8 +61,10 @@
 #define slithy(ptr)     (((ptr)->mflags1 & M1_SLITHY) != 0L)
 #define is_wooden(ptr)      ((ptr) == &mons[PM_WOOD_GOLEM])
 #define thick_skinned(ptr)  (((ptr)->mflags1 & M1_THICK_HIDE) != 0L)
+#define hug_throttles(ptr)  ((ptr) == &mons[PM_ROPE_GOLEM])
 #define slimeproof(ptr)     ((ptr) == &mons[PM_GREEN_SLIME] || flaming(ptr) || noncorporeal(ptr))
 #define lays_eggs(ptr)      (((ptr)->mflags1 & M1_OVIPAROUS) != 0L)
+#define eggs_in_water(ptr)  (lays_eggs(ptr) && (ptr)->mlet == S_EEL && is_swimmer(ptr))
 #define regenerates(ptr)    (((ptr)->mflags1 & M1_REGEN) != 0L)
 #define noregen(ptr)        (((ptr)->mflags3 & M3_NOREGEN) != 0L)
 #define perceives(ptr)      (((ptr)->mflags1 & M1_SEE_INVIS) != 0L)
@@ -124,6 +126,7 @@
 #define strongmonst(ptr)    (((ptr)->mflags2 & M2_STRONG) != 0L)
 #define can_breathe(ptr)    attacktype(ptr, AT_BREA)
 #define cantwield(ptr)      (nohands(ptr) || verysmall(ptr))
+#define cant_wield(ptr)     (nohands(ptr) || verysmall(ptr))
 #define could_twoweap(ptr)  ((ptr)->mattk[1].aatyp == AT_WEAP)
 #define cantweararm(ptr)    (breakarm(ptr) || sliparm(ptr))
 #define throws_rocks(ptr)   (((ptr)->mflags2 & M2_ROCKTHROW) != 0L)
@@ -149,6 +152,7 @@
 #define is_covetous(ptr)    ((ptr->mflags3 & M3_COVETOUS))
 #define infravision(ptr)    ((ptr->mflags3 & M3_INFRAVISION))
 #define infravisible(ptr)   ((ptr->mflags3 & M3_INFRAVISIBLE))
+#define is_displacer(ptr)   ((ptr)->mflags3 & M3_DISPLACES)
 #define is_mplayer(ptr)     (((ptr) >= &mons[PM_ARCHEOLOGIST]) && \
                              ((ptr) <= &mons[PM_WIZARD]))
 #define is_watch(ptr)       ((ptr) == &mons[PM_WATCHMAN] || \
@@ -224,6 +228,10 @@
 #define is_mind_flayer(ptr) ((ptr) == &mons[PM_MIND_FLAYER] || \
                              (ptr) == &mons[PM_MASTER_MIND_FLAYER])
 
+#define hates_light(ptr) ((ptr) == &mons[PM_GREMLIN])
+
+/* used to vary a few messages */
+#define weirdnonliving(ptr) (is_golem(ptr) || (ptr)->mlet == S_VORTEX)
 #define nonliving(ptr)      (is_golem(ptr) || is_undead(ptr) || \
                              is_statue(ptr) || \
                              (ptr)->mlet == S_VORTEX || \
@@ -239,7 +247,7 @@
 
 /* no corpse (ie, blank scrolls) if killed by fire */
 #define completelyburns(ptr) \
-    ((ptr) == &mons[PM_PAPER_GOLEM] || (ptr) == &mons[PM_STRAW_GOLEM])
+    ((ptr) == &mons[PM_PAPER_GOLEM] || (ptr) == &mons[PM_STRAW_GOLEM] || (ptr) == &mons[PM_WAX_GOLEM])
 
 /* Used for conduct with corpses, tins, and digestion attacks */
 /* G_NOCORPSE monsters might still be swallowed as a purple worm */

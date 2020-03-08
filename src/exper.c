@@ -1,8 +1,10 @@
-/*  SCCS Id: @(#)exper.c    3.4 2002/11/20  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#ifndef LONG_MAX
+#include <limits.h>
+#endif
 
 STATIC_DCL int FDECL(enermod, (int));
 
@@ -10,6 +12,10 @@ long
 newuexp(lev)
 int lev;
 {
+    if (lev < 1) {
+        /* for newuexp(u.ulevel - 1) when u.ulevel is 1 */
+        return 0L;
+    }
     if (lev < 10) return (10L * (1L << lev));
     if (lev < 20) return (10000L * (1L << (lev - 10)));
     return (10000000L * ((long)(lev - 19)));
@@ -34,13 +40,45 @@ int en;
     }
 }
 
+/* calculate spell power/energy points for new level */
 int
-experience(mtmp, nk)    /* return # of exp points for mtmp after nk killed */
+newpw()
+{
+    int en = 0, enrnd, enfix;
+
+    if (u.ulevel == 0) {
+        en = urole.enadv.infix + urace.enadv.infix;
+        if (urole.enadv.inrnd > 0) {
+            en += rnd(urole.enadv.inrnd);
+        }
+        if (urace.enadv.inrnd > 0) {
+            en += rnd(urace.enadv.inrnd);
+        }
+    } else {
+        enrnd = (int) ACURR(A_WIS) / 2;
+        if (u.ulevel < urole.xlev) {
+            enrnd += urole.enadv.lornd + urace.enadv.lornd;
+            enfix = urole.enadv.lofix + urace.enadv.lofix;
+        } else {
+            enrnd += urole.enadv.hirnd + urace.enadv.hirnd;
+            enfix = urole.enadv.hifix + urace.enadv.hifix;
+        }
+        en = enermod(rn1(enrnd, enfix));
+    }
+    if (en <= 0) {
+        en = 1;
+    }
+    if (u.ulevel < MAXULEV) {
+        u.ueninc[u.ulevel] = (xchar) en;
+    }
+    return en;
+}
+
+/* return # of exp points for mtmp after nk killed */
+int
+experience(mtmp, nk)
 register struct monst *mtmp;
 register int nk;
-#if defined(macintosh) && (defined(__SC__) || defined(__MRC__))
-# pragma unused(nk)
-#endif
 {
     register struct permonst *ptr = mtmp->data;
     int i, tmp, tmp2;
@@ -72,7 +110,9 @@ register int nk;
         if(tmp2 > AD_PHYS && tmp2 < AD_BLND) tmp += 2*mtmp->m_lev;
         else if((tmp2 == AD_DRLI) || (tmp2 == AD_STON) ||
                 (tmp2 == AD_SLIM)) tmp += 50;
-        else if(tmp != AD_PHYS) tmp += mtmp->m_lev;
+        else if (tmp2 != AD_PHYS) {
+            tmp += mtmp->m_lev;
+        }
         /* extra heavy damage bonus */
         if((int)(ptr->mattk[i].damd * ptr->mattk[i].damn) > 23)
             tmp += mtmp->m_lev;
@@ -107,18 +147,32 @@ register int exp, score, rexp;
     u.uexp += exp;
     u.urexp += 4*exp + rexp;
     u.urscore += 4*score + rexp;
+
+    /* cap experience and score on wraparound */
+    if (u.uexp < 0) {
+        u.uexp = LONG_MAX;
+    }
+    if (u.urexp < 0) {
+        u.urexp = LONG_MAX;
+    }
+    if (u.urscore < 0) {
+        u.urscore = LONG_MAX;
+    }
+
     if(exp
 #ifdef SCORE_ON_BOTL
        || flags.showscore
 #endif
        ) flags.botl = 1;
+
     if (u.urexp >= (Role_if(PM_WIZARD) ? 1000 : 2000))
         flags.beginner = 0;
 }
 
+/* e.g., hit by drain life attack */
 void
-losexp(drainer)     /* e.g., hit by drain life attack */
-const char *drainer;    /* cause of death, if drain should be fatal */
+losexp(drainer)
+const char *drainer; /* cause of death, if drain should be fatal */
 {
     register int num;
 
@@ -138,8 +192,10 @@ const char *drainer;    /* cause of death, if drain should be fatal */
         reset_rndmonst(NON_PM); /* new monster selection */
     } else {
         if (drainer) {
-            killer_format = KILLED_BY;
-            killer = drainer;
+            killer.format = KILLED_BY;
+            if (killer.name != drainer) {
+                Strcpy(killer.name, drainer);
+            }
             done(DIED);
         }
         /* no drainer or lifesaved */
@@ -153,12 +209,6 @@ const char *drainer;    /* cause of death, if drain should be fatal */
     if (u.uhp < 1) u.uhp = 1;
     else if (u.uhp > u.uhpmax) u.uhp = u.uhpmax;
 
-    if (u.ulevel < urole.xlev)
-        num = rn1((int)ACURR(A_WIS)/2 + urole.enadv.lornd + urace.enadv.lornd,
-                  urole.enadv.lofix + urace.enadv.lofix);
-    else
-        num = rn1((int)ACURR(A_WIS)/2 + urole.enadv.hirnd + urace.enadv.hirnd,
-                  urole.enadv.hifix + urace.enadv.hifix);
     num = enermod(num);     /* M. Stephenson */
     u.uenmax -= num;
     if (u.uenmax < 0) u.uenmax = 0;
@@ -168,6 +218,16 @@ const char *drainer;    /* cause of death, if drain should be fatal */
 
     if (u.uexp > 0)
         u.uexp = newuexp(u.ulevel) - 1;
+
+    if (Upolyd) {
+        num = monhp_per_lvl(&youmonst);
+        u.mhmax -= num;
+        u.mh -= num;
+        if (u.mh <= 0) {
+            rehumanize();
+        }
+    }
+
     flags.botl = 1;
 }
 
@@ -213,7 +273,10 @@ boolean incr;   /* true iff via incremental experience growth */
         u.uenmax += num;
         u.uen += num;
     }
+
+    /* increase level (unless already maxxed) */
     if (u.ulevel < MAXULEV) {
+        /* increase experience points to reflect new level */
         if (incr) {
             long tmp = newuexp(u.ulevel + 1);
             if (u.uexp >= tmp) u.uexp = tmp - 1;
@@ -221,8 +284,10 @@ boolean incr;   /* true iff via incremental experience growth */
             u.uexp = newuexp(u.ulevel);
         }
         ++u.ulevel;
+        pline("Welcome %sto experience level %d.",
+              (u.ulevelmax < u.ulevel) ? "" : "back ",
+              u.ulevel);
         if (u.ulevelmax < u.ulevel) u.ulevelmax = u.ulevel;
-        pline("Welcome to experience level %d.", u.ulevel);
         adjabil(u.ulevel - 1, u.ulevel);    /* give new intrinsics */
         reset_rndmonst(NON_PM);     /* new monster selection */
     }

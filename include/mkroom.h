@@ -8,15 +8,16 @@
 /* mkroom.h - types and structures for room and shop initialization */
 
 struct mkroom {
-    schar lx, hx, ly, hy;  /* usually xchar, but hx may be -1 */
-    schar rtype;        /* type of room (zoo, throne, etc...) */
-    schar rlit;     /* is the room lit ? */
-    schar needfill;     /* does the room need filling? */
+    schar lx, hx, ly, hy; /* usually xchar, but hx may be -1 */
+    schar rtype;          /* type of room (zoo, throne, etc...) */
+    schar orig_rtype;     /* same as rtype, but not zeroed later */
+    schar rlit;           /* is the room lit ? */
+    schar needfill;       /* does the room need filling? */
     schar needjoining;
-    schar doorct;       /* door count */
-    schar fdoor;        /* index for the first door of the room */
-    schar nsubrooms;    /* number of subrooms */
-    boolean irregular;  /* true if room is non-rectangular */
+    schar doorct;         /* door count */
+    schar fdoor;          /* index for the first door of the room */
+    schar nsubrooms;      /* number of subrooms */
+    boolean irregular;    /* true if room is non-rectangular */
     struct mkroom *sbrooms[MAX_SUBROOMS];  /* Subrooms pointers */
     struct monst *resident; /* priest/shopkeeper/guard for this room */
 };

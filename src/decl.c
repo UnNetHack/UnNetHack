@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)decl.c 3.2 2001/12/10  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -23,14 +22,15 @@ NEARDATA int multi = 0;
 char multi_txt[BUFSZ] = DUMMY;
 const char *multi_reason = NULL;
 #if 0
-NEARDATA int warnlevel = 0;     /* used by movemon and dochugw */
+NEARDATA int warnlevel = 0; /* used by movemon and dochugw */
 #endif
 NEARDATA int nroom = 0;
 NEARDATA int nsubroom = 0;
 NEARDATA int occtime = 0;
 
-int x_maze_max, y_maze_max; /* initialized in main, used in mkmaze.c */
-int otg_temp;           /* used by object_to_glyph() [otg] */
+/* maze limits must be even; masking off lowest bit guarantees that */
+int x_maze_max = (COLNO - 1) & ~1, y_maze_max = (ROWNO - 1) & ~1;
+int otg_temp; /* used by object_to_glyph() [otg] */
 
 #ifdef REDO
 NEARDATA int in_doagain = 0;
@@ -51,12 +51,11 @@ NEARDATA char pl_tutorial[QT_T_MAX-QT_T_FIRST+1] = {0};
 NEARDATA int smeq[MAXNROFROOMS+1] = DUMMY;
 NEARDATA int doorindex = 0;
 
+NEARDATA int warn_obj_cnt = 0;
 NEARDATA char *save_cm = 0;
-NEARDATA int killer_format = 0;
-const char *killer = 0;
-const char *delayed_killer = 0;
+
+NEARDATA struct kinfo killer = DUMMY;
 NEARDATA long done_money = 0;
-char killer_buf[BUFSZ] = DUMMY;
 
 long killer_flags = 0L;
 
@@ -71,6 +70,7 @@ NEARDATA int current_fruit = 0;
 NEARDATA struct fruit *ffruit = (struct fruit *)0;
 
 NEARDATA char tune[6] = DUMMY;
+NEARDATA boolean ransacked = 0;
 
 const char *occtxt = DUMMY;
 const char quitchars[] = " \r\n\033";
@@ -164,6 +164,7 @@ NEARDATA struct permonst upermonst = DUMMY;
 /* > to be replaced with context */
 NEARDATA struct polearm_info polearm;
 /* < to be replaced with context */
+NEARDATA struct obj_split context_objsplit = DUMMY;
 NEARDATA struct flag flags = DUMMY;
 NEARDATA struct instance_flags iflags = DUMMY;
 NEARDATA struct you u = DUMMY;
@@ -190,15 +191,17 @@ NEARDATA struct obj *invent = (struct obj *)0,
  *  This must be the same order as used for buzz() in zap.c.
  */
 const int zapcolors[NUM_ZAP] = {
-    HI_ZAP,     /* 0 - missile */
+    HI_ZAP,         /* 0 - missile */
     CLR_ORANGE,     /* 1 - fire */
     CLR_WHITE,      /* 2 - frost */
-    HI_ZAP,     /* 3 - sleep */
+    HI_ZAP,         /* 3 - sleep */
     CLR_BLACK,      /* 4 - death */
     CLR_WHITE,      /* 5 - lightning */
-    CLR_YELLOW,     /* 6 - poison gas */
+    /* NH 3.6.3: poison gas zap used to be yellow and acid zap was green,
+       which conflicted with the corresponding dragon colors */
+    CLR_GREEN,      /* 6 - poison gas */
     CLR_RED,        /* 7 - lava */
-    CLR_GREEN,      /* 8 - acid */
+    CLR_YELLOW,     /* 8 - acid */
 };
 #endif /* text color */
 

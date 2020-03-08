@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)alloc.c    3.4 1995/10/04  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -32,25 +31,13 @@ long *
 alloc(lth)
 register unsigned int lth;
 {
-#ifdef LINT
-/*
- * a ridiculous definition, suppressing
- *  "possible pointer alignment problem" for (long *) malloc()
- * from lint
- */
-    long dummy = ftell(stderr);
+    void *ptr;
 
-    if(lth) dummy = 0;  /* make sure arg is used */
-    return(&dummy);
-#else
-    register genericptr_t ptr;
-
-    ptr = malloc(lth);
+    ptr = calloc(lth, 1);
 #ifndef MONITOR_HEAP
     if (!ptr) panic("Memory allocation failure; cannot get %u bytes", lth);
 #endif
-    return((long *) ptr);
-#endif
+    return ptr;
 }
 
 

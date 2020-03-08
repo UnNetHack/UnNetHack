@@ -5,30 +5,34 @@
 #include "hack.h"
 
 /* monster mage spells */
-#define MGC_PSI_BOLT     0
-#define MGC_CURE_SELF    1
-#define MGC_HASTE_SELF   2
-#define MGC_STUN_YOU     3
-#define MGC_DISAPPEAR    4
-#define MGC_WEAKEN_YOU   5
-#define MGC_DESTRY_ARMR  6
-#define MGC_CURSE_ITEMS  7
-#define MGC_AGGRAVATION  8
-#define MGC_SUMMON_MONS  9
-#define MGC_CLONE_WIZ   10
-#define MGC_DEATH_TOUCH 11
+enum mcast_mage_spells {
+    MGC_PSI_BOLT = 0,
+    MGC_CURE_SELF,
+    MGC_HASTE_SELF,
+    MGC_STUN_YOU,
+    MGC_DISAPPEAR,
+    MGC_WEAKEN_YOU,
+    MGC_DESTRY_ARMR,
+    MGC_CURSE_ITEMS,
+    MGC_AGGRAVATION,
+    MGC_SUMMON_MONS,
+    MGC_CLONE_WIZ,
+    MGC_DEATH_TOUCH,
+};
 
 /* monster cleric spells */
-#define CLC_OPEN_WOUNDS  0
-#define CLC_CURE_SELF    1
-#define CLC_CONFUSE_YOU  2
-#define CLC_PARALYZE     3
-#define CLC_BLIND_YOU    4
-#define CLC_INSECTS  5
-#define CLC_CURSE_ITEMS  6
-#define CLC_LIGHTNING    7
-#define CLC_FIRE_PILLAR  8
-#define CLC_GEYSER   9
+enum mcast_cleric_spells {
+    CLC_OPEN_WOUNDS = 0,
+    CLC_CURE_SELF,
+    CLC_CONFUSE_YOU,
+    CLC_PARALYZE,
+    CLC_BLIND_YOU,
+    CLC_INSECTS,
+    CLC_CURSE_ITEMS,
+    CLC_LIGHTNING,
+    CLC_FIRE_PILLAR,
+    CLC_GEYSER,
+};
 
 /* punisher spells, some call back to magical or clerical spells */
 #define PUN_OPEN_WOUNDS 0
@@ -52,6 +56,7 @@ STATIC_DCL void FDECL(cast_wizard_spell, (struct monst *, int, int));
 STATIC_DCL void FDECL(cast_cleric_spell, (struct monst *, int, int));
 STATIC_DCL void FDECL(cast_punisher_spell, (struct monst *, int, int));
 STATIC_DCL void FDECL(map_punisher_spell, (int, unsigned int*, int*));
+static int FDECL(m_cure_self, (struct monst *, int));
 STATIC_DCL boolean FDECL(is_undirected_spell, (unsigned int, int));
 STATIC_DCL boolean FDECL(spell_would_be_useless, (struct monst *, unsigned int, int));
 
@@ -74,8 +79,7 @@ boolean undirected;
             point_msg = "all around, then curses";
         else if ((Invis && !perceives(mtmp->data) &&
                   (mtmp->mux != u.ux || mtmp->muy != u.uy)) ||
-                 (youmonst.m_ap_type == M_AP_OBJECT &&
-                  youmonst.mappearance == STRANGE_OBJECT) ||
+                  is_obj_mappear(&youmonst, STRANGE_OBJECT) ||
                  u.uundetected)
             point_msg = "and curses in your general direction";
         else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
@@ -85,7 +89,9 @@ boolean undirected;
 
         pline("%s points %s.", Monnam(mtmp), point_msg);
     } else if ((!(moves % 4) || !rn2(4))) {
-        if (flags.soundok) Norep("You hear a mumbled curse.");
+        if (!Deaf) {
+            Norep("You hear a mumbled curse."); /* Deaf-aware */
+        }
     }
 }
 
@@ -95,7 +101,19 @@ STATIC_OVL int
 choose_magic_spell(spellval)
 int spellval;
 {
+    /* for 3.4.3 and earlier, val greater than 22 selected the default spell
+     */
+    while (spellval > 24 && rn2(25)) {
+        spellval = rn2(spellval);
+    }
+
     switch (spellval) {
+    case 24:
+    case 23:
+        if (Antimagic || Hallucination) {
+            return MGC_PSI_BOLT;
+        }
+        /* fall through */
     case 22:
     case 21:
     case 20:
@@ -140,7 +158,18 @@ STATIC_OVL int
 choose_clerical_spell(spellnum)
 int spellnum;
 {
+    /* for 3.4.3 and earlier, num greater than 13 selected the default spell */
+    while (spellnum > 15 && rn2(16)) {
+        spellnum = rn2(spellnum);
+    }
+
     switch (spellnum) {
+    case 15:
+    case 14:
+        if (rn2(3)) {
+            return CLC_OPEN_WOUNDS;
+        }
+        /* fall through */
     case 13:
         return CLC_GEYSER;
     case 12:
@@ -267,15 +296,16 @@ boolean foundyou;
 
     nomul(0, 0);
     if(rn2(ml*10) < (mtmp->mconf ? 100 : 20)) { /* fumbled attack */
-        if (canseemon(mtmp) && flags.soundok)
+        if (canseemon(mtmp) && !Deaf) {
             pline_The("air crackles around %s.", mon_nam(mtmp));
+        }
         return(0);
     }
     if (canspotmon(mtmp) || !is_undirected_spell(mattk->adtyp, spellnum)) {
         pline("%s casts a spell%s!",
               canspotmon(mtmp) ? Monnam(mtmp) : "Something",
               is_undirected_spell(mattk->adtyp, spellnum) ? "" :
-              (Invisible && !perceives(mtmp->data) &&
+              (Invis && !perceives(mtmp->data) &&
                (mtmp->mux != u.ux || mtmp->muy != u.uy)) ?
               " at a spot near you" :
               (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy)) ?
@@ -358,6 +388,24 @@ boolean foundyou;
     return(ret);
 }
 
+static int
+m_cure_self(mtmp, dmg)
+struct monst *mtmp;
+int dmg;
+{
+    if (mtmp->mhp < mtmp->mhpmax) {
+        if (canseemon(mtmp)) {
+            pline("%s looks better.", Monnam(mtmp));
+        }
+        /* note: player healing does 6d4; this used to do 1d8 */
+        if ((mtmp->mhp += d(3, 6)) > mtmp->mhpmax) {
+            mtmp->mhp = mtmp->mhpmax;
+        }
+        dmg = 0;
+    }
+    return dmg;
+}
+
 /* monster wizard and cleric spellcasting functions */
 /*
    If dmg is zero, then the monster is not casting at you.
@@ -388,8 +436,8 @@ int spellnum;
             if (Hallucination) {
                 You("have an out of body experience.");
             } else {
-                killer_format = KILLED_BY_AN;
-                killer = "touch of death";
+                killer.format = KILLED_BY_AN;
+                Strcpy(killer.name, "touch of death");
                 done(DIED);
             }
         } else {
@@ -398,6 +446,7 @@ int spellnum;
         }
         dmg = 0;
         break;
+
     case MGC_CLONE_WIZ:
         if (mtmp->iswiz && flags.no_of_wizards == 1) {
             pline("Double Trouble...");
@@ -406,6 +455,7 @@ int spellnum;
         } else
             warning("bad wizard cloning?");
         break;
+
     case MGC_SUMMON_MONS:
     {
         int count;
@@ -419,7 +469,7 @@ int spellnum;
 
             /* messages not quite right if plural monsters created but
                only a single monster is seen */
-            if (Invisible && !perceives(mtmp->data) &&
+            if (Invis && !perceives(mtmp->data) &&
                 (mtmp->mux != u.ux || mtmp->muy != u.uy))
                 pline("%s around a spot near you!", mappear);
             else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
@@ -430,16 +480,19 @@ int spellnum;
         dmg = 0;
         break;
     }
+
     case MGC_AGGRAVATION:
         You_feel("that monsters are aware of your presence.");
         aggravate();
         dmg = 0;
         break;
+
     case MGC_CURSE_ITEMS:
         You_feel("as if you need some help.");
         rndcurse();
         dmg = 0;
         break;
+
     case MGC_DESTRY_ARMR:
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
@@ -449,6 +502,7 @@ int spellnum;
         }
         dmg = 0;
         break;
+
     case MGC_WEAKEN_YOU:        /* drain strength */
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
@@ -463,16 +517,21 @@ int spellnum;
         }
         dmg = 0;
         break;
+
     case MGC_DISAPPEAR:     /* makes self invisible */
         if (!mtmp->minvis && !mtmp->invis_blkd) {
             if (canseemon(mtmp))
                 pline("%s suddenly %s!", Monnam(mtmp),
                       !See_invisible ? "disappears" : "becomes transparent");
             mon_set_minvis(mtmp);
+            if (cansee(mtmp->mx, mtmp->my) && !canspotmon(mtmp)) {
+                map_invisible(mtmp->mx, mtmp->my);
+            }
             dmg = 0;
         } else
             warning("no reason for monster to cast disappear spell?");
         break;
+
     case MGC_STUN_YOU:
         if (Antimagic || Free_action) {
             shieldeff(u.ux, u.uy);
@@ -483,24 +542,20 @@ int spellnum;
             You(Stunned ? "struggle to keep your balance." : "reel...");
             dmg = d(ACURR(A_DEX) < 12 ? 6 : 4, 4);
             if (Half_spell_damage) dmg = (dmg + 1) / 2;
-            make_stunned(HStun + dmg, FALSE);
+            make_stunned((HStun & TIMEOUT) + (long) dmg, FALSE);
         }
         dmg = 0;
         break;
+
     case MGC_HASTE_SELF:
         mon_adjust_speed(mtmp, 1, (struct obj *)0);
         dmg = 0;
         break;
+
     case MGC_CURE_SELF:
-        if (mtmp->mhp < mtmp->mhpmax) {
-            if (canseemon(mtmp))
-                pline("%s looks better.", Monnam(mtmp));
-            /* note: player healing does 6d4; this used to do 1d8 */
-            if ((mtmp->mhp += d(3, 6)) > mtmp->mhpmax)
-                mtmp->mhp = mtmp->mhpmax;
-            dmg = 0;
-        }
+        dmg = m_cure_self(mtmp, dmg);
         break;
+
     case MGC_PSI_BOLT:
         /* prior to 3.4.0 Antimagic was setting the damage to 1--this
            made the spell virtually harmless to players with magic res. */
@@ -559,11 +614,13 @@ int spellnum;
 
     switch (spellnum) {
     case CLC_GEYSER:
-        /* this is physical damage, not magical damage */
+        /* this is physical damage (force not heat),
+         * not magical damage or fire damage */
         pline("A sudden geyser slams into you from nowhere!");
         dmg = d(8, 6);
         if (Half_physical_damage) dmg = (dmg + 1) / 2;
         break;
+
     case CLC_FIRE_PILLAR:
         pline("A pillar of fire strikes all around you!");
         if (Fire_resistance) {
@@ -579,6 +636,7 @@ int spellnum;
         destroy_item(SPBOOK_CLASS, AD_FIRE);
         (void) burn_floor_objects(u.ux, u.uy, TRUE, FALSE);
         break;
+
     case CLC_LIGHTNING:
     {
         boolean reflects;
@@ -595,13 +653,16 @@ int spellnum;
         if (Half_spell_damage) dmg = (dmg + 1) / 2;
         destroy_item(WAND_CLASS, AD_ELEC);
         destroy_item(RING_CLASS, AD_ELEC);
+        (void) flashburn((long) rnd(100));
         break;
     }
+
     case CLC_CURSE_ITEMS:
         You_feel("as if you need some help.");
         rndcurse();
         dmg = 0;
         break;
+
     case CLC_INSECTS:
     {
         /* Try for insects, and if there are none
@@ -609,11 +670,11 @@ int spellnum;
         struct permonst *pm = mkclass(S_ANT, 0);
         struct monst *mtmp2 = (struct monst *)0;
         char let = (pm ? S_ANT : S_SNAKE);
-        boolean success;
-        int i;
+        boolean success = FALSE;
+        int i, quan;
         coord bypos;
-        int quan;
 
+        int oldseen = monster_census(TRUE);
         quan = (mtmp->m_lev < 2) ? 1 : rnd((int)mtmp->m_lev / 2);
         if (quan < 3) quan = 3;
         success = pm ? TRUE : FALSE;
@@ -621,37 +682,60 @@ int spellnum;
             if (!enexto(&bypos, mtmp->mux, mtmp->muy, mtmp->data))
                 break;
             if ((pm = mkclass(let, 0)) != 0 &&
-                (mtmp2 = makemon(pm, bypos.x, bypos.y, NO_MM_FLAGS)) != 0) {
+                (mtmp2 = makemon(pm, bypos.x, bypos.y, MM_ANGRY)) != 0) {
                 success = TRUE;
                 mtmp2->msleeping = mtmp2->mpeaceful = mtmp2->mtame = 0;
                 set_malign(mtmp2);
             }
         }
-        /* Not quite right:
-         * -- message doesn't always make sense for unseen caster (particularly
-         *    the first message)
-         * -- message assumes plural monsters summoned (non-plural should be
-         *    very rare, unlike in nasty())
-         * -- message assumes plural monsters seen
-         */
-        if (!success)
-            pline("%s casts at a clump of sticks, but nothing happens.",
-                  Monnam(mtmp));
-        else if (let == S_SNAKE)
-            pline("%s transforms a clump of sticks into snakes!",
-                  Monnam(mtmp));
-        else if (Invisible && !perceives(mtmp->data) &&
-                 (mtmp->mux != u.ux || mtmp->muy != u.uy))
-            pline("%s summons insects around a spot near you!",
-                  Monnam(mtmp));
-        else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
-            pline("%s summons insects around your displaced image!",
-                  Monnam(mtmp));
-        else
-            pline("%s summons insects!", Monnam(mtmp));
+        int newseen = monster_census(TRUE);
+
+        /* not canspotmon(), which includes unseen things sensed via warning */
+        boolean seecaster = canseemon(mtmp) || tp_sensemon(mtmp) || Detect_monsters;
+
+        const char *fmt = NULL;
+        if (!seecaster) {
+            char *arg; /* [not const: upstart(N==1 ? an() : makeplural())] */
+            const char *what = (let == S_SNAKE) ? "snake" : "insect";
+
+            if (newseen <= oldseen || Unaware) {
+                /* unseen caster fails or summons unseen critters,
+                   or unconscious hero ("You dream that you hear...") */
+                You_hear("someone summoning %s.", makeplural(what));
+            } else {
+                /* unseen caster summoned seen critter(s) */
+                arg = (newseen == oldseen + 1) ? an(what) : makeplural(what);
+                if (!Deaf) {
+                    You_hear("someone summoning something, and %s %s.", arg, vtense(arg, "appear"));
+                } else {
+                    pline("%s %s.", upstart(arg), vtense(arg, "appear"));
+                }
+            }
+
+        /* seen caster, possibly producing unseen--or just one--critters;
+           hero is told what the caster is doing and doesn't necessarily
+           observe complete accuracy of that caster's results (in other
+           words, no need to fuss with visibility or singularization;
+           player is told what's happening even if hero is unconscious) */
+        } else if (!success) {
+            fmt = "%s casts at a clump of sticks, but nothing happens.";
+        } else if (let == S_SNAKE) {
+            fmt = "%s transforms a clump of sticks into snakes!";
+        } else if (Invis && !perceives(mtmp->data) &&
+                   (mtmp->mux != u.ux || mtmp->muy != u.uy)) {
+            fmt = "%s summons insects around a spot near you!";
+        } else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy)) {
+            fmt = "%s summons insects around your displaced image!";
+        } else {
+            fmt = "%s summons insects!";
+        }
+        if (fmt) {
+            pline(fmt, Monnam(mtmp));
+        }
         dmg = 0;
         break;
     }
+
     case CLC_BLIND_YOU:
         /* note: resists_blnd() doesn't apply here */
         if (!Blinded) {
@@ -665,6 +749,7 @@ int spellnum;
         } else
             warning("no reason for monster to cast blindness spell?");
         break;
+
     case CLC_PARALYZE:
         if (Antimagic || Free_action) {
             shieldeff(u.ux, u.uy);
@@ -678,8 +763,10 @@ int spellnum;
             if (Half_spell_damage) dmg = (dmg + 1) / 2;
             nomul(-dmg, "paralyzed by a monster");
         }
+        nomovemsg = 0;
         dmg = 0;
         break;
+
     case CLC_CONFUSE_YOU:
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
@@ -697,16 +784,11 @@ int spellnum;
         }
         dmg = 0;
         break;
+
     case CLC_CURE_SELF:
-        if (mtmp->mhp < mtmp->mhpmax) {
-            if (canseemon(mtmp))
-                pline("%s looks better.", Monnam(mtmp));
-            /* note: player healing does 6d4; this used to do 1d8 */
-            if ((mtmp->mhp += d(3, 6)) > mtmp->mhpmax)
-                mtmp->mhp = mtmp->mhpmax;
-            dmg = 0;
-        }
+        dmg = m_cure_self(mtmp, dmg);
         break;
+
     case CLC_OPEN_WOUNDS:
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
@@ -721,6 +803,7 @@ int spellnum;
         else
             Your("body is covered with painful wounds!");
         break;
+
     default:
         warning("mcastu: invalid clerical spell (%d)", spellnum);
         dmg = 0;
@@ -864,6 +947,16 @@ int spellnum;
         if ((!mtmp->iswiz || flags.no_of_wizards > 1)
             && spellnum == MGC_CLONE_WIZ)
             return TRUE;
+        /* aggravation (global wakeup) when everyone is already active */
+        if (spellnum == MGC_AGGRAVATION) {
+            /* if nothing needs to be awakened then this spell is useless
+               but caster might not realize that [chance to pick it then
+               must be very small otherwise caller's many retry attempts
+               will eventually end up picking it too often] */
+            if (!has_aggravatables(mtmp)) {
+                return rn2(100) ? TRUE : FALSE;
+            }
+        }
     } else if (adtyp == AD_CLRC) {
         /* summon insects/sticks to snakes won't be cast by peaceful monsters */
         if (mtmp->mpeaceful && spellnum == CLC_INSECTS)
@@ -891,8 +984,9 @@ int spellnum;
 /* convert 1..10 to 0..9; add 10 for second group (spell casting) */
 #define ad_to_typ(k) (10 + (int)k - 1)
 
+/* monster uses spell (ranged) */
 int
-buzzmu(mtmp, mattk)     /* monster uses spell (ranged) */
+buzzmu(mtmp, mattk)
 register struct monst *mtmp;
 register struct attack  *mattk;
 {

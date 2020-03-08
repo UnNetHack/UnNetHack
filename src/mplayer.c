@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)mplayer.c  3.4 1997/02/04  */
 /*  Copyright (c) Izchak Miller, 1992.            */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,16 +8,17 @@ STATIC_DCL void FDECL(get_mplname, (struct monst *, char *));
 STATIC_DCL void FDECL(mk_mplayer_armor, (struct monst *, SHORT_P));
 
 /* These are the names of those who
- * contributed to the development of NetHack 3.2/3.3/3.4.
+ * contributed to the development of NetHack 3.2/3.3/3.4/3.6.
  *
  * Keep in alphabetical order within teams.
  * Same first name is entered once within each team.
  */
 static const char *developers[] = {
     /* devteam */
-    "Dave", "Dean", "Eric", "Izchak", "Janet", "Jessie",
-    "Ken", "Kevin", "Michael", "Mike", "Pat", "Paul", "Steve", "Timo",
-    "Warwick",
+    "Alex",    "Dave",   "Dean",    "Derek",   "Eric",    "Izchak",
+    "Janet",   "Jessie", "Ken",     "Kevin",   "Michael", "Mike",
+    "Pasi",    "Pat",    "Patric",  "Paul",    "Sean",    "Steve",
+    "Timo",    "Warwick",
     /* PC team */
     "Bill", "Eric", "Keizo", "Ken", "Kevin", "Michael", "Mike", "Paul",
     "Stephen", "Steve", "Timo", "Yitzhak",
@@ -36,7 +36,6 @@ static const char *developers[] = {
     "Joshua", "Pat",
     ""
 };
-
 
 /* return a randomly chosen developer name */
 STATIC_OVL const char *
@@ -150,7 +149,7 @@ register boolean special;
         mtmp->mpeaceful = 0;
         set_malign(mtmp); /* peaceful may have changed again */
 
-        switch(monsndx(ptr)) {
+        switch (monsndx(ptr)) {
         case PM_ARCHEOLOGIST:
             if (rn2(2)) weapon = BULLWHIP;
             break;
@@ -184,7 +183,7 @@ register boolean special;
             if (rn2(2)) armor = rnd_class(PLATE_MAIL, CHAIN_MAIL);
             break;
         case PM_MONK:
-            weapon = STRANGE_OBJECT;
+            weapon = !rn2(3) ? SHURIKEN : STRANGE_OBJECT;
             armor = STRANGE_OBJECT;
             cloak = ROBE;
             if (rn2(2)) shield = STRANGE_OBJECT;
@@ -201,7 +200,9 @@ register boolean special;
             if (rn2(2)) weapon = ELVEN_DAGGER;
             break;
         case PM_ROGUE:
-            if (rn2(2)) weapon = SHORT_SWORD;
+            if (rn2(2)) {
+                weapon = rn2(2) ? SHORT_SWORD : ORCISH_DAGGER;
+            }
             break;
         case PM_SAMURAI:
             if (rn2(2)) weapon = KATANA;
@@ -237,22 +238,32 @@ register boolean special;
             else if (!rn2(2)) otmp->greased = 1;
             if (special && rn2(2))
                 otmp = mk_artifact(otmp, A_NONE);
+            /* usually increase stack size if stackable weapon */
+            if (objects[otmp->otyp].oc_merge &&
+                 !otmp->oartifact &&
+                 mon_might_throw_wep(otmp)) {
+                otmp->quan += (long) rn2(is_spear(otmp) ? 4 : 8);
+            }
             /* mplayers knew better than to overenchant Magicbane */
             if (otmp->oartifact == ART_MAGICBANE)
                 otmp->spe = rnd(4);
             (void) mpickobj(mtmp, otmp);
         }
 
-        if(special) {
+        if (special) {
             if (!rn2(10))
                 (void) mongets(mtmp, rn2(3) ? LUCKSTONE : LOADSTONE);
             mk_mplayer_armor(mtmp, armor);
             mk_mplayer_armor(mtmp, cloak);
             mk_mplayer_armor(mtmp, helm);
             mk_mplayer_armor(mtmp, shield);
-            if (rn2(8))
+            if (weapon == WAR_HAMMER) {
+                /* valkyrie: wimpy weapon or Mjollnir */
+                mk_mplayer_armor(mtmp, GAUNTLETS_OF_POWER);
+            } else if (rn2(8)) {
                 mk_mplayer_armor(mtmp, rnd_class(LEATHER_GLOVES,
                                                  GAUNTLETS_OF_DEXTERITY));
+            }
             if (rn2(8))
                 mk_mplayer_armor(mtmp, rnd_class(LOW_BOOTS, LEVITATION_BOOTS));
             m_dowear(mtmp, TRUE);
@@ -296,12 +307,13 @@ boolean special;
     int pm, x, y;
     struct monst fakemon;
 
-    while(num) {
+    fakemon = zeromonst;
+    while (num) {
         int tryct = 0;
 
         /* roll for character class */
-        pm = PM_ARCHEOLOGIST + rn2(PM_WIZARD - PM_ARCHEOLOGIST + 1);
-        fakemon.data = &mons[pm];
+        pm = rn1(PM_WIZARD - PM_ARCHEOLOGIST + 1, PM_ARCHEOLOGIST);
+        set_mon_data(&fakemon, &mons[pm]);
 
         /* roll for an available location */
         do {

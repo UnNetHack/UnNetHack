@@ -14,6 +14,9 @@
 
 /* #define DEBUG */ /* uncomment for debugging */
 
+/* from sp_lev.c, for deliver_splev_message() */
+extern char *lev_message;
+
 static void FDECL(Fread, (genericptr_t, int, int, dlb *));
 STATIC_DCL struct qtmsg * FDECL(construct_qtlist, (long));
 STATIC_DCL const char * NDECL(intermed);
@@ -21,9 +24,10 @@ STATIC_DCL const char * NDECL(creatorname);
 STATIC_DCL const char * NDECL(neminame);
 STATIC_DCL const char * NDECL(guardname);
 STATIC_DCL const char * NDECL(homebase);
+static void FDECL(qtext_pronoun, (CHAR_P, CHAR_P));
 STATIC_DCL struct qtmsg * FDECL(msg_in, (struct qtmsg *, int));
 STATIC_DCL void FDECL(convert_arg, (CHAR_P));
-STATIC_DCL void NDECL(convert_line);
+static void FDECL(convert_line, (char *,char *));
 STATIC_DCL void FDECL(deliver_by_pline, (struct qtmsg *));
 STATIC_DCL void FDECL(deliver_by_window, (struct qtmsg *, int));
 
@@ -211,6 +215,45 @@ homebase()  /* return your role leader's location */
     return(urole.homebase);
 }
 
+/* replace deity, leader, nemesis, or artifact name with pronoun;
+   overwrites cvt_buf[] */
+static void
+qtext_pronoun(who, which)
+char who;   /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
+char which; /* 'h'|'H'|'i'|'I'|'j'|'J' */
+{
+    const char *pnoun;
+    int g;
+    char lwhich = lowc(which); /* H,I,J -> h,i,j */
+
+    /*
+     * Invalid subject (not d,l,n,o) yields neuter, singular result.
+     *
+     * For %o, treat all artifacts as neuter; some have plural names,
+     * which genders[] doesn't handle; cvt_buf[] already contains name.
+     */
+    if (who == 'o' &&
+         (strstri(cvt_buf, "Eyes ")  ||
+          strcmpi(cvt_buf, makesingular(cvt_buf)))) {
+        pnoun = (lwhich == 'h') ? "they" :
+                (lwhich == 'i') ? "them" :
+                (lwhich == 'j') ? "their" : "?";
+    } else {
+        g = (who == 'd') ? quest_status.godgend :
+            (who == 'l') ? quest_status.ldrgend :
+            (who == 'n') ? quest_status.nemgend : 2; /* default to neuter */
+        pnoun = (lwhich == 'h') ? genders[g].he :
+                (lwhich == 'i') ? genders[g].him :
+                (lwhich == 'j') ? genders[g].his : "?";
+    }
+    Strcpy(cvt_buf, pnoun);
+    /* capitalize for H,I,J */
+    if (lwhich != which) {
+        cvt_buf[0] = highc(cvt_buf[0]);
+    }
+    return;
+}
+
 STATIC_OVL struct qtmsg *
 msg_in(qtm_list, msgnum)
 struct qtmsg *qtm_list;
@@ -250,8 +293,19 @@ char c;
         break;
     case 'i':   str = intermed();
         break;
-    case 'o':   str = the(artiname(urole.questarti));
-        break;
+    case 'O':
+    case 'o':
+                str = the(artiname(urole.questarti));
+                if (c == 'O') {
+                    /* shorten "the Foo of Bar" to "the Foo"
+                       (buffer returned by the() is modifiable) */
+                    char *p = strstri(str, " of ");
+
+                    if (p) {
+                        *p = '\0';
+                    }
+                }
+                break;
     case 'm':   str = creatorname();
         break;
     case 'n':   str = neminame();
@@ -289,16 +343,16 @@ char c;
 }
 
 STATIC_OVL void
-convert_line()
+convert_line(in_line, out_line)
+char *in_line, *out_line;
 {
     char *c, *cc;
+    char xbuf[BUFSZ];
 
     cc = out_line;
-    for (c = in_line; *c; c++) {
-
+    for (c = xcrypt(in_line, xbuf); *c; c++) {
         *cc = 0;
         switch(*c) {
-
         case '\r':
         case '\n':
             *(++cc) = 0;
@@ -308,7 +362,6 @@ convert_line()
             if (*(c+1)) {
                 convert_arg(*(++c));
                 switch (*(++c)) {
-
                 /* insert "a"/"an" prefix */
                 case 'A': Strcat(cc, An(cvt_buf));
                     cc += strlen(cc);
@@ -319,6 +372,21 @@ convert_line()
 
                 /* capitalize */
                 case 'C': cvt_buf[0] = highc(cvt_buf[0]);
+                    break;
+
+                /* replace name with pronoun;
+                   valid for %d, %l, %n, and %o */
+                case 'h': /* he/she */
+                case 'H': /* He/She */
+                case 'i': /* him/her */
+                case 'I':
+                case 'j': /* his/her */
+                case 'J':
+                    if (index("dlno", lowc(*(c - 1)))) {
+                        qtext_pronoun(*(c - 1), *c);
+                    } else {
+                        --c; /* default action */
+                    }
                     break;
 
                 /* pluralize */
@@ -352,8 +420,9 @@ convert_line()
             break;
         }
     }
-    if (cc >= out_line + sizeof out_line)
+    if (cc > &out_line[BUFSZ-1]) {
         panic("convert_line: overflow");
+    }
     *cc = 0;
     return;
 }
@@ -362,9 +431,8 @@ char *
 string_subst(str)
 char *str;
 {
-    strncpy(in_line, str, 79);
-    in_line[79] = '\0';
-    convert_line();
+    xcrypt(str, in_line);
+    convert_line(in_line, out_line);
     return out_line;
 }
 
@@ -377,9 +445,8 @@ struct qtmsg *qt_msg;
     char xbuf[BUFSZ];
 
     for (size = 0; size < qt_msg->size; size += (long)strlen(in_line)) {
-        (void) dlb_fgets(xbuf, 80, msg_file);
-        (void) xcrypt(xbuf, in_line);
-        convert_line();
+        (void) dlb_fgets(in_line, sizeof in_line, msg_file);
+        convert_line(in_line, out_line);
         pline("%s", out_line);
     }
 
@@ -391,13 +458,26 @@ struct qtmsg *qt_msg;
 int how;
 {
     long size;
-    char xbuf[BUFSZ];
-    winid datawin = create_nhwindow(how);
+    char in_line[BUFSZ], out_line[BUFSZ];
+    boolean qtdump = (how == NHW_MAP);
+    winid datawin = create_nhwindow(qtdump ? NHW_TEXT : how);
 
+#ifdef DEBUG
+    if (qtdump) {
+        char buf[BUFSZ];
+
+        /* when dumping quest messages at startup, all of them are passed to
+         * deliver_by_window(), even if normally given to deliver_by_pline()
+         */
+        Sprintf(buf, "msgnum: %d, delivery: %c",
+                qt_msg->msgnum, qt_msg->delivery);
+        putstr(datawin, 0, buf);
+        putstr(datawin, 0, "");
+    }
+#endif
     for (size = 0; size < qt_msg->size; size += (long)strlen(in_line)) {
-        (void) dlb_fgets(xbuf, 80, msg_file);
-        (void) xcrypt(xbuf, in_line);
-        convert_line();
+        (void) dlb_fgets(in_line, sizeof in_line, msg_file);
+        convert_line(in_line, out_line);
         putstr(datawin, 0, out_line);
     }
     display_nhwindow(datawin, TRUE);
@@ -419,9 +499,8 @@ char   *msgbuf;
     }
 
     (void) dlb_fseek(msg_file, qt_msg->offset, SEEK_SET);
-    (void) dlb_fgets(xbuf, 80, msg_file);
-    (void) xcrypt(xbuf, in_line);
-    convert_line();
+    (void) dlb_fgets(in_line, sizeof in_line, msg_file);
+    convert_line(in_line, out_line);
     strcpy(msgbuf, out_line);
 }
 
@@ -459,6 +538,34 @@ int msgnum;
         deliver_by_pline(qt_msg);
     else deliver_by_window(qt_msg, NHW_TEXT);
     return;
+}
+/** special levels can include a custom arrival message; display it */
+void
+deliver_splev_message()
+{
+    char *str, *nl, in_line[BUFSZ], out_line[BUFSZ];
+
+    /* there's no provision for delivering via window instead of pline */
+    if (lev_message) {
+        /* lev_message can span multiple lines using embedded newline chars;
+           any segments too long to fit within in_line[] will be truncated */
+        for (str = lev_message; *str; str = nl + 1) {
+            /* copying will stop at newline if one is present */
+            copynchars(in_line, str, (int) (sizeof in_line) - 1);
+
+            /* convert_line() expects encrypted input */
+            (void) xcrypt(in_line, in_line);
+            convert_line(in_line, out_line);
+            pline("%s", out_line);
+
+            if ((nl = index(str, '\n')) == 0) {
+                break; /* done if no newline */
+            }
+        }
+
+        free(lev_message);
+        lev_message = 0;
+    }
 }
 
 /** The names of creator deities from different cultures. */

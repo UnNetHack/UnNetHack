@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)allmain.c  3.4 2003/04/02  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -140,7 +139,8 @@ can_regenerate()
 }
 
 void
-moveloop()
+moveloop(resuming)
+boolean resuming;
 {
 #if defined(MICRO) || defined(WIN32)
     char ch;
@@ -171,6 +171,13 @@ moveloop()
         change_luck(-1);
     }
 
+    if (!resuming) {
+        /* new game */
+        flags.rndencode = rnd(9000);
+        set_wear(); /* for side-effects of starting gear */
+        (void) pickup(1);      /* autopickup at initial location */
+    }
+
     initrack();
 
 
@@ -184,10 +191,6 @@ moveloop()
     dragons_init();
     doredraw(); /* partial workaround to http://sourceforge.net/apps/trac/unnethack/ticket/2 */
     shop_selection_init();
-
-#ifdef WIZARD
-    if (wizard) add_debug_extended_commands();
-#endif
 
     (void) encumber_msg(); /* in case they auto-picked up something */
     if (defer_see_monsters) {
@@ -496,8 +499,8 @@ moveloop()
                 else if (!u.uinvulnerable) {
                     u.utrap -= 1<<8;
                     if (u.utrap < 1<<8) {
-                        killer_format = KILLED_BY;
-                        killer = "molten lava";
+                        killer.format = KILLED_BY;
+                        Strcpy(killer.name, "molten lava");
                         You("sink below the surface and die.");
                         done(DISSOLVED);
                     } else if (!u.umoved) {

@@ -17,6 +17,7 @@
  */
 
 struct flag {
+    boolean acoustics;  /* allow dungeon sound messages */
 #ifdef AMIFLUSH
     boolean altmeta;    /* use ALT keys as META */
     boolean amiflush;   /* kill typeahead */
@@ -110,6 +111,7 @@ struct flag {
     /* 8: travel */
     unsigned long warntype; /* warn_of_mon monster type M2 */
     unsigned startingpet_mid;
+    int rndencode;          /* randomized escape sequence introducer */
     int warnlevel;
     int djinni_count, ghost_count;  /* potion effect tuning */
     int pickup_burden;      /* maximum burden before prompt */
@@ -197,6 +199,8 @@ struct flag {
     boolean hell_and_hell; /* like heaven_or_hell but only player has max 1 HP */
 
     boolean marathon;   /* cannot heal, fixed high max hp */
+
+    boolean goldX;      /* for BUCX filtering, whether gold is X or U */
 };
 
 #define marathon_mode flags.marathon
@@ -212,6 +216,14 @@ struct flag {
 #define GPCOORDS_COMPASS 'c'
 #define GPCOORDS_COMFULL 'f'
 #define GPCOORDS_SCREEN  's'
+
+enum getloc_filters {
+    GFILTER_NONE = 0,
+    GFILTER_VIEW,
+    GFILTER_AREA,
+
+    NUM_GFILTER
+};
 
 struct instance_flags {
     /* stuff that really isn't option or platform related. They are
@@ -281,6 +293,7 @@ struct instance_flags {
 #ifdef WIZARD
     boolean sanity_check;   /* run sanity checks */
     boolean mon_polycontrol;    /* debug: control monster polymorphs */
+    boolean in_parse;      /* is a command being parsed? */
 #endif
 #ifdef TTY_GRAPHICS
     char prevmsg_window;    /* type of old message window to use */
@@ -410,6 +423,7 @@ struct instance_flags {
     char *hp_notify_fmt;
     char *nameempty;    /* what to automatically name known empty wands */
     boolean show_buc;   /* always show BUC status */
+    boolean clicklook;  /* allow right-clicking for look */
     boolean cmdassist;  /* provide detailed assistance for some commands */
     boolean obsolete;   /* obsolete options can point at this, it isn't used */
     boolean rest_on_space;  /* space means rest */
@@ -429,6 +443,12 @@ struct instance_flags {
 #define MAX_ALTKEYHANDLER 25
     char altkeyhandler[MAX_ALTKEYHANDLER];
 #endif
+    /* copies of values in struct u, used during detection when the
+       originals are temporarily cleared; kept here rather than
+       locally so that they can be restored during a hangup save */
+    Bitfield(save_uswallow, 1);
+    Bitfield(save_uinwater, 1);
+    Bitfield(save_uburied, 1);
 #ifdef REALTIME_ON_BOTL
     boolean showrealtime;  /* show actual elapsed time */
 #endif
@@ -447,6 +467,12 @@ struct instance_flags {
     char truecolor_separator;
 #endif
     genericptr_t returning_missile; /* 'struct obj *'; Mjollnir or aklys */
+
+    boolean force_invmenu;    /* always menu when handling inventory */
+    boolean autodescribe;     /* autodescribe mode in getpos() */
+
+    boolean renameallowed;    /* can change hero name during role selection */
+    boolean renameinprogress; /* we are changing hero name */
 };
 
 /*
@@ -494,5 +520,16 @@ enum plnmsg_types {
 #define RUN_LEAP    1   /* update display every 7 steps */
 #define RUN_STEP    2   /* update display every single step */
 #define RUN_CRAWL   3   /* walk w/ extra delay after each update */
+
+enum gloctypes {
+    GLOC_MONS = 0,
+    GLOC_OBJS,
+    GLOC_DOOR,
+    GLOC_EXPLORE,
+    GLOC_INTERESTING,
+    GLOC_VALID,
+
+    NUM_GLOCS
+};
 
 #endif /* FLAG_H */

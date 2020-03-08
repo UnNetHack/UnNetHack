@@ -742,7 +742,7 @@ xchar ltmp;
         } else {
 # endif
         pline("Be seeing you...");
-        terminate(EXIT_SUCCESS);
+        nh_terminate(EXIT_SUCCESS);
 # ifndef AMIGA
     }
 # endif
@@ -924,13 +924,35 @@ register int fd;
 }
 
 void
+restcemetery(fd, cemeteryaddr)
+int fd;
+struct cemetery **cemeteryaddr;
+{
+    struct cemetery *bonesinfo, **bonesaddr;
+    int flag;
+
+    mread(fd, &flag, sizeof flag);
+    if (flag == 0) {
+        bonesaddr = cemeteryaddr;
+        do {
+            bonesinfo = (struct cemetery *) alloc(sizeof *bonesinfo);
+            mread(fd, bonesinfo, sizeof *bonesinfo);
+            *bonesaddr = bonesinfo;
+            bonesaddr = &(*bonesaddr)->next;
+        } while (*bonesaddr);
+    } else {
+        *cemeteryaddr = 0;
+    }
+}
+
+void
 trickery(reason)
 char *reason;
 {
     pline("Strange, this map is not as I remember it.");
     pline("Somebody is trying some trickery here...");
     pline("This game is void.");
-    killer = reason;
+    Strcpy(killer.name, reason ? reason : "");
     done(TRICKED);
 }
 
@@ -983,6 +1005,8 @@ boolean ghostly;
 #endif
         trickery(trickbuf);
     }
+
+    restcemetery(fd, &level.bonesinfo);
 
 #ifdef RLECOMP
     {

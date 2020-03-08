@@ -3,6 +3,9 @@
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* If you change the context structure make sure you increment EDITLEVEL in */
+/* patchlevel.h if needed. */
+
 #ifndef CONTEXT_H
 #define CONTEXT_H
 
@@ -12,5 +15,12 @@ struct polearm_info {
 };
 
 extern struct polearm_info polearm;
+
+struct obj_split {
+    unsigned parent_oid; /* set: splitobj(),         */
+    unsigned child_oid;  /* reset: clear_splitobjs() */
+};
+
+extern struct obj_split context_objsplit; /* track most recently split object stack */
 
 #endif /* CONTEXT_H */

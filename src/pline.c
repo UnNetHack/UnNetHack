@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)pline.c    3.4 1999/11/28  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -71,6 +70,7 @@ pline VA_DECL(const char *, line)
     VA_END();
 }
 
+static unsigned pline_flags = 0;
 char prevmsg[BUFSZ];
 
 # ifdef USE_STDARG
@@ -127,6 +127,22 @@ pline VA_DECL(const char *, line)
     putstr(WIN_MESSAGE, 0, line);
     strncpy(prevmsg, line, BUFSZ);
     if (typ == MSGTYP_STOP) display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
+}
+
+/* pline() variant which can override MSGTYPE handling or suppress
+   message history (tty interface uses pline() to issue prompts and
+   they shouldn't be blockable via MSGTYPE=hide) */
+/*VARARGS2*/
+void custompline
+VA_DECL2(unsigned, pflags, const char *, line)
+{
+    VA_START(line);
+    VA_INIT(line, const char *);
+    pline_flags = pflags;
+    vpline(line, VA_ARGS);
+    pline_flags = 0;
+    VA_END();
+    return;
 }
 
 /*VARARGS1*/
@@ -246,12 +262,13 @@ You_hear VA_DECL(const char *, line)
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
-    if (Underwater)
+    if (Underwater) {
         YouPrefix(tmp, "You barely hear ", line);
-    else if (u.usleep)
+    } else if (Unaware) {
         YouPrefix(tmp, "You dream that you hear ", line);
-    else
+    } else {
         YouPrefix(tmp, "You hear ", line);
+    }
     vpline(strcat(tmp, line), VA_ARGS);
     VA_END();
 }
@@ -280,7 +297,6 @@ void
 verbalize VA_DECL(const char *, line)
 {
     char *tmp;
-    if (!flags.soundok) return;
     VA_START(line);
     VA_INIT(line, const char *);
     tmp = You_buf((int)strlen(line) + sizeof "\"\"");
@@ -355,6 +371,7 @@ impossible VA_DECL(const char *, s)
     pline("%s", pbuf);
     pline("Program in disorder; you probably should S)ave and restart the process.");
     program_state.in_impossible = 0;
+    abort();
     VA_END();
 }
 
@@ -368,6 +385,8 @@ warning VA_DECL(const char *, s)
     pbuf[BUFSZ-1] = '\0'; /* sanity */
     paniclog("warning", pbuf);
     pline("Warning: %s\n", pbuf);
+    dosave0();
+    abort();
     if (iflags.debug_fuzzer) {
         panic("Warning: %s", pbuf);
     }

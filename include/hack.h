@@ -72,6 +72,10 @@ enum hunger_state_types {
 #define DISMOUNT_VANISHED   7
 #endif
 
+/* mgflags for mapglyph() */
+#define MG_FLAG_NORMAL     0x00
+#define MG_FLAG_NOOVERRIDE 0x01
+
 /* Special returns from mapglyph() */
 #define MG_CORPSE   0x01
 #define MG_INVIS    0x02
@@ -108,6 +112,15 @@ enum cost_alteration_types {
     COST_ROT     = 17, /* rotting attack */
     COST_CORRODE = 18 /* acid damage */
 };
+
+/* bitmask flags for corpse_xname();
+   PFX_THE takes precedence over ARTICLE, NO_PFX takes precedence over both */
+#define CXN_NORMAL    0 /* no special handling */
+#define CXN_SINGULAR  1 /* override quantity if greather than 1 */
+#define CXN_NO_PFX    2 /* suppress "the" from "the Unique Monst */
+#define CXN_PFX_THE   4 /* prefix with "the " (unless pname) */
+#define CXN_ARTICLE   8 /* include a/an/the prefix */
+#define CXN_NOCORPSE 16 /* suppress " corpse" suffix */
 
 /*
  * This is the way the game ends.  If these are rearranged, the arrays
@@ -186,6 +199,18 @@ enum hmon_atkmode_types {
 #include "rect.h"
 #include "region.h"
 
+/* Symbol offsets */
+#define SYM_OFF_P (0)
+#define SYM_OFF_O (SYM_OFF_P + MAXPCHARS)
+#define SYM_OFF_M (SYM_OFF_O + MAXOCLASSES)
+#define SYM_OFF_W (SYM_OFF_M + MAXMCLASSES)
+#define SYM_OFF_X (SYM_OFF_W + WARNCOUNT)
+#define SYM_MAX (SYM_OFF_X + MAXOTHER)
+
+#define def_monsyms_explain(i) monexplain[i]
+#define def_objsyms_explain(i) objexplain[i]
+#define def_oc_syms_name(i)    oclass_names[i]
+
 #ifdef USE_TRAMPOLI /* This doesn't belong here, but we have little choice */
 #undef NDECL
 #define NDECL(f) f()
@@ -254,12 +279,14 @@ enum hmon_atkmode_types {
 #define ALL_FINISHED      0x01  /* called routine already finished the job */
 
 /* flags to control query_objlist() */
-#define BY_NEXTHERE   0x1   /* follow objlist by nexthere field */
-#define AUTOSELECT_SINGLE 0x2   /* if only 1 object, don't ask */
-#define USE_INVLET    0x4   /* use object's invlet */
-#define INVORDER_SORT     0x8   /* sort objects by packorder */
-#define SIGNAL_NOMENU     0x10  /* return -1 rather than 0 if none allowed */
-#define FEEL_COCKATRICE   0x20  /* engage cockatrice checks and react */
+#define BY_NEXTHERE        0x1 /* follow objlist by nexthere field */
+#define AUTOSELECT_SINGLE  0x2 /* if only 1 object, don't ask */
+#define USE_INVLET         0x4 /* use object's invlet */
+#define INVORDER_SORT      0x8 /* sort objects by packorder */
+#define SIGNAL_NOMENU     0x10 /* return -1 rather than 0 if none allowed */
+#define SIGNAL_ESCAPE     0x20 /* return -2 rather than 0 for ESC */
+#define FEEL_COCKATRICE   0x40 /* engage cockatrice checks and react */
+#define INCLUDE_HERO      0x80 /* show hero among engulfer's inventory */
 
 /* Flags to control query_category() */
 /* BY_NEXTHERE used by query_category() too, so skip 0x01 */
@@ -274,6 +301,7 @@ enum hmon_atkmode_types {
 #define BUC_UNCURSED 0x200
 #define BUC_UNKNOWN  0x400
 #define BUC_ALLBKNOWN (BUC_BLESSED|BUC_CURSED|BUC_UNCURSED)
+#define BUCX_TYPES (BUC_ALLBKNOWN | BUC_UNKNOWN)
 #define UNIDENTIFIED_TYPES 0x800
 #define ALL_TYPES_SELECTED -2
 
@@ -342,6 +370,13 @@ enum hmon_atkmode_types {
 #define XKILL_NOCORPSE  2
 #define XKILL_NOCONDUCT 4
 
+/* pline_flags; mask values for custompline()'s first argument */
+/* #define PLINE_ORDINARY 0 */
+#define PLINE_NOREPEAT   1
+#define OVERRIDE_MSGTYPE 2
+#define SUPPRESS_HISTORY 4
+#define URGENT_MESSAGE   8
+
 /* Macros for messages referring to hands, eyes, feet, etc... */
 #define ARM 0
 #define EYE 1
@@ -364,6 +399,8 @@ enum hmon_atkmode_types {
 #define STOMACH 18
 
 /* indices for some special tin types */
+#define ROTTEN_TIN     0
+#define HOMEMADE_TIN   1
 #define SPINACH_TIN  (-1)
 #define RANDOM_TIN   (-2)
 #define HEALTHY_TIN  (-3)

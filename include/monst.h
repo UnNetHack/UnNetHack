@@ -199,12 +199,13 @@ struct monst {
 
 /* mimic appearances that block vision/light */
 #define is_lightblocker_mappear(mon)                       \
+    ((mon->data == &mons[PM_GIANT_TURTLE]) ||              \
     (is_obj_mappear(mon, BOULDER)                          \
-     || (M_AP_TYPE(mon) == M_AP_FURNITURE                    \
+     || (M_AP_TYPE(mon) == M_AP_FURNITURE                  \
          && ((mon)->mappearance == S_hcdoor                \
              || (mon)->mappearance == S_vcdoor             \
              || (mon)->mappearance < S_ndoor /* = walls */ \
-             || (mon)->mappearance == S_tree)))
+             || (mon)->mappearance == S_tree))))
 #define is_door_mappear(mon) (M_AP_TYPE(mon) == M_AP_FURNITURE   \
                               && ((mon)->mappearance == S_hcdoor \
                                   || (mon)->mappearance == S_vcdoor))

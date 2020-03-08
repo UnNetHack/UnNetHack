@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)bones.c    3.4 2003/09/06  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,6 +12,7 @@ extern long bytes_counted;
 STATIC_DCL boolean FDECL(no_bones_level, (d_level *));
 STATIC_DCL void FDECL(goodfruit, (int));
 STATIC_DCL void FDECL(resetobjs, (struct obj *, BOOLEAN_P));
+static boolean FDECL(fixuporacle, (struct monst *));
 
 STATIC_OVL boolean
 no_bones_level(lev)
@@ -42,13 +42,10 @@ STATIC_OVL void
 goodfruit(id)
 int id;
 {
-    register struct fruit *f;
+    struct fruit *f = fruit_from_indx(-id);
 
-    for(f=ffruit; f; f=f->nextf) {
-        if(f->fid == -id) {
-            f->fid = id;
-            return;
-        }
+    if (f) {
+        f->fid = id;
     }
 }
 
@@ -120,16 +117,53 @@ boolean restore;
             otmp->was_thrown = 0;
             otmp->was_dropped = 0;
 
+            /* strip user-supplied names */
+            /* Statue and some corpse names are left intact,
+               presumably in case they came from score file.
+               [TODO: this ought to be done differently--names
+               which came from such a source or came from any
+               stoned or killed monster should be flagged in
+               some manner; then we could just check the flag
+               here and keep "real" names (dead pets, &c) while
+               discarding player notes attached to statues.] */
+            if (has_oname(otmp) &&
+                 !(otmp->oartifact ||
+                   otmp->otyp == STATUE ||
+                   (otmp->otyp == CORPSE && otmp->corpsenm >= SPECIAL_PM))) {
+                free_oname(otmp);
+            }
+
             if (otmp->otyp == SLIME_MOLD) goodfruit(otmp->spe);
 #ifdef MAIL
             else if (otmp->otyp == SCR_MAIL) otmp->spe = MAIL_JUNK;
 #endif
-            else if (otmp->otyp == EGG) otmp->spe = 0;
-            else if (otmp->otyp == TIN) {
+            else if (otmp->otyp == EGG) {
+                otmp->spe = 0; /* not "laid by you" in next game */
+            } else if (otmp->otyp == TIN) {
                 /* make tins of unique monster's meat be empty */
                 if (otmp->corpsenm >= LOW_PM &&
-                    (mons[otmp->corpsenm].geno & G_UNIQ))
+                     unique_corpstat(&mons[otmp->corpsenm])) {
                     otmp->corpsenm = NON_PM;
+                }
+            } else if (otmp->otyp == CORPSE || otmp->otyp == STATUE) {
+                int mnum = otmp->corpsenm;
+
+                /* Discard incarnation details of unique monsters
+                   (by passing null instead of otmp for object),
+                   shopkeepers (by passing false for revival flag),
+                   temple priests, and vault guards in order to
+                   prevent corpse revival or statue reanimation. */
+                if (has_omonst(otmp) && cant_revive(&mnum, FALSE, (struct obj *) 0)) {
+                    free_omonst(otmp);
+                    /* mnum is now either human_zombie or doppelganger;
+                       for corpses of uniques, we need to force the
+                       transformation now rather than wait until a
+                       revival attempt, otherwise eating this corpse
+                       would behave as if it remains unique */
+                    if (mnum == PM_DOPPELGANGER && otmp->otyp == CORPSE) {
+                        set_corpsenm(otmp, mnum);
+                    }
+                }
             } else if (otmp->otyp == AMULET_OF_YENDOR) {
                 /* no longer the real Amulet */
                 otmp->otyp = FAKE_AMULET_OF_YENDOR;
@@ -267,6 +301,62 @@ int x, y;
     if (cont) cont->owt = weight(cont);
 }
 
+/* possibly restore oracle's room and/or put her back inside it; returns
+   False if she's on the wrong level and should be removed, True otherwise */
+static boolean
+fixuporacle(oracle)
+struct monst *oracle;
+{
+    coord cc;
+    int ridx, o_ridx;
+
+    /* oracle doesn't move, but knight's joust or monk's staggering blow
+       could push her onto a hole in the floor; at present, traps don't
+       activate in such situation hence she won't fall to another level;
+       however, that could change so be prepared to cope with such things */
+    if (!Is_oracle_level(&u.uz)) {
+        return FALSE;
+    }
+
+    oracle->mpeaceful = 1;
+    o_ridx = levl[oracle->mx][oracle->my].roomno - ROOMOFFSET;
+    if (o_ridx >= 0 && rooms[o_ridx].rtype == DELPHI) {
+        return TRUE; /* no fixup needed */
+    }
+
+    /*
+     * The Oracle isn't in DELPHI room.  Either hero entered her chamber
+     * and got the one-time welcome message, converting it into an
+     * ordinary room, or she got teleported out, or both.  Try to put
+     * her back inside her room, if necessary, and restore its type.
+     */
+
+    /* find original delphi chamber; should always succeed */
+    for (ridx = 0; ridx < SIZE(rooms); ++ridx) {
+        if (rooms[ridx].orig_rtype == DELPHI) {
+            break;
+        }
+    }
+
+    if (o_ridx != ridx && ridx < SIZE(rooms)) {
+        /* room found and she's not not in it, so try to move her there */
+        cc.x = (rooms[ridx].lx + rooms[ridx].hx) / 2;
+        cc.y = (rooms[ridx].ly + rooms[ridx].hy) / 2;
+        if (enexto(&cc, cc.x, cc.y, oracle->data)) {
+            rloc_to(oracle, cc.x, cc.y);
+            o_ridx = levl[oracle->mx][oracle->my].roomno - ROOMOFFSET;
+        }
+        /* [if her room is already full, she might end up outside;
+           that's ok, next hero just won't get any welcome message,
+           same as used to happen before this fixup was introduced] */
+    }
+    if (ridx == o_ridx) {
+        /* if she's in her room, mark it as such */
+        rooms[ridx].rtype = DELPHI;
+    }
+    return TRUE; /* keep oracle in new bones file */
+}
+
 /* check whether bones are feasible */
 boolean
 can_make_bones()
@@ -316,8 +406,7 @@ struct obj *corpse;
     clear_bypasses();
     fd = open_bonesfile(&u.uz, &bonesid);
     if (fd >= 0) {
-        (void) close(fd);
-        compress_bonesfile();
+        (void) nhclose(fd);
 #ifdef WIZARD
         if (wizard) {
             if (yn("Bones file already exists.  Replace it?") == 'y') {
@@ -326,6 +415,9 @@ struct obj *corpse;
             }
         }
 #endif
+        /* compression can change the file's name, so must
+           wait until after any attempt to delete this file */
+        compress_bonesfile();
         return;
     }
 
@@ -340,6 +432,7 @@ make_bones:
         if (mtmp->iswiz || mptr == &mons[PM_MEDUSA] ||
             mptr->msound == MS_NEMESIS || mptr->msound == MS_LEADER ||
             mptr == &mons[PM_VLAD_THE_IMPALER] ||
+            (mptr == &mons[PM_ORACLE] && !fixuporacle(mtmp)) ||
             mptr == &mons[PM_CTHULHU]) {
             mongone(mtmp);
         }
@@ -392,11 +485,13 @@ make_bones:
             (void) obj_attach_mid(corpse, mtmp->m_id);
     } else {
         /* give your possessions to the monster you become */
-        in_mklev = TRUE;
-        mtmp = makemon(&mons[u.ugrave_arise], u.ux, u.uy, NO_MM_FLAGS);
+        in_mklev = TRUE; /* use <u.ux,u.uy> as-is */
+        mtmp = makemon(&mons[u.ugrave_arise], u.ux, u.uy, NO_MINVENT);
         in_mklev = FALSE;
         if (!mtmp) {
+            /* arise-type might have been genocided */
             drop_upon_death((struct monst *)0, (struct obj *)0, u.ux, u.uy);
+            u.ugrave_arise = NON_PM; /* in case caller cares */
             return;
         }
         mtmp = christen_monst(mtmp, plname);
@@ -405,6 +500,11 @@ make_bones:
              an(mons[u.ugrave_arise].mname));
         display_nhwindow(WIN_MESSAGE, FALSE);
         drop_upon_death(mtmp, (struct obj *)0, u.ux, u.uy);
+        /* 'mtmp' now has hero's inventory; if 'mtmp' is a mummy, give it
+           a wrapping unless already carrying one */
+        if (mtmp->data->mlet == S_MUMMY && !m_carrying(mtmp, MUMMY_WRAPPING)) {
+            (void) mongets(mtmp, MUMMY_WRAPPING);
+        }
         m_dowear(mtmp, TRUE);
     }
     if (mtmp) {
@@ -430,16 +530,19 @@ make_bones:
     resetobjs(level.buriedobjlist, FALSE);
 
     /* Hero is no longer on the map. */
+    u.ux0 = u.ux, u.uy0 = u.uy;
     u.ux = u.uy = 0;
 
     /* Clear all memory from the level. */
-    for(x=0; x<COLNO; x++) for(y=0; y<ROWNO; y++) {
+    for (x=1; x<COLNO; x++) {
+        for (y=0; y<ROWNO; y++) {
             levl[x][y].seenv = 0;
             levl[x][y].stepped_on = 0;
             levl[x][y].waslit = 0;
             levl[x][y].glyph = cmap_to_glyph(S_stone);
             levl[x][y].styp = STONE; /* clear dungeon overview last seen info */
         }
+    }
 
     fd = create_bonesfile(&u.uz, &bonesid, whynot);
     if(fd < 0) {
@@ -478,7 +581,7 @@ make_bones:
             if (wizard)
                 pline("Insufficient space to create bones file.");
 # endif
-            (void) close(fd);
+            (void) nhclose(fd);
             cancel_bonesfile();
             return;
         }
@@ -502,7 +605,7 @@ getbones()
 {
     register int fd;
     register int ok;
-    char c, *bonesid, oldbonesid[10];
+    char c, *bonesid, oldbonesid[40]; /* was [10]; more should be safer */
 
     if(discover)        /* save bones files for real games */
         return(0);
@@ -523,12 +626,12 @@ getbones()
 #ifdef WIZARD
         if (!wizard)
 #endif
-        pline("Discarding unuseable bones; no need to panic...");
+        pline("Discarding unusable bones; no need to panic...");
     } else {
 #ifdef WIZARD
         if(wizard)  {
             if(yn("Get bones?") == 'n') {
-                (void) close(fd);
+                (void) nhclose(fd);
                 compress_bonesfile();
                 return(0);
             }
@@ -561,10 +664,13 @@ getbones()
              * set to the magic DEFUNCT_MONSTER cookie value.
              */
             for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+                if (has_mname(mtmp)) {
+                    sanitize_name(MNAME(mtmp));
+                }
                 if (mtmp->mhpmax == DEFUNCT_MONSTER) {
 #if defined(DEBUG) && defined(WIZARD)
                     if (wizard)
-                        pline("Removing defunct monster %s from bones.",
+                        debug_pline("Removing defunct monster %s from bones.",
                               mtmp->data->mname);
 #endif
                     mongone(mtmp);
@@ -576,7 +682,8 @@ getbones()
             resetobjs(level.buriedobjlist, TRUE);
         }
     }
-    (void) close(fd);
+    (void) nhclose(fd);
+    sanitize_engravings();
 
 #ifdef WIZARD
     if(wizard) {

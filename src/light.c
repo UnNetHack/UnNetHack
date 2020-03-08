@@ -499,7 +499,8 @@ light_sources_sanity_check()
         } else if (ls->type == LS_MONSTER) {
             mtmp = (struct monst *) ls->id.a_monst;
             auint = mtmp->m_id;
-            if (find_mid(auint, FM_EVERYWHERE) != mtmp) {
+            struct monst *m = find_mid(auint, FM_EVERYWHERE);
+            if (m != mtmp) {
                 panic("insane light source: can't find mon #%u!", auint);
             }
         } else {

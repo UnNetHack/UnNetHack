@@ -157,7 +157,7 @@ curses_bail(const char *mesg)
 {
     clearlocks();
     curses_exit_nhwindows(mesg);
-    terminate(EXIT_SUCCESS);
+    nh_terminate(EXIT_SUCCESS);
 }
 
 

@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)worn.c 3.4 2003/01/08  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -42,7 +41,6 @@ const struct worn {
 /* note: monsters don't have clairvoyance, so your role
    has no significant effect on their use of w_blocks() */
 
-
 /* Updated to use the extrinsic and blocked fields. */
 void
 setworn(obj, mask)
@@ -62,9 +60,10 @@ long mask;
             violated(CONDUCT_NUDISM);
             /* Restoring a game and naming worn armor uses setworn.  *
              * This can unneccessariely increase the conduct-counter *
-             * (only visible in Wizmode)                 */
+             * (only visible in Wizmode)                             */
         }
-        for(wp = worn; wp->w_mask; wp++) if(wp->w_mask & mask) {
+        for (wp = worn; wp->w_mask; wp++)  {
+            if (wp->w_mask & mask) {
                 oobj = *(wp->w_obj);
                 if(oobj && !(oobj->owornmask & wp->w_mask))
                     warning("Setworn: mask = %ld.", wp->w_mask);
@@ -87,6 +86,9 @@ long mask;
                         if (oobj->oartifact)
                             set_artifact_intrinsic(oobj, 0, mask);
                     }
+                    /* in case wearing or removal is in progress or removal
+                       is pending (via 'A' command for multiple items) */
+                    cancel_doff(oobj, wp->w_mask);
                 }
                 *(wp->w_obj) = obj;
                 if(obj) {
@@ -114,6 +116,7 @@ long mask;
                     }
                 }
             }
+        }
     }
     update_inventory();
 }
@@ -129,8 +132,11 @@ register struct obj *obj;
 
     if (!obj) return;
     if (obj == uwep || obj == uswapwep) u.twoweap = 0;
-    for(wp = worn; wp->w_mask; wp++)
-        if(obj == *(wp->w_obj)) {
+    for (wp = worn; wp->w_mask; wp++) {
+        if (obj == *(wp->w_obj)) {
+            /* in case wearing or removal is in progress or removal
+               is pending (via 'A' command for multiple items) */
+            cancel_doff(obj, wp->w_mask);
             *(wp->w_obj) = 0;
             p = objects[obj->otyp].oc_oprop;
             u.uprops[p].extrinsic = u.uprops[p].extrinsic & ~wp->w_mask;
@@ -144,6 +150,7 @@ register struct obj *obj;
                     u.uprops[CLAIRVOYANT].blocked &= ~wp->w_mask;
             }
         }
+    }
     update_inventory();
 }
 
@@ -287,6 +294,12 @@ struct obj *obj;    /* item to make known if effect can be seen */
         if (mon->permspeed == MFAST) mon->permspeed = 0;
         petrify = TRUE;
         break;
+    case -4: /* green slime */
+        if (mon->permspeed == MFAST) {
+            mon->permspeed = 0;
+        }
+        give_msg = FALSE;
+        break;
     }
 
     for (otmp = mon->minvent; otmp; otmp = otmp->nobj)
@@ -297,7 +310,9 @@ struct obj *obj;    /* item to make known if effect can be seen */
     else
         mon->mspeed = mon->permspeed;
 
-    if (give_msg && (mon->mspeed != oldspeed || petrify) && canseemon(mon)) {
+    /* no message if monster is immobile (temp or perm) or unseen */
+    if (give_msg && (mon->mspeed != oldspeed || petrify) &&
+        mon->data->mmove && !(mon->mfrozen || mon->msleeping) && canseemon(mon)) {
         /* fast to slow (skipping intermediate state) or vice versa */
         const char *howmuch = (mon->mspeed + oldspeed == MFAST + MSLOW) ?
                               "much " : "";
@@ -319,15 +334,15 @@ struct obj *obj;    /* item to make known if effect can be seen */
             pline("%s seems to be moving %sslower.", Monnam(mon), howmuch);
         }
 
-        /* might discover an object if we see the speed change happen, but
-           avoid making possibly forgotten book known when casting its spell */
-        if (obj != 0 && obj->dknown &&
-            objects[obj->otyp].oc_class != SPBOOK_CLASS)
-            makeknown(obj->otyp);
+        /* might discover an object if we see the speed change happen */
+        if (obj != 0) {
+            learn_wand(obj);
+        }
     }
 }
 
-/* armor put on or taken off; might be magical variety */
+/* armor put on or taken off; might be magical variety
+   [TODO: rename to 'update_mon_extrinsics()' and change all callers...] */
 void
 update_mon_intrinsics(mon, obj, on, silently)
 struct monst *mon;
@@ -413,17 +428,15 @@ boolean on, silently;
         case ACID_RES:
         case STONE_RES:
             mask = (uchar) (1 << (which - 1));
-            /* If the monster doesn't have this resistance intrinsically,
-               check whether any other worn item confers it.  Note that
-               we don't currently check for anything conferred via simply
-               carrying an object. */
-            if (!(mon->data->mresists & mask)) {
-                for (otmp = mon->minvent; otmp; otmp = otmp->nobj)
-                    if (otmp->owornmask &&
-                        (int) objects[otmp->otyp].oc_oprop == which)
-                        break;
-                if (!otmp)
-                    mon->mextrinsics &= ~((unsigned short) mask);
+            /* update monster's extrinsics (for worn objects only;
+               'obj' itself might still be worn or already unworn) */
+            for (otmp = mon->minvent; otmp; otmp = otmp->nobj) {
+                if (otmp != obj && otmp->owornmask && objects[otmp->otyp].oc_oprop == which) {
+                    break;
+                }
+            }
+            if (!otmp) {
+                mon->mextrinsics &= ~((unsigned short) mask);
             }
             break;
         default:
@@ -477,7 +490,10 @@ register struct monst *mon;
     return base;
 }
 
-/* weapons are handled separately; rings and eyewear aren't used by monsters */
+/*
+ * weapons are handled separately;
+ * rings and eyewear aren't used by monsters
+ */
 
 /* Wear the best object of each type that the monster has.  During creation,
  * the monster can put everything on at once; otherwise, wearing takes time.
@@ -513,8 +529,9 @@ boolean creation;
     m_dowear_type(mon, W_AMUL, creation, FALSE);
 #ifdef TOURIST
     /* can't put on shirt if already wearing suit */
-    if (!cantweararm(mon->data) || (mon->misc_worn_check & W_ARM))
+    if (!cantweararm(mon->data) && !(mon->misc_worn_check & W_ARM)) {
         m_dowear_type(mon, W_ARMU, creation, FALSE);
+    }
 #endif
     /* treating small as a special case allows
        hobbits, gnomes, and kobolds to wear cloaks */
@@ -573,6 +590,13 @@ boolean racialexception;
             break;
         case W_ARMH:
             if (!is_helmet(obj)) continue;
+            /* changing alignment is not implemented for monsters;
+               priests and minions could change alignment but wouldn't
+               want to, so they reject helms of opposite alignment */
+            if (obj->otyp == HELM_OF_OPPOSITE_ALIGNMENT &&
+                 (mon->ispriest || mon->isminion)) {
+                continue;
+            }
             /* (flimsy exception matches polyself handling) */
             if (has_horns(mon->data) && !is_flimsy(obj)) continue;
             break;
@@ -604,6 +628,10 @@ boolean racialexception;
 outer_break:
     if (!best || best == old) return;
 
+    /* same auto-cursing behavior as for hero */
+    boolean autocurse = ((best->otyp == HELM_OF_OPPOSITE_ALIGNMENT || best->otyp == DUNCE_CAP) &&
+                         !best->cursed);
+
     /* if wearing a cloak, account for the time spent removing
        and re-wearing it when putting on a suit or shirt */
     if ((flag == W_ARM
@@ -629,6 +657,11 @@ outer_break:
                 buf[0] = '\0';
             pline("%s%s puts on %s.", Monnam(mon),
                   buf, distant_name(best, doname));
+            if (autocurse) {
+                pline("%s %s %s %s for a moment.", s_suffix(Monnam(mon)),
+                      simpleonames(best), otense(best, "glow"),
+                      hcolor(NH_BLACK));
+            }
         } /* can see it */
         m_delay += objects[best->otyp].oc_delay;
         mon->mfrozen = m_delay;
@@ -638,6 +671,9 @@ outer_break:
         update_mon_intrinsics(mon, old, FALSE, creation);
     mon->misc_worn_check |= flag;
     best->owornmask |= flag;
+    if (autocurse) {
+        curse(best);
+    }
     update_mon_intrinsics(mon, best, TRUE, creation);
     /* if couldn't see it but now can, or vice versa, */
     if (!creation && (unseen ^ !canseemon(mon))) {
@@ -674,15 +710,16 @@ long flag;
             impossible("bad flag in which_armor");
             return 0;
         }
-    }
+    } else {
+        struct obj *obj;
 
-    struct obj *obj;
-    for (obj = mon->minvent; obj; obj = obj->nobj) {
-        if (obj->owornmask & flag) {
-            return obj;
+        for (obj = mon->minvent; obj; obj = obj->nobj) {
+            if (obj->owornmask & flag) {
+                return obj;
+            }
         }
+        return (struct obj *)0;
     }
-    return (struct obj *)0;
 }
 
 /* remove an item of armor and then drop it */
@@ -709,14 +746,24 @@ clear_bypasses()
     struct obj *otmp, *nobj;
     struct monst *mtmp;
 
+    /*
+     * 'Object' bypass is also used for one monster function:
+     * polymorph control of long worms.  Activated via setting
+     * context.bypasses even if no specific object has been
+     * bypassed.
+     */
+
     for (otmp = fobj; otmp; otmp = nobj) {
         nobj = otmp->nobj;
         if (otmp->bypass) {
             otmp->bypass = 0;
+
             /* bypass will have inhibited any stacking, but since it's
-               used for polymorph handling, the objects here probably
-               have been transformed and won't be stacked in the usual
-               manner afterwards; so don't bother with this */
+             * used for polymorph handling, the objects here probably
+             * have been transformed and won't be stacked in the usual
+             * manner afterwards; so don't bother with this.
+             * [Changing the fobj chain mid-traversal would also be risky.]
+             */
 #if 0
             if (objects[otmp->otyp].oc_merge) {
                 xchar ox, oy;
@@ -728,18 +775,31 @@ clear_bypasses()
 #endif  /*0*/
         }
     }
-    /* invent and mydogs chains shouldn't matter here */
+    for (otmp = invent; otmp; otmp = otmp->nobj) {
+        otmp->bypass = 0;
+    }
     for (otmp = migrating_objs; otmp; otmp = otmp->nobj)
         otmp->bypass = 0;
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp)) continue;
         for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
             otmp->bypass = 0;
+        /* long worm created by polymorph has mon->mextra->mcorpsenm set
+           to PM_LONG_WORM to flag it as not being subject to further
+           polymorph (so polymorph zap won't hit monster to transform it
+           into a long worm, then hit that worm's tail and transform it
+           again on same zap); clearing mcorpsenm reverts worm to normal */
+        if (mtmp->data == &mons[PM_LONG_WORM] && has_mcorpsenm(mtmp)) {
+            MCORPSENM(mtmp) = NON_PM;
+        }
     }
     for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
         for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
             otmp->bypass = 0;
+        /* no MCORPSENM(mtmp)==PM_LONG_WORM check here; long worms can't
+           be just created by polymorph and migrating at the same time */
     }
+    /* billobjs and mydogs chains don't matter here */
     flags.bypasses = FALSE;
 }
 
@@ -787,7 +847,7 @@ mon_break_armor(mon, polyspot)
 struct monst *mon;
 boolean polyspot;
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     struct permonst *mdat = mon->data;
     boolean vis = cansee(mon->mx, mon->my);
     boolean handless_or_tiny = (nohands(mdat) || verysmall(mdat));
@@ -952,6 +1012,8 @@ extra_pref(mon, obj)
 struct monst *mon;
 struct obj *obj;
 {
+    /* currently only does speed boots, but might be expanded if monsters
+     * get to use more armor abilities. */
     if (obj) {
         if (obj->otyp == SPEED_BOOTS && mon->permspeed != MFAST)
             return 20;
@@ -960,11 +1022,12 @@ struct obj *obj;
 }
 
 /*
- * Exceptions to things based on race. Correctly checks polymorphed player race.
+ * Exceptions to things based on race.
+ * Correctly checks polymorphed player race.
  * Returns:
- *   0 No exception, normal rules apply.
- *   1 If the race/object combination is acceptable.
- *  -1 If the race/object combination is unacceptable.
+ *       0 No exception, normal rules apply.
+ *       1 If the race/object combination is acceptable.
+ *      -1 If the race/object combination is unacceptable.
  */
 int
 racial_exception(mon, obj)

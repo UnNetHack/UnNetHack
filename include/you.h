@@ -423,19 +423,21 @@ struct you {
     schar uhitinc;
     schar udaminc;
     schar uac;
-    uchar uspellprot;       /* protection by SPE_PROTECTION */
-    uchar usptime;          /* #moves until uspellprot-- */
-    uchar uspmtime;         /* #moves between uspellprot-- */
+    uchar uspellprot;        /* protection by SPE_PROTECTION */
+    uchar usptime;           /* #moves until uspellprot-- */
+    uchar uspmtime;          /* #moves between uspellprot-- */
     int uhp, uhpmax;
-    int uen, uenmax;        /* magical energy - M. Stephenson */
-    int ugangr;         /* if the gods are angry at you */
-    int ugifts;         /* number of artifacts bestowed */
-    int ublessed, ublesscnt;    /* blessing/duration from #pray */
+    int uen, uenmax;         /* magical energy - M. Stephenson */
+    xchar uhpinc[MAXULEV];   /* increases to uhpmax for each level gain */
+    xchar ueninc[MAXULEV];   /* increases to uenmax for each level gain */
+    int ugangr;              /* if the gods are angry at you */
+    int ugifts;              /* number of artifacts bestowed */
+    int ublessed, ublesscnt; /* blessing/duration from #pray */
     long umoney0;
     long uexp, urexp;
-    long urscore;       /**< the current score */
-    long ucleansed;     /* to record moves when player was cleansed */
-    long usleep;        /* sleeping; monstermove you last started */
+    long urscore;            /**< the current score */
+    long ucleansed;          /* to record moves when player was cleansed */
+    long usleep;             /* sleeping; monstermove you last started */
     int uinvault;
     struct monst *ustuck;
 #ifdef STEED
@@ -443,14 +445,14 @@ struct you {
     long ugallop;
     int urideturns;
 #endif
-    int umortality;     /* how many times you died */
-    int ugrave_arise; /* you die and become something aside from a ghost */
+    int umortality;         /* how many times you died */
+    int ugrave_arise;       /* you die and become something aside from a ghost */
     time_t ubirthday;       /* real world time when game began */
     time_t udeathday;       /* real world time when game ended */
 
     int weapon_slots;       /* unused skill slots */
-    int skills_advanced;        /* # of advances made so far */
-    xchar skill_record[P_SKILL_LIMIT];      /* skill advancements */
+    int skills_advanced;    /* # of advances made so far */
+    xchar skill_record[P_SKILL_LIMIT]; /* skill advancements */
     struct skills weapon_skills[P_NUM_SKILLS];
     boolean twoweap;        /* KMH -- Using two-weapon combat */
     boolean incloud;        /* used for blindness in stinking clouds */

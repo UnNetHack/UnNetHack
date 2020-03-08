@@ -4,7 +4,7 @@
 #include "hack.h"
 #include "mfndpos.h"
 
-/* this matches the categorizations shown by enlightenment */
+/* these match the categorizations shown by enlightenment */
 #define ALGN_SINNED (-4) /* worse than strayed */
 #define ALGN_PIOUS   14  /* better than fervent (9..13) */
 
@@ -52,7 +52,6 @@ register xchar omx, omy, gx, gy;
     coord poss[9];
     long info[9];
     long allowflags;
-    struct obj *ib = (struct obj *)0;
 
     if (omx == gx && omy == gy)
         return(0);
@@ -113,15 +112,20 @@ pick_move:
             return 0;
         }
         remove_monster(omx, omy);
-        newsym(omx, omy);
         place_monster(mtmp, nix, niy);
         newsym(nix, niy);
         if (mtmp->isshk && !in_his_shop && inhishop(mtmp))
             check_special_room(FALSE);
-        if ((ib = sobj_at(BOULDER, nix, niy))) {
-            mpickup_obj(mtmp, ib);
+#if 0 /* dead code; maybe someday someone will track down why... */
+        if (ib) {
+            if (cansee(mtmp->mx, mtmp->my)) {
+                pline("%s picks up %s.", Monnam(mtmp),
+                      distant_name(ib, doname));
+            }
+            obj_extract_self(ib);
+            (void) mpickobj(mtmp, ib);
         }
-        newsym(nix, niy);
+#endif
         return(1);
     }
     return(0);

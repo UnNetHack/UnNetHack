@@ -59,6 +59,7 @@ char *argv[];
 	register char *dir;
 #endif
 	boolean exact_username;
+    boolean resuming = FALSE; /* assume new game */
 #ifdef SIMPLE_MAIL
 	char* e_simple = NULL;
 #endif
@@ -304,6 +305,7 @@ char *argv[];
 			}
 		}
 		flags.move = 0;
+        resuming = TRUE;
 	} else {
 not_recovered:
 		player_selection();
@@ -315,7 +317,8 @@ not_recovered:
 		(void) pickup(1);
 	}
 
-	moveloop();
+    /* moveloop() never returns but isn't flagged NORETURN */
+    moveloop(resuming);
 	exit(EXIT_SUCCESS);
 	/*NOTREACHED*/
 	return(0);

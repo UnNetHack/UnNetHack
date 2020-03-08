@@ -3,6 +3,7 @@ all: options/test_base32 options/test_options unicode/test_unicode wishing/test_
 clean:
 	rm -f `find */test_* -executable`
 
+TEST_CFLAGS=-Wall -Wno-unused-variable -Wno-unused-but-set-variable
 %: %.c
 	echo `pkg-config --libs check`
-	$(CC) -Wall -I../include -I../src -g $(CFLAGS) $@.c `pkg-config --libs check` -o $@ && ./$@
+	$(CC) $(TEST_CFLAGS) -I../include -I../src -g $(CFLAGS) $@.c `pkg-config --libs check` -o $@ && ./$@

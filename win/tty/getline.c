@@ -232,11 +232,19 @@ char *base;
 
     com_index = -1;
     for (oindex = 0; extcmdlist[oindex].ef_txt != (char *)0; oindex++) {
-        if (!strncmpi(base, extcmdlist[oindex].ef_txt, strlen(base))) {
-            if (com_index == -1)    /* no matches yet */
+        if (extcmdlist[oindex].flags & CMD_NOT_AVAILABLE) {
+            continue;
+        }
+        if ((extcmdlist[oindex].flags & AUTOCOMPLETE) &&
+             !(!wizard && (extcmdlist[oindex].flags & WIZMODECMD)) &&
+             !strncmpi(base, extcmdlist[oindex].ef_txt, strlen(base))) {
+            if (com_index == -1) {
+                /* no matches yet */
                 com_index = oindex;
-            else            /* more than 1 match */
+            } else {
+                /* more than 1 match */
                 return FALSE;
+            }
         }
     }
     if (com_index >= 0) {
@@ -244,7 +252,7 @@ char *base;
         return TRUE;
     }
 
-    return FALSE;   /* didn't match anything */
+    return FALSE; /* didn't match anything */
 }
 
 /*

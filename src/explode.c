@@ -121,12 +121,7 @@ int expltype;
     if (olet == MON_EXPLODE) {
         /* when explode() is called recursively, killer.name might change so
            we need to retain a copy of the current value for this explosion */
-#if NEXT_VERSION
         str = strcpy(killr_buf, killer.name);
-#else
-        str = killer;
-#endif
-        killer = 0;     /* set again later as needed */
         do_hallu = (Hallucination && (strstri(str, "'s explosion") || strstri(str, "s' explosion")));
         adtyp = AD_PHYS;
     } else
@@ -510,21 +505,21 @@ int expltype;
                 if (olet == MON_EXPLODE) {
                     if (generic) { /* explosion was unseen; str=="explosion", */
                         ;          /* killer.name=="gas spore's explosion"    */
-                    } else if (str != killer_buf && str != hallu_buf) {
-                        Strcpy(killer_buf, str);
+                    } else if (str != killer.name && str != hallu_buf) {
+                        Strcpy(killer.name, str);
                     }
-                    killer_format = KILLED_BY_AN;
+                    killer.format = KILLED_BY_AN;
                 } else if (type >= 0 && olet != SCROLL_CLASS) {
-                    killer_format = NO_KILLER_PREFIX;
-                    Sprintf(killer_buf, "caught %sself in %s own %s",
+                    killer.format = NO_KILLER_PREFIX;
+                    Sprintf(killer.name, "caught %sself in %s own %s",
                             uhim(), uhis(), str);
                 } else if (!strncmpi(str, "tower of flame", 8) ||
                            !strncmpi(str, "fireball", 8)) {
-                    killer_format = KILLED_BY_AN;
-                    Strcpy(killer_buf, str);
+                    killer.format = KILLED_BY_AN;
+                    Strcpy(killer.name, str);
                 } else {
-                    killer_format = KILLED_BY;
-                    Strcpy(killer_buf, str);
+                    killer.format = KILLED_BY;
+                    Strcpy(killer.name, str);
                 }
                 if (iflags.last_msg == PLNMSG_CAUGHT_IN_EXPLOSION ||
                     iflags.last_msg == PLNMSG_TOWER_OF_FLAME) {
@@ -533,7 +528,6 @@ int expltype;
                 } else {
                     pline_The("%s is fatal.", str);
                 }
-                killer = killer_buf;
                 /* Known BUG: BURNING suppresses corpse in bones data,
                    but done does not handle killer reason correctly */
                 done((adtyp == AD_FIRE) ? BURNING : DIED);

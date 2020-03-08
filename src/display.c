@@ -1810,7 +1810,7 @@ dump_screen()
         for (x = 1; x < COLNO; x++) {
             /* map glyph to character and color */
             glyph = gbuf[y][x].glyph;
-            mapglyph(glyph, (glyph_t*)&ch, &color, &special, x, y);
+            mapglyph(glyph, (glyph_t*)&ch, &color, &special, x, y, 0);
             /* we can't use ch for output as that may be non-ASCII due
              * to DEC- or IBMgraphics */
             uchar c = get_glyph_char(glyph, &oclass);

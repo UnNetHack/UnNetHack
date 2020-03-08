@@ -589,7 +589,7 @@ char dummy_yn_function(const char *question, const char *choices,
 
 /** Strips newline from end of string. */
 static
-void strip_newline(char *str) {
+void dummy_strip_newline(char *str) {
     /* Strip newline from end */
     if (str[strlen(str)-1] == '\n') {
         str[strlen(str)-1] = '\0';
@@ -621,7 +621,7 @@ void dummy_getlin(const char *question, char *input)
         input[0] = '\033';
         input[1] = '\0';
     } else {
-        strip_newline(input);
+        dummy_strip_newline(input);
     }
 
 }
@@ -646,7 +646,7 @@ int dummy_get_ext_cmd()
     ret = fgets(cmd, sizeof(cmd), stdin);
 
     for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++) {
-        strip_newline(ret);
+        dummy_strip_newline(ret);
         if (!strcmpi(ret, extcmdlist[i].ef_txt)) {
             return i;
         }

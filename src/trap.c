@@ -1380,7 +1380,7 @@ unsigned trflags;
 
     case LEVEL_TELEP:
         seetrap(trap);
-        level_tele_trap(trap);
+        level_tele_trap(trap, trflags);
         break;
 
     case WEB: /* Our luckless player has stumbled into a web. */
@@ -2837,8 +2837,10 @@ const char *str;
     if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))
         return;
     You("turn to stone...");
-    killer_format = KILLED_BY;
-    killer = str;
+    killer.format = KILLED_BY;
+    if (str != killer.name) {
+        Strcpy(killer.name, str ? str : "");
+    }
     done(STONING);
 }
 
@@ -2877,8 +2879,10 @@ const char * str;
     result = (youmonst.data->cwt);
     weight_dmg(result);
     result = min(6, result);
-    killer_format = KILLED_BY;
-    killer = str;
+    killer.format = KILLED_BY;
+    if (str != killer.name) {
+        Strcpy(killer.name, str ? str : "");
+    }
     u.ugrave_arise = -3;
     done(DISINTEGRATED);
 
@@ -2956,11 +2960,7 @@ boolean byplayer;
         if (cansee(mon->mx, mon->my)) {
             pline("%s%s touches %s.", arg ? arg : "",
                   arg ? mon_nam(mon) : Monnam(mon),
-#if NEXT_VERSION
                   corpse_xname(mwep, (const char *) 0, CXN_PFX_THE));
-#else
-                  corpse_xname(mwep, FALSE));
-#endif
         }
         minstapetrify(mon, byplayer);
         /* if life-saved, might not be able to continue wielding */
@@ -4011,7 +4011,7 @@ drown()
          (Teleport_control || rn2(3) < Luck+2)) {
         You("attempt a teleport spell."); /* utcsri!carroll */
         if (!level.flags.noteleport) {
-            (void) dotele();
+            (void) dotele(FALSE);
             if(!is_pool(u.ux, u.uy))
                 return(TRUE);
         } else pline_The("attempted teleport spell fails.");
@@ -4085,13 +4085,13 @@ crawl:
         /* killer format and name are reconstructed every iteration
            because lifesaving resets them */
         pool_of_water = waterbody_name(u.ux, u.uy);
-        killer_format = KILLED_BY_AN;
+        killer.format = KILLED_BY_AN;
         /* avoid "drowned in [a] water" */
         if (!strcmp(pool_of_water, "water")) {
             pool_of_water = "deep water";
-            killer_format = KILLED_BY;
+            killer.format = KILLED_BY;
         }
-        Strcpy(killer_buf, pool_of_water);
+        Strcpy(killer.name, pool_of_water);
         done(DROWNING);
         /* oops, we're still alive.  better get out of the water. */
         if (safe_teleds(TRUE)) {
@@ -5635,8 +5635,8 @@ lava_effects()
                      u.umonnum == PM_STEAM_VORTEX ||
                      u.umonnum == PM_FOG_CLOUD);
         u.uhp = -1;
-        killer_format = KILLED_BY;
-        killer = lava_killer;
+        killer.format = KILLED_BY;
+        Strcpy(killer.name, lava_killer);
         You("%s...", boil_away ? "boil away" : "burn to a crisp");
         done(BURNING);
         while (!safe_teleds(TRUE)) {
@@ -5743,8 +5743,8 @@ sink_into_lava()
 
         u.utrap -= (1 << 8);
         if (u.utrap < (1 << 8)) {
-            killer_format = KILLED_BY;
-            killer = "molten lava";
+            killer.format = KILLED_BY;
+            Strcpy(killer.name, "molten lava");
             You("sink below the surface and die.");
             burn_away_slime(); /* add insult to injury? */
             done(DISSOLVED);

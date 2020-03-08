@@ -207,6 +207,9 @@ struct obj {
                              objects[otmp->otyp].oc_skill <= -P_BOW)
 #define uslinging() (uwep && objects[uwep->otyp].oc_skill == P_SLING)
 
+/* 'is_quest_artifact()' only applies to the current role's artifact */
+#define any_quest_artifact(o) ((o)->oartifact >= ART_ITLACHIAYAQUE)
+
 /* Armor */
 #define is_shield(otmp) (otmp->oclass == ARMOR_CLASS && \
                          objects[otmp->otyp].oc_armcat == ARM_SHIELD)

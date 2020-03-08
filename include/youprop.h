@@ -82,7 +82,7 @@
 
 /*** Troubles ***/
 /* Pseudo-property */
-#define Punished        (uball)
+#define Punished (uball != 0)
 
 /* Those implemented solely as timeouts (we use just intrinsic) */
 #define HStun           u.uprops[STUNNED].intrinsic
@@ -100,6 +100,10 @@
                  !(ublindf && ublindf->oartifact == ART_EYES_OF_THE_OVERWORLD))
 /* ...the Eyes operate even when you really are blind
     or don't have any eyes */
+#define Blindfolded_only                                            \
+    (Blindfolded && ublindf->oartifact != ART_EYES_OF_THE_OVERWORLD \
+     && !u.roleplay.blindfolded && !Blinded && haseyes(youmonst.data))
+/* ...blind because of a blindfold, and *only* that */
 
 #define Sick            u.uprops[SICK].intrinsic
 #define Stoned          u.uprops[STONED].intrinsic

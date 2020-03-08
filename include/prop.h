@@ -108,6 +108,7 @@ struct prop {
 #   define W_RINGR      0x00040000L /* Right ring */
 #   define W_RING       (W_RINGL | W_RINGR)
 #   define W_TOOL       0x00080000L /* Eyewear */
+#   define W_ACCESSORY (W_RING | W_AMUL | W_TOOL)
 #ifdef STEED
 #   define W_SADDLE     0x00100000L /* KMH -- For riding monsters */
 #endif

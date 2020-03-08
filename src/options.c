@@ -48,6 +48,7 @@ static struct Bool_Opt
     boolean *addr, initvalue;
     int optflags;
 } boolopt[] = {
+    { "acoustics", &flags.acoustics, TRUE, SET_IN_FILE },
 #ifdef AMIGA
     {"altmeta", &flags.altmeta, TRUE, DISP_IN_GAME},
 #else
@@ -59,6 +60,7 @@ static struct Bool_Opt
 #else
     {"asksavedisk", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+    {"autodescribe", &iflags.autodescribe, TRUE, SET_IN_FILE },
     {"autodig", &flags.autodig, FALSE, SET_IN_GAME},
 #ifdef AUTO_OPEN
     {"autoopen", &iflags.autoopen, TRUE, SET_IN_GAME},
@@ -85,6 +87,7 @@ static struct Bool_Opt
 #ifdef CURSES_GRAPHICS
     {"classic_status", &iflags.classic_status, TRUE, SET_IN_FILE},
 #endif
+    {"clicklook", &iflags.clicklook, FALSE, SET_IN_FILE },
     {"cmdassist", &iflags.cmdassist, TRUE, SET_IN_GAME},
     {"color", &iflags.wc_color, TRUE, SET_IN_GAME},     /*WC*/
     {"confirm", &flags.confirm, TRUE, SET_IN_GAME},
@@ -107,7 +110,7 @@ static struct Bool_Opt
     {"elberethignore", &flags.elberethignore, FALSE, SET_IN_FILE},
 #endif
     {"eight_bit_tty", &iflags.wc_eight_bit_input, FALSE, SET_IN_FILE},  /*WC*/
-#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS) || defined(X11_GRAPHICS)
     {"extmenu", &iflags.extmenu, FALSE, SET_IN_GAME},
 #else
     {"extmenu", (boolean *)0, FALSE, SET_IN_FILE},
@@ -124,7 +127,9 @@ static struct Bool_Opt
 #else
     {"flush", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+    {"force_invmenu", &iflags.force_invmenu, FALSE, SET_IN_GAME },
     {"fullscreen", &iflags.wc2_fullscreen, FALSE, SET_IN_FILE},
+    {"goldX", &flags.goldX, FALSE, SET_IN_FILE },
     {"guicolor", &iflags.wc2_guicolor, TRUE, SET_IN_GAME},
     {"heaven_or_hell", &flags.heaven_or_hell, FALSE, SET_IN_FILE},
     {"hell_and_hell", &flags.hell_and_hell, FALSE, SET_IN_FILE},
@@ -163,6 +168,7 @@ static struct Bool_Opt
     {"mail", (boolean *)0, TRUE, SET_IN_FILE},
 #endif
     {"marathon", &flags.marathon, FALSE, DISP_IN_GAME },
+    {"mention_walls", &iflags.mention_walls, FALSE, SET_IN_GAME },
 #ifdef MENU_COLOR
 # ifdef MICRO
     {"menucolors", &iflags.use_menu_color, TRUE,  SET_IN_FILE},
@@ -555,21 +561,22 @@ static char def_inv_order[MAXOCLASSES] = {
 typedef struct {
     const char *name;
     char cmd;
+    const char *desc;
 } menu_cmd_t;
 
 #define NUM_MENU_CMDS 11
 static const menu_cmd_t default_menu_cmd_info[NUM_MENU_CMDS] = {
-/* 0*/ { "menu_first_page",    MENU_FIRST_PAGE },
-    { "menu_last_page", MENU_LAST_PAGE },
-    { "menu_next_page", MENU_NEXT_PAGE },
-    { "menu_previous_page", MENU_PREVIOUS_PAGE },
-    { "menu_select_all",    MENU_SELECT_ALL },
-/* 5*/ { "menu_deselect_all",  MENU_UNSELECT_ALL },
-    { "menu_invert_all",    MENU_INVERT_ALL },
-    { "menu_select_page",   MENU_SELECT_PAGE },
-    { "menu_deselect_page", MENU_UNSELECT_PAGE },
-    { "menu_invert_page",   MENU_INVERT_PAGE },
-/*10*/ { "menu_search",        MENU_SEARCH },
+ { "menu_first_page",    MENU_FIRST_PAGE,    "Go to first page" },
+ { "menu_last_page",     MENU_LAST_PAGE,     "Go to last page" },
+ { "menu_next_page",     MENU_NEXT_PAGE,     "Go to next page" },
+ { "menu_previous_page", MENU_PREVIOUS_PAGE, "Go to previous page" },
+ { "menu_select_all",    MENU_SELECT_ALL,    "Select all items" },
+ { "menu_deselect_all",  MENU_UNSELECT_ALL,  "Unselect all items" },
+ { "menu_invert_all",    MENU_INVERT_ALL,    "Invert selection" },
+ { "menu_select_page",   MENU_SELECT_PAGE,   "Select items in current page" },
+ { "menu_deselect_page", MENU_UNSELECT_PAGE, "Unselect items in current page" },
+ { "menu_invert_page",   MENU_INVERT_PAGE,   "Invert current page selection" },
+ { "menu_search",        MENU_SEARCH,        "Search and toggle matching items" },
 };
 
 /*
@@ -577,7 +584,7 @@ static const menu_cmd_t default_menu_cmd_info[NUM_MENU_CMDS] = {
  * The accelerator list must be a valid C string.
  */
 #define MAX_MENU_MAPPED_CMDS 32 /* some number */
-char mapped_menu_cmds[MAX_MENU_MAPPED_CMDS+1];          /* exported */
+char mapped_menu_cmds[MAX_MENU_MAPPED_CMDS+1]; /* exported */
 static char mapped_menu_op[MAX_MENU_MAPPED_CMDS+1];
 static short n_menu_mapped = 0;
 
@@ -627,9 +634,17 @@ boolean val_allowed;
         const char *p = index(user_string, ':'),
                    *q = index(user_string, '=');
 
-        if (!p || (q && q < p)) p = q;
-        while(p && p > user_string && isspace(*(p-1))) p--;
-        if (p) len = (int)(p - user_string);
+        if (!p || (q && q < p)) {
+            p = q;
+        }
+        if (p) {
+            /* 'user_string' hasn't necessarily been through mungspaces()
+               so might have tabs or consecutive spaces */
+            while (p > user_string && isspace(*(p-1))) {
+                p--;
+            }
+            len = (int)(p - user_string);
+        }
     }
 
     return (len >= min_length) && !strncmpi(opt_name, user_string, len);
@@ -638,7 +653,7 @@ boolean val_allowed;
 /* most environment variables will eventually be printed in an error
  * message if they don't work, and most error message paths go through
  * BUFSZ buffers, which could be overflowed by a maliciously long
- * environment variable.  if a variable can legitimately be long, or
+ * environment variable.  If a variable can legitimately be long, or
  * if it's put in a smaller buffer, the responsible code will have to
  * bounds-check itself.
  */
@@ -654,6 +669,7 @@ const char *ev;
         return (char *)0;
 }
 
+/* process options */
 void
 initoptions()
 {
@@ -664,6 +680,9 @@ initoptions()
 
     /* initialize the random number generator */
     init_random(0);
+
+    /* set up the command parsing */
+    reset_commands(TRUE); /* init */
 
     /* for detection of configfile options specified multiple times */
     iflags.opt_booldup = iflags.opt_compdup = (int *)0;
@@ -682,12 +701,13 @@ initoptions()
 #endif
     iflags.menu_headings = ATR_INVERSE;
     iflags.pilesize = 5;
+    iflags.getpos_coords = GPCOORDS_NONE;
 
-    /* Use negative indices to indicate not yet selected */
-    flags.initrole = -1;
-    flags.initrace = -1;
-    flags.initgend = -1;
-    flags.initalign = -1;
+    /* Set the default monster and object class symbols. */
+    flags.initrole = ROLE_NONE;
+    flags.initrace = ROLE_NONE;
+    flags.initgend = ROLE_NONE;
+    flags.initalign = ROLE_NONE;
 
     /* Set the default monster and object class symbols.  Don't use */
     /* memcpy() --- sizeof char != sizeof uchar on some machines.   */
@@ -767,6 +787,11 @@ initoptions()
 #endif /* MAC_GRAPHICS_ENV */
     flags.menu_style = MENU_FULL;
 
+    iflags.wc_align_message = ALIGN_TOP;
+    iflags.wc_align_status = ALIGN_BOTTOM;
+    /* only used by curses */
+    iflags.wc2_windowborders = 2; /* 'Auto' */
+
     /* since this is done before init_objects(), do partial init here */
     objects[SLIME_MOLD].oc_name_idx = SLIME_MOLD;
     nmcpy(pl_fruit, OBJ_NAME(objects[SLIME_MOLD]), PL_FSIZ);
@@ -821,68 +846,85 @@ int maxlen;
 }
 
 /*
- * escapes: escape expansion for showsyms. C-style escapes understood include
- * \n, \b, \t, \r, \xnnn (hex), \onnn (octal), \nnn (decimal). The ^-prefix
- * for control characters is also understood, and \[mM] followed by any of the
- * previous forms or by a character has the effect of 'meta'-ing the value (so
- * that the alternate character set will be enabled).
+ * escapes(): escape expansion for showsyms.  C-style escapes understood
+ * include \n, \b, \t, \r, \xnnn (hex), \onnn (octal), \nnn (decimal).
+ * (Note: unlike in C, leading digit 0 is not used to indicate octal;
+ * the letter o (either upper or lower case) is used for that.
+ * The ^-prefix for control characters is also understood, and \[mM]
+ * has the effect of 'meta'-ing the value which follows (so that the
+ * alternate character set will be enabled).
+ *
+ * X     normal key X
+ * ^X    control-X
+ * \mX   meta-X
+ *
+ * For 3.4.3 and earlier, input ending with "\M", backslash, or caret
+ * prior to terminating '\0' would pull that '\0' into the output and then
+ * keep processing past it, potentially overflowing the output buffer.
+ * Now, trailing \ or ^ will act like \\ or \^ and add '\\' or '^' to the
+ * output and stop there; trailing \M will fall through to \<other> and
+ * yield 'M', then stop.  Any \X or \O followed by something other than
+ * an appropriate digit will also fall through to \<other> and yield 'X'
+ * or 'O', plus stop if the non-digit is end-of-string.
  */
 STATIC_OVL void
 escapes(cp, tp)
-const char  *cp;
-char *tp;
+const char *cp; /* might be 'tp', updating in place */
+char *tp; /* result is never longer than 'cp' */
 {
-    while (*cp)
-    {
-        int cval = 0, meta = 0;
+    static NEARDATA const char oct[] = "01234567", dec[] = "0123456789",
+                               hex[] = "00112233445566778899aAbBcCdDeEfF";
+    const char *dp;
+    int cval, meta, dcount;
 
-        if (*cp == '\\' && index("mM", cp[1])) {
-            meta = 1;
+    while (*cp) {
+        /* \M has to be followed by something to do meta conversion,
+           otherwise it will just be \M which ultimately yields 'M' */
+        meta = (*cp == '\\' && (cp[1] == 'm' || cp[1] == 'M') && cp[2]);
+        if (meta) {
             cp += 2;
         }
-        if (*cp == '\\' && index("0123456789xXoO", cp[1]))
-        {
-            const char *dp, *hex = "00112233445566778899aAbBcCdDeEfF";
-            int dcount = 0;
 
-            cp++;
-            if (*cp == 'x' || *cp == 'X')
-                for (++cp; (dp = index(hex, *cp)) && (dcount++ < 2); cp++)
-                    cval = (cval * 16) + (dp - hex) / 2;
-            else if (*cp == 'o' || *cp == 'O')
-                for (++cp; (index("01234567", *cp)) && (dcount++ < 3); cp++)
-                    cval = (cval * 8) + (*cp - '0');
-            else
-                for (; (index("0123456789", *cp)) && (dcount++ < 3); cp++)
-                    cval = (cval * 10) + (*cp - '0');
-        }
-        else if (*cp == '\\' && cp[1] != '\0') /* C-style character escapes */
-        {
-            switch (*++cp)
-            {
-            case '\\': cval = '\\'; break;
-            case 'n': cval = '\n'; break;
-            case 't': cval = '\t'; break;
-            case 'b': cval = '\b'; break;
-            case 'r': cval = '\r'; break;
-            default: cval = *cp;
-            }
-            cp++;
-        }
-        else if (*cp == '^' && cp[1] != '\0') /* expand control-character syntax */
-        {
-            cval = (*++cp & 0x1f);
-            cp++;
-        }
-        else if (*cp != '\0') {
+        cval = dcount = 0; /* for decimal, octal, hexadecimal cases */
+        if ((*cp != '\\' && *cp != '^') || !cp[1]) {
+            /* simple character, or nothing left for \ or ^ to escape */
             cval = *cp++;
-        } else {
-            cval = 0;
-            meta = 0;
+        } else if (*cp == '^') { /* expand control-character syntax */
+            cval = (*++cp & 0x1f);
+            ++cp;
+
+        /* remaining cases are all for backslash; we know cp[1] is not \0 */
+        } else if (index(dec, cp[1])) {
+            ++cp; /* move past backslash to first digit */
+            do {
+                cval = (cval * 10) + (*cp - '0');
+            } while (*++cp && index(dec, *cp) && ++dcount < 3);
+        } else if ((cp[1] == 'o' || cp[1] == 'O') && cp[2] && index(oct, cp[2])) {
+            cp += 2; /* move past backslash and 'O' */
+            do {
+                cval = (cval * 8) + (*cp - '0');
+            } while (*++cp && index(oct, *cp) && ++dcount < 3);
+        } else if ((cp[1] == 'x' || cp[1] == 'X') && cp[2] && (dp = index(hex, cp[2])) != 0) {
+            cp += 2; /* move past backslash and 'X' */
+            do {
+                cval = (cval * 16) + ((int) (dp - hex) / 2);
+            } while (*++cp && (dp = index(hex, *cp)) != 0 && ++dcount < 2);
+        } else { /* C-style character escapes */
+            switch (*++cp) {
+                case '\\': cval = '\\'; break;
+                case 'n':  cval = '\n'; break;
+                case 't':  cval = '\t'; break;
+                case 'b':  cval = '\b'; break;
+                case 'r':  cval = '\r'; break;
+                default:   cval = *cp;
+            }
+            ++cp;
         }
-        if (meta)
+
+        if (meta) {
             cval |= 0x80;
-        *tp++ = cval;
+        }
+        *tp++ = (char) cval;
     }
     *tp = '\0';
 }
@@ -1406,8 +1448,10 @@ char *str;
             break;
         }
 
-    if (c == CLR_MAX)
+    if (c < 0 || c >= CLR_MAX) {
         raw_printf("Unknown color '%s'", str);
+        c = CLR_MAX; /* "none of the above" */
+    }
 
     return c;
 }
@@ -4766,7 +4810,7 @@ char *str;
     char buf[PL_FSIZ];
     boolean user_specified = (str == pl_fruit);
     /* if not user-specified, then it's a fruit name for a fruit on
-     * a bones level...
+     * a bones level or from orctown raider's loot...
      */
 
     /* Note: every fruit has an id (spe for fruit objects) of at least
@@ -4804,8 +4848,8 @@ char *str;
              (!strcmp(str+7, "spinach") ||
               name_to_mon(str+7) >= LOW_PM)) ||
             !strcmp(str, "empty tin") ||
-            ((!strncmp(eos(str)-7, " corpse", 7) ||
-              !strncmp(eos(str)-4, " egg", 4)) &&
+            ((str_end_is(pl_fruit, " corpse") ||
+              str_end_is(pl_fruit, " egg")) &&
              name_to_mon(str) >= LOW_PM))
         {
             Strcpy(buf, pl_fruit);

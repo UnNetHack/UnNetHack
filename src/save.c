@@ -90,7 +90,7 @@ dosave()
             /* make sure they see the Saving message */
             display_nhwindow(WIN_MESSAGE, TRUE);
             exit_nhwindows("Be seeing you...");
-            terminate(EXIT_SUCCESS);
+            nh_terminate(EXIT_SUCCESS);
         } else (void)doredraw();
     }
     return 0;
@@ -107,7 +107,7 @@ int sig_unused;
     (void) signal(SIGINT, SIG_IGN);
     clearlocks();
 #  ifndef VMS
-    terminate(EXIT_FAILURE);
+    nh_terminate(EXIT_FAILURE);
 #  endif
 # else  /* SAVEONHANGUP */
     if (!program_state.done_hup++) {
@@ -120,7 +120,7 @@ int sig_unused;
 #  endif
         {
             clearlocks();
-            terminate(EXIT_FAILURE);
+            nh_terminate(EXIT_FAILURE);
         }
     }
 # endif
@@ -141,6 +141,22 @@ dosave0()
 #ifdef WHEREIS_FILE
     delete_whereis();
 #endif
+    /* we may get here via hangup signal, in which case we want to fix up
+       a few of things before saving so that they won't be restored in
+       an improper state; these will be no-ops for normal save sequence */
+    u.uinvulnerable = 0;
+    if (iflags.save_uswallow) {
+        u.uswallow = 1;
+        iflags.save_uswallow = 0;
+    }
+    if (iflags.save_uinwater) {
+        u.uinwater = 1;
+        iflags.save_uinwater = 0;
+    }
+    if (iflags.save_uburied) {
+        u.uburied = 1;
+        iflags.save_uburied = 0;
+    }
 
     if (!SAVEF[0])
         return 0;
@@ -272,7 +288,7 @@ dosave0()
             HUP pline("%s", whynot);
             (void) close(fd);
             (void) delete_savefile();
-            HUP killer = whynot;
+            HUP Strcpy(killer.name, whynot);
             HUP done(TRICKED);
             return(0);
         }
@@ -391,7 +407,7 @@ savestateinlock()
         if (fd < 0) {
             pline("%s", whynot);
             pline("Probably someone removed it.");
-            killer = whynot;
+            Strcpy(killer.name, whynot);
             done(TRICKED);
             return;
         }
@@ -402,7 +418,7 @@ savestateinlock()
                     "Level #0 pid (%d) doesn't match ours (%d)!",
                     hpid, hackpid);
             pline("%s", whynot);
-            killer = whynot;
+            Strcpy(killer.name, whynot);
             done(TRICKED);
         }
         (void) close(fd);
@@ -410,7 +426,7 @@ savestateinlock()
         fd = create_levelfile(0, whynot);
         if (fd < 0) {
             pline("%s", whynot);
-            killer = whynot;
+            Strcpy(killer.name, whynot);
             done(TRICKED);
             return;
         }
@@ -480,32 +496,64 @@ int mode;
 #ifdef TOS
     short tlev;
 #endif
+    /*
+     *  Level file contents:
+     *    version info (handled by caller);
+     *    save file info (compression type; also by caller);
+     *    process ID;
+     *    internal level number (ledger number);
+     *    bones info;
+     *    actual level data.
+     *
+     *  If we're tearing down the current level without saving anything
+     *  (which happens at end of game or upon entrance to endgame or
+     *  after an aborted restore attempt) then we don't want to do any
+     *  actual I/O.  So when only freeing, we skip to the bones info
+     *  portion (which has some freeing to do), then jump quite a bit
+     *  further ahead to the middle of the 'actual level data' portion.
+     */
+    if (mode != FREE_SAVE) {
+        /* WRITE_SAVE (probably ORed with FREE_SAVE), or COUNT_SAVE */
 
-    /* if we're tearing down the current level without saving anything
-       (which happens upon entrance to the endgame or after an aborted
-       restore attempt) then we don't want to do any actual I/O */
-    if (mode == FREE_SAVE) goto skip_lots;
-    if (iflags.purge_monsters) {
         /* purge any dead monsters (necessary if we're starting
-         * a panic save rather than a normal one, or sometimes
-         * when changing levels without taking time -- e.g.
-         * create statue trap then immediately level teleport) */
-        dmonsfree();
+           a panic save rather than a normal one, or sometimes
+           when changing levels without taking time -- e.g.
+           create statue trap then immediately level teleport) */
+        if (iflags.purge_monsters) {
+            dmonsfree();
+        }
+
+        if (fd < 0) {
+            panic("Save on bad file!"); /* impossible */
+        }
+#ifdef MFLOPPY
+        count_only = (mode & COUNT_SAVE);
+#endif
+        if (lev >= 0 && lev <= maxledgerno()) {
+            level_info[lev].flags |= VISITED;
+        }
+        bwrite(fd, &hackpid, sizeof hackpid);
+#ifdef TOS
+        tlev = lev;
+        tlev &= 0x00ff;
+        bwrite(fd, &tlev, sizeof tlev);
+#else
+        bwrite(fd, &lev, sizeof lev);
+#endif
     }
 
-    if(fd < 0) panic("Save on bad file!");  /* impossible */
-#ifdef MFLOPPY
-    count_only = (mode & COUNT_SAVE);
-#endif
-    if (lev >= 0 && lev <= maxledgerno())
-        level_info[lev].flags |= VISITED;
-    bwrite(fd, (genericptr_t) &hackpid, sizeof(hackpid));
-#ifdef TOS
-    tlev=lev; tlev &= 0x00ff;
-    bwrite(fd, (genericptr_t) &tlev, sizeof(tlev));
-#else
-    bwrite(fd, (genericptr_t) &lev, sizeof(lev));
-#endif
+    /* bones info comes before level data; the intent is for an external
+       program ('hearse') to be able to match a bones file with the
+       corresponding log file entry--or perhaps just skip that?--without
+       the guessing that was needed in 3.4.3 and without having to
+       interpret level data to find where to start; unfortunately it
+       still needs to handle all the data compression schemes */
+    savecemetery(fd, mode, &level.bonesinfo);
+
+    if (mode == FREE_SAVE) {
+        goto skip_lots;
+    }
+
 #ifdef RLECOMP
     {
         /* perform run-length encoding of rm structs */
@@ -583,6 +631,12 @@ skip_lots:
     save_mongen_override(fd, level.mon_gen, mode);
     save_lvl_sounds(fd, level.sounds, mode);
     if (release_data(mode)) {
+        int x,y;
+        for (y = 0; y < ROWNO; y++) {
+            for (x = 0; x < COLNO; x++) {
+                level.monsters[x][y] = 0;
+            }
+        }
         fmon = 0;
         ftrap = 0;
         fobj = 0;
@@ -679,7 +733,7 @@ register int fd;
         if (write(fd, outbuf, outbufp) != outbufp) {
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
             if (program_state.done_hup)
-                terminate(EXIT_FAILURE);
+                nh_terminate(EXIT_FAILURE);
             else
 #endif
             bclose(fd); /* panic (outbufp != 0) */
@@ -704,7 +758,7 @@ register unsigned num;
         if ((unsigned) write(fd, loc, num) != num) {
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
             if (program_state.done_hup)
-                terminate(EXIT_FAILURE);
+                nh_terminate(EXIT_FAILURE);
             else
 #endif
             panic("cannot write %u bytes to file #%d", num, fd);
@@ -809,7 +863,7 @@ register unsigned num;
     if (failed) {
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
         if (program_state.done_hup)
-            terminate(EXIT_FAILURE);
+            nh_terminate(EXIT_FAILURE);
         else
 #endif
         panic("cannot write %u bytes to file #%d", num, fd);
@@ -847,12 +901,41 @@ register int fd, mode;
     for (tmplev = sp_levchn; tmplev; tmplev = tmplev2) {
         tmplev2 = tmplev->next;
         if (perform_bwrite(mode))
-            bwrite(fd, (genericptr_t) tmplev, sizeof(s_level));
+            bwrite(fd, tmplev, sizeof(s_level));
         if (release_data(mode))
-            free((genericptr_t) tmplev);
+            free(tmplev);
     }
     if (release_data(mode))
         sp_levchn = 0;
+}
+
+/* used when saving a level and also when saving dungeon overview data */
+void
+savecemetery(fd, mode, cemeteryaddr)
+int fd;
+int mode;
+struct cemetery **cemeteryaddr;
+{
+    struct cemetery *thisbones, *nextbones;
+    int flag;
+
+    flag = *cemeteryaddr ? 0 : -1;
+    if (perform_bwrite(mode)) {
+        bwrite(fd, &flag, sizeof flag);
+    }
+    nextbones = *cemeteryaddr;
+    while ((thisbones = nextbones) != 0) {
+        nextbones = thisbones->next;
+        if (perform_bwrite(mode)) {
+            bwrite(fd, thisbones, sizeof *thisbones);
+        }
+        if (release_data(mode)) {
+            free(thisbones);
+        }
+    }
+    if (release_data(mode)) {
+        *cemeteryaddr = 0;
+    }
 }
 
 STATIC_OVL void

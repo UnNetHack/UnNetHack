@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)pager.c    3.4 2003/08/13  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,6 +10,7 @@
 STATIC_DCL boolean FDECL(is_swallow_sym, (int));
 STATIC_DCL int FDECL(append_str, (char *, const char *));
 STATIC_DCL struct permonst * FDECL(lookat, (int, int, char *, char *));
+static void FDECL(do_supplemental_info, (char *, struct permonst *, BOOLEAN_P));
 STATIC_DCL int FDECL(do_look, (BOOLEAN_P));
 STATIC_DCL boolean FDECL(help_menu, (int *));
 #ifdef PORT_HELP
@@ -43,9 +43,37 @@ const char *new_str;
     if (strstri(buf, new_str)) return 0;
 
     space_left = BUFSZ - strlen(buf) - 1;
+    if (space_left < 1) {
+        return 0;
+    }
     (void) strncat(buf, " or ", space_left);
     (void) strncat(buf, new_str, space_left - 4);
     return 1;
+}
+
+/* shared by monster probing (via query_objlist!) as well as lookat() */
+char *
+self_lookat(outbuf)
+char *outbuf;
+{
+    char race[QBUFSZ];
+
+    /* include race with role unless polymorphed */
+    race[0] = '\0';
+    if (!Upolyd) {
+        Sprintf(race, "%s ", urace.adj);
+    }
+    Sprintf(outbuf, "%s%s%s called %s",
+            /* being blinded may hide invisibility from self */
+            (Invis && (senseself() || !Blind)) ? "invisible " : "", race,
+            mons[u.umonnum].mname, plname);
+    if (u.usteed) {
+        Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
+    }
+    if (u.uundetected || (Upolyd && U_AP_TYPE)) {
+        mhidden_description(&youmonst, FALSE, eos(outbuf));
+    }
+    return outbuf;
 }
 
 /* describe a hidden monster; used for look_at during extended monster
@@ -152,7 +180,7 @@ struct obj **obj_p;
         if (mtmp && has_mcorpsenm(mtmp)) {
             /* mimic as corpse/statue */
             if (otmp->otyp == SLIME_MOLD) {
-                /* override context.current_fruit to avoid
+                /* override current_fruit to avoid
                      look, use 'O' to make new named fruit, look again
                    giving different results when current_fruit changes */
                 otmp->spe = MCORPSENM(mtmp);
@@ -195,6 +223,164 @@ struct obj **obj_p;
     return fakeobj; /* when True, caller needs to dealloc *obj_p */
 }
 
+static void
+look_at_object(buf, x, y, glyph)
+char *buf; /* output buffer */
+int x, y, glyph;
+{
+    struct obj *otmp = 0;
+    boolean fakeobj = object_from_map(glyph, x, y, &otmp);
+
+    if (otmp) {
+        Strcpy(buf, (otmp->otyp != STRANGE_OBJECT) ?
+                      distant_name(otmp, doname_with_price) : obj_descr[STRANGE_OBJECT].oc_name);
+        if (fakeobj) {
+            otmp->where = OBJ_FREE; /* object_from_map set it to OBJ_FLOOR */
+            dealloc_obj(otmp), otmp = 0;
+        }
+    } else {
+        Strcpy(buf, something); /* sanity precaution */
+    }
+
+    if (otmp && otmp->where == OBJ_BURIED) {
+        Strcat(buf, " (buried)");
+    } else if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR) {
+        Strcat(buf, " embedded in stone");
+    } else if (IS_WALL(levl[x][y].typ) || levl[x][y].typ == SDOOR) {
+        Strcat(buf, " embedded in a wall");
+    } else if (closed_door(x, y)) {
+        Strcat(buf, " embedded in a door");
+    } else if (is_pool(x, y)) {
+        Strcat(buf, " in water");
+    } else if (is_lava(x, y)) {
+        Strcat(buf, " in molten lava"); /* [can this ever happen?] */
+    }
+    return;
+}
+
+static void
+look_at_monster(buf, monbuf, mtmp, x, y)
+char *buf, *monbuf; /* buf: output, monbuf: optional output */
+struct monst *mtmp;
+int x, y;
+{
+    char *name, monnambuf[BUFSZ];
+    boolean accurate = !Hallucination;
+
+    name = (mtmp->data == &mons[PM_COYOTE] && accurate) ?
+            coyotename(mtmp, monnambuf) : distant_monnam(mtmp, ARTICLE_NONE, monnambuf);
+
+    Sprintf(buf, "%s%s%s",
+            (mtmp->mx != x || mtmp->my != y) ?
+             ((mtmp->isshk && accurate) ? "tail of " : "tail of a ") : "",
+            (mtmp->mtame && accurate) ?
+             "tame " : (mtmp->mpeaceful && accurate) ? "peaceful " : "",
+            name);
+    if (mon_wounds(mtmp)) {
+        Strcat(buf, ", ");
+        Strcat(buf, mon_wounds(mtmp));
+    }
+    if (u.ustuck == mtmp) {
+        if (u.uswallow || iflags.save_uswallow) {
+            /* monster detection */
+            Strcat(buf, is_animal(mtmp->data) ? ", swallowing you" : ", engulfing you");
+        } else {
+            Strcat(buf, (Upolyd && sticks(youmonst.data)) ? ", being held" : ", holding you");
+        }
+    }
+    if (mtmp->mleashed) {
+        Strcat(buf, ", leashed to you");
+    }
+
+    if (mtmp->mtrapped && cansee(mtmp->mx, mtmp->my)) {
+        struct trap *t = t_at(mtmp->mx, mtmp->my);
+        int tt = t ? t->ttyp : NO_TRAP;
+
+        /* newsym lets you know of the trap, so mention it here */
+        if (tt == BEAR_TRAP || is_pit(tt) || tt == WEB) {
+            Sprintf(eos(buf), ", trapped in %s",
+                    an(defsyms[trap_to_defsym(tt)].explanation));
+            t->tseen = 1;
+        }
+    }
+
+    /* we know the hero sees a monster at this location, but if it's shown
+       due to persistant monster detection he might remember something else */
+    if (mtmp->mundetected || M_AP_TYPE(mtmp))
+        mhidden_description(mtmp, FALSE, eos(buf));
+
+    if (monbuf) {
+        unsigned how_seen = how_mon_is_seen(mtmp);
+
+        monbuf[0] = '\0';
+        if (how_seen != 0 && how_seen != MONSEEN_NORMAL) {
+            if (how_seen & MONSEEN_NORMAL) {
+                Strcat(monbuf, "normal vision");
+                how_seen &= ~MONSEEN_NORMAL;
+                /* how_seen can't be 0 yet... */
+                if (how_seen) {
+                    Strcat(monbuf, ", ");
+                }
+            }
+            if (how_seen & MONSEEN_SEEINVIS) {
+                Strcat(monbuf, "see invisible");
+                how_seen &= ~MONSEEN_SEEINVIS;
+                if (how_seen) {
+                    Strcat(monbuf, ", ");
+                }
+            }
+            if (how_seen & MONSEEN_INFRAVIS) {
+                Strcat(monbuf, "infravision");
+                how_seen &= ~MONSEEN_INFRAVIS;
+                if (how_seen) {
+                    Strcat(monbuf, ", ");
+                }
+            }
+            if (how_seen & MONSEEN_TELEPAT) {
+                Strcat(monbuf, "telepathy");
+                how_seen &= ~MONSEEN_TELEPAT;
+                if (how_seen) {
+                    Strcat(monbuf, ", ");
+                }
+            }
+            if (how_seen & MONSEEN_XRAYVIS) {
+                /* Eyes of the Overworld */
+                Strcat(monbuf, "astral vision");
+                how_seen &= ~MONSEEN_XRAYVIS;
+                if (how_seen) {
+                    Strcat(monbuf, ", ");
+                }
+            }
+            if (how_seen & MONSEEN_DETECT) {
+                Strcat(monbuf, "monster detection");
+                how_seen &= ~MONSEEN_DETECT;
+                if (how_seen) {
+                    Strcat(monbuf, ", ");
+                }
+            }
+            if (how_seen & MONSEEN_WARNMON) {
+                char wbuf[BUFSZ];
+                if (Hallucination) {
+                    Strcat(monbuf, "paranoid delusion");
+                } else {
+                    Sprintf(wbuf, "warned of %s",
+                            makeplural(mtmp->data->mname));
+                    Strcat(monbuf, wbuf);
+                }
+                how_seen &= ~MONSEEN_WARNMON;
+                if (how_seen) {
+                    Strcat(monbuf, ", ");
+                }
+            }
+            /* should have used up all the how_seen bits by now */
+            if (how_seen) {
+                impossible("lookat: unknown method of seeing monster");
+                Sprintf(eos(monbuf), "(%u)", how_seen);
+            }
+        } /* seen by something other than normal vision */
+    } /* monbuf is non-null */
+}
+
 /*
  * Return the name of the glyph found at (x,y).
  * If not hallucinating and the glyph is a monster, also monster data.
@@ -204,46 +390,30 @@ lookat(x, y, buf, monbuf)
 int x, y;
 char *buf, *monbuf;
 {
-    register struct monst *mtmp = (struct monst *) 0;
+    struct monst *mtmp = (struct monst *) 0;
     struct permonst *pm = (struct permonst *) 0;
     int glyph;
 
-    buf[0] = monbuf[0] = 0;
+    buf[0] = monbuf[0] = '\0';
     glyph = glyph_at(x, y);
-    if (u.ux == x && u.uy == y && senseself()) {
-        char race[QBUFSZ];
+    if (u.ux == x && u.uy == y && canspotself() &&
+         !(iflags.save_uswallow &&
+           glyph == mon_to_glyph(u.ustuck)) &&
+         (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0)) {
+        /* fill in buf[] */
+        (void) self_lookat(buf);
 
-        /* if not polymorphed, show both the role and the race */
-        race[0] = 0;
-        if (!Upolyd) {
-            Sprintf(race, "%s ", urace.adj);
-        }
-
-        Sprintf(buf, "%s%s%s called %s",
-                Invis ? "invisible " : "",
-                race,
-                mons[u.umonnum].mname,
-                plname);
         /* file lookup can't distinguish between "gnomish wizard" monster
            and correspondingly named player character, always picking the
            former; force it to find the general "wizard" entry instead */
         if (Role_if(PM_WIZARD) && Race_if(PM_GNOME) && !Upolyd)
             pm = &mons[PM_WIZARD];
 
-#ifdef STEED
-        if (u.usteed) {
-            char steedbuf[BUFSZ];
-
-            Sprintf(steedbuf, ", mounted on %s", y_monnam(u.usteed));
-            /* assert((sizeof buf >= strlen(buf)+strlen(steedbuf)+1); */
-            Strcat(buf, steedbuf);
-        }
-#endif
         /* When you see yourself normally, no explanation is appended
            (even if you could also see yourself via other means).
            Sensing self while blind or swallowed is treated as if it
            were by normal vision (cf canseeself()). */
-        if ((Invisible || u.uundetected) && !Blind && !u.uswallow) {
+        if ((Invisible || u.uundetected) && !Blind && !(u.uswallow || iflags.save_uswallow)) {
             unsigned how = 0;
 
             if (Infravision) how |= 1;
@@ -261,153 +431,41 @@ char *buf, *monbuf;
                         (how & 4) ? "monster detection" : "");
         }
     } else if (u.uswallow) {
-        /* all locations when swallowed other than the hero are the monster */
-        Sprintf(buf, "interior of %s",
-                Blind ? "a monster" : a_monnam(u.ustuck));
+        /* when swallowed, we're only called for spots adjacent to hero,
+           and blindness doesn't prevent hero from feeling what holds him */
+        Sprintf(buf, "interior of %s", a_monnam(u.ustuck));
         pm = u.ustuck->data;
     } else if (glyph_is_monster(glyph)) {
         bhitpos.x = x;
         bhitpos.y = y;
-        mtmp = m_at(x, y);
-        if (mtmp != (struct monst *) 0) {
-            char *name, monnambuf[BUFSZ];
-            boolean accurate = !Hallucination;
-
-            if (mtmp->data == &mons[PM_COYOTE] && accurate)
-                name = coyotename(mtmp, monnambuf);
-            else
-                name = distant_monnam(mtmp, ARTICLE_NONE, monnambuf);
-
+        if ((mtmp = m_at(x, y)) != 0) {
+            look_at_monster(buf, monbuf, mtmp, x, y);
             pm = mtmp->data;
-            Sprintf(buf, "%s%s%s",
-                    (mtmp->mx != x || mtmp->my != y) ?
-                    ((mtmp->isshk && accurate)
-                     ? "tail of " : "tail of a ") : "",
-                    (mtmp->mtame && accurate) ? "tame " :
-                    (mtmp->mpeaceful && accurate) ? "peaceful " : "",
-                    name);
-            if (mon_wounds(mtmp)) {
-                Strcat(buf, ", ");
-                Strcat(buf, mon_wounds(mtmp));
-            } if (u.ustuck == mtmp)
-                Strcat(buf, (Upolyd && sticks(youmonst.data)) ?
-                       ", being held" : ", holding you");
-            if (mtmp->mleashed)
-                Strcat(buf, ", leashed to you");
-
-            if (mtmp->mtrapped && cansee(mtmp->mx, mtmp->my)) {
-                struct trap *t = t_at(mtmp->mx, mtmp->my);
-                int tt = t ? t->ttyp : NO_TRAP;
-
-                /* newsym lets you know of the trap, so mention it here */
-                if (tt == BEAR_TRAP || tt == PIT ||
-                    tt == SPIKED_PIT || tt == WEB)
-                    Sprintf(eos(buf), ", trapped in %s",
-                            an(defsyms[trap_to_defsym(tt)].explanation));
-            }
-
-            {
-                int ways_seen = 0, normal = 0, xraydist;
-                boolean useemon = (boolean) canseemon(mtmp);
-
-                xraydist = (u.xray_range<0) ? -1 : u.xray_range * u.xray_range;
-                /* normal vision */
-                if ((mtmp->wormno ? worm_known(mtmp) : cansee(mtmp->mx, mtmp->my)) &&
-                    mon_visible(mtmp) && !mtmp->minvis) {
-                    ways_seen++;
-                    normal++;
-                }
-                /* see invisible */
-                if (useemon && mtmp->minvis)
-                    ways_seen++;
-                /* infravision */
-                if ((!mtmp->minvis || See_invisible) && see_with_infrared(mtmp))
-                    ways_seen++;
-                /* telepathy */
-                if (tp_sensemon(mtmp))
-                    ways_seen++;
-                /* xray */
-                if (useemon && xraydist > 0 &&
-                    distu(mtmp->mx, mtmp->my) <= xraydist)
-                    ways_seen++;
-                if (Detect_monsters)
-                    ways_seen++;
-                if (MATCH_WARN_OF_MON(mtmp))
-                    ways_seen++;
-
-                if (ways_seen > 1 || !normal) {
-                    if (normal) {
-                        Strcat(monbuf, "normal vision");
-                        /* can't actually be 1 yet here */
-                        if (ways_seen-- > 1) Strcat(monbuf, ", ");
-                    }
-                    if (useemon && mtmp->minvis) {
-                        Strcat(monbuf, "see invisible");
-                        if (ways_seen-- > 1) Strcat(monbuf, ", ");
-                    }
-                    if ((!mtmp->minvis || See_invisible) &&
-                        see_with_infrared(mtmp)) {
-                        Strcat(monbuf, "infravision");
-                        if (ways_seen-- > 1) Strcat(monbuf, ", ");
-                    }
-                    if (tp_sensemon(mtmp)) {
-                        Strcat(monbuf, "telepathy");
-                        if (ways_seen-- > 1) Strcat(monbuf, ", ");
-                    }
-                    if (useemon && xraydist > 0 &&
-                        distu(mtmp->mx, mtmp->my) <= xraydist) {
-                        /* Eyes of the Overworld */
-                        Strcat(monbuf, "astral vision");
-                        if (ways_seen-- > 1) Strcat(monbuf, ", ");
-                    }
-                    if (Detect_monsters) {
-                        Strcat(monbuf, "monster detection");
-                        if (ways_seen-- > 1) Strcat(monbuf, ", ");
-                    }
-                    if (MATCH_WARN_OF_MON(mtmp)) {
-                        char wbuf[BUFSZ];
-                        if (Hallucination)
-                            Strcat(monbuf, "paranoid delusion");
-                        else {
-                            Sprintf(wbuf, "warned of %s",
-                                    makeplural(mtmp->data->mname));
-                            Strcat(monbuf, wbuf);
-                        }
-                        if (ways_seen-- > 1) Strcat(monbuf, ", ");
-                    }
-                }
-            }
+        } else if (Hallucination) {
+            /* 'monster' must actually be a statue */
+            Strcpy(buf, rndmonnam());
         }
-    }
-    else if (glyph_is_object(glyph)) {
-        struct obj *otmp = vobj_at(x, y);
-
-        if (!otmp || otmp->otyp != glyph_to_obj(glyph)) {
-            if (glyph_to_obj(glyph) != STRANGE_OBJECT) {
-                otmp = mksobj(glyph_to_obj(glyph), FALSE, FALSE);
-                if (otmp->oclass == COIN_CLASS)
-                    otmp->quan = 2L; /* to force pluralization */
-                else if (otmp->otyp == SLIME_MOLD)
-                    otmp->spe = current_fruit; /* give the fruit a type */
-                Strcpy(buf, distant_name(otmp, xname));
-                dealloc_obj(otmp);
-            }
-        } else
-            Strcpy(buf, distant_name(otmp, xname));
-
-        if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
-            Strcat(buf, " embedded in stone");
-        else if (IS_WALL(levl[x][y].typ) || levl[x][y].typ == SDOOR)
-            Strcat(buf, " embedded in a wall");
-        else if (closed_door(x, y))
-            Strcat(buf, " embedded in a door");
-        else if (is_pool(x, y))
-            Strcat(buf, " in water");
-        else if (is_lava(x, y))
-            Strcat(buf, " in molten lava"); /* [can this ever happen?] */
+    } else if (glyph_is_object(glyph)) {
+        look_at_object(buf, x, y, glyph); /* fill in buf[] */
     } else if (glyph_is_trap(glyph)) {
         int tnum = what_trap(glyph_to_trap(glyph));
-        Strcpy(buf, defsyms[trap_to_defsym(tnum)].explanation);
+
+        /* Trap detection displays a bear trap at locations having
+         * a trapped door or trapped container or both.
+         * TODO: we should create actual trap types for doors and
+         * chests so that they can have their own glyphs and tiles.
+         */
+        if (trapped_chest_at(tnum, x, y)) {
+            Strcpy(buf, "trapped chest"); /* might actually be a large box */
+        } else if (trapped_door_at(tnum, x, y)) {
+            Strcpy(buf, "trapped door"); /* not "trap door"... */
+        } else {
+            Strcpy(buf, defsyms[trap_to_defsym(tnum)].explanation);
+        }
+    } else if (glyph_is_warning(glyph)) {
+        int warnindx = glyph_to_warning(glyph);
+
+        Strcpy(buf, def_warnsyms[warnindx].explanation);
     } else if(!glyph_is_cmap(glyph)) {
         Strcpy(buf, "unexplored area");
     } else switch(glyph_to_cmap(glyph)) {
@@ -431,6 +489,21 @@ char *buf, *monbuf;
         case S_icewall:
             Strcat(buf, "ice wall");
             break;
+        case S_stone:
+            if (!levl[x][y].seenv) {
+                Strcpy(buf, "unexplored");
+                break;
+            } else if (Underwater && !Is_waterlevel(&u.uz)) {
+                /* "unknown" == previously mapped but not visible when
+                   submerged; better terminology appreciated... */
+                Strcpy(buf, (distu(x, y) <= 2) ? "land" : "unknown");
+                break;
+            } else if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR) {
+                Strcpy(buf, "stone");
+                break;
+            }
+            /* fall through */
+
         default:
             Strcpy(buf, defsyms[glyph_to_cmap(glyph)].explanation);
             break;
@@ -450,22 +523,29 @@ char *buf, *monbuf;
  *   Therefore, we create a copy of inp _just_ for data.base lookup.
  */
 void
-checkfile(inp, pm, user_typed_name, without_asking)
+checkfile(inp, pm, user_typed_name, without_asking, supplemental_name)
 char *inp;
 struct permonst *pm;
 boolean user_typed_name, without_asking;
+char *supplemental_name;
 {
     dlb *fp;
-    char buf[BUFSZ], newstr[BUFSZ];
+    char buf[BUFSZ], newstr[BUFSZ], givenname[BUFSZ];
     char *ep, *dbase_str;
     long txt_offset;
     int chk_skip;
     boolean found_in_file = FALSE, skipping_entry = FALSE;
+    winid datawin = WIN_ERR;
 
     fp = dlb_fopen_area(NH_DATAAREA, DATAFILE, "r");
     if (!fp) {
-        pline("Cannot open data file!");
+        pline("Cannot open 'data' file!");
         return;
+    }
+    /* If someone passed us garbage, prevent fault. */
+    if (!inp || strlen(inp) > (BUFSZ - 1)) {
+        impossible("bad do_look buffer passed (%s)!", !inp ? "null" : "too long");
+        goto checkfile_done;
     }
 
     /* To prevent the need for entries in data.base like *ngel to account
@@ -477,130 +557,573 @@ boolean user_typed_name, without_asking;
     else dbase_str = strcpy(newstr, inp);
     (void) lcase(dbase_str);
 
-    if (!strncmp(dbase_str, "interior of ", 12))
+    if (!strncmp(dbase_str, "interior of ", 12)) {
         dbase_str += 12;
-    if (!strncmp(dbase_str, "a ", 2))
+    }
+    if (!strncmp(dbase_str, "a ", 2)) {
         dbase_str += 2;
-    else if (!strncmp(dbase_str, "an ", 3))
+    } else if (!strncmp(dbase_str, "an ", 3)) {
         dbase_str += 3;
-    else if (!strncmp(dbase_str, "the ", 4))
+    } else if (!strncmp(dbase_str, "the ", 4)) {
         dbase_str += 4;
-    if (!strncmp(dbase_str, "tame ", 5))
+    } else if (!strncmp(dbase_str, "some ", 5)) {
         dbase_str += 5;
-    else if (!strncmp(dbase_str, "peaceful ", 9))
+    } else if (digit(*dbase_str)) {
+        /* remove count prefix ("2 ya") which can come from looking at map */
+        while (digit(*dbase_str)) {
+            ++dbase_str;
+        }
+        if (*dbase_str == ' ') {
+            ++dbase_str;
+        }
+    }
+    if (!strncmp(dbase_str, "pair of ", 8)) {
+        dbase_str += 8;
+    }
+    if (!strncmp(dbase_str, "tame ", 5)) {
+        dbase_str += 5;
+    } else if (!strncmp(dbase_str, "peaceful ", 9)) {
         dbase_str += 9;
-    if (!strncmp(dbase_str, "invisible ", 10))
+    }
+    if (!strncmp(dbase_str, "invisible ", 10)) {
         dbase_str += 10;
-    if (!strncmp(dbase_str, "statue of ", 10))
+    }
+    if (!strncmp(dbase_str, "saddled ", 8)) {
+        dbase_str += 8;
+    }
+    if (!strncmp(dbase_str, "blessed ", 8)) {
+        dbase_str += 8;
+    } else if (!strncmp(dbase_str, "uncursed ", 9)) {
+        dbase_str += 9;
+    } else if (!strncmp(dbase_str, "cursed ", 7)) {
+        dbase_str += 7;
+    }
+    if (!strncmp(dbase_str, "empty ", 6)) {
+        dbase_str += 6;
+    }
+    if (!strncmp(dbase_str, "partly used ", 12)) {
+        dbase_str += 12;
+    } else if (!strncmp(dbase_str, "partly eaten ", 13)) {
+        dbase_str += 13;
+    }
+    if (!strncmp(dbase_str, "statue of ", 10)) {
         dbase_str[6] = '\0';
-    else if (!strncmp(dbase_str, "figurine of ", 12))
+    } else if (!strncmp(dbase_str, "figurine of ", 12)) {
         dbase_str[8] = '\0';
+    }
+    /* remove enchantment ("+0 aklys"); [for 3.6.0 and earlier, this wasn't
+       needed because looking at items on the map used xname() rather than
+       doname() hence known enchantment was implicitly suppressed] */
+    if (*dbase_str && index("+-", dbase_str[0]) && digit(dbase_str[1])) {
+        ++dbase_str; /* skip sign */
+        while (digit(*dbase_str)) {
+            ++dbase_str;
+        }
+        if (*dbase_str == ' ') {
+            ++dbase_str;
+        }
+    }
+    /* "towel", "wet towel", and "moist towel" share one data.base entry;
+       for "wet towel", we keep prefix so that the prompt will ask about
+       "wet towel"; for "moist towel", we also want to ask about "wet towel".
+       (note: strncpy() only terminates output string if the specified
+       count is bigger than the length of the substring being copied) */
+    if (!strncmp(dbase_str, "moist towel", 11)) {
+        (void) strncpy(dbase_str += 2, "wet", 3); /* skip "mo" replace "ist" */
+    }
 
     /* Make sure the name is non-empty. */
     if (*dbase_str) {
-        /* adjust the input to remove "named " and convert to lower case */
-        char *alt = 0; /* alternate description */
+        long pass1offset = -1L;
+        int chk_skip, pass = 1;
+        boolean yes_to_moreinfo, found_in_file, pass1found_in_file, skipping_entry;
+        char *sp, *ap, *alt = 0; /* alternate description */
 
-        if ((ep = strstri(dbase_str, " named ")) != 0)
+        /* adjust the input to remove "named " and "called " */
+        if ((ep = strstri(dbase_str, " named ")) != 0) {
             alt = ep + 7;
-        else
-            ep = strstri(dbase_str, " called ");
-        if (!ep) ep = strstri(dbase_str, ", ");
-        if (ep && ep > dbase_str) *ep = '\0';
+            if ((ap = strstri(dbase_str, " called ")) != 0 && ap < ep)
+                ep = ap; /* "named" is alt but truncate at "called" */
+        } else if ((ep = strstri(dbase_str, " called ")) != 0) {
+            copynchars(givenname, ep + 8, BUFSZ - 1);
+            alt = givenname;
+            if (supplemental_name && (sp = strstri(inp, " called ")) != 0)
+                copynchars(supplemental_name, sp + 8, BUFSZ - 1);
+        } else
+            ep = strstri(dbase_str, ", ");
+        if (ep && ep > dbase_str)
+            *ep = '\0';
+        /* remove article from 'alt' name ("a pair of lenses named
+           The Eyes of the Overworld" simplified above to "lenses named
+           The Eyes of the Overworld", now reduced to "The Eyes of the
+           Overworld", skip "The" as with base name processing) */
+        if (alt && (!strncmpi(alt, "a ", 2)
+                    || !strncmpi(alt, "an ", 3)
+                    || !strncmpi(alt, "the ", 4)))
+            alt = index(alt, ' ') + 1;
+        /* remove charges or "(lit)" or wizmode "(N aum)" */
+        if ((ep = strstri(dbase_str, " (")) != 0 && ep > dbase_str)
+            *ep = '\0';
+        if (alt && (ap = strstri(alt, " (")) != 0 && ap > alt)
+            *ap = '\0';
 
         /*
          * If the object is named, then the name is the alternate description;
-         * otherwise, the result of makesingular() applied to the name is. This
-         * isn't strictly optimal, but named objects of interest to the user
-         * will usually be found under their name, rather than under their
-         * object type, so looking for a singular form is pointless.
+         * otherwise, the result of makesingular() applied to the name is.
+         * This isn't strictly optimal, but named objects of interest to the
+         * user will usually be found under their name, rather than under
+         * their object type, so looking for a singular form is pointless.
          */
-
         if (!alt)
             alt = makesingular(dbase_str);
-        else
-        if (user_typed_name)
-            (void) lcase(alt);
 
-        /* skip first record; read second */
-        txt_offset = 0L;
-        if (!dlb_fgets(buf, BUFSZ, fp) || !dlb_fgets(buf, BUFSZ, fp)) {
-            impossible("can't read 'data' file");
-            (void) dlb_fclose(fp);
-            return;
-        } else if (sscanf(buf, "%8lx\n", &txt_offset) < 1 || txt_offset <= 0)
-            goto bad_data_file;
+        pass1found_in_file = FALSE;
+        for (pass = !strcmp(alt, dbase_str) ? 0 : 1; pass >= 0; --pass) {
+            found_in_file = skipping_entry = FALSE;
+            txt_offset = 0L;
+            if (dlb_fseek(fp, txt_offset, SEEK_SET) < 0 ) {
+                impossible("can't get to start of 'data' file");
+                goto checkfile_done;
+            }
+            /* skip first record; read second */
+            if (!dlb_fgets(buf, BUFSZ, fp) || !dlb_fgets(buf, BUFSZ, fp)) {
+                impossible("can't read 'data' file");
+                goto checkfile_done;
+            } else if (sscanf(buf, "%8lx\n", &txt_offset) < 1
+                       || txt_offset == 0L)
+                goto bad_data_file;
 
-        /* look for the appropriate entry */
-        while (dlb_fgets(buf, BUFSZ, fp)) {
-            if (*buf == '.') break; /* we passed last entry without success */
+            /* look for the appropriate entry */
+            while (dlb_fgets(buf, BUFSZ, fp)) {
+                if (*buf == '.')
+                    break; /* we passed last entry without success */
 
-            if (digit(*buf)) {
-                /* a number indicates the end of current entry */
-                skipping_entry = FALSE;
-            } else if (!skipping_entry) {
-                if (!(ep = index(buf, '\n'))) goto bad_data_file;
-                *ep = 0;
-                /* if we match a key that begins with "~", skip this entry */
-                chk_skip = (*buf == '~') ? 1 : 0;
-                if (pmatch(&buf[chk_skip], dbase_str) ||
-                    (alt && pmatch(&buf[chk_skip], alt))) {
-                    if (chk_skip) {
-                        skipping_entry = TRUE;
-                        continue;
-                    } else {
-                        found_in_file = TRUE;
-                        break;
+                if (digit(*buf)) {
+                    /* a number indicates the end of current entry */
+                    skipping_entry = FALSE;
+                } else if (!skipping_entry) {
+                    if (!(ep = index(buf, '\n')))
+                        goto bad_data_file;
+                    (void) strip_newline((ep > buf) ? ep - 1 : ep);
+                    /* if we match a key that begins with "~", skip
+                       this entry */
+                    chk_skip = (*buf == '~') ? 1 : 0;
+                    if ((pass == 0 && pmatch(&buf[chk_skip], dbase_str))
+                        || (pass == 1 && alt && pmatch(&buf[chk_skip], alt))) {
+                        if (chk_skip) {
+                            skipping_entry = TRUE;
+                            continue;
+                        } else {
+                            found_in_file = TRUE;
+                            if (pass == 1)
+                                pass1found_in_file = TRUE;
+                            break;
+                        }
                     }
                 }
             }
+            if (found_in_file) {
+                long entry_offset, fseekoffset;
+                int entry_count;
+                int i;
+
+                /* skip over other possible matches for the info */
+                do {
+                    if (!dlb_fgets(buf, BUFSZ, fp))
+                        goto bad_data_file;
+                } while (!digit(*buf));
+                if (sscanf(buf, "%ld,%d\n", &entry_offset, &entry_count) < 2)
+                    goto bad_data_file;
+                fseekoffset = (long) txt_offset + entry_offset;
+                if (pass == 1)
+                    pass1offset = fseekoffset;
+                else if (fseekoffset == pass1offset)
+                    goto checkfile_done;
+
+                yes_to_moreinfo = FALSE;
+                if (!user_typed_name && !without_asking) {
+                    char *entrytext = pass ? alt : dbase_str;
+                    char question[QBUFSZ];
+
+                    Strcpy(question, "More info about \"");
+                    /* +2 => length of "\"?" */
+                    copynchars(eos(question), entrytext,
+                               (int) (sizeof question - 1
+                                      - (strlen(question) + 2)));
+                    Strcat(question, "\"?");
+                    if (yn(question) == 'y')
+                        yes_to_moreinfo = TRUE;
+                }
+
+                if (user_typed_name || without_asking || yes_to_moreinfo) {
+                    if (dlb_fseek(fp, fseekoffset, SEEK_SET) < 0) {
+                        pline("? Seek error on 'data' file!");
+                        goto checkfile_done;
+                    }
+                    datawin = create_nhwindow(NHW_MENU);
+                    for (i = 0; i < entry_count; i++) {
+                        if (!dlb_fgets(buf, BUFSZ, fp))
+                            goto bad_data_file;
+                        (void) strip_newline(buf);
+                        if (index(buf + 1, '\t') != 0)
+                            (void) tabexpand(buf + 1);
+                        putstr(datawin, 0, buf + 1);
+                    }
+                    display_nhwindow(datawin, FALSE);
+                    destroy_nhwindow(datawin), datawin = WIN_ERR;
+                }
+            } else if (user_typed_name && pass == 0 && !pass1found_in_file)
+                pline("I don't have any information on those things.");
         }
     }
 
-    if(found_in_file) {
-        long entry_offset;
-        int entry_count;
-        int i;
+    goto checkfile_done; /* skip error feedback */
 
-        /* skip over other possible matches for the info */
-        do {
-            if (!dlb_fgets(buf, BUFSZ, fp)) goto bad_data_file;
-        } while (!digit(*buf));
-        if (sscanf(buf, "%ld,%d\n", &entry_offset, &entry_count) < 2) {
-bad_data_file:  impossible("'data' file in wrong format");
-            (void) dlb_fclose(fp);
-            return;
-        }
+ bad_data_file:
+    impossible("'data' file in wrong format or corrupted");
 
-        if (user_typed_name || without_asking || yn("More info?") == 'y') {
-            winid datawin;
-
-            if (dlb_fseek(fp, txt_offset + entry_offset, SEEK_SET) < 0) {
-                pline("? Seek error on 'data' file!");
-                (void) dlb_fclose(fp);
-                return;
-            }
-            datawin = create_nhwindow(NHW_MENU);
-            for (i = 0; i < entry_count; i++) {
-                if (!dlb_fgets(buf, BUFSZ, fp)) goto bad_data_file;
-                if ((ep = index(buf, '\n')) != 0) *ep = 0;
-                if (index(buf+1, '\t') != 0) (void) tabexpand(buf+1);
-                putstr(datawin, 0, buf+1);
-            }
-            display_nhwindow(datawin, FALSE);
-            destroy_nhwindow(datawin);
-        }
-    } else if (user_typed_name)
-        pline("I don't have any information on those things.");
-
+ checkfile_done:
+    if (datawin != WIN_ERR) {
+        destroy_nhwindow(datawin);
+    }
     (void) dlb_fclose(fp);
 }
 
 /* getpos() return values */
-#define LOOK_TRADITIONAL    0   /* '.' -- ask about "more info?" */
-#define LOOK_QUICK      1   /* ',' -- skip "more info?" */
-#define LOOK_ONCE       2   /* ';' -- skip and stop looping */
-#define LOOK_VERBOSE        3   /* ':' -- show more info w/o asking */
+#define LOOK_TRADITIONAL 0   /* '.' -- ask about "more info?" */
+#define LOOK_QUICK       1   /* ',' -- skip "more info?" */
+#define LOOK_ONCE        2   /* ';' -- skip and stop looping */
+#define LOOK_VERBOSE     3   /* ':' -- show more info w/o asking */
+
+int
+do_screen_description(cc, looked, sym, out_str, firstmatch, for_supplement)
+coord cc;
+boolean looked;
+glyph_t sym;
+char *out_str;
+const char **firstmatch;
+struct permonst **for_supplement;
+{
+    static const char mon_interior[] = "the interior of a monster";
+    static const char unreconnoitered[] = "unreconnoitered";
+    static char look_buf[BUFSZ];
+    char prefix[BUFSZ];
+    int i, alt_i, j, glyph = NO_GLYPH,
+        skipped_venom = 0, found = 0; /* count of matching syms found */
+    boolean hit_trap, need_to_look = FALSE,
+            submerged = (Underwater && !Is_waterlevel(&u.uz));
+    const char *x_str;
+    nhsym tmpsym;
+
+    if (looked) {
+        int oc;
+        unsigned os;
+
+        glyph = glyph_at(cc.x, cc.y);
+        /* Convert glyph at selected position to a symbol for use below. */
+        (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y, 0);
+
+        Sprintf(prefix, "%s        ", encglyph(glyph));
+    } else {
+        Sprintf(prefix, "%c        ", sym);
+    }
+
+    /*
+     * Check all the possibilities, saving all explanations in a buffer.
+     * When all have been checked then the string is printed.
+     */
+
+    /*
+     * Handle restricted vision range (limited to adjacent spots when
+     * swallowed or underwater) cases first.
+     *
+     * 3.6.0 listed anywhere on map, other than self, as "interior
+     * of a monster" when swallowed, and non-adjacent water or
+     * non-water anywhere as "dark part of a room" when underwater.
+     * "unreconnoitered" is an attempt to convey "even if you knew
+     * what was there earlier, you don't know what is there in the
+     * current circumstance".
+     *
+     * (Note: 'self' will always be visible when swallowed so we don't
+     * need special swallow handling for <ux,uy>.
+     * Another note: for '#terrain' without monsters, u.uswallow and
+     * submerged will always both be False and skip this code.)
+     */
+    x_str = 0;
+    if (!looked) {
+        ; /* skip special handling */
+    } else if (((u.uswallow || submerged) && distu(cc.x, cc.y) > 2) ||
+               /* detection showing some category, so mostly background */
+               (((iflags.terrainmode & (TER_DETECT | TER_MAP)) == TER_DETECT) &&
+                (glyph == cmap_to_glyph(S_stone)))) {
+        x_str = unreconnoitered;
+        need_to_look = FALSE;
+    } else if (is_swallow_sym(sym)) {
+        x_str = mon_interior;
+        need_to_look = TRUE; /* for specific monster type */
+    }
+    if (x_str) {
+        /* we know 'found' is zero here, but guard against some other
+           special case being inserted ahead of us someday */
+        if (!found) {
+            Sprintf(out_str, "%s%s", prefix, x_str);
+            *firstmatch = x_str;
+            found++;
+        } else {
+            found += append_str(out_str, x_str); /* not 'an(x_str)' */
+        }
+        /* for is_swallow_sym(), we want to list the current symbol's
+           other possibilities (wand for '/', throne for '\\', &c) so
+           don't jump to the end for the x_str==mon_interior case */
+        if (x_str == unreconnoitered) {
+            goto didlook;
+        }
+    }
+ check_monsters:
+    /* Check for monsters */
+#if NEXT_VERSION
+    if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
+        for (i = 1; i < MAXMCLASSES; i++) {
+            if (sym == (looked ? showsyms[i + SYM_OFF_M] : def_monsyms[i].sym) &&
+                 def_monsyms[i].explain && *def_monsyms[i].explain) {
+                need_to_look = TRUE;
+                if (!found) {
+                    Sprintf(out_str, "%s%s", prefix, an(def_monsyms[i].explain));
+                    *firstmatch = def_monsyms[i].explain;
+                    found++;
+                } else {
+                    found += append_str(out_str, an(def_monsyms[i].explain));
+                }
+            }
+        }
+        /* handle '@' as a special case if it refers to you and you're
+           playing a character which isn't normally displayed by that
+           symbol; firstmatch is assumed to already be set for '@' */
+        if ((looked ? (sym == showsyms[S_HUMAN + SYM_OFF_M] && cc.x == u.ux && cc.y == u.uy) :
+                      (sym == def_monsyms[S_HUMAN].sym && !flags.showrace)) &&
+             !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd) {
+            found += append_str(out_str, "you"); /* tack on "or you" */
+        }
+    }
+
+    /* Now check for objects */
+    if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0) {
+        for (i = 1; i < MAXOCLASSES; i++) {
+            if (sym == (looked ? showsyms[i + SYM_OFF_O] : def_oc_syms[i].sym) ||
+                 (looked && i == ROCK_CLASS && glyph_is_statue(glyph))) {
+                need_to_look = TRUE;
+                if (looked && i == VENOM_CLASS) {
+                    skipped_venom++;
+                    continue;
+                }
+                if (!found) {
+                    Sprintf(out_str, "%s%s", prefix, an(def_oc_syms[i].explain));
+                    *firstmatch = def_oc_syms[i].explain;
+                    found++;
+                } else {
+                    found += append_str(out_str, an(def_oc_syms[i].explain));
+                }
+            }
+        }
+    }
+#endif
+
+    if (sym == DEF_INVISIBLE) {
+        extern const char altinvisexplain[]; /* drawing.c */
+        /* for active clairvoyance, use alternate "unseen creature" */
+        boolean usealt = (EDetect_monsters & I_SPECIAL) != 0L;
+        const char *unseen_explain = !usealt ? invisexplain : altinvisexplain;
+
+        if (!found) {
+            Sprintf(out_str, "%s%s", prefix, an(unseen_explain));
+            *firstmatch = unseen_explain;
+            found++;
+        } else {
+            found += append_str(out_str, an(unseen_explain));
+        }
+    }
+
+    /* Now check for graphics symbols */
+    alt_i = (sym == (looked ? showsyms[0] : defsyms[0].sym)) ? 0 : (2 + 1);
+    for (hit_trap = FALSE, i = 0; i < MAXPCHARS; i++) {
+        /* when sym is the default background character, we process
+           i == 0 three times: unexplored, stone, dark part of a room */
+        if (alt_i < 2) {
+            x_str = !alt_i++ ? "unexplored" : submerged ? "unknown" : "stone";
+            i = 0; /* for second iteration, undo loop increment */
+            /* alt_i is now 1 or 2 */
+        } else {
+            if (alt_i++ == 2) {
+                i = 0; /* undo loop increment */
+            }
+            x_str = defsyms[i].explanation;
+            if (submerged && !strcmp(x_str, defsyms[0].explanation)) {
+                x_str = "land"; /* replace "dark part of a room" */
+            }
+            /* alt_i is now 3 or more and no longer of interest */
+        }
+        if (sym == (looked ? showsyms[i] : defsyms[i].sym) && *x_str) {
+            /* avoid "an unexplored", "an stone", "an air", "a water",
+               "a floor of a room", "a dark part of a room";
+               article==2 => "the", 1 => "an", 0 => (none) */
+            int article = strstri(x_str, " of a room") ? 2 :
+                              !((alt_i <= 2) ||
+                                strcmp(x_str, "air") == 0 ||
+                                strcmp(x_str, "land") == 0 ||
+                                strcmp(x_str, "water") == 0);
+
+            if (!found) {
+                if (is_cmap_trap(i)) {
+                    Sprintf(out_str, "%sa trap", prefix);
+                    hit_trap = TRUE;
+                } else {
+                    Sprintf(out_str, "%s%s", prefix,
+                            article == 2 ? the(x_str) :
+                            article == 1 ? an(x_str) : x_str);
+                }
+                *firstmatch = x_str;
+                found++;
+            } else if (!(hit_trap && is_cmap_trap(i)) &&
+                       !(found >= 3 && is_cmap_drawbridge(i)) &&
+                       /* don't mention vibrating square outside of Gehennom
+                          unless this happens to be one (hallucination?) */
+                       (i != S_vibrating_square ||
+                        Inhell ||
+                        (looked && glyph_is_trap(glyph) && glyph_to_trap(glyph) == VIBRATING_SQUARE))) {
+                found += append_str(out_str, (article == 2) ? the(x_str) :
+                                             (article == 1) ? an(x_str) : x_str);
+                if (is_cmap_trap(i)) {
+                    hit_trap = TRUE;
+                }
+            }
+
+            if (i == S_altar || is_cmap_trap(i)) {
+                need_to_look = TRUE;
+            }
+        }
+    }
+
+    /* Now check for warning symbols */
+    for (i = 1; i < WARNCOUNT; i++) {
+        x_str = def_warnsyms[i].explanation;
+        if (sym == (looked ? warnsyms[i] : def_warnsyms[i].sym)) {
+            if (!found) {
+                Sprintf(out_str, "%s%s", prefix, def_warnsyms[i].explanation);
+                *firstmatch = def_warnsyms[i].explanation;
+                found++;
+            } else {
+                found += append_str(out_str, def_warnsyms[i].explanation);
+            }
+            /* Kludge: warning trumps boulders on the display.
+               Reveal the boulder too or player can get confused */
+            if (looked && sobj_at(BOULDER, cc.x, cc.y)) {
+                Strcat(out_str, " co-located with a boulder");
+            }
+            break; /* out of for loop*/
+        }
+    }
+
+    /* if we ignored venom and list turned out to be short, put it back */
+#if NEXT_VERSION
+    if (skipped_venom && found < 2) {
+        x_str = def_oc_syms[VENOM_CLASS].explain;
+        if (!found) {
+            Sprintf(out_str, "%s%s", prefix, an(x_str));
+            *firstmatch = x_str;
+            found++;
+        } else {
+            found += append_str(out_str, an(x_str));
+        }
+    }
+#endif
+
+    /* Finally, handle some optional overriding symbols */
+    for (j = SYM_OFF_X; j < SYM_MAX; ++j) {
+        if (j == (SYM_INVISIBLE + SYM_OFF_X)) {
+            continue;       /* already handled above */
+        }
+        tmpsym = Is_rogue_level(&u.uz) ? ov_rogue_syms[j] : ov_primary_syms[j];
+        if (tmpsym && sym == tmpsym) {
+            switch (j) {
+            case SYM_BOULDER + SYM_OFF_X:
+                if (!found) {
+                    *firstmatch = "boulder";
+                    Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
+                    found++;
+                } else {
+                    found += append_str(out_str, "boulder");
+                }
+                break;
+            case SYM_PET_OVERRIDE + SYM_OFF_X:
+                if (looked) {
+                    int oc = 0;
+                    unsigned os = 0;
+
+                    /* convert to symbol without override in effect */
+                    (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y, MG_FLAG_NOOVERRIDE);
+                    goto check_monsters;
+                }
+                break;
+#ifdef NEXT_VERSION
+            case SYM_HERO_OVERRIDE + SYM_OFF_X:
+                sym = showsyms[S_HUMAN + SYM_OFF_M];
+                goto check_monsters;
+#endif
+            }
+        }
+    }
+#if 0
+    /* handle optional boulder symbol as a special case */
+    if (o_syms[SYM_BOULDER + SYM_OFF_X] && sym == o_syms[SYM_BOULDER + SYM_OFF_X]) {
+        if (!found) {
+            *firstmatch = "boulder";
+            Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
+            found++;
+        } else {
+            found += append_str(out_str, "boulder");
+        }
+    }
+#endif
+
+    /*
+     * If we are looking at the screen, follow multiple possibilities or
+     * an ambiguous explanation by something more detailed.
+     */
+
+    if (found > 4) {
+        /* 3.6.3: this used to be "That can be many things" (without prefix)
+           which turned it into a sentence that lacked its terminating period;
+           we could add one below but reinstating the prefix here is better */
+        Sprintf(out_str, "%scan be many things", prefix);
+    }
+
+ didlook:
+    if (looked) {
+        struct permonst *pm = (struct permonst *)0;
+
+        if (found > 1 || need_to_look) {
+            char monbuf[BUFSZ];
+            char temp_buf[BUFSZ];
+
+            pm = lookat(cc.x, cc.y, look_buf, monbuf);
+            if (pm && for_supplement) {
+                *for_supplement = pm;
+            }
+            *firstmatch = look_buf;
+            if (*(*firstmatch)) {
+                Sprintf(temp_buf, " (%s)", *firstmatch);
+                (void) strncat(out_str, temp_buf, BUFSZ - strlen(out_str) - 1);
+                found = 1; /* we have something to look up */
+            }
+            if (monbuf[0]) {
+                Sprintf(temp_buf, " [seen: %s]", monbuf);
+                (void) strncat(out_str, temp_buf, BUFSZ - strlen(out_str) - 1);
+            }
+        }
+    }
+
+    return found;
+}
 
 /* also used by getpos hack in do_name.c */
 const char what_is_an_unknown_object[] = "an unknown object";
@@ -611,7 +1134,7 @@ boolean quick;      /* use cursor && don't search for "more info" */
 {
     char out_str[BUFSZ], look_buf[BUFSZ];
     const char *x_str, *firstmatch = 0;
-    struct permonst *pm = 0;
+    struct permonst *pm = 0, *supplemental_pm = 0;
     int i, ans = 0;
     glyph_t sym;            /* typed symbol or converted glyph */
     int found;          /* count of matching syms found */
@@ -639,11 +1162,17 @@ boolean quick;      /* use cursor && don't search for "more info" */
         sym = 0;    /* gcc -Wall lint */
     } else {
         getlin("Specify what? (type the word)", out_str);
+            /* keep single space as-is */
+        if (strcmp(out_str, " ")) {
+            /* remove leading and trailing whitespace and
+                condense consecutive internal whitespace */
+            mungspaces(out_str);
+        }
         if (out_str[0] == '\0' || out_str[0] == '\033')
             return 0;
 
         if (out_str[1]) { /* user typed in a complete string */
-            checkfile(out_str, pm, TRUE, TRUE);
+            checkfile(out_str, pm, TRUE, TRUE, (char *) 0);
             return 0;
         }
         sym = out_str[0];
@@ -892,9 +1421,14 @@ boolean quick;      /* use cursor && don't search for "more info" */
             /* check the data file for information about this thing */
             if (found == 1 && ans != LOOK_QUICK && ans != LOOK_ONCE &&
                 (ans == LOOK_VERBOSE || (flags.help && !quick))) {
-                char temp_buf[BUFSZ];
+                char temp_buf[BUFSZ], supplemental_name[BUFSZ];
+
+                supplemental_name[0] = '\0';
                 Strcpy(temp_buf, firstmatch);
-                checkfile(temp_buf, pm, FALSE, (boolean)(ans == LOOK_VERBOSE));
+                checkfile(temp_buf, pm, FALSE, (boolean) (ans == LOOK_VERBOSE), supplemental_name);
+                if (supplemental_pm) {
+                    do_supplemental_info(supplemental_name, supplemental_pm, (ans == LOOK_VERBOSE));
+                }
             }
         } else {
             pline("I've never heard of such things.");
@@ -908,6 +1442,94 @@ boolean quick;      /* use cursor && don't search for "more info" */
     return 0;
 }
 
+static const char *suptext1[] = {
+    "%s is a member of a marauding horde of orcs",
+    "rumored to have brutally attacked and plundered",
+    "the ordinarily sheltered town that is located ",
+    "deep within The Gnomish Mines.",
+    "",
+    "The members of that vicious horde proudly and ",
+    "defiantly acclaim their allegiance to their",
+    "leader %s in their names.",
+    (char *) 0,
+};
+
+static const char *suptext2[] = {
+    "\"%s\" is the common dungeon name of",
+    "a nefarious orc who is known to acquire property",
+    "from thieves and sell it off for profit.",
+    "",
+    "The perpetrator was last seen hanging around the",
+    "stairs leading to the Gnomish Mines.",
+    (char *) 0,
+};
+
+static void
+do_supplemental_info(name, pm, without_asking)
+char *name;
+struct permonst *pm;
+boolean without_asking;
+{
+    const char **textp;
+    winid datawin = WIN_ERR;
+    char *entrytext = name, *bp = (char *) 0, *bp2 = (char *) 0;
+    char question[QBUFSZ];
+    boolean yes_to_moreinfo = FALSE;
+    boolean is_marauder = (name && pm && is_orc(pm));
+
+    /*
+     * Provide some info on some specific things
+     * meant to support in-game mythology, and not
+     * available from data.base or other sources.
+     */
+    if (is_marauder && (strlen(name) < (BUFSZ - 1))) {
+        char fullname[BUFSZ];
+
+        bp = strstri(name, " of ");
+        bp2 = strstri(name, " the Fence");
+
+        if (bp || bp2) {
+            Strcpy(fullname, name);
+            if (!without_asking) {
+                Strcpy(question, "More info about \"");
+                /* +2 => length of "\"?" */
+                copynchars(eos(question), entrytext,
+                    (int) (sizeof question - 1 - (strlen(question) + 2)));
+                Strcat(question, "\"?");
+                if (yn(question) == 'y')
+                yes_to_moreinfo = TRUE;
+            }
+            if (yes_to_moreinfo) {
+                int i, subs = 0;
+                const char *gang = (char *) 0;
+
+                if (bp) {
+                    textp = suptext1;
+                    gang = bp + 4;
+                    *bp = '\0';
+                } else {
+                    textp = suptext2;
+                    gang = "";
+                }
+                datawin = create_nhwindow(NHW_MENU);
+                for (i = 0; textp[i]; i++) {
+                    char buf[BUFSZ];
+                    const char *txt;
+
+                    if (strstri(textp[i], "%s") != 0) {
+                        Sprintf(buf, textp[i], subs++ ? gang : fullname);
+                        txt = buf;
+                    } else {
+                        txt = textp[i];
+                    }
+                    putstr(datawin, 0, txt);
+                }
+                display_nhwindow(datawin, FALSE);
+                destroy_nhwindow(datawin), datawin = WIN_ERR;
+            }
+        }
+    }
+}
 
 int
 dowhatis()

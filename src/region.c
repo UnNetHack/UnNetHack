@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)region.c   3.4 2002/10/15  */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -94,12 +93,13 @@ int nrect;
     NhRegion *reg;
 
     reg = (NhRegion *) alloc(sizeof (NhRegion));
+    (void) memset(reg, 0, sizeof(NhRegion));
     /* Determines bounding box */
     if (nrect > 0) {
         reg->bounding_box = rects[0];
     } else {
-        reg->bounding_box.lx = 99;
-        reg->bounding_box.ly = 99;
+        reg->bounding_box.lx = COLNO;
+        reg->bounding_box.ly = ROWNO;
         reg->bounding_box.hx = 0;
         reg->bounding_box.hy = 0;
     }
@@ -133,7 +133,7 @@ int nrect;
     reg->n_monst = 0;
     reg->max_monst = 0;
     reg->monsters = NULL;
-    reg->arg = NULL;
+    reg->arg = zeroany;
     return reg;
 }
 
@@ -276,6 +276,12 @@ NhRegion *reg;
             free((genericptr_t) reg->rects);
         if (reg->monsters)
             free((genericptr_t) reg->monsters);
+        if (reg->enter_msg) {
+            free(reg->enter_msg);
+        }
+        if (reg->leave_msg) {
+            free(reg->leave_msg);
+        }
         free((genericptr_t) reg);
     }
 }
@@ -336,7 +342,14 @@ NhRegion *reg;
     if (i == n_regions)
         return;
 
+    /* remove region before potential newsym() calls, but don't free it yet */
+    if (--n_regions != i) {
+        regions[i] = regions[n_regions];
+    }
+
+    regions[n_regions] = (NhRegion *) 0;
     /* Update screen if necessary */
+    reg->ttl = -2L; /* for visible_region_at */
     if (reg->visible)
         for (x = reg->bounding_box.lx; x <= reg->bounding_box.hx; x++)
             for (y = reg->bounding_box.ly; y <= reg->bounding_box.hy; y++)
@@ -344,9 +357,6 @@ NhRegion *reg;
                     newsym(x, y);
 
     free_region(reg);
-    regions[i] = regions[n_regions - 1];
-    regions[n_regions - 1] = (NhRegion *) 0;
-    n_regions--;
 }
 
 /*
@@ -381,6 +391,9 @@ run_regions()
     /* End of life ? */
     /* Do it backward because the array will be modified */
     for (i = n_regions - 1; i >= 0; i--) {
+        if (regions[i] == NULL) {
+            abort();
+        }
         if (regions[i]->ttl == 0) {
             if ((f_indx = regions[i]->expire_f) == NO_CALLBACK ||
                 (*callbacks[f_indx])(regions[i], (genericptr_t) 0))
@@ -467,7 +480,7 @@ x, y;
 }
 
 /*
- * check wether a monster enters/leaves one or more region.
+ * check whether a monster enters/leaves one or more regions.
  */
 boolean
 m_in_out_region(mon, x, y)
@@ -596,10 +609,14 @@ xchar x, y;
 {
     register int i;
 
-    for (i = 0; i < n_regions; i++)
-        if (inside_region(regions[i], x, y) && regions[i]->visible &&
-            regions[i]->ttl != 0)
+    for (i = 0; i < n_regions; i++) {
+        if (!regions[i]->visible || regions[i]->ttl <= 0) {
+            continue;
+        }
+        if (inside_region(regions[i], x, y)) {
             return regions[i];
+        }
+    }
     return (NhRegion *) 0;
 }
 
@@ -642,21 +659,21 @@ int mode;
         bwrite(fd, (genericptr_t) &n, sizeof n);
         if (n > 0)
             bwrite(fd, (genericptr_t) regions[i]->leave_msg, n);
-        bwrite(fd, (genericptr_t) &regions[i]->ttl, sizeof (short));
+        bwrite(fd, &regions[i]->ttl, sizeof(long));
         bwrite(fd, (genericptr_t) &regions[i]->expire_f, sizeof (short));
         bwrite(fd, (genericptr_t) &regions[i]->can_enter_f, sizeof (short));
         bwrite(fd, (genericptr_t) &regions[i]->enter_f, sizeof (short));
         bwrite(fd, (genericptr_t) &regions[i]->can_leave_f, sizeof (short));
         bwrite(fd, (genericptr_t) &regions[i]->leave_f, sizeof (short));
         bwrite(fd, (genericptr_t) &regions[i]->inside_f, sizeof (short));
-        bwrite(fd, (genericptr_t) &regions[i]->player_flags, sizeof (boolean));
+        bwrite(fd, &regions[i]->player_flags, sizeof(unsigned int));
         bwrite(fd, (genericptr_t) &regions[i]->n_monst, sizeof (short));
         for (j = 0; j < regions[i]->n_monst; j++)
             bwrite(fd, (genericptr_t) &regions[i]->monsters[j],
                    sizeof (unsigned));
         bwrite(fd, (genericptr_t) &regions[i]->visible, sizeof (boolean));
         bwrite(fd, (genericptr_t) &regions[i]->glyph, sizeof (int));
-        bwrite(fd, (genericptr_t) &regions[i]->arg, sizeof (genericptr_t));
+        bwrite(fd, &regions[i]->arg, sizeof(anything));
     }
 
 skip_lots:
@@ -713,7 +730,7 @@ boolean ghostly; /* If a bones file restore */
         } else
             regions[i]->leave_msg = NULL;
 
-        mread(fd, (genericptr_t) &regions[i]->ttl, sizeof (short));
+        mread(fd, &regions[i]->ttl, sizeof(long));
         /* check for expired region */
         if (regions[i]->ttl >= 0)
             regions[i]->ttl =
@@ -724,7 +741,7 @@ boolean ghostly; /* If a bones file restore */
         mread(fd, (genericptr_t) &regions[i]->can_leave_f, sizeof (short));
         mread(fd, (genericptr_t) &regions[i]->leave_f, sizeof (short));
         mread(fd, (genericptr_t) &regions[i]->inside_f, sizeof (short));
-        mread(fd, (genericptr_t) &regions[i]->player_flags, sizeof (boolean));
+        mread(fd, &regions[i]->player_flags, sizeof (unsigned int));
         if (ghostly) { /* settings pertained to old player */
             clear_hero_inside(regions[i]);
             clear_heros_fault(regions[i]);
@@ -741,7 +758,7 @@ boolean ghostly; /* If a bones file restore */
                   sizeof (unsigned));
         mread(fd, (genericptr_t) &regions[i]->visible, sizeof (boolean));
         mread(fd, (genericptr_t) &regions[i]->glyph, sizeof (int));
-        mread(fd, (genericptr_t) &regions[i]->arg, sizeof (genericptr_t));
+        mread(fd, &regions[i]->arg, sizeof(anything));
     }
     /* remove expired regions, do not trigger the expire_f callback (yet!);
        also update monster lists if this data is coming from a bones file */
@@ -750,6 +767,34 @@ boolean ghostly; /* If a bones file restore */
             remove_region(regions[i]);
         else if (ghostly && regions[i]->n_monst > 0)
             reset_region_mids(regions[i]);
+}
+
+/* to support '#stats' wizard-mode command */
+void
+region_stats(hdrfmt, hdrbuf, count, size)
+const char *hdrfmt;
+char *hdrbuf;
+long *count, *size;
+{
+    NhRegion *rg;
+    int i;
+
+    /* other stats formats take one parameter; this takes two */
+    Sprintf(hdrbuf, hdrfmt, (long) sizeof (NhRegion), (long) sizeof (NhRect));
+    *count = (long) n_regions; /* might be 0 even though max_regions isn't */
+    *size = (long) max_regions * (long) sizeof (NhRegion);
+    for (i = 0; i < n_regions; ++i) {
+        rg = regions[i];
+        *size += (long) rg->nrects * (long) sizeof (NhRect);
+        if (rg->enter_msg) {
+            *size += (long) (strlen(rg->enter_msg) + 1);
+        }
+        if (rg->leave_msg) {
+            *size += (long) (strlen(rg->leave_msg) + 1);
+        }
+        *size += (long) rg->max_monst * (long) sizeof *rg->monsters;
+    }
+    /* ? */
 }
 
 /* update monster IDs for region being loaded from bones; `ghostly' implied */
@@ -791,8 +836,12 @@ const char *msg_leave;
     NhRect tmprect;
     NhRegion *reg = create_region((NhRect *) 0, 0);
 
-    reg->enter_msg = msg_enter;
-    reg->leave_msg = msg_leave;
+    if (msg_enter) {
+        reg->enter_msg = dupstr(msg_enter);
+    }
+    if (msg_leave) {
+        reg->leave_msg = dupstr(msg_leave);
+    }
     tmprect.lx = x;
     tmprect.ly = y;
     tmprect.hx = x + w;
@@ -884,12 +933,13 @@ genericptr_t p2;
     size_t damage;
 
     reg = (NhRegion *) p1;
-    damage = (size_t) reg->arg;
+    damage = reg->arg.a_int;
 
     /* If it was a thick cloud, it dissipates a little first */
     if (damage >= 5) {
         damage /= 2;    /* It dissipates, let's do less damage */
-        reg->arg = (genericptr_t) damage;
+        reg->arg = zeroany;
+        reg->arg.a_int = damage;
         reg->ttl = 2;   /* Here's the trick : reset ttl */
         return FALSE;   /* THEN return FALSE, means "still there" */
     }
@@ -945,7 +995,7 @@ genericptr_t p2;
     int dam;
 
     reg = (NhRegion *) p1;
-    dam = (size_t) reg->arg;
+    dam = reg->arg.a_int;
     if (p2 == NULL) {       /* This means *YOU* Bozo! */
         u.incloud = TRUE;
         if (nonliving(youmonst.data) || Breathless)
@@ -1039,11 +1089,79 @@ int duration;
         set_heros_fault(cloud); /* assume player has created it */
     cloud->inside_f = INSIDE_GAS_CLOUD;
     cloud->expire_f = EXPIRE_GAS_CLOUD;
-    cloud->arg = (genericptr_t) damage;
+    cloud->arg = zeroany;
+    cloud->arg.a_int = damage;
     cloud->visible = TRUE;
     cloud->glyph = cmap_to_glyph(S_cloud);
     add_region(cloud);
     return cloud;
+}
+
+/* for checking troubles during prayer; is hero at risk? */
+boolean
+region_danger()
+{
+    int i, f_indx, n = 0;
+
+    for (i = 0; i < n_regions; i++) {
+        /* only care about regions that hero is in */
+        if (!hero_inside(regions[i])) {
+            continue;
+        }
+        f_indx = regions[i]->inside_f;
+        /* the only type of region we understand is gas_cloud */
+        if (f_indx == INSIDE_GAS_CLOUD) {
+            /* completely harmless if you don't need to breathe */
+            if (nonliving(youmonst.data) || Breathless) {
+                continue;
+            }
+            /* minor inconvenience if you're poison resistant;
+               not harmful enough to be a prayer-level trouble */
+            if (Poison_resistance) {
+                continue;
+            }
+            ++n;
+        }
+    }
+    return n ? TRUE : FALSE;
+}
+
+/* for fixing trouble at end of prayer;
+   danger detected at start of prayer might have expired by now */
+void
+region_safety()
+{
+    NhRegion *r = 0;
+    int i, f_indx, n = 0;
+
+    for (i = 0; i < n_regions; i++) {
+        /* only care about regions that hero is in */
+        if (!hero_inside(regions[i])) {
+            continue;
+        }
+        f_indx = regions[i]->inside_f;
+        /* the only type of region we understand is gas_cloud */
+        if (f_indx == INSIDE_GAS_CLOUD) {
+            if (!n++ && regions[i]->ttl >= 0) {
+                r = regions[i];
+            }
+        }
+    }
+
+    if (n > 1 || (n == 1 && !r)) {
+        /* multiple overlapping cloud regions or non-expiring one */
+        safe_teleds(FALSE);
+    } else if (r) {
+        remove_region(r);
+        pline_The("gas cloud enveloping you dissipates.");
+    } else {
+        /* cloud dissipated on its own, so nothing needs to be done */
+        pline_The("gas cloud has dissipated.");
+    }
+    /* maybe cure blindness too */
+    if ((Blinded & TIMEOUT) == 1L) {
+        make_blinded(0L, TRUE);
+    }
 }
 
 /*region.c*/

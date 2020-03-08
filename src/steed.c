@@ -1,9 +1,7 @@
-/*  SCCS Id: @(#)steed.c    3.4 2003/01/10  */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-
 
 #ifdef STEED
 
@@ -12,7 +10,8 @@ static NEARDATA const char steeds[] = {
     S_QUADRUPED, S_UNICORN, S_ANGEL, S_CENTAUR, S_DRAGON, S_JABBERWOCK, '\0'
 };
 
-STATIC_DCL boolean FDECL(landing_spot, (coord *, int, int));
+static boolean FDECL(landing_spot, (coord *, int, int));
+static void FDECL(maybewakesteed, (struct monst *));
 
 /* caller has decided that hero can't reach something while mounted */
 void
@@ -36,7 +35,6 @@ struct monst *mtmp;
             !is_whirly(ptr) && !unsolid(ptr));
 }
 
-
 int
 use_saddle(otmp)
 struct obj *otmp;
@@ -46,13 +44,7 @@ struct obj *otmp;
     int chance;
     const char *s;
 
-
-    /* Can you use it? */
-    if (nohands(youmonst.data)) {
-        You("have no hands!");  /* not `body_part(HAND)' */
-        return 0;
-    } else if (!freehand()) {
-        You("have no free %s.", body_part(HAND));
+    if (!u_handsy()) {
         return 0;
     }
 
@@ -125,13 +117,16 @@ struct obj *otmp;
     case P_ISRESTRICTED:
     case P_UNSKILLED:
     default:
-        chance -= 20;   break;
+        chance -= 20;
+        break;
     case P_BASIC:
         break;
     case P_SKILLED:
-        chance += 15;   break;
+        chance += 15;
+        break;
     case P_EXPERT:
-        chance += 30;   break;
+        chance += 30;
+        break;
     }
     if (Confusion || Fumbling || Glib)
         chance -= 20;
@@ -148,18 +143,15 @@ struct obj *otmp;
     if (otmp->cursed)
         chance -= 50;
 
+    /* [intended] steed becomes alert if possible */
+    maybewakesteed(mtmp);
+
     /* Make the attempt */
     if (rn2(100) < chance) {
         You("put the saddle on %s.", mon_nam(mtmp));
         if (otmp->owornmask) remove_worn_item(otmp, FALSE);
         freeinv(otmp);
-        /* mpickobj may free otmp it if merges, but we have already
-           checked for a saddle above, so no merger should happen */
-        (void) mpickobj(mtmp, otmp);
-        mtmp->misc_worn_check |= W_SADDLE;
-        otmp->owornmask = W_SADDLE;
-        otmp->leashmon = mtmp->m_id;
-        update_mon_intrinsics(mtmp, otmp, TRUE, FALSE);
+        put_saddle_on_mon(otmp, mtmp);
     } else
         pline("%s resists!", Monnam(mtmp));
     return 1;
@@ -192,7 +184,6 @@ struct monst *mtmp;
             (!Underwater || is_swimmer(mtmp->data)));
 }
 
-
 int
 doride()
 {
@@ -210,7 +201,6 @@ doride()
         return 0;
     return 1;
 }
-
 
 /* Start riding, with the given monster */
 boolean
@@ -241,7 +231,10 @@ boolean force;          /* Quietly force this animal */
      * healed upon dismount (Wounded_legs context switch).
      * By preventing a hero with Wounded_legs from
      * mounting a steed, the potential for abuse is
-     * minimized, if not eliminated altogether.
+     * reduced.  However, dismounting still immediately
+     * heals the steed's wounded legs.  [In 3.4.3 and
+     * earlier, that unintentionally made the hero's
+     * temporary 1 point Dex loss become permanent.]
      */
     if (Wounded_legs) {
         Your("%s are in no shape for riding.", makeplural(body_part(LEG)));
@@ -266,10 +259,20 @@ boolean force;          /* Quietly force this animal */
     /* Can the player reach and see the monster? */
     if (!mtmp || (!force && ((Blind && !Blind_telepat) ||
                              mtmp->mundetected ||
-                             mtmp->m_ap_type == M_AP_FURNITURE ||
-                             mtmp->m_ap_type == M_AP_OBJECT))) {
+                             M_AP_TYPE(mtmp) == M_AP_FURNITURE ||
+                             M_AP_TYPE(mtmp) == M_AP_OBJECT))) {
         pline("I see nobody there.");
         return (FALSE);
+    }
+    if (mtmp->data == &mons[PM_LONG_WORM] &&
+         (u.ux + u.dx != mtmp->mx || u.uy + u.dy != mtmp->my)) {
+        /* As of 3.6.2:  test_move(below) is used to check for trying to mount
+           diagonally into or out of a doorway or through a tight squeeze;
+           attempting to mount a tail segment when hero was not adjacent
+           to worm's head could trigger an impossible() in worm_cross()
+           called from test_move(), so handle not-on-head before that */
+        You("couldn't ride %s, let alone its tail.", a_monnam(mtmp));
+        return FALSE;
     }
     if (u.uswallow || u.ustuck || u.utrap || Punished ||
         !test_move(u.ux, u.uy, mtmp->mx-u.ux, mtmp->my-u.uy, TEST_MOVE)) {
@@ -316,12 +319,12 @@ boolean force;          /* Quietly force this animal */
         return (FALSE);
     }
     if (!force && Underwater && !is_swimmer(ptr)) {
-        You_cant("ride that creature while under water.");
+        You_cant("ride that creature while under %s.", hliquid("water"));
         return (FALSE);
     }
     if (!can_saddle(mtmp) || !can_ride(mtmp)) {
         You_cant("ride such a creature.");
-        return (0);
+        return FALSE;
     }
 
     /* Is the player impaired? */
@@ -350,16 +353,20 @@ boolean force;          /* Quietly force this animal */
                 x_monnam(mtmp, ARTICLE_A, (char *)0,
                          SUPPRESS_IT|SUPPRESS_INVISIBLE|SUPPRESS_HALLUCINATION,
                          TRUE));
-        losehp(rn1(5, 10), buf, NO_KILLER_PREFIX);
+        losehp(Maybe_Half_Phys(rn1(5, 10)), buf, NO_KILLER_PREFIX);
         return (FALSE);
     }
 
     /* Success */
+    maybewakesteed(mtmp);
     if (!force) {
         if (Levitation && !is_floater(ptr) && !is_flyer(ptr))
             /* Must have Lev_at_will at this point */
             pline("%s magically floats up!", Monnam(mtmp));
         You("mount %s.", mon_nam(mtmp));
+        if (Flying) {
+            You("and %s take flight together.", mon_nam(mtmp));
+        }
     }
     /* setuwep handles polearms differently when you're mounted */
     if (uwep && is_pole(uwep)) unweapon = FALSE;
@@ -369,7 +376,6 @@ boolean force;          /* Quietly force this animal */
     flags.botl = TRUE;
     return (TRUE);
 }
-
 
 /* You and your steed have moved */
 void
@@ -386,7 +392,6 @@ exercise_steed()
     }
     return;
 }
-
 
 /* The player kicks or whips the steed */
 void
@@ -463,8 +468,7 @@ int forceit;
             for (y = u.uy-1; y <= u.uy+1; y++) {
                 if (!isok(x, y) || (x == u.ux && y == u.uy)) continue;
 
-                if (ACCESSIBLE(levl[x][y].typ) &&
-                    !MON_AT(x, y) && !closed_door(x, y)) {
+                if (accessible(x, y) && !MON_AT(x, y)) {
                     distance = distu(x, y);
                     if (min_distance < 0 || distance < min_distance ||
                         (distance == min_distance && rn2(2))) {
@@ -496,7 +500,7 @@ int reason;         /* Player was thrown off etc. */
 {
     struct monst *mtmp;
     struct obj *otmp;
-    coord cc;
+    coord cc, steedcc;
     const char *verb = "fall";
     boolean repair_leg_damage = TRUE;
     unsigned save_utrap = u.utrap;
@@ -518,7 +522,7 @@ int reason;         /* Player was thrown off etc. */
         /* fall through */
     case DISMOUNT_VANISHED:
         if (!have_spot) have_spot = landing_spot(&cc, reason, 1);
-        losehp(rn1(10, 10), "riding accident", KILLED_BY_AN);
+        losehp(Maybe_Half_Phys(rn1(10, 10)), "riding accident", KILLED_BY_AN);
         set_wounded_legs(BOTH_SIDES, (int)HWounded_legs + rn1(5, 5));
         repair_leg_damage = FALSE;
         break;
@@ -540,7 +544,7 @@ int reason;         /* Player was thrown off etc. */
         if (otmp && otmp->cursed) {
             You("can't.  The saddle %s cursed.",
                 otmp->bknown ? "is" : "seems to be");
-            otmp->bknown = TRUE;
+            otmp->bknown = 1; /* ok to skip set_bknown() here */
             return;
         }
         if (!have_spot) {
@@ -555,43 +559,82 @@ int reason;         /* Player was thrown off etc. */
         } else
             You("dismount %s.", mon_nam(mtmp));
     }
-    /* While riding these refer to the steed's legs
-     * so after dismounting they refer to the player's
-     * legs once again.
-     */
-    if (repair_leg_damage) HWounded_legs = EWounded_legs = 0;
+    /* While riding, Wounded_legs refers to the steed's legs;
+       after dismounting, it reverts to the hero's legs. */
+    if (repair_leg_damage) {
+        heal_legs(1);
+    }
 
     /* Release the steed and saddle */
     u.usteed = 0;
     u.ugallop = 0L;
 
-    /* Set player and steed's position.  Try moving the player first
-       unless we're in the midst of creating a bones file. */
-    if (reason == DISMOUNT_BONES) {
-        /* move the steed to an adjacent square */
-        if (enexto(&cc, u.ux, u.uy, mtmp->data))
-            rloc_to(mtmp, cc.x, cc.y);
-        else    /* evidently no room nearby; move steed elsewhere */
-            (void) rloc(mtmp, FALSE);
-        return;
+    /*
+     * rloc(), rloc_to(), and monkilled()->mondead()->m_detach() all
+     * expect mtmp to be on the map or else have mtmp->mx be 0, but
+     * setting the latter to 0 here would interfere with dropping
+     * the saddle.  Prior to 3.6.2, being off the map didn't matter.
+     *
+     * place_monster() expects mtmp to be alive and not be u.usteed.
+     *
+     * Unfortunately, <u.ux,u.uy> (former steed's implicit location)
+     * might now be occupied by an engulfer, so we can't just put mtmp
+     * at that spot.  An engulfer's previous spot will be unoccupied
+     * but we don't know where that was and even if we did, it might
+     * be hostile terrain.
+     */
+    steedcc.x = u.ux, steedcc.y = u.uy;
+    if (m_at(u.ux, u.uy)) {
+        /* hero's spot has a monster in it; hero must have been plucked
+           from saddle as engulfer moved into his spot--other dismounts
+           shouldn't run into this situation; find nearest viable spot */
+        if (!enexto(&steedcc, u.ux, u.uy, mtmp->data) &&
+            /* no spot? must have been engulfed by a lurker-above over
+               water or lava; try requesting a location for a flyer */
+             !enexto(&steedcc, u.ux, u.uy, &mons[PM_BAT]))
+            /* still no spot; last resort is any spot within bounds */
+            (void) enexto(&steedcc, u.ux, u.uy, &mons[PM_GHOST]);
+    }
+    if (!m_at(steedcc.x, steedcc.y)) {
+        if (mtmp->mhp < 1) {
+            mtmp->mhp = 0; /* make sure it isn't negative */
+        }
+        mtmp->mhp++; /* force at least one hit point, possibly resurrecting */
+        place_monster(mtmp, steedcc.x, steedcc.y);
+        mtmp->mhp--; /* take the extra hit point away: cancel resurrection */
+    } else {
+        impossible("Dismounting: can't place former steed on map.");
     }
     if (!DEADMONSTER(mtmp)) {
-        place_monster(mtmp, u.ux, u.uy);
+        /* if for bones, there's no reason to place the hero;
+           we want to make room for potential ghost, so move steed */
+        if (reason == DISMOUNT_BONES) {
+            /* move the steed to an adjacent square */
+            if (enexto(&cc, u.ux, u.uy, mtmp->data)) {
+                rloc_to(mtmp, cc.x, cc.y);
+            } else {
+                /* evidently no room nearby; move steed elsewhere */
+                (void) rloc(mtmp, FALSE);
+            }
+            return;
+        }
+
+        /* Set hero's and/or steed's positions.  Try moving the hero first. */
         if (!u.uswallow && !u.ustuck && have_spot) {
             struct permonst *mdat = mtmp->data;
 
             /* The steed may drop into water/lava */
             if (!is_flyer(mdat) && !is_floater(mdat) && !is_clinger(mdat)) {
                 if (is_pool(u.ux, u.uy)) {
-                    if (!Underwater)
-                        pline("%s falls into the %s!", Monnam(mtmp),
-                              surface(u.ux, u.uy));
+                    if (!Underwater) {
+                        pline("%s falls into the %s!", Monnam(mtmp), surface(u.ux, u.uy));
+                    }
                     if (!is_swimmer(mdat) && !amphibious(mdat)) {
                         killed(mtmp);
                         adjalign(-1);
                     }
                 } else if (is_lava(u.ux, u.uy)) {
-                    pline("%s is pulled into the lava!", Monnam(mtmp));
+                    pline("%s is pulled into the %s!", Monnam(mtmp), hliquid("lava"));
                     if (!likes_lava(mdat)) {
                         killed(mtmp);
                         adjalign(-1);
@@ -608,10 +651,11 @@ int reason;         /* Player was thrown off etc. */
              * We use this kludge to make sure there is only one such attempt.
              *
              * Clearly this is not the best way to do it.  A full fix would
-             * involve having these functions not call pickup() at all, instead
+             * involve having these functions not call pickup() at all,
+             * instead
              * calling them first and calling pickup() afterwards.  But it
              * would take a lot of work to keep this change from having any
-             * unforseen side effects (for instance, you would no longer be
+             * unforeseen side effects (for instance, you would no longer be
              * able to walk onto a square with a hole, and autopickup before
              * falling into the hole).
              */
@@ -625,23 +669,33 @@ int reason;         /* Player was thrown off etc. */
                 in_steed_dismounting = FALSE;
 
                 /* Put your steed in your trap */
-                if (save_utrap)
+                if (save_utrap) {
                     (void) mintrap(mtmp);
+                }
             }
-            /* Couldn't... try placing the steed */
+
+        /* Couldn't move hero... try moving the steed. */
         } else if (enexto(&cc, u.ux, u.uy, mtmp->data)) {
             /* Keep player here, move the steed to cc */
             rloc_to(mtmp, cc.x, cc.y);
             /* Player stays put */
-            /* Otherwise, kill the steed */
-        } else {
-            killed(mtmp);
-            adjalign(-1);
-        }
-    }
 
-    /* Return the player to the floor */
-    if (reason != DISMOUNT_ENGULFED) {
+        /* Otherwise, kill the steed. */
+        } else {
+            if (reason == DISMOUNT_BYCHOICE) {
+                /* [un]#ride: hero gets credit/blame for killing steed */
+                killed(mtmp);
+                adjalign(-1);
+            } else {
+                /* other dismount: kill former steed with no penalty;
+                   damage type is just "neither AD_DGST nor -AD_RBRE" */
+                monkilled(mtmp, "", -AD_PHYS);
+            }
+        }
+    } /* !DEADMONST(mtmp) */
+
+    /* usually return the hero to the surface */
+    if (reason != DISMOUNT_ENGULFED && reason != DISMOUNT_BONES) {
         in_steed_dismounting = TRUE;
         (void) float_down(0L, W_SADDLE);
         in_steed_dismounting = FALSE;
@@ -655,22 +709,99 @@ int reason;         /* Player was thrown off etc. */
     return;
 }
 
+/* when attempting to saddle or mount a sleeping steed, try to wake it up
+   (for the saddling case, it won't be u.usteed yet) */
+static void
+maybewakesteed(steed)
+struct monst *steed;
+{
+    int frozen = (int) steed->mfrozen;
+    boolean wasimmobile = steed->msleeping || !steed->mcanmove;
+
+    steed->msleeping = 0;
+    if (frozen) {
+        frozen = (frozen + 1) / 2; /* half */
+        /* might break out of timed sleep or paralysis */
+        if (!rn2(frozen)) {
+            steed->mfrozen = 0;
+            steed->mcanmove = 1;
+        } else {
+            /* didn't awake, but remaining duration is halved */
+            steed->mfrozen = frozen;
+        }
+    }
+    if (wasimmobile && !steed->msleeping && steed->mcanmove) {
+        pline("%s wakes up.", Monnam(steed));
+    }
+    /* regardless of waking, terminate any meal in progress */
+    finish_meating(steed);
+}
+
+/* decide whether hero's steed is able to move;
+   doesn't check for holding traps--those affect the hero directly */
+boolean
+stucksteed(checkfeeding)
+boolean checkfeeding;
+{
+    struct monst *steed = u.usteed;
+
+    if (steed) {
+        /* check whether steed can move */
+        if (steed->msleeping || !steed->mcanmove) {
+            pline("%s won't move!", upstart(y_monnam(steed)));
+            return TRUE;
+        }
+        /* optionally check whether steed is in the midst of a meal */
+        if (checkfeeding && steed->meating) {
+            pline("%s is still eating.", upstart(y_monnam(steed)));
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 void
 place_monster(mon, x, y)
 struct monst *mon;
 int x, y;
 {
+    struct monst *othermon;
+    const char *monnm, *othnm;
+    char buf[QBUFSZ];
+
+    buf[0] = '\0';
+    /* normal map bounds are <1..COLNO-1,0..ROWNO-1> but sometimes
+       vault guards (either living or dead) are parked at <0,0> */
+    if (!isok(x, y) && (x != 0 || y != 0 || !mon->isgd)) {
+        describe_level(buf);
+        impossible("trying to place %s at <%d,%d> mstate:%lx on %s",
+                   minimal_monnam(mon, TRUE), x, y, mon->mstate, buf);
+        x = y = 0;
+    }
     if (mon == u.usteed ||
         /* special case is for convoluted vault guard handling */
         (DEADMONSTER(mon) && !(mon->isgd && x == 0 && y == 0))) {
-        impossible("placing %s onto map?",
-                   (mon == u.usteed) ? "steed" : "defunct monster");
+        describe_level(buf);
+        impossible("placing %s onto map, mstate:%lx, on %s?",
+                   (mon == u.usteed) ? "steed" : "defunct monster",
+                   mon->mstate, buf);
         return;
+    }
+    if ((othermon = level.monsters[x][y]) != 0) {
+        describe_level(buf);
+        monnm = minimal_monnam(mon, FALSE);
+        othnm = (mon != othermon) ? minimal_monnam(othermon, TRUE) : "itself";
+        impossible("placing %s over %s at <%d,%d>, mstates:%lx %lx on %s?",
+                   monnm, othnm, x, y, othermon->mstate, mon->mstate, buf);
     }
     mon->mx = x, mon->my = y;
     level.monsters[x][y] = mon;
-    if (mon->data == &mons[PM_GIANT_TURTLE] && (!mon->minvis || See_invisible))
+    mon->mstate &= ~(MON_OFFMAP | MON_MIGRATING | MON_LIMBO |
+                     MON_BUBBLEMOVE | MON_ENDGAME_FREE | MON_ENDGAME_MIGR);
+
+    if (mon->data == &mons[PM_GIANT_TURTLE] && (!mon->minvis || See_invisible)) {
         block_point(x, y);
+    }
 }
 
 #endif /* STEED */

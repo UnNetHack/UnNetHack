@@ -3293,7 +3293,7 @@ struct sp_coder *coder;
 
     if (!OV_pop_s(op)) return;
 
-    msg = string_subst(OV_s(op));
+    msg = OV_s(op);
     if (!msg) return;
 
     old_n = lev_message ? (strlen(lev_message)+1) : 0;
@@ -4117,7 +4117,7 @@ char *nbuf;
     return ov;
 }
 
-char
+xchar
 selection_getpoint(x, y, ov)
 int x, y;
 struct opvar *ov;
@@ -6212,7 +6212,8 @@ sp_lev *lvl;
             get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(tmp));
             if (isok(x, y)) {
                 struct opvar *pt = selection_opvar(NULL);
-                selection_floodfill(pt, x, y);
+                floodfillchk_match_under_typ = levl[x][y].typ;
+                selection_floodfill(pt, x, y, FALSE);
                 splev_stack_push(coder->stack, pt);
             }
             opvar_free(tmp);

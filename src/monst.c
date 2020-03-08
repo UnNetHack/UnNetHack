@@ -1,11 +1,9 @@
-/*  SCCS Id: @(#)monst.c    3.4 2000/07/14  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "config.h"
 #include "permonst.h"
 #include "monsym.h"
-#include "dungeon.h"    /* prerequisite for eshk,vault,epri */
 
 #define NO_ATTK {0, 0, 0, 0}
 
@@ -2810,6 +2808,12 @@ struct permonst _mons2[] = {
 #endif
 /* standard demons & devils
  */
+#define SEDUCTION_ATTACKS_YES                                     \
+    A(ATTK(AT_BITE, AD_SSEX, 0, 0), ATTK(AT_CLAW, AD_PHYS, 1, 3), \
+      ATTK(AT_CLAW, AD_PHYS, 1, 3), NO_ATTK, NO_ATTK, NO_ATTK)
+#define SEDUCTION_ATTACKS_NO                                      \
+    A(ATTK(AT_CLAW, AD_PHYS, 1, 3), ATTK(AT_CLAW, AD_PHYS, 1, 3), \
+      ATTK(AT_BITE, AD_DRLI, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK)
     MON("horned devil", S_DEMON,
         LVL(6, 9, -5, 50, 11), (G_HELL|G_NOCORPSE|2),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4),
@@ -3939,6 +3943,9 @@ monst_init()
 {
     return;
 }
+
+const struct attack sa_yes[NATTK] = SEDUCTION_ATTACKS_YES;
+const struct attack sa_no[NATTK] = SEDUCTION_ATTACKS_NO;
 #endif
 
 /*monst.c*/

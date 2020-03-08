@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)monmove.c  3.4 2002/04/06  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,15 +15,17 @@ STATIC_DCL void FDECL(watch_on_duty, (struct monst *));
 static void make_group_attackers_flee(struct monst* mtmp);
 static void share_hp(struct monst* mon1, struct monst* mon2);
 
-boolean /* TRUE : mtmp died */
+/* TRUE if mtmp died */
+boolean
 mb_trapped(mtmp)
 register struct monst *mtmp;
 {
     if (flags.verbose) {
-        if (cansee(mtmp->mx, mtmp->my))
+        if (cansee(mtmp->mx, mtmp->my) && !Unaware) {
             pline("KABOOM!!  You see a door explode.");
-        else if (flags.soundok)
+        } else if (!Deaf) {
             You_hear("a distant explosion.");
+        }
     }
     wake_nearto(mtmp->mx, mtmp->my, 7*7);
     mtmp->mstun = 1;
@@ -51,17 +52,42 @@ boolean for_unlocking; /* true => credit card ok, false => not ok */
     return m_carrying(mon, SKELETON_KEY) || m_carrying(mon, LOCK_PICK);
 }
 
+void
+mon_yells(mon, shout)
+struct monst *mon;
+const char *shout;
+{
+    if (Deaf) {
+        if (canspotmon(mon)) {
+            /* Sidenote on "A watchman angrily waves her arms!"
+             * Female being called watchman is correct (career name).
+             */
+            pline("%s angrily %s %s %s!",
+                Amonnam(mon),
+                nolimbs(mon->data) ? "shakes" : "waves",
+                mhis(mon),
+                nolimbs(mon->data) ? mbodypart(mon, HEAD) : makeplural(mbodypart(mon, ARM)));
+        }
+    } else {
+        if (canspotmon(mon)) {
+            pline("%s yells:", Amonnam(mon));
+        } else {
+            You_hear("someone yell:");
+        }
+        verbalize("%s", shout);
+    }
+}
+
 STATIC_OVL void
 watch_on_duty(mtmp)
 register struct monst *mtmp;
 {
     int x, y;
 
-    if(mtmp->mpeaceful && in_town(u.ux+u.dx, u.uy+u.dy) &&
-       mtmp->mcansee && m_canseeu(mtmp) && !rn2(3)) {
-
+    if (mtmp->mpeaceful && in_town(u.ux+u.dx, u.uy+u.dy) &&
+        mtmp->mcansee && m_canseeu(mtmp) && !rn2(3)) {
 #ifdef CONVICT
-        if(Role_if(PM_CONVICT) && !Upolyd) {
+        if (Role_if(PM_CONVICT) && !Upolyd) {
             verbalize("%s yells: Hey!  You are the one from the wanted poster!",
                       Amonnam(mtmp));
             (void) angry_guards(!(flags.soundok));
@@ -69,18 +95,17 @@ register struct monst *mtmp;
             return;
         }
 #endif /* CONVICT */
-        if(picking_lock(&x, &y) && IS_DOOR(levl[x][y].typ) &&
-           (levl[x][y].doormask & D_LOCKED)) {
+        if (picking_lock(&x, &y) && IS_DOOR(levl[x][y].typ) &&
+            (levl[x][y].doormask & D_LOCKED)) {
 
-            if(couldsee(mtmp->mx, mtmp->my)) {
-
+            if (couldsee(mtmp->mx, mtmp->my)) {
                 pline("%s yells:", Amonnam(mtmp));
-                if(levl[x][y].looted & D_WARNED) {
-                    verbalize("Halt, thief!  You're under arrest!");
+                if (levl[x][y].looted & D_WARNED) {
+                    mon_yells(mtmp, "Halt, thief!  You're under arrest!");
                     (void) angry_guards(!(flags.soundok));
                 } else {
-                    verbalize("Hey, stop picking that lock!");
-                    levl[x][y].looted |=  D_WARNED;
+                    mon_yells(mtmp, "Hey, stop picking that lock!");
+                    levl[x][y].looted |= D_WARNED;
                 }
                 stop_occupation();
             }
@@ -95,39 +120,22 @@ int
 dochugw(mtmp)
 register struct monst *mtmp;
 {
-    register int x = mtmp->mx, y = mtmp->my;
+    int x = mtmp->mx, y = mtmp->my;
     boolean already_saw_mon = !occupation ? 0 : canspotmon(mtmp);
     int rd = dochug(mtmp);
-#if 0
-    /* part of the original warning code which was replaced in 3.3.1 */
-    int dd;
-
-    if(Warning && !rd && !mtmp->mpeaceful &&
-       (dd = distu(mtmp->mx, mtmp->my)) < distu(x, y) &&
-       dd < 100 && !canseemon(mtmp)) {
-        /* Note: this assumes we only want to warn against the monster to
-         * which the weapon does extra damage, as there is no "monster
-         * which the weapon warns against" field.
-         */
-        if (spec_ability(uwep, SPFX_WARN) && spec_dbon(uwep, mtmp, 1))
-            warnlevel = 100;
-        else if ((int) (mtmp->m_lev / 4) > warnlevel)
-            warnlevel = (mtmp->m_lev / 4);
-    }
-#endif /* 0 */
 
     /* a similar check is in monster_nearby() in hack.c */
     /* check whether hero notices monster and stops current activity */
     if (occupation && !rd && !Confusion &&
         (!mtmp->mpeaceful || Hallucination) &&
         /* it's close enough to be a threat */
-        distu(mtmp->mx, mtmp->my) <= (BOLT_LIM+1)*(BOLT_LIM+1) &&
+        distu(x, y) <= (BOLT_LIM+1)*(BOLT_LIM+1) &&
         /* and either couldn't see it before, or it was too far away */
         (!already_saw_mon || !couldsee(x, y) ||
          distu(x, y) > (BOLT_LIM+1)*(BOLT_LIM+1)) &&
         /* can see it now, or sense it and would normally see it */
         (canseemon(mtmp) ||
-         (sensemon(mtmp) && couldsee(mtmp->mx, mtmp->my))) &&
+         (sensemon(mtmp) && couldsee(x, y))) &&
         mtmp->mcanmove &&
         !noattacks(mtmp->data) && !onscary(u.ux, u.uy, mtmp))
         stop_occupation();
@@ -140,25 +148,44 @@ onscary(x, y, mtmp)
 int x, y;
 struct monst *mtmp;
 {
+    /* creatures who are directly resistant to magical scaring:
+     *
+     * Rodney, lawful minions, Angels, the Riders, shopkeepers
+     * inside their own shop, priests inside their own temple,
+     * Humans, Cthulhu, Vlad, the Watcher in the Water,
+     * the Quest Nemesis, and unique demons */
     if (mtmp->isshk || mtmp->isgd || mtmp->iswiz || !mtmp->mcansee ||
-        mtmp->mpeaceful || mtmp->data->mlet == S_HUMAN ||
-        is_lminion(mtmp) || mtmp->data == &mons[PM_ANGEL] ||
-        mtmp->data == &mons[PM_CTHULHU] ||
-        /* Vlad ignores Elbereth/Scare Monster/Garlic */
-        mtmp->data == &mons[PM_VLAD_THE_IMPALER] ||
-        mtmp->data == &mons[PM_WATCHER_IN_THE_WATER] ||
-        mtmp->mnum == quest_info(MS_NEMESIS) ||
-        (mtmp->data->geno & G_UNIQ && is_demon(mtmp->data)) ||
-        is_rider(mtmp->data))
-        return(FALSE);
+         mtmp->mpeaceful || mtmp->data->mlet == S_HUMAN ||
+         is_lminion(mtmp) || mtmp->data == &mons[PM_ANGEL] ||
+         mtmp->data == &mons[PM_CTHULHU] ||
+         /* Vlad ignores Elbereth/Scare Monster/Garlic */
+         mtmp->data == &mons[PM_VLAD_THE_IMPALER] ||
+         mtmp->data == &mons[PM_WATCHER_IN_THE_WATER] ||
+         mtmp->mnum == quest_info(MS_NEMESIS) ||
+         (mtmp->data->geno & G_UNIQ && is_demon(mtmp->data)) ||
+         (mtmp->isshk && inhishop(mtmp)) ||
+         (mtmp->ispriest && inhistemple(mtmp)) ||
+         is_rider(mtmp->data)) {
+        return FALSE;
+    }
 
-    return (boolean)(sobj_at(SCR_SCARE_MONSTER, x, y)
+    /* <0,0> is used by musical scaring to check for the above;
+     * it doesn't care about scrolls or engravings or dungeon branch */
+    if (x == 0 && y == 0) {
+        return TRUE;
+    }
+
+    /* should this still be true for defiled/molochian altars? */
+    if (IS_ALTAR(levl[x][y].typ) && (is_vampire(mtmp->data) || is_vampshifter(mtmp))) {
+        return TRUE;
+    }
+
+    return (sobj_at(SCR_SCARE_MONSTER, x, y)
 #ifdef ELBERETH
-                     || (!flags.elberethignore
-                         && sengr_at("Elbereth", x, y))
+            || ((!flags.elberethignore && sengr_at("Elbereth", x, y)) &&
+                 ((u.ux == x && u.uy == y) || (Displaced && mtmp->mux == x && mtmp->muy == y)))
 #endif
-                     || (is_vampire(mtmp->data)
-                         && IS_ALTAR(levl[x][y].typ)));
+           );
 }
 
 /* regenerate lost hit points */
@@ -183,7 +210,12 @@ boolean digest_meal;
         (moves % freq == 0 || regenerates(mon->data))) mon->mhp++;
     if (mon->mspec_used) mon->mspec_used--;
     if (digest_meal) {
-        if (mon->meating) mon->meating--;
+        if (mon->meating) {
+            mon->meating--;
+            if (mon->meating <= 0) {
+                finish_meating(mon);
+            }
+        }
     }
 }
 
@@ -200,17 +232,17 @@ register struct monst *mtmp;
      * + Nymphs, jabberwocks, and leprechauns do not easily wake up.
      *
      * Wake up if:
-     *  in direct LOS                       AND
-     *  within 10 squares                   AND
-     *  not stealthy or (mon is an ettin and 9/10)      AND
+     *  in direct LOS                                           AND
+     *  within 10 squares                                       AND
+     *  not stealthy or (mon is an ettin and 9/10)              AND
      *  (mon is not a nymph, jabberwock, or leprechaun) or 1/50 AND
      *  Aggravate or mon is (dog or human) or
      *      (1/7 and mon is not mimicing furniture or object)
      */
-    if(couldsee(mtmp->mx, mtmp->my) &&
-       distu(mtmp->mx, mtmp->my) <= 100 &&
-       (!Stealth || (mtmp->data == &mons[PM_ETTIN] && rn2(10))) &&
-       (!(mtmp->data->mlet == S_NYMPH
+    if (couldsee(mtmp->mx, mtmp->my) &&
+        distu(mtmp->mx, mtmp->my) <= 100 &&
+        (!Stealth || (mtmp->data == &mons[PM_ETTIN] && rn2(10))) &&
+        (!(mtmp->data->mlet == S_NYMPH
           || mtmp->data == &mons[PM_JABBERWOCK]
 #if 0   /* DEFERRED */
           || mtmp->data == &mons[PM_VORPAL_JABBERWOCK]
@@ -219,13 +251,34 @@ register struct monst *mtmp;
        (Aggravate_monster
         || (mtmp->data->mlet == S_DOG ||
             mtmp->data->mlet == S_HUMAN)
-        || (!rn2(7) && mtmp->m_ap_type != M_AP_FURNITURE &&
-            mtmp->m_ap_type != M_AP_OBJECT) )) {
+        || (!rn2(7) && M_AP_TYPE(mtmp) != M_AP_FURNITURE
+            && M_AP_TYPE(mtmp) != M_AP_OBJECT))) {
         mtmp->msleeping = 0;
         return(1);
     }
     return(0);
 }
+
+/* ungrab/expel held/swallowed hero */
+static void
+release_hero(mon)
+struct monst *mon;
+{
+    if (mon == u.ustuck) {
+        if (u.uswallow) {
+            expels(mon, mon->data, TRUE);
+        } else if (!sticks(youmonst.data)) {
+            unstuck(mon); /* let go */
+            You("get released!");
+        }
+    }
+}
+
+#define flees_light(mon) ((mon)->data == &mons[PM_GREMLIN] \
+                          && (uwep && artifact_light(uwep) && uwep->lamplit))
+/* we could include this in the above macro, but probably overkill/overhead */
+/*      && (!(which_armor((mon), W_ARMC) != 0                               */
+/*            && which_armor((mon), W_ARMH) != 0))                          */
 
 /* monster begins fleeing for the specified time, 0 means untimed flee
  * if first, only adds fleetime if monster isn't already fleeing
@@ -237,13 +290,13 @@ int fleetime;
 boolean first;
 boolean fleemsg;
 {
-    if (u.ustuck == mtmp) {
-        if (u.uswallow)
-            expels(mtmp, mtmp->data, TRUE);
-        else if (!sticks(youmonst.data)) {
-            unstuck(mtmp); /* monster lets go when fleeing */
-            You("get released!");
-        }
+    /* shouldn't happen; maybe warrants impossible()? */
+    if (DEADMONSTER(mtmp)) {
+        return;
+    }
+
+    if (mtmp == u.ustuck) {
+        release_hero(mtmp); /* expels/unstuck */
     }
 
     if (!first || !mtmp->mflee) {
@@ -257,17 +310,32 @@ boolean fleemsg;
             mtmp->mfleetim = min(fleetime, 127);
         }
         if (!mtmp->mflee && fleemsg && canseemon(mtmp)
+            && M_AP_TYPE(mtmp) != M_AP_FURNITURE
+            && M_AP_TYPE(mtmp) != M_AP_OBJECT
             && !mtmp->mfrozen && !is_vegetation(mtmp->data)) {
-            if (mtmp->data->mlet != S_MIMIC)
-                pline("%s turns to flee!", (Monnam(mtmp)));
-            else
-                pline("%s mimics a chicken for a moment!", (Monnam(mtmp)));
+            /* unfortunately we can't distinguish between temporary
+               sleep and temporary paralysis, so both conditions
+               receive the same alternate message */
+            if (!mtmp->mcanmove || !mtmp->data->mmove) {
+                pline("%s seems to flinch.", Adjmonnam(mtmp, "immobile"));
+            } else if (flees_light(mtmp)) {
+                if (rn2(10) || Deaf) {
+                    pline("%s flees from the painful light of %s.", Monnam(mtmp), bare_artifactname(uwep));
+                } else {
+                    verbalize("Bright light!");
+                }
+            } else {
+                if (mtmp->data->mlet != S_MIMIC)
+                    pline("%s turns to flee!", (Monnam(mtmp)));
+                else
+                    pline("%s mimics a chicken for a moment!", (Monnam(mtmp)));
+            }
         }
         mtmp->mflee = 1;
     }
 
     /* ignore recently-stepped spaces when made to flee */
-    memset(mtmp->mtrack, MTSZ, sizeof(coord));
+    memset(mtmp->mtrack, 0, sizeof(mtmp->mtrack));
 }
 
 STATIC_OVL void
@@ -276,6 +344,7 @@ register struct monst *mtmp;
 int *inrange, *nearby, *scared;
 {
     int seescaryx, seescaryy;
+    boolean sawscary = FALSE, bravegremlin = (rn2(5) == 0);
 
     *inrange = (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <=
                 (BOLT_LIM * BOLT_LIM));
@@ -296,20 +365,22 @@ int *inrange, *nearby, *scared;
         seescaryy = u.uy;
     }
     *scared = (*nearby && (onscary(seescaryx, seescaryy, mtmp) ||
+                           (flees_light(mtmp) && !bravegremlin) ||
                            (!mtmp->mpeaceful &&
                             in_your_sanctuary(mtmp, 0, 0) &&
                             /* don't warn due to fleeing monsters about
                              * the right temple on Astral */
                             !Is_astralevel(&u.uz))));
 
-    if(*scared) {
+    if (*scared) {
         if (rn2(7))
             monflee(mtmp, rnd(10), TRUE, TRUE);
         else
             monflee(mtmp, rnd(100), TRUE, TRUE);
     }
-
 }
+
+#undef flees_light
 
 /* perform a special one-time action for a monster; returns -1 if nothing
    special happened, 0 if monster uses up its turn, 1 if monster is killed */
@@ -317,7 +388,7 @@ STATIC_OVL int
 m_arrival(mon)
 struct monst *mon;
 {
-    mon->mstrategy &= ~STRAT_ARRIVE;    /* always reset */
+    mon->mstrategy &= ~STRAT_ARRIVE;/* always reset */
 
     return -1;
 }
@@ -336,7 +407,7 @@ register struct monst *mtmp;
     struct obj *ygold = 0, *lepgold = 0;
     struct monst* currmon;
 
-/*  Pre-movement adjustments    */
+    /*  Pre-movement adjustments */
 
     mdat = mtmp->data;
 
@@ -379,7 +450,7 @@ register struct monst *mtmp;
     /* some monsters teleport */
     if (mtmp->mflee && !rn2(40) && can_teleport(mdat) && !mtmp->iswiz &&
         !level.flags.noteleport) {
-        (void) rloc(mtmp, FALSE);
+        (void) rloc(mtmp, TRUE);
         return(0);
     }
     if (mdat->msound == MS_SHRIEK && !um_dist(mtmp->mx, mtmp->my, 1))
@@ -445,6 +516,12 @@ register struct monst *mtmp;
     if (mtmp->mflee && !mtmp->mfleetim
         && mtmp->mhp == mtmp->mhpmax && !rn2(25)) mtmp->mflee = 0;
 
+    /* cease conflict-induced swallow/grab if conflict has ended */
+    if (mtmp == u.ustuck && mtmp->mpeaceful && !mtmp->mconf && !Conflict) {
+        release_hero(mtmp);
+        return 0; /* uses up monster's turn */
+    }
+
     set_apparxy(mtmp);
     /* Must be done after you move and before the monster does.  The
      * set_apparxy() call in m_move() doesn't suffice since the variables
@@ -453,37 +530,42 @@ register struct monst *mtmp;
 
     /* Monsters that want to acquire things */
     /* may teleport, so do it before inrange is set */
-    if(is_covetous(mdat)) (void) tactics(mtmp);
+    if (is_covetous(mdat)) {
+        (void) tactics(mtmp);
+    }
 
     /* check distance and scariness of attacks */
     distfleeck(mtmp, &inrange, &nearby, &scared);
 
-    if(find_defensive(mtmp)) {
+    if (find_defensive(mtmp)) {
         if (use_defensive(mtmp) != 0)
             return 1;
-    } else if(find_misc(mtmp)) {
+    } else if (find_misc(mtmp)) {
         if (use_misc(mtmp) != 0)
             return 1;
     }
 
     /* Demonic Blackmail! */
-    if(nearby && mdat->msound == MS_BRIBE &&
+    if (nearby && mdat->msound == MS_BRIBE &&
 #ifdef CONVICT
-       (monsndx(mdat) != PM_PRISON_GUARD) &&
+         (monsndx(mdat) != PM_PRISON_GUARD) &&
 #endif /* CONVICT */
-       mtmp->mpeaceful && !mtmp->mtame && !u.uswallow) {
+         mtmp->mpeaceful && !mtmp->mtame && !u.uswallow) {
         if (mtmp->mux != u.ux || mtmp->muy != u.uy) {
             pline("%s whispers at thin air.",
                   cansee(mtmp->mux, mtmp->muy) ? Monnam(mtmp) : "It");
 
             if (is_demon(youmonst.data)) {
                 /* "Good hunting, brother" */
-                if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
+                if (!tele_restrict(mtmp)) {
+                    (void) rloc(mtmp, TRUE);
+                }
             } else {
                 mtmp->minvis = mtmp->perminvis = 0;
                 /* Why?  For the same reason in real demon talk */
                 pline("%s gets angry!", Amonnam(mtmp));
                 mtmp->mpeaceful = 0;
+                set_malign(mtmp);
                 /* since no way is an image going to pay it off */
             }
         } else if(demon_talk(mtmp)) return(1);  /* you paid it off */
@@ -510,12 +592,11 @@ register struct monst *mtmp;
 #endif /* CONVICT */
 
     /* the watch will look around and see if you are up to no good :-) */
-    if (mdat == &mons[PM_WATCHMAN] || mdat == &mons[PM_WATCH_CAPTAIN])
+    if (is_watch(mdat)) {
         watch_on_duty(mtmp);
 
     /* [DS] Cthulhu also uses psychic blasts */
-    else if ((is_mind_flayer(mdat) || mdat == &mons[PM_CTHULHU])
-             && !rn2(20)) {
+    } else if ((is_mind_flayer(mdat) || mdat == &mons[PM_CTHULHU]) && !rn2(20)) {
         struct monst *m2, *nmon = (struct monst *)0;
 
         if (canseemon(mtmp))
@@ -532,9 +613,9 @@ register struct monst *mtmp;
         }
         pline("A wave of psychic energy pours over you!");
         if (mtmp->mpeaceful &&
-            (!Conflict || resist(mtmp, RING_CLASS, 0, 0)))
+            (!Conflict || resist(mtmp, RING_CLASS, 0, 0))) {
             pline("It feels quite soothing.");
-        else {
+        } else if (!u.uinvulnerable) {
             register boolean m_sen = sensemon(mtmp);
 
             if (m_sen || (Blind_telepat && rn2(2)) || !rn2(10)) {
@@ -554,7 +635,7 @@ register struct monst *mtmp;
             }
         }
 toofar:
-        for(m2=fmon; m2; m2 = nmon) {
+        for (m2=fmon; m2; m2 = nmon) {
             nmon = m2->nmon;
             if (DEADMONSTER(m2)) continue;
             if (m2->mpeaceful == mtmp->mpeaceful) continue;
@@ -580,9 +661,9 @@ toofar:
     /* If monster is nearby you, and has to wield a weapon, do so.   This
      * costs the monster a move, of course.
      */
-    if((!mtmp->mpeaceful || Conflict) && inrange &&
-       dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 8
-       && attacktype(mdat, AT_WEAP)) {
+    if ((!mtmp->mpeaceful || Conflict) && inrange &&
+         dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 8
+         && attacktype(mdat, AT_WEAP)) {
         struct obj *mw_tmp;
 
         /* The scared check is necessary.  Otherwise a monster that is
@@ -601,18 +682,18 @@ toofar:
         }
     }
 
-/*  Now the actual movement phase   */
+    /*  Now the actual movement phase   */
 
     if (mdat->mlet == S_LEPRECHAUN) {
         ygold = findgold(invent);
         lepgold = findgold(mtmp->minvent);
     }
 
-    if(!nearby || mtmp->mflee || scared ||
-       mtmp->mconf || mtmp->mstun || (mtmp->minvis && !rn2(3)) ||
-       (mdat->mlet == S_LEPRECHAUN && !ygold && (lepgold || rn2(2))) ||
-       (is_wanderer(mdat) && !rn2(4)) || (Conflict && !mtmp->iswiz) ||
-       (!mtmp->mcansee && !rn2(4)) || mtmp->mpeaceful) {
+    if (!nearby || mtmp->mflee || scared ||
+        mtmp->mconf || mtmp->mstun || (mtmp->minvis && !rn2(3)) ||
+        (mdat->mlet == S_LEPRECHAUN && !ygold && (lepgold || rn2(2))) ||
+        (is_wanderer(mdat) && !rn2(4)) || (Conflict && !mtmp->iswiz) ||
+        (!mtmp->mcansee && !rn2(4)) || mtmp->mpeaceful) {
         /* Possibly cast an undirected spell if not attacking you */
         /* note that most of the time castmu() will pick a directed
            spell and do nothing, so the monster moves normally */
@@ -653,40 +734,52 @@ toofar:
         case 1:     /* monster moved */
             /* Maybe it stepped on a trap and fell asleep... */
             if (mtmp->msleeping || !mtmp->mcanmove) return(0);
-            if(!nearby &&
-               (ranged_attk(mdat) || find_offensive(mtmp)))
+            /* Monsters can move and then shoot on same turn;
+               our hero can't.  Is that fair? */
+            if (!nearby &&
+                 (ranged_attk(mdat) || find_offensive(mtmp))) {
                 break;
-            else if(u.uswallow && mtmp == u.ustuck) {
+            }
+            /* engulfer/grabber checks */
+            if (mtmp == u.ustuck) {
                 /* a monster that's digesting you can move at the
                  * same time -dlc
                  */
-                return(mattacku(mtmp));
-            } else
-                return(0);
-            /*NOTREACHED*/
-            break;
-        case 2:     /* monster died */
+                if (u.uswallow) {
+                    return mattacku(mtmp);
+                }
+                /* if confused grabber has wandered off, let go */
+                if (distu(mtmp->mx, mtmp->my) > 2) {
+                    unstuck(mtmp);
+                }
+            }
+            return 0;
+
+        case 2: /* monster died */
             return(1);
         }
     }
 
-/*  Now, attack the player if possible - one attack set per monst   */
+    /* Now, attack the player if possible - one attack set per monst */
 
     if (!mtmp->mpeaceful ||
         /* Attacks work even when engulfed by tame monsters */
         (u.uswallow && mtmp == u.ustuck) ||
         (Conflict && !resist(mtmp, RING_CLASS, 0, 0))) {
-        if(inrange && !noattacks(mdat) && u.uhp > 0 && !scared && tmp != 3)
-        {
-            if(mattacku(mtmp)) return(1); /* monster died (e.g. exploded) */
+        if (inrange && !noattacks(mdat) &&
+             (Upolyd ? u.mh : u.uhp) > 0 && !scared && tmp != 3) {
+            if (mattacku(mtmp)) {
+                return 1; /* monster died (e.g. exploded) */
+            }
 
             /* group attacker AI */
             if (is_groupattacker(mdat)) {
                 mtmp->mgrlastattack = monstermoves;
             }
         }
-
-        if(mtmp->wormno) wormhitu(mtmp);
+        if (mtmp->wormno) {
+            wormhitu(mtmp);
+        }
     }
     /* special speeches for quest monsters */
     if (!mtmp->msleeping && mtmp->mcanmove && nearby)
@@ -712,11 +805,94 @@ boolean
 itsstuck(mtmp)
 register struct monst *mtmp;
 {
-    if (sticks(youmonst.data) && mtmp==u.ustuck && !u.uswallow) {
+    if (sticks(youmonst.data) && mtmp == u.ustuck && !u.uswallow) {
         pline("%s cannot escape from you!", Monnam(mtmp));
         return(TRUE);
     }
     return(FALSE);
+}
+
+/*
+ * should_displace()
+ *
+ * Displacement of another monster is a last resort and only
+ * used on approach. If there are better ways to get to target,
+ * those should be used instead. This function does that evaluation.
+ */
+boolean
+should_displace(mtmp, poss, info, cnt, gx, gy)
+struct monst *mtmp;
+coord *poss; /* coord poss[9] */
+long *info;  /* long info[9] */
+int cnt;
+xchar gx, gy;
+{
+    int shortest_with_displacing = -1;
+    int shortest_without_displacing = -1;
+    int count_without_displacing = 0;
+    register int i, nx, ny;
+    int ndist;
+
+    for (i = 0; i < cnt; i++) {
+        nx = poss[i].x;
+        ny = poss[i].y;
+        ndist = dist2(nx, ny, gx, gy);
+        if (MON_AT(nx, ny) && (info[i] & ALLOW_MDISP) && !(info[i] & ALLOW_M) &&
+             !undesirable_disp(mtmp, nx, ny)) {
+            if ((shortest_with_displacing == -1) ||
+                 (ndist < shortest_with_displacing)) {
+                shortest_with_displacing = ndist;
+            }
+        } else {
+            if ((shortest_without_displacing == -1) ||
+                 (ndist < shortest_without_displacing)) {
+                shortest_without_displacing = ndist;
+            }
+            count_without_displacing++;
+        }
+    }
+    if ((shortest_with_displacing > -1) &&
+         (shortest_with_displacing < shortest_without_displacing || !count_without_displacing)) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+boolean
+m_digweapon_check(mtmp, nix, niy)
+struct monst *mtmp;
+xchar nix,niy;
+{
+    boolean can_tunnel = 0;
+    struct obj *mw_tmp = MON_WEP(mtmp);
+
+    if (!Is_rogue_level(&u.uz)) {
+        can_tunnel = tunnels(mtmp->data);
+    }
+
+    if (can_tunnel && needspick(mtmp->data) && !mwelded(mw_tmp) &&
+        (may_dig(nix, niy) || closed_door(nix, niy))) {
+        /* may_dig() is either IS_STWALL or IS_TREE */
+        if (closed_door(nix, niy)) {
+            if (!mw_tmp ||
+                 !is_pick(mw_tmp) ||
+                 !is_axe(mw_tmp)) {
+                mtmp->weapon_check = NEED_PICK_OR_AXE;
+            }
+        } else if (IS_TREE(levl[nix][niy].typ)) {
+            if (!(mw_tmp = MON_WEP(mtmp)) || !is_axe(mw_tmp)) {
+                mtmp->weapon_check = NEED_AXE;
+            }
+        } else if (IS_STWALL(levl[nix][niy].typ)) {
+            if (!(mw_tmp = MON_WEP(mtmp)) || !is_pick(mw_tmp)) {
+                mtmp->weapon_check = NEED_PICK_AXE;
+            }
+        }
+        if (mtmp->weapon_check >= NEED_PICK_AXE && mon_wield_item(mtmp)) {
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 /* Return values:
@@ -732,15 +908,17 @@ register int after;
 {
     register int appr;
     xchar gx, gy, nix, niy, chcnt;
-    int chi;    /* could be schar except for stupid Sun-2 compiler */
+    int chi; /* could be schar except for stupid Sun-2 compiler */
     boolean likegold=0, likegems=0, likeobjs=0, likemagic=0, conceals=0;
     boolean likerock=0, can_tunnel=0, breakrock=0;
     boolean can_open=0, can_unlock=0, doorbuster=0;
     boolean uses_items=0, setlikes=0;
     boolean avoid=FALSE;
+    boolean better_with_displacing = FALSE;
+    boolean sawmon = canspotmon(mtmp); /* before it moved */
     struct permonst *ptr;
     struct monst *mtoo;
-    schar mmoved = 0;   /* not strictly nec.: chi >= 0 will do */
+    schar mmoved = 0; /* not strictly nec.: chi >= 0 will do */
     long info[9];
     long flag;
     int omx = mtmp->mx, omy = mtmp->my;
@@ -754,7 +932,7 @@ register int after;
 
     if (stationary(mtmp->data)) return(0);
 
-    if(mtmp->mtrapped) {
+    if (mtmp->mtrapped) {
         int i = mintrap(mtmp);
         if(i >= 2) { newsym(mtmp->mx, mtmp->my); return(2); }/* it died */
         if(i == 1) return(0);   /* still in trap, so didn't move */
@@ -767,6 +945,9 @@ register int after;
 
     if (mtmp->meating) {
         mtmp->meating--;
+        if (mtmp->meating <= 0) {
+            finish_meating(mtmp);
+        }
         return 3;           /* still eating */
     }
     if (hides_under(ptr) && OBJ_AT(mtmp->mx, mtmp->my) && rn2(10))
@@ -782,18 +963,18 @@ register int after;
 #endif
     can_tunnel = tunnels(ptr);
     can_open = !(nohands(ptr) || verysmall(ptr));
-    can_unlock = ((can_open && m_carrying(mtmp, SKELETON_KEY)) ||
+    can_unlock = ((can_open && mon_has_key(mtmp, TRUE)) ||
                   mtmp->iswiz || is_rider(ptr));
     doorbuster = is_giant(ptr);
     if(mtmp->wormno) goto not_special;
     /* my dog gets special treatment */
-    if(mtmp->mtame) {
+    if (mtmp->mtame) {
         mmoved = dog_move(mtmp, after);
         goto postmov;
     }
 
     /* likewise for shopkeeper */
-    if(mtmp->isshk) {
+    if (mtmp->isshk) {
         mmoved = shk_move(mtmp);
         if(mmoved == -2) return(2);
         if(mmoved >= 0) goto postmov;
@@ -801,7 +982,7 @@ register int after;
     }
 
     /* and for the guard */
-    if(mtmp->isgd) {
+    if (mtmp->isgd) {
         mmoved = gd_move(mtmp);
         if(mmoved == -2) return(2);
         if(mmoved >= 0) goto postmov;
@@ -809,7 +990,7 @@ register int after;
     }
 
     /* and the acquisitive monsters get special treatment */
-    if(is_covetous(ptr)) {
+    if (is_covetous(ptr)) {
         xchar tx = STRAT_GOALX(mtmp->mstrategy),
               ty = STRAT_GOALY(mtmp->mstrategy);
         struct monst *intruder = m_at(tx, ty);
@@ -817,9 +998,8 @@ register int after;
          * if there's a monster on the object or in possesion of it,
          * attack it.
          */
-        if((dist2(mtmp->mx, mtmp->my, tx, ty) < 2) &&
-           intruder && (intruder != mtmp)) {
-
+        if ((dist2(mtmp->mx, mtmp->my, tx, ty) < 2) &&
+             intruder && (intruder != mtmp)) {
             notonhead = (intruder->mx != tx || intruder->my != ty);
             if(mattackm(mtmp, intruder) == 2) return(2);
             mmoved = 1;
@@ -828,7 +1008,7 @@ register int after;
     }
 
     /* and for the priest */
-    if(mtmp->ispriest) {
+    if (mtmp->ispriest) {
         mmoved = pri_move(mtmp);
         if(mmoved == -2) return(2);
         if(mmoved >= 0) goto postmov;
@@ -836,19 +1016,20 @@ register int after;
     }
 
 #ifdef MAIL
-    if(ptr == &mons[PM_MAIL_DAEMON]) {
-        if(flags.soundok && canseemon(mtmp))
+    if (ptr == &mons[PM_MAIL_DAEMON]) {
+        if (!Deaf && canseemon(mtmp)) {
             verbalize("I'm late!");
+        }
         mongone(mtmp);
         return(2);
     }
 #endif
 
     /* teleport if that lies in our nature */
-    if(ptr == &mons[PM_TENGU] && !rn2(5) && !mtmp->mcan &&
-       !tele_restrict(mtmp)) {
+    if (ptr == &mons[PM_TENGU] && !rn2(5) && !mtmp->mcan &&
+         !tele_restrict(mtmp)) {
         if(mtmp->mhp < 7 || mtmp->mpeaceful || rn2(2))
-            (void) rloc(mtmp, FALSE);
+            (void) rloc(mtmp, TRUE);
         else
             mnexto(mtmp);
         mmoved = 1;
@@ -872,14 +1053,14 @@ not_special:
 
         if (!mtmp->mcansee ||
             (should_see && Invis && !perceives(ptr) && rn2(11)) ||
-            (youmonst.m_ap_type == M_AP_OBJECT && youmonst.mappearance == STRANGE_OBJECT) || u.uundetected ||
-            (youmonst.m_ap_type == M_AP_OBJECT && youmonst.mappearance == GOLD_PIECE && !likes_gold(ptr)) ||
+            (is_obj_mappear(&youmonst,STRANGE_OBJECT)) || u.uundetected ||
+            (is_obj_mappear(&youmonst,GOLD_PIECE) && !likes_gold(ptr)) ||
             (mtmp->mpeaceful && !mtmp->isshk) ||  /* allow shks to follow */
             ((monsndx(ptr) == PM_STALKER || ptr->mlet == S_BAT ||
               ptr->mlet == S_LIGHT) && !rn2(3)))
             appr = 0;
 
-        if(monsndx(ptr) == PM_LEPRECHAUN && (appr == 1) &&
+        if (monsndx(ptr) == PM_LEPRECHAUN && (appr == 1) &&
            ( (lepgold = findgold(mtmp->minvent)) &&
              (lepgold->quan > ((ygold = findgold(invent)) ? ygold->quan : 0L)) ))
             appr = -1;
@@ -963,7 +1144,7 @@ look_for_obj:
                * searches_for_item().  We need to do this check in
                * mpickstuff() as well.
                */
-              if(xx >= lmx && xx <= oomx && yy >= lmy && yy <= oomy) {
+              if (xx >= lmx && xx <= oomx && yy >= lmy && yy <= oomy) {
                   /* don't get stuck circling around an object that's underneath
                      an immobile or hidden monster; paralysis victims excluded */
                   if ((mtoo = m_at(xx, yy)) != 0 &&
@@ -1014,15 +1195,15 @@ look_for_obj:
                   }
               }
           }
-      } else if(likegold) {
+      } else if (likegold) {
           /* don't try to pick up anything else, but use the same loop */
           uses_items = 0;
           likegems = likeobjs = likemagic = likerock = breakrock = conceals = 0;
           goto look_for_obj;
       }
 
-      if(minr < SQSRCHRADIUS && appr == -1) {
-          if(distmin(omx, omy, mtmp->mux, mtmp->muy) <= 3) {
+      if (minr < SQSRCHRADIUS && appr == -1) {
+          if (distmin(omx, omy, mtmp->mux, mtmp->muy) <= 3) {
               gx = mtmp->mux;
               gy = mtmp->muy;
           } else
@@ -1048,7 +1229,9 @@ look_for_obj:
     if ((passes_bars(ptr) || metallivorous(ptr)) && !In_sokoban(&u.uz)) flag |= ALLOW_BARS;
     if (can_tunnel) flag |= ALLOW_DIG;
     if (is_human(ptr) || ptr == &mons[PM_MINOTAUR]) flag |= ALLOW_SSM;
-    if (is_undead(ptr) && ptr->mlet != S_GHOST) flag |= NOGARLIC;
+    if ((is_undead(ptr) && ptr->mlet != S_GHOST) || is_vampshifter(mtmp)) {
+        flag |= NOGARLIC;
+    }
     if (throws_rocks(ptr) || is_rockbreaker(ptr)) flag |= ALLOW_ROCK;
     if (can_open) flag |= OPENDOOR;
     if (can_unlock) flag |= UNLOCKDOOR;
@@ -1074,10 +1257,19 @@ look_for_obj:
                 if(!(info[i] & NOTONL)) avoid=TRUE;
         }
 
-        for(i=0; i < cnt; i++) {
+        better_with_displacing = should_displace(mtmp, poss, info, cnt, gx, gy);
+
+        for (i=0; i < cnt; i++) {
             if (avoid && (info[i] & NOTONL)) continue;
             nx = poss[i].x;
             ny = poss[i].y;
+
+            if (MON_AT(nx, ny) &&
+                 (info[i] & ALLOW_MDISP) &&
+                 !(info[i] & ALLOW_M) &&
+                 !better_with_displacing) {
+                continue;
+            }
 
             if (appr != 0) {
                 /* avoid stepping back onto recently-stepped spaces */
@@ -1090,8 +1282,8 @@ look_for_obj:
 
             nearer = ((ndist = dist2(nx, ny, gx, gy)) < nidist);
 
-            if((appr == 1 && nearer) || (appr == -1 && !nearer) ||
-               (!appr && !rn2(++chcnt)) || !mmoved) {
+            if ((appr == 1 && nearer) || (appr == -1 && !nearer) ||
+                (!appr && !rn2(++chcnt)) || !mmoved) {
                 nix = nx;
                 niy = ny;
                 nidist = ndist;
@@ -1105,8 +1297,13 @@ nxti:       ;
     if(mmoved) {
         register int j;
 
-        if (mmoved==1 && (u.ux != nix || u.uy != niy) && itsstuck(mtmp))
+        if (mmoved==1 && (u.ux != nix || u.uy != niy) && itsstuck(mtmp)) {
             return(3);
+        }
+
+        if (mmoved == 1 && m_digweapon_check(mtmp, nix,niy)) {
+            return 3;
+        }
 
         /* Can't go through crystal wall no matter what */
         if (IS_CRYSTALICEWALL(levl[nix][niy].typ))
@@ -1181,8 +1378,24 @@ nxti:       ;
             return 3;
         }
 
+        if ((info[chi] & ALLOW_MDISP)) {
+            struct monst *mtmp2;
+            int mstatus;
+
+            mtmp2 = m_at(nix, niy);
+            mstatus = mdisplacem(mtmp, mtmp2, FALSE);
+            if ((mstatus & MM_AGR_DIED) || (mstatus & MM_DEF_DIED)) {
+                return 2;
+            }
+            if (mstatus & MM_HIT) {
+                return 1;
+            }
+            return 3;
+        }
+
         if (!m_in_out_region(mtmp, nix, niy))
             return 3;
+
         remove_monster(omx, omy);
         place_monster(mtmp, nix, niy);
         for(j = MTSZ-1; j > 0; j--)
@@ -1192,18 +1405,22 @@ nxti:       ;
         /* Place a segment at the old position. */
         if (mtmp->wormno) worm_move(mtmp);
     } else {
-        if(is_unicorn(ptr) && rn2(2) && !tele_restrict(mtmp)) {
-            (void) rloc(mtmp, FALSE);
+        if (is_unicorn(ptr) && rn2(2) && !tele_restrict(mtmp)) {
+            (void) rloc(mtmp, TRUE);
             return(1);
         }
         if(mtmp->wormno) worm_nomove(mtmp);
     }
 postmov:
-    if(mmoved == 1 || mmoved == 3) {
+    if (mmoved == 1 || mmoved == 3) {
         boolean canseeit = cansee(mtmp->mx, mtmp->my);
 
-        if(mmoved == 1) {
-            newsym(omx, omy);   /* update the old position */
+        if (mmoved == 1) {
+            /* normal monster move will already have <nix,niy>,
+               but pet dog_move() with 'goto postmov' won't */
+            nix = mtmp->mx, niy = mtmp->my;
+
+            newsym(omx, omy); /* update the old position */
             if (mintrap(mtmp) >= 2) {
                 if(mtmp->mx) newsym(mtmp->mx, mtmp->my);
                 return(2); /* it died */
@@ -1211,9 +1428,9 @@ postmov:
             ptr = mtmp->data;
 
             /* open a door, or crash through it, if you can */
-            if(IS_DOOR(levl[mtmp->mx][mtmp->my].typ)
-               && !passes_walls(ptr) /* doesn't need to open doors */
-               && !can_tunnel /* taken care of below */
+            if (IS_DOOR(levl[mtmp->mx][mtmp->my].typ)
+                && !passes_walls(ptr) /* doesn't need to open doors */
+                && !can_tunnel /* taken care of below */
                ) {
                 struct rm *here = &levl[mtmp->mx][mtmp->my];
                 boolean btrapped = (here->doormask & D_TRAPPED);
@@ -1409,6 +1626,12 @@ boolean
 accessible(x, y)
 register int x, y;
 {
+    int levtyp = levl[x][y].typ;
+
+    /* use underlying terrain in front of closed drawbridge */
+    if (levtyp == DRAWBRIDGE_UP) {
+        levtyp = db_under_typ(&levl[x][y]);
+    }
     return((boolean)(ACCESSIBLE(levl[x][y].typ) && !closed_door(x, y)));
 }
 
@@ -1435,13 +1658,13 @@ register struct monst *mtmp;
     notseen = (!mtmp->mcansee || (Invis && !perceives(mtmp->data)));
     /* add cases as required.  eg. Displacement ... */
     if (notseen || Underwater) {
-        /* Xorns can smell valuable metal like gold, treat as seen */
-        if ((mtmp->data == &mons[PM_XORN]) &&
-            umoney
-            && !Underwater)
+        /* Xorns can smell quantities of valuable metal
+            like that in solid gold coins, treat as seen */
+        if ((mtmp->data == &mons[PM_XORN]) && umoney && !Underwater) {
             disp = 0;
-        else
+        } else {
             disp = 1;
+        }
     } else if (Displaced) {
         disp = couldsee(mx, my) ? 2 : 1;
     } else disp = 0;
@@ -1450,11 +1673,6 @@ register struct monst *mtmp;
     /* without something like the following, invis. and displ.
        are too powerful */
     gotu = notseen ? !rn2(3) : Displaced ? !rn2(4) : FALSE;
-
-#if 0       /* this never worked as intended & isn't needed anyway */
-    /* If invis but not displaced, staying around gets you 'discovered' */
-    gotu |= (!Displaced && u.dx == 0 && u.dy == 0);
-#endif
 
     if (!gotu) {
         register int try_cnt = 0;
@@ -1477,6 +1695,54 @@ found_you:
 
     mtmp->mux = mx;
     mtmp->muy = my;
+}
+
+/*
+ * mon-to-mon displacement is a deliberate "get out of my way" act,
+ * not an accidental bump, so we don't consider mstun or mconf in
+ * undesired_disp().
+ *
+ * We do consider many other things about the target and its
+ * location however.
+ */
+boolean
+undesirable_disp(mtmp, x, y)
+struct monst *mtmp; /* barging creature */
+xchar x, y; /* spot 'mtmp' is considering moving to */
+{
+    boolean is_pet = (mtmp && mtmp->mtame && !mtmp->isminion);
+    struct trap *trap = t_at(x, y);
+
+    if (is_pet) {
+        /* Pets avoid a trap if you've seen it usually. */
+        if (trap && trap->tseen && rn2(40)) {
+            return TRUE;
+        }
+        /* Pets avoid cursed locations */
+        if (cursed_object_at(x, y)) {
+            return TRUE;
+        }
+
+    /* Monsters avoid a trap if they've seen that type before */
+    } else if (trap && rn2(40) &&
+               (mtmp->mtrapseen & (1 << (trap->ttyp - 1))) != 0) {
+        return TRUE;
+    }
+
+    /* oversimplification:  creatures that bargethrough can't swap places
+       when target monster is in rock or closed door or water (in particular,
+       avoid moving to spots where mondied() won't leave a corpse; doesn't
+       matter whether barger is capable of moving to such a target spot if
+       it were unoccupied) */
+    if (!accessible(x, y) &&
+        /* mondied() allows is_pool() as an exception to !accessible(),
+           but we'll only do that if 'mtmp' is already at a water location
+           so that we don't swap a water critter onto land */
+         !(is_pool(x, y) && is_pool(mtmp->mx, mtmp->my))) {
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 /*
@@ -1566,6 +1832,38 @@ struct monst *mtmp;
         return TRUE;
     }
     return FALSE;
+}
+
+static int
+vamp_shift(mon, ptr, domsg)
+struct monst *mon;
+struct permonst *ptr;
+boolean domsg;
+{
+    int reslt = 0;
+    char oldmtype[BUFSZ];
+
+    /* remember current monster type before shapechange */
+    Strcpy(oldmtype, domsg ? noname_monnam(mon, ARTICLE_THE) : "");
+
+    if (mon->data == ptr) {
+        /* already right shape */
+        reslt = 1;
+        domsg = FALSE;
+    } else if (is_vampshifter(mon)) {
+        reslt = newcham(mon, ptr, FALSE, FALSE);
+    }
+
+    if (reslt && domsg) {
+        pline("You %s %s where %s was.",
+              !canseemon(mon) ? "now detect" : "observe",
+              noname_monnam(mon, ARTICLE_A), oldmtype);
+        /* this message is given when it turns into a fog cloud
+           in order to move under a closed door */
+        display_nhwindow(WIN_MESSAGE, FALSE);
+    }
+
+    return reslt;
 }
 
 static void

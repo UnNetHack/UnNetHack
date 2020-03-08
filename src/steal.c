@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)steal.c    3.4 2003/12/04  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -20,19 +19,33 @@ register struct obj *otmp;
         (otmp == uarms) ? "shield" :
         (otmp == uarmg) ? "gloves" :
         (otmp == uarmc) ? cloak_simple_name(otmp) :
-        (otmp == uarmh) ? "helmet" : "armor");
+        (otmp == uarmh) ? helm_simple_name(otmp) : suit_simple_name(otmp));
 }
 
-long        /* actually returns something that fits in an int */
-somegold(umoney)
-long umoney;
+/* proportional subset of gold; return value actually fits in an int */
+long
+somegold(lmoney)
+long lmoney;
 {
-#ifdef LINT /* long conv. ok */
-    return(0L);
-#else
-    return (long)( (umoney < 100) ? umoney :
-                   (umoney > 10000) ? rnd(10000) : rnd((int) umoney) );
-#endif
+    int igold = (lmoney >= (long) LARGEST_INT) ? LARGEST_INT : (int) lmoney;
+
+    if (igold < 50) {
+        ; /* all gold */
+    } else if (igold < 100) {
+        igold = rn1(igold - 25 + 1, 25);
+    } else if (igold < 500) {
+        igold = rn1(igold - 50 + 1, 50);
+    } else if (igold < 1000) {
+        igold = rn1(igold - 100 + 1, 100);
+    } else if (igold < 5000) {
+        igold = rn1(igold - 500 + 1, 500);
+    } else if (igold < 10000) {
+        igold = rn1(igold - 1000 + 1, 1000);
+    } else {
+        igold = rn1(igold - 5000 + 1, 5000);
+    }
+
+    return (long) igold;
 }
 
 /*
@@ -61,6 +74,8 @@ register struct monst *mtmp;
     register struct obj *fgold = g_at(u.ux, u.uy);
     register struct obj *ygold;
     register long tmp;
+    struct monst *who;
+    const char *whose, *what;
 
     /* skip lesser coins on the floor */
     while (fgold && fgold->otyp != GOLD_PIECE) fgold = fgold->nexthere;
@@ -72,21 +87,47 @@ register struct monst *mtmp;
         obj_extract_self(fgold);
         add_to_minv(mtmp, fgold);
         newsym(u.ux, u.uy);
-        pline("%s quickly snatches some gold from between your %s!",
-              Monnam(mtmp), makeplural(body_part(FOOT)));
+        if (u.usteed) {
+            who = u.usteed;
+            whose = s_suffix(y_monnam(who));
+            what = makeplural(mbodypart(who, FOOT));
+        } else {
+            who = &youmonst;
+            whose = "your";
+            what = makeplural(body_part(FOOT));
+        }
+        /* [ avoid "between your rear regions" :-] */
+        if (slithy(who->data)) {
+            what = "coils";
+        }
+        /* reduce "rear hooves/claws" to "hooves/claws" */
+        if (!strncmp(what, "rear ", 5)) {
+            what += 5;
+        }
+        pline("%s quickly snatches some gold from %s %s %s!", Monnam(mtmp),
+              (Levitation || Flying) ? "beneath" : "between", whose, what);
         if(!ygold || !rn2(5)) {
-            if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
+            if (!tele_restrict(mtmp)) {
+                (void) rloc(mtmp, TRUE);
+            }
             monflee(mtmp, 0, FALSE, FALSE);
         }
     } else if(ygold) {
         const int gold_price = objects[GOLD_PIECE].oc_cost;
+
         tmp = (somegold(money_cnt(invent)) + gold_price - 1) / gold_price;
         tmp = min(tmp, ygold->quan);
-        if (tmp < ygold->quan) ygold = splitobj(ygold, tmp);
+        if (tmp < ygold->quan) {
+            ygold = splitobj(ygold, tmp);
+        } else {
+            setnotworn(ygold);
+        }
         freeinv(ygold);
         add_to_minv(mtmp, ygold);
         Your("purse feels lighter.");
-        if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
+        if (!tele_restrict(mtmp)) {
+            (void) rloc(mtmp, TRUE);
+        }
         monflee(mtmp, 0, FALSE, FALSE);
         flags.botl = 1;
     }
@@ -117,14 +158,17 @@ stealarm()
                     /* Implies seduction, "you gladly hand over ..."
                        so we don't set mavenge bit here. */
                     monflee(mtmp, 0, FALSE, FALSE);
-                    if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
+                    if (!tele_restrict(mtmp)) {
+                        (void) rloc(mtmp, TRUE);
+                    }
                     break;
                 }
             }
             break;
         }
     }
-botm:   stealoid = 0;
+botm:
+    stealoid = 0;
     return 0;
 }
 
@@ -162,7 +206,7 @@ boolean unchain_ball;   /* whether to unpunish or just unwield */
         Ring_gone(obj);
     } else if (obj->owornmask & W_TOOL) {
         Blindf_off(obj);
-    } else if (obj->owornmask & (W_WEP|W_SWAPWEP|W_QUIVER)) {
+    } else if (obj->owornmask & W_WEAPONS) {
         if (obj == uwep)
             uwepgone();
         if (obj == uswapwep)
@@ -182,6 +226,7 @@ boolean unchain_ball;   /* whether to unpunish or just unwield */
 /* Returns 1 when something was stolen (or at least, when N should flee now)
  * Returns -1 if the monster died in the attempt
  * Avoid stealing the object stealoid
+ * Nymphs and monkeys won't steal coins
  */
 int
 steal(mtmp, objnambuf)
@@ -189,8 +234,9 @@ struct monst *mtmp;
 char *objnambuf;
 {
     struct obj *otmp;
-    int tmp, could_petrify, named = 0, armordelay;
+    int tmp, could_petrify, armordelay, olddelay, icnt, named = 0, retrycnt = 0;
     boolean monkey_business; /* true iff an animal is doing the thievery */
+    boolean was_doffing, was_punished = Punished;
 
     if (objnambuf) *objnambuf = '\0';
     /* the following is true if successful on first of two attacks. */
@@ -201,22 +247,26 @@ char *objnambuf;
        so this will cause it to be removed now */
     if (occupation) (void) maybe_finished_meal(FALSE);
 
-    if (!invent || (inv_cnt(FALSE) == 1 && uskin)) {
+    icnt = inv_cnt(FALSE); /* don't include gold */
+    if (!icnt || (icnt == 1 && uskin)) {
 nothing_to_steal:
         /* Not even a thousand men in armor can strip a naked man. */
         if(Blind)
             pline("Somebody tries to rob you, but finds nothing to steal.");
+        else if (inv_cnt(TRUE) > inv_cnt(FALSE)) /* ('icnt' might be stale) */
+            pline("%s tries to rob you, but isn't interested in gold.",
+                  Monnam(mtmp));
         else
             pline("%s tries to rob you, but there is nothing to steal!",
                   Monnam(mtmp));
-        return(1);  /* let her flee */
+        return(1); /* let her flee */
     }
 
     /* Monkey or mugger robbing you.
      * You don't wanna be charmed/seduced by a mugger. */
     monkey_business = (is_animal(mtmp->data) ||
                        mtmp->data->mlet == S_HUMAN);
-    if (monkey_business) {
+    if (monkey_business || uarmg) {
         ;   /* skip ring special cases */
     } else if (Adornment & LEFT_RING) {
         otmp = uleft;
@@ -226,29 +276,35 @@ nothing_to_steal:
         goto gotobj;
     }
 
+retry:
     tmp = 0;
-    for(otmp = invent; otmp; otmp = otmp->nobj)
-        if ((!uarm || otmp != uarmc) && otmp != uskin
-#ifdef INVISIBLE_OBJECTS
-            && (!otmp->oinvis || perceives(mtmp->data))
-#endif
-            )
-            tmp += ((otmp->owornmask &
-                     (W_ARMOR | W_RING | W_AMUL | W_TOOL)) ? 5 : 1);
-    if (!tmp) goto nothing_to_steal;
+    for (otmp = invent; otmp; otmp = otmp->nobj) {
+        if ((!uarm || otmp != uarmc) && otmp != uskin &&
+             otmp->oclass != COIN_CLASS) {
+            tmp += (otmp->owornmask & (W_ARMOR | W_ACCESSORY)) ? 5 : 1;
+        }
+    }
+    if (!tmp) {
+        goto nothing_to_steal;
+    }
     tmp = rn2(tmp);
-    for(otmp = invent; otmp; otmp = otmp->nobj)
-        if ((!uarm || otmp != uarmc) && otmp != uskin
-#ifdef INVISIBLE_OBJECTS
-            && (!otmp->oinvis || perceives(mtmp->data))
-#endif
-            )
-            if((tmp -= ((otmp->owornmask &
-                         (W_ARMOR | W_RING | W_AMUL | W_TOOL)) ? 5 : 1)) < 0)
+    for (otmp = invent; otmp; otmp = otmp->nobj) {
+        if ((!uarm || otmp != uarmc) && otmp != uskin &&
+             otmp->oclass != COIN_CLASS) {
+            tmp -= (otmp->owornmask & (W_ARMOR | W_ACCESSORY)) ? 5 : 1;
+
+            if (tmp < 0) {
                 break;
-    if(!otmp) {
+            }
+        }
+    }
+    if (!otmp) {
         warning("Steal fails!");
         return(0);
+    }
+    /* can't steal ring(s) while wearing gloves */
+    if ((otmp == uleft || otmp == uright) && uarmg) {
+        otmp = uarmg;
     }
     /* can't steal gloves while wielding - so steal the wielded item. */
     if (otmp == uarmg && uwep)
@@ -256,31 +312,47 @@ nothing_to_steal:
     /* can't steal armor while wearing cloak - so steal the cloak. */
     else if(otmp == uarm && uarmc) otmp = uarmc;
 #ifdef TOURIST
+    /* can't steal shirt while wearing cloak or suit */
     else if(otmp == uarmu && uarmc) otmp = uarmc;
     else if(otmp == uarmu && uarm) otmp = uarm;
 #endif
 gotobj:
-    if(otmp->o_id == stealoid) return(0);
+    if (otmp->o_id == stealoid) {
+        return 0;
+    }
+
+    if (otmp->otyp == BOULDER && !throws_rocks(mtmp->data)) {
+        if (!retrycnt++) {
+            goto retry;
+        }
+        goto cant_take;
+    }
 
     /* animals can't overcome curse stickiness nor unlock chains */
     if (monkey_business) {
         boolean ostuck;
         /* is the player prevented from voluntarily giving up this item?
            (ignores loadstones; the !can_carry() check will catch those) */
-        if (otmp == uball)
+        if (otmp == uball) {
             ostuck = TRUE; /* effectively worn; curse is implicit */
-        else if (otmp == uquiver || (otmp == uswapwep && !u.twoweap))
+        } else if (otmp == uquiver || (otmp == uswapwep && !u.twoweap)) {
             ostuck = FALSE; /* not really worn; curse doesn't matter */
-        else
-            ostuck = (otmp->cursed && otmp->owornmask);
+        } else {
+            ostuck = ((otmp->cursed && otmp->owornmask) ||
+                      /* nymphs can steal rings from under
+                         cursed weapon but animals can't */
+                       (otmp == uright && welded(uwep)) ||
+                       (otmp == uleft && welded(uwep) && bimanual(uwep)));
+        }
 
         if (ostuck || !can_carry(mtmp, otmp)) {
             static const char * const how[] = { "steal", "snatch", "grab", "take" };
 cant_take:
-            pline("%s tries to %s your %s but gives up.",
-                  Monnam(mtmp), how[rn2(SIZE(how))],
+            pline("%s tries to %s %s%s but gives up.", Monnam(mtmp),
+                  how[rn2(SIZE(how))],
+                  (otmp->owornmask & W_ARMOR) ? "your " : "",
                   (otmp->owornmask & W_ARMOR) ? equipname(otmp) :
-                  cxname(otmp));
+                  yname(otmp));
             /* the fewer items you have, the less likely the thief
                is going to stick around to try again (0) instead of
                running away (1) */
@@ -293,10 +365,15 @@ cant_take:
         o_unleash(otmp);
     }
 
+    was_doffing = doffing(otmp);
+    /* stop donning/doffing now so that afternmv won't be clobbered
+       below; stop_occupation doesn't handle donning/doffing */
+    olddelay = stop_donning(otmp);
+
     /* you're going to notice the theft... */
     stop_occupation();
 
-    if((otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL))) {
+    if (otmp->owornmask & (W_ARMOR | W_ACCESSORY)) {
         switch(otmp->oclass) {
         case TOOL_CLASS:
         case AMULET_CLASS:
@@ -306,14 +383,15 @@ cant_take:
             break;
         case ARMOR_CLASS:
             armordelay = objects[otmp->otyp].oc_delay;
-            /* Stop putting on armor which has been stolen. */
-            if (donning(otmp)) {
-                remove_worn_item(otmp, TRUE);
-                break;
-            } else if (monkey_business) {
+            if (olddelay > 0 && olddelay < armordelay) {
+                armordelay = olddelay;
+            }
+            if (monkey_business) {
                 /* animals usually don't have enough patience
                    to take off items which require extra time */
-                if (armordelay >= 1 && rn2(10)) goto cant_take;
+                if (armordelay >= 1 && !olddelay && rn2(10)) {
+                    goto cant_take;
+                }
                 remove_worn_item(otmp, TRUE);
                 break;
             } else {
@@ -323,23 +401,28 @@ cant_take:
 
                 otmp->cursed = 0;
                 /* can't charm you without first waking you */
-                if (multi < 0 && is_fainted()) unmul((char *)0);
+                if (Unaware) {
+                    unmul((char *) 0);
+                }
                 slowly = (armordelay >= 1 || multi < 0);
                 if(flags.female)
                     pline("%s charms you.  You gladly %s your %s.",
                           !seen ? "She" : Monnam(mtmp),
                           curssv ? "let her take" :
-                          slowly ? "start removing" : "hand over",
+                          !slowly ? "hand over" :
+                          was_doffing ? "continue removing" : "start removing",
                           equipname(otmp));
                 else
                     pline("%s seduces you and %s off your %s.",
                           !seen ? "She" : Adjmonnam(mtmp, "beautiful"),
                           curssv ? "helps you to take" :
-                          slowly ? "you start taking" : "you take",
+                          !slowly ? "you take" :
+                          was_doffing ? "you continue taking" : "you start taking",
                           equipname(otmp));
                 named++;
                 /* the following is to set multi for later on */
                 nomul(-armordelay, "taking off clothes");
+                nomovemsg = 0;
                 remove_worn_item(otmp, TRUE);
                 otmp->cursed = curssv;
                 if(multi < 0) {
@@ -359,19 +442,27 @@ cant_take:
             warning("Tried to steal a strange worn thing. [%d]",
                     otmp->oclass);
         }
-    }
-    else if (otmp->owornmask)
+    } else if (otmp->owornmask) {
+        /* weapon or ball&chain */
         remove_worn_item(otmp, TRUE);
+    }
 
     /* do this before removing it from inventory */
     if (objnambuf) Strcpy(objnambuf, yname(otmp));
-    /* set mavenge bit so knights won't suffer an
-     * alignment penalty during retaliation;
-     */
-    mtmp->mavenge = 1;
+    /* usually set mavenge bit so knights won't suffer an alignment penalty
+       during retaliation; not applicable for removing attached iron ball */
+    if (!Conflict && !(was_punished && !Punished)) {
+        mtmp->mavenge = 1;
+    }
 
+    if (otmp->unpaid) {
+        subfrombill(otmp, shop_keeper(*u.ushops));
+    }
     freeinv(otmp);
-    pline("%s stole %s.", named ? "She" : Monnam(mtmp), doname(otmp));
+    /* if attached ball was taken, uball and uchain are now Null */
+    pline("%s%s stole %s.", named ? "She" : Monnam(mtmp),
+          (was_punished && !Punished) ? " removed your chain and" : "",
+          doname(otmp));
     could_petrify = (otmp->otyp == CORPSE &&
                      touch_petrifies(&mons[otmp->corpsenm]));
     (void) mpickobj(mtmp, otmp); /* may free otmp */
@@ -390,6 +481,16 @@ register struct obj *otmp;
 {
     int freed_otmp;
     boolean snuff_otmp = FALSE;
+
+    if (!otmp) {
+        impossible("monster (%s) taking or picking up nothing?", mtmp->data->mname);
+        return 1;
+    } else if (otmp == uball || otmp == uchain) {
+        impossible("monster (%s) taking or picking up attached %s (%s)?",
+                   mtmp->data->mname,
+                   (otmp == uchain) ? "chain" : "ball", simpleonames(otmp));
+        return 0;
+    }
 
     /* if monster is acquiring a thrown or kicked object, the throwing
        or kicking code shouldn't continue to track and place it */
@@ -410,6 +511,11 @@ register struct obj *otmp;
             pline("%s out.", Tobjnam(otmp, "go"));
         snuff_otmp = TRUE;
     }
+    /* for hero owned object on shop floor, mtmp is taking possession
+       and if it's eventually dropped in a shop, shk will claim it */
+    if (!mtmp->mtame) {
+        otmp->no_charge = 0;
+    }
     /* Must do carrying effects on object prior to add_to_minv() */
     carry_obj_effects(otmp);
     /* add_to_minv() might free otmp [if merged with something else],
@@ -421,15 +527,17 @@ register struct obj *otmp;
     return freed_otmp;
 }
 
+/* called for AD_SAMU (the Wizard and quest nemeses) */
 void
 stealamulet(mtmp)
 struct monst *mtmp;
 {
+    char buf[BUFSZ];
     struct obj *otmp = (struct obj *)0;
     int real=0, fake=0;
 
     /* select the artifact to steal */
-    if(u.uhave.amulet) {
+    if (u.uhave.amulet) {
         real = AMULET_OF_YENDOR;
         fake = FAKE_AMULET_OF_YENDOR;
     } else if(u.uhave.questart) {
@@ -453,16 +561,91 @@ struct monst *mtmp;
     }
 
     if (otmp) { /* we have something to snatch */
-        if (otmp->owornmask)
+        /* take off outer gear if we're targetting [hypothetical]
+           quest artifact suit, shirt, gloves, or rings */
+        if ((otmp == uarm || otmp == uarmu) && uarmc) {
+            remove_worn_item(uarmc, FALSE);
+        }
+        if (otmp == uarmu && uarm) {
+            remove_worn_item(uarm, FALSE);
+        }
+        if ((otmp == uarmg || ((otmp == uright || otmp == uleft) && uarmg)) && uwep) {
+            /* gloves are about to be unworn; unwield weapon(s) first */
+            if (u.twoweap) {
+                /* remove_worn_item(uswapwep) indirectly */
+                remove_worn_item(uswapwep, FALSE); /* clears u.twoweap */
+            }
+            remove_worn_item(uwep, FALSE);
+        }
+        if ((otmp == uright || otmp == uleft) && uarmg) {
+            /* calls Gloves_off() to handle wielded cockatrice corpse */
+            remove_worn_item(uarmg, FALSE);
+        }
+
+        /* finally, steal the target item */
+        if (otmp->owornmask) {
             remove_worn_item(otmp, TRUE);
+        }
+        if (otmp->unpaid) {
+            subfrombill(otmp, shop_keeper(*u.ushops));
+        }
         freeinv(otmp);
-        /* mpickobj wont merge otmp because none of the above things
-           to steal are mergable */
-        (void) mpickobj(mtmp, otmp); /* may merge and free otmp */
-        pline("%s stole %s!", Monnam(mtmp), doname(otmp));
-        if (can_teleport(mtmp->data) && !tele_restrict(mtmp))
-            (void) rloc(mtmp, FALSE);
+        Strcpy(buf, doname(otmp));
+        (void) mpickobj(mtmp, otmp); /* could merge and free otmp but won't */
+        pline("%s steals %s!", Monnam(mtmp), buf);
+        if (can_teleport(mtmp->data) && !tele_restrict(mtmp)) {
+            (void) rloc(mtmp, TRUE);
+        }
     }
+}
+
+/* when a mimic gets poked with something, it might take that thing
+   (at present, only implemented for when the hero does the poking) */
+void
+maybe_absorb_item(mon, obj, ochance, achance)
+struct monst *mon;
+struct obj *obj;
+int ochance, achance; /* percent chance for ordinary item, artifact */
+{
+    if (obj == uball || obj == uchain || obj->oclass == ROCK_CLASS ||
+         obj_resists(obj, 100 - ochance, 100 - achance) ||
+         !touch_artifact(obj, mon)) {
+        return;
+    }
+
+    if (carried(obj)) {
+        if (obj->owornmask) {
+            remove_worn_item(obj, TRUE);
+        }
+        if (obj->unpaid) {
+            subfrombill(obj, shop_keeper(*u.ushops));
+        }
+        if (cansee(mon->mx, mon->my)) {
+            const char *MonName = Monnam(mon);
+
+            /* mon might be invisible; avoid "It pulls ... and absorbs it!" */
+            if (!strcmp(MonName, "It")) {
+                MonName = "Something";
+            }
+            pline("%s pulls %s away from you and absorbs %s!", MonName,
+                  yname(obj), (obj->quan > 1L) ? "them" : "it");
+        } else {
+            const char *hand_s = body_part(HAND);
+
+            if (bimanual(obj)) {
+                hand_s = makeplural(hand_s);
+            }
+            pline("%s %s pulled from your %s!", upstart(yname(obj)), otense(obj, "are"), hand_s);
+        }
+        freeinv(obj);
+    } else {
+        /* not carried; presumably thrown or kicked */
+        if (canspotmon(mon)) {
+            pline("%s absorbs %s!", Monnam(mon), yname(obj));
+        }
+    }
+    /* add to mon's inventory */
+    (void) mpickobj(mon, obj);
 }
 
 /* drop one object taken from a (possibly dead) monster's inventory */
@@ -473,34 +656,46 @@ struct obj *obj;
 boolean verbosely;
 {
     int omx = mon->mx, omy = mon->my;
+    boolean update_mon = FALSE;
 
     if (obj->owornmask) {
         /* perform worn item handling if the monster is still alive */
-        if (mon->mhp > 0) {
+        if (!DEADMONSTER(mon)) {
             mon->misc_worn_check &= ~obj->owornmask;
-            update_mon_intrinsics(mon, obj, FALSE, TRUE);
-            /* obj_no_longer_held(obj); -- done by place_object */
-            if (obj->owornmask & W_WEP) setmnotwielded(mon, obj);
+            update_mon = TRUE;
 #ifdef STEED
-            /* don't charge for an owned saddle on dead steed */
+        /* don't charge for an owned saddle on dead steed (provided
+           that the hero is within the same shop at the time) */
         } else if (mon->mtame && (obj->owornmask & W_SADDLE) &&
-                   !obj->unpaid && costly_spot(omx, omy)) {
+                   !obj->unpaid && costly_spot(omx, omy) &&
+                   /* being at costly_spot guarantees lev->roomno is not 0 */
+                   index(in_rooms(u.ux, u.uy, SHOPBASE), levl[omx][omy].roomno)) {
             obj->no_charge = 1;
 #endif
         }
+        /* this should be done even if the monster has died */
+        if (obj->owornmask & W_WEP) {
+            setmnotwielded(mon, obj);
+        }
         obj->owornmask = 0L;
     }
+    /* obj_no_longer_held(obj); -- done by place_object */
     if (verbosely && cansee(omx, omy))
         pline("%s drops %s.", Monnam(mon), distant_name(obj, doname));
     if (!flooreffects(obj, omx, omy, "fall")) {
         place_object(obj, omx, omy);
         stackobj(obj);
     }
+    /* do this last, after placing obj on floor; removing steed's saddle
+       throws rider, possibly inflicting fatal damage and producing bones */
+    if (update_mon) {
+        update_mon_intrinsics(mon, obj, FALSE, TRUE);
+    }
 }
 
 /* some monsters bypass the normal rules for moving between levels or
    even leaving the game entirely; when that happens, prevent them from
-   taking the Amulet or invocation tools with them */
+   taking the Amulet, invocation items, or quest artifact with them */
 void
 mdrop_special_objs(mon)
 struct monst *mon;
@@ -510,10 +705,23 @@ struct monst *mon;
     for (obj = mon->minvent; obj; obj = otmp) {
         otmp = obj->nobj;
         /* the Amulet, invocation tools, and Rider corpses resist even when
-           artifacts and ordinary objects are given 0% resistance chance */
-        if (obj_resists(obj, 0, 0)) {
+           artifacts and ordinary objects are given 0% resistance chance;
+           current role's quest artifact is rescued too--quest artifacts
+           for the other roles are not */
+        if (obj_resists(obj, 0, 0) || is_quest_artifact(obj)) {
             obj_extract_self(obj);
-            mdrop_obj(mon, obj, FALSE);
+            if (mon->mx) {
+                mdrop_obj(mon, obj, FALSE);
+            } else { /* migrating monster not on map */
+                if (obj->owornmask) {
+                    mon->misc_worn_check &= ~obj->owornmask;
+                    if (obj->owornmask & W_WEP) {
+                        setmnotwielded(mon, obj);
+                    }
+                    obj->owornmask = 0L;
+                }
+                rloco(obj);
+            }
         }
     }
 }
@@ -521,50 +729,31 @@ struct monst *mon;
 /* release the objects the creature is carrying */
 void
 relobj(mtmp, show, is_pet)
-register struct monst *mtmp;
-register int show;
+struct monst *mtmp;
+int show;
 boolean is_pet;     /* If true, pet should keep wielded/worn items */
 {
-    register struct obj *otmp;
-    register int omx = mtmp->mx, omy = mtmp->my;
-    struct obj *keepobj = 0;
-    struct obj *wep = MON_WEP(mtmp);
-    boolean item1 = FALSE, item2 = FALSE;
+    struct obj *otmp;
+    int omx = mtmp->mx, omy = mtmp->my;
 
-    if (!is_pet || mindless(mtmp->data) || is_animal(mtmp->data))
-        item1 = item2 = TRUE;
-    if (!tunnels(mtmp->data) || !needspick(mtmp->data))
-        item1 = TRUE;
-
-    while ((otmp = mtmp->minvent) != 0) {
-        obj_extract_self(otmp);
-        /* special case: pick-axe and unicorn horn are non-worn */
-        /* items that we also want pets to keep 1 of */
-        /* (It is a coincidence that these can also be wielded.) */
-        if (otmp->owornmask || otmp == wep ||
-            ((!item1 && otmp->otyp == PICK_AXE) ||
-             (!item2 && otmp->otyp == UNICORN_HORN && !otmp->cursed))) {
-            if (is_pet) { /* dont drop worn/wielded item */
-                if (otmp->otyp == PICK_AXE)
-                    item1 = TRUE;
-                if (otmp->otyp == UNICORN_HORN && !otmp->cursed)
-                    item2 = TRUE;
-                otmp->nobj = keepobj;
-                keepobj = otmp;
-                continue;
-            }
+    /* vault guard's gold goes away rather than be dropped... */
+    if (mtmp->isgd && (otmp = findgold(mtmp->minvent)) != 0) {
+        if (canspotmon(mtmp)) {
+            pline("%s gold %s.", s_suffix(Monnam(mtmp)),
+                  canseemon(mtmp) ? "vanishes" : "seems to vanish");
         }
+        obj_extract_self(otmp);
+        obfree(otmp, (struct obj *) 0);
+    } /* isgd && has gold */
+
+    while ((otmp = (is_pet ? droppables(mtmp) : mtmp->minvent)) != 0) {
+        obj_extract_self(otmp);
         mdrop_obj(mtmp, otmp, is_pet && flags.verbose);
     }
 
-    /* put kept objects back */
-    while ((otmp = keepobj) != (struct obj *)0) {
-        keepobj = otmp->nobj;
-        (void) add_to_minv(mtmp, otmp);
-    }
-
-    if (show & cansee(omx, omy))
+    if (show && cansee(omx, omy)) {
         newsym(omx, omy);
+    }
 }
 
 /*steal.c*/

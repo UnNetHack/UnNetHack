@@ -85,6 +85,15 @@ static long laststattime;
 # endif
 
 void
+free_maildata()
+{
+    if (mailbox) {
+        free(mailbox);
+        mailbox = (char *) 0;
+    }
+}
+
+void
 getmailstatus()
 {
     if(!mailbox && !(mailbox = nh_getenv("MAIL"))) {
@@ -94,6 +103,7 @@ getmailstatus()
 
         (void) memcpy(&ppasswd, getpwuid(getuid()), sizeof(struct passwd));
         if (ppasswd.pw_dir) {
+            /* note: 'sizeof "LITERAL"' includes +1 for terminating '\0' */
             mailbox = (char *) alloc((unsigned) strlen(ppasswd.pw_dir)+sizeof(AMS_MAILBOX));
             Strcpy(mailbox, ppasswd.pw_dir);
             Strcat(mailbox, AMS_MAILBOX);
@@ -101,6 +111,7 @@ getmailstatus()
             return;
 #   else
         const char *pw_name = getpwuid(getuid())->pw_name;
+        /* note: 'sizeof "LITERAL"' includes +1 for terminating '\0' */
         mailbox = (char *) alloc(sizeof(MAILPATH)+strlen(pw_name));
         Strcpy(mailbox, MAILPATH);
         Strcat(mailbox, pw_name);
@@ -109,10 +120,10 @@ getmailstatus()
         return;
 #  endif
     }
-    if(stat(mailbox, &omstat)) {
+    if (mailbox && stat(mailbox, &omstat)) {
 #  ifdef PERMANENT_MAILBOX
         pline("Cannot get status of MAIL=\"%s\".", mailbox);
-        mailbox = 0;
+        free_maildata();
 #  else
         omstat.st_mtime = 0;
 #  endif
@@ -140,7 +151,7 @@ coord *startp;
      */
     if (Blind && !Blind_telepat) {
         if (!enexto(startp, u.ux, u.uy, (struct permonst *) 0))
-            return FALSE; /* no good posiitons */
+            return FALSE; /* no good positions */
         return TRUE;
     }
 
@@ -228,7 +239,7 @@ retry:
 STATIC_OVL boolean
 md_stop(stopp, startp)
 coord *stopp;       /* stopping position (we fill it in) */
-coord *startp;      /* starting positon (read only) */
+coord *startp;      /* starting position (read only) */
 {
     int x, y, distance, min_distance = -1;
 
@@ -236,7 +247,7 @@ coord *startp;      /* starting positon (read only) */
         for (y = u.uy-1; y <= u.uy+1; y++) {
             if (!isok(x, y) || (x == u.ux && y == u.uy)) continue;
 
-            if (ACCESSIBLE(levl[x][y].typ) && !MON_AT(x, y)) {
+            if (accessible(x, y) && !MON_AT(x, y)) {
                 distance = dist2(x, y, startp->x, startp->y);
                 if (min_distance < 0 || distance < min_distance ||
                     (distance == min_distance && rn2(2))) {
@@ -321,19 +332,22 @@ register int tx, ty;            /* destination of mail daemon */
         else if (fx == u.ux && fy == u.uy)
             verbalize("Excuse me.");
 
+        if (mon) {
+            remove_monster(fx, fy);
+        }
         place_monster(md, fx, fy); /* put md down */
         newsym(fx, fy);     /* see it */
         flush_screen(0);    /* make sure md shows up */
         delay_output();     /* wait a little bit */
 
         /* Remove md from the dungeon.  Restore original mon, if necessary. */
+        remove_monster(fx, fy);
         if (mon) {
             if ((mon->mx != fx) || (mon->my != fy))
                 place_worm_seg(mon, fx, fy);
             else
                 place_monster(mon, fx, fy);
-        } else
-            remove_monster(fx, fy);
+        }
         newsym(fx, fy);
     }
 
@@ -342,9 +356,11 @@ register int tx, ty;            /* destination of mail daemon */
      * very unlikely).  If one exists, then have the md leave in disgust.
      */
     if ((mon = m_at(fx, fy)) != 0) {
+        remove_monster(fx, fy);
         place_monster(md, fx, fy); /* display md with text below */
         newsym(fx, fy);
         verbalize("This place's too crowded.  I'm outta here.");
+        remove_monster(fx, fy);
 
         if ((mon->mx != fx) || (mon->my != fy)) /* put mon back */
             place_worm_seg(mon, fx, fy);
@@ -405,9 +421,11 @@ struct mail_info *info;
                                   (const char *)0, (const char *)0);
     }
 
-    /* zip back to starting location */
 go_back:
-    (void) md_rush(md, start.x, start.y);
+    /* zip back to starting location */
+    if (!md_rush(md, start.x, start.y)) {
+        md->mx = md->my = 0; /* for mongone, md is not on map */
+    }
     mongone(md);
     /* deliver some classes of messages even if no daemon ever shows up */
 give_up:
@@ -420,9 +438,6 @@ give_up:
 void
 ckmailstatus()
 {
-    if (iflags.debug_fuzzer) {
-        return;
-    }
     if (u.uswallow || !flags.biff) return;
     if (mustgetmail < 0) {
 #if defined(AMIGA) || defined(MSDOS) || defined(TOS)
@@ -489,7 +504,7 @@ ckmailstatus()
     if(stat(mailbox, &nmstat)) {
 #  ifdef PERMANENT_MAILBOX
         pline("Cannot get status of MAIL=\"%s\" anymore.", mailbox);
-        mailbox = 0;
+        free_maildata();
 #  else
         nmstat.st_mtime = 0;
 #  endif
@@ -586,7 +601,7 @@ struct obj *otmp;
 
     if(child(1)) {
         (void) execl(mr, mr, (char *)0);
-        terminate(EXIT_FAILURE);
+        nh_terminate(EXIT_FAILURE);
     }
 # else
 #  ifndef AMS               /* AMS mailboxes are directories */
@@ -618,6 +633,9 @@ ckmailstatus()
 {
     struct mail_info *brdcst;
 
+    if (iflags.debug_fuzzer) {
+        return;
+    }
     if (u.uswallow || !flags.biff) return;
 
     while (broadcasts > 0) {    /* process all trapped broadcasts [until] */
@@ -635,13 +653,15 @@ struct obj *otmp;
 {
 #  ifdef SHELL  /* can't access mail reader without spawning subprocess */
     const char *txt, *cmd;
-    char *p, buf[BUFSZ], qbuf[BUFSZ];
+    char *p, buf[BUFSZ] = DUMMY, qbuf[BUFSZ];
     int len;
 
-    /* there should be a command hidden beyond the object name */
-    txt = otmp->onamelth ? ONAME(otmp) : "";
+    /* there should be a command in OMAILCMD */
+    txt = has_oname(otmp) ? ONAME(otmp) : "";
     len = strlen(txt);
-    cmd = (len + 1 < otmp->onamelth) ? txt + len + 1 : (char *) 0;
+    if (has_omailcmd(otmp)) {
+        cmd = OMAILCMD(otmp);
+    }
     if (!cmd || !*cmd) cmd = "SPAWN";
 
     Sprintf(qbuf, "System command (%s)", cmd);

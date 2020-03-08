@@ -304,6 +304,8 @@ NEARDATA struct objclass objects[] = {
     HELM("cornuthaum", "conical hat",
          0, 1,  CLAIRVOYANT,
          3, 1,  4,  80, 10, 2, CLOTH, CLR_BLUE),
+        /* name coined by devteam; confers clairvoyance for wizards,
+           blocks clairvoyance if worn by role other than wizard */
     HELM("dunce cap", "conical hat",
          0, 1,  0,   3, 1,  4,   1, 10, 0, CLOTH, CLR_BLUE),
     HELM("dented pot", (char *)0,
@@ -419,6 +421,7 @@ NEARDATA struct objclass objects[] = {
 /*  'cope' is not a spelling mistake... leave it be */
     CLOAK("mummy wrapping", (char *)0,
           1, 0,   0,      0, 0,  3,  2, 10, 1, CLOTH, CLR_GRAY),
+          /* worn mummy wrapping blocks invisibility */
     CLOAK("elven cloak", "faded pall",
           0, 1,   STEALTH,    8, 0, 10, 60,  9, 3, CLOTH, CLR_BLACK),
     CLOAK("orcish cloak", "coarse mantelet",
@@ -429,6 +432,8 @@ NEARDATA struct objclass objects[] = {
           0, 0,   0,      8, 0, 10, 50,  9, 3, CLOTH, HI_CLOTH),
     CLOAK("robe", (char *)0,
           1, 1,   0,      3, 0, 15, 50,  8, 3, CLOTH, CLR_RED),
+          /* robe was adopted from slash'em, where it's worn as a suit
+             rather than as a cloak and there are several variations */
     CLOAK("alchemy smock", "apron",
           0, 1,   POISON_RES, 9, 0, 10, 50,  9, 1, CLOTH, CLR_WHITE),
     CLOAK("leather cloak", (char *)0,
@@ -693,7 +698,9 @@ NEARDATA struct objclass objects[] = {
     WEPTOOL("unicorn horn", (char *)0,
             1, 1, 1,  0,  20, 100, 12, 12, PIERCE, P_UNICORN_HORN, BONE, CLR_WHITE),
 
-/* two special unique artifact "tools" */
+/* two unique tools;
+ * not artifacts, despite the comment which used to be here
+ */
     OBJECT(OBJ("Candelabrum of Invocation", "candelabrum"),
            BITS(0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, P_NONE, GOLD), 0,
            TOOL_CLASS, 0, 0, 10, 5000, 0, 0, 0, 0, 200, HI_GOLD),
@@ -807,48 +814,48 @@ NEARDATA struct objclass objects[] = {
 #define SCROLL(name, text, mgc, prob, cost) OBJECT( \
         OBJ(name, text), BITS(0, 1, 0, 0, mgc, 0, 0, 0, 0, 0, 0, P_NONE, PAPER), 0, \
         SCROLL_CLASS, prob, 0, 5, cost, 0, 0, 0, 0, 6, HI_PAPER )
-    SCROLL("enchant armor",         "ZELGO MER",            1,  63,  80),
-    SCROLL("destroy armor",         "JUYED AWK YACC",       1,  45, 100),
-    SCROLL("confuse monster",       "NR 9",                 1,  53, 100),
-    SCROLL("scare monster",         "XIXAXA XOXAXA XUXAXA", 1,  35, 100),
-    SCROLL("remove curse",          "PRATYAVAYAH",          1,  65,  80),
-    SCROLL("enchant weapon",        "DAIYEN FOOELS",        1,  80,  60),
-    SCROLL("create monster",        "LEP GEX VEN ZEA",      1,  45, 200),
-    SCROLL("taming",                "PRIRUTSENIE",          1,  15, 200),
-    SCROLL("genocide",              "ELBIB YLOH",           1,  15, 300),
-    SCROLL("light",                 "VERR YED HORRE",       1,  90,  50),
-    SCROLL("teleportation",         "VENZAR BORGAVVE",      1,  55, 100),
-    SCROLL("gold detection",        "THARR",                1,  33, 100),
-    SCROLL("food detection",        "YUM YUM",              1,  25, 100),
-    SCROLL("identify",              "KERNOD WEL",           1, 180,  20),
-    SCROLL("magic mapping",         "ELAM EBOW",            1,  45, 100),
-    SCROLL("flood",                 "AQUE BRAGH",           1,  35, 200),
-    SCROLL("fire",                  "ANDOVA BEGARIN",       1,  30, 100),
-    SCROLL("earth",                 "KIRJE",                1,  18, 200),
-    SCROLL("punishment",            "VE FORBRYDERNE",       1,  15, 300),
-    SCROLL("charging",              "HACKEM MUCHE",         1,  15, 300),
-    SCROLL("stinking cloud",        "VELOX NEB",            1,  15, 300),
-    SCROLL((char *)0,               "FOOBIE BLETCH",        1,   0, 100),
-    SCROLL((char *)0,               "TEMOV",                1,   0, 100),
-    SCROLL((char *)0,               "GARVEN DEH",           1,   0, 100),
-    SCROLL((char *)0,               "READ ME",              1,   0, 100),/* Lewis Carroll */
-    SCROLL((char *)0,               "ETAOIN SHRDLU",        1,   0, 100),
-    SCROLL((char *)0,               "LOREM IPSUM",          1,   0, 100),
-    SCROLL((char *)0,               "FNORD",                1,   0, 100),/* Illuminati */
-    SCROLL((char *)0,               "KO BATE",              1,   0, 100),/* Kurd Lasswitz */
-    SCROLL((char *)0,               "ACHAT SHTAYIM SHALOSH", 1,   0, 100),/* Uri Geller */
-    SCROLL((char *)0,               "ABRA KA DABRA",        1,   0, 100),/* traditional incantation */
-    SCROLL((char *)0,               "ASHPD",                1,   0, 100),/* Portal */
-    SCROLL((char *)0,               "SODALG",               1,   0, 100),/* Portal */
-    SCROLL((char *)0,               "ZLORFIK",              1,   0, 100),/* Zak McKracken */
-    SCROLL((char *)0,               "GNIK SISI VLE",        1,   0, 100),/* Zak McKracken */
-    SCROLL((char *)0,               "HAPAX LEGOMENON",      1,   0, 100),
-    SCROLL((char *)0,               "HZLRC KSTSBD MPFNG",   1,   0, 100),
-    SCROLL((char *)0,               "EIRIS SAZUN IDISI",    1,   0, 100),/* Merseburg Incantations */
-    SCROLL((char *)0,               "PHOL ENDE WODAN",      1,   0, 100),/* Merseburg Incantations */
-    SCROLL((char *)0,               "GHOTI",                1,   0, 100),/* pronounced as 'fish', George Bernard Shaw */
-    SCROLL((char *)0,               "MAPIRO MAHAMA DIROMAT", 1,   0, 100),/* Wizardry */
-    SCROLL((char *)0,               "VAS CORP BET MANI",    1,   0, 100),/* Ultima */
+    SCROLL("enchant armor",         "ZELGO MER",             1,  63,  80),
+    SCROLL("destroy armor",         "JUYED AWK YACC",        1,  45, 100),
+    SCROLL("confuse monster",       "NR 9",                  1,  53, 100),
+    SCROLL("scare monster",         "XIXAXA XOXAXA XUXAXA",  1,  35, 100),
+    SCROLL("remove curse",          "PRATYAVAYAH",           1,  65,  80),
+    SCROLL("enchant weapon",        "DAIYEN FOOELS",         1,  80,  60),
+    SCROLL("create monster",        "LEP GEX VEN ZEA",       1,  45, 200),
+    SCROLL("taming",                "PRIRUTSENIE",           1,  15, 200),
+    SCROLL("genocide",              "ELBIB YLOH",            1,  15, 300),
+    SCROLL("light",                 "VERR YED HORRE",        1,  90,  50),
+    SCROLL("teleportation",         "VENZAR BORGAVVE",       1,  55, 100),
+    SCROLL("gold detection",        "THARR",                 1,  33, 100),
+    SCROLL("food detection",        "YUM YUM",               1,  25, 100),
+    SCROLL("identify",              "KERNOD WEL",            1, 180,  20),
+    SCROLL("magic mapping",         "ELAM EBOW",             1,  45, 100),
+    SCROLL("flood",                 "AQUE BRAGH",            1,  35, 200),
+    SCROLL("fire",                  "ANDOVA BEGARIN",        1,  30, 100),
+    SCROLL("earth",                 "KIRJE",                 1,  18, 200),
+    SCROLL("punishment",            "VE FORBRYDERNE",        1,  15, 300),
+    SCROLL("charging",              "HACKEM MUCHE",          1,  15, 300),
+    SCROLL("stinking cloud",        "VELOX NEB",             1,  15, 300),
+    SCROLL((char *)0,               "FOOBIE BLETCH",         1,   0, 100),
+    SCROLL((char *)0,               "TEMOV",                 1,   0, 100),
+    SCROLL((char *)0,               "GARVEN DEH",            1,   0, 100),
+    SCROLL((char *)0,               "READ ME",               1,   0, 100), /* Lewis Carroll */
+    SCROLL((char *)0,               "ETAOIN SHRDLU",         1,   0, 100),
+    SCROLL((char *)0,               "LOREM IPSUM",           1,   0, 100),
+    SCROLL((char *)0,               "FNORD",                 1,   0, 100), /* Illuminati */
+    SCROLL((char *)0,               "KO BATE",               1,   0, 100), /* Kurd Lasswitz */
+    SCROLL((char *)0,               "ABRA KA DABRA",         1,   0, 100), /* traditional incantation */
+    SCROLL((char *)0,               "ASHPD SODALG",          1,   0, 100), /* Portal */
+    SCROLL((char *)0,               "ZLORFIK",               1,   0, 100), /* Zak McKracken */
+    SCROLL((char *)0,               "GNIK SISI VLE",         1,   0, 100), /* Zak McKracken */
+    SCROLL((char *)0,               "HAPAX LEGOMENON",       1,   0, 100),
+    SCROLL((char *)0,               "HZLRC KSTSBD MPFNG",    1,   0, 100),
+    SCROLL((char *)0,               "EIRIS SAZUN IDISI",     1,   0, 100), /* Merseburg Incantations */
+    SCROLL((char *)0,               "PHOL ENDE WODAN",       1,   0, 100), /* Merseburg Incantations */
+    SCROLL((char *)0,               "GHOTI",                 1,   0, 100), /* pronounced as 'fish', George Bernard Shaw */
+    SCROLL((char *)0,               "MAPIRO MAHAMA DIROMAT", 1,   0, 100), /* Wizardry */
+    SCROLL((char *)0,               "VAS CORP BET MANI",     1,   0, 100), /* Ultima */
+    SCROLL((char *)0,               "XOR OTA",               1,   0, 100), /* Aarne Haapakoski */
+    SCROLL((char *)0,               "STRC PRST SKRZ KRK",    1,   0, 100), /* Czech and Slovak tongue-twister */
 
     /* these must come last because they have special descriptions */
 #ifdef MAIL

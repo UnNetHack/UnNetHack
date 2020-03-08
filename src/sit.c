@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)sit.c  3.4 2002/09/21  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -7,6 +6,7 @@
 
 STATIC_DCL void FDECL(curse_objects, (struct obj *, int, boolean));
 
+/* take away the hero's money */
 void
 take_gold()
 {
@@ -16,6 +16,7 @@ take_gold()
         nobj = otmp->nobj;
         if (otmp->oclass == COIN_CLASS) {
             lost_money = 1;
+            remove_worn_item(otmp, FALSE);
             delobj(otmp);
         }
     }
@@ -27,12 +28,12 @@ take_gold()
     }
 }
 
+/* #sit command */
 int
 dosit()
 {
     static const char sit_message[] = "sit on the %s.";
-    register struct trap *trap;
-    register int typ = levl[u.ux][u.uy].typ;
+    int typ = levl[u.ux][u.uy].typ;
 
 
 #ifdef STEED
@@ -41,103 +42,112 @@ dosit()
         return (0);
     }
 #endif
+    if (u.uundetected && is_hider(youmonst.data) && u.umonnum != PM_TRAPPER) {
+        u.uundetected = 0; /* no longer on the ceiling */
+    }
 
-    if(!can_reach_floor(FALSE))  {
-        if (Levitation)
+    if (!can_reach_floor(FALSE))  {
+        if (u.uswallow) {
+            There("are no seats in here!");
+        } else if (Levitation) {
             You("tumble in place.");
-        else
+        } else {
             You("are sitting on air.");
+        }
         return 0;
     } else if (is_pool(u.ux, u.uy) && !Underwater) {  /* water walking */
         goto in_water;
     }
 
-    if(OBJ_AT(u.ux, u.uy)) {
+    struct trap *trap = t_at(u.ux, u.uy);
+    if (OBJ_AT(u.ux, u.uy) &&
+        /* ensure we're not standing on the precipice */
+         !(uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
         register struct obj *obj;
 
         obj = level.objects[u.ux][u.uy];
-        You("sit on %s.", the(xname(obj)));
-        if (!(Is_box(obj) || objects[obj->otyp].oc_material == CLOTH))
-            pline("It's not very comfortable...");
+        if (youmonst.data->mlet == S_DRAGON && obj->oclass == COIN_CLASS) {
+            You("coil up around your %shoard.",
+                (obj->quan + money_cnt(invent) < u.ulevel * 1000) ? "meager " : "");
+        } else {
+            You("sit on %s.", the(xname(obj)));
+            if (!(Is_box(obj) || objects[obj->otyp].oc_material == CLOTH)) {
+                pline("It's not very comfortable...");
+            }
+        }
 
     } else if ((trap = t_at(u.ux, u.uy)) != 0 ||
                (u.utrap && (u.utraptype >= TT_LAVA))) {
 
         if (u.utrap) {
             exercise(A_WIS, FALSE); /* you're getting stuck longer */
-            if(u.utraptype == TT_BEARTRAP) {
+            if (u.utraptype == TT_BEARTRAP) {
                 You_cant("sit down with your %s in the bear trap.", body_part(FOOT));
                 u.utrap++;
-            } else if(u.utraptype == TT_PIT) {
-                if(trap->ttyp == SPIKED_PIT) {
+            } else if (u.utraptype == TT_PIT) {
+                if (trap && trap->ttyp == SPIKED_PIT) {
                     You("sit down on a spike.  Ouch!");
-                    losehp(1, "sitting on an iron spike", KILLED_BY);
+                    losehp(Half_physical_damage ? rn2(2) : 1,
+                            "sitting on an iron spike", KILLED_BY);
                     exercise(A_STR, FALSE);
                 } else
                     You("sit down in the pit.");
                 u.utrap += rn2(5);
-            } else if(u.utraptype == TT_WEB) {
+            } else if (u.utraptype == TT_WEB) {
                 You("sit in the spider web and get entangled further!");
                 u.utrap += rn1(10, 5);
-            } else if(u.utraptype == TT_LAVA) {
+            } else if (u.utraptype == TT_LAVA) {
                 /* Must have fire resistance or they'd be dead already */
-                You("sit in the lava!");
+                You("sit in the %s!", hliquid("lava"));
+                if (Slimed) {
+                    burn_away_slime();
+                }
                 u.utrap += rnd(4);
-                losehp(d(2, 10), "sitting in lava", KILLED_BY);
-            } else if(u.utraptype == TT_INFLOOR) {
+                losehp(d(2, 10), "sitting in lava", KILLED_BY); /* lava damage */
+            } else if (u.utraptype == TT_INFLOOR || u.utraptype == TT_BURIEDBALL) {
                 You_cant("maneuver to sit!");
                 u.utrap++;
             }
         } else {
             You("sit down.");
-            dotrap(trap, 0);
+            dotrap(trap, VIASITTING);
         }
-    } else if(Underwater || Is_waterlevel(&u.uz)) {
+    } else if ((Underwater || Is_waterlevel(&u.uz)) && !eggs_in_water(youmonst.data)) {
         if (Is_waterlevel(&u.uz))
             There("are no cushions floating nearby.");
         else
             You("sit down on the muddy bottom.");
-    } else if(is_pool(u.ux, u.uy)) {
+    } else if (is_pool(u.ux, u.uy) && !eggs_in_water(youmonst.data)) {
 in_water:
-        You("sit in the water.");
+        You("sit in the %s.", hliquid("water"));
         if (!rn2(10) && uarm)
             (void) water_damage(uarm, "armor", TRUE);
         if (!rn2(10) && uarmf && uarmf->otyp != WATER_WALKING_BOOTS)
             (void) water_damage(uarm, "armor", TRUE);
 #ifdef SINKS
     } else if(IS_SINK(typ)) {
-
         You(sit_message, defsyms[S_sink].explanation);
         Your("%s gets wet.", humanoid(youmonst.data) ? "rump" : "underside");
 #endif
     } else if(IS_ALTAR(typ)) {
-
         You(sit_message, defsyms[S_altar].explanation);
         altar_wrath(u.ux, u.uy);
-
     } else if(IS_GRAVE(typ)) {
-
         You(sit_message, defsyms[S_grave].explanation);
-
     } else if(typ == STAIRS) {
-
         You(sit_message, "stairs");
-
     } else if(typ == LADDER) {
-
         You(sit_message, "ladder");
-
     } else if (is_lava(u.ux, u.uy)) {
-
         /* must be WWalking */
-        You(sit_message, "lava");
+        You(sit_message, hliquid("lava"));
         burn_away_slime();
         if (likes_lava(youmonst.data)) {
-            pline_The("lava feels warm.");
+            pline_The("%s feels warm.", hliquid("lava"));
             return 1;
         }
-        pline_The("lava burns you!");
-        losehp(d((Fire_resistance ? 2 : 10), 10),
+        pline_The("%s burns you!", hliquid("lava"));
+        losehp(d((Fire_resistance ? 2 : 10), 10), /* lava damage */
                "sitting on lava", KILLED_BY);
 
     } else if (is_ice(u.ux, u.uy)) {
@@ -177,6 +187,7 @@ in_water:
                 if(u.uhp >= (u.uhpmax - 5)) u.uhpmax += 4;
                 u.uhp = u.uhpmax;
                 check_uhpmax();
+                u.ucreamed = 0;
                 make_blinded(0L, TRUE);
                 make_sick(0L, (char *) 0, FALSE, SICK_ALL);
                 heal_legs(0);
@@ -195,7 +206,7 @@ in_water:
                 break;
             case 7:
             {
-                register int cnt = rnd(10);
+                int cnt = rnd(10);
 
                 pline("A voice echoes:");
                 verbalize("Thy audience hath been summoned, %s!",
@@ -206,7 +217,7 @@ in_water:
             }
             case 8:
                 pline("A voice echoes:");
-                verbalize("By thy Imperious order, %s...",
+                verbalize("By thine Imperious order, %s...",
                           flags.female ? "Dame" : "Sire");
                 do_genocide(5, FALSE); /* REALLY|ONTHRONE, see do_genocide() */
                 break;
@@ -215,15 +226,14 @@ in_water:
                 verbalize("A curse upon thee for sitting upon this most holy throne!");
                 if (Luck > 0)  {
                     make_blinded(Blinded + rn1(100, 250), TRUE);
+                    change_luck((Luck > 1) ? -rnd(2) : -1);
                 } else rndcurse();
                 break;
             case 10:
                 if (Luck < 0 || (HSee_invisible & INTRINSIC))  {
                     if (level.flags.nommap) {
-                        pline(
-                            "A terrible drone fills your head!");
-                        make_confused(HConfusion + rnd(30),
-                                      FALSE);
+                        pline("A terrible drone fills your head!");
+                        make_confused((HConfusion & TIMEOUT) + (long) rnd(30), FALSE);
                     } else {
                         pline("An image forms in your mind.");
                         do_mapping();
@@ -248,12 +258,12 @@ in_water:
                 You("are granted an insight!");
                 if (invent) {
                     /* rn2(5) agrees w/seffects() */
-                    identify_pack(rn2(5));
+                    identify_pack(rn2(5), FALSE);
                 }
                 break;
             case 13:
                 Your("mind turns into a pretzel!");
-                make_confused(HConfusion + rn1(7, 16), FALSE);
+                make_confused((HConfusion & TIMEOUT) + (long) rn1(7, 16), FALSE);
                 break;
             default:    impossible("throne effect");
                 break;
@@ -268,6 +278,7 @@ in_water:
         if (!rn2(3) && IS_THRONE(levl[u.ux][u.uy].typ)) {
             /* may have teleported */
             levl[u.ux][u.uy].typ = ROOM;
+            levl[u.ux][u.uy].flags = 0;
             pline_The("throne vanishes in a puff of logic.");
             newsym(u.ux, u.uy);
         }
@@ -276,31 +287,41 @@ in_water:
         struct obj *uegg;
 
         if (!flags.female) {
-            pline("Males can't lay eggs!");
+            pline("%s can't lay eggs!",
+                    Hallucination ? "You may think you are a platypus, but a male still" : "Males");
             return 0;
         }
 
         if (u.uhunger < (int)objects[EGG].oc_nutrition) {
             You("don't have enough energy to lay an egg.");
             return 0;
+        } else if (eggs_in_water(youmonst.data)) {
+            if (!(Underwater || Is_waterlevel(&u.uz))) {
+                pline("A splash tetra you are not.");
+                return 0;
+            }
+            if (Upolyd &&
+                (youmonst.data == &mons[PM_GIANT_EEL] ||
+                  youmonst.data == &mons[PM_ELECTRIC_EEL])) {
+                You("yearn for the Sargasso Sea.");
+                return 0;
+            }
         }
 
         uegg = mksobj(EGG, FALSE, FALSE);
         uegg->spe = 1;
         uegg->quan = 1;
         uegg->owt = weight(uegg);
-        uegg->corpsenm = egg_type_from_parent(u.umonnum, FALSE);
-        uegg->known = uegg->dknown = 1;
         /* this sets hatch timers if appropriate */
         set_corpsenm(uegg, egg_type_from_parent(u.umonnum, FALSE));
-        You("lay an egg.");
+        uegg->known = uegg->dknown = 1;
+        You("%s an egg.", eggs_in_water(youmonst.data) ? "spawn" : "lay");
         dropy(uegg);
         stackobj(uegg);
         morehungry((int)objects[EGG].oc_nutrition);
-    } else if (u.uswallow)
-        There("are no seats in here!");
-    else
+    } else {
         pline("Having fun sitting on the %s?", surface(u.ux, u.uy));
+    }
     return(1);
 }
 
@@ -393,8 +414,9 @@ boolean showmsg;
     }
 }
 
+/* remove a random INTRINSIC ability */
 void
-attrcurse()         /* remove a random INTRINSIC ability */
+attrcurse()
 {
     switch(rnd(11)) {
     case 1: if (HFire_resistance & INTRINSIC) {

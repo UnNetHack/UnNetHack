@@ -1,10 +1,7 @@
-/*  SCCS Id: @(#)rip.c  3.4 2003/01/08  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-
-STATIC_DCL void FDECL(center, (int, char *));
 
 extern const char * const killed_by_prefix[];   /* from topten.c */
 
@@ -18,6 +15,7 @@ extern const char * const killed_by_prefix[];   /* from topten.c */
 #endif
 
 #ifdef TEXT_TOMBSTONE
+static void FDECL(center, (int, char *));
 
 #ifndef NH320_DEDICATION
 /* A normal tombstone for end of game display. */
@@ -97,8 +95,7 @@ int how;
 
     rip = dp = (char **) alloc(sizeof(rip_txt));
     for (x = 0; rip_txt[x]; x++) {
-        dp[x] = (char *) alloc((unsigned int)(strlen(rip_txt[x]) + 1));
-        Strcpy(dp[x], rip_txt[x]);
+        dp[x] = dupstr(rip_txt[x]);
     }
     dp[x] = (char *)0;
 
@@ -114,20 +111,21 @@ int how;
     center(GOLD_LINE, buf);
 
     /* Put together death description */
-    switch (killer_format) {
+    switch (killer.format) {
     default: warning("bad killer format?");
     case KILLED_BY_AN:
         Strcpy(buf, killed_by_prefix[how]);
-        Strcat(buf, an(killer));
+        Strcat(buf, an(killer.name));
         break;
     case KILLED_BY:
         Strcpy(buf, killed_by_prefix[how]);
-        Strcat(buf, killer);
+        Strcat(buf, killer.name);
         break;
     case NO_KILLER_PREFIX:
-        Strcpy(buf, killer);
+        Strcpy(buf, killer.name);
         break;
     }
+
 
     /* Put death type on stone */
     for (line=DEATH_LINE, dpx = buf; line<YEAR_LINE; line++) {

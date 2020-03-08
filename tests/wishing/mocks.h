@@ -35,7 +35,7 @@ void You_hear(const char *str, ...) {}
 void You_see(const char *str, ...) {}
 void verbalize(const char *str, ...) {}
 void panic(const char *str,...) {}
-void terminate(int status) {}
+void nh_terminate(int status) { exit(0); }
 void docrt() {}
 int isok(int x, int y) { return 1; }
 
@@ -103,7 +103,8 @@ void artifact_exists(struct obj *obj, const char *str, BOOLEAN_P bool) {}
 int nartifact_exist() { return 0; }
 boolean confers_luck(struct obj *obj) { return FALSE; }
 boolean defends(int number1, struct obj *obj) { return FALSE; }
-boolean protects(int number2, struct obj *obj) { return FALSE; }
+boolean defends_when_carried(int i, struct obj *o) { return FALSE; }
+boolean protects(struct obj *o, BOOLEAN_P b) { return FALSE; }
 boolean undiscovered_artifact(XCHAR_P typ) { return FALSE; }
 boolean MATCH_WARN_OF_MON(struct monst *monst) { return FALSE; }
 
@@ -151,7 +152,7 @@ long get_cost_of_shop_item(struct obj *obj) { return 0; }
 char* shk_your(char *buf, struct obj *obj) { return "shk_your"; }
 char* Shk_Your(char *buf, struct obj *obj) { return "Shk_Your"; }
 
-void rloco(struct obj *obj) {}
+boolean rloco(struct obj *obj) { return FALSE; }
 
 void attach_fig_transform_timeout(struct obj *obj) {}
 void begin_burn(struct obj *obj, BOOLEAN_P bool) {}
@@ -200,3 +201,27 @@ long stolen_value(struct obj *o, XCHAR_P c1, XCHAR_P c2, BOOLEAN_P b1, BOOLEAN_P
 void update_mon_intrinsics(struct monst *m, struct obj *o, BOOLEAN_P b1, BOOLEAN_P b2) {}
 char *x_monnam(struct monst *m, int i1, const char *s, int i2, BOOLEAN_P b) { return NULL; }
 const char *safe_oname(struct obj *o) { return NULL; }
+
+void update_inventory() {}
+void reset_commands(BOOLEAN_P b) {}
+
+char *tshirt_text(struct obj *o, char *s) { return NULL; }
+void tin_details(struct obj *o, int i, char *s) {}
+
+long count_contents(struct obj *o, BOOLEAN_P b1, BOOLEAN_P b2, BOOLEAN_P b3, BOOLEAN_P b4) { return 0; }
+boolean donning(struct obj *o) { return FALSE; }
+boolean doffing(struct obj *o) { return FALSE; }
+struct monst *find_mid(unsigned i1, unsigned i2) { return NULL; }
+char *noit_mon_nam(struct monst *m) { return NULL; }
+
+const char *glow_color(int i) { return NULL; }
+const char *glow_verb(int i, BOOLEAN_P b) { return NULL; }
+boolean restoring = FALSE;
+
+boolean is_pool(int i1, int i2) { return FALSE; }
+boolean is_lava(int i1, int i3) { return FALSE; }
+void feel_newsym(XCHAR_P x, XCHAR_P y) {}
+void reset_utrap(BOOLEAN_P b) {}
+
+boolean is_fainted() { return FALSE; }
+boolean unconscious() { return FALSE; }

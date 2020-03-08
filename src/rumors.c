@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)rumors.c   3.4 1996/04/20  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -15,7 +14,19 @@
  * this also happens with real fortune cookies.  -dgk
  */
 
-/*  3.1
+/*      3.6
+ * The rumors file consists of a "do not edit" line, then a line containing
+ * three sets of three counts (first two in decimal, third in hexadecimal).
+ * The first set has the number of true rumors, the count in bytes for all
+ * true rumors, and the file offset to the first one.  The second set has
+ * the same group of numbers for the false rumors.  The third set has 0 for
+ * count, 0 for size, and the file offset for end-of-file.  The offset of
+ * the first true rumor plus the size of the true rumors matches the offset
+ * of the first false rumor.  Likewise, the offset of the first false rumor
+ * plus the size of the false rumors matches the offset for end-of-file.
+ */
+
+/*      3.1     [now obsolete for rumors but still accurate for oracles]
  * The rumors file consists of a "do not edit" line, a hexadecimal number
  * giving the number of bytes of useful/true rumors, followed by those
  * true rumors (one per line), followed by the useless/false/misleading/cute
@@ -31,11 +42,16 @@
 STATIC_DCL void FDECL(init_rumors, (dlb *));
 STATIC_DCL void FDECL(init_oracles, (dlb *));
 
-static long true_rumor_start,  true_rumor_size,  true_rumor_end,
-            false_rumor_start, false_rumor_size, false_rumor_end;
-static int oracle_flg = 0;  /* -1=>don't use, 0=>need init, 1=>init done */
+/* rumor size variables are signed so that value -1 can be used as a flag */
+static long true_rumor_size = 0L, false_rumor_size;
+/* rumor start offsets are unsigned because they're handled via %lx format */
+static unsigned long true_rumor_start, false_rumor_start;
+/* rumor end offsets are signed because they're compared with [dlb_]ftell() */
+static long true_rumor_end, false_rumor_end;
+/* oracles are handled differently from rumors... */
+static int oracle_flg = 0; /* -1=>don't use, 0=>need init, 1=>init done */
 static unsigned oracle_cnt = 0;
-static long *oracle_loc = 0;
+static unsigned long *oracle_loc = 0;
 
 STATIC_OVL void
 init_rumors(fp)

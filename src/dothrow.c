@@ -47,8 +47,10 @@ int shotlimit;
          * been split from there (possibly triggering a panic in addinv),
          * and freeinv+addinv potentially has other side-effects.
          */
-        freeinv(obj);
-        addinv(obj);
+        if (obj->o_id == context_objsplit.parent_oid ||
+            obj->o_id == context_objsplit.child_oid) {
+            (void) unsplitobj(obj);
+        }
         return(0);
     }
 
@@ -82,12 +84,12 @@ int shotlimit;
     if (!uarmg && !Stone_resistance && (obj->otyp == CORPSE &&
                                         touch_petrifies(&mons[obj->corpsenm]))) {
         You("throw %s with your bare %s.",
-            corpse_xname(obj, TRUE),
+            corpse_xname(obj, (const char *) 0, CXN_PFX_THE),
             /* throwing with one hand, but pluralize since the
                expression "with your bare hands" sounds better */
             makeplural(body_part(HAND)));
-        Sprintf(killer_buf, "throwing %s bare-handed", killer_xname(obj));
-        instapetrify(killer_buf);
+        Sprintf(killer.name, "throwing %s bare-handed", killer_xname(obj));
+        instapetrify(killer.name);
     }
     if (welded(obj)) {
         weldmsg(obj);
@@ -1086,8 +1088,8 @@ boolean hitsroof;
         } else if (petrifier && !Stone_resistance &&
                    !(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))) {
 petrify:
-            killer_format = KILLED_BY;
-            killer = "elementary physics"; /* "what goes up..." */
+            killer.format = KILLED_BY;
+            Strcpy(killer.name, "elementary physics"); /* "what goes up..." */
             You("turn to stone.");
             if (obj) dropy(obj); /* bypass most of hitfloor() */
             thrownobj = 0;  /* now either gone or on floor */
@@ -1773,7 +1775,8 @@ struct obj   *obj; /* thrownobj or kickedobj or uwep */
             if (hmode == HMON_APPLIED) {
                 u.uconduct.weaphit++;
             }
-            if (hmon(mon, obj, hmode)) { /* mon still alive */
+            if (hmon(mon, obj, hmode, dieroll)) {
+                /* mon still alive */
                 if (mon->wormno) {
                     cutworm(mon, bhitpos.x, bhitpos.y, obj);
                 }
@@ -1834,7 +1837,8 @@ struct obj   *obj; /* thrownobj or kickedobj or uwep */
             int was_swallowed = guaranteed_hit;
 
             exercise(A_DEX, TRUE);
-            if (!hmon(mon, obj, hmode)) { /* mon killed */
+            if (!hmon(mon, obj, hmode, dieroll)) {
+                /* mon killed */
                 if (was_swallowed && !u.uswallow && obj == uball)
                     return 1; /* already did placebc() */
             }
@@ -1854,7 +1858,7 @@ struct obj   *obj; /* thrownobj or kickedobj or uwep */
         exercise(A_STR, TRUE);
         if (tmp >= dieroll) {
             exercise(A_DEX, TRUE);
-            (void) hmon(mon, obj, hmode);
+            (void) hmon(mon, obj, hmode, dieroll);
 #ifdef WEBB_DISINT
             if (obj_disint) {
                 if (*u.ushops || obj->unpaid)
@@ -1871,7 +1875,7 @@ struct obj   *obj; /* thrownobj or kickedobj or uwep */
                 otyp == BLINDING_VENOM || otyp == ACID_VENOM ||
                 otyp == FREEZING_ICE) &&
                (guaranteed_hit || ACURR(A_DEX) > rnd(25))) {
-        (void) hmon(mon, obj, hmode);
+        (void) hmon(mon, obj, hmode, dieroll);
         return 1;   /* hmon used it up */
 
     } else if (obj->oclass == POTION_CLASS &&

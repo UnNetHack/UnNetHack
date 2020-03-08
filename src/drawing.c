@@ -18,10 +18,14 @@
 
 #define g_FILLER(symbol) 0
 
-uchar oc_syms[MAXOCLASSES]  = DUMMY; /* the current object  display symbols */
-glyph_t showsyms[MAXPCHARS] = DUMMY; /* the current feature display symbols */
-uchar monsyms[MAXMCLASSES]  = DUMMY; /* the current monster display symbols */
-uchar warnsyms[WARNCOUNT]   = DUMMY;  /* the current warning display symbols */
+uchar oc_syms[MAXOCLASSES]  = DUMMY;    /* the current object  display symbols */
+glyph_t showsyms[MAXPCHARS] = DUMMY;    /* the current feature display symbols */
+nhsym primary_syms[SYM_MAX] = DUMMY;    /* primary symbols          */
+nhsym rogue_syms[SYM_MAX] = DUMMY;      /* rogue symbols           */
+nhsym ov_primary_syms[SYM_MAX] = DUMMY; /* overides via config SYMBOL */
+nhsym ov_rogue_syms[SYM_MAX] = DUMMY;   /* overides via config ROGUESYMBOL */
+uchar monsyms[MAXMCLASSES]  = DUMMY;    /* the current monster display symbols */
+uchar warnsyms[WARNCOUNT]   = DUMMY;    /* the current warning display symbols */
 
 /* Default object class symbols.  See objclass.h. */
 const char def_oc_syms[MAXOCLASSES] = {
@@ -46,6 +50,7 @@ const char def_oc_syms[MAXOCLASSES] = {
 };
 
 const char invisexplain[] = "remembered, unseen, creature";
+const char altinvisexplain[] = "unseen creature"; /* for clairvoyance */
 
 /* Object descriptions.  Used in do_look(). */
 const char * const objexplain[] = { /* these match def_oc_syms, above */
@@ -277,6 +282,7 @@ struct symdef defsyms[MAXPCHARS] = {
     {'^', "anti-magic field", C(HI_ZAP)},   /* trap */
     {'^', "ice trap",   C(CLR_WHITE)},  /* trap */
     {'^', "polymorph trap", C(CLR_BRIGHT_GREEN)},   /* trap */
+    {'^', "vibrating square", C(CLR_MAGENTA) },    /* "trap" */
     {'|', "wall",       C(CLR_GRAY)},   /* vbeam */
     {'-', "wall",       C(CLR_GRAY)},   /* hbeam */
     {'\\', "wall",       C(CLR_GRAY)},   /* lslant */
@@ -394,6 +400,7 @@ static glyph_t ibm_graphics[MAXPCHARS] = {
     g_FILLER(S_anti_magic_trap),
     g_FILLER(S_ice_trap),
     g_FILLER(S_polymorph_trap),
+    g_FILLER(S_vibrating_square),
     0xb3,   /* S_vbeam: meta-3, vertical rule */
     0xc4,   /* S_hbeam: meta-D, horizontal rule */
     g_FILLER(S_lslant),
@@ -499,6 +506,7 @@ static glyph_t dec_graphics[MAXPCHARS] = {
     g_FILLER(S_anti_magic_trap),
     g_FILLER(S_ice_trap),
     g_FILLER(S_polymorph_trap),
+    g_FILLER(S_vibrating_square),
     0xf8,   /* S_vbeam: meta-x, vertical rule */
     0xf1,   /* S_hbeam: meta-q, horizontal rule */
     g_FILLER(S_lslant),
@@ -602,6 +610,7 @@ static glyph_t mac_graphics[MAXPCHARS] = {
     g_FILLER(S_anti_magic_trap),
     g_FILLER(S_ice_trap),
     g_FILLER(S_polymorph_trap),
+    g_FILLER(S_vibrating_square),
     g_FILLER(S_vbeam),
     g_FILLER(S_hbeam),
     g_FILLER(S_lslant),
@@ -707,6 +716,7 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
     g_FILLER(S_anti_magic_trap),
     g_FILLER(S_ice_trap),
     g_FILLER(S_polymorph_trap),
+    g_FILLER(S_vibrating_square),
     0x2502, /* S_vbeam: BOX DRAWINGS LIGHT VERTICAL */
     0x2500, /* S_hbeam: BOX DRAWINGS LIGHT HORIZONTAL */
     g_FILLER(S_lslant),

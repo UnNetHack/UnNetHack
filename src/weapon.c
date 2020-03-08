@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)weapon.c   3.4 2002/11/07  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,26 +8,29 @@
  */
 #include "hack.h"
 
-STATIC_DCL int FDECL(enhance_skill, (boolean));
+static void FDECL(give_may_advance_msg, (int));
+static int FDECL(enhance_skill, (boolean));
+static boolean FDECL(could_advance, (int));
+static boolean FDECL(peaked_skill, (int));
+static int FDECL(slots_required, (int));
+static void FDECL(skill_advance, (int));
 
 /* Categories whose names don't come from OBJ_NAME(objects[type])
  */
-#define PN_BARE_HANDED          (-1)    /* includes martial arts */
-#define PN_TWO_WEAPONS          (-2)
-#define PN_RIDING           (-3)
-#define PN_POLEARMS         (-4)
-#define PN_SABER            (-5)
-#define PN_HAMMER           (-6)
-#define PN_WHIP             (-7)
-#define PN_ATTACK_SPELL         (-8)
-#define PN_HEALING_SPELL        (-9)
-#define PN_DIVINATION_SPELL     (-10)
-#define PN_ENCHANTMENT_SPELL        (-11)
-#define PN_CLERIC_SPELL         (-12)
-#define PN_ESCAPE_SPELL         (-13)
-#define PN_MATTER_SPELL         (-14)
-
-STATIC_DCL void FDECL(give_may_advance_msg, (int));
+#define PN_BARE_HANDED        (-1)    /* includes martial arts */
+#define PN_TWO_WEAPONS        (-2)
+#define PN_RIDING             (-3)
+#define PN_POLEARMS           (-4)
+#define PN_SABER              (-5)
+#define PN_HAMMER             (-6)
+#define PN_WHIP               (-7)
+#define PN_ATTACK_SPELL       (-8)
+#define PN_HEALING_SPELL      (-9)
+#define PN_DIVINATION_SPELL  (-10)
+#define PN_ENCHANTMENT_SPELL (-11)
+#define PN_CLERIC_SPELL      (-12)
+#define PN_ESCAPE_SPELL      (-13)
+#define PN_MATTER_SPELL      (-14)
 
 STATIC_VAR NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
     0,                DAGGER,         KNIFE,        AXE,
@@ -91,7 +93,6 @@ STATIC_DCL boolean FDECL(could_advance, (int));
 STATIC_DCL boolean FDECL(peaked_skill, (int));
 STATIC_DCL int FDECL(slots_required, (int));
 
-STATIC_DCL char *FDECL(skill_level_name, (int, char *));
 STATIC_DCL void FDECL(skill_advance, (int));
 
 #define P_NAME(type) ((skill_names_indices[type] > 0) ? \
@@ -103,6 +104,70 @@ STATIC_DCL void FDECL(skill_advance, (int));
 static NEARDATA const char kebabable[] = {
     S_XORN, S_DRAGON, S_JABBERWOCK, S_NAGA, S_GIANT, '\0'
 };
+
+/* weapon's skill category name for use as generalized description of weapon;
+   mostly used to shorten "you drop your <weapon>" messages when slippery
+   fingers or polymorph causes hero to involuntarily drop wielded weapon(s) */
+const char *
+weapon_descr(obj)
+struct obj *obj;
+{
+    int skill = weapon_type(obj);
+    const char *descr = P_NAME(skill);
+
+    /* assorted special cases */
+    switch (skill) {
+    case P_NONE:
+        /* not a weapon or weptool: use item class name;
+           override class name "food" for corpses, tins, and eggs,
+           "large rock" for statues and boulders, and "tool" for towels */
+        descr = (obj->otyp == CORPSE ||
+                 obj->otyp == TIN ||
+                 obj->otyp == EGG ||
+                 obj->otyp == STATUE ||
+                 obj->otyp == BOULDER ||
+                 obj->otyp == TOWEL) ? OBJ_NAME(objects[obj->otyp]) : objexplain[(int)obj->oclass];
+        break;
+
+    case P_SLING:
+        if (is_ammo(obj)) {
+            descr = (obj->otyp == ROCK || is_graystone(obj)) ? "stone" :
+                    /* avoid "rock"; what about known glass? */
+                    (obj->oclass == GEM_CLASS) ? "gem"
+                    /* in case somebody adds odd sling ammo */ : objexplain[(int)obj->oclass];
+        }
+        break;
+
+    case P_BOW:
+        if (is_ammo(obj)) {
+            descr = "arrow";
+        }
+        break;
+
+    case P_CROSSBOW:
+        if (is_ammo(obj)) {
+            descr = "bolt";
+        }
+        break;
+
+    case P_FLAIL:
+        if (obj->otyp == GRAPPLING_HOOK) {
+            descr = "hook";
+        }
+        break;
+
+    case P_PICK_AXE:
+        /* even if "dwarvish mattock" hasn't been discovered yet */
+        if (obj->otyp == DWARVISH_MATTOCK) {
+            descr = "mattock";
+        }
+        break;
+
+    default:
+        break;
+    }
+    return makesingular(descr);
+}
 
 /*
  *  hitval returns an integer representing the "to hit" bonuses
@@ -127,7 +192,9 @@ struct monst *mon;
 
     /* Blessed weapons used against undead or demons */
     if (Is_weapon && otmp->blessed &&
-        (is_demon(ptr) || is_undead(ptr))) tmp += 2;
+        (is_demon(ptr) || is_undead(ptr) || is_vampshifter(mon))) {
+        tmp += 2;
+    }
 
     if (is_spear(otmp) &&
         index(kebabable, ptr->mlet)) tmp += 2;
@@ -255,15 +322,16 @@ struct monst *mon;
     if (objects[otyp].oc_material <= LEATHER && thick_skinned(ptr))
         /* thick skinned/scaled creatures don't feel it */
         tmp = 0;
-    if (ptr == &mons[PM_SHADE] && objects[otyp].oc_material != SILVER)
+    if (ptr == &mons[PM_SHADE] && !shade_glare(otmp)) {
         tmp = 0;
+    }
 
-    /* "very heavy iron ball"; weight increase is in increments of 160 */
+    /* "very heavy iron ball"; weight increase is in increments */
     if (otyp == HEAVY_IRON_BALL && tmp > 0) {
         int wt = (int)objects[HEAVY_IRON_BALL].oc_weight;
 
         if ((int)otmp->owt > wt) {
-            wt = ((int)otmp->owt - wt) / 160;
+            wt = ((int)otmp->owt - wt) / IRON_BALL_W_INCR;
             tmp += rnd(4 * wt);
             if (tmp > 25) tmp = 25; /* objects[].oc_wldam */
         }
@@ -274,12 +342,17 @@ struct monst *mon;
         otmp->oclass == BALL_CLASS || otmp->oclass == CHAIN_CLASS) {
         int bonus = 0;
 
-        if (otmp->blessed && (is_undead(ptr) || is_demon(ptr)))
+        if (otmp->blessed &&
+            (is_undead(ptr) || is_demon(ptr) || is_vampshifter(mon))) {
             bonus += rnd(4);
+        }
         if (is_axe(otmp) && is_wooden(ptr))
             bonus += rnd(4);
         if (objects[otyp].oc_material == SILVER && hates_silver(ptr))
             bonus += rnd(20);
+        if (artifact_light(otmp) && otmp->lamplit && hates_light(ptr)) {
+            bonus += rnd(8);
+        }
 
         /* if the weapon is going to get a double damage bonus, adjust
            this bonus so that effectively it's added after the doubling */
@@ -290,7 +363,7 @@ struct monst *mon;
     }
 
     if (tmp > 0) {
-        /* It's debateable whether a rusted blunt instrument
+        /* It's debatable whether a rusted blunt instrument
            should do less damage than a pristine one, since
            it will hit with essentially the same impact, but
            there ought to some penalty for using damaged gear
@@ -300,6 +373,110 @@ struct monst *mon;
     }
 
     return(tmp);
+}
+
+/* check whether blessed and/or silver damage applies for *non-weapon* hit;
+   return value is the amount of the extra damage */
+int
+special_dmgval(magr, mdef, armask, silverhit_p)
+struct monst *magr, *mdef;
+long armask; /* armor mask, multiple bits accepted for W_ARMC|W_ARM|W_ARMU
+              * or W_ARMG|W_RINGL|W_RINGR only */
+long *silverhit_p; /* output flag mask for silver bonus */
+{
+    struct obj *obj;
+    struct permonst *ptr = mdef->data;
+    boolean left_ring = (armask & W_RINGL) ? TRUE : FALSE;
+    boolean right_ring = (armask & W_RINGR) ? TRUE : FALSE;
+    long silverhit = 0L;
+    int bonus = 0;
+
+    obj = 0;
+    if (armask & (W_ARMC | W_ARM | W_ARMU)) {
+        if ((armask & W_ARMC) && (obj = which_armor(magr, W_ARMC))) {
+            armask = W_ARMC;
+        } else if ((armask & W_ARM) && (obj = which_armor(magr, W_ARM))) {
+            armask = W_ARM;
+        } else if ((armask & W_ARMU) && (obj = which_armor(magr, W_ARMU))) {
+            armask = W_ARMU;
+        } else {
+            armask = 0L;
+        }
+    } else if (armask & (W_ARMG | W_RINGL | W_RINGR)) {
+        armask = ((obj = which_armor(magr, W_ARMG))) ?  W_ARMG : 0L;
+    } else {
+        obj = which_armor(magr, armask);
+    }
+
+    if (obj) {
+        if (obj->blessed &&
+             (is_undead(ptr) || is_demon(ptr) || is_vampshifter(mdef))) {
+            bonus += rnd(4);
+        }
+        /* the only silver armor is shield of reflection (silver dragon
+           scales refer to color, not material) and the only way to hit
+           with one--aside from throwing--is to wield it and perform a
+           weapon hit, but we include a general check here */
+        if (objects[obj->otyp].oc_material == SILVER && mon_hates_silver(mdef)) {
+            bonus += rnd(20);
+            silverhit |= armask;
+        }
+
+    /* when no gloves we check for silver rings (blessed rings ignored) */
+    } else if ((left_ring || right_ring) && magr == &youmonst) {
+        if (left_ring && uleft) {
+            if (objects[uleft->otyp].oc_material == SILVER && mon_hates_silver(mdef)) {
+                bonus += rnd(20);
+                silverhit |= W_RINGL;
+            }
+        }
+        if (right_ring && uright) {
+            if (objects[uright->otyp].oc_material == SILVER && mon_hates_silver(mdef)) {
+                /* two silver rings don't give double silver damage
+                   but 'silverhit' messages might be adjusted for them */
+                if (!(silverhit & W_RINGL)) {
+                    bonus += rnd(20);
+                }
+                silverhit |= W_RINGR;
+            }
+        }
+    }
+
+    if (silverhit_p) {
+        *silverhit_p = silverhit;
+    }
+    return bonus;
+}
+
+/* give a "silver <item> sears <target>" message;
+   not used for weapon hit, so we only handle rings */
+void
+silver_sears(magr, mdef, silverhit)
+struct monst *magr UNUSED;
+struct monst *mdef;
+long silverhit;
+{
+    char rings[20]; /* plenty of room for "rings" */
+    int ltyp = ((uleft && (silverhit & W_RINGL)) ? uleft->otyp : STRANGE_OBJECT);
+    int rtyp = ((uright && (silverhit & W_RINGR)) ? uright->otyp : STRANGE_OBJECT);
+    boolean l_ag = (objects[ltyp].oc_material == SILVER && uleft->dknown);
+    boolean r_ag = (objects[rtyp].oc_material == SILVER && uright->dknown);
+
+    if (silverhit & (W_RINGL | W_RINGR)) {
+        /* plural if both the same type (so not multi_claw and both rings
+           are non-Null) and either both known or neither known, or both
+           silver (in case there is ever more than one type of silver ring)
+           and both known; singular if multi_claw (where one of ltyp or
+           rtyp will always be STRANGE_OBJECT) even if both rings are known
+           silver [see hmonas(uhitm.c) for explanation of 'multi_claw'] */
+        boolean both = ((ltyp == rtyp && uleft->dknown == uright->dknown) || (l_ag && r_ag));
+        Sprintf(rings, "ring%s", both ? "s" : "");
+        Your("%s%s %s %s!",
+             (l_ag || r_ag) ? "silver " :
+             both ? "" :
+             (silverhit & W_RINGL) ? "left " : "right ",
+             rings, vtense(rings, "sear"), mon_nam(mdef));
+    }
 }
 
 STATIC_DCL struct obj *FDECL(oselect, (struct monst *, int));
@@ -323,13 +500,13 @@ int x;
     return (struct obj *)0;
 }
 
+/* TODO: have monsters use aklys' throw-and-return */
 static NEARDATA const int rwep[] =
 {   DWARVISH_SPEAR, SILVER_SPEAR, ELVEN_SPEAR, SPEAR, ORCISH_SPEAR,
     JAVELIN, SHURIKEN, YA, SILVER_ARROW, ELVEN_ARROW, ARROW,
     ORCISH_ARROW, CROSSBOW_BOLT, SILVER_DAGGER, ELVEN_DAGGER, DAGGER,
     ORCISH_DAGGER, KNIFE, FLINT, ROCK, LOADSTONE, LUCKSTONE, DART,
     /* BOOMERANG, */ CREAM_PIE
-    /* note: CREAM_PIE should NOT be #ifdef KOPS */
 };
 
 static NEARDATA const int pwep[] =
@@ -338,8 +515,9 @@ static NEARDATA const int pwep[] =
 
 static struct obj *propellor;
 
+/* select a ranged weapon for the monster */
 struct obj *
-select_rwep(mtmp)   /* select a ranged weapon for the monster */
+select_rwep(mtmp)
 register struct monst *mtmp;
 {
     register struct obj *otmp;
@@ -358,12 +536,17 @@ register struct monst *mtmp;
     if(throws_rocks(mtmp->data))    /* ...boulders for giants */
         Oselect(BOULDER);
 
-    /* Select polearms first; they do more damage and aren't expendable */
+    /* Select polearms first; they do more damage and aren't expendable.
+       But don't pick one if monster's weapon is welded, because then
+       we'd never have a chance to throw non-wielding missiles. */
     /* The limit of 13 here is based on the monster polearm range limit
      * (defined as 5 in mthrowu.c).  5 corresponds to a distance of 2 in
      * one direction and 1 in another; one space beyond that would be 3 in
      * one direction and 2 in another; 3^2+2^2=13.
      */
+    struct obj *mwep = MON_WEP(mtmp);
+    /* NO_WEAPON_WANTED means we already tried to wield and failed */
+    boolean mweponly = (mwelded(mwep) && mtmp->weapon_check == NO_WEAPON_WANTED);
     if (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 13 && couldsee(mtmp->mx, mtmp->my)) {
         for (i = 0; i < SIZE(pwep); i++) {
             /* Only strong monsters can wield big (esp. long) weapons.
@@ -374,7 +557,8 @@ register struct monst *mtmp;
                  || !objects[pwep[i]].oc_bimanual) &&
                 (objects[pwep[i]].oc_material != SILVER
                  || !hates_silver(mtmp->data))) {
-                if ((otmp = oselect(mtmp, pwep[i])) != 0) {
+                if ((otmp = oselect(mtmp, pwep[i])) != 0 &&
+                     (otmp == mwep || !mweponly)) {
                     propellor = otmp; /* force the monster to wield it */
                     return otmp;
                 }
@@ -419,9 +603,12 @@ register struct monst *mtmp;
             case P_CROSSBOW:
                 propellor = (oselect(mtmp, CROSSBOW));
             }
-            if ((otmp = MON_WEP(mtmp)) && otmp->cursed && otmp != propellor
-                && mtmp->weapon_check == NO_WEAPON_WANTED)
+            if ((otmp = MON_WEP(mtmp)) &&
+                 mwelded(otmp) &&
+                 (otmp != propellor) &&
+                 (mtmp->weapon_check == NO_WEAPON_WANTED)) {
                 propellor = 0;
+            }
         }
         /* propellor = obj, propellor to use
          * propellor = &zeroobj, doesn't need a propellor
@@ -434,9 +621,10 @@ register struct monst *mtmp;
              */
             if (rwep[i] != LOADSTONE) {
                 /* Don't throw a cursed weapon-in-hand or an artifact */
-                if ((otmp = oselect(mtmp, rwep[i])) && !otmp->oartifact
-                    && (!otmp->cursed || otmp != MON_WEP(mtmp)))
+                if ((otmp = oselect(mtmp, rwep[i])) && !otmp->oartifact &&
+                     !(otmp == MON_WEP(mtmp) && mwelded(otmp))) {
                     return(otmp);
+                }
             } else for(otmp=mtmp->minvent; otmp; otmp=otmp->nobj) {
                     if (otmp->otyp == LOADSTONE && !otmp->cursed)
                         return otmp;
@@ -446,6 +634,21 @@ register struct monst *mtmp;
 
     /* failure */
     return (struct obj *)0;
+}
+
+/* is 'obj' a type of weapon that any monster knows how to throw? */
+boolean
+mon_might_throw_wep(obj)
+struct obj *obj;
+{
+    short idx;
+
+    for (idx = 0; idx < SIZE(rwep); ++idx) {
+        if (obj->otyp == rwep[idx]) {
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 /* Weapons in order of preference */
@@ -465,17 +668,18 @@ static const NEARDATA short hwep[] = {
     ATHAME, SCALPEL, KNIFE, WORM_TOOTH
 };
 
+/* select a hand to hand weapon for the monster */
 struct obj *
-select_hwep(mtmp)   /* select a hand to hand weapon for the monster */
-register struct monst *mtmp;
+select_hwep(mtmp)
+struct monst *mtmp;
 {
-    register struct obj *otmp;
-    register int i;
+    struct obj *otmp;
+    int i;
     boolean strong = strongmonst(mtmp->data);
     boolean wearing_shield = (mtmp->misc_worn_check & W_ARMS) != 0;
 
     /* prefer artifacts to everything else */
-    for(otmp=mtmp->minvent; otmp; otmp = otmp->nobj) {
+    for (otmp=mtmp->minvent; otmp; otmp = otmp->nobj) {
         if (otmp->oclass == WEAPON_CLASS &&
             otmp->oartifact &&
             touch_artifact(otmp, mtmp)) {
@@ -498,8 +702,9 @@ register struct monst *mtmp;
     /* big weapon is basically the same as bimanual */
     /* all monsters can wield the remaining weapons */
     for (i = 0; i < SIZE(hwep); i++) {
-        if (hwep[i] == CORPSE && !(mtmp->misc_worn_check & W_ARMG))
+        if (hwep[i] == CORPSE && !(mtmp->misc_worn_check & W_ARMG) && !resists_ston(mtmp)) {
             continue;
+        }
         if (((strong && !wearing_shield)
              || !objects[hwep[i]].oc_bimanual) &&
             (objects[hwep[i]].oc_material != SILVER
@@ -561,8 +766,9 @@ boolean polyspot;
      * polymorphed into little monster.  But it's not quite clear how to
      * handle this anyway....
      */
-    if (!(mw_tmp->cursed && mon->weapon_check == NO_WEAPON_WANTED))
+    if (!(mwelded(mw_tmp) && mon->weapon_check == NO_WEAPON_WANTED)) {
         mon->weapon_check = NEED_WEAPON;
+    }
     return;
 }
 
@@ -622,7 +828,7 @@ register struct monst *mon;
          * can know it's cursed and needn't even bother trying.
          * Still....
          */
-        if (mw_tmp && mw_tmp->cursed && mw_tmp->otyp != CORPSE) {
+        if (mw_tmp && mwelded(mw_tmp)) {
             if (canseemon(mon)) {
                 char welded_buf[BUFSZ];
                 const char *mon_hand = mbodypart(mon, HAND);
@@ -639,11 +845,8 @@ register struct monst *mon;
                     pline("%s cannot wield that %s.",
                           mon_nam(mon), xname(obj));
                 } else {
-                    pline("%s tries to wield %s.", Monnam(mon),
-                          doname(obj));
-                    pline("%s %s %s!",
-                          s_suffix(Monnam(mon)),
-                          xname(mw_tmp), welded_buf);
+                    pline("%s tries to wield %s.", Monnam(mon), doname(obj));
+                    pline("%s %s!", Yname2(mw_tmp), welded_buf);
                 }
                 mw_tmp->bknown = 1;
             }
@@ -655,7 +858,15 @@ register struct monst *mon;
         mon->weapon_check = NEED_WEAPON;
         if (canseemon(mon)) {
             pline("%s wields %s!", Monnam(mon), doname(obj));
-            if (obj->cursed && obj->otyp != CORPSE) {
+            /* 3.6.3: mwelded() predicate expects the object to have its
+               W_WEP bit set in owormmask, but the pline here and for
+               artifact_light don't want that because they'd have '(weapon
+               in hand/claw)' appended; so we set it for the mwelded test
+               and then clear it, until finally setting it for good below */
+            obj->owornmask |= W_WEP;
+            boolean newly_welded = mwelded(obj);
+            obj->owornmask &= ~W_WEP;
+            if (newly_welded) {
                 pline("%s %s to %s %s!",
                       Tobjnam(obj, "weld"),
                       is_plural(obj) ? "themselves" : "itself",
@@ -665,10 +876,15 @@ register struct monst *mon;
         }
         if (artifact_light(obj) && !obj->lamplit) {
             begin_burn(obj, FALSE);
-            if (canseemon(mon))
-                pline("%s brilliantly in %s %s!",
-                      Tobjnam(obj, "glow"),
-                      s_suffix(mon_nam(mon)), mbodypart(mon, HAND));
+            if (canseemon(mon)) {
+                pline("%s %s in %s %s!", Tobjnam(obj, "shine"),
+                      arti_light_description(obj), s_suffix(mon_nam(mon)),
+                      mbodypart(mon, HAND));
+            } else if (cansee(mon->mx, mon->my)) {
+                /* 3.6.3: artifact might be getting wielded by invisible monst */
+                pline("Light begins shining %s.",
+                      (distu(mon->mx, mon->my) <= 5 * 5) ? "nearby" : "in the distance");
+            }
         }
         obj->owornmask = W_WEP;
         return 1;
@@ -690,8 +906,9 @@ struct monst *mon;
     }
 }
 
+/* attack bonus for strength & dexterity */
 int
-abon()      /* attack bonus for strength & dexterity */
+abon()
 {
     int sbon;
     int str = ACURR(A_STR), dex = ACURR(A_DEX);
@@ -704,7 +921,7 @@ abon()      /* attack bonus for strength & dexterity */
     else if (str < STR18(100)) sbon = 2;
     else sbon = 3;
 
-/* Game tuning kludge: make it a bit easier for a low level character to hit */
+    /* Game tuning kludge: make it a bit easier for a low level character to hit */
     sbon += (u.ulevel < 3) ? 1 : 0;
 
     if (dex < 4) return(sbon-3);
@@ -714,8 +931,9 @@ abon()      /* attack bonus for strength & dexterity */
     else return(sbon + dex-14);
 }
 
+/* damage bonus for strength */
 int
-dbon()      /* damage bonus for strength */
+dbon()
 {
     int str = ACURR(A_STR);
     int dbon = 0;
@@ -807,7 +1025,7 @@ boolean verbose;
 }
 
 /* copy the skill level name into the given buffer */
-STATIC_OVL char *
+char *
 skill_level_name(skill, buf)
 int skill;
 char *buf;
@@ -826,6 +1044,13 @@ char *buf;
     }
     Strcpy(buf, ptr);
     return buf;
+}
+
+const char *
+skill_name(skill)
+int skill;
+{
+    return P_NAME(skill);
 }
 
 /* return the # of slots required to advance the skill */
@@ -854,21 +1079,24 @@ int skill;
 }
 
 /* return true if this skill can be advanced */
-/*ARGSUSED*/
-STATIC_OVL boolean
+boolean
 can_advance(skill, speedy)
 int skill;
 boolean speedy;
 {
-    return !P_RESTRICTED(skill)
-           && P_SKILL(skill) < P_MAX_SKILL(skill) && (
+    if (P_RESTRICTED(skill) ||
+         P_SKILL(skill) >= P_MAX_SKILL(skill) ||
+         u.skills_advanced >= P_SKILL_LIMIT) {
+        return FALSE;
+    }
 #ifdef WIZARD
-        (wizard && speedy) ||
+    if (wizard && speedy) {
+        return TRUE;
+    }
 #endif
-        (P_ADVANCE(skill) >=
-         (unsigned) practice_needed_to_advance(P_SKILL(skill))
-         && u.skills_advanced < P_SKILL_LIMIT
-         && u.weapon_slots >= slots_required(skill)));
+
+    return ((int)P_ADVANCE(skill) >= practice_needed_to_advance(P_SKILL(skill)) &&
+            u.weapon_slots >= slots_required(skill));
 }
 
 /* return true if any skill can be advanced */
@@ -887,11 +1115,13 @@ STATIC_OVL boolean
 could_advance(skill)
 int skill;
 {
-    return !P_RESTRICTED(skill)
-           && P_SKILL(skill) < P_MAX_SKILL(skill) && (
-        (P_ADVANCE(skill) >=
-         (unsigned) practice_needed_to_advance(P_SKILL(skill))
-         && u.skills_advanced < P_SKILL_LIMIT));
+    if (P_RESTRICTED(skill) ||
+         P_SKILL(skill) >= P_MAX_SKILL(skill) ||
+         u.skills_advanced >= P_SKILL_LIMIT) {
+        return FALSE;
+    }
+
+    return ((int) P_ADVANCE(skill) >= practice_needed_to_advance(P_SKILL(skill)));
 }
 
 /* return true if this skill has reached its maximum and there's been enough
@@ -900,10 +1130,12 @@ STATIC_OVL boolean
 peaked_skill(skill)
 int skill;
 {
-    return !P_RESTRICTED(skill)
-           && P_SKILL(skill) >= P_MAX_SKILL(skill) && (
-        (P_ADVANCE(skill) >=
-         (unsigned) practice_needed_to_advance(P_SKILL(skill))));
+    if (P_RESTRICTED(skill)) {
+        return FALSE;
+    }
+
+    return (P_SKILL(skill) >= P_MAX_SKILL(skill) &&
+            ((int) P_ADVANCE(skill) >= practice_needed_to_advance(P_SKILL(skill))));
 }
 
 /* return true if this skill requires only a bit more exercise before it can
@@ -926,7 +1158,6 @@ int skill;
         return remaining * 5 <= next_level - this_level;
     }
 }
-
 
 STATIC_OVL void
 skill_advance(skill)
@@ -1213,7 +1444,7 @@ int n;  /* number of slots to gain; normally one */
 
 void
 lose_weapon_skill(n)
-int n;  /* number of slots to lose; normally one */
+int n; /* number of slots to lose; normally one */
 {
     int skill;
 
@@ -1424,6 +1655,13 @@ const struct def_skill *class_skill;
 
     /* Set skill for all weapons in inventory to be basic */
     for (obj = invent; obj; obj = obj->nobj) {
+        /* don't give skill just because of carried ammo, wait until
+           we see the relevant launcher (prevents an archeologist's
+           touchstone from inadvertently providing skill in sling) */
+        if (is_ammo(obj)) {
+            continue;
+        }
+
         skill = weapon_type(obj);
         if (skill != P_NONE)
             P_SKILL(skill) = P_BASIC;
@@ -1472,6 +1710,10 @@ const struct def_skill *class_skill;
             P_ADVANCE(skill) = practice_needed_to_advance(P_SKILL(skill)-1);
         }
     }
+
+    /* each role has a special spell; allow at least basic for its type
+       (despite the function name, this works for spell skills too) */
+    unrestrict_weapon_skill(spell_skilltype(urole.spelspec));
 }
 
 void
@@ -1483,9 +1725,12 @@ register struct obj *obj;
     if (artifact_light(obj) && obj->lamplit) {
         end_burn(obj, FALSE);
         if (canseemon(mon))
-            pline("%s in %s %s %s glowing.", The(xname(obj)),
+            pline("%s in %s %s %s shining.", The(xname(obj)),
                   s_suffix(mon_nam(mon)), mbodypart(mon, HAND),
                   otense(obj, "stop"));
+    }
+    if (MON_WEP(mon) == obj) {
+        MON_NOWEP(mon);
     }
     obj->owornmask &= ~W_WEP;
 }

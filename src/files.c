@@ -644,6 +644,11 @@ int fd;
 }
 #endif
 
+int nhclose(int fd)
+{
+    return close(fd);
+}
+
 #ifdef WHEREIS_FILE
 /** Set the filename for the whereis file. */
 void
@@ -700,7 +705,7 @@ boolean playing; /**< True if game is running.  */
             0L,
 #endif
             u.uhave.amulet ? 1 : 0,
-            u.uevent.ascended ? 2 : killer ? 1 : 0,
+            u.uevent.ascended ? 2 : killer.name[0] ? 1 : 0,
             playing);
 
     fp = fopen_datafile_area(LOGAREA, whereis_file, "w", SCOREPREFIX);
@@ -1299,7 +1304,7 @@ boolean uncomp;
 #endif
         (void) fprintf(stderr, "redirect of %s for %scompress failed\n",
                        filename, uncomp ? "un" : "");
-        terminate(EXIT_FAILURE);
+        nh_terminate(EXIT_FAILURE);
     }
 }
 
@@ -1404,7 +1409,7 @@ boolean uncomp;
         perror((char *)0);
         (void) fprintf(stderr, "Exec to %scompress %s failed.\n",
                        uncomp ? "un" : "", filename);
-        terminate(EXIT_FAILURE);
+        nh_terminate(EXIT_FAILURE);
     } else if (f == -1) {
         perror((char *)0);
         pline("Fork to %scompress %s failed.",
@@ -2555,7 +2560,7 @@ read_wizkit()
             else *ep = '\0';    /* remove newline */
 
             if (buf[0]) {
-                otmp = readobjnam(buf, (struct obj *)0, FALSE);
+                otmp = readobjnam(buf, (struct obj *)0);
                 if (otmp) {
                     if (otmp != &zeroobj)
                         otmp = addinv(otmp);

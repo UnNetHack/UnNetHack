@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)vision.c   3.4 1999/02/18  */
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990. */
 /* NetHack may be freely redistributed.  See license for details.   */
 
@@ -15,7 +14,7 @@
  * offset on the same row as the source *is* included so we don't have to
  * make an extra check.  For example, a circle of radius 4 has offsets:
  *
- *              XXX +2
+ *              XXX     +2
  *              ...X    +3
  *              ....X   +4
  *              ....X   +4
@@ -23,22 +22,22 @@
  *
  */
 char circle_data[] = {
-/*  0*/ 1, 1,
-/*  2*/ 2, 2, 1,
-/*  5*/ 3, 3, 2, 1,
-/*  9*/ 4, 4, 4, 3, 2,
-/* 14*/ 5, 5, 5, 4, 3, 2,
-/* 20*/ 6, 6, 6, 5, 5, 4, 2,
-/* 27*/ 7, 7, 7, 6, 6, 5, 4, 2,
-/* 35*/ 8, 8, 8, 7, 7, 6, 6, 4, 2,
-/* 44*/ 9, 9, 9, 9, 8, 8, 7, 6, 5, 3,
-/* 54*/ 10, 10, 10, 10, 9, 9, 8, 7, 6, 5, 3,
-/* 65*/ 11, 11, 11, 11, 10, 10, 9, 9, 8, 7, 5, 3,
-/* 77*/ 12, 12, 12, 12, 11, 11, 10, 10, 9, 8, 7, 5, 3,
-/* 90*/ 13, 13, 13, 13, 12, 12, 12, 11, 10, 10, 9, 7, 6, 3,
-/*104*/ 14, 14, 14, 14, 13, 13, 13, 12, 12, 11, 10, 9, 8, 6, 3,
-/*119*/ 15, 15, 15, 15, 14, 14, 14, 13, 13, 12, 11, 10, 9, 8, 6, 3,
-/*135*/ 16 /* should be MAX_RADIUS+1; used to terminate range loops -dlc */
+    /*  0*/ 1, 1,
+    /*  2*/ 2, 2, 1,
+    /*  5*/ 3, 3, 2, 1,
+    /*  9*/ 4, 4, 4, 3, 2,
+    /* 14*/ 5, 5, 5, 4, 3, 2,
+    /* 20*/ 6, 6, 6, 5, 5, 4, 2,
+    /* 27*/ 7, 7, 7, 6, 6, 5, 4, 2,
+    /* 35*/ 8, 8, 8, 7, 7, 6, 6, 4, 2,
+    /* 44*/ 9, 9, 9, 9, 8, 8, 7, 6, 5, 3,
+    /* 54*/ 10, 10, 10, 10, 9, 9, 8, 7, 6, 5, 3,
+    /* 65*/ 11, 11, 11, 11, 10, 10, 9, 9, 8, 7, 5, 3,
+    /* 77*/ 12, 12, 12, 12, 11, 11, 10, 10, 9, 8, 7, 5, 3,
+    /* 90*/ 13, 13, 13, 13, 12, 12, 12, 11, 10, 10, 9, 7, 6, 3,
+    /*104*/ 14, 14, 14, 14, 13, 13, 13, 12, 12, 11, 10, 9, 8, 6, 3,
+    /*119*/ 15, 15, 15, 15, 14, 14, 14, 13, 13, 12, 11, 10, 9, 8, 6, 3,
+    /*135*/ 16 /* should be MAX_RADIUS+1; used to terminate range loops -dlc */
 };
 
 /*
@@ -46,22 +45,22 @@ char circle_data[] = {
  * circle of a given radius.
  */
 char circle_start[] = {
-/*  */ 0,       /* circles of radius zero are not used */
-/* 1*/ 0,
-/* 2*/ 2,
-/* 3*/ 5,
-/* 4*/ 9,
-/* 5*/ 14,
-/* 6*/ 20,
-/* 7*/ 27,
-/* 8*/ 35,
-/* 9*/ 44,
-/*10*/ 54,
-/*11*/ 65,
-/*12*/ 77,
-/*13*/ 90,
-/*14*/ 104,
-/*15*/ 119,
+    /*  */ 0, /* circles of radius zero are not used */
+    /* 1*/ 0,
+    /* 2*/ 2,
+    /* 3*/ 5,
+    /* 4*/ 9,
+    /* 5*/ 14,
+    /* 6*/ 20,
+    /* 7*/ 27,
+    /* 8*/ 35,
+    /* 9*/ 44,
+    /*10*/ 54,
+    /*11*/ 65,
+    /*12*/ 77,
+    /*13*/ 90,
+    /*14*/ 104,
+    /*15*/ 119,
 };
 
 
@@ -79,19 +78,17 @@ char    **viz_array;
 #endif
 char    *viz_rmin, *viz_rmax;       /* current vision cs bounds */
 
-
 /*------ local variables ------*/
 
-
-static char could_see[2][ROWNO][COLNO];     /* vision work space */
+static char could_see[2][ROWNO][COLNO]; /* vision work space */
 static char *cs_rows0[ROWNO], *cs_rows1[ROWNO];
 static char cs_rmin0[ROWNO],  cs_rmax0[ROWNO];
 static char cs_rmin1[ROWNO],  cs_rmax1[ROWNO];
 
-static char viz_clear[ROWNO][COLNO];        /* vision clear/blocked map */
+static char viz_clear[ROWNO][COLNO]; /* vision clear/blocked map */
 static char *viz_clear_rows[ROWNO];
 
-static char left_ptrs[ROWNO][COLNO];        /* LOS algorithm helpers */
+static char left_ptrs[ROWNO][COLNO]; /* LOS algorithm helpers */
 static char right_ptrs[ROWNO][COLNO];
 
 /* Forward declarations. */
@@ -107,7 +104,7 @@ STATIC_DCL void FDECL(rogue_vision, (char **, char *, char *));
 
 /* Macro definitions that I can't find anywhere. */
 #define sign(z) ((z) < 0 ? -1 : ((z) ? 1 : 0 ))
-#define v_abs(z)  ((z) < 0 ? -(z) : (z))    /* don't use abs -- it may exist */
+#define v_abs(z)  ((z) < 0 ? -(z) : (z)) /* don't use abs -- it may exist */
 
 /*
  * vision_init()
@@ -179,13 +176,11 @@ register struct rm    *lev;
     for (obj = level.objects[x][y]; obj; obj = obj->nexthere)
         if (obj->otyp == BOULDER) return 1;
 
-    /* Mimics mimicing a door or boulder block light. */
+    /* Mimics mimicing a door or boulder or ... block light. */
     if ((mon = m_at(x, y)) && (!mon->minvis || See_invisible) &&
-        ((mon->data == &mons[PM_GIANT_TURTLE]) ||
-         ((mon->m_ap_type == M_AP_FURNITURE &&
-           (mon->mappearance == S_hcdoor || mon->mappearance == S_vcdoor)) ||
-          (mon->m_ap_type == M_AP_OBJECT && mon->mappearance == BOULDER))))
+         is_lightblocker_mappear(mon)) {
         return 1;
+    }
 
     return 0;
 }
@@ -220,15 +215,15 @@ vision_reset()
         lev = &levl[1][y];
         for (x = 1; x < COLNO; x++, lev += ROWNO)
             if (block != (IS_ROCK(lev->typ) || does_block(x, y, lev))) {
-                if(block) {
-                    for(i=dig_left; i<x; i++) {
+                if (block) {
+                    for (i=dig_left; i<x; i++) {
                         left_ptrs [y][i] = dig_left;
                         right_ptrs[y][i] = x-1;
                     }
                 } else {
                     i = dig_left;
                     if(dig_left) dig_left--; /* point at first blocked point */
-                    for(; i<x; i++) {
+                    for (; i<x; i++) {
                         left_ptrs [y][i] = dig_left;
                         right_ptrs[y][i] = x;
                         viz_clear[y][i] = 1;
@@ -240,7 +235,7 @@ vision_reset()
         /* handle right boundary; almost identical for blocked/unblocked */
         i = dig_left;
         if(!block && dig_left) dig_left--; /* point at first blocked point */
-        for(; i<COLNO; i++) {
+        for (; i<COLNO; i++) {
             left_ptrs [y][i] = dig_left;
             right_ptrs[y][i] = (COLNO-1);
             viz_clear[y][i] = !block;
@@ -371,17 +366,17 @@ STATIC_DCL int FDECL(new_angle, (struct rm *, unsigned char *, int, int));
  * see, then we want to extend a spine of the T to connect with the wall
  * that is beyond.  Example:
  *
- *   Correct, but ugly             Extend T spine
+ *       Correct, but ugly                         Extend T spine
  *
- *      | ...                   | ...
- *      | ...   <-- wall beyond & floor --> | ...
- *      | ...                   | ...
- * Unseen   -->   ...                   | ...
- * spine    +-...   <-- trwall & doorway    --> +-...
- *      | ...                   | ...
+ *              | ...                                   | ...
+ *              | ...   <-- wall beyond & floor -->     | ...
+ *              | ...                                   | ...
+ * Unseen   -->   ...                                   | ...
+ * spine        +-...   <-- trwall & doorway    -->     +-...
+ *              | ...                                   | ...
  *
  *
- *         @    <-- hero        -->    @
+ *                 @    <-- hero                -->        @
  *
  *
  * We fake the above check by only checking if the horizontal &
@@ -448,7 +443,6 @@ int row, col;
 
 #endif
 
-
 /*
  * vision_recalc()
  *
@@ -497,30 +491,26 @@ void
 vision_recalc(control)
 int control;
 {
-    char **temp_array;  /* points to the old vision array */
-    char **next_array;  /* points to the new vision array */
-    char *next_row; /* row pointer for the new array */
-    char *old_row;  /* row pointer for the old array */
-    char *next_rmin;    /* min pointer for the new array */
-    char *next_rmax;    /* max pointer for the new array */
-    char *ranges;   /* circle ranges -- used for xray & night vision */
-    int row;        /* row counter (outer loop)  */
-    int start, stop;    /* inner loop starting/stopping index */
-    int dx, dy;     /* one step from a lit door or lit wall (see below) */
-    register int col;   /* inner loop counter */
-    register struct rm *lev;    /* pointer to current pos */
-    struct rm *flev;    /* pointer to position in "front" of current pos */
-    extern unsigned char seenv_matrix[3][3];    /* from display.c */
-    static unsigned char colbump[COLNO+1];  /* cols to bump sv */
-    unsigned char *sv;              /* ptr to seen angle bits */
-    int oldseenv;               /* previous seenv value */
+    char **temp_array; /* points to the old vision array */
+    char **next_array; /* points to the new vision array */
+    char *next_row;    /* row pointer for the new array */
+    char *old_row;     /* row pointer for the old array */
+    char *next_rmin;   /* min pointer for the new array */
+    char *next_rmax;   /* max pointer for the new array */
+    char *ranges;      /* circle ranges -- used for xray & night vision */
+    int row = 0;       /* row counter (outer loop)  */
+    int start, stop;   /* inner loop starting/stopping index */
+    int dx, dy;        /* one step from a lit door or lit wall (see below) */
+    register int col;  /* inner loop counter */
+    register struct rm *lev; /* pointer to current pos */
+    struct rm *flev;   /* pointer to position in "front" of current pos */
+    extern unsigned char seenv_matrix[3][3]; /* from display.c */
+    static unsigned char colbump[COLNO+1];   /* cols to bump sv */
+    unsigned char *sv;                       /* ptr to seen angle bits */
+    int oldseenv;                            /* previous seenv value */
 
-    vision_full_recalc = 0;         /* reset flag */
+    vision_full_recalc = 0; /* reset flag */
     if (in_mklev || !iflags.vision_inited) return;
-
-#ifdef GCC_WARN
-    row = 0;
-#endif
 
     /*
      * Either the light sources have been taken care of, or we must
@@ -599,7 +589,12 @@ int control;
         /* if in a pit, just update for immediate locations */
         else if (u.utrap && u.utraptype == TT_PIT) {
             for (row = u.uy-1; row <= u.uy+1; row++) {
-                if (row < 0) continue; if (row >= ROWNO) break;
+                if (row < 0) {
+                    continue;
+                }
+                if (row >= ROWNO) {
+                    break;
+                }
 
                 next_rmin[row] = max(      0, u.ux - 1);
                 next_rmax[row] = min(COLNO-1, u.ux + 1);
@@ -620,7 +615,12 @@ int control;
                 ranges = circle_ptr(u.xray_range);
 
                 for (row = u.uy-u.xray_range; row <= u.uy+u.xray_range; row++) {
-                    if (row < 0) continue; if (row >= ROWNO) break;
+                    if (row < 0) {
+                        continue;
+                    }
+                    if (row >= ROWNO) {
+                        break;
+                    }
                     dy = v_abs(u.uy-row);   next_row = next_array[row];
 
                     start = max(      0, u.ux - ranges[dy]);
@@ -658,7 +658,12 @@ int control;
                 ranges = circle_ptr(u.nv_range);
 
                 for (row = u.uy-u.nv_range; row <= u.uy+u.nv_range; row++) {
-                    if (row < 0) continue; if (row >= ROWNO) break;
+                    if (row < 0) {
+                        continue;
+                    }
+                    if (row >= ROWNO) {
+                        break;
+                    }
                     dy = v_abs(u.uy-row);   next_row = next_array[row];
 
                     start = max(      0, u.ux - ranges[dy]);
@@ -1664,26 +1669,23 @@ int right_mark;     /* right mark of previous row */
 char *limits;       /* points at range limit for current row, or NULL */
 {
     register int i;
-    register char *rowp;
+    char *rowp = NULL;
     int hit_stone = 0;
     int left_shadow, right_shadow, loc_right;
     int lblock_col;         /* local block column (current row) */
     int nrow, deeper;
-    char *row_min;      /* left most */
-    char *row_max;      /* right most */
-    int lim_max;        /* right most limit of circle */
+    char *row_min = NULL; /* left most */
+    char *row_max = NULL; /* right most */
+    int lim_max;          /* right most limit of circle */
 
-#ifdef GCC_WARN
-    rowp = 0;
-#endif
     nrow    = row + step;
     deeper  = good_row(nrow) && (!limits || (*limits >= *(limits+1)));
-    if(!vis_func) {
+    if (!vis_func) {
         rowp    = cs_rows[row];
         row_min = &cs_left[row];
         row_max = &cs_right[row];
     }
-    if(limits) {
+    if (limits) {
         lim_max = start_col + *limits;
         if(lim_max > COLNO-1) lim_max = COLNO-1;
         if(right_mark > lim_max) right_mark = lim_max;
@@ -1832,7 +1834,7 @@ char *limits;       /* points at range limit for current row, or NULL */
          * shadow limit imposed by the far block (right) then use the far
          * wall as our new far block when we recurse.
          *
-         * If the limits are the the same, and the far block really exists
+         * If the limits are the same, and the far block really exists
          * (fb_row >= 0) then do the same as above.
          *
          * Normally, the check would be for the far wall being closer OR EQUAL
@@ -1919,18 +1921,15 @@ int right;          /* right mark of the previous row */
 char *limits;
 {
     register int i;
-    register char *rowp;
+    char *rowp = NULL;
     int hit_stone = 0;
     int left_shadow, right_shadow, loc_left;
     int lblock_col;         /* local block column (current row) */
     int nrow, deeper;
-    char *row_min;      /* left most */
-    char *row_max;      /* right most */
+    char *row_min = NULL; /* left most */
+    char *row_max = NULL; /* right most */
     int lim_min;
 
-#ifdef GCC_WARN
-    rowp = 0;
-#endif
     nrow    = row + step;
     deeper  = good_row(nrow) && (!limits || (*limits >= *(limits+1)));
     if(!vis_func) {
@@ -2201,16 +2200,16 @@ int left;           /* first (left side) visible spot on prev row */
 int right_mark;     /* last (right side) visible spot on prev row */
 char *limits;       /* points at range limit for current row, or NULL */
 {
-    int right;          /* right limit of "could see" */
-    int right_edge;         /* right edge of an opening */
-    int nrow;           /* new row (calculate once) */
-    int deeper;         /* if TRUE, call self as needed */
-    int result;         /* set by q?_path() */
-    register int i;         /* loop counter */
-    register char *rowp;    /* row optimization */
-    char      *row_min; /* left most  [used by macro set_min()] */
-    char      *row_max; /* right most [used by macro set_max()] */
-    int lim_max;        /* right most limit of circle */
+    int right;            /* right limit of "could see" */
+    int right_edge;       /* right edge of an opening */
+    int nrow;             /* new row (calculate once) */
+    int deeper;           /* if TRUE, call self as needed */
+    int result;           /* set by q?_path() */
+    register int i;       /* loop counter */
+    char *rowp = NULL;    /* row optimization */
+    char *row_min = NULL; /* left most  [used by macro set_min()] */
+    char *row_max = NULL; /* right most [used by macro set_max()] */
+    int lim_max;          /* right most limit of circle */
 
     rowp = row_min = row_max = 0;
     nrow    = row + step;
@@ -2381,11 +2380,11 @@ char *limits;
 {
     int left, left_edge, nrow, deeper, result;
     register int i;
-    register char *rowp;
-    char      *row_min, *row_max;
+    char *rowp = NULL;
+    char *row_min = NULL;
+    char *row_max = NULL;
     int lim_min;
 
-    rowp = row_min = row_max = 0;
     nrow    = row+step;
     deeper  = good_row(nrow) && (!limits || (*limits >= *(limits+1)));
     if(!vis_func) {
@@ -2603,11 +2602,17 @@ genericptr_t arg;
         register int x;
         int y, min_x, max_x, max_y, offset;
         char *limits;
+        boolean override_vision;
+
+        /* vision doesn't pass through water or clouds, detection should
+           [this probably ought to be an arg supplied by our caller...] */
+        override_vision = (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz)) && detecting(func);
 
         if (range > MAX_RADIUS || range < 1)
             panic("do_clear_area:  illegal range %d", range);
-        if(vision_full_recalc)
+        if (vision_full_recalc) {
             vision_recalc(0); /* recalc vision if dirty */
+        }
         limits = circle_ptr(range);
         if ((max_y = (srow + range)) >= ROWNO) max_y = ROWNO-1;
         if ((y = (srow - range)) < 0) y = 0;
@@ -2616,10 +2621,57 @@ genericptr_t arg;
             if((min_x = (scol - offset)) < 0) min_x = 0;
             if((max_x = (scol + offset)) >= COLNO) max_x = COLNO-1;
             for (x = min_x; x <= max_x; x++)
-                if (couldsee(x, y))
+                if (couldsee(x, y) || override_vision) {
                     (*func)(x, y, arg);
+                }
         }
     }
+}
+
+/* bitmask indicating ways mon is seen; extracted from lookat(pager.c) */
+unsigned
+how_mon_is_seen(mon)
+struct monst *mon;
+{
+    boolean useemon = (boolean) canseemon(mon);
+    int xraydist = (u.xray_range < 0) ? -1 : (u.xray_range * u.xray_range);
+    unsigned how_seen = 0; /* result */
+
+    /* normal vision;
+       cansee is true for both normal and astral vision,
+       but couldsee it not true for astral vision */
+    if ((mon->wormno ? worm_known(mon) :
+        (cansee(mon->mx, mon->my) && couldsee(mon->mx, mon->my))) &&
+        mon_visible(mon) &&
+        !mon->minvis) {
+        how_seen |= MONSEEN_NORMAL;
+    }
+    /* see invisible */
+    if (useemon && mon->minvis) {
+        how_seen |= MONSEEN_SEEINVIS;
+    }
+    /* infravision */
+    if ((!mon->minvis || See_invisible) && see_with_infrared(mon)) {
+        how_seen |= MONSEEN_INFRAVIS;
+    }
+    /* telepathy */
+    if (tp_sensemon(mon)) {
+        how_seen |= MONSEEN_TELEPAT;
+    }
+    /* xray */
+    if (useemon && xraydist > 0 && distu(mon->mx, mon->my) <= xraydist) {
+        how_seen |= MONSEEN_XRAYVIS;
+    }
+    /* extended detection */
+    if (Detect_monsters) {
+        how_seen |= MONSEEN_DETECT;
+    }
+    /* class-/type-specific warning */
+    if (MATCH_WARN_OF_MON(mon)) {
+        how_seen |= MONSEEN_WARNMON;
+    }
+
+    return how_seen;
 }
 
 /*vision.c*/

@@ -38,6 +38,7 @@ E NEARDATA int occtime;
 
 #define WARNCOUNT 6         /* number of different warning levels */
 E uchar warnsyms[WARNCOUNT];
+E NEARDATA int warn_obj_cnt; /* count of monsters meeting criteria */
 
 E int x_maze_max, y_maze_max;
 E int otg_temp;
@@ -194,9 +195,11 @@ E NEARDATA struct sinfo {
 #ifdef PANICLOG
     int in_paniclog;
 #endif
+    int wizkit_wishing;
 } program_state;
 
 E boolean restoring;
+E boolean ransacked;
 
 E const char quitchars[];
 E const char vowels[];
@@ -211,14 +214,18 @@ E const char disclosure_options[];
 E NEARDATA int smeq[];
 E NEARDATA int doorindex;
 E NEARDATA char *save_cm;
+
+E NEARDATA struct kinfo {
+    struct kinfo *next; /* chain of delayed killers */
+    int id;             /* uprop keys to ID a delayed killer */
+    int format;         /* one of the killer formats */
 #define KILLED_BY_AN     0
-#define KILLED_BY    1
+#define KILLED_BY        1
 #define NO_KILLER_PREFIX 2
-E NEARDATA int killer_format;
-E const char *killer;
-E const char *delayed_killer;
+    char name[BUFSZ]; /* actual killer name */
+} killer;
+
 E long done_money;
-E char killer_buf[BUFSZ];
 
 E long killer_flags;
 
@@ -496,6 +503,14 @@ E char *fqn_prefix[PREFIX_COUNT];
 E char *fqn_prefix_names[PREFIX_COUNT];
 #endif
 
+struct opvar {
+    xchar spovartyp; /* one of SPOVAR_foo */
+    union {
+        char *str;
+        long l;
+    } vardata;
+};
+
 #ifdef AUTOPICKUP_EXCEPTIONS
 struct autopickup_exception {
     char *pattern;
@@ -516,6 +531,13 @@ E struct _plinemsg *pline_msg;
 #define MSGTYP_NOREP    1
 #define MSGTYP_NOSHOW   2
 #define MSGTYP_STOP 3
+
+enum bcargs { override_restriction = -1 };
+struct breadcrumbs {
+    const char *funcnm;
+    int linenum;
+    boolean in_effect;
+};
 
 #ifdef RECORD_ACHIEVE
 struct u_achieve {

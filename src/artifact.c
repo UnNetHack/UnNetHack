@@ -16,6 +16,7 @@ extern boolean notonhead;   /* for long worms */
 #define get_artifact(o) \
     (((o)&&(o)->oartifact) ? &artilist[(int) (o)->oartifact] : 0)
 
+static boolean FDECL(bane_applies, (const struct artifact *, struct monst *));
 STATIC_DCL int FDECL(spec_applies, (const struct artifact *, struct monst *));
 STATIC_DCL int FDECL(arti_invoke, (struct obj*));
 STATIC_DCL boolean FDECL(Mb_hit, (struct monst *magr, struct monst *mdef,
@@ -107,6 +108,7 @@ int artinum;
    given, then unaligned ones also become eligible for this.)
    If no alignment is given, then 'otmp' is converted
    into an artifact of matching type, or returned as-is if that's not possible.
+
    For the 2nd case, caller should use ``obj = mk_artifact(obj, A_NONE);''
    for the 1st, ``obj = mk_artifact((struct obj *)0, some_alignment);''.
  */
@@ -200,9 +202,9 @@ register const char *name;
 
 void
 artifact_exists(otmp, name, mod)
-register struct obj *otmp;
-register const char *name;
-register boolean mod;
+struct obj *otmp;
+const char *name;
+boolean mod;
 {
     register const struct artifact *a;
 
@@ -270,6 +272,29 @@ struct obj *obj;
     return FALSE;
 }
 
+/* decide whether this obj is effective when attacking against shades;
+   does not consider the bonus for blessed objects versus undead */
+boolean
+shade_glare(obj)
+struct obj *obj;
+{
+    const struct artifact *arti;
+
+    /* any silver object is effective */
+    if (objects[obj->otyp].oc_material == SILVER) {
+        return TRUE;
+    }
+    /* non-silver artifacts with bonus against undead also are effective */
+    arti = get_artifact(obj);
+    if (arti && (arti->spfx & SPFX_DFLAG2) && arti->mtype == M2_UNDEAD) {
+        return TRUE;
+    }
+    /* [if there was anything with special bonus against noncorporeals,
+       it would be effective too] */
+    /* otherwise, harmless to shades */
+    return FALSE;
+}
+
 boolean
 restrict_name(otmp, name, restrict_typ)  /* returns 1 if name is restricted */
 register struct obj *otmp;
@@ -312,8 +337,8 @@ register struct obj *otmp;
 
 boolean
 defends(adtyp, otmp)
-register int adtyp;
-register struct obj *otmp;
+int adtyp;
+struct obj *otmp;
 {
     register const struct artifact *weap;
     unsigned long mask;
@@ -389,17 +414,22 @@ struct obj *otmp;
     return FALSE;
 }
 
-/* used for monsters */
+/* determine whether an item confers Protection */
 boolean
-protects(adtyp, otmp)
-int adtyp;
+protects(otmp, being_worn)
 struct obj *otmp;
+boolean being_worn;
 {
-    register const struct artifact *weap;
+    const struct artifact *arti;
 
-    if ((weap = get_artifact(otmp)) != 0)
-        return (boolean)(weap->cary.adtyp == adtyp);
-    return FALSE;
+    if (being_worn && objects[otmp->otyp].oc_oprop == PROTECTION) {
+        return TRUE;
+    }
+    arti = get_artifact(otmp);
+    if (!arti) {
+        return FALSE;
+    }
+    return (arti->cspfx & SPFX_PROTECT) || (being_worn && (arti->spfx & SPFX_PROTECT));
 }
 
 /*
@@ -408,12 +438,13 @@ struct obj *otmp;
  */
 void
 set_artifact_intrinsic(otmp, on, wp_mask)
-register struct obj *otmp;
+struct obj *otmp;
 boolean on;
 long wp_mask;
 {
     long *mask = 0;
-    register const struct artifact *oart = get_artifact(otmp);
+    const struct artifact *art;
+    const struct artifact *oart = get_artifact(otmp);
     uchar dtyp;
     long spfx;
 
@@ -434,19 +465,23 @@ long wp_mask;
         mask = &EDisint_resistance;
     else if (dtyp == AD_DRST)
         mask = &EPoison_resistance;
+    else if (dtyp == AD_DRLI) {
+        mask = &EDrain_resistance;
+    }
 
     if (mask && wp_mask == W_ART && !on) {
         /* find out if some other artifact also confers this intrinsic */
         /* if so, leave the mask alone */
-        register struct obj* obj;
-        for(obj = invent; obj; obj = obj->nobj)
-            if(obj != otmp && obj->oartifact) {
-                register const struct artifact *art = get_artifact(obj);
-                if(art->cary.adtyp == dtyp) {
+        struct obj* obj;
+        for (obj = invent; obj; obj = obj->nobj) {
+            if (obj != otmp && obj->oartifact) {
+                const struct artifact *art = get_artifact(obj);
+                if (art && art->cary.adtyp == dtyp) {
                     mask = (long *) 0;
                     break;
                 }
             }
+        }
     }
     if (mask) {
         if (on) *mask |= wp_mask;
@@ -510,14 +545,17 @@ long wp_mask;
 
     /* intrinsics from the spfx field; there could be more than one */
     spfx = (wp_mask != W_ART) ? oart->spfx : oart->cspfx;
-    if(spfx && wp_mask == W_ART && !on) {
+    if (spfx && wp_mask == W_ART && !on) {
         /* don't change any spfx also conferred by other artifacts */
-        register struct obj* obj;
-        for(obj = invent; obj; obj = obj->nobj)
-            if(obj != otmp && obj->oartifact) {
-                register const struct artifact *art = get_artifact(obj);
-                spfx &= ~art->cspfx;
+        struct obj* obj;
+        for (obj = invent; obj; obj = obj->nobj) {
+            if (obj != otmp && obj->oartifact) {
+                const struct artifact *art = get_artifact(obj);
+                if (art) {
+                    spfx &= ~art->cspfx;
+                }
             }
+        }
     }
 
     if (spfx & SPFX_SEARCH) {
@@ -605,7 +643,7 @@ long wp_mask;
         else EReflecting &= ~wp_mask;
     }
 
-    if(wp_mask == W_ART && !on && oart->inv_prop) {
+    if (wp_mask == W_ART && !on && oart->inv_prop) {
         /* might have to turn off invoked power too */
         if (oart->inv_prop <= LAST_PROP &&
             (u.uprops[oart->inv_prop].extrinsic & W_ARTI))
@@ -613,8 +651,13 @@ long wp_mask;
     }
 }
 
+/* touch_artifact()'s return value isn't sufficient to tell whether it
+   dished out damage, and tracking changes to u.uhp, u.mh, Lifesaved
+   when trying to avoid second wounding is too cumbersome */
+static boolean touch_blasted; /* for retouch_object() */
+
 /*
- * creature (usually player) tries to touch (pick up or wield) an artifact obj.
+ * creature (usually hero) tries to touch (pick up or wield) an artifact obj.
  * Returns 0 if the object refuses to be touched.
  * This routine does not change any object chains.
  * Ignores such things as gauntlets, assuming the artifact is not
@@ -628,6 +671,7 @@ struct monst *mon;
     register const struct artifact *oart = get_artifact(obj);
     boolean badclass, badalign, self_willed, yours;
 
+    touch_blasted = FALSE;
     if(!oart) return 1;
 
     /* [ALI] Thiefbane has a special affinity with shopkeepers */
@@ -648,7 +692,7 @@ struct monst *mon;
         badclass = self_willed &&
                    oart->role != NON_PM && oart != &artilist[ART_EXCALIBUR];
         badalign = (oart->spfx & SPFX_RESTR) && oart->alignment != A_NONE &&
-                   (oart->alignment != sgn(mon->data->maligntyp));
+                   (oart->alignment != mon_aligntyp(mon));
     } else {    /* an M3_WANTSxxx monster or a fake player */
         /* special monsters trying to take the Amulet, invocation tools or
            quest item can touch anything except for `spec_applies' artifacts */
@@ -656,30 +700,37 @@ struct monst *mon;
     }
     /* weapons which attack specific categories of monsters are
        bad for them even if their alignments happen to match */
-    if (!badalign && (oart->spfx & SPFX_DBONUS) != 0) {
-        struct artifact tmp;
-
-        tmp = *oart;
-        tmp.spfx &= SPFX_DBONUS;
-        badalign = !!spec_applies(&tmp, mon);
+    if (!badalign) {
+        badalign = bane_applies(oart, mon);
     }
 
     if (((badclass || badalign) && self_willed) ||
         (badalign && (!yours || !rn2(4))))  {
-        int dmg;
+        int dmg, tmp;
         char buf[BUFSZ];
 
         if (!yours) return 0;
         You("are blasted by %s power!", s_suffix(the(xname(obj))));
+        touch_blasted = TRUE;
         dmg = d((Antimagic ? 2 : 4), (self_willed ? 10 : 4));
+        /* add half (maybe quarter) of the usual silver damage bonus */
+        if (objects[obj->otyp].oc_material == SILVER && Hate_silver) {
+            tmp = rnd(10), dmg += Maybe_Half_Phys(tmp);
+        }
         Sprintf(buf, "touching %s", oart->name);
-        losehp(dmg, buf, KILLED_BY);
+        losehp(dmg, buf, KILLED_BY); /* magic damage, not physical */
         exercise(A_WIS, FALSE);
     }
 
     /* can pick it up unless you're totally non-synch'd with the artifact */
     if (badclass && badalign && self_willed) {
-        if (yours) pline("%s your grasp!", Tobjnam(obj, "evade"));
+        if (yours) {
+            if (!carried(obj)) {
+                pline("%s your grasp!", Tobjnam(obj, "evade"));
+            } else {
+                pline("%s beyond your control!", Tobjnam(obj, "are"));
+            }
+        }
         return 0;
     }
 #ifdef CONVICT
@@ -697,6 +748,43 @@ struct monst *mon;
 #endif /* CONVICT */
 
     return 1;
+}
+
+/* decide whether an artifact itself is vulnerable to a particular type
+   of erosion damage, independent of the properties of its bearer */
+boolean
+arti_immune(obj, dtyp)
+struct obj *obj;
+int dtyp;
+{
+    register const struct artifact *weap = get_artifact(obj);
+
+    if (!weap) {
+        return FALSE;
+    }
+    if (dtyp == AD_PHYS) {
+        return FALSE; /* nothing is immune to phys dmg */
+    }
+    return (weap->attk.adtyp == dtyp ||
+            defends(dtyp, obj) ||
+            weap->cary.adtyp == dtyp);
+}
+
+static boolean
+bane_applies(oart, mon)
+const struct artifact *oart;
+struct monst *mon;
+{
+    struct artifact atmp;
+
+    if (oart && (oart->spfx & SPFX_DBONUS) != 0) {
+        atmp = *oart;
+        atmp.spfx &= SPFX_DBONUS; /* clear other spfx fields */
+        if (spec_applies(&atmp, mon)) {
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 /* decide whether an artifact's special attacks apply against mtmp */
@@ -761,9 +849,11 @@ long
 spec_m2(otmp)
 struct obj *otmp;
 {
-    register const struct artifact *artifact = get_artifact(otmp);
-    if (artifact)
+    const struct artifact *artifact = get_artifact(otmp);
+
+    if (artifact) {
         return artifact->mtype;
+    }
     return 0L;
 }
 
@@ -773,7 +863,7 @@ spec_abon(otmp, mon)
 struct obj *otmp;
 struct monst *mon;
 {
-    register const struct artifact *weap = get_artifact(otmp);
+    const struct artifact *weap = get_artifact(otmp);
 
     /* no need for an extra check for `NO_ATTK' because this will
        always return 0 for any artifact which has that attribute */
@@ -846,7 +936,7 @@ xchar m;
 /* display a list of discovered artifacts; return their count */
 int
 disp_artifact_discoveries(tmpwin)
-winid tmpwin;       /* supplied by dodiscover() */
+winid tmpwin; /* supplied by dodiscover() */
 {
     int i, m, otyp;
     char buf[BUFSZ];
@@ -892,25 +982,30 @@ winid tmpwin;       /* supplied by dodiscover() */
  * stun attack.  As of 3.4.1, those effects can occur but
  * will be slightly less likely than they were in 3.3.x.]
  */
-#define MB_MAX_DIEROLL      8   /* rolls above this aren't magical */
-static const char * const mb_verb[2][4] = {
-    { "probe", "stun", "scare", "cancel" },
-    { "prod", "amaze", "tickle", "purge" },
+enum mb_effect_indices {
+    MB_INDEX_PROBE = 0,
+    MB_INDEX_STUN,
+    MB_INDEX_SCARE,
+    MB_INDEX_CANCEL,
+
+    NUM_MB_INDICES
 };
-#define MB_INDEX_PROBE      0
-#define MB_INDEX_STUN       1
-#define MB_INDEX_SCARE      2
-#define MB_INDEX_CANCEL     3
+
+#define MB_MAX_DIEROLL      8   /* rolls above this aren't magical */
+static const char *const mb_verb[2][NUM_MB_INDICES] = {
+    { "probe", "stun",  "scare",  "cancel" },
+    { "prod",  "amaze", "tickle", "purge" },
+};
 
 /* called when someone is being hit by Magicbane */
 STATIC_OVL boolean
 Mb_hit(magr, mdef, mb, dmgptr, dieroll, vis, hittee)
-struct monst *magr, *mdef;  /* attacker and defender */
-struct obj *mb;         /* Magicbane */
-int *dmgptr;            /* extra damage target will suffer */
-int dieroll;            /* d20 that has already scored a hit */
-boolean vis;            /* whether the action can be seen */
-char *hittee;           /* target's name: "you" or mon_nam(mdef) */
+struct monst *magr, *mdef; /* attacker and defender */
+struct obj *mb;            /* Magicbane */
+int *dmgptr;               /* extra damage target will suffer */
+int dieroll;               /* d20 that has already scored a hit */
+boolean vis;               /* whether the action can be seen */
+char *hittee;              /* target's name: "you" or mon_nam(mdef) */
 {
     struct permonst *old_uasmon;
     const char *verb;
@@ -941,18 +1036,18 @@ char *hittee;           /* target's name: "you" or mon_nam(mdef) */
        [note that a successful save against AD_STUN doesn't actually
        prevent the target from ending up stunned] */
     attack_indx = MB_INDEX_PROBE;
-    *dmgptr += rnd(4);          /* (2..3)d4 */
+    *dmgptr += rnd(4);     /* (2..3)d4 */
     if (do_stun) {
         attack_indx = MB_INDEX_STUN;
-        *dmgptr += rnd(4);  /* (3..4)d4 */
+        *dmgptr += rnd(4); /* (3..4)d4 */
     }
     if (dieroll <= scare_dieroll) {
         attack_indx = MB_INDEX_SCARE;
-        *dmgptr += rnd(4);  /* (3..5)d4 */
+        *dmgptr += rnd(4); /* (3..5)d4 */
     }
     if (dieroll <= (scare_dieroll / 2)) {
         attack_indx = MB_INDEX_CANCEL;
-        *dmgptr += rnd(4);  /* (4..6)d4 */
+        *dmgptr += rnd(4); /* (4..6)d4 */
     }
 
     /* give the hit message prior to inflicting the effects */
@@ -983,19 +1078,19 @@ char *hittee;           /* target's name: "you" or mon_nam(mdef) */
                 if (youmonst.data != old_uasmon)
                     *dmgptr = 0; /* rehumanized, so no more damage */
                 if (u.uenmax > 0) {
-                    You("lose magical energy!");
                     u.uenmax--;
                     if (u.uen > 0) u.uen--;
                     flags.botl = 1;
+                    You("lose magical energy!");
                 }
             } else {
                 if (mdef->data == &mons[PM_CLAY_GOLEM])
                     mdef->mhp = 1; /* cancelled clay golems will die */
                 if (youattack && attacktype(mdef->data, AT_MAGC)) {
-                    You("absorb magical energy!");
                     u.uenmax++;
                     u.uen++;
                     flags.botl = 1;
+                    You("absorb magical energy!");
                 }
             }
         }
@@ -1052,6 +1147,7 @@ char *hittee;           /* target's name: "you" or mon_nam(mdef) */
             mdef->mconf = 1;
     }
 
+    /* now give message(s) describing side-effects */
     if (youattack || youdefend || vis) {
         (void) upstart(hittee); /* capitalize */
         if (resisted) {
@@ -1147,6 +1243,9 @@ int dieroll; /* needed for Magicbane and vorpal blades */
             pline_The("massive hammer hits%s %s%c",
                       !spec_dbon_applies ? "" : "!  Lightning strikes",
                       hittee, !spec_dbon_applies ? '.' : '!');
+        if (spec_dbon_applies) {
+            wake_nearto(mdef->mx, mdef->my, 4 * 4);
+        }
         if (!rn2(5)) (void) destroy_mitem(mdef, RING_CLASS, AD_ELEC);
         if (!rn2(5)) (void) destroy_mitem(mdef, WAND_CLASS, AD_ELEC);
         return realizes_damage;
@@ -1399,21 +1498,28 @@ int dieroll; /* needed for Magicbane and vorpal blades */
         }
     }
     if (spec_ability(otmp, SPFX_DRLI)) {
+        /* some non-living creatures (golems, vortices) are
+           vulnerable to life drain effects */
+        const char *life = nonliving(mdef->data) ? "animating force" : "life";
+
         if (!youdefend) {
             if (vis) {
                 if(otmp->oartifact == ART_STORMBRINGER)
-                    pline_The("%s blade draws the life from %s!",
+                    pline_The("%s blade draws the %s from %s!",
                               hcolor(NH_BLACK),
+                              life,
                               mon_nam(mdef));
                 else
-                    pline("%s draws the life from %s!",
+                    pline("%s draws the %s from %s!",
                           The(distant_name(otmp, xname)),
+                          life,
                           mon_nam(mdef));
             }
             if (mdef->m_lev == 0) {
                 *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
             } else {
-                int drain = rnd(8);
+                int drain = monhp_per_lvl(mdef);
+
                 *dmgptr += drain;
                 mdef->mhpmax -= drain;
                 mdef->m_lev--;
@@ -1425,15 +1531,17 @@ int dieroll; /* needed for Magicbane and vorpal blades */
             int oldhpmax = u.uhpmax;
 
             if (Blind)
-                You_feel("an %s drain your life!",
-                         otmp->oartifact == ART_STORMBRINGER ?
-                         "unholy blade" : "object");
+                You_feel("an %s drain your %s!",
+                         otmp->oartifact == ART_STORMBRINGER ?  "unholy blade" : "object",
+                         life);
             else if (otmp->oartifact == ART_STORMBRINGER)
-                pline_The("%s blade drains your life!",
-                          hcolor(NH_BLACK));
+                pline_The("%s blade drains your %s!",
+                          hcolor(NH_BLACK),
+                          life);
             else
-                pline("%s drains your life!",
-                      The(distant_name(otmp, xname)));
+                pline("%s drains your %s!",
+                      The(distant_name(otmp, xname)),
+                      life);
             losexp("life drainage");
             if (magr && magr->mhp < magr->mhpmax) {
                 magr->mhp += (oldhpmax - u.uhpmax)/2;
@@ -1465,26 +1573,29 @@ static NEARDATA const char recharge_type[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 static NEARDATA const char invoke_types[] = { ALL_CLASSES, 0 };
 /* #invoke: an "ugly check" filters out most objects */
 
+/** the #invoke command */
 int
 doinvoke()
 {
-    register struct obj *obj;
+    struct obj *obj;
 
     obj = getobj(invoke_types, "invoke");
     if (!obj) return 0;
-    if (obj->oartifact && !touch_artifact(obj, &youmonst)) return 1;
+    if (!retouch_object(&obj, FALSE)) {
+        return 1;
+    }
     return arti_invoke(obj);
 }
 
 STATIC_OVL int
 arti_invoke(obj)
-register struct obj *obj;
+struct obj *obj;
 {
     register const struct artifact *oart = get_artifact(obj);
 
     if(!oart || !oart->inv_prop) {
         if(obj->otyp == CRYSTAL_BALL)
-            use_crystal_ball(obj);
+            use_crystal_ball(&obj);
 #ifdef ASTRAL_ESCAPE
         else if(obj->otyp == AMULET_OF_YENDOR ||
                 obj->otyp == FAKE_AMULET_OF_YENDOR)
@@ -1497,9 +1608,9 @@ register struct obj *obj;
         return 1;
     }
 
-    if(oart->inv_prop > LAST_PROP) {
+    if (oart->inv_prop > LAST_PROP) {
         /* It's a special power, not "just" a property */
-        if(obj->age > monstermoves) {
+        if (obj->age > monstermoves) {
             /* the artifact is tired :-) */
             You_feel("that %s %s ignoring you.",
                      the(xname(obj)), otense(obj, "are"));
@@ -1509,7 +1620,7 @@ register struct obj *obj;
         }
         obj->age = monstermoves + rnz(100);
 
-        switch(oart->inv_prop) {
+        switch (oart->inv_prop) {
         case TAMING: {
             struct obj pseudo;
 
@@ -1772,7 +1883,6 @@ struct obj *obj;
     const char *line;
     char buf[BUFSZ];
 
-
     /* Is this a speaking artifact? */
     if (!oart || !(oart->spfx & SPFX_SPEAK))
         return;
@@ -1806,6 +1916,117 @@ struct obj *otmp;
         return (artilist[(int) otmp->oartifact].cost);
     else
         return (100L * (long)objects[otmp->otyp].oc_cost);
+}
+
+static uchar
+abil_to_adtyp(abil)
+long *abil;
+{
+    struct abil2adtyp_tag {
+        long *abil;
+        uchar adtyp;
+    } abil2adtyp[] = {
+        { &EFire_resistance, AD_FIRE },
+        { &ECold_resistance, AD_COLD },
+        { &EShock_resistance, AD_ELEC },
+        { &EAntimagic, AD_MAGM },
+        { &EDisint_resistance, AD_DISN },
+        { &EPoison_resistance, AD_DRST },
+        { &EDrain_resistance, AD_DRLI },
+    };
+    int k;
+
+    for (k = 0; k < SIZE(abil2adtyp); k++) {
+        if (abil2adtyp[k].abil == abil) {
+            return abil2adtyp[k].adtyp;
+        }
+    }
+    return 0;
+}
+
+static unsigned long
+abil_to_spfx(abil)
+long *abil;
+{
+    static const struct abil2spfx_tag {
+        long *abil;
+        unsigned long spfx;
+    } abil2spfx[] = {
+        { &ESearching, SPFX_SEARCH },
+        { &EHalluc_resistance, SPFX_HALRES },
+        { &ETelepat, SPFX_ESP },
+        { &ERegeneration, SPFX_REGEN },
+        { &ETeleport_control, SPFX_TCTRL },
+        { &EWarn_of_mon, SPFX_WARN },
+        { &EWarning, SPFX_WARN },
+        { &EEnergy_regeneration, SPFX_EREGEN },
+        { &EHalf_spell_damage, SPFX_HSPDAM },
+        { &EHalf_physical_damage, SPFX_HPHDAM },
+        { &EReflecting, SPFX_REFLECT },
+    };
+    int k;
+
+    for (k = 0; k < SIZE(abil2spfx); k++) {
+        if (abil2spfx[k].abil == abil) {
+            return abil2spfx[k].spfx;
+        }
+    }
+    return 0L;
+}
+
+/*
+ * Return the first item that is conveying a particular intrinsic.
+ */
+struct obj *
+what_gives(abil)
+long *abil;
+{
+    struct obj *obj;
+    uchar dtyp;
+    unsigned long spfx;
+    long wornbits;
+    long wornmask = (W_ARM | W_ARMC | W_ARMH | W_ARMS |
+                     W_ARMG | W_ARMF | W_ARMU |
+                     W_AMUL | W_RINGL | W_RINGR | W_TOOL |
+                     W_ART | W_ARTI);
+
+    if (u.twoweap) {
+        wornmask |= W_SWAPWEP;
+    }
+    dtyp = abil_to_adtyp(abil);
+    spfx = abil_to_spfx(abil);
+    wornbits = (wornmask & *abil);
+
+    for (obj = invent; obj; obj = obj->nobj) {
+        if (obj->oartifact && (abil != &EWarn_of_mon)) {
+            const struct artifact *art = get_artifact(obj);
+
+            if (art) {
+                if (dtyp) {
+                    if ((art->cary.adtyp == dtyp) /* carried */ ||
+                        (defends(dtyp, obj) &&
+                         (obj->owornmask & ~(W_ART | W_ARTI)))) /* defends while worn */ {
+                        return obj;
+                    }
+                }
+                if (spfx) {
+                    /* property conferred when carried */
+                    if ((art->cspfx & spfx) == spfx) {
+                        return obj;
+                    }
+                    /* property conferred when wielded or worn */
+                    if ((art->spfx & spfx) == spfx && obj->owornmask) {
+                        return obj;
+                    }
+                }
+            }
+        } else {
+            if (wornbits && wornbits == (wornmask & obj->owornmask)) {
+                return obj;
+            }
+        }
+    }
+    return (struct obj *) 0;
 }
 
 boolean
@@ -1846,6 +2067,346 @@ struct obj *otmp;
     }
 
     return NULL;
+}
+
+const char *
+glow_color(arti_indx)
+int arti_indx;
+{
+    int colornum = artilist[arti_indx].acolor;
+    const char *colorstr = clr2colorname(colornum);
+
+    return hcolor(colorstr);
+}
+
+/* glow verb; [0] holds the value used when blind */
+static const char *glow_verbs[] = {
+    "quiver", "flicker", "glimmer", "gleam"
+};
+
+/* relative strength that Sting is glowing (0..3), to select verb */
+static int
+glow_strength(count)
+int count;
+{
+    /* glow strength should also be proportional to proximity and
+       probably difficulty, but we don't have that information and
+       gathering it is more trouble than this would be worth */
+    return (count > 12) ? 3 : (count > 4) ? 2 : (count > 0);
+}
+
+const char *
+glow_verb(count, ingsfx)
+int count; /* 0 means blind rather than no applicable creatures */
+boolean ingsfx;
+{
+    static char resbuf[20];
+
+    Strcpy(resbuf, glow_verbs[glow_strength(count)]);
+    /* ing_suffix() will double the last consonant for all the words
+       we're using and none of them should have that, so bypass it */
+    if (ingsfx) {
+        Strcat(resbuf, "ing");
+    }
+    return resbuf;
+}
+
+/* use for warning "glow" for Sting, Orcrist, and Grimtooth */
+void
+Sting_effects(orc_count)
+int orc_count; /* new count (warn_obj_cnt is old count); -1 is a flag value */
+{
+    if (uwep && (uwep->oartifact == ART_STING ||
+                 uwep->oartifact == ART_ORCRIST ||
+                 uwep->oartifact == ART_GRIMTOOTH)) {
+        int oldstr = glow_strength(warn_obj_cnt);
+        int newstr = glow_strength(orc_count);
+
+        if (orc_count == -1 && warn_obj_cnt > 0) {
+            /* -1 means that blindness has just been toggled; give a
+               'continue' message that eventual 'stop' message will match */
+            pline("%s is %s.", bare_artifactname(uwep), glow_verb(Blind ? 0 : warn_obj_cnt, TRUE));
+        } else if (newstr > 0 && newstr != oldstr) {
+            /* 'start' message */
+            if (!Blind) {
+                pline("%s %s %s%c", bare_artifactname(uwep),
+                      otense(uwep, glow_verb(orc_count, FALSE)),
+                      glow_color(uwep->oartifact),
+                      (newstr > oldstr) ? '!' : '.');
+            } else if (oldstr == 0) /* quivers */ {
+                pline("%s %s slightly.", bare_artifactname(uwep), otense(uwep, glow_verb(0, FALSE)));
+            }
+        } else if (orc_count == 0 && warn_obj_cnt > 0) {
+            /* 'stop' message */
+            pline("%s stops %s.", bare_artifactname(uwep), glow_verb(Blind ? 0 : warn_obj_cnt, TRUE));
+        }
+    }
+}
+
+/* called when hero is wielding/applying/invoking a carried item, or
+   after undergoing a transformation (alignment change, lycanthropy,
+   polymorph) which might affect item access */
+int
+retouch_object(objp, loseit)
+struct obj **objp; /* might be destroyed or unintentionally dropped */
+boolean loseit;    /* whether to drop it if hero can longer touch it */
+{
+    struct obj *obj = *objp;
+
+    if (touch_artifact(obj, &youmonst)) {
+        char buf[BUFSZ];
+        int dmg = 0, tmp;
+        boolean ag = (objects[obj->otyp].oc_material == SILVER && Hate_silver);
+        boolean bane = bane_applies(get_artifact(obj), &youmonst);
+
+        /* nothing else to do if hero can successfully handle this object */
+        if (!ag && !bane) {
+            return 1;
+        }
+
+        /* hero can't handle this object, but didn't get touch_artifact()'s
+           "<obj> evades your grasp|control" message; give an alternate one */
+        You_cant("handle %s%s!", yname(obj), obj->owornmask ? " anymore" : "");
+        /* also inflict damage unless touch_artifact() already did so */
+        if (!touch_blasted) {
+            /* damage is somewhat arbitrary; half the usual 1d20 physical
+               for silver, 1d10 magical for <foo>bane, potentially both */
+            if (ag) {
+                tmp = rnd(10), dmg += Maybe_Half_Phys(tmp);
+            }
+            if (bane) {
+                dmg += rnd(10);
+            }
+            Sprintf(buf, "handling %s", killer_xname(obj));
+            losehp(dmg, buf, KILLED_BY);
+            exercise(A_CON, FALSE);
+        }
+    }
+
+    /* removing a worn item might result in loss of levitation,
+       dropping the hero onto a polymorph trap or into water or
+       lava and potentially dropping or destroying the item */
+    if (obj->owornmask) {
+        struct obj *otmp;
+
+        remove_worn_item(obj, FALSE);
+        for (otmp = invent; otmp; otmp = otmp->nobj) {
+            if (otmp == obj) {
+                break;
+            }
+        }
+        if (!otmp) {
+            *objp = obj = 0;
+        }
+    }
+
+    /* if we still have it and caller wants us to drop it, do so now */
+    if (loseit && obj) {
+        if (Levitation) {
+            freeinv(obj);
+            hitfloor(obj, TRUE);
+        } else {
+            /* dropx gives a message iff item lands on an altar */
+            if (!IS_ALTAR(levl[u.ux][u.uy].typ)) {
+                pline("%s to the %s.", Tobjnam(obj, "fall"), surface(u.ux, u.uy));
+            }
+            dropx(obj);
+        }
+        *objp = obj = 0; /* no longer in inventory */
+    }
+    return 0;
+}
+
+/* an item which is worn/wielded or an artifact which conveys
+   something via being carried or which has an #invoke effect
+   currently in operation undergoes a touch test; if it fails,
+   it will be unworn/unwielded and revoked but not dropped */
+static boolean
+untouchable(obj, drop_untouchable)
+struct obj *obj;
+boolean drop_untouchable;
+{
+    struct artifact *art;
+    boolean beingworn, carryeffect, invoked;
+    long wearmask = ~(W_QUIVER | (u.twoweap ? 0L : W_SWAPWEP) | W_BALL);
+
+    beingworn = ((obj->owornmask & wearmask) ||
+                 /* some items in use don't have any wornmask setting */
+                 (obj->oclass == TOOL_CLASS &&
+                  (obj->lamplit ||
+                  (obj->otyp == LEASH && obj->leashmon) ||
+                  (Is_container(obj) && Has_contents(obj)))));
+
+    if ((art = get_artifact(obj)) != 0) {
+        carryeffect = (art->cary.adtyp || art->cspfx);
+        invoked = (art->inv_prop > 0 &&
+                   art->inv_prop <= LAST_PROP &&
+                   (u.uprops[art->inv_prop].extrinsic & W_ARTI) != 0L);
+    } else {
+        carryeffect = invoked = FALSE;
+    }
+
+    if (beingworn || carryeffect || invoked) {
+        if (!retouch_object(&obj, drop_untouchable)) {
+            /* "<artifact> is beyond your control" or "you can't handle
+               <object>" has been given and it is now unworn/unwielded
+               and possibly dropped (depending upon caller); if dropped,
+               carried effect was turned off, else we leave that alone;
+               we turn off invocation property here if still carried */
+            if (invoked && obj) {
+                arti_invoke(obj); /* reverse #invoke */
+            }
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+/* check all items currently in use (mostly worn) for touchability */
+void
+retouch_equipment(dropflag)
+int dropflag; /* 0==don't drop, 1==drop all, 2==drop weapon */
+{
+    static int nesting = 0; /* recursion control */
+    struct obj *obj;
+    boolean dropit, had_gloves = (uarmg != 0);
+    int had_rings = (!!uleft + !!uright);
+
+    /*
+     * We can potentially be called recursively if losing/unwearing
+     * an item causes worn helm of opposite alignment to come off or
+     * be destroyed.
+     *
+     * BUG: if the initial call was due to putting on a helm of
+     * opposite alignment and it does come off to trigger recursion,
+     * after the inner call executes, the outer call will finish
+     * using the non-helm alignment rather than the helm alignment
+     * which triggered this in the first place.
+     */
+    if (!nesting++) {
+        clear_bypasses(); /* init upon initial entry */
+    }
+
+    dropit = (dropflag > 0); /* drop all or drop weapon */
+    /* check secondary weapon first, before possibly unwielding primary */
+    if (u.twoweap) {
+        bypass_obj(uswapwep); /* so loop below won't process it again */
+        (void) untouchable(uswapwep, dropit);
+    }
+    /* check primary weapon next so that they're handled together */
+    if (uwep) {
+        bypass_obj(uwep); /* so loop below won't process it again */
+        (void) untouchable(uwep, dropit);
+    }
+
+    /* in case someone is daft enough to add artifact or silver saddle */
+    if (u.usteed && (obj = which_armor(u.usteed, W_SADDLE)) != 0) {
+        /* untouchable() calls retouch_object() which expects an object in
+           hero's inventory, but remove_worn_item() will be harmless for
+           saddle and we're suppressing drop, so this works as intended */
+        if (untouchable(obj, FALSE)) {
+            dismount_steed(DISMOUNT_THROWN);
+        }
+    }
+    /*
+     * TODO?  Force off gloves if either or both rings are going to
+     * become unworn; force off cloak [suit] before suit [shirt].
+     * The torso handling is hypothetical; the case for gloves is
+     * not, due to the possibility of unwearing silver rings.
+     */
+
+    dropit = (dropflag == 1); /* all untouchable items */
+    /* loss of levitation (silver ring, or Heart of Ahriman invocation)
+       might cause hero to lose inventory items (by dropping into lava,
+       for instance), so inventory traversal needs to rescan the whole
+       invent chain each time it moves on to another object; we use bypass
+       handling to keep track of which items have already been processed */
+    while ((obj = nxt_unbypassed_obj(invent)) != 0) {
+        (void) untouchable(obj, dropit);
+    }
+
+    if (had_rings != (!!uleft + !!uright) && uarmg && uarmg->cursed) {
+        uncurse(uarmg); /* temporary? hack for ring removal plausibility */
+    }
+    if (had_gloves && !uarmg) {
+        selftouch("After losing your gloves, you");
+    }
+
+    if (!--nesting) {
+        clear_bypasses(); /* reset upon final exit */
+    }
+}
+
+static int mkot_trap_warn_count = 0;
+
+static int
+count_surround_traps(x, y)
+int x, y;
+{
+    struct rm *levp;
+    struct obj *otmp;
+    struct trap *ttmp;
+    int dx, dy, glyph, ret = 0;
+
+    for (dx = x - 1; dx < x + 2; ++dx) {
+        for (dy = y - 1; dy < y + 2; ++dy) {
+            if (!isok(dx, dy)) {
+                continue;
+            }
+            /* If a trap is shown here, don't count it; the hero
+             * should be expecting it.  But if there is a trap here
+             * that's not shown, either undiscovered or covered by
+             * something, do count it.
+             */
+            glyph = glyph_at(dx, dy);
+            if (glyph_is_trap(glyph)) {
+                continue;
+            }
+            if ((ttmp = t_at(dx, dy)) != 0) {
+                ++ret;
+                continue;
+            }
+            levp = &levl[dx][dy];
+            if (IS_DOOR(levp->typ) && (levp->doormask & D_TRAPPED) != 0) {
+                ++ret;
+                continue;
+            }
+            for (otmp = level.objects[dx][dy]; otmp; otmp = otmp->nexthere) {
+                if (Is_container(otmp) && otmp->otrapped) {
+                    ++ret; /* we're counting locations, so just */
+                    break; /* count the first one in a pile     */
+                }
+            }
+        }
+    }
+    /*
+     * [Shouldn't we also check inventory for a trapped container?
+     * Even if its trap has already been found, there's no 'tknown'
+     * flag to help hero remember that so we have nothing comparable
+     * to a shown glyph to justify skipping it.]
+     */
+    return ret;
+}
+
+/* sense adjacent traps if wielding MKoT without wearing gloves */
+void
+mkot_trap_warn()
+{
+    static const char *const heat[7] = {
+        "cool", "slightly warm", "warm", "very warm", "hot", "very hot", "like fire"
+    };
+
+    if (!uarmg && uwep && uwep->oartifact == ART_MASTER_KEY_OF_THIEVERY) {
+        int idx, ntraps = count_surround_traps(u.ux, u.uy);
+
+        if (ntraps != mkot_trap_warn_count) {
+            idx = min(ntraps, SIZE(heat)-1);
+            pline_The("Key feels %s%c", heat[idx], (ntraps > 3) ? '!' : '.');
+        }
+        mkot_trap_warn_count = ntraps;
+    } else {
+        mkot_trap_warn_count = 0;
+    }
 }
 
 /* Master Key is magic key if its bless/curse state meets our criteria:

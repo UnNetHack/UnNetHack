@@ -469,10 +469,8 @@ long num;
     otmp->quan = num;
     otmp->owt = weight(otmp); /* -= obj->owt ? */
 
-#ifdef NEXT_VERSION
-    context.objsplit.parent_oid = obj->o_id;
-    context.objsplit.child_oid = otmp->o_id;
-#endif
+    context_objsplit.parent_oid = obj->o_id;
+    context_objsplit.child_oid = otmp->o_id;
     obj->nobj = otmp;
     /* Only set nexthere when on the floor, nexthere is also used */
     /* as a back pointer to the container object when contained. */
@@ -548,22 +546,20 @@ struct obj *obj;
     }
 
     /* first try the expected case; obj is split from another stack */
-#if NEXT_VERSION
-    if (obj->o_id == context.objsplit.child_oid) {
+    if (obj->o_id == context_objsplit.child_oid) {
         /* parent probably precedes child and will require list traversal */
         ochild = obj;
-        target_oid = context.objsplit.parent_oid;
+        target_oid = context_objsplit.parent_oid;
         if (obj->nobj && obj->nobj->o_id == target_oid)
             oparent = obj->nobj;
-    } else if (obj->o_id == context.objsplit.parent_oid) {
+    } else if (obj->o_id == context_objsplit.parent_oid) {
         /* alternate scenario: another stack was split from obj;
            child probably follows parent and will be found here */
         oparent = obj;
-        target_oid = context.objsplit.child_oid;
+        target_oid = context_objsplit.child_oid;
         if (obj->nobj && obj->nobj->o_id == target_oid)
             ochild = obj->nobj;
     }
-#endif
     /* if we have only half the split, scan obj's list to find other half */
     if (ochild && !oparent) {
         /* expected case */
@@ -589,9 +585,7 @@ struct obj *obj;
 void
 clear_splitobjs()
 {
-#if NEXT_VERSION
-    context.objsplit.parent_oid = context.objsplit.child_oid = 0;
-#endif
+    context_objsplit.parent_oid = context_objsplit.child_oid = 0;
 }
 
 /*
@@ -2299,6 +2293,9 @@ boolean tipping; /* caller emptying entire contents; affects shop handling */
             if (objects[obj->otyp].oc_magic) {
                 do {
                     obj->otyp = rnd_class(POT_BOOZE, POT_WATER);
+                    if (rnf(1,137)) {
+                        obj->otyp = (rnf(1,5)) ? POT_VAMPIRE_BLOOD : POT_BLOOD;
+                    }
                 } while (obj->otyp == POT_SICKNESS);
             }
             what = (obj->quan > 1L) ? "Some potions" : "A potion";
@@ -2309,29 +2306,32 @@ boolean tipping; /* caller emptying entire contents; affects shop handling */
             }
             what = "Some food";
         }
-        ++objcount;
+        objcount++;
         pline("%s %s out.", what, vtense(what, "spill"));
         obj->blessed = horn->blessed;
         obj->cursed = horn->cursed;
         obj->owt = weight(obj);
+        obj->bknown = horn->bknown; /* autoidentify BUC from BUC identified item generator */
         /* using a shop's horn of plenty entails a usage fee and also
            confers ownership of the created item to the shopkeeper */
-        if (horn->unpaid)
+        if (horn->unpaid) {
             addtobill(obj, FALSE, FALSE, tipping);
+        }
         /* if it ended up on bill, we don't want "(unpaid, N zorkids)"
            being included in its formatted name during next message */
         iflags.suppress_price++;
         if (!tipping) {
             obj = hold_another_object(obj,
-                                      u.uswallow
-                                        ? "Oops!  %s out of your reach!"
-                                        : (Is_airlevel(&u.uz)
-                                           || Is_waterlevel(&u.uz)
-                                           || levl[u.ux][u.uy].typ < IRONBARS
-                                           || levl[u.ux][u.uy].typ >= ICE)
-                                          ? "Oops!  %s away from you!"
-                                          : "Oops!  %s to the floor!",
-                                      The(aobjnam(obj, "slip")), (char *) 0);
+                                      u.uswallow ?
+                                       "Oops!  %s out of your reach!" :
+                                       (Is_airlevel(&u.uz) ||
+                                        Is_waterlevel(&u.uz) ||
+                                        levl[u.ux][u.uy].typ < IRONBARS ||
+                                        levl[u.ux][u.uy].typ >= ICE) ?
+                                       "Oops!  %s away from you!" :
+                                       "Oops!  %s to the floor!",
+                                       The(aobjnam(obj, "slip")),
+                                       (const char *)0);
             nhUse(obj);
         } else {
             /* assumes this is taking place at hero's location */

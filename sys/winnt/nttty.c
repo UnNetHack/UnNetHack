@@ -232,7 +232,7 @@ DWORD ctrltype;
 #endif
 #if 0
 			clearlocks();
-			terminate(EXIT_FAILURE);
+			nh_terminate(EXIT_FAILURE);
 #endif
 		default:
 			return FALSE;

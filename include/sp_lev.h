@@ -299,14 +299,6 @@ enum corefuncs {
 #define SP_MAPCHAR_LIT(l) ((l >> 8) & 0xff)
 #define SP_MAPCHAR_PACK(typ, lit) ((( lit ) << 8) + ((char)( typ )))
 
-struct opvar {
-    xchar spovartyp; /* one of SPOVAR_foo */
-    union {
-        char *str;
-        long l;
-    } vardata;
-};
-
 struct splev_var {
     struct splev_var *next;
     char *name;

@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)u_init.c   3.4 2002/10/22  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -552,6 +551,7 @@ u_init()
      * necessary when aborting from a failed restore */
     (void) memset((genericptr_t)&u, 0, sizeof(u));
     u.ustuck = (struct monst *)0;
+    memset(&u.ubirthday, 0, sizeof(u.ubirthday));
 
 #if 0   /* documentation of more zero values as desirable */
     u.usick_cause[0] = 0;
@@ -593,12 +593,7 @@ u_init()
 
     u.ulevel = 0;   /* set up some of the initial attributes */
     u.uhp = u.uhpmax = newhp();
-    u.uenmax = urole.enadv.infix + urace.enadv.infix;
-    if (urole.enadv.inrnd > 0)
-        u.uenmax += rnd(urole.enadv.inrnd);
-    if (urace.enadv.inrnd > 0)
-        u.uenmax += rnd(urace.enadv.inrnd);
-    u.uen = u.uenmax;
+    u.uen = u.uenmax = newpw();
     u.uspellprot = 0;
     adjabil(0, 1);
     u.ulevel = u.ulevelmax = 1;
@@ -732,6 +727,8 @@ u_init()
         if(!rn2(5)) ini_inv(Magicmarker);
         else if(!rn2(10)) ini_inv(Lamp);
         knows_class(ARMOR_CLASS);
+        /* sufficiently martial-arts oriented item to ignore language issue */
+        knows_object(SHURIKEN);
         skill_init(Skill_Mon);
         break;
     case PM_PRIEST:
