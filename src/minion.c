@@ -356,6 +356,9 @@ struct monst *mtmp;
     } else if (offer == 0L) {
         You("refuse.");
         return 0L;
+    } else if (umoney == 0) {
+        You("have no gold%s.", hidden_gold() ? " ready" : "");
+        return 0L;
     } else if (offer >= umoney) {
         You("give %s all your gold.", mon_nam(mtmp));
         offer = umoney;
