@@ -633,7 +633,9 @@ toofar:
         }
 
         tmp = m_move(mtmp, 0);
-        distfleeck(mtmp, &inrange, &nearby, &scared);  /* recalc */
+        if (tmp != 2) {
+            distfleeck(mtmp, &inrange, &nearby, &scared);  /* recalc */
+        }
 
         switch (tmp) {
         case 0:     /* no movement, but it can still attack you */

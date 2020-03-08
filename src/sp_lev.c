@@ -2127,6 +2127,7 @@ struct mkroom   *croom;
         otmp->owt = weight(otmp);
     }
 
+
     /* contents (of a container or monster's inventory) */
     if (o->containment & SP_OBJ_CONTENT) {
         if (!container_idx) {
@@ -2140,14 +2141,17 @@ struct mkroom   *croom;
                 ; /* ['otmp' remains on floor] */
             } else {
                 remove_object(otmp);
-                (void) mpickobj(invent_carrying_monster, otmp);
+                boolean merged = mpickobj(invent_carrying_monster, otmp);
+                if (merged) {
+                    return;
+                }
             }
         } else {
             struct obj *cobj = container_obj[container_idx - 1];
 
             remove_object(otmp);
             if (cobj) {
-                (void) add_to_container(cobj, otmp);
+                otmp = add_to_container(cobj, otmp);
                 cobj->owt = weight(cobj);
             } else {
                 obj_extract_self(otmp);
@@ -6279,7 +6283,6 @@ sp_lev *lvl;
 next_opcode:
         coder->frame->n_opcode++;
     } /*while*/
-
     link_doors_rooms();
     fill_rooms();
     remove_boundary_syms();
