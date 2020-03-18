@@ -1175,15 +1175,21 @@ int thrown;
             if (canseemon(mon)) pline("%s %s reality!", Monnam(mon),
                                       level.flags.noteleport ? "tries to warp" : "warps");
             if (!level.flags.noteleport) {
-                if (rnd(13)<=4) { /* The 4/13 chance is intentional */
-                    new_tele(1); coord cc;
-                    enexto(&cc, u.ux, u.uy, &mons[PM_URANIUM_IMP]);
-                    rloc_to(mon, cc.x, cc.y);
-                } else {
-                    tele(); coord cc;
-                    enexto(&cc, u.ux, u.uy, &mons[PM_URANIUM_IMP]);
-                    rloc_to(mon, cc.x, cc.y);
+                /* The 4/13 chance is intentional */
+                boolean disable_teleport_control = rnf(4,13);
+                coord cc;
+                int saved_teleport_control = HTeleport_control;
+                if (saved_teleport_control && disable_teleport_control && !Stunned) {
+                    /* disable intrinsic teleport control */
+                    HTeleport_control = 0;
+                    pline("The teleportation is too chaotic to control!");
                 }
+                tele();
+                if (saved_teleport_control && disable_teleport_control && !Stunned) {
+                    HTeleport_control = saved_teleport_control;
+                }
+                enexto(&cc, u.ux, u.uy, &mons[PM_URANIUM_IMP]);
+                rloc_to(mon, cc.x, cc.y);
             }
         }
         return TRUE;

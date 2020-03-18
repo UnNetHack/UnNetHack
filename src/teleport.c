@@ -621,8 +621,7 @@ release_it:
 }
 
 void
-new_tele(Uncontrolled)
-boolean Uncontrolled;
+tele()
 {
     coord cc;
 
@@ -657,16 +656,14 @@ boolean Uncontrolled;
         You_feel("disoriented for a moment.");
         return;
     }
-    if ((Teleport_control && !Stunned && !Uncontrolled)
+    if ((Teleport_control && !Stunned)
 #ifdef WIZARD
         || wizard
 #endif
         ) {
         if (unconscious()) {
             pline("Being unconscious, you cannot control your teleport.");
-        } else if (Uncontrolled) {
-            pline("The teleportation is too chaotic to control!");
-        }   else {
+        } else {
 #ifdef STEED
             char buf[BUFSZ];
             if (u.usteed) Sprintf(buf, " and %s", mon_nam(u.usteed));
@@ -692,11 +689,7 @@ boolean Uncontrolled;
 
     (void) safe_teleds(FALSE);
 }
-void
-tele()
-{
-    new_tele(0);
-}
+
 int
 dotele()
 {

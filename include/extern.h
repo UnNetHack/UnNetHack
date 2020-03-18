@@ -2146,7 +2146,6 @@ E int FDECL(epathto, (coord *, int, XCHAR_P, XCHAR_P, struct permonst *));
 E void FDECL(teleds, (int, int, BOOLEAN_P));
 E boolean FDECL(safe_teleds, (BOOLEAN_P));
 E boolean FDECL(teleport_pet, (struct monst *, BOOLEAN_P));
-E void new_tele(boolean);
 E void NDECL(tele);
 E int NDECL(dotele);
 E void NDECL(level_tele);
