@@ -1872,8 +1872,8 @@ tty_display_nhwindow(window, blocking)
     case NHW_MENU:
 	cw->active = 1;
 	/* avoid converting to uchar before calculations are finished */
-	cw->offx = (uchar) (int)
-	    max((int) 10, (int) (ttyDisplay->cols - cw->maxcol - 1));
+
+    cw->offx = min(COLNO-1, ttyDisplay->cols - cw->maxcol - 1);
 	if(cw->type == NHW_MENU
 #ifdef WIN_EDGE
 	    || iflags.win_edge
@@ -1882,7 +1882,7 @@ tty_display_nhwindow(window, blocking)
 	    cw->offy = 0;
 	if(ttyDisplay->toplin == 1)
 	    tty_display_nhwindow(WIN_MESSAGE, TRUE);
-	if(cw->offx == 10 || cw->maxrow >= (int) ttyDisplay->rows
+    if (cw->offx < 0 || cw->maxrow >= ttyDisplay->rows
 #ifdef WIN_EDGE
 	    || iflags.win_edge
 #endif

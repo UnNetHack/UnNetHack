@@ -13,6 +13,9 @@
 	  - Adjust monster distribution for dilapidated armories
 	  - Blackmarket: new entrance area for the classic design
 
+	* user interface improvements:
+	  - Optimized placement of menu windows in TTY port
+
 	* bug fixes:
 	  - Fix over-escaping of characters on HTML dump map
 	  - Fix crash when /dev/(u)random can't be opened
