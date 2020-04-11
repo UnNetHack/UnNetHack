@@ -3,16 +3,11 @@
 
 /* Global declarations for curses interface */
 
-int term_rows, term_cols; /* size of underlying terminal */
-
-WINDOW *base_term;    /* underlying terminal window */
-
-WINDOW *mapwin, *statuswin, *messagewin;    /* Main windows */
-
-int orig_cursor;	/* Preserve initial cursor state */
-
-boolean counting;   /* Count window is active */
-
+extern int term_rows, term_cols;                /* size of underlying terminal */
+extern WINDOW *base_term;                       /* underlying terminal window */
+extern WINDOW *mapwin, *statuswin, *messagewin; /* Main windows */
+extern int orig_cursor;                         /* Preserve initial cursor state */
+extern boolean counting;                        /* Count window is active */
 
 #define TEXTCOLOR   /* Allow color */
 #define NHW_END 19
@@ -97,7 +92,7 @@ extern void curses_display_file(const char *filename,BOOLEAN_P must_exist);
 extern void curses_start_menu(winid wid);
 
 extern void curses_add_menu(winid wid, int glyph, int cnt, const ANY_P * identifier,
-		CHAR_P accelerator, CHAR_P group_accel, int attr, 
+		CHAR_P accelerator, CHAR_P group_accel, int attr,
 		const char *str, BOOLEAN_P presel);
 
 extern void curses_end_menu(winid wid, const char *prompt);
@@ -317,4 +312,3 @@ extern void curses_prev_mesg(void);
 extern void curses_count_window(const char *count_text);
 
 #endif  /* WINCURS_H */
-
