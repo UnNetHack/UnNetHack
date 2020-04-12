@@ -61,10 +61,10 @@ anything *id;
 {
     light_source *ls;
 
-
     if (iflags.debug_fuzzer) { // TODO REMOVE ME
         pline("new_light_source: %dx%d, range=%d, type=%d, id=%d", x, y, range, type, id->a_int);
     }
+    light_sources_sanity_check();
 
     if (range > MAX_RADIUS || range < 1) {
         impossible("new_light_source:  illegal range %d", range);
@@ -83,6 +83,8 @@ anything *id;
     light_base = ls;
 
     vision_full_recalc = 1; /* make the source show up */
+
+    light_sources_sanity_check();
 }
 
 /*

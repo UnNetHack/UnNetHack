@@ -771,8 +771,8 @@ void
 flip_level_rnd(int flp)
 {
     int c = 0;
-    if ((flp & 1) && rn2(2)) c |= 1;
-    if ((flp & 2) && rn2(2)) c |= 2;
+    //if ((flp & 1) && rn2(2)) c |= 1;
+    //if ((flp & 2) && rn2(2)) c |= 2;
 
     /* Workaround for preventing the stairs to Vlad's tower appearing
      * in the wizard's tower because of a bug in level flipping. */
@@ -6379,6 +6379,7 @@ const char *name;
     boolean result = FALSE;
     struct version_info vers_info;
 
+    fuzzer_printf("load_special %s\n", name);
     if (!(lvl = sp_lev_cache(name))) {
         fd = dlb_fopen_area(FILE_AREA_UNSHARE, name, RDBMODE);
         if (!fd) return FALSE;
