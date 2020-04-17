@@ -2932,7 +2932,7 @@ goodfruit:
             bad_negation(fullname, FALSE);
             return;
         } else if (!(op = string_for_opt(opts, FALSE))) return;
-        if (strlen(op) > 1 || (*op) != ':' || (*op) != ';') {
+        if (strlen(op) > 1 || ((*op) != ':' && (*op) != ';')) {
             badoption(opts);
         } else {
             iflags.truecolor_separator = (*op);
