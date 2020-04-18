@@ -49,6 +49,9 @@
 extern short glyph2tile[];
 extern int total_tiles_used;
 
+/* from dlb.c */
+extern FILE *FDECL(fopen_datafile, (const char *,const char *,int));
+
 /* Define these if you really want a lot of junk on your screen. */
 /* #define VERBOSE */		/* print various info & events as they happen */
 /* #define VERBOSE_UPDATE */	/* print screen update bounds */
@@ -109,7 +112,7 @@ X11_print_glyph(window, x, y, glyph)
 	/* map glyph to character and color */
         mapglyph(glyph, &och, &color, &special, x, y);
 	ch = (uchar)och;
-	
+
 	/* Only update if we need to. */
 	ch_ptr = &map_info->mtype.text_map->text[y][x];
 

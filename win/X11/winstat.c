@@ -831,6 +831,7 @@ init_column(name, parent, top, left, col_indices)
 				parent, args, num_args);
 
     max_width1 = max_width2 = 0;
+    width1 = width2 = 0;
     for (ip = col_indices; *ip >= 0; ip++) {
 	sv = &shown_stats[*ip];
 	create_widget(form, sv, *ip);	/* will set init width */
