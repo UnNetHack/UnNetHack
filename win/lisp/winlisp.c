@@ -4,7 +4,7 @@
 /*
  * "Main" file for the lisp/emacs window-port.  This contains most of
  * the interface routines.  Please see doc/window.doc for an
- * description of the window interface.  
+ * description of the window interface.
  */
 
 #ifdef MSDOS			/* from compiler */
@@ -55,7 +55,7 @@ const char *hunger_stat[] = {
 	"Starved"
 };
 
-typedef struct 
+typedef struct
 {
   char *name;
   int type;
@@ -230,7 +230,7 @@ cmd_index_t cmd_index[] = { {"gowest", CMD_KEY, 'h'},
 
 /* This variable is set when the user has selected an extended command. */
 static int extended_cmd_id;
-  
+
 /* Interface definition, for windows.c */
 struct window_procs lisp_procs = {
   "lisp",
@@ -390,7 +390,7 @@ special_glyph_to_string(special)
     case MG_RIDDEN:
       return "ridden";
     }
-  
+
   /* If it's a combination, just return special. */
   if (special)
     return "special";
@@ -558,7 +558,7 @@ lisp_player_selection ()
 
 	  pick4u = lisp_yn_function ("Shall I pick a character for you? [ynq] ", "ynq", 'y');
 
-	  if (pick4u != 'y' && pick4u != 'n') 
+	  if (pick4u != 'y' && pick4u != 'n')
 	    {
 	    give_up:	/* Quit */
 	      if (selected) free((genericptr_t) selected);
@@ -607,9 +607,9 @@ lisp_player_selection ()
 					Strcpy(rolenamebuf, roles[i].name.m);
 					Strcat(rolenamebuf, "/");
 					Strcat(rolenamebuf, roles[i].name.f);
-				} else 
+				} else
 					Strcpy(rolenamebuf, roles[i].name.m);
-			}	
+			}
 			add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, thisch,
 			    0, ATR_NONE, an(rolenamebuf), MENU_UNSELECTED);
 			lastch = thisch;
@@ -639,7 +639,7 @@ lisp_player_selection ()
 	    (void)  root_plselection_prompt(plbuf, QBUFSZ - 1,
 			flags.initrole, flags.initrace, flags.initgend, flags.initalign);
 	}
-	
+
 	/* Select a race, if necessary */
 	/* force compatibility with role, try for compatibility with
 	 * pre-selected gender/alignment */
@@ -945,7 +945,7 @@ generate_status_line ()
   printf ("(");
   lisp_list (lisp_string ("name");
 	     lisp_string (plname););
-  if (Upolyd) 
+  if (Upolyd)
     {
       lisp_list (lisp_string ("rank");
 		 lisp_nil);
@@ -982,7 +982,7 @@ generate_status_line ()
 
 #ifdef SCORE_ON_BOTL
   lisp_list (lisp_string ("Score");
-	     lisp_int (botl_score()););
+          lisp_long (botl_score()););
 #endif
 
   if (In_endgame(&u.uz))
@@ -1045,7 +1045,7 @@ generate_status_line ()
   else
     lisp_list (lisp_string ("hunger"); lisp_nil);
 
-  if (Sick) 
+  if (Sick)
     {
       if (u.usick_type & SICK_VOMITABLE)
 	lisp_list (lisp_string ("sick"); lisp_string ("FoodPois"));
@@ -1076,7 +1076,7 @@ generate_status_line ()
     lisp_list (lisp_string ("slimed"); lisp_nil);
 
   if (near_capacity() > UNENCUMBERED)
-    lisp_list (lisp_string ("encumbrance"); 
+    lisp_list (lisp_string ("encumbrance");
 	       lisp_string (enc_stat[near_capacity()]));
   else
     lisp_list (lisp_string ("encumbrance"); lisp_nil);
@@ -1102,7 +1102,7 @@ lisp_putstr(window, attr, str)
 	}
     }
   else if (window == WIN_MESSAGE)
-    lisp_cmd ("message", 
+    lisp_cmd ("message",
 	      lisp_literal (attr_to_string (attr));
 	      lisp_string (str));
   else
@@ -1143,7 +1143,7 @@ lisp_add_menu(window, glyph, cnt, identifier, ch, gch, attr, str, preselected)
 	    lisp_current_accelerator = 'A';
 	  else
 	    lisp_current_accelerator++;
-	}      
+	}
       else
 	lisp_menu_item_list[lisp_menu_list_num].accelerator = ch;
 
@@ -1218,11 +1218,11 @@ lisp_select_menu(window, how, menu_list)
 
   /* The client should submit a structure like this:
 
-   ((ch count) (ch count) (ch count) ...) 
+   ((ch count) (ch count) (ch count) ...)
 
    where ch is the accelerator for the menu item and count is the
    number of them to select.
-   
+
    We strtok it so we just get id count id count id count. */
 
   token = strtok (list, delim);
@@ -1231,7 +1231,7 @@ lisp_select_menu(window, how, menu_list)
   *menu_list = malloc (sizeof (menu_item));
   if (*menu_list == NULL)
     {
-      panic ("Memory allocation failure; cannot get %u bytes", 
+      panic ("Memory allocation failure; cannot get %lu bytes",
 	     sizeof (menu_item));
     }
   size = 0;
@@ -1242,7 +1242,7 @@ lisp_select_menu(window, how, menu_list)
       size++;
       if ((*menu_list = realloc (*menu_list, size * sizeof (menu_item))) == NULL)
 	{
-	  panic ("Memory allocation failure; cannot get %u bytes", 
+	  panic ("Memory allocation failure; cannot get %lu bytes",
 		 size * sizeof (menu_item));
 	}
 
@@ -1284,9 +1284,9 @@ lisp_get_cmd(str)
 
   for (i=0; cmd_index[i].name != (char *)0; i++)
     {
-      if (!strcmp (str, cmd_index[i].name)) 
+      if (!strcmp (str, cmd_index[i].name))
 	return i;
-    }	  
+    }
 
   return -1;
 }
@@ -1300,7 +1300,7 @@ lisp_get_ext_cmd_id (str)
   for (i=0; extcmdlist[i].ef_txt != (char *)0; i++) {
     if (!strcmp (str, extcmdlist[i].ef_txt)) return i;
   }
-  
+
   return -1;
 }
 
@@ -1310,7 +1310,7 @@ lisp_get_ext_cmd_id (str)
 /* { */
 /*   int i; */
 /*   int ret = 1; */
-  
+
 /*   for (i=10;n / i; i *= 10) */
 /*     { */
 /*       ret++; */
@@ -1417,7 +1417,7 @@ lisp_nhgetch()
     {
       impossible ("Impossible command type: %d", cmd_index[cmd].type);
     }
-  return NULL;
+  return 0;
 }
 
 int
@@ -1476,7 +1476,7 @@ winid_is_taken (winid n)
 
   for (i=0; i<winid_list_len; i++)
     if (winid_list[i] == n) return 1;
-  
+
   return 0;
 }
 
@@ -1484,7 +1484,7 @@ static int
 add_winid (winid n)
 {
   if (winid_is_taken (n)) return 0; /* failed. */
-  
+
   winid_list[find_empty_cell()] = n;
   return 1; /* success! */
 }
@@ -1493,13 +1493,13 @@ static winid
 get_unique_winid ()
 {
   winid i;
-  
+
   /* look for a unique number, and add it to the list of taken
      numbers. */
   i = 0;
   while (!add_winid (i)) i++;
 
-  return i;	  
+  return i;
 }
 
 /* When a window is destroyed, it gives back its window number with
@@ -1511,7 +1511,7 @@ return_winid (winid n)
 
   for (i=0; i<winid_list_len; i++)
     {
-      if (winid_list[i] == n) 
+      if (winid_list[i] == n)
 	{
 	  winid_list[i] = -1;
 	  return;
@@ -1693,7 +1693,7 @@ lisp_init_nhwindows(argcp,argv)
 
   /* Print each command-line option, constructing a list of strings */
   lisp_cmd ("init-nhwindows",
-	    for (i=0; i<*argcp; i++) 
+	    for (i=0; i<*argcp; i++)
 	      lisp_string (argv[i]));
 
   /* FIXME: doesn't remove the arguments parsed, as specified in the
@@ -1929,7 +1929,7 @@ static void
 get_death_text (buf)
      char buf[BUFSZ];
 {
-  
+
 }
 
 void
@@ -1938,7 +1938,7 @@ lisp_outrip(window, how)
      int how;
 {
   lisp_cmd ("outrip",
-	    lisp_int (window);	    
+	    lisp_int (window);
 	    lisp_string (plname);
 	    lisp_long (u.ugold);
 	    lisp_string ("Died while trying to finish nethack-el."));
