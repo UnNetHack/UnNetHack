@@ -17,8 +17,6 @@ addons:
       - libxaw7-dev
       - xfonts-utils
 
-sudo: false
-
 notifications:
   irc:
     channels: "chat.freenode.net#unnethack"
