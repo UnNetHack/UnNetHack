@@ -1981,7 +1981,7 @@ struct mkroom	*croom;
 	}
 
 #ifdef RECORD_ACHIEVE
-	/* Nasty hack here: try to determine if this is the Mines 
+	/* Nasty hack here: try to determine if this is the Mines
 	 * "prize" and then set record_achieve_special (maps to corpsenm)
 	 * for the object.  That field will later be checked to find out if
 	 * the player obtained the prize. */
@@ -3411,7 +3411,7 @@ spo_mon_generation(coder)
     mg->total_mon_freq = 0;
     mg->gen_chances = NULL;
     while (OV_i(n_tuples)-- > 0) {
-	struct opvar *mfreq, *is_sym, *mon;
+	struct opvar *mfreq = NULL, *is_sym, *mon = NULL;
 	mgtuple = (struct mon_gen_tuple *)alloc(sizeof(struct mon_gen_tuple));
 	if (!mgtuple) panic("mgtuple alloc");
 	if (!OV_pop_i(is_sym) ||
@@ -3462,7 +3462,7 @@ spo_level_sounds(coder)
     mg->sounds = (struct lvl_sound_bite *)alloc(sizeof(struct lvl_sound_bite) * mg->n_sounds);
     if (!mg->sounds) panic("lvlsnds snds alloc");
     while (OV_i(n_tuples)-- > 0) {
-	struct opvar *flags, *msg;
+	struct opvar *flags, *msg = NULL;
 
 	if (!OV_pop_i(flags) || !OV_pop_s(msg)) {
 	    panic("oopsie when loading lvl_sound_bite.");
@@ -5648,7 +5648,7 @@ sp_lev *lvl;
 	    break;
 	case SPO_SEL_LINE:
 	    {
-		struct opvar *tmp, *tmp2, *pt = selection_opvar(NULL);
+		struct opvar *tmp = NULL, *tmp2 = NULL, *pt = selection_opvar(NULL);
 		schar x1,y1,x2,y2;
 		if (!OV_pop_c(tmp) || !OV_pop_c(tmp2)) panic("no ter sel linecoord");
 		get_location_coord(&x1, &y1, ANY_LOC, coder->croom, OV_i(tmp));
@@ -5665,7 +5665,7 @@ sp_lev *lvl;
 	    break;
 	case SPO_SEL_RNDLINE:
 	    {
-		struct opvar *tmp, *tmp2, *tmp3, *pt = selection_opvar(NULL);
+		struct opvar *tmp = NULL, *tmp2 = NULL, *tmp3 = NULL, *pt = selection_opvar(NULL);
 		schar x1,y1,x2,y2;
 		if (!OV_pop_i(tmp3) || !OV_pop_c(tmp) || !OV_pop_c(tmp2)) panic("no ter sel randline");
 		get_location_coord(&x1, &y1, ANY_LOC, coder->croom, OV_i(tmp));
