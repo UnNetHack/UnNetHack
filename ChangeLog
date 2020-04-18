@@ -24,6 +24,7 @@
 	  - Fix crash when changing statuslines to 3 on screens with 24
 	  - Show Elbereth statusline indicator when blind and flying
 	  - Fix compiling with -fno-common
+	  - OPTIONS=truecolor_separator was incorrectly parsed
 
 2019-01-01  UnNetHack 5.2.0
 	* Support SOURCE_DATE_EPOCH for reproducible builds (patch from Debian)

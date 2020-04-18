@@ -56,6 +56,7 @@ compile
 /src/tile.c
 
 # /tests/
+tests/test_*.xml
 tests/*/test_*.xml
 tests/options/test_base32
 tests/options/test_options
