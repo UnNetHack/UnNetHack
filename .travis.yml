@@ -6,6 +6,9 @@ compiler:
   - gcc
   - clang
 
+env:
+  - CFLAGS='-O2 -Wall -Wextra -fno-common -Werror=format -Werror=return-type -Werror=uninitialized -Werror=implicit-function-declaration' LFLAGS=-fno-common
+
 addons:
   apt:
     packages:
