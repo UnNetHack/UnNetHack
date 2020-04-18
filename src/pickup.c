@@ -2194,12 +2194,18 @@ register struct obj *obj;
 		if (obj->otyp == WAN_CANCELLATION) {
 			makeknown(obj->otyp);
 		}
-		obfree(obj, (struct obj *)0);
-
-		/* dump it out onto the floor so the scatterage can take effect */
-		if (dump_container(current_container, TRUE)) {
-			pline("The contents fly everywhere!");
-		}
+        int items_scattered = 0;
+        if (Is_container(obj)) {
+            /* also dump contents of inserted object */
+            items_scattered += dump_container(obj, TRUE);
+        } else {
+            obfree(obj, (struct obj *)0);
+        }
+        /* dump it out onto the floor so the scatterage can take effect */
+        items_scattered += dump_container(current_container, TRUE);
+        if (items_scattered > 0) {
+            pline("The contents fly everywhere!");
+        }
 		scatter(u.ux,u.uy,10,VIS_EFFECTS|MAY_HIT|MAY_DESTROY|MAY_FRACTURE,0);
 
 		losehp(d(6,6),"magical explosion", KILLED_BY_AN);

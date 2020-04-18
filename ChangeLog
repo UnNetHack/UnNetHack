@@ -25,6 +25,7 @@
 	  - Show Elbereth statusline indicator when blind and flying
 	  - Fix compiling with -fno-common
 	  - OPTIONS=truecolor_separator was incorrectly parsed
+	  - Bag of holding explosion also scatters contents of inserted container
 
 2019-01-01  UnNetHack 5.2.0
 	* Support SOURCE_DATE_EPOCH for reproducible builds (patch from Debian)
