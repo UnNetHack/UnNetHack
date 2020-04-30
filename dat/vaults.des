@@ -153,6 +153,12 @@ ROOM:"rndvault", unlit, random, random, random {
   LOOP [3d3] {
     TRAP:"web", random
   }
+  IF [ level.depth < 3 ] { BREAK }
+  # add some inhabitants on lower levels
+  IF [ level.depth < 7 ] {
+    [25%]:MONSTER:"cave spider",random
+    [25%]:MONSTER:"cave spider",random
+  }
 }
 
 
