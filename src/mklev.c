@@ -1589,8 +1589,11 @@ coord *tm;
 	}
 
 	(void) maketrap(m.x, m.y, kind);
-	if (kind == WEB) (void) makemon(&mons[PM_GIANT_SPIDER],
-						m.x, m.y, NO_MM_FLAGS);
+    /* don't create giant spiders too soon and not always */
+    if ((level_difficulty() >= 7) && rnf(6,7)) {
+        if (kind == WEB) (void) makemon(&mons[PM_GIANT_SPIDER],
+                m.x, m.y, NO_MM_FLAGS);
+    }
 }
 
 void

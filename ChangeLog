@@ -12,6 +12,8 @@
 	  - Disable the rogue tribute level
 	  - Adjust monster distribution for dilapidated armories
 	  - Blackmarket: new entrance area for the classic design
+	  - Themed rooms:
+	    - Prevent giant spiders appearing out of depth
 
 	* user interface improvements:
 	  - Optimized placement of menu windows in TTY port
