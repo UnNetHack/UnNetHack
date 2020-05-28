@@ -2711,6 +2711,7 @@ invocation_message()
          */
         if (dist_invocation_pos == 0) {
             strange_vibration = "strange vibration";
+            maketrap(inv_pos.x, inv_pos.y, VIBRATING_SQUARE);
         } else if (dist_invocation_pos <= 2) {
             strange_vibration = "weak trembling";
         } else {

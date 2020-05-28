@@ -27,6 +27,7 @@
 
 	* user interface improvements:
 	  - Optimized placement of menu windows in TTY port
+	  - Mark vibrating square automatically as trap after being found
 
 	* bug fixes:
 	  - Fix over-escaping of characters on HTML dump map
