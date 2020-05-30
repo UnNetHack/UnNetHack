@@ -1,4 +1,4 @@
-20XX-XX-XX  UnNetHack 5.X.X
+20XX-XX-XX  UnNetHack 6.X.X
 	* Use TAB as separator in xlogfile
 	* Add info about pre-seeded games to dumplog
 	* Seed is encoded as Crockford base32 string

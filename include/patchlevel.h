@@ -1,15 +1,14 @@
-/*  SCCS Id: @(#)patchlevel.h   3.4 2003/12/06  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* UnNetHack 5.0.0 */
 #define GAME_SHORT_NAME "UNH"
-#define VERSION_MAJOR   5
-#define VERSION_MINOR   3
+#define VERSION_MAJOR   6
+#define VERSION_MINOR   0
 /*
  * PATCHLEVEL is updated for each release.
  */
-#define PATCHLEVEL  2
+#define PATCHLEVEL  0
 /*
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
@@ -32,7 +31,7 @@
 /*#define VERSION_REVISION  1*/
 
 #define COPYRIGHT_BANNER_A \
-    "UnNetHack 5, Copyright 2009-2020"
+    "UnNetHack 6, Copyright 2009-2020"
 
 #define COPYRIGHT_BANNER_B \
     "    Based on NetHack, Copyright 1985-2003 by Stichting Mathematisch"
@@ -49,7 +48,7 @@
  * PP = patch level, ee = edit level, L = literal suffix "L",
  * with all four numbers specified as two hexadecimal digits.
  */
-#define VERSION_COMPATIBILITY 0x05030000L   /* 5.0.0-e0 */
+#define VERSION_COMPATIBILITY 0x06000000L   /* 6.0.0-e0 */
 
 
 /*****************************************************************************/
