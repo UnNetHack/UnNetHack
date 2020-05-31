@@ -3288,6 +3288,7 @@ int bg_glyph UNUSED;
 {
     glyph_t ch;
     boolean reverse_on = FALSE;
+    boolean underline_on = FALSE;
     int color;
     unsigned special;
 
@@ -3336,6 +3337,11 @@ int bg_glyph UNUSED;
         }
     }
 
+    if (!reverse_on && (special & MG_STATUE)) {
+        term_start_attr(ATR_ULINE);
+        underline_on = TRUE;
+    }
+
 #if defined(USE_TILES) && defined(MSDOS)
     if (iflags.grmode && iflags.tile_view)
         xputg(glyph, ch, special);
@@ -3350,6 +3356,10 @@ int bg_glyph UNUSED;
 #else
     g_putch(ch);        /* print the character */
 #endif
+
+    if (underline_on) {
+        term_end_attr(ATR_ULINE);
+    }
 
     if (reverse_on) {
         term_end_attr(ATR_INVERSE);

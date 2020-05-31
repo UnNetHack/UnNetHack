@@ -114,6 +114,9 @@ unsigned mgflags;
         ch = get_monsym(offset);
         obj_color(STATUE);
         special |= MG_STATUE;
+        if (level.objects[x][y] && level.objects[x][y]->nexthere) {
+            special |= MG_INVERSE;
+        }
     } else if ((offset = (glyph - GLYPH_WARNING_OFF)) >= 0) {  /* a warning flash */
         ch = warnsyms[offset];
 # ifdef ROGUE_COLOR

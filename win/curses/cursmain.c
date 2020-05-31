@@ -573,6 +573,9 @@ curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph,
 
     /* map glyph to character and color */
     mapglyph(glyph, (glyph_t*)&ch, &color, &special, x, y, 0);
+    if (special & MG_STATUE) {
+        attr = A_UNDERLINE;
+    }
     if ((special & MG_PET) && iflags.hilite_pet) {
         attr = iflags.wc2_petattr;
     }
