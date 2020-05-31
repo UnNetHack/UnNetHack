@@ -75,10 +75,11 @@ static void FDECL(display_cursor, (struct xwindow *));
 /* Global functions ======================================================== */
 
 void
-X11_print_glyph(window, x, y, glyph)
+X11_print_glyph(window, x, y, glyph, bg_glyph)
     winid window;
     xchar x, y;
     int glyph;
+    int bg_glyph UNUSED;
 {
     struct map_info_t *map_info;
     boolean update_bbox;
@@ -110,7 +111,7 @@ X11_print_glyph(window, x, y, glyph)
 	register unsigned char *co_ptr;
 #endif
 	/* map glyph to character and color */
-        mapglyph(glyph, &och, &color, &special, x, y);
+        (void) mapglyph(glyph, &och, &color, &special, x, y, 0);
 	ch = (uchar)och;
 
 	/* Only update if we need to. */

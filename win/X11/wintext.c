@@ -290,7 +290,7 @@ create_text_window(wp)
 		XtParseTranslationTable(text_translations));	num_args++;
 
     wp->w = XtCreateManagedWidget(
-		killer && WIN_MAP == WIN_ERR ?
+		killer.name[0] && WIN_MAP == WIN_ERR ?
 				  "tombstone" : "text_text", /* name */
 		asciiTextWidgetClass,
 		form,			/* parent widget */
