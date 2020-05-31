@@ -528,7 +528,7 @@ bail(mesg)
 {
   clearlocks ();
   lisp_exit_nhwindows (mesg);
-  terminate (EXIT_SUCCESS);
+  nh_terminate (EXIT_SUCCESS);
   /*NOTREACHED*/
 }
 
@@ -1003,7 +1003,7 @@ generate_status_line ()
 		 lisp_int (depth(&u.uz)););
 
   lisp_list (lisp_string ("$");
-	     lisp_long (u.ugold););
+	     lisp_long (money_cnt(invent)););
   lisp_list (lisp_string ("HP");
 	     lisp_int (hp););
   lisp_list (lisp_string ("HPmax");
@@ -1853,17 +1853,18 @@ lisp_update_positionbar(features)
 #define warn_color(n) def_warnsyms[n].color
 
 void
-lisp_print_glyph(window, x, y, glyph)
+lisp_print_glyph(window, x, y, glyph, bg_glyph)
     winid window;
     xchar x, y;
     int glyph;
+    int bg_glyph;
 {
     glyph_t ch;
     int	    color;
     unsigned special;
 
     /* map glyph to character and color */
-    mapglyph(glyph, &ch, &color, &special, x, y);
+    mapglyph(glyph, &ch, &color, &special, x, y, 0);
 
     /* If the user doesn't want to highlight the pet, then we erase
        the PET bit from special. In the lisp code the special argument
@@ -1940,6 +1941,6 @@ lisp_outrip(window, how)
   lisp_cmd ("outrip",
 	    lisp_int (window);
 	    lisp_string (plname);
-	    lisp_long (u.ugold);
+	    lisp_long (money_cnt(invent));
 	    lisp_string ("Died while trying to finish nethack-el."));
 }

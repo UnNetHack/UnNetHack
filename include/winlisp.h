@@ -52,7 +52,7 @@ E void FDECL(lisp_cliparound, (int, int));
 #ifdef POSITIONBAR
 E void FDECL(lisp_update_positionbar, (char *));
 #endif
-E void FDECL(lisp_print_glyph, (winid, XCHAR_P, XCHAR_P, int));
+E void FDECL(lisp_print_glyph, (winid, XCHAR_P, XCHAR_P, int, int));
 E void FDECL(lisp_raw_print, (const char *));
 E void FDECL(lisp_raw_print_bold, (const char *));
 E int NDECL(lisp_nhgetch);
