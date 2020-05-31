@@ -6,6 +6,8 @@
 
 struct window_procs windowprocs;
 
+struct cmd Cmd;
+
 #include "hacklib.c"
 #include "decl.c"
 #include "drawing.c"
