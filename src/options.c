@@ -2068,7 +2068,7 @@ boolean tinitial, tfrom_file;
             if (compat || negated || initial) {
                 /* for backwards compatibility, "number_pad" without a
                    value is a synonym for number_pad:1 */
-                iflags.num_pad = !negated;
+                Cmd.num_pad = iflags.num_pad = !negated;
                 if (iflags.num_pad) iflags.num_pad_mode = 0;
             }
             return;
@@ -2078,11 +2078,11 @@ boolean tinitial, tfrom_file;
             return;
         }
         if (*op == '1' || *op == '2') {
-            iflags.num_pad = 1;
+            Cmd.num_pad = iflags.num_pad = 1;
             if (*op == '2') iflags.num_pad_mode = 1;
             else iflags.num_pad_mode = 0;
         } else if (*op == '0') {
-            iflags.num_pad = 0;
+            Cmd.num_pad = iflags.num_pad = 0;
             iflags.num_pad_mode = 0;
         } else badoption(opts);
         return;
@@ -4084,16 +4084,16 @@ boolean setinitial, setfromfile;
             int mode = mode_pick->item.a_int - 1;
             switch(mode) {
             case 2:
-                iflags.num_pad = 1;
+                Cmd.num_pad = iflags.num_pad = 1;
                 iflags.num_pad_mode = 1;
                 break;
             case 1:
-                iflags.num_pad = 1;
+                Cmd.num_pad = iflags.num_pad = 1;
                 iflags.num_pad_mode = 0;
                 break;
             case 0:
             default:
-                iflags.num_pad = 0;
+                Cmd.num_pad = iflags.num_pad = 0;
                 iflags.num_pad_mode = 0;
             }
             free((genericptr_t)mode_pick);
