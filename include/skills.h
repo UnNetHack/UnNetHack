@@ -105,7 +105,7 @@
  * P_MASTER        800
  * P_GRAND_MASTER 1600
  */
-#define practice_needed_to_advance(level) ((1 << (level > 0 ? level-1 : 0))*100)
+#define practice_needed_to_advance(level) (level == 0 ? 0 : (1 << (level-1))*100)
 
 /* The hero's skill in various weapons. */
 struct skills {
