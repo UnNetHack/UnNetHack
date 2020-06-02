@@ -382,12 +382,16 @@ doextlist()
     anything any;
     menu_item *selected;
     int n, pass;
-    int menumode = 0, menushown[2], onelist = 0;
+    int menumode = 1, menushown[2], onelist = 0;
     boolean redisplay = TRUE, search = FALSE;
     static const char *headings[] = {
         "Extended commands",
         "Debugging Extended Commands"
     };
+#ifdef WIN_EDGE
+    boolean saved_win_edge = iflags.win_edge;
+    iflags.win_edge = TRUE;
+#endif
 
     searchbuf[0] = '\0';
     menuwin = create_nhwindow(NHW_MENU);
@@ -548,6 +552,9 @@ doextlist()
         }
     }
     destroy_nhwindow(menuwin);
+#ifdef WIN_EDGE
+    iflags.win_edge = saved_win_edge;
+#endif
     return 0;
 }
 
