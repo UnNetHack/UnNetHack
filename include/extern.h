@@ -196,6 +196,7 @@ E void FDECL(savech, (CHAR_P));
 #ifdef WIZARD
 E void NDECL(add_debug_extended_commands);
 #endif /* WIZARD */
+E void FDECL(parseautocomplete, (char *, BOOLEAN_P));
 E void FDECL(reset_commands, (BOOLEAN_P));
 E void FDECL(rhack, (char *));
 E int NDECL(doextlist);

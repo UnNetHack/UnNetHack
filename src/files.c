@@ -2155,6 +2155,8 @@ boolean recursive;
     } else if (match_varname(buf, "NAME", 4)) {
         (void) strncpy(plname, bufp, PL_NSIZ-1);
         plnamesuffix();
+    } else if (match_varname(buf, "AUTOCOMPLETE", 5)) {
+        parseautocomplete(bufp, TRUE);
     } else if (match_varname(buf, "MSGTYPE", 7)) {
         char pattern[256];
         char msgtype[11];

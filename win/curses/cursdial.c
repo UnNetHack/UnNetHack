@@ -317,11 +317,12 @@ curses_ext_cmd()
     if (iflags.extmenu) {
         return extcmd_via_menu();
     }
-    
+
     startx = 0;
     starty = 0;
     if (iflags.wc_popup_dialog) { /* Prompt in popup window */
         int x0, y0, w, h; /* bounding coords of popup */
+
         extwin2 = curses_create_window(25, 1, UP);
         wrefresh(extwin2);
         /* create window inside window to prevent overwriting of border */
@@ -386,6 +387,10 @@ curses_ext_cmd()
             break;
         }
 
+        /* DEL/Rubout */
+        if (letter == '\177') {
+            letter = '\b';
+        }
         if ((letter == '\b') || (letter == KEY_BACKSPACE)) {
             if (prompt_width == 0) {
                 ret = -1;
@@ -402,8 +407,12 @@ curses_ext_cmd()
             ret = -1;
         }
         for (count = 0; extcmdlist[count].ef_txt; count++) {
-            /* Un has no autocomplete (yet) so autocomp everything.
-             * if (!extcmdlist[count].autocomplete) continue; */
+            if (!wizard && (extcmdlist[count].flags & WIZMODECMD)) {
+                continue;
+            }
+            if (!(extcmdlist[count].flags & AUTOCOMPLETE)) {
+                continue;
+            }
             if (strlen(extcmdlist[count].ef_txt) > prompt_width) {
                 if (strncasecmp(cur_choice, extcmdlist[count].ef_txt,
                                 prompt_width) == 0) {
@@ -1088,7 +1097,7 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
         if (curletter == '\033') {
             curletter = curses_convert_keys(curletter);
         }
-        
+
         switch (how) {
         case PICK_NONE:
             if (menu->num_pages == 1) {
@@ -1133,7 +1142,7 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
                 if (count > 0) {
                     count_letter = curletter;
                 }
-            }                
+            }
         }
 
         switch (curletter) {

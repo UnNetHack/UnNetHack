@@ -37,6 +37,8 @@
 static Widget extended_command_popup = 0;
 static Widget extended_command_form;
 static Widget *extended_commands = 0;
+static const char **command_list;
+static short *command_indx;
 static int extended_command_selected;	/* index of the selected command; */
 static int ps_selected;			/* index of selected role */
 #define PS_RANDOM (-50)
@@ -45,6 +47,7 @@ static const char ps_randchars[] = "*@";
 static const char ps_quitchars[] = "\033qQ";
 
 #define EC_NCHARS 32
+static boolean ec_full_list = FALSE;
 static boolean ec_active = FALSE;
 static int ec_nchars = 0;
 static char ec_chars[EC_NCHARS];
@@ -639,6 +642,24 @@ ec_dismiss()
     exit_x_event = TRUE;		/* leave event loop */
 }
 
+/* decide whether extcmdlist[idx] should be part of extended commands menu */
+static boolean
+ignore_extcmd(idx)
+int idx;
+{
+    /* #shell or #suspect might not be available;
+       'extmenu' option controls whether we show full list
+       or just the traditional extended commands */
+    if ((extcmdlist[idx].flags & CMD_NOT_AVAILABLE) != 0 ||
+         ((extcmdlist[idx].flags & AUTOCOMPLETE) == 0 && !ec_full_list) ||
+         strlen(extcmdlist[idx].ef_txt) < 2)  {
+        /* ignore "#" and "?" */
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 /* ARGSUSED */
 void
 ec_key(w, event, params, num_params)
@@ -712,32 +733,35 @@ ec_key(w, event, params, num_params)
 static void
 init_extended_commands_popup()
 {
-    int i, num_commands;
-    const char **command_list;
+    int i, j, num_commands, ignore_cmds = 0;
 
     /* count commands */
-    for (num_commands = 0; extcmdlist[num_commands].ef_txt; num_commands++)
-	;	/* do nothing */
+    for (num_commands = 0; extcmdlist[num_commands].ef_txt; num_commands++) {
+        if (ignore_extcmd(num_commands)) {
+            ++ignore_cmds;
+        }
+    }
 
-    /* If the last entry is "help", don't use it. */
-    if (strcmp(extcmdlist[num_commands-1].ef_txt, "?") == 0)
-	--num_commands;
+    j = num_commands - ignore_cmds;
+    command_list = (const char **) alloc((unsigned) (j * sizeof (char *) + 1));
+    command_indx = (short *) alloc((unsigned) (j * sizeof (short) + 1));
 
-    command_list =
-		(const char **) alloc((unsigned)num_commands * sizeof(char *));
+    for (i = j = 0; i < num_commands; i++) {
+        if (ignore_extcmd(i)) {
+            continue;
+        }
+        command_indx[j] = (short) i;
+        command_list[j++] = extcmdlist[i].ef_txt;
+    }
+    command_list[j] = (char *) 0;
+    command_indx[j] = -1;
+    num_commands = j;
 
-    for (i = 0; i < num_commands; i++)
-	command_list[i] = extcmdlist[i].ef_txt;
+    extended_command_popup = make_menu("extended_commands", "Extended Commands",
+                  extended_command_translations, "dismiss", extend_dismiss,
+                  "help", extend_help, num_commands, command_list,
+                  &extended_commands, extend_select, &extended_command_form);
 
-    extended_command_popup = make_menu("extended_commands",
-				"Extended Commands",
-				extended_command_translations,
-				"dismiss", extend_dismiss,
-				"help", extend_help,
-				num_commands, command_list, &extended_commands,
-				extend_select, &extended_command_form);
-
-    free((char *)command_list);
 }
 
 /* ------------------------------------------------------------------------- */

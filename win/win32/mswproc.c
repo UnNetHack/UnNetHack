@@ -1591,14 +1591,14 @@ void mswin_getlin(const char *question, char *input)
 
 /*
 int get_ext_cmd(void)
-	    -- Get an extended command in a window-port specific way.
-	       An index into extcmdlist[] is returned on a successful
-	       selection, -1 otherwise.
+ -- Get an extended command in a window-port specific way.
+    An index into extcmdlist[] is returned on a successful
+    selection, -1 otherwise.
 */
 int mswin_get_ext_cmd()
 {
-	int ret;
-	logDebug("mswin_get_ext_cmd()\n");
+    int ret;
+    logDebug("mswin_get_ext_cmd()\n");
 
     if (!iflags.wc_popup_dialog)
     {
@@ -1609,11 +1609,11 @@ int mswin_get_ext_cmd()
 
         createcaret = 1;
         SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE),
-            WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
+                WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
 
         cmd[0] = '\0';
         i = -2;
- mswin_clear_nhwindow(WIN_MESSAGE);
+        mswin_clear_nhwindow(WIN_MESSAGE);
         mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, "#", 0);
         len = 0;
         ShowCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
@@ -1647,22 +1647,23 @@ int mswin_get_ext_cmd()
                     }
                     else
                     {
-
                         cmd[len++] = c;
                         cmd[len] = '\0';
                         /* Find a command with this prefix in extcmdlist */
-	                    com_index = -1;
-	                    for (oindex = 0; extcmdlist[oindex].ef_txt != (char *)0; oindex++) {
-		                    if (!strncmpi(cmd, extcmdlist[oindex].ef_txt, len)) {
-			                    if (com_index == -1)	/* no matches yet */
-			                        com_index = oindex;
+                        com_index = -1;
+                        for (oindex = 0; extcmdlist[oindex].ef_txt != (char *)0; oindex++) {
+                            if ((extcmdlist[oindex].flags & AUTOCOMPLETE) &&
+                                 !(!wizard && (extcmdlist[oindex].flags & WIZMODECMD))
+                                 !strncmpi(cmd, extcmdlist[oindex].ef_txt, len)) {
+                                if (com_index == -1) /* no matches yet */
+                                    com_index = oindex;
                                 else
-                                    com_index = -2;     /* two matches, don't complete */
-		                    }
-	                    }
-	                    if (com_index >= 0) {
-		                    Strcpy(cmd, extcmdlist[com_index].ef_txt);
-	                    }
+                                    com_index = -2;  /* two matches, don't complete */
+                            }
+                        }
+                        if (com_index >= 0) {
+                            Strcpy(cmd, extcmdlist[com_index].ef_txt);
+                        }
                     }
                     mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, cmd, 1);
                     break;
@@ -1671,15 +1672,15 @@ int mswin_get_ext_cmd()
         HideCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
         createcaret = 0;
         SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE),
-            WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
-	    return i;
+                WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
+        return i;
     }
     else
     {
-    	if(mswin_ext_cmd_window (&ret) == IDCANCEL)
-	    	return -1;
-	    else
-		    return ret;
+        if(mswin_ext_cmd_window (&ret) == IDCANCEL)
+            return -1;
+        else
+            return ret;
     }
 }
 

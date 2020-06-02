@@ -17,6 +17,8 @@
 	  - Wet towel handling
 	  - Vibrating square implemented as trap
 	  - Improved role/race/gender/alignment selection
+	  - AUTOCOMPLETE option to disable or enable autocompletion for
+	    extended commands
 
 	* dungeon layout:
 	  - Disable the rogue tribute level
