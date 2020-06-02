@@ -344,6 +344,7 @@ int c;
     if (c == 0) {
         /* reset */
         vmc_count = 0;
+        class_filter = bucx_filter = shop_filter = FALSE;
     } else if (!menu_class_present(c)) {
         valid_menu_classes[vmc_count++] = (char) c;
         /* categorize the new class */
