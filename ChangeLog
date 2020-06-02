@@ -19,6 +19,7 @@
 	  - Improved role/race/gender/alignment selection
 	  - AUTOCOMPLETE option to disable or enable autocompletion for
 	    extended commands
+	  - Interactive extended command list
 
 	* dungeon layout:
 	  - Disable the rogue tribute level

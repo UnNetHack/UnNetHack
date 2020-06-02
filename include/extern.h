@@ -965,6 +965,7 @@ E int FDECL(isqrt, (int));
 E int FDECL(distmin, (int, int, int, int));
 E boolean FDECL(online2, (int, int, int, int));
 E boolean FDECL(pmatch, (const char *, const char *));
+E boolean FDECL(pmatchi, (const char *, const char *));
 #ifndef STRNCMPI
 E int FDECL(strncmpi, (const char *, const char *, int));
 #endif

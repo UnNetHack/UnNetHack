@@ -355,12 +355,10 @@ doextcmd()
             return 0; /* quit */
         }
         func = extcmdlist[idx].ef_funct;
-#if NEXT_VERSION
         if (!wizard && (extcmdlist[idx].flags & WIZMODECMD)) {
             You("can't do that.");
             return 0;
         }
-#endif
         if (iflags.menu_requested && !accept_menu_prefix(func)) {
             pline("'%s' prefix has no effect for the %s command.",
                   visctrl(Cmd.spkeys[NHKF_REQMENU]),
@@ -380,21 +378,176 @@ doextlist()
 {
     const struct ext_func_tab *efp;
     char buf[BUFSZ], searchbuf[BUFSZ], promptbuf[QBUFSZ];
-    winid datawin;
+    winid menuwin;
+    anything any;
+    menu_item *selected;
+    int n, pass;
+    int menumode = 0, menushown[2], onelist = 0;
+    boolean redisplay = TRUE, search = FALSE;
+    static const char *headings[] = {
+        "Extended commands",
+        "Debugging Extended Commands"
+    };
 
-    datawin = create_nhwindow(NHW_TEXT);
-    putstr(datawin, 0, "");
-    putstr(datawin, 0, "            Extended Commands List");
-    putstr(datawin, 0, "");
-    putstr(datawin, 0, "    Press '#', then type:");
-    putstr(datawin, 0, "");
+    searchbuf[0] = '\0';
+    menuwin = create_nhwindow(NHW_MENU);
 
-    for(efp = extcmdlist; efp->ef_txt; efp++) {
-        Sprintf(buf, "    %-15s - %s.", efp->ef_txt, efp->ef_desc);
-        putstr(datawin, 0, buf);
+    while (redisplay) {
+        redisplay = FALSE;
+        any = zeroany;
+        start_menu(menuwin);
+        add_menu(menuwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, "Extended Commands List",
+                 MENU_UNSELECTED);
+        add_menu(menuwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+
+        Strcpy(buf, menumode ? "Show" : "Hide");
+        Strcat(buf, " commands that don't autocomplete");
+        if (!menumode) {
+            Strcat(buf, " (those not marked with [A])");
+        }
+        any.a_int = 1;
+        add_menu(menuwin, NO_GLYPH, MENU_DEFCNT, &any, 'a', 0, ATR_NONE, buf, MENU_UNSELECTED);
+
+        if (!*searchbuf) {
+            any.a_int = 2;
+            /* was 's', but then using ':' handling within the interface
+               would only examine the two or three meta entries, not the
+               actual list of extended commands shown via separator lines;
+               having ':' as an explicit selector overrides the default
+               menu behavior for it; we retain 's' as a group accelerator */
+            add_menu(menuwin, NO_GLYPH, MENU_DEFCNT, &any, ':', 's', ATR_NONE, "Search extended commands",
+                     MENU_UNSELECTED);
+        } else {
+            Strcpy(buf, "Show all, clear search");
+            if (strlen(buf) + strlen(searchbuf) + strlen(" (\"\")") < QBUFSZ) {
+                Sprintf(eos(buf), " (\"%s\")", searchbuf);
+            }
+            any.a_int = 3;
+            /* specifying ':' as a group accelerator here is mostly a
+               statement of intent (we'd like to accept it as a synonym but
+               also want to hide it from general menu use) because it won't
+               work for interfaces which support ':' to search; use as a
+               general menu command takes precedence over group accelerator */
+            add_menu(menuwin, NO_GLYPH, MENU_DEFCNT, &any, 's', ':', ATR_NONE, buf, MENU_UNSELECTED);
+        }
+        if (wizard) {
+            any.a_int = 4;
+            add_menu(menuwin, NO_GLYPH, MENU_DEFCNT, &any, 'z', 0, ATR_NONE,
+                     onelist ? "Show debugging commands in separate section"
+                     : "Show all alphabetically, including debugging commands",
+                     MENU_UNSELECTED);
+        }
+        any = zeroany;
+        add_menu(menuwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+        menushown[0] = menushown[1] = 0;
+        n = 0;
+        for (pass = 0; pass <= 1; ++pass) {
+            /* skip second pass if not in wizard mode or wizard mode
+               commands are being integrated into a single list */
+            if (pass == 1 && (onelist || !wizard)) {
+                break;
+            }
+            for (efp = extcmdlist; efp->ef_txt; efp++) {
+                int wizc;
+
+                if ((efp->flags & CMD_NOT_AVAILABLE) != 0) {
+                    continue;
+                }
+                /* if hiding non-autocomplete commands, skip such */
+                if (menumode == 1 && (efp->flags & AUTOCOMPLETE) == 0) {
+                    continue;
+                }
+                /* if searching, skip this command if it doesn't match */
+                if (*searchbuf &&
+                    /* first try case-insensitive substring match */
+                     !strstri(efp->ef_txt, searchbuf) &&
+                     !strstri(efp->ef_desc, searchbuf) &&
+                    /* wildcard support; most interfaces use case-insensitve
+                       pmatch rather than regexp for menu searching */
+                     !pmatchi(searchbuf, efp->ef_txt) &&
+                     !pmatchi(searchbuf, efp->ef_desc)) {
+                    continue;
+                }
+                /* skip wizard mode commands if not in wizard mode;
+                   when showing two sections, skip wizard mode commands
+                   in pass==0 and skip other commands in pass==1 */
+                wizc = (efp->flags & WIZMODECMD) != 0;
+                if (wizc && !wizard) {
+                    continue;
+                }
+                if (!onelist && pass != wizc) {
+                    continue;
+                }
+
+                /* We're about to show an item, have we shown the menu yet?
+                   Doing menu in inner loop like this on demand avoids a
+                   heading with no subordinate entries on the search
+                   results menu. */
+                if (!menushown[pass]) {
+                    Strcpy(buf, headings[pass]);
+                    add_menu(menuwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings, buf, MENU_UNSELECTED);
+                    menushown[pass] = 1;
+                }
+                Sprintf(buf, " %-15s %-3s %s",
+                        efp->ef_txt,
+                        (efp->flags & AUTOCOMPLETE) ? "[A]" : " ",
+                        efp->ef_desc);
+                add_menu(menuwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
+                ++n;
+            }
+            if (n) {
+                add_menu(menuwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+            }
+        }
+        if (*searchbuf && !n) {
+            add_menu(menuwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, "no matches", MENU_UNSELECTED);
+        }
+
+        end_menu(menuwin, (char *) 0);
+        n = select_menu(menuwin, PICK_ONE, &selected);
+        if (n > 0) {
+            switch (selected[0].item.a_int) {
+            case 1: /* 'a': toggle show/hide non-autocomplete */
+                menumode = 1 - menumode;  /* toggle 0 -> 1, 1 -> 0 */
+                redisplay = TRUE;
+                break;
+
+            case 2: /* ':' when not searching yet: enable search */
+                search = TRUE;
+                break;
+
+            case 3: /* 's' when already searching: disable search */
+                search = FALSE;
+                searchbuf[0] = '\0';
+                redisplay = TRUE;
+                break;
+
+            case 4: /* 'z': toggle showing wizard mode commands separately */
+                search = FALSE;
+                searchbuf[0] = '\0';
+                onelist = 1 - onelist;  /* toggle 0 -> 1, 1 -> 0 */
+                redisplay = TRUE;
+            }
+            free(selected);
+        } else {
+            search = FALSE;
+            searchbuf[0] = '\0';
+        }
+        if (search) {
+            Strcpy(promptbuf, "Extended command list search phrase");
+            Strcat(promptbuf, "?");
+            getlin(promptbuf, searchbuf);
+            (void) mungspaces(searchbuf);
+            if (searchbuf[0] == '\033') {
+                searchbuf[0] = '\0';
+            }
+            if (*searchbuf) {
+                redisplay = TRUE;
+            }
+            search = FALSE;
+        }
     }
-    display_nhwindow(datawin, FALSE);
-    destroy_nhwindow(datawin);
+    destroy_nhwindow(menuwin);
     return 0;
 }
 
@@ -1796,7 +1949,7 @@ struct ext_func_tab extcmdlist[] = {
     {   'D',  "droptype", "drop specific item types", doddrop },
     {   'e',  "eat", "eat something", doeat },
     {   'E',  "engrave", "engrave writing on the floor", doengrave },
-    { C('e'), "engraveelbereth", "engrave \"Elbereth\" on the floor", doengrave_elbereth, AUTOCOMPLETE },
+    { C('e'), "engraveelbereth", "engrave \"Elbereth\" on the floor", doengrave_elbereth, 0 },
     { M('e'), "enhance", "advance or check weapon and spell skills", enhance_weapon_skill, IFBURIED | AUTOCOMPLETE },
     {  '\0',  "exploremode", "enter explore (discovery) mode", enter_explore_mode, IFBURIED },
     {   'f',  "fire", "fire ammunition from quiver", dofire },
@@ -2726,7 +2879,6 @@ boolean condition;
     }
 
     /* find and modify the extended command */
-#ifdef NEXT_VERSION
     for (efp = extcmdlist; efp->ef_txt; efp++) {
         if (!strcmp(autocomplete, efp->ef_txt)) {
             if (condition) {
@@ -2737,7 +2889,6 @@ boolean condition;
             return;
         }
     }
-#endif
 
     /* not a real extended command */
     raw_printf("Bad autocomplete: invalid extended command '%s'.", autocomplete);
