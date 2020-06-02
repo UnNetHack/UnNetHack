@@ -893,14 +893,14 @@ boolean by_hero;
             char buf[BUFSZ];
 
             Strcpy(buf, one_of ? "one of " : "");
-            /* shk_your: "the " or "your " or "<mon>'s " or "<Shk>'s ".
-               If the result is "Shk's " then it will be ambiguous:
+            /* shk_your: "the" or "your" or "<mon>'s" or "<Shk>'s".
+               If the result is "Shk's" then it will be ambiguous:
                is Shk the mon carrying it, or does Shk's shop own it?
                Let's not worry about that... */
             (void) shk_your(eos(buf), corpse);
             if (one_of)
                 corpse->quan++; /* force plural */
-            Strcat(buf, corpse_xname(corpse, (const char *) 0, CXN_NO_PFX));
+            sprintf("%s %s", buf, corpse_xname(corpse, (const char *) 0, CXN_NO_PFX));
             if (one_of) /* could be simplified to ''corpse->quan = 1L;'' */
                 corpse->quan--;
             pline("%s glows iridescently.", upstart(buf));
@@ -1031,14 +1031,14 @@ struct monst *mon;
         /* save the name; the object is liable to go away */
         if (youseeit) {
             Strcpy(corpse, corpse_xname(otmp, NULL, CXN_SINGULAR));
-            Shk_Your(owner, otmp); /* includes a trailing space */
+            Shk_Your(owner, otmp);
         }
 
         /* for a stack, only one is revived */
         if ((mtmp2 = revive(otmp, !flags.mon_moving)) != 0) {
             ++res;
             if (youseeit) {
-                pline("%s%s suddenly comes alive!", owner, corpse);
+                pline("%s %s suddenly comes alive!", owner, corpse);
             } else if (canseemon(mtmp2)) {
                 pline("%s suddenly appears!", Amonnam(mtmp2));
             }

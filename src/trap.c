@@ -678,7 +678,7 @@ int *fail_reason;
     if ((x == u.ux && y == u.uy) || cause == ANIMATE_SPELL) {
         /* "the|your|Manlobbi's statue [of a wombat]" */
         shkp = shop_keeper(*in_rooms(mon->mx, mon->my, SHOPBASE));
-        Sprintf(statuename, "%s%s", shk_your(tmpbuf, statue),
+        Sprintf(statuename, "%s %s", shk_your(tmpbuf, statue),
                 (cause == ANIMATE_SPELL &&
                  /* avoid "of a shopkeeper" if it's Manlobbi himself
                     (if carried, it can't be unpaid--hence won't be
@@ -690,7 +690,7 @@ int *fail_reason;
         pline_The("%s suddenly seems more animated.", rndmonnam());
     } else if (cause == ANIMATE_SHATTER) {
         if (cansee(x, y)) {
-            Sprintf(statuename, "%s%s", shk_your(tmpbuf, statue),
+            Sprintf(statuename, "%s %s", shk_your(tmpbuf, statue),
                     xname(statue));
         } else {
             Strcpy(statuename, "a statue");
