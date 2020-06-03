@@ -287,6 +287,8 @@ struct symdef defsyms[MAXPCHARS] = {
     {'-', "wall",       C(CLR_GRAY)},   /* hbeam */
     {'\\', "wall",       C(CLR_GRAY)},   /* lslant */
     {'/', "wall",       C(CLR_GRAY)},   /* rslant */
+    {'#', "poison cloud", C(CLR_BRIGHT_GREEN) },   /* part of a cloud */
+    {'?', "valid position", C(CLR_BRIGHT_GREEN) }, /*  target position */
 /*70*/ {'*', "",       C(CLR_WHITE)},   /* dig beam */
     {'!', "",       C(CLR_WHITE)},  /* camera flash beam */
     {')', "",       C(HI_WOOD)},    /* boomerang open left */
@@ -405,6 +407,8 @@ static glyph_t ibm_graphics[MAXPCHARS] = {
     0xc4,   /* S_hbeam: meta-D, horizontal rule */
     g_FILLER(S_lslant),
     g_FILLER(S_rslant),
+    g_FILLER(S_poisoncloud),
+    g_FILLER(S_goodpos),
 /*70*/ g_FILLER(S_digbeam),
     g_FILLER(S_flashbeam),
     g_FILLER(S_boomleft),
@@ -511,6 +515,8 @@ static glyph_t dec_graphics[MAXPCHARS] = {
     0xf1,   /* S_hbeam: meta-q, horizontal rule */
     g_FILLER(S_lslant),
     g_FILLER(S_rslant),
+    g_FILLER(S_poisoncloud),
+    g_FILLER(S_goodpos),
 /*70*/ g_FILLER(S_digbeam),
     g_FILLER(S_flashbeam),
     g_FILLER(S_boomleft),
@@ -615,6 +621,8 @@ static glyph_t mac_graphics[MAXPCHARS] = {
     g_FILLER(S_hbeam),
     g_FILLER(S_lslant),
     g_FILLER(S_rslant),
+    g_FILLER(S_poisoncloud),
+    g_FILLER(S_goodpos),
 /*70*/ g_FILLER(S_digbeam),
     g_FILLER(S_flashbeam),
     g_FILLER(S_boomleft),
@@ -721,6 +729,8 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
     0x2500, /* S_hbeam: BOX DRAWINGS LIGHT HORIZONTAL */
     g_FILLER(S_lslant),
     g_FILLER(S_rslant),
+    g_FILLER(S_poisoncloud),
+    g_FILLER(S_goodpos),
     g_FILLER(S_digbeam),
     g_FILLER(S_flashbeam),
     g_FILLER(S_boomleft),
