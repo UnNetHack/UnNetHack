@@ -392,8 +392,16 @@ struct obj *obj;
      * are included regardless of whether either unpaid or BUC-status
      * is also specified since player has explicitly requested coins.
      * If no class filtering is specified but bless/curse state is,
-     * coins are either unknown or uncursed based on an option setting.
+     * coins are always ignored.
      */
+    if (obj->oclass == COIN_CLASS) {
+        return class_filter ? (index(valid_menu_classes, COIN_CLASS) ? TRUE : FALSE) :
+               /* coins are never unpaid, but check anyway */
+               shop_filter ? (obj->unpaid ? TRUE : FALSE) :
+               bucx_filter ? FALSE :
+               TRUE; /* catchall: no filters specified, so accept */
+    }
+
     if (Role_if(PM_PRIEST) && !obj->bknown) {
         set_bknown(obj, 1);
     }
