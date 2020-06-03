@@ -220,6 +220,7 @@ int prob2;
                 if (wizard)
                     pline("trim_contents: %s just disappeared", doname(otmp));
 #endif
+                setnotworn(otmp);
                 obj_extract_self(otmp);
                 obfree(otmp, (struct obj *)0);  /* dealloc_obj() isn't sufficient */
                 disappeared++; /* only counts explicitly obfree'd objects */
