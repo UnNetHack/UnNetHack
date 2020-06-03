@@ -1022,6 +1022,9 @@ char *op;
     char *sp, buf[BUFSZ];
 
     num = 0;
+    if (!index(op, GOLD_SYM)) {
+        buf[num++] = COIN_CLASS;
+    }
 
     for (sp = op; *sp; sp++) {
         oc_sym = def_char_to_objclass(*sp);
