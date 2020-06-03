@@ -3043,7 +3043,7 @@ float_up()
         u.ufeetfrozen = 0;
         pline_The("ice falls off.");
     }
-    if (Flying) {
+    if (Levitation && Flying) {
         You("are no longer able to control your flight.");
     }
     float_vs_flight(); /* set BFlying, also BLevitation if still trapped */

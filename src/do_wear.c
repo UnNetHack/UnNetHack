@@ -995,11 +995,23 @@ Amulet_on()
     }
 
     case AMULET_OF_FLYING:
-        if (!(EFlying & ~W_AMUL) && !is_flyer(youmonst.data)) {
-            You_feel("like flying!");
-            if (!Levitation)
-                float_up();
-            makeknown(AMULET_OF_FLYING);
+        /* setworn() has already set extrinisic flying */
+        float_vs_flight(); /* block flying if levitating */
+        if (Flying) {
+            /* to determine whether this flight is new we have to muck
+               about in the Flying intrinsic (actually extrinsic) */
+            EFlying &= ~W_AMUL;
+            boolean already_flying = !!Flying;
+            EFlying |= W_AMUL;
+
+            if (!already_flying) {
+                flags.botl = TRUE; /* status: 'Fly' On */
+                You_feel("like flying!");
+                if (!Levitation) {
+                    float_up();
+                }
+                makeknown(AMULET_OF_FLYING);
+            }
         }
         break;
 
@@ -1061,16 +1073,24 @@ Amulet_off()
         }
         return;
 
-    case AMULET_OF_FLYING:
+    case AMULET_OF_FLYING: {
+        boolean was_flying = !!Flying;
+
+        /* remove amulet 'early' to determine whether Flying changes */
         setworn((struct obj *)0, W_AMUL);
-        (void) float_down(0L, 0L);
-        return;
+        float_vs_flight(); /* probably not needed here */
+        if (was_flying && !Flying) {
+            makeknown(AMULET_OF_FLYING);
+            flags.botl = TRUE; /* status: 'Fly' Off */
+            (void) float_down(0L, 0L);
+        }
+        break;
+    }
 
     case AMULET_OF_YENDOR:
         break;
     }
     setworn((struct obj *)0, W_AMUL);
-    return;
 }
 
 /* handle ring discovery; comparable to learnwand() */
