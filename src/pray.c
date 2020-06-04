@@ -2085,6 +2085,25 @@ doturn()
     return(1);
 }
 
+int
+altarmask_at(x, y)
+int x, y;
+{
+    int res = 0;
+
+    if (isok(x, y)) {
+        struct monst *mon = m_at(x, y);
+
+        if (mon && M_AP_TYPE(mon) == M_AP_FURNITURE &&
+             mon->mappearance == S_altar) {
+            res = has_mcorpsenm(mon) ? MCORPSENM(mon) : 0;
+        } else if (IS_ALTAR(levl[x][y].typ)) {
+            res = levl[x][y].altarmask;
+        }
+    }
+    return res;
+}
+
 const char *
 a_gname()
 {

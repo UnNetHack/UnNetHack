@@ -170,9 +170,25 @@ unsigned mgflags;
             color = CLR_WHITE;
         else if (iflags.use_color &&
                  (offset == S_upstair || offset == S_dnstair) &&
-                 (x == sstairs.sx && y == sstairs.sy))
+                 (x == sstairs.sx && y == sstairs.sy)) {
             color = CLR_YELLOW;
-        else
+        } else if (offset == S_altar && iflags.use_color) {
+            int amsk = altarmask_at(x, y); /* might be a mimic */
+
+            if (((Is_astralevel(&u.uz) || Is_sanctum(&u.uz))) && (amsk & AM_SHRINE)) {
+                /* high altar */
+                color = CLR_BRIGHT_MAGENTA;
+            } else {
+                switch (amsk & AM_MASK) {
+                case AM_NONE:
+                    color = CLR_RED;
+                    break;
+
+                default:
+                    cmap_color(S_altar); /* gray */
+                }
+            }
+        } else
 #endif
         cmap_color(offset);
     } else if ((offset = (glyph - GLYPH_OBJ_OFF)) >= 0) {   /* object */
