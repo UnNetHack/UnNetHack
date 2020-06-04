@@ -185,6 +185,8 @@ struct obj **potmp, **pobj;
         if (otmp->oclass == COIN_CLASS) {
             otmp->owt = weight(otmp);
             otmp->bknown = 0;
+        } else {
+            otmp->owt += obj->owt;
         }
         if (!has_oname(otmp) && has_oname(obj)) {
             otmp = *potmp = oname(otmp, ONAME(obj));
