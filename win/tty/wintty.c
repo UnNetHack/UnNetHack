@@ -3547,15 +3547,15 @@ tty_debug_show_colors()
 
     for (c = 0; c < CLR_MAX; c++) {
         sprintf(buf, " %2d %s ", c, clr2colorname(c));
-        while (strlen(buf) < 16) { strcat(buf, " "); }
+        while (strlen(buf) < 18) { strcat(buf, " "); }
         if (iflags.color_definitions[c]) {
-            sprintf(eos(buf), "  %06" PRIx64 " ", iflags.color_definitions[c]);
+            sprintf(eos(buf), "%06" PRIx64 " ", iflags.color_definitions[c]);
         }
         while (strlen(buf) < 26) { strcat(buf, " "); }
         sprintf(eos(buf), " %2d %s ", c, clr2colorname(c));
-        while (strlen(buf) < 42) { strcat(buf, " "); }
+        while (strlen(buf) < 44) { strcat(buf, " "); }
         if (iflags.color_definitions[c]) {
-            sprintf(eos(buf), "  %06" PRIx64 " ", iflags.color_definitions[c]);
+            sprintf(eos(buf), "%06" PRIx64 " ", iflags.color_definitions[c]);
         }
 
         for (i = 0; i < strlen(buf); i++) {
