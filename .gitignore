@@ -11,6 +11,7 @@ compile
 /TAGS
 /.svn
 
+
 # /dat/
 /dat/Makefile
 /dat/*.lev
@@ -26,6 +27,9 @@ compile
 /dat/rumors
 /dat/spec_levs
 /dat/vaults.dat
+/dat/UnNetHack.ad
+/dat/pet_mark.xbm
+/dat/x11tiles
 
 # /doc/
 /doc/Makefile
@@ -40,6 +44,7 @@ compile
 /include/lev_comp.h
 /include/onames.h
 /include/pm.h
+/include/tile.h
 /include/vis_tab.h
 /include/win32api.h
 
@@ -76,6 +81,7 @@ tests/wishing/test_wishing
 /util/makedefs
 /util/recover
 /util/tilemap
+/util/tile2x11
 
 # /win/
 /win/*/*.o
