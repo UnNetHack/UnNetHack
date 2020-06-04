@@ -2674,6 +2674,7 @@ nextclass:
                          &any, ilet, 0, ATR_NONE, doname(otmp),
                          MENU_UNSELECTED);
             if (want_dump) dump_object(ilet, otmp, doname(otmp));
+            gotsomething = TRUE;
         }
     }
 #else /* SORTLOOT */
@@ -2699,6 +2700,7 @@ nextclass:
                     add_menu(win, obj_to_glyph(otmp), otmp->quan,
                              &any, ilet, 0, ATR_NONE, doname(otmp),
                              MENU_UNSELECTED);
+                gotsomething = TRUE;
             }
         }
     }
