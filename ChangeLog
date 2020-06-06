@@ -34,6 +34,7 @@
 	  - Mark vibrating square automatically as trap after being found
 	  - Show statues underlined in tty and curses
 	  - Add inventory weight/carrycap and n/52 items display (from xNetHack)
+	  - Show maximal skill enhancement level in enhance menu
 
 	* bug fixes:
 	  - Fix over-escaping of characters on HTML dump map

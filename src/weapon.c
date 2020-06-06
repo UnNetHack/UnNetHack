@@ -1026,13 +1026,15 @@ boolean verbose;
 
 /* copy the skill level name into the given buffer */
 char *
-skill_level_name(skill, buf)
+skill_level_name(skill, buf, max)
 int skill;
 char *buf;
+boolean max;
 {
     const char *ptr;
 
-    switch (P_SKILL(skill)) {
+    skill = max ? P_MAX_SKILL(skill) : P_SKILL(skill);
+    switch (skill) {
     case P_UNSKILLED:    ptr = "Unskilled"; break;
     case P_BASIC:        ptr = "Basic";     break;
     case P_SKILLED:      ptr = "Skilled";   break;
@@ -1211,7 +1213,7 @@ int enhance_skill(boolean want_dump)
 {
     int pass, i, n, len, longest,
         to_advance, eventually_advance, maxxed_cnt, almost_advance;
-    char buf[BUFSZ], sklnambuf[BUFSZ];
+    char buf[BUFSZ];
     const char *prefix;
     menu_item *selected;
     anything any;
@@ -1304,10 +1306,10 @@ int enhance_skill(boolean want_dump)
                 if (want_dump) {
                     if (P_SKILL(i) > P_UNSKILLED) {
                         Sprintf(buf2, "%-*s [%s]",
-                                longest, P_NAME(i), skill_level_name(i, buf));
+                                longest, P_NAME(i), skill_level_name(i, buf, FALSE));
                         dump_text("    %s\n", buf2);
                         Sprintf(buf2, "<tr><td>%s</td><td>[%s]</td></tr>",
-                                P_NAME(i), skill_level_name(i, buf));
+                                P_NAME(i), skill_level_name(i, buf, FALSE));
                         dump_html("%s\n", buf2);
                         logged=TRUE;
                     } else if (i == skill_ranges[pass].last && !logged) {
@@ -1335,28 +1337,37 @@ int enhance_skill(boolean want_dump)
                     else
                         prefix = (to_advance + eventually_advance + maxxed_cnt +
                                   almost_advance > 0) ? "    " : "";
-                    (void) skill_level_name(i, sklnambuf);
+
+                    char tmp_buf[BUFSZ], skill_buf[BUFSZ], max_skill_buf[BUFSZ];
+                    (void) skill_level_name(i, skill_buf, FALSE);
+                    (void) skill_level_name(i, tmp_buf, TRUE);
+                    Sprintf(max_skill_buf, "(%s)", tmp_buf);
 #ifdef WIZARD
                     if (wizard) {
                         if (!iflags.menu_tab_sep)
-                            Sprintf(buf, " %s%-*s %-12s %5d(%4d)",
-                                    prefix, longest, P_NAME(i), sklnambuf,
+                            Sprintf(buf, " %s%-*s %-12s %-12s %5d(%4d)",
+                                    prefix, longest, P_NAME(i),
+                                    skill_buf, max_skill_buf,
                                     P_ADVANCE(i),
                                     practice_needed_to_advance(P_SKILL(i)));
                         else
-                            Sprintf(buf, " %s%s\t%s\t%5d(%4d)",
-                                    prefix, P_NAME(i), sklnambuf,
+                            Sprintf(buf, " %s%s\t%s\t%s\t%5d(%4d)",
+                                    prefix, P_NAME(i),
+                                    skill_buf, max_skill_buf,
                                     P_ADVANCE(i),
                                     practice_needed_to_advance(P_SKILL(i)));
                     } else
 #endif
                     {
-                        if (!iflags.menu_tab_sep)
-                            Sprintf(buf, " %s %-*s [%s]",
-                                    prefix, longest, P_NAME(i), sklnambuf);
-                        else
-                            Sprintf(buf, " %s%s\t[%s]",
-                                    prefix, P_NAME(i), sklnambuf);
+                        if (!iflags.menu_tab_sep) {
+                            Sprintf(buf, " %s %-*s %12s %s",
+                                    prefix, longest, P_NAME(i),
+                                    skill_buf, max_skill_buf);
+                        } else {
+                            Sprintf(buf, " %s%s\t%s\t%s]",
+                                    prefix, P_NAME(i),
+                                    skill_buf, max_skill_buf);
+                        }
                     }
                     any.a_int = can_advance(i, speedy) ? i+1 : 0;
                     add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
