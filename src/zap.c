@@ -531,6 +531,10 @@ struct monst *mtmp;
 
     mstatusline(mtmp);
     if (notonhead) return;  /* don't show minvent for long worm tail */
+    if (mtmp->data == &mons[PM_CTHULHU]) {
+        /* Cthulhu keeps his secrets */
+        return;
+    }
 
     if (mtmp->minvent) {
         for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
