@@ -1,5 +1,4 @@
 20XX-XX-XX  UnNetHack 6.X.X
-	* Use TAB as separator in xlogfile
 	* Add info about pre-seeded games to dumplog
 	* Seed is encoded as Crockford base32 string
 	* Set color default to false if env variable NO_COLOR is present
@@ -40,6 +39,10 @@
 	  - Show statues underlined in tty and curses
 	  - Add inventory weight/carrycap and n/52 items display (from xNetHack)
 	  - Show maximal skill enhancement level in enhance menu
+
+	* Xlogfile changes:
+	  - Use TAB as separator in xlogfile
+	  - Record number of normal and artifact wishes
 
 	* bug fixes:
 	  - Fix over-escaping of characters on HTML dump map
