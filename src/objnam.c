@@ -4028,7 +4028,7 @@ wiztrap:
             madeterrain = TRUE;
         }
 
-        if (!BSTRCMP(bp, p-4, "tree")) {
+        if (!BSTRCMP(bp, p-4, "tree") && !madeterrain) {
             levl[u.ux][u.uy].typ = TREE;
             pline("A tree.");
             block_point(u.ux, u.uy);
