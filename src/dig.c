@@ -20,8 +20,9 @@ enum dig_types {
     DIGTYP_STATUE,
     DIGTYP_BOULDER,
     DIGTYP_DOOR,
+    DIGTYP_TREE,
     DIGTYP_ICEWALL,
-    DIGTYP_TREE
+    DIGTYP_CRYSTAL_ICEWALL
 };
 
 static boolean
@@ -171,6 +172,7 @@ xchar x, y;
             ispick && sobj_at(BOULDER, x, y) ? DIGTYP_BOULDER :
             closed_door(x, y) ? DIGTYP_DOOR :
             ispick && IS_ICEWALL(levl[x][y].typ) ? DIGTYP_ICEWALL :
+            ispick && IS_CRYSTALICEWALL(levl[x][y].typ) ? DIGTYP_CRYSTAL_ICEWALL :
             IS_TREES(levl[x][y].typ) ?
             (ispick ? DIGTYP_UNDIGGABLE : DIGTYP_TREE) :
             ispick && IS_ROCK(levl[x][y].typ) &&
@@ -549,9 +551,9 @@ cleanup:
         return 0;
 
     } else {        /* not enough effort has been spent yet */
-        static const char *const d_target[7] = {
+        static const char *const d_target[8] = {
             "", "rock", "statue", "boulder", "door", "tree",
-            "ice wall"
+            "ice wall", "crystal ice wall"
         };
         int dig_target = dig_typ(uwep, dpx, dpy);
 
@@ -1403,6 +1405,8 @@ boolean zap;
                     str = "wall";
                 } else if (IS_ICEWALL(lev->typ)) {
                     str = "ice wall";
+                } else if (IS_CRYSTALICEWALL(lev->typ)) {
+                    str = "crystal ice wall";
                 } else {
                     str = "fountain";
                 }
