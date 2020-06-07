@@ -618,6 +618,26 @@ int val;
     return rt;
 }
 
+/** integer log2 function without using floating point.
+ *
+ * @returns rounded down log2 value, or -1 if value <= 0
+ */
+int
+ilog2(value)
+int value;
+{
+    if (value <= 0) {
+        return -1;
+    }
+
+    int ret = 0;
+    while (value >>= 1) {
+        ret++;
+    }
+
+    return ret;
+}
+
 /* are two points lined up (on a straight line)? */
 boolean
 online2(x0, y0, x1, y1)

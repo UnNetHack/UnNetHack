@@ -32,6 +32,7 @@
 	    - Prevent giant spiders appearing out of depth
 	    - Spider nests might have cave spiders on low levels
 	  - Prevent dungeon feature generation on stairs
+	  - Level with trees have a chance of an additional axe
 
 	* user interface improvements:
 	  - Optimized placement of menu windows in TTY port
