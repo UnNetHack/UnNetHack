@@ -964,4 +964,8 @@ int max_points;
     }
 }
 
+const char *__asan_default_options() {
+      return "print_legend=1:print_stats=1:print_summary=1:log_path=/home/bubi/c/unnethack/sandkasten/spear_update/asan/asan.log:strip_path_prefix=/home/bubi/c/unnethack/sandkasten/spear_update/:abort_on_error=1:disable_coredump=0:unmap_shadow_on_exit=1:detect_stack_use_after_return=true:verbosity=3:strict_string_checks=true:detect_leaks=0:check_initialization_order=1";
+}
+
 /*allmain.c*/
