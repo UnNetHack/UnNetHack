@@ -4657,6 +4657,9 @@ sel_set_ter(x, y, arg)
 int x, y;
 genericptr_t arg;
 {
+    if (levl[x][y].typ == STAIRS) {
+        return;
+    }
     terrain terr;
 
     terr = (*(terrain *)arg);

@@ -28,6 +28,7 @@
 	  - Themed rooms:
 	    - Prevent giant spiders appearing out of depth
 	    - Spider nests might have cave spiders on low levels
+	  - Prevent dungeon feature generation on stairs
 
 	* user interface improvements:
 	  - Optimized placement of menu windows in TTY port
