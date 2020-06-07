@@ -507,6 +507,7 @@ Helmet_on()
            disrobe) or maybe lava (probably not, helm isn't 'organic') */
         uchangealign((u.ualign.type != A_NEUTRAL) ? -u.ualign.type :
                      (uarmh->o_id % 2) ? A_CHAOTIC : A_LAWFUL, 1);
+        docrt(); /* altar highlighting might have changed */
         /* fall through */
 
     case DUNCE_CAP:
@@ -592,6 +593,7 @@ Helmet_off()
            properties, including levitation; uarmh could get
            dropped or destroyed here */
         uchangealign(u.ualignbase[A_CURRENT], 2);
+        docrt(); /* altar highlighting might have changed */
         break;
 
     default:

@@ -185,7 +185,11 @@ unsigned mgflags;
                     break;
 
                 default:
-                    cmap_color(S_altar); /* gray */
+                    if (Amask2align(amsk & AM_MASK) == u.ualign.type) {
+                        color = CLR_WHITE;
+                    } else {
+                        cmap_color(S_altar); /* gray */
+                    }
                 }
             }
         } else
