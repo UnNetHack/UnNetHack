@@ -22,6 +22,9 @@
 	  - Interactive extended command list
 	  - Allow vampires to transform into fog clouds to pass closed doors
 
+	* artifact changes:
+	  - Removed artifact wish failure due to the number of existing artifacts
+
 	* dungeon layout:
 	  - Disable the rogue tribute level
 	  - Adjust monster distribution for dilapidated armories
