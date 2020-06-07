@@ -11,6 +11,7 @@ STATIC_DCL int FDECL(disturb, (struct monst *));
 STATIC_DCL void FDECL(distfleeck, (struct monst *, int *, int *, int *));
 STATIC_DCL int FDECL(m_arrival, (struct monst *));
 STATIC_DCL void FDECL(watch_on_duty, (struct monst *));
+static int FDECL(vamp_shift, (struct monst *, struct permonst *, BOOLEAN_P));
 
 static void make_group_attackers_flee(struct monst* mtmp);
 static void share_hp(struct monst* mon1, struct monst* mon2);
@@ -1419,6 +1420,35 @@ postmov:
             /* normal monster move will already have <nix,niy>,
                but pet dog_move() with 'goto postmov' won't */
             nix = mtmp->mx, niy = mtmp->my;
+            /* sequencing issue:  when monster movement decides that a
+               monster can move to a door location, it moves the monster
+               there before dealing with the door rather than after;
+               so a vampire/bat that is going to shift to fog cloud and
+               pass under the door is already there but transformation
+               into fog form--and its message, when in sight--has not
+               happened yet; we have to move monster back to previous
+               location before performing the vamp_shift() to make the
+               message happen at right time, then back to the door again
+               [if we did the shift above, before moving the monster,
+               we would need to duplicate it in dog_move()...] */
+            if (is_vampshifter(mtmp) && !amorphous(mtmp->data) &&
+                 IS_DOOR(levl[nix][niy].typ) &&
+                 ((levl[nix][niy].doormask & (D_LOCKED | D_CLOSED)) != 0) &&
+                 can_fog(mtmp)) {
+                if (sawmon) {
+                    remove_monster(nix, niy);
+                    place_monster(mtmp, omx, omy);
+                    newsym(nix, niy), newsym(omx, omy);
+                }
+                if (vamp_shift(mtmp, &mons[PM_FOG_CLOUD], sawmon)) {
+                    ptr = mtmp->data; /* update cached value */
+                }
+                if (sawmon) {
+                    remove_monster(omx, omy);
+                    place_monster(mtmp, nix, niy);
+                    newsym(omx, omy), newsym(nix, niy);
+                }
+            }
 
             newsym(omx, omy); /* update the old position */
             if (mintrap(mtmp) >= 2) {
@@ -1435,14 +1465,24 @@ postmov:
                 struct rm *here = &levl[mtmp->mx][mtmp->my];
                 boolean btrapped = (here->doormask & D_TRAPPED);
 
-                if(here->doormask & (D_LOCKED|D_CLOSED) && amorphous(ptr)) {
+                /* if mon has MKoT, disarm door trap; no message given */
+                if (btrapped && has_magic_key(mtmp)) {
+                    /* BUG: this lets a vampire or blob or a doorbuster
+                       holding the Key disarm the trap even though it isn't
+                       using that Key when squeezing under or smashing the
+                       door.  Not significant enough to worry about; perhaps
+                       the Key's magic is more powerful for monsters? */
+                    here->doormask &= ~D_TRAPPED;
+                    btrapped = FALSE;
+                }
+                if (here->doormask & (D_LOCKED|D_CLOSED) && amorphous(ptr)) {
                     if (flags.verbose && canseemon(mtmp))
                         pline("%s %s under the door.", Monnam(mtmp),
                               (ptr == &mons[PM_FOG_CLOUD] ||
-                               ptr == &mons[PM_YELLOW_LIGHT])
+                               ptr->mlet == S_LIGHT)
                               ? "flows" : "oozes");
-                } else if(here->doormask & D_LOCKED && can_unlock) {
-                    if(btrapped) {
+                } else if (here->doormask & D_LOCKED && can_unlock) {
+                    if (btrapped) {
                         here->doormask = D_NODOOR;
                         newsym(mtmp->mx, mtmp->my);
                         unblock_point(mtmp->mx, mtmp->my); /* vision */

@@ -20,6 +20,7 @@
 	  - AUTOCOMPLETE option to disable or enable autocompletion for
 	    extended commands
 	  - Interactive extended command list
+	  - Allow vampires to transform into fog clouds to pass closed doors
 
 	* dungeon layout:
 	  - Disable the rogue tribute level

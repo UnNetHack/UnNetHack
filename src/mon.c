@@ -1376,9 +1376,12 @@ nexttry:    /* eels prefer the water, but if there is no water nearby,
                 continue;
             }
             if (IS_DOOR(ntyp) && !amorphous(mdat) &&
-               ((levl[nx][ny].doormask & D_CLOSED && !(flag & OPENDOOR)) ||
-                (levl[nx][ny].doormask & D_LOCKED && !(flag & UNLOCKDOOR))) &&
-               !thrudoor) continue;
+                !(amorphous(mdat) || can_fog(mon)) &&
+                ((levl[nx][ny].doormask & D_CLOSED && !(flag & OPENDOOR)) ||
+                 (levl[nx][ny].doormask & D_LOCKED && !(flag & UNLOCKDOOR))) &&
+                !thrudoor) {
+                continue;
+            }
             /* avoid poison gas? */
             if (!poisongas_ok &&
                 !in_poisongas &&
