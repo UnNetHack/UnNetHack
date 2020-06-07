@@ -1356,6 +1356,8 @@ register int mmflags;
         mtmp->cham = mcham;
         /* Vlad stays in his normal shape so he can carry the Candelabrum */
         if (mndx != PM_VLAD_THE_IMPALER &&
+            /* don't generate vampires polymorphed */
+            !is_vampire(mtmp->data) &&
             /* Note:  shapechanger's initial form used to be chosen here
                with rndmonst(), yielding a monster which was appropriate
                to the level's difficulty but ignoring the changer's usual
