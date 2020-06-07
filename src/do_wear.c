@@ -525,6 +525,7 @@ Helmet_on()
             You_feel("%s.", /* track INT change; ignore WIS */
                      ACURR(A_INT) <= (ABASE(A_INT) + ABON(A_INT) + ATEMP(A_INT)) ?
                      "like sitting in a corner" : "giddy");
+            makeknown(DUNCE_CAP);
         } else {
             /* [message formerly given here moved to uchangealign()] */
             makeknown(HELM_OF_OPPOSITE_ALIGNMENT);
@@ -566,6 +567,7 @@ Helmet_off()
 
     case DUNCE_CAP:
         flags.botl = 1;
+        makeknown(DUNCE_CAP);
         break;
 
     case CORNUTHAUM:
