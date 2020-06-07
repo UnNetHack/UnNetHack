@@ -1867,6 +1867,13 @@ boolean want_disp;
             you_have_X(buf);
         }
 
+        if (u.uconduct.wisharti) {
+            Sprintf(buf, "used %ld wish%s for %s",
+                    u.uconduct.wisharti, (u.uconduct.wisharti > 1L) ? "es" : "",
+                    (u.uconduct.wisharti == 1L) ? "an artifact" : "artifacts");
+            you_have_X(buf);
+        }
+
         if (!u.uconduct.wisharti)
             enl_msg(You_, "have not wished", "did not wish",
                     " for any artifacts");
