@@ -422,6 +422,7 @@ struct toptenentry *tt;
                                          "normal"));
     (void)fprintf(rfile, SEP "gold=%ld", money_cnt(invent));
     (void)fprintf(rfile, SEP "wish_cnt=%ld", u.uconduct.wishes);
+    (void)fprintf(rfile, SEP "magic_wish_cnt=%ld", u.uconduct.wishmagic);
     (void)fprintf(rfile, SEP "arti_wish_cnt=%ld", u.uconduct.wisharti);
     (void)fprintf(rfile, SEP "rngseed=u%s", encode_base32(level_info[0].seed));
     (void)fprintf(rfile, SEP "user_seed=%u", is_game_pre_seeded ? 1 : 0);

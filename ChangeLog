@@ -43,7 +43,7 @@
 
 	* Xlogfile changes:
 	  - Use TAB as separator in xlogfile
-	  - Record number of normal and artifact wishes
+	  - Record number of normal, magical, and artifact wishes
 
 	* bug fixes:
 	  - Fix over-escaping of characters on HTML dump map
