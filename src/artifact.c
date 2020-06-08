@@ -2156,7 +2156,11 @@ boolean loseit;    /* whether to drop it if hero can longer touch it */
     if (touch_artifact(obj, &youmonst)) {
         char buf[BUFSZ];
         int dmg = 0, tmp;
+#if 0
         boolean ag = (objects[obj->otyp].oc_material == SILVER && Hate_silver);
+#else
+        boolean ag = FALSE;
+#endif
         boolean bane = bane_applies(get_artifact(obj), &youmonst);
 
         /* nothing else to do if hero can successfully handle this object */
