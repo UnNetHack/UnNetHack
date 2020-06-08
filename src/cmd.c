@@ -2075,7 +2075,7 @@ struct ext_func_tab extcmdlist[] = {
 #ifdef DEBUG
     {  '\0',  "wizbury", "bury objs under and around you", wiz_debug_cmd_bury, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
 #endif
-    { C('e'), "wizdetect", "reveal hidden things within a small radius", wiz_detect, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
+    {  '\0',  "wizdetect", "reveal hidden things within a small radius", wiz_detect, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
 #ifdef DEBUG
     {  '\0',  "wizdebug", "wizard debug command", wiz_debug_cmd, AUTOCOMPLETE | WIZMODECMD },
 #endif
