@@ -1229,7 +1229,7 @@ struct obj *otmp;
         return 0;
 
     /* hostile monsters who like gold will pick up the whole stack;
-       tame mosnters with hands will pick up the partial stack */
+       tame monsters with hands will pick up the partial stack */
     int iquan = (otmp->quan > (long)LARGEST_INT) ? 20000 + rn2(LARGEST_INT-20000+1) : (int)otmp->quan;
 
     /* monsters without hands can't pick up multiple objects at once
@@ -1251,8 +1251,21 @@ struct obj *otmp;
                 }
             }
         }
-        if ((mtmp->data->mflags1 & M1_NOHANDS) && !glomper) {
-            return 1;
+        if (nohands(mtmp->data) && !glomper) {
+            /* a big mouth can carry a lot */
+            if (!has_head(mtmp->data)) {
+                return 1;
+            }
+            /* limit how many gold pieces monsters with no hands can lift */
+            if (otmp->oclass == COIN_CLASS) {
+                if (iquan > 200) {
+                    iquan = d(6, 50);
+                    int saved_quan = otmp->quan;
+                    otmp->quan = iquan;
+                    newload = weight(otmp);
+                    otmp->quan = saved_quan;
+                }
+            }
         }
     }
 

@@ -478,7 +478,7 @@ int udist;
             carryamt = can_carry(mtmp, obj);
             if (carryamt > 0 && !obj->cursed &&
                  could_reach_item(mtmp, obj->ox, obj->oy)) {
-                if(rn2(20) < edog->apport+3) {
+                if (rn2(20) < edog->apport+3) {
                     if (rn2(udist) || !rn2(edog->apport)) {
                         otmp = obj;
                         if (carryamt != obj->quan) {
