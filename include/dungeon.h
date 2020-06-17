@@ -5,13 +5,13 @@
 #ifndef DUNGEON_H
 #define DUNGEON_H
 
-typedef struct d_flags {    /* dungeon/level type flags */
-    Bitfield(town, 1);  /* is this a town? (levels only) */
-    Bitfield(hellish, 1);   /* is this part of hell? */
-    Bitfield(maze_like, 1); /* is this a maze? */
+typedef struct d_flags {     /* dungeon/level type flags */
+    Bitfield(town, 1);       /* is this a town? (levels only) */
+    Bitfield(hellish, 1);    /* is this part of hell? */
+    Bitfield(maze_like, 1);  /* is this a maze? */
     Bitfield(rogue_like, 1); /* is this an old-fashioned presentation? */
-    Bitfield(align, 3); /* dungeon alignment. */
-    Bitfield(unused, 1);    /* etc... */
+    Bitfield(align, 3);      /* dungeon alignment. */
+    Bitfield(unused, 1);     /* etc... */
 } d_flags;
 
 typedef struct d_level {    /* basic dungeon level element */
@@ -19,13 +19,13 @@ typedef struct d_level {    /* basic dungeon level element */
     xchar dlevel;       /* level number */
 } d_level;
 
-typedef struct s_level {    /* special dungeon level element */
+typedef struct s_level { /* special dungeon level element */
     struct  s_level *next;
-    d_level dlevel;     /* dungeon & level numbers */
-    char proto[15];     /* name of prototype file (eg. "tower") */
-    char boneid;        /* character to id level in bones files */
-    uchar rndlevs;      /* no. of randomly available similar levels */
-    d_flags flags;      /* type flags */
+    d_level dlevel; /* dungeon & level numbers */
+    char proto[15]; /* name of prototype file (eg. "tower") */
+    char boneid;    /* character to id level in bones files */
+    uchar rndlevs;  /* no. of randomly available similar levels */
+    d_flags flags;  /* type flags */
 } s_level;
 
 typedef struct stairway {   /* basic stairway identifier */
@@ -167,10 +167,11 @@ typedef struct branch {
 
 struct linfo {
     unsigned char flags;
-#define VISITED     0x01    /* hero has visited this level */
-#define FORGOTTEN   0x02    /* hero will forget this level when reached */
-#define LFILE_EXISTS    0x04    /* a level file exists for this level */
-#define PRE_SEEDED  0x08    /* dungeon was generated with user supplied seed */
+#define VISITED      0x01    /* hero has visited this level */
+#define FORGOTTEN    0x02    /* hero will forget this level when reached */
+#define LFILE_EXISTS 0x04    /* a level file exists for this level */
+#define PRE_SEEDED   0x08    /* dungeon was generated with user supplied seed */
+#define BONES_LEVEL  0x10    /* this level was a bones level */
 #define is_game_pre_seeded (level_info[0].flags & PRE_SEEDED)
     unsigned int seed;      /* level seed */
 /*

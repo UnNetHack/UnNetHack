@@ -1282,7 +1282,10 @@ mklev()
     set_random_state(level_info[ledger_no(&u.uz)].seed);
 
     init_mapseen(&u.uz);
-    if(getbones()) return;
+    if (getbones()) {
+        level_info[ledger_no(&u.uz)].flags |= BONES_LEVEL;
+        return;
+    }
     in_mklev = TRUE;
     makelevel();
     bound_digging();

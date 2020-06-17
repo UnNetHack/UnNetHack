@@ -65,7 +65,7 @@ STATIC_DCL mapseen *FDECL(load_mapseen, (int));
 STATIC_DCL void FDECL(save_mapseen, (int, mapseen *));
 STATIC_DCL mapseen *FDECL(find_mapseen, (d_level *));
 STATIC_DCL void FDECL(print_mapseen, (winid, mapseen *, boolean, boolean, boolean));
-STATIC_DCL boolean FDECL(interest_mapseen, (mapseen *));
+static boolean FDECL(interest_mapseen, (mapseen *, boolean));
 STATIC_DCL char *FDECL(seen_string, (xchar, const char *));
 STATIC_DCL const char *FDECL(br_string2, (branch *));
 
@@ -2393,9 +2393,18 @@ d_level *lev;
 
 /* returns true if this level has something interesting to print out */
 STATIC_OVL boolean
-interest_mapseen(mptr)
+interest_mapseen(mptr, final)
 mapseen *mptr;
+boolean final; /**< if game is finished */
 {
+    /* bones level by itself is interesting, even if nothing else on it is */
+    if (wizard || final) {
+        boolean bones = (level_info[ledger_no(&mptr->lev)].flags & BONES_LEVEL);
+        if (bones) {
+            return TRUE;
+        }
+    }
+
     if (on_level(&u.uz, &mptr->lev)) {
         return TRUE;
     }
@@ -2735,7 +2744,7 @@ int reason; /* how hero died; used when disclosing end-of-game level */
     for (mptr = mapseenchn; mptr; mptr = mptr->next) {
 
         /* only print out info for a level or a dungeon if interest */
-        if (interest_mapseen(mptr)) {
+        if (interest_mapseen(mptr, FALSE)) {
             printdun = (first || lastdun != mptr->lev.dnum);
             /* if (!first) putstr(win, 0, ""); */
             print_mapseen(win, mptr, printdun, FALSE, FALSE);
@@ -2773,7 +2782,7 @@ dumpoverview()
             previous_was_interesting = FALSE;
         }
         /* only print out info for a level or a dungeon if interest */
-        if (interest_mapseen(mptr)) {
+        if (interest_mapseen(mptr, TRUE)) {
             previous_was_interesting = TRUE;
             printdun = (first || lastdun != mptr->lev.dnum);
 
@@ -2991,9 +3000,23 @@ print_mapseen(
 #ifdef WIZARD
     /* wizmode prints out proto dungeon names for clarity */
     if (wizard || final) {
-        s_level *slev;
-        if ((slev = Is_special(&mptr->lev)))
-            Sprintf(eos(buf), " [%s]", slev->proto);
+        s_level *slev = Is_special(&mptr->lev);
+        boolean bones = (level_info[ledger_no(&mptr->lev)].flags & BONES_LEVEL);
+        if (slev || bones) {
+            Sprintf(eos(buf), " [");
+        }
+        if (slev) {
+            Sprintf(eos(buf), "%s", slev->proto);
+        }
+        if (slev && bones) {
+            Sprintf(eos(buf), ", ");
+        }
+        if (bones) {
+            Sprintf(eos(buf), "bones");
+        }
+        if (slev || bones) {
+            Sprintf(eos(buf), "]");
+        }
     }
 #endif
 

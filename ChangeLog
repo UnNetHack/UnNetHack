@@ -8,6 +8,8 @@
 	  count
 	* Enable GOLDOBJ unconditionally and remove obsolete code
 	* Rename the Dark One to Anaraxis the Black (from xNetHack)
+	* Show bones level in dungeon overview
+
 	* Port NetHack 3.6 improvements, non exhaustive list:
 	  - Automatic fuzzer for debugging
 	  - Statues as monster symbols
