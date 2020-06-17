@@ -371,7 +371,6 @@ impossible VA_DECL(const char *, s)
     pline("%s", pbuf);
     pline("Program in disorder; you probably should S)ave and restart the process.");
     program_state.in_impossible = 0;
-    abort();
     VA_END();
 }
 
@@ -385,8 +384,6 @@ warning VA_DECL(const char *, s)
     pbuf[BUFSZ-1] = '\0'; /* sanity */
     paniclog("warning", pbuf);
     pline("Warning: %s\n", pbuf);
-    dosave0();
-    abort();
     if (iflags.debug_fuzzer) {
         panic("Warning: %s", pbuf);
     }
