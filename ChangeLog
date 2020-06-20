@@ -42,6 +42,7 @@
 	  - Show statues underlined in tty and curses
 	  - Add inventory weight/carrycap and n/52 items display (from xNetHack)
 	  - Show maximal skill enhancement level in enhance menu
+	  - Allow player with both hands cursed to use containers if they have a head
 
 	* Xlogfile changes:
 	  - Use TAB as separator in xlogfile

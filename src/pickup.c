@@ -2627,7 +2627,8 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
     abort_looting = FALSE;
     emptymsg[0] = '\0';
 
-    if (!u_handsy()) {
+    /* let the hero be creative with their body parts */
+    if (!has_head(youmonst.data) && !u_handsy()) {
         return 0;
     }
 
