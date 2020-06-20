@@ -490,6 +490,8 @@ int what; /* should be a long */
     struct obj *objchain;
     int traverse_how;
 
+    flags.last_picked_up_otyp = STRANGE_OBJECT;
+
     /* we might have arrived here while fainted or sleeping, via
        random teleport or levitation timeout; if so, skip check_here
        and read_engr_at in addition to bypassing autopickup itself
@@ -1518,6 +1520,7 @@ boolean telekinesis; /* not picking it up directly by hand */
                       telekinesis ? "raise" : "pick",
                       (obj->quan == 1L) ? "it" : "them");
             makeknown(obj->otyp);
+            flags.last_picked_up_otyp = obj->otyp;
             useupf(obj, obj->quan);
             return 1; /* tried to pick something up and failed, but
                          don't want to terminate pickup loop yet   */
@@ -1545,6 +1548,8 @@ boolean telekinesis; /* not picking it up directly by hand */
     prinv(nearload == SLT_ENCUMBER ? moderateloadmsg : (char *) 0,
           obj, count);
     mrg_to_wielded = FALSE;
+
+    flags.last_picked_up_otyp = obj->otyp;
 
     if (Is_sokoprize(obj)) {
         makeknown(obj->otyp); /* obj is already known */

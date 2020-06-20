@@ -2083,6 +2083,7 @@ boolean hero_caused; /* is this the hero's fault? */
 boolean from_invent;
 {
     boolean fracture = FALSE;
+    flags.last_broken_otyp = obj->otyp;
 
     int am;
     if (IS_ALTAR(levl[x][y].typ))

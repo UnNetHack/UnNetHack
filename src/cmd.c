@@ -1646,13 +1646,25 @@ int typ;
         any.a_int = 4;
         add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'd', 'f', ATR_NONE, "Annotate the current level", MENU_UNSELECTED);
 
+        char let = 'e';
         if ((flags.last_broken_otyp != STRANGE_OBJECT) &&
+            (objects[flags.last_broken_otyp].oc_uname == NULL) &&
             (!objects[flags.last_broken_otyp].oc_name_known)) {
             char buf[BUFSZ];
             Sprintf(buf, "Name %s (last broken object)",
                     an(obj_typename(flags.last_broken_otyp)));
             any.a_int = 5;
-            add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'e', 'V', ATR_NONE, buf, MENU_UNSELECTED);
+            add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, let++, 'V', ATR_NONE, buf, MENU_UNSELECTED);
+        }
+
+        if ((flags.last_picked_up_otyp != STRANGE_OBJECT) &&
+            (objects[flags.last_picked_up_otyp].oc_uname == NULL) &&
+            (!objects[flags.last_picked_up_otyp].oc_name_known)) {
+            char buf[BUFSZ];
+            Sprintf(buf, "Name %s (last picked up object)",
+                    an(obj_typename(flags.last_picked_up_otyp)));
+            any.a_int = 6;
+            add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, let++, 'P', ATR_NONE, buf, MENU_UNSELECTED);
         }
 
         any.a_int = 0;
@@ -1673,11 +1685,13 @@ int typ;
     default: break;
     case 0: do_mname(); break;
     /* cases 1 & 2 duplicated from ddocall() */
+
     case 1:
         allowall[0] = ALL_CLASSES; allowall[1] = '\0';
         obj = getobj(allowall, "name");
         if(obj) do_oname(obj);
         break;
+
     case 2:
         obj = getobj(callable, "call");
         if (obj) {
@@ -1693,11 +1707,17 @@ int typ;
             docall(obj);
         }
         break;
+
     case 3:
         donamelevel();
         break;
+
     case 4:
         docall_input(flags.last_broken_otyp);
+        break;
+
+    case 5:
+        docall_input(flags.last_picked_up_otyp);
         break;
     }
     return 0;
