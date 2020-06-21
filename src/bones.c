@@ -116,6 +116,7 @@ boolean restore;
             otmp->no_charge = 0;
             otmp->was_thrown = 0;
             otmp->was_dropped = 0;
+            otmp->picked_up_turn = 0;
 
             /* strip user-supplied names */
             /* Statue and some corpse names are left intact,

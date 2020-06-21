@@ -304,6 +304,7 @@ enum hmon_atkmode_types {
 #define BUC_ALLBKNOWN (BUC_BLESSED|BUC_CURSED|BUC_UNCURSED)
 #define BUCX_TYPES (BUC_ALLBKNOWN | BUC_UNKNOWN)
 #define UNIDENTIFIED_TYPES 0x800
+#define RECENTLY_PICKED_UP 0x1000
 #define ALL_TYPES_SELECTED -2
 
 /* Flags to control find_mid() */

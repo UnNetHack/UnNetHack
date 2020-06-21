@@ -124,6 +124,7 @@ struct obj {
     unsigned oeaten;        /* nutrition left in food, if partly eaten */
     long age;               /* creation date */
     long owornmask;
+    long picked_up_turn;    /* keep track of when obj got picked up */
     struct oextra *oextra;  /* pointer to oextra struct */
 };
 

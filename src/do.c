@@ -878,6 +878,7 @@ int retry;
         n = query_category("Drop what type of items?",
                            invent,
                            UNIDENTIFIED_TYPES | UNPAID_TYPES | ALL_TYPES | CHOOSE_ALL |
+                           RECENTLY_PICKED_UP |
                            BUC_BLESSED | BUC_CURSED | BUC_UNCURSED | BUC_UNKNOWN,
                            &pick_list, PICK_ANY);
         if (!n) goto drop_done;

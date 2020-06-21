@@ -326,7 +326,7 @@ struct obj *obj;
    (with room for all object classes, 'u'npaid, BUCX, and terminator) */
 static char valid_menu_classes[MAXOCLASSES + 10];
 static boolean class_filter, bucx_filter, shop_filter;
-static boolean unidentified_filter;
+static boolean unidentified_filter, recently_picked_up_filter;
 
 /* check valid_menu_classes[] for an entry; also used by askchain() */
 boolean
@@ -346,7 +346,7 @@ int c;
         /* reset */
         vmc_count = 0;
         class_filter = bucx_filter = shop_filter = FALSE;
-        unidentified_filter = FALSE;
+        unidentified_filter = recently_picked_up_filter = FALSE;
     } else if (!menu_class_present(c)) {
         valid_menu_classes[vmc_count++] = (char) c;
         /* categorize the new class */
@@ -366,6 +366,10 @@ int c;
 
         case 'I':
             unidentified_filter = TRUE;
+            break;
+
+        case 'P':
+            recently_picked_up_filter = TRUE;
             break;
 
         default:
@@ -403,7 +407,7 @@ struct obj *obj;
      * If no class filtering is specified but bless/curse state is,
      * coins are always ignored.
      */
-    if (obj->oclass == COIN_CLASS) {
+    if (obj->oclass == COIN_CLASS && !recently_picked_up_filter) {
         return class_filter ? (index(valid_menu_classes, COIN_CLASS) ? TRUE : FALSE) :
                /* coins are never unpaid, but check anyway */
                shop_filter ? (obj->unpaid ? TRUE : FALSE) :
@@ -438,6 +442,11 @@ struct obj *obj;
     }
 
     if (unidentified_filter && !not_fully_identified(obj)) {
+        return FALSE;
+    }
+
+    if (recently_picked_up_filter &&
+         get_recently_picked_up_turn() > obj->picked_up_turn) {
         return FALSE;
     }
 
@@ -1016,12 +1025,16 @@ int how;               /* type of query */
     boolean do_unidentified = FALSE;
     boolean do_blessed = FALSE, do_cursed = FALSE, do_uncursed = FALSE,
             do_buc_unknown = FALSE;
+    boolean do_picked_up = FALSE;
     int num_buc_types = 0;
 
     *pick_list = (menu_item *) 0;
     if (!olist) return 0;
     if ((qflags & UNPAID_TYPES) && count_unpaid(olist)) do_unpaid = TRUE;
     if ((qflags & UNIDENTIFIED_TYPES) && count_unidentified(olist)) do_unidentified = TRUE;
+    if ((qflags & RECENTLY_PICKED_UP) && get_recently_picked_up_turn() > 0) {
+        do_picked_up = TRUE;
+    }
     if (qflags & WORN_TYPES) {
         ofilter = is_worn;
     }
@@ -1147,6 +1160,14 @@ int how;               /* type of query */
         any.a_int = 'I';
         add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
                  "Unidentified items", MENU_UNSELECTED);
+    }
+    /* unidentifed items if there are any */
+    if (do_picked_up) {
+        invlet = 'P';
+        any = zeroany;
+        any.a_int = 'P';
+        add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
+                 "Items most recently picked up", MENU_UNSELECTED);
     }
     /* items with b/u/c/unknown if there are any;
        this cluster of menu entries is in alphabetical order,
@@ -1550,6 +1571,7 @@ boolean telekinesis; /* not picking it up directly by hand */
     mrg_to_wielded = FALSE;
 
     flags.last_picked_up_otyp = obj->otyp;
+    obj->picked_up_turn = moves;
 
     if (Is_sokoprize(obj)) {
         makeknown(obj->otyp); /* obj is already known */
@@ -2967,6 +2989,9 @@ boolean put_in;
         all_categories = FALSE;
         Sprintf(buf, "%s what type of objects?", action);
         mflags = (ALL_TYPES | UNPAID_TYPES | BUCX_TYPES | CHOOSE_ALL | UNIDENTIFIED_TYPES);
+        if (put_in) {
+            mflags |= RECENTLY_PICKED_UP;
+        }
         n = query_category(buf, put_in ? invent : current_container->cobj,
                            mflags, &pick_list, PICK_ANY);
         if (!n) return 0;
