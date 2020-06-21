@@ -578,9 +578,6 @@ struct proto_dungeon *pd;
     struct tmplevel *tlevel = &pd->tmplevel[proto_index];
 
     pd->final_lev[proto_index] = (s_level *) 0; /* no "real" level */
-#ifdef WIZARD
-    if (!wizard)
-#endif
     if (tlevel->chance <= rn2(100)) return;
 
     pd->final_lev[proto_index] = new_level =
@@ -815,10 +812,7 @@ init_dungeons()
     for (i = 0; i < n_dgns; i++) {
         Fread((genericptr_t)&pd.tmpdungeon[i],
               sizeof(struct tmpdungeon), 1, dgn_file);
-#ifdef WIZARD
-        if(!wizard)
-#endif
-        if(pd.tmpdungeon[i].chance && (pd.tmpdungeon[i].chance <= rn2(100))) {
+        if (pd.tmpdungeon[i].chance && (pd.tmpdungeon[i].chance <= rn2(100))) {
             int j;
 
             /* skip over any levels or branches */
