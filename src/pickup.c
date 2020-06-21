@@ -326,6 +326,7 @@ struct obj *obj;
    (with room for all object classes, 'u'npaid, BUCX, and terminator) */
 static char valid_menu_classes[MAXOCLASSES + 10];
 static boolean class_filter, bucx_filter, shop_filter;
+static boolean unidentified_filter;
 
 /* check valid_menu_classes[] for an entry; also used by askchain() */
 boolean
@@ -345,6 +346,7 @@ int c;
         /* reset */
         vmc_count = 0;
         class_filter = bucx_filter = shop_filter = FALSE;
+        unidentified_filter = FALSE;
     } else if (!menu_class_present(c)) {
         valid_menu_classes[vmc_count++] = (char) c;
         /* categorize the new class */
@@ -353,12 +355,19 @@ int c;
         case 'U':
         case 'C':
             /* fall through */
+
         case 'X':
             bucx_filter = TRUE;
             break;
+
         case 'u':
             shop_filter = TRUE;
             break;
+
+        case 'I':
+            unidentified_filter = TRUE;
+            break;
+
         default:
             class_filter = TRUE;
             break;
@@ -399,6 +408,7 @@ struct obj *obj;
                /* coins are never unpaid, but check anyway */
                shop_filter ? (obj->unpaid ? TRUE : FALSE) :
                bucx_filter ? FALSE :
+               unidentified_filter ? FALSE :
                TRUE; /* catchall: no filters specified, so accept */
     }
 
@@ -414,6 +424,7 @@ struct obj *obj;
     if (shop_filter && !obj->unpaid && !(Has_contents(obj) && count_unpaid(obj->cobj) > 0)) {
         return FALSE;
     }
+
     if (bucx_filter) {
         /* first categorize this object's bless/curse state */
         char bucx = !obj->bknown ? 'X' :
@@ -425,6 +436,11 @@ struct obj *obj;
             return FALSE;
         }
     }
+
+    if (unidentified_filter && !not_fully_identified(obj)) {
+        return FALSE;
+    }
+
     /* obj didn't fail any of the filter checks, so accept */
     return TRUE;
 }
