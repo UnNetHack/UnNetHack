@@ -3350,8 +3350,8 @@ xchar x, y;
         } else if (sell_response != 'n') {
             pline("%s cannot pay you at present.", Monnam(shkp));
             Sprintf(qbuf,
-                    "Will you accept %ld %s in credit for %s?",
-                    tmpcr, currency(tmpcr), doname(obj));
+                    "Will you accept %ld %s in credit for ",
+                    tmpcr, currency(tmpcr));
             /* won't accept 'a' response here */
             /* KLY - 3/2000 yes, we will, it's a damn nuisance
                        to have to constantly hit 'y' to sell for credit */
