@@ -2055,6 +2055,7 @@ E void FDECL(altar_wrath, (int, int));
 E int FDECL(invoke_amulet, (struct obj *));
 #endif
 E int NDECL(in_trouble);
+extern void msg_luck_change(int change);
 
 
 /* ### priest.c ### */

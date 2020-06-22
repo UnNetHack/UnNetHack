@@ -4716,6 +4716,10 @@ sokoban_trickster()
         if (!achieve.finish_sokoban) {
             /* not yet found the sokoban prize */
             u.uconduct.sokoban += 1;
+            /* inform the player on the first transgression */
+            if (u.uconduct.sokoban == 1) {
+                msg_luck_change(0);
+            }
         }
     }
 #endif

@@ -46,6 +46,7 @@
 
 	* Sokoban:
 	  - Sokoban's level difficulty is equal to Sokoban's entrance level
+	  - Give feedback when player breaks Sokoban rules for the first time
 
 	* user interface improvements:
 	  - Optimized placement of menu windows in TTY port

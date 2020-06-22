@@ -1793,18 +1793,31 @@ dosacrifice()
             change_luck((value * LUCKMAX) / (MAXVALUE * 2));
             if ((int)u.uluck < 0) u.uluck = 0;
             if (u.uluck != saved_luck) {
-                if (Blind)
-                    You("think %s brushed your %s.", something, body_part(FOOT));
-                else You(Hallucination ?
-                         "see crabgrass at your %s.  A funny thing in a dungeon." :
-                         "glimpse a four-leaf clover at your %s.",
-                         makeplural(body_part(FOOT)));
+                msg_luck_change(u.uluck - saved_luck);
             }
         }
     }
-    return(1);
+    return 1;
 }
 
+void
+msg_luck_change(int change)
+{
+    const char* leafs = change > 0 ? "four" : "three";
+    if (change < 0) {
+        warning("msg_luck_change: negative luck changed not handled");
+    }
+
+    if (Blind) {
+        You("think %s brushed your %s.", something, body_part(FOOT));
+    } else {
+        You(Hallucination ?
+                "see crabgrass at your %s%s.  A funny thing in a dungeon." :
+                "glimpse a %s-leaf clover at your %s.",
+                Hallucination ? "" :leafs,
+                makeplural(body_part(FOOT)));
+    }
+}
 
 /* determine prayer results in advance; also used for enlightenment */
 boolean
