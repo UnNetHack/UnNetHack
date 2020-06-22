@@ -3755,10 +3755,11 @@ boolean force;
               avg luck (Luck==0):     75%
               awful luck (Luck<-4):  100%
          */
+        pline("%s:%d luck: %d\n", __FILE__, __LINE__, Luck);
         return ER_NOTHING;
 
     } else if (obj->oclass == SCROLL_CLASS) {
-        if (obj->otyp != SCR_FLOOD ||
+        if (obj->otyp == SCR_FLOOD ||
 #ifdef MAIL
              obj->otyp == SCR_MAIL ||
 #endif
