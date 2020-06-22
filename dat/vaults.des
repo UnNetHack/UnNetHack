@@ -1173,6 +1173,7 @@ MAP
 |....|........|....|
 --------------------
 ENDMAP
+REGION:(1,1,1,1),lit,"rndvault",irregular,joined { }
 OBJECT:"apple",random
 OBJECT:"pear",random
 OBJECT:"banana",random
