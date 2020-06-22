@@ -4713,8 +4713,8 @@ sokoban_trickster()
 {
 #ifdef RECORD_ACHIEVE
     if (In_sokoban(&u.uz)) {
-        if (!achieve.finish_sokoban) {
-            /* not yet found the sokoban prize */
+        if (Sokoban && !achieve.finish_sokoban) {
+            /* Sokoban unsolved and not yet found the sokoban prize */
             u.uconduct.sokoban += 1;
             /* inform the player on the first transgression */
             if (u.uconduct.sokoban == 1) {

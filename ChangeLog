@@ -46,7 +46,9 @@
 
 	* Sokoban:
 	  - Sokoban's level difficulty is equal to Sokoban's entrance level
+	  - Solving Sokoban without breaking any rules increases luck
 	  - Give feedback when player breaks Sokoban rules for the first time
+	  - Remove Sokoban restrictions after solving the top Sokoban level
 
 	* user interface improvements:
 	  - Optimized placement of menu windows in TTY port

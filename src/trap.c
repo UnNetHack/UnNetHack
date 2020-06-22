@@ -5784,7 +5784,7 @@ maybe_finish_sokoban()
 {
     struct trap *t;
 
-    if (Sokoban && !in_mklev) {
+    if (Sokoban && !in_mklev && !achieve.finish_sokoban) {
         /* scan all remaining traps, ignoring any created by the hero;
            if this level has no more pits or holes, the current sokoban
            puzzle has been solved */
@@ -5797,18 +5797,17 @@ maybe_finish_sokoban()
             }
         }
         if (!t) {
-            /* we've passed the last trap without finding a pit or hole;
-               clear the sokoban_rules flag so that luck penalties for
-               things like breaking boulders or jumping will no longer
-               be given, and restrictions on diagonal moves are lifted */
-#if NEXT_VERSION
-            Sokoban = 0; /* clear level.flags.sokoban_rules */
-#endif
-            /* TODO: give some feedback about solving the sokoban puzzle
-               (perhaps say "congratulations" in Japanese?) */
+            /* We've passed the last trap without finding a pit or hole on
+               the last Sokoban level. Lift all Sokoban restrictions. */
+            if (Is_sokoend_level(&u.uz)) {
+                achieve.solved_sokoban = 1;
+                /* award the player for solving Sokoban the "proper" way */
+                change_luck(1);
+                /* give some feedback about solving the Sokoban puzzle */
+                msg_luck_change(1);
+            }
         }
     }
 }
-
 
 /*trap.c*/

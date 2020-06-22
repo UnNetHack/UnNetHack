@@ -559,6 +559,7 @@ struct u_achieve {
                                       * u.uevent.ascended. */
     Bitfield(get_luckstone, 1);      /* You obtained the luckstone at the
                                       * end of the mines. */
+    Bitfield(solved_sokoban, 1);     /* Finished the last Sokoban puzzle. */
     Bitfield(finish_sokoban, 1);     /* You obtained the sokoban prize. */
     Bitfield(killed_medusa, 1);      /* You defeated Medusa. */
 };
