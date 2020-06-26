@@ -1546,9 +1546,15 @@ display_weight(struct obj *obj)
 
     /* [max] weight inventory */
     if ((obj->otyp != BOULDER) || !throws_rocks (youmonst.data)) {
-        if ((obj->otyp < LUCKSTONE) &&
-            (obj->otyp != CHEST) && (obj->otyp != LARGE_BOX) && (obj->otyp != ICE_BOX) &&
-            (!Hallucination && flags.invweight)) {
+        if (is_stone(obj) &&
+            (!objects[LOADSTONE].oc_name_known) &&
+            (!objects[obj->otyp].oc_name_known || !obj->dknown)) {
+            return 0;
+        }
+        if (Is_container(obj) && (!obj->cknown || !obj->dknown)) {
+            return 0;
+        }
+        if (!Hallucination && flags.invweight) {
             return obj->owt;
         }
     }

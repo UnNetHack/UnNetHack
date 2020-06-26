@@ -345,6 +345,7 @@ struct obj {
                              (obj)->otyp == LOADSTONE || \
                              (obj)->otyp == FLINT     || \
                              (obj)->otyp == TOUCHSTONE)
+#define is_stone(obj)       ((obj)->otyp >= LUCKSTONE && (obj)->otyp <= ROCK)
 
 /* misc */
 #ifdef KOPS
