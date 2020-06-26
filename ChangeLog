@@ -44,6 +44,7 @@
 	  - Add inventory weight/carrycap and n/52 items display (from xNetHack)
 	  - Show maximal skill enhancement level in enhance menu
 	  - Allow player with both hands cursed to use containers if they have a head
+	  - The '$' command reports the gold in the containers of the player
 
 	* Xlogfile changes:
 	  - Use TAB as separator in xlogfile

@@ -3666,6 +3666,13 @@ doprgold()
         Your("wallet is empty.");
     else
         Your("wallet contains %ld %s.", umoney, currency(umoney));
+
+    /* this should take into account the cknown bit of containers */
+    long stashed_gold = hidden_gold();
+    if (stashed_gold > 0) {
+        You("have %ld %s stashed away.", stashed_gold, currency(stashed_gold));
+    }
+
     shopper_financial_report();
     return 0;
 }
