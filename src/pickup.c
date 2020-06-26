@@ -874,11 +874,14 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
     *pick_list = (menu_item *) 0;
     if (!olist) return 0;
 
-    /* count the number of items allowed */
+    /* count the number weight of items allowed */
+    long weight_classes[MAXOCLASSES] = { 0 };
     for (n = 0, last = 0, curr = olist; curr; curr = FOLLOW(curr, qflags))
         if ((*allow)(curr)) {
             last = curr;
             n++;
+            long weight = display_weight(curr);
+            weight_classes[(int)curr->oclass] += weight;
         }
 
     if (n == 0) /* nothing to pick here */
@@ -948,9 +951,14 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 
                 /* if sorting, print type name (once only) */
                 if (qflags & INVORDER_SORT && !printed_type_name) {
+                    char buf[BUFSZ];
+                    Sprintf(buf, "%s", let_to_name(*pack, FALSE));
+                    if (weight_classes[(int)curr->oclass] > 0) {
+                        Sprintf(eos(buf), " (%ld aum)", weight_classes[(int)curr->oclass]);
+                    }
                     any.a_obj = (struct obj *) 0;
                     add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings,
-                             let_to_name(*pack, FALSE), MENU_UNSELECTED);
+                             buf, MENU_UNSELECTED);
                     printed_type_name = TRUE;
                 }
 

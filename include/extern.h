@@ -1764,6 +1764,7 @@ E char *FDECL(mshot_xname, (struct obj *));
 E boolean FDECL(the_unique_obj, (struct obj *obj));
 E boolean FDECL(the_unique_pm, (struct permonst *));
 E boolean FDECL(erosion_matters, (struct obj *));
+extern long display_weight(struct obj *);
 E char *FDECL(doname, (struct obj *));
 E char *FDECL(doname_with_price, (struct obj *));
 E boolean FDECL(not_fully_identified, (struct obj *));

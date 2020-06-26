@@ -2596,9 +2596,15 @@ boolean want_dump;
     }
 
 #ifdef SORTLOOT
-    /* count the number of items */
-    for (n = 0, otmp = invent; otmp; otmp = otmp->nobj)
-        if(!lets || !*lets || index(lets, otmp->invlet)) n++;
+    /* count the number and weight of items */
+    long weight_classes[MAXOCLASSES] = { 0 };
+    for (n = 0, otmp = invent; otmp; otmp = otmp->nobj) {
+        if (!lets || !*lets || index(lets, otmp->invlet)) {
+            n++;
+            long weight = display_weight(otmp);
+            weight_classes[(int)otmp->oclass] += weight;
+        }
+    }
 
     /* Make a temporary array to store the objects sorted */
     oarray = (struct obj **)alloc(n*sizeof(struct obj*));
@@ -2656,16 +2662,23 @@ nextclass:
     classcount = 0;
     any.a_void = 0;     /* set all bits to zero */
 #ifdef SORTLOOT
-    for(i = 0; i < n; i++) {
+    for (i = 0; i < n; i++) {
         otmp = oarray[i];
         ilet = otmp->invlet;
         if (!flags.sortpack || otmp->oclass == *invlet) {
             if (flags.sortpack && !classcount) {
-                any.a_void = 0;       /* zero */
+                char buf[BUFSZ];
+                Sprintf(buf, "%s", let_to_name(*invlet, FALSE));
+                if (weight_classes[(int)otmp->oclass] > 0) {
+                    Sprintf(eos(buf), " (%ld aum)", weight_classes[(int)otmp->oclass]);
+                }
+                any.a_void = 0; /* zero */
                 if (want_disp)
                     add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings,
-                             let_to_name(*invlet, FALSE), MENU_UNSELECTED);
-                if (want_dump) dump_subtitle(let_to_name(*invlet, FALSE));
+                             buf, MENU_UNSELECTED);
+                if (want_dump) {
+                    dump_subtitle(buf);
+                }
                 classcount++;
             }
             any.a_char = ilet;

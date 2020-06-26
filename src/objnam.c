@@ -1527,19 +1527,33 @@ ring:
             }
         }
     }
-#ifdef SHOW_WEIGHT
-    /* [max] weight inventory */
-    if ((obj->otyp != BOULDER) || !throws_rocks (youmonst.data)) {
-        if ((obj->otyp < LUCKSTONE) && (obj->otyp != CHEST) && (obj->otyp != LARGE_BOX) &&
-            (obj->otyp != ICE_BOX) && (!Hallucination && flags.invweight)) {
-            /* "aum" is stolen from Crawl's "Arbitrary Unit of Measure" */
-            Sprintf (eos(bp), " (%d aum)", obj->owt);
-        }
+    long weight = display_weight(obj);
+    if (weight > 0) {
+        /* "aum" is stolen from Crawl's "Arbitrary Unit of Measure" */
+        Sprintf (eos(bp), " (%d aum)", obj->owt);
     }
 
-#endif
+    return bp;
+}
 
-    return(bp);
+long
+display_weight(struct obj *obj)
+{
+#ifdef SHOW_WEIGHT
+    if (!flags.invweight) {
+        return 0;
+    }
+
+    /* [max] weight inventory */
+    if ((obj->otyp != BOULDER) || !throws_rocks (youmonst.data)) {
+        if ((obj->otyp < LUCKSTONE) &&
+            (obj->otyp != CHEST) && (obj->otyp != LARGE_BOX) && (obj->otyp != ICE_BOX) &&
+            (!Hallucination && flags.invweight)) {
+            return obj->owt;
+        }
+    }
+#endif
+    return 0;
 }
 
 /** Wrapper function for vanilla behaviour. */
