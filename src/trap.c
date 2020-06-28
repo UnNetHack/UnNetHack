@@ -3755,7 +3755,6 @@ boolean force;
               avg luck (Luck==0):     75%
               awful luck (Luck<-4):  100%
          */
-        pline("%s:%d luck: %d\n", __FILE__, __LINE__, Luck);
         return ER_NOTHING;
 
     } else if (obj->oclass == SCROLL_CLASS) {
