@@ -69,6 +69,7 @@
 	  - Fix warning when bribing a prison guard with an amount but no gold in
 	    inventory
 	  - Fix crash when trying to delete a worn item when saving bones
+	  - Gold field in xlogfile didn't include stashed gold for GOLDOBJ
 
 2019-01-01  UnNetHack 5.2.0
 	* Support SOURCE_DATE_EPOCH for reproducible builds (patch from Debian)

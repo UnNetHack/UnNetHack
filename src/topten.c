@@ -420,7 +420,7 @@ struct toptenentry *tt;
                                          heaven_or_hell_mode ? "hoh" :
                                          marathon_mode ? "marathon" :
                                          "normal"));
-    (void)fprintf(rfile, SEP "gold=%ld", money_cnt(invent));
+    (void)fprintf(rfile, SEP "gold=%ld", money_cnt(invent) + hidden_gold());
     (void)fprintf(rfile, SEP "wish_cnt=%ld", u.uconduct.wishes);
     (void)fprintf(rfile, SEP "magic_wish_cnt=%ld", u.uconduct.wishmagic);
     (void)fprintf(rfile, SEP "arti_wish_cnt=%ld", u.uconduct.wisharti);
