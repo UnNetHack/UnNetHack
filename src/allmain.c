@@ -139,13 +139,16 @@ can_regenerate()
 }
 
 FILE *flevelinfo;
+extern int random_seed;
+extern long generated_gold;
 
 void
 write_level_info()
 {
 	s_level *lev = Is_special(&u.uz);
 	if (lev) {
-		fprintf(flevelinfo, "%s:%s:%d\n", encode_base32(level_info[0].seed), lev->proto, depth(&u.uz));
+        fprintf(flevelinfo, "%s:%s:%d:gold=%ld\n", encode_base32(level_info[0].seed),
+                lev->proto, depth(&u.uz), generated_gold);
 		//pline("%s:%d\n", lev->proto, depth(&u.uz));
 	}
 	//wiz_map();

@@ -1560,6 +1560,8 @@ int x, y;
         mksobj_at(rn2(2) ? QUARTERSTAFF : CLUB, x, y, TRUE, FALSE);
 }
 
+long generated_gold = 0;
+
 /* create a stack of N gold pieces; never returns Null */
 struct obj *
 mkgold(amount, x, y)
@@ -1577,6 +1579,7 @@ int x, y;
         gold->quan = amount;
     }
     gold->owt = weight(gold);
+	generated_gold += amount;
     return (gold);
 }
 
