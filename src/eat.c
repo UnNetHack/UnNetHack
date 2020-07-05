@@ -1573,7 +1573,7 @@ register struct obj *otmp;
         You("cannot handle the tin properly to open it.");
         return;
     } else if (otmp->blessed) {
-        pline_The("tin opens like magic!");
+        mesg = "The tin opens like magic!";
         tmp = 0;
     } else if (uwep) {
         switch (uwep->otyp) {
