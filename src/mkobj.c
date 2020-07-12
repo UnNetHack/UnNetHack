@@ -455,8 +455,12 @@ long num;
 {
     struct obj *otmp;
 
-    if (obj->cobj || num <= 0L || obj->quan <= num)
-        panic("splitobj"); /* can't split containers */
+    if (obj->cobj) {
+        panic("splitobj: trying to split a container"); /* can't split containers */
+    }
+    if (obj->quan <= num || num <= 0L) {
+        warning("splitobj: trying to split %ld items from a max of %ld", num, obj->quan);
+    }
     otmp = newobj();
     *otmp = *obj; /* copies whole structure */
     otmp->oextra = (struct oextra *) 0;

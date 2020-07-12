@@ -1259,11 +1259,14 @@ struct obj *otmp;
             /* limit how many gold pieces monsters with no hands can lift */
             if (otmp->oclass == COIN_CLASS) {
                 if (iquan > 200) {
-                    iquan = d(6, 50);
-                    int saved_quan = otmp->quan;
-                    otmp->quan = iquan;
-                    newload = weight(otmp);
-                    otmp->quan = saved_quan;
+                    long new_iquan = d(6, 50);
+                    if (new_iquan < otmp->quan) {
+                        iquan = new_iquan;
+                        long saved_quan = otmp->quan;
+                        otmp->quan = iquan;
+                        newload = weight(otmp);
+                        otmp->quan = saved_quan;
+                    }
                 }
             }
         }
