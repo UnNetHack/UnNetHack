@@ -53,6 +53,11 @@ KDEINCDIR=/usr/include/kde
 CXXFLAGS = $(CFLAGS) -I. -I$(QTINCDIR)
 CXX=g++
 
+# file for regular expression matching
+REGEXOBJ = posixregex.o
+#REGEXOBJ = pmatchregex.o
+#REGEXOBJ = cppregex.o
+
 # files for a straight tty port using no native windowing system
 WINTTYSRC = $(srcdir)/../win/tty/getline.c $(srcdir)/../win/tty/termcap.c $(srcdir)/../win/tty/topl.c \
 	$(srcdir)/../win/tty/wintty.c
@@ -270,7 +275,7 @@ HOBJ = $(FIRSTOBJ) allmain.o apply.o artifact.o attrib.o ball.o \
 	steal.o steed.o teleport.o tile.o timeout.o topten.o track.o trap.o tutorial.o \
 	u_init.o uhitm.o unicode.o vault.o vision.o vis_tab.o weapon.o were.o wield.o \
 	windows.o wizard.o worm.o worn.o write.o zap.o \
-	$(RANDOBJ) $(SYSOBJ) $(WINOBJ) version.o \
+	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) version.o \
 	livelog.o
 # the .o files from the HACKCSRC, SYSSRC, and WINSRC lists
 
@@ -507,6 +512,10 @@ pctty.o: $(srcdir)/../sys/share/pctty.c $(HACK_H)
 	$(CC) $(CFLAGS) -c $(srcdir)/../sys/share/pctty.c
 pcunix.o: $(srcdir)/../sys/share/pcunix.c $(HACK_H)
 	$(CC) $(CFLAGS) -c $(srcdir)/../sys/share/pcunix.c
+pmatchregex.o: ../sys/share/pmatchregex.c $(HACK_H)
+	$(CC) $(CFLAGS) -c -o $@ ../sys/share/pmatchregex.c
+posixregex.o: ../sys/share/posixregex.c $(HACK_H)
+	$(CC) $(CFLAGS) -c -o $@ ../sys/share/posixregex.c
 random.o: $(srcdir)/../sys/share/random.c $(HACK_H)
 	$(CC) $(CFLAGS) -c $(srcdir)/../sys/share/random.c
 ioctl.o: $(srcdir)/../sys/share/ioctl.c $(HACK_H) ../include/tcap.h

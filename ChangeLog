@@ -22,6 +22,7 @@
 	    extended commands
 	  - Interactive extended command list
 	  - Allow vampires to transform into fog clouds to pass closed doors
+	  - Regexp engine for string matching
 
 	* artifact changes:
 	  - Removed artifact wish failure due to the number of existing artifacts
