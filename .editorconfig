@@ -17,3 +17,6 @@ indent_style = tab
 
 [dat/*.des]
 trim_trailing_whitespace = false
+
+[.git/COMMIT_EDITMSG]
+max_line_length=72
