@@ -247,6 +247,8 @@ char preferred_pet; /* '\0', 'c', 'd', 'n' (none) */
 NEARDATA struct monst *mydogs = (struct monst *)0;
 /* monsters that are moving to another dungeon level */
 NEARDATA struct monst *migrating_mons = (struct monst *)0;
+/* autopickup exception list */
+struct autopickup_exception *apelist = (struct autopickup_exception *)0;
 
 NEARDATA struct mvitals mvitals[NUMMONS];
 

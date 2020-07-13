@@ -339,7 +339,7 @@ add_menu(windid window, int glyph, const anything identifier,
 */
 void dummy_add_menu(winid wid, int glyph, int cnt, const ANY_P * identifier,
         CHAR_P accelerator, CHAR_P group_accel, int attr,
-        const char *str, BOOLEAN_P presel)
+        const char *str, unsigned int presel)
 {
     /* Do Nothing */
     dummy_printf("dummy_add_menu(%s, %d, %d, %d, %c, %c, %d, %s, %d\n", winid2str(wid), glyph, cnt, (int)identifier, accelerator, group_accel, attr, str, presel);

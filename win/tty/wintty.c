@@ -2857,7 +2857,7 @@ winid window;
  * later.
  */
 void
-tty_add_menu(window, glyph, cnt, identifier, ch, gch, attr, str, preselected)
+tty_add_menu(window, glyph, cnt, identifier, ch, gch, attr, str, itemflags)
 winid window;       /* window to use, must be of type NHW_MENU */
 int glyph;          /* glyph to display with item */
 int cnt;            /* max number of times this item can be selected */
@@ -2866,8 +2866,9 @@ char ch;            /* keyboard accelerator (0 = pick our own) */
 char gch;           /* group accelerator (0 = no group) */
 int attr;           /* attribute for string (like tty_putstr()) */
 const char *str;        /* menu string */
-boolean preselected;     /* item is marked as selected */
+unsigned int itemflags; /* itemflags such as MENU_ITEMFLAGS_SELECTED */
 {
+    boolean preselected = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
     register struct WinDesc *cw = 0;
     tty_menu_item *item;
 

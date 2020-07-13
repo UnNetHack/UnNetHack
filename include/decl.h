@@ -513,10 +513,12 @@ struct opvar {
 
 #ifdef AUTOPICKUP_EXCEPTIONS
 struct autopickup_exception {
+    struct nhregex *regex;
     char *pattern;
     boolean grab;
     struct autopickup_exception *next;
 };
+extern struct autopickup_exception *apelist;
 #endif /* AUTOPICKUP_EXCEPTIONS */
 
 struct _plinemsg {

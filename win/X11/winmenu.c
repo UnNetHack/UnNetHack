@@ -592,7 +592,7 @@ X11_add_menu(window, glyph, cnt, identifier, ch, gch, attr, str, preselected)
     char gch;			/* group accelerator (0 = no group) */
     int attr;
     const char *str;
-    boolean preselected;
+    unsigned int preselected;
 {
     x11_menu_item *item;
     struct menu_info_t *menu_info;

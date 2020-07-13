@@ -716,23 +716,23 @@ end_query:
 }
 
 #ifdef AUTOPICKUP_EXCEPTIONS
-boolean
-is_autopickup_exception(obj, grab)
+struct autopickup_exception *
+check_autopickup_exceptions(obj)
 struct obj *obj;
-boolean grab;    /* forced pickup, rather than forced leave behind? */
 {
     /*
      *  Does the text description of this match an exception?
      */
-    char *objdesc = makesingular(doname(obj));
-    struct autopickup_exception *ape = (grab) ?
-                                       iflags.autopickup_exceptions[AP_GRAB] :
-                                       iflags.autopickup_exceptions[AP_LEAVE];
-    while (ape) {
-        if (pmatch(ape->pattern, objdesc)) return TRUE;
-        ape = ape->next;
+    struct autopickup_exception *ape = apelist;
+
+    if (ape) {
+        char *objdesc = makesingular(doname(obj));
+
+        while (ape && !regex_match(objdesc, ape->regex)) {
+            ape = ape->next;
+        }
     }
-    return FALSE;
+    return ape;
 }
 #endif /* AUTOPICKUP_EXCEPTIONS */
 
@@ -760,14 +760,10 @@ boolean calc_costly;
     pickit = (!*otypes || index(otypes, otmp->oclass));
 
 #ifdef AUTOPICKUP_EXCEPTIONS
-    /* check for "always pick up */
-    if (!pickit) {
-        pickit = is_autopickup_exception(otmp, TRUE);
-    }
-
-    /* then for "never pick up */
-    if (pickit) {
-        pickit = !is_autopickup_exception(otmp, FALSE);
+    /* check for autopickup exceptions */
+    struct autopickup_exception *ape = check_autopickup_exceptions(otmp);
+    if (ape) {
+        pickit = ape->grab;
     }
 #endif
 
@@ -780,6 +776,7 @@ boolean calc_costly;
     if (pickit) {
         pickit = flags.pickup_dropped || !otmp->was_dropped;
     }
+
     /* never pick up sokoban prize */
     if (Is_sokoprize(otmp)) {
         pickit = FALSE;

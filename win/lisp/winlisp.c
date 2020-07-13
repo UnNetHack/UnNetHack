@@ -1131,7 +1131,7 @@ lisp_add_menu(window, glyph, cnt, identifier, ch, gch, attr, str, preselected)
     char gch;			/* group accelerator (0 = no group) */
     int attr;			/* attribute for string (like tty_putstr()) */
     const char *str;		/* menu string */
-    boolean preselected;	/* item is marked as selected */
+    unsigned int preselected; /* item is marked as selected */
 {
   if (identifier->a_void)
     {

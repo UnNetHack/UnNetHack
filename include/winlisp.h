@@ -39,7 +39,7 @@ E void FDECL(lisp_display_file, (const char *, BOOLEAN_P));
 #endif
 E void FDECL(lisp_start_menu, (winid));
 E void FDECL(lisp_add_menu, (winid, int, int, const ANY_P *,
-                             CHAR_P, CHAR_P, int, const char *, BOOLEAN_P));
+                             CHAR_P, CHAR_P, int, const char *, unsigned int));
 E void FDECL(lisp_end_menu, (winid, const char *));
 E int FDECL(lisp_select_menu, (winid, int, MENU_ITEM_P **));
 E char FDECL(lisp_message_menu, (char, int, const char *mesg));
