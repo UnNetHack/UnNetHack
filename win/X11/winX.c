@@ -559,7 +559,7 @@ X11_putstr(window, attr, str)
 	    X11_destroy_nhwindow(window);
 	    *wp = window_list[new_win];
 	    window_list[new_win].type = NHW_NONE;	/* allow re-use */
-	    /* fall though to add text */
+        /* fall through */ /* to add text */
 	case NHW_TEXT:
 	    add_to_text_window(wp, attr, str);
 	    break;
@@ -1880,7 +1880,7 @@ init_standard_windows()
 	XtSetArg(args[0], XtNwidth, &form_width);
 	XtSetArg(args[1], XtNheight, &form_height);
 	XtGetValues(toplevel, args, TWO);
-	
+
 	if (form_width > screen_width || form_height > screen_height) {
 	    XtSetArg(args[0], XtNwidth, min(form_width,screen_width));
 	    XtSetArg(args[1], XtNheight, min(form_height,screen_height));

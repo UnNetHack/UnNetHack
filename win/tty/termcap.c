@@ -1569,12 +1569,15 @@ int n;
     switch (n) {
     case ATR_ULINE:
         if(nh_US) return nh_US;
+        /* fall through */
+
     case ATR_BOLD:
     case ATR_BLINK:
 #if defined(TERMLIB) && defined(TEXTCOLOR)
         if (MD) return MD;
 #endif
         return nh_HI;
+
     case ATR_INVERSE:
         return MR;
     }
@@ -1588,9 +1591,12 @@ int n;
     switch (n) {
     case ATR_ULINE:
         if(nh_UE) return nh_UE;
+        /* fall through */
+
     case ATR_BOLD:
     case ATR_BLINK:
         return nh_HE;
+
     case ATR_INVERSE:
         return ME;
     }

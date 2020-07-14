@@ -382,7 +382,7 @@ register struct monst *mtmp;
                 return(1);
             }
         }
-        /* fall through :-) */
+        /* fall through */ // :-)
 
     case STRAT_NONE: /* harass */
         if (!rn2(!mtmp->mflee ? 5 : 33)) mnexto(mtmp);

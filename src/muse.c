@@ -1056,18 +1056,23 @@ try_again:
     case 6: case 9:
         if (level.flags.noteleport && ++trycnt < 2)
             goto try_again;
-        if (!rn2(3)) return WAN_TELEPORTATION;
-    /* else FALLTHRU */
+        if (!rn2(3)) {
+            return WAN_TELEPORTATION;
+        }
+    /* fall through */
     case 0: case 1:
         return SCR_TELEPORTATION;
+
     case 8: case 10:
         if (!rn2(3)) return WAN_CREATE_MONSTER;
-    /* else FALLTHRU */
+    /* fall through */
+
     case 2: return SCR_CREATE_MONSTER;
     case 3: return POT_HEALING;
     case 4: return POT_EXTRA_HEALING;
     case 5: return (mtmp->data != &mons[PM_PESTILENCE]) ?
                POT_FULL_HEALING : POT_SICKNESS;
+
     case 7: if (is_floater(pm) || mtmp->isshk || mtmp->isgd
                 || mtmp->ispriest
                 )

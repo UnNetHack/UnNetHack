@@ -1812,6 +1812,7 @@ do_objs()
 			    prefix = -1;
 			    break;
 			}
+            /* fall through */
 		    default:
 			Fprintf(ofp,"#define\t");
 		}

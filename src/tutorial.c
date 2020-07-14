@@ -425,7 +425,7 @@ maybe_tutorial()
                    give the message until a second container's listed */
                 if(Role_if(PM_ARCHEOLOGIST)) break;
                 if(Role_if(PM_ROGUE)) break;
-            /* otherwise fall through */
+                /* fall through */
             case LARGE_BOX:
             case CHEST:
             case ICE_BOX:

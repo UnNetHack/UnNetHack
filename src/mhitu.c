@@ -2340,6 +2340,7 @@ boolean ufound;
         case AD_ELEC:
             physical_damage = FALSE;
             not_affected |= Shock_resistance;
+            goto common;
 
         case AD_PHYS:
             /* there aren't any exploding creatures with AT_EXPL attack

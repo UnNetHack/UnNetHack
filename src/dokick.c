@@ -907,13 +907,17 @@ dokick()
 
     if (u.uswallow) {
         switch(rn2(3)) {
-        case 0:  You_cant("move your %s!", body_part(LEG));
+        case 0:
+            You_cant("move your %s!", body_part(LEG));
             break;
-        case 1:  if (is_animal(u.ustuck->data)) {
+        case 1:
+            if (is_animal(u.ustuck->data)) {
                 pline("%s burps loudly.", Monnam(u.ustuck));
                 break;
-        }
-        default: Your("feeble kick has no effect."); break;
+            }
+            /* fall through */
+        default:
+            Your("feeble kick has no effect."); break;
         }
         return(1);
     } else if (u.utrap && u.utraptype == TT_PIT) {
@@ -1427,6 +1431,7 @@ schar loc;
             cc->y = cc->x = 0;
             break;
         } /* else fall to the next cases */
+        /* fall through */
 
     case MIGR_STAIRS_UP:
     case MIGR_LADDER_UP:

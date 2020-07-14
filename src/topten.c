@@ -528,7 +528,6 @@ int how;
     t0->name[NAMSZ] = '\0';
     t0->death[0] = '\0';
     switch (killer.format) {
-    default: warning("bad killer format?");
     case KILLED_BY_AN:
         Strcat(t0->death, killed_by_prefix[how]);
         (void) strncat(t0->death, an(killer.name),
@@ -542,6 +541,7 @@ int how;
     case NO_KILLER_PREFIX:
         (void) strncat(t0->death, killer.name, DTHSZ);
         break;
+    default: warning("bad killer format?");
     }
     t0->birthdate = yyyymmdd(u.ubirthday);
     t0->deathdate = yyyymmdd(u.udeathday);

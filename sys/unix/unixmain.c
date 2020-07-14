@@ -367,6 +367,7 @@ char *argv[];
 			/* otherwise fall thru to discover */
 			wiz_error_flag = TRUE;
 #endif
+            /* fall through */
 		case 'X':
 			discover = TRUE;
 			break;
