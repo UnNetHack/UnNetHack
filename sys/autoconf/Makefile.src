@@ -54,9 +54,10 @@ CXXFLAGS = $(CFLAGS) -I. -I$(QTINCDIR)
 CXX=g++
 
 # file for regular expression matching
-REGEXOBJ = posixregex.o
+#REGEXOBJ = posixregex.o
 #REGEXOBJ = pmatchregex.o
 #REGEXOBJ = cppregex.o
+REGEXOBJ = @REGEXOBJ@
 
 # files for a straight tty port using no native windowing system
 WINTTYSRC = $(srcdir)/../win/tty/getline.c $(srcdir)/../win/tty/termcap.c $(srcdir)/../win/tty/topl.c \

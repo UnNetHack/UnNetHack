@@ -421,10 +421,7 @@ typedef long glyph_t;
     defined(CURSES_GRAPHICS)
 # define MENU_COLOR
 /*# define MENU_COLOR_REGEX*/
-/*# define MENU_COLOR_REGEX_POSIX */
-/* if MENU_COLOR_REGEX is defined, use regular expressions (regex.h,
- * GNU specific functions by default, POSIX functions with
- * MENU_COLOR_REGEX_POSIX).
+/* if MENU_COLOR_REGEX is defined, use regular expressions (regex.h)
  * otherwise use pmatch() to match menu color lines.
  * pmatch() provides basic globbing: '*' and '?' wildcards.
  */

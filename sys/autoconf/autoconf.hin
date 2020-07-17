@@ -188,17 +188,8 @@
 /* Use regular expressions */
 #undef MENU_COLOR_REGEX
 
-/* GNU regex is available */
-#undef MENU_COLOR_REGEX_GNU
-
-/* Posix regex is available */
-#undef MENU_COLOR_REGEX_POSIX
-
 /* Microsoft Window's native graphics */
 #undef MSWIN_GRAPHICS
-
-/* No void type available */
-#undef NOVOID
 
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
