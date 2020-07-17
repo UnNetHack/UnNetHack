@@ -69,15 +69,8 @@
 
 #ifdef MENU_COLOR
 struct menucoloring {
-# ifdef MENU_COLOR_REGEX
-#  ifdef MENU_COLOR_REGEX_POSIX
-    regex_t match;
-#  else
-    struct re_pattern_buffer match;
-#  endif
-# else
-    char *match;
-# endif
+    struct nhregex *match;
+    char *origstr;
     int color, attr;
     struct menucoloring *next;
 };

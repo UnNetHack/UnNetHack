@@ -1293,25 +1293,6 @@ free_dungeons()
     return;
 }
 
-#ifdef MENU_COLOR
-void
-free_menu_coloring()
-{
-    struct menucoloring *tmp = menu_colorings;
-
-    while (tmp) {
-        struct menucoloring *tmp2 = tmp->next;
-# ifdef MENU_COLOR_REGEX
-        (void) regfree(&tmp->match);
-# else
-        free(tmp->match);
-# endif
-        free(tmp);
-        tmp = tmp2;
-    }
-}
-#endif /* MENU_COLOR */
-
 void
 freedynamicdata()
 {

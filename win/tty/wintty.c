@@ -1835,15 +1835,7 @@ int *color, *attr;
 
     if (iflags.use_menu_color && iflags.use_color)
         for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
-# ifdef MENU_COLOR_REGEX
-#  ifdef MENU_COLOR_REGEX_POSIX
-            if (regexec(&tmpmc->match, str, 0, NULL, 0) == 0) {
-#  else
-            if (re_search(&tmpmc->match, str, strlen(str), 0, 9999, 0) >= 0) {
-#  endif
-# else
-            if (pmatch(tmpmc->match, str)) {
-# endif
+            if (regex_match(str, tmpmc->match)) {
                 if (!foundcolor && tmpmc->color != CLR_UNDEFINED) {
                     *color = tmpmc->color;
                     foundcolor = TRUE;

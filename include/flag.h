@@ -302,9 +302,7 @@ struct instance_flags {
     boolean extmenu;    /* extended commands use menu interface */
 #endif
     boolean use_background_glyph; /* use background glyph when appropriate */
-#ifdef MENU_COLOR
     boolean use_menu_color; /* use color in menus; only if wc_color */
-#endif
 #ifdef WIN_EDGE
     boolean win_edge;   /* are the menus aligned left&top */
 #endif

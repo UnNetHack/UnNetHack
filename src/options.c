@@ -175,15 +175,7 @@ static struct Bool_Opt
 #endif
     {"marathon", &flags.marathon, FALSE, DISP_IN_GAME },
     {"mention_walls", &iflags.mention_walls, FALSE, SET_IN_GAME },
-#ifdef MENU_COLOR
-# ifdef MICRO
     {"menucolors", &iflags.use_menu_color, TRUE,  SET_IN_FILE},
-# else
-    {"menucolors", &iflags.use_menu_color, FALSE, SET_IN_FILE},
-# endif
-#else
-    {"menucolors", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 #ifdef WIZARD
     /* for menu debugging only*/
     {"menu_tab_sep", &iflags.menu_tab_sep, FALSE, SET_IN_GAME},
@@ -623,6 +615,15 @@ STATIC_OVL boolean FDECL(wc2_supported, (const char *));
 
 static int FDECL(handle_add_list_remove, (const char *, int));
 
+static const char *FDECL(attr2attrname, (int));
+static boolean FDECL(test_regex_pattern, (const char *, const char *));
+
+/* menu coloring */
+extern struct menucoloring *menu_colorings;
+static boolean FDECL(add_menu_coloring_parsed, (char *, int, int));
+static void FDECL(free_one_menu_coloring, (int));
+static int NDECL(count_menucolors);
+
 #ifdef AUTOPICKUP_EXCEPTIONS
 static int NDECL(handler_autopickup_exception);
 static void FDECL(remove_autopickup_exception, (struct autopickup_exception *));
@@ -706,6 +707,102 @@ handler_autopickup_exception()
     return optn_ok;
 }
 #endif /* AUTOPICKUP_EXCEPTIONS */
+
+static int
+handler_menu_colors()
+{
+    winid tmpwin;
+    anything any;
+    char buf[BUFSZ];
+    int opt_idx, nmc, mcclr, mcattr;
+    char mcbuf[BUFSZ];
+
+menucolors_again:
+    nmc = count_menucolors();
+    opt_idx = handle_add_list_remove("menucolor", nmc);
+    if (opt_idx == 3) {
+        /* done */
+
+menucolors_done:
+        /* in case we've made a change which impacts current persistent
+           inventory window; we don't track whether an actual changed
+           occurred, so just assume there was one and that it matters;
+           if we're wrong, a redundant update is cheap... */
+        if (nmc > 0) {
+            iflags.use_menu_color = TRUE;
+        }
+        update_inventory();
+
+        return optn_ok;
+
+    } else if (opt_idx == 0) { /* add new */
+        mcbuf[0] = '\0';
+        getlin("What new menucolor pattern?", mcbuf);
+        if (*mcbuf == '\033') {
+            goto menucolors_done;
+        }
+        if (*mcbuf &&
+             test_regex_pattern(mcbuf, "MENUCOLORS regex") &&
+             (mcclr = query_color((char *) 0)) != -1 &&
+             (mcattr = query_attr((char *) 0)) != -1 &&
+             !add_menu_coloring_parsed(mcbuf, mcclr, mcattr)) {
+            pline("Error adding the menu color.");
+            wait_synch();
+        }
+        goto menucolors_again;
+
+    } else {
+        /* list (1) or remove (2) */
+        int pick_idx, pick_cnt;
+        int mc_idx;
+        unsigned ln;
+        const char *sattr, *sclr;
+        menu_item *pick_list = (menu_item *) 0;
+        struct menucoloring *tmp = menu_colorings;
+        char clrbuf[QBUFSZ];
+
+        tmpwin = create_nhwindow(NHW_MENU);
+        start_menu(tmpwin);
+        any = zeroany;
+        mc_idx = 0;
+        while (tmp) {
+            sattr = attr2attrname(tmp->attr);
+            sclr = strcpy(clrbuf, clr2colorname(tmp->color));
+            (void) strNsubst(clrbuf, " ", "-", 0);
+            any.a_int = ++mc_idx;
+            /* construct suffix */
+            Sprintf(buf, "\"\"=%s%s%s", sclr,
+                    (tmp->attr != ATR_NONE && tmp->attr != ATR_UNDEFINED) ? "&" : "",
+                    (tmp->attr != ATR_NONE && tmp->attr != ATR_UNDEFINED) ? sattr : "");
+            /* now main string */
+            ln = sizeof buf - strlen(buf) - 1; /* length available */
+            Strcpy(mcbuf, "\"");
+            if (strlen(tmp->origstr) > ln) {
+                Strcat(strncat(mcbuf, tmp->origstr, ln - 3), "...");
+            } else {
+                Strcat(mcbuf, tmp->origstr);
+            }
+            /* combine main string and suffix */
+            Strcat(mcbuf, &buf[1]); /* skip buf[]'s initial quote */
+            add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, mcbuf, MENU_ITEMFLAGS_NONE);
+            tmp = tmp->next;
+        }
+        Sprintf(mcbuf, "%s menu colors", (opt_idx == 1) ? "List of" : "Remove which");
+        end_menu(tmpwin, mcbuf);
+        pick_cnt = select_menu(tmpwin, (opt_idx == 1) ? PICK_NONE : PICK_ANY, &pick_list);
+        if (pick_cnt > 0) {
+            for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
+                free_one_menu_coloring(pick_list[pick_idx].item.a_int - 1 - pick_idx);
+            }
+            free(pick_list), pick_list = (menu_item *) 0;
+        }
+        destroy_nhwindow(tmpwin);
+        if (pick_cnt >= 0) {
+            goto menucolors_again;
+        }
+    }
+    return optn_ok;
+}
 
 /* check whether a user-supplied option string is a proper leading
    substring of a particular option name; option string might have
@@ -1569,7 +1666,8 @@ static const struct {
     { "inverse", ATR_INVERSE },
     { NULL, ATR_NONE }, /* everything after this is an alias */
     { "normal", ATR_NONE },
-    { "uline", ATR_ULINE }
+    { "uline", ATR_ULINE },
+    { "reverse", ATR_INVERSE },
 };
 
 const char *
@@ -1608,8 +1706,173 @@ char *str;
     return c;
 }
 
-#ifdef MENU_COLOR
-extern struct menucoloring *menu_colorings;
+static const char *
+attr2attrname(attr)
+int attr;
+{
+    int i;
+    for (i = 0; i < SIZE(attrnames); i++) {
+        if (attrnames[i].attr == attr) {
+            return attrnames[i].name;
+        }
+    }
+    return (char *) 0;
+}
+
+int
+query_color(prompt)
+const char *prompt;
+{
+    winid tmpwin;
+    anything any;
+    int i, pick_cnt;
+    menu_item *picks = (menu_item *) 0;
+
+    tmpwin = create_nhwindow(NHW_MENU);
+    start_menu(tmpwin);
+    any = zeroany;
+    for (i = 0; i < SIZE(colornames); i++) {
+        if (!colornames[i].name) {
+            break;
+        }
+        any.a_int = i + 1;
+        add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, colornames[i].name,
+                 (colornames[i].color == NO_COLOR) ? MENU_ITEMFLAGS_SELECTED
+                                                   : MENU_ITEMFLAGS_NONE);
+    }
+    end_menu(tmpwin, (prompt && *prompt) ? prompt : "Pick a color");
+    pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
+    destroy_nhwindow(tmpwin);
+    if (pick_cnt > 0) {
+        i = colornames[picks[0].item.a_int - 1].color;
+        /* pick_cnt==2: explicitly picked something other than the
+           preselected entry */
+        if (pick_cnt == 2 && i == NO_COLOR) {
+            i = colornames[picks[1].item.a_int - 1].color;
+        }
+        free(picks);
+        return i;
+    } else if (pick_cnt == 0) {
+        /* pick_cnt==0: explicitly picking preselected entry toggled it off */
+        return NO_COLOR;
+    }
+    return -1;
+}
+
+/* ask about highlighting attribute; for menu headers and menu
+   coloring patterns, only one attribute at a time is allowed;
+   for status highlighting, multiple attributes are allowed [overkill;
+   life would be much simpler if that were restricted to one also...] */
+int
+query_attr(prompt)
+const char *prompt;
+{
+    winid tmpwin;
+    anything any;
+    int i, pick_cnt;
+    menu_item *picks = (menu_item *) 0;
+    boolean allow_many = (prompt && !strncmpi(prompt, "Choose", 6));
+    int default_attr = ATR_NONE;
+
+    if (prompt && strstri(prompt, "menu headings")) {
+        default_attr = iflags.menu_headings;
+    }
+    tmpwin = create_nhwindow(NHW_MENU);
+    start_menu(tmpwin);
+    any = zeroany;
+    for (i = 0; i < SIZE(attrnames); i++) {
+        if (!attrnames[i].name) {
+            break;
+        }
+        any.a_int = i + 1;
+        add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, attrnames[i].attr,
+                 attrnames[i].name,
+                 (attrnames[i].attr == default_attr) ? MENU_ITEMFLAGS_SELECTED
+                                                     : MENU_ITEMFLAGS_NONE);
+    }
+    end_menu(tmpwin, (prompt && *prompt) ? prompt : "Pick an attribute");
+    pick_cnt = select_menu(tmpwin, allow_many ? PICK_ANY : PICK_ONE, &picks);
+    destroy_nhwindow(tmpwin);
+    if (pick_cnt > 0) {
+        int j, k = 0;
+
+        if (allow_many) {
+            /* PICK_ANY, with one preselected entry (ATR_NONE) which
+               should be excluded if any other choices were picked */
+            for (i = 0; i < pick_cnt; ++i) {
+                j = picks[i].item.a_int - 1;
+                if (attrnames[j].attr != ATR_NONE || pick_cnt == 1) {
+                    switch (attrnames[j].attr) {
+                    case ATR_DIM:     k |= HL_DIM; break;
+                    case ATR_BLINK:   k |= HL_BLINK; break;
+                    case ATR_ULINE:   k |= HL_ULINE; break;
+                    case ATR_INVERSE: k |= HL_INVERSE; break;
+                    case ATR_BOLD:    k |= HL_BOLD; break;
+                    case ATR_NONE:    k =  HL_NONE; break;
+                    }
+                }
+            }
+        } else {
+            /* PICK_ONE, but might get 0 or 2 due to preselected entry */
+            j = picks[0].item.a_int - 1;
+            /* pick_cnt==2: explicitly picked something other than the
+               preselected entry */
+            if (pick_cnt == 2 && attrnames[j].attr == default_attr) {
+                j = picks[1].item.a_int - 1;
+            }
+            k = attrnames[j].attr;
+        }
+        free(picks);
+        return k;
+    } else if (pick_cnt == 0 && !allow_many) {
+        /* PICK_ONE, preselected entry explicitly chosen */
+        return default_attr;
+    }
+    /* either ESC to explicitly cancel (pick_cnt==-1) or
+       PICK_ANY with preselected entry toggled off and nothing chosen */
+    return -1;
+}
+
+/* parse 'str' as a regular expression to check whether it's valid;
+   compiled regexp gets thrown away regardless of the outcome */
+static boolean
+test_regex_pattern(str, errmsg)
+const char *str;
+const char *errmsg;
+{
+    static const char def_errmsg[] = "NHregex error";
+    struct nhregex *match;
+    const char *re_error_desc;
+    boolean retval;
+
+    if (!str) {
+        return FALSE;
+    }
+    if (!errmsg) {
+        errmsg = def_errmsg;
+    }
+
+    match = regex_init();
+    if (!match) {
+        config_error_add("%s", errmsg);
+        return FALSE;
+    }
+
+    retval = regex_compile(str, match);
+    /* get potential error message before freeing regexp and free regexp
+       before issuing message in case the error is "ran out of memory"
+       since message delivery might need to allocate some memory */
+    re_error_desc = !retval ? regex_error_desc(match) : 0;
+    /* discard regexp; caller will re-parse it after validating other stuff */
+    regex_free(match);
+    /* if returning failure, tell player */
+    if (!retval) {
+        config_error_add("%s: %s", errmsg, re_error_desc);
+    }
+
+    return retval;
+}
+
 
 /* parse '"regex_string"=color&attr' and add it to menucoloring */
 boolean
@@ -1619,10 +1882,8 @@ char *str;
     int i, c = CLR_UNDEFINED, a = ATR_UNDEFINED;
     struct menucoloring *tmp;
     char *tmps, *cs = strchr(str, '=');
-#ifdef MENU_COLOR_REGEX_POSIX
     int errnum;
     char errbuf[80];
-#endif
     const char *err = (char *)0;
 
     if (!cs || !str) return FALSE;
@@ -1639,6 +1900,7 @@ char *str;
 
     if (c > CLR_UNDEFINED) return FALSE;
 
+    mungspaces(tmps);
     tmps = c == CLR_UNDEFINED ? cs : strchr(str, '&');
     if (tmps) {
         tmps++;
@@ -1663,42 +1925,93 @@ char *str;
         }
     }
 
-    tmp = (struct menucoloring *)alloc(sizeof(struct menucoloring));
-#ifdef MENU_COLOR_REGEX
-#ifdef MENU_COLOR_REGEX_POSIX
-    errnum = regcomp(&tmp->match, tmps, REG_EXTENDED | REG_NOSUB);
-    if (errnum != 0)
-    {
-        regerror(errnum, &tmp->match, errbuf, sizeof(errbuf));
-        err = errbuf;
-    }
-#else
-    re_syntax_options = RE_SYNTAX_POSIX_EXTENDED;
-    tmp->match.translate = 0;
-    tmp->match.fastmap = 0;
-    tmp->match.buffer = 0;
-    tmp->match.allocated = 0;
-    tmp->match.regs_allocated = REGS_FIXED;
-    err = re_compile_pattern(tmps, strlen(tmps), &tmp->match);
-#endif
-#else
-    tmp->match = (char *)alloc(strlen(tmps)+1);
-    (void) memcpy((genericptr_t)tmp->match, (genericptr_t)tmps, strlen(tmps)+1);
-#endif
-    if (err) {
-        raw_printf("\nMenucolor regex error: %s\n", err);
-        wait_synch();
-        free(tmp);
+    return add_menu_coloring_parsed(tmps, c, a);
+}
+
+static boolean
+add_menu_coloring_parsed(str, c, a)
+char *str;
+int c, a;
+{
+    static const char re_error[] = "Menucolor regex error";
+    struct menucoloring *tmp;
+
+    if (!str) {
         return FALSE;
-    } else {
-        tmp->next = menu_colorings;
-        tmp->color = c;
-        tmp->attr = a;
-        menu_colorings = tmp;
-        return TRUE;
+    }
+    tmp = (struct menucoloring *) alloc(sizeof *tmp);
+    tmp->match = regex_init();
+    /* test_regex_pattern() has already validated this regexp but parsing
+       it again could conceivably run out of memory */
+    if (!regex_compile(str, tmp->match)) {
+        const char *re_error_desc = regex_error_desc(tmp->match);
+
+        /* free first in case reason for regcomp failure was out-of-memory */
+        regex_free(tmp->match);
+        free(tmp);
+        config_error_add("%s: %s", re_error, re_error_desc);
+        return FALSE;
+    }
+    tmp->next = menu_colorings;
+    tmp->origstr = dupstr(str);
+    tmp->color = c;
+    tmp->attr = a;
+    menu_colorings = tmp;
+    return TRUE;
+}
+
+void
+free_menu_coloring()
+{
+    struct menucoloring *tmp, *tmp2;
+
+    for (tmp = menu_colorings; tmp; tmp = tmp2) {
+        tmp2 = tmp->next;
+        regex_free(tmp->match);
+        free(tmp->origstr);
+        free(tmp);
+    }
+    menu_colorings = (struct menucoloring *) 0;
+}
+
+static void
+free_one_menu_coloring(idx)
+int idx; /* 0 .. */
+{
+    struct menucoloring *tmp = menu_colorings;
+    struct menucoloring *prev = NULL;
+
+    while (tmp) {
+        if (idx == 0) {
+            struct menucoloring *next = tmp->next;
+
+            regex_free(tmp->match);
+            free(tmp->origstr);
+            free(tmp);
+            if (prev) {
+                prev->next = next;
+            } else {
+                menu_colorings = next;
+            }
+            return;
+        }
+        idx--;
+        prev = tmp;
+        tmp = tmp->next;
     }
 }
-#endif /* MENU_COLOR */
+
+static int
+count_menucolors()
+{
+    struct menucoloring *tmp;
+    int count = 0;
+
+    for (tmp = menu_colorings; tmp; tmp = tmp->next) {
+        count++;
+    }
+    return count;
+}
 
 /* parse '"monster name":color' and change monster info accordingly */
 boolean
@@ -3865,8 +4178,8 @@ doset()
     doset_add_menu(tmpwin, "race", 0);
     doset_add_menu(tmpwin, "gender", 0);
 
-    for (pass = startpass; pass <= endpass; pass++)
-        for (i = 0; compopt[i].name; i++)
+    for (pass = startpass; pass <= endpass; pass++) {
+        for (i = 0; compopt[i].name; i++) {
             if (compopt[i].optflags == pass) {
                 if (!strcmp(compopt[i].name, "name") ||
                     !strcmp(compopt[i].name, "role") ||
@@ -3883,13 +4196,30 @@ doset()
                     doset_add_menu(tmpwin, compopt[i].name,
                                    (pass == DISP_IN_GAME) ? 0 : indexoffset);
             }
-#ifdef AUTOPICKUP_EXCEPTIONS
-    any.a_int = -1;
-    Sprintf(buf, "autopickup exceptions (%d currently set)",
-            count_apes());
-    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
+        }
+    }
 
+    any = zeroany;
+    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, iflags.menu_headings,
+             "Other settings:", MENU_ITEMFLAGS_NONE);
+
+#ifdef AUTOPICKUP_EXCEPTIONS
+    if (count_apes() > 0) {
+        any.a_int = -1;
+        Sprintf(buf, "autopickup exceptions (%d currently set)", count_apes());
+        add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
+    }
 #endif /* AUTOPICKUP_EXCEPTIONS */
+
+#ifdef MENU_COLOR
+    if (count_menucolors() > 0) {
+        any.a_int = -2;
+        Sprintf(buf, "message colors        (%d currently set)", count_menucolors());
+        add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
+    }
+#endif /* AUTOPICKUP_EXCEPTIONS */
+
 #ifdef PREFIXES_IN_USE
     any.a_void = 0;
     add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
@@ -3913,6 +4243,11 @@ doset()
             if (opt_indx == -2) {
                 special_handling("autopickup_exception",
                                  setinitial, fromfile);
+            } else
+#endif
+#ifdef MENU_COLOR
+            if (opt_indx == -3) {
+                special_handling("menu colors", setinitial, fromfile);
             } else
 #endif
             if (opt_indx < boolcount) {
@@ -4291,6 +4626,10 @@ boolean setinitial, setfromfile;
 #ifdef AUTOPICKUP_EXCEPTIONS
     } else if (!strcmp("autopickup_exception", optname)) {
         handler_autopickup_exception();
+#endif
+#ifdef MENU_COLOR
+    } else if (!strcmp("menu colors", optname)) {
+        handler_menu_colors();
 #endif
     }
     return retval;

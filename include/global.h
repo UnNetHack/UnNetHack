@@ -95,6 +95,8 @@ typedef xchar boolean;          /* 0 or 1 */
 #define FALSE   ((boolean)0)
 #endif
 
+enum optchoice { opt_in, opt_out};
+
 /*
  * type nhsym: loadable symbols go into this type
  */
@@ -377,21 +379,6 @@ struct version_info {
 /* size of terminal screen is (at least) (ROWNO+3) by COLNO */
 #define COLNO   80
 #define ROWNO   21
-
-/* MAXCO must hold longest uncompressed status line, and must be larger
- * than COLNO
- *
- * longest practical second status line at the moment is
- *  Astral Plane $:12345 HP:700(700) Pw:111(111) AC:-127 Xp:30/123456789
- *  T:123456 Satiated Conf FoodPois Ill Blind Stun Hallu Overloaded
- * -- or somewhat over 130 characters
- */
-#if COLNO <= 140
-#define MAXCO 160
-#else
-#define MAXCO (COLNO+20)
-#endif
-
 
 #define MAXNROFROOMS    40  /* max number of rooms per level */
 #define MAX_SUBROOMS    24  /* max # of subrooms in a given room */

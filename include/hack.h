@@ -198,6 +198,7 @@ enum hmon_atkmode_types {
 #include "engrave.h"
 #include "rect.h"
 #include "region.h"
+#include "botl.h"
 
 /* Symbol offsets */
 #define SYM_OFF_P (0)
