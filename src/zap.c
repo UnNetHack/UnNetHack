@@ -904,7 +904,7 @@ boolean by_hero;
             (void) shk_your(eos(buf), corpse);
             if (one_of)
                 corpse->quan++; /* force plural */
-            sprintf("%s %s", buf, corpse_xname(corpse, (const char *) 0, CXN_NO_PFX));
+            Strcat(buf, corpse_xname(corpse, (const char *) 0, CXN_NO_PFX));
             if (one_of) /* could be simplified to ''corpse->quan = 1L;'' */
                 corpse->quan--;
             pline("%s glows iridescently.", upstart(buf));
