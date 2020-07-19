@@ -71,6 +71,9 @@ STATIC_DCL void FDECL(writeentry, (FILE *, struct toptenentry *));
 #ifdef XLOGFILE
 STATIC_DCL void FDECL(munge_xlstring, (char *dest, char *src, int n));
 STATIC_DCL void FDECL(write_xlentry, (FILE *, struct toptenentry *));
+static void FDECL(add_achieveX, (char *, const char *, BOOLEAN_P));
+static char *NDECL(encode_extended_achievements);
+static char *NDECL(encode_extended_conducts);
 #endif
 STATIC_DCL void FDECL(free_ttlist, (struct toptenentry *));
 STATIC_DCL int FDECL(classmon, (char *, BOOLEAN_P));
@@ -392,6 +395,8 @@ struct toptenentry *tt;
     (void)fprintf(rfile, SEP "event=%ld", encode_uevent());
     (void)fprintf(rfile, SEP "carried=%ld", encode_carried());
 
+    (void)fprintf(rfile, SEP "achieveX=%s", encode_extended_achievements());
+    (void)fprintf(rfile, SEP "conductX=%s", encode_extended_conducts());
 #ifdef RECORD_REALTIME
     (void)fprintf(rfile, SEP "realtime=%ld", (long)realtime_data.realtime);
 #endif
@@ -429,6 +434,99 @@ struct toptenentry *tt;
 
     (void)fprintf(rfile, "\n");
 
+}
+
+/* add the achievement or conduct comma-separated to string */
+static void
+add_achieveX(buf, achievement, condition)
+char *buf;
+const char *achievement;
+boolean condition;
+{
+    if (condition) {
+        if (buf[0] != '\0') {
+            Strcat(buf, ",");
+        }
+        Strcat(buf, achievement);
+    }
+}
+
+static char *
+encode_extended_achievements()
+{
+    static char buf[30*40];
+
+    buf[0] = '\0';
+    /* the original 12 xlogfile achievements */
+    add_achieveX(buf, "ascended", u.uevent.ascended);
+    add_achieveX(buf, "entered_astral_plane", Is_astralevel(&u.uz));
+    add_achieveX(buf, "entered_elemental_planes", In_endgame(&u.uz));
+    add_achieveX(buf, "obtained_the_amulet_of_yendor", achieve.get_amulet);
+    add_achieveX(buf, "performed_the_invocation_ritual", achieve.perform_invocation);
+    add_achieveX(buf, "obtained_the_book_of_the_dead", achieve.get_book);
+    add_achieveX(buf, "obtained_the_bell_of_opening", achieve.get_bell);
+    add_achieveX(buf, "obtained_the_candelabrum_of_invocation", achieve.get_candelabrum);
+    add_achieveX(buf, "entered_gehennom", achieve.enter_gehennom);
+    add_achieveX(buf, "defeated_medusa", achieve.killed_medusa);
+    add_achieveX(buf, "obtained_the_luckstone_from_the_mines", achieve.get_luckstone);
+    add_achieveX(buf, "obtained_the_sokoban_prize", achieve.finish_sokoban);
+
+    /* oracle */
+    add_achieveX(buf, "consulted_the_oracle", (u.uevent.minor_oracle || u.uevent.major_oracle));
+    add_achieveX(buf, "got_minor_oracle_consultation", u.uevent.minor_oracle);
+    add_achieveX(buf, "got_major_oracle_consultation", u.uevent.major_oracle);
+
+    /* quest */
+    add_achieveX(buf, "entered_quest_portal_level", u.uevent.qcalled);
+    add_achieveX(buf, "accepted_for_quest", quest_status.got_quest);
+    add_achieveX(buf, "defeated_quest_nemesis", quest_status.killed_nemesis);
+    add_achieveX(buf, "quest_completed", u.uevent.qcompleted);
+
+    /* other notable achievements */
+    add_achieveX(buf, "entered_gehennom_the_front_way", u.uevent.gehennom_entered);
+    add_achieveX(buf, "opened_castle_drawbridge", u.uevent.uopened_dbridge);
+    add_achieveX(buf, "got_crowned", u.uevent.uhand_of_elbereth);
+
+#if 0
+    /* TODO 3.7 achievements
+    add_achieveX(buf, "entered_the_gnomish_mines",
+    add_achieveX(buf, "entered_mine_town",
+    add_achieveX(buf, "entered_a_shop",
+    add_achieveX(buf, "entered_a_temple",
+    add_achieveX(buf, "entered_sokoban",
+    add_achieveX(buf, "entered_bigroom",
+    */
+#endif
+
+    return buf;
+}
+
+static char *
+encode_extended_conducts()
+{
+    static char buf[BUFSZ];
+
+    buf[0] = '\0';
+    add_achieveX(buf, "foodless",     !u.uconduct.food);
+    add_achieveX(buf, "vegan",        !u.uconduct.unvegan);
+    add_achieveX(buf, "vegetarian",   !u.uconduct.unvegetarian);
+    add_achieveX(buf, "atheist",      !u.uconduct.gnostic);
+    add_achieveX(buf, "weaponless",   !u.uconduct.weaphit);
+    add_achieveX(buf, "pacifist",     !u.uconduct.killer);
+    add_achieveX(buf, "illiterate",   !u.uconduct.literate);
+    add_achieveX(buf, "polyless",     !u.uconduct.polypiles);
+    add_achieveX(buf, "polyselfless", !u.uconduct.polyselfs);
+    add_achieveX(buf, "wishless",     !u.uconduct.wishes);
+    add_achieveX(buf, "artiwishless", !u.uconduct.wisharti);
+    add_achieveX(buf, "genocideless", !num_genocides());
+    add_achieveX(buf, "sokoban",      !u.uconduct.sokoban);
+    add_achieveX(buf, "blindfolded",   u.roleplay.blindfolded);
+    add_achieveX(buf, "nudist",        u.roleplay.nudist);
+    add_achieveX(buf, "bonesless",    !u.uconduct.bones);
+    add_achieveX(buf, "elberethless",  !u.uconduct.elbereths);
+    add_achieveX(buf, "deactivated_elbereth", flags.elberethignore);
+
+    return buf;
 }
 
 #undef SEP
