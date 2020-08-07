@@ -242,7 +242,10 @@ struct obj {
                                  || (otmp)->otyp == DWARVISH_MITHRIL_COAT \
                                  || (otmp)->otyp == DWARVISH_CLOAK \
                                  || (otmp)->otyp == DWARVISH_ROUNDSHIELD)
-#define is_gnomish_armor(otmp)  (FALSE)
+/* they're into stylish headwear, in other words into seeming taller */
+#define is_gnomish_armor(otmp)  ((otmp)->otyp == CORNUTHAUM \
+                                 || (otmp)->otyp == DUNCE_CAP \
+                                 || (otmp)->otyp == FEDORA)
 
 
 /* Eggs and other food */
