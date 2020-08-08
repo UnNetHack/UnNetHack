@@ -51,6 +51,9 @@
 	  - The '$' command reports the gold in the containers of the player
 	  - Show total weight of object classes with invweight
 
+	* skill changes:
+	  - Allow convicts to become skilled in broadsword (reported by RojjaCebolla)
+
 	* Xlogfile changes:
 	  - Use TAB as separator in xlogfile
 	  - Record number of normal, magical, and artifact wishes
@@ -228,6 +231,7 @@
 	    - Werebane conveys polymorph control while wielded.
 	    - Ogresmasher gives 25 CON while wielded.
 	    - Trollsbane prevents trolls from leaving corpses while wielded.
+
 	  - Other:
 	    - Luck Blade added, first sacrifice gift for Convicts
 	    - Grimtooth is the first sacrifice gift for Rogues; it is now
