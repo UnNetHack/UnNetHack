@@ -751,14 +751,12 @@ tele(void)
 
     /* Disable teleportation in stronghold && Vlad's Tower */
     if (noteleport_level(&youmonst)) {
-#ifdef WIZARD
         if (!wizard) {
-#endif
-        pline("A mysterious force prevents you from teleporting!");
-        return;
-#ifdef WIZARD
-    }
-#endif
+            pline("A mysterious force prevents you from teleporting!");
+            return;
+        } else {
+            pline("Overriding non-teleport flag.");
+        }
     }
 
     /* don't show trap if "Sorry..." */
