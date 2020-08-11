@@ -1133,6 +1133,8 @@ lisp_add_menu(window, glyph, cnt, identifier, ch, gch, attr, str, preselected)
     const char *str;		/* menu string */
     unsigned int preselected; /* item is marked as selected */
 {
+    nhUse(cnt);
+
   if (identifier->a_void)
     {
       lisp_menu_item_list[lisp_menu_list_num].identifier = *identifier;
@@ -1424,6 +1426,10 @@ int
 lisp_nh_poskey(x, y, mod)
      int *x, *y, *mod;
 {
+    nhUse(x);
+    nhUse(y);
+    nhUse(mod);
+
 /*    char scratch[256]; */
 
 /*    printf ("(nethack-api-poskey)\n"); */
@@ -1673,7 +1679,9 @@ void
 lisp_suspend_nhwindows(str)
      const char *str;
 {
-  return;
+    nhUse(str);
+
+    return;
 }
 
 /* All keys are defined in emacs, so number_pad makes no sense. */
@@ -1681,7 +1689,9 @@ void
 lisp_number_pad(state)
      int state;
 {
-  return;
+    nhUse(state);
+
+    return;
 }
 
 void
@@ -1763,7 +1773,7 @@ lisp_get_ext_cmd()
 void
 #ifdef FILE_AREAS
 lisp_display_file(farea, fname, complain)
-     const char *farea;
+     const char *farea UNUSED;
 #else
 lisp_display_file(fname, complain)
 #endif
@@ -1857,7 +1867,7 @@ lisp_print_glyph(window, x, y, glyph, bg_glyph)
     winid window;
     xchar x, y;
     int glyph;
-    int bg_glyph;
+    int bg_glyph UNUSED;
 {
     glyph_t ch;
     int	    color;
@@ -1912,8 +1922,8 @@ lisp_print_glyph(window, x, y, glyph, bg_glyph)
 #ifdef CLIPPING
 void
 lisp_cliparound(x, y)
-     int x;
-     int y;
+     int x UNUSED;
+     int y UNUSED;
 {
   /* as far as I can tell, the x and y values here are exactly the
      ones given by the next lisp_curs call, so its redundant
@@ -1928,7 +1938,7 @@ void lisp_end_screen() {return; }    /* called from settty() in unixtty.c */
 
 static void
 get_death_text (buf)
-     char buf[BUFSZ];
+     char buf[BUFSZ] UNUSED;
 {
 
 }
@@ -1936,7 +1946,7 @@ get_death_text (buf)
 void
 lisp_outrip(window, how)
      winid window;
-     int how;
+     int how UNUSED;
 {
   lisp_cmd ("outrip",
 	    lisp_int (window);

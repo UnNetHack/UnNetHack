@@ -95,7 +95,7 @@ mapglyph(glyph, ochar, ocolor, ospecial, x, y, mgflags)
 int glyph, *ocolor, x, y;
 glyph_t *ochar;
 unsigned *ospecial;
-unsigned mgflags;
+unsigned mgflags UNUSED;
 {
     register int offset;
 #if defined(TEXTCOLOR) || defined(ROGUE_COLOR)

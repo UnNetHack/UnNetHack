@@ -304,6 +304,8 @@ struct obj *book;
             book->cursed && book->bknown && multi >= 0) {
         stop_occupation();
     }
+#else
+    nhUse(book);
 #endif
 }
 

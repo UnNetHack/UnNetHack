@@ -731,7 +731,7 @@ register struct mkroom *sroom;
 /* stock a newly-created black market with objects */
 static void
 stock_blkmar(shp, sroom, sh)
-const struct shclass *shp;
+const struct shclass *shp UNUSED;
 register struct mkroom *sroom;
 register int sh;
 {

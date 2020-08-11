@@ -4623,7 +4623,7 @@ make_bounce:
                         pline("%s bounces!", The(fltxt));
                 }
             }
-            if(!dx || !dy || !rn2(20)) {
+            if (!dx || !dy || !rn2(bchance)) {
                 dx = -dx;
                 dy = -dy;
             } else {

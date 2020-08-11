@@ -447,6 +447,8 @@ curses_update_stats(void)
         if (border)
             ay -= 2;
 
+        nhUse(ax); /* getmaxyx macro isn't sufficient */
+
         if (cy != ay) {
             curses_create_main_windows();
             curses_last_messages();
@@ -846,6 +848,8 @@ curses_add_statuses(WINDOW *win, boolean align_right,
         getmaxyx(win, my, mx);
         if (!curses_window_has_border(STATUS_WIN))
             mx++;
+
+        nhUse(my);
 
         *x = mx;
     }

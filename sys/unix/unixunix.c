@@ -405,7 +405,7 @@ const char *filearea, *filename;
 FILE *
 fopen_datafile_area(filearea, filename, mode, use_scoreprefix)
 const char *filearea, *filename, *mode;
-boolean use_scoreprefix;
+boolean use_scoreprefix UNUSED;
 {
 	FILE *fp;
 	char *buf;

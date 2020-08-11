@@ -94,7 +94,7 @@ init_nhwindows(int* argcp, char** argv)
                 ** windows?  Or at least all but WIN_INFO?      -dean
 */
 void
-curses_init_nhwindows(int *argcp, char **argv)
+curses_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
 {
 #ifdef PDCURSES
     char window_title[BUFSZ];
@@ -233,7 +233,7 @@ curses_exit_nhwindows(const char *str)
 
 /* Prepare the window to be suspended. */
 void
-curses_suspend_nhwindows(const char *str)
+curses_suspend_nhwindows(const char *str UNUSED)
 {
     endwin();
 }
@@ -428,7 +428,7 @@ add_menu(winid wid, int glyph, const anything identifier,
                    menu is displayed, set preselected to TRUE.
 */
 void
-curses_add_menu(winid wid, int glyph, int cnt, const ANY_P * identifier,
+curses_add_menu(winid wid, int glyph, int cnt UNUSED, const ANY_P * identifier,
                 CHAR_P accelerator, CHAR_P group_accel, int attr,
                 const char *str, unsigned int presel)
 {
@@ -752,7 +752,7 @@ number_pad(state)
             -- Initialize the number pad to the given state.
 */
 void
-curses_number_pad(int state)
+curses_number_pad(int state UNUSED)
 {
 }
 
@@ -797,7 +797,7 @@ outrip(winid, int)
                genl_outrip for the value and check the #if in rip.c.
 */
 void
-curses_outrip(winid wid, int how)
+curses_outrip(winid wid UNUSED, int how UNUSED)
 {
 }
 

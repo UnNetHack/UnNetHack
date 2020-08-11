@@ -90,6 +90,10 @@ ps_quit(w, client_data, call_data)
     Widget w;
     XtPointer client_data, call_data;
 {
+    nhUse(w);
+    nhUse(client_data);
+    nhUse(call_data);
+
     ps_selected = PS_QUIT;
     exit_x_event = TRUE;		/* leave event loop */
 }
@@ -100,6 +104,10 @@ ps_random(w, client_data, call_data)
     Widget w;
     XtPointer client_data, call_data;
 {
+    nhUse(w);
+    nhUse(client_data);
+    nhUse(call_data);
+
     ps_selected = PS_RANDOM;
     exit_x_event = TRUE;		/* leave event loop */
 }
@@ -110,6 +118,9 @@ ps_select(w, client_data, call_data)
     Widget w;
     XtPointer client_data, call_data;
 {
+    nhUse(w);
+    nhUse(call_data);
+
     ps_selected = (int) client_data;
     exit_x_event = TRUE;		/* leave event loop */
 }
@@ -125,6 +136,10 @@ ps_key(w, event, params, num_params)
     char ch, *mark;
     char rolechars[QBUFSZ];
     int i;
+
+    nhUse(w);
+    nhUse(params);
+    nhUse(num_params);
 
     (void)memset(rolechars, '\0', sizeof rolechars);  /* for index() */
     for (i = 0; roles[i].name.m; ++i) {
@@ -168,6 +183,10 @@ race_key(w, event, params, num_params)
     char racechars[QBUFSZ];
     int i;
 
+    nhUse(w);
+    nhUse(params);
+    nhUse(num_params);
+
     (void)memset(racechars, '\0', sizeof racechars);  /* for index() */
     for (i = 0; races[i].noun; ++i) {
 	ch = lowc(*races[i].noun);
@@ -208,6 +227,10 @@ gend_key(w, event, params, num_params)
     char ch, *mark;
     static char gendchars[] = "mf";
 
+    nhUse(w);
+    nhUse(params);
+    nhUse(num_params);
+
     ch = key_event_to_char((XKeyEvent *) event);
     if (ch == '\0') {	/* don't accept nul char/modifier event */
 	/* don't beep */
@@ -239,6 +262,10 @@ algn_key(w, event, params, num_params)
 {
     char ch, *mark;
     static char algnchars[] = "LNC";
+
+    nhUse(w);
+    nhUse(params);
+    nhUse(num_params);
 
     ch = key_event_to_char((XKeyEvent *) event);
     if (ch == '\0') {	/* don't accept nul char/modifier event */
@@ -566,6 +593,9 @@ extend_select(w, client_data, call_data)
 {
     int selected = (int) client_data;
 
+    nhUse(w);
+    nhUse(call_data);
+
     if (extended_command_selected != selected) {
 	/* visibly deselect old one */
 	if (extended_command_selected >= 0)
@@ -589,6 +619,10 @@ extend_dismiss(w, client_data, call_data)
     Widget w;
     XtPointer client_data, call_data;
 {
+    nhUse(w);
+    nhUse(client_data);
+    nhUse(call_data);
+
     ec_dismiss();
 }
 
@@ -598,6 +632,10 @@ extend_help(w, client_data, call_data)
     Widget w;
     XtPointer client_data, call_data;
 {
+    nhUse(w);
+    nhUse(client_data);
+    nhUse(call_data);
+
     /* We might need to make it known that we already have one listed. */
     (void) doextlist();
 }
@@ -625,6 +663,10 @@ popup_delete(w, event, params, num_params)
     String *params;
     Cardinal *num_params;
 {
+    nhUse(event);
+    nhUse(params);
+    nhUse(num_params);
+
     ps_selected = PS_QUIT;
     nh_XtPopdown(w);
     exit_x_event = TRUE;		/* leave event loop */
@@ -671,6 +713,10 @@ ec_key(w, event, params, num_params)
     char ch;
     int i;
     XKeyEvent *xkey = (XKeyEvent *) event;
+
+    nhUse(w);
+    nhUse(params);
+    nhUse(num_params);
 
     ch = key_event_to_char(xkey);
 

@@ -903,7 +903,6 @@ register const char *let, *word;
     boolean useboulder = FALSE;
     xchar foox = 0;
     long cnt;
-    boolean cntgiven = FALSE;
     boolean msggiven = FALSE;
     boolean oneloop = FALSE;
     boolean prezero = FALSE;
@@ -1175,7 +1174,6 @@ register const char *let, *word;
             }
             if (allowcnt && ctmp >= 0) {
                 cnt = ctmp;
-                cntgiven = TRUE;
             }
             /* they typed a letter (not a space) at the prompt */
         }
@@ -1271,7 +1269,7 @@ const char *word;
 struct obj *otmp;
 {
 #if 1 /* 'P','R' vs 'W','T' handling is obsolete */
-    /*nhUse(otmp);*/
+    nhUse(otmp);
     pline(silly_thing_to, word);
 #else
     const char *s1, *s2, *s3, *what;
@@ -1837,7 +1835,7 @@ int id_limit;
 void
 identify_pack(id_limit, learning_id)
 int id_limit;
-boolean learning_id; /* true if we just read unknown identify scroll */
+boolean learning_id UNUSED; /* true if we just read unknown identify scroll */
 {
     struct obj *obj;
     int n, unid_cnt = count_unidentified(invent);
@@ -2750,7 +2748,7 @@ nextclass:
         want_reply = FALSE;
     }
     if (want_disp) {
-        end_menu(win, (char *) 0);
+        end_menu(win, query && *query ? query : (char *) 0);
 
         n = select_menu(win, want_reply ? PICK_ONE : PICK_NONE, &selected);
         if (n > 0) {

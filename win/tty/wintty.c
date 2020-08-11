@@ -308,8 +308,8 @@ winch()
 /*ARGSUSED*/
 void
 tty_init_nhwindows(argcp, argv)
-int* argcp;
-char** argv;
+int *argcp UNUSED;
+char **argv UNUSED;
 {
     int wid, hgt;
 
@@ -3494,6 +3494,10 @@ int *x, *y, *mod;
         ttyDisplay->toplin = 2;
     return i;
 # else
+    nhUse(x);
+    nhUse(y);
+    nhUse(mod);
+
     return tty_nhgetch();
 # endif
 }

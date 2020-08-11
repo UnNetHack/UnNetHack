@@ -1337,10 +1337,10 @@ register struct obj *otmp;
         otmp->owt = weight(otmp);
     else if (otmp->otyp == FIGURINE && otmp->timed)
         (void) stop_timer(FIG_TRANSFORM, obj_to_any(otmp));
+
     if (otmp->lamplit) {
         maybe_adjust_light(otmp, old_light);
     }
-    return;
 }
 
 void
@@ -1357,6 +1357,7 @@ register struct obj *otmp;
         set_moreluck();
     else if (otmp->otyp == BAG_OF_HOLDING)
         otmp->owt = weight(otmp);
+
     if (otmp->lamplit) {
         maybe_adjust_light(otmp, old_light);
     }
@@ -1400,7 +1401,10 @@ register struct obj *otmp;
             book_cursed(otmp);
         }
     }
-    return;
+
+    if (otmp->lamplit) {
+        maybe_adjust_light(otmp, old_light);
+    }
 }
 
 void

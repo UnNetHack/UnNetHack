@@ -1352,7 +1352,7 @@ sp_lev *sp;
 static boolean
 write_common_data(fd, lvl)
 int fd;
-sp_lev *lvl;
+sp_lev *lvl UNUSED;
 {
 	static struct version_info version_data = {
 			VERSION_NUMBER, VERSION_FEATURES,

@@ -297,6 +297,8 @@ const char *basename;
 int whichprefix, buffnum;
 {
 #ifndef PREFIXES_IN_USE
+    nhUse(whichprefix);
+    nhUse(buffnum);
     return basename;
 #else
     if (!basename || whichprefix < 0 || whichprefix >= PREFIX_COUNT)
@@ -325,6 +327,7 @@ int
 validate_prefix_locations(reasonbuf)
 char *reasonbuf;
 {
+    nhUse(reasonbuf);
 #if defined(NOCWD_ASSUMPTIONS)
     FILE *fp;
     const char *filename;
@@ -725,7 +728,7 @@ boolean playing; /**< True if game is running.  */
 /** Signal handler to update whereis information. */
 void
 signal_whereis(sig_unused)
-int sig_unused;
+int sig_unused UNUSED;
 {
     touch_whereis();
 }
@@ -1785,6 +1788,7 @@ void
 unlock_file_area(filearea, filename)
 const char *filearea, *filename;
 {
+    nhUse(filearea);
     unlock_file(filename);
 }
 #endif
@@ -2052,6 +2056,8 @@ char        *tmp_ramdisk;
 char        *tmp_levels;
 boolean recursive;
 {
+    nhUse(tmp_ramdisk);
+    nhUse(tmp_levels);
 #if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
 # pragma unused(tmp_ramdisk,tmp_levels)
 #endif
@@ -2593,6 +2599,7 @@ void
 check_recordfile(dir)
 const char *dir;
 {
+    nhUse(dir);
 #if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
 # pragma unused(dir)
 #endif

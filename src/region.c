@@ -927,7 +927,7 @@ int radius, ttl;
 boolean
 expire_gas_cloud(p1, p2)
 genericptr_t p1;
-genericptr_t p2;
+void *p2 UNUSED;
 {
     NhRegion *reg;
     size_t damage;

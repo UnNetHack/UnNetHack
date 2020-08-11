@@ -1119,6 +1119,8 @@ int uid;
 #ifdef PERS_IS_UID
     if (!playerct && t1->uid == uid)
         return 1;
+#else
+    nhUse(uid);
 #endif
 
     for (i = 0; i < playerct; i++) {

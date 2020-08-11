@@ -4620,7 +4620,6 @@ boolean force;
     struct trap *ttmp;
     struct monst *mtmp;
     boolean trap_skipped = FALSE;
-    boolean box_here = FALSE;
     boolean deal_with_floor_trap = FALSE;
     char the_trap[BUFSZ], qbuf[QBUFSZ];
     int boxcnt = 0;
@@ -4650,7 +4649,6 @@ boolean force;
     for (otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere) {
         /* are there are one or more containers here? */
         if (Is_box(otmp) && !u.dx && !u.dy) {
-            box_here = TRUE;
             boxcnt++;
         }
         if (otmp->oartifact == ART_EXCALIBUR && (levl[x][y].typ <= SCORR)) {

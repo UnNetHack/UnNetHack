@@ -108,7 +108,7 @@ extern const char * const killed_by_prefix[];   /* from topten.c */
 /*ARGSUSED*/
 void
 done1(sig_unused)   /* called as signal() handler, so sent at least one arg */
-int sig_unused;
+int sig_unused UNUSED;
 {
 #ifndef NO_SIGNAL
     (void) signal(SIGINT, SIG_IGN);
@@ -178,7 +178,7 @@ done2()
 /*ARGSUSED*/
 STATIC_PTR void
 done_intr(sig_unused) /* called as signal() handler, so sent at least one arg */
-int sig_unused;
+int sig_unused UNUSED;
 {
     done_stopprint++;
     (void) signal(SIGINT, SIG_IGN);
@@ -1446,7 +1446,7 @@ STATIC_OVL void
 list_genocided(defquery, ask, want_disp)
 int defquery;
 boolean ask;
-boolean want_disp;
+boolean want_disp UNUSED;
 {
     register int i;
     int ngenocided=0;

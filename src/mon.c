@@ -3322,7 +3322,7 @@ struct monst *mtmp;
 void
 setmangry(mtmp, via_attack)
 struct monst *mtmp;
-boolean via_attack;
+boolean via_attack UNUSED;
 {
     mtmp->mstrategy &= ~STRAT_WAITMASK;
 #ifdef BLACKMARKET

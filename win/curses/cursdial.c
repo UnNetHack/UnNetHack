@@ -330,6 +330,7 @@ curses_ext_cmd()
         getmaxyx(extwin2,h,w);
         extwin = newwin(1, w-2, y0+1, x0+1);
         if (w - 4 < maxlen) maxlen = w - 4;
+        nhUse(h); /* needed only to give getmaxyx three arguments */
     } else {
         curses_get_window_xy(MESSAGE_WIN, &winx, &winy);
         curses_get_window_size(MESSAGE_WIN, &messageh, &messagew);

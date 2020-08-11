@@ -694,7 +694,7 @@ unsigned int stuckid, steedid;  /* STEED */
 /*ARGSUSED*/    /* fd used in MFLOPPY only */
 STATIC_OVL int
 restlevelfile(fd, ltmp)
-register int fd;
+int fd UNUSED;
 xchar ltmp;
 #if defined(macintosh) && (defined(__SC__) || defined(__MRC__))
 # pragma unused(fd)

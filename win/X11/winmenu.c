@@ -96,6 +96,8 @@ menu_select(w, client_data, call_data)
 #endif
     long how_many;
 
+    nhUse(client_data);
+
     wp = find_widget(w);
     menu_info  = wp->menu_information;
     how_many = menu_info->counting ? menu_info->menu_count : -1L;
@@ -155,6 +157,10 @@ menu_delete(w, event, params, num_params)
     String *params;
     Cardinal *num_params;
 {
+    nhUse(event);
+    nhUse(params);
+    nhUse(num_params);
+
     menu_cancel((Widget)None, (XtPointer) find_widget(w), (XtPointer) 0);
 }
 
@@ -171,6 +177,9 @@ invert_line(wp, curr, which, how_many)
 {
     reset_menu_count(wp->menu_information);
     curr->selected = !curr->selected;
+
+    nhUse(which);
+
     if (curr->selected) {
 #ifdef USE_FWF
 	XfwfMultiListHighlightItem((XfwfMultiListWidget)wp->w, which);
@@ -204,6 +213,9 @@ menu_key(w, event, params, num_params)
     struct xwindow *wp;
     char ch;
     int count;
+
+    nhUse(params);
+    nhUse(num_params);
 
     wp = find_widget(w);
     menu_info = wp->menu_information;
@@ -331,6 +343,10 @@ menu_ok(w, client_data, call_data)
 {
     struct xwindow *wp = (struct xwindow *) client_data;
 
+    nhUse(w);
+    nhUse(client_data);
+    nhUse(call_data);
+
     menu_popdown(wp);
 }
 
@@ -341,6 +357,9 @@ menu_cancel(w, client_data, call_data)
     XtPointer client_data, call_data;
 {
     struct xwindow *wp = (struct xwindow *) client_data;
+
+    nhUse(w);
+    nhUse(call_data);
 
     if (wp->menu_information->is_active) {
 	select_none(wp);
@@ -355,6 +374,9 @@ menu_all(w, client_data, call_data)
     Widget w;
     XtPointer client_data, call_data;
 {
+    nhUse(w);
+    nhUse(call_data);
+
     select_all((struct xwindow *) client_data);
 }
 
@@ -364,6 +386,9 @@ menu_none(w, client_data, call_data)
     Widget w;
     XtPointer client_data, call_data;
 {
+    nhUse(w);
+    nhUse(call_data);
+
     select_none((struct xwindow *) client_data);
 }
 
@@ -373,6 +398,9 @@ menu_invert(w, client_data, call_data)
     Widget w;
     XtPointer client_data, call_data;
 {
+    nhUse(w);
+    nhUse(call_data);
+
     invert_all((struct xwindow *) client_data);
 }
 
@@ -384,6 +412,9 @@ menu_search(w, client_data, call_data)
 {
     struct xwindow *wp = (struct xwindow *) client_data;
     struct menu_info_t *menu_info = wp->menu_information;
+
+    nhUse(w);
+    nhUse(call_data);
 
     char buf[BUFSZ];
     X11_getlin("Search for:", buf);
@@ -596,6 +627,10 @@ X11_add_menu(window, glyph, cnt, identifier, ch, gch, attr, str, preselected)
 {
     x11_menu_item *item;
     struct menu_info_t *menu_info;
+
+    nhUse(glyph);
+    nhUse(cnt);
+    nhUse(preselected);
 
     check_winid(window);
     menu_info = window_list[window].menu_information;

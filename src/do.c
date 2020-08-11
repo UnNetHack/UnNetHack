@@ -2051,7 +2051,7 @@ struct obj *corpse;
 void
 revive_mon(arg, timeout)
 anything *arg;
-long timeout;
+long timeout UNUSED;
 {
     struct obj *body = arg->a_obj;
 

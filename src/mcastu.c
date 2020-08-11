@@ -589,8 +589,8 @@ int spellnum;
 STATIC_OVL
 void
 cast_punisher_spell(mtmp, dmg, spellnum)
-struct monst* mtmp;
-int dmg;
+struct monst* mtmp UNUSED;
+int dmg UNUSED;
 int spellnum;
 {
     switch(spellnum) {

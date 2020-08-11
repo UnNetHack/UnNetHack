@@ -23,7 +23,6 @@ STATIC_DCL void FDECL(mswings, (struct monst *, struct obj *));
 STATIC_DCL void FDECL(wildmiss, (struct monst *, struct attack *));
 STATIC_DCL int FDECL(mon_scream, (struct monst*, struct attack*));
 
-STATIC_DCL void FDECL(hurtarmor, (int));
 STATIC_DCL void FDECL(hitmsg, (struct monst *, struct attack *));
 
 STATIC_DCL void FDECL(invulnerability_messages, (struct monst *, BOOLEAN_P, BOOLEAN_P));
@@ -268,7 +267,8 @@ boolean message;
 /* select a monster's next attack, possibly substituting for its usual one */
 struct attack *
 getmattk(magr, mdef, indx, prev_result, alt_attk_buf)
-struct monst *magr, *mdef;
+struct monst *magr;
+struct monst *mdef UNUSED;
 int indx, prev_result[];
 struct attack *alt_attk_buf;
 {
@@ -815,73 +815,6 @@ register struct monst *mtmp;
         /* sum[i] == 0: unsuccessful attack */
     }
     return(0);
-}
-
-/*
- * helper function for some compilers that have trouble with hitmu
- */
-
-STATIC_OVL void
-hurtarmor(attk)
-int attk;
-{
-    int hurt;
-
-    switch(attk) {
-    /* 0 is burning, which we should never be called with */
-    case AD_RUST: hurt = 1; break;
-    case AD_CORR: hurt = 3; break;
-    default: hurt = 2; break;
-    }
-
-    /* What the following code does: it keeps looping until it
-     * finds a target for the rust monster.
-     * Head, feet, etc... not covered by metal, or covered by
-     * rusty metal, are not targets.  However, your body always
-     * is, no matter what covers it.
-     */
-    while (1) {
-        switch(rn2(5)) {
-        case 0:
-            if (!uarmh || (!water_damage(uarmh, xname(uarmh), FALSE) == ER_NOTHING)) {
-                continue;
-            }
-            break;
-        case 1:
-            if (uarmc) {
-                (void)water_damage(uarmc, xname(uarmc), FALSE);
-                break;
-            }
-            /* Note the difference between break and continue;
-             * break means it was hit and didn't rust; continue
-             * means it wasn't a target and though it didn't rust
-             * something else did.
-             */
-            if (uarm)
-                (void)water_damage(uarm, xname(uarm), FALSE);
-#ifdef TOURIST
-            else if (uarmu)
-                (void)water_damage(uarmu, xname(uarmu), FALSE);
-#endif
-            break;
-        case 2:
-            if (!uarms || (!water_damage(uarms, xname(uarms), FALSE) == ER_NOTHING)) {
-                continue;
-            }
-            break;
-        case 3:
-            if (!uarmg || !water_damage(uarmg, xname(uarmg), FALSE) == ER_NOTHING) {
-                continue;
-            }
-            break;
-        case 4:
-            if (!uarmf || !water_damage(uarmf, xname(uarmf), FALSE) == ER_NOTHING) {
-                continue;
-            }
-            break;
-        }
-        break; /* Out of while loop */
-    }
 }
 
 STATIC_OVL boolean
@@ -2683,6 +2616,19 @@ struct attack *mattk;
     default: warning("Gaze attack %d?", mattk->adtyp);
         break;
     }
+    if (react >= 0) {
+        if (Hallucination && rn2(3)) {
+            react = rn2(SIZE(reactions));
+        }
+        /* cancelled/hallucinatory feedback; monster might look "confused",
+           "stunned",&c but we don't actually set corresponding attribute */
+        pline("%s looks %s%s.", Monnam(mtmp),
+                !rn2(3) ? "" :
+                already ? "quite " :
+                !rn2(2) ? "a bit " : "somewhat ",
+                reactions[react]);
+    }
+
     return(0);
 }
 

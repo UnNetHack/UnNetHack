@@ -64,6 +64,10 @@ delete_text(w, event, params, num_params)
     struct xwindow *wp;
     struct text_info_t *text_info;
 
+    nhUse(event);
+    nhUse(params);
+    nhUse(num_params);
+
     wp = find_widget(w);
     text_info = wp->text_information;
 
@@ -91,6 +95,10 @@ dismiss_text(w, event, params, num_params)
 {
     struct xwindow *wp;
     struct text_info_t *text_info;
+
+    nhUse(event);
+    nhUse(params);
+    nhUse(num_params);
 
     wp = find_widget(w);
     text_info = wp->text_information;
@@ -139,6 +147,8 @@ add_to_text_window(wp, attr, str)
 {
     struct text_info_t *text_info = wp->text_information;
     int width;
+
+    nhUse(attr);
 
     append_text_buffer(&text_info->text, str, FALSE);
 

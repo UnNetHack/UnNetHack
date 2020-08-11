@@ -1042,7 +1042,7 @@ xchar x, y;
 static void
 autoexplore_msg(text, mode)
 const char *text;
-int mode;
+int mode UNUSED;
 {
     if (iflags.autoexplore) {
         char tmp[BUFSZ];

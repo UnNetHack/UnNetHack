@@ -667,6 +667,9 @@ int gloc;
             Sprintf(fullbuf, "%s%s%s", firstmatch, (*tmpbuf ? " " : ""), tmpbuf);
             add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, fullbuf, MENU_UNSELECTED);
         }
+#else
+        nhUse(tmpcc);
+        nhUse(any);
 #endif
     }
 

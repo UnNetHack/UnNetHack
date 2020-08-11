@@ -39,6 +39,7 @@ int
 curses_read_char()
 {
     int ch, tmpch;
+    nhUse(tmpch);
 
     ch = getch();
     tmpch = ch;
@@ -291,10 +292,6 @@ curses_break_str(const char *str, int width, int line_num)
         if (last_space == 0) {  /* No spaces found */
             last_space = count - 1;
         }
-        for (count = 0; count < last_space; count++) {
-            curstr[count] = substr[count];
-        }
-        curstr[count] = '\0';
         if (substr[count] == '\0') {
             break;
         }
@@ -325,7 +322,6 @@ curses_str_remainder(const char *str, int width, int line_num)
     int curline = 0;
     int strsize = strlen(str);
     char substr[strsize];
-    char curstr[strsize];
     char tmpstr[strsize];
 
     strcpy(substr, str);
@@ -347,10 +343,6 @@ curses_str_remainder(const char *str, int width, int line_num)
         if (last_space == 0) {  /* No spaces found */
             last_space = count - 1;
         }
-        for (count = 0; count < last_space; count++) {
-            curstr[count] = substr[count];
-        }
-        curstr[count] = '\0';
         if (substr[count] == '\0') {
             break;
         }

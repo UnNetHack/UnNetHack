@@ -1426,7 +1426,7 @@ d_level *lev;
 
 boolean
 has_ceiling(lev)
-d_level *lev;
+d_level *lev UNUSED;
 {
     return !level.flags.sky;
 }
@@ -2718,9 +2718,9 @@ dooverview()
 /* called for #overview or for end of game disclosure */
 void
 show_overview(why, reason)
-int why;    /* 0 => #overview command,
-               1 or 2 => final disclosure (1: hero lived, 2: hero died) */
-int reason; /* how hero died; used when disclosing end-of-game level */
+int why UNUSED; /* 0 => #overview command,
+                   1 or 2 => final disclosure (1: hero lived, 2: hero died) */
+int reason UNUSED; /* how hero died; used when disclosing end-of-game level */
 {
     winid win;
     mapseen *mptr;

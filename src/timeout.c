@@ -687,6 +687,16 @@ nh_timeout()
             case LEVITATION:
                 (void) float_down(I_SPECIAL|TIMEOUT, 0L);
                 break;
+
+            case FLYING:
+                /* timed Flying is via #wizintrinsic only */
+                if (was_flying && !Flying) {
+                    flags.botl = 1;
+                    You("land.");
+                    spoteffects(TRUE);
+                }
+                break;
+
             case STRANGLED:
                 killer.format = KILLED_BY;
                 Strcpy(killer.name, (u.uburied) ? "suffocation" : "strangulation");

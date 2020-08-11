@@ -530,6 +530,7 @@ void
 readmail(otmp)
 struct obj *otmp;
 {
+    nhUse(otmp);
 #ifdef DEF_MAILREADER
     register const char *mr = 0;
     if (iflags.debug_fuzzer) {
@@ -719,7 +720,7 @@ struct obj *otmp;
 
 void
 read_hint(otmp)
-struct obj *otmp;
+struct obj *otmp UNUSED;
 {
     /* TODO: option for beginner, general changes, public server hints? */
     static char *hint[] = {

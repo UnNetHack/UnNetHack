@@ -103,6 +103,9 @@ init_nhwindows(int* argcp, char** argv)
 */
 void dummy_init_nhwindows(int* argc, char** argv)
 {
+    nhUse(argc);
+    nhUse(argv);
+
     dummy_printf("dummy_init_nhwindows\n");
 }
 
@@ -284,10 +287,6 @@ dummy_display_file(const char *filename, BOOLEAN_P must_exist)
     } else {
 #define LLEN 128
         char line[LLEN];
-        int num_lines, charcount;
-
-        num_lines = 0;
-        charcount = 1;
         while (dlb_fgets(line, LLEN, f)) {
             printf("%s", line);
         }
@@ -388,6 +387,7 @@ int select_menu(windid window, int how, menu_item **selected)
 int dummy_select_menu(winid wid, int how, MENU_ITEM_P **selected)
 {
     int nReturned = -1;
+    nhUse(selected);
     dummy_printf("dummy_select_menu(%s, %d, ...)\n", winid2str(wid), how);
 
     /*if (wid != -1 && dummy_windowlist[wid].win != NULL &&
@@ -441,6 +441,9 @@ cliparound(x, y)-- Make sure that the user is more-or-less centered on the
 */
 void dummy_cliparound(int x, int y)
 {
+    nhUse(x);
+    nhUse(y);
+
     /* Do Nothing */
     dummy_printf("dummy_cliparound\n");
 }
@@ -528,6 +531,10 @@ int nh_poskey(int *x, int *y, int *mod)
 */
 int dummy_nh_poskey(int *x, int *y, int *mod)
 {
+    nhUse(x);
+    nhUse(y);
+    nhUse(mod);
+
     dummy_printf("dummy_nh_poskey\n");
     return dummy_getchar();
 }
@@ -661,6 +668,8 @@ number_pad(state)
 */
 void dummy_number_pad(int state)
 {
+    nhUse(state);
+
     /* Do Nothing */
     dummy_printf("dummy_number_pad\n");
 }
@@ -707,5 +716,8 @@ outrip(winid, int)
 */
 void dummy_outrip(winid wid, int how)
 {
+    nhUse(wid);
+    nhUse(how);
+
     dummy_printf("dummy_outrip\n");
 }

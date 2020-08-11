@@ -3683,10 +3683,9 @@ boolean croaked;
     boolean did_repair = FALSE, saw_door = FALSE;
     boolean saw_floor = FALSE, stop_picking = FALSE;
     boolean doorway_trap = FALSE, skip_msg = FALSE;
-    int saw_walls = 0, saw_untrap = 0, feedback;
+    int saw_walls = 0, saw_untrap = 0;
     char trapmsg[BUFSZ];
 
-    feedback = !croaked; /* 1 => give feedback, 0 => don't or already did */
     tmp_dam = level.damagelist;
     tmp2_dam = 0;
     while (tmp_dam) {

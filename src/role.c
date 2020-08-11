@@ -1008,7 +1008,8 @@ int rolenum, gendnum, alignnum, pickhow;
 /* gender and alignment are not comparable (and also not constrainable) */
 boolean
 ok_gend(rolenum, racenum, gendnum, alignnum)
-int rolenum, racenum, gendnum, alignnum;
+int rolenum, racenum, gendnum;
+int alignnum UNUSED;
 {
     int i;
     short allow;
@@ -1084,7 +1085,9 @@ int rolenum, racenum, alignnum, pickhow;
 /* alignment and gender are not comparable (and also not constrainable) */
 boolean
 ok_align(rolenum, racenum, gendnum, alignnum)
-int rolenum, racenum, gendnum, alignnum;
+int rolenum, racenum;
+int gendnum UNUSED;
+int alignnum;
 {
     int i;
     short allow;

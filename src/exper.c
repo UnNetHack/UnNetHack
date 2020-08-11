@@ -78,7 +78,7 @@ newpw()
 int
 experience(mtmp, nk)
 register struct monst *mtmp;
-register int nk;
+int nk UNUSED;
 {
     register struct permonst *ptr = mtmp->data;
     int i, tmp, tmp2;

@@ -145,7 +145,13 @@ X11_print_glyph(window, x, y, glyph, bg_glyph)
  * on this being defined.
  */
 /*ARGSUSED*/
-void X11_cliparound(x, y) int x, y; { }
+void
+X11_cliparound(x, y)
+int x UNUSED;
+int y UNUSED;
+{
+    return;
+}
 #endif /* CLIPPING */
 
 /* End global functions ==================================================== */
@@ -1102,6 +1108,8 @@ map_exposed(w, client_data, widget_data)
     int start_row, stop_row, start_col, stop_col;
     XExposeEvent *event = (XExposeEvent *) widget_data;
     int t_height, t_width;	/* tile/text height & width */
+
+    nhUse(client_data);
 
     if (!XtIsRealized(w) || event->count > 0) return;
 

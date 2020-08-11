@@ -143,8 +143,8 @@ const char *s;
 /*ARGSUSED*/
 char
 genl_message_menu(let, how, mesg)
-char let;
-int how;
+char let UNUSED;
+int how UNUSED;
 const char *mesg;
 {
     pline("%s", mesg);
@@ -154,7 +154,7 @@ const char *mesg;
 /*ARGSUSED*/
 void
 genl_preference_update(pref)
-const char *pref;
+const char *pref UNUSED;
 {
     /* window ports are expected to provide
        their own preference update routine

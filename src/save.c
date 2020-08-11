@@ -101,7 +101,7 @@ dosave()
 /*ARGSUSED*/
 void
 hangup(sig_unused)  /* called as signal() handler, so sent at least one arg */
-int sig_unused;
+int sig_unused UNUSED;
 {
 # ifdef NOSAVEONHANGUP
     (void) signal(SIGINT, SIG_IGN);

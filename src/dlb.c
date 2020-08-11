@@ -266,7 +266,8 @@ lib_dlb_cleanup()
 static boolean
 lib_dlb_fopen(dp, name, mode)
 dlb *dp;
-const char *name, *mode;
+const char *name;
+const char *mode UNUSED;
 {
     long start, size;
     library *lp;
@@ -285,7 +286,7 @@ const char *name, *mode;
 
 static int
 lib_dlb_fclose(dp)
-dlb *dp;
+dlb *dp UNUSED;
 {
     /* nothing needs to be done */
     return 0;
