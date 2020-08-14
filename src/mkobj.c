@@ -2445,6 +2445,13 @@ const char *mesg;
     struct obj *obj;
 
     for (obj = objlist; obj; obj = obj->nobj) {
+        if (distant_name(obj, doname) == NULL) {
+            insane_object(obj, "%s obj has no distant name!", mesg, NULL);
+        }
+        if (doname(obj) == NULL) {
+            insane_object(obj, "%s obj has no name!", mesg, NULL);
+        }
+
         if (obj->where != wheretype) {
             insane_object(obj, ofmt0, mesg, (struct monst *) 0);
         }

@@ -2624,7 +2624,7 @@ boolean include_contents;
 
     /* onbill() gave no message if unexpected problem occurred */
     if (!shkp || (unp_obj->unpaid && !bp)) {
-        impossible("unpaid_cost: object wasn't on any bill.");
+        impossible("unpaid_cost: object wasn't on any bill; shkp: %p %d %p.", shkp, unp_obj->unpaid, bp);
     } else {
         if (bp) {
             amt = unp_obj->quan * bp->price;

@@ -1487,6 +1487,7 @@ E int FDECL(can_carry, (struct monst *, struct obj *));
 E int FDECL(mfndpos, (struct monst *, coord *, long *, long));
 E boolean FDECL(monnear, (struct monst *, int, int));
 E void NDECL(dmonsfree);
+E void NDECL(sanity_check_dmonsfree);
 E void FDECL(elemental_clog, (struct monst *));
 E int FDECL(mcalcmove, (struct monst*));
 E void NDECL(mcalcdistress);

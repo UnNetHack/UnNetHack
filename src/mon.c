@@ -1715,6 +1715,33 @@ dmonsfree()
     iflags.purge_monsters = 0;
 }
 
+
+void
+sanity_check_dmonsfree()
+{
+    struct monst *mtmp;
+    int count = 0;
+    char buf[QBUFSZ];
+
+    fuzzer_printf("sanity_check_dmonsfree\n");
+    buf[0] = '\0';
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp) && !mtmp->isgd) {
+            fuzzer_printf("sanity_check_dmonsfree: freetmp %p %s\n", mtmp, mtmp->data->mname);
+            count++;
+            if (count > iflags.purge_monsters) {
+                describe_level(buf);
+                impossible("dmonsfree 1: %d removed doesn't match %d pending on %s", count, iflags.purge_monsters, buf);
+            }
+        }
+    }
+
+    if (count != iflags.purge_monsters) {
+        describe_level(buf);
+        impossible("dmonsfree 2: %d removed doesn't match %d pending on %s", count, iflags.purge_monsters, buf);
+    }
+}
+
 /* called when monster is moved to larger structure */
 void
 replmon(mtmp, mtmp2)
@@ -1922,6 +1949,7 @@ struct monst *mtmp;
 struct permonst *mptr;  /* reflects mtmp->data _prior_ to mtmp's death */
 {
     boolean onmap = (mtmp->mx > 0);
+    fuzzer_printf("m_detach(): %s %d\n", mtmp->data->mname, iflags.purge_monsters+1);
 
     if (mtmp == polearm.hitmon) {
         polearm.hitmon = 0;

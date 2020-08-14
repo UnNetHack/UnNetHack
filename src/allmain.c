@@ -211,6 +211,8 @@ boolean resuming;
         do_positionbar();
 #endif
 
+        sanity_check_dmonsfree();
+
         didmove = flags.move;
         if(didmove) {
             /* actual time passed */
@@ -515,6 +517,8 @@ boolean resuming;
 
         } /* actual time passed */
 
+        sanity_check_dmonsfree();
+
         /****************************************/
         /* once-per-player-input things go here */
         /****************************************/
@@ -620,8 +624,10 @@ boolean resuming;
             do_vicinity_map();
 
 #ifdef WIZARD
-        if (iflags.sanity_check || iflags.debug_fuzzer)
+        if (iflags.sanity_check || iflags.debug_fuzzer) {
             sanity_check();
+            sanity_check_dmonsfree();
+        }
 #endif
 
 #ifdef CLIPPING
