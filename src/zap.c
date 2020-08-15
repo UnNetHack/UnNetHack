@@ -2988,6 +2988,11 @@ boolean youattack, allow_cancel_kill, self_cancel;
             int adtyp = mdef->data->mattk[0].adtyp;
             int aatyp = mdef->data->mattk[0].aatyp;
 
+            if (mdef->data->mlet == S_JABBERWOCK) {
+                adtyp = mdef->data->mattk[3].adtyp;
+                aatyp = mdef->data->mattk[3].aatyp;
+            }
+
             if (aatyp != AT_NONE) {
                 switch (adtyp) {
                 case AD_COLD:
@@ -3010,6 +3015,9 @@ boolean youattack, allow_cancel_kill, self_cancel;
                     break;
                 case AD_SPOR:
                     msg = "dormant";
+                    break;
+                case AD_HEAD:
+                    msg = "less sharp";
                     break;
                 default:
                     break;
