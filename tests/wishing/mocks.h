@@ -25,6 +25,7 @@ struct cmd Cmd;
 void raw_printf(const char *str,...) {}
 void impossible(const char *str,...) {}
 void warning(const char *str,...) {}
+void fuzzer_printf(const char *str, ...) {}
 
 unsigned long get_feature_notice_ver(char *str) { return 0; }
 unsigned long get_current_feature_ver() { return 0; }

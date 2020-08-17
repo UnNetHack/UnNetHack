@@ -15,6 +15,7 @@
 STATIC_DCL void NDECL(do_positionbar);
 #endif
 STATIC_DCL void FDECL(interrupt_multi, (const char *, int, int));
+void dump_rng_state();
 
 static int prev_hp_notify;
 enum monster_generation monclock;
@@ -321,9 +322,10 @@ boolean resuming;
 
                     monstermoves++;
                     moves++;
-                    if (moves >= 199999) { printf("moves: %ld\n", moves); done(PANICKED); }
+                    if (moves % 1000 == 0) { dump_rng_state(); }
+                    if (moves >= 200000) { printf("moves: %ld\n", moves); done(PANICKED); }
                     if (wizard) { iflags.debug_fuzzer = FALSE; }
-                    //if (moves >= 169122) { iflags.debug_fuzzer = FALSE; wizard = TRUE; }
+                    //if (moves >= 200000) { iflags.debug_fuzzer = FALSE; wizard = TRUE; }
 
                     /********************************/
                     /* once-per-turn things go here */

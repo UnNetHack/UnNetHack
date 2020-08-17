@@ -20,6 +20,13 @@ RND(int x)
 }
 
 void
+dump_rng_state()
+{
+    isaac_ctx *_ctx = &default_rng;
+    fuzzer_printf("dump_rng_state: 0x%x 0x%x 0x%x 0x%x\n", _ctx->n, _ctx->a, _ctx->b, _ctx->c);
+}
+
+void
 set_random_state(unsigned int x)
 {
     unsigned char seed[8];
