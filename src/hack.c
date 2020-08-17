@@ -1270,7 +1270,9 @@ testdiag:
                 !In_sokoban(&u.uz)) {
                 if (still_chewing(x, y)) return FALSE;
             } else {
-                if (moverock() < 0) return FALSE;
+                if (flags.run != 0 || moverock() < 0) {
+                    return FALSE;
+                }
             }
         } else if (mode == TEST_TRAV) {
             struct obj* obj;
