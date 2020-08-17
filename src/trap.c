@@ -3967,7 +3967,7 @@ drown()
                 Hallucination ? "the Titanic" : "a rock");
     }
 
-    water_damage(invent, (char *)0, FALSE);
+    water_damage_chain(invent, FALSE);
 
     if (u.umonnum == PM_GREMLIN && rn2(3))
         (void)split_mon(&youmonst, (struct monst *)0);
@@ -5700,7 +5700,7 @@ swamp_effects()
     if (!swampok) {
         if (!rn2(5)) {
             Your("baggage gets wet.");
-            water_damage(invent, (char *)0, FALSE);
+            water_damage_chain(invent, FALSE);
         } else if (uarmf)
             water_damage(uarmf, "boots", TRUE);
     }
