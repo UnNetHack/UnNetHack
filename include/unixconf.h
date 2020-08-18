@@ -143,6 +143,8 @@
 #endif
 #endif
 
+/* #define AVOID_WIN_IOCTL */ /* ensure USE_WIN_IOCTL remains undefined */
+
 /*
  * If you define MAIL, then the player will be notified of new mail
  * when it arrives.  If you also define DEF_MAILREADER then this will

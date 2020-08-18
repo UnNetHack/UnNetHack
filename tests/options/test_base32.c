@@ -7,7 +7,7 @@ check_decode_base32(
         const char* input,
         unsigned long expected_number)
 {
-    int converted_number = decode_base32(input);
+    long converted_number = decode_base32(input);
     fail_unless((converted_number == expected_number),
             "\n\nFailed expected \"%s\" to convert to %lu but got %lu.\n",
             input, expected_number, converted_number);

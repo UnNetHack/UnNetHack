@@ -86,6 +86,7 @@ extern char FDECL(core_func_retval, (int));
 extern int FDECL(is_core_func, (char *));
 extern int FDECL(core_func_idx, (char *));
 
+extern int NDECL(yyparse);
 extern void FDECL(yyerror, (const char *));
 
 /*

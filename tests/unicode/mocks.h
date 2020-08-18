@@ -46,6 +46,7 @@ const struct Gender genders[] = {};
 const struct Role roles[] = {};
 const struct Race races[] = {};
 
+char* makeplural(const char *str) { return (char*)str; }
 
 int doredraw() { return 0; }
 boolean on_level(d_level *a, d_level *b) { return FALSE; }
