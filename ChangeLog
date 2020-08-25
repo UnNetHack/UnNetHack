@@ -41,6 +41,9 @@
 	  - Level with trees have a chance of an additional axe
 	  - Fix pacman level connectivity to the rest of the level
 
+	* Sokoban:
+	  - Sokoban's level difficulty is equal to Sokoban's entrance level
+
 	* user interface improvements:
 	  - Optimized placement of menu windows in TTY port
 	  - Mark vibrating square automatically as trap after being found

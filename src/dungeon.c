@@ -1677,6 +1677,10 @@ d_level *lev;
 xchar
 level_difficulty()
 {
+    if (In_sokoban(&u.uz)) {
+        return (xchar)depth(&oracle_level)+1;
+    }
+
     if (In_endgame(&u.uz))
         return((xchar)(depth(&sanctum_level) + u.ulevel/2));
     else
