@@ -40,6 +40,7 @@
 	  - Prevent dungeon feature generation on stairs
 	  - Level with trees have a chance of an additional axe
 	  - Fix pacman level connectivity to the rest of the level
+	  - Remove random secret doors
 
 	* Sokoban:
 	  - Sokoban's level difficulty is equal to Sokoban's entrance level

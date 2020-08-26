@@ -1533,7 +1533,7 @@ register struct mkroom *aroom;
         return;
     }
 
-    dosdoor(x, y, aroom, rn2(8) ? DOOR : SDOOR);
+    dosdoor(x, y, aroom, DOOR);
 }
 
 boolean
