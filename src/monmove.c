@@ -1464,6 +1464,7 @@ postmov:
                ) {
                 struct rm *here = &levl[mtmp->mx][mtmp->my];
                 boolean btrapped = (here->doormask & D_TRAPPED);
+                boolean observeit = canseeit && canspotmon(mtmp);
 
                 /* if mon has MKoT, disarm door trap; no message given */
                 if (btrapped && has_magic_key(mtmp)) {
@@ -1489,27 +1490,33 @@ postmov:
                         if(mb_trapped(mtmp)) return(2);
                     } else {
                         if (flags.verbose) {
-                            if (canseeit)
-                                You("see a door unlock and open.");
-                            else if (flags.soundok)
+                            if (observeit) {
+                                pline("%s unlocks and opens a door.", Monnam(mtmp));
+                            } else if (canseeit) {
+                                You_see("a door unlock and open.");
+                            } else if (!Deaf) {
                                 You_hear("a door unlock and open.");
+                            }
                         }
                         here->doormask = D_ISOPEN;
                         /* newsym(mtmp->mx, mtmp->my); */
                         unblock_point(mtmp->mx, mtmp->my); /* vision */
                     }
                 } else if (here->doormask == D_CLOSED && can_open) {
-                    if(btrapped) {
+                    if (btrapped) {
                         here->doormask = D_NODOOR;
                         newsym(mtmp->mx, mtmp->my);
                         unblock_point(mtmp->mx, mtmp->my); /* vision */
                         if(mb_trapped(mtmp)) return(2);
                     } else {
                         if (flags.verbose) {
-                            if (canseeit)
-                                You("see a door open.");
-                            else if (flags.soundok)
+                            if (observeit) {
+                                pline("%s opens a door.", Monnam(mtmp));
+                            } else if (canseeit) {
+                                You_see("a door open.");
+                            } else if (!Deaf) {
                                 You_hear("a door open.");
+                            }
                         }
                         here->doormask = D_ISOPEN;
                         /* newsym(mtmp->mx, mtmp->my); */  /* done below */
@@ -1517,17 +1524,20 @@ postmov:
                     }
                 } else if (here->doormask & (D_LOCKED|D_CLOSED)) {
                     /* mfndpos guarantees this must be a doorbuster */
-                    if(btrapped) {
+                    if (btrapped) {
                         here->doormask = D_NODOOR;
                         newsym(mtmp->mx, mtmp->my);
                         unblock_point(mtmp->mx, mtmp->my); /* vision */
                         if(mb_trapped(mtmp)) return(2);
                     } else {
                         if (flags.verbose) {
-                            if (canseeit)
-                                You("see a door crash open.");
-                            else if (flags.soundok)
+                            if (observeit) {
+                                pline("%s smashes down a door.", Monnam(mtmp));
+                            } else if (canseeit) {
+                                You_see("a door crash open.");
+                            } else if (!Deaf) {
                                 You_hear("a door crash open.");
+                            }
                         }
                         if (here->doormask & D_LOCKED && !rn2(2))
                             here->doormask = D_NODOOR;

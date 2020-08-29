@@ -2360,7 +2360,7 @@ struct obj *otmp;
                 if (Blind)
                     You_feel("%s fall from your pack!", the(xname(otmp)));
                 else
-                    You("see %s fall out of your pack!", the(xname(otmp)));
+                    You_see("%s fall out of your pack!", the(xname(otmp)));
                 pline("But you can't retrieve it.");
                 if (Hallucination) {
                     You("feel like Dorothy travelling back to Kansas!");

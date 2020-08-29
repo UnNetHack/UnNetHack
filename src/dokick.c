@@ -1280,7 +1280,7 @@ dokick()
                                       "Muddy waste pops up from the drain"));
                 if(!(maploc->looted & S_LRING)) { /* once per sink */
                     if (!Blind)
-                        You("see a ring shining in its midst.");
+                        You_see("a ring shining in its midst.");
                     (void) mkobj_at(RING_CLASS, x, y, TRUE);
                     newsym(x, y);
                     exercise(A_DEX, TRUE);

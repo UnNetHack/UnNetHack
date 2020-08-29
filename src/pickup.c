@@ -3246,7 +3246,7 @@ del_sokoprize()
             y = otmp->oy;
             obj_extract_self(otmp);
             if (cansee(x, y)) {
-                You("see %s vanishing.", an(xname(otmp)));
+                You_see("%s vanishing.", an(xname(otmp)));
                 newsym(x, y);
             } else cnt++;
             obfree(otmp, (struct obj *)0);

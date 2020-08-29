@@ -2469,7 +2469,7 @@ glovecheck:     target = which_armor(mtmp, W_ARMG);
                       surface(mtmp->mx, mtmp->my),
                       mon_nam(mtmp));
             else if (see_it)
-                You("see a freezing cloud shoot from the %s!",
+                You_see("a freezing cloud shoot from the %s!",
                     surface(mtmp->mx, mtmp->my));
 
             if (resists_cold(mtmp)) {
@@ -3379,7 +3379,7 @@ domagictrap()
             make_blinded((long)rn1(5, 10), FALSE);
             if (!Blind) Your("%s", vision_clears);
         } else if (!Blind) {
-            You("see a flash of light!");
+            You_see("a flash of light!");
         }
 
         /* deafness effects */
@@ -4664,13 +4664,13 @@ boolean force;
             else
                 Strcat(the_trap, "stone");
 
-            You("see %s.", the_trap);
+            You_see("%s.", the_trap);
             switch (ynq("Try to pull it out?")) {
             case 'q': return(1);
             case 'n': trap_skipped = TRUE;  continue;
             }
 
-            if(touch_artifact(otmp, &youmonst) && u.ualign.type == A_LAWFUL && u.ualign.record >= 14) {
+            if (touch_artifact(otmp, &youmonst) && u.ualign.type == A_LAWFUL && u.ualign.record >= 14) {
                 pline("It slides out easily!");
                 (void) pick_obj(otmp);
             } else {

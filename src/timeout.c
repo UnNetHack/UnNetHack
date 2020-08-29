@@ -1112,7 +1112,8 @@ struct obj *obj;
             pline("Batteries have not been invented yet.");
         break;
     case OBJ_FLOOR:
-        (Hallucination) ? You("feel a strange urge to give a lantern a hug.") : You("see a lantern getting dim.");
+        (Hallucination) ? You("feel a strange urge to give a lantern a hug.") :
+                          You_see("a lantern getting dim.");
         break;
     case OBJ_MINVENT:
         pline("%s lantern is getting dim.",
@@ -1189,7 +1190,8 @@ long timeout;
                       whose);
                 break;
             case OBJ_FLOOR:
-                (Hallucination) ? You("missed a great opportunity to try a flaming shot.") : You("see a burning potion of oil go out.");
+                (Hallucination) ? You("missed a great opportunity to try a flaming shot.") :
+                                  You_see("a burning potion of oil go out.");
                 need_newsym = TRUE;
                 break;
             }
@@ -1257,7 +1259,8 @@ long timeout;
                     break;
                 case OBJ_FLOOR:
                     if (obj->otyp == BRASS_LANTERN)
-                        (Hallucination) ? You("feel like the floor is less happy now.") : You("see a lantern run out of power.");
+                        (Hallucination) ? You("feel like the floor is less happy now.") :
+                                          You_see("a lantern run out of power.");
                     else
                         You_see("%s go out.", an(xname(obj)));
                     break;
@@ -1295,7 +1298,7 @@ long timeout;
                           many ? "s are" : " is");
                     break;
                 case OBJ_FLOOR:
-                    You("see %scandle%s getting short.",
+                    You_see("%scandle%s getting short.",
                         menorah ? "a candelabrum's " :
                         many ? "some " : "a ",
                         many ? "s" : "");
