@@ -742,8 +742,7 @@ register int sh;
      * door get objects).
      */
     /* [max] removed register int cl,  char buf[bufsz] */
-    int i, sx, sy, first = 0, next = 0, total, partial, typ;
-    struct obj *otmp;
+    int i, sx, sy, first = 0, next = 0, total, partial;
     /* int blkmar_gen[NUM_OBJECTS+2]; */
     int *clp, *lastclp;
     int goodcl[12];
@@ -789,43 +788,16 @@ register int sh;
             partial += next-first;
         }
 
-        for(sy = sroom->ly; sy <= sroom->hy; sy++) {
-            if((sx == sroom->lx && doors[sh].x == sx-1) ||
-               (sx == sroom->hx && doors[sh].x == sx+1) ||
-               (sy == sroom->ly && doors[sh].y == sy-1) ||
-               (sy == sroom->hy && doors[sh].y == sy+1) ||
-               /* the Blackmarket has 400 items on average */
-               (!rnf(400, blkmar_size)))
+        for (sy = sroom->ly; sy <= sroom->hy; sy++) {
+            if ((sx == sroom->lx && doors[sh].x == sx-1) ||
+                (sx == sroom->hx && doors[sh].x == sx+1) ||
+                (sy == sroom->ly && doors[sh].y == sy-1) ||
+                (sy == sroom->hy && doors[sh].y == sy+1) ||
+                /* the Blackmarket has 400 items on average */
+                (!rnf(400, blkmar_size)))
                 continue;
 
-            for (i=0; i<50; i++) {
-                typ = rn2(next-first) + first;
-
-                /* forbidden objects  */
-                if (typ==AMULET_OF_YENDOR || typ==CANDELABRUM_OF_INVOCATION ||
-                    typ==BELL_OF_OPENING  || typ==SPE_BOOK_OF_THE_DEAD ||
-                    objects[typ].oc_nowish || typ==0)
-                    continue;
-
-                otmp = mkobj_at(RANDOM_CLASS, sx, sy, TRUE);
-                /* generate multiple copies with decreasing probabilities */
-                /*        if (rn2(blkmar_gen[typ]+1) && i<49)  continue; */
-
-                /*        otmp = mksobj_at(typ, sx, sy, TRUE, TRUE);
-                          blkmar_gen[typ]++;*/
-
-                /* prevent wishing abuse */
-                if (typ==WAN_WISHING) {
-                    otmp->spe = 0;
-                    otmp->recharged = 1;
-                }
-                if (typ==MAGIC_LAMP) {
-                    otmp->spe = 0;
-                }
-
-                break;
-            }
-
+            mkobj_at(RANDOM_CLASS, sx, sy, TRUE);
         }
     }
 
