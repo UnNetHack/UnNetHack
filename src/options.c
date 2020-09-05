@@ -115,7 +115,7 @@ static struct Bool_Opt
 #endif
     {"dark_room", &iflags.dark_room, TRUE, SET_IN_GAME},
 #ifdef DEBUG_FUZZER
-    {"debug_fuzzer", &iflags.debug_fuzzer, FALSE, SET_IN_FILE},
+    {"debug_fuzzer", &iflags.debug_fuzzer, TRUE, SET_IN_FILE},
 #endif
     {"deathdropless", &flags.deathdropless, FALSE, SET_IN_FILE},
 #if defined(TERMLIB) && !defined(MAC_GRAPHICS_ENV)
