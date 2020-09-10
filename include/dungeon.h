@@ -174,6 +174,7 @@ struct linfo {
 #define BONES_LEVEL  0x10    /* this level was a bones level */
 #define is_game_pre_seeded (level_info[0].flags & PRE_SEEDED)
     unsigned int seed;      /* level seed */
+#define game_seed level_info[0].seed
 /*
  * Note:  VISITED and LFILE_EXISTS are currently almost always set at the
  * same time.  However they _mean_ different things.

@@ -774,7 +774,7 @@ d_level *lev;
     /* Simple bones pool by adding a number to the bones filename.
      * The number must stay the same for the current game. */
     dptr = eos(file);
-    Sprintf(dptr, ".%d", (int)(u.ubirthday % 5));
+    Sprintf(dptr, ".%d", (game_seed % 5));
 #endif
 
 #ifdef VMS

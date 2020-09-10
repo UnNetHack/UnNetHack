@@ -370,7 +370,7 @@ const char * const *nlp;
            and restore support which would be necessary for randomization;
            try not to make too many assumptions about time_t's internals;
            use ledger_no rather than depth to keep mine town distinct. */
-        int nseed = level_info[0].seed / 257;
+        int nseed = game_seed / 257;
 
         name_wanted = ledger_no(&u.uz) + (nseed % 13) - (nseed % 5);
         if (name_wanted < 0) name_wanted += (13 + 5);

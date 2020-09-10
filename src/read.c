@@ -73,7 +73,7 @@ char *buf;
     if (erosion) {
         wipeout_text(buf,
                      (strlen(buf) * erosion / (2 * MAX_ERODE)),
-                     otmp->o_id ^ (unsigned) u.ubirthday);
+                     otmp->o_id ^ (unsigned)game_seed);
     }
     return buf;
 }

@@ -534,7 +534,7 @@ antholemon()
     int mtyp;
 
     /* Same monsters within a level, different ones between levels */
-    switch ((level_difficulty() + ((long)u.ubirthday)) % 4) {
+    switch ((level_difficulty() + game_seed) % 4) {
     default:    mtyp = PM_GIANT_ANT; break;
     case 0:     mtyp = PM_SOLDIER_ANT; break;
     case 1:     mtyp = PM_FIRE_ANT; break;

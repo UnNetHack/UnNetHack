@@ -601,9 +601,9 @@ creatorname()
     if (pirateday()) {
         return "the FSM";
     } else if (discordian_holiday()) {
-        return (u.ubirthday % 2) ? "Discordia" : "Eris";
+        return (game_seed % 2) ? "Discordia" : "Eris";
     } else {
-        int index = u.ubirthday % SIZE(creator_names);
+        int index = game_seed % SIZE(creator_names);
         return creator_names[index];
     }
 }
