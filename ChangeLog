@@ -69,7 +69,6 @@
 	  - Fix map overdrawing statuslines on screens with 24 lines (found by Mandevil)
 	  - Fix crash when changing statuslines to 3 on screens with 24
 	  - Show Elbereth statusline indicator when blind and flying
-	  - Fix compiling with -fno-common
 	  - OPTIONS=truecolor_separator was incorrectly parsed
 	  - Bag of holding explosion also scatters contents of inserted container
 	  - Fix some bit shift warnings
@@ -82,6 +81,10 @@
 	  - Fix crash when trying to delete a worn item when saving bones
 	  - Gold field in xlogfile didn't include stashed gold for GOLDOBJ
 	  - Observing tamed dragon's breathing didn't identify the dragon (reported by Thidwick)
+
+	* build fixes:
+	  - Fix compiling with -fno-common
+	  - Fix compilation with bison 3.7
 
 2019-01-01  UnNetHack 5.2.0
 	* Support SOURCE_DATE_EPOCH for reproducible builds (patch from Debian)
