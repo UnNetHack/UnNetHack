@@ -150,6 +150,8 @@ extern int rnd_vault_freq;
 
 %}
 
+%define api.header.include {"lev_comp.h"}
+
 %union
 {
 	long	i;

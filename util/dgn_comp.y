@@ -63,6 +63,8 @@ extern FILE *yyin, *yyout;	/* from dgn_lex.c */
 
 %}
 
+%define api.header.include {"dgn_comp.h"}
+
 %union
 {
 	int	i;
