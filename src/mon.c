@@ -117,15 +117,18 @@ mon_sanity_check()
 
         x = mtmp->mx, y = mtmp->my;
         if (!isok(x, y) && !(mtmp->isgd && x == 0 && y == 0)) {
-            impossible("mon (%s) claims to be at <%d,%d>?", fmt_ptr((genericptr_t) mtmp), x, y);
+            impossible("mon (%s, %s) claims to be at <%d,%d>?",
+                       mtmp->data->mname, fmt_ptr(mtmp), x, y);
         } else if (mtmp == u.usteed) {
             /* steed is in fmon list but not on the map; its
                <mx,my> coordinates should match hero's location */
             if (x != u.ux || y != u.uy) {
-                impossible("steed (%s) claims to be at <%d,%d>?", fmt_ptr((genericptr_t) mtmp), x, y);
+                impossible("steed (%s, %s) claims to be at <%d,%d>?",
+                               mtmp->data->mname, fmt_ptr(mtmp), x, y);
             }
         } else if (level.monsters[x][y] != mtmp) {
-            impossible("mon (%s) at <%d,%d> is not there!", fmt_ptr((genericptr_t) mtmp), x, y);
+            impossible("mon (%s, %s) at <%d,%d> is not there!",
+                       mtmp->data->mname, fmt_ptr(mtmp), x, y);
         } else if (mtmp->wormno) {
             sanity_check_worm(mtmp);
         }
@@ -140,16 +143,15 @@ mon_sanity_check()
                     }
                 }
                 if (!m) {
-                    impossible("map mon (%s) at <%d,%d> not in fmon list!",
-                               fmt_ptr((genericptr_t) mtmp), x, y);
+                    impossible("map mon (%s, %s) at <%d,%d> not in fmon list!",
+                               mtmp->data->mname, fmt_ptr(mtmp), x, y);
                 } else if (mtmp == u.usteed) {
-                    impossible("steed (%s) is on the map at <%d,%d>!",
-                               fmt_ptr((genericptr_t) mtmp), x, y);
+                    impossible("steed (%s, %s) is on the map at <%d,%d>!",
+                               mtmp->data->mname, fmt_ptr(mtmp), x, y);
                 } else if ((mtmp->mx != x || mtmp->my != y)
                          && mtmp->data != &mons[PM_LONG_WORM]) {
-                    impossible("map mon (%s) at <%d,%d> is found at <%d,%d>?",
-                               fmt_ptr((genericptr_t) mtmp),
-                               mtmp->mx, mtmp->my, x, y);
+                    impossible("map mon (%s, %s) at <%d,%d> is found at <%d,%d>?",
+                               mtmp->data->mname, fmt_ptr(mtmp), mtmp->mx, mtmp->my, x, y);
                 }
             }
         }
