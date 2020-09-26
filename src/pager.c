@@ -1425,6 +1425,10 @@ boolean quick;      /* use cursor && don't search for "more info" */
 
                 supplemental_name[0] = '\0';
                 Strcpy(temp_buf, firstmatch);
+                /* don't reveal identity of Riders in the "More info about" prompt */
+                if (is_rider(pm)) {
+                    pm = NULL;
+                }
                 checkfile(temp_buf, pm, FALSE, (boolean) (ans == LOOK_VERBOSE), supplemental_name);
                 if (supplemental_pm) {
                     do_supplemental_info(supplemental_name, supplemental_pm, (ans == LOOK_VERBOSE));
