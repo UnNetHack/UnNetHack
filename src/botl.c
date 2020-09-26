@@ -315,19 +315,19 @@ bot1()
 
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
     if (flags.hitpointbar) {
-        int bar_length = strlen(newbot1)-1;
+        int bar_length = strlen(newbot1);
         char tmp[MAXCO];
-        char *p = tmp;
         /* filledbar >= 0 and < MAXCO */
         int hp = (uhp() < 0) ? 0 : uhp();
         int filledbar = (uhpmax() > 0) ? (hp * bar_length / uhpmax()) : 0;
-        if (filledbar >= MAXCO) { filledbar = MAXCO-1; }
+        if (filledbar > MAXCO) {
+            filledbar = MAXCO;
+        }
         Strcpy(tmp, newbot1);
-        p++;
 
         /* draw hp bar */
         if (iflags.use_inverse) term_start_attr(ATR_INVERSE);
-        p[filledbar] = '\0';
+        tmp[filledbar] = '\0';
         if (iflags.use_color) {
             /* draw in color mode */
             apply_color_option(percentage_color_of(uhp(), uhpmax(), hp_colors), tmp, 1);
