@@ -1682,6 +1682,12 @@ char *str;
     monster = name_to_mon(tmps);
     if (monster > -1) {
         mons[monster].mcolor = c;
+        /* give all Riders the same color */
+        if (monster == PM_DEATH || monster == PM_FAMINE || monster == PM_PESTILENCE) {
+            mons[PM_DEATH].mcolor = c;
+            mons[PM_FAMINE].mcolor = c;
+            mons[PM_PESTILENCE].mcolor = c;
+        }
         return TRUE;
     } else {
         return FALSE;
