@@ -1963,7 +1963,9 @@ struct ext_func_tab extcmdlist[] = {
     {   'D',  "droptype", "drop specific item types", doddrop },
     {   'e',  "eat", "eat something", doeat },
     {   'E',  "engrave", "engrave writing on the floor", doengrave },
+#ifdef ELBERETH
     { C('e'), "engraveelbereth", "engrave \"Elbereth\" on the floor", doengrave_elbereth, 0 },
+#endif
     { M('e'), "enhance", "advance or check weapon and spell skills", enhance_weapon_skill, IFBURIED | AUTOCOMPLETE },
     {  '\0',  "exploremode", "enter explore (discovery) mode", enter_explore_mode, IFBURIED },
     {   'f',  "fire", "fire ammunition from quiver", dofire },
