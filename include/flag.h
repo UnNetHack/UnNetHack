@@ -360,9 +360,6 @@ struct instance_flags {
 #ifdef USE_TILES
     boolean vt_nethack;
 #endif
-#ifdef QUIVER_FIRED
-    boolean quiver_fired;   /* quiver with f command */
-#endif
 /*
  * Window capability support.
  */

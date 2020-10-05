@@ -425,7 +425,6 @@ NETHACK_ARG(dungeon-growth,[Dungeon growth],DUNGEON_GROWTH,yes)
 # NETHACK_ARG(display-layers,[Support transparent tilesets],DISPLAY_LAYERS,yes)
 NETHACK_ARG(autopickup-exceptions,[Exceptions to autopickup],
   AUTOPICKUP_EXCEPTIONS,yes)
-NETHACK_ARG(quiver-fired,[Firing without anything quivered will ask you what to quiver],QUIVER_FIRED,yes)
 NETHACK_ARG(qwertz,[QWERTZ keyboard layout support],QWERTZ,yes)
 NETHACK_ARG(simple-mail,[simple mail dgamelaunch support],SIMPLE_MAIL,no)
 
