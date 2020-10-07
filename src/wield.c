@@ -385,6 +385,7 @@ int
 dowieldquiver()
 {
     struct obj *newquiver;
+    struct obj *oldquiver = uquiver;
     const char *quivee_types = (uslinging() ||
                                 (uswapwep && objects[uswapwep->otyp].oc_skill == P_SLING)) ?
                                bullets : ready_objs;
@@ -443,6 +444,16 @@ dowieldquiver()
 
     /* Finally, place it in the quiver */
     setuqwep(newquiver);
+
+    /* keep track of quiver order */
+    if (newquiver) {
+        newquiver->quiver_priority = game_loop_counter;
+    } else {
+        /* reset old quivered object if explicitly unquivered */
+        if (oldquiver) {
+            oldquiver->quiver_priority = 0;
+        }
+    }
     /* Take no time since this is a convenience slot */
     return (0);
 }

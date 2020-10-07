@@ -321,12 +321,18 @@ static void
 autoquiver()
 {
     struct obj *otmp, *oammo = 0, *omissile = 0, *omisc = 0, *altammo = 0;
+    struct obj *oquiver = NULL;
 
     if (uquiver)
         return;
 
     /* Scan through the inventory */
     for (otmp = invent; otmp; otmp = otmp->nobj) {
+        if (otmp->quiver_priority != 0 &&
+            (!oquiver || otmp->quiver_priority > oquiver->quiver_priority)) {
+          oquiver = otmp;
+        }
+
         if (otmp->owornmask || otmp->oartifact || !otmp->dknown) {
             ; /* Skip it */
         } else if (otmp->otyp == ROCK ||
@@ -368,14 +374,17 @@ autoquiver()
     }
 
     /* Pick the best choice */
-    if (oammo)
+    if (oquiver) {
+        setuqwep(oquiver);
+    } else if (oammo) {
         setuqwep(oammo);
-    else if (omissile)
+    } else if (omissile) {
         setuqwep(omissile);
-    else if (altammo)
+    } else if (altammo) {
         setuqwep(altammo);
-    else if (omisc)
+    } else if (omisc) {
         setuqwep(omisc);
+    }
 
     return;
 }
@@ -407,13 +416,31 @@ dofire()
         return 0;
     }
 
+    /* autoquiver previously manually selected projectiles */
+    if (!uquiver) {
+        struct obj *otmp;
+        /* ensure, there is something to quiver */
+        for (otmp = invent; otmp; otmp = otmp->nobj) {
+            if (otmp->quiver_priority != 0) {
+                autoquiver();
+                You("fill your quiver:");
+                prinv((char *)0, uquiver, 0L);
+                break;
+            }
+        }
+    }
+
     if (!uquiver) {
         if (!flags.autoquiver) {
             /* Don't automatically fill the quiver */
             You("have no ammunition readied!");
             dowieldquiver(); /* quiver_fired */
-            if (!uquiver)
+            if (uquiver) {
+                /* quivering while firing gets lower priority than manually quivering items */
+                uquiver->quiver_priority = -game_loop_counter;
+            } else {
                 return(dothrow());
+            }
         } else {
             autoquiver();
             if (!uquiver) {

@@ -626,6 +626,7 @@ unsigned int *stuckid, *steedid;    /* STEED */
     restlevchn(fd);
     mread(fd, (genericptr_t) &moves, sizeof moves);
     mread(fd, (genericptr_t) &monstermoves, sizeof monstermoves);
+    mread(fd, (genericptr_t) &game_loop_counter, sizeof game_loop_counter);
     mread(fd, (genericptr_t) &quest_status, sizeof(struct q_score));
     mread(fd, (genericptr_t) spl_book,
           sizeof(struct spell) * (MAXSPELL + 1));

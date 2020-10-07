@@ -213,6 +213,7 @@ const int shield_static[SHIELD_COUNT] = {
 
 NEARDATA struct spell spl_book[MAXSPELL + 1] = {DUMMY};
 
+long game_loop_counter = 1L;
 NEARDATA long moves = 1L, monstermoves = 1L;
 /* These diverge when player is Fast */
 NEARDATA long wailmsg = 0L;

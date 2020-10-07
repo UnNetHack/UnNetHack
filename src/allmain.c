@@ -515,6 +515,7 @@ boolean resuming;
         /****************************************/
         /* once-per-player-input things go here */
         /****************************************/
+        game_loop_counter++;
 
         find_ac();
         if(!flags.mv || Blind) {

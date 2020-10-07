@@ -125,6 +125,7 @@ struct obj {
     long age;               /* creation date */
     long owornmask;
     long picked_up_turn;    /* keep track of when obj got picked up */
+    long quiver_priority;   /* priority for automatic quivering of objects */
     struct oextra *oextra;  /* pointer to oextra struct */
 };
 

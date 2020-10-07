@@ -276,6 +276,7 @@ E NEARDATA struct dig_info {        /* apply.c, hack.c */
     boolean down, chew, warned, quiet;
 } digging;
 
+extern long game_loop_counter;
 E NEARDATA long moves, monstermoves;
 E NEARDATA long wailmsg;
 
