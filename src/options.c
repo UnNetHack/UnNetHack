@@ -24,6 +24,8 @@ NEARDATA struct instance_flags iflags;  /* provide linkage */
 #define PREFER_TILED FALSE
 #endif
 
+static boolean illegal_menu_cmd_key(CHAR_P);
+
 #ifdef CURSES_GRAPHICS
 extern int curses_read_attrs(char *attrs);
 #endif
@@ -1217,6 +1219,67 @@ const char *optn;
               buf);
     }
     return 1;
+}
+
+/*
+ * This is used by parse_config_line() in files.c
+ *
+ */
+
+/* parse key:command */
+boolean
+parsebindings(bindings)
+char* bindings;
+{
+    char *bind;
+    char key;
+    int i;
+    boolean ret = FALSE;
+
+    /* break off first binding from the rest; parse the rest */
+    if ((bind = index(bindings, ',')) != 0) {
+        *bind++ = 0;
+        ret |= parsebindings(bind);
+    }
+
+    /* parse a single binding: first split around : */
+    if (! (bind = index(bindings, ':'))) {
+        return FALSE; /* it's not a binding */
+    }
+    *bind++ = 0;
+
+    /* read the key to be bound */
+    key = txt2key(bindings);
+    if (!key) {
+        config_error_add("Unknown key binding key '%s'", bindings);
+        return FALSE;
+    }
+
+    bind = trimspaces(bind);
+
+    /* is it a special key? */
+    if (bind_specialkey(key, bind)) {
+        return TRUE;
+    }
+
+    /* is it a menu command? */
+    for (i = 0; i < SIZE(default_menu_cmd_info); i++) {
+        if (!strcmp(default_menu_cmd_info[i].name, bind)) {
+            if (illegal_menu_cmd_key(key)) {
+                config_error_add("Bad menu key %s:%s", visctrl(key), bind);
+                return FALSE;
+            } else
+                add_menu_cmd_alias(key, default_menu_cmd_info[i].cmd);
+            return TRUE;
+        }
+    }
+
+    /* extended command? */
+    if (!bind_key(key, bind)) {
+        config_error_add("Unknown key binding command '%s'", bind);
+        return FALSE;
+    }
+    return TRUE;
 }
 
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
@@ -4866,6 +4929,27 @@ const char *str;
         free(buf),  buf = 0;
     }
     return;
+}
+
+/** Check if character c is illegal as a menu command key */
+boolean
+illegal_menu_cmd_key(c)
+char c;
+{
+    if (c == 0 || c == '\r' || c == '\n' || c == '\033' || c == ' ' ||
+         digit(c) || (letter(c) && c != '@')) {
+        config_error_add("Reserved menu command key '%s'", visctrl(c));
+        return TRUE;
+    } else { /* reject default object class symbols */
+        int j;
+        for (j = 1; j < MAXOCLASSES; j++) {
+            if (c == def_oc_syms[j]) {
+                config_error_add("Menu command key '%s' is an object class", visctrl(c));
+                return TRUE;
+            }
+        }
+    }
+    return FALSE;
 }
 
 /* Returns the fid of the fruit type; if that type already exists, it

@@ -196,11 +196,14 @@ E void FDECL(savech, (CHAR_P));
 #ifdef WIZARD
 E void NDECL(add_debug_extended_commands);
 #endif /* WIZARD */
+extern boolean bind_specialkey(UCHAR_P, const char *);
+extern char txt2key(char *);
 E void FDECL(parseautocomplete, (char *, BOOLEAN_P));
 E void FDECL(reset_commands, (BOOLEAN_P));
 E void FDECL(rhack, (char *));
 E int NDECL(doextlist);
 E int NDECL(extcmd_via_menu);
+extern boolean bind_key(UCHAR_P, const char *);
 E void FDECL(enlightenment, (int, BOOLEAN_P));
 E void FDECL(show_conduct, (int, BOOLEAN_P));
 E int FDECL(xytod, (SCHAR_P, SCHAR_P));
@@ -1831,6 +1834,7 @@ E void NDECL(option_help);
 E void FDECL(next_opt, (winid, const char *));
 E int FDECL(fruitadd, (char *));
 E int FDECL(choose_classes_menu, (const char *, int, BOOLEAN_P, char *, char *));
+extern boolean parsebindings(char *);
 E void FDECL(add_menu_cmd_alias, (CHAR_P, CHAR_P));
 E char FDECL(map_menu_cmd, (CHAR_P));
 E void FDECL(assign_warnings, (uchar *));

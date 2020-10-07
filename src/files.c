@@ -2161,6 +2161,10 @@ boolean recursive;
     } else if (match_varname(buf, "NAME", 4)) {
         (void) strncpy(plname, bufp, PL_NSIZ-1);
         plnamesuffix();
+    } else if (match_varname(buf, "BINDINGS", 4)) {
+        if (!parsebindings(bufp)) {
+            return FALSE;
+        }
     } else if (match_varname(buf, "AUTOCOMPLETE", 5)) {
         parseautocomplete(bufp, TRUE);
     } else if (match_varname(buf, "MSGTYPE", 7)) {
