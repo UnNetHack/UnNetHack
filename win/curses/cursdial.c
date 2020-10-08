@@ -929,8 +929,8 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num)
     int count, curletter, entry_cols, start_col, num_lines, footer_x;
     boolean first_accel = TRUE;
 
-#ifdef MENU_COLOR
     int color = NO_COLOR;
+#ifdef MENU_COLOR
     int attr = A_NORMAL;
     boolean menu_color = FALSE;
 #endif /* MENU_COLOR */

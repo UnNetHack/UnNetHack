@@ -227,3 +227,7 @@ void reset_utrap(BOOLEAN_P b) {}
 
 boolean is_fainted() { return FALSE; }
 boolean unconscious() { return FALSE; }
+
+char txt2key(char *txt) { return ' '; }
+boolean bind_key(UCHAR_P key, const char *command) { return FALSE; }
+boolean bind_specialkey(UCHAR_P key, const char *command) { return FALSE; }

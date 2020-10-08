@@ -8,6 +8,11 @@ struct window_procs windowprocs;
 
 struct cmd Cmd;
 
+#define CLR_UNDEFINED -1
+#define ATR_UNDEFINED -1
+
+#include "color.h"
+
 #include "hacklib.c"
 #include "decl.c"
 #include "drawing.c"
@@ -62,3 +67,7 @@ void isaac_init(isaac_ctx *_ctx,const unsigned char *_seed,int _nseed) {}
 void reset_commands(BOOLEAN_P b) {}
 boolean is_pool(int i1, int i2) { return FALSE; }
 boolean is_lava(int i1, int i3) { return FALSE; }
+
+char txt2key(char *txt) { return ' '; }
+boolean bind_key(UCHAR_P key, const char *command) { return FALSE; }
+boolean bind_specialkey(UCHAR_P key, const char *command) { return FALSE; }

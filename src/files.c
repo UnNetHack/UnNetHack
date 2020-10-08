@@ -2217,10 +2217,12 @@ boolean recursive;
             (void) fclose(include_fp);
         }
 
+#ifdef MENU_COLOR
     } else if (match_varname(buf, "MENUCOLOR", 9)) {
         /* automatically activate menucolors if configured rules exist */
         iflags.use_menu_color = TRUE;
         (void) add_menu_coloring(bufp);
+#endif
     } else if (match_varname(buf, "MONSTERCOLOR", 12)) {
         return parse_monster_color(bufp);
     } else if (match_varname(buf, "MONSTERSYMBOL", 13)) {

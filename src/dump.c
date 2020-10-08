@@ -259,10 +259,12 @@ const char *str;
 # ifdef TTY_GRAPHICS
         int color;
         int attr;
+#  ifdef MENU_COLOR
         if (iflags.use_menu_color &&
             get_menu_coloring(str, &color, &attr)) {
             fprintf(html_dump_fp, "<span class=\"nh_color_%d\"><span class=\"nh_item_letter\">%c</span> - %s</span>%s<br />\n", color, c, link, starting_inventory);
         } else
+#  endif
 # endif
         fprintf(html_dump_fp, "<span class=\"nh_item_letter\">%c</span> - %s%s<br />\n", c, link, starting_inventory);
     }
@@ -335,10 +337,12 @@ struct obj *obj;
 # ifdef TTY_GRAPHICS
         int color;
         int attr;
+#  ifdef MENU_COLOR
         if (iflags.use_menu_color &&
             get_menu_coloring(str, &color, &attr)) {
             fprintf(html_dump_fp, "<li class=\"nh_color_%d\">%s</li>\n", color, link);
         } else
+#  endif
 # endif
         fprintf(html_dump_fp, "<li>%s</li>\n", link);
     }

@@ -708,8 +708,9 @@ handler_autopickup_exception()
 }
 #endif /* AUTOPICKUP_EXCEPTIONS */
 
+#ifdef MENU_COLOR
 static int
-handler_menu_colors()
+handler_menu_colors(void)
 {
     winid tmpwin;
     anything any;
@@ -803,6 +804,7 @@ menucolors_done:
     }
     return optn_ok;
 }
+#endif
 
 /* check whether a user-supplied option string is a proper leading
    substring of a particular option name; option string might have
@@ -1833,6 +1835,7 @@ const char *prompt;
     return -1;
 }
 
+#ifdef MENU_COLOR
 /* parse 'str' as a regular expression to check whether it's valid;
    compiled regexp gets thrown away regardless of the outcome */
 static boolean
@@ -1872,7 +1875,6 @@ const char *errmsg;
 
     return retval;
 }
-
 
 /* parse '"regex_string"=color&attr' and add it to menucoloring */
 boolean
@@ -2012,6 +2014,7 @@ count_menucolors()
     }
     return count;
 }
+#endif
 
 /* parse '"monster name":color' and change monster info accordingly */
 boolean
