@@ -1935,7 +1935,7 @@ gulp_blnd_check()
 {
     struct attack *mattk;
 
-    if (!Blinded &
+    if (!Blinded &&
          u.uswallow &&
          (mattk = attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_BLND)) &&
          can_blnd(u.ustuck, &youmonst, mattk->aatyp, (struct obj *) 0)) {
