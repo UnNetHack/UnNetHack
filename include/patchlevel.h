@@ -1,14 +1,14 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* UnNetHack 5.0.0 */
+/* UnNetHack 6.0.0 */
 #define GAME_SHORT_NAME "UNH"
 #define VERSION_MAJOR   6
 #define VERSION_MINOR   0
 /*
  * PATCHLEVEL is updated for each release.
  */
-#define PATCHLEVEL  0
+#define PATCHLEVEL  1
 /*
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
@@ -48,7 +48,7 @@
  * PP = patch level, ee = edit level, L = literal suffix "L",
  * with all four numbers specified as two hexadecimal digits.
  */
-#define VERSION_COMPATIBILITY 0x06000000L   /* 6.0.0-e0 */
+#define VERSION_COMPATIBILITY 0x06000100L   /* 6.0.1-e0 */
 
 
 /*****************************************************************************/
