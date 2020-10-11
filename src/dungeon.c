@@ -714,7 +714,7 @@ struct level_map {
     { "asmodeus",   &asmodeus_level },
     { "astral", &astral_level },
     { "baalz",  &baalzebub_level },
-    { "bigroom",    &bigroom_level },
+    { "bigrm",  &bigroom_level },
     { "castle", &stronghold_level },
     { "earth",  &earth_level },
     { "fakewiz1",   &portal_level },
@@ -1007,12 +1007,9 @@ init_dungeons()
     mines_dnum = dname_to_dnum("The Gnomish Mines");
     tower_dnum = dname_to_dnum("Vlad's Tower");
     mall_dnum = dname_to_dnum("Town");
-/*
- #ifdef BLACKMARKET
-    blackmarket_dnum = dname_to_dnum("The Black Market");
- #endif
- */
     sheol_dnum = dname_to_dnum("Sheol");
+    moria_dnum = dname_to_dnum("The Ruins of Moria");
+    dragon_caves_dnum = dname_to_dnum("The Dragon Caves");
 
     /* one special fixup for dummy surface level */
     if ((x = find_level("dummy")) != 0) {

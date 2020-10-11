@@ -61,8 +61,6 @@ char prefixbuf[STRBUF_LEN];
 
 /* Open the live log file */
 boolean livelog_start() {
-
-
     last_achieve_int = encodeachieve();
 
     return TRUE;
