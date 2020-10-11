@@ -615,20 +615,23 @@ static char save_bones_compat_buf[BUFSZ];
 static void
 build_savebones_compat_string()
 {
-#ifdef VERSION_COMPATIBILITY
-	unsigned long uver = VERSION_COMPATIBILITY;
-#endif
-	Strcpy(save_bones_compat_buf,
-		"save and bones files accepted from version");
-#ifdef VERSION_COMPATIBILITY
-	Sprintf(eos(save_bones_compat_buf), "s %lu.%lu.%lu through %d.%d.%d",
-		((uver & 0xFF000000L) >> 24), ((uver & 0x00FF0000L) >> 16),
-		((uver & 0x0000FF00L) >> 8),
-		VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
-#else
-	Sprintf(eos(save_bones_compat_buf), " %d.%d.%d only",
-		VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
-#endif
+    unsigned long uver = VERSION_COMPATIBILITY;
+    unsigned long cver  = (((unsigned long) VERSION_MAJOR << 24) |
+                           ((unsigned long) VERSION_MINOR << 16) |
+                           ((unsigned long) PATCHLEVEL    <<  8));
+
+    Strcpy(save_bones_compat_buf,
+           "save and bones files accepted from version");
+
+    if (uver != cver) {
+        Sprintf(eos(save_bones_compat_buf), "s %lu.%lu.%lu through %d.%d.%d",
+                ((uver & 0xFF000000L) >> 24), ((uver & 0x00FF0000L) >> 16),
+                ((uver & 0x0000FF00L) >> 8),
+                VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
+    } else {
+        Sprintf(eos(save_bones_compat_buf), " %d.%d.%d only",
+                VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
+    }
 }
 
 static const char *build_opts[] = {
