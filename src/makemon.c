@@ -1190,17 +1190,6 @@ register int mmflags;
 
     /* Does monster already exist at the position? */
     if (MON_AT(x, y)) {
-        if ((mmflags & MM_ADJACENTOK) != 0) {
-            coord bypos;
-            if(enexto_core(&bypos, x, y, ptr, gpflags)) {
-                x = bypos.x;
-                y = bypos.y;
-            } else
-                return((struct monst *) 0);
-        } else
-            return((struct monst *) 0);
-    }
-    if (MON_AT(x, y)) {
         if (!(mmflags & MM_ADJACENTOK) || !enexto_core(&cc, x, y, ptr, gpflags)) {
             return NULL;
         }
