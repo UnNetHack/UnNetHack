@@ -90,6 +90,10 @@ register struct obj *obj;
     struct obj *olduwep = uwep;
     int oldcon = acurr(A_CON);
 
+    if (obj) {
+        obj->quiver_priority = 0;
+    }
+
     if (obj == uwep) return; /* necessary to not set unweapon */
     /* This message isn't printed in the caller because it happens
      * *whenever* Sunsword is unwielded, from whatever cause.
@@ -249,6 +253,9 @@ void
 setuswapwep(obj)
 register struct obj *obj;
 {
+    if (obj) {
+        obj->quiver_priority = 0;
+    }
     setworn(obj, W_SWAPWEP);
 }
 
