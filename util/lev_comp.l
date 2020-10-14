@@ -391,8 +391,10 @@ FILE *input_f;
 	    yyrestart(input_f);
 	else
 #endif
+    {
 	    yyin = input_f;
 	    if (!orig_yyin) orig_yyin = yyin;
+    }
 }
 /* analogous routine (for completeness) */
 void init_yyout( output_f )

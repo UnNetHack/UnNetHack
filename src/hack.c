@@ -3662,7 +3662,7 @@ bcorr:
                  * you even if you are running
                  */
                 if (!Levitation && !Flying && !is_clinger(youmonst.data) &&
-                   x == u.ux+u.dx && y == u.uy+u.dy)
+                    x == u.ux+u.dx && y == u.uy+u.dy) {
                     /* No Wwalking check; otherwise they'd be able
                      * to test boots by trying to SHIFT-direction
                      * into a pool and seeing if the game allowed it
@@ -3672,6 +3672,7 @@ bcorr:
                             hliquid(is_pool(x, y) ? "water" : is_swamp(x, y) ? "swamp" : "lava"));
                     }
                     goto stop;
+                }
                 continue;
             } else { /* e.g. objects or trap or stairs */
                 if (flags.run == 1) goto bcorr;

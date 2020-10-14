@@ -1599,28 +1599,57 @@ coord *tm;
                 kind = NO_TRAP; break;
             case ROLLING_BOULDER_TRAP:
             case SLP_GAS_TRAP:
-                if (lvl < 2) kind = NO_TRAP; break;
+                if (lvl < 2) {
+                    kind = NO_TRAP;
+                }
+                break;
             case LEVEL_TELEP:
-                if (lvl < 5 || level.flags.noteleport)
-                    kind = NO_TRAP; break;
+                if (lvl < 5 || level.flags.noteleport) {
+                    kind = NO_TRAP;
+                }
+                break;
             case SPIKED_PIT:
-                if (lvl < 5) kind = NO_TRAP; break;
+                if (lvl < 5) {
+                    kind = NO_TRAP;
+                }
+                break;
             case LANDMINE:
-                if (lvl < 6) kind = NO_TRAP; break;
+                if (lvl < 6) {
+                    kind = NO_TRAP;
+                }
+                break;
             case WEB:
-                if (lvl < 7) kind = NO_TRAP; break;
+                if (lvl < 7) {
+                    kind = NO_TRAP;
+                }
+                break;
             case STATUE_TRAP:
             case POLY_TRAP:
-                if (lvl < 8) kind = NO_TRAP; break;
+                if (lvl < 8) {
+                    kind = NO_TRAP;
+                }
+                break;
             case FIRE_TRAP:
-                if (!Inhell || Insheol) kind = NO_TRAP; break;
+                if (!Inhell || Insheol) {
+                    kind = NO_TRAP;
+                }
+                break;
             case ICE_TRAP:
-                if (!Insheol) kind = NO_TRAP; break;
+                if (!Insheol) {
+                    kind = NO_TRAP;
+                }
+                break;
             case TELEP_TRAP:
-                if (level.flags.noteleport) kind = NO_TRAP; break;
+                if (level.flags.noteleport) {
+                    kind = NO_TRAP;
+                }
+                break;
             case HOLE:
                 /* make these much less often than other traps */
-                if (rn2(7)) kind = NO_TRAP; break;
+                if (rn2(7)) {
+                    kind = NO_TRAP;
+                }
+                break;
             }
         } while (kind == NO_TRAP);
     }
