@@ -1823,6 +1823,7 @@ E char *FDECL(thesimpleoname, (struct obj *));
 E char *FDECL(bare_artifactname, (struct obj *));
 E char *FDECL(makeplural, (const char *));
 E char *FDECL(makesingular, (const char *));
+extern short name_to_otyp(const char *);
 E struct obj *FDECL(readobjnam, (char *, struct obj *));
 E int FDECL(rnd_class, (int, int));
 E const char *FDECL(suit_simple_name, (struct obj *));
@@ -2439,6 +2440,7 @@ E int NDECL(dovspell);
 E void FDECL(initialspell, (struct obj *));
 E void NDECL(dump_spells);
 E boolean FDECL(parse_spellorder, (char *));
+extern const char* spelltypemnemonic(int);
 
 /* ### steal.c ### */
 
@@ -2854,6 +2856,7 @@ E int NDECL(abon);
 E int NDECL(dbon);
 E void FDECL(wet_a_towel, (struct obj *, int, BOOLEAN_P));
 E void FDECL(dry_a_towel, (struct obj *, int, BOOLEAN_P));
+extern const char* skill_name(int);
 E int NDECL(enhance_weapon_skill);
 #ifdef DUMP_LOG
 E void NDECL(dump_weapon_skill);
@@ -2972,6 +2975,7 @@ E int FDECL(racial_exception, (struct monst *, struct obj *));
 
 /* ### write.c ### */
 
+extern int ink_cost(struct obj *);
 E int FDECL(dowrite, (struct obj *));
 
 /* ### zap.c ### */
