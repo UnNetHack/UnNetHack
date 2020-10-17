@@ -451,4 +451,21 @@ struct obj {
  *      struct or data during a save.
  */
 
+/* This struct holds detailed stats about how an object's damage is
+ * constructed.
+ * Filled in dmgval_core() and used in the pokedex.
+ */
+struct damage_info_t {
+    int damage_small;
+    const char* bonus_small;
+    int damage_large;
+    const char* bonus_large;
+
+    /* various bonus damage conditions */
+    const char* blessed_damage;
+    const char* axe_damage;
+    const char* silver_damage;
+    const char* light_damage;
+};
+
 #endif /* OBJ_H */

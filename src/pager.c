@@ -17,6 +17,9 @@ STATIC_DCL boolean FDECL(help_menu, (int *));
 #ifdef PORT_HELP
 extern void NDECL(port_help);
 #endif
+static boolean lookup_database_entry(dlb *fp, const char* dbase_str, const char* inp,
+        struct permonst *pm,
+        boolean user_typed_name, boolean without_asking, char *supplemental_name);
 
 /* Returns "true" for characters that could represent a monster's stomach. */
 STATIC_OVL boolean
@@ -573,80 +576,18 @@ short otyp;
         Sprintf(buf, "Deals %s damage.", dmgtyp);
         OBJPUTSTR(buf);
 
-        /* Ugh. Can we just get rid of dmgval() and put its damage bonuses into
-         * the object class? */
-        const char* sdambon = "";
-        const char* ldambon = "";
-        switch (otyp) {
-        case IRON_CHAIN:
-        case CROSSBOW_BOLT:
-        case MACE:
-        case FLAIL:
-        case SPETUM:
-        case TRIDENT:
-            sdambon = "+1";
-            break;
-
-        case BATTLE_AXE:
-        case BARDICHE:
-        case BILL_GUISARME:
-        case GUISARME:
-        case LUCERN_HAMMER:
-        case MORNING_STAR:
-        case RANSEUR:
-        case BROADSWORD:
-        case ELVEN_BROADSWORD:
-        case RUNESWORD:
-        case VOULGE:
-            sdambon = "+1d4";
-            break;
-
-        case WAR_HAMMER:
-            sdambon = "+1d6";
-            break;
-        }
-        /* and again, because /large/ damage is entirely separate. Bleah. */
-        switch (otyp) {
-        case CROSSBOW_BOLT:
-        case MORNING_STAR:
-        case PARTISAN:
-        case RUNESWORD:
-        case ELVEN_BROADSWORD:
-        case BROADSWORD:
-            ldambon = "+1";
-            break;
-
-        case FLAIL:
-        case RANSEUR:
-        case VOULGE:
-            ldambon = "+1d4";
-            break;
-
-        case HALBERD:
-        case SPETUM:
-            ldambon = "+1d6";
-            break;
-
-        case WAR_HAMMER:
-            ldambon = "+1d8";
-            break;
-
-        case BATTLE_AXE:
-        case BARDICHE:
-        case TRIDENT:
-            ldambon = "+2d4";
-            break;
-
-        case TSURUGI:
-        case DWARVISH_MATTOCK:
-        case TWO_HANDED_SWORD:
-            ldambon = "+2d6";
-            break;
-        }
+        struct damage_info_t damage_info = dmgval_info(&dummy);
         Sprintf(buf,
-               "Damage: 1d%d%s versus small and 1d%d%s versus large monsters.",
-                oc.oc_wsdam, sdambon, oc.oc_wldam, ldambon);
+                "Damage: 1d%d%s versus small and 1d%d%s versus large monsters.",
+                damage_info.damage_small, damage_info.bonus_small,
+                damage_info.damage_large, damage_info.bonus_large);
         OBJPUTSTR(buf);
+
+        if (damage_info.blessed_damage) { OBJPUTSTR(damage_info.blessed_damage); }
+        if (damage_info.axe_damage)     { OBJPUTSTR(damage_info.axe_damage); }
+        if (damage_info.silver_damage)  { OBJPUTSTR(damage_info.silver_damage); }
+        if (damage_info.light_damage)   { OBJPUTSTR(damage_info.light_damage); }
+
         Sprintf(buf, "Has a %s%d %s to hit.",
                 (oc.oc_hitbon >= 0 ? "+" : ""),
                  oc.oc_hitbon,
@@ -954,12 +895,10 @@ boolean user_typed_name, without_asking;
 char *supplemental_name;
 {
     dlb *fp;
-    char buf[BUFSZ], newstr[BUFSZ], givenname[BUFSZ];
+    char newstr[BUFSZ];
     char *ep, *dbase_str;
-    long txt_offset;
     int chk_skip;
     boolean found_in_file = FALSE, skipping_entry = FALSE;
-    winid datawin = WIN_ERR;
 
     fp = dlb_fopen_area(NH_DATAAREA, DATAFILE, "r");
     if (!fp) {
@@ -969,7 +908,8 @@ char *supplemental_name;
     /* If someone passed us garbage, prevent fault. */
     if (!inp || strlen(inp) > (BUFSZ - 1)) {
         impossible("bad do_look buffer passed (%s)!", !inp ? "null" : "too long");
-        goto checkfile_done;
+        (void) dlb_fclose(fp);
+        return;
     }
 
     /* To prevent the need for entries in data.base like *ngel to account
@@ -1058,219 +998,237 @@ char *supplemental_name;
 
     /* Make sure the name is non-empty. */
     if (*dbase_str) {
-        long pass1offset = -1L;
-        int chk_skip, pass = 1;
-        boolean yes_to_moreinfo, found_in_file, pass1found_in_file, skipping_entry;
-        char *sp, *ap, *alt = 0; /* alternate description */
-
-        /* adjust the input to remove "named " and "called " */
-        if ((ep = strstri(dbase_str, " named ")) != 0) {
-            alt = ep + 7;
-            if ((ap = strstri(dbase_str, " called ")) != 0 && ap < ep)
-                ep = ap; /* "named" is alt but truncate at "called" */
-        } else if ((ep = strstri(dbase_str, " called ")) != 0) {
-            copynchars(givenname, ep + 8, BUFSZ - 1);
-            alt = givenname;
-            if (supplemental_name && (sp = strstri(inp, " called ")) != 0)
-                copynchars(supplemental_name, sp + 8, BUFSZ - 1);
-        } else
-            ep = strstri(dbase_str, ", ");
-        if (ep && ep > dbase_str)
-            *ep = '\0';
-        /* remove article from 'alt' name ("a pair of lenses named
-           The Eyes of the Overworld" simplified above to "lenses named
-           The Eyes of the Overworld", now reduced to "The Eyes of the
-           Overworld", skip "The" as with base name processing) */
-        if (alt && (!strncmpi(alt, "a ", 2)
-                    || !strncmpi(alt, "an ", 3)
-                    || !strncmpi(alt, "the ", 4)))
-            alt = index(alt, ' ') + 1;
-        /* remove charges or "(lit)" or wizmode "(N aum)" */
-        if ((ep = strstri(dbase_str, " (")) != 0 && ep > dbase_str)
-            *ep = '\0';
-        if (alt && (ap = strstri(alt, " (")) != 0 && ap > alt)
-            *ap = '\0';
-
-        /*
-         * If the object is named, then the name is the alternate description;
-         * otherwise, the result of makesingular() applied to the name is.
-         * This isn't strictly optimal, but named objects of interest to the
-         * user will usually be found under their name, rather than under
-         * their object type, so looking for a singular form is pointless.
-         */
-        if (!alt)
-            alt = makesingular(dbase_str);
-
-        pass1found_in_file = FALSE;
-        for (pass = !strcmp(alt, dbase_str) ? 0 : 1; pass >= 0; --pass) {
-            found_in_file = skipping_entry = FALSE;
-            txt_offset = 0L;
-            if (dlb_fseek(fp, txt_offset, SEEK_SET) < 0 ) {
-                impossible("can't get to start of 'data' file");
-                goto checkfile_done;
-            }
-            /* skip first record; read second */
-            if (!dlb_fgets(buf, BUFSZ, fp) || !dlb_fgets(buf, BUFSZ, fp)) {
-                impossible("can't read 'data' file");
-                goto checkfile_done;
-            } else if (sscanf(buf, "%8lx\n", &txt_offset) < 1
-                       || txt_offset == 0L)
-                goto bad_data_file;
-
-            /* look for the appropriate entry */
-            while (dlb_fgets(buf, BUFSZ, fp)) {
-                if (*buf == '.')
-                    break; /* we passed last entry without success */
-
-                if (digit(*buf)) {
-                    /* a number indicates the end of current entry */
-                    skipping_entry = FALSE;
-                } else if (!skipping_entry) {
-                    if (!(ep = index(buf, '\n')))
-                        goto bad_data_file;
-                    (void) strip_newline((ep > buf) ? ep - 1 : ep);
-                    /* if we match a key that begins with "~", skip
-                       this entry */
-                    chk_skip = (*buf == '~') ? 1 : 0;
-                    if ((pass == 0 && pmatch(&buf[chk_skip], dbase_str))
-                        || (pass == 1 && alt && pmatch(&buf[chk_skip], alt))) {
-                        if (chk_skip) {
-                            skipping_entry = TRUE;
-                            continue;
-                        } else {
-                            found_in_file = TRUE;
-                            if (pass == 1)
-                                pass1found_in_file = TRUE;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            /* database entry should exist, now find where it is */
-            long entry_offset, fseekoffset;
-            int entry_count;
-            int i;
-            if (found_in_file) {
-                /* skip over other possible matches for the info */
-                do {
-                    if (!dlb_fgets(buf, BUFSZ, fp)) {
-                        goto bad_data_file;
-                    }
-                } while (!digit(*buf));
-
-                if (sscanf(buf, "%ld,%d\n", &entry_offset, &entry_count) < 2)
-                    goto bad_data_file;
-                fseekoffset = (long) txt_offset + entry_offset;
-                if (pass == 1)
-                    pass1offset = fseekoffset;
-                else if (fseekoffset == pass1offset)
-                    goto checkfile_done;
-            }
-
-            /* object lookup: try to parse as an object */
-            int otyp = name_to_otyp(dbase_str);
-
-            /* prompt for more info (if using whatis to navigate the map) */
-            yes_to_moreinfo = FALSE;
-            if (!user_typed_name && !without_asking) {
-                char *entrytext = pass ? alt : dbase_str;
-                char question[QBUFSZ];
-
-                Strcpy(question, "More info about \"");
-                /* +2 => length of "\"?" */
-                copynchars(eos(question), entrytext,
-                           (sizeof question - 1 - (strlen(question) + 2)));
-                Strcat(question, "\"?");
-                if (yn(question) == 'y') {
-                    yes_to_moreinfo = TRUE;
-                }
-            }
-
-            /* finally, put the appropriate information into a window */
-            if (user_typed_name || without_asking || yes_to_moreinfo) {
-                if (!found_in_file && !pm && otyp == STRANGE_OBJECT) {
-                    if ((user_typed_name && pass == 0 && !pass1found_in_file) || yes_to_moreinfo) {
-                        pline("I don't have any information on those things.");
-                    }
-                    /* don't print anything otherwise; we don't want it to e.g.
-                     * print a database entry and then print the above message. */
-                } else {
-                    datawin = create_nhwindow(NHW_MENU);
-
-                    /* object lookup info */
-                    if (otyp != STRANGE_OBJECT) {
-                        add_obj_info(datawin, otyp);
-                        putstr(datawin, 0, "");
-                    }
-
-                    /* encyclopedia entry */
-                    if (found_in_file) {
-                        if (dlb_fseek(fp, (long) txt_offset + entry_offset, SEEK_SET) < 0) {
-                            pline("? Seek error on 'data' file!");
-                            (void) dlb_fclose(fp);
-                            return;
-                        }
-
-                        char titlebuf[BUFSZ];
-                        Sprintf(titlebuf, "Encyclopedia entry for \"%s\":", dbase_str);
-                        putstr(datawin, ATR_BOLD, titlebuf);
-                        putstr(datawin, ATR_NONE, "");
-
-                        for (i = 0; i < entry_count; i++) {
-                            /* room for 1-tab or 8-space prefix + BUFSZ-1 + \0 */
-                            char tabbuf[BUFSZ + 8], *tp;
-
-                            if (!dlb_fgets(tabbuf, BUFSZ, fp)) {
-                                goto bad_data_file;
-                            }
-                            tp = tabbuf;
-                            if (!index(tp, '\n')) {
-                                goto bad_data_file;
-                            }
-                            (void) strip_newline(tp);
-                            /* text in this file is indented with one tab but
-                               someone modifying it might use spaces instead */
-                            if (*tp == '\t') {
-                                ++tp;
-                            } else if (*tp == ' ') {
-                                /* remove up to 8 spaces (we expect 8-column
-                                   tab stops but user might have them set at
-                                   something else so we don't require it) */
-                                do {
-                                    ++tp;
-                                } while (tp < &tabbuf[8] && *tp == ' ');
-                            } else if (*tp) { /* empty lines are ok */
-                                goto bad_data_file;
-                            }
-                            /* if a tab after the leading one is found,
-                               convert tabs into spaces; the attributions
-                               at the end of quotes typically have them */
-                            if (index(tp, '\t') != 0) {
-                                (void) tabexpand(tp);
-                            }
-                            putstr(datawin, 0, tp);
-                        }
-                    }
-                    display_nhwindow(datawin, FALSE);
-                    destroy_nhwindow(datawin), datawin = WIN_ERR;
-                }
-            } else if (user_typed_name && pass == 0 && !pass1found_in_file) {
-                pline("I don't have any information on those things.");
-            }
+        if (!lookup_database_entry(fp, dbase_str, inp, pm,
+                    user_typed_name, without_asking, supplemental_name)) {
+            impossible("'data' file in wrong format or corrupted");
         }
     }
 
-    goto checkfile_done; /* skip error feedback */
+    (void) dlb_fclose(fp);
+}
 
- bad_data_file:
-    impossible("'data' file in wrong format or corrupted");
+static boolean
+lookup_database_entry(
+dlb *fp,
+const char* dbase_str,
+const char *inp,
+struct permonst *pm,
+boolean user_typed_name,
+boolean without_asking,
+char *supplemental_name)
+{
+    char buf[BUFSZ], givenname[BUFSZ];
+    char *ep;
+    long txt_offset;
+    winid datawin = WIN_ERR;
 
+    long pass1offset = -1L;
+    int chk_skip, pass = 1;
+    boolean yes_to_moreinfo, found_in_file, pass1found_in_file, skipping_entry;
+    char *sp, *ap, *alt = 0; /* alternate description */
+
+    /* adjust the input to remove "named " and "called " */
+    if ((ep = strstri(dbase_str, " named ")) != 0) {
+        alt = ep + 7;
+        if ((ap = strstri(dbase_str, " called ")) != 0 && ap < ep)
+            ep = ap; /* "named" is alt but truncate at "called" */
+    } else if ((ep = strstri(dbase_str, " called ")) != 0) {
+        copynchars(givenname, ep + 8, BUFSZ - 1);
+        alt = givenname;
+        if (supplemental_name && (sp = strstri(inp, " called ")) != 0)
+            copynchars(supplemental_name, sp + 8, BUFSZ - 1);
+    } else
+        ep = strstri(dbase_str, ", ");
+    if (ep && ep > dbase_str)
+        *ep = '\0';
+    /* remove article from 'alt' name ("a pair of lenses named
+        The Eyes of the Overworld" simplified above to "lenses named
+        The Eyes of the Overworld", now reduced to "The Eyes of the
+        Overworld", skip "The" as with base name processing) */
+    if (alt && (!strncmpi(alt, "a ", 2)
+                || !strncmpi(alt, "an ", 3)
+                || !strncmpi(alt, "the ", 4)))
+        alt = index(alt, ' ') + 1;
+    /* remove charges or "(lit)" or wizmode "(N aum)" */
+    if ((ep = strstri(dbase_str, " (")) != 0 && ep > dbase_str)
+        *ep = '\0';
+    if (alt && (ap = strstri(alt, " (")) != 0 && ap > alt)
+        *ap = '\0';
+
+    /*
+        * If the object is named, then the name is the alternate description;
+        * otherwise, the result of makesingular() applied to the name is.
+        * This isn't strictly optimal, but named objects of interest to the
+        * user will usually be found under their name, rather than under
+        * their object type, so looking for a singular form is pointless.
+        */
+    if (!alt)
+        alt = makesingular(dbase_str);
+
+    pass1found_in_file = FALSE;
+    for (pass = !strcmp(alt, dbase_str) ? 0 : 1; pass >= 0; --pass) {
+        found_in_file = skipping_entry = FALSE;
+        txt_offset = 0L;
+        if (dlb_fseek(fp, txt_offset, SEEK_SET) < 0 ) {
+            impossible("can't get to start of 'data' file");
+            goto checkfile_done;
+        }
+        /* skip first record; read second */
+        if (!dlb_fgets(buf, BUFSZ, fp) || !dlb_fgets(buf, BUFSZ, fp)) {
+            impossible("can't read 'data' file");
+            goto checkfile_done;
+        } else if (sscanf(buf, "%8lx\n", &txt_offset) < 1 || txt_offset == 0L) {
+            return FALSE;
+        }
+
+        /* look for the appropriate entry */
+        while (dlb_fgets(buf, BUFSZ, fp)) {
+            if (*buf == '.')
+                break; /* we passed last entry without success */
+
+            if (digit(*buf)) {
+                /* a number indicates the end of current entry */
+                skipping_entry = FALSE;
+            } else if (!skipping_entry) {
+                if (!(ep = index(buf, '\n'))) {
+                    return FALSE;
+                }
+                (void) strip_newline((ep > buf) ? ep - 1 : ep);
+                /* if we match a key that begins with "~", skip
+                    this entry */
+                chk_skip = (*buf == '~') ? 1 : 0;
+                if ((pass == 0 && pmatch(&buf[chk_skip], dbase_str))
+                    || (pass == 1 && alt && pmatch(&buf[chk_skip], alt))) {
+                    if (chk_skip) {
+                        skipping_entry = TRUE;
+                        continue;
+                    } else {
+                        found_in_file = TRUE;
+                        if (pass == 1)
+                            pass1found_in_file = TRUE;
+                        break;
+                    }
+                }
+            }
+        }
+
+        /* database entry should exist, now find where it is */
+        long entry_offset, fseekoffset;
+        int entry_count;
+        int i;
+        if (found_in_file) {
+            /* skip over other possible matches for the info */
+            do {
+                if (!dlb_fgets(buf, BUFSZ, fp)) {
+                    return FALSE;
+                }
+            } while (!digit(*buf));
+
+            if (sscanf(buf, "%ld,%d\n", &entry_offset, &entry_count) < 2) {
+                return FALSE;
+            }
+            fseekoffset = (long) txt_offset + entry_offset;
+            if (pass == 1)
+                pass1offset = fseekoffset;
+            else if (fseekoffset == pass1offset)
+                goto checkfile_done;
+        }
+
+        /* object lookup: try to parse as an object */
+        int otyp = name_to_otyp(dbase_str);
+
+        /* prompt for more info (if using whatis to navigate the map) */
+        yes_to_moreinfo = FALSE;
+        if (!user_typed_name && !without_asking) {
+            const char *entrytext = pass ? alt : dbase_str;
+            char question[QBUFSZ];
+
+            Strcpy(question, "More info about \"");
+            /* +2 => length of "\"?" */
+            copynchars(eos(question), entrytext,
+                        (sizeof question - 1 - (strlen(question) + 2)));
+            Strcat(question, "\"?");
+            if (yn(question) == 'y') {
+                yes_to_moreinfo = TRUE;
+            }
+        }
+
+        /* finally, put the appropriate information into a window */
+        if (user_typed_name || without_asking || yes_to_moreinfo) {
+            if (!found_in_file && !pm && otyp == STRANGE_OBJECT) {
+                if ((user_typed_name && pass == 0 && !pass1found_in_file) || yes_to_moreinfo) {
+                    pline("I don't have any information on those things.");
+                }
+                /* don't print anything otherwise; we don't want it to e.g.
+                    * print a database entry and then print the above message. */
+            } else {
+                datawin = create_nhwindow(NHW_MENU);
+
+                /* object lookup info */
+                if (otyp != STRANGE_OBJECT) {
+                    add_obj_info(datawin, otyp);
+                    putstr(datawin, 0, "");
+                }
+
+                /* encyclopedia entry */
+                if (found_in_file) {
+                    if (dlb_fseek(fp, (long) txt_offset + entry_offset, SEEK_SET) < 0) {
+                        pline("? Seek error on 'data' file!");
+                        return FALSE;
+                    }
+
+                    char titlebuf[BUFSZ];
+                    Sprintf(titlebuf, "Encyclopedia entry for \"%s\":", dbase_str);
+                    putstr(datawin, ATR_BOLD, titlebuf);
+                    putstr(datawin, ATR_NONE, "");
+
+                    for (i = 0; i < entry_count; i++) {
+                        /* room for 1-tab or 8-space prefix + BUFSZ-1 + \0 */
+                        char tabbuf[BUFSZ + 8], *tp;
+
+                        if (!dlb_fgets(tabbuf, BUFSZ, fp)) {
+                            return FALSE;
+                        }
+                        tp = tabbuf;
+                        if (!index(tp, '\n')) {
+                            return FALSE;
+                        }
+                        (void) strip_newline(tp);
+                        /* text in this file is indented with one tab but
+                            someone modifying it might use spaces instead */
+                        if (*tp == '\t') {
+                            ++tp;
+                        } else if (*tp == ' ') {
+                            /* remove up to 8 spaces (we expect 8-column
+                                tab stops but user might have them set at
+                                something else so we don't require it) */
+                            do {
+                                ++tp;
+                            } while (tp < &tabbuf[8] && *tp == ' ');
+                        } else if (*tp) { /* empty lines are ok */
+                            return FALSE;
+                        }
+                        /* if a tab after the leading one is found,
+                            convert tabs into spaces; the attributions
+                            at the end of quotes typically have them */
+                        if (index(tp, '\t') != 0) {
+                            (void) tabexpand(tp);
+                        }
+                        putstr(datawin, 0, tp);
+                    }
+                }
+                display_nhwindow(datawin, FALSE);
+                destroy_nhwindow(datawin), datawin = WIN_ERR;
+            }
+        } else if (user_typed_name && pass == 0 && !pass1found_in_file) {
+            pline("I don't have any information on those things.");
+        }
+    }
  checkfile_done:
     if (datawin != WIN_ERR) {
         destroy_nhwindow(datawin);
     }
-    (void) dlb_fclose(fp);
+    return TRUE;
 }
 
 /* getpos() return values */

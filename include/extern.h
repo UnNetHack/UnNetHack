@@ -2845,6 +2845,7 @@ E const char *FDECL(weapon_descr, (struct obj *));
 E int FDECL(hitval, (struct obj *, struct monst *));
 E int FDECL(dmgval, (struct obj *, struct monst *));
 E int FDECL(special_dmgval, (struct monst *, struct monst *, long, long *));
+extern struct damage_info_t dmgval_info(struct obj*);
 E void FDECL(silver_sears, (struct monst *, struct monst *, long));
 E struct obj *FDECL(select_rwep, (struct monst *));
 E boolean FDECL(mon_might_throw_wep, (struct obj *));
