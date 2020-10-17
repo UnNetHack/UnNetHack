@@ -10,7 +10,7 @@ os:
   - linux
 
 env:
-  - CFLAGS='-O2 -Wall -Wextra -fno-common -Werror=format -Werror=return-type -Werror=uninitialized -Werror=implicit-function-declaration -Werror=misleading-indentation' LFLAGS=-fno-common
+  - CFLAGS='-O2 -Wall -Wextra -fno-common -Werror=format -Werror=return-type -Werror=uninitialized -Werror=implicit-function-declaration' LFLAGS=-fno-common
 
 jobs:
   include:
