@@ -492,7 +492,13 @@ struct obj *obj;
         return FALSE;
     }
     if (obj->oclass == TOOL_CLASS) {
-        return (boolean)(objects[obj->otyp].oc_charged);
+        if (obj->otyp == BRASS_LANTERN ||
+            (obj->otyp == OIL_LAMP) ||
+            /* only list magic lamps if they are not identified yet */
+            (obj->otyp == MAGIC_LAMP && !objects[MAGIC_LAMP].oc_name_known)) {
+            return TRUE;
+        }
+        return objects[obj->otyp].oc_charged;
     }
     return FALSE; /* why are weapons/armor considered charged anyway? */
 }
