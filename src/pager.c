@@ -658,7 +658,7 @@ short otyp;
         OBJPUTSTR("Scroll.");
     }
     if (olet == SPBOOK_CLASS) {
-        if (otyp == SPE_BLANK_PAPER) {
+        if (otyp == SPE_BLANK_PAPER || otyp == SPE_BOOK_OF_THE_DEAD) {
             OBJPUTSTR("Spellbook.");
         } else {
             Sprintf(buf, "Level %d spellbook, in the %s school. %s spell.",
@@ -758,7 +758,7 @@ short otyp;
     if (olet == SCROLL_CLASS || olet == SPBOOK_CLASS) {
         if (otyp == SCR_BLANK_PAPER || otyp == SPE_BLANK_PAPER) {
             OBJPUTSTR("Can be written on.");
-        } else {
+        } else if (otyp != SPE_BOOK_OF_THE_DEAD) {
             Sprintf(buf, "Takes %d to %d ink to write.", ink_cost(&dummy)/2, ink_cost(&dummy)-1);
             OBJPUTSTR(buf);
         }
