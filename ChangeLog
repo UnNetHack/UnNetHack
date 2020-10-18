@@ -63,6 +63,7 @@
 	  - The '$' command reports the gold in the containers of the player
 	  - Show total weight of object classes with invweight
 	  - List lamps and lanterns in charging prompt
+	  - Autoidentify magic lamps and oil lamps when rubbing
 
 	* skill changes:
 	  - Allow convicts to become skilled in broadsword (reported by RojjaCebolla)

@@ -1534,9 +1534,12 @@ dorub()
             }
             djinni_from_bottle(uwep);
             makeknown(MAGIC_LAMP);
+            makeknown(OIL_LAMP);
             update_inventory();
         } else if (rn2(2)) {
             You("%s smoke.", !Blind ? "see a puff of" : "smell");
+            makeknown_msg(MAGIC_LAMP);
+            makeknown(OIL_LAMP);
         } else {
             pline("%s", nothing_happens);
         }
