@@ -2567,7 +2567,7 @@ more_dips:
             obj->otyp = OIL_LAMP;
             obj->age = 0;
         }
-        if (obj->age > 1000L) {
+        if (obj->age > MAX_LAMP_FUEL*2/3) {
             pline("%s %s full.", Yname2(obj), otense(obj, "are"));
             potion->in_use = FALSE; /* didn't go poof */
         } else {
@@ -2577,7 +2577,9 @@ more_dips:
                diluted potion provides less benefit but we don't attempt
                to track that the lamp now also has some non-oil in it */
             obj->age += (!potion->odiluted ? 4L : 3L) * potion->age / 2L;
-            if (obj->age > 1500L) obj->age = 1500L;
+            if (obj->age > MAX_LAMP_FUEL) {
+                obj->age = MAX_LAMP_FUEL;
+            }
             useup(potion);
             exercise(A_WIS, TRUE);
         }

@@ -320,6 +320,8 @@ struct obj {
                          otmp->otyp == WAX_CANDLE)
 #define MAX_OIL_IN_FLASK 400    /* maximum amount of oil in a potion of oil */
 
+#define MAX_LAMP_FUEL 1500 /* maximum amount of fuel in lamps or lanterns */
+
 /* MAGIC_LAMP intentionally excluded below */
 /* age field of this is relative age rather than absolute */
 #define age_is_relative(otmp)   ((otmp)->otyp == BRASS_LANTERN \

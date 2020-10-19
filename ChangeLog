@@ -64,6 +64,7 @@
 	  - Show total weight of object classes with invweight
 	  - List lamps and lanterns in charging prompt
 	  - Autoidentify magic lamps and oil lamps when rubbing
+	  - Give feedback if lamps or lanterns are full after charging
 
 	* skill changes:
 	  - Allow convicts to become skilled in broadsword (reported by RojjaCebolla)

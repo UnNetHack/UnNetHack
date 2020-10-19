@@ -669,13 +669,29 @@ int curse_bless;
                 }
             } else if (is_blessed) {
                 obj->spe = 1;
-                obj->age = 1500;
+                obj->age = MAX_LAMP_FUEL;
                 p_glow2(obj, NH_BLUE);
             } else {
                 obj->spe = 1;
-                obj->age += 750;
-                if (obj->age > 1500) obj->age = 1500;
+                obj->age += MAX_LAMP_FUEL/2;
+                if (obj->age > MAX_LAMP_FUEL) {
+                    obj->age = MAX_LAMP_FUEL;
+                }
                 p_glow1(obj);
+            }
+            /* give some indication if obj is full */
+            if (obj->age == MAX_LAMP_FUEL) {
+                if (obj->otyp == BRASS_LANTERN) {
+                    if (Blind) {
+                        You("smell %s.", Hallucination ? "unicorn farts" : "ozone");
+                    } else {
+                        You_see("%s from %s.",
+                                Hallucination ? "unicorn farts escape" : "sparks fly",
+                                yname(obj));
+                    }
+                } else if (obj->otyp == OIL_LAMP) {
+                    pline("%s is filled to the brim.", Yname2(obj));
+                }
             }
             break;
 

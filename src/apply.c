@@ -1528,7 +1528,7 @@ dorub()
                artifact which blasts the hero with lethal results) */
             uwep->otyp = OIL_LAMP;
             uwep->spe = 0; /* for safety */
-            uwep->age = rn1(500, 1000);
+            uwep->age = rn1(MAX_LAMP_FUEL/3, MAX_LAMP_FUEL*2/3);
             if (uwep->lamplit) {
                 begin_burn(uwep, TRUE);
             }
