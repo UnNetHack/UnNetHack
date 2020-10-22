@@ -921,7 +921,6 @@ dog_move(mtmp, after)
 register struct monst *mtmp;
 int after; /* this is extra fast monster movement */
 {
-    int omx, omy; /* original mtmp position */
     int appr, whappr, udist;
     int i, j, k;
     register struct edog *edog = EDOG(mtmp);
@@ -946,11 +945,9 @@ int after; /* this is extra fast monster movement */
      */
     has_edog = !mtmp->isminion;
 
-    omx = mtmp->mx;
-    omy = mtmp->my;
     if (has_edog && dog_hunger(mtmp, edog)) return(2);  /* starved */
 
-    udist = distu(omx, omy);
+    udist = distu(mtmp->mx, mtmp->my);
 #ifdef STEED
     /* Let steeds eat and maybe throw rider during Conflict */
     if (mtmp == u.usteed) {
@@ -964,8 +961,8 @@ int after; /* this is extra fast monster movement */
     /* maybe we tamed him while being swallowed --jgm */
     if (!udist) return(0);
 
-    nix = omx;  /* set before newdogpos */
-    niy = omy;
+    nix = mtmp->mx;  /* set before newdogpos */
+    niy = mtmp->my;
     cursemsg[0] = FALSE;    /* lint suppression */
     info[0] = 0;        /* ditto */
 
@@ -1168,7 +1165,7 @@ int after; /* this is extra fast monster movement */
         j = ((ndist = GDIST(nx, ny)) - nidist) * appr;
         if ((j == 0 && !rn2(++chcnt)) || j < 0 ||
             (j > 0 && !whappr &&
-             ((omx == nix && omy == niy && !rn2(3))
+             ((mtmp->mx == nix && mtmp->my == niy && !rn2(3))
               || !rn2(12))
             )) {
             nix = nx;
@@ -1242,7 +1239,12 @@ nxti:   ;
         }
     }
 
+    int omx, omy; /* original mtmp position */
+
 newdogpos:
+    omx = mtmp->mx;
+    omy = mtmp->my;
+
     if (nix != omx || niy != omy) {
         struct obj *mw_tmp;
         boolean wasseen;
