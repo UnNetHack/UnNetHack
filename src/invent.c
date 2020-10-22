@@ -4288,6 +4288,7 @@ char *title;
         /* Fool the 'weapon in hand' routine into
          * displaying 'weapon in claw', etc. properly.
          */
+        struct permonst *youmonst_data = youmonst.data;
         youmonst.data = mon->data;
         /* in case inside a shop, don't append "for sale" prices */
         iflags.suppress_price++;
@@ -4299,7 +4300,7 @@ char *title;
 
         iflags.suppress_price--;
         /* was 'set_uasmon();' but that potentially has side-effects */
-        youmonst.data = &mons[u.umonnum]; /* most basic part of set_uasmon */
+        youmonst.data = youmonst_data;
     } else {
         invdisp_nothing(title ? title : tmp, "(none)");
         n = 0;
