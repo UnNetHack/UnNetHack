@@ -2294,7 +2294,7 @@ struct obj *obj;
         }
     }
 
-    if (!retouch_object(&obj, FALSE)) {
+    if (!retouch_object(&obj, FALSE, FALSE)) {
         return 1; /* costs a turn even though it didn't get worn */
     }
 

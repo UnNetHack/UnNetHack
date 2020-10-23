@@ -3855,7 +3855,7 @@ doapply()
     obj = getobj(class_list, "use or apply");
     if(!obj) return 0;
 
-    if (!retouch_object(&obj, FALSE)) {
+    if (!retouch_object(&obj, FALSE, FALSE)) {
         return 1; /* evading your grasp costs a turn; just be
                      grateful that you don't drop it as well */
     }

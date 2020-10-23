@@ -93,7 +93,7 @@ E const char *FDECL(get_warned_of_monster, (struct obj *));
 E const char *FDECL(glow_color, (int));
 E const char *FDECL(glow_verb, (int, BOOLEAN_P));
 E void FDECL(Sting_effects, (int));
-E int FDECL(retouch_object, (struct obj **, BOOLEAN_P));
+E int FDECL(retouch_object, (struct obj **, boolean, boolean));
 E void FDECL(retouch_equipment, (int));
 E void NDECL(mkot_trap_warn);
 E boolean FDECL(is_magic_key, (struct monst *, struct obj *));
