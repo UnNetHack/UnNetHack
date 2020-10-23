@@ -1497,37 +1497,43 @@ int dieroll; /* needed for Magicbane and vorpal blades */
             }
         }
     }
+
     if (spec_ability(otmp, SPFX_DRLI)) {
         /* some non-living creatures (golems, vortices) are
            vulnerable to life drain effects */
         const char *life = nonliving(mdef->data) ? "animating force" : "life";
 
         if (!youdefend) {
-            if (vis) {
-                if(otmp->oartifact == ART_STORMBRINGER)
-                    pline_The("%s blade draws the %s from %s!",
-                              hcolor(NH_BLACK),
-                              life,
-                              mon_nam(mdef));
-                else
-                    pline("%s draws the %s from %s!",
-                          The(distant_name(otmp, xname)),
-                          life,
-                          mon_nam(mdef));
-            }
-            if (mdef->m_lev == 0) {
-                *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
+            if (resists_drli(mdef)) {
+                return FALSE;
             } else {
-                int drain = monhp_per_lvl(mdef);
+                if (vis) {
+                    if(otmp->oartifact == ART_STORMBRINGER)
+                        pline_The("%s blade draws the %s from %s!",
+                                hcolor(NH_BLACK),
+                                life,
+                                mon_nam(mdef));
+                    else
+                        pline("%s draws the %s from %s!",
+                            The(distant_name(otmp, xname)),
+                            life,
+                            mon_nam(mdef));
+                }
+                if (mdef->m_lev == 0) {
+                    *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
+                } else {
+                    int drain = monhp_per_lvl(mdef);
 
-                *dmgptr += drain;
-                mdef->mhpmax -= drain;
-                mdef->m_lev--;
-                drain /= 2;
-                if (drain) healup(drain, 0, FALSE, FALSE);
+                    *dmgptr += drain;
+                    mdef->mhpmax -= drain;
+                    mdef->m_lev--;
+                    drain /= 2;
+                    if (drain) healup(drain, 0, FALSE, FALSE);
+                }
             }
             return vis;
-        } else { /* youdefend */
+
+        } else if (!Drain_resistance) {
             int oldhpmax = u.uhpmax;
 
             if (Blind)
