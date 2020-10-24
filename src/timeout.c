@@ -1247,6 +1247,7 @@ long timeout;
         case 0:
             /* even if blind you'll know if holding it */
             if (canseeit || obj->where == OBJ_INVENT) {
+                obj->cknown = TRUE;
                 switch (obj->where) {
                 case OBJ_INVENT:
                     need_invupdate = TRUE;

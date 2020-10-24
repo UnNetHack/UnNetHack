@@ -1412,6 +1412,7 @@ struct obj *obj;
         if (obj->otyp == BRASS_LANTERN)
             Your("lamp has run out of power.");
         else pline("This %s has no oil.", xname(obj));
+        obj->cknown = TRUE;
         return;
     }
     if (obj->cursed && !rn2(2)) {
@@ -1422,6 +1423,7 @@ struct obj *obj;
            obj->otyp == BRASS_LANTERN) {
             check_unpaid(obj);
             pline("%s lamp is now on.", Shk_Your(buf, obj));
+            obj->cknown = FALSE;
         } else {    /* candle(s) */
             pline("%s flame%s %s%s",
                   s_suffix(Yname2(obj)),

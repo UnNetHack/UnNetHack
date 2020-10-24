@@ -670,10 +670,12 @@ int curse_bless;
             } else if (is_blessed) {
                 obj->spe = 1;
                 obj->age = MAX_LAMP_FUEL;
+                obj->cknown = FALSE;
                 p_glow2(obj, NH_BLUE);
             } else {
                 obj->spe = 1;
                 obj->age += MAX_LAMP_FUEL/2;
+                obj->cknown = FALSE;
                 if (obj->age > MAX_LAMP_FUEL) {
                     obj->age = MAX_LAMP_FUEL;
                 }
