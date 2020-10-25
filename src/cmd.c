@@ -5,6 +5,7 @@
 #include "lev.h"
 #include "func_tab.h"
 /* #define DEBUG */ /* uncomment for debugging */
+extern void sanity_check_flying(void);
 
 /* Macros for meta and ctrl modifiers:
  *   M and C return the meta/ctrl code for the given character;
@@ -2688,6 +2689,18 @@ trap_sanity_check()
 }
 
 void
+sanity_check_flying(void)
+{
+    if (!Flying) {
+        if (!is_were(youmonst.data) && !Upolyd) {
+            fuzzer_printf("%s %ld\n", youmonst.data->mname, youmonst.data->mflags1);
+            abort();
+        }
+    }
+}
+
+
+void
 sanity_check()
 {
     obj_sanity_check();
@@ -2697,6 +2710,7 @@ sanity_check()
     bc_sanity_check();
     trap_sanity_check();
     sanity_check_shopkeepers();
+    sanity_check_flying();
 }
 
 #ifdef DEBUG_MIGRATING_MONS
