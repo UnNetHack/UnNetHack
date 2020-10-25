@@ -2781,6 +2781,8 @@ do_takeoff()
         if (!cursed(ublindf)) Blindf_off(ublindf);
     } else warning("do_takeoff: taking off %lx", taking_off);
 
+    takeoff_mask &= ~I_SPECIAL; /* clear cancel_doff() flag */
+
     return(otmp);
 }
 
