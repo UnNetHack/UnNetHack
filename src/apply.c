@@ -1412,6 +1412,7 @@ struct obj *obj;
         if (obj->otyp == BRASS_LANTERN)
             Your("lamp has run out of power.");
         else pline("This %s has no oil.", xname(obj));
+        obj->cknown = TRUE;
         return;
     }
     if (obj->cursed && !rn2(2)) {
@@ -1422,6 +1423,7 @@ struct obj *obj;
            obj->otyp == BRASS_LANTERN) {
             check_unpaid(obj);
             pline("%s lamp is now on.", Shk_Your(buf, obj));
+            obj->cknown = FALSE;
         } else {    /* candle(s) */
             pline("%s flame%s %s%s",
                   s_suffix(Yname2(obj)),
@@ -1528,15 +1530,18 @@ dorub()
                artifact which blasts the hero with lethal results) */
             uwep->otyp = OIL_LAMP;
             uwep->spe = 0; /* for safety */
-            uwep->age = rn1(500, 1000);
+            uwep->age = rn1(MAX_LAMP_FUEL/3, MAX_LAMP_FUEL*2/3);
             if (uwep->lamplit) {
                 begin_burn(uwep, TRUE);
             }
             djinni_from_bottle(uwep);
             makeknown(MAGIC_LAMP);
+            makeknown(OIL_LAMP);
             update_inventory();
         } else if (rn2(2)) {
             You("%s smoke.", !Blind ? "see a puff of" : "smell");
+            makeknown_msg(MAGIC_LAMP);
+            makeknown(OIL_LAMP);
         } else {
             pline("%s", nothing_happens);
         }
