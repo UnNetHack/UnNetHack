@@ -4935,7 +4935,7 @@ register xchar x, y;
     return(FALSE);
 }
 
-/* "your " or "Foobar's " (note the trailing space) */
+/* "your" or "Foobar's" or "the" */
 char *
 shk_your(buf, obj)
 char *buf;
