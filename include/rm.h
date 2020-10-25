@@ -664,6 +664,6 @@ extern dlevel_t level;  /* structure describing the current level */
                               (struct monst *)0)
 
 /* restricted movement */
-#define Sokoban (!achieve.solved_sokoban)
+#define Sokoban (In_sokoban(&u.uz) && !achieve.solved_sokoban)
 
 #endif /* RM_H */
