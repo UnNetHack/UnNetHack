@@ -130,15 +130,12 @@ register struct obj *pen;
 
     /* get paper to write on */
     paper = getobj(write_on, "write on");
-    if(!paper)
+    if (!paper) {
         return(0);
+    }
     typeword = (paper->oclass == SPBOOK_CLASS) ? "spellbook" : "scroll";
     if (Blind && !paper->dknown) {
         You("don't know if that %s is blank or not!", typeword);
-        return 0;
-    } else if (paper->oclass == SPBOOK_CLASS) {
-        /* can't write a magic book while blind */
-        pline("%s can't create braille text.", upstart(ysimple_name(pen)));
         return 0;
     }
     paper->dknown = 1;
@@ -333,8 +330,12 @@ found:
     /* success */
     if (new_obj->oclass == SPBOOK_CLASS) {
         /* acknowledge the change in the object's description... */
-        pline_The("spellbook warps strangely, then turns %s.",
-                  new_book_description(new_obj->otyp, namebuf));
+        if (Blind) {
+            pline_The("spellbook vibrates strangely.");
+        } else {
+            pline_The("spellbook warps strangely, then turns %s.",
+                    new_book_description(new_obj->otyp, namebuf));
+        }
     }
     new_obj->blessed = (curseval > 0);
     new_obj->cursed = (curseval < 0);
