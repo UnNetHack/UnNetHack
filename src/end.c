@@ -1155,8 +1155,17 @@ boolean identified, all_containers, want_disp;
 
     for (box = list; box; box = box->nobj) {
         int saveknown = objects[box->otyp].oc_name_known;
-        objects[box->otyp].oc_name_known = 1;
+        if (identified) {
+            objects[box->otyp].oc_name_known = 1;
+        }
         if (Is_container(box) || box->otyp == STATUE) {
+            if (!box->cknown || (identified && !box->lknown)) {
+                box->cknown = 1; /* we're looking at the contents now */
+                if (identified) {
+                    box->lknown = 1;
+                }
+                update_inventory();
+            }
             if (box->otyp == BAG_OF_TRICKS && box->spe) {
                 continue; /* bag of tricks with charges can't contain anything */
             } else if (box->cobj) {
@@ -1225,7 +1234,6 @@ nextclass:
                                        want_disp);
                 }
             } else {
-                objects[box->otyp].oc_name_known = 1;
                 if (want_disp) {
                     pline("%s empty.", Tobjnam(box, "are"));
                     display_nhwindow(WIN_MESSAGE, FALSE);
