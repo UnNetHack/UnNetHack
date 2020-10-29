@@ -771,7 +771,20 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     if (obj->otyp == T_SHIRT && program_state.gameover) {
         char tmpbuf[BUFSZ];
 
-        Sprintf(eos(buf), " with text \"%s\"", tshirt_text(obj, tmpbuf));
+        /* disclose without breaking illiterate conduct, but mainly tip off
+           players who aren't aware that something readable is present */
+        switch (obj->otyp) {
+        case T_SHIRT:
+            Sprintf(eos(buf), " with text \"%s\"", tshirt_text(obj, tmpbuf));
+            break;
+
+        case HAWAIIAN_SHIRT:
+            Sprintf(eos(buf), " with %s motif", an(hawaiian_motif(obj, tmpbuf)));
+            break;
+
+        default:
+            break;
+        }
     }
 
     if (has_oname(obj) && dknown) {

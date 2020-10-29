@@ -88,6 +88,7 @@
 
 	* Other:
 	  - Adjusted quantity formula when wishing for stackable items
+	  - 'Readable' Hawaiian shirt designs (by Michael Meyer)
 
 	* bug fixes:
 	  - Fix over-escaping of characters on HTML dump map

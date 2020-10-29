@@ -166,10 +166,72 @@ char *buf;
     return erode_obj_text(tshirt, buf);
 }
 
+char *
+hawaiian_motif(struct obj *shirt, char *buf)
+{
+    static const char *hawaiian_motifs[] = {
+        /* birds */
+        "flamingo",
+        "parrot",
+        "toucan",
+        "bird of paradise", /* could be a bird or a flower */
+        /* sea creatures */
+        "sea turtle",
+        "tropical fish",
+        "jellyfish",
+        "giant eel",
+        "water nymph",
+        /* plants */
+        "plumeria",
+        "orchid",
+        "hibiscus flower",
+        "palm tree",
+        /* other */
+        "hula dancer",
+        "sailboat",
+        "ukulele",
+    };
+
+    /* a tourist's starting shirt always has the same o_id; we need some
+       additional randomness or else its design will never differ */
+    unsigned motif = shirt->o_id ^ (unsigned) game_seed;
+
+    Strcpy(buf, hawaiian_motifs[motif % SIZE(hawaiian_motifs)]);
+    return buf;
+}
+
 static char *
-apron_text(apron, buf)
-struct obj *apron;
-char *buf;
+hawaiian_design(struct obj *shirt, char *buf)
+{
+    static const char *hawaiian_bgs[] = {
+        /* solid colors */
+        "purple",
+        "yellow",
+        "red",
+        "blue",
+        "orange",
+        "black",
+        "green",
+        /* adjectives */
+        "abstract",
+        "geometric",
+        "patterned",
+        "naturalistic",
+    };
+
+    /* This hash method is slightly different than the one in hawaiian_motif;
+       using the same formula in both cases may lead to some shirt combos
+       never appearing, if the sizes of the two lists have common factors. */
+    unsigned bg = shirt->o_id ^ (unsigned) ~game_seed;
+
+    Sprintf(buf, "%s on %s background",
+            makeplural(hawaiian_motif(shirt, buf)),
+            an(hawaiian_bgs[bg % SIZE(hawaiian_bgs)]));
+    return buf;
+}
+
+static char *
+apron_text(struct obj* apron, char* buf)
 {
     static const char *apron_msgs[] = {
         "Kiss the cook",
@@ -222,7 +284,9 @@ doread()
         useup(scroll);
         return 1;
 #ifdef TOURIST
-    } else if (scroll->otyp == T_SHIRT || scroll->otyp == ALCHEMY_SMOCK) {
+    } else if (scroll->otyp == T_SHIRT ||
+               scroll->otyp == ALCHEMY_SMOCK ||
+               scroll->otyp == HAWAIIAN_SHIRT) {
         char buf[BUFSZ];
 
         if (Blind) {
@@ -234,7 +298,8 @@ doread()
             return 0;
         }
         /* can't read shirt worn under suit (under cloak is ok though) */
-        if (scroll->otyp == T_SHIRT && uarm && scroll == uarmu) {
+        if ((scroll->otyp == T_SHIRT || scroll->otyp == HAWAIIAN_SHIRT) &&
+             uarm && scroll == uarmu) {
             pline("%s shirt is obscured by %s %s.",
                   scroll->unpaid ? "That" : "Your", shk_your(buf, uarm),
                   suit_simple_name(uarm));
@@ -244,6 +309,11 @@ doread()
         if (successful_cdt(CONDUCT_ILLITERACY)) {
             livelog_printf(LL_CONDUCT, "became literate by reading %s",
                            an(dump_typename(scroll->otyp)));
+        }
+
+        if (scroll->otyp == HAWAIIAN_SHIRT) {
+            pline("%s features %s.", flags.verbose ? "The design" : "It", hawaiian_design(scroll, buf));
+            return 1;
         }
         violated(CONDUCT_ILLITERACY);
 
