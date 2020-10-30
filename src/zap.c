@@ -4453,11 +4453,13 @@ boolean say; /* Announce out of sight hit/miss events if true */
         }
 
         if (mon) {
+            int saved_mhp;
             if (type == ZT_SPELL(ZT_FIRE)) break;
             if (type >= 0) mon->mstrategy &= ~STRAT_WAITMASK;
 #ifdef STEED
 buzzmonst:
 #endif
+            saved_mhp = mon->mhp; /* for print_mon_wounded() */
             notonhead = (mon->mx != bhitpos.x || mon->my != bhitpos.y);
             if (zap_hit(find_mac(mon), spell_type)) {
                 if (mon_reflects(mon, (char *)0)) {
@@ -4524,9 +4526,7 @@ buzzmonst:
                             /* normal non-fatal hit */
                             if (say || canseemon(mon)) {
                                 hit(fltxt, mon, exclam(tmp));
-                            }
-                            if (Role_if(PM_HEALER) && flags.wounds) {
-                                wounds_message(mon);
+                                print_mon_wounded(mon, saved_mhp);
                             }
                         } else {
                             /* some armor was destroyed; no damage done */
@@ -5519,6 +5519,7 @@ int damage, tell;
     }
 
     if (damage) {
+        int saved_mhp = mtmp->mhp;
         mtmp->mhp -= damage;
         if (DEADMONSTER(mtmp)) {
             if (m_using) {
@@ -5526,8 +5527,8 @@ int damage, tell;
             } else {
                 killed(mtmp);
             }
-        } else if (Role_if(PM_HEALER) && flags.wounds) {
-            wounds_message(mtmp);
+        } else {
+            print_mon_wounded(mtmp, saved_mhp);
         }
     }
     return(resisted);

@@ -455,6 +455,8 @@ E struct monst *FDECL(christen_orc, (struct monst *, const char *,
                                      const char *));
 E const char *FDECL(noveltitle, (int *));
 E const char *FDECL(lookup_novel, (const char *, int *));
+extern char *mon_wounds(struct monst *);
+extern void print_mon_wounded(struct monst *, int);
 
 /* ### do_wear.c ### */
 
@@ -1597,6 +1599,7 @@ E const char *FDECL(stagger, (const struct permonst *, const char *));
 E const char *FDECL(on_fire, (struct permonst *, struct attack *));
 E const struct permonst *FDECL(raceptr, (struct monst *));
 E boolean FDECL(olfaction, (struct permonst *));
+extern boolean is_fleshy(const struct permonst *);
 
 /* ### monmove.c ### */
 

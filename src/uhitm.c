@@ -762,6 +762,7 @@ int dieroll;
     char yourbuf[BUFSZ];
     char unconventional[BUFSZ]; /* substituted for word "attack" in msg */
     char saved_oname[BUFSZ];
+    int saved_mhp = mon->mhp;
 
     unconventional[0] = '\0';
     saved_oname[0] = '\0';
@@ -1533,7 +1534,7 @@ int dieroll;
 
     if (!destroyed) {
         showdmg(tmp, FALSE);
-        if (Role_if(PM_HEALER) && flags.wounds) wounds_message(mon);
+        print_mon_wounded(mon, saved_mhp);
     }
 
     return((boolean)(destroyed ? FALSE : TRUE));

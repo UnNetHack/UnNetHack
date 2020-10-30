@@ -77,6 +77,7 @@
 	  - Support UTF8graphics on curses
 	  - Use bright colors on supporting terminals in tty port
 	  - Monster and object information database
+	  - Reduce message spam when healers sense injuries
 
 	* skill changes:
 	  - Allow convicts to become skilled in broadsword (reported by RojjaCebolla)

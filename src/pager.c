@@ -281,10 +281,13 @@ int x, y;
             (mtmp->mtame && accurate) ?
              "tame " : (mtmp->mpeaceful && accurate) ? "peaceful " : "",
             name);
-    if (mon_wounds(mtmp)) {
+
+    char *mwounds = mon_wounds(mtmp);
+    if (mwounds) {
         Strcat(buf, ", ");
-        Strcat(buf, mon_wounds(mtmp));
+        Strcat(buf, mwounds);
     }
+
     if (u.ustuck == mtmp) {
         if (u.uswallow || iflags.save_uswallow) {
             /* monster detection */
