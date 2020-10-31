@@ -451,6 +451,10 @@ typedef long glyph_t;
 
 #define ADVENT_CALENDAR
 
+/* FREE_ALL_MEMORY is neither experimental nor inadequately tested,
+   but it isn't necessary for successful operation of the program */
+#define FREE_ALL_MEMORY /* free all memory at exit */
+
 /* End of Section 5 */
 
 /*

@@ -149,6 +149,9 @@ remember_topl()
 
     if (len > (unsigned)cw->datlen[idx]) {
         if (cw->data[idx]) free(cw->data[idx]);
+        if (cw->attributes && cw->attributes[idx]) {
+            free(cw->attributes[idx]);
+        }
         len += (8 - (len & 7)); /* pad up to next multiple of 8 */
         cw->data[idx] = (char *)alloc(len);
         cw->datlen[idx] = (short)len;

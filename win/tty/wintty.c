@@ -1600,6 +1600,10 @@ boolean free_data;
         if (free_data) {
             free((genericptr_t)cw->data);
             cw->data = (char **)0;
+            if (cw->attributes) {
+                free(cw->attributes);
+                cw->attributes = NULL;
+            }
             if (cw->datlen) free((genericptr_t)cw->datlen);
             cw->datlen = (short *)0;
             cw->rows = 0;
