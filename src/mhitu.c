@@ -2368,7 +2368,7 @@ struct attack *mattk;
        appropriate to what's currently being displayed, giving
        ordinary monsters a gaze attack when hero thinks he or she
        is facing a gazing creature, but let's not go that far...] */
-    if (Hallucination && rnf(1,4)) {
+    if (Hallucination && rnf(3,4)) {
         cancelled = TRUE;
     }
 
