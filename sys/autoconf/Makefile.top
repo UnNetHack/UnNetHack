@@ -40,12 +40,12 @@ GAMEGRP  = @GROUP@
 
 # Permissions - some places use setgid instead of setuid, for instance
 # See also the option "SECURE" in include/config.h
-GAMEPERM = 04755
+GAMEPERM = 02755
 FILEPERM = 0644
 EXEPERM  = 0755
 DIRPERM  = 0755
-VARFILEPERM = 0644
-VARDIRPERM  = 0755
+VARFILEPERM = 0664
+VARDIRPERM  = 0775
 
 # GAMEDIR also appears in config.h as "HACKDIR".
 # VARDIR may also appear in unixconf.h as "VAR_PLAYGROUND" else GAMEDIR

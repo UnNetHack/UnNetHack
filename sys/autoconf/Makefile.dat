@@ -293,7 +293,7 @@ spec_levs: ../util/lev_comp \
 	advcal.des moria.des \
 	bigroom.des blkmar.des castle.des \
 	dragons.des \
-	endgame.des gehennom.des heck.des knox.des town-?.des \
+	endgame.des gehennom.des heck.des knox.des $(wildcard town-*.des) \
 	medusa.des \
 	mines.des nymph.des oracle.des \
 	sheol.des \
