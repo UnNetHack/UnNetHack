@@ -2750,7 +2750,8 @@ struct _create_particular_data *d;
 }
 
 static boolean
-create_particular_creation(d)
+create_particular_creation(str, d)
+char *str;
 struct _create_particular_data *d;
 {
     struct permonst *whichpm = NULL;
@@ -2763,9 +2764,9 @@ struct _create_particular_data *d;
         if (cant_revive(&d->which, FALSE, (struct obj *) 0) && firstchoice != PM_LONG_WORM_TAIL) {
             /* wizard mode can override handling of special monsters */
             char buf[BUFSZ];
-
-            Sprintf(buf, "Creating %s instead; force %s?", mons[d->which].mname, mons[firstchoice].mname);
-            if (yn(buf) == 'y') {
+            /* if str contains shapechanger name, create shapeshanger */
+            if (!strstri(str, mons[d->which].mname)) {
+                /* otherwise overwrite with firstchoice */
                 d->which = firstchoice;
             }
         }
@@ -2882,7 +2883,7 @@ create_particular()
     if (!tryct) {
         pline("%s", thats_enough_tries);
     } else {
-        return create_particular_creation(&d);
+        return create_particular_creation(bufp, &d);
     }
 
     return FALSE;
