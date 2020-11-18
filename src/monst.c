@@ -1165,13 +1165,15 @@ NEARDATA struct permonst mons[] = {
         M1_FLY|M1_HUMANOID|M1_SEE_INVIS,
         M2_HOSTILE|M2_NOPOLY|M2_MINION|M2_STALK|M2_STRONG|M2_NASTY|M2_COLLECT,
         M3_INFRAVISION, CLR_BLACK),
+    /* the AD&D Monster Manual depicts ki-rin as very similar to unicorns
+       except that they fly (without wings) and can cast spells */
     MON("ki-rin", S_ANGEL,
         LVL(16, 18, -5, 90, 15), (G_NOSHEOL|G_NOHELL|G_NOCORPSE|1),
         A(ATTK(AT_KICK, AD_PHYS, 2, 4), ATTK(AT_KICK, AD_PHYS, 2, 4),
           ATTK(AT_BUTT, AD_PHYS, 3, 6), ATTK(AT_MAGC, AD_SPEL, 2, 6),
           NO_ATTK, NO_ATTK),
-        SIZ(WT_HUMAN, 400, 0, MS_NEIGH, MZ_LARGE), 0, 0,
-        M1_FLY|M1_SEE_INVIS,
+        SIZ(WT_HUMAN, 400, 0, MS_SPELL, MZ_LARGE), MR_POISON, 0,
+        M1_FLY | M1_NOHANDS | M1_SEE_INVIS,
         M2_NOPOLY|M2_MINION|M2_STALK|M2_STRONG|M2_NASTY|M2_LORD,
         M3_INFRAVISIBLE|M3_INFRAVISION, HI_GOLD),
     MON("Archon", S_ANGEL,
