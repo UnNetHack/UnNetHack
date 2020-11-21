@@ -1473,8 +1473,10 @@ int part;
     if (mptr == &mons[PM_RAVEN])
         return bird_parts[part];
     if (mptr->mlet == S_CENTAUR || mptr->mlet == S_UNICORN ||
-        (mptr == &mons[PM_ROTHE] && part != HAIR))
+         (mptr == &mons[PM_KI_RIN]) ||
+         (mptr == &mons[PM_ROTHE] && part != HAIR)) {
         return horse_parts[part];
+    }
     if (mptr->mlet == S_LIGHT) {
         if (part == HANDED) return "rayed";
         else if (part == ARM || part == FINGER ||
