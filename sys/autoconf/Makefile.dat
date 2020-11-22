@@ -16,14 +16,14 @@ LEVCOMP_FLAGS=
 
 all:	$(VARDAT) spec_levs quest_levs dungeon
 
-../util/makedefs:
+../util/makedefs$(EXEEXT):
 	(cd ../util ; make makedefs$(EXEEXT))
 
-../util/dgn_comp:
-	(cd ../util ; make dgn_comp)
+../util/dgn_comp$(EXEEXT):
+	(cd ../util ; make dgn_comp$(EXEEXT))
 
-../util/lev_comp:
-	(cd ../util ; make lev_comp)
+../util/lev_comp$(EXEEXT):
+	(cd ../util ; make lev_comp$(EXEEXT))
 
 ../util/tile2x11:
 	(cd ../util ; make tile2x11)
@@ -270,26 +270,26 @@ GEM_RSC.RSC:
 	# cp $(srcdir)/../win/gem/GEM_RSC.RSC GEM_RSC.RSC
 	$(UUDECODE) $(srcdir)/../win/gem/gem_rsc.uu
 
-data:	data.base ../util/makedefs
+data:	data.base ../util/makedefs$(EXEEXT)
 	../util/makedefs$(EXEEXT) -d
 
-rumors:	rumors.tru rumors.fal ../util/makedefs
+rumors:	rumors.tru rumors.fal ../util/makedefs$(EXEEXT)
 	../util/makedefs$(EXEEXT) -r
 
-quest.dat:	quest.txt ../util/makedefs
+quest.dat:	quest.txt ../util/makedefs$(EXEEXT)
 	../util/makedefs$(EXEEXT) -q
 
-oracles:	oracles.txt ../util/makedefs
+oracles:	oracles.txt ../util/makedefs$(EXEEXT)
 	../util/makedefs$(EXEEXT) -h
 
 vaults.dat:	spec_levs
 
 # note: 'options' should have already been made when include/date.h was created
-options:	../util/makedefs
+options:	../util/makedefs$(EXEEXT)
 	../util/makedefs$(EXEEXT) -v
 
 
-spec_levs: ../util/lev_comp \
+spec_levs: ../util/lev_comp$(EXEEXT) \
 	advcal.des moria.des \
 	bigroom.des blkmar.des castle.des \
 	dragons.des \
@@ -322,7 +322,7 @@ spec_levs: ../util/lev_comp \
 	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/yendor.des
 	touch spec_levs
 
-quest_levs: ../util/lev_comp \
+quest_levs: ../util/lev_comp$(EXEEXT) \
 	Arch.des Barb.des Caveman.des Convict.des Healer.des Knight.des \
 	Monk.des Priest.des Ranger.des Rogue.des Samurai.des \
 	Tourist.des Valkyrie.des Wizard.des
@@ -344,7 +344,7 @@ quest_levs: ../util/lev_comp \
 	../util/lev_comp$(EXEEXT) $(LEVCOMP_FLAGS) $(srcdir)/Wizard.des
 	touch quest_levs
 
-dungeon: $(srcdir)/dungeon.def ../util/makedefs ../util/dgn_comp
+dungeon: $(srcdir)/dungeon.def ../util/makedefs$(EXEEXT) ../util/dgn_comp$(EXEEXT)
 	../util/makedefs$(EXEEXT) -e
 	../util/dgn_comp$(EXEEXT) dungeon.pdf
 

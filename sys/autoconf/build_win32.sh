@@ -21,7 +21,7 @@ function compile_unnethack {
 		--without-compression --disable-file-areas \
 		--disable-status-color --enable-score-on-botl --enable-realtime-on-botl \
 		$GRAPHICS \
-		&& make install
+		&& make --trace install
 }
 
 rm -rf $INSTALL/share/unnethack $DESTDIR/unnethack-win32-*

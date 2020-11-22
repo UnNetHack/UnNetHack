@@ -1,0 +1,78 @@
+name: UnNetHack CI builds
+
+on:
+  push:
+    branches: [ '*' ]
+    tags: [ '*' ]
+  pull_request:
+    branches: [ '*' ]
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: configure
+      env:
+        CFLAGS: '-O2 -Wall -Wextra -fno-common -Werror=format -Werror=return-type -Werror=uninitialized -Werror=implicit-function-declaration -Wno-format-overflow'
+        LFLAGS: '-fno-common'
+      run: "./configure --with-owner=`id -un` --with-group=`id -gn` --enable-wizmode=`id -un` --enable-dummy-graphics --enable-lisp-graphics --enable-curses-graphics --disable-x11-graphics --enable-tty-graphics"
+
+    - name: make
+      run: make all
+
+    - name: install libcheck
+      run: sudo apt-get install check
+
+    - name: make check
+      run: make check
+
+  macos:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: configure
+      env:
+        CFLAGS: '-O2 -Wall -Wextra -fno-common -Werror=format -Werror=return-type -Werror=uninitialized -Werror=implicit-function-declaration'
+        LFLAGS: '-fno-common'
+      run: "./configure --with-owner=`id -un` --with-group=`id -gn` --enable-wizmode=`id -un` --enable-dummy-graphics --enable-lisp-graphics --enable-curses-graphics --disable-x11-graphics --enable-tty-graphics"
+
+    - name: make
+      run: make all
+
+  windows:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup
+      run: |
+          sudo dpkg --add-architecture i386 && dpkg --print-foreign-architectures && sudo apt-get update
+          sudo apt-get install gcc-mingw-w64-i686 wine-development wine32 wine-binfmt imagemagick
+          sudo update-binfmts --import /usr/share/binfmts/wine
+
+    - name: Build
+      run: sys/autoconf/build_win32.sh
+
+    - name: Set environment variables
+      run: |
+          echo "sha_short=$(echo $GITHUB_SHA | cut -b 1-8)" >> $GITHUB_ENV
+          echo "version=$(grep VERSION_STRING include/date.h | cut -f 2 -d \")" >> $GITHUB_ENV
+
+    - name: Copy generated zip file
+      run: |
+          cp /tmp/unnethack_win32/unnethack-win32-${{ env.version }}.zip unnethack-win32-${{ env.version }}-${{ env.sha_short }}.zip
+
+    - name: Pre-Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        prerelease: true
+        files: unnethack-win32-${{ env.version }}-${{ env.sha_short }}.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

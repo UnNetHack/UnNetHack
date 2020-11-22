@@ -173,12 +173,12 @@ quest.dat: $(GAME)
 	( cd dat ; $(MAKE) quest.dat )
 
 spec_levs: $(GAME)
-	( cd util ; $(MAKE) lev_comp )
+	( cd util ; $(MAKE) lev_comp$(EXEEXT) )
 	( cd dat ; $(MAKE) spec_levs )
 	( cd dat ; $(MAKE) quest_levs )
 
 dungeon: $(GAME)
-	( cd util ; $(MAKE) dgn_comp )
+	( cd util ; $(MAKE) dgn_comp$(EXEEXT) )
 	( cd dat ; $(MAKE) dungeon )
 
 Guidebook.txt:
@@ -224,10 +224,10 @@ title.img:
 	( cd dat ; $(MAKE) title.img )
 
 check-dlb: @OPTIONS_FILE@
-	@if egrep -s librarian dat/@OPTIONS_FILE@ ; then $(MAKE) dlb ; else true ; fi
+	@if egrep -s librarian dat/@OPTIONS_FILE@ ; then $(MAKE) dlb$(EXEEXT) ; else true ; fi
 
-dlb: spec_levs
-	( cd util ; $(MAKE) dlb )
+dlb$(EXEEXT): spec_levs
+	( cd util ; $(MAKE) dlb$(EXEEXT) )
 	( cd dat ; LC_ALL=C ; ../util/dlb$(EXEEXT) cf nhdat $(SHARE_DATDLB) $(UNSHARE_DATDLB) )
 
 
