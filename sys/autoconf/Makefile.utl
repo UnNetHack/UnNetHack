@@ -184,7 +184,7 @@ YACCDIST =
 
 #	dependencies for makedefs
 #
-makedefs:	$(MAKEOBJS)
+makedefs$(EXEEXT):	$(MAKEOBJS)
 	$(CC) $(LFLAGS) -o makedefs $(MAKEOBJS)
 
 makedefs.o: makedefs.c $(CONFIG_H) $(srcdir)/../include/permonst.h \
@@ -193,13 +193,13 @@ makedefs.o: makedefs.c $(CONFIG_H) $(srcdir)/../include/permonst.h \
 		$(srcdir)/../include/monst.h $(srcdir)/../include/you.h $(srcdir)/../include/flag.h \
 		$(srcdir)/../include/dlb.h $(srcdir)/../include/patchlevel.h $(srcdir)/../include/qtext.h
 
-../include/onames.h: makedefs
+../include/onames.h: makedefs$(EXEEXT)
 	./makedefs$(EXEEXT) -o
-../include/pm.h: makedefs
+../include/pm.h: makedefs$(EXEEXT)
 	./makedefs$(EXEEXT) -p
-../src/monstr.c: makedefs
+../src/monstr.c: makedefs$(EXEEXT)
 	./makedefs$(EXEEXT) -m
-../include/vis_tab.h: makedefs
+../include/vis_tab.h: makedefs$(EXEEXT)
 	./makedefs$(EXEEXT) -z
 # makedefs -z makes both vis_tab.h and vis_tab.c, but writes the .h first
 ../src/vis_tab.c: ../include/vis_tab.h

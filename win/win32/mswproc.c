@@ -1653,7 +1653,7 @@ int mswin_get_ext_cmd()
                         com_index = -1;
                         for (oindex = 0; extcmdlist[oindex].ef_txt != (char *)0; oindex++) {
                             if ((extcmdlist[oindex].flags & AUTOCOMPLETE) &&
-                                 !(!wizard && (extcmdlist[oindex].flags & WIZMODECMD))
+                                 !(!wizard && (extcmdlist[oindex].flags & WIZMODECMD)) &&
                                  !strncmpi(cmd, extcmdlist[oindex].ef_txt, len)) {
                                 if (com_index == -1) /* no matches yet */
                                     com_index = oindex;
@@ -1748,50 +1748,50 @@ outrip(winid, int)
 #define STONE_LINE_LEN	16
 void mswin_outrip(winid wid, int how)
 {
-	char buf[BUFSZ];
+    char buf[BUFSZ];
 
-   	logDebug("mswin_outrip(%d)\n", wid, how);
+    logDebug("mswin_outrip(%d)\n", wid, how);
     if ((wid >= 0) && (wid < MAXWINDOWS) ) {
-		DestroyWindow(GetNHApp()->windowlist[wid].win);
-		GetNHApp()->windowlist[wid].win = mswin_init_RIP_window();
-		GetNHApp()->windowlist[wid].type = NHW_RIP;
-		GetNHApp()->windowlist[wid].dead = 0;
-	}
+        DestroyWindow(GetNHApp()->windowlist[wid].win);
+        GetNHApp()->windowlist[wid].win = mswin_init_RIP_window();
+        GetNHApp()->windowlist[wid].type = NHW_RIP;
+        GetNHApp()->windowlist[wid].dead = 0;
+    }
 
-	/* Put name on stone */
-	Sprintf(buf, "%s", plname);
-	buf[STONE_LINE_LEN] = 0;
-	putstr(wid, 0, buf);
+    /* Put name on stone */
+    Sprintf(buf, "%s", plname);
+    buf[STONE_LINE_LEN] = 0;
+    putstr(wid, 0, buf);
 
-	/* Put $ on stone */
-	Sprintf(buf, "%ld Au", done_money);
+    /* Put $ on stone */
+    Sprintf(buf, "%ld Au", done_money);
 
-	buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
-	putstr(wid, 0, buf);
+    buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
+    putstr(wid, 0, buf);
 
-	/* Put together death description */
-	switch (killer_format) {
-		default: impossible("bad killer format?");
-		case KILLED_BY_AN:
-			Strcpy(buf, killed_by_prefix[how]);
-			Strcat(buf, an(killer));
-			break;
-		case KILLED_BY:
-			Strcpy(buf, killed_by_prefix[how]);
-			Strcat(buf, killer);
-			break;
-		case NO_KILLER_PREFIX:
-			Strcpy(buf, killer);
-			break;
-	}
+    /* Put together death description */
+    switch (killer.format) {
+        default: impossible("bad killer format?");
+        case KILLED_BY_AN:
+                 Strcpy(buf, killed_by_prefix[how]);
+                 Strcat(buf, an(killer.name));
+                 break;
+        case KILLED_BY:
+                 Strcpy(buf, killed_by_prefix[how]);
+                 Strcat(buf, killer.name);
+                 break;
+        case NO_KILLER_PREFIX:
+                 Strcpy(buf, killer.name);
+                 break;
+    }
 
-	/* Put death type on stone */
-	putstr(wid, 0, buf);
+    /* Put death type on stone */
+    putstr(wid, 0, buf);
 
-	/* Put year on stone */
-	Sprintf(buf, "%4d", getyear());
-	putstr(wid, 0, buf);
-	mswin_finish_rip_text(wid);
+    /* Put year on stone */
+    Sprintf(buf, "%4d", getyear());
+    putstr(wid, 0, buf);
+    mswin_finish_rip_text(wid);
 }
 
 /* handle options updates here */

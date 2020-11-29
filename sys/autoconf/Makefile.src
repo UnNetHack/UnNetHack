@@ -169,7 +169,7 @@ RANDOBJ =
 # used by `make depend' to reconstruct this Makefile; you shouldn't need this
 AWK	= @AWK@
 
-MAKEDEFS = ../util/makedefs
+MAKEDEFS = ../util/makedefs$(EXEEXT)
 
 # timestamp files to reduce `make' overhead and shorten .o dependency lists
 CONFIG_H = ../src/config.h-t
@@ -403,7 +403,7 @@ $(MAKEDEFS): ../util/makedefs.c  $(CONFIG_H) ../include/permonst.h \
 		../include/artilist.h ../include/dungeon.h ../include/obj.h \
 		../include/monst.h ../include/you.h ../include/flag.h \
 		../include/dlb.h ../include/patchlevel.h ../include/qtext.h
-	@( cd ../util ; $(MAKE) makedefs)
+	@( cd ../util ; $(MAKE) makedefs$(EXEEXT))
 
 ../include/onames.h: $(MAKEDEFS)
 	@( cd ../util ; $(MAKE) ../include/onames.h )
