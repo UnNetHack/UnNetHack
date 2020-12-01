@@ -11,6 +11,5 @@ pool:
 
 steps:
 - script: |
-    find
-    configure && make && make install
+    ./configure && make && make install
   displayName: 'build'
