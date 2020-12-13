@@ -788,8 +788,11 @@ struct attack *mattk;
         case AD_DRST:
             otmp = mksobj(BLINDING_VENOM, TRUE, FALSE);
             break;
+        case AD_COLD:
+            otmp = mksobj(FREEZING_ICE, TRUE, FALSE);
+            break;
         default:
-            impossible("bad attack type in spitmu");
+            warning("bad attack type in spitmm %d", mattk->adtyp);
             /* fall through */
         case AD_ACID:
             otmp = mksobj(ACID_VENOM, TRUE, FALSE);
@@ -1003,7 +1006,7 @@ register struct attack *mattk;
             otmp = mksobj(FREEZING_ICE, TRUE, FALSE);
             break;
         default:
-            warning("bad attack type in spitmu");
+            warning("bad attack type in spitmu %d", mattk->adtyp);
         /* fall through */
         case AD_ACID:
             otmp = mksobj(ACID_VENOM, TRUE, FALSE);
