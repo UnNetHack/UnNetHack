@@ -390,6 +390,14 @@ dosounds()
         pline("%s", blkmar_msg[rn2(2)+hallu]);
     }
 #endif /* BLACKMARKET */
+
+#ifdef ADVENT_CALENDAR
+    if (Is_advent_calendar(&u.uz)) {
+        if ((getmonth()==12) && (getmday() < 25)) {
+            fill_advent_calendar(FALSE);
+        }
+    }
+#endif
 }
 
 static const char * const h_sounds[] = {

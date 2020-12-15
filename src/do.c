@@ -1777,9 +1777,6 @@ boolean at_stairs, falling, portal;
         if (mk_advcal_portal())
             You("smell chocolate!");
     }
-    if (Is_advent_calendar(&u.uz)) {
-        fill_advent_calendar(FALSE);
-    }
 #endif
 
     /* once Croesus is dead, his alarm doesn't work any more */
