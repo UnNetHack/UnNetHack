@@ -389,8 +389,14 @@ attack(struct monst *mtmp)
              * if your pet is a long worm with a tail.
              * there's also a chance of displacing a "frozen" monster.
              * sleeping monsters might magically walk in their sleep.
+             * This block of code used to only be called for pets; now
+             * that it also applies to peacefuls, non-pets mustn't be
+             * forced to flee.
              */
-            boolean foo = (Punished || !rn2(7) || (is_longworm(mtmp->data) && mtmp->wormno)),
+            boolean foo = (Punished || !rn2(7) ||
+                           (is_longworm(mtmp->data) && mtmp->wormno) ||
+                           (IS_ROCK(levl[u.ux][u.uy].typ) &&
+                            !passes_walls(mtmp->data))),
                     inshop = FALSE;
             char *p;
 
@@ -404,12 +410,12 @@ attack(struct monst *mtmp)
                 }
             }
 
-            if (inshop || foo ||
-                (IS_ROCK(levl[u.ux][u.uy].typ) &&
-                 !passes_walls(mtmp->data))) {
+            if (inshop || foo) {
                 char buf[BUFSZ];
 
-                monflee(mtmp, rnd(6), FALSE, FALSE);
+                if (mtmp->mtame) { /* see 'additional considerations' above */
+                    monflee(mtmp, rnd(6), FALSE, FALSE);
+                }
                 Strcpy(buf, y_monnam(mtmp));
                 buf[0] = highc(buf[0]);
                 You("stop.  %s is in the way!", buf);
