@@ -517,7 +517,7 @@ bot2()
         Sprintf(nb = eos(nb), " T:%ld", moves);
 
 #ifdef REALTIME_ON_BOTL
-    if(iflags.showrealtime) {
+    if (iflags.showrealtime) {
         time_t currenttime = get_realtime();
         Sprintf(nb = eos(nb), " %ld:%2.2ld", currenttime / 3600,
                 (currenttime % 3600) / 60);

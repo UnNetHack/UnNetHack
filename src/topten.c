@@ -398,7 +398,7 @@ struct toptenentry *tt;
     (void)fprintf(rfile, SEP "achieveX=%s", encode_extended_achievements());
     (void)fprintf(rfile, SEP "conductX=%s", encode_extended_conducts());
 #ifdef RECORD_REALTIME
-    (void)fprintf(rfile, SEP "realtime=%ld", (long)realtime_data.realtime);
+    (void)fprintf(rfile, SEP "realtime=%ld", (long)urealtime.realtime);
 #endif
 
 #ifdef RECORD_START_END_TIME

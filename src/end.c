@@ -723,12 +723,7 @@ die:
     program_state.something_worth_saving = 0;
 
     /* record time of death */
-#if defined(BSD) && !defined(POSIX_TYPES)
-    (void) time((long *)&u.udeathday);
-#else
-    (void) time(&u.udeathday);
-#endif
-
+    u.udeathday = current_epoch();
 
 #ifdef DUMP_LOG
     /* D: Grab screen dump right here */
@@ -775,9 +770,10 @@ die:
     inven_inuse(TRUE);
 
 #ifdef RECORD_REALTIME
-    /* Update the realtime counter to reflect the playtime of the current
-     * game. */
-    realtime_data.realtime = get_realtime();
+    /* remember time of death here instead of having bones, rip, and
+       topten figure it out separately and possibly getting different
+       time or even day if player is slow responding to --More-- */
+    urealtime.realtime += (u.udeathday - urealtime.start_timing);
 #endif /* RECORD_REALTIME */
 
     /* Sometimes you die on the first move.  Life's not fair.
@@ -922,7 +918,7 @@ die:
     dump_line("  Started: ", get_formatted_time(u.ubirthday, DUMP_DATE_FORMAT));
     dump_line("  Ended:   ", get_formatted_time(u.udeathday, DUMP_DATE_FORMAT));
 #ifdef RECORD_REALTIME
-    Sprintf(pbuf, "  Play time: %s", iso8601_duration(realtime_data.realtime));
+    Sprintf(pbuf, "  Play time: %s", iso8601_duration(urealtime.realtime));
     dump_line(pbuf, "");
 #endif
     dump_html("</div>\n", "");

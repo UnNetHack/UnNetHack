@@ -331,7 +331,7 @@ struct u_achieve achieve = DUMMY;
 #endif
 
 #if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
-struct realtime_data realtime_data = { 0, 0, 0 };
+struct u_realtime urealtime = { 0 };
 #endif
 
 struct _plinemsg *pline_msg = NULL;

@@ -547,9 +547,9 @@ boolean resuming;
             /* Update the bottom line if the number of minutes has
              * changed */
             time_t currenttime = get_realtime();
-            if (currenttime / 60 != realtime_data.last_displayed_time / 60) {
+            if (currenttime / 60 != urealtime.last_displayed_time / 60) {
                 flags.botl = 1;
-                realtime_data.last_displayed_time = currenttime;
+                urealtime.last_displayed_time = currenttime;
             }
         }
 #endif
@@ -804,14 +804,8 @@ newgame()
 #if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
 
     /* Start the timer here */
-    realtime_data.realtime = (time_t)0L;
-
-#if defined(BSD) && !defined(POSIX_TYPES)
-    (void) time((long *)&realtime_data.restoretime);
-#else
-    (void) time(&realtime_data.restoretime);
-#endif
-
+    urealtime.realtime = (time_t)0L;
+    urealtime.start_timing = current_epoch();
 #endif /* RECORD_REALTIME || REALTIME_ON_BOTL */
 
     /* Success! */
@@ -922,41 +916,20 @@ do_positionbar()
 time_t
 get_realtime(void)
 {
-    time_t current_time = 0;
-    /* Add maximally this many seconds per invocation to get somewhat
-     * reasonable realtime values. */
-#define MAX_IDLE_TIME_IN_SECONDS 60
-    static time_t time_last_activity = 0;
-    static time_t time_spent_playing = 0;
-
     /* Get current time */
-#if defined(BSD) && !defined(POSIX_TYPES)
-    (void) time((long *)&current_time);
-#else
-    (void) time(&current_time);
-#endif
-
-    /* Initialize last_activity_time. */
-    if (time_last_activity == 0) {
-        time_last_activity = current_time;
-    }
+    time_t current_time = current_epoch();
 
     /* Since the timer isn't set until the game starts, this prevents us
      * from displaying nonsense on the bottom line before it does. */
-    if (realtime_data.restoretime == 0) {
-        time_spent_playing = realtime_data.realtime;
+    if (urealtime.start_timing == 0) {
+        current_time = urealtime.realtime;
     } else {
-        time_t idletime = current_time - time_last_activity;
-        time_last_activity = current_time;
-        /* Add time the player spent "thinking". */
-        time_spent_playing += (idletime > MAX_IDLE_TIME_IN_SECONDS) ? MAX_IDLE_TIME_IN_SECONDS : idletime;
-        /* Update realtime for livelog events. */
-        realtime_data.realtime = time_spent_playing;
+        current_time -= urealtime.start_timing;
+        current_time += urealtime.realtime;
     }
 
-    return time_spent_playing;
+    return current_time;
 }
-#undef MAX_IDLE_TIME_IN_SECONDS
 #endif /* REALTIME_ON_BOTL || RECORD_REALTIME */
 
 /** Interrupt a multiturn action if current_points is equal to max_points. */

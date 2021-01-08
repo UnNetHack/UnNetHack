@@ -645,11 +645,7 @@ u_init()
         aligns[flags.initalign].value;
     u.ulycn = NON_PM;
 
-#if defined(BSD) && !defined(POSIX_TYPES)
-    (void) time((long *)&u.ubirthday);
-#else
-    (void) time(&u.ubirthday);
-#endif
+    u.ubirthday = current_epoch();
 
     /*
      *  For now, everyone starts out with a night vision range of 1 and
