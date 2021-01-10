@@ -440,9 +440,10 @@ struct instance_flags {
     Bitfield(save_uswallow, 1);
     Bitfield(save_uinwater, 1);
     Bitfield(save_uburied, 1);
-#ifdef REALTIME_ON_BOTL
-    boolean showrealtime;  /* show actual elapsed time */
-#endif
+    /* REALTIME_ON_BOTL */
+    int showrealtime;    /* show elapsed time */
+    int realtime_format; /* how elapsed time is presented */
+
 #ifdef AUTO_OPEN
     boolean autoopen;   /* open doors by walking into them */
 #endif
@@ -521,6 +522,22 @@ enum gloctypes {
     GLOC_VALID,
 
     NUM_GLOCS
+};
+
+enum realtime_types {
+    REALTIME_NONE = 0,
+    REALTIME_PLAYTIME,
+    REALTIME_WALLTIME,
+
+    NUM_REALTIME_TYPES
+};
+
+enum realtime_formats {
+    REALTIME_FORMAT_SECONDS = 0,
+    REALTIME_FORMAT_CONDENSED,
+    REALTIME_FORMAT_UNITS,
+
+    NUM_REALTIME_FORMATS
 };
 
 #endif /* FLAG_H */

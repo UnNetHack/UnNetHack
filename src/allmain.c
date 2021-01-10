@@ -544,12 +544,18 @@ boolean resuming;
 
 #ifdef REALTIME_ON_BOTL
         if (iflags.showrealtime) {
-            /* Update the bottom line if the number of minutes has
-             * changed */
             time_t currenttime = get_realtime();
-            if (currenttime / 60 != urealtime.last_displayed_time / 60) {
-                flags.botl = 1;
-                urealtime.last_displayed_time = currenttime;
+            if (currenttime >= 3600 &&
+                 (iflags.realtime_format != REALTIME_FORMAT_SECONDS)) {
+                if (currenttime / 60 != urealtime.last_displayed_time / 60) {
+                    flags.botl = 1;
+                    urealtime.last_displayed_time = currenttime;
+                }
+            } else {
+                if (currenttime != urealtime.last_displayed_time) {
+                    flags.botl = 1;
+                    urealtime.last_displayed_time = currenttime;
+                }
             }
         }
 #endif

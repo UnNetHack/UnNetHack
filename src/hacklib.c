@@ -1153,6 +1153,29 @@ long seconds;
     return buf_fmt_duration;
 }
 
+/** Returns a human readable formatted duration (e.g. 2h:03m:ss). */
+char *
+format_duration(seconds)
+long seconds;
+{
+    long minutes = seconds / 60;
+    long hours = minutes / 60;
+    long days = hours / 24;
+
+    seconds = seconds % 60;
+    minutes = minutes % 60;
+    hours = hours % 24;
+
+    if (days > 0) {
+        sprintf(buf_fmt_duration, "%ldd:%2.2ldh:%2.2ldm:%2.2lds", days, hours, minutes, seconds);
+    } else if (hours > 0) {
+        sprintf(buf_fmt_duration, "%ldh:%2.2ldm:%2.2lds", hours, minutes, seconds);
+    } else {
+        sprintf(buf_fmt_duration, "%ldm:%2.2lds", minutes, seconds);
+    }
+    return buf_fmt_duration;
+}
+
 /** Returns epoch time. */
 time_t
 current_epoch()

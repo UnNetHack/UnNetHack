@@ -38,6 +38,17 @@ extern int supports_utf8;
 
 enum { optn_silenterr = -1, optn_err = 0, optn_ok = 1 };
 
+static const char* realtime_type_strings[] = {
+    "disabled",
+    "play time",
+    "wallclock time",
+};
+static const char* realtime_format_strings[] = {
+    "seconds",
+    "condensed",
+    "units",
+};
+
 /*
  *  NOTE:  If you add (or delete) an option, please update the short
  *  options help (option_help()), the long options help (dat/opthelp),
@@ -256,9 +267,6 @@ static struct Bool_Opt
     {"showexp", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
     {"showrace", &iflags.showrace, FALSE, SET_IN_GAME},
-#ifdef REALTIME_ON_BOTL
-    {"showrealtime", &iflags.showrealtime, FALSE, SET_IN_GAME},
-#endif
 #ifdef SCORE_ON_BOTL
     {"showscore", &flags.showscore, FALSE, SET_IN_GAME},
 #else
@@ -451,6 +459,10 @@ static struct Comp_Opt
 #endif /* CONVICT */
     { "role",     "your starting role (e.g., Barbarian, Valkyrie)",
       PL_CSIZ, DISP_IN_GAME },
+#ifdef REALTIME_ON_BOTL
+    {"realtime", "play time display", 1, SET_IN_GAME},
+    {"realtime_format", "format of displayed play time", 1, SET_IN_GAME},
+#endif
     { "runmode", "display frequency when `running' or `travelling'",
       sizeof "teleport", SET_IN_GAME },
     { "scores",   "the parts of the score list you wish to see",
@@ -887,6 +899,9 @@ initoptions()
     iflags.menu_headings = ATR_INVERSE;
     iflags.pilesize = 5;
     iflags.getpos_coords = GPCOORDS_NONE;
+
+    iflags.showrealtime = REALTIME_NONE;
+    iflags.realtime_format = REALTIME_FORMAT_UNITS;
 
     /* Set the default monster and object class symbols. */
     flags.initrole = ROLE_NONE;
@@ -3240,6 +3255,51 @@ goodfruit:
         return;
     }
 
+    /* backwards compatibility */
+    fullname = "showrealtime";
+    if (match_optname(opts, fullname, 12, FALSE)) {
+        iflags.showrealtime = REALTIME_PLAYTIME;
+        return;
+    }
+    fullname = "realtime";
+    if (match_optname(opts, fullname, 8, TRUE)) {
+        op = string_for_opt(opts, negated);
+        if (op && !negated) {
+            iflags.showrealtime = REALTIME_PLAYTIME;
+            if (!strncmpi(op, realtime_type_strings[REALTIME_NONE], 1)) {
+                iflags.showrealtime = REALTIME_NONE;
+            } else if (!strncmpi(op, realtime_type_strings[REALTIME_PLAYTIME], 1)) {
+                iflags.showrealtime = REALTIME_PLAYTIME;
+            } else if (!strncmpi(op, realtime_type_strings[REALTIME_WALLTIME], 1)) {
+                iflags.showrealtime = REALTIME_WALLTIME;
+            } else {
+                badoption(opts);
+            }
+        } else if (negated) {
+            bad_negation(fullname, TRUE);
+        }
+        return;
+    }
+
+    fullname = "realtime_format";
+    if (match_optname(opts, fullname, 15, TRUE)) {
+        op = string_for_opt(opts, negated);
+        if (op && !negated) {
+            if (!strncmpi(op, realtime_format_strings[REALTIME_FORMAT_SECONDS], 1)) {
+                iflags.realtime_format = REALTIME_FORMAT_SECONDS;
+            } else if (!strncmpi(op, realtime_format_strings[REALTIME_FORMAT_CONDENSED], 1)) {
+                iflags.realtime_format = REALTIME_FORMAT_CONDENSED;
+            } else if (!strncmpi(op, realtime_format_strings[REALTIME_FORMAT_UNITS], 1)) {
+                iflags.realtime_format = REALTIME_FORMAT_UNITS;
+            } else {
+                badoption(opts);
+            }
+        } else if (negated) {
+            bad_negation(fullname, TRUE);
+        }
+        return;
+    }
+
     /* things to disclose at end of game */
     if (match_optname(opts, "disclose", 7, TRUE)) {
         /*
@@ -4464,6 +4524,42 @@ boolean setinitial, setfromfile;
             }
         }
         retval = TRUE;
+    } else if (!strcmp("realtime", optname)) {
+        const char *mode_name;
+        menu_item *mode_pick = (menu_item *)0;
+        tmpwin = create_nhwindow(NHW_MENU);
+        start_menu(tmpwin);
+        for (i = 0; i < SIZE(realtime_type_strings); i++) {
+            mode_name = realtime_type_strings[i];
+            any.a_int = i + 1;
+            add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, *mode_name, 0,
+                     ATR_NONE, mode_name, MENU_UNSELECTED);
+        }
+        end_menu(tmpwin, "Select type of elapsed time to show:");
+        if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
+            iflags.showrealtime = mode_pick->item.a_int - 1;
+            free(mode_pick);
+        }
+        destroy_nhwindow(tmpwin);
+        retval = TRUE;
+    } else if (!strcmp("realtime_format", optname)) {
+        const char *mode_name;
+        menu_item *mode_pick = (menu_item *)0;
+        tmpwin = create_nhwindow(NHW_MENU);
+        start_menu(tmpwin);
+        for (i = 0; i < SIZE(realtime_format_strings); i++) {
+            mode_name = realtime_format_strings[i];
+            any.a_int = i + 1;
+            add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, *mode_name, 0,
+                     ATR_NONE, mode_name, MENU_UNSELECTED);
+        }
+        end_menu(tmpwin, "Select the format of the display of elapsed time:");
+        if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
+            iflags.realtime_format = mode_pick->item.a_int - 1;
+            free(mode_pick);
+        }
+        destroy_nhwindow(tmpwin);
+        retval = TRUE;
     } else if (!strcmp("runmode", optname)) {
         const char *mode_name;
         menu_item *mode_pick = (menu_item *)0;
@@ -4858,6 +4954,13 @@ char *buf;
     else if (!strcmp(optname, "ratname"))
         Sprintf(buf, "%s", ratname[0] ? catname : none );
 #endif /* CONVICT */
+#ifdef REALTIME_ON_BOTL
+    else if (!strcmp(optname, "realtime")) {
+        Sprintf(buf, "%s", realtime_type_strings[iflags.showrealtime]);
+    } else if (!strcmp(optname, "realtime_format")) {
+        Sprintf(buf, "%s", realtime_format_strings[iflags.realtime_format]);
+    }
+#endif
     else if (!strcmp(optname, "role"))
         Sprintf(buf, "%s", rolestring(flags.initrole, roles, name.m));
     else if (!strcmp(optname, "runmode"))
