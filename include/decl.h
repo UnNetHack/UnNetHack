@@ -569,12 +569,12 @@ E struct u_achieve achieve;
 #endif
 
 #if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
-E struct realtime_data {
-    time_t realtime;  /* Amount of actual playing time up until the last time
-                       * the game was restored. */
-    time_t restoretime; /* The time that the game was started or restored. */
-    time_t last_displayed_time; /* Last time displayed on the status line */
-} realtime_data;
+extern struct u_realtime {
+    time_t realtime;     /**< Accumulated playing time in seconds */
+    time_t start_timing; /**< Time game was started or restored or 'realtime'
+                              was last updated (savegamestate for checkpoint) */
+    time_t last_displayed_time; /**< Last time displayed on the status line */
+} urealtime;
 #endif /* RECORD_REALTIME || REALTIME_ON_BOTL */
 
 #ifdef SIMPLE_MAIL

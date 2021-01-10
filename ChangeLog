@@ -66,6 +66,7 @@
 	  - Autoidentify magic lamps and oil lamps when rubbing
 	  - Give feedback if lamps or lanterns are full after charging
 	  - Show "empty" on known empty lamps and lanterns
+	  - Wallclock and play time duration on status line
 
 	* skill changes:
 	  - Allow convicts to become skilled in broadsword (reported by RojjaCebolla)

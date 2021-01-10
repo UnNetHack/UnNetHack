@@ -517,10 +517,32 @@ bot2()
         Sprintf(nb = eos(nb), " T:%ld", moves);
 
 #ifdef REALTIME_ON_BOTL
-    if(iflags.showrealtime) {
-        time_t currenttime = get_realtime();
-        Sprintf(nb = eos(nb), " %ld:%2.2ld", currenttime / 3600,
-                (currenttime % 3600) / 60);
+    if (iflags.showrealtime) {
+        time_t currenttime;
+        if (iflags.showrealtime == REALTIME_PLAYTIME) {
+            currenttime = get_realtime();
+        } else {
+            /* REALTIME_WALLTIME implied */
+            currenttime = current_epoch() - u.ubirthday;;
+        }
+
+        switch (iflags.realtime_format) {
+            case REALTIME_FORMAT_SECONDS:
+                Sprintf(nb = eos(nb), " %ld", currenttime);
+                break;
+
+            case REALTIME_FORMAT_CONDENSED:
+                Sprintf(nb = eos(nb), " %ld:%2.2ld", currenttime / 3600, (currenttime % 3600) / 60);
+                break;
+
+            case REALTIME_FORMAT_UNITS:
+            default: {
+                char *duration = format_duration(currenttime);
+                /* only show 2 time units */
+                *(strchr(duration, ':')+4) = '\0';
+                Sprintf(nb = eos(nb), " %s", duration);
+            }
+        }
     }
 #endif
     if (iflags.statuslines < 3) {

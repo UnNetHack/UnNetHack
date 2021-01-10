@@ -653,8 +653,7 @@ unsigned int *stuckid, *steedid;    /* STEED */
     mread(fd, (genericptr_t) &achieve, sizeof achieve);
 #endif
 #if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
-    mread(fd, (genericptr_t) &realtime_data.realtime,
-          sizeof realtime_data.realtime);
+    mread(fd, &urealtime.realtime, sizeof urealtime.realtime);
 #endif
 
     /* must come after all mons & objs are restored */
@@ -909,14 +908,8 @@ register int fd;
     program_state.something_worth_saving++; /* useful data now exists */
 
 #if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
-
-/* Start the timer here (realtime has already been set) */
-#if defined(BSD) && !defined(POSIX_TYPES)
-    (void) time((long *)&realtime_data.restoretime);
-#else
-    (void) time(&realtime_data.restoretime);
-#endif
-
+    /* Start the timer here (realtime has already been set) */
+    urealtime.start_timing = current_epoch();
 #endif /* RECORD_REALTIME || REALTIME_ON_BOTL */
 
     /* Success! */

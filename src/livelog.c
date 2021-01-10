@@ -118,7 +118,7 @@ char *livelog_prefix() {
              lev ? lev->proto : "", /* proto level name if special level */
              u.uhp, u.uhpmax, u.umortality,
 #ifdef RECORD_REALTIME
-             (long)realtime_data.realtime,
+             (long)get_realtime(),
 #endif
              encodeconduct(),
              urole.filecode, urace.filecode,

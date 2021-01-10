@@ -63,6 +63,7 @@ compile
 # /tests/
 tests/test_*.xml
 tests/*/test_*.xml
+tests/hacklib/test_hacklib
 tests/options/test_base32
 tests/options/test_options
 tests/unicode/test_unicode

@@ -1,4 +1,8 @@
-all: options/test_base32 options/test_options unicode/test_unicode wishing/test_wishing
+all: options/test_base32 \
+     hacklib/test_hacklib \
+     options/test_options \
+     unicode/test_unicode \
+     wishing/test_wishing
 
 clean:
 	rm -f `find */test_* -executable`

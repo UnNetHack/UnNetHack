@@ -1146,10 +1146,40 @@ long seconds;
      * is non-trivial */
     long minutes = seconds / 60;
     long hours = minutes / 60;
+    long days = hours / 24;
 
-    /* PThh:mm:ss */
-    sprintf(buf_fmt_duration, "PT%02ld:%02ld:%02ld",
-            hours, minutes % 60, seconds % 60);
+    if (days > 0) {
+        /* PddDThh:mm:ss */
+        sprintf(buf_fmt_duration, "P%02ldDT%02ld:%02ld:%02ld",
+                days, hours % 24, minutes % 60, seconds % 60);
+    } else {
+        /* PThh:mm:ss */
+        sprintf(buf_fmt_duration, "PT%02ld:%02ld:%02ld",
+                hours, minutes % 60, seconds % 60);
+    }
+    return buf_fmt_duration;
+}
+
+/** Returns a human readable formatted duration (e.g. 2h:03m:ss). */
+char *
+format_duration(seconds)
+long seconds;
+{
+    long minutes = seconds / 60;
+    long hours = minutes / 60;
+    long days = hours / 24;
+
+    seconds = seconds % 60;
+    minutes = minutes % 60;
+    hours = hours % 24;
+
+    if (days > 0) {
+        sprintf(buf_fmt_duration, "%ldd:%2.2ldh:%2.2ldm:%2.2lds", days, hours, minutes, seconds);
+    } else if (hours > 0) {
+        sprintf(buf_fmt_duration, "%ldh:%2.2ldm:%2.2lds", hours, minutes, seconds);
+    } else {
+        sprintf(buf_fmt_duration, "%ldm:%2.2lds", minutes, seconds);
+    }
     return buf_fmt_duration;
 }
 
