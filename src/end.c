@@ -918,6 +918,8 @@ die:
     dump_line("  Started: ", get_formatted_time(u.ubirthday, DUMP_DATE_FORMAT));
     dump_line("  Ended:   ", get_formatted_time(u.udeathday, DUMP_DATE_FORMAT));
 #ifdef RECORD_REALTIME
+    Sprintf(pbuf, "  Wallclock time: %s", iso8601_duration(u.udeathday - u.ubirthday));
+    dump_line(pbuf, "");
     Sprintf(pbuf, "  Play time: %s", iso8601_duration(urealtime.realtime));
     dump_line(pbuf, "");
 #endif

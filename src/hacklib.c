@@ -1146,10 +1146,17 @@ long seconds;
      * is non-trivial */
     long minutes = seconds / 60;
     long hours = minutes / 60;
+    long days = hours / 24;
 
-    /* PThh:mm:ss */
-    sprintf(buf_fmt_duration, "PT%02ld:%02ld:%02ld",
-            hours, minutes % 60, seconds % 60);
+    if (days > 0) {
+        /* PddDThh:mm:ss */
+        sprintf(buf_fmt_duration, "P%02ldDT%02ld:%02ld:%02ld",
+                days, hours % 24, minutes % 60, seconds % 60);
+    } else {
+        /* PThh:mm:ss */
+        sprintf(buf_fmt_duration, "PT%02ld:%02ld:%02ld",
+                hours, minutes % 60, seconds % 60);
+    }
     return buf_fmt_duration;
 }
 
