@@ -2888,6 +2888,18 @@ create_particular()
 
     return FALSE;
 }
+
+boolean
+create_particular_from_buffer(const char* bufp)
+{
+    struct _create_particular_data d;
+
+    if (create_particular_parse(bufp, &d)) {
+        return create_particular_creation(bufp, &d);
+    }
+
+    return FALSE;
+}
 #endif /* WIZARD */
 
 void
