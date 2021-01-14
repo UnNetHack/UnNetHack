@@ -77,6 +77,9 @@ REGION:(00,00,36,16),lit,"ordinary"
 STAIR:levregion(01,03,20,19),(00,00,36,15),up
 STAIR:levregion(61,03,75,19),(00,00,36,15),down
 
+# mark the whole area for entering Minetown livelogging
+REGION:(02,02,34,16),lit,"ordinary",regular
+
 # shame we can't make polluted fountains
 FOUNTAIN:(16,09)
 FOUNTAIN:(25,09)
@@ -815,6 +818,8 @@ REGION:(16,4,18,6),lit,"tool shop"
 REGION:(23,1,25,3),lit,"shop"
 REGION:(22,12,24,13),lit,"food shop"
 REGION:(31,12,36,14),lit,"temple"
+# mark the room for entering Minetown livelogging
+REGION:(02,01,04,03),lit,"ordinary",regular
 ALTAR:(35,13),align[0],shrine
 
 DOOR:closed,(5,2)
@@ -1272,7 +1277,7 @@ MONSTER:'h',random
 # "Catacombs" by Kelly Bailey
 # Relies on some very specific behavior of MAZEWALK.
 #
-LEVEL:"minend-3"
+LEVEL: "minend-3"
 FLAGS:mazelevel
 INIT_MAP:solidfill,'-'
 GEOMETRY:center,bottom
