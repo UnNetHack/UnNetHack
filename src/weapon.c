@@ -1411,32 +1411,32 @@ int enhance_skill(boolean want_dump)
                     char tmp_buf[BUFSZ], skill_buf[BUFSZ], max_skill_buf[BUFSZ];
                     (void) skill_level_name(i, skill_buf, FALSE);
                     (void) skill_level_name(i, tmp_buf, TRUE);
-                    Sprintf(max_skill_buf, "(%s)", tmp_buf);
+                    Snprintf(max_skill_buf, sizeof(max_skill_buf), "(%s)", tmp_buf);
 #ifdef WIZARD
                     if (wizard) {
                         if (!iflags.menu_tab_sep)
-                            Sprintf(buf, " %s%-*s %-12s %-12s %5d(%4d)",
-                                    prefix, longest, P_NAME(i),
-                                    skill_buf, max_skill_buf,
-                                    P_ADVANCE(i),
-                                    practice_needed_to_advance(P_SKILL(i)));
+                            Snprintf(buf, sizeof(buf), " %s%-*s %-12s %-12s %5d(%4d)",
+                                     prefix, longest, P_NAME(i),
+                                     skill_buf, max_skill_buf,
+                                     P_ADVANCE(i),
+                                     practice_needed_to_advance(P_SKILL(i)));
                         else
-                            Sprintf(buf, " %s%s\t%s\t%s\t%5d(%4d)",
-                                    prefix, P_NAME(i),
-                                    skill_buf, max_skill_buf,
-                                    P_ADVANCE(i),
-                                    practice_needed_to_advance(P_SKILL(i)));
+                            Snprintf(buf, sizeof(buf), " %s%s\t%s\t%s\t%5d(%4d)",
+                                     prefix, P_NAME(i),
+                                     skill_buf, max_skill_buf,
+                                     P_ADVANCE(i),
+                                     practice_needed_to_advance(P_SKILL(i)));
                     } else
 #endif
                     {
                         if (!iflags.menu_tab_sep) {
-                            Sprintf(buf, " %s %-*s %12s %s",
-                                    prefix, longest, P_NAME(i),
-                                    skill_buf, max_skill_buf);
+                            Snprintf(buf, sizeof(buf), " %s %-*s %12s %s",
+                                     prefix, longest, P_NAME(i),
+                                     skill_buf, max_skill_buf);
                         } else {
-                            Sprintf(buf, " %s%s\t%s\t%s]",
-                                    prefix, P_NAME(i),
-                                    skill_buf, max_skill_buf);
+                            Snprintf(buf, sizeof(buf), " %s%s\t%s\t%s]",
+                                     prefix, P_NAME(i),
+                                     skill_buf, max_skill_buf);
                         }
                     }
                     any.a_int = can_advance(i, speedy) ? i+1 : 0;

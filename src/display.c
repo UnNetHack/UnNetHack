@@ -1794,7 +1794,7 @@ dump_screen()
      *    this */
     /* Longest monster name:    guardian naga hatchling
      * Longest dungeon feature: altar to Amaterasu Omikami (lawful) */
-#define BUFSIZE_PER_SQUARE 200
+#define BUFSIZE_PER_SQUARE BUFSZ*2
     char buf[COLNO*BUFSIZE_PER_SQUARE], html_buf[COLNO*BUFSIZE_PER_SQUARE], html_c[BUFSZ], tmpbuf[BUFSIZE_PER_SQUARE], *ptr;
     int ch, glyph, oclass;
     int color;

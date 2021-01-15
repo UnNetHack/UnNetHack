@@ -506,7 +506,7 @@ draw_horizontal(int x, int y, int hp, int hpmax)
         draw_horizontal_new(x, y, hp, hpmax);
         return;
     }
-    char buf[BUFSZ];
+    char buf[BUFSZ*2];
     char rank[BUFSZ];
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
 

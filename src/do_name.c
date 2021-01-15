@@ -81,7 +81,7 @@ const char *goal;
     static const char *const fastmovemode[2] = {
         "8 units at a time", "skipping same glyphs",
     };
-    char sbuf[BUFSZ];
+    char sbuf[BUFSZ*2];
     boolean doing_what_is;
     winid tmpwin = create_nhwindow(NHW_MENU);
 
@@ -700,7 +700,7 @@ int gloc;
         tmpcc.y = garr[i].y;
         if (do_screen_description(tmpcc, TRUE, sym, tmpbuf, &firstmatch, (struct permonst **)0)) {
             (void) coord_desc(garr[i].x, garr[i].y, tmpbuf, iflags.getpos_coords);
-            Sprintf(fullbuf, "%s%s%s", firstmatch, (*tmpbuf ? " " : ""), tmpbuf);
+            Snprintf(fullbuf, sizeof fullbuf, "%s%s%s", firstmatch, (*tmpbuf ? " " : ""), tmpbuf);
             int glyph = (tmpcc.x + tmpcc.y * COLNO) * -1;
             add_menu(tmpwin, glyph, MENU_DEFCNT, &any, 0, 0, ATR_NONE, fullbuf, MENU_UNSELECTED);
         }
@@ -1210,7 +1210,7 @@ do_mname()
     coord cc;
     register int cx, cy;
     register struct monst *mtmp;
-    char qbuf[QBUFSZ];
+    char qbuf[BUFSZ*2];
 
     if (Hallucination) {
         You("would never recognize it anyway.");

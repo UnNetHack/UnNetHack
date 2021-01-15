@@ -3029,7 +3029,7 @@ goodfruit:
         if (negated) {
             iflags.getpos_coords = GPCOORDS_NONE;
             return retval;
-        } else if (!(op = string_for_env_opt(fullname, opts, FALSE))) {
+        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
             static char gpcoords[] = {
                 GPCOORDS_NONE, GPCOORDS_COMPASS,
                 GPCOORDS_COMFULL, GPCOORDS_MAP,
@@ -3054,7 +3054,7 @@ goodfruit:
         if (negated) {
             iflags.getloc_filter = GFILTER_NONE;
             return retval;
-        } else if (!(op = string_for_env_opt(fullname, opts, FALSE))) {
+        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
             char c = lowc(*op);
 
             switch (c) {
@@ -4402,7 +4402,7 @@ int indexoffset;            /* value to add to index in compopt[], or zero
 int
 doset()
 {
-    char buf[BUFSZ], buf2[BUFSZ];
+    char buf[BUFSZ*2], buf2[BUFSZ];
     int i, pass, boolcount, pick_cnt, pick_idx, opt_indx;
     boolean *bool_p;
     winid tmpwin;
@@ -4492,7 +4492,7 @@ doset()
             biggest_name = (int) strlen(compopt[i].name);
     if (biggest_name > 30) biggest_name = 30;
     if (!iflags.menu_tab_sep)
-        Sprintf(fmtstr_doset_add_menu, "%%s%%-%ds [%%s]", biggest_name);
+        Sprintf(fmtstr_doset_add_menu, "%%s%%-%us [%%s]", biggest_name);
 
     /* deliberately put `name', `role', `race', `gender' first */
     doset_add_menu(tmpwin, "name", 0);
@@ -5684,8 +5684,8 @@ option_help()
     putstr(datawin, 0, "Compound options:");
     for (i = 0; compopt[i].name; i++) {
         Sprintf(buf2, "`%s'", compopt[i].name);
-        Sprintf(buf, "%-20s - %s%c", buf2, compopt[i].descr,
-                compopt[i+1].name ? ',' : '.');
+        Snprintf(buf, sizeof(buf), "%-20s - %s%c", buf2, compopt[i].descr,
+                 compopt[i + 1].name ? ',' : '.');
         putstr(datawin, 0, buf);
     }
 

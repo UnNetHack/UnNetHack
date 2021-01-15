@@ -658,7 +658,7 @@ add_mon_info(winid datawin, struct permonst * pm)
         Sprintf(buf2, " (%s form)", pm->mlet == S_HUMAN ? "human" : "animal");
     }
 
-    snprintf(buf, BUFSZ, "Monster lookup for \"%s\"%s:", pm->mname, buf2);
+    Snprintf(buf, BUFSZ, "Monster lookup for \"%s\"%s:", pm->mname, buf2);
     putstr(datawin, ATR_BOLD, buf);
     MONPUTSTR("");
 
@@ -703,7 +703,7 @@ add_mon_info(winid datawin, struct permonst * pm)
     ADDRESIST(resists_mgc(pm), "magic");
     if (identified_monster) {
         if (*buf) {
-            snprintf(buf2, BUFSZ, "Resists %s.", buf);
+            Snprintf(buf2, BUFSZ, "Resists %s.", buf);
             MONPUTSTR(buf2);
         } else {
             MONPUTSTR("Has no resistances.");
@@ -751,7 +751,7 @@ add_mon_info(winid datawin, struct permonst * pm)
             Sprintf(buf2, "Provides %d nutrition when eaten.", pm->cnutrit);
             MONPUTSTR(buf2);
             if (*buf) {
-                snprintf(buf2, BUFSZ, "Corpse may convey %s.", buf);
+                Snprintf(buf2, BUFSZ, "Corpse may convey %s.", buf);
                 MONPUTSTR(buf2);
             } else {
                 MONPUTSTR("Corpse conveys no intrinsics.");
@@ -798,7 +798,7 @@ add_mon_info(winid datawin, struct permonst * pm)
     }
     if (*buf) {
         if (identified_monster) {
-            snprintf(buf2, BUFSZ, "Is %s.", buf);
+            Snprintf(buf2, BUFSZ, "Is %s.", buf);
             MONPUTSTR(buf2);
         }
         buf[0] = '\0';
@@ -820,7 +820,7 @@ add_mon_info(winid datawin, struct permonst * pm)
         APPENDC(tunnels(pm), "dig");
     }
     if (*buf) {
-        snprintf(buf2, BUFSZ, "Can %s.", buf);
+        Snprintf(buf2, BUFSZ, "Can %s.", buf);
         MONPUTSTR(buf2);
         buf[0] = '\0';
     }
@@ -880,7 +880,7 @@ add_mon_info(winid datawin, struct permonst * pm)
         APPENDC(TRUE, buf2);
     }
     if (*buf) {
-        snprintf(buf2, BUFSZ, "Attacks: %s", buf);
+        Snprintf(buf2, BUFSZ, "Attacks: %s", buf);
         MONPUTSTR(buf2);
     } else {
         MONPUTSTR("Has no attacks.");
@@ -1963,12 +1963,12 @@ struct permonst **for_supplement;
             }
             *firstmatch = look_buf;
             if (*(*firstmatch)) {
-                Sprintf(temp_buf, " (%s)", *firstmatch);
+                Snprintf(temp_buf, sizeof temp_buf, " (%s)", *firstmatch);
                 (void) strncat(out_str, temp_buf, BUFSZ - strlen(out_str) - 1);
                 found = 1; /* we have something to look up */
             }
             if (monbuf[0]) {
-                Sprintf(temp_buf, " [seen: %s]", monbuf);
+                Snprintf(temp_buf, sizeof temp_buf, " [seen: %s]", monbuf);
                 (void) strncat(out_str, temp_buf, BUFSZ - strlen(out_str) - 1);
             }
         }
@@ -2372,12 +2372,12 @@ do_look(int mode, coord *click_cc)
                 pm = lookat(cc.x, cc.y, look_buf, monbuf);
                 firstmatch = look_buf;
                 if (*firstmatch) {
-                    Sprintf(temp_buf, " (%s)", firstmatch);
+                    Snprintf(temp_buf, sizeof temp_buf, " (%s)", *firstmatch);
                     (void)strncat(out_str, temp_buf, BUFSZ-strlen(out_str)-1);
                     found = 1; /* we have something to look up */
                 }
                 if (monbuf[0]) {
-                    Sprintf(temp_buf, " [seen: %s]", monbuf);
+                    Snprintf(temp_buf, sizeof temp_buf, " [seen: %s]", monbuf);
                     (void)strncat(out_str, temp_buf, BUFSZ-strlen(out_str)-1);
                 }
             }

@@ -1018,6 +1018,12 @@ E void FDECL(strbuf_empty, (strbuf_t *));
 E void FDECL(strbuf_nl_to_crlf, (strbuf_t *));
 extern int swapbits(int, int, int);
 extern void strip_brackets(char *);
+/* note: the snprintf CPP wrapper includes the "fmt" argument in "..."
+   (__VA_ARGS__) to allow for zero arguments after fmt */
+#define Snprintf(str, size, ...) \
+    nh_snprintf(__func__, __LINE__, str, size, __VA_ARGS__)
+extern void nh_snprintf(const char *func, int line, char *str, size_t size,
+                        const char *fmt, ...);
 
 /* ### invent.c ### */
 

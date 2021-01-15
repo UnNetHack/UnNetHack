@@ -2,6 +2,8 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include <stdarg.h>
+
 /* Assorted 'small' utility routines.  They're virtually independent of
    NetHack, except that rounddiv may call panic(). */
 
@@ -1312,5 +1314,40 @@ strip_brackets(char *str)
     *dest = '\0'; /* terminate string with null terminator */
 }
 
+/*
+ * Wrap snprintf for use in the main code.
+ *
+ * Wrap reasons:
+ *   1. If there are any platform issues, we have one spot to fix them -
+ *      snprintf is a routine with a troubling history of bad implementations.
+ *   2. Add combersome error checking in one spot.  Problems with text wrangling
+ *      do not have to be fatal.
+ *   3. Gcc 9+ will issue a warning unless the return value is used.
+ *      Annoyingly, explicitly casting to void does not remove the error.
+ *      So, use the result - see reason #2.
+ */
+void
+nh_snprintf(const char *func, int line, char *str, size_t size,
+            const char *fmt, ...)
+{
+    va_list ap;
+    int n;
+
+    va_start(ap, fmt);
+#ifdef NO_VSNPRINTF
+    n = vsprintf(str, fmt, ap);
+#else
+    n = vsnprintf(str, size, fmt, ap);
+#endif
+    va_end(ap);
+    if (n < 0 || (size_t)n >= size) {
+        /* is there a problem? */
+        impossible("snprintf %s: func %s, file line %d",
+                   n < 0 ? "format error"
+                         : "overflow",
+                   func, line);
+        str[size-1] = 0; /* make sure it is nul terminated */
+    }
+}
 
 /*hacklib.c*/
