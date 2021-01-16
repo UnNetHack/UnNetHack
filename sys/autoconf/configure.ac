@@ -1,9 +1,5 @@
 dnl	UNNETHACK autoconf template
-AC_INIT(UNNETHACK, 5.1.0, bhaak@gmx.net)
-dnl Avoid AC_REVISION() because we check configure into CVS
-dnl and it will cause confusing revision numbers to be included
-dnl in configure if developers forget to check in configure.ac
-dnl before running bootstrap.sh and checking in configure.
+AC_INIT([UNNETHACK],[6.0.1],[bhaak@gmx.net])
 
 AC_CONFIG_SRCDIR(Files)
 AC_SUBST(SRCDIR,[../$srcdir/src])
@@ -104,7 +100,7 @@ case $host_os in
 esac
 
 dnl  ----- Check for programs
-AC_PROG_LEX
+AC_PROG_LEX(noyywrap)
 if test "$LEX" = ":"; then
 	AC_MSG_ERROR([cannot find flex or lex])
 fi
@@ -240,10 +236,8 @@ if test "$enable_dummy_graphics" != "no"; then
 fi
 
 if test "$enable_mswin_graphics" != "no"; then
-    AC_MINGW32
-
     if test "$WINDRES" = "no"; then
-	AC_MSG_ERROR([Need windres for Microsoft Window's native graphics])
+        AC_MSG_ERROR([Need windres for Microsoft Window's native graphics])
     fi
     WINSRC="${WINSRC} \$(WINMSSRC)"
     WINOBJ="${WINOBJ} \$(WINMSOBJ)"
@@ -287,9 +281,6 @@ else
     AC_MSG_ERROR([need to enable at least one window system])
 fi
 
-
-dnl  ----- Check for header files
-AC_HEADER_STDC
 # Due to what may be a bug in autoconf, we have to call AC_CHECK_HEADERS()
 # to get the various HAVE_xxx_H preprocessor variables detected by
 # AC_HEADER_STDC active. These are needed for AC_CHECK_DECLS(), below.
