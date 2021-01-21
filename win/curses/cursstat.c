@@ -586,6 +586,10 @@ draw_horizontal(int x, int y, int hp, int hpmax)
     if (flags.time)
         print_statdiff(" T:", &prevtime, moves, STAT_TIME);
 
+    if (iflags.showrealtime) {
+        wprintw(win, " %s", botl_realtime());
+    }
+
     curses_add_statuses(win, FALSE, FALSE, NULL, NULL);
 }
 
@@ -668,6 +672,10 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
 
     if (flags.time)
         print_statdiff(" T:", &prevtime, moves, STAT_TIME);
+
+    if (iflags.showrealtime) {
+        wprintw(win, " %s", botl_realtime());
+    }
 
     curses_add_statuses(win, TRUE, FALSE, &x, &y);
 

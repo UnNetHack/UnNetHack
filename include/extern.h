@@ -158,6 +158,7 @@ E long NDECL(botl_score);
 E int FDECL(describe_level, (char *));
 E const char *NDECL(rank);
 E const char *FDECL(rank_of, (int, SHORT_P, BOOLEAN_P));
+extern const char* botl_realtime();
 E void NDECL(bot);
 #ifdef DUMP_LOG
 E void FDECL(bot1str, (char *));
