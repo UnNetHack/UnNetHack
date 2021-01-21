@@ -429,6 +429,7 @@ struct toptenentry *tt;
     (void)fprintf(rfile, SEP "wish_cnt=%ld", u.uconduct.wishes);
     (void)fprintf(rfile, SEP "magic_wish_cnt=%ld", u.uconduct.wishmagic);
     (void)fprintf(rfile, SEP "arti_wish_cnt=%ld", u.uconduct.wisharti);
+    (void)fprintf(rfile, SEP "bones=%ld", u.uconduct.bones);
     (void)fprintf(rfile, SEP "rngseed=u%s", encode_base32(level_info[0].seed));
     (void)fprintf(rfile, SEP "user_seed=%u", is_game_pre_seeded ? 1 : 0);
 
@@ -522,7 +523,7 @@ encode_extended_conducts()
     add_achieveX(buf, "sokoban",      !u.uconduct.sokoban);
     add_achieveX(buf, "blindfolded",   u.roleplay.blindfolded);
     add_achieveX(buf, "nudist",        u.roleplay.nudist);
-    add_achieveX(buf, "bonesless",    !u.uconduct.bones);
+    add_achieveX(buf, "bonesless",    !flags.bones);
     add_achieveX(buf, "elberethless",  !u.uconduct.elbereths);
     add_achieveX(buf, "deactivated_elbereth", flags.elberethignore);
 

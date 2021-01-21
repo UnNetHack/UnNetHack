@@ -1916,12 +1916,16 @@ boolean want_disp;
 #endif /* ELBERETH */
 #endif /* ELBERETH_CONDUCT */
 
-    if ((wizard || final) && !u.uconduct.bones) {
-        you_have_never("encountered a bones level");
-    } else if (wizard || final) {
-        Sprintf(buf, "encountered %ld bones level%s",
-                u.uconduct.bones, plur(u.uconduct.bones));
-        you_have_X(buf);
+    if (wizard || discover || final) {
+        if (!flags.bones) {
+            you_have_X("disabled loading of bones levels");
+        } else if (!u.uconduct.bones) {
+            you_have_never("encountered a bones level");
+        } else {
+            Sprintf(buf, "encountered %ld bones level%s",
+                    u.uconduct.bones, plur(u.uconduct.bones));
+            you_have_X(buf);
+        }
     }
 
 #ifdef RECORD_ACHIEVE
