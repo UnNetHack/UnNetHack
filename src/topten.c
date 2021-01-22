@@ -501,6 +501,7 @@ encode_extended_achievements()
     add_achieveX(buf, "entered_fort_ludios", u.uevent.entered_fort_ludios);
 
     add_achieveX(buf, "entered_a_shop", u.uevent.entered_a_shop);
+    add_achieveX(buf, "entered_a_temple", u.uevent.entered_a_temple);
 
     return buf;
 }

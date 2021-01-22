@@ -411,6 +411,8 @@ register int roomno;
     boolean tended = (priest != (struct monst *)0);
 
     if (tended) {
+        record_uevent_achievement("entered a temple", entered_a_temple);
+
         epri_p = EPRI(priest);
         shrined = has_shrine(priest);
         sanctum = (Is_sanctum(&u.uz) || In_endgame(&u.uz));
