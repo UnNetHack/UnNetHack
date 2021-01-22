@@ -500,6 +500,8 @@ encode_extended_achievements()
     add_achieveX(buf, "entered_vlads_tower", u.uevent.entered_vlads_tower);
     add_achieveX(buf, "entered_fort_ludios", u.uevent.entered_fort_ludios);
 
+    add_achieveX(buf, "entered_a_shop", u.uevent.entered_a_shop);
+
     return buf;
 }
 

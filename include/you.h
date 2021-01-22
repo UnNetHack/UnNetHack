@@ -59,6 +59,8 @@ struct u_event {
     Bitfield(entered_vlads_tower, 1);       /* entered Vlad's Tower */
     Bitfield(entered_fort_ludios, 1);       /* entered Fort Ludios */
 
+    Bitfield(entered_a_shop, 1);            /* entered a shop */
+
 #ifdef ELBERETH
     Bitfield(uhand_of_elbereth, 2);  /* became Hand of Elbereth */
 #endif

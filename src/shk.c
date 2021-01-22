@@ -722,6 +722,7 @@ char *enterstring;
         u.ushops[0] = '\0';
         return;
     }
+    record_uevent_achievement("entered a shop", entered_a_shop);
 
     eshkp->bill_p = &(eshkp->bill[0]);
 
