@@ -280,6 +280,12 @@
 /* Use strncmpi */
 #undef STRNCMPI
 
+/* Use configuration file for public server */
+#undef SYSCF
+
+/* Enable public server global configuration file */
+#undef SYSCF_FILE
+
 /* A System V like system */
 #undef SYSV
 

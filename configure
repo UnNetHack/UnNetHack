@@ -662,6 +662,9 @@ GROUP
 OWNER
 WIZARD
 WHEREIS_FILE
+SYSCF_COMMENT
+SYSCF_CP
+SYSCF_FILE
 DUMP_HTML_CSS_FILE
 DUMPMSGS
 DUMP_FN
@@ -819,6 +822,7 @@ enable_dump_text
 enable_dump_html
 enable_dump_html_css_file
 enable_dump_html_css_embedded
+enable_sysconf
 enable_utf8_glyphs
 enable_whereis_file
 enable_wizmode
@@ -1544,6 +1548,8 @@ Optional Features:
   --enable-dump-html-css-embedded
                           CSS file should be included in the HTML dump
                           (default=no)
+  --enable-sysconf=FILE   Enable public server global configuration file
+                          (default=no, default file=[sysconf])
   --enable-utf8-glyphs    Enable UTF-8 glyphs in TTY (default=yes)
   --enable-whereis-file=FILE
                           Log information about running games (default=no,
@@ -7612,6 +7618,45 @@ printf "%s\n" "#define DUMP_HTML_CSS_EMBEDDED /**/" >>confdefs.h
    fi
 
 	fi
+fi
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to enable sysconf" >&5
+printf %s "checking whether to enable sysconf... " >&6; }
+   # Check whether --enable-sysconf was given.
+if test ${enable_sysconf+y}
+then :
+  enableval=$enable_sysconf; if test "$enableval" != no; then enable_sysconf=yes;
+         if test "$enableval" != yes; then sysconf=$enableval;
+         else sysconf=sysconf; fi;
+        else enable_sysconf=no; fi
+else $as_nop
+  enable_sysconf=no;sysconf=sysconf
+fi
+
+   if test "$enable_sysconf" != "no" ; then
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes (file $sysconf)" >&5
+printf "%s\n" "yes (file $sysconf)" >&6; }
+
+printf "%s\n" "#define SYSCF_FILE                \"$sysconf\"" >>confdefs.h
+
+      SYSCF_FILE="$sysconf"
+
+   else
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+   fi
+
+if test "$enable_sysconf" != "no" ; then
+
+printf "%s\n" "#define SYSCF /**/" >>confdefs.h
+
+
+
+else
+	SYSCF_CP=@#
+
+	SYSCF_COMMENT=#
+
 fi
 
 if test "$enable_tty_graphics" != "no" -a "$host_os" != mingw32; then

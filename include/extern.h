@@ -19,6 +19,7 @@ E char *FDECL(fmt_ptr, (const genericptr));
 
 /* ### allmain.c ### */
 
+extern void early_init();
 E void FDECL(moveloop, (BOOLEAN_P));
 E void NDECL(stop_occupation);
 E void NDECL(display_gamewindows);
@@ -849,7 +850,7 @@ E void FDECL(unlock_file, (const char *));
 #ifdef USER_SOUNDS
 E boolean FDECL(can_read_file, (const char *));
 #endif
-E void FDECL(read_config_file, (const char *));
+extern boolean read_config_file(const char *, int);
 E void FDECL(check_recordfile, (const char *));
 #if defined(WIZARD)
 E void NDECL(read_wizkit);
@@ -860,6 +861,9 @@ E char** NDECL(get_saved_games);
 E void FDECL(free_saved_games, (char**));
 #ifdef SELF_RECOVER
 E boolean NDECL(recover_savefile);
+#endif
+#ifdef SYSCF_FILE
+extern void assure_syscf_file(void);
 #endif
 E int FDECL(nhclose, (int));
 #ifdef HOLD_LOCKFILE_OPEN
@@ -2469,6 +2473,10 @@ E void FDECL(dismount_steed, (int));
 E void FDECL(place_monster, (struct monst *, int, int));
 E boolean FDECL(stucksteed, (BOOLEAN_P));
 #endif
+
+/* ### sys.c ### */
+
+extern void sys_early_init();
 
 /* ### teleport.c ### */
 

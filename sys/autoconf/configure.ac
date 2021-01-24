@@ -440,6 +440,16 @@ if test "$enable_dump" != "no" ; then
 	fi
 fi
 
+NETHACK_ARG_WITH_PARAM(sysconf,[Enable public server global configuration file],SYSCF_FILE,no,FILE,[sysconf])
+if test "$enable_sysconf" != "no" ; then
+	AC_DEFINE([SYSCF], [], [Use configuration file for public server])
+	AC_SUBST(SYSCF_CP,[])
+	AC_SUBST(SYSCF_COMMENT,[])
+else
+	AC_SUBST(SYSCF_CP,[@#])
+	AC_SUBST(SYSCF_COMMENT,[#])
+fi
+
 if test "$enable_tty_graphics" != "no" -a "$host_os" != mingw32; then
 	NETHACK_ARG(utf8-glyphs,[Enable UTF-8 glyphs in TTY],UTF8_GLYPHS,yes)
 	if test "$enable_utf8_glyphs" != "no" ; then

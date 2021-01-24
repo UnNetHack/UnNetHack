@@ -166,9 +166,9 @@ STATIC_DCL void FDECL(docompress_file, (const char *, const char *, BOOLEAN_P));
 #ifndef FILE_AREAS
 STATIC_DCL char *FDECL(make_lockname, (const char *, char *));
 #endif
-STATIC_DCL FILE *FDECL(fopen_config_file, (const char *));
+static FILE *fopen_config_file(const char *, int);
 STATIC_DCL int FDECL(get_uchars, (FILE *, char *, char *, uchar *, BOOLEAN_P, int, const char *));
-int FDECL(parse_config_line, (FILE *, char *, char *, char *, BOOLEAN_P));
+int parse_config_line(FILE *, char *, char *, char *, boolean , int );
 #ifdef NOCWD_ASSUMPTIONS
 STATIC_DCL void FDECL(adjust_prefix, (char *, int));
 #endif
@@ -1843,9 +1843,8 @@ const char *backward_compat_configfile = "nethack.cnf";
 #define fopenp fopen
 #endif
 
-STATIC_OVL FILE *
-fopen_config_file(filename)
-const char *filename;
+static FILE *
+fopen_config_file(const char *filename, int src)
 {
     FILE *fp;
 #if defined(UNIX) || defined(VMS)
@@ -1853,9 +1852,20 @@ const char *filename;
     char *envp;
 #endif
 
-    /* "filename" is an environment variable, so it should hang around */
-    /* if set, it is expected to be a full path name (if relevant) */
-    if (filename) {
+    if (src == set_in_sysconf) {
+        /* SYSCF_FILE; if we can't open it, caller will bail */
+        if (filename && *filename) {
+            fp = fopen_datafile_area(FILE_AREA_SHARE, filename, "r", HACKPREFIX);
+        } else {
+            fp = (FILE *) 0;
+        }
+        return  fp;
+    }
+    /* If src != set_in_sysconf, "filename" is an environment variable, so it
+     * should hang around. If set, it is expected to be a full path name
+     * (if relevant)
+     */
+    if (filename && *filename) {
 #ifdef UNIX
         if (access(filename, 4) == -1) {
             /* 4 is R_OK on newer systems */
@@ -2047,23 +2057,26 @@ int prefixid;
 
 #define match_varname(INP, NAM, LEN) match_optname(INP, NAM, LEN, TRUE)
 
-/*ARGSUSED*/
 int
-parse_config_line(fp, buf, tmp_ramdisk, tmp_levels, recursive)
-FILE        *fp;
-char        *buf;
-char        *tmp_ramdisk;
-char        *tmp_levels;
-boolean recursive;
+parse_config_line(FILE *fp,
+                  char *buf,
+                  char *tmp_ramdisk,
+                  char *tmp_levels,
+                  boolean recursive,
+                  int  src)
 {
     nhUse(tmp_ramdisk);
     nhUse(tmp_levels);
+    nhUse(src);
 #if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
 # pragma unused(tmp_ramdisk,tmp_levels)
 #endif
     char        *bufp, *altp;
     uchar translate[MAXPCHARS];
     int len;
+#ifdef SYSCF
+    boolean in_sysconf = (src == set_in_sysconf);
+#endif
 
     if (*buf == '#')
         return 1;
@@ -2209,13 +2222,33 @@ boolean recursive;
             if ((include_fp = fopenp(bufp, "r")) == (FILE *)0) return 0;
 
             while (fgets(include_buf, 4*BUFSZ, include_fp)) {
-                if (!parse_config_line(include_fp, include_buf, (char *)0, (char *)0, FALSE)) {
+                if (!parse_config_line(include_fp, include_buf, (char *)0, (char *)0, FALSE, src)) {
                     raw_printf("Bad option line in %s:  \"%.50s\"", bufp, include_buf);
                     wait_synch();
                 }
             }
             (void) fclose(include_fp);
         }
+#ifdef SYSCF
+    } else if (src == set_in_sysconf && match_varname(buf, "LIVELOG", 7)) {
+#ifdef LIVELOGFILE
+        long n = strtol(bufp, NULL, 0);
+        if (n < 0 || n > 0xFFFF) {
+            raw_printf("Illegal value in LIVELOG (must be between 0 and 0xFFFF).");
+            return 0;
+        }
+        sysopt.livelog = n;
+#else
+        raw_printf("WARNING: LIVELOG value configured but LIVELOGFILE not #defined. Ignored.");
+#endif
+    } else if (src == set_in_sysconf && match_varname(buf, "LLC_TURNS", 9)) {
+        long n = atoi(bufp);
+        if (n < 0) {
+            raw_printf("Illegal value in LLC_TURNS (must be a positive integer).");
+            return 0;
+        }
+        sysopt.ll_conduct_turns = n;
+#endif /* SYSCF */
 
 #ifdef MENU_COLOR
     } else if (match_varname(buf, "MENUCOLOR", 9)) {
@@ -2421,9 +2454,8 @@ const char *filename;
 }
 #endif /* USER_SOUNDS */
 
-void
-read_config_file(filename)
-const char *filename;
+boolean
+read_config_file(const char *filename, int src)
 {
 #define tmp_levels  (char *)0
 #define tmp_ramdisk (char *)0
@@ -2441,7 +2473,9 @@ const char *filename;
     char buf[4*BUFSZ];
     FILE    *fp;
 
-    if (!(fp = fopen_config_file(filename))) return;
+    if (!(fp = fopen_config_file(filename, src))) {
+        return FALSE;
+    }
 
 #if defined(MICRO) || defined(WIN32)
 # ifdef MFLOPPY
@@ -2455,7 +2489,7 @@ const char *filename;
     set_duplicate_opt_detection(1);
 
     while (fgets(buf, 4*BUFSZ, fp)) {
-        if (!parse_config_line(fp, buf, tmp_ramdisk, tmp_levels, TRUE)) {
+        if (!parse_config_line(fp, buf, tmp_ramdisk, tmp_levels, TRUE, src)) {
             raw_printf("Bad option line:  \"%.50s\"", buf);
             wait_synch();
         }
@@ -2481,7 +2515,7 @@ const char *filename;
     Strcpy(bones, levels);
 # endif /* MFLOPPY */
 #endif /* MICRO */
-    return;
+    return TRUE;
 }
 
 #ifdef WIZARD
@@ -2902,5 +2936,29 @@ int ifd, ofd;
 
 /* ----------  END INTERNAL RECOVER ----------- */
 #endif /*SELF_RECOVER*/
+
+/* ----------  OTHER ----------- */
+
+#ifdef SYSCF
+# ifdef SYSCF_FILE
+void
+assure_syscf_file(void)
+{
+    FILE *fd;
+    /*
+     * All we really care about is the end result - can we read the file?
+     * So just check that directly.
+     */
+    fd = fopen_datafile_area(FILE_AREA_SHARE, SYSCF_FILE, "r", HACKPREFIX);
+    if (fd) {
+        /* readable */
+        fclose(fd);
+        return;
+    }
+    raw_printf("Unable to open SYSCF_FILE \"%s\".\n", SYSCF_FILE);
+    exit(EXIT_FAILURE);
+}
+# endif /* SYSCF_FILE */
+#endif /* SYSCF */
 
 /*files.c*/

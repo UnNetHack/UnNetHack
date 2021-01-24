@@ -176,7 +176,6 @@ char *item;
 
 /* Shout */
 #ifdef LIVELOG_SHOUT
-
 int
 doshout()
 {

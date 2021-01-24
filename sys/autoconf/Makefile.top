@@ -329,6 +329,12 @@ install: $(GAME) recover$(EXEEXT) $(CNF_SHARE_DAT) dungeon spec_levs @GUIDEBOOK_
 	-( cd $(DESTDIR)$(FILE_AREA_VAR) ; $(CHOWN) $(GAMEUID) perm record logfile @XLOGFILE@ @LIVELOGFILE@ ; \
 			$(CHGRP) $(GAMEGRP) perm record logfile @XLOGFILE@ @LIVELOGFILE@ ; \
 			chmod $(VARFILEPERM) perm record logfile @XLOGFILE@ @LIVELOGFILE@ )
+	@SYSCF_CP@cp $(srcdir)/dat/sysconf $(DESTDIR)$(FILE_AREA_SHARE) ; \
+		( cd $(DESTDIR)$(FILE_AREA_SHARE) ; \
+		  @SYSCF_COMMENT@$(CHOWN) $(GAMEUID) @SYSCF_FILE@ ; \
+		  @SYSCF_COMMENT@$(CHGRP) $(GAMEGRP) @SYSCF_FILE@ ; \
+		  @SYSCF_COMMENT@$(CHMOD) $(FILEPERM) @SYSCF_FILE@ \
+		)
 # and a reminder
 	@echo You may also want to reinstall the man pages via the doc Makefile.
 

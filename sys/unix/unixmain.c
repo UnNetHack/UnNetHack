@@ -63,6 +63,9 @@ char *argv[];
 #ifdef SIMPLE_MAIL
     char* e_simple = NULL;
 #endif
+
+    early_init();
+
 #if defined(__APPLE__)
     /* special hack to change working directory to a resource fork when
        running from finder --sam */

@@ -995,6 +995,24 @@ initoptions()
     /* since this is done before init_objects(), do partial init here */
     objects[SLIME_MOLD].oc_name_idx = SLIME_MOLD;
     nmcpy(pl_fruit, OBJ_NAME(objects[SLIME_MOLD]), PL_FSIZ);
+
+#ifdef SYSCF
+/* someday there may be other SYSCF alternatives besides text file */
+#ifdef SYSCF_FILE
+    /* If SYSCF_FILE is specified, it _must_ exist... */
+    assure_syscf_file();
+
+    /* ... and _must_ parse correctly. */
+    if (!read_config_file(SYSCF_FILE, set_in_sysconf)) {
+        nh_terminate(EXIT_FAILURE);
+    }
+    /*
+     * TODO [maybe]: parse the sysopt entries which are space-separated
+     * lists of usernames into arrays with one name per element.
+     */
+#endif
+#endif /* SYSCF */
+
 #ifndef MAC
     opts = getenv("NETHACKOPTIONS");
     if (!opts) opts = getenv("HACKOPTIONS");
@@ -1003,9 +1021,9 @@ initoptions()
             if (*opts == '@') opts++;   /* @filename */
             /* looks like a filename */
             if (strlen(opts) < BUFSZ/2)
-                read_config_file(opts);
+                read_config_file(opts, set_in_config);
         } else {
-            read_config_file((char *)0);
+            read_config_file((char *) 0, set_in_config);
             /* let the total length of options be long;
              * parseoptions() will check each individually
              */
@@ -1013,7 +1031,7 @@ initoptions()
         }
     } else
 #endif
-    read_config_file((char *)0);
+    read_config_file((char *) 0, set_in_config);
 
     (void)fruitadd(pl_fruit);
     /* Remove "slime mold" from list of object names; this will */
