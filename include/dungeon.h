@@ -169,6 +169,8 @@ struct linfo {
         /* Note:  VISITED and LFILE_EXISTS are currently almost always
          * set at the same time.  However they _mean_ different things.
          */
+    unsigned long seed; /* level seed */
+#define PRE_SEEDED 0x08 /* dungeon was generated with supplied seed */
 };
 
 /* types and structures for dungeon map recording

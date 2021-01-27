@@ -588,6 +588,18 @@ display_gamewindows()
     display_nhwindow(WIN_MAP, FALSE);
 }
 
+static
+void
+init_level_seeds()
+{
+    int i;
+    g.level_info[0].seed = 1; // TODO REMOVE ME
+    set_random(g.level_info[0].seed, rn2);
+    for (i = 1; i < MAXLINFO; i++) {
+        g.level_info[i].seed = rn2(INT_MAX);
+    }
+}
+
 void
 newgame()
 {
@@ -603,6 +615,8 @@ newgame()
 
     for (i = LOW_PM; i < NUMMONS; i++)
         g.mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;
+
+    init_level_seeds();
 
     init_objects(); /* must be before u_init() */
 

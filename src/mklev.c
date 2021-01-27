@@ -1108,7 +1108,7 @@ mklev()
     struct mkroom *croom;
     int ridx;
 
-    reseed_random(rn2);
+    set_random(g.level_info[ledger_no(&u.uz)].seed, rn2);
     reseed_random(rn2_on_display_rng);
 
     init_mapseen(&u.uz);

@@ -914,7 +914,7 @@ static struct tm *NDECL(getlt);
 /* Sets the seed for the random number generator */
 #ifdef USE_ISAAC64
 
-static void
+void
 set_random(seed, fn)
 unsigned long seed;
 int FDECL((*fn), (int));
@@ -925,7 +925,7 @@ int FDECL((*fn), (int));
 #else /* USE_ISAAC64 */
 
 /*ARGSUSED*/
-static void
+void
 set_random(seed, fn)
 unsigned long seed;
 int FDECL((*fn), (int)) UNUSED;

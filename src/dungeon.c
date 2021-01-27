@@ -782,6 +782,8 @@ init_dungeons()
     struct level_map *lev_map;
     int tidx;
 
+    set_random(g.level_info[0].seed, rn2);
+
     (void) memset(&pd, 0, sizeof (struct proto_dungeon));
     pd.n_levs = pd.n_brs = 0;
 
