@@ -11,6 +11,8 @@
 #include "patchlevel.h"
 #endif
 
+#define SEP "\t"
+
 /* Encodes the current xlog "achieve" status to an integer */
 long
 encodeachieve(void)
@@ -88,24 +90,24 @@ static
 char *livelog_prefix() {
     s_level *lev = Is_special(&u.uz);
     snprintf(prefixbuf, STRBUF_LEN,
-             "version=%s-%d.%d.%d:"
-             "player=%s:turns=%ld:starttime=%ld:"
-             "currenttime=%ld:"
-             "dnum=%d:dname=%s:dlev=%d:maxlvl=%d:"
-             "dlev_name=%s:"
-             "hp=%d:maxhp=%d:deaths=%d:"
+             "version=%s-%d.%d.%d" SEP
+             "player=%s" SEP "turns=%ld" SEP "starttime=%ld" SEP
+             "currenttime=%ld" SEP
+             "dnum=%d" SEP "dname=%s" SEP "dlev=%d" SEP "maxlvl=%d" SEP
+             "dlev_name=%s" SEP
+             "hp=%d" SEP "maxhp=%d" SEP "deaths=%d" SEP
 #ifdef RECORD_REALTIME
-             "realtime=%ld:"
+             "realtime=%ld" SEP
 #endif
-             "conduct=0x%lx:"
-             "role=%s:race=%s:"
-             "gender=%s:align=%s:"
-             "gender0=%s:align0=%s:"
-             "explvl=%d:exp=%ld:"
-             "elbereths=%ld:"
-             "xplevel=%d:" /* XP level */
-             "exp=%ld:" /* Experience points */
-             "mode=%s:"
+             "conduct=0x%lx" SEP
+             "role=%s" SEP "race=%s" SEP
+             "gender=%s" SEP "align=%s" SEP
+             "gender0=%s" SEP "align0=%s" SEP
+             "explvl=%d" SEP "exp=%ld" SEP
+             "elbereths=%ld" SEP
+             "xplevel=%d" SEP /* XP level */
+             "exp=%ld" SEP /* Experience points */
+             "mode=%s" SEP
              "gold=%ld",
              GAME_SHORT_NAME, VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
              plname,
@@ -152,7 +154,7 @@ void livelog_achieve_update() {
     }
 
     snprintf(strbuf, STRBUF_LEN,
-             "%s:type=achievements:achieve=0x%lx:achieve_diff=0x%lx\n",
+             "%s" SEP "type=achievements" SEP "achieve=0x%lx" SEP "achieve_diff=0x%lx\n",
              livelog_prefix(),
              achieve_int,
              achieve_diff);
@@ -167,10 +169,11 @@ livelog_wish(item)
 char *item;
 {
     snprintf(strbuf, STRBUF_LEN,
-             "%s:type=wish:wish=%s:wish_count=%ld\n",
+             "%s" SEP "type=wish" SEP "wish=%s" SEP "wish_count=%ld\n",
              livelog_prefix(),
              item,
              u.uconduct.wishes);
+
     livelog_write_string(strbuf);
 }
 
@@ -193,9 +196,11 @@ doshout()
     }
 
     /* filter livelog delimiter */
-    for (p = buf; *p != 0; p++)
-        if( *p == ':' )
+    for (p = buf; *p != 0; p++) {
+        if (*p == SEP[0]) {
             *p = ' ';
+        }
+    }
 
     livelog_generic("shout", buf);
 
@@ -249,7 +254,7 @@ long total;
        shop:       Name of the shop (e.g. general store)
        shoplifted: Merchandise worth this many Zorkmids was stolen */
     snprintf(strbuf, STRBUF_LEN,
-             "%s:type=shoplifting:shopkeeper=%s:shop=%s:shoplifted=%ld\n",
+             "%s" SEP "type=shoplifting" SEP "shopkeeper=%s" SEP "shop=%s" SEP "shoplifted=%ld\n",
              livelog_prefix(),
              shk_name,
              shop_name,
@@ -266,7 +271,7 @@ const char* race;
 const char* role;
 {
     snprintf(strbuf, STRBUF_LEN,
-             "%s:type=%s:game_action=%s:character=%s %s %s\n",
+             "%s" SEP "type=%s" SEP "game_action=%s" SEP "character=%s %s %s\n",
              livelog_prefix(),
              verb,
              verb,
@@ -282,7 +287,7 @@ livelog_game_action(verb)
 const char* verb;
 {
     snprintf(strbuf, STRBUF_LEN,
-             "%s:type=%s:game_action=%s\n",
+             "%s" SEP "type=%s" SEP "game_action=%s\n",
              livelog_prefix(),
              verb,
              verb);
@@ -296,7 +301,7 @@ const char* field;
 const char* text;
 {
     snprintf(strbuf, STRBUF_LEN,
-             "%s:type=%s:%s=%s\n",
+             "%s" SEP "type=%s" SEP "%s=%s\n",
              livelog_prefix(),
              field,
              field,
@@ -311,11 +316,13 @@ const char* genocided_monster;
 int level_wide;
 {
     snprintf(strbuf, STRBUF_LEN,
-             "%s:type=genocide:genocided_monster=%s:dungeon_wide=%s\n",
+             "%s" SEP "type=genocide" SEP "genocided_monster=%s" SEP "dungeon_wide=%s\n",
              livelog_prefix(),
              genocided_monster,
              level_wide ? "no" : "yes");
     livelog_write_string(strbuf);
 }
+
+#undef SEP
 
 #endif /* LIVELOGFILE */
