@@ -655,6 +655,46 @@ place_it:
                 set_corpsenm(otmp, rndmonnum());
             }
         }
+
+        /* Put a Fort Ludios vault on Medusa if it hasn't been generated before. */
+        branch *br = dungeon_branch("Fort Ludios");
+        d_level *not_existing = get_floating_branch(&knox_level, br);
+        if (not_existing) {
+            int x, y;
+            /* Search for a suitable location for the portal.
+             * Ignore the arrival and possible Medusa home. */
+            for (x = 10; x < COLNO-10; x++) {
+                for (y = 0; y < ROWNO; y++) {
+                    if ((isok(x+1, y+1) && levl[x+1][y+1].typ == ROOM) &&
+                        (isok(x+1, y+2) && levl[x+1][y+2].typ == ROOM) &&
+                        (isok(x+2, y+1) && levl[x+2][y+1].typ == ROOM) &&
+                        (isok(x+2, y+2) && levl[x+2][y+2].typ == ROOM)) {
+
+                        /* count the room and water tiles */
+                        int i, j;
+                        int cnt_room = 0, cnt_water = 0;
+                        for (i = x; i-x < 4; i++) {
+                            for (j = y; j-y < 4; j++) {
+                                if (isok(i, j)) {
+                                    if (levl[i][j].typ == ROOM) {
+                                        cnt_room++;
+                                    }
+                                    if (levl[i][j].typ == MOAT) {
+                                        cnt_water++;
+                                    }
+                                }
+                            }
+                        }
+                        /* only put the vault into a specific location */
+                        if (cnt_room == 5 && cnt_water == 11) {
+                            mk_knox_vault(x+1, y+1, 1, 1);
+                            x = COLNO;
+                            y = ROWNO;
+                        }
+                    }
+                }
+            }
+        }
     } else if (Is_wiz1_level(&u.uz)) {
         croom = search_special(MORGUE);
 
