@@ -687,7 +687,18 @@ place_it:
                         }
                         /* only put the vault into a specific location */
                         if (cnt_room == 5 && cnt_water == 11) {
-                            mk_knox_vault(x+1, y+1, 1, 1);
+                            mk_knox_vault(x+1, y+1, 0, 0);
+
+                            /* This vault is not very well hidden,
+                             * add additional security for the gold. */
+                            struct obj *gold = sobj_at(GOLD_PIECE, x+1, y+1);
+                            obj_extract_self(gold);
+                            struct obj *iron_safe = mksobj(IRON_SAFE, TRUE, FALSE);
+                            add_to_container(iron_safe, gold);
+                            place_object(iron_safe, x+1, y+1);
+
+
+                            /* break out of loop */
                             x = COLNO;
                             y = ROWNO;
                         }
