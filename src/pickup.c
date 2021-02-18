@@ -2530,8 +2530,9 @@ boolean past;
 {
     static NEARDATA const char sc[] = "Schroedinger's Cat";
     struct obj *deadcat;
-    struct monst *livecat;
+    struct monst *livecat = 0;
     xchar ox, oy;
+    boolean itsalive = rn2(2);
 
     box->spe = 0;       /* box->owt will be updated below */
     if (get_obj_location(box, &ox, &oy, 0))
@@ -2541,29 +2542,43 @@ boolean past;
        (telepathic or monster/object/food detection) ought to
        force the determination of alive vs dead state; but basing
        it just on opening the box is much simpler to cope with */
-    livecat = (rn2(2) && !past) ? makemon(&mons[PM_HOUSECAT],
-                                          box->ox, box->oy, NO_MINVENT) : 0;
-    if (livecat) {
-        livecat->mpeaceful = 1;
-        set_malign(livecat);
-        if (!canspotmon(livecat))
-            You("think %s brushed your %s.", something, body_part(FOOT));
-        else
-            pline("%s inside the box is still alive!", Monnam(livecat));
-        (void) christen_monst(livecat, sc);
+    boolean makecat = (itsalive && !past);
+    /* SchroedingersBox already has a cat corpse in it */
+    deadcat = box->cobj;
+    if (itsalive) {
+        if (makecat) {
+            livecat = makemon(&mons[PM_HOUSECAT], box->ox, box->oy, NO_MINVENT | MM_ADJACENTOK);
+        }
+        if (livecat) {
+            livecat->mpeaceful = 1;
+            set_malign(livecat);
+            if (!canspotmon(livecat)) {
+                You("think %s brushed your %s.", something, body_part(FOOT));
+            } else {
+                pline("%s inside the box is still alive!", Monnam(livecat));
+            }
+            (void) christen_monst(livecat, sc);
+            if (deadcat) {
+                obj_extract_self(deadcat);
+                obfree(deadcat, (struct obj *) 0), deadcat = 0;
+            }
+            box->owt = weight(box);
+            box->spe = 0;
+        }
     } else {
-        deadcat = mk_named_object(CORPSE, &mons[PM_HOUSECAT],
-                                  box->ox, box->oy, sc);
+        box->spe = 0; /* now an ordinary box (with a cat corpse inside) */
         if (deadcat) {
-            obj_extract_self(deadcat);
-            (void) add_to_container(box, deadcat);
+            /* set_corpsenm() will start the rot timer that was removed
+               when makemon() created SchroedingersBox; start it from
+               now rather than from when this special corpse got created */
+            deadcat->age = monstermoves;
+            set_corpsenm(deadcat, PM_HOUSECAT);
+            deadcat = oname(deadcat, sc);
         }
         pline_The("%s%s inside the box is dead!",
                   Hallucination ? rndmonnam() : "housecat",
                   past ? " that was" : "");
     }
-    box->owt = weight(box);
-    return;
 }
 
 /* based largely on borrowed code from dNetHack by Chris_ANG */
