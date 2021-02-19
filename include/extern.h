@@ -169,6 +169,7 @@ E void FDECL(bot3str, (char *));
 /* ### cmd.c ### */
 
 E char NDECL(randomkey);
+extern boolean redraw_cmd(char);
 E char FDECL(cmd_from_func, (int NDECL((*))));
 #ifdef USE_TRAMPOLI
 E int NDECL(doextcmd);
@@ -405,7 +406,7 @@ E void FDECL(heal_legs, (int));
 E void FDECL(do_oname, (struct obj *));
 E char *FDECL(coord_desc, (int, int, char *, CHAR_P));
 E boolean FDECL(getpos_menu, (coord *, int));
-E int FDECL(getpos, (coord *, BOOLEAN_P, const char *));
+extern int getpos(coord *, boolean, const char *);
 E void FDECL(getpos_sethilite, (void (*f)(int), boolean (*d)(int,int)));
 E void FDECL(new_mname, (struct monst *, int));
 E void FDECL(free_mname, (struct monst *));
@@ -889,6 +890,7 @@ E void NDECL(drinksink);
 E void FDECL(catchup_dgn_growths, (int));
 E void FDECL(dgn_growths, (BOOLEAN_P, BOOLEAN_P));
 #endif
+extern boolean is_valid_travelpt(int,int);
 E anything *FDECL(uint_to_any, (unsigned));
 E anything *FDECL(long_to_any, (long));
 E anything *FDECL(monst_to_any, (struct monst *));
@@ -1825,7 +1827,7 @@ E int FDECL(shiny_obj, (CHAR_P));
 
 E boolean FDECL(match_optname, (const char *, const char *, int, BOOLEAN_P));
 E void NDECL(initoptions);
-E void FDECL(parseoptions, (char *, BOOLEAN_P, BOOLEAN_P));
+extern boolean parseoptions(char *, boolean, boolean);
 E boolean FDECL(parse_monster_color, (char *));
 E boolean FDECL(parse_symbol, (const char *));
 E boolean FDECL(parse_monster_symbol, (const char *));

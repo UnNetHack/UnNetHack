@@ -881,26 +881,25 @@ struct permonst **for_supplement;
     }
  check_monsters:
     /* Check for monsters */
-#if NEXT_VERSION
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
         for (i = 1; i < MAXMCLASSES; i++) {
-            if (sym == (looked ? showsyms[i + SYM_OFF_M] : def_monsyms[i].sym) &&
-                 def_monsyms[i].explain && *def_monsyms[i].explain) {
+            if (sym == (looked ? monsyms[i] : def_monsyms[i]) &&
+                 def_monsyms_explain(i) && *def_monsyms_explain(i)) {
                 need_to_look = TRUE;
                 if (!found) {
-                    Sprintf(out_str, "%s%s", prefix, an(def_monsyms[i].explain));
-                    *firstmatch = def_monsyms[i].explain;
+                    Sprintf(out_str, "%s%s", prefix, an(def_monsyms_explain(i)));
+                    *firstmatch = def_monsyms_explain(i);
                     found++;
                 } else {
-                    found += append_str(out_str, an(def_monsyms[i].explain));
+                    found += append_str(out_str, an(def_monsyms_explain(i)));
                 }
             }
         }
         /* handle '@' as a special case if it refers to you and you're
            playing a character which isn't normally displayed by that
            symbol; firstmatch is assumed to already be set for '@' */
-        if ((looked ? (sym == showsyms[S_HUMAN + SYM_OFF_M] && cc.x == u.ux && cc.y == u.uy) :
-                      (sym == def_monsyms[S_HUMAN].sym && !flags.showrace)) &&
+        if ((looked ? (sym == monsyms[S_HUMAN] && cc.x == u.ux && cc.y == u.uy) :
+                      (sym == def_monsyms[S_HUMAN] && !iflags.showrace)) &&
              !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd) {
             found += append_str(out_str, "you"); /* tack on "or you" */
         }
@@ -909,7 +908,7 @@ struct permonst **for_supplement;
     /* Now check for objects */
     if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0) {
         for (i = 1; i < MAXOCLASSES; i++) {
-            if (sym == (looked ? showsyms[i + SYM_OFF_O] : def_oc_syms[i].sym) ||
+            if (sym == (looked ? oc_syms[i] : def_oc_syms[i]) ||
                  (looked && i == ROCK_CLASS && glyph_is_statue(glyph))) {
                 need_to_look = TRUE;
                 if (looked && i == VENOM_CLASS) {
@@ -917,16 +916,15 @@ struct permonst **for_supplement;
                     continue;
                 }
                 if (!found) {
-                    Sprintf(out_str, "%s%s", prefix, an(def_oc_syms[i].explain));
-                    *firstmatch = def_oc_syms[i].explain;
+                    Sprintf(out_str, "%s%s", prefix, an(def_objsyms_explain(i)));
+                    *firstmatch = def_objsyms_explain(i);
                     found++;
                 } else {
-                    found += append_str(out_str, an(def_oc_syms[i].explain));
+                    found += append_str(out_str, an(def_objsyms_explain(i)));
                 }
             }
         }
     }
-#endif
 
     if (sym == DEF_INVISIBLE) {
         extern const char altinvisexplain[]; /* drawing.c */
