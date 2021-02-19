@@ -82,6 +82,10 @@ typedef struct mi {
 #ifdef MENU_COLOR
 # define ATR_UNDEFINED 8
 #endif
+/* not a display attribute but passed to putstr() as an attribute;
+   can be masked with one regular display attribute */
+#define ATR_URGENT    16
+#define ATR_NOHISTORY 32
 
 /* nh_poskey() modifier types */
 #define CLICK_1     1

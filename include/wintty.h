@@ -50,7 +50,14 @@ struct WinDesc {
 
 /* window flags */
 #define WIN_CANCELLED 1
-#define WIN_STOP 1      /* for NHW_MESSAGE; stops output */
+#define WIN_STOP 1        /* for NHW_MESSAGE; stops output */
+#define WIN_LOCKHISTORY 2 /* for NHW_MESSAGE; suppress history updates */
+
+/* topline states */
+#define TOPLINE_EMPTY          0 /* empty */
+#define TOPLINE_NEED_MORE      1 /* non-empty, need --More-- */
+#define TOPLINE_NON_EMPTY      2 /* non-empty, no --More-- required */
+#define TOPLINE_SPECIAL_PROMPT 3 /* special prompt state */
 
 /* descriptor for tty-based displays -- all the per-display data */
 struct DisplayDesc {
@@ -156,6 +163,8 @@ E boolean FDECL(parse_status_color_options, (char *));
 
 /* ### topl.c ### */
 
+extern void show_topl(const char *);
+extern void remember_topl(void);
 E void FDECL(addtopl, (const char *));
 E void NDECL(more);
 E void FDECL(update_topl, (const char *));

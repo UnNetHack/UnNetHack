@@ -359,10 +359,19 @@ Attributes
 void
 curses_putstr(winid wid, int attr, const char *text)
 {
-    int curses_attr = curses_convert_attr(attr);
+    int mesgflags, curses_attr;
 
-    /* We need to convert NetHack attributes to curses attributes */
-    curses_puts(wid, curses_attr, text);
+    mesgflags = attr & (ATR_URGENT | ATR_NOHISTORY);
+    attr &= ~mesgflags;
+
+    if (wid == WIN_MESSAGE && (mesgflags & ATR_NOHISTORY) != 0) {
+        /* display message without saving it in recall history */
+        curses_count_window(text);
+    } else {
+        /* We need to convert NetHack attributes to curses attributes */
+        curses_attr = curses_convert_attr(attr);
+        curses_puts(wid, curses_attr, text);
+    }
 }
 
 /* Display the file named str.  Complain about missing files
@@ -433,6 +442,9 @@ curses_add_menu(winid wid, int glyph, int cnt UNUSED, const ANY_P * identifier,
                 const char *str, unsigned int presel)
 {
     int curses_attr = curses_convert_attr(attr);
+
+    attr &= ~(ATR_URGENT | ATR_NOHISTORY);
+    curses_attr = curses_convert_attr(attr);
 
     if (inv_update) {
         curses_add_inv(inv_update, glyph, accelerator, curses_attr, str);

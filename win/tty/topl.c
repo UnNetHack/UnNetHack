@@ -16,7 +16,6 @@
 
 STATIC_DCL void FDECL(redotoplin, (const char*));
 STATIC_DCL void FDECL(topl_putsym, (CHAR_P));
-STATIC_DCL void NDECL(remember_topl);
 STATIC_DCL void FDECL(removetopl, (int));
 
 #ifdef OVLB
@@ -140,12 +139,37 @@ const char *str;
         more();
 }
 
-STATIC_OVL void
+void
+show_topl(const char *str)
+{
+    struct WinDesc *cw = wins[WIN_MESSAGE];
+
+    if (!(cw->flags & WIN_STOP)) {
+        if (ttyDisplay->cury && ttyDisplay->toplin == TOPLINE_NON_EMPTY) {
+            tty_clear_nhwindow(WIN_MESSAGE);
+        }
+
+        cw->curx = cw->cury = 0;
+        home();
+        cl_end();
+        addtopl(str);
+
+        if (ttyDisplay->cury && ttyDisplay->toplin != TOPLINE_SPECIAL_PROMPT) {
+            ttyDisplay->toplin = TOPLINE_NON_EMPTY;
+        }
+    }
+}
+
+void
 remember_topl()
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
     int idx = cw->maxrow;
     unsigned len = strlen(toplines) + 1;
+
+    if ((cw->flags & WIN_LOCKHISTORY) || !*toplines) {
+        return;
+    }
 
     if (len > (unsigned)cw->datlen[idx]) {
         if (cw->data[idx]) free(cw->data[idx]);
@@ -157,6 +181,7 @@ remember_topl()
         cw->datlen[idx] = (short)len;
     }
     Strcpy(cw->data[idx], toplines);
+    *toplines = '\0';
     cw->maxcol = cw->maxrow = (idx + 1) % cw->rows;
 }
 

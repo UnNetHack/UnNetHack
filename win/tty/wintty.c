@@ -2602,13 +2602,29 @@ const int *attributes;
     print_vt_code(AVTC_SELECT_WINDOW, window);
 
     switch(cw->type) {
-    case NHW_MESSAGE:
+    case NHW_MESSAGE: {
         /* really do this later */
 #if defined(USER_SOUNDS) && defined(WIN32CON)
         play_sound_for_message(str);
 #endif
-        update_topl(str);
+        int suppress_history = (attr & ATR_NOHISTORY);
+
+        /* in case we ever support display attributes for topline
+           messages, clear flag mask leaving only display attr */
+        /*attr &= ~(ATR_URGENT | ATR_NOHISTORY);*/
+
+        if (!suppress_history) {
+            /* normal output; add to current top line if room, else flush
+               whatever is there to history and then write this */
+            update_topl(str);
+        } else {
+            /* put anything already on top line into history */
+            remember_topl();
+            /* write to top line without remembering what we're writing */
+            show_topl(str);
+        }
         break;
+    }
 
     case NHW_STATUS:
         ob = &cw->data[cw->cury][j = cw->curx];
