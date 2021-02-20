@@ -687,7 +687,8 @@ int gloc;
         if (do_screen_description(tmpcc, TRUE, sym, tmpbuf, &firstmatch, (struct permonst **)0)) {
             (void) coord_desc(garr[i].x, garr[i].y, tmpbuf, iflags.getpos_coords);
             Sprintf(fullbuf, "%s%s%s", firstmatch, (*tmpbuf ? " " : ""), tmpbuf);
-            add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, fullbuf, MENU_UNSELECTED);
+            int glyph = (tmpcc.x + tmpcc.y * COLNO) * -1;
+            add_menu(tmpwin, glyph, MENU_DEFCNT, &any, 0, 0, ATR_NONE, fullbuf, MENU_UNSELECTED);
         }
     }
 

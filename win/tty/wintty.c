@@ -1977,7 +1977,14 @@ struct WinDesc *cw;
                         /* map glyph to character and color */
                         mapglyph(curr->glyph, &character, &glyph_color, &special, 0, 0, 0);
 
-                        print_vt_code(AVTC_GLYPH_START, glyph2tile[curr->glyph]);
+                        /* ugly workaround, needs proper structure */
+                        int glyph = curr->glyph;
+                        if (glyph < 0) {
+                            int x = abs(glyph) % COLNO;
+                            int y = abs(glyph) / COLNO;
+                            glyph = glyph_at(x, y);
+                        }
+                        print_vt_code(AVTC_GLYPH_START, glyph2tile[glyph]);
                         if (glyph_color != NO_COLOR) term_start_color(glyph_color);
 #ifdef UTF8_GLYPHS
                         pututf8char(character);
