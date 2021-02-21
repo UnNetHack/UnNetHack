@@ -484,7 +484,7 @@ int x, y, gloc;
         /* fall through */
 
     case GLOC_INTERESTING:
-        return gather_locs_interesting(x,y, GLOC_DOOR) ||
+        return !gather_locs_interesting(x,y, GLOC_DOOR) &&
                !(glyph_is_cmap(glyph) &&
                  (is_cmap_wall(glyph_to_cmap(glyph)) ||
                   glyph_to_cmap(glyph) == S_tree     ||
