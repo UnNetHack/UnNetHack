@@ -516,6 +516,7 @@ enum plnmsg_types {
 enum gloctypes {
     GLOC_MONS = 0,
     GLOC_OBJS,
+    GLOC_DUNGEON_FEATURE,
     GLOC_DOOR,
     GLOC_EXPLORE,
     GLOC_INTERESTING,

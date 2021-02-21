@@ -42,6 +42,7 @@ boolean FDECL((*gp_getvalidf), (int, int));
 static const char *const gloc_descr[NUM_GLOCS][4] = {
     { "any monsters", "monster", "next/previous monster", "monsters" },
     { "any items", "item", "next/previous object", "objects" },
+    { "any dungeon features", "dungeon feature", "next/previous dungeon feature", "dungeon features" },
     { "any doors", "door", "next/previous door or doorway", "doors or doorways" },
     { "any unexplored areas", "unexplored area", "unexplored location", "unexplored locations" },
     { "anything interesting", "interesting thing", "anything interesting", "anything interesting" },
@@ -111,6 +112,10 @@ const char *goal;
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MAP) != 0) {
         /* these are primarily useful when choosing a travel
            destination for the '_' command */
+        getpos_help_keyxhelp(tmpwin,
+                             visctrl(Cmd.spkeys[NHKF_GETPOS_DUNGEON_FEATURE_NEXT]),
+                             visctrl(Cmd.spkeys[NHKF_GETPOS_DUNGEON_FEATURE_PREV]),
+                             GLOC_DUNGEON_FEATURE);
         getpos_help_keyxhelp(tmpwin,
                              visctrl(Cmd.spkeys[NHKF_GETPOS_DOOR_NEXT]),
                              visctrl(Cmd.spkeys[NHKF_GETPOS_DOOR_PREV]),
@@ -442,15 +447,22 @@ int x, y, gloc;
         /* unlike '/M', this skips monsters revealed by
            warning glyphs and remembered unseen ones */
         return (glyph_is_monster(glyph) && glyph != monnum_to_glyph(PM_LONG_WORM_TAIL));
+
     case GLOC_OBJS:
         return (glyph_is_object(glyph) &&
                 glyph != objnum_to_glyph(BOULDER) &&
                 glyph != objnum_to_glyph(ROCK));
+
+    case GLOC_DUNGEON_FEATURE:
+        return (glyph_is_cmap(glyph) &&
+                (is_cmap_furniture(glyph_to_cmap(glyph))));
+
     case GLOC_DOOR:
         return (glyph_is_cmap(glyph) &&
                 (is_cmap_door(glyph_to_cmap(glyph)) ||
                  is_cmap_drawbridge(glyph_to_cmap(glyph)) ||
                  glyph_to_cmap(glyph) == S_ndoor));
+
     case GLOC_EXPLORE:
         return (glyph_is_cmap(glyph) &&
                 (is_cmap_door(glyph_to_cmap(glyph)) ||
@@ -464,11 +476,13 @@ int x, y, gloc;
                  IS_UNEXPLORED_LOC(x - 1, y) ||
                  IS_UNEXPLORED_LOC(x, y + 1) ||
                  IS_UNEXPLORED_LOC(x, y - 1)));
+
     case GLOC_VALID:
         if (getpos_getvalid) {
             return (*getpos_getvalid)(x,y);
         }
         /* fall through */
+
     case GLOC_INTERESTING:
         return gather_locs_interesting(x,y, GLOC_DOOR) ||
                !(glyph_is_cmap(glyph) &&
@@ -725,6 +739,8 @@ getpos(coord *ccp, boolean force, const char *goal)
         NHKF_GETPOS_MON_PREV,
         NHKF_GETPOS_OBJ_NEXT,
         NHKF_GETPOS_OBJ_PREV,
+        NHKF_GETPOS_DUNGEON_FEATURE_NEXT,
+        NHKF_GETPOS_DUNGEON_FEATURE_PREV,
         NHKF_GETPOS_DOOR_NEXT,
         NHKF_GETPOS_DOOR_PREV,
         NHKF_GETPOS_UNEX_NEXT,
@@ -735,7 +751,7 @@ getpos(coord *ccp, boolean force, const char *goal)
         NHKF_GETPOS_VALID_PREV
     };
     char pick_chars[6];
-    char mMoOdDxX[13];
+    char mMoOdDxX[NUM_GLOCS*2 + 1];
     int result = 0;
     int cx, cy, i, c;
     int sidx, tx, ty;
