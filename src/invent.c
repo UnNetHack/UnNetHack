@@ -2459,6 +2459,18 @@ struct obj *obj2;
         }
     }
 
+    /* Sort by quantity, ascending */
+    if (obj1->quan != obj2->quan) {
+        return obj1->quan - obj2->quan;
+    }
+
+    /* Sort by shop price, ascending */
+    int price1 = get_cost_of_shop_item(obj1);
+    int price2 = get_cost_of_shop_item(obj2);
+    if (price1 != price2) {
+        return price1 - price2;
+    }
+
     /* They're identical, as far as we're concerned.  We want
        to force a deterministic order, and do so by producing a
        stable sort: maintain the original order of equal items. */
