@@ -2765,6 +2765,8 @@ struct {
     { NHKF_GETPOS_MON_PREV,  'M', "getpos.mon.prev" },
     { NHKF_GETPOS_OBJ_NEXT,  'o', "getpos.obj.next" },
     { NHKF_GETPOS_OBJ_PREV,  'O', "getpos.obj.prev" },
+    { NHKF_GETPOS_DUNGEON_FEATURE_NEXT, 'f', "getpos.dungeon_feature.next" },
+    { NHKF_GETPOS_DUNGEON_FEATURE_PREV, 'F', "getpos.dungeon_feature.prev" },
     { NHKF_GETPOS_DOOR_NEXT, 'd', "getpos.door.next" },
     { NHKF_GETPOS_DOOR_PREV, 'D', "getpos.door.prev" },
     { NHKF_GETPOS_UNEX_NEXT, 'x', "getpos.unexplored.next" },
@@ -3306,9 +3308,7 @@ register char *cmd;
     case NHKF_CLICKLOOK:
         if (iflags.clicklook) {
             flags.move = FALSE;
-#if NEXT_VERSION
             do_look(2, &clicklook_cc);
-#endif
         }
         return;
 

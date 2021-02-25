@@ -122,6 +122,18 @@ enum cost_alteration_types {
 #define CXN_ARTICLE   8 /* include a/an/the prefix */
 #define CXN_NOCORPSE 16 /* suppress " corpse" suffix */
 
+/* flags for look_here() */
+#define LOOKHERE_PICKED_SOME   1
+#define LOOKHERE_SKIP_DFEATURE 2
+
+/* getpos() return values */
+enum getpos_retval {
+    LOOK_TRADITIONAL = 0, /* '.' -- ask about "more info?" */
+    LOOK_QUICK       = 1, /* ',' -- skip "more info?" */
+    LOOK_ONCE        = 2, /* ';' -- skip and stop looping */
+    LOOK_VERBOSE     = 3  /* ':' -- show more info w/o asking */
+};
+
 /*
  * This is the way the game ends.  If these are rearranged, the arrays
  * in end.c and topten.c will need to be changed.  Some parts of the

@@ -10,8 +10,8 @@
 STATIC_DCL boolean FDECL(is_swallow_sym, (int));
 STATIC_DCL int FDECL(append_str, (char *, const char *));
 STATIC_DCL struct permonst * FDECL(lookat, (int, int, char *, char *));
+static void look_all(boolean, boolean, boolean);
 static void FDECL(do_supplemental_info, (char *, struct permonst *, BOOLEAN_P));
-STATIC_DCL int FDECL(do_look, (BOOLEAN_P));
 STATIC_DCL boolean FDECL(help_menu, (int *));
 #ifdef PORT_HELP
 extern void NDECL(port_help);
@@ -881,26 +881,25 @@ struct permonst **for_supplement;
     }
  check_monsters:
     /* Check for monsters */
-#if NEXT_VERSION
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
         for (i = 1; i < MAXMCLASSES; i++) {
-            if (sym == (looked ? showsyms[i + SYM_OFF_M] : def_monsyms[i].sym) &&
-                 def_monsyms[i].explain && *def_monsyms[i].explain) {
+            if (sym == (looked ? monsyms[i] : def_monsyms[i]) &&
+                 def_monsyms_explain(i) && *def_monsyms_explain(i)) {
                 need_to_look = TRUE;
                 if (!found) {
-                    Sprintf(out_str, "%s%s", prefix, an(def_monsyms[i].explain));
-                    *firstmatch = def_monsyms[i].explain;
+                    Sprintf(out_str, "%s%s", prefix, an(def_monsyms_explain(i)));
+                    *firstmatch = def_monsyms_explain(i);
                     found++;
                 } else {
-                    found += append_str(out_str, an(def_monsyms[i].explain));
+                    found += append_str(out_str, an(def_monsyms_explain(i)));
                 }
             }
         }
         /* handle '@' as a special case if it refers to you and you're
            playing a character which isn't normally displayed by that
            symbol; firstmatch is assumed to already be set for '@' */
-        if ((looked ? (sym == showsyms[S_HUMAN + SYM_OFF_M] && cc.x == u.ux && cc.y == u.uy) :
-                      (sym == def_monsyms[S_HUMAN].sym && !flags.showrace)) &&
+        if ((looked ? (sym == monsyms[S_HUMAN] && cc.x == u.ux && cc.y == u.uy) :
+                      (sym == def_monsyms[S_HUMAN] && !iflags.showrace)) &&
              !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd) {
             found += append_str(out_str, "you"); /* tack on "or you" */
         }
@@ -909,7 +908,7 @@ struct permonst **for_supplement;
     /* Now check for objects */
     if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0) {
         for (i = 1; i < MAXOCLASSES; i++) {
-            if (sym == (looked ? showsyms[i + SYM_OFF_O] : def_oc_syms[i].sym) ||
+            if (sym == (looked ? oc_syms[i] : def_oc_syms[i]) ||
                  (looked && i == ROCK_CLASS && glyph_is_statue(glyph))) {
                 need_to_look = TRUE;
                 if (looked && i == VENOM_CLASS) {
@@ -917,16 +916,15 @@ struct permonst **for_supplement;
                     continue;
                 }
                 if (!found) {
-                    Sprintf(out_str, "%s%s", prefix, an(def_oc_syms[i].explain));
-                    *firstmatch = def_oc_syms[i].explain;
+                    Sprintf(out_str, "%s%s", prefix, an(def_objsyms_explain(i)));
+                    *firstmatch = def_objsyms_explain(i);
                     found++;
                 } else {
-                    found += append_str(out_str, an(def_oc_syms[i].explain));
+                    found += append_str(out_str, an(def_objsyms_explain(i)));
                 }
             }
         }
     }
-#endif
 
     if (sym == DEF_INVISIBLE) {
         extern const char altinvisexplain[]; /* drawing.c */
@@ -1128,54 +1126,170 @@ struct permonst **for_supplement;
 /* also used by getpos hack in do_name.c */
 const char what_is_an_unknown_object[] = "an unknown object";
 
-STATIC_OVL int
-do_look(quick)
-boolean quick;      /* use cursor && don't search for "more info" */
+int
+do_look(int mode, coord *click_cc)
 {
+    boolean quick = (mode == 1); /* use cursor; don't search for "more info" */
+    boolean clicklook = (mode == 2); /* right mouse-click method */
     char out_str[BUFSZ], look_buf[BUFSZ];
     const char *x_str, *firstmatch = 0;
     struct permonst *pm = 0, *supplemental_pm = 0;
-    int i, ans = 0;
-    glyph_t sym;            /* typed symbol or converted glyph */
-    int found;          /* count of matching syms found */
-    coord cc;           /* screen pos of unknown glyph */
-    boolean save_verbose;   /* saved value of flags.verbose */
-    boolean from_screen;    /* question from the screen */
-    boolean force_defsyms;  /* force using glyphs from defsyms[].sym */
-    boolean need_to_look;   /* need to get explan. from glyph */
-    boolean hit_trap;       /* true if found trap explanation */
-    int skipped_venom;      /* non-zero if we ignored "splash of venom" */
+    int i = '\0', ans = 0;
+    glyph_t sym;           /* typed symbol or converted glyph */
+    int found;             /* count of matching syms found */
+    coord cc;              /* screen pos of unknown glyph */
+    boolean save_verbose;  /* saved value of flags.verbose */
+    boolean from_screen;   /* question from the screen */
+    boolean force_defsyms; /* force using glyphs from defsyms[].sym */
+    boolean need_to_look;  /* need to get explan. from glyph */
+    boolean hit_trap;      /* true if found trap explanation */
+    int skipped_venom;     /* non-zero if we ignored "splash of venom" */
     static const char *mon_interior = "the interior of a monster";
 
     force_defsyms = FALSE;
-    if (quick) {
-        from_screen = TRUE; /* yes, we want to use the cursor */
-    } else {
-        i = ynq("Specify unknown object by cursor?");
-        if (i == 'q') return 0;
-        from_screen = (i == 'y');
-    }
+    if (!clicklook) {
+        if (quick) {
+            from_screen = TRUE; /* yes, we want to use the cursor */
+            i = 'y';
+        } else {
+            menu_item *pick_list = (menu_item *) 0;
+            winid win;
+            anything any;
 
-    if (from_screen) {
-        cc.x = u.ux;
-        cc.y = u.uy;
-        sym = 0;    /* gcc -Wall lint */
-    } else {
-        getlin("Specify what? (type the word)", out_str);
+            any = zeroany;
+            win = create_nhwindow(NHW_MENU);
+            start_menu(win);
+            any.a_char = '/';
+            /* 'y' and 'n' to keep backwards compatibility with previous
+               versions: "Specify unknown object by cursor?" */
+            add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, iflags.lootabc ? 0 : any.a_char, 'y', ATR_NONE,
+                     "something on the map", MENU_ITEMFLAGS_NONE);
+            any.a_char = 'i';
+            add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, iflags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+                     "something you're carrying", MENU_ITEMFLAGS_NONE);
+            any.a_char = '?';
+            add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, iflags.lootabc ? 0 : any.a_char, 'n', ATR_NONE,
+                     "something else (by symbol or name)", MENU_ITEMFLAGS_NONE);
+            if (!u.uswallow && !Hallucination) {
+                any = zeroany;
+                add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+                /* these options work sensibly for the swallowed case,
+                   but there's no reason for the player to use them then;
+                   objects work fine when hallucinating, but screen
+                   symbol/monster class letter doesn't match up with
+                   bogus monster type, so suppress when hallucinating */
+                any.a_char = 'm';
+                add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, iflags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+                         "nearby monsters", MENU_ITEMFLAGS_NONE);
+                any.a_char = 'M';
+                add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, iflags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+                         "all monsters shown on map", MENU_ITEMFLAGS_NONE);
+                any.a_char = 'o';
+                add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, iflags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+                         "nearby objects", MENU_ITEMFLAGS_NONE);
+                any.a_char = 'O';
+                add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, iflags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+                         "all objects shown on map", MENU_ITEMFLAGS_NONE);
+                any.a_char = 'd';
+                add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, iflags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+                         "nearby dungeon features", MENU_ITEMFLAGS_NONE);
+                any.a_char = 'D';
+                add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, iflags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+                         "all dungeon features shown on map", MENU_ITEMFLAGS_NONE);
+            }
+            end_menu(win, "What do you want to look at:");
+            if (select_menu(win, PICK_ONE, &pick_list) > 0) {
+                i = pick_list->item.a_char;
+                free(pick_list);
+            }
+            destroy_nhwindow(win);
+        }
+
+        switch (i) {
+        default:
+        case 'q':
+            return 0;
+
+        case 'y':
+        case '/':
+            from_screen = TRUE;
+            sym = 0;
+            cc.x = u.ux;
+            cc.y = u.uy;
+            break;
+
+        case 'i':
+          {
+            char invlet;
+            struct obj *invobj;
+
+            invlet = display_inventory((const char *) 0, TRUE);
+            if (!invlet || invlet == '\033') {
+                return 0;
+            }
+            *out_str = '\0';
+            for (invobj = invent; invobj; invobj = invobj->nobj) {
+                if (invobj->invlet == invlet) {
+                    strcpy(out_str, singular(invobj, xname));
+                    break;
+                }
+            }
+            if (*out_str) {
+                checkfile(out_str, pm, TRUE, TRUE, (char *) 0);
+            }
+            return 0;
+          }
+
+        case '?':
+            from_screen = FALSE;
+            getlin("Specify what? (type the word)", out_str);
             /* keep single space as-is */
-        if (strcmp(out_str, " ")) {
-            /* remove leading and trailing whitespace and
-                condense consecutive internal whitespace */
-            mungspaces(out_str);
-        }
-        if (out_str[0] == '\0' || out_str[0] == '\033')
+            if (strcmp(out_str, " ")) {
+                /* remove leading and trailing whitespace and
+                   condense consecutive internal whitespace */
+                mungspaces(out_str);
+            }
+            if (out_str[0] == '\0' || out_str[0] == '\033') {
+                return 0;
+            }
+
+            if (out_str[1]) {
+                /* user typed in a complete string */
+                checkfile(out_str, pm, TRUE, TRUE, (char *) 0);
+                return 0;
+            }
+            sym = out_str[0];
+            break;
+
+        case 'm':
+            look_all(TRUE, TRUE, FALSE); /* list nearby monsters */
             return 0;
 
-        if (out_str[1]) { /* user typed in a complete string */
-            checkfile(out_str, pm, TRUE, TRUE, (char *) 0);
+        case 'M':
+            look_all(FALSE, TRUE, FALSE); /* list all monsters */
+            return 0;
+
+        case 'o':
+            look_all(TRUE, FALSE, FALSE); /* list nearby objects */
+            return 0;
+
+        case 'O':
+            look_all(FALSE, FALSE, FALSE); /* list all objects */
+            return 0;
+
+        case 'd':
+            look_all(TRUE, FALSE, TRUE); /* list nearby dungeon features */
+            return 0;
+
+        case 'D':
+            look_all(FALSE, FALSE, TRUE); /* list all dungeon features */
             return 0;
         }
-        sym = out_str[0];
+    } else { /* clicklook */
+        cc.x = click_cc->x;
+        cc.y = click_cc->y;
+        sym = 0;
+        from_screen = FALSE;
     }
 
     /* Save the verbose flag, we change it later. */
@@ -1446,6 +1560,103 @@ boolean quick;      /* use cursor && don't search for "more info" */
     return 0;
 }
 
+static void
+look_all(boolean nearby,  /* True => within BOLTLIM, False => entire map */
+         boolean do_mons, /* True => monsters, False => objects */
+         boolean do_dungeon_features)
+{
+    winid win;
+    int x, y, lo_x, lo_y, hi_x, hi_y, glyph, count = 0;
+    char lookbuf[BUFSZ], outbuf[BUFSZ];
+
+    win = create_nhwindow(NHW_TEXT);
+    lo_y = nearby ? max(u.uy - BOLT_LIM, 0) : 0;
+    lo_x = nearby ? max(u.ux - BOLT_LIM, 1) : 1;
+    hi_y = nearby ? min(u.uy + BOLT_LIM, ROWNO - 1) : ROWNO - 1;
+    hi_x = nearby ? min(u.ux + BOLT_LIM, COLNO - 1) : COLNO - 1;
+    for (y = lo_y; y <= hi_y; y++) {
+        for (x = lo_x; x <= hi_x; x++) {
+            lookbuf[0] = '\0';
+            glyph = glyph_at(x, y);
+            if (do_mons) {
+                if (glyph_is_monster(glyph)) {
+                    struct monst *mtmp;
+
+                    bhitpos.x = x; /* [is this actually necessary?] */
+                    bhitpos.y = y;
+                    if (x == u.ux && y == u.uy && canspotself()) {
+                        (void) self_lookat(lookbuf);
+                        count++;
+                    } else if ((mtmp = m_at(x, y)) != 0) {
+                        look_at_monster(lookbuf, (char *) 0, mtmp, x, y);
+                        count++;
+                    }
+                } else if (glyph_is_invisible(glyph)) {
+                    /* remembered, unseen, creature */
+                    Strcpy(lookbuf, invisexplain);
+                    count++;
+                } else if (glyph_is_warning(glyph)) {
+                    int warnindx = glyph_to_warning(glyph);
+
+                    Strcpy(lookbuf, def_warnsyms[warnindx].explanation);
+                    count++;
+                }
+            } else if (do_dungeon_features) {
+                if (glyph_is_cmap(glyph) && (is_cmap_furniture(glyph_to_cmap(glyph)))) {
+                    int indx = glyph_to_cmap(glyph);
+                    Strcpy(lookbuf, defsyms[indx].explanation);
+                    count++;
+                }
+            } else {
+                /* !do_mons */
+                if (glyph_is_object(glyph)) {
+                    look_at_object(lookbuf, x, y, glyph);
+                    count++;
+                }
+            }
+            if (*lookbuf) {
+                char coordbuf[20], which[12], cmode;
+
+                cmode = (iflags.getpos_coords != GPCOORDS_NONE) ? iflags.getpos_coords : GPCOORDS_MAP;
+                if (count == 1) {
+                    Strcpy(which, do_mons ? "monsters" : "objects");
+                    if (nearby) {
+                        char *loc = (cmode != GPCOORDS_COMPASS) ?  coord_desc(u.ux, u.uy, coordbuf, cmode) :
+                                    (!canspotself()) ? "your position" : "you";
+                        Sprintf(outbuf, "%s currently shown near %s:", upstart(which), loc);
+                    } else {
+                        Sprintf(outbuf, "All %s currently shown on the map:", which);
+                    }
+                    putstr(win, 0, outbuf);
+                    /* hack alert! Qt watches a text window for any line
+                       with 4 consecutive spaces and renders the window
+                       in a fixed-width font it if finds at least one */
+                    putstr(win, 0, "    "); /* separator */
+                }
+                /* prefix: "coords  C  " where 'C' is mon or obj symbol */
+                Sprintf(outbuf, (cmode == GPCOORDS_SCREEN) ? "%s  " :
+                                (cmode == GPCOORDS_MAP) ? "%8s  " : "%12s  ",
+                                coord_desc(x, y, coordbuf, cmode));
+#if 0           /* when putmixed */
+                (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y, 0);
+                Sprintf(eos(outbuf), "%s  ", encglyph(glyph));
+#endif
+                /* guard against potential overflow */
+                lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
+                Strcat(outbuf, lookbuf);
+                putstr(win, 0, outbuf); /* putmixed(win, 0, outbuf); */
+            }
+        }
+    }
+    if (count) {
+        display_nhwindow(win, TRUE);
+    } else {
+        pline("No %s are currently shown %s.", do_mons ? "monsters" : "objects",
+              nearby ? "nearby" : "on the map");
+    }
+    destroy_nhwindow(win);
+}
+
 static const char *suptext1[] = {
     "%s is a member of a marauding horde of orcs",
     "rumored to have brutally attacked and plundered",
@@ -1535,12 +1746,14 @@ boolean without_asking;
     }
 }
 
+/* the '/' command */
 int
 dowhatis()
 {
-    return do_look(FALSE);
+    return do_look(0, (coord *) 0);
 }
 
+/* the ';' command */
 int
 doquickwhatis()
 {
@@ -1548,7 +1761,8 @@ doquickwhatis()
         check_tutorial_message(QT_T_CURSOR_NUMPAD);
     else
         check_tutorial_message(QT_T_CURSOR_VIKEYS);
-    return do_look(TRUE);
+
+    return do_look(1, (coord *) 0);
 }
 
 int

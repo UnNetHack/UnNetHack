@@ -104,6 +104,13 @@ unsigned mgflags UNUSED;
     glyph_t ch;
     unsigned special = 0;
 
+    /* ugly workaround, needs proper structure in add_menu */
+    if (glyph < 0) {
+        x = abs(glyph) % COLNO;
+        y = abs(glyph) / COLNO;
+        glyph = glyph_at(x, y);
+    }
+
     /*
      *  Map the glyph back to a character and color.
      *

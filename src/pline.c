@@ -53,6 +53,24 @@ char *msg;
     return MSGTYP_NORMAL;
 }
 
+static unsigned pline_flags = 0;
+
+/* keeps windowprocs usage out of pline() */
+static void
+putmesg(const char *line)
+{
+    int attr = ATR_NONE;
+
+    if (pline_flags & URGENT_MESSAGE) {
+        attr |= ATR_URGENT;
+    }
+    if (pline_flags & SUPPRESS_HISTORY) {
+        attr |= ATR_NOHISTORY;
+    }
+
+    putstr(WIN_MESSAGE, attr, line);
+}
+
 /*VARARGS1*/
 /* Note that these declarations rely on knowledge of the internals
  * of the variable argument handling stuff in "tradstdc.h"
@@ -70,7 +88,6 @@ pline VA_DECL(const char *, line)
     VA_END();
 }
 
-static unsigned pline_flags = 0;
 char prevmsg[BUFSZ];
 
 # ifdef USE_STDARG
@@ -101,13 +118,15 @@ pline VA_DECL(const char *, line)
     }
 #if defined(DUMP_LOG) && defined(DUMPMSGS)
     if (DUMPMSGS > 0 && !program_state.gameover) {
-        /* count identical messages */
-        if (lastmsg >= 0 && !strncmp(msgs[lastmsg], line, BUFSZ)) {
-            msgs_count[lastmsg] += 1;
-        } else {
-            lastmsg = (lastmsg + 1) % DUMPMSGS;
-            strncpy(msgs[lastmsg], line, BUFSZ);
-            msgs_count[lastmsg] = 1;
+        if ((pline_flags & SUPPRESS_HISTORY) == 0) {
+            /* count identical messages */
+            if (lastmsg >= 0 && !strncmp(msgs[lastmsg], line, BUFSZ)) {
+                msgs_count[lastmsg] += 1;
+            } else {
+                lastmsg = (lastmsg + 1) % DUMPMSGS;
+                strncpy(msgs[lastmsg], line, BUFSZ);
+                msgs_count[lastmsg] = 1;
+            }
         }
     }
 #endif
@@ -120,11 +139,15 @@ pline VA_DECL(const char *, line)
     if (no_repeat && !strcmp(line, toplines))
         return;
 #endif /* MAC */
-    if (vision_full_recalc) vision_recalc(0);
-    if (u.ux) flush_screen(1);      /* %% */
+    if (vision_full_recalc) {
+        vision_recalc(0);
+    }
+    if (u.ux) {
+        flush_screen(1); /* %% */
+    }
     if (typ == MSGTYP_NOSHOW) return;
     if (typ == MSGTYP_NOREP && !strcmp(line, prevmsg)) return;
-    putstr(WIN_MESSAGE, 0, line);
+    putmesg(line);
     strncpy(prevmsg, line, BUFSZ);
     if (typ == MSGTYP_STOP) display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
 }

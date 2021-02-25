@@ -5,6 +5,7 @@
 STATIC_DCL char *NDECL(nextmbuf);
 static void FDECL(getpos_help, (BOOLEAN_P, const char *));
 static void FDECL(gather_locs, (coord **, int *, int));
+static void auto_describe(int, int);
 static void call_object(int, char *);
 static void call_input(int, char *);
 
@@ -41,6 +42,7 @@ boolean FDECL((*gp_getvalidf), (int, int));
 static const char *const gloc_descr[NUM_GLOCS][4] = {
     { "any monsters", "monster", "next/previous monster", "monsters" },
     { "any items", "item", "next/previous object", "objects" },
+    { "any dungeon features", "dungeon feature", "next/previous dungeon feature", "dungeon features" },
     { "any doors", "door", "next/previous door or doorway", "doors or doorways" },
     { "any unexplored areas", "unexplored area", "unexplored location", "unexplored locations" },
     { "anything interesting", "interesting thing", "anything interesting", "anything interesting" },
@@ -110,6 +112,10 @@ const char *goal;
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MAP) != 0) {
         /* these are primarily useful when choosing a travel
            destination for the '_' command */
+        getpos_help_keyxhelp(tmpwin,
+                             visctrl(Cmd.spkeys[NHKF_GETPOS_DUNGEON_FEATURE_NEXT]),
+                             visctrl(Cmd.spkeys[NHKF_GETPOS_DUNGEON_FEATURE_PREV]),
+                             GLOC_DUNGEON_FEATURE);
         getpos_help_keyxhelp(tmpwin,
                              visctrl(Cmd.spkeys[NHKF_GETPOS_DOOR_NEXT]),
                              visctrl(Cmd.spkeys[NHKF_GETPOS_DOOR_PREV]),
@@ -441,15 +447,22 @@ int x, y, gloc;
         /* unlike '/M', this skips monsters revealed by
            warning glyphs and remembered unseen ones */
         return (glyph_is_monster(glyph) && glyph != monnum_to_glyph(PM_LONG_WORM_TAIL));
+
     case GLOC_OBJS:
         return (glyph_is_object(glyph) &&
                 glyph != objnum_to_glyph(BOULDER) &&
                 glyph != objnum_to_glyph(ROCK));
+
+    case GLOC_DUNGEON_FEATURE:
+        return (glyph_is_cmap(glyph) &&
+                (is_cmap_furniture(glyph_to_cmap(glyph))));
+
     case GLOC_DOOR:
         return (glyph_is_cmap(glyph) &&
                 (is_cmap_door(glyph_to_cmap(glyph)) ||
                  is_cmap_drawbridge(glyph_to_cmap(glyph)) ||
                  glyph_to_cmap(glyph) == S_ndoor));
+
     case GLOC_EXPLORE:
         return (glyph_is_cmap(glyph) &&
                 (is_cmap_door(glyph_to_cmap(glyph)) ||
@@ -463,13 +476,15 @@ int x, y, gloc;
                  IS_UNEXPLORED_LOC(x - 1, y) ||
                  IS_UNEXPLORED_LOC(x, y + 1) ||
                  IS_UNEXPLORED_LOC(x, y - 1)));
+
     case GLOC_VALID:
         if (getpos_getvalid) {
             return (*getpos_getvalid)(x,y);
         }
         /* fall through */
+
     case GLOC_INTERESTING:
-        return gather_locs_interesting(x,y, GLOC_DOOR) ||
+        return !gather_locs_interesting(x,y, GLOC_DOOR) &&
                !(glyph_is_cmap(glyph) &&
                  (is_cmap_wall(glyph_to_cmap(glyph)) ||
                   glyph_to_cmap(glyph) == S_tree     ||
@@ -622,6 +637,29 @@ char *outbuf, cmode;
     return outbuf;
 }
 
+static void
+auto_describe(int cx, int cy)
+{
+    coord cc;
+    int sym = 0;
+    char tmpbuf[BUFSZ];
+    const char *firstmatch = "unknown";
+
+    cc.x = cx;
+    cc.y = cy;
+    if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch, (struct permonst **) 0)) {
+        (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
+        boolean illegal = (iflags.autodescribe && getpos_getvalid && !(*getpos_getvalid)(cx, cy));
+        boolean no_travel_path = iflags.getloc_travelmode && !is_valid_travelpt(cx, cy);
+        custompline((SUPPRESS_HISTORY | OVERRIDE_MSGTYPE),
+                    "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
+                    illegal ? " (illegal)" : "",
+                    no_travel_path ? " (no travel path)" : "");
+        curs(WIN_MAP, cx, cy);
+        flush_screen(0);
+    }
+}
+
 boolean
 getpos_menu(ccp, gloc)
 coord *ccp;
@@ -660,17 +698,12 @@ int gloc;
         any.a_int = i + 1;
         tmpcc.x = garr[i].x;
         tmpcc.y = garr[i].y;
-#if NEXT_VERSION
         if (do_screen_description(tmpcc, TRUE, sym, tmpbuf, &firstmatch, (struct permonst **)0)) {
-            (void) coord_desc(garr[i].x, garr[i].y, tmpbuf,
-                              iflags.getpos_coords);
+            (void) coord_desc(garr[i].x, garr[i].y, tmpbuf, iflags.getpos_coords);
             Sprintf(fullbuf, "%s%s%s", firstmatch, (*tmpbuf ? " " : ""), tmpbuf);
-            add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, fullbuf, MENU_UNSELECTED);
+            int glyph = (tmpcc.x + tmpcc.y * COLNO) * -1;
+            add_menu(tmpwin, glyph, MENU_DEFCNT, &any, 0, 0, ATR_NONE, fullbuf, MENU_UNSELECTED);
         }
-#else
-        nhUse(tmpcc);
-        nhUse(any);
-#endif
     }
 
     Sprintf(tmpbuf, "Pick %s%s%s",
@@ -690,26 +723,64 @@ int gloc;
 }
 
 int
-getpos(cc, force, goal)
-coord *cc;
-boolean force;
-const char *goal;
+getpos(coord *ccp, boolean force, const char *goal)
 {
+    const char *cp;
+    static struct {
+        int nhkf, ret;
+    } const pick_chars_def[] = {
+        { NHKF_GETPOS_PICK, LOOK_TRADITIONAL },
+        { NHKF_GETPOS_PICK_Q, LOOK_QUICK },
+        { NHKF_GETPOS_PICK_O, LOOK_ONCE },
+        { NHKF_GETPOS_PICK_V, LOOK_VERBOSE }
+    };
+    static const int mMoOdDxX_def[] = {
+        NHKF_GETPOS_MON_NEXT,
+        NHKF_GETPOS_MON_PREV,
+        NHKF_GETPOS_OBJ_NEXT,
+        NHKF_GETPOS_OBJ_PREV,
+        NHKF_GETPOS_DUNGEON_FEATURE_NEXT,
+        NHKF_GETPOS_DUNGEON_FEATURE_PREV,
+        NHKF_GETPOS_DOOR_NEXT,
+        NHKF_GETPOS_DOOR_PREV,
+        NHKF_GETPOS_UNEX_NEXT,
+        NHKF_GETPOS_UNEX_PREV,
+        NHKF_GETPOS_INTERESTING_NEXT,
+        NHKF_GETPOS_INTERESTING_PREV,
+        NHKF_GETPOS_VALID_NEXT,
+        NHKF_GETPOS_VALID_PREV
+    };
+    char pick_chars[6];
+    char mMoOdDxX[NUM_GLOCS*2 + 1];
     int result = 0;
     int cx, cy, i, c;
     int sidx, tx, ty;
-    boolean msg_given = TRUE;   /* clear message window by default */
-    static const char pick_chars[] = ".,;:";
-    const char *cp;
-    const char *sdp;
-    if(iflags.num_pad) sdp = ndir; else sdp = sdir; /* DICE workaround */
+    boolean msg_given = TRUE; /* clear message window by default */
+    boolean show_goal_msg = FALSE;
+    boolean hilite_state = FALSE;
+    coord *garr[NUM_GLOCS] = DUMMY;
+    int gcount[NUM_GLOCS] = DUMMY;
+    int gidx[NUM_GLOCS] = DUMMY;
 
+    for (i = 0; i < SIZE(pick_chars_def); i++) {
+        pick_chars[i] = Cmd.spkeys[pick_chars_def[i].nhkf];
+    }
+    pick_chars[SIZE(pick_chars_def)] = '\0';
+
+    for (i = 0; i < SIZE(mMoOdDxX_def); i++) {
+        mMoOdDxX[i] = Cmd.spkeys[mMoOdDxX_def[i]];
+    }
+    mMoOdDxX[SIZE(mMoOdDxX_def)] = '\0';
+
+    if (!goal) {
+        goal = "desired location";
+    }
     if (flags.verbose) {
-        pline("(For instructions type a ?)");
+        pline("(For instructions type a '%s')", visctrl(Cmd.spkeys[NHKF_GETPOS_HELP]));
         msg_given = TRUE;
     }
-    cx = cc->x;
-    cy = cc->y;
+    cx = ccp->x;
+    cy = ccp->y;
 #ifdef CLIPPING
     cliparound(cx, cy);
 #endif
@@ -719,15 +790,38 @@ const char *goal;
     lock_mouse_cursor(TRUE);
 #endif
     for (;;) {
+        if (show_goal_msg) {
+            pline("Move cursor to %s:", goal);
+            curs(WIN_MAP, cx, cy);
+            flush_screen(0);
+            show_goal_msg = FALSE;
+        } else if (iflags.autodescribe && !msg_given && !hilite_state) {
+            auto_describe(cx, cy);
+        }
+
         c = nh_poskey(&tx, &ty, &sidx);
-        if (c == '\033') {
+
+        if (hilite_state) {
+            (*getpos_hilitefunc)(2);
+            hilite_state = FALSE;
+            curs(WIN_MAP, cx, cy);
+            flush_screen(0);
+        }
+
+        if (iflags.autodescribe) {
+            msg_given = FALSE;
+        }
+
+        if (c == Cmd.spkeys[NHKF_ESC]) {
             cx = cy = -10;
             msg_given = TRUE; /* force clear */
             result = -1;
             break;
         }
-        if(c == 0) {
-            if (!isok(tx, ty)) continue;
+        if (c == 0) {
+            if (!isok(tx, ty)) {
+                continue;
+            }
             /* a mouse click event, just assign and return */
             cx = tx;
             cy = ty;
@@ -735,64 +829,178 @@ const char *goal;
         }
         if ((cp = index(pick_chars, c)) != 0) {
             /* '.' => 0, ',' => 1, ';' => 2, ':' => 3 */
-            result = cp - pick_chars;
+            result = pick_chars_def[(int) (cp - pick_chars)].ret;
             break;
         }
         for (i = 0; i < 8; i++) {
             int dx, dy;
 
-            if (sdp[i] == c) {
+            if (Cmd.dirchars[i] == c) {
                 /* a normal movement letter or digit */
                 dx = xdir[i];
                 dy = ydir[i];
-            } else if (sdir[i] == lowc((char)c)) {
-                /* a shifted movement letter */
-                dx = 8 * xdir[i];
-                dy = 8 * ydir[i];
-            } else
+            } else if (Cmd.alphadirchars[i] == lowc((char) c) ||
+                       (Cmd.num_pad && Cmd.dirchars[i] == (c & 0177))) {
+                /* a shifted movement letter or Meta-digit */
+                if (iflags.getloc_moveskip) {
+                    /* skip same glyphs */
+                    int glyph = glyph_at(cx, cy);
+
+                    dx = xdir[i];
+                    dy = ydir[i];
+                    while (isok(cx + dx, cy + dy) &&
+                           glyph == glyph_at(cx + dx, cy + dy) &&
+                           isok(cx + dx + xdir[i], cy + dy + ydir[i]) &&
+                           glyph == glyph_at(cx + dx + xdir[i], cy + dy + ydir[i])) {
+                        dx += xdir[i];
+                        dy += ydir[i];
+                    }
+                } else {
+                    dx = 8 * xdir[i];
+                    dy = 8 * ydir[i];
+                }
+            } else {
                 continue;
+            }
 
             /* truncate at map edge; diagonal moves complicate this... */
             if (cx + dx < 1) {
                 dy -= sgn(dy) * (1 - (cx + dx));
                 dx = 1 - cx; /* so that (cx+dx == 1) */
-            } else if (cx + dx > COLNO-1) {
-                dy += sgn(dy) * ((COLNO-1) - (cx + dx));
-                dx = (COLNO-1) - cx;
+            } else if (cx + dx > COLNO - 1) {
+                dy += sgn(dy) * ((COLNO - 1) - (cx + dx));
+                dx = (COLNO - 1) - cx;
             }
             if (cy + dy < 0) {
                 dx -= sgn(dx) * (0 - (cy + dy));
                 dy = 0 - cy; /* so that (cy+dy == 0) */
-            } else if (cy + dy > ROWNO-1) {
-                dx += sgn(dx) * ((ROWNO-1) - (cy + dy));
-                dy = (ROWNO-1) - cy;
+            } else if (cy + dy > ROWNO - 1) {
+                dx += sgn(dx) * ((ROWNO - 1) - (cy + dy));
+                dy = (ROWNO - 1) - cy;
             }
             cx += dx;
             cy += dy;
             goto nxtc;
         }
 
-        if(c == '?') {
-            getpos_help(force, goal);
-        } else if (c == 'm' || c == 'M') {
-            struct monst *tmpmon = (c == 'm') ? getpos_nextmon() : getpos_prevmon();
-            if (tmpmon) {
-                cx = tmpmon->mx;
-                cy = tmpmon->my;
-                goto nxtc;
+        if (c == Cmd.spkeys[NHKF_GETPOS_HELP] || redraw_cmd(c)) {
+            if (c == Cmd.spkeys[NHKF_GETPOS_HELP]) {
+                getpos_help(force, goal);
+            } else {
+                /* ^R */
+                docrt(); /* redraw */
             }
-        } else if (c == '@') {
+            /* update message window to reflect that we're still targetting */
+            show_goal_msg = TRUE;
+            msg_given = TRUE;
+        } else if (c == Cmd.spkeys[NHKF_GETPOS_SHOWVALID] && getpos_hilitefunc) {
+            if (!hilite_state) {
+                (*getpos_hilitefunc)(0);
+                (*getpos_hilitefunc)(1);
+                hilite_state = TRUE;
+            }
+            goto nxtc;
+        } else if (c == Cmd.spkeys[NHKF_GETPOS_AUTODESC]) {
+            iflags.autodescribe = !iflags.autodescribe;
+            pline("Automatic description %sis %s.",
+                  flags.verbose ? "of features under cursor " : "",
+                  iflags.autodescribe ? "on" : "off");
+            if (!iflags.autodescribe) {
+                show_goal_msg = TRUE;
+            }
+            msg_given = TRUE;
+            goto nxtc;
+        } else if (c == Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]) {
+            static const char *const view_filters[NUM_GFILTER] = {
+                "Not limiting targets",
+                "Limiting targets to those in sight",
+                "Limiting targets to those in same area"
+            };
+
+            iflags.getloc_filter = (iflags.getloc_filter + 1) % NUM_GFILTER;
+            for (i = 0; i < NUM_GLOCS; i++) {
+                if (garr[i]) {
+                    free(garr[i]);
+                    garr[i] = NULL;
+                }
+                gidx[i] = gcount[i] = 0;
+            }
+            pline("%s.", view_filters[iflags.getloc_filter]);
+            msg_given = TRUE;
+            goto nxtc;
+        } else if (c == Cmd.spkeys[NHKF_GETPOS_MENU]) {
+            iflags.getloc_usemenu = !iflags.getloc_usemenu;
+            pline("%s a menu to show possible targets.",
+                  iflags.getloc_usemenu ? "Using" : "Not using");
+            msg_given = TRUE;
+            goto nxtc;
+        } else if (c == Cmd.spkeys[NHKF_GETPOS_SELF]) {
+            /* reset 'm&M', 'o&O', &c; otherwise, there's no way for player
+               to achieve that except by manually cycling through all spots */
+            for (i = 0; i < NUM_GLOCS; i++) {
+                gidx[i] = 0;
+            }
             cx = u.ux;
             cy = u.uy;
+            goto nxtc;
+        } else if (c == Cmd.spkeys[NHKF_GETPOS_MOVESKIP]) {
+            iflags.getloc_moveskip = !iflags.getloc_moveskip;
+            pline("%skipping over similar terrain when fastmoving the cursor.",
+                  iflags.getloc_moveskip ? "S" : "Not s");
+            msg_given = TRUE;
+            goto nxtc;
+        } else if ((cp = index(mMoOdDxX, c)) != 0) { /* 'm|M', 'o|O', &c */
+            /* nearest or farthest monster or object or door or unexplored */
+            int gtmp = (int) (cp - mMoOdDxX); /* 0..7 */
+            int gloc = gtmp >> 1;             /* 0..3 */
+
+            if (iflags.getloc_usemenu) {
+                coord tmpcrd;
+
+                if (getpos_menu(&tmpcrd, gloc)) {
+                    cx = tmpcrd.x;
+                    cy = tmpcrd.y;
+                    goto nxtc;
+                } else {
+                    result = -1;
+                    break;
+                }
+            }
+
+            if (!garr[gloc]) {
+                gather_locs(&garr[gloc], &gcount[gloc], gloc);
+                gidx[gloc] = 0; /* garr[][0] is hero's spot */
+            }
+            if (!(gtmp & 1)) {
+                /* c=='m' || c=='o' || c=='d' || c=='x') */
+                gidx[gloc] = (gidx[gloc] + 1) % gcount[gloc];
+            } else {
+                /* c=='M' || c=='O' || c=='D' || c=='X') */
+                if (--gidx[gloc] < 0) {
+                    gidx[gloc] = gcount[gloc] - 1;
+                }
+            }
+            cx = garr[gloc][gidx[gloc]].x;
+            cy = garr[gloc][gidx[gloc]].y;
             goto nxtc;
         } else {
             if (!index(quitchars, c)) {
                 char matching[MAXPCHARS];
                 int pass, lo_x, lo_y, hi_x, hi_y, k = 0;
-                (void)memset((genericptr_t)matching, 0, sizeof matching);
-                for (sidx = 1; sidx < MAXPCHARS; sidx++)
-                    if (c == defsyms[sidx].sym || c == (int)showsyms[sidx])
+
+                (void) memset(matching, 0, sizeof matching);
+                /* [0] left as 0 */
+                for (sidx = 1; sidx < MAXPCHARS; sidx++) {
+                    if (is_cmap_door(sidx) ||
+                         is_cmap_wall(sidx) ||
+                         is_cmap_corr(sidx) ||
+                         is_cmap_room(sidx)) {
+                        continue;
+                    }
+                    if (c == defsyms[sidx].sym || c == (int) showsyms[sidx]) {
                         matching[sidx] = (char) ++k;
+                    }
+                }
                 if (k) {
                     for (pass = 0; pass <= 1; pass++) {
                         /* pass 0: just past current pos to lower right;
@@ -803,51 +1011,63 @@ const char *goal;
                             lo_x = (pass == 0 && ty == lo_y) ? cx + 1 : 1;
                             hi_x = (pass == 1 && ty == hi_y) ? cx : COLNO - 1;
                             for (tx = lo_x; tx <= hi_x; tx++) {
-                                /* look at dungeon feature, not at user-visible glyph */
-                                k = back_to_glyph(tx, ty);
-                                /* uninteresting background glyph */
-                                if (glyph_is_cmap(k) &&
-                                    (IS_DOOR(levl[tx][ty].typ) || /* monsters mimicking a door */
-                                     glyph_to_cmap(k) == S_darkroom ||
-                                     glyph_to_cmap(k) == S_room ||
-                                     glyph_to_cmap(k) == S_corr ||
-                                     glyph_to_cmap(k) == S_litcorr)) {
-                                    /* what the user remembers to be at tx,ty */
-                                    k = glyph_at(tx, ty);
+                                /* first, look at what is currently visible
+                                   (might be monster) */
+                                k = glyph_at(tx, ty);
+                                if (glyph_is_cmap(k) && matching[glyph_to_cmap(k)]) {
+                                    goto foundc;
                                 }
-                                /* TODO: - open doors are only matched with '-' */
-                                /* should remembered or seen items be matched? */
-                                if (glyph_is_cmap(k) &&
-                                    matching[glyph_to_cmap(k)] &&
-                                    levl[tx][ty].seenv && /* only if already seen */
-                                    (!IS_WALL(levl[tx][ty].typ) &&
-                                     (levl[tx][ty].typ != SDOOR) &&
-                                     glyph_to_cmap(k) != S_room &&
-                                     glyph_to_cmap(k) != S_corr &&
-                                     glyph_to_cmap(k) != S_litcorr)
-                                    ) {
-                                    cx = tx,  cy = ty;
-                                    if (msg_given) {
-                                        clear_nhwindow(WIN_MESSAGE);
-                                        msg_given = FALSE;
+                                /* next, try glyph that's remembered here
+                                   (might be trap or object) */
+                                if (level.flags.hero_memory &&
+                                    /* !terrainmode: don't move to remembered
+                                       trap or object if not currently shown */
+                                     !iflags.terrainmode) {
+                                    k = levl[tx][ty].glyph;
+                                    if (glyph_is_cmap(k) && matching[glyph_to_cmap(k)]) {
+                                        goto foundc;
                                     }
-                                    goto nxtc;
                                 }
+                                /* last, try actual terrain here (shouldn't
+                                   we be using g.lastseentyp[][] instead?) */
+                                if (levl[tx][ty].seenv) {
+                                    k = back_to_glyph(tx, ty);
+                                    if (glyph_is_cmap(k) && matching[glyph_to_cmap(k)]) {
+                                        goto foundc;
+                                    }
+                                }
+                                continue;
+                            foundc:
+                                cx = tx, cy = ty;
+                                if (msg_given) {
+                                    clear_nhwindow(WIN_MESSAGE);
+                                    msg_given = FALSE;
+                                }
+                                goto nxtc;
                             } /* column */
-                        } /* row */
-                    } /* pass */
+                        }     /* row */
+                    }         /* pass */
                     pline("Can't find dungeon feature '%c'.", c);
                     msg_given = TRUE;
                     goto nxtc;
                 } else {
-                    pline("Unknown direction: '%s' (%s).",
-                          visctrl((char)c),
-                          !force ? "aborted" :
-                          iflags.num_pad ? "use 2468 or ." : "use hjkl or .");
+                    char note[QBUFSZ];
+
+                    if (!force) {
+                        Strcpy(note, "aborted");
+                    } else {
+                        /* hjkl */
+                        Sprintf(note, "use '%c', '%c', '%c', '%c' or '%s'",
+                                Cmd.move_W, Cmd.move_S, Cmd.move_N, Cmd.move_E,
+                                visctrl(Cmd.spkeys[NHKF_GETPOS_PICK]));
+                    }
+                    pline("Unknown direction: '%s' (%s).", visctrl((char) c), note);
                     msg_given = TRUE;
                 } /* k => matching */
-            } /* !quitchars */
-            if (force) goto nxtc;
+            }     /* !quitchars */
+            if (force) {
+                goto nxtc;
+            }
             pline("Done.");
             msg_given = FALSE; /* suppress clear */
             cx = -1;
@@ -855,7 +1075,7 @@ const char *goal;
             result = 0; /* not -1 */
             break;
         }
-nxtc:   ;
+    nxtc:
 #ifdef CLIPPING
         cliparound(cx, cy);
 #endif
@@ -865,10 +1085,19 @@ nxtc:   ;
 #ifdef MAC
     lock_mouse_cursor(FALSE);
 #endif
-    if (msg_given) clear_nhwindow(WIN_MESSAGE);
-    cc->x = cx;
-    cc->y = cy;
-    getpos_freemons();
+    if (msg_given) {
+        clear_nhwindow(WIN_MESSAGE);
+    }
+    ccp->x = cx;
+    ccp->y = cy;
+    for (i = 0; i < NUM_GLOCS; i++) {
+        if (garr[i]) {
+            free(garr[i]);
+        }
+    }
+    getpos_hilitefunc = (void (*)(int)) 0;
+    getpos_getvalid = (boolean (*)(int, int)) 0;
+
     return result;
 }
 

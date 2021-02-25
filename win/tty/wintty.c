@@ -1977,7 +1977,14 @@ struct WinDesc *cw;
                         /* map glyph to character and color */
                         mapglyph(curr->glyph, &character, &glyph_color, &special, 0, 0, 0);
 
-                        print_vt_code(AVTC_GLYPH_START, glyph2tile[curr->glyph]);
+                        /* ugly workaround, needs proper structure */
+                        int glyph = curr->glyph;
+                        if (glyph < 0) {
+                            int x = abs(glyph) % COLNO;
+                            int y = abs(glyph) / COLNO;
+                            glyph = glyph_at(x, y);
+                        }
+                        print_vt_code(AVTC_GLYPH_START, glyph2tile[glyph]);
                         if (glyph_color != NO_COLOR) term_start_color(glyph_color);
 #ifdef UTF8_GLYPHS
                         pututf8char(character);
@@ -2602,13 +2609,29 @@ const int *attributes;
     print_vt_code(AVTC_SELECT_WINDOW, window);
 
     switch(cw->type) {
-    case NHW_MESSAGE:
+    case NHW_MESSAGE: {
         /* really do this later */
 #if defined(USER_SOUNDS) && defined(WIN32CON)
         play_sound_for_message(str);
 #endif
-        update_topl(str);
+        int suppress_history = (attr & ATR_NOHISTORY);
+
+        /* in case we ever support display attributes for topline
+           messages, clear flag mask leaving only display attr */
+        /*attr &= ~(ATR_URGENT | ATR_NOHISTORY);*/
+
+        if (!suppress_history) {
+            /* normal output; add to current top line if room, else flush
+               whatever is there to history and then write this */
+            update_topl(str);
+        } else {
+            /* put anything already on top line into history */
+            remember_topl();
+            /* write to top line without remembering what we're writing */
+            show_topl(str);
+        }
         break;
+    }
 
     case NHW_STATUS:
         ob = &cw->data[cw->cury][j = cw->curx];
