@@ -960,8 +960,11 @@ getpos(coord *ccp, boolean force, const char *goal)
                 if (getpos_menu(&tmpcrd, gloc)) {
                     cx = tmpcrd.x;
                     cy = tmpcrd.y;
+                    goto nxtc;
+                } else {
+                    result = -1;
+                    break;
                 }
-                goto nxtc;
             }
 
             if (!garr[gloc]) {
