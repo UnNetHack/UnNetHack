@@ -3308,9 +3308,7 @@ register char *cmd;
     case NHKF_CLICKLOOK:
         if (iflags.clicklook) {
             flags.move = FALSE;
-#if NEXT_VERSION
             do_look(2, &clicklook_cc);
-#endif
         }
         return;
 

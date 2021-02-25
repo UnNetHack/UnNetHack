@@ -1865,6 +1865,7 @@ E int FDECL(query_attr, (const char *));
 E void FDECL(mhidden_description, (struct monst *, BOOLEAN_P, char *));
 E boolean FDECL(object_from_map, (int,int,int,struct obj **));
 E int FDECL(do_screen_description, (coord, BOOLEAN_P, glyph_t, char *, const char **, struct permonst **));
+extern int do_look(int, coord *);
 E int NDECL(dowhatis);
 E int NDECL(doquickwhatis);
 E int NDECL(doidtrap);
