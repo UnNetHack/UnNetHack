@@ -1337,6 +1337,8 @@ E void FDECL(wallwalk_right, (XCHAR_P, XCHAR_P, SCHAR_P, SCHAR_P, SCHAR_P, int))
 #ifdef ADVENT_CALENDAR
 E boolean NDECL(mk_advcal_portal);
 #endif
+extern void mk_knox_vault(int, int, int, int);
+extern d_level * get_floating_branch(d_level *, branch *);
 
 /* ### mkmap.c ### */
 

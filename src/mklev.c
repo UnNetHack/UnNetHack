@@ -806,6 +806,16 @@ clear_level_structures()
     clear_regions();
 }
 
+/** Create a vault with the magic portal to Fort Ludios. */
+void
+mk_knox_vault(int x, int y, int w, int h)
+{
+    add_room(x, y, x+w, y+h, TRUE, VAULT, FALSE);
+    level.flags.has_vault = 1;
+    fill_room(&rooms[nroom-1], FALSE);
+    mk_knox_portal(x+w, y+h);
+}
+
 STATIC_OVL void
 makelevel()
 {
@@ -931,12 +941,8 @@ makelevel()
         h = 1;
         if (check_room(&vault_x, &w, &vault_y, &h, TRUE)) {
 fill_vault:
-            add_room(vault_x, vault_y, vault_x+w,
-                     vault_y+h, TRUE, VAULT, FALSE);
-            level.flags.has_vault = 1;
+            mk_knox_vault(vault_x, vault_y, w, h);
             ++room_threshold;
-            fill_room(&rooms[nroom - 1], FALSE);
-            mk_knox_portal(vault_x+w, vault_y+h);
             if(!level.flags.noteleport && !rn2(3)) makevtele();
         } else if(rnd_rect() && create_vault()) {
             vault_x = rooms[nroom].lx;
@@ -1948,6 +1954,32 @@ int dist;
     newsym(x, y);
 }
 
+/** Gets the level structure for the source level of the Fort Ludios portal.
+ * @return the d_level structure
+ */
+d_level *
+get_floating_branch(d_level *target, branch *br)
+{
+    extern int n_dgns; /* from dungeon.c */
+    d_level *source;
+    if (on_level(target, &br->end1)) {
+        source = &br->end2;
+    } else {
+        /* disallow branch on a level with one branch already */
+        if (Is_branchlev(&u.uz)) {
+            return NULL;
+        }
+        source = &br->end1;
+    }
+
+    /* Already set. */
+    if (source->dnum < n_dgns) {
+        return NULL;
+    }
+    return source;
+}
+
+
 /*
  * The portal to Ludios is special.  The entrance can only occur within a
  * vault in the main dungeon at a depth greater than 10.  The Ludios branch
@@ -1962,27 +1994,21 @@ xchar x, y;
 {
     extern int n_dgns;      /* from dungeon.c */
     d_level *source;
-    branch *br;
     schar u_depth;
+    branch *br = dungeon_branch("Fort Ludios");
 
-    br = dungeon_branch("Fort Ludios");
-    if (on_level(&knox_level, &br->end1)) {
-        source = &br->end2;
-    } else {
-        /* disallow Knox branch on a level with one branch already */
-        if(Is_branchlev(&u.uz))
-            return;
-        source = &br->end1;
-    }
-
+    source = get_floating_branch(&knox_level, br);
     /* Already set. */
-    if (source->dnum < n_dgns) return;
+    if (!source) {
+        return;
+    }
 
     if (!(u.uz.dnum == oracle_level.dnum        /* in main dungeon */
           && !at_dgn_entrance("The Quest")  /* but not Quest's entry */
           && (u_depth = depth(&u.uz)) > 10  /* beneath 10 */
-          && u_depth < depth(&medusa_level))) /* and above Medusa */
+          && u_depth <= depth(&medusa_level))) { /* and on or above Medusa */
         return;
+    }
 
     /* Adjust source to be current level and re-insert branch. */
     *source = u.uz;
@@ -2069,17 +2095,11 @@ mk_advcal_portal()
     if (made_branch) return FALSE;
 
     br = dungeon_branch("Advent Calendar");
-    if (on_level(&advcal_level, &br->end1)) {
-        source = &br->end2;
-    } else {
-        /* disallow branch on a level with one branch already */
-        if(Is_branchlev(&u.uz))
-            return FALSE;
-        source = &br->end1;
-    }
-
+    source = get_floating_branch(&advcal_level, br);
     /* Already set. */
-    if (source->dnum < n_dgns) return FALSE;
+    if (!source) {
+        return FALSE;
+    }
 
     if (!(u.uz.dnum == oracle_level.dnum        /* in main dungeon */
           && !at_dgn_entrance("The Quest")  /* but not Quest's entry */

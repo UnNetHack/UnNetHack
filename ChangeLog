@@ -46,6 +46,8 @@
 	  - Level with trees have a chance of an additional axe
 	  - Fix pacman level connectivity to the rest of the level
 	  - Remove random secret doors
+	  - Generate Fort Ludios portal on Medusa if it hasn't been generated
+	     already (idea by RojjaCebolla)
 
 	* Sokoban:
 	  - Sokoban's level difficulty is equal to Sokoban's entrance level
