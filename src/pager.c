@@ -10,7 +10,7 @@
 STATIC_DCL boolean FDECL(is_swallow_sym, (int));
 STATIC_DCL int FDECL(append_str, (char *, const char *));
 STATIC_DCL struct permonst * FDECL(lookat, (int, int, char *, char *));
-static void look_all(boolean,boolean);
+static void look_all(boolean, boolean, boolean);
 static void FDECL(do_supplemental_info, (char *, struct permonst *, BOOLEAN_P));
 STATIC_DCL boolean FDECL(help_menu, (int *));
 #ifdef PORT_HELP
@@ -1190,6 +1190,12 @@ do_look(int mode, coord *click_cc)
                 any.a_char = 'O';
                 add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, iflags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
                          "all objects shown on map", MENU_ITEMFLAGS_NONE);
+                any.a_char = 'd';
+                add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, iflags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+                         "nearby dungeon features", MENU_ITEMFLAGS_NONE);
+                any.a_char = 'D';
+                add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, iflags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+                         "all dungeon features shown on map", MENU_ITEMFLAGS_NONE);
             }
             end_menu(win, "What do you want to look at:");
             if (select_menu(win, PICK_ONE, &pick_list) > 0) {
@@ -1256,19 +1262,27 @@ do_look(int mode, coord *click_cc)
             break;
 
         case 'm':
-            look_all(TRUE, TRUE); /* list nearby monsters */
+            look_all(TRUE, TRUE, FALSE); /* list nearby monsters */
             return 0;
 
         case 'M':
-            look_all(FALSE, TRUE); /* list all monsters */
+            look_all(FALSE, TRUE, FALSE); /* list all monsters */
             return 0;
 
         case 'o':
-            look_all(TRUE, FALSE); /* list nearby objects */
+            look_all(TRUE, FALSE, FALSE); /* list nearby objects */
             return 0;
 
         case 'O':
-            look_all(FALSE, FALSE); /* list all objects */
+            look_all(FALSE, FALSE, FALSE); /* list all objects */
+            return 0;
+
+        case 'd':
+            look_all(TRUE, FALSE, TRUE); /* list nearby dungeon features */
+            return 0;
+
+        case 'D':
+            look_all(FALSE, FALSE, TRUE); /* list all dungeon features */
             return 0;
         }
     } else { /* clicklook */
@@ -1548,7 +1562,8 @@ do_look(int mode, coord *click_cc)
 
 static void
 look_all(boolean nearby,  /* True => within BOLTLIM, False => entire map */
-         boolean do_mons) /* True => monsters, False => objects */
+         boolean do_mons, /* True => monsters, False => objects */
+         boolean do_dungeon_features)
 {
     winid win;
     int x, y, lo_x, lo_y, hi_x, hi_y, glyph, count = 0;
@@ -1584,6 +1599,12 @@ look_all(boolean nearby,  /* True => within BOLTLIM, False => entire map */
                     int warnindx = glyph_to_warning(glyph);
 
                     Strcpy(lookbuf, def_warnsyms[warnindx].explanation);
+                    count++;
+                }
+            } else if (do_dungeon_features) {
+                if (glyph_is_cmap(glyph) && (is_cmap_furniture(glyph_to_cmap(glyph)))) {
+                    int indx = glyph_to_cmap(glyph);
+                    Strcpy(lookbuf, defsyms[indx].explanation);
                     count++;
                 }
             } else {
