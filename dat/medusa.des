@@ -7,7 +7,7 @@
 #
 
 LEVEL:"medusa-1"
-FLAGS: noteleport,mazelevel
+FLAGS: noteleport,mazelevel,noflipx
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
@@ -112,7 +112,7 @@ MONSTER:random,random
 MONSTER:random,random
 
 LEVEL:"medusa-2"
-FLAGS: noteleport,mazelevel
+FLAGS: noteleport,mazelevel,noflipx
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
