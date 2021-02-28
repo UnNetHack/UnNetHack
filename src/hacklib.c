@@ -1281,4 +1281,13 @@ strbuf_t *strbuf;
     }
 }
 
+/** swapbits(val, bita, bitb) swaps bit a with bit b in val */
+int
+swapbits(int val, int bita, int bitb)
+{
+    int tmp = ((val >> bita) & 1) ^ ((val >> bitb) & 1);
+
+    return (val ^ ((tmp << bita) | (tmp << bitb)));
+}
+
 /*hacklib.c*/

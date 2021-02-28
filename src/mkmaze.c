@@ -1485,6 +1485,87 @@ coord *cc;
     return;
 }
 
+void
+get_level_extends(int *left, int *top, int *right, int *bottom)
+{
+    int x, y;
+    unsigned typ;
+    struct rm *lev;
+    boolean found, nonwall;
+    int xmin, xmax, ymin, ymax;
+
+    found = nonwall = FALSE;
+    for (xmin = 0; !found && xmin <= COLNO; xmin++) {
+        lev = &levl[xmin][0];
+        for (y = 0; y <= ROWNO-1; y++, lev++) {
+            typ = lev->typ;
+            if (typ != STONE) {
+                found = TRUE;
+                if (!IS_WALL(typ)) {
+                    nonwall = TRUE;
+                }
+            }
+        }
+    }
+    xmin -= (nonwall || !level.flags.is_maze_lev) ? 2 : 1;
+    if (xmin < 0) {
+        xmin = 0;
+    }
+
+    found = nonwall = FALSE;
+    for (xmax = COLNO - 1; !found && xmax >= 0; xmax--) {
+        lev = &levl[xmax][0];
+        for (y = 0; y <= ROWNO - 1; y++, lev++) {
+            typ = lev->typ;
+            if (typ != STONE) {
+                found = TRUE;
+                if (!IS_WALL(typ)) {
+                    nonwall = TRUE;
+                }
+            }
+        }
+    }
+    xmax += (nonwall || !level.flags.is_maze_lev) ? 2 : 1;
+    if (xmax >= COLNO) {
+        xmax = COLNO - 1;
+    }
+
+    found = nonwall = FALSE;
+    for (ymin = 0; !found && ymin <= ROWNO; ymin++) {
+        lev = &levl[xmin][ymin];
+        for (x = xmin; x <= xmax; x++, lev += ROWNO) {
+            typ = lev->typ;
+            if (typ != STONE) {
+                found = TRUE;
+                if (!IS_WALL(typ)) {
+                    nonwall = TRUE;
+                }
+            }
+        }
+    }
+    ymin -= (nonwall || !level.flags.is_maze_lev) ? 2 : 1;
+
+    found = nonwall = FALSE;
+    for (ymax = ROWNO - 1; !found && ymax >= 0; ymax--) {
+        lev = &levl[xmin][ymax];
+        for (x = xmin; x <= xmax; x++, lev += ROWNO) {
+            typ = lev->typ;
+            if (typ != STONE) {
+                found = TRUE;
+                if (!IS_WALL(typ)) {
+                    nonwall = TRUE;
+                }
+            }
+        }
+    }
+    ymax += (nonwall || !level.flags.is_maze_lev) ? 2 : 1;
+
+    *left = xmin;
+    *right = xmax;
+    *top = ymin;
+    *bottom = ymax;
+}
+
 /* put a non-diggable boundary around the initial portion of a level map.
  * assumes that no level will initially put things beyond the isok() range.
  *
@@ -1499,77 +1580,21 @@ void
 bound_digging()
 {
     int x, y;
-    unsigned typ;
-    struct rm *lev;
-    boolean found, nonwall;
     int xmin, xmax, ymin, ymax;
 
-    if(Is_earthlevel(&u.uz)) return; /* everything diggable here */
-
-    found = nonwall = FALSE;
-    for (xmin = 0; !found && xmin <= COLNO; xmin++) {
-        lev = &levl[xmin][0];
-        for (y = 0; y <= ROWNO-1; y++, lev++) {
-            typ = lev->typ;
-            if (typ != STONE) {
-                found = TRUE;
-                if(!IS_WALL(typ)) nonwall = TRUE;
-            }
-        }
+    if (Is_earthlevel(&u.uz)) {
+        return; /* everything diggable here */
     }
-    xmin -= (nonwall || !level.flags.is_maze_lev) ? 2 : 1;
-    if (xmin < 0) xmin = 0;
 
-    found = nonwall = FALSE;
-    for (xmax = COLNO-1; !found && xmax >= 0; xmax--) {
-        lev = &levl[xmax][0];
-        for (y = 0; y <= ROWNO-1; y++, lev++) {
-            typ = lev->typ;
-            if (typ != STONE) {
-                found = TRUE;
-                if(!IS_WALL(typ)) nonwall = TRUE;
-            }
-        }
-    }
-    xmax += (nonwall || !level.flags.is_maze_lev) ? 2 : 1;
-    if (xmax >= COLNO) xmax = COLNO-1;
+    get_level_extends(&xmin, &ymin, &xmax, &ymax);
 
-    found = nonwall = FALSE;
-    for (ymin = 0; !found && ymin <= ROWNO; ymin++) {
-        lev = &levl[xmin][ymin];
-        for (x=xmin; x<=xmax; x++, lev += ROWNO) {
-            typ = lev->typ;
-            if (typ != STONE) {
-                found = TRUE;
-                if(!IS_WALL(typ)) nonwall = TRUE;
-            }
-        }
-    }
-    ymin -= (nonwall || !level.flags.is_maze_lev) ? 2 : 1;
-
-    found = nonwall = FALSE;
-    for (ymax = ROWNO-1; !found && ymax >= 0; ymax--) {
-        lev = &levl[xmin][ymax];
-        for (x = xmin; x <= xmax; x++, lev += ROWNO) {
-            typ = lev->typ;
-            if (typ != STONE) {
-                found = TRUE;
-                if(!IS_WALL(typ)) nonwall = TRUE;
-            }
-        }
-    }
-    ymax += (nonwall || !level.flags.is_maze_lev) ? 2 : 1;
-
-    for (x = 0; x < COLNO; x++)
-        for (y = 0; y < ROWNO; y++)
+    for (x = 0; x < COLNO; x++) {
+        for (y = 0; y < ROWNO; y++) {
             if (y <= ymin || y >= ymax || x <= xmin || x >= xmax) {
-#ifdef DCC30_BUG
-                lev = &levl[x][y];
-                lev->wall_info |= W_NONDIGGABLE;
-#else
                 levl[x][y].wall_info |= W_NONDIGGABLE;
-#endif
             }
+        }
+    }
 }
 
 void

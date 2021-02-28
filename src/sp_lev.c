@@ -531,13 +531,48 @@ struct rm *lev;
     }
 }
 
+static int
+flip_encoded_direction_bits(int flp, int val)
+{
+    /* These depend on xdir[] and ydir[] order */
+    if (flp & 1) {
+        val = swapbits(val, 1, 7);
+        val = swapbits(val, 2, 6);
+        val = swapbits(val, 3, 5);
+    }
+    if (flp & 2) {
+        val = swapbits(val, 1, 3);
+        val = swapbits(val, 0, 4);
+        val = swapbits(val, 7, 5);
+    }
+
+    return val;
+}
+
+#define FlipX(val) ((maxx - (val)) + minx)
+#define FlipY(val) ((maxy - (val)) + miny)
+#define inFlipArea(x,y) \
+    ((x) >= minx && (x) <= maxx && (y) >= miny && (y) <= maxy)
+#define Flip_coord(cc) \
+    do {                                            \
+        if ((cc).x && inFlipArea((cc).x, (cc).y)) { \
+            if (flp & 1)                            \
+                (cc).y = FlipY((cc).y);             \
+            if (flp & 2)                            \
+                (cc).x = FlipX((cc).x);             \
+        }                                           \
+    } while (0)
+
+extern timer_element *timer_base;
+
+/**
+ * Transpose top with bottom or left with right or both; sometimes called
+   for new special levels */
 void
 flip_level(int flp)
 {
-    int x2 = COLNO-1;
-    int y2 = ROWNO-1;
-
     int x, y, i;
+    int minx, miny, maxx, maxy;
 
     struct rm trm;
 
@@ -546,102 +581,146 @@ flip_level(int flp)
     struct monst *mtmp;
     struct engr *etmp;
     struct mkroom *sroom;
+    timer_element *timer;
+
+    /* nothing to do unless (flp & 1) or (flp & 2) or both */
+    if ((flp & 3) == 0) {
+        return;
+    }
+
+    get_level_extends(&minx, &miny, &maxx, &maxy);
+    /* get_level_extends() returns -1,-1 to COLNO,ROWNO at max */
+    if (miny < 0) {
+        miny = 0;
+    }
+    if (minx < 1) {
+        minx = 1;
+    }
+    if (maxx >= COLNO) {
+        maxx = (COLNO - 1);
+    }
+    if (maxy >= ROWNO) {
+        maxy = (ROWNO - 1);
+    }
 
     /* stairs and ladders */
     if (flp & 1) {
-        yupstair = y2 - yupstair;
-        ydnstair = y2 - ydnstair;
-        yupladder = y2 - yupladder;
-        ydnladder = y2 - ydnladder;
+        yupstair = FlipY(yupstair);
+        ydnstair = FlipY(ydnstair);
+        yupladder = FlipY(yupladder);
+        ydnladder = FlipY(ydnladder);
     }
     if (flp & 2) {
-        xupstair = x2 - xupstair;
-        xdnstair = x2 - xdnstair;
-        xupladder = x2 - xupladder;
-        xdnladder = x2 - xdnladder;
+        xupstair = FlipX(xupstair);
+        xdnstair = FlipX(xdnstair);
+        xupladder = FlipX(xupladder);
+        xdnladder = FlipX(xdnladder);
     }
 
     /* traps */
     for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap) {
+        if (!inFlipArea(ttmp->tx, ttmp->ty)) {
+            continue;
+        }
         if (flp & 1) {
-            ttmp->ty = y2 - ttmp->ty;
+            ttmp->ty = FlipY(ttmp->ty);
             if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {
-                ttmp->launch.y = y2 - ttmp->launch.y;
-                ttmp->launch2.y = y2 - ttmp->launch2.y;
+                ttmp->launch.y = FlipY(ttmp->launch.y);
+                ttmp->launch2.y = FlipY(ttmp->launch2.y);
+            } else if (is_pit(ttmp->ttyp) && ttmp->conjoined) {
+                ttmp->conjoined = flip_encoded_direction_bits(flp, ttmp->conjoined);
             }
         }
         if (flp & 2) {
-            ttmp->tx = x2 - ttmp->tx;
+            ttmp->tx = FlipX(ttmp->tx);
             if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {
-                ttmp->launch.x = x2 - ttmp->launch.x;
-                ttmp->launch2.x = x2 - ttmp->launch2.x;
+                ttmp->launch.x = FlipX(ttmp->launch.x);
+                ttmp->launch2.x = FlipX(ttmp->launch2.x);
+            } else if (is_pit(ttmp->ttyp) && ttmp->conjoined) {
+                ttmp->conjoined = flip_encoded_direction_bits(flp, ttmp->conjoined);
             }
         }
     }
 
     /* objects */
     for (otmp = fobj; otmp; otmp = otmp->nobj) {
-        if (flp & 1)
-            otmp->oy = y2 - otmp->oy;
-        if (flp & 2)
-            otmp->ox = x2 - otmp->ox;
+        if (!inFlipArea(otmp->ox, otmp->oy)) {
+            continue;
+        }
+        if (flp & 1) {
+            otmp->oy = FlipY(otmp->oy);
+        }
+        if (flp & 2) {
+            otmp->ox = FlipX(otmp->ox);
+        }
     }
 
     /* buried objects */
     for (otmp = level.buriedobjlist; otmp; otmp = otmp->nobj) {
-        if (flp & 1)
-            otmp->oy = y2 - otmp->oy;
-        if (flp & 2)
-            otmp->ox = x2 - otmp->ox;
+        if (!inFlipArea(otmp->ox, otmp->oy)) {
+            continue;
+        }
+        if (flp & 1) {
+            otmp->oy = FlipY(otmp->oy);
+        }
+        if (flp & 2) {
+            otmp->ox = FlipX(otmp->ox);
+        }
     }
 
     /* monsters */
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (mtmp->isgd && mtmp->mx == 0) {
+            continue;
+        }
+        /* skip the occasional earth elemental outside the flip area */
+        if (!inFlipArea(mtmp->mx, mtmp->my)) {
+            continue;
+        }
         if (flp & 1) {
-            mtmp->my = y2 - mtmp->my;
-            if (mtmp->ispriest)
-                EPRI(mtmp)->shrpos.y = y2 - EPRI(mtmp)->shrpos.y;
-            else if (mtmp->isshk) {
-                ESHK(mtmp)->shk.y = y2 - ESHK(mtmp)->shk.y;
-                ESHK(mtmp)->shd.y = y2 - ESHK(mtmp)->shd.y;
-            } else if (mtmp->wormno) {
-                flip_worm_segs_vertical(mtmp, y2);
-            }
+            mtmp->my = FlipY(mtmp->my);
         }
         if (flp & 2) {
-            mtmp->mx = x2 - mtmp->mx;
-            if (mtmp->ispriest)
-                EPRI(mtmp)->shrpos.x = x2 - EPRI(mtmp)->shrpos.x;
-            else if (mtmp->isshk) {
-                ESHK(mtmp)->shk.x = x2 - ESHK(mtmp)->shk.x;
-                ESHK(mtmp)->shd.x = x2 - ESHK(mtmp)->shd.x;
-            } else if (mtmp->wormno) {
-                flip_worm_segs_horizontal(mtmp, x2);
+            mtmp->mx = FlipX(mtmp->mx);
+        }
+        if (mtmp->ispriest) {
+            Flip_coord(EPRI(mtmp)->shrpos);
+        } else if (mtmp->isshk) {
+            Flip_coord(ESHK(mtmp)->shk); /* shk's preferred spot */
+            Flip_coord(ESHK(mtmp)->shd); /* shop door */
+        } else if (mtmp->wormno) {
+            if (flp & 1) {
+                flip_worm_segs_vertical(mtmp, miny, maxy);
+            }
+            if (flp & 2) {
+                flip_worm_segs_horizontal(mtmp, minx, maxx);
             }
         }
     }
 
     /* engravings */
     for (etmp = head_engr; etmp; etmp = etmp->nxt_engr) {
-        if (flp & 1)
-            etmp->engr_y = y2 - etmp->engr_y;
-        if (flp & 2)
-            etmp->engr_x = x2 - etmp->engr_x;
+        if (flp & 1) {
+            etmp->engr_y = FlipY(etmp->engr_y);
+        }
+        if (flp & 2) {
+            etmp->engr_x = FlipX(etmp->engr_x);
+        }
     }
 
-    /* regions */
+    /* level (teleport) regions */
     for (i = 0; i < num_lregions; i++) {
         if (flp & 1) {
-            lregions[i].inarea.y1 = y2 - lregions[i].inarea.y1;
-            lregions[i].inarea.y2 = y2 - lregions[i].inarea.y2;
+            lregions[i].inarea.y1 = FlipY(lregions[i].inarea.y1);
+            lregions[i].inarea.y2 = FlipY(lregions[i].inarea.y2);
             if (lregions[i].inarea.y1 > lregions[i].inarea.y2) {
                 int tmp = lregions[i].inarea.y1;
                 lregions[i].inarea.y1 = lregions[i].inarea.y2;
                 lregions[i].inarea.y2 = tmp;
             }
 
-            lregions[i].delarea.y1 = y2 - lregions[i].delarea.y1;
-            lregions[i].delarea.y2 = y2 - lregions[i].delarea.y2;
+            lregions[i].delarea.y1 = FlipY(lregions[i].delarea.y1);
+            lregions[i].delarea.y2 = FlipY(lregions[i].delarea.y2);
             if (lregions[i].delarea.y1 > lregions[i].delarea.y2) {
                 int tmp = lregions[i].delarea.y1;
                 lregions[i].delarea.y1 = lregions[i].delarea.y2;
@@ -649,16 +728,16 @@ flip_level(int flp)
             }
         }
         if (flp & 2) {
-            lregions[i].inarea.x1 = x2 - lregions[i].inarea.x1;
-            lregions[i].inarea.x2 = x2 - lregions[i].inarea.x2;
+            lregions[i].inarea.x1 = FlipX(lregions[i].inarea.x1);
+            lregions[i].inarea.x2 = FlipX(lregions[i].inarea.x2);
             if (lregions[i].inarea.x1 > lregions[i].inarea.x2) {
                 int tmp = lregions[i].inarea.x1;
                 lregions[i].inarea.x1 = lregions[i].inarea.x2;
                 lregions[i].inarea.x2 = tmp;
             }
 
-            lregions[i].delarea.x1 = x2 - lregions[i].delarea.x1;
-            lregions[i].delarea.x2 = x2 - lregions[i].delarea.x2;
+            lregions[i].delarea.x1 = FlipX(lregions[i].delarea.x1);
+            lregions[i].delarea.x2 = FlipX(lregions[i].delarea.x2);
             if (lregions[i].delarea.x1 > lregions[i].delarea.x2) {
                 int tmp = lregions[i].delarea.x1;
                 lregions[i].delarea.x1 = lregions[i].delarea.x2;
@@ -668,12 +747,14 @@ flip_level(int flp)
     }
 
     /* rooms */
-    for(sroom = &rooms[0]; ; sroom++) {
-        if (sroom->hx < 0) break;
+    for (sroom = &rooms[0]; ; sroom++) {
+        if (sroom->hx < 0) {
+            break;
+        }
 
         if (flp & 1) {
-            sroom->ly = y2 - sroom->ly;
-            sroom->hy = y2 - sroom->hy;
+            sroom->ly = FlipY(sroom->ly);
+            sroom->hy = FlipY(sroom->hy);
             if (sroom->ly > sroom->hy) {
                 int tmp = sroom->ly;
                 sroom->ly = sroom->hy;
@@ -681,8 +762,8 @@ flip_level(int flp)
             }
         }
         if (flp & 2) {
-            sroom->lx = x2 - sroom->lx;
-            sroom->hx = x2 - sroom->hx;
+            sroom->lx = FlipX(sroom->lx);
+            sroom->hx = FlipX(sroom->hx);
             if (sroom->lx > sroom->hx) {
                 int tmp = sroom->lx;
                 sroom->lx = sroom->hx;
@@ -693,9 +774,10 @@ flip_level(int flp)
         if (sroom->nsubrooms)
             for (i = 0; i < sroom->nsubrooms; i++) {
                 struct mkroom *rroom = sroom->sbrooms[i];
+
                 if (flp & 1) {
-                    rroom->ly = y2 - rroom->ly;
-                    rroom->hy = y2 - rroom->hy;
+                    rroom->ly = FlipY(rroom->ly);
+                    rroom->hy = FlipY(rroom->hy);
                     if (rroom->ly > rroom->hy) {
                         int tmp = rroom->ly;
                         rroom->ly = rroom->hy;
@@ -703,8 +785,8 @@ flip_level(int flp)
                     }
                 }
                 if (flp & 2) {
-                    rroom->lx = x2 - rroom->lx;
-                    rroom->hx = x2 - rroom->hx;
+                    rroom->lx = FlipX(rroom->lx);
+                    rroom->hx = FlipX(rroom->hx);
                     if (rroom->lx > rroom->hx) {
                         int tmp = rroom->lx;
                         rroom->lx = rroom->hx;
@@ -716,55 +798,73 @@ flip_level(int flp)
 
     /* doors */
     for (i = 0; i < doorindex; i++) {
-        if (flp & 1)
-            doors[i].y = y2 - doors[i].y;
-        if (flp & 2)
-            doors[i].x = x2 - doors[i].x;
+        Flip_coord(doors[i]);
     }
 
     /* the map */
     if (flp & 1) {
-        for (x = 0; x <= x2; x++)
-            for (y = 0; y <= (y2 / 2); y++) {
+        for (x = minx; x <= maxx; x++) {
+            for (y = miny; y < (miny + ((maxy - miny + 1) / 2)); y++) {
+                int ny = FlipY(y);
 
                 flip_drawbridge_vertical(&levl[x][y]);
-                flip_drawbridge_vertical(&levl[x][y2-y]);
+                flip_drawbridge_vertical(&levl[x][ny]);
 
                 trm = levl[x][y];
-                levl[x][y] = levl[x][y2-y];
-                levl[x][y2-y] = trm;
+                levl[x][y] = levl[x][ny];
+                levl[x][ny] = trm;
 
                 otmp = level.objects[x][y];
-                level.objects[x][y] = level.objects[x][y2-y];
-                level.objects[x][y2-y] = otmp;
+                level.objects[x][y] = level.objects[x][ny];
+                level.objects[x][ny] = otmp;
 
                 mtmp = level.monsters[x][y];
-                level.monsters[x][y] = level.monsters[x][y2-y];
-                level.monsters[x][y2-y] = mtmp;
+                level.monsters[x][y] = level.monsters[x][ny];
+                level.monsters[x][ny] = mtmp;
             }
+        }
     }
     if (flp & 2) {
-        for (x = 0; x <= (x2 / 2); x++)
-            for (y = 0; y <= y2; y++) {
+        for (x = minx; x < (minx + ((maxx - minx + 1) / 2)); x++) {
+            for (y = miny; y <= maxy; y++) {
+                int nx = FlipX(x);
 
                 flip_drawbridge_horizontal(&levl[x][y]);
-                flip_drawbridge_horizontal(&levl[x2-x][y]);
+                flip_drawbridge_horizontal(&levl[nx][y]);
 
                 trm = levl[x][y];
-                levl[x][y] = levl[x2-x][y];
-                levl[x2-x][y] = trm;
+                levl[x][y] = levl[nx][y];
+                levl[nx][y] = trm;
 
                 otmp = level.objects[x][y];
-                level.objects[x][y] = level.objects[x2-x][y];
-                level.objects[x2-x][y] = otmp;
+                level.objects[x][y] = level.objects[nx][y];
+                level.objects[nx][y] = otmp;
 
                 mtmp = level.monsters[x][y];
-                level.monsters[x][y] = level.monsters[x2-x][y];
-                level.monsters[x2-x][y] = mtmp;
+                level.monsters[x][y] = level.monsters[nx][y];
+                level.monsters[nx][y] = mtmp;
             }
+        }
+    }
+
+    /* timed effects */
+    for (timer = timer_base; timer; timer = timer->next) {
+        if (timer->func_index == MELT_ICE_AWAY) {
+            long ty = timer->arg.a_long & 0xffff;
+            long tx = (timer->arg.a_long >> 16) & 0xffff;
+
+            if (flp & 1) {
+                ty = FlipY(ty);
+            }
+            if (flp & 2) {
+                tx = FlipX(tx);
+            }
+            timer->arg.a_long = ((tx << 16) | ty);
+        }
     }
 
     wall_extends(1, 0, COLNO-1, ROWNO-1);
+    vision_reset();
 }
 
 void
@@ -778,7 +878,9 @@ flip_level_rnd(int flp)
      * in the wizard's tower because of a bug in level flipping. */
     if (On_W_tower_level(&u.uz)) { flp &= 1; }
 
-    flip_level(c);
+    if (c) {
+        flip_level(c);
+    }
 }
 
 /*

@@ -1009,6 +1009,7 @@ E void FDECL(strbuf_append, (strbuf_t *, const char *));
 E void FDECL(strbuf_reserve, (strbuf_t *, int));
 E void FDECL(strbuf_empty, (strbuf_t *));
 E void FDECL(strbuf_nl_to_crlf, (strbuf_t *));
+extern int swapbits(int, int, int);
 
 /* ### invent.c ### */
 
@@ -1352,6 +1353,7 @@ E void FDECL(wall_extends, (int, int, int, int));
 E void FDECL(walkfrom, (int, int, SCHAR_P));
 E void FDECL(makemaz, (const char *));
 E void FDECL(mazexy, (coord *));
+extern void get_level_extends(int *, int *, int *, int *);
 E void NDECL(bound_digging);
 E void FDECL(mkportal, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
 E boolean FDECL(bad_location, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
@@ -2933,8 +2935,8 @@ E int FDECL(size_wseg, (struct monst *));
 E int FDECL(count_wsegs, (struct monst *));
 E boolean FDECL(worm_known, (struct monst *));
 E int FDECL(wseg_at, (struct monst *, int, int));
-E void FDECL(flip_worm_segs_vertical, (struct monst *, int));
-E void FDECL(flip_worm_segs_horizontal, (struct monst *, int));
+extern void flip_worm_segs_vertical(struct monst *, int, int);
+extern void flip_worm_segs_horizontal(struct monst *, int, int);
 
 /* ### worn.c ### */
 
