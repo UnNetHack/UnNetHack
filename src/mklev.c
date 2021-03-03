@@ -1401,20 +1401,22 @@ coord *mp;
     if (nroom == 0) {
         mazexy(mp); /* already verifies location */
     } else {
-        /* not perfect - there may be only one stairway */
-        if(nroom > 2) {
-            int tryct = 0;
+        int tryct = 0;
+        boolean good_room;
 
-            do
-                croom = &rooms[rn2(nroom)];
-            while((croom == dnstairs_room || croom == upstairs_room ||
-                   croom->rtype != OROOM) && (++tryct < 100));
-        } else
+        /* search for an ideal place */
+        while (++tryct < 100) {
             croom = &rooms[rn2(nroom)];
 
-        if (!somexyspace(croom, mp, 2)) {
-            if (!somexyspace(croom, mp, 0))
-                impossible("can't place branch!");
+            good_room = croom != dnstairs_room && croom != upstairs_room && croom->rtype == OROOM;
+            if (good_room && (somexyspace(croom, mp, 2) || somexyspace(croom, mp, 0))) {
+                return croom;
+            }
+        }
+
+        /* last effort to place the stairs */
+        if (!somexyspace(croom, mp, 2) && !somexyspace(croom, mp, 0)) {
+            impossible("can't place branch!");
         }
     }
     return croom;
