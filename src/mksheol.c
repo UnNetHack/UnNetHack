@@ -513,12 +513,19 @@ at_middle(void) {
 }
 
 static void
-mkopensheol(void) {
+mkopensheol(void)
+{
     /*  This one's simple. */
+    int num_points = 300;
+    int tries = 0;
 again:
     do {
-        init_level_base_voronoi(opentyps, 10, 300);
-    } while(verify_stairs_place() != STAT_STAIRSOK);
+        init_level_base_voronoi(opentyps, 10, num_points);
+    } while (verify_stairs_place() != STAT_STAIRSOK);
+    tries++;
+    if (tries > 100 && num_points > 100) {
+        num_points--;
+    }
 
     finalize_map();
 
