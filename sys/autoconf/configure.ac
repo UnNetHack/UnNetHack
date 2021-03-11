@@ -142,8 +142,8 @@ if test "$enable_tty_graphics" != "no"; then
         dnl  ----- Check for tparm in curses
         LIBS=
         AC_CHECK_HEADERS(ncurses.h curses.h termcap.h)
-        AC_SEARCH_LIBS([tparm], [ncurses curses tinfo], AC_DEFINE(HAVE_TPARM, 1, [Define this if you have the tparm function in an included lib.]))
-        TERMLIB_VARIANTS="ncurses curses tinfo termlib termcap terminfo"
+        AC_SEARCH_LIBS([tparm], [ncursesw ncurses curses tinfo], AC_DEFINE(HAVE_TPARM, 1, [Define this if you have the tparm function in an included lib.]))
+        TERMLIB_VARIANTS="ncursesw ncurses curses tinfo termlib termcap terminfo"
         AC_SEARCH_LIBS([has_colors], ${TERMLIB_VARIANTS},
                      [WINTTYLIB="${LIBS}"
                       WINSRC="${WINSRC} \$(WINTTYSRC)"
