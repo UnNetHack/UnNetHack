@@ -542,7 +542,7 @@ short otyp;
         Strcat(buf, str);                   \
     }
 
-    Sprintf(buf, "Object lookup for \"%s\":", safe_typename(otyp));
+    Sprintf(buf, "Object lookup for \"%s\":", simple_typename(otyp));
     putstr(datawin, ATR_BOLD, buf);
     OBJPUTSTR("");
 
