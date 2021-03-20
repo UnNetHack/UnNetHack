@@ -5668,7 +5668,7 @@ return tparm ();
   return 0;
 }
 _ACEOF
-for ac_lib in '' ncursesw ncurses curses tinfo
+for ac_lib in '' ncursesw ncurses curses tinfow tinfo
 do
   if test -z "$ac_lib"; then
     ac_res="none required"
@@ -5707,7 +5707,8 @@ printf "%s\n" "#define HAVE_TPARM 1" >>confdefs.h
 
 fi
 
-        TERMLIB_VARIANTS="ncursesw ncurses curses tinfo termlib termcap terminfo"
+        TERMLIB_VARIANTS="ncursesw ncurses curses tinfow tinfo termlib termcap terminfo"
+
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for library containing has_colors" >&5
 printf %s "checking for library containing has_colors... " >&6; }
 if test ${ac_cv_search_has_colors+y}
@@ -5832,7 +5833,7 @@ return tparm ();
   return 0;
 }
 _ACEOF
-for ac_lib in '' ncurses curses tinfo
+for ac_lib in '' ncursesw ncurses curses tinfow tinfo
 do
   if test -z "$ac_lib"; then
     ac_res="none required"
@@ -5871,7 +5872,7 @@ printf "%s\n" "#define HAVE_TPARM 1" >>confdefs.h
 
 fi
 
-    CURSES_VARIANTS="ncurses curses tinfo"
+    CURSES_VARIANTS="ncursesw ncurses curses tinfow tinfo"
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for library containing has_colors" >&5
 printf %s "checking for library containing has_colors... " >&6; }
 if test ${ac_cv_search_has_colors+y}
