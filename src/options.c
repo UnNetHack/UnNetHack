@@ -30,10 +30,6 @@ static boolean illegal_menu_cmd_key(CHAR_P);
 extern int curses_read_attrs(char *attrs);
 #endif
 
-#ifdef UTF8_GRAPHICS
-extern int supports_utf8;
-#endif
-
 #define config_error_add raw_printf
 
 enum { optn_silenterr = -1, optn_err = 0, optn_ok = 1 };
@@ -942,7 +938,7 @@ initoptions()
 
     /* set default characters */
 #ifdef UTF8_GLYPHS
-    if (supports_utf8) {
+    if (iflags.supports_utf8) {
         switch_graphics(UTF8_GRAPHICS);
     } else {
         switch_graphics(ASCII_GRAPHICS);

@@ -5804,6 +5804,12 @@ then :
   printf "%s\n" "#define HAVE_TERMCAP_H 1" >>confdefs.h
 
 fi
+ac_fn_c_check_header_compile "$LINENO" "locale.h" "ac_cv_header_locale_h" "$ac_includes_default"
+if test "x$ac_cv_header_locale_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_LOCALE_H 1" >>confdefs.h
+
+fi
 
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for library containing tparm" >&5
 printf %s "checking for library containing tparm... " >&6; }

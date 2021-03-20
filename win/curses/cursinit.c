@@ -936,6 +936,10 @@ curses_init_options()
        options.c in case the game is compiled with both tty and curses. */
     if (iflags.IBMgraphics) {
         switch_graphics(IBM_GRAPHICS);
+#ifdef HAVE_LOCALE_H
+    } else if (iflags.UTF8graphics && iflags.supports_utf8) {
+        switch_graphics(UTF8_GRAPHICS);
+#endif
     } else if (iflags.DECgraphics || iflags.UTF8graphics || iflags.cursesgraphics) {
         switch_graphics(CURS_GRAPHICS);
     } else {

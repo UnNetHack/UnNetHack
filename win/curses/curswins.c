@@ -557,6 +557,30 @@ is_main_window(winid wid)
     }
 }
 
+static int
+wpututf8char(WINDOW *win, int y, int x, glyph_t c)
+{
+    if (c < 0x80) {
+        return mvwprintw(win, y, x, "%c", c);
+    } else if(c < 0x800) {
+        return mvwprintw(win, y, x, "%c%c",
+                         0xC0 | (c >> 6),
+                         0x80 | (c & 0x3F));
+    } else if (c < 0x10000) {
+        return mvwprintw(win, y, x, "%c%c%c",
+                         0xE0 | (c >> 12),
+                         0x80 | (c >>  6 & 0x3F),
+                         0x80 | (c & 0x3F));
+    } else if (c < 0x200000) {
+        return mvwprintw(win, y, x, "%c%c%c%c",
+                         0xF0 | (c >> 18),
+                         0x80 | (c >> 12 & 0x3F),
+                         0x80 | (c >>  6 & 0x3F),
+                         0x80 | (c & 0x3F));
+    }
+
+    return 0;
+}
 
 /* Unconditionally write a single character to a window at the given
 coordinates without a refresh.  Currently only used for the map. */
@@ -565,10 +589,18 @@ static void
 write_char(WINDOW * win, int x, int y, nethack_char nch)
 {
     curses_toggle_color_attr(win, nch.color, nch.attr, ON);
+#ifdef UTF8_GLYPHS
+    if (iflags.UTF8graphics) {
+        wpututf8char(win, y, x, nch.ch);
+    } else {
+#endif
 #ifdef PDCURSES
-    mvwaddrawch(win, y, x, nch.ch);
+        mvwaddrawch(win, y, x, nch.ch);
 #else
-    mvwaddch(win, y, x, nch.ch);
+        mvwaddch(win, y, x, nch.ch);
+#endif
+#ifdef UTF8_GLYPHS
+    }
 #endif
     curses_toggle_color_attr(win, nch.color, nch.attr, OFF);
 }

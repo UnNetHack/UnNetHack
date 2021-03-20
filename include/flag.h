@@ -267,6 +267,7 @@ struct instance_flags {
     boolean echo;           /* 1 to echo characters */
     boolean IBMgraphics;    /* use IBM extended character set */
     boolean UTF8graphics;   /* use UTF-8 characters */
+    int supports_utf8;      /* if the terminal supports utf8 */
     unsigned msg_history;   /* hint: # of top lines to save */
     int getpos_coords;      /* show coordinates when getting cursor position */
     boolean num_pad;        /* use numbers for movement commands */

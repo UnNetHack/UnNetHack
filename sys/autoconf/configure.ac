@@ -168,7 +168,7 @@ WINCURSESLIB=
 if test "$enable_curses_graphics" != "no"; then
     # For curses, determine the curses lib
     LIBS=
-    AC_CHECK_HEADERS(ncurses.h curses.h termcap.h)
+    AC_CHECK_HEADERS(ncurses.h curses.h termcap.h locale.h)
     AC_SEARCH_LIBS([tparm], [ncursesw ncurses curses tinfow tinfo], AC_DEFINE(HAVE_TPARM, 1, [Define this if you have the tparm function in an included lib.]))
     CURSES_VARIANTS="ncursesw ncurses curses tinfow tinfo"
     AC_SEARCH_LIBS([has_colors], ${CURSES_VARIANTS},

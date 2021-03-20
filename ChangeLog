@@ -69,6 +69,7 @@
 	  - Give feedback if lamps or lanterns are full after charging
 	  - Show "empty" on known empty lamps and lanterns
 	  - Wallclock and play time duration on status line
+	  - Support UTF8graphics on curses
 
 	* skill changes:
 	  - Allow convicts to become skilled in broadsword (reported by RojjaCebolla)

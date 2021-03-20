@@ -452,7 +452,6 @@ error VA_DECL(const char *,s)
 #endif /* !__begui__ */
 
 #ifdef UTF8_GLYPHS
-int supports_utf8=0;
 void
 check_utf8_console()
 {
@@ -485,7 +484,7 @@ check_utf8_console()
             /* column == 3 means UTF-8 is supported,
              * non-supporting terminals will report the cursor position
              * in column 5 */
-            supports_utf8 = c == '3' ? TRUE : FALSE;
+            iflags.supports_utf8 = c == '3' ? TRUE : FALSE;
 
             /* disable read timeout */
             raw.c_cc[VTIME] = 0;
