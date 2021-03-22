@@ -559,10 +559,16 @@ doextlist()
 }
 
 #if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
-#define MAX_EXT_CMD 50      /* Change if we ever have > 50 ext cmds */
+#define MAX_EXT_CMD 200 /* Change if we ever have more ext cmds */
 /*
- * This is currently used only by the tty port and is
- * controlled via runtime option 'extmenu'
+ * This is currently used only by the tty interface and is
+ * controlled via runtime option 'extmenu'.  (Most other interfaces
+ * already use a menu all the time for extended commands.)
+ *
+ * ``# ?'' is counted towards the limit of the number of commands,
+ * so we actually support MAX_EXT_CMD-1 "real" extended commands.
+ *
+ * Here after # - now show pick-list of possible commands.
  */
 int
 extcmd_via_menu()   /* here after # - now show pick-list of possible commands */
@@ -570,57 +576,74 @@ extcmd_via_menu()   /* here after # - now show pick-list of possible commands */
     const struct ext_func_tab *efp;
     menu_item *pick_list = (menu_item *)0;
     winid win;
-    anything any;
-    const struct ext_func_tab *choices[MAX_EXT_CMD];
+    anything any = { 0 };
+    const struct ext_func_tab *choices[MAX_EXT_CMD + 1];
     char buf[BUFSZ];
     char cbuf[QBUFSZ], prompt[QBUFSZ], fmtstr[20];
     int i, n, nchoices, acount;
-    int ret,  biggest;
+    int ret, len, biggest;
     int accelerator, prevaccelerator;
     int matchlevel = 0;
+    boolean wastoolong, one_per_line;
 
     ret = 0;
     cbuf[0] = '\0';
     biggest = 0;
     while (!ret) {
         i = n = 0;
-        accelerator = 0;
         any.a_void = 0;
         /* populate choices */
-        for(efp = extcmdlist; efp->ef_txt; efp++) {
+        for (efp = extcmdlist; efp->ef_txt; efp++) {
+            if ((efp->flags & CMD_NOT_AVAILABLE) ||
+                !(efp->flags & AUTOCOMPLETE) ||
+                (!wizard && (efp->flags & WIZMODECMD))) {
+                continue;
+            }
             if (!matchlevel || !strncmp(efp->ef_txt, cbuf, matchlevel)) {
-                choices[i++] = efp;
-                if ((int)strlen(efp->ef_desc) > biggest) {
-                    biggest = strlen(efp->ef_desc);
-                    Sprintf(fmtstr, "%%-%ds", biggest + 15);
+                choices[i] = efp;
+                if ((len = (int) strlen(efp->ef_desc)) > biggest) {
+                    biggest = len;
                 }
-                if (i >= MAX_EXT_CMD - 2) {
-                    warning("Exceeded %d extended commands in doextcmd() menu",
-                            MAX_EXT_CMD - 2);
-                    return 0;
+                if (++i > MAX_EXT_CMD) {
+                    warning("Exceeded %d extended commands in doextcmd() menu; 'extmenu' disabled.",
+                            MAX_EXT_CMD);
+                    iflags.extmenu = 0;
+                    return -1;
                 }
             }
         }
         choices[i] = (struct ext_func_tab *)0;
         nchoices = i;
         /* if we're down to one, we have our selection so get out of here */
-        if (nchoices == 1) {
-            for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++)
-                if (!strncmpi(extcmdlist[i].ef_txt, cbuf, matchlevel)) {
-                    ret = i;
-                    break;
-                }
+        if (nchoices <= 1) {
+            ret = (nchoices == 1) ? (int) (choices[0] - extcmdlist) : -1;
             break;
         }
 
         /* otherwise... */
         win = create_nhwindow(NHW_MENU);
         start_menu(win);
-        prevaccelerator = 0;
+        Sprintf(fmtstr, "%%-%ds", biggest + 15);
+        prompt[0] = '\0';
+        wastoolong = FALSE; /* True => had to wrap due to line width
+                             * ('w' in wizard mode) */
+        /* -3: two line menu header, 1 line menu footer (for prompt) */
+        one_per_line = (nchoices < ROWNO - 3);
+        accelerator = prevaccelerator = 0;
         acount = 0;
-        for(i = 0; choices[i]; ++i) {
+        for (i = 0; choices[i]; ++i) {
             accelerator = choices[i]->ef_txt[matchlevel];
-            if (accelerator != prevaccelerator || nchoices < (ROWNO - 3)) {
+            if (accelerator != prevaccelerator || one_per_line) {
+                wastoolong = FALSE;
+            }
+            if (accelerator != prevaccelerator ||
+                one_per_line ||
+                (acount >= 2 &&
+                    /* +4: + sizeof " or " - sizeof "" */
+                     (strlen(prompt) + 4 + strlen(choices[i]->ef_txt)
+                      /* -6: enough room for 1 space left margin
+                       *   + "%c - " menu selector + 1 space right margin */
+                      >= min(sizeof prompt, COLNO - 6)))) {
                 if (acount) {
                     /* flush the extended commands for that letter already in buf */
                     Sprintf(buf, fmtstr, prompt);
@@ -628,14 +651,21 @@ extcmd_via_menu()   /* here after # - now show pick-list of possible commands */
                     add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, any.a_char, 0,
                              ATR_NONE, buf, FALSE);
                     acount = 0;
+                    if (!(accelerator != prevaccelerator || one_per_line)) {
+                        wastoolong = TRUE;
+                    }
                 }
             }
             prevaccelerator = accelerator;
-            if (!acount || nchoices < (ROWNO - 3)) {
-                Sprintf(prompt, "%s [%s]", choices[i]->ef_txt,
+            if (!acount || one_per_line) {
+                Sprintf(prompt, "%s%s [%s]",
+                        wastoolong ? "or " : "",
+                        choices[i]->ef_txt,
                         choices[i]->ef_desc);
             } else if (acount == 1) {
-                Sprintf(prompt, "%s or %s", choices[i-1]->ef_txt,
+                Sprintf(prompt, "%s%s or %s",
+                        wastoolong ? "or " : "",
+                        choices[i - 1]->ef_txt,
                         choices[i]->ef_txt);
             } else {
                 Strcat(prompt, " or ");
@@ -653,7 +683,7 @@ extcmd_via_menu()   /* here after # - now show pick-list of possible commands */
         end_menu(win, prompt);
         n = select_menu(win, PICK_ONE, &pick_list);
         destroy_nhwindow(win);
-        if (n==1) {
+        if (n == 1) {
             if (matchlevel > (QBUFSZ - 2)) {
                 free((genericptr_t)pick_list);
 #ifdef DEBUG
@@ -670,8 +700,9 @@ extcmd_via_menu()   /* here after # - now show pick-list of possible commands */
             if (matchlevel) {
                 ret = 0;
                 matchlevel = 0;
-            } else
+            } else {
                 ret = -1;
+            }
         }
     }
     return ret;
@@ -1975,6 +2006,7 @@ struct ext_func_tab extcmdlist[] = {
     { M('A'), "annotate", "name current level", donamelevel, IFBURIED | AUTOCOMPLETE },
     {   'a',  "apply", "apply (use) a tool (pick-axe, key, lamp...)", doapply },
     { C('x'), "attributes", "show your attributes", doattributes, IFBURIED },
+    {   'v',  "autoexplore", "automatic exploration of the dungeon", doautoexplore, AUTOCOMPLETE },
     {   '@',  "autopickup", "toggle the pickup option on/off", dotogglepickup, IFBURIED },
     {   'C',  "call", "call (name) something", do_naming_ddocall, IFBURIED },
     {   'Z',  "cast", "zap (cast) a spell", docast, IFBURIED },
@@ -2087,7 +2119,6 @@ struct ext_func_tab extcmdlist[] = {
     {   '<',  "up", "go up a staircase", doup },
 
     {  '\0',  "vanquished", "list vanquished monsters", dovanquished, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
-    {   'v',  "autoexplore", "automatic exploration of the dungeon", doautoexplore, AUTOCOMPLETE },
     {   'V',  "versionshort", "show version", doversion, IFBURIED | GENERALCMD },
     {  '\0',  "version", "list compile time options for this version of NetHack", doextversion, IFBURIED | AUTOCOMPLETE | GENERALCMD },
     {  '\0',  "vision", "show vision array", wiz_show_vision, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
