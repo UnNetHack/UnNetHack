@@ -106,4 +106,9 @@ struct text_color_option {
 extern int ttycolors[CLR_MAX];
 #endif
 
+/* hardcoded value for gray on terminals supporting
+ * more than 16 colors */
+#define TERMINAL_COLOR_GRAY 241 /* #626262 */
+#define TERMINAL_COLOR_GRAY_RGB 0x626262
+
 #endif /* COLOR_H */

@@ -1328,12 +1328,12 @@ init_hilite()
 
     if (iflags.wc2_newcolors) {
         if (colors == 256) {
-            scratch = tparm(setf, 241); /* #626262 */
+            scratch = tparm(setf, TERMINAL_COLOR_GRAY);
             free((genericptr_t) hilites[CLR_BLACK]);
             hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + 1);
             Strcpy(hilites[CLR_BLACK], scratch);
         } else if (colors == 16777216) {
-            init_color_rgb(CLR_BLACK, 0x626262);
+            init_color_rgb(CLR_BLACK, TERMINAL_COLOR_GRAY_RGB);
         }
     }
 
