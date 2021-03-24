@@ -354,7 +354,7 @@ static glyph_t ibm_graphics[MAXPCHARS] = {
     241,    /* S_tree:  plus or minus symbol */
     241,    /* S_deadtree:  plus or minus symbol */
     0xfa,   /* S_room:  meta-z, centered dot */
-    g_FILLER(S_stone),  /* S_darkroom:  meta-z, centered dot */
+    0xfa,   /* S_darkroom:  meta-z, centered dot */
 /*20*/ 0xb0,    /* S_corr:  meta-0, light shading */
     0xb1,   /* S_litcorr:   meta-1, medium shading */
     g_FILLER(S_upstair),
@@ -462,7 +462,7 @@ static glyph_t dec_graphics[MAXPCHARS] = {
     0xe7,   /* S_tree:  meta-g, plus-or-minus */
     0xe7,   /* S_deadtree:  meta-g, plus-or-minus */
     0xfe,   /* S_room:  meta-~, centered dot */
-    g_FILLER(S_stone),  /* S_darkroom:  meta-~, centered dot */
+    0xfe,   /* S_darkroom:  meta-~, centered dot */
 /*20*/ g_FILLER(S_corr),
     g_FILLER(S_litcorr),
     g_FILLER(S_upstair),
@@ -676,7 +676,7 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
     0x03a8, /* S_tree:  GREEK CAPITAL LETTER PSI */
     0x03a8, /* S_deadtree:  GREEK CAPITAL LETTER PSI */
     0x00b7, /* S_room:  MIDDLE DOT */
-    g_FILLER(S_stone),  /* S_darkroom:  meta-~, centered dot */
+    0x00b7, /* S_darkroom:  MIDDLE DOT */
     g_FILLER(S_corr),
     g_FILLER(S_litcorr),
     g_FILLER(S_upstair),
