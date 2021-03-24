@@ -231,10 +231,10 @@ struct symdef defsyms[MAXPCHARS] = {
     {'#', "dead tree",  C(CLR_BLACK)},  /* dead tree */
     {'.', "floor of a room", C(CLR_GRAY)},   /* room */
     {'.', "dark part of a room", C(CLR_BLACK)},  /* dark room */
-/*20*/ {'#', "corridor",   C(CLR_GRAY)},    /* dark corr */
+/*20*/ {'#', "corridor",   C(CLR_BLACK)},    /* dark corr */
     {'#', "lit corridor",   C(CLR_GRAY)},   /* lit corr (see mapglyph.c) */
-    {'<', "staircase up",   C(CLR_GRAY)},   /* upstair */
-    {'>', "staircase down", C(CLR_GRAY)},   /* dnstair */
+    {'<', "staircase up",   C(CLR_WHITE)},   /* upstair */
+    {'>', "staircase down", C(CLR_WHITE)},   /* dnstair */
     {'<', "ladder up",  C(CLR_BROWN)},  /* upladder */
     {'>', "ladder down",    C(CLR_BROWN)},  /* dnladder */
     {'_', "altar",      C(CLR_GRAY)},   /* altar */
