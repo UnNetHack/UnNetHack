@@ -934,10 +934,11 @@ curses_init_options()
     /* Make sure that FOOgraphics enables the correct graphic set,
        otherwise this will cause display issues.  We can't disable them in
        options.c in case the game is compiled with both tty and curses. */
+    switch_graphics(ASCII_GRAPHICS);
     if (iflags.IBMgraphics) {
         switch_graphics(IBM_GRAPHICS);
 #ifdef HAVE_LOCALE_H
-    } else if (iflags.UTF8graphics && iflags.supports_utf8) {
+    } else if (iflags.supports_utf8 && !iflags.cursesgraphics) {
         switch_graphics(UTF8_GRAPHICS);
 #endif
     } else if (iflags.DECgraphics || iflags.UTF8graphics || iflags.cursesgraphics) {
