@@ -165,6 +165,8 @@ STATIC_PTR int NDECL(wiz_show_wmodes);
 STATIC_PTR int NDECL(wiz_mazewalkmap);
 extern char SpLev_Map[COLNO][ROWNO];
 STATIC_PTR int NDECL(wiz_showkills);    /* showborn patch */
+static void wiz_map_levltyp();
+static void wiz_levltyp_legend();
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern void FDECL(show_borlandc_stats, (winid));
 #endif
@@ -1096,6 +1098,330 @@ STATIC_PTR int wiz_showkills()      /* showborn patch */
 
 #endif /* WIZARD */
 
+/* wizard mode variant of #terrain; internal levl[][].typ values in base-36 */
+static void
+wiz_map_levltyp(void)
+{
+    winid win;
+    int x, y, terrain;
+    char row[COLNO + 1];
+    boolean istty = !strcmp(windowprocs.name, "tty");
+
+    win = create_nhwindow(NHW_TEXT);
+    /* map row 0, levl[][0], is drawn on the second line of tty screen */
+    if (istty) {
+        putstr(win, 0, ""); /* tty only: blank top line */
+    }
+    for (y = 0; y < ROWNO; y++) {
+        /* map column 0, levl[0][], is off the left edge of the screen;
+           it should always have terrain type "undiggable stone" */
+        for (x = 1; x < COLNO; x++) {
+            terrain = levl[x][y].typ;
+            /* assumes there aren't more than 10+26+26 terrain types */
+            row[x - 1] = (char) ((terrain == STONE && !may_dig(x, y)) ? '*' :
+                                (terrain < 10) ? '0' + terrain :
+                                (terrain < 36) ? 'a' + terrain - 10 :
+                                'A' + terrain - 36);
+        }
+        x--;
+        if (levl[0][y].typ != STONE || may_dig(0, y)) {
+            row[x++] = '!';
+        }
+        row[x] = '\0';
+        putstr(win, 0, row);
+    }
+
+    char dsc[BUFSZ];
+    s_level *slev = Is_special(&u.uz);
+
+    Sprintf(dsc, "D:%d,L:%d", u.uz.dnum, u.uz.dlevel);
+    /* [dungeon branch features currently omitted] */
+    /* special level features */
+    if (slev) {
+        Sprintf(eos(dsc), " \"%s\"", slev->proto);
+        /* special level flags (note: dungeon.def doesn't set `maze'
+            or `hell' for any specific levels so those never show up) */
+        if (slev->flags.maze_like) {
+            Strcat(dsc, " mazelike");
+        }
+        if (slev->flags.hellish) {
+            Strcat(dsc, " hellish");
+        }
+        if (slev->flags.town) {
+            Strcat(dsc, " town");
+        }
+        if (slev->flags.rogue_like) {
+            Strcat(dsc, " roguelike");
+        }
+        /* alignment currently omitted to save space */
+    }
+    /* level features */
+    if (level.flags.nfountains) {
+        Sprintf(eos(dsc), " %c:%d", defsyms[S_fountain].sym, (int) level.flags.nfountains);
+    }
+    if (level.flags.nsinks) {
+        Sprintf(eos(dsc), " %c:%d", defsyms[S_sink].sym, (int) level.flags.nsinks);
+    }
+    if (level.flags.has_vault) {
+        Strcat(dsc, " vault");
+    }
+    if (level.flags.has_shop) {
+        Strcat(dsc, " shop");
+    }
+    if (level.flags.has_temple) {
+        Strcat(dsc, " temple");
+    }
+    if (level.flags.has_court) {
+        Strcat(dsc, " throne");
+    }
+    if (level.flags.has_zoo) {
+        Strcat(dsc, " zoo");
+    }
+    if (level.flags.has_morgue) {
+        Strcat(dsc, " morgue");
+    }
+    if (level.flags.has_barracks) {
+        Strcat(dsc, " barracks");
+    }
+    if (level.flags.has_beehive) {
+        Strcat(dsc, " hive");
+    }
+    if (level.flags.has_swamp) {
+        Strcat(dsc, " swamp");
+    }
+    /* level flags */
+    if (level.flags.noteleport) {
+        Strcat(dsc, " noTport");
+    }
+    if (level.flags.hardfloor) {
+        Strcat(dsc, " noDig");
+    }
+    if (level.flags.nommap) {
+        Strcat(dsc, " noMMap");
+    }
+    if (!level.flags.hero_memory) {
+        Strcat(dsc, " noMem");
+    }
+    if (level.flags.shortsighted) {
+        Strcat(dsc, " shortsight");
+    }
+    if (level.flags.graveyard) {
+        Strcat(dsc, " graveyard");
+    }
+    if (level.flags.is_maze_lev) {
+        Strcat(dsc, " maze");
+    }
+    if (level.flags.is_cavernous_lev) {
+        Strcat(dsc, " cave");
+    }
+    if (level.flags.arboreal) {
+        Strcat(dsc, " tree");
+    }
+    if (Sokoban) {
+        Strcat(dsc, " sokoban-rules");
+    }
+    /* non-flag info; probably should include dungeon branching
+        checks (extra stairs and magic portals) here */
+    if (Invocation_lev(&u.uz)) {
+        Strcat(dsc, " invoke");
+    }
+    if (On_W_tower_level(&u.uz)) {
+        Strcat(dsc, " tower");
+    }
+    /* append a branch identifier for completeness' sake */
+    if (u.uz.dnum == 0) {
+        Strcat(dsc, " dungeon");
+    } else if (u.uz.dnum == mines_dnum) {
+        Strcat(dsc, " mines");
+    } else if (In_sokoban(&u.uz)) {
+        Strcat(dsc, " sokoban");
+    } else if (u.uz.dnum == quest_dnum) {
+        Strcat(dsc, " quest");
+    } else if (Is_knox(&u.uz)) {
+        Strcat(dsc, " ludios");
+    } else if (u.uz.dnum == 1) {
+        Strcat(dsc, " gehennom");
+    } else if (u.uz.dnum == tower_dnum) {
+        Strcat(dsc, " vlad");
+    } else if (In_endgame(&u.uz)) {
+        Strcat(dsc, " endgame");
+    } else {
+        /* somebody's added a dungeon branch we're not expecting */
+        const char *brname = dungeons[u.uz.dnum].dname;
+
+        if (!brname || !*brname) {
+            brname = "unknown";
+        }
+        if (!strncmpi(brname, "the ", 4)) {
+            brname += 4;
+        }
+        Sprintf(eos(dsc), " %s", brname);
+    }
+    /* limit the line length to map width */
+    if (strlen(dsc) >= COLNO) {
+        dsc[COLNO - 1] = '\0'; /* truncate */
+    }
+    putstr(win, 0, dsc);
+
+    display_nhwindow(win, TRUE);
+    destroy_nhwindow(win);
+    return;
+}
+
+/* temporary? hack, since level type codes aren't the same as screen
+   symbols and only the latter have easily accessible descriptions */
+static const char *levltyp[] = {
+    "stone", "vertical wall", "horizontal wall", "top-left corner wall",
+    "top-right corner wall", "bottom-left corner wall",
+    "bottom-right corner wall", "cross wall", "tee-up wall", "tee-down wall",
+    "tee-left wall", "tee-right wall", "drawbridge wall", "tree", "dead tree",
+    "ice wall", "crystal ice wall",
+    "secret door", "secret corridor", "pool", "moat", "water",
+    "drawbridge up", "lava pool", "iron bars", "door", "corridor", "room",
+    "stairs", "ladder", "fountain", "throne", "sink", "grave", "altar", "ice",
+    "swamp",
+    "drawbridge down", "air", "cloud",
+    /* not a real terrain type, but used for undiggable stone
+       by wiz_map_levltyp() */
+    "unreachable/undiggable",
+    /* padding in case the number of entries above is odd */
+    ""
+};
+
+/* explanation of base-36 output from wiz_map_levltyp() */
+static void
+wiz_levltyp_legend(void)
+{
+    winid win;
+    int i, j, last, c;
+    const char *dsc, *fmt;
+    char buf[BUFSZ];
+
+    win = create_nhwindow(NHW_TEXT);
+    putstr(win, 0, "#terrain encodings:");
+    putstr(win, 0, "");
+    fmt = " %c - %-28s"; /* TODO: include tab-separated variant for win32 */
+    *buf = '\0';
+    /* output in pairs, left hand column holds [0],[1],...,[N/2-1]
+       and right hand column holds [N/2],[N/2+1],...,[N-1];
+       N ('last') will always be even, and may or may not include
+       the empty string entry to pad out the final pair, depending
+       upon how many other entries are present in levltyp[] */
+    last = SIZE(levltyp) & ~1;
+    for (i = 0; i < last / 2; ++i) {
+        for (j = i; j < last; j += last / 2) {
+            dsc = levltyp[j];
+            c = !*dsc ? ' ' :
+                !strncmp(dsc, "unreachable", 11) ? '*' :
+                /* same int-to-char conversion as wiz_map_levltyp() */
+                (j < 10) ? '0' + j :
+                (j < 36) ? 'a' + j - 10 :
+                'A' + j - 36;
+            Sprintf(eos(buf), fmt, c, dsc);
+            if (j > i) {
+                putstr(win, 0, buf);
+                *buf = '\0';
+            }
+        }
+    }
+    display_nhwindow(win, TRUE);
+    destroy_nhwindow(win);
+    return;
+}
+
+/* #terrain command -- show known map, inspired by crawl's '|' command */
+static int
+doterrain(void)
+{
+    winid men;
+    menu_item *sel;
+    anything any;
+    int n;
+    int which;
+
+    /*
+     * normal play: choose between known map without mons, obj, and traps
+     *  (to see underlying terrain only), or
+     *  known map without mons and objs (to see traps under mons and objs), or
+     *  known map without mons (to see objects under monsters);
+     * explore mode: normal choices plus full map (w/o mons, objs, traps);
+     * wizard mode: normal and explore choices plus
+     *  a dump of the internal levl[][].typ codes w/ level flags, or
+     *  a legend for the levl[][].typ codes dump
+     */
+    men = create_nhwindow(NHW_MENU);
+    start_menu(men);
+    any = zeroany;
+    any.a_int = 1;
+    add_menu(men, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
+             "known map without monsters, objects, and traps", MENU_SELECTED);
+    any.a_int = 2;
+    add_menu(men, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
+             "known map without monsters and objects", MENU_UNSELECTED);
+    any.a_int = 3;
+    add_menu(men, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
+             "known map without monsters", MENU_UNSELECTED);
+    if (discover || wizard) {
+        any.a_int = 4;
+        add_menu(men, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
+                 "full map without monsters, objects, and traps", MENU_UNSELECTED);
+        if (wizard) {
+            any.a_int = 5;
+            add_menu(men, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
+                     "internal levl[][].typ codes in base-36", MENU_UNSELECTED);
+            any.a_int = 6;
+            add_menu(men, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
+                     "legend of base-36 levl[][].typ codes", MENU_UNSELECTED);
+        }
+    }
+    end_menu(men, "View which?");
+
+    n = select_menu(men, PICK_ONE, &sel);
+    destroy_nhwindow(men);
+    /*
+     * n <  0: player used ESC to cancel;
+     * n == 0: preselected entry was explicitly chosen and got toggled off;
+     * n == 1: preselected entry was implicitly chosen via <space>|<enter>;
+     * n == 2: another entry was explicitly chosen, so skip preselected one.
+     */
+    which = (n < 0) ? -1 : (n == 0) ? 1 : sel[0].item.a_int;
+    if (n > 1 && which == 1) {
+        which = sel[1].item.a_int;
+    }
+    if (n > 0) {
+        free(sel);
+    }
+
+    switch (which) {
+    case 1: /* known map */
+        reveal_terrain(0, TER_MAP);
+        break;
+
+    case 2: /* known map with known traps */
+        reveal_terrain(0, TER_MAP | TER_TRP);
+        break;
+
+    case 3: /* known map with known traps and objects */
+        reveal_terrain(0, TER_MAP | TER_TRP | TER_OBJ);
+        break;
+
+    case 4: /* full map */
+        reveal_terrain(1, TER_MAP);
+        break;
+
+    case 5: /* map internals */
+        wiz_map_levltyp();
+        break;
+
+    case 6: /* internal details */
+        wiz_levltyp_legend();
+        break;
+
+    default:
+        break;
+    }
+    return 0; /* no time elapses */
+}
 
 /* -enlightenment and conduct- */
 static winid en_win;
@@ -2104,8 +2430,12 @@ struct ext_func_tab extcmdlist[] = {
     {   'T', "takeoff", "take off one piece of armor", dotakeoff },
     {   'A', "takeoffall", "remove all armor", doddoremarm },
     { C('t'), "teleport", "teleport around the level", dotelecmd, IFBURIED },
+    /* \177 == <del> aka <delete> aka <rubout>; some terminals have an
+       option to swap it with <backspace> so if there's a key labeled
+       <delete> it may or may not actually invoke the #terrain command */
+    { '\177', "terrain", "view map without monsters or objects obstructing it",
+              doterrain, IFBURIED | AUTOCOMPLETE, NULL },
 #if NEXT_VERSION
-    {  '\0', "terrain", "show map without obstructions", doterrain, IFBURIED | AUTOCOMPLETE },
     {  '\0', "therecmdmenu", "menu of commands you can do from here to adjacent spot", dotherecmdmenu },
 #endif
     {   't',  "throw", "throw something", dothrow },
