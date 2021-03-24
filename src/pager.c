@@ -12,6 +12,7 @@ STATIC_DCL int FDECL(append_str, (char *, const char *));
 STATIC_DCL struct permonst * FDECL(lookat, (int, int, char *, char *));
 static void look_all(boolean, boolean, boolean);
 static void add_obj_info(winid, short);
+static void add_mon_info(winid, struct permonst *);
 static void FDECL(do_supplemental_info, (char *, struct permonst *, BOOLEAN_P));
 STATIC_DCL boolean FDECL(help_menu, (int *));
 #ifdef PORT_HELP
@@ -516,6 +517,355 @@ char *buf, *monbuf;
     return ((pm && !Hallucination) ? pm : (struct permonst *) 0);
 }
 
+extern const int monstr[];
+
+static const char*
+attack_type(int aatyp)
+{
+    switch (aatyp) {
+        case AT_ANY:  return "fake"; break;             /* fake attack; dmgtype_fromattack wildcard */
+        case AT_NONE: return "passive"; break;          /* passive monster (ex. acid blob) */
+        case AT_CLAW: return "claw"; break;             /* claw (punch, hit, etc.) */
+        case AT_BITE: return "bite"; break;             /* bite */
+        case AT_KICK: return "kick"; break;             /* kick */
+        case AT_BUTT: return "butt"; break;             /* head butt (ex. a unicorn) */
+        case AT_TUCH: return "touch"; break;            /* touches */
+        case AT_STNG: return "sting"; break;            /* sting */
+        case AT_HUGS: return "bearhug"; break;          /* crushing bearhug */
+        case AT_SPIT: return "spit"; break;             /* spits substance - ranged */
+        case AT_ENGL: return "engulf"; break;           /* engulf (swallow or by a cloud) */
+        case AT_BREA: return "breath"; break;           /* breath - ranged */
+        case AT_EXPL: return "explode"; break;          /* explodes - proximity */
+        case AT_BOOM: return "explode on death"; break; /* explodes when killed */
+        case AT_GAZE: return "gaze"; break;             /* gaze - ranged */
+        case AT_TENT: return "tentacle"; break;         /* tentacles */
+        case AT_SCRE: return "scream"; break;           /* scream - sonic attack */
+        case AT_WEAP: return "weapon"; break;           /* uses weapon */
+        case AT_MAGC: return "spellcast"; break;        /* uses magic spell(s) */
+        default: impossible("attack_type: unknown attack type %d", aatyp);
+    }
+    return "(unknown)";
+}
+
+static const char*
+damage_type(int adtyp)
+{
+    switch (adtyp) {
+        case AD_ANY:  return "fake"; break;                /* fake damage; attacktype_fordmg wildcard */
+        case AD_PHYS: return "physical"; break;            /* ordinary physical */
+        case AD_MAGM: return "magic missile"; break;       /* magic missiles */
+        case AD_FIRE: return "fire"; break;                /* fire damage */
+        case AD_COLD: return "cold"; break;                /* frost damage */
+        case AD_SLEE: return "sleep"; break;               /* sleep ray */
+        case AD_DISN: return "disintegration"; break;      /* disintegration (death ray) */
+        case AD_ELEC: return "shock"; break;               /* shock damage */
+        case AD_DRST: return "strength poison"; break;     /* drains str (poison) */
+        case AD_LAVA: return "lava"; break;                /* a jet of molten lava */
+        case AD_ACID: return "acid"; break;                /* acid damage */
+        case AD_SPC1: return NULL; break;                  /* for extension of buzz() */
+        case AD_SPC2: return NULL; break;                  /* for extension of buzz() */
+        case AD_BLND: return "blind"; break;               /* blinds (yellow light) */
+        case AD_STUN: return "stun"; break;                /* stuns */
+        case AD_SLOW: return "slow"; break;                /* slows */
+        case AD_PLYS: return "paralyze"; break;            /* paralyses */
+        case AD_DRLI: return "level drain"; break;         /* drains life levels (Vampire) */
+        case AD_DREN: return "energy drain"; break;        /* drains magic energy */
+        case AD_LEGS: return "wound leg"; break;           /* damages legs (xan) */
+        case AD_STON: return "petrify"; break;             /* petrifies (Medusa, cockatrice) */
+        case AD_STCK: return "sticky"; break;              /* sticks to you (mimic) */
+        case AD_SGLD: return "steal gold"; break;          /* steals gold (leppie) */
+        case AD_SITM: return "steal item"; break;          /* steals item (nymphs) */
+        case AD_SEDU: return "charm"; break;               /* seduces & steals multiple items */
+        case AD_TLPT: return "teleport"; break;            /* teleports you (Quantum Mech.) */
+        case AD_RUST: return "rust"; break;                /* rusts armour (Rust Monster)*/
+        case AD_CONF: return "confuse"; break;             /* confuses (Umber Hulk) */
+        case AD_DGST: return "digest"; break;              /* digests opponent (trapper, etc.) */
+        case AD_HEAL: return "heal"; break;                /* heals opponent's wounds (nurse) */
+        case AD_WRAP: return "drown"; break;               /* special "stick" for eels */
+        case AD_WERE: return "lycanthropy"; break;         /* confers lycanthropy */
+        case AD_DRDX: return "dexterity poison"; break;    /* drains dexterity (quasit) */
+        case AD_DRCO: return "constitution poison"; break; /* drains constitution */
+        case AD_DRIN: return "eat brains"; break;          /* drains intelligence (mind flayer) */
+        case AD_DISE: return "disease"; break;             /* confers diseases */
+        case AD_DCAY: return "decay"; break;               /* decays organics (brown Pudding) */
+        case AD_SSEX: return "seduce"; break;              /* Succubus seduction (extended) */
+        case AD_HALU: return "hallucination"; break;       /* causes hallucination */
+        case AD_DETH: return "Death special"; break;       /* for Death only */
+        case AD_PEST: return "Pestilence special"; break;  /* for Pestilence only */
+        case AD_FAMN: return "Famine special"; break;      /* for Famine only */
+        case AD_SLIM: return "slime"; break;               /* turns you into green slime */
+        case AD_ENCH: return "disenchant"; break;          /* remove enchantment (disenchanter) */
+        case AD_CORR: return "corrode"; break;             /* corrode armor (black pudding) */
+        case AD_LUCK: return "steal intrinsic"; break;     /* drain luck (evil eye) */
+        case AD_FREZ: return "freeze"; break;              /* freezing attack (blue slime) */
+        case AD_HEAD: return "decapitate"; break;          /* decapitate (vorpal jabberwock) */
+        case AD_PUNI: return "Punisher speical"; break;    /* punisher spells */
+        case AD_LVLT: return "level teleport"; break;      /* level teleport (weeping angel) */
+        case AD_BLNK: return "mental invasion"; break;     /* mental invasion (weeping angel) */
+        case AD_SPOR: return "generate spore"; break;      /* generate spore */
+        case AD_CLRC: return "clerical"; break;            /* random clerical spell */
+        case AD_SPEL: return "arcane"; break;              /* random magic spell */
+        case AD_RBRE: return "random breath"; break;       /* random breath weapon */
+        case AD_SAMU: return "steal Amulet"; break;        /* hits, may steal Amulet (Wizard) */
+        case AD_CURS: return "random curse"; break;        /* random curse (ex. gremlin) */
+        default: impossible("damage_type: unknown damage type %d", adtyp);
+    }
+    return "(unknown)";
+}
+
+/* Add some information to an encyclopedia window which is printing information
+ * about a monster. */
+static void
+add_mon_info(winid datawin, struct permonst * pm)
+{
+    char buf[BUFSZ];
+    char buf2[BUFSZ];
+    int gen = pm->geno;
+    int freq = (gen & G_FREQ);
+    boolean uniq = !!(gen & G_UNIQ);
+    boolean hell = !!(gen & G_HELL);
+    boolean nohell = !!(gen & G_NOHELL);
+
+#define ADDRESIST(condition, str)                       \
+    if (condition) {                                    \
+        if (*buf) {                                     \
+            Strcat(buf, ", ");                          \
+        }                                               \
+        Strcat(buf, str);                               \
+    }
+#define ADDMR(field, res, str)                          \
+    if (field & (res)) {                                \
+        if (*buf) {                                     \
+            Strcat(buf, ", ");                          \
+        }                                               \
+        Strcat(buf, str);                               \
+    }
+#define APPENDC(cond, str)                              \
+    if (cond) {                                         \
+        if (*buf) {                                     \
+            Strcat(buf, ", ");                          \
+        }                                               \
+        Strcat(buf, str);                               \
+    }
+#define MONPUTSTR(str) putstr(datawin, ATR_NONE, str)
+
+    /* differentiate the two forms of werecreatures */
+    Strcpy(buf2, "");
+    if (is_were(pm)) {
+        Sprintf(buf2, " (%s form)", pm->mlet == S_HUMAN ? "human" : "animal");
+    }
+
+    snprintf(buf, BUFSZ, "Monster lookup for \"%s\"%s:", pm->mname, buf2);
+    putstr(datawin, ATR_BOLD, buf);
+    MONPUTSTR("");
+
+    /* Misc */
+    Sprintf(buf, "Difficulty %d, speed %d, base level %d, base AC %d, magic saving throw %d, weight %d.",
+            monstr[monsndx(pm)], pm->mmove, pm->mlevel, pm->ac, pm->mr, pm->cwt);
+    MONPUTSTR(buf);
+
+    /* Generation */
+    if (uniq) {
+        Strcpy(buf, "Unique.");
+    } else if (freq == 0) {
+        Strcpy(buf, "Not randomly generated.");
+    } else {
+        Sprintf(buf, "Normally %s%s, %s.",
+                hell ? "only appears in Gehennom" :
+                nohell ? "only appears outside Gehennom" :
+                "appears in any branch",
+                (gen & G_SGROUP) ? " in groups" :
+                (gen & G_LGROUP) ? " in large groups" : "",
+                freq >= 5 ? "very common" :
+                freq == 4 ? "common" :
+                freq == 3 ? "slightly rare" :
+                freq == 2 ? "rare" : "very rare");
+        MONPUTSTR(buf);
+    }
+
+    /* Resistances */
+    buf[0] = '\0';
+    ADDRESIST(pm_resistance(pm, MR_FIRE), "fire");
+    ADDRESIST(pm_resistance(pm, MR_COLD), "cold");
+    ADDRESIST(pm_resistance(pm, MR_SLEEP), "sleep");
+    ADDRESIST(pm_resistance(pm, MR_DISINT), "disintegration");
+    ADDRESIST(pm_resistance(pm, MR_ELEC), "shock");
+    ADDRESIST(pm_resistance(pm, MR_POISON), "poison");
+    ADDRESIST(pm_resistance(pm, MR_ACID), "acid");
+    ADDRESIST(pm_resistance(pm, MR_STONE), "petrification");
+    ADDRESIST(resists_drain(pm), "life-drain");
+    /* ADDRESIST(SICK_RES, "sickness"); */
+    ADDRESIST(resists_mgc(pm), "magic");
+    if (*buf) {
+        snprintf(buf2, BUFSZ, "Resists %s.", buf);
+        MONPUTSTR(buf2);
+    } else {
+        MONPUTSTR("Has no resistances.");
+    }
+
+    /* Corpse conveyances */
+    buf[0] = '\0';
+    APPENDC(intrinsic_possible(FIRE_RES, pm), "fire");
+    APPENDC(intrinsic_possible(COLD_RES, pm), "cold");
+    APPENDC(intrinsic_possible(SHOCK_RES, pm), "shock");
+    APPENDC(intrinsic_possible(SLEEP_RES, pm), "sleep");
+    APPENDC(intrinsic_possible(POISON_RES, pm), "poison");
+    APPENDC(intrinsic_possible(DISINT_RES, pm), "disintegration");
+    /* acid and stone resistance aren't currently conveyable */
+    if (*buf) {
+        Strcat(buf, " resistance");
+    }
+    APPENDC(intrinsic_possible(TELEPORT, pm), "teleportation");
+    APPENDC(intrinsic_possible(TELEPORT_CONTROL, pm), "teleport control");
+    APPENDC(intrinsic_possible(TELEPAT, pm), "telepathy");
+    //APPENDC(intrinsic_possible(INTRINSIC_GAIN_STR, pm), "strength");
+    //APPENDC(intrinsic_possible(INTRINSIC_GAIN_EN, pm), "magic energy");
+    /* There are a bunch of things that happen in cpostfx (levels for wraiths,
+     * stunning for bats...) but only count the ones that actually behave like
+     * permanent intrinsic gains.
+     * If you find yourself listing multiple things here for the same effect,
+     * that may indicate the property should be added to psuedo_intrinsics. */
+    APPENDC(pm == &mons[PM_QUANTUM_MECHANIC], "speed or slowness");
+    APPENDC(pm == &mons[PM_MIND_FLAYER] || pm == &mons[PM_MASTER_MIND_FLAYER], "intelligence");
+    if (is_were(pm)) {
+        /* Weres need a bit of special handling, since 1) you always get
+         * lycanthropy so "may convey" could imply the player might not contract
+         * it; 2) the animal forms are flagged as G_NOCORPSE, but still have a
+         * meaningless listed corpse nutrition value which shouldn't print. */
+        if (pm->mlet == S_HUMAN) {
+            Sprintf(buf2, "Provides %d nutrition when eaten.", pm->cnutrit);
+            MONPUTSTR(buf2);
+        }
+        MONPUTSTR("Corpse conveys lycanthropy.");
+    } else if (!(gen & G_NOCORPSE)) {
+        Sprintf(buf2, "Provides %d nutrition when eaten.", pm->cnutrit);
+        MONPUTSTR(buf2);
+        if (*buf) {
+            snprintf(buf2, BUFSZ, "Corpse may convey %s.", buf);
+            MONPUTSTR(buf2);
+        } else {
+            MONPUTSTR("Corpse conveys no intrinsics.");
+        }
+    } else {
+        MONPUTSTR("Leaves no corpse.");
+    }
+
+    /* Flag descriptions */
+    buf[0] = '\0';
+    APPENDC(is_male(pm), "male");
+    APPENDC(pm->msize == MZ_TINY, "tiny");
+    APPENDC(pm->msize == MZ_SMALL, "small");
+    APPENDC(pm->msize == MZ_LARGE, "large");
+    APPENDC(pm->msize == MZ_HUGE, "huge");
+    APPENDC(pm->msize == MZ_GIGANTIC, "gigantic");
+    if (!(*buf)) {
+        /* for nonstandard sizes */
+        APPENDC(verysmall(pm), "small");
+        APPENDC(bigmonst(pm), "big");
+    }
+
+    /* inherent characteristics: "Monster is X." */
+    APPENDC(!(gen & G_GENO), "ungenocideable");
+    APPENDC(breathless(pm), "breathless");
+    if (!breathless(pm)) {
+        APPENDC(amphibious(pm), "amphibious");
+    }
+    APPENDC(amorphous(pm), "amorphous");
+    APPENDC(noncorporeal(pm), "incorporeal");
+    if (!noncorporeal(pm)) {
+        APPENDC(unsolid(pm), "unsolid");
+    }
+    APPENDC(acidic(pm), "acidic");
+    APPENDC(poisonous(pm), "poisonous");
+    APPENDC(regenerates(pm), "regenerating");
+    APPENDC(is_reviver(pm), "reviving");
+    APPENDC(is_floater(pm), "floating");
+    APPENDC(pm_invisible(pm), "invisible");
+    APPENDC(is_undead(pm), "undead");
+    if (!is_undead(pm)) {
+        APPENDC(nonliving(pm), "nonliving");
+    }
+    if (*buf) {
+        snprintf(buf2, BUFSZ, "Is %s.", buf);
+        MONPUTSTR(buf2);
+        buf[0] = '\0';
+    }
+
+    /* inherent abilities: "Monster can X." */
+    APPENDC(hides_under(pm), "hide under objects");
+    APPENDC(pm->mlet == S_MIMIC, "mimic objects and terrain");
+    APPENDC(is_hider(pm) && !(pm->mlet == S_MIMIC), "hide on the ceiling");
+    APPENDC(is_swimmer(pm), "swim");
+    if (!is_floater(pm)) {
+        APPENDC(is_flyer(pm), "fly");
+    }
+    APPENDC(passes_walls(pm), "phase through walls");
+    APPENDC(can_teleport(pm), "teleport");
+    APPENDC(is_clinger(pm), "cling to the ceiling");
+    APPENDC(needspick(pm), "mine");
+    if (!needspick(pm)) {
+        APPENDC(tunnels(pm), "dig");
+    }
+    if (*buf) {
+        snprintf(buf2, BUFSZ, "Can %s.", buf);
+        MONPUTSTR(buf2);
+        buf[0] = '\0';
+    }
+
+    /* Full-line remarks. */
+    if (touch_petrifies(pm)) {
+        MONPUTSTR("Petrifies by touch.");
+    }
+    if (perceives(pm)) {
+        MONPUTSTR("Can see invisible.");
+    }
+    if (control_teleport(pm)) {
+        MONPUTSTR("Has teleport control.");
+    }
+    if (your_race(pm)) {
+        MONPUTSTR("Is the same race as you.");
+    }
+    if (!(gen & G_NOCORPSE)) {
+        if (vegan(pm)) {
+            MONPUTSTR("May be eaten by vegans.");
+        } else if (vegetarian(pm)) {
+            MONPUTSTR("May be eaten by vegetarians.");
+        }
+    }
+    snprintf(buf, BUFSZ, "Is %sa valid polymorph form.", polyok(pm) ? "" : "not ");
+    MONPUTSTR(buf);
+
+    /* Attacks */
+    buf[0] = buf2[0] = '\0';
+    int i;
+    for (i = 0; i < 6; i++) {
+        char dicebuf[20]; /* should be a safe limit */
+        struct attack * attk = &(pm->mattk[i]);
+        if (attk->damn) {
+            Sprintf(dicebuf, "%dd%d", attk->damn, attk->damd);
+        } else if (attk->damd) {
+            Sprintf(dicebuf, "(level+1)d%d", attk->damd);
+        } else {
+            if (!attk->aatyp && !attk->adtyp) {
+                /* no attack in this slot */
+                continue;
+            } else {
+                /* real attack, but 0d0 damage */
+                dicebuf[0] = '\0';
+            }
+        }
+        Sprintf(buf2, "%s%s%s %s", dicebuf, ((*dicebuf) ? " " : ""),
+                attack_type(attk->aatyp), damage_type(attk->adtyp));
+        APPENDC(TRUE, buf2);
+    }
+    if (*buf) {
+        snprintf(buf2, BUFSZ, "Attacks: %s", buf);
+        MONPUTSTR(buf2);
+    } else {
+        MONPUTSTR("Has no attacks.");
+    }
+}
+
 /* Add some information to an encyclopedia window which is printing information
  * about an object. */
 static void
@@ -899,6 +1249,7 @@ char *supplemental_name;
     char *ep, *dbase_str;
     int chk_skip;
     boolean found_in_file = FALSE, skipping_entry = FALSE;
+    boolean lookat_mon = (pm != (struct permonst *) 0);
 
     fp = dlb_fopen_area(NH_DATAAREA, DATAFILE, "r");
     if (!fp) {
@@ -1134,6 +1485,16 @@ char *supplemental_name)
                 goto checkfile_done;
         }
 
+        boolean lookat_mon = (pm != (struct permonst *) 0);
+        /* monster lookup: try to parse as a monster */
+        if (!lookat_mon) {
+            pm = (struct permonst *) 0; /* just to be safe */
+            int mndx = name_to_mon(dbase_str);
+            if (mndx != NON_PM) {
+                pm = &mons[mndx];
+            }
+        }
+
         /* object lookup: try to parse as an object */
         int otyp = name_to_otyp(dbase_str);
 
@@ -1162,11 +1523,37 @@ char *supplemental_name)
                 /* don't print anything otherwise; we don't want it to e.g.
                     * print a database entry and then print the above message. */
             } else {
+                boolean do_obj_lookup = FALSE, do_mon_lookup = FALSE;
+                if (pm) {
+                    do_mon_lookup = TRUE;
+                    if (!lookat_mon && otyp != STRANGE_OBJECT) {
+                        /* found matches for both and player is NOT looking
+                         * at a monster; ask which they want to see */
+                        /* TODO: this would ideally be better generalized so
+                         * that the caller could communicate that an object
+                         * is being looked at, too */
+                        pline("That matches both a monster and an object.");
+                        if (yn("Show the monster information?") != 'y') {
+                            do_obj_lookup = TRUE;
+                            do_mon_lookup = FALSE;
+                        }
+                    }
+                } else if (otyp != STRANGE_OBJECT) {
+                    do_obj_lookup = TRUE;
+                }
+
                 datawin = create_nhwindow(NHW_MENU);
 
                 /* object lookup info */
-                if (otyp != STRANGE_OBJECT) {
+                if (do_obj_lookup) {
                     add_obj_info(datawin, otyp);
+                    putstr(datawin, 0, "");
+                } else if (do_mon_lookup) {
+                    /* monster lookup info */
+                    /* secondary to object lookup because there are some
+                     * monsters whose names are substrings of objects, like
+                     * "skeleton" and "skeleton key". */
+                    add_mon_info(datawin, pm);
                     putstr(datawin, 0, "");
                 }
 

@@ -717,6 +717,7 @@ E void FDECL(food_disappears, (struct obj *));
 E void FDECL(food_substitution, (struct obj *, struct obj *));
 E boolean FDECL(bite_monster, (struct monst *mon));
 E void NDECL(fix_petrification);
+extern int intrinsic_possible(int, struct permonst *);
 E void FDECL(consume_oeaten, (struct obj *, int));
 E boolean FDECL(maybe_finished_meal, (BOOLEAN_P));
 E void FDECL(set_tin_variety, (struct obj *, int));

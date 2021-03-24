@@ -20,6 +20,16 @@
 #define resists_acid(mon)   ((((mon)->data->mresists | (mon)->mextrinsics) & MR_ACID) != 0)
 #define resists_ston(mon)   ((((mon)->data->mresists | (mon)->mextrinsics) & MR_STONE) != 0)
 
+/* as of 3.2.0:  gray dragons, Angels, Oracle, Yeenoghu */
+#define resists_mgc(ptr) \
+    (dmgtype(ptr, AD_MAGM) || ptr == &mons[PM_BABY_GRAY_DRAGON] \
+     || dmgtype(ptr, AD_RBRE)) /* Tiamat */
+
+#define resists_drain(ptr) \
+    (is_undead(ptr) || is_demon(ptr) || is_were(ptr) \
+     || ptr == &mons[PM_DEATH])
+/* is_were() doesn't handle hero in human form */
+
 #define is_lminion(mon)     (is_minion((mon)->data) && mon_aligntyp(mon) == A_LAWFUL)
 
 #define is_flyer(ptr)       (((ptr)->mflags1 & M1_FLY) != 0L)
