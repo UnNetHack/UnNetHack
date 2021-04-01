@@ -521,7 +521,7 @@ curses_update_inventory(void)
 {
     /* Don't do anything if perm_invent is off unless we
        changed the option. */
-    if (!flags.perm_invent) {
+    if (!iflags.perm_invent) {
         if (curses_get_nhwin(INV_WIN)) {
             curses_create_main_windows();
             curses_last_messages();

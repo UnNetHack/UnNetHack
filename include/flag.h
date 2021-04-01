@@ -72,7 +72,6 @@ struct flag {
 #ifdef MAC
     boolean page_wait;  /* put up a --More-- after a page of messages */
 #endif
-    boolean perm_invent;    /* keep full inventories up until dismissed */
     boolean pickup;     /* whether you pickup or move and look */
     boolean pickup_dropped;     /* don't auto-pickup items you dropped */
     boolean pickup_thrown;      /* auto-pickup items you threw */
@@ -272,6 +271,7 @@ struct instance_flags {
     int getpos_coords;      /* show coordinates when getting cursor position */
     boolean num_pad;        /* use numbers for movement commands */
     boolean news;           /* print news */
+    boolean perm_invent;    /* keep full inventories up until dismissed */
     boolean window_inited;  /* true if init_nhwindows() completed */
     boolean vision_inited;  /* true if vision is ready */
     boolean menu_tab_sep;   /* Use tabs to separate option menu fields */

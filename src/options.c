@@ -222,7 +222,7 @@ static struct Bool_Opt
     {"paranoid_lava", &iflags.paranoid_lava, TRUE, SET_IN_FILE},
     {"paranoid_water", &iflags.paranoid_water, TRUE, SET_IN_FILE},
 #endif
-    {"perm_invent", &flags.perm_invent, FALSE, SET_IN_GAME},
+    {"perm_invent", &iflags.perm_invent, FALSE, SET_IN_GAME},
     {"perma_hallu", &flags.perma_hallu, FALSE, SET_IN_FILE},
     {"pickup_dropped", &flags.pickup_dropped, FALSE, SET_IN_GAME},
     {"pickup_thrown", &flags.pickup_thrown, TRUE, SET_IN_GAME},
@@ -4443,7 +4443,9 @@ doset()
 #endif
                 /* hide options that are useless in tty*/
                 if (istty) {
-                    if (bool_p == &flags.perm_invent) continue;
+                    if (bool_p == &iflags.perm_invent) {
+                        continue;
+                    }
 #ifdef CURSES_GRAPHICS
                     if (bool_p == &iflags.cursesgraphics) continue;
 #endif

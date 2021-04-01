@@ -792,8 +792,7 @@ X11_select_menu(window, how, menu_list)
      * when first created.  For 3.2.0 release, just recreate
      * each time.
      */
-    if (menu_info->valid_widgets
-			&& (window != WIN_INVEN || !flags.perm_invent)) {
+    if (menu_info->valid_widgets && (window != WIN_INVEN || !iflags.perm_invent)) {
 	XtDestroyWidget(wp->popup);
 	menu_info->valid_widgets = FALSE;
 	menu_info->is_up = FALSE;

@@ -2526,7 +2526,7 @@ boolean want_dump;
     }
 
     if (want_disp) {
-        if (flags.perm_invent && (lets || xtra_choice || wizid)) {
+        if (iflags.perm_invent && (lets || xtra_choice || wizid)) {
             /* partial inventory in perm_invent setting; don't operate on
             full inventory window, use an alternate one instead; create
             the first time needed and keep it for re-use as needed later */
@@ -2555,7 +2555,7 @@ boolean want_dump;
        more than 1; for the last one, we don't need a precise number.
        For perm_invent update we force 'more than 1'.
      */
-    n = (flags.perm_invent && !lets && !want_reply) ? 2 :
+    n = (iflags.perm_invent && !lets && !want_reply) ? 2 :
          lets ? strlen(lets) :
          !invent ? 0 :
          !invent->nobj ? 1 : 2;
@@ -2763,7 +2763,7 @@ nextclass:
        nothing has been listed (because there isn't anyhing to list;
        the n==0 case above gets skipped for perm_invent), put something
        into the menu */
-    if (want_disp && flags.perm_invent && !lets && !gotsomething) {
+    if (want_disp && iflags.perm_invent && !lets && !gotsomething) {
         any = zeroany;
         add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, 0,
                  "Not carrying anything", MENU_UNSELECTED);
