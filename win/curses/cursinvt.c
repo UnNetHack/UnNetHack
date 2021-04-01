@@ -95,22 +95,22 @@ curses_add_inv(
         wattroff(win, glyphclr);
     }
 
+    int color = NO_COLOR;
 #ifdef MENU_COLOR
-    if (accelerator && /* Don't colorize categories */
-        iflags.use_menu_color) {
-        int color = NO_COLOR;
-        boolean menu_color = FALSE;
-        char str_mutable[BUFSZ];
-        Strcpy(str_mutable, str);
-        attr = 0;
-        curses_get_menu_coloring(str_mutable, &color, &attr);
-        if (color != NO_COLOR)
-            attr |= curses_color_attr(color, 0);
+    /* colorize categorizes */
+    if (iflags.use_menu_color) {
+        if (get_menu_coloring(str, &color, &attr)) {
+            attr = curses_convert_attr(attr);
+        }
     }
 #endif
+    if (color == NO_COLOR) {
+        color = NONE;
+    }
 
-    wattron(win, attr);
+    curses_menu_color_attr(win, color, attr, ON);
     wprintw(win, "%s", str);
-    wattroff(win, attr);
+    curses_menu_color_attr(win, color, attr, OFF);
+
     wclrtoeol(win);
 }

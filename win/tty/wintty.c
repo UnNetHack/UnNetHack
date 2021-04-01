@@ -1837,22 +1837,16 @@ int *color, *attr;
     strcpy(str, line);
     strip_brackets(str);
 
-    if (iflags.use_menu_color && iflags.use_color)
-        for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
+    if (iflags.use_menu_color && iflags.use_color) {
+        for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next) {
             if (regex_match(str, tmpmc->match)) {
-                if (!foundcolor && tmpmc->color != CLR_UNDEFINED) {
-                    *color = tmpmc->color;
-                    foundcolor = TRUE;
-                }
-                if (!foundattr && tmpmc->attr != ATR_UNDEFINED) {
-                    *attr = tmpmc->attr;
-                    foundattr = TRUE;
-                }
-                if (foundattr && foundcolor) return TRUE;
+                *color = tmpmc->color;
+                *attr = tmpmc->attr;
+                return TRUE;
             }
-    if (foundcolor && !foundattr) *attr = ATR_NONE;
-    if (foundattr && !foundcolor) *color = NO_COLOR;
-    return foundcolor || foundattr;
+        }
+    }
+    return FALSE;
 }
 #endif /* MENU_COLOR */
 

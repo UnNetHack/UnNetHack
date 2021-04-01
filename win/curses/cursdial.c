@@ -927,6 +927,7 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num)
 {
     nhmenu_item *menu_item_ptr;
     int count, curletter, entry_cols, start_col, num_lines, footer_x;
+    char *tmpstr;
     boolean first_accel = TRUE;
 
     int color = NO_COLOR;
@@ -953,12 +954,13 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num)
 
     werase(win);
 
-    if (strlen(menu->prompt) > 0) {
+    if (menu->prompt && *menu->prompt) {
         num_lines = curses_num_lines(menu->prompt, menu->width);
 
         for (count = 0; count < num_lines; count++) {
-            mvwprintw(win, count + 1, 1, "%s",
-                      curses_break_str(menu->prompt, menu->width, count + 1));
+            tmpstr = curses_break_str(menu->prompt, menu->width, count + 1);
+            mvwprintw(win, count + 1, 1, "%s", tmpstr);
+            free(tmpstr);
         }
     }
 
@@ -1016,36 +1018,40 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num)
             start_col += 2;
         }
 #ifdef MENU_COLOR
-        if (iflags.use_menu_color && iflags.use_color
-            && (menu_color
-                = curses_get_menu_coloring ((char *) menu_item_ptr->str, &color,
-                                     &attr))) {
-            if (color != NO_COLOR) {
-                curses_toggle_color_attr(win, color, NONE, ON);
+        color = NONE;
+        menu_color = iflags.use_menu_color && iflags.use_color &&
+                     get_menu_coloring(menu_item_ptr->str, &color, &attr);
+        if (menu_color) {
+            attr = curses_convert_attr(attr);
+            if (color != NONE || attr != A_NORMAL) {
+                curses_menu_color_attr(win, color, attr, ON);
             }
-            if (attr != A_NORMAL) {
-                menu_item_ptr->attr = menu_item_ptr->attr | attr;
+        } else {
+            attr = menu_item_ptr->attr;
+            if (color != NONE || attr != A_NORMAL) {
+                curses_toggle_color_attr(win, color, attr, ON);
             }
         }
 #endif /* MENU_COLOR */
-        curses_toggle_color_attr(win, NONE, menu_item_ptr->attr, ON);
 
         num_lines = curses_num_lines(menu_item_ptr->str, entry_cols);
-
         for (count = 0; count < num_lines; count++) {
-            if (strlen(menu_item_ptr->str) > 0) {
-                mvwprintw(win, menu_item_ptr->line_num + count + 1,
-                          start_col, "%s", curses_break_str(menu_item_ptr->str,
-                                                            entry_cols,
-                                                            count + 1));
+            if (menu_item_ptr->str && *menu_item_ptr->str) {
+                tmpstr = curses_break_str(menu_item_ptr->str, entry_cols, count + 1);
+                mvwprintw(win, menu_item_ptr->line_num + count + 1, start_col, "%s", tmpstr);
+                free(tmpstr);
             }
         }
 #ifdef MENU_COLOR
-        if (menu_color && (color != NO_COLOR)) {
-            curses_toggle_color_attr(win, color, NONE, OFF);
+        if (color != NONE || attr != A_NORMAL) {
+            if (menu_color) {
+                curses_menu_color_attr(win, color, attr, OFF);
+            } else {
+                curses_toggle_color_attr(win, color, attr, OFF);
+            }
         }
 #endif /* MENU_COLOR */
-        curses_toggle_color_attr(win, NONE, menu_item_ptr->attr, OFF);
+
         menu_item_ptr = menu_item_ptr->next_item;
     }
 
@@ -1090,6 +1096,7 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
 
     while (!dismiss) {
         curletter = getch();
+
         if (curletter == ERR) {
             num_selected = -1;
             dismiss = TRUE;
@@ -1106,7 +1113,6 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
                     num_selected = -1;
                 } else {
                     num_selected = 0;
-
                 }
                 dismiss = TRUE;
                 break;
@@ -1381,27 +1387,6 @@ menu_clear_selections(nhmenu *menu)
         menu_item_ptr = menu_item_ptr->next_item;
     }
 }
-
-
-/* This is to get the color of a menu item if the menucolor patch is
- applied */
-
-#ifdef MENU_COLOR
-boolean
-curses_get_menu_coloring(char *str, int *color, int *attr)
-{
-    struct menucoloring *tmpmc;
-
-    if (iflags.use_menu_color && iflags.use_color)
-        for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
-            if (regex_match(str, tmpmc->match)) {
-                *color = tmpmc->color;
-                *attr = curses_convert_attr(tmpmc->attr);
-                return TRUE;
-            }
-    return FALSE;
-}
-#endif /* MENU_COLOR */
 
 
 /* Get the maximum height for a menu */
