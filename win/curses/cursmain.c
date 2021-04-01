@@ -449,12 +449,11 @@ curses_add_menu(winid wid, int glyph, int cnt UNUSED, const ANY_P * identifier,
                 CHAR_P accelerator, CHAR_P group_accel, int attr,
                 const char *str, unsigned int presel)
 {
+    attr &= ~(ATR_URGENT | ATR_NOHISTORY);
     int curses_attr = curses_convert_attr(attr);
 
-    attr &= ~(ATR_URGENT | ATR_NOHISTORY);
-    curses_attr = curses_convert_attr(attr);
-
     if (inv_update) {
+        /* persistent inventory window; nothing is selectable */
         curses_add_inv(inv_update, glyph, accelerator, curses_attr, str);
         inv_update++;
         return;

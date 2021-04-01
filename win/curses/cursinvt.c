@@ -59,8 +59,13 @@ curses_update_inv(void)
 
 /* Adds an inventory item. */
 void
-curses_add_inv(int y, int glyph, CHAR_P accelerator, attr_t attr,
-               const char *str)
+curses_add_inv(
+    int y,              /* line index; 1..n rather than 0..n-1 */
+    int glyph,          /* glyph to display with item */
+    CHAR_P accelerator, /* selector letter for items, 0 for class headers */
+    attr_t attr,        /* curses attribute for headers, 0 for items */
+    const char *str)    /* formatted inventory item, without invlet prefix,
+                         * or class header text */
 {
     WINDOW *win = curses_get_nhwin(INV_WIN);
 
@@ -73,11 +78,10 @@ curses_add_inv(int y, int glyph, CHAR_P accelerator, attr_t attr,
 
     wmove(win, y, x);
     if (accelerator) {
-        attr_t bold = A_BOLD;
-        wattron(win, bold);
-        waddch(win, accelerator);
-        wattroff(win, bold);
-        wprintw(win, ") ");
+        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
+        wprintw(win, " %c", accelerator);
+        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
+        wprintw(win,  ") ");
     }
 
     if (accelerator && glyph != NO_GLYPH && !iflags.vanilla_ui_behavior) {
