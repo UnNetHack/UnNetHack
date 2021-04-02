@@ -5030,8 +5030,13 @@ struct sp_coder *coder;
         !OV_pop_typ(typ, SPOVAR_MAPCHAR) ||
         !OV_pop_c(coord)) return;
 
-    sp.x = SP_COORD_X(OV_i(coord));
-    sp.y = SP_COORD_Y(OV_i(coord));
+    if (coord->vardata.l & SP_COORD_IS_RANDOM) {
+        sp.x = -1;
+        sp.y = -1;
+    } else {
+        sp.x = SP_COORD_X(OV_i(coord));
+        sp.y = SP_COORD_Y(OV_i(coord));
+    }
 
     sp.lit = SP_MAPCHAR_LIT(OV_i(typ));
     sp.count = OV_i(count);
