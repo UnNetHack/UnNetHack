@@ -475,6 +475,14 @@ FLAGS: mazelevel, noflip
 INIT_MAP: mines, '.', ' ', true, true, unlit, true, '}'
 TELEPORT_REGION: levregion(11,01,59,19), levregion(01,01,02,02)
 NOMAP
+
+# add some muddy swamp
+LOOP [2d3] {
+  SPILL: random, 'M', north, 1d2
+  SPILL: random, 'M', south, 1d2
+  SPILL: random, 'M', east, 1d2
+  SPILL: random, 'M', west, 1d2
+}
 # show some water using gaps in the walls
 LOOP [10] {
   SPILL: random, '}', north, 0
@@ -482,6 +490,7 @@ LOOP [10] {
   SPILL: random, '}', east, 0
   SPILL: random, '}', west, 0
 }
+
 # chance of spillage, or maybe a river?
 IF [50%] {
   IF [60%] {
@@ -505,6 +514,10 @@ IF [50%] {
     }
   }
 }
+
+# add a few water tiles all over the place
+REPLACE_TERRAIN:(00,00,70,20), '.', '}', 1%
+
 #
 #  always put stairs relatively far apart
 #
