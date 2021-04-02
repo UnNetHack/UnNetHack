@@ -722,6 +722,9 @@ die:
     /* in case of a subsequent panic(), there's no point trying to save */
     program_state.something_worth_saving = 0;
 
+    /* deactivate perm_invent window to prevent the DYWYPISI? changes being shown */
+    iflags.perm_invent = FALSE;
+
     /* record time of death */
     u.udeathday = current_epoch();
 
