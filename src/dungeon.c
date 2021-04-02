@@ -2968,7 +2968,7 @@ print_mapseen(
                     depthstart, depthstart +
                     dungeons[mptr->lev.dnum].dunlev_ureached - 1);
         if (!dump) {
-            putstr(win, ATR_INVERSE, buf);
+            putstr(win, !final ? iflags.menu_headings : 0, buf);
         } else {
 #ifdef DUMP_LOG
             dump_text("  %s\n", buf);
