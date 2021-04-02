@@ -39,12 +39,6 @@ curses_update_inv(void)
     /* Clear the window as it is at the moment. */
     werase(win);
 
-    wmove(win, y, x);
-    attr_t attr = A_UNDERLINE;
-    wattron(win, attr);
-    wprintw(win, "Inventory:");
-    wattroff(win, attr);
-
     /* The actual inventory will override this if we do carry stuff */
     wmove(win, y + 1, x);
     wprintw(win, "Not carrying anything");
@@ -68,15 +62,20 @@ curses_add_inv(
                          * or class header text */
 {
     WINDOW *win = curses_get_nhwin(INV_WIN);
+    int x, width, height, available_width;
+    int border = curses_window_has_border(INV_WIN) ? 1 : 0;
 
-    /* Figure out where to draw the line */
-    int x = 0;
-    if (curses_window_has_border(INV_WIN)) {
-        x++;
-        y++;
+    x = border; /* same for every line; 1 if border, 0 otherwise */
+
+    curses_get_window_size(INV_WIN, &height, &width);
+
+    /* exit early if we're outside the visible area */
+    if (y > height + border) {
+        return;
     }
 
-    wmove(win, y, x);
+    wmove(win, y - 1 + border, x);
+
     if (accelerator) {
         curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
         wprintw(win, " %c", accelerator);
