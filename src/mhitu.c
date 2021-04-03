@@ -3009,6 +3009,14 @@ struct monst *mon;
     if (!tele_restrict(mon)) {
         (void) rloc(mon, TRUE);
     }
+
+    /* After all has been said and done, try switching the gender of the foocubus.
+     * The foocubus is searching for a new kind of victim.
+     * https://reddit.com/comments/leuy6p//gms59yt */
+    int mnum = (mon->data == &mons[PM_SUCCUBUS]) ? PM_INCUBUS : PM_SUCCUBUS;
+    boolean show_msg = canseemon(mon);
+    (void) newcham(mon, &mons[mnum], FALSE, show_msg);
+
     return 1;
 }
 #endif /* SEDUCE */
