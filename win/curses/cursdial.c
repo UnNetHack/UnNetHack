@@ -611,7 +611,6 @@ curses_display_nhmenu(winid wid, int how, MENU_ITEM_P ** _selected)
         win = curses_create_window(current_menu->width,
                                    current_menu->height, CENTER);
     } else { /* Display during-game menus on the right out of the way */
-
         win = curses_create_window(current_menu->width,
                                    current_menu->height, RIGHT);
     }
@@ -620,7 +619,7 @@ curses_display_nhmenu(winid wid, int how, MENU_ITEM_P ** _selected)
     curses_destroy_win(win);
 
     if (num_chosen > 0) {
-        selected = (MENU_ITEM_P *) malloc(num_chosen * sizeof (MENU_ITEM_P));
+        selected = (MENU_ITEM_P *) alloc((unsigned) (num_chosen * sizeof (MENU_ITEM_P)));
         count = 0;
 
         menu_item_ptr = current_menu->entries;
@@ -640,8 +639,7 @@ curses_display_nhmenu(winid wid, int how, MENU_ITEM_P ** _selected)
         }
 
         if (count != num_chosen) {
-            impossible("curses_display_nhmenu: Selected items less than "
-                  "expected number");
+            impossible("curses_display_nhmenu: Selected items less than expected number");
         }
     }
 
@@ -846,30 +844,38 @@ static void
 menu_win_size(nhmenu *menu)
 {
     int width, height, maxwidth, maxheight, curentrywidth, lastline;
-    int maxentrywidth = strlen(menu->prompt);
-    int maxheaderwidth = 0;
-    nhmenu_item *menu_item_ptr = menu->entries;
+    int maxentrywidth = 0;
+    int maxheaderwidth = menu->prompt ? (int) strlen(menu->prompt) : 0;
+    nhmenu_item *menu_item_ptr;
 
-    maxwidth = 38;              /* Reasonable minimum usable width */
-
-    if ((term_cols / 2) > maxwidth) {
-        maxwidth = (term_cols / 2);     /* Half the screen */
+    if (program_state.gameover) {
+        /* for final inventory disclosure, use full width */
+        maxwidth = term_cols - 2; /* +2: borders assumed */
+    } else {
+        /* this used to be 38, which is 80/2 - 2 (half a 'normal' sized
+           screen minus room for a border box), but some data files
+           have been manually formatted for 80 columns (usually limited
+           to 78 but sometimes 79, rarely 80 itself) and using a value
+           less that 40 meant that a full line would wrap twice:
+           1..38, 39..76, and 77..80 */
+        maxwidth = 40; /* Reasonable minimum usable width */
+        if ((term_cols / 2) > maxwidth) {
+            maxwidth = (term_cols / 2); /* Half the screen */
+        }
     }
-
     maxheight = menu_max_height();
 
     /* First, determine the width of the longest menu entry */
-    while (menu_item_ptr != NULL)
-    {
+    for (menu_item_ptr = menu->entries; menu_item_ptr != NULL;
+         menu_item_ptr = menu_item_ptr->next_item) {
+        curentrywidth = (int) strlen(menu_item_ptr->str);
         if (menu_item_ptr->identifier.a_void == NULL) {
-            curentrywidth = strlen(menu_item_ptr->str);
-
             if (curentrywidth > maxheaderwidth) {
                 maxheaderwidth = curentrywidth;
             }
         } else {
-            /* Add space for accelerator */
-            curentrywidth = strlen(menu_item_ptr->str) + 4;
+            /* Add space for accelerator (selector letter) */
+            curentrywidth += 4;
             if (menu_item_ptr->glyph != NO_GLYPH
                         && !iflags.vanilla_ui_behavior)
                 curentrywidth += 2;
@@ -877,22 +883,24 @@ menu_win_size(nhmenu *menu)
         if (curentrywidth > maxentrywidth) {
             maxentrywidth = curentrywidth;
         }
-        menu_item_ptr = menu_item_ptr->next_item;
     }
 
-    /* If the widest entry is smaller than maxwidth, reduce maxwidth accordingly */
-    if (maxentrywidth < maxwidth) {
-        maxwidth = maxentrywidth;
+    /*
+     * 3.6.3: This used to set maxwidth to maxheaderwidth when that was
+     * bigger but only set it to maxentrywidth if the latter was smaller,
+     * so entries wider than the default would always wrap unless at
+     * least one header or separator line was long, even when there was
+     * lots of space available to display them without wrapping.  The
+     * reason to force narrow menus isn't known.  It may have been to
+     * reduce the amount of map rewriting when menu is dismissed, but if
+     * so, that was an issue due to excessive screen writing for the map
+     * (output was flushed for each character) which was fixed long ago.
+     */
+    maxwidth = max(maxentrywidth, maxheaderwidth);
+    if (maxwidth > term_cols - 2) {
+        /* -2: space for left and right borders */
+        maxwidth = term_cols - 2;
     }
-
-    /* Try not to wrap headers/normal text lines if possible.  We can
-       go wider than half the screen for this purpose if need be */
-
-    if ((maxheaderwidth > maxwidth) && (maxheaderwidth < (term_cols - 2))) {
-        maxwidth = maxheaderwidth;
-    }
-
-    width = maxwidth;
 
     /* Possibly reduce height if only 1 page */
     if (!menu_is_multipage(menu, maxwidth, maxheight)) {
@@ -907,16 +915,16 @@ menu_win_size(nhmenu *menu)
         if (lastline < maxheight) {
             maxheight = lastline;
         }
-    } else {                    /* If multipage, make sure we have enough width for page footer */
-
-        if (width < 20) {
-            width = 20;
-        }
     }
 
-    height = maxheight;
-    menu->width = width;
-    menu->height = height;
+    /* avoid a tiny popup window; when it's shown over the endings of
+       old messages rather than over the map, it is fairly easy for
+       the player to overlook it, particularly when walking around and
+       stepping on a pile of 2 items; also, multi-page menus need enough
+       room for "(Page M of N) => " even if all entries are narrower
+       than that; we specify same minimum width even when single page */
+    menu->width = max(maxwidth, 25);
+    menu->height = max(maxheight, 5);
 }
 
 
