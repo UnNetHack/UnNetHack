@@ -530,6 +530,16 @@ IF [50%] {
   STAIR: levregion(50,01,70,20), levregion(45,10,49,12), up
   STAIR: levregion(01,01,20,20), levregion(40,10,44,12), down
 }
+
+# small chance for a fountain or sink
+IF [10%] {
+  IF [50%] {
+    SINK: random
+  } ELSE {
+    FOUNTAIN: random
+  }
+}
+
 #
 $object = OBJECT: { '(', '/', '=', '+', ')', '[', '?', '*', '%' }
 SHUFFLE: $object
@@ -551,4 +561,8 @@ LOOP [4d4] {
 #
 LOOP [12] {
   TRAP: random, random
+}
+#
+LOOP [2d3] {
+  TRAP: "rust", random
 }
