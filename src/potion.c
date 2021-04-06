@@ -2011,7 +2011,12 @@ register struct obj *o1, *o2;
         }
 
         if (i1==ALCHEMY_WHITE && i2==ALCHEMY_BLACK) {
-            return ALCHEMY_GRAY;
+            if (OBJ_NAME(objects[ALCHEMY_GRAY]) == 0) {
+                /* silver potions don't exist in this game */
+                return 0;
+            } else {
+                return ALCHEMY_GRAY;
+            }
         } else if ( (IS_PRIMARY_COLOR(i1) && IS_PRIMARY_COLOR(i2))
                     || (IS_SECONDARY_COLOR(i1) && IS_SECONDARY_COLOR(i2)) ) {
             /* bitwise OR simulates pigment addition */
