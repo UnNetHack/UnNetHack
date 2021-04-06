@@ -616,7 +616,7 @@ PACKAGE_STRING='UNNETHACK 6.0.1'
 PACKAGE_BUGREPORT='bhaak@gmx.net'
 PACKAGE_URL=''
 
-ac_unique_file="Files"
+ac_unique_file="README.configure"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stddef.h>

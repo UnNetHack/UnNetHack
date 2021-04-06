@@ -1,7 +1,7 @@
 dnl	UNNETHACK autoconf template
 AC_INIT([UNNETHACK],[6.0.1],[bhaak@gmx.net])
 
-AC_CONFIG_SRCDIR(Files)
+AC_CONFIG_SRCDIR(README.configure)
 AC_SUBST(SRCDIR,[../$srcdir/src])
 AC_CONFIG_AUX_DIR(sys/autoconf)
 
