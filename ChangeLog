@@ -21,6 +21,7 @@
 	  - The Wizard of Yendor and Quest Nemesis steal any artifact
 	  - The Wizard of Yendor will never steal the quest artifact of
 	    the current role
+	  - Monsters may throw potions of oil as an offensive item (from xNetHack)
 
 	* Race changes:
 	  - Allow player vampires to be neutral

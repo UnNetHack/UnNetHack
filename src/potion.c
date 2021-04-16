@@ -1166,6 +1166,7 @@ peffects(struct obj *otmp)
         }
         exercise(A_WIS, good_for_you);
     }
+    /* no Glib for monsters */
     break;
 
     case POT_ACID:
