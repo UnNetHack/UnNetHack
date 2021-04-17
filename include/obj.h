@@ -268,6 +268,10 @@ struct obj {
 #define Is_mbag(otmp)   (otmp->otyp == BAG_OF_HOLDING || \
                          otmp->otyp == BAG_OF_TRICKS)
 #define SchroedingersBox(o) ((o)->otyp == LARGE_BOX && (o)->spe == 1)
+/* usually waterproof; random chance to be subjected to leakage if cursed;
+   excludes statues, which aren't vulernable to water even when cursed */
+#define Is_waterproof_container(o) \
+    ((o)->otyp == OILSKIN_SACK || (o)->otyp == ICE_BOX || Is_box(o))
 
 #define Is_sokoprize(otmp)  ((otmp)->sokoprize && !Is_box(otmp))
 
