@@ -154,6 +154,57 @@ write_level_info()
 	//wiz_map();
 }
 
+char *
+obj_class_name(int otyp)
+{
+    struct objclass *ocl = &objects[otyp];
+
+    switch (ocl->oc_class) {
+    case COIN_CLASS:
+        return "coin";
+    case POTION_CLASS:
+        return "potion";
+    case SCROLL_CLASS:
+        return "scroll";
+    case WAND_CLASS:
+        return "wand";
+    case SPBOOK_CLASS:
+        return "spellbook";
+    case RING_CLASS:
+        return "ring";
+    case AMULET_CLASS:
+        return "amulet";
+    case GEM_CLASS:
+        return "gem";
+    case ROCK_CLASS:
+        return "rock";
+    case WEAPON_CLASS:
+        return "weapon";
+    case ARMOR_CLASS:
+        return "armor";
+    case TOOL_CLASS:
+        return "tool";
+    case FOOD_CLASS:
+        return "food";
+    default:
+        return "unknown";
+    }
+}
+
+void
+write_obj_info(struct obj* obj)
+{
+    if (flevelinfo) {
+        struct objclass *ocl = &objects[obj->otyp];
+        const char *actualn = OBJ_NAME(*ocl);
+        const char *dn = OBJ_DESCR(*ocl);
+
+        fprintf(flevelinfo, "%s:class=%s:name=%s:description=%s:quan=%ld:spe=%d:\n",
+                encode_base32(level_info[0].seed),
+                obj_class_name(obj->otyp), actualn, dn, obj->quan, obj->spe);
+    }
+}
+
 void
 level_statistics(boolean up)
 {

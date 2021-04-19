@@ -805,6 +805,8 @@ static const char dknowns[] = {
     GEM_CLASS, SPBOOK_CLASS, WEAPON_CLASS, TOOL_CLASS, 0
 };
 
+extern void write_obj_info(struct obj* obj);
+
 /* mksobj(): create a specific type of object; result it always non-Null */
 struct obj *
 mksobj(otyp, init, artif)
@@ -1160,6 +1162,9 @@ boolean artif;
     if (objects[otyp].oc_unique && !otmp->oartifact)
         otmp = mk_artifact(otmp, (aligntyp) A_NONE);
     otmp->owt = weight(otmp);
+
+    write_obj_info(otmp);
+
     return otmp;
 }
 
