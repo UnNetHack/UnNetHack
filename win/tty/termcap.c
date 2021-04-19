@@ -1310,31 +1310,36 @@ init_hilite()
             hilites[c] = (char *) alloc(strlen(scratch) + 1);
             Strcpy(hilites[c], scratch);
         }
-        if (c != CLR_BLACK) {
-            hilites[c|BRIGHT] = (char*) alloc(strlen(scratch)+strlen(MD)+1);
-            Strcpy(hilites[c|BRIGHT], MD);
-            Strcat(hilites[c|BRIGHT], scratch);
+        if (colors >= 16) {
+            /* Use proper bright colors if terminal supports them. */
+            scratch = tparm(setf, ti_map[c]|BRIGHT);
+            hilites[c|BRIGHT] = (char *) alloc(strlen(scratch) + 1);
+            Strcpy(hilites[c|BRIGHT], scratch);
+        } else {
+            /* For terminals supporting only 8 colors, use bold + color for
+             * bright colors. */
+            if (c != CLR_BLACK) {
+                hilites[c|BRIGHT] = (char*) alloc(strlen(scratch)+strlen(MD)+1);
+                Strcpy(hilites[c|BRIGHT], MD);
+                Strcat(hilites[c|BRIGHT], scratch);
+            }
         }
-
     }
+
     if (!iflags.wc2_newcolors) {
         hilites[CLR_BLACK] = hilites[CLR_BLUE];
     }
 
     char *colorterm = getenv("COLORTERM");
     if (colorterm && !strcmpi(colorterm, "truecolor")) {
-        colors = iflags.color_mode = 16777216;
-    }
-
-    if (iflags.wc2_newcolors) {
-        if (colors == 256) {
-            scratch = tparm(setf, TERMINAL_COLOR_GRAY);
-            free((genericptr_t) hilites[CLR_BLACK]);
-            hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + 1);
-            Strcpy(hilites[CLR_BLACK], scratch);
-        } else if (colors == 16777216) {
+        if (iflags.wc2_newcolors && colors == 8) {
+            /* Peculiar special case.
+             * Terminal reports both 8 color support but also truecolor support.
+             * For terminals supporting more colors, proper gray will have
+             * been set already. */
             init_color_rgb(CLR_BLACK, TERMINAL_COLOR_GRAY_RGB);
         }
+        colors = iflags.color_mode = 16777216;
     }
 
     if (colors == 256) {
