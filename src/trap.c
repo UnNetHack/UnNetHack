@@ -3730,6 +3730,7 @@ boolean force;
         return ER_GREASED;
 
     } else if (Is_container(obj) &&
+               (obj->otyp != IRON_SAFE) &&
                (!Is_waterproof_container(obj) || (obj->cursed && !rn2(3)))) {
         if (carried(obj)) {
             pline("Some %s gets into your %s!", hliquid("water"), ostr);
