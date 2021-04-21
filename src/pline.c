@@ -399,6 +399,9 @@ impossible VA_DECL(const char *, s)
     }
     pline("%s", pbuf);
     pline("Please report these messages to %s.", DEVTEAM_EMAIL);
+    if (sysopt.support) {
+        pline("Alternatively, contact local support: %s", sysopt.support);
+    }
 
     program_state.in_impossible = 0;
     VA_END();

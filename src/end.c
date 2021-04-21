@@ -314,15 +314,22 @@ panic VA_DECL(const char *, str)
     else if (program_state.something_worth_saving)
         raw_print("\nError save file being written.\n");
 # else
-    if (!wizard)
-        raw_printf("Report error to \"%s\"%s.",
-#  ifdef WIZARD_NAME    /*(KR1ED)*/
-                   WIZARD_NAME,
+    if (!wizard) {
+        const char *maybe_rebuild = !program_state.something_worth_saving
+                                     ? "." : "\nand it may be possible to rebuild.";
+
+        if (sysopt.support) {
+            raw_printf("To report this error, %s%s", sysopt.support, maybe_rebuild);
+        } else {
+            raw_printf("Report error to \"%s\"%s",
+#  ifdef WIZARD_NAME /*(KR1ED)*/
+                       WIZARD_NAME,
 #  else
-                   WIZARD,
+                       WIZARD,
 #  endif
-                   !program_state.something_worth_saving ? "" :
-                   " and it may be possible to rebuild.");
+                       maybe_rebuild);
+        }
+    }
 # endif
     if (!iflags.debug_fuzzer) {
         if (program_state.something_worth_saving) {

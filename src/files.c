@@ -2230,6 +2230,11 @@ parse_config_line(FILE *fp,
             (void) fclose(include_fp);
         }
 #ifdef SYSCF
+    } else if (in_sysconf && match_varname(buf, "SUPPORT", 7)) {
+        if (sysopt.support) {
+            free(sysopt.support);
+        }
+        sysopt.support = dupstr(bufp);
     } else if (src == set_in_sysconf && match_varname(buf, "LIVELOG", 7)) {
 #ifdef LIVELOGFILE
         long n = strtol(bufp, NULL, 0);
