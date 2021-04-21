@@ -424,7 +424,10 @@ const char * const *nlp;
             "One-legged", "Barefoot", "Cold-blooded", "Cut-throat",
             "Evil-eyed", "Scar-faced", "Five-toothed", "Four-limbed",
             "Eight-fingered", "Color-blind", "Iron-bellied",
-            "Silver-tongued", "Crazy-eyed",
+            "Silver-tongued", "Crazy-eyed", "Hot-blooded",
+            "Green-skinned", "Sharp-eyed", "Hard-nosed", "Dog-eared",
+            "Peg-legged", "Knock-knee", "Hook-handed", "One-nostril",
+            "Double-chinned", "Double-jointed", "Nine-lives",
             0
         };
         for (num_prefixes = 0; prefixes[num_prefixes]; num_prefixes++)
