@@ -309,8 +309,8 @@ panic VA_DECL(const char *, str)
 #if defined(WIZARD) && !defined(MICRO)
 # if defined(NOTIFY_NETHACK_BUGS)
     if (!wizard)
-        raw_printf("Report the following error to \"%s\".",
-                   "bhaak@gmx.net");
+        raw_printf("Report the following error to \"%s\" or at \"%s\".",
+                   DEVTEAM_EMAIL, DEVTEAM_URL);
     else if (program_state.something_worth_saving)
         raw_print("\nError save file being written.\n");
 # else
