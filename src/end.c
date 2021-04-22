@@ -679,6 +679,8 @@ int how;
             if ((how == GENOCIDED) && is_playermon_genocided())
                 pline("Unfortunately you are still genocided...");
             else {
+                livelog_printf(LL_LIFESAVE, "averted death (%s)", killer.name);
+
                 killer.name[0] = 0;
                 killer.format = 0;
                 return;

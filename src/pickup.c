@@ -2355,7 +2355,8 @@ register struct obj *obj;
         }
     } else if ((current_container->otyp == BAG_OF_HOLDING) && mbag_explodes(obj, 0)) {
 #ifdef LIVELOGFILE
-        livelog_generic("boh_explosion", dump_typename(obj->otyp));
+        livelog_printf(LL_ACHIEVE, "just blew up %s %s with %s",
+                       uhis(), dump_typename(current_container->otyp), an(dump_typename(obj->otyp)));
 #endif
         /* explicitly mention what item is triggering the explosion */
         pline( "As you put %s inside, you are blasted by a magical explosion!", doname(obj));

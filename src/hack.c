@@ -782,6 +782,13 @@ xchar x, y;
     }
 
     /* Okay, you've chewed through something */
+    if (successful_cdt(CONDUCT_FOODLESS)) {
+        livelog_printf(LL_CONDUCT, "ate for the first time, by chewing through %s",
+                       boulder ? "a boulder" :
+                       IS_TREES(lev->typ) ? "a tree" :
+                       IS_ROCK(lev->typ) ? "rock" :
+                       (lev->typ == IRONBARS) ? "iron bars" : "a door");
+    }
     violated(CONDUCT_FOODLESS);
     u.uhunger += rnd(20);
 
@@ -2542,6 +2549,9 @@ pull_free:
                        killed() so we duplicate some of the latter here */
                     int tmp, mndx;
 
+                    if (!u.uconduct.killer) {
+                        livelog_printf(LL_CONDUCT, "killed for the first time");
+                    }
                     u.uconduct.killer++;
                     mndx = monsndx(mtmp->data);
                     tmp = experience(mtmp, (int) mvitals[mndx].died);

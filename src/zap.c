@@ -2050,6 +2050,9 @@ struct obj *obj, *otmp;
                 break;
             }
             /* KMH, conduct */
+            if (!u.uconduct.polypiles) {
+                livelog_printf(LL_CONDUCT, "polymorphed %s first object", uhis());
+            }
             u.uconduct.polypiles++;
             /* any saved lock context will be dangerously obsolete */
             if (Is_box(obj)) (void) boxlock(obj, otmp);

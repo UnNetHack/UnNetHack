@@ -5,6 +5,8 @@
 
 #ifdef LIVELOGFILE
 
+#include <stdarg.h>
+
 #ifdef SHORT_FILENAMES
 #include "patchlev.h"
 #else
@@ -69,6 +71,7 @@ boolean livelog_start() {
 }
 
 /* Locks the live log file and writes 'buffer' */
+static
 void livelog_write_string(char* buffer) {
     FILE* livelogfile;
 #ifdef FILE_AREAS
@@ -315,14 +318,51 @@ livelog_genocide(genocided_monster, level_wide)
 const char* genocided_monster;
 int level_wide;
 {
+    if (level_wide) {
+        livelog_printf(LL_GENOCIDE, "genocided %s on a level in %s",
+                       genocided_monster, dungeons[u.uz.dnum].dname);
+    } else if (num_genocides() == 0) {
+        livelog_printf(LL_CONDUCT | LL_GENOCIDE, "performed %s first genocide (%s)",
+                       uhis(), genocided_monster);
+    } else {
+        livelog_printf(LL_GENOCIDE, "genocided %s", genocided_monster);
+    }
+}
+
+void
+livelog_printf(unsigned int ll_type, const char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+
+    if (!(ll_type & sysopt.livelog)) {
+        return;
+    }
+    if ((ll_type == LL_CONDUCT) && (moves < sysopt.ll_conduct_turns)) {
+        return;
+    }
+
+    char ll_msgbuf[BUFSZ];
+    vsnprintf(ll_msgbuf, BUFSZ, fmt, args);
+
     snprintf(strbuf, STRBUF_LEN,
-             "%s" SEP "type=genocide" SEP "genocided_monster=%s" SEP "dungeon_wide=%s\n",
+             "%s" SEP "lltype=%d" SEP "curtime=%ld" SEP "message=%s\n",
              livelog_prefix(),
-             genocided_monster,
-             level_wide ? "no" : "yes");
+             (ll_type & sysopt.livelog),
+             (long)current_epoch(),
+             ll_msgbuf);
     livelog_write_string(strbuf);
+
+    va_end(args);
 }
 
 #undef SEP
+
+#else
+
+void
+livelog_printf(unsigned int ll_type, const char *fmt, ...)
+{
+}
 
 #endif /* LIVELOGFILE */

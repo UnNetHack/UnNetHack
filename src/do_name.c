@@ -1380,6 +1380,13 @@ const char *name;
         }
         if (via_naming) {
             /* violate illiteracy conduct since successfully wrote arti-name */
+            if (successful_cdt(CONDUCT_ILLITERACY)) {
+                livelog_printf(LL_CONDUCT | LL_ARTIFACT, "became literate by naming %s",
+                               bare_artifactname(obj));
+            } else {
+                livelog_printf(LL_ARTIFACT, "chose %s to be named \"%s\"",
+                               ansimpleoname(obj), bare_artifactname(obj));
+            }
             violated(CONDUCT_ILLITERACY);
         }
     }

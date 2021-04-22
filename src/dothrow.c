@@ -1792,6 +1792,9 @@ struct obj   *obj; /* thrownobj or kickedobj or uwep */
 
             /* attack hits mon */
             if (hmode == HMON_APPLIED) {
+                if (!u.uconduct.weaphit) {
+                    livelog_printf(LL_CONDUCT, "hit with a wielded weapon for the first time");
+                }
                 u.uconduct.weaphit++;
             }
             if (hmon(mon, obj, hmode, dieroll)) {

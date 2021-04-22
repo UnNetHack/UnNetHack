@@ -299,6 +299,9 @@ register struct obj *obj;
 
     if (obj->oclass != COIN_CLASS) {
         /* KMH, conduct */
+        if (!u.uconduct.gnostic) {
+            livelog_printf(LL_CONDUCT, "eschewed atheism, by dropping %s on an altar", doname(obj));
+        }
         u.uconduct.gnostic++;
     } else {
         /* coins don't have bless/curse status */
@@ -1472,6 +1475,7 @@ boolean at_stairs, falling, portal;
         }
         mklev();
         new = TRUE; /* made the level */
+        livelog_printf(LL_DEBUG, "entered new level %d, %s.", dunlev(&u.uz), dungeons[u.uz.dnum].dname);
     } else {
         /* returning to previously visited level; reload it */
         fd = open_levelfile(new_ledger, whynot);

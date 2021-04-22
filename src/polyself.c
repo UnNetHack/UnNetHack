@@ -466,6 +466,10 @@ int mntmp;
     }
 
     /* KMH, conduct */
+    if (!u.uconduct.polyselfs) {
+        livelog_printf(LL_CONDUCT, "changed form for the first time, becoming %s",
+                       an(mons[mntmp].mname));
+    }
     u.uconduct.polyselfs++;
 
     /* exercise used to be at the very end but only Wis was affected

@@ -74,7 +74,7 @@ struct u_event {
 # define record_uevent_achievement(message, field) \
 { \
         if (!u.uevent.field) { \
-            livelog_generic("message", message); \
+            livelog_printf(LL_ACHIEVE, message); \
             u.uevent.field = TRUE; \
         } \
 }
