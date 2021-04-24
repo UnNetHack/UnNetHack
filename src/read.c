@@ -2636,90 +2636,269 @@ struct obj *from_obj;
 }
 
 #ifdef WIZARD
+struct _create_particular_data {
+    int quan;
+    int which;
+    int fem;
+    char monclass;
+    boolean randmonst;
+    boolean maketame, makepeaceful, makehostile;
+    boolean sleeping, saddled, invisible, hidden;
+};
+
+static boolean
+create_particular_parse(str, d)
+char *str;
+struct _create_particular_data *d;
+{
+    char *bufp = str;
+    char *tmpp;
+
+    d->quan = 1 + ((multi > 0) ? multi : 0);
+    d->monclass = MAXMCLASSES;
+    d->which = urole.malenum; /* an arbitrary index into mons[] */
+    d->fem = -1; /* gender not specified */
+    d->randmonst = FALSE;
+    d->maketame = d->makepeaceful = d->makehostile = FALSE;
+    d->sleeping = d->saddled = d->invisible = d->hidden = FALSE;
+
+    /* quantity */
+    if (digit(*bufp)) {
+        d->quan = atoi(bufp);
+        while (digit(*bufp)) {
+            bufp++;
+        }
+        while (*bufp == ' ') {
+            bufp++;
+        }
+    }
+#define QUAN_LIMIT (ROWNO * (COLNO - 1))
+    /* maximum possible quantity is one per cell: (0..ROWNO-1) x (1..COLNO-1)
+       [21*79==1659 for default map size; could subtract 1 for hero's spot] */
+    if (d->quan < 1 || d->quan > QUAN_LIMIT) {
+        d->quan = QUAN_LIMIT - monster_census(FALSE);
+    }
+#undef QUAN_LIMIT
+    /* gear -- extremely limited number of possibilities supported */
+    if ((tmpp = strstri(bufp, "saddled ")) != 0) {
+        d->saddled = TRUE;
+        (void) memset(tmpp, ' ', sizeof "saddled " - 1);
+    }
+    /* state -- limited number of possibilitie supported */
+    if ((tmpp = strstri(bufp, "sleeping ")) != 0) {
+        d->sleeping = TRUE;
+        (void) memset(tmpp, ' ', sizeof "sleeping " - 1);
+    }
+    if ((tmpp = strstri(bufp, "invisible ")) != 0) {
+        d->invisible = TRUE;
+        (void) memset(tmpp, ' ', sizeof "invisible " - 1);
+    }
+    if ((tmpp = strstri(bufp, "hidden ")) != 0) {
+        d->hidden = TRUE;
+        (void) memset(tmpp, ' ', sizeof "hidden " - 1);
+    }
+    /* check "female" before "male" to avoid false hit mid-word */
+    if ((tmpp = strstri(bufp, "female ")) != 0) {
+        d->fem = 1;
+        (void) memset(tmpp, ' ', sizeof "female " - 1);
+    }
+    if ((tmpp = strstri(bufp, "male ")) != 0) {
+        d->fem = 0;
+        (void) memset(tmpp, ' ', sizeof "male " - 1);
+    }
+    bufp = mungspaces(bufp); /* after potential memset(' ') */
+    /* allow the initial disposition to be specified */
+    if (!strncmpi(bufp, "tame ", 5)) {
+        bufp += 5;
+        d->maketame = TRUE;
+    } else if (!strncmpi(bufp, "peaceful ", 9)) {
+        bufp += 9;
+        d->makepeaceful = TRUE;
+    } else if (!strncmpi(bufp, "hostile ", 8)) {
+        bufp += 8;
+        d->makehostile = TRUE;
+    }
+    /* decide whether a valid monster was chosen */
+    if (wizard && (!strcmp(bufp, "*") || !strcmp(bufp, "random"))) {
+        d->randmonst = TRUE;
+        return TRUE;
+    }
+    d->which = name_to_mon(bufp);
+    if (d->which >= LOW_PM) {
+        return TRUE; /* got one */
+    }
+    d->monclass = name_to_monclass(bufp, &d->which);
+
+    if (d->which >= LOW_PM) {
+        d->monclass = MAXMCLASSES; /* matters below */
+        return TRUE;
+#ifdef NEXT_VERSION
+    } else if (d->monclass == S_invisible) { /* not an actual monster class */
+        d->which = PM_STALKER;
+        d->monclass = MAXMCLASSES;
+        return TRUE;
+#endif
+    } else if (d->monclass == S_WORM_TAIL) { /* empty monster class */
+        d->which = PM_LONG_WORM;
+        d->monclass = MAXMCLASSES;
+        return TRUE;
+    } else if (d->monclass > 0) {
+        d->which = urole.malenum; /* reset from NON_PM */
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static boolean
+create_particular_creation(str, d)
+char *str;
+struct _create_particular_data *d;
+{
+    struct permonst *whichpm = NULL;
+    int i, mx, my, firstchoice = NON_PM;
+    struct monst *mtmp;
+    boolean madeany = FALSE;
+
+    if (!d->randmonst) {
+        firstchoice = d->which;
+        if (cant_revive(&d->which, FALSE, (struct obj *) 0) && firstchoice != PM_LONG_WORM_TAIL) {
+            /* wizard mode can override handling of special monsters */
+            char buf[BUFSZ];
+            /* if str contains shapechanger name, create shapeshanger */
+            if (!strstri(str, mons[d->which].mname)) {
+                /* otherwise overwrite with firstchoice */
+                d->which = firstchoice;
+            }
+        }
+        whichpm = &mons[d->which];
+    }
+    for (i = 0; i < d->quan; i++) {
+        if (d->monclass != MAXMCLASSES) {
+            whichpm = mkclass(d->monclass, 0);
+        } else if (d->randmonst) {
+            whichpm = rndmonst();
+        }
+        mtmp = makemon(whichpm, u.ux, u.uy, NO_MM_FLAGS);
+        if (!mtmp) {
+            /* quit trying if creation failed and is going to repeat */
+            if (d->monclass == MAXMCLASSES && !d->randmonst) {
+                break;
+            }
+            /* otherwise try again */
+            continue;
+        }
+        mx = mtmp->mx, my = mtmp->my;
+        /* 'is_FOO()' ought to be called 'always_FOO()' */
+        if (d->fem != -1 && !is_male(mtmp->data) && !is_female(mtmp->data)) {
+            mtmp->female = d->fem; /* ignored for is_neuter() */
+        }
+        if (d->maketame) {
+            (void) tamedog(mtmp, (struct obj *) 0);
+        } else if (d->makepeaceful || d->makehostile) {
+            mtmp->mtame = 0; /* sanity precaution */
+            mtmp->mpeaceful = d->makepeaceful ? 1 : 0;
+            set_malign(mtmp);
+        }
+        if (d->saddled && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)) {
+            struct obj *otmp = mksobj(SADDLE, TRUE, FALSE);
+
+            put_saddle_on_mon(otmp, mtmp);
+        }
+        if (d->invisible) {
+            mon_set_minvis(mtmp);
+            if (does_block(mx, my, &levl[mx][my])) {
+                block_point(mx, my);
+            } else {
+                unblock_point(mx, my);
+            }
+        }
+       if (d->hidden &&
+           ((is_hider(mtmp->data) && mtmp->data->mlet != S_MIMIC) ||
+            (hides_under(mtmp->data) && OBJ_AT(mx, my)) ||
+            (mtmp->data->mlet == S_EEL && is_pool(mx, my)))) {
+            mtmp->mundetected = 1;
+       }
+        if (d->sleeping) {
+            mtmp->msleeping = 1;
+        }
+        /* iff asking for 'hidden', show location of every created monster
+           that can't be seen--whether that's due to successfully hiding
+           or vision issues (line-of-sight, invisibility, blindness) */
+        if (d->hidden && !canspotmon(mtmp)) {
+            int count = couldsee(mx, my) ? 8 : 4;
+            char saveviz = viz_array[my][mx];
+
+            if (!flags.sparkle) {
+                count /= 2;
+            }
+            viz_array[my][mx] |= (IN_SIGHT | COULD_SEE);
+            flash_glyph_at(mx, my, mon_to_glyph(mtmp), count);
+            viz_array[my][mx] = saveviz;
+            newsym(mx, my);
+        }
+        madeany = TRUE;
+        /* in case we got a doppelganger instead of what was asked
+           for, make it start out looking like what was asked for */
+        if (mtmp->cham != NON_PM && firstchoice != NON_PM && mtmp->cham != firstchoice) {
+            (void) newcham(mtmp, &mons[firstchoice], FALSE, FALSE);
+        }
+    }
+    return madeany;
+}
+
 /*
  * Make a new monster with the type controlled by the user.
  *
  * Note:  when creating a monster by class letter, specifying the
  * "strange object" (']') symbol produces a random monster rather
- * than a mimic; this behavior quirk is useful so don't "fix" it...
+ * than a mimic.  This behavior quirk is useful so don't "fix" it
+ * (use 'm'--or "mimic"--to create a random mimic).
+ *
+ * Used in wizard mode only (for ^G command and for scroll or spell
+ * of create monster).  Once upon a time, an earlier incarnation of
+ * this code was also used for the scroll/spell in explore mode.
  */
 boolean
 create_particular()
 {
-    char buf[BUFSZ], *bufp, monclass = MAXMCLASSES;
-    int which, tries, i, quan;
-    struct permonst *whichpm;
-    struct monst *mtmp;
-    boolean madeany = FALSE;
-    boolean maketame, makepeaceful, makehostile;
+    char buf[BUFSZ] = DUMMY, *bufp;
+    int  tryct = 5;
+    struct _create_particular_data d;
 
-    tries = 0;
     do {
-        if (multi > 0) quan = multi;
-        else quan = 1;
-        which = urole.malenum;  /* an arbitrary index into mons[] */
-        maketame = makepeaceful = makehostile = FALSE;
-        getlin("Create what kind of monster? [type the name or symbol]",
-               buf);
+        getlin("Create what kind of monster? [type the name or symbol]", buf);
         bufp = mungspaces(buf);
-        if (*bufp == '\033') return FALSE;
-        /* get quantity */
-        if (digit(*bufp) && strcmp(bufp, "0")) {
-            quan = atoi(bufp);
-            while (digit(*bufp))
-                bufp++;
-            while (*bufp == ' ')
-                bufp++;
+        if (*bufp == '\033') {
+            return FALSE;
         }
-        /* allow the initial disposition to be specified */
-        if (!strncmpi(bufp, "tame ", 5)) {
-            bufp += 5;
-            maketame = TRUE;
-        } else if (!strncmpi(bufp, "peaceful ", 9)) {
-            bufp += 9;
-            makepeaceful = TRUE;
-        } else if (!strncmpi(bufp, "hostile ", 8)) {
-            bufp += 8;
-            makehostile = TRUE;
+
+        if (create_particular_parse(bufp, &d)) {
+            break;
         }
-        /* decide whether a valid monster was chosen */
-        if (strlen(bufp) == 1) {
-            monclass = def_char_to_monclass(*bufp);
-            if (monclass != MAXMCLASSES) break; /* got one */
-        } else {
-            which = name_to_mon(bufp);
-            if (which >= LOW_PM) break; /* got one */
-        }
+
         /* no good; try again... */
         pline("I've never heard of such monsters.");
-    } while (++tries < 5);
+    } while (--tryct > 0);
 
-    if (tries == 5) {
+    if (!tryct) {
         pline("%s", thats_enough_tries);
     } else {
-        (void) cant_revive(&which, FALSE, (struct obj *) 0);
-        whichpm = &mons[which];
-        for (i = 0; i < quan; i++) {
-            if (monclass != MAXMCLASSES)
-                whichpm = mkclass(monclass, 0);
-            if (maketame) {
-                mtmp = makemon(whichpm, u.ux, u.uy, MM_EDOG);
-                if (mtmp) {
-                    initedog(mtmp);
-                    set_malign(mtmp);
-                }
-            } else {
-                mtmp = makemon(whichpm, u.ux, u.uy, NO_MM_FLAGS);
-                if ((makepeaceful || makehostile) && mtmp) {
-                    mtmp->mtame = 0; /* sanity precaution */
-                    mtmp->mpeaceful = makepeaceful ? 1 : 0;
-                    set_malign(mtmp);
-                }
-            }
-            if (mtmp) madeany = TRUE;
-        }
+        return create_particular_creation(bufp, &d);
     }
-    return madeany;
+
+    return FALSE;
+}
+
+boolean
+create_particular_from_buffer(const char* bufp)
+{
+    struct _create_particular_data d;
+
+    if (create_particular_parse(bufp, &d)) {
+        return create_particular_creation(bufp, &d);
+    }
+
+    return FALSE;
 }
 #endif /* WIZARD */
 

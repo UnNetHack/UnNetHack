@@ -921,6 +921,9 @@ int *mndx_p;
         len = (int) strlen(in_str);
         for (i = 1; i < MAXMCLASSES; i++) {
             x = def_monsyms_explain(i);
+            if (!x) {
+                continue;
+            }
             if ((p = strstri(x, in_str)) != 0 && (p == x || *(p - 1) == ' ') &&
                  ((int) strlen(p) >= len &&
                    (p[len] == '\0' || p[len] == ' '))) {

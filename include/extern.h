@@ -345,6 +345,7 @@ E void FDECL(newsym, (int, int));
 E void FDECL(newsym_force, (int, int));
 E void FDECL(shieldeff, (XCHAR_P, XCHAR_P));
 E void FDECL(tmp_at, (int, int));
+extern void flash_glyph_at(int, int, int, int);
 E void FDECL(swallowed, (int));
 E void FDECL(under_ground, (int));
 E void FDECL(under_water, (int));
@@ -2157,6 +2158,7 @@ E boolean NDECL(create_particular);
 #endif
 E void FDECL(drop_boulder_on_player, (BOOLEAN_P, BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
 E int FDECL(drop_boulder_on_monster, (int, int, BOOLEAN_P, BOOLEAN_P));
+extern boolean create_particular_from_buffer(const char*);
 
 /* ### rect.c ### */
 

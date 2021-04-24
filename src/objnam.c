@@ -4167,16 +4167,30 @@ typfnd:
     }
 
     /* if player specified a reasonable count, maybe honor it */
-    if(cnt > 0 && objects[typ].oc_merge && oclass != SPBOOK_CLASS &&
-       (cnt < rnd(6) ||
-#ifdef WIZARD
-        wizard ||
-#endif
-        (cnt <= 7 && Is_candle(otmp)) ||
-        (cnt <= 100 &&
-         ((oclass == WEAPON_CLASS && is_ammo(otmp))
-          || typ == ROCK || is_missile(otmp)))))
-        otmp->quan = (long) cnt;
+    if (cnt > 0 && objects[typ].oc_merge && oclass != SPBOOK_CLASS) {
+        /* at most 10, with a mean of 5 */
+        int max_amt = wizard ? cnt : rnf(1, 100) ? 10 : d(4, 3)-3;
+        int min_amt = 1;
+
+        if (max_amt <= 7 && Is_candle(otmp)) {
+            /* the player might need them later */
+            max_amt = 7;
+        } else if ((oclass == WEAPON_CLASS && is_ammo(otmp)) ||
+                    typ == ROCK ||
+                    is_missile(otmp)) {
+            /* up to about 100 projectiles */
+            min_amt = 15 + rn2(11);
+            max_amt = min_amt + rn2(80);
+        }
+
+        if (rnl(4) || wizard) {
+            /* bad luck gets you only the minimum amount of items
+             * if you wish for too many items */
+            otmp->quan = (cnt <= max_amt) ? cnt : min_amt;
+        } else {
+            otmp->quan = (cnt <= max_amt) ? cnt : max_amt;
+        }
+    }
 
 #ifdef WIZARD
     if (oclass == VENOM_CLASS) otmp->spe = 1;
