@@ -1011,6 +1011,7 @@ E void FDECL(strbuf_reserve, (strbuf_t *, int));
 E void FDECL(strbuf_empty, (strbuf_t *));
 E void FDECL(strbuf_nl_to_crlf, (strbuf_t *));
 extern int swapbits(int, int, int);
+extern void strip_brackets(char *);
 
 /* ### invent.c ### */
 

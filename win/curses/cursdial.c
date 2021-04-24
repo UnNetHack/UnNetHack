@@ -1020,7 +1020,7 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num)
 #ifdef MENU_COLOR
         color = NONE;
         menu_color = iflags.use_menu_color && iflags.use_color &&
-                     get_menu_coloring(menu_item_ptr->str, &color, &attr);
+                     curses_get_menu_coloring(menu_item_ptr->str, &color, &attr);
         if (menu_color) {
             attr = curses_convert_attr(attr);
             if (color != NONE || attr != A_NORMAL) {
@@ -1396,3 +1396,29 @@ menu_max_height(void)
 {
     return term_rows - 2;
 }
+
+#ifdef MENU_COLOR
+boolean
+curses_get_menu_coloring(line, color, attr)
+const char *line;
+int *color, *attr;
+{
+    struct menucoloring *tmpmc;
+    boolean foundcolor = FALSE, foundattr = FALSE;
+    char str[BUFSZ];
+
+    strcpy(str, line);
+    strip_brackets(str);
+
+    if (iflags.use_menu_color && iflags.use_color) {
+        for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next) {
+            if (regex_match(str, tmpmc->match)) {
+                *color = tmpmc->color;
+                *attr = tmpmc->attr;
+                return TRUE;
+            }
+        }
+    }
+    return FALSE;
+}
+#endif

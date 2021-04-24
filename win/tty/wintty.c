@@ -1801,29 +1801,6 @@ char acc;       /* group accelerator, 0 => all */
     }
 }
 
-/* Strip [] from strings like "a [cursed] rusty iron wand" so
- * menucolors regexp can apply.
- * Completely hacky. */
-static void
-strip_brackets(str)
-char *str;
-{
-    /* from http://stackoverflow.com/questions/4161822 */
-    char *src, *dest;
-
-    src = dest = str; /* both pointers point to the first char of input */
-    while (*src != '\0') /* exit loop when null terminator reached */
-    {
-        if (*src != '[' && *src != ']') /* if source is not a [] char */
-        {
-            *dest = *src; /* copy the char at source to destination */
-            dest++;       /* increment destination pointer */
-        }
-        src++; /* increment source pointer */
-    }
-    *dest = '\0'; /* terminate string with null terminator */
-}
-
 #ifdef MENU_COLOR
 boolean
 get_menu_coloring(line, color, attr)

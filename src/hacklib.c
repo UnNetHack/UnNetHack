@@ -1290,4 +1290,27 @@ swapbits(int val, int bita, int bitb)
     return (val ^ ((tmp << bita) | (tmp << bitb)));
 }
 
+/** Strip [] from strings like "a [cursed] rusty iron wand" so
+ * menucolors regexp can apply.
+ * Completely hacky. */
+void
+strip_brackets(char *str)
+{
+    /* from http://stackoverflow.com/questions/4161822 */
+    char *src, *dest;
+
+    src = dest = str; /* both pointers point to the first char of input */
+    while (*src != '\0') {
+        /* exit loop when null terminator reached */
+        if (*src != '[' && *src != ']') {
+            /* if source is not a [] char */
+            *dest = *src; /* copy the char at source to destination */
+            dest++;       /* increment destination pointer */
+        }
+        src++; /* increment source pointer */
+    }
+    *dest = '\0'; /* terminate string with null terminator */
+}
+
+
 /*hacklib.c*/

@@ -98,7 +98,7 @@ curses_add_inv(
 #ifdef MENU_COLOR
     /* colorize categorizes */
     if (iflags.use_menu_color) {
-        if (get_menu_coloring(str, &color, &attr)) {
+        if (curses_get_menu_coloring(str, &color, &attr)) {
             attr = curses_convert_attr(attr);
         }
     }
