@@ -274,8 +274,12 @@ const char* race;
 const char* role;
 {
     snprintf(strbuf, STRBUF_LEN,
-             "%s" SEP "type=%s" SEP "game_action=%s" SEP "character=%s %s %s\n",
+             "%s" SEP
+             "term=%s" SEP "colors=%d" SEP
+             "type=%s" SEP "game_action=%s" SEP "character=%s %s %s\n",
              livelog_prefix(),
+             nh_getenv("TERM"),
+             iflags.color_mode,
              verb,
              verb,
              alignment_sex,
