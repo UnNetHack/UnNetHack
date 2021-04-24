@@ -1389,71 +1389,32 @@ char* bindings;
 
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 
-struct name_value {
-    char *name;
-    int value;
-};
-
-const struct name_value status_colornames[] = {
-    { "black",  CLR_BLACK },
-    { "red",    CLR_RED },
-    { "green",  CLR_GREEN },
-    { "brown",  CLR_BROWN },
-    { "blue",   CLR_BLUE },
-    { "magenta",    CLR_MAGENTA },
-    { "cyan",   CLR_CYAN },
-    { "gray",   CLR_GRAY },
-    { "orange", CLR_ORANGE },
-    { "lightgreen", CLR_BRIGHT_GREEN },
-    { "yellow", CLR_YELLOW },
-    { "lightblue",  CLR_BRIGHT_BLUE },
-    { "lightmagenta", CLR_BRIGHT_MAGENTA },
-    { "lightcyan",  CLR_BRIGHT_CYAN },
-    { "white",  CLR_WHITE },
-    { NULL,     -1 }
-};
-
-const struct name_value status_attrnames[] = {
-    { "none",  ATR_NONE },
-    { "bold",  ATR_BOLD },
-    { "dim",   ATR_DIM },
-    { "underline", ATR_ULINE },
-    { "blink", ATR_BLINK },
-    { "inverse",   ATR_INVERSE },
-    { NULL,    -1 }
-};
-
-int
-value_of_name(name, name_values)
-const char *name;
-const struct name_value *name_values;
-{
-    while (name_values->name && !strstri(name_values->name, name))
-        ++name_values;
-    return name_values->value;
-}
+int match_str2clr(char*);
+int match_str2attr(const char *, boolean);
 
 struct color_option
 parse_color_option(start)
 char *start;
 {
-    struct color_option result = {NO_COLOR, 0};
-    char last;
-    char *end;
-    int attr;
+    struct color_option result = { NO_COLOR, 0 };
+    char *end = NULL;
+    int attr = 0;
+    char *end_of_string = start + strlen(start);
 
-    for (end = start; *end != '&' && *end != '\0'; ++end);
-    last = *end;
-    *end = '\0';
-    result.color = value_of_name(start, status_colornames);
-
-    while (last == '&') {
-        for (start = ++end; *end != '&' && *end != '\0'; ++end);
-        last = *end;
+    if ((end = index(start, '&')) != 0) {
         *end = '\0';
-        attr = value_of_name(start, status_attrnames);
-        if (attr >= 0)
+    }
+    result.color = match_str2clr(start);
+
+    while (end && end < end_of_string) {
+        start = end + 1;
+        if ((end = index(start, '&')) != 0) {
+            *end = '\0';
+        }
+        attr = match_str2attr(start, FALSE);
+        if (attr >= 0) {
             result.attr_bits |= 1 << attr;
+        }
     }
 
     return result;
@@ -1725,6 +1686,25 @@ int attr;
         }
     }
     return (char *) 0;
+}
+
+int
+match_str2attr(const char *str, boolean complain)
+{
+    int i, a = -1;
+
+    for (i = 0; i < SIZE(attrnames); i++) {
+        if (attrnames[i].name && fuzzymatch(str, attrnames[i].name, " -_", TRUE)) {
+            a = attrnames[i].attr;
+            break;
+        }
+    }
+
+    if (a == -1 && complain) {
+        config_error_add("Unknown text attribute '%.50s'", str);
+    }
+
+    return a;
 }
 
 int
