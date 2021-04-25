@@ -1864,49 +1864,47 @@ const char *errmsg;
 
 /* parse '"regex_string"=color&attr' and add it to menucoloring */
 boolean
-add_menu_coloring(str)
-char *str;
+add_menu_coloring(char *tmpstr) /* never NULL but could be empty */
 {
-    int i, c = CLR_UNDEFINED, a = ATR_UNDEFINED;
-    struct menucoloring *tmp;
-    char *tmps, *cs = strchr(str, '=');
-    int errnum;
-    char errbuf[80];
-    const char *err = (char *)0;
+    int c = NO_COLOR, a = ATR_NONE;
+    char *tmps, *cs, *amp;
+    char str[BUFSZ];
 
-    if (!cs || !str) return FALSE;
+    (void) strncpy(str, tmpstr, sizeof str - 1);
+    str[sizeof str - 1] = '\0';
 
-    tmps = cs;
-    tmps++;
-    while (*tmps && isspace(*tmps)) tmps++;
-
-    for (i = 0; i < SIZE(colornames); i++)
-        if (colornames[i].name && strstri(tmps, colornames[i].name) == tmps) {
-            c = colornames[i].color;
-            break;
-        }
-
-    if (c > CLR_UNDEFINED) return FALSE;
-
-    mungspaces(tmps);
-    tmps = c == CLR_UNDEFINED ? cs : strchr(str, '&');
-    if (tmps) {
-        tmps++;
-        while (*tmps && isspace(*tmps)) tmps++;
-        for (i = 0; i < SIZE(attrnames); i++)
-            if (attrnames[i].name && strstri(tmps, attrnames[i].name) == tmps) {
-                a = attrnames[i].attr;
-                break;
-            }
+    if ((cs = index(str, '=')) == 0) {
+        config_error_add("Malformed MENUCOLOR");
+        return FALSE;
     }
 
-    if (c == CLR_UNDEFINED && a == ATR_UNDEFINED) return FALSE;
+    tmps = cs + 1; /* advance past '=' */
+    mungspaces(tmps);
+    if ((amp = index(tmps, '&')) != 0) {
+        *amp = '\0';
+    }
 
+    c = match_str2clr(tmps);
+    if (c >= CLR_MAX) {
+        return FALSE;
+    }
+
+    if (amp) {
+        tmps = amp + 1; /* advance past '&' */
+        a = match_str2attr(tmps, TRUE);
+        if (a == -1) {
+            return FALSE;
+        }
+    }
+
+    /* the regexp portion here has not been condensed by mungspaces() */
     *cs = '\0';
     tmps = str;
-    if ((*tmps == '"') || (*tmps == '\'')) {
+    if (*tmps == '"' || *tmps == '\'') {
         cs--;
-        while (isspace(*cs)) cs--;
+        while (isspace((uchar) *cs)) {
+            cs--;
+        }
         if (*cs == *tmps) {
             *cs = '\0';
             tmps++;
