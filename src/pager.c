@@ -625,6 +625,8 @@ add_mon_info(winid datawin, struct permonst * pm)
     boolean uniq = !!(gen & G_UNIQ);
     boolean hell = !!(gen & G_HELL);
     boolean nohell = !!(gen & G_NOHELL);
+    boolean sheol = !!(gen & G_SHEOL);
+    boolean nosheol = !!(gen & G_NOSHEOL);
 
 #define ADDRESIST(condition, str)                       \
     if (condition) {                                    \
@@ -673,6 +675,8 @@ add_mon_info(winid datawin, struct permonst * pm)
         Sprintf(buf, "Normally %s%s, %s.",
                 hell ? "only appears in Gehennom" :
                 nohell ? "only appears outside Gehennom" :
+                sheol ? "only appears in Sheol" :
+                nosheol ? "only appears outside Sheol" :
                 "appears in any branch",
                 (gen & G_SGROUP) ? " in groups" :
                 (gen & G_LGROUP) ? " in large groups" : "",
