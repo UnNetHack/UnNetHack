@@ -11,6 +11,17 @@
 #include <signal.h>
 #endif
 
+void
+early_init()
+{
+#if 0
+    decl_globals_init();
+    objects_globals_init();
+    monst_globals_init();
+#endif
+    sys_early_init();
+}
+
 #ifdef POSITIONBAR
 STATIC_DCL void NDECL(do_positionbar);
 #endif

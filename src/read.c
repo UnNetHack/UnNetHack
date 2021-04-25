@@ -213,6 +213,9 @@ doread()
         } else {
             outrumor(bcsign(scroll), BY_COOKIE);
             if (!Blind) {
+                if (successful_cdt(CONDUCT_ILLITERACY)) {
+                    livelog_printf(LL_CONDUCT, "became literate by reading a fortune cookie");
+                }
                 violated(CONDUCT_ILLITERACY);
             }
         }
@@ -238,6 +241,10 @@ doread()
             return 0;
         }
 
+        if (successful_cdt(CONDUCT_ILLITERACY)) {
+            livelog_printf(LL_CONDUCT, "became literate by reading %s",
+                           an(dump_typename(scroll->otyp)));
+        }
         violated(CONDUCT_ILLITERACY);
 
         /* populate 'buf[]' */
@@ -283,15 +290,21 @@ doread()
         pline("\"%d0%d %d%d1 0%d%d0\"", (int)((scroll->o_id % 89)+10), (int)(scroll->o_id % 4),
               (int)(((scroll->o_id * 499) % 899999) + 100000), (int)(scroll->o_id % 10),
               (int)(!(scroll->o_id % 3)), (int)((scroll->o_id * 7) % 10));
-        u.uconduct.literate++;
+
+        if (successful_cdt(CONDUCT_ILLITERACY)) {
+            livelog_printf(LL_CONDUCT, "became literate by reading %s", an(dump_typename(scroll->otyp)));
+        }
+        violated(CONDUCT_ILLITERACY);
         return 1;
 #endif  /* TOURIST */
+
     } else if ((scroll->otyp == TIN) ||
                (scroll->otyp == CAN_OF_GREASE) ||
                (scroll->otyp == CANDY_BAR)) {
         pline("This %s has no %s.", singular(scroll, xname),
               (scroll->otyp == CANDY_BAR) ? "wrapper" : "label");
         return(0);
+
     } else if (scroll->otyp == MAGIC_MARKER) {
         if (Blind) {
             You_cant("feel any Braille writing.");
@@ -300,23 +313,38 @@ doread()
         if (flags.verbose)
             pline("It reads:");
         pline("\"Magic Marker(TM) Red Ink Marker Pen.  Water Soluble.\"");
-        u.uconduct.literate++;
+
+        if (successful_cdt(CONDUCT_ILLITERACY)) {
+            livelog_printf(LL_CONDUCT, "became literate by reading %s", an(dump_typename(scroll->otyp)));
+        }
+        violated(CONDUCT_ILLITERACY);
         return 1;
+
     } else if (scroll->oclass == COIN_CLASS) {
         if (Blind)
             You("feel the embossed words:");
         else if (flags.verbose)
             You("read:");
         pline("\"1 Zorkmid. 857 GUE.  In Frobs We Trust.\"");
-        u.uconduct.literate++;
+
+        if (successful_cdt(CONDUCT_ILLITERACY)) {
+            livelog_printf(LL_CONDUCT, "became literate by reading a coin's engravings");
+        }
+        violated(CONDUCT_ILLITERACY);
         return 1;
+
     } else if (scroll->oartifact == ART_ORB_OF_FATE) {
         if (Blind)
             You("feel the engraved signature:");
         else pline("It is signed:");
         pline("\"Odin.\"");
-        u.uconduct.literate++;
+
+        if (successful_cdt(CONDUCT_ILLITERACY)) {
+            livelog_printf(LL_CONDUCT, "became literate by reading the divine signature of Odin");
+        }
+        violated(CONDUCT_ILLITERACY);
         return 1;
+
     } else if (OBJ_DESCR(objects[scroll->otyp]) &&
                !strncmp(OBJ_DESCR(objects[scroll->otyp]), "runed", 5)) {
         if (scroll->otyp == RUNESWORD) {
@@ -326,7 +354,12 @@ doread()
             You_cant("decipher the Elvish runes.");
             return 0;
         }
-        u.uconduct.literate++;
+
+        if (successful_cdt(CONDUCT_ILLITERACY)) {
+            livelog_printf(LL_CONDUCT, "became literate by reading Elvish runes");
+        }
+        violated(CONDUCT_ILLITERACY);
+
         if (objects[scroll->otyp].oc_merge) {
             if (Blind)
                 You("feel the engraved runes:");
@@ -389,8 +422,14 @@ doread()
 #ifdef MAIL
         && scroll->otyp != SCR_MAIL
 #endif
-        )
+        ) {
+        if (successful_cdt(CONDUCT_ILLITERACY)) {
+            livelog_printf(LL_CONDUCT, "became literate by reading %s",
+                           scroll->oclass == SPBOOK_CLASS ? "a book" :
+                           scroll->oclass == SCROLL_CLASS ? "a scroll" : "something");
+        }
         violated(CONDUCT_ILLITERACY);
+    }
 
     confused = (Confusion != 0);
 #ifdef MAIL
@@ -2445,6 +2484,9 @@ boolean only_on_level; /**< if TRUE only genocide monsters on current level,
     }
     if (how & REALLY) {
         char* genocided_name = (*which != 'a') ? buf : makeplural(buf);
+#ifdef LIVELOGFILE
+        livelog_genocide(genocided_name, only_on_level);
+#endif
         /* setting no-corpse affects wishing and random tin generation */
         if (!only_on_level) { mvitals[mndx].mvflags |= (G_GENOD | G_NOCORPSE); }
         pline("Wiped out %s%s%s.", which,
@@ -2453,10 +2495,6 @@ boolean only_on_level; /**< if TRUE only genocide monsters on current level,
         if (!only_on_level && mons[mndx].mlet == S_TROLL) {
             pline("*plonk*");
         }
-
-#ifdef LIVELOGFILE
-        livelog_genocide(genocided_name, only_on_level);
-#endif
 
         if (killplayer) {
             /* might need to wipe out dual role */

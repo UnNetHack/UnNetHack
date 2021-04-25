@@ -223,6 +223,9 @@ found:
     }
 
     /* KMH, conduct */
+    if (successful_cdt(CONDUCT_ILLITERACY)) {
+        livelog_printf(LL_CONDUCT, "became literate by writing %s", an(typeword));
+    }
     violated(CONDUCT_ILLITERACY);
 
     new_obj = mksobj(i, FALSE, FALSE);

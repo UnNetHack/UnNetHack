@@ -772,6 +772,7 @@ gcrownu()
     case A_LAWFUL:
         u.uevent.uhand_of_elbereth = 1;
         verbalize("I crown thee...  The Hand of Elbereth!");
+        livelog_printf(LL_DIVINEGIFT, "was crowned \"The Hand of Elbereth\" by %s", u_gname());
         break;
 
     case A_NEUTRAL:
@@ -779,6 +780,7 @@ gcrownu()
         in_hand = (uwep && uwep->oartifact == ART_VORPAL_BLADE);
         already_exists = exist_artifact(LONG_SWORD, artiname(ART_VORPAL_BLADE));
         verbalize("Thou shalt be my Envoy of Balance!");
+        livelog_printf(LL_DIVINEGIFT, "became %s Envoy of Balance", s_suffix(u_gname()));
         break;
 
     case A_CHAOTIC:
@@ -787,6 +789,10 @@ gcrownu()
         already_exists = exist_artifact(RUNESWORD, artiname(ART_STORMBRINGER));
         verbalize("Thou art chosen to %s for My Glory!",
                   already_exists && !in_hand ? "take lives" : "steal souls");
+        livelog_printf(LL_DIVINEGIFT, "was chosen to %s for the Glory of %s",
+                       ((already_exists && !in_hand) || class_gift != STRANGE_OBJECT) ? "take lives" :
+                                                                                        "steal souls",
+                       u_gname());
         break;
     }
 
@@ -1377,6 +1383,12 @@ dosacrifice()
         extern const int monstr[];
 
         /* KMH, conduct */
+        if (!u.uconduct.gnostic++) {
+            livelog_printf(LL_CONDUCT,
+                           "rejected atheism by offering %s on an altar of %s",
+                           corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
+                           a_gname());
+        }
         u.uconduct.gnostic++;
 
         /* you're handling this corpse, even if it was killed upon the altar */
@@ -1655,19 +1667,10 @@ dosacrifice()
                     consume_offering(otmp);
                     pline("%s accepts your allegiance.", a_gname());
 
-                    /* The player wears a helm of opposite alignment? */
-                    if (uarmh && uarmh->otyp == HELM_OF_OPPOSITE_ALIGNMENT)
-                        u.ualignbase[A_CURRENT] = altaralign;
-                    else
-                        u.ualign.type = u.ualignbase[A_CURRENT] = altaralign;
-                    u.ublessed = 0;
-                    flags.botl = 1;
-
-                    You("have a sudden sense of a new direction.");
+                    uchangealign(altaralign, 0);
                     /* Beware, Conversion is costly */
                     change_luck(-3);
                     u.ublesscnt += 300;
-                    adjalign((int)(u.ualignbase[A_ORIGINAL] * (ALIGNLIM / 2)));
                 } else {
                     u.ugangr += 3;
                     adjalign(-5);
@@ -1784,6 +1787,10 @@ dosacrifice()
                     u.ugifts++;
                     u.ublesscnt = rnz(300 + (50 * nartifacts));
                     exercise(A_WIS, TRUE);
+                    livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
+                                    "had %s bestowed upon %s by %s",
+                                    otmp->oartifact ? artiname(otmp->oartifact) : an(xname(otmp)),
+                                    artiname(otmp->oartifact), uhim(), u_gname());
                     /* make sure we can use this weapon */
                     unrestrict_weapon_skill(weapon_type(otmp));
                     discover_artifact(otmp->oartifact);
@@ -1876,7 +1883,16 @@ dopray()
         if (yn("Are you sure you want to pray?") == 'n')
             return 0;
 
+    if (!u.uconduct.gnostic) {
+        /* breaking conduct should probably occur in can_pray() at
+         * "You begin praying to %s", as demons who find praying repugnant
+         * should not break conduct.  Also we can add more detail to the
+         * livelog message as p_aligntyp will be known.
+         */
+        livelog_printf(LL_CONDUCT, "rejected atheism with a prayer");
+    }
     u.uconduct.gnostic++;
+
     /* Praying implies that the hero is conscious and since we have
        no deafness attribute this implies that all verbalized messages
        can be heard.  So, in case the player has used the 'O' command
@@ -1998,6 +2014,10 @@ doturn()
         }
         You("don't know how to turn undead!");
         return 0;
+    }
+
+    if (!u.uconduct.gnostic) {
+        livelog_printf(LL_CONDUCT, "rejected atheism by turning undead");
     }
     u.uconduct.gnostic++;
     const char *gname = halu_gname(u.ualign.type);

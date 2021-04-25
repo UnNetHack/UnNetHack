@@ -45,7 +45,23 @@ struct u_event {
     Bitfield(uopened_dbridge, 1);    /* opened the drawbridge */
 
     Bitfield(invoked, 1);        /* invoked Gate to the Sanctum level */
-    Bitfield(gehennom_entered, 1);   /* entered Gehennom via Valley */
+
+    Bitfield(gehennom_entered, 1);          /* entered Gehennom via Valley */
+    Bitfield(entered_the_gnomish_mines, 1); /* entered the Gnomish Mines */
+    Bitfield(entered_mine_town, 1);         /* entered Minetown */
+    Bitfield(entered_sokoban, 1);           /* entered Sokoban */
+    Bitfield(entered_the_bigroom, 1);       /* entered the Big Room */
+    Bitfield(entered_the_blackmarket, 1);   /* entered the Blackmarket */
+    Bitfield(entered_the_town, 1);          /* entered the Town */
+    Bitfield(entered_moria, 1);             /* entered Moria */
+    Bitfield(entered_the_dragon_caves, 1);  /* entered the Dragon Caves */
+    Bitfield(entered_sheol, 1);             /* entered Sheol */
+    Bitfield(entered_vlads_tower, 1);       /* entered Vlad's Tower */
+    Bitfield(entered_fort_ludios, 1);       /* entered Fort Ludios */
+
+    Bitfield(entered_a_shop, 1);            /* entered a shop */
+    Bitfield(entered_a_temple, 1);          /* entered a temple */
+
 #ifdef ELBERETH
     Bitfield(uhand_of_elbereth, 2);  /* became Hand of Elbereth */
 #endif
@@ -53,6 +69,19 @@ struct u_event {
     Bitfield(uvibrated, 1);      /* stepped on "vibrating square" */
     Bitfield(ascended, 1);       /* has offered the Amulet */
 };
+
+#ifdef LIVELOGFILE
+# define record_uevent_achievement(message, field) \
+{ \
+        if (!u.uevent.field) { \
+            livelog_printf(LL_ACHIEVE, message); \
+            u.uevent.field = TRUE; \
+        } \
+}
+#else
+# define record_uevent_achievement(message, field) if (!u.uevent.field) { u.uevent.field = TRUE; }
+#endif
+
 
 /* KMH, conduct --
  * These are voluntary challenges.  Each field denotes the number of

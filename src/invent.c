@@ -1070,6 +1070,7 @@ register const char *let, *word;
                   || otmp->otyp == T_SHIRT
                   || otmp->otyp == CREDIT_CARD
 #endif
+                  || otmp->otyp == ALCHEMY_SMOCK
                   || otmp->otyp == MAGIC_MARKER
                   || otmp->oclass == COIN_CLASS
                   || otmp->oartifact == ART_ORB_OF_FATE

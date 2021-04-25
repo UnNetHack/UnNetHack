@@ -559,6 +559,9 @@ int dieroll;
                 cutworm(mon, bhitpos.x, bhitpos.y, weapon);
             }
         }
+        if (u.uconduct.weaphit && !oldweaphit) {
+            livelog_printf(LL_CONDUCT, "hit with a wielded weapon for the first time");
+        }
     }
     return(malive);
 }

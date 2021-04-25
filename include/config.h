@@ -172,6 +172,9 @@
 /* #define LIVELOGFILE "livelog" */ /* live game progress log file */
 
 /* #define LIVELOG_SHOUT */
+/* LL_flags defined in global.h. */
+/* #define LIVELOG_DETAIL (LL_WISH | LL_ACHIEVE | LL_UMONST) */
+#define LIVELOG_DETAIL 0x1FFF
 
 /*
  *  If COMPRESS is defined, it should contain the full path name of your

@@ -309,20 +309,27 @@ panic VA_DECL(const char *, str)
 #if defined(WIZARD) && !defined(MICRO)
 # if defined(NOTIFY_NETHACK_BUGS)
     if (!wizard)
-        raw_printf("Report the following error to \"%s\".",
-                   "bhaak@gmx.net");
+        raw_printf("Report the following error to \"%s\" or at \"%s\".",
+                   DEVTEAM_EMAIL, DEVTEAM_URL);
     else if (program_state.something_worth_saving)
         raw_print("\nError save file being written.\n");
 # else
-    if (!wizard)
-        raw_printf("Report error to \"%s\"%s.",
-#  ifdef WIZARD_NAME    /*(KR1ED)*/
-                   WIZARD_NAME,
+    if (!wizard) {
+        const char *maybe_rebuild = !program_state.something_worth_saving
+                                     ? "." : "\nand it may be possible to rebuild.";
+
+        if (sysopt.support) {
+            raw_printf("To report this error, %s%s", sysopt.support, maybe_rebuild);
+        } else {
+            raw_printf("Report error to \"%s\"%s",
+#  ifdef WIZARD_NAME /*(KR1ED)*/
+                       WIZARD_NAME,
 #  else
-                   WIZARD,
+                       WIZARD,
 #  endif
-                   !program_state.something_worth_saving ? "" :
-                   " and it may be possible to rebuild.");
+                       maybe_rebuild);
+        }
+    }
 # endif
     if (!iflags.debug_fuzzer) {
         if (program_state.something_worth_saving) {
@@ -672,6 +679,8 @@ int how;
             if ((how == GENOCIDED) && is_playermon_genocided())
                 pline("Unfortunately you are still genocided...");
             else {
+                livelog_printf(LL_LIFESAVE, "averted death (%s)", killer.name);
+
                 killer.name[0] = 0;
                 killer.format = 0;
                 return;

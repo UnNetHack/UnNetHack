@@ -392,7 +392,17 @@ impossible VA_DECL(const char *, s)
         panic("%s", pbuf);
     }
     pline("%s", pbuf);
-    pline("Program in disorder; you probably should S)ave and restart the process.");
+    /* reuse pbuf[] */
+    Strcpy(pbuf, "Program in disorder!");
+    if (program_state.something_worth_saving) {
+        Strcat(pbuf, "  (Saving and reloading may fix this problem.)");
+    }
+    pline("%s", pbuf);
+    pline("Please report these messages to %s.", DEVTEAM_EMAIL);
+    if (sysopt.support) {
+        pline("Alternatively, contact local support: %s", sysopt.support);
+    }
+
     program_state.in_impossible = 0;
     VA_END();
 }

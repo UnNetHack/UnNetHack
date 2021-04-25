@@ -299,6 +299,9 @@ register struct obj *obj;
 
     if (obj->oclass != COIN_CLASS) {
         /* KMH, conduct */
+        if (!u.uconduct.gnostic) {
+            livelog_printf(LL_CONDUCT, "eschewed atheism, by dropping %s on an altar", doname(obj));
+        }
         u.uconduct.gnostic++;
     } else {
         /* coins don't have bless/curse status */
@@ -1472,6 +1475,7 @@ boolean at_stairs, falling, portal;
         }
         mklev();
         new = TRUE; /* made the level */
+        livelog_printf(LL_DEBUG, "entered new level %d, %s.", dunlev(&u.uz), dungeons[u.uz.dnum].dname);
     } else {
         /* returning to previously visited level; reload it */
         fd = open_levelfile(new_ledger, whynot);
@@ -1783,8 +1787,39 @@ boolean at_stairs, falling, portal;
     if (Is_knox(&u.uz) && (new || !mvitals[PM_CROESUS].died)) {
         You("penetrated a high security area!");
         pline("An alarm sounds!");
-        for(mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-            if (!DEADMONSTER(mtmp) && mtmp->msleeping) mtmp->msleeping = 0;
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (!DEADMONSTER(mtmp) && mtmp->msleeping) {
+                mtmp->msleeping = 0;
+            }
+        }
+    }
+
+    if (newdungeon) {
+        if (In_mines(&u.uz)) {
+            record_uevent_achievement("entered the Gnomish Mines", entered_the_gnomish_mines);
+        } else if (In_sokoban(&u.uz)) {
+            record_uevent_achievement("entered Sokoban", entered_sokoban);
+        } else if (Is_blackmarket(&u.uz)) {
+            record_uevent_achievement("entered the Blackmarket", entered_the_blackmarket);
+        } else if (In_dragon_caves(&u.uz)) {
+            record_uevent_achievement("entered the Dragon Caves", entered_the_dragon_caves);
+        } else if (In_moria(&u.uz)) {
+            record_uevent_achievement("entered Moria", entered_moria);
+        } else if (In_sheol(&u.uz)) {
+            record_uevent_achievement("entered Sheol", entered_sheol);
+        } else if (In_V_tower(&u.uz)) {
+            record_uevent_achievement("entered Vlad's tower", entered_vlads_tower);
+        } else if (Is_knox(&u.uz)) {
+            record_uevent_achievement("entered Fort Ludios", entered_fort_ludios);
+        }
+    }
+
+    if (new) {
+        if (Is_bigroom(&u.uz)) {
+            record_uevent_achievement("entered the Big Room", entered_the_bigroom);
+        } else if (Is_town_level(&u.uz)) {
+            record_uevent_achievement("entered the Town", entered_the_town);
+        }
     }
 
     if (on_level(&u.uz, &astral_level))

@@ -231,6 +231,7 @@ enum hmon_atkmode_types {
 
 #include "extern.h"
 #include "winprocs.h"
+#include "sys.h"
 
 #ifdef USE_TRAMPOLI
 #include "wintty.h"
@@ -439,14 +440,28 @@ enum hmon_atkmode_types {
 #define MENU_DEFCNT 1
 
 /*
- * Option flags
- * Each higher number includes the characteristics of the numbers
- * below it.
+ * option setting restrictions
  */
-#define SET_IN_FILE 0 /* config file option only */
-#define SET_VIA_PROG    1 /* may be set via extern program, not seen in game */
-#define DISP_IN_GAME    2 /* may be set via extern program, displayed in game */
-#define SET_IN_GAME 3 /* may be set via extern program or set in the game */
+enum optset_restrictions {
+    set_in_sysconf = 0, /* system config file option only */
+
+    SET_IN_FILE    = 1, /* config file option only */
+    set_in_config  = 1, /* config file option only */
+
+    SET_VIA_PROG   = 2, /* may be set via extern program, not seen in game */
+    set_viaprog    = 2, /* may be set via extern program, not seen in game */
+
+    DISP_IN_GAME   = 3, /* may be set via extern program, displayed in game */
+    set_gameview   = 3, /* may be set via extern program, displayed in game */
+
+    SET_IN_GAME    = 4, /* may be set via extern program or set in the game */
+    set_in_game    = 4, /* may be set via extern program or set in the game */
+
+    set_wizonly    = 5, /* may be set set in the game if wizmode */
+
+    set_hidden     = 6  /* placeholder for prefixed entries, never show it  */
+};
+#define SET__IS_VALUE_VALID(s) ((s < set_in_sysconf) || (s > set_wizonly))
 
 #define FEATURE_NOTICE_VER(major, minor, patch) (((unsigned long)major << 24) | \
                                                  ((unsigned long)minor << 16) | \
@@ -533,5 +548,8 @@ enum hmon_atkmode_types {
 #else
 # define debug_pline if (0) pline
 #endif
+
+#define DEVTEAM_EMAIL "bhaak@gmx.net"
+#define DEVTEAM_URL "https://github.com/unnethack/unnethack"
 
 #endif /* HACK_H */

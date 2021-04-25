@@ -204,7 +204,7 @@ HACKCSRC = $(srcdir)/allmain.c $(srcdir)/alloc.c $(srcdir)/apply.c \
 	$(srcdir)/rnd.c $(srcdir)/role.c $(srcdir)/rumors.c $(srcdir)/save.c \
 	$(srcdir)/shk.c $(srcdir)/shknam.c $(srcdir)/sit.c $(srcdir)/sounds.c \
 	$(srcdir)/sp_lev.c $(srcdir)/spell.c $(srcdir)/steal.c \
-	$(srcdir)/steed.c $(srcdir)/teleport.c $(srcdir)/timeout.c \
+	$(srcdir)/steed.c $(srcdir)/sys.c $(srcdir)/teleport.c $(srcdir)/timeout.c \
 	$(srcdir)/topten.c $(srcdir)/track.c $(srcdir)/trap.c \
 	$(srcdir)/u_init.c $(srcdir)/uhitm.c $(srcdir)/vault.c \
 	$(srcdir)/version.c $(srcdir)/vision.c $(srcdir)/weapon.c \
@@ -273,9 +273,9 @@ HOBJ = $(FIRSTOBJ) allmain.o apply.o artifact.o attrib.o ball.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o rnd_isaac.o \
 	role.o rumors.o save.o shk.o shknam.o sit.o sounds.o sp_lev.o spell.o \
-	steal.o steed.o teleport.o tile.o timeout.o topten.o track.o trap.o tutorial.o \
-	u_init.o uhitm.o unicode.o vault.o vision.o vis_tab.o weapon.o were.o wield.o \
-	windows.o wizard.o worm.o worn.o write.o zap.o \
+	steal.o steed.o sys.o teleport.o tile.o timeout.o topten.o track.o trap.o \
+	tutorial.o u_init.o uhitm.o unicode.o vault.o vision.o vis_tab.o weapon.o were.o \
+	wield.o windows.o wizard.o worm.o worn.o write.o zap.o \
 	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) version.o \
 	livelog.o
 # the .o files from the HACKCSRC, SYSSRC, and WINSRC lists
@@ -842,7 +842,8 @@ sounds.o: $(srcdir)/sounds.c $(HACK_H)
 sp_lev.o: $(srcdir)/sp_lev.c $(HACK_H) ../include/dlb.h ../include/sp_lev.h
 spell.o: $(srcdir)/spell.c $(HACK_H)
 steal.o: $(srcdir)/steal.c $(HACK_H)
-steed.o: $(srcdir)/steed.c $(HACK_H)
+steed.o: $(srcdir)/steed.c $(HACK_H) ../include/sys.h
+sys.o: $(srcdir)/sys.c $(HACK_H)
 teleport.o: $(srcdir)/teleport.c $(HACK_H)
 timeout.o: $(srcdir)/timeout.c $(HACK_H) ../include/lev.h
 topten.o: $(srcdir)/topten.c $(HACK_H) ../include/dlb.h ../include/patchlevel.h

@@ -411,6 +411,8 @@ register int roomno;
     boolean tended = (priest != (struct monst *)0);
 
     if (tended) {
+        record_uevent_achievement("entered a temple", entered_a_temple);
+
         epri_p = EPRI(priest);
         shrined = has_shrine(priest);
         sanctum = (Is_sanctum(&u.uz) || In_endgame(&u.uz));
@@ -549,6 +551,9 @@ register struct monst *priest;
     boolean strayed = (u.ualign.record < 0);
 
     /* KMH, conduct */
+    if (!u.uconduct.gnostic) {
+        livelog_printf(LL_CONDUCT, "rejected atheism by consulting with %s", mon_nam(priest));
+    }
     u.uconduct.gnostic++;
 
     if(priest->mflee || (!priest->ispriest && coaligned && strayed)) {

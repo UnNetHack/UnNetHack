@@ -488,16 +488,20 @@ encode_extended_achievements()
     add_achieveX(buf, "opened_castle_drawbridge", u.uevent.uopened_dbridge);
     add_achieveX(buf, "got_crowned", u.uevent.uhand_of_elbereth);
 
-#if 0
-    /* TODO 3.7 achievements
-    add_achieveX(buf, "entered_the_gnomish_mines",
-    add_achieveX(buf, "entered_mine_town",
-    add_achieveX(buf, "entered_a_shop",
-    add_achieveX(buf, "entered_a_temple",
-    add_achieveX(buf, "entered_sokoban",
-    add_achieveX(buf, "entered_bigroom",
-    */
-#endif
+    add_achieveX(buf, "entered_the_gnomish_mines", u.uevent.entered_the_gnomish_mines);
+    add_achieveX(buf, "entered_mine_town", u.uevent.entered_mine_town);
+    add_achieveX(buf, "entered_sokoban", u.uevent.entered_sokoban);
+    add_achieveX(buf, "entered_bigroom", u.uevent.entered_the_bigroom);
+    add_achieveX(buf, "entered_the_town", u.uevent.entered_the_town);
+    add_achieveX(buf, "entered_the_blackmarket", u.uevent.entered_the_blackmarket);
+    add_achieveX(buf, "entered_moria", u.uevent.entered_moria);
+    add_achieveX(buf, "entered_the_dragon_caves", u.uevent.entered_the_dragon_caves);
+    add_achieveX(buf, "entered_sheol", u.uevent.entered_sheol);
+    add_achieveX(buf, "entered_vlads_tower", u.uevent.entered_vlads_tower);
+    add_achieveX(buf, "entered_fort_ludios", u.uevent.entered_fort_ludios);
+
+    add_achieveX(buf, "entered_a_shop", u.uevent.entered_a_shop);
+    add_achieveX(buf, "entered_a_temple", u.uevent.entered_a_temple);
 
     return buf;
 }

@@ -782,6 +782,13 @@ xchar x, y;
     }
 
     /* Okay, you've chewed through something */
+    if (successful_cdt(CONDUCT_FOODLESS)) {
+        livelog_printf(LL_CONDUCT, "ate for the first time, by chewing through %s",
+                       boulder ? "a boulder" :
+                       IS_TREES(lev->typ) ? "a tree" :
+                       IS_ROCK(lev->typ) ? "rock" :
+                       (lev->typ == IRONBARS) ? "iron bars" : "a door");
+    }
     violated(CONDUCT_FOODLESS);
     u.uhunger += rnd(20);
 
@@ -2542,6 +2549,9 @@ pull_free:
                        killed() so we duplicate some of the latter here */
                     int tmp, mndx;
 
+                    if (!u.uconduct.killer) {
+                        livelog_printf(LL_CONDUCT, "killed for the first time");
+                    }
                     u.uconduct.killer++;
                     mndx = monsndx(mtmp->data);
                     tmp = experience(mtmp, (int) mvitals[mndx].died);
@@ -3212,17 +3222,32 @@ register int x, y;
     if (!slev || !slev->flags.town)
         return FALSE;
 
-    /*
-     * See if (x,y) is in a room with subrooms, if so, assume it's the
-     * town.  If there are no subrooms, the whole level is in town.
-     */
+    /* See if (x,y) is in a room with subrooms, if so, assume it's the town. */
+    int min_x = COLNO, max_x = 0, min_y = ROWNO, max_y = 0;
     for (sroom = &rooms[0]; sroom->hx > 0; sroom++) {
+        if (sroom->doorct > 0) {
+            /* determine the minimum bounding box for the town's rooms */
+            min_x = min(min_x, sroom->lx-1);
+            max_x = max(max_x, sroom->hx+1);
+            min_y = min(min_y, sroom->ly-1);
+            max_y = max(max_y, sroom->hy+1);
+        }
         if (sroom->nsubrooms > 0) {
             has_subrooms = TRUE;
             if (inside_room(sroom, x, y)) return TRUE;
         }
     }
 
+    if (!has_subrooms && In_mines(&u.uz)) {
+        /* check if coordinates lie within bounding box */
+        if (x >= min_x && x <= max_x &&
+             y >= min_y && y <= max_y) {
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+    /* if there are no subrooms, the whole level is in town */
     return !has_subrooms;
 }
 
@@ -3268,6 +3293,15 @@ register boolean newlev;
     *ptr2 = '\0';
 }
 
+static boolean
+u_in_mine_town()
+{
+    if (!In_mines(&u.uz)) {
+        return FALSE;
+    }
+    return in_town(u.ux, u.uy);
+}
+
 /* possibly deliver a one-time room entry message */
 void
 check_special_room(newlev)
@@ -3280,6 +3314,10 @@ register boolean newlev;
 
     if (*u.ushops0)
         u_left_shop(u.ushops_left, newlev);
+
+    if (!u.uevent.entered_mine_town && u_in_mine_town()) {
+        record_uevent_achievement("entered Minetown", entered_mine_town);
+    }
 
     if (!*u.uentered && !*u.ushops_entered)     /* implied by newlev */
         return;     /* no entrance messages necessary */
