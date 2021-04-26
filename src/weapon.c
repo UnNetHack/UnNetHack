@@ -14,6 +14,7 @@ static boolean FDECL(could_advance, (int));
 static boolean FDECL(peaked_skill, (int));
 static int FDECL(slots_required, (int));
 static void FDECL(skill_advance, (int));
+static int dmgval_core(struct obj*, struct monst*, struct damage_info_t*);
 
 /* Categories whose names don't come from OBJ_NAME(objects[type])
  */
@@ -251,15 +252,37 @@ dmgval(otmp, mon)
 struct obj *otmp;
 struct monst *mon;
 {
+    struct damage_info_t ignored = {0};
+    return dmgval_core(otmp, mon, &ignored);
+}
+
+struct damage_info_t
+dmgval_info(struct obj *otmp)
+{
+    struct damage_info_t damage_info = {0};
+    damage_info.bonus_small = "";
+    damage_info.bonus_large = "";
+    (void)dmgval_core(otmp, NULL, &damage_info);
+    return damage_info;
+}
+
+static int
+dmgval_core(
+struct obj *otmp,
+struct monst *mon,
+struct damage_info_t *damage_info)
+{
     int tmp = 0, otyp = otmp->otyp;
-    struct permonst *ptr = mon->data;
+    struct permonst *ptr = mon ? mon->data : NULL;
     boolean Is_weapon = (otmp->oclass == WEAPON_CLASS || is_weptool(otmp));
 
     if (otyp == CREAM_PIE) return 0;
 
-    if (bigmonst(ptr)) {
-        if (objects[otyp].oc_wldam)
+    if (ptr == NULL || bigmonst(ptr)) {
+        if (objects[otyp].oc_wldam) {
             tmp = rnd(objects[otyp].oc_wldam);
+            damage_info->damage_large = objects[otyp].oc_wldam;
+        }
         switch (otyp) {
         case IRON_CHAIN:
         case CROSSBOW_BOLT:
@@ -267,28 +290,47 @@ struct monst *mon;
         case PARTISAN:
         case RUNESWORD:
         case ELVEN_BROADSWORD:
-        case BROADSWORD:    tmp++; break;
+        case BROADSWORD:
+            tmp++;
+            damage_info->bonus_large = "+1";
+            break;
 
         case FLAIL:
         case RANSEUR:
-        case VOULGE:        tmp += rnd(4); break;
+        case VOULGE:
+            tmp += rnd(4);
+            damage_info->bonus_large = "+1d4";
+            break;
 
         case ACID_VENOM:
         case HALBERD:
-        case SPETUM:        tmp += rnd(6); break;
+        case SPETUM:
+            tmp += rnd(6);
+            damage_info->bonus_large = "+1d6";
+            break;
 
         case FREEZING_ICE:
         case BATTLE_AXE:
         case BARDICHE:
-        case TRIDENT:       tmp += d(2, 4); break;
+        case TRIDENT:
+            tmp += d(2, 4);
+            damage_info->bonus_large = "+2d4";
+            break;
 
         case TSURUGI:
         case DWARVISH_MATTOCK:
-        case TWO_HANDED_SWORD:  tmp += d(2, 6); break;
+        case TWO_HANDED_SWORD:
+            tmp += d(2, 6);
+            damage_info->bonus_large = "+2d6";
+            break;
         }
-    } else {
-        if (objects[otyp].oc_wsdam)
+    }
+
+    if (ptr == NULL || !bigmonst(ptr)) {
+        if (objects[otyp].oc_wsdam) {
             tmp = rnd(objects[otyp].oc_wsdam);
+            damage_info->damage_small = objects[otyp].oc_wsdam;
+        }
         switch (otyp) {
         case IRON_CHAIN:
         case CROSSBOW_BOLT:
@@ -296,7 +338,10 @@ struct monst *mon;
         case WAR_HAMMER:
         case FLAIL:
         case SPETUM:
-        case TRIDENT:       tmp++; break;
+        case TRIDENT:
+            tmp++;
+            damage_info->bonus_small = "+1";
+            break;
 
         case BATTLE_AXE:
         case BARDICHE:
@@ -308,9 +353,15 @@ struct monst *mon;
         case BROADSWORD:
         case ELVEN_BROADSWORD:
         case RUNESWORD:
-        case VOULGE:        tmp += rnd(4); break;
+        case VOULGE:
+            tmp += rnd(4);
+            damage_info->bonus_small = "+1d4";
+            break;
 
-        case ACID_VENOM:    tmp += rnd(6); break;
+        case ACID_VENOM:
+            tmp += rnd(6);
+            damage_info->bonus_small = "+1d6";
+            break;
         }
     }
     if (Is_weapon) {
@@ -319,10 +370,11 @@ struct monst *mon;
         if (tmp < 0) tmp = 0;
     }
 
-    if (objects[otyp].oc_material <= LEATHER && thick_skinned(ptr))
+    if (objects[otyp].oc_material <= LEATHER && ptr && thick_skinned(ptr)) {
         /* thick skinned/scaled creatures don't feel it */
         tmp = 0;
-    if (ptr == &mons[PM_SHADE] && !shade_glare(otmp)) {
+    }
+    if (ptr && ptr == &mons[PM_SHADE] && !shade_glare(otmp)) {
         tmp = 0;
     }
 
@@ -337,21 +389,39 @@ struct monst *mon;
         }
     }
 
-/*  Put weapon vs. monster type damage bonuses in below:    */
+    /*  Put weapon vs. monster type damage bonuses in below:    */
     if (Is_weapon || otmp->oclass == GEM_CLASS ||
         otmp->oclass == BALL_CLASS || otmp->oclass == CHAIN_CLASS) {
         int bonus = 0;
 
-        if (otmp->blessed &&
-            (is_undead(ptr) || is_demon(ptr) || is_vampshifter(mon))) {
-            bonus += rnd(4);
+        if (otmp->blessed) {
+            if (otmp->bknown) {
+                damage_info->blessed_damage = "Additional 1d4 against undead, demons, or vampires.";
+            }
+            if (ptr && (is_undead(ptr) || is_demon(ptr) || is_vampshifter(mon))) {
+                bonus += rnd(4);
+            }
         }
-        if (is_axe(otmp) && is_wooden(ptr))
-            bonus += rnd(4);
-        if (objects[otyp].oc_material == SILVER && hates_silver(ptr))
-            bonus += rnd(20);
-        if (artifact_light(otmp) && otmp->lamplit && hates_light(ptr)) {
-            bonus += rnd(8);
+
+        if (is_axe(otmp)) {
+            damage_info->axe_damage = "Additional 1d4 against wood golems.";
+            if (ptr && is_wooden(ptr)) {
+                bonus += rnd(4);
+            }
+        }
+
+        if (objects[otyp].oc_material == SILVER) {
+            damage_info->silver_damage = "Additional 1d20 against silver hating monsters.";
+            if (ptr && hates_silver(ptr)) {
+                bonus += rnd(20);
+            }
+        }
+
+        if (artifact_light(otmp)) {
+            damage_info->light_damage = "Additional 1d8 against light hating monsters.";
+            if (otmp->lamplit && ptr && hates_light(ptr)) {
+                bonus += rnd(8);
+            }
         }
 
         /* if the weapon is going to get a double damage bonus, adjust

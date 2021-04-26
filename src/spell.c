@@ -29,7 +29,6 @@ STATIC_DCL int FDECL(percent_success, (int));
 STATIC_DCL int NDECL(throwspell);
 STATIC_DCL void NDECL(cast_protection);
 STATIC_DCL void FDECL(spell_backfire, (int));
-STATIC_DCL const char *FDECL(spelltypemnemonic, (int));
 
 /* The roles[] table lists the role-specific values for tuning
  * percent_success().
@@ -590,7 +589,7 @@ docast()
     return 0;
 }
 
-STATIC_OVL const char *
+const char *
 spelltypemnemonic(skill)
 int skill;
 {

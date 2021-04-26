@@ -2,18 +2,15 @@
 
 #include "hack.h"
 
-static int FDECL(cost, (struct obj *));
 static boolean FDECL(label_known, (int, struct obj *));
 static char *FDECL(new_book_description, (int, char *));
 
 /*
  * returns basecost of a scroll or a spellbook
  */
-STATIC_OVL int
-cost(otmp)
-register struct obj *otmp;
+int
+ink_cost(struct obj *otmp)
 {
-
     if (otmp->oclass == SPBOOK_CLASS)
         return(10 * objects[otmp->otyp].oc_level);
 
@@ -59,7 +56,7 @@ register struct obj *otmp;
 
     case SCR_BLANK_PAPER:
     default:
-        warning("You can't write such a weird scroll!");
+        warning("You can't write such a weird scroll %d!", otmp->otyp);
     }
     return(1000);
 }
@@ -235,7 +232,7 @@ found:
     check_unpaid(pen);
 
     /* see if there's enough ink */
-    basecost = cost(new_obj);
+    basecost = ink_cost(new_obj);
     if(pen->spe < basecost/2)  {
         Your("marker is too dry to write that!");
         obfree(new_obj, (struct obj *) 0);

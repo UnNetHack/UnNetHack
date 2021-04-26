@@ -1721,6 +1721,21 @@ ret:
     return cnt;
 }
 
+/** Returns TRUE if pm is an identified dragon. */
+boolean
+is_dragon_identified(struct permonst *pm)
+{
+    if (pm->mlet != S_DRAGON) {
+        /* not a dragon */
+        return TRUE;
+    }
+    if (monsndx(pm) == PM_CHROMATIC_DRAGON) {
+        return TRUE;
+    }
+    int scales = Dragon_to_scales(pm);
+    return objects[scales].oc_name_known;
+}
+
 void
 identify_dragon(int number)
 {
