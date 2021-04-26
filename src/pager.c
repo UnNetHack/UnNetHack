@@ -844,6 +844,9 @@ add_mon_info(winid datawin, struct permonst * pm)
         } else if (vegetarian(pm)) {
             MONPUTSTR("May be eaten by vegetarians.");
         }
+        if (has_blood(pm)) {
+            MONPUTSTR("May be drunk by vampiric monsters.");
+        }
     }
     snprintf(buf, BUFSZ, "Is %sa valid polymorph form.", polyok(pm) ? "" : "not ");
     MONPUTSTR(buf);
