@@ -627,6 +627,7 @@ add_mon_info(winid datawin, struct permonst * pm)
     boolean nohell = !!(gen & G_NOHELL);
     boolean sheol = !!(gen & G_SHEOL);
     boolean nosheol = !!(gen & G_NOSHEOL);
+    boolean identified_monster = is_dragon_identified((pm));
 
 #define ADDRESIST(condition, str)                       \
     if (condition) {                                    \
@@ -700,11 +701,13 @@ add_mon_info(winid datawin, struct permonst * pm)
     ADDRESIST(resists_drain(pm), "life-drain");
     /* ADDRESIST(SICK_RES, "sickness"); */
     ADDRESIST(resists_mgc(pm), "magic");
-    if (*buf) {
-        snprintf(buf2, BUFSZ, "Resists %s.", buf);
-        MONPUTSTR(buf2);
-    } else {
-        MONPUTSTR("Has no resistances.");
+    if (identified_monster) {
+        if (*buf) {
+            snprintf(buf2, BUFSZ, "Resists %s.", buf);
+            MONPUTSTR(buf2);
+        } else {
+            MONPUTSTR("Has no resistances.");
+        }
     }
 
     /* Corpse conveyances */
@@ -716,8 +719,10 @@ add_mon_info(winid datawin, struct permonst * pm)
     APPENDC(intrinsic_possible(POISON_RES, pm), "poison");
     APPENDC(intrinsic_possible(DISINT_RES, pm), "disintegration");
     /* acid and stone resistance aren't currently conveyable */
-    if (*buf) {
-        Strcat(buf, " resistance");
+    if (identified_monster) {
+        if (*buf) {
+            Strcat(buf, " resistance");
+        }
     }
     APPENDC(intrinsic_possible(TELEPORT, pm), "teleportation");
     APPENDC(intrinsic_possible(TELEPORT_CONTROL, pm), "teleport control");
@@ -731,27 +736,29 @@ add_mon_info(winid datawin, struct permonst * pm)
      * that may indicate the property should be added to psuedo_intrinsics. */
     APPENDC(pm == &mons[PM_QUANTUM_MECHANIC], "speed or slowness");
     APPENDC(pm == &mons[PM_MIND_FLAYER] || pm == &mons[PM_MASTER_MIND_FLAYER], "intelligence");
-    if (is_were(pm)) {
-        /* Weres need a bit of special handling, since 1) you always get
-         * lycanthropy so "may convey" could imply the player might not contract
-         * it; 2) the animal forms are flagged as G_NOCORPSE, but still have a
-         * meaningless listed corpse nutrition value which shouldn't print. */
-        if (pm->mlet == S_HUMAN) {
+    if (identified_monster) {
+        if (is_were(pm)) {
+            /* Weres need a bit of special handling, since 1) you always get
+            * lycanthropy so "may convey" could imply the player might not contract
+            * it; 2) the animal forms are flagged as G_NOCORPSE, but still have a
+            * meaningless listed corpse nutrition value which shouldn't print. */
+            if (pm->mlet == S_HUMAN) {
+                Sprintf(buf2, "Provides %d nutrition when eaten.", pm->cnutrit);
+                MONPUTSTR(buf2);
+            }
+            MONPUTSTR("Corpse conveys lycanthropy.");
+        } else if (!(gen & G_NOCORPSE)) {
             Sprintf(buf2, "Provides %d nutrition when eaten.", pm->cnutrit);
             MONPUTSTR(buf2);
-        }
-        MONPUTSTR("Corpse conveys lycanthropy.");
-    } else if (!(gen & G_NOCORPSE)) {
-        Sprintf(buf2, "Provides %d nutrition when eaten.", pm->cnutrit);
-        MONPUTSTR(buf2);
-        if (*buf) {
-            snprintf(buf2, BUFSZ, "Corpse may convey %s.", buf);
-            MONPUTSTR(buf2);
+            if (*buf) {
+                snprintf(buf2, BUFSZ, "Corpse may convey %s.", buf);
+                MONPUTSTR(buf2);
+            } else {
+                MONPUTSTR("Corpse conveys no intrinsics.");
+            }
         } else {
-            MONPUTSTR("Corpse conveys no intrinsics.");
+            MONPUTSTR("Leaves no corpse.");
         }
-    } else {
-        MONPUTSTR("Leaves no corpse.");
     }
 
     /* Flag descriptions */
@@ -790,8 +797,10 @@ add_mon_info(winid datawin, struct permonst * pm)
         APPENDC(nonliving(pm), "nonliving");
     }
     if (*buf) {
-        snprintf(buf2, BUFSZ, "Is %s.", buf);
-        MONPUTSTR(buf2);
+        if (identified_monster) {
+            snprintf(buf2, BUFSZ, "Is %s.", buf);
+            MONPUTSTR(buf2);
+        }
         buf[0] = '\0';
     }
 
@@ -858,8 +867,13 @@ add_mon_info(winid datawin, struct permonst * pm)
                 dicebuf[0] = '\0';
             }
         }
-        Sprintf(buf2, "%s%s%s %s", dicebuf, ((*dicebuf) ? " " : ""),
-                attack_type(attk->aatyp), damage_type(attk->adtyp));
+
+        if (identified_monster || i != 0) {
+            Sprintf(buf2, "%s%s%s %s", dicebuf, ((*dicebuf) ? " " : ""),
+                    attack_type(attk->aatyp), damage_type(attk->adtyp));
+        } else {
+            Strcpy(buf2, "unknown");
+        }
         APPENDC(TRUE, buf2);
     }
     if (*buf) {
