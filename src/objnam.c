@@ -3285,6 +3285,25 @@ const char * in_str;
     if (fruit_from_name(in_str, FALSE, NULL)) {
         return SLIME_MOLD;
     }
+
+    /* try dragon scales and dragon scale mail */
+    if (!strncmpi(in_str, "set of ", 7)) {
+        in_str += 7;
+    }
+    for (int i = PM_GRAY_DRAGON; i <= PM_CHROMATIC_DRAGON; i++) {
+        struct objclass oclass = objects[GRAY_DRAGON_SCALES + i - PM_GRAY_DRAGON];
+        if ((!strcmpi(OBJ_DESCR(oclass), in_str)) ||
+            (!strcmpi(OBJ_NAME(oclass), in_str))) {
+            return oclass.oc_name_idx;
+        }
+
+        oclass = objects[GRAY_DRAGON_SCALE_MAIL + i - PM_GRAY_DRAGON];
+        if ((!strcmpi(OBJ_DESCR(oclass), in_str)) ||
+            (!strcmpi(OBJ_NAME(oclass), in_str))) {
+            return oclass.oc_name_idx;
+        }
+    }
+
     return STRANGE_OBJECT;
 }
 

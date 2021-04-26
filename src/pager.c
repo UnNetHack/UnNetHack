@@ -1196,6 +1196,10 @@ short otyp;
             }
         }
     }
+    if ((otyp == CHROMATIC_DRAGON_SCALES) || (otyp == CHROMATIC_DRAGON_SCALE_MAIL)) {
+        OBJPUTSTR("Confers fire, cold, sleep, disintegration, shock, poison, acid, petrification, "
+                  "magic resistance.");
+    }
 
     buf[0] = '\0';
     ADDCLASSPROP(oc.oc_magic, "inherently magical");
