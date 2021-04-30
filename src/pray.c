@@ -1790,7 +1790,7 @@ dosacrifice()
                     livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
                                     "had %s bestowed upon %s by %s",
                                     otmp->oartifact ? artiname(otmp->oartifact) : an(xname(otmp)),
-                                    artiname(otmp->oartifact), uhim(), u_gname());
+                                    uhim(), u_gname());
                     /* make sure we can use this weapon */
                     unrestrict_weapon_skill(weapon_type(otmp));
                     discover_artifact(otmp->oartifact);

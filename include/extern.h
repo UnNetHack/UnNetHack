@@ -3057,7 +3057,7 @@ E void FDECL(livelog_game_started, (const char*, const char*, const char*, const
 E void FDECL(livelog_game_action, (const char*));
 E void FDECL(livelog_generic, (const char*, const char*));
 E void FDECL(livelog_genocide, (const char*, int));
-extern void livelog_printf(unsigned int, const char *, ...);
+extern void livelog_printf(unsigned int, const char *, ...) PRINTF_F(2, 3);
 
 #endif /* !MAKEDEFS_C && !LEV_LEX_C */
 
