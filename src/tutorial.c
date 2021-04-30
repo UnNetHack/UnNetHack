@@ -532,7 +532,7 @@ tutorial_redisplay()
     for (i.a_int = QT_T_FIRST; i.a_int <= QT_T_MAX; i.a_int++) {
         if (pl_tutorial[i.a_int - QT_T_FIRST] > 0) {
             static char namebuf[80];
-            char* name;
+            const char* name;
             qt_com_firstline(i.a_int, namebuf);
             /* adding 10 to namebuf removes the 'Tutorial: ' at the start */
             name = *namebuf ? namebuf + 10 : "(not found)";

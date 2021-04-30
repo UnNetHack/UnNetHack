@@ -909,7 +909,7 @@ spovar2str(spovar)
 {
     static int togl = 0;
     static char buf[2][128];
-    char *n = NULL;
+    const char *n = NULL;
     int is_array = (spovar & SPOVAR_ARRAY);
     spovar &= ~SPOVAR_ARRAY;
 

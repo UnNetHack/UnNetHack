@@ -729,7 +729,7 @@ read_hint(otmp)
 struct obj *otmp UNUSED;
 {
     /* TODO: option for beginner, general changes, public server hints? */
-    static char *hint[] = {
+    static const char *hint[] = {
         /* beginner hints */
         /* none at the moment */
 

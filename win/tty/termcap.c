@@ -675,16 +675,25 @@ register int x, y;
     ttyDisplay->curx = x;
 }
 
-/* See note at OVLx ifdef above.   xputc() is a special function. */
-void
-xputc(c)
-#if defined(apollo)
-int c;
-#else
-char c;
-#endif
+int
+xputc(int c) /* actually char, but explicitly specify its widened type */
 {
-    (void) putchar(c);
+    /*
+     * Note:  xputc() as a direct all to putchar() doesn't make any
+     * sense _if_ putchar() is a function.  But if it is a macro, an
+     * overlay configuration would want to avoid hidden code bloat
+     * from multiple putchar() expansions.  And it gets passed as an
+     * argument to tputs() so we have to guarantee an actual function
+     * (while possibly lacking ANSI's (func) syntax to override macro).
+     *
+     * xputc() used to be declared as 'void xputc(c) char c; {}' but
+     * avoiding the proper type 'int' just to avoid (void) casts when
+     * ignoring the result can't have been sufficent reason to add it.
+     * It also had '#if apollo' conditional to have the arg be int.
+     * Matching putchar()'s declaration and using explicit casts where
+     * warranted is more robust, so we're just a jacket around that.
+     */
+    return putchar(c);
 }
 
 void
@@ -872,18 +881,9 @@ tty_delay_output()
        then this looks terrible. */
     if(flags.null)
 # ifdef TERMINFO
-    /* cbosgd!cbcephus!pds for SYS V R2 */
-#  ifdef NHSTDC
-        tputs("$<50>", 1, (int (*)())xputc);
-#  else
         tputs("$<50>", 1, xputc);
-#  endif
 # else
-#  if defined(NHSTDC) || defined(ULTRIX_PROTO)
-        tputs("50", 1, (int (*)())xputc);
-#  else
         tputs("50", 1, xputc);
-#  endif
 # endif
 
     else if(ospeed > 0 && ospeed < SIZE(tmspc10) && nh_CM) {

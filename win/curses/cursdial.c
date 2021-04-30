@@ -932,7 +932,7 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num)
 
     int color = NO_COLOR;
 #ifdef MENU_COLOR
-    int attr = A_NORMAL;
+    attr_t attr = A_NORMAL;
     boolean menu_color = FALSE;
 #endif /* MENU_COLOR */
 
@@ -1399,9 +1399,7 @@ menu_max_height(void)
 
 #ifdef MENU_COLOR
 boolean
-curses_get_menu_coloring(line, color, attr)
-const char *line;
-int *color, *attr;
+curses_get_menu_coloring(const char *line, int *color, attr_t*attr)
 {
     struct menucoloring *tmpmc;
     boolean foundcolor = FALSE, foundattr = FALSE;

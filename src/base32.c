@@ -63,7 +63,7 @@ decode_base32(const char* str)
     return ret;
 }
 
-static char* base32_encoding[] = {
+static const char* base32_encoding[] = {
     "o", /*  0 */
     "i", /*  1 */
     "2", /*  2 */

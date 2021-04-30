@@ -390,8 +390,10 @@ const struct Role roles[] = {
         { 10, 0,  0, 8,  1, 0 },/* Hit points */
         {  4, 3,  0, 2,  0, 3 }, 12,/* Energy */
         0, 1, 0, 3, 10, A_INT, SPE_MAGIC_MISSILE,   -4},
-/* Array terminator */
-    {{0, 0}}
+    /* Array terminator */
+    { { 0 }, { { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 } },
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, { 0 }, { 0 }, { 0 }, { 0 },
+        0, 0, 0, 0, 0, 0, 0, 0, 0 }
 };
 
 
@@ -489,8 +491,8 @@ const struct Race races[] = {
         {  3, 0,  0, 3,  2, 0 },/* Hit points */
         {  3, 0,  4, 0,  4, 0 } /* Energy */
     },
-/* Array terminator */
-    { 0, 0, 0, 0 }
+    /* Array terminator */
+    { 0, 0, 0, 0, { 0 }, 0, 0, 0, 0, 0, 0, 0, 0, { 0 }, { 0 }, { 0 }, { 0 } }
 };
 
 
@@ -618,8 +620,7 @@ randrole_filtered()
 }
 
 int
-str2role(str)
-char *str;
+str2role(const char *str)
 {
     int i, len;
 
@@ -691,8 +692,7 @@ int rolenum;
 
 
 int
-str2race(str)
-char *str;
+str2race(const char *str)
 {
     int i, len;
 
@@ -758,8 +758,7 @@ int rolenum, racenum;
 
 
 int
-str2gend(str)
-char *str;
+str2gend(const char *str)
 {
     int i, len;
 
@@ -822,8 +821,7 @@ int rolenum, racenum;
 
 
 int
-str2align(str)
-char *str;
+str2align(const char *str)
 {
     int i, len;
 

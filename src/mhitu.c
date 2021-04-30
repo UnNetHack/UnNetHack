@@ -1907,12 +1907,14 @@ do_stone:
                 hpmax_p = &u.uhpmax;
                 lowerlimit = u.ulevel;
             }
-            if (*hpmax_p - permdmg > lowerlimit)
+            if (*hpmax_p - permdmg > lowerlimit) {
                 *hpmax_p -= permdmg;
-            else if (*hpmax_p > lowerlimit)
+            } else if (*hpmax_p > lowerlimit) {
                 *hpmax_p = lowerlimit;
-            else /* unlikely... */
-                ; /* already at or below minimum threshold; do nothing */
+            } else {
+                /* unlikely... */
+                /* already at or below minimum threshold; do nothing */
+            }
             flags.botl = 1;
         }
 

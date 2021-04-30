@@ -51,7 +51,7 @@ static long true_rumor_end, false_rumor_end;
 /* oracles are handled differently from rumors... */
 static int oracle_flg = 0; /* -1=>don't use, 0=>need init, 1=>init done */
 static unsigned oracle_cnt = 0;
-static unsigned long *oracle_loc = 0;
+static long *oracle_loc = 0;
 
 STATIC_OVL void
 init_rumors(fp)

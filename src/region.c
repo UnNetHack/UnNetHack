@@ -277,10 +277,10 @@ NhRegion *reg;
         if (reg->monsters)
             free((genericptr_t) reg->monsters);
         if (reg->enter_msg) {
-            free(reg->enter_msg);
+            free((void *)reg->enter_msg);
         }
         if (reg->leave_msg) {
-            free(reg->leave_msg);
+            free((void *)reg->leave_msg);
         }
         free((genericptr_t) reg);
     }

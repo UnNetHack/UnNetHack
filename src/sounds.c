@@ -841,7 +841,7 @@ register struct monst *mtmp;
     case MS_DJINNI:
         if (mtmp->mtame) {
             if (ptr == &mons[PM_PRISONER]) {
-                char *honorific;
+                const char *honorific;
                 if (is_neuter(youmonst.data)) {
                     honorific = "creature";
                 } else if(flags.female) {

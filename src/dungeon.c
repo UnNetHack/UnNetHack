@@ -66,7 +66,7 @@ STATIC_DCL void FDECL(save_mapseen, (int, mapseen *));
 STATIC_DCL mapseen *FDECL(find_mapseen, (d_level *));
 STATIC_DCL void FDECL(print_mapseen, (winid, mapseen *, boolean, boolean, boolean));
 static boolean FDECL(interest_mapseen, (mapseen *, boolean));
-STATIC_DCL char *FDECL(seen_string, (xchar, const char *));
+static const char *seen_string(xchar, const char *);
 STATIC_DCL const char *FDECL(br_string2, (branch *));
 
 #ifdef DEBUG
@@ -2805,7 +2805,7 @@ dumpoverview()
 }
 #endif
 
-static char *
+static const char *
 seen_string(xchar x, const char *obj)
 {
     /* players are computer scientists: 0, 1, 2, n */

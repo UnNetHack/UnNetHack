@@ -635,8 +635,8 @@ register struct monst *priest;
                       (theft by gremlin clears the intrinsic but not
                       its former magnitude, making it recoverable) */
                    (!(HProtection & INTRINSIC) ||
-                    u.ublessed < 20 &&
-                    (u.ublessed < 9 || !rn2(u.ublessed)))) {
+                    (u.ublessed < 20 &&
+                     (u.ublessed < 9 || !rn2(u.ublessed))))) {
             verbalize("Thy devotion has been rewarded.");
             if (!(HProtection & INTRINSIC))  {
                 HProtection |= FROMOUTSIDE;

@@ -9,7 +9,7 @@
 extern lev_region *lregions;
 extern int num_lregions;
 /* for preserving the insect legs when wallifying baalz level */
-static lev_region bughack = { {COLNO, ROWNO, 0, 0}, {COLNO, ROWNO, 0, 0} };
+static lev_region bughack = { { COLNO, ROWNO, 0, 0 }, { COLNO, ROWNO, 0, 0 }, 0, 0, 0, 0, { 0 } };
 extern char SpLev_Map[COLNO][ROWNO];
 
 static int FDECL(iswall, (int, int));
@@ -1680,7 +1680,7 @@ movebubbles()
     int x, y, i, j;
     struct trap *btrap;
     static const struct rm water_pos =
-    { cmap_to_glyph(S_water), WATER, 0, 0, 0, 0, 0, 0, 0 };
+    { cmap_to_glyph(S_water), WATER, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
     /* set up the portal the first time bubbles are moved */
     if (!wportal) set_wportal();

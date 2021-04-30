@@ -742,10 +742,9 @@ makevtele()
 STATIC_OVL void
 clear_level_structures()
 {
-    static struct rm zerorm = { cmap_to_glyph(S_stone),
-                                0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    register int x, y;
-    register struct rm *lev;
+    static struct rm zerorm = { cmap_to_glyph(S_stone), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    int x, y;
+    struct rm *lev;
 
     for(x=0; x<COLNO; x++) {
         lev = &levl[x][0];

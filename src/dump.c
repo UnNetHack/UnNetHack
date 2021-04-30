@@ -251,7 +251,7 @@ const struct obj *obj;
 const char *str;
 {
 #ifdef DUMP_LOG
-    char *starting_inventory = obj->was_in_starting_inventory ? "*" : "";
+    const char *starting_inventory = obj->was_in_starting_inventory ? "*" : "";
     if (dump_fp)
         fprintf(dump_fp, "  %c - %s%s\n", c, str, starting_inventory);
     if (html_dump_fp) {
@@ -487,7 +487,7 @@ const char *title;
 
 static char html_escape_buf[BUFSZ];
 /** Escape a single character for HTML. */
-char* html_escape_character(const char c) {
+const char* html_escape_character(const char c) {
     switch (c) {
     case '<':
         return "&lt;";
