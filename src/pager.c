@@ -2372,7 +2372,7 @@ do_look(int mode, coord *click_cc)
                 pm = lookat(cc.x, cc.y, look_buf, monbuf);
                 firstmatch = look_buf;
                 if (*firstmatch) {
-                    Snprintf(temp_buf, sizeof temp_buf, " (%s)", *firstmatch);
+                    Snprintf(temp_buf, sizeof temp_buf, " (%s)", firstmatch);
                     (void)strncat(out_str, temp_buf, BUFSZ-strlen(out_str)-1);
                     found = 1; /* we have something to look up */
                 }
