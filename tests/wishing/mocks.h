@@ -41,12 +41,12 @@ void nh_terminate(int status) { exit(0); }
 void docrt() {}
 int isok(int x, int y) { return 1; }
 
-int str2role(char *str) { return 0; }
-int str2race(char *str) { return 0; }
-int str2gend(char *str) { return 0; }
-int str2align(char *str) { return 0; }
+int str2role(const char *str) { return 0; }
+int str2race(const char *str) { return 0; }
+int str2gend(const char *str) { return 0; }
+int str2align(const char *str) { return 0; }
 
-void read_config_file(const char *str) {}
+boolean read_config_file(const char *str, int src) {}
 const char* configfile = "";
 
 const struct Align aligns[] = {};
