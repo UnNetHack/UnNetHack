@@ -709,5 +709,12 @@ const char *encountered, *expected;
             }
         }
     }
+
+    if (MAXPCHARS != SIZE(altlabels)) {
+        Fprintf(stderr, "Not enough alt labels, expected %d, got %d\n",
+                MAXPCHARS, SIZE(altlabels));
+        exit(EXIT_FAILURE);
+    }
+
     return FALSE;
 }
