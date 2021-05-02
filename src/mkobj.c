@@ -1188,16 +1188,31 @@ set_corpsenm(obj, id)
 struct obj *obj;
 int id;
 {
+    int old_id = obj->corpsenm;
     long when = 0L;
 
     if (obj->timed) {
-        if (obj->otyp == EGG)
+        if (obj->otyp == EGG) {
             when = stop_timer(HATCH_EGG, obj_to_any(obj));
-        else {
+        } else {
             when = 0L;
             obj_stop_timers(obj); /* corpse or figurine */
         }
     }
+    /* oeaten is used to determine how much nutrition is left in
+       multiple-bite food and also used to derive how many hit points
+       a creature resurrected from a partly eaten corpse gets; latter
+       is of interest when a <foo> corpse revives as a <foo> zombie
+       in case they are defined with different mons[].cnutrit values */
+    if (obj->otyp == CORPSE && obj->oeaten != 0 &&
+         /* when oeaten is non-zero, index old_id can't be NON_PM
+            and divisor mons[old_id].cnutrit can't be zero */
+         mons[old_id].cnutrit != mons[id].cnutrit) {
+        /* oeaten and cnutrit are unsigned; theoretically that could
+           be 16 bits and the calculation might overflow, so force long */
+        obj->oeaten = (unsigned) ((long) obj->oeaten * (long) mons[id].cnutrit / (long) mons[old_id].cnutrit);
+    }
+
     obj->corpsenm = id;
     switch (obj->otyp) {
     case CORPSE:

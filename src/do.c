@@ -2152,7 +2152,7 @@ zombify_mon(anything *arg, long timeout)
             free_omonst(body);
         }
 
-        body->corpsenm = zmon;
+        set_corpsenm(body, zmon);
         revive_mon(arg, timeout);
     }
 }
