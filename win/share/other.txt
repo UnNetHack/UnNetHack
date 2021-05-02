@@ -1345,235 +1345,273 @@ P = (108, 145, 182)
   ................
   ................
 }
-# tile 63 (wall)
+# tile 70 (vertical beam)
 {
-  MMMMMMMNNMMMMMMM
-  MMMMMMNNMMMMMMMM
-  MMMMMNNMMMMMMMMM
-  MMMMMMNNMMMMMMMM
-  MMMMMMMNNMMMMMMM
-  MMMMMMMMNNMMMMMM
-  MMMMMMMMMNNMMMMM
-  MMMMMMMMNNMMMMMM
-  MMMMMMMNNMMMMMMM
-  MMMMMMNNMMMMMMMM
-  MMMMMNNMMMMMMMMM
-  MMMMMMNNMMMMMMMM
-  MMMMMMMNNMMMMMMM
-  MMMMMMMMNNMMMMMM
-  MMMMMMMMMNNMMMMM
-  MMMMMMMMNNMMMMMM
+  .......NN.......
+  ......NN........
+  .....NN.........
+  ......NN........
+  .......NN.......
+  ........NN......
+  .........NN.....
+  ........NN......
+  .......NN.......
+  ......NN........
+  .....NN.........
+  ......NN........
+  .......NN.......
+  ........NN......
+  .........NN.....
+  ........NN......
 }
-# tile 64 (wall)
+# tile 71 (horizontal beam)
 {
-  MMMMMMMMMMMMMMMM
-  MMMMMMMMMMMMMMMM
-  MMMMMMMMMMMMMMMM
-  MMMMMMMMMMMMMMMM
-  MMMMMMMMMMMMMMMM
-  MMNMMMMMMMNMMMMM
-  MNNNMMMMMNNNMMMM
-  NNMNNMMMNNMNNMMM
-  NMMMNNMNNMMMNNMN
-  MMMMMNNNMMMMMNNN
-  MMMMMMNMMMMMMMNM
-  MMMMMMMMMMMMMMMM
-  MMMMMMMMMMMMMMMM
-  MMMMMMMMMMMMMMMM
-  MMMMMMMMMMMMMMMM
-  MMMMMMMMMMMMMMMM
+  ................
+  ................
+  ................
+  ................
+  ................
+  ..N.......N.....
+  .NNN.....NNN....
+  NN.NN...NN.NN...
+  N...NN.NN...NN.N
+  .....NNN.....NNN
+  ......N.......N.
+  ................
+  ................
+  ................
+  ................
+  ................
 }
-# tile 65 (wall)
+# tile 72 (left slant beam)
 {
-  NNNNNMMMMMMMMMMM
-  MMMMNMMMMMMMMMMM
-  MMMMNMMMMMMMMMMM
-  MMMMNMMMMMMMMMMM
-  MMMMNMMMMMMMMMMM
-  MMMMNMMMMMMMMMMM
-  MMMMNMMMMMMMMMMM
-  MMMMNMMMMMMMMMMM
-  MMMMNNNNNNNNNMMM
-  MMMMMMMMMMMMNMMM
-  MMMMMMMMMMMMNMMM
-  MMMMMMMMMMMMNMMM
-  MMMMMMMMMMMMNMMM
-  MMMMMMMMMMMMNMMM
-  MMMMMMMMMMMMNMMM
-  MMMMMMMMMMMMNNNN
+  NNNNN...........
+  ....N...........
+  ....N...........
+  ....N...........
+  ....N...........
+  ....N...........
+  ....N...........
+  ....N...........
+  ....NNNNNNNNN...
+  ............N...
+  ............N...
+  ............N...
+  ............N...
+  ............N...
+  ............N...
+  ............NNNN
 }
-# tile 66 (wall)
+# tile 73 (right slant beam)
 {
-  MMMMMMMMMMMMNNNN
-  MMMMMMMMMMMMNMMM
-  MMMMMMMMMMMMNMMM
-  MMMMMMMMMMMMNMMM
-  MMMMMMMMMMMMNMMM
-  MMMMMMMMMMMMNMMM
-  MMMMMMMMMMMMNMMM
-  MMMMNNNNNNNNNMMM
-  MMMMNMMMMMMMMMMM
-  MMMMNMMMMMMMMMMM
-  MMMMNMMMMMMMMMMM
-  MMMMNMMMMMMMMMMM
-  MMMMNMMMMMMMMMMM
-  MMMMNMMMMMMMMMMM
-  MMMMNMMMMMMMMMMM
-  NNNNNMMMMMMMMMMM
+  ............NNNN
+  ............N...
+  ............N...
+  ............N...
+  ............N...
+  ............N...
+  ............N...
+  ....NNNNNNNNN...
+  ....N...........
+  ....N...........
+  ....N...........
+  ....N...........
+  ....N...........
+  ....N...........
+  ....N...........
+  NNNNN...........
 }
-# tile 67 (cmap 73)
+# tile 74 (dig beam)
 {
-  MMMMAAAAMMMMMMMM
-  MMAMMMMAAMMAAMMM
-  MAAMAAAMMMMMMAAM
-  MAAMAMMMMAMMAAMM
-  MMAMMMMAMAMAMAAM
-  MAMMAAAMAMMMMAAM
-  MAMAAMMMMMAMAAMM
-  MMMAAMMMMAAMMMMM
-  MAMAMMMAMMMAMAMM
-  MMMAMMMMMMAAMAAM
-  MAMAAAMAAAAMAMAM
-  MAAMMAAMMMMMMMAM
-  MMAMMMAAMMAMMAAM
-  MMAAAAAMMAAAAAMM
-  MMMMAAMMMMAAAMMM
-  MMMMMMMMMMMMMMMM
+  ....AAAA........
+  ..A....AA..AA...
+  .AA.AAA......AA.
+  .AA.A....A..AA..
+  ..A....A.A.A.AA.
+  .A..AAA.A....AA.
+  .A.AA.....A.AA..
+  ...AA....AA.....
+  .A.A...A...A.A..
+  ...A......AA.AA.
+  .A.AAA.AAAA.A.A.
+  .AA..AA.......A.
+  ..A...AA..A..AA.
+  ..AAAAA..AAAAA..
+  ....AA....AAA...
+  ................
 }
-# tile 68 (cmap 74)
+# tile 75 (flash beam)
 {
-  MMMMMMMMMMMMMMMM
-  MMMMMNNNNNNMMMMM
-  MMMNNNNNNNNNNMMM
-  MMNNNNNNNNNNNNMM
-  MMNNNNNNNNNNNNMM
-  MNNNNNNNNNNNNNNM
-  MNNNNNNNNNNNNNNM
-  MNNNNNNNNNNNNNNM
-  MNNNNNNNNNNNNNNM
-  MNNNNNNNNNNNNNNM
-  MNNNNNNNNNNNNNNM
-  MMNNNNNNNNNNNNMM
-  MMNNNNNNNNNNNNMM
-  MMMNNNNNNNNNNMMM
-  MMMMMNNNNNNMMMMM
-  MMMMMMMMMMMMMMMM
+  ................
+  .....NNNNNN.....
+  ...NNNNNNNNNN...
+  ..NNNNNNNNNNNN..
+  ..NNNNNNNNNNNN..
+  .NNNNNNNNNNNNNN.
+  .NNNNNNNNNNNNNN.
+  .NNNNNNNNNNNNNN.
+  .NNNNNNNNNNNNNN.
+  .NNNNNNNNNNNNNN.
+  .NNNNNNNNNNNNNN.
+  ..NNNNNNNNNNNN..
+  ..NNNNNNNNNNNN..
+  ...NNNNNNNNNN...
+  .....NNNNNN.....
+  ................
 }
-# tile 69 (cmap 75)
+# tile 76 (boom left)
 {
-  MMMMMMMMMMMMMMMM
-  MMMMMMMMMMMMMMMM
-  MMMMKKMMMMMMMMMM
-  MMMMKHKAMMMMMMMM
-  MMMMMKHKAMMMMMMM
-  MMMMMMKKKAMMMMMM
-  MMMMMMMKKKAMMMMM
-  MMMMMMMMKDKAMMMM
-  MMMMMMMMJDKAMMMM
-  MMMMMMMJKDJAMMMM
-  MMMMMMJKDJAMMMMM
-  MMMMMJHDJAMMMMMM
-  MMMMJHDJAMMMMMMM
-  MMMMMKJAMMMMMMMM
-  MMMMMMMMMMMMMMMM
-  MMMMMMMMMMMMMMMM
+  ................
+  ................
+  ....KK..........
+  ....KHKA........
+  .....KHKA.......
+  ......KKKA......
+  .......KKKA.....
+  ........KDKA....
+  ........JDKA....
+  .......JKDJA....
+  ......JKDJA.....
+  .....JHDJA......
+  ....JHDJA.......
+  .....KJA........
+  ................
+  ................
 }
-# tile 70 (cmap 76)
+# tile 77 (boom right)
 {
-  MMMMMMMMMMMMMMMM
-  MMMMMMMMMMMMMMMM
-  MMMMMMMMMJKMMMMM
-  MMMMMMMMJDHJMMMM
-  MMMMMMMJDHJAMMMM
-  MMMMMMJDKJAMMMMM
-  MMMMMJDKJAMMMMMM
-  MMMMMKDJAMMMMMMM
-  MMMMMKDKAMMMMMMM
-  MMMMMMKKKAMMMMMM
-  MMMMMMMKKKAMMMMM
-  MMMMMMMMKHKAMMMM
-  MMMMMMMMMKHKAMMM
-  MMMMMMMMMMKKAMMM
-  MMMMMMMMMMMMMMMM
-  MMMMMMMMMMMMMMMM
+  ................
+  ................
+  .........JK.....
+  ........JDHJ....
+  .......JDHJA....
+  ......JDKJA.....
+  .....JDKJA......
+  .....KDJA.......
+  .....KDKA.......
+  ......KKKA......
+  .......KKKA.....
+  ........KHKA....
+  .........KHKA...
+  ..........KKA...
+  ................
+  ................
 }
-# tile 71 (cmap 77)
+# tile 78 (shield1)
 {
-  MMMMMMMMMMMMMMMM
-  MMMMMIMMMMIMMMMM
-  MMMMIMMMMMMIMMMM
-  MMMIMMMMMMMMIMMM
-  MMIMMMIIIIMMMIMM
-  MIMMMMMMMMMMMMIM
-  MMMMIMMIIMMIMMMM
-  MMMMIMIIIIMIMMMM
-  MMMMIMIIIIMIMMMM
-  MMMMIMMIIMMIMMMM
-  MIMMMMMMMMMMMMIM
-  MMIMMMIIIIMMMIMM
-  MMMIMMMMMMMMIMMM
-  MMMMIMMMMMMIMMMM
-  MMMMMIMMMMIMMMMM
-  MMMMMMMMMMMMMMMM
+  ................
+  .....I....I.....
+  ....I......I....
+  ...I........I...
+  ..I...IIII...I..
+  .I............I.
+  ....I..II..I....
+  ....I.IIII.I....
+  ....I.IIII.I....
+  ....I..II..I....
+  .I............I.
+  ..I...IIII...I..
+  ...I........I...
+  ....I......I....
+  .....I....I.....
+  ................
 }
-# tile 72 (cmap 78)
+# tile 79 (shield2)
 {
-  MMMMMMMMMMMMMMMM
-  MCCCCCCCCCCCCCCC
-  MCMMMMMMMMMMMMMM
-  MCMCCCCCCCCCCCCM
-  MCMCMMMMMMMMMMCM
-  MCMCMCCCCCCCCMCM
-  MCMCMCMMMMMMCMCM
-  MCMCMCMCCCCMCMCM
-  MCMCMCMCCMCMCMCM
-  MCMCMCMMMMCMCMCM
-  MCMCMCCCCCCMCMCM
-  MCMCMMMMMMMMCMCM
-  MCMCCCCCCCCCCMCM
-  MCMMMMMMMMMMMMCM
-  MCCCCCCCCCCCCCCM
-  MMMMMMMMMMMMMMMM
+  ................
+  .CCCCCCCCCCCCCCC
+  .C..............
+  .C.CCCCCCCCCCCC.
+  .C.C..........C.
+  .C.C.CCCCCCCC.C.
+  .C.C.C......C.C.
+  .C.C.C.CCCC.C.C.
+  .C.C.C.CC.C.C.C.
+  .C.C.C....C.C.C.
+  .C.C.CCCCCC.C.C.
+  .C.C........C.C.
+  .C.CCCCCCCCCC.C.
+  .C............C.
+  .CCCCCCCCCCCCCC.
+  ................
 }
-# tile 73 (cmap 79)
+# tile 80 (shield3)
 {
-  MMMMMMMHHMMMMMMM
-  MMMMMMMHHMMMMMMM
-  MMMMHHMHHMHHMMMM
-  MMMHMMMHHMMMHMMM
-  MMHMHMMMMMMHMHMM
-  MMHMMHMMMMHMMHMM
-  MMMMMMHMMHMMMMMM
-  HHHHMMMHHMMMHHHH
-  HHHHMMMHHMMMHHHH
-  MMMMMMHMMHMMMMMM
-  MMHMMHMMMMHMMHMM
-  MMHMHMMMMMMHMHMM
-  MMMHMMMHHMMMHMMM
-  MMMMHHMHHMHHMMMM
-  MMMMMMMHHMMMMMMM
-  MMMMMMMHHMMMMMMM
+  .......HH.......
+  .......HH.......
+  ....HH.HH.HH....
+  ...H...HH...H...
+  ..H.H......H.H..
+  ..H..H....H..H..
+  ......H..H......
+  HHHH...HH...HHHH
+  HHHH...HH...HHHH
+  ......H..H......
+  ..H..H....H..H..
+  ..H.H......H.H..
+  ...H...HH...H...
+  ....HH.HH.HH....
+  .......HH.......
+  .......HH.......
 }
-# tile 74 (cmap 80)
+# tile 81 (shield4)
 {
-  MMMMMMMMMMMMMMMM
-  MMMMMMNNNNNMMMMM
-  MMMMMMMMNMMMMMMM
-  MMMNNNNMNMNNNMMM
-  MMMNMMNMNMNMNMMM
-  MNMNNNNMNMNMNMMM
-  MNMMMMMMNMNNNMNM
-  MNNNNNNNNMMMMMNM
-  MNMMMMMNNNNNNNNM
-  MNMNNNMNMMMMMMNM
-  MMMNMNMNMNNNNMNM
-  MMMNMNMNMNMMNMMM
-  MMMNNNMNMNNNNMMM
-  MMMMMMMNMMMMMMMM
-  MMMMMNNNNNMMMMMM
-  MMMMMMMMMMMMMMMM
+  ................
+  ......NNNNN.....
+  ........N.......
+  ...NNNN.N.NNN...
+  ...N..N.N.N.N...
+  .N.NNNN.N.N.N...
+  .N......N.NNN.N.
+  .NNNNNNNN.....N.
+  .N.....NNNNNNNN.
+  .N.NNN.N......N.
+  ...N.N.N.NNNN.N.
+  ...N.N.N.N..N...
+  ...NNN.N.NNNN...
+  .......N........
+  .....NNNNN......
+  ................
 }
-# tile 75 (cmap 81)
+# tile 82 (poison cloud)
+{
+  BBBBBBBBBBBBBBBB
+  BBBBBFFFFFFFBBBB
+  BBBFFFFFFFFFFBBB
+  BBFFFFFFFFFGFFBB
+  BBFFFFFFFFFFFFFB
+  BFFFFFFFFFFFFGFB
+  FFFGFFFFFFFFGFFF
+  FFFFFFFFFFGGFFFF
+  FFFFFFFFFFFFFGFF
+  FFGGFFFFFFFGGFFG
+  FFFFFGGGGGFFFFGG
+  BGFFFFFFFFFFGGGB
+  BBGGGFFFFGGGGGGB
+  BBBGGGGGGGGGGBBB
+  BBBBBBGGGGBBBBBB
+  BBBBBBBBBBBBBBBB
+}
+# tile 83 (valid position)
+{
+  ................
+  ................
+  .....GGGG.......
+  ....GGGGGG......
+  ...GGFFFFGG.....
+  ...GGF...GGF....
+  ....FF...GGF....
+  ........GGFF....
+  .......GGFF.....
+  ......GGFF......
+  ......GGF.......
+  .......FF.......
+  ......GG........
+  ......GGF.......
+  .......FF.......
+  ................
+}
+# tile 84 (cmap 84)
 {
   AAAAAAADDDDDDAAA
   AAAAADDDDDDDDDDD
@@ -1592,7 +1630,7 @@ P = (108, 145, 182)
   AAAADDDDDDMMMMMM
   AAAADDDDDDMMMMMM
 }
-# tile 76 (cmap 82)
+# tile 85 (cmap 85)
 {
   AAAAAAAAAAAAAAAA
   DDAAAAAAAAAAAAAA
@@ -1611,7 +1649,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 77 (cmap 83)
+# tile 86 (cmap 86)
 {
   AAAAAAAAAAAAAAAA
   AAADDDDDAAAAAAAA
@@ -1630,7 +1668,7 @@ P = (108, 145, 182)
   MMMMDDDDDDDDDDDD
   MMMMDDDDDDDDDDDA
 }
-# tile 78 (cmap 84)
+# tile 87 (cmap 87)
 {
   AAAADDDDDDMMMMMM
   AAAADDDDDDDMMMMM
@@ -1649,7 +1687,7 @@ P = (108, 145, 182)
   DDDDDDDMMMMMMMMM
   DDCCDDDMMMMMMMMM
 }
-# tile 79 (cmap 85)
+# tile 88 (cmap 88)
 {
   MMMMDDDDDDDDDDDA
   MMMMDDDDDDDDDDDA
@@ -1668,7 +1706,7 @@ P = (108, 145, 182)
   MMMMMMDDDDDDDDAA
   MMMMMMMDDDDDDDAA
 }
-# tile 80 (cmap 86)
+# tile 89 (cmap 89)
 {
   DDDCDDDMMMMMMMMM
   DDDCDDDMMMMMMMMM
@@ -1687,7 +1725,7 @@ P = (108, 145, 182)
   AAAAAAAAAAAADDDD
   AAAAAAAAAAAAAADD
 }
-# tile 81 (cmap 87)
+# tile 90 (cmap 90)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -1706,7 +1744,7 @@ P = (108, 145, 182)
   DDDDDDDDDDDDDDDD
   DDDDDDDDDDDDDDAA
 }
-# tile 82 (cmap 88)
+# tile 91 (cmap 91)
 {
   MMMMMMDDDDDDDDAA
   MMMMMMDDDDDDDDDA
