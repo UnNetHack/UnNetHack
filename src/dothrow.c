@@ -1011,6 +1011,41 @@ check_shop_obj(struct obj *obj, coordxy x, coordxy y, boolean broken)
     }
 }
 
+/* Will 'obj' cause damage if it falls on hero's head when thrown upward?
+   Not used to handle things which break when they hit. */
+static boolean
+harmless_missile(struct obj *obj)
+{
+    int otyp = obj->otyp;
+
+    /* this list is fairly arbitrary */
+    switch (otyp) {
+    case SLING:
+    case EUCALYPTUS_LEAF:
+    case KELP_FROND:
+    case SPRIG_OF_WOLFSBANE:
+    case FORTUNE_COOKIE:
+    case PANCAKE:
+        return TRUE;
+    case RUBBER_HOSE:
+    case BAG_OF_TRICKS:
+        return (obj->spe < 1);
+    case SACK:
+    case OILSKIN_SACK:
+    case BAG_OF_HOLDING:
+        return !Has_contents(obj);
+    default:
+        if (obj->oclass == SCROLL_CLASS) { /* scrolls but not all paper objs */
+            return TRUE;
+        }
+        if (objects[otyp].oc_material == CLOTH) {
+            return TRUE;
+        }
+        break;
+    }
+    return FALSE;
+}
+
 /*
  * Hero tosses an object upwards with appropriate consequences.
  *
@@ -1086,6 +1121,10 @@ toss_up(struct obj *obj, boolean hitsroof)
             break;
         }
         return FALSE;
+    } else if (harmless_missile(obj)) {
+        pline("It doesn't hurt.");
+        hitfloor(obj, FALSE);
+        thrownobj = 0;
     } else { /* neither potion nor other breaking object */
         boolean less_damage = uarmh && is_metallic(uarmh), artimsg = FALSE;
         int dmg = dmgval(obj, &youmonst);
@@ -1123,7 +1162,7 @@ toss_up(struct obj *obj, boolean hitsroof)
                 if (!artimsg) {
                     pline("Fortunately, you are wearing a hard helmet.");
                 }
-                /* helmet definitely protects you when it blocks petrification */
+            /* helmet definitely protects you when it blocks petrification */
             } else if (!petrifier) {
                 if (flags.verbose) {
                     Your("%s does not protect you.", helm_simple_name(uarmh));
@@ -1133,7 +1172,7 @@ toss_up(struct obj *obj, boolean hitsroof)
                    !(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))) {
 petrify:
             killer.format = KILLED_BY;
-            Strcpy(killer.name, "elementary physics"); /* "what goes up..." */
+            Strcpy(killer.name, "elementary physics"); /* what goes up... */
             You("turn to stone.");
             if (obj) {
                 dropy(obj); /* bypass most of hitfloor() */
