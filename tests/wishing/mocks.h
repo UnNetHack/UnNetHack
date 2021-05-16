@@ -46,7 +46,7 @@ int str2race(const char *str) { return 0; }
 int str2gend(const char *str) { return 0; }
 int str2align(const char *str) { return 0; }
 
-boolean read_config_file(const char *str, int src) {}
+boolean read_config_file(const char *str, int src) { return FALSE; }
 const char* configfile = "";
 
 const struct Align aligns[] = {};
