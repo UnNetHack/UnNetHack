@@ -1565,6 +1565,82 @@ call_object(int obj_otyp, char *buf)
     }
 }
 
+void
+namefloorobj()
+{
+    coord cc;
+    int glyph;
+    char buf[BUFSZ];
+    struct obj *obj = 0;
+    boolean fakeobj = FALSE, use_plural;
+
+    cc.x = u.ux, cc.y = u.uy;
+    /* "dot for under/over you" only makes sense when the cursor hasn't
+       been moved off the hero's '@' yet, but there's no way to adjust
+       the help text once getpos() has started */
+    Sprintf(buf, "object on map (or '.' for one %s you)",
+            (u.uundetected && hides_under(youmonst.data)) ? "over" : "under");
+    if (getpos(&cc, FALSE, buf) < 0 || cc.x <= 0) {
+        return;
+    }
+    if (cc.x == u.ux && cc.y == u.uy) {
+        obj = vobj_at(u.ux, u.uy);
+    } else {
+        glyph = glyph_at(cc.x, cc.y);
+        if (glyph_is_object(glyph)) {
+            fakeobj = object_from_map(glyph, cc.x, cc.y, &obj);
+        }
+        /* else 'obj' stays null */
+    }
+    if (!obj) {
+        /* "under you" is safe here since there's no object to hide under */
+        pline("There doesn't seem to be any object %s.",
+              (cc.x == u.ux && cc.y == u.uy) ? "under you" : "there");
+        return;
+    }
+    /* note well: 'obj' might be an instance of STRANGE_OBJECT if target
+       is a mimic; passing that to xname (directly or via simpleonames)
+       would yield "glorkum" so we need to handle it explicitly; it will
+       always fail the Hallucination test and pass the !callable test,
+       resulting in the "can't be assigned a type name" message */
+    Strcpy(buf, (obj->otyp != STRANGE_OBJECT) ? simpleonames(obj) : obj_descr[STRANGE_OBJECT].oc_name);
+    use_plural = (obj->quan > 1L);
+    if (Hallucination) {
+        const char *unames[6];
+        char tmpbuf[BUFSZ];
+
+        /* straight role name */
+        unames[0] = ((Upolyd ? u.mfemale : flags.female) && urole.name.f) ? urole.name.f : urole.name.m;
+        /* random rank title for hero's role
+
+           note: the 30 is hardcoded in xlev_to_rank, so should be
+           hardcoded here too */
+        unames[1] = rank_of(rn2(30) + 1, Role_switch, flags.female);
+        /* random fake monster */
+        unames[2] = rndmonnam();
+        /* increased chance for fake monster */
+        unames[3] = unames[2];
+        /* traditional */
+        unames[4] = roguename();
+        /* silly */
+        unames[5] = "Wibbly Wobbly";
+        pline("%s %s to call you \"%s.\"",
+              The(buf), use_plural ? "decide" : "decides",
+              unames[rn2(SIZE(unames))]);
+    } else if (!objtyp_is_callable(obj->otyp)) {
+        pline("%s %s can't be assigned a type name.", use_plural ? "Those" : "That", buf);
+    } else if (!obj->dknown) {
+        You("don't know %s %s well enough to name %s.",
+            use_plural ? "those" : "that", buf, use_plural ? "them" : "it");
+    } else {
+        docall(obj);
+    }
+    if (fakeobj) {
+        obj->where = OBJ_FREE; /* object_from_map() sets it to OBJ_FLOOR */
+        dealloc_obj(obj);
+    }
+}
+
 static const char * const ghostnames[] = {
     /* these names should have length < PL_NSIZ */
     /* Capitalize the names for aesthetics -dgk */

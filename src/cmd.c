@@ -1975,14 +1975,17 @@ int typ;
     winid win;
     anything any;
     menu_item *pick_list = NULL;
-    int n;
-    register struct obj *obj;
+    struct obj *obj;
     char allowall[2];
+    /* if player wants a,b,c instead of i,o when looting, do that here too */
+    boolean abc = iflags.lootabc;
+
     static NEARDATA const char callable[] = {
         SCROLL_CLASS, POTION_CLASS, WAND_CLASS, RING_CLASS, AMULET_CLASS,
         GEM_CLASS, SPBOOK_CLASS, ARMOR_CLASS, TOOL_CLASS, 0
     };
 
+    char ch = 'q';
     if (!typ) {
         any.a_void = 0;
         win = create_nhwindow(NHW_MENU);
@@ -1991,27 +1994,39 @@ int typ;
         /* the accelerator keys are chosen to be compatible with NAO and
          * where possible similar to AceHack's keys. That explains the
          * choice for the group accelerators. */
-        any.a_int = 1;
-        add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'a', 'C', ATR_NONE, "Name a monster", MENU_UNSELECTED);
+        any.a_char = 'm'; /* group accelerator 'C' */
+        add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, abc ? 0 : any.a_char, 'C', ATR_NONE,
+                 "Name a monster", MENU_UNSELECTED);
 
-        any.a_int = 2;
-        add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'b', 'y', ATR_NONE, "Name an individual item", MENU_UNSELECTED);
+        if (invent) {
+            /* we use y and n as accelerators so that we can accept user's
+            response keyed to old "name an individual object?" prompt */
+            any.a_char = 'i'; /* group accelerator 'y' */
+            add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, abc ? 0 : any.a_char, 'y', ATR_NONE,
+                     "Name an individual item", MENU_UNSELECTED);
 
-        any.a_int = 3;
-        add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'c', 'n', ATR_NONE, "Name all items of a certain type", MENU_UNSELECTED);
+            any.a_char = 'o'; /* group accelerator 'n' */
+            add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, abc ? 0 : any.a_char, 'n', ATR_NONE,
+                     "Name all items of a certain type", MENU_UNSELECTED);
+        }
 
-        any.a_int = 4;
-        add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 'd', 'f', ATR_NONE, "Annotate the current level", MENU_UNSELECTED);
+        any.a_char = 'f'; /* group accelerator ',' (or ':' instead?) */
+        add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, abc ? 0 : any.a_char, ',', ATR_NONE,
+                 "Name the type of an item on the floor", MENU_UNSELECTED);
 
-        char let = 'e';
+        any.a_char = 'a'; /* group accelerator 'l' */
+        add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, abc ? 0 : any.a_char, 'l', ATR_NONE,
+                 "Annotate the current level", MENU_UNSELECTED);
+
         if ((flags.last_broken_otyp != STRANGE_OBJECT) &&
             (objects[flags.last_broken_otyp].oc_uname == NULL) &&
             (!objects[flags.last_broken_otyp].oc_name_known)) {
             char buf[BUFSZ];
             Sprintf(buf, "Name %s (last broken object)",
                     an(obj_typename(flags.last_broken_otyp)));
-            any.a_int = 5;
-            add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, let++, 'V', ATR_NONE, buf, MENU_UNSELECTED);
+            any.a_char = 'b'; /* group accelerator 'V' */
+            add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, abc ? 0 : any.a_char, 'V', ATR_NONE, buf,
+                     MENU_UNSELECTED);
         }
 
         if ((flags.last_picked_up_otyp != STRANGE_OBJECT) &&
@@ -2020,62 +2035,71 @@ int typ;
             char buf[BUFSZ];
             Sprintf(buf, "Name %s (last picked up object)",
                     an(obj_typename(flags.last_picked_up_otyp)));
-            any.a_int = 6;
-            add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, let++, 'P', ATR_NONE, buf, MENU_UNSELECTED);
+            any.a_char = 'p'; /* group accelerator 'P' */
+            add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, abc ? 0 : any.a_char, 'P', ATR_NONE, buf,
+                     MENU_UNSELECTED);
         }
 
         any.a_int = 0;
         add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, 0, 'q', ATR_NONE, "", MENU_UNSELECTED);
 
         end_menu(win, "What do you wish to name?");
-        n = select_menu(win, PICK_ONE, &pick_list);
-        destroy_nhwindow(win);
-
-        if (pick_list) {
-            n = (pick_list[0].item.a_int - 1);
-            free((genericptr_t) pick_list);
-        } else return 0;
-    } else {
-        n = (typ - 1);
-    }
-    switch (n) {
-    default: break;
-    case 0: do_mname(); break;
-    /* cases 1 & 2 duplicated from ddocall() */
-
-    case 1:
-        allowall[0] = ALL_CLASSES; allowall[1] = '\0';
-        obj = getobj(allowall, "name");
-        if(obj) do_oname(obj);
-        break;
-
-    case 2:
-        obj = getobj(callable, "call");
-        if (obj) {
-            /* behave as if examining it in inventory;
-                               this might set dknown if it was picked up
-                               while blind and the hero can now see */
-            (void) xname(obj);
-
-            if (!obj->dknown) {
-                You("would never recognize another one.");
-                return 0;
-            }
-            docall(obj);
+        if (select_menu(win, PICK_ONE, &pick_list) > 0) {
+            ch = pick_list[0].item.a_char;
+            free(pick_list);
         }
-        break;
+        destroy_nhwindow(win);
+    }
 
-    case 3:
-        donamelevel();
-        break;
+    switch (ch) {
+        default:
+        case 'q':
+            break;
 
-    case 4:
-        docall_input(flags.last_broken_otyp);
-        break;
+        case 'm':
+            do_mname();
+            break;
+            /* cases 1 & 2 duplicated from ddocall() */
 
-    case 5:
-        docall_input(flags.last_picked_up_otyp);
-        break;
+        case 'i':
+            allowall[0] = ALL_CLASSES; allowall[1] = '\0';
+            obj = getobj(allowall, "name");
+            if (obj) {
+                do_oname(obj);
+            }
+            break;
+
+        case 'o':
+            obj = getobj(callable, "call");
+            if (obj) {
+                /* behave as if examining it in inventory;
+                   this might set dknown if it was picked up
+                   while blind and the hero can now see */
+                (void) xname(obj);
+
+                if (!obj->dknown) {
+                    You("would never recognize another one.");
+                    return 0;
+                }
+                docall(obj);
+            }
+            break;
+
+        case 'f':
+            namefloorobj();
+            break;
+
+        case 'a':
+            donamelevel();
+            break;
+
+        case 'b':
+            docall_input(flags.last_broken_otyp);
+            break;
+
+        case 'p':
+            docall_input(flags.last_picked_up_otyp);
+            break;
     }
     return 0;
 }
