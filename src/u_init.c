@@ -13,7 +13,7 @@ struct trobj {
 
 STATIC_DCL void FDECL(ini_inv, (struct trobj *));
 STATIC_DCL void FDECL(knows_object, (int));
-STATIC_DCL void FDECL(knows_class, (CHAR_P));
+static void knows_class(char);
 STATIC_DCL boolean FDECL(restricted_spell_discipline, (int));
 
 #define UNDEF_TYP   0
@@ -625,17 +625,52 @@ register int obj;
 }
 
 /* Know ordinary (non-magical) objects of a certain class,
- * like all gems except the loadstone and luckstone.
- */
-STATIC_OVL void
-knows_class(sym)
-register char sym;
+   like all gems except the loadstone and luckstone. */
+static void
+knows_class(char sym)
 {
-    register int ct;
-    for (ct = 1; ct < NUM_OBJECTS; ct++)
+    struct obj odummy, *o;
+    int ct;
+
+    odummy = zeroobj;
+    odummy.oclass = sym;
+    o = &odummy; /* for use in various obj.h macros */
+
+    /*
+     * Note:  the exceptions here can be bypassed if necessary by
+     *        calling knows_object() directly.  So an elven ranger,
+     *        for example, knows all elven weapons despite the bow,
+     *        arrow, and spear limitation below.
+     */
+
+    for (ct = bases[(uchar) sym]; ct < bases[(uchar) sym + 1]; ct++) {
+        /* not flagged as magic but shouldn't be pre-discovered */
+        if (ct == CORNUTHAUM || ct == DUNCE_CAP) {
+            continue;
+        }
+        if (sym == WEAPON_CLASS) {
+            odummy.otyp = ct; /* update 'o' */
+            /* arbitrary: only knights and samurai recognize polearms */
+            if ((!Role_if(PM_KNIGHT) && !Role_if(PM_SAMURAI)) && is_pole(o)) {
+                continue;
+            }
+            /* rangers know all launchers (bows, &c), ammo (arrows, &c),
+               and spears regardless of race/species, but not other weapons */
+            if (Role_if(PM_RANGER) &&
+                (!is_launcher(o) && !is_ammo(o) && !is_spear(o))) {
+                continue;
+            }
+            /* rogues know daggers, regardless of racial variations */
+            if (Role_if(PM_ROGUE) && (objects[o->otyp].oc_skill != P_DAGGER)) {
+                continue;
+            }
+        }
+
         if (objects[ct].oc_class == sym && !objects[ct].oc_magic &&
-            !Is_dragon_armor(ct))
+             !Is_dragon_armor(ct)) {
             knows_object(ct);
+        }
+    }
 }
 
 void
@@ -771,8 +806,10 @@ u_init()
             Barbarian[B_MINOR].trotyp = SHORT_SWORD;
         }
         ini_inv(Barbarian);
-        if(!rn2(6)) ini_inv(Lamp);
-        knows_class(WEAPON_CLASS);
+        if (!rn2(6)) {
+            ini_inv(Lamp);
+        }
+        knows_class(WEAPON_CLASS); /* excluding polearms */
         knows_class(ARMOR_CLASS);
         skill_init(Skill_B);
         break;
@@ -801,7 +838,7 @@ u_init()
         break;
     case PM_KNIGHT:
         ini_inv(Knight);
-        knows_class(WEAPON_CLASS);
+        knows_class(WEAPON_CLASS); /* all weapons */
         knows_class(ARMOR_CLASS);
         /* give knights chess-like mobility
          * -- idea from wooledge@skybridge.scl.cwru.edu */
@@ -841,6 +878,7 @@ u_init()
         Ranger[RAN_TWO_ARROWS].trquan = rn1(10, 50);
         Ranger[RAN_ZERO_ARROWS].trquan = rn1(10, 30);
         ini_inv(Ranger);
+        knows_class(WEAPON_CLASS); /* bows, arrows, spears only */
         skill_init(Skill_Ran);
         break;
     case PM_ROGUE:
@@ -849,13 +887,16 @@ u_init()
         ini_inv(Rogue);
         if(!rn2(5)) ini_inv(Blindfold);
         knows_object(SACK);
+        knows_class(WEAPON_CLASS); /* daggers only */
         skill_init(Skill_R);
         break;
     case PM_SAMURAI:
         Samurai[S_ARROWS].trquan = rn1(20, 26);
         ini_inv(Samurai);
-        if(!rn2(5)) ini_inv(Blindfold);
-        knows_class(WEAPON_CLASS);
+        if (!rn2(5)) {
+            ini_inv(Blindfold);
+        }
+        knows_class(WEAPON_CLASS); /* all weapons */
         knows_class(ARMOR_CLASS);
         skill_init(Skill_S);
         break;
@@ -871,8 +912,10 @@ u_init()
         break;
     case PM_VALKYRIE:
         ini_inv(Valkyrie);
-        if(!rn2(6)) ini_inv(Lamp);
-        knows_class(WEAPON_CLASS);
+        if (!rn2(6)) {
+            ini_inv(Lamp);
+        }
+        knows_class(WEAPON_CLASS); /* excludes polearms */
         knows_class(ARMOR_CLASS);
         skill_init(Skill_V);
         break;
