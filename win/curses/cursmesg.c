@@ -292,57 +292,67 @@ window, depending on the user's settings */
 void
 curses_count_window(const char *count_text)
 {
-    int startx, starty, winx, winy;
-    int messageh, messagew;
     static WINDOW *countwin = NULL;
+    int winx, winy;
+    int messageh, messagew, border;
 
-    if ((count_text == NULL) && (countwin != NULL)) {
-        delwin(countwin);
-        countwin = NULL;
+    if (!count_text) {
+        if (countwin) {
+            delwin(countwin);
+            countwin = NULL;
+        }
         counting = FALSE;
         return;
     }
 
-    counting = TRUE;
+    /* position of message window, not current position within message window
+       (so <0,0> for align_message:Top but will vary for other alignings) */
+    curses_get_window_xy(MESSAGE_WIN, &winx, &winy);
+    /* size of message window, with space for borders already subtracted */
+    curses_get_window_size(MESSAGE_WIN, &messageh, &messagew);
 
-    if (iflags.wc_popup_dialog) {       /* Display count in popup window */
-        startx = 1;
-        starty = 1;
+    /* decide where to put the one-line counting window */
+    border = curses_window_has_border(MESSAGE_WIN) ? 1 : 0;
+    winx += border; /* first writeable message column */
+    winy += border + (messageh - 1); /* last writable message line */
 
-        if (countwin == NULL) {
-            countwin = curses_create_window(25, 1, UP);
+    /* if most recent message (probably prompt leading to this instance of
+       counting window) is going to be covered up, scroll mesgs up a line */
+    if (!counting && my == border + (messageh - 1) && mx > border) {
+        scroll_window(MESSAGE_WIN);
+        if (messageh > 1) {
+            /* handling for next message will behave as if we're currently
+               positioned at the end of next to last line of message window */
+            my = border + (messageh - 1) - 1;
+            mx = border + (messagew - 1); /* (0 + 80 - 1) or (1 + 78 - 1) */
+        } else {
+            /* for a one-line window, use beginning of only line instead */
+            my = mx = border; /* 0 or 1 */
         }
-
-    } else {                    /* Display count at bottom of message window */
-
-        curses_get_window_xy(MESSAGE_WIN, &winx, &winy);
-        curses_get_window_size(MESSAGE_WIN, &messageh, &messagew);
-
-        if (curses_window_has_border(MESSAGE_WIN)) {
-            winx++;
-            winy++;
-        }
-
-        winy += messageh - 1;
-
-        if (countwin == NULL) {
-            pline("#");
-#ifndef PDCURSES
-            countwin = newwin(1, 25, winy, winx);
-#endif /* !PDCURSES */
-        }
-#ifdef PDCURSES
-        else {
-            curses_destroy_win(countwin);
-        }
-
-        countwin = newwin(1, 25, winy, winx);
-#endif /* PDCURSES */
-        startx = 0;
-        starty = 0;
+        /* wmove(curses_get_nhwin(MESSAGE_WIN), my, mx); -- not needed */
+    }
+    /* in case we're being called from clear_nhwindow(MESSAGE_WIN)
+       which gets called for every command keystroke; it sends an
+       empty string to get the scroll-up-one-line effect above and
+       we want to avoid the curses overhead for the operations below... */
+    if (!*count_text) {
+        return;
     }
 
-    mvwprintw(countwin, starty, startx, "%s", count_text);
+    counting = TRUE;
+#ifdef PDCURSES
+    if (countwin) {
+        curses_destroy_win(countwin), countwin = NULL;
+    }
+#endif /* PDCURSES */
+    /* this used to specify a width of 25; that was adequate for 'Count: 123'
+       but not for dolook's autodescribe when it refers to a named monster */
+    if (!countwin) {
+        countwin = newwin(1, messagew, winy, winx);
+    }
+    werase(countwin);
+
+    mvwprintw(countwin, 0, 0, "%s", count_text);
     wrefresh(countwin);
 }
 
