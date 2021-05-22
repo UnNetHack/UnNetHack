@@ -330,7 +330,10 @@ autoquiver()
     for (otmp = invent; otmp; otmp = otmp->nobj) {
         if (otmp->quiver_priority != 0 &&
             (!oquiver || otmp->quiver_priority > oquiver->quiver_priority)) {
-          oquiver = otmp;
+            /* don't autoquiver worn objects */
+            if (!otmp->owornmask) {
+                oquiver = otmp;
+            }
         }
 
         if (otmp->owornmask || otmp->oartifact || !otmp->dknown) {
@@ -418,15 +421,10 @@ dofire()
 
     /* autoquiver previously manually selected projectiles */
     if (!uquiver) {
-        struct obj *otmp;
-        /* ensure, there is something to quiver */
-        for (otmp = invent; otmp; otmp = otmp->nobj) {
-            if (otmp->quiver_priority != 0) {
-                autoquiver();
-                You("fill your quiver:");
-                prinv((char *)0, uquiver, 0L);
-                break;
-            }
+        autoquiver();
+        if (uquiver) {
+            You("fill your quiver:");
+            prinv((char *)0, uquiver, 0L);
         }
     }
 
