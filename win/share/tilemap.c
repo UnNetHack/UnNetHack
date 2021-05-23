@@ -15,6 +15,7 @@ const char * FDECL(tilename, (int, int));
 void NDECL(init_tilemap);
 void FDECL(process_substitutions, (FILE *));
 boolean FDECL(acceptable_tilename, (int, const char *, const char *));
+static int include_obj_class = 0;
 
 #if defined(MICRO) || defined(WIN32)
 #undef exit
@@ -59,7 +60,7 @@ struct conditionals {
 #endif
 
 #ifndef CHARON /* not supported yet */
-    { MON_GLYPH, PM_CROESUS, "Charon" },
+    { MON_GLYPH, PM_EXECUTIONER, "Charon" },
 #endif
 #ifndef MAIL
     { MON_GLYPH, PM_FAMINE, "mail daemon" },
@@ -166,16 +167,64 @@ int set, entry;
 
     tilenum = 0; /* set-relative number */
     for (i = 0; i < NUM_OBJECTS; i++) {
+        int oc_class = objects[i].oc_class;
+        char *object_class = NULL;
+
+        if (include_obj_class) {
+            switch (oc_class) {
+                case RING_CLASS:
+                    object_class = " ring";
+                    break;
+                case AMULET_CLASS:
+                    if (strncmp("Amulet of Yendor ", obj_descr[i].oc_descr, 16)) {
+                        object_class = " amulet";
+                    }
+                    break;
+                case POTION_CLASS:
+                    object_class = " potion";
+                    break;
+                case SPBOOK_CLASS:
+                    object_class = " spellbook";
+                    break;
+                case WAND_CLASS:
+                    object_class = " wand";
+                    break;
+                case GEM_CLASS:
+                    object_class = " gem";
+                    if (!strcmp("small piece of unrefined mithril", obj_descr[i].oc_name)) {
+                        object_class = " stone";
+                    }
+                    if (!strcmp("rock", obj_descr[i].oc_name)) {
+                        object_class = "";
+                    }
+                    break;
+            }
+        }
         /* prefer to give the description - that's all the tile's
          * appearance should reveal */
         if (set == OBJ_GLYPH && tilenum == entry) {
-            if ( !obj_descr[i].oc_descr )
+            if (!obj_descr[i].oc_descr) {
+                if (object_class) {
+                    Sprintf(buf, "%s%s",
+                            obj_descr[i].oc_name,
+                            object_class);
+                    return buf;
+                }
                 return obj_descr[i].oc_name;
-            if ( !obj_descr[i].oc_name )
+            }
+            if (!obj_descr[i].oc_name) {
+                if (object_class) {
+                    Sprintf(buf, "%s%s",
+                            obj_descr[i].oc_descr,
+                            object_class);
+                    return buf;
+                }
                 return obj_descr[i].oc_descr;
+            }
 
-            Sprintf(buf, "%s / %s",
+            Sprintf(buf, "%s%s / %s",
                     obj_descr[i].oc_descr,
+                    object_class ? object_class : "",
                     obj_descr[i].oc_name);
             return buf;
         }
@@ -272,34 +321,6 @@ int set, entry;
     Sprintf(buf, "unknown %d %d", set, entry);
     return buf;
 }
-
-#ifdef TILELIST
-int main()
-{
-    int i;
-    char filename[30];
-    FILE *ofp;
-
-    for (i = 0; i < NUMMONS; i++) {
-        printf("%s\n", tilename(MON_GLYPH, i));
-    }
-    for (i = 0; i < NUM_OBJECTS; i++) {
-        printf("%s\n", tilename(OBJ_GLYPH, i));
-    }
-    int quit = 0;
-    i = 0;
-    while (!quit) {
-        const char* name = tilename(OTH_GLYPH, i++);
-        if (!strncmp("unknown ",name, 8)) {
-            quit = 1;
-        } else {
-            printf("%s\n", name);
-        }
-    }
-
-    return 0;
-}
-#endif
 
 #else /* TILETEXT */
 
@@ -723,3 +744,73 @@ const char *encountered, *expected;
 
     return FALSE;
 }
+
+#ifdef TILELIST
+
+#include "../src/monst.c"
+#include "../src/objects.c"
+#include "../src/drawing.c"
+
+static void
+output_tilenames_set(int set, int debug, const char* suffix)
+{
+    int i = 0;
+    char *name = NULL;
+    while (TRUE) {
+        char *were = "";
+        name = tilename(set, i);
+        if (!strncmp("unknown ", name, 8)) {
+            break;
+        }
+        if (set == MON_GLYPH) {
+            if (!strncmp("were", name, 4)) {
+                were = i < 200 ? " (beast)" : " (human)";
+            }
+        }
+        if (set == OTH_GLYPH) {
+            if (!strncmp("cmap ", name, 5)) {
+                for (int i = 0; i < SIZE(altlabels); i++) {
+                    if (!strcmp(altlabels[i].expectedlabel, name)) {
+                        name = altlabels[i].betterlabel;
+                    }
+                }
+            }
+            switch (i) {
+                case S_boomleft:  name = "boomerang left"; break;
+                case S_boomright: name = "boomerang right"; break;
+                case S_ss1: name = "sparkle shield 1"; break;
+                case S_ss2: name = "sparkle shield 2"; break;
+                case S_ss3: name = "sparkle shield 3"; break;
+                case S_ss4: name = "sparkle shield 4"; break;
+                case S_land_mine: name = "land mine (trap)"; break;
+                case S_vodbridge: name = "lowered drawbridge (vertical)"; break;
+                case S_hodbridge: name = "lowered drawbridge (horizontal)"; break;
+                case S_vcdbridge: name = "raised drawbridge (vertical)"; break;
+                case S_hcdbridge: name = "raised drawbridge (horizontal)"; break;
+                case S_vodoor: name = "open door (vertical)"; break;
+                case S_hodoor: name = "open door (horizontal)"; break;
+                case S_vcdoor: name = "closed door (vertical)"; break;
+                case S_hcdoor: name = "closed door (horizontal)"; break;
+                case S_pool: name = "water (pool)"; break;
+                case S_water: name = "water (under water)"; break;
+            }
+        }
+        if (debug) {
+            printf("%d ", i);
+        }
+        printf("%s%s%s\n", name, were, suffix);
+        i++;
+    }
+}
+
+int main()
+{
+    include_obj_class = TRUE;
+    output_tilenames_set(MON_GLYPH, FALSE, "");
+    output_tilenames_set(OBJ_GLYPH, FALSE, "");
+    output_tilenames_set(OTH_GLYPH, FALSE, "");
+    output_tilenames_set(MON_GLYPH, FALSE, " (statue)");
+
+    return 0;
+}
+#endif

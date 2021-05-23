@@ -27,7 +27,7 @@ CC = @CC@ -DAUTOCONF
 #	For Bull DPX/2 systems at B.O.S. 2.0 or higher use the following:
 #
 # CC = gcc -ansi -D_BULL_SOURCE -D_XOPEN_SOURCE -D_POSIX_SOURCE
-# 
+#
 #	If you are using GCC 2.2.2 or higher on a DPX/2, just use:
 #
 # CC = gcc -ansi
@@ -101,7 +101,7 @@ CFLAGS = -O2 -I../include -I$(srcdir)/../include @CFLAGS@
 LFLAGS = @LFLAGS@
 
 LIBS =
- 
+
 # If you are cross-compiling, you must use this:
 #OBJDIR = .
 # otherwise, you can save a little bit of disk space with this:
@@ -116,7 +116,7 @@ OBJDIR = ../src
 # LEX      = flex
 LEX      = @LEX@
 YACC     = @YACC@
- 
+
 # these are the suffixes of the output files from YACC/LEX. Under MS-DOS
 # and similar systems, they may differ
 YTABC = .tab.c
@@ -358,7 +358,7 @@ tiletxt.o: $(srcdir)/../win/share/tilemap.c $(HACK_H)
 tilelist.o: $(srcdir)/../win/share/tilemap.c $(HACK_H)
 	$(CC) $(CFLAGS) -DTILETEXT -DTILELIST -o tilelist.o -c $(srcdir)/../win/share/tilemap.c
 tilelist: tilelist.o
-	$(CC) $(CFLAGS) $(LFLAGS) ../src/monst_util.o ../src/objects_util.o ../src/decl_util.o ../src/drawing_util.o tilelist.o -o tilelist
+	$(CC) $(LFLAGS) ../src/decl_util.o tilelist.o -o tilelist
 
 gifread.o: $(srcdir)/../win/share/gifread.c $(CONFIG_H) ../include/tile.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/share/gifread.c
