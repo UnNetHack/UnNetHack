@@ -63,16 +63,18 @@ jobs:
       run: |
           echo "sha_short=$(echo $GITHUB_SHA | cut -b 1-8)" >> $GITHUB_ENV
           echo "version=$(grep VERSION_STRING include/date.h | cut -f 2 -d \")" >> $GITHUB_ENV
+          echo "git_tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
     - name: Copy generated zip file
+      if: startsWith(github.ref, 'refs/tags/')
       run: |
-          cp /tmp/unnethack_win32/unnethack-win32-${{ env.version }}.zip unnethack-win32-${{ env.version }}-${{ env.sha_short }}.zip
+          cp /tmp/unnethack_win32/unnethack-win32-${{ env.version }}.zip unnethack-win32-${{ env.git_tag }}.zip
 
     - name: Pre-Release
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
         prerelease: true
-        files: unnethack-win32-${{ env.version }}-${{ env.sha_short }}.zip
+        files: unnethack-win32-${{ env.git_tag }}.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
