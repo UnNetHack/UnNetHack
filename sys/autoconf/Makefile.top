@@ -385,7 +385,7 @@ win32_release: $(GAME)
 	cp $(srcdir)/README $(DESTDIR)$(GAMEDIR)/README.txt
 	touch $(GAMEDIR)/News
 	cp $(srcdir)/dat/*.ttf $(DESTDIR)$(GAMEDIR)/
-	convert -verbose $(srcdir)/tilesets/unchozo32b.png $(DESTDIR)$(GAMEDIR)/unchozo32b.bmp
+	convert -verbose $(srcdir)/tilesets/unchozo32b.png BMP3:$(DESTDIR)$(GAMEDIR)/unchozo32b.bmp
 	vim -c "set fileformat=dos" -c w -c q $(DESTDIR)$(GAMEDIR)/News
 	vim -c "set fileformat=dos" -c w -c q $(DESTDIR)$(GAMEDIR)/defaults.nh
 	vim -c "set fileformat=dos" -c w -c q $(DESTDIR)$(GAMEDIR)/license
