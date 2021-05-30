@@ -731,7 +731,11 @@ void
 init_level_seeds()
 {
     int i;
-    set_random_state(level_info[0].seed);
+    if (is_game_pre_seeded) {
+        set_random_state(level_info[0].seed + sysopt.serverseed);
+    } else {
+        set_random_state(level_info[0].seed);
+    }
     for (i=1; i<MAXLINFO; i++) {
         level_info[i].seed = rn2(INT_MAX);
     }

@@ -10,6 +10,8 @@ struct sysopt {
     unsigned int livelog;  /* event types to livelog */
     int ll_conduct_turns;  /* do not livelog conducts before this turncount */
 #endif
+
+    int serverseed; /* added to a user-supplied seed for obfuscation */
 };
 
 extern struct sysopt sysopt;
