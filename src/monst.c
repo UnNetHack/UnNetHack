@@ -10,6 +10,8 @@
 #define WT_ELF     800
 #define WT_DRAGON 4500
 
+/* caveat: in other source files, C('X') is used to convert 'X' into '^X' but
+   here is it used to make color values be conditionally present or absent */
 #ifdef C
 #undef C
 #endif
@@ -3330,8 +3332,13 @@ struct permonst _mons2[] = {
         M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_STRONG|M2_COLLECT, M3_INFRAVISIBLE, HI_DOMESTIC),
 #endif
+    /* valk is lawful by default; player valk can be neutral, in which case
+       role_init() will change this monster and 'warrior' to be neutral too;
+       if a neutral valk leaves a bones file containing neutral warriors,
+       the latter will magically turn lawful if encountered by a lawful valk
+       or any non-valk (for bones on the dungeon side of the portal) */
     MON("valkyrie", S_HUMAN,
-        LVL(10, 12, 10, 1, -1), G_NOGEN,
+        LVL(10, 12, 10, 1, 1), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 8), ATTK(AT_WEAP, AD_PHYS, 1, 8),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, 0, MS_HUMANOID, MZ_HUMAN), MR_COLD, 0,
@@ -3487,6 +3494,8 @@ struct permonst _mons2[] = {
         M2_COLLECT|M2_MAGIC,
         M3_CLOSE|M3_INFRAVISIBLE, HI_DOMESTIC),
 #endif
+    /* for a valkyrie hero, Norn's alignment will be changed to match hero's
+       starting alignment */
     MON("Norn", S_HUMAN,
         LVL(20, 12, 0, 80, 0), (G_NOGEN|G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 8), ATTK(AT_WEAP, AD_PHYS, 1, 6),
@@ -3706,8 +3715,10 @@ struct permonst _mons2[] = {
         M2_NOPOLY|M2_ELF|M2_PEACEFUL|M2_COLLECT,
         M3_INFRAVISION|M3_INFRAVISIBLE, HI_DOMESTIC),
 #endif
+    /* attendants used to lawful but have been changed to netural because
+       grow_up() promotes them to healer and the latter is always neutral */
     MON("attendant", S_HUMAN,
-        LVL(5, 12, 10, 10, 3), G_NOGEN,
+        LVL(5, 12, 10, 10, 0), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, 0, MS_GUARDIAN, MZ_HUMAN), MR_POISON, 0,
@@ -3780,8 +3791,11 @@ struct permonst _mons2[] = {
         M2_NOPOLY|M2_HUMAN|M2_PEACEFUL | M2_STRONG|M2_COLLECT|M2_MAGIC,
         M3_INFRAVISIBLE, HI_DOMESTIC),
 #endif
+    /* warriors used to be chaotic but have been changed to lawful because
+       grow_up() promotes them to valkyrie; for a valkyrie hero, they might
+       be changed to neutral at game start; see the valkyrie comment above */
     MON("warrior", S_HUMAN,
-        LVL(5, 12, 10, 10, -1), G_NOGEN,
+        LVL(5, 12, 10, 10, 1), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 8), ATTK(AT_WEAP, AD_PHYS, 1, 8),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, 0, MS_GUARDIAN, MZ_HUMAN), 0, 0,
