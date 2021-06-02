@@ -745,7 +745,7 @@ struct obj *otmp UNUSED;
 #ifdef SIMPLE_MAIL
         /* public server hints */
         "If you need advice, #shout, somebody might mail you help.",
-        "Visit IRC channel #unnethack on freenode.",
+        "Visit IRC channel #unnethack on Libera.Chat.",
         "To opt out of these hints, put OPTIONS=nohint into your options.",
 #endif
     };
