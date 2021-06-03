@@ -5801,10 +5801,12 @@ maybe_finish_sokoban()
                the last Sokoban level. Lift all Sokoban restrictions. */
             if (Is_sokoend_level(&u.uz)) {
                 achieve.solved_sokoban = 1;
-                /* award the player for solving Sokoban the "proper" way */
-                change_luck(1);
-                /* give some feedback about solving the Sokoban puzzle */
-                msg_luck_change(1);
+                if (u.uconduct.sokoban == 0) {
+                    /* award the player for solving Sokoban the "proper" way */
+                    change_luck(1);
+                    /* give some feedback about solving the Sokoban puzzle */
+                    msg_luck_change(1);
+                }
             }
         }
     }
