@@ -108,6 +108,7 @@
 	  - Observing tamed dragon's breathing didn't identify the dragon (reported by Thidwick)
 	  - MONSTERCOLOR could be used to reveal identity of Riders (reported by Nicole Kleinhoff)
 	  - Don't reveal description of spellbook when writing it blind
+	  - Fix statuscolors crash due to incorrect color name parsing
 
 	* build fixes:
 	  - Fix compiling with -fno-common

@@ -1501,8 +1501,9 @@ char *start;
         text_color_option->text = (char *)alloc(length);
         memcpy((char *)text_color_option->text, start, length);
         text_color_option->color_option = parse_color_option(middle);
-        if (text_color_option->color_option.color >= 0
-            && text_color_option->color_option.attr_bits >= 0) {
+        if (text_color_option->color_option.color >= 0 &&
+             text_color_option->color_option.color < CLR_MAX &&
+             text_color_option->color_option.attr_bits >= 0) {
             text_color_option->next = text_colors;
             text_colors = text_color_option;
             return TRUE;
