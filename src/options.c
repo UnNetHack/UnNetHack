@@ -3561,9 +3561,11 @@ goodfruit:
 
     fullname = "seed";
     if (match_optname(opts, fullname, sizeof("seed")-1, TRUE)) {
+#ifdef SYSCF
         if (sysopt.disable_user_seed) {
             return TRUE;
         }
+#endif
 
         if (negated) {
             bad_negation(fullname, FALSE);
