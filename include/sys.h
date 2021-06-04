@@ -12,6 +12,7 @@ struct sysopt {
 #endif
 
     int serverseed; /* added to a user-supplied seed for obfuscation */
+    int disable_user_seed; /* ignore user supplied random seed */
 };
 
 extern struct sysopt sysopt;

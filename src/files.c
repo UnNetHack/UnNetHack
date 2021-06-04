@@ -2230,9 +2230,12 @@ parse_config_line(FILE *fp,
             (void) fclose(include_fp);
         }
 #ifdef SYSCF
-    } else if (match_varname(buf, "SERVERSEED", 10)) {
+    } else if (in_sysconf && match_varname(buf, "SERVERSEED", 10)) {
         int n = atoi(bufp);
         sysopt.serverseed = n;
+    } else if (in_sysconf && match_varname(buf, "DISABLE_USER_SEED", 17)) {
+        int n = atoi(bufp);
+        sysopt.disable_user_seed = n;
     } else if (in_sysconf && match_varname(buf, "SUPPORT", 7)) {
         if (sysopt.support) {
             free(sysopt.support);
