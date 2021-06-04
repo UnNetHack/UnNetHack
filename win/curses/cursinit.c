@@ -422,7 +422,10 @@ curses_init_nhcolors()
 
 
         if (COLORS >= 16) {
-            init_pair( 9, TERMINAL_COLOR_GRAY, -1);
+# ifdef USE_DARKGRAY
+            //init_pair(1, COLOR_BLACK + 8, -1);
+# endif
+            init_pair(9, COLOR_BLACK + 8, -1);
             init_pair(10, COLOR_RED + 8, -1);
             init_pair(11, COLOR_GREEN + 8, -1);
             init_pair(12, COLOR_YELLOW + 8, -1);
@@ -430,18 +433,6 @@ curses_init_nhcolors()
             init_pair(14, COLOR_MAGENTA + 8, -1);
             init_pair(15, COLOR_CYAN + 8, -1);
             init_pair(16, COLOR_WHITE + 8, -1);
-        }
-
-        if (can_change_color()) {
-# ifdef USE_DARKGRAY
-                if (COLORS > 16) {
-                    color_content(CURSES_DARK_GRAY, &orig_darkgray.r,
-                                  &orig_darkgray.g, &orig_darkgray.b);
-                    init_color(CURSES_DARK_GRAY, 300, 300, 300);
-                    /* just override black colorpair entry here */
-                    init_pair(1, CURSES_DARK_GRAY, -1);
-                }
-# endif
         }
     }
 #endif
@@ -1080,16 +1071,6 @@ curses_display_splash_window()
 void
 curses_cleanup()
 {
-#ifdef TEXTCOLOR
-    if (has_colors() && can_change_color()) {
-# ifdef USE_DARKGRAY
-            if (COLORS > 16) {
-                init_color(CURSES_DARK_GRAY, orig_darkgray.r,
-                           orig_darkgray.g, orig_darkgray.b);
-            }
-# endif
-        }
-#endif
 }
 
 

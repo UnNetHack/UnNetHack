@@ -217,12 +217,13 @@ curses_color_attr(int nh_color, int bg_color)
     attr_t cattr = A_NORMAL;
 
     if (!nh_color) {
-#ifdef USE_DARKGRAY
-        if (!can_change_color() || COLORS <= 16)
-            cattr |= A_BOLD;
-#else
-        color = COLOR_BLUE;
-#endif
+        if (iflags.wc2_newcolors) {
+            if (COLORS <= 16) {
+                cattr |= A_BOLD;
+            }
+        } else {
+            color = COLOR_BLUE;
+        }
     }
 
     if (COLORS < 16 && color > 8) {
