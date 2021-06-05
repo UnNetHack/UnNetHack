@@ -23,25 +23,6 @@ static void set_window_position(int *, int *, int *, int *, int,
                                 int *, int *, int *, int *, int,
                                 int, int);
 
-/* array to save initial terminal colors for later restoration */
-
-typedef struct nhrgb_type {
-    short r;
-    short g;
-    short b;
-} nhrgb;
-
-nhrgb orig_yellow;
-nhrgb orig_white;
-nhrgb orig_darkgray;
-nhrgb orig_hired;
-nhrgb orig_higreen;
-nhrgb orig_hiyellow;
-nhrgb orig_hiblue;
-nhrgb orig_himagenta;
-nhrgb orig_hicyan;
-nhrgb orig_hiwhite;
-
 /* Banners used for an optional ASCII splash screen */
 
 #define NETHACK_SPLASH_A \
