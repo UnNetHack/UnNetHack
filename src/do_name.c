@@ -1335,7 +1335,7 @@ register struct obj *obj;
     }
     ++via_naming; /* This ought to be an argument rather than a static... */
     obj = oname(obj, buf);
-    ++via_naming; /* This ought to be an argument rather than a static... */
+    --via_naming; /* ...but oname() is used in a lot of places, so defer. */
 }
 
 struct obj *
