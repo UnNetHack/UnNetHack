@@ -35,3 +35,42 @@ LIVELOG=0x0FFF
 # Do not livelog breaking of conducts before this turncount
 # Cuts down on spam
 LLC_TURNS=3000
+
+# Sensible settings
+OPTIONS=boulder:0
+
+# Minimal menucolors
+MENUCOLOR=" blessed "=green
+MENUCOLOR=" holy "=green
+MENUCOLOR=" cursed "=red
+MENUCOLOR=" unholy "=red
+MENUCOLOR=" uncursed "=cyan
+MENUCOLOR=" cursed * (being worn)"=orange&underline
+
+# Default statuscolors settings
+#
+## HP
+STATUSCOLOR=hp%100=green,hp%66=yellow,hp%50=orange
+STATUSCOLOR=hp%33=red&bold,hp%15:red&inverse,hp%0:red&inverse&blink
+## Power
+STATUSCOLOR=pw%100=green,pw%66=yellow,pw%50:orange,pw%33=red&bold
+## Strength
+STATUSCOLOR=st%100=green,st%66=yellow,st%50:orange,st%33=red&bold
+## Carry
+STATUSCOLOR=burdened:yellow,stressed:orange,strained:red&bold
+STATUSCOLOR=overtaxed:red&inverse,overloaded:red&inverse&blink
+## Hunger
+STATUSCOLOR=satiated:yellow,hungry:orange,weak:red&bold
+STATUSCOLOR=fainting:red&inverse,fainted:red&inverse&blink
+## Mental
+STATUSCOLOR=hallu:yellow,conf:orange,stun:red&bold
+## Health
+STATUSCOLOR=foodpois:red&inverse,slime:red&inverse
+STATUSCOLOR=stone:red&inverse,strngl:red&inverse
+STATUSCOLOR=ill:red&inverse,termill:red&inverse
+## Other
+STATUSCOLOR=held:red&inverse,blind:red&inverse
+STATUSCOLOR=deaf:yellow,lev:yellow,fly:yellow
+STATUSCOLOR=ride:brown
+STATUSCOLOR=frozen:lightblue&inverse
+STATUSCOLOR=elbereth:green&inverse

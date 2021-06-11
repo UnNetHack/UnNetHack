@@ -1880,6 +1880,10 @@ E void NDECL(free_menu_coloring);
 E const char * FDECL(clr2colorname, (int));
 E int FDECL(query_color, (const char *));
 E int FDECL(query_attr, (const char *));
+#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
+extern boolean parse_status_color_options(char *);
+extern void free_status_colors();
+#endif
 
 /* ### pager.c ### */
 

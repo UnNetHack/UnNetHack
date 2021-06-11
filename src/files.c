@@ -2263,6 +2263,19 @@ parse_config_line(FILE *fp,
 
 #ifdef MENU_COLOR
     } else if (match_varname(buf, "MENUCOLOR", 9)) {
+        /* default menucolors in sysconf */
+        static boolean sysconf_menucolors = FALSE;
+        if (src == set_in_sysconf) {
+            sysconf_menucolors = TRUE;
+        } else {
+            /* parsing menucolors configured by user */
+            if (sysconf_menucolors) {
+                sysconf_menucolors = FALSE;
+                /* delete menucolors set in sysconf */
+                free_menu_coloring();
+            }
+        }
+
         /* automatically activate menucolors if configured rules exist */
         iflags.use_menu_color = TRUE;
         (void) add_menu_coloring(bufp);
@@ -2286,6 +2299,19 @@ parse_config_line(FILE *fp,
     } else if (match_varname(buf, "STATUSCOLOR", 11)) {
         /* ignore statuscolor entries if not compiled in */
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
+        /* default statuscolors in sysconf */
+        static boolean sysconf_statuscolors = FALSE;
+        if (src == set_in_sysconf) {
+            sysconf_statuscolors = TRUE;
+        } else {
+            /* parsing statuscolors configured by user */
+            if (sysconf_statuscolors) {
+                sysconf_statuscolors = FALSE;
+                /* delete statuscolors set in sysconf */
+                free_status_colors();
+            }
+        }
+
         (void) parse_status_color_options(bufp);
 #endif
     } else if (match_varname(buf, "DUNGEON", 4)) {
