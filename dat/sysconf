@@ -45,7 +45,7 @@ MENUCOLOR=" holy "=green
 MENUCOLOR=" cursed "=red
 MENUCOLOR=" unholy "=red
 MENUCOLOR=" uncursed "=cyan
-MENUCOLOR=" cursed * (being worn)"=orange&underline
+MENUCOLOR=" cursed .* \(being worn\)"=red&bold
 
 # Default statuscolors settings
 #
