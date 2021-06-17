@@ -549,8 +549,8 @@ flip_encoded_direction_bits(int flp, int val)
     return val;
 }
 
-#define FlipX(val) ((maxx - (val)) + minx)
-#define FlipY(val) ((maxy - (val)) + miny)
+#define FlipX(val) (inFlipArea(val, miny) ? ((maxx - (val)) + minx) : val)
+#define FlipY(val) (inFlipArea(minx, val) ? ((maxy - (val)) + miny) : val)
 #define inFlipArea(x,y) \
     ((x) >= minx && (x) <= maxx && (y) >= miny && (y) <= maxy)
 #define Flip_coord(cc) \
