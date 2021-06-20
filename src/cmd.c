@@ -1571,6 +1571,10 @@ boolean want_disp;
 
         enl_msg("Monster generation rate ", "is ", "was ", buf);
     }
+    if (wizard) {
+        Snprintf(buf, sizeof(buf), "Current process id is %d", getpid());
+        enl_msg("","","",buf);
+    }
 #endif
 
     /*** Resistances to troubles ***/
