@@ -356,7 +356,7 @@ curses_count_window(const char *count_text)
     wrefresh(countwin);
 }
 
-	/* Gets a "line" (buffer) of input. */
+/* Gets a "line" (buffer) of input. */
 void
 curses_message_win_getline(const char *prompt, char *answer, int buffer)
 {
@@ -468,21 +468,29 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
             break;
         case ERR: /* should not happen */
             *answer = '\0';
-            free(tmpbuf);
-            free(linestarts);
-            curs_set(orig_cursor);
-            curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
-            return;
+            goto alldone;
+
         case '\r':
         case '\n':
-            free(linestarts);
-            strncpy(answer, p_answer, buffer);
-            strcpy(toplines, tmpbuf);
-            mesg_add_line((char *) tmpbuf);
-            free(tmpbuf);
-            curs_set(orig_cursor);
-            curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
-            return;
+            (void) strncpy(answer, p_answer, buffer);
+            answer[buffer - 1] = '\0';
+            Strcpy(toplines, tmpbuf);
+            mesg_add_line(tmpbuf);
+#if 1
+            /* position at end of current line so next message will be
+               written on next line regardless of whether it could fit here */
+            mx = border_space ? (width + 1) : (width - 1);
+            wmove(win, my, mx);
+#else       /* after various other changes, this resulted in getline()
+             * prompt+answer being following by a blank message line */
+            if (++my > maxy) {
+                scroll_window(MESSAGE_WIN);
+                my--;
+            }
+            mx = border_space;
+#endif /*0*/
+            goto alldone;
+
         case '\b':
         case KEY_BACKSPACE:
             if (len < 1) {
@@ -512,6 +520,13 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
             p_answer[len] = '\0';
         }
     }
+
+ alldone:
+    free(linestarts);
+    free(tmpbuf);
+    curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
+    curs_set(orig_cursor);
+    return;
 }
 
 /* Scroll lines upward in given window, or clear window if only one line. */
