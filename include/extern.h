@@ -1635,6 +1635,7 @@ E struct monst *FDECL(mk_mplayer, (struct permonst *, XCHAR_P,
                                    XCHAR_P, BOOLEAN_P));
 E void FDECL(create_mplayers, (int, BOOLEAN_P));
 E void FDECL(mplayer_talk, (struct monst *));
+extern const char* dev_name();
 
 #if defined(MICRO) || defined(WIN32)
 

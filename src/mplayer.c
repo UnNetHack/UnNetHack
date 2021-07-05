@@ -3,7 +3,6 @@
 
 #include "hack.h"
 
-STATIC_DCL const char *NDECL(dev_name);
 STATIC_DCL void FDECL(get_mplname, (struct monst *, char *));
 STATIC_DCL void FDECL(mk_mplayer_armor, (struct monst *, SHORT_P));
 
@@ -38,7 +37,7 @@ static const char *developers[] = {
 };
 
 /* return a randomly chosen developer name */
-STATIC_OVL const char *
+const char *
 dev_name()
 {
     register int i, m = 0, n = SIZE(developers);

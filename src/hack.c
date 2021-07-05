@@ -3283,7 +3283,7 @@ register boolean newlev;
          * but everything else gives a message only the first time */
         switch (rt) {
         case ZOO:
-            pline("Welcome to David's treasure zoo!");
+            pline("Welcome to %s treasure zoo!", s_suffix(dev_name()));
             break;
         case GARDEN:
             if (Blind) pline_The("air here smells nice and fresh!");
