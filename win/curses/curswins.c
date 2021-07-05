@@ -463,7 +463,7 @@ and text attributes */
 void
 curses_puts(winid wid, int attr, const char *text)
 {
-    anything *identifier;
+    anything identifier;
     WINDOW *win = NULL;
 
     if (is_main_window(wid)) {
@@ -488,10 +488,8 @@ curses_puts(winid wid, int attr, const char *text)
             impossible("curses_puts: Attempted write to nonexistant window %d!", wid);
             return;
         }
-        identifier = malloc(sizeof (anything));
-        identifier->a_void = NULL;
-        curses_add_nhmenu_item(wid, NO_GLYPH, identifier, 0, 0, attr, text,
-                               FALSE);
+        identifier = zeroany;
+        curses_add_nhmenu_item(wid, NO_GLYPH, &identifier, 0, 0, attr, text, FALSE);
     } else {
         waddstr(win, text);
         wnoutrefresh(win);

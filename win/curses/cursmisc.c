@@ -232,7 +232,7 @@ curses_copy_of(const char *s)
 {
     if (!s)
         s = "";
-    return strcpy((char *) alloc((unsigned) (strlen(s) + 1)), s);
+    return dupstr(s);
 }
 
 
@@ -555,7 +555,7 @@ curses_view_file(const char *filename, boolean must_exist)
 #endif
 {
     winid wid;
-    anything *identifier;
+    anything identifier;
     char buf[BUFSZ];
     menu_item *selected = NULL;
 #ifdef FILE_AREAS
@@ -574,11 +574,10 @@ curses_view_file(const char *filename, boolean must_exist)
 
     wid = curses_get_wid(NHW_MENU);
     curses_create_nhmenu(wid);
-    identifier = malloc(sizeof (anything));
-    identifier->a_void = NULL;
+    identifier = zeroany;
 
     while (dlb_fgets(buf, BUFSZ, fp) != NULL) {
-        curses_add_menu(wid, NO_GLYPH, MENU_DEFCNT, identifier, 0, 0, A_NORMAL, buf, FALSE);
+        curses_add_menu(wid, NO_GLYPH, MENU_DEFCNT, &identifier, 0, 0, A_NORMAL, buf, FALSE);
     }
 
     dlb_fclose(fp);

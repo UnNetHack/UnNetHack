@@ -105,6 +105,7 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
                 height++;
             }
         }
+        free(tmpstr);
     }
 
     if (iflags.window_inited) {
@@ -455,15 +456,22 @@ curses_create_nhmenu(winid wid)
         if (menu_item_ptr != NULL) {
             while (menu_item_ptr->next_item != NULL) {
                 tmp_menu_item = menu_item_ptr->next_item;
+                free((char *) menu_item_ptr->str);
                 free(menu_item_ptr);
                 menu_item_ptr = tmp_menu_item;
             }
-            free(menu_item_ptr);        /* Last entry */
+            free((char *) menu_item_ptr->str);
+            free(menu_item_ptr); /* Last entry */
             new_menu->entries = NULL;
         }
         if (new_menu->prompt != NULL) { /* Reusing existing menu */
             free((char *) new_menu->prompt);
+            new_menu->prompt = NULL;
         }
+        new_menu->num_pages = 0;
+        new_menu->height = 0;
+        new_menu->width = 0;
+        new_menu->reuse_accels = FALSE;
         return;
     }
 
@@ -566,7 +574,6 @@ curses_finalize_nhmenu(winid wid, const char *prompt)
     }
 
     current_menu->num_entries = count;
-
     current_menu->prompt = curses_copy_of(prompt);
 }
 
@@ -679,9 +686,11 @@ curses_del_menu(winid wid)
     if (menu_item_ptr != NULL) {
         while (menu_item_ptr->next_item != NULL) {
             tmp_menu_item = menu_item_ptr->next_item;
+            free((void *)menu_item_ptr->str);
             free(menu_item_ptr);
             menu_item_ptr = tmp_menu_item;
         }
+        free((void *)menu_item_ptr->str);
         free(menu_item_ptr);    /* Last entry */
         current_menu->entries = NULL;
     }
@@ -698,6 +707,9 @@ curses_del_menu(winid wid)
         tmpmenu->prev_menu = current_menu->prev_menu;
     }
 
+    if (current_menu->prompt) {
+        free((char *) current_menu->prompt);
+    }
     free(current_menu);
 
     curses_del_wid(wid);
