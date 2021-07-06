@@ -327,7 +327,7 @@ register struct obj *obj;
     if (Has_contents(obj) && !obj->olocked) {
         int blessed = 0;
         int cursed = 0;
-        struct obj * otmp;
+        struct obj * otmp, *cobj;
 
         obj->cknown = 1;
 
@@ -338,8 +338,13 @@ register struct obj *obj;
             if (otmp->cursed) {
                 cursed++;
             }
-            if (!Hallucination) {
+            if (!Hallucination && !otmp->bknown) {
                 otmp->bknown = 1;
+                for (cobj = obj->cobj; cobj; cobj = cobj->nobj) {
+                    if (merged(&cobj, &otmp)) {
+                        break;
+                    }
+                }
             }
         }
         /* even when hallucinating, if you get no flashes at all, you know
@@ -347,7 +352,14 @@ register struct obj *obj;
          * naming them all */
         if (Hallucination && blessed + cursed == 0) {
             for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
-                otmp->bknown = 1;
+                if (!otmp->bknown) {
+                    otmp->bknown = 1;
+                    for (cobj = obj->cobj; cobj; cobj = cobj->nobj) {
+                        if (merged(&cobj, &otmp)) {
+                            break;
+                        }
+                    }
+                }
             }
         }
 
