@@ -6141,6 +6141,7 @@ sp_lev *lvl;
             struct opvar *a;
             if (!OV_pop_i(a)) break;
             spo_corefunc(coder, OV_i(a));
+            opvar_free(a);
         }
         break;
         case SPO_DICE:
