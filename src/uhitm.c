@@ -2723,17 +2723,18 @@ use_weapon:
             dieroll = rnd(20);
             dhit = (tmp > dieroll || u.uswallow);
             /* caller must set bhitpos */
-            if (!known_hitum(mon, weapon, &dhit, tmp, armorpenalty, mattk, dieroll)) {
+            boolean monster_survived = known_hitum(mon, weapon, &dhit, tmp, armorpenalty, mattk, dieroll);
+            /* originalweapon points to an equipment slot which might
+               now be empty if the weapon was destroyed during the hit;
+               passive(,weapon,...) won't call passive_obj() in that case */
+            weapon = *originalweapon; /* might receive passive erosion */
+            if (!monster_survived) {
                 /* enemy dead, before any special abilities used */
                 sum[i] = 2;
                 break;
             } else {
                 sum[i] = dhit;
             }
-            /* originalweapon points to an equipment slot which might
-               now be empty if the weapon was destroyed during the hit;
-               passive(,weapon,...) won't call passive_obj() in that case */
-            weapon = *originalweapon; /* might receive passive erosion */
             /* might be a worm that gets cut in half; if so, early return */
             if (m_at(u.ux + u.dx, u.uy + u.dy) != mon) {
                 i = NATTK; /* skip additional attacks */
