@@ -1947,8 +1947,8 @@ just_an(char *outbuf, const char *str)
 
     *outbuf = '\0';
     c0 = lowc(*str);
-    if (!str[1]) {
-        /* single letter; might be used for named fruit */
+    if (!str[1] || str[1] == ' ') {
+        /* single letter; might be used for named fruit or a musical note */
         Strcpy(outbuf, index("aefhilmnosx", c0) ? "an " : "a ");
     } else if (!strncmpi(str, "the ", 4) ||
                !strcmpi(str, "molten lava") ||
@@ -1956,14 +1956,17 @@ just_an(char *outbuf, const char *str)
                !strcmpi(str, "ice")) {
         ; /* no article */
     } else {
-        if ((index(vowels, c0) &&
-             strncmpi(str, "one-", 4) &&
-             strncmpi(str, "eucalyptus", 10) &&
+        /* normal case is "an <vowel>" or "a <consonant>" */
+        if ((index(vowels, c0) /* some exceptions warranting "a <vowel>" */ &&
+             /* 'wun' initial sound */
+             (strncmpi(str, "one", 3) || (str[3] && !index("-_ ", str[3]))) &&
+             /* long 'u' initial sound */
+             strncmpi(str, "eu", 2) /* "eucalyptus leaf" */ &&
+             strncmpi(str, "uke", 3) && strncmpi(str, "ukulele", 7) &&
              strncmpi(str, "unicorn", 7) &&
              strncmpi(str, "uranium", 7) &&
-             strncmpi(str, "useful", 6)) ||
-            (index("x", c0) &&
-             !index(vowels, lowc(str[1])))) {
+             strncmpi(str, "useful", 6)) /* "useful tool" */ ||
+                (c0 == 'x' && !index(vowels, lowc(str[1])))) {
             Strcpy(outbuf, "an ");
         } else {
             Strcpy(outbuf, "a ");
