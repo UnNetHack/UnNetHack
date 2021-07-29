@@ -32,8 +32,7 @@ static const char *developers[] = {
     /* OS/2 team */
     "Helge", "Ron", "Timo",
     /* VMS team */
-    "Joshua", "Pat",
-    ""
+    "Joshua", "Pat"
 };
 
 /* return a randomly chosen developer name */
