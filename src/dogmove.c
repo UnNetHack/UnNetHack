@@ -26,7 +26,8 @@ struct obj *
 droppables(mon)
 struct monst *mon;
 {
-    struct obj *obj, *wep, dummy, *pickaxe, *unihorn, *key;
+    struct obj *obj, *wep, *pickaxe, *unihorn, *key;
+    static struct obj dummy;
 
     dummy = zeroobj;
     dummy.otyp = GOLD_PIECE; /* not STRANGE_OBJECT or tools of interest */
