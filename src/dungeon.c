@@ -2425,18 +2425,15 @@ boolean final; /**< if game is finished */
     if (In_sokoban(&mptr->lev) && (In_sokoban(&u.uz) || !mptr->feat.sokosolved)) {
         return TRUE;
     }
+
     /* when in the endgame, list all endgame levels visited, whether they
-       have annotations or not, so that #overview doesn't become extremely
-       sparse once the rest of the dungeon has been flagged as unreachable */
+       have annotations or not */
     if (In_endgame(&u.uz)) {
-        return In_endgame(&mptr->lev);
+        if (In_endgame(&mptr->lev)) {
+            return TRUE;
+        }
     }
-    return (on_level(&u.uz, &mptr->lev) ||
-            ((!mptr->feat.forgot) &&
-             (INTEREST(mptr->feat) ||
-              (mptr->custom) ||
-              (mptr->br)))
-            );
+
     /* level is of interest if it has non-zero feature count or known bones
        or user annotation or known connection to another dungeon branch
        or is the furthest level reached in its branch */
