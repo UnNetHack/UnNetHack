@@ -1615,6 +1615,40 @@ boolean maybe_wakeup;
     return;
 }
 
+static boolean
+befriend_with_obj(struct permonst *data, struct obj *obj)
+{
+    if (obj->oclass != FOOD_CLASS) {
+        return FALSE;
+    }
+
+#ifdef CONVICT
+    if (Role_if(PM_CONVICT) && is_rat(data)) {
+        return TRUE;
+    }
+#endif
+
+#ifdef EXOTIC_PETS
+    if (Role_if(PM_ROGUE) &&
+         (data == &mons[PM_MONKEY]) &&
+         (obj->otyp == BANANA || !rn2(2))) {
+        return TRUE;
+    }
+# ifdef TOURIST
+    if (Role_if(PM_TOURIST) &&
+         (data == &mons[PM_CROCODILE] || data == &mons[PM_BABY_CROCODILE])) {
+        return TRUE;
+    }
+# endif
+    if ((Role_if(PM_RANGER) || Role_if(PM_CAVEMAN)) &&
+         (data == &mons[PM_WINTER_WOLF_CUB])) {
+        return TRUE;
+    }
+#endif
+
+  return is_domestic(data);
+}
+
 #define quest_arti_hits_leader(obj, mon)      \
     (obj->oartifact && is_quest_artifact(obj) \
      && mon->m_id == quest_status.leader_m_id)
@@ -1903,24 +1937,8 @@ struct obj   *obj; /* thrownobj or kickedobj or uwep */
         potionhit(mon, obj, POTHIT_HERO_THROW);
         return 1;
 
-#ifdef EXOTIC_PETS
-    } else if ((befriend_with_obj(mon->data, obj)) ||
-               (mon->mtame && dogfood(mon, obj) <= ACCFOOD) ||
-               (obj->oclass == FOOD_CLASS &&
-                ((Role_if(PM_ROGUE) &&
-                  mon->data == &mons[PM_MONKEY] &&
-                  (obj->otyp == BANANA || !rn2(2))) ||
-# ifdef TOURIST
-                 (Role_if(PM_TOURIST) &&
-                  (mon->data == &mons[PM_CROCODILE] ||
-                   mon->data == &mons[PM_BABY_CROCODILE])) ||
-# endif
-                 ((Role_if(PM_RANGER) || Role_if(PM_CAVEMAN)) &&
-                  mon->data == &mons[PM_WINTER_WOLF_CUB])))) {
-#else
     } else if (befriend_with_obj(mon->data, obj) ||
                (mon->mtame && dogfood(mon, obj) <= ACCFOOD)) {
-#endif
         if (tamedog(mon, obj))
             return 1;           /* obj is gone */
         else {

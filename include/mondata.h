@@ -304,14 +304,6 @@
                              ((ptr)->mlet != S_GOLEM || (ptr) == &mons[PM_FLESH_GOLEM]) && \
                              (!is_undead(ptr) || is_vampire(ptr)))
 
-#ifdef CONVICT
-#define befriend_with_obj(ptr, obj) ((obj)->oclass == FOOD_CLASS && \
-                                     (is_domestic(ptr) || (is_rat(ptr) && Role_if(PM_CONVICT))))
-#else
-#define befriend_with_obj(ptr, obj) ((obj)->oclass == FOOD_CLASS && \
-                                     is_domestic(ptr))
-#endif
-
 #define is_rockbreaker(ptr) (((ptr)->msound == MS_LEADER || \
                               is_blkmktstaff((ptr)) || \
                               is_rider((ptr))) && \
