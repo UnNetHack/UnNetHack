@@ -326,12 +326,15 @@ boolean
 find_defensive(mtmp)
 struct monst *mtmp;
 {
-    register struct obj *obj = 0;
+    struct obj *obj;
     struct trap *t;
     int x=mtmp->mx, y=mtmp->my;
     boolean stuck = (mtmp == u.ustuck);
     boolean immobile = (mtmp->data->mmove == 0);
     int fraction;
+
+    m.defensive = (struct obj *) 0;
+    m.has_defense = 0;
 
     if (is_animal(mtmp->data) || mindless(mtmp->data))
         return FALSE;
@@ -339,19 +342,25 @@ struct monst *mtmp;
         return FALSE;
     if (u.uswallow && stuck) return FALSE;
 
-    m.defensive = (struct obj *)0;
-    m.has_defense = 0;
-
-    /* since unicorn horns don't get used up, the monster would look
-     * silly trying to use the same cursed horn round after round
+    /*
+     * Since unicorn horns don't get used up, the monster would look
+     * silly trying to use the same cursed horn round after round,
+     * so skip cursed unicorn horns.
+     *
+     * Unicorns use their own horns; they're excluded from inventory
+     * scanning by nohands().  Ki-rin is depicted in the AD&D Monster
+     * Manual with same horn as a unicorn, so let it use its horn too.
+     * is_unicorn() doesn't include it; the class differs and it has
+     * no interest in gems.
      */
     if (mtmp->mconf || mtmp->mstun || !mtmp->mcansee) {
-        if (!is_unicorn(mtmp->data) && !nohands(mtmp->data)) {
+        obj = 0;
+        if (!nohands(mtmp->data)) {
             for(obj = mtmp->minvent; obj; obj = obj->nobj)
                 if (obj->otyp == UNICORN_HORN && !obj->cursed)
                     break;
         }
-        if (obj || is_unicorn(mtmp->data)) {
+        if (obj || is_unicorn(mtmp->data) || mtmp->data == &mons[PM_KI_RIN]) {
             m.defensive = obj;
             m.has_defense = MUSE_UNICORN_HORN;
             return TRUE;
@@ -2125,7 +2134,7 @@ struct obj *obj;
         if (typ == PICK_AXE)
             return (boolean)needspick(mon->data);
         if (typ == UNICORN_HORN)
-            return (boolean)(!obj->cursed && !is_unicorn(mon->data));
+            return (boolean) (!obj->cursed && !is_unicorn(mon->data) && mon->data != &mons[PM_KI_RIN]);
         if (typ == FROST_HORN || typ == FIRE_HORN)
             return (obj->spe > 0 && can_blow(mon));
         if ((typ == SKELETON_KEY) || (typ == CREDIT_CARD) || (typ == LOCK_PICK)) {

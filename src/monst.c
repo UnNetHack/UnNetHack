@@ -10,6 +10,8 @@
 #define WT_ELF     800
 #define WT_DRAGON 4500
 
+/* caveat: in other source files, C('X') is used to convert 'X' into '^X' but
+   here is it used to make color values be conditionally present or absent */
 #ifdef C
 #undef C
 #endif
@@ -36,6 +38,9 @@ void NDECL(monst_init);
  *  resistances, resistances conferred (both MR_* defines),
  *  3 * flag bitmaps (M1_*, M2_*, and M3_* defines respectively)
  *  symbol color (C(x) macro)
+ *
+ *  For AT_BREA attacks, '# sides' is ignored; 6 is used for most
+ *  damage types, 25 for sleep, not applicable for death or poison.
  */
 #define MON(nam, sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, col) \
     {nam, sym, 0, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, C(col)}
@@ -129,7 +134,7 @@ NEARDATA struct permonst mons[] = {
         LVL(5, 6, 4, 0, 0), (G_NOSHEOL|G_GENO|3),
         A(ATTK(AT_BITE, AD_PHYS, 3, 6),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(10, 10, 0, MS_SILENT, MZ_LARGE), MR_POISON, MR_POISON,
+        SIZ(200, 50, 0, MS_SILENT, MZ_LARGE), MR_POISON, MR_POISON,
         M1_ANIMAL|M1_NOHANDS|M1_POIS|M1_CARNIVORE,
         M2_HOSTILE, 0, CLR_BLACK),
     MON("queen bee", S_ANT,
@@ -284,7 +289,7 @@ NEARDATA struct permonst mons[] = {
         CLR_BROWN),
     MON("winter wolf cub", S_DOG,
         LVL(5, 12, 4, 0, -5), (G_NOHELL|G_GENO|G_SGROUP|2),
-        A(ATTK(AT_BITE, AD_PHYS, 1, 8), ATTK(AT_BREA, AD_COLD, 1, 8),
+        A(ATTK(AT_BITE, AD_PHYS, 1, 8), ATTK(AT_BREA, AD_COLD, 1, 6),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(250, 200, 0, MS_BARK, MZ_SMALL), MR_COLD, MR_COLD,
         M1_ANIMAL|M1_NOHANDS|M1_CARNIVORE, M2_HOSTILE, 0, CLR_CYAN),
@@ -908,7 +913,7 @@ NEARDATA struct permonst mons[] = {
         LVL(5, 15, 4, 0, 0), (G_GENO|1),
         A(ATTK(AT_BITE, AD_DRST, 2, 4),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(100, 100, 0, MS_SILENT, MZ_LARGE), MR_POISON, MR_POISON,
+        SIZ(200, 100, 0, MS_SILENT, MZ_LARGE), MR_POISON, MR_POISON,
         M1_ANIMAL|M1_NOHANDS|M1_OVIPAROUS|M1_POIS|M1_CARNIVORE,
         M2_HOSTILE|M2_STRONG, 0, CLR_MAGENTA),
     MON("scorpion", S_SPIDER,
@@ -1008,7 +1013,7 @@ NEARDATA struct permonst mons[] = {
         M2_HOSTILE|M2_NEUTER, M3_INFRAVISIBLE, CLR_CYAN),
     MON("energy vortex", S_VORTEX,
         LVL(6, 20, 2, 30, 0), (G_GENO|G_NOCORPSE|1),
-        A(ATTK(AT_ENGL, AD_ELEC, 1, 6), ATTK(AT_ENGL, AD_DREN, 0, 0),
+        A(ATTK(AT_ENGL, AD_ELEC, 1, 6), ATTK(AT_ENGL, AD_DREN, 2, 6),
           ATTK(AT_NONE, AD_ELEC, 0, 4), NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(0, 0, 0, MS_SILENT, MZ_HUGE),
         MR_ELEC|MR_SLEEP|MR_DISINT|MR_POISON|MR_STONE, 0,
@@ -1162,13 +1167,15 @@ NEARDATA struct permonst mons[] = {
         M1_FLY|M1_HUMANOID|M1_SEE_INVIS,
         M2_HOSTILE|M2_NOPOLY|M2_MINION|M2_STALK|M2_STRONG|M2_NASTY|M2_COLLECT,
         M3_INFRAVISION, CLR_BLACK),
+    /* the AD&D Monster Manual depicts ki-rin as very similar to unicorns
+       except that they fly (without wings) and can cast spells */
     MON("ki-rin", S_ANGEL,
         LVL(16, 18, -5, 90, 15), (G_NOSHEOL|G_NOHELL|G_NOCORPSE|1),
         A(ATTK(AT_KICK, AD_PHYS, 2, 4), ATTK(AT_KICK, AD_PHYS, 2, 4),
           ATTK(AT_BUTT, AD_PHYS, 3, 6), ATTK(AT_MAGC, AD_SPEL, 2, 6),
           NO_ATTK, NO_ATTK),
-        SIZ(WT_HUMAN, 400, 0, MS_NEIGH, MZ_LARGE), 0, 0,
-        M1_FLY|M1_SEE_INVIS,
+        SIZ(WT_HUMAN, 400, 0, MS_SPELL, MZ_LARGE), MR_POISON, 0,
+        M1_FLY | M1_NOHANDS | M1_SEE_INVIS,
         M2_NOPOLY|M2_MINION|M2_STALK|M2_STRONG|M2_NASTY|M2_LORD,
         M3_INFRAVISIBLE|M3_INFRAVISION, HI_GOLD),
     MON("Archon", S_ANGEL,
@@ -1413,9 +1420,10 @@ NEARDATA struct permonst mons[] = {
         M1_CARNIVORE,
         M2_HOSTILE|M2_STRONG|M2_NASTY|M2_GREEDY|M2_JEWELS|M2_MAGIC,
         0, CLR_BROWN),
+    /* disintegration breath is actually all or nothing, not 1d255 */
     MON("sirrush", S_DRAGON,
         LVL(15, 9, -1, 20, -6), (G_GENO|1),
-        A(ATTK(AT_BREA, AD_DISN, 4, 10), ATTK(AT_BITE, AD_PHYS, 3, 8),
+        A(ATTK(AT_BREA, AD_DISN, 1, 255), ATTK(AT_BITE, AD_PHYS, 3, 8),
           ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4),
           NO_ATTK, NO_ATTK),
         SIZ(WT_DRAGON, 1500, 0, MS_ROAR, MZ_GIGANTIC), MR_DISINT, MR_DISINT,
@@ -1489,14 +1497,14 @@ NEARDATA struct permonst mons[] = {
         A(ATTK(AT_ENGL, AD_PHYS, 1, 10),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(0, 0, 0, MS_SILENT, MZ_HUGE), MR_POISON|MR_STONE, 0,
-        M1_NOEYES|M1_NOLIMBS|M1_NOHEAD|M1_MINDLESS|M1_UNSOLID|M1_FLY,
+        M1_NOEYES|M1_NOLIMBS|M1_NOHEAD|M1_MINDLESS|M1_BREATHLESS|M1_UNSOLID|M1_FLY,
         M2_STRONG|M2_NEUTER, 0, CLR_CYAN),
     MON("fire elemental", S_ELEMENTAL,
         LVL(8, 12, 2, 30, 0), (G_NOSHEOL|G_NOCORPSE|1),
         A(ATTK(AT_CLAW, AD_FIRE, 3, 6), ATTK(AT_NONE, AD_FIRE, 0, 4),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(0, 0, 0, MS_SILENT, MZ_HUGE), MR_FIRE|MR_POISON|MR_STONE, 0,
-        M1_NOEYES|M1_NOLIMBS|M1_NOHEAD|M1_MINDLESS|M1_UNSOLID|M1_FLY|M1_NOTAKE,
+        M1_NOEYES|M1_NOLIMBS|M1_NOHEAD|M1_MINDLESS|M1_BREATHLESS|M1_UNSOLID|M1_FLY|M1_NOTAKE,
         M2_STRONG|M2_NEUTER, M3_INFRAVISIBLE, CLR_YELLOW),
     MON("earth elemental", S_ELEMENTAL,
         LVL(8, 6, 2, 30, 0), (G_NOCORPSE|1),
@@ -1512,7 +1520,7 @@ NEARDATA struct permonst mons[] = {
         A(ATTK(AT_CLAW, AD_PHYS, 5, 6),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(2500, 0, 0, MS_SILENT, MZ_HUGE), MR_POISON|MR_STONE, 0,
-        M1_NOEYES|M1_NOLIMBS|M1_NOHEAD|M1_MINDLESS|M1_AMPHIBIOUS|M1_SWIM,
+        M1_NOEYES|M1_NOLIMBS|M1_NOHEAD|M1_MINDLESS|M1_BREATHLESS|M1_UNSOLID|M1_AMPHIBIOUS|M1_SWIM,
         M2_STRONG|M2_NEUTER, 0, CLR_BLUE),
 /*
  * Fungi
@@ -2193,7 +2201,7 @@ struct permonst _mons2[] = {
         M3_INFRAVISIBLE, HI_ZAP),
 #endif
     MON("Vlad the Impaler", S_VAMPIRE,
-        LVL(28, 24, -6, 80, -10), (G_NOGEN|G_NOCORPSE|G_UNIQ),
+        LVL(28, 26, -6, 80, -10), (G_NOGEN|G_NOCORPSE|G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 10), ATTK(AT_BITE, AD_DRLI, 1, 12),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, 0, MS_VAMPIRE, MZ_HUMAN), MR_SLEEP|MR_POISON, 0,
@@ -2207,8 +2215,8 @@ struct permonst _mons2[] = {
     MON("barrow wight", S_WRAITH,
         LVL(3, 12, 5, 5, -3), (G_GENO|G_NOCORPSE|1),
         A(ATTK(AT_WEAP, AD_DRLI, 0, 0), ATTK(AT_MAGC, AD_SPEL, 0, 0),
-          ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(1200, 0, 0, MS_SPELL, MZ_HUMAN), MR_COLD|MR_SLEEP|MR_POISON, 0,
+          ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_TUCH, AD_COLD, 1, 4), NO_ATTK, NO_ATTK),
+        SIZ(1200, 0, 0, MS_SPELL, MZ_HUMAN), MR_COLD | MR_SLEEP | MR_POISON, 0,
         M1_BREATHLESS|M1_HUMANOID,
         M2_UNDEAD|M2_STALK|M2_HOSTILE|M2_COLLECT, 0, CLR_GRAY),
     MON("wraith", S_WRAITH,
@@ -2242,18 +2250,20 @@ struct permonst _mons2[] = {
 /*
  * Apelike beasts
  */
+    /* tameable via banana; does not grow up into ape...
+       not flagged as domestic, so no guilt penalty for eating non-pet one */
     MON("monkey", S_YETI,
         LVL(2, 12, 6, 0, 0), (G_NOSHEOL|G_GENO|1),
         A(ATTK(AT_CLAW, AD_SITM, 0, 0), ATTK(AT_BITE, AD_PHYS, 1, 3),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(100, 50, 0, MS_GROWL, MZ_SMALL), 0, 0,
-        M1_ANIMAL|M1_HUMANOID|M1_CARNIVORE, 0, M3_INFRAVISIBLE, CLR_GRAY),
+        M1_ANIMAL | M1_HUMANOID | M1_OMNIVORE, 0, M3_INFRAVISIBLE, CLR_GRAY),
     MON("ape", S_YETI,
         LVL(4, 12, 6, 0, 0), (G_NOSHEOL|G_GENO|G_SGROUP|2),
         A(ATTK(AT_CLAW, AD_PHYS, 1, 3), ATTK(AT_CLAW, AD_PHYS, 1, 3),
           ATTK(AT_BITE, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(1100, 500, 0, MS_GROWL, MZ_LARGE), 0, 0,
-        M1_ANIMAL|M1_HUMANOID|M1_CARNIVORE, M2_STRONG, M3_INFRAVISIBLE,
+        M1_ANIMAL | M1_HUMANOID | M1_OMNIVORE, M2_STRONG, M3_INFRAVISIBLE,
         CLR_BROWN),
     MON("owlbear", S_YETI,
         LVL(5, 12, 5, 0, 0), (G_NOSHEOL|G_GENO|3),
@@ -3089,8 +3099,8 @@ struct permonst _mons2[] = {
         M1_SWIM|M1_AMPHIBIOUS|M1_SLITHY|M1_NOLIMBS|M1_NOTAKE|M1_POIS,
         M2_HOSTILE, 0, CLR_BLUE),
     MON("piranha", S_EEL,
-        LVL(5, 12, 4, 0, 0), (G_GENO|G_NOGEN|G_SGROUP),
-        A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK,
+        LVL(5, 18, 4, 0, 0), (G_GENO | G_NOGEN | G_SGROUP),
+        A(ATTK(AT_BITE, AD_PHYS, 2, 6), ATTK(AT_BITE, AD_PHYS, 2, 6),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(60, 30, 0, MS_SILENT, MZ_SMALL), 0, 0,
         M1_SWIM|M1_AMPHIBIOUS|M1_ANIMAL|M1_SLITHY|M1_NOLIMBS|
@@ -3322,8 +3332,13 @@ struct permonst _mons2[] = {
         M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_STRONG|M2_COLLECT, M3_INFRAVISIBLE, HI_DOMESTIC),
 #endif
+    /* valk is lawful by default; player valk can be neutral, in which case
+       role_init() will change this monster and 'warrior' to be neutral too;
+       if a neutral valk leaves a bones file containing neutral warriors,
+       the latter will magically turn lawful if encountered by a lawful valk
+       or any non-valk (for bones on the dungeon side of the portal) */
     MON("valkyrie", S_HUMAN,
-        LVL(10, 12, 10, 1, -1), G_NOGEN,
+        LVL(10, 12, 10, 1, 1), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 8), ATTK(AT_WEAP, AD_PHYS, 1, 8),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, 0, MS_HUMANOID, MZ_HUMAN), MR_COLD, 0,
@@ -3479,6 +3494,8 @@ struct permonst _mons2[] = {
         M2_COLLECT|M2_MAGIC,
         M3_CLOSE|M3_INFRAVISIBLE, HI_DOMESTIC),
 #endif
+    /* for a valkyrie hero, Norn's alignment will be changed to match hero's
+       starting alignment */
     MON("Norn", S_HUMAN,
         LVL(20, 12, 0, 80, 0), (G_NOGEN|G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 8), ATTK(AT_WEAP, AD_PHYS, 1, 6),
@@ -3524,7 +3541,7 @@ struct permonst _mons2[] = {
  */
     MON("Tiamat", S_DRAGON,
         LVL(17, 12, 0, 30, -14), (G_NOGEN|G_UNIQ),
-        A(ATTK(AT_BREA, AD_RBRE, 6, 8), ATTK(AT_MAGC, AD_SPEL, 0, 0),
+        A(ATTK(AT_BREA, AD_RBRE, 6, 6), ATTK(AT_MAGC, AD_SPEL, 0, 0),
           ATTK(AT_CLAW, AD_SAMU, 2, 8), ATTK(AT_BITE, AD_PHYS, 4, 8),
           ATTK(AT_BITE, AD_PHYS, 4, 8), ATTK(AT_STNG, AD_PHYS, 1, 6)),
         SIZ(WT_DRAGON, 1700, 0, MS_NEMESIS, MZ_GIGANTIC),
@@ -3698,8 +3715,10 @@ struct permonst _mons2[] = {
         M2_NOPOLY|M2_ELF|M2_PEACEFUL|M2_COLLECT,
         M3_INFRAVISION|M3_INFRAVISIBLE, HI_DOMESTIC),
 #endif
+    /* attendants used to lawful but have been changed to netural because
+       grow_up() promotes them to healer and the latter is always neutral */
     MON("attendant", S_HUMAN,
-        LVL(5, 12, 10, 10, 3), G_NOGEN,
+        LVL(5, 12, 10, 10, 0), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, 0, MS_GUARDIAN, MZ_HUMAN), MR_POISON, 0,
@@ -3772,8 +3791,11 @@ struct permonst _mons2[] = {
         M2_NOPOLY|M2_HUMAN|M2_PEACEFUL | M2_STRONG|M2_COLLECT|M2_MAGIC,
         M3_INFRAVISIBLE, HI_DOMESTIC),
 #endif
+    /* warriors used to be chaotic but have been changed to lawful because
+       grow_up() promotes them to valkyrie; for a valkyrie hero, they might
+       be changed to neutral at game start; see the valkyrie comment above */
     MON("warrior", S_HUMAN,
-        LVL(5, 12, 10, 10, -1), G_NOGEN,
+        LVL(5, 12, 10, 10, 1), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 8), ATTK(AT_WEAP, AD_PHYS, 1, 8),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, 0, MS_GUARDIAN, MZ_HUMAN), 0, 0,

@@ -1629,9 +1629,11 @@ befriend_with_obj(struct permonst *data, struct obj *obj)
 #endif
 
 #ifdef EXOTIC_PETS
+    /* monkeys are tameable via bananas but not pacifiable via food,
+       otherwise their theft attack could be nullified too easily */
     if (Role_if(PM_ROGUE) &&
-         (data == &mons[PM_MONKEY]) &&
-         (obj->otyp == BANANA || !rn2(2))) {
+         (data == &mons[PM_MONKEY] || data == &mons[PM_APE]) &&
+         (obj->otyp == BANANA)) {
         return TRUE;
     }
 # ifdef TOURIST
@@ -1646,6 +1648,15 @@ befriend_with_obj(struct permonst *data, struct obj *obj)
     }
 #endif
 
+   /* horses can be tamed by always-veggy food or lichen corpses but
+     not tamed or pacified by other corpses or tins of veggy critters */
+    if (is_domestic(data) && (data->mlet == S_UNICORN)) {
+       return ((objects[obj->otyp].oc_material == VEGGY) ||
+               (obj->otyp == CORPSE && obj->corpsenm == PM_LICHEN));
+    }
+
+  /* dogs and cats can be tamed by anything they like to eat and are
+     pacified by any other food */
   return is_domestic(data);
 }
 
