@@ -208,6 +208,7 @@ void update_inventory() {}
 void reset_commands(BOOLEAN_P b) {}
 
 char *tshirt_text(struct obj *o, char *s) { return NULL; }
+char *hawaiian_motif(struct obj *o, char *s) { return NULL; }
 void tin_details(struct obj *o, int i, char *s) {}
 
 long count_contents(struct obj *o, BOOLEAN_P b1, BOOLEAN_P b2, BOOLEAN_P b3, BOOLEAN_P b4) { return 0; }
