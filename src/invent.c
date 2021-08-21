@@ -1068,6 +1068,7 @@ register const char *let, *word;
                   || otmp->otyp == CANDY_BAR
 #ifdef TOURIST
                   || otmp->otyp == T_SHIRT
+                  || otmp->otyp == HAWAIIAN_SHIRT
                   || otmp->otyp == CREDIT_CARD
 #endif
                   || otmp->otyp == ALCHEMY_SMOCK

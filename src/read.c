@@ -230,7 +230,7 @@ hawaiian_design(struct obj *shirt, char *buf)
     return buf;
 }
 
-static char *
+char *
 apron_text(struct obj* apron, char* buf)
 {
     static const char *apron_msgs[] = {
@@ -243,6 +243,17 @@ apron_text(struct obj* apron, char* buf)
         "If you can't stand the heat, get out of Gehennom!",
         "If we weren't meant to eat animals, why are they made out of meat?",
         "If you don't like the food, I'll stab you",
+        /* In the movie "The Sum of All Fears", a Russian worker in a weapons
+           facility wears a T-shirt that a translator says reads, "I am a
+           bomb technician, if you see me running ... try to catch up."
+           In nethack, the quote is far more suitable to an alchemy smock
+           (particularly since so many of these others are about cooking)
+           than a T-shirt and is paraphrased to simplify/shorten it.
+           [later... turns out that this is already a T-shirt message:
+            "I am a Valkyrie.  If you see me running, try to keep up."
+           so this one has been revised a little:  added alchemist prefix,
+           changed "keep up" to original source's "catch up"] */
+        "I am an alchemist; if you see me running, try to catch up...",
     };
 
     Strcpy(buf, apron_msgs[apron->o_id % SIZE(apron_msgs)]);

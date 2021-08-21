@@ -768,7 +768,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
         Strcpy(buf, makeplural(buf));
     }
 
-    if (obj->otyp == T_SHIRT && program_state.gameover) {
+    if (program_state.gameover) {
         char tmpbuf[BUFSZ];
 
         /* disclose without breaking illiterate conduct, but mainly tip off
@@ -776,6 +776,10 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
         switch (obj->otyp) {
         case T_SHIRT:
             Sprintf(eos(buf), " with text \"%s\"", tshirt_text(obj, tmpbuf));
+            break;
+
+        case ALCHEMY_SMOCK:
+            Sprintf(eos(buf), " with text \"%s\"", apron_text(obj, tmpbuf));
             break;
 
         case HAWAIIAN_SHIRT:

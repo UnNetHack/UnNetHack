@@ -2160,6 +2160,7 @@ E long NDECL(random);
 E void FDECL(learn_scroll, (struct obj *));
 E char *FDECL(tshirt_text, (struct obj *, char *));
 extern char *hawaiian_motif(struct obj *, char *);
+extern char *apron_text(struct obj *, char *);
 E int NDECL(doread);
 E boolean FDECL(is_chargeable, (struct obj *));
 E void FDECL(recharge, (struct obj *, int));
