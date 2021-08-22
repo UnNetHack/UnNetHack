@@ -96,6 +96,9 @@
 #define P_MASTER        5   /* Unarmed combat/martial arts only */
 #define P_GRAND_MASTER  6   /* Unarmed combat/martial arts only */
 
+/* Arbitrary value, needs to be truthy but not equal to TRUE */
+#define P_UNSKILLED_WEAPON (TRUE + 1)
+
 /**
  * To reach the specified skill level:
  * P_UNSKILLED       0

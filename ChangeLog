@@ -78,6 +78,8 @@
 	  - Use bright colors on supporting terminals in tty port
 	  - Monster and object information database
 	  - Reduce message spam when healers sense injuries
+	  - Output "You begin awkwardly bashing" for currently unskilled but
+	    skillable weapons
 
 	* skill changes:
 	  - Allow convicts to become skilled in broadsword (reported by RojjaCebolla)

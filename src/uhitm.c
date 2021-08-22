@@ -456,10 +456,10 @@ register struct monst *mtmp;
         untwoweapon();
 
     if (unweapon) {
-        unweapon = FALSE;
         if (flags.verbose) {
+            const char *awkwardly = (unweapon == P_UNSKILLED_WEAPON) ? "awkwardly " : "";
             if (uwep) {
-                You("begin bashing monsters with %s.", yname(uwep));
+                You("begin %sbashing monsters with %s.", awkwardly, yname(uwep));
             } else if (!cantwield(youmonst.data)) {
                 You("begin %sing monsters with your %s %s.",
                     Role_if(PM_MONK) ? "strik" : "bash",
@@ -467,6 +467,7 @@ register struct monst *mtmp;
                     makeplural(body_part(HAND)));
             }
         }
+        unweapon = FALSE;
     }
     exercise(A_STR, TRUE); /* you're exercising muscles */
     /* andrew@orca: prevent unlimited pick-axe attacks */

@@ -123,6 +123,22 @@ register struct obj *obj;
                                        && !u.usteed
 #endif
                                        ) : !is_weptool(obj) && !is_wet_towel(obj);
+
+        int weapon_skill = weapon_type(obj); /* non-weapons => P_NONE */
+        /* check moves because starting weapon is wielded before skills are initialized */
+        if (moves > 1 && weapon_skill != P_NONE) {
+            /* it's suitable as a weapon */
+            if (P_SKILL(weapon_skill) <= P_UNSKILLED) {
+                /* the player is unskilled in this weapon */
+                if (P_MAX_SKILL(weapon_skill) > P_UNSKILLED) {
+                    /* it has an enhanceable weapon skill */
+                    unweapon = P_UNSKILLED_WEAPON;
+                } else {
+                    /* otherwise just output the "begin bashing" message */
+                    unweapon = TRUE;
+                }
+            }
+        }
     } else {
         unweapon = TRUE; /* for "bare hands" message */
     }

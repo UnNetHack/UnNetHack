@@ -288,7 +288,7 @@ E NEARDATA boolean in_mklev;
 E NEARDATA boolean in_mk_rndvault;
 E NEARDATA boolean rndvault_failed;
 E NEARDATA boolean stoned;
-E NEARDATA boolean unweapon;
+extern int unweapon;
 E NEARDATA boolean mrg_to_wielded;
 E NEARDATA struct obj *current_wand, *thrownobj, *kickedobj;
 
