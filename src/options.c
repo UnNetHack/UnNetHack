@@ -4534,19 +4534,15 @@ doset()
              "Other settings:", MENU_ITEMFLAGS_NONE);
 
 #ifdef AUTOPICKUP_EXCEPTIONS
-    if (count_apes() > 0) {
-        any.a_int = -1;
-        Sprintf(buf, "autopickup exceptions (%d currently set)", count_apes());
-        add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
-    }
+    any.a_int = -1;
+    Sprintf(buf, "autopickup exceptions (%d currently set)", count_apes());
+    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 #endif /* AUTOPICKUP_EXCEPTIONS */
 
 #ifdef MENU_COLOR
-    if (count_menucolors() > 0) {
-        any.a_int = -2;
-        Sprintf(buf, "message colors        (%d currently set)", count_menucolors());
-        add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
-    }
+    any.a_int = -2;
+    Sprintf(buf, "message colors        (%d currently set)", count_menucolors());
+    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 #endif /* AUTOPICKUP_EXCEPTIONS */
 
 #ifdef PREFIXES_IN_USE
