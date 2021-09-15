@@ -9,9 +9,14 @@ static boolean NDECL(rm_waslit);
 static void FDECL(mkcavepos, (XCHAR_P, XCHAR_P, int, BOOLEAN_P, BOOLEAN_P));
 static void FDECL(mkcavearea, (BOOLEAN_P));
 static int NDECL(dig);
-static void FDECL(dig_up_grave, (coord *));
 static int FDECL(adj_pit_checks, (coord *, char *));
 static void FDECL(pit_flow, (struct trap *, SCHAR_P));
+
+enum grave_type {
+    GRAVE_NORMAL = 0,
+    GRAVE_BALIN,
+};
+static void dig_up_grave(coord *, enum grave_type);
 
 /* Indices returned by dig_typ() */
 enum dig_types {
@@ -959,8 +964,19 @@ coord *cc;
         return TRUE;
 
     } else if (IS_GRAVE(lev->typ)) {
+        int grave_type = GRAVE_NORMAL;
+        if (In_moria(&u.uz)) {
+            struct engr *e = engr_at(dig_x, dig_y);
+
+            if (e && e->engr_type == HEADSTONE) {
+                if (!strncmp(e->engr_txt, "Balin,", 6)) {
+                    grave_type = GRAVE_BALIN;
+                }
+            }
+        }
+
         digactualhole(dig_x, dig_y, BY_YOU, PIT);
-        dig_up_grave(cc);
+        dig_up_grave(cc, grave_type);
         return TRUE;
     } else if (lev->typ == DRAWBRIDGE_UP) {
         /* must be floor or ice, other cases handled above */
@@ -1026,8 +1042,7 @@ coord *cc;
 }
 
 static void
-dig_up_grave(cc)
-coord *cc;
+dig_up_grave(coord *cc, enum grave_type type)
 {
     struct obj *otmp;
     xchar dig_x, dig_y;
@@ -1055,37 +1070,52 @@ coord *cc;
         adjalign(-sgn(u.ualign.type));
         You("have violated the sanctity of this grave!");
     }
-    if (!rn2(13)) {
-        You("unearth a pine box.");
-        otmp = mksobj_at(LARGE_BOX, dig_x, dig_y, TRUE, FALSE);
-        otmp->spe = +4;
-    } else {
-        switch (rn2(5)) {
-        case 0:
-        case 1:
+
+    switch (type) {
+    case GRAVE_BALIN:
+        if ((otmp = mksobj_at(CORPSE, dig_x, dig_y, FALSE, FALSE))) {
+            otmp->age -= 100; /* old corpse */
+            otmp->corpsenm = PM_DWARF_LORD;
+            oname(otmp, "Balin");
+            /* Durin's Axe */
+            otmp = mksobj_at(BATTLE_AXE, dig_x, dig_y, FALSE, FALSE);
+            curse(otmp);
             You("unearth a corpse.");
-            if ((otmp = mk_tt_object(CORPSE, dig_x, dig_y)) != 0) {
-                otmp->age -= 100; /* this is an *OLD* corpse */
+        }
+        break;
+    default:
+        if (!rn2(13)) {
+            You("unearth a pine box.");
+            otmp = mksobj_at(LARGE_BOX, dig_x, dig_y, TRUE, FALSE);
+            otmp->spe = +4;
+        } else {
+            switch (rn2(5)) {
+            case 0:
+            case 1:
+                You("unearth a corpse.");
+                if ((otmp = mk_tt_object(CORPSE, dig_x, dig_y)) != 0) {
+                    otmp->age -= 100; /* this is an *OLD* corpse */
+                }
+                break;
+            case 2:
+                if (!Blind) {
+                    pline(Hallucination ? "Dude!  The living dead!" :
+                                "The grave's owner is very upset!");
+                }
+                (void) makemon(mkclass(S_ZOMBIE, 0), dig_x, dig_y, NO_MM_FLAGS);
+                break;
+            case 3:
+                if (!Blind) {
+                    pline(Hallucination ? "I want my mummy!" :
+                            "You've disturbed a tomb!");
+                }
+                (void) makemon(mkclass(S_MUMMY, 0), dig_x, dig_y, NO_MM_FLAGS);
+                break;
+            default:
+                /* No corpse */
+                pline_The("grave seems unused.  Strange...");
+                break;
             }
-            break;
-        case 2:
-            if (!Blind) {
-                pline(Hallucination ? "Dude!  The living dead!" :
-                               "The grave's owner is very upset!");
-            }
-            (void) makemon(mkclass(S_ZOMBIE, 0), dig_x, dig_y, NO_MM_FLAGS);
-            break;
-        case 3:
-            if (!Blind) {
-                pline(Hallucination ? "I want my mummy!" :
-                        "You've disturbed a tomb!");
-            }
-            (void) makemon(mkclass(S_MUMMY, 0), dig_x, dig_y, NO_MM_FLAGS);
-            break;
-        default:
-            /* No corpse */
-            pline_The("grave seems unused.  Strange...");
-            break;
         }
     }
     levl[dig_x][dig_y].typ = ROOM;
