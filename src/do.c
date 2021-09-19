@@ -2087,13 +2087,50 @@ anything *arg;
 long timeout UNUSED;
 {
     struct obj *body = arg->a_obj;
+    struct permonst *mptr = &mons[body->corpsenm];
 
     /* if we succeed, the corpse is gone, otherwise, rot it away */
     if (!revive_corpse(body)) {
-        if (is_rider(&mons[body->corpsenm]))
-            You_feel("less hassled.");
-        (void) start_timer(250L - (monstermoves-body->age),
-                           TIMER_OBJECT, ROT_CORPSE, arg);
+        long when;
+        int action;
+
+        if (is_rider(mptr) && rn2(99)) {
+            /* Rider usually tries again */
+            action = REVIVE_MON;
+            for (when = 3L; when < 67L; when++) {
+                if (!rn2(3)) {
+                    break;
+                }
+            }
+        } else { /* rot this corpse away */
+            You_feel("%sless hassled.", is_rider(mptr) ? "much " : "");
+            action = ROT_CORPSE;
+            when = 250L - (moves - body->age);
+            if (when < 1L) {
+                when = 1L;
+            }
+        }
+        (void) start_timer(when, TIMER_OBJECT, action, arg);
+    }
+}
+
+/** Timeout callback. Revive the corpse as a zombie. */
+void
+zombify_mon(anything *arg, long timeout)
+{
+    struct obj *body = arg->a_obj;
+    int zmon = zombie_form(&mons[body->corpsenm]);
+
+    if (zmon != NON_PM) {
+        if (has_omid(body)) {
+            free_omid(body);
+        }
+        if (has_omonst(body)) {
+            free_omonst(body);
+        }
+
+        body->corpsenm = zmon;
+        revive_mon(arg, timeout);
     }
 }
 

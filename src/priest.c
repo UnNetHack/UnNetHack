@@ -51,6 +51,7 @@ register xchar omx, omy, gx, gy;
     schar chcnt, cnt;
     coord poss[9];
     long info[9];
+    long ninfo = 0;
     long allowflags;
 
     if (omx == gx && omy == gy)
@@ -90,12 +91,15 @@ pick_move:
         ny = poss[i].y;
         if (IS_ROOM(levl[nx][ny].typ) ||
             (mtmp->isshk && (!in_his_shop || ESHK(mtmp)->following))) {
-            if (avoid && (info[i] & NOTONL))
+            if (avoid && (info[i] & NOTONL) && !(info[i] & ALLOW_M)) {
                 continue;
+            }
             if ((!appr && !rn2(++chcnt)) ||
-               (appr && GDIST(nx, ny) < GDIST(nix, niy))) {
+                (appr && GDIST(nx, ny) < GDIST(nix, niy)) ||
+                (info[i] & ALLOW_M)) {
                 nix = nx;
                 niy = ny;
+                ninfo = info[i];
             }
         }
     }
@@ -108,6 +112,18 @@ pick_move:
     }
 
     if (nix != omx || niy != omy) {
+        if (ninfo & ALLOW_M) {
+            /* mtmp is deciding it would like to attack this turn.
+             * Returns from m_move_aggress don't correspond to the same things
+             * as this function should return, so we need to translate. */
+            switch (m_move_aggress(mtmp, nix, niy)) {
+            case 2:
+                return -2; /* died making the attack */
+            case 3:
+                return 1; /* attacked and spent this move */
+            }
+        }
+
         if (MON_AT(nix, niy)) {
             return 0;
         }

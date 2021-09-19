@@ -204,6 +204,7 @@ E NEARDATA struct sinfo {
 
 E boolean restoring;
 E boolean ransacked;
+extern boolean zombify;
 
 E const char quitchars[];
 E const char vowels[];

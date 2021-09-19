@@ -71,6 +71,7 @@ NEARDATA struct fruit *ffruit = (struct fruit *)0;
 
 NEARDATA char tune[6] = DUMMY;
 NEARDATA boolean ransacked = 0;
+boolean zombify = FALSE;
 
 const char *occtxt = DUMMY;
 const char quitchars[] = " \r\n\033";

@@ -399,6 +399,7 @@ E void FDECL(schedule_goto, (d_level *, BOOLEAN_P, BOOLEAN_P, int,
 E void NDECL(deferred_goto);
 E boolean FDECL(revive_corpse, (struct obj *));
 E void FDECL(revive_mon, (ANY_P *, long));
+extern void zombify_mon(union any *, long);
 E int NDECL(donull);
 E int NDECL(dowipe);
 E void FDECL(set_wounded_legs, (long, int));
@@ -1489,8 +1490,11 @@ E void FDECL(mksheol, (void*));
 
 /* ### mon.c ### */
 
+extern boolean zombie_maker(struct permonst *);
+extern int zombie_form(struct permonst *);
 E int FDECL(select_newcham_form, (struct monst *));
 E void FDECL(remove_monster, (int, int));
+E int FDECL(m_poisongas_ok, (struct monst *));
 E int FDECL(undead_to_corpse, (int));
 E int FDECL(genus, (int, int));
 E int FDECL(pm_to_cham, (int));
@@ -1613,6 +1617,7 @@ E void FDECL(monflee, (struct monst *, int, BOOLEAN_P, BOOLEAN_P));
 E int FDECL(dochug, (struct monst *));
 E boolean FDECL(m_digweapon_check, (struct monst *, XCHAR_P, XCHAR_P));
 E int FDECL(m_move, (struct monst *, int));
+extern int m_move_aggress(struct monst *, xchar, xchar);
 E boolean FDECL(closed_door, (int, int));
 E boolean FDECL(accessible, (int, int));
 E void FDECL(set_apparxy, (struct monst *));
