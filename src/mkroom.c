@@ -387,8 +387,16 @@ throne_placed:
                 if(!rn2(10)) /* lots of treasure buried with dead */
                     (void) mksobj_at((rn2(3)) ? LARGE_BOX : CHEST,
                                      sx, sy, TRUE, FALSE);
-                if (!rn2(5))
+                if (!rn2(5)) {
                     make_grave(sx, sy, (char *)0);
+                } else if (In_moria(&u.uz) && rnf(1, 1000)) {
+                    /* there's only one graveyard in Moria */
+                    static int once = 1;
+                    if (once == 1) {
+                        make_grave(sx, sy, "Guest41, Wherever you are, I hope you're doing fine");
+                    }
+                    once++;
+                }
                 break;
             case BEEHIVE:
                 if(!rn2(3))

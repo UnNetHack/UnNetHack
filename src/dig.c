@@ -15,6 +15,7 @@ static void FDECL(pit_flow, (struct trap *, SCHAR_P));
 enum grave_type {
     GRAVE_NORMAL = 0,
     GRAVE_BALIN,
+    GRAVE_GUEST41,
 };
 static void dig_up_grave(coord *, enum grave_type);
 
@@ -971,6 +972,8 @@ coord *cc;
             if (e && e->engr_type == HEADSTONE) {
                 if (!strncmp(e->engr_txt, "Balin,", 6)) {
                     grave_type = GRAVE_BALIN;
+                } else if (!strncmp(e->engr_txt, "Guest41,", 8)) {
+                    grave_type = GRAVE_GUEST41;
                 }
             }
         }
@@ -1083,6 +1086,12 @@ dig_up_grave(coord *cc, enum grave_type type)
             You("unearth a corpse.");
         }
         break;
+
+    case GRAVE_GUEST41:
+        /* No corpse */
+        pline_The("grave seems unused.  You have a hopeful feeling...");
+        break;
+
     default:
         if (!rn2(13)) {
             You("unearth a pine box.");
