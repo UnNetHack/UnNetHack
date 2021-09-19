@@ -260,7 +260,7 @@ register struct monst *mtmp;
         u.ugrave_arise = PM_WRAITH;
     else if (mtmp->data->mlet == S_MUMMY && urace.mummynum != NON_PM)
         u.ugrave_arise = urace.mummynum;
-    else if (zombie_maker(mptr) && zombie_form(youmonst.data) != NON_PM) {
+    else if (zombie_maker(mtmp) && zombie_form(youmonst.data) != NON_PM) {
         u.ugrave_arise = zombie_form(youmonst.data);
     }
     else if (is_vampire(mtmp->data) && Race_if(PM_HUMAN))

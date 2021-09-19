@@ -1872,7 +1872,7 @@ post_stone: if (mdef->mhp > 0) return 0;
             mdef->mhp = 0;
         }
         zombify = (!otmp &&
-                   zombie_maker(magr->data) &&
+                   zombie_maker(magr) &&
                    ((mattk->aatyp == AT_TUCH ||
                      mattk->aatyp == AT_CLAW ||
                      mattk->aatyp == AT_BITE) &&

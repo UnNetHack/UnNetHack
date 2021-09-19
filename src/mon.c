@@ -175,11 +175,16 @@ int x, y;
     level.monsters[x][y] = (struct monst *)0;
 }
 
-/* Return TRUE if this monster is capable of converting other monsters into
- * zombies. */
+/* return True if mon is capable of converting other monsters into zombies */
 boolean
-zombie_maker(struct permonst *pm)
+zombie_maker(struct monst *mon)
 {
+    struct permonst *pm = mon->data;
+
+    if (mon->mcan) {
+        return FALSE;
+    }
+
     switch (pm->mlet) {
     case S_ZOMBIE:
         /* Z-class monsters that aren't actually zombies go here */
@@ -196,15 +201,15 @@ zombie_maker(struct permonst *pm)
     return FALSE;
 }
 
-/* return the monster index of the zombie monster which this monster could be
- * turned into, or NON_PM if it doesn't have a direct counterpart. Sort of the
- * zombie-specific inverse of undead_to_corpse.
- * If a zombie gets passed to this function, it should return NON_PM, not the
- * same monster again. */
+/* Return monster index of zombie monster which this monster could
+   be turned into, or NON_PM if it doesn't have a direct counterpart.
+   Sort of the zombie-specific inverse of undead_to_corpse. */
 int
 zombie_form(struct permonst *pm)
 {
     switch (pm->mlet) {
+    case S_ZOMBIE: /* when already a zombie/ghoul/skeleton, will stay as is */
+        return NON_PM;
     case S_KOBOLD:
         return PM_KOBOLD_ZOMBIE;
 
@@ -1623,18 +1628,15 @@ nexttry:    /* eels prefer the water, but if there is no water nearby,
     return(cnt);
 }
 
-/* Part of mm_aggression that represents two-way aggression. To avoid having to
- * code each case twice, this function contains those cases that ought to
- * happen twice, and mm_aggression will call it twice. */
+/* Part of mm_aggression that represents two-way aggression.  To avoid
+   having to code each case twice, this function contains those cases that
+   ought to happen twice, and mm_aggression will call it twice. */
 static long
 mm_2way_aggression(magr, mdef)
 struct monst *magr, *mdef;
 {
-    struct permonst *ma = magr->data;
-    struct permonst *md = mdef->data;
-
     /* zombies vs things that can be zombified */
-    if (zombie_maker(ma) && zombie_form(md) != NON_PM) {
+    if (zombie_maker(magr) && zombie_form(mdef->data) != NON_PM) {
         return (ALLOW_M | ALLOW_TM);
     }
 
@@ -2871,7 +2873,7 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
             zombify = (!thrownobj &&
                        !stoned &&
                        !uwep &&
-                       zombie_maker(youmonst.data) &&
+                       zombie_maker(&youmonst) &&
                        zombie_form(mtmp->data) != NON_PM);
             cadaver = make_corpse(mtmp, burycorpse ? CORPSTAT_BURIED
                                                    : CORPSTAT_NONE);

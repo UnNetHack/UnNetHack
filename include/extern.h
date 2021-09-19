@@ -1490,7 +1490,7 @@ E void FDECL(mksheol, (void*));
 
 /* ### mon.c ### */
 
-extern boolean zombie_maker(struct permonst *);
+extern boolean zombie_maker(struct monst *);
 extern int zombie_form(struct permonst *);
 E int FDECL(select_newcham_form, (struct monst *));
 E void FDECL(remove_monster, (int, int));
