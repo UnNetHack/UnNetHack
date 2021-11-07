@@ -1983,6 +1983,7 @@ struct obj *corpse;
     char cname[BUFSZ];
     struct obj *container = (struct obj *)0;
     int container_where = 0;
+    boolean is_zomb = (mons[corpse->corpsenm].mlet == S_ZOMBIE);
 
     where = corpse->where;
     is_uwep = corpse == uwep;
@@ -2069,6 +2070,24 @@ struct obj *corpse;
                 pline("%s escapes from %s!", Amonnam(mtmp), sackname);
             }
             break;
+
+        case OBJ_BURIED:
+            if (is_zomb) {
+                maketrap(mtmp->mx, mtmp->my, PIT);
+                if (cansee(mtmp->mx, mtmp->my)) {
+                    struct trap *ttmp;
+
+                    ttmp = t_at(mtmp->mx, mtmp->my);
+                    ttmp->tseen = TRUE;
+                    pline("%s claws itself out of the ground!", Amonnam(mtmp));
+                    newsym(mtmp->mx, mtmp->my);
+                } else if (distu(mtmp->mx, mtmp->my) < 5*5) {
+                    You_hear("scratching noises.");
+                }
+                break;
+            }
+            /* fall through */
+
         default:
             /* we should be able to handle the other cases... */
             impossible("revive_corpse: lost corpse @ %d", where);
@@ -2087,13 +2106,54 @@ anything *arg;
 long timeout UNUSED;
 {
     struct obj *body = arg->a_obj;
+    struct permonst *mptr = &mons[body->corpsenm];
 
     /* if we succeed, the corpse is gone, otherwise, rot it away */
     if (!revive_corpse(body)) {
-        if (is_rider(&mons[body->corpsenm]))
-            You_feel("less hassled.");
-        (void) start_timer(250L - (monstermoves-body->age),
-                           TIMER_OBJECT, ROT_CORPSE, arg);
+        long when;
+        int action;
+
+        if (is_rider(mptr) && rn2(99)) {
+            /* Rider usually tries again */
+            action = REVIVE_MON;
+            for (when = 3L; when < 67L; when++) {
+                if (!rn2(3)) {
+                    break;
+                }
+            }
+        } else { /* rot this corpse away */
+            if (!obj_has_timer(body, ROT_CORPSE)) {
+                You_feel("%sless hassled.", is_rider(mptr) ? "much " : "");
+            }
+            action = ROT_CORPSE;
+            when = 250L - (moves - body->age);
+            if (when < 1L) {
+                when = 1L;
+            }
+        }
+        if (!obj_has_timer(body, action)) {
+            (void) start_timer(when, TIMER_OBJECT, action, arg);
+        }
+    }
+}
+
+/** Timeout callback. Revive the corpse as a zombie. */
+void
+zombify_mon(anything *arg, long timeout)
+{
+    struct obj *body = arg->a_obj;
+    int zmon = zombie_form(&mons[body->corpsenm]);
+
+    if (zmon != NON_PM && !(mvitals[zmon].mvflags & G_GENOD)) {
+        if (has_omid(body)) {
+            free_omid(body);
+        }
+        if (has_omonst(body)) {
+            free_omonst(body);
+        }
+
+        body->corpsenm = zmon;
+        revive_mon(arg, timeout);
     }
 }
 

@@ -206,6 +206,7 @@ done_in_by(mtmp)
 register struct monst *mtmp;
 {
     char buf[BUFSZ];
+    struct permonst *mptr = mtmp->data;
     boolean distorted = (boolean)(Hallucination && canspotmon(mtmp));
 
     You("die...");
@@ -259,6 +260,9 @@ register struct monst *mtmp;
         u.ugrave_arise = PM_WRAITH;
     else if (mtmp->data->mlet == S_MUMMY && urace.mummynum != NON_PM)
         u.ugrave_arise = urace.mummynum;
+    else if (zombie_maker(mtmp) && zombie_form(youmonst.data) != NON_PM) {
+        u.ugrave_arise = zombie_form(youmonst.data);
+    }
     else if (is_vampire(mtmp->data) && Race_if(PM_HUMAN))
         u.ugrave_arise = PM_VAMPIRE;
     else if (mtmp->data == &mons[PM_GHOUL])

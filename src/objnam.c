@@ -3349,6 +3349,7 @@ struct obj *no_wish;
     int islit, unlabeled, ishistoric, isdiluted, trapped;
     int tmp, tinv, tvariety;
     int wetness, gsize = 0;
+    boolean zombifying;
     struct fruit *f;
     int ftype = current_fruit;
     char fruitbuf[BUFSZ];
@@ -3391,6 +3392,7 @@ struct obj *no_wish;
     oclass = 0;
     actualn = dn = un = 0;
     wetness = 0;
+    zombifying = FALSE;
 
     if (!bp) goto any;
     /* first, remove extra whitespace they may have typed */
@@ -3484,7 +3486,9 @@ struct obj *no_wish;
             broken = 1;
             locked = unlocked = 0;
         } else if (!strncmpi(bp, "greased ", l=8)) {
-            isgreased=1;
+            isgreased = 1;
+        } else if (!strncmpi(bp, "zombifying ", l = 11)) {
+            zombifying = TRUE;
         } else if (!strncmpi(bp, "very ", l=5)) {
             /* very rusted very heavy iron ball */
             very = 1;
@@ -4399,6 +4403,9 @@ typfnd:
                     mntmp = genus(mntmp, 1);
                 }
                 set_corpsenm(otmp, mntmp);
+            }
+            if (zombifying && zombie_form(&mons[mntmp])) {
+                (void) start_timer(rn1(5, 10), TIMER_OBJECT, ZOMBIFY_MON, obj_to_any(otmp));
             }
             break;
 

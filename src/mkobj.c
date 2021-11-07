@@ -1269,6 +1269,9 @@ struct obj *body;
                     break;
                 }
         }
+    } else if (zombify && zombie_form(&mons[body->corpsenm]) != NON_PM) {
+        action = ZOMBIFY_MON;
+        when = rn1(15, 5); /* 5..19 */
     }
 
     if (body->norevive) body->norevive = 0;
@@ -1634,7 +1637,8 @@ boolean init;
         otmp->corpsenm = monsndx(ptr);
         otmp->owt = weight(otmp);
         if (otmp->otyp == CORPSE &&
-                (special_corpse(old_corpsenm) ||
+                (zombify ||
+                 special_corpse(old_corpsenm) ||
                  special_corpse(otmp->corpsenm))) {
             obj_stop_timers(otmp);
             start_corpse_timeout(otmp);

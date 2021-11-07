@@ -19,6 +19,7 @@ extern boolean notonhead;   /* for long worms */
 /* kludge to use mondied instead of killed */
 extern boolean m_using;
 
+static boolean zombie_can_dig(xchar x, xchar y);
 STATIC_DCL void FDECL(polyuse, (struct obj*, int, int));
 STATIC_DCL void FDECL(create_polymon, (struct obj *, int));
 STATIC_DCL boolean FDECL(zap_updown, (struct obj *));
@@ -754,6 +755,24 @@ int *container_nesting;
     return (struct monst *)0;
 }
 
+/* can zombie dig the location at x,y */
+static boolean
+zombie_can_dig(xchar x, xchar y)
+{
+    if (isok(x,y)) {
+        schar typ = levl[x][y].typ;
+        struct trap *ttmp;
+
+        if ((ttmp = t_at(x, y)) != 0) {
+            return FALSE;
+        }
+        if (typ == ROOM || typ == CORR || typ == GRAVE) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 /*
  * Attempt to revive the given corpse, return the revived monster if
  * successful.  Note: this does NOT use up the corpse if it fails.
@@ -772,6 +791,7 @@ boolean by_hero;
     xchar x, y;
     boolean one_of;
     int montype, container_nesting = 0;
+    boolean is_zomb = (mons[corpse->corpsenm].mlet == S_ZOMBIE);
 
     if (corpse->otyp != CORPSE) {
         impossible("Attempting to revive %s?", xname(corpse));
@@ -780,9 +800,11 @@ boolean by_hero;
 
     x = y = 0;
     if (corpse->where != OBJ_CONTAINED) {
-        /* only for invent, minvent, or floor */
+        int locflags = is_zomb ? BURIED_TOO : 0;
+
+        /* only for invent, minvent, or floor, or if zombie, buried */
         container = 0;
-        (void) get_obj_location(corpse, &x, &y, 0);
+        (void) get_obj_location(corpse, &x, &y, locflags);
     } else {
         /* deal with corpses in [possibly nested] containers */
         struct monst *carrier;
@@ -816,6 +838,11 @@ boolean by_hero;
                           || container->otyp == STATUE
                           || (container->otyp == BAG_OF_HOLDING && rn2(40)))))
         return (struct monst *) 0;
+
+    /* buried zombie cannot dig itself out, do not revive */
+    if (is_zomb && corpse->where == OBJ_BURIED && !zombie_can_dig(x, y)) {
+        return (struct monst *) 0;
+    }
 
     /* record the object's location now that we're sure where it is */
     corpse->ox = x, corpse->oy = y;
@@ -975,6 +1002,8 @@ remove_corpse(corpse)
 struct obj *corpse;
 {
     xchar x, y;
+    boolean is_zomb = (mons[corpse->corpsenm].mlet == S_ZOMBIE);
+
     switch (corpse->where) {
     case OBJ_INVENT:
         useup(corpse);
@@ -995,6 +1024,13 @@ struct obj *corpse;
         obj_extract_self(corpse);
         obfree(corpse, (struct obj *) 0);
         break;
+    case OBJ_BURIED:
+        if (is_zomb) {
+            obj_extract_self(corpse);
+            obfree(corpse, (struct obj *) 0);
+            break;
+        }
+        /* fall through */
     default:
         panic("remove_corpse");
     }

@@ -92,6 +92,9 @@
 	  - Adjusted quantity formula when wishing for stackable items
 	  - 'Readable' Hawaiian shirt designs (by Michael Meyer)
 
+	* Imported NetHack 3.7 features
+	  - Mild Zombie Apocalypse (monsters killed by zombies might rise as zombies)
+
 	* bug fixes:
 	  - Fix over-escaping of characters on HTML dump map
 	  - Fix crash when /dev/(u)random can't be opened

@@ -1871,7 +1871,14 @@ post_stone: if (mdef->mhp > 0) return 0;
             place_monster(mdef, mdef->mx, mdef->my);
             mdef->mhp = 0;
         }
+        zombify = (!otmp &&
+                   zombie_maker(magr) &&
+                   ((mattk->aatyp == AT_TUCH ||
+                     mattk->aatyp == AT_CLAW ||
+                     mattk->aatyp == AT_BITE) &&
+                   zombie_form(mdef->data) != NON_PM));
         monkilled(mdef, "", (int)mattk->adtyp);
+        zombify = FALSE; /* reset */
         if (!DEADMONSTER(mdef)) {
             return res; /* mdef lifesaved */
         } else if (res == MM_AGR_DIED) {

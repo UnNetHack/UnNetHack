@@ -18,6 +18,7 @@ static boolean FDECL(trapmove, (int, int, struct trap *));
 static struct monst *FDECL(monstinroom, (struct permonst *, int));
 static boolean FDECL(doorless_door, (int, int));
 static void FDECL(move_update, (BOOLEAN_P));
+static void check_buried_zombies(xchar, xchar);
 static void FDECL(struggle_sub, (const char *));
 static boolean check_interrupt(struct monst *mtmp);
 
@@ -1807,6 +1808,27 @@ u_rooted()
     return FALSE;
 }
 
+/* reduce zombification timeout of buried zombies around px, py */
+static void
+check_buried_zombies(xchar x, xchar y)
+{
+    struct obj *otmp;
+    long t;
+
+    for (otmp = level.buriedobjlist; otmp; otmp = otmp->nobj) {
+        if (otmp->otyp == CORPSE &&
+            otmp->timed &&
+            (otmp->ox >= x - 1 &&
+             otmp->ox <= x + 1 &&
+             otmp->oy >= y - 1 &&
+             otmp->oy <= y + 1 &&
+             (t = peek_timer(ZOMBIFY_MON, obj_to_any(otmp))) > 0)) {
+            t = stop_timer(ZOMBIFY_MON, obj_to_any(otmp));
+            (void) start_timer(max(1, t - rn2(10)), TIMER_OBJECT, ZOMBIFY_MON, obj_to_any(otmp));
+        }
+    }
+}
+
 void
 domove()
 {
@@ -2607,6 +2629,10 @@ pull_free:
                              !!sobj_at(BOULDER, u.ux, u.uy+1) * 3;
             if (wallcount >= 3) nomul(0, 0);
         }
+    }
+
+    if (!Levitation && !Flying && !Stealth) {
+        check_buried_zombies(u.ux, u.uy);
     }
 
     if (hides_under(youmonst.data) || youmonst.data->mlet == S_EEL || u.dx || u.dy) {
