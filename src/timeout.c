@@ -10,6 +10,7 @@ STATIC_DCL void NDECL(vomiting_dialogue);
 STATIC_DCL void NDECL(choke_dialogue);
 STATIC_DCL void NDECL(slime_dialogue);
 STATIC_DCL void FDECL(slimed_to_death, (struct kinfo *));
+STATIC_DCL void NDECL(sickness_dialogue);
 STATIC_DCL void NDECL(phaze_dialogue);
 STATIC_DCL void FDECL(done_timeout, (int, int));
 STATIC_DCL void NDECL(slip_or_trip);
@@ -306,6 +307,38 @@ choke_dialogue()
     exercise(A_STR, FALSE);
 }
 
+static const char *const sickness_texts[] = {
+    "Your illness feels worse.",
+    "Your illness is severe.",
+    "You are at Death's door.",
+};
+
+static void
+sickness_dialogue(void)
+{
+    long j = (Sick & TIMEOUT), i = j / 2L;
+
+    if (i > 0L && i <= SIZE(sickness_texts) && (j % 2) != 0) {
+        char buf[BUFSZ], pronounbuf[40];
+
+        Strcpy(buf, sickness_texts[SIZE(sickness_texts) - i]);
+        /* change the message slightly for food poisoning */
+        if ((u.usick_type & SICK_NONVOMITABLE) == 0) {
+            (void) strsubst(buf, "illness", "sickness");
+        }
+        if (Hallucination && strstri(buf, "Death's door")) {
+            /* youmonst: for Hallucination, mhe()'s mon argument isn't used */
+            Strcpy(pronounbuf, mhe(&youmonst));
+            Sprintf(eos(buf), "  %s %s inviting you in.",
+                    /* upstart() modifies its argument but vtense() doesn't
+                       care whether or not that has already happened */
+                    upstart(pronounbuf), vtense(pronounbuf, "are"));
+        }
+        pline("%s", buf);
+    }
+    exercise(A_CON, FALSE);
+}
+
 static NEARDATA const char *const levi_texts[] = {
     "You float slightly lower.",
     "You wobble unsteadily %s the %s."
@@ -524,19 +557,35 @@ nh_timeout()
             u.luckturn = moves;
         }
     }
-    if(Phasing) phasing_dialogue();
-    if(u.uinvulnerable) return; /* things past this point could kill you */
-    if(Stoned) stoned_dialogue();
-    if(Slimed) slime_dialogue();
-    if(Vomiting) vomiting_dialogue();
-    if(Strangled) choke_dialogue();
+
+    if (Phasing) {
+        phasing_dialogue();
+    }
+    if (u.uinvulnerable) {
+        return; /* things past this point could kill you */
+    }
+    if (Stoned) {
+        stoned_dialogue();
+    }
+    if (Slimed) {
+        slime_dialogue();
+    }
+    if (Vomiting) {
+        vomiting_dialogue();
+    }
+    if (Strangled) {
+        choke_dialogue();
+    }
+    if (Sick) {
+        sickness_dialogue();
+    }
     if (HLevitation & TIMEOUT) {
         levitation_dialogue();
     }
     if (HPasses_walls & TIMEOUT) {
         phaze_dialogue();
     }
-    if(u.mtimedone && !--u.mtimedone) {
+    if (u.mtimedone && !--u.mtimedone) {
         if (Unchanging) {
             u.mtimedone = rnd(100*youmonst.data->mlevel + 1);
         } else if (is_were(youmonst.data)) {
@@ -545,7 +594,9 @@ nh_timeout()
             rehumanize();
         }
     }
-    if(u.ucreamed) u.ucreamed--;
+    if (u.ucreamed) {
+        u.ucreamed--;
+    }
 
     /* Dissipate spell-based protection. */
     if (u.usptime) {
