@@ -2802,7 +2802,9 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
          * appears).
          */
         stoned = FALSE;
-        if (!cansee(x, y)) pline("Maybe not...");
+        if (!cansee(x, y) && !vamp_rise_msg) {
+            pline("Maybe not...");
+        }
         return;
     }
 
