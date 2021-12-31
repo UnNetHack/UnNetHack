@@ -34,6 +34,7 @@ extern int curses_read_attrs(char *attrs);
 
 enum { optn_silenterr = -1, optn_err = 0, optn_ok = 1 };
 
+#ifdef REALTIME_ON_BOTL
 static const char* realtime_type_strings[] = {
     "disabled",
     "play time",
@@ -44,6 +45,7 @@ static const char* realtime_format_strings[] = {
     "condensed",
     "units",
 };
+#endif
 
 /*
  *  NOTE:  If you add (or delete) an option, please update the short
@@ -458,8 +460,8 @@ static struct Comp_Opt
     { "role",     "your starting role (e.g., Barbarian, Valkyrie)",
       PL_CSIZ, DISP_IN_GAME },
 #ifdef REALTIME_ON_BOTL
-    {"realtime", "play time display", 1, SET_IN_GAME},
-    {"realtime_format", "format of displayed play time", 1, SET_IN_GAME},
+    {"realtime", "show realtime in status line", 1, SET_IN_GAME},
+    {"realtime_format", "format of realtime in status line", 1, SET_IN_GAME},
 #endif
     { "runmode", "display frequency when `running' or `travelling'",
       sizeof "teleport", SET_IN_GAME },
@@ -900,8 +902,10 @@ initoptions()
     iflags.pilesize = 5;
     iflags.getpos_coords = GPCOORDS_NONE;
 
+#ifdef REALTIME_ON_BOTL
     iflags.showrealtime = REALTIME_NONE;
     iflags.realtime_format = REALTIME_FORMAT_UNITS;
+#endif
 
     /* Set the default monster and object class symbols. */
     flags.initrole = ROLE_NONE;
@@ -3428,6 +3432,7 @@ goodfruit:
         return retval;
     }
 
+#ifdef REALTIME_ON_BOTL
     /* backwards compatibility */
     fullname = "showrealtime";
     if (match_optname(opts, fullname, 12, FALSE)) {
@@ -3477,6 +3482,7 @@ goodfruit:
         }
         return retval;
     }
+#endif
 
     /* things to disclose at end of game */
     if (match_optname(opts, "disclose", 7, TRUE)) {
@@ -4783,6 +4789,7 @@ boolean setinitial, setfromfile;
             }
         }
         retval = TRUE;
+#ifdef REALTIME_ON_BOTL
     } else if (!strcmp("realtime", optname)) {
         const char *mode_name;
         menu_item *mode_pick = (menu_item *)0;
@@ -4794,7 +4801,7 @@ boolean setinitial, setfromfile;
             add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, *mode_name, 0,
                      ATR_NONE, mode_name, MENU_UNSELECTED);
         }
-        end_menu(tmpwin, "Select type of elapsed time to show:");
+        end_menu(tmpwin, "Type of time to show on status bar:");
         if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
             iflags.showrealtime = mode_pick->item.a_int - 1;
             free(mode_pick);
@@ -4812,13 +4819,14 @@ boolean setinitial, setfromfile;
             add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, *mode_name, 0,
                      ATR_NONE, mode_name, MENU_UNSELECTED);
         }
-        end_menu(tmpwin, "Select the format of the display of elapsed time:");
+        end_menu(tmpwin, "Format used by realtime display:");
         if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
             iflags.realtime_format = mode_pick->item.a_int - 1;
             free(mode_pick);
         }
         destroy_nhwindow(tmpwin);
         retval = TRUE;
+#endif
     } else if (!strcmp("runmode", optname)) {
         const char *mode_name;
         menu_item *mode_pick = (menu_item *)0;
