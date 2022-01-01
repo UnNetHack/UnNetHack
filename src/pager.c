@@ -1052,6 +1052,21 @@ add_obj_info(winid datawin, struct obj *obj, short otyp)
     if (olet == POTION_CLASS) {
         /* nothing special */
         OBJPUTSTR("Potion.");
+
+        if (obj) {
+            const char *potion_desc = OBJ_DESCR(objects[obj->otyp]);
+            if (is_colorless_mix_potion(obj)) {
+                OBJPUTSTR("Is a colorless potion.");
+            } else if (!strcmp(potion_desc, "black")) {
+                OBJPUTSTR("Turns light colored potions into their dark colored variants.");
+            } else if (!strcmp(potion_desc, "white")) {
+                OBJPUTSTR("Turns dark colored potions into their light colored variants.");
+            } else if (!is_colorless_mix_potion(obj)) {
+                Sprintf(buf, "Is a %s %s colored potion.",
+                        is_dark_mix_color(obj) ? "dark" : "light", get_base_mix_color(obj));
+                OBJPUTSTR(buf);
+            }
+        }
     }
 
     if (olet == SCROLL_CLASS) {

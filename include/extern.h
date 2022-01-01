@@ -2072,6 +2072,9 @@ E void FDECL(mongrantswish, (struct monst **));
 E void FDECL(djinni_from_bottle, (struct obj *));
 E struct monst *FDECL(split_mon, (struct monst *, struct monst *));
 E const char *NDECL(bottlename);
+extern boolean is_dark_mix_color(struct obj *);
+extern boolean is_colorless_mix_potion(struct obj *);
+extern const char* get_base_mix_color(struct obj *);
 
 /* ### pray.c ### */
 

@@ -1659,7 +1659,7 @@ do_illness:
     {
 
         /* Note: potionbreathe() does its own docall() */
-        if ((distance==0 || ((distance < 3) && rn2(5))) &&
+        if ((distance == 0 || ((distance < 3) && rn2(5))) &&
             (!breathless(youmonst.data) || haseyes(youmonst.data))) {
             potionbreathe(obj);
         } else if (obj->dknown && !objects[obj->otyp].oc_name_known &&
@@ -1887,7 +1887,7 @@ register struct obj *obj;
  */
 
 /* Assumes gain ability is first potion and vampire blood is last */
-char alchemy_table1[POT_VAMPIRE_BLOOD - POT_GAIN_ABILITY];
+char alchemy_table1[POT_VAMPIRE_BLOOD - POT_GAIN_ABILITY + 1];
 short alchemy_table2[17];
 
 #define ALCHEMY_WHITE 0
@@ -1908,7 +1908,7 @@ alchemy_init()
         short i;
         const char* potion_desc;
 
-        for(i=POT_GAIN_ABILITY; i<=POT_WATER; i++) {
+        for (i = POT_GAIN_ABILITY; i <= POT_VAMPIRE_BLOOD; i++) {
             potion_desc = OBJ_DESCR(objects[i]);
             if (0==strcmp(potion_desc, "white")) {
                 alchemy_table1[i-POT_GAIN_ABILITY]=0;
@@ -1967,6 +1967,59 @@ alchemy_init()
         }
         init = TRUE;
     }
+}
+
+/** Returns true if the potion is a dark colored potion. */
+boolean
+is_dark_mix_color(struct obj *potion)
+{
+    alchemy_init();
+    int alchemy_index = alchemy_table1[potion->otyp - POT_GAIN_ABILITY];
+    if (alchemy_index >= 0 && IS_DARK_COLOR(alchemy_index)) {
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+/** Returns true if the potion is a colorless potion with regards to color alchemy. */
+boolean
+is_colorless_mix_potion(struct obj *potion)
+{
+    if (potion->otyp >= POT_WATER) {
+        return TRUE;
+    }
+    alchemy_init();
+    if (alchemy_table1[potion->otyp - POT_GAIN_ABILITY] < 0) {
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+/** Returns true if the potion is a colorless potion with regards to color alchemy. */
+const char*
+get_base_mix_color(struct obj *potion)
+{
+    const char *desc = OBJ_DESCR(objects[potion->otyp]);
+
+    if (!strcmp(desc, "pink") || !strcmp(desc, "ruby")) {
+        return "red";
+    } else if (!strcmp(desc, "sky blue") || !strcmp(desc, "indigo")) {
+        return "blue";
+    } else if (!strcmp(desc, "yellow") || !strcmp(desc, "golden")) {
+        return "yellow";
+    } else if (!strcmp(desc, "orange") || !strcmp(desc, "amber")) {
+        return "orange";
+    } else if (!strcmp(desc, "emerald") || !strcmp(desc, "dark green")) {
+        return "green";
+    } else if (!strcmp(desc, "puce") || !strcmp(desc, "magenta")) {
+        return "purple";
+    } else if (!strcmp(desc, "ochre") || !strcmp(desc, "brown")) {
+        return "brown";
+    }
+
+    return "colorless";
 }
 
 /** Returns the potion type when object o1 is dipped into object o2 */
