@@ -1201,6 +1201,11 @@ add_obj_info(winid datawin, struct obj *obj, short otyp)
     }
     OBJPUTSTR(buf);
 
+    if (obj && identified) {
+        Sprintf(buf, "Unidentified description is \"%s\".", cxname_unidentified(obj));
+        OBJPUTSTR(buf);
+    }
+
     /* Scrolls or spellbooks: ink cost */
     if (otyp != STRANGE_OBJECT) {
         if (olet == SCROLL_CLASS || olet == SPBOOK_CLASS) {

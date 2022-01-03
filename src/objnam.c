@@ -479,15 +479,23 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     if (Is_sokoprize(obj)) {
         obj->dknown = 1;
     }
+
     if (Role_if(PM_PRIEST)) {
         obj->bknown = 1; /* actively avoid set_bknown();
                           * we mustn't call update_inventory() now because
                           * it would call xname() (via doname()) recursively
                           * and could end up clobbering all the obufs... */
     }
+
     if (iflags.override_ID) {
         known = dknown = bknown = TRUE;
         nn = 1;
+    } else if (cxn_flags & CXN_UNIDENTIFIED) {
+        /* force unidentified */
+        known = FALSE;
+        dknown = TRUE;
+        bknown = FALSE;
+        nn = FALSE;
     } else {
         known = obj->known;
         dknown = obj->dknown;
@@ -1767,6 +1775,19 @@ struct obj *obj;
     return xname_flags(obj, CXN_SINGULAR);
 }
 #endif /* SORTLOOT */
+
+/** Returns the unidentified name of obj. */
+char *
+cxname_unidentified(obj)
+struct obj *obj;
+{
+    int cxn_flags = CXN_UNIDENTIFIED | CXN_SINGULAR;
+    if (obj->otyp == CORPSE) {
+        return corpse_xname(obj, (const char *) 0, cxn_flags);
+    }
+
+    return xname_flags(obj, cxn_flags);
+}
 
 /* treat an object as fully ID'd when it might be used as reason for death */
 char *

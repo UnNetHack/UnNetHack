@@ -1817,6 +1817,7 @@ E char *FDECL(cxname, (struct obj *));
 #ifdef SORTLOOT
 E char *FDECL(cxname_singular, (struct obj *));
 #endif
+extern char *cxname_unidentified(struct obj *);
 E char *FDECL(killer_xname, (struct obj *));
 E char *FDECL(short_oname, (struct obj *, char *(*)(OBJ_P), char *(*)(OBJ_P), unsigned));
 E const char *FDECL(singular, (struct obj *, char *(*)(OBJ_P)));

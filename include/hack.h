@@ -113,14 +113,15 @@ enum cost_alteration_types {
     COST_CORRODE = 18 /* acid damage */
 };
 
-/* bitmask flags for corpse_xname();
+/* bitmask flags for xname();
    PFX_THE takes precedence over ARTICLE, NO_PFX takes precedence over both */
-#define CXN_NORMAL    0 /* no special handling */
-#define CXN_SINGULAR  1 /* override quantity if greather than 1 */
-#define CXN_NO_PFX    2 /* suppress "the" from "the Unique Monst */
-#define CXN_PFX_THE   4 /* prefix with "the " (unless pname) */
-#define CXN_ARTICLE   8 /* include a/an/the prefix */
-#define CXN_NOCORPSE 16 /* suppress " corpse" suffix */
+#define CXN_NORMAL        0 /* no special handling */
+#define CXN_SINGULAR      1 /* override quantity if greather than 1 */
+#define CXN_NO_PFX        2 /* suppress "the" from "the Unique Monst */
+#define CXN_PFX_THE       4 /* prefix with "the " (unless pname) */
+#define CXN_ARTICLE       8 /* include a/an/the prefix */
+#define CXN_NOCORPSE     16 /* suppress " corpse" suffix */
+#define CXN_UNIDENTIFIED 32 /* force unidentified name */
 
 /* flags for look_here() */
 #define LOOKHERE_PICKED_SOME   1
