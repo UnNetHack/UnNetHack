@@ -376,18 +376,32 @@ unsigned corpseflags;
     case PM_GLOWING_DRAGON:
     case PM_YELLOW_DRAGON:
     case PM_CHROMATIC_DRAGON:
-        /* Make dragon scales.  This assumes that the order of the */
-        /* dragons is the same as the order of the scales.     */
-        if (!rn2(mtmp->mrevived ? 20 : 3)) {
+        /* Make dragon scales.  This assumes that the order of the
+         * dragons is the same as the order of the scales. */
+
+        /* With reviving the dead corpses, this should result in a 50%
+         * chance of getting the chromatic dragon scales in the Dragon Caves. */
+        int chance = 0;
+        if (mtmp->mrevived == 0) {
+            chance = mndx == PM_CHROMATIC_DRAGON ? 6 : 3;
+        } else if (mtmp->mrevived == 1) {
+            chance = 20;
+        } else {
+            if (canseemon(mtmp)) {
+                pline("%s scales look quite %s...", s_suffix(Monnam(mtmp)), hcolor("brittle"));
+            }
+        }
+        if (chance > 0 && rnf(1, chance)) {
             num = GRAY_DRAGON_SCALES + monsndx(mdat) - PM_GRAY_DRAGON;
             obj = mksobj_at(num, x, y, FALSE, FALSE);
             obj->spe = 0;
             obj->cursed = obj->blessed = FALSE;
         }
         goto default_1;
+
     case PM_TIAMAT:
-        /* Make chromatic dragon scales. */
-        if (!rn2(mtmp->mrevived ? 20 : 1)) {
+        /* Make chromatic dragon scales from Tiamat's body only once. */
+        if (mtmp->mrevived == 0) {
             obj = mksobj_at(CHROMATIC_DRAGON_SCALES, x, y, FALSE, FALSE);
             obj->spe = 0;
             obj->cursed = obj->blessed = FALSE;
@@ -397,12 +411,13 @@ unsigned corpseflags;
     case PM_WHITE_UNICORN:
     case PM_GRAY_UNICORN:
     case PM_BLACK_UNICORN:
-        if (mtmp->mrevived && rn2(20)) {
-            if (canseemon(mtmp))
-                pline("%s recently regrown horn crumbles to dust.",
-                      s_suffix(Monnam(mtmp)));
-        } else
+        if ((mtmp->mrevived > 1) || (mtmp->mrevived == 1 && rn2(20))) {
+            if (canseemon(mtmp)) {
+                pline("%s recently regrown horn crumbles to dust.", s_suffix(Monnam(mtmp)));
+            }
+        } else {
             (void) mksobj_at(UNICORN_HORN, x, y, TRUE, FALSE);
+        }
         goto default_1;
     case PM_LONG_WORM:
         (void) mksobj_at(WORM_TOOTH, x, y, TRUE, FALSE);
@@ -505,6 +520,7 @@ default_1:
             /* preserve the unique traits of some creatures */
             obj = mkcorpstat(CORPSE, KEEPTRAITS(mtmp) ? mtmp : 0,
                              mdat, x, y, corpstatflags);
+            obj->mrevived = mtmp->mrevived;
             if (burythem) {
                 boolean dealloc;
 

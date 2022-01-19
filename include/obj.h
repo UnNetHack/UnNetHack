@@ -57,7 +57,7 @@ struct obj {
     char oclass;        /* object class */
     char invlet;        /* designation in inventory */
     int oartifact;      /* artifact array index */
-    int mysterious_reserved_int; /* so I might add something cool in 3.6.1+ */
+    int mrevived;       /* keep track of revivification from former monster */
     xchar where;        /* where the object thinks it is */
 #define OBJ_FREE       0 /* object not attached to anything */
 #define OBJ_FLOOR      1 /* object on floor */

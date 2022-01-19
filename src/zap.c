@@ -683,7 +683,7 @@ boolean adjacentok; /* False: at obj's spot only, True: nearby is allowed */
         mtmp2->mlstmv = mtmp->mlstmv;
         mtmp2->m_ap_type = mtmp->m_ap_type;
         /* set these ones explicitly */
-        mtmp2->mrevived = 1;
+        mtmp2->mrevived = obj->mrevived + 1;
         mtmp2->mavenge = 0;
         mtmp2->meating = 0;
         mtmp2->mleashed = 0;
@@ -989,7 +989,7 @@ boolean by_hero;
     if (corpse->oeaten)
         mtmp->mhp = eaten_stat(mtmp->mhp, corpse);
     /* track that this monster was revived at least once */
-    mtmp->mrevived = 1;
+    mtmp->mrevived = corpse->mrevived + 1;
 
     /* finally, get rid of the corpse--it's gone now */
     remove_corpse(corpse);

@@ -92,6 +92,8 @@
 	  - Port XP curve from FIQHack
 	  - Adjusted quantity formula when wishing for stackable items
 	  - 'Readable' Hawaiian shirt designs (by Michael Meyer)
+	  - Dragon scales and unicorn horns don't drop from repeatedly revived monsters
+	  - Reduced chance of dropping chromatic dragon scales
 
 	* Imported NetHack 3.7 features
 	  - Mild Zombie Apocalypse (monsters killed by zombies might rise as zombies)

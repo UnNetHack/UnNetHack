@@ -94,6 +94,7 @@ struct monst {
     int mtrapped;         /* trapped in a pit, web or bear trap */
     int mfeetfrozen;      /* monster's feet are frozen so it can't
                              move (0 = not frozen) */
+    int mrevived;         /* has been revived from the dead */
 
     Bitfield(female, 1);     /* is female */
     Bitfield(minvis, 1);     /* currently invisible */
@@ -111,7 +112,6 @@ struct monst {
 
     Bitfield(mspeed, 2);    /* current speed */
     Bitfield(permspeed, 2); /* intrinsic mspeed value */
-    Bitfield(mrevived, 1);  /* has been revived from the dead */
     Bitfield(mcloned, 1);   /* has been cloned from another */
     Bitfield(mavenge, 1);   /* did something to deserve retaliation */
     Bitfield(mflee, 1);     /* fleeing */
