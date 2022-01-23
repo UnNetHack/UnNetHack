@@ -655,13 +655,8 @@ validrace(rolenum, racenum)
 int rolenum, racenum;
 {
     /* Assumes validrole */
-    /* WAC -- checks ROLE_GENDMASK and ROLE_ALIGNMASK as well (otherwise, there
-     * might not be an allowed gender or alignment for that role
-     */
-    return (racenum >= 0 && racenum < SIZE(races)-1 &&
-            (roles[rolenum].allow & races[racenum].allow & ROLE_RACEMASK) &&
-            (roles[rolenum].allow & races[racenum].allow & ROLE_GENDMASK) &&
-            (roles[rolenum].allow & races[racenum].allow & ROLE_ALIGNMASK));
+    return (racenum >= 0 && racenum < SIZE(races) - 1 &&
+            (roles[rolenum].allow & races[racenum].allow & ROLE_RACEMASK));
 }
 
 int
