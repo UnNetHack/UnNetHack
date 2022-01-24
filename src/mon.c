@@ -375,7 +375,7 @@ unsigned corpseflags;
     case PM_GREEN_DRAGON:
     case PM_GLOWING_DRAGON:
     case PM_YELLOW_DRAGON:
-    case PM_CHROMATIC_DRAGON:
+    case PM_CHROMATIC_DRAGON: {
         /* Make dragon scales.  This assumes that the order of the
          * dragons is the same as the order of the scales. */
 
@@ -398,6 +398,7 @@ unsigned corpseflags;
             obj->cursed = obj->blessed = FALSE;
         }
         goto default_1;
+    }
 
     case PM_TIAMAT:
         /* Make chromatic dragon scales from Tiamat's body only once. */
