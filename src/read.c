@@ -39,11 +39,14 @@ STATIC_PTR void FDECL(undo_flood, (int, int, genericptr_t));
 STATIC_PTR void FDECL(set_lit, (int, int, genericptr_t));
 
 static boolean
-learn_scroll_typ(scrolltyp)
-short scrolltyp;
+learn_scroll_typ(short scrolltyp, boolean verbose)
 {
     if (!objects[scrolltyp].oc_name_known) {
-        makeknown(scrolltyp);
+        if (verbose) {
+            makeknown_msg(scrolltyp);
+        } else {
+            makeknown(scrolltyp);
+        }
         more_experienced(0, 0, 10);
         return TRUE;
     } else {
@@ -59,7 +62,7 @@ struct obj *sobj;
     /* it's implied that sobj->dknown is set;
        we couldn't be reading this scroll otherwise */
     if (sobj->oclass != SPBOOK_CLASS) {
-        (void) learn_scroll_typ(sobj->otyp);
+        (void) learn_scroll_typ(sobj->otyp, FALSE);
     }
 }
 
@@ -1622,11 +1625,17 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                         if (shop_h2o && (obj->cursed || obj->blessed)) {
                             alter_cost(obj, 0L); /* price goes up */
                         }
-                    } else {
+                    } else if (obj->cursed) {
                         if (shop_h2o) {
                             costly_alteration(obj, COST_UNCURS);
                         }
                         uncurse(obj);
+                        /* if the object was known to be cursed and is now known not to be,
+                           make the scroll known; it's trivial to identify anyway by comparing
+                           inventory before and after */
+                        if (obj->bknown && otyp == SCR_REMOVE_CURSE) {
+                            (void) learn_scroll_typ(SCR_REMOVE_CURSE, TRUE);
+                        }
                     }
                 }
             }
@@ -1859,7 +1868,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             pline("This is an identify scroll.");
         }
         if (!already_known) {
-            (void) learn_scroll_typ(SCR_IDENTIFY);
+            (void) learn_scroll_typ(SCR_IDENTIFY, FALSE);
         }
         /* fall through */
     case SPE_IDENTIFY:
@@ -1987,7 +1996,7 @@ case SPE_MAGIC_MAPPING:
         useup(sobj);
         sobj = 0; /* it's gone */
         if (!already_known) {
-            (void) learn_scroll_typ(SCR_FIRE);
+            (void) learn_scroll_typ(SCR_FIRE, FALSE);
         }
         if (confused) {
             if (Fire_resistance) {
