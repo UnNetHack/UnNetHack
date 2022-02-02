@@ -1053,7 +1053,7 @@ add_obj_info(winid datawin, struct obj *obj, short otyp)
         /* nothing special */
         OBJPUTSTR("Potion.");
 
-        if (obj) {
+        if (obj && obj->dknown) {
             const char *potion_desc = OBJ_DESCR(objects[obj->otyp]);
             if (is_colorless_mix_potion(obj)) {
                 OBJPUTSTR("Is a colorless potion.");
