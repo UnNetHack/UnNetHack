@@ -380,6 +380,9 @@ release_archive: $(GAME)
 
 dist: release_archive
 
+win32_prerelease_tag:
+	git tag $(RELEASEVERSION)-`git log -1 --date=format:%Y%m%d --format="%cd-%h"`
+
 win32_release: $(GAME)
 	cp $(srcdir)/ChangeLog  $(DESTDIR)$(GAMEDIR)/ChangeLog.txt
 	cp $(srcdir)/README $(DESTDIR)$(GAMEDIR)/README.txt
