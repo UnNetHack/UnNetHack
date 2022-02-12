@@ -869,10 +869,12 @@ movemon(void)
             if (M_AP_TYPE(mtmp) == M_AP_FURNITURE || M_AP_TYPE(mtmp) == M_AP_OBJECT) {
                 continue;
             }
-            if(mtmp->mundetected) continue;
+            if (mtmp->mundetected) {
+                continue;
+            }
         } else if (mtmp->data->mlet == S_EEL &&
                 !mtmp->mundetected &&
-                (mtmp->mflee || distu(mtmp->mx, mtmp->my) > 2) &&
+                (mtmp->mflee || !next2u(mtmp->mx, mtmp->my)) &&
                 !canseemon(mtmp) &&
                 !rn2(4)) {
             /* some eels end up stuck in isolated pools, where they
@@ -2665,7 +2667,7 @@ monkilled(struct monst *mdef, const char *fltxt, int how)
 }
 
 void
-unstuck(struct monst *mtmp)
+unstuck(struct monst* mtmp)
 {
     if (u.ustuck == mtmp) {
         if (u.uswallow) {
@@ -3613,12 +3615,11 @@ restrap(struct monst *mtmp)
 {
     struct trap *t;
 
-
     if (mtmp->mcan || M_AP_TYPE(mtmp) || cansee(mtmp->mx, mtmp->my) ||
         rn2(3) || mtmp == u.ustuck ||
         /* can't hide while trapped except in pits */
         (mtmp->mtrapped && (t = t_at(mtmp->mx, mtmp->my)) && !is_pit(t->ttyp)) ||
-        (sensemon(mtmp) && distu(mtmp->mx, mtmp->my) <= 2)) {
+        (sensemon(mtmp) && next2u(mtmp->mx, mtmp->my))) {
         return FALSE;
     }
 
@@ -4551,8 +4552,11 @@ angry_guards(boolean silent)
            && mtmp->mpeaceful) {
             ct++;
             if (cansee(mtmp->mx, mtmp->my) && mtmp->mcanmove) {
-                if (distu(mtmp->mx, mtmp->my) == 2) nct++;
-                else sct++;
+                if (next2u(mtmp->mx, mtmp->my)) {
+                    nct++;
+                } else {
+                    sct++;
+                }
             }
             if (mtmp->msleeping || mtmp->mfrozen) {
                 slct++;

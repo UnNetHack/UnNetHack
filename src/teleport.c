@@ -1570,8 +1570,8 @@ rloc_to(struct monst *mtmp, coordxy x, coordxy y)
         if (u.uswallow) {
             u_on_newpos(mtmp->mx, mtmp->my);
             docrt();
-        } else if (distu(mtmp->mx, mtmp->my) > 2) {
-           unstuck(mtmp);
+        } else if (!next2u(mtmp->mx, mtmp->my)) {
+            unstuck(mtmp);
         }
     }
 

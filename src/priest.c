@@ -373,7 +373,7 @@ priestname(
     Strcat(pname, " of ");
     /* Astral Call bugfix */
     if (mon->data == &mons[PM_HIGH_PRIEST] && !Hallucination &&
-            Is_astralevel(&u.uz) && distu(mon->mx, mon->my) > 2) {
+            Is_astralevel(&u.uz) && !next2u(mon->mx, mon->my)) {
         Strcat(pname, rnd_gname(str2role((char*)urole.name.m)));
         Strcat(pname, "?");
     } else {

@@ -278,8 +278,8 @@ dig(void)
     /* or perhaps you teleported away */
     if (u.uswallow || !uwep || (!ispick && !is_axe(uwep)) ||
         !on_level(&digging.level, &u.uz) ||
-        ((digging.down ? (dpx != u.ux || dpy != u.uy)
-          : (distu(dpx, dpy) > 2)))) {
+        ((digging.down ? (dpx != u.ux || dpy != u.uy) :
+          !next2u(dpx, dpy)))) {
         return 0;
     }
 

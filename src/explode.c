@@ -418,7 +418,7 @@ explode(coordxy x, coordxy y, int type, int dam, char olet, int expltype)
                     /* if grabber is reaching into hero's spot and
                        hero's spot is within explosion radius, grabber
                        gets hit by double damage */
-                    if (grabbed && (mtmp == u.ustuck) && (distu(x, y) <= 2)) {
+                    if (grabbed && (mtmp == u.ustuck) && next2u(x, y)) {
                         mdam *= 2;
                     }
                     /* being resistant to opposite type of damage makes

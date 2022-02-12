@@ -776,7 +776,7 @@ toofar:
                     return mattacku(mtmp);
                 }
                 /* if confused grabber has wandered off, let go */
-                if (distu(mtmp->mx, mtmp->my) > 2) {
+                if (!next2u(mtmp->mx, mtmp->my)) {
                     unstuck(mtmp);
                 }
             }

@@ -2252,7 +2252,7 @@ breakobj(struct obj *obj, coordxy x, coordxy y, boolean hero_caused, boolean fro
                 levl[x][y].altarmask = AM_CHAOTIC;
             }
             angry_priest();
-        } else if (distu(x, y) <= 2) {
+        } else if (next2u(x, y)) {
             if (!breathless(youmonst.data) || haseyes(youmonst.data)) {
                 /* wet towel protects both eyes and breathing */
                 if (obj->otyp != POT_WATER && !Half_gas_damage) {

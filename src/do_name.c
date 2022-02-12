@@ -2004,7 +2004,7 @@ distant_monnam(struct monst *mon, int article, char *outbuf)
        unless you're adjacent (overridden for hallucination which does
        its own obfuscation) */
     if (mon->data == &mons[PM_HIGH_PRIEST] && !Hallucination &&
-        Is_astralevel(&u.uz) && distu(mon->mx, mon->my) > 2) {
+        Is_astralevel(&u.uz) && !next2u(mon->mx, mon->my)) {
         Strcpy(outbuf, article == ARTICLE_THE ? "the " : "");
         Strcat(outbuf, mon->female ? "high priestess" : "high priest");
     } else {

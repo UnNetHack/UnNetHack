@@ -1442,7 +1442,8 @@ static boolean
 findtravelpath(boolean (*guess) (coordxy, coordxy))
 {
     /* if travel to adjacent, reachable location, use normal movement rules */
-    if (!guess && iflags.travel1 && distmin(u.ux, u.uy, u.tx, u.ty) == 1) {
+    if (!guess && iflags.travel1 &&
+        next2u(u.tx, u.ty)) { /* one step away */
         flags.run = 0;
         if (test_move(u.ux, u.uy, u.tx-u.ux, u.ty-u.uy, TEST_MOVE)) {
             u.dx = u.tx-u.ux;
@@ -2227,7 +2228,7 @@ domove(void)
         }
 
         if (u.ustuck && (x != u.ustuck->mx || y != u.ustuck->my)) {
-            if (distu(u.ustuck->mx, u.ustuck->my) > 2) {
+            if (!next2u(u.ustuck->mx, u.ustuck->my)) {
                 /* perhaps it fled (or was teleported or ... ) */
                 u.ustuck = 0;
             } else if (sticks(youmonst.data)) {

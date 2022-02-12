@@ -520,4 +520,4 @@ struct you {
 /* hero at (x,y)? */
 #define u_at(x,y) ((x) == u.ux && (y) == u.uy)
 
-#endif  /* YOU_H */
+#endif /* YOU_H */

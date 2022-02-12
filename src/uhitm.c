@@ -150,7 +150,7 @@ attack_checks(struct monst *mtmp, struct obj *wep) /**< uwep for attack(), null 
          */
         if (M_AP_TYPE(mtmp) && !Protection_from_shape_changers &&
             /* applied pole-arm attack is too far to get stuck */
-             distu(mtmp->mx, mtmp->my) <= 2) {
+             next2u(mtmp->mx, mtmp->my)) {
             if (!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data, AD_STCK)) {
                 u.ustuck = mtmp;
             }
@@ -1718,7 +1718,7 @@ shade_miss(struct monst *magr, struct monst *mdef, struct obj *obj, boolean thro
 
     if (verbose &&
         ((youdef || cansee(mdef->mx, mdef->my) || sensemon(mdef)) ||
-         (magr == &youmonst && distu(mdef->mx, mdef->my) <= 2))) {
+         (magr == &youmonst && next2u(mdef->mx, mdef->my)))) {
         static const char harmlessly_thru[] = " harmlessly through ";
 
         what = (!obj || shade_aware(obj)) ? "attack" : cxname(obj);

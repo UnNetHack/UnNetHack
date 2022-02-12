@@ -774,10 +774,10 @@ next_to_u(void)
             continue;
         }
         if (mtmp->mleashed) {
-            if (distu(mtmp->mx, mtmp->my) > 2) {
+            if (!next2u(mtmp->mx, mtmp->my)) {
                 mnexto(mtmp);
             }
-            if (distu(mtmp->mx, mtmp->my) > 2) {
+            if (!next2u(mtmp->mx, mtmp->my)) {
                 for (otmp = invent; otmp; otmp = otmp->nobj) {
                     if (otmp->otyp == LEASH &&
                        otmp->leashmon == (int)mtmp->m_id) {
