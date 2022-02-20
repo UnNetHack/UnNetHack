@@ -1508,6 +1508,35 @@ spell_idx(short otyp)
     return -1;
 }
 
+/** forcibly learn spell otyp, if possible */
+boolean
+force_learn_spell(short otyp)
+{
+    int i;
+
+    if (known_spell(otyp)) {
+        return FALSE;
+    }
+
+    for (i = 0; i < MAXSPELL; i++) {
+        if (spellid(i) == NO_SPELL) {
+            break;
+        }
+    }
+
+    if (i == MAXSPELL) {
+        impossible("Too many spells memorized");
+    } else {
+        spl_book[i].sp_id = otyp;
+        spl_book[i].sp_lev = objects[otyp].oc_level;
+        incrnknow(i);
+
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 /** Number of spells hero knows */
 int
 num_spells(void)
