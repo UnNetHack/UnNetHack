@@ -1478,6 +1478,36 @@ initialspell(struct obj *obj)
     return;
 }
 
+/* return TRUE if hero knows spell otyp, FALSE otherwise */
+boolean
+known_spell(short otyp)
+{
+    int i;
+
+    for (i = 0; (i < MAXSPELL) && (spellid(i) != NO_SPELL); i++) {
+        if (spellid(i) == otyp) {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
+/* return index for spell otyp, or -1 if not found */
+int
+spell_idx(short otyp)
+{
+    int i;
+
+    for (i = 0; (i < MAXSPELL) && (spellid(i) != NO_SPELL); i++) {
+        if (spellid(i) == otyp) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 /** Number of spells hero knows */
 int
 num_spells(void)
