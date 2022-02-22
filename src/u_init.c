@@ -1122,7 +1122,11 @@ u_init()
     shambler->mflags2 &= ~M2_WERE;              /* no lycanthropes */
     shambler->mflags2 &= ~M2_PNAME;             /* not a proper name */
 
-    return;
+    /* If we have at least one spell, force starting Pw to be 5,
+       so hero can cast the level 1 spell they should have */
+    if (num_spells() && (u.uenmax < 5)) {
+        u.uen = u.uenmax = u.ueninc[u.ulevel] = 5;
+    }
 }
 
 /* skills aren't initialized, so we use the role-specific skill lists */
@@ -1164,6 +1168,7 @@ register struct trobj *trop;
 {
     struct obj *obj;
     int otyp, i;
+    boolean got_sp1 = FALSE; /* got a level 1 spellbook? */
 
     while (trop->trclass) {
         otyp = (int) trop->trotyp;
@@ -1214,9 +1219,8 @@ register struct trobj *trop;
                       low level players or unbalancing; also
                       spells in restricted skill categories */
                    || (obj->oclass == SPBOOK_CLASS &&
-                       (objects[otyp].oc_level > 3 ||
-                        restricted_spell_discipline(otyp)))
-                   ) {
+                       (objects[otyp].oc_level > (got_sp1 ? 3 : 1) ||
+                        restricted_spell_discipline(otyp)))) {
                 dealloc_obj(obj);
                 obj = mkobj(trop->trclass, FALSE);
                 otyp = obj->otyp;
@@ -1247,6 +1251,11 @@ register struct trobj *trop;
             if (obj->oclass == RING_CLASS ||
                 obj->oclass == SPBOOK_CLASS)
                 nocreate4 = otyp;
+
+            /* First spellbook should be level 1 - did we get it? */
+            if (obj->oclass == SPBOOK_CLASS && objects[obj->otyp].oc_level == 1) {
+                got_sp1 = TRUE;
+            }
         }
 
         if (urace.malenum != PM_HUMAN) {

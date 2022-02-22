@@ -1392,4 +1392,19 @@ struct obj *obj;
     return;
 }
 
+/** Number of spells hero knows */
+int
+num_spells(void)
+{
+    int i;
+
+    for (i = 0; i < MAXSPELL; i++) {
+        if (spellid(i) == NO_SPELL) {
+            break;
+        }
+    }
+
+    return i;
+}
+
 /*spell.c*/
