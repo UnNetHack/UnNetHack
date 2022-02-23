@@ -120,7 +120,7 @@ goodpos(coordxy x, coordxy y, struct monst *mtmp, unsigned int gpflags)
      * which could be co-located and thus get restricted a bit too much.
      * oh well.
      */
-    if (x == u.ux && y == u.uy &&
+    if (u_at(x, y) &&
         mtmp != &youmonst &&
         (mtmp != u.ustuck || !u.uswallow)
         && (!u.usteed || mtmp != u.usteed)

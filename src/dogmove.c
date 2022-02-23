@@ -608,7 +608,7 @@ dog_goal(struct monst *mtmp, struct edog *edog, int after, int udist, int whappr
         (gtyp != DOGFOOD && gtyp != APPORT && monstermoves < edog->hungrytime)) {
         gx = u.ux;
         gy = u.uy;
-        if (after && udist <= 4 && gx == u.ux && gy == u.uy) {
+        if (after && udist <= 4 && u_at(gx, gy)) {
             return -2;
         }
         appr = (udist >= 9) ? 1 : (mtmp->mflee) ? -1 : 0;
@@ -635,7 +635,7 @@ dog_goal(struct monst *mtmp, struct edog *edog, int after, int udist, int whappr
     }
 
 #define FARAWAY (COLNO + 2)     /* position outside screen */
-    if (gx == u.ux && gy == u.uy && !in_masters_sight) {
+    if (u_at(gx, gy) && !in_masters_sight) {
         coord *cp;
 
         cp = gettrack(omx, omy);

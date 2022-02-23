@@ -104,7 +104,7 @@ trapped_chest_at(int ttyp, coordxy x, coordxy y)
         return TRUE;
     }
     /* in inventory, we need to find one which is actually trapped */
-    if (x == u.ux && y == u.uy) {
+    if (u_at(x, y)) {
         for (otmp = invent; otmp; otmp = otmp->nobj) {
             if (Is_box(otmp) && otmp->otrapped) {
                 return TRUE;
@@ -405,7 +405,7 @@ outgoldmap:
             }
             map_object(temp, 1);
         }
-        if (temp && temp->ox == u.ux && temp->oy == u.uy) {
+        if (temp && u_at(temp->ox, temp->oy)) {
             ugold = TRUE;
         }
     }
@@ -437,7 +437,7 @@ outgoldmap:
                 }
             }
         }
-        if (temp && temp->ox == u.ux && temp->oy == u.uy) {
+        if (temp && u_at(temp->ox, temp->oy)) {
             ugold = TRUE;
         }
     }
@@ -482,7 +482,7 @@ food_detect(struct obj *sobj)
 
     for (obj = fobj; obj; obj = obj->nobj) {
         if (o_in(obj, oclass)) {
-            if (obj->ox == u.ux && obj->oy == u.uy) {
+            if (u_at(obj->ox, obj->oy)) {
                 ctu++;
             } else {
                 ct++;
@@ -493,7 +493,7 @@ food_detect(struct obj *sobj)
         /* no DEADMONSTER(mtmp) check needed since dmons never have inventory */
         for (obj = mtmp->minvent; obj; obj = obj->nobj) {
             if (o_in(obj, oclass)) {
-                if (mtmp->mx == u.ux && mtmp->my == u.uy) {
+                if (u_at(mtmp->mx, mtmp->my)) {
                     ctu++; /* steed or an engulfer with inventory */
                 } else {
                     ct++;
@@ -654,7 +654,7 @@ object_detect(
 
     for (obj = fobj; obj; obj = obj->nobj) {
         if ((!class && !boulder) || o_in(obj, class) || o_in(obj, boulder)) {
-            if (obj->ox == u.ux && obj->oy == u.uy) {
+            if (u_at(obj->ox, obj->oy)) {
                 ctu++;
             } else {
                 ct++;
@@ -667,7 +667,7 @@ object_detect(
 
     for (obj = level.buriedobjlist; obj; obj = obj->nobj) {
         if (!class || o_in(obj, class)) {
-            if (obj->ox == u.ux && obj->oy == u.uy) {
+            if (u_at(obj->ox, obj->oy)) {
                 ctu++;
             } else {
                 ct++;
@@ -976,7 +976,7 @@ detect_obj_traps(
     for (otmp = objlist; otmp; otmp = otmp->nobj) {
         if (Is_box(otmp) && otmp->otrapped &&
              get_obj_location(otmp, &x, &y, BURIED_TOO | CONTAINED_TOO)) {
-            result |= (x == u.ux && y == u.uy) ? OTRAP_HERE : OTRAP_THERE;
+            result |= u_at(x, y) ? OTRAP_HERE : OTRAP_THERE;
             if (show_them) {
                 sense_trap((struct trap *) 0, x, y, how);
             }
@@ -1689,7 +1689,7 @@ dosearch0(int aflag) /**< intrinsic autosearch vs explicit searching */
                 if (!isok(x, y)) {
                     continue;
                 }
-                if (x != u.ux || y != u.uy) {
+                if (!u_at(x, y)) {
                     if (Blind && !aflag) {
                         feel_location(x, y);
                     }
@@ -1766,7 +1766,7 @@ warnreveal(void)
 
     for (x = u.ux - 1; x <= u.ux + 1; x++) {
         for (y = u.uy - 1; y <= u.uy + 1; y++) {
-            if (!isok(x, y) || (x == u.ux && y == u.uy)) {
+            if (!isok(x, y) || u_at(x, y)) {
                 continue;
             }
             if ((mtmp = m_at(x, y)) && warning_of(mtmp) && mtmp->mundetected) {
@@ -1842,7 +1842,7 @@ reveal_terrain_getglyph(coordxy x, coordxy y, int full, unsigned int swallowed, 
            the invisible monster glyph, which is handled like
            an object, replacing any object or trap at its spot) */
         glyph = !swallowed ? glyph_at(x, y) : levl_glyph;
-        if (keep_mons && x == u.ux && y == u.uy && swallowed) {
+        if (keep_mons && u_at(x, y) && swallowed) {
             glyph = mon_to_glyph(u.ustuck);
         } else if (((glyph_is_monster(glyph) || glyph_is_warning(glyph)) &&
                     !keep_mons) ||

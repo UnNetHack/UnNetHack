@@ -244,9 +244,9 @@ md_stop(
 {
     int x, y, distance, min_distance = -1;
 
-    for (x = u.ux-1; x <= u.ux+1; x++) {
-        for (y = u.uy-1; y <= u.uy+1; y++) {
-            if (!isok(x, y) || (x == u.ux && y == u.uy)) {
+    for (x = u.ux - 1; x <= u.ux + 1; x++) {
+        for (y = u.uy - 1; y <= u.uy + 1; y++) {
+            if (!isok(x, y) || u_at(x, y)) {
                 continue;
             }
 
@@ -341,7 +341,7 @@ md_rush(
 
         if ((mon = m_at(fx, fy)) != 0) { /* save monster at this position */
             verbalize("%s", md_exclamations());
-        } else if (fx == u.ux && fy == u.uy) {
+        } else if (u_at(fx, fy)) {
             verbalize("Excuse me.");
         }
 

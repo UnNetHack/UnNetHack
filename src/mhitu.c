@@ -386,7 +386,7 @@ mattacku(struct monst *mtmp)
     /* Is it near you?  Affects your actions */
     boolean range2 = !monnear(mtmp, mtmp->mux, mtmp->muy);
     /* Does it think it's near you?  Affects its actions */
-    boolean foundyou = (mtmp->mux==u.ux && mtmp->muy==u.uy);
+    boolean foundyou = u_at(mtmp->mux, mtmp->muy);
     /* Is it attacking you or your image? */
     boolean youseeit = canseemon(mtmp);
     /* Might be attacking your image around the corner, or

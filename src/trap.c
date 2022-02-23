@@ -327,7 +327,7 @@ maketrap(coordxy x, coordxy y, int typ)
             return (struct trap *) 0;
         }
         oldplace = TRUE;
-        if (u.utrap && (x == u.ux) && (y == u.uy) &&
+        if (u.utrap && u_at(x, y) &&
             ((u.utraptype == TT_BEARTRAP && typ != BEAR_TRAP) ||
              (u.utraptype == TT_WEB && typ != WEB) ||
              (u.utraptype == TT_PIT && !is_pit(typ)))) {
@@ -676,7 +676,7 @@ animate_statue(struct obj *statue, coordxy x, coordxy y, int cause, int *fail_re
     comes_to_life = !canspotmon(mon) ? "disappears" :
                     golem_xform ? "turns into flesh" :
                     (nonliving(mon->data) || is_vampshifter(mon)) ? "moves" : "comes to life";
-    if ((x == u.ux && y == u.uy) || cause == ANIMATE_SPELL) {
+    if (u_at(x, y) || cause == ANIMATE_SPELL) {
         /* "the|your|Manlobbi's statue [of a wombat]" */
         shkp = shop_keeper(*in_rooms(mon->mx, mon->my, SHOPBASE));
         Sprintf(statuename, "%s %s", shk_your(tmpbuf, statue),
@@ -747,7 +747,7 @@ animate_statue(struct obj *statue, coordxy x, coordxy y, int cause, int *fail_re
     delobj(statue);
 
     /* avoid hiding under nothing */
-    if (x == u.ux && y == u.uy && Upolyd && hides_under(youmonst.data) && !OBJ_AT(x, y)) {
+    if (u_at(x, y) && Upolyd && hides_under(youmonst.data) && !OBJ_AT(x, y)) {
         u.uundetected = 0;
     }
 
@@ -1917,7 +1917,7 @@ roll:
                 launch_drop_spot((struct obj *) 0, 0, 0);
                 break;
             }
-        } else if (bhitpos.x == u.ux && bhitpos.y == u.uy) {
+        } else if (u_at(bhitpos.x, bhitpos.y)) {
             if (multi) {
                 nomul(0, 0);
             }
@@ -4346,7 +4346,7 @@ cnv_trap_obj(int otyp, int cnt, struct trap *ttmp, boolean bury_it)
         stackobj(otmp);
     }
     newsym(ttmp->tx, ttmp->ty);
-    if (u.utrap && ttmp->tx == u.ux && ttmp->ty == u.uy) {
+    if (u.utrap && u_at(ttmp->tx, ttmp->ty)) {
         reset_utrap(TRUE);
     }
     deltrap(ttmp);
@@ -4795,7 +4795,7 @@ untrap(boolean force)
         ttmp = 0;
     }
     const char *trapdescr = ttmp ? defsyms[trap_to_defsym(ttmp->ttyp)].explanation : 0;
-    boolean here = (x == u.ux && y == u.uy); /* !u.dx && !u.dy */
+    boolean here = u_at(x, y); /* !u.dx && !u.dy */
 
     for (otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere) {
         /* are there are one or more containers here? */
@@ -4881,7 +4881,7 @@ untrap(boolean force)
             if (deal_with_floor_trap) {
                 if (u.utrap) {
                     You("cannot deal with %s while trapped%s!", the_trap,
-                        (x == u.ux && y == u.uy) ? " in it" : "");
+                        u_at(x, y) ? " in it" : "");
                     return 1;
                 }
                 if ((mtmp = m_at(x, y)) != 0 &&
@@ -5299,8 +5299,8 @@ chest_trap(struct obj *obj, int bodypart, boolean disarm)
             /* unpunish() in advance if either ball or chain (or both)
                is going to be destroyed */
             if (Punished &&
-                ((uchain->ox == u.ux && uchain->oy == u.uy) ||
-                 (uball->where == OBJ_FLOOR && uball->ox == u.ux && uball->oy == u.uy))) {
+                (u_at(uchain->ox, uchain->oy) ||
+                 (uball->where == OBJ_FLOOR && u_at(uball->ox, uball->oy)))) {
                 unpunish();
             }
 
@@ -5530,7 +5530,7 @@ uteetering_at_seen_pit(struct trap *trap)
     return (trap &&
             is_pit(trap->ttyp) &&
             trap->tseen &&
-            trap->tx == u.ux && trap->ty == u.uy &&
+            u_at(trap->tx, trap->ty) &&
             !(u.utrap && u.utraptype == TT_PIT));
 }
 
@@ -5544,7 +5544,7 @@ uescaped_shaft(struct trap *trap)
     return (trap &&
             is_hole(trap->ttyp) &&
             trap->tseen &&
-            trap->tx == u.ux && trap->ty == u.uy);
+            u_at(trap->tx, trap->ty));
 }
 
 /* Destroy a trap that emanates from the floor. */
@@ -5566,7 +5566,7 @@ delfloortrap(struct trap *ttmp)
                  (ttmp->ttyp == ANTI_MAGIC))) {
         struct monst *mtmp;
 
-        if (ttmp->tx == u.ux && ttmp->ty == u.uy) {
+        if (u_at(ttmp->tx, ttmp->ty)) {
             if (u.utraptype != TT_BURIEDBALL) {
                 reset_utrap(TRUE);
             }

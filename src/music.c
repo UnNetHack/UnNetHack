@@ -288,7 +288,7 @@ do_earthquake(int force)
                     } else {
                         You_hear("a thumping sound.");
                     }
-                    if (x==u.ux && y==u.uy) {
+                    if (u_at(x, y)) {
                         You("easily dodge the falling %s.",
                             mon_nam(mtmp));
                     }
@@ -357,7 +357,7 @@ do_pit:             chasm = maketrap(x, y, PIT);
                     if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
                         if (cansee(x, y)) {
                             pline("KADOOM!  The boulder falls into a chasm%s!",
-                                  ((x == u.ux) && (y == u.uy)) ? " below you" : "");
+                                  u_at(x, y) ? " below you" : "");
                         }
                         if (mtmp) {
                             mtmp->mtrapped = 0;
@@ -401,7 +401,7 @@ do_pit:             chasm = maketrap(x, y, PIT);
                                 }
                             }
                         }
-                    } else if (x == u.ux && y == u.uy) {
+                    } else if (u_at(x, y)) {
                         if (u.utrap && u.utraptype == TT_BURIEDBALL) {
                             /* Note:  the chain should break if a pit gets
                                created at the buried ball's location, which

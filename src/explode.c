@@ -167,7 +167,7 @@ explode(coordxy x, coordxy y, int type, int dam, char olet, int expltype)
                 explmask[i][j] = 0;
             }
 
-            if (i+x-1 == u.ux && j+y-1 == u.uy) {
+            if (u_at(i + x - 1, j + y - 1)) {
                 switch (adtyp) {
                 case AD_PHYS:
                     explmask[i][j] = 0;
@@ -202,8 +202,8 @@ explode(coordxy x, coordxy y, int type, int dam, char olet, int expltype)
                 }
             }
             /* can be both you and mtmp if you're swallowed or riding */
-            mtmp = m_at(i+x-1, j+y-1);
-            if (!mtmp && i+x-1 == u.ux && j+y-1 == u.uy) {
+            mtmp = m_at(i + x - 1, j + y - 1);
+            if (!mtmp && u_at(i + x - 1, j + y - 1)) {
                 mtmp = u.usteed;
             }
 
@@ -325,7 +325,7 @@ explode(coordxy x, coordxy y, int type, int dam, char olet, int expltype)
                 if (explmask[i][j] == 2) {
                     continue;
                 }
-                if (i+x-1 == u.ux && j+y-1 == u.uy) {
+                if (u_at(i + x - 1, j + y - 1)) {
                     uhurt = (explmask[i][j] == 1) ? 1 : 2;
                 /* for inside_engulfer, only <u.ux,u.uy> is affected */
                 } else if (inside_engulfer) {
@@ -337,8 +337,8 @@ explode(coordxy x, coordxy y, int type, int dam, char olet, int expltype)
                                          type, &shopdamage, exploding_wand_typ);
                 }
 
-                mtmp = m_at(i+x-1, j+y-1);
-                if (!mtmp && i+x-1 == u.ux && j+y-1 == u.uy) {
+                mtmp = m_at(i + x - 1, j + y - 1);
+                if (!mtmp && u_at(i + x - 1, j + y - 1)) {
                     mtmp = u.usteed;
                 }
 
@@ -744,7 +744,7 @@ scatter(int sx, int sy,  /**< location of objects to scatter */
                             stmp->stopped = TRUE;
                         }
                     }
-                } else if (bhitpos.x==u.ux && bhitpos.y==u.uy) {
+                } else if (u_at(bhitpos.x, bhitpos.y)) {
                     if (scflags & MAY_HITYOU) {
                         int hitvalu, hitu;
 
@@ -795,7 +795,7 @@ scatter(int sx, int sy,  /**< location of objects to scatter */
     }
 
     newsym(sx, sy);
-    if (sx == u.ux && sy == u.uy && u.uundetected && hides_under(youmonst.data)) {
+    if (u_at(sx, sy) && u.uundetected && hides_under(youmonst.data)) {
         (void) hideunder(&youmonst);
     }
 

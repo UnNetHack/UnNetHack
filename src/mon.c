@@ -1502,9 +1502,9 @@ nexttry:    /* eels prefer the water, but if there is no water nearby,
                     if(!(flag & ALLOW_SSM)) continue;
                     info[cnt] |= ALLOW_SSM;
                 }
-                if ((nx == u.ux && ny == u.uy) ||
+                if (u_at(nx, ny) ||
                     (nx == mon->mux && ny == mon->muy)) {
-                    if (nx == u.ux && ny == u.uy) {
+                    if (u_at(nx, ny)) {
                         /* If it's right next to you, it found you,
                          * displaced or no.  We must set mux and muy
                          * right now, so when we return we can tell

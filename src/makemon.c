@@ -1296,7 +1296,7 @@ _makemon(struct permonst *ptr, coordxy x, coordxy y, int mmflags)
     struct monst *mtmp;
     int mndx, mcham, ct, mitem, xlth, mhitdie;
     boolean anymon = (!ptr);
-    boolean byyou = (x == u.ux && y == u.uy);
+    boolean byyou = u_at(x, y);
     boolean allow_minvent = ((mmflags & NO_MINVENT) == 0);
     boolean countbirth = ((mmflags & MM_NOCOUNTBIRTH) == 0);
     unsigned gpflags = (mmflags & MM_IGNOREWATER) ? MM_IGNOREWATER : 0;

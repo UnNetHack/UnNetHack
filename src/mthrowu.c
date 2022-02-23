@@ -144,7 +144,7 @@ drop_throw(struct obj *obj, boolean ohit, coordxy x, coordxy y)
             /* don't double-dip on damage */
             if (!flooreffects(obj, x, y, "fall")) {
                 place_object(obj, x, y);
-                if (!mtmp && x == u.ux && y == u.uy) {
+                if (!mtmp && u_at(x, y)) {
                     mtmp = &youmonst;
                 }
                 if (mtmp && ohit) {
@@ -612,7 +612,7 @@ m_throw(
             if (ohitmon(mtmp, singleobj, range, TRUE)) {
                 break;
             }
-        } else if (bhitpos.x == u.ux && bhitpos.y == u.uy) {
+        } else if (u_at(bhitpos.x, bhitpos.y)) {
             if (multi) {
                 nomul(0, 0);
             }
@@ -1151,7 +1151,7 @@ linedup(
 
     if ((!tbx || !tby || abs(tbx) == abs(tby)) /* straight line or diagonal */
        && distmin(tbx, tby, 0, 0) < BOLT_LIM) {
-        if (ax == u.ux && ay == u.uy) {
+        if (u_at(ax, ay)) {
             return (boolean)(couldsee(bx, by));
         } else if (clear_path(ax, ay, bx, by)) {
             return TRUE;

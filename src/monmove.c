@@ -175,10 +175,14 @@ onscary(coordxy x, coordxy y, struct monst *mtmp)
         return TRUE;
     }
 
-    return (sobj_at(SCR_SCARE_MONSTER, x, y)
-            || ((!flags.elberethignore && sengr_at("Elbereth", x, y)) &&
-                 ((u.ux == x && u.uy == y) || (Displaced && mtmp->mux == x && mtmp->muy == y)))
-           );
+    /* the scare monster scroll doesn't have any of the below
+     * restrictions, being its own source of power */
+    if (sobj_at(SCR_SCARE_MONSTER, x, y)) {
+        return TRUE;
+    }
+
+    return ((!flags.elberethignore && sengr_at("Elbereth", x, y)) &&
+            (u_at(x, y) || (Displaced && mtmp->mux == x && mtmp->muy == y)));
 }
 
 /* regenerate lost hit points */
@@ -1444,7 +1448,7 @@ nxti:
             nix = mtmp->mux;
             niy = mtmp->muy;
         }
-        if (nix == u.ux && niy == u.uy) {
+        if (u_at(nix, niy)) {
             mtmp->mux = u.ux;
             mtmp->muy = u.uy;
             return 0;
@@ -1872,7 +1876,7 @@ set_apparxy(struct monst *mtmp)
 
     /* monsters which know where you are don't suddenly forget,
        if you haven't moved away */
-    if (mx == u.ux && my == u.uy) {
+    if (u_at(mx, my)) {
         goto found_you;
     }
 

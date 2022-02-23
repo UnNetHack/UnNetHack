@@ -393,7 +393,7 @@ pick_lock(
 
     /* Very clumsy special case for this, but forcing the player to
      * a)pply > just to open a safe, when a)pply . works in all other cases? */
-    if ((cc.x == u.ux && cc.y == u.uy) || picktyp == STETHOSCOPE) { /* pick lock on a container */
+    if (u_at(cc.x, cc.y) || picktyp == STETHOSCOPE) { /* pick lock on a container */
         const char *verb;
         char qsfx[QBUFSZ];
         boolean it;
@@ -742,7 +742,7 @@ doopen_indir(coordxy x, coordxy y)
     }
 
     /* open at yourself/up/down */
-    if ((cc.x == u.ux) && (cc.y == u.uy)) {
+    if (u_at(cc.x, cc.y)) {
         return doloot();
     }
 
@@ -885,7 +885,7 @@ doclose(void)
 
     x = u.ux + u.dx;
     y = u.uy + u.dy;
-    if ((x == u.ux) && (y == u.uy)) {
+    if (u_at(x, y)) {
         You("are in the way!");
         return 1;
     }

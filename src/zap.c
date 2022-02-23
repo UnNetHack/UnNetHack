@@ -3976,7 +3976,7 @@ boomhit(struct obj *obj, int dx, int dy)
             bhitpos.y -= dy;
             break;
         }
-        if (bhitpos.x == u.ux && bhitpos.y == u.uy) { /* ct == 9 */
+        if (u_at(bhitpos.x, bhitpos.y)) { /* ct == 9 */
             if (Fumbling || rn2(20) >= ACURR(A_DEX)) {
                 /* we hit ourselves */
                 (void) thitu(10 + obj->spe, dmgval(obj, &youmonst), &obj, "boomerang");
@@ -4465,10 +4465,10 @@ burn_floor_objects(coordxy x, coordxy y, boolean give_feedback, boolean u_caused
                 /* save name before potential delobj() */
                 if (give_feedback) {
                     obj->quan = 1;
-                    Strcpy(buf1, (x == u.ux && y == u.uy) ?
+                    Strcpy(buf1, u_at(x, y) ?
                            xname(obj) : distant_name(obj, xname));
                     obj->quan = 2;
-                    Strcpy(buf2, (x == u.ux && y == u.uy) ?
+                    Strcpy(buf2, u_at(x, y) ?
                            xname(obj) : distant_name(obj, xname));
                     obj->quan = scrquan;
                 }
@@ -4759,9 +4759,9 @@ buzzmonst:
                     miss(fltxt, mon);
                 }
             }
-        } else if (sx == u.ux && sy == u.uy && range >= 0) {
+        } else if (u_at(sx, sy) && range >= 0) {
             nomul(0, 0);
-            if (u.usteed && !rn2(3) && !mon_reflects(u.usteed, (char *)0)) {
+            if (u.usteed && !rn2(3) && !mon_reflects(u.usteed, (char *) 0)) {
                 mon = u.usteed;
                 goto buzzmonst;
             } else if (zap_hit((int) u.uac, 0)) {
@@ -5074,7 +5074,7 @@ zap_over_floor(coordxy x, coordxy y, int type, boolean *shopdamage, short int ex
                     You_hear("a crackling sound.");
                 }
 
-                if (x == u.ux && y == u.uy) {
+                if (u_at(x, y)) {
                     if (u.uinwater) { /* not just `if (Underwater)' */
                         /* leave the no longer existent water */
                         u.uinwater = 0;

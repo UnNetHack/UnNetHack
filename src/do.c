@@ -164,7 +164,7 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
         ttyp = t->ttyp;
         tseen = t->tseen ? TRUE : FALSE;
         if (((mtmp = m_at(x, y)) && mtmp->mtrapped) ||
-            (u.utrap && u.ux == x && u.uy == y)) {
+            (u.utrap && u_at(x, y))) {
             if (*verb && (cansee(x, y) || distu(x, y) == 0)) {
                 pline("%s boulder %s into the pit%s.",
                       Blind ? "A" : "The",
@@ -214,7 +214,7 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
             }
         }
         if (*verb) {
-            if (Blind && (x == u.ux) && (y == u.uy)) {
+            if (Blind && u_at(x, y)) {
                 You_hear("a CRASH! beneath you.");
             } else if (!Blind && cansee(x, y)) {
                 pline_The("boulder %s%s.",
@@ -265,8 +265,7 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
         /* Reasonably bulky objects (arbitrary) splash when dropped.
          * If you're floating above the water even small things make noise.
          * Stuff dropped near fountains always misses */
-        if ((Blind || (Levitation || Flying || Wwalking)) &&
-             !Deaf && ((x == u.ux) && (y == u.uy))) {
+        if ((Blind || (Levitation || Flying)) && !Deaf && u_at(x, y)) {
             if (!Underwater) {
                 if (weight(obj) > 9) {
                     pline("Splash!");
@@ -278,7 +277,7 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
             newsym(x, y);
         }
         return water_damage(obj, NULL, FALSE) == ER_DESTROYED;
-    } else if (u.ux == x && u.uy == y && (t = t_at(x, y)) != 0 &&
+    } else if (u_at(x, y) && (t = t_at(x, y)) != 0 &&
                (uteetering_at_seen_pit(t) || uescaped_shaft(t))) {
         /* you escaped a pit and are standing on the precipice */
         if (Blind && !Deaf) {

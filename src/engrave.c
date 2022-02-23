@@ -270,10 +270,9 @@ surface(coordxy x, coordxy y)
 {
     struct rm *lev = &levl[x][y];
 
-    if ((x == u.ux) && (y == u.uy) && u.uswallow &&
-        is_animal(u.ustuck->data))
+    if (u_at(x, y) && u.uswallow && is_animal(u.ustuck->data)) {
         return "maw";
-    else if (IS_AIR(lev->typ) && Is_airlevel(&u.uz)) {
+    } else if (IS_AIR(lev->typ) && Is_airlevel(&u.uz)) {
         return "air";
     } else if (is_pool(x, y)) {
         return (Underwater && !Is_waterlevel(&u.uz)) ? "bottom" : hliquid("water");

@@ -683,7 +683,7 @@ deserted_shop(char *enterstring)
 
     for (x = r->lx; x <= r->hx; ++x) {
         for (y = r->ly; y <= r->hy; ++y) {
-            if (x == u.ux && y == u.uy) {
+            if (u_at(x, y)) {
                 continue;
             }
             if ((mtmp = m_at(x, y)) != 0) {
@@ -1567,7 +1567,7 @@ dopay(void)
             pline("Try again...");
             return 0;
         }
-        if (u.ux == cx && u.uy == cy) {
+        if (u_at(cx, cy)) {
             You("are generous to yourself.");
             return 0;
         }
@@ -2208,7 +2208,7 @@ set_repo_loc(struct monst *shkp)
         or entry spot, then your gear gets dumped all the way inside */
     if (*u.ushops != eshkp->shoproom ||
         IS_DOOR(levl[u.ux][u.uy].typ) ||
-        (u.ux == eshkp->shk.x && u.uy == eshkp->shk.y)) {
+        u_at(eshkp->shk.x, eshkp->shk.y)) {
         /* shk.x,shk.y is the position immediately in
          * front of the door -- move in one more space
          */
@@ -4212,7 +4212,7 @@ shk_move(struct monst *shkp)
         if ((!Is_blackmarket(&u.uz) && (Invis || u.usteed) && !inside_shop(u.ux, u.uy))) {
             avoid = FALSE;
         } else {
-            uondoor = (u.ux == eshkp->shd.x && u.uy == eshkp->shd.y);
+            uondoor = u_at(eshkp->shd.x, eshkp->shd.y);
             if (uondoor) {
                 badinv = (!Is_blackmarket(&u.uz) &&
                           (carrying(PICK_AXE) ||

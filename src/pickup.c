@@ -2051,7 +2051,7 @@ lootcont:
                               u.ux, u.uy, &cc)) {
             return 0;
         }
-        if (cc.x == u.ux && cc.y == u.uy) {
+        if (u_at(cc.x, cc.y)) {
             underfoot = TRUE;
             if (container_at(cc.x, cc.y, FALSE)) {
                 goto lootcont;

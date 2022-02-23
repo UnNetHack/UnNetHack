@@ -790,7 +790,7 @@ newsym(coordxy x, coordxy y)
 
     /* only permit updating the hero when swallowed */
     if (u.uswallow) {
-        if (x == u.ux && y == u.uy) {
+        if (u_at(x, y)) {
             display_self();
         }
         return;
@@ -835,7 +835,7 @@ newsym(coordxy x, coordxy y)
             return;
         }
 
-        if (x == u.ux && y == u.uy) {
+        if (u_at(x, y)) {
             int see_self = canspotself();
 
             /* update map information for <u.ux,u.uy> (remembered topology
@@ -874,8 +874,8 @@ newsym(coordxy x, coordxy y)
 
     /* Can't see the location. */
     else {
-        if (x == u.ux && y == u.uy) {
-            feel_location(u.ux, u.uy);  /* forces an update */
+        if (u_at(x, y)) {
+            feel_location(u.ux, u.uy); /* forces an update */
 
             if (canspotself()) {
                 display_self();
@@ -1277,7 +1277,7 @@ under_water(int mode)
         for (y = u.uy-1; y <= u.uy+1; y++) {
             if (isok(x, y)) {
                 if ((is_pool_or_lava(x, y) || is_ice(x, y) || is_swamp(x, y))) {
-                    if (Blind && !(x == u.ux && y == u.uy)) {
+                    if (Blind && !u_at(x, y)) {
                         show_glyph(x, y, cmap_to_glyph(S_stone));
                     } else {
                         newsym(x, y);

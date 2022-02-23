@@ -642,7 +642,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
     struct monst *mtmp = m_at(x, y); /* may be madeby */
     boolean madeby_u = (madeby == BY_YOU);
     boolean madeby_obj = (madeby == BY_OBJECT);
-    boolean at_u = (x == u.ux) && (y == u.uy);
+    boolean at_u = u_at(x, y);
     boolean wont_fall = Levitation || Flying;
 
     if (at_u && u.utrap) {
@@ -856,7 +856,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
 void
 liquid_flow(coordxy x, coordxy y, schar typ, struct trap *ttmp, const char *fillmsg)
 {
-    boolean u_spot = (x == u.ux && y == u.uy);
+    boolean u_spot = u_at(x, y);
 
     if (ttmp) {
         (void) delfloortrap(ttmp);
@@ -1316,8 +1316,8 @@ use_pick_axe2(struct obj *obj)
                 !on_level(&digging.level, &u.uz) || digging.down) {
                 if (flags.autodig &&
                     dig_target == DIGTYP_ROCK && !digging.down &&
-                    digging.pos.x == u.ux &&
-                    digging.pos.y == u.uy &&
+                    u_at(digging.pos.x, digging.pos.y) &&
+                    digging.pos.x == u.ux && digging.pos.y == u.uy &&
                     (moves <= digging.lastdigtime+2 &&
                      moves >= digging.lastdigtime)) {
                     /* avoid messages if repeated autodigging */
@@ -1952,9 +1952,9 @@ pit_flow(struct trap *trap, schar filltyp)
         levl[t.tx][t.ty].typ = filltyp;
         levl[t.tx][t.ty].flags = 0;
         liquid_flow(t.tx, t.ty, filltyp, trap,
-                    (t.tx == u.ux && t.ty == u.uy)
-                    ? "Suddenly %s flows in from the adjacent pit!"
-                    : (char *) 0);
+                    u_at(t.tx, t.ty) ?
+                    "Suddenly %s flows in from the adjacent pit!" :
+                    (char *) 0);
         for (idx = 0; idx < 8; ++idx) {
             if (t.conjoined & (1 << idx)) {
                 int x, y;
@@ -2287,7 +2287,8 @@ rot_corpse(anything *arg, long int timeout UNUSED)
         if (mtmp && !OBJ_AT(x, y) && mtmp->mundetected &&
             hides_under(mtmp->data)) {
             mtmp->mundetected = 0;
-        } else if (x == u.ux && y == u.uy && u.uundetected && hides_under(youmonst.data)) {
+        } else if (u_at(x, y) &&
+                   u.uundetected && hides_under(youmonst.data)) {
             (void) hideunder(&youmonst);
         }
         newsym(x, y);

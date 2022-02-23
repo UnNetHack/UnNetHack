@@ -403,7 +403,7 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
 
     buf[0] = monbuf[0] = '\0';
     glyph = glyph_at(x, y);
-    if (u.ux == x && u.uy == y && canspotself() &&
+    if (u_at(x, y) && canspotself() &&
          !(iflags.save_uswallow &&
            glyph == mon_to_glyph(u.ustuck)) &&
          (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0)) {
@@ -1889,7 +1889,7 @@ do_screen_description(coord cc, boolean looked, glyph_t sym, char *out_str, cons
         /* handle '@' as a special case if it refers to you and you're
            playing a character which isn't normally displayed by that
            symbol; firstmatch is assumed to already be set for '@' */
-        if ((looked ? (sym == monsyms[S_HUMAN] && cc.x == u.ux && cc.y == u.uy) :
+        if ((looked ? (sym == monsyms[S_HUMAN] && u_at(cc.x, cc.y)) :
                       (sym == def_monsyms[S_HUMAN] && !iflags.showrace)) &&
              !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd) {
             found += append_str(out_str, "you"); /* tack on "or you" */
@@ -2583,7 +2583,7 @@ look_all(boolean nearby,  /* True => within BOLTLIM, False => entire map */
 
                     bhitpos.x = x; /* [is this actually necessary?] */
                     bhitpos.y = y;
-                    if (x == u.ux && y == u.uy && canspotself()) {
+                    if (u_at(x, y) && canspotself()) {
                         (void) self_lookat(lookbuf);
                         count++;
                     } else if ((mtmp = m_at(x, y)) != 0) {
