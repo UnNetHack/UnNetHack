@@ -2674,9 +2674,9 @@ extern void dump_spells(void);
 extern boolean parse_spellorder(char *);
 extern const char* spelltypemnemonic(int);
 extern int num_spells(void);
-extern boolean known_spell(short);
+extern int known_spell(short);
 extern int spell_idx(short);
-extern boolean force_learn_spell(short);
+extern char force_learn_spell(short);
 
 /* ### steal.c ### */
 

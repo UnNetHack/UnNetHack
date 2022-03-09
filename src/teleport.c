@@ -958,25 +958,19 @@ dotele(boolean break_the_rules) /**< TRUE: wizard mode ^T */
     }
     if (!trap) {
         boolean castit = FALSE;
-        int sp_no = 0, energy = 0;
+        int energy = 0;
 
-        if (!Teleportation || (u.ulevel < (Role_if(PM_WIZARD) ? 8 : 12)
-                               && !can_teleport(youmonst.data))) {
-            /* Try to use teleport away spell.
-               Prior to 3.6.2 this used to require that you know the spellbook
-               (probably just intended as an optimization to skip the
-               lookup loop) but it is possible to know and cast a spell
-               after forgetting its book due to amnesia. */
-            for (sp_no = 0; sp_no < MAXSPELL; sp_no++) {
-                if (spl_book[sp_no].sp_id == SPE_TELEPORT_AWAY) {
-                    break;
-                }
-            }
+        if (!Teleportation || (u.ulevel < (Role_if(PM_WIZARD) ? 8 : 12) &&
+                               !can_teleport(youmonst.data))) {
+            /* Try to use teleport away spell. */
+            int knownsp = known_spell(SPE_TELEPORT_AWAY);
             /* casting isn't inhibited by being Stunned (...it ought to be) */
-            castit = (sp_no < MAXSPELL && !Confusion);
+            castit = (knownsp >= spe_Fresh && !Confusion);
             if (!castit && !break_the_rules) {
-                const char *reason = ((sp_no < MAXSPELL) ? "can't cast that spell" : "don't know that spell");
-                You("%s.", !Teleportation ? reason : "are not able to teleport at will");
+                You("%s.", (!Teleportation ? ((knownsp != spe_Unknown) ?
+                                              "can't cast that spell" :
+                                              "don't know that spell") :
+                            "are not able to teleport at will"));
                 return 0;
             }
         }
@@ -1023,7 +1017,7 @@ dotele(boolean break_the_rules) /**< TRUE: wizard mode ^T */
         if (castit) {
             /* energy cost is deducted in spelleffects() */
             exercise(A_WIS, TRUE);
-            if (spelleffects(sp_no, TRUE)) {
+            if (spelleffects(SPE_TELEPORT_AWAY, TRUE)) {
                 return 1;
             } else if (!break_the_rules) {
                 return 0;

@@ -26,6 +26,7 @@ static int learn(void);
 static boolean getspell(int *);
 static boolean dospellmenu(const char *, int, int *);
 static int percent_success(int);
+static char *spellretention(int, char *);
 static int throwspell(void);
 static void cast_protection(void);
 static void spell_backfire(int);
@@ -415,7 +416,7 @@ learn(void)
 int
 study_book(struct obj *spellbook)
 {
-    int booktype = spellbook->otyp;
+    int booktype = spellbook->otyp, i;
     boolean confused = (Confusion != 0);
     boolean too_hard = FALSE;
 
@@ -453,6 +454,23 @@ study_book(struct obj *spellbook)
             warning("Unknown spellbook level %d, book %d;",
                     objects[booktype].oc_level, booktype);
             return 0;
+        }
+
+        /* check to see if we already know it and want to refresh our memory */
+        for (i = 0; i < MAXSPELL; i++) {
+            if (spellid(i) == booktype || spellid(i) == NO_SPELL) {
+                break;
+            }
+        }
+        if (spellid(i) == booktype && spellknow(i) > KEEN / 10) {
+            You("know \"%s\" quite well already.",
+                OBJ_NAME(objects[booktype]));
+            /* hero has just been told what spell this book is for; it may
+               have been undiscovered if spell was learned via divine gift */
+            makeknown(booktype);
+            if (yn("Refresh your memory anyway?") == 'n') {
+                return 0;
+            }
         }
 
         /* Books are often wiser than their readers (Rus.) */
@@ -1221,8 +1239,9 @@ dospellmenu(const char *prompt, int splaction, int *spell_no)
 
 {
     winid tmpwin;
-    int i, n, how;
-    char buf[BUFSZ];
+    int i, n, how, splnum;
+    char buf[BUFSZ], retentionbuf[24], sep;
+    const char *fmt;
     menu_item *selected;
     anything any;
 
@@ -1240,21 +1259,34 @@ dospellmenu(const char *prompt, int splaction, int *spell_no)
      * in the window-ports (say via a tab character).
      */
     if (!iflags.menu_tab_sep) {
-        Sprintf(buf, "%-20s     Level  %-12s Fail  Memory",
+        Sprintf(buf, "%-20s     Level %-12s Fail Retention",
                 "    Name", "Category");
+        fmt = "%-20s  %2d%s   %-12s %3d%% %9s";
+        sep = ' ';
     } else {
-        Sprintf(buf, "Name\tLevel\tCategory\tFail");
+        Sprintf(buf, "Name\tLevel\tCategory\tFail\tRetention");
+        fmt = "%s\t%-d\t%s\t%-d%%\t%s";
+        sep = '\t';
     }
+
+    if (wizard) {
+        Sprintf(eos(buf), "%c%6s", sep, "turns");
+    }
+
     add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_BOLD, buf, MENU_UNSELECTED);
+
+
     for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
-        Sprintf(buf, iflags.menu_tab_sep ?
-                "%s\t%-d%s\t%s\t%-d%%" : "%-20s  %2d%s   %-12s %3d%%"
-                "   %3d%%",
-                spellname(i), spellev(i),
+        splnum = i;
+        Sprintf(buf, fmt,
+                spellname(splnum), spellev(splnum),
                 (spellknow(i) > 1000) ? " " : (spellknow(i) ? "!" : "*"),
-                spelltypemnemonic(spell_skilltype(spellid(i))),
-                100 - percent_success(i),
-                (spellknow(i) * 100 + (KEEN-1)) / KEEN);
+                spelltypemnemonic(spell_skilltype(spellid(splnum))),
+                100 - percent_success(splnum),
+                spellretention(splnum, retentionbuf));
+        if (wizard) {
+            Sprintf(eos(buf), "%c%6d", sep, spellknow(i));
+        }
 
         any.a_int = i+1;    /* must be non-zero */
         add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any,
@@ -1454,6 +1486,49 @@ percent_success(int spell)
     return chance;
 }
 
+static char *
+spellretention(int idx, char * outbuf)
+{
+    long turnsleft, percent, accuracy;
+    int skill;
+
+    skill = P_SKILL(spell_skilltype(spellid(idx)));
+    skill = max(skill, P_UNSKILLED); /* restricted same as unskilled */
+    turnsleft = spellknow(idx);
+    *outbuf = '\0'; /* lint suppression */
+
+    if (turnsleft < 1L) {
+        /* spell has expired; hero can't successfully cast it anymore */
+        Strcpy(outbuf, "(gone)");
+    } else if (turnsleft >= (long) KEEN) {
+        /* full retention, first turn or immediately after reading book */
+        Strcpy(outbuf, "100%");
+    } else {
+        /*
+         * Retention is displayed as a range of percentages of
+         * amount of time left until memory of the spell expires;
+         * the precision of the range depends upon hero's skill
+         * in this spell.
+         *    expert:  2% intervals; 1-2,   3-4,  ...,   99-100;
+         *   skilled:  5% intervals; 1-5,   6-10, ...,   95-100;
+         *     basic: 10% intervals; 1-10, 11-20, ...,   91-100;
+         * unskilled: 25% intervals; 1-25, 26-50, 51-75, 76-100.
+         *
+         * At the low end of each range, a value of N% really means
+         * (N-1)%+1 through N%; so 1% is "greater than 0, at most 200".
+         * KEEN is a multiple of 100; KEEN/100 loses no precision.
+         */
+        percent = (turnsleft - 1L) / ((long) KEEN / 100L) + 1L;
+        accuracy = (skill == P_EXPERT) ? 2L :
+                   (skill == P_SKILLED) ? 5L :
+                   (skill == P_BASIC) ? 10L :
+                   25L;
+        /* round up to the high end of this range */
+        percent = accuracy * ((percent - 1L) / accuracy + 1L);
+        Sprintf(outbuf, "%ld%%-%ld%%", percent - accuracy + 1L, percent);
+    }
+    return outbuf;
+}
 
 /* Learn a spell during creation of the initial inventory */
 void
@@ -1478,19 +1553,22 @@ initialspell(struct obj *obj)
     return;
 }
 
-/* return TRUE if hero knows spell otyp, FALSE otherwise */
-boolean
+/* returns one of spe_Unknown, spe_Fresh, spe_GoingStale, spe_Forgotten */
+int
 known_spell(short otyp)
 {
-    int i;
+    int i, k;
 
     for (i = 0; (i < MAXSPELL) && (spellid(i) != NO_SPELL); i++) {
         if (spellid(i) == otyp) {
-            return TRUE;
+            k = spellknow(i);
+            return (k > KEEN / 10) ? spe_Fresh :
+                   (k > 0) ? spe_GoingStale :
+                   spe_Forgotten;
         }
     }
 
-    return FALSE;
+    return spe_Unknown;
 }
 
 /* return index for spell otyp, or -1 if not found */
@@ -1508,33 +1586,34 @@ spell_idx(short otyp)
     return -1;
 }
 
-/** forcibly learn spell otyp, if possible */
-boolean
+/** learn or refresh spell otyp, if feasible; return casting letter or '\0' */
+char
 force_learn_spell(short otyp)
 {
     int i;
 
-    if (known_spell(otyp)) {
-        return FALSE;
+    if (otyp == SPE_BLANK_PAPER || otyp == SPE_BOOK_OF_THE_DEAD ||
+        known_spell(otyp) == spe_Fresh) {
+        return '\0';
     }
 
     for (i = 0; i < MAXSPELL; i++) {
-        if (spellid(i) == NO_SPELL) {
+        if (spellid(i) == NO_SPELL || spellid(i) == otyp) {
             break;
         }
     }
 
     if (i == MAXSPELL) {
         impossible("Too many spells memorized");
-    } else {
-        spl_book[i].sp_id = otyp;
-        spl_book[i].sp_lev = objects[otyp].oc_level;
-        incrnknow(i);
-
-        return TRUE;
+        return '\0';
     }
-
-    return FALSE;
+    /* for a going-stale or forgotten spell the sp_id and sp_lev assignments
+       are redundant but harmless; for an unknown spell, they're essential */
+    spl_book[i].sp_id = otyp;
+    spl_book[i].sp_lev = objects[otyp].oc_level;
+    incrnknow(i); /* set spl_book[i].sp_know to KEEN; unlike when learning
+                   * a spell by reading its book, we don't need to add 1 */
+    return spellet(i);
 }
 
 /** Number of spells hero knows */
