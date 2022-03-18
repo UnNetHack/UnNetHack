@@ -322,7 +322,7 @@ dosounds(void)
             }
             if (mtmp->ispriest && inhistemple(mtmp) &&
                 /* priest must be active */
-                 mtmp->mcanmove && !mtmp->msleeping &&
+                 !helpless(mtmp) &&
                 /* hero must be outside this temple */
                  temple_occupied(u.urooms) != EPRI(mtmp)->shroom) {
                 break;
@@ -467,7 +467,7 @@ growl(struct monst *mtmp)
 {
     const char *growl_verb = 0;
 
-    if (mtmp->msleeping || !mtmp->mcanmove || !mtmp->data->msound) {
+    if (helpless(mtmp) || mtmp->data->msound == MS_SILENT) {
         return;
     }
 
@@ -492,7 +492,7 @@ yelp(struct monst *mtmp)
 {
     const char *yelp_verb = 0;
 
-    if (mtmp->msleeping || !mtmp->mcanmove || !mtmp->data->msound) {
+    if (helpless(mtmp) || !mtmp->data->msound) {
         return;
     }
 
@@ -535,7 +535,7 @@ whimper(struct monst *mtmp)
 {
     const char *whimper_verb = 0;
 
-    if (mtmp->msleeping || !mtmp->mcanmove || !mtmp->data->msound) {
+    if (helpless(mtmp) || !mtmp->data->msound) {
         return;
     }
 
@@ -567,9 +567,10 @@ whimper(struct monst *mtmp)
 void
 beg(struct monst *mtmp)
 {
-    if (mtmp->msleeping || !mtmp->mcanmove ||
-        !(carnivorous(mtmp->data) || herbivorous(mtmp->data)))
+    if (helpless(mtmp) ||
+        !(carnivorous(mtmp->data) || herbivorous(mtmp->data))) {
         return;
+    }
 
     /* presumably nearness and soundok checks have already been made */
     if (!is_silent(mtmp->data) && mtmp->data->msound <= MS_ANIMAL) {
@@ -1217,7 +1218,7 @@ dochat(void)
     }
 
     if (u.usteed && u.dz > 0) {
-        if (!u.usteed->mcanmove || u.usteed->msleeping) {
+        if (helpless(u.usteed)) {
             pline("%s seems not to notice you.", Monnam(u.usteed));
             return 1;
         } else {
@@ -1267,7 +1268,7 @@ dochat(void)
     }
 
     /* sleeping monsters won't talk, except priests (who wake up) */
-    if ((!mtmp->mcanmove || mtmp->msleeping) && !mtmp->ispriest) {
+    if (helpless(mtmp) && !mtmp->ispriest) {
         /* If it is unseen, the player can't tell the difference between
            not noticing him and just not existing, so skip the message. */
         if (canspotmon(mtmp)) {
@@ -1284,7 +1285,7 @@ dochat(void)
             map_invisible(mtmp->mx, mtmp->my);
         }
         pline("%s is eating noisily.", Monnam(mtmp));
-        return 0;
+        return ECMD_OK;
     }
 
     /* That is IT. EVERYBODY OUT. You are DEAD SERIOUS. */

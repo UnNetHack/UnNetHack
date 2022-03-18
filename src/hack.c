@@ -3888,7 +3888,7 @@ check_interrupt(struct monst *mtmp)
             (!is_hider(mtmp->data) || !mtmp->mundetected) &&
             (!mtmp->mpeaceful || Hallucination) &&
             !noattacks(mtmp->data) && !mtmp->msleeping &&
-            mtmp->data->mmove && mtmp->mcanmove &&
+            !helpless(mtmp) &&
             !onscary(u.ux, u.uy, mtmp) &&
             canspotmon(mtmp));
 }

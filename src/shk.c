@@ -25,8 +25,7 @@ static void kops_gone(boolean);
 static boolean
 muteshk(struct monst *shkp)
 {
-    return ((shkp)->msleeping ||
-            !(shkp)->mcanmove ||
+    return (helpless(shkp) ||
             (shkp)->data->msound <= MS_ANIMAL);
 }
 
@@ -1359,7 +1358,7 @@ rile_shk(struct monst *shkp)
 static void
 rouse_shk(struct monst *shkp, boolean verbosely)
 {
-    if (!shkp->mcanmove || shkp->msleeping) {
+    if (helpless(shkp)) {
         /* greed induced recovery... */
         if (verbosely && canspotmon(shkp)) {
             pline("%s %s.", Shknam(shkp),
@@ -1609,7 +1608,7 @@ proceed:
         rouse_shk(shkp, TRUE);
     }
 
-    if (!shkp->mcanmove || shkp->msleeping) { /* still asleep/paralyzed */
+    if (helpless(shkp)) { /* still asleep/paralyzed */
         pline("%s %s.", Shknam(shkp),
               rn2(2) ? "seems to be napping" : "doesn't respond");
         return 0;
@@ -2107,7 +2106,7 @@ inherits(struct monst *shkp, int numsk, int croaked, boolean silently)
             }
             pline("%s %slooks at your corpse%s and %s.",
                   Shknam(shkp),
-                  (!shkp->mcanmove || shkp->msleeping) ? "wakes up, " : "",
+                  helpless(shkp) ? "wakes up, " : "",
                   takes,
                   !inhishop(shkp) ? "disappears" : "sighs");
         }
@@ -2146,7 +2145,7 @@ inherits(struct monst *shkp, int numsk, int croaked, boolean silently)
         umoney = money_cnt(invent);
 
         takes[0] = '\0';
-        if (!shkp->mcanmove || shkp->msleeping) {
+        if (helpless(shkp)) {
             Strcat(takes, "wakes up and ");
         }
         if (distu(shkp->mx, shkp->my) > 2) {
@@ -3754,7 +3753,7 @@ shkcatch(struct obj *obj, coordxy x, coordxy y)
     if (!(shkp = shop_keeper(inside_shop(x, y))) ||
         !inhishop(shkp)) return 0;
 
-    if (shkp->mcanmove && !shkp->msleeping &&
+    if (!helpless(shkp) &&
         (*u.ushops != ESHK(shkp)->shoproom || !inside_shop(u.ux, u.uy)) &&
         dist2(shkp->mx, shkp->my, x, y) < 3 &&
         /* if it is the shk's pos, you hit and anger him */
@@ -3971,7 +3970,7 @@ repair_damage(
     if ((monstermoves - tmp_dam->when) < REPAIR_DELAY) {
         return 0;
     }
-    if (shkp->msleeping || !shkp->mcanmove || ESHK(shkp)->following) {
+    if (helpless(shkp) || ESHK(shkp)->following) {
         return 0;
     }
     x = tmp_dam->place.x;
@@ -4286,7 +4285,7 @@ shopdig(int fall)
 
     /* 0 == can't speak, 1 == makes animal noises, 2 == speaks */
     lang = 0;
-    if (shkp->msleeping || !shkp->mcanmove || is_silent(shkp->data)) {
+    if (helpless(shkp) || is_silent(shkp->data)) {
         ; /* lang stays 0 */
     } else if (shkp->data->msound <= MS_ANIMAL) {
         lang = 1;
@@ -4321,8 +4320,8 @@ shopdig(int fall)
             adjalign(-sgn(u.ualign.type));
         }
     } else if (!um_dist(shkp->mx, shkp->my, 5) &&
-              !shkp->msleeping && shkp->mcanmove &&
-              (ESHK(shkp)->billct || ESHK(shkp)->debit)) {
+               !helpless(shkp) &&
+               (ESHK(shkp)->billct || ESHK(shkp)->debit)) {
         struct obj *obj, *obj2;
 
         if (nolimbs(shkp->data)) {
@@ -4558,7 +4557,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
        || !rn2(50)) {
 getcad:
         if (muteshk(shkp)) {
-            if (animal && shkp->mcanmove && !shkp->msleeping) {
+            if (animal && !helpless(shkp)) {
                 yelp(shkp);
             }
         } else if (pursue || uinshp || !um_dist(x, y, 1)) {
@@ -5087,15 +5086,16 @@ block_door(coordxy x, coordxy y)
         return FALSE;
     }
 
-    if (shkp->mx == ESHK(shkp)->shk.x && shkp->my == ESHK(shkp)->shk.y
+    if (shkp->mx == ESHK(shkp)->shk.x && shkp->my == ESHK(shkp)->shk.y &&
        /* Actually, the shk should be made to block _any_
         * door, including a door the player digs, if the
         * shk is within a 'jumping' distance.
         */
-       && ESHK(shkp)->shd.x == x && ESHK(shkp)->shd.y == y
-       && shkp->mcanmove && !shkp->msleeping
-       && (ESHK(shkp)->debit || ESHK(shkp)->billct || ESHK(shkp)->robbed)) {
-        pline("%s%s blocks your way!", shkname(shkp),
+       ESHK(shkp)->shd.x == x && ESHK(shkp)->shd.y == y &&
+       shkp->mcanmove && !shkp->msleeping &&
+       !helpless(shkp) &&
+       (ESHK(shkp)->debit || ESHK(shkp)->billct || ESHK(shkp)->robbed)) {
+        pline("%s%s blocks your way!", Shknam(shkp),
               Invis ? " senses your motion and" : "");
         return TRUE;
     }
@@ -5129,16 +5129,16 @@ block_entry(coordxy x, coordxy y)
     sx = ESHK(shkp)->shk.x;
     sy = ESHK(shkp)->shk.y;
 
-    if (shkp->mx == sx && shkp->my == sy
-       && shkp->mcanmove && !shkp->msleeping
-       && (x == sx-1 || x == sx+1 || y == sy-1 || y == sy+1)
-       && (Invis ||
-           (!Is_blackmarket(&u.uz) &&
-            (carrying(PICK_AXE) ||
-             carrying(DWARVISH_MATTOCK) ||
-             carrying(CRYSTAL_PICK))) ||
-           u.usteed)) {
-        pline("%s%s blocks your way!", shkname(shkp),
+    if (shkp->mx == sx && shkp->my == sy && !helpless(shkp) &&
+        shkp->mcanmove && !shkp->msleeping &&
+        (x == sx-1 || x == sx+1 || y == sy-1 || y == sy+1) &&
+        (Invis ||
+          (!Is_blackmarket(&u.uz) &&
+           (carrying(PICK_AXE) ||
+            carrying(DWARVISH_MATTOCK) ||
+            carrying(CRYSTAL_PICK))) ||
+          u.usteed)) {
+        pline("%s%s blocks your way!", Shknam(shkp),
               Invis ? " senses your motion and" : "");
         return TRUE;
     }

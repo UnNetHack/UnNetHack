@@ -530,9 +530,10 @@ find_defensive(struct monst *mtmp)
                 if (!isok(xx, yy) || (xx == x && yy == y)) {
                     continue;
                 }
-                if ((mon = m_at(xx, yy)) && is_mercenary(mon->data) &&
-                    mon->data != &mons[PM_GUARD] &&
-                    (mon->msleeping || (!mon->mcanmove))) {
+                if ((mon = m_at(xx, yy)) &&
+                     is_mercenary(mon->data) &&
+                     mon->data != &mons[PM_GUARD] &&
+                     helpless(mon)) {
                     m.defensive = obj;
                     m.has_defense = MUSE_BUGLE;
                     goto toot; /* double break */
@@ -2460,7 +2461,7 @@ munstone(struct monst *mon, boolean by_you)
     if (resists_ston(mon)) {
         return FALSE;
     }
-    if (mon->meating || !mon->mcanmove || mon->msleeping) {
+    if (mon->meating || helpless(mon)) {
         return FALSE;
     }
     mon->mstrategy &= ~STRAT_WAITFORU;
@@ -2619,7 +2620,7 @@ munslime(struct monst *mon, boolean by_you)
     if (slimeproof(mptr)) {
         return FALSE;
     }
-    if (mon->meating || !mon->mcanmove || mon->msleeping) {
+    if (mon->meating || helpless(mon)) {
         return FALSE;
     }
     mon->mstrategy &= ~STRAT_WAITFORU;

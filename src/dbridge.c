@@ -513,14 +513,14 @@ e_missed(struct entity *etmp, boolean chunks)
 
     if (is_flyer(etmp->edata) &&
         (is_u(etmp) ? !Unaware :
-         (etmp->emon->mcanmove && !etmp->emon->msleeping)))
+         !helpless(etmp->emon))) {
         /* flying requires mobility */
         misses = 5; /* out of 8 */
-    else if (is_floater(etmp->edata) ||
-             (is_u(etmp) && Levitation)) /* doesn't require mobility */
+    } else if (is_floater(etmp->edata) ||
+             (is_u(etmp) && Levitation)) { /* doesn't require mobility */
         misses = 3;
-    else if (chunks && is_pool(etmp->ex, etmp->ey)) {
-        misses = 2;                 /* sitting ducks */
+    } else if (chunks && is_pool(etmp->ex, etmp->ey)) {
+        misses = 2; /* sitting ducks */
     } else {
         misses = 0;
     }
@@ -543,9 +543,10 @@ e_jumps(struct entity *etmp)
     int tmp = 4;        /* out of 10 */
 
     if (is_u(etmp) ? (Unaware || Fumbling) :
-        (!etmp->emon->mcanmove || etmp->emon->msleeping ||
-         !etmp->edata->mmove   || etmp->emon->wormno))
+        (helpless(etmp->emon) ||
+         !etmp->edata->mmove || etmp->emon->wormno)) {
         return FALSE;
+    }
 
     if (is_u(etmp) ? Confusion : etmp->emon->mconf) {
         tmp -= 2;

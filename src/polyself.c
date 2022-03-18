@@ -1310,10 +1310,10 @@ dogaze(void)
                     if (yn(qbuf) != 'y') {
                         continue;
                     }
-                    setmangry(mtmp, TRUE);
                 }
-                if (!mtmp->mcanmove || mtmp->mstun || mtmp->msleeping ||
-                    !mtmp->mcansee || !haseyes(mtmp->data)) {
+                setmangry(mtmp, TRUE);
+                if (helpless(mtmp) || mtmp->mstun ||
+                     !mtmp->mcansee || !haseyes(mtmp->data)) {
                     looked--;
                     continue;
                 }

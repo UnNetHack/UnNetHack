@@ -486,8 +486,7 @@ has_aggravatables(struct monst *mon)
             continue;
         }
         if ((mtmp->mstrategy & STRAT_WAITFORU) != 0 ||
-             mtmp->msleeping ||
-             !mtmp->mcanmove) {
+             helpless(mtmp)) {
             return TRUE;
         }
     }
@@ -671,7 +670,7 @@ resurrect(void)
                 if (mtmp->mfrozen == 1) { /* would unfreeze on next move */
                     mtmp->mfrozen = 0,  mtmp->mcanmove = 1;
                 }
-                if (mtmp->mcanmove && !mtmp->msleeping) {
+                if (!helpless(mtmp)) {
                     *mmtmp = mtmp->nmon;
                     mon_arrive(mtmp, TRUE);
                     /* note: there might be a second Wizard; if so,

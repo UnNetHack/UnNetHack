@@ -1655,7 +1655,7 @@ steedintrap(struct trap *trap, struct obj *otmp)
 
     case SLP_GAS_TRAP:
         if (!resists_sleep(steed) && !breathless(steed->data) &&
-             !steed->msleeping && steed->mcanmove) {
+             !helpless(steed)) {
             if (sleep_monst(steed, rnd(25), -1)) {
                 /* no in_sight check here; you can feel it even if blind */
                 pline("%s suddenly falls asleep!", Monnam(steed));
@@ -4482,9 +4482,8 @@ static void
 reward_untrap(struct trap *ttmp, struct monst *mtmp)
 {
     if (!ttmp->madeby_u) {
-        if (rnl(10) < 8 && !mtmp->mpeaceful &&
-            !mtmp->msleeping && !mtmp->mfrozen &&
-            !mindless(mtmp->data) &&
+        if (rnl(10) < 8 && !mtmp->mpeaceful && !helpless(mtmp) &&
+            !mtmp->mfrozen && !mindless(mtmp->data) &&
             mtmp->data->mlet != S_HUMAN) {
             mtmp->mpeaceful = 1;
             set_malign(mtmp); /* reset alignment */
@@ -4656,7 +4655,7 @@ help_monster_out(struct monst *mtmp, struct trap *ttmp)
     }
 
     /* Will our hero succeed? */
-    if ((uprob = untrap_prob(ttmp)) && !mtmp->msleeping && mtmp->mcanmove) {
+    if ((uprob = untrap_prob(ttmp)) && !helpless(mtmp)) {
         You("try to reach out your %s, but %s backs away skeptically.",
             makeplural(body_part(ARM)),
             mon_nam(mtmp));

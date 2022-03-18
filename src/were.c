@@ -94,7 +94,7 @@ new_were(struct monst *mon)
     }
 
     set_mon_data(mon, &mons[pm]);
-    if (mon->msleeping || !mon->mcanmove) {
+    if (helpless(mon)) {
         /* transformation wakens and/or revitalizes */
         mon->msleeping = 0;
         mon->mfrozen = 0;   /* not asleep or paralyzed */

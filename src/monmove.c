@@ -754,7 +754,7 @@ toofar:
             break;
         case 1:     /* monster moved */
             /* Maybe it stepped on a trap and fell asleep... */
-            if (mtmp->msleeping || !mtmp->mcanmove) {
+            if (helpless(mtmp)) {
                 return 0;
             }
             /* Monsters can move and then shoot on same turn;
@@ -805,7 +805,7 @@ toofar:
         }
     }
     /* special speeches for quest monsters */
-    if (!mtmp->msleeping && mtmp->mcanmove && nearby) {
+    if (!helpless(mtmp) && nearby) {
         quest_talk(mtmp);
     }
     /* extra emotional attack for vile monsters */
@@ -1779,10 +1779,11 @@ postmov:
                (just in case the object it was hiding under went away);
                usually set mundetected unless monster can't move.  */
             if (mtmp->mundetected ||
-                (mtmp->mcanmove && !mtmp->msleeping && rn2(5)))
+                (!helpless(mtmp) && rn2(5))) {
                 mtmp->mundetected = (ptr->mlet != S_EEL) ?
                                     OBJ_AT(mtmp->mx, mtmp->my) :
                                     (is_pool(mtmp->mx, mtmp->my) && !Is_waterlevel(&u.uz));
+            }
             newsym(mtmp->mx, mtmp->my);
         }
         if (mtmp->isshk) {

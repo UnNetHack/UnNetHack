@@ -878,8 +878,8 @@ monster_detect(
                  (mtmp->data == &mons[PM_LONG_WORM] && mclass == S_WORM_TAIL)) {
                 map_monst(mtmp, TRUE);
             }
-            if (otmp && otmp->cursed &&
-                (mtmp->msleeping || !mtmp->mcanmove)) {
+
+            if (otmp && otmp->cursed && helpless(mtmp)) {
                 mtmp->msleeping = mtmp->mfrozen = 0;
                 mtmp->mcanmove = 1;
                 woken = TRUE;

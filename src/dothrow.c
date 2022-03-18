@@ -1804,7 +1804,7 @@ thitmonst(
     }
 
     if (obj->oclass == GEM_CLASS && is_unicorn(mon->data)) {
-        if (mon->msleeping || !mon->mcanmove) {
+        if (helpless(mon)) {
             tmiss(obj, mon, FALSE);
             return 0;
         } else if (mon->mtame) {

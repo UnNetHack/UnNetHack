@@ -224,4 +224,7 @@ struct monst {
  * (mon evaluated twice) */
 #define IS_TRAPPED(mon) ((mon)->mtrapped || (mon)->mfeetfrozen)
 
+#define engulfing_u(mon) (u.uswallow && (u.ustuck == (mon)))
+#define helpless(mon) ((mon)->msleeping || !(mon)->mcanmove)
+
 #endif /* MONST_H */
