@@ -5159,15 +5159,25 @@ change it enough..."]],
 made changes to become ready for this task..."]],
       },
       locate_first = {
-         synopsis = "[This is the entrance to %i.]",
+         synopsis = "[This is %i.]",
          output = "text",
-         text = [[The ice and snow gives way to a valley floor.  You %x ahead of you
-a huge round hill surrounded by pools of lava.  This then is the entrance
-to %i.  It looks like you're not going to get in without
-a fight though.]],
+         text = [[
+Your pursuit of %n brings you to an area you have visited only
+once or twice before in your life, but there's no way you have forgotten
+it -- here is the majestic rainbow bridge Bifrost, connecting this realm
+to Muspelheim far below.
+
+But what is this?  As you draw closer, you %x that it is shattered
+and broken.  Cursing, you remember that this too was prophesied: that it
+would be sundered by the weight of %n and %nj forces
+marching across it.
+
+Before you can think about crossing, you realize you have been spotted.
+A grim giant with hatred in his eyes points at you with a gleaming sword
+and says something to his compatriots.  They start moving towards you.]]
       },
       locate_next = {
-         text = "Once again, you stand before the entrance to %i.",
+         text = "Once again, you stand before %i.",
       },
       nemesis_first = {
          synopsis = "[\"%oC has shown me that I must kill you.\"]",

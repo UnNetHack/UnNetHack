@@ -349,7 +349,9 @@ const struct Role roles[] = {
             {"Lord",        "Lady"}
         },
         "Tyr", "Odin", "Loki", /* Norse */
-        "Val", "the Shrine of Destiny", "the cave of Surtur",
+        "Val",
+        "the Shrine of Destiny",
+        "the Shattered Bridge",
         PM_VALKYRIE, NON_PM, NON_PM /*PM_WINTER_WOLF_CUB*/,
         PM_NORN, PM_WARRIOR, PM_LORD_SURTUR,
         ART_ORB_OF_FATE,
