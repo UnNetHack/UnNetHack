@@ -122,6 +122,7 @@
 	  - MONSTERCOLOR could be used to reveal identity of Riders (reported by Nicole Kleinhoff)
 	  - Don't reveal description of spellbook when writing it blind
 	  - Fix statuscolors crash due to incorrect color name parsing
+	  - Empty bag of tricks were considered magical bags
 
 	* build fixes:
 	  - Fix compiling with -fno-common
