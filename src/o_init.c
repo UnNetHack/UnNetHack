@@ -1,4 +1,3 @@
-/*  SCCS Id: @(#)o_init.c   3.4 1999/12/09  */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -192,18 +191,17 @@ shuffle_all()
             oclass != TOOL_CLASS &&
             oclass != WEAPON_CLASS &&
             oclass != ARMOR_CLASS &&
+            oclass != POTION_CLASS &&
             oclass != GEM_CLASS &&
             oclass != VENOM_CLASS) {
             int j = last-1;
 
-            if (oclass == POTION_CLASS)
-                /* water and following have fixed descriptions */
-                j = POT_WATER - 1;
-            else if (oclass == AMULET_CLASS ||
-                     oclass == SCROLL_CLASS ||
-                     oclass == SPBOOK_CLASS) {
-                while (!objects[j].oc_magic || objects[j].oc_unique)
+            if (oclass == AMULET_CLASS ||
+                 oclass == SCROLL_CLASS ||
+                 oclass == SPBOOK_CLASS) {
+                while (!objects[j].oc_magic || objects[j].oc_unique) {
                     j--;
+                }
             }
 
             /* non-magical amulets, scrolls, and spellbooks
@@ -235,6 +233,20 @@ shuffle_all()
         swap_armor(j, pos, GRAY_DRAGON_SCALES);
         swap_armor(j, pos, GRAY_DRAGON_SCALE_MAIL);
     }
+
+    /* Shuffle the potions such that all descriptions that participate in
+     * color alchemy are mapped to potions that actually exist in the game,
+     * so that they can always be alchemized.
+     *
+     * Assumes:
+     * - POT_POLYMORPH maps to the last color description.
+     * - water and beyond have fixed descs
+     * - POT_OIL is the last shuffled potion that isn't just a description.
+     */
+    /* Shuffle the non-color potion descriptions. */
+    shuffle(POT_POLYMORPH + 1, POT_WATER - 1, TRUE);
+    /* Shuffle potions that will exist with no description guarantees. */
+    shuffle(bases[POTION_CLASS], POT_OIL, TRUE);
 }
 
 /**
