@@ -78,6 +78,7 @@
 	  - Redesigned Monk home, upper filler, and locate levels (from xNetHack)
 	  - Updated Barbarian home level (from NetHack 3.7)
 	  - Redesigned Barbarian filler and goal levels (from xNetHack)
+	  - Redesigned Valkyrie home, filler and goal levels (from xNetHack)
 
 	* Sokoban:
 	  - Sokoban's level difficulty is equal to Sokoban's entrance level

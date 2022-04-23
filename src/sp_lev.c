@@ -3937,6 +3937,8 @@ lspo_level_flags(lua_State *L)
             level.flags.hardfloor = 1;
         } else if (!strcmpi(s, "nommap")) {
             level.flags.nommap = 1;
+        } else if (!strcmpi(s, "nommap-boss")){
+            /* ignored for the time being */
         } else if (!strcmpi(s, "shortsighted")) {
             level.flags.shortsighted = 1;
         } else if (!strcmpi(s, "arboreal")) {

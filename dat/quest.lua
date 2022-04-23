@@ -5085,12 +5085,13 @@ that should not be able to live in this environment moving towards you.]],
       goal_first = {
          synopsis = "[This is the lair of %n.]",
          output = "text",
-         text = [[Through clouds of sulphurous gasses, you %x a rock palisade
-surrounded with a moat of bubbling lava.  You remember the description
-from something that %l said.  This is the lair of %n.]],
+         text = [[Through clouds of sulphurous gases, you %x a wall of great stones
+surrounded with a moat of bubbling lava.  This can only be the fortress
+of %n.  From somewhere ahead, you hear a great deep voice
+shouting orders, and you silently hope you have not arrived too late.]],
       },
       goal_next = {
-         text = "Once again, you stand in sight of %ns lair.",
+         text = "Once again, you stand in sight of %ns fortress.",
       },
       gotit = {
          synopsis = "[You must return %o to %l.]",
