@@ -1843,9 +1843,22 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             int random_classes[] = { WEAPON_CLASS, ARMOR_CLASS, RING_CLASS, AMULET_CLASS,
                                      TOOL_CLASS, FOOD_CLASS, POTION_CLASS, SCROLL_CLASS, SPBOOK_CLASS,
                                      WAND_CLASS, COIN_CLASS, GEM_CLASS };
-            return object_detect((struct obj *)0, random_classes[rn2(SIZE(random_classes))], FALSE);
-        } else if (sobj_cursed) return(trap_detect(sobj));
-        else return(gold_detect(sobj));
+            /* We don't want detection behavior depending on the scroll's properties, so object_detect() is
+             * called with a NULL pointer. But then we need to call strange_feeling() manually. */
+            if (object_detect((struct obj *)0, random_classes[rn2(SIZE(random_classes))], FALSE)) {
+                strange_feeling(sobj, (char *) 0);
+                sobj = 0; /* nothing detected: strange_feeling -> useup */
+            }
+        } else if (sobj_cursed) {
+            if (trap_detect(sobj)) {
+                sobj = 0; /* nothing detected: strange_feeling -> useup */
+            }
+        } else {
+            if (gold_detect(sobj)) {
+                sobj = 0; /* nothing detected: strange_feeling -> useup */
+            }
+        }
+        break;
 
     case SCR_FOOD_DETECTION:
     case SPE_DETECT_FOOD:
