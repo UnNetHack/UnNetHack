@@ -98,7 +98,6 @@ const struct Role roles[] = {
         { 14, 0,  0, 8,  2, 0 },/* Hit points */
         {  1, 0,  0, 1,  0, 1 }, 10,/* Energy */
         0, 12, 0, 1,  8, A_INT, SPE_DIG,             -4},
-#ifdef CONVICT
     {   {"Convict", 0}, {
             {"Detainee",     0},
             {"Inmate",   0},
@@ -125,7 +124,6 @@ const struct Role roles[] = {
         {  8, 0,  0, 8,  0, 0 },/* Hit points */
         {  1, 0,  0, 1,  0, 1 }, 10,/* Energy */
         -10, 5, 0, 2, 10, A_INT, SPE_TELEPORT_AWAY,   -4},
-#endif  /* CONVICT */
     {   {"Healer", 0}, {
             {"Rhizotomist",    0},
             {"Empiric",        0},

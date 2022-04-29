@@ -192,10 +192,8 @@ makedog()
     else if (pettype == PM_BABY_CROCODILE)
         petname = crocodilename;
 #endif
-#ifdef CONVICT
     else if (pettype == PM_SEWER_RAT)
         petname = ratname;
-#endif /* CONVICT */
     else
         petname = catname;
 
@@ -210,11 +208,10 @@ makedog()
         }
     }
 
-#ifdef CONVICT
     if (!*petname && pettype == PM_SEWER_RAT) {
         if(Role_if(PM_CONVICT)) petname = "Nicodemus"; /* Rats of NIMH */
     }
-#endif /* CONVICT */
+
     mtmp = makemon(&mons[pettype], u.ux, u.uy, MM_EDOG);
 
     if(!mtmp) return((struct monst *) 0); /* pets were genocided */
@@ -988,13 +985,12 @@ struct obj *obj;
         return FALSE;
     }
 
-#ifdef CONVICT
     if (Role_if(PM_CONVICT) && (is_domestic(mtmp->data) && obj)) {
         /* Domestic animals are wary of the Convict */
         pline("%s still looks wary of you.", Monnam(mtmp));
         return FALSE;
     }
-#endif
+
     /* If we cannot tame it, at least it's no longer afraid. */
     mtmp->mflee = 0;
     mtmp->mfleetim = 0;

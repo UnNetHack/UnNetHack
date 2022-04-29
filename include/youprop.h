@@ -295,9 +295,7 @@
 #define EPasses_walls       u.uprops[PASSES_WALLS].extrinsic
 #define Passes_walls        (HPasses_walls || EPasses_walls || \
                              passes_walls(youmonst.data))
-#ifdef CONVICT
-# define Phasing            u.uprops[PASSES_WALLS].intrinsic
-#endif /* CONVICT */
+#define Phasing             u.uprops[PASSES_WALLS].intrinsic
 
 /*** Physical attributes ***/
 #define HSlow_digestion     u.uprops[SLOW_DIGESTION].intrinsic

@@ -302,7 +302,7 @@ int *attk_count, *role_roll_penalty;
             mtmp->mfrozen = 0;
         }
     }
-#ifdef CONVICT
+
     /* Adding iron ball as a weapon skill gives a -4 penalty for
        unskilled vs no penalty for non-weapon objects.  Add 4 to
        compensate. */
@@ -311,7 +311,7 @@ int *attk_count, *role_roll_penalty;
                        penalty for unskilled vs no penalty for non-
                        weapon objects. */
     }
-#endif /* CONVICT */
+
     if (Role_if(PM_MONK) && !Upolyd) {
         if (uarm) {
             tmp -= (*role_roll_penalty = urole.spelarmr);
@@ -855,11 +855,7 @@ int dieroll;
                 Strcpy(saved_oname, bare_artifactname(obj));
             }
             if (obj->oclass == WEAPON_CLASS || is_weptool(obj) ||
-#ifdef CONVICT
-               obj->oclass == GEM_CLASS || obj->otyp == HEAVY_IRON_BALL) {
-#else
-               obj->oclass == GEM_CLASS) {
-#endif /* CONVICT */
+                obj->oclass == GEM_CLASS || obj->otyp == HEAVY_IRON_BALL) {
 
                 /* is it not a melee weapon? */
                 if (/* if you strike with a bow... */

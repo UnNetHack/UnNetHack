@@ -391,11 +391,9 @@ register struct obj *gold;
                 } else if (mtmp->data == &mons[PM_GUARD]) {
                     goldreqd = 5000L;
                     lawful_bribery_alignment(-2);
-#ifdef CONVICT
                 } else if (mtmp->data == &mons[PM_PRISON_GUARD]) {
                     goldreqd = 200L;
                     lawful_bribery_alignment(-2);
-#endif /* CONVICT */
                 }
 
                 if (goldreqd) {

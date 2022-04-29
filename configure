@@ -789,7 +789,6 @@ enable_seduce
 enable_randomized_planes
 enable_steed
 enable_tourist
-enable_convict
 enable_redo
 enable_clipping
 enable_menu_color
@@ -1495,7 +1494,6 @@ Optional Features:
                           Shuffling order of Elemental Planes (default=yes)
   --enable-steed          Ability to ride monsters (default=yes)
   --enable-tourist        Tourist class (default=yes)
-  --enable-convict        Convict class (default=yes)
   --enable-redo           Redo last command (default=yes)
   --enable-clipping       Allow smaller screens (default=yes)
   --enable-menu-color     TTY graphics menu color (default=yes)
@@ -6956,24 +6954,6 @@ printf "%s\n" "$enable_tourist" >&6; }
    if test "$enable_tourist" != "no" ; then
 
 printf "%s\n" "#define TOURIST /**/" >>confdefs.h
-
-   fi
-
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to enable convict" >&5
-printf %s "checking whether to enable convict... " >&6; }
-   # Check whether --enable-convict was given.
-if test ${enable_convict+y}
-then :
-  enableval=$enable_convict;
-else $as_nop
-  enable_convict="yes"
-fi
-
-   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $enable_convict" >&5
-printf "%s\n" "$enable_convict" >&6; }
-   if test "$enable_convict" != "no" ; then
-
-printf "%s\n" "#define CONVICT /**/" >>confdefs.h
 
    fi
 

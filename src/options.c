@@ -453,10 +453,8 @@ static struct Comp_Opt
       12, DISP_IN_GAME },
     { "race",     "your starting race (e.g., Human, Elf)",
       PL_CSIZ, DISP_IN_GAME },
-#ifdef CONVICT
     { "ratname",  "the name of your (first) rat (e.g., ratname:Squeak)",
       PL_PSIZ, DISP_IN_GAME },
-#endif /* CONVICT */
     { "role",     "your starting role (e.g., Barbarian, Valkyrie)",
       PL_CSIZ, DISP_IN_GAME },
 #ifdef REALTIME_ON_BOTL
@@ -2543,7 +2541,6 @@ boolean tinitial, tfrom_file;
         return retval;
     }
 
-#ifdef CONVICT
     fullname = "ratname";
     if (match_optname(opts, fullname, 3, TRUE)) {
         if (negated) {
@@ -2553,7 +2550,6 @@ boolean tinitial, tfrom_file;
             nmcpy(ratname, op, PL_PSIZ);
         return retval;
     }
-#endif /* CONVICT */
 
     fullname = "nameempty";
     if (match_optname(opts, fullname, sizeof("nameempty")-1, TRUE)) {
@@ -5311,10 +5307,8 @@ char *buf;
     }
     else if (!strcmp(optname, "race"))
         Sprintf(buf, "%s", rolestring(flags.initrace, races, noun));
-#ifdef CONVICT
     else if (!strcmp(optname, "ratname"))
         Sprintf(buf, "%s", ratname[0] ? catname : none );
-#endif /* CONVICT */
 #ifdef REALTIME_ON_BOTL
     else if (!strcmp(optname, "realtime")) {
         Sprintf(buf, "%s", realtime_type_strings[iflags.showrealtime]);

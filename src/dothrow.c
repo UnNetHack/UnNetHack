@@ -1621,11 +1621,9 @@ befriend_with_obj(struct permonst *data, struct obj *obj)
         return FALSE;
     }
 
-#ifdef CONVICT
     if (Role_if(PM_CONVICT) && is_rat(data)) {
         return TRUE;
     }
-#endif
 
 #ifdef EXOTIC_PETS
     /* monkeys are tameable via bananas but not pacifiable via food,

@@ -984,7 +984,6 @@ register struct monst *mtmp;
         break;
 #endif
     case MS_BRIBE:
-#ifdef CONVICT
         if (monsndx(ptr) == PM_PRISON_GUARD) {
             long gdemand = 500 * u.ulevel;
             long goffer = 0;
@@ -1005,11 +1004,11 @@ register struct monst *mtmp;
             } else {
                 verbl_msg = "Out of my way, scum!"; /* still a jerk */
             }
-        } else
-#endif /* CONVICT */
-        if (mtmp->mpeaceful && !mtmp->mtame) {
-            (void) demon_talk(mtmp);
-            break;
+        } else {
+            if (mtmp->mpeaceful && !mtmp->mtame) {
+                (void) demon_talk(mtmp);
+                break;
+            }
         }
     /* fall through */
     case MS_CUSS:
@@ -1065,12 +1064,9 @@ register struct monst *mtmp;
         if (!mtmp->mpeaceful)
             verbl_msg = "You worthless piece of scum!";
         else
-#ifdef CONVICT
-        if (Role_if(PM_CONVICT))
+        if (Role_if(PM_CONVICT)) {
             verbl_msg = "We offer a special discount for our friends on this side of the law.";
-        else
-#endif /* CONVICT */
-        {
+        } else {
             static const char * const one_eyed_sam_msg[3] = {
                 "Psst! If you smuggle me the Amulet of Yendor we can split the profit!",
                 "Today's special: Buy two items and get the third for full price!",
@@ -1259,7 +1255,6 @@ dochat()
         monflee(mtmp, rn1(20, 10), TRUE, FALSE);
     }
 
-#ifdef CONVICT
     if (Role_if(PM_CONVICT) && is_rat(mtmp->data) && !mtmp->mpeaceful &&
         !mtmp->mtame) {
         You("attempt to soothe the %s with chittering sounds.",
@@ -1277,7 +1272,7 @@ dochat()
         }
         return 0;
     }
-#endif /* CONVICT */
+
     return domonnoise(mtmp);
 }
 

@@ -2677,9 +2677,7 @@ void
 punish(sobj)
 register struct obj *sobj;
 {
-#ifdef CONVICT
     struct obj *otmp;
-#endif /* CONVICT */
     struct obj *reuse_ball = (sobj && sobj->otyp == HEAVY_IRON_BALL) ? sobj : (struct obj *) 0;
 
     /* KMH -- Punishment is still okay when you are riding */
@@ -2701,21 +2699,17 @@ register struct obj *sobj;
         return;
     }
     setworn(mkobj(CHAIN_CLASS, TRUE), W_CHAIN);
-#ifdef CONVICT
     if (((otmp = carrying(HEAVY_IRON_BALL)) != 0) &&(otmp->oartifact ==
                                                      ART_IRON_BALL_OF_LIBERATION)) {
         setworn(otmp, W_BALL);
         Your("%s chains itself to you!", xname(otmp));
     } else {
-#endif
         if (!reuse_ball) {
             setworn(mkobj(BALL_CLASS, TRUE), W_BALL);
         } else {
             setworn(reuse_ball, W_BALL);
         }
-#ifdef CONVICT
     }
-#endif /* CONVICT */
     uball->spe = 1;     /* special ball (see save) */
 
     /*

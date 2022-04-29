@@ -1608,11 +1608,9 @@ boolean want_disp;
             if (u.usick_type & SICK_NONVOMITABLE)
                 you_are("sick from illness");
         }
-#ifdef CONVICT
         if (Punished) {
             you_are("punished");
         }
-#endif /* CONVICT */
     }
     if (Stoned) you_are("turning to stone");
     if (Slimed) you_are("turning into slime");

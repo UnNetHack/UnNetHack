@@ -796,7 +796,6 @@ newgame()
     if(MON_AT(u.ux, u.uy)) mnexto(m_at(u.ux, u.uy));
     (void) makedog();
     docrt();
-#ifdef CONVICT
     if (Role_if(PM_CONVICT)) {
         setworn(mkobj(CHAIN_CLASS, TRUE), W_CHAIN);
         setworn(mkobj(BALL_CLASS, TRUE), W_BALL);
@@ -804,19 +803,14 @@ newgame()
         placebc();
         newsym(u.ux, u.uy);
     }
-#endif /* CONVICT */
 
     if (flags.legacy) {
         flush_screen(1);
-#ifdef CONVICT
         if (Role_if(PM_CONVICT)) {
             com_pager(199);
         } else {
             com_pager(1);
         }
-#else
-        com_pager(1);
-#endif /* CONVICT */
     }
 
 #ifdef INSURANCE

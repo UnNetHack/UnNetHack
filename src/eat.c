@@ -1932,19 +1932,17 @@ struct obj *otmp;
                   "Mmm, tripe... not bad!");
         else {
             pline("Yak - dog food!");
-#ifdef CONVICT
             if (Role_if(PM_CONVICT))
                 pline("At least it's not prison food.");
-#endif /* CONVICT */
             more_experienced(1, 1, 0);
             newexplevel();
             /* not cannibalism, but we use similar criteria
                for deciding whether to be sickened by this meal */
-            if (rn2(2) && !CANNIBAL_ALLOWED())
-#ifdef CONVICT
-                if (!Role_if(PM_CONVICT))
-#endif /* CONVICT */
-                make_vomiting((long)rn1(victual.reqtime, 14), FALSE);
+            if (rn2(2) && !CANNIBAL_ALLOWED()) {
+                if (!Role_if(PM_CONVICT)) {
+                    make_vomiting((long)rn1(victual.reqtime, 14), FALSE);
+                }
+            }
         }
         break;
 
@@ -1999,15 +1997,14 @@ struct obj *otmp;
 #endif
         if (otmp->otyp == EGG && stale_egg(otmp)) {
             pline("Ugh.  Rotten egg."); /* perhaps others like it */
-#ifdef CONVICT
             if (Role_if(PM_CONVICT) && (rn2(8) > u.ulevel)) {
                 You_feel("a slight stomach ache."); /* prisoners are used to bad food */
-            } else
-#endif /* CONVICT */
+            } else {
             /* increasing existing nausea means that it will take longer
                before eventual vomit, but also means that constitution
                will be abused more times before illness completes */
-            make_vomiting(Vomiting+d(10, 4), TRUE);
+                make_vomiting(Vomiting+d(10, 4), TRUE);
+            }
         } else
 give_feedback:
             pline("This %s is %s", singular(otmp, xname),
@@ -2949,10 +2946,8 @@ gethungry()
             herbivorous(youmonst.data) ||
             metallivorous(youmonst.data) ||
             is_vampire(youmonst.data))
-#ifdef CONVICT
         /* Convicts can last twice as long at hungry and below */
         && (!Role_if(PM_CONVICT) || (moves % 2) || (u.uhs < HUNGRY))
-#endif /* CONVICT */
         && !Slow_digestion)
         u.uhunger--;        /* ordinary food consumption */
 

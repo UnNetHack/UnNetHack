@@ -437,7 +437,7 @@ invault()
             mongone(guard);
             return;
         }
-#ifdef CONVICT
+
         if (Role_if(PM_CONVICT) && !Upolyd) {
             setmangry(guard, FALSE);
             verbalize("I saw your pic on the wanted poster!");
@@ -447,7 +447,7 @@ invault()
             }
             return;
         }
-#endif /* CONVICT */
+
         if (Strangled || is_silent(youmonst.data) || multi < 0) {
             /* [we ought to record whether this this message has already
                been given in order to vary it upon repeat visits, but

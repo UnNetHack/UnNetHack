@@ -749,13 +749,12 @@ char *enterstring;
             return;
         }
     }
-#ifdef CONVICT
+
     /* Visible striped prison shirt */
     if (!Is_blackmarket(&u.uz) &&
         (uarmu && (uarmu->otyp == STRIPED_SHIRT)) && !uarm && !uarmc) {
         eshkp->pbanned = TRUE;
     }
-#endif /* CONVICT */
 
     rt = rooms[*enterstring - ROOMOFFSET].rtype;
 
@@ -779,24 +778,20 @@ char *enterstring;
             pline("%s is combing through %s inventory list.", Shknam(shkp), noit_mhis(shkp));
         }
     } else {
-#ifdef CONVICT
         if (!eshkp->pbanned || inside_shop(u.ux, u.uy)) {
-#endif /* CONVICT */
-        if (!Deaf && !muteshk(shkp)) {
-            verbalize("%s, %s!  Welcome%s to %s %s!",
-                      Hello(shkp), plname,
-                      eshkp->visitct++ ? " again" : "",
-                      s_suffix(shkname(shkp)),
-                      shtypes[rt - SHOPBASE].name);
-        } else {
-            You("enter %s %s%s!",
-                s_suffix(shkname(shkp)),
-                shtypes[rt - SHOPBASE].name,
-                eshkp->visitct++ ? " again" : "");
+            if (!Deaf && !muteshk(shkp)) {
+                verbalize("%s, %s!  Welcome%s to %s %s!",
+                        Hello(shkp), plname,
+                        eshkp->visitct++ ? " again" : "",
+                        s_suffix(shkname(shkp)),
+                        shtypes[rt - SHOPBASE].name);
+            } else {
+                You("enter %s %s%s!",
+                    s_suffix(shkname(shkp)),
+                    shtypes[rt - SHOPBASE].name,
+                    eshkp->visitct++ ? " again" : "");
+            }
         }
-#ifdef CONVICT
-        }
-#endif /* CONVICT */
     }
     /* can't do anything about blocking if teleported in */
     if (!inside_shop(u.ux, u.uy) && !(Is_blackmarket(&u.uz))) {
@@ -864,11 +859,9 @@ char *enterstring;
             }
             should_block = TRUE;
 #endif
-#ifdef CONVICT
         } else if (eshkp->pbanned) {
             verbalize("I don't sell to your kind here.");
             should_block = TRUE;
-#endif
         } else {
             should_block = (Fast && (sobj_at(PICK_AXE, u.ux, u.uy) ||
                                      sobj_at(DWARVISH_MATTOCK, u.ux, u.uy) ||
@@ -1961,9 +1954,7 @@ boolean silently; /* maybe avoid messages */
     if (firstshk) {
         numsk++;
         taken = inherits(firstshk, numsk, croaked, silently);
-#ifdef CONVICT
         ESHK(firstshk)->pbanned = FALSE; /* Un-ban for bones levels */
-#endif /* CONVICT */
     }
     /* now handle the rest */
     for (mtmp = next_shkp(fmon, FALSE); mtmp; mtmp = next_shkp(mtmp2, FALSE)) {
@@ -1973,9 +1964,7 @@ boolean silently; /* maybe avoid messages */
         if (mtmp != firstshk) {
             numsk++;
             taken |= inherits(mtmp, numsk, croaked, silently);
-#ifdef CONVICT
             eshkp->pbanned = FALSE; /* Un-ban for bones levels */
-#endif /* CONVICT */
         }
         /* for bones: we don't want a shopless shk around */
         if (!local) {
@@ -2327,17 +2316,9 @@ register struct monst *shkp;    /* if angry, impose a surcharge */
             obj->oclass==SPBOOK_CLASS  || obj->oclass==WAND_CLASS     ||
             obj->otyp==LUCKSTONE       || obj->otyp==LOADSTONE        ||
             objects[obj->otyp].oc_magic) {
-#ifdef CONVICT
             tmp *= Role_if(PM_CONVICT) ? 20 : 25;
-#else
-            tmp *= 25;
-#endif
         } else {
-#ifdef CONVICT
             tmp *= Role_if(PM_CONVICT) ? 12 : 15;
-#else
-            tmp *= 15;
-#endif
         }
     }
 #endif /* BLACKMARKET */
@@ -4059,9 +4040,7 @@ struct monst *shkp;
                           (carrying(PICK_AXE) ||
                            carrying(DWARVISH_MATTOCK) ||
                            carrying(CRYSTAL_PICK) ||
-#ifdef CONVICT
                            eshkp->pbanned ||
-#endif /* CONVICT */
                            (Fast && (sobj_at(PICK_AXE, u.ux, u.uy) ||
                                      sobj_at(DWARVISH_MATTOCK, u.ux, u.uy) ||
                                      sobj_at(CRYSTAL_PICK, u.ux, u.uy)))));

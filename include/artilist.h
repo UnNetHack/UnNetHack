@@ -43,12 +43,10 @@ static NEARDATA struct artifact artilist[] = {
             (SPFX_NOGEN | SPFX_RESTR | SPFX_SEEK | SPFX_DEFN | SPFX_INTEL | SPFX_SEARCH),
             0, 0, PHYS(5, 10), SPDF_DRAIN, NO_CARY, 0, A_LAWFUL, PM_KNIGHT, NON_PM,
             4000L, NO_COLOR),
-#ifdef CONVICT
     A("Luck Blade", BROADSWORD,
             (SPFX_RESTR | SPFX_LUCK),
             0, 0, PHYS(5, 6), SPDF_NONE, NO_CARY, 0, A_CHAOTIC, PM_CONVICT, NON_PM,
             3000L, NO_COLOR),
-#endif /* CONVICT */
     /*
      * Stormbringer only has a 2 because it can drain a level,
      * providing 8 more.
@@ -221,12 +219,10 @@ static NEARDATA struct artifact artilist[] = {
             0, 0, PHYS(5, 0), SPDF_NONE, CARY(AD_MAGM), CONFLICT, A_LAWFUL, PM_CAVEMAN, NON_PM,
             2500L, NO_COLOR),
 
-#ifdef CONVICT
     A("The Iron Ball of Liberation", HEAVY_IRON_BALL,
             (SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL),
             (SPFX_DISPL | SPFX_SEARCH | SPFX_WARN), 0, NO_ATTK, SPDF_NONE, CARY(AD_MAGM), PHASING, A_NEUTRAL, PM_PRISONER, NON_PM,
             5000L, NO_COLOR),
-#endif /* CONVICT */
 
 #if 0 /* OBSOLETE */
     A("The Palantir of Westernesse", CRYSTAL_BALL,
