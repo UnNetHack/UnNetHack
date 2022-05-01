@@ -384,7 +384,6 @@ if test "$enable_tty_graphics" != "no"; then
 NETHACK_ARG(status-color,[TTY graphics status color],STATUS_COLORS,yes)
 fi
 NETHACK_ARG(auto-open,[Open doors by walking into them],AUTO_OPEN,yes)
-NETHACK_ARG(elbereth,[Engraving the E-word repels monsters],ELBERETH,yes)
 # NETHACK_ARG(noartifactwish,[Prevent wishing for special artifacts],
 #  NOARTIFACTWISH,no)
 # NETHACK_ARG(no-bones,[Disable loading and saving bones levels],NO_BONES,no)

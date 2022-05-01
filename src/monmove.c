@@ -181,10 +181,8 @@ struct monst *mtmp;
     }
 
     return (sobj_at(SCR_SCARE_MONSTER, x, y)
-#ifdef ELBERETH
             || ((!flags.elberethignore && sengr_at("Elbereth", x, y)) &&
                  ((u.ux == x && u.uy == y) || (Displaced && mtmp->mux == x && mtmp->muy == y)))
-#endif
            );
 }
 

@@ -75,9 +75,6 @@
 /* Dungeon growth */
 #undef DUNGEON_GROWTH
 
-/* Engraving the E-word repels monsters */
-#undef ELBERETH
-
 /* Show experience on bottom line */
 #undef EXP_ON_BOTL
 

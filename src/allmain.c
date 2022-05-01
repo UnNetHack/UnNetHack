@@ -153,10 +153,9 @@ boolean resuming;
     int timeout_start = rnd(10000)+25000;
     int past_clock;
     /* for keeping track of Elbereth and correctstatus line display */
-#ifdef ELBERETH
     int was_on_elbereth = 0;
     int is_on_elbereth = 0;
-#endif
+
     boolean can_regen = can_regenerate();
 
     flags.moonphase = phase_of_the_moon();
@@ -533,14 +532,12 @@ boolean resuming;
             if (vision_full_recalc) vision_recalc(0);   /* vision! */
         }
 
-#ifdef ELBERETH
         /* check changes of Elbereth at current player location */
         is_on_elbereth = sengr_at("Elbereth", u.ux, u.uy);
         if (was_on_elbereth != is_on_elbereth) {
             was_on_elbereth = is_on_elbereth;
             flags.botlx = 1;
         }
-#endif
 
 #ifdef REALTIME_ON_BOTL
         if (iflags.showrealtime) {

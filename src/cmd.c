@@ -74,9 +74,7 @@ extern int NDECL(dothrow); /**/
 extern int NDECL(doeat); /**/
 extern int NDECL(done2); /**/
 extern int NDECL(doengrave); /**/
-#ifdef ELBERETH
 extern int NDECL(doengrave_elbereth); /**/
-#endif
 extern int NDECL(dopickup); /**/
 extern int NDECL(ddoinv); /**/
 extern int NDECL(dotypeinv); /**/
@@ -1513,7 +1511,6 @@ boolean want_disp;
     dump_title(buf);
     dump_list_start();
 
-#ifdef ELBERETH
     if (u.uevent.uhand_of_elbereth) {
         static const char * const hofe_titles[3] = {
             "the Hand of Elbereth",
@@ -1522,7 +1519,6 @@ boolean want_disp;
         };
         you_are(hofe_titles[u.uevent.uhand_of_elbereth - 1]);
     }
-#endif
 
     /* heaven or hell modes */
     if (heaven_or_hell_mode) {
@@ -2281,7 +2277,6 @@ boolean want_disp;
     }
 
 #ifdef ELBERETH_CONDUCT
-#ifdef ELBERETH
     /* no point displaying the conduct if Elbereth doesn't do anything */
     if (flags.elberethignore) {
         you_have_been("ignored by Elbereth");
@@ -2294,7 +2289,6 @@ boolean want_disp;
             you_have_never("engraved Elbereth");
         }
     }
-#endif /* ELBERETH */
 #endif /* ELBERETH_CONDUCT */
 
     if (wizard || discover || final) {
@@ -2370,9 +2364,7 @@ struct ext_func_tab extcmdlist[] = {
     {   'D',  "droptype", "drop specific item types", doddrop, 0, NULL },
     {   'e',  "eat", "eat something", doeat, 0, NULL },
     {   'E',  "engrave", "engrave writing on the floor", doengrave, 0, NULL },
-#ifdef ELBERETH
     { C('e'), "engraveelbereth", "engrave \"Elbereth\" on the floor", doengrave_elbereth, 0, NULL },
-#endif
     { M('e'), "enhance", "advance or check weapon and spell skills", enhance_weapon_skill,
               IFBURIED | AUTOCOMPLETE, NULL },
     {  '\0',  "exploremode", "enter explore (discovery) mode", enter_explore_mode, IFBURIED, NULL },

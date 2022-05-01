@@ -339,7 +339,6 @@ xchar x, y;
     return((struct engr *) 0);
 }
 
-#ifdef ELBERETH
 /* Decide whether a particular string is engraved at a specified
  * location; a case-insensitive substring match is used.
  * Ignore headstones, in case the player names herself "Elbereth".
@@ -361,7 +360,6 @@ xchar x, y;
 
     return FALSE;
 }
-#endif /* ELBERETH */
 
 #ifdef ELBERETH_CONDUCT
 /** Return the number of distinct times Elbereth is engraved at
@@ -588,7 +586,6 @@ doengrave()
     return engrave(NULL, FALSE);
 }
 
-#ifdef ELBERETH
 int
 doengrave_elbereth()
 {
@@ -599,7 +596,6 @@ doengrave_elbereth()
         return engrave("Elbereth", TRUE);
     }
 }
-#endif
 
 static
 int

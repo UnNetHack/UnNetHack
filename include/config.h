@@ -367,8 +367,6 @@ typedef long glyph_t;
 #define KOPS        /* Keystone Kops by Scott R. Turner */
 #define SEDUCE      /* Succubi/incubi seduction, by KAA, suggested by IM */
 
-/* difficulty */
-#define ELBERETH    /* Engraving the E-word repels monsters */
 /* I/O */
 #define REDO        /* support for redoing last command - DGK */
 #if !defined(MAC)

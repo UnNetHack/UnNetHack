@@ -466,9 +466,6 @@ make_version()
 #ifdef INSURANCE
 			| (1L << 18)
 #endif
-#ifdef ELBERETH
-			| (1L << 19)
-#endif
 #ifdef EXP_ON_BOTL
 			| (1L << 20)
 #endif
@@ -663,9 +660,6 @@ static const char *build_opts[] = {
 		"elapsed time on status line",
 #endif
 		"dungeon map overview patch",
-#ifdef ELBERETH
-		"Elbereth",
-#endif
 #ifdef EXP_ON_BOTL
 		"experience points on status line",
 #endif
@@ -1053,9 +1047,7 @@ h_filter(line)
 #ifndef SINKS
 	if (!strcmp(tag, "SINKS")) skip = TRUE;
 #endif
-#ifndef ELBERETH
 	if (!strcmp(tag, "ELBERETH")) skip = TRUE;
-#endif
     } else if (skip && !strncmp(line, "-----", 5))
 	skip = FALSE;
     return skip;

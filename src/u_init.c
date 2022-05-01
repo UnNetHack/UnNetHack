@@ -538,9 +538,7 @@ u_init()
     u.ublessed = 0;             /* not worthy yet */
     u.ugangr   = 0;             /* gods not angry */
     u.ugifts   = 0;             /* no divine gifts bestowed */
-# ifdef ELBERETH
     u.uevent.uhand_of_elbereth = 0;
-# endif
     u.uevent.uheard_tune = 0;
     u.uevent.uopened_dbridge = 0;
     u.uevent.udemigod = 0;      /* not a demi-god yet... */
@@ -1032,9 +1030,7 @@ register struct trobj *trop;
                    || otyp == nocreate2
                    || otyp == nocreate3
                    || otyp == nocreate4
-#ifdef ELBERETH
                    || otyp == RIN_LEVITATION
-#endif
                    /* 'useless' items */
                    || otyp == POT_HALLUCINATION
                    || otyp == POT_ACID

@@ -792,7 +792,6 @@ enable_clipping
 enable_menu_color
 enable_status_color
 enable_auto_open
-enable_elbereth
 enable_bones_pool
 enable_user_sounds
 enable_exp_on_botl
@@ -1495,7 +1494,6 @@ Optional Features:
   --enable-menu-color     TTY graphics menu color (default=yes)
   --enable-status-color   TTY graphics status color (default=yes)
   --enable-auto-open      Open doors by walking into them (default=yes)
-  --enable-elbereth       Engraving the E-word repels monsters (default=yes)
   --enable-bones-pool     Multiple bones per level (default=yes)
   --enable-user-sounds    Allow user-defined mapping from messages to sounds)
                           (default=no)
@@ -7008,24 +7006,6 @@ printf "%s\n" "$enable_auto_open" >&6; }
    if test "$enable_auto_open" != "no" ; then
 
 printf "%s\n" "#define AUTO_OPEN /**/" >>confdefs.h
-
-   fi
-
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to enable elbereth" >&5
-printf %s "checking whether to enable elbereth... " >&6; }
-   # Check whether --enable-elbereth was given.
-if test ${enable_elbereth+y}
-then :
-  enableval=$enable_elbereth;
-else $as_nop
-  enable_elbereth="yes"
-fi
-
-   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $enable_elbereth" >&5
-printf "%s\n" "$enable_elbereth" >&6; }
-   if test "$enable_elbereth" != "no" ; then
-
-printf "%s\n" "#define ELBERETH /**/" >>confdefs.h
 
    fi
 
