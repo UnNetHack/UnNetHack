@@ -461,9 +461,6 @@ make_version()
 #ifdef TOURIST
 			| (1L << 10)
 #endif
-#ifdef STEED
-			| (1L << 11)
-#endif
 			| (1L << 12)
 		/* flag bits and/or other global variables (15..26) */
 #ifdef TEXTCOLOR
@@ -724,9 +721,6 @@ static const char *build_opts[] = {
 		"pickup thrown objects",
 #ifdef REDO
 		"redo command",
-#endif
-#ifdef STEED
-		"saddles and riding",
 #endif
 #ifdef SCORE_ON_BOTL
 		"score on status line",

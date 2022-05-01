@@ -25,9 +25,7 @@ STATIC_DCL void FDECL(create_polymon, (struct obj *, int));
 STATIC_DCL boolean FDECL(zap_updown, (struct obj *));
 STATIC_DCL void FDECL(zhitu, (int, int, const char *, XCHAR_P, XCHAR_P));
 STATIC_DCL void FDECL(revive_egg, (struct obj *));
-#ifdef STEED
 STATIC_DCL boolean FDECL(zap_steed, (struct obj *));
-#endif
 
 STATIC_DCL int FDECL(zap_hit, (int, int));
 STATIC_DCL void FDECL(backfire, (struct obj *));
@@ -375,7 +373,6 @@ struct obj *otmp;
         } else if (openfallingtrap(mtmp, TRUE, &learn_it)) {
             /* mtmp might now be on the migrating monsters list */
             break;
-#ifdef STEED
         } else if (!!(obj = which_armor(mtmp, W_SADDLE))) {
             char buf[BUFSZ];
 
@@ -390,7 +387,6 @@ struct obj *otmp;
             }
             obj_extract_self(obj);
             mdrop_obj(mtmp, obj, FALSE);
-#endif
         }
         break;
     case SPE_HEALING:
@@ -2833,7 +2829,6 @@ long duration;
     return FALSE;
 }
 
-#ifdef STEED
 /* you've zapped a wand downwards while riding
  * Return TRUE if the steed was hit by the wand.
  * Return FALSE if the steed was not hit by the wand.
@@ -2897,7 +2892,6 @@ struct obj *obj; /* wand or spell */
     }
     return steedhit;
 }
-#endif
 
 /*
  * cancel a monster (possibly the hero).  inventory is cancelled only
@@ -3340,13 +3334,10 @@ register struct obj *obj;
     boolean disclose = FALSE, was_unkn = !objects[otyp].oc_name_known;
 
     exercise(A_WIS, TRUE);
-#ifdef STEED
     if (u.usteed && (objects[otyp].oc_dir != NODIR) &&
         !u.dx && !u.dy && (u.dz > 0) && zap_steed(obj)) {
         disclose = TRUE;
-    } else
-#endif
-    if (objects[otyp].oc_dir == IMMEDIATE) {
+    } else if (objects[otyp].oc_dir == IMMEDIATE) {
         obj_zapped = FALSE;
 
         if (u.uswallow) {
@@ -4492,9 +4483,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
             int saved_mhp;
             if (type == ZT_SPELL(ZT_FIRE)) break;
             if (type >= 0) mon->mstrategy &= ~STRAT_WAITMASK;
-#ifdef STEED
 buzzmonst:
-#endif
             saved_mhp = mon->mhp; /* for print_mon_wounded() */
             notonhead = (mon->mx != bhitpos.x || mon->my != bhitpos.y);
             if (zap_hit(find_mac(mon), spell_type)) {
@@ -4585,13 +4574,10 @@ buzzmonst:
             }
         } else if (sx == u.ux && sy == u.uy && range >= 0) {
             nomul(0, 0);
-#ifdef STEED
             if (u.usteed && !rn2(3) && !mon_reflects(u.usteed, (char *)0)) {
                 mon = u.usteed;
                 goto buzzmonst;
-            } else
-#endif
-            if (zap_hit((int) u.uac, 0)) {
+            } else if (zap_hit((int) u.uac, 0)) {
                 range -= 2;
                 pline("%s hits you!", The(fltxt));
                 if (Reflecting) {

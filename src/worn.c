@@ -457,10 +457,8 @@ maybe_blocks:
         break;
     }
 
-#ifdef STEED
     if (!on && mon == u.usteed && obj->otyp == SADDLE)
         dismount_steed(DISMOUNT_FELL);
-#endif
 
     /* if couldn't see it but now can, or vice versa, update display */
     if (!silently && (unseen ^ !canseemon(mon)))
@@ -976,7 +974,6 @@ boolean polyspot;
             m_lose_armor(mon, otmp);
         }
     }
-#ifdef STEED
     if (!can_saddle(mon)) {
         if ((otmp = which_armor(mon, W_SADDLE)) != 0) {
             if (polyspot) bypass_obj(otmp);
@@ -1000,8 +997,6 @@ noride:
         }
         dismount_steed(DISMOUNT_FELL);
     }
-#endif
-    return;
 }
 
 /* bias a monster's preferences towards armor that has special benefits. */

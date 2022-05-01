@@ -194,12 +194,11 @@ in_trouble()
         Cursed_obj(uarmf, FUMBLE_BOOTS))
         return TROUBLE_FUMBLING;
     if (worst_cursed_item()) return TROUBLE_CURSED_ITEMS;
-#ifdef STEED
+
     if (u.usteed) { /* can't voluntarily dismount from a cursed saddle */
         otmp = which_armor(u.usteed, W_SADDLE);
         if (Cursed_obj(otmp, SADDLE)) return TROUBLE_SADDLE;
     }
-#endif
 
     if (Blinded > 1 && haseyes(youmonst.data) &&
         (!u.uswallow || !attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_BLND))) {
@@ -207,11 +206,9 @@ in_trouble()
     }
     for(i=0; i<A_MAX; i++)
         if(ABASE(i) < AMAX(i)) return(TROUBLE_POISONED);
-    if(Wounded_legs
-#ifdef STEED
-       && !u.usteed
-#endif
-       ) return (TROUBLE_WOUNDED_LEGS);
+    if (Wounded_legs && !u.usteed) {
+        return (TROUBLE_WOUNDED_LEGS);
+    }
     if (u.uhs >= HUNGRY) {
         return TROUBLE_HUNGRY;
     }
@@ -537,7 +534,6 @@ decurse:
         (void) make_hallucinated(0L, FALSE, 0L);
         break;
 
-#ifdef STEED
     case TROUBLE_SADDLE:
         otmp = which_armor(u.usteed, W_SADDLE);
         uncurse(otmp);
@@ -549,7 +545,6 @@ decurse:
             set_bknown(otmp, 1);
         }
         break;
-#endif
     }
 }
 

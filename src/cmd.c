@@ -1620,15 +1620,11 @@ boolean want_disp;
         you_have(buf);
     }
     if (Fumbling) enl_msg("You fumble", "", "d", "");
-    if (Wounded_legs
-#ifdef STEED
-        && !u.usteed
-#endif
-        ) {
+    if (Wounded_legs && !u.usteed) {
         Sprintf(buf, "wounded %s", makeplural(body_part(LEG)));
         you_have(buf);
     }
-#if defined(WIZARD) && defined(STEED)
+#if defined(WIZARD)
     if (Wounded_legs && u.usteed && (wizard || final)) {
         Strcpy(buf, x_monnam(u.usteed, ARTICLE_YOUR, (char *)0,
                              SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION, FALSE));
@@ -1700,7 +1696,6 @@ boolean want_disp;
     if (Breathless) you_can("survive without air");
     else if (Amphibious) you_can("breathe water");
     if (Passes_walls) you_can("walk through walls");
-#ifdef STEED
     /* If you die while dismounting, u.usteed is still set.  Since several
      * places in the done() sequence depend on u.usteed, just detect this
      * special case. */
@@ -1708,7 +1703,6 @@ boolean want_disp;
         Sprintf(buf, "riding %s", y_monnam(u.usteed));
         you_are(buf);
     }
-#endif
     if (u.uswallow) {
         Sprintf(buf, "swallowed by %s", a_monnam(u.ustuck));
 #ifdef WIZARD
@@ -2434,9 +2428,7 @@ struct ext_func_tab extcmdlist[] = {
     {   'r',  "read", "read a scroll or spellbook", doread, 0, NULL },
     { C('r'), "redraw", "redraw screen", doredraw, IFBURIED | GENERALCMD, NULL },
     {   'R',  "remove", "remove an accessory (ring, amulet, etc)", doremring, 0, NULL },
-#ifdef STEED
     { M('R'), "ride", "mount or dismount a saddled steed", doride, AUTOCOMPLETE, NULL },
-#endif
     {  '\0',  "rooms", "show room numbers", wiz_show_rooms, AUTOCOMPLETE | WIZMODECMD, NULL },
     { M('r'), "rub", "rub a lamp or a stone", dorub, AUTOCOMPLETE, NULL },
     {   'S',  "save", "save the game and exit", dosave, IFBURIED | GENERALCMD, NULL },

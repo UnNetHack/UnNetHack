@@ -167,9 +167,7 @@ struct monst *
 makedog()
 {
     register struct monst *mtmp;
-#ifdef STEED
     register struct obj *otmp;
-#endif
     const char *petname;
     int pettype;
     static int petname_used = 0;
@@ -231,13 +229,11 @@ makedog()
 #endif
 
     flags.startingpet_mid = mtmp->m_id;
-#ifdef STEED
     /* Horses already wear a saddle */
     if (pettype == PM_PONY && !!(otmp = mksobj(SADDLE, TRUE, FALSE))) {
         otmp->dknown = otmp->bknown = otmp->rknown = 1;
         put_saddle_on_mon(otmp, mtmp);
     }
-#endif
 
     if (!*petname && pettype == PM_KITTEN && !rn2(100)) {
         if (mtmp->female) petname = "Shiva"; /* RIP 1 Oct 1998 - 6 Sep 2009 */
@@ -390,10 +386,9 @@ boolean with_you;
     mtmp->mtrack[0].x = mtmp->mtrack[0].y = 0;
     mtmp->mtrack[1].x = mtmp->mtrack[1].y = 0;
 
-#ifdef STEED
     if (mtmp == u.usteed)
         return; /* don't place steed on the map */
-#endif
+
     if (with_you) {
         /* When a monster accompanies you, sometimes it will arrive
            at your intended destination and you'll end up next to
@@ -661,11 +656,9 @@ boolean pets_only;  /* true for ascension or final escape */
                 only if in range. -3. */
              (u.uhave.amulet && mtmp->iswiz))
             && ((!mtmp->msleeping && mtmp->mcanmove)
-#ifdef STEED
                 /* eg if level teleport or new trap, steed has no control
                    to avoid following */
                 || (mtmp == u.usteed)
-#endif
                 )
             /* monster won't follow if it hasn't noticed you yet */
             && !(mtmp->mstrategy & STRAT_WAITFORU)) {

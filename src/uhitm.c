@@ -7,9 +7,7 @@ STATIC_DCL void FDECL(steal_it, (struct monst *, struct attack *));
 static boolean FDECL(hitum, (struct monst *, struct attack *));
 static boolean FDECL(hmon_hitmon, (struct monst *, struct obj *, int, int));
 STATIC_DCL void FDECL(noisy_hit, (struct monst*, struct obj*, int));
-#ifdef STEED
 STATIC_DCL int FDECL(joust, (struct monst *, struct obj *));
-#endif
 STATIC_DCL void NDECL(demonpet);
 STATIC_DCL boolean FDECL(m_slips_free, (struct monst *mtmp, struct attack *mattk));
 STATIC_DCL int FDECL(explum, (struct monst *, struct attack *));
@@ -754,9 +752,7 @@ int dieroll;
     boolean hand_to_hand = (thrown == HMON_MELEE ||
                             /* not grapnels; applied implies uwep */
                             (thrown == HMON_APPLIED && is_pole(uwep)));
-#ifdef STEED
     int jousting = 0;
-#endif
     long silverhit = 0L;
     int wtype;
     struct obj *monwep;
@@ -863,11 +859,7 @@ int dieroll;
                     /* or strike with a missile in your hand... */
                     (!thrown && (is_missile(obj) || is_ammo(obj))) ||
                     /* or use a pole at short range and not mounted... */
-                    (!thrown &&
-#ifdef STEED
-                     !u.usteed &&
-#endif
-                     is_pole(obj)) ||
+                    (!thrown && !u.usteed && is_pole(obj)) ||
                     /* or throw a missile without the proper bow... */
                     (is_ammo(obj) && (thrown != HMON_THROWN || !ammo_and_launcher(obj, uwep)))) {
                     /* then do only 1-2 points of damage */
@@ -957,14 +949,14 @@ int dieroll;
                 if (artifact_light(obj) && obj->lamplit && mon_hates_light(mon)) {
                     lightobj = TRUE;
                 }
-#ifdef STEED
+
                 if (u.usteed && !thrown && tmp > 0 &&
                     weapon_type(obj) == P_LANCE && mon != u.ustuck) {
                     jousting = joust(mon, obj);
                     /* exercise skill even for minimal damage hits */
                     if (jousting) valid_weapon_attack = TRUE;
                 }
-#endif
+
                 if (thrown == HMON_THROWN && (is_ammo(obj) || is_missile(obj))) {
                     if (ammo_and_launcher(obj, uwep)) {
                         if (uwep->oartifact == ART_LONGBOW_OF_DIANA)
@@ -1303,7 +1295,7 @@ int dieroll;
         }
     } else
 #endif
-#ifdef STEED
+
     if (jousting) {
         tmp += d(2, (obj == uwep) ? 10 : 2);    /* [was in dmgval()] */
         You("joust %s%s",
@@ -1325,7 +1317,6 @@ int dieroll;
         }
         hittxt = TRUE;
     } else
-#endif
 
     /* VERY small chance of stunning opponent if unarmed. */
     if (unarmed && tmp > 1 && !thrown && !obj && !Upolyd) {

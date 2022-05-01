@@ -469,12 +469,12 @@ register struct monst *magr, *mdef;
                 strike = 0;
                 break;
             }
-#ifdef STEED
+
             if (u.usteed && (mdef == u.usteed)) {
                 strike = 0;
                 break;
             }
-#endif
+
             /* D: Prevent engulf from a distance */
             if (distmin(magr->mx, magr->my, mdef->mx, mdef->my) > 1) {
                 continue;
@@ -1462,17 +1462,12 @@ post_stone: if (mdef->mhp > 0) return 0;
                 if (vis && canspotmon(magr) && flags.verbose)
                     pline("%s is glancing at you with a hungry stare.", Monnam(magr));
             } else {
-#ifdef STEED
                 if (u.usteed == mdef) {
                     pline("%s vanishes from underneath you.", Monnam(mdef));
                     dismount_steed(DISMOUNT_VANISHED);
-                } else {
-#endif
-                if (vis && canspotmon(mdef) && flags.verbose)
-                    pline("%s vanishes before your eyes.", Monnam(mdef));
-#ifdef STEED
-            }
-#endif
+                } else if (vis && canspotmon(mdef) && flags.verbose) {
+                        pline("%s vanishes before your eyes.", Monnam(mdef));
+                }
                 int nlev;
                 d_level flev;
                 nlev = random_teleport_level();
@@ -1673,12 +1668,11 @@ post_stone: if (mdef->mhp > 0) return 0;
             Strcpy(mdefnambuf, x_monnam(mdef, ARTICLE_THE, (char *)0, 0, FALSE));
 
             otmp = obj;
-#ifdef STEED
             if (u.usteed == mdef &&
                 otmp == which_armor(mdef, W_SADDLE))
                 /* "You can no longer ride <steed>." */
                 dismount_steed(DISMOUNT_POLY);
-#endif
+
             obj_extract_self(otmp);
             if (otmp->owornmask) {
                 mdef->misc_worn_check &= ~otmp->owornmask;

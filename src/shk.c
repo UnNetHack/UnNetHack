@@ -845,7 +845,6 @@ char *enterstring;
                       tool, plur(cnt));
             }
             should_block = TRUE;
-#ifdef STEED
         } else if (u.usteed) {
             if (!Deaf && !muteshk(shkp)) {
                 verbalize(NOTANGRY(shkp) ?
@@ -858,7 +857,6 @@ char *enterstring;
                       y_monnam(u.usteed));
             }
             should_block = TRUE;
-#endif
         } else if (eshkp->pbanned) {
             verbalize("I don't sell to your kind here.");
             should_block = TRUE;
@@ -4026,12 +4024,7 @@ struct monst *shkp;
     } else {
 #define GDIST(x, y)  (dist2(x, y, gx, gy))
 
-        if ((!Is_blackmarket(&u.uz) && (Invis
-#ifdef STEED
-                                        || u.usteed
-#endif
-                                        ) && !inside_shop(u.ux, u.uy)))
-        {
+        if ((!Is_blackmarket(&u.uz) && (Invis || u.usteed) && !inside_shop(u.ux, u.uy))) {
             avoid = FALSE;
         } else {
             uondoor = (u.ux == eshkp->shd.x && u.uy == eshkp->shd.y);
@@ -4903,11 +4896,8 @@ register xchar x, y;
            (!Is_blackmarket(&u.uz) &&
             (carrying(PICK_AXE) ||
              carrying(DWARVISH_MATTOCK) ||
-             carrying(CRYSTAL_PICK)))
-#ifdef STEED
-           || u.usteed
-#endif
-           )) {
+             carrying(CRYSTAL_PICK))) ||
+           u.usteed)) {
         pline("%s%s blocks your way!", shkname(shkp),
               Invis ? " senses your motion and" : "");
         return(TRUE);

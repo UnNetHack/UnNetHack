@@ -40,17 +40,17 @@ static
 void ghack_quit_game_cb(GtkWidget *widget, gpointer data)
 {
     GtkWidget *box;
-    box = gnome_message_box_new(_("Do you really want to quit?"), 
-	    GNOME_MESSAGE_BOX_QUESTION, GNOME_STOCK_BUTTON_YES, 
+    box = gnome_message_box_new(_("Do you really want to quit?"),
+	    GNOME_MESSAGE_BOX_QUESTION, GNOME_STOCK_BUTTON_YES,
 	    GNOME_STOCK_BUTTON_NO, NULL);
     gnome_dialog_set_default( GNOME_DIALOG(box), 1);
-    gnome_dialog_set_parent (GNOME_DIALOG (box), 
+    gnome_dialog_set_parent (GNOME_DIALOG (box),
 	    GTK_WINDOW (ghack_get_main_window ()) );
     gnome_dialog_set_accelerator (GNOME_DIALOG(box), 1, 'n', 0);
     gnome_dialog_set_accelerator (GNOME_DIALOG(box), 0, 'y', 0);
 
     gtk_window_set_modal( GTK_WINDOW(box), TRUE);
-    gtk_signal_connect( GTK_OBJECT(box), "clicked", 
+    gtk_signal_connect( GTK_OBJECT(box), "clicked",
 	    (GtkSignalFunc)ghack_quit_game, NULL);
     gtk_widget_show(box);
 }
@@ -71,17 +71,17 @@ void ghack_save_game(GtkWidget *widget, int button)
 void ghack_save_game_cb(GtkWidget *widget, gpointer data)
 {
     GtkWidget *box;
-    box = gnome_message_box_new(_("Quit and save the current game?"), 
-	    GNOME_MESSAGE_BOX_QUESTION, GNOME_STOCK_BUTTON_YES, 
+    box = gnome_message_box_new(_("Quit and save the current game?"),
+	    GNOME_MESSAGE_BOX_QUESTION, GNOME_STOCK_BUTTON_YES,
 	    GNOME_STOCK_BUTTON_NO, NULL);
     gnome_dialog_set_default( GNOME_DIALOG(box), 1);
-    gnome_dialog_set_parent (GNOME_DIALOG (box), 
+    gnome_dialog_set_parent (GNOME_DIALOG (box),
 	    GTK_WINDOW (ghack_get_main_window ()) );
     gnome_dialog_set_accelerator (GNOME_DIALOG(box), 1, 'n', 0);
     gnome_dialog_set_accelerator (GNOME_DIALOG(box), 0, 'y', 0);
 
     gtk_window_set_modal( GTK_WINDOW(box), TRUE);
-    gtk_signal_connect( GTK_OBJECT(box), "clicked", 
+    gtk_signal_connect( GTK_OBJECT(box), "clicked",
 	    (GtkSignalFunc)ghack_save_game, NULL);
     gtk_widget_show(box);
 }
@@ -98,17 +98,17 @@ static
 void ghack_new_game_cb(GtkWidget *widget, gpointer data)
 {
     GtkWidget *box;
-    box = gnome_message_box_new(_("Start a new game?"), 
-	    GNOME_MESSAGE_BOX_QUESTION, GNOME_STOCK_BUTTON_YES, 
+    box = gnome_message_box_new(_("Start a new game?"),
+	    GNOME_MESSAGE_BOX_QUESTION, GNOME_STOCK_BUTTON_YES,
 	    GNOME_STOCK_BUTTON_NO, NULL);
     gnome_dialog_set_default( GNOME_DIALOG(box), 1);
-    gnome_dialog_set_parent (GNOME_DIALOG (box), 
+    gnome_dialog_set_parent (GNOME_DIALOG (box),
 	    GTK_WINDOW (ghack_get_main_window ()) );
     gnome_dialog_set_accelerator (GNOME_DIALOG(box), 1, 'n', 0);
     gnome_dialog_set_accelerator (GNOME_DIALOG(box), 0, 'y', 0);
 
     gtk_window_set_modal( GTK_WINDOW(box), TRUE);
-    gtk_signal_connect( GTK_OBJECT(box), "clicked", 
+    gtk_signal_connect( GTK_OBJECT(box), "clicked",
 	    (GtkSignalFunc)ghack_new_game, NULL);
     gtk_widget_show(box);
 }
@@ -119,12 +119,12 @@ about_destroy_callback (void)
     about = NULL;
 }
 
-static void 
+static void
 ghack_about_cb(GtkWidget *widget, gpointer data)
 {
     char buf[BUFSZ]="\0";
     char buf1[BUFSZ]="\0";
-    const gchar *authors[] = {"Erik Andersen", "Anthony Taylor", 
+    const gchar *authors[] = {"Erik Andersen", "Anthony Taylor",
 	"Jeff Garzik", "The Nethack Dev Team", NULL};
 
     if (about) {
@@ -134,31 +134,31 @@ ghack_about_cb(GtkWidget *widget, gpointer data)
 
     getversionstring(buf);
     strcat( buf1, VERSION_STRING);
-    strcat( buf, 
+    strcat( buf,
       _("\nSend comments and bug reports to: bhaak@gmx.net\n"
       "This game is free software. See License for details."));
-    about = gnome_about_new(_("Nethack"), 
+    about = gnome_about_new(_("Nethack"),
 	    buf1, "Copyright (C) 1985-2002 Mike Stephenson",
 	    (const char **)authors, buf,
 	    NULL);
 
     gtk_signal_connect (GTK_OBJECT (about), "destroy",
 	(GtkSignalFunc) about_destroy_callback, NULL);
-    
+
     gtk_widget_show(about);
 }
 
-static void 
+static void
 ghack_settings_cb(GtkWidget *widget, gpointer data)
 {
     ghack_settings_dialog();
 }
 
-static void 
+static void
 ghack_accelerator_selected (GtkWidget *widget, gpointer data)
 {
     GdkEventKey event;
-    int key = GPOINTER_TO_INT( data); 
+    int key = GPOINTER_TO_INT( data);
     /* g_message("An accelerator for \"%c\" was selected", key); */
     /* stuff a key directly into the keybuffer */
     event.state=0;
@@ -178,89 +178,89 @@ ghack_accelerator_selected (GtkWidget *widget, gpointer data)
 #endif
 
 
-GnomeUIInfo game_tree[] = 
+GnomeUIInfo game_tree[] =
 {
     {
-	GNOME_APP_UI_ITEM, N_ ("_Change Settings..."), 
-	N_("Change Game Settings"), ghack_settings_cb, NULL, NULL, 
+	GNOME_APP_UI_ITEM, N_ ("_Change Settings..."),
+	N_("Change Game Settings"), ghack_settings_cb, NULL, NULL,
 	GNOME_APP_PIXMAP_NONE, NULL, 0,0, NULL
     },
     GNOMEUIINFO_SEPARATOR,
-    { 
-	GNOME_APP_UI_ITEM, N_("Version"), NULL, 
-	ghack_accelerator_selected, GINT_TO_POINTER('v'), NULL, 
-	GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ABOUT, 'v',0 
-    }, 
-    { 
-	GNOME_APP_UI_ITEM, N_("History..."), NULL, 
-	ghack_accelerator_selected, GINT_TO_POINTER('V'), NULL, 
-	GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ABOUT, 'V',GDK_SHIFT_MASK 
-    }, 
-    { 
-	GNOME_APP_UI_ITEM, N_("Compilation..."), NULL, 
-	ghack_accelerator_selected, GINT_TO_POINTER(M('v')), NULL, 
+    {
+	GNOME_APP_UI_ITEM, N_("Version"), NULL,
+	ghack_accelerator_selected, GINT_TO_POINTER('v'), NULL,
+	GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ABOUT, 'v',0
+    },
+    {
+	GNOME_APP_UI_ITEM, N_("History..."), NULL,
+	ghack_accelerator_selected, GINT_TO_POINTER('V'), NULL,
+	GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ABOUT, 'V',GDK_SHIFT_MASK
+    },
+    {
+	GNOME_APP_UI_ITEM, N_("Compilation..."), NULL,
+	ghack_accelerator_selected, GINT_TO_POINTER(M('v')), NULL,
 	GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ABOUT,'v',GDK_MOD1_MASK
-    }, 
-    { 
-	GNOME_APP_UI_ITEM, N_("Options..."), NULL, 
-	ghack_accelerator_selected, GINT_TO_POINTER('O'), NULL, 
+    },
+    {
+	GNOME_APP_UI_ITEM, N_("Options..."), NULL,
+	ghack_accelerator_selected, GINT_TO_POINTER('O'), NULL,
 	GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_PREF, 'O', GDK_SHIFT_MASK
-    }, 
-    { 
-	GNOME_APP_UI_ITEM, N_("Explore Mode..."), NULL, 
-	ghack_accelerator_selected, GINT_TO_POINTER('X'), NULL, 
+    },
+    {
+	GNOME_APP_UI_ITEM, N_("Explore Mode..."), NULL,
+	ghack_accelerator_selected, GINT_TO_POINTER('X'), NULL,
 	GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_QUIT, 'X', GDK_SHIFT_MASK
-    }, 
+    },
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_MENU_NEW_GAME_ITEM(ghack_new_game_cb, NULL),
     GNOMEUIINFO_MENU_SAVE_ITEM(ghack_save_game_cb, NULL),
-    { 
-	GNOME_APP_UI_ITEM, N_("Exit"), NULL, 
-	ghack_quit_game_cb, GINT_TO_POINTER(M('Q')), NULL, 
+    {
+	GNOME_APP_UI_ITEM, N_("Exit"), NULL,
+	ghack_quit_game_cb, GINT_TO_POINTER(M('Q')), NULL,
 	GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ABOUT, 'Q', GDK_MOD1_MASK
-    }, 
+    },
     GNOMEUIINFO_END
 };
 
 
 
 GnomeUIInfo edit_menu[] = {
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Inventory"), 
-	       N_("Edit/View your Inventory"), ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Inventory"),
+	       N_("Edit/View your Inventory"), ghack_accelerator_selected,
 	       GINT_TO_POINTER('i'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'i', 0
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Discoveries"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Discoveries"),
 	       N_("Edit/View your Discoveries"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('\\'), NULL, GNOME_APP_PIXMAP_NONE, NULL, '\\',0
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("List/reorder your spells"), 
-	       N_("List/reorder your spells"), ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("List/reorder your spells"),
+	       N_("List/reorder your spells"), ghack_accelerator_selected,
 	       GINT_TO_POINTER('x'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'x', 0
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Adjust letters"), 
-	       N_("Adjust letter for items in your Inventory"), ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Adjust letters"),
+	       N_("Adjust letter for items in your Inventory"), ghack_accelerator_selected,
 	        GINT_TO_POINTER(M('a')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'a', GDK_MOD1_MASK
 	   },
 	   GNOMEUIINFO_SEPARATOR,
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Name object"), 
-	       N_("Assign a name to an object"), ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Name object"),
+	       N_("Assign a name to an object"), ghack_accelerator_selected,
 	       GINT_TO_POINTER(M('n')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'n', GDK_MOD1_MASK
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Name creature"), 
-	       N_("Assign a name to a creature"), ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Name creature"),
+	       N_("Assign a name to a creature"), ghack_accelerator_selected,
 	       GINT_TO_POINTER('C'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'C', GDK_SHIFT_MASK
 	   },
 	   GNOMEUIINFO_SEPARATOR,
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Qualifications"), 
-	       N_("Edit your Qualifications"), ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Qualifications"),
+	       N_("Edit your Qualifications"), ghack_accelerator_selected,
 	       GINT_TO_POINTER(M('e')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'e',GDK_MOD1_MASK
 	   },
            GNOMEUIINFO_END
@@ -268,97 +268,95 @@ GnomeUIInfo edit_menu[] = {
 
 
 GnomeUIInfo apparel_menu[] = {
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Wield Weapon"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Wield Weapon"),
 	       N_("Select a weapon to fight with"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('w'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'w',0
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Remove Apparel..."), 
-	       N_("Remove apparel dialog bog"), ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Remove Apparel..."),
+	       N_("Remove apparel dialog bog"), ghack_accelerator_selected,
 	       GINT_TO_POINTER('A'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'A',GDK_SHIFT_MASK
 	   },
 	   GNOMEUIINFO_SEPARATOR,
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Wear Armor"), 
-	       N_("Put on armor"), ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Wear Armor"),
+	       N_("Put on armor"), ghack_accelerator_selected,
 	       GINT_TO_POINTER('W'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'W',GDK_SHIFT_MASK
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Take off Armor"), 
-	       N_("Take off armor you are wearing"), ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Take off Armor"),
+	       N_("Take off armor you are wearing"), ghack_accelerator_selected,
 	       GINT_TO_POINTER('T'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'T',GDK_SHIFT_MASK
 	   },
 	   GNOMEUIINFO_SEPARATOR,
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Put on non-armor"), 
-	       N_("Put on non-armor apparel"), ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Put on non-armor"),
+	       N_("Put on non-armor apparel"), ghack_accelerator_selected,
 	       GINT_TO_POINTER('P'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'P',GDK_SHIFT_MASK
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Remove non-armor"), 
-	       N_("Remove non-armor apparel you are wearing"), ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Remove non-armor"),
+	       N_("Remove non-armor apparel you are wearing"), ghack_accelerator_selected,
 	       GINT_TO_POINTER('R'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'R',GDK_SHIFT_MASK
 	   },
            GNOMEUIINFO_END
 };
 
 GnomeUIInfo action_menu[] = {
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Get"), 
-	       N_("Pick up things at the current location"), 
-	       ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Get"),
+	       N_("Pick up things at the current location"),
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER(','), NULL, GNOME_APP_PIXMAP_NONE, NULL, ',',0
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Loot"), 
-	       N_("loot a box on the floor"), 
-	       ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Loot"),
+	       N_("loot a box on the floor"),
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER(M('l')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'l',GDK_MOD1_MASK
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Sit"), 
-	       N_("sit down"), 
-	       ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Sit"),
+	       N_("sit down"),
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER(M('s')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 's',GDK_MOD1_MASK
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Force"), 
-	       N_("force a lock"), 
-	       ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Force"),
+	       N_("force a lock"),
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER(M('f')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'f',GDK_MOD1_MASK
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Kick"), 
-	       N_("kick something (usually a door)"), 
-	       ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Kick"),
+	       N_("kick something (usually a door)"),
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER(C('d')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'd',GDK_CONTROL_MASK
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Jump"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Jump"),
 	       N_("jump to another location"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER(M('j')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'j',GDK_MOD1_MASK
 	   },
-#ifdef STEED
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Ride"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Ride"),
 	       N_("Ride (or stop riding) a monster"),
-	       doride, 
+	       doride,
 	       GINT_TO_POINTER(M('r')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'R',GDK_MOD1_MASK
 	   },
-#endif
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Wipe face"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Wipe face"),
 	       N_("wipe off your face"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER(M('w')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'w',GDK_MOD1_MASK
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Throw/Shoot"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Throw/Shoot"),
 	       N_("throw or shoot a weapon"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('t'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 't',0
 	   },
 	   {
@@ -367,228 +365,228 @@ GnomeUIInfo action_menu[] = {
 	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('Q'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'Q',GDK_SHIFT_MASK,
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Open Door"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Open Door"),
 	       N_("open a door"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('o'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'o',0
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Close Door"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Close Door"),
 	       N_("open a door"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('c'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'c',0
 	   },
 	   GNOMEUIINFO_SEPARATOR,
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Drop"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Drop"),
 	       N_("drop an object"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('d'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'd',0
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Drop Many"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Drop Many"),
 	       N_("drop selected types of objects"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('D'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'D',GDK_SHIFT_MASK
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Eat"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Eat"),
 	       N_("eat something"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('e'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'e',0
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Engrave"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Engrave"),
 	       N_("write a message in the dust on the floor"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('E'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'E',GDK_SHIFT_MASK
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Apply"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Apply"),
 	       N_("apply or use a tool (pick-axe, key, camera, etc.)"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('a'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'a',0
 	   },
 	   GNOMEUIINFO_SEPARATOR,
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Up"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Up"),
 	       N_("go up the stairs"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('<'), NULL, GNOME_APP_PIXMAP_NONE, NULL, '<',0
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Down"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Down"),
 	       N_("go down the stairs"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('>'), NULL, GNOME_APP_PIXMAP_NONE, NULL, '>',0
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Rest"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Rest"),
 	       N_("wait for a moment"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('.'), NULL, GNOME_APP_PIXMAP_NONE, NULL, '.',0
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Search"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Search"),
 	       N_("search for secret doors, hidden traps and monsters"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('s'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 's',0
 	   },
 	   GNOMEUIINFO_SEPARATOR,
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Chat"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Chat"),
 	       N_("talk to someone"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER(M('c')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'c',GDK_MOD1_MASK
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Pay"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Pay"),
 	       N_("pay your bill to the shopkeeper"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('p'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'p',0
 	   },
            GNOMEUIINFO_END
 };
 
 GnomeUIInfo magic_menu[] = {
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Quaff potion"), 
-	       N_("drink a potion"), 
-	       ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Quaff potion"),
+	       N_("drink a potion"),
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('q'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'q',0
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Read Book/Scroll"), 
-	       N_("read a spell book or a scroll"), 
-	       ghack_accelerator_selected, 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Read Book/Scroll"),
+	       N_("read a spell book or a scroll"),
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('r'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'r',0
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Zap Wand"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Zap Wand"),
 	       N_("zap a wand"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('z'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'z',0
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Zap Spell"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Zap Spell"),
 	       N_("cast a spell"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER('Z'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'Z',GDK_SHIFT_MASK
 	   },
 	   GNOMEUIINFO_SEPARATOR,
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Dip"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Dip"),
 	       N_("dip an object into something"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER(M('d')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'd',GDK_MOD1_MASK
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Rub"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Rub"),
 	       N_("Rub something (i.e. a lamp)"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER(M('r')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'r',GDK_MOD1_MASK
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Invoke"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Invoke"),
 	       N_("invoke an object's special powers"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER(M('i')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'i',GDK_MOD1_MASK
 	   },
 	   GNOMEUIINFO_SEPARATOR,
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Offer"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Offer"),
 	       N_("offer a sacrifice to the gods"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER(M('o')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'o',GDK_MOD1_MASK
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Pray"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Pray"),
 	       N_("pray to the gods for help"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER(M('p')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'p',GDK_MOD1_MASK
 	   },
 	   GNOMEUIINFO_SEPARATOR,
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Teleport"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Teleport"),
 	       N_("teleport (if you can)"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER(C('t')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 't',GDK_CONTROL_MASK
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Monster Action"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Monster Action"),
 	       N_("use a monster's special ability"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER(M('m')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'm',GDK_MOD1_MASK
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Turn Undead"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Turn Undead"),
 	       N_("turn undead"),
-	       ghack_accelerator_selected, 
+	       ghack_accelerator_selected,
 	       GINT_TO_POINTER(M('t')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 't',GDK_MOD1_MASK
 	   },
            GNOMEUIINFO_END
 };
 
 GnomeUIInfo help_menu[] = {
-            { 
-		GNOME_APP_UI_ITEM, N_("About..."), 
-		N_("About GnomeHack"), ghack_about_cb, NULL, NULL, 
-		GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ABOUT, 0, 0, NULL 
-	    }, 
-	   { 
+            {
+		GNOME_APP_UI_ITEM, N_("About..."),
+		N_("About GnomeHack"), ghack_about_cb, NULL, NULL,
+		GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ABOUT, 0, 0, NULL
+	    },
+	   {
 	       GNOME_APP_UI_ITEM, N_("Help"), NULL,
-	       ghack_accelerator_selected, 
-	       GINT_TO_POINTER('?'), NULL, GNOME_APP_PIXMAP_STOCK, 
+	       ghack_accelerator_selected,
+	       GINT_TO_POINTER('?'), NULL, GNOME_APP_PIXMAP_STOCK,
 	       GNOME_STOCK_MENU_ABOUT, '?', 0
 	   },
 	   GNOMEUIINFO_SEPARATOR,
-	   { 
-	       GNOME_APP_UI_ITEM, N_("What is here"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("What is here"),
 	       N_("Check what items occupy the current location"),
-	       ghack_accelerator_selected, 
-	       GINT_TO_POINTER(':'), NULL, GNOME_APP_PIXMAP_STOCK, 
+	       ghack_accelerator_selected,
+	       GINT_TO_POINTER(':'), NULL, GNOME_APP_PIXMAP_STOCK,
 	       GNOME_STOCK_MENU_ABOUT, ':',0
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("What is that"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("What is that"),
 	       N_("Identify an object"),
-	       ghack_accelerator_selected, 
-	       GINT_TO_POINTER(';'), NULL, GNOME_APP_PIXMAP_STOCK, 
+	       ghack_accelerator_selected,
+	       GINT_TO_POINTER(';'), NULL, GNOME_APP_PIXMAP_STOCK,
 	       GNOME_STOCK_MENU_ABOUT, ';',0
 	   },
-	   { 
-	       GNOME_APP_UI_ITEM, N_("Identify a map symbol"), 
+	   {
+	       GNOME_APP_UI_ITEM, N_("Identify a map symbol"),
 	       N_("Identify a map symbol"),
-	       ghack_accelerator_selected, 
-	       GINT_TO_POINTER('/'), NULL, GNOME_APP_PIXMAP_STOCK, 
+	       ghack_accelerator_selected,
+	       GINT_TO_POINTER('/'), NULL, GNOME_APP_PIXMAP_STOCK,
 	       GNOME_STOCK_MENU_ABOUT, '/',0
 	   },
-	   GNOMEUIINFO_END 
+	   GNOMEUIINFO_END
 };
-	    
+
 GnomeUIInfo mainmenu[] = {
 	    GNOMEUIINFO_MENU_GAME_TREE(game_tree),
 	    GNOMEUIINFO_MENU_EDIT_TREE(edit_menu),
-	    { GNOME_APP_UI_SUBTREE, N_("Apparel"), NULL, apparel_menu, NULL, 
+	    { GNOME_APP_UI_SUBTREE, N_("Apparel"), NULL, apparel_menu, NULL,
 		NULL, 0, NULL, 0, 0, NULL },
-	    { GNOME_APP_UI_SUBTREE, N_("Action"), NULL, action_menu, NULL, 
+	    { GNOME_APP_UI_SUBTREE, N_("Action"), NULL, action_menu, NULL,
 		NULL, 0, NULL, 0, 0, NULL },
-	    { GNOME_APP_UI_SUBTREE, N_("Magic"), NULL, magic_menu, NULL, 
+	    { GNOME_APP_UI_SUBTREE, N_("Magic"), NULL, magic_menu, NULL,
 		NULL, 0, NULL, 0, 0, NULL },
 	    GNOMEUIINFO_MENU_HELP_TREE(help_menu),
 	    GNOMEUIINFO_END
 };
 
 static void
-ghack_main_window_key_press(GtkWidget *widget, GdkEventKey *event, 
+ghack_main_window_key_press(GtkWidget *widget, GdkEventKey *event,
 	gpointer data)
 {
     /* First, turn off the key press propogation.  We've got the
      * key, but we don't wan't the underlying Gtk widgets to get it,
      * since they do the wrong thing with the arrow keys (shift focus)... */
     gtk_signal_emit_stop_by_name( GTK_OBJECT(mainWindow), "key_press_event");
-    
+
     /* stuff the key event into the keybuffer */
     ghack_handle_key_press(widget, event, data);
 }
@@ -620,7 +618,7 @@ parse_args (int argc, char *argv[])
     switch(ch)
     {
       case 'h':
-        g_print ( 
+        g_print (
       	  _("%s: A gnomified 'Hello World' program\n\n"
       	    "Usage: %s [--help] [--version]\n\n"
       	    "Options:\n"
@@ -646,7 +644,7 @@ parse_args (int argc, char *argv[])
 #if 0
   session_id = gnome_client_new (
   	/* callback to save the state and parameter for it */
-  	save_state, argv[0], 
+  	save_state, argv[0],
   	/* callback to die and parameter for it */
     	NULL, NULL,
 	/* id from the previous session if restarted, NULL otherwise */
@@ -739,7 +737,7 @@ void ghack_init_main_window( int argc, char** argv)
     gdk_imlib_init();
 
     /* Main window */
-    mainWindow = gnome_app_new((char *) "nethack", 
+    mainWindow = gnome_app_new((char *) "nethack",
 	    (char *) N_("Nethack for Gnome"));
     gtk_widget_realize(mainWindow);
     if (restarted) {
@@ -749,23 +747,23 @@ void ghack_init_main_window( int argc, char** argv)
     gtk_window_set_default_size( GTK_WINDOW(mainWindow), 800, 600);
     gtk_window_set_policy(GTK_WINDOW(mainWindow), FALSE, TRUE, TRUE);
     gnome_app_create_menus(GNOME_APP(mainWindow), mainmenu);
-    gtk_signal_connect(GTK_OBJECT(mainWindow), "key_press_event", 
+    gtk_signal_connect(GTK_OBJECT(mainWindow), "key_press_event",
 	    GTK_SIGNAL_FUNC(ghack_main_window_key_press), NULL);
-    gtk_signal_connect(GTK_OBJECT(mainWindow), "delete_event", 
+    gtk_signal_connect(GTK_OBJECT(mainWindow), "delete_event",
 	    GTK_SIGNAL_FUNC(ghack_quit_game_cb), NULL);
 
     /* Put some stuff into our main window */
     vBoxMain = gtk_vbox_new (FALSE, 0);
     hBoxFirstRow = gtk_hbox_new (FALSE, 0);
-   
+
     /* pack Boxes into other boxes to produce the right structure */
-    gtk_box_pack_start (GTK_BOX (vBoxMain), hBoxFirstRow, FALSE, TRUE, 0);   
-    
+    gtk_box_pack_start (GTK_BOX (vBoxMain), hBoxFirstRow, FALSE, TRUE, 0);
+
     /* pack vBoxMain which contains all our widgets into the main window. */
     gnome_app_set_contents(GNOME_APP(mainWindow), vBoxMain);
-    
+
     /* DONT show the main window yet, due to a Gtk bug that causes it
-     * to not refresh the window when adding widgets after the window 
+     * to not refresh the window when adding widgets after the window
      * has already been shown */
     if (uid != euid)
       setuid(euid);
@@ -774,15 +772,15 @@ void ghack_init_main_window( int argc, char** argv)
 	  signal(ghack_chain[i].signum, ghack_sig_handler);
 }
 
-void ghack_main_window_add_map_window(GtkWidget* win) 
+void ghack_main_window_add_map_window(GtkWidget* win)
 {
     GtkWidget *vBox;
-    
+
     vBox= gtk_vbox_new (TRUE, 0);
     gtk_box_pack_start (GTK_BOX (vBox), win, TRUE, TRUE, 2);
     gtk_box_pack_start (GTK_BOX (vBoxMain), vBox, TRUE, TRUE, 2);
     gtk_widget_show_all(vBox);
-    /* Ok, now show the main window -- now that we have added in 
+    /* Ok, now show the main window -- now that we have added in
      * all the windows (relys on nethack displaying the map window last
      * (This is an ugly kludge, BTW)
      */

@@ -787,7 +787,6 @@ enable_blackmarket
 enable_kops
 enable_seduce
 enable_randomized_planes
-enable_steed
 enable_tourist
 enable_redo
 enable_clipping
@@ -1492,7 +1491,6 @@ Optional Features:
   --enable-seduce         Succubi/incubi seduction (default=yes)
   --enable-randomized-planes
                           Shuffling order of Elemental Planes (default=yes)
-  --enable-steed          Ability to ride monsters (default=yes)
   --enable-tourist        Tourist class (default=yes)
   --enable-redo           Redo last command (default=yes)
   --enable-clipping       Allow smaller screens (default=yes)
@@ -6917,24 +6915,6 @@ printf "%s\n" "$enable_randomized_planes" >&6; }
    if test "$enable_randomized_planes" != "no" ; then
 
 printf "%s\n" "#define RANDOMIZED_PLANES /**/" >>confdefs.h
-
-   fi
-
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to enable steed" >&5
-printf %s "checking whether to enable steed... " >&6; }
-   # Check whether --enable-steed was given.
-if test ${enable_steed+y}
-then :
-  enableval=$enable_steed;
-else $as_nop
-  enable_steed="yes"
-fi
-
-   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $enable_steed" >&5
-printf "%s\n" "$enable_steed" >&6; }
-   if test "$enable_steed" != "no" ; then
-
-printf "%s\n" "#define STEED /**/" >>confdefs.h
 
    fi
 

@@ -1180,7 +1180,6 @@ dochat()
         return(0);
     }
 
-#ifdef STEED
     if (u.usteed && u.dz > 0) {
         if (!u.usteed->mcanmove || u.usteed->msleeping) {
             pline("%s seems not to notice you.", Monnam(u.usteed));
@@ -1189,7 +1188,7 @@ dochat()
             return domonnoise(u.usteed);
         }
     }
-#endif
+
     if (u.dz) {
         pline("They won't hear you %s there.", u.dz < 0 ? "up" : "down");
         return(0);

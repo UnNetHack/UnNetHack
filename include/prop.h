@@ -109,9 +109,7 @@ struct prop {
 #   define W_RING       (W_RINGL | W_RINGR)
 #   define W_TOOL       0x00080000L /* Eyewear */
 #   define W_ACCESSORY (W_RING | W_AMUL | W_TOOL)
-#ifdef STEED
 #   define W_SADDLE     0x00100000L /* KMH -- For riding monsters */
-#endif
 #   define W_BALL       0x00200000L /* Punishment ball */
 #   define W_CHAIN      0x00400000L /* Punishment chain */
 

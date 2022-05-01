@@ -409,7 +409,6 @@ register struct monst *mtmp;
         if(u.uinvulnerable) return (0); /* stomachs can't hurt you! */
     }
 
-#ifdef STEED
     else if (u.usteed) {
         if (mtmp == u.usteed)
             /* Your steed won't attack you */
@@ -429,7 +428,6 @@ register struct monst *mtmp;
             return (!!(mattackm(u.usteed, mtmp) & MM_DEF_DIED));
         }
     }
-#endif
 
     if (u.uundetected && !range2 && foundyou && !u.uswallow) {
         if (!canspotmon(mtmp)) {
@@ -925,12 +923,10 @@ struct monst *mon;
     if (armor && armpro < objects[armor->otyp].a_can)
         armpro = objects[armor->otyp].a_can;
 
-#ifdef STEED
     /* this one is really a stretch... */
     armor = (mon == &youmonst) ? 0 : which_armor(mon, W_SADDLE);
     if (armor && armpro < objects[armor->otyp].a_can)
         armpro = objects[armor->otyp].a_can;
-#endif
 
     return armpro;
 }
@@ -2000,7 +1996,6 @@ struct attack  *mattk;
         place_monster(mtmp, u.ux, u.uy);
         u.ustuck = mtmp;
         newsym(mtmp->mx, mtmp->my);
-#ifdef STEED
         if (is_animal(mtmp->data) && u.usteed) {
             char buf[BUFSZ];
 
@@ -2012,9 +2007,9 @@ struct attack  *mattk;
             pline ("%s lunges forward and plucks you off %s!",
                    Monnam(mtmp), buf);
             dismount_steed(DISMOUNT_ENGULFED);
-        } else
-#endif
-        pline("%s engulfs you!", Monnam(mtmp));
+        } else {
+            pline("%s engulfs you!", Monnam(mtmp));
+        }
         stop_occupation();
         reset_occupations();    /* behave as if you had moved */
 
