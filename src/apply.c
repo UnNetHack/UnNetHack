@@ -9,9 +9,7 @@ static const char tools[] = { COIN_CLASS, TOOL_CLASS, WEAPON_CLASS, WAND_CLASS, 
 static const char tools_too[] = { COIN_CLASS, ALL_CLASSES, TOOL_CLASS, POTION_CLASS,
                                   WEAPON_CLASS, WAND_CLASS, GEM_CLASS, 0 };
 
-#ifdef TOURIST
 STATIC_DCL int FDECL(use_camera, (struct obj *));
-#endif
 STATIC_DCL int FDECL(use_towel, (struct obj *));
 STATIC_DCL boolean FDECL(its_dead, (int, int, int *, struct obj*));
 STATIC_DCL int FDECL(use_stethoscope, (struct obj *));
@@ -45,7 +43,6 @@ void FDECL( amii_speaker, ( struct obj *, char *, int ) );
 
 static const char no_elbow_room[] = "don't have enough elbow-room to maneuver.";
 
-#ifdef TOURIST
 STATIC_OVL int
 use_camera(obj)
 struct obj *obj;
@@ -85,7 +82,6 @@ struct obj *obj;
     }
     return 1;
 }
-#endif
 
 STATIC_OVL int
 use_towel(obj)
@@ -3895,9 +3891,7 @@ doapply()
         use_grease(obj);
         break;
     case LOCK_PICK:
-#ifdef TOURIST
     case CREDIT_CARD:
-#endif
     case SKELETON_KEY:
         (void) pick_lock(obj, 0, 0, FALSE);
         break;
@@ -3966,11 +3960,9 @@ doapply()
     case POT_OIL:
         light_cocktail(&obj);
         break;
-#ifdef TOURIST
     case EXPENSIVE_CAMERA:
         res = use_camera(obj);
         break;
-#endif
     case TOWEL:
         res = use_towel(obj);
         break;

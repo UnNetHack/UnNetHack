@@ -96,11 +96,9 @@ struct monst *victim;
                 (void) burn_dmg(item, xname(item));
                 return TRUE;
             }
-#ifdef TOURIST
             item = hitting_u ? uarmu : which_armor(victim, W_ARMU);
             if (item)
                 (void) burn_dmg(item, "shirt");
-#endif
             return TRUE;
         case 2:
             item = hitting_u ? uarms : which_armor(victim, W_ARMS);
@@ -1196,11 +1194,9 @@ unsigned trflags;
                 (void) water_damage(uarmc, cloak_simple_name(uarmc), TRUE);
             } else if (uarm) {
                 (void) water_damage(uarm, suit_simple_name(uarm), TRUE);
-#ifdef TOURIST
             } else if (uarmu) {
                 (void) water_damage(uarmu, "shirt", TRUE);
             }
-#endif
         }
         update_inventory();
 
@@ -2401,10 +2397,8 @@ glovecheck:     target = which_armor(mtmp, W_ARMG);
                                         TRUE);
                 } else if ((target = which_armor(mtmp, W_ARM))) {
                     (void) water_damage(target, suit_simple_name(target), TRUE);
-#ifdef TOURIST
                 } else if ((target = which_armor(mtmp, W_ARMU))) {
                     (void) water_damage(target, "shirt", TRUE);
-#endif
                 }
             }
 
@@ -3878,9 +3872,7 @@ boolean *lostsome;
                       obj == uamul || obj == uleft || obj == uright ||
                       obj == ublindf || obj == uarm || obj == uarmc ||
                       obj == uarmg || obj == uarmf ||
-#ifdef TOURIST
                       obj == uarmu ||
-#endif
                       (obj->cursed && (obj == uarmh || obj == uarms)) ||
                       welded(obj)))
                     otmp = obj;
@@ -5568,9 +5560,7 @@ lava_effects()
                     else if(obj == uarms) (void) Shield_off();
                     else if(obj == uarmg) (void) Gloves_off();
                     else if(obj == uarmf) (void) Boots_off();
-#ifdef TOURIST
                     else if(obj == uarmu) setnotworn(obj);
-#endif
                     else if(obj == uleft) Ring_gone(obj);
                     else if(obj == uright) Ring_gone(obj);
                     else if(obj == ublindf) Blindf_off(obj);

@@ -114,14 +114,9 @@ can_regenerate()
     if (is_elf(youmonst.data)) {
         if (uwep && is_iron(uwep) &&
             !is_quest_artifact(uwep) && !uarmg) return 0;
-#ifdef TOURIST
         if (uarm && is_iron(uarm) && !uarmu) return 0;
         if (uarmu && is_iron(uarmu)) return 0;
         if (uarmc && is_iron(uarmc) && !uarmu && !uarm) return 0;
-#else
-        if (uarm && is_iron(uarm)) return 0;
-        if (uarmc && is_iron(uarmc) && !uarm) return 0;
-#endif
         if (uarmh && is_iron(uarmh) &&
             !is_quest_artifact(uarmh)) return 0;
         if (uarms && is_iron(uarms) && !uarmg) return 0;
@@ -129,13 +124,8 @@ can_regenerate()
         if (uarmf && is_iron(uarmf)) return 0;
         if (uleft && is_iron(uleft)) return 0;
         if (uright && is_iron(uright)) return 0;
-#ifdef TOURIST
         if (uamul && is_iron(uamul) &&
             !is_quest_artifact(uamul) && !uarmu && !uarm) return 0;
-#else
-        if (uamul && is_iron(uamul) &&
-            !is_quest_artifact(uamul) && !uarm) return 0;
-#endif
         if (ublindf && is_iron(ublindf)) return 0;
         if (uchain && is_iron(uchain)) return 0;
         if (uswapwep && is_iron(uswapwep) && u.twoweap) return 0;

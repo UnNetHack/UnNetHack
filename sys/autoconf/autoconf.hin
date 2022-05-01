@@ -286,9 +286,6 @@
 /* Using msleep */
 #undef TIMED_DELAY
 
-/* Tourist class */
-#undef TOURIST
-
 /* Console output */
 #undef TTY_GRAPHICS
 

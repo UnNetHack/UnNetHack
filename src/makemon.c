@@ -367,9 +367,8 @@ register struct monst *mtmp;
                 if (uarms) m_inityour(mtmp, uarms);
                 if (uarmg) m_inityour(mtmp, uarmg);
                 if (uarmf) m_inityour(mtmp, uarmf);
-#ifdef TOURIST
                 if (uarmu) m_inityour(mtmp, uarmu);
-#endif
+
                 /* same chance for an amulet of reflection as other
                    angelic beings have for a shield of reflection */
                 if (!rn2(4)) (void)mongets(mtmp, AMULET_OF_REFLECTION);

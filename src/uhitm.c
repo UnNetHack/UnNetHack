@@ -74,10 +74,8 @@ int hurt;
             }
             if ((target = which_armor(mdef, W_ARM)) != (struct obj *)0) {
                 (void) erode_obj(target, xname(target), hurt, EF_GREASE | EF_VERBOSE);
-#ifdef TOURIST
             } else if ((target = which_armor(mdef, W_ARMU)) != (struct obj *)0) {
                 (void) erode_obj(target, xname(target), hurt, EF_GREASE | EF_VERBOSE);
-#endif
             }
             break;
         case 2:
@@ -1012,14 +1010,14 @@ int dieroll;
                     }
                     tmp = 1;
                     break;
-#ifdef TOURIST
+
                 case EXPENSIVE_CAMERA:
                     You("succeed in destroying %s.  Congratulations!", ysimple_name(obj));
                     create_camera_demon(obj, u.ux, u.uy);
                     useup(obj);
                     return(TRUE);
                     break;
-#endif
+
                 case CORPSE: /* fixed by polder@cs.vu.nl */
                     if (touch_petrifies(&mons[obj->corpsenm])) {
                         tmp = 1;
@@ -1667,9 +1665,7 @@ struct attack *mattk;
         /* grabbing attacks the body */
         obj = which_armor(mdef, W_ARMC);        /* cloak */
         if (!obj) obj = which_armor(mdef, W_ARM);   /* suit */
-#ifdef TOURIST
         if (!obj) obj = which_armor(mdef, W_ARMU);  /* shirt */
-#endif
     }
 
     /* if your cloak/armor is greased, monster slips off; this

@@ -2286,14 +2286,13 @@ register struct monst *shkp;    /* if angry, impose a surcharge */
         } else if (!(obj->o_id % 4)) /* arbitrarily impose surcharge */
             tmp += tmp / 3L;
     }
-#ifdef TOURIST
-    if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV/2))
-        || (uarmu && !uarm && !uarmc))  /* touristy shirt visible */
+
+    if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV/2)) || (uarmu && !uarm && !uarmc)) {
+        /* touristy shirt visible */
         tmp += tmp / 3L;
-    else
-#endif
-    if (uarmh && uarmh->otyp == DUNCE_CAP)
+    } else if (uarmh && uarmh->otyp == DUNCE_CAP) {
         tmp += tmp / 3L;
+    }
 
     if (ACURR(A_CHA) > 18) tmp /= 2L;
     else if (ACURR(A_CHA) > 17) tmp -= tmp / 3L;
@@ -2482,12 +2481,10 @@ register struct monst *shkp;
 {
     long tmp = getprice(obj, TRUE) * obj->quan;
 
-#ifdef TOURIST
     if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV/2))
         || (uarmu && !uarm && !uarmc))  /* touristy shirt visible */
         tmp /= 3L;
     else
-#endif
     if (uarmh && uarmh->otyp == DUNCE_CAP)
         tmp /= 3L;
     else
@@ -4726,11 +4723,8 @@ boolean altusage; /* some items have an "alternate" use with different cost */
     } else if (otmp->oclass == SPBOOK_CLASS) {
         tmp -= tmp / 5L;
     } else if (otmp->otyp == CAN_OF_GREASE ||
-               otmp->otyp == TINNING_KIT
-#ifdef TOURIST
-               || otmp->otyp == EXPENSIVE_CAMERA
-#endif
-               ) {
+               otmp->otyp == TINNING_KIT ||
+               otmp->otyp == EXPENSIVE_CAMERA) {
         tmp /= 10L;
     } else if (otmp->otyp == POT_OIL) {
         tmp /= 5L;

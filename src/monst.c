@@ -3315,7 +3315,6 @@ struct permonst _mons2[] = {
         SIZ(WT_HUMAN, 400, 0, MS_HUMANOID, MZ_HUMAN), 0, 0,
         M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_STRONG|M2_COLLECT, M3_INFRAVISIBLE, HI_DOMESTIC),
-#ifdef TOURIST
     MON("tourist", S_HUMAN,
         LVL(10, 12, 10, 1, 0), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_WEAP, AD_PHYS, 1, 6),
@@ -3323,7 +3322,6 @@ struct permonst _mons2[] = {
         SIZ(WT_HUMAN, 400, 0, MS_HUMANOID, MZ_HUMAN), 0, 0,
         M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_STRONG|M2_COLLECT, M3_INFRAVISIBLE, HI_DOMESTIC),
-#endif
     /* valk is lawful by default; player valk can be neutral, in which case
        role_init() will change this monster and 'warrior' to be neutral too;
        if a neutral valk leaves a bones file containing neutral warriors,
@@ -3473,7 +3471,6 @@ struct permonst _mons2[] = {
         M2_NOPOLY|M2_HUMAN|M2_PNAME|M2_PEACEFUL|M2_STRONG|M2_MALE|
         M2_COLLECT|M2_MAGIC,
         M3_CLOSE|M3_INFRAVISIBLE, HI_LORD),
-#ifdef TOURIST
     MON("Twoflower", S_HUMAN,
         LVL(20, 12, 10, 20, 0), (G_NOGEN|G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_WEAP, AD_PHYS, 1, 6),
@@ -3483,7 +3480,6 @@ struct permonst _mons2[] = {
         M2_NOPOLY|M2_HUMAN|M2_PNAME|M2_PEACEFUL|M2_STRONG|M2_MALE|
         M2_COLLECT|M2_MAGIC,
         M3_CLOSE|M3_INFRAVISIBLE, HI_DOMESTIC),
-#endif
     /* for a valkyrie hero, Norn's alignment will be changed to match hero's
        starting alignment */
     MON("Norn", S_HUMAN,
@@ -3632,11 +3628,9 @@ struct permonst _mons2[] = {
         M2_NOPOLY|M2_HUMAN|M2_PNAME|M2_HOSTILE|M2_STRONG|M2_STALK|
         M2_NASTY|M2_MALE|M2_COLLECT|M2_MAGIC,
         M3_WANTSARTI|M3_WAITFORU|M3_INFRAVISIBLE, HI_LORD),
-#ifdef TOURIST
 /*
  * Note: the Master of Thieves was defined above.
  */
-#endif
     MON("Lord Surtur", S_GIANT,
         LVL(15, 12, 2, 50, 12), (G_NOGEN|G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 10), ATTK(AT_WEAP, AD_PHYS, 2, 10),
@@ -3767,7 +3761,6 @@ struct permonst _mons2[] = {
         M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_PEACEFUL|M2_STRONG|M2_COLLECT, M3_INFRAVISIBLE,
         HI_DOMESTIC),
-#ifdef TOURIST
     MON("guide", S_HUMAN,
         LVL(5, 12, 10, 20, 0), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_MAGC, AD_SPEL, 0, 0),
@@ -3776,7 +3769,6 @@ struct permonst _mons2[] = {
         M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_PEACEFUL | M2_STRONG|M2_COLLECT|M2_MAGIC,
         M3_INFRAVISIBLE, HI_DOMESTIC),
-#endif
     /* warriors used to be chaotic but have been changed to lawful because
        grow_up() promotes them to valkyrie; for a valkyrie hero, they might
        be changed to neutral at game start; see the valkyrie comment above */

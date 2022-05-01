@@ -1633,12 +1633,12 @@ befriend_with_obj(struct permonst *data, struct obj *obj)
          (obj->otyp == BANANA)) {
         return TRUE;
     }
-# ifdef TOURIST
+
     if (Role_if(PM_TOURIST) &&
          (data == &mons[PM_CROCODILE] || data == &mons[PM_BABY_CROCODILE])) {
         return TRUE;
     }
-# endif
+
     if ((Role_if(PM_RANGER) || Role_if(PM_CAVEMAN)) &&
          (data == &mons[PM_WINTER_WOLF_CUB])) {
         return TRUE;
@@ -2191,12 +2191,10 @@ boolean from_invent;
         }
         /* monster breathing isn't handled... [yet?] */
         break;
-#ifdef TOURIST
     case EXPENSIVE_CAMERA: {
         create_camera_demon(obj, x, y);
         break;
     }
-#endif
     case EGG:
         /* breaking your own eggs is bad luck */
         if (hero_caused && obj->spe && obj->corpsenm >= LOW_PM)
@@ -2256,9 +2254,7 @@ struct obj *obj;
         obj->oclass != GEM_CLASS)
         return 1;
     switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
-#ifdef TOURIST
     case EXPENSIVE_CAMERA:
-#endif
     case POT_WATER:         /* really, all potions */
     case EGG:
     case CREAM_PIE:
@@ -2290,9 +2286,7 @@ boolean in_view;
     case LENSES:
     case MIRROR:
     case CRYSTAL_BALL:
-#ifdef TOURIST
     case EXPENSIVE_CAMERA:
-#endif
         to_pieces = " into a thousand pieces";
     /* fall through */
     case POT_WATER:         /* really, all potions */

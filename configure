@@ -787,7 +787,6 @@ enable_blackmarket
 enable_kops
 enable_seduce
 enable_randomized_planes
-enable_tourist
 enable_redo
 enable_clipping
 enable_menu_color
@@ -1491,7 +1490,6 @@ Optional Features:
   --enable-seduce         Succubi/incubi seduction (default=yes)
   --enable-randomized-planes
                           Shuffling order of Elemental Planes (default=yes)
-  --enable-tourist        Tourist class (default=yes)
   --enable-redo           Redo last command (default=yes)
   --enable-clipping       Allow smaller screens (default=yes)
   --enable-menu-color     TTY graphics menu color (default=yes)
@@ -6919,24 +6917,6 @@ printf "%s\n" "#define RANDOMIZED_PLANES /**/" >>confdefs.h
    fi
 
 # NETHACK_ARG(dwarf,[Dwarf race],DWARF,yes)
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to enable tourist" >&5
-printf %s "checking whether to enable tourist... " >&6; }
-   # Check whether --enable-tourist was given.
-if test ${enable_tourist+y}
-then :
-  enableval=$enable_tourist;
-else $as_nop
-  enable_tourist="yes"
-fi
-
-   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $enable_tourist" >&5
-printf "%s\n" "$enable_tourist" >&6; }
-   if test "$enable_tourist" != "no" ; then
-
-printf "%s\n" "#define TOURIST /**/" >>confdefs.h
-
-   fi
-
 # NETHACK_ARG(yeoman,[Yeoman class],YEOMAN,yes)
 # NETHACK_ARG(zouthern,[Zoutherner class],ZOUTHERN,no)
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to enable redo" >&5

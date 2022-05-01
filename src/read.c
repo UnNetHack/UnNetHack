@@ -297,7 +297,6 @@ doread()
         }
         useup(scroll);
         return 1;
-#ifdef TOURIST
     } else if (scroll->otyp == T_SHIRT ||
                scroll->otyp == ALCHEMY_SMOCK ||
                scroll->otyp == HAWAIIAN_SHIRT) {
@@ -380,7 +379,6 @@ doread()
         }
         violated(CONDUCT_ILLITERACY);
         return 1;
-#endif  /* TOURIST */
 
     } else if ((scroll->otyp == TIN) ||
                (scroll->otyp == CAN_OF_GREASE) ||
@@ -742,9 +740,7 @@ int curse_bless;
 
         case MAGIC_MARKER:
         case TINNING_KIT:
-#ifdef TOURIST
         case EXPENSIVE_CAMERA:
-#endif
             if (is_cursed) stripspe(obj);
             else if (rechrg && obj->otyp == MAGIC_MARKER) { /* previously recharged */
                 obj->recharged = 1; /* override increment done above */
