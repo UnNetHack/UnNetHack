@@ -1155,8 +1155,10 @@ int otyp;
     default:           skills = 0; break;   /* lint suppression */
     }
 
-    while (skills->skill != P_NONE) {
-        if (skills->skill == this_skill) return FALSE;
+    while (skills && skills->skill != P_NONE) {
+        if (skills->skill == this_skill) {
+            return FALSE;
+        }
         ++skills;
     }
     return TRUE;
@@ -1362,15 +1364,9 @@ register struct trobj *trop;
             obj->was_in_starting_inventory = TRUE;
         }
 
-#if !defined(PYRAMID_BUG) && !defined(MAC)
-        if(--trop->trquan) continue;    /* make a similar object */
-#else
-        if(trop->trquan) {      /* check if zero first */
-            --trop->trquan;
-            if(trop->trquan)
-                continue;   /* make a similar object */
+        if (--trop->trquan) {
+            continue; /* make a similar object */
         }
-#endif
         trop++;
     }
 }
