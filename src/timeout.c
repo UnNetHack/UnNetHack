@@ -1858,16 +1858,39 @@ void
 timer_sanity_check()
 {
     timer_element *curr;
+    boolean corrupted_timer = FALSE;
 
     /* this should be much more complete */
-    for (curr = timer_base; curr; curr = curr->next)
+    for (curr = timer_base; curr; curr = curr->next) {
         if (curr->kind == TIMER_OBJECT) {
             struct obj *obj = curr->arg.a_obj;
+
             if (obj->timed == 0) {
-                pline("timer sanity: untimed obj %s, timer %ld",
-                      fmt_ptr((genericptr_t)obj), curr->tid);
+                impossible("timer sanity: untimed obj %s, timer %ld", fmt_ptr(obj), curr->tid);
+                corrupted_timer = TRUE;
+            }
+        } else if (curr->kind == TIMER_LEVEL) {
+            long where = curr->arg.a_long;
+            xchar x = (xchar) ((where >> 16) & 0xFFFF),
+                  y = (xchar) (where & 0xFFFF);
+
+            if (!isok(x, y)) {
+                impossible("timer sanity: spot timer %lu at <%d,%d>", curr->tid, x, y);
+                corrupted_timer = TRUE;
+            } else if (curr->func_index == MELT_ICE_AWAY && !is_ice(x, y)) {
+                impossible("timer sanity: melt timer %lu on non-ice %d <%d,%d>",
+                           curr->tid, levl[x][y].typ, x, y);
+                corrupted_timer = TRUE;
             }
         }
+
+        /* Try removing the corrupted timer.
+           In debug environments, impossible will have crashed the game already. */
+        if (corrupted_timer) {
+            remove_timer(&timer_base, curr->func_index, &curr->arg);
+            corrupted_timer = FALSE;
+        }
+    }
 }
 
 #endif /* WIZARD */
