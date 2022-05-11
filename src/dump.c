@@ -106,7 +106,9 @@ dump_init()
         strncpy(dump_path, new_dump_fn, BUFSIZ-1);
         dump_fp = fopen(new_dump_fn, "w");
         if (!dump_fp) {
-            pline("Can't open %s for output.", new_dump_fn);
+            if (new_dump_fn) {
+                pline("Can't open %s for output.", new_dump_fn);
+            }
             pline("Dump file not created.");
 #ifdef UNIX
         } else {

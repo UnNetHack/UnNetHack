@@ -2280,6 +2280,10 @@ long *total_count, *total_size;
     struct cemetery *ce;
     mapseen *mptr = find_mapseen(&u.uz);
 
+    if (!statsfmt) {
+        return;
+    }
+
     ocount = bcount = acount = osize = bsize = asize = 0L;
     for (mptr = mapseenchn; mptr; mptr = mptr->next) {
         ++ocount;
