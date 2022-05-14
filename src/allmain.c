@@ -758,19 +758,19 @@ newgame()
     for (i = 0; i < NUMMONS; i++)
         mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;
 
+    flags.pantheon = -1; /* role_init() will reset this */
+    role_init();         /* must be before init_dungeons(), u_init(),
+                          * and init_artifacts() */
+
     init_level_seeds();
 
-    init_objects();     /* must be before u_init() */
+    init_objects();      /* must be before u_init() */
 
-    flags.pantheon = -1;    /* role_init() will reset this */
-    role_init();        /* must be before init_dungeons(), u_init(),
-                         * and init_artifacts() */
-
-    init_dungeons();    /* must be before u_init() to avoid rndmonst()
-                         * creating odd monsters for any tins and eggs
-                         * in hero's initial inventory */
-    init_artifacts();   /* before u_init() in case $WIZKIT specifies
-                         * any artifacts */
+    init_dungeons();     /* must be before u_init() to avoid rndmonst()
+                          * creating odd monsters for any tins and eggs
+                          * in hero's initial inventory */
+    init_artifacts();    /* before u_init() in case $WIZKIT specifies
+                          * any artifacts */
     u_init();
 
 #ifndef NO_SIGNAL
