@@ -610,15 +610,17 @@ getbones()
     register int ok;
     char c, *bonesid, oldbonesid[40]; /* was [10]; more should be safer */
 
-    if(discover)        /* save bones files for real games */
-        return(0);
-
     /* wizard check added by GAN 02/05/87 */
     if(rn2(3)   /* only once in three times do we find bones */
 #ifdef WIZARD
        && !wizard
 #endif
        ) return(0);
+
+    if (discover) {
+        /* save bones files for real games */
+        return 0;
+    }
 
     if (!flags.bones) return(0);
     if(no_bones_level(&u.uz)) return(0);
