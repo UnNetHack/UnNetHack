@@ -17,6 +17,9 @@
 	* Monster changes:
 	  - Foocubi switch gender after successful seduction attack
 
+	* Race changes:
+	  - Allow player vampires to be neutral
+
 	* Ported NetHack 3.6 improvements, non exhaustive list:
 	  - Automatic fuzzer for debugging
 	  - Statues as monster symbols

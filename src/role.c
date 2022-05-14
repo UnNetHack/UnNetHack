@@ -482,7 +482,7 @@ const struct Race races[] = {
     {   "vampire", "vampiric", "vampirehood", "Vam",
         {0, 0},
         PM_VAMPIRE, NON_PM, PM_HUMAN_MUMMY, PM_HUMAN_ZOMBIE,
-        MH_VAMPIRE | ROLE_MALE|ROLE_FEMALE | ROLE_CHAOTIC,
+        MH_VAMPIRE | ROLE_MALE | ROLE_FEMALE | ROLE_NEUTRAL | ROLE_CHAOTIC,
         MH_VAMPIRE, 0, MH_ELF|MH_GNOME|MH_DWARF|MH_ORC,
         /*    Str     Int Wis Dex Con Cha */
         {      3,      3,  3,  3,  3,  3 },
