@@ -508,7 +508,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
                     free(tmpstr);
                 } else {
                     /* clean up the leftovers on the next line, if we didn't scroll it away */
-                    mvwprintw(win, my--, border_space, "%*c", strlen(linestarts[nlines]), ' ');
+                    mvwprintw(win, my--, border_space, "%*c", (int) strlen(linestarts[nlines]), ' ');
                 }
             }
             break;
