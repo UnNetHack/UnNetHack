@@ -124,6 +124,11 @@ register struct obj *obj;
                          has_blood(&mons[obj->corpsenm]) && (!obj->odrained ||
                                                              obj->oeaten > drainlevel(obj)));
 
+    if (is_gem_eater(youmonst.data) &&
+        (obj->oclass == GEM_CLASS && objects[obj->otyp].oc_tough)) {
+        return TRUE;
+    }
+
     /* return((boolean)(!!index(comestibles, obj->oclass))); */
     return (boolean)(obj->oclass == FOOD_CLASS);
 }
@@ -394,6 +399,14 @@ struct obj *otmp;
             nut += nut / 6; /* 600 -> 700 */
         }
     }
+
+    if (otmp->oclass == GEM_CLASS && objects[otmp->otyp].oc_tough) {
+        /* Nutritional value of hard gems should be proportional to their density. But we don't have this
+           data so just go by a price heuristic. */
+        int factor = 10 * objects[otmp->otyp].oc_cost / objects[DIAMOND].oc_cost;
+        nut *= factor;
+    }
+
     return nut;
 }
 
