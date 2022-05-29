@@ -2426,15 +2426,18 @@ struct obj *potion, *obj;
         }
         potion->in_use = FALSE; /* didn't go poof */
         return(1);
-    } else if(obj->oclass == POTION_CLASS && obj->otyp != potion->otyp) {
+    } else if (obj->oclass == POTION_CLASS && obj->otyp != potion->otyp) {
         /* Mixing potions is dangerous... */
         /* Give a clue to what's going on ... */
-        if(potion->dknown && obj->dknown) {
-            You("mix the %s potion with the %s one ...",
+        if (potion->dknown && obj->dknown) {
+            You("mix the %s potion%s with the %s one%s ...",
                 OBJ_DESCR(objects[potion->otyp]),
-                OBJ_DESCR(objects[obj->otyp]));
-        } else
+                potion->quan > 1 ? "s" : "",
+                OBJ_DESCR(objects[obj->otyp]),
+                obj->quan > 1 ? "s" : "");
+        } else {
             pline_The("potions mix...");
+        }
         /* KMH, balance patch -- acid is particularly unstable */
         if (obj->cursed || obj->otyp == POT_ACID ||
             potion->otyp == POT_ACID ||
@@ -2453,25 +2456,29 @@ struct obj *potion, *obj;
         obj->blessed = obj->cursed = obj->bknown = 0;
         if (Blind || Hallucination) obj->dknown = 0;
 
+        short mixed_otyp;
         if ((mixture = mixtype(obj, potion)) != 0) {
-            obj->otyp = mixture;
+            mixed_otyp = mixture;
         } else {
             switch (obj->odiluted ? 1 : rnd(8)) {
             case 1:
-                obj->otyp = POT_WATER;
+                mixed_otyp = POT_WATER;
                 break;
+
             case 2:
             case 3:
-                obj->otyp = POT_SICKNESS;
+                mixed_otyp = POT_SICKNESS;
                 break;
+
             case 4:
             {
                 struct obj *otmp;
                 otmp = mkobj(POTION_CLASS, FALSE);
-                obj->otyp = otmp->otyp;
+                mixed_otyp = otmp->otyp;
                 obfree(otmp, (struct obj *)0);
             }
             break;
+
             default:
                 if (!Blind)
                     pline_The("mixture glows brightly and evaporates.");
@@ -2481,10 +2488,8 @@ struct obj *potion, *obj;
             }
         }
 
-        obj->odiluted = (obj->otyp != POT_WATER);
-
-        if (OBJ_NAME(objects[obj->otyp]) == 0) {
-            panic("dipping created an inexistant potion (%d)", obj->otyp);
+        if (OBJ_NAME(objects[mixed_otyp]) == 0) {
+            panic("dipping created an inexistant potion (%d)", mixed_otyp);
         }
 
         if (obj->otyp == POT_WATER && !Hallucination) {
@@ -2492,10 +2497,35 @@ struct obj *potion, *obj;
                       Blind ? "" : ", then clears");
         } else if (!Blind) {
             pline_The("mixture looks %s.",
-                      hcolor(OBJ_DESCR(objects[obj->otyp])));
+                      hcolor(OBJ_DESCR(objects[mixed_otyp])));
         }
 
-        useup(potion);
+        /* mixing potions needs equal numbers of both types */
+        int count = (obj->quan > potion->quan) ? potion->quan : obj->quan;
+
+        struct obj *mixed_potion;
+        if (count < potion->quan) {
+            mixed_potion = splitobj(potion, count);
+            assigninvlet(mixed_potion);
+        } else {
+            mixed_potion = potion;
+        }
+        /* the mixed potions don't get lost */
+        mixed_potion->quan = count * 2;
+        mixed_potion->owt = weight(mixed_potion);
+        mixed_potion->otyp = mixed_otyp;
+
+        /* diluted if any of the involved potions is diluted */
+        if (mixed_potion->otyp != POT_WATER) {
+            mixed_potion->odiluted = (obj->odiluted || potion->odiluted);
+        }
+
+        if (count >= obj->quan) {
+            useupall(obj);
+        } else {
+            useupall(splitobj(obj, count));
+        }
+
         return(1);
     }
 
