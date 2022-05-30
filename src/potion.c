@@ -2155,7 +2155,7 @@ register struct obj *o1, *o2;
                 break;
 
             case JASPER:
-                potion_descr = "purple-red";
+                potion_descr = "puce";
                 break;
 
             /* orange */
@@ -2178,11 +2178,11 @@ register struct obj *o1, *o2;
 
             /* yellowish brown */
             case AMBER:
-                potion_descr = "brown";
+                potion_descr = "amber";
                 break;
 
             case TOPAZ:
-                potion_descr = "murky";
+                potion_descr = "brown";
                 break;
 
             /* green */
@@ -2191,11 +2191,11 @@ register struct obj *o1, *o2;
                 break;
 
             case TURQUOISE:
-                potion_descr = "sky blue";
+                potion_descr = "squishy";
                 break;
 
             case AQUAMARINE:
-                potion_descr = "cyan";
+                potion_descr = "sparkling";
                 break;
 
             case JADE:
@@ -2204,7 +2204,7 @@ register struct obj *o1, *o2;
 
             /* blue */
             case SAPPHIRE:
-                potion_descr = "brilliant blue";
+                potion_descr = "indigo";
                 break;
 
             /* violet */
@@ -2849,6 +2849,7 @@ more_dips:
                 /* MRKR: an alchemy smock ought to be */
                 /* some protection against this: */
                 losehp(Acid_resistance ? rnd(5) : rnd(10), "alchemic blast", KILLED_BY_AN);
+
                 return 1;
             }
 

@@ -777,7 +777,7 @@ NEARDATA struct objclass objects[] = {
     POTION("hallucination", "sky blue",     1, HALLUC,     40, 100, CLR_CYAN),
     POTION("invisibility", "indigo",        1, INVIS,      40, 150, CLR_BRIGHT_BLUE),
     POTION("see invisible", "magenta",      1, SEE_INVIS,  42,  50, CLR_MAGENTA),
-    POTION("healing", "amber",              1, 0,          57, 100, CLR_ORANGE),
+    POTION("healing", "amber",              1, 0,          57, 100, CLR_BROWN),
     POTION("extra healing", "puce",         1, 0,          47, 100, CLR_RED),
     POTION("gain level", "brown",           1, 0,          20, 300, CLR_BROWN),
     POTION("monster detection", "white",    1, 0,          40, 150, CLR_WHITE),
@@ -788,7 +788,7 @@ NEARDATA struct objclass objects[] = {
 /* ^^^ POT_POLYMORPH == last potion description used in color alchemy. */
 /* Remaining potions that aren't just descriptions follow. */
     POTION("levitation", "viscous",         1, LEVITATION, 42, 200, CLR_GRAY),
-    POTION("enlightenment", "swirly",       1, 0,          20, 200, CLR_BROWN),
+    POTION("enlightenment", "swirly",       1, 0,          20, 200, CLR_ORANGE),
     POTION("sleeping", "effervescent",      1, 0,          42, 100, CLR_GRAY),
     POTION("booze", "milky",                0, 0,          42,  50, CLR_WHITE),
     POTION("sickness", "fizzy",             0, 0,          42,  50, CLR_CYAN),
