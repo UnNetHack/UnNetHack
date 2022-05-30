@@ -44,6 +44,7 @@
 	  - Ensure all color alchemy potions exist in any given game
 	  - Potion mixing needs equal numbers of potions on both sides
 	     Number of generated potions is the combined total of the involved potions
+	  - Gem alchemy (from dNetHack)
 
 	* artifact changes:
 	  - Removed artifact wish failure due to the number of existing artifacts
