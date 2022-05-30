@@ -1130,9 +1130,10 @@ add_obj_info(winid datawin, struct obj *obj, short otyp)
             } else if (mixture > 0) {
                 Sprintf(buf, "Dipping into a potion of acid creates %s potion.",
                         an(OBJ_DESCR(objects[mixture])));
-                const char* identified_potion = OBJ_NAME(objects[mixture]);
-                if (oc.oc_name_known) {
-                    Sprintf(eos(buf)-1, " (%s).", identified_potion);
+                const char* identified_potion_name = OBJ_NAME(objects[mixture]);
+                boolean identified_potion = objects[mixture].oc_name_known;
+                if (identified_potion && identified_potion_name) {
+                    Sprintf(eos(buf)-1, " (%s).", identified_potion_name);
                 }
                 OBJPUTSTR(buf);
             }
