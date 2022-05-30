@@ -13,7 +13,6 @@ STATIC_DCL long FDECL(itimeout_incr, (long, int));
 STATIC_DCL void NDECL(ghost_from_bottle);
 STATIC_OVL void NDECL(alchemy_init);
 STATIC_DCL boolean FDECL(H2Opotion_dip, (struct obj *, struct obj *, BOOLEAN_P, const char *));
-STATIC_DCL short FDECL(mixtype, (struct obj *, struct obj *));
 
 #ifndef TESTING
 STATIC_DCL int FDECL(dip, (struct obj *, struct obj *));
@@ -2028,7 +2027,7 @@ get_base_mix_color(struct obj *potion)
 }
 
 /** Returns the potion type when object o1 is dipped into object o2 */
-STATIC_OVL short
+short
 mixtype(o1, o2)
 register struct obj *o1, *o2;
 {

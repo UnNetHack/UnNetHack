@@ -2076,6 +2076,7 @@ E const char *NDECL(bottlename);
 extern boolean is_dark_mix_color(struct obj *);
 extern boolean is_colorless_mix_potion(struct obj *);
 extern const char* get_base_mix_color(struct obj *);
+extern short mixtype(struct obj *, struct obj *);
 
 /* ### pray.c ### */
 

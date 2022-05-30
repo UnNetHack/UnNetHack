@@ -1105,17 +1105,37 @@ add_obj_info(winid datawin, struct obj *obj, short otyp)
         }
     }
 
-    if (identified && olet == GEM_CLASS) {
-        if (oc.oc_material == MINERAL) {
-            OBJPUTSTR("Type of stone.");
-        } else if (oc.oc_material == GLASS) {
-            OBJPUTSTR("Piece of colored glass.");
-        } else {
-            OBJPUTSTR("Precious gem.");
+    if (olet == GEM_CLASS) {
+        if (identified) {
+            if (oc.oc_material == MINERAL) {
+                OBJPUTSTR("Type of stone.");
+            } else if (oc.oc_material == GLASS) {
+                OBJPUTSTR("Piece of colored glass.");
+            } else {
+                OBJPUTSTR("Precious gem.");
+            }
+            /* can do unconditionally, these aren't randomized */
+            if (oc.oc_tough) {
+                OBJPUTSTR("Is made of a hard material.");
+            }
         }
-        /* can do unconditionally, these aren't randomized */
-        if (oc.oc_tough) {
-            OBJPUTSTR("Is made of a hard material.");
+
+        if (obj && objects[obj->otyp].oc_name_known) {
+            struct obj *potion = mksobj(POT_ACID, FALSE, FALSE);
+            short mixture = mixtype(obj, potion);
+            obfree(potion, (struct obj *)0);
+
+            if (obj->otyp == DILITHIUM_CRYSTAL) {
+                OBJPUTSTR("Dipping into a potion of acid creates an explosion.");
+            } else if (mixture > 0) {
+                Sprintf(buf, "Dipping into a potion of acid creates %s potion.",
+                        an(OBJ_DESCR(objects[mixture])));
+                const char* identified_potion = OBJ_NAME(objects[mixture]);
+                if (oc.oc_name_known) {
+                    Sprintf(eos(buf)-1, " (%s).", identified_potion);
+                }
+                OBJPUTSTR(buf);
+            }
         }
     }
 
