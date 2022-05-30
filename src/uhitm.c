@@ -7,9 +7,7 @@ STATIC_DCL void FDECL(steal_it, (struct monst *, struct attack *));
 static boolean FDECL(hitum, (struct monst *, struct attack *));
 static boolean FDECL(hmon_hitmon, (struct monst *, struct obj *, int, int));
 STATIC_DCL void FDECL(noisy_hit, (struct monst*, struct obj*, int));
-#ifdef STEED
 STATIC_DCL int FDECL(joust, (struct monst *, struct obj *));
-#endif
 STATIC_DCL void NDECL(demonpet);
 STATIC_DCL boolean FDECL(m_slips_free, (struct monst *mtmp, struct attack *mattk));
 STATIC_DCL int FDECL(explum, (struct monst *, struct attack *));
@@ -76,10 +74,8 @@ int hurt;
             }
             if ((target = which_armor(mdef, W_ARM)) != (struct obj *)0) {
                 (void) erode_obj(target, xname(target), hurt, EF_GREASE | EF_VERBOSE);
-#ifdef TOURIST
             } else if ((target = which_armor(mdef, W_ARMU)) != (struct obj *)0) {
                 (void) erode_obj(target, xname(target), hurt, EF_GREASE | EF_VERBOSE);
-#endif
             }
             break;
         case 2:
@@ -302,7 +298,7 @@ int *attk_count, *role_roll_penalty;
             mtmp->mfrozen = 0;
         }
     }
-#ifdef CONVICT
+
     /* Adding iron ball as a weapon skill gives a -4 penalty for
        unskilled vs no penalty for non-weapon objects.  Add 4 to
        compensate. */
@@ -311,7 +307,7 @@ int *attk_count, *role_roll_penalty;
                        penalty for unskilled vs no penalty for non-
                        weapon objects. */
     }
-#endif /* CONVICT */
+
     if (Role_if(PM_MONK) && !Upolyd) {
         if (uarm) {
             tmp -= (*role_roll_penalty = urole.spelarmr);
@@ -754,9 +750,7 @@ int dieroll;
     boolean hand_to_hand = (thrown == HMON_MELEE ||
                             /* not grapnels; applied implies uwep */
                             (thrown == HMON_APPLIED && is_pole(uwep)));
-#ifdef STEED
     int jousting = 0;
-#endif
     long silverhit = 0L;
     int wtype;
     struct obj *monwep;
@@ -855,11 +849,7 @@ int dieroll;
                 Strcpy(saved_oname, bare_artifactname(obj));
             }
             if (obj->oclass == WEAPON_CLASS || is_weptool(obj) ||
-#ifdef CONVICT
-               obj->oclass == GEM_CLASS || obj->otyp == HEAVY_IRON_BALL) {
-#else
-               obj->oclass == GEM_CLASS) {
-#endif /* CONVICT */
+                obj->oclass == GEM_CLASS || obj->otyp == HEAVY_IRON_BALL) {
 
                 /* is it not a melee weapon? */
                 if (/* if you strike with a bow... */
@@ -867,11 +857,7 @@ int dieroll;
                     /* or strike with a missile in your hand... */
                     (!thrown && (is_missile(obj) || is_ammo(obj))) ||
                     /* or use a pole at short range and not mounted... */
-                    (!thrown &&
-#ifdef STEED
-                     !u.usteed &&
-#endif
-                     is_pole(obj)) ||
+                    (!thrown && !u.usteed && is_pole(obj)) ||
                     /* or throw a missile without the proper bow... */
                     (is_ammo(obj) && (thrown != HMON_THROWN || !ammo_and_launcher(obj, uwep)))) {
                     /* then do only 1-2 points of damage */
@@ -961,14 +947,14 @@ int dieroll;
                 if (artifact_light(obj) && obj->lamplit && mon_hates_light(mon)) {
                     lightobj = TRUE;
                 }
-#ifdef STEED
+
                 if (u.usteed && !thrown && tmp > 0 &&
                     weapon_type(obj) == P_LANCE && mon != u.ustuck) {
                     jousting = joust(mon, obj);
                     /* exercise skill even for minimal damage hits */
                     if (jousting) valid_weapon_attack = TRUE;
                 }
-#endif
+
                 if (thrown == HMON_THROWN && (is_ammo(obj) || is_missile(obj))) {
                     if (ammo_and_launcher(obj, uwep)) {
                         if (uwep->oartifact == ART_LONGBOW_OF_DIANA)
@@ -1024,14 +1010,14 @@ int dieroll;
                     }
                     tmp = 1;
                     break;
-#ifdef TOURIST
+
                 case EXPENSIVE_CAMERA:
                     You("succeed in destroying %s.  Congratulations!", ysimple_name(obj));
                     create_camera_demon(obj, u.ux, u.uy);
                     useup(obj);
                     return(TRUE);
                     break;
-#endif
+
                 case CORPSE: /* fixed by polder@cs.vu.nl */
                     if (touch_petrifies(&mons[obj->corpsenm])) {
                         tmp = 1;
@@ -1307,7 +1293,7 @@ int dieroll;
         }
     } else
 #endif
-#ifdef STEED
+
     if (jousting) {
         tmp += d(2, (obj == uwep) ? 10 : 2);    /* [was in dmgval()] */
         You("joust %s%s",
@@ -1329,7 +1315,6 @@ int dieroll;
         }
         hittxt = TRUE;
     } else
-#endif
 
     /* VERY small chance of stunning opponent if unarmed. */
     if (unarmed && tmp > 1 && !thrown && !obj && !Upolyd) {
@@ -1680,9 +1665,7 @@ struct attack *mattk;
         /* grabbing attacks the body */
         obj = which_armor(mdef, W_ARMC);        /* cloak */
         if (!obj) obj = which_armor(mdef, W_ARM);   /* suit */
-#ifdef TOURIST
         if (!obj) obj = which_armor(mdef, W_ARMU);  /* shirt */
-#endif
     }
 
     /* if your cloak/armor is greased, monster slips off; this

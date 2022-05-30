@@ -868,7 +868,6 @@ NEARDATA struct permonst mons[] = {
         SIZ(40, 30, 0, MS_SQEEK, MZ_TINY), MR_POISON, 0,
         M1_NOHANDS|M1_POIS|M1_REGEN|M1_CARNIVORE,
         M2_NOPOLY|M2_WERE|M2_HOSTILE, M3_INFRAVISIBLE, CLR_MAGENTA),
-#ifdef CONVICT
     MON("enormous rat", S_RODENT,
         LVL(6, 8, 5, 0, 0), (G_NOSHEOL|G_GENO|G_SGROUP|1),
         A(ATTK(AT_BITE, AD_PHYS, 2, 6),
@@ -876,7 +875,6 @@ NEARDATA struct permonst mons[] = {
         SIZ(400, 150, 0, MS_SQEEK, MZ_MEDIUM), 0, 0,
         M1_ANIMAL|M1_NOHANDS|M1_CARNIVORE, M2_HOSTILE, M3_INFRAVISIBLE,
         CLR_BROWN),
-#endif /* CONVICT */
     MON("rock mole", S_RODENT,
         LVL(3, 3, 0, 20, 0), (G_NOSHEOL|G_GENO|2),
         A(ATTK(AT_BITE, AD_PHYS, 1, 6),
@@ -2492,7 +2490,6 @@ struct permonst _mons2[] = {
         M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_STRONG|M2_COLLECT,
         M3_INFRAVISIBLE, HI_DOMESTIC),
-#ifdef CONVICT
     MON("miner", S_HUMAN,
         LVL(2, 6, 10, 10, 4), (G_GENO|G_NOGEN),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 8),
@@ -2509,7 +2506,6 @@ struct permonst _mons2[] = {
         M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_MERC|M2_STALK|M2_HOSTILE|M2_STRONG|M2_COLLECT,
         M3_INFRAVISIBLE, HI_METAL),
-#endif /* CONVICT */
     MON("wererat", S_HUMAN,
         LVL(2, 12, 10, 10, -7), (G_NOSHEOL|1),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 4),
@@ -2806,7 +2802,6 @@ struct permonst _mons2[] = {
         M1_HUMANOID|M1_POIS|M1_SWIM,
         M2_NOPOLY|M2_DEMON|M2_STALK|M2_HOSTILE|M2_NASTY|M2_COLLECT,
         M3_INFRAVISIBLE|M3_INFRAVISION, CLR_BLUE),
-#ifdef CONVICT
     MON("lava demon", S_DEMON,
         LVL(12, 12, -8, 40, -7), (G_NOCORPSE|G_NOGEN),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_BITE, AD_PHYS, 1, 8),
@@ -2815,7 +2810,6 @@ struct permonst _mons2[] = {
         M1_HUMANOID|M1_POIS,
         M2_NOPOLY|M2_DEMON|M2_STALK|M2_HOSTILE|M2_NASTY|M2_COLLECT,
         M3_INFRAVISIBLE|M3_INFRAVISION, CLR_RED),
-#endif
 /* standard demons & devils
  */
 #define SEDUCTION_ATTACKS_YES                                     \
@@ -3253,7 +3247,6 @@ struct permonst _mons2[] = {
         M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_STRONG|M2_FEMALE|M2_COLLECT, M3_INFRAVISIBLE,
         HI_DOMESTIC),
-#ifdef CONVICT
     MON("convict", S_HUMAN,
         LVL(10, 12, 10, 1, 0), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_WEAP, AD_PHYS, 1, 6),
@@ -3261,7 +3254,6 @@ struct permonst _mons2[] = {
         SIZ(WT_HUMAN, 400, 0, MS_HUMANOID, MZ_HUMAN), 0, 0,
         M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_STRONG|M2_COLLECT, M3_INFRAVISIBLE, HI_DOMESTIC),
-#endif  /* CONVICT */
     MON("healer", S_HUMAN,
         LVL(10, 12, 10, 1, 0), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6),
@@ -3323,7 +3315,6 @@ struct permonst _mons2[] = {
         SIZ(WT_HUMAN, 400, 0, MS_HUMANOID, MZ_HUMAN), 0, 0,
         M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_STRONG|M2_COLLECT, M3_INFRAVISIBLE, HI_DOMESTIC),
-#ifdef TOURIST
     MON("tourist", S_HUMAN,
         LVL(10, 12, 10, 1, 0), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_WEAP, AD_PHYS, 1, 6),
@@ -3331,7 +3322,6 @@ struct permonst _mons2[] = {
         SIZ(WT_HUMAN, 400, 0, MS_HUMANOID, MZ_HUMAN), 0, 0,
         M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_STRONG|M2_COLLECT, M3_INFRAVISIBLE, HI_DOMESTIC),
-#endif
     /* valk is lawful by default; player valk can be neutral, in which case
        role_init() will change this monster and 'warrior' to be neutral too;
        if a neutral valk leaves a bones file containing neutral warriors,
@@ -3383,7 +3373,6 @@ struct permonst _mons2[] = {
         M2_NOPOLY|M2_HUMAN|M2_PNAME|M2_PEACEFUL|M2_STRONG|M2_MALE|
         M2_COLLECT|M2_MAGIC,
         M3_CLOSE|M3_INFRAVISIBLE, HI_LORD),
-#ifdef CONVICT
     MON("Robert the Lifer", S_HUMAN,
         LVL(20, 12, 0, 40, -20), (G_NOGEN|G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_WEAP, AD_PHYS, 1, 6),
@@ -3393,7 +3382,6 @@ struct permonst _mons2[] = {
         M2_NOPOLY|M2_HUMAN|M2_PNAME|M2_PEACEFUL|M2_STRONG|M2_MALE|
         M2_COLLECT|M2_MAGIC,
         M3_CLOSE|M3_INFRAVISIBLE, HI_DOMESTIC),
-#endif /* CONVICT */
 #if 0   /* OBSOLETE */
 /* Two for elves - one of each sex.
  */
@@ -3483,7 +3471,6 @@ struct permonst _mons2[] = {
         M2_NOPOLY|M2_HUMAN|M2_PNAME|M2_PEACEFUL|M2_STRONG|M2_MALE|
         M2_COLLECT|M2_MAGIC,
         M3_CLOSE|M3_INFRAVISIBLE, HI_LORD),
-#ifdef TOURIST
     MON("Twoflower", S_HUMAN,
         LVL(20, 12, 10, 20, 0), (G_NOGEN|G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_WEAP, AD_PHYS, 1, 6),
@@ -3493,7 +3480,6 @@ struct permonst _mons2[] = {
         M2_NOPOLY|M2_HUMAN|M2_PNAME|M2_PEACEFUL|M2_STRONG|M2_MALE|
         M2_COLLECT|M2_MAGIC,
         M3_CLOSE|M3_INFRAVISIBLE, HI_DOMESTIC),
-#endif
     /* for a valkyrie hero, Norn's alignment will be changed to match hero's
        starting alignment */
     MON("Norn", S_HUMAN,
@@ -3551,7 +3537,6 @@ struct permonst _mons2[] = {
         M2_NOPOLY|M2_PNAME|M2_HOSTILE|M2_FEMALE|M2_STALK|M2_STRONG|M2_NASTY|
         M2_GREEDY|M2_JEWELS|M2_MAGIC,
         M3_WANTSARTI|M3_WAITFORU|M3_INFRAVISIBLE, HI_LORD),
-#ifdef CONVICT
     MON("Warden Arianna", S_HUMAN,
         LVL(20, 12, 0, 40, -14), (G_NOGEN|G_UNIQ|G_NOCORPSE),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 25), ATTK(AT_WEAP, AD_PHYS, 1, 25),
@@ -3561,7 +3546,6 @@ struct permonst _mons2[] = {
         M2_NOPOLY|M2_HUMAN|M2_PNAME|M2_HOSTILE|M2_STRONG|M2_STALK|
         M2_NASTY|M2_FEMALE|M2_COLLECT|M2_MAGIC,
         M3_WANTSARTI|M3_WAITFORU|M3_INFRAVISIBLE, HI_LORD),
-#endif /* CONVICT */
 #if 0   /* OBSOLETE */
     MON("Goblin King", S_ORC,
         LVL(15, 12, 10, 0, -15), (G_NOGEN|G_UNIQ),
@@ -3644,11 +3628,9 @@ struct permonst _mons2[] = {
         M2_NOPOLY|M2_HUMAN|M2_PNAME|M2_HOSTILE|M2_STRONG|M2_STALK|
         M2_NASTY|M2_MALE|M2_COLLECT|M2_MAGIC,
         M3_WANTSARTI|M3_WAITFORU|M3_INFRAVISIBLE, HI_LORD),
-#ifdef TOURIST
 /*
  * Note: the Master of Thieves was defined above.
  */
-#endif
     MON("Lord Surtur", S_GIANT,
         LVL(15, 12, 2, 50, 12), (G_NOGEN|G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 10), ATTK(AT_WEAP, AD_PHYS, 2, 10),
@@ -3695,7 +3677,6 @@ struct permonst _mons2[] = {
         M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_PEACEFUL|M2_STRONG|M2_COLLECT, M3_INFRAVISIBLE,
         HI_DOMESTIC),
-#ifdef CONVICT
     MON("inmate", S_HUMAN,
         LVL(12, 12, 10, 0, 0), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6),
@@ -3704,7 +3685,6 @@ struct permonst _mons2[] = {
         M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_PEACEFUL|M2_STRONG|M2_COLLECT,
         M3_INFRAVISIBLE|M3_CLOSE, CLR_BLACK),
-#endif /* CONVICT */
 #if 0   /* OBSOLETE */
     MON("High-elf", S_HUMAN,
         LVL(5, 12, 10, 10, -7), G_NOGEN,
@@ -3781,7 +3761,6 @@ struct permonst _mons2[] = {
         M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_PEACEFUL|M2_STRONG|M2_COLLECT, M3_INFRAVISIBLE,
         HI_DOMESTIC),
-#ifdef TOURIST
     MON("guide", S_HUMAN,
         LVL(5, 12, 10, 20, 0), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_MAGC, AD_SPEL, 0, 0),
@@ -3790,7 +3769,6 @@ struct permonst _mons2[] = {
         M1_HUMANOID|M1_OMNIVORE,
         M2_NOPOLY|M2_HUMAN|M2_PEACEFUL | M2_STRONG|M2_COLLECT|M2_MAGIC,
         M3_INFRAVISIBLE, HI_DOMESTIC),
-#endif
     /* warriors used to be chaotic but have been changed to lawful because
        grow_up() promotes them to valkyrie; for a valkyrie hero, they might
        be changed to neutral at game start; see the valkyrie comment above */

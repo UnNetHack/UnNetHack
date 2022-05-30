@@ -1226,18 +1226,14 @@ do_mname()
     cy = cc.y;
 
     if (cx == u.ux && cy == u.uy) {
-#ifdef STEED
-        if (u.usteed && canspotmon(u.usteed))
+        if (u.usteed && canspotmon(u.usteed)) {
             mtmp = u.usteed;
-        else {
-#endif
-        pline("This %s creature is called %s and cannot be renamed.",
-              beautiful(),
-              plname);
-        return(0);
-#ifdef STEED
-    }
-#endif
+        } else {
+            pline("This %s creature is called %s and cannot be renamed.",
+                    beautiful(),
+                    plname);
+            return(0);
+        }
     } else
         mtmp = m_at(cx, cy);
 

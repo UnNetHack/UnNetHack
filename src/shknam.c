@@ -262,18 +262,10 @@ const struct shclass shtypes[] = {
       {10, -WOODEN_HARP  }, { 3, -MAGIC_HARP },
       {10, -BELL     }, {10, -BUGLE      },
       {10, -LEATHER_DRUM }, { 2, -DRUM_OF_EARTHQUAKE},
-#ifdef TOURIST
       { 5, -T_SHIRT  }, { 5, -LOCK_PICK  },
-#else
-      { 5, -TIN_WHISTLE  }, { 5, -LOCK_PICK  },
-#endif
       {0, 0}}, shkmusic},
     {"pet store", FOOD_CLASS, 1, D_SHOP, {
-#ifdef STEED
          {67, -FIGURINE}, {5, -LEASH}, {10, -TRIPE_RATION}, {5, -SADDLE},
-#else
-         {72, -FIGURINE}, {5, -LEASH}, {10, -TRIPE_RATION},
-#endif
          {10, -TIN_WHISTLE}, {3, -MAGIC_WHISTLE}
      }, shkpet},
     /* Shops below this point are "unique".  That is they must all have a

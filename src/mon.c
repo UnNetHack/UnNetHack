@@ -295,9 +295,7 @@ int mndx, mode;
     case PM_HUNTER:      mndx = mode ? PM_RANGER    : PM_HUMAN; break;
     case PM_THUG:        mndx = mode ? PM_ROGUE     : PM_HUMAN; break;
     case PM_ROSHI:       mndx = mode ? PM_SAMURAI   : PM_HUMAN; break;
-#ifdef TOURIST
     case PM_GUIDE:       mndx = mode ? PM_TOURIST   : PM_HUMAN; break;
-#endif
     case PM_APPRENTICE:  mndx = mode ? PM_WIZARD    : PM_HUMAN; break;
     case PM_WARRIOR:     mndx = mode ? PM_VALKYRIE  : PM_HUMAN; break;
     default:
@@ -575,7 +573,6 @@ register struct monst *mtmp;
     inswamp = is_swamp(mtmp->mx, mtmp->my) && grounded;
     infountain = IS_FOUNTAIN(levl[mtmp->mx][mtmp->my].typ);
 
-#ifdef STEED
     /* Flying and levitation keeps our steed out of the liquid
        (but not water-walking or swimming; note: if hero is in a
        water location on the Plane of Water, flight and levitating
@@ -583,7 +580,6 @@ register struct monst *mtmp;
        and steed will be subject to water effects, as intended) */
     if (mtmp == u.usteed && (Flying || Levitation))
         return (0);
-#endif
 
     /* Gremlin multiplying won't go on forever since the hit points
      * keep going down, and when it gets to 1 hit point the clone
@@ -734,7 +730,6 @@ struct monst *mon;
     else if (mon->mspeed == MFAST)
         mmove = (4 * mmove + 2) / 3;
 
-#ifdef STEED
     if (mon == u.usteed) {
         if (u.ugallop && flags.mv) {
             /* increase movement by a factor of 1.5; also increase variance of
@@ -743,7 +738,6 @@ struct monst *mon;
             mmove = ((rn2(2) ? 4 : 5) * mmove) / 3;
         }
     }
-#endif
 
     return mmove;
 }
@@ -1358,12 +1352,11 @@ struct obj *otmp;
         }
     }
 
-#ifdef STEED
     /* Steeds don't pick up stuff (to avoid shop abuse) */
     if (mtmp == u.usteed) {
         return 0;
     }
-#endif
+
     if (mtmp->isshk) {
         return iquan; /* no limit */
     }
@@ -1841,10 +1834,10 @@ struct monst *mtmp, *mtmp2;
     relmon(mtmp, (struct monst **) 0);
 
     /* finish adding its replacement */
-#ifdef STEED
-    if (mtmp == u.usteed); else     /* don't place steed onto the map */
-#endif
-    place_monster(mtmp2, mtmp2->mx, mtmp2->my);
+    if (mtmp != u.usteed) {
+        /* don't place steed onto the map */
+        place_monster(mtmp2, mtmp2->mx, mtmp2->my);
+    }
     if (mtmp2->wormno)      /* update level.monsters[wseg->wx][wseg->wy] */
         place_wsegs(mtmp2, NULL); /* locations to mtmp2 not mtmp. */
     if (emits_light(mtmp2->data)) {
@@ -1858,9 +1851,7 @@ struct monst *mtmp, *mtmp2;
     mtmp2->nmon = fmon;
     fmon = mtmp2;
     if (u.ustuck == mtmp) u.ustuck = mtmp2;
-#ifdef STEED
     if (u.usteed == mtmp) u.usteed = mtmp2;
-#endif
     if (mtmp2->isshk) replshk(mtmp, mtmp2);
 
     /* discard the old monster */
@@ -2252,11 +2243,9 @@ uchar adtyp;
         return;
     }
 
-#ifdef STEED
     /* Player is thrown from his steed when it dies */
     if (mtmp == u.usteed)
         dismount_steed(DISMOUNT_GENERIC);
-#endif
 
     /* extinguish monster's armor */
     if ((otmp = which_armor(mtmp, W_ARM)) && (Is_glowing_dragon_armor(otmp->otyp)))
@@ -2557,11 +2546,11 @@ struct monst *mdef;
     if (mdef->isgd && !grddead(mdef)) {
         return;
     }
-#ifdef STEED
+
     /* Player is thrown from his steed when it disappears */
     if (mdef == u.usteed)
         dismount_steed(DISMOUNT_GENERIC);
-#endif
+
     /* stuck to you? release */
     unstuck(mdef);
     /* drop special items like the Amulet so that a dismissed Kop or nurse
@@ -3190,14 +3179,12 @@ struct monst *mtmp;
     coord mm;
     boolean couldspot = canspotmon(mtmp);
 
-#ifdef STEED
     if (mtmp == u.usteed) {
         /* Keep your steed in sync with you instead */
         mtmp->mx = u.ux;
         mtmp->my = u.uy;
         return;
     }
-#endif
 
     if (!enexto(&mm, u.ux, u.uy, mtmp->data) || !isok(mm.x, mm.y)) {
         deal_with_overcrowding(mtmp);

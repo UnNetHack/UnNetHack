@@ -787,15 +787,11 @@ enable_blackmarket
 enable_kops
 enable_seduce
 enable_randomized_planes
-enable_steed
-enable_tourist
-enable_convict
 enable_redo
 enable_clipping
 enable_menu_color
 enable_status_color
 enable_auto_open
-enable_elbereth
 enable_bones_pool
 enable_user_sounds
 enable_exp_on_botl
@@ -1493,15 +1489,11 @@ Optional Features:
   --enable-seduce         Succubi/incubi seduction (default=yes)
   --enable-randomized-planes
                           Shuffling order of Elemental Planes (default=yes)
-  --enable-steed          Ability to ride monsters (default=yes)
-  --enable-tourist        Tourist class (default=yes)
-  --enable-convict        Convict class (default=yes)
   --enable-redo           Redo last command (default=yes)
   --enable-clipping       Allow smaller screens (default=yes)
   --enable-menu-color     TTY graphics menu color (default=yes)
   --enable-status-color   TTY graphics status color (default=yes)
   --enable-auto-open      Open doors by walking into them (default=yes)
-  --enable-elbereth       Engraving the E-word repels monsters (default=yes)
   --enable-bones-pool     Multiple bones per level (default=yes)
   --enable-user-sounds    Allow user-defined mapping from messages to sounds)
                           (default=no)
@@ -6922,61 +6914,7 @@ printf "%s\n" "#define RANDOMIZED_PLANES /**/" >>confdefs.h
 
    fi
 
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to enable steed" >&5
-printf %s "checking whether to enable steed... " >&6; }
-   # Check whether --enable-steed was given.
-if test ${enable_steed+y}
-then :
-  enableval=$enable_steed;
-else $as_nop
-  enable_steed="yes"
-fi
-
-   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $enable_steed" >&5
-printf "%s\n" "$enable_steed" >&6; }
-   if test "$enable_steed" != "no" ; then
-
-printf "%s\n" "#define STEED /**/" >>confdefs.h
-
-   fi
-
 # NETHACK_ARG(dwarf,[Dwarf race],DWARF,yes)
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to enable tourist" >&5
-printf %s "checking whether to enable tourist... " >&6; }
-   # Check whether --enable-tourist was given.
-if test ${enable_tourist+y}
-then :
-  enableval=$enable_tourist;
-else $as_nop
-  enable_tourist="yes"
-fi
-
-   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $enable_tourist" >&5
-printf "%s\n" "$enable_tourist" >&6; }
-   if test "$enable_tourist" != "no" ; then
-
-printf "%s\n" "#define TOURIST /**/" >>confdefs.h
-
-   fi
-
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to enable convict" >&5
-printf %s "checking whether to enable convict... " >&6; }
-   # Check whether --enable-convict was given.
-if test ${enable_convict+y}
-then :
-  enableval=$enable_convict;
-else $as_nop
-  enable_convict="yes"
-fi
-
-   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $enable_convict" >&5
-printf "%s\n" "$enable_convict" >&6; }
-   if test "$enable_convict" != "no" ; then
-
-printf "%s\n" "#define CONVICT /**/" >>confdefs.h
-
-   fi
-
 # NETHACK_ARG(yeoman,[Yeoman class],YEOMAN,yes)
 # NETHACK_ARG(zouthern,[Zoutherner class],ZOUTHERN,no)
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to enable redo" >&5
@@ -7068,24 +7006,6 @@ printf "%s\n" "$enable_auto_open" >&6; }
    if test "$enable_auto_open" != "no" ; then
 
 printf "%s\n" "#define AUTO_OPEN /**/" >>confdefs.h
-
-   fi
-
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to enable elbereth" >&5
-printf %s "checking whether to enable elbereth... " >&6; }
-   # Check whether --enable-elbereth was given.
-if test ${enable_elbereth+y}
-then :
-  enableval=$enable_elbereth;
-else $as_nop
-  enable_elbereth="yes"
-fi
-
-   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $enable_elbereth" >&5
-printf "%s\n" "$enable_elbereth" >&6; }
-   if test "$enable_elbereth" != "no" ; then
-
-printf "%s\n" "#define ELBERETH /**/" >>confdefs.h
 
    fi
 

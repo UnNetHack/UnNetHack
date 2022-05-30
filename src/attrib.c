@@ -43,12 +43,10 @@ const struct innate {
                    {  15, &(HWarning), "sensitive", "" },
                    {   0, 0, 0, 0 } },
 
-#ifdef CONVICT
     con_abil[] = { {   1, &(HSick_resistance), "", "" },
                    {   7, &(HPoison_resistance), "healthy", "" },
                    {  20, &(HSearching), "perceptive", "unaware" },
                    {   0, 0, 0, 0 } },
-#endif  /* CONVICT */
 
 hea_abil[] = { {     1, &(HPoison_resistance), "", "" },
                {  15, &(HWarning), "sensitive", "" },
@@ -372,11 +370,9 @@ exerper()
 
         if(Sick || Vomiting) exercise(A_CON, FALSE);
         if(Confusion || Hallucination) exercise(A_WIS, FALSE);
-        if((Wounded_legs
-#ifdef STEED
-            && !u.usteed
-#endif
-            ) || Fumbling || HStun) exercise(A_DEX, FALSE);
+        if ((Wounded_legs && !u.usteed) || Fumbling || HStun) {
+            exercise(A_DEX, FALSE);
+        }
     }
 }
 
@@ -566,9 +562,7 @@ int oldlevel, newlevel;
     case PM_ARCHEOLOGIST:   abil = arc_abil;    break;
     case PM_BARBARIAN:      abil = bar_abil;    break;
     case PM_CAVEMAN:        abil = cav_abil;    break;
-#ifdef CONVICT
     case PM_CONVICT:        abil = con_abil;    break;
-#endif  /* CONVICT */
     case PM_HEALER:         abil = hea_abil;    break;
     case PM_KNIGHT:         abil = kni_abil;    break;
     case PM_MONK:           abil = mon_abil;    break;
@@ -576,9 +570,7 @@ int oldlevel, newlevel;
     case PM_RANGER:         abil = ran_abil;    break;
     case PM_ROGUE:          abil = rog_abil;    break;
     case PM_SAMURAI:        abil = sam_abil;    break;
-#ifdef TOURIST
     case PM_TOURIST:        abil = tou_abil;    break;
-#endif
     case PM_VALKYRIE:       abil = val_abil;    break;
     case PM_WIZARD:         abil = wiz_abil;    break;
     default:                abil = 0;       break;

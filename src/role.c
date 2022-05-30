@@ -98,7 +98,6 @@ const struct Role roles[] = {
         { 14, 0,  0, 8,  2, 0 },/* Hit points */
         {  1, 0,  0, 1,  0, 1 }, 10,/* Energy */
         0, 12, 0, 1,  8, A_INT, SPE_DIG,             -4},
-#ifdef CONVICT
     {   {"Convict", 0}, {
             {"Detainee",     0},
             {"Inmate",   0},
@@ -125,7 +124,6 @@ const struct Role roles[] = {
         {  8, 0,  0, 8,  0, 0 },/* Hit points */
         {  1, 0,  0, 1,  0, 1 }, 10,/* Energy */
         -10, 5, 0, 2, 10, A_INT, SPE_TELEPORT_AWAY,   -4},
-#endif  /* CONVICT */
     {   {"Healer", 0}, {
             {"Rhizotomist",    0},
             {"Empiric",        0},
@@ -315,7 +313,6 @@ const struct Role roles[] = {
         { 13, 0,  0, 8,  1, 0 },/* Hit points */
         {  1, 0,  0, 1,  0, 1 }, 11,/* Energy */
         10, 10, 0, 0,  8, A_INT, SPE_CLAIRVOYANCE,    -4},
-#ifdef TOURIST
     {   {"Tourist", 0}, {
             {"Rambler",     0},
             {"Sightseer",   0},
@@ -340,7 +337,6 @@ const struct Role roles[] = {
         {  8, 0,  0, 8,  0, 0 },/* Hit points */
         {  1, 0,  0, 1,  0, 1 }, 14,/* Energy */
         0, 5, 1, 2, 10, A_INT, SPE_CHARM_MONSTER,   -4},
-#endif
     {   {"Valkyrie", 0}, {
             {"Stripling",   0},
             {"Skirmisher",  0},
@@ -1962,10 +1958,8 @@ struct monst *mtmp;
     case PM_SAMURAI:
         return (mtmp && mtmp->data == &mons[PM_SHOPKEEPER] ?
                 "Irasshaimase" : "Konnichi wa"); /* Japanese */
-#ifdef TOURIST
     case PM_TOURIST:
         return ("Aloha"); /* Hawaiian */
-#endif
     case PM_VALKYRIE:
         return (
 #ifdef MAIL
@@ -1987,10 +1981,8 @@ Goodbye()
         return ("Punardarsanaya");  /* Sanskrit */
     case PM_SAMURAI:
         return ("Sayonara");        /* Japanese */
-#ifdef TOURIST
     case PM_TOURIST:
         return ("Aloha");           /* Hawaiian */
-#endif
     case PM_VALKYRIE:
         return ("Farvel");          /* Norse */
     default:

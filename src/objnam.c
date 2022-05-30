@@ -1313,9 +1313,7 @@ boolean with_price;
 
     case TOOL_CLASS:
         if(obj->owornmask & (W_TOOL /* blindfold */
-#ifdef STEED
                              | W_SADDLE
-#endif
                              )) {
             Strcat(bp, " (being worn)");
             break;
@@ -2831,17 +2829,13 @@ STATIC_OVL NEARDATA const struct o_range o_ranges[] = {
     { "boots",  ARMOR_CLASS,  LOW_BOOTS,      LEVITATION_BOOTS },
     { "shoes",  ARMOR_CLASS,  LOW_BOOTS,      IRON_SHOES },
     { "cloak",  ARMOR_CLASS,  MUMMY_WRAPPING, CLOAK_OF_DISPLACEMENT },
-#ifdef TOURIST
     { "shirt",  ARMOR_CLASS,  HAWAIIAN_SHIRT, T_SHIRT},
-#endif
     { "dragon scales",
       ARMOR_CLASS,  GRAY_DRAGON_SCALES, YELLOW_DRAGON_SCALES },
     { "dragon scale mail",
       ARMOR_CLASS,  GRAY_DRAGON_SCALE_MAIL, YELLOW_DRAGON_SCALE_MAIL },
     { "sword",  WEAPON_CLASS, SHORT_SWORD,    KATANA },
-#ifdef WIZARD
     { "venom",  VENOM_CLASS,  BLINDING_VENOM, FREEZING_ICE },
-#endif
     { "gray stone", GEM_CLASS,    LUCKSTONE,      FLINT },
     { "grey stone", GEM_CLASS,    LUCKSTONE,      FLINT },
 };
@@ -3120,10 +3114,8 @@ struct alt_spellings {
     { "amulet of poison resistance", AMULET_VERSUS_POISON },
     { "potion of sleep", POT_SLEEPING },
     { "stone", ROCK },
-#ifdef TOURIST
     { "camera", EXPENSIVE_CAMERA },
     { "tee shirt", T_SHIRT },
-#endif
     { "can", TIN },
     { "can opener", TIN_OPENER },
     { "kelp", KELP_FROND },

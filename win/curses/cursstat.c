@@ -882,11 +882,9 @@ curses_add_statuses(WINDOW *win, boolean align_right,
     int enc = near_capacity();
     statprob(enc_stat[enc], enc > UNENCUMBERED);
 
-#ifdef ELBERETH
     if (sengr_at("Elbereth", u.ux, u.uy)) {
         statprob("Elbereth", !Blind);
     }
-#endif
 #undef statprob
 }
 

@@ -646,14 +646,14 @@ const char *word;
                       body_part(HAND));
         return(FALSE);
     }
-#ifdef STEED
+
     if (obj->owornmask & W_SADDLE) {
         if (*word)
             You("cannot %s %s you are sitting on.", word,
                 something);
         return (FALSE);
     }
-#endif
+
     return(TRUE);
 }
 
@@ -996,11 +996,10 @@ dodown()
         return 1;
     }
 
-#ifdef STEED
     if (stucksteed(TRUE)) {
         return 0;
     }
-#endif
+
     /* Levitation might be blocked, but player can still use '>' to
        turn off controlled levitation */
     if (HLevitation || ELevitation) {
@@ -1165,11 +1164,11 @@ doup()
             return(0);
         }
     }
-#ifdef STEED
+
     if (stucksteed(TRUE)) {
         return 0;
     }
-#endif
+
     if(u.ustuck) {
         You("are %s, and cannot go up.",
             !u.uswallow ? "being held" : is_animal(u.ustuck->data) ?
@@ -1555,25 +1554,19 @@ boolean at_stairs, falling, portal;
                 You("fly down along the %s.",
                     at_ladder ? "ladder" : "stairs");
             else if (u.dz &&
-#ifdef CONVICT
                      (near_capacity() > UNENCUMBERED || (Punished &&
                                                          ((uwep != uball) || ((P_SKILL(P_FLAIL) < P_BASIC))
                                                           || !Role_if(PM_CONVICT)))
                       || Fumbling)) {
-#else
-                     (near_capacity() > UNENCUMBERED || Punished || Fumbling)) {
-#endif /* CONVICT */
                 You("fall down the %s.", at_ladder ? "ladder" : "stairs");
                 if (Punished) {
                     drag_down();
                     ballrelease(FALSE);
                 }
-#ifdef STEED
                 /* falling off steed has its own losehp() call */
                 if (u.usteed)
                     dismount_steed(DISMOUNT_FELL);
                 else
-#endif
                     losehp(Maybe_Half_Phys(rnd(3)),
                            at_ladder ? "falling off a ladder" : "falling downstairs",
                            KILLED_BY);
@@ -1625,11 +1618,7 @@ boolean at_stairs, falling, portal;
 #endif
 #endif
 
-    if ((mtmp = m_at(u.ux, u.uy)) != 0
-#ifdef STEED
-        && mtmp != u.usteed
-#endif
-        ) {
+    if ((mtmp = m_at(u.ux, u.uy)) != 0 && mtmp != u.usteed) {
         /* There's a monster at your target destination; it might be one
            which accompanied you--see mon_arrive(dogmove.c)--or perhaps
            it was already here.  Randomly move you to an adjacent spot
@@ -2238,10 +2227,7 @@ int how; /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
            during petrification countdown, "your limbs turn to stone"
            before the final stages and that calls us (how==2) to cure
            wounded legs, but we want to suppress the feel better message */
-#ifdef STEED
-        if (!u.usteed && how != 2)
-#endif
-        {
+        if (!u.usteed && how != 2) {
             /* KMH, intrinsics patch */
             if((EWounded_legs & BOTH_SIDES) == BOTH_SIDES) {
                 Your("%s feel somewhat better.",

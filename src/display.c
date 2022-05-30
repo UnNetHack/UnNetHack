@@ -1329,11 +1329,10 @@ see_monsters()
     }
 #endif
 
-#ifdef STEED
     /* when mounted, hero's location gets caught by monster loop */
-    if (!u.usteed)
-#endif
-    newsym(u.ux, u.uy);
+    if (!u.usteed) {
+        newsym(u.ux, u.uy);
+    }
 }
 
 /*

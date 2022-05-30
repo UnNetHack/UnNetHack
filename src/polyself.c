@@ -629,7 +629,7 @@ int mntmp;
 
     if (!sticky && !u.uswallow && u.ustuck && sticks(youmonst.data)) u.ustuck = 0;
     else if (sticky && !sticks(youmonst.data)) uunstick();
-#ifdef STEED
+
     if (u.usteed) {
         if (touch_petrifies(u.usteed->data) &&
             !Stone_resistance && rnl(3)) {
@@ -642,7 +642,6 @@ int mntmp;
         }
         if (!can_ride(u.usteed)) dismount_steed(DISMOUNT_POLY);
     }
-#endif
 
     if (flags.verbose) {
         static const char use_thec[] = "Use the command #%s to %s.";
@@ -797,12 +796,10 @@ break_armor()
                 useup(otmp);
             }
         }
-#ifdef TOURIST
         if (uarmu) {
             Your("shirt rips to shreds!");
             useup(uarmu);
         }
-#endif
     } else if (sliparm(youmonst.data)) {
         if (((otmp = uarm) != 0) && (racial_exception(&youmonst, otmp) < 1)) {
             if (donning(otmp)) cancel_don();
@@ -817,7 +814,6 @@ break_armor()
             (void) Cloak_off();
             dropp(otmp);
         }
-#ifdef TOURIST
         if ((otmp = uarmu) != 0) {
             if (is_whirly(youmonst.data))
                 You("seep right through your shirt!");
@@ -825,7 +821,6 @@ break_armor()
             setworn((struct obj *)0, otmp->owornmask & W_ARMU);
             dropp(otmp);
         }
-#endif
     }
     if (has_horns(youmonst.data)) {
         if ((otmp = uarmh) != 0) {

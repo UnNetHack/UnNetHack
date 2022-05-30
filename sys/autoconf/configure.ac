@@ -374,10 +374,7 @@ NETHACK_ARG(seduce,[Succubi/incubi seduction],SEDUCE,yes)
 # NETHACK_ARG(eaten-memory,[Remember which monsters have been eaten],
 #  EATEN_MEMORY,yes)
 NETHACK_ARG(randomized-planes,[Shuffling order of Elemental Planes],RANDOMIZED_PLANES,yes)
-NETHACK_ARG(steed,[Ability to ride monsters],STEED,yes)
 # NETHACK_ARG(dwarf,[Dwarf race],DWARF,yes)
-NETHACK_ARG(tourist,[Tourist class],TOURIST,yes)
-NETHACK_ARG(convict,[Convict class],CONVICT,yes)
 # NETHACK_ARG(yeoman,[Yeoman class],YEOMAN,yes)
 # NETHACK_ARG(zouthern,[Zoutherner class],ZOUTHERN,no)
 NETHACK_ARG(redo,[Redo last command],REDO,yes)
@@ -387,7 +384,6 @@ if test "$enable_tty_graphics" != "no"; then
 NETHACK_ARG(status-color,[TTY graphics status color],STATUS_COLORS,yes)
 fi
 NETHACK_ARG(auto-open,[Open doors by walking into them],AUTO_OPEN,yes)
-NETHACK_ARG(elbereth,[Engraving the E-word repels monsters],ELBERETH,yes)
 # NETHACK_ARG(noartifactwish,[Prevent wishing for special artifacts],
 #  NOARTIFACTWISH,no)
 # NETHACK_ARG(no-bones,[Disable loading and saving bones levels],NO_BONES,no)

@@ -74,9 +74,7 @@ extern int NDECL(dothrow); /**/
 extern int NDECL(doeat); /**/
 extern int NDECL(done2); /**/
 extern int NDECL(doengrave); /**/
-#ifdef ELBERETH
 extern int NDECL(doengrave_elbereth); /**/
-#endif
 extern int NDECL(dopickup); /**/
 extern int NDECL(ddoinv); /**/
 extern int NDECL(dotypeinv); /**/
@@ -1513,7 +1511,6 @@ boolean want_disp;
     dump_title(buf);
     dump_list_start();
 
-#ifdef ELBERETH
     if (u.uevent.uhand_of_elbereth) {
         static const char * const hofe_titles[3] = {
             "the Hand of Elbereth",
@@ -1522,7 +1519,6 @@ boolean want_disp;
         };
         you_are(hofe_titles[u.uevent.uhand_of_elbereth - 1]);
     }
-#endif
 
     /* heaven or hell modes */
     if (heaven_or_hell_mode) {
@@ -1608,11 +1604,9 @@ boolean want_disp;
             if (u.usick_type & SICK_NONVOMITABLE)
                 you_are("sick from illness");
         }
-#ifdef CONVICT
         if (Punished) {
             you_are("punished");
         }
-#endif /* CONVICT */
     }
     if (Stoned) you_are("turning to stone");
     if (Slimed) you_are("turning into slime");
@@ -1622,15 +1616,11 @@ boolean want_disp;
         you_have(buf);
     }
     if (Fumbling) enl_msg("You fumble", "", "d", "");
-    if (Wounded_legs
-#ifdef STEED
-        && !u.usteed
-#endif
-        ) {
+    if (Wounded_legs && !u.usteed) {
         Sprintf(buf, "wounded %s", makeplural(body_part(LEG)));
         you_have(buf);
     }
-#if defined(WIZARD) && defined(STEED)
+#if defined(WIZARD)
     if (Wounded_legs && u.usteed && (wizard || final)) {
         Strcpy(buf, x_monnam(u.usteed, ARTICLE_YOUR, (char *)0,
                              SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION, FALSE));
@@ -1702,7 +1692,6 @@ boolean want_disp;
     if (Breathless) you_can("survive without air");
     else if (Amphibious) you_can("breathe water");
     if (Passes_walls) you_can("walk through walls");
-#ifdef STEED
     /* If you die while dismounting, u.usteed is still set.  Since several
      * places in the done() sequence depend on u.usteed, just detect this
      * special case. */
@@ -1710,7 +1699,6 @@ boolean want_disp;
         Sprintf(buf, "riding %s", y_monnam(u.usteed));
         you_are(buf);
     }
-#endif
     if (u.uswallow) {
         Sprintf(buf, "swallowed by %s", a_monnam(u.ustuck));
 #ifdef WIZARD
@@ -2289,7 +2277,6 @@ boolean want_disp;
     }
 
 #ifdef ELBERETH_CONDUCT
-#ifdef ELBERETH
     /* no point displaying the conduct if Elbereth doesn't do anything */
     if (flags.elberethignore) {
         you_have_been("ignored by Elbereth");
@@ -2302,7 +2289,6 @@ boolean want_disp;
             you_have_never("engraved Elbereth");
         }
     }
-#endif /* ELBERETH */
 #endif /* ELBERETH_CONDUCT */
 
     if (wizard || discover || final) {
@@ -2378,9 +2364,7 @@ struct ext_func_tab extcmdlist[] = {
     {   'D',  "droptype", "drop specific item types", doddrop, 0, NULL },
     {   'e',  "eat", "eat something", doeat, 0, NULL },
     {   'E',  "engrave", "engrave writing on the floor", doengrave, 0, NULL },
-#ifdef ELBERETH
     { C('e'), "engraveelbereth", "engrave \"Elbereth\" on the floor", doengrave_elbereth, 0, NULL },
-#endif
     { M('e'), "enhance", "advance or check weapon and spell skills", enhance_weapon_skill,
               IFBURIED | AUTOCOMPLETE, NULL },
     {  '\0',  "exploremode", "enter explore (discovery) mode", enter_explore_mode, IFBURIED, NULL },
@@ -2436,9 +2420,7 @@ struct ext_func_tab extcmdlist[] = {
     {   'r',  "read", "read a scroll or spellbook", doread, 0, NULL },
     { C('r'), "redraw", "redraw screen", doredraw, IFBURIED | GENERALCMD, NULL },
     {   'R',  "remove", "remove an accessory (ring, amulet, etc)", doremring, 0, NULL },
-#ifdef STEED
     { M('R'), "ride", "mount or dismount a saddled steed", doride, AUTOCOMPLETE, NULL },
-#endif
     {  '\0',  "rooms", "show room numbers", wiz_show_rooms, AUTOCOMPLETE | WIZMODECMD, NULL },
     { M('r'), "rub", "rub a lamp or a stone", dorub, AUTOCOMPLETE, NULL },
     {   'S',  "save", "save the game and exit", dosave, IFBURIED | GENERALCMD, NULL },

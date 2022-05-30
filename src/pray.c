@@ -8,9 +8,7 @@ STATIC_DCL struct obj *NDECL(worst_cursed_item);
 STATIC_DCL void FDECL(fix_worst_trouble, (int));
 STATIC_DCL void FDECL(angrygods, (ALIGNTYP_P));
 STATIC_DCL void FDECL(at_your_feet, (const char *));
-#ifdef ELBERETH
 STATIC_DCL void NDECL(gcrownu);
-#endif  /*ELBERETH*/
 STATIC_DCL void FDECL(pleased, (ALIGNTYP_P));
 STATIC_DCL void FDECL(godvoice, (ALIGNTYP_P, const char*));
 STATIC_DCL void FDECL(god_zaps_you, (ALIGNTYP_P));
@@ -194,12 +192,11 @@ in_trouble()
         Cursed_obj(uarmf, FUMBLE_BOOTS))
         return TROUBLE_FUMBLING;
     if (worst_cursed_item()) return TROUBLE_CURSED_ITEMS;
-#ifdef STEED
+
     if (u.usteed) { /* can't voluntarily dismount from a cursed saddle */
         otmp = which_armor(u.usteed, W_SADDLE);
         if (Cursed_obj(otmp, SADDLE)) return TROUBLE_SADDLE;
     }
-#endif
 
     if (Blinded > 1 && haseyes(youmonst.data) &&
         (!u.uswallow || !attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_BLND))) {
@@ -207,11 +204,9 @@ in_trouble()
     }
     for(i=0; i<A_MAX; i++)
         if(ABASE(i) < AMAX(i)) return(TROUBLE_POISONED);
-    if(Wounded_legs
-#ifdef STEED
-       && !u.usteed
-#endif
-       ) return (TROUBLE_WOUNDED_LEGS);
+    if (Wounded_legs && !u.usteed) {
+        return (TROUBLE_WOUNDED_LEGS);
+    }
     if (u.uhs >= HUNGRY) {
         return TROUBLE_HUNGRY;
     }
@@ -260,10 +255,8 @@ worst_cursed_item()
         otmp = uarmh;
     } else if (uarmf && uarmf->cursed) {        /* boots */
         otmp = uarmf;
-#ifdef TOURIST
     } else if (uarmu && uarmu->cursed) {        /* shirt */
         otmp = uarmu;
-#endif
     } else if (uamul && uamul->cursed) {        /* amulet */
         otmp = uamul;
     } else if (uleft && uleft->cursed) {        /* left ring */
@@ -537,7 +530,6 @@ decurse:
         (void) make_hallucinated(0L, FALSE, 0L);
         break;
 
-#ifdef STEED
     case TROUBLE_SADDLE:
         otmp = which_armor(u.usteed, W_SADDLE);
         uncurse(otmp);
@@ -549,7 +541,6 @@ decurse:
             set_bknown(otmp, 1);
         }
         break;
-#endif
     }
 }
 
@@ -617,9 +608,7 @@ aligntyp resp_god;
         if (uarm && !(EReflecting & W_ARM) &&
             !(EDisint_resistance & W_ARM) && !uarmc)
             (void) destroy_arm(uarm);
-#ifdef TOURIST
         if (uarmu && !uarm && !uarmc) (void) destroy_arm(uarmu);
-#endif
         if (!Disint_resistance)
             fry_by_god(resp_god, TRUE);
         else {
@@ -733,7 +722,6 @@ const char *str;
     }
 }
 
-#ifdef ELBERETH
 STATIC_OVL void
 gcrownu()
 {
@@ -934,7 +922,6 @@ gcrownu()
        up-to-29 you can get from gaining experience levels */
     add_weapon_skill(1);
 }
-#endif  /*ELBERETH*/
 
 STATIC_OVL void
 pleased(g_align)
@@ -1188,13 +1175,10 @@ aligntyp g_align;
         case 7:
         case 8:
         case 9: /* KMH -- can occur during full moons */
-#ifdef ELBERETH
             if (u.ualign.record >= PIOUS && !u.uevent.uhand_of_elbereth) {
                 gcrownu();
                 break;
-                /* fall through */
             }
-#endif  /*ELBERETH*/
             /* fall through */
 
         case 6: {
@@ -1230,9 +1214,7 @@ aligntyp g_align;
 
     u.ublesscnt = rnz(350);
     kick_on_butt = u.uevent.udemigod ? 1 : 0;
-#ifdef ELBERETH
     if (u.uevent.uhand_of_elbereth) kick_on_butt++;
-#endif
     if (kick_on_butt) u.ublesscnt += kick_on_butt * rnz(1000);
 
     return;

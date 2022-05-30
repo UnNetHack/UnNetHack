@@ -30,9 +30,6 @@
 /* Options to pass to the compression program, if any */
 #undef COMPRESS_OPTIONS
 
-/* Convict class */
-#undef CONVICT
-
 /* Console output */
 #undef CURSES_GRAPHICS
 
@@ -77,9 +74,6 @@
 
 /* Dungeon growth */
 #undef DUNGEON_GROWTH
-
-/* Engraving the E-word repels monsters */
-#undef ELBERETH
 
 /* Show experience on bottom line */
 #undef EXP_ON_BOTL
@@ -274,9 +268,6 @@
    backward compatibility; new code need not use it. */
 #undef STDC_HEADERS
 
-/* Ability to ride monsters */
-#undef STEED
-
 /* Use strncmpi */
 #undef STRNCMPI
 
@@ -291,9 +282,6 @@
 
 /* Using msleep */
 #undef TIMED_DELAY
-
-/* Tourist class */
-#undef TOURIST
 
 /* Console output */
 #undef TTY_GRAPHICS

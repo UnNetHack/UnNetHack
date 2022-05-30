@@ -68,11 +68,9 @@ pet_type()
     else if ((Role_if(PM_RANGER) || Role_if(PM_CAVEMAN)) &&
              ((preferred_pet == 'e') || (!rn2(3))))
         return (rn2(4) ? PM_WOLF : PM_WINTER_WOLF_CUB);
-# ifdef TOURIST
     else if (Role_if(PM_TOURIST) &&
              ((preferred_pet == 'e') || (!rn2(3))))
         return (PM_BABY_CROCODILE);
-# endif
 #endif
     else
         return (rn2(2) ? PM_KITTEN : PM_LITTLE_DOG);
@@ -167,9 +165,7 @@ struct monst *
 makedog()
 {
     register struct monst *mtmp;
-#ifdef STEED
     register struct obj *otmp;
-#endif
     const char *petname;
     int pettype;
     static int petname_used = 0;
@@ -192,10 +188,8 @@ makedog()
     else if (pettype == PM_BABY_CROCODILE)
         petname = crocodilename;
 #endif
-#ifdef CONVICT
     else if (pettype == PM_SEWER_RAT)
         petname = ratname;
-#endif /* CONVICT */
     else
         petname = catname;
 
@@ -210,11 +204,10 @@ makedog()
         }
     }
 
-#ifdef CONVICT
     if (!*petname && pettype == PM_SEWER_RAT) {
         if(Role_if(PM_CONVICT)) petname = "Nicodemus"; /* Rats of NIMH */
     }
-#endif /* CONVICT */
+
     mtmp = makemon(&mons[pettype], u.ux, u.uy, MM_EDOG);
 
     if(!mtmp) return((struct monst *) 0); /* pets were genocided */
@@ -234,13 +227,11 @@ makedog()
 #endif
 
     flags.startingpet_mid = mtmp->m_id;
-#ifdef STEED
     /* Horses already wear a saddle */
     if (pettype == PM_PONY && !!(otmp = mksobj(SADDLE, TRUE, FALSE))) {
         otmp->dknown = otmp->bknown = otmp->rknown = 1;
         put_saddle_on_mon(otmp, mtmp);
     }
-#endif
 
     if (!*petname && pettype == PM_KITTEN && !rn2(100)) {
         if (mtmp->female) petname = "Shiva"; /* RIP 1 Oct 1998 - 6 Sep 2009 */
@@ -393,10 +384,9 @@ boolean with_you;
     mtmp->mtrack[0].x = mtmp->mtrack[0].y = 0;
     mtmp->mtrack[1].x = mtmp->mtrack[1].y = 0;
 
-#ifdef STEED
     if (mtmp == u.usteed)
         return; /* don't place steed on the map */
-#endif
+
     if (with_you) {
         /* When a monster accompanies you, sometimes it will arrive
            at your intended destination and you'll end up next to
@@ -664,11 +654,9 @@ boolean pets_only;  /* true for ascension or final escape */
                 only if in range. -3. */
              (u.uhave.amulet && mtmp->iswiz))
             && ((!mtmp->msleeping && mtmp->mcanmove)
-#ifdef STEED
                 /* eg if level teleport or new trap, steed has no control
                    to avoid following */
                 || (mtmp == u.usteed)
-#endif
                 )
             /* monster won't follow if it hasn't noticed you yet */
             && !(mtmp->mstrategy & STRAT_WAITFORU)) {
@@ -988,13 +976,12 @@ struct obj *obj;
         return FALSE;
     }
 
-#ifdef CONVICT
     if (Role_if(PM_CONVICT) && (is_domestic(mtmp->data) && obj)) {
         /* Domestic animals are wary of the Convict */
         pline("%s still looks wary of you.", Monnam(mtmp));
         return FALSE;
     }
-#endif
+
     /* If we cannot tame it, at least it's no longer afraid. */
     mtmp->mflee = 0;
     mtmp->mfleetim = 0;

@@ -297,7 +297,6 @@ doread()
         }
         useup(scroll);
         return 1;
-#ifdef TOURIST
     } else if (scroll->otyp == T_SHIRT ||
                scroll->otyp == ALCHEMY_SMOCK ||
                scroll->otyp == HAWAIIAN_SHIRT) {
@@ -380,7 +379,6 @@ doread()
         }
         violated(CONDUCT_ILLITERACY);
         return 1;
-#endif  /* TOURIST */
 
     } else if ((scroll->otyp == TIN) ||
                (scroll->otyp == CAN_OF_GREASE) ||
@@ -742,9 +740,7 @@ int curse_bless;
 
         case MAGIC_MARKER:
         case TINNING_KIT:
-#ifdef TOURIST
         case EXPENSIVE_CAMERA:
-#endif
             if (is_cursed) stripspe(obj);
             else if (rechrg && obj->otyp == MAGIC_MARKER) { /* previously recharged */
                 obj->recharged = 1; /* override increment done above */
@@ -2677,9 +2673,7 @@ void
 punish(sobj)
 register struct obj *sobj;
 {
-#ifdef CONVICT
     struct obj *otmp;
-#endif /* CONVICT */
     struct obj *reuse_ball = (sobj && sobj->otyp == HEAVY_IRON_BALL) ? sobj : (struct obj *) 0;
 
     /* KMH -- Punishment is still okay when you are riding */
@@ -2701,21 +2695,17 @@ register struct obj *sobj;
         return;
     }
     setworn(mkobj(CHAIN_CLASS, TRUE), W_CHAIN);
-#ifdef CONVICT
     if (((otmp = carrying(HEAVY_IRON_BALL)) != 0) &&(otmp->oartifact ==
                                                      ART_IRON_BALL_OF_LIBERATION)) {
         setworn(otmp, W_BALL);
         Your("%s chains itself to you!", xname(otmp));
     } else {
-#endif
         if (!reuse_ball) {
             setworn(mkobj(BALL_CLASS, TRUE), W_BALL);
         } else {
             setworn(reuse_ball, W_BALL);
         }
-#ifdef CONVICT
     }
-#endif /* CONVICT */
     uball->spe = 1;     /* special ball (see save) */
 
     /*

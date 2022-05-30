@@ -87,7 +87,6 @@ register struct monst *mtmp;
 
     if (mtmp->mpeaceful && in_town(u.ux+u.dx, u.uy+u.dy) &&
         mtmp->mcansee && m_canseeu(mtmp) && !rn2(3)) {
-#ifdef CONVICT
         if (Role_if(PM_CONVICT) && !Upolyd) {
             verbalize("%s yells: Hey!  You are the one from the wanted poster!",
                       Amonnam(mtmp));
@@ -95,7 +94,7 @@ register struct monst *mtmp;
             stop_occupation();
             return;
         }
-#endif /* CONVICT */
+
         if (picking_lock(&x, &y) && IS_DOOR(levl[x][y].typ) &&
             (levl[x][y].doormask & D_LOCKED)) {
 
@@ -182,10 +181,8 @@ struct monst *mtmp;
     }
 
     return (sobj_at(SCR_SCARE_MONSTER, x, y)
-#ifdef ELBERETH
             || ((!flags.elberethignore && sengr_at("Elbereth", x, y)) &&
                  ((u.ux == x && u.uy == y) || (Displaced && mtmp->mux == x && mtmp->muy == y)))
-#endif
            );
 }
 
@@ -548,9 +545,7 @@ register struct monst *mtmp;
 
     /* Demonic Blackmail! */
     if (nearby && mdat->msound == MS_BRIBE &&
-#ifdef CONVICT
          (monsndx(mdat) != PM_PRISON_GUARD) &&
-#endif /* CONVICT */
          mtmp->mpeaceful && !mtmp->mtame && !u.uswallow) {
         if (mtmp->mux != u.ux || mtmp->muy != u.uy) {
             pline("%s whispers at thin air.",
@@ -572,7 +567,6 @@ register struct monst *mtmp;
         } else if(demon_talk(mtmp)) return(1);  /* you paid it off */
     }
 
-#ifdef CONVICT
     /* Prison guard extortion */
     if(nearby && (monsndx(mdat) == PM_PRISON_GUARD) && !mtmp->mpeaceful
        && !mtmp->mtame && !u.uswallow && (!mtmp->mspec_used)) {
@@ -590,7 +584,6 @@ register struct monst *mtmp;
             mtmp->mspec_used = 1000;
         }
     }
-#endif /* CONVICT */
 
     /* the watch will look around and see if you are up to no good :-) */
     if (is_watch(mdat)) {

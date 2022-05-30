@@ -552,11 +552,7 @@ amii_player_selection()
 		{
 		    flags.initrole = randrole();
 #if 0	/* OBSOLETE */
-#ifdef  TOURIST
 		    strcpy( pl_character, roles[ rnd( 11 ) ] );
-#else
-		    strcpy( pl_character, roles[ rnd( 10 ) ] );
-#endif
 #endif
 		    aredone = 1;
 		    amii_clear_nhwindow( WIN_BASE );
@@ -581,11 +577,7 @@ amii_player_selection()
 		case 1: /* Random Character */
 		    flags.initrole = randrole();
 #if 0	/* OBSOLETE */
-#ifdef  TOURIST
 		    strcpy( pl_character, roles[ rnd( 11 ) ] );
-#else
-		    strcpy( pl_character, roles[ rnd( 10 ) ] );
-#endif
 #endif
 		    amii_clear_nhwindow( WIN_BASE );
 		    CloseShWindow( cwin );
@@ -1482,9 +1474,9 @@ give_up:	/* Quit */
 					Strcpy(rolenamebuf, roles[i].name.m);
 					Strcat(rolenamebuf, "/");
 					Strcat(rolenamebuf, roles[i].name.f);
-				} else 
+				} else
 					Strcpy(rolenamebuf, roles[i].name.m);
-			}	
+			}
 			add_menu(win, NO_GLYPH, &any, thisch,
 			    0, ATR_NONE, an(rolenamebuf), MENU_UNSELECTED);
 			lastch = thisch;

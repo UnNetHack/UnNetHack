@@ -119,9 +119,7 @@ register struct obj *obj;
         unweapon = (obj->oclass == WEAPON_CLASS) ?
                    is_launcher(obj) || is_ammo(obj) ||
                    is_missile(obj) || (is_pole(obj)
-#ifdef STEED
                                        && !u.usteed
-#endif
                                        ) : !is_weptool(obj) && !is_wet_towel(obj);
 
         int weapon_skill = weapon_type(obj); /* non-weapons => P_NONE */
@@ -342,11 +340,7 @@ boolean prompt_for_obj;
         return (doswapweapon());
     else if (wep == uquiver)
         setuqwep((struct obj *) 0);
-    else if (wep->owornmask & (W_ARMOR | W_ACCESSORY
-#ifdef STEED
-                               | W_SADDLE
-#endif
-                               )) {
+    else if (wep->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE)) {
         You("cannot wield that!");
         return (0);
     }
@@ -441,11 +435,7 @@ dowieldquiver()
         pline("%s already being used as a weapon!",
               !is_plural(uwep) ? "That is" : "They are");
         return(0);
-    } else if (newquiver->owornmask & (W_ARMOR | W_ACCESSORY
-#ifdef STEED
-                                       | W_SADDLE
-#endif
-                                       )) {
+    } else if (newquiver->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE)) {
         You("cannot ready that!");
         return (0);
     } else {

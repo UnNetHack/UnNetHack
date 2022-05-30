@@ -458,12 +458,6 @@ make_version()
 			| (1L <<  7)
 #endif
 		/* objects (10..14) */
-#ifdef TOURIST
-			| (1L << 10)
-#endif
-#ifdef STEED
-			| (1L << 11)
-#endif
 			| (1L << 12)
 		/* flag bits and/or other global variables (15..26) */
 #ifdef TEXTCOLOR
@@ -471,9 +465,6 @@ make_version()
 #endif
 #ifdef INSURANCE
 			| (1L << 18)
-#endif
-#ifdef ELBERETH
-			| (1L << 19)
 #endif
 #ifdef EXP_ON_BOTL
 			| (1L << 20)
@@ -669,9 +660,6 @@ static const char *build_opts[] = {
 		"elapsed time on status line",
 #endif
 		"dungeon map overview patch",
-#ifdef ELBERETH
-		"Elbereth",
-#endif
 #ifdef EXP_ON_BOTL
 		"experience points on status line",
 #endif
@@ -725,9 +713,6 @@ static const char *build_opts[] = {
 #ifdef REDO
 		"redo command",
 #endif
-#ifdef STEED
-		"saddles and riding",
-#endif
 #ifdef SCORE_ON_BOTL
 		"score on status line",
 #endif
@@ -774,9 +759,6 @@ static const char *build_opts[] = {
 #endif
 #ifdef TIMED_DELAY
 		"timed wait for display effects",
-#endif
-#ifdef TOURIST
-		"tourists",
 #endif
 #ifdef UTF8_GLYPHS
 		"UTF-8 glyphs",
@@ -1065,9 +1047,7 @@ h_filter(line)
 #ifndef SINKS
 	if (!strcmp(tag, "SINKS")) skip = TRUE;
 #endif
-#ifndef ELBERETH
 	if (!strcmp(tag, "ELBERETH")) skip = TRUE;
-#endif
     } else if (skip && !strncmp(line, "-----", 5))
 	skip = FALSE;
     return skip;
@@ -1848,11 +1828,9 @@ do_objs()
 
 		if (!strncmp(objnam, "THE_", 4))
 			objnam += 4;
-#ifdef TOURIST
 		/* fudge _platinum_ YENDORIAN EXPRESS CARD */
 		if (!strncmp(objnam, "PLATINUM_", 9))
 			objnam += 9;
-#endif
 		Fprintf(ofp,"#define\tART_%s\t%d\n", limit(objnam, 1), i);
 	}
 

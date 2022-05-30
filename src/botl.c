@@ -577,7 +577,6 @@ bot2()
         botl_text(u.ufeetfrozen > 0, "Frozen", newbot2, 1);
     }
 
-#ifdef ELBERETH
     int engr_type;
     if ((engr_type = sengr_at("Elbereth", u.ux, u.uy))) {
         boolean feelable_engraving = (engr_type == ENGRAVE || engr_type == BURN) && can_reach_floor(FALSE);
@@ -585,7 +584,6 @@ bot2()
             botl_text(1, "Elbereth", newbot2, 1);
         }
     }
-#endif
 #ifdef DUMP_LOG
 }
 STATIC_OVL void

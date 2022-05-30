@@ -63,10 +63,8 @@ lock_action()
     /* otherwise we're trying to unlock it */
     else if (xlock.picktyp == LOCK_PICK)
         return actions[4];  /* "picking the lock" */
-#ifdef TOURIST
     else if (xlock.picktyp == CREDIT_CARD)
         return actions[4];  /* same as lock_pick */
-#endif
     else if (xlock.door)
         return actions[0];  /* "unlocking the door" */
     else
@@ -336,9 +334,7 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
 
         if (nohands(youmonst.data)) {
             const char *what = (picktyp == LOCK_PICK) ? "pick" : "key";
-#ifdef TOURIST
             if (picktyp == CREDIT_CARD) what = "card";
-#endif
             if (picktyp == STETHOSCOPE) what = "stethoscope";
 
             pline(no_longer, "hold the", what);
@@ -368,9 +364,7 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
     }
 
     if ((picktyp != LOCK_PICK && picktyp != STETHOSCOPE &&
-#ifdef TOURIST
          picktyp != CREDIT_CARD &&
-#endif
          picktyp != SKELETON_KEY)) {
         warning("picking lock with object %d?", picktyp);
         return PICKLOCK_DID_NOTHING;
@@ -443,19 +437,15 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
                     You_cant("fix its broken lock with %s.", doname(pick));
                     return PICKLOCK_LEARNED_SOMETHING;
                 }
-#ifdef TOURIST
                 else if (picktyp == CREDIT_CARD && !otmp->olocked) {
                     /* credit cards are only good for unlocking */
                     You_cant("do that with %s.", an(simple_typename(picktyp)));
                     return PICKLOCK_LEARNED_SOMETHING;
                 }
-#endif
                 switch(picktyp) {
-#ifdef TOURIST
                 case CREDIT_CARD:
                     ch = ACURR(A_DEX) + 20*Role_if(PM_ROGUE);
                     break;
-#endif
                 case LOCK_PICK:
                     ch = 4*ACURR(A_DEX) + 25*Role_if(PM_ROGUE);
                     break;
@@ -491,13 +481,11 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
         if ((mtmp = m_at(cc.x, cc.y)) && canseemon(mtmp) &&
             M_AP_TYPE(mtmp) != M_AP_FURNITURE &&
             M_AP_TYPE(mtmp) != M_AP_OBJECT) {
-#ifdef TOURIST
             if (picktyp == CREDIT_CARD &&
                 (mtmp->isshk || mtmp->data == &mons[PM_ORACLE]))
                 verbalize("No checks, no credit, no problem.");
             else
-#endif
-            pline("I don't think %s would appreciate that.", mon_nam(mtmp));
+                pline("I don't think %s would appreciate that.", mon_nam(mtmp));
             return PICKLOCK_LEARNED_SOMETHING;
         } else if (mtmp && is_door_mappear(mtmp)) {
             /* "The door actually was a <mimic>!" */
@@ -526,13 +514,12 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
             pline("This door is broken.");
             return PICKLOCK_LEARNED_SOMETHING;
         default:
-#ifdef TOURIST
             /* credit cards are only good for unlocking */
             if (picktyp == CREDIT_CARD && !(door->doormask & D_LOCKED)) {
                 You_cant("lock a door with a credit card.");
                 return PICKLOCK_LEARNED_SOMETHING;
             }
-#endif
+
             /* ALI - Artifact doors */
             key = artifact_door(cc.x, cc.y);
 
@@ -545,11 +532,9 @@ boolean explicit; /**< Mentioning tool when (un)locking doors? */
             if(c == 'n') return(0);
 
             switch(picktyp) {
-#ifdef TOURIST
             case CREDIT_CARD:
                 ch = 2*ACURR(A_DEX) + 20*Role_if(PM_ROGUE);
                 break;
-#endif
             case LOCK_PICK:
                 ch = 3*ACURR(A_DEX) + 30*Role_if(PM_ROGUE);
                 break;
@@ -925,19 +910,11 @@ doclose()
     }
 
     if (door->doormask == D_ISOPEN) {
-        if(verysmall(youmonst.data)
-#ifdef STEED
-           && !u.usteed
-#endif
-           ) {
+        if (verysmall(youmonst.data) && !u.usteed) {
             pline("You're too small to push the door closed.");
             return res;
         }
-        if (
-#ifdef STEED
-            u.usteed ||
-#endif
-            rn2(25) < (ACURRSTR+ACURR(A_DEX)+ACURR(A_CON))/3) {
+        if (u.usteed || rn2(25) < (ACURRSTR+ACURR(A_DEX)+ACURR(A_CON))/3) {
             pline_The("door closes.");
             door->doormask = D_CLOSED;
             feel_newsym(x, y); /* the hero knows she closed it */

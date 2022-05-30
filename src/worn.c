@@ -17,9 +17,7 @@ const struct worn {
     { W_ARMS, &uarms },
     { W_ARMG, &uarmg },
     { W_ARMF, &uarmf },
-#ifdef TOURIST
     { W_ARMU, &uarmu },
-#endif
     { W_RINGL, &uleft },
     { W_RINGR, &uright },
     { W_WEP, &uwep },
@@ -457,10 +455,8 @@ maybe_blocks:
         break;
     }
 
-#ifdef STEED
     if (!on && mon == u.usteed && obj->otyp == SADDLE)
         dismount_steed(DISMOUNT_FELL);
-#endif
 
     /* if couldn't see it but now can, or vice versa, update display */
     if (!silently && (unseen ^ !canseemon(mon)))
@@ -527,12 +523,10 @@ boolean creation;
         return;
 
     m_dowear_type(mon, W_AMUL, creation, FALSE);
-#ifdef TOURIST
     /* can't put on shirt if already wearing suit */
     if (!cantweararm(mon->data) && !(mon->misc_worn_check & W_ARM)) {
         m_dowear_type(mon, W_ARMU, creation, FALSE);
     }
-#endif
     /* treating small as a special case allows
        hobbits, gnomes, and kobolds to wear cloaks */
     if (!cantweararm(mon->data) || mon->data->msize == MZ_SMALL)
@@ -580,11 +574,9 @@ boolean racialexception;
                 continue;
             best = obj;
             goto outer_break; /* no such thing as better amulets */
-#ifdef TOURIST
         case W_ARMU:
             if (!is_shirt(obj)) continue;
             break;
-#endif
         case W_ARMC:
             if (!is_cloak(obj)) continue;
             break;
@@ -634,12 +626,10 @@ outer_break:
 
     /* if wearing a cloak, account for the time spent removing
        and re-wearing it when putting on a suit or shirt */
-    if ((flag == W_ARM
-#ifdef TOURIST
-         || flag == W_ARMU
-#endif
-         ) && (mon->misc_worn_check & W_ARMC))
+    if ((flag == W_ARM || flag == W_ARMU) &&
+         (mon->misc_worn_check & W_ARMC)) {
         m_delay += 2;
+    }
     /* when upgrading a piece of armor, account for time spent
        taking off current one */
     if (old)
@@ -884,7 +874,6 @@ boolean polyspot;
                 m_useup(mon, otmp);
             }
         }
-#ifdef TOURIST
         if ((otmp = which_armor(mon, W_ARMU)) != 0) {
             if (vis)
                 pline("%s shirt rips to shreds!", s_suffix(Monnam(mon)));
@@ -892,7 +881,6 @@ boolean polyspot;
                 You_hear("a ripping sound.");
             m_useup(mon, otmp);
         }
-#endif
     } else if (sliparm(mdat)) {
         if ((otmp = which_armor(mon, W_ARM)) != 0) {
             if (vis)
@@ -915,7 +903,6 @@ boolean polyspot;
             if (polyspot) bypass_obj(otmp);
             m_lose_armor(mon, otmp);
         }
-#ifdef TOURIST
         if ((otmp = which_armor(mon, W_ARMU)) != 0) {
             if (vis) {
                 if (sliparm(mon->data))
@@ -928,7 +915,6 @@ boolean polyspot;
             if (polyspot) bypass_obj(otmp);
             m_lose_armor(mon, otmp);
         }
-#endif
     }
     if (handless_or_tiny) {
         /* [caller needs to handle weapon checks] */
@@ -976,7 +962,6 @@ boolean polyspot;
             m_lose_armor(mon, otmp);
         }
     }
-#ifdef STEED
     if (!can_saddle(mon)) {
         if ((otmp = which_armor(mon, W_SADDLE)) != 0) {
             if (polyspot) bypass_obj(otmp);
@@ -1000,8 +985,6 @@ noride:
         }
         dismount_steed(DISMOUNT_FELL);
     }
-#endif
-    return;
 }
 
 /* bias a monster's preferences towards armor that has special benefits. */

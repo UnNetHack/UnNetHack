@@ -252,12 +252,8 @@
 /* BFlying has I_SPECIAL set if levitating or trapped in the floor or both,
    FROMOUTSIDE set if inside solid rock (or in water on Plane of Water) */
 #define BFlying         u.uprops[FLYING].blocked
-#ifdef STEED
-# define Flying         (EFlying || is_flyer(youmonst.data) || \
+#define Flying          (EFlying || is_flyer(youmonst.data) || \
                          (u.usteed && is_flyer(u.usteed->data)))
-#else
-# define Flying         (EFlying || is_flyer(youmonst.data))
-#endif
 /* May touch surface; does not override any others */
 
 #define EWwalking u.uprops[WWALKING].extrinsic
@@ -267,14 +263,9 @@
 
 #define HSwimming       u.uprops[SWIMMING].intrinsic
 #define ESwimming       u.uprops[SWIMMING].extrinsic    /* [Tom] */
-#ifdef STEED
-# define Swimming       (HSwimming || ESwimming || \
+#define Swimming        (HSwimming || ESwimming || \
                          is_swimmer(youmonst.data) || \
                          (u.usteed && is_swimmer(u.usteed->data)))
-#else
-# define Swimming       (HSwimming || ESwimming || \
-                         is_swimmer(youmonst.data))
-#endif
 /* Get wet, don't go under water unless if amphibious */
 
 #define HMagical_breathing  u.uprops[MAGICAL_BREATHING].intrinsic
@@ -295,9 +286,7 @@
 #define EPasses_walls       u.uprops[PASSES_WALLS].extrinsic
 #define Passes_walls        (HPasses_walls || EPasses_walls || \
                              passes_walls(youmonst.data))
-#ifdef CONVICT
-# define Phasing            u.uprops[PASSES_WALLS].intrinsic
-#endif /* CONVICT */
+#define Phasing             u.uprops[PASSES_WALLS].intrinsic
 
 /*** Physical attributes ***/
 #define HSlow_digestion     u.uprops[SLOW_DIGESTION].intrinsic

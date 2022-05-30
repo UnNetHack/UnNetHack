@@ -12,9 +12,7 @@ equipname(otmp)
 register struct obj *otmp;
 {
     return (
-#ifdef TOURIST
         (otmp == uarmu) ? "shirt" :
-#endif
         (otmp == uarmf) ? "boots" :
         (otmp == uarms) ? "shield" :
         (otmp == uarmg) ? "gloves" :
@@ -195,9 +193,7 @@ boolean unchain_ball;   /* whether to unpunish or just unwield */
         else if (obj == uarmg) (void) Gloves_off();
         else if (obj == uarmh) (void) Helmet_off();
         else if (obj == uarms) (void) Shield_off();
-#ifdef TOURIST
         else if (obj == uarmu) (void) Shirt_off();
-#endif
         /* catchall -- should never happen */
         else setworn((struct obj *)0, obj->owornmask & W_ARMOR);
     } else if (obj->owornmask & W_AMUL) {
@@ -311,11 +307,9 @@ retry:
         otmp = uwep;
     /* can't steal armor while wearing cloak - so steal the cloak. */
     else if(otmp == uarm && uarmc) otmp = uarmc;
-#ifdef TOURIST
     /* can't steal shirt while wearing cloak or suit */
     else if(otmp == uarmu && uarmc) otmp = uarmc;
     else if(otmp == uarmu && uarm) otmp = uarm;
-#endif
 gotobj:
     if (otmp->o_id == stealoid) {
         return 0;
@@ -663,7 +657,6 @@ boolean verbosely;
         if (!DEADMONSTER(mon)) {
             mon->misc_worn_check &= ~obj->owornmask;
             update_mon = TRUE;
-#ifdef STEED
         /* don't charge for an owned saddle on dead steed (provided
            that the hero is within the same shop at the time) */
         } else if (mon->mtame && (obj->owornmask & W_SADDLE) &&
@@ -671,7 +664,6 @@ boolean verbosely;
                    /* being at costly_spot guarantees lev->roomno is not 0 */
                    index(in_rooms(u.ux, u.uy, SHOPBASE), levl[omx][omy].roomno)) {
             obj->no_charge = 1;
-#endif
         }
         /* this should be done even if the monster has died */
         if (obj->owornmask & W_WEP) {

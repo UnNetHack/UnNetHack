@@ -123,9 +123,7 @@ struct eshk {
     boolean surcharge;    /* angry shk inflates prices */
     boolean dismiss_kops; /* pacified shk sends kops away */
     boolean cheapskate;   /* offers less than normal for sold goods */
-#ifdef CONVICT
     boolean pbanned;      /* player is banned from the shop */
-#endif /* CONVICT */
     coord shk;            /* usual position shopkeeper */
     coord shd;            /* position shop door */
     d_level shoplevel;    /* level (& dungeon) of his shop */

@@ -749,13 +749,12 @@ char *enterstring;
             return;
         }
     }
-#ifdef CONVICT
+
     /* Visible striped prison shirt */
     if (!Is_blackmarket(&u.uz) &&
         (uarmu && (uarmu->otyp == STRIPED_SHIRT)) && !uarm && !uarmc) {
         eshkp->pbanned = TRUE;
     }
-#endif /* CONVICT */
 
     rt = rooms[*enterstring - ROOMOFFSET].rtype;
 
@@ -779,24 +778,20 @@ char *enterstring;
             pline("%s is combing through %s inventory list.", Shknam(shkp), noit_mhis(shkp));
         }
     } else {
-#ifdef CONVICT
         if (!eshkp->pbanned || inside_shop(u.ux, u.uy)) {
-#endif /* CONVICT */
-        if (!Deaf && !muteshk(shkp)) {
-            verbalize("%s, %s!  Welcome%s to %s %s!",
-                      Hello(shkp), plname,
-                      eshkp->visitct++ ? " again" : "",
-                      s_suffix(shkname(shkp)),
-                      shtypes[rt - SHOPBASE].name);
-        } else {
-            You("enter %s %s%s!",
-                s_suffix(shkname(shkp)),
-                shtypes[rt - SHOPBASE].name,
-                eshkp->visitct++ ? " again" : "");
+            if (!Deaf && !muteshk(shkp)) {
+                verbalize("%s, %s!  Welcome%s to %s %s!",
+                        Hello(shkp), plname,
+                        eshkp->visitct++ ? " again" : "",
+                        s_suffix(shkname(shkp)),
+                        shtypes[rt - SHOPBASE].name);
+            } else {
+                You("enter %s %s%s!",
+                    s_suffix(shkname(shkp)),
+                    shtypes[rt - SHOPBASE].name,
+                    eshkp->visitct++ ? " again" : "");
+            }
         }
-#ifdef CONVICT
-        }
-#endif /* CONVICT */
     }
     /* can't do anything about blocking if teleported in */
     if (!inside_shop(u.ux, u.uy) && !(Is_blackmarket(&u.uz))) {
@@ -850,7 +845,6 @@ char *enterstring;
                       tool, plur(cnt));
             }
             should_block = TRUE;
-#ifdef STEED
         } else if (u.usteed) {
             if (!Deaf && !muteshk(shkp)) {
                 verbalize(NOTANGRY(shkp) ?
@@ -863,12 +857,9 @@ char *enterstring;
                       y_monnam(u.usteed));
             }
             should_block = TRUE;
-#endif
-#ifdef CONVICT
         } else if (eshkp->pbanned) {
             verbalize("I don't sell to your kind here.");
             should_block = TRUE;
-#endif
         } else {
             should_block = (Fast && (sobj_at(PICK_AXE, u.ux, u.uy) ||
                                      sobj_at(DWARVISH_MATTOCK, u.ux, u.uy) ||
@@ -1961,9 +1952,7 @@ boolean silently; /* maybe avoid messages */
     if (firstshk) {
         numsk++;
         taken = inherits(firstshk, numsk, croaked, silently);
-#ifdef CONVICT
         ESHK(firstshk)->pbanned = FALSE; /* Un-ban for bones levels */
-#endif /* CONVICT */
     }
     /* now handle the rest */
     for (mtmp = next_shkp(fmon, FALSE); mtmp; mtmp = next_shkp(mtmp2, FALSE)) {
@@ -1973,9 +1962,7 @@ boolean silently; /* maybe avoid messages */
         if (mtmp != firstshk) {
             numsk++;
             taken |= inherits(mtmp, numsk, croaked, silently);
-#ifdef CONVICT
             eshkp->pbanned = FALSE; /* Un-ban for bones levels */
-#endif /* CONVICT */
         }
         /* for bones: we don't want a shopless shk around */
         if (!local) {
@@ -2299,14 +2286,13 @@ register struct monst *shkp;    /* if angry, impose a surcharge */
         } else if (!(obj->o_id % 4)) /* arbitrarily impose surcharge */
             tmp += tmp / 3L;
     }
-#ifdef TOURIST
-    if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV/2))
-        || (uarmu && !uarm && !uarmc))  /* touristy shirt visible */
+
+    if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV/2)) || (uarmu && !uarm && !uarmc)) {
+        /* touristy shirt visible */
         tmp += tmp / 3L;
-    else
-#endif
-    if (uarmh && uarmh->otyp == DUNCE_CAP)
+    } else if (uarmh && uarmh->otyp == DUNCE_CAP) {
         tmp += tmp / 3L;
+    }
 
     if (ACURR(A_CHA) > 18) tmp /= 2L;
     else if (ACURR(A_CHA) > 17) tmp -= tmp / 3L;
@@ -2327,17 +2313,9 @@ register struct monst *shkp;    /* if angry, impose a surcharge */
             obj->oclass==SPBOOK_CLASS  || obj->oclass==WAND_CLASS     ||
             obj->otyp==LUCKSTONE       || obj->otyp==LOADSTONE        ||
             objects[obj->otyp].oc_magic) {
-#ifdef CONVICT
             tmp *= Role_if(PM_CONVICT) ? 20 : 25;
-#else
-            tmp *= 25;
-#endif
         } else {
-#ifdef CONVICT
             tmp *= Role_if(PM_CONVICT) ? 12 : 15;
-#else
-            tmp *= 15;
-#endif
         }
     }
 #endif /* BLACKMARKET */
@@ -2503,12 +2481,10 @@ register struct monst *shkp;
 {
     long tmp = getprice(obj, TRUE) * obj->quan;
 
-#ifdef TOURIST
     if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV/2))
         || (uarmu && !uarm && !uarmc))  /* touristy shirt visible */
         tmp /= 3L;
     else
-#endif
     if (uarmh && uarmh->otyp == DUNCE_CAP)
         tmp /= 3L;
     else
@@ -4045,12 +4021,7 @@ struct monst *shkp;
     } else {
 #define GDIST(x, y)  (dist2(x, y, gx, gy))
 
-        if ((!Is_blackmarket(&u.uz) && (Invis
-#ifdef STEED
-                                        || u.usteed
-#endif
-                                        ) && !inside_shop(u.ux, u.uy)))
-        {
+        if ((!Is_blackmarket(&u.uz) && (Invis || u.usteed) && !inside_shop(u.ux, u.uy))) {
             avoid = FALSE;
         } else {
             uondoor = (u.ux == eshkp->shd.x && u.uy == eshkp->shd.y);
@@ -4059,9 +4030,7 @@ struct monst *shkp;
                           (carrying(PICK_AXE) ||
                            carrying(DWARVISH_MATTOCK) ||
                            carrying(CRYSTAL_PICK) ||
-#ifdef CONVICT
                            eshkp->pbanned ||
-#endif /* CONVICT */
                            (Fast && (sobj_at(PICK_AXE, u.ux, u.uy) ||
                                      sobj_at(DWARVISH_MATTOCK, u.ux, u.uy) ||
                                      sobj_at(CRYSTAL_PICK, u.ux, u.uy)))));
@@ -4754,11 +4723,8 @@ boolean altusage; /* some items have an "alternate" use with different cost */
     } else if (otmp->oclass == SPBOOK_CLASS) {
         tmp -= tmp / 5L;
     } else if (otmp->otyp == CAN_OF_GREASE ||
-               otmp->otyp == TINNING_KIT
-#ifdef TOURIST
-               || otmp->otyp == EXPENSIVE_CAMERA
-#endif
-               ) {
+               otmp->otyp == TINNING_KIT ||
+               otmp->otyp == EXPENSIVE_CAMERA) {
         tmp /= 10L;
     } else if (otmp->otyp == POT_OIL) {
         tmp /= 5L;
@@ -4924,11 +4890,8 @@ register xchar x, y;
            (!Is_blackmarket(&u.uz) &&
             (carrying(PICK_AXE) ||
              carrying(DWARVISH_MATTOCK) ||
-             carrying(CRYSTAL_PICK)))
-#ifdef STEED
-           || u.usteed
-#endif
-           )) {
+             carrying(CRYSTAL_PICK))) ||
+           u.usteed)) {
         pline("%s%s blocks your way!", shkname(shkp),
               Invis ? " senses your motion and" : "");
         return(TRUE);

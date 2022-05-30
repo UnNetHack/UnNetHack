@@ -62,9 +62,8 @@ struct u_event {
     Bitfield(entered_a_shop, 1);            /* entered a shop */
     Bitfield(entered_a_temple, 1);          /* entered a temple */
 
-#ifdef ELBERETH
     Bitfield(uhand_of_elbereth, 2);  /* became Hand of Elbereth */
-#endif
+
     Bitfield(udemigod, 1);       /* killed the wiz */
     Bitfield(uvibrated, 1);      /* stepped on "vibrating square" */
     Bitfield(ascended, 1);       /* has offered the Amulet */
@@ -469,11 +468,11 @@ struct you {
     long usleep;             /* sleeping; monstermove you last started */
     int uinvault;
     struct monst *ustuck;
-#ifdef STEED
+
     struct monst *usteed;
     long ugallop;
     int urideturns;
-#endif
+
     int umortality;         /* how many times you died */
     int ugrave_arise;       /* you die and become something aside from a ghost */
     time_t ubirthday;       /* real world time when game began */

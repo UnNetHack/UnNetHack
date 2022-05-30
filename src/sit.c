@@ -36,12 +36,11 @@ dosit()
     int typ = levl[u.ux][u.uy].typ;
 
 
-#ifdef STEED
     if (u.usteed) {
         You("are already sitting on %s.", mon_nam(u.usteed));
         return (0);
     }
-#endif
+
     if (u.uundetected && is_hider(youmonst.data) && u.umonnum != PM_TRAPPER) {
         u.uundetected = 0; /* no longer on the ceiling */
     }
@@ -346,7 +345,6 @@ rndcurse()          /* curse a few inventory items at random! */
     curse_objects(invent,
                   rnd(6/((!!Antimagic) + (!!Half_spell_damage) + 1)), TRUE);
 
-#ifdef STEED
     /* treat steed's saddle as extended part of hero's inventory */
     if (u.usteed && !rn2(4) &&
         (otmp = which_armor(u.usteed, W_SADDLE)) != 0 &&
@@ -363,7 +361,6 @@ rndcurse()          /* curse a few inventory items at random! */
             otmp->bknown = TRUE;
         }
     }
-#endif  /*STEED*/
 }
 
 void

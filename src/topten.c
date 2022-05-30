@@ -294,9 +294,7 @@ encode_uevent()
     if (u.uevent.ascended) c |= 0x00100UL;          /* someone needs to use this variable */
 
     /* notable other events */
-#ifdef ELBERETH
     if (u.uevent.uhand_of_elbereth) c |= 0x00200UL; /* was crowned */
-#endif
 
     /* boss kills */
     if (quest_status.killed_nemesis) c |= 0x00400UL; /* defeated quest nemesis */

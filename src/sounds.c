@@ -933,14 +933,15 @@ register struct monst *mtmp;
                             "complains about unpleasant dungeon conditions."
                             : "asks you about the One Ring.";
                 break;
+
             case PM_ARCHEOLOGIST:
                 pline_msg = "describes a recent article in \"Spelunker Today\" magazine.";
                 break;
-#ifdef TOURIST
+
             case PM_TOURIST:
                 verbl_msg = "Aloha.";
                 break;
-#endif
+
             default:
                 pline_msg = "discusses dungeon exploration.";
                 break;
@@ -984,7 +985,6 @@ register struct monst *mtmp;
         break;
 #endif
     case MS_BRIBE:
-#ifdef CONVICT
         if (monsndx(ptr) == PM_PRISON_GUARD) {
             long gdemand = 500 * u.ulevel;
             long goffer = 0;
@@ -1005,11 +1005,11 @@ register struct monst *mtmp;
             } else {
                 verbl_msg = "Out of my way, scum!"; /* still a jerk */
             }
-        } else
-#endif /* CONVICT */
-        if (mtmp->mpeaceful && !mtmp->mtame) {
-            (void) demon_talk(mtmp);
-            break;
+        } else {
+            if (mtmp->mpeaceful && !mtmp->mtame) {
+                (void) demon_talk(mtmp);
+                break;
+            }
         }
     /* fall through */
     case MS_CUSS:
@@ -1033,10 +1033,8 @@ register struct monst *mtmp;
             verbl_msg = Role_if(PM_HEALER) ?
                         "Doc, I can't help you unless you cooperate." :
                         "Please undress so I can examine you.";
-#ifdef TOURIST
         else if (uarmu)
             verbl_msg = "Take off your shirt, please.";
-#endif
         else verbl_msg = "Relax, this won't hurt a bit.";
         break;
     case MS_GUARD:
@@ -1065,12 +1063,9 @@ register struct monst *mtmp;
         if (!mtmp->mpeaceful)
             verbl_msg = "You worthless piece of scum!";
         else
-#ifdef CONVICT
-        if (Role_if(PM_CONVICT))
+        if (Role_if(PM_CONVICT)) {
             verbl_msg = "We offer a special discount for our friends on this side of the law.";
-        else
-#endif /* CONVICT */
-        {
+        } else {
             static const char * const one_eyed_sam_msg[3] = {
                 "Psst! If you smuggle me the Amulet of Yendor we can split the profit!",
                 "Today's special: Buy two items and get the third for full price!",
@@ -1184,7 +1179,6 @@ dochat()
         return(0);
     }
 
-#ifdef STEED
     if (u.usteed && u.dz > 0) {
         if (!u.usteed->mcanmove || u.usteed->msleeping) {
             pline("%s seems not to notice you.", Monnam(u.usteed));
@@ -1193,7 +1187,7 @@ dochat()
             return domonnoise(u.usteed);
         }
     }
-#endif
+
     if (u.dz) {
         pline("They won't hear you %s there.", u.dz < 0 ? "up" : "down");
         return(0);
@@ -1259,7 +1253,6 @@ dochat()
         monflee(mtmp, rn1(20, 10), TRUE, FALSE);
     }
 
-#ifdef CONVICT
     if (Role_if(PM_CONVICT) && is_rat(mtmp->data) && !mtmp->mpeaceful &&
         !mtmp->mtame) {
         You("attempt to soothe the %s with chittering sounds.",
@@ -1277,7 +1270,7 @@ dochat()
         }
         return 0;
     }
-#endif /* CONVICT */
+
     return domonnoise(mtmp);
 }
 
