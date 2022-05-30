@@ -724,6 +724,12 @@ boolean atme;
     coord cc;
 
     /*
+     *  Note: dotele() also calculates energy use and checks nutrition
+     *  and strength requirements; it any of these change, update it too.
+     */
+    energy = SPELL_LEV_PW(spellev(spell)); /* 5 <= energy <= 35 */
+
+    /*
      * Spell casting no longer affects knowledge of the spell. A
      * decrement of spell knowledge is done every turn.
      */
@@ -731,13 +737,18 @@ boolean atme;
         Your("knowledge of this spell is twisted.");
         pline("It invokes nightmarish images in your mind...");
         spell_backfire(spell);
-        return(0);
+        u.uen -= rnd(energy);
+        if (u.uen < 0) {
+            u.uen = 0;
+        }
+        flags.botl = 1;
+        return ECMD_TIME;
+
     } else if (spellknow(spell) <= 100) {
         You("strain to recall the spell.");
     } else if (spellknow(spell) <= 1000) {
         Your("knowledge of this spell is growing faint.");
     }
-    energy = (spellev(spell) * 5);    /* 5 <= energy <= 35 */
 
     if (u.uhunger <= 10 && spellid(spell) != SPE_DETECT_FOOD) {
         You("are too hungry to cast that spell.");
@@ -1390,6 +1401,21 @@ struct obj *obj;
     }
     warning("Too many spells memorized!");
     return;
+}
+
+/** Number of spells hero knows */
+int
+num_spells(void)
+{
+    int i;
+
+    for (i = 0; i < MAXSPELL; i++) {
+        if (spellid(i) == NO_SPELL) {
+            break;
+        }
+    }
+
+    return i;
 }
 
 /*spell.c*/

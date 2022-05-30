@@ -39,7 +39,7 @@ STATIC_VAR NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
     TWO_HANDED_SWORD, SCIMITAR,       PN_SABER,     CLUB,
     MACE,             MORNING_STAR,   FLAIL,
     PN_HAMMER,        QUARTERSTAFF,   PN_POLEARMS,  SPEAR,
-    JAVELIN,          TRIDENT,        LANCE,        BOW,
+    TRIDENT,        LANCE,        BOW,
     SLING,            CROSSBOW,       DART,
     SHURIKEN,         BOOMERANG,      PN_WHIP,      UNICORN_HORN,
     PN_ATTACK_SPELL,     PN_HEALING_SPELL,
@@ -1478,7 +1478,7 @@ int enhance_skill(boolean want_dump)
 
 /*
  * Change from restricted to unrestricted, allowing P_BASIC as max.  This
- * function may be called with with P_NONE.  Used in pray.c.
+ * function may be called with with P_NONE.  Used in pray.c as well as below.
  */
 void
 unrestrict_weapon_skill(skill)

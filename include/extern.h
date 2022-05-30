@@ -2466,6 +2466,7 @@ E void FDECL(initialspell, (struct obj *));
 E void NDECL(dump_spells);
 E boolean FDECL(parse_spellorder, (char *));
 extern const char* spelltypemnemonic(int);
+extern int num_spells(void);
 
 /* ### steal.c ### */
 

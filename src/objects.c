@@ -113,7 +113,7 @@ NEARDATA struct objclass objects[] = {
     WEAPON("silver spear", (char *)0,
            1, 1, 0,  2, 36, 40,  6,  8, 0, P,   P_SPEAR, SILVER, HI_SILVER),
     WEAPON("javelin", "throwing spear",
-           0, 1, 0, 10, 20,  3,  6,  6, 0, P,   P_JAVELIN, IRON, HI_METAL),
+           0, 1, 0, 10, 20,  3,  6,  6, 0, P,   P_SPEAR, IRON, HI_METAL),
 
     WEAPON("trident", (char *)0,
            1, 0, 0,  8, 25,  5,  6,  4, 0, P,   P_TRIDENT, IRON, HI_METAL),
@@ -857,7 +857,7 @@ NEARDATA struct objclass objects[] = {
     SPELL("magic missile",   "vellum",      P_ATTACK_SPELL, 45,  2, 2, 1, RAY,       HI_PAPER),
     SPELL("fireball",        "ragged",      P_ATTACK_SPELL, 20,  4, 4, 1, RAY,       HI_PAPER),
     SPELL("cone of cold",    "dog eared",   P_ATTACK_SPELL, 10,  7, 4, 1, RAY,       HI_PAPER),
-    SPELL("sleep",           "mottled",     P_ENCHANTMENT_SPELL, 50,  1, 1, 1, RAY,       HI_PAPER),
+    SPELL("sleep",           "mottled",     P_ENCHANTMENT_SPELL, 50,  1, 3, 1, RAY,       HI_PAPER),
     SPELL("finger of death", "stained",     P_ATTACK_SPELL,  5, 10, 7, 1, RAY,       HI_PAPER),
     SPELL("light",           "cloth",       P_DIVINATION_SPELL, 45,  1, 1, 1, NODIR,     HI_CLOTH),
     SPELL("detect monsters", "leather",     P_DIVINATION_SPELL, 43,  1, 1, 1, NODIR,     HI_LEATHER),
