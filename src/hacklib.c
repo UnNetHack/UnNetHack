@@ -1062,6 +1062,14 @@ phase_of_the_moon()     /* 0-7, with 0: new, 4: full */
 }
 
 boolean
+is_june()
+{
+    int month = getlt()->tm_mon;
+
+    return ((boolean)(month == 5)); /* 0 is Jan, 11 is Dec */
+}
+
+boolean
 friday_13th()
 {
     register struct tm *lt = getlt();

@@ -189,6 +189,11 @@ gottype:
          */
         if(isbig(sroom) && (shtypes[i].symb == WAND_CLASS
                             || shtypes[i].symb == SPBOOK_CLASS)) i = 0;
+
+        /* all rainbow shops are general stores */
+        if (is_rainbow_shop(sroom)) {
+            i = 0;
+        }
     }
     sroom->rtype = SHOPBASE + i;
 
@@ -1103,6 +1108,25 @@ int sym;
         break; /* not a cmap symbol? */
     }
     return typ;
+}
+
+boolean
+is_rainbow_shop(struct mkroom *sroom)
+{
+    if (!is_june() || sroom->irregular) {
+        return FALSE;
+    }
+
+    int offset = 1;
+    if (doors[sroom->fdoor].y < sroom->ly || doors[sroom->fdoor].y > sroom->hy) {
+        offset = 0;
+    }
+    /* We need 6 horizontal aisles */
+    if (sroom->hy - sroom->ly + offset == 6) {
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 /*mkroom.c*/

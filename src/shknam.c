@@ -6,7 +6,6 @@
 #include "hack.h"
 
 STATIC_DCL boolean FDECL(stock_room_goodpos, (struct mkroom *, int, int, int, int));
-STATIC_DCL void FDECL(mkshobj_at, (const struct shclass *, int, int));
 STATIC_DCL void FDECL(nameshk, (struct monst *, const char * const *));
 STATIC_DCL int  FDECL(shkinit, (const struct shclass *, struct mkroom *));
 #ifdef BLACKMARKET
@@ -303,9 +302,7 @@ shop_selection_init()
 
 /* make an object of the appropriate type for a shop square */
 STATIC_OVL void
-mkshobj_at(shp, sx, sy)
-const struct shclass *shp;
-int sx, sy;
+mkshobj_at(const struct shclass *shp, int sx, int sy, int color)
 {
     struct monst *mtmp;
     int atype;
@@ -332,10 +329,20 @@ int sx, sy;
     }
 #endif /* BLACKMARKET */
     atype = get_shop_item(shp - shtypes);
-    if (atype < 0)
+    if (atype < 0) {
         (void) mksobj_at(-atype, sx, sy, TRUE, TRUE);
-    else
-        (void) mkobj_at(atype, sx, sy, TRUE);
+    } else {
+redo:
+        struct obj *otmp = mkobj_at(atype, sx, sy, TRUE);
+
+        if ((shp->symb == RANDOM_CLASS) && (color >= 0)) {
+            if (objects[otmp->otyp].oc_color != color) {
+                obj_extract_self(otmp);
+                obfree(otmp, NULL);
+                goto redo;
+            }
+        }
+    }
 }
 
 /* extract a shopkeeper name for the given shop type */
@@ -706,11 +713,34 @@ register struct mkroom *sroom;
     }
 #endif /* BLACKMARKET */
 
+    static int rainbow_colors[] = {
+        CLR_RED,
+        CLR_ORANGE,
+        CLR_YELLOW,
+        CLR_GREEN,
+        CLR_BLUE,
+        CLR_MAGENTA,
+    };
+
+    boolean rainbow_shop = is_rainbow_shop(sroom);
+
     for (sx = sroom->lx; sx <= sroom->hx; sx++)
         for (sy = sroom->ly; sy <= sroom->hy; sy++) {
             if (stock_room_goodpos(sroom, rmno, sh, sx,sy)) {
-                if (!IS_ROOM(levl[sx][sy].typ)) continue;
-                mkshobj_at(shp, sx, sy);
+                if (!IS_ROOM(levl[sx][sy].typ)) {
+                    continue;
+                }
+
+                int color_index = sy - sroom->ly;
+                if (doors[sroom->fdoor].y < sroom->ly || doors[sroom->fdoor].y > sroom->hy) {
+                    color_index--;
+                }
+                if (rainbow_shop &&
+                     color_index >= 0 && color_index < SIZE(rainbow_colors)) {
+                    mkshobj_at(shp, sx, sy, rainbow_colors[color_index]);
+                } else {
+                    mkshobj_at(shp, sx, sy, -1);
+                }
             }
         }
 

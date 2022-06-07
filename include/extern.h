@@ -1006,6 +1006,7 @@ E int NDECL(midnight);
 E boolean NDECL(piday);
 E boolean NDECL(aprilfoolsday);
 E boolean NDECL(discordian_holiday);
+extern boolean is_june();
 E char *FDECL(iso8601, (time_t));
 E char *FDECL(iso8601_duration, (long));
 extern char* format_duration(long);
@@ -1479,6 +1480,7 @@ E void FDECL(save_rooms, (int));
 E void FDECL(rest_rooms, (int));
 E struct mkroom *FDECL(search_special, (SCHAR_P));
 E int FDECL(cmap_to_type, (int));
+extern boolean is_rainbow_shop(struct mkroom *);
 
 /* #### mksheol.c ### */
 
