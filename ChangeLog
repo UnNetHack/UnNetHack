@@ -90,6 +90,7 @@
 	  - Reduce message spam when healers sense injuries
 	  - Output "You begin awkwardly bashing" for currently unskilled but
 	    skillable weapons
+	  - No paranoid prompt for safe traps when flying or levitating (reported by hackemslashem)
 
 	* skill changes:
 	  - Allow convicts to become skilled in broadsword (reported by RojjaCebolla)

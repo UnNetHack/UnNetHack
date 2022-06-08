@@ -2240,14 +2240,30 @@ pull_free:
     if (iflags.paranoid_trap &&
         ((trap = t_at(x, y)) && trap->tseen)) {
         char qbuf[BUFSZ];
-        Sprintf(qbuf, "Do you really want to %s into that %s?",
-                locomotion(youmonst.data, "step"),
-                defsyms[trap_to_defsym(trap->ttyp)].explanation);
-        if (yn(qbuf) != 'y') {
-            nomul(0, 0);
-            flags.move = 0;
-            return;
+
+        switch (trap->ttyp) {
+        case SQKY_BOARD:
+        case BEAR_TRAP:
+        case PIT:
+        case SPIKED_PIT:
+        case HOLE:
+        case TRAPDOOR:
+            if (Levitation && !Flying) {
+                goto do_nothing;
+            }
+            /* fall through */
+
+        default:
+            Sprintf(qbuf, "Do you really want to %s into that %s?",
+                    locomotion(youmonst.data, "step"),
+                    defsyms[trap_to_defsym(trap->ttyp)].explanation);
+            if (yn(qbuf) != 'y') {
+                nomul(0, 0);
+                flags.move = 0;
+                return;
+            }
         }
+do_nothing:
     }
 
     if (u.ufeetfrozen) {
