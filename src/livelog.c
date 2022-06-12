@@ -219,8 +219,8 @@ struct monst *mtmp;
 {
     char *name = (char *)0;
 
-    if (has_mname(mtmp)) {
-        name = MNAME(mtmp);
+    if (has_mgivenname(mtmp)) {
+        name = MGIVENNAME(mtmp);
     }
 
     if (name &&

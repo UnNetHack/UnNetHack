@@ -667,8 +667,8 @@ getbones()
              * set to the magic DEFUNCT_MONSTER cookie value.
              */
             for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-                if (has_mname(mtmp)) {
-                    sanitize_name(MNAME(mtmp));
+                if (has_mgivenname(mtmp)) {
+                    sanitize_name(MGIVENNAME(mtmp));
                 }
                 if (mtmp->mhpmax == DEFUNCT_MONSTER) {
 #if defined(DEBUG) && defined(WIZARD)

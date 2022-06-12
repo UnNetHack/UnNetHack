@@ -1131,10 +1131,10 @@ struct monst *mtmp;
     bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
     bwrite(fd, (genericptr_t) mtmp, buflen);
     if (mtmp->mextra) {
-        buflen = has_mname(mtmp) ? (int) strlen(MNAME(mtmp)) + 1 : 0;
+        buflen = has_mgivenname(mtmp) ? (int) strlen(MGIVENNAME(mtmp)) + 1 : 0;
         bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
         if (buflen > 0) {
-            bwrite(fd, (genericptr_t) MNAME(mtmp), buflen);
+            bwrite(fd, (genericptr_t) MGIVENNAME(mtmp), buflen);
         }
         buflen = EGD(mtmp) ? (int) sizeof (struct egd) : 0;
         bwrite(fd, (genericptr_t) &buflen, sizeof buflen);

@@ -1105,33 +1105,32 @@ getpos(coord *ccp, boolean force, const char *goal)
 
 /* allocate space for a monster's name; removes old name if there is one */
 void
-new_mname(mon, lth)
-struct monst *mon;
-int lth; /* desired length (caller handles adding 1 for terminator) */
+new_mgivenname(struct monst *mon,
+               int lth) /**< desired length (caller handles adding 1 for terminator) */
 {
     if (lth) {
         /* allocate mextra if necessary; otherwise get rid of old name */
         if (!mon->mextra) {
             mon->mextra = newmextra();
         } else {
-            free_mname(mon); /* already has mextra, might also have name */
+            free_mgivenname(mon); /* already has mextra, might also have name */
         }
-        MNAME(mon) = (char *) alloc((unsigned) lth);
+        MGIVENNAME(mon) = (char *) alloc((unsigned) lth);
     } else {
         /* zero length: the new name is empty; get rid of the old name */
-        if (has_mname(mon))
-            free_mname(mon);
+        if (has_mgivenname(mon)) {
+            free_mgivenname(mon);
+        }
     }
 }
 
 /* release a monster's name; retains mextra even if all fields are now null */
 void
-free_mname(mon)
-struct monst *mon;
+free_mgivenname(struct monst *mon)
 {
-    if (has_mname(mon)) {
-        free((genericptr_t) MNAME(mon));
-        MNAME(mon) = (char *) 0;
+    if (has_mgivenname(mon)) {
+        free((genericptr_t) MGIVENNAME(mon));
+        MGIVENNAME(mon) = (char *) 0;
     }
 }
 
@@ -1198,9 +1197,9 @@ const char *name;
         name = strncpy(buf, name, PL_PSIZ - 1);
         buf[PL_PSIZ - 1] = '\0';
     }
-    new_mname(mtmp, lth); /* removes old name if one is present */
+    new_mgivenname(mtmp, lth); /* removes old name if one is present */
     if (lth) {
-        Strcpy(MNAME(mtmp), name);
+        Strcpy(MGIVENNAME(mtmp), name);
     }
     return mtmp;
 }
@@ -1796,8 +1795,8 @@ boolean called;
     if (do_hallu) {
         Strcat(buf, rndmonnam());
         name_at_start = FALSE;
-    } else if (do_name && has_mname(mtmp)) {
-        char *name = MNAME(mtmp);
+    } else if (do_name && has_mgivenname(mtmp)) {
+        char *name = MGIVENNAME(mtmp);
 
         if (mdat == &mons[PM_GHOST]) {
             Sprintf(eos(buf), "%s ghost", s_suffix(name));
@@ -1878,7 +1877,7 @@ l_monnam(mtmp)
 struct monst *mtmp;
 {
     return x_monnam(mtmp, ARTICLE_NONE, (char *) 0,
-                    (has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, TRUE);
+                    (has_mgivenname(mtmp)) ? SUPPRESS_SADDLE : 0, TRUE);
 }
 
 char *
@@ -1886,7 +1885,7 @@ mon_nam(mtmp)
 struct monst *mtmp;
 {
     return x_monnam(mtmp, ARTICLE_THE, (char *) 0,
-                    (has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE);
+                    (has_mgivenname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE);
 }
 
 /* print the name as if mon_nam() was called, but assume that the player
@@ -1898,7 +1897,7 @@ noit_mon_nam(mtmp)
 struct monst *mtmp;
 {
     return x_monnam(mtmp, ARTICLE_THE, (char *) 0,
-                    (has_mname(mtmp)) ? (SUPPRESS_SADDLE | SUPPRESS_IT)
+                    (has_mgivenname(mtmp)) ? (SUPPRESS_SADDLE | SUPPRESS_IT)
                                       : SUPPRESS_IT,
                     FALSE);
 }
@@ -1949,7 +1948,7 @@ struct monst *mtmp;
     int prefix, suppression_flag;
 
     prefix = mtmp->mtame ? ARTICLE_YOUR : ARTICLE_THE;
-    suppression_flag = (has_mname(mtmp) ||
+    suppression_flag = (has_mgivenname(mtmp) ||
                         /* "saddled" is redundant when mounted */
                         mtmp == u.usteed) ? SUPPRESS_SADDLE : 0;
 
@@ -1962,7 +1961,7 @@ struct monst *mtmp;
 const char *adj;
 {
     char *bp = x_monnam(mtmp, ARTICLE_THE, adj,
-                        has_mname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);
+                        has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);
 
     *bp = highc(*bp);
     return(bp);
@@ -1973,7 +1972,7 @@ a_monnam(mtmp)
 register struct monst *mtmp;
 {
     return x_monnam(mtmp, ARTICLE_A, (char *)0,
-                    has_mname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);
+                    has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);
 }
 
 char *

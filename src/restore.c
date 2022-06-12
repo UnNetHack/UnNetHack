@@ -403,8 +403,8 @@ struct monst *mtmp;
         /* mname - monster's name */
         mread(fd, (genericptr_t) &buflen, sizeof(buflen));
         if (buflen > 0) { /* includes terminating '\0' */
-            new_mname(mtmp, buflen);
-            mread(fd, (genericptr_t) MNAME(mtmp), buflen);
+            new_mgivenname(mtmp, buflen);
+            mread(fd, (genericptr_t) MGIVENNAME(mtmp), buflen);
         }
         /* egd - vault guard */
         mread(fd, (genericptr_t) &buflen, sizeof(buflen));

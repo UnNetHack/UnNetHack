@@ -978,7 +978,7 @@ stolen_booty()
             continue;
         }
 
-        if (is_orc(mtmp->data) && !has_mname(mtmp) && rn2(10)) {
+        if (is_orc(mtmp->data) && !has_mgivenname(mtmp) && rn2(10)) {
             /*
              * We'll consider the orc captain from the level
              * .des file to be the captain of a rival orc horde

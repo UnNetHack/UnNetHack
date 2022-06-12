@@ -965,7 +965,7 @@ unsigned trflags;
         u.usteed->mtrapseen |= (1 << (ttype-1));
         /* suppress article in various steed messages when using its
            name (which won't occur when hallucinating) */
-        if (has_mname(u.usteed) && !Hallucination) {
+        if (has_mgivenname(u.usteed) && !Hallucination) {
             steed_article = ARTICLE_NONE;
         }
     }

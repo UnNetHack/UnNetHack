@@ -2797,8 +2797,9 @@ boolean incl_wsegs;
 
     if (mtmp->mextra) {
         sz += (int) sizeof (struct mextra);
-        if (MNAME(mtmp))
-            sz += (int) strlen(MNAME(mtmp)) + 1;
+        if (MGIVENNAME(mtmp)) {
+            sz += (int) strlen(MGIVENNAME(mtmp)) + 1;
+        }
         if (EGD(mtmp))
             sz += (int) sizeof (struct egd);
         if (EPRI(mtmp))

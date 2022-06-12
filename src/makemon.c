@@ -964,8 +964,8 @@ xchar x, y; /* clone's preferred location or 0 (near mon) */
         new_light_source(m2->mx, m2->my, emits_light(m2->data), LS_MONSTER,
                          monst_to_any(m2));
     /* if 'parent' is named, give the clone the same name */
-    if (has_mname(mon)) {
-        m2 = christen_monst(m2, MNAME(mon));
+    if (has_mgivenname(mon)) {
+        m2 = christen_monst(m2, MGIVENNAME(mon));
     } else if (mon->isshk) {
         m2 = christen_monst(m2, shkname(mon));
     }
@@ -1537,7 +1537,7 @@ newmextra()
     struct mextra *mextra;
 
     mextra = (struct mextra *) alloc(sizeof(struct mextra));
-    mextra->mname = 0;
+    mextra->mgivenname = 0;
     mextra->egd = 0;
     mextra->epri = 0;
     mextra->eshk = 0;

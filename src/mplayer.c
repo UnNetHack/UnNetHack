@@ -48,7 +48,7 @@ dev_name()
         i = rn2(n);
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
             if(!is_mplayer(mtmp->data)) continue;
-            if (!strncmp(developers[i], (has_mname(mtmp)) ? MNAME(mtmp) : "",
+            if (!strncmp(developers[i], (has_mgivenname(mtmp)) ? MGIVENNAME(mtmp) : "",
                         strlen(developers[i]))) {
                 match = TRUE;
                 break;

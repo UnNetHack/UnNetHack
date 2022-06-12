@@ -1032,7 +1032,7 @@ slip_or_trip()
     } else if (rn2(3) && is_ice(u.ux, u.uy)) {
         pline("%s %s%s on the ice.",
               u.usteed ? upstart(x_monnam(u.usteed,
-                                          (has_mname(u.usteed)) ? ARTICLE_NONE : ARTICLE_THE,
+                                          (has_mgivenname(u.usteed)) ? ARTICLE_NONE : ARTICLE_THE,
                                           (char *)0, SUPPRESS_SADDLE, FALSE)) :
               "You", rn2(2) ? "slip" : "slide", on_foot ? "" : "s");
     } else {

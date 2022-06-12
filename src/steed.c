@@ -549,7 +549,7 @@ int reason;         /* Player was thrown off etc. */
             You("can't. There isn't anywhere for you to stand.");
             return;
         }
-        if (!has_mname(mtmp)) {
+        if (!has_mgivenname(mtmp)) {
             pline("You've been through the dungeon on %s with no name.",
                   an(mtmp->data->mname));
             if (Hallucination)

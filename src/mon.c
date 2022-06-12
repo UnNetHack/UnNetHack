@@ -457,19 +457,19 @@ unsigned corpseflags;
         num = d(2, 6);
         while (num--)
             obj = mksobj_at(IRON_CHAIN, x, y, TRUE, FALSE);
-        free_mname(mtmp); /* don't christen obj */
+        free_mgivenname(mtmp); /* don't christen obj */
         break;
     case PM_GLASS_GOLEM:
         num = d(2, 4); /* very low chance of creating all glass gems */
         while (num--)
             obj = mksobj_at((LAST_GEM + rnd(9)), x, y, TRUE, FALSE);
-        free_mname(mtmp);
+        free_mgivenname(mtmp);
         break;
     case PM_CLAY_GOLEM:
         obj = mksobj_at(ROCK, x, y, FALSE, FALSE);
         obj->quan = (long)(rn2(20) + 50);
         obj->owt = weight(obj);
-        free_mname(mtmp);
+        free_mgivenname(mtmp);
         break;
     case PM_STONE_GOLEM:
         corpstatflags &= ~CORPSTAT_INIT;
@@ -480,30 +480,30 @@ unsigned corpseflags;
         while(num--) {
             obj = mksobj_at(QUARTERSTAFF, x, y, TRUE, FALSE);
         }
-        free_mname(mtmp);
+        free_mgivenname(mtmp);
         break;
     case PM_LEATHER_GOLEM:
         num = d(2, 4);
         while(num--)
             obj = mksobj_at(LEATHER_ARMOR, x, y, TRUE, FALSE);
-        free_mname(mtmp);
+        free_mgivenname(mtmp);
         break;
     case PM_WAX_GOLEM:
         num = d(2, 4);
         while (num--)
             obj = mksobj_at(WAX_CANDLE, x, y, TRUE, FALSE);
-        free_mname(mtmp);
+        free_mgivenname(mtmp);
         break;
     case PM_GOLD_GOLEM:
         /* Good luck gives more coins */
         obj = mkgold((long)(200 - rnl(101)), x, y);
-        free_mname(mtmp);
+        free_mgivenname(mtmp);
         break;
     case PM_PAPER_GOLEM:
         num = rnd(4);
         while (num--)
             obj = mksobj_at(SCR_BLANK_PAPER, x, y, TRUE, FALSE);
-        free_mname(mtmp);
+        free_mgivenname(mtmp);
         break;
     case PM_SKELETON:
         if (!rn2(40)) {
@@ -540,8 +540,8 @@ default_1:
        prevent the same attack beam from hitting its corpse */
     if (flags.bypasses) bypass_obj(obj);
 
-    if (has_mname(mtmp)) {
-        obj = oname(obj, MNAME(mtmp));
+    if (has_mgivenname(mtmp)) {
+        obj = oname(obj, MGIVENNAME(mtmp));
     }
 
     /* Avoid "It was hidden under a green mold corpse!"
@@ -1930,9 +1930,9 @@ struct monst *mtmp2, *mtmp1;
 
     if (!mtmp2->mextra)
         mtmp2->mextra = newmextra();
-    if (MNAME(mtmp1)) {
-        new_mname(mtmp2, (int) strlen(MNAME(mtmp1)) + 1);
-        Strcpy(MNAME(mtmp2), MNAME(mtmp1));
+    if (MGIVENNAME(mtmp1)) {
+        new_mgivenname(mtmp2, (int) strlen(MGIVENNAME(mtmp1)) + 1);
+        Strcpy(MGIVENNAME(mtmp2), MGIVENNAME(mtmp1));
     }
     if (EGD(mtmp1)) {
         if (!EGD(mtmp2))
@@ -1970,8 +1970,9 @@ struct monst *m;
     struct mextra *x = m->mextra;
 
     if (x) {
-        if (x->mname)
-            free((genericptr_t) x->mname);
+        if (x->mgivenname) {
+            free((genericptr_t) x->mgivenname);
+        }
         if (x->egd)
             free((genericptr_t) x->egd);
         if (x->epri)
@@ -2616,8 +2617,8 @@ struct monst *mdef;
            so that saved monster traits won't retain any stale
            item-conferred attributes */
         otmp = mkcorpstat(STATUE, mdef, mdef->data, x, y, CORPSTAT_NONE);
-        if (has_mname(mdef)) {
-            otmp = oname(otmp, MNAME(mdef));
+        if (has_mgivenname(mdef)) {
+            otmp = oname(otmp, MGIVENNAME(mdef));
         }
         while ((obj = oldminvent) != 0) {
             oldminvent = obj->nobj;
@@ -2755,7 +2756,7 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
     violated(CONDUCT_PACIFISM);
 
     if (!nomsg) {
-        boolean namedpet = has_mname(mtmp) && !Hallucination;
+        boolean namedpet = has_mgivenname(mtmp) && !Hallucination;
         const char *verb = nonliving(mtmp->data) ? "destroy" : "kill";
 
         You("%s %s!",
@@ -3479,7 +3480,7 @@ boolean via_attack UNUSED;
         if (is_blkmktstaff(mtmp->data) ||
             /* non-tame named monsters are presumably
              * black marketeer's assistants */
-            (has_mname(mtmp) && MNAME(mtmp))) {
+            (has_mgivenname(mtmp) && MGIVENNAME(mtmp))) {
             blkmar_guards(mtmp);
         }
     }
@@ -4216,7 +4217,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
 
     /* we need this one whether msg is true or not */
     Strcpy(l_oldname, x_monnam(mtmp, ARTICLE_THE, (char *) 0,
-                               has_mname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
+                               has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
 
     /* mdat = 0 -> caller wants a random monster shape */
     tryct = 0;
@@ -4251,8 +4252,10 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
      * the opposite sex.  Player characters don't use ranks when
      * polymorphed, so dropping rank for mplayers seems reasonable.
      */
-    if (In_endgame(&u.uz) && is_mplayer(olddata)
-        && has_mname(mtmp) && (p = strstr(MNAME(mtmp), " the ")) != 0) {
+    if (In_endgame(&u.uz) &&
+         is_mplayer(olddata) &&
+         has_mgivenname(mtmp) &&
+         (p = strstr(MGIVENNAME(mtmp), " the ")) != 0) {
         *p = '\0';
     }
 

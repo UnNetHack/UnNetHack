@@ -441,7 +441,7 @@ register struct monst *mtmp;
         /* non-tame named monsters are presumably
          * black marketeer's assistants */
         else if (mt->mpeaceful &&
-                 ((!mt->mtame && has_mname(mt) && MNAME(mt) &&
+                 ((!mt->mtame && has_mgivenname(mt) && MGIVENNAME(mt) &&
                    mt->mpeaceful && mt != mtmp) ||
                   mt->data == &mons[PM_ONE_EYED_SAM])) {
             if (!mesg_given) {
@@ -1017,7 +1017,7 @@ register char rmno;
                        (int) rooms[rmno - ROOMOFFSET].rtype,
                        shkp->mnum,
                        /* [real shopkeeper name is kept in ESHK, not MNAME] */
-                       has_mname(shkp) ? MNAME(shkp) : "anonymous");
+                       has_mgivenname(shkp) ? MGIVENNAME(shkp) : "anonymous");
             /* not sure if this is appropriate, because it does nothing to
                correct the underlying rooms[].resident issue but... */
             return (struct monst *) 0;

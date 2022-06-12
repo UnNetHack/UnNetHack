@@ -1801,7 +1801,7 @@ unsigned long deliverflags;
 
             /* special treatment for orcs and their kind */
             if ((otmp->corpsenm & M2_ORC) != 0 && has_oname(otmp)) {
-                if (!has_mname(mtmp)) {
+                if (!has_mgivenname(mtmp)) {
                     if (at_crime_scene || !rn2(2))
                         mtmp = christen_orc(mtmp,
                                             at_crime_scene ? ONAME(otmp)
