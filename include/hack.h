@@ -329,15 +329,15 @@ enum hmon_atkmode_types {
 #define PICK_RANDOM 0
 #define PICK_RIGID  1
 
-/* Flags to control dotrap() in trap.c */
-#define FORCETRAP 0x01     /* triggering not left to chance */
-#define NOWEBMSG 0x02      /* suppress stumble into web message */
-#define FORCEBUNGLE 0x04   /* adjustments appropriate for bungling */
+/* Flags to control dotrap() and mintrap() in trap.c */
+#define NO_TRAP_FLAGS 0x00U
+#define FORCETRAP     0x01 /* triggering not left to chance */
+#define NOWEBMSG      0x02 /* suppress stumble into web message */
+#define FORCEBUNGLE   0x04 /* adjustments appropriate for bungling */
 #define RECURSIVETRAP 0x08 /* trap changed into another type this same turn */
-#define TOOKPLUNGE 0x10    /* used '>' to enter pit below you */
-#define VIASITTING 0x20    /* #sit while at trap location (affects message) */
-#define FAILEDUNTRAP 0x40  /* trap activated by failed untrap attempt */
-
+#define TOOKPLUNGE    0x10 /* used '>' to enter pit below you */
+#define VIASITTING    0x20 /* #sit while at trap location (affects message) */
+#define FAILEDUNTRAP  0x40 /* trap activated by failed untrap attempt */
 
 /* Flags to control test_move in hack.c */
 #define DO_MOVE     0   /* really doing the move */

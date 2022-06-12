@@ -1891,7 +1891,7 @@ domove_swap_with_pet(struct monst *mtmp, xchar x, xchar y)
                      has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
 
         /* check for displacing it into pools and traps */
-        switch (minliquid(mtmp) ? Trap_Killed_Mon : mintrap(mtmp)) {
+        switch (minliquid(mtmp) ? Trap_Killed_Mon : mintrap(mtmp, NO_TRAP_FLAGS)) {
         case Trap_Effect_Finished:
             break;
 

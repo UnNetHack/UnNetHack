@@ -560,7 +560,7 @@ struct obj *obj;
                 mnexto(mtmp);
                 if (mtmp->mx != omx || mtmp->my != omy) {
                     mtmp->mundetected = 0; /* reveal non-mimic hider */
-                    if (mintrap(mtmp) == 2) {
+                    if (mintrap(mtmp, NO_TRAP_FLAGS) == Trap_Killed_Mon) {
                         change_luck(-1);
                     }
                 }

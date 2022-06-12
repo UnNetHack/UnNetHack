@@ -927,7 +927,7 @@ register int after;
     if (stationary(mtmp->data)) return(0);
 
     if (mtmp->mtrapped) {
-        int i = mintrap(mtmp);
+        int i = mintrap(mtmp, NO_TRAP_FLAGS);
         if(i >= 2) { newsym(mtmp->mx, mtmp->my); return(2); }/* it died */
         if(i == 1) return(0);   /* still in trap, so didn't move */
     }
@@ -1390,6 +1390,8 @@ postmov:
         boolean canseeit = cansee(mtmp->mx, mtmp->my);
 
         if (mmoved == 1) {
+            int trapret;
+
             /* normal monster move will already have <nix,niy>,
                but pet dog_move() with 'goto postmov' won't */
             nix = mtmp->mx, niy = mtmp->my;
@@ -1424,11 +1426,14 @@ postmov:
             }
 
             newsym(omx, omy); /* update the old position */
-            if (mintrap(mtmp) >= 2) {
-                if(mtmp->mx) newsym(mtmp->mx, mtmp->my);
-                return(2); /* it died */
+            trapret = mintrap(mtmp, NO_TRAP_FLAGS);
+            if (trapret == Trap_Killed_Mon || trapret == Trap_Moved_Mon) {
+                if (mtmp->mx) {
+                    newsym(mtmp->mx, mtmp->my);
+                }
+                return 2; /* it died */
             }
-            ptr = mtmp->data;
+            ptr = mtmp->data; /* in case mintrap() caused polymorph */
 
             /* open a door, or crash through it, if you can */
             if (IS_DOOR(levl[mtmp->mx][mtmp->my].typ)

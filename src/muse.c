@@ -2555,7 +2555,7 @@ boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
         }
         /* hack to avoid mintrap()'s chance of avoiding known trap */
         mon->mtrapseen &= ~(1 << (FIRE_TRAP - 1));
-        mintrap(mon);
+        (void) mintrap(mon, FORCETRAP);
     } else if (otyp == STRANGE_OBJECT) {
         /* monster is using fire breath on self */
         if (vis) {

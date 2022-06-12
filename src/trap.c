@@ -36,9 +36,6 @@ STATIC_OVL int FDECL(steedintrap, (struct trap *, struct obj *));
 STATIC_OVL boolean FDECL(keep_saddle_with_steedcorpse,
                          (unsigned, struct obj *, struct obj *));
 
-/* mintrap() should take a flags argument, but for time being we use this */
-STATIC_VAR int force_mintrap = 0;
-
 STATIC_VAR const char *const a_your[2] = { "a", "your" };
 STATIC_VAR const char *const A_Your[2] = { "A", "Your" };
 STATIC_VAR const char tower_of_flame[] = "tower of flame";
@@ -1409,10 +1406,13 @@ unsigned trflags;
                 u.usteed->mx = u.ux;
                 u.usteed->my = u.uy;
 
-                /* mintrap currently does not return 2(died) for webs */
-                if (mintrap(u.usteed)) {
+                /* mintrap currently does not return Trap_Killed_Mon
+                   (mon died) for webs */
+                if (mintrap(u.usteed, trflags) != Trap_Effect_Finished) {
                     decrease_mon_trapcounter(u.usteed);
-                    if (strongmonst(u.usteed->data)) str = 17;
+                    if (strongmonst(u.usteed->data)) {
+                        str = 17;
+                    }
                 } else {
                     reset_utrap(FALSE);
                     break;
@@ -2141,8 +2141,7 @@ schar dx, dy;
 }
 
 int
-mintrap(mtmp)
-register struct monst *mtmp;
+mintrap(struct monst *mtmp, unsigned mintrapflags)
 {
     struct trap *trap = t_at(mtmp->mx, mtmp->my);
     boolean trapkilled = FALSE;
@@ -2154,6 +2153,7 @@ register struct monst *mtmp;
                          mtmp->mhp>6 &&
                          rn2(20));
 #endif
+    boolean forcetrap = ((mintrapflags & FORCETRAP) != 0 || (mintrapflags & FAILEDUNTRAP) != 0);
 
     if (!trap) {
         decrease_mon_trapcounter(mtmp);
@@ -2326,7 +2326,7 @@ register struct monst *mtmp;
                             You_hear("the roaring of an angry bear!");
                     }
                 }
-            } else if (force_mintrap) {
+            } else if (forcetrap) {
                 if (in_sight) {
                     pline("%s evades %s bear trap!", Monnam(mtmp), a_your[trap->madeby_u]);
                     seetrap(trap);
@@ -2505,7 +2505,7 @@ mfiretrap:
             if (is_flyer(mptr) || is_floater(mptr) ||
                 (mtmp->wormno && count_wsegs(mtmp) > 5) ||
                 is_clinger(mptr)) {
-                if (force_mintrap && !Sokoban) {
+                if (forcetrap && !Sokoban) {
                     /* openfallingtrap; not inescapable here */
                     if (in_sight) {
                         seetrap(trap);
@@ -2552,7 +2552,7 @@ mfiretrap:
                 mptr == &mons[PM_WUMPUS] ||
                 (mtmp->wormno && count_wsegs(mtmp) > 5) ||
                 mptr->msize >= MZ_HUGE) {
-                if (force_mintrap && !Sokoban) {
+                if (forcetrap && !Sokoban) {
                     /* openfallingtrap; not inescapable here */
                     if (in_sight) {
                         seetrap(trap);
@@ -2659,7 +2659,7 @@ mfiretrap:
                           Monnam(mtmp), a_your[trap->madeby_u]);
                 deltrap(trap);
                 newsym(mtmp->mx, mtmp->my);
-            } else if (force_mintrap && !mtmp->mtrapped) {
+            } else if (forcetrap && !mtmp->mtrapped) {
                 if (in_sight) {
                     pline("%s avoids %s spider web!", Monnam(mtmp), a_your[trap->madeby_u]);
                     seetrap(trap);
@@ -2709,7 +2709,9 @@ mfiretrap:
                 trapkilled = TRUE;
             } else {
                 /* monsters recursively fall into new pit */
-                if (mintrap(mtmp) == 2) trapkilled=TRUE;
+                if (mintrap(mtmp, mintrapflags | FORCETRAP) == Trap_Killed_Mon) {
+                    trapkilled = TRUE;
+                }
             }
             /* a boulder may fill the new pit, crushing monster */
             fill_pit(tx, ty); /* thitm may have already destroyed the trap */
@@ -4953,9 +4955,7 @@ boolean *noticed; /* set to true iff hero notices the effect; */
         if (u.usteed) {
             dotrapflags |= NOWEBMSG;
         }
-        ++force_mintrap;
         dotrap(t, dotrapflags);
-        --force_mintrap;
         result = (u.utrap != 0);
     } else {
         if (mon->mtrapped) {
@@ -4964,9 +4964,7 @@ boolean *noticed; /* set to true iff hero notices the effect; */
         /* you notice it if you see the trap close/tremble/whatever
            or if you sense the monster who becomes trapped */
         *noticed = cansee(t->tx, t->ty) || canspotmon(mon);
-        ++force_mintrap;
-        result = (mintrap(mon) != 0);
-        --force_mintrap;
+        result = (mintrap(mon, FORCETRAP) != Trap_Effect_Finished);
     }
     return result;
 }
@@ -5013,9 +5011,7 @@ boolean *noticed; /* set to true iff hero notices the effect; */
         *noticed = cansee(t->tx, t->ty) || canspotmon(mon);
         /* monster will be angered; mintrap doesn't handle that */
         wakeup(mon, TRUE);
-        ++force_mintrap;
-        result = (mintrap(mon) != 0);
-        --force_mintrap;
+        result = (mintrap(mon, FORCETRAP) != Trap_Effect_Finished);
         /* mon might now be on the migrating monsters list */
     }
     return result;

@@ -426,7 +426,7 @@ register struct monst *magr, *mdef;
                             Strcpy(buf, Monnam(mdef));
                             pline("%s divides as %s hits it!", buf, mon_nam(magr));
                         }
-                        mintrap(mclone);
+                        (void) mintrap(mclone, NO_TRAP_FLAGS);
                     }
                 }
             } else {
@@ -870,7 +870,8 @@ register struct attack *mattk;
         place_monster(magr, dx, dy);
         newsym(dx, dy);
         /* aggressor moves to <dx,dy> and might encounter trouble there */
-        if (minliquid(magr) || (t_at(dx, dy) && mintrap(magr) == 2)) {
+        if (minliquid(magr) ||
+             (t_at(dx, dy) && mintrap(magr, NO_TRAP_FLAGS) == Trap_Killed_Mon)) {
             status |= MM_AGR_DIED;
         }
     }

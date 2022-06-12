@@ -751,7 +751,7 @@ int ttyp;
                           "flies" : "floats");
                 }
             } else if (mtmp != madeby) {
-                (void) mintrap(mtmp);
+                (void) mintrap(mtmp, NO_TRAP_FLAGS);
             }
         }
     } else { /* was TRAPDOOR now a HOLE*/

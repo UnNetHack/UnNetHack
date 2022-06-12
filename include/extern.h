@@ -2610,7 +2610,7 @@ E void FDECL(reset_utrap, (BOOLEAN_P));
 E void FDECL(dotrap, (struct trap *, unsigned));
 E void FDECL(seetrap, (struct trap *));
 E void FDECL(feeltrap, (struct trap *));
-E int FDECL(mintrap, (struct monst *));
+extern int mintrap(struct monst *, unsigned);
 E void FDECL(instapetrify, (const char *));
 E void FDECL(minstapetrify, (struct monst *, BOOLEAN_P));
 #ifdef WEBB_DISINT
