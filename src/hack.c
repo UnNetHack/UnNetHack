@@ -2263,8 +2263,8 @@ pull_free:
                 return;
             }
         }
-do_nothing:
     }
+do_nothing:
 
     if (u.ufeetfrozen) {
         --u.ufeetfrozen;

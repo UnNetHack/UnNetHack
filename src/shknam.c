@@ -332,8 +332,9 @@ mkshobj_at(const struct shclass *shp, int sx, int sy, int color)
     if (atype < 0) {
         (void) mksobj_at(-atype, sx, sy, TRUE, TRUE);
     } else {
+        struct obj *otmp;
 redo:
-        struct obj *otmp = mkobj_at(atype, sx, sy, TRUE);
+        otmp = mkobj_at(atype, sx, sy, TRUE);
 
         if ((shp->symb == RANDOM_CLASS) && (color >= 0)) {
             if (objects[otmp->otyp].oc_color != color) {
