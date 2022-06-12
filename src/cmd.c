@@ -4995,7 +4995,7 @@ doautofight()
         for (j = -1; j <= 1; j++) {
             if (!isok(u.ux+i, u.uy+j)) continue;
             mtmp = m_at(u.ux+i, u.uy+j);
-            if (mtmp && canspotmon(mtmp) && !is_safepet(mtmp)) {
+            if (mtmp && canspotmon(mtmp) && !is_safemon(mtmp)) {
                 if (attack(mtmp)) return 1;
                 break;
             }

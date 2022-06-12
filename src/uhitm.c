@@ -381,7 +381,7 @@ register struct monst *mtmp;
      * you'll usually just swap places if this is a movement command
      */
     /* Intelligent chaotic weapons (Stormbringer) want blood */
-    if (is_safepet(mtmp) && !flags.forcefight) {
+    if (is_safemon(mtmp) && !flags.forcefight) {
         if (!uwep || uwep->oartifact != ART_STORMBRINGER) {
             /* there are some additional considerations: this won't work
              * if in a shop or Punished or you miss a random roll or

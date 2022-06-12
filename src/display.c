@@ -141,6 +141,13 @@ STATIC_DCL void FDECL(set_seenv, (struct rm *, int, int, int, int));
 STATIC_DCL void FDECL(t_warn, (struct rm *));
 STATIC_DCL int FDECL(wall_angle, (struct rm *));
 
+int
+is_safemon(struct monst *mon)
+{
+    return _is_safemon(mon);
+}
+/* #define is_safemon() isn't useful here */
+
 /*
  * magic_map_background()
  *

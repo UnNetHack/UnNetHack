@@ -19,6 +19,7 @@ static struct monst *FDECL(monstinroom, (struct permonst *, int));
 static boolean FDECL(doorless_door, (int, int));
 static void FDECL(move_update, (BOOLEAN_P));
 static void check_buried_zombies(xchar, xchar);
+static boolean domove_swap_with_pet(struct monst *, xchar, xchar);
 static void FDECL(struggle_sub, (const char *));
 static boolean check_interrupt(struct monst *mtmp);
 
@@ -1822,6 +1823,130 @@ check_buried_zombies(xchar x, xchar y)
     }
 }
 
+/** Maybe swap places with a monster? returns TRUE if swapped places */
+static boolean
+domove_swap_with_pet(struct monst *mtmp, xchar x, xchar y)
+{
+    struct trap *trap;
+    /* if it turns out we can't actually move */
+    boolean didnt_move = FALSE;
+    boolean u_with_boulder = (sobj_at(BOULDER, u.ux, u.uy) != 0);
+
+    /* seemimic/newsym should be done before moving hero, otherwise
+       the display code will draw the hero here before we possibly
+       cancel the swap below (we can ignore steed mx,my here) */
+    u.ux = u.ux0, u.uy = u.uy0;
+    mtmp->mundetected = 0;
+    if (M_AP_TYPE(mtmp)) {
+        seemimic(mtmp);
+    }
+    u.ux = mtmp->mx, u.uy = mtmp->my; /* resume swapping positions */
+
+    if (mtmp->mtrapped && (trap = t_at(mtmp->mx, mtmp->my)) != 0 &&
+         is_pit(trap->ttyp) &&
+         sobj_at(BOULDER, trap->tx, trap->ty)) {
+        /* can't swap places with pet pinned in a pit by a boulder */
+        didnt_move = TRUE;
+    } else if (u.ux0 != x && u.uy0 != y && NODIAG(mtmp->data - mons)) {
+        /* can't swap places when pet can't move to your spot */
+        You("stop.  %s can't move diagonally.", upstart(y_monnam(mtmp)));
+        didnt_move = TRUE;
+    } else if (u_with_boulder &&
+               !(verysmall(mtmp->data) && (!mtmp->minvent || curr_mon_load(mtmp) <= 600))) {
+        /* can't swap places when pet won't fit there with the boulder */
+        You("stop.  %s won't fit into the same spot that you're at.", upstart(y_monnam(mtmp)));
+        didnt_move = TRUE;
+    } else if (u.ux0 != x &&
+               u.uy0 != y &&
+               bad_rock(mtmp->data, x, u.uy0) &&
+               bad_rock(mtmp->data, u.ux0, y) &&
+               (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
+        /* can't swap places when pet won't fit thru the opening */
+        You("stop.  %s won't fit through.", upstart(y_monnam(mtmp)));
+        didnt_move = TRUE;
+    } else if (mtmp->mpeaceful && mtmp->mtrapped) {
+        /* all mtame are also mpeaceful, so this affects pets too */
+        You("stop.  %s can't move out of that trap.", upstart(y_monnam(mtmp)));
+        didnt_move = TRUE;
+    } else if (mtmp->mpeaceful &&
+               (!goodpos(u.ux0, u.uy0, mtmp, 0) ||
+                t_at(u.ux0, u.uy0) != NULL ||
+                mundisplaceable(mtmp))) {
+        /* displacing peaceful into unsafe or trapped space, or trying to
+         * displace quest leader, Oracle, shopkeeper, or priest */
+        You("stop.  %s doesn't want to swap places.", upstart(y_monnam(mtmp)));
+        didnt_move = TRUE;
+    } else {
+        mtmp->mtrapped = 0;
+        remove_monster(x, y);
+        place_monster(mtmp, u.ux0, u.uy0);
+        newsym(x, y);
+        newsym(u.ux0, u.uy0);
+
+        You("%s %s.", mtmp->mpeaceful ? "swap places with" : "frighten",
+            x_monnam(mtmp,
+                     mtmp->mtame ? ARTICLE_YOUR :
+                      (!has_mgivenname(mtmp) && !type_is_pname(mtmp->data)) ? ARTICLE_THE : ARTICLE_NONE,
+                     (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
+                     has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
+
+        /* check for displacing it into pools and traps */
+        switch (minliquid(mtmp) ? Trap_Killed_Mon : mintrap(mtmp)) {
+        case Trap_Effect_Finished:
+            break;
+
+        case Trap_Caught_Mon: /* trapped */
+        case Trap_Moved_Mon: /* changed levels */
+            /* there's already been a trap message, reinforce it */
+            abuse_dog(mtmp);
+            adjalign(-3);
+            break;
+
+        case Trap_Killed_Mon:
+            /* drowned or died...
+             * you killed your pet by direct action, so get experience
+             * and possibly penalties;
+             * we want the level gain message, if it happens, to occur
+             * before the guilt message below
+             */
+            {
+                /* minliquid() and mintrap() call mondead() rather than
+                   killed() so we duplicate some of the latter here */
+                int tmp, mndx;
+
+                if (!u.uconduct.killer++) {
+                    livelog_printf(LL_CONDUCT, "killed for the first time");
+                }
+                mndx = monsndx(mtmp->data);
+                tmp = experience(mtmp, (int) mvitals[mndx].died);
+                more_experienced(tmp, tmp, 0);
+                newexplevel(); /* will decide if you go up */
+            }
+            /* That's no way to treat a pet!  Your god gets angry.
+             *
+             * [This has always been pretty iffy.  Why does your
+             * patron deity care at all, let alone enough to get mad?]
+             */
+            if (rn2(4)) {
+                You_feel("guilty about losing your pet like this.");
+                u.ugangr++;
+                adjalign(-15);
+            }
+            /* you killed your pet by direct action.
+             * minliquid and mintrap don't know to do this
+             */
+            violated(CONDUCT_PACIFISM);
+            break;
+
+        default:
+            impossible("that's strange, unknown mintrap result!");
+            break;
+        }
+    }
+
+    return !didnt_move;
+}
+
 void
 domove()
 {
@@ -2105,7 +2230,7 @@ pull_free:
         }
 
         mtmp = m_at(x, y);
-        if (mtmp && !is_safepet(mtmp)) {
+        if (mtmp && !is_safemon(mtmp)) {
             /* Don't attack if you're running, and can see it */
             /* It's fine to displace pets, though */
             /* We should never get here if forcefight */
@@ -2134,7 +2259,7 @@ pull_free:
         /* don't stop travel when displacing pets; if the
            displace fails for some reason, attack() in uhitm.c
            will stop travel rather than domove */
-        if (!is_safepet(mtmp) || flags.forcefight) {
+        if (!is_safemon(mtmp) || flags.forcefight) {
             nomul(0, 0);
         }
         /* only attack if we know it's there */
@@ -2165,7 +2290,7 @@ pull_free:
         }
         if (flags.forcefight || !mtmp->mundetected || sensemon(mtmp) ||
            ((hides_under(mtmp->data) || mtmp->data->mlet == S_EEL) &&
-            !is_safepet(mtmp))) {
+            !is_safemon(mtmp))) {
             gethungry();
             if (wtcap >= HVY_ENCUMBER && moves%3) {
                 if (Upolyd && u.mh > 1) {
@@ -2439,154 +2564,41 @@ do_nothing:
 
     /* now move the hero */
     mtmp = m_at(x, y);
+    /* tentatively move the hero plus steed; leave CLIPPING til later */
     u.ux += u.dx;
     u.uy += u.dy;
     /* Move your steed, too */
     if (u.usteed) {
         u.usteed->mx = u.ux;
         u.usteed->my = u.uy;
-        exercise_steed();
+        /* [if move attempt ends up being blocked, should training count?] */
+        exercise_steed(); /* train riding skill */
     }
 
     /*
      * If safepet at destination then move the pet to the hero's
-     * previous location using the same conditions as in attack().
+     * previous location using the same conditions as in do_attack().
      * there are special extenuating circumstances:
      * (1) if the pet dies then your god angers,
-     * (2) if the pet gets trapped then your god may disapprove,
-     * (3) if the pet was already trapped and you attempt to free it
-     * not only do you encounter the trap but you may frighten your
-     * pet causing it to go wild!  moral: don't abuse this privilege.
+     * (2) if the pet gets trapped then your god may disapprove.
      *
      * Ceiling-hiding pets are skipped by this section of code, to
      * be caught by the normal falling-monster code.
      */
-    if (is_safepet(mtmp) && !(is_hider(mtmp->data) && mtmp->mundetected)) {
-        /* if trapped, there's a chance the pet goes wild */
-        if (mtmp->mtrapped) {
-            if (!rn2(mtmp->mtame)) {
-                mtmp->mtame = mtmp->mpeaceful = mtmp->msleeping = 0;
-                if (mtmp->mleashed) m_unleash(mtmp, TRUE);
-                growl(mtmp);
-            } else {
-                yelp(mtmp);
-            }
-        }
-
-        /* seemimic/newsym should be done before moving hero, otherwise
-           the display code will draw the hero here before we possibly
-           cancel the swap below (we can ignore steed mx,my here) */
-        u.ux = u.ux0, u.uy = u.uy0;
-        mtmp->mundetected = 0;
-        if (M_AP_TYPE(mtmp)) {
-            seemimic(mtmp);
-        } else if (!mtmp->mtame) {
-            newsym(mtmp->mx, mtmp->my);
-        }
-        u.ux = mtmp->mx, u.uy = mtmp->my; /* resume swapping positions */
-
-        if (mtmp->mtrapped &&
-            (trap = t_at(mtmp->mx, mtmp->my)) != 0 &&
-            is_pit(trap->ttyp) &&
-            sobj_at(BOULDER, trap->tx, trap->ty)) {
-            /* can't swap places with pet pinned in a pit by a boulder */
+    if (is_safemon(mtmp) && !(is_hider(mtmp->data) && mtmp->mundetected)) {
+        if (!domove_swap_with_pet(mtmp, x, y)) {
             u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
+            /* could skip this bit since we're about to call u_on_newpos() */
             if (u.usteed) {
                 u.usteed->mx = u.ux, u.usteed->my = u.uy;
-            }
-
-        } else if (u.ux0 != x && u.uy0 != y && NODIAG(mtmp->data - mons)) {
-            /* can't swap places when pet can't move to your spot */
-            u.ux = u.ux0, u.uy = u.uy0;
-            if (u.usteed) {
-                u.usteed->mx = u.ux, u.usteed->my = u.uy;
-            }
-            You("stop.  %s can't move diagonally.", upstart(y_monnam(mtmp)));
-
-        } else if (u_with_boulder &&
-                   !(verysmall(mtmp->data) &&
-                   (!mtmp->minvent || (curr_mon_load(mtmp) <= 600)))) {
-            /* can't swap places when pet won't fit there with the boulder */
-            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
-            if (u.usteed) {
-                u.usteed->mx = u.ux, u.usteed->my = u.uy;
-            }
-            You("stop.  %s won't fit into the same spot that you're at.", upstart(y_monnam(mtmp)));
-
-        } else if (u.ux0 != x && u.uy0 != y &&
-                   bad_rock(mtmp->data, x, u.uy0) &&
-                   bad_rock(mtmp->data, u.ux0, y) &&
-                   (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
-            /* can't swap places when pet won't fit thru the opening */
-            u.ux = u.ux0,  u.uy = u.uy0;/* didn't move after all */
-            if (u.usteed) {
-                u.usteed->mx = u.ux, u.usteed->my = u.uy;
-            }
-            You("stop.  %s won't fit through.", upstart(y_monnam(mtmp)));
-        } else {
-            char pnambuf[BUFSZ];
-
-            /* save its current description in case of polymorph */
-            Strcpy(pnambuf, y_monnam(mtmp));
-            mtmp->mtrapped = 0;
-            remove_monster(x, y);
-            place_monster(mtmp, u.ux0, u.uy0);
-            newsym(x, y);
-            newsym(u.ux0, u.uy0);
-
-            You("%s %s.", mtmp->mtame ? "displaced" : "frighten", pnambuf);
-
-            /* check for displacing it into pools and traps */
-            switch (minliquid(mtmp) ? 2 : mintrap(mtmp)) {
-            case 0:
-                break;
-            case 1: /* trapped */
-            case 3: /* changed levels */
-                /* there's already been a trap message, reinforce it */
-                abuse_dog(mtmp);
-                adjalign(-3);
-                break;
-            case 2:
-                /* drowned or died...
-                 * you killed your pet by direct action, so get experience
-                 * and possibly penalties;
-                 * we want the level gain message, if it happens, to occur
-                 * before the guilt message below
-                 */
-                {
-                    /* minliquid() and mintrap() call mondead() rather than
-                       killed() so we duplicate some of the latter here */
-                    int tmp, mndx;
-
-                    if (!u.uconduct.killer) {
-                        livelog_printf(LL_CONDUCT, "killed for the first time");
-                    }
-                    u.uconduct.killer++;
-                    mndx = monsndx(mtmp->data);
-                    tmp = experience(mtmp, (int) mvitals[mndx].died);
-                    more_experienced(tmp, 0, 0);
-                    newexplevel(); /* will decide if you go up */
-                }
-                /* it may have drowned or died.  that's no way to
-                 * treat a pet!  your god gets angry.
-                 */
-                if (rn2(4)) {
-                    You_feel("guilty about losing your pet like this.");
-                    u.ugangr++;
-                    adjalign(-15);
-                }
-
-                /* you killed your pet by direct action.
-                 * minliquid and mintrap don't know to do this
-                 */
-                violated(CONDUCT_PACIFISM);
-                break;
-            default:
-                pline("that's strange, unknown mintrap result!");
-                break;
             }
         }
     }
+
+    /* tentative move above didn't handle CLIPPING, in case there was a
+       monster in the way and the move attempt ended up being blocked;
+       do a full re-position now, possibly back to where hero started */
+    u_on_newpos(u.ux, u.uy);
 
     reset_occupations();
     if (flags.run) {
@@ -2662,10 +2674,20 @@ do_nothing:
         nomovemsg = "";
     }
 
+    runmode_delay_output();
+}
+
+/* delay output based on value of runmode,
+   if hero is running or doing a multi-turn action */
+void
+runmode_delay_output(void)
+{
     if (flags.run && iflags.runmode != RUN_TPORT) {
         /* display every step or every 7th step depending upon mode */
         if (iflags.runmode != RUN_LEAP || !(moves % 7L)) {
-            if (flags.time) flags.botl = 1;
+            if (flags.time) {
+                flags.botl = 1;
+            }
             curs_on_u();
             delay_output();
             if (iflags.runmode == RUN_CRAWL) {

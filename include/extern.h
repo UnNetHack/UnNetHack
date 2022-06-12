@@ -331,6 +331,7 @@ E void FDECL(bury_obj, (struct obj *));
 #ifdef INVISIBLE_OBJECTS
 E struct obj * FDECL(vobj_at, (XCHAR_P, XCHAR_P));
 #endif /* INVISIBLE_OBJECTS */
+extern int is_safemon(struct monst *);
 E void FDECL(magic_map_background, (XCHAR_P, XCHAR_P, int));
 E void FDECL(map_background, (XCHAR_P, XCHAR_P, int));
 E void FDECL(map_trap, (struct trap *, int));
@@ -912,6 +913,7 @@ E boolean FDECL(invocation_pos, (XCHAR_P, XCHAR_P));
 E boolean FDECL(test_move, (int, int, int, int, int));
 E boolean NDECL(u_rooted);
 E void NDECL(domove);
+extern void runmode_delay_output(void);
 E boolean NDECL(overexertion);
 E void NDECL(invocation_message);
 E void NDECL(switch_terrain);
