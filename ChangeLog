@@ -133,6 +133,7 @@
 	  - Don't reveal description of spellbook when writing it blind
 	  - Fix statuscolors crash due to incorrect color name parsing
 	  - Empty bag of tricks were considered magical bags
+	  - Fix class of starting vampire blood potions for player vampires (reported by K2)
 
 	* build fixes:
 	  - Fix compiling with -fno-common
