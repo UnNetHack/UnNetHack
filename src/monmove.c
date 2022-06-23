@@ -1590,7 +1590,12 @@ postmov:
                 if (meatmetal(mtmp) == 2) return 2; /* it died */
             }
 
-            if(g_at(mtmp->mx, mtmp->my) && likegold) mpickgold(mtmp);
+            if  (g_at(mtmp->mx, mtmp->my) && likegold) {
+                /* don't let hostile monsters pick up gold in shops to prevent credit cloning abuse */
+                if (!*in_rooms(mtmp->mx, mtmp->my, SHOPBASE)) {
+                    mpickgold(mtmp);
+                }
+            }
 
             /* Maybe a cube ate just about anything */
             if (ptr == &mons[PM_GELATINOUS_CUBE]) {
