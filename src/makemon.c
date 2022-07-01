@@ -17,7 +17,7 @@ static boolean uncommon(int);
 static int align_shift(struct permonst *);
 static boolean mk_gen_ok(int, int, int);
 static boolean wrong_elem_type(struct permonst *);
-static void m_initgrp(struct monst *, int, int, int, int);
+static void m_initgrp(struct monst *, coordxy, coordxy, int, int);
 static void m_initthrow(struct monst *, int, int);
 static void m_initweap(struct monst *);
 static void m_inityour(struct monst *, struct obj *);
@@ -71,7 +71,7 @@ wrong_elem_type(struct permonst *ptr)
 }
 /* make a group just like mtmp */
 static void
-m_initgrp(struct monst *mtmp, int x, int y, int n, int mmflags)
+m_initgrp(struct monst *mtmp, coordxy x, coordxy y, int n, int mmflags)
 {
     coord mm;
     int cnt = rnd(n);
@@ -884,7 +884,7 @@ m_initinv(struct monst *mtmp)
 /* Note: for long worms, always call cutworm (cutworm calls clone_mon) */
 struct monst *
 clone_mon(struct monst *mon,
-          xchar x, xchar y) /**< clone's preferred location or 0 (near mon) */
+          coordxy x, coordxy y) /**< clone's preferred location or 0 (near mon) */
 {
     coord mm;
     struct monst *m2;
@@ -1120,7 +1120,7 @@ makemon_rnd_goodpos(struct monst *mon, unsigned int gpflags, coord *cc)
 
 static
 struct monst *
-_makemon(struct permonst *ptr, int x, int y, int mmflags)
+_makemon(struct permonst *ptr, coordxy x, coordxy y, int mmflags)
 {
     struct monst *mtmp;
     int mndx, mcham, ct, mitem, xlth, mhitdie;
@@ -1529,7 +1529,7 @@ newmextra(void)
  *  In case we make a monster group, only return the one at [x,y].
  */
 struct monst *
-makemon(struct permonst *ptr, int x, int y, int mmflags)
+makemon(struct permonst *ptr, coordxy x, coordxy y, int mmflags)
 {
     use_mon_rng++;
     struct monst *mtmp = _makemon(ptr, x, y, mmflags);
@@ -2592,7 +2592,7 @@ bagotricks(struct obj *bag)
 
 /** May create a camera demon emerging from camera around position x,y. */
 void
-create_camera_demon(struct obj *camera, int x, int y)
+create_camera_demon(struct obj *camera, coordxy x, coordxy y)
 {
     struct monst *mtmp;
 

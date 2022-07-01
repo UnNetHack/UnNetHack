@@ -514,7 +514,7 @@ sgn(int n)
 
 /* calculate x/y, rounding as appropriate */
 int
-rounddiv(long int x, int y)
+rounddiv(long x, int y)
 {
     int r, m;
     int divsgn = 1;

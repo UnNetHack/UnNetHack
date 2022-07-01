@@ -30,7 +30,7 @@ static void lifesaved_monster(struct monst *, uchar);
 #else
 static void lifesaved_monster(struct monst *);
 #endif
-static void migrate_mon(struct monst *, xchar, xchar);
+static void migrate_mon(struct monst *, xint16, xint16);
 static boolean ok_to_obliterate(struct monst *);
 static void deal_with_overcrowding(struct monst *);
 
@@ -161,7 +161,7 @@ mon_sanity_check(void)
 }
 
 void
-remove_monster(int x, int y)
+remove_monster(coordxy x, coordxy y)
 {
     if (level.monsters[x][y] &&
         (level.monsters[x][y]->data == &mons[PM_GIANT_TURTLE] &&
@@ -1373,7 +1373,7 @@ mfndpos(struct monst *mon, coord *poss, long int *info, long int flag)
 
 {
     struct permonst *mdat = mon->data;
-    xchar x, y, nx, ny;
+    coordxy x, y, nx, ny;
     int cnt = 0;
     uchar ntyp;
     uchar nowtyp;
@@ -1744,7 +1744,7 @@ mm_displacement(
 
 /* Is the square close enough for the monster to move or attack into? */
 boolean
-monnear(struct monst *mon, int x, int y)
+monnear(struct monst *mon, coordxy x, coordxy y)
 {
     int distance = dist2(mon->mx, mon->my, x, y);
 
@@ -2529,7 +2529,7 @@ void
 monstone(struct monst *mdef)
 {
     struct obj *otmp, *obj, *oldminvent;
-    xchar x = mdef->mx, y = mdef->my;
+    coordxy x = mdef->mx, y = mdef->my;
     boolean wasinside = FALSE;
 
     /* we have to make the statue before calling mondead, to be able to
@@ -3007,14 +3007,17 @@ vamp_stone(struct monst *mtmp)
 void
 m_into_limbo(struct monst *mtmp)
 {
-    xchar target_lev = ledger_no(&u.uz), xyloc = MIGR_APPROX_XY;
+    xint16 target_lev = ledger_no(&u.uz), xyloc = MIGR_APPROX_XY;
 
     mtmp->mstate |= MON_LIMBO;
     migrate_mon(mtmp, target_lev, xyloc);
 }
 
 static void
-migrate_mon(struct monst *mtmp, xchar target_lev, xchar xyloc)
+migrate_mon(
+    struct monst *mtmp,
+    xint16 target_lev, /**< destination level */
+    xint16 xyloc)      /**< MIGR_xxx flag for location within destination */
 {
     unstuck(mtmp);
     mdrop_special_objs(mtmp);
@@ -3109,7 +3112,7 @@ elemental_clog(struct monst *mon)
         /* last resort - migrate mon to the next plane */
         } else if (!Is_astralevel(&u.uz)) {
             d_level dest;
-            xchar target_lev;
+            coordxy target_lev;
 
             dest = u.uz;
             dest.dlevel--;
@@ -3197,12 +3200,12 @@ maybe_mnexto(struct monst *mtmp)
 int
 mnearto(
     struct monst *mtmp,
-    xchar x,
-    xchar y,
+    coordxy x,
+    coordxy y,
     boolean move_other) /**< make sure mtmp gets to x, y! so move m_at(x, y) */
 {
     struct monst *othermon = (struct monst *)0;
-    xchar newx, newy;
+    coordxy newx, newy;
     coord mm;
     int res = 1;
 
@@ -3475,7 +3478,7 @@ wake_nearby(void)
 
 /* Wake up monsters near some particular location. */
 void
-wake_nearto(int x, int y, int distance)
+wake_nearto(coordxy x, coordxy y, int distance)
 {
     struct monst *mtmp;
 
@@ -3628,7 +3631,7 @@ hideunder(struct monst *mtmp)
 {
     struct trap *t;
     boolean undetected = FALSE, is_u = (mtmp == &youmonst);
-    xchar x = is_u ? u.ux : mtmp->mx, y = is_u ? u.uy : mtmp->my;
+    coordxy x = is_u ? u.ux : mtmp->mx, y = is_u ? u.uy : mtmp->my;
 
     if (mtmp == u.ustuck) {
         ; /* can't hide if holding you or held by you */
@@ -3664,7 +3667,7 @@ hide_monst(struct monst *mon)
 
     if ((is_hider(mon->data) || hider_under) &&
          !(mon->mundetected || M_AP_TYPE(mon))) {
-        xchar x = mon->mx, y = mon->my;
+        coordxy x = mon->mx, y = mon->my;
         char save_viz = viz_array[y][x];
 
         /* override vision, forcing hero to be unable to see monster's spot */

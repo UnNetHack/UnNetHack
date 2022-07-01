@@ -38,7 +38,7 @@ static int spec_dbon_applies = 0;
 /* flags including which artifacts have already been created */
 static boolean artiexist[1+NROFARTIFACTS+1];
 /* and a discovery list for them (no dummy first entry here) */
-static xchar artidisco[NROFARTIFACTS];
+static xint16 artidisco[NROFARTIFACTS];
 
 static void hack_artifacts(void);
 static boolean attacks(int, struct obj *);
@@ -858,7 +858,7 @@ spec_dbon(struct obj *otmp, struct monst *mon, int tmp)
 
 /* add identified artifact to discoveries list */
 void
-discover_artifact(xchar m)
+discover_artifact(xint16 m)
 {
     int i;
 
@@ -876,7 +876,7 @@ discover_artifact(xchar m)
 
 /* used to decide whether an artifact has been fully identified */
 boolean
-undiscovered_artifact(xchar m)
+undiscovered_artifact(xint16 m)
 {
     int i;
 
@@ -2287,7 +2287,7 @@ retouch_equipment(int dropflag) /**< 0==don't drop, 1==drop all, 2==drop weapon 
 static int mkot_trap_warn_count = 0;
 
 static int
-count_surround_traps(int x, int y)
+count_surround_traps(coordxy x, coordxy y)
 {
     struct rm *levp;
     struct obj *otmp;

@@ -292,9 +292,9 @@ strategy(struct monst *mtmp)
 }
 
 static void
-choose_stairs(xchar *sx, xchar *sy)
+choose_stairs(coordxy *sx, coordxy *sy)
 {
-    xchar x = 0, y = 0;
+    coordxy x = 0, y = 0;
 
     if (builds_up(&u.uz)) {
         if (xdnstair) {
@@ -329,7 +329,7 @@ int
 tactics(struct monst *mtmp)
 {
     unsigned long strat = strategy(mtmp);
-    xchar sx = 0, sy = 0, mx, my;
+    coordxy sx = 0, sy = 0, mx, my;
 
     /* Cthulhu doesn't need to heal. He can't die! */
     if ((mtmp->data == &mons[PM_CTHULHU]) &&
@@ -376,7 +376,7 @@ tactics(struct monst *mtmp)
     default:            /* kill, maim, pillage! */
     {
         long where = (strat & STRAT_STRATMASK);
-        xchar tx = STRAT_GOALX(strat),
+        coordxy tx = STRAT_GOALX(strat),
               ty = STRAT_GOALY(strat);
         int targ = strat & STRAT_GOAL;
         struct obj *otmp;

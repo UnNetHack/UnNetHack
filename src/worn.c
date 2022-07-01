@@ -735,7 +735,7 @@ clear_bypasses(void)
              */
 #if 0
             if (objects[otmp->otyp].oc_merge) {
-                xchar ox, oy;
+                coordxy ox, oy;
 
                 (void) get_obj_location(otmp, &ox, &oy, 0);
                 stack_object(otmp);

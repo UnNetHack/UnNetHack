@@ -11,11 +11,11 @@ static void autoquiver(void);
 static int gem_accept(struct monst *, struct obj *);
 static void tmiss(struct obj *, struct monst *, boolean);
 static int throw_gold(struct obj *);
-static void check_shop_obj(struct obj *, xchar, xchar, boolean);
+static void check_shop_obj(struct obj *, coordxy, coordxy, boolean);
 static void breakmsg(struct obj *, boolean);
 static boolean toss_up(struct obj *, boolean);
 static void sho_obj_return_to_u(struct obj *obj);
-static boolean mhurtle_step(genericptr_t, int, int);
+static boolean mhurtle_step(genericptr_t, coordxy, coordxy);
 
 static NEARDATA const char toss_objs[] =
 { ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, WEAPON_CLASS, 0 };
@@ -511,7 +511,11 @@ hitfloor(
  * before the failed callback.
  */
 boolean
-walk_path(coord *src_cc, coord *dest_cc, boolean (*check_proc) (genericptr_t, int, int), genericptr_t arg)
+walk_path(
+    coord *src_cc,
+    coord *dest_cc,
+    boolean (*check_proc) (genericptr_t, coordxy, coordxy),
+    genericptr_t arg)
 {
     int x, y, dx, dy, x_change, y_change, err, i, prev_x, prev_y;
     boolean keep_going = TRUE;
@@ -592,7 +596,7 @@ walk_path(coord *src_cc, coord *dest_cc, boolean (*check_proc) (genericptr_t, in
    vs drag-to-dest; original callers use first mode, jumping wants second,
    grappling hook backfire and thrown chained ball need third */
 boolean
-hurtle_jump(genericptr_t arg, int x, int y)
+hurtle_jump(genericptr_t arg, coordxy x, coordxy y)
 {
     boolean res;
     long save_EWwalking = EWwalking;
@@ -623,7 +627,7 @@ hurtle_jump(genericptr_t arg, int x, int y)
  *  o let jumps go over boulders
  */
 boolean
-hurtle_step(genericptr_t arg, int x, int y)
+hurtle_step(genericptr_t arg, coordxy x, coordxy y)
 {
     int ox, oy, *range = (int *)arg;
     struct obj *obj;
@@ -749,7 +753,7 @@ hurtle_step(genericptr_t arg, int x, int y)
     /* Caller has already determined that dragging the ball is allowed */
     if (Punished && uball->where == OBJ_FLOOR) {
         int bc_control;
-        xchar ballx, bally, chainx, chainy;
+        coordxy ballx, bally, chainx, chainy;
         boolean cause_delay;
 
         if (drag_ball(x, y, &bc_control, &ballx, &bally, &chainx, &chainy, &cause_delay, TRUE)) {
@@ -825,7 +829,7 @@ hurtle_step(genericptr_t arg, int x, int y)
 }
 
 static boolean
-mhurtle_step(genericptr_t arg, int x, int y)
+mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
 {
     struct monst *mon = (struct monst *)arg;
 
@@ -943,7 +947,7 @@ mhurtle(struct monst *mon, int dx, int dy, int range)
 }
 
 static void
-check_shop_obj(struct obj *obj, xchar x, xchar y, boolean broken)
+check_shop_obj(struct obj *obj, coordxy x, coordxy y, boolean broken)
 {
     boolean costly_xy;
     struct monst *shkp = shop_keeper(*u.ushops);
@@ -2055,7 +2059,7 @@ nopick:
  */
 int
 hero_breaks(struct obj *obj,
-            xchar x, xchar y, /**< object location (ox, oy may not be right) */
+            coordxy x, coordxy y, /**< object location (ox, oy may not be right) */
             boolean from_invent) /**< thrown or dropped by player; maybe on shop bill */
 {
     boolean in_view = Blind ? FALSE : (from_invent || cansee(x, y));
@@ -2072,7 +2076,7 @@ hero_breaks(struct obj *obj,
  * Return 0 if the object doesn't break, 1 if the object broke.
  */
 int
-breaks(struct obj *obj, xchar x, xchar y)
+breaks(struct obj *obj, coordxy x, coordxy y)
 
             /* object location (ox, oy may not be right) */
 {
@@ -2089,7 +2093,7 @@ breaks(struct obj *obj, xchar x, xchar y)
  * and break messages have been delivered prior to getting here.
  */
 void
-breakobj(struct obj *obj, xchar x, xchar y, boolean hero_caused, boolean from_invent)
+breakobj(struct obj *obj, coordxy x, coordxy y, boolean hero_caused, boolean from_invent)
 
                      /* object location (ox, oy may not be right) */
                      /* is this the hero's fault? */

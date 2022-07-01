@@ -89,7 +89,7 @@ get_objsym(int glyph)
 
 /*ARGSUSED*/
 void
-mapglyph(int glyph, glyph_t *ochar, int *ocolor, unsigned int *ospecial, int x, int y,
+mapglyph(int glyph, glyph_t *ochar, int *ocolor, unsigned int *ospecial, coordxy x, coordxy y,
     unsigned int mgflags UNUSED)
 {
     int offset;

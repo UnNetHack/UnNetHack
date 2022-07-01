@@ -1328,7 +1328,7 @@ mbhit(
     ddy = sgn(mon->muy - mon->my);
 
     while(range-- > 0) {
-        int x, y;
+        coordxy x, y;
 
         bhitpos.x += ddx;
         bhitpos.y += ddy;

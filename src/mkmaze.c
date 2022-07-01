@@ -12,15 +12,15 @@ extern int num_lregions;
 static lev_region bughack = { { COLNO, ROWNO, 0, 0 }, { COLNO, ROWNO, 0, 0 }, 0, 0, 0, 0, { 0 } };
 extern char SpLev_Map[COLNO][ROWNO];
 
-static int iswall(int, int);
-static int iswall_or_stone(int, int);
-static boolean is_solid(int, int);
+static int iswall(coordxy, coordxy);
+static int iswall_or_stone(coordxy, coordxy);
+static boolean is_solid(coordxy, coordxy);
 static int extend_spine(int [3][3], int, int, int);
-static boolean okay(int, int, int);
+static boolean okay(coordxy, coordxy, int);
 static void maze0xy(coord *);
-static boolean put_lregion_here(xchar, xchar, xchar,
-                                xchar, xchar, xchar, xchar, boolean, d_level *, xchar);
-static void move(int *, int *, int);
+static boolean put_lregion_here(coordxy, coordxy, coordxy,
+                                coordxy, coordxy, coordxy, xint16, boolean, d_level *, coordxy);
+static void move(coordxy *, coordxy *, int);
 static void setup_waterlevel(void);
 static void unsetup_waterlevel(void);
 
@@ -28,6 +28,8 @@ static void check_ransacked(char *);
 static void migr_booty_item(int, const char *);
 static void migrate_orc(struct monst *, unsigned long);
 static void stolen_booty(void);
+static boolean maze_inbounds(coordxy, coordxy);
+static void maze_remove_deadends(xint16);
 
 /* adjust a coordinate one step in the specified direction */
 #define mz_move(X, Y, dir) \
@@ -42,7 +44,7 @@ static void stolen_booty(void);
     } while (0)
 
 static int
-iswall(int x, int y)
+iswall(coordxy x, coordxy y)
 {
     int type;
 
@@ -55,7 +57,7 @@ iswall(int x, int y)
 }
 
 static int
-iswall_or_stone(int x, int y)
+iswall_or_stone(coordxy x, coordxy y)
 {
     /* out of bounds = stone */
     if (!isok(x, y)) {
@@ -67,7 +69,7 @@ iswall_or_stone(int x, int y)
 
 /* return TRUE if out of bounds, wall or rock */
 static boolean
-is_solid(int x, int y)
+is_solid(coordxy x, coordxy y)
 {
     return (!isok(x, y) || IS_STWALL(levl[x][y].typ));
 }
@@ -174,7 +176,7 @@ wall_extends(int x1, int y1, int x2, int y2)
      * so even though this table says VWALL, we actually leave whatever
      * typ was there alone.
      */
-    static xchar spine_array[16] = {
+    static coordxy spine_array[16] = {
         VWALL,  HWALL,      HWALL,      HWALL,
         VWALL,  TRCORNER,   TLCORNER,   TDWALL,
         VWALL,  BRCORNER,   BLCORNER,   TUWALL,
@@ -217,7 +219,7 @@ wall_extends(int x1, int y1, int x2, int y2)
 }
 
 static boolean
-okay(int x, int y, int dir)
+okay(coordxy x, coordxy y, int dir)
 {
     move(&x, &y, dir);
     move(&x, &y, dir);
@@ -237,7 +239,7 @@ maze0xy(coord *cc)
 }
 
 boolean
-bad_location(xchar x, xchar y, xchar lx, xchar ly, xchar hx, xchar hy, xchar lax)
+bad_location(coordxy x, coordxy y, coordxy lx, coordxy ly, coordxy hx, coordxy hy, coordxy lax)
 {
     return((boolean)(t_at(x, y) || invocation_pos(x, y) ||
                      within_bounded_area(x, y, lx, ly, hx, hy) ||
@@ -259,11 +261,15 @@ bad_location(xchar x, xchar y, xchar lx, xchar ly, xchar hx, xchar hy, xchar lax
  *
  * Returns TRUE if it could place the location. */
 int
-place_lregion(xchar lx, xchar ly, xchar hx, xchar hy, xchar nlx, xchar nly, xchar nhx, xchar nhy, xchar rtype, d_level *lev)
+place_lregion(
+    coordxy lx, coordxy ly, coordxy hx, coordxy hy,
+    coordxy nlx, coordxy nly, coordxy nhx, coordxy nhy,
+    xint16 rtype,
+    d_level *lev)
 {
     int trycnt;
     boolean oneshot;
-    xchar x, y;
+    coordxy x, y;
     int lax = 0;
 
     if (!lx) { /* default to whole level */
@@ -304,7 +310,13 @@ place_lregion(xchar lx, xchar ly, xchar hx, xchar hy, xchar nlx, xchar nly, xcha
 }
 
 static boolean
-put_lregion_here(xchar x, xchar y, xchar nlx, xchar nly, xchar nhx, xchar nhy, xchar rtype, boolean oneshot, d_level *lev, xchar lax)
+put_lregion_here(
+    coordxy x, coordxy y, coordxy nlx, coordxy nly,
+    coordxy nhx, coordxy nhy,
+    xint16 rtype,
+    boolean oneshot,
+    d_level *lev,
+    coordxy lax)
 {
     struct monst *mtmp;
 
@@ -985,7 +997,7 @@ stolen_booty(void)
 #undef ORC_LEADER
 
 boolean
-maze_inbounds(int x, int y)
+maze_inbounds(coordxy x, coordxy y)
 {
     return (x >= 2 && y >= 2 &&
             x < x_maze_max && y < y_maze_max &&
@@ -993,7 +1005,7 @@ maze_inbounds(int x, int y)
 }
 
 void
-maze_remove_deadends(xchar typ)
+maze_remove_deadends(xint16 typ)
 {
     char dirok[4];
     int x, y, dir, idx, idx2, dx, dy, dx2, dy2;
@@ -1367,7 +1379,7 @@ schar typ;
 #else
 
 void
-walkfrom(int x, int y, schar typ)
+walkfrom(coordxy x, coordxy y, schar typ)
 {
     int q, a, dir;
     int dirs[4];
@@ -1404,7 +1416,7 @@ walkfrom(int x, int y, schar typ)
 #endif /* MICRO */
 
 static void
-move(int *x, int *y, int dir)
+move(coordxy *x, coordxy *y, int dir)
 {
     switch(dir) {
     case 0: --(*y); break;
@@ -1558,7 +1570,7 @@ bound_digging(void)
 }
 
 void
-mkportal(xchar x, xchar y, xchar todnum, xchar todlevel)
+mkportal(coordxy x, coordxy y, xint16 todnum, xint16 todlevel)
 {
     /* a portal "trap" must be matched by a */
     /* portal in the destination dungeon/dlevel */
@@ -1580,12 +1592,12 @@ mkportal(xchar x, xchar y, xchar todnum, xchar todlevel)
 void
 fumaroles(void)
 {
-    xchar n;
+    xint16 n;
     boolean snd = FALSE, loud = FALSE;
 
     for (n = rn2(3) + 2; n; n--) {
-        xchar x = rn1(COLNO - 4, 3);
-        xchar y = rn1(ROWNO - 4, 3);
+        coordxy x = rn1(COLNO - 4, 3);
+        coordxy y = rn1(ROWNO - 4, 3);
 
         if (levl[x][y].typ == LAVAPOOL) {
             NhRegion *r = create_gas_cloud(x, y, 4+rn2(5), rn1(10, 5), rn1(3,4));
@@ -1628,7 +1640,7 @@ static int xmin, ymin, xmax, ymax;  /* level boundaries */
 #define bymax (ymax - 1)
 
 static void set_wportal(void);
-static void mk_bubble(int, int, int);
+static void mk_bubble(coordxy, coordxy, int);
 static void mv_bubble(struct bubble *, int, int, boolean);
 
 void
@@ -1843,7 +1855,7 @@ restore_waterlevel(int fd)
 }
 
 const char *
-waterbody_name(xchar x, xchar y)
+waterbody_name(coordxy x, coordxy y)
 {
     struct rm *lev;
     schar ltyp;
@@ -1932,7 +1944,7 @@ unsetup_waterlevel(void)
 }
 
 static void
-mk_bubble(int x, int y, int n)
+mk_bubble(coordxy x, coordxy y, int n)
 {
     /*
      * These bit masks make visually pleasing bubbles on a normal aspect

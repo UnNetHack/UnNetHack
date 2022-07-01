@@ -438,7 +438,7 @@ void
 move_bc(
     int before,
     int control,
-    xchar ballx, xchar bally, xchar chainx, xchar chainy) /* only matter !before */
+    coordxy ballx, coordxy bally, coordxy chainx, coordxy chainy) /* only matter !before */
 {
     if (Blind) {
         /*
@@ -554,9 +554,9 @@ move_bc(
 /** return TRUE if the caller needs to place the ball and chain down again */
 boolean
 drag_ball(
-    xchar x, xchar y,
+    coordxy x, coordxy y,
     int *bc_control,
-    xchar *ballx, xchar *bally, xchar *chainx, xchar *chainy,
+    coordxy *ballx, coordxy *bally, coordxy *chainx, coordxy *chainy,
     boolean *cause_delay,
     boolean allow_drag)
 {
@@ -591,7 +591,7 @@ drag_ball(
 
     /* only need to move the chain? */
     if (carried(uball) || distmin(x, y, uball->ox, uball->oy) <= 2) {
-        xchar oldchainx = uchain->ox, oldchainy = uchain->oy;
+        coordxy oldchainx = uchain->ox, oldchainy = uchain->oy;
         *bc_control = BC_CHAIN;
         move_bc(1, *bc_control, *ballx, *bally, *chainx, *chainy);
         if (carried(uball)) {
@@ -643,7 +643,7 @@ drag_ball(
          *    0
          */
         case 5: {
-            xchar tempx, tempy, tempx2, tempy2;
+            coordxy tempx, tempy, tempx2, tempy2;
 
             /* find position closest to current position of chain */
             /* no effect if current position is already OK */
@@ -833,7 +833,7 @@ drag:
         *ballx = *chainx = x;
         *bally = *chainy = y;
     } else {
-        xchar newchainx = u.ux, newchainy = u.uy;
+        coordxy newchainx = u.ux, newchainy = u.uy;
 
         /*
          * Generally, chain moves to hero's previous location and ball
@@ -873,7 +873,7 @@ drag:
  *  Should not be called while swallowed.
  */
 void
-drop_ball(xchar x, xchar y)
+drop_ball(coordxy x, coordxy y)
 {
     if (Blind) {
         /* get the order */

@@ -41,11 +41,11 @@ void dummy_cliparound(int x, int y);
  * dummy_cliparound (which lacks the winid) simply calls this funtion.
 */
 void dummy_cliparound_proper(winid wid, int x, int y);
-void dummy_print_glyph(winid wid, xchar x, xchar y, int glyph, int bg_glyph);
+void dummy_print_glyph(winid wid, coordxy x, coordxy y, int glyph, int bg_glyph);
 void dummy_raw_print(const char *str);
 void dummy_raw_print_bold(const char *str);
 int  dummy_nhgetch(void);
-int  dummy_nh_poskey(int *x, int *y, int *mod);
+int  dummy_nh_poskey(coordxy *x, coordxy *y, int *mod);
 void dummy_nhbell(void);
 int  dummy_doprev_message(void);
 char dummy_yn_function(const char *question, const char *choices,

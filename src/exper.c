@@ -107,7 +107,7 @@ newpw(void)
         en = 1;
     }
     if (u.ulevel < MAXULEV) {
-        u.ueninc[u.ulevel] = (xchar) en;
+        u.ueninc[u.ulevel] = (xint16) en;
     }
     return en;
 }

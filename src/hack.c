@@ -9,17 +9,17 @@
 
 static void maybe_wail(void);
 static int moverock(void);
-static int still_chewing(xchar, xchar);
+static int still_chewing(coordxy, coordxy);
 #ifdef SINKS
 static void dosinkfall(void);
 #endif
-static boolean findtravelpath(boolean (*)(int, int));
-static boolean trapmove(int, int, struct trap *);
+static boolean findtravelpath(boolean (*)(coordxy, coordxy));
+static boolean trapmove(coordxy, coordxy, struct trap *);
 static struct monst *monstinroom(struct permonst *, int);
-static boolean doorless_door(int, int);
+static boolean doorless_door(coordxy, coordxy);
 static void move_update(boolean);
-static void check_buried_zombies(xchar, xchar);
-static boolean domove_swap_with_pet(struct monst *, xchar, xchar);
+static void check_buried_zombies(coordxy, coordxy);
+static boolean domove_swap_with_pet(struct monst *, coordxy, coordxy);
 static void struggle_sub(const char *);
 static boolean check_interrupt(struct monst *mtmp);
 
@@ -35,7 +35,7 @@ static anything tmp_anything;
 
 #ifdef DUNGEON_GROWTH
 void
-rndmappos(xchar *x, xchar *y) /* guaranteed to return a valid coord */
+rndmappos(coordxy *x, coordxy *y) /* guaranteed to return a valid coord */
 
 
 {
@@ -61,7 +61,7 @@ static const struct herb_info {
 };
 
 long
-count_herbs_at(xchar x, xchar y, boolean watery)
+count_herbs_at(coordxy x, coordxy y, boolean watery)
 {
     int dd;
     long count = 0;
@@ -80,7 +80,7 @@ count_herbs_at(xchar x, xchar y, boolean watery)
 
 /* returns TRUE if a herb can grow at (x,y) */
 boolean
-herb_can_grow_at(xchar x, xchar y, boolean watery)
+herb_can_grow_at(coordxy x, coordxy y, boolean watery)
 {
     struct rm *lev = &levl[x][y];
     if (inside_shop(x, y)) return FALSE;
@@ -97,7 +97,7 @@ herb_can_grow_at(xchar x, xchar y, boolean watery)
 
 /* grow herbs in water. return true if did something. */
 boolean
-grow_water_herbs(int herb, xchar x, xchar y)
+grow_water_herbs(int herb, coordxy x, coordxy y)
 {
     struct obj *otmp;
 
@@ -117,7 +117,7 @@ grow_water_herbs(int herb, xchar x, xchar y)
 /* grow herb on ground at (x,y), or maybe spread out.
    return true if did something. */
 boolean
-grow_herbs(int herb, xchar x, xchar y, boolean showmsg, boolean update)
+grow_herbs(int herb, coordxy x, coordxy y, boolean showmsg, boolean update)
 {
     struct obj *otmp;
 
@@ -174,7 +174,7 @@ grow_herbs(int herb, xchar x, xchar y, boolean showmsg, boolean update)
 /* moves topmost object in water at (x,y) to dir.
    return true if did something. */
 boolean
-water_current(xchar x, xchar y, int dir, unsigned int waterforce, boolean showmsg, boolean update)
+water_current(coordxy x, coordxy y, int dir, unsigned int waterforce, boolean showmsg, boolean update)
 
 
                       /* strength of the water current */
@@ -219,7 +219,7 @@ water_current(xchar x, xchar y, int dir, unsigned int waterforce, boolean showms
 
 /* a tree at (x,y) spontaneously drops a ripe fruit */
 boolean
-drop_ripe_treefruit(xchar x, xchar y, boolean showmsg, boolean update)
+drop_ripe_treefruit(coordxy x, coordxy y, boolean showmsg, boolean update)
 {
     struct rm *lev;
 
@@ -272,7 +272,7 @@ drop_ripe_treefruit(xchar x, xchar y, boolean showmsg, boolean update)
  * Creates a kind of forest, with (hopefully) most places available.
  */
 boolean
-seed_tree(xchar x, xchar y)
+seed_tree(coordxy x, coordxy y)
 {
     coord pos, pos2;
     struct rm *lev;
@@ -375,7 +375,7 @@ obj_to_any(struct obj *obj)
 }
 
 boolean
-revive_nasty(int x, int y, const char *msg)
+revive_nasty(coordxy x, coordxy y, const char *msg)
 {
     struct obj *otmp, *otmp2;
     struct monst *mtmp;
@@ -414,7 +414,7 @@ revive_nasty(int x, int y, const char *msg)
 static int
 moverock(void)
 {
-    xchar rx, ry, sx, sy;
+    coordxy rx, ry, sx, sy;
     struct obj *otmp;
     struct trap *ttmp;
     struct monst *mtmp;
@@ -708,7 +708,7 @@ cannot_push:
  *  Returns TRUE if still eating, FALSE when done.
  */
 static int
-still_chewing(xchar x, xchar y)
+still_chewing(coordxy x, coordxy y)
 {
     struct rm *lev = &levl[x][y];
     struct obj *boulder = sobj_at(BOULDER, x, y);
@@ -854,7 +854,7 @@ still_chewing(xchar x, xchar y)
 }
 
 void
-movobj(struct obj *obj, xchar ox, xchar oy)
+movobj(struct obj *obj, coordxy ox, coordxy oy)
 {
     /* optimize by leaving on the fobj chain? */
     remove_object(obj);
@@ -953,7 +953,7 @@ dosinkfall(void)
 
 /* intended to be called only on ROCKs */
 boolean
-may_dig(xchar x, xchar y)
+may_dig(coordxy x, coordxy y)
 {
     struct rm *lev = &levl[x][y];
 
@@ -964,14 +964,14 @@ may_dig(xchar x, xchar y)
 }
 
 boolean
-may_passwall(xchar x, xchar y)
+may_passwall(coordxy x, coordxy y)
 {
     return (boolean)(!((IS_STWALL(levl[x][y].typ) || IS_TREES(levl[x][y].typ)) &&
                        (levl[x][y].wall_info & W_NONPASSWALL)));
 }
 
 boolean
-bad_rock(struct permonst *mdat, xchar x, xchar y)
+bad_rock(struct permonst *mdat, coordxy x, coordxy y)
 {
     return((boolean) ((Sokoban && sobj_at(BOULDER, x, y)) ||
                       (IS_ROCK(levl[x][y].typ)
@@ -1011,7 +1011,7 @@ cant_squeeze_thru(struct monst *mon)
 }
 
 boolean
-invocation_pos(xchar x, xchar y)
+invocation_pos(coordxy x, coordxy y)
 {
     return((boolean)(Invocation_lev(&u.uz) && x == inv_pos.x && y == inv_pos.y));
 }
@@ -1281,7 +1281,7 @@ testdiag:
    avoid treating traps and doors known to be locked as valid explore
    targets (although they are still valid travel intermediates). */
 static boolean
-unexplored(int x, int y)
+unexplored(coordxy x, coordxy y)
 {
     int i, j, k, l;
     struct trap *ttmp = t_at(x, y);
@@ -1328,7 +1328,7 @@ unexplored(int x, int y)
 /** Returns a distance modified by a constant factor.
  * The lower the value the better.*/
 int
-autotravel_weighting(int x, int y, unsigned int distance)
+autotravel_weighting(coordxy x, coordxy y, unsigned int distance)
 {
     int glyph = levl[x][y].glyph;
 
@@ -1371,7 +1371,7 @@ autotravel_weighting(int x, int y, unsigned int distance)
  * Returns TRUE if a path was found.
  */
 static boolean
-findtravelpath(boolean (*guess) (int, int))
+findtravelpath(boolean (*guess) (coordxy, coordxy))
 {
     /* if travel to adjacent, reachable location, use normal movement rules */
     if (!guess && iflags.travel1 && distmin(u.ux, u.uy, u.tx, u.ty) == 1) {
@@ -1387,9 +1387,9 @@ findtravelpath(boolean (*guess) (int, int))
     }
     if (u.tx != u.ux || u.ty != u.uy || guess == unexplored) {
         unsigned travel[COLNO][ROWNO];
-        xchar travelstepx[2][COLNO*ROWNO];
-        xchar travelstepy[2][COLNO*ROWNO];
-        xchar tx, ty, ux, uy;
+        coordxy travelstepx[2][COLNO*ROWNO];
+        coordxy travelstepy[2][COLNO*ROWNO];
+        coordxy tx, ty, ux, uy;
         int n = 1;      /* max offset in travelsteps */
         int set = 0;        /* two sets current and previous */
         int radius = 1;     /* search radius */
@@ -1541,7 +1541,7 @@ found:
 }
 
 boolean
-is_valid_travelpt(int x, int y)
+is_valid_travelpt(coordxy x, coordxy y)
 {
     int tx = u.tx;
     int ty = u.ty;
@@ -1564,7 +1564,7 @@ is_valid_travelpt(int x, int y)
 
 /* A function version of couldsee, so we can take a pointer to it. */
 static boolean
-couldsee_func(int x, int y)
+couldsee_func(coordxy x, coordxy y)
 {
     return couldsee(x, y);
 }
@@ -1577,7 +1577,7 @@ couldsee_func(int x, int y)
  * It should only leak information about "obvious" coordinates, e.g.
  * unexplored rooms or big areas not reachable by the player. */
 static boolean
-interesting_to_explore(int x, int y)
+interesting_to_explore(coordxy x, coordxy y)
 {
     if (!goodpos(x, y, &youmonst, 0)) return FALSE;
 
@@ -1602,7 +1602,7 @@ interesting_to_explore(int x, int y)
    (all failures and most successful escapes leave hero at original spot) */
 static boolean
 trapmove(
-    int x, int y, /**< targetted destination, <u.ux+u.dx,u.uy+u.dy> */
+    coordxy x, coordxy y, /**< targetted destination, <u.ux+u.dx,u.uy+u.dy> */
     struct trap *desttrap) /**< nonnull if another trap at <x,y> */
 {
     boolean anchored = FALSE;
@@ -1765,7 +1765,7 @@ u_rooted(void)
 
 /* reduce zombification timeout of buried zombies around px, py */
 static void
-check_buried_zombies(xchar x, xchar y)
+check_buried_zombies(coordxy x, coordxy y)
 {
     struct obj *otmp;
     long t;
@@ -1786,7 +1786,7 @@ check_buried_zombies(xchar x, xchar y)
 
 /** Maybe swap places with a monster? returns TRUE if swapped places */
 static boolean
-domove_swap_with_pet(struct monst *mtmp, xchar x, xchar y)
+domove_swap_with_pet(struct monst *mtmp, coordxy x, coordxy y)
 {
     struct trap *trap;
     /* if it turns out we can't actually move */
@@ -1913,11 +1913,11 @@ domove(void)
 {
     struct monst *mtmp;
     struct rm *tmpr;
-    xchar x, y;
+    coordxy x, y;
     struct trap *trap = NULL;
     int wtcap;
     boolean on_ice;
-    xchar chainx = 0, chainy = 0,
+    coordxy chainx = 0, chainy = 0,
           ballx = 0, bally = 0;     /* ball&chain new positions */
     int bc_control = 0;             /* control for ball&chain */
     boolean cause_delay = FALSE;    /* dragging ball will skip a move */
@@ -3078,7 +3078,7 @@ monstinroom(struct permonst *mdat, int roomno)
 }
 
 char *
-in_rooms(xchar x, xchar y, int typewanted)
+in_rooms(coordxy x, coordxy y, int typewanted)
 {
     static char buf[5];
     char rno, *ptr = &buf[4];
@@ -3144,7 +3144,7 @@ in_rooms(xchar x, xchar y, int typewanted)
 
 /* is (x,y) in a town? */
 boolean
-in_town(int x, int y)
+in_town(coordxy x, coordxy y)
 {
     s_level *slev = Is_special(&u.uz);
     struct mkroom *sroom;
@@ -3691,7 +3691,7 @@ stop:
 
 /* check for a doorway which lacks its door (NODOOR or BROKEN) */
 static boolean
-doorless_door(int x, int y)
+doorless_door(coordxy x, coordxy y)
 {
     struct rm *lev_p = &levl[x][y];
 
@@ -3726,7 +3726,7 @@ check_interrupt(struct monst *mtmp)
 
 /* used by drown() to check whether hero can crawl from water to <x,y> */
 boolean
-crawl_destination(int x, int y)
+crawl_destination(coordxy x, coordxy y)
 {
     /* is location ok in general? */
     if (!goodpos(x, y, &youmonst, 0))
@@ -4102,7 +4102,7 @@ money_cnt(struct obj *otmp)
 }
 
 boolean
-MON_AT(int x, int y)
+MON_AT(coordxy x, coordxy y)
 {
     assert_valid_coordinates(x, y);
 
@@ -4110,7 +4110,7 @@ MON_AT(int x, int y)
 }
 
 boolean
-OBJ_AT(int x, int y)
+OBJ_AT(coordxy x, coordxy y)
 {
     assert_valid_coordinates(x, y);
 

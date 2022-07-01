@@ -20,8 +20,8 @@ static int max_regions = 0;
 boolean inside_gas_cloud(genericptr, genericptr);
 boolean expire_gas_cloud(genericptr, genericptr);
 boolean revive_cthulhu(genericptr, genericptr);
-boolean inside_rect(NhRect *, int, int);
-boolean inside_region(NhRegion *, int, int);
+boolean inside_rect(NhRect *, coordxy, coordxy);
+boolean inside_region(NhRegion *, coordxy, coordxy);
 NhRegion *create_region(NhRect *, int);
 void add_rect_to_reg(NhRegion *, NhRect *);
 void add_mon_to_reg(NhRegion *, struct monst *);
@@ -38,9 +38,9 @@ void remove_region(NhRegion *);
 #if 0
 void replace_mon_regions(struct monst *, struct monst *);
 void remove_mon_from_regions(struct monst *);
-NhRegion *create_msg_region(xchar, xchar, xchar, xchar, const char *, const char *);
+NhRegion *create_msg_region(coordxy, coordxy, coordxy, coordxy, const char *, const char *);
 boolean enter_force_field(genericptr, genericptr);
-NhRegion *create_force_field(xchar, xchar, int, int);
+NhRegion *create_force_field(coordxy, coordxy, int, int);
 #endif
 
 static void reset_region_mids(NhRegion *);
@@ -56,7 +56,7 @@ static callback_proc callbacks[] = {
 
 /* Should be inlined. */
 boolean
-inside_rect(NhRect *r, int x, int y)
+inside_rect(NhRect *r, coordxy x, coordxy y)
 {
     return (x >= r->lx && x <= r->hx && y >= r->ly && y <= r->hy);
 }
@@ -65,7 +65,7 @@ inside_rect(NhRect *r, int x, int y)
  * Check if a point is inside a region.
  */
 boolean
-inside_region(NhRegion *reg, int x, int y)
+inside_region(NhRegion *reg, coordxy x, coordxy y)
 {
     int i;
 
@@ -415,7 +415,7 @@ run_regions(void)
  * check whether player enters/leaves one or more regions.
  */
 boolean
-in_out_region(xchar x, xchar y)
+in_out_region(coordxy x, coordxy y)
 {
     int i, f_indx;
 
@@ -464,7 +464,7 @@ in_out_region(xchar x, xchar y)
  * check whether a monster enters/leaves one or more regions.
  */
 boolean
-m_in_out_region(struct monst *mon, xchar x, xchar y)
+m_in_out_region(struct monst *mon, coordxy x, coordxy y)
 {
     int i, f_indx;
 
@@ -582,7 +582,7 @@ struct monst *mon;
  * Returns NULL if not, otherwise returns region.
  */
 NhRegion *
-visible_region_at(xchar x, xchar y)
+visible_region_at(coordxy x, coordxy y)
 {
     int i;
 
@@ -598,7 +598,7 @@ visible_region_at(xchar x, xchar y)
 }
 
 void
-show_region(NhRegion *reg, xchar x, xchar y)
+show_region(NhRegion *reg, coordxy x, coordxy y)
 {
     show_glyph(x, y, reg->glyph);
 }
@@ -797,8 +797,8 @@ reset_region_mids(NhRegion *reg)
 
 NhRegion *
 create_msg_region(x, y, w, h, msg_enter, msg_leave)
-xchar x, y;
-xchar w, h;
+coordxy x, y;
+coordxy w, h;
 const char *msg_enter;
 const char *msg_leave;
 {
@@ -851,7 +851,7 @@ genericptr_t p2;
 
 NhRegion *
 create_force_field(x, y, radius, ttl)
-xchar x, y;
+coordxy x, y;
 int radius, ttl;
 {
     int i;
@@ -1014,7 +1014,7 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
 }
 
 NhRegion *
-create_cthulhu_death_cloud(xchar x, xchar y, int radius, size_t damage, int duration)
+create_cthulhu_death_cloud(coordxy x, coordxy y, int radius, size_t damage, int duration)
 {
     NhRegion *cloud;
 
@@ -1025,7 +1025,7 @@ create_cthulhu_death_cloud(xchar x, xchar y, int radius, size_t damage, int dura
 }
 
 NhRegion *
-create_gas_cloud(xchar x, xchar y, int radius, size_t damage, int duration)
+create_gas_cloud(coordxy x, coordxy y, int radius, size_t damage, int duration)
 {
     NhRegion *cloud;
     int i, nrect;

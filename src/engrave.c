@@ -232,21 +232,21 @@ can_reach_floor(boolean check_pit)
 }
 
 void
-You_cant_reach_the_floor(int x, int y, boolean check_pit)
+You_cant_reach_the_floor(coordxy x, coordxy y, boolean check_pit)
 {
     You("can't reach the %s.",
         (check_pit && can_reach_floor(FALSE)) ? "bottom of the pit" : surface(x, y));
 }
 
 void
-You_cant_reach_the_ceiling(int x, int y)
+You_cant_reach_the_ceiling(coordxy x, coordxy y)
 {
     You("can't reach the %s.", ceiling(x, y));
 }
 
 /* give a message after caller has determined that hero can't reach */
 void
-cant_reach_floor(int x, int y, boolean up, boolean check_pit)
+cant_reach_floor(coordxy x, coordxy y, boolean up, boolean check_pit)
 {
     You("can't reach the %s.",
         up ? ceiling(x, y)
@@ -256,7 +256,7 @@ cant_reach_floor(int x, int y, boolean up, boolean check_pit)
 }
 
 const char *
-surface(int x, int y)
+surface(coordxy x, coordxy y)
 {
     struct rm *lev = &levl[x][y];
 
@@ -289,7 +289,7 @@ surface(int x, int y)
 }
 
 const char *
-ceiling(int x, int y)
+ceiling(coordxy x, coordxy y)
 {
     struct rm *lev = &levl[x][y];
     const char *what;
@@ -317,7 +317,7 @@ ceiling(int x, int y)
 }
 
 struct engr *
-engr_at(xchar x, xchar y)
+engr_at(coordxy x, coordxy y)
 {
     struct engr *ep = head_engr;
 
@@ -336,7 +336,7 @@ engr_at(xchar x, xchar y)
  * Returns the type of engraving.
  */
 int
-sengr_at(const char *s, xchar x, xchar y)
+sengr_at(const char *s, coordxy x, coordxy y)
 {
     struct engr *ep = engr_at(x, y);
 
@@ -358,7 +358,7 @@ sengr_at(const char *s, xchar x, xchar y)
  */
 static
 unsigned
-nengr_at(xchar x, xchar y)
+nengr_at(coordxy x, coordxy y)
 {
     const char *s = "Elbereth";
     struct engr *ep = engr_at(x, y);
@@ -386,7 +386,7 @@ u_wipe_engr(int cnt)
 }
 
 void
-wipe_engr_at(xchar x, xchar y, xchar cnt)
+wipe_engr_at(coordxy x, coordxy y, xint16 cnt)
 {
     struct engr *ep = engr_at(x, y);
 
@@ -405,7 +405,7 @@ wipe_engr_at(xchar x, xchar y, xchar cnt)
 }
 
 void
-read_engr_at(int x, int y)
+read_engr_at(coordxy x, coordxy y)
 {
     struct engr *ep = engr_at(x, y);
     int sensed = 0;
@@ -484,7 +484,7 @@ read_engr_at(int x, int y)
 }
 
 void
-make_engr_at(int x, int y, const char *s, long int e_time, xchar e_type)
+make_engr_at(coordxy x, coordxy y, const char *s, long int e_time, xint16 e_type)
 {
     struct engr *ep;
     size_t smem = strlen(s) + 1;
@@ -510,7 +510,7 @@ make_engr_at(int x, int y, const char *s, long int e_time, xchar e_type)
 
 /* delete any engraving at location <x,y> */
 void
-del_engr_at(int x, int y)
+del_engr_at(coordxy x, coordxy y)
 {
     struct engr *ep = engr_at(x, y);
 
@@ -591,8 +591,8 @@ engrave(const char *engraving, boolean fingers)
     boolean ptext = TRUE;   /* TRUE if we must prompt for engrave text */
     boolean teleengr =FALSE;/* TRUE if we move the old engraving */
     boolean zapwand = FALSE;/* TRUE if we remove a wand charge */
-    xchar type = DUST;  /* Type of engraving made */
-    xchar oetype = 0;   /* will be set to type of current engraving */
+    xint16 type = DUST; /* Type of engraving made */
+    xint16 oetype = 0;  /* will be set to type of current engraving */
     char buf[BUFSZ];    /* Buffer for final/poly engraving text */
     char ebuf[BUFSZ];   /* Buffer for initial engraving text */
     char fbuf[BUFSZ];   /* Buffer for "your fingers" */
@@ -817,7 +817,7 @@ engrave(const char *engraving, boolean fingers)
             case WAN_POLYMORPH:
                 if (oep)  {
                     if (!Blind) {
-                        type = (xchar)0; /* random */
+                        type = (xint16) 0; /* random */
                         (void) random_engraving(buf);
                         doknown = TRUE;
                     } else {
@@ -1613,7 +1613,7 @@ static const char *epitaphs[] = {
  * The caller is responsible for newsym(x, y).
  */
 void
-make_grave(int x, int y, const char *str)
+make_grave(coordxy x, coordxy y, const char *str)
 {
     /* Can we put a grave here? */
     if ((levl[x][y].typ != ROOM && levl[x][y].typ != GRAVE) || t_at(x, y)) return;

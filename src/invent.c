@@ -618,7 +618,7 @@ freeinv(struct obj *obj)
 }
 
 void
-delallobj(int x, int y)
+delallobj(coordxy x, coordxy y)
 {
     struct obj *otmp, *otmp2;
 
@@ -658,7 +658,7 @@ delobj(struct obj *obj)
 
 /* try to find a particular type of object at designated map location */
 struct obj *
-sobj_at(int otyp, int x, int y)
+sobj_at(int otyp, coordxy x, coordxy y)
 {
     struct obj *otmp;
 
@@ -763,7 +763,7 @@ o_on(unsigned int id, struct obj *objchn)
 }
 
 boolean
-obj_here(struct obj *obj, int x, int y)
+obj_here(struct obj *obj, coordxy x, coordxy y)
 {
     struct obj *otmp;
 
@@ -773,7 +773,7 @@ obj_here(struct obj *obj, int x, int y)
 }
 
 struct obj *
-g_at(int x, int y)
+g_at(coordxy x, coordxy y)
 {
     struct obj *obj = level.objects[x][y];
 
@@ -875,12 +875,12 @@ getobj(const char *let, const char *word)
     char lets[BUFSZ], altlets[BUFSZ], *ap;
     int foo = 0;
     char *bp = buf;
-    xchar allowcnt = 0; /* 0, 1 or 2 */
+    coordxy allowcnt = 0; /* 0, 1 or 2 */
     boolean usegold = FALSE; /* can't use gold because its illegal */
     boolean allowall = FALSE;
     boolean allownone = FALSE;
     boolean useboulder = FALSE;
-    xchar foox = 0;
+    coordxy foox = 0;
     long cnt;
     boolean msggiven = FALSE;
     boolean oneloop = FALSE;
@@ -1745,7 +1745,9 @@ void
 fully_identify_obj(struct obj *otmp)
 {
     makeknown(otmp->otyp);
-    if (otmp->oartifact) discover_artifact((xchar)otmp->oartifact);
+    if (otmp->oartifact) {
+        discover_artifact((coordxy)otmp->oartifact);
+    }
     otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
     if (Is_container(otmp) || otmp->otyp == STATUE) {
         otmp->cknown = otmp->lknown = 1;
@@ -2966,7 +2968,7 @@ count_contents(struct obj *container, boolean nested, boolean quantity, boolean 
     long count = 0L;
 
     if (!everything && !newdrop) {
-        xchar x, y;
+        coordxy x, y;
 
         for (topc = container; topc->where == OBJ_CONTAINED; topc = topc->ocontainer) {
             continue;
@@ -3263,7 +3265,7 @@ dotypeinv(void)
 /* return a string describing the dungeon feature at <x,y> if there
    is one worth mentioning at that location; otherwise null */
 const char *
-dfeature_at(int x, int y, char *buf)
+dfeature_at(coordxy x, coordxy y, char *buf)
 {
     struct rm *lev = &levl[x][y];
     int ltyp = lev->typ, cmap = -1;
@@ -4272,7 +4274,7 @@ only_here(struct obj *obj)
  * Currently, this is only used with a wand of probing zapped downwards.
  */
 int
-display_binventory(int x, int y, boolean as_if_seen)
+display_binventory(coordxy x, coordxy y, boolean as_if_seen)
 {
     struct obj *obj;
     menu_item *selected = 0;

@@ -16,7 +16,7 @@ static void pass_two(schar, schar);
 static void pass_three(schar, schar);
 static void wallify_map(void);
 static void join_map(schar, schar);
-static void finish_map(schar, schar, xchar, xchar);
+static void finish_map(schar, schar, coordxy, coordxy);
 static void remove_room(unsigned);
 static void backfill(schar, schar);
 void mkmap(lev_init *);
@@ -179,7 +179,7 @@ pass_three(schar bg_typ, schar fg_typ)
 }
 
 boolean
-check_flood_anyroom(int x, int y, schar fg_typ, boolean anyroom)
+check_flood_anyroom(coordxy x, coordxy y, schar fg_typ, boolean anyroom)
 {
     if (!isok(x, y)) return FALSE;
     return (anyroom ? IS_ROOM(levl[x][y].typ) : levl[x][y].typ == fg_typ);
@@ -465,7 +465,7 @@ mkmap(lev_init *init_lev)
           fg_typ = init_lev->fg;
     boolean smooth = init_lev->smoothed,
             join = init_lev->joined;
-    xchar lit = init_lev->lit,
+    xint16 lit = init_lev->lit,
           walled = init_lev->walled;
     int i;
 

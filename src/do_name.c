@@ -28,10 +28,10 @@ nextmbuf(void)
  * parameter value 0 = initialize, 1 = highlight, 2 = done
  */
 static void (*getpos_hilitefunc)(int) = (void (*)(int)) 0;
-static boolean (*getpos_getvalid)(int, int) = (boolean (*)(int, int)) 0;
+static boolean (*getpos_getvalid)(coordxy, coordxy) = (boolean (*)(coordxy, coordxy)) 0;
 
 void
-getpos_sethilite(void (*gp_hilitef) (int), boolean (*gp_getvalidf) (int, int))
+getpos_sethilite(void (*gp_hilitef) (int), boolean (*gp_getvalidf) (coordxy, coordxy))
 {
     getpos_hilitefunc = gp_hilitef;
     getpos_getvalid = gp_getvalidf;
@@ -347,7 +347,7 @@ gloc_filter_classify_glyph(int glyph)
 }
 
 static int
-gloc_filter_floodfill_matcharea(int x, int y)
+gloc_filter_floodfill_matcharea(coordxy x, coordxy y)
 {
     int glyph = back_to_glyph(x, y);
 
@@ -367,7 +367,7 @@ gloc_filter_floodfill_matcharea(int x, int y)
 }
 
 void
-gloc_filter_floodfill(int x, int y)
+gloc_filter_floodfill(coordxy x, coordxy y)
 {
     gloc_filter_floodfill_match_glyph = back_to_glyph(x, y);
 
@@ -408,7 +408,7 @@ gloc_filter_done(void)
 }
 
 static boolean
-gather_locs_interesting(int x, int y, int gloc)
+gather_locs_interesting(coordxy x, coordxy y, int gloc)
 {
     /* TODO: if glyph is a pile glyph, convert to ordinary one
      *       in order to keep tail/boulder/rock check simple.
@@ -496,7 +496,8 @@ gather_locs_interesting(int x, int y, int gloc)
 static void
 gather_locs(coord **arr_p, int *cnt_p, int gloc)
 {
-    int x, y, pass, idx;
+    int pass, idx;
+    coordxy x, y;
 
     /*
      * We always include the hero's location even if there is no monster
@@ -577,7 +578,7 @@ dxdy_to_dist_descr(int dx, int dy, boolean fulldir)
 
 /* coordinate formatting for 'whatis_coord' option */
 char *
-coord_desc(int x, int y, char *outbuf, char cmode)
+coord_desc(coordxy x, coordxy y, char *outbuf, char cmode)
 {
     static char screen_fmt[16]; /* [12] suffices: "[%02d,%02d]" */
     int dx, dy;
@@ -731,7 +732,8 @@ getpos(coord *ccp, boolean force, const char *goal)
     char mMoOdDxX[NUM_GLOCS*2 + 1];
     int result = 0;
     int cx, cy, i, c;
-    int sidx, tx, ty;
+    int sidx;
+    coordxy tx = u.ux, ty = u.uy;
     boolean msg_given = TRUE; /* clear message window by default */
     boolean show_goal_msg = FALSE;
     boolean hilite_state = FALSE;
@@ -1073,7 +1075,7 @@ getpos(coord *ccp, boolean force, const char *goal)
         }
     }
     getpos_hilitefunc = (void (*)(int)) 0;
-    getpos_getvalid = (boolean (*)(int, int)) 0;
+    getpos_getvalid = (boolean (*)(coordxy, coordxy)) 0;
 
     return result;
 }

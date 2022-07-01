@@ -786,7 +786,7 @@ engulf_target(struct monst *magr, struct monst *mdef)
 static int
 gulpmm(struct monst *magr, struct monst *mdef, struct attack *mattk)
 {
-    xchar ax, ay, dx, dy;
+    coordxy ax, ay, dx, dy;
     int status;
     char buf[BUFSZ];
     struct obj *obj;

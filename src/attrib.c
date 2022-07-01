@@ -668,7 +668,7 @@ newhp(void)
         hp = 1;
     }
     if (u.ulevel < MAXULEV) {
-        u.uhpinc[u.ulevel] = (xchar) hp;
+        u.uhpinc[u.ulevel] = (xint16) hp;
     }
     return hp;
 }

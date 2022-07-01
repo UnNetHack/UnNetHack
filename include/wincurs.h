@@ -107,7 +107,7 @@ extern void curses_wait_synch(void);
 
 extern void curses_cliparound(int x, int y);
 
-extern void curses_print_glyph(winid wid, xchar x, xchar y, int glyph, int bg_glyph);
+extern void curses_print_glyph(winid wid, coordxy x, coordxy y, int glyph, int bg_glyph);
 
 extern void curses_raw_print(const char *str);
 
@@ -115,7 +115,7 @@ extern void curses_raw_print_bold(const char *str);
 
 extern int curses_nhgetch(void);
 
-extern int curses_nh_poskey(int *x, int *y, int *mod);
+extern int curses_nh_poskey(coordxy *x, coordxy *y, int *mod);
 
 extern void curses_nhbell(void);
 
@@ -223,7 +223,7 @@ extern int curses_read_attrs(char *attrs);
 
 extern int curses_convert_keys(int key);
 
-extern int curses_get_mouse(int *mousex, int *mousey, int *mod);
+extern int curses_get_mouse(coordxy *mousex, coordxy *mousey, int *mod);
 
 /* cursdial.c */
 

@@ -26,20 +26,20 @@
 
 extern void mkmap(lev_init *);
 
-static void get_room_loc(schar *, schar *, struct mkroom *);
-static void get_free_room_loc(schar *, schar *, struct mkroom *, packed_coord);
+static void get_room_loc(coordxy *, coordxy *, struct mkroom *);
+static void get_free_room_loc(coordxy *, coordxy *, struct mkroom *, packed_coord);
 static void create_trap(trap *, struct mkroom *);
 static int noncoalignment(aligntyp);
 static void create_monster(monster *, struct mkroom *);
 static void create_object(object *, struct mkroom *);
 static void create_altar(altar *, struct mkroom *);
-static boolean search_door(struct mkroom *, xchar *, xchar *, xchar, int);
+static boolean search_door(struct mkroom *, coordxy *, coordxy *, xint16, int);
 static void fix_stair_rooms(void);
 static void create_corridor(corridor *);
 static void count_features(void);
 
-static boolean create_subroom(struct mkroom *, xchar, xchar,
-                              xchar, xchar, xchar, xchar);
+static boolean create_subroom(struct mkroom *, coordxy, coordxy,
+                              coordxy, coordxy, xint16, xint16);
 
 long opvar_array_length(struct sp_coder *);
 
@@ -71,13 +71,13 @@ extern int min_rx, max_rx, min_ry, max_ry; /* from mkmap.c */
 char SpLev_Map[COLNO][ROWNO];
 
 static aligntyp ralign[3] = { AM_CHAOTIC, AM_NEUTRAL, AM_LAWFUL };
-static NEARDATA xchar xstart, ystart;
-static NEARDATA char xsize, ysize;
+static coordxy xstart, ystart;
+static char xsize, ysize;
 
-static void set_wall_property(xchar, xchar, xchar, xchar, int);
+static void set_wall_property(coordxy, coordxy, coordxy, coordxy, int);
 static int rnddoor(void);
 static int rndtrap(void);
-static void get_location(schar *, schar *, int, struct mkroom *);
+static void get_location(coordxy *, coordxy *, int, struct mkroom *);
 static void light_region(region *);
 static void maze1xy(coord *, int);
 static boolean sp_level_loader(dlb *, sp_lev *);
@@ -101,7 +101,7 @@ static struct monst *invent_carrying_monster = NULL;
 void
 solidify_map(void)
 {
-    xchar x, y;
+    coordxy x, y;
 
     for (x = 0; x < COLNO; x++) {
         for (y = 0; y < ROWNO; y++) {
@@ -254,7 +254,7 @@ opvar_new_int(long int i)
 }
 
 struct opvar *
-opvar_new_coord(int x, int y)
+opvar_new_coord(coordxy x, coordxy y)
 {
     struct opvar *tmpov = (struct opvar *)alloc(sizeof(struct opvar));
     if (!tmpov) panic("could not alloc opvar struct");
@@ -389,7 +389,7 @@ opvar_var_defined(struct sp_coder *coder, char *name)
 }
 
 struct opvar *
-splev_stack_getdat(struct sp_coder *coder, xchar typ)
+splev_stack_getdat(struct sp_coder *coder, coordxy typ)
 {
     if (coder && coder->stack) {
         struct opvar *tmp = splev_stack_pop(coder->stack);
@@ -860,9 +860,9 @@ flip_level_rnd(int flp)
  * Make walls of the area (x1, y1, x2, y2) non diggable/non passwall-able
  */
 static void
-set_wall_property(xchar x1, xchar y1, xchar x2, xchar y2, int prop)
+set_wall_property(coordxy x1, coordxy y1, coordxy x2, coordxy y2, int prop)
 {
-    xchar x, y;
+    coordxy x, y;
     struct rm *lev;
 
     x1 = max(x1, 1);
@@ -898,7 +898,7 @@ shuffle_alignments(void)
 static void
 count_features(void)
 {
-    xchar x, y;
+    coordxy x, y;
 
     level.flags.nfountains = level.flags.nsinks = 0;
     for (y = 0; y < ROWNO; y++)
@@ -919,7 +919,7 @@ remove_boundary_syms(void)
      * are laid out.  CROSSWALLS are used to specify "invisible"
      * boundaries where DOOR syms look bad or aren't desirable.
      */
-    xchar x, y;
+    coordxy x, y;
     boolean has_bounds = FALSE;
 
     for (x = 0; x < COLNO-1; x++)
@@ -938,7 +938,7 @@ remove_boundary_syms(void)
 }
 /* used by sel_set_door() and link_doors_rooms() */
 static void
-set_door_orientation(int x, int y)
+set_door_orientation(coordxy x, coordxy y)
 {
     boolean wleft, wright, wup, wdown;
 
@@ -984,7 +984,7 @@ set_door_orientation(int x, int y)
 }
 
 static void
-maybe_add_door(int x, int y, struct mkroom *droom)
+maybe_add_door(coordxy x, coordxy y, struct mkroom *droom)
 {
     if (droom->hx >= 0 && doorindex < DOORMAX && inside_room(droom, x, y)) {
         int i;
@@ -1087,7 +1087,10 @@ rndtrap(void)
 static boolean is_ok_location(schar, schar, int);
 
 static void
-get_location(schar *x, schar *y, int humidity, struct mkroom *croom)
+get_location(
+    coordxy *x, coordxy *y,
+    int humidity,
+    struct mkroom *croom)
 {
     int cpt = 0;
     int mx, my, sx, sy;
@@ -1194,7 +1197,11 @@ get_unpacked_coord(long int loc, int defhumidity)
 }
 
 static void
-get_location_coord(schar *x, schar *y, int humidity, struct mkroom *croom, long int crd)
+get_location_coord(
+    coordxy *x, coordxy *y,
+    int humidity,
+    struct mkroom *croom,
+    long crd)
 {
     unpacked_coord c;
 
@@ -1213,7 +1220,7 @@ get_location_coord(schar *x, schar *y, int humidity, struct mkroom *croom, long 
  */
 
 static void
-get_room_loc(schar *x, schar *y, struct mkroom *croom)
+get_room_loc(coordxy *x, coordxy *y, struct mkroom *croom)
 {
     coord c;
 
@@ -1239,9 +1246,12 @@ get_room_loc(schar *x, schar *y, struct mkroom *croom)
  */
 
 static void
-get_free_room_loc(schar *x, schar *y, struct mkroom *croom, long int pos)
+get_free_room_loc(
+    coordxy *x, coordxy *y,
+    struct mkroom *croom,
+    long int pos)
 {
-    schar try_x, try_y;
+    coordxy try_x, try_y;
     int trycnt = 0;
 
     get_location_coord(&try_x, &try_y, DRY, croom, pos);
@@ -1258,12 +1268,12 @@ get_free_room_loc(schar *x, schar *y, struct mkroom *croom, long int pos)
 }
 
 boolean
-check_room(xchar *lowx, xchar *ddx, xchar *lowy, xchar *ddy, boolean vault)
+check_room(coordxy *lowx, coordxy *ddx, coordxy *lowy, coordxy *ddy, boolean vault)
 {
     int x, y, hix = *lowx + *ddx, hiy = *lowy + *ddy;
     struct rm *lev;
     int xlim, ylim, ymax;
-    xchar s_lowx, s_ddx, s_lowy, s_ddy;
+    coordxy s_lowx, s_ddx, s_lowy, s_ddy;
 
     s_lowx = *lowx; s_ddx = *ddx;
     s_lowy = *lowy; s_ddy = *ddy;
@@ -1324,9 +1334,13 @@ chk:
  * This is still very incomplete...
  */
 boolean
-create_room(xchar x, xchar y, xchar w, xchar h, xchar xal, xchar yal, xchar rtype, xchar rlit)
+create_room(
+    coordxy x, coordxy y,
+    coordxy w, coordxy h,
+    coordxy xal, coordxy yal,
+    xint16 rtype, xint16 rlit)
 {
-    xchar xabs, yabs;
+    coordxy xabs, yabs;
     int wtmp, htmp, xaltmp, yaltmp, xtmp, ytmp;
     NhRect  *r1 = 0, r2;
     int trycnt = 0;
@@ -1355,7 +1369,7 @@ create_room(xchar x, xchar y, xchar w, xchar h, xchar xal, xchar yal, xchar rtyp
      * it up.
      */
     do {
-        xchar xborder, yborder;
+        coordxy xborder, yborder;
         wtmp = w; htmp = h;
         xtmp = x; ytmp = y;
         xaltmp = xal; yaltmp = yal;
@@ -1364,7 +1378,7 @@ create_room(xchar x, xchar y, xchar w, xchar h, xchar xal, xchar yal, xchar rtyp
 
         if((xtmp < 0 && ytmp <0 && wtmp < 0 && xaltmp < 0 &&
             yaltmp < 0) || vault) {
-            xchar hx, hy, lx, ly, dx, dy;
+            coordxy hx, hy, lx, ly, dx, dy;
             r1 = rnd_rect(); /* Get a random rectangle */
 
             if (!r1) { /* No more free rectangles ! */
@@ -1412,7 +1426,7 @@ create_room(xchar x, xchar y, xchar w, xchar h, xchar xal, xchar yal, xchar rtyp
             r2.hy = yabs + htmp;
         } else {    /* Only some parameters are random */
             int rndpos = 0;
-            xchar dx, dy;
+            coordxy dx, dy;
             if (xtmp < 0 && ytmp < 0) { /* Position is RANDOM */
                 xtmp = rnd(5);
                 ytmp = rnd(5);
@@ -1498,9 +1512,13 @@ create_room(xchar x, xchar y, xchar w, xchar h, xchar xal, xchar yal, xchar rtyp
  * x & y are relative to the parent room.
  */
 static boolean
-create_subroom(struct mkroom *proom, xchar x, xchar y, xchar w, xchar h, xchar rtype, xchar rlit)
+create_subroom(
+    struct mkroom *proom,
+    coordxy x, coordxy y,
+    coordxy w, coordxy h,
+    xint16 rtype, xint16 rlit)
 {
-    xchar width, height;
+    coordxy width, height;
 
     width = proom->hx - proom->lx + 1;
     height = proom->hy - proom->ly + 1;
@@ -1633,9 +1651,9 @@ redoloop:;
 void
 create_secret_door(
     struct mkroom *croom,
-    xchar walls) /**< any of W_NORTH | W_SOUTH | W_EAST | W_WEST (or W_ANY) */
+    coordxy walls) /**< any of W_NORTH | W_SOUTH | W_EAST | W_WEST (or W_ANY) */
 {
-    xchar sx, sy; /* location of the secret door */
+    coordxy sx, sy; /* location of the secret door */
     int count;
 
     for(count = 0; count < 100; count++) {
@@ -1674,7 +1692,7 @@ create_secret_door(
 static void
 create_trap(trap *t, struct mkroom *croom)
 {
-    schar x = -1, y = -1;
+    coordxy x = -1, y = -1;
     coord tm;
 
     if (croom)
@@ -1696,7 +1714,7 @@ create_trap(trap *t, struct mkroom *croom)
 static void
 spill_terrain(spill *sp, struct mkroom *croom)
 {
-    schar x, y, nx, ny, qx, qy;
+    coordxy x, y, nx, ny, qx, qy;
     int j, k, lastdir, guard;
     boolean found = FALSE;
 
@@ -1785,7 +1803,7 @@ noncoalignment(aligntyp alignment)
 
 /* attempt to screen out locations where a mimic-as-boulder shouldn't occur */
 static boolean
-m_bad_boulder_spot(int x, int y)
+m_bad_boulder_spot(coordxy x, coordxy y)
 {
     struct rm *lev;
 
@@ -1833,7 +1851,7 @@ static void
 create_monster(monster *m, struct mkroom *croom)
 {
     struct monst *mtmp;
-    schar x, y;
+    coordxy x, y;
     char class;
     aligntyp amask;
     coord cc;
@@ -2080,7 +2098,7 @@ static void
 create_object(object *o, struct mkroom *croom)
 {
     struct obj *otmp;
-    schar x, y;
+    coordxy x, y;
     char c;
     boolean named; /* has a name been supplied in level description? */
 
@@ -2315,7 +2333,8 @@ create_object(object *o, struct mkroom *croom)
 static void
 create_altar(altar *a, struct mkroom *croom)
 {
-    schar sproom, x = -1, y = -1;
+    schar sproom;
+    coordxy x = -1, y = -1;
     aligntyp amask;
     boolean croom_is_temple = TRUE;
     int oldtyp;
@@ -2369,7 +2388,7 @@ create_altar(altar *a, struct mkroom *croom)
 void
 replace_terrain(replaceterrain *terr, struct mkroom *croom)
 {
-    schar x, y, x1, y1, x2, y2;
+    coordxy x, y, x1, y1, x2, y2;
 
     if (terr->toter >= MAX_TYPE) return;
 
@@ -2391,7 +2410,10 @@ replace_terrain(replaceterrain *terr, struct mkroom *croom)
  * Search for a door in a room on a specified wall.
  */
 static boolean
-search_door(struct mkroom *croom, xchar *x, xchar *y, xchar wall, int cnt)
+search_door(
+    struct mkroom *croom,
+    coordxy *x, coordxy *y,
+    xint16 wall, int cnt)
 {
     int dx, dy;
     int xx, yy;
@@ -2708,7 +2730,7 @@ build_room(room *r, struct mkroom *mkr)
 {
     boolean okroom;
     struct mkroom   *aroom;
-    xchar rtype = (!r->chance || rn2(100) < r->chance) ? r->rtype : OROOM;
+    xint16 rtype = (!r->chance || rn2(100) < r->chance) ? r->rtype : OROOM;
 
     if(mkr) {
         aroom = &subrooms[nsubroom];
@@ -2812,7 +2834,7 @@ maze1xy(coord *m, int humidity)
     } while (!(x % 2) || !(y % 2) || !SpLev_Map[x][y] ||
              !is_ok_location((schar)x, (schar)y, humidity));
 
-    m->x = (xchar)x,  m->y = (xchar)y;
+    m->x = (coordxy)x,  m->y = (coordxy)y;
 }
 
 /*
@@ -2826,7 +2848,7 @@ static void
 fill_empty_maze(void)
 {
     int mapcountmax, mapcount, mapfact;
-    xchar x, y;
+    coordxy x, y;
     coord mm;
 
     mapcountmax = mapcount = (x_maze_max - 2) * (y_maze_max - 2);
@@ -3128,7 +3150,7 @@ spo_corefunc(struct sp_coder *coder, long int fn)
         struct opvar *obj;
         struct opvar *crd;
         int otyp;
-        schar ox, oy;
+        coordxy ox, oy;
         if (!OV_pop_c(crd) || !OV_pop_typ(obj, SPOVAR_OBJ)) {
             impossible("No coord and obj for obj_at()");
             return;
@@ -3149,7 +3171,7 @@ spo_corefunc(struct sp_coder *coder, long int fn)
         long rv = 0;
         struct opvar *mon;
         struct opvar *crd;
-        schar ox, oy;
+        coordxy ox, oy;
         if (!OV_pop_c(crd) || !OV_pop_typ(mon, SPOVAR_MONST)) {
             impossible("No coord and mon for mon_at()");
             return;
@@ -3780,7 +3802,7 @@ void
 spo_engraving(struct sp_coder *coder)
 {
     struct opvar *etyp, *txt, *coord;
-    xchar x, y;
+    coordxy x, y;
 
     if (!OV_pop_i(etyp) ||
         !OV_pop_s(txt) ||
@@ -3904,7 +3926,7 @@ spo_endroom(struct sp_coder *coder)
 void
 spo_stair(struct sp_coder *coder)
 {
-    xchar x, y;
+    coordxy x, y;
     struct opvar *up, *coord;
     struct trap *badtrap;
 
@@ -3925,7 +3947,7 @@ spo_stair(struct sp_coder *coder)
 void
 spo_ladder(struct sp_coder *coder)
 {
-    xchar x, y;
+    coordxy x, y;
     struct opvar *up, *coord;
 
     if (!OV_pop_i(up) ||
@@ -3950,7 +3972,7 @@ void
 spo_grave(struct sp_coder *coder)
 {
     struct opvar *coord, *typ, *txt;
-    schar x, y;
+    coordxy x, y;
     if (!OV_pop_i(typ) ||
         !OV_pop_s(txt) ||
         !OV_pop_c(coord)) return;
@@ -3996,7 +4018,7 @@ void
 spo_wallwalk(struct sp_coder *coder)
 {
     struct opvar *coord, *fgtyp, *bgtyp, *chance;
-    xchar x, y;
+    coordxy x, y;
 
     if (!OV_pop_i(chance) ||
         !OV_pop_typ(bgtyp, SPOVAR_MAPCHAR) ||
@@ -4038,7 +4060,7 @@ void
 spo_gold(struct sp_coder *coder)
 {
     struct opvar *coord, *amt;
-    schar x, y;
+    coordxy x, y;
     long amount;
 
     if (!OV_pop_c(coord) || !OV_pop_i(amt)) return;
@@ -4099,8 +4121,8 @@ selection_opvar(char *nbuf)
     return ov;
 }
 
-xchar
-selection_getpoint(int x, int y, struct opvar *ov)
+coordxy
+selection_getpoint(coordxy x, coordxy y, struct opvar *ov)
 {
     if (!ov || ov->spovartyp != SPOVAR_SEL) return 0;
     if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO) return 0;
@@ -4109,7 +4131,7 @@ selection_getpoint(int x, int y, struct opvar *ov)
 }
 
 void
-selection_setpoint(int x, int y, struct opvar *ov, char c)
+selection_setpoint(coordxy x, coordxy y, struct opvar *ov, char c)
 {
     if (!ov || ov->spovartyp != SPOVAR_SEL) return;
     if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO) return;
@@ -4166,7 +4188,7 @@ selection_filter_mapchar(struct opvar *ov, struct opvar *mc)
 {
     int x, y;
     schar mapc;
-    xchar lit;
+    coordxy lit;
     struct opvar *ret = selection_opvar(NULL);
 
     if (!ov || !mc || !ret) return NULL;
@@ -4261,23 +4283,23 @@ selection_do_grow(struct opvar *ov, int dir)
             if (tmp[x][y]) selection_setpoint(x, y, ov, 1);
 }
 
-static int (*selection_flood_check_func)(int, int);
+static int (*selection_flood_check_func)(coordxy, coordxy);
 static schar floodfillchk_match_under_typ;
 
 void
-set_selection_floodfillchk(int (*f) (int, int))
+set_selection_floodfillchk(int (*f) (coordxy, coordxy))
 {
     selection_flood_check_func = f;
 }
 
 static int
-floodfillchk_match_under(int x, int y)
+floodfillchk_match_under(coordxy x, coordxy y)
 {
     return (floodfillchk_match_under_typ == levl[x][y].typ);
 }
 
 static int
-floodfillchk_match_accessible(int x, int y)
+floodfillchk_match_accessible(coordxy x, coordxy y)
 {
     return (ACCESSIBLE(levl[x][y].typ) ||
             levl[x][y].typ == SDOOR ||
@@ -4286,9 +4308,9 @@ floodfillchk_match_accessible(int x, int y)
 
 /* check whethere <x,y> is already in xs[],ys[] */
 static boolean
-sel_flood_havepoint(int x, int y, xchar *xs, xchar *ys, int n)
+sel_flood_havepoint(coordxy x, coordxy y, coordxy *xs, coordxy *ys, int n)
 {
-    xchar xx = (xchar) x, yy = (xchar) y;
+    coordxy xx = (coordxy) x, yy = (coordxy) y;
 
     while (n > 0) {
         --n;
@@ -4300,7 +4322,7 @@ sel_flood_havepoint(int x, int y, xchar *xs, xchar *ys, int n)
 }
 
 void
-selection_floodfill(struct opvar *ov, int x, int y, boolean diagonals)
+selection_floodfill(struct opvar *ov, coordxy x, coordxy y, boolean diagonals)
 {
     struct opvar *tmp = selection_opvar(NULL);
 #define SEL_FLOOD_STACK (COLNO*ROWNO)
@@ -4326,11 +4348,11 @@ selection_floodfill(struct opvar *ov, int x, int y, boolean diagonals)
 
     static const char floodfill_stack_overrun[] = "floodfill stack overrun";
     int idx = 0;
-    xchar dx[SEL_FLOOD_STACK];
-    xchar dy[SEL_FLOOD_STACK];
+    coordxy dx[SEL_FLOOD_STACK];
+    coordxy dy[SEL_FLOOD_STACK];
     schar under = levl[x][y].typ;
 
-    if (selection_flood_check_func == (int (*) (int, int)) 0) {
+    if (selection_flood_check_func == (int (*) (coordxy, coordxy)) 0) {
         opvar_free(tmp);
         return;
     }
@@ -4587,7 +4609,7 @@ selection_do_randline(schar x1, schar y1, schar x2, schar y2, schar rough, schar
 }
 
 void
-selection_iterate(struct opvar *ov, void (*func) (int, int, genericptr_t), genericptr_t arg)
+selection_iterate(struct opvar *ov, void (*func) (coordxy, coordxy, genericptr_t), genericptr_t arg)
 {
     int x, y;
     /* yes, this is very naive, but it's not _that_ expensive. */
@@ -4597,7 +4619,7 @@ selection_iterate(struct opvar *ov, void (*func) (int, int, genericptr_t), gener
 }
 
 void
-sel_set_ter(int x, int y, genericptr_t arg)
+sel_set_ter(coordxy x, coordxy y, genericptr_t arg)
 {
     if (levl[x][y].typ == STAIRS) {
         return;
@@ -4617,18 +4639,18 @@ sel_set_ter(int x, int y, genericptr_t arg)
 }
 
 void
-sel_set_feature(int x, int y, genericptr_t arg)
+sel_set_feature(coordxy x, coordxy y, genericptr_t arg)
 {
     if (IS_FURNITURE(levl[x][y].typ)) return;
     levl[x][y].typ = (*(int *)arg);
 }
 
 void
-sel_set_door(int dx, int dy, genericptr_t arg)
+sel_set_door(coordxy dx, coordxy dy, genericptr_t arg)
 {
-    xchar typ = (*(xchar *)arg);
-    xchar x = dx;
-    xchar y = dy;
+    coordxy typ = (*(coordxy *)arg);
+    coordxy x = dx;
+    coordxy y = dy;
 
     /*get_location(&x, &y, DRY, (struct mkroom *)0);*/
     if (!IS_DOOR(levl[x][y].typ) && levl[x][y].typ != SDOOR) {
@@ -4648,12 +4670,12 @@ void
 spo_door(struct sp_coder *coder)
 {
     struct opvar *msk, *sel;
-    xchar typ;
+    coordxy typ;
 
     if (!OV_pop_i(msk) ||
         !OV_pop_typ(sel, SPOVAR_SEL)) return;
 
-    typ = OV_i(msk) == -1 ? rnddoor() : (xchar)OV_i(msk);
+    typ = OV_i(msk) == -1 ? rnddoor() : (coordxy)OV_i(msk);
 
     selection_iterate(sel, sel_set_door, (genericptr_t)&typ);
 
@@ -4973,7 +4995,7 @@ void
 spo_region(struct sp_coder *coder)
 {
     struct opvar *rtype, *rlit, *flags, *area;
-    xchar dx1, dy1, dx2, dy2;
+    coordxy dx1, dy1, dx2, dy2;
     struct mkroom *troom;
     boolean prefilled, room_not_needed, irregular, joined;
 
@@ -5077,7 +5099,7 @@ spo_region(struct sp_coder *coder)
 void
 spo_drawbridge(struct sp_coder *coder)
 {
-    xchar x, y;
+    coordxy x, y;
     int dopen;
     struct opvar *dir, *db_open, *coord;
 
@@ -5102,7 +5124,7 @@ spo_drawbridge(struct sp_coder *coder)
 void
 spo_mazewalk(struct sp_coder *coder)
 {
-    xchar x, y;
+    coordxy x, y;
     struct opvar *ftyp, *fstocked, *fdir, *coord;
     int dir;
 
@@ -5171,7 +5193,7 @@ void
 spo_wall_property(struct sp_coder *coder)
 {
     struct opvar *r;
-    xchar dx1, dy1, dx2, dy2;
+    coordxy dx1, dy1, dx2, dy2;
     int wprop = (coder->opcode == SPO_NON_DIGGABLE) ? W_NONDIGGABLE : W_NONPASSWALL;
 
     if (!OV_pop_r(r)) return;
@@ -5215,7 +5237,7 @@ spo_room_door(struct sp_coder *coder)
 }
 
 void
-sel_set_wallify(int x, int y, void *arg UNUSED)
+sel_set_wallify(coordxy x, coordxy y, void *arg UNUSED)
 {
     wallify_map(x, y, x, y);
 }
@@ -5232,10 +5254,10 @@ spo_wallify(struct sp_coder *coder)
     case 0:
     {
         if (!OV_pop_r(r)) return;
-        dx1 = (xchar)SP_REGION_X1(OV_i(r));
-        dy1 = (xchar)SP_REGION_Y1(OV_i(r));
-        dx2 = (xchar)SP_REGION_X2(OV_i(r));
-        dy2 = (xchar)SP_REGION_Y2(OV_i(r));
+        dx1 = (coordxy)SP_REGION_X1(OV_i(r));
+        dy1 = (coordxy)SP_REGION_Y1(OV_i(r));
+        dx2 = (coordxy)SP_REGION_X2(OV_i(r));
+        dy2 = (coordxy)SP_REGION_Y2(OV_i(r));
         wallify_map(dx1 < 0 ? (xstart - 1) : dx1,
                     dy1 < 0 ? (ystart - 1) : dy1,
                     dx2 < 0 ? (xstart + xsize + 1) : dx2,
@@ -5258,8 +5280,8 @@ spo_map(struct sp_coder *coder)
 {
     mazepart tmpmazepart;
     struct opvar *mpxs, *mpys, *mpmap, *mpa, *mpkeepr, *mpzalign;
-    xchar halign, valign;
-    xchar tmpxstart, tmpystart, tmpxsize, tmpysize;
+    coordxy halign, valign;
+    coordxy tmpxstart, tmpystart, tmpxsize, tmpysize;
     int tryct = 0;
     unpacked_coord upc;
 
@@ -5338,13 +5360,13 @@ redo_maploc:
         xsize = COLNO-1;
         ysize = ROWNO;
     } else {
-        xchar x, y;
+        coordxy x, y;
         /* random vault should never overwrite anything */
         if (in_mk_rndvault) {
             boolean isokp = TRUE;
             for(y = ystart - 1; y < ystart+ysize + 1; y++)
                 for(x = xstart - 1; x < xstart+xsize + 1; x++) {
-                    xchar mptyp;
+                    coordxy mptyp;
                     if (!isok(x, y)) {
                         isokp = FALSE;
                     } else if (y < ystart || y >= (ystart+ysize) ||
@@ -5373,7 +5395,7 @@ redo_maploc:
         /* Load the map */
         for(y = ystart; y < ystart+ysize; y++)
             for(x = xstart; x < xstart+xsize; x++) {
-                xchar mptyp = (mpmap->vardata.str[(y-ystart) * xsize + (x-xstart)] - 1);
+                coordxy mptyp = (mpmap->vardata.str[(y-ystart) * xsize + (x-xstart)] - 1);
                 if (mptyp >= MAX_TYPE) continue;
                 levl[x][y].typ = mptyp;
                 levl[x][y].lit = FALSE;
@@ -6039,7 +6061,7 @@ sp_level_coder(sp_lev *lvl)
         {
             struct opvar *tmp;
             struct opvar *pt = selection_opvar(NULL);
-            schar x, y;
+            coordxy x, y;
             if (!OV_pop_c(tmp)) panic("no ter sel coord");
             get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(tmp));
             selection_setpoint(x, y, pt, 1);
@@ -6051,7 +6073,7 @@ sp_level_coder(sp_lev *lvl)
         case SPO_SEL_FILLRECT:
         {
             struct opvar *tmp, *pt = selection_opvar(NULL);
-            schar x, y, x1, y1, x2, y2;
+            coordxy x, y, x1, y1, x2, y2;
             if (!OV_pop_r(tmp)) panic("no ter sel region");
             x1 = min(SP_REGION_X1(OV_i(tmp)), SP_REGION_X2(OV_i(tmp)));
             y1 = min(SP_REGION_Y1(OV_i(tmp)), SP_REGION_Y2(OV_i(tmp)));
@@ -6084,7 +6106,7 @@ sp_level_coder(sp_lev *lvl)
         case SPO_SEL_LINE:
         {
             struct opvar *tmp = NULL, *tmp2 = NULL, *pt = selection_opvar(NULL);
-            schar x1, y1, x2, y2;
+            coordxy x1, y1, x2, y2;
             if (!OV_pop_c(tmp) || !OV_pop_c(tmp2)) panic("no ter sel linecoord");
             get_location_coord(&x1, &y1, ANY_LOC, coder->croom, OV_i(tmp));
             get_location_coord(&x2, &y2, ANY_LOC, coder->croom, OV_i(tmp2));
@@ -6101,7 +6123,7 @@ sp_level_coder(sp_lev *lvl)
         case SPO_SEL_RNDLINE:
         {
             struct opvar *tmp = NULL, *tmp2 = NULL, *tmp3 = NULL, *pt = selection_opvar(NULL);
-            schar x1, y1, x2, y2;
+            coordxy x1, y1, x2, y2;
             if (!OV_pop_i(tmp3) || !OV_pop_c(tmp) || !OV_pop_c(tmp2)) panic("no ter sel randline");
             get_location_coord(&x1, &y1, ANY_LOC, coder->croom, OV_i(tmp));
             get_location_coord(&x2, &y2, ANY_LOC, coder->croom, OV_i(tmp2));
@@ -6129,7 +6151,7 @@ sp_level_coder(sp_lev *lvl)
         case SPO_SEL_FLOOD:
         {
             struct opvar *tmp;
-            schar x, y;
+            coordxy x, y;
             if (!OV_pop_c(tmp)) panic("no ter sel flood coord");
             get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(tmp));
             if (isok(x, y)) {
@@ -6159,7 +6181,7 @@ sp_level_coder(sp_lev *lvl)
         {
             struct opvar *filled, *xaxis, *yaxis, *pt;
             struct opvar *sel = selection_opvar(NULL);
-            schar x, y;
+            coordxy x, y;
             if (!OV_pop_i(filled)) panic("no filled for ellipse");
             if (!OV_pop_i(yaxis)) panic("no yaxis for ellipse");
             if (!OV_pop_i(xaxis)) panic("no xaxis for ellipse");
@@ -6177,7 +6199,7 @@ sp_level_coder(sp_lev *lvl)
         {
             struct opvar *gtyp, *glim, *mind, *maxd, *coord, *coord2;
             struct opvar *sel;
-            schar x, y, x2, y2;
+            coordxy x, y, x2, y2;
             if (!OV_pop_i(gtyp)) panic("no gtyp for grad");
             if (!OV_pop_i(glim)) panic("no glim for grad");
             if (!OV_pop_c(coord2)) panic("no coord2 for grad");

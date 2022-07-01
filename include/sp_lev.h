@@ -302,7 +302,7 @@ enum corefuncs {
 struct splev_var {
     struct splev_var *next;
     char *name;
-    xchar svtyp; /* SPOVAR_foo */
+    coordxy svtyp; /* SPOVAR_foo */
     union {
         struct opvar *value;
         struct opvar **arrayvalues;
@@ -355,7 +355,7 @@ struct sp_coder {
 
 #define packed_coord long
 typedef struct {
-    xchar is_random;
+    xint16 is_random;
     long getloc_flags;
     int x, y;
 } unpacked_coord;
@@ -375,23 +375,24 @@ typedef union str_or_len {
 } Str_or_Len;
 
 typedef struct {
-    xchar init_style; /* one of LVLINIT_foo */
+    xint16 init_style; /* one of LVLINIT_foo */
     long flags;
     schar filling;
     boolean init_present, padding;
     char fg, bg;
     boolean smoothed, joined;
-    xchar lit, walled;
+    xint16 lit, walled;
     boolean icedpools;
 } lev_init;
 
 typedef struct {
-    xchar wall, pos, secret, mask;
+    xint16 wall, pos, secret, mask;
 } room_door;
 
 typedef struct {
     packed_coord coord;
-    xchar x, y, type;
+    coordxy x, y;
+    xint16 type;
 } trap;
 
 typedef struct {
@@ -399,7 +400,8 @@ typedef struct {
     short id;
     aligntyp align;
     packed_coord coord;
-    xchar x, y, class, appear;
+    coordxy x, y;
+    xint16 class, appear;
     schar peaceful, asleep;
     short female, invis, cancelled, revived, avenge, fleeing, blinded, paralyzed, stunned, confused;
     long seentraps;
@@ -411,7 +413,8 @@ typedef struct {
     int corpsenm;
     short id, spe;
     packed_coord coord;
-    xchar x, y, class, containment;
+    coordxy x, y;
+    xint16 class, containment;
     schar curse_state;
     int quan;
     short buried;
@@ -421,41 +424,42 @@ typedef struct {
 
 typedef struct {
     packed_coord coord;
-    xchar x, y;
+    coordxy x, y;
     aligntyp align;
-    xchar shrine;
+    xint16 shrine;
 } altar;
 
 typedef struct {
-    xchar x1, y1, x2, y2;
-    xchar rtype, rlit, rirreg;
+    coordxy x1, y1, x2, y2;
+    xint16 rtype, rlit, rirreg;
 } region;
 
 typedef struct {
-    xchar ter, tlit;
+    xint16 ter, tlit;
 } terrain;
 
 typedef struct {
-    xchar chance;
-    xchar x1, y1, x2, y2;
-    xchar fromter, toter, tolit;
+    coordxy chance;
+    coordxy x1, y1, x2, y2;
+    coordxy fromter, toter, tolit;
 } replaceterrain;
 
 /* values for rtype are defined in dungeon.h */
 typedef struct {
-    struct { xchar x1, y1, x2, y2; } inarea;
-    struct { xchar x1, y1, x2, y2; } delarea;
+    struct { coordxy x1, y1, x2, y2; } inarea;
+    struct { coordxy x1, y1, x2, y2; } delarea;
     boolean in_islev, del_islev;
-    xchar rtype, padding;
+    xint16 rtype, padding;
     Str_or_Len rname;
 } lev_region;
 
 typedef struct _room {
     Str_or_Len name;
     Str_or_Len parent;
-    xchar x, y, w, h;
-    xchar xalign, yalign;
-    xchar rtype, chance, rlit, filled, joined;
+    coordxy x, y;
+    xint16 w, h;
+    xint16 xalign, yalign;
+    xint16 rtype, chance, rlit, filled, joined;
 } room;
 
 typedef struct {
@@ -468,9 +472,9 @@ typedef struct {
 
 typedef struct {
     struct {
-        xchar room;
-        xchar wall;
-        xchar door;
+        xint16 room;
+        xint16 wall;
+        xint16 door;
     } src, dest;
 } corridor;
 
@@ -485,7 +489,7 @@ typedef struct {
 } sp_lev;
 
 typedef struct {
-    xchar x, y, direction, count, lit;
+    coordxy x, y, direction, count, lit;
     char typ;
 } spill;
 

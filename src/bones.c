@@ -85,7 +85,7 @@ resetobjs(struct obj *ochain, boolean restore)
             if (otmp->oclass == FOOD_CLASS && otmp->oeaten) {
                 struct obj *top;
                 char *p;
-                xchar ox, oy;
+                coordxy ox, oy;
 
                 for (top = otmp; top->where == OBJ_CONTAINED;
                      top = top->ocontainer)
@@ -257,7 +257,7 @@ sanitize_name(char *namebuf)
 
 /* called by savebones(); also by finish_paybill(shk.c) */
 void
-drop_upon_death(struct monst *mtmp, struct obj *cont, int x, int y)
+drop_upon_death(struct monst *mtmp, struct obj *cont, coordxy x, coordxy y)
                     /* monster if hero turned into one (other than ghost) */
                   /* container if hero is turned into a statue */
          

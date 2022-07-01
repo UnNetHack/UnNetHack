@@ -1232,7 +1232,7 @@ print_glyph(window, x, y, glyph)
                    port wants (symbol, font, color, attributes, ...there's
                    a 1-1 map between glyphs and distinct things on the map).
 */
-void mswin_print_glyph(winid wid,XCHAR_P x,XCHAR_P y,int glyph)
+void mswin_print_glyph(winid wid, coordxy x, coordxy y, int glyph)
 {
     logDebug("mswin_print_glyph(%d, %d, %d, %d)\n", wid, x, y, glyph);
 
@@ -1306,7 +1306,7 @@ int mswin_nhgetch()
 }
 
 /*
-int nh_poskey(int *x, int *y, int *mod)
+int nh_poskey(coordxy *x, coordxy *y, int *mod)
                 -- Returns a single character input from the user or a
                    a positioning event (perhaps from a mouse).  If the
                    return value is non-zero, a character was typed, else,
@@ -1320,7 +1320,7 @@ int nh_poskey(int *x, int *y, int *mod)
                    hardware supports.  If no mouse is supported, this
                    routine always returns a non-zero character.
 */
-int mswin_nh_poskey(int *x, int *y, int *mod)
+int mswin_nh_poskey(coordxy *x, coordxy *y, int *mod)
 {
 	PMSNHEvent event;
   	int key;

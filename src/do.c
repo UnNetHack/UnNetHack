@@ -20,7 +20,7 @@ static int wipeoff(void);
 static int menu_drop(int);
 static int currentlevel_rewrite(void);
 static void final_level(void);
-/* static boolean badspot(xchar,xchar); */
+/* static boolean badspot(coordxy,coordxy); */
 static boolean unique_item_check(void);
 static void levelport_monsters(void);
 
@@ -133,7 +133,7 @@ boulder_hits_pool(struct obj *otmp, int rx, int ry, boolean pushing)
  * away.
  */
 boolean
-flooreffects(struct obj *obj, int x, int y, const char *verb)
+flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
 {
     struct trap *t;
     struct monst *mtmp;
@@ -1257,7 +1257,7 @@ save_currentstate(void)
 /*
    static boolean
    badspot(x, y)
-   xchar x, y;
+   coordxy x, y;
    {
     return((levl[x][y].typ != ROOM && levl[x][y].typ != AIR &&
              levl[x][y].typ != CORR) || MON_AT(x, y));
@@ -1311,7 +1311,7 @@ void
 goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal)
 {
     int fd, l_idx;
-    xchar new_ledger;
+    xint16 new_ledger;
     boolean cant_go_back,
             up = (depth(newlevel) < depth(&u.uz)),
             newdungeon = (u.uz.dnum != newlevel->dnum),
@@ -1511,7 +1511,7 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
             } else {
                 if (newdungeon) {
                     if (Is_stronghold(&u.uz)) {
-                        xchar x, y;
+                        coordxy x, y;
                         int trycnt = 0;
 
                         do {
@@ -1958,7 +1958,7 @@ revive_corpse(struct obj *corpse)
 {
     struct monst *mtmp = 0, *mcarry;
     boolean is_uwep, chewed;
-    xchar where;
+    xint16 where;
     char cname[BUFSZ];
     struct obj *container = (struct obj *)0;
     int container_where = 0;

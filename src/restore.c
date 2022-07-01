@@ -30,7 +30,7 @@ static void freefruitchn(struct fruit *);
 static void ghostfruit(struct obj *);
 static boolean restgamestate(int, unsigned int *, unsigned int *);
 static void restlevelstate(unsigned int, unsigned int);
-static int restlevelfile(int, xchar);
+static int restlevelfile(int, xint8);
 static void reset_oattached_mids(boolean);
 
 /*
@@ -673,7 +673,7 @@ restlevelstate(unsigned int stuckid, unsigned int steedid)
 static int
 restlevelfile(
     int fd UNUSED, /**< fd used in MFLOPPY only */
-    xchar ltmp
+    xint8 ltmp
 )
 #if defined(macintosh) && (defined(__SC__) || defined(__MRC__))
 # pragma unused(fd)
@@ -737,7 +737,7 @@ int
 dorecover(int fd)
 {
     unsigned int stuckid = 0, steedid = 0;  /* not a */
-    xchar ltmp;
+    xint8 ltmp;
     int rtmp;
     struct obj *otmp;
 
@@ -746,7 +746,7 @@ dorecover(int fd)
 #endif
 
     restoring = TRUE;
-    getlev(fd, 0, (xchar)0, FALSE);
+    getlev(fd, 0, (xint8)0, FALSE);
     if (!restgamestate(fd, &stuckid, &steedid)) {
         display_nhwindow(WIN_MESSAGE, TRUE);
         savelev(-1, 0, FREE_SAVE);  /* discard current level */
@@ -825,7 +825,7 @@ dorecover(int fd)
 #ifdef STORE_PLNAME_IN_FILE
     mread(fd, (genericptr_t) plname, PL_NSIZ);
 #endif
-    getlev(fd, 0, (xchar)0, FALSE);
+    getlev(fd, 0, (xint8)0, FALSE);
     (void) close(fd);
 
     if (!wizard && !discover)
@@ -924,13 +924,13 @@ trickery(char *reason)
 }
 
 void
-getlev(int fd, int pid, xchar lev, boolean ghostly)
+getlev(int fd, int pid, xint8 lev, boolean ghostly)
 {
     struct trap *trap;
     struct monst *mtmp;
     branch *br;
     int hpid;
-    xchar dlvl;
+    xint8 dlvl;
     int x, y;
 #ifdef TOS
     short tlev;

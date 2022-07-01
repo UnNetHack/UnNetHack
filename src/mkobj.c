@@ -6,7 +6,7 @@
 static void mkbox_cnts(struct obj *);
 static unsigned nextoid(struct obj *, struct obj *);
 static void maybe_adjust_light(struct obj *, int);
-static void obj_timer_checks(struct obj *, xchar, xchar, int);
+static void obj_timer_checks(struct obj *, coordxy, coordxy, int);
 static void container_weight(struct obj *);
 static struct obj *save_mtraits(struct obj *, struct monst *);
 static void objlist_sanity(struct obj *, int, const char *);
@@ -204,7 +204,7 @@ free_omailcmd(struct obj *otmp)
 }
 
 struct obj *
-mkobj_at(char let, int x, int y, boolean artif)
+mkobj_at(char let, coordxy x, coordxy y, boolean artif)
 {
     struct obj *otmp;
 
@@ -214,7 +214,7 @@ mkobj_at(char let, int x, int y, boolean artif)
 }
 
 struct obj *
-mksobj_at(int otyp, int x, int y, boolean init, boolean artif)
+mksobj_at(int otyp, coordxy x, coordxy y, boolean init, boolean artif)
 {
     struct obj *otmp;
 
@@ -694,7 +694,7 @@ static const char *const alteration_verbs[] = {
 void
 costly_alteration(struct obj *obj, int alter_type)
 {
-    xchar ox, oy;
+    coordxy ox, oy;
     char objroom;
     boolean learn_bknown;
     const char *those, *them;
@@ -1256,7 +1256,7 @@ static void
 maybe_adjust_light(struct obj *obj, int old_range)
 {
     char buf[BUFSZ];
-    xchar ox, oy;
+    coordxy ox, oy;
     int new_range = arti_light_radius(obj), delta = new_range - old_range;
 
     /* radius of light emitting artifact varies by curse/bless state
@@ -1512,13 +1512,13 @@ static int treefruits[] = { APPLE, ORANGE, PEAR, BANANA, EUCALYPTUS_LEAF };
 
 /* called when a tree is kicked; never returns Null */
 struct obj *
-rnd_treefruit_at(int x, int y)
+rnd_treefruit_at(coordxy x, coordxy y)
 {
     return mksobj_at(treefruits[rn2(SIZE(treefruits))], x, y, TRUE, FALSE);
 }
 
 void
-rnd_treesticks_at(int x, int y)
+rnd_treesticks_at(coordxy x, coordxy y)
 {
     int num = rnd(3);
     while(num--)
@@ -1527,7 +1527,7 @@ rnd_treesticks_at(int x, int y)
 
 /* create a stack of N gold pieces; never returns Null */
 struct obj *
-mkgold(long int amount, int x, int y)
+mkgold(long int amount, coordxy x, coordxy y)
 {
     struct obj *gold = g_at(x, y);
 
@@ -1561,7 +1561,7 @@ mkgold(long int amount, int x, int y)
  * resurrection.
  */
 struct obj *
-mkcorpstat(int objtype, struct monst *mtmp, struct permonst *ptr, int x, int y, boolean init)
+mkcorpstat(int objtype, struct monst *mtmp, struct permonst *ptr, coordxy x, coordxy y, boolean init)
                 /* CORPSE or STATUE */
 
 
@@ -1701,7 +1701,7 @@ get_mtraits(struct obj *obj, boolean copyof)
 
 /* make an object named after someone listed in the scoreboard file */
 struct obj *
-mk_tt_object(int objtype, int x, int y)
+mk_tt_object(int objtype, coordxy x, coordxy y)
              /* CORPSE or STATUE */
 
 {
@@ -1722,7 +1722,7 @@ mk_tt_object(int objtype, int x, int y)
 /* make a new corpse or statue, uninitialized if a statue (i.e. no books);
    never returns Null */
 struct obj *
-mk_named_object(int objtype, struct permonst *ptr, int x, int y, const char *nm)
+mk_named_object(int objtype, struct permonst *ptr, coordxy x, coordxy y, const char *nm)
              /* CORPSE or STATUE */
 
 
@@ -1772,7 +1772,7 @@ is_rottable(struct obj *otmp)
 
 /* put the object at the given location */
 void
-place_object(struct obj *otmp, int x, int y)
+place_object(struct obj *otmp, coordxy x, coordxy y)
 {
     struct obj *otmp2 = level.objects[x][y];
 
@@ -1832,7 +1832,7 @@ place_object(struct obj *otmp, int x, int y)
  * Also used for starting ice effects too. [zap.c]
  */
 void
-obj_ice_effects(int x, int y, boolean do_buried)
+obj_ice_effects(coordxy x, coordxy y, boolean do_buried)
 {
     struct obj *otmp;
 
@@ -1877,7 +1877,7 @@ peek_at_iced_corpse_age(struct obj *otmp)
 static void
 obj_timer_checks(
     struct obj *otmp,
-    xchar x, xchar y,
+    coordxy x, coordxy y,
     int force) /**< 0 = no force so do checks, <0 = force off, >0 force on */
 {
     long tleft = 0L;
@@ -1947,8 +1947,8 @@ obj_timer_checks(
 void
 remove_object(struct obj *otmp)
 {
-    xchar x = otmp->ox;
-    xchar y = otmp->oy;
+    coordxy x = otmp->ox;
+    coordxy y = otmp->oy;
 
     if (otmp->where != OBJ_FLOOR)
         panic("remove_object: obj not on floor");
@@ -2817,7 +2817,7 @@ obj_nexto(struct obj *otmp)
  * reliably predict which one we want to 'find' first
  */
 struct obj *
-obj_nexto_xy(struct obj *obj, int x, int y, boolean recurs)
+obj_nexto_xy(struct obj *obj, coordxy x, coordxy y, boolean recurs)
 {
     struct obj *otmp;
     int fx, fy, ex, ey, otyp = obj->otyp;

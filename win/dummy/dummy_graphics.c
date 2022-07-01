@@ -456,7 +456,7 @@ print_glyph(window, x, y, glyph)
                    port wants (symbol, font, color, attributes, ...there's
                    a 1-1 map between glyphs and distinct things on the map).
 */
-void dummy_print_glyph(winid wid, xchar x, xchar y, int glyph, int bg_glyph)
+void dummy_print_glyph(winid wid, coordxy x, coordxy y, int glyph, int bg_glyph)
 {
     if (wid != -1) {
         dummy_printf("winid %d; x %d, y %d, glyph: %d, bg_glyph: %d\n", wid, x, y, glyph, bg_glyph);
@@ -516,7 +516,7 @@ int dummy_nhgetch(void)
 }
 
 /*
-int nh_poskey(int *x, int *y, int *mod)
+int nh_poskey(coordxy *x, coordxy *y, int *mod)
                 -- Returns a single character input from the user or a
                    a positioning event (perhaps from a mouse).  If the
                    return value is non-zero, a character was typed, else,
@@ -530,7 +530,7 @@ int nh_poskey(int *x, int *y, int *mod)
                    hardware supports.  If no mouse is supported, this
                    routine always returns a non-zero character.
 */
-int dummy_nh_poskey(int *x, int *y, int *mod)
+int dummy_nh_poskey(coordxy *x, coordxy *y, int *mod)
 {
     nhUse(x);
     nhUse(y);

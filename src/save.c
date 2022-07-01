@@ -36,7 +36,7 @@ static void savegamestate(int, int);
 void save_mongen_override(int, struct mon_gen_override *, int);
 void save_lvl_sounds(int, struct lvl_sounds *, int);
 #ifdef MFLOPPY
-static void savelev0(int, xchar, int);
+static void savelev0(int, xint8, int);
 static boolean swapout_oldest();
 static void copyfile(char *, char *);
 #endif /* MFLOPPY */
@@ -135,7 +135,7 @@ dosave0(void)
 {
     const char *fq_save;
     int fd, ofd;
-    xchar ltmp;
+    xint8 ltmp;
     d_level uz_save;
     char whynot[BUFSZ];
 
@@ -266,7 +266,7 @@ dosave0(void)
     u.ustuck = (struct monst *)0;
     u.usteed = (struct monst *)0;
 
-    for(ltmp = (xchar)1; ltmp <= maxledgerno(); ltmp++) {
+    for (ltmp = (xint8)1; ltmp <= maxledgerno(); ltmp++) {
         if (ltmp == ledger_no(&uz_save)) continue;
         if (!(level_info[ltmp].flags & LFILE_EXISTS)) continue;
 #ifdef MICRO
@@ -450,7 +450,7 @@ savestateinlock(void)
 boolean
 savelev(fd, lev, mode)
 int fd;
-xchar lev;
+xint8 lev;
 int mode;
 {
     if (mode & COUNT_SAVE) {
@@ -481,7 +481,7 @@ static void
 savelev0(fd, lev, mode)
 #else
 void
-savelev(int fd, xchar lev, int mode)
+savelev(int fd, xint8 lev, int mode)
 #endif
 
 

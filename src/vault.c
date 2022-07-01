@@ -4,11 +4,11 @@
 #include "hack.h"
 
 static boolean clear_fcorr(struct monst *, boolean);
-static void blackout(int, int);
+static void blackout(coordxy, coordxy);
 static void restfakecorr(struct monst *);
 static void parkguard(struct monst *);
-static boolean in_fcorridor(struct monst *, int, int);
-static boolean find_guard_dest(struct monst *, xchar *, xchar *);
+static boolean in_fcorridor(struct monst *, coordxy, coordxy);
+static boolean find_guard_dest(struct monst *, coordxy *, coordxy *);
 static void move_gold(struct obj *, int);
 static void wallify_vault(struct monst *);
 static void gd_mv_monaway(struct monst *, int, int);
@@ -121,7 +121,7 @@ clear_fcorr(struct monst *grd, boolean forceshow)
    the corridor, we don't want the light to reappear if/when a new tunnel
    goes through the same area */
 static void
-blackout(int x, int y)
+blackout(coordxy x, coordxy y)
 {
     struct rm *lev;
     int i, j;
@@ -192,7 +192,7 @@ grddead(struct monst *grd)
 }
 
 static boolean
-in_fcorridor(struct monst *grd, int x, int y)
+in_fcorridor(struct monst *grd, coordxy x, coordxy y)
 {
     int fci;
     struct egd *egrd = EGD(grd);
@@ -268,7 +268,7 @@ uleftvault(struct monst *grd)
 }
 
 static boolean
-find_guard_dest(struct monst *guard, xchar *rx, xchar *ry)
+find_guard_dest(struct monst *guard, coordxy *rx, coordxy *ry)
 {
     int x, y, dd, lx = 0, ly = 0;
 
@@ -322,7 +322,7 @@ invault(void)
         /* if time ok and no guard now. */
         char buf[BUFSZ];
         int x, y, gx, gy;
-        xchar rx, ry;
+        coordxy rx, ry;
         long umoney;
 
         /* first find the goal for the guard */
@@ -524,8 +524,8 @@ invault(void)
             EGD(guard)->fakecorr[0].ftyp = levl[x][y].typ;
         } else { /* the initial guard location is a dug door */
             int vlt = EGD(guard)->vroom;
-            xchar lowx = rooms[vlt].lx, hix = rooms[vlt].hx;
-            xchar lowy = rooms[vlt].ly, hiy = rooms[vlt].hy;
+            coordxy lowx = rooms[vlt].lx, hix = rooms[vlt].hx;
+            coordxy lowy = rooms[vlt].ly, hiy = rooms[vlt].hy;
 
             if(x == lowx-1 && y == lowy-1)
                 EGD(guard)->fakecorr[0].ftyp = TLCORNER;
@@ -551,7 +551,7 @@ invault(void)
 static void
 move_gold(struct obj *gold, int vroom)
 {
-    xchar nx, ny;
+    coordxy nx, ny;
 
     remove_object(gold);
     newsym(gold->ox, gold->oy);
@@ -568,7 +568,7 @@ wallify_vault(struct monst *grd)
     int x, y, typ;
     int vlt = EGD(grd)->vroom;
     char tmp_viz;
-    xchar lox = rooms[vlt].lx - 1, hix = rooms[vlt].hx + 1,
+    coordxy lox = rooms[vlt].lx - 1, hix = rooms[vlt].hx + 1,
           loy = rooms[vlt].ly - 1, hiy = rooms[vlt].hy + 1;
     struct monst *mon;
     struct obj *gold;
@@ -669,7 +669,7 @@ gd_pick_corridor_gold(struct monst *grd, int goldx, int goldy)
         gdelta = distu(guardx, guardy);
         if (gdelta > 2 && see_it) { /* skip if player won't see it */
             bestdelta = gdelta;
-            bestcc.x = (xchar) guardx, bestcc.y = (xchar) guardy;
+            bestcc.x = (coordxy) guardx, bestcc.y = (coordxy) guardy;
             tryct = 9;
             do {
                 /* pick an available spot nearest the hero and also try

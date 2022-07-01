@@ -564,7 +564,7 @@ use_magic_whistle(struct obj *obj)
 }
 
 boolean
-um_dist(xchar x, xchar y, xchar n)
+um_dist(coordxy x, coordxy y, xint16 n)
 {
     return((boolean)(abs(u.ux - x) > n  || abs(u.uy - y) > n));
 }
@@ -772,7 +772,7 @@ next_to_u(void)
 }
 
 void
-check_leash(xchar x, xchar y)
+check_leash(coordxy x, coordxy y)
 {
     struct obj *otmp;
     struct monst *mtmp;
@@ -1280,7 +1280,7 @@ snuff_candle(struct obj *otmp)
     if ((candle || otmp->otyp == CANDELABRUM_OF_INVOCATION) &&
         otmp->lamplit) {
         char buf[BUFSZ];
-        xchar x, y;
+        coordxy x, y;
         boolean many = candle ? otmp->quan > 1L : otmp->spe > 1;
 
         (void) get_obj_location(otmp, &x, &y, 0);
@@ -1301,7 +1301,7 @@ snuff_candle(struct obj *otmp)
 boolean
 snuff_lit(struct obj *obj)
 {
-    xchar x, y;
+    coordxy x, y;
 
     if (obj->lamplit) {
         if (obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP ||
@@ -1322,7 +1322,7 @@ snuff_lit(struct obj *obj)
 boolean
 catch_lit(struct obj *obj)
 {
-    xchar x, y;
+    coordxy x, y;
 
     if (!obj->lamplit && (obj->otyp == MAGIC_LAMP || ignitable(obj))) {
         if ((obj->otyp == MAGIC_LAMP ||
@@ -1535,7 +1535,7 @@ enum jump_trajectory {
 
 /* callback routine for walk_path() */
 static boolean
-check_jump(void *arg, int x, int y)
+check_jump(void *arg, coordxy x, coordxy y)
 {
     int traj = *(int *) arg;
     struct rm *lev = &levl[x][y];
@@ -1571,7 +1571,7 @@ check_jump(void *arg, int x, int y)
 }
 
 static boolean
-is_valid_jump_pos(int x, int y, int magic, boolean showmsg)
+is_valid_jump_pos(coordxy x, coordxy y, int magic, boolean showmsg)
 {
     if (!magic && !(HJumping & ~INTRINSIC) && !EJumping && distu(x, y) != 5) {
         /* The Knight jumping restriction still applies when riding a
@@ -1648,7 +1648,7 @@ is_valid_jump_pos(int x, int y, int magic, boolean showmsg)
 static int jumping_is_magic;
 
 static boolean
-get_valid_jump_position(int x, int y)
+get_valid_jump_position(coordxy x, coordxy y)
 {
     return (isok(x, y) &&
             (ACCESSIBLE(levl[x][y].typ) || Passes_walls) &&
@@ -2200,7 +2200,7 @@ fig_transform(anything *arg, long int timeout)
 static boolean
 figurine_location_checks(struct obj *obj, coord *cc, boolean quietly)
 {
-    xchar x, y;
+    coordxy x, y;
 
     if (carried(obj) && u.uswallow) {
         if (!quietly)
@@ -2234,7 +2234,7 @@ static void
 use_figurine(struct obj **optr)
 {
     struct obj *obj = *optr;
-    xchar x, y;
+    coordxy x, y;
     coord cc;
 
     if (u.uswallow) {
@@ -2328,7 +2328,7 @@ use_grease(struct obj *obj)
 
 static struct trapinfo {
     struct obj *tobj;
-    xchar tx, ty;
+    coordxy tx, ty;
     int time_needed;
     boolean force_bungle;
 } trapinfo;
@@ -2924,7 +2924,7 @@ static int polearm_range_min = -1;
 static int polearm_range_max = -1;
 
 static boolean
-get_valid_polearm_position(int x, int y)
+get_valid_polearm_position(coordxy x, coordxy y)
 {
     return (isok(x, y) &&
             ACCESSIBLE(levl[x][y].typ) &&
@@ -3687,7 +3687,7 @@ do_flip_coin(struct obj *obj)
         ((ACURR(A_DEX) + Luck) > 0) && rn2((ACURR(A_DEX) + Luck))) {
         /* coin flipping is independent of other random
            functions, so use rand() intentionally here */
-        xchar ht = rand() % 2;
+        coordxy ht = rand() % 2;
         if (!Hallucination) {
             pline("%s.", ht ? "Heads" : "Tails");
         } else {

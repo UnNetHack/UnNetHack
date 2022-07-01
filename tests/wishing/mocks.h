@@ -39,7 +39,7 @@ void verbalize(const char *str, ...) {}
 void panic(const char *str,...) {}
 void nh_terminate(int status) { exit(0); }
 void docrt() {}
-int isok(int x, int y) { return 1; }
+int isok(coordxy x, coordxy y) { return 1; }
 
 int str2role(const char *str) { return 0; }
 int str2race(const char *str) { return 0; }
@@ -68,20 +68,20 @@ const char *align_str(aligntyp alignment) { return "unknown"; }
 
 const char* artifact_name(const char *name, short *typ) { return NULL; }
 void attach_egg_hatch_timeout(struct obj *obj, long i) {}
-void block_point(int x, int y) {}
-void unblock_point(int x, int y) {}
+void block_point(coordxy x, coordxy y) {}
+void unblock_point(coordxy x, coordxy y) {}
 const char* body_part(int typ) { return "body_part"; }
 int can_be_hatched(int typ) { return typ; }
 void consume_oeaten(struct obj *obj, int amount) {}
 boolean dead_species(int typ, boolean bool) { return FALSE; }
-void del_engr_at(int x, int y) {}
+void del_engr_at(coordxy x, coordxy y) {}
 void delete_contents(struct obj *obj) {}
 int genus(int typ, int number) { return 0; }
 boolean is_quest_artifact(struct obj *obj) { return FALSE; }
 void kill_egg(struct obj *obj) {}
-void make_grave(int x, int y, const char *engraving) {}
-struct trap* maketrap(int x, int y, int typ) { return NULL; }
-void newsym(int x, int y) {}
+void make_grave(coordxy x, coordxy y, const char *engraving) {}
+struct trap* maketrap(coordxy x, coordxy y, int typ) { return NULL; }
+void newsym(coordxy x, coordxy y) {}
 int title_to_mon(const char *str, int* number1, int* number2) { return NON_PM; }
 
 void obfree(struct obj *obj1, struct obj *obj2) {}
@@ -107,12 +107,12 @@ boolean confers_luck(struct obj *obj) { return FALSE; }
 boolean defends(int number1, struct obj *obj) { return FALSE; }
 boolean defends_when_carried(int i, struct obj *o) { return FALSE; }
 boolean protects(struct obj *o, boolean b) { return FALSE; }
-boolean undiscovered_artifact(xchar typ) { return FALSE; }
+boolean undiscovered_artifact(coordxy typ) { return FALSE; }
 boolean MATCH_WARN_OF_MON(struct monst *monst) { return FALSE; }
 
 void set_moreluck() {}
 
-boolean is_ice(int x, int y) { return FALSE; }
+boolean is_ice(coordxy x, coordxy y) { return FALSE; }
 
 void obj_no_longer_held(struct obj *obj) {}
 
@@ -121,15 +121,15 @@ struct obj* realloc_obj(struct obj *obj, int number1, genericptr_t generic, int 
 
 boolean In_quest(d_level *level) { return FALSE; }
 boolean In_hell(d_level *level) { return FALSE; }
-xchar level_difficulty() { return 1; }
+coordxy level_difficulty() { return 1; }
 
 int eaten_stat(int number1, struct obj *obj) { return 0; }
 
-char* in_rooms(xchar x, xchar y, int number) { return NULL; }
+char* in_rooms(coordxy x, coordxy y, int number) { return NULL; }
 
 int merged(struct obj **obj1, struct obj **obj2) { return 0; }
 const char* currency(long number) { return "currency"; }
-struct obj* g_at(int x, int y) { return NULL; }
+struct obj* g_at(coordxy x, coordxy y) { return NULL; }
 void freeinv(struct obj *obj) {}
 
 void del_light_source(int number, ANY_P *generic) {}
@@ -149,7 +149,7 @@ void addtobill(struct obj *obj, boolean bool1, boolean bool2, boolean bool3) {}
 void splitbill(struct obj *obj1, struct obj *obj2) {}
 void subfrombill(struct obj *obj, struct monst *monst) {}
 boolean is_fshk(struct monst *monst) { return FALSE; }
-boolean costly_spot(xchar x, xchar y) { return FALSE; }
+boolean costly_spot(coordxy x, coordxy y) { return FALSE; }
 long get_cost_of_shop_item(struct obj *obj) { return 0; }
 char* shk_your(char *buf, struct obj *obj) { return "shk_your"; }
 char* Shk_Your(char *buf, struct obj *obj) { return "Shk_Your"; }
@@ -169,7 +169,7 @@ boolean lava_effects() { return FALSE; }
 boolean swamp_effects() { return FALSE; }
 
 void drop_uswapwep() {}
-boolean get_obj_location(struct obj *obj, xchar *x, xchar *y, int number) { return FALSE; }
+boolean get_obj_location(struct obj *obj, coordxy *x, coordxy *y, int number) { return FALSE; }
 
 void copy_mextra(struct monst *m1, struct monst *m2) {}
 void dealloc_mextra(struct monst *m) {}
@@ -178,7 +178,7 @@ struct obj *hold_another_object(struct obj *o, const char *s1, const char *s2, c
 boolean can_reach_floor(boolean b) { return FALSE; }
 void hitfloor(struct obj *o, boolean b) {}
 void doaltarobj(struct obj *o) {}
-const char *surface(int i1, int i2) { return NULL; }
+const char *surface(coordxy i1, coordxy i2) { return NULL; }
 void dropy(struct obj *o) {}
 
 anything *obj_to_any(struct obj *o) { return NULL; }
@@ -198,8 +198,8 @@ struct obj *nxtobj(struct obj *o, int i, boolean b) { return NULL; }
 void obj_adjust_light_radius(struct obj *o, int i) {}
 int oid_price_adjustment(struct obj *o, unsigned i) { return 0; }
 void set_tin_variety(struct obj *o, int i) {}
-struct obj *sobj_at(int i1, int i2, int i3) { return NULL; }
-long stolen_value(struct obj *o, xchar c1, xchar c2, boolean b1, boolean b2) { return 0; }
+struct obj *sobj_at(int i1, coordxy i2, coordxy i3) { return NULL; }
+long stolen_value(struct obj *o, coordxy c1, coordxy c2, boolean b1, boolean b2) { return 0; }
 void update_mon_intrinsics(struct monst *m, struct obj *o, boolean b1, boolean b2) {}
 char *x_monnam(struct monst *m, int i1, const char *s, int i2, boolean b) { return NULL; }
 const char *safe_oname(struct obj *o) { return NULL; }
@@ -222,9 +222,9 @@ const char *glow_color(int i) { return NULL; }
 const char *glow_verb(int i, boolean b) { return NULL; }
 boolean restoring = FALSE;
 
-boolean is_pool(int i1, int i2) { return FALSE; }
-boolean is_lava(int i1, int i3) { return FALSE; }
-void feel_newsym(xchar x, xchar y) {}
+boolean is_pool(coordxy i1, coordxy i2) { return FALSE; }
+boolean is_lava(coordxy i1, coordxy i3) { return FALSE; }
+void feel_newsym(coordxy x, coordxy y) {}
 void reset_utrap(boolean b) {}
 
 boolean is_fainted() { return FALSE; }

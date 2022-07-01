@@ -12,12 +12,12 @@
 extern boolean known;   /* from read.c */
 
 static void do_dknown_of(struct obj *);
-static boolean check_map_spot(int, int, char, unsigned);
+static boolean check_map_spot(coordxy, coordxy, char, unsigned);
 static boolean clear_stale_map(char, unsigned);
-static void sense_trap(struct trap *, xchar, xchar, int);
-static void show_map_spot(int, int);
-static void findone(int, int, genericptr_t);
-static void openone(int, int, genericptr_t);
+static void sense_trap(struct trap *, coordxy, coordxy, int);
+static void show_map_spot(coordxy, coordxy);
+static void findone(coordxy, coordxy, genericptr_t);
+static void openone(coordxy, coordxy, genericptr_t);
 
 /* bring hero out from underwater or underground or being engulfed;
    return True iff any change occurred */
@@ -78,7 +78,7 @@ map_monst(struct monst *mtmp, boolean showtail)
 /* this is checking whether a trap symbol represents a trapped chest,
    not whether a trapped chest is actually present */
 boolean
-trapped_chest_at(int ttyp, int x, int y)
+trapped_chest_at(int ttyp, coordxy x, coordxy y)
 {
     struct monst *mtmp;
     struct obj *otmp;
@@ -132,7 +132,7 @@ trapped_chest_at(int ttyp, int x, int y)
 /* this is checking whether a trap symbol represents a trapped door,
    not whether the door here is actually trapped */
 boolean
-trapped_door_at(int ttyp, int x, int y)
+trapped_door_at(int ttyp, coordxy x, coordxy y)
 {
     struct rm *lev;
 
@@ -209,7 +209,7 @@ do_dknown_of(struct obj *obj)
 
 /* Check whether the location has an outdated object displayed on it. */
 static boolean
-check_map_spot(int x, int y, char oclass, unsigned int material)
+check_map_spot(coordxy x, coordxy y, char oclass, unsigned int material)
 {
     int glyph;
     struct obj *otmp;
@@ -817,7 +817,7 @@ monster_detect(
 }
 
 static void
-sense_trap(struct trap *trap, xchar x, xchar y, int src_cursed)
+sense_trap(struct trap *trap, coordxy x, coordxy y, int src_cursed)
 {
     if (Hallucination || src_cursed) {
         struct obj obj; /* fake object */
@@ -865,7 +865,7 @@ detect_obj_traps(
     int how) /**< 1 for misleading map feedback */
 {
     struct obj *otmp;
-    xchar x, y;
+    coordxy x, y;
     int result = OTRAP_NONE;
 
     /*
@@ -1170,7 +1170,7 @@ use_crystal_ball(struct obj **optr)
 }
 
 static void
-show_map_spot(int x, int y)
+show_map_spot(coordxy x, coordxy y)
 {
     struct rm *lev;
     struct trap *t;
@@ -1278,7 +1278,7 @@ cvt_sdoor_to_door(struct rm *lev)
 /* find something at one location; it should find all somethings there
    since it is used for magical detection rather than physical searching */
 static void
-findone(int zx, int zy, genericptr_t num)
+findone(coordxy zx, coordxy zy, genericptr_t num)
 {
     struct trap *ttmp;
     struct monst *mtmp;
@@ -1334,7 +1334,7 @@ findone(int zx, int zy, genericptr_t num)
 }
 
 static void
-openone(int zx, int zy, genericptr_t num)
+openone(coordxy zx, coordxy zy, genericptr_t num)
 {
     struct trap *ttmp;
     struct obj *otmp;
@@ -1416,7 +1416,7 @@ openit(void)
 
 /* callback hack for overriding vision in do_clear_area() */
 boolean
-detecting(void (*func) (int, int, void *))
+detecting(void (*func)(coordxy, coordxy, genericptr_t))
 {
     return (func == findone || func == openone);
 }
@@ -1506,9 +1506,9 @@ dosearch0(int aflag) /**< intrinsic autosearch vs explicit searching */
  #define GCC_BUG in *conf.h (or adding -DGCC_BUG to CFLAGS in the
    makefile).
  */
-    volatile xchar x, y;
+    volatile coordxy x, y;
 #else
-    xchar x, y;
+    coordxy x, y;
 #endif
     struct trap *trap;
     struct monst *mtmp;
@@ -1639,7 +1639,7 @@ sokoban_detect(void)
 }
 
 static int
-reveal_terrain_getglyph(int x, int y, int full, unsigned int swallowed, int default_glyph, int which_subset)
+reveal_terrain_getglyph(coordxy x, coordxy y, int full, unsigned int swallowed, int default_glyph, int which_subset)
 {
     int glyph, levl_glyph;
     uchar seenv;
