@@ -89,7 +89,7 @@ struct color_option {
 
 
 struct percent_color_option {
-    xchar statclrtype;
+    coordxy statclrtype;
     int percentage;
     struct color_option color_option;
     const struct percent_color_option *next;

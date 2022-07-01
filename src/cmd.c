@@ -207,7 +207,7 @@ static const char unavailcmd[] = "Unavailable command '%s'.";
 static const char cmdnotavail[] = "'%s' command not available.";
 
 static char here_cmd_menu(boolean);
-static char there_cmd_menu(boolean, int, int);
+static char there_cmd_menu(boolean, coordxy, coordxy);
 static char *parse(void);
 static boolean help_dir(char, uchar, const char *);
 static int dosuspend_core(void);
@@ -869,7 +869,7 @@ static int
 wiz_where(void)
 {
     if (wizard) {
-        (void) print_dungeon(FALSE, (schar *)0, (xchar *)0);
+        (void) print_dungeon(FALSE, (schar *)0, (xint16 *)0);
     } else {
         pline(unavailcmd, visctrl((int) cmd_from_func(wiz_where)));
     }
@@ -3857,9 +3857,9 @@ prefix_cmd(char c)
  * Returns non-zero if coordinates in cc are valid.
  */
 int
-get_adjacent_loc(const char *prompt, const char *emsg, xchar x, xchar y, coord *cc)
+get_adjacent_loc(const char *prompt, const char *emsg, coordxy x, coordxy y, coord *cc)
 {
-    xchar new_x, new_y;
+    coordxy new_x, new_y;
     if (!getdir(prompt)) {
         pline("%s", Never_mind);
         return 0;
@@ -4148,7 +4148,7 @@ directionname(int dir)
 }
 
 int
-isok(int x, int y)
+isok(coordxy x, coordxy y)
 {
     /* x corresponds to curx, so x==1 is the first column. Ach. %% */
     return x >= 1 && x <= COLNO-1 && y >= 0 && y <= ROWNO-1;
@@ -4196,7 +4196,7 @@ add_herecmd_menuitem(winid win, int (*func)(void), const char *text)
 }
 
 static char
-there_cmd_menu(boolean doit, int x, int y)
+there_cmd_menu(boolean doit, coordxy x, coordxy y)
 {
     winid win;
     char ch;
@@ -4393,7 +4393,7 @@ static NEARDATA int last_multi;
  * convert a MAP window position into a movecmd
  */
 const char *
-click_to_cmd(int x, int y, int mod)
+click_to_cmd(coordxy x, coordxy y, int mod)
 {
     int dir;
     static char cmd[4];
@@ -4714,7 +4714,8 @@ char
 readchar(void)
 {
     int sym;
-    int x = u.ux, y = u.uy, mod = 0;
+    coordxy x = u.ux, y = u.uy;
+    int mod = 0;
 
     if (iflags.debug_fuzzer) {
         return randomkey();
@@ -4771,7 +4772,7 @@ readchar(void)
 static int
 find_remembered_stairs(boolean upstairs, coord *cc)
 {
-    xchar x, y;
+    coordxy x, y;
     int stair, ladder, branch;
     if (upstairs) {
         stair = S_upstair;

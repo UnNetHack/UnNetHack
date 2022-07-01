@@ -77,7 +77,7 @@ static void display_cursor(struct xwindow *);
 void
 X11_print_glyph(window, x, y, glyph, bg_glyph)
     winid window;
-    xchar x, y;
+    coordxy x, y;
     int glyph;
     int bg_glyph UNUSED;
 {

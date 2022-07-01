@@ -21,9 +21,9 @@ struct RoleName {
 
 struct RoleAdvance {
     /* "fix" is the fixed amount, "rnd" is the random amount */
-    xchar infix, inrnd; /* at character initialization */
-    xchar lofix, lornd; /* gained per level <  urole.xlev */
-    xchar hifix, hirnd; /* gained per level >= urole.xlev */
+    xint16 infix, inrnd; /* at character initialization */
+    xint16 lofix, lornd; /* gained per level <  urole.xlev */
+    xint16 hifix, hirnd; /* gained per level >= urole.xlev */
 };
 
 struct u_have {
@@ -172,12 +172,12 @@ struct Role {
 #define ROLE_CHAOTIC    AM_CHAOTIC
 
     /*** Attributes (from attrib.c and exper.c) ***/
-    xchar attrbase[A_MAX];  /* lowest initial attributes */
-    xchar attrdist[A_MAX];  /* distribution of initial attributes */
+    xint16 attrbase[A_MAX];  /* lowest initial attributes */
+    xint16 attrdist[A_MAX];  /* distribution of initial attributes */
     struct RoleAdvance hpadv; /* hit point advancement */
     struct RoleAdvance enadv; /* energy advancement */
-    xchar xlev;     /* cutoff experience level */
-    xchar initrecord;   /* initial alignment record */
+    xint16 xlev;     /* cutoff experience level */
+    xint16 initrecord;   /* initial alignment record */
 
     /*** Spell statistics (from spell.c) ***/
     int spelbase;       /* base spellcasting penalty */
@@ -234,8 +234,8 @@ struct Race {
           hatemask;     /* bit mask of always hostile */
 
     /*** Attributes ***/
-    xchar attrmin[A_MAX];   /* minimum allowable attribute */
-    xchar attrmax[A_MAX];   /* maximum allowable attribute */
+    xint16 attrmin[A_MAX];   /* minimum allowable attribute */
+    xint16 attrmax[A_MAX];   /* maximum allowable attribute */
     struct RoleAdvance hpadv; /* hit point advancement */
     struct RoleAdvance enadv; /* energy advancement */
 #if 0   /* DEFERRED */
@@ -354,11 +354,11 @@ extern const struct Conduct conducts[];/* table of available roleplay conducts*/
 
 /*** Information about the player ***/
 struct you {
-    xchar ux, uy;
+    coordxy ux, uy;
     schar dx, dy, dz;   /* direction of move (or zap or ... ) */
     schar di;       /* direction of FF */
-    xchar tx, ty;       /* destination of travel */
-    xchar ux0, uy0;     /* initial position FF */
+    coordxy tx, ty;       /* destination of travel */
+    coordxy ux0, uy0;     /* initial position FF */
     d_level uz, uz0;    /* your level on this and the previous turn */
     d_level utolev;     /* level monster teleported you to, or uz */
     uchar utotype;      /* bitmask of goto_level() flags for utolev */
@@ -456,8 +456,8 @@ struct you {
     uchar uspmtime;          /* #moves between uspellprot-- */
     int uhp, uhpmax;
     int uen, uenmax;         /* magical energy - M. Stephenson */
-    xchar uhpinc[MAXULEV];   /* increases to uhpmax for each level gain */
-    xchar ueninc[MAXULEV];   /* increases to uenmax for each level gain */
+    xint16 uhpinc[MAXULEV];  /* increases to uhpmax for each level gain */
+    xint16 ueninc[MAXULEV];  /* increases to uenmax for each level gain */
     int ugangr;              /* if the gods are angry at you */
     int ugifts;              /* number of artifacts bestowed */
     int ublessed, ublesscnt; /* blessing/duration from #pray */
@@ -480,7 +480,7 @@ struct you {
 
     int weapon_slots;       /* unused skill slots */
     int skills_advanced;    /* # of advances made so far */
-    xchar skill_record[P_SKILL_LIMIT]; /* skill advancements */
+    xint16 skill_record[P_SKILL_LIMIT]; /* skill advancements */
     struct skills weapon_skills[P_NUM_SKILLS];
     boolean twoweap;        /* KMH -- Using two-weapon combat */
     boolean incloud;        /* used for blindness in stinking clouds */

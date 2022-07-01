@@ -1408,7 +1408,7 @@ lisp_nhgetch(void)
 }
 
 int
-lisp_nh_poskey(int *x, int *y, int *mod)
+lisp_nh_poskey(coordxy *x, coordxy *y, int *mod)
 {
     nhUse(x);
     nhUse(y);
@@ -1832,7 +1832,7 @@ lisp_update_positionbar(features)
 void
 lisp_print_glyph(
     winid window,
-    xchar x, xchar y,
+    coordxy x, coordxy y,
     int glyph,
     int bg_glyph UNUSED)
 {

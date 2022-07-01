@@ -24,20 +24,10 @@ typedef signed char schar;
 #define f()	f(void)
 #define CHAR_P char
 #define SCHAR_P schar
-#define UCHAR_P uchar
-#define XCHAR_P xchar
-#define SHORT_P short
-#define BOOLEAN_P boolean
-#define ALIGNTYP_P aligntyp
 typedef signed char	xchar;
 #include "wingem.h"
 #undef CHAR_P
 #undef SCHAR_P
-#undef UCHAR_P
-#undef XCHAR_P
-#undef SHORT_P
-#undef BOOLEAN_P
-#undef ALIGNTYP_P
 
 static char nullstr[]="",  md[]="NetHack 3.4.3", strCancel[]="Cancel", strOk[]="Ok", strText[]="Text";
 

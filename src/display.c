@@ -122,22 +122,22 @@
  */
 #include "hack.h"
 
-static void show_mon_or_warn(int, int, int);
-static void display_monster(xchar, xchar, struct monst *, int, xchar);
+static void show_mon_or_warn(coordxy, coordxy, int);
+static void display_monster(coordxy, coordxy, struct monst *, int, coordxy);
 static int swallow_to_glyph(int, int);
 static void display_warning(struct monst *);
 
-static int check_pos(int, int, int);
-static int get_bk_glyph(xchar, xchar);
-static int tether_glyph(int, int);
+static int check_pos(coordxy, coordxy, int);
+static int get_bk_glyph(coordxy, coordxy);
+static int tether_glyph(coordxy, coordxy);
 #ifdef WA_VERBOSE
 static boolean more_than_one(int, int, int, int, int);
 #endif
 static int set_twall(int, int, int, int, int, int, int, int);
-static int set_wall(int, int, int);
+static int set_wall(coordxy, coordxy, int);
 static int set_corn(int, int, int, int, int, int, int, int);
-static int set_crosswall(int, int);
-static void set_seenv(struct rm *, int, int, int, int);
+static int set_crosswall(coordxy, coordxy);
+static void set_seenv(struct rm *, int, int, coordxy, coordxy);
 static void t_warn(struct rm *);
 static int wall_angle(struct rm *);
 
@@ -155,7 +155,7 @@ is_safemon(struct monst *mon)
  * attention to and correct unexplored, lit ROOM and CORR spots.
  */
 void
-magic_map_background(xchar x, xchar y, int show)
+magic_map_background(coordxy x, coordxy y, int show)
 {
     int glyph = back_to_glyph(x, y); /* assumes hero can see x,y */
     struct rm *lev = &levl[x][y];
@@ -199,7 +199,7 @@ magic_map_background(xchar x, xchar y, int show)
  * the hero can physically see the location.  Update the screen if directed.
  */
 void
-map_background(xchar x, xchar y, int show)
+map_background(coordxy x, coordxy y, int show)
 {
     int glyph = back_to_glyph(x, y);
 
@@ -264,7 +264,7 @@ map_object(struct obj *obj, int show)
  * by newsym() if necessary.
  */
 void
-map_invisible(xchar x, xchar y)
+map_invisible(coordxy x, coordxy y)
 {
     assert_valid_coordinates(x, y);
 
@@ -276,7 +276,7 @@ map_invisible(xchar x, xchar y)
 }
 
 boolean
-unmap_invisible(int x, int y)
+unmap_invisible(coordxy x, coordxy y)
 {
     if (isok(x,y) && glyph_is_invisible(levl[x][y].glyph)) {
         unmap_object(x, y);
@@ -296,7 +296,7 @@ unmap_invisible(int x, int y)
  * to call newsym().
  */
 void
-unmap_object(int x, int y)
+unmap_object(coordxy x, coordxy y)
 {
     struct trap *trap;
 
@@ -326,7 +326,7 @@ unmap_object(int x, int y)
  * at location (x,y).
  */
 struct obj *
-vobj_at(int x, int y)
+vobj_at(coordxy x, coordxy y)
 {
     assert_valid_coordinates(x, y);
 
@@ -356,7 +356,7 @@ vobj_at(int x, int y)
     }
 
 void
-map_location(int x, int y, int show)
+map_location(coordxy x, coordxy y, int show)
 {
     assert_valid_coordinates(x, y);
     _map_location(x, y, show);
@@ -364,7 +364,7 @@ map_location(int x, int y, int show)
 
 /* display something on monster layer; may need to fixup object layer */
 static void
-show_mon_or_warn(int x, int y, int monglyph)
+show_mon_or_warn(coordxy x, coordxy y, int monglyph)
 {
     struct obj *o;
 
@@ -397,7 +397,7 @@ show_mon_or_warn(int x, int y, int monglyph)
  *
  */
 static void
-display_monster(xchar x, xchar y,    /**< display position */
+display_monster(coordxy x, coordxy y,    /**< display position */
                 struct monst *mon,   /**< monster to display */
                 int sightflags,      /**< 1 if the monster is physically seen;
                                           2 if detected using Detect_monsters */
@@ -557,7 +557,7 @@ warning_of(struct monst *mon)
  * When hero knows what happened to location, even when blind.
  */
 void
-feel_newsym(xchar x, xchar y)
+feel_newsym(coordxy x, coordxy y)
 {
     if (Blind) {
         feel_location(x, y);
@@ -577,7 +577,7 @@ feel_newsym(xchar x, xchar y)
  * searching only finds one monster per turn so we must check that separately.
  */
 void
-feel_location(xchar x, xchar y)
+feel_location(coordxy x, coordxy y)
 {
     struct rm *lev;
     struct obj *boulder;
@@ -744,12 +744,12 @@ feel_location(xchar x, xchar y)
  * Possibly put a new glyph at the given location.
  */
 void
-newsym(int x, int y)
+newsym(coordxy x, coordxy y)
 {
     struct monst *mon;
     struct rm *lev = &(levl[x][y]);
     int see_it;
-    xchar worm_tail;
+    coordxy worm_tail;
 
     if (in_mklev) return;
 
@@ -909,7 +909,7 @@ show_mem:
  * pulled into a platform dependent routine for fancier graphics if desired.
  */
 void
-shieldeff(xchar x, xchar y)
+shieldeff(coordxy x, coordxy y)
 {
     int i;
 
@@ -925,7 +925,7 @@ shieldeff(xchar x, xchar y)
 }
 
 static int
-tether_glyph(int x, int y)
+tether_glyph(coordxy x, coordxy y)
 {
     int tdx, tdy;
     tdx = u.ux - x;
@@ -970,7 +970,7 @@ static struct tmp_glyph {
 } tgfirst;
 
 void
-tmp_at(int x, int y)
+tmp_at(coordxy x, coordxy y)
 {
     static struct tmp_glyph *tglyph = (struct tmp_glyph *)0;
     struct tmp_glyph *tmp;
@@ -1101,7 +1101,7 @@ tmp_at(int x, int y)
  * meant to be at the location.
  */
 void
-flash_glyph_at(int x, int y, int tg, int rpt)
+flash_glyph_at(coordxy x, coordxy y, int tg, int rpt)
 {
     int i, glyph[2];
 
@@ -1129,7 +1129,7 @@ flash_glyph_at(int x, int y, int tg, int rpt)
 void
 swallowed(int first)
 {
-    static xchar lastx, lasty;  /* last swallowed position */
+    static coordxy lastx, lasty;  /* last swallowed position */
     int swallower, left_ok, rght_ok;
 
     if (first) {
@@ -1187,7 +1187,7 @@ swallowed(int first)
 void
 under_water(int mode)
 {
-    static xchar lastx, lasty;
+    static coordxy lastx, lasty;
     static boolean dela;
     int x, y;
 
@@ -1470,7 +1470,7 @@ redraw_map(void)
 /* Glyph Buffering (3rd screen) ============================================ */
 
 typedef struct {
-    xchar new;      /* perhaps move this bit into the rm strucure. */
+    coordxy new;      /* perhaps move this bit into the rm strucure. */
     int glyph;
 } gbuf_entry;
 
@@ -1482,7 +1482,7 @@ static char gbuf_stop[ROWNO];
  * between object piles and single objects, it doesn't mark the location
  * for update. */
 void
-newsym_force(int x, int y)
+newsym_force(coordxy x, coordxy y)
 {
     newsym(x,y);
     gbuf[y][x].new = 1;
@@ -1497,7 +1497,7 @@ newsym_force(int x, int y)
  * Store the glyph in the 3rd screen for later flushing.
  */
 void
-show_glyph(int x, int y, int glyph)
+show_glyph(coordxy x, coordxy y, int glyph)
 {
     /*
      * Check for bad positions and glyphs.
@@ -1914,7 +1914,7 @@ dump_screen(void)
  * variables.
  */
 int
-back_to_glyph(xchar x, xchar y)
+back_to_glyph(coordxy x, coordxy y)
 {
     assert_valid_coordinates(x, y);
 
@@ -2061,7 +2061,7 @@ zapdir_to_glyph(int dx, int dy, int beam_type)
  * structure, so we must check the "third screen".
  */
 int
-glyph_at(xchar x, xchar y)
+glyph_at(coordxy x, coordxy y)
 {
     if(x < 0 || y < 0 || x >= COLNO || y >= ROWNO)
         return cmap_to_glyph(S_room);       /* XXX */
@@ -2082,7 +2082,7 @@ glyph_at(xchar x, xchar y)
  */
 
 static int
-get_bk_glyph(xchar x, xchar y)
+get_bk_glyph(coordxy x, coordxy y)
 {
     assert_valid_coordinates(x, y);
 
@@ -2197,7 +2197,7 @@ int x, y, a, b, c, dd;
  * Things that are ambigious: lava
  */
 static int
-check_pos(int x, int y, int which)
+check_pos(coordxy x, coordxy y, int which)
 {
     int type;
     if (!isok(x, y)) return which;
@@ -2248,7 +2248,7 @@ set_twall(int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3)
 
 /* Return wall mode for a horizontal or vertical wall. */
 static int
-set_wall(int x, int y, int horiz)
+set_wall(coordxy x, coordxy y, int horiz)
 {
     int wmode, is_1, is_2;
 
@@ -2298,7 +2298,7 @@ set_corn(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
 
 /* Return mode for a crosswall. */
 static int
-set_crosswall(int x, int y)
+set_crosswall(coordxy x, coordxy y)
 {
     int wmode, is_1, is_2, is_3, is_4;
 
@@ -2418,7 +2418,7 @@ static void
 set_seenv(
     struct rm *lev,
     int x0, int y0, /**< from */
-    int x, int y)   /**<  to  */
+    coordxy x, coordxy y)   /**<  to  */
 {
     int dx = x-x0, dy = y0-y;
     lev->seenv |= seenv_matrix[sign(dy)+1][sign(dx)+1];

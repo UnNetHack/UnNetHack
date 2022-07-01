@@ -10,12 +10,12 @@
 /* worm segment structure */
 struct wseg {
     struct wseg *nseg;
-    xchar wx, wy;   /* the segment's position */
+    coordxy wx, wy;   /* the segment's position */
 };
 
 static void toss_wsegs(struct wseg *, boolean);
 static void shrink_worm(int);
-static void random_dir(xchar, xchar, xchar *, xchar *);
+static void random_dir(coordxy, coordxy, coordxy *, coordxy *);
 static struct wseg *create_worm_tail(int);
 
 /*  Description of long worm implementation.
@@ -327,7 +327,7 @@ cutoff(struct monst *worm, struct wseg *tail)
  *  that both halves will survive.
  */
 void
-cutworm(struct monst *worm, xchar x, xchar y, struct obj *weap)
+cutworm(struct monst *worm, coordxy x, coordxy y, struct obj *weap)
 {
     struct wseg  *curr, *new_tail;
     struct monst *new_worm;
@@ -494,8 +494,8 @@ save_worm(int fd, int mode)
             /* Save segment locations of the monster. */
             if (count) {
                 for (curr = wtails[i]; curr; curr = curr->nseg) {
-                    bwrite(fd, (genericptr_t) &(curr->wx), sizeof(xchar));
-                    bwrite(fd, (genericptr_t) &(curr->wy), sizeof(xchar));
+                    bwrite(fd, (genericptr_t) &(curr->wx), sizeof(coordxy));
+                    bwrite(fd, (genericptr_t) &(curr->wy), sizeof(coordxy));
                 }
             }
         }
@@ -538,8 +538,8 @@ rest_worm(int fd)
         for (curr = (struct wseg *) 0, j = 0; j < count; j++) {
             temp = newseg();
             temp->nseg = (struct wseg *) 0;
-            mread(fd, (genericptr_t) &(temp->wx), sizeof(xchar));
-            mread(fd, (genericptr_t) &(temp->wy), sizeof(xchar));
+            mread(fd, (genericptr_t) &(temp->wx), sizeof(coordxy));
+            mread(fd, (genericptr_t) &(temp->wy), sizeof(coordxy));
             if (curr)
                 curr->nseg = temp;
             else
@@ -567,8 +567,8 @@ place_wsegs(struct monst *worm, struct monst *oldworm)
     }
 
     while (curr != wheads[worm->wormno]) {
-        xchar x = curr->wx;
-        xchar y = curr->wy;
+        coordxy x = curr->wx;
+        coordxy y = curr->wy;
 
         if (oldworm) {
             if (m_at(x,y) == oldworm) {
@@ -647,12 +647,12 @@ remove_worm(struct monst *worm)
  *  be, if somehow the head is disjoint from the tail.
  */
 void
-place_worm_tail_randomly(struct monst *worm, xchar x, xchar y)
+place_worm_tail_randomly(struct monst *worm, coordxy x, coordxy y)
 {
     int wnum = worm->wormno;
     struct wseg *curr = wtails[wnum];
     struct wseg *new_tail;
-    xchar ox = x, oy = y;
+    coordxy ox = x, oy = y;
 
     if (!wnum) {
         warning("place_worm_tail_randomly: worm->wormno was 0");
@@ -671,7 +671,7 @@ place_worm_tail_randomly(struct monst *worm, xchar x, xchar y)
     new_tail->wy = y;
 
     while(curr)  {
-        xchar nx, ny;
+        coordxy nx, ny;
         char tryct = 0;
 
         /* pick a random direction from x, y and search for goodpos() */
@@ -704,7 +704,7 @@ place_worm_tail_randomly(struct monst *worm, xchar x, xchar y)
  * enexto() with a search radius.
  */
 static void
-random_dir(xchar x, xchar y, xchar *nx, xchar *ny)
+random_dir(coordxy x, coordxy y, coordxy *nx, coordxy *ny)
 {
     *nx = x;
     *ny = y;
@@ -866,14 +866,14 @@ worm_cross(int x1, int y1, int x2, int y2)
 
 /* construct an index number for a worm tail segment */
 int
-wseg_at(struct monst *worm, int x, int y)
+wseg_at(struct monst *worm, coordxy x, coordxy y)
 {
     int res = 0;
 
     if (worm && worm->wormno && m_at(x, y) == worm) {
         struct wseg *curr;
         int i, n;
-        xchar wx = (xchar) x, wy = (xchar) y;
+        coordxy wx = (coordxy) x, wy = (coordxy) y;
 
         for (i = 0, curr = wtails[worm->wormno]; curr; curr = curr->nseg) {
             if (curr->wx == wx && curr->wy == wy) {

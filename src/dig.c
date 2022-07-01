@@ -6,7 +6,7 @@
 static NEARDATA boolean did_dig_msg;
 
 static boolean rm_waslit(void);
-static void mkcavepos(xchar, xchar, int, boolean, boolean);
+static void mkcavepos(coordxy, coordxy, int, boolean, boolean);
 static void mkcavearea(boolean);
 static int dig(void);
 static int adj_pit_checks(coord *, char *);
@@ -34,7 +34,7 @@ enum dig_types {
 static boolean
 rm_waslit(void)
 {
-    xchar x, y;
+    coordxy x, y;
 
     if (levl[u.ux][u.uy].typ == ROOM && levl[u.ux][u.uy].waslit) {
         return TRUE;
@@ -53,7 +53,7 @@ rm_waslit(void)
  * immediately after the effect is complete.
  */
 static void
-mkcavepos(xchar x, xchar y, int dist, boolean waslit, boolean rockit)
+mkcavepos(coordxy x, coordxy y, int dist, boolean waslit, boolean rockit)
 {
     struct rm *lev;
 
@@ -105,9 +105,9 @@ static void
 mkcavearea(boolean rockit)
 {
     int dist;
-    xchar xmin = u.ux, xmax = u.ux;
-    xchar ymin = u.uy, ymax = u.uy;
-    xchar i;
+    coordxy xmin = u.ux, xmax = u.ux;
+    coordxy ymin = u.uy, ymax = u.uy;
+    coordxy i;
     boolean waslit = rm_waslit();
 
     if (rockit) {
@@ -155,7 +155,7 @@ mkcavearea(boolean rockit)
 
 /* When digging into location <x,y>, what are you actually digging into? */
 int
-dig_typ(struct obj *otmp, xchar x, xchar y)
+dig_typ(struct obj *otmp, coordxy x, coordxy y)
 {
     boolean ispick;
 
@@ -193,7 +193,7 @@ is_digging(void)
 #define BY_OBJECT   ((struct monst *)0)
 
 boolean
-dig_check(struct monst *madeby, boolean verbose, int x, int y)
+dig_check(struct monst *madeby, boolean verbose, coordxy x, coordxy y)
 {
     struct trap *ttmp = t_at(x, y);
     const char *verb = (madeby == BY_YOU && uwep && is_axe(uwep)) ? "chop" : "dig in";
@@ -267,7 +267,7 @@ static int
 dig(void)
 {
     struct rm *lev;
-    xchar dpx = digging.pos.x, dpy = digging.pos.y;
+    coordxy dpx = digging.pos.x, dpy = digging.pos.y;
     boolean ispick = uwep && is_pick(uwep);
     const char *verb = (!uwep || is_pick(uwep)) ? "dig into" : "chop through";
 
@@ -630,7 +630,7 @@ fillholetyp(
 }
 
 void
-digactualhole(int x, int y, struct monst *madeby, int ttyp)
+digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
 {
     struct obj *oldobjs, *newobjs;
     struct trap *ttmp;
@@ -665,7 +665,7 @@ digactualhole(int x, int y, struct monst *madeby, int ttyp)
 #endif
     } else if (lev->typ == DRAWBRIDGE_DOWN ||
                (is_drawbridge_wall(x, y) >= 0)) {
-        int bx = x, by = y;
+        coordxy bx = x, by = y;
         /* if under the portcullis, the bridge is adjacent */
         (void) find_drawbridge(&bx, &by);
         destroy_drawbridge(bx, by);
@@ -852,7 +852,7 @@ digactualhole(int x, int y, struct monst *madeby, int ttyp)
  * in apply.c.
  */
 void
-liquid_flow(xchar x, xchar y, schar typ, struct trap *ttmp, const char *fillmsg)
+liquid_flow(coordxy x, coordxy y, schar typ, struct trap *ttmp, const char *fillmsg)
 {
     boolean u_spot = (x == u.ux && y == u.uy);
 
@@ -882,7 +882,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
     struct rm *lev;
     struct obj *boulder_here;
     schar typ;
-    xchar dig_x, dig_y;
+    coordxy dig_x, dig_y;
     boolean nohole;
 
     if (!cc) {
@@ -923,7 +923,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
             pline_The("drawbridge seems too hard to dig through.");
             return FALSE;
         } else {
-            int x = dig_x, y = dig_y;
+            coordxy x = dig_x, y = dig_y;
             /* if under the portcullis, the bridge is adjacent */
             (void) find_drawbridge(&x, &y);
             destroy_drawbridge(x, y);
@@ -1031,7 +1031,7 @@ static void
 dig_up_grave(coord *cc, enum grave_type type)
 {
     struct obj *otmp;
-    xchar dig_x, dig_y;
+    coordxy dig_x, dig_y;
 
     if (!cc) {
         dig_x = u.ux;
@@ -1385,7 +1385,7 @@ use_pick_axe2(struct obj *obj)
  * zap == TRUE if wand/spell of digging, FALSE otherwise (chewing)
  */
 void
-watch_dig(struct monst *mtmp, xchar x, xchar y, boolean zap)
+watch_dig(struct monst *mtmp, coordxy x, coordxy y, boolean zap)
 {
     struct rm *lev = &levl[x][y];
 
@@ -2136,7 +2136,7 @@ bury_an_obj(
 }
 
 void
-bury_objs(int x, int y)
+bury_objs(coordxy x, coordxy y)
 {
     struct obj *otmp, *otmp2;
     struct monst *shkp;
@@ -2171,7 +2171,7 @@ bury_objs(int x, int y)
 
 /* move objects from buriedobjlist to fobj/nexthere lists */
 void
-unearth_objs(int x, int y)
+unearth_objs(coordxy x, coordxy y)
 {
     struct obj *otmp, *otmp2, *bball;
     coord cc;
@@ -2234,7 +2234,7 @@ rot_organic(anything *arg, long int timeout UNUSED)
 void
 rot_corpse(anything *arg, long int timeout UNUSED)
 {
-    xchar x = 0, y = 0;
+    coordxy x = 0, y = 0;
     struct obj *obj = arg->a_obj;
     boolean on_floor = obj->where == OBJ_FLOOR;
     boolean in_invent = obj->where == OBJ_INVENT;

@@ -5,7 +5,7 @@
 
 static int monmulti(struct monst *, struct obj *, struct obj *);
 static void monshoot(struct monst *, struct obj *, struct obj *);
-static int drop_throw(struct obj *, boolean, int, int);
+static int drop_throw(struct obj *, boolean, coordxy, coordxy);
 static boolean m_lined_up(struct monst *, struct monst *);
 
 #define URETREATING(x, y) (distmin(u.ux, u.uy, x, y) > distmin(u.ux0, u.uy0, x, y))
@@ -112,7 +112,7 @@ thitu(
  */
 
 static int
-drop_throw(struct obj *obj, boolean ohit, int x, int y)
+drop_throw(struct obj *obj, boolean ohit, coordxy x, coordxy y)
 {
     int retvalu = 1;
     int create;
@@ -490,7 +490,7 @@ ohitmon(
 void
 m_throw(
     struct monst *mon, /**< launching monster */
-    int x, int y, /**< launch point */
+    coordxy x, coordxy y, /**< launch point */
     int dx, int dy, /**< direction */
     int range, /**< maximum distance */
     struct obj *obj) /**< missile (or stack providing it) */
@@ -719,7 +719,7 @@ int
 thrwmm(struct monst *mtmp, struct monst *mtarg)
 {
     struct obj *otmp, *mwep;
-    xchar x, y;
+    coordxy x, y;
     boolean ispole;
 
     /* Polearms won't be applied by monsters against other monsters */
@@ -907,7 +907,7 @@ void
 thrwmu(struct monst *mtmp)
 {
     struct obj *otmp, *mwep;
-    xchar x, y;
+    coordxy x, y;
     const char *onm;
 
     /* Rearranged beginning so monsters can use polearms not in a line */
@@ -1061,10 +1061,10 @@ breamu(struct monst *mtmp, struct attack *mattk)         /* monster breathes at 
 
 boolean
 linedup(
-    xchar ax,
-    xchar ay,
-    xchar bx,
-    xchar by,
+    coordxy ax,
+    coordxy ay,
+    coordxy bx,
+    coordxy by,
     int boulderhandling) /**< 0=block, 1=ignore, 2=conditionally block */
 {
     int dx, dy, boulderspots;
@@ -1255,7 +1255,7 @@ hit_bars(struct obj **obj_p, int objx, int objy, int barsx, int barsy, boolean y
 }
 
 void
-dissolve_bars(int x, int y)
+dissolve_bars(coordxy x, coordxy y)
 {
     levl[x][y].typ = (Is_special(&u.uz) || *in_rooms(x, y, 0)) ? ROOM : CORR;
     levl[x][y].flags = 0;

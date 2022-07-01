@@ -54,7 +54,7 @@ extern char circle_start[];
 
 /* Create a new light source.  */
 void
-new_light_source(xchar x, xchar y, int range, int type, anything *id)
+new_light_source(coordxy x, coordxy y, int range, int type, anything *id)
 {
     light_source *ls;
 
@@ -207,7 +207,7 @@ do_light_sources(char **cs_rows)
    way to its destination; show its light so that hero has a chance to
    remember terrain, objects, and monsters being revealed */
 void
-show_transient_light(struct obj *obj, int x, int y)
+show_transient_light(struct obj *obj, coordxy x, coordxy y)
 {
     light_source *ls;
     struct monst *mon;
@@ -561,7 +561,7 @@ any_light_source(void)
  * only for burning light sources.
  */
 void
-snuff_light_source(int x, int y)
+snuff_light_source(coordxy x, coordxy y)
 {
     light_source *ls;
     struct obj *obj;

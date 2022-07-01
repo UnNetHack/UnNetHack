@@ -21,7 +21,7 @@
  *              @...X   +4
  *
  */
-char circle_data[] = {
+const coordxy circle_data[] = {
     /*  0*/ 1, 1,
     /*  2*/ 2, 2, 1,
     /*  5*/ 3, 3, 2, 1,
@@ -76,31 +76,31 @@ boolean vision_full_recalc = 0;
 /* Pointers to the current vision array. */
 char    **viz_array;
 #endif
-char    *viz_rmin, *viz_rmax;       /* current vision cs bounds */
+coordxy *viz_rmin, *viz_rmax;       /* current vision cs bounds */
 
 /*------ local variables ------*/
 
 static char could_see[2][ROWNO][COLNO]; /* vision work space */
 static char *cs_rows0[ROWNO], *cs_rows1[ROWNO];
-static char cs_rmin0[ROWNO],  cs_rmax0[ROWNO];
-static char cs_rmin1[ROWNO],  cs_rmax1[ROWNO];
+static coordxy cs_rmin0[ROWNO], cs_rmax0[ROWNO];
+static coordxy cs_rmin1[ROWNO], cs_rmax1[ROWNO];
 
 static char viz_clear[ROWNO][COLNO]; /* vision clear/blocked map */
 static char *viz_clear_rows[ROWNO];
 
-static char left_ptrs[ROWNO][COLNO]; /* LOS algorithm helpers */
-static char right_ptrs[ROWNO][COLNO];
+static coordxy left_ptrs[ROWNO][COLNO]; /* LOS algorithm helpers */
+static coordxy right_ptrs[ROWNO][COLNO];
 
 /* Forward declarations. */
 static void fill_point(int, int);
 static void dig_point(int, int);
 static void view_init(void);
-static void view_from(int, int, char **, char *, char *, int,
-                      void (*)(int, int, genericptr_t),
+static void view_from(coordxy, coordxy, char **, coordxy *, coordxy *, int,
+                      void (*)(coordxy, coordxy, genericptr_t),
                       genericptr_t);
-static void get_unused_cs(char ***, char **, char **);
+static void get_unused_cs(char ***, coordxy **, coordxy **);
 #ifdef REINCARNATION
-static void rogue_vision(char **, char *, char *);
+static void rogue_vision(char **, coordxy *, coordxy *);
 #endif
 
 /* Macro definitions that I can't find anywhere. */
@@ -153,7 +153,7 @@ vision_init(void)
  * sight.
  */
 int
-does_block(int x, int y, struct rm *lev)
+does_block(coordxy x, coordxy y, struct rm *lev)
 {
     struct obj   *obj;
     struct monst *mon;
@@ -253,10 +253,10 @@ vision_reset(void)
  * to the unused vision work area.
  */
 static void
-get_unused_cs(char ***rows, char **rmin, char **rmax)
+get_unused_cs(char ***rows, coordxy **rmin, coordxy **rmax)
 {
     int row;
-    char *nrmin, *nrmax;
+    coordxy *nrmin, *nrmax;
 
     if (viz_array == cs_rows0) {
         *rows = cs_rows1;
@@ -294,9 +294,7 @@ get_unused_cs(char ***rows, char **rmin, char **rmax)
  * due to the one-sided lit wall hack.
  */
 static void
-rogue_vision(char **next, char *rmin, char *rmax)
-                    /* could_see array pointers */
-
+rogue_vision(char **next, coordxy *rmin, coordxy *rmax) /* could_see array pointers */
 {
     int rnum = levl[u.ux][u.uy].roomno - ROOMOFFSET; /* no SHARED... */
     int start, stop, in_door, xhi, xlo, yhi, ylo;
@@ -491,9 +489,9 @@ vision_recalc(int control)
     char **next_array; /* points to the new vision array */
     char *next_row;    /* row pointer for the new array */
     char *old_row;     /* row pointer for the old array */
-    char *next_rmin;   /* min pointer for the new array */
-    char *next_rmax;   /* max pointer for the new array */
-    char *ranges;      /* circle ranges -- used for xray & night vision */
+    coordxy *next_rmin; /* min pointer for the new array */
+    coordxy *next_rmax; /* max pointer for the new array */
+    const coordxy *ranges; /* circle ranges -- used for xray & night vision */
     int row = 0;       /* row counter (outer loop)  */
     int start, stop;   /* inner loop starting/stopping index */
     int dx, dy;        /* one step from a lit door or lit wall (see below) */
@@ -532,7 +530,7 @@ vision_recalc(int control)
          *  + Monsters can see you even when you're in a pit.
          */
         view_from(u.uy, u.ux, next_array, next_rmin, next_rmax,
-                  0, (void (*)(int, int, genericptr_t)) 0, (genericptr_t)0);
+                  0, (void (*)(coordxy, coordxy, genericptr_t)) 0, (genericptr_t)0);
 
         /*
          * Our own version of the update loop below.  We know we can't see
@@ -601,7 +599,7 @@ vision_recalc(int control)
             }
         } else
             view_from(u.uy, u.ux, next_array, next_rmin, next_rmax,
-                      0, (void (*)(int, int, genericptr_t)) 0, (genericptr_t)0);
+                      0, (void (*)(coordxy, coordxy, genericptr_t)) 0, (genericptr_t)0);
 
         /*
          * Set the IN_SIGHT bit for xray and night vision.
@@ -810,7 +808,7 @@ skip:
         newsym(u.ux, u.uy); /* Make sure the hero shows up! */
 
     /* Set the new min and max pointers. */
-    viz_rmin  = next_rmin;
+    viz_rmin = next_rmin;
     viz_rmax = next_rmax;
 
     recalc_mapseen();
@@ -823,7 +821,7 @@ skip:
  * Make the location opaque to light.
  */
 void
-block_point(int x, int y)
+block_point(coordxy x, coordxy y)
 {
     fill_point(y, x);
 
@@ -845,7 +843,7 @@ block_point(int x, int y)
  * Make the location transparent to light.
  */
 void
-unblock_point(int x, int y)
+unblock_point(coordxy x, coordxy y)
 {
     dig_point(y, x);
 
@@ -1075,10 +1073,10 @@ static int start_row;
 static int start_col;
 static int step;
 static char **cs_rows;
-static char *cs_left;
-static char *cs_right;
+static coordxy *cs_left;
+static coordxy *cs_right;
 
-static void (*vis_func)(int, int, genericptr_t);
+static void (*vis_func)(coordxy, coordxy, genericptr_t);
 static genericptr_t varg;
 
 /*
@@ -1552,8 +1550,8 @@ cleardone:
 static close2d *close_dy[CLOSE_MAX_BC_DY];
 static far2d   *far_dy[FAR_MAX_BC_DY];
 
-static void right_side(int, int, int, int, int, int, int, char*);
-static void left_side(int, int, int, int, int, int, int, char*);
+static void right_side(int, int, int, int, int, int, int, coordxy *);
+static void left_side(int, int, int, int, int, int, int, coordxy *);
 static int close_shadow(int, int, int, int);
 static int far_shadow(int, int, int, int);
 
@@ -1657,7 +1655,7 @@ right_side(
     int fb_row, fb_col, /**< far block row and col */
     int left, /**< left mark of the previous row */
     int right_mark, /**< right mark of previous row */
-    char *limits) /**< points at range limit for current row, or NULL */
+    coordxy *limits) /**< points at range limit for current row, or NULL */
 {
     int i;
     char *rowp = NULL;
@@ -1665,9 +1663,9 @@ right_side(
     int left_shadow, right_shadow, loc_right;
     int lblock_col;         /* local block column (current row) */
     int nrow, deeper;
-    char *row_min = NULL; /* left most */
-    char *row_max = NULL; /* right most */
-    int lim_max;          /* right most limit of circle */
+    coordxy *row_min = NULL; /* left most */
+    coordxy *row_max = NULL; /* right most */
+    int lim_max; /* right most limit of circle */
 
     nrow    = row + step;
     deeper  = good_row(nrow) && (!limits || (*limits >= *(limits+1)));
@@ -1903,13 +1901,13 @@ right_side(
  * for blow by blow comments.
  */
 static void
-left_side(row, cb_row, cb_col, fb_row, fb_col, left_mark, right, limits)
-int row;            /* the current row */
-int cb_row, cb_col;     /* close block row and col */
-int fb_row, fb_col;     /* far block row and col */
-int left_mark;      /* left mark of previous row */
-int right;          /* right mark of the previous row */
-char *limits;
+left_side(
+    int row, /* the current row */
+    int cb_row, int cb_col, /* close block row and col */
+    int fb_row, int fb_col,     /* far block row and col */
+    int left_mark,      /* left mark of previous row */
+    int right,          /* right mark of the previous row */
+    const coordxy *limits)
 {
     int i;
     char *rowp = NULL;
@@ -2081,13 +2079,13 @@ char *limits;
  * and right most boundaries of what could be seen.
  */
 static void
-view_from(srow, scol, loc_cs_rows, left_most, right_most, range, func, arg)
-int srow, scol;                 /* source row and column */
-char **loc_cs_rows;             /* could_see array (row pointers) */
-char *left_most, *right_most;       /* limits of what could be seen */
-int range;          /* 0 if unlimited */
-void (*func)(int, int, genericptr_t);
-genericptr_t arg;
+view_from(
+    coordxy srow, coordxy scol, /* source row and column */
+    char **loc_cs_rows, /* could_see array (row pointers) */
+    coordxy *left_most, coordxy *right_most, /* limits of what could be seen */
+    int range, /* 0 if unlimited */
+    void (*func)(coordxy, coordxy, genericptr_t),
+    genericptr_t arg)
 {
     int i;
     char     *rowp;
@@ -2171,8 +2169,8 @@ genericptr_t arg;
 /*
  * Defines local to Algorithm C.
  */
-static void right_side(int, int, int, char*);
-static void left_side(int, int, int, char*);
+static void right_side(int, int, int, coordxy *);
+static void left_side(int, int, int, coordxy *);
 
 /* Initialize algorithm C (nothing). */
 static void
@@ -2189,7 +2187,7 @@ right_side(
     int row, /**< current row */
     int left, /**< first (left side) visible spot on prev row */
     int right_mark, /**< last (right side) visible spot on prev row */
-    char *limits) /**< points at range limit for current row, or NULL */
+    coordxy *limits) /**< points at range limit for current row, or NULL */
 {
     int right;            /* right limit of "could see" */
     int right_edge;       /* right edge of an opening */
@@ -2198,11 +2196,10 @@ right_side(
     int result;           /* set by q?_path() */
     int i;       /* loop counter */
     char *rowp = NULL;    /* row optimization */
-    char *row_min = NULL; /* left most  [used by macro set_min()] */
-    char *row_max = NULL; /* right most [used by macro set_max()] */
+    coordxy *row_min = NULL; /* left most  [used by macro set_min()] */
+    coordxy *row_max = NULL; /* right most [used by macro set_max()] */
     int lim_max;          /* right most limit of circle */
 
-    rowp = row_min = row_max = 0;
     nrow    = row + step;
     /*
      * Can go deeper if the row is in bounds and the next row is within
@@ -2365,13 +2362,13 @@ rside2:         /* used if q?_path() is a macro */
  * extensive comments.
  */
 static void
-left_side(int row, int left_mark, int right, char *limits)
+left_side(int row, int left_mark, int right, coordxy *limits)
 {
     int left, left_edge, nrow, deeper, result;
     int i;
     char *rowp = NULL;
-    char *row_min = NULL;
-    char *row_max = NULL;
+    coordxy *row_min = NULL;
+    coordxy *row_max = NULL;
     int lim_min;
 
     nrow    = row+step;
@@ -2481,14 +2478,24 @@ lside2:         /* used if q?_path() is a macro */
  * Calculate all possible visible locations from the given location
  * (srow,scol).  NOTE this is (y,x)!  Mark the visible locations in the
  * array provided.
+ *
+ * Arguments
+ *   srow, scol     starting row and column
+ *   loc_cs_rows    pointers to the rows of the could_see array
+ *   left_most      min mark on each row
+ *   right_most     max mark on each row
+ *   range          0 if unlimited
+ *   func           function to call on each spot
+ *   arg            argument for func
  */
 static void
-view_from(int srow, int scol, char **loc_cs_rows, char *left_most, char *right_most, int range, void (*func) (int, int, genericptr_t), genericptr_t arg)
-                        /* starting row and column */
-                        /* pointers to the rows of the could_see array */
-                        /* min mark on each row */
-                        /* max mark on each row */
-                    /* 0 if unlimited */
+view_from(
+    coordxy srow, coordxy scol,
+    char **loc_cs_rows,
+    coordxy *left_most, coordxy *right_most,
+    int range,
+    void (*func)(coordxy, coordxy, genericptr_t),
+    genericptr_t arg)
 
 
 {
@@ -2497,7 +2504,7 @@ view_from(int srow, int scol, char **loc_cs_rows, char *left_most, char *right_m
     int nrow;           /* the next row */
     int left;           /* the left-most visible column */
     int right;          /* the right-most visible column */
-    char     *limits;   /* range limit for next row */
+    coordxy *limits;   /* range limit for next row */
 
     /* Set globals for q?_path(), left_side(), and right_side() to use. */
     start_col = scol;
@@ -2532,7 +2539,7 @@ view_from(int srow, int scol, char **loc_cs_rows, char *left_most, char *right_m
         if(left < scol - range) left = scol - range;
         if(right > scol + range) right = scol + range;
     } else
-        limits = (char*) 0;
+        limits = (coordxy *) 0;
 
     if(func) {
         for (i = left; i <= right; i++) (*func)(i, srow, arg);
@@ -2578,16 +2585,20 @@ view_from(int srow, int scol, char **loc_cs_rows, char *left_most, char *right_m
  * vision matrix and reduce extra work.
  */
 void
-do_clear_area(int scol, int srow, int range, void (*func) (int, int, genericptr_t), genericptr_t arg)
+do_clear_area(
+    coordxy scol, coordxy srow,
+    int range,
+    void (*func) (coordxy, coordxy, genericptr_t),
+    genericptr_t arg)
 {
     /* If not centered on hero, do the hard work of figuring the area */
     if (scol != u.ux || srow != u.uy)
-        view_from(srow, scol, (char **)0, (char *)0, (char *)0,
+        view_from(srow, scol, (char **)0, (coordxy *)0, (coordxy *)0,
                   range, func, arg);
     else {
         int x;
         int y, min_x, max_x, max_y, offset;
-        char *limits;
+        const coordxy *limits;
         boolean override_vision;
 
         /* vision doesn't pass through water or clouds, detection should

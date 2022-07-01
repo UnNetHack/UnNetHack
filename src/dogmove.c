@@ -16,8 +16,8 @@ static int find_friends(struct monst *, struct monst *, int);
 static struct monst *best_target(struct monst *);
 static long score_targ(struct monst *, struct monst *);
 
-static boolean can_reach_location(struct monst *, xchar, xchar, xchar, xchar);
-static boolean could_reach_item(struct monst *, xchar, xchar);
+static boolean can_reach_location(struct monst *, coordxy, coordxy, coordxy, coordxy);
+static boolean could_reach_item(struct monst *, coordxy, coordxy);
 static void quickmimic(struct monst *);
 
 /* pick a carried item for pet to drop */
@@ -136,12 +136,12 @@ droppables(struct monst *mon)
 
 static NEARDATA const char nofetch[] = { BALL_CLASS, CHAIN_CLASS, ROCK_CLASS, 0 };
 
-static xchar gtyp, gx, gy;  /* type and position of dog's current goal */
+static coordxy gtyp, gx, gy;  /* type and position of dog's current goal */
 
-static void wantdoor(int, int, genericptr_t);
+static void wantdoor(coordxy, coordxy, genericptr_t);
 
 boolean
-cursed_object_at(int x, int y)
+cursed_object_at(coordxy x, coordxy y)
 {
     struct obj *otmp;
 
@@ -199,7 +199,7 @@ dog_nutrition(struct monst *mtmp, struct obj *obj)
 
 /* returns 2 if pet dies, otherwise 1 */
 int
-dog_eat(struct monst *mtmp, struct obj *obj, int x, int y, boolean devour)
+dog_eat(struct monst *mtmp, struct obj *obj, coordxy x, coordxy y, boolean devour)
 
                  /* if unpaid, then thrown or kicked by hero */
           /* dog's starting location, might be different from current */
@@ -501,7 +501,7 @@ dog_goal(struct monst *mtmp, struct edog *edog, int after, int udist, int whappr
     int omx, omy;
     boolean in_masters_sight, dog_has_minvent;
     struct obj *obj;
-    xchar otyp;
+    xint16 otyp;
     int appr;
 
     /* Steeds don't move on their own will */
@@ -900,12 +900,12 @@ dog_move(struct monst *mtmp,
     int i, j, k;
     struct edog *edog = EDOG(mtmp);
     struct obj *obj = (struct obj *) 0;
-    xchar otyp;
+    xint16 otyp;
     boolean has_edog, cursemsg[9], do_eat = FALSE;
     boolean better_with_displacing = FALSE;
-    xchar nix, niy;     /* position mtmp is (considering) moving to */
+    coordxy nix, niy;     /* position mtmp is (considering) moving to */
     int nx, ny;    /* temporary coordinates */
-    xchar cnt, uncursedcnt, chcnt;
+    xint16 cnt, uncursedcnt, chcnt;
     int chi = -1, nidist, ndist;
     coord poss[9];
     long info[9], allowflags;
@@ -1303,7 +1303,7 @@ dognext:
 
 /* check if a monster could pick up objects from a location */
 static boolean
-could_reach_item(struct monst *mon, xchar nx, xchar ny)
+could_reach_item(struct monst *mon, coordxy nx, coordxy ny)
 {
     if ((!is_pool(nx, ny) || is_swimmer(mon->data)) &&
         (!is_lava(nx, ny) || likes_lava(mon->data)) &&
@@ -1320,7 +1320,7 @@ could_reach_item(struct monst *mon, xchar nx, xchar ny)
  * deep.
  */
 static boolean
-can_reach_location(struct monst *mon, xchar mx, xchar my, xchar fx, xchar fy)
+can_reach_location(struct monst *mon, coordxy mx, coordxy my, coordxy fx, coordxy fy)
 {
     int i, j;
     int dist;
@@ -1352,7 +1352,7 @@ can_reach_location(struct monst *mon, xchar mx, xchar my, xchar fx, xchar fy)
 
 /* do_clear_area client */
 static void
-wantdoor(int x, int y, genericptr_t distance)
+wantdoor(coordxy x, coordxy y, genericptr_t distance)
 {
     int ndist;
 

@@ -8,7 +8,7 @@
 static void dowatersnakes(void);
 static void dowaterdemon(void);
 static void dowaternymph(void);
-static void gush(int, int, genericptr_t);
+static void gush(coordxy, coordxy, genericptr_t);
 static void dofindgem(void);
 
 /* used when trying to dip in or drink from fountain or sink or pool while
@@ -114,7 +114,7 @@ dogushforth(int drinking)
 }
 
 static void
-gush(int x, int y, genericptr_t poolcnt)
+gush(coordxy x, coordxy y, genericptr_t poolcnt)
 {
     struct monst *mtmp;
     struct trap *ttmp;
@@ -158,7 +158,7 @@ dofindgem(void)
 }
 
 void
-dryup(xchar x, xchar y, boolean isyou)
+dryup(coordxy x, coordxy y, boolean isyou)
 {
     if (IS_FOUNTAIN(levl[x][y].typ) &&
         (!rn2(3) || FOUNTAIN_IS_WARNED(x, y))) {
@@ -519,7 +519,7 @@ dipfountain(struct obj *obj)
 
 #ifdef SINKS
 void
-breaksink(int x, int y)
+breaksink(coordxy x, coordxy y)
 {
     if(cansee(x, y) || (x == u.ux && y == u.uy))
         pline_The("pipes break!  Water spurts out!");

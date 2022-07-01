@@ -2376,8 +2376,7 @@ void
 tty_curs(
     winid window,
     int x,
-    int y)  /* not xchar: perhaps xchar is unsigned and
-               curx-x would be unsigned as well */
+    int y)
 {
     struct WinDesc *cw = 0;
     int cx = ttyDisplay->curx;
@@ -3221,7 +3220,7 @@ tty_cliparound(int x, int y)
 void
 tty_print_glyph(
     winid window,
-    xchar x, xchar y,
+    coordxy x, coordxy y,
     int glyph,
     int bg_glyph UNUSED)
 {
@@ -3401,7 +3400,7 @@ tty_nhgetch(void)
  */
 /*ARGSUSED*/
 int
-tty_nh_poskey(int *x, int *y, int *mod)
+tty_nh_poskey(coordxy *x, coordxy *y, int *mod)
 {
 # if defined(WIN32CON)
     int i;

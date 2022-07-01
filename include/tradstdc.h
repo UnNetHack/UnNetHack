@@ -311,45 +311,18 @@ typedef genericptr genericptr_t;    /* (void *) or (char *) */
 # endif
 #endif
 
-/* this applies to both VMS and Digital Unix/HP Tru64 */
-#ifdef WIDENED_PROTOTYPES
-/* ANSI C uses "value preserving rules", where 'unsigned char' and
-   'unsigned short' promote to 'int' if signed int is big enough to hold
-   all possible values, rather than traditional "sign preserving rules"
-   where 'unsigned char' and 'unsigned short' promote to 'unsigned int'.
-   However, the ANSI C rules aren't binding on non-ANSI compilers.
-   When DEC C (aka Compaq C, then HP C) is in non-standard 'common' mode
-   it supports prototypes that expect widened types, but it uses the old
-   sign preserving rules for how to widen narrow unsigned types.  (In its
-   default 'relaxed' mode, __STDC__ is 1 and uchar widens to 'int'.) */
-#if defined(__DECC) && (!defined(__STDC__) || !__STDC__)
-#define UCHAR_P unsigned int
-#endif
-#endif
-
 /* These are used for arguments within VDECL prototype declarations.
  */
 #ifdef UNWIDENED_PROTOTYPES
 #define CHAR_P char
 #define SCHAR_P schar
-#define UCHAR_P uchar
-#define XCHAR_P xchar
-#define SHORT_P short
 #ifndef SKIP_BOOLEAN
 #define BOOLEAN_P boolean
 #endif
-#define ALIGNTYP_P aligntyp
 #else
 #ifdef WIDENED_PROTOTYPES
 #define CHAR_P int
 #define SCHAR_P int
-#ifndef UCHAR_P
-#define UCHAR_P int
-#endif
-#define XCHAR_P int
-#define SHORT_P int
-#define BOOLEAN_P int
-#define ALIGNTYP_P int
 #else
 /* Neither widened nor unwidened prototypes.  Argument list expansion
  * by VDECL always empty; all xxx_P vanish so defs aren't needed. */

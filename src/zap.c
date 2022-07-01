@@ -19,11 +19,11 @@ extern boolean notonhead;   /* for long worms */
 /* kludge to use mondied instead of killed */
 extern boolean m_using;
 
-static boolean zombie_can_dig(xchar x, xchar y);
+static boolean zombie_can_dig(coordxy x, coordxy y);
 static void polyuse(struct obj*, int, int);
 static void create_polymon(struct obj *, int);
 static boolean zap_updown(struct obj *);
-static void zhitu(int, int, const char *, xchar, xchar);
+static void zhitu(int, int, const char *, coordxy, coordxy);
 static void revive_egg(struct obj *);
 static boolean zap_steed(struct obj *);
 
@@ -560,7 +560,7 @@ probe_monster(struct monst *mtmp)
  * is not available or subject to the constraints above.
  */
 boolean
-get_obj_location(struct obj *obj, xchar *xp, xchar *yp, int locflags)
+get_obj_location(struct obj *obj, coordxy *xp, coordxy *yp, int locflags)
 {
     switch (obj->where) {
     case OBJ_INVENT:
@@ -597,7 +597,7 @@ get_obj_location(struct obj *obj, xchar *xp, xchar *yp, int locflags)
 boolean
 get_mon_location(
     struct monst *mon,
-    xchar *xp, xchar *yp,
+    coordxy *xp, coordxy *yp,
     int locflags) /* non-zero means get location even if monster is buried */
 {
     if (mon == &youmonst) {
@@ -744,7 +744,7 @@ get_container_location(struct obj *obj, int *loc, int *container_nesting)
 
 /* can zombie dig the location at x,y */
 static boolean
-zombie_can_dig(xchar x, xchar y)
+zombie_can_dig(coordxy x, coordxy y)
 {
     if (isok(x,y)) {
         schar typ = levl[x][y].typ;
@@ -773,7 +773,7 @@ revive(struct obj *corpse, boolean by_hero)
     struct permonst *mptr;
     struct obj *container;
     coord xy;
-    xchar x, y;
+    coordxy x, y;
     boolean one_of;
     int montype, container_nesting = 0;
     boolean is_zomb = (mons[corpse->corpsenm].mlet == S_ZOMBIE);
@@ -985,7 +985,7 @@ revive(struct obj *corpse, boolean by_hero)
 void
 remove_corpse(struct obj *corpse)
 {
-    xchar x, y;
+    coordxy x, y;
     boolean is_zomb = (mons[corpse->corpsenm].mlet == S_ZOMBIE);
 
     switch (corpse->where) {
@@ -1568,7 +1568,7 @@ struct obj *
 poly_obj(struct obj *obj, int id)
 {
     struct obj *otmp;
-    xchar ox = 0, oy = 0;
+    coordxy ox = 0, oy = 0;
     long old_wornmask, new_wornmask = 0L;
     boolean can_merge = (id == STRANGE_OBJECT);
     int obj_location = obj->where;
@@ -1841,7 +1841,7 @@ stone_to_flesh_obj(struct obj *obj)
     struct permonst *ptr;
     struct monst *mon, *shkp;
     struct obj *item;
-    xchar oox, ooy;
+    coordxy oox, ooy;
     boolean smell = FALSE, golem_xform = FALSE;
 
     if (objects[obj->otyp].oc_material != MINERAL &&
@@ -1968,7 +1968,7 @@ int
 bhito(struct obj *obj, struct obj *otmp)
 {
     int res = 1; /* affected object by default */
-    xchar refresh_x, refresh_y;
+    coordxy refresh_x, refresh_y;
 
     boolean learn_it = FALSE, maybelearnit;
 
@@ -3025,7 +3025,8 @@ static boolean
 zap_updown(struct obj *obj) /**< wand or spell */
 {
     boolean striking = FALSE, disclose = FALSE;
-    int x, y, xx, yy, ptmp;
+    coordxy x, y, xx, yy;
+    int ptmp;
     struct obj *otmp;
     struct engr *e;
     struct trap *ttmp;
@@ -3200,7 +3201,7 @@ zap_updown(struct obj *obj) /**< wand or spell */
                 /* fall through */
             case SPE_POLYMORPH:
                 del_engr(e);
-                make_engr_at(x, y, random_engraving(buf), moves, (xchar)0);
+                make_engr_at(x, y, random_engraving(buf), moves, (coordxy)0);
                 break;
             case WAN_CANCELLATION:
             case WAN_MAKE_INVISIBLE:
@@ -3496,7 +3497,7 @@ bhit(
         tmp_at(DISP_FLASH, obj_to_glyph(obj));
 
     while(range-- > 0) {
-        int x, y;
+        coordxy x, y;
 
         bhitpos.x += ddx;
         bhitpos.y += ddy;
@@ -4021,7 +4022,7 @@ zhitm(
 }
 
 static void
-zhitu(int type, int nd, const char *fltxt, xchar sx, xchar sy)
+zhitu(int type, int nd, const char *fltxt, coordxy sx, coordxy sy)
 {
     int dam = 0;
 
@@ -4150,7 +4151,7 @@ zhitu(int type, int nd, const char *fltxt, xchar sx, xchar sy)
 }
 
 void
-melt_icewall(xchar x, xchar y)
+melt_icewall(coordxy x, coordxy y)
 {
     struct rm *lev = &levl[x][y];
     if (cansee(x, y)) {
@@ -4166,7 +4167,7 @@ melt_icewall(xchar x, xchar y)
 }
 
 void
-melt_ice(xchar x, xchar y, const char *msg)
+melt_ice(coordxy x, coordxy y, const char *msg)
 {
     struct rm *lev = &levl[x][y];
     struct obj *otmp;
@@ -4213,7 +4214,7 @@ melt_ice(xchar x, xchar y, const char *msg)
  * return the number of objects burned
  */
 int
-burn_floor_objects(int x, int y, boolean give_feedback, boolean u_caused)
+burn_floor_objects(coordxy x, coordxy y, boolean give_feedback, boolean u_caused)
 
                        /* caller needs to decide about visibility checks */
 
@@ -4323,7 +4324,7 @@ disintegrate_mon(struct monst *mon, int type, const char *fltxt)
 }
 
 void
-buzz(int type, int nd, xchar sx, xchar sy, int dx, int dy)
+buzz(int type, int nd, coordxy sx, coordxy sy, int dx, int dy)
 {
     dobuzz(type, nd, sx, sy, dx, dy, TRUE);
 }
@@ -4339,13 +4340,13 @@ void
 dobuzz(
     int type,
     int nd,
-    xchar sx, xchar sy,
+    coordxy sx, coordxy sy,
     int dx, int dy,
     boolean say) /**< announce out of sight hit/miss events if true */
 {
     int range, abstype = abs(type) % 10;
     struct rm *lev;
-    xchar lsx, lsy;
+    coordxy lsx, lsy;
     struct monst *mon;
     coord save_bhitpos;
     boolean shopdamage = FALSE;
@@ -4633,7 +4634,7 @@ make_bounce:
  */
 void
 start_melt_ice_timeout(
-    xchar x, xchar y,
+    coordxy x, coordxy y,
     long int min_time) /**< <x,y>'s old melt timeout (deleted by time we get here) */
 {
     int when;
@@ -4667,14 +4668,14 @@ start_melt_ice_timeout(
 void
 melt_ice_away(anything *arg, long int timeout UNUSED)
 {
-    xchar x, y;
+    coordxy x, y;
     long where = arg->a_long;
     boolean save_mon_moving = flags.mon_moving; /* will be False */
 
     /* melt_ice -> minliquid -> mondead|xkilled shouldn't credit/blame hero */
     flags.mon_moving = TRUE; /* hero isn't causing this ice to melt */
-    y = (xchar) (where & 0xFFFF);
-    x = (xchar) ((where >> 16) & 0xFFFF);
+    y = (coordxy) (where & 0xFFFF);
+    x = (coordxy) ((where >> 16) & 0xFFFF);
     /* melt_ice does newsym when appropriate */
     melt_ice(x, y, "Some ice melts away.");
     flags.mon_moving = save_mon_moving;
@@ -4686,7 +4687,7 @@ melt_ice_away(anything *arg, long int timeout UNUSED)
  * amount by which range is reduced (the latter is just ignored by fireballs)
  */
 int
-zap_over_floor(xchar x, xchar y, int type, boolean *shopdamage, short int exploding_wand_typ)
+zap_over_floor(coordxy x, coordxy y, int type, boolean *shopdamage, short int exploding_wand_typ)
 {
     const char *zapverb;
     struct monst *mon;
@@ -4986,7 +4987,7 @@ def_case:
 void
 fracture_rock(struct obj *obj) /* no texts here! */
 {
-    xchar x, y;
+    coordxy x, y;
     boolean by_you = !flags.mon_moving;
 
     if (by_you && get_obj_location(obj, &x, &y, 0) && costly_spot(x, y)) {

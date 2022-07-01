@@ -1485,7 +1485,7 @@ ring:
     if (iflags.suppress_price || restoring) {
         ; /* don't attempt to obtain any stop pricing, even if 'with_price' */
     } else if (obj->unpaid) {
-        xchar ox, oy;
+        coordxy ox, oy;
         long quotedprice = unpaid_cost(obj, TRUE);
         struct monst *shkp = (struct monst *)0;
 

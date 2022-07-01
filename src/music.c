@@ -663,7 +663,7 @@ do_play_instrument(struct obj *instr)
 {
     char buf[BUFSZ] = DUMMY, c = 'y';
     char *s;
-    int x, y;
+    coordxy x, y;
     boolean ok;
 
     if (Underwater) {

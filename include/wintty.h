@@ -26,13 +26,13 @@ typedef struct tty_mi {
 
 /* descriptor for tty-based windows */
 struct WinDesc {
-    int flags;          /* window flags */
-    xchar type;         /* type of window */
-    boolean active;     /* true if window is active */
-    short offx, offy;       /* offset from topleft of display */
-    long rows, cols;        /* dimensions */
-    long curx, cury;        /* current cursor position */
-    long maxrow, maxcol;    /* the maximum size used -- for MENU wins */
+    int flags;           /* window flags */
+    xint16 type;         /* type of window */
+    boolean active;      /* true if window is active */
+    short offx, offy;    /* offset from topleft of display */
+    long rows, cols;     /* dimensions */
+    long curx, cury;     /* current cursor position */
+    long maxrow, maxcol; /* the maximum size used -- for MENU wins */
     /* maxcol is also used by WIN_MESSAGE for */
     /* tracking the ^P command */
     short *datlen;      /* allocation size for *data */
@@ -205,11 +205,11 @@ E void tty_cliparound(int, int);
 #ifdef POSITIONBAR
 E void tty_update_positionbar(char *);
 #endif
-E void tty_print_glyph(winid, xchar, xchar, int, int);
+E void tty_print_glyph(winid, coordxy, coordxy, int, int);
 E void tty_raw_print(const char *);
 E void tty_raw_print_bold(const char *);
 E int tty_nhgetch(void);
-E int tty_nh_poskey(int *, int *, int *);
+E int tty_nh_poskey(coordxy *, coordxy *, int *);
 E void tty_nhbell(void);
 E int tty_doprev_message(void);
 E char tty_yn_function(const char *, const char *, char);

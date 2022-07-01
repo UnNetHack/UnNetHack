@@ -9,7 +9,7 @@
 
 static boolean is_swallow_sym(int);
 static int append_str(char *, const char *);
-static struct permonst * lookat(int, int, char *, char *);
+static struct permonst * lookat(coordxy, coordxy, char *, char *);
 static void look_all(boolean, boolean, boolean);
 static void add_obj_info(winid, struct obj *, short);
 static void add_mon_info(winid, struct permonst *);
@@ -81,9 +81,9 @@ self_lookat(char *outbuf)
    detection and for probing; also when looking at self */
 void
 mhidden_description(struct monst *mon, boolean altmon, char *outbuf)
-                  
+
                 /* for probing: if mimicking a monster, say so */
-             
+
 {
     struct obj *otmp;
     boolean fakeobj, isyou = (mon == &youmonst);
@@ -138,7 +138,7 @@ mhidden_description(struct monst *mon, boolean altmon, char *outbuf)
 
 /* extracted from lookat(); also used by namefloorobj() */
 boolean
-object_from_map(int glyph, int x, int y, struct obj **obj_p)
+object_from_map(int glyph, coordxy x, coordxy y, struct obj **obj_p)
 {
     boolean fakeobj = FALSE, mimic_obj = FALSE;
     struct monst *mtmp;
@@ -223,9 +223,9 @@ object_from_map(int glyph, int x, int y, struct obj **obj_p)
 }
 
 static void
-look_at_object(char *buf, int x, int y, int glyph)
+look_at_object(char *buf, coordxy x, coordxy y, int glyph)
            /* output buffer */
-                
+
 {
     struct obj *otmp = 0;
     boolean fakeobj = object_from_map(glyph, x, y, &otmp);
@@ -258,10 +258,10 @@ look_at_object(char *buf, int x, int y, int glyph)
 }
 
 static void
-look_at_monster(char *buf, char *monbuf, struct monst *mtmp, int x, int y)
+look_at_monster(char *buf, char *monbuf, struct monst *mtmp, coordxy x, coordxy y)
                     /* buf: output, monbuf: optional output */
-                   
-         
+
+
 {
     char *name, monnambuf[BUFSZ];
     boolean accurate = !Hallucination;
@@ -388,7 +388,7 @@ look_at_monster(char *buf, char *monbuf, struct monst *mtmp, int x, int y)
  * If not hallucinating and the glyph is a monster, also monster data.
  */
 static struct permonst *
-lookat(int x, int y, char *buf, char *monbuf)
+lookat(coordxy x, coordxy y, char *buf, char *monbuf)
 {
     struct monst *mtmp = (struct monst *) 0;
     struct permonst *pm = (struct permonst *) 0;

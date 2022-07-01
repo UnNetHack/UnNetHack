@@ -139,7 +139,7 @@ dochugw(struct monst *mtmp)
 }
 
 boolean
-onscary(int x, int y, struct monst *mtmp)
+onscary(coordxy x, coordxy y, struct monst *mtmp)
 {
     /* creatures who are directly resistant to magical scaring:
      *
@@ -794,7 +794,7 @@ itsstuck(struct monst *mtmp)
  * those should be used instead. This function does that evaluation.
  */
 boolean
-should_displace(struct monst *mtmp, coord *poss, long int *info, int cnt, xchar gx, xchar gy)
+should_displace(struct monst *mtmp, coord *poss, long int *info, int cnt, coordxy gx, coordxy gy)
 
              /* coord poss[9] */
              /* long info[9] */
@@ -833,7 +833,7 @@ should_displace(struct monst *mtmp, coord *poss, long int *info, int cnt, xchar 
 }
 
 boolean
-m_digweapon_check(struct monst *mtmp, xchar nix, xchar niy)
+m_digweapon_check(struct monst *mtmp, coordxy nix, coordxy niy)
 {
     boolean can_tunnel = 0;
     struct obj *mw_tmp = MON_WEP(mtmp);
@@ -877,7 +877,8 @@ int
 m_move(struct monst *mtmp, int after)
 {
     int appr;
-    xchar gx, gy, nix, niy, chcnt;
+    coordxy gx, gy, nix, niy;
+    xint16 chcnt;
     int chi; /* could be schar except for stupid Sun-2 compiler */
     boolean likegold=0, likegems=0, likeobjs=0, likemagic=0, conceals=0;
     boolean likerock=0, can_tunnel=0, breakrock=0;
@@ -961,7 +962,7 @@ m_move(struct monst *mtmp, int after)
 
     /* and the acquisitive monsters get special treatment */
     if (is_covetous(ptr)) {
-        xchar tx = STRAT_GOALX(mtmp->mstrategy),
+        coordxy tx = STRAT_GOALX(mtmp->mstrategy),
               ty = STRAT_GOALY(mtmp->mstrategy);
         struct monst *intruder = m_at(tx, ty);
         /*
@@ -1634,7 +1635,7 @@ postmov:
  * (mtmp died) or 3 (mtmp made its move).
  */
 int
-m_move_aggress(struct monst* mtmp, xchar x, xchar y)
+m_move_aggress(struct monst* mtmp, coordxy x, coordxy y)
 {
     struct monst *mtmp2;
     int mstatus;
@@ -1665,14 +1666,14 @@ m_move_aggress(struct monst* mtmp, xchar x, xchar y)
 }
 
 boolean
-closed_door(int x, int y)
+closed_door(coordxy x, coordxy y)
 {
     return((boolean)(IS_DOOR(levl[x][y].typ) &&
                      (levl[x][y].doormask & (D_LOCKED | D_CLOSED))));
 }
 
 boolean
-accessible(int x, int y)
+accessible(coordxy x, coordxy y)
 {
     int levtyp = levl[x][y].typ;
 
@@ -1755,7 +1756,7 @@ found_you:
 boolean
 undesirable_disp(
     struct monst *mtmp, /**< barging creature */
-    xchar x, xchar y) /**< spot 'mtmp' is considering moving to */
+    coordxy x, coordxy y) /**< spot 'mtmp' is considering moving to */
 {
     boolean is_pet = (mtmp && mtmp->mtame && !mtmp->isminion);
     struct trap *trap = t_at(x, y);

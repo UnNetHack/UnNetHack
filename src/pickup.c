@@ -32,7 +32,7 @@ static int traditional_loot(boolean);
 static int menu_loot(int, boolean);
 static char in_or_out_menu(const char *, struct obj *, boolean, boolean, boolean, boolean);
 static boolean able_to_loot(int, int, boolean);
-static boolean mon_beside(int, int);
+static boolean mon_beside(coordxy, coordxy);
 static int do_loot_cont(struct obj **, int, int);
 static int dump_container(struct obj*, boolean);
 static void del_sokoprize(void);
@@ -1717,7 +1717,7 @@ encumber_msg(void)
 
 /* Is there a container at x,y. Optional: return count of containers at x,y */
 int
-container_at(int x, int y, boolean countem)
+container_at(coordxy x, coordxy y, boolean countem)
 {
     struct obj *cobj, *nobj;
     int container_count = 0;
@@ -1773,7 +1773,7 @@ able_to_loot(
 }
 
 static boolean
-mon_beside(int x, int y)
+mon_beside(coordxy x, coordxy y)
 {
     int i, j, nx, ny;
 
@@ -2544,7 +2544,7 @@ observe_quantum_cat(struct obj *box, boolean past)
     static NEARDATA const char sc[] = "Schroedinger's Cat";
     struct obj *deadcat;
     struct monst *livecat = 0;
-    xchar ox, oy;
+    coordxy ox, oy;
     boolean itsalive = rn2(2);
 
     box->spe = 0;       /* box->owt will be updated below */
@@ -2601,7 +2601,7 @@ open_coffin(struct obj *box, boolean past)
     /* static NEARDATA const char sc[] = "Schroedinger's Cat"; */
     /* Would be nice to name the vampire and put the name on the coffin. But not today. */
     struct monst *vampire;
-    xchar ox, oy;
+    coordxy ox, oy;
 
     pline("That %s %s, it%s a coffin!", past ? "wasn't" : "isn't",
           an(simple_typename(box->otyp)), past ? " was" : "'s");

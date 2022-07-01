@@ -65,8 +65,8 @@ uint32_t isaac_next_uint32(isaac_ctx *_ctx) { return 0; }
 void isaac_init(isaac_ctx *_ctx,const unsigned char *_seed,int _nseed) {}
 
 void reset_commands(boolean b) {}
-boolean is_pool(int i1, int i2) { return FALSE; }
-boolean is_lava(int i1, int i3) { return FALSE; }
+boolean is_pool(coordxy i1, coordxy i2) { return FALSE; }
+boolean is_lava(coordxy i1, coordxy i3) { return FALSE; }
 
 char txt2key(char *txt) { return ' '; }
 boolean bind_key(uchar key, const char *command) { return FALSE; }

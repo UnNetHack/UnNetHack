@@ -34,9 +34,9 @@ static void forget(int);
 #endif
 static int maybe_tame(struct monst *, struct obj *);
 
-static void do_flood(int, int, genericptr_t);
-static void undo_flood(int, int, genericptr_t);
-static void set_lit(int, int, genericptr_t);
+static void do_flood(coordxy, coordxy, genericptr_t);
+static void undo_flood(coordxy, coordxy, genericptr_t);
+static void set_lit(coordxy, coordxy, genericptr_t);
 
 static boolean
 learn_scroll_typ(short scrolltyp, boolean verbose)
@@ -1020,7 +1020,7 @@ void
 forget_levels(int percent)
 {
     int i, count;
-    xchar maxl, this_lev;
+    coordxy maxl, this_lev;
     int indices[MAXLINFO];
 
     if (percent == 0) return;
@@ -1134,7 +1134,7 @@ maybe_tame(struct monst *mtmp, struct obj *sobj)
 
 /** Remove water tile at x,y. */
 static void
-undo_flood(int x, int y, genericptr_t roomcnt)
+undo_flood(coordxy x, coordxy y, genericptr_t roomcnt)
 {
     if ((levl[x][y].typ != POOL) &&
         (levl[x][y].typ != MOAT) &&
@@ -1150,7 +1150,7 @@ undo_flood(int x, int y, genericptr_t roomcnt)
 }
 
 static void
-do_flood(int x, int y, genericptr_t poolcnt)
+do_flood(coordxy x, coordxy y, genericptr_t poolcnt)
 {
     struct monst *mtmp;
     struct trap *ttmp;
@@ -1182,7 +1182,7 @@ do_flood(int x, int y, genericptr_t poolcnt)
 }
 
 static boolean
-get_valid_stinking_cloud_pos(int x, int y)
+get_valid_stinking_cloud_pos(coordxy x, coordxy y)
 {
     return (!(!isok(x,y) ||
               !cansee(x, y) ||
@@ -1191,7 +1191,7 @@ get_valid_stinking_cloud_pos(int x, int y)
 }
 
 static boolean
-is_valid_stinking_cloud_pos(int x, int y, boolean showmsg)
+is_valid_stinking_cloud_pos(coordxy x, coordxy y, boolean showmsg)
 {
     if (!get_valid_stinking_cloud_pos(x,y)) {
         if (showmsg) {
@@ -2149,7 +2149,7 @@ static struct litmon *gremlins = 0;
  * Low-level lit-field update routine.
  */
 static void
-set_lit(int x, int y, genericptr_t val)
+set_lit(coordxy x, coordxy y, genericptr_t val)
 {
     struct monst *mtmp;
     struct litmon *gremlin;

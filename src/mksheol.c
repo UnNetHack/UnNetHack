@@ -46,9 +46,9 @@ static schar opentyps[10] = { ICEWALL,
 
 static void init_level_base_voronoi(schar* vtyps, int numtyps, int numpoints);
 static int check_voronoi_winner(patchcoord* coords, int num_coords,
-                                int x, int y);
+                                coordxy x, coordxy y);
 static void carve_path(floorprob* probs);
-static void fuzzy_circle(int x, int y,
+static void fuzzy_circle(coordxy x, coordxy y,
                          int guaranteed_passage_radius, int fallout,
                          floorprob* floorprobs);
 static void wallify_map(void);
@@ -188,7 +188,7 @@ init_level_base_voronoi(schar* vtyps, int numtyps, int numpoints)
 }
 
 static int
-check_voronoi_winner(patchcoord *coords, int num_coords, int x, int y)
+check_voronoi_winner(patchcoord *coords, int num_coords, coordxy x, coordxy y)
 {
     int i1;
     int winner = 0, winner_distance;
@@ -325,7 +325,7 @@ carve_path(floorprob *floorprobs)
  * After that, linearly makes it less likely that a passable square is
  * made. This makes a sort of "rough" edge. */
 static void
-fuzzy_circle(int x, int y, int guaranteed_passage_radius, int fallout, floorprob *floorprobs)
+fuzzy_circle(coordxy x, coordxy y, int guaranteed_passage_radius, int fallout, floorprob *floorprobs)
 {
     int i1, i2;
     int fallout_2 = fallout * fallout;

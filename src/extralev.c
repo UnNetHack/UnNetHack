@@ -10,8 +10,8 @@
 #ifdef REINCARNATION
 
 struct rogueroom {
-    xchar rlx, rly;
-    xchar dx, dy;
+    coordxy rlx, rly;
+    coordxy dx, dy;
     boolean real;
     uchar doortable;
     int nroom; /* Only meaningful for "real" rooms */
@@ -23,8 +23,8 @@ struct rogueroom {
 
 static NEARDATA struct rogueroom r[3][3];
 static void roguejoin(int, int, int, int, int);
-static void roguecorr(int, int, int);
-static void miniwalk(int, int);
+static void roguecorr(coordxy, coordxy, int);
+static void miniwalk(coordxy, coordxy);
 
 static void
 roguejoin(int x1, int y1, int x2, int y2, int horiz)
@@ -56,7 +56,7 @@ roguejoin(int x1, int y1, int x2, int y2, int horiz)
 }
 
 static void
-roguecorr(int x, int y, int dir)
+roguecorr(coordxy x, coordxy y, int dir)
 {
     int fromx, fromy, tox, toy;
 
@@ -153,7 +153,7 @@ roguecorr(int x, int y, int dir)
 
 /* Modified walkfrom() from mkmaze.c */
 static void
-miniwalk(int x, int y)
+miniwalk(coordxy x, coordxy y)
 {
     int q, dir;
     int dirs[4];
@@ -285,7 +285,7 @@ makeroguerooms(void) {
 }
 
 void
-corr(int x, int y)
+corr(coordxy x, coordxy y)
 {
     levl[x][y].typ = CORR;
 }

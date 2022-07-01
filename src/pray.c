@@ -2087,7 +2087,7 @@ doturn(void)
 }
 
 int
-altarmask_at(int x, int y)
+altarmask_at(coordxy x, coordxy y)
 {
     int res = 0;
 
@@ -2112,7 +2112,7 @@ a_gname(void)
 
 /* returns the name of an altar's deity */
 const char *
-a_gname_at(xchar x, xchar y)
+a_gname_at(coordxy x, coordxy y)
 {
     if(!IS_ALTAR(levl[x][y].typ)) return((char *)0);
 
@@ -2236,7 +2236,7 @@ align_gtitle(aligntyp alignment)
 }
 
 void
-altar_wrath(int x, int y)
+altar_wrath(coordxy x, coordxy y)
 {
     aligntyp altaralign = a_align(x, y);
 

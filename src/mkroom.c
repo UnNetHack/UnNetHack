@@ -246,7 +246,7 @@ mkzoo(int type)
 }
 
 void
-mk_zoo_thronemon(int x, int y)
+mk_zoo_thronemon(coordxy x, coordxy y)
 {
     int i = rnd(level_difficulty());
     int pm = (i > 9) ? PM_OGRE_KING :
@@ -292,7 +292,7 @@ fill_zoo(struct mkroom *sroom)
             (void) somexy(sroom, &mm);
             tx = mm.x;
             ty = mm.y;
-        } while (occupied((xchar)tx, (xchar)ty) && --i > 0);
+        } while (occupied((coordxy)tx, (coordxy)ty) && --i > 0);
 throne_placed:
         mk_zoo_thronemon(tx, ty);
         break;
@@ -739,7 +739,7 @@ somey(struct mkroom *croom)
 }
 
 boolean
-inside_room(struct mkroom *croom, xchar x, xchar y)
+inside_room(struct mkroom *croom, coordxy x, coordxy y)
 {
     return((boolean)(x >= croom->lx-1 && x <= croom->hx+1 &&
                      y >= croom->ly-1 && y <= croom->hy+1));

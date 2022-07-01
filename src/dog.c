@@ -74,7 +74,7 @@ pet_type(void)
 }
 
 struct monst *
-make_familiar(struct obj *otmp, xchar x, xchar y, boolean quietly)
+make_familiar(struct obj *otmp, coordxy x, coordxy y, boolean quietly)
 {
     struct permonst *pm;
     struct monst *mtmp = 0;
@@ -343,7 +343,8 @@ void
 mon_arrive(struct monst *mtmp, boolean with_you)
 {
     struct trap *t;
-    xchar xlocale, ylocale, xyloc, xyflags, wander;
+    coordxy xlocale, ylocale, xyloc, xyflags;
+    xint16 wander;
     int num_segs;
     boolean failed_to_place = FALSE;
 
@@ -406,7 +407,7 @@ mon_arrive(struct monst *mtmp, boolean with_you)
         mtmp->mlstmv = monstermoves - 1L;
 
         /* let monster move a bit on new level (see placement code below) */
-        wander = (xchar) min(nmv, 8);
+        wander = (xint16) min(nmv, 8);
     } else {
         wander = 0;
     }
@@ -738,13 +739,13 @@ keepdogs(boolean pets_only) /**< TRUE for ascension or final escape */
 void
 migrate_to_level(
     struct monst *mtmp,
-    xchar tolev, /**< destination level */
-    xchar xyloc, /**< MIGR_xxx destination xy location: */
+    xint16 tolev, /**< destination level */
+    xint16 xyloc, /**< MIGR_xxx destination xy location: */
     coord *cc)   /**< optional destination coordinates */
 {
     struct obj *obj;
     d_level new_lev;
-    xchar xyflags;
+    coordxy xyflags;
     int num_segs = 0;   /* count of worm segments */
 
     if (mtmp->isshk)
@@ -773,8 +774,8 @@ migrate_to_level(
     }
     relmon(mtmp, &migrating_mons); /* move it from map to migrating_mons */
 
-    new_lev.dnum = ledger_to_dnum((xchar)tolev);
-    new_lev.dlevel = ledger_to_dlev((xchar)tolev);
+    new_lev.dnum = ledger_to_dnum((xint16)tolev);
+    new_lev.dlevel = ledger_to_dlev((xint16)tolev);
     /* overload mtmp->[mx,my], mtmp->[mux,muy], and mtmp->mtrack[] as */
     /* destination codes (setup flag bits before altering mx or my) */
     xyflags = (depth(&new_lev) < depth(&u.uz)); /* 1 => up */

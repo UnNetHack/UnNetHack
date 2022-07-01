@@ -18,14 +18,14 @@
 
 #include "hack.h"
 
-static void get_wall_for_db(int *, int *);
-static struct entity *e_at(int, int);
-static void m_to_e(struct monst *, int, int, struct entity *);
+static void get_wall_for_db(coordxy *, coordxy *);
+static struct entity *e_at(coordxy, coordxy);
+static void m_to_e(struct monst *, coordxy, coordxy, struct entity *);
 static void u_to_e(struct entity *);
-static void set_entity(int, int, struct entity *);
+static void set_entity(coordxy, coordxy, struct entity *);
 static const char *e_nam(struct entity *);
 static const char *E_phrase(struct entity *, const char *);
-static boolean e_survives_at(struct entity *, int, int);
+static boolean e_survives_at(struct entity *, coordxy, coordxy);
 static void e_died(struct entity *, int, int);
 static boolean automiss(struct entity *);
 static boolean e_missed(struct entity *, boolean);
@@ -33,7 +33,7 @@ static boolean e_jumps(struct entity *);
 static void do_entity(struct entity *);
 
 boolean
-is_pool(int x, int y)
+is_pool(coordxy x, coordxy y)
 {
     schar ltyp;
 
@@ -49,7 +49,7 @@ is_pool(int x, int y)
 }
 
 boolean
-is_lava(int x, int y)
+is_lava(coordxy x, coordxy y)
 {
     schar ltyp;
 
@@ -62,7 +62,7 @@ is_lava(int x, int y)
 }
 
 boolean
-is_pool_or_lava(int x, int y)
+is_pool_or_lava(coordxy x, coordxy y)
 {
     if (is_pool(x, y) || is_lava(x, y)) {
         return TRUE;
@@ -72,7 +72,7 @@ is_pool_or_lava(int x, int y)
 }
 
 boolean
-is_any_icewall(int x, int y)
+is_any_icewall(coordxy x, coordxy y)
 {
     if (!isok(x, y)) return FALSE;
     if (IS_ANY_ICEWALL(levl[x][y].typ))
@@ -81,7 +81,7 @@ is_any_icewall(int x, int y)
 }
 
 boolean
-is_ice(int x, int y)
+is_ice(coordxy x, coordxy y)
 {
     schar ltyp;
 
@@ -94,7 +94,7 @@ is_ice(int x, int y)
 }
 
 boolean
-is_swamp(int x, int y)
+is_swamp(coordxy x, coordxy y)
 {
     schar ltyp;
 
@@ -108,7 +108,7 @@ is_swamp(int x, int y)
 }
 
 boolean
-is_moat(int x, int y)
+is_moat(coordxy x, coordxy y)
 {
     schar ltyp;
 
@@ -149,7 +149,7 @@ db_under_typ(struct rm *lev)
  */
 
 int
-is_drawbridge_wall(int x, int y)
+is_drawbridge_wall(coordxy x, coordxy y)
 {
     struct rm *lev;
 
@@ -179,7 +179,7 @@ is_drawbridge_wall(int x, int y)
  * (instead of UP or DOWN, as with is_drawbridge_wall).
  */
 boolean
-is_db_wall(int x, int y)
+is_db_wall(coordxy x, coordxy y)
 {
     return((boolean)( levl[x][y].typ == DBWALL ));
 }
@@ -189,7 +189,7 @@ is_db_wall(int x, int y)
  * a drawbridge or drawbridge wall.
  */
 boolean
-find_drawbridge(int *x, int *y)
+find_drawbridge(coordxy *x, coordxy *y)
 {
     int dir;
 
@@ -212,7 +212,7 @@ find_drawbridge(int *x, int *y)
  * Find the drawbridge wall associated with a drawbridge.
  */
 static void
-get_wall_for_db(int *x, int *y)
+get_wall_for_db(coordxy *x, coordxy *y)
 {
     switch (levl[*x][*y].drawbridgemask & DB_DIR) {
     case DB_NORTH: (*y)--; break;
@@ -228,7 +228,7 @@ get_wall_for_db(int *x, int *y)
  *     flag must be put to TRUE if we want the drawbridge to be opened.
  */
 boolean
-create_drawbridge(int x, int y, int dir, int flag)
+create_drawbridge(coordxy x, coordxy y, int dir, int flag)
 {
     int x2, y2;
     boolean horiz;
@@ -287,7 +287,7 @@ struct entity {
 static NEARDATA struct entity occupants[ENTITIES];
 
 static struct entity *
-e_at(int x, int y)
+e_at(coordxy x, coordxy y)
 {
     int entitycnt;
 
@@ -305,7 +305,7 @@ e_at(int x, int y)
 }
 
 static void
-m_to_e(struct monst *mtmp, int x, int y, struct entity *etmp)
+m_to_e(struct monst *mtmp, coordxy x, coordxy y, struct entity *etmp)
 {
     etmp->emon = mtmp;
     if (mtmp) {
@@ -329,7 +329,7 @@ u_to_e(struct entity *etmp)
 }
 
 static void
-set_entity(int x, int y, struct entity *etmp)
+set_entity(coordxy x, coordxy y, struct entity *etmp)
 {
     if ((x == u.ux) && (y == u.uy))
         u_to_e(etmp);
@@ -380,7 +380,7 @@ E_phrase(struct entity *etmp, const char *verb)
  * Simple-minded "can it be here?" routine
  */
 static boolean
-e_survives_at(struct entity *etmp, int x, int y)
+e_survives_at(struct entity *etmp, coordxy x, coordxy y)
 {
     if (noncorporeal(etmp->edata))
         return(TRUE);
@@ -533,7 +533,8 @@ e_jumps(struct entity *etmp)
 static void
 do_entity(struct entity *etmp)
 {
-    int newx, newy, at_portcullis, oldx, oldy;
+    coordxy newx, newy, oldx, oldy;
+    int at_portcullis;
     boolean must_jump = FALSE, relocates = FALSE, e_inview;
     struct rm *crm;
 
@@ -745,11 +746,11 @@ do_entity(struct entity *etmp)
  * @return TRUE when drawbridge got closed, FALSE otherwise
  */
 boolean
-close_drawbridge(int x, int y)
+close_drawbridge(coordxy x, coordxy y)
 {
     struct rm *lev1, *lev2;
     struct trap *t;
-    int x2, y2;
+    coordxy x2, y2;
 
     lev1 = &levl[x][y];
     if (lev1->typ != DRAWBRIDGE_DOWN) return FALSE;
@@ -815,11 +816,11 @@ close_drawbridge(int x, int y)
  * Open the drawbridge located at x,y
  */
 void
-open_drawbridge(int x, int y)
+open_drawbridge(coordxy x, coordxy y)
 {
     struct rm *lev1, *lev2;
     struct trap *t;
-    int x2, y2;
+    coordxy x2, y2;
 
     lev1 = &levl[x][y];
     if (lev1->typ != DRAWBRIDGE_UP) return;
@@ -859,12 +860,12 @@ open_drawbridge(int x, int y)
  * Let's destroy the drawbridge located at x,y
  */
 void
-destroy_drawbridge(int x, int y)
+destroy_drawbridge(coordxy x, coordxy y)
 {
     struct rm *lev1, *lev2;
     struct trap *t;
     struct obj *otmp;
-    int x2, y2, i;
+    coordxy x2, y2, i;
     int db_u;
     boolean e_inview;
     struct entity *etmp1 = &(occupants[0]), *etmp2 = &(occupants[1]);

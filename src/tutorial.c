@@ -49,7 +49,7 @@ check_tutorial_oclass(int oclass)
    if there is a message and it hasn't been shown already. Returns TRUE
    if a message is shown. */
 int
-check_tutorial_location(int lx, int ly, boolean from_farlook)
+check_tutorial_location(coordxy lx, coordxy ly, boolean from_farlook)
 {
     struct rm *l = &(levl[lx][ly]);
     if (!flags.tutorial) return FALSE; /* short-circuit */
@@ -103,7 +103,7 @@ check_tutorial_location(int lx, int ly, boolean from_farlook)
 }
 /* Display tutorial messages that may result from farlook data. */
 void
-check_tutorial_farlook(int x, int y)
+check_tutorial_farlook(coordxy x, coordxy y)
 {
     int glyph = glyph_at(x, y);
     /* Monsters */

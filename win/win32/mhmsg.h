@@ -30,9 +30,9 @@ typedef struct mswin_nhmsg_putstr {
 } MSNHMsgPutstr, *PMSNHMsgPutstr;
 
 typedef struct mswin_nhmsg_print_glyph {
-  XCHAR_P		x;
-  XCHAR_P		y;
-  int			glyph;
+  coordxy x;
+  coordxy y;
+  int glyph;
 } MSNHMsgPrintGlyph, *PMSNHMsgPrintGlyph;
 
 typedef struct mswin_nhmsg_cliparound {

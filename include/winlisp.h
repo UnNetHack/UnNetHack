@@ -52,11 +52,11 @@ E void lisp_cliparound(int, int);
 #ifdef POSITIONBAR
 E void lisp_update_positionbar(char *);
 #endif
-E void lisp_print_glyph(winid, xchar, xchar, int, int);
+E void lisp_print_glyph(winid, coordxy, coordxy, int, int);
 E void lisp_raw_print(const char *);
 E void lisp_raw_print_bold(const char *);
 E int lisp_nhgetch(void);
-E int lisp_nh_poskey(int *, int *, int *);
+E int lisp_nh_poskey(coordxy *, coordxy *, int *);
 E void lisp_nhbell(void);
 E int lisp_doprev_message(void);
 E char lisp_yn_function(const char *, const char *, char);

@@ -13,11 +13,11 @@ static NEARDATA const char *gate_str;
 extern boolean notonhead;   /* for long worms */
 
 static void kickdmg(struct monst *, boolean);
-static boolean maybe_kick_monster(struct monst *, xchar, xchar);
-static void kick_monster(struct monst *, xchar, xchar);
+static boolean maybe_kick_monster(struct monst *, coordxy, coordxy);
+static void kick_monster(struct monst *, coordxy, coordxy);
 static void lawful_bribery_alignment(schar);
-static int kick_object(xchar, xchar, char *);
-static int kick_object_core(xchar, xchar);
+static int kick_object(coordxy, coordxy, char *);
+static int kick_object_core(coordxy, coordxy);
 static char *kickstr(char *, const char *);
 static void otransit_msg(struct obj *, boolean, long);
 static void drop_to(coord *, schar);
@@ -118,7 +118,7 @@ kickdmg(struct monst *mon, boolean clumsy)
 }
 
 static boolean
-maybe_kick_monster(struct monst *mon, xchar x, xchar y)
+maybe_kick_monster(struct monst *mon, coordxy x, coordxy y)
 {
     if (mon) {
         boolean save_forcefight = flags.forcefight;
@@ -140,7 +140,7 @@ maybe_kick_monster(struct monst *mon, xchar x, xchar y)
 }
 
 static void
-kick_monster(struct monst *mon, xchar x, xchar y)
+kick_monster(struct monst *mon, coordxy x, coordxy y)
 {
     boolean clumsy = FALSE;
     int i, j;
@@ -424,7 +424,7 @@ lawful_bribery_alignment(schar penalty)
 void
 container_impact_dmg(
     struct obj *obj,
-    xchar x, xchar y) /**< coordinates where object was before the impact, not after */
+    coordxy x, coordxy y) /**< coordinates where object was before the impact, not after */
 {
     struct monst *shkp;
     struct obj *otmp, *otmp2;
@@ -491,7 +491,7 @@ container_impact_dmg(
 
 /* jacket around kick_object_core */
 static int
-kick_object(xchar x, xchar y, char *kickobjnam)
+kick_object(coordxy x, coordxy y, char *kickobjnam)
 {
     int res = 0;
 
@@ -509,7 +509,7 @@ kick_object(xchar x, xchar y, char *kickobjnam)
 
 /* guts of kick_object */
 static int
-kick_object_core(xchar x, xchar y)
+kick_object_core(coordxy x, coordxy y)
 {
     int range;
     struct monst *mon, *shkp = 0;
@@ -809,7 +809,7 @@ kickstr(char *buf, const char *kickobjnam)
 int
 dokick(void)
 {
-    int x, y;
+    coordxy x, y;
     int avrg_attrib;
     int dmg = 0, glyph, oldglyph = -1;
     struct monst *mtmp;
@@ -1440,8 +1440,8 @@ drop_to(coord *cc, schar loc)
 void
 impact_drop(
     struct obj *missile, /**< caused impact, won't drop itself */
-    xchar x, xchar y, /**< location affected */
-    xchar dlev) /**< if !0 send to dlev near player */
+    coordxy x, coordxy y, /**< location affected */
+    xint16 dlev) /**< if !0 send to dlev near player */
 {
     schar toloc;
     struct obj *obj, *obj2;
@@ -1567,10 +1567,10 @@ impact_drop(
  * otmp is either a kicked, dropped, or thrown object.
  */
 boolean
-ship_object(struct obj *otmp, xchar x, xchar y, boolean shop_floor_obj)
+ship_object(struct obj *otmp, coordxy x, coordxy y, boolean shop_floor_obj)
 {
     schar toloc;
-    xchar ox, oy;
+    coordxy ox, oy;
     coord cc;
     struct obj *obj;
     struct trap *t;
@@ -1833,7 +1833,7 @@ otransit_msg(struct obj *otmp, boolean nodrop, long int num)
 
 /* migration destination for objects which fall down to next level */
 schar
-down_gate(xchar x, xchar y)
+down_gate(coordxy x, coordxy y)
 {
     struct trap *ttmp;
 

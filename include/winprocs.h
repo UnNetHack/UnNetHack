@@ -42,11 +42,11 @@ struct window_procs {
 #ifdef POSITIONBAR
     void (*win_update_positionbar)(char *);
 #endif
-    void (*win_print_glyph)(winid, xchar, xchar, int, int);
+    void (*win_print_glyph)(winid, coordxy, coordxy, int, int);
     void (*win_raw_print)(const char *);
     void (*win_raw_print_bold)(const char *);
     int (*win_nhgetch)(void);
-    int (*win_nh_poskey)(int *, int *, int *);
+    int (*win_nh_poskey)(coordxy *, coordxy *, int *);
     void (*win_nhbell)(void);
     int (*win_doprev_message)(void);
     char (*win_yn_function)(const char *, const char *, char);

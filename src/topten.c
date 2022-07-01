@@ -63,7 +63,7 @@ struct toptenentry {
 
 static void topten_print(const char *);
 static void topten_print_bold(const char *);
-static xchar observable_depth(d_level *);
+static coordxy observable_depth(d_level *);
 static void outheader(void);
 static void outentry(int, struct toptenentry *, boolean);
 static void readentry(FILE *, struct toptenentry *);
@@ -123,7 +123,7 @@ topten_print_bold(const char *x)
         putstr(toptenwin, ATR_BOLD, x);
 }
 
-static xchar
+static coordxy
 observable_depth(d_level *lev)
 {
 #ifdef RANDOMIZED_PLANES    /* if we ever randomize the order of the elemental planes, we
