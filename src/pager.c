@@ -1683,7 +1683,6 @@ char *supplemental_name)
                 datawin = create_nhwindow(NHW_MENU);
 
                 /* object lookup info */
-                do_obj_lookup = TRUE;
                 if (do_obj_lookup) {
                     add_obj_info(datawin, obj, otyp);
                     putstr(datawin, 0, "");
