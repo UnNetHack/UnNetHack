@@ -16,6 +16,7 @@ static void fry_by_god(aligntyp, boolean);
 static void gods_angry(aligntyp);
 static void gods_upset(aligntyp);
 static void consume_offering(struct obj *);
+static boolean pray_revive(void);
 static boolean water_prayer(boolean);
 static boolean blocked_boulder(int, int);
 
@@ -2040,6 +2041,27 @@ can_pray(boolean praying) /**< FALSE means no messages should be given */
     return !praying ? (boolean)(p_type == 3 && !Inhell) : TRUE;
 }
 
+/* return TRUE if praying revived a pet corpse */
+static boolean
+pray_revive(void)
+{
+    struct obj *otmp;
+
+    for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere) {
+        if (otmp->otyp == CORPSE && has_omonst(otmp) &&
+             OMONST(otmp)->mtame && !OMONST(otmp)->isminion) {
+            break;
+        }
+    }
+
+    if (!otmp) {
+        return FALSE;
+    }
+
+    return (revive(otmp, TRUE) != NULL);
+}
+
+/* #pray commmand */
 int
 dopray(void)
 {
@@ -2168,6 +2190,7 @@ prayer_done(void) /* M. Stephenson (1.0.3b) */
     } else {
         /* coaligned */
         if (on_altar()) {
+            (void) pray_revive();
             (void) water_prayer(TRUE);
         }
         pleased(alignment); /* nice */
