@@ -367,6 +367,8 @@ void
 dipfountain(obj)
 register struct obj *obj;
 {
+    int er = ER_NOTHING;
+
     if (Levitation) {
         floating_above("fountain");
         return;
@@ -412,7 +414,7 @@ register struct obj *obj;
             (void) angry_guards(FALSE);
         return;
     } else {
-        int er = water_damage(obj, NULL, TRUE);
+        er = water_damage(obj, NULL, TRUE);
 
         /* Acid and water don't mix */
         if (obj->otyp == POT_ACID && er != ER_DESTROYED) {
@@ -511,6 +513,11 @@ register struct obj *obj;
         }
         exercise(A_WIS, TRUE);
         newsym(u.ux, u.uy);
+        break;
+    default:
+        if (er == ER_NOTHING) {
+            pline("Nothing seems to happen.");
+        }
         break;
     }
     update_inventory();
