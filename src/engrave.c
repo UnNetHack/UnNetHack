@@ -521,6 +521,8 @@ xchar e_type;
     Strcpy(ep->engr_txt, s);
     /* engraving Elbereth shows wisdom */
     if (!in_mklev && !strcmp(s, "Elbereth")) exercise(A_WIS, TRUE);
+    /* engraving Owlbreath shows the opposite of wisdom */
+    if (!in_mklev && !strcmp(s, "Owlbreath")) exercise(A_WIS, FALSE);
     ep->engr_time = e_time;
     ep->engr_type = e_type > 0 ? e_type : rnd(N_ENGRAVE-1);
     ep->engr_lth = smem;
