@@ -446,7 +446,7 @@ struct obj *obj;
     }
 
     if (recently_picked_up_filter &&
-         get_recently_picked_up_turn() > obj->picked_up_turn) {
+         get_most_recently_picked_up_turn() > obj->picked_up_turn) {
         return FALSE;
     }
 
@@ -475,6 +475,59 @@ is_worn_by_type(otmp)
 register struct obj *otmp;
 {
     return (is_worn(otmp) && allow_category(otmp));
+}
+
+/**
+ * Returns the most recent turn on which an item got picked up.
+ */
+int
+get_most_recently_picked_up_turn()
+{
+    struct obj *list = invent;
+    int turn = 0;
+
+    while (list) {
+        if (list->picked_up_turn > turn) {
+            turn = list->picked_up_turn;
+        }
+        list = list->nobj;
+    }
+    return turn;
+}
+
+
+/**
+ * Returns the number of most recently picked up items
+ */
+int
+count_most_recently_picked_up(struct obj *olist)
+{
+    struct obj *otmp;
+    int cnt = 0;
+    int turn = get_most_recently_picked_up_turn();
+
+    for (otmp = olist; otmp; otmp = otmp->nobj) {
+        if (otmp->picked_up_turn == turn) {
+            cnt++;
+        }
+    }
+
+    return cnt;
+}
+
+struct obj *
+find_most_recently_picked_up_obj(struct obj *olist)
+{
+    struct obj *otmp = NULL;
+    int turn = get_most_recently_picked_up_turn();
+
+    for (otmp = olist; otmp; otmp = otmp->nobj) {
+        if (otmp->picked_up_turn == turn) {
+            return otmp;
+        }
+    }
+
+    return (struct obj *) 0;
 }
 
 /*
@@ -1025,15 +1078,15 @@ int how;               /* type of query */
     boolean do_unidentified = FALSE;
     boolean do_blessed = FALSE, do_cursed = FALSE, do_uncursed = FALSE,
             do_buc_unknown = FALSE;
-    boolean do_picked_up = FALSE;
+    int num_most_recently_picked_up = 0;
     int num_buc_types = 0;
 
     *pick_list = (menu_item *) 0;
     if (!olist) return 0;
     if ((qflags & UNPAID_TYPES) && count_unpaid(olist)) do_unpaid = TRUE;
     if ((qflags & UNIDENTIFIED_TYPES) && count_unidentified(olist)) do_unidentified = TRUE;
-    if ((qflags & RECENTLY_PICKED_UP) && get_recently_picked_up_turn() > 0) {
-        do_picked_up = TRUE;
+    if (qflags & RECENTLY_PICKED_UP) {
+        num_most_recently_picked_up = count_most_recently_picked_up(olist);
     }
     if (qflags & WORN_TYPES) {
         ofilter = is_worn;
@@ -1153,21 +1206,13 @@ int how;               /* type of query */
         add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
                  "Unpaid items already used up", MENU_UNSELECTED);
     }
-    /* unidentifed items if there are any */
+    /* unidentified items if there are any */
     if (do_unidentified) {
         invlet = 'I';
         any = zeroany;
         any.a_int = 'I';
         add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
                  "Unidentified items", MENU_UNSELECTED);
-    }
-    /* unidentifed items if there are any */
-    if (do_picked_up) {
-        invlet = 'P';
-        any = zeroany;
-        any.a_int = 'P';
-        add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
-                 "Items most recently picked up", MENU_UNSELECTED);
     }
     /* items with b/u/c/unknown if there are any;
        this cluster of menu entries is in alphabetical order,
@@ -1200,6 +1245,20 @@ int how;               /* type of query */
         add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE,
                  "Items of unknown B/C/U status",
                  MENU_UNSELECTED);
+    }
+    /* most recently picked up items */
+    if (num_most_recently_picked_up) {
+        char tmpbuf[BUFSZ];
+
+        if (num_most_recently_picked_up == 1) {
+            Sprintf(tmpbuf, "Most recently picked up: %s", doname(find_most_recently_picked_up_obj(olist)));
+        } else {
+            Sprintf(tmpbuf, "Items most recently picked up");
+        }
+        invlet = 'P';
+        any = zeroany;
+        any.a_int = 'P';
+        add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, invlet, 0, ATR_NONE, tmpbuf, MENU_UNSELECTED);
     }
     end_menu(win, qstr);
     n = select_menu(win, how, pick_list);

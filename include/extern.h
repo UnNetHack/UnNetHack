@@ -1095,7 +1095,6 @@ E void NDECL(reassign);
 E int NDECL(doorganize);
 E int FDECL(count_objects, (struct obj *));
 E int FDECL(count_unidentified, (struct obj *));
-E int NDECL(get_recently_picked_up_turn);
 E void NDECL(learn_unseen_invent);
 E void NDECL(update_inventory);
 E int FDECL(count_unpaid, (struct obj *));
@@ -1961,6 +1960,9 @@ E void NDECL(getlock);
 
 /* ### pickup.c ### */
 
+extern int get_most_recently_picked_up_turn();
+extern int count_most_recently_picked_up(struct obj *);
+extern struct obj *find_most_recently_picked_up_obj(struct obj *);
 E void FDECL(observe_quantum_cat, (struct obj *, boolean));
 E boolean FDECL(container_gone, (int (*)(OBJ_P)));
 E boolean NDECL(u_handsy);

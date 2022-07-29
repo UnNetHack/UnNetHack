@@ -2906,24 +2906,6 @@ struct obj *list;
 }
 
 /**
- * Returns the most recent turn on which an item got picked up.
- */
-int
-get_recently_picked_up_turn()
-{
-    struct obj *list = invent;
-    int turn = 0;
-
-    while (list) {
-        if (list->picked_up_turn > turn) {
-            turn = list->picked_up_turn;
-        }
-        list = list->nobj;
-    }
-    return turn;
-}
-
-/**
  * Returns the number of items within the given list including
  * contained objects.
  */
