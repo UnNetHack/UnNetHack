@@ -6,7 +6,7 @@
 #include <limits.h>
 #endif
 
-STATIC_DCL int FDECL(enermod, (int));
+static int enermod(int);
 
 /* Return the experience points cutoff to level up to the next level.
  * Oddly, the experience point values are offset by one from the levels they
@@ -60,7 +60,7 @@ newuexp(int lev)
     return 10000000;
 }
 
-STATIC_OVL int
+static int
 enermod(en)
 int en;
 {

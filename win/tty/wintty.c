@@ -124,8 +124,8 @@ winid BASE_WINDOW;
 struct WinDesc *wins[MAXWIN];
 struct DisplayDesc *ttyDisplay; /* the tty display descriptor */
 
-extern void FDECL(cmov, (int, int)); /* from termcap.c */
-extern void FDECL(nocmov, (int, int)); /* from termcap.c */
+extern void cmov(int, int); /* from termcap.c */
+extern void nocmov(int, int); /* from termcap.c */
 #if defined(UNIX) || defined(VMS)
 static char obuf[BUFSIZ];   /* BUFSIZ is defined in stdio.h */
 #endif
@@ -152,7 +152,7 @@ static int clipy = 0, clipymax = 0;
 #endif /* CLIPPING */
 
 #if defined(USE_TILES) && defined(MSDOS)
-extern void FDECL(adjust_cursor_flags, (struct WinDesc *));
+extern void adjust_cursor_flags(struct WinDesc *);
 #endif
 
 #if defined(ASCIIGRAPH) && !defined(NO_TERMS)
@@ -164,28 +164,28 @@ boolean HE_resets_AS;   /* see termcap.c */
 static const char to_continue[] = "to continue";
 #define getret() getreturn(to_continue)
 #else
-STATIC_DCL void NDECL(getret);
+static void getret();
 #endif
-STATIC_DCL void FDECL(erase_menu_or_text, (winid, struct WinDesc *, BOOLEAN_P));
-STATIC_DCL void FDECL(free_window_info, (struct WinDesc *, BOOLEAN_P));
-STATIC_DCL void FDECL(dmore, (struct WinDesc *, const char *));
-STATIC_DCL void FDECL(set_item_state, (winid, int, tty_menu_item *));
-STATIC_DCL void FDECL(set_all_on_page, (winid, tty_menu_item *, tty_menu_item *));
-STATIC_DCL void FDECL(unset_all_on_page, (winid, tty_menu_item *, tty_menu_item *));
-STATIC_DCL void FDECL(invert_all_on_page, (winid, tty_menu_item *, tty_menu_item *, CHAR_P));
-STATIC_DCL void FDECL(invert_all, (winid, tty_menu_item *, tty_menu_item *, CHAR_P));
-STATIC_DCL void FDECL(process_menu_window, (winid, struct WinDesc *));
-STATIC_DCL void FDECL(process_text_window, (winid, struct WinDesc *));
-STATIC_DCL tty_menu_item *FDECL(reverse, (tty_menu_item *));
-const char * FDECL(compress_str, (const char *));
-STATIC_DCL void FDECL(tty_putsym, (winid, int, int, CHAR_P));
-static void FDECL(setup_rolemenu, (winid, BOOLEAN_P, int, int, int));
-static void FDECL(setup_racemenu, (winid, BOOLEAN_P, int, int, int));
-static void FDECL(setup_gendmenu, (winid, BOOLEAN_P, int, int, int));
-static void FDECL(setup_algnmenu, (winid, BOOLEAN_P, int, int, int));
-static boolean NDECL(reset_role_filtering);
-static char *FDECL(copy_of, (const char *));
-STATIC_DCL void FDECL(bail, (const char *));    /* __attribute__((noreturn)) */
+static void erase_menu_or_text(winid, struct WinDesc *, BOOLEAN_P);
+static void free_window_info(struct WinDesc *, BOOLEAN_P);
+static void dmore(struct WinDesc *, const char *);
+static void set_item_state(winid, int, tty_menu_item *);
+static void set_all_on_page(winid, tty_menu_item *, tty_menu_item *);
+static void unset_all_on_page(winid, tty_menu_item *, tty_menu_item *);
+static void invert_all_on_page(winid, tty_menu_item *, tty_menu_item *, CHAR_P);
+static void invert_all(winid, tty_menu_item *, tty_menu_item *, CHAR_P);
+static void process_menu_window(winid, struct WinDesc *);
+static void process_text_window(winid, struct WinDesc *);
+static tty_menu_item *reverse(tty_menu_item *);
+const char * compress_str(const char *);
+static void tty_putsym(winid, int, int, CHAR_P);
+static void setup_rolemenu(winid, BOOLEAN_P, int, int, int);
+static void setup_racemenu(winid, BOOLEAN_P, int, int, int);
+static void setup_gendmenu(winid, BOOLEAN_P, int, int, int);
+static void setup_algnmenu(winid, BOOLEAN_P, int, int, int);
+static boolean reset_role_filtering();
+static char *copy_of(const char *);
+static void bail(const char *);    /* __attribute__((noreturn)) */
 
 /*
  * A string containing all the default commands -- to add to a list
@@ -239,7 +239,7 @@ int i, c;
 #endif /* USE_TILES */
 
 /* clean up and quit */
-STATIC_OVL void
+static void
 bail(mesg)
 const char *mesg;
 {
@@ -250,7 +250,7 @@ const char *mesg;
 }
 
 #if defined(SIGWINCH) && defined(CLIPPING)
-STATIC_OVL void
+static void
 winch()
 {
     int oldLI = LI, oldCO = CO, i;
@@ -1377,7 +1377,7 @@ tty_get_nh_event()
 }
 
 #if !defined(MICRO) && !defined(WIN32CON)
-STATIC_OVL void
+static void
 getret()
 {
     xputs("\n");
@@ -1550,7 +1550,7 @@ int type;
     return newid;
 }
 
-STATIC_OVL void
+static void
 erase_menu_or_text(window, cw, clear)
 winid window;
 struct WinDesc *cw;
@@ -1568,7 +1568,7 @@ boolean clear;
         docorner((int)cw->offx, cw->maxrow+1);
 }
 
-STATIC_OVL void
+static void
 free_window_info(cw, free_data)
 struct WinDesc *cw;
 boolean free_data;
@@ -1672,7 +1672,7 @@ winid window;
     cw->curx = cw->cury = 0;
 }
 
-STATIC_OVL void
+static void
 dmore(cw, s)
 register struct WinDesc *cw;
 const char *s;              /* valid responses */
@@ -1692,7 +1692,7 @@ const char *s;              /* valid responses */
     xwaitforspace(s);
 }
 
-STATIC_OVL void
+static void
 set_item_state(window, lineno, item)
 winid window;
 int lineno;
@@ -1706,7 +1706,7 @@ tty_menu_item *item;
     term_end_attr(item->attr);
 }
 
-STATIC_OVL void
+static void
 set_all_on_page(window, page_start, page_end)
 winid window;
 tty_menu_item *page_start, *page_end;
@@ -1721,7 +1721,7 @@ tty_menu_item *page_start, *page_end;
         }
 }
 
-STATIC_OVL void
+static void
 unset_all_on_page(window, page_start, page_end)
 winid window;
 tty_menu_item *page_start, *page_end;
@@ -1737,7 +1737,7 @@ tty_menu_item *page_start, *page_end;
         }
 }
 
-STATIC_OVL void
+static void
 invert_all_on_page(window, page_start, page_end, acc)
 winid window;
 tty_menu_item *page_start, *page_end;
@@ -1761,7 +1761,7 @@ char acc;       /* group accelerator, 0 => all */
  * Invert all entries that match the give group accelerator (or all if
  * zero).
  */
-STATIC_OVL void
+static void
 invert_all(window, page_start, page_end, acc)
 winid window;
 tty_menu_item *page_start, *page_end;
@@ -1817,7 +1817,7 @@ int *color, *attr;
 }
 #endif /* MENU_COLOR */
 
-STATIC_OVL void
+static void
 process_menu_window(window, cw)
 winid window;
 struct WinDesc *cw;
@@ -2176,7 +2176,7 @@ group_accel:
     free((genericptr_t)morestr);
 }
 
-STATIC_OVL void
+static void
 process_text_window(window, cw)
 winid window;
 struct WinDesc *cw;
@@ -2476,7 +2476,7 @@ register int x, y;  /* not xchar: perhaps xchar is unsigned and
     ttyDisplay->cury = y;
 }
 
-STATIC_OVL void
+static void
 tty_putsym(window, x, y, ch)
 winid window;
 int x, y;
@@ -2886,7 +2886,7 @@ unsigned int itemflags; /* itemflags such as MENU_ITEMFLAGS_SELECTED */
 }
 
 /* Invert the given list, can handle NULL as an input. */
-STATIC_OVL tty_menu_item *
+static tty_menu_item *
 reverse(curr)
 tty_menu_item *curr;
 {

@@ -178,17 +178,11 @@ typedef const char *vA;
  * Used for robust ANSI parameter forward declarations:
  * int VDECL(sprintf, (char *, const char *, ...));
  *
- * NDECL() is used for functions with zero arguments;
- * FDECL() is used for functions with a fixed number of arguments;
  * VDECL() is used for functions with a variable number of arguments.
  * Separate macros are needed because ANSI will mix old-style declarations
  * with prototypes, except in the case of varargs, and the OVERLAY-specific
  * trampoli.* mechanism conflicts with the ANSI <<f(void)>> syntax.
  */
-
-# define NDECL(f)   f(void) /* overridden later if USE_TRAMPOLI set */
-
-# define FDECL(f, p) f p
 
 # if defined(MSDOS) || defined(USE_STDARG)
 #  define VDECL(f, p)    f p
@@ -237,8 +231,6 @@ typedef const char *vA;
 
 #else /* NHSTDC */  /* a "traditional" C  compiler */
 
-# define NDECL(f)   f()
-# define FDECL(f, p) f()
 # define VDECL(f, p) f()
 
 # define VOID_ARGS /*empty*/
@@ -335,7 +327,7 @@ typedef genericptr genericptr_t;    /* (void *) or (char *) */
 #endif
 #endif
 
-/* These are used for arguments within FDECL/VDECL prototype declarations.
+/* These are used for arguments within VDECL prototype declarations.
  */
 #ifdef UNWIDENED_PROTOTYPES
 #define CHAR_P char
@@ -360,7 +352,7 @@ typedef genericptr genericptr_t;    /* (void *) or (char *) */
 #define ALIGNTYP_P int
 #else
 /* Neither widened nor unwidened prototypes.  Argument list expansion
- * by FDECL/VDECL always empty; all xxx_P vanish so defs aren't needed. */
+ * by VDECL always empty; all xxx_P vanish so defs aren't needed. */
 #endif
 #endif
 
@@ -393,11 +385,7 @@ typedef genericptr genericptr_t;    /* (void *) or (char *) */
  * include files have prototypes and the compiler also complains that
  * prototyped and unprototyped declarations don't match.
  */
-# undef NDECL
-# undef FDECL
 # undef VDECL
-# define NDECL(f)   f()
-# define FDECL(f, p) f()
 # define VDECL(f, p) f()
 # undef VOID_ARGS
 # define VOID_ARGS /*empty*/

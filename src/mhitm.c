@@ -13,18 +13,18 @@ static NEARDATA struct obj *otmp;
 static const char brief_feeling[] =
     "have a %s feeling for a moment, then it passes.";
 
-STATIC_DCL int FDECL(hitmm, (struct monst *, struct monst *, struct attack *));
-STATIC_DCL int FDECL(gazemm, (struct monst *, struct monst *, struct attack *));
-STATIC_DCL int FDECL(gulpmm, (struct monst *, struct monst *, struct attack *));
-STATIC_DCL int FDECL(explmm, (struct monst *, struct monst *, struct attack *));
-STATIC_DCL int FDECL(mdamagem, (struct monst *, struct monst *, struct attack *));
+static int hitmm(struct monst *, struct monst *, struct attack *);
+static int gazemm(struct monst *, struct monst *, struct attack *);
+static int gulpmm(struct monst *, struct monst *, struct attack *);
+static int explmm(struct monst *, struct monst *, struct attack *);
+static int mdamagem(struct monst *, struct monst *, struct attack *);
 #ifdef WEBB_DISINT
-STATIC_DCL int FDECL(defdisintagr, (struct monst *, struct monst *, struct attack *));
+static int defdisintagr(struct monst *, struct monst *, struct attack *);
 #endif
-STATIC_DCL void FDECL(mswingsm, (struct monst *, struct monst *, struct obj *));
-STATIC_DCL void FDECL(noises, (struct monst *, struct attack *));
-STATIC_DCL void FDECL(missmm, (struct monst *, struct monst *, struct attack *));
-STATIC_DCL int FDECL(passivemm, (struct monst *, struct monst *, BOOLEAN_P, int));
+static void mswingsm(struct monst *, struct monst *, struct obj *);
+static void noises(struct monst *, struct attack *);
+static void missmm(struct monst *, struct monst *, struct attack *);
+static int passivemm(struct monst *, struct monst *, BOOLEAN_P, int);
 
 /* Needed for the special case of monsters wielding vorpal blades (rare).
  * If we use this a lot it should probably be a parameter to mdamagem()
@@ -32,7 +32,7 @@ STATIC_DCL int FDECL(passivemm, (struct monst *, struct monst *, BOOLEAN_P, int)
  */
 static int dieroll;
 
-STATIC_OVL void
+static void
 noises(magr, mattk)
 register struct monst *magr;
 register struct attack *mattk;
@@ -48,8 +48,7 @@ register struct attack *mattk;
     }
 }
 
-STATIC_OVL
-void
+static void
 missmm(magr, mdef, mattk)
 register struct monst *magr, *mdef;
 struct attack *mattk;
@@ -576,7 +575,7 @@ register struct monst *magr, *mdef;
 }
 
 /* Returns the result of mdamagem(). */
-STATIC_OVL int
+static int
 hitmm(magr, mdef, mattk)
 register struct monst *magr, *mdef;
 struct attack *mattk;
@@ -697,7 +696,7 @@ struct attack *mattk;
 }
 
 /* Returns the same values as mdamagem(). */
-STATIC_OVL int
+static int
 gazemm(magr, mdef, mattk)
 register struct monst *magr, *mdef;
 struct attack *mattk;
@@ -797,7 +796,7 @@ struct monst *magr, *mdef;
 }
 
 /* Returns the same values as mattackm(). */
-STATIC_OVL int
+static int
 gulpmm(magr, mdef, mattk)
 register struct monst *magr, *mdef;
 register struct attack *mattk;
@@ -894,7 +893,7 @@ register struct attack *mattk;
     return status;
 }
 
-STATIC_OVL int
+static int
 explmm(magr, mdef, mattk)
 struct monst *magr, *mdef;
 struct attack *mattk;
@@ -935,7 +934,7 @@ struct attack *mattk;
 }
 
 #ifdef WEBB_DISINT
-STATIC_OVL int
+static int
 defdisintagr(magr, mdef, mattk)
 register struct monst   *magr, *mdef;
 register struct attack  *mattk;
@@ -1068,7 +1067,7 @@ register struct attack  *mattk;
 /*
  *  See comment at top of mattackm(), for return values.
  */
-STATIC_OVL int
+static int
 mdamagem(magr, mdef, mattk)
 register struct monst   *magr, *mdef;
 register struct attack  *mattk;
@@ -1975,7 +1974,7 @@ struct obj *obj;
     }
 }
 
-STATIC_OVL void
+static void
 mswingsm(magr, mdef, otemp)
 struct monst *magr, *mdef;
 struct obj *otemp;
@@ -1992,7 +1991,7 @@ struct obj *otemp;
  * Passive responses by defenders.  Does not replicate responses already
  * handled above.  Returns same values as mattackm.
  */
-STATIC_OVL int
+static int
 passivemm(magr, mdef, mhit, mdead)
 register struct monst *magr, *mdef;
 boolean mhit;

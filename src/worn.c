@@ -3,9 +3,9 @@
 
 #include "hack.h"
 
-STATIC_DCL void FDECL(m_lose_armor, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(m_dowear_type, (struct monst *, long, BOOLEAN_P, BOOLEAN_P));
-STATIC_DCL int FDECL(extra_pref, (struct monst *, struct obj *));
+static void m_lose_armor(struct monst *, struct obj *);
+static void m_dowear_type(struct monst *, long, BOOLEAN_P, BOOLEAN_P);
+static int extra_pref(struct monst *, struct obj *);
 
 const struct worn {
     long w_mask;
@@ -543,7 +543,7 @@ boolean creation;
         m_dowear_type(mon, W_ARM, creation, RACE_EXCEPTION);
 }
 
-STATIC_OVL void
+static void
 m_dowear_type(mon, flag, creation, racialexception)
 struct monst *mon;
 long flag;
@@ -713,7 +713,7 @@ long flag;
 }
 
 /* remove an item of armor and then drop it */
-STATIC_OVL void
+static void
 m_lose_armor(mon, obj)
 struct monst *mon;
 struct obj *obj;

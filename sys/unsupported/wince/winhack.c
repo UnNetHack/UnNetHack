@@ -8,15 +8,9 @@
 #include "mhmain.h"
 #include "mhmap.h"
 
-#ifdef OVL0
-#define SHARED_DCL
-#else
-#define SHARED_DCL extern
-#endif
+char orgdir[PATHLEN];	/* also used in pcsys.c, amidos.c */
 
-SHARED_DCL char orgdir[PATHLEN];	/* also used in pcsys.c, amidos.c */
-
-extern void FDECL(nethack_exit,(int));
+extern void nethack_exit(int);
 static TCHAR* _get_cmd_arg(TCHAR* pCmdLine);
 
 // Global Variables:
@@ -29,7 +23,7 @@ static void win_hack_init(int, char **);
 static void __cdecl mswin_moveloop(void *);
 static BOOL setMapTiles(const char* fname);
 
-extern void FDECL(pcmain, (int,char **));
+extern void pcmain(int,char **);
 
 #define MAX_CMDLINE_PARAM 255
 
@@ -104,12 +98,12 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	}
 
 	// Perform application initialization:
-	if (!InitInstance (hInstance, nCmdShow)) 
+	if (!InitInstance (hInstance, nCmdShow))
 	{
 		return FALSE;
 	}
 
-	/* get command line parameters */	
+	/* get command line parameters */
 	p = _get_cmd_arg(
 #if defined(WIN_CE_PS2xx) || defined(WIN32_PLATFORM_HPCPRO)
 		lpCmdLine
@@ -211,7 +205,7 @@ getlock()
 		GetNHApp()->hMainWnd,
 		TEXT("There are files from a game in progress under your name. Recover?"),
 		TEXT("Nethack"),
-		MB_YESNO | MB_DEFBUTTON1 
+		MB_YESNO | MB_DEFBUTTON1
 		);
 	switch(choice) {
 	case IDYES:
@@ -222,7 +216,7 @@ getlock()
 		}
 		break;
 
-	case IDNO: 
+	case IDNO:
 		unlock_file(HLOCK);
 		error("%s", "Cannot start a new game.");
 		break;
@@ -254,25 +248,25 @@ error VA_DECL(const char *,s)
 	VA_INIT(s, const char *);
 	/* error() may get called before tty is initialized */
 	if (iflags.window_inited) end_screen();
-	
+
 	vsprintf(buf, s, VA_ARGS);
 	NH_A2W(buf, wbuf, sizeof(wbuf)/sizeof(wbuf[0]));
 	if( last_error>0 ) {
 		LPVOID lpMsgBuf;
-		if( FormatMessage( 
-				FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-				FORMAT_MESSAGE_FROM_SYSTEM | 
+		if( FormatMessage(
+				FORMAT_MESSAGE_ALLOCATE_BUFFER |
+				FORMAT_MESSAGE_FROM_SYSTEM |
 				FORMAT_MESSAGE_IGNORE_INSERTS,
 				NULL,
 				last_error,
 				0, // Default language
 				(LPTSTR) &lpMsgBuf,
 				0,
-				NULL 
+				NULL
 			)
 			)
 		{
-			
+
 			_tcsncat(wbuf, TEXT("\nSystem Error: "), sizeof(wbuf)/sizeof(wbuf[0]) - _tcslen(wbuf) );
 			_tcsncat(wbuf, lpMsgBuf, sizeof(wbuf)/sizeof(wbuf[0]) - _tcslen(wbuf) );
 
@@ -283,7 +277,7 @@ error VA_DECL(const char *,s)
 	VA_END();
 
 	MessageBox( NULL, wbuf, TEXT("Error"), MB_OK | MB_ICONERROR );
-	
+
 	exit(EXIT_FAILURE);
 }
 
@@ -312,7 +306,7 @@ TCHAR* _get_cmd_arg(TCHAR* pCmdLine)
 		/* skip to whitespace */
 		for(pArgs = pRetArg; *pArgs && !_istspace(*pArgs); pArgs = CharNext(pArgs));
 	}
-	
+
 	if( pArgs && *pArgs ) {
 		TCHAR* p;
 		p = pArgs;
@@ -325,7 +319,7 @@ TCHAR* _get_cmd_arg(TCHAR* pCmdLine)
 	return pRetArg;
 }
 
-/* 
+/*
  * Strip out troublesome file system characters.
  */
 

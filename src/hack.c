@@ -7,20 +7,20 @@
 
 /* #define DEBUG */ /* uncomment for debugging */
 
-static void NDECL(maybe_wail);
-static int NDECL(moverock);
-static int FDECL(still_chewing, (XCHAR_P, XCHAR_P));
+static void maybe_wail();
+static int moverock();
+static int still_chewing(XCHAR_P, XCHAR_P);
 #ifdef SINKS
-static void NDECL(dosinkfall);
+static void dosinkfall();
 #endif
-static boolean FDECL(findtravelpath, (boolean (*)(int, int)));
-static boolean FDECL(trapmove, (int, int, struct trap *));
-static struct monst *FDECL(monstinroom, (struct permonst *, int));
-static boolean FDECL(doorless_door, (int, int));
-static void FDECL(move_update, (BOOLEAN_P));
+static boolean findtravelpath(boolean (*)(int, int));
+static boolean trapmove(int, int, struct trap *);
+static struct monst *monstinroom(struct permonst *, int);
+static boolean doorless_door(int, int);
+static void move_update(BOOLEAN_P);
 static void check_buried_zombies(xchar, xchar);
 static boolean domove_swap_with_pet(struct monst *, xchar, xchar);
-static void FDECL(struggle_sub, (const char *));
+static void struggle_sub(const char *);
 static boolean check_interrupt(struct monst *mtmp);
 
 static boolean door_opened; /* set to true if door was opened during test_move */
@@ -3867,11 +3867,11 @@ const char *msg_override;
     nomovemsg = 0;
     u.usleep = 0;
     if (afternmv) {
-        int NDECL((*f)) = afternmv;
+        int (*f)(void) = afternmv;
 
         /* clear afternmv before calling it (to override the
            encumbrance hack for levitation--see weight_cap()) */
-        afternmv = (int NDECL((*))) 0;
+        afternmv = (int (*)(void)) 0;
         (void) (*f)();
         /* for finishing Armor/Boots/&c_on() */
         update_inventory();

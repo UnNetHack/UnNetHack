@@ -50,8 +50,8 @@
  * No item may be in more than one of these slots.
  */
 
-static boolean FDECL(cant_wield_corpse, (struct obj *));
-STATIC_DCL int FDECL(ready_weapon, (struct obj *));
+static boolean cant_wield_corpse(struct obj *);
+static int ready_weapon(struct obj *);
 
 static int wield(boolean prompt_for_obj);
 
@@ -162,7 +162,7 @@ struct obj *obj;
     return TRUE;
 }
 
-STATIC_OVL int
+static int
 ready_weapon(wep)
 struct obj *wep;
 {

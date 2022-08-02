@@ -34,10 +34,10 @@
  *                       random intervals.
  */
 
-STATIC_DCL boolean FDECL(md_start, (coord *));
-STATIC_DCL boolean FDECL(md_stop, (coord *, coord *));
-STATIC_DCL boolean FDECL(md_rush, (struct monst *, int, int));
-STATIC_DCL void FDECL(newmail, (struct mail_info *));
+static boolean md_start(coord *);
+static boolean md_stop(coord *, coord *);
+static boolean md_rush(struct monst *, int, int);
+static void newmail(struct mail_info *);
 
 int mailckfreq = 0;
 
@@ -57,9 +57,9 @@ static int gethint = -1;
 #   if !defined(SUNOS4) && !(defined(ULTRIX) && defined(__GNUC__))
 /* DO trust all SVR4 to typedef uid_t in <sys/types.h> (probably to a long) */
 #    if defined(POSIX_TYPES) || defined(SVR4) || defined(HPUX)
-extern struct passwd *FDECL(getpwuid, (uid_t));
+extern struct passwd *getpwuid(uid_t);
 #    else
-extern struct passwd *FDECL(getpwuid, (int));
+extern struct passwd *getpwuid(int);
 #    endif
 #   endif
 #  endif
@@ -135,7 +135,7 @@ getmailstatus()
  * Pick coordinates for a starting position for the mail daemon.  Called
  * from newmail() and newphone().
  */
-STATIC_OVL boolean
+static boolean
 md_start(startp)
 coord *startp;
 {
@@ -236,7 +236,7 @@ retry:
  * enexto().  Use enexto() as a last resort because enexto() chooses
  * its point randomly, which is not what we want.
  */
-STATIC_OVL boolean
+static boolean
 md_stop(stopp, startp)
 coord *stopp;       /* stopping position (we fill it in) */
 coord *startp;      /* starting position (read only) */
@@ -280,7 +280,7 @@ static NEARDATA const char *mail_text[] = {
  * FALSE if the md gets stuck in a position where there is a monster.  Return
  * TRUE otherwise.
  */
-STATIC_OVL boolean
+static boolean
 md_rush(md, tx, ty)
 struct monst *md;
 register int tx, ty;            /* destination of mail daemon */
@@ -381,7 +381,7 @@ register int tx, ty;            /* destination of mail daemon */
 
 /* Deliver a scroll of mail. */
 /*ARGSUSED*/
-STATIC_OVL void
+static void
 newmail(info)
 struct mail_info *info;
 {
@@ -631,7 +631,7 @@ bail:
 
 # ifdef VMS
 
-extern NDECL(struct mail_info *parse_next_broadcast);
+extern struct mail_info *parse_next_broadcast();
 
 volatile int broadcasts = 0;
 

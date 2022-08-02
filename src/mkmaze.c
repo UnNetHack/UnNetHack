@@ -12,22 +12,22 @@ extern int num_lregions;
 static lev_region bughack = { { COLNO, ROWNO, 0, 0 }, { COLNO, ROWNO, 0, 0 }, 0, 0, 0, 0, { 0 } };
 extern char SpLev_Map[COLNO][ROWNO];
 
-static int FDECL(iswall, (int, int));
-static int FDECL(iswall_or_stone, (int, int));
-STATIC_DCL boolean FDECL(is_solid, (int, int));
-STATIC_DCL int FDECL(extend_spine, (int [3][3], int, int, int));
-STATIC_DCL boolean FDECL(okay, (int, int, int));
-STATIC_DCL void FDECL(maze0xy, (coord *));
-STATIC_DCL boolean FDECL(put_lregion_here, (XCHAR_P, XCHAR_P, XCHAR_P,
-                                            XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, BOOLEAN_P, d_level *, XCHAR_P));
-STATIC_DCL void FDECL(move, (int *, int *, int));
-STATIC_DCL void NDECL(setup_waterlevel);
-STATIC_DCL void NDECL(unsetup_waterlevel);
+static int iswall(int, int);
+static int iswall_or_stone(int, int);
+static boolean is_solid(int, int);
+static int extend_spine(int [3][3], int, int, int);
+static boolean okay(int, int, int);
+static void maze0xy(coord *);
+static boolean put_lregion_here(XCHAR_P, XCHAR_P, XCHAR_P,
+                                XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, BOOLEAN_P, d_level *, XCHAR_P);
+static void move(int *, int *, int);
+static void setup_waterlevel();
+static void unsetup_waterlevel();
 
-static void FDECL(check_ransacked, (char *));
-static void FDECL(migr_booty_item, (int, const char *));
-static void FDECL(migrate_orc, (struct monst *, unsigned long));
-static void NDECL(stolen_booty);
+static void check_ransacked(char *);
+static void migr_booty_item(int, const char *);
+static void migrate_orc(struct monst *, unsigned long);
+static void stolen_booty();
 
 /* adjust a coordinate one step in the specified direction */
 #define mz_move(X, Y, dir) \
@@ -68,7 +68,7 @@ int x, y;
 }
 
 /* return TRUE if out of bounds, wall or rock */
-STATIC_OVL boolean
+static boolean
 is_solid(x, y)
 int x, y;
 {
@@ -93,7 +93,7 @@ int x, y;
  *      W x W       This would extend a spine from x down.
  *      . W W
  */
-STATIC_OVL int
+static int
 extend_spine(locale, wall_there, dx, dy)
 int locale[3][3];
 int wall_there, dx, dy;
@@ -223,7 +223,7 @@ int x1, y1, x2, y2;
     }
 }
 
-STATIC_OVL boolean
+static boolean
 okay(x, y, dir)
 int x, y;
 int dir;
@@ -237,7 +237,7 @@ int dir;
 }
 
 /* find random starting point for maze generation */
-STATIC_OVL void
+static void
 maze0xy(cc)
 coord   *cc;
 {
@@ -320,7 +320,7 @@ d_level *lev;
     return FALSE;
 }
 
-STATIC_OVL boolean
+static boolean
 put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, oneshot, lev, lax)
 xchar x, y;
 xchar nlx, nly, nhx, nhy;
@@ -1440,7 +1440,7 @@ schar typ;
 }
 #endif /* MICRO */
 
-STATIC_OVL void
+static void
 move(x, y, dir)
 register int *x, *y;
 register int dir;
@@ -1668,9 +1668,9 @@ static int xmin, ymin, xmax, ymax;  /* level boundaries */
 #define bxmax (xmax - 1)
 #define bymax (ymax - 1)
 
-STATIC_DCL void NDECL(set_wportal);
-STATIC_DCL void FDECL(mk_bubble, (int, int, int));
-STATIC_DCL void FDECL(mv_bubble, (struct bubble *, int, int, BOOLEAN_P));
+static void set_wportal();
+static void mk_bubble(int, int, int);
+static void mv_bubble(struct bubble *, int, int, BOOLEAN_P);
 
 void
 movebubbles()
@@ -1920,7 +1920,7 @@ xchar x, y;
     return hliquid("water");
 }
 
-STATIC_OVL void
+static void
 set_wportal()
 {
     /* there better be only one magic portal on water level... */
@@ -1929,7 +1929,7 @@ set_wportal()
     impossible("set_wportal(): no portal!");
 }
 
-STATIC_OVL void
+static void
 setup_waterlevel()
 {
     int x, y;
@@ -1962,7 +1962,7 @@ setup_waterlevel()
             mk_bubble(x, y, rn2(7));
 }
 
-STATIC_OVL void
+static void
 unsetup_waterlevel()
 {
     struct bubble *b, *bb;
@@ -1975,7 +1975,7 @@ unsetup_waterlevel()
     bbubbles = ebubbles = (struct bubble *)0;
 }
 
-STATIC_OVL void
+static void
 mk_bubble(x, y, n)
 int x, y, n;
 {
@@ -2036,7 +2036,7 @@ int x, y, n;
  * in the immediate neighborhood of one, he/she may get sucked inside.
  * This property also makes leaving a bubble slightly difficult.
  */
-STATIC_OVL void
+static void
 mv_bubble(b, dx, dy, ini)
 struct bubble *b;
 int dx, dy;

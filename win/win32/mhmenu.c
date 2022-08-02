@@ -113,7 +113,7 @@ COLORREF nhcolor_to_RGB(int c)
 }
 
 
-STATIC_OVL boolean
+static boolean
 get_menu_coloring(str, color, attr)
 char *str;
 int *color, *attr;

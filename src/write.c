@@ -2,8 +2,8 @@
 
 #include "hack.h"
 
-static boolean FDECL(label_known, (int, struct obj *));
-static char *FDECL(new_book_description, (int, char *));
+static boolean label_known(int, struct obj *);
+static char *new_book_description(int, char *);
 
 /*
  * returns basecost of a scroll or a spellbook

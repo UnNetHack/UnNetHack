@@ -20,16 +20,16 @@ extern boolean notonhead;   /* for long worms */
 extern boolean m_using;
 
 static boolean zombie_can_dig(xchar x, xchar y);
-STATIC_DCL void FDECL(polyuse, (struct obj*, int, int));
-STATIC_DCL void FDECL(create_polymon, (struct obj *, int));
-STATIC_DCL boolean FDECL(zap_updown, (struct obj *));
-STATIC_DCL void FDECL(zhitu, (int, int, const char *, XCHAR_P, XCHAR_P));
-STATIC_DCL void FDECL(revive_egg, (struct obj *));
-STATIC_DCL boolean FDECL(zap_steed, (struct obj *));
+static void polyuse(struct obj*, int, int);
+static void create_polymon(struct obj *, int);
+static boolean zap_updown(struct obj *);
+static void zhitu(int, int, const char *, XCHAR_P, XCHAR_P);
+static void revive_egg(struct obj *);
+static boolean zap_steed(struct obj *);
 
-STATIC_DCL int FDECL(zap_hit, (int, int));
-STATIC_DCL void FDECL(backfire, (struct obj *));
-STATIC_DCL int FDECL(spell_hit_bonus, (int));
+static int zap_hit(int, int);
+static void backfire(struct obj *);
+static int spell_hit_bonus(int);
 
 #define ZT_MAGIC_MISSILE (AD_MAGM-1)
 #define ZT_FIRE          (AD_FIRE-1)
@@ -50,7 +50,7 @@ STATIC_DCL int FDECL(spell_hit_bonus, (int));
 
 #define M_IN_WATER(ptr) ((ptr)->mlet == S_EEL || amphibious(ptr) || is_swimmer(ptr))
 
-STATIC_VAR const char are_blinded_by_the_flash[] = "are blinded by the flash!";
+static const char are_blinded_by_the_flash[] = "are blinded by the flash!";
 
 const char * const flash_types[] = {    /* also used in buzzmu(mcastu.c) */
     "magic missile",    /* Wands must be 0-9 */
@@ -1032,7 +1032,7 @@ struct obj *corpse;
     }
 }
 
-STATIC_OVL void
+static void
 revive_egg(obj)
 struct obj *obj;
 {
@@ -1395,7 +1395,7 @@ struct obj *obj;
  * there's a random factor here to keep from always using the stuff
  * at the top of the pile.
  */
-STATIC_OVL void
+static void
 polyuse(objhdr, mat, minwt)
 struct obj *objhdr;
 int mat, minwt;
@@ -1436,7 +1436,7 @@ int mat, minwt;
  * Polymorph some of the stuff in this pile into a monster, preferably
  * a golem of the kind okind.
  */
-STATIC_OVL void
+static void
 create_polymon(obj, okind)
 struct obj *obj;
 int okind;
@@ -1860,7 +1860,7 @@ int id;
 }
 
 /* stone-to-flesh spell hits and maybe transforms or animates obj */
-STATIC_OVL int
+static int
 stone_to_flesh_obj(obj)
 struct obj *obj;
 {
@@ -2229,7 +2229,7 @@ struct obj *obj, *otmp;
 int
 bhitpile(obj, fhito, tx, ty, zz)
 struct obj *obj;
-int FDECL((*fhito), (OBJ_P, OBJ_P));
+int (*fhito)(OBJ_P, OBJ_P);
 int tx, ty;
 schar zz;
 {
@@ -2339,7 +2339,7 @@ register struct obj *obj;
     }
 }
 
-STATIC_OVL void
+static void
 backfire(otmp)
 struct obj *otmp;
 {
@@ -2831,7 +2831,7 @@ long duration;
  * Return TRUE if the steed was hit by the wand.
  * Return FALSE if the steed was not hit by the wand.
  */
-STATIC_OVL boolean
+static boolean
 zap_steed(obj)
 struct obj *obj; /* wand or spell */
 {
@@ -3065,7 +3065,7 @@ boolean youattack, allow_cancel_kill, self_cancel;
 }
 
 /* you've zapped an immediate type wand up or down */
-STATIC_OVL boolean
+static boolean
 zap_updown(obj)
 struct obj *obj; /* wand or spell */
 {
@@ -3409,7 +3409,7 @@ int dmg; /* base amount to be adjusted by bonus or penalty */
  * Generate the to hit bonus for a spell.  Based on the hero's skill in
  * spell class and dexterity.
  */
-STATIC_OVL int
+static int
 spell_hit_bonus(skill)
 int skill;
 {
@@ -3473,7 +3473,7 @@ register struct monst *mtmp;
           mon_nam(mtmp) : "it");
 }
 
-STATIC_OVL void
+static void
 skiprange(range, skipstart, skipend)
 int range, *skipstart, *skipend;
 {
@@ -3509,8 +3509,8 @@ struct monst *
 bhit(ddx, ddy, range, weapon, fhitm, fhito, obj, obj_destroyed)
 register int ddx, ddy, range;          /**< direction and range */
 int weapon;                            /**< see values in hack.h */
-int FDECL((*fhitm), (MONST_P, OBJ_P)), /**< fns called when mon/obj hit */
-FDECL((*fhito), (OBJ_P, OBJ_P));
+int (*fhitm) (MONST_P, OBJ_P),         /**< fns called when mon/obj hit */
+(*fhito)(OBJ_P, OBJ_P);
 struct obj *obj;                       /**< object tossed/used */
 boolean *obj_destroyed;                /**< has object been deallocated? Pointer to boolean, may be NULL */
 {
@@ -4072,7 +4072,7 @@ struct obj **ootmp; /* to return worn armor for caller to disintegrate */
     return(tmp);
 }
 
-STATIC_OVL void
+static void
 zhitu(type, nd, fltxt, sx, sy)
 int type, nd;
 const char *fltxt;
@@ -4320,7 +4320,7 @@ boolean u_caused;
 }
 
 /* will zap/spell/breath attack score a hit against armor class `ac'? */
-STATIC_OVL int
+static int
 zap_hit(ac, type)
 int ac;
 int type; /* either hero cast spell type or 0 */
@@ -4337,7 +4337,7 @@ int type; /* either hero cast spell type or 0 */
     return (3 - chance) < ac+spell_bonus;
 }
 
-STATIC_OVL void
+static void
 disintegrate_mon(mon, type, fltxt)
 struct monst *mon;
 int type; /* hero vs other */
@@ -5142,7 +5142,7 @@ const char *const destroy_strings[][3] = {
 
 /* guts of destroy_item(), which ought to be called maybe_destroy_items();
    caller must decide whether obj is eligible */
-STATIC_OVL void
+static void
 destroy_one_item(obj, osym, dmgtyp)
 struct obj *obj;
 int osym, dmgtyp;
@@ -5552,7 +5552,7 @@ int damage, tell;
 
 #define MAXWISHTRY 5
 
-STATIC_OVL void
+static void
 wishcmdassist(triesleft)
 int triesleft;
 {

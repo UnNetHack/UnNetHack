@@ -2,9 +2,9 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-STATIC_DCL char *NDECL(nextmbuf);
-static void FDECL(getpos_help, (BOOLEAN_P, const char *));
-static void FDECL(gather_locs, (coord **, int *, int));
+static char *nextmbuf();
+static void getpos_help(BOOLEAN_P, const char *);
+static void gather_locs(coord **, int *, int);
 static void auto_describe(int, int);
 static void call_object(int, char *);
 static void call_input(int, char *);
@@ -14,7 +14,7 @@ extern const char what_is_an_unknown_object[];      /* from pager.c */
 #define NUMMBUF 5
 
 /* manage a pool of BUFSZ buffers, so callers don't have to */
-STATIC_OVL char *
+static char *
 nextmbuf()
 {
     static char NEARDATA bufs[NUMMBUF][BUFSZ];
@@ -27,13 +27,13 @@ nextmbuf()
 /* function for getpos() to highlight desired map locations.
  * parameter value 0 = initialize, 1 = highlight, 2 = done
  */
-static void FDECL((*getpos_hilitefunc), (int)) = (void FDECL((*), (int))) 0;
-static boolean FDECL((*getpos_getvalid), (int, int)) = (boolean FDECL((*), (int, int))) 0;
+static void (*getpos_hilitefunc)(int) = (void (*)(int)) 0;
+static boolean (*getpos_getvalid)(int, int) = (boolean (*)(int, int)) 0;
 
 void
 getpos_sethilite(gp_hilitef, gp_getvalidf)
-void FDECL((*gp_hilitef), (int));
-boolean FDECL((*gp_getvalidf), (int, int));
+void (*gp_hilitef)(int);
+boolean (*gp_getvalidf)(int, int);
 {
     getpos_hilitefunc = gp_hilitef;
     getpos_getvalid = gp_getvalidf;
@@ -1259,7 +1259,7 @@ do_mname()
     return(0);
 }
 
-STATIC_VAR int via_naming = 0;
+static int via_naming = 0;
 
 /*
  * This routine changes the address of obj. Be careful not to call it
@@ -1453,7 +1453,7 @@ ddocall()
 }
 
 /* for use by safe_qbuf() */
-STATIC_PTR char *
+static char *
 docall_xname(obj)
 struct obj *obj;
 {

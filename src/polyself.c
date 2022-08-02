@@ -20,12 +20,12 @@
 
 #include "hack.h"
 
-STATIC_DCL void FDECL(polyman, (const char *, const char *));
-static void FDECL(dropp, (struct obj *));
-STATIC_DCL void NDECL(break_armor);
-STATIC_DCL void FDECL(drop_weapon, (int));
-STATIC_DCL int FDECL(armor_to_dragon, (int));
-STATIC_DCL void NDECL(newman);
+static void polyman(const char *, const char *);
+static void dropp(struct obj *);
+static void break_armor();
+static void drop_weapon(int);
+static int armor_to_dragon(int);
+static void newman();
 
 static const char no_longer_petrify_resistant[] = "No longer petrify-resistant, you";
 
@@ -142,7 +142,7 @@ boolean on;
 }
 
 /* make a (new) human out of the player */
-STATIC_OVL void
+static void
 polyman(fmt, arg)
 const char *fmt, *arg;
 {
@@ -240,7 +240,7 @@ change_sex()
     }
 }
 
-STATIC_OVL void
+static void
 newman()
 {
     int tmp, oldlvl;
@@ -772,7 +772,7 @@ struct obj *obj;
     }
 }
 
-STATIC_OVL void
+static void
 break_armor()
 {
     register struct obj *otmp;
@@ -875,7 +875,7 @@ break_armor()
     }
 }
 
-STATIC_OVL void
+static void
 drop_weapon(alone)
 int alone;
 {
@@ -1547,7 +1547,7 @@ int damtype, dam;
     }
 }
 
-STATIC_OVL int
+static int
 armor_to_dragon(atyp)
 int atyp;
 {

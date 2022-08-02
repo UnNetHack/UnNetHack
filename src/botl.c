@@ -14,9 +14,9 @@ const char * const enc_stat[] = {
     "Overloaded"
 };
 
-STATIC_DCL void NDECL(bot1);
-STATIC_DCL void NDECL(bot2);
-STATIC_DCL void NDECL(bot3);
+static void bot1();
+static void bot2();
+static void bot3();
 
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 
@@ -153,7 +153,7 @@ int statusline;
 
 #endif
 
-STATIC_OVL NEARDATA int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
+static NEARDATA int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
 
 /* convert experience level (1..30) to rank index (0..8) */
 int
@@ -268,7 +268,7 @@ botl_score()
 #ifdef DUMP_LOG
 void bot1str(char *newbot1)
 #else
-STATIC_OVL void
+static void
 bot1()
 #endif
 {
@@ -368,7 +368,7 @@ bot1()
 #endif
 #ifdef DUMP_LOG
 }
-STATIC_OVL void
+static void
 bot1()
 {
     char newbot1[MAXCO];
@@ -476,7 +476,7 @@ botl_realtime()
 void bot2str(newbot2)
 char* newbot2;
 #else
-STATIC_OVL void
+static void
 bot2()
 #endif
 {
@@ -586,7 +586,7 @@ bot2()
     }
 #ifdef DUMP_LOG
 }
-STATIC_OVL void
+static void
 bot2()
 {
     char newbot2[MAXCO];

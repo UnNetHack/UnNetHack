@@ -11,13 +11,13 @@
 
 extern boolean known;   /* from read.c */
 
-STATIC_DCL void FDECL(do_dknown_of, (struct obj *));
-STATIC_DCL boolean FDECL(check_map_spot, (int, int, CHAR_P, unsigned));
-STATIC_DCL boolean FDECL(clear_stale_map, (CHAR_P, unsigned));
-STATIC_DCL void FDECL(sense_trap, (struct trap *, XCHAR_P, XCHAR_P, int));
-STATIC_DCL void FDECL(show_map_spot, (int, int));
-STATIC_PTR void FDECL(findone, (int, int, genericptr_t));
-STATIC_PTR void FDECL(openone, (int, int, genericptr_t));
+static void do_dknown_of(struct obj *);
+static boolean check_map_spot(int, int, CHAR_P, unsigned);
+static boolean clear_stale_map(CHAR_P, unsigned);
+static void sense_trap(struct trap *, XCHAR_P, XCHAR_P, int);
+static void show_map_spot(int, int);
+static void findone(int, int, genericptr_t);
+static void openone(int, int, genericptr_t);
 
 /* bring hero out from underwater or underground or being engulfed;
    return True iff any change occurred */
@@ -207,7 +207,7 @@ unsigned material;
     return (struct obj *) 0;
 }
 
-STATIC_OVL void
+static void
 do_dknown_of(obj)
 struct obj *obj;
 {
@@ -221,7 +221,7 @@ struct obj *obj;
 }
 
 /* Check whether the location has an outdated object displayed on it. */
-STATIC_OVL boolean
+static boolean
 check_map_spot(x, y, oclass, material)
 int x, y;
 char oclass;
@@ -275,7 +275,7 @@ unsigned material;
    reappear after the detection has completed.  Return true if noticeable
    change occurs.
  */
-STATIC_OVL boolean
+static boolean
 clear_stale_map(oclass, material)
 char oclass;
 unsigned material;
@@ -836,7 +836,7 @@ int mclass;         /* monster class, 0 for all */
     return 0;
 }
 
-STATIC_OVL void
+static void
 sense_trap(trap, x, y, src_cursed)
 struct trap *trap;
 xchar x, y;
@@ -1195,7 +1195,7 @@ struct obj **optr;
     return;
 }
 
-STATIC_OVL void
+static void
 show_map_spot(x, y)
 register int x, y;
 {
@@ -1305,7 +1305,7 @@ struct rm *lev;
 
 /* find something at one location; it should find all somethings there
    since it is used for magical detection rather than physical searching */
-STATIC_PTR void
+static void
 findone(zx, zy, num)
 int zx, zy;
 genericptr_t num;
@@ -1363,7 +1363,7 @@ genericptr_t num;
     }
 }
 
-STATIC_PTR void
+static void
 openone(zx, zy, num)
 int zx, zy;
 genericptr_t num;
@@ -1449,7 +1449,7 @@ openit()
 /* callback hack for overriding vision in do_clear_area() */
 boolean
 detecting(func)
-void FDECL((*func), (int, int, void *));
+void (*func)(int, int, void *);
 {
     return (func == findone || func == openone);
 }

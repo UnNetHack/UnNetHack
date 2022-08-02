@@ -20,23 +20,23 @@ static NEARDATA const char readable[] =
 { COIN_CLASS, ALL_CLASSES, SCROLL_CLASS, SPBOOK_CLASS, 0 };
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
-static void FDECL(wand_explode, (struct obj *));
+static void wand_explode(struct obj *);
 #if 0
-static void NDECL(do_class_genocide);
+static void do_class_genocide();
 #endif
-static void FDECL(stripspe, (struct obj *));
-static void FDECL(p_glow1, (struct obj *));
-static void FDECL(p_glow2, (struct obj *, const char *));
-static void FDECL(randomize, (int *, int));
-static void FDECL(forget_single_object, (int));
+static void stripspe(struct obj *);
+static void p_glow1(struct obj *);
+static void p_glow2(struct obj *, const char *);
+static void randomize(int *, int);
+static void forget_single_object(int);
 #if 0
-static void FDECL(forget, (int));
+static void forget(int);
 #endif
-static int FDECL(maybe_tame, (struct monst *, struct obj *));
+static int maybe_tame(struct monst *, struct obj *);
 
-STATIC_PTR void FDECL(do_flood, (int, int, genericptr_t));
-STATIC_PTR void FDECL(undo_flood, (int, int, genericptr_t));
-STATIC_PTR void FDECL(set_lit, (int, int, genericptr_t));
+static void do_flood(int, int, genericptr_t);
+static void undo_flood(int, int, genericptr_t);
+static void set_lit(int, int, genericptr_t);
 
 static boolean
 learn_scroll_typ(short scrolltyp, boolean verbose)
@@ -1153,7 +1153,7 @@ struct obj *sobj;
 }
 
 /** Remove water tile at x,y. */
-STATIC_PTR void
+static void
 undo_flood(x, y, roomcnt)
 int x, y;
 genericptr_t roomcnt;
@@ -1171,7 +1171,7 @@ genericptr_t roomcnt;
     newsym(x, y);
 }
 
-STATIC_PTR void
+static void
 do_flood(x, y, poolcnt)
 int x, y;
 genericptr_t poolcnt;
@@ -2178,7 +2178,7 @@ static struct litmon *gremlins = 0;
 /*
  * Low-level lit-field update routine.
  */
-STATIC_PTR void
+static void
 set_lit(x, y, val)
 int x, y;
 genericptr_t val;

@@ -13,8 +13,7 @@
 # define Static static
 #endif
 
-static boolean FDECL(pmatch_internal, (const char *, const char *,
-                                       BOOLEAN_P, const char *));
+static boolean pmatch_internal(const char *, const char *, BOOLEAN_P, const char *);
 
 /* is 'c' a digit? */
 boolean
@@ -817,9 +816,9 @@ boolean caseblind;
  */
 
 #if defined(AMIGA) && !defined(AZTEC_C) && !defined(__SASC_60) && !defined(_DCC) && !defined(__GNUC__)
-extern struct tm *FDECL(localtime, (time_t *));
+extern struct tm *localtime(time_t *);
 #endif
-static struct tm *NDECL(getlt);
+static struct tm *getlt();
 
 static int
 get_int_from_dev_random()

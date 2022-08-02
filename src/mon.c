@@ -10,29 +10,29 @@
 #include "mfndpos.h"
 #include <ctype.h>
 
-STATIC_VAR boolean vamp_rise_msg, disintegested;
+static boolean vamp_rise_msg, disintegested;
 
-STATIC_DCL void FDECL(sanity_check_single_mon, (struct monst *, BOOLEAN_P, const char *));
-STATIC_DCL boolean FDECL(restrap, (struct monst *));
-static long FDECL(mm_2way_aggression, (struct monst *, struct monst *));
-STATIC_DCL long FDECL(mm_aggression, (struct monst *, struct monst *));
-STATIC_DCL long FDECL(mm_displacement, (struct monst *, struct monst *));
-STATIC_DCL int NDECL(pick_animal);
-STATIC_DCL void FDECL(kill_eggs, (struct obj *));
-STATIC_DCL int FDECL(pickvampshape, (struct monst *));
-STATIC_DCL boolean FDECL(isspecmon, (struct monst *));
-STATIC_DCL boolean FDECL(validspecmon, (struct monst *, int));
-STATIC_DCL struct permonst *FDECL(accept_newcham_form, (struct monst *, int));
-STATIC_DCL struct obj *FDECL(make_corpse, (struct monst *, unsigned));
-STATIC_DCL void FDECL(m_detach, (struct monst *, struct permonst *));
+static void sanity_check_single_mon(struct monst *, BOOLEAN_P, const char *);
+static boolean restrap(struct monst *);
+static long mm_2way_aggression(struct monst *, struct monst *);
+static long mm_aggression(struct monst *, struct monst *);
+static long mm_displacement(struct monst *, struct monst *);
+static int pick_animal();
+static void kill_eggs(struct obj *);
+static int pickvampshape(struct monst *);
+static boolean isspecmon(struct monst *);
+static boolean validspecmon(struct monst *, int);
+static struct permonst *accept_newcham_form(struct monst *, int);
+static struct obj *make_corpse(struct monst *, unsigned);
+static void m_detach(struct monst *, struct permonst *);
 #ifdef WEBB_DISINT
-STATIC_DCL void FDECL(lifesaved_monster, (struct monst *, uchar));
+static void lifesaved_monster(struct monst *, uchar);
 #else
-STATIC_DCL void FDECL(lifesaved_monster, (struct monst *));
+static void lifesaved_monster(struct monst *);
 #endif
-STATIC_DCL void FDECL(migrate_mon, (struct monst *, XCHAR_P, XCHAR_P));
-STATIC_DCL boolean FDECL(ok_to_obliterate, (struct monst *));
-STATIC_DCL void FDECL(deal_with_overcrowding, (struct monst *));
+static void migrate_mon(struct monst *, XCHAR_P, XCHAR_P);
+static boolean ok_to_obliterate(struct monst *);
+static void deal_with_overcrowding(struct monst *);
 
 #ifdef REINCARNATION
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
@@ -54,10 +54,10 @@ const char *warnings[] = {
     "white", "pink", "red", "ruby", "purple", "black"
 };
 
-STATIC_DCL void NDECL(warn_effects);
+static void warn_effects();
 #endif /* 0 */
 
-STATIC_OVL void
+static void
 sanity_check_single_mon(mtmp, chk_geno, msg)
 struct monst *mtmp;
 boolean chk_geno;
@@ -345,7 +345,7 @@ int mndx;
  * G_NOCORPSE set in order to prevent wishing for one, finding tins of one,
  * etc....
  */
-STATIC_OVL struct obj *
+static struct obj *
 make_corpse(mtmp, corpseflags)
 register struct monst *mtmp;
 unsigned corpseflags;
@@ -2013,7 +2013,7 @@ struct monst *mon;
 }
 
 /* remove effects of mtmp from other data structures */
-STATIC_OVL void
+static void
 m_detach(mtmp, mptr)
 struct monst *mtmp;
 struct permonst *mptr;  /* reflects mtmp->data _prior_ to mtmp's death */
@@ -2075,7 +2075,7 @@ struct monst *mon;
     return (struct obj *)0;
 }
 
-STATIC_OVL void
+static void
 #ifdef WEBB_DISINT
 lifesaved_monster(mtmp, adtyp)
 struct monst *mtmp;
@@ -3060,7 +3060,7 @@ struct monst *mtmp;
     migrate_mon(mtmp, target_lev, xyloc);
 }
 
-STATIC_OVL void
+static void
 migrate_mon(mtmp, target_lev, xyloc)
 struct monst *mtmp;
 xchar target_lev, xyloc;
@@ -3071,7 +3071,7 @@ xchar target_lev, xyloc;
     mtmp->mstate |= MON_MIGRATING;
 }
 
-STATIC_OVL boolean
+static boolean
 ok_to_obliterate(mtmp)
 struct monst *mtmp;
 {
@@ -3201,7 +3201,7 @@ struct monst *mtmp;
     }
 }
 
-STATIC_OVL void
+static void
 deal_with_overcrowding(mtmp)
 struct monst *mtmp;
 {
@@ -3660,7 +3660,7 @@ struct monst *mon;
 }
 
 /* unwatched hiders may hide again; if so, returns True */
-STATIC_OVL boolean
+static boolean
 restrap(mtmp)
 register struct monst *mtmp;
 {
@@ -3777,7 +3777,7 @@ boolean construct;
     }
 }
 
-STATIC_OVL int
+static int
 pick_animal()
 {
     if (!animal_list) {
@@ -3858,7 +3858,7 @@ int shiftflags;
     }
 }
 
-STATIC_OVL int
+static int
 pickvampshape(mon)
 struct monst *mon;
 {
@@ -4484,7 +4484,7 @@ boolean egg;
 }
 
 /* kill off any eggs of genocided monsters */
-STATIC_OVL void
+static void
 kill_eggs(obj_list)
 struct obj *obj_list;
 {

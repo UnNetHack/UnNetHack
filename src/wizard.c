@@ -11,13 +11,13 @@
 
 extern const int monstr[];
 
-STATIC_DCL short FDECL(which_arti, (int));
-STATIC_DCL boolean FDECL(mon_has_arti, (struct monst *, SHORT_P));
-STATIC_DCL struct monst *FDECL(other_mon_has_arti, (struct monst *, SHORT_P));
-STATIC_DCL struct obj *FDECL(on_ground, (SHORT_P));
-STATIC_DCL boolean FDECL(you_have, (int));
-static unsigned long FDECL(target_on, (int, struct monst *));
-static unsigned long FDECL(strategy, (struct monst *));
+static short which_arti(int);
+static boolean mon_has_arti(struct monst *, SHORT_P);
+static struct monst *other_mon_has_arti(struct monst *, SHORT_P);
+static struct obj *on_ground(SHORT_P);
+static boolean you_have(int);
+static unsigned long target_on(int, struct monst *);
+static unsigned long strategy(struct monst *);
 
 static NEARDATA const int nasties[] = {
     /* neutral */
@@ -131,7 +131,7 @@ register struct monst *mtmp;
 
 #define M_Wants(mask)   (mtmp->data->mflags3 & (mask))
 
-STATIC_OVL short
+static short
 which_arti(mask)
 register int mask;
 {
@@ -150,7 +150,7 @@ register int mask;
  *  since bell, book, candle, and amulet are all objects, not really
  *  artifacts right now.    [MRS]
  */
-STATIC_OVL boolean
+static boolean
 mon_has_arti(mtmp, otyp)
 register struct monst *mtmp;
 register short otyp;
@@ -168,7 +168,7 @@ register short otyp;
 
 }
 
-STATIC_OVL struct monst *
+static struct monst *
 other_mon_has_arti(mtmp, otyp)
 register struct monst *mtmp;
 register short otyp;
@@ -183,7 +183,7 @@ register short otyp;
     return((struct monst *)0);
 }
 
-STATIC_OVL struct obj *
+static struct obj *
 on_ground(otyp)
 register short otyp;
 {
@@ -198,7 +198,7 @@ register short otyp;
     return((struct obj *)0);
 }
 
-STATIC_OVL boolean
+static boolean
 you_have(mask)
 register int mask;
 {

@@ -4,7 +4,7 @@
 #include "hack.h"
 
 /* at most one of `door' and `box' should be non-null at any given time */
-STATIC_VAR NEARDATA struct xlock_s {
+static NEARDATA struct xlock_s {
     struct rm  *door;
     struct obj *box;
     int picktyp; /* key|pick|card for unlock, sharp vs blunt for #force */
@@ -13,12 +13,12 @@ STATIC_VAR NEARDATA struct xlock_s {
 } xlock;
 
 /* occupation callbacks */
-static int NDECL(picklock);
-static int NDECL(forcelock);
+static int picklock();
+static int forcelock();
 
-STATIC_DCL const char *NDECL(lock_action);
-static boolean FDECL(obstructed, (int, int, BOOLEAN_P));
-STATIC_DCL void FDECL(chest_shatter_msg, (struct obj *));
+static const char *lock_action();
+static boolean obstructed(int, int, BOOLEAN_P);
+static void chest_shatter_msg(struct obj *);
 
 boolean
 picking_lock(x, y)
@@ -42,7 +42,7 @@ int x, y;
 }
 
 /* produce an occupation string appropriate for the current activity */
-STATIC_OVL const char *
+static const char *
 lock_action()
 {
     /* "unlocking"+2 == "locking" */
@@ -1138,7 +1138,7 @@ int x, y;
     return res;
 }
 
-STATIC_OVL void
+static void
 chest_shatter_msg(otmp)
 struct obj *otmp;
 {

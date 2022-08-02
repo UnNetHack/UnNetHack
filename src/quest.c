@@ -12,19 +12,19 @@
 #define Not_firsttime   (on_level(&u.uz0, &u.uz))
 #define Qstat(x)    (quest_status.x)
 
-STATIC_DCL void NDECL(on_start);
-STATIC_DCL void NDECL(on_locate);
-STATIC_DCL void NDECL(on_goal);
-STATIC_DCL boolean NDECL(not_capable);
-STATIC_DCL int FDECL(is_pure, (BOOLEAN_P));
-STATIC_DCL void FDECL(expulsion, (BOOLEAN_P));
-STATIC_DCL void NDECL(chat_with_leader);
-STATIC_DCL void NDECL(chat_with_nemesis);
-STATIC_DCL void NDECL(chat_with_guardian);
-STATIC_DCL void FDECL(prisoner_speaks, (struct monst *));
+static void on_start();
+static void on_locate();
+static void on_goal();
+static boolean not_capable();
+static int is_pure(BOOLEAN_P);
+static void expulsion(BOOLEAN_P);
+static void chat_with_leader();
+static void chat_with_nemesis();
+static void chat_with_guardian();
+static void prisoner_speaks(struct monst *);
 
 
-STATIC_OVL void
+static void
 on_start()
 {
     if(!Qstat(first_start)) {
@@ -36,7 +36,7 @@ on_start()
     }
 }
 
-STATIC_OVL void
+static void
 on_locate()
 {
     if(!Qstat(first_locate)) {
@@ -46,7 +46,7 @@ on_locate()
         qt_pager(QT_NEXTLOCATE);
 }
 
-STATIC_OVL void
+static void
 on_goal()
 {
     if (Qstat(killed_nemesis)) {
@@ -102,7 +102,7 @@ ok_to_quest()
     return FALSE;
 }
 
-STATIC_OVL boolean
+static boolean
 not_capable()
 {
     return((boolean)(u.ulevel < MIN_QUEST_LEVEL));
@@ -114,7 +114,7 @@ not_capable()
  *          0 if his alignment status is too low
  *          1 if he is worthy
  */
-STATIC_OVL int
+static int
 is_pure(talk)
 boolean talk;
 {
@@ -150,7 +150,7 @@ boolean talk;
  * This assumes that the hero is currently _in_ the quest dungeon and that
  * there is a single branch to and from it.
  */
-STATIC_OVL void
+static void
 expulsion(seal)
 boolean seal;
 {
@@ -213,7 +213,7 @@ struct obj *obj;    /* quest artifact; possibly null if carrying Amulet */
     }
 }
 
-STATIC_OVL void
+static void
 chat_with_leader()
 {
 /*  Rule 0: Cheater checks.                 */
@@ -312,7 +312,7 @@ register struct monst *mtmp;
     }
 }
 
-STATIC_OVL void
+static void
 chat_with_nemesis()
 {
 /*  The nemesis will do most of the talking, but... */
@@ -336,7 +336,7 @@ nemesis_speaks()
     if(!rn2(5)) qt_pager(rn1(10, QT_DISCOURAGE));
 }
 
-STATIC_OVL void
+static void
 chat_with_guardian()
 {
 /*  These guys/gals really don't have much to say... */
@@ -346,7 +346,7 @@ chat_with_guardian()
         qt_pager(rn1(5, QT_GUARDTALK));
 }
 
-STATIC_OVL void
+static void
 prisoner_speaks (mtmp)
 register struct monst *mtmp;
 {

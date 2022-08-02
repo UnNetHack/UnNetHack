@@ -22,9 +22,9 @@ extern INPUT_RECORD ir;
 char dllname[512];
 char *shortdllname;
 
-int FDECL(__declspec(dllexport) __stdcall
-ProcessKeystroke, (HANDLE hConIn, INPUT_RECORD *ir, 
-    boolean *valid, BOOLEAN_P numberpad, int portdebug));
+int __declspec(dllexport) __stdcall
+ProcessKeystroke(HANDLE hConIn, INPUT_RECORD *ir,
+    boolean *valid, BOOLEAN_P numberpad, int portdebug);
 
 int WINAPI DllMain(HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
 {
@@ -222,7 +222,7 @@ int __declspec(dllexport) __stdcall
 CheckInput(hConIn, ir, count, numpad, mode, mod, cc)
 HANDLE hConIn;
 INPUT_RECORD *ir;
-DWORD *count; 
+DWORD *count;
 boolean numpad;
 int mode;
 int *mod;
@@ -255,11 +255,11 @@ coord *cc;
 #if 0	/* middle button */
 				    else if (ir->Event.MouseEvent.dwButtonState & MIDBUTTON)
 			      		*mod = CLICK_3;
-#endif 
+#endif
 			           return 0;
 			    }
 	        	}
-		    } else 
+		    } else
 			done = 1;
 		}
 	}

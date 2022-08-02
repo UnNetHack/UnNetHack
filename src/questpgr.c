@@ -17,19 +17,19 @@
 /* from sp_lev.c, for deliver_splev_message() */
 extern char *lev_message;
 
-static void FDECL(Fread, (genericptr_t, int, int, dlb *));
-STATIC_DCL struct qtmsg * FDECL(construct_qtlist, (long));
-STATIC_DCL const char * NDECL(intermed);
-STATIC_DCL const char * NDECL(creatorname);
-STATIC_DCL const char * NDECL(neminame);
-STATIC_DCL const char * NDECL(guardname);
-STATIC_DCL const char * NDECL(homebase);
-static void FDECL(qtext_pronoun, (CHAR_P, CHAR_P));
-STATIC_DCL struct qtmsg * FDECL(msg_in, (struct qtmsg *, int));
-STATIC_DCL void FDECL(convert_arg, (CHAR_P));
-static void FDECL(convert_line, (char *,char *));
-STATIC_DCL void FDECL(deliver_by_pline, (struct qtmsg *));
-STATIC_DCL void FDECL(deliver_by_window, (struct qtmsg *, int));
+static void Fread(genericptr_t, int, int, dlb *);
+static struct qtmsg * construct_qtlist(long);
+static const char * intermed();
+static const char * creatorname();
+static const char * neminame();
+static const char * guardname();
+static const char * homebase();
+static void qtext_pronoun(CHAR_P, CHAR_P);
+static struct qtmsg * msg_in(struct qtmsg *, int);
+static void convert_arg(CHAR_P);
+static void convert_line(char *,char *);
+static void deliver_by_pline(struct qtmsg *);
+static void deliver_by_window(struct qtmsg *, int);
 
 static char in_line[80], cvt_buf[64], out_line[128];
 static struct   qtlists qt_list;
@@ -38,7 +38,7 @@ static dlb  *msg_file;
 static char nambuf[sizeof cvt_buf];
 
 #ifdef DEBUG
-static void NDECL(dump_qtlist);
+static void dump_qtlist();
 
 static void
 dump_qtlist()   /* dump the character msg list to check appearance */
@@ -71,7 +71,7 @@ dlb *stream;
     }
 }
 
-STATIC_OVL struct qtmsg *
+static struct qtmsg *
 construct_qtlist(hdr_offset)
 long hdr_offset;
 {
@@ -177,7 +177,7 @@ ldrname()   /* return your role leader's name */
     return nambuf;
 }
 
-STATIC_OVL const char *
+static const char *
 intermed()  /* return your intermediate target string */
 {
     return (urole.intermed);
@@ -190,7 +190,7 @@ struct obj *otmp;
     return((boolean)(otmp->oartifact == urole.questarti));
 }
 
-STATIC_OVL const char *
+static const char *
 neminame()  /* return your role nemesis' name */
 {
     int i = urole.neminum;
@@ -201,7 +201,7 @@ neminame()  /* return your role nemesis' name */
     return nambuf;
 }
 
-STATIC_OVL const char *
+static const char *
 guardname() /* return your role leader's guard monster name */
 {
     int i = urole.guardnum;
@@ -209,7 +209,7 @@ guardname() /* return your role leader's guard monster name */
     return(mons[i].mname);
 }
 
-STATIC_OVL const char *
+static const char *
 homebase()  /* return your role leader's location */
 {
     return(urole.homebase);
@@ -254,7 +254,7 @@ char which; /* 'h'|'H'|'i'|'I'|'j'|'J' */
     return;
 }
 
-STATIC_OVL struct qtmsg *
+static struct qtmsg *
 msg_in(qtm_list, msgnum)
 struct qtmsg *qtm_list;
 int msgnum;
@@ -267,7 +267,7 @@ int msgnum;
     return((struct qtmsg *)0);
 }
 
-STATIC_OVL void
+static void
 convert_arg(c)
 char c;
 {
@@ -342,7 +342,7 @@ char c;
     Strcpy(cvt_buf, str);
 }
 
-STATIC_OVL void
+static void
 convert_line(in_line, out_line)
 char *in_line, *out_line;
 {
@@ -439,7 +439,7 @@ char *str;
 }
 
 
-STATIC_OVL void
+static void
 deliver_by_pline(qt_msg)
 struct qtmsg *qt_msg;
 {
@@ -454,7 +454,7 @@ struct qtmsg *qt_msg;
 
 }
 
-STATIC_OVL void
+static void
 deliver_by_window(qt_msg, how)
 struct qtmsg *qt_msg;
 int how;
@@ -595,7 +595,7 @@ static const char *creator_names[] = {
 
 /** Return the name of the creator deity.
  * The name stays the same for the running game. */
-STATIC_OVL const char *
+static const char *
 creatorname()
 {
     if (pirateday()) {

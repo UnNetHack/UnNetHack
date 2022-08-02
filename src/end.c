@@ -30,28 +30,28 @@ static struct val_list { struct valuable_data *list; int size; } valuables[] = {
 };
 
 #ifndef NO_SIGNAL
-STATIC_PTR void FDECL(done_intr, (int));
+static void done_intr(int);
 # if defined(UNIX) || defined(VMS) || defined (__EMX__)
-static void FDECL(done_hangup, (int));
+static void done_hangup(int);
 # endif
 #endif
-STATIC_PTR int NDECL(heaven_or_hell_lifesave_end);
-STATIC_DCL void FDECL(disclose, (int, BOOLEAN_P));
-STATIC_DCL void FDECL(get_valuables, (struct obj *));
-STATIC_DCL void FDECL(sort_valuables, (struct valuable_data *, int));
-STATIC_DCL void FDECL(artifact_score, (struct obj *, BOOLEAN_P, winid));
-STATIC_DCL void FDECL(savelife, (int));
+static int heaven_or_hell_lifesave_end();
+static void disclose(int, BOOLEAN_P);
+static void get_valuables(struct obj *);
+static void sort_valuables(struct valuable_data *, int);
+static void artifact_score(struct obj *, BOOLEAN_P, winid);
+static void savelife(int);
 #ifdef DUMP_LOG
 extern char msgs[][BUFSZ];
 extern int msgs_count[];
 extern int lastmsg;
-void FDECL(do_vanquished, (int, BOOLEAN_P));
+void do_vanquished(int, BOOLEAN_P);
 #endif /* DUMP_LOG */
-STATIC_DCL void FDECL(list_genocided, (int, BOOLEAN_P, BOOLEAN_P));
-STATIC_DCL boolean FDECL(should_query_disclose_option, (int, char *));
+static void list_genocided(int, BOOLEAN_P, BOOLEAN_P);
+static boolean should_query_disclose_option(int, char *);
 
 #if defined(__BEOS__) || defined(MICRO) || defined(WIN32) || defined(OS2)
-extern void FDECL(nethack_exit, (int));
+extern void nethack_exit(int);
 #else
 #define nethack_exit exit
 #endif
@@ -176,7 +176,7 @@ done2()
 
 #ifndef NO_SIGNAL
 /*ARGSUSED*/
-STATIC_PTR void
+static void
 done_intr(sig_unused) /* called as signal() handler, so sent at least one arg */
 int sig_unused UNUSED;
 {
@@ -360,7 +360,7 @@ panic VA_DECL(const char *, str)
     done(PANICKED);
 }
 
-STATIC_OVL boolean
+static boolean
 should_query_disclose_option(category, defquery)
 int category;
 char *defquery;
@@ -398,7 +398,7 @@ char *defquery;
     return TRUE;
 }
 
-STATIC_OVL void
+static void
 disclose(how, taken)
 int how;
 boolean taken;
@@ -462,7 +462,7 @@ boolean taken;
 }
 
 /* try to get the player back in a viable state after being killed */
-STATIC_OVL void
+static void
 savelife(how)
 int how;
 {
@@ -492,7 +492,7 @@ int how;
  * Get valuables from the given list.  Revised code: the list always remains
  * intact.
  */
-STATIC_OVL void
+static void
 get_valuables(list)
 struct obj *list;   /* inventory or container contents */
 {
@@ -525,7 +525,7 @@ struct obj *list;   /* inventory or container contents */
  *  Sort collected valuables, most frequent to least.  We could just
  *  as easily use qsort, but we don't care about efficiency here.
  */
-STATIC_OVL void
+static void
 sort_valuables(list, size)
 struct valuable_data list[];
 int size;       /* max value is less than 20 */
@@ -548,7 +548,7 @@ int size;       /* max value is less than 20 */
 }
 
 /* called twice; first to calculate total, then to list relevant items */
-STATIC_OVL void
+static void
 artifact_score(list, counting, endwin)
 struct obj *list;
 boolean counting;   /* true => add up points; false => display them */
@@ -1149,7 +1149,7 @@ die:
     nh_terminate(EXIT_SUCCESS);
 }
 
-STATIC_PTR int
+static int
 heaven_or_hell_lifesave_end()
 {
     u.uinvulnerable = FALSE;
@@ -1467,7 +1467,7 @@ num_genocides()
     return n;
 }
 
-STATIC_OVL void
+static void
 list_genocided(defquery, ask, want_disp)
 int defquery;
 boolean ask;

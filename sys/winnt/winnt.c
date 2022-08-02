@@ -230,7 +230,7 @@ void Delay(int ms)
 }
 
 #ifdef WIN32CON
-extern void NDECL(backsp);
+extern void backsp();
 #endif
 
 void win32_abort()

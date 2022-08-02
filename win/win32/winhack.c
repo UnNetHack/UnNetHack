@@ -33,11 +33,7 @@ typedef HRESULT (CALLBACK* DLLGETVERSIONPROC)(DLLVERSIONINFO *);
 
 #endif
 
-#ifdef OVL0
 #define SHARED_DCL
-#else
-#define SHARED_DCL extern
-#endif
 
 /* Minimal common control library version
 Version     _WIN_32IE   Platform/IE
@@ -53,7 +49,7 @@ Version     _WIN_32IE   Platform/IE
 #define INSTALL_NOTES "http://www.nethack.org/v340/ports/download-win.html#cc"
 /*#define COMCTL_URL "http://www.microsoft.com/msdownload/ieplatform/ie/comctrlx86.asp"*/
 
-extern void FDECL(nethack_exit,(int));
+extern void nethack_exit(int);
 static TCHAR* _get_cmd_arg(TCHAR* pCmdLine);
 static HRESULT GetComCtlVersion(LPDWORD pdwMajor, LPDWORD pdwMinor);
 
@@ -67,7 +63,7 @@ NHWinApp _nethack_app;
 #endif
 
 // Foward declarations of functions included in this code module:
-extern void FDECL(pcmain, (int,char **));
+extern void pcmain(int,char **);
 static void __cdecl mswin_moveloop(void *);
 
 #define MAX_CMDLINE_PARAM 255
@@ -137,8 +133,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	InitCtrls.dwSize = sizeof(InitCtrls);
 	InitCtrls.dwICC = ICC_LISTVIEW_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
-	
-	/* get command line parameters */	
+
+	/* get command line parameters */
 	p = _get_cmd_arg(GetCommandLine());
 	p = _get_cmd_arg(NULL); /* skip first paramter - command name */
 	for( argc = 1; p && argc<MAX_CMDLINE_PARAM; argc++ ) {
@@ -212,7 +208,7 @@ TCHAR* _get_cmd_arg(TCHAR* pCmdLine)
 			/* skip to whitespace */
 			for(pArgs = pRetArg; *pArgs && !_istspace(*pArgs); pArgs = CharNext(pArgs));
 		}
-		
+
 		if( pArgs && *pArgs ) {
 			TCHAR* p;
 			p = pArgs;

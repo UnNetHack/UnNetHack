@@ -7,25 +7,25 @@
 #define CONTAINED_SYM   '>' /* designator for inside a container */
 #define HANDS_SYM '-'
 
-STATIC_DCL void NDECL(reorder_invent);
-static void FDECL(noarmor, (BOOLEAN_P));
-STATIC_DCL void FDECL(invdisp_nothing, (const char *, const char *));
-STATIC_DCL boolean FDECL(worn_wield_only, (struct obj *));
-STATIC_DCL boolean FDECL(only_here, (struct obj *));
-STATIC_DCL void FDECL(compactify, (char *));
-STATIC_DCL boolean FDECL(taking_off, (const char *));
-STATIC_DCL boolean FDECL(putting_on, (const char *));
-STATIC_PTR int FDECL(ckunpaid, (struct obj *));
-STATIC_PTR int FDECL(ckvalidcat, (struct obj *));
-static char FDECL(display_pickinv, (const char *, const char *,
-                                    const char *, BOOLEAN_P, long *, BOOLEAN_P, BOOLEAN_P));
-STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
-STATIC_DCL void NDECL(dounpaid);
-STATIC_DCL struct obj *FDECL(find_unpaid, (struct obj *, struct obj **));
-STATIC_DCL void FDECL(menu_identify, (int));
-STATIC_DCL boolean FDECL(tool_in_use, (struct obj *));
-STATIC_DCL char FDECL(obj_to_let, (struct obj *));
-STATIC_DCL int FDECL(itemactions, (struct obj *));
+static void reorder_invent();
+static void noarmor(BOOLEAN_P);
+static void invdisp_nothing(const char *, const char *);
+static boolean worn_wield_only(struct obj *);
+static boolean only_here(struct obj *);
+static void compactify(char *);
+static boolean taking_off(const char *);
+static boolean putting_on(const char *);
+static int ckunpaid(struct obj *);
+static int ckvalidcat(struct obj *);
+static char display_pickinv(const char *, const char *,
+                            const char *, BOOLEAN_P, long *, BOOLEAN_P, BOOLEAN_P);
+static boolean this_type_only(struct obj *);
+static void dounpaid();
+static struct obj *find_unpaid(struct obj *, struct obj **);
+static void menu_identify(int);
+static boolean tool_in_use(struct obj *);
+static char obj_to_let(struct obj *);
+static int itemactions(struct obj *);
 
 static int lastinvnr = 51;  /* 0 ... 51 (never saved&restored) */
 
@@ -92,7 +92,7 @@ register struct obj *otmp;
 #define inv_rank(o) ((o)->invlet ^ 040)
 
 /* sort the inventory; used by addinv() and doorganize() */
-STATIC_OVL void
+static void
 reorder_invent()
 {
     struct obj *otmp, *prev, *next;
@@ -811,7 +811,7 @@ register int x, y;
 }
 
 /* compact a string of inventory letters by dashing runs of letters */
-STATIC_OVL void
+static void
 compactify(buf)
 register char *buf;
 {
@@ -858,7 +858,7 @@ struct obj *obj;
 }
 
 /* match the prompt for either 'T' or 'R' command */
-STATIC_OVL boolean
+static boolean
 taking_off(action)
 const char *action;
 {
@@ -866,7 +866,7 @@ const char *action;
 }
 
 /* match the prompt for either 'W' or 'P' command */
-STATIC_OVL boolean
+static boolean
 putting_on(action)
 const char *action;
 {
@@ -1312,7 +1312,7 @@ struct obj *otmp;
 #endif
 }
 
-STATIC_PTR int
+static int
 ckvalidcat(otmp)
 register struct obj *otmp;
 {
@@ -1320,7 +1320,7 @@ register struct obj *otmp;
     return((int)allow_category(otmp));
 }
 
-STATIC_PTR int
+static int
 ckunpaid(otmp)
 register struct obj *otmp;
 {
@@ -1341,13 +1341,13 @@ struct obj *otmp;
 }
 
 /* extra xprname() input that askchain() can't pass through safe_qbuf() */
-STATIC_VAR struct xprnctx {
+static struct xprnctx {
     char let;
     boolean dot;
 } safeq_xprn_ctx;
 
 /* safe_qbuf() -> short_oname() callback */
-STATIC_PTR char *
+static char *
 safeq_xprname(obj)
 struct obj *obj;
 {
@@ -1355,7 +1355,7 @@ struct obj *obj;
 }
 
 /* alternate safe_qbuf() -> short_oname() callback */
-STATIC_PTR char *
+static char *
 safeq_shortxprname(obj)
 struct obj *obj;
 {
@@ -1371,12 +1371,12 @@ static NEARDATA const char removeables[] =
 int
 ggetobj(word, fn, mx, combo, resultflags)
 const char *word;
-int FDECL((*fn), (OBJ_P)), mx;
+int (*fn) (OBJ_P), mx;
 boolean combo; /* combination menu flag */
 unsigned *resultflags;
 {
-    int FDECL((*ckfn), (OBJ_P)) = (int FDECL((*), (OBJ_P))) 0;
-    boolean FDECL((*filter), (OBJ_P)) = (boolean FDECL((*), (OBJ_P))) 0;
+    int (*ckfn) (OBJ_P) = (int (*) (OBJ_P)) 0;
+    boolean (*filter) (OBJ_P) = (boolean (*) (OBJ_P)) 0;
     boolean takeoff, ident, allflag, m_seen;
     int itemcount;
     int oletct, iletct, unpaid, oc_of_sym;
@@ -1559,7 +1559,7 @@ askchain(objchn, olets, allflag, fn, ckfn, mx, word)
 struct obj **objchn; /* *objchn might change */
 int allflag, mx;
 const char *olets, *word; /* olets is an Obj Class char array */
-int FDECL((*fn), (OBJ_P)), FDECL((*ckfn), (OBJ_P));
+int (*fn)(OBJ_P), (*ckfn)(OBJ_P);
 {
     struct obj *otmp, *otmp2, *otmpo;
     register char sym, ilet;
@@ -1808,7 +1808,7 @@ struct obj *otmp;
 }
 
 /* menu of unidentified objects; select and identify up to id_limit of them */
-STATIC_OVL void
+static void
 menu_identify(id_limit)
 int id_limit;
 {
@@ -1929,7 +1929,7 @@ update_inventory()
     (*windowprocs.win_update_inventory)();
 }
 
-STATIC_OVL char
+static char
 obj_to_let(obj) /* should of course only be called for things in invent */
 register struct obj *obj;
 {
@@ -2042,7 +2042,7 @@ struct obj *obj;
 {
     winid win;
     int n;
-    int NDECL((*feedback_fn)) = 0;
+    int (*feedback_fn)(void) = 0;
     anything any;
     menu_item *selected = 0;
 
@@ -2340,8 +2340,12 @@ struct obj *obj;
 
     n = select_menu(win, PICK_ONE, &selected);
     destroy_nhwindow(win);
-    if (n == 1) feedback_fn = (int NDECL((*)))selected[0].item.a_void;
-    if (n == 1) free((genericptr_t) selected);
+    if (n == 1) {
+        feedback_fn = (int (*)(void))selected[0].item.a_void;
+    }
+    if (n == 1) {
+        free(selected);
+    }
 
     if (!feedback_fn) return 0;
 #if 0
@@ -2377,7 +2381,7 @@ struct obj *obj;
  * next unpaid object is returned.  This routine recursively follows
  * containers.
  */
-STATIC_OVL struct obj *
+static struct obj *
 find_unpaid(list, last_found)
 struct obj *list, **last_found;
 {
@@ -2935,7 +2939,7 @@ int
 count_buc(list, type, filterfunc)
 struct obj *list;
 int type;
-boolean FDECL((*filterfunc), (OBJ_P));
+boolean (*filterfunc)(OBJ_P);
 {
     int count = 0;
 
@@ -3044,7 +3048,7 @@ boolean nested, /* include contents of any nested containers */
     return count;
 }
 
-STATIC_OVL void
+static void
 dounpaid()
 {
     winid win;
@@ -3135,7 +3139,7 @@ dounpaid()
 /* query objlist callback: return TRUE if obj type matches "this_type" */
 static int this_type;
 
-STATIC_OVL boolean
+static boolean
 this_type_only(obj)
 struct obj *obj;
 {
@@ -3210,7 +3214,7 @@ dotypeinv()
         types[0] = 0;
         class_count = collect_obj_classes(types, invent,
                                           FALSE,
-                                          (boolean FDECL((*), (OBJ_P))) 0, &itemcount);
+                                          (boolean (*)(OBJ_P)) 0, &itemcount);
         if (unpaid_count || billx || (bcnt + ccnt + ucnt + xcnt) != 0) {
             types[class_count++] = ' ';
         }
@@ -3802,7 +3806,7 @@ dopramulet()
     return 0;
 }
 
-STATIC_OVL boolean
+static boolean
 tool_in_use(obj)
 struct obj *obj;
 {
@@ -3880,7 +3884,7 @@ long numused;
  * Conversion from a class to a string for printing.
  * This must match the object class order.
  */
-STATIC_VAR NEARDATA const char *names[] = { 0,
+static NEARDATA const char *names[] = { 0,
                                             "Illegal objects", "Weapons", "Armor", "Rings", "Amulets",
                                             "Tools", "Comestibles", "Potions", "Scrolls", "Spellbooks",
                                             "Wands", "Coins", "Gems", "Boulders/Statues", "Iron balls",
@@ -4208,7 +4212,7 @@ cleansplit:
 }
 
 /* common to display_minventory and display_cinventory */
-STATIC_OVL void
+static void
 invdisp_nothing(hdr, txt)
 const char *hdr, *txt;
 {
@@ -4230,7 +4234,7 @@ const char *hdr, *txt;
 }
 
 /* query_objlist callback: return things that could possibly be worn/wielded */
-STATIC_OVL boolean
+static boolean
 worn_wield_only(obj)
 struct obj *obj;
 {
@@ -4337,7 +4341,7 @@ register struct obj *obj;
 /* query objlist callback: return TRUE if obj is at given location */
 static coord only;
 
-STATIC_OVL boolean
+static boolean
 only_here(obj)
 struct obj *obj;
 {

@@ -27,27 +27,27 @@
 
 #include "hack.h"
 
-STATIC_DCL void FDECL(put_monsters_to_sleep, (int));
-STATIC_DCL void FDECL(charm_snakes, (int));
-STATIC_DCL void FDECL(calm_nymphs, (int));
-STATIC_DCL void FDECL(charm_monsters, (int));
-STATIC_DCL int FDECL(do_improvisation, (struct obj *));
+static void put_monsters_to_sleep(int);
+static void charm_snakes(int);
+static void calm_nymphs(int);
+static void charm_monsters(int);
+static int do_improvisation(struct obj *);
 
 #ifdef UNIX386MUSIC
-STATIC_DCL int NDECL(atconsole);
-STATIC_DCL void FDECL(speaker, (struct obj *, char *));
+static int atconsole();
+static void speaker(struct obj *, char *);
 #endif
 #ifdef VPIX_MUSIC
 extern int sco_flag_console;    /* will need changing if not _M_UNIX */
-STATIC_DCL void NDECL(playinit);
-STATIC_DCL void FDECL(playstring, (char *, size_t));
-STATIC_DCL void FDECL(speaker, (struct obj *, char *));
+static void playinit();
+static void playstring(char *, size_t);
+static void speaker(struct obj *, char *);
 #endif
 #ifdef PCMUSIC
-void FDECL( pc_speaker, ( struct obj *, char * ) );
+void  pc_speaker( struct obj *, char * ) ;
 #endif
 #ifdef AMIGA
-void FDECL( amii_speaker, ( struct obj *, char *, int ) );
+void  amii_speaker( struct obj *, char *, int ) ;
 #endif
 
 /*
@@ -87,7 +87,7 @@ int distance;
  * Make monsters fall asleep.  Note that they may resist the spell.
  */
 
-STATIC_OVL void
+static void
 put_monsters_to_sleep(distance)
 int distance;
 {
@@ -109,7 +109,7 @@ int distance;
  * Charm snakes in range.  Note that the snakes are NOT tamed.
  */
 
-STATIC_OVL void
+static void
 charm_snakes(distance)
 int distance;
 {
@@ -146,7 +146,7 @@ int distance;
  * Calm nymphs in range.
  */
 
-STATIC_OVL void
+static void
 calm_nymphs(distance)
 int distance;
 {
@@ -213,7 +213,7 @@ struct monst *bugler; /* monster that played instrument */
 /* Charm monsters in range.  Note that they may resist the spell.
  * If swallowed, range is reduced to 0.
  */
-STATIC_OVL void
+static void
 charm_monsters(distance)
 int distance;
 {
@@ -452,7 +452,7 @@ const char *beats[] = {
 /*
  * The player is trying to extract something from his/her instrument.
  */
-STATIC_OVL int
+static int
 do_improvisation(instr)
 struct obj *instr;
 {
@@ -834,7 +834,7 @@ struct obj *instr;
  * Play audible music on the machine's speaker if appropriate.
  */
 
-STATIC_OVL int
+static int
 atconsole()
 {
     /*
@@ -852,7 +852,7 @@ atconsole()
     return(!strcmp(termtype, "AT386") || !strcmp(termtype, "xterm"));
 }
 
-STATIC_OVL void
+static void
 speaker(instr, buf)
 struct obj *instr;
 char    *buf;
@@ -933,7 +933,7 @@ int ticks;
 #include "interp.c" /* from snd86unx.shr */
 
 
-STATIC_OVL void
+static void
 speaker(instr, buf)
 struct obj *instr;
 char    *buf;

@@ -108,7 +108,7 @@ static const char *random_mesg[] = {
     "Our coil is broken, and we don't have a replacement. It's useless. It's so useless.",
 };
 
-static const char *NDECL(blengr);
+static const char *blengr();
 
 char *
 random_engraving(outbuf)
