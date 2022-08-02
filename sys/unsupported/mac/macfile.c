@@ -28,7 +28,7 @@
 
 /* The HandleFiles are resources built into the application which are treated
    as read-only files: if we fail to open a file we look for a resource */
-   
+
 #define FIRST_HF 32000   /* file ID of first HandleFile */
 #define MAX_HF 6		 /* Max # of open HandleFiles */
 
@@ -42,11 +42,11 @@ typedef struct handlefile {
 	Handle		data;  /* The resource, purgeable */
 } HandleFile;
 
-static  HandleFile *FDECL(IsHandleFile,(int));
-static int FDECL(OpenHandleFile,(const unsigned char *, long));
-static int FDECL(CloseHandleFile,(int));
-static int FDECL(ReadHandleFile,(int, void *, unsigned));
-static long FDECL(SetHandleFilePos,(int, short, long));
+static  HandleFile *IsHandleFile(int);
+static int OpenHandleFile(const unsigned char *, long);
+static int CloseHandleFile(int);
+static int ReadHandleFile(int, void *, unsigned);
+static long SetHandleFilePos(int, short, long);
 
 HandleFile theHandleFiles [MAX_HF];
 MacDirs theDirs;		/* also referenced in macwin.c */
@@ -76,13 +76,13 @@ OpenHandleFile (const unsigned char *name, long fileType)
 	for (i = 0; i < MAX_HF; i ++) {
 		if (theHandleFiles[i].data == 0L) break;
 	}
-	
+
 	if (i >= MAX_HF)
 		return -1;
 
 	h = GetNamedResource (fileType, name);
 	if (!h) return (-1);
-	
+
 	theHandleFiles[i].data = h;
 	theHandleFiles[i].size = GetHandleSize (h);
 	GetResInfo (h, &theHandleFiles[i].id, (void*) &theHandleFiles[i].type, s);
@@ -112,18 +112,18 @@ ReadHandleFile (int fd, void *ptr, unsigned len)
 	Handle h;
 
 	if (!IsHandleFile (fd)) return -1;
-	
+
 	fd -= FIRST_HF;
 	maxBytes = theHandleFiles[fd].size - theHandleFiles[fd].mark;
 	if (len > maxBytes) len = maxBytes;
-	
+
 	h = theHandleFiles[fd].data;
-	
+
 	HLock(h);
 	BlockMove (*h + theHandleFiles[fd].mark, ptr, len);
 	HUnlock(h);
 	theHandleFiles[fd].mark += len;
-	
+
 	return(len);
 }
 
@@ -132,17 +132,17 @@ static long
 SetHandleFilePos (int fd, short whence, long pos)
 {
 	long curpos;
-	
+
 	if (!IsHandleFile (fd)) return -1;
-	
+
 	fd -= FIRST_HF;
-	
+
 	curpos = theHandleFiles [fd].mark;
 	switch (whence) {
-		case SEEK_CUR : 
+		case SEEK_CUR :
 			curpos += pos;
 			break;
-		case SEEK_END : 
+		case SEEK_END :
 			curpos = theHandleFiles[fd].size  - pos;
 			break;
 		default : /* set */
@@ -154,9 +154,9 @@ SetHandleFilePos (int fd, short whence, long pos)
 		curpos = 0;
 	else if (curpos > theHandleFiles [fd].size)
 		curpos = theHandleFiles [fd].size;
-	
+
 	theHandleFiles [fd].mark = curpos;
-	
+
 	return curpos;
 }
 
@@ -294,7 +294,7 @@ int
 macread (int fd, void *ptr, unsigned len)
 {
 	long amt = len;
-	
+
 	if (IsHandleFile (fd)) {
 		return ReadHandleFile (fd, ptr, amt);
 	} else {
@@ -393,7 +393,7 @@ boolean rsrc_dlb_fopen(dlb *dp, const char *name, const char *mode) {
 # pragma unused(mode)
 #endif
 	Str255 pname;
-	
+
 	C2P(name, pname);
 	dp->fd = OpenHandleFile(pname, 'File');	/* automatically read-only */
 	return dp->fd >= 0;
@@ -408,7 +408,7 @@ int rsrc_dlb_fread(char *buf, int size, int quan, dlb *dp) {
 
 	if (size < 0 || quan < 0) return 0;
 	nread = ReadHandleFile(dp->fd, buf, (unsigned)size * (unsigned)quan);
-	
+
 	return nread/size;	/* # of whole pieces (== quan in normal case) */
 }
 

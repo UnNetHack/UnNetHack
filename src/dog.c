@@ -3,7 +3,7 @@
 
 #include "hack.h"
 
-STATIC_DCL int NDECL(pet_type);
+static int pet_type();
 
 void
 newedog(mtmp)
@@ -52,7 +52,7 @@ register struct monst *mtmp;
     EDOG(mtmp)->killed_by_u = 0;
 }
 
-STATIC_OVL int
+static int
 pet_type()
 {
     if (urole.petnum != NON_PM)

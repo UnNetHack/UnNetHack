@@ -319,10 +319,10 @@ int sco_flag_console = 0;
 int sco_map_valid = -1;
 unsigned char sco_chanmap_buf[BSIZE];
 
-void NDECL(sco_mapon);
-void NDECL(sco_mapoff);
-void NDECL(check_sco_console);
-void NDECL(init_sco_cons);
+void sco_mapon();
+void sco_mapoff();
+void check_sco_console();
+void init_sco_cons();
 
 void
 sco_mapon()
@@ -382,10 +382,10 @@ init_sco_cons()
 
 int linux_flag_console = 0;
 
-void NDECL(linux_mapon);
-void NDECL(linux_mapoff);
-void NDECL(check_linux_console);
-void NDECL(init_linux_cons);
+void linux_mapon();
+void linux_mapoff();
+void check_linux_console();
+void init_linux_cons();
 
 void
 linux_mapon()

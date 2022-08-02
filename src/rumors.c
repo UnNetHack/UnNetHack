@@ -39,8 +39,8 @@
  * and placed there by 'makedefs'.
  */
 
-STATIC_DCL void FDECL(init_rumors, (dlb *));
-STATIC_DCL void FDECL(init_oracles, (dlb *));
+static void init_rumors(dlb *);
+static void init_oracles(dlb *);
 
 /* rumor size variables are signed so that value -1 can be used as a flag */
 static long true_rumor_size = 0L, false_rumor_size;
@@ -53,7 +53,7 @@ static int oracle_flg = 0; /* -1=>don't use, 0=>need init, 1=>init done */
 static unsigned oracle_cnt = 0;
 static long *oracle_loc = 0;
 
-STATIC_OVL void
+static void
 init_rumors(fp)
 dlb *fp;
 {
@@ -195,7 +195,7 @@ int mechanism;
     pline("%s", line);
 }
 
-STATIC_OVL void
+static void
 init_oracles(fp)
 dlb *fp;
 {

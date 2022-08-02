@@ -3,7 +3,7 @@
 
 #include "hack.h"
 
-STATIC_OVL NEARDATA long takeoff_mask = 0L;
+static NEARDATA long takeoff_mask = 0L;
 static NEARDATA long taking_off = 0L;
 
 static NEARDATA int todelay;
@@ -30,22 +30,22 @@ static NEARDATA const long takeoff_order[] = { WORN_BLINDF, W_WEP,
                                                WORN_SHIRT,
                                                WORN_BOOTS, W_SWAPWEP, W_QUIVER, 0L };
 
-STATIC_DCL void FDECL(on_msg, (struct obj *));
-STATIC_PTR int NDECL(Armor_on);
-STATIC_DCL int NDECL(Cloak_on);
-STATIC_PTR int NDECL(Helmet_on);
-STATIC_PTR int NDECL(Gloves_on);
-STATIC_PTR int NDECL(Shield_on);
-STATIC_PTR int NDECL(Shirt_on);
-STATIC_DCL void NDECL(Amulet_on);
-static void FDECL(learnring, (struct obj *, BOOLEAN_P));
-STATIC_DCL void FDECL(Ring_off_or_gone, (struct obj *, BOOLEAN_P));
-STATIC_PTR int FDECL(select_off, (struct obj *));
-STATIC_DCL struct obj *NDECL(do_takeoff);
-STATIC_PTR int NDECL(take_off);
-STATIC_DCL int FDECL(menu_remarm, (int));
-STATIC_DCL void FDECL(already_wearing, (const char*));
-STATIC_DCL void FDECL(already_wearing2, (const char*, const char*));
+static void on_msg(struct obj *);
+static int Armor_on();
+static int Cloak_on();
+static int Helmet_on();
+static int Gloves_on();
+static int Shield_on();
+static int Shirt_on();
+static void Amulet_on();
+static void learnring(struct obj *, BOOLEAN_P);
+static void Ring_off_or_gone(struct obj *, BOOLEAN_P);
+static int select_off(struct obj *);
+static struct obj *do_takeoff();
+static int take_off();
+static int menu_remarm(int);
+static void already_wearing(const char*);
+static void already_wearing2(const char*, const char*);
 
 /* plural "fingers" or optionally "gloves" */
 const char *
@@ -66,7 +66,7 @@ struct obj *otmp;
 }
 
 /* for items that involve no delay */
-STATIC_OVL void
+static void
 on_msg(otmp)
 register struct obj *otmp;
 {
@@ -308,7 +308,7 @@ Boots_off()
     return 0;
 }
 
-STATIC_OVL int
+static int
 Cloak_on()
 {
     long oldprop;
@@ -456,8 +456,7 @@ Cloak_off()
     return 0;
 }
 
-STATIC_PTR
-int
+static int
 Helmet_on()
 {
     if (!uarmh) {
@@ -598,8 +597,7 @@ Helmet_off()
     return 0;
 }
 
-STATIC_PTR
-int
+static int
 Gloves_on()
 {
     if (!uarmg) {
@@ -721,7 +719,7 @@ Gloves_off()
     return 0;
 }
 
-STATIC_OVL int
+static int
 Shield_on()
 {
     /* no shield currently requires special handling when put on, but we
@@ -775,7 +773,7 @@ Shield_off()
     return 0;
 }
 
-STATIC_OVL int
+static int
 Shirt_on()
 {
     /* no shirt currently requires special handling when put on, but we
@@ -823,8 +821,7 @@ lucky_fedora()
     return 1;
 }
 
-STATIC_PTR
-int
+static int
 Armor_on()
 {
     if (uarm && Is_glowing_dragon_armor(uarm->otyp)) {
@@ -914,7 +911,7 @@ Armor_gone()
     return 0;
 }
 
-STATIC_OVL void
+static void
 Amulet_on()
 {
     if (!uamul) {
@@ -1277,7 +1274,7 @@ adjust_attrib:
     }
 }
 
-STATIC_OVL void
+static void
 Ring_off_or_gone(obj, gone)
 register struct obj *obj;
 boolean gone;
@@ -1654,7 +1651,7 @@ struct obj *stolenobj; /* no message if stolenobj is already being doffing */
     cancel_don();
     /* don't want <armor>_on() or <armor>_off() being called
        by unmul() since the on or off action isn't completing */
-    afternmv = (int NDECL((*))) 0;
+    afternmv = (int (*)(void)) 0;
     if (putting_on || otmp != stolenobj) {
         Sprintf(buf, "You stop %s %s.",
                 putting_on ? "putting on" : "taking off",
@@ -1955,14 +1952,14 @@ struct obj *otmp;
     return(1);
 }
 
-STATIC_OVL void
+static void
 already_wearing(cc)
 const char *cc;
 {
     You("are already wearing %s%c", cc, (cc == c_that_) ? '!' : '.');
 }
 
-STATIC_OVL void
+static void
 already_wearing2(cc1, cc2)
 const char *cc1, *cc2;
 {
@@ -2587,8 +2584,7 @@ unchanger()
 }
 
 /* occupation callback for 'A' */
-STATIC_PTR
-int
+static int
 select_off(otmp)
 register struct obj *otmp;
 {
@@ -2692,7 +2688,7 @@ register struct obj *otmp;
     return(0);
 }
 
-STATIC_OVL struct obj *
+static struct obj *
 do_takeoff()
 {
     struct obj *otmp = (struct obj *) 0;
@@ -2753,8 +2749,7 @@ do_takeoff()
 static const char *disrobing = "";
 
 /* occupation callback for 'A' */
-STATIC_PTR
-int
+static int
 take_off()
 {
     register int i;
@@ -2881,7 +2876,7 @@ doddoremarm()
     return 0;
 }
 
-STATIC_OVL int
+static int
 menu_remarm(retry)
 int retry;
 {

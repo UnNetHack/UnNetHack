@@ -116,8 +116,8 @@ hea_abil[] = { {     1, &(HPoison_resistance), "", "" },
     hum_abil[] = { { 0, 0, 0, 0 } };
 
 static long next_check = 600L;  /* arbitrary first setting */
-STATIC_DCL void NDECL(exerper);
-STATIC_DCL void FDECL(postadjabil, (long *));
+static void exerper();
+static void postadjabil(long *);
 
 /* adjust an attribute; return TRUE if change is made, FALSE otherwise */
 boolean
@@ -315,7 +315,7 @@ boolean inc_or_dec;
     if (moves > 0 && (i == A_STR || i == A_CON)) (void)encumber_msg();
 }
 
-STATIC_OVL void
+static void
 exerper()
 {
     if(!(moves % 10)) {
@@ -540,8 +540,7 @@ redist_attr()
     (void)encumber_msg();
 }
 
-STATIC_OVL
-void
+static void
 postadjabil(ability)
 long *ability;
 {

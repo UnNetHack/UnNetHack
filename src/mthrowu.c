@@ -3,10 +3,10 @@
 
 #include "hack.h"
 
-STATIC_DCL int FDECL(monmulti, (struct monst *, struct obj *, struct obj *));
-STATIC_DCL void FDECL(monshoot, (struct monst *, struct obj *, struct obj *));
-STATIC_DCL int FDECL(drop_throw, (struct obj *, BOOLEAN_P, int, int));
-STATIC_DCL boolean FDECL(m_lined_up, (struct monst *, struct monst *));
+static int monmulti(struct monst *, struct obj *, struct obj *);
+static void monshoot(struct monst *, struct obj *, struct obj *);
+static int drop_throw(struct obj *, BOOLEAN_P, int, int);
+static boolean m_lined_up(struct monst *, struct monst *);
 
 #define URETREATING(x, y) (distmin(u.ux, u.uy, x, y) > distmin(u.ux0, u.uy0, x, y))
 
@@ -17,7 +17,7 @@ STATIC_DCL boolean FDECL(m_lined_up, (struct monst *, struct monst *));
 /*
  * Keep consistent with breath weapons in zap.c, and AD_* in monattk.h.
  */
-STATIC_OVL NEARDATA const char *breathwep[] = {
+static NEARDATA const char *breathwep[] = {
     "fragments",
     "fire",
     "frost",
@@ -31,7 +31,7 @@ STATIC_OVL NEARDATA const char *breathwep[] = {
 };
 
 extern boolean notonhead; /* for long worms */
-STATIC_VAR int mesg_given; /* for m_throw()/thitu() 'miss' message */
+static int mesg_given; /* for m_throw()/thitu() 'miss' message */
 
 /* hero is hit by something other than a monster */
 int
@@ -110,7 +110,7 @@ const char *name; /* if null, then format `*objp' */
  * Returns 0 if object still exists (not destroyed).
  */
 
-STATIC_OVL int
+static int
 drop_throw(obj, ohit, x, y)
 register struct obj *obj;
 boolean ohit;
@@ -151,13 +151,13 @@ int x, y;
 }
 
 /* The monster that's being shot at when one monster shoots at another */
-STATIC_OVL struct monst *target = 0;
+static struct monst *target = 0;
 /* The monster that's doing the shooting/throwing */
-STATIC_OVL struct monst *archer = 0;
+static struct monst *archer = 0;
 
 /* calculate multishot volley count for mtmp throwing otmp (if not ammo) or
    shooting otmp with mwep (if otmp is ammo and mwep appropriate launcher) */
-STATIC_OVL int
+static int
 monmulti(mtmp, otmp, mwep)
 struct monst *mtmp;
 struct obj *otmp, *mwep;
@@ -253,7 +253,7 @@ struct obj *otmp, *mwep;
 }
 
 /* mtmp throws otmp, or shoots otmp with mwep, at hero or at monster mtarg */
-STATIC_OVL void
+static void
 monshoot(mtmp, otmp, mwep)
 struct monst *mtmp;
 struct obj *otmp, *mwep;
@@ -1122,7 +1122,7 @@ int boulderhandling; /* 0=block, 1=ignore, 2=conditionally block */
     return FALSE;
 }
 
-STATIC_OVL boolean
+static boolean
 m_lined_up(mtarg, mtmp)
 struct monst *mtarg, *mtmp;
 {

@@ -5,12 +5,12 @@
 
 static NEARDATA boolean did_dig_msg;
 
-static boolean NDECL(rm_waslit);
-static void FDECL(mkcavepos, (XCHAR_P, XCHAR_P, int, BOOLEAN_P, BOOLEAN_P));
-static void FDECL(mkcavearea, (BOOLEAN_P));
-static int NDECL(dig);
-static int FDECL(adj_pit_checks, (coord *, char *));
-static void FDECL(pit_flow, (struct trap *, SCHAR_P));
+static boolean rm_waslit();
+static void mkcavepos(XCHAR_P, XCHAR_P, int, BOOLEAN_P, BOOLEAN_P);
+static void mkcavearea(BOOLEAN_P);
+static int dig();
+static int adj_pit_checks(coord *, char *);
+static void pit_flow(struct trap *, SCHAR_P);
 
 enum grave_type {
     GRAVE_NORMAL = 0,

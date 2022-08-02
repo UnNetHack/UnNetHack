@@ -12,26 +12,26 @@ extern int dotrow;  /* shared with save */
 #endif
 
 #ifdef USE_TILES
-extern void FDECL(substitute_tiles, (d_level *));       /* from tile.c */
+extern void substitute_tiles(d_level *);       /* from tile.c */
 #endif
 
 #ifdef ZEROCOMP
-static int NDECL(mgetc);
+static int mgetc();
 #endif
-STATIC_DCL void NDECL(find_lev_obj);
-STATIC_DCL void FDECL(restlevchn, (int));
-STATIC_DCL void FDECL(restdamage, (int, BOOLEAN_P));
-STATIC_DCL void FDECL(restobj, (int, struct obj *));
-STATIC_DCL struct obj *FDECL(restobjchn, (int, BOOLEAN_P, BOOLEAN_P));
-STATIC_OVL void FDECL(restmon, (int, struct monst *));
-STATIC_DCL struct monst *FDECL(restmonchn, (int, BOOLEAN_P));
-STATIC_DCL struct fruit *FDECL(loadfruitchn, (int));
-STATIC_DCL void FDECL(freefruitchn, (struct fruit *));
-STATIC_DCL void FDECL(ghostfruit, (struct obj *));
-STATIC_DCL boolean FDECL(restgamestate, (int, unsigned int *, unsigned int *));
-STATIC_DCL void FDECL(restlevelstate, (unsigned int, unsigned int));
-STATIC_DCL int FDECL(restlevelfile, (int, XCHAR_P));
-STATIC_DCL void FDECL(reset_oattached_mids, (BOOLEAN_P));
+static void find_lev_obj();
+static void restlevchn(int);
+static void restdamage(int, BOOLEAN_P);
+static void restobj(int, struct obj *);
+static struct obj *restobjchn(int, BOOLEAN_P, BOOLEAN_P);
+static void restmon(int, struct monst *);
+static struct monst *restmonchn(int, BOOLEAN_P);
+static struct fruit *loadfruitchn(int);
+static void freefruitchn(struct fruit *);
+static void ghostfruit(struct obj *);
+static boolean restgamestate(int, unsigned int *, unsigned int *);
+static void restlevelstate(unsigned int, unsigned int);
+static int restlevelfile(int, XCHAR_P);
+static void reset_oattached_mids(BOOLEAN_P);
 
 /*
  * Save a mapping of IDs from ghost levels to the current level.  This
@@ -46,15 +46,15 @@ struct bucket {
     } map[N_PER_BUCKET];
 };
 
-STATIC_DCL void NDECL(clear_id_mapping);
-STATIC_DCL void FDECL(add_id_mapping, (unsigned, unsigned));
+static void clear_id_mapping();
+static void add_id_mapping(unsigned, unsigned);
 
 static int n_ids_mapped = 0;
 static struct bucket *id_map = 0;
 
 
 #ifdef AMII_GRAPHICS
-void FDECL( amii_setpens, (int) );  /* use colors from save file */
+void  amii_setpens(int) ;  /* use colors from save file */
 extern int amii_numcolors;
 #endif
 
@@ -67,7 +67,7 @@ static NEARDATA long omoves;
 #define Is_IceBox(o) ((o)->otyp == ICE_BOX ? TRUE : FALSE)
 
 /* Recalculate level.objects[x][y], since this info was not saved. */
-STATIC_OVL void
+static void
 find_lev_obj()
 {
     register struct obj *fobjtmp = (struct obj *)0;
@@ -115,7 +115,7 @@ boolean quietly;
     }
 }
 
-STATIC_OVL void
+static void
 restlevchn(fd)
 register int fd;
 {
@@ -138,7 +138,7 @@ register int fd;
     }
 }
 
-STATIC_OVL void
+static void
 restdamage(fd, ghostly)
 int fd;
 boolean ghostly;
@@ -239,7 +239,7 @@ register int fd;
 }
 
 /* restore one object */
-STATIC_OVL void
+static void
 restobj(fd, otmp)
 int fd;
 struct obj *otmp;
@@ -293,7 +293,7 @@ struct obj *otmp;
     }
 }
 
-STATIC_OVL struct obj *
+static struct obj *
 restobjchn(fd, ghostly, frozen)
 register int fd;
 boolean ghostly, frozen;
@@ -385,7 +385,7 @@ boolean ghostly, frozen;
 }
 
 /* restore one monster */
-STATIC_OVL void
+static void
 restmon(fd, mtmp)
 int fd;
 struct monst *mtmp;
@@ -442,7 +442,7 @@ struct monst *mtmp;
     } /* mextra */
 }
 
-STATIC_OVL struct monst *
+static struct monst *
 restmonchn(fd, ghostly)
 register int fd;
 boolean ghostly;
@@ -517,7 +517,7 @@ boolean ghostly;
     return first;
 }
 
-STATIC_OVL struct fruit *
+static struct fruit *
 loadfruitchn(fd)
 int fd;
 {
@@ -534,7 +534,7 @@ int fd;
     return flist;
 }
 
-STATIC_OVL void
+static void
 freefruitchn(flist)
 register struct fruit *flist;
 {
@@ -547,7 +547,7 @@ register struct fruit *flist;
     }
 }
 
-STATIC_OVL void
+static void
 ghostfruit(otmp)
 register struct obj *otmp;
 {
@@ -560,8 +560,7 @@ register struct obj *otmp;
     else otmp->spe = fruitadd(oldf->fname);
 }
 
-STATIC_OVL
-boolean
+static boolean
 restgamestate(fd, stuckid, steedid)
 register int fd;
 unsigned int *stuckid, *steedid;    /* STEED */
@@ -668,7 +667,7 @@ unsigned int *stuckid, *steedid;    /* STEED */
 /* update game state pointers to those valid for the current level (so we
  * don't dereference a wild u.ustuck when saving the game state, for instance)
  */
-STATIC_OVL void
+static void
 restlevelstate(stuckid, steedid)
 unsigned int stuckid, steedid;  /* STEED */
 {
@@ -691,7 +690,7 @@ unsigned int stuckid, steedid;  /* STEED */
 }
 
 /*ARGSUSED*/    /* fd used in MFLOPPY only */
-STATIC_OVL int
+static int
 restlevelfile(fd, ltmp)
 int fd UNUSED;
 xchar ltmp;
@@ -1175,7 +1174,7 @@ boolean ghostly;
 
 
 /* Clear all structures for object and monster ID mapping. */
-STATIC_OVL void
+static void
 clear_id_mapping()
 {
     struct bucket *curr;
@@ -1188,7 +1187,7 @@ clear_id_mapping()
 }
 
 /* Add a mapping to the ID map. */
-STATIC_OVL void
+static void
 add_id_mapping(gid, nid)
 unsigned gid, nid;
 {
@@ -1239,7 +1238,7 @@ unsigned gid, *nidp;
     return FALSE;
 }
 
-STATIC_OVL void
+static void
 reset_oattached_mids(ghostly)
 boolean ghostly;
 {

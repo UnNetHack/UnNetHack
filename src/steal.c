@@ -3,11 +3,11 @@
 
 #include "hack.h"
 
-STATIC_PTR int NDECL(stealarm);
+static int stealarm();
 
-STATIC_DCL const char *FDECL(equipname, (struct obj *));
+static const char *equipname(struct obj *);
 
-STATIC_OVL const char *
+static const char *
 equipname(otmp)
 register struct obj *otmp;
 {
@@ -135,7 +135,7 @@ register struct monst *mtmp;
 unsigned int stealoid;      /* object to be stolen */
 unsigned int stealmid;      /* monster doing the stealing */
 
-STATIC_PTR int
+static int
 stealarm()
 {
     register struct monst *mtmp;

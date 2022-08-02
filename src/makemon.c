@@ -13,15 +13,15 @@
     (mptr->mlet == S_HUMAN && Role_if(role_pm) && \
      (mptr->msound == MS_LEADER || mptr->msound == MS_NEMESIS))
 
-STATIC_DCL boolean FDECL(uncommon, (int));
-STATIC_DCL int FDECL(align_shift, (struct permonst *));
-STATIC_DCL boolean FDECL(mk_gen_ok, (int, int, int));
-STATIC_DCL boolean FDECL(wrong_elem_type, (struct permonst *));
-static void FDECL(m_initgrp, (struct monst *, int, int, int, int));
-STATIC_DCL void FDECL(m_initthrow, (struct monst *, int, int));
-STATIC_DCL void FDECL(m_initweap, (struct monst *));
-STATIC_DCL void FDECL(m_inityour, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(m_initinv, (struct monst *));
+static boolean uncommon(int);
+static int align_shift(struct permonst *);
+static boolean mk_gen_ok(int, int, int);
+static boolean wrong_elem_type(struct permonst *);
+static void m_initgrp(struct monst *, int, int, int, int);
+static void m_initthrow(struct monst *, int, int);
+static void m_initweap(struct monst *);
+static void m_inityour(struct monst *, struct obj *);
+static void m_initinv(struct monst *);
 
 extern const int monstr[];
 
@@ -47,7 +47,7 @@ register struct permonst *ptr;
 /*
  * Return true if the given monster cannot exist on this elemental level.
  */
-STATIC_OVL boolean
+static boolean
 wrong_elem_type(ptr)
 struct permonst *ptr;
 {
@@ -72,7 +72,7 @@ struct permonst *ptr;
     return FALSE;
 }
 /* make a group just like mtmp */
-STATIC_OVL void
+static void
 m_initgrp(mtmp, x, y, n, mmflags)
 struct monst *mtmp;
 int x, y, n, mmflags;
@@ -139,8 +139,7 @@ int x, y, n, mmflags;
     }
 }
 
-STATIC_OVL
-void
+static void
 m_initthrow(mtmp, otyp, oquan)
 struct monst *mtmp;
 int otyp, oquan;
@@ -154,7 +153,7 @@ int otyp, oquan;
     (void) mpickobj(mtmp, otmp);
 }
 
-STATIC_OVL void
+static void
 m_inityour(mtmp, obj)
 struct monst *mtmp;
 struct obj *obj;
@@ -172,7 +171,7 @@ struct obj *obj;
     (void) mpickobj(mtmp, otmp);
 }
 
-STATIC_OVL void
+static void
 m_initweap(mtmp)
 register struct monst *mtmp;
 {
@@ -606,7 +605,7 @@ long amount;
     add_to_minv(mtmp, gold);
 }
 
-STATIC_OVL void
+static void
 m_initinv(mtmp)
 register struct monst   *mtmp;
 {
@@ -1612,7 +1611,7 @@ struct permonst *mptr;  /* usually null; used for confused reading */
     return known;
 }
 
-STATIC_OVL boolean
+static boolean
 uncommon(mndx)
 int mndx;
 {
@@ -1671,7 +1670,7 @@ prohibited_by_generation_flags(struct permonst *ptr)
  *  comparing the dungeon alignment and monster alignment.
  *  return an integer in the range of 0-5.
  */
-STATIC_OVL int
+static int
 align_shift(ptr)
 register struct permonst *ptr;
 {
@@ -1873,7 +1872,7 @@ int mndx; /* particular species that can no longer be created */
 }
 
 /* decide whether it's ok to generate a candidate monster by mkclass() */
-STATIC_OVL boolean
+static boolean
 mk_gen_ok(mndx, mvflagsmask, genomask)
 int mndx, mvflagsmask, genomask;
 {

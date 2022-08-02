@@ -12,20 +12,20 @@ static NEARDATA const char *gate_str;
 
 extern boolean notonhead;   /* for long worms */
 
-STATIC_DCL void FDECL(kickdmg, (struct monst *, BOOLEAN_P));
-static boolean FDECL(maybe_kick_monster, (struct monst *, XCHAR_P, XCHAR_P));
-static void FDECL(kick_monster, (struct monst *, XCHAR_P, XCHAR_P));
-STATIC_DCL void FDECL(lawful_bribery_alignment, (SCHAR_P));
-static int FDECL(kick_object, (XCHAR_P, XCHAR_P, char *));
-static int FDECL(kick_object_core, (XCHAR_P, XCHAR_P));
-static char *FDECL(kickstr, (char *, const char *));
-STATIC_DCL void FDECL(otransit_msg, (struct obj *, BOOLEAN_P, long));
-STATIC_DCL void FDECL(drop_to, (coord *, SCHAR_P));
+static void kickdmg(struct monst *, BOOLEAN_P);
+static boolean maybe_kick_monster(struct monst *, XCHAR_P, XCHAR_P);
+static void kick_monster(struct monst *, XCHAR_P, XCHAR_P);
+static void lawful_bribery_alignment(SCHAR_P);
+static int kick_object(XCHAR_P, XCHAR_P, char *);
+static int kick_object_core(XCHAR_P, XCHAR_P);
+static char *kickstr(char *, const char *);
+static void otransit_msg(struct obj *, BOOLEAN_P, long);
+static void drop_to(coord *, SCHAR_P);
 
 static const char kick_passes_thru[] = "kick passes harmlessly through";
 
 /* kicking damage when not poly'd into a form with a kick attack */
-STATIC_OVL void
+static void
 kickdmg(mon, clumsy)
 struct monst *mon;
 boolean clumsy;
@@ -499,7 +499,7 @@ xchar x, y; /* coordinates where object was before the impact, not after */
 }
 
 /* jacket around kick_object_core */
-STATIC_OVL int
+static int
 kick_object(x, y, kickobjnam)
 xchar x, y;
 char *kickobjnam;
@@ -743,8 +743,8 @@ xchar x, y;
     newsym(x, y);
     boolean kickedobj_broken = FALSE;
     mon = bhit(u.dx, u.dy, range, KICKED_WEAPON,
-               (int FDECL((*), (MONST_P, OBJ_P))) 0,
-               (int FDECL((*), (OBJ_P, OBJ_P))) 0,
+               (int (*) (MONST_P, OBJ_P)) 0,
+               (int (*) (OBJ_P, OBJ_P)) 0,
                kickedobj, &kickedobj_broken);
     if (kickedobj_broken) {
         return 1; /* object broken */
@@ -1415,7 +1415,7 @@ dumb:
     return(1);
 }
 
-STATIC_OVL void
+static void
 drop_to(cc, loc)
 coord *cc;
 schar loc;
@@ -1823,7 +1823,7 @@ unsigned long deliverflags;
     }
 }
 
-STATIC_OVL void
+static void
 otransit_msg(otmp, nodrop, num)
 register struct obj *otmp;
 register boolean nodrop;

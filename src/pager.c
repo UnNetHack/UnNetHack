@@ -7,23 +7,23 @@
 #include "hack.h"
 #include "dlb.h"
 
-STATIC_DCL boolean FDECL(is_swallow_sym, (int));
-STATIC_DCL int FDECL(append_str, (char *, const char *));
-STATIC_DCL struct permonst * FDECL(lookat, (int, int, char *, char *));
+static boolean is_swallow_sym(int);
+static int append_str(char *, const char *);
+static struct permonst * lookat(int, int, char *, char *);
 static void look_all(boolean, boolean, boolean);
 static void add_obj_info(winid, struct obj *, short);
 static void add_mon_info(winid, struct permonst *);
-static void FDECL(do_supplemental_info, (char *, struct permonst *, BOOLEAN_P));
-STATIC_DCL boolean FDECL(help_menu, (int *));
+static void do_supplemental_info(char *, struct permonst *, BOOLEAN_P);
+static boolean help_menu(int *);
 #ifdef PORT_HELP
-extern void NDECL(port_help);
+extern void port_help();
 #endif
 static boolean lookup_database_entry(dlb *fp, struct obj *obj, const char* dbase_str, const char* inp,
         struct permonst *pm,
         boolean user_typed_name, boolean without_asking, char *supplemental_name);
 
 /* Returns "true" for characters that could represent a monster's stomach. */
-STATIC_OVL boolean
+static boolean
 is_swallow_sym(c)
 int c;
 {
@@ -38,7 +38,7 @@ int c;
  * a substring of buf.  Return 1 if the string was appended, 0 otherwise.
  * It is expected that buf is of size BUFSZ.
  */
-STATIC_OVL int
+static int
 append_str(buf, new_str)
 char *buf;
 const char *new_str;
@@ -393,7 +393,7 @@ int x, y;
  * Return the name of the glyph found at (x,y).
  * If not hallucinating and the glyph is a monster, also monster data.
  */
-STATIC_OVL struct permonst *
+static struct permonst *
 lookat(x, y, buf, monbuf)
 int x, y;
 char *buf, *monbuf;
@@ -2860,7 +2860,7 @@ static const char *help_menu_items[] = {
     (char *)0
 };
 
-STATIC_OVL boolean
+static boolean
 help_menu(sel)
 int *sel;
 {

@@ -13,7 +13,7 @@
 #ifdef AMII_GRAPHICS	/* too early in the file? too late? */
 
 #ifdef AMIFLUSH
-static struct Message *FDECL(GetFMsg,(struct MsgPort *));
+static struct Message *GetFMsg(struct MsgPort *);
 #endif
 
 static int BufferGetchar(void);
@@ -112,7 +112,7 @@ struct NewWindow *nw;
  * Close a window that shared the HackPort IDCMP port.
  */
 
-void FDECL(CloseShWindow, (struct Window *));
+void CloseShWindow(struct Window *);
 void CloseShWindow(win)
 struct Window *win;
 {
@@ -266,7 +266,7 @@ register struct IntuiMessage *message;
     theEvent.ie_Qualifier = numeric_pad ? IEQUALIFIER_NUMERICPAD : qualifier;
     theEvent.ie_EventAddress = (APTR) (message->IAddress);
 
-    length = RawKeyConvert(&theEvent, (char *)buffer, 
+    length = RawKeyConvert(&theEvent, (char *)buffer,
       (long) sizeof(buffer), NULL);
 
     if (length == 1) {   /* Plain ASCII character */

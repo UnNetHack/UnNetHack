@@ -13,11 +13,11 @@
  * yyunput is properly declared in flex.skel.
  */
 #if !defined(FLEX_SCANNER) && !defined(FLEXHACK_SCANNER)
-int FDECL(yyback, (int *,int));
-int NDECL(yylook);
-int NDECL(yyinput);
-int NDECL(yywrap);
-int NDECL(yylex);
+int yyback(int *,int);
+int yylook();
+int yyinput();
+int yywrap();
+int yylex();
 	/* Traditional lexes let yyunput() and yyoutput() default to int;
 	 * newer ones may declare them as void since they don't return
 	 * values.  For even more fun, the lex supplied as part of the
@@ -47,47 +47,47 @@ int NDECL(yylex);
 #  undef VOIDYYPUT
 # endif
 # ifdef VOIDYYPUT
-void FDECL(yyunput, (int));
-void FDECL(yyoutput, (int));
+void yyunput(int);
+void yyoutput(int);
 # else
-int FDECL(yyunput, (int));
-int FDECL(yyoutput, (int));
+int yyunput(int);
+int yyoutput(int);
 # endif
 #endif	/* !FLEX_SCANNER && !FLEXHACK_SCANNER */
 
 #ifdef FLEX_SCANNER
 #define YY_MALLOC_DECL \
-	      genericptr_t FDECL(malloc, (size_t)); \
-	      genericptr_t FDECL(realloc, (genericptr_t,size_t));
+	      genericptr_t malloc(size_t); \
+	      genericptr_t realloc(genericptr_t,size_t);
 #endif
 
-void FDECL(init_yyin, (FILE *));
-void FDECL(init_yyout, (FILE *));
+void init_yyin(FILE *);
+void init_yyout(FILE *);
 
-void FDECL(include_push, (const char *));
-int NDECL(include_pop);
+void include_push(const char *);
+int include_pop();
 
-long NDECL(handle_varstring_method);
-long FDECL(corefunc_str_check, (char *, long));
+long handle_varstring_method();
+long corefunc_str_check(char *, long);
 
-extern struct lc_vardefs *FDECL(vardef_defined,(struct lc_vardefs *,char *, int));
+extern struct lc_vardefs *vardef_defined(struct lc_vardefs *,char *, int);
 
 extern struct lc_vardefs *variable_definitions;
 
-extern long FDECL(method_defined, (char *, long, long *));
+extern long method_defined(char *, long, long *);
 
-void FDECL(savetoken, (char *));
-void NDECL(newline);
-void FDECL(advancepos, (char *));
+void savetoken(char *);
+void newline();
+void advancepos(char *);
 
 extern void VDECL(lc_error, (const char *, ...));
 
-extern char FDECL(core_func_retval, (int));
-extern int FDECL(is_core_func, (char *));
-extern int FDECL(core_func_idx, (char *));
+extern char core_func_retval(int);
+extern int is_core_func(char *);
+extern int core_func_idx(char *);
 
-extern int NDECL(yyparse);
-extern void FDECL(yyerror, (const char *));
+extern int yyparse();
+extern void yyerror(const char *);
 
 /*
  * This doesn't always get put in lev_comp.h

@@ -5,11 +5,11 @@
 
 #include "hack.h"
 
-STATIC_DCL int NDECL(bc_order);
-STATIC_DCL void NDECL(litter);
-static void NDECL(placebc_core);
-static void NDECL(unplacebc_core);
-static boolean FDECL(check_restriction, (int));
+static int bc_order();
+static void litter();
+static void placebc_core();
+static void unplacebc_core();
+static boolean check_restriction(int);
 
 static int bcrestriction = 0;
 #ifdef BREADCRUMBS
@@ -358,7 +358,7 @@ int linenum;
  *  Return the stacking of the hero's ball & chain.  This assumes that the
  *  hero is being punished.
  */
-STATIC_OVL int
+static int
 bc_order()
 {
     struct obj *obj;
@@ -966,7 +966,7 @@ xchar x, y;
 }
 
 /* ball&chain cause hero to randomly lose stuff from inventory */
-STATIC_OVL void
+static void
 litter()
 {
     struct obj *otmp, *nextobj = 0;

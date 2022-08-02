@@ -3,21 +3,21 @@
 
 #include "hack.h"
 
-STATIC_PTR int NDECL(prayer_done);
-STATIC_DCL struct obj *NDECL(worst_cursed_item);
-STATIC_DCL void FDECL(fix_worst_trouble, (int));
-STATIC_DCL void FDECL(angrygods, (ALIGNTYP_P));
-STATIC_DCL void FDECL(at_your_feet, (const char *));
-STATIC_DCL void NDECL(gcrownu);
-STATIC_DCL void FDECL(pleased, (ALIGNTYP_P));
-STATIC_DCL void FDECL(godvoice, (ALIGNTYP_P, const char*));
-STATIC_DCL void FDECL(god_zaps_you, (ALIGNTYP_P));
-static void FDECL(fry_by_god, (ALIGNTYP_P, BOOLEAN_P));
-STATIC_DCL void FDECL(gods_angry, (ALIGNTYP_P));
-STATIC_DCL void FDECL(gods_upset, (ALIGNTYP_P));
-STATIC_DCL void FDECL(consume_offering, (struct obj *));
-STATIC_DCL boolean FDECL(water_prayer, (BOOLEAN_P));
-STATIC_DCL boolean FDECL(blocked_boulder, (int, int));
+static int prayer_done();
+static struct obj *worst_cursed_item();
+static void fix_worst_trouble(int);
+static void angrygods(ALIGNTYP_P);
+static void at_your_feet(const char *);
+static void gcrownu();
+static void pleased(ALIGNTYP_P);
+static void godvoice(ALIGNTYP_P, const char*);
+static void god_zaps_you(ALIGNTYP_P);
+static void fry_by_god(ALIGNTYP_P, BOOLEAN_P);
+static void gods_angry(ALIGNTYP_P);
+static void gods_upset(ALIGNTYP_P);
+static void consume_offering(struct obj *);
+static boolean water_prayer(BOOLEAN_P);
+static boolean blocked_boulder(int, int);
 
 /* simplify a few tests */
 #define Cursed_obj(obj, typ) ((obj) && (obj)->otyp == (typ) && (obj)->cursed)
@@ -223,7 +223,7 @@ in_trouble()
 }
 
 /* select an item for TROUBLE_CURSED_ITEMS */
-STATIC_OVL struct obj *
+static struct obj *
 worst_cursed_item()
 {
     register struct obj *otmp;
@@ -282,7 +282,7 @@ worst_cursed_item()
     return otmp;
 }
 
-STATIC_OVL void
+static void
 fix_worst_trouble(trouble)
 register int trouble;
 {
@@ -551,7 +551,7 @@ decurse:
  * bathroom walls, but who is foiled by bathrobes." --Bertrand Russell, 1943
  * Divine wrath, dungeon walls, and armor follow the same principle.
  */
-STATIC_OVL void
+static void
 god_zaps_you(resp_god)
 aligntyp resp_god;
 {
@@ -626,7 +626,7 @@ aligntyp resp_god;
     }
 }
 
-STATIC_OVL void
+static void
 fry_by_god(resp_god, via_disintegration)
 aligntyp resp_god;
 boolean via_disintegration;
@@ -637,7 +637,7 @@ boolean via_disintegration;
     done(DIED);
 }
 
-STATIC_OVL void
+static void
 angrygods(resp_god)
 aligntyp resp_god;
 {
@@ -722,7 +722,7 @@ const char *str;
     }
 }
 
-STATIC_OVL void
+static void
 gcrownu()
 {
     struct obj *obj;
@@ -923,7 +923,7 @@ gcrownu()
     add_weapon_skill(1);
 }
 
-STATIC_OVL void
+static void
 pleased(g_align)
 aligntyp g_align;
 {
@@ -1223,7 +1223,7 @@ aligntyp g_align;
 /* either blesses or curses water on the altar,
  * returns true if it found any water here.
  */
-STATIC_OVL boolean
+static boolean
 water_prayer(bless_water)
 boolean bless_water;
 {
@@ -1252,7 +1252,7 @@ boolean bless_water;
     return((boolean)(changed > 0L));
 }
 
-STATIC_OVL void
+static void
 godvoice(g_align, words)
 aligntyp g_align;
 const char *words;
@@ -1267,7 +1267,7 @@ const char *words;
               godvoices[rn2(SIZE(godvoices))], quot, words, quot);
 }
 
-STATIC_OVL void
+static void
 gods_angry(g_align)
 aligntyp g_align;
 {
@@ -1275,7 +1275,7 @@ aligntyp g_align;
 }
 
 /* The g_align god is upset with you. */
-STATIC_OVL void
+static void
 gods_upset(g_align)
 aligntyp g_align;
 {
@@ -1286,7 +1286,7 @@ aligntyp g_align;
 
 static NEARDATA const char sacrifice_types[] = { FOOD_CLASS, AMULET_CLASS, 0 };
 
-STATIC_OVL void
+static void
 consume_offering(otmp)
 register struct obj *otmp;
 {
@@ -1909,7 +1909,7 @@ dopray()
     return(1);
 }
 
-STATIC_PTR int
+static int
 prayer_done() /* M. Stephenson (1.0.3b) */
 {
     aligntyp alignment = p_aligntyp;
@@ -2278,7 +2278,7 @@ register int x, y;
 }
 
 /* assumes isok() at one space away, but not necessarily at two */
-STATIC_OVL boolean
+static boolean
 blocked_boulder(dx, dy)
 int dx, dy;
 {

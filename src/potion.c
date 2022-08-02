@@ -8,18 +8,18 @@ boolean notonhead = FALSE;
 static NEARDATA int nothing, unkn;
 static NEARDATA const char beverages[] = { POTION_CLASS, 0 };
 
-STATIC_DCL long FDECL(itimeout, (long));
-STATIC_DCL long FDECL(itimeout_incr, (long, int));
-STATIC_DCL void NDECL(ghost_from_bottle);
-STATIC_OVL void NDECL(alchemy_init);
-STATIC_DCL boolean FDECL(H2Opotion_dip, (struct obj *, struct obj *, BOOLEAN_P, const char *));
+static long itimeout(long);
+static long itimeout_incr(long, int);
+static void ghost_from_bottle();
+static void alchemy_init();
+static boolean H2Opotion_dip(struct obj *, struct obj *, BOOLEAN_P, const char *);
 
 #ifndef TESTING
-STATIC_DCL int FDECL(dip, (struct obj *, struct obj *));
+static int dip(struct obj *, struct obj *);
 #endif
 
 /* force `val' to be within valid range for intrinsic timeout value */
-STATIC_OVL long
+static long
 itimeout(val)
 long val;
 {
@@ -30,7 +30,7 @@ long val;
 }
 
 /* increment `old' by `incr' and force result to be valid intrinsic timeout */
-STATIC_OVL long
+static long
 itimeout_incr(old, incr)
 long old;
 int incr;
@@ -432,7 +432,7 @@ int xtime;
     }
 }
 
-STATIC_OVL void
+static void
 ghost_from_bottle()
 {
     struct monst *mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, NO_MM_FLAGS);
@@ -1251,13 +1251,13 @@ bottlename()
 }
 
 /* handle item dipped into water potion or steed saddle splashed by same */
-STATIC_OVL boolean
+static boolean
 H2Opotion_dip(potion, targobj, useeit, objphrase)
 struct obj *potion, *targobj;
 boolean useeit;
 const char *objphrase; /* "Your widget glows" or "Steed's saddle glows" */
 {
-    void FDECL((*func), (OBJ_P)) = 0;
+    void (*func) (OBJ_P) = 0;
     const char *glowcolor = 0;
 #define COST_alter (-2)
 #define COST_none (-1)
@@ -1897,7 +1897,7 @@ short alchemy_table2[17];
 #define IS_DARK_COLOR(x)        ((x)&8)
 
 /** Does a one-time set up of alchemical tables. */
-STATIC_OVL void
+static void
 alchemy_init()
 {
     static boolean init = FALSE;

@@ -9,20 +9,20 @@
 #include <limits.h>
 
 #ifdef SINKS
-static void NDECL(polymorph_sink);
-static boolean NDECL(teleport_sink);
-STATIC_DCL void FDECL(dosinkring, (struct obj *));
+static void polymorph_sink();
+static boolean teleport_sink();
+static void dosinkring(struct obj *);
 #endif /* SINKS */
 
-STATIC_PTR int FDECL(drop, (struct obj *));
-STATIC_PTR int NDECL(wipeoff);
+static int drop(struct obj *);
+static int wipeoff();
 
-STATIC_DCL int FDECL(menu_drop, (int));
-STATIC_DCL int NDECL(currentlevel_rewrite);
-STATIC_DCL void NDECL(final_level);
-/* static boolean FDECL(badspot, (XCHAR_P,XCHAR_P)); */
-STATIC_DCL boolean NDECL(unique_item_check);
-STATIC_DCL void NDECL(levelport_monsters);
+static int menu_drop(int);
+static int currentlevel_rewrite();
+static void final_level();
+/* static boolean badspot(XCHAR_P,XCHAR_P); */
+static boolean unique_item_check();
+static void levelport_monsters();
 
 static NEARDATA const char drop_types[] =
 { ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, 0 };
@@ -466,8 +466,7 @@ teleport_sink()
     return FALSE;
 }
 
-STATIC_OVL
-void
+static void
 dosinkring(obj)  /* obj is a ring being dropped over a kitchen sink */
 register struct obj *obj;
 {
@@ -673,8 +672,7 @@ const char *word;
     return(TRUE);
 }
 
-STATIC_PTR
-int
+static int
 drop(obj)
 register struct obj *obj;
 {
@@ -879,7 +877,7 @@ doddrop()
 }
 
 /* Drop things from the hero's inventory, using a menu. */
-STATIC_OVL int
+static int
 menu_drop(retry)
 int retry;
 {
@@ -1217,7 +1215,7 @@ doup()
 d_level save_dlevel = {0, 0};
 
 /* check that we can write out the current level */
-STATIC_OVL int
+static int
 currentlevel_rewrite()
 {
     register int fd;
@@ -1851,7 +1849,7 @@ boolean at_stairs, falling, portal;
 #endif
 }
 
-STATIC_OVL void
+static void
 final_level()
 {
     struct monst *mtmp;
@@ -2168,7 +2166,7 @@ donull()
     return(1);  /* Do nothing, but let other things happen */
 }
 
-STATIC_PTR int
+static int
 wipeoff()
 {
     if(u.ucreamed < 4) u.ucreamed = 0;

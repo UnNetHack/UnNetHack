@@ -9,12 +9,12 @@ extern char bones[];    /* from files.c */
 extern long bytes_counted;
 #endif
 
-STATIC_DCL boolean FDECL(no_bones_level, (d_level *));
-STATIC_DCL void FDECL(goodfruit, (int));
-STATIC_DCL void FDECL(resetobjs, (struct obj *, BOOLEAN_P));
-static boolean FDECL(fixuporacle, (struct monst *));
+static boolean no_bones_level(d_level *);
+static void goodfruit(int);
+static void resetobjs(struct obj *, BOOLEAN_P);
+static boolean fixuporacle(struct monst *);
 
-STATIC_OVL boolean
+static boolean
 no_bones_level(lev)
 d_level *lev;
 {
@@ -38,7 +38,7 @@ d_level *lev;
  * ID is positive instead of negative).  This way, when we later save the
  * chain of fruit types, we know to only save the types that exist.
  */
-STATIC_OVL void
+static void
 goodfruit(id)
 int id;
 {
@@ -49,7 +49,7 @@ int id;
     }
 }
 
-STATIC_OVL void
+static void
 resetobjs(ochain, restore)
 struct obj *ochain;
 boolean restore;
@@ -196,7 +196,7 @@ boolean restore;
 }
 
 /** Removes objects recursively from a container with a probability of prob1/prob2. */
-STATIC_OVL void
+static void
 trim_contents(container, prob1, prob2)
 struct obj *container;
 int prob1;

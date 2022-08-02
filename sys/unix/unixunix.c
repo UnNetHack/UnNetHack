@@ -15,19 +15,19 @@
 #include <signal.h>
 
 #ifdef _M_UNIX
-extern void NDECL(sco_mapon);
-extern void NDECL(sco_mapoff);
+extern void sco_mapon();
+extern void sco_mapoff();
 #endif
 #ifdef __linux__
-extern void NDECL(linux_mapon);
-extern void NDECL(linux_mapoff);
+extern void linux_mapon();
+extern void linux_mapoff();
 #endif
 
 #ifndef NHSTDC
 extern int errno;
 #endif
 
-extern int FDECL(restore_savefile, (char *, const char *));
+extern int restore_savefile(char *, const char *);
 
 static struct stat buf;
 
@@ -510,12 +510,12 @@ FILE *stream;
 
 #ifdef GETRES_SUPPORT
 
-extern int FDECL(nh_getresuid, (uid_t *, uid_t *, uid_t *));
-extern uid_t NDECL(nh_getuid);
-extern uid_t NDECL(nh_geteuid);
-extern int FDECL(nh_getresgid, (gid_t *, gid_t *, gid_t *));
-extern gid_t NDECL(nh_getgid);
-extern gid_t NDECL(nh_getegid);
+extern int nh_getresuid(uid_t *, uid_t *, uid_t *);
+extern uid_t nh_getuid();
+extern uid_t nh_geteuid();
+extern int nh_getresgid(gid_t *, gid_t *, gid_t *);
+extern gid_t nh_getgid();
+extern gid_t nh_getegid();
 
 int
 (getresuid)(ruid, euid, suid)

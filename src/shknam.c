@@ -5,12 +5,11 @@
 
 #include "hack.h"
 
-STATIC_DCL boolean FDECL(stock_room_goodpos, (struct mkroom *, int, int, int, int));
-STATIC_DCL void FDECL(nameshk, (struct monst *, const char * const *));
-STATIC_DCL int  FDECL(shkinit, (const struct shclass *, struct mkroom *));
+static boolean stock_room_goodpos(struct mkroom *, int, int, int, int);
+static void nameshk(struct monst *, const char * const *);
+static int  shkinit(const struct shclass *, struct mkroom *);
 #ifdef BLACKMARKET
-STATIC_DCL void FDECL(stock_blkmar,
-                      (const struct shclass *, struct mkroom *, int));
+static void stock_blkmar(const struct shclass *, struct mkroom *, int);
 #endif /* BLACKMARKET */
 
 /*
@@ -301,7 +300,7 @@ shop_selection_init()
 }
 
 /* make an object of the appropriate type for a shop square */
-STATIC_OVL void
+static void
 mkshobj_at(const struct shclass *shp, int sx, int sy, int color)
 {
     struct monst *mtmp;
@@ -347,7 +346,7 @@ redo:
 }
 
 /* extract a shopkeeper name for the given shop type */
-STATIC_OVL void
+static void
 nameshk(shk, nlp)
 struct monst *shk;
 const char * const *nlp;
@@ -477,7 +476,7 @@ struct monst *mtmp;
 }
 
 /* create a new shopkeeper in the given room */
-STATIC_OVL int
+static int
 shkinit(shp, sroom)
 const struct shclass *shp;
 struct mkroom *sroom;
@@ -639,7 +638,7 @@ shk_failed:
     return(sh);
 }
 
-STATIC_OVL boolean
+static boolean
 stock_room_goodpos(sroom, rmno, sh, sx, sy)
 struct mkroom *sroom;
 int rmno, sh, sx,sy;

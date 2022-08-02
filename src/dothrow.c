@@ -5,17 +5,17 @@
 
 #include "hack.h"
 
-STATIC_DCL int FDECL(throw_obj, (struct obj *, int));
-STATIC_DCL boolean FDECL(ok_to_throw, (int *));
-STATIC_DCL void NDECL(autoquiver);
-STATIC_DCL int FDECL(gem_accept, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(tmiss, (struct obj *, struct monst *, BOOLEAN_P));
-STATIC_DCL int FDECL(throw_gold, (struct obj *));
-STATIC_DCL void FDECL(check_shop_obj, (struct obj *, XCHAR_P, XCHAR_P, BOOLEAN_P));
-STATIC_DCL void FDECL(breakmsg, (struct obj *, BOOLEAN_P));
-STATIC_DCL boolean FDECL(toss_up, (struct obj *, BOOLEAN_P));
-STATIC_DCL void FDECL(sho_obj_return_to_u, (struct obj *obj));
-STATIC_DCL boolean FDECL(mhurtle_step, (genericptr_t, int, int));
+static int throw_obj(struct obj *, int);
+static boolean ok_to_throw(int *);
+static void autoquiver();
+static int gem_accept(struct monst *, struct obj *);
+static void tmiss(struct obj *, struct monst *, BOOLEAN_P);
+static int throw_gold(struct obj *);
+static void check_shop_obj(struct obj *, XCHAR_P, XCHAR_P, BOOLEAN_P);
+static void breakmsg(struct obj *, BOOLEAN_P);
+static boolean toss_up(struct obj *, BOOLEAN_P);
+static void sho_obj_return_to_u(struct obj *obj);
+static boolean mhurtle_step(genericptr_t, int, int);
 
 static NEARDATA const char toss_objs[] =
 { ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, WEAPON_CLASS, 0 };
@@ -26,7 +26,7 @@ static NEARDATA const char bullets[] =
 extern boolean notonhead;   /* for long worms */
 
 /* Throw the selected object, asking for direction */
-STATIC_OVL int
+static int
 throw_obj(obj, shotlimit)
 struct obj *obj;
 int shotlimit;
@@ -261,7 +261,7 @@ int shotlimit;
 }
 
 /* common to dothrow() and dofire() */
-STATIC_OVL boolean
+static boolean
 ok_to_throw(shotlimit_p)
 int *shotlimit_p; /* (see dothrow()) */
 {
@@ -518,7 +518,7 @@ boolean
 walk_path(src_cc, dest_cc, check_proc, arg)
 coord *src_cc;
 coord *dest_cc;
-boolean FDECL((*check_proc), (genericptr_t, int, int));
+boolean (*check_proc)(genericptr_t, int, int);
 genericptr_t arg;
 {
     int x, y, dx, dy, x_change, y_change, err, i, prev_x, prev_y;
@@ -836,7 +836,7 @@ int x, y;
     return TRUE;
 }
 
-STATIC_OVL boolean
+static boolean
 mhurtle_step(arg, x, y)
 genericptr_t arg;
 int x, y;
@@ -960,7 +960,7 @@ int dx, dy, range;
     return;
 }
 
-STATIC_OVL void
+static void
 check_shop_obj(obj, x, y, broken)
 struct obj *obj;
 xchar x, y;
@@ -1000,7 +1000,7 @@ boolean broken;
  *
  * Returns FALSE if the object is gone.
  */
-STATIC_OVL boolean
+static boolean
 toss_up(obj, hitsroof)
 struct obj *obj;
 boolean hitsroof;
@@ -1133,7 +1133,7 @@ struct obj *obj;
 }
 
 /* the currently thrown object is returning to you (not for boomerangs) */
-STATIC_OVL void
+static void
 sho_obj_return_to_u(obj)
 struct obj *obj;
 {
@@ -1351,8 +1351,8 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         boolean obj_destroyed = FALSE;
         mon = bhit(u.dx, u.dy, range,
                    tethered_weapon ? THROWN_TETHERED_WEAPON : THROWN_WEAPON,
-                   (int FDECL((*), (MONST_P, OBJ_P))) 0,
-                   (int FDECL((*), (OBJ_P, OBJ_P))) 0,
+                   (int (*) (MONST_P, OBJ_P)) 0,
+                   (int (*) (OBJ_P, OBJ_P)) 0,
                    obj, &obj_destroyed);
 
         /* have to do this after bhit() so u.ux & u.uy are correct */
@@ -1591,7 +1591,7 @@ boolean mon_notices;
 }
 
 /* thrown object misses target monster */
-STATIC_OVL void
+static void
 tmiss(obj, mon, maybe_wakeup)
 struct obj *obj;
 struct monst *mon;
@@ -1977,7 +1977,7 @@ struct obj   *obj; /* thrownobj or kickedobj or uwep */
     return 0;
 }
 
-STATIC_OVL int
+static int
 gem_accept(mon, obj)
 register struct monst *mon;
 register struct obj *obj;
@@ -2268,7 +2268,7 @@ struct obj *obj;
     }
 }
 
-STATIC_OVL void
+static void
 breakmsg(obj, in_view)
 struct obj *obj;
 boolean in_view;
@@ -2311,7 +2311,7 @@ boolean in_view;
     }
 }
 
-STATIC_OVL int
+static int
 throw_gold(obj)
 struct obj *obj;
 {
@@ -2357,8 +2357,8 @@ struct obj *obj;
         } else {
             boolean object_destroyed = FALSE;
             mon = bhit(u.dx, u.dy, range, THROWN_WEAPON,
-                       (int FDECL((*), (MONST_P, OBJ_P))) 0,
-                       (int FDECL((*), (OBJ_P, OBJ_P))) 0,
+                       (int (*) (MONST_P, OBJ_P)) 0,
+                       (int (*) (OBJ_P, OBJ_P)) 0,
                        obj, &object_destroyed);
             if (object_destroyed) {
                 thrownobj = 0;

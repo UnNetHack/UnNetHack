@@ -19,33 +19,33 @@
 /* conversion of result to int is reasonable */
 
 
-STATIC_DCL void FDECL(mkfount, (int, struct mkroom *));
+static void mkfount(int, struct mkroom *);
 #ifdef SINKS
-STATIC_DCL void FDECL(mksink, (struct mkroom *));
+static void mksink(struct mkroom *);
 #endif
-STATIC_DCL void FDECL(mkaltar, (struct mkroom *));
-STATIC_DCL void FDECL(mkgrave, (struct mkroom *));
-STATIC_DCL void NDECL(makevtele);
-STATIC_DCL void NDECL(clear_level_structures);
-STATIC_DCL void NDECL(makelevel);
-STATIC_DCL struct mkroom *FDECL(find_branch_room, (coord *));
-STATIC_DCL struct mkroom *FDECL(pos_to_room, (XCHAR_P, XCHAR_P));
-STATIC_DCL boolean FDECL(place_niche, (struct mkroom *, int*, int*, int*));
-STATIC_DCL void FDECL(makeniche, (int));
-STATIC_DCL void NDECL(make_niches);
+static void mkaltar(struct mkroom *);
+static void mkgrave(struct mkroom *);
+static void makevtele();
+static void clear_level_structures();
+static void makelevel();
+static struct mkroom *find_branch_room(coord *);
+static struct mkroom *pos_to_room(XCHAR_P, XCHAR_P);
+static boolean place_niche(struct mkroom *, int*, int*, int*);
+static void makeniche(int);
+static void make_niches();
 
-STATIC_PTR int FDECL( CFDECLSPEC do_comp, (const genericptr, const genericptr));
+static int  CFDECLSPEC do_comp(const genericptr, const genericptr);
 
-STATIC_DCL void FDECL(dosdoor, (XCHAR_P, XCHAR_P, struct mkroom *, int));
-STATIC_DCL void FDECL(join, (int, int, BOOLEAN_P));
-STATIC_DCL void FDECL(do_room_or_subroom, (struct mkroom *, int, int, int, int,
-                                           BOOLEAN_P, SCHAR_P, BOOLEAN_P, BOOLEAN_P));
-STATIC_DCL void NDECL(makerooms);
-STATIC_DCL void FDECL(finddpos, (coord *, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
-STATIC_DCL void FDECL(mkinvpos, (XCHAR_P, XCHAR_P, int));
-STATIC_DCL void FDECL(mk_knox_portal, (XCHAR_P, XCHAR_P));
+static void dosdoor(XCHAR_P, XCHAR_P, struct mkroom *, int);
+static void join(int, int, BOOLEAN_P);
+static void do_room_or_subroom(struct mkroom *, int, int, int, int,
+                               BOOLEAN_P, SCHAR_P, BOOLEAN_P, BOOLEAN_P);
+static void makerooms();
+static void finddpos(coord *, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P);
+static void mkinvpos(XCHAR_P, XCHAR_P, int);
+static void mk_knox_portal(XCHAR_P, XCHAR_P);
 
-STATIC_DCL void NDECL(place_random_engravings);
+static void place_random_engravings();
 
 #define create_vault()  create_room(-1, -1, 2, 2, -1, -1, VAULT, TRUE)
 #define init_vault()    vault_x = -1
@@ -56,7 +56,7 @@ static boolean made_branch; /* used only during level creation */
 
 /* Args must be (const genericptr) so that qsort will always be happy. */
 
-STATIC_PTR int CFDECLSPEC
+static int CFDECLSPEC
 do_comp(vx, vy)
 const genericptr vx;
 const genericptr vy;
@@ -77,7 +77,7 @@ const genericptr vy;
 #endif /* LINT */
 }
 
-STATIC_OVL void
+static void
 finddpos(cc, xl, yl, xh, yh)
 coord *cc;
 xchar xl, yl, xh, yh;
@@ -115,7 +115,7 @@ sort_rooms()
 #endif
 }
 
-STATIC_OVL void
+static void
 do_room_or_subroom(croom, lowx, lowy, hix, hiy, lit, rtype, special, is_room)
 register struct mkroom *croom;
 int lowx, lowy;
@@ -289,7 +289,7 @@ rndvault_getname()
     return NULL;
 }
 
-STATIC_OVL void
+static void
 makerooms()
 {
     boolean tried_vault = FALSE;
@@ -324,7 +324,7 @@ makerooms()
     return;
 }
 
-STATIC_OVL void
+static void
 join(a, b, nxcor)
 register int a, b;
 boolean nxcor;
@@ -499,7 +499,7 @@ register struct mkroom *aroom;
     for( ; broom->hx >= 0; broom++) broom->fdoor++;
 }
 
-STATIC_OVL void
+static void
 dosdoor(x, y, aroom, type)
 register xchar x, y;
 register struct mkroom *aroom;
@@ -557,7 +557,7 @@ register int type;
     add_door(x, y, aroom);
 }
 
-STATIC_OVL boolean
+static boolean
 place_niche(aroom, dy, xx, yy)
 register struct mkroom *aroom;
 int *dy, *xx, *yy;
@@ -616,7 +616,7 @@ static const char * const hhgtg_engravings[] = {
     "We apologize for the inconvenience",
 };
 
-STATIC_OVL void
+static void
 makeniche(trap_type)
 int trap_type;
 {
@@ -709,7 +709,7 @@ int chance;
 }
 
 
-STATIC_OVL void
+static void
 make_niches()
 {
     register int ct = rnd((nroom>>1) + 1), dep = depth(&u.uz);
@@ -728,7 +728,7 @@ make_niches()
     }
 }
 
-STATIC_OVL void
+static void
 makevtele()
 {
     makeniche(TELEP_TRAP);
@@ -739,7 +739,7 @@ makevtele()
  * special) but it's easier to put it all in one place than make sure
  * each type initializes what it needs to separately.
  */
-STATIC_OVL void
+static void
 clear_level_structures()
 {
     static struct rm zerorm = { cmap_to_glyph(S_stone), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -815,7 +815,7 @@ mk_knox_vault(int x, int y, int w, int h)
     mk_knox_portal(x+w, y+h);
 }
 
-STATIC_OVL void
+static void
 makelevel()
 {
     register struct mkroom *croom, *troom;
@@ -1393,7 +1393,7 @@ register struct mkroom *croom;
 }
 
 /* Find an unused room for a branch location. */
-STATIC_OVL struct mkroom *
+static struct mkroom *
 find_branch_room(mp)
 coord *mp;
 {
@@ -1424,7 +1424,7 @@ coord *mp;
 }
 
 /* Find the room for (x,y).  Return null if not in a room. */
-STATIC_OVL struct mkroom *
+static struct mkroom *
 pos_to_room(x, y)
 xchar x, y;
 {
@@ -1720,8 +1720,7 @@ struct mkroom *croom;
     levl[x][y].ladder = up ? LA_UP : LA_DOWN;
 }
 
-STATIC_OVL
-void
+static void
 mkfount(mazeflag, croom)
 register int mazeflag;
 register struct mkroom *croom;
@@ -1742,7 +1741,7 @@ register struct mkroom *croom;
 }
 
 #ifdef SINKS
-STATIC_OVL void
+static void
 mksink(croom)
 register struct mkroom *croom;
 {
@@ -1759,7 +1758,7 @@ register struct mkroom *croom;
 #endif /* SINKS */
 
 
-STATIC_OVL void
+static void
 mkaltar(croom)
 register struct mkroom *croom;
 {
@@ -1885,7 +1884,7 @@ mkinvokearea()
 /* Change level topology.  Boulders in the vicinity are eliminated.
  * Temporarily overrides vision in the name of a nice effect.
  */
-STATIC_OVL void
+static void
 mkinvpos(x, y, dist)
 xchar x, y;
 int dist;
@@ -1991,7 +1990,7 @@ get_floating_branch(d_level *target, branch *br)
  *
  * Ludios will remain isolated until the branch is corrected by this function.
  */
-STATIC_OVL void
+static void
 mk_knox_portal(x, y)
 xchar x, y;
 {

@@ -17,23 +17,21 @@ boolean m_using = FALSE;
  * don't know not to read scrolls, etc....
  */
 
-STATIC_DCL struct permonst *FDECL(muse_newcham_mon, (struct monst *));
-STATIC_DCL int FDECL(precheck, (struct monst *, struct obj *));
-static void FDECL(mzapwand, (struct monst *, struct obj *, BOOLEAN_P));
-STATIC_DCL void FDECL(mreadmsg, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(mquaffmsg, (struct monst *, struct obj *));
-STATIC_PTR int FDECL(mbhitm, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(mbhit,
-                      (struct monst *, int, int FDECL((*), (MONST_P, OBJ_P)),
-                       int FDECL((*), (OBJ_P, OBJ_P)), struct obj *));
-STATIC_DCL void FDECL(you_aggravate, (struct monst *));
-STATIC_DCL void FDECL(mon_consume_unstone, (struct monst *, struct obj *,
-                                            BOOLEAN_P, BOOLEAN_P));
-static boolean FDECL(mcould_eat_tin, (struct monst *));
-static boolean FDECL(muse_unslime, (struct monst *, struct obj *, struct trap *, BOOLEAN_P));
-static boolean FDECL(cures_stoning, (struct monst *, struct obj *, BOOLEAN_P));
-static int FDECL(cures_sliming, (struct monst *, struct obj *));
-static boolean FDECL(green_mon, (struct monst *));
+static struct permonst *muse_newcham_mon(struct monst *);
+static int precheck(struct monst *, struct obj *);
+static void mzapwand(struct monst *, struct obj *, BOOLEAN_P);
+static void mreadmsg(struct monst *, struct obj *);
+static void mquaffmsg(struct monst *, struct obj *);
+static int mbhitm(struct monst *, struct obj *);
+static void mbhit(struct monst *, int, int (*) (MONST_P, OBJ_P),
+                  int (*)(OBJ_P, OBJ_P), struct obj *);
+static void you_aggravate(struct monst *);
+static void mon_consume_unstone(struct monst *, struct obj *, BOOLEAN_P, BOOLEAN_P);
+static boolean mcould_eat_tin(struct monst *);
+static boolean muse_unslime(struct monst *, struct obj *, struct trap *, BOOLEAN_P);
+static boolean cures_stoning(struct monst *, struct obj *, BOOLEAN_P);
+static int cures_sliming(struct monst *, struct obj *);
+static boolean green_mon(struct monst *);
 
 static struct musable {
     struct obj *offensive;
@@ -56,7 +54,7 @@ static boolean zap_oseen;
  * the item.  Returns 0 if nothing happened, 2 if the monster can't do anything
  * (i.e. it teleported) and 1 if it's dead.
  */
-STATIC_OVL int
+static int
 precheck(mon, obj)
 struct monst *mon;
 struct obj *obj;
@@ -154,7 +152,7 @@ struct obj *obj;
 
 /* when a monster zaps a wand give a message, deduct a charge, and if it
    isn't directly seen, remove hero's memory of the number of charges */
-STATIC_OVL void
+static void
 mzapwand(mtmp, otmp, self)
 struct monst *mtmp;
 struct obj *otmp;
@@ -204,7 +202,7 @@ boolean self;
     otmp->spe -= 1; /* use a charge */
 }
 
-STATIC_OVL void
+static void
 mreadmsg(mtmp, otmp)
 struct monst *mtmp;
 struct obj *otmp;
@@ -244,7 +242,7 @@ struct obj *otmp;
               vismon ? mon_nam(mtmp) : mhe(mtmp));
 }
 
-STATIC_OVL void
+static void
 mquaffmsg(mtmp, otmp)
 struct monst *mtmp;
 struct obj *otmp;
@@ -1251,8 +1249,7 @@ struct monst *mtmp;
 #undef nomore
 }
 
-STATIC_PTR
-int
+static int
 mbhitm(mtmp, otmp)
 register struct monst *mtmp;
 register struct obj *otmp;
@@ -1331,12 +1328,12 @@ register struct obj *otmp;
  * zapping you, so we need a special function for it.  (Unless someone wants
  * to merge the two functions...)
  */
-STATIC_OVL void
+static void
 mbhit(mon, range, fhitm, fhito, obj)
 struct monst *mon;          /* monster shooting the wand */
 register int range;         /* direction and range */
-int FDECL((*fhitm), (MONST_P, OBJ_P));
-int FDECL((*fhito), (OBJ_P, OBJ_P));  /* fns called when mon/obj hit */
+int (*fhitm)(MONST_P, OBJ_P);
+int (*fhito)(OBJ_P, OBJ_P);  /* fns called when mon/obj hit */
 struct obj *obj;            /* 2nd arg to fhitm/fhito */
 {
     register struct monst *mtmp;
@@ -2000,7 +1997,7 @@ skipmsg:
     return 0;
 }
 
-STATIC_OVL void
+static void
 you_aggravate(mtmp)
 struct monst *mtmp;
 {
@@ -2295,7 +2292,7 @@ boolean by_you;
     return FALSE;
 }
 
-STATIC_OVL void
+static void
 mon_consume_unstone(mon, obj, by_you, stoning)
 struct monst *mon;
 struct obj *obj;

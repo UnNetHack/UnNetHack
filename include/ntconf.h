@@ -62,8 +62,8 @@
 /* Stuff to help the user with some common, yet significant errors */
 #define INTERJECT_PANIC     0
 #define INTERJECTION_TYPES  (INTERJECT_PANIC + 1)
-extern void FDECL(interject_assistance, (int, int, genericptr_t, genericptr_t));
-extern void FDECL(interject, (int));
+extern void interject_assistance(int, int, genericptr_t, genericptr_t);
+extern void interject(int);
 
 /* The following is needed for prototypes of certain functions */
 #if defined(_MSC_VER)
@@ -128,12 +128,12 @@ extern char hackdir[];
 #define ABORT C('a')
 #define getuid() 1
 #define getlogin() ((char *)0)
-extern void NDECL(win32_abort);
+extern void win32_abort();
 #ifdef WIN32CON
-extern void FDECL(nttty_preference_update, (const char *));
-extern void NDECL(toggle_mouse_support);
-extern void FDECL(map_subkeyvalue, (char *));
-extern void NDECL(load_keyboard_handler);
+extern void nttty_preference_update(const char *);
+extern void toggle_mouse_support();
+extern void map_subkeyvalue(char *);
+extern void load_keyboard_handler();
 #endif
 
 #include <fcntl.h>
@@ -186,7 +186,7 @@ int _RTLENTRY _EXPFUNC read  (int __handle, void _FAR *__buf, unsigned __len);
 #endif
 #endif
 
-extern int FDECL(set_win32_option, (const char *, const char *));
+extern int set_win32_option(const char *, const char *);
 #ifdef WIN32CON
 #define LEFTBUTTON  FROM_LEFT_1ST_BUTTON_PRESSED
 #define RIGHTBUTTON RIGHTMOST_BUTTON_PRESSED

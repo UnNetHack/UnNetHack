@@ -23,22 +23,22 @@ int dotcnt, dotrow; /* also used in restore */
 #endif
 
 #ifdef ZEROCOMP
-STATIC_DCL void FDECL(bputc, (int));
+static void bputc(int);
 #endif
-STATIC_DCL void FDECL(savelevchn, (int, int));
-STATIC_DCL void FDECL(savedamage, (int, int));
-STATIC_DCL void FDECL(saveobj, (int, struct obj *));
-STATIC_DCL void FDECL(saveobjchn, (int, struct obj *, int));
-STATIC_DCL void FDECL(savemon, (int, struct monst *));
-STATIC_DCL void FDECL(savemonchn, (int, struct monst *, int));
-STATIC_DCL void FDECL(savetrapchn, (int, struct trap *, int));
-STATIC_DCL void FDECL(savegamestate, (int, int));
-void FDECL(save_mongen_override, (int, struct mon_gen_override *, int));
-void FDECL(save_lvl_sounds, (int, struct lvl_sounds *, int));
+static void savelevchn(int, int);
+static void savedamage(int, int);
+static void saveobj(int, struct obj *);
+static void saveobjchn(int, struct obj *, int);
+static void savemon(int, struct monst *);
+static void savemonchn(int, struct monst *, int);
+static void savetrapchn(int, struct trap *, int);
+static void savegamestate(int, int);
+void save_mongen_override(int, struct mon_gen_override *, int);
+void save_lvl_sounds(int, struct lvl_sounds *, int);
 #ifdef MFLOPPY
-STATIC_DCL void FDECL(savelev0, (int, XCHAR_P, int));
-STATIC_DCL boolean NDECL(swapout_oldest);
-STATIC_DCL void FDECL(copyfile, (char *, char *));
+static void savelev0(int, XCHAR_P, int);
+static boolean swapout_oldest();
+static void copyfile(char *, char *);
 #endif /* MFLOPPY */
 #ifdef GCC_WARN
 static long nulls[10];
@@ -306,7 +306,7 @@ dosave0()
     return(1);
 }
 
-STATIC_OVL void
+static void
 savegamestate(fd, mode)
 register int fd, mode;
 {
@@ -477,7 +477,7 @@ int mode;
     return TRUE;
 }
 
-STATIC_OVL void
+static void
 savelev0(fd, lev, mode)
 #else
 void
@@ -672,7 +672,7 @@ static NEARDATA boolean compressing = FALSE;
     HUP printf("outbufp %d outrunlength %d\n", outbufp,outrunlength);
    }*/
 
-STATIC_OVL void
+static void
 bputc(c)
 int c;
 {
@@ -881,7 +881,7 @@ int fd;
 }
 #endif /* ZEROCOMP */
 
-STATIC_OVL void
+static void
 savelevchn(fd, mode)
 register int fd, mode;
 {
@@ -932,7 +932,7 @@ struct cemetery **cemeteryaddr;
     }
 }
 
-STATIC_OVL void
+static void
 savedamage(fd, mode)
 register int fd, mode;
 {
@@ -1029,7 +1029,7 @@ register struct lvl_sounds *or;
     }
 }
 
-STATIC_OVL void
+static void
 saveobj(fd, otmp)
 int fd;
 struct obj *otmp;
@@ -1069,7 +1069,7 @@ struct obj *otmp;
     }
 }
 
-STATIC_OVL void
+static void
 saveobjchn(fd, otmp, mode)
 register int fd, mode;
 register struct obj *otmp;
@@ -1118,7 +1118,7 @@ register struct obj *otmp;
         bwrite(fd, (genericptr_t) &minusone, sizeof (int));
 }
 
-STATIC_OVL void
+static void
 savemon(fd, mtmp)
 int fd;
 struct monst *mtmp;
@@ -1167,7 +1167,7 @@ struct monst *mtmp;
     }
 }
 
-STATIC_OVL void
+static void
 savemonchn(fd, mtmp, mode)
 register int fd, mode;
 register struct monst *mtmp;
@@ -1199,7 +1199,7 @@ register struct monst *mtmp;
         bwrite(fd, (genericptr_t) &minusone, sizeof (int));
 }
 
-STATIC_OVL void
+static void
 savetrapchn(fd, trap, mode)
 register int fd, mode;
 register struct trap *trap;
@@ -1389,7 +1389,7 @@ int lev;
     return TRUE;
 }
 
-STATIC_OVL boolean
+static boolean
 swapout_oldest() {
     char to[PATHLEN], from[PATHLEN];
     int i, oldest;
@@ -1421,7 +1421,7 @@ swapout_oldest() {
     return TRUE;
 }
 
-STATIC_OVL void
+static void
 copyfile(from, to)
 char *from, *to;
 {

@@ -58,18 +58,18 @@ static int yygrowstack(void);
 #include "date.h"
 #include "dgn_file.h"
 
-void FDECL(yyerror, (const char *));
-void FDECL(yywarning, (const char *));
-int NDECL(yylex);
-int NDECL(yyparse);
-int FDECL(getchain, (char *));
-int NDECL(check_dungeon);
-int NDECL(check_branch);
-int NDECL(check_level);
-void NDECL(init_dungeon);
-void NDECL(init_branch);
-void NDECL(init_level);
-void NDECL(output_dgn);
+void yyerror(const char *);
+void yywarning(const char *);
+int yylex();
+int yyparse();
+int getchain(char *);
+int check_dungeon();
+int check_branch();
+int check_level();
+void init_dungeon();
+void init_branch();
+void init_level();
+void output_dgn();
 
 #define Free(ptr)		free((genericptr_t)ptr)
 

@@ -11,10 +11,10 @@ struct trobj {
     Bitfield(trbless, 2);
 };
 
-STATIC_DCL void FDECL(ini_inv, (struct trobj *));
-STATIC_DCL void FDECL(knows_object, (int));
+static void ini_inv(struct trobj *);
+static void knows_object(int);
 static void knows_class(char);
-STATIC_DCL boolean FDECL(restricted_spell_discipline, (int));
+static boolean restricted_spell_discipline(int);
 
 #define UNDEF_TYP   0
 #define UNDEF_SPE   '\177'
@@ -616,7 +616,7 @@ static const struct def_skill Skill_W[] = {
 };
 
 
-STATIC_OVL void
+static void
 knows_object(obj)
 register int obj;
 {
@@ -1143,7 +1143,7 @@ u_init()
 }
 
 /* skills aren't initialized, so we use the role-specific skill lists */
-STATIC_OVL boolean
+static boolean
 restricted_spell_discipline(otyp)
 int otyp;
 {
@@ -1177,7 +1177,7 @@ int otyp;
     return TRUE;
 }
 
-STATIC_OVL void
+static void
 ini_inv(trop)
 register struct trobj *trop;
 {

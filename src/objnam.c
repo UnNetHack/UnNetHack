@@ -8,15 +8,15 @@
 #define SCHAR_LIM 127
 #define NUMOBUF 12
 
-STATIC_DCL char *FDECL(strprepend, (char *, const char *));
-static boolean FDECL(wishymatch, (const char *, const char *, BOOLEAN_P));
-static char *NDECL(nextobuf);
-STATIC_DCL void FDECL(releaseobuf, (char *));
-static char *FDECL(minimal_xname, (struct obj *));
-static void FDECL(add_erosion_words, (struct obj *, char *, BOOLEAN_P));
-static char *FDECL(just_an, (char *str, const char *));
-static char *FDECL(xname_flags, (struct obj *, unsigned));
-static boolean FDECL(badman, (const char *, BOOLEAN_P));
+static char *strprepend(char *, const char *);
+static boolean wishymatch(const char *, const char *, BOOLEAN_P);
+static char *nextobuf();
+static void releaseobuf(char *);
+static char *minimal_xname(struct obj *);
+static void add_erosion_words(struct obj *, char *, BOOLEAN_P);
+static char *just_an(char *str, const char *);
+static char *xname_flags(struct obj *, unsigned);
+static boolean badman(const char *, BOOLEAN_P);
 
 struct Jitem {
     int item;
@@ -40,7 +40,7 @@ struct Jitem {
                            typ != EMERALD &&                        \
                            typ != OPAL)))
 
-STATIC_OVL struct Jitem Japanese_items[] = {
+static struct Jitem Japanese_items[] = {
     { SHORT_SWORD, "wakizashi" },
     { BROADSWORD, "ninja-to" },
     { FLAIL, "nunchaku" },
@@ -56,9 +56,9 @@ STATIC_OVL struct Jitem Japanese_items[] = {
     {0, "" }
 };
 
-STATIC_DCL const char *FDECL(Japanese_item_name, (int i));
+static const char *Japanese_item_name(int i);
 
-STATIC_OVL char *
+static char *
 strprepend(s, pref)
 char *s;
 const char *pref;
@@ -74,7 +74,7 @@ static char NEARDATA obufs[NUMOBUF][BUFSZ];
 static int obufidx = 0;
 
 /* manage a pool of BUFSZ buffers, so callers don't have to */
-STATIC_OVL char *
+static char *
 nextobuf()
 {
     obufidx = (obufidx + 1) % NUMOBUF;
@@ -83,7 +83,7 @@ nextobuf()
 }
 
 /* put the most recently allocated buffer back if possible */
-STATIC_OVL void
+static void
 releaseobuf(bufp)
 char *bufp;
 {
@@ -250,7 +250,7 @@ static int distantname = 0;
 char *
 distant_name(obj, func)
 struct obj *obj;
-char *FDECL((*func), (OBJ_P));
+char *(*func)(OBJ_P);
 {
     char *str;
 
@@ -1863,8 +1863,8 @@ struct obj *obj;
 char *
 short_oname(obj, func, altfunc, lenlimit)
 struct obj *obj;
-char *FDECL((*func), (OBJ_P)),    /* main formatting routine */
-     *FDECL((*altfunc), (OBJ_P)); /* alternate for shortest result */
+char *(*func) (OBJ_P),   /* main formatting routine */
+     *(*altfunc)(OBJ_P); /* alternate for shortest result */
 unsigned lenlimit;
 {
     struct obj save_obj;
@@ -1945,7 +1945,7 @@ unsigned lenlimit;
 const char *
 singular(otmp, func)
 register struct obj *otmp;
-char *FDECL((*func), (OBJ_P));
+char *(*func)(OBJ_P);
 {
     long savequan;
 #ifdef SHOW_WEIGHT
@@ -2815,7 +2815,7 @@ struct o_range {
 };
 
 /* wishable subranges of objects */
-STATIC_OVL NEARDATA const struct o_range o_ranges[] = {
+static NEARDATA const struct o_range o_ranges[] = {
     { "bag",    TOOL_CLASS,   SACK,       BAG_OF_TRICKS },
     { "lamp",   TOOL_CLASS,   OIL_LAMP,       MAGIC_LAMP },
     { "candle", TOOL_CLASS,   TALLOW_CANDLE,  WAX_CANDLE },
@@ -4653,7 +4653,7 @@ int first, last;
     return 0;
 }
 
-STATIC_OVL const char *
+static const char *
 Japanese_item_name(i)
 int i;
 {
@@ -4776,7 +4776,7 @@ safe_qbuf(qbuf, qprefix, qsuffix, obj, func, altfunc, lastR)
 char *qbuf; /* output buffer */
 const char *qprefix, *qsuffix;
 struct obj *obj;
-char *FDECL((*func), (OBJ_P)), *FDECL((*altfunc), (OBJ_P));
+char *(*func) (OBJ_P), *(*altfunc) (OBJ_P);
 const char *lastR;
 {
     char *bufp, *endp;

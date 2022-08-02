@@ -23,9 +23,9 @@ early_init()
 }
 
 #ifdef POSITIONBAR
-STATIC_DCL void NDECL(do_positionbar);
+static void do_positionbar();
 #endif
-STATIC_DCL void FDECL(interrupt_multi, (const char *, int, int));
+static void interrupt_multi(const char *, int, int);
 
 static int prev_hp_notify;
 enum monster_generation monclock;
@@ -858,7 +858,7 @@ boolean new_game;   /* false => restoring an old game */
 }
 
 #ifdef POSITIONBAR
-STATIC_DCL void
+static void
 do_positionbar()
 {
     static char pbar[COLNO];
@@ -934,8 +934,7 @@ get_realtime(void)
 #endif /* REALTIME_ON_BOTL || RECORD_REALTIME */
 
 /** Interrupt a multiturn action if current_points is equal to max_points. */
-STATIC_DCL
-void
+static void
 interrupt_multi(points, current_points, max_points)
 const char *points;
 int current_points;

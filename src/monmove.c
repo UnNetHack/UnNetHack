@@ -7,11 +7,11 @@
 
 extern boolean notonhead;
 
-STATIC_DCL int FDECL(disturb, (struct monst *));
-STATIC_DCL void FDECL(distfleeck, (struct monst *, int *, int *, int *));
-STATIC_DCL int FDECL(m_arrival, (struct monst *));
-STATIC_DCL void FDECL(watch_on_duty, (struct monst *));
-static int FDECL(vamp_shift, (struct monst *, struct permonst *, BOOLEAN_P));
+static int disturb(struct monst *);
+static void distfleeck(struct monst *, int *, int *, int *);
+static int m_arrival(struct monst *);
+static void watch_on_duty(struct monst *);
+static int vamp_shift(struct monst *, struct permonst *, BOOLEAN_P);
 
 static void make_group_attackers_flee(struct monst* mtmp);
 static void share_hp(struct monst* mon1, struct monst* mon2);
@@ -79,7 +79,7 @@ const char *shout;
     }
 }
 
-STATIC_OVL void
+static void
 watch_on_duty(mtmp)
 register struct monst *mtmp;
 {
@@ -221,7 +221,7 @@ boolean digest_meal;
  * Possibly awaken the given monster.  Return a 1 if the monster has been
  * jolted awake.
  */
-STATIC_OVL int
+static int
 disturb(mtmp)
 register struct monst *mtmp;
 {
@@ -336,7 +336,7 @@ boolean fleemsg;
     memset(mtmp->mtrack, 0, sizeof(mtmp->mtrack));
 }
 
-STATIC_OVL void
+static void
 distfleeck(mtmp, inrange, nearby, scared)
 register struct monst *mtmp;
 int *inrange, *nearby, *scared;
@@ -382,7 +382,7 @@ int *inrange, *nearby, *scared;
 
 /* perform a special one-time action for a monster; returns -1 if nothing
    special happened, 0 if monster uses up its turn, 1 if monster is killed */
-STATIC_OVL int
+static int
 m_arrival(mon)
 struct monst *mon;
 {

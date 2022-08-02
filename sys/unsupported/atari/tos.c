@@ -24,9 +24,9 @@ static char *nh_HE="\033q";
 
 #include <ctype.h>
 
-static char NDECL(DOSgetch);
-static char NDECL(BIOSgetch);
-static void NDECL(init_aline);
+static char DOSgetch();
+static char BIOSgetch();
+static void init_aline();
 char *_a_line;			/* for Line A variables */
 # ifdef TEXTCOLOR
 boolean colors_changed = FALSE;

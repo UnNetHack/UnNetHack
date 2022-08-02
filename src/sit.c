@@ -4,7 +4,7 @@
 #include "hack.h"
 #include "artifact.h"
 
-STATIC_DCL void FDECL(curse_objects, (struct obj *, int, boolean));
+static void curse_objects(struct obj *, int, boolean);
 
 /* take away the hero's money */
 void
