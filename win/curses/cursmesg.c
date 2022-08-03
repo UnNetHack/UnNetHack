@@ -163,7 +163,7 @@ curses_block(boolean require_tab)
 }
 
 int
-curses_more()
+curses_more(void)
 {
     return curses_block(FALSE);
 }
@@ -172,7 +172,7 @@ curses_more()
 /* Clear the message window if one line; otherwise unhighlight old messages */
 
 void
-curses_clear_unhighlight_message_window()
+curses_clear_unhighlight_message_window(void)
 {
     int mh, mw, count;
     boolean border = curses_window_has_border(MESSAGE_WIN);
@@ -213,7 +213,7 @@ curses_clear_unhighlight_message_window()
 recent messages. */
 
 void
-curses_last_messages()
+curses_last_messages(void)
 {
     boolean border = curses_window_has_border(MESSAGE_WIN);
 
@@ -239,7 +239,7 @@ curses_last_messages()
 /* Initialize list for message history */
 
 void
-curses_init_mesg_history()
+curses_init_mesg_history(void)
 {
     max_messages = iflags.msg_history;
 
@@ -256,7 +256,7 @@ curses_init_mesg_history()
 /* Display previous message window messages in reverse chron order */
 
 void
-curses_prev_mesg()
+curses_prev_mesg(void)
 {
     int count;
     winid wid;

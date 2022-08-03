@@ -35,19 +35,19 @@ static void done_intr(int);
 static void done_hangup(int);
 # endif
 #endif
-static int heaven_or_hell_lifesave_end();
-static void disclose(int, BOOLEAN_P);
+static int heaven_or_hell_lifesave_end(void);
+static void disclose(int, boolean);
 static void get_valuables(struct obj *);
 static void sort_valuables(struct valuable_data *, int);
-static void artifact_score(struct obj *, BOOLEAN_P, winid);
+static void artifact_score(struct obj *, boolean, winid);
 static void savelife(int);
 #ifdef DUMP_LOG
 extern char msgs[][BUFSZ];
 extern int msgs_count[];
 extern int lastmsg;
-void do_vanquished(int, BOOLEAN_P);
+void do_vanquished(int, boolean);
 #endif /* DUMP_LOG */
-static void list_genocided(int, BOOLEAN_P, BOOLEAN_P);
+static void list_genocided(int, boolean, boolean);
 static boolean should_query_disclose_option(int, char *);
 
 #if defined(__BEOS__) || defined(MICRO) || defined(WIN32) || defined(OS2)
@@ -105,10 +105,10 @@ static NEARDATA const char *ends[] = {      /* "when you..." */
 
 extern const char * const killed_by_prefix[];   /* from topten.c */
 
+/* called as signal() handler, so sent at least one arg */
 /*ARGSUSED*/
 void
-done1(sig_unused)   /* called as signal() handler, so sent at least one arg */
-int sig_unused UNUSED;
+done1(int sig_unused UNUSED)
 {
 #ifndef NO_SIGNAL
     (void) signal(SIGINT, SIG_IGN);
@@ -129,7 +129,7 @@ int sig_unused UNUSED;
 
 /* "#quit" command or keyboard interrupt */
 int
-done2()
+done2(void)
 {
     if (iflags.debug_fuzzer) {
         return 0;
@@ -177,8 +177,8 @@ done2()
 #ifndef NO_SIGNAL
 /*ARGSUSED*/
 static void
-done_intr(sig_unused) /* called as signal() handler, so sent at least one arg */
-int sig_unused UNUSED;
+done_intr(int sig_unused UNUSED) /* called as signal() handler, so sent at least one arg */
+
 {
     done_stopprint++;
     (void) signal(SIGINT, SIG_IGN);
@@ -190,8 +190,8 @@ int sig_unused UNUSED;
 
 # if defined(UNIX) || defined(VMS) || defined(__EMX__)
 static void
-done_hangup(sig)    /* signal() handler */
-int sig;
+done_hangup(int sig)    /* signal() handler */
+
 {
     program_state.done_hup++;
     (void)signal(SIGHUP, SIG_IGN);
@@ -202,8 +202,7 @@ int sig;
 #endif /* NO_SIGNAL */
 
 void
-done_in_by(mtmp)
-register struct monst *mtmp;
+done_in_by(register struct monst *mtmp)
 {
     char buf[BUFSZ];
     struct permonst *mptr = mtmp->data;
@@ -361,9 +360,7 @@ panic VA_DECL(const char *, str)
 }
 
 static boolean
-should_query_disclose_option(category, defquery)
-int category;
-char *defquery;
+should_query_disclose_option(int category, char *defquery)
 {
     int idx;
     char *dop = index(disclosure_options, category);
@@ -399,9 +396,7 @@ char *defquery;
 }
 
 static void
-disclose(how, taken)
-int how;
-boolean taken;
+disclose(int how, boolean taken)
 {
     char c = 0, defquery;
     char qbuf[QBUFSZ];
@@ -463,8 +458,7 @@ boolean taken;
 
 /* try to get the player back in a viable state after being killed */
 static void
-savelife(how)
-int how;
+savelife(int how)
 {
     u.uswldtim = 0;
     u.uhp = u.uhpmax;
@@ -493,8 +487,7 @@ int how;
  * intact.
  */
 static void
-get_valuables(list)
-struct obj *list;   /* inventory or container contents */
+get_valuables(struct obj *list) /**< inventory or container contents */
 {
     register struct obj *obj;
     register int i;
@@ -526,9 +519,9 @@ struct obj *list;   /* inventory or container contents */
  *  as easily use qsort, but we don't care about efficiency here.
  */
 static void
-sort_valuables(list, size)
-struct valuable_data list[];
-int size;       /* max value is less than 20 */
+sort_valuables(
+    struct valuable_data *list,
+    int size) /**< max value is less than 20 */
 {
     register int i, j;
     struct valuable_data ltmp;
@@ -549,10 +542,10 @@ int size;       /* max value is less than 20 */
 
 /* called twice; first to calculate total, then to list relevant items */
 static void
-artifact_score(list, counting, endwin)
-struct obj *list;
-boolean counting;   /* true => add up points; false => display them */
-winid endwin;
+artifact_score(struct obj *list, boolean counting, winid endwin)
+
+                    /* true => add up points; false => display them */
+
 {
     char pbuf[BUFSZ];
     struct obj *otmp;
@@ -591,8 +584,7 @@ winid endwin;
 
 /* Be careful not to call panic from here! */
 void
-done(how)
-int how;
+done(int how)
 {
     boolean taken;
     char kilbuf[BUFSZ], pbuf[BUFSZ];
@@ -810,10 +802,10 @@ die:
     }
     if (have_windows) wait_synch(); /* flush screen output */
 #ifndef NO_SIGNAL
-    (void) signal(SIGINT, (SIG_RET_TYPE) done_intr);
+    (void)signal(SIGINT, (SIG_RET_TYPE) done_intr);
 # if defined(UNIX) || defined(VMS) || defined (__EMX__)
-    (void) signal(SIGQUIT, (SIG_RET_TYPE) done_intr);
-    (void) signal(SIGHUP, (SIG_RET_TYPE) done_hangup);
+    (void)signal(SIGQUIT, (SIG_RET_TYPE) done_intr);
+    (void)signal(SIGHUP, (SIG_RET_TYPE) done_hangup);
 # endif
 #endif /* NO_SIGNAL */
 
@@ -1150,7 +1142,7 @@ die:
 }
 
 static int
-heaven_or_hell_lifesave_end()
+heaven_or_hell_lifesave_end(void)
 {
     u.uinvulnerable = FALSE;
     return(1);
@@ -1158,9 +1150,7 @@ heaven_or_hell_lifesave_end()
 
 
 void
-container_contents(list, identified, all_containers, want_disp)
-struct obj *list;
-boolean identified, all_containers, want_disp;
+container_contents(struct obj *list, boolean identified, boolean all_containers, boolean want_disp)
 {
     register struct obj *box, *obj;
 #ifdef SORTLOOT
@@ -1268,8 +1258,7 @@ nextclass:
 
 /* should be called with either EXIT_SUCCESS or EXIT_FAILURE */
 void
-nh_terminate(status)
-int status;
+nh_terminate(int status)
 {
 #ifdef MAC
     getreturn("to exit");
@@ -1287,7 +1276,7 @@ int status;
 /* #vanquished extended command, based on showborn.
    There is probably a much better place to put this. */
 void
-list_vanquishedonly()
+list_vanquishedonly(void)
 {
     register int i, lev;
     int ntypes = 0, max_lev = 0, nkilled;
@@ -1356,19 +1345,15 @@ list_vanquishedonly()
     }
 }
 
-void        /* showborn patch */
-list_vanquished(defquery, ask)
-char defquery;
-boolean ask;
+void /* showborn patch */
+list_vanquished(char defquery, boolean ask)
 #ifdef DUMP_LOG
 {
     do_vanquished(defquery, ask);
 }
 
 void
-do_vanquished(defquery, ask)
-int defquery;
-boolean ask;
+do_vanquished(int defquery, boolean ask)
 #endif
 {
     register int i, lev;
@@ -1457,7 +1442,7 @@ boolean ask;
 
 /* number of monster species which have been genocided */
 int
-num_genocides()
+num_genocides(void)
 {
     int i, n = 0;
 
@@ -1468,10 +1453,7 @@ num_genocides()
 }
 
 static void
-list_genocided(defquery, ask, want_disp)
-int defquery;
-boolean ask;
-boolean want_disp UNUSED;
+list_genocided(int defquery, boolean ask, boolean want_disp UNUSED)
 {
     register int i;
     int ngenocided=0;
@@ -1575,10 +1557,7 @@ boolean want_disp UNUSED;
 
 /* set a delayed killer, ensure non-delayed killer is cleared out */
 void
-delayed_killer(id, format, killername)
-int id;
-int format;
-const char *killername;
+delayed_killer(int id, int format, const char *killername)
 {
     struct kinfo *k = find_delayed_killer(id);
 
@@ -1597,8 +1576,7 @@ const char *killername;
 }
 
 struct kinfo *
-find_delayed_killer(id)
-int id;
+find_delayed_killer(int id)
 {
     struct kinfo *k;
 
@@ -1611,8 +1589,7 @@ int id;
 }
 
 void
-dealloc_killer(kptr)
-struct kinfo *kptr;
+dealloc_killer(struct kinfo *kptr)
 {
     struct kinfo *prev = &killer, *k;
 
@@ -1636,9 +1613,7 @@ struct kinfo *kptr;
 }
 
 void
-save_killers(fd, mode)
-int fd;
-int mode;
+save_killers(int fd, int mode)
 {
     struct kinfo *kptr;
 
@@ -1657,8 +1632,7 @@ int mode;
 }
 
 void
-restore_killers(fd)
-int fd;
+restore_killers(int fd)
 {
     struct kinfo *kptr;
 
@@ -1671,8 +1645,7 @@ int fd;
 }
 
 static int
-wordcount(p)
-char *p;
+wordcount(char *p)
 {
     int words = 0;
 
@@ -1691,8 +1664,7 @@ char *p;
 }
 
 static void
-bel_copy1(inp, out)
-char **inp, *out;
+bel_copy1(char **inp, char *out)
 {
     char *in = *inp;
 
@@ -1708,8 +1680,7 @@ char **inp, *out;
 }
 
 char *
-build_english_list(in)
-char *in;
+build_english_list(char *in)
 {
     char *out, *p = in;
     int len = (int) strlen(p), words = wordcount(p);

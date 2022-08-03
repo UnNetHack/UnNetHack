@@ -43,10 +43,10 @@ extern void VDECL(lc_error, (const char *, ...));
 extern void VDECL(lc_warning, (const char *, ...));
 extern void yyerror(const char *);
 extern void yywarning(const char *);
-extern int yylex();
-int yyparse();
+extern int yylex(void);
+int yyparse(void);
  extern void include_push(const char *);
-extern int include_pop();
+extern int include_pop(void);
 
 extern int get_floor_type(CHAR_P);
 extern int get_room_type(char *);
@@ -75,7 +75,7 @@ extern struct lc_vardefs *vardef_new(long,char *);
 extern void vardef_free_all(struct lc_vardefs *);
 extern struct lc_vardefs *vardef_defined(struct lc_vardefs *,char *, int);
 
-extern void break_stmt_start();
+extern void break_stmt_start(void);
 extern void break_stmt_end(sp_lev *);
 extern void break_stmt_new(sp_lev *, long);
 

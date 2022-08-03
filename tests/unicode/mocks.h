@@ -58,8 +58,8 @@ void reassign() {}
 void set_random_state(unsigned int a) { }
 int rnd(int a) { return 0; }
 
-void reset_commands(BOOLEAN_P b) {}
+void reset_commands(boolean b) {}
 
 char txt2key(char *txt) { return ' '; }
-boolean bind_key(UCHAR_P key, const char *command) { return FALSE; }
-boolean bind_specialkey(UCHAR_P key, const char *command) { return FALSE; }
+boolean bind_key(uchar key, const char *command) { return FALSE; }
+boolean bind_specialkey(uchar key, const char *command) { return FALSE; }

@@ -107,29 +107,29 @@ E void xwaitforspace(const char *);
 
 E void tty_startup(int*, int*);
 #ifndef NO_TERMS
-E void tty_shutdown();
+E void tty_shutdown(void);
 #endif
 extern int xputc(int);
 E void xputs(const char *);
 #if defined(SCREEN_VGA) || defined(SCREEN_8514)
 E void xputg(int, int, unsigned);
 #endif
-E void cl_end();
-E void clear_screen();
-E void home();
-E void standoutbeg();
-E void standoutend();
+E void cl_end(void);
+E void clear_screen(void);
+E void home(void);
+E void standoutbeg(void);
+E void standoutend(void);
 # if 0
-E void revbeg();
-E void boldbeg();
-E void blinkbeg();
-E void dimbeg();
-E void m_end();
+E void revbeg(void);
+E void boldbeg(void);
+E void blinkbeg(void);
+E void dimbeg(void);
+E void m_end(void);
 # endif
-E void backsp();
-E void graph_on();
-E void graph_off();
-E void cl_eos();
+E void backsp(void);
+E void graph_on(void);
+E void graph_off(void);
+E void cl_eos(void);
 
 /*
  * termcap.c (or facsimiles in other ports) is the right place for doing
@@ -139,11 +139,11 @@ E void cl_eos();
  */
 E void term_start_attr(int attr);
 E void term_end_attr(int attr);
-E void term_start_raw_bold();
-E void term_end_raw_bold();
+E void term_start_raw_bold(void);
+E void term_end_raw_bold(void);
 
 #ifdef TEXTCOLOR
-E void term_end_color();
+E void term_end_color(void);
 E void term_start_color(int color);
 E int has_color(int color);
 #endif /* TEXTCOLOR */
@@ -157,79 +157,79 @@ E boolean parse_status_color_options(char *);
 extern void show_topl(const char *);
 extern void remember_topl(void);
 E void addtopl(const char *);
-E void more();
+E void more(void);
 E void update_topl(const char *);
 E void putsyms(const char*);
 
 /* ### wintty.c ### */
 #ifdef CLIPPING
-E void setclipped();
+E void setclipped(void);
 #endif
 E void docorner(int, int);
-E void end_glyphout();
+E void end_glyphout(void);
 E void g_putch(int);
-E void win_tty_init();
+E void win_tty_init(void);
 
 /* external declarations */
 E void tty_init_nhwindows(int *, char **);
-E void tty_player_selection();
-E void tty_askname();
-E void tty_get_nh_event();
+E void tty_player_selection(void);
+E void tty_askname(void);
+E void tty_get_nh_event(void);
 E void tty_exit_nhwindows(const char *);
 E void tty_suspend_nhwindows(const char *);
-E void tty_resume_nhwindows();
+E void tty_resume_nhwindows(void);
 E winid tty_create_nhwindow(int);
 E void tty_clear_nhwindow(winid);
-E void tty_display_nhwindow(winid, BOOLEAN_P);
+E void tty_display_nhwindow(winid, boolean);
 E void tty_dismiss_nhwindow(winid);
 E void tty_destroy_nhwindow(winid);
 E void tty_curs(winid, int, int);
 E void tty_putstr(winid, int, const char *);
 #ifdef FILE_AREAS
-E void tty_display_file(const char *, const char *, BOOLEAN_P);
+E void tty_display_file(const char *, const char *, boolean);
 #else
-E void tty_display_file(const char *, BOOLEAN_P);
+E void tty_display_file(const char *, boolean);
 #endif
 E void tty_start_menu(winid);
 E void tty_add_menu(winid, int, int, const ANY_P *,
-                    CHAR_P, CHAR_P, int, const char *, unsigned int);
+                    char, char, int, const char *, unsigned int);
 E void tty_end_menu(winid, const char *);
 E int tty_select_menu(winid, int, MENU_ITEM_P **);
-E char tty_message_menu(CHAR_P, int, const char *);
-E void tty_update_inventory();
-E void tty_mark_synch();
-E void tty_wait_synch();
+E char tty_message_menu(char, int, const char *);
+E void tty_update_inventory(void);
+E void tty_mark_synch(void);
+E void tty_wait_synch(void);
 #ifdef CLIPPING
 E void tty_cliparound(int, int);
 #endif
 #ifdef POSITIONBAR
 E void tty_update_positionbar(char *);
 #endif
-E void tty_print_glyph(winid, XCHAR_P, XCHAR_P, int, int);
+E void tty_print_glyph(winid, xchar, xchar, int, int);
 E void tty_raw_print(const char *);
 E void tty_raw_print_bold(const char *);
-E int tty_nhgetch();
+E int tty_nhgetch(void);
 E int tty_nh_poskey(int *, int *, int *);
-E void tty_nhbell();
-E int tty_doprev_message();
-E char tty_yn_function(const char *, const char *, CHAR_P);
+E void tty_nhbell(void);
+E int tty_doprev_message(void);
+E char tty_yn_function(const char *, const char *, char);
 E void tty_getlin(const char *, char *);
-E int tty_get_ext_cmd();
+E int tty_get_ext_cmd(void);
 E void tty_number_pad(int);
-E void tty_delay_output();
+E void tty_delay_output(void);
 #ifdef CHANGE_COLOR
 E void tty_change_color(int color, long rgb, int reverse);
 #ifdef MAC
 E void tty_change_background(int white_or_black);
 E short set_tty_font_name(winid, char *);
 #endif
-E char * tty_get_color_string();
+E char * tty_get_color_string(void);
 #endif
-E int tty_debug_show_colors();
+E int tty_debug_show_colors(void);
 
 /* other defs that really should go away (they're tty specific) */
-E void tty_start_screen();
-E void tty_end_screen();
+E void tty_start_screen(void);
+E void tty_end_screen(void);
 
 E void genl_outrip(winid, int);
 

@@ -11,15 +11,14 @@ static int disturb(struct monst *);
 static void distfleeck(struct monst *, int *, int *, int *);
 static int m_arrival(struct monst *);
 static void watch_on_duty(struct monst *);
-static int vamp_shift(struct monst *, struct permonst *, BOOLEAN_P);
+static int vamp_shift(struct monst *, struct permonst *, boolean);
 
 static void make_group_attackers_flee(struct monst* mtmp);
 static void share_hp(struct monst* mon1, struct monst* mon2);
 
 /* TRUE if mtmp died */
 boolean
-mb_trapped(mtmp)
-register struct monst *mtmp;
+mb_trapped(register struct monst *mtmp)
 {
     if (flags.verbose) {
         if (cansee(mtmp->mx, mtmp->my) && !Unaware) {
@@ -43,9 +42,9 @@ register struct monst *mtmp;
 
 /* check whether a monster is carrying a locking/unlocking tool */
 boolean
-mon_has_key(mon, for_unlocking)
-struct monst *mon;
-boolean for_unlocking; /* true => credit card ok, false => not ok */
+mon_has_key(
+    struct monst *mon,
+    boolean for_unlocking) /**< TRUE => credit card ok, FALSE => not ok */
 {
     if (for_unlocking && m_carrying(mon, CREDIT_CARD)) {
         return TRUE;
@@ -54,9 +53,7 @@ boolean for_unlocking; /* true => credit card ok, false => not ok */
 }
 
 void
-mon_yells(mon, shout)
-struct monst *mon;
-const char *shout;
+mon_yells(struct monst *mon, const char *shout)
 {
     if (Deaf) {
         if (canspotmon(mon)) {
@@ -80,8 +77,7 @@ const char *shout;
 }
 
 static void
-watch_on_duty(mtmp)
-register struct monst *mtmp;
+watch_on_duty(register struct monst *mtmp)
 {
     int x, y;
 
@@ -117,8 +113,7 @@ register struct monst *mtmp;
 }
 
 int
-dochugw(mtmp)
-register struct monst *mtmp;
+dochugw(register struct monst *mtmp)
 {
     int x = mtmp->mx, y = mtmp->my;
     boolean already_saw_mon = !occupation ? 0 : canspotmon(mtmp);
@@ -144,9 +139,7 @@ register struct monst *mtmp;
 }
 
 boolean
-onscary(x, y, mtmp)
-int x, y;
-struct monst *mtmp;
+onscary(int x, int y, struct monst *mtmp)
 {
     /* creatures who are directly resistant to magical scaring:
      *
@@ -188,9 +181,7 @@ struct monst *mtmp;
 
 /* regenerate lost hit points */
 void
-mon_regen(mon, digest_meal)
-struct monst *mon;
-boolean digest_meal;
+mon_regen(struct monst *mon, boolean digest_meal)
 {
     /* regeneration not relevant in heaven or hell mode */
     if (heaven_or_hell_mode && !hell_and_hell_mode) {
@@ -222,8 +213,7 @@ boolean digest_meal;
  * jolted awake.
  */
 static int
-disturb(mtmp)
-register struct monst *mtmp;
+disturb(register struct monst *mtmp)
 {
     /*
      * + Ettins are hard to surprise.
@@ -259,8 +249,7 @@ register struct monst *mtmp;
 
 /* ungrab/expel held/swallowed hero */
 static void
-release_hero(mon)
-struct monst *mon;
+release_hero(struct monst *mon)
 {
     if (mon == u.ustuck) {
         if (u.uswallow) {
@@ -282,11 +271,7 @@ struct monst *mon;
  * if first, only adds fleetime if monster isn't already fleeing
  * if fleemsg, prints a message about new flight, otherwise, caller should */
 void
-monflee(mtmp, fleetime, first, fleemsg)
-struct monst *mtmp;
-int fleetime;
-boolean first;
-boolean fleemsg;
+monflee(struct monst *mtmp, int fleetime, boolean first, boolean fleemsg)
 {
     /* shouldn't happen; maybe warrants impossible()? */
     if (DEADMONSTER(mtmp)) {
@@ -337,9 +322,7 @@ boolean fleemsg;
 }
 
 static void
-distfleeck(mtmp, inrange, nearby, scared)
-register struct monst *mtmp;
-int *inrange, *nearby, *scared;
+distfleeck(register struct monst *mtmp, int *inrange, int *nearby, int *scared)
 {
     int seescaryx, seescaryy;
     boolean sawscary = FALSE, bravegremlin = (rn2(5) == 0);
@@ -383,8 +366,7 @@ int *inrange, *nearby, *scared;
 /* perform a special one-time action for a monster; returns -1 if nothing
    special happened, 0 if monster uses up its turn, 1 if monster is killed */
 static int
-m_arrival(mon)
-struct monst *mon;
+m_arrival(struct monst *mon)
 {
     mon->mstrategy &= ~STRAT_ARRIVE;/* always reset */
 
@@ -396,8 +378,7 @@ struct monst *mon;
  * code. --KAA
  */
 int
-dochug(mtmp)
-register struct monst *mtmp;
+dochug(register struct monst *mtmp)
 {
     register struct permonst *mdat;
     register int tmp=0;
@@ -796,8 +777,7 @@ static NEARDATA const char boulder_class[] = { ROCK_CLASS, 0 };
 static NEARDATA const char gem_class[] = { GEM_CLASS, 0 };
 
 boolean
-itsstuck(mtmp)
-register struct monst *mtmp;
+itsstuck(register struct monst *mtmp)
 {
     if (sticks(youmonst.data) && mtmp == u.ustuck && !u.uswallow) {
         pline("%s cannot escape from you!", Monnam(mtmp));
@@ -814,12 +794,12 @@ register struct monst *mtmp;
  * those should be used instead. This function does that evaluation.
  */
 boolean
-should_displace(mtmp, poss, info, cnt, gx, gy)
-struct monst *mtmp;
-coord *poss; /* coord poss[9] */
-long *info;  /* long info[9] */
-int cnt;
-xchar gx, gy;
+should_displace(struct monst *mtmp, coord *poss, long int *info, int cnt, xchar gx, xchar gy)
+
+             /* coord poss[9] */
+             /* long info[9] */
+
+
 {
     int shortest_with_displacing = -1;
     int shortest_without_displacing = -1;
@@ -853,9 +833,7 @@ xchar gx, gy;
 }
 
 boolean
-m_digweapon_check(mtmp, nix, niy)
-struct monst *mtmp;
-xchar nix,niy;
+m_digweapon_check(struct monst *mtmp, xchar nix, xchar niy)
 {
     boolean can_tunnel = 0;
     struct obj *mw_tmp = MON_WEP(mtmp);
@@ -896,9 +874,7 @@ xchar nix,niy;
  * 3: did not move, and can't do anything else either.
  */
 int
-m_move(mtmp, after)
-register struct monst *mtmp;
-register int after;
+m_move(register struct monst *mtmp, register int after)
 {
     register int appr;
     xchar gx, gy, nix, niy, chcnt;
@@ -1689,16 +1665,14 @@ m_move_aggress(struct monst* mtmp, xchar x, xchar y)
 }
 
 boolean
-closed_door(x, y)
-register int x, y;
+closed_door(register int x, register int y)
 {
     return((boolean)(IS_DOOR(levl[x][y].typ) &&
                      (levl[x][y].doormask & (D_LOCKED | D_CLOSED))));
 }
 
 boolean
-accessible(x, y)
-register int x, y;
+accessible(register int x, register int y)
 {
     int levtyp = levl[x][y].typ;
 
@@ -1711,8 +1685,7 @@ register int x, y;
 
 /* decide where the monster thinks you are standing */
 void
-set_apparxy(mtmp)
-register struct monst *mtmp;
+set_apparxy(register struct monst *mtmp)
 {
     boolean notseen, gotu;
     register int disp, mx = mtmp->mux, my = mtmp->muy;
@@ -1780,9 +1753,9 @@ found_you:
  * location however.
  */
 boolean
-undesirable_disp(mtmp, x, y)
-struct monst *mtmp; /* barging creature */
-xchar x, y; /* spot 'mtmp' is considering moving to */
+undesirable_disp(
+    struct monst *mtmp, /**< barging creature */
+    xchar x, xchar y) /**< spot 'mtmp' is considering moving to */
 {
     boolean is_pet = (mtmp && mtmp->mtame && !mtmp->isminion);
     struct trap *trap = t_at(x, y);
@@ -1824,8 +1797,7 @@ xchar x, y; /* spot 'mtmp' is considering moving to */
  * Used by can_ooze() and can_fog().
  */
 static boolean
-stuff_prevents_passage(mtmp)
-struct monst *mtmp;
+stuff_prevents_passage(struct monst *mtmp)
 {
     struct obj *chain, *obj;
 
@@ -1885,8 +1857,7 @@ struct monst *mtmp;
 }
 
 boolean
-can_ooze(mtmp)
-struct monst *mtmp;
+can_ooze(struct monst *mtmp)
 {
     if (!amorphous(mtmp->data) || stuff_prevents_passage(mtmp)) {
         return FALSE;
@@ -1896,8 +1867,7 @@ struct monst *mtmp;
 
 /* monster can change form into a fog if necessary */
 boolean
-can_fog(mtmp)
-struct monst *mtmp;
+can_fog(struct monst *mtmp)
 {
     if (!(mvitals[PM_FOG_CLOUD].mvflags & G_GENOD) &&
             is_vampshifter(mtmp) &&
@@ -1909,10 +1879,7 @@ struct monst *mtmp;
 }
 
 static int
-vamp_shift(mon, ptr, domsg)
-struct monst *mon;
-struct permonst *ptr;
-boolean domsg;
+vamp_shift(struct monst *mon, struct permonst *ptr, boolean domsg)
 {
     int reslt = 0;
     char oldmtype[BUFSZ];
@@ -1941,8 +1908,7 @@ boolean domsg;
 }
 
 static void
-make_group_attackers_flee(mtmp)
-struct monst *mtmp;
+make_group_attackers_flee(struct monst *mtmp)
 {
     struct monst* currmon;
 
@@ -1959,8 +1925,7 @@ struct monst *mtmp;
 }
 
 static void
-share_hp(mon1, mon2)
-struct monst *mon1, *mon2;
+share_hp(struct monst *mon1, struct monst *mon2)
 {
     struct monst *tmp;
     char nam[BUFSZ];

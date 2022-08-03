@@ -104,15 +104,13 @@ struct win_choices {
 };
 
 static void
-def_raw_print(s)
-const char *s;
+def_raw_print(const char *s)
 {
     puts(s);
 }
 
 void
-choose_windows(s)
-const char *s;
+choose_windows(const char *s)
 {
     register int i;
 
@@ -141,10 +139,7 @@ const char *s;
  */
 /*ARGSUSED*/
 char
-genl_message_menu(let, how, mesg)
-char let UNUSED;
-int how UNUSED;
-const char *mesg;
+genl_message_menu(char let UNUSED, int how UNUSED, const char *mesg)
 {
     pline("%s", mesg);
     return 0;
@@ -152,8 +147,7 @@ const char *mesg;
 
 /*ARGSUSED*/
 void
-genl_preference_update(pref)
-const char *pref UNUSED;
+genl_preference_update(const char *pref UNUSED)
 {
     /* window ports are expected to provide
        their own preference update routine

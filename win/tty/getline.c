@@ -19,9 +19,9 @@ static boolean ext_cmd_getlin_hook(char *);
 typedef boolean (*getlin_hook_proc)(char *);
 
 static void hooked_tty_getlin(const char*, char*, getlin_hook_proc);
-extern int extcmd_via_menu();  /* cmd.c */
+extern int extcmd_via_menu(void); /* cmd.c */
 
-extern char erase_char, kill_char;  /* from appropriate tty.c file */
+extern char erase_char, kill_char; /* from appropriate tty.c file */
 
 /*
  * Read a line closed with '\n' into the array char bufp[BUFSZ].
@@ -30,18 +30,13 @@ extern char erase_char, kill_char;  /* from appropriate tty.c file */
  * resulting string is "\033".
  */
 void
-tty_getlin(query, bufp)
-const char *query;
-register char *bufp;
+tty_getlin(const char *query, char *bufp)
 {
     hooked_tty_getlin(query, bufp, (getlin_hook_proc) 0);
 }
 
 static void
-hooked_tty_getlin(query, bufp, hook)
-const char *query;
-register char *bufp;
-getlin_hook_proc hook;
+hooked_tty_getlin(const char *query, char *bufp, getlin_hook_proc hook)
 {
     register char *obufp = bufp;
     register int c;
@@ -185,8 +180,7 @@ getlin_hook_proc hook;
 }
 
 void
-xwaitforspace(s)
-register const char *s; /* chars allowed besides return */
+xwaitforspace(const char *s) /**< chars allowed besides return */
 {
     register int c, x = ttyDisplay ? (int) ttyDisplay->dismiss_more : '\n';
 
@@ -218,8 +212,7 @@ register const char *s; /* chars allowed besides return */
  *  + base has enough room to hold our string
  */
 static boolean
-ext_cmd_getlin_hook(base)
-char *base;
+ext_cmd_getlin_hook(char *base)
 {
     int oindex, com_index;
 
@@ -253,7 +246,7 @@ char *base;
  * stop when we have found enough characters to make a unique command.
  */
 int
-tty_get_ext_cmd()
+tty_get_ext_cmd(void)
 {
     int i;
     char buf[BUFSZ];

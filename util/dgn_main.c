@@ -53,9 +53,7 @@ FILE *freopen(char *,char *,FILE *);
 extern unsigned _stklen = STKSIZ;
 #endif
 int
-main(argc, argv)
-int argc;
-char **argv;
+main(int argc, char **argv)
 {
 	char	infile[64], outfile[64], basename[64];
 	FILE	*fin, *fout;
@@ -158,8 +156,7 @@ char **argv;
  * MAX_ERRORS wouldn't be reasonable.
  */
 
-void yyerror(s)
-const char *s;
+void yyerror(const char *s)
 {
 	(void) fprintf(stderr,"%s : line %d : %s\n",fname,line_number, s);
 	if (++fatal_error > MAX_ERRORS) {
@@ -172,13 +169,12 @@ const char *s;
  * Just display a warning (that is : a non fatal error)
  */
 
-void yywarning(s)
-const char *s;
+void yywarning(const char *s)
 {
 	(void) fprintf(stderr,"%s : line %d : WARNING : %s\n",fname,line_number,s);
 }
 
-int yywrap()
+int yywrap(void)
 {
 	SpinCursor(3); /*	Don't know if this is a good place to put it ?
 						Is it called for our grammar ? Often enough ?

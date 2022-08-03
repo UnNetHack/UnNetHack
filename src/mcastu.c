@@ -48,7 +48,7 @@ enum mcast_cleric_spells {
 
 #define NUM_PUN_SPELLS  10
 
-static void cursetxt(struct monst *, BOOLEAN_P);
+static void cursetxt(struct monst *, boolean);
 static int choose_magic_spell(int);
 static int choose_clerical_spell(int);
 static int choose_punisher_spell(void);
@@ -64,9 +64,7 @@ extern const char * const flash_types[];    /* from zap.c */
 
 /* feedback when frustrated monster couldn't cast a spell */
 static void
-cursetxt(mtmp, undirected)
-struct monst *mtmp;
-boolean undirected;
+cursetxt(struct monst *mtmp, boolean undirected)
 {
     /* silent monsters don't curse. */
     if (is_silent(mtmp->data)) return;
@@ -97,8 +95,7 @@ boolean undirected;
 /* convert a level based random selection into a specific mage spell;
    inappropriate choices will be screened out by spell_would_be_useless() */
 static int
-choose_magic_spell(spellval)
-int spellval;
+choose_magic_spell(int spellval)
 {
     /* for 3.4.3 and earlier, val greater than 22 selected the default spell
      */
@@ -154,8 +151,7 @@ int spellval;
 
 /* convert a level based random selection into a specific cleric spell */
 static int
-choose_clerical_spell(spellnum)
-int spellnum;
+choose_clerical_spell(int spellnum)
 {
     /* for 3.4.3 and earlier, num greater than 13 selected the default spell */
     while (spellnum > 15 && rn2(16)) {
@@ -217,11 +213,7 @@ choose_punisher_spell(void)
  * 0: unsuccessful spell
  */
 int
-castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
-register struct monst *mtmp;
-register struct attack *mattk;
-boolean thinks_it_foundyou;
-boolean foundyou;
+castmu(register struct monst *mtmp, register struct attack *mattk, boolean thinks_it_foundyou, boolean foundyou)
 {
     int dmg, ml = mtmp->m_lev;
     int ret;
@@ -388,9 +380,7 @@ boolean foundyou;
 }
 
 static int
-m_cure_self(mtmp, dmg)
-struct monst *mtmp;
-int dmg;
+m_cure_self(struct monst *mtmp, int dmg)
 {
     if (mtmp->mhp < mtmp->mhpmax) {
         if (canseemon(mtmp)) {
@@ -415,10 +405,7 @@ int dmg;
    and spell_would_be_useless().
  */
 static void
-cast_wizard_spell(mtmp, dmg, spellnum)
-struct monst *mtmp;
-int dmg;
-int spellnum;
+cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
 {
     if (dmg == 0 && !is_undirected_spell(AD_SPEL, spellnum)) {
         warning("cast directed wizard spell (%d) with dmg=0?", spellnum);
@@ -585,10 +572,7 @@ int spellnum;
 }
 
 static void
-cast_punisher_spell(mtmp, dmg, spellnum)
-struct monst* mtmp UNUSED;
-int dmg UNUSED;
-int spellnum;
+cast_punisher_spell(struct monst *mtmp UNUSED, int dmg UNUSED, int spellnum)
 {
     switch(spellnum) {
     case PUN_PUNISHMENT:
@@ -598,10 +582,7 @@ int spellnum;
 }
 
 static void
-cast_cleric_spell(mtmp, dmg, spellnum)
-struct monst *mtmp;
-int dmg;
-int spellnum;
+cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
 {
     if (dmg == 0 && !is_undirected_spell(AD_CLRC, spellnum)) {
         warning("cast directed cleric spell (%d) with dmg=0?", spellnum);
@@ -810,10 +791,7 @@ int spellnum;
 }
 
 static void
-map_punisher_spell(spellnum, padtyp, pspellnum)
-int spellnum;
-unsigned int* padtyp;
-int* pspellnum;
+map_punisher_spell(int spellnum, unsigned int *padtyp, int *pspellnum)
 {
     switch(spellnum) {
     case PUN_OPEN_WOUNDS:
@@ -859,9 +837,7 @@ int* pspellnum;
 }
 
 static boolean
-is_undirected_spell(adtyp, spellnum)
-unsigned int adtyp;
-int spellnum;
+is_undirected_spell(unsigned int adtyp, int spellnum)
 {
     if (adtyp == AD_SPEL) {
         switch (spellnum) {
@@ -900,10 +876,7 @@ int spellnum;
 
 /* Some spells are useless under some circumstances. */
 static boolean
-spell_would_be_useless(mtmp, adtyp, spellnum)
-struct monst *mtmp;
-unsigned int adtyp;
-int spellnum;
+spell_would_be_useless(struct monst *mtmp, unsigned int adtyp, int spellnum)
 {
     /* Some spells don't require the player to really be there and can be cast
      * by the monster when you're invisible, yet still shouldn't be cast when
@@ -979,9 +952,7 @@ int spellnum;
 
 /* monster uses spell (ranged) */
 int
-buzzmu(mtmp, mattk)
-register struct monst *mtmp;
-register struct attack  *mattk;
+buzzmu(register struct monst *mtmp, register struct attack *mattk)
 {
     /* don't print constant stream of curse messages for 'normal'
        spellcasting monsters at range */

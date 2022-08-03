@@ -11,14 +11,14 @@ static NEARDATA int utcnt, utpnt;
 static NEARDATA coord utrack[UTSZ];
 
 void
-initrack()
+initrack(void)
 {
     utcnt = utpnt = 0;
 }
 
 /* add to track */
 void
-settrack()
+settrack(void)
 {
     if(utcnt < UTSZ) utcnt++;
     if(utpnt == UTSZ) utpnt = 0;
@@ -28,8 +28,7 @@ settrack()
 }
 
 coord *
-gettrack(x, y)
-register int x, y;
+gettrack(register int x, register int y)
 {
     register int cnt, ndist;
     register coord *tc;

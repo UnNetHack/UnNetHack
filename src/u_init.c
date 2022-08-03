@@ -617,8 +617,7 @@ static const struct def_skill Skill_W[] = {
 
 
 static void
-knows_object(obj)
-register int obj;
+knows_object(register int obj)
 {
     discover_object(obj, TRUE, FALSE);
     objects[obj].oc_pre_discovered = 1; /* not a "discovery" */
@@ -674,7 +673,7 @@ knows_class(char sym)
 }
 
 void
-u_init()
+u_init(void)
 {
     register int i;
     struct permonst* shambler = &mons[PM_SHAMBLING_HORROR];
@@ -1144,8 +1143,7 @@ u_init()
 
 /* skills aren't initialized, so we use the role-specific skill lists */
 static boolean
-restricted_spell_discipline(otyp)
-int otyp;
+restricted_spell_discipline(int otyp)
 {
     const struct def_skill *skills;
     int this_skill = spell_skilltype(otyp);
@@ -1178,8 +1176,7 @@ int otyp;
 }
 
 static void
-ini_inv(trop)
-register struct trobj *trop;
+ini_inv(register struct trobj *trop)
 {
     struct obj *obj;
     int otyp, i;

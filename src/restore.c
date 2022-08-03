@@ -18,20 +18,20 @@ extern void substitute_tiles(d_level *);       /* from tile.c */
 #ifdef ZEROCOMP
 static int mgetc();
 #endif
-static void find_lev_obj();
+static void find_lev_obj(void);
 static void restlevchn(int);
-static void restdamage(int, BOOLEAN_P);
+static void restdamage(int, boolean);
 static void restobj(int, struct obj *);
-static struct obj *restobjchn(int, BOOLEAN_P, BOOLEAN_P);
+static struct obj *restobjchn(int, boolean, boolean);
 static void restmon(int, struct monst *);
-static struct monst *restmonchn(int, BOOLEAN_P);
+static struct monst *restmonchn(int, boolean);
 static struct fruit *loadfruitchn(int);
 static void freefruitchn(struct fruit *);
 static void ghostfruit(struct obj *);
 static boolean restgamestate(int, unsigned int *, unsigned int *);
 static void restlevelstate(unsigned int, unsigned int);
-static int restlevelfile(int, XCHAR_P);
-static void reset_oattached_mids(BOOLEAN_P);
+static int restlevelfile(int, xchar);
+static void reset_oattached_mids(boolean);
 
 /*
  * Save a mapping of IDs from ghost levels to the current level.  This
@@ -46,7 +46,7 @@ struct bucket {
     } map[N_PER_BUCKET];
 };
 
-static void clear_id_mapping();
+static void clear_id_mapping(void);
 static void add_id_mapping(unsigned, unsigned);
 
 static int n_ids_mapped = 0;
@@ -68,7 +68,7 @@ static NEARDATA long omoves;
 
 /* Recalculate level.objects[x][y], since this info was not saved. */
 static void
-find_lev_obj()
+find_lev_obj(void)
 {
     register struct obj *fobjtmp = (struct obj *)0;
     register struct obj *otmp;
@@ -101,8 +101,7 @@ find_lev_obj()
  * infamous "HUP" cheat) get used up here.
  */
 void
-inven_inuse(quietly)
-boolean quietly;
+inven_inuse(boolean quietly)
 {
     register struct obj *otmp, *otmp2;
 
@@ -116,8 +115,7 @@ boolean quietly;
 }
 
 static void
-restlevchn(fd)
-register int fd;
+restlevchn(register int fd)
 {
     int cnt;
     s_level *tmplev, *x;
@@ -139,9 +137,7 @@ register int fd;
 }
 
 static void
-restdamage(fd, ghostly)
-int fd;
-boolean ghostly;
+restdamage(int fd, boolean ghostly)
 {
     int counter;
     struct damage *tmp_dam;
@@ -182,8 +178,7 @@ boolean ghostly;
 }
 
 struct lvl_sounds *
-rest_lvl_sounds(fd)
-register int fd;
+rest_lvl_sounds(register int fd)
 {
     int marker;
     struct lvl_sounds *or = NULL;
@@ -208,8 +203,7 @@ register int fd;
 }
 
 struct mon_gen_override *
-rest_mongen_override(fd)
-register int fd;
+rest_mongen_override(register int fd)
 {
     int marker;
     struct mon_gen_override *or = NULL;
@@ -240,9 +234,7 @@ register int fd;
 
 /* restore one object */
 static void
-restobj(fd, otmp)
-int fd;
-struct obj *otmp;
+restobj(int fd, struct obj *otmp)
 {
     int buflen;
 
@@ -294,9 +286,7 @@ struct obj *otmp;
 }
 
 static struct obj *
-restobjchn(fd, ghostly, frozen)
-register int fd;
-boolean ghostly, frozen;
+restobjchn(register int fd, boolean ghostly, boolean frozen)
 {
     register struct obj *otmp, *otmp2 = 0;
     register struct obj *first = (struct obj *) 0;
@@ -386,9 +376,7 @@ boolean ghostly, frozen;
 
 /* restore one monster */
 static void
-restmon(fd, mtmp)
-int fd;
-struct monst *mtmp;
+restmon(int fd, struct monst *mtmp)
 {
     int buflen;
 
@@ -443,9 +431,7 @@ struct monst *mtmp;
 }
 
 static struct monst *
-restmonchn(fd, ghostly)
-register int fd;
-boolean ghostly;
+restmonchn(register int fd, boolean ghostly)
 {
     register struct monst *mtmp, *mtmp2 = 0;
     register struct monst *first = (struct monst *) 0;
@@ -518,8 +504,7 @@ boolean ghostly;
 }
 
 static struct fruit *
-loadfruitchn(fd)
-int fd;
+loadfruitchn(int fd)
 {
     register struct fruit *flist, *fnext;
 
@@ -535,8 +520,7 @@ int fd;
 }
 
 static void
-freefruitchn(flist)
-register struct fruit *flist;
+freefruitchn(register struct fruit *flist)
 {
     register struct fruit *fnext;
 
@@ -548,8 +532,7 @@ register struct fruit *flist;
 }
 
 static void
-ghostfruit(otmp)
-register struct obj *otmp;
+ghostfruit(register struct obj *otmp)
 {
     register struct fruit *oldf;
 
@@ -561,9 +544,7 @@ register struct obj *otmp;
 }
 
 static boolean
-restgamestate(fd, stuckid, steedid)
-register int fd;
-unsigned int *stuckid, *steedid;    /* STEED */
+restgamestate(register int fd, unsigned int *stuckid, unsigned int *steedid)
 {
     /* discover is actually flags.explore */
     boolean remember_discover = discover;
@@ -668,8 +649,7 @@ unsigned int *stuckid, *steedid;    /* STEED */
  * don't dereference a wild u.ustuck when saving the game state, for instance)
  */
 static void
-restlevelstate(stuckid, steedid)
-unsigned int stuckid, steedid;  /* STEED */
+restlevelstate(unsigned int stuckid, unsigned int steedid)
 {
     register struct monst *mtmp;
 
@@ -689,11 +669,12 @@ unsigned int stuckid, steedid;  /* STEED */
     }
 }
 
-/*ARGSUSED*/    /* fd used in MFLOPPY only */
+/*ARGSUSED*/
 static int
-restlevelfile(fd, ltmp)
-int fd UNUSED;
-xchar ltmp;
+restlevelfile(
+    int fd UNUSED, /**< fd used in MFLOPPY only */
+    xchar ltmp
+)
 #if defined(macintosh) && (defined(__SC__) || defined(__MRC__))
 # pragma unused(fd)
 #endif
@@ -753,8 +734,7 @@ xchar ltmp;
 }
 
 int
-dorecover(fd)
-register int fd;
+dorecover(register int fd)
 {
     unsigned int stuckid = 0, steedid = 0;  /* not a register */
     xchar ltmp;
@@ -914,9 +894,7 @@ register int fd;
 }
 
 void
-restcemetery(fd, cemeteryaddr)
-int fd;
-struct cemetery **cemeteryaddr;
+restcemetery(int fd, struct cemetery **cemeteryaddr)
 {
     struct cemetery *bonesinfo, **bonesaddr;
     int flag;
@@ -936,8 +914,7 @@ struct cemetery **cemeteryaddr;
 }
 
 void
-trickery(reason)
-char *reason;
+trickery(char *reason)
 {
     pline("Strange, this map is not as I remember it.");
     pline("Somebody is trying some trickery here...");
@@ -947,10 +924,7 @@ char *reason;
 }
 
 void
-getlev(fd, pid, lev, ghostly)
-int fd, pid;
-xchar lev;
-boolean ghostly;
+getlev(int fd, int pid, xchar lev, boolean ghostly)
 {
     register struct trap *trap;
     register struct monst *mtmp;
@@ -1175,7 +1149,7 @@ boolean ghostly;
 
 /* Clear all structures for object and monster ID mapping. */
 static void
-clear_id_mapping()
+clear_id_mapping(void)
 {
     struct bucket *curr;
 
@@ -1188,8 +1162,7 @@ clear_id_mapping()
 
 /* Add a mapping to the ID map. */
 static void
-add_id_mapping(gid, nid)
-unsigned gid, nid;
+add_id_mapping(unsigned int gid, unsigned int nid)
 {
     int idx;
 
@@ -1213,8 +1186,7 @@ unsigned gid, nid;
  * ID.
  */
 boolean
-lookup_id_mapping(gid, nidp)
-unsigned gid, *nidp;
+lookup_id_mapping(unsigned int gid, unsigned int *nidp)
 {
     int i;
     struct bucket *curr;
@@ -1239,8 +1211,7 @@ unsigned gid, *nidp;
 }
 
 static void
-reset_oattached_mids(ghostly)
-boolean ghostly;
+reset_oattached_mids(boolean ghostly)
 {
     struct obj *otmp;
     unsigned oldid, nid;
@@ -1328,16 +1299,13 @@ register unsigned len;
 #else /* ZEROCOMP */
 
 void
-minit()
+minit(void)
 {
     return;
 }
 
 void
-mread(fd, buf, len)
-register int fd;
-register genericptr_t buf;
-register unsigned int len;
+mread(register int fd, register genericptr_t buf, register unsigned int len)
 {
     register int rlen;
 

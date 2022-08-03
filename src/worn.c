@@ -4,7 +4,7 @@
 #include "hack.h"
 
 static void m_lose_armor(struct monst *, struct obj *);
-static void m_dowear_type(struct monst *, long, BOOLEAN_P, BOOLEAN_P);
+static void m_dowear_type(struct monst *, long, boolean, boolean);
 static int extra_pref(struct monst *, struct obj *);
 
 const struct worn {
@@ -41,9 +41,7 @@ const struct worn {
 
 /* Updated to use the extrinsic and blocked fields. */
 void
-setworn(obj, mask)
-register struct obj *obj;
-long mask;
+setworn(register struct obj *obj, long int mask)
 {
     register const struct worn *wp;
     register struct obj *oobj;
@@ -122,8 +120,7 @@ long mask;
 /* called e.g. when obj is destroyed */
 /* Updated to use the extrinsic and blocked fields. */
 void
-setnotworn(obj)
-register struct obj *obj;
+setnotworn(register struct obj *obj)
 {
     register const struct worn *wp;
     register int p;
@@ -154,8 +151,7 @@ register struct obj *obj;
 
 /* return item worn in slot indiciated by wornmask; needed by poly_obj() */
 struct obj *
-wearmask_to_obj(wornmask)
-long wornmask;
+wearmask_to_obj(long int wornmask)
 {
     const struct worn *wp;
 
@@ -169,8 +165,7 @@ long wornmask;
 
 /* return a bitmask of the equipment slot(s) a given item might be worn in */
 long
-wearslot(obj)
-struct obj *obj;
+wearslot(struct obj *obj)
 {
     int otyp = obj->otyp;
     /* practically any item can be wielded or quivered; it's up to
@@ -245,8 +240,7 @@ struct obj *obj;
 }
 
 void
-mon_set_minvis(mon)
-struct monst *mon;
+mon_set_minvis(struct monst *mon)
 {
     mon->perminvis = 1;
     if (!mon->invis_blkd) {
@@ -259,10 +253,9 @@ struct monst *mon;
 }
 
 void
-mon_adjust_speed(mon, adjust, obj)
-struct monst *mon;
-int adjust; /* positive => increase speed, negative => decrease */
-struct obj *obj;    /* item to make known if effect can be seen */
+mon_adjust_speed(struct monst *mon,
+                 int adjust,      /**< positive => increase speed, negative => decrease */
+                 struct obj *obj) /**< item to make known if effect can be seen */
 {
     struct obj *otmp;
     boolean give_msg = !in_mklev, petrify = FALSE;
@@ -342,10 +335,7 @@ struct obj *obj;    /* item to make known if effect can be seen */
 /* armor put on or taken off; might be magical variety
    [TODO: rename to 'update_mon_extrinsics()' and change all callers...] */
 void
-update_mon_intrinsics(mon, obj, on, silently)
-struct monst *mon;
-struct obj *obj;
-boolean on, silently;
+update_mon_intrinsics(struct monst *mon, struct obj *obj, boolean on, boolean silently)
 {
     int unseen;
     uchar mask;
@@ -464,8 +454,7 @@ maybe_blocks:
 }
 
 int
-find_mac(mon)
-register struct monst *mon;
+find_mac(register struct monst *mon)
 {
     register struct obj *obj;
     int base = mon->data->ac;
@@ -505,9 +494,7 @@ register struct monst *mon;
  * already worn body armor is too obviously buggy...
  */
 void
-m_dowear(mon, creation)
-register struct monst *mon;
-boolean creation;
+m_dowear(register struct monst *mon, boolean creation)
 {
 #define RACE_EXCEPTION TRUE
     /* Note the restrictions here are the same as in dowear in do_wear.c
@@ -544,11 +531,7 @@ boolean creation;
 }
 
 static void
-m_dowear_type(mon, flag, creation, racialexception)
-struct monst *mon;
-long flag;
-boolean creation;
-boolean racialexception;
+m_dowear_type(struct monst *mon, long int flag, boolean creation, boolean racialexception)
 {
     struct obj *old, *best, *obj;
     int m_delay = 0;
@@ -676,9 +659,7 @@ outer_break:
 #undef RACE_EXCEPTION
 
 struct obj *
-which_armor(mon, flag)
-struct monst *mon;
-long flag;
+which_armor(struct monst *mon, long int flag)
 {
     if (mon == &youmonst) {
         switch (flag) {
@@ -714,9 +695,7 @@ long flag;
 
 /* remove an item of armor and then drop it */
 static void
-m_lose_armor(mon, obj)
-struct monst *mon;
-struct obj *obj;
+m_lose_armor(struct monst *mon, struct obj *obj)
 {
     mon->misc_worn_check &= ~obj->owornmask;
     if (obj->owornmask)
@@ -731,7 +710,7 @@ struct obj *obj;
 
 /* all objects with their bypass bit set should now be reset to normal */
 void
-clear_bypasses()
+clear_bypasses(void)
 {
     struct obj *otmp, *nobj;
     struct monst *mtmp;
@@ -794,8 +773,7 @@ clear_bypasses()
 }
 
 void
-bypass_obj(obj)
-struct obj *obj;
+bypass_obj(struct obj *obj)
 {
     obj->bypass = 1;
     flags.bypasses = TRUE;
@@ -803,9 +781,7 @@ struct obj *obj;
 
 /* set or clear the bypass bit in a list of objects */
 void
-bypass_objlist(objchain, on)
-struct obj *objchain;
-boolean on; /* TRUE => set, FALSE => clear */
+bypass_objlist(struct obj *objchain, boolean on) /**< TRUE => set, FALSE => clear */
 {
     if (on && objchain) {
         flags.bypasses = TRUE;
@@ -819,8 +795,7 @@ boolean on; /* TRUE => set, FALSE => clear */
 /* return the first object without its bypass bit set; set that bit
    before returning so that successive calls will find further objects */
 struct obj *
-nxt_unbypassed_obj(objchain)
-struct obj *objchain;
+nxt_unbypassed_obj(struct obj *objchain)
 {
     while (objchain) {
         if (!objchain->bypass) {
@@ -833,9 +808,7 @@ struct obj *objchain;
 }
 
 void
-mon_break_armor(mon, polyspot)
-struct monst *mon;
-boolean polyspot;
+mon_break_armor(struct monst *mon, boolean polyspot)
 {
     struct obj *otmp;
     struct permonst *mdat = mon->data;
@@ -991,9 +964,7 @@ noride:
 /* currently only does speed boots, but might be expanded if monsters get to
    use more armor abilities */
 static int
-extra_pref(mon, obj)
-struct monst *mon;
-struct obj *obj;
+extra_pref(struct monst *mon, struct obj *obj)
 {
     /* currently only does speed boots, but might be expanded if monsters
      * get to use more armor abilities. */
@@ -1013,9 +984,7 @@ struct obj *obj;
  *      -1 If the race/object combination is unacceptable.
  */
 int
-racial_exception(mon, obj)
-struct monst *mon;
-struct obj *obj;
+racial_exception(struct monst *mon, struct obj *obj)
 {
     const struct permonst *ptr = raceptr(mon);
 

@@ -73,7 +73,11 @@ typedef long off_t;
 #endif
 #ifndef SIG_RET_TYPE
 # if defined(NHSTDC) || defined(POSIX_TYPES) || defined(OS2) || defined(__DECC)
-#  define SIG_RET_TYPE void (*)()
+#  ifdef LINUX
+#   define SIG_RET_TYPE sighandler_t
+#  else
+#   define SIG_RET_TYPE void (*)()
+#  endif
 # endif
 #endif
 #ifndef SIG_RET_TYPE
@@ -93,7 +97,7 @@ typedef long off_t;
 # undef random
 # endif
 # if !defined(__SC__) && !defined(LINUX)
-E long random();
+E long random(void);
 # endif
 # if (!defined(SUNOS4) && !defined(bsdi) && !defined(__FreeBSD__) && !defined(__NetBSD__)) || defined(RANDOM)
 E void srandom(unsigned int);
@@ -102,9 +106,6 @@ E void srandom(unsigned int);
 E int srandom(unsigned int);
 #  endif
 # endif
-#else
-E long lrand48();
-E void srand48();
 #endif /* BSD || ULTRIX || RANDOM */
 
 #ifdef LEGACY_CODE
@@ -151,7 +152,7 @@ E void qsort(genericptr_t, size_t, size_t,
              int (*)(const genericptr, const genericptr));
 #else
 # if defined(BSD) || defined(ULTRIX)
-E int qsort();
+E int qsort(void);
 # else
 #  if !defined(LATTICE) && !defined(AZTEC_50)
 E void qsort(genericptr_t, size_t, size_t,
@@ -222,7 +223,7 @@ E int read(int, genericptr_t, unsigned int);
 E int open(const char *, int, ...);
 E int dup2(int, int);
 E int setmode(int, int);
-E int kbhit();
+E int kbhit(void);
 # if !defined(_DCC)
 #  if defined(__TURBOC__)
 E int chdir(const char *);
@@ -253,9 +254,9 @@ E int ioctl(int, int, char*);
 E int isatty(int); /* 1==yes, 0==no, -1==error */
 #include <sys/file.h>
 # if defined(ULTRIX_PROTO) || defined(__GNUC__)
-E int fork();
+E int fork(void);
 # else
-E long fork();
+E long fork(void);
 # endif
 #endif /* ULTRIX */
 
@@ -292,8 +293,8 @@ E int write(int, const genericptr, unsigned);
 
 /* both old & new versions of Ultrix want these, but real BSD does not */
 #ifdef ultrix
-E void abort();
-E void bcopy();
+E void abort(void);
+E void bcopy(void);
 # ifdef ULTRIX
 E int system(const char *);
 #  ifndef _UNISTD_H_
@@ -302,12 +303,12 @@ E int execl(const char *, ...);
 # endif
 #endif
 #ifdef MICRO
-E void abort();
+E void abort(void);
 E void _exit(int);
 E int system(const char *);
 #endif
 #if defined(HPUX) && !defined(_POSIX_SOURCE)
-E long fork();
+E long fork(void);
 #endif
 
 #ifdef POSIX_TYPES
@@ -324,13 +325,13 @@ E void *memset(void *, int, size_t);
 #  endif
 # else
 #  ifndef memcmp    /* some systems seem to macro these back to b*() */
-E int memcmp();
+E int memcmp(void);
 #  endif
 #  ifndef memcpy
-E char *memcpy();
+E char *memcpy(void);
 #  endif
 #  ifndef memset
-E char *memset();
+E char *memset(void);
 #  endif
 # endif
 #else
@@ -361,10 +362,7 @@ E char *memset(char*, int, int);
 #endif /* MICRO */
 
 #if defined(BSD) && defined(ultrix) /* i.e., old versions of Ultrix */
-E void sleep();
-#endif
-#if defined(ULTRIX) || defined(SYSV)
-E unsigned sleep();
+E void sleep(void);
 #endif
 #if defined(HPUX)
 E unsigned int sleep(unsigned int);
@@ -374,31 +372,31 @@ E int sleep(unsigned);
 #endif
 
 E char *getenv(const char *);
-E char *getlogin();
+E char *getlogin(void);
 #if defined(HPUX) && !defined(_POSIX_SOURCE)
-E long getuid();
-E long getgid();
-E long getpid();
+E long getuid(void);
+E long getgid(void);
+E long getpid(void);
 #else
 # ifdef POSIX_TYPES
-E pid_t getpid();
-E uid_t getuid();
-E gid_t getgid();
+E pid_t getpid(void);
+E uid_t getuid(void);
+E gid_t getgid(void);
 #  ifdef VMS
-E pid_t getppid();
+E pid_t getppid(void);
 #  endif
 # else  /*!POSIX_TYPES*/
 #  ifndef getpid        /* Borland C defines getpid() as a macro */
-E int getpid();
+E int getpid(void);
 #  endif
 #  ifdef VMS
-E int getppid();
-E unsigned getuid();
-E unsigned getgid();
+E int getppid(void);
+E unsigned getuid(void);
+E unsigned getgid(void);
 #  endif
 #  if defined(ULTRIX) && !defined(_UNISTD_H_)
-E unsigned getuid();
-E unsigned getgid();
+E unsigned getuid(void);
+E unsigned getgid(void);
 E int setgid(int);
 E int setuid(int);
 #  endif
@@ -481,7 +479,7 @@ E char  *rindex(const char *, int);
 E int sprintf(char *, const char *, ...);
 # else
 #  define OLD_SPRINTF
-E char *sprintf();
+E char *sprintf(void);
 # endif
 #endif
 #ifdef SPRINTF_PROTO
@@ -519,7 +517,7 @@ E char *tgoto(const char *, int, int);
 #else
 # if !(defined(HPUX) && defined(_POSIX_SOURCE))
 E int tgetent(char *, const char *);
-E void tputs(const char *, int, int (*)());
+E void tputs(const char *, int, int (*)(int));
 # endif
 E int tgetnum(const char *);
 E int tgetflag(const char *);

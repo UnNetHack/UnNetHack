@@ -155,7 +155,7 @@ curses_destroy_win(WINDOW * win)
 /* Refresh nethack windows if they exist, or base window if not */
 
 void
-curses_refresh_nethack_windows()
+curses_refresh_nethack_windows(void)
 {
     WINDOW *status_window, *message_window, *map_window, *inv_window;
 
@@ -684,7 +684,7 @@ curses_draw_map(int sx, int sy, int ex, int ey)
 /* Init map array to blanks */
 
 static void
-clear_map()
+clear_map(void)
 {
     int x, y;
 

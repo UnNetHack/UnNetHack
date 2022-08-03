@@ -85,7 +85,7 @@ static long laststattime;
 # endif
 
 void
-free_maildata()
+free_maildata(void)
 {
     if (mailbox) {
         free(mailbox);
@@ -94,7 +94,7 @@ free_maildata()
 }
 
 void
-getmailstatus()
+getmailstatus(void)
 {
     if(!mailbox && !(mailbox = nh_getenv("MAIL"))) {
 #  ifdef MAILPATH
@@ -136,8 +136,7 @@ getmailstatus()
  * from newmail() and newphone().
  */
 static boolean
-md_start(startp)
-coord *startp;
+md_start(coord *startp)
 {
     coord testcc;   /* scratch coordinates */
     int row;        /* current row we are checking */
@@ -237,9 +236,9 @@ retry:
  * its point randomly, which is not what we want.
  */
 static boolean
-md_stop(stopp, startp)
-coord *stopp;       /* stopping position (we fill it in) */
-coord *startp;      /* starting position (read only) */
+md_stop(
+    coord *stopp, /**< stopping position (we fill it in) */
+    coord *startp) /**< starting position (read only) */
 {
     int x, y, distance, min_distance = -1;
 
@@ -281,9 +280,10 @@ static NEARDATA const char *mail_text[] = {
  * TRUE otherwise.
  */
 static boolean
-md_rush(md, tx, ty)
-struct monst *md;
-register int tx, ty;            /* destination of mail daemon */
+md_rush(
+    struct monst *md,
+    int tx,
+    int ty) /**< destination of mail daemon */
 {
     struct monst *mon;          /* displaced monster */
     register int dx, dy;        /* direction counters */
@@ -382,8 +382,7 @@ register int tx, ty;            /* destination of mail daemon */
 /* Deliver a scroll of mail. */
 /*ARGSUSED*/
 static void
-newmail(info)
-struct mail_info *info;
+newmail(struct mail_info *info)
 {
     struct monst *md;
     coord start, stop;
@@ -493,7 +492,7 @@ struct obj *otmp;
 # ifdef UNIX
 
 void
-ckmailstatus()
+ckmailstatus(void)
 {
 #ifdef SIMPLE_MAIL
     if (mailckfreq == 0)
@@ -533,8 +532,7 @@ ckmailstatus()
 
 /*ARGSUSED*/
 void
-readmail(otmp)
-struct obj *otmp;
+readmail(struct obj *otmp)
 {
     nhUse(otmp);
 #ifdef DEF_MAILREADER
@@ -725,8 +723,7 @@ struct obj *otmp;
 # endif /* LAN_MAIL */
 
 void
-read_hint(otmp)
-struct obj *otmp UNUSED;
+read_hint(struct obj *otmp UNUSED)
 {
     /* TODO: option for beginner, general changes, public server hints? */
     static const char *hint[] = {
@@ -754,7 +751,7 @@ struct obj *otmp UNUSED;
 }
 
 void
-maybe_hint()
+maybe_hint(void)
 {
     if (u.uswallow || !flags.biff || !flags.hint) return;
 
