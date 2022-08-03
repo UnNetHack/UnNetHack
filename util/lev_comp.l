@@ -14,10 +14,10 @@
  */
 #if !defined(FLEX_SCANNER) && !defined(FLEXHACK_SCANNER)
 int yyback(int *,int);
-int yylook();
-int yyinput();
-int yywrap();
-int yylex();
+int yylook(void);
+int yyinput(void);
+int yywrap(void);
+int yylex(void);
 	/* Traditional lexes let yyunput() and yyoutput() default to int;
 	 * newer ones may declare them as void since they don't return
 	 * values.  For even more fun, the lex supplied as part of the
@@ -65,9 +65,9 @@ void init_yyin(FILE *);
 void init_yyout(FILE *);
 
 void include_push(const char *);
-int include_pop();
+int include_pop(void);
 
-long handle_varstring_method();
+long handle_varstring_method(void);
 long corefunc_str_check(char *, long);
 
 extern struct lc_vardefs *vardef_defined(struct lc_vardefs *,char *, int);
@@ -77,7 +77,7 @@ extern struct lc_vardefs *variable_definitions;
 extern long method_defined(char *, long, long *);
 
 void savetoken(char *);
-void newline();
+void newline(void);
 void advancepos(char *);
 
 extern void VDECL(lc_error, (const char *, ...));
@@ -86,7 +86,7 @@ extern char core_func_retval(int);
 extern int is_core_func(char *);
 extern int core_func_idx(char *);
 
-extern int yyparse();
+extern int yyparse(void);
 extern void yyerror(const char *);
 
 /*
@@ -383,8 +383,7 @@ long *alloc(n)
 #endif
 
 /* routine to switch to another input file; needed for flex */
-void init_yyin( input_f )
-FILE *input_f;
+void init_yyin(FILE *input_f)
 {
 #if defined(FLEX_SCANNER) || defined(FLEXHACK_SCANNER)
 	if (yyin)
@@ -397,15 +396,13 @@ FILE *input_f;
     }
 }
 /* analogous routine (for completeness) */
-void init_yyout( output_f )
-FILE *output_f;
+void init_yyout(FILE *output_f)
 {
 	yyout = output_f;
 }
 
 void
-include_push(fname)
-const char *fname;
+include_push(const char *fname)
 {
   if (doing_included_file >= 5)
     yyerror("Too deep includes");
@@ -428,7 +425,7 @@ const char *fname;
 }
 
 int
-include_pop()
+include_pop(void)
 {
   if (--doing_included_file < 0) {
     doing_included_file = 0;
@@ -447,7 +444,7 @@ include_pop()
  * Stub needed for lex interface.
  */
 int
-yywrap()
+yywrap(void)
 {
     if (doing_included_file > 0) {
         include_pop();
@@ -456,7 +453,7 @@ yywrap()
 }
 
 long
-handle_varstring_check()
+handle_varstring_check(void)
 {
   struct lc_vardefs *vd;
   yylval.map = (char *) alloc(strlen(yytext)+1);
@@ -479,7 +476,7 @@ handle_varstring_check()
 }
 
 long
-handle_varstring_method()
+handle_varstring_method(void)
 {
   struct lc_vardefs *vd;
   char *idx = index(yytext, '.');
@@ -519,9 +516,7 @@ handle_varstring_method()
 
 
 long
-corefunc_str_check(s, retval)
-char *s;
-long retval;
+corefunc_str_check(char *s, long retval)
 {
   int f = is_core_func(s);
   if (f) {
@@ -542,7 +537,7 @@ long retval;
 }
 
 void
-newline()
+newline(void)
 {
   line_number++;
   token_start_pos = 0;
@@ -550,16 +545,14 @@ newline()
 }
 
 void
-savetoken(s)
-char *s;
+savetoken(char *s)
 {
    sprintf(curr_token, "%s", s);
    advancepos(s);
 }
 
 void
-advancepos(s)
-char *s;
+advancepos(char *s)
 {
    token_start_pos += strlen(s);
 }

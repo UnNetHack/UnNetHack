@@ -15,11 +15,11 @@
 #endif
 
 static void redotoplin(const char*);
-static void topl_putsym(CHAR_P);
+static void topl_putsym(char);
 static void removetopl(int);
 
 int
-tty_doprev_message()
+tty_doprev_message(void)
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
 
@@ -115,8 +115,7 @@ tty_doprev_message()
 }
 
 static void
-redotoplin(str)
-const char *str;
+redotoplin(const char *str)
 {
     int otoplin = ttyDisplay->toplin;
     home();
@@ -156,7 +155,7 @@ show_topl(const char *str)
 }
 
 void
-remember_topl()
+remember_topl(void)
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
     int idx = cw->maxrow;
@@ -181,8 +180,7 @@ remember_topl()
 }
 
 void
-addtopl(s)
-const char *s;
+addtopl(const char *s)
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
 
@@ -193,7 +191,7 @@ const char *s;
 }
 
 void
-more()
+more(void)
 {
     struct WinDesc *cw = wins[WIN_MESSAGE];
 
@@ -231,8 +229,7 @@ more()
 }
 
 void
-update_topl(bp)
-register const char *bp;
+update_topl(const char *bp)
 {
     register char *tl, *otl;
     register int n0;
@@ -279,8 +276,7 @@ register const char *bp;
 }
 
 static void
-topl_putsym(c)
-char c;
+topl_putsym(char c)
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
 
@@ -319,16 +315,14 @@ char c;
 }
 
 void
-putsyms(str)
-const char *str;
+putsyms(const char *str)
 {
     while(*str)
         topl_putsym(*str++);
 }
 
 static void
-removetopl(n)
-register int n;
+removetopl(int n)
 {
     /* assume addtopl() has been done, so ttyDisplay->toplin is already set */
     while (n-- > 0) putsyms("\b \b");
@@ -337,9 +331,7 @@ register int n;
 extern char erase_char;     /* from xxxtty.c; don't need kill_char */
 
 char
-tty_yn_function(query, resp, def)
-const char *query, *resp;
-char def;
+tty_yn_function(const char *query, const char *resp, char def)
 /*
  *   Generic yes/no function. 'def' is the default (returned by space or
  *   return; 'esc' returns 'q', or 'n', or the default, depending on

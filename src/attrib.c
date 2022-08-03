@@ -116,14 +116,14 @@ hea_abil[] = { {     1, &(HPoison_resistance), "", "" },
     hum_abil[] = { { 0, 0, 0, 0 } };
 
 static long next_check = 600L;  /* arbitrary first setting */
-static void exerper();
+static void exerper(void);
 static void postadjabil(long *);
 
 /* adjust an attribute; return TRUE if change is made, FALSE otherwise */
 boolean
-adjattrib(ndx, incr, msgflg)
-int ndx, incr;
-int msgflg;         /* positive => no message, zero => message, and */
+adjattrib(int ndx, int incr, int msgflg)
+
+                    /* positive => no message, zero => message, and */
 {               /* negative => conditional (msg if change made) */
     if (Fixed_abil || !incr) return FALSE;
 
@@ -180,9 +180,7 @@ int msgflg;         /* positive => no message, zero => message, and */
 }
 
 void
-gainstr(otmp, incr)
-register struct obj *otmp;
-register int incr;
+gainstr(register struct obj *otmp, register int incr)
 {
     int num = 1;
 
@@ -195,8 +193,8 @@ register int incr;
 }
 
 void
-losestr(num)    /* may kill you; cause may be poison or monster like 'a' */
-register int num;
+losestr(register int num)    /* may kill you; cause may be poison or monster like 'a' */
+
 {
     int ustr = ABASE(A_STR) - num;
 
@@ -215,8 +213,7 @@ register int num;
 }
 
 void
-change_luck(n)
-register schar n;
+change_luck(register schar n)
 {
     u.uluck += n;
     if (u.uluck < 0 && u.uluck < LUCKMIN) u.uluck = LUCKMIN;
@@ -224,8 +221,7 @@ register schar n;
 }
 
 int
-stone_luck(parameter)
-boolean parameter; /* So I can't think up of a good name.  So sue me. --KAA */
+stone_luck(boolean parameter) /* So I can't think up of a good name.  So sue me. --KAA */
 {
     register struct obj *otmp;
     register long bonchance = 0;
@@ -241,7 +237,7 @@ boolean parameter; /* So I can't think up of a good name.  So sue me. --KAA */
 }
 
 boolean
-has_luckitem()
+has_luckitem(void)
 {
     register struct obj *otmp;
 
@@ -252,7 +248,7 @@ has_luckitem()
 
 /* there has just been an inventory change affecting a luck-granting item */
 void
-set_moreluck()
+set_moreluck(void)
 {
     if (!has_luckitem()) u.moreluck = 0;
     else if (stone_luck(TRUE) >= 0) u.moreluck = LUCKADD;
@@ -260,7 +256,7 @@ set_moreluck()
 }
 
 void
-restore_attrib()
+restore_attrib(void)
 {
     int i;
 
@@ -281,9 +277,7 @@ restore_attrib()
 #define AVAL    50      /* tune value for exercise gains */
 
 void
-exercise(i, inc_or_dec)
-int i;
-boolean inc_or_dec;
+exercise(int i, boolean inc_or_dec)
 {
 #ifdef DEBUG
     pline("Exercise:");
@@ -316,7 +310,7 @@ boolean inc_or_dec;
 }
 
 static void
-exerper()
+exerper(void)
 {
     if(!(moves % 10)) {
         /* Hunger Checks */
@@ -377,7 +371,7 @@ exerper()
 }
 
 void
-exerchk()
+exerchk(void)
 {
     int i, mod_val;
 
@@ -465,15 +459,14 @@ exerchk()
 
 /* next_check will otherwise have its initial 600L after a game restore */
 void
-reset_attribute_clock()
+reset_attribute_clock(void)
 {
     if (moves > 600L) next_check = moves + rn1(50, 800);
 }
 
 
 void
-init_attr(np)
-register int np;
+init_attr(register int np)
 {
     register int i, x, tryct;
 
@@ -522,7 +515,7 @@ register int np;
 }
 
 void
-redist_attr()
+redist_attr(void)
 {
     register int i, tmp;
 
@@ -541,8 +534,7 @@ redist_attr()
 }
 
 static void
-postadjabil(ability)
-long *ability;
+postadjabil(long int *ability)
 {
     if (!ability) return;
     if (ability == &(HWarning) || ability == &(HSee_invisible))
@@ -550,8 +542,7 @@ long *ability;
 }
 
 void
-adjabil(oldlevel, newlevel)
-int oldlevel, newlevel;
+adjabil(int oldlevel, int newlevel)
 {
     register const struct innate *abil, *rabil;
     long mask = FROMEXPER;
@@ -635,7 +626,7 @@ int oldlevel, newlevel;
 
 
 int
-newhp()
+newhp(void)
 {
     int hp, conplus;
 
@@ -683,8 +674,7 @@ newhp()
 }
 
 schar
-acurr(x)
-int x;
+acurr(int x)
 {
     register int tmp = (u.abon.a[x] + u.atemp.a[x] + u.acurr.a[x]);
 
@@ -721,7 +711,7 @@ int x;
 /* condense clumsy ACURR(A_STR) value into value that fits into game formulas
  */
 schar
-acurrstr()
+acurrstr(void)
 {
     register int str = ACURR(A_STR);
 
@@ -734,8 +724,7 @@ acurrstr()
  * location for any future alignment limits
  */
 void
-adjalign(n)
-register int n;
+adjalign(register int n)
 {
     register int newalign = u.ualign.record + n;
 
@@ -754,7 +743,7 @@ register int n;
  * according to gender and charisma.
  */
 const char *
-beautiful()
+beautiful(void)
 {
     return (ACURR(A_CHA) > 14 ?
             (poly_gender()==1 ? "beautiful" : "handsome") :
@@ -763,14 +752,14 @@ beautiful()
 
 /** Returns the hitpoints of your current form. */
 int
-uhp()
+uhp(void)
 {
     return (Upolyd ? u.mh : u.uhp);
 }
 
 /** Returns the maximal hitpoints of your current form. */
 int
-uhpmax()
+uhpmax(void)
 {
     return (Upolyd ? u.mhmax : u.uhpmax);
 }
@@ -779,8 +768,8 @@ uhpmax()
    to distinguish between observable +0 result and no-visible-effect
    due to an attribute not being able to exceed maximum or minimum */
 boolean
-extremeattr(attrindx) /* does attrindx's value match its max or min? */
-int attrindx;
+extremeattr(int attrindx) /* does attrindx's value match its max or min? */
+
 {
     /* Fixed_abil and racial MINATTR/MAXATTR aren't relevant here */
     int lolimit = 3, hilimit = 25, curval = ACURR(attrindx);
@@ -811,9 +800,8 @@ int attrindx;
 
 /* change hero's alignment type, possibly losing use of artifacts */
 void
-uchangealign(newalign, reason)
-int newalign;
-int reason; /* 0==conversion, 1==helm-of-OA on, 2==helm-of-OA off */
+uchangealign(int newalign,
+             int reason) /**< 0==conversion, 1==helm-of-OA on, 2==helm-of-OA off */
 {
     aligntyp oldalign = u.ualign.type;
 

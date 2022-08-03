@@ -72,8 +72,8 @@ typedef struct dlb_handle {
 #define DLB_P dlb *
 #endif
 
-boolean dlb_init();
-void dlb_cleanup();
+boolean dlb_init(void);
+void dlb_cleanup(void);
 
 #ifndef FILE_AREAS
 dlb *dlb_fopen(const char *, const char *);

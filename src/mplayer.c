@@ -4,7 +4,7 @@
 #include "hack.h"
 
 static void get_mplname(struct monst *, char *);
-static void mk_mplayer_armor(struct monst *, SHORT_P);
+static void mk_mplayer_armor(struct monst *, short);
 
 /* These are the names of those who
  * contributed to the development of NetHack 3.2/3.3/3.4/3.6.
@@ -37,7 +37,7 @@ static const char *developers[] = {
 
 /* return a randomly chosen developer name */
 const char *
-dev_name()
+dev_name(void)
 {
     register int i, m = 0, n = SIZE(developers);
     register struct monst *mtmp;
@@ -62,9 +62,7 @@ dev_name()
 }
 
 static void
-get_mplname(mtmp, nam)
-register struct monst *mtmp;
-char *nam;
+get_mplname(register struct monst *mtmp, char *nam)
 {
     boolean fmlkind = is_female(mtmp->data);
     const char *devnam;
@@ -87,9 +85,7 @@ char *nam;
 }
 
 static void
-mk_mplayer_armor(mon, typ)
-struct monst *mon;
-short typ;
+mk_mplayer_armor(struct monst *mon, short int typ)
 {
     struct obj *obj;
 
@@ -107,10 +103,7 @@ short typ;
 }
 
 struct monst *
-mk_mplayer(ptr, x, y, special)
-register struct permonst *ptr;
-xchar x, y;
-register boolean special;
+mk_mplayer(register struct permonst *ptr, xchar x, xchar y, register boolean special)
 {
     register struct monst *mtmp;
     char nam[PL_NSIZ];
@@ -296,9 +289,7 @@ register boolean special;
  * fill up the overflow.
  */
 void
-create_mplayers(num, special)
-register int num;
-boolean special;
+create_mplayers(register int num, boolean special)
 {
     int pm, x, y;
     struct monst fakemon;
@@ -326,8 +317,7 @@ boolean special;
 }
 
 void
-mplayer_talk(mtmp)
-register struct monst *mtmp;
+mplayer_talk(register struct monst *mtmp)
 {
     static const char *same_class_msg[3] = {
         "I can't win, and neither will you!",

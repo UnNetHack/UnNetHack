@@ -24,7 +24,7 @@ extern int vms_open(const char *,int,unsigned);
 int restore_savefile(char *, const char *);
 static void set_levelfile_name(int);
 static int open_levelfile(int, const char *);
-static int create_savefile();
+static int create_savefile(void);
 void copy_bytes(int,int);
 
 #ifndef WIN_CE
@@ -61,9 +61,7 @@ char savename[SAVESIZE]; /* holds relative path of save file from playground */
 
 #ifndef NO_MAIN
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
 	int argno;
 	const char *dir = (char *)0;
@@ -148,8 +146,7 @@ char *argv[];
 static char lock[256];
 
 static void
-set_levelfile_name(lev)
-int lev;
+set_levelfile_name(int lev)
 {
 	char *tf;
 
@@ -162,9 +159,7 @@ int lev;
 }
 
 static int
-open_levelfile(lev, directory)
-int lev;
-const char *directory;
+open_levelfile(int lev, const char *directory)
 {
 	int fd;
 	char levelfile[BUFSIZ];
@@ -184,7 +179,7 @@ const char *directory;
 }
 
 static int
-create_savefile()
+create_savefile(void)
 {
 	int fd;
 	char savefile[BUFSIZ];
@@ -203,8 +198,7 @@ create_savefile()
 }
 
 void
-copy_bytes(ifd, ofd)
-int ifd, ofd;
+copy_bytes(int ifd, int ofd)
 {
 	char buf[BUFSIZ];
 	int nfrom, nto;
@@ -220,9 +214,7 @@ int ifd, ofd;
 }
 
 int
-restore_savefile(basename, directory)
-char *basename;
-const char *directory;
+restore_savefile(char *basename, const char *directory)
 {
 	int gfd, lfd, sfd;
 	int lev, savelev, hpid;

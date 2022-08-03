@@ -64,7 +64,7 @@ char strbuf[STRBUF_LEN];
 char prefixbuf[STRBUF_LEN];
 
 /* Open the live log file */
-boolean livelog_start() {
+boolean livelog_start(void) {
     last_achieve_int = encodeachieve();
 
     return TRUE;
@@ -90,7 +90,7 @@ void livelog_write_string(char* buffer) {
 }
 
 static
-char *livelog_prefix() {
+char *livelog_prefix(void) {
     s_level *lev = Is_special(&u.uz);
     snprintf(prefixbuf, STRBUF_LEN,
              "version=%s-%d.%d.%d" SEP
@@ -144,7 +144,7 @@ char *livelog_prefix() {
 /* Writes changes in the achieve structure to the live log.
  * Called from various places in the NetHack source,
  * usually where xlog's achieve is set. */
-void livelog_achieve_update() {
+void livelog_achieve_update(void) {
     long achieve_int, achieve_diff;
 
     achieve_int = encodeachieve();
@@ -168,8 +168,7 @@ void livelog_achieve_update() {
 
 /* Reports wishes */
 void
-livelog_wish(item)
-char *item;
+livelog_wish(char *item)
 {
     snprintf(strbuf, STRBUF_LEN,
              "%s" SEP "type=wish" SEP "wish=%s" SEP "wish_count=%ld\n",
@@ -183,7 +182,7 @@ char *item;
 /* Shout */
 #ifdef LIVELOG_SHOUT
 int
-doshout()
+doshout(void)
 {
     char buf[BUFSZ], qbuf[QBUFSZ];
     char* p;
@@ -214,8 +213,7 @@ doshout()
 
 #ifdef LIVELOG_BONES_KILLER
 void
-livelog_bones_killed(mtmp)
-struct monst *mtmp;
+livelog_bones_killed(struct monst *mtmp)
 {
     char *name = (char *)0;
 
@@ -248,10 +246,7 @@ struct monst *mtmp;
 
 /** Reports shoplifting */
 void
-livelog_shoplifting(shk_name, shop_name, total)
-const char* shk_name;
-const char* shop_name;
-long total;
+livelog_shoplifting(const char *shk_name, const char *shop_name, long int total)
 {
     /* shopkeeper: Name of the shopkeeper (e.g. Kopasker)
        shop:       Name of the shop (e.g. general store)
@@ -267,11 +262,7 @@ long total;
 
 /** Livelog method for reporting the starting/resuming of a game. */
 void
-livelog_game_started(verb, alignment_sex, race, role)
-const char* verb;
-const char* alignment_sex;
-const char* race;
-const char* role;
+livelog_game_started(const char *verb, const char *alignment_sex, const char *race, const char *role)
 {
     snprintf(strbuf, STRBUF_LEN,
              "%s" SEP
@@ -290,8 +281,7 @@ const char* role;
 
 /** Livelog method for reporting saving, quitting, etc. */
 void
-livelog_game_action(verb)
-const char* verb;
+livelog_game_action(const char *verb)
 {
     snprintf(strbuf, STRBUF_LEN,
              "%s" SEP "type=%s" SEP "game_action=%s\n",
@@ -303,9 +293,7 @@ const char* verb;
 
 /** Livelog method for reporting generic events with one customizable field. */
 void
-livelog_generic(field, text)
-const char* field;
-const char* text;
+livelog_generic(const char *field, const char *text)
 {
     snprintf(strbuf, STRBUF_LEN,
              "%s" SEP "type=%s" SEP "%s=%s\n",
@@ -318,9 +306,7 @@ const char* text;
 
 /** Livelog method for reporting monster genocides. */
 void
-livelog_genocide(genocided_monster, level_wide)
-const char* genocided_monster;
-int level_wide;
+livelog_genocide(const char *genocided_monster, int level_wide)
 {
     if (level_wide) {
         livelog_printf(LL_GENOCIDE, "genocided %s on a level in %s",

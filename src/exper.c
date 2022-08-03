@@ -61,8 +61,7 @@ newuexp(int lev)
 }
 
 static int
-enermod(en)
-int en;
+enermod(int en)
 {
     switch (Role_switch) {
     case PM_PRIEST:
@@ -81,7 +80,7 @@ int en;
 
 /* calculate spell power/energy points for new level */
 int
-newpw()
+newpw(void)
 {
     int en = 0, enrnd, enfix;
 
@@ -115,9 +114,7 @@ newpw()
 
 /* return # of exp points for mtmp after nk killed */
 int
-experience(mtmp, nk)
-register struct monst *mtmp;
-int nk UNUSED;
+experience(struct monst *mtmp, int nk UNUSED)
 {
     register struct permonst *ptr = mtmp->data;
     int i, tmp, tmp2;
@@ -180,8 +177,7 @@ int nk UNUSED;
  * Adds to Experience and Scoring counter
  */
 void
-more_experienced(exp, score, rexp)
-register int exp, score, rexp;
+more_experienced(register int exp, register int score, register int rexp)
 {
     u.uexp += exp;
     u.urexp += 4*exp + rexp;
@@ -210,8 +206,7 @@ register int exp, score, rexp;
 
 /* e.g., hit by drain life attack */
 void
-losexp(drainer)
-const char *drainer; /* cause of death, if drain should be fatal */
+losexp(const char *drainer) /**< cause of death, if drain should be fatal */
 {
     register int num;
 
@@ -277,15 +272,15 @@ const char *drainer; /* cause of death, if drain should be fatal */
  * at a dragon created with a wand of polymorph??
  */
 void
-newexplevel()
+newexplevel(void)
 {
     if (u.ulevel < MAXULEV && u.uexp >= newuexp(u.ulevel))
         pluslvl(TRUE);
 }
 
 void
-pluslvl(incr)
-boolean incr;   /* true iff via incremental experience growth */
+pluslvl(boolean incr)
+                /* true iff via incremental experience growth */
 {       /*  (false for potion of gain level)      */
     register int num;
 
@@ -342,8 +337,7 @@ boolean incr;   /* true iff via incremental experience growth */
    experience level:  base number of points needed to reach the current
    level plus a random portion of what it takes to get to the next level */
 long
-rndexp(gaining)
-boolean gaining;    /* gaining XP via potion vs setting XP for polyself */
+rndexp(boolean gaining) /**< gaining XP via potion vs setting XP for polyself */
 {
     long minexp, maxexp, diff, factor, result;
 

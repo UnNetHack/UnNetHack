@@ -283,7 +283,7 @@ const struct shclass shtypes[] = {
 /* validate shop probabilities; otherwise incorrect local changes could
    end up provoking infinite loops or wild subscripts fetching garbage */
 void
-shop_selection_init()
+shop_selection_init(void)
 {
     register int i, j, item_prob, shop_prob;
 
@@ -347,9 +347,7 @@ redo:
 
 /* extract a shopkeeper name for the given shop type */
 static void
-nameshk(shk, nlp)
-struct monst *shk;
-const char * const *nlp;
+nameshk(struct monst *shk, const char *const *nlp)
 {
     int i, trycnt, names_avail;
     const char *shname = 0;
@@ -453,8 +451,7 @@ const char * const *nlp;
 }
 
 void
-neweshk(mtmp)
-struct monst *mtmp;
+neweshk(struct monst *mtmp)
 {
     if (!mtmp->mextra)
         mtmp->mextra = newmextra();
@@ -465,8 +462,7 @@ struct monst *mtmp;
 }
 
 void
-free_eshk(mtmp)
-struct monst *mtmp;
+free_eshk(struct monst *mtmp)
 {
     if (mtmp->mextra && ESHK(mtmp)) {
         free((genericptr_t) ESHK(mtmp));
@@ -477,9 +473,7 @@ struct monst *mtmp;
 
 /* create a new shopkeeper in the given room */
 static int
-shkinit(shp, sroom)
-const struct shclass *shp;
-struct mkroom *sroom;
+shkinit(const struct shclass *shp, struct mkroom *sroom)
 {
     register int sh, sx, sy;
     struct monst *shk;
@@ -639,9 +633,7 @@ shk_failed:
 }
 
 static boolean
-stock_room_goodpos(sroom, rmno, sh, sx, sy)
-struct mkroom *sroom;
-int rmno, sh, sx,sy;
+stock_room_goodpos(struct mkroom *sroom, int rmno, int sh, int sx, int sy)
 {
     if (sroom->irregular) {
         if (levl[sx][sy].edge ||
@@ -660,9 +652,7 @@ int rmno, sh, sx,sy;
 
 /* stock a newly-created room with objects */
 void
-stock_room(shp_indx, sroom)
-int shp_indx;
-register struct mkroom *sroom;
+stock_room(int shp_indx, register struct mkroom *sroom)
 {
     /*
      * Someday soon we'll dispatch on the shdist field of shclass to do
@@ -755,10 +745,7 @@ register struct mkroom *sroom;
 #ifdef BLACKMARKET
 /* stock a newly-created black market with objects */
 static void
-stock_blkmar(shp, sroom, sh)
-const struct shclass *shp UNUSED;
-register struct mkroom *sroom;
-register int sh;
+stock_blkmar(const struct shclass *shp UNUSED, register struct mkroom *sroom, register int sh)
 {
     /*
      * Someday soon we'll dispatch on the shdist field of shclass to do
@@ -836,9 +823,7 @@ register int sh;
 
 /* does shkp's shop stock this item type? */
 boolean
-saleable(shkp, obj)
-struct monst *shkp;
-struct obj *obj;
+saleable(struct monst *shkp, struct obj *obj)
 {
     int i, shp_indx = ESHK(shkp)->shoptype - SHOPBASE;
     const struct shclass *shp = &shtypes[shp_indx];
@@ -854,8 +839,7 @@ struct obj *obj;
 
 /* positive value: class; negative value: specific object type */
 int
-get_shop_item(type)
-int type;
+get_shop_item(int type)
 {
     const struct shclass *shp = shtypes+type;
     register int i, j;
@@ -869,8 +853,7 @@ int type;
 
 /* version of shkname() for beginning of sentence */
 char *
-Shknam(mtmp)
-struct monst *mtmp;
+Shknam(struct monst *mtmp)
 {
     char *nam = shkname(mtmp);
 
@@ -883,8 +866,7 @@ struct monst *mtmp;
    will yield some other shopkeeper's name (not necessarily one residing
    in the current game's dungeon, or who keeps same type of shop) */
 char *
-shkname(mtmp)
-struct monst *mtmp;
+shkname(struct monst *mtmp)
 {
     char *nam;
     unsigned save_isshk = mtmp->isshk;
@@ -932,8 +914,7 @@ struct monst *mtmp;
 }
 
 boolean
-shkname_is_pname(mtmp)
-struct monst *mtmp;
+shkname_is_pname(struct monst *mtmp)
 {
     const char *shknm = ESHK(mtmp)->shknam;
 
@@ -941,9 +922,7 @@ struct monst *mtmp;
 }
 
 boolean
-is_izchak(shkp, override_hallucination)
-struct monst *shkp;
-boolean override_hallucination;
+is_izchak(struct monst *shkp, boolean override_hallucination)
 {
     const char *shknm;
 

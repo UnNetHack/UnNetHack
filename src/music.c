@@ -55,8 +55,7 @@ void  amii_speaker( struct obj *, char *, int ) ;
  */
 
 void
-awaken_monsters(distance)
-int distance;
+awaken_monsters(int distance)
 {
     struct monst *mtmp;
     int distm;
@@ -88,8 +87,7 @@ int distance;
  */
 
 static void
-put_monsters_to_sleep(distance)
-int distance;
+put_monsters_to_sleep(int distance)
 {
     struct monst *mtmp;
 
@@ -110,8 +108,7 @@ int distance;
  */
 
 static void
-charm_snakes(distance)
-int distance;
+charm_snakes(int distance)
 {
     struct monst *mtmp;
     int could_see_mon, was_peaceful;
@@ -147,8 +144,7 @@ int distance;
  */
 
 static void
-calm_nymphs(distance)
-int distance;
+calm_nymphs(int distance)
 {
     struct monst *mtmp;
 
@@ -171,8 +167,7 @@ int distance;
 
 /* Awake soldiers anywhere the level (and any nearby monster). */
 void
-awaken_soldiers(bugler)
-struct monst *bugler; /* monster that played instrument */
+awaken_soldiers(struct monst *bugler) /**< monster that played instrument */
 {
     struct monst *mtmp;
     int distance, distm;
@@ -214,8 +209,7 @@ struct monst *bugler; /* monster that played instrument */
  * If swallowed, range is reduced to 0.
  */
 static void
-charm_monsters(distance)
-int distance;
+charm_monsters(int distance)
 {
     struct monst *mtmp, *mtmp2;
 
@@ -241,8 +235,7 @@ int distance;
  */
 
 void
-do_earthquake(force)
-int force;
+do_earthquake(int force)
 {
     register int x, y;
     struct monst *mtmp;
@@ -453,8 +446,7 @@ const char *beats[] = {
  * The player is trying to extract something from his/her instrument.
  */
 static int
-do_improvisation(instr)
-struct obj *instr;
+do_improvisation(struct obj *instr)
 {
     int damage, mode, do_spec = !(Stunned || Confusion);
     struct obj itmp;
@@ -667,8 +659,7 @@ struct obj *instr;
  */
 
 int
-do_play_instrument(instr)
-struct obj *instr;
+do_play_instrument(struct obj *instr)
 {
     char buf[BUFSZ] = DUMMY, c = 'y';
     char *s;

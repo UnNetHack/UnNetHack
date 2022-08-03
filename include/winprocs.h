@@ -18,21 +18,21 @@ struct window_procs {
     void (*win_resume_nhwindows)(void);
     winid (*win_create_nhwindow)(int);
     void (*win_clear_nhwindow)(winid);
-    void (*win_display_nhwindow)(winid, BOOLEAN_P);
+    void (*win_display_nhwindow)(winid, boolean);
     void (*win_destroy_nhwindow)(winid);
     void (*win_curs)(winid, int, int);
     void (*win_putstr)(winid, int, const char *);
 #ifdef FILE_AREAS
-    void (*win_display_file)(const char *, const char *, BOOLEAN_P);
+    void (*win_display_file)(const char *, const char *, boolean);
 #else
-    void (*win_display_file)(const char *, BOOLEAN_P);
+    void (*win_display_file)(const char *, boolean);
 #endif
     void (*win_start_menu)(winid);
     void (*win_add_menu)(winid, int, int, const ANY_P *,
-                         CHAR_P, CHAR_P, int, const char *, unsigned int);
+                         char, char, int, const char *, unsigned int);
     void (*win_end_menu)(winid, const char *);
     int (*win_select_menu)(winid, int, MENU_ITEM_P **);
-    char (*win_message_menu)(CHAR_P, int, const char *);
+    char (*win_message_menu)(char, int, const char *);
     void (*win_update_inventory)(void);
     void (*win_mark_synch)(void);
     void (*win_wait_synch)(void);
@@ -42,14 +42,14 @@ struct window_procs {
 #ifdef POSITIONBAR
     void (*win_update_positionbar)(char *);
 #endif
-    void (*win_print_glyph)(winid, XCHAR_P, XCHAR_P, int, int);
+    void (*win_print_glyph)(winid, xchar, xchar, int, int);
     void (*win_raw_print)(const char *);
     void (*win_raw_print_bold)(const char *);
     int (*win_nhgetch)(void);
     int (*win_nh_poskey)(int *, int *, int *);
     void (*win_nhbell)(void);
     int (*win_doprev_message)(void);
-    char (*win_yn_function)(const char *, const char *, CHAR_P);
+    char (*win_yn_function)(const char *, const char *, char);
     void (*win_getlin)(const char *, char *);
     int (*win_get_ext_cmd)(void);
     void (*win_number_pad)(int);

@@ -31,8 +31,7 @@ extern const int monstr[];
 #define tooweak(monindx, lev)   (monstr[monindx] < lev)
 
 boolean
-is_home_elemental(ptr)
-register struct permonst *ptr;
+is_home_elemental(register struct permonst *ptr)
 {
     if (ptr->mlet == S_ELEMENTAL)
         switch (monsndx(ptr)) {
@@ -48,8 +47,7 @@ register struct permonst *ptr;
  * Return true if the given monster cannot exist on this elemental level.
  */
 static boolean
-wrong_elem_type(ptr)
-struct permonst *ptr;
+wrong_elem_type(struct permonst *ptr)
 {
     if (ptr->mlet == S_ELEMENTAL) {
         return((boolean)(!is_home_elemental(ptr)));
@@ -73,9 +71,7 @@ struct permonst *ptr;
 }
 /* make a group just like mtmp */
 static void
-m_initgrp(mtmp, x, y, n, mmflags)
-struct monst *mtmp;
-int x, y, n, mmflags;
+m_initgrp(struct monst *mtmp, int x, int y, int n, int mmflags)
 {
     coord mm;
     register int cnt = rnd(n);
@@ -140,9 +136,7 @@ int x, y, n, mmflags;
 }
 
 static void
-m_initthrow(mtmp, otyp, oquan)
-struct monst *mtmp;
-int otyp, oquan;
+m_initthrow(struct monst *mtmp, int otyp, int oquan)
 {
     register struct obj *otmp;
 
@@ -154,9 +148,7 @@ int otyp, oquan;
 }
 
 static void
-m_inityour(mtmp, obj)
-struct monst *mtmp;
-struct obj *obj;
+m_inityour(struct monst *mtmp, struct obj *obj)
 {
     register struct obj *otmp;
 
@@ -172,8 +164,7 @@ struct obj *obj;
 }
 
 static void
-m_initweap(mtmp)
-register struct monst *mtmp;
+m_initweap(register struct monst *mtmp)
 {
     register struct permonst *ptr = mtmp->data;
     register int mm = monsndx(ptr);
@@ -595,9 +586,7 @@ register struct monst *mtmp;
  *   Makes up money for monster's inventory.
  */
 void
-mkmonmoney(mtmp, amount)
-struct monst *mtmp;
-long amount;
+mkmonmoney(struct monst *mtmp, long int amount)
 {
     struct obj *gold = mksobj(GOLD_PIECE, FALSE, FALSE);
 
@@ -606,8 +595,7 @@ long amount;
 }
 
 static void
-m_initinv(mtmp)
-register struct monst   *mtmp;
+m_initinv(register struct monst *mtmp)
 {
     register int cnt;
     register struct obj *otmp;
@@ -895,9 +883,8 @@ register struct monst   *mtmp;
 
 /* Note: for long worms, always call cutworm (cutworm calls clone_mon) */
 struct monst *
-clone_mon(mon, x, y)
-struct monst *mon;
-xchar x, y; /* clone's preferred location or 0 (near mon) */
+clone_mon(struct monst *mon,
+          xchar x, xchar y) /**< clone's preferred location or 0 (near mon) */
 {
     coord mm;
     struct monst *m2;
@@ -1015,10 +1002,7 @@ xchar x, y; /* clone's preferred location or 0 (near mon) */
  *         TRUE  propagation successful
  */
 boolean
-propagate(mndx, tally, ghostly)
-int mndx;
-boolean tally;
-boolean ghostly;
+propagate(int mndx, boolean tally, boolean ghostly)
 {
     boolean result;
     uchar lim = mbirth_limit(mndx);
@@ -1045,8 +1029,7 @@ boolean ghostly;
 
 /* amount of HP to lose from level drain (or gain from Stormbringer) */
 int
-monhp_per_lvl(mon)
-struct monst *mon;
+monhp_per_lvl(struct monst *mon)
 {
     struct permonst *ptr = mon->data;
     int hp = rnd(8); /* default is d8 */
@@ -1070,10 +1053,7 @@ struct monst *mon;
 }
 
 static boolean
-makemon_rnd_goodpos(mon, gpflags, cc)
-struct monst *mon;
-unsigned gpflags;
-coord *cc;
+makemon_rnd_goodpos(struct monst *mon, unsigned int gpflags, coord *cc)
 {
     int tryct = 0;
     int nx,ny;
@@ -1140,10 +1120,7 @@ coord *cc;
 
 static
 struct monst *
-_makemon(ptr, x, y, mmflags)
-register struct permonst *ptr;
-register int x, y;
-register int mmflags;
+_makemon(register struct permonst *ptr, register int x, register int y, register int mmflags)
 {
     register struct monst *mtmp;
     int mndx, mcham, ct, mitem, xlth, mhitdie;
@@ -1478,9 +1455,7 @@ register int mmflags;
 /* set up a new monster's initial level and hit points;
    used by newcham() as well as by makemon() */
 void
-newmonhp(mtmp, mndx)
-struct monst *mtmp;
-int mndx;
+newmonhp(struct monst *mtmp, int mndx)
 {
     struct permonst *ptr = &mons[mndx];
 
@@ -1531,7 +1506,7 @@ int mndx;
 }
 
 struct mextra *
-newmextra()
+newmextra(void)
 {
     struct mextra *mextra;
 
@@ -1554,10 +1529,7 @@ newmextra()
  *  In case we make a monster group, only return the one at [x,y].
  */
 struct monst *
-makemon(ptr, x, y, mmflags)
-register struct permonst *ptr;
-register int x, y;
-register int mmflags;
+makemon(register struct permonst *ptr, register int x, register int y, register int mmflags)
 {
     use_mon_rng++;
     struct monst *mtmp = _makemon(ptr, x, y, mmflags);
@@ -1566,8 +1538,7 @@ register int mmflags;
 }
 
 int
-mbirth_limit(mndx)
-int mndx;
+mbirth_limit(int mndx)
 {
     /* assert(MAXMONNO < 255); */
     return (mndx == PM_NAZGUL ? 9 : mndx == PM_ERINYS ? 3 :
@@ -1577,9 +1548,9 @@ int mndx;
 /* used for wand/scroll/spell of create monster */
 /* returns TRUE iff you know monsters have been created */
 boolean
-create_critters(cnt, mptr)
-int cnt;
-struct permonst *mptr;  /* usually null; used for confused reading */
+create_critters(
+    int cnt,
+    struct permonst *mptr) /**< usually NULL; used for confused reading */
 {
     coord c;
     int x, y;
@@ -1612,8 +1583,7 @@ struct permonst *mptr;  /* usually null; used for confused reading */
 }
 
 static boolean
-uncommon(mndx)
-int mndx;
+uncommon(int mndx)
 {
     if (mons[mndx].geno & (G_NOGEN | G_UNIQ)) return TRUE;
     if (mvitals[mndx].mvflags & G_GONE) return TRUE;
@@ -1671,8 +1641,7 @@ prohibited_by_generation_flags(struct permonst *ptr)
  *  return an integer in the range of 0-5.
  */
 static int
-align_shift(ptr)
-register struct permonst *ptr;
+align_shift(register struct permonst *ptr)
 {
     static NEARDATA long oldmoves = 0L; /* != 1, starting value of moves */
     static NEARDATA s_level *lev;
@@ -1698,7 +1667,7 @@ register struct permonst *ptr;
 
 /** Returns the level of the weakest monster to make. */
 int
-min_monster_difficulty()
+min_monster_difficulty(void)
 {
     int zlevel = level_difficulty();
     if (u.uevent.udemigod) {
@@ -1711,7 +1680,7 @@ min_monster_difficulty()
 
 /** Returns the level of the strongest monster to make. */
 int
-max_monster_difficulty()
+max_monster_difficulty(void)
 {
     int zlevel = level_difficulty();
     if (u.uevent.udemigod) {
@@ -1724,8 +1693,7 @@ max_monster_difficulty()
 
 
 struct permonst *
-get_override_mon(override)
-struct mon_gen_override *override;
+get_override_mon(struct mon_gen_override *override)
 {
     int chance, try = 100;
     struct mon_gen_tuple *mt;
@@ -1754,7 +1722,7 @@ static NEARDATA struct {
 
 static
 struct permonst *
-_rndmonst()
+_rndmonst(void)
 {
     register struct permonst *ptr;
     register int mndx, ct;
@@ -1848,7 +1816,7 @@ _rndmonst()
 
 /* select a random monster type */
 struct permonst *
-rndmonst()
+rndmonst(void)
 {
     use_mon_rng++;
     struct permonst *tmp = _rndmonst();
@@ -1859,8 +1827,7 @@ rndmonst()
 /* called when you change level (experience or dungeon depth) or when
    monster species can no longer be created (genocide or extinction) */
 void
-reset_rndmonst(mndx)
-int mndx; /* particular species that can no longer be created */
+reset_rndmonst(int mndx) /**< particular species that can no longer be created */
 {
     /* cached selection info is out of date */
     if (mndx == NON_PM) {
@@ -1873,8 +1840,7 @@ int mndx; /* particular species that can no longer be created */
 
 /* decide whether it's ok to generate a candidate monster by mkclass() */
 static boolean
-mk_gen_ok(mndx, mvflagsmask, genomask)
-int mndx, mvflagsmask, genomask;
+mk_gen_ok(int mndx, int mvflagsmask, int genomask)
 {
     struct permonst *ptr = &mons[mndx];
 
@@ -1899,19 +1865,14 @@ int mndx, mvflagsmask, genomask;
  *  in that class can be made.
  */
 struct permonst *
-mkclass(class, spc)
-char class;
-int spc;
+mkclass(char class, int spc)
 {
     return mkclass_aligned(class, spc, A_NONE);
 }
 
 /* mkclass() with alignment restrictions; used by ndemon() */
 struct permonst *
-mkclass_aligned(class, spc, atyp)
-char class;
-int spc;
-aligntyp atyp;
+mkclass_aligned(char class, int spc, aligntyp atyp)
 {
     register int first, last, num = 0;
     int k, nums[SPECIAL_PM + 1]; /* +1: insurance for final return value */
@@ -1990,8 +1951,7 @@ aligntyp atyp;
    genocided types are avoided but extinct ones are acceptable; we don't
    check polyok() here--caller accepts some choices !polyok() would reject */
 int
-mkclass_poly(class)
-int class;
+mkclass_poly(int class)
 {
     register int first, last, num = 0;
 
@@ -2024,8 +1984,8 @@ int class;
 }
 
 int
-adj_lev(ptr) /* adjust strength of monsters based on u.uz and u.ulevel */
-register struct permonst *ptr;
+adj_lev(register struct permonst *ptr) /* adjust strength of monsters based on u.uz and u.ulevel */
+
 {
     int tmp, tmp2;
 
@@ -2054,8 +2014,7 @@ register struct permonst *ptr;
 /* monster earned experience and will gain some hit points; it might also
    grow into a bigger monster (baby to adult, soldier to officer, etc) */
 struct permonst *
-grow_up(mtmp, victim)
-struct monst *mtmp, *victim;
+grow_up(struct monst *mtmp, struct monst *victim)
 {
     int oldtype, newtype, max_increase, cur_increase,
         lev_limit, hp_threshold;
@@ -2168,9 +2127,7 @@ struct monst *mtmp, *victim;
 }
 
 int
-mongets(mtmp, otyp)
-struct monst *mtmp;
-int otyp;
+mongets(struct monst *mtmp, int otyp)
 {
     register struct obj *otmp;
     int spe;
@@ -2217,8 +2174,7 @@ int otyp;
 }
 
 int
-golemhp(type)
-int type;
+golemhp(int type)
 {
     switch(type) {
         case PM_STRAW_GOLEM: return 20;
@@ -2244,8 +2200,7 @@ int type;
  *  ( some "animal" types are co-aligned, but also hungry )
  */
 boolean
-peace_minded(ptr)
-register struct permonst *ptr;
+peace_minded(register struct permonst *ptr)
 {
     aligntyp mal = ptr->maligntyp, ual = u.ualign.type;
 
@@ -2287,8 +2242,7 @@ register struct permonst *ptr;
  *   it's never bad to kill a hostile monster, although it may not be good
  */
 void
-set_malign(mtmp)
-struct monst *mtmp;
+set_malign(struct monst *mtmp)
 {
     schar mal = mtmp->data->maligntyp;
     boolean coaligned;
@@ -2339,8 +2293,7 @@ struct monst *mtmp;
 
 /* allocate a new mcorpsenm field for a monster; only need mextra itself */
 void
-newmcorpsenm(mtmp)
-struct monst *mtmp;
+newmcorpsenm(struct monst *mtmp)
 {
     if (!mtmp->mextra) {
         mtmp->mextra = newmextra();
@@ -2350,8 +2303,7 @@ struct monst *mtmp;
 
 /* release monster's mcorpsenm field; basically a no-op */
 void
-freemcorpsenm(mtmp)
-struct monst *mtmp;
+freemcorpsenm(struct monst *mtmp)
 {
     if (has_mcorpsenm(mtmp)) {
         MCORPSENM(mtmp) = NON_PM;
@@ -2366,8 +2318,8 @@ static NEARDATA char syms[] = {
 };
 
 void
-set_mimic_sym(mtmp) /* KAA, modified by ERS */
-register struct monst *mtmp;
+set_mimic_sym(register struct monst *mtmp) /* KAA, modified by ERS */
+
 {
     int typ, roomno, rt;
     unsigned appear, ap_type;
@@ -2511,8 +2463,7 @@ assign_sym:
 /* Release a monster from a bag of tricks or
  * produce an interesting effect ... nda 5/13/2003 */
 int
-bagotricks(bag)
-struct obj *bag;
+bagotricks(struct obj *bag)
 {
     if (!bag || bag->otyp != BAG_OF_TRICKS) {
         warning("bad bag o' tricks");
@@ -2641,9 +2592,7 @@ struct obj *bag;
 
 /** May create a camera demon emerging from camera around position x,y. */
 void
-create_camera_demon(camera, x, y)
-struct obj *camera;
-int x, y;
+create_camera_demon(struct obj *camera, int x, int y)
 {
     struct monst *mtmp;
 
