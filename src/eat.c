@@ -89,7 +89,7 @@ const char *hu_stat[] = {
  * polymorphed character.  Not used for monster checks.
  */
 boolean
-is_edible(register struct obj *obj)
+is_edible(struct obj *obj)
 {
     /* protect invocation tools but not Rider corpses (handled elsewhere)*/
     /* if (obj->oclass != FOOD_CLASS && obj_resists(obj, 0, 0)) */
@@ -598,7 +598,7 @@ maybe_cannibal(int pm, boolean allowmsg)
 }
 
 static void
-cprefx(register int pm)
+cprefx(int pm)
 {
     (void) maybe_cannibal(pm, TRUE);
     if (flesh_petrifies(&mons[pm])) {
@@ -735,7 +735,7 @@ fix_petrification(void)
 
 /* intrinsic_possible() returns TRUE iff a monster can give an intrinsic. */
 int
-intrinsic_possible(int type, register struct permonst *ptr)
+intrinsic_possible(int type, struct permonst *ptr)
 {
     switch (type) {
     case FIRE_RES:
@@ -829,9 +829,9 @@ intrinsic_possible(int type, register struct permonst *ptr)
  * and what type of intrinsic it is trying to give you.
  */
 static void
-givit(int type, register struct permonst *ptr)
+givit(int type, struct permonst *ptr)
 {
-    register int chance;
+    int chance;
 
 #ifdef DEBUG
     debugpline("Attempting to give intrinsic %d", type);
@@ -1309,7 +1309,7 @@ tin_details(struct obj *obj, int mnum, char *buf)
 void
 set_tin_variety(struct obj *obj, int forcetype)
 {
-    register int r;
+    int r;
 
     if (forcetype == SPINACH_TIN
         || (forcetype == HEALTHY_TIN
@@ -1341,7 +1341,7 @@ static int
 tin_variety(struct obj *obj,
             boolean disp) /**< we're just displaying so leave things alone */
 {
-    register int r;
+    int r;
 
     if (obj->spe == 1) {
         r = SPINACH_TIN;
@@ -1374,7 +1374,7 @@ tin_variety(struct obj *obj,
 static int
 opentin(void)
 {
-    register int r;
+    int r;
     const char *what;
     int which;
 
@@ -1542,10 +1542,10 @@ use_up_tin:
 
 /* called when starting to open a tin */
 static void
-start_tin(register struct obj *otmp)
+start_tin(struct obj *otmp)
 {
     const char *mesg = 0;
-    register int tmp;
+    int tmp;
 
     if (metallivorous(youmonst.data)) {
         mesg = "You bite right into the metal tin...";
@@ -2269,7 +2269,7 @@ static const char *foodwords[] = {
 };
 
 static const char *
-foodword(register struct obj *otmp)
+foodword(struct obj *otmp)
 {
     if (otmp->oclass == FOOD_CLASS) return "food";
     if (otmp->oclass == GEM_CLASS &&
@@ -3183,7 +3183,7 @@ floorfood(
     const char *verb,
     int corpsecheck) /**< 0, no check, 1, corpses, 2, tinnable corpses */
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     char qbuf[QBUFSZ];
     char c;
     boolean feeding = (!strcmp(verb, "eat"));           // corpsecheck == 0
@@ -3336,7 +3336,7 @@ vomit(void) /* A good idea from David Neves */
 }
 
 int
-eaten_stat(register int base, register struct obj *obj)
+eaten_stat(int base, struct obj *obj)
 {
     long uneaten_amt, full_amount;
 

@@ -226,7 +226,7 @@ in_trouble(void)
 static struct obj *
 worst_cursed_item(void)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     /* if strained or worse, check for loadstone first */
     if (near_capacity() >= HVY_ENCUMBER) {
@@ -283,7 +283,7 @@ worst_cursed_item(void)
 }
 
 static void
-fix_worst_trouble(register int trouble)
+fix_worst_trouble(int trouble)
 {
     int i;
     struct obj *otmp = 0;
@@ -1118,7 +1118,7 @@ pleased(aligntyp g_align)
             break;
 
         case 4: {
-            register struct obj *otmp;
+            struct obj *otmp;
             int any = 0;
 
             if (Blind)
@@ -1219,8 +1219,8 @@ pleased(aligntyp g_align)
 static boolean
 water_prayer(boolean bless_water)
 {
-    register struct obj* otmp;
-    register long changed = 0;
+    struct obj* otmp;
+    long changed = 0;
     boolean other = FALSE, bc_known = !(Blind || Hallucination);
 
     for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere) {
@@ -1275,7 +1275,7 @@ gods_upset(aligntyp g_align)
 static NEARDATA const char sacrifice_types[] = { FOOD_CLASS, AMULET_CLASS, 0 };
 
 static void
-consume_offering(register struct obj *otmp)
+consume_offering(struct obj *otmp)
 {
     if (Hallucination)
         switch (rn2(3)) {
@@ -1301,7 +1301,7 @@ consume_offering(register struct obj *otmp)
 int
 dosacrifice(void)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     int value = 0;
     int pm;
     aligntyp altaralign = a_align(u.ux, u.uy);
@@ -1347,7 +1347,7 @@ dosacrifice(void)
 #define MAXVALUE 24 /* Highest corpse value (besides Wiz) */
 
     if (otmp->otyp == CORPSE) {
-        register struct permonst *ptr = &mons[otmp->corpsenm];
+        struct permonst *ptr = &mons[otmp->corpsenm];
         struct monst *mtmp;
         extern const int monstr[];
 
@@ -2236,7 +2236,7 @@ align_gtitle(aligntyp alignment)
 }
 
 void
-altar_wrath(register int x, register int y)
+altar_wrath(int x, int y)
 {
     aligntyp altaralign = a_align(x, y);
 
@@ -2260,7 +2260,7 @@ altar_wrath(register int x, register int y)
 static boolean
 blocked_boulder(int dx, int dy)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     long count = 0L;
 
     for(otmp = level.objects[u.ux+dx][u.uy+dy]; otmp; otmp = otmp->nexthere) {

@@ -299,7 +299,7 @@ popch(void) {
 
 char
 pgetchar(void) {        /* curtesy of aeb@cwi.nl */
-    register int ch;
+    int ch;
 
     if (iflags.debug_fuzzer) {
         return randomkey();
@@ -3237,7 +3237,7 @@ void
 parseautocomplete(char *autocomplete, boolean condition)
 {
     struct ext_func_tab *efp;
-    register char *autoc;
+    char *autoc;
 
     /* break off first autocomplete from the rest; parse the rest */
     if ((autoc = index(autocomplete, ',')) != 0 ||
@@ -3526,7 +3526,7 @@ ch2spkeys(char c, int start, int end)
 }
 
 void
-rhack(register char *cmd)
+rhack(char *cmd)
 {
     int spkey = -1;
     boolean do_walk, do_rush, prefix_seen, bad_command,
@@ -3747,7 +3747,7 @@ rhack(register char *cmd)
 
     if (bad_command) {
         char expcmd[10];
-        register char *cp = expcmd;
+        char *cp = expcmd;
 
         while (*cmd && (int)(cp - expcmd) < (int)(sizeof expcmd - 3)) {
             if (*cmd >= 040 && *cmd < 0177) {
@@ -3776,7 +3776,7 @@ rhack(register char *cmd)
 int
 xytod(schar x, schar y)
 {
-    register int dd;
+    int dd;
 
     for(dd = 0; dd < 8; dd++)
         if(x == xdir[dd] && y == ydir[dd]) return dd;
@@ -3786,7 +3786,7 @@ xytod(schar x, schar y)
 
 /* convert a direction code into an x,y pair */
 void
-dtoxy(coord *cc, register int dd)
+dtoxy(coord *cc, int dd)
 {
     cc->x = xdir[dd];
     cc->y = ydir[dd];
@@ -4148,7 +4148,7 @@ directionname(int dir)
 }
 
 int
-isok(register int x, register int y)
+isok(int x, int y)
 {
     /* x corresponds to curx, so x==1 is the first column. Ach. %% */
     return x >= 1 && x <= COLNO-1 && y >= 0 && y <= ROWNO-1;
@@ -4591,7 +4591,7 @@ parse(void)
 #else
     static char in_line[COLNO];
 #endif
-    register int foo;
+    int foo;
     boolean prezero = FALSE;
 
     multi = 0;
@@ -4713,7 +4713,7 @@ end_of_input(void)
 char
 readchar(void)
 {
-    register int sym;
+    int sym;
     int x = u.ux, y = u.uy, mod = 0;
 
     if (iflags.debug_fuzzer) {
@@ -4731,7 +4731,7 @@ readchar(void)
 
 #ifdef NR_OF_EOFS
     if (sym == EOF) {
-        register int cnt = NR_OF_EOFS;
+        int cnt = NR_OF_EOFS;
         /*
          * Some SYSV systems seem to return EOFs for various reasons
          * (?like when one hits break or for interrupted systemcalls?),

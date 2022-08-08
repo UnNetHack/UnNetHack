@@ -187,8 +187,8 @@ deadbook(struct obj *book2)
     /* KMH -- Need ->known to avoid "_a_ Book of the Dead" */
     book2->known = 1;
     if(invocation_pos(u.ux, u.uy) && !On_stairs(u.ux, u.uy)) {
-        register struct obj *otmp;
-        register boolean arti1_primed = FALSE, arti2_primed = FALSE,
+        struct obj *otmp;
+        boolean arti1_primed = FALSE, arti2_primed = FALSE,
                          arti_cursed = FALSE;
 
         if(book2->cursed) {
@@ -384,10 +384,10 @@ learn(void)
 }
 
 int
-study_book(register struct obj *spellbook)
+study_book(struct obj *spellbook)
 {
-    register int booktype = spellbook->otyp;
-    register boolean confused = (Confusion != 0);
+    int booktype = spellbook->otyp;
+    boolean confused = (Confusion != 0);
     boolean too_hard = FALSE;
 
     if (delay && !confused && spellbook == book &&

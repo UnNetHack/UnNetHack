@@ -252,7 +252,7 @@ static void
 winch(void)
 {
     int oldLI = LI, oldCO = CO, i;
-    register struct WinDesc *cw;
+    struct WinDesc *cw;
 
     getwindowsz();
     if((oldLI != LI || oldCO != CO) && ttyDisplay) {
@@ -1294,7 +1294,7 @@ void
 tty_askname(void)
 {
     static char who_are_you[] = "Who are you? ";
-    register int c, ct, tryct = 0;
+    int c, ct, tryct = 0;
 
     tty_putstr(BASE_WINDOW, 0, "");
     do {
@@ -1610,7 +1610,7 @@ free_window_info(struct WinDesc *cw, boolean free_data)
 void
 tty_clear_nhwindow(winid window)
 {
-    register struct WinDesc *cw = 0;
+    struct WinDesc *cw = 0;
 
     if(window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
         panic(winpanicstr,  window);
@@ -2158,7 +2158,7 @@ static void
 process_text_window(winid window, struct WinDesc *cw)
 {
     int i, n, attr;
-    register char *cp;
+    char *cp;
 
     for (n = 0, i = 0; i < cw->maxrow; i++) {
         if (!cw->offx && (n + cw->offy == ttyDisplay->rows - 1)) {
@@ -2232,7 +2232,7 @@ tty_display_nhwindow(
     winid window,
     boolean blocking) /**< with ttys, all windows are blocking */
 {
-    register struct WinDesc *cw = 0;
+    struct WinDesc *cw = 0;
 
     if(window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
         panic(winpanicstr,  window);
@@ -2311,7 +2311,7 @@ tty_display_nhwindow(
 void
 tty_dismiss_nhwindow(winid window)
 {
-    register struct WinDesc *cw = 0;
+    struct WinDesc *cw = 0;
 
     if(window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
         panic(winpanicstr,  window);
@@ -2355,7 +2355,7 @@ tty_dismiss_nhwindow(winid window)
 void
 tty_destroy_nhwindow(winid window)
 {
-    register struct WinDesc *cw = 0;
+    struct WinDesc *cw = 0;
 
     if(window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
         panic(winpanicstr,  window);
@@ -2454,7 +2454,7 @@ tty_curs(
 static void
 tty_putsym(winid window, int x, int y, char ch)
 {
-    register struct WinDesc *cw = 0;
+    struct WinDesc *cw = 0;
 
     if(window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
         panic(winpanicstr,  window);
@@ -2493,8 +2493,8 @@ compress_str(const char *str)
     static char cbuf[BUFSZ];
     /* compress in case line too long */
     if((int)strlen(str) >= CO) {
-        register const char *bp0 = str;
-        register char *bp1 = cbuf;
+        const char *bp0 = str;
+        char *bp1 = cbuf;
 
         do {
 #ifdef CLIPPING
@@ -2517,10 +2517,10 @@ tty_putstr_extended(
     const char *str,
     const int *attributes)
 {
-    register struct WinDesc *cw = 0;
-    register char *ob;
-    register const char *nb;
-    register long i, j, n0;
+    struct WinDesc *cw = 0;
+    char *ob;
+    const char *nb;
+    long i, j, n0;
 
     /* Assume there's a real problem if the window is missing --
      * probably a panic message
@@ -2721,9 +2721,9 @@ boolean complain)
     {
         /* use external pager; this may give security problems */
 #ifdef FILE_AREAS
-        register int fd = open_area(farea, fname, 0, 0);
+        int fd = open_area(farea, fname, 0, 0);
 #else
-        register int fd = open(fname, 0);
+        int fd = open(fname, 0);
 #endif
 
         if(fd < 0) {
@@ -2823,7 +2823,7 @@ tty_add_menu(
     unsigned int itemflags) /**< itemflags such as MENU_ITEMFLAGS_SELECTED */
 {
     boolean preselected = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
-    register struct WinDesc *cw = 0;
+    struct WinDesc *cw = 0;
     tty_menu_item *item;
 
     if (str == (const char*) 0)
@@ -2981,7 +2981,7 @@ tty_end_menu(
 int
 tty_select_menu(winid window, int how, menu_item **menu_list)
 {
-    register struct WinDesc *cw = 0;
+    struct WinDesc *cw = 0;
     tty_menu_item *curr;
     menu_item *mi;
     int n, cancelled;
@@ -3086,8 +3086,8 @@ tty_wait_synch(void)
 void
 docorner(int xmin, int ymax)
 {
-    register int y;
-    register struct WinDesc *cw = wins[WIN_MAP];
+    int y;
+    struct WinDesc *cw = wins[WIN_MAP];
 
 #if defined(SIGWINCH) && defined(CLIPPING)
     if(ymax > LI) ymax = LI;        /* can happen if window gets smaller */
@@ -3140,7 +3140,7 @@ end_glyphout(void)
 void
 g_putch(int in_ch)
 {
-    register char ch = (char)in_ch;
+    char ch = (char)in_ch;
 
 # if defined(ASCIIGRAPH) && !defined(NO_TERMS)
     if (iflags.IBMgraphics || iflags.eight_bit_tty) {

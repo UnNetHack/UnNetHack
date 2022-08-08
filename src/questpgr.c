@@ -268,7 +268,7 @@ msg_in(struct qtmsg *qtm_list, int msgnum)
 static void
 convert_arg(char c)
 {
-    register const char *str;
+    const char *str;
 
     switch (c) {
 

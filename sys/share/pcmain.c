@@ -94,8 +94,8 @@ int argc;
 char *argv[];
 {
 
-	register int fd;
-	register char *dir;
+	int fd;
+	char *dir;
 #if defined(WIN32)
 	char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
 #endif

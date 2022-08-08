@@ -1243,7 +1243,7 @@ change_inv_order(char *op)
 }
 
 static void
-graphics_opts(register char *opts, const char *optype, int maxlen, int offset)
+graphics_opts(char *opts, const char *optype, int maxlen, int offset)
 {
     glyph_t translate[MAXPCHARS+1];
     int length, i;
@@ -1261,7 +1261,7 @@ graphics_opts(register char *opts, const char *optype, int maxlen, int offset)
 }
 
 static void
-warning_opts(register char *opts, const char *optype)
+warning_opts(char *opts, const char *optype)
 {
     uchar translate[MAXPCHARS+1];
     int length, i;
@@ -1280,7 +1280,7 @@ warning_opts(register char *opts, const char *optype)
 }
 
 void
-assign_warnings(register uchar *graph_chars)
+assign_warnings(uchar *graph_chars)
 {
     int i;
     for (i = 0; i < WARNCOUNT; i++)
@@ -2268,7 +2268,7 @@ common_prefix_options_parser(const char *fullname, char *opts, boolean negated)
     /* check for "+option1 -option2" */
     while (*op) {
         boolean check = FALSE, value = FALSE;
-        register char c;
+        char c;
         c = *op;
         if (c == '+') {
             check = TRUE;
@@ -2304,9 +2304,9 @@ common_prefix_options_parser(const char *fullname, char *opts, boolean negated)
 }
 
 boolean
-parseoptions(register char *opts, boolean tinitial, boolean tfrom_file)
+parseoptions(char *opts, boolean tinitial, boolean tfrom_file)
 {
-    register char *op;
+    char *op;
     unsigned num;
     boolean negated;
     int i;
@@ -3468,7 +3468,7 @@ goodfruit:
         num = 0;
         prefix_val = -1;
         while (*op && num < sizeof flags.end_disclose - 1) {
-            register char c, *dop;
+            char c, *dop;
             static char valid_settings[] = {
                 DISCLOSE_PROMPT_DEFAULT_YES,
                 DISCLOSE_PROMPT_DEFAULT_NO,
@@ -5597,7 +5597,7 @@ void
 option_help(void)
 {
     char buf[BUFSZ], buf2[BUFSZ];
-    register int i;
+    int i;
     winid datawin;
 
     datawin = create_nhwindow(NHW_TEXT);
@@ -5698,8 +5698,8 @@ illegal_menu_cmd_key(char c)
 int
 fruitadd(char *str)
 {
-    register int i;
-    register struct fruit *f;
+    int i;
+    struct fruit *f;
     struct fruit *lastf = 0;
     int highest_fruit_id = 0;
     char buf[PL_FSIZ];

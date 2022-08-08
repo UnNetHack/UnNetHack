@@ -134,7 +134,7 @@ int
 dosave0(void)
 {
     const char *fq_save;
-    register int fd, ofd;
+    int fd, ofd;
     xchar ltmp;
     d_level uz_save;
     char whynot[BUFSZ];
@@ -308,7 +308,7 @@ dosave0(void)
 }
 
 static void
-savegamestate(register int fd, register int mode)
+savegamestate(int fd, int mode)
 {
     int uid;
 #if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
@@ -742,7 +742,7 @@ int fd;
 genericptr_t loc;
 register unsigned num;
 {
-    register unsigned char *bp = (unsigned char *)loc;
+    unsigned char *bp = (unsigned char *)loc;
 
     if (!compressing) {
 #ifdef MFLOPPY
@@ -822,7 +822,7 @@ bflush(int fd)
 }
 
 void
-bwrite(register int fd, register genericptr_t loc, register unsigned int num)
+bwrite(int fd, genericptr_t loc, unsigned int num)
 {
     boolean failed;
 
@@ -875,7 +875,7 @@ bclose(int fd)
 #endif /* ZEROCOMP */
 
 static void
-savelevchn(register int fd, register int mode)
+savelevchn(int fd, int mode)
 {
     s_level *tmplev, *tmplev2;
     int cnt = 0;
@@ -922,9 +922,9 @@ savecemetery(int fd, int mode, struct cemetery **cemeteryaddr)
 }
 
 static void
-savedamage(register int fd, register int mode)
+savedamage(int fd, int mode)
 {
-    register struct damage *damageptr, *tmp_dam;
+    struct damage *damageptr, *tmp_dam;
     unsigned int xl = 0;
 
     damageptr = level.damagelist;
@@ -946,7 +946,7 @@ savedamage(register int fd, register int mode)
 }
 
 void
-save_mongen_override(register int fd, register struct mon_gen_override *or, register int mode)
+save_mongen_override(int fd, struct mon_gen_override *or, int mode)
 {
     struct mon_gen_tuple *mt;
     struct mon_gen_tuple *prev;
@@ -979,7 +979,7 @@ save_mongen_override(register int fd, register struct mon_gen_override *or, regi
 }
 
 void
-save_lvl_sounds(register int fd, register struct lvl_sounds *or, register int mode)
+save_lvl_sounds(int fd, struct lvl_sounds *or, int mode)
 {
     int marker = 0;
     int i;
@@ -1052,9 +1052,9 @@ saveobj(int fd, struct obj *otmp)
 }
 
 static void
-saveobjchn(register int fd, register struct obj *otmp, register int mode)
+saveobjchn(int fd, struct obj *otmp, int mode)
 {
-    register struct obj *otmp2;
+    struct obj *otmp2;
     int minusone = -1;
 
     while (otmp) {
@@ -1146,9 +1146,9 @@ savemon(int fd, struct monst *mtmp)
 }
 
 static void
-savemonchn(register int fd, register struct monst *mtmp, register int mode)
+savemonchn(int fd, struct monst *mtmp, int mode)
 {
-    register struct monst *mtmp2;
+    struct monst *mtmp2;
     int minusone = -1;
 
     while (mtmp) {
@@ -1176,10 +1176,10 @@ savemonchn(register int fd, register struct monst *mtmp, register int mode)
 }
 
 static void
-savetrapchn(register int fd, register struct trap *trap, register int mode)
+savetrapchn(int fd, struct trap *trap, int mode)
 {
     static struct trap zerotrap;
-    register struct trap *trap2;
+    struct trap *trap2;
 
     while (trap) {
         trap2 = trap->ntrap;
@@ -1199,10 +1199,10 @@ savetrapchn(register int fd, register struct trap *trap, register int mode)
  * level routine marks nonexistent fruits by making the fid negative.
  */
 void
-savefruitchn(register int fd, register int mode)
+savefruitchn(int fd, int mode)
 {
     static struct fruit zerofruit;
-    register struct fruit *f2, *f1;
+    struct fruit *f2, *f1;
 
     f1 = ffruit;
     while (f1) {

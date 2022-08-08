@@ -197,7 +197,7 @@ outrumor(int truth, int mechanism)
 static void
 init_oracles(dlb *fp)
 {
-    register int i;
+    int i;
     char line[BUFSZ];
     int cnt = 0;
 
@@ -323,7 +323,7 @@ register struct monst *oracl;
 #endif
 
 int
-doconsult(register struct monst *oracl)
+doconsult(struct monst *oracl)
 {
     long umoney = money_cnt(invent);
     int u_pay, minor_cost = 50, major_cost = 500 + 50 * u.ulevel;

@@ -771,7 +771,7 @@ dropp(struct obj *obj)
 static void
 break_armor(void)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     if (breakarm(youmonst.data)) {
         if ((otmp = uarm) != 0) {
@@ -1017,7 +1017,7 @@ doremove(void)
 int
 dospinweb(void)
 {
-    register struct trap *ttmp = t_at(u.ux, u.uy);
+    struct trap *ttmp = t_at(u.ux, u.uy);
 
     if (Levitation || Is_airlevel(&u.uz)
         || Underwater || Is_waterlevel(&u.uz)) {
@@ -1152,7 +1152,7 @@ dosummon(void)
 int
 dogaze(void)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
     int looked = 0;
     char qbuf[QBUFSZ];
     int i;

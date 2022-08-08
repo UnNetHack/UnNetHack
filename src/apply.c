@@ -323,7 +323,7 @@ static const char hollow_str[] = "a hollow sound.  This must be a secret %s!";
    almost useless.  As a compromise, one use per turn is free, another
    uses up the turn; this makes curse status have a tangible effect. */
 static int
-use_stethoscope(register struct obj *obj)
+use_stethoscope(struct obj *obj)
 {
     static long last_used_move = -1;
     static short last_used_movement = 0;
@@ -564,7 +564,7 @@ use_magic_whistle(struct obj *obj)
 }
 
 boolean
-um_dist(register xchar x, register xchar y, register xchar n)
+um_dist(xchar x, xchar y, xchar n)
 {
     return((boolean)(abs(u.ux - x) > n  || abs(u.uy - y) > n));
 }
@@ -572,8 +572,8 @@ um_dist(register xchar x, register xchar y, register xchar n)
 int
 number_leashed(void)
 {
-    register int i = 0;
-    register struct obj *obj;
+    int i = 0;
+    struct obj *obj;
 
     for(obj = invent; obj; obj = obj->nobj)
         if(obj->otyp == LEASH && obj->leashmon != 0) i++;
@@ -582,9 +582,9 @@ number_leashed(void)
 
 /* otmp is about to be destroyed or stolen */
 void
-o_unleash(register struct obj *otmp)
+o_unleash(struct obj *otmp)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
 
     for(mtmp = fmon; mtmp; mtmp = mtmp->nmon)
         if(mtmp->m_id == (unsigned)otmp->leashmon)
@@ -594,9 +594,9 @@ o_unleash(register struct obj *otmp)
 
 /* mtmp is about to die, or become untame */
 void
-m_unleash(register struct monst *mtmp, boolean feedback)
+m_unleash(struct monst *mtmp, boolean feedback)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     if (feedback) {
         if (canseemon(mtmp))
@@ -615,8 +615,8 @@ m_unleash(register struct monst *mtmp, boolean feedback)
 void
 unleash_all(void)
 {
-    register struct obj *otmp;
-    register struct monst *mtmp;
+    struct obj *otmp;
+    struct monst *mtmp;
 
     for(otmp = invent; otmp; otmp = otmp->nobj)
         if(otmp->otyp == LEASH) otmp->leashmon = 0;
@@ -743,8 +743,8 @@ get_mleash(struct monst *mtmp)
 boolean
 next_to_u(void)
 {
-    register struct monst *mtmp;
-    register struct obj *otmp;
+    struct monst *mtmp;
+    struct obj *otmp;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp)) continue;
@@ -772,10 +772,10 @@ next_to_u(void)
 }
 
 void
-check_leash(register xchar x, register xchar y)
+check_leash(xchar x, xchar y)
 {
-    register struct obj *otmp;
-    register struct monst *mtmp;
+    struct obj *otmp;
+    struct monst *mtmp;
 
     for (otmp = invent; otmp; otmp = otmp->nobj) {
         if (otmp->otyp != LEASH || otmp->leashmon == 0) continue;
@@ -1023,7 +1023,7 @@ use_mirror(struct obj *obj)
 static void
 use_bell(struct obj **optr)
 {
-    register struct obj *obj = *optr;
+    struct obj *obj = *optr;
     struct monst *mtmp;
     boolean wakem = FALSE, learno = FALSE,
             ordinary = (obj->otyp != BELL_OF_OPENING || !obj->spe),
@@ -1142,7 +1142,7 @@ use_bell(struct obj **optr)
 }
 
 static void
-use_candelabrum(register struct obj *obj)
+use_candelabrum(struct obj *obj)
 {
     const char *s = (obj->spe != 1) ? "candles" : "candle";
 
@@ -1203,8 +1203,8 @@ use_candelabrum(register struct obj *obj)
 static void
 use_candle(struct obj **optr)
 {
-    register struct obj *obj = *optr;
-    register struct obj *otmp;
+    struct obj *obj = *optr;
+    struct obj *otmp;
     const char *s = (obj->quan != 1) ? "candles" : "candle";
     char qbuf[QBUFSZ], qsfx[QBUFSZ], *q;
 
@@ -1273,7 +1273,7 @@ use_candle(struct obj **optr)
 
 /* call in drop, throw, and put in box, etc. */
 boolean
-snuff_candle(register struct obj *otmp)
+snuff_candle(struct obj *otmp)
 {
     boolean candle = Is_candle(otmp);
 
@@ -1856,7 +1856,7 @@ tinnable(struct obj *corpse)
 }
 
 static void
-use_tinning_kit(register struct obj *obj)
+use_tinning_kit(struct obj *obj)
 {
     struct obj *corpse, *can;
 
@@ -2233,7 +2233,7 @@ figurine_location_checks(struct obj *obj, coord *cc, boolean quietly)
 static void
 use_figurine(struct obj **optr)
 {
-    register struct obj *obj = *optr;
+    struct obj *obj = *optr;
     xchar x, y;
     coord cc;
 
@@ -3272,8 +3272,8 @@ static int
 do_break_wand(struct obj *obj)
 {
     static const char nothing_else_happens[] = "But nothing else happens...";
-    register int i, x, y;
-    register struct monst *mon;
+    int i, x, y;
+    struct monst *mon;
     int dmg, damage;
     boolean affects_objects, is_fragile;
     boolean shop_damage = FALSE;
@@ -3657,7 +3657,7 @@ discard_broken_wand:
 static boolean
 uhave_graystone(void)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     for(otmp = invent; otmp; otmp = otmp->nobj)
         if(is_graystone(otmp))
@@ -3768,7 +3768,7 @@ int
 doapply(void)
 {
     struct obj *obj;
-    register int res = 1;
+    int res = 1;
     char class_list[MAXOCLASSES+2];
 
     if(check_capacity((char *)0)) return (0);

@@ -1069,7 +1069,7 @@ unturn_dead(struct monst *mon)
     return res;
 }
 
-boolean cancellable(register struct obj *obj)
+boolean cancellable(struct obj *obj)
 {
     return objects[obj->otyp].oc_magic ||
            (obj->spe &&
@@ -1082,7 +1082,7 @@ boolean cancellable(register struct obj *obj)
 
 /* cancel obj, possibly carried by you or a monster */
 void
-cancel_item(register struct obj *obj)
+cancel_item(struct obj *obj)
 {
     boolean u_ring = (obj == uleft) || (obj == uright);
 
@@ -1379,7 +1379,7 @@ obj_shudders(struct obj *obj)
 static void
 polyuse(struct obj *objhdr, int mat, int minwt)
 {
-    register struct obj *otmp, *otmp2;
+    struct obj *otmp, *otmp2;
 
     for (otmp = objhdr; minwt > 0 && otmp; otmp = otmp2) {
         otmp2 = otmp->nexthere;
@@ -2202,7 +2202,7 @@ int
 bhitpile(struct obj *obj, int (*fhito) (struct obj *, struct obj *), int tx, int ty, schar zz)
 {
     int hitanything = 0;
-    register struct obj *otmp, *next_obj;
+    struct obj *otmp, *next_obj;
 
     if (obj->otyp == SPE_FORCE_BOLT || obj->otyp == WAN_STRIKING) {
         struct trap *t = t_at(tx, ty);
@@ -2239,7 +2239,7 @@ bhitpile(struct obj *obj, int (*fhito) (struct obj *, struct obj *), int tx, int
  *            it removes a charge from the wand.
  */
 int
-zappable(register struct obj *wand)
+zappable(struct obj *wand)
 {
     int zap_it = 1;
     if (wand->spe < 0) {
@@ -2260,7 +2260,7 @@ zappable(register struct obj *wand)
  * added by GAN 11/03/86
  */
 void
-zapnodir(register struct obj *obj)
+zapnodir(struct obj *obj)
 {
     boolean known = FALSE;
 
@@ -2323,7 +2323,7 @@ static NEARDATA const char zap_syms[] = { WAND_CLASS, 0 };
 int
 dozap(void)
 {
-    register struct obj *obj;
+    struct obj *obj;
     int damage;
 
     if(check_capacity((char *)0)) return(0);
@@ -2857,7 +2857,7 @@ zap_steed(struct obj *obj) /**< wand or spell */
  * themselves with cancellation.
  */
 boolean
-cancel_monst(register struct monst *mdef, register struct obj *obj, boolean youattack, boolean allow_cancel_kill, boolean self_cancel)
+cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack, boolean allow_cancel_kill, boolean self_cancel)
 {
     boolean youdefend = (mdef == &youmonst);
     static const char writing_vanishes[] =
@@ -3280,7 +3280,7 @@ zapwrapup(void)
 
 /* called for various wand and spell effects - M. Stephenson */
 void
-weffects(register struct obj *obj)
+weffects(struct obj *obj)
 {
     int otyp = obj->otyp;
     boolean disclose = FALSE, was_unkn = !objects[otyp].oc_name_known;
@@ -3391,7 +3391,7 @@ spell_hit_bonus(int skill)
 }
 
 const char *
-exclam(register int force)
+exclam(int force)
 {
     /* force == 0 occurs e.g. with sleep ray */
     /* note that large force is usual with wands so that !! would
@@ -3413,7 +3413,7 @@ hit(const char *str,    /**< zap text or missile name */
 }
 
 void
-miss(register const char *str, register struct monst *mtmp)
+miss(const char *str, struct monst *mtmp)
 {
     pline("%s %s %s.", The(str), vtense(str, "miss"),
           ((cansee(bhitpos.x, bhitpos.y) || canspotmon(mtmp))
@@ -3771,7 +3771,7 @@ bhit(
 struct monst *
 boomhit(struct obj *obj, int dx, int dy)
 {
-    register int i, ct;
+    int i, ct;
     int boom; /* showsym[] index  */
     struct monst *mtmp;
     boolean counterclockwise = TRUE; /* right-handed throw */
@@ -3852,8 +3852,8 @@ zhitm(
     int nd,             /**< number of hit dice to use */
     struct obj **ootmp) /**< to return worn armor for caller to disintegrate */
 {
-    register int tmp = 0;
-    register int abstype = abs(type) % 10;
+    int tmp = 0;
+    int abstype = abs(type) % 10;
     boolean sho_shieldeff = FALSE;
     boolean spellcaster = is_hero_spell(type); /* maybe get a bonus! */
 
@@ -3977,7 +3977,7 @@ zhitm(
 #endif
         if (!resists_blnd(mon) &&
             !(type > 0 && u.uswallow && mon == u.ustuck)) {
-            register unsigned rnd_tmp = rnd(50);
+            unsigned rnd_tmp = rnd(50);
             mon->mcansee = 0;
             if((mon->mblinded + rnd_tmp) > 127)
                 mon->mblinded = 127;
@@ -4345,11 +4345,11 @@ dobuzz(
 {
     int range, abstype = abs(type) % 10;
     struct rm *lev;
-    register xchar lsx, lsy;
+    xchar lsx, lsy;
     struct monst *mon;
     coord save_bhitpos;
     boolean shopdamage = FALSE;
-    register const char *fltxt;
+    const char *fltxt;
     struct obj *otmp;
     int spell_type;
 
@@ -4358,7 +4358,7 @@ dobuzz(
 
     fltxt = flash_types[(type <= -30) ? abstype : abs(type)];
     if(u.uswallow) {
-        register int tmp;
+        int tmp;
 
         if(type < 0) return;
         tmp = zhitm(u.ustuck, type, nd, &otmp);
@@ -4722,7 +4722,7 @@ zap_over_floor(xchar x, xchar y, int type, boolean *shopdamage, short int explod
             if (lev->typ != POOL && lev->typ != BOG) { /* MOAT or DRAWBRIDGE_UP */
                 if (cansee(x, y)) msgtxt = "Some water evaporates.";
             } else {
-                register struct trap *ttmp;
+                struct trap *ttmp;
 
                 rangemod -= 3;
                 if (lev->typ == BOG) {
@@ -5025,7 +5025,7 @@ fracture_rock(struct obj *obj) /* no texts here! */
 
 /* handle statue hit by striking/force bolt/pick-axe */
 boolean
-break_statue(register struct obj *obj)
+break_statue(struct obj *obj)
 {
     /* [obj is assumed to be on floor, so no get_obj_location() needed] */
     struct trap *trap = t_at(obj->ox, obj->oy);

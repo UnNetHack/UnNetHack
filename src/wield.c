@@ -84,7 +84,7 @@ static int wield(boolean prompt_for_obj);
  * to print the appropriate messages.
  */
 void
-setuwep(register struct obj *obj)
+setuwep(struct obj *obj)
 {
     struct obj *olduwep = uwep;
     int oldcon = acurr(A_CON);
@@ -254,13 +254,13 @@ ready_weapon(struct obj *wep)
 }
 
 void
-setuqwep(register struct obj *obj)
+setuqwep(struct obj *obj)
 {
     setworn(obj, W_QUIVER);
 }
 
 void
-setuswapwep(register struct obj *obj)
+setuswapwep(struct obj *obj)
 {
     if (obj) {
         obj->quiver_priority = 0;
@@ -298,7 +298,7 @@ dowield(void)
 static int
 wield(boolean prompt_for_obj)
 {
-    register struct obj *wep=&zeroobj, *oldwep;
+    struct obj *wep=&zeroobj, *oldwep;
     int result;
 
     /* May we attempt this? */
@@ -352,7 +352,7 @@ wield(boolean prompt_for_obj)
 int
 doswapweapon(void)
 {
-    register struct obj *oldwep, *oldswap;
+    struct obj *oldwep, *oldswap;
     int result = 0;
 
     /* May we attempt this? */
@@ -685,7 +685,7 @@ untwoweapon(void)
 }
 
 int
-chwepon(register struct obj *otmp, register int amount)
+chwepon(struct obj *otmp, int amount)
 {
     const char *color = hcolor((amount < 0) ? NH_BLACK : NH_BLUE);
     const char *xtime;
@@ -828,7 +828,7 @@ chwepon(register struct obj *otmp, register int amount)
 }
 
 int
-welded(register struct obj *obj)
+welded(struct obj *obj)
 {
     if (obj && obj == uwep && will_weld(obj)) {
         set_bknown(obj, 1);
@@ -838,7 +838,7 @@ welded(register struct obj *obj)
 }
 
 void
-weldmsg(register struct obj *obj)
+weldmsg(struct obj *obj)
 {
     long savewornmask;
 

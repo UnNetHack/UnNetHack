@@ -192,10 +192,10 @@ convert_uchars(
 void
 tty_startup(int *wid, int *hgt)
 {
-    register int i;
+    int i;
 #ifdef TERMLIB
-    register const char *term;
-    register char *tptr;
+    const char *term;
+    char *tptr;
     char *tbufptr, *pc;
 #endif
 
@@ -547,7 +547,7 @@ static void tty_ascgraphics_hilite_fixup();
 static void
 tty_ascgraphics_hilite_fixup(void)
 {
-    register int c;
+    int c;
 
     for (c = 0; c < CLR_MAX / 2; c++)
         if (c != CLR_BLACK) {
@@ -689,7 +689,7 @@ cl_end(void)
     else {  /* no-CE fix - free after Harold Rynes */
         /* this looks terrible, especially on a slow terminal
            but is better than nothing */
-        register int cx = ttyDisplay->curx+1;
+        int cx = ttyDisplay->curx+1;
 
         while(cx < CO) {
             xputc(' ');
@@ -815,7 +815,7 @@ void
 tty_delay_output(void)
 {
 #if defined(MICRO)
-    register int i;
+    int i;
 #endif
     if (iflags.debug_fuzzer) {
         return;
@@ -845,9 +845,9 @@ tty_delay_output(void)
 
     else if(ospeed > 0 && ospeed < SIZE(tmspc10) && nh_CM) {
         /* delay by sending cm(here) an appropriate number of times */
-        register int cmlen = strlen(tgoto(nh_CM, ttyDisplay->curx,
+        int cmlen = strlen(tgoto(nh_CM, ttyDisplay->curx,
                                           ttyDisplay->cury));
-        register int i = 500 + tmspc10[ospeed]/2;
+        int i = 500 + tmspc10[ospeed]/2;
 
         while(i > 0) {
             cmov((int)ttyDisplay->curx, (int)ttyDisplay->cury);
@@ -864,7 +864,7 @@ cl_eos(void) /* free after Robert Viduya */
     if(nh_CD)
         xputs(nh_CD);
     else {
-        register int cy = ttyDisplay->cury+1;
+        int cy = ttyDisplay->cury+1;
         while(cy <= LI-2) {
             cl_end();
             xputc('\n');
@@ -1243,7 +1243,7 @@ init_color_rgb(int color, uint64_t rgb)
 static void
 init_hilite(void)
 {
-    register int c;
+    int c;
     char *setf, *scratch;
 
     for (c = 0; c < SIZE(hilites); c++) {
@@ -1360,7 +1360,7 @@ analyze_seq (str, fg, bg)
 char *str;
 int *fg, *bg;
 {
-    register int c, code;
+    int c, code;
     int len;
 
 #   ifdef MICRO
@@ -1418,7 +1418,7 @@ int *fg, *bg;
 static void
 init_hilite(void)
 {
-    register int c;
+    int c;
 #  ifdef TOS
     extern unsigned long tos_numcolors; /* in tos.c */
     static char NOCOL[] = "\033b0", COLHE[] = "\033q\033b0";
@@ -1501,7 +1501,7 @@ static void
 kill_hilite(void)
 {
 # ifndef TOS
-    register int c;
+    int c;
 
     for (c = 0; c < CLR_MAX / 2; c++) {
         if ((!iflags.wc2_newcolors) &&

@@ -539,10 +539,10 @@ topten(int how)
     int uid = getuid();
     int rank, rank0 = -1, rank1 = 0;
     int occ_cnt = PERSMAX;
-    register struct toptenentry *t0, *tprev;
+    struct toptenentry *t0, *tprev;
     struct toptenentry *t1;
     FILE *rfile;
-    register int flg = 0;
+    int flg = 0;
     boolean t0_used;
 #ifdef LOGFILE
     FILE *lfile;
@@ -893,7 +893,7 @@ static void
 outheader(void)
 {
     char linebuf[BUFSZ];
-    register char *bp;
+    char *bp;
 
     Strcpy(linebuf, " No  Points     Name");
     bp = eos(linebuf);
@@ -1230,10 +1230,10 @@ prscore(int argc, char **argv)
     const char **players;
     int playerct, rank;
     boolean current_ver = TRUE, init_done = FALSE;
-    register struct toptenentry *t1;
+    struct toptenentry *t1;
     FILE *rfile;
     boolean match_found = FALSE;
-    register int i;
+    int i;
     char pbuf[BUFSZ];
     int uid = -1;
 #ifndef PERS_IS_UID
@@ -1393,8 +1393,8 @@ struct obj *
 tt_oname(struct obj *otmp)
 {
     int rank;
-    register int i;
-    register struct toptenentry *tt;
+    int i;
+    struct toptenentry *tt;
     FILE *rfile;
     struct toptenentry tt_buf;
 

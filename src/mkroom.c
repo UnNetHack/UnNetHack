@@ -32,9 +32,9 @@ static void rest_room(int, struct mkroom *);
 extern const struct shclass shtypes[];  /* defined in shknam.c */
 
 static boolean
-isbig(register struct mkroom *sroom)
+isbig(struct mkroom *sroom)
 {
-    register int area = (sroom->hx - sroom->lx + 1)
+    int area = (sroom->hx - sroom->lx + 1)
                         * (sroom->hy - sroom->ly + 1);
 
     return((boolean)( area > 20 ));
@@ -68,7 +68,7 @@ mkroom(int roomtype)
 static void
 mkshop(void)
 {
-    register struct mkroom *sroom;
+    struct mkroom *sroom;
     int i = -1;
 #ifdef WIZARD
     char *ep = (char *)0;   /* (init == lint suppression) */
@@ -176,7 +176,7 @@ gottype:
     }
 
     if(i < 0) {         /* shoptype not yet determined */
-        register int j;
+        int j;
 
         /* pick a shop type at random */
         for (j = rnd(100), i = 0; (j -= shtypes[i].prob) > 0; i++)
@@ -237,7 +237,7 @@ pick_room(boolean strict)
 static void
 mkzoo(int type)
 {
-    register struct mkroom *sroom;
+    struct mkroom *sroom;
 
     if ((sroom = pick_room(FALSE)) != 0) {
         sroom->rtype = type;
@@ -267,7 +267,7 @@ void
 fill_zoo(struct mkroom *sroom)
 {
     struct monst *mon;
-    register int sx, sy, i;
+    int sx, sy, i;
     int sh, tx = 0, ty = 0, goldlim = 0, type = sroom->rtype;
     int rmno = (sroom - rooms) + ROOMOFFSET;
     coord mm;
@@ -510,7 +510,7 @@ mkundead(coord *mm, boolean revive_corpses, int mm_flags)
 static struct permonst *
 morguemon(void)
 {
-    register int i = rn2(100), hd = rn2(level_difficulty());
+    int i = rn2(100), hd = rn2(level_difficulty());
 
     if (hd > 10 && i < 10) {
         if (Inhell || In_endgame(&u.uz)) {
@@ -560,13 +560,13 @@ armorymon(void)
 static void
 mkgarden(struct mkroom *croom) /**< NULL == choose random room */
 {
-    register int tryct = 0;
+    int tryct = 0;
     boolean maderoom = FALSE;
     coord pos;
-    register int i, tried;
+    int i, tried;
 
     while ((tryct++ < 25) && !maderoom) {
-        register struct mkroom *sroom = croom ? croom : &rooms[rn2(nroom)];
+        struct mkroom *sroom = croom ? croom : &rooms[rn2(nroom)];
 
         if (sroom->hx < 0 || (!croom && (sroom->rtype != OROOM ||
                                          !sroom->rlit || has_upstairs(sroom) || has_dnstairs(sroom))))
@@ -606,8 +606,8 @@ mkgarden(struct mkroom *croom) /**< NULL == choose random room */
 static void
 mkswamp(void) /* Michiel Huisjes & Fred de Wilde */
 {
-    register struct mkroom *sroom;
-    register int sx, sy, i, eelct = 0;
+    struct mkroom *sroom;
+    int sx, sy, i, eelct = 0;
 
     for(i=0; i<5; i++) {        /* turn up to 5 rooms swampy */
         sroom = &rooms[rn2(nroom)];
@@ -671,9 +671,9 @@ shrine_pos(int roomno)
 static void
 mktemple(void)
 {
-    register struct mkroom *sroom;
+    struct mkroom *sroom;
     coord *shrine_spot;
-    register struct rm *lev;
+    struct rm *lev;
 
     if(!(sroom = pick_room(TRUE))) return;
 
@@ -693,10 +693,10 @@ mktemple(void)
 }
 
 boolean
-nexttodoor(register int sx, register int sy)
+nexttodoor(int sx, int sy)
 {
-    register int dx, dy;
-    register struct rm *lev;
+    int dx, dy;
+    struct rm *lev;
     for(dx = -1; dx <= 1; dx++) for(dy = -1; dy <= 1; dy++) {
             if(!isok(sx+dx, sy+dy)) continue;
             if(IS_DOOR((lev = &levl[sx+dx][sy+dy])->typ) ||
@@ -707,7 +707,7 @@ nexttodoor(register int sx, register int sy)
 }
 
 boolean
-has_dnstairs(register struct mkroom *sroom)
+has_dnstairs(struct mkroom *sroom)
 {
     if (sroom == dnstairs_room)
         return TRUE;
@@ -717,7 +717,7 @@ has_dnstairs(register struct mkroom *sroom)
 }
 
 boolean
-has_upstairs(register struct mkroom *sroom)
+has_upstairs(struct mkroom *sroom)
 {
     if (sroom == upstairs_room)
         return TRUE;
@@ -727,13 +727,13 @@ has_upstairs(register struct mkroom *sroom)
 }
 
 int
-somex(register struct mkroom *croom)
+somex(struct mkroom *croom)
 {
     return rn1(croom->hx - croom->lx + 1, croom->lx);
 }
 
 int
-somey(register struct mkroom *croom)
+somey(struct mkroom *croom)
 {
     return rn1(croom->hy - croom->ly + 1, croom->ly);
 }
@@ -823,7 +823,7 @@ somexyspace(struct mkroom *croom, coord *pos, int flags)
 struct mkroom *
 search_special(schar type)
 {
-    register struct mkroom *croom;
+    struct mkroom *croom;
 
     for(croom = &rooms[0]; croom->hx >= 0; croom++)
         if((type == ANY_TYPE && croom->rtype != OROOM) ||

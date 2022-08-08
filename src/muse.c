@@ -1100,7 +1100,7 @@ try_again:
 boolean
 find_offensive(struct monst *mtmp)
 {
-    register struct obj *obj;
+    struct obj *obj;
     boolean ranged_stuff = lined_up(mtmp);
     boolean reflection_skip = (Reflecting && rn2(2));
     struct obj *helmet = which_armor(mtmp, W_ARMH);
@@ -1233,7 +1233,7 @@ find_offensive(struct monst *mtmp)
 }
 
 static int
-mbhitm(register struct monst *mtmp, register struct obj *otmp)
+mbhitm(struct monst *mtmp, struct obj *otmp)
 {
     int tmp;
     boolean reveal_invis = FALSE;
@@ -1317,9 +1317,9 @@ mbhit(
     int (*fhito)(OBJ_P, OBJ_P), /**< fns called when mon/obj hit */
     struct obj *obj) /**< 2nd arg to fhitm/fhito */
 {
-    register struct monst *mtmp;
-    register struct obj *otmp;
-    register uchar typ;
+    struct monst *mtmp;
+    struct obj *otmp;
+    uchar typ;
     int ddx, ddy;
 
     bhitpos.x = mon->mx;
@@ -1357,7 +1357,7 @@ mbhit(
         /* modified by GAN to hit all objects */
         if (fhito) {
             int hitanything = 0;
-            register struct obj *next_obj;
+            struct obj *next_obj;
 
             for(otmp = level.objects[bhitpos.x][bhitpos.y];
                 otmp; otmp = next_obj) {
@@ -1452,7 +1452,7 @@ use_offensive(struct monst *mtmp)
     case MUSE_SCR_EARTH:
     {
         /* TODO: handle steeds */
-        register int x, y;
+        int x, y;
         /* don't use monster fields after killing it */
         boolean confused = (mtmp->mconf ? TRUE : FALSE);
         int mmx = mtmp->mx, mmy = mtmp->my;
@@ -1622,7 +1622,7 @@ rnd_offensive_item(struct monst *mtmp)
 boolean
 find_misc(struct monst *mtmp)
 {
-    register struct obj *obj;
+    struct obj *obj;
     struct permonst *mdat = mtmp->data;
     int x = mtmp->mx, y = mtmp->my;
     struct trap *t;
@@ -1785,7 +1785,7 @@ use_misc(struct monst *mtmp)
         mquaffmsg(mtmp, otmp);
         if (otmp->cursed) {
             if (Can_rise_up(mtmp->mx, mtmp->my, &u.uz)) {
-                register int tolev = depth(&u.uz)-1;
+                int tolev = depth(&u.uz)-1;
                 d_level tolevel;
 
                 get_level(&tolevel, tolev);

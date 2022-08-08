@@ -256,9 +256,9 @@ cant_reach_floor(int x, int y, boolean up, boolean check_pit)
 }
 
 const char *
-surface(register int x, register int y)
+surface(int x, int y)
 {
-    register struct rm *lev = &levl[x][y];
+    struct rm *lev = &levl[x][y];
 
     if ((x == u.ux) && (y == u.uy) && u.uswallow &&
         is_animal(u.ustuck->data))
@@ -289,9 +289,9 @@ surface(register int x, register int y)
 }
 
 const char *
-ceiling(register int x, register int y)
+ceiling(int x, int y)
 {
-    register struct rm *lev = &levl[x][y];
+    struct rm *lev = &levl[x][y];
     const char *what;
 
     /* other room types will no longer exist when we're interested --
@@ -319,7 +319,7 @@ ceiling(register int x, register int y)
 struct engr *
 engr_at(xchar x, xchar y)
 {
-    register struct engr *ep = head_engr;
+    struct engr *ep = head_engr;
 
     while(ep) {
         if(x == ep->engr_x && y == ep->engr_y)
@@ -338,7 +338,7 @@ engr_at(xchar x, xchar y)
 int
 sengr_at(const char *s, xchar x, xchar y)
 {
-    register struct engr *ep = engr_at(x, y);
+    struct engr *ep = engr_at(x, y);
 
     if (ep && ep->engr_type != HEADSTONE && ep->engr_time <= moves) {
         if (strstri(ep->engr_txt, s) != 0) {
@@ -361,7 +361,7 @@ unsigned
 nengr_at(xchar x, xchar y)
 {
     const char *s = "Elbereth";
-    register struct engr *ep = engr_at(x, y);
+    struct engr *ep = engr_at(x, y);
     unsigned count = 0;
     const char *p;
 
@@ -379,16 +379,16 @@ nengr_at(xchar x, xchar y)
 #endif /* ELBERETH_CONDUCT */
 
 void
-u_wipe_engr(register int cnt)
+u_wipe_engr(int cnt)
 {
     if (can_reach_floor(TRUE))
         wipe_engr_at(u.ux, u.uy, cnt);
 }
 
 void
-wipe_engr_at(register xchar x, register xchar y, register xchar cnt)
+wipe_engr_at(xchar x, xchar y, xchar cnt)
 {
-    register struct engr *ep = engr_at(x, y);
+    struct engr *ep = engr_at(x, y);
 
     /* Headstones are indelible */
     if(ep && ep->engr_type != HEADSTONE) {
@@ -407,7 +407,7 @@ wipe_engr_at(register xchar x, register xchar y, register xchar cnt)
 void
 read_engr_at(int x, int y)
 {
-    register struct engr *ep = engr_at(x, y);
+    struct engr *ep = engr_at(x, y);
     int sensed = 0;
     char buf[BUFSZ];
 
@@ -512,7 +512,7 @@ make_engr_at(int x, int y, const char *s, long int e_time, xchar e_type)
 void
 del_engr_at(int x, int y)
 {
-    register struct engr *ep = engr_at(x, y);
+    struct engr *ep = engr_at(x, y);
 
     if (ep) del_engr(ep);
 }
@@ -1108,7 +1108,7 @@ engrave(const char *engraving, boolean fingers)
      * possible) by now.
      */
     if (oep) {
-        register char c = 'n';
+        char c = 'n';
 
         /* Give player the choice to add to engraving. */
         if (type == HEADSTONE || engraving) {
@@ -1448,12 +1448,12 @@ engr_stats(const char *hdrfmt, char *hdrbuf, long int *count, long int *size)
 
 
 void
-del_engr(register struct engr *ep)
+del_engr(struct engr *ep)
 {
     if (ep == head_engr) {
         head_engr = ep->nxt_engr;
     } else {
-        register struct engr *ept;
+        struct engr *ept;
 
         for (ept = head_engr; ept; ept = ept->nxt_engr)
             if (ept->nxt_engr == ep) {

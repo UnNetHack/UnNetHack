@@ -105,8 +105,8 @@ shuffle(int o_low, int o_high, boolean domaterial)
 void
 init_objects(void)
 {
-    register int i, first, last, sum;
-    register char oclass;
+    int i, first, last, sum;
+    char oclass;
 #ifdef TEXTCOLOR
 # define COPY_OBJ_DESCR(o_dst, o_src) \
     o_dst.oc_descr_idx = o_src.oc_descr_idx, \
@@ -278,8 +278,8 @@ swap_armor(
 int
 find_skates(void)
 {
-    register int i;
-    register const char *s;
+    int i;
+    const char *s;
 
     for (i = SPEED_BOOTS; i <= LEVITATION_BOOTS; i++)
         if ((s = OBJ_DESCR(objects[i])) != 0 && !strcmp(s, "snow boots"))
@@ -299,7 +299,7 @@ oinit(void)
 void
 savenames(int fd, int mode)
 {
-    register int i;
+    int i;
     unsigned int len;
 
     if (perform_bwrite(mode)) {
@@ -326,9 +326,9 @@ savenames(int fd, int mode)
 }
 
 void
-restnames(register int fd)
+restnames(int fd)
 {
-    register int i;
+    int i;
     unsigned int len;
 
     mread(fd, (genericptr_t) bases, sizeof bases);
@@ -346,10 +346,10 @@ restnames(register int fd)
 }
 
 void
-discover_object(register int oindx, boolean mark_as_known, boolean credit_hero)
+discover_object(int oindx, boolean mark_as_known, boolean credit_hero)
 {
     if (!objects[oindx].oc_name_known) {
-        register int dindx, acls = objects[oindx].oc_class;
+        int dindx, acls = objects[oindx].oc_class;
 
         /* Loop thru disco[] 'til we find the target (which may have been
            uname'd) or the next open slot; one or the other will be found
@@ -374,11 +374,11 @@ discover_object(register int oindx, boolean mark_as_known, boolean credit_hero)
 
 /* if a class name has been cleared, we may need to purge it from disco[] */
 void
-undiscover_object(register int oindx)
+undiscover_object(int oindx)
 {
     if (!objects[oindx].oc_name_known) {
-        register int dindx, acls = objects[oindx].oc_class;
-        register boolean found = FALSE;
+        int dindx, acls = objects[oindx].oc_class;
+        boolean found = FALSE;
 
         /* find the object; shift those behind it forward one slot */
         for (dindx = bases[acls];
@@ -443,7 +443,7 @@ static short uniq_objs[] = {
 int
 dodiscovered(void) /* free after Robert Viduya */
 {
-    register int i, dis;
+    int i, dis;
     int ct = 0;
     char *s, oclass, prev_class, classes[MAXOCLASSES];
     winid tmpwin;
@@ -722,7 +722,7 @@ doclassdisco(void)
 void
 rename_disco(void)
 {
-    register int i, dis;
+    int i, dis;
     int ct = 0, mn = 0, sl;
     char *s, oclass, prev_class;
     winid tmpwin;

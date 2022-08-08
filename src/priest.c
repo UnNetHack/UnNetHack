@@ -37,10 +37,10 @@ free_epri(struct monst *mtmp)
  * Valid returns are  1: moved  0: didn't  -1: let m_move do it  -2: died.
  */
 int
-move_special(register struct monst *mtmp, boolean in_his_shop, schar appr, boolean uondoor, boolean avoid, register xchar omx, register xchar omy, register xchar gx, register xchar gy)
+move_special(struct monst *mtmp, boolean in_his_shop, schar appr, boolean uondoor, boolean avoid, xchar omx, xchar omy, xchar gx, xchar gy)
 {
-    register xchar nx, ny, nix, niy;
-    register schar i;
+    xchar nx, ny, nix, niy;
+    schar i;
     schar chcnt, cnt;
     coord poss[9];
     long info[9];
@@ -141,9 +141,9 @@ pick_move:
 }
 
 char
-temple_occupied(register char *array)
+temple_occupied(char *array)
 {
-    register char *ptr;
+    char *ptr;
 
     for (ptr = array; *ptr; ptr++)
         if (rooms[*ptr - ROOMOFFSET].rtype == TEMPLE)
@@ -152,7 +152,7 @@ temple_occupied(register char *array)
 }
 
 static boolean
-histemple_at(register struct monst *priest, register xchar x, register xchar y)
+histemple_at(struct monst *priest, xchar x, xchar y)
 {
     return (boolean) (priest && priest->ispriest &&
                       (EPRI(priest)->shroom == *in_rooms(x, y, TEMPLE)) &&
@@ -178,9 +178,9 @@ inhistemple(struct monst *priest)
  * pri_move: return 1: moved  0: didn't  -1: let m_move do it  -2: died
  */
 int
-pri_move(register struct monst *priest)
+pri_move(struct monst *priest)
 {
-    register xchar gx, gy, omx, omy;
+    xchar gx, gy, omx, omy;
     schar temple;
     boolean avoid = TRUE;
 
@@ -380,7 +380,7 @@ has_shrine(struct monst *pri)
 struct monst *
 findpriest(char roomno)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp)) continue;
@@ -393,7 +393,7 @@ findpriest(char roomno)
 
 /* called from check_special_room() when the player enters the temple room */
 void
-intemple(register int roomno)
+intemple(int roomno)
 {
     struct epri *epri_p;
     boolean shrined, sanctum, can_speak;
@@ -542,7 +542,7 @@ forget_temple_entry(struct monst *priest)
 }
 
 void
-priest_talk(register struct monst *priest)
+priest_talk(struct monst *priest)
 {
     boolean coaligned = p_coaligned(priest);
     boolean strayed = (u.ualign.record < 0);
@@ -654,10 +654,10 @@ priest_talk(register struct monst *priest)
 }
 
 struct monst *
-mk_roamer(register struct permonst *ptr, aligntyp alignment, xchar x, xchar y, boolean peaceful)
+mk_roamer(struct permonst *ptr, aligntyp alignment, xchar x, xchar y, boolean peaceful)
 {
-    register struct monst *roamer;
-    register boolean coaligned = (u.ualign.type == alignment);
+    struct monst *roamer;
+    boolean coaligned = (u.ualign.type == alignment);
 
     if (MON_AT(x, y)) (void) rloc(m_at(x, y), FALSE);   /* insurance */
 
@@ -679,7 +679,7 @@ mk_roamer(register struct permonst *ptr, aligntyp alignment, xchar x, xchar y, b
 }
 
 void
-reset_hostility(register struct monst *roamer)
+reset_hostility(struct monst *roamer)
 {
     if (!roamer->isminion) {
         return;
@@ -701,8 +701,8 @@ in_your_sanctuary(struct monst *mon, xchar x, xchar y)
                     /* if non-null, <mx,my> overrides <x,y> */
 
 {
-    register char roomno;
-    register struct monst *priest;
+    char roomno;
+    struct monst *priest;
 
     if (mon) {
         if (is_minion(mon->data) || is_rider(mon->data)) return FALSE;
@@ -785,7 +785,7 @@ ghod_hitsu(struct monst *priest)
 void
 angry_priest(void)
 {
-    register struct monst *priest;
+    struct monst *priest;
     struct rm *lev;
 
     if ((priest = findpriest(temple_occupied(u.urooms))) != 0) {
@@ -840,7 +840,7 @@ clearpriests(void)
 
 /* munge priest-specific structure when restoring -dlc */
 void
-restpriest(register struct monst *mtmp, boolean ghostly)
+restpriest(struct monst *mtmp, boolean ghostly)
 {
     if (u.uz.dlevel) {
         if (ghostly)

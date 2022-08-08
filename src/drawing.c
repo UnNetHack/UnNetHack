@@ -791,9 +791,9 @@ def_char_to_monclass(char ch)
 }
 
 void
-assign_graphics(register glyph_t *graph_chars, int glth, int maxlen, int offset)
+assign_graphics(glyph_t *graph_chars, int glth, int maxlen, int offset)
 {
-    register int i;
+    int i;
 
     for (i = 0; i < maxlen; i++)
         showsyms[i+offset] = (((i < glth) && graph_chars[i]) ?
@@ -992,7 +992,7 @@ assign_rogue_graphics(boolean is_rlevel)
     /* Adjust graphics display characters on Rogue levels */
 
     if (is_rlevel) {
-        register int i;
+        int i;
 
         save_syms();
 

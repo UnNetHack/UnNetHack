@@ -1180,8 +1180,8 @@ do_mname(void)
 {
     char buf[BUFSZ];
     coord cc;
-    register int cx, cy;
-    register struct monst *mtmp;
+    int cx, cy;
+    struct monst *mtmp;
     char qbuf[BUFSZ*2];
 
     if (Hallucination) {
@@ -1238,7 +1238,7 @@ static int via_naming = 0;
  * when obj is in the inventory.
  */
 void
-do_oname(register struct obj *obj)
+do_oname(struct obj *obj)
 {
     char *bufp, buf[BUFSZ], bufcpy[BUFSZ], qbuf[QBUFSZ];
     const char *aname;
@@ -1289,7 +1289,7 @@ do_oname(register struct obj *obj)
         return;
     } else if (restrict_name(obj, buf, FALSE) || exist_artifact(obj->otyp, buf)) {
         int n = rn2((int)strlen(buf));
-        register char c1, c2;
+        char c1, c2;
 
         c1 = lowc(buf[n]);
         do c2 = 'a' + rn2('z'-'a'); while (c1 == c2);
@@ -1376,7 +1376,7 @@ objtyp_is_callable(int i)
 int
 ddocall(void)
 {
-    register struct obj *obj;
+    struct obj *obj;
 #ifdef REDO
     char ch;
 #endif
@@ -1507,7 +1507,7 @@ call_input(int obj_otyp, char *prompt)
 static void
 call_object(int obj_otyp, char *buf)
 {
-    register char **str1;
+    char **str1;
     /* clear old name */
     str1 = &(objects[obj_otyp].oc_uname);
     if(*str1) free((genericptr_t)*str1);
@@ -1639,7 +1639,7 @@ rndghostname(void)
  * options works, since those are special cases.
  */
 char *
-x_monnam(register struct monst *mtmp, int article, const char *adjective, int suppress, boolean called)
+x_monnam(struct monst *mtmp, int article, const char *adjective, int suppress, boolean called)
 
 
 /* ARTICLE_NONE, ARTICLE_THE, ARTICLE_A: obvious
@@ -1867,7 +1867,7 @@ noit_mon_nam(struct monst *mtmp)
 char *
 Monnam(struct monst *mtmp)
 {
-    register char *bp = mon_nam(mtmp);
+    char *bp = mon_nam(mtmp);
 
     *bp = highc(*bp);
     return(bp);
@@ -1876,7 +1876,7 @@ Monnam(struct monst *mtmp)
 char *
 noit_Monnam(struct monst *mtmp)
 {
-    register char *bp = noit_mon_nam(mtmp);
+    char *bp = noit_mon_nam(mtmp);
 
     *bp = highc(*bp);
     return(bp);
@@ -1922,7 +1922,7 @@ Adjmonnam(struct monst *mtmp, const char *adj)
 }
 
 char *
-a_monnam(register struct monst *mtmp)
+a_monnam(struct monst *mtmp)
 {
     return x_monnam(mtmp, ARTICLE_A, (char *)0,
                     has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);

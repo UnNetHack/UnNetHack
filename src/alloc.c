@@ -28,7 +28,7 @@ extern void VDECL(panic, (const char *, ...)) PRINTF_F(1, 2);
 
 
 long *
-alloc(register unsigned int lth)
+alloc(unsigned int lth)
 {
     void *ptr;
 

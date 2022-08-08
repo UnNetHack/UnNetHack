@@ -569,8 +569,8 @@ pick_lock(
 int
 doforce(void)
 {
-    register struct obj *otmp;
-    register int c, picktyp;
+    struct obj *otmp;
+    int c, picktyp;
     char qbuf[QBUFSZ];
 
     if (u.uswallow) {
@@ -675,7 +675,7 @@ doopen_indir(int x, int y)
 {
 #endif /* AUTO_OPEN */
     coord cc;
-    register struct rm *door;
+    struct rm *door;
     boolean portcullis;
     int res = 0;
     struct monst *mtmp;
@@ -783,7 +783,7 @@ doopen_indir(int x, int y)
 }
 
 static boolean
-obstructed(register int x, register int y, boolean quietly)
+obstructed(int x, int y, boolean quietly)
 {
     struct monst *mtmp = m_at(x, y);
 
@@ -821,8 +821,8 @@ obstructed(register int x, register int y, boolean quietly)
 int
 doclose(void)
 {
-    register int x, y;
-    register struct rm *door;
+    int x, y;
+    struct rm *door;
     struct monst *mtmp;
     boolean portcullis;
     int res = 0;
@@ -964,7 +964,7 @@ boxlock(struct obj *obj, struct obj *otmp) /* obj *is* a box */
 boolean
 doorlock(struct obj *otmp, int x, int y)
 {
-    register struct rm *door = &levl[x][y];
+    struct rm *door = &levl[x][y];
     boolean res = TRUE;
     int loudness = 0;
     const char *msg = (const char *)0;

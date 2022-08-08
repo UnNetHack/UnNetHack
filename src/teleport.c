@@ -193,7 +193,7 @@ goodpos(int x, int y, struct monst *mtmp, unsigned int gpflags)
  * Return TRUE and the position chosen when successful, FALSE otherwise.
  */
 boolean
-enexto(coord *cc, register xchar xx, register xchar yy, struct permonst *mdat)
+enexto(coord *cc, xchar xx, xchar yy, struct permonst *mdat)
 {
     return enexto_core(cc, xx, yy, mdat, NO_MM_FLAGS);
 }
@@ -333,7 +333,7 @@ coord epathto_debug_cc[100];
 #endif
 
 int
-epathto(coord *cc, int nc, register xchar xx, register xchar yy, struct permonst *mdat)
+epathto(coord *cc, int nc, xchar xx, xchar yy, struct permonst *mdat)
 {
     int i, j, dir, ndirs, xy, x, y, r;
     int path_len, postype;
@@ -481,7 +481,7 @@ tele_jump_ok(int x1, int y1, int x2, int y2)
 }
 
 static boolean
-teleok(register int x, register int y, boolean trapok)
+teleok(int x, int y, boolean trapok)
 {
     if (!trapok) {
         /* allow teleportation onto vibrating square, it's not a real trap */
@@ -498,7 +498,7 @@ teleok(register int x, register int y, boolean trapok)
 }
 
 void
-teleds(register int nux, register int nuy, boolean allow_drag)
+teleds(int nux, int nuy, boolean allow_drag)
 {
     if (u.utraptype == TT_BURIEDBALL) {
         /* unearth it */
@@ -633,7 +633,7 @@ teleds(register int nux, register int nuy, boolean allow_drag)
 boolean
 safe_teleds(boolean allow_drag)
 {
-    register int nux, nuy, tcnt = 0;
+    int nux, nuy, tcnt = 0;
 
     do {
         nux = rnd(COLNO-1);
@@ -650,7 +650,7 @@ safe_teleds(boolean allow_drag)
 static void
 vault_tele(void)
 {
-    register struct mkroom *croom = search_special(VAULT);
+    struct mkroom *croom = search_special(VAULT);
     coord c;
 
     if (croom && somexy(croom, &c) && teleok(c.x, c.y, FALSE)) {
@@ -661,9 +661,9 @@ vault_tele(void)
 }
 
 boolean
-teleport_pet(register struct monst *mtmp, boolean force_it)
+teleport_pet(struct monst *mtmp, boolean force_it)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     if (mtmp == u.usteed)
         return (FALSE);
@@ -893,7 +893,7 @@ dotele(boolean break_the_rules) /**< TRUE: wizard mode ^T */
     }
     if (!trap) {
         boolean castit = FALSE;
-        register int sp_no = 0, energy = 0;
+        int sp_no = 0, energy = 0;
 
         if (!Teleportation || (u.ulevel < (Role_if(PM_WIZARD) ? 8 : 12)
                                && !can_teleport(youmonst.data))) {
@@ -990,7 +990,7 @@ dotele(boolean break_the_rules) /**< TRUE: wizard mode ^T */
 void
 level_tele(void)
 {
-    register int newlev;
+    int newlev;
     d_level newlevel;
     const char *escape_by_flying = 0; /* when surviving dest of -N */
     char buf[BUFSZ];
@@ -1274,7 +1274,7 @@ random_levtport:
 }
 
 void
-domagicportal(register struct trap *ttmp)
+domagicportal(struct trap *ttmp)
 {
     struct d_level target_level;
 
@@ -1364,11 +1364,11 @@ level_tele_trap(struct trap *trap, unsigned int trflags)
 
 /* check whether monster can arrive at location <x,y> via Tport (or fall) */
 static boolean
-rloc_pos_ok(register int x, register int y, struct monst *mtmp)
+rloc_pos_ok(int x, int y, struct monst *mtmp)
                    /* coordinates of candidate location */
 
 {
-    register int xx, yy;
+    int xx, yy;
 
     if (!goodpos(x, y, mtmp, 0)) return FALSE;
     /*
@@ -1428,9 +1428,9 @@ rloc_pos_ok(register int x, register int y, struct monst *mtmp)
  * the worm.
  */
 void
-rloc_to(struct monst *mtmp, register int x, register int y)
+rloc_to(struct monst *mtmp, int x, int y)
 {
-    register int oldx = mtmp->mx, oldy = mtmp->my;
+    int oldx = mtmp->mx, oldy = mtmp->my;
     boolean resident_shk = mtmp->isshk && inhishop(mtmp);
 
     if (x == mtmp->mx && y == mtmp->my && m_at(x, y) == mtmp) {
@@ -1480,7 +1480,7 @@ rloc(struct monst *mtmp, boolean suppress_impossible)
                     /* mx==0 implies migrating monster arrival */
 
 {
-    register int x, y, trycount;
+    int x, y, trycount;
 
     if (mtmp == u.usteed) {
         tele();
@@ -1682,9 +1682,9 @@ mlevel_tele_trap(struct monst *mtmp, struct trap *trap, boolean force_it, int in
 
 /* place object randomly, returns False if it's gone (eg broken) */
 boolean
-rloco(register struct obj *obj)
+rloco(struct obj *obj)
 {
-    register xchar tx, ty, otx, oty;
+    xchar tx, ty, otx, oty;
     boolean restricted_fall;
     int try_limit = 4000;
 

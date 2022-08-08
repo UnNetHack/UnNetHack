@@ -18,7 +18,7 @@ static void share_hp(struct monst* mon1, struct monst* mon2);
 
 /* TRUE if mtmp died */
 boolean
-mb_trapped(register struct monst *mtmp)
+mb_trapped(struct monst *mtmp)
 {
     if (flags.verbose) {
         if (cansee(mtmp->mx, mtmp->my) && !Unaware) {
@@ -77,7 +77,7 @@ mon_yells(struct monst *mon, const char *shout)
 }
 
 static void
-watch_on_duty(register struct monst *mtmp)
+watch_on_duty(struct monst *mtmp)
 {
     int x, y;
 
@@ -113,7 +113,7 @@ watch_on_duty(register struct monst *mtmp)
 }
 
 int
-dochugw(register struct monst *mtmp)
+dochugw(struct monst *mtmp)
 {
     int x = mtmp->mx, y = mtmp->my;
     boolean already_saw_mon = !occupation ? 0 : canspotmon(mtmp);
@@ -213,7 +213,7 @@ mon_regen(struct monst *mon, boolean digest_meal)
  * jolted awake.
  */
 static int
-disturb(register struct monst *mtmp)
+disturb(struct monst *mtmp)
 {
     /*
      * + Ettins are hard to surprise.
@@ -322,7 +322,7 @@ monflee(struct monst *mtmp, int fleetime, boolean first, boolean fleemsg)
 }
 
 static void
-distfleeck(register struct monst *mtmp, int *inrange, int *nearby, int *scared)
+distfleeck(struct monst *mtmp, int *inrange, int *nearby, int *scared)
 {
     int seescaryx, seescaryy;
     boolean sawscary = FALSE, bravegremlin = (rn2(5) == 0);
@@ -378,10 +378,10 @@ m_arrival(struct monst *mon)
  * code. --KAA
  */
 int
-dochug(register struct monst *mtmp)
+dochug(struct monst *mtmp)
 {
-    register struct permonst *mdat;
-    register int tmp=0;
+    struct permonst *mdat;
+    int tmp=0;
     int inrange, nearby, scared;
     struct obj *ygold = 0, *lepgold = 0;
     struct monst* currmon;
@@ -591,7 +591,7 @@ dochug(register struct monst *mtmp)
             (!Conflict || resist(mtmp, RING_CLASS, 0, 0))) {
             pline("It feels quite soothing.");
         } else if (!u.uinvulnerable) {
-            register boolean m_sen = sensemon(mtmp);
+            boolean m_sen = sensemon(mtmp);
 
             if (m_sen || (Blind_telepat && rn2(2)) || !rn2(10)) {
                 int dmg;
@@ -777,7 +777,7 @@ static NEARDATA const char boulder_class[] = { ROCK_CLASS, 0 };
 static NEARDATA const char gem_class[] = { GEM_CLASS, 0 };
 
 boolean
-itsstuck(register struct monst *mtmp)
+itsstuck(struct monst *mtmp)
 {
     if (sticks(youmonst.data) && mtmp == u.ustuck && !u.uswallow) {
         pline("%s cannot escape from you!", Monnam(mtmp));
@@ -804,7 +804,7 @@ should_displace(struct monst *mtmp, coord *poss, long int *info, int cnt, xchar 
     int shortest_with_displacing = -1;
     int shortest_without_displacing = -1;
     int count_without_displacing = 0;
-    register int i, nx, ny;
+    int i, nx, ny;
     int ndist;
 
     for (i = 0; i < cnt; i++) {
@@ -874,9 +874,9 @@ m_digweapon_check(struct monst *mtmp, xchar nix, xchar niy)
  * 3: did not move, and can't do anything else either.
  */
 int
-m_move(register struct monst *mtmp, register int after)
+m_move(struct monst *mtmp, int after)
 {
-    register int appr;
+    int appr;
     xchar gx, gy, nix, niy, chcnt;
     int chi; /* could be schar except for stupid Sun-2 compiler */
     boolean likegold=0, likegems=0, likeobjs=0, likemagic=0, conceals=0;
@@ -1036,7 +1036,7 @@ not_special:
             appr = -1;
 
         if (!should_see && can_track(ptr)) {
-            register coord *cp;
+            coord *cp;
 
             cp = gettrack(omx, omy);
             if (cp) {
@@ -1061,7 +1061,7 @@ not_special:
              * situation where you toss arrows at it and it has nothing
              * better to do than pick the arrows up.
              */
-            register int pctload = (curr_mon_load(mtmp) * 100) /
+            int pctload = (curr_mon_load(mtmp) * 100) /
                                    max_mon_load(mtmp);
 
             /* look for gold or jewels nearby */
@@ -1080,9 +1080,9 @@ not_special:
 
 #define SQSRCHRADIUS    5
 
-    { register int minr = SQSRCHRADIUS;     /* not too far away */
-      register struct obj *otmp;
-      register int xx, yy;
+    { int minr = SQSRCHRADIUS;     /* not too far away */
+      struct obj *otmp;
+      int xx, yy;
       int oomx, oomy, lmx, lmy;
 
       /* cut down the search radius if it thinks character is closer. */
@@ -1207,10 +1207,10 @@ look_for_obj:
     if (can_unlock) flag |= UNLOCKDOOR;
     if (doorbuster) flag |= BUSTDOOR;
     {
-        register int i, j, nx, ny, nearer;
+        int i, j, nx, ny, nearer;
         int jcnt, cnt;
         int ndist, nidist;
-        register coord *mtrk;
+        coord *mtrk;
         coord poss[9];
 
         cnt = mfndpos(mtmp, poss, info, flag);
@@ -1265,7 +1265,7 @@ nxti:       ;
     }
 
     if(mmoved) {
-        register int j;
+        int j;
 
         if (mmoved==1 && (u.ux != nix || u.uy != niy) && itsstuck(mtmp)) {
             return(3);
@@ -1545,7 +1545,7 @@ postmov:
             /* recompute the likes tests, in case we polymorphed
              * or if the "likegold" case got taken above */
             if (setlikes) {
-                register int pctload = (curr_mon_load(mtmp) * 100) /
+                int pctload = (curr_mon_load(mtmp) * 100) /
                                        max_mon_load(mtmp);
 
                 /* look for gold or jewels nearby */
@@ -1665,14 +1665,14 @@ m_move_aggress(struct monst* mtmp, xchar x, xchar y)
 }
 
 boolean
-closed_door(register int x, register int y)
+closed_door(int x, int y)
 {
     return((boolean)(IS_DOOR(levl[x][y].typ) &&
                      (levl[x][y].doormask & (D_LOCKED | D_CLOSED))));
 }
 
 boolean
-accessible(register int x, register int y)
+accessible(int x, int y)
 {
     int levtyp = levl[x][y].typ;
 
@@ -1685,10 +1685,10 @@ accessible(register int x, register int y)
 
 /* decide where the monster thinks you are standing */
 void
-set_apparxy(register struct monst *mtmp)
+set_apparxy(struct monst *mtmp)
 {
     boolean notseen, gotu;
-    register int disp, mx = mtmp->mux, my = mtmp->muy;
+    int disp, mx = mtmp->mux, my = mtmp->muy;
     long umoney = money_cnt(invent);
 
     /*
@@ -1722,7 +1722,7 @@ set_apparxy(register struct monst *mtmp)
     gotu = notseen ? !rn2(3) : Displaced ? !rn2(4) : FALSE;
 
     if (!gotu) {
-        register int try_cnt = 0;
+        int try_cnt = 0;
         do {
             if (++try_cnt > 200) goto found_you;    /* punt */
             mx = u.ux - disp + rn2(2*disp+1);

@@ -28,7 +28,7 @@ free_edog(struct monst *mtmp)
 }
 
 void
-initedog(register struct monst *mtmp)
+initedog(struct monst *mtmp)
 {
     mtmp->mtame = is_domestic(mtmp->data) ? 10 : 5;
     mtmp->mpeaceful = 1;
@@ -74,7 +74,7 @@ pet_type(void)
 }
 
 struct monst *
-make_familiar(register struct obj *otmp, xchar x, xchar y, boolean quietly)
+make_familiar(struct obj *otmp, xchar x, xchar y, boolean quietly)
 {
     struct permonst *pm;
     struct monst *mtmp = 0;
@@ -158,8 +158,8 @@ make_familiar(register struct obj *otmp, xchar x, xchar y, boolean quietly)
 struct monst *
 makedog(void)
 {
-    register struct monst *mtmp;
-    register struct obj *otmp;
+    struct monst *mtmp;
+    struct obj *otmp;
     const char *petname;
     int pettype;
     static int petname_used = 0;
@@ -613,8 +613,8 @@ mon_catchup_elapsed_time(
 void
 keepdogs(boolean pets_only) /**< TRUE for ascension or final escape */
 {
-    register struct monst *mtmp, *mtmp2;
-    register struct obj *obj;
+    struct monst *mtmp, *mtmp2;
+    struct obj *obj;
     int num_segs;
     boolean stay_behind;
 #ifdef BLACKMARKET
@@ -699,7 +699,7 @@ keepdogs(boolean pets_only) /**< TRUE for ascension or final escape */
                 set_residency(mtmp, TRUE);
 
             if (mtmp->wormno) {
-                register int cnt;
+                int cnt;
                 /* NOTE: worm is truncated to # segs = max wormno size */
                 cnt = count_wsegs(mtmp);
                 num_segs = min(cnt, MAX_NUM_WORMS - 1);
@@ -798,7 +798,7 @@ migrate_to_level(
 /* return quality of food; the lower the better */
 /* fungi will eat even tainted food */
 int
-dogfood(struct monst *mon, register struct obj *obj)
+dogfood(struct monst *mon, struct obj *obj)
 {
     struct permonst *mptr = mon->data, *fptr = 0;
     boolean carni = carnivorous(mptr);

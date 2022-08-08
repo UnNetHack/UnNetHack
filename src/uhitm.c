@@ -256,7 +256,7 @@ check_caitiff(struct monst *mtmp)
 }
 
 int
-find_roll_to_hit(register struct monst *mtmp, uchar aatyp, struct obj *weapon, int *attk_count, int *role_roll_penalty)
+find_roll_to_hit(struct monst *mtmp, uchar aatyp, struct obj *weapon, int *attk_count, int *role_roll_penalty)
 
                     /* usually AT_WEAP or AT_KICK */
                     /* uwep or uswapwep or NULL */
@@ -359,9 +359,9 @@ find_roll_to_hit(register struct monst *mtmp, uchar aatyp, struct obj *weapon, i
 /* try to attack; return FALSE if monster evaded */
 /* u.dx and u.dy must be set */
 boolean
-attack(register struct monst *mtmp)
+attack(struct monst *mtmp)
 {
-    register struct permonst *mdat = mtmp->data;
+    struct permonst *mdat = mtmp->data;
 
     /* This section of code provides protection against accidentally
      * hitting peaceful (like '@') and tame (like 'd') monsters.
@@ -492,7 +492,7 @@ atk_done:
 
 /* really hit target monster; returns TRUE if it still lives */
 static boolean
-known_hitum(register struct monst *mon, struct obj *weapon, int *mhit, int rollneeded, int armorpenalty, struct attack *uattk, int dieroll)
+known_hitum(struct monst *mon, struct obj *weapon, int *mhit, int rollneeded, int armorpenalty, struct attack *uattk, int dieroll)
 
 
 
@@ -1817,8 +1817,8 @@ damageum(
     struct attack *mattk, /**< hero's attack */
     int specialdmg) /**< blessed and/or silver bonus against various things */
 {
-    register struct permonst *pd = mdef->data;
-    register int tmp = d((int)mattk->damn, (int)mattk->damd);
+    struct permonst *pd = mdef->data;
+    int tmp = d((int)mattk->damn, (int)mattk->damd);
     boolean negated;
     struct obj *mongold;
 
@@ -2302,9 +2302,9 @@ physical:
 }
 
 static int
-explum(register struct monst *mdef, register struct attack *mattk)
+explum(struct monst *mdef, struct attack *mattk)
 {
-    register int tmp = d((int)mattk->damn, (int)mattk->damd);
+    int tmp = d((int)mattk->damn, (int)mattk->damd);
 
     You("explode!");
     switch (mattk->adtyp) {
@@ -2382,10 +2382,10 @@ end_engulf(void)
 }
 
 static int
-gulpum(register struct monst *mdef, register struct attack *mattk)
+gulpum(struct monst *mdef, struct attack *mattk)
 {
-    register int tmp;
-    register int dam = d((int)mattk->damn, (int)mattk->damd);
+    int tmp;
+    int dam = d((int)mattk->damn, (int)mattk->damd);
     struct obj *otmp;
     struct permonst *pd = mdef->data;
     /* Not totally the same as for real monsters.  Specifically, these
@@ -2596,7 +2596,7 @@ missum(struct monst *mdef, struct attack *mattk, boolean wouldhavehit)
 
 /* attack monster as a monster; returns true if mon survives */
 static boolean
-hmonas(register struct monst *mon)
+hmonas(struct monst *mon)
 {
     struct attack *mattk, alt_attk;
     struct obj *weapon, **originalweapon;
@@ -3062,8 +3062,8 @@ passive(struct monst *mon, struct obj *weapon, boolean mhit, int malive, uchar a
 
 
 {
-    register struct permonst *ptr = mon->data;
-    register int i, tmp;
+    struct permonst *ptr = mon->data;
+    int i, tmp;
 
     if (mhit && aatyp == AT_BITE && is_vampiric(youmonst.data)) {
         if (bite_monster(mon))

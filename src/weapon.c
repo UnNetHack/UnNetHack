@@ -576,9 +576,9 @@ static struct obj *propellor;
 
 /* select a ranged weapon for the monster */
 struct obj *
-select_rwep(register struct monst *mtmp)
+select_rwep(struct monst *mtmp)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     int i;
 
 #ifdef KOPS
@@ -830,7 +830,7 @@ possibly_unwield(struct monst *mon, boolean polyspot)
  * Returns 1 if the monster took time to do it, 0 if it did not.
  */
 int
-mon_wield_item(register struct monst *mon)
+mon_wield_item(struct monst *mon)
 {
     struct obj *obj;
 
@@ -1754,7 +1754,7 @@ skill_init(const struct def_skill *class_skill)
 }
 
 void
-setmnotwielded(register struct monst *mon, register struct obj *obj)
+setmnotwielded(struct monst *mon, struct obj *obj)
 {
     if (!obj) return;
     if (artifact_light(obj) && obj->lamplit) {
