@@ -116,7 +116,7 @@ newpw(void)
 int
 experience(struct monst *mtmp, int nk UNUSED)
 {
-    register struct permonst *ptr = mtmp->data;
+    struct permonst *ptr = mtmp->data;
     int i, tmp, tmp2;
 
     tmp = 1 + mtmp->m_lev * mtmp->m_lev;
@@ -177,7 +177,7 @@ experience(struct monst *mtmp, int nk UNUSED)
  * Adds to Experience and Scoring counter
  */
 void
-more_experienced(register int exp, register int score, register int rexp)
+more_experienced(int exp, int score, int rexp)
 {
     u.uexp += exp;
     u.urexp += 4*exp + rexp;
@@ -208,7 +208,7 @@ more_experienced(register int exp, register int score, register int rexp)
 void
 losexp(const char *drainer) /**< cause of death, if drain should be fatal */
 {
-    register int num;
+    int num;
 
 #ifdef WIZARD
     /* override life-drain resistance when handling an explicit
@@ -282,7 +282,7 @@ void
 pluslvl(boolean incr)
                 /* true iff via incremental experience growth */
 {       /*  (false for potion of gain level)      */
-    register int num;
+    int num;
 
     if (!incr) You_feel("more experienced.");
     num = newhp();

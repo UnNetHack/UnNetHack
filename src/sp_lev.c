@@ -862,7 +862,7 @@ flip_level_rnd(int flp)
 static void
 set_wall_property(xchar x1, xchar y1, xchar x2, xchar y2, int prop)
 {
-    register xchar x, y;
+    xchar x, y;
     struct rm *lev;
 
     x1 = max(x1, 1);
@@ -1121,7 +1121,7 @@ get_location(schar *x, schar *y, int humidity, struct mkroom *croom)
             if (is_ok_location(*x, *y, humidity)) break;
         } while (++cpt < 100);
         if (cpt >= 100) {
-            register int xx, yy;
+            int xx, yy;
 
             /* last try */
             for (xx = 0; xx < sx; xx++)
@@ -1150,9 +1150,9 @@ found_it:;
 }
 
 static boolean
-is_ok_location(register schar x, register schar y, register int humidity)
+is_ok_location(schar x, schar y, int humidity)
 {
-    register int typ;
+    int typ;
 
     if (Is_waterlevel(&u.uz)) return TRUE;  /* accept any spot */
 
@@ -1242,7 +1242,7 @@ static void
 get_free_room_loc(schar *x, schar *y, struct mkroom *croom, long int pos)
 {
     schar try_x, try_y;
-    register int trycnt = 0;
+    int trycnt = 0;
 
     get_location_coord(&try_x, &try_y, DRY, croom, pos);
     if (levl[try_x][try_y].typ != ROOM) {
@@ -1260,8 +1260,8 @@ get_free_room_loc(schar *x, schar *y, struct mkroom *croom, long int pos)
 boolean
 check_room(xchar *lowx, xchar *ddx, xchar *lowy, xchar *ddy, boolean vault)
 {
-    register int x, y, hix = *lowx + *ddx, hiy = *lowy + *ddy;
-    register struct rm *lev;
+    int x, y, hix = *lowx + *ddx, hiy = *lowy + *ddy;
+    struct rm *lev;
     int xlim, ylim, ymax;
     xchar s_lowx, s_ddx, s_lowy, s_ddy;
 
@@ -1573,7 +1573,7 @@ create_door(room_door *dd, struct mkroom *broom)
     }
 
     do {
-        register int dwall, dpos;
+        int dwall, dpos;
 
         dwall = dd->wall;
         if (dwall == -1)    /* The wall is RANDOM */
@@ -2506,7 +2506,7 @@ dig_corridor(coord *org, coord *dest, boolean nxcor, schar ftyp, schar btyp)
 
         /* do we have to change direction ? */
         if(dy && dix > diy) {
-            register int ddx = (xx > tx) ? -1 : 1;
+            int ddx = (xx > tx) ? -1 : 1;
 
             crm = &levl[xx+ddx][yy];
             if(crm->typ == btyp || crm->typ == ftyp || crm->typ == SCORR) {
@@ -2515,7 +2515,7 @@ dig_corridor(coord *org, coord *dest, boolean nxcor, schar ftyp, schar btyp)
                 continue;
             }
         } else if(dx && diy > dix) {
-            register int ddy = (yy > ty) ? -1 : 1;
+            int ddy = (yy > ty) ? -1 : 1;
 
             crm = &levl[xx][yy+ddy];
             if(crm->typ == btyp || crm->typ == ftyp || crm->typ == SCORR) {
@@ -2739,10 +2739,10 @@ build_room(room *r, struct mkroom *mkr)
 static void
 light_region(region *tmpregion)
 {
-    register boolean litstate = tmpregion->rlit ? 1 : 0;
-    register int hiy = tmpregion->y2;
-    register int x, y;
-    register struct rm *lev;
+    boolean litstate = tmpregion->rlit ? 1 : 0;
+    int hiy = tmpregion->y2;
+    int x, y;
+    struct rm *lev;
     int lowy = tmpregion->y1;
     int lowx = tmpregion->x1, hix = tmpregion->x2;
 
@@ -2800,7 +2800,7 @@ wallify_map(int x1, int y1, int x2, int y2)
 static void
 maze1xy(coord *m, int humidity)
 {
-    register int x, y, tryct = 2000;
+    int x, y, tryct = 2000;
     /* tryct:  normally it won't take more than ten or so tries due
        to the circumstances under which we'll be called, but the
        `humidity' screening might drastically change the chances */
@@ -4974,7 +4974,7 @@ spo_region(struct sp_coder *coder)
 {
     struct opvar *rtype, *rlit, *flags, *area;
     xchar dx1, dy1, dx2, dy2;
-    register struct mkroom *troom;
+    struct mkroom *troom;
     boolean prefilled, room_not_needed, irregular, joined;
 
     if (!OV_pop_i(flags) ||

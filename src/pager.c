@@ -2716,7 +2716,7 @@ doquickwhatis(void)
 int
 doidtrap(void)
 {
-    register struct trap *trap;
+    struct trap *trap;
     int x, y, tt;
 
     if (!getdir("^")) return 0;
@@ -2750,7 +2750,7 @@ dowhatdoes_core(char q, char *cbuf)
 {
     dlb *fp;
     char bufr[BUFSZ];
-    register char *buf = &bufr[6], *ep, ctrl, meta;
+    char *buf = &bufr[6], *ep, ctrl, meta;
 
     fp = dlb_fopen_area(NH_CMDHELPAREA, CMDHELPFILE, "r");
     if (!fp) {

@@ -85,10 +85,10 @@ simple_look(
 }
 
 int
-collect_obj_classes(char *ilets, register struct obj *otmp, boolean here, boolean (*filter) (struct obj *), int *itemcount)
+collect_obj_classes(char *ilets, struct obj *otmp, boolean here, boolean (*filter) (struct obj *), int *itemcount)
 {
-    register int iletct = 0;
-    register char c;
+    int iletct = 0;
+    char c;
 
     *itemcount = 0;
     ilets[iletct] = '\0'; /* terminate ilets so that index() will work */
@@ -279,8 +279,8 @@ rider_corpse_revival(struct obj *obj, boolean remotely)
 static void
 check_here(boolean picked_some)
 {
-    register struct obj *obj;
-    register int ct = 0;
+    struct obj *obj;
+    int ct = 0;
 
     /* count the objects here */
     for (obj = level.objects[u.ux][u.uy]; obj; obj = obj->nexthere) {
@@ -453,7 +453,7 @@ struct obj *obj;
 
 /* query_objlist callback: return TRUE if valid class and worn */
 boolean
-is_worn_by_type(register struct obj *otmp)
+is_worn_by_type(struct obj *otmp)
 {
     return (is_worn(otmp) && allow_category(otmp));
 }
@@ -1847,7 +1847,7 @@ int
 doloot(void)
 {
     struct obj *cobj, *nobj, *otmp;
-    register int c = -1;
+    int c = -1;
     int timepassed = 0;
     coord cc;
     boolean underfoot = TRUE;
@@ -2088,9 +2088,9 @@ tip_container(struct obj *cobj)
 int
 dotip(void)
 {
-    register struct obj *cobj, *nobj;
-    register struct monst *shkp;
-    register int c = -1;
+    struct obj *cobj, *nobj;
+    struct monst *shkp;
+    int c = -1;
     coord cc;
     char qbuf[BUFSZ];
     const char tools[] = {TOOL_CLASS, 0};
@@ -2265,7 +2265,7 @@ static NEARDATA struct obj *current_container;
 
 /* Returns: -1 to stop, 1 item was inserted, 0 item was not inserted. */
 static int
-in_container(register struct obj *obj)
+in_container(struct obj *obj)
 {
     boolean floor_container = !carried(current_container);
     boolean was_unpaid = FALSE;
@@ -2444,9 +2444,9 @@ ck_bag(struct obj *obj)
 
 /* Returns: -1 to stop, 1 item was removed, 0 item was not removed. */
 static int
-out_container(register struct obj *obj)
+out_container(struct obj *obj)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     boolean is_gold = (obj->oclass == COIN_CLASS);
     int res, loadlev;
     long count;

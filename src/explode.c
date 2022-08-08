@@ -579,8 +579,8 @@ scatter(int sx, int sy,  /**< location of objects to scatter */
         unsigned int scflags,
         struct obj *obj) /**< only scatter this obj        */
 {
-    register struct obj *otmp;
-    register int tmp;
+    struct obj *otmp;
+    int tmp;
     int farthest = 0;
     uchar typ;
     long qtmp;

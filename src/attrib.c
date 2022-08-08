@@ -180,7 +180,7 @@ adjattrib(int ndx, int incr, int msgflg)
 }
 
 void
-gainstr(register struct obj *otmp, register int incr)
+gainstr(struct obj *otmp, int incr)
 {
     int num = 1;
 
@@ -193,7 +193,7 @@ gainstr(register struct obj *otmp, register int incr)
 }
 
 void
-losestr(register int num)    /* may kill you; cause may be poison or monster like 'a' */
+losestr(int num)    /* may kill you; cause may be poison or monster like 'a' */
 
 {
     int ustr = ABASE(A_STR) - num;
@@ -213,7 +213,7 @@ losestr(register int num)    /* may kill you; cause may be poison or monster lik
 }
 
 void
-change_luck(register schar n)
+change_luck(schar n)
 {
     u.uluck += n;
     if (u.uluck < 0 && u.uluck < LUCKMIN) u.uluck = LUCKMIN;
@@ -223,8 +223,8 @@ change_luck(register schar n)
 int
 stone_luck(boolean parameter) /* So I can't think up of a good name.  So sue me. --KAA */
 {
-    register struct obj *otmp;
-    register long bonchance = 0;
+    struct obj *otmp;
+    long bonchance = 0;
 
     for (otmp = invent; otmp; otmp = otmp->nobj)
         if (confers_luck(otmp)) {
@@ -239,7 +239,7 @@ stone_luck(boolean parameter) /* So I can't think up of a good name.  So sue me.
 boolean
 has_luckitem(void)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     for (otmp = invent; otmp; otmp = otmp->nobj)
         if (confers_luck(otmp)) return TRUE;
@@ -466,9 +466,9 @@ reset_attribute_clock(void)
 
 
 void
-init_attr(register int np)
+init_attr(int np)
 {
-    register int i, x, tryct;
+    int i, x, tryct;
 
 
     for(i = 0; i < A_MAX; i++) {
@@ -517,7 +517,7 @@ init_attr(register int np)
 void
 redist_attr(void)
 {
-    register int i, tmp;
+    int i, tmp;
 
     for(i = 0; i < A_MAX; i++) {
         if (i==A_INT || i==A_WIS) continue;
@@ -544,7 +544,7 @@ postadjabil(long int *ability)
 void
 adjabil(int oldlevel, int newlevel)
 {
-    register const struct innate *abil, *rabil;
+    const struct innate *abil, *rabil;
     long mask = FROMEXPER;
 
 
@@ -676,7 +676,7 @@ newhp(void)
 schar
 acurr(int x)
 {
-    register int tmp = (u.abon.a[x] + u.atemp.a[x] + u.acurr.a[x]);
+    int tmp = (u.abon.a[x] + u.atemp.a[x] + u.acurr.a[x]);
 
     if (x == A_STR) {
         if (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER) return(125);
@@ -713,7 +713,7 @@ acurr(int x)
 schar
 acurrstr(void)
 {
-    register int str = ACURR(A_STR);
+    int str = ACURR(A_STR);
 
     if (str <= 18) return((schar)str);
     if (str <= 121) return((schar)(19 + str / 50)); /* map to 19-21 */
@@ -724,9 +724,9 @@ acurrstr(void)
  * location for any future alignment limits
  */
 void
-adjalign(register int n)
+adjalign(int n)
 {
-    register int newalign = u.ualign.record + n;
+    int newalign = u.ualign.record + n;
 
     if(n < 0) {
         if(newalign < u.ualign.record)

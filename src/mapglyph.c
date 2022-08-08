@@ -92,7 +92,7 @@ void
 mapglyph(int glyph, glyph_t *ochar, int *ocolor, unsigned int *ospecial, int x, int y,
     unsigned int mgflags UNUSED)
 {
-    register int offset;
+    int offset;
 #if defined(TEXTCOLOR) || defined(ROGUE_COLOR)
     int color = NO_COLOR;
 #endif

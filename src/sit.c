@@ -62,7 +62,7 @@ dosit(void)
     if (OBJ_AT(u.ux, u.uy) &&
         /* ensure we're not standing on the precipice */
          !(uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
-        register struct obj *obj;
+        struct obj *obj;
 
         obj = level.objects[u.ux][u.uy];
         if (youmonst.data->mlet == S_DRAGON && obj->oclass == COIN_CLASS) {

@@ -266,7 +266,7 @@ can_blnd(
 boolean
 ranged_attk(struct permonst *ptr)
 {
-    register int i, atyp;
+    int i, atyp;
     long atk_mask = (1L << AT_BREA) | (1L << AT_SPIT) | (1L << AT_GAZE);
 
     /* was: (attacktype(ptr, AT_BREA) || attacktype(ptr, AT_WEAP) ||
@@ -293,7 +293,7 @@ mon_hates_silver(struct monst *mon)
 
 /* returns TRUE if monster is especially affected by silver weapons */
 boolean
-hates_silver(register struct permonst *ptr)
+hates_silver(struct permonst *ptr)
 {
     return((boolean)(is_were(ptr) || is_vampire(ptr) || is_demon(ptr) ||
                      ptr == &mons[PM_SHADE] ||
@@ -384,7 +384,7 @@ can_be_strangled(struct monst *mon)
 
 /** returns TRUE if monster can track well */
 boolean
-can_track(register struct permonst *ptr)
+can_track(struct permonst *ptr)
 {
     if (uwep && uwep->oartifact == ART_EXCALIBUR)
         return TRUE;
@@ -394,7 +394,7 @@ can_track(register struct permonst *ptr)
 
 /** creature will slide out of armor */
 boolean
-sliparm(register struct permonst *ptr)
+sliparm(struct permonst *ptr)
 {
     return((boolean)(is_whirly(ptr) || ptr->msize <= MZ_SMALL ||
                      noncorporeal(ptr)));
@@ -402,7 +402,7 @@ sliparm(register struct permonst *ptr)
 
 /** creature will break out of armor */
 boolean
-breakarm(register struct permonst *ptr)
+breakarm(struct permonst *ptr)
 {
     if (sliparm(ptr)) {
         return FALSE;
@@ -417,7 +417,7 @@ breakarm(register struct permonst *ptr)
 
 /** creature sticks other creatures it hits */
 boolean
-sticks(register struct permonst *ptr)
+sticks(struct permonst *ptr)
 {
     return((boolean)(dmgtype(ptr, AD_STCK) || dmgtype(ptr, AD_WRAP) ||
                      attacktype(ptr, AT_HUGS)));
@@ -480,7 +480,7 @@ dmgtype(struct permonst *ptr, int dtyp)
 /* returns the maximum damage a defender can do to the attacker via
  * a passive defense */
 int
-max_passive_dmg(register struct monst *mdef, register struct monst *magr)
+max_passive_dmg(struct monst *mdef, struct monst *magr)
 {
     int i, dmg = 0, multi2 = 0;
     uchar adtyp;
@@ -633,7 +633,7 @@ same_race(struct permonst *pm1, struct permonst *pm2)
 int
 monsndx(struct permonst *ptr)
 {
-    register int i;
+    int i;
 
     if (ptr == &upermonst) return PM_PLAYERMON;
 
@@ -670,9 +670,9 @@ name_to_mon(const char *in_str)
      * This also permits plurals created by adding suffixes such as 's'
      * or 'es'.  Other plurals must still be handled explicitly.
      */
-    register int i;
-    register int mntmp = NON_PM;
-    register char *s, *str, *term;
+    int i;
+    int mntmp = NON_PM;
+    char *s, *str, *term;
     char buf[BUFSZ];
     int len, slen;
 
@@ -765,7 +765,7 @@ name_to_mon(const char *in_str)
             /* end of list */
             { 0, NON_PM }
         };
-        register const struct alt_spl *namep;
+        const struct alt_spl *namep;
 
         for (namep = names; namep->name; namep++)
             if (!strncmpi(str, namep->name, (int)strlen(namep->name)))
@@ -773,7 +773,7 @@ name_to_mon(const char *in_str)
     }
 
     for (len = 0, i = LOW_PM; i < NUMMONS; i++) {
-        register int m_i_len = strlen(mons[i].mname);
+        int m_i_len = strlen(mons[i].mname);
         if (m_i_len > len && !strncmpi(mons[i].mname, str, m_i_len)) {
             if (m_i_len == slen) {
                 mntmp = i;
@@ -909,7 +909,7 @@ name_to_monclass(const char *in_str, int *mndx_p)
 
 /* returns 3 values (0=male, 1=female, 2=none) */
 int
-gender(register struct monst *mtmp)
+gender(struct monst *mtmp)
 {
     if (is_neuter(mtmp->data)) return 2;
     return mtmp->female;
@@ -1029,7 +1029,7 @@ static const short grownups[][2] = {
 int
 little_to_big(int montype)
 {
-    register int i;
+    int i;
 
     for (i = 0; grownups[i][0] >= LOW_PM; i++)
         if(montype == grownups[i][0]) return grownups[i][1];
@@ -1039,7 +1039,7 @@ little_to_big(int montype)
 int
 big_to_little(int montype)
 {
-    register int i;
+    int i;
 
     for (i = 0; grownups[i][0] >= LOW_PM; i++)
         if(montype == grownups[i][1]) return grownups[i][0];

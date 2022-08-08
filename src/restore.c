@@ -70,8 +70,8 @@ static NEARDATA long omoves;
 static void
 find_lev_obj(void)
 {
-    register struct obj *fobjtmp = (struct obj *)0;
-    register struct obj *otmp;
+    struct obj *fobjtmp = (struct obj *)0;
+    struct obj *otmp;
     int x, y;
 
     for(x=0; x<COLNO; x++) for(y=0; y<ROWNO; y++)
@@ -103,7 +103,7 @@ find_lev_obj(void)
 void
 inven_inuse(boolean quietly)
 {
-    register struct obj *otmp, *otmp2;
+    struct obj *otmp, *otmp2;
 
     for (otmp = invent; otmp; otmp = otmp2) {
         otmp2 = otmp->nobj;
@@ -115,7 +115,7 @@ inven_inuse(boolean quietly)
 }
 
 static void
-restlevchn(register int fd)
+restlevchn(int fd)
 {
     int cnt;
     s_level *tmplev, *x;
@@ -178,7 +178,7 @@ restdamage(int fd, boolean ghostly)
 }
 
 struct lvl_sounds *
-rest_lvl_sounds(register int fd)
+rest_lvl_sounds(int fd)
 {
     int marker;
     struct lvl_sounds *or = NULL;
@@ -203,7 +203,7 @@ rest_lvl_sounds(register int fd)
 }
 
 struct mon_gen_override *
-rest_mongen_override(register int fd)
+rest_mongen_override(int fd)
 {
     int marker;
     struct mon_gen_override *or = NULL;
@@ -286,10 +286,10 @@ restobj(int fd, struct obj *otmp)
 }
 
 static struct obj *
-restobjchn(register int fd, boolean ghostly, boolean frozen)
+restobjchn(int fd, boolean ghostly, boolean frozen)
 {
-    register struct obj *otmp, *otmp2 = 0;
-    register struct obj *first = (struct obj *) 0;
+    struct obj *otmp, *otmp2 = 0;
+    struct obj *first = (struct obj *) 0;
     int buflen;
 
     while (1) {
@@ -431,10 +431,10 @@ restmon(int fd, struct monst *mtmp)
 }
 
 static struct monst *
-restmonchn(register int fd, boolean ghostly)
+restmonchn(int fd, boolean ghostly)
 {
-    register struct monst *mtmp, *mtmp2 = 0;
-    register struct monst *first = (struct monst *) 0;
+    struct monst *mtmp, *mtmp2 = 0;
+    struct monst *first = (struct monst *) 0;
     int offset, buflen;
 
     while (1) {
@@ -506,7 +506,7 @@ restmonchn(register int fd, boolean ghostly)
 static struct fruit *
 loadfruitchn(int fd)
 {
-    register struct fruit *flist, *fnext;
+    struct fruit *flist, *fnext;
 
     flist = 0;
     while (fnext = newfruit(),
@@ -520,9 +520,9 @@ loadfruitchn(int fd)
 }
 
 static void
-freefruitchn(register struct fruit *flist)
+freefruitchn(struct fruit *flist)
 {
-    register struct fruit *fnext;
+    struct fruit *fnext;
 
     while (flist) {
         fnext = flist->nextf;
@@ -532,9 +532,9 @@ freefruitchn(register struct fruit *flist)
 }
 
 static void
-ghostfruit(register struct obj *otmp)
+ghostfruit(struct obj *otmp)
 {
-    register struct fruit *oldf;
+    struct fruit *oldf;
 
     for (oldf = oldfruit; oldf; oldf = oldf->nextf)
         if (oldf->fid == otmp->spe) break;
@@ -544,7 +544,7 @@ ghostfruit(register struct obj *otmp)
 }
 
 static boolean
-restgamestate(register int fd, unsigned int *stuckid, unsigned int *steedid)
+restgamestate(int fd, unsigned int *stuckid, unsigned int *steedid)
 {
     /* discover is actually flags.explore */
     boolean remember_discover = discover;
@@ -651,7 +651,7 @@ restgamestate(register int fd, unsigned int *stuckid, unsigned int *steedid)
 static void
 restlevelstate(unsigned int stuckid, unsigned int steedid)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
 
     if (stuckid) {
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
@@ -679,7 +679,7 @@ restlevelfile(
 # pragma unused(fd)
 #endif
 {
-    register int nfd;
+    int nfd;
     char whynot[BUFSZ];
 
     nfd = create_levelfile(ltmp, whynot);
@@ -734,9 +734,9 @@ restlevelfile(
 }
 
 int
-dorecover(register int fd)
+dorecover(int fd)
 {
-    unsigned int stuckid = 0, steedid = 0;  /* not a register */
+    unsigned int stuckid = 0, steedid = 0;  /* not a */
     xchar ltmp;
     int rtmp;
     struct obj *otmp;
@@ -926,8 +926,8 @@ trickery(char *reason)
 void
 getlev(int fd, int pid, xchar lev, boolean ghostly)
 {
-    register struct trap *trap;
-    register struct monst *mtmp;
+    struct trap *trap;
+    struct monst *mtmp;
     branch *br;
     int hpid;
     xchar dlvl;
@@ -1031,7 +1031,7 @@ getlev(int fd, int pid, xchar lev, boolean ghostly)
 
     /* regenerate animals while on another level */
     if (u.uz.dlevel) {
-        register struct monst *mtmp2;
+        struct monst *mtmp2;
 
         for (mtmp = fmon; mtmp; mtmp = mtmp2) {
             mtmp2 = mtmp->nmon;
@@ -1115,7 +1115,7 @@ getlev(int fd, int pid, xchar lev, boolean ghostly)
                 break;
             case BR_PORTAL: /* max of 1 portal per level */
             {
-                register struct trap *ttmp;
+                struct trap *ttmp;
                 for(ttmp = ftrap; ttmp; ttmp = ttmp->ntrap)
                     if (ttmp->ttyp == MAGIC_PORTAL)
                         break;
@@ -1126,7 +1126,7 @@ getlev(int fd, int pid, xchar lev, boolean ghostly)
             }
         } else if (!br) {
             /* Remove any dangling portals. */
-            register struct trap *ttmp;
+            struct trap *ttmp;
             for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap)
                 if (ttmp->ttyp == MAGIC_PORTAL) {
                     deltrap(ttmp);
@@ -1285,7 +1285,7 @@ register unsigned len;
             inrunlength--;
             *(*((char **)&buf))++ = '\0';
         } else {
-            register short ch = mgetc();
+            short ch = mgetc();
             if (ch < 0) return -1; /*readlen;*/
             if ((*(*(char **)&buf)++ = (char)ch) == RLESC) {
                 inrunlength = mgetc();
@@ -1305,9 +1305,9 @@ minit(void)
 }
 
 void
-mread(register int fd, register genericptr_t buf, register unsigned int len)
+mread(int fd, genericptr_t buf, unsigned int len)
 {
-    register int rlen;
+    int rlen;
 
 #if defined(BSD) || defined(ULTRIX)
     rlen = read(fd, buf, (int) len);

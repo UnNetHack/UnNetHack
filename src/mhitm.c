@@ -33,7 +33,7 @@ static int passivemm(struct monst *, struct monst *, boolean, int);
 static int dieroll;
 
 static void
-noises(register struct monst *magr, register struct attack *mattk)
+noises(struct monst *magr, struct attack *mattk)
 {
     boolean farq = (distu(magr->mx, magr->my) > 15);
 
@@ -47,7 +47,7 @@ noises(register struct monst *magr, register struct attack *mattk)
 }
 
 static void
-missmm(register struct monst *magr, register struct monst *mdef, struct attack *mattk)
+missmm(struct monst *magr, struct monst *mdef, struct attack *mattk)
 {
     const char *fmt;
     char buf[BUFSZ], mdef_name[BUFSZ];
@@ -101,9 +101,9 @@ missmm(register struct monst *magr, register struct monst *mdef, struct attack *
  */
  /* have monsters fight each other */
 int
-fightm(register struct monst *mtmp)
+fightm(struct monst *mtmp)
 {
-    register struct monst *mon, *nmon;
+    struct monst *mon, *nmon;
     int result, has_u_swallowed;
 #ifdef LINT
     nmon = 0;
@@ -172,7 +172,7 @@ fightm(register struct monst *mtmp)
  *                 returns same results as mattackm().
  */
 int
-mdisplacem(register struct monst *magr, register struct monst *mdef, boolean quietly)
+mdisplacem(struct monst *magr, struct monst *mdef, boolean quietly)
 {
     struct permonst *pa, *pd;
     int tx, ty, fx, fy;
@@ -278,7 +278,7 @@ mdisplacem(register struct monst *magr, register struct monst *mdef, boolean qui
  * In the case of exploding monsters, the monster dies as well.
  */
 int
-mattackm(register struct monst *magr, register struct monst *mdef)
+mattackm(struct monst *magr, struct monst *mdef)
 {
     int i,          /* loop counter */
         tmp,        /* amour class difference */
@@ -568,7 +568,7 @@ mattackm(register struct monst *magr, register struct monst *mdef)
 
 /* Returns the result of mdamagem(). */
 static int
-hitmm(register struct monst *magr, register struct monst *mdef, struct attack *mattk)
+hitmm(struct monst *magr, struct monst *mdef, struct attack *mattk)
 {
     boolean weaponhit = ((mattk->aatyp == AT_WEAP || (mattk->aatyp == AT_CLAW && otmp)));
     boolean silverhit = (weaponhit && otmp && objects[otmp->otyp].oc_material == SILVER);
@@ -687,7 +687,7 @@ hitmm(register struct monst *magr, register struct monst *mdef, struct attack *m
 
 /* Returns the same values as mdamagem(). */
 static int
-gazemm(register struct monst *magr, register struct monst *mdef, struct attack *mattk)
+gazemm(struct monst *magr, struct monst *mdef, struct attack *mattk)
 {
     char buf[BUFSZ];
 
@@ -784,7 +784,7 @@ engulf_target(struct monst *magr, struct monst *mdef)
 
 /* Returns the same values as mattackm(). */
 static int
-gulpmm(register struct monst *magr, register struct monst *mdef, register struct attack *mattk)
+gulpmm(struct monst *magr, struct monst *mdef, struct attack *mattk)
 {
     xchar ax, ay, dx, dy;
     int status;
@@ -918,7 +918,7 @@ explmm(struct monst *magr, struct monst *mdef, struct attack *mattk)
 
 #ifdef WEBB_DISINT
 static int
-defdisintagr(register struct monst *magr, register struct monst *mdef, register struct attack *mattk)
+defdisintagr(struct monst *magr, struct monst *mdef, struct attack *mattk)
 {
     int tmp=-1; /* -1 a miss,
                    -MM_AGR_DIED aggre died,
@@ -1049,7 +1049,7 @@ defdisintagr(register struct monst *magr, register struct monst *mdef, register 
  *  See comment at top of mattackm(), for return values.
  */
 static int
-mdamagem(register struct monst *magr, register struct monst *mdef, register struct attack *mattk)
+mdamagem(struct monst *magr, struct monst *mdef, struct attack *mattk)
 {
     struct obj *obj;
     char buf[BUFSZ];
@@ -1515,7 +1515,7 @@ post_stone: if (mdef->mhp > 0) return 0;
 
     case AD_BLND:
         if (can_blnd(magr, mdef, mattk->aatyp, (struct obj*)0)) {
-            register unsigned rnd_tmp;
+            unsigned rnd_tmp;
 
             if (vis && mdef->mcansee && canspotmon(mdef)) {
                 pline("%s is blinded.", Monnam(mdef));
@@ -1962,10 +1962,10 @@ mswingsm(struct monst *magr, struct monst *mdef, struct obj *otemp)
  * handled above.  Returns same values as mattackm.
  */
 static int
-passivemm(register struct monst *magr, register struct monst *mdef, boolean mhit, int mdead)
+passivemm(struct monst *magr, struct monst *mdef, boolean mhit, int mdead)
 {
-    register struct permonst *mddat = mdef->data;
-    register struct permonst *madat = magr->data;
+    struct permonst *mddat = mdef->data;
+    struct permonst *madat = magr->data;
     char buf[BUFSZ];
     int i, tmp;
 

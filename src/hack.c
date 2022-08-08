@@ -63,13 +63,13 @@ static const struct herb_info {
 long
 count_herbs_at(xchar x, xchar y, boolean watery)
 {
-    register int dd;
-    register long count = 0;
+    int dd;
+    long count = 0;
 
     if (isok(x, y)) {
         for (dd = 0; dd < SIZE(herb_info); dd++) {
             if (watery == herb_info[dd].in_water) {
-                register struct obj *otmp = sobj_at(herb_info[dd].herb, x, y);
+                struct obj *otmp = sobj_at(herb_info[dd].herb, x, y);
                 if (otmp)
                     count += otmp->quan;
             }
@@ -82,7 +82,7 @@ count_herbs_at(xchar x, xchar y, boolean watery)
 boolean
 herb_can_grow_at(xchar x, xchar y, boolean watery)
 {
-    register struct rm *lev = &levl[x][y];
+    struct rm *lev = &levl[x][y];
     if (inside_shop(x, y)) return FALSE;
     if (watery)
         return (IS_POOL(lev->typ) &&
@@ -221,7 +221,7 @@ water_current(xchar x, xchar y, int dir, unsigned int waterforce, boolean showms
 boolean
 drop_ripe_treefruit(xchar x, xchar y, boolean showmsg, boolean update)
 {
-    register struct rm *lev;
+    struct rm *lev;
 
     rndmappos(&x, &y);
     lev = &levl[x][y];
@@ -377,7 +377,7 @@ obj_to_any(struct obj *obj)
 boolean
 revive_nasty(int x, int y, const char *msg)
 {
-    register struct obj *otmp, *otmp2;
+    struct obj *otmp, *otmp2;
     struct monst *mtmp;
     coord cc;
     boolean revived = FALSE;
@@ -414,10 +414,10 @@ revive_nasty(int x, int y, const char *msg)
 static int
 moverock(void)
 {
-    register xchar rx, ry, sx, sy;
-    register struct obj *otmp;
-    register struct trap *ttmp;
-    register struct monst *mtmp;
+    xchar rx, ry, sx, sy;
+    struct obj *otmp;
+    struct trap *ttmp;
+    struct monst *mtmp;
 
     sx = u.ux + u.dx, sy = u.uy + u.dy; /* boulder starting position */
     while ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
@@ -854,7 +854,7 @@ still_chewing(xchar x, xchar y)
 }
 
 void
-movobj(register struct obj *obj, register xchar ox, register xchar oy)
+movobj(struct obj *obj, xchar ox, xchar oy)
 {
     /* optimize by leaving on the fobj chain? */
     remove_object(obj);
@@ -869,7 +869,7 @@ static NEARDATA const char fell_on_sink[] = "fell onto a sink";
 static void
 dosinkfall(void)
 {
-    register struct obj *obj;
+    struct obj *obj;
     int dmg;
     boolean lev_boots = (uarmf && uarmf->otyp == LEVITATION_BOOTS);
     boolean innate_lev = ((HLevitation & (FROMOUTSIDE | FROMFORM)) != 0L);
@@ -953,7 +953,7 @@ dosinkfall(void)
 
 /* intended to be called only on ROCKs */
 boolean
-may_dig(register xchar x, register xchar y)
+may_dig(xchar x, xchar y)
 {
     struct rm *lev = &levl[x][y];
 
@@ -964,14 +964,14 @@ may_dig(register xchar x, register xchar y)
 }
 
 boolean
-may_passwall(register xchar x, register xchar y)
+may_passwall(xchar x, xchar y)
 {
     return (boolean)(!((IS_STWALL(levl[x][y].typ) || IS_TREES(levl[x][y].typ)) &&
                        (levl[x][y].wall_info & W_NONPASSWALL)));
 }
 
 boolean
-bad_rock(struct permonst *mdat, register xchar x, register xchar y)
+bad_rock(struct permonst *mdat, xchar x, xchar y)
 {
     return((boolean) ((Sokoban && sobj_at(BOULDER, x, y)) ||
                       (IS_ROCK(levl[x][y].typ)
@@ -1034,8 +1034,8 @@ test_move(int ux, int uy, int dx, int dy, int mode)
 {
     int x = ux+dx;
     int y = uy+dy;
-    register struct rm *tmpr = &levl[x][y];
-    register struct rm *ust;
+    struct rm *tmpr = &levl[x][y];
+    struct rm *ust;
 
     door_opened = FALSE;
     /*
@@ -1911,9 +1911,9 @@ domove_swap_with_pet(struct monst *mtmp, xchar x, xchar y)
 void
 domove(void)
 {
-    register struct monst *mtmp;
-    register struct rm *tmpr;
-    register xchar x, y;
+    struct monst *mtmp;
+    struct rm *tmpr;
+    xchar x, y;
     struct trap *trap = NULL;
     int wtcap;
     boolean on_ice;
@@ -2064,7 +2064,7 @@ domove(void)
         x = u.ux + u.dx;
         y = u.uy + u.dy;
         if (Stunned || (Confusion && !rn2(5))) {
-            register int tries = 0;
+            int tries = 0;
 
             do {
                 if (tries++ > 50) {
@@ -3063,7 +3063,7 @@ spoteffects(boolean pick)
 static struct monst *
 monstinroom(struct permonst *mdat, int roomno)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp)) {
@@ -3078,12 +3078,12 @@ monstinroom(struct permonst *mdat, int roomno)
 }
 
 char *
-in_rooms(register xchar x, register xchar y, register int typewanted)
+in_rooms(xchar x, xchar y, int typewanted)
 {
     static char buf[5];
     char rno, *ptr = &buf[4];
     int typefound, min_x, min_y, max_x, max_y_offset, step;
-    register struct rm *lev;
+    struct rm *lev;
 
 #define goodtype(rno) (!typewanted || \
                        ((typefound = rooms[rno - ROOMOFFSET].rtype) == typewanted) || \
@@ -3144,10 +3144,10 @@ in_rooms(register xchar x, register xchar y, register int typewanted)
 
 /* is (x,y) in a town? */
 boolean
-in_town(register int x, register int y)
+in_town(int x, int y)
 {
     s_level *slev = Is_special(&u.uz);
-    register struct mkroom *sroom;
+    struct mkroom *sroom;
     boolean has_subrooms = FALSE;
 
     if (!slev || !slev->flags.town)
@@ -3183,7 +3183,7 @@ in_town(register int x, register int y)
 }
 
 static void
-move_update(register boolean newlev)
+move_update(boolean newlev)
 {
     char *ptr1, *ptr2, *ptr3, *ptr4;
 
@@ -3234,9 +3234,9 @@ u_in_mine_town(void)
 
 /* possibly deliver a one-time room entry message */
 void
-check_special_room(register boolean newlev)
+check_special_room(boolean newlev)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
     char *ptr;
 
     move_update(newlev);
@@ -3437,7 +3437,7 @@ pickup_checks(void)
         }
     }
     if (!OBJ_AT(u.ux, u.uy)) {
-        register struct rm *lev = &levl[u.ux][u.uy];
+        struct rm *lev = &levl[u.ux][u.uy];
 
         if (IS_THRONE(lev->typ))
             pline("It must weigh%s a ton!", lev->looted ? " almost" : "");
@@ -3775,7 +3775,7 @@ monster_nearby(void)
 }
 
 void
-nomul(register int nval, const char *txt)
+nomul(int nval, const char *txt)
 {
     if (multi < nval) return; /* This is a bug fix by ab@unido */
     u.uinvulnerable = FALSE;  /* Kludge to avoid ctrl-C bug -dlc */
@@ -4001,8 +4001,8 @@ static int wc;  /* current weight_cap(); valid after call to inv_weight() */
 int
 inv_weight(void)
 {
-    register struct obj *otmp = invent;
-    register int wt = 0;
+    struct obj *otmp = invent;
+    int wt = 0;
 
     while (otmp) {
         if (otmp->oclass == COIN_CLASS)
@@ -4073,8 +4073,8 @@ check_capacity(const char *str)
 int
 inv_cnt(boolean incl_gold)
 {
-    register struct obj *otmp = invent;
-    register int ct = 0;
+    struct obj *otmp = invent;
+    int ct = 0;
 
     while (otmp) {
         if (incl_gold || otmp->invlet != GOLD_SYM) {

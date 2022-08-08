@@ -202,7 +202,7 @@ done_hangup(int sig)    /* signal() handler */
 #endif /* NO_SIGNAL */
 
 void
-done_in_by(register struct monst *mtmp)
+done_in_by(struct monst *mtmp)
 {
     char buf[BUFSZ];
     struct permonst *mptr = mtmp->data;
@@ -489,8 +489,8 @@ savelife(int how)
 static void
 get_valuables(struct obj *list) /**< inventory or container contents */
 {
-    register struct obj *obj;
-    register int i;
+    struct obj *obj;
+    int i;
 
     /* find amulets and gems, ignoring all artifacts */
     for (obj = list; obj; obj = obj->nobj)
@@ -523,7 +523,7 @@ sort_valuables(
     struct valuable_data *list,
     int size) /**< max value is less than 20 */
 {
-    register int i, j;
+    int i, j;
     struct valuable_data ltmp;
 
     /* move greater quantities to the front of the list */
@@ -989,10 +989,10 @@ die:
     if (how == ESCAPED || how == DEFIED || how == ASCENDED)
 #endif
     {
-        register struct monst *mtmp;
-        register struct obj *otmp;
-        register struct val_list *val;
-        register int i;
+        struct monst *mtmp;
+        struct obj *otmp;
+        struct val_list *val;
+        int i;
 
         for (val = valuables; val->list; val++)
             for (i = 0; i < val->size; i++) {
@@ -1152,7 +1152,7 @@ heaven_or_hell_lifesave_end(void)
 void
 container_contents(struct obj *list, boolean identified, boolean all_containers, boolean want_disp)
 {
-    register struct obj *box, *obj;
+    struct obj *box, *obj;
 #ifdef SORTLOOT
     struct obj **oarray;
     int i, j, n;
@@ -1278,7 +1278,7 @@ nh_terminate(int status)
 void
 list_vanquishedonly(void)
 {
-    register int i, lev;
+    int i, lev;
     int ntypes = 0, max_lev = 0, nkilled;
     long total_killed = 0L;
     winid klwin = WIN_ERR;
@@ -1356,7 +1356,7 @@ void
 do_vanquished(int defquery, boolean ask)
 #endif
 {
-    register int i, lev;
+    int i, lev;
     int ntypes = 0, max_lev = 0, nkilled;
     long total_killed = 0L;
     char c;
@@ -1455,7 +1455,7 @@ num_genocides(void)
 static void
 list_genocided(int defquery, boolean ask, boolean want_disp UNUSED)
 {
-    register int i;
+    int i;
     int ngenocided=0;
 #ifdef SHOW_EXTINCT
     int nextincted=0;

@@ -84,7 +84,7 @@ long wgrowtime[MAX_NUM_WORMS] = DUMMY;
 int
 get_wormno(void)
 {
-    register int new_wormno = 1;
+    int new_wormno = 1;
 
     while (new_wormno < MAX_NUM_WORMS) {
         if (!wheads[new_wormno]) {
@@ -110,8 +110,8 @@ get_wormno(void)
 void
 initworm(struct monst *worm, int wseg_count)
 {
-    register struct wseg *seg, *new_tail = create_worm_tail(wseg_count);
-    register int wnum = worm->wormno;
+    struct wseg *seg, *new_tail = create_worm_tail(wseg_count);
+    int wnum = worm->wormno;
 
     if (!wnum) {
         warning("initworm: worm->wormno was 0");
@@ -139,9 +139,9 @@ initworm(struct monst *worm, int wseg_count)
  *  The display may or may not need to be updated as we free the segments.
  */
 static void
-toss_wsegs(register struct wseg *curr, register boolean display_update)
+toss_wsegs(struct wseg *curr, boolean display_update)
 {
-    register struct wseg *seg;
+    struct wseg *seg;
 
     while (curr) {
         seg = curr->nseg;
@@ -191,8 +191,8 @@ shrink_worm(int wnum) /**< worm number */
 void
 worm_move(struct monst *worm)
 {
-    register struct wseg *seg, *new_seg;    /* new segment */
-    register int wnum = worm->wormno;       /* worm number */
+    struct wseg *seg, *new_seg;    /* new segment */
+    int wnum = worm->wormno;       /* worm number */
 
 
     if (!wnum) {
@@ -238,7 +238,7 @@ worm_move(struct monst *worm)
  *  The worm don't move so it should shrink.
  */
 void
-worm_nomove(register struct monst *worm)
+worm_nomove(struct monst *worm)
 {
     shrink_worm((int) worm->wormno);    /* shrink */
 
@@ -256,9 +256,9 @@ worm_nomove(register struct monst *worm)
  *  Kill a worm tail.
  */
 void
-wormgone(register struct monst *worm)
+wormgone(struct monst *worm)
 {
-    register int wnum = worm->wormno;
+    int wnum = worm->wormno;
 
     if (!wnum) {
         warning("wormgone: worm->wormno was 0");
@@ -283,10 +283,10 @@ wormgone(register struct monst *worm)
  *  If the hero is near any part of the worm, the worm will try to attack.
  */
 void
-wormhitu(register struct monst *worm)
+wormhitu(struct monst *worm)
 {
-    register int wnum = worm->wormno;
-    register struct wseg *seg;
+    int wnum = worm->wormno;
+    struct wseg *seg;
 
     if (!wnum) {
         warning("wormhitu: worm->wormno was 0");
@@ -329,8 +329,8 @@ cutoff(struct monst *worm, struct wseg *tail)
 void
 cutworm(struct monst *worm, xchar x, xchar y, struct obj *weap)
 {
-    register struct wseg  *curr, *new_tail;
-    register struct monst *new_worm;
+    struct wseg  *curr, *new_tail;
+    struct monst *new_worm;
     int wnum = worm->wormno;
     int cut_chance, new_wnum;
 
@@ -618,9 +618,9 @@ sanity_check_worm(struct monst *worm)
  *  not remove the mon from the fmon chain.
  */
 void
-remove_worm(register struct monst *worm)
+remove_worm(struct monst *worm)
 {
-    register struct wseg *curr = wtails[worm->wormno];
+    struct wseg *curr = wtails[worm->wormno];
 
     if (!worm->wormno) {
         warning("remove_worm: worm->wormno was 0");
@@ -652,7 +652,7 @@ place_worm_tail_randomly(struct monst *worm, xchar x, xchar y)
     int wnum = worm->wormno;
     struct wseg *curr = wtails[wnum];
     struct wseg *new_tail;
-    register xchar ox = x, oy = y;
+    xchar ox = x, oy = y;
 
     if (!wnum) {
         warning("place_worm_tail_randomly: worm->wormno was 0");
@@ -704,7 +704,7 @@ place_worm_tail_randomly(struct monst *worm, xchar x, xchar y)
  * enexto() with a search radius.
  */
 static void
-random_dir(register xchar x, register xchar y, register xchar *nx, register xchar *ny)
+random_dir(xchar x, xchar y, xchar *nx, xchar *ny)
 {
     *nx = x;
     *ny = y;
@@ -746,8 +746,8 @@ size_wseg(struct monst *worm)
 int
 count_wsegs(struct monst *mtmp)
 {
-    register int i=0;
-    register struct wseg *curr = (wtails[mtmp->wormno])->nseg;
+    int i=0;
+    struct wseg *curr = (wtails[mtmp->wormno])->nseg;
 
     if (!mtmp->wormno) {
         warning("count_wsegs: mtmp->wormno was 0");
@@ -769,8 +769,8 @@ count_wsegs(struct monst *mtmp)
 static struct wseg *
 create_worm_tail(int num_segs)
 {
-    register int i=0;
-    register struct wseg *new_tail, *curr;
+    int i=0;
+    struct wseg *new_tail, *curr;
 
     if (!num_segs) return (struct wseg *)0;
 

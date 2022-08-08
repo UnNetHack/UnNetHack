@@ -213,7 +213,7 @@ choose_punisher_spell(void)
  * 0: unsuccessful spell
  */
 int
-castmu(register struct monst *mtmp, register struct attack *mattk, boolean thinks_it_foundyou, boolean foundyou)
+castmu(struct monst *mtmp, struct attack *mattk, boolean thinks_it_foundyou, boolean foundyou)
 {
     int dmg, ml = mtmp->m_lev;
     int ret;
@@ -952,7 +952,7 @@ spell_would_be_useless(struct monst *mtmp, unsigned int adtyp, int spellnum)
 
 /* monster uses spell (ranged) */
 int
-buzzmu(register struct monst *mtmp, register struct attack *mattk)
+buzzmu(struct monst *mtmp, struct attack *mattk)
 {
     /* don't print constant stream of curse messages for 'normal'
        spellcasting monsters at range */

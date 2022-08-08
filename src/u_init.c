@@ -617,7 +617,7 @@ static const struct def_skill Skill_W[] = {
 
 
 static void
-knows_object(register int obj)
+knows_object(int obj)
 {
     discover_object(obj, TRUE, FALSE);
     objects[obj].oc_pre_discovered = 1; /* not a "discovery" */
@@ -675,7 +675,7 @@ knows_class(char sym)
 void
 u_init(void)
 {
-    register int i;
+    int i;
     struct permonst* shambler = &mons[PM_SHAMBLING_HORROR];
     struct attack* attkptr;
 
@@ -1061,7 +1061,7 @@ u_init(void)
  */
     for(i = 0; i < A_MAX; i++)
         if(!rn2(20)) {
-            register int xd = rn2(7) - 2; /* biased variation */
+            int xd = rn2(7) - 2; /* biased variation */
             (void) adjattrib(i, xd, TRUE);
             if (ABASE(i) < AMAX(i)) AMAX(i) = ABASE(i);
         }
@@ -1176,7 +1176,7 @@ restricted_spell_discipline(int otyp)
 }
 
 static void
-ini_inv(register struct trobj *trop)
+ini_inv(struct trobj *trop)
 {
     struct obj *obj;
     int otyp, i;

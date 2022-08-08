@@ -240,7 +240,7 @@ int n;
 
 char *
 index(sp, c)
-register char *sp, c;
+char *sp, c;
 {
 	do {
 		if (*sp == c)

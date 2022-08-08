@@ -31,7 +31,7 @@ floating_above(const char *what)
 static void
 dowatersnakes(void)
 {
-    register int num = rn1(5, 2);
+    int num = rn1(5, 2);
     struct monst *mtmp;
 
     if (!(mvitals[PM_WATER_MOCCASIN].mvflags & G_GONE)) {
@@ -79,7 +79,7 @@ dowaterdemon(void)
 static void
 dowaternymph(void)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
 
     if(!(mvitals[PM_WATER_NYMPH].mvflags & G_GONE) &&
        (mtmp = makemon(&mons[PM_WATER_NYMPH], u.ux, u.uy, NO_MM_FLAGS))) {
@@ -116,8 +116,8 @@ dogushforth(int drinking)
 static void
 gush(int x, int y, genericptr_t poolcnt)
 {
-    register struct monst *mtmp;
-    register struct trap *ttmp;
+    struct monst *mtmp;
+    struct trap *ttmp;
 
     if (((x+y)%2) || (x == u.ux && y == u.uy) ||
         (rn2(1 + distmin(u.ux, u.uy, x, y)))  ||
@@ -214,8 +214,8 @@ void
 drinkfountain(void)
 {
     /* What happens when you drink from a fountain? */
-    register boolean mgkftn = (levl[u.ux][u.uy].blessedftn == 1);
-    register int fate = rnd(30);
+    boolean mgkftn = (levl[u.ux][u.uy].blessedftn == 1);
+    int fate = rnd(30);
 
     if (Levitation) {
         floating_above("fountain");
@@ -292,7 +292,7 @@ drinkfountain(void)
             break;
 
         case 24: /* Curse an item */ {
-            register struct obj *obj;
+            struct obj *obj;
 
             pline("This water's no good!");
             morehungry(rn1(20, 11));
@@ -336,7 +336,7 @@ drinkfountain(void)
             break;
 
         case 29: /* Scare */ {
-            register struct monst *mtmp;
+            struct monst *mtmp;
 
             pline("This %s gives you bad breath!", hliquid("water"));
             for(mtmp = fmon; mtmp; mtmp = mtmp->nmon)
@@ -358,7 +358,7 @@ drinkfountain(void)
 }
 
 void
-dipfountain(register struct obj *obj)
+dipfountain(struct obj *obj)
 {
     int er = ER_NOTHING;
 

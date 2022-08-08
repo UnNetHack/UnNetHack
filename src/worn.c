@@ -41,11 +41,11 @@ const struct worn {
 
 /* Updated to use the extrinsic and blocked fields. */
 void
-setworn(register struct obj *obj, long int mask)
+setworn(struct obj *obj, long int mask)
 {
-    register const struct worn *wp;
-    register struct obj *oobj;
-    register int p;
+    const struct worn *wp;
+    struct obj *oobj;
+    int p;
 
     if ((mask & (W_ARM|I_SPECIAL)) == (W_ARM|I_SPECIAL)) {
         /* restoring saved game; no properties are conferred via skin */
@@ -120,10 +120,10 @@ setworn(register struct obj *obj, long int mask)
 /* called e.g. when obj is destroyed */
 /* Updated to use the extrinsic and blocked fields. */
 void
-setnotworn(register struct obj *obj)
+setnotworn(struct obj *obj)
 {
-    register const struct worn *wp;
-    register int p;
+    const struct worn *wp;
+    int p;
 
     if (!obj) return;
     if (obj == uwep || obj == uswapwep) u.twoweap = 0;
@@ -454,9 +454,9 @@ maybe_blocks:
 }
 
 int
-find_mac(register struct monst *mon)
+find_mac(struct monst *mon)
 {
-    register struct obj *obj;
+    struct obj *obj;
     int base = mon->data->ac;
     long mwflags = mon->misc_worn_check;
 
@@ -494,7 +494,7 @@ find_mac(register struct monst *mon)
  * already worn body armor is too obviously buggy...
  */
 void
-m_dowear(register struct monst *mon, boolean creation)
+m_dowear(struct monst *mon, boolean creation)
 {
 #define RACE_EXCEPTION TRUE
     /* Note the restrictions here are the same as in dowear in do_wear.c

@@ -41,11 +41,11 @@ static char venom_inv[] = { VENOM_CLASS, 0 };   /* (constant) */
 #endif
 
 void
-assigninvlet(register struct obj *otmp)
+assigninvlet(struct obj *otmp)
 {
     boolean inuse[52];
-    register int i;
-    register struct obj *obj;
+    int i;
+    struct obj *obj;
 
     /* there should be at most one of these in inventory... */
     if (otmp->oclass == COIN_CLASS) {
@@ -161,7 +161,7 @@ merge_choice(struct obj *objlist, struct obj *obj)
 int
 merged(struct obj **potmp, struct obj **pobj)
 {
-    register struct obj *otmp = *potmp, *obj = *pobj;
+    struct obj *otmp = *potmp, *obj = *pobj;
 
     if (mergable(otmp, obj)) {
         /* Approximate age: we do it this way because if we were to
@@ -539,7 +539,7 @@ useupall(struct obj *obj)
 }
 
 void
-useup(register struct obj *obj)
+useup(struct obj *obj)
 {
     /*  Note:  This works correctly for containers because they */
     /*     (containers) don't merge.                */
@@ -610,7 +610,7 @@ freeinv_core(struct obj *obj)
 
 /* remove an object from the hero's inventory */
 void
-freeinv(register struct obj *obj)
+freeinv(struct obj *obj)
 {
     extract_nobj(obj, &invent);
     freeinv_core(obj);
@@ -635,7 +635,7 @@ delallobj(int x, int y)
 
 /* destroy object in fobj chain (if unpaid, it remains on the bill) */
 void
-delobj(register struct obj *obj)
+delobj(struct obj *obj)
 {
     boolean update_map;
 
@@ -660,7 +660,7 @@ delobj(register struct obj *obj)
 struct obj *
 sobj_at(int otyp, int x, int y)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     for (otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere) {
         if (otmp->otyp == otyp) {
@@ -674,7 +674,7 @@ sobj_at(int otyp, int x, int y)
 struct obj *
 nxtobj(struct obj *obj, int type, boolean by_nexthere)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     otmp = obj; /* start with the object after this one */
     do {
@@ -688,9 +688,9 @@ nxtobj(struct obj *obj, int type, boolean by_nexthere)
 }
 
 struct obj *
-carrying(register int type)
+carrying(int type)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     for(otmp = invent; otmp; otmp = otmp->nobj)
         if(otmp->otyp == type)
@@ -740,7 +740,7 @@ currency(long int amount)
 boolean
 have_lizard(void)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     for(otmp = invent; otmp; otmp = otmp->nobj)
         if(otmp->otyp == CORPSE && otmp->corpsenm == PM_LIZARD)
@@ -749,7 +749,7 @@ have_lizard(void)
 }
 
 struct obj *
-o_on(unsigned int id, register struct obj *objchn)
+o_on(unsigned int id, struct obj *objchn)
 {
     struct obj *temp;
 
@@ -763,9 +763,9 @@ o_on(unsigned int id, register struct obj *objchn)
 }
 
 boolean
-obj_here(register struct obj *obj, int x, int y)
+obj_here(struct obj *obj, int x, int y)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     for(otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere)
         if(obj == otmp) return(TRUE);
@@ -773,9 +773,9 @@ obj_here(register struct obj *obj, int x, int y)
 }
 
 struct obj *
-g_at(register int x, register int y)
+g_at(int x, int y)
 {
-    register struct obj *obj = level.objects[x][y];
+    struct obj *obj = level.objects[x][y];
 
     while (obj) {
         if (obj->oclass == COIN_CLASS) return obj;
@@ -786,10 +786,10 @@ g_at(register int x, register int y)
 
 /* compact a string of inventory letters by dashing runs of letters */
 static void
-compactify(register char *buf)
+compactify(char *buf)
 {
-    register int i1 = 1, i2 = 1;
-    register char ilet, ilet1, ilet2;
+    int i1 = 1, i2 = 1;
+    char ilet, ilet1, ilet2;
 
     ilet2 = buf[0];
     ilet1 = buf[1];
@@ -867,7 +867,7 @@ getnextgetobj(void)
 !!!! may be able to remove "usegold"
  */
 struct obj *
-getobj(register const char *let, register const char *word)
+getobj(const char *let, const char *word)
 {
     struct obj *otmp;
     char ilet = 0;
@@ -939,7 +939,7 @@ getobj(register const char *let, register const char *word)
             || (usegold && otmp->invlet == GOLD_SYM)
             || (useboulder && otmp->otyp == BOULDER)
             ) {
-            register int otyp = otmp->otyp;
+            int otyp = otmp->otyp;
             bp[foo++] = otmp->invlet;
 
             /* ugly check: remove inappropriate things */
@@ -1280,14 +1280,14 @@ silly_thing(const char *word, struct obj *otmp)
 }
 
 static int
-ckvalidcat(register struct obj *otmp)
+ckvalidcat(struct obj *otmp)
 {
     /* use allow_category() from pickup.c */
     return((int)allow_category(otmp));
 }
 
 static int
-ckunpaid(register struct obj *otmp)
+ckunpaid(struct obj *otmp)
 {
     return (otmp->unpaid || (Has_contents(otmp) && count_unpaid(otmp->cobj)));
 }
@@ -1524,8 +1524,8 @@ askchain(struct obj **objchn, const char *olets, int allflag, int (*fn) (struct 
 
 {
     struct obj *otmp, *otmp2, *otmpo;
-    register char sym, ilet;
-    register int cnt = 0, dud = 0, tmp;
+    char sym, ilet;
+    int cnt = 0, dud = 0, tmp;
     boolean takeoff, nodot, ident, take_out, put_in, first, ininv, bycat;
     char qbuf[QBUFSZ], qpfx[QBUFSZ];
 
@@ -1890,7 +1890,7 @@ update_inventory(void)
 }
 
 static char
-obj_to_let(register struct obj *obj) /* should of course only be called for things in invent */
+obj_to_let(struct obj *obj) /* should of course only be called for things in invent */
 
 {
     if (!flags.invlet_constant) {
@@ -2757,7 +2757,7 @@ display_inventory(const char *lets, boolean want_reply)
 
 /** See display_inventory. This is the same thing WITH dumpfile creation */
 char
-dump_inventory(register const char *lets, boolean want_reply, boolean want_disp)
+dump_inventory(const char *lets, boolean want_reply, boolean want_disp)
 {
     return display_pickinv(lets, NULL, NULL, want_reply, (long *)0, TRUE, want_disp);
 }
@@ -2991,7 +2991,7 @@ dounpaid(void)
 {
     winid win;
     struct obj *otmp, *marker;
-    register char ilet;
+    char ilet;
     char *invlet = flags.inv_order;
     int classcount, count, num_so_far;
     int save_unpaid = 0;    /* lint init */
@@ -3714,7 +3714,7 @@ doprring(void)
         You("are not wearing any rings.");
     else {
         char lets[3];
-        register int ct = 0;
+        int ct = 0;
 
         if(uleft) lets[ct++] = obj_to_let(uleft);
         if(uright) lets[ct++] = obj_to_let(uright);
@@ -3785,9 +3785,9 @@ doprinuse(void)
  * uses up an object that's on the floor, charging for it as necessary
  */
 void
-useupf(register struct obj *obj, long int numused)
+useupf(struct obj *obj, long int numused)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     boolean at_u = (obj->ox == u.ux && obj->oy == u.uy);
 
     /* burn_floor_objects() keeps an object pointer that it tries to
@@ -4179,7 +4179,7 @@ worn_wield_only(struct obj *obj)
  *  MINV_ALL            - display all inventory
  */
 struct obj *
-display_minventory(register struct monst *mon, int dflags, char *title)
+display_minventory(struct monst *mon, int dflags, char *title)
 {
     struct obj *ret;
     char tmp[QBUFSZ];
@@ -4229,7 +4229,7 @@ display_minventory(register struct monst *mon, int dflags, char *title)
  * Currently, this is only used for statues, via wand of probing.
  */
 struct obj *
-display_cinventory(register struct obj *obj)
+display_cinventory(struct obj *obj)
 {
     struct obj *ret;
     char tmp[QBUFSZ];

@@ -112,7 +112,7 @@ thitu(
  */
 
 static int
-drop_throw(register struct obj *obj, boolean ohit, int x, int y)
+drop_throw(struct obj *obj, boolean ohit, int x, int y)
 {
     int retvalu = 1;
     int create;
@@ -719,7 +719,7 @@ int
 thrwmm(struct monst *mtmp, struct monst *mtarg)
 {
     struct obj *otmp, *mwep;
-    register xchar x, y;
+    xchar x, y;
     boolean ispole;
 
     /* Polearms won't be applied by monsters against other monsters */
@@ -969,7 +969,7 @@ thrwmu(struct monst *mtmp)
 
 /* monster spits substance at you */
 int
-spitmu(register struct monst *mtmp, register struct attack *mattk)
+spitmu(struct monst *mtmp, struct attack *mattk)
 {
     struct obj *otmp;
 
@@ -1017,7 +1017,7 @@ spitmu(register struct monst *mtmp, register struct attack *mattk)
 
 /* monster breathes at you (ranged) */
 int
-breamu(register struct monst *mtmp, register struct attack *mattk)         /* monster breathes at you (ranged) */
+breamu(struct monst *mtmp, struct attack *mattk)         /* monster breathes at you (ranged) */
 
 
 {
@@ -1116,7 +1116,7 @@ m_lined_up(struct monst *mtarg, struct monst *mtmp)
 }
 
 boolean
-lined_up(register struct monst *mtmp)      /* is mtmp in position to use ranged attack? */
+lined_up(struct monst *mtmp)      /* is mtmp in position to use ranged attack? */
 
 {
     boolean ignore_boulders;
@@ -1138,7 +1138,7 @@ lined_up(register struct monst *mtmp)      /* is mtmp in position to use ranged 
 struct obj *
 m_carrying(struct monst *mtmp, int type)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
         if (otmp->otyp == type)
@@ -1255,7 +1255,7 @@ hit_bars(struct obj **obj_p, int objx, int objy, int barsx, int barsy, boolean y
 }
 
 void
-dissolve_bars(register int x, register int y)
+dissolve_bars(int x, int y)
 {
     levl[x][y].typ = (Is_special(&u.uz) || *in_rooms(x, y, 0)) ? ROOM : CORR;
     levl[x][y].flags = 0;

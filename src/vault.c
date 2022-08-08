@@ -209,7 +209,7 @@ in_fcorridor(struct monst *grd, int x, int y)
 struct monst *
 findgd(void)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp)) {
@@ -233,7 +233,7 @@ vault_summon_gd(void)
 char
 vault_occupied(char *array)
 {
-    register char *ptr;
+    char *ptr;
 
     for (ptr = array; *ptr; ptr++)
         if (rooms[*ptr - ROOMOFFSET].rtype == VAULT)
@@ -270,7 +270,7 @@ uleftvault(struct monst *grd)
 static boolean
 find_guard_dest(struct monst *guard, xchar *rx, xchar *ry)
 {
-    register int x, y, dd, lx = 0, ly = 0;
+    int x, y, dd, lx = 0, ly = 0;
 
     for (dd = 2; (dd < ROWNO || dd < COLNO); dd++) {
         for (y = u.uy - dd; y <= u.uy + dd; ly = y, y++) {
@@ -354,7 +354,7 @@ invault(void)
             }
         }
         while(levl[x][y].typ == ROOM) {
-            register int dx, dy;
+            int dx, dy;
 
             dx = (gx > x) ? 1 : (gx < x) ? -1 : 0;
             dy = (gy > y) ? 1 : (gy < y) ? -1 : 0;
@@ -636,7 +636,7 @@ wallify_vault(struct monst *grd)
 }
 
 static void
-gd_mv_monaway(register struct monst *grd, int nx, int ny)
+gd_mv_monaway(struct monst *grd, int nx, int ny)
 {
     if (MON_AT(nx, ny) && !(nx == grd->mx && ny == grd->my)) {
         if (!Deaf)
@@ -739,7 +739,7 @@ gd_pick_corridor_gold(struct monst *grd, int goldx, int goldy)
  * return  1: guard moved,  0: guard didn't,  -1: let m_move do it,  -2: died
  */
 int
-gd_move(register struct monst *grd)
+gd_move(struct monst *grd)
 {
     int x, y, nx, ny, m, n;
     int dx, dy, gx = 0, gy = 0, fci;
@@ -752,7 +752,7 @@ gd_move(register struct monst *grd)
     boolean semi_dead = DEADMONSTER(grd);
     boolean newspot = FALSE;
     long umoney = money_cnt(invent);
-    register boolean u_carry_gold = ((umoney + hidden_gold()) > 0L);
+    boolean u_carry_gold = ((umoney + hidden_gold()) > 0L);
     boolean see_guard;
 
     if (!on_level(&(egrd->gdlevel), &u.uz)) {
@@ -1090,7 +1090,7 @@ cleanup:
 void
 paygd(boolean silently)
 {
-    register struct monst *grd = findgd();
+    struct monst *grd = findgd();
     long umoney = money_cnt(invent);
     struct obj *coins, *nextcoins;
     int gx, gy;
@@ -1138,8 +1138,8 @@ paygd(boolean silently)
 long
 hidden_gold(void)
 {
-    register long value = 0L;
-    register struct obj *obj;
+    long value = 0L;
+    struct obj *obj;
 
     for (obj = invent; obj; obj = obj->nobj)
         if (Has_contents(obj))
@@ -1153,7 +1153,7 @@ hidden_gold(void)
 boolean
 gd_sound(void)
 {
-    register struct monst *grd = findgd();
+    struct monst *grd = findgd();
 
     if (vault_occupied(u.urooms)) return(FALSE);
     else return((boolean)(grd == (struct monst *)0));

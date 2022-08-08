@@ -100,7 +100,7 @@ missmu(struct monst *mtmp, boolean nearmiss, struct attack *mattk)
 }
 
 static void
-mswings(register struct monst *mtmp, register struct obj *otemp)        /* monster swings obj */
+mswings(struct monst *mtmp, struct obj *otemp)        /* monster swings obj */
 
 
 {
@@ -140,7 +140,7 @@ u_slow_down(void)
 }
 
 static void
-wildmiss(register struct monst *mtmp, register struct attack *mattk)       /* monster attacked your displaced image */
+wildmiss(struct monst *mtmp, struct attack *mattk)       /* monster attacked your displaced image */
 
 
 {
@@ -364,7 +364,7 @@ getmattk(struct monst *magr, struct monst *mdef, int indx, int *prev_result, str
  *      take care of it...
  */
 int
-mattacku(register struct monst *mtmp)
+mattacku(struct monst *mtmp)
 {
     struct  attack  *mattk, alt_attk;
     int i, j=0, tmp, sum[NATTK];
@@ -918,7 +918,7 @@ magic_negation(struct monst *mon)
  *         attacking you
  */
 static int
-hitmu(register struct monst *mtmp, register struct attack *mattk)
+hitmu(struct monst *mtmp, struct attack *mattk)
 {
     struct permonst *mdat = mtmp->data;
     int uncancelled, ptmp;
@@ -1232,7 +1232,7 @@ dopois:
         break;
 
     case AD_LEGS:
-    { register long side = rn2(2) ? RIGHT_SIDE : LEFT_SIDE;
+    { long side = rn2(2) ? RIGHT_SIDE : LEFT_SIDE;
       const char *sidestr = (side == RIGHT_SIDE) ? "right" : "left";
 
       /* This case is too obvious to ignore, but Nethack is not in
@@ -1948,7 +1948,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
     struct trap *t = t_at(u.ux, u.uy);
     int tmp = d((int)mattk->damn, (int)mattk->damd);
     int tim_tmp;
-    register struct obj *otmp2;
+    struct obj *otmp2;
     int i;
     boolean physical_damage = FALSE;
 
@@ -2355,7 +2355,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
 
     /* assumes that hero has to see monster's gaze in order to be
        affected, rather than monster just having to look at hero;
-       when hallucinating, hero's brain doesn't register what
+       when hallucinating, hero's brain doesn't what
        it's seeing correctly so the gaze is usually ineffective
        [this could be taken a lot farther and select a gaze effect
        appropriate to what's currently being displayed, giving

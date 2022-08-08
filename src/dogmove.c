@@ -205,7 +205,7 @@ dog_eat(struct monst *mtmp, struct obj *obj, int x, int y, boolean devour)
           /* dog's starting location, might be different from current */
 
 {
-    register struct edog *edog = EDOG(mtmp);
+    struct edog *edog = EDOG(mtmp);
     boolean poly, grow, heal, eyes, slimer, deadmimic;
     int nutrit;
     boolean vampiric = is_vampiric(mtmp->data);
@@ -429,7 +429,7 @@ dog_died:
 static int
 dog_invent(struct monst *mtmp, struct edog *edog, int udist)
 {
-    register int omx, omy, carryamt = 0;
+    int omx, omy, carryamt = 0;
     struct obj *obj, *otmp;
 
     if (mtmp->msleeping || !mtmp->mcanmove) return(0);
@@ -496,11 +496,11 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
  * returns -1/0/1 (dog's desire to approach player) or -2 (abort move)
  */
 static int
-dog_goal(register struct monst *mtmp, struct edog *edog, int after, int udist, int whappr)
+dog_goal(struct monst *mtmp, struct edog *edog, int after, int udist, int whappr)
 {
-    register int omx, omy;
+    int omx, omy;
     boolean in_masters_sight, dog_has_minvent;
-    register struct obj *obj;
+    struct obj *obj;
     xchar otyp;
     int appr;
 
@@ -522,7 +522,7 @@ dog_goal(register struct monst *mtmp, struct edog *edog, int after, int udist, i
 #define DDIST(x, y) (dist2(x, y, omx, omy))
 #define SQSRCHRADIUS 5
         int min_x, max_x, min_y, max_y;
-        register int nx, ny;
+        int nx, ny;
 
         gtyp = UNDEF;   /* no goal as yet */
         gx = gy = 0;    /* suppress 'used before set' message */
@@ -599,7 +599,7 @@ dog_goal(register struct monst *mtmp, struct edog *edog, int after, int udist, i
 
 #define FARAWAY (COLNO + 2)     /* position outside screen */
     if (gx == u.ux && gy == u.uy && !in_masters_sight) {
-        register coord *cp;
+        coord *cp;
 
         cp = gettrack(omx, omy);
         if (cp) {
@@ -636,7 +636,7 @@ dog_goal(register struct monst *mtmp, struct edog *edog, int after, int udist, i
 }
 
 static struct monst *
-find_targ(register struct monst *mtmp, int dx, int dy, int maxdist)
+find_targ(struct monst *mtmp, int dx, int dy, int maxdist)
 {
     struct monst *targ = 0;
     int curx = mtmp->mx, cury = mtmp->my;
@@ -898,13 +898,13 @@ dog_move(struct monst *mtmp,
 {
     int appr, whappr, udist;
     int i, j, k;
-    register struct edog *edog = EDOG(mtmp);
+    struct edog *edog = EDOG(mtmp);
     struct obj *obj = (struct obj *) 0;
     xchar otyp;
     boolean has_edog, cursemsg[9], do_eat = FALSE;
     boolean better_with_displacing = FALSE;
     xchar nix, niy;     /* position mtmp is (considering) moving to */
-    register int nx, ny;    /* temporary coordinates */
+    int nx, ny;    /* temporary coordinates */
     xchar cnt, uncursedcnt, chcnt;
     int chi = -1, nidist, ndist;
     coord poss[9];
@@ -1025,7 +1025,7 @@ dog_move(struct monst *mtmp,
 
         if ((info[i] & ALLOW_M) && MON_AT(nx, ny)) {
             int mstatus;
-            register struct monst *mtmp2 = m_at(nx, ny);
+            struct monst *mtmp2 = m_at(nx, ny);
 
             if ((int)mtmp2->m_lev >= (int)mtmp->m_lev+2 ||
                 (mtmp2->data == &mons[PM_FLOATING_EYE] && rn2(10) &&

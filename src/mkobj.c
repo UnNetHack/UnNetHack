@@ -269,8 +269,8 @@ mkobj(char oclass, boolean artif)
 static void
 mkbox_cnts(struct obj *box)
 {
-    register int n;
-    register struct obj *otmp;
+    int n;
+    struct obj *otmp;
 
     box->cobj = (struct obj *) 0;
 
@@ -315,7 +315,7 @@ mkbox_cnts(struct obj *box)
                 (void) stop_timer(REVIVE_MON, obj_to_any(otmp));
             }
         } else {
-            register int tprob;
+            int tprob;
             const struct icp *iprobs = boxiprobs;
 
             for (tprob = rnd(100); (tprob -= iprobs->iprob) > 0; iprobs++)
@@ -353,8 +353,8 @@ mkbox_cnts(struct obj *box)
 int
 rndmonnum(void)
 {
-    register struct permonst *ptr;
-    register int i;
+    struct permonst *ptr;
+    int i;
     unsigned short excludeflags;
 
     /* Plan A: get a level-appropriate common monster */
@@ -647,9 +647,9 @@ unknwn_contnr_contents(struct obj *obj)
  * usage of an object.
  */
 void
-bill_dummy_object(register struct obj *otmp)
+bill_dummy_object(struct obj *otmp)
 {
-    register struct obj *dummy;
+    struct obj *dummy;
     long cost = 0L;
 
     if (otmp->unpaid) {
@@ -1294,7 +1294,7 @@ maybe_adjust_light(struct obj *obj, int old_range)
  *      these routines to make the actual curse/bless state change.
  */
 void
-bless(register struct obj *otmp)
+bless(struct obj *otmp)
 {
     int old_light = 0;
 
@@ -1318,7 +1318,7 @@ bless(register struct obj *otmp)
 }
 
 void
-unbless(register struct obj *otmp)
+unbless(struct obj *otmp)
 {
     int old_light = 0;
 
@@ -1337,7 +1337,7 @@ unbless(register struct obj *otmp)
 }
 
 void
-curse(register struct obj *otmp)
+curse(struct obj *otmp)
 {
     unsigned already_cursed;
     int old_light = 0;
@@ -1380,7 +1380,7 @@ curse(register struct obj *otmp)
 }
 
 void
-uncurse(register struct obj *otmp)
+uncurse(struct obj *otmp)
 {
     int old_light = 0;
 
@@ -1401,7 +1401,7 @@ uncurse(register struct obj *otmp)
 }
 
 void
-blessorcurse(register struct obj *otmp, register int chance)
+blessorcurse(struct obj *otmp, int chance)
 {
     if(otmp->blessed || otmp->cursed) return;
 
@@ -1416,7 +1416,7 @@ blessorcurse(register struct obj *otmp, register int chance)
 }
 
 int
-bcsign(register struct obj *otmp)
+bcsign(struct obj *otmp)
 {
     return(!!otmp->blessed - !!otmp->cursed);
 }
@@ -1444,7 +1444,7 @@ set_bknown(
  *     container's weight.
  */
 int
-weight(register struct obj *obj)
+weight(struct obj *obj)
 {
     int wt = objects[obj->otyp].oc_weight;
 
@@ -1457,7 +1457,7 @@ weight(register struct obj *obj)
     }
     if (Is_container(obj) || obj->otyp == STATUE) {
         struct obj *contents;
-        register int cwt = 0;
+        int cwt = 0;
 
         if (obj->otyp == STATUE && obj->corpsenm >= LOW_PM)
             wt = (int)obj->quan *
@@ -1529,7 +1529,7 @@ rnd_treesticks_at(int x, int y)
 struct obj *
 mkgold(long int amount, int x, int y)
 {
-    register struct obj *gold = g_at(x, y);
+    struct obj *gold = g_at(x, y);
 
     if (amount <= 0L)
         amount = (long)(1 + rnd(level_difficulty()+2) * rnd(30));
@@ -1738,7 +1738,7 @@ mk_named_object(int objtype, struct permonst *ptr, int x, int y, const char *nm)
 }
 
 boolean
-is_flammable(register struct obj *otmp)
+is_flammable(struct obj *otmp)
 {
     int otyp = otmp->otyp;
     int omat = objects[otyp].oc_material;
@@ -1757,7 +1757,7 @@ is_flammable(register struct obj *otmp)
 }
 
 boolean
-is_rottable(register struct obj *otmp)
+is_rottable(struct obj *otmp)
 {
     int otyp = otmp->otyp;
 
@@ -1772,9 +1772,9 @@ is_rottable(register struct obj *otmp)
 
 /* put the object at the given location */
 void
-place_object(register struct obj *otmp, int x, int y)
+place_object(struct obj *otmp, int x, int y)
 {
-    register struct obj *otmp2 = level.objects[x][y];
+    struct obj *otmp2 = level.objects[x][y];
 
     if (!isok(x, y)) { /* validate location */
         void VDECL((*func), (const char *, ...)) PRINTF_F(1, 2);
@@ -1945,7 +1945,7 @@ obj_timer_checks(
 #undef ROT_ICE_ADJUSTMENT
 
 void
-remove_object(register struct obj *otmp)
+remove_object(struct obj *otmp)
 {
     xchar x = otmp->ox;
     xchar y = otmp->oy;

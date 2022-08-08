@@ -286,7 +286,7 @@ md_rush(
     int ty) /**< destination of mail daemon */
 {
     struct monst *mon;          /* displaced monster */
-    register int dx, dy;        /* direction counters */
+    int dx, dy;        /* direction counters */
     int fx = md->mx, fy = md->my;   /* current location */
     int nfx = fx, nfy = fy,     /* new location */
         d1, d2;         /* shortest distances */
@@ -536,7 +536,7 @@ readmail(struct obj *otmp)
 {
     nhUse(otmp);
 #ifdef DEF_MAILREADER
-    register const char *mr = 0;
+    const char *mr = 0;
     if (iflags.debug_fuzzer) {
         return;
     }

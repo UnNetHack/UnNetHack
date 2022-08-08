@@ -8,7 +8,7 @@ static int stealarm(void);
 static const char *equipname(struct obj *);
 
 static const char *
-equipname(register struct obj *otmp)
+equipname(struct obj *otmp)
 {
     return (
         (otmp == uarmu) ? "shirt" :
@@ -53,7 +53,7 @@ somegold(long int lmoney)
    Deals in gold only, as leprechauns don't care for lesser coins.
  */
 struct obj *
-findgold(register struct obj *chain)
+findgold(struct obj *chain)
 {
     while (chain && chain->otyp != GOLD_PIECE) chain = chain->nobj;
     return chain;
@@ -63,11 +63,11 @@ findgold(register struct obj *chain)
    Steal gold coins only.  Leprechauns don't care for lesser coins.
  */
 void
-stealgold(register struct monst *mtmp)
+stealgold(struct monst *mtmp)
 {
-    register struct obj *fgold = g_at(u.ux, u.uy);
-    register struct obj *ygold;
-    register long tmp;
+    struct obj *fgold = g_at(u.ux, u.uy);
+    struct obj *ygold;
+    long tmp;
     struct monst *who;
     const char *whose, *what;
 
@@ -134,8 +134,8 @@ unsigned int stealmid;      /* monster doing the stealing */
 static int
 stealarm(void)
 {
-    register struct monst *mtmp;
-    register struct obj *otmp;
+    struct monst *mtmp;
+    struct obj *otmp;
 
     for(otmp = invent; otmp; otmp = otmp->nobj) {
         if(otmp->o_id == stealoid) {
@@ -463,7 +463,7 @@ cant_take:
 
 /* Returns 1 if otmp is free'd, 0 otherwise. */
 int
-mpickobj(register struct monst *mtmp, register struct obj *otmp)
+mpickobj(struct monst *mtmp, struct obj *otmp)
 {
     int freed_otmp;
     boolean snuff_otmp = FALSE;

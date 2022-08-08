@@ -31,7 +31,7 @@ extern const int monstr[];
 #define tooweak(monindx, lev)   (monstr[monindx] < lev)
 
 boolean
-is_home_elemental(register struct permonst *ptr)
+is_home_elemental(struct permonst *ptr)
 {
     if (ptr->mlet == S_ELEMENTAL)
         switch (monsndx(ptr)) {
@@ -74,7 +74,7 @@ static void
 m_initgrp(struct monst *mtmp, int x, int y, int n, int mmflags)
 {
     coord mm;
-    register int cnt = rnd(n);
+    int cnt = rnd(n);
     struct monst *mon;
 #if defined(__GNUC__) && (defined(HPUX) || defined(DGUX))
     /* There is an unresolved problem with several people finding that
@@ -138,7 +138,7 @@ m_initgrp(struct monst *mtmp, int x, int y, int n, int mmflags)
 static void
 m_initthrow(struct monst *mtmp, int otyp, int oquan)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     otmp = mksobj(otyp, TRUE, FALSE);
     otmp->quan = (long) rn1(oquan, 3);
@@ -150,7 +150,7 @@ m_initthrow(struct monst *mtmp, int otyp, int oquan)
 static void
 m_inityour(struct monst *mtmp, struct obj *obj)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     otmp = mksobj(obj->otyp, FALSE, FALSE);
     if (obj->blessed) bless(obj);
@@ -164,10 +164,10 @@ m_inityour(struct monst *mtmp, struct obj *obj)
 }
 
 static void
-m_initweap(register struct monst *mtmp)
+m_initweap(struct monst *mtmp)
 {
-    register struct permonst *ptr = mtmp->data;
-    register int mm = monsndx(ptr);
+    struct permonst *ptr = mtmp->data;
+    int mm = monsndx(ptr);
     struct obj *otmp;
     int bias, w1, w2;
 
@@ -595,11 +595,11 @@ mkmonmoney(struct monst *mtmp, long int amount)
 }
 
 static void
-m_initinv(register struct monst *mtmp)
+m_initinv(struct monst *mtmp)
 {
-    register int cnt;
-    register struct obj *otmp;
-    register struct permonst *ptr = mtmp->data;
+    int cnt;
+    struct obj *otmp;
+    struct permonst *ptr = mtmp->data;
     int i;
 #ifdef REINCARNATION
     if (Is_rogue_level(&u.uz)) return;
@@ -612,7 +612,7 @@ m_initinv(register struct monst *mtmp)
 
         case S_HUMAN:
             if(is_mercenary(ptr)) {
-                register int mac;
+                int mac;
 
                 switch(monsndx(ptr)) {
                     case PM_GUARD: mac = -1; break;
@@ -1120,9 +1120,9 @@ makemon_rnd_goodpos(struct monst *mon, unsigned int gpflags, coord *cc)
 
 static
 struct monst *
-_makemon(register struct permonst *ptr, register int x, register int y, register int mmflags)
+_makemon(struct permonst *ptr, int x, int y, int mmflags)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
     int mndx, mcham, ct, mitem, xlth, mhitdie;
     boolean anymon = (!ptr);
     boolean byyou = (x == u.ux && y == u.uy);
@@ -1529,7 +1529,7 @@ newmextra(void)
  *  In case we make a monster group, only return the one at [x,y].
  */
 struct monst *
-makemon(register struct permonst *ptr, register int x, register int y, register int mmflags)
+makemon(struct permonst *ptr, int x, int y, int mmflags)
 {
     use_mon_rng++;
     struct monst *mtmp = _makemon(ptr, x, y, mmflags);
@@ -1641,11 +1641,11 @@ prohibited_by_generation_flags(struct permonst *ptr)
  *  return an integer in the range of 0-5.
  */
 static int
-align_shift(register struct permonst *ptr)
+align_shift(struct permonst *ptr)
 {
     static NEARDATA long oldmoves = 0L; /* != 1, starting value of moves */
     static NEARDATA s_level *lev;
-    register int alshift;
+    int alshift;
 
     if (oldmoves != moves) {
         lev = Is_special(&u.uz);
@@ -1724,8 +1724,8 @@ static
 struct permonst *
 _rndmonst(void)
 {
-    register struct permonst *ptr;
-    register int mndx, ct;
+    struct permonst *ptr;
+    int mndx, ct;
 
     if (level.mon_gen &&
             (rn2(100) < level.mon_gen->override_chance) &&
@@ -1874,7 +1874,7 @@ mkclass(char class, int spc)
 struct permonst *
 mkclass_aligned(char class, int spc, aligntyp atyp)
 {
-    register int first, last, num = 0;
+    int first, last, num = 0;
     int k, nums[SPECIAL_PM + 1]; /* +1: insurance for final return value */
     int maxmlev, mask = (G_NOGEN | G_UNIQ) & ~spc;
 
@@ -1953,7 +1953,7 @@ mkclass_aligned(char class, int spc, aligntyp atyp)
 int
 mkclass_poly(int class)
 {
-    register int first, last, num = 0;
+    int first, last, num = 0;
 
     for (first = LOW_PM; first < SPECIAL_PM; first++) {
         if (mons[first].mlet == class) {
@@ -1984,7 +1984,7 @@ mkclass_poly(int class)
 }
 
 int
-adj_lev(register struct permonst *ptr) /* adjust strength of monsters based on u.uz and u.ulevel */
+adj_lev(struct permonst *ptr) /* adjust strength of monsters based on u.uz and u.ulevel */
 
 {
     int tmp, tmp2;
@@ -2129,7 +2129,7 @@ grow_up(struct monst *mtmp, struct monst *victim)
 int
 mongets(struct monst *mtmp, int otyp)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     int spe;
 
     if (!otyp) return 0;
@@ -2200,7 +2200,7 @@ golemhp(int type)
  *  ( some "animal" types are co-aligned, but also hungry )
  */
 boolean
-peace_minded(register struct permonst *ptr)
+peace_minded(struct permonst *ptr)
 {
     aligntyp mal = ptr->maligntyp, ual = u.ualign.type;
 
@@ -2318,7 +2318,7 @@ static NEARDATA char syms[] = {
 };
 
 void
-set_mimic_sym(register struct monst *mtmp) /* KAA, modified by ERS */
+set_mimic_sym(struct monst *mtmp) /* KAA, modified by ERS */
 
 {
     int typ, roomno, rt;

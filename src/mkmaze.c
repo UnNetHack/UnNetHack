@@ -573,7 +573,7 @@ place_it:
         /* randomize Sokoban prize */
         if (dunlev(&u.uz)==1) {
             int price=0;
-            register struct engr *ep;
+            struct engr *ep;
             for (ep = head_engr; ep; ep = ep->nxt_engr) {
                 /* Sokoban top levels have no random, burned engravings */
                 if (ep && ep->engr_txt[0] && ep->engr_type == BURN &&
@@ -1404,7 +1404,7 @@ walkfrom(int x, int y, schar typ)
 #endif /* MICRO */
 
 static void
-move(register int *x, register int *y, register int dir)
+move(int *x, int *y, int dir)
 {
     switch(dir) {
     case 0: --(*y); break;

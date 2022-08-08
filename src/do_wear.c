@@ -65,7 +65,7 @@ off_msg(struct obj *otmp)
 
 /* for items that involve no delay */
 static void
-on_msg(register struct obj *otmp)
+on_msg(struct obj *otmp)
 {
     if (flags.verbose) {
         char how[BUFSZ];
@@ -1117,7 +1117,7 @@ learnring(struct obj *ring, boolean observed)
 }
 
 void
-Ring_on(register struct obj *obj)
+Ring_on(struct obj *obj)
 {
     long oldprop = u.uprops[objects[obj->otyp].oc_oprop].extrinsic;
     int old_attrib, which;
@@ -1269,7 +1269,7 @@ adjust_attrib:
 }
 
 static void
-Ring_off_or_gone(register struct obj *obj, boolean gone)
+Ring_off_or_gone(struct obj *obj, boolean gone)
 {
     long mask = (obj->owornmask & W_RING);
     int old_attrib, which;
@@ -1420,7 +1420,7 @@ Ring_gone(struct obj *obj)
 }
 
 void
-Blindf_on(register struct obj *otmp)
+Blindf_on(struct obj *otmp)
 {
     boolean already_blind = Blind, changed = FALSE;
 
@@ -1447,7 +1447,7 @@ Blindf_on(register struct obj *otmp)
 }
 
 void
-Blindf_off(register struct obj *otmp)
+Blindf_off(struct obj *otmp)
 {
     boolean was_blind = Blind, changed = FALSE;
 
@@ -1500,7 +1500,7 @@ set_wear(void)
 
 /* check whether the target object is currently being put on (or taken off) */
 boolean
-donning(register struct obj *otmp)       /* also checks for doffing */
+donning(struct obj *otmp)       /* also checks for doffing */
 
 {
     /* long what = (occupation == take_off) ? taking_off : 0L; */
@@ -2406,7 +2406,7 @@ find_ac(void)
 void
 glibr(void)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     int xfl = 0;
     boolean leftfall, rightfall, wastwoweap = FALSE;
     const char *otherwep = 0, *thiswep, *which, *hand;
@@ -2500,7 +2500,7 @@ glibr(void)
 struct obj *
 some_armor(struct monst *victim)
 {
-    register struct obj *otmph, *otmp;
+    struct obj *otmph, *otmp;
 
     otmph = (victim == &youmonst) ? uarmc : which_armor(victim, W_ARMC);
     if (!otmph)
@@ -2557,7 +2557,7 @@ unchanger(void)
 
 /* occupation callback for 'A' */
 static int
-select_off(register struct obj *otmp)
+select_off(struct obj *otmp)
 {
     struct obj *why;
     char buf[BUFSZ];
@@ -2723,8 +2723,8 @@ static const char *disrobing = "";
 static int
 take_off(void)
 {
-    register int i;
-    register struct obj *otmp;
+    int i;
+    struct obj *otmp;
 
     if (taking_off) {
         if (todelay > 0) {
@@ -2902,9 +2902,9 @@ menu_remarm(int retry)
 
 /* hit by destroy armor scroll/black dragon breath/monster spell */
 int
-destroy_arm(register struct obj *atmp)
+destroy_arm(struct obj *atmp)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 #define DESTROY_ARM(o) ((otmp = (o)) != 0 && \
                         (!atmp || atmp == otmp) && \
                         (!obj_resists(otmp, 0, 90)))
@@ -2958,7 +2958,7 @@ destroy_arm(register struct obj *atmp)
 }
 
 void
-adj_abon(register struct obj *otmp, register schar delta)
+adj_abon(struct obj *otmp, schar delta)
 {
     if (uarmg && uarmg == otmp && otmp->otyp == GAUNTLETS_OF_DEXTERITY) {
         if (delta) {

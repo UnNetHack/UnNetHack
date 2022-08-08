@@ -285,7 +285,7 @@ const struct shclass shtypes[] = {
 void
 shop_selection_init(void)
 {
-    register int i, j, item_prob, shop_prob;
+    int i, j, item_prob, shop_prob;
 
     for (shop_prob = 0, i = 0; i < SIZE(shtypes)-1; i++) {
         shop_prob += shtypes[i].prob;
@@ -475,7 +475,7 @@ free_eshk(struct monst *mtmp)
 static int
 shkinit(const struct shclass *shp, struct mkroom *sroom)
 {
-    register int sh, sx, sy;
+    int sh, sx, sy;
     struct monst *shk;
     struct eshk *eshkp;
     long shkmoney; /* Temporary placeholder for Shopkeeper's initial capital */
@@ -509,7 +509,7 @@ shk_failed:
         /* Said to happen sometimes, but I have never seen it. */
         /* Supposedly fixed by fdoor change in mklev.c */
         if(wizard) {
-            register int j = sroom->doorct;
+            int j = sroom->doorct;
 
             pline("Where is shopdoor?");
             pline("Room at (%d,%d),(%d,%d).",
@@ -598,7 +598,7 @@ shk_failed:
 #ifdef BLACKMARKET
     /* One-eyed Sam already got her equipment in makemon */
     if (Is_blackmarket(&u.uz) && sroom->rtype != BLACKSHOP) {
-        register struct obj *otmp;
+        struct obj *otmp;
         /* black marketeer's equipment */
         otmp = mksobj(LONG_SWORD, FALSE, FALSE);
         mpickobj(shk, otmp);
@@ -652,7 +652,7 @@ stock_room_goodpos(struct mkroom *sroom, int rmno, int sh, int sx, int sy)
 
 /* stock a newly-created room with objects */
 void
-stock_room(int shp_indx, register struct mkroom *sroom)
+stock_room(int shp_indx, struct mkroom *sroom)
 {
     /*
      * Someday soon we'll dispatch on the shdist field of shclass to do
@@ -685,7 +685,7 @@ stock_room(int shp_indx, register struct mkroom *sroom)
         levl[sx][sy].doormask = D_LOCKED;
 
     if(levl[sx][sy].doormask == D_LOCKED) {
-        register int m = sx, n = sy;
+        int m = sx, n = sy;
 
         if(inside_shop(sx+1, sy)) m--;
         else if(inside_shop(sx-1, sy)) m++;
@@ -745,7 +745,7 @@ stock_room(int shp_indx, register struct mkroom *sroom)
 #ifdef BLACKMARKET
 /* stock a newly-created black market with objects */
 static void
-stock_blkmar(const struct shclass *shp UNUSED, register struct mkroom *sroom, register int sh)
+stock_blkmar(const struct shclass *shp UNUSED, struct mkroom *sroom, int sh)
 {
     /*
      * Someday soon we'll dispatch on the shdist field of shclass to do
@@ -753,7 +753,7 @@ stock_blkmar(const struct shclass *shp UNUSED, register struct mkroom *sroom, re
      * shop-style placement (all squares except a row nearest the first
      * door get objects).
      */
-    /* [max] removed register int cl,  char buf[bufsz] */
+    /* [max] removed int cl,  char buf[bufsz] */
     int i, sx, sy, first = 0, next = 0, total, partial;
     /* int blkmar_gen[NUM_OBJECTS+2]; */
     int *clp, *lastclp;
@@ -842,7 +842,7 @@ int
 get_shop_item(int type)
 {
     const struct shclass *shp = shtypes+type;
-    register int i, j;
+    int i, j;
 
     /* select an appropriate object type at random */
     for(j = rnd(100), i = 0; (j -= shp->iprobs[i].iprob) > 0; i++)

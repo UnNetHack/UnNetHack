@@ -48,7 +48,7 @@ dodrop(void)
  * it's gone for good...  If the destination is not a pool, returns FALSE.
  */
 boolean
-boulder_hits_pool(struct obj *otmp, register int rx, register int ry, boolean pushing)
+boulder_hits_pool(struct obj *otmp, int rx, int ry, boolean pushing)
 {
     if (!otmp || otmp->otyp != BOULDER)
         warning("Not a boulder?");
@@ -285,7 +285,7 @@ flooreffects(struct obj *obj, int x, int y, const char *verb)
 
 /** obj is an object dropped on an altar */
 void
-doaltarobj(register struct obj *obj)
+doaltarobj(struct obj *obj)
 {
     if (Blind)
         return;
@@ -460,7 +460,7 @@ teleport_sink(void)
 }
 
 static void
-dosinkring(register struct obj *obj)  /* obj is a ring being dropped over a kitchen sink */
+dosinkring(struct obj *obj)  /* obj is a ring being dropped over a kitchen sink */
 
 {
     struct obj *otmp, *otmp2;
@@ -664,7 +664,7 @@ canletgo(struct obj *obj, const char *word)
 }
 
 static int
-drop(register struct obj *obj)
+drop(struct obj *obj)
 {
     if(!obj) return(0);
     if(!canletgo(obj, "drop"))
@@ -722,7 +722,7 @@ drop(register struct obj *obj)
 /* Called in several places - may produce output */
 /* eg ship_object() and dropy() -> sellobj() both produce output */
 void
-dropx(register struct obj *obj)
+dropx(struct obj *obj)
 {
     /* Tipped objects aren't considered carried, even if
      * their container is, so don't freeinv() it. */
@@ -1202,7 +1202,7 @@ d_level save_dlevel = {0, 0};
 static int
 currentlevel_rewrite(void)
 {
-    register int fd;
+    int fd;
     char whynot[BUFSZ];
 
     /* since level change might be a bit slow, flush any buffered screen
@@ -1257,7 +1257,7 @@ save_currentstate(void)
 /*
    static boolean
    badspot(x, y)
-   register xchar x, y;
+   xchar x, y;
    {
     return((levl[x][y].typ != ROOM && levl[x][y].typ != AIR &&
              levl[x][y].typ != CORR) || MON_AT(x, y));
@@ -1493,7 +1493,7 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
 
     if (portal && !In_endgame(&u.uz)) {
         /* find the portal on the new level */
-        register struct trap *ttrap;
+        struct trap *ttrap;
 
         for (ttrap = ftrap; ttrap; ttrap = ttrap->ntrap)
             /* find the portal with the right destination level */
@@ -1511,7 +1511,7 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
             } else {
                 if (newdungeon) {
                     if (Is_stronghold(&u.uz)) {
-                        register xchar x, y;
+                        xchar x, y;
                         int trycnt = 0;
 
                         do {
@@ -2180,7 +2180,7 @@ dowipe(void)
 }
 
 void
-set_wounded_legs(register long int side, register int timex)
+set_wounded_legs(long int side, int timex)
 {
     /* KMH -- STEED
      * If you are riding, your steed gets the wounded legs instead.
@@ -2244,8 +2244,8 @@ heal_legs(int how) /**< 0: ordinary, 1: dismounting steed, 2: limbs turn to ston
 boolean
 unique_item_check(void)
 {
-    register struct obj *obj;
-    register struct monst *mtmp;
+    struct obj *obj;
+    struct monst *mtmp;
 
     for (obj = fobj; obj; obj = obj->nobj) {
         if (is_unique(obj)) return TRUE;
@@ -2263,7 +2263,7 @@ unique_item_check(void)
 void
 levelport_monsters(void)
 {
-    register struct monst *mtmp, *mtmp2;
+    struct monst *mtmp, *mtmp2;
     int nlev;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp2) {

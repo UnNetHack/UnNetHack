@@ -355,7 +355,7 @@ fixuporacle(struct monst *oracle)
 boolean
 can_make_bones(void)
 {
-    register struct trap *ttmp;
+    struct trap *ttmp;
 
     if (ledger_no(&u.uz) <= 0 || ledger_no(&u.uz) > maxledgerno())
         return FALSE;
@@ -594,8 +594,8 @@ make_bones:
 int
 getbones(void)
 {
-    register int fd;
-    register int ok;
+    int fd;
+    int ok;
     char c, *bonesid, oldbonesid[40]; /* was [10]; more should be safer */
 
     /* wizard check added by GAN 02/05/87 */
@@ -645,7 +645,7 @@ getbones(void)
 #endif
             trickery(errbuf);
         } else {
-            register struct monst *mtmp;
+            struct monst *mtmp;
 
             getlev(fd, 0, 0, TRUE);
 

@@ -38,8 +38,8 @@ tty_getlin(const char *query, char *bufp)
 static void
 hooked_tty_getlin(const char *query, char *bufp, getlin_hook_proc hook)
 {
-    register char *obufp = bufp;
-    register int c;
+    char *obufp = bufp;
+    int c;
     struct WinDesc *cw = wins[WIN_MESSAGE];
     boolean doprev = 0;
 
@@ -182,7 +182,7 @@ hooked_tty_getlin(const char *query, char *bufp, getlin_hook_proc hook)
 void
 xwaitforspace(const char *s) /**< chars allowed besides return */
 {
-    register int c, x = ttyDisplay ? (int) ttyDisplay->dismiss_more : '\n';
+    int c, x = ttyDisplay ? (int) ttyDisplay->dismiss_more : '\n';
 
     morc = 0;
 

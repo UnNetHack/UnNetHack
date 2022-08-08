@@ -4,7 +4,7 @@
 #include "hack.h"
 
 void
-were_change(register struct monst *mon)
+were_change(struct monst *mon)
 {
     if (!is_were(mon->data))
         return;
@@ -75,9 +75,9 @@ were_beastie(int pm)
 }
 
 void
-new_were(register struct monst *mon)
+new_were(struct monst *mon)
 {
-    register int pm;
+    int pm;
 
     pm = counter_were(monsndx(mon->data));
     if (pm < LOW_PM) {

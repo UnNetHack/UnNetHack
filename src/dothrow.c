@@ -284,7 +284,7 @@ ok_to_throw(int *shotlimit_p) /**< (see dothrow()) */
 int
 dothrow(void)
 {
-    register struct obj *obj;
+    struct obj *obj;
     int shotlimit;
 
     /*
@@ -1134,8 +1134,8 @@ throwit(
     boolean twoweap)     /**< used to restore twoweapon mode if
                               wielded weapon returns */
 {
-    register struct monst *mon;
-    register int range, urange;
+    struct monst *mon;
+    int range, urange;
     boolean crossbowing, clear_thrownobj = FALSE;
     boolean impaired = (Confusion || Stunned || Blind ||
                         Hallucination || Fumbling);
@@ -1642,8 +1642,8 @@ thitmonst(
     struct monst *mon,
     struct obj *obj) /**< thrownobj or kickedobj or uwep */
 {
-    register int tmp;     /* Base chance to hit */
-    register int disttmp; /* distance modifier */
+    int tmp;     /* Base chance to hit */
+    int disttmp; /* distance modifier */
     int otyp = obj->otyp;
     boolean guaranteed_hit = (u.uswallow && mon == u.ustuck);
     int dieroll;
@@ -1948,7 +1948,7 @@ thitmonst(
 }
 
 static int
-gem_accept(register struct monst *mon, register struct obj *obj)
+gem_accept(struct monst *mon, struct obj *obj)
 {
     char buf[BUFSZ];
     boolean is_buddy = sgn(mon->data->maligntyp) == sgn(u.ualign.type);
@@ -2279,7 +2279,7 @@ static int
 throw_gold(struct obj *obj)
 {
     int range, odx, ody;
-    register struct monst *mon;
+    struct monst *mon;
 
     if (!u.dx && !u.dy && !u.dz) {
         You("cannot throw gold at yourself.");

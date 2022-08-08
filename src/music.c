@@ -237,7 +237,7 @@ charm_monsters(int distance)
 void
 do_earthquake(int force)
 {
-    register int x, y;
+    int x, y;
     struct monst *mtmp;
     struct obj *otmp;
     struct trap *chasm;

@@ -437,7 +437,7 @@ ghost_from_bottle(void)
 int
 dodrink(void)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     const char *potion_descr;
 
     if (Strangled) {
@@ -516,7 +516,7 @@ dodrink(void)
 }
 
 int
-dopotion(register struct obj *otmp)
+dopotion(struct obj *otmp)
 {
     int retval;
 
@@ -541,9 +541,9 @@ dopotion(register struct obj *otmp)
 }
 
 int
-peffects(register struct obj *otmp)
+peffects(struct obj *otmp)
 {
-    register int i, ii, lim;
+    int i, ii, lim;
 
     switch(otmp->otyp) {
     case POT_RESTORE_ABILITY:
@@ -931,7 +931,7 @@ peffects(register struct obj *otmp)
                     goto_level(&earth_level, FALSE, FALSE, FALSE);
 #endif
                 } else {
-                    register int newlev = depth(&u.uz)-1;
+                    int newlev = depth(&u.uz)-1;
                     d_level newlevel;
 
                     get_level(&newlevel, newlev);
@@ -1045,7 +1045,7 @@ peffects(register struct obj *otmp)
         break;
 
     case POT_GAIN_ENERGY: /* M. Stephenson */
-    {   register int num;
+    {   int num;
         if(otmp->cursed)
             You_feel("lackluster.");
         else
@@ -1168,7 +1168,7 @@ peffects(register struct obj *otmp)
 }
 
 void
-healup(int nhp, int nxtra, register boolean curesick, register boolean cureblind)
+healup(int nhp, int nxtra, boolean curesick, boolean cureblind)
 {
     if (nhp && !marathon_mode) {
         if (Upolyd) {
@@ -1195,7 +1195,7 @@ healup(int nhp, int nxtra, register boolean curesick, register boolean cureblind
 }
 
 void
-strange_feeling(register struct obj *obj, register const char *txt)
+strange_feeling(struct obj *obj, const char *txt)
 {
     if (flags.beginner || !txt)
         You("have a %s feeling for a moment, then it passes.",
@@ -1525,7 +1525,7 @@ do_illness:
                 break;
             case POT_BLINDNESS:
                 if (haseyes(mon->data)) {
-                    register int btmp = 64 + rn2(32) +
+                    int btmp = 64 + rn2(32) +
                                         rn2(32) * !resist(mon, POTION_CLASS, 0, NOTELL);
                     btmp += mon->mblinded;
                     mon->mblinded = min(btmp, 127);
@@ -1653,9 +1653,9 @@ do_illness:
 
 /* vapors are inhaled or get in your eyes */
 void
-potionbreathe(register struct obj *obj)
+potionbreathe(struct obj *obj)
 {
-    register int i, ii, kn = 0;
+    int i, ii, kn = 0;
     boolean cureblind = FALSE;
 
     /* potion of unholy water might be wielded; prevent
@@ -1992,7 +1992,7 @@ get_base_mix_color(struct obj *potion)
 
 /** Returns the potion type when object o1 is dipped into object o2 */
 short
-mixtype(register struct obj *o1, register struct obj *o2)
+mixtype(struct obj *o1, struct obj *o2)
 {
     /* cut down on the number of cases below */
     if (o1->oclass == POTION_CLASS &&
@@ -2209,7 +2209,7 @@ mixtype(register struct obj *o1, register struct obj *o2)
 
 
 boolean
-get_wet(register struct obj *obj)
+get_wet(struct obj *obj)
 
 /* returns TRUE if something happened (potion should be used up) */
 {
@@ -2319,7 +2319,7 @@ int
 dodip(void)
 {
     static const char Dip_[] = "Dip ";
-    register struct obj *potion, *obj;
+    struct obj *potion, *obj;
     struct obj *singlepotion;
     uchar here;
     char allowall[2];
@@ -2896,7 +2896,7 @@ mongrantswish(struct monst **monp)
 
 
 void
-djinni_from_bottle(register struct obj *obj)
+djinni_from_bottle(struct obj *obj)
 {
     struct monst *mtmp;
     int chance;

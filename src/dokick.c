@@ -285,7 +285,7 @@ doit:
  *  The gold object is *not* attached to the fobj chain!
  */
 boolean
-ghitm(register struct monst *mtmp, register struct obj *gold)
+ghitm(struct monst *mtmp, struct obj *gold)
 {
     boolean msg_given = FALSE;
 #ifdef WEBB_DISINT
@@ -410,7 +410,7 @@ ghitm(register struct monst *mtmp, register struct obj *gold)
 }
 
 void
-lawful_bribery_alignment(register schar penalty)
+lawful_bribery_alignment(schar penalty)
 {
     if ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10)) {
         adjalign(penalty);
@@ -812,7 +812,7 @@ dokick(void)
     int x, y;
     int avrg_attrib;
     int dmg = 0, glyph, oldglyph = -1;
-    register struct monst *mtmp;
+    struct monst *mtmp;
     boolean no_kick = FALSE;
     char buf[BUFSZ], kickobjnam[BUFSZ];
 
@@ -1050,7 +1050,7 @@ dokick(void)
             } else goto ouch;
         }
         if (IS_THRONE(maploc->typ)) {
-            register int i;
+            int i;
             if(Levitation) goto dumb;
             if ((Luck < 0 || maploc->doormask) && !rn2(3)) {
                 maploc->typ = ROOM;
@@ -1444,8 +1444,8 @@ impact_drop(
     xchar dlev) /**< if !0 send to dlev near player */
 {
     schar toloc;
-    register struct obj *obj, *obj2;
-    register struct monst *shkp;
+    struct obj *obj, *obj2;
+    struct monst *shkp;
     long oct, dct, price, debit, robbed;
     boolean angry, costly, isrock;
     coord cc;
@@ -1681,8 +1681,8 @@ ship_object(struct obj *otmp, xchar x, xchar y, boolean shop_floor_obj)
 void
 obj_delivery(boolean near_hero)
 {
-    register struct obj *otmp, *otmp2;
-    register int nx, ny;
+    struct obj *otmp, *otmp2;
+    int nx, ny;
     long where;
     boolean nobreak, noscatter;
 
@@ -1801,7 +1801,7 @@ deliver_obj_to_mon(struct monst *mtmp, int cnt, long unsigned int deliverflags)
 }
 
 static void
-otransit_msg(register struct obj *otmp, register boolean nodrop, long int num)
+otransit_msg(struct obj *otmp, boolean nodrop, long int num)
 {
     char *optr = 0, obuf[BUFSZ], xbuf[BUFSZ];
 

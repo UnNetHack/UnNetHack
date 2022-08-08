@@ -95,7 +95,7 @@ releaseobuf(char *bufp)
 }
 
 char *
-obj_typename(register int otyp)
+obj_typename(int otyp)
 {
     char *buf = nextobuf();
     struct objclass *ocl = &objects[otyp];
@@ -970,7 +970,7 @@ erosion_matters(struct obj *obj)
 }
 
 static char *
-doname_base(register struct obj *obj, boolean with_price)
+doname_base(struct obj *obj, boolean with_price)
 {
     boolean ispoisoned = FALSE;
     boolean weightshown = FALSE;
@@ -990,7 +990,7 @@ doname_base(register struct obj *obj, boolean with_price)
         }
     }
 
-    register char *bp = xname(obj), *tmp;
+    char *bp = xname(obj), *tmp;
 
     int dump_ID_flag = program_state.gameover;
     /* display ID in addition to appearance */
@@ -1569,14 +1569,14 @@ display_weight(struct obj *obj)
 
 /** Wrapper function for vanilla behaviour. */
 char *
-doname(register struct obj *obj)
+doname(struct obj *obj)
 {
     return doname_base(obj, FALSE);
 }
 
 /** Name of object including price. */
 char *
-doname_with_price(register struct obj *obj)
+doname_with_price(struct obj *obj)
 {
     return doname_base(obj, TRUE);
 }
@@ -1912,7 +1912,7 @@ short_oname(struct obj *obj, char *(*func) (struct obj *), char *(*altfunc) (str
  * Used if only one of a collection of objects is named (e.g. in eat.c).
  */
 const char *
-singular(register struct obj *otmp, char *(*func) (struct obj *))
+singular(struct obj *otmp, char *(*func) (struct obj *))
 {
     long savequan;
 #ifdef SHOW_WEIGHT
@@ -2020,7 +2020,7 @@ the(const char *str)
         insert_the = TRUE;
     } else {
         /* Probably a proper name, might not need an article */
-        register char *tmp, *named, *called;
+        char *tmp, *named, *called;
         int l;
 
         /* some objects have capitalized adjectives in their names */
@@ -2106,7 +2106,7 @@ yobjnam(struct obj *obj, const char *verb)
 char *
 Yobjnam2(struct obj *obj, const char *verb)
 {
-    register char *s = yobjnam(obj, verb);
+    char *s = yobjnam(obj, verb);
 
     *s = highc(*s);
     return s;
@@ -2259,9 +2259,9 @@ sing:
 
 /* capitalized variant of doname() */
 char *
-Doname2(register struct obj *obj)
+Doname2(struct obj *obj)
 {
-    register char *s = doname(obj);
+    char *s = doname(obj);
 
     *s = highc(*s);
     return(s);
@@ -2577,7 +2577,7 @@ char *
 makeplural(const char *oldstr)
 {
     /* Note: cannot use strcmpi here -- it'd give MATZot, CAVEMeN,... */
-    register char *spot;
+    char *spot;
     char *str = nextobuf();
     char lo_c;
     const char *excess = (char *)0;
@@ -2793,7 +2793,7 @@ static NEARDATA const struct o_range o_ranges[] = {
 char *
 makesingular(const char *oldstr)
 {
-    register char *p, *bp;
+    char *p, *bp;
     const char *excess = 0;
     char *str = nextobuf();
 
@@ -3116,7 +3116,7 @@ rnd_otyp_by_namedesc(
 {
     int i, n = 0;
     short validobjs[NUM_OBJECTS];
-    register const char *zn;
+    const char *zn;
     int prob, maxprob = 0;
 
     if (!name || !*name) {
@@ -3280,7 +3280,7 @@ name_to_otyp(const char *in_str)
  * return null.
  */
 struct obj *
-readobjnam(register char *bp, struct obj *no_wish)
+readobjnam(char *bp, struct obj *no_wish)
 {
     char *p;
     int i;
@@ -3851,7 +3851,7 @@ retry:
     } else if (!strcmpi(bp, "looking glass")) {
         ; /* avoid false hit on "* glass" */
     } else if (!BSTRCMPI(bp, p-6, " glass") || !strcmpi(bp, "glass")) {
-        register char *g = bp;
+        char *g = bp;
 
         /* treat "broken glass" as a non-existent item; since "broken" is
            also a chest/box prefix it might have been stripped off above */
@@ -3881,7 +3881,7 @@ srch:
     /* check real names of gems first */
     if (!oclass && actualn) {
         for (i = bases[GEM_CLASS]; i <= LAST_GEM; i++) {
-            register const char *zn;
+            const char *zn;
 
             if ((zn = OBJ_NAME(objects[i])) && !strcmpi(actualn, zn)) {
                 typ = i;
