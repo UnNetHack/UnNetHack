@@ -53,8 +53,13 @@ jobs:
     - name: Setup
       run: |
           sudo dpkg --add-architecture i386 && dpkg --print-foreign-architectures && sudo apt-get update
-          # https://github.com/OpenSC/OpenSC/commit/75dbe58b4a7857cd67925fa8a38bc81bf37d7e1a
-          sudo apt install -y --allow-downgrades libpcre2-8-0=10.34-7
+          # https://github.com/actions/runner-images/issues/4589
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update -qq
+          sudo apt-get install -yqq --allow-downgrades libgd3/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
+          sudo apt-get purge -yqq libmono* moby* mono* php* libgdiplus libpcre2-posix3 libzip4
+
+          # wine
           sudo apt-get install gcc-mingw-w64-i686 wine-development wine32 wine-binfmt imagemagick
           sudo update-binfmts --import /usr/share/binfmts/wine
 
