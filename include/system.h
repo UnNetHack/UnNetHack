@@ -15,14 +15,20 @@
  * autoconf.h which should override the defaults set earlier in
  * config.h and *conf.h
  */
-#include "autoconf_paths.h"
-#include "autoconf.h"
-#if HAVE_STRING_H
-#include <string.h>
-#endif
-#if HAVE_DECL_STRNICMP && !HAVE_DECL_STRNCMPI
-#define strncmpi(a, b, c) strnicmp(a, b, c)
-#endif
+# include "autoconf_paths.h"
+# include "autoconf.h"
+
+# if HAVE_STRING_H
+#  include <string.h>
+# endif
+
+# if HAVE_DECL_STRNICMP && !HAVE_DECL_STRNCMPI
+#  define strncmpi(a, b, c) strnicmp(a, b, c)
+# endif
+
+# if HAVE_STRINGS_H
+#  include <strings.h>
+# endif
 #endif
 
 /* some old <sys/types.h> may not define off_t and size_t; if your system is
@@ -413,7 +419,9 @@ E int setuid(int);
 /* <X11/Intrinsic.h> #includes <string[s].h>; so does defining POSIX_TYPES */
 
 #if (defined(ULTRIX) || defined(NeXT)) && defined(__GNUC__)
-#include <strings.h>
+# ifndef _STRINGS_H
+#  include <strings.h>
+# endif
 #else
 E char  *strcpy(char *, const char *);
 E char  *strncpy(char *, const char *, size_t);
