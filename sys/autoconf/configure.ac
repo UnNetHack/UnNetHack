@@ -100,7 +100,10 @@ case $host_os in
 esac
 
 dnl  ----- Check for programs
+dnl Workaround for finding old flex versions
+OLD_CFLAGS=$CFLAGS; CFLAGS="$CFLAGS -D_POSIX_SOURCE=1"
 AC_PROG_LEX(noyywrap)
+CFLAGS=$OLD_CFLAGS
 if test "$LEX" = ":"; then
 	AC_MSG_ERROR([cannot find flex or lex])
 fi
