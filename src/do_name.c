@@ -2277,7 +2277,7 @@ static const char * const bogusmons[] = {
     "amphitheatre", /* evil patch idea by yasdorian */
     "banana peel golem", /* evil patch idea from DCSS */
     "dissolved undead potato",
-    "dragonbreath nymph"
+    "dragonbreath nymph",
     "fart elemental", /* evil patch idea from DCSS */
     "floating nose", /* evil patch idea by K2 */
     "goldfish", /* evil patch idea from DCSS */
