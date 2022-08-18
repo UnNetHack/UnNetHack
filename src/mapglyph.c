@@ -62,8 +62,7 @@ int explcolors[] = {
 /** Returns the correct monster glyph.
  *  Returns a Unicode codepoint in UTF8graphics and an ASCII character otherwise. */
 glyph_t
-get_monsym(glyph)
-int glyph;
+get_monsym(int glyph)
 {
     if (iflags.UTF8graphics &&
         mons[glyph].unicode_codepoint) {
@@ -77,8 +76,7 @@ int glyph;
 /** Returns the correct object glyph.
  *  Returns a Unicode codepoint in UTF8graphics and an ASCII character otherwise. */
 static glyph_t
-get_objsym(glyph)
-int glyph;
+get_objsym(int glyph)
 {
     if (iflags.UTF8graphics &&
         objects[glyph].unicode_codepoint) {
@@ -91,13 +89,10 @@ int glyph;
 
 /*ARGSUSED*/
 void
-mapglyph(glyph, ochar, ocolor, ospecial, x, y, mgflags)
-int glyph, *ocolor, x, y;
-glyph_t *ochar;
-unsigned *ospecial;
-unsigned mgflags UNUSED;
+mapglyph(int glyph, glyph_t *ochar, int *ocolor, unsigned int *ospecial, coordxy x, coordxy y,
+    unsigned int mgflags UNUSED)
 {
-    register int offset;
+    int offset;
 #if defined(TEXTCOLOR) || defined(ROGUE_COLOR)
     int color = NO_COLOR;
 #endif
@@ -325,8 +320,7 @@ unsigned mgflags UNUSED;
 }
 
 char *
-encglyph(glyph)
-int glyph;
+encglyph(int glyph)
 {
     static char encbuf[20]; /* 10+1 would suffice */
 
@@ -335,9 +329,7 @@ int glyph;
 }
 
 char *
-decode_mixed(buf, str)
-char *buf;
-const char *str;
+decode_mixed(char *buf, const char *str)
 {
     static const char hex[] = "00112233445566778899aAbBcCdDeEfF";
     char *put = buf;
@@ -438,10 +430,7 @@ const char *str;
  */
 
 void
-genl_putmixed(window, attr, str)
-winid window;
-int attr;
-const char *str;
+genl_putmixed(winid window, int attr, const char *str)
 {
     char buf[BUFSZ];
 

@@ -3,8 +3,8 @@
 
 #include "hack.h"
 
-STATIC_DCL void FDECL(get_mplname, (struct monst *, char *));
-STATIC_DCL void FDECL(mk_mplayer_armor, (struct monst *, SHORT_P));
+static void get_mplname(struct monst *, char *);
+static void mk_mplayer_armor(struct monst *, short);
 
 /* These are the names of those who
  * contributed to the development of NetHack 3.2/3.3/3.4/3.6.
@@ -37,11 +37,11 @@ static const char *developers[] = {
 
 /* return a randomly chosen developer name */
 const char *
-dev_name()
+dev_name(void)
 {
-    register int i, m = 0, n = SIZE(developers);
-    register struct monst *mtmp;
-    register boolean match;
+    int i, m = 0, n = SIZE(developers);
+    struct monst *mtmp;
+    boolean match;
 
     do {
         match = FALSE;
@@ -61,10 +61,8 @@ dev_name()
     return(developers[i]);
 }
 
-STATIC_OVL void
-get_mplname(mtmp, nam)
-register struct monst *mtmp;
-char *nam;
+static void
+get_mplname(struct monst *mtmp, char *nam)
 {
     boolean fmlkind = is_female(mtmp->data);
     const char *devnam;
@@ -86,10 +84,8 @@ char *nam;
                         (boolean)mtmp->female));
 }
 
-STATIC_OVL void
-mk_mplayer_armor(mon, typ)
-struct monst *mon;
-short typ;
+static void
+mk_mplayer_armor(struct monst *mon, short int typ)
 {
     struct obj *obj;
 
@@ -107,12 +103,9 @@ short typ;
 }
 
 struct monst *
-mk_mplayer(ptr, x, y, special)
-register struct permonst *ptr;
-xchar x, y;
-register boolean special;
+mk_mplayer(struct permonst *ptr, coordxy x, coordxy y, boolean special)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
     char nam[PL_NSIZ];
 
     if(!is_mplayer(ptr))
@@ -296,9 +289,7 @@ register boolean special;
  * fill up the overflow.
  */
 void
-create_mplayers(num, special)
-register int num;
-boolean special;
+create_mplayers(int num, boolean special)
 {
     int pm, x, y;
     struct monst fakemon;
@@ -320,14 +311,13 @@ boolean special;
         /* if pos not found in 50 tries, don't bother to continue */
         if(tryct > 50) return;
 
-        (void) mk_mplayer(&mons[pm], (xchar)x, (xchar)y, special);
+        (void) mk_mplayer(&mons[pm], (coordxy)x, (coordxy)y, special);
         num--;
     }
 }
 
 void
-mplayer_talk(mtmp)
-register struct monst *mtmp;
+mplayer_talk(struct monst *mtmp)
 {
     static const char *same_class_msg[3] = {
         "I can't win, and neither will you!",

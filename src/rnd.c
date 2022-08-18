@@ -34,8 +34,7 @@ set_random_state(unsigned int x)
 }
 
 int
-rn2(x)      /**< 0 <= rn2(x) < x */
-register int x;
+rn2(int x) /**< 0 <= rn2(x) < x */
 {
     if (x <= 0) {
         warning("rn2(%d) attempted", x);
@@ -46,10 +45,10 @@ register int x;
 }
 
 int
-rnl(x)      /**< 0 <= rnl(x) < x; sometimes subtracting Luck */
-register int x; /**< good luck approaches 0, bad luck approaches (x-1) */
+rnl(int x) /**< 0 <= rnl(x) < x; sometimes subtracting Luck */
+                    /**< good luck approaches 0, bad luck approaches (x-1) */
 {
-    register int i;
+    int i;
 
     if (x <= 0) {
         warning("rnl(%d) attempted", x);
@@ -68,8 +67,8 @@ register int x; /**< good luck approaches 0, bad luck approaches (x-1) */
 }
 
 int
-rnd(x)      /**< 1 <= rnd(x) <= x */
-register int x;
+rnd(int x)      /**< 1 <= rnd(x) <= x */
+
 {
     if (x <= 0) {
         warning("rnd(%d) attempted", x);
@@ -80,10 +79,10 @@ register int x;
 }
 
 int
-d(n, x)      /**< n <= d(n,x) <= (n*x) */
-register int n, x;
+d(int n, int x)      /**< n <= d(n,x) <= (n*x) */
+
 {
-    register int tmp = n;
+    int tmp = n;
 
     if (x < 0 || n < 0 || (x == 0 && n != 0)) {
         warning("d(%d,%d) attempted", n, x);
@@ -94,8 +93,7 @@ register int n, x;
 }
 
 int
-rne(x)
-register int x;
+rne(int x)
 {
     int i;
 
@@ -122,15 +120,14 @@ register int x;
 }
 
 int
-rnz(i)
-int i;
+rnz(int i)
 {
 #ifdef LINT
     int x = i;
     int tmp = 1000;
 #else
-    register long x = i;
-    register long tmp = 1000;
+    long x = i;
+    long tmp = 1000;
 #endif
     tmp += rn2(1000);
     tmp *= rne(4);
@@ -140,8 +137,8 @@ int i;
 }
 
 int
-rnf(numerator, denominator) /**< @returns (rnf(n,d) < n/d) */
-int numerator, denominator;
+rnf(int numerator, int denominator) /**< @returns (rnf(n,d) < n/d) */
+
 {
     return rn2(denominator) < numerator;
 }

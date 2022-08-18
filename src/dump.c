@@ -19,7 +19,7 @@
 
 extern char msgs[][BUFSZ];
 extern int lastmsg;
-void FDECL(do_vanquished, (int, BOOLEAN_P));
+void do_vanquished(int, boolean);
 #endif
 
 #ifdef DUMP_LOG
@@ -34,7 +34,7 @@ char html_dump_path[BUFSIZ];
 
 static
 char*
-get_dump_filename()
+get_dump_filename(void)
 {
     static char buf[BUFSIZ+1+5];
     char *f, *p, *end;
@@ -94,7 +94,7 @@ get_dump_filename()
 }
 
 void
-dump_init()
+dump_init(void)
 {
     if (dump_fn[0]) {
 #ifdef UNIX
@@ -135,8 +135,7 @@ dump_init()
 #ifdef DUMP_LOG
 /** Set a file's access and modify time to u.udeathday. */
 static void
-adjust_file_timestamp(fpath)
-const char* fpath;
+adjust_file_timestamp(const char *fpath)
 {
 # ifdef HAVE_UTIME_H
     if (u.udeathday > 0) {
@@ -152,7 +151,7 @@ const char* fpath;
 #endif
 
 void
-dump_exit()
+dump_exit(void)
 {
 #ifdef DUMP_LOG
     if (dump_fp) {
@@ -170,8 +169,7 @@ dump_exit()
 }
 
 void
-dump(pre, str)
-const char *pre, *str;
+dump(const char *pre, const char *str)
 {
 #ifdef DUMP_LOG
     if (dump_fp)
@@ -183,8 +181,7 @@ const char *pre, *str;
 
 /** Outputs a string only into the html dump. */
 void
-dump_html(format, str)
-const char *format, *str;
+dump_html(const char *format, const char *str)
 {
 #ifdef DUMP_LOG
     if (html_dump_fp)
@@ -194,8 +191,7 @@ const char *format, *str;
 
 /** Outputs a string only into the text dump. */
 void
-dump_text(format, str)
-const char *format, *str;
+dump_text(const char *format, const char *str)
 {
 #ifdef DUMP_LOG
     if (dump_fp)
@@ -205,8 +201,7 @@ const char *format, *str;
 
 /** Dumps one line as is. */
 void
-dump_line(pre, str)
-const char *pre, *str;
+dump_line(const char *pre, const char *str)
 {
 #ifdef DUMP_LOG
     if (dump_fp)
@@ -229,9 +224,7 @@ static char tmp_html_link[4*BUFSZ];
 static char tmp_html_link_name[2*BUFSZ];
 /** Return a link to nethackwiki . */
 char *
-html_link(link_name, name)
-const char *link_name;
-const char *name;
+html_link(const char *link_name, const char *name)
 {
     tmp_html_link_name[0] = '\0';
     while (*name != '\0' && strlen(tmp_html_link_name) < BUFSZ - 10) {
@@ -247,10 +240,7 @@ const char *name;
 
 /** Dumps an object from the inventory. */
 void
-dump_object(c, obj, str)
-const char c;
-const struct obj *obj;
-const char *str;
+dump_object(const char c, const struct obj *obj, const char *str)
 {
 #ifdef DUMP_LOG
     const char *starting_inventory = obj->was_in_starting_inventory ? "*" : "";
@@ -275,8 +265,7 @@ const char *str;
 
 /** Dumps a secondary title. */
 void
-dump_subtitle(str)
-const char *str;
+dump_subtitle(const char *str)
 {
 #ifdef DUMP_LOG
     dump_text("  %s\n", str);
@@ -286,8 +275,7 @@ const char *str;
 
 /** Dump a title. Strips : from the end of str. */
 void
-dump_title(str)
-char *str;
+dump_title(char *str)
 {
 #ifdef DUMP_LOG
     int len = strlen(str);
@@ -303,7 +291,7 @@ char *str;
 
 /** Starts a list in the dump. */
 void
-dump_list_start()
+dump_list_start(void)
 {
 #ifdef DUMP_LOG
     if (html_dump_fp)
@@ -313,9 +301,7 @@ dump_list_start()
 
 /** Dumps a linked list item. */
 void
-dump_list_item_link(link, str)
-const char *link;
-const char *str;
+dump_list_item_link(const char *link, const char *str)
 {
 #ifdef DUMP_LOG
     if (dump_fp)
@@ -327,8 +313,7 @@ const char *str;
 
 /** Dumps an object as list item. */
 void
-dump_list_item_object(obj)
-struct obj *obj;
+dump_list_item_object(struct obj *obj)
 {
 #ifdef DUMP_LOG
     if (dump_fp)
@@ -353,8 +338,7 @@ struct obj *obj;
 
 /** Dumps a list item. */
 void
-dump_list_item(str)
-const char *str;
+dump_list_item(const char *str)
 {
 #ifdef DUMP_LOG
     if (dump_fp)
@@ -366,14 +350,14 @@ const char *str;
 
 /** Ends a list in the dump. */
 void
-dump_list_end()
+dump_list_end(void)
 {
     dump_html("</ul>\n", "");
 }
 
 /** Starts a blockquote in the dump. */
 void
-dump_blockquote_start()
+dump_blockquote_start(void)
 {
 #ifdef DUMP_LOG
     if (html_dump_fp)
@@ -383,7 +367,7 @@ dump_blockquote_start()
 
 /** Ends a blockquote in the dump. */
 void
-dump_blockquote_end()
+dump_blockquote_end(void)
 {
 #ifdef DUMP_LOG
     dump_text("\n", "");
@@ -393,7 +377,7 @@ dump_blockquote_end()
 
 /** Starts a definition list in the dump. */
 void
-dump_definition_list_start()
+dump_definition_list_start(void)
 {
 #ifdef DUMP_LOG
     if (html_dump_fp)
@@ -403,8 +387,7 @@ dump_definition_list_start()
 
 /** Dumps a definition list item. */
 void
-dump_definition_list_dt(str)
-const char *str;
+dump_definition_list_dt(const char *str)
 {
 #ifdef DUMP_LOG
     if (dump_fp)
@@ -420,8 +403,7 @@ const char *str;
 
 /** Dumps a definition list item. */
 void
-dump_definition_list_dd(str)
-const char *str;
+dump_definition_list_dd(const char *str)
 {
 #ifdef DUMP_LOG
     if (dump_fp)
@@ -433,7 +415,7 @@ const char *str;
 
 /** Ends a list in the dump. */
 void
-dump_definition_list_end()
+dump_definition_list_end(void)
 {
     dump_html("</dl>\n", "");
 }
@@ -464,8 +446,7 @@ dump_html_css_file(const char *filename)
 
 /** Dumps the HTML header. */
 void
-dump_header_html(title)
-const char *title;
+dump_header_html(const char *title)
 {
     dump_html("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n", "");
     dump_html("<html xmlns=\"http://www.w3.org/1999/xhtml\">\n", "");
@@ -510,7 +491,7 @@ const char* html_escape_character(const char c) {
 #ifdef DUMP_LOG
 /** Screenshot of the HTML map. */
 int
-dump_screenshot()
+dump_screenshot(void)
 {
     char screenshot[BUFSZ];
     char *filename = get_dump_filename();

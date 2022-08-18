@@ -48,26 +48,23 @@ enum mcast_cleric_spells {
 
 #define NUM_PUN_SPELLS  10
 
-STATIC_DCL void FDECL(cursetxt, (struct monst *, BOOLEAN_P));
-STATIC_DCL int FDECL(choose_magic_spell, (int));
-STATIC_DCL int FDECL(choose_clerical_spell, (int));
-STATIC_DCL int FDECL(choose_punisher_spell, (void));
-STATIC_DCL void FDECL(cast_wizard_spell, (struct monst *, int, int));
-STATIC_DCL void FDECL(cast_cleric_spell, (struct monst *, int, int));
-STATIC_DCL void FDECL(cast_punisher_spell, (struct monst *, int, int));
-STATIC_DCL void FDECL(map_punisher_spell, (int, unsigned int*, int*));
-static int FDECL(m_cure_self, (struct monst *, int));
-STATIC_DCL boolean FDECL(is_undirected_spell, (unsigned int, int));
-STATIC_DCL boolean FDECL(spell_would_be_useless, (struct monst *, unsigned int, int));
+static void cursetxt(struct monst *, boolean);
+static int choose_magic_spell(int);
+static int choose_clerical_spell(int);
+static int choose_punisher_spell(void);
+static void cast_wizard_spell(struct monst *, int, int);
+static void cast_cleric_spell(struct monst *, int, int);
+static void cast_punisher_spell(struct monst *, int, int);
+static void map_punisher_spell(int, unsigned int*, int*);
+static int m_cure_self(struct monst *, int);
+static boolean is_undirected_spell(unsigned int, int);
+static boolean spell_would_be_useless(struct monst *, unsigned int, int);
 
 extern const char * const flash_types[];    /* from zap.c */
 
 /* feedback when frustrated monster couldn't cast a spell */
-STATIC_OVL
-void
-cursetxt(mtmp, undirected)
-struct monst *mtmp;
-boolean undirected;
+static void
+cursetxt(struct monst *mtmp, boolean undirected)
 {
     /* silent monsters don't curse. */
     if (is_silent(mtmp->data)) return;
@@ -97,9 +94,8 @@ boolean undirected;
 
 /* convert a level based random selection into a specific mage spell;
    inappropriate choices will be screened out by spell_would_be_useless() */
-STATIC_OVL int
-choose_magic_spell(spellval)
-int spellval;
+static int
+choose_magic_spell(int spellval)
 {
     /* for 3.4.3 and earlier, val greater than 22 selected the default spell
      */
@@ -154,9 +150,8 @@ int spellval;
 }
 
 /* convert a level based random selection into a specific cleric spell */
-STATIC_OVL int
-choose_clerical_spell(spellnum)
-int spellnum;
+static int
+choose_clerical_spell(int spellnum)
 {
     /* for 3.4.3 and earlier, num greater than 13 selected the default spell */
     while (spellnum > 15 && rn2(16)) {
@@ -200,7 +195,7 @@ int spellnum;
 
 /* choose a Punisher statue spell. These statues are powerful enough
  * that I think adjusting based on level is not useful. */
-STATIC_OVL int
+static int
 choose_punisher_spell(void)
 {
     int spell = rn2(NUM_PUN_SPELLS);
@@ -218,11 +213,7 @@ choose_punisher_spell(void)
  * 0: unsuccessful spell
  */
 int
-castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
-register struct monst *mtmp;
-register struct attack *mattk;
-boolean thinks_it_foundyou;
-boolean foundyou;
+castmu(struct monst *mtmp, struct attack *mattk, boolean thinks_it_foundyou, boolean foundyou)
 {
     int dmg, ml = mtmp->m_lev;
     int ret;
@@ -389,9 +380,7 @@ boolean foundyou;
 }
 
 static int
-m_cure_self(mtmp, dmg)
-struct monst *mtmp;
-int dmg;
+m_cure_self(struct monst *mtmp, int dmg)
 {
     if (mtmp->mhp < mtmp->mhpmax) {
         if (canseemon(mtmp)) {
@@ -415,12 +404,8 @@ int dmg;
    If you modify either of these, be sure to change is_undirected_spell()
    and spell_would_be_useless().
  */
-STATIC_OVL
-void
-cast_wizard_spell(mtmp, dmg, spellnum)
-struct monst *mtmp;
-int dmg;
-int spellnum;
+static void
+cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
 {
     if (dmg == 0 && !is_undirected_spell(AD_SPEL, spellnum)) {
         warning("cast directed wizard spell (%d) with dmg=0?", spellnum);
@@ -586,12 +571,8 @@ int spellnum;
     if (dmg) mdamageu(mtmp, dmg);
 }
 
-STATIC_OVL
-void
-cast_punisher_spell(mtmp, dmg, spellnum)
-struct monst* mtmp UNUSED;
-int dmg UNUSED;
-int spellnum;
+static void
+cast_punisher_spell(struct monst *mtmp UNUSED, int dmg UNUSED, int spellnum)
 {
     switch(spellnum) {
     case PUN_PUNISHMENT:
@@ -600,12 +581,8 @@ int spellnum;
     }
 }
 
-STATIC_OVL
-void
-cast_cleric_spell(mtmp, dmg, spellnum)
-struct monst *mtmp;
-int dmg;
-int spellnum;
+static void
+cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
 {
     if (dmg == 0 && !is_undirected_spell(AD_CLRC, spellnum)) {
         warning("cast directed cleric spell (%d) with dmg=0?", spellnum);
@@ -813,12 +790,8 @@ int spellnum;
     if (dmg) mdamageu(mtmp, dmg);
 }
 
-STATIC_DCL
-void
-map_punisher_spell(spellnum, padtyp, pspellnum)
-int spellnum;
-unsigned int* padtyp;
-int* pspellnum;
+static void
+map_punisher_spell(int spellnum, unsigned int *padtyp, int *pspellnum)
 {
     switch(spellnum) {
     case PUN_OPEN_WOUNDS:
@@ -863,11 +836,8 @@ int* pspellnum;
     }
 }
 
-STATIC_DCL
-boolean
-is_undirected_spell(adtyp, spellnum)
-unsigned int adtyp;
-int spellnum;
+static boolean
+is_undirected_spell(unsigned int adtyp, int spellnum)
 {
     if (adtyp == AD_SPEL) {
         switch (spellnum) {
@@ -905,12 +875,8 @@ int spellnum;
 }
 
 /* Some spells are useless under some circumstances. */
-STATIC_DCL
-boolean
-spell_would_be_useless(mtmp, adtyp, spellnum)
-struct monst *mtmp;
-unsigned int adtyp;
-int spellnum;
+static boolean
+spell_would_be_useless(struct monst *mtmp, unsigned int adtyp, int spellnum)
 {
     /* Some spells don't require the player to really be there and can be cast
      * by the monster when you're invisible, yet still shouldn't be cast when
@@ -986,9 +952,7 @@ int spellnum;
 
 /* monster uses spell (ranged) */
 int
-buzzmu(mtmp, mattk)
-register struct monst *mtmp;
-register struct attack  *mattk;
+buzzmu(struct monst *mtmp, struct attack *mattk)
 {
     /* don't print constant stream of curse messages for 'normal'
        spellcasting monsters at range */

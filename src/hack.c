@@ -7,20 +7,20 @@
 
 /* #define DEBUG */ /* uncomment for debugging */
 
-static void NDECL(maybe_wail);
-static int NDECL(moverock);
-static int FDECL(still_chewing, (XCHAR_P, XCHAR_P));
+static void maybe_wail(void);
+static int moverock(void);
+static int still_chewing(coordxy, coordxy);
 #ifdef SINKS
-static void NDECL(dosinkfall);
+static void dosinkfall(void);
 #endif
-static boolean FDECL(findtravelpath, (boolean (*)(int, int)));
-static boolean FDECL(trapmove, (int, int, struct trap *));
-static struct monst *FDECL(monstinroom, (struct permonst *, int));
-static boolean FDECL(doorless_door, (int, int));
-static void FDECL(move_update, (BOOLEAN_P));
-static void check_buried_zombies(xchar, xchar);
-static boolean domove_swap_with_pet(struct monst *, xchar, xchar);
-static void FDECL(struggle_sub, (const char *));
+static boolean findtravelpath(boolean (*)(coordxy, coordxy));
+static boolean trapmove(coordxy, coordxy, struct trap *);
+static struct monst *monstinroom(struct permonst *, int);
+static boolean doorless_door(coordxy, coordxy);
+static void move_update(boolean);
+static void check_buried_zombies(coordxy, coordxy);
+static boolean domove_swap_with_pet(struct monst *, coordxy, coordxy);
+static void struggle_sub(const char *);
 static boolean check_interrupt(struct monst *mtmp);
 
 static boolean door_opened; /* set to true if door was opened during test_move */
@@ -35,9 +35,9 @@ static anything tmp_anything;
 
 #ifdef DUNGEON_GROWTH
 void
-rndmappos(x, y) /* guaranteed to return a valid coord */
-xchar *x;
-xchar *y;
+rndmappos(coordxy *x, coordxy *y) /* guaranteed to return a valid coord */
+
+
 {
     if (*x >= COLNO) *x = COLNO;
     else if (*x == -1) *x = rn2(COLNO-1)+1;
@@ -61,17 +61,15 @@ static const struct herb_info {
 };
 
 long
-count_herbs_at(x, y, watery)
-xchar x, y;
-boolean watery;
+count_herbs_at(coordxy x, coordxy y, boolean watery)
 {
-    register int dd;
-    register long count = 0;
+    int dd;
+    long count = 0;
 
     if (isok(x, y)) {
         for (dd = 0; dd < SIZE(herb_info); dd++) {
             if (watery == herb_info[dd].in_water) {
-                register struct obj *otmp = sobj_at(herb_info[dd].herb, x, y);
+                struct obj *otmp = sobj_at(herb_info[dd].herb, x, y);
                 if (otmp)
                     count += otmp->quan;
             }
@@ -82,11 +80,9 @@ boolean watery;
 
 /* returns TRUE if a herb can grow at (x,y) */
 boolean
-herb_can_grow_at(x, y, watery)
-xchar x, y;
-boolean watery;
+herb_can_grow_at(coordxy x, coordxy y, boolean watery)
 {
-    register struct rm *lev = &levl[x][y];
+    struct rm *lev = &levl[x][y];
     if (inside_shop(x, y)) return FALSE;
     if (watery)
         return (IS_POOL(lev->typ) &&
@@ -101,9 +97,7 @@ boolean watery;
 
 /* grow herbs in water. return true if did something. */
 boolean
-grow_water_herbs(herb, x, y)
-int herb;
-xchar x, y;
+grow_water_herbs(int herb, coordxy x, coordxy y)
 {
     struct obj *otmp;
 
@@ -123,10 +117,7 @@ xchar x, y;
 /* grow herb on ground at (x,y), or maybe spread out.
    return true if did something. */
 boolean
-grow_herbs(herb, x, y, showmsg, update)
-int herb;
-xchar x, y;
-boolean showmsg, update;
+grow_herbs(int herb, coordxy x, coordxy y, boolean showmsg, boolean update)
 {
     struct obj *otmp;
 
@@ -183,11 +174,11 @@ boolean showmsg, update;
 /* moves topmost object in water at (x,y) to dir.
    return true if did something. */
 boolean
-water_current(x, y, dir, waterforce, showmsg, update)
-xchar x, y;
-int dir;
-unsigned waterforce;  /* strength of the water current */
-boolean showmsg, update;
+water_current(coordxy x, coordxy y, int dir, unsigned int waterforce, boolean showmsg, boolean update)
+
+
+                      /* strength of the water current */
+
 {
     struct obj *otmp;
     coord pos;
@@ -228,11 +219,9 @@ boolean showmsg, update;
 
 /* a tree at (x,y) spontaneously drops a ripe fruit */
 boolean
-drop_ripe_treefruit(x, y, showmsg, update)
-xchar x, y;
-boolean showmsg, update;
+drop_ripe_treefruit(coordxy x, coordxy y, boolean showmsg, boolean update)
 {
-    register struct rm *lev;
+    struct rm *lev;
 
     rndmappos(&x, &y);
     lev = &levl[x][y];
@@ -283,8 +272,7 @@ boolean showmsg, update;
  * Creates a kind of forest, with (hopefully) most places available.
  */
 boolean
-seed_tree(x, y)
-xchar x, y;
+seed_tree(coordxy x, coordxy y)
 {
     coord pos, pos2;
     struct rm *lev;
@@ -327,9 +315,9 @@ xchar x, y;
 }
 
 void
-dgn_growths(showmsg, update)
-boolean showmsg; /* show messages */
-boolean update;  /* do newsym() */
+dgn_growths(
+    boolean showmsg, /**< show messages */
+    boolean update) /**< do newsym() */
 {
     int herbnum = rn2(SIZE(herb_info));
     (void) seed_tree(-1, -1);
@@ -345,8 +333,7 @@ boolean update;  /* do newsym() */
 
 /* catch up with growths when returning to a previously visited level */
 void
-catchup_dgn_growths(mvs)
-int mvs;
+catchup_dgn_growths(int mvs)
 {
     if (mvs < 0) mvs = 0;
     else if (mvs > LARGEST_INT) mvs = LARGEST_INT;
@@ -356,8 +343,7 @@ int mvs;
 #endif /* DUNGEON_GROWTH */
 
 anything *
-uint_to_any(ui)
-unsigned ui;
+uint_to_any(unsigned int ui)
 {
     tmp_anything = zeroany;
     tmp_anything.a_uint = ui;
@@ -365,8 +351,7 @@ unsigned ui;
 }
 
 anything *
-long_to_any(lng)
-long lng;
+long_to_any(long int lng)
 {
     tmp_anything = zeroany;
     tmp_anything.a_long = lng;
@@ -374,8 +359,7 @@ long lng;
 }
 
 anything *
-monst_to_any(mtmp)
-struct monst *mtmp;
+monst_to_any(struct monst *mtmp)
 {
     tmp_anything = zeroany;
     tmp_anything.a_monst = mtmp;
@@ -383,8 +367,7 @@ struct monst *mtmp;
 }
 
 anything *
-obj_to_any(obj)
-struct obj *obj;
+obj_to_any(struct obj *obj)
 {
     tmp_anything = zeroany;
     tmp_anything.a_obj = obj;
@@ -392,11 +375,9 @@ struct obj *obj;
 }
 
 boolean
-revive_nasty(x, y, msg)
-int x, y;
-const char *msg;
+revive_nasty(coordxy x, coordxy y, const char *msg)
 {
-    register struct obj *otmp, *otmp2;
+    struct obj *otmp, *otmp2;
     struct monst *mtmp;
     coord cc;
     boolean revived = FALSE;
@@ -431,12 +412,12 @@ const char *msg;
 }
 
 static int
-moverock()
+moverock(void)
 {
-    register xchar rx, ry, sx, sy;
-    register struct obj *otmp;
-    register struct trap *ttmp;
-    register struct monst *mtmp;
+    coordxy rx, ry, sx, sy;
+    struct obj *otmp;
+    struct trap *ttmp;
+    struct monst *mtmp;
 
     sx = u.ux + u.dx, sy = u.uy + u.dy; /* boulder starting position */
     while ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
@@ -727,8 +708,7 @@ cannot_push:
  *  Returns TRUE if still eating, FALSE when done.
  */
 static int
-still_chewing(x, y)
-xchar x, y;
+still_chewing(coordxy x, coordxy y)
 {
     struct rm *lev = &levl[x][y];
     struct obj *boulder = sobj_at(BOULDER, x, y);
@@ -874,9 +854,7 @@ xchar x, y;
 }
 
 void
-movobj(obj, ox, oy)
-register struct obj *obj;
-register xchar ox, oy;
+movobj(struct obj *obj, coordxy ox, coordxy oy)
 {
     /* optimize by leaving on the fobj chain? */
     remove_object(obj);
@@ -889,9 +867,9 @@ register xchar ox, oy;
 static NEARDATA const char fell_on_sink[] = "fell onto a sink";
 
 static void
-dosinkfall()
+dosinkfall(void)
 {
-    register struct obj *obj;
+    struct obj *obj;
     int dmg;
     boolean lev_boots = (uarmf && uarmf->otyp == LEVITATION_BOOTS);
     boolean innate_lev = ((HLevitation & (FROMOUTSIDE | FROMFORM)) != 0L);
@@ -975,8 +953,7 @@ dosinkfall()
 
 /* intended to be called only on ROCKs */
 boolean
-may_dig(x, y)
-register xchar x, y;
+may_dig(coordxy x, coordxy y)
 {
     struct rm *lev = &levl[x][y];
 
@@ -987,17 +964,14 @@ register xchar x, y;
 }
 
 boolean
-may_passwall(x, y)
-register xchar x, y;
+may_passwall(coordxy x, coordxy y)
 {
     return (boolean)(!((IS_STWALL(levl[x][y].typ) || IS_TREES(levl[x][y].typ)) &&
                        (levl[x][y].wall_info & W_NONPASSWALL)));
 }
 
 boolean
-bad_rock(mdat, x, y)
-struct permonst *mdat;
-register xchar x, y;
+bad_rock(struct permonst *mdat, coordxy x, coordxy y)
 {
     return((boolean) ((Sokoban && sobj_at(BOULDER, x, y)) ||
                       (IS_ROCK(levl[x][y].typ)
@@ -1010,8 +984,7 @@ register xchar x, y;
    the reason why:  1: can't fit, 2: possessions won't fit, 3: sokoban
    returns 0 if we can squeeze through */
 int
-cant_squeeze_thru(mon)
-struct monst *mon;
+cant_squeeze_thru(struct monst *mon)
 {
     int amt;
     struct permonst *ptr = mon->data;
@@ -1038,16 +1011,13 @@ struct monst *mon;
 }
 
 boolean
-invocation_pos(x, y)
-xchar x, y;
+invocation_pos(coordxy x, coordxy y)
 {
     return((boolean)(Invocation_lev(&u.uz) && x == inv_pos.x && y == inv_pos.y));
 }
 
 static void
-autoexplore_msg(text, mode)
-const char *text;
-int mode UNUSED;
+autoexplore_msg(const char *text, int mode UNUSED)
 {
     if (iflags.autoexplore) {
         char tmp[BUFSZ];
@@ -1060,14 +1030,12 @@ int mode UNUSED;
  *  mode is one of DO_MOVE, TEST_MOVE, TEST_TRAV or TEST_TRAP
  */
 boolean
-test_move(ux, uy, dx, dy, mode)
-int ux, uy, dx, dy;
-int mode;
+test_move(int ux, int uy, int dx, int dy, int mode)
 {
     int x = ux+dx;
     int y = uy+dy;
-    register struct rm *tmpr = &levl[x][y];
-    register struct rm *ust;
+    struct rm *tmpr = &levl[x][y];
+    struct rm *ust;
 
     door_opened = FALSE;
     /*
@@ -1313,8 +1281,7 @@ testdiag:
    avoid treating traps and doors known to be locked as valid explore
    targets (although they are still valid travel intermediates). */
 static boolean
-unexplored(x, y)
-int x, y;
+unexplored(coordxy x, coordxy y)
 {
     int i, j, k, l;
     struct trap *ttmp = t_at(x, y);
@@ -1361,9 +1328,7 @@ int x, y;
 /** Returns a distance modified by a constant factor.
  * The lower the value the better.*/
 int
-autotravel_weighting(x, y, distance)
-int x, y;
-unsigned distance;
+autotravel_weighting(coordxy x, coordxy y, unsigned int distance)
 {
     int glyph = levl[x][y].glyph;
 
@@ -1406,8 +1371,7 @@ unsigned distance;
  * Returns TRUE if a path was found.
  */
 static boolean
-findtravelpath(guess)
-boolean (*guess)(int, int);
+findtravelpath(boolean (*guess) (coordxy, coordxy))
 {
     /* if travel to adjacent, reachable location, use normal movement rules */
     if (!guess && iflags.travel1 && distmin(u.ux, u.uy, u.tx, u.ty) == 1) {
@@ -1423,9 +1387,9 @@ boolean (*guess)(int, int);
     }
     if (u.tx != u.ux || u.ty != u.uy || guess == unexplored) {
         unsigned travel[COLNO][ROWNO];
-        xchar travelstepx[2][COLNO*ROWNO];
-        xchar travelstepy[2][COLNO*ROWNO];
-        xchar tx, ty, ux, uy;
+        coordxy travelstepx[2][COLNO*ROWNO];
+        coordxy travelstepy[2][COLNO*ROWNO];
+        coordxy tx, ty, ux, uy;
         int n = 1;      /* max offset in travelsteps */
         int set = 0;        /* two sets current and previous */
         int radius = 1;     /* search radius */
@@ -1577,8 +1541,7 @@ found:
 }
 
 boolean
-is_valid_travelpt(x,y)
-int x,y;
+is_valid_travelpt(coordxy x, coordxy y)
 {
     int tx = u.tx;
     int ty = u.ty;
@@ -1601,8 +1564,7 @@ int x,y;
 
 /* A function version of couldsee, so we can take a pointer to it. */
 static boolean
-couldsee_func(x, y)
-int x, y;
+couldsee_func(coordxy x, coordxy y)
 {
     return couldsee(x, y);
 }
@@ -1615,8 +1577,7 @@ int x, y;
  * It should only leak information about "obvious" coordinates, e.g.
  * unexplored rooms or big areas not reachable by the player. */
 static boolean
-interesting_to_explore(x, y)
-int x, y;
+interesting_to_explore(coordxy x, coordxy y)
 {
     if (!goodpos(x, y, &youmonst, 0)) return FALSE;
 
@@ -1640,9 +1601,9 @@ int x, y;
    return true iff moving should continue to intended destination
    (all failures and most successful escapes leave hero at original spot) */
 static boolean
-trapmove(x, y, desttrap)
-int x, y;              /* targetted destination, <u.ux+u.dx,u.uy+u.dy> */
-struct trap *desttrap; /* nonnull if another trap at <x,y> */
+trapmove(
+    coordxy x, coordxy y, /**< targetted destination, <u.ux+u.dx,u.uy+u.dy> */
+    struct trap *desttrap) /**< nonnull if another trap at <x,y> */
 {
     boolean anchored = FALSE;
     const char *predicament, *culprit;
@@ -1789,7 +1750,7 @@ struct trap *desttrap; /* nonnull if another trap at <x,y> */
 }
 
 boolean
-u_rooted()
+u_rooted(void)
 {
     if (!youmonst.data->mmove) {
         You("are rooted %s.",
@@ -1804,7 +1765,7 @@ u_rooted()
 
 /* reduce zombification timeout of buried zombies around px, py */
 static void
-check_buried_zombies(xchar x, xchar y)
+check_buried_zombies(coordxy x, coordxy y)
 {
     struct obj *otmp;
     long t;
@@ -1825,7 +1786,7 @@ check_buried_zombies(xchar x, xchar y)
 
 /** Maybe swap places with a monster? returns TRUE if swapped places */
 static boolean
-domove_swap_with_pet(struct monst *mtmp, xchar x, xchar y)
+domove_swap_with_pet(struct monst *mtmp, coordxy x, coordxy y)
 {
     struct trap *trap;
     /* if it turns out we can't actually move */
@@ -1948,15 +1909,15 @@ domove_swap_with_pet(struct monst *mtmp, xchar x, xchar y)
 }
 
 void
-domove()
+domove(void)
 {
-    register struct monst *mtmp;
-    register struct rm *tmpr;
-    register xchar x, y;
+    struct monst *mtmp;
+    struct rm *tmpr;
+    coordxy x, y;
     struct trap *trap = NULL;
     int wtcap;
     boolean on_ice;
-    xchar chainx = 0, chainy = 0,
+    coordxy chainx = 0, chainy = 0,
           ballx = 0, bally = 0;     /* ball&chain new positions */
     int bc_control = 0;             /* control for ball&chain */
     boolean cause_delay = FALSE;    /* dragging ball will skip a move */
@@ -2103,7 +2064,7 @@ domove()
         x = u.ux + u.dx;
         y = u.uy + u.dy;
         if (Stunned || (Confusion && !rn2(5))) {
-            register int tries = 0;
+            int tries = 0;
 
             do {
                 if (tries++ > 50) {
@@ -2702,7 +2663,7 @@ runmode_delay_output(void)
 
 /* combat increases metabolism */
 boolean
-overexertion()
+overexertion(void)
 {
     /* this used to be part of domove() when moving to a monster's
        position, but is now called by attack() so that it doesn't
@@ -2723,8 +2684,7 @@ overexertion()
 }
 
 void
-struggle_sub(predicament)
-const char *predicament;
+struggle_sub(const char *predicament)
 {
     if (flags.verbose) {
         if (u.usteed)
@@ -2736,7 +2696,7 @@ const char *predicament;
 }
 
 void
-invocation_message()
+invocation_message(void)
 {
     /* mark the square as stepped on, whether it's the VS or not;
         don't do so when blind, though, because it would misleadingly
@@ -2791,7 +2751,7 @@ invocation_message()
    might be going into solid rock, inhibiting levitation or flight,
    or coming back out of such, reinstating levitation/flying */
 void
-switch_terrain()
+switch_terrain(void)
 {
     struct rm *lev = &levl[u.ux][u.uy];
     boolean blocklev = (IS_ROCK(lev->typ) ||
@@ -2838,8 +2798,7 @@ switch_terrain()
    leaving a pool of water/lava, and by moveloop to check for staying on one;
    returns true to skip rest of spoteffects */
 boolean
-pooleffects(newspot)
-boolean newspot;             /* true if called by spoteffects */
+pooleffects(boolean newspot) /**< TRUE if called by spoteffects */
 {
     /* check for leaving water */
     if (u.uinwater) {
@@ -2947,8 +2906,7 @@ boolean newspot;             /* true if called by spoteffects */
 }
 
 void
-spoteffects(pick)
-boolean pick;
+spoteffects(boolean pick)
 {
     static int inspoteffects = 0;
     static coord spotloc;
@@ -3103,11 +3061,9 @@ boolean pick;
 
 /* returns first matching monster */
 static struct monst *
-monstinroom(mdat, roomno)
-struct permonst *mdat;
-int roomno;
+monstinroom(struct permonst *mdat, int roomno)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp)) {
@@ -3122,14 +3078,12 @@ int roomno;
 }
 
 char *
-in_rooms(x, y, typewanted)
-register xchar x, y;
-register int typewanted;
+in_rooms(coordxy x, coordxy y, int typewanted)
 {
     static char buf[5];
     char rno, *ptr = &buf[4];
     int typefound, min_x, min_y, max_x, max_y_offset, step;
-    register struct rm *lev;
+    struct rm *lev;
 
 #define goodtype(rno) (!typewanted || \
                        ((typefound = rooms[rno - ROOMOFFSET].rtype) == typewanted) || \
@@ -3190,11 +3144,10 @@ register int typewanted;
 
 /* is (x,y) in a town? */
 boolean
-in_town(x, y)
-register int x, y;
+in_town(coordxy x, coordxy y)
 {
     s_level *slev = Is_special(&u.uz);
-    register struct mkroom *sroom;
+    struct mkroom *sroom;
     boolean has_subrooms = FALSE;
 
     if (!slev || !slev->flags.town)
@@ -3230,8 +3183,7 @@ register int x, y;
 }
 
 static void
-move_update(newlev)
-register boolean newlev;
+move_update(boolean newlev)
 {
     char *ptr1, *ptr2, *ptr3, *ptr4;
 
@@ -3272,7 +3224,7 @@ register boolean newlev;
 }
 
 static boolean
-u_in_mine_town()
+u_in_mine_town(void)
 {
     if (!In_mines(&u.uz)) {
         return FALSE;
@@ -3282,10 +3234,9 @@ u_in_mine_town()
 
 /* possibly deliver a one-time room entry message */
 void
-check_special_room(newlev)
-register boolean newlev;
+check_special_room(boolean newlev)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
     char *ptr;
 
     move_update(newlev);
@@ -3449,7 +3400,7 @@ register boolean newlev;
   -1 = do normal pickup
   -2 = loot the monster */
 int
-pickup_checks()
+pickup_checks(void)
 {
     /* uswallow case added by GAN 01/29/87 */
     if (u.uswallow) {
@@ -3486,7 +3437,7 @@ pickup_checks()
         }
     }
     if (!OBJ_AT(u.ux, u.uy)) {
-        register struct rm *lev = &levl[u.ux][u.uy];
+        struct rm *lev = &levl[u.ux][u.uy];
 
         if (IS_THRONE(lev->typ))
             pline("It must weigh%s a ton!", lev->looted ? " almost" : "");
@@ -3529,7 +3480,7 @@ pickup_checks()
 
 /* the ',' command */
 int
-dopickup()
+dopickup(void)
 {
     int count, tmpcount, ret;
 
@@ -3551,7 +3502,7 @@ dopickup()
 /* turn around a corner if that is the only way we can proceed */
 /* do not turn left or right twice */
 void
-lookaround()
+lookaround(void)
 {
     int x, y;
     int i, x0 = 0, y0 = 0, m0 = 1, i0 = 9;
@@ -3740,8 +3691,7 @@ stop:
 
 /* check for a doorway which lacks its door (NODOOR or BROKEN) */
 static boolean
-doorless_door(x, y)
-int x, y;
+doorless_door(coordxy x, coordxy y)
 {
     struct rm *lev_p = &levl[x][y];
 
@@ -3776,8 +3726,7 @@ check_interrupt(struct monst *mtmp)
 
 /* used by drown() to check whether hero can crawl from water to <x,y> */
 boolean
-crawl_destination(x, y)
-int x, y;
+crawl_destination(coordxy x, coordxy y)
 {
     /* is location ok in general? */
     if (!goodpos(x, y, &youmonst, 0))
@@ -3803,7 +3752,7 @@ int x, y;
 /* something like lookaround, but we are not running */
 /* react only to monsters that might hit us */
 int
-monster_nearby()
+monster_nearby(void)
 {
     int x, y;
     struct monst *mtmp;
@@ -3826,9 +3775,7 @@ monster_nearby()
 }
 
 void
-nomul(nval, txt)
-register int nval;
-const char *txt;
+nomul(int nval, const char *txt)
 {
     if (multi < nval) return; /* This is a bug fix by ab@unido */
     u.uinvulnerable = FALSE;  /* Kludge to avoid ctrl-C bug -dlc */
@@ -3843,8 +3790,7 @@ const char *txt;
 
 /* called when a non-movement, multi-turn action has completed */
 void
-unmul(msg_override)
-const char *msg_override;
+unmul(const char *msg_override)
 {
     multi = 0;  /* caller will usually have done this already */
     (void) memset(multi_txt, 0, BUFSZ);
@@ -3867,11 +3813,11 @@ const char *msg_override;
     nomovemsg = 0;
     u.usleep = 0;
     if (afternmv) {
-        int NDECL((*f)) = afternmv;
+        int (*f)(void) = afternmv;
 
         /* clear afternmv before calling it (to override the
            encumbrance hack for levitation--see weight_cap()) */
-        afternmv = (int NDECL((*))) 0;
+        afternmv = (int (*)(void)) 0;
         (void) (*f)();
         /* for finishing Armor/Boots/&c_on() */
         update_inventory();
@@ -3879,7 +3825,7 @@ const char *msg_override;
 }
 
 static void
-maybe_wail()
+maybe_wail(void)
 {
     static short powers[] = { TELEPORT, SEE_INVIS, POISON_RES, COLD_RES,
                               SHOCK_RES, FIRE_RES, SLEEP_RES, DISINT_RES,
@@ -3914,9 +3860,9 @@ maybe_wail()
  * Wizard mode.
  */
 void
-showdmg(n, you)
-int n; /**< amount of damage inflicted */
-boolean you; /**< true, if you are hit */
+showdmg(
+    int n, /**< amount of damage inflicted */
+    boolean you) /**< TRUE, if you are hit */
 {
 #ifdef WIZARD
     if (iflags.showdmg && wizard && n > 0) {
@@ -3929,7 +3875,7 @@ boolean you; /**< true, if you are hit */
 }
 
 void
-check_uhpmax()
+check_uhpmax(void)
 {
     if (!heaven_or_hell_mode) return;
 
@@ -3944,9 +3890,7 @@ check_uhpmax()
 }
 
 void
-set_uhpmax(new_hpmax, poly)
-int new_hpmax;
-boolean poly;
+set_uhpmax(int new_hpmax, boolean poly)
 {
     if (!heaven_or_hell_mode || new_hpmax < 1) {
         if (!poly) u.uhpmax = new_hpmax;
@@ -3959,20 +3903,13 @@ boolean poly;
 }
 
 void
-losehp(n, knam, k_format)
-int n;
-const char *knam;
-boolean k_format;
+losehp(int n, const char *knam, boolean k_format)
 {
     losehp_how(n, knam, k_format, DIED);
 }
 
 void
-losehp_how(n, knam, k_format, how)
-int n;
-const char *knam;
-int how;
-boolean k_format;
+losehp_how(int n, const char *knam, boolean k_format, int how)
 {
     showdmg(n, TRUE);
 
@@ -4007,7 +3944,7 @@ boolean k_format;
 }
 
 int
-weight_cap()
+weight_cap(void)
 {
     long carrcap, save_ELev = ELevitation, save_BLev = BLevitation;
 
@@ -4062,10 +3999,10 @@ static int wc;  /* current weight_cap(); valid after call to inv_weight() */
 /* returns how far beyond the normal capacity the player is currently. */
 /* inv_weight() is negative if the player is below normal capacity. */
 int
-inv_weight()
+inv_weight(void)
 {
-    register struct obj *otmp = invent;
-    register int wt = 0;
+    struct obj *otmp = invent;
+    int wt = 0;
 
     while (otmp) {
         if (otmp->oclass == COIN_CLASS)
@@ -4096,8 +4033,7 @@ inv_weight()
  * over the normal capacity the player is loaded.  Max is 5.
  */
 int
-calc_capacity(xtra_wt)
-int xtra_wt;
+calc_capacity(int xtra_wt)
 {
     int cap, wt = inv_weight() + xtra_wt;
 
@@ -4108,13 +4044,13 @@ int xtra_wt;
 }
 
 int
-near_capacity()
+near_capacity(void)
 {
     return calc_capacity(0);
 }
 
 int
-max_capacity()
+max_capacity(void)
 {
     int wt = inv_weight();
 
@@ -4122,8 +4058,7 @@ max_capacity()
 }
 
 boolean
-check_capacity(str)
-const char *str;
+check_capacity(const char *str)
 {
     if (near_capacity() >= EXT_ENCUMBER) {
         if (str)
@@ -4136,11 +4071,10 @@ const char *str;
 }
 
 int
-inv_cnt(incl_gold)
-boolean incl_gold;
+inv_cnt(boolean incl_gold)
 {
-    register struct obj *otmp = invent;
-    register int ct = 0;
+    struct obj *otmp = invent;
+    int ct = 0;
 
     while (otmp) {
         if (incl_gold || otmp->invlet != GOLD_SYM) {
@@ -4156,8 +4090,7 @@ boolean incl_gold;
 /* now that u.gold/m.gold is gone.*/
 /* Counting money in a container might be possible too. */
 long
-money_cnt(otmp)
-struct obj *otmp;
+money_cnt(struct obj *otmp)
 {
     while(otmp) {
         if (otmp->oclass == COIN_CLASS) {
@@ -4169,7 +4102,7 @@ struct obj *otmp;
 }
 
 boolean
-MON_AT(int x, int y)
+MON_AT(coordxy x, coordxy y)
 {
     assert_valid_coordinates(x, y);
 
@@ -4177,7 +4110,7 @@ MON_AT(int x, int y)
 }
 
 boolean
-OBJ_AT(int x, int y)
+OBJ_AT(coordxy x, coordxy y)
 {
     assert_valid_coordinates(x, y);
 

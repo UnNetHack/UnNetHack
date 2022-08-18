@@ -7,24 +7,22 @@
 
 extern boolean notonhead;
 
-STATIC_DCL boolean FDECL(dog_hunger, (struct monst *, struct edog *));
-STATIC_DCL int FDECL(dog_invent, (struct monst *, struct edog *, int));
-STATIC_DCL int FDECL(dog_goal, (struct monst *, struct edog *, int, int, int));
+static boolean dog_hunger(struct monst *, struct edog *);
+static int dog_invent(struct monst *, struct edog *, int);
+static int dog_goal(struct monst *, struct edog *, int, int, int);
 
-static struct monst *FDECL(find_targ, (struct monst *, int, int, int));
-static int FDECL(find_friends, (struct monst *, struct monst *, int));
-static struct monst *FDECL(best_target, (struct monst *));
-static long FDECL(score_targ, (struct monst *, struct monst *));
+static struct monst *find_targ(struct monst *, int, int, int);
+static int find_friends(struct monst *, struct monst *, int);
+static struct monst *best_target(struct monst *);
+static long score_targ(struct monst *, struct monst *);
 
-STATIC_DCL boolean FDECL(can_reach_location, (struct monst *, XCHAR_P, XCHAR_P,
-                                              XCHAR_P, XCHAR_P));
-STATIC_DCL boolean FDECL(could_reach_item, (struct monst *, XCHAR_P, XCHAR_P));
-static void FDECL(quickmimic, (struct monst *));
+static boolean can_reach_location(struct monst *, coordxy, coordxy, coordxy, coordxy);
+static boolean could_reach_item(struct monst *, coordxy, coordxy);
+static void quickmimic(struct monst *);
 
 /* pick a carried item for pet to drop */
 struct obj *
-droppables(mon)
-struct monst *mon;
+droppables(struct monst *mon)
 {
     struct obj *obj, *wep, *pickaxe, *unihorn, *key;
     static struct obj dummy;
@@ -138,13 +136,12 @@ struct monst *mon;
 
 static NEARDATA const char nofetch[] = { BALL_CLASS, CHAIN_CLASS, ROCK_CLASS, 0 };
 
-STATIC_VAR xchar gtyp, gx, gy;  /* type and position of dog's current goal */
+static coordxy gtyp, gx, gy;  /* type and position of dog's current goal */
 
-STATIC_PTR void FDECL(wantdoor, (int, int, genericptr_t));
+static void wantdoor(coordxy, coordxy, genericptr_t);
 
 boolean
-cursed_object_at(x, y)
-int x, y;
+cursed_object_at(coordxy x, coordxy y)
 {
     struct obj *otmp;
 
@@ -154,9 +151,7 @@ int x, y;
 }
 
 int
-dog_nutrition(mtmp, obj)
-struct monst *mtmp;
-struct obj *obj;
+dog_nutrition(struct monst *mtmp, struct obj *obj)
 {
     int nutrit;
 
@@ -204,13 +199,13 @@ struct obj *obj;
 
 /* returns 2 if pet dies, otherwise 1 */
 int
-dog_eat(mtmp, obj, x, y, devour)
-struct monst *mtmp;
-struct obj *obj; /* if unpaid, then thrown or kicked by hero */
-int x, y; /* dog's starting location, might be different from current */
-boolean devour;
+dog_eat(struct monst *mtmp, struct obj *obj, coordxy x, coordxy y, boolean devour)
+
+                 /* if unpaid, then thrown or kicked by hero */
+          /* dog's starting location, might be different from current */
+
 {
-    register struct edog *edog = EDOG(mtmp);
+    struct edog *edog = EDOG(mtmp);
     boolean poly, grow, heal, eyes, slimer, deadmimic;
     int nutrit;
     boolean vampiric = is_vampiric(mtmp->data);
@@ -386,10 +381,8 @@ boolean devour;
 }
 
 /* hunger effects -- returns TRUE on starvation */
-STATIC_OVL boolean
-dog_hunger(mtmp, edog)
-struct monst *mtmp;
-struct edog *edog;
+static boolean
+dog_hunger(struct monst *mtmp, struct edog *edog)
 {
     if (monstermoves > edog->hungrytime + 500) {
         if (!carnivorous(mtmp->data) && !herbivorous(mtmp->data)) {
@@ -433,13 +426,10 @@ dog_died:
 /* do something with object (drop, pick up, eat) at current position
  * returns 1 if object eaten (since that counts as dog's move), 2 if died
  */
-STATIC_OVL int
-dog_invent(mtmp, edog, udist)
-struct monst *mtmp;
-struct edog *edog;
-int udist;
+static int
+dog_invent(struct monst *mtmp, struct edog *edog, int udist)
 {
-    register int omx, omy, carryamt = 0;
+    int omx, omy, carryamt = 0;
     struct obj *obj, *otmp;
 
     if (mtmp->msleeping || !mtmp->mcanmove) return(0);
@@ -505,16 +495,13 @@ int udist;
 /* set dog's goal -- gtyp, gx, gy
  * returns -1/0/1 (dog's desire to approach player) or -2 (abort move)
  */
-STATIC_OVL int
-dog_goal(mtmp, edog, after, udist, whappr)
-register struct monst *mtmp;
-struct edog *edog;
-int after, udist, whappr;
+static int
+dog_goal(struct monst *mtmp, struct edog *edog, int after, int udist, int whappr)
 {
-    register int omx, omy;
+    int omx, omy;
     boolean in_masters_sight, dog_has_minvent;
-    register struct obj *obj;
-    xchar otyp;
+    struct obj *obj;
+    xint16 otyp;
     int appr;
 
     /* Steeds don't move on their own will */
@@ -535,7 +522,7 @@ int after, udist, whappr;
 #define DDIST(x, y) (dist2(x, y, omx, omy))
 #define SQSRCHRADIUS 5
         int min_x, max_x, min_y, max_y;
-        register int nx, ny;
+        int nx, ny;
 
         gtyp = UNDEF;   /* no goal as yet */
         gx = gy = 0;    /* suppress 'used before set' message */
@@ -612,7 +599,7 @@ int after, udist, whappr;
 
 #define FARAWAY (COLNO + 2)     /* position outside screen */
     if (gx == u.ux && gy == u.uy && !in_masters_sight) {
-        register coord *cp;
+        coord *cp;
 
         cp = gettrack(omx, omy);
         if (cp) {
@@ -649,10 +636,7 @@ int after, udist, whappr;
 }
 
 static struct monst *
-find_targ(mtmp, dx, dy, maxdist)
-register struct monst *mtmp;
-int dx, dy;
-int maxdist;
+find_targ(struct monst *mtmp, int dx, int dy, int maxdist)
 {
     struct monst *targ = 0;
     int curx = mtmp->mx, cury = mtmp->my;
@@ -695,9 +679,7 @@ int maxdist;
 }
 
 static int
-find_friends(mtmp, mtarg, maxdist)
-struct monst *mtmp, *mtarg;
-int    maxdist;
+find_friends(struct monst *mtmp, struct monst *mtarg, int maxdist)
 {
     struct monst *pal;
     int dx = sgn(mtarg->mx - mtmp->mx);
@@ -746,8 +728,7 @@ int    maxdist;
 }
 
 static long
-score_targ(mtmp, mtarg)
-struct monst *mtmp, *mtarg;
+score_targ(struct monst *mtmp, struct monst *mtarg)
 {
     long score = 0L;
 
@@ -856,8 +837,7 @@ struct monst *mtmp, *mtarg;
 }
 
 static struct monst *
-best_target(mtmp)
-struct monst *mtmp;   /* Pet */
+best_target(struct monst *mtmp) /**< Pet */
 {
     int dx, dy;
     long bestscore = -40000L, currscore;
@@ -913,20 +893,19 @@ struct monst *mtmp;   /* Pet */
 
 /* return 0 (no move), 1 (move) or 2 (dead) */
 int
-dog_move(mtmp, after)
-register struct monst *mtmp;
-int after; /* this is extra fast monster movement */
+dog_move(struct monst *mtmp,
+         int after) /**< this is extra fast monster movement */
 {
     int appr, whappr, udist;
     int i, j, k;
-    register struct edog *edog = EDOG(mtmp);
+    struct edog *edog = EDOG(mtmp);
     struct obj *obj = (struct obj *) 0;
-    xchar otyp;
+    xint16 otyp;
     boolean has_edog, cursemsg[9], do_eat = FALSE;
     boolean better_with_displacing = FALSE;
-    xchar nix, niy;     /* position mtmp is (considering) moving to */
-    register int nx, ny;    /* temporary coordinates */
-    xchar cnt, uncursedcnt, chcnt;
+    coordxy nix, niy;     /* position mtmp is (considering) moving to */
+    int nx, ny;    /* temporary coordinates */
+    xint16 cnt, uncursedcnt, chcnt;
     int chi = -1, nidist, ndist;
     coord poss[9];
     long info[9], allowflags;
@@ -1046,7 +1025,7 @@ int after; /* this is extra fast monster movement */
 
         if ((info[i] & ALLOW_M) && MON_AT(nx, ny)) {
             int mstatus;
-            register struct monst *mtmp2 = m_at(nx, ny);
+            struct monst *mtmp2 = m_at(nx, ny);
 
             if ((int)mtmp2->m_lev >= (int)mtmp->m_lev+2 ||
                 (mtmp2->data == &mons[PM_FLOATING_EYE] && rn2(10) &&
@@ -1323,10 +1302,8 @@ dognext:
 }
 
 /* check if a monster could pick up objects from a location */
-STATIC_OVL boolean
-could_reach_item(mon, nx, ny)
-struct monst *mon;
-xchar nx, ny;
+static boolean
+could_reach_item(struct monst *mon, coordxy nx, coordxy ny)
 {
     if ((!is_pool(nx, ny) || is_swimmer(mon->data)) &&
         (!is_lava(nx, ny) || likes_lava(mon->data)) &&
@@ -1342,10 +1319,8 @@ xchar nx, ny;
  * Since the maximum food distance is 5, this should never be more than 5 calls
  * deep.
  */
-STATIC_OVL boolean
-can_reach_location(mon, mx, my, fx, fy)
-struct monst *mon;
-xchar mx, my, fx, fy;
+static boolean
+can_reach_location(struct monst *mon, coordxy mx, coordxy my, coordxy fx, coordxy fy)
 {
     int i, j;
     int dist;
@@ -1376,10 +1351,8 @@ xchar mx, my, fx, fy;
 }
 
 /* do_clear_area client */
-STATIC_PTR void
-wantdoor(x, y, distance)
-int x, y;
-genericptr_t distance;
+static void
+wantdoor(coordxy x, coordxy y, genericptr_t distance)
 {
     int ndist;
 
@@ -1409,8 +1382,7 @@ static struct qmchoices {
 };
 
 void
-finish_meating(mtmp)
-struct monst *mtmp;
+finish_meating(struct monst *mtmp)
 {
     mtmp->meating = 0;
     if (M_AP_TYPE(mtmp) && mtmp->mappearance && mtmp->cham == NON_PM) {
@@ -1422,8 +1394,7 @@ struct monst *mtmp;
 }
 
 static void
-quickmimic(mtmp)
-struct monst *mtmp;
+quickmimic(struct monst *mtmp)
 {
     int idx = 0, trycnt = 5, spotted;
     char buf[BUFSZ];

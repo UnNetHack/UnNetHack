@@ -74,17 +74,17 @@ struct termio termio;
 #endif
 
 #ifdef _M_UNIX
-extern void NDECL(sco_mapon);
-extern void NDECL(sco_mapoff);
+extern void sco_mapon(void);
+extern void sco_mapoff(void);
 #endif
 #ifdef __linux__
-extern void NDECL(linux_mapon);
-extern void NDECL(linux_mapoff);
+extern void linux_mapon(void);
+extern void linux_mapoff(void);
 #endif
 
 #ifdef AUX
 void
-catch_stp()
+catch_stp(void)
 {
     signal(SIGTSTP, SIG_DFL);
     dosuspend();
@@ -92,7 +92,7 @@ catch_stp()
 #endif /* AUX */
 
 void
-getwindowsz()
+getwindowsz(void)
 {
 #ifdef USE_WIN_IOCTL
     /*
@@ -115,7 +115,7 @@ getwindowsz()
 }
 
 void
-getioctls()
+getioctls(void)
 {
 #ifdef BSD_JOB_CONTROL
 	(void) ioctl(fileno(stdin), (int) TIOCGLTC, (char *) &ltchars);
@@ -138,7 +138,7 @@ getioctls()
 }
 
 void
-setioctls()
+setioctls(void)
 {
 #ifdef BSD_JOB_CONTROL
 	(void) ioctl(fileno(stdin), (int) TIOCSLTC, (char *) &ltchars);
@@ -157,7 +157,7 @@ setioctls()
 
 #ifdef SUSPEND		/* No longer implies BSD */
 int
-dosuspend()
+dosuspend(void)
 {
     if (iflags.debug_fuzzer) {
         return 0;

@@ -15,7 +15,7 @@ extern const char * const killed_by_prefix[];   /* from topten.c */
 #endif
 
 #ifdef TEXT_TOMBSTONE
-static void FDECL(center, (int, char *));
+static void center(int, char *);
 
 #ifndef NH320_DEDICATION
 /* A normal tombstone for end of game display. */
@@ -70,12 +70,10 @@ static const char *rip_txt[] = {
 
 static char **rip;
 
-STATIC_OVL void
-center(line, text)
-int line;
-char *text;
+static void
+center(int line, char *text)
 {
-    register char *ip, *op;
+    char *ip, *op;
     ip = text;
     op = &rip[line][STONE_LINE_CENT - ((strlen(text)+1)>>1)];
     while(*ip) *op++ = *ip++;
@@ -83,14 +81,12 @@ char *text;
 
 
 void
-genl_outrip(tmpwin, how)
-winid tmpwin;
-int how;
+genl_outrip(winid tmpwin, int how)
 {
-    register char **dp;
-    register char *dpx;
+    char **dp;
+    char *dpx;
     char buf[BUFSZ];
-    register int x;
+    int x;
     int line;
 
     rip = dp = (char **) alloc(sizeof(rip_txt));
@@ -129,7 +125,7 @@ int how;
 
     /* Put death type on stone */
     for (line=DEATH_LINE, dpx = buf; line<YEAR_LINE; line++) {
-        register int i, i0;
+        int i, i0;
         char tmpchar;
 
         if ( (i0=strlen(dpx)) > STONE_LINE_LEN) {

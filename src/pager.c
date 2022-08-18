@@ -7,25 +7,24 @@
 #include "hack.h"
 #include "dlb.h"
 
-STATIC_DCL boolean FDECL(is_swallow_sym, (int));
-STATIC_DCL int FDECL(append_str, (char *, const char *));
-STATIC_DCL struct permonst * FDECL(lookat, (int, int, char *, char *));
+static boolean is_swallow_sym(int);
+static int append_str(char *, const char *);
+static struct permonst * lookat(coordxy, coordxy, char *, char *);
 static void look_all(boolean, boolean, boolean);
 static void add_obj_info(winid, struct obj *, short);
 static void add_mon_info(winid, struct permonst *);
-static void FDECL(do_supplemental_info, (char *, struct permonst *, BOOLEAN_P));
-STATIC_DCL boolean FDECL(help_menu, (int *));
+static void do_supplemental_info(char *, struct permonst *, boolean);
+static boolean help_menu(int *);
 #ifdef PORT_HELP
-extern void NDECL(port_help);
+extern void port_help();
 #endif
 static boolean lookup_database_entry(dlb *fp, struct obj *obj, const char* dbase_str, const char* inp,
         struct permonst *pm,
         boolean user_typed_name, boolean without_asking, char *supplemental_name);
 
 /* Returns "true" for characters that could represent a monster's stomach. */
-STATIC_OVL boolean
-is_swallow_sym(c)
-int c;
+static boolean
+is_swallow_sym(int c)
 {
     int i;
     for (i = S_sw_tl; i <= S_sw_br; i++)
@@ -38,10 +37,8 @@ int c;
  * a substring of buf.  Return 1 if the string was appended, 0 otherwise.
  * It is expected that buf is of size BUFSZ.
  */
-STATIC_OVL int
-append_str(buf, new_str)
-char *buf;
-const char *new_str;
+static int
+append_str(char *buf, const char *new_str)
 {
     int space_left; /* space remaining in buf */
 
@@ -58,8 +55,7 @@ const char *new_str;
 
 /* shared by monster probing (via query_objlist!) as well as lookat() */
 char *
-self_lookat(outbuf)
-char *outbuf;
+self_lookat(char *outbuf)
 {
     char race[QBUFSZ];
 
@@ -84,10 +80,10 @@ char *outbuf;
 /* describe a hidden monster; used for look_at during extended monster
    detection and for probing; also when looking at self */
 void
-mhidden_description(mon, altmon, outbuf)
-struct monst *mon;
-boolean altmon; /* for probing: if mimicking a monster, say so */
-char *outbuf;
+mhidden_description(struct monst *mon, boolean altmon, char *outbuf)
+
+                /* for probing: if mimicking a monster, say so */
+
 {
     struct obj *otmp;
     boolean fakeobj, isyou = (mon == &youmonst);
@@ -142,9 +138,7 @@ char *outbuf;
 
 /* extracted from lookat(); also used by namefloorobj() */
 boolean
-object_from_map(glyph, x, y, obj_p)
-int glyph, x, y;
-struct obj **obj_p;
+object_from_map(int glyph, coordxy x, coordxy y, struct obj **obj_p)
 {
     boolean fakeobj = FALSE, mimic_obj = FALSE;
     struct monst *mtmp;
@@ -229,9 +223,9 @@ struct obj **obj_p;
 }
 
 static void
-look_at_object(buf, x, y, glyph)
-char *buf; /* output buffer */
-int x, y, glyph;
+look_at_object(char *buf, coordxy x, coordxy y, int glyph)
+           /* output buffer */
+
 {
     struct obj *otmp = 0;
     boolean fakeobj = object_from_map(glyph, x, y, &otmp);
@@ -264,10 +258,10 @@ int x, y, glyph;
 }
 
 static void
-look_at_monster(buf, monbuf, mtmp, x, y)
-char *buf, *monbuf; /* buf: output, monbuf: optional output */
-struct monst *mtmp;
-int x, y;
+look_at_monster(char *buf, char *monbuf, struct monst *mtmp, coordxy x, coordxy y)
+                    /* buf: output, monbuf: optional output */
+
+
 {
     char *name, monnambuf[BUFSZ];
     boolean accurate = !Hallucination;
@@ -393,10 +387,8 @@ int x, y;
  * Return the name of the glyph found at (x,y).
  * If not hallucinating and the glyph is a monster, also monster data.
  */
-STATIC_OVL struct permonst *
-lookat(x, y, buf, monbuf)
-int x, y;
-char *buf, *monbuf;
+static struct permonst *
+lookat(coordxy x, coordxy y, char *buf, char *monbuf)
 {
     struct monst *mtmp = (struct monst *) 0;
     struct permonst *pm = (struct permonst *) 0;
@@ -1369,12 +1361,7 @@ add_obj_info(winid datawin, struct obj *obj, short otyp)
  *   Therefore, we create a copy of inp _just_ for data.base lookup.
  */
 void
-checkfile(obj, inp, pm, user_typed_name, without_asking, supplemental_name)
-struct obj *obj;
-char *inp;
-struct permonst *pm;
-boolean user_typed_name, without_asking;
-char *supplemental_name;
+checkfile(struct obj *obj, char *inp, struct permonst *pm, boolean user_typed_name, boolean without_asking, char *supplemental_name)
 {
     dlb *fp;
     char newstr[BUFSZ];
@@ -1766,13 +1753,7 @@ checkfile_done:
 #define LOOK_VERBOSE     3   /* ':' -- show more info w/o asking */
 
 int
-do_screen_description(cc, looked, sym, out_str, firstmatch, for_supplement)
-coord cc;
-boolean looked;
-glyph_t sym;
-char *out_str;
-const char **firstmatch;
-struct permonst **for_supplement;
+do_screen_description(coord cc, boolean looked, glyph_t sym, char *out_str, const char **firstmatch, struct permonst **for_supplement)
 {
     static const char mon_interior[] = "the interior of a monster";
     static const char unreconnoitered[] = "unreconnoitered";
@@ -2650,10 +2631,7 @@ static const char *suptext2[] = {
 };
 
 static void
-do_supplemental_info(name, pm, without_asking)
-char *name;
-struct permonst *pm;
-boolean without_asking;
+do_supplemental_info(char *name, struct permonst *pm, boolean without_asking)
 {
     const char **textp;
     winid datawin = WIN_ERR;
@@ -2718,14 +2696,14 @@ boolean without_asking;
 
 /* the '/' command */
 int
-dowhatis()
+dowhatis(void)
 {
     return do_look(0, (coord *) 0);
 }
 
 /* the ';' command */
 int
-doquickwhatis()
+doquickwhatis(void)
 {
     if(iflags.num_pad)
         check_tutorial_message(QT_T_CURSOR_NUMPAD);
@@ -2736,9 +2714,9 @@ doquickwhatis()
 }
 
 int
-doidtrap()
+doidtrap(void)
 {
-    register struct trap *trap;
+    struct trap *trap;
     int x, y, tt;
 
     if (!getdir("^")) return 0;
@@ -2768,13 +2746,11 @@ doidtrap()
 }
 
 char *
-dowhatdoes_core(q, cbuf)
-char q;
-char *cbuf;
+dowhatdoes_core(char q, char *cbuf)
 {
     dlb *fp;
     char bufr[BUFSZ];
-    register char *buf = &bufr[6], *ep, ctrl, meta;
+    char *buf = &bufr[6], *ep, ctrl, meta;
 
     fp = dlb_fopen_area(NH_CMDHELPAREA, CMDHELPFILE, "r");
     if (!fp) {
@@ -2813,7 +2789,7 @@ char *cbuf;
 }
 
 int
-dowhatdoes()
+dowhatdoes(void)
 {
     char bufr[BUFSZ];
     char q, *reslt;
@@ -2860,9 +2836,8 @@ static const char *help_menu_items[] = {
     (char *)0
 };
 
-STATIC_OVL boolean
-help_menu(sel)
-int *sel;
+static boolean
+help_menu(int *sel)
 {
     winid tmpwin = create_nhwindow(NHW_MENU);
 #ifdef PORT_HELP
@@ -2906,7 +2881,7 @@ int *sel;
 }
 
 int
-dohelp()
+dohelp(void)
 {
     int sel = 0;
 
@@ -2935,7 +2910,7 @@ dohelp()
 }
 
 int
-dohistory()
+dohistory(void)
 {
     display_file_area(NH_HISTORY_AREA, HISTORY, TRUE);
     return 0;

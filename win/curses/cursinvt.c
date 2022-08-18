@@ -56,7 +56,7 @@ void
 curses_add_inv(
     int y,              /* line index; 1..n rather than 0..n-1 */
     int glyph,          /* glyph to display with item */
-    CHAR_P accelerator, /* selector letter for items, 0 for class headers */
+    char accelerator,   /* selector letter for items, 0 for class headers */
     attr_t attr,        /* curses attribute for headers, 0 for items */
     const char *str)    /* formatted inventory item, without invlet prefix,
                          * or class header text */

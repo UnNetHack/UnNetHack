@@ -7,8 +7,8 @@
 
 #define E extern
 
-E int NDECL((*occupation));
-E int NDECL((*afternmv));
+E int (*occupation)(void);
+E int (*afternmv)(void);
 
 E const char *hname;
 E int hackpid;
@@ -70,13 +70,13 @@ E struct dgn_topology {     /* special dungeon levels for speed */
     d_level d_fire_level;
     d_level d_air_level;
     d_level d_astral_level;
-    xchar d_tower_dnum;
-    xchar d_sokoban_dnum;
-    xchar d_mines_dnum, d_quest_dnum;
-    xchar d_mall_dnum;
-    xchar d_sheol_dnum;
-    xchar d_moria_dnum;
-    xchar d_dragon_caves_dnum;
+    xint16 d_tower_dnum;
+    xint16 d_sokoban_dnum;
+    xint16 d_mines_dnum, d_quest_dnum;
+    xint16 d_mall_dnum;
+    xint16 d_sheol_dnum;
+    xint16 d_moria_dnum;
+    xint16 d_dragon_caves_dnum;
     d_level d_qstart_level, d_qlocate_level, d_nemesis_level;
     d_level d_knox_level;
     d_level d_nymph_level;
@@ -506,7 +506,7 @@ E char *fqn_prefix_names[PREFIX_COUNT];
 #endif
 
 struct opvar {
-    xchar spovartyp; /* one of SPOVAR_foo */
+    xint16 spovartyp; /* one of SPOVAR_foo */
     union {
         char *str;
         long l;
@@ -524,7 +524,7 @@ extern struct autopickup_exception *apelist;
 #endif /* AUTOPICKUP_EXCEPTIONS */
 
 struct _plinemsg {
-    xchar msgtype;
+    xint16 msgtype;
     char *pattern;
     struct _plinemsg *next;
 };

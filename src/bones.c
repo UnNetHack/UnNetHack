@@ -9,14 +9,13 @@ extern char bones[];    /* from files.c */
 extern long bytes_counted;
 #endif
 
-STATIC_DCL boolean FDECL(no_bones_level, (d_level *));
-STATIC_DCL void FDECL(goodfruit, (int));
-STATIC_DCL void FDECL(resetobjs, (struct obj *, BOOLEAN_P));
-static boolean FDECL(fixuporacle, (struct monst *));
+static boolean no_bones_level(d_level *);
+static void goodfruit(int);
+static void resetobjs(struct obj *, boolean);
+static boolean fixuporacle(struct monst *);
 
-STATIC_OVL boolean
-no_bones_level(lev)
-d_level *lev;
+static boolean
+no_bones_level(d_level *lev)
 {
     extern d_level save_dlevel;     /* in do.c */
     s_level *sptr;
@@ -38,9 +37,8 @@ d_level *lev;
  * ID is positive instead of negative).  This way, when we later save the
  * chain of fruit types, we know to only save the types that exist.
  */
-STATIC_OVL void
-goodfruit(id)
-int id;
+static void
+goodfruit(int id)
 {
     struct fruit *f = fruit_from_indx(-id);
 
@@ -49,10 +47,8 @@ int id;
     }
 }
 
-STATIC_OVL void
-resetobjs(ochain, restore)
-struct obj *ochain;
-boolean restore;
+static void
+resetobjs(struct obj *ochain, boolean restore)
 {
     struct obj *otmp, *nobj;
 
@@ -89,7 +85,7 @@ boolean restore;
             if (otmp->oclass == FOOD_CLASS && otmp->oeaten) {
                 struct obj *top;
                 char *p;
-                xchar ox, oy;
+                coordxy ox, oy;
 
                 for (top = otmp; top->where == OBJ_CONTAINED;
                      top = top->ocontainer)
@@ -196,11 +192,8 @@ boolean restore;
 }
 
 /** Removes objects recursively from a container with a probability of prob1/prob2. */
-STATIC_OVL void
-trim_contents(container, prob1, prob2)
-struct obj *container;
-int prob1;
-int prob2;
+static void
+trim_contents(struct obj *container, int prob1, int prob2)
 {
     struct obj *otmp;
     struct obj *onext;
@@ -238,8 +231,7 @@ int prob2;
 /* while loading bones, strip out text possibly supplied by old player
    that might accidentally or maliciously disrupt new player's display */
 void
-sanitize_name(namebuf)
-char *namebuf;
+sanitize_name(char *namebuf)
 {
     int c;
     boolean strip_8th_bit = (WINDOWPORT("tty")
@@ -265,10 +257,10 @@ char *namebuf;
 
 /* called by savebones(); also by finish_paybill(shk.c) */
 void
-drop_upon_death(mtmp, cont, x, y)
-struct monst *mtmp; /* monster if hero turned into one (other than ghost) */
-struct obj *cont; /* container if hero is turned into a statue */
-int x, y;
+drop_upon_death(struct monst *mtmp, struct obj *cont, coordxy x, coordxy y)
+                    /* monster if hero turned into one (other than ghost) */
+                  /* container if hero is turned into a statue */
+         
 {
     struct obj *otmp;
     int inventory_count=count_objects(invent);
@@ -307,8 +299,7 @@ int x, y;
 /* possibly restore oracle's room and/or put her back inside it; returns
    False if she's on the wrong level and should be removed, True otherwise */
 static boolean
-fixuporacle(oracle)
-struct monst *oracle;
+fixuporacle(struct monst *oracle)
 {
     coord cc;
     int ridx, o_ridx;
@@ -362,9 +353,9 @@ struct monst *oracle;
 
 /* check whether bones are feasible */
 boolean
-can_make_bones()
+can_make_bones(void)
 {
-    register struct trap *ttmp;
+    struct trap *ttmp;
 
     if (ledger_no(&u.uz) <= 0 || ledger_no(&u.uz) > maxledgerno())
         return FALSE;
@@ -393,8 +384,7 @@ can_make_bones()
 
 /* save bones and possessions of a deceased adventurer */
 void
-savebones(corpse)
-struct obj *corpse;
+savebones(struct obj *corpse)
 {
     int fd, x, y;
     struct trap *ttmp;
@@ -602,10 +592,10 @@ make_bones:
 }
 
 int
-getbones()
+getbones(void)
 {
-    register int fd;
-    register int ok;
+    int fd;
+    int ok;
     char c, *bonesid, oldbonesid[40]; /* was [10]; more should be safer */
 
     /* wizard check added by GAN 02/05/87 */
@@ -655,7 +645,7 @@ getbones()
 #endif
             trickery(errbuf);
         } else {
-            register struct monst *mtmp;
+            struct monst *mtmp;
 
             getlev(fd, 0, 0, TRUE);
 

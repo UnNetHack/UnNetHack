@@ -36,7 +36,7 @@ static int parse_escape_sequence(void);
 /* Read a character of input from the user */
 
 int
-curses_read_char()
+curses_read_char(void)
 {
     int ch, tmpch;
     nhUse(tmpch);
@@ -515,7 +515,7 @@ curses_move_cursor(winid wid, int x, int y)
 /* Perform actions that should be done every turn before nhgetch() */
 
 void
-curses_prehousekeeping()
+curses_prehousekeeping(void)
 {
 #ifndef PDCURSES
     WINDOW *win = curses_get_nhwin(MAP_WIN);
@@ -538,7 +538,7 @@ curses_prehousekeeping()
 /* Perform actions that should be done every turn after nhgetch() */
 
 void
-curses_posthousekeeping()
+curses_posthousekeeping(void)
 {
     curs_set(0);
     curses_decrement_highlights(FALSE);
@@ -808,7 +808,7 @@ event, or the first non-mouse key event in the case of mouse
 movement. */
 
 int
-curses_get_mouse(int *mousex, int *mousey, int *mod)
+curses_get_mouse(coordxy *mousex, coordxy *mousey, int *mod)
 {
     int key = '\033';
 
@@ -888,7 +888,7 @@ term_start_attr(int attr)
 }
 
 extern void
-term_end_color()
+term_end_color(void)
 {
 }
 

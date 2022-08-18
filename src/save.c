@@ -23,22 +23,22 @@ int dotcnt, dotrow; /* also used in restore */
 #endif
 
 #ifdef ZEROCOMP
-STATIC_DCL void FDECL(bputc, (int));
+static void bputc(int);
 #endif
-STATIC_DCL void FDECL(savelevchn, (int, int));
-STATIC_DCL void FDECL(savedamage, (int, int));
-STATIC_DCL void FDECL(saveobj, (int, struct obj *));
-STATIC_DCL void FDECL(saveobjchn, (int, struct obj *, int));
-STATIC_DCL void FDECL(savemon, (int, struct monst *));
-STATIC_DCL void FDECL(savemonchn, (int, struct monst *, int));
-STATIC_DCL void FDECL(savetrapchn, (int, struct trap *, int));
-STATIC_DCL void FDECL(savegamestate, (int, int));
-void FDECL(save_mongen_override, (int, struct mon_gen_override *, int));
-void FDECL(save_lvl_sounds, (int, struct lvl_sounds *, int));
+static void savelevchn(int, int);
+static void savedamage(int, int);
+static void saveobj(int, struct obj *);
+static void saveobjchn(int, struct obj *, int);
+static void savemon(int, struct monst *);
+static void savemonchn(int, struct monst *, int);
+static void savetrapchn(int, struct trap *, int);
+static void savegamestate(int, int);
+void save_mongen_override(int, struct mon_gen_override *, int);
+void save_lvl_sounds(int, struct lvl_sounds *, int);
 #ifdef MFLOPPY
-STATIC_DCL void FDECL(savelev0, (int, XCHAR_P, int));
-STATIC_DCL boolean NDECL(swapout_oldest);
-STATIC_DCL void FDECL(copyfile, (char *, char *));
+static void savelev0(int, xint8, int);
+static boolean swapout_oldest();
+static void copyfile(char *, char *);
 #endif /* MFLOPPY */
 #ifdef GCC_WARN
 static long nulls[10];
@@ -66,7 +66,7 @@ extern const struct text_color_option *text_colors;
 static unsigned ustuck_id = 0, usteed_id = 0;
 
 int
-dosave()
+dosave(void)
 {
     if (iflags.debug_fuzzer) {
         return 0;
@@ -100,8 +100,9 @@ dosave()
 #if defined(UNIX) || defined(VMS) || defined (__EMX__) || defined(WIN32)
 /*ARGSUSED*/
 void
-hangup(sig_unused)  /* called as signal() handler, so sent at least one arg */
-int sig_unused UNUSED;
+hangup(
+    int sig_unused UNUSED) /**< called as signal() handler, so sent
+                                at least one arg */
 {
 # ifdef NOSAVEONHANGUP
     (void) signal(SIGINT, SIG_IGN);
@@ -130,11 +131,11 @@ int sig_unused UNUSED;
 
 /* returns 1 if save successful */
 int
-dosave0()
+dosave0(void)
 {
     const char *fq_save;
-    register int fd, ofd;
-    xchar ltmp;
+    int fd, ofd;
+    xint8 ltmp;
     d_level uz_save;
     char whynot[BUFSZ];
 
@@ -265,7 +266,7 @@ dosave0()
     u.ustuck = (struct monst *)0;
     u.usteed = (struct monst *)0;
 
-    for(ltmp = (xchar)1; ltmp <= maxledgerno(); ltmp++) {
+    for (ltmp = (xint8)1; ltmp <= maxledgerno(); ltmp++) {
         if (ltmp == ledger_no(&uz_save)) continue;
         if (!(level_info[ltmp].flags & LFILE_EXISTS)) continue;
 #ifdef MICRO
@@ -306,9 +307,8 @@ dosave0()
     return(1);
 }
 
-STATIC_OVL void
-savegamestate(fd, mode)
-register int fd, mode;
+static void
+savegamestate(int fd, int mode)
 {
     int uid;
 #if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
@@ -375,7 +375,7 @@ register int fd, mode;
 
 #ifdef INSURANCE
 void
-savestateinlock()
+savestateinlock(void)
 {
     int fd, hpid;
     static boolean havestate = TRUE;
@@ -450,7 +450,7 @@ savestateinlock()
 boolean
 savelev(fd, lev, mode)
 int fd;
-xchar lev;
+xint8 lev;
 int mode;
 {
     if (mode & COUNT_SAVE) {
@@ -477,15 +477,15 @@ int mode;
     return TRUE;
 }
 
-STATIC_OVL void
+static void
 savelev0(fd, lev, mode)
 #else
 void
-savelev(fd, lev, mode)
+savelev(int fd, xint8 lev, int mode)
 #endif
-int fd;
-xchar lev;
-int mode;
+
+
+
 {
 #ifdef TOS
     short tlev;
@@ -672,7 +672,7 @@ static NEARDATA boolean compressing = FALSE;
     HUP printf("outbufp %d outrunlength %d\n", outbufp,outrunlength);
    }*/
 
-STATIC_OVL void
+static void
 bputc(c)
 int c;
 {
@@ -742,7 +742,7 @@ int fd;
 genericptr_t loc;
 register unsigned num;
 {
-    register unsigned char *bp = (unsigned char *)loc;
+    unsigned char *bp = (unsigned char *)loc;
 
     if (!compressing) {
 #ifdef MFLOPPY
@@ -790,8 +790,7 @@ static FILE *bw_FILE = 0;
 static boolean buffering = FALSE;
 
 void
-bufon(fd)
-int fd;
+bufon(int fd)
 {
 #ifdef UNIX
     if(bw_fd >= 0)
@@ -804,16 +803,14 @@ int fd;
 }
 
 void
-bufoff(fd)
-int fd;
+bufoff(int fd)
 {
     bflush(fd);
     buffering = FALSE;
 }
 
 void
-bflush(fd)
-int fd;
+bflush(int fd)
 {
 #ifdef UNIX
     if(fd == bw_fd) {
@@ -825,10 +822,7 @@ int fd;
 }
 
 void
-bwrite(fd, loc, num)
-register int fd;
-register genericptr_t loc;
-register unsigned num;
+bwrite(int fd, genericptr_t loc, unsigned int num)
 {
     boolean failed;
 
@@ -865,8 +859,7 @@ register unsigned num;
 }
 
 void
-bclose(fd)
-int fd;
+bclose(int fd)
 {
     bufoff(fd);
 #ifdef UNIX
@@ -881,9 +874,8 @@ int fd;
 }
 #endif /* ZEROCOMP */
 
-STATIC_OVL void
-savelevchn(fd, mode)
-register int fd, mode;
+static void
+savelevchn(int fd, int mode)
 {
     s_level *tmplev, *tmplev2;
     int cnt = 0;
@@ -905,10 +897,7 @@ register int fd, mode;
 
 /* used when saving a level and also when saving dungeon overview data */
 void
-savecemetery(fd, mode, cemeteryaddr)
-int fd;
-int mode;
-struct cemetery **cemeteryaddr;
+savecemetery(int fd, int mode, struct cemetery **cemeteryaddr)
 {
     struct cemetery *thisbones, *nextbones;
     int flag;
@@ -932,11 +921,10 @@ struct cemetery **cemeteryaddr;
     }
 }
 
-STATIC_OVL void
-savedamage(fd, mode)
-register int fd, mode;
+static void
+savedamage(int fd, int mode)
 {
-    register struct damage *damageptr, *tmp_dam;
+    struct damage *damageptr, *tmp_dam;
     unsigned int xl = 0;
 
     damageptr = level.damagelist;
@@ -958,9 +946,7 @@ register int fd, mode;
 }
 
 void
-save_mongen_override(fd, or, mode)
-register int fd, mode;
-register struct mon_gen_override *or;
+save_mongen_override(int fd, struct mon_gen_override *or, int mode)
 {
     struct mon_gen_tuple *mt;
     struct mon_gen_tuple *prev;
@@ -993,9 +979,7 @@ register struct mon_gen_override *or;
 }
 
 void
-save_lvl_sounds(fd, or, mode)
-register int fd, mode;
-register struct lvl_sounds *or;
+save_lvl_sounds(int fd, struct lvl_sounds *or, int mode)
 {
     int marker = 0;
     int i;
@@ -1029,10 +1013,8 @@ register struct lvl_sounds *or;
     }
 }
 
-STATIC_OVL void
-saveobj(fd, otmp)
-int fd;
-struct obj *otmp;
+static void
+saveobj(int fd, struct obj *otmp)
 {
     int buflen, zerobuf = 0;
 
@@ -1069,12 +1051,10 @@ struct obj *otmp;
     }
 }
 
-STATIC_OVL void
-saveobjchn(fd, otmp, mode)
-register int fd, mode;
-register struct obj *otmp;
+static void
+saveobjchn(int fd, struct obj *otmp, int mode)
 {
-    register struct obj *otmp2;
+    struct obj *otmp2;
     int minusone = -1;
 
     while (otmp) {
@@ -1118,10 +1098,8 @@ register struct obj *otmp;
         bwrite(fd, (genericptr_t) &minusone, sizeof (int));
 }
 
-STATIC_OVL void
-savemon(fd, mtmp)
-int fd;
-struct monst *mtmp;
+static void
+savemon(int fd, struct monst *mtmp)
 {
     int buflen;
 
@@ -1167,12 +1145,10 @@ struct monst *mtmp;
     }
 }
 
-STATIC_OVL void
-savemonchn(fd, mtmp, mode)
-register int fd, mode;
-register struct monst *mtmp;
+static void
+savemonchn(int fd, struct monst *mtmp, int mode)
 {
-    register struct monst *mtmp2;
+    struct monst *mtmp2;
     int minusone = -1;
 
     while (mtmp) {
@@ -1199,13 +1175,11 @@ register struct monst *mtmp;
         bwrite(fd, (genericptr_t) &minusone, sizeof (int));
 }
 
-STATIC_OVL void
-savetrapchn(fd, trap, mode)
-register int fd, mode;
-register struct trap *trap;
+static void
+savetrapchn(int fd, struct trap *trap, int mode)
 {
     static struct trap zerotrap;
-    register struct trap *trap2;
+    struct trap *trap2;
 
     while (trap) {
         trap2 = trap->ntrap;
@@ -1225,11 +1199,10 @@ register struct trap *trap;
  * level routine marks nonexistent fruits by making the fid negative.
  */
 void
-savefruitchn(fd, mode)
-register int fd, mode;
+savefruitchn(int fd, int mode)
 {
     static struct fruit zerofruit;
-    register struct fruit *f2, *f1;
+    struct fruit *f2, *f1;
 
     f1 = ffruit;
     while (f1) {
@@ -1249,8 +1222,7 @@ register int fd, mode;
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 
 void
-free_percent_color_options(list_head)
-const struct percent_color_option *list_head;
+free_percent_color_options(const struct percent_color_option *list_head)
 {
     if (list_head == NULL) return;
     free_percent_color_options(list_head->next);
@@ -1258,8 +1230,7 @@ const struct percent_color_option *list_head;
 }
 
 void
-free_text_color_options(list_head)
-const struct text_color_option *list_head;
+free_text_color_options(const struct text_color_option *list_head)
 {
     if (list_head == NULL) return;
     free_text_color_options(list_head->next);
@@ -1268,7 +1239,7 @@ const struct text_color_option *list_head;
 }
 
 void
-free_status_colors()
+free_status_colors(void)
 {
     free_percent_color_options(hp_colors); hp_colors = NULL;
     free_percent_color_options(pw_colors); pw_colors = NULL;
@@ -1278,7 +1249,7 @@ free_status_colors()
 
 /* also called by prscore(); this probably belongs in dungeon.c... */
 void
-free_dungeons()
+free_dungeons(void)
 {
 #ifdef FREE_ALL_MEMORY
     savelevchn(0, FREE_SAVE);
@@ -1288,7 +1259,7 @@ free_dungeons()
 }
 
 void
-freedynamicdata()
+freedynamicdata(void)
 {
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
     free_status_colors();
@@ -1389,7 +1360,7 @@ int lev;
     return TRUE;
 }
 
-STATIC_OVL boolean
+static boolean
 swapout_oldest() {
     char to[PATHLEN], from[PATHLEN];
     int i, oldest;
@@ -1421,7 +1392,7 @@ swapout_oldest() {
     return TRUE;
 }
 
-STATIC_OVL void
+static void
 copyfile(from, to)
 char *from, *to;
 {
@@ -1450,7 +1421,7 @@ char *from, *to;
 }
 
 void
-co_false()      /* see comment in bones.c */
+co_false() /* see comment in bones.c */
 {
     count_only = FALSE;
     return;

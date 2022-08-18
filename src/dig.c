@@ -5,12 +5,12 @@
 
 static NEARDATA boolean did_dig_msg;
 
-static boolean NDECL(rm_waslit);
-static void FDECL(mkcavepos, (XCHAR_P, XCHAR_P, int, BOOLEAN_P, BOOLEAN_P));
-static void FDECL(mkcavearea, (BOOLEAN_P));
-static int NDECL(dig);
-static int FDECL(adj_pit_checks, (coord *, char *));
-static void FDECL(pit_flow, (struct trap *, SCHAR_P));
+static boolean rm_waslit(void);
+static void mkcavepos(coordxy, coordxy, int, boolean, boolean);
+static void mkcavearea(boolean);
+static int dig(void);
+static int adj_pit_checks(coord *, char *);
+static void pit_flow(struct trap *, schar);
 
 enum grave_type {
     GRAVE_NORMAL = 0,
@@ -32,9 +32,9 @@ enum dig_types {
 };
 
 static boolean
-rm_waslit()
+rm_waslit(void)
 {
-    register xchar x, y;
+    coordxy x, y;
 
     if (levl[u.ux][u.uy].typ == ROOM && levl[u.ux][u.uy].waslit) {
         return TRUE;
@@ -53,12 +53,9 @@ rm_waslit()
  * immediately after the effect is complete.
  */
 static void
-mkcavepos(x, y, dist, waslit, rockit)
-xchar x, y;
-int dist;
-boolean waslit, rockit;
+mkcavepos(coordxy x, coordxy y, int dist, boolean waslit, boolean rockit)
 {
-    register struct rm *lev;
+    struct rm *lev;
 
     if (!isok(x, y)) {
         return;
@@ -66,7 +63,7 @@ boolean waslit, rockit;
     lev = &levl[x][y];
 
     if (rockit) {
-        register struct monst *mtmp;
+        struct monst *mtmp;
 
         if (IS_ROCK(lev->typ)) {
             return;
@@ -105,14 +102,13 @@ boolean waslit, rockit;
 }
 
 static void
-mkcavearea(rockit)
-register boolean rockit;
+mkcavearea(boolean rockit)
 {
     int dist;
-    xchar xmin = u.ux, xmax = u.ux;
-    xchar ymin = u.uy, ymax = u.uy;
-    register xchar i;
-    register boolean waslit = rm_waslit();
+    coordxy xmin = u.ux, xmax = u.ux;
+    coordxy ymin = u.uy, ymax = u.uy;
+    coordxy i;
+    boolean waslit = rm_waslit();
 
     if (rockit) {
         pline("Crash!  The ceiling collapses around you!");
@@ -159,9 +155,7 @@ register boolean rockit;
 
 /* When digging into location <x,y>, what are you actually digging into? */
 int
-dig_typ(otmp, x, y)
-struct obj *otmp;
-xchar x, y;
+dig_typ(struct obj *otmp, coordxy x, coordxy y)
 {
     boolean ispick;
 
@@ -187,7 +181,7 @@ xchar x, y;
 }
 
 boolean
-is_digging()
+is_digging(void)
 {
     if (occupation == dig) {
         return TRUE;
@@ -199,10 +193,7 @@ is_digging()
 #define BY_OBJECT   ((struct monst *)0)
 
 boolean
-dig_check(madeby, verbose, x, y)
-struct monst *madeby;
-boolean verbose;
-int x, y;
+dig_check(struct monst *madeby, boolean verbose, coordxy x, coordxy y)
 {
     struct trap *ttmp = t_at(x, y);
     const char *verb = (madeby == BY_YOU && uwep && is_axe(uwep)) ? "chop" : "dig in";
@@ -273,11 +264,11 @@ int x, y;
 }
 
 static int
-dig()
+dig(void)
 {
-    register struct rm *lev;
-    register xchar dpx = digging.pos.x, dpy = digging.pos.y;
-    register boolean ispick = uwep && is_pick(uwep);
+    struct rm *lev;
+    coordxy dpx = digging.pos.x, dpy = digging.pos.y;
+    boolean ispick = uwep && is_pick(uwep);
     const char *verb = (!uwep || is_pick(uwep)) ? "dig into" : "chop through";
 
     lev = &levl[dpx][dpy];
@@ -528,7 +519,7 @@ dig()
         }
 
         if (Is_earthlevel(&u.uz) && !rn2(3)) {
-            register struct monst *mtmp;
+            struct monst *mtmp;
 
             switch(rn2(2)) {
             case 0:
@@ -583,7 +574,7 @@ cleanup:
 
 /* When will hole be finished? Very rough indication used by shopkeeper. */
 int
-holetime()
+holetime(void)
 {
     if (occupation != dig || !*u.ushops) {
         return -1;
@@ -593,11 +584,12 @@ holetime()
 
 /* Return typ of liquid to fill a hole with, or ROOM, if no liquid nearby */
 schar
-fillholetyp(x, y, fill_if_any)
-int x, y;
-boolean fill_if_any; /* force filling if it exists at all */
+fillholetyp(
+    int x,
+    int y,
+    boolean fill_if_any) /**< force filling if it exists at all */
 {
-    register int x1, y1;
+    int x1, y1;
     int lo_x = max(1, x-1), hi_x = min(x+1, COLNO-1),
         lo_y = max(0, y-1), hi_y = min(y+1, ROWNO-1);
     int pool_cnt = 0, moat_cnt = 0, lava_cnt = 0, swamp_cnt = 0;
@@ -638,13 +630,10 @@ boolean fill_if_any; /* force filling if it exists at all */
 }
 
 void
-digactualhole(x, y, madeby, ttyp)
-register int x, y;
-struct monst *madeby;
-int ttyp;
+digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
 {
     struct obj *oldobjs, *newobjs;
-    register struct trap *ttmp;
+    struct trap *ttmp;
     char surface_type[BUFSZ];
     struct rm *lev = &levl[x][y];
     boolean shopdoor;
@@ -676,7 +665,7 @@ int ttyp;
 #endif
     } else if (lev->typ == DRAWBRIDGE_DOWN ||
                (is_drawbridge_wall(x, y) >= 0)) {
-        int bx = x, by = y;
+        coordxy bx = x, by = y;
         /* if under the portcullis, the bridge is adjacent */
         (void) find_drawbridge(&bx, &by);
         destroy_drawbridge(bx, by);
@@ -863,11 +852,7 @@ int ttyp;
  * in apply.c.
  */
 void
-liquid_flow(x, y, typ, ttmp, fillmsg)
-xchar x, y;
-schar typ;
-struct trap *ttmp;
-const char *fillmsg;
+liquid_flow(coordxy x, coordxy y, schar typ, struct trap *ttmp, const char *fillmsg)
 {
     boolean u_spot = (x == u.ux && y == u.uy);
 
@@ -891,15 +876,13 @@ const char *fillmsg;
 
 /* return TRUE if digging succeeded, FALSE otherwise */
 boolean
-dighole(pit_only, by_magic, cc)
-boolean pit_only, by_magic;
-coord *cc;
+dighole(boolean pit_only, boolean by_magic, coord *cc)
 {
-    register struct trap *ttmp;
+    struct trap *ttmp;
     struct rm *lev;
     struct obj *boulder_here;
     schar typ;
-    xchar dig_x, dig_y;
+    coordxy dig_x, dig_y;
     boolean nohole;
 
     if (!cc) {
@@ -940,7 +923,7 @@ coord *cc;
             pline_The("drawbridge seems too hard to dig through.");
             return FALSE;
         } else {
-            int x = dig_x, y = dig_y;
+            coordxy x = dig_x, y = dig_y;
             /* if under the portcullis, the bridge is adjacent */
             (void) find_drawbridge(&x, &y);
             destroy_drawbridge(x, y);
@@ -1048,7 +1031,7 @@ static void
 dig_up_grave(coord *cc, enum grave_type type)
 {
     struct obj *otmp;
-    xchar dig_x, dig_y;
+    coordxy dig_x, dig_y;
 
     if (!cc) {
         dig_x = u.ux;
@@ -1135,8 +1118,7 @@ dig_up_grave(coord *cc, enum grave_type type)
 }
 
 int
-use_pick_axe(obj)
-struct obj *obj;
+use_pick_axe(struct obj *obj)
 {
     const char *sdp, *verb;
     char *dsp, dirsyms[12], qbuf[BUFSZ];
@@ -1207,11 +1189,10 @@ struct obj *obj;
 /*       use_pick_axe2() uses the existing u.dx, u.dy and u.dz    */
 
 int
-use_pick_axe2(obj)
-struct obj *obj;
+use_pick_axe2(struct obj *obj)
 {
-    register int rx, ry;
-    register struct rm *lev;
+    int rx, ry;
+    struct rm *lev;
     struct trap *trap, *trap_with_u;
     int dig_target;
     boolean ispick = is_pick(obj);
@@ -1404,10 +1385,7 @@ struct obj *obj;
  * zap == TRUE if wand/spell of digging, FALSE otherwise (chewing)
  */
 void
-watch_dig(mtmp, x, y, zap)
-struct monst *mtmp;
-xchar x, y;
-boolean zap;
+watch_dig(struct monst *mtmp, coordxy x, coordxy y, boolean zap)
 {
     struct rm *lev = &levl[x][y];
 
@@ -1461,10 +1439,9 @@ boolean zap;
 
 /* Return TRUE if monster died, FALSE otherwise.  Called from m_move(). */
 boolean
-mdig_tunnel(mtmp)
-register struct monst *mtmp;
+mdig_tunnel(struct monst *mtmp)
 {
-    register struct rm *here;
+    struct rm *here;
     int pile = rnd(12);
 
     here = &levl[mtmp->mx][mtmp->my];
@@ -1567,8 +1544,7 @@ register struct monst *mtmp;
 /* draft refers to air currents, but can be a pun on "draft" as conscription
    for military service (probably not a good pun if it has to be explained) */
 void
-draft_message(unexpected)
-boolean unexpected;
+draft_message(boolean unexpected)
 {
     /*
      * [Bug or TODO?  Have caller pass coordinates and use the travel
@@ -1613,7 +1589,7 @@ boolean unexpected;
 
 /* digging via wand zap or spell cast */
 void
-zap_dig()
+zap_dig(void)
 {
     struct rm *room;
     struct monst *mtmp;
@@ -1865,9 +1841,7 @@ zap_dig()
  * down in the pit.
  */
 static int
-adj_pit_checks(cc, msg)
-coord *cc;
-char *msg;
+adj_pit_checks(coord *cc, char *msg)
 {
     int ltyp;
     struct rm *room;
@@ -1960,9 +1934,7 @@ char *msg;
  * Ensure that all conjoined pits fill up.
  */
 static void
-pit_flow(trap, filltyp)
-struct trap *trap;
-schar filltyp;
+pit_flow(struct trap *trap, schar filltyp)
 {
     if (trap && filltyp != ROOM && is_pit(trap->ttyp)) {
         struct trap t;
@@ -1998,8 +1970,7 @@ schar filltyp;
 }
 
 struct obj *
-buried_ball(cc)
-coord *cc;
+buried_ball(coord *cc)
 {
     int odist, bdist = COLNO;
     struct obj *otmp, *ball = 0;
@@ -2048,7 +2019,7 @@ coord *cc;
 }
 
 void
-buried_ball_to_punishment()
+buried_ball_to_punishment(void)
 {
     coord cc;
     struct obj *ball;
@@ -2072,7 +2043,7 @@ buried_ball_to_punishment()
 }
 
 void
-buried_ball_to_freedom()
+buried_ball_to_freedom(void)
 {
     coord cc;
     struct obj *ball;
@@ -2099,9 +2070,9 @@ buried_ball_to_freedom()
 /* move objects from fobj/nexthere lists to buriedobjlist, keeping position
    information */
 struct obj *
-bury_an_obj(otmp, dealloced)
-struct obj *otmp;
-boolean *dealloced; /* return TRUE if otmp was freed */
+bury_an_obj(
+    struct obj *otmp,
+    boolean *dealloced) /**< return TRUE if otmp was freed */
 {
     struct obj *otmp2;
     boolean under_ice;
@@ -2165,8 +2136,7 @@ boolean *dealloced; /* return TRUE if otmp was freed */
 }
 
 void
-bury_objs(x, y)
-int x, y;
+bury_objs(coordxy x, coordxy y)
 {
     struct obj *otmp, *otmp2;
     struct monst *shkp;
@@ -2201,8 +2171,7 @@ int x, y;
 
 /* move objects from buriedobjlist to fobj/nexthere lists */
 void
-unearth_objs(x, y)
-int x, y;
+unearth_objs(coordxy x, coordxy y)
 {
     struct obj *otmp, *otmp2, *bball;
     coord cc;
@@ -2242,9 +2211,7 @@ int x, y;
  */
 /* ARGSUSED */
 void
-rot_organic(arg, timeout)
-anything *arg;
-long timeout UNUSED;
+rot_organic(anything *arg, long int timeout UNUSED)
 {
     struct obj *obj = arg->a_obj;
 
@@ -2265,11 +2232,9 @@ long timeout UNUSED;
  * Called when a corpse has rotted completely away.
  */
 void
-rot_corpse(arg, timeout)
-anything *arg;
-long timeout;   /* unused */
+rot_corpse(anything *arg, long int timeout UNUSED)
 {
-    xchar x = 0, y = 0;
+    coordxy x = 0, y = 0;
     struct obj *obj = arg->a_obj;
     boolean on_floor = obj->where == OBJ_FLOOR;
     boolean in_invent = obj->where == OBJ_INVENT;

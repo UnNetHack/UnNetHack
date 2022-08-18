@@ -11,10 +11,10 @@ struct trobj {
     Bitfield(trbless, 2);
 };
 
-STATIC_DCL void FDECL(ini_inv, (struct trobj *));
-STATIC_DCL void FDECL(knows_object, (int));
+static void ini_inv(struct trobj *);
+static void knows_object(int);
 static void knows_class(char);
-STATIC_DCL boolean FDECL(restricted_spell_discipline, (int));
+static boolean restricted_spell_discipline(int);
 
 #define UNDEF_TYP   0
 #define UNDEF_SPE   '\177'
@@ -616,9 +616,8 @@ static const struct def_skill Skill_W[] = {
 };
 
 
-STATIC_OVL void
-knows_object(obj)
-register int obj;
+static void
+knows_object(int obj)
 {
     discover_object(obj, TRUE, FALSE);
     objects[obj].oc_pre_discovered = 1; /* not a "discovery" */
@@ -674,9 +673,9 @@ knows_class(char sym)
 }
 
 void
-u_init()
+u_init(void)
 {
-    register int i;
+    int i;
     struct permonst* shambler = &mons[PM_SHAMBLING_HORROR];
     struct attack* attkptr;
 
@@ -1062,7 +1061,7 @@ u_init()
  */
     for(i = 0; i < A_MAX; i++)
         if(!rn2(20)) {
-            register int xd = rn2(7) - 2; /* biased variation */
+            int xd = rn2(7) - 2; /* biased variation */
             (void) adjattrib(i, xd, TRUE);
             if (ABASE(i) < AMAX(i)) AMAX(i) = ABASE(i);
         }
@@ -1143,9 +1142,8 @@ u_init()
 }
 
 /* skills aren't initialized, so we use the role-specific skill lists */
-STATIC_OVL boolean
-restricted_spell_discipline(otyp)
-int otyp;
+static boolean
+restricted_spell_discipline(int otyp)
 {
     const struct def_skill *skills;
     int this_skill = spell_skilltype(otyp);
@@ -1177,9 +1175,8 @@ int otyp;
     return TRUE;
 }
 
-STATIC_OVL void
-ini_inv(trop)
-register struct trobj *trop;
+static void
+ini_inv(struct trobj *trop)
 {
     struct obj *obj;
     int otyp, i;

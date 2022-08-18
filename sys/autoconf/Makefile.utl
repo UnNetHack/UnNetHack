@@ -231,7 +231,7 @@ lev_main.o:  lev_main.c $(HACK_H) ../include/sp_lev.h ../include/tcap.h \
 # is one "_cplusplus" inside a comment
 lev_lex.o:   lev_lex.c $(HACK_H) ../include/lev_comp.h ../include/sp_lev.h
 	@echo $(CC) -c $(CFLAGS) lev_lex.c
-	@$(CC) -c $(CFLAGS) -DWEIRD_LEX=`egrep -c _cplusplus lev_lex.c` lev_lex.c
+	@$(CC) -c $(CFLAGS) -D_POSIX_C_SOURCE=200809L -DWEIRD_LEX=`egrep -c _cplusplus lev_lex.c` lev_lex.c
 
 ../include/lev_comp.h: lev_yacc.c
 
@@ -263,7 +263,7 @@ dgn_main.o:  dgn_main.c $(CONFIG_H) ../include/dlb.h
 # see dgn_comp.l for WEIRD_LEX discussion
 dgn_lex.o:   dgn_lex.c $(CONFIG.H) ../include/dgn_comp.h ../include/dgn_file.h
 	@echo $(CC) -c $(CFLAGS) dgn_lex.c
-	@$(CC) -c $(CFLAGS) -DWEIRD_LEX=`egrep -c _cplusplus dgn_lex.c` dgn_lex.c
+	@$(CC) -c $(CFLAGS) -D_POSIX_C_SOURCE=200809L -DWEIRD_LEX=`egrep -c _cplusplus dgn_lex.c` dgn_lex.c
 
 ../include/dgn_comp.h: dgn_yacc.c
 

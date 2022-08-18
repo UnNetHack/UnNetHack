@@ -178,17 +178,11 @@ typedef const char *vA;
  * Used for robust ANSI parameter forward declarations:
  * int VDECL(sprintf, (char *, const char *, ...));
  *
- * NDECL() is used for functions with zero arguments;
- * FDECL() is used for functions with a fixed number of arguments;
  * VDECL() is used for functions with a variable number of arguments.
  * Separate macros are needed because ANSI will mix old-style declarations
  * with prototypes, except in the case of varargs, and the OVERLAY-specific
  * trampoli.* mechanism conflicts with the ANSI <<f(void)>> syntax.
  */
-
-# define NDECL(f)   f(void) /* overridden later if USE_TRAMPOLI set */
-
-# define FDECL(f, p) f p
 
 # if defined(MSDOS) || defined(USE_STDARG)
 #  define VDECL(f, p)    f p
@@ -237,8 +231,6 @@ typedef const char *vA;
 
 #else /* NHSTDC */  /* a "traditional" C  compiler */
 
-# define NDECL(f)   f()
-# define FDECL(f, p) f()
 # define VDECL(f, p) f()
 
 # define VOID_ARGS /*empty*/
@@ -319,48 +311,21 @@ typedef genericptr genericptr_t;    /* (void *) or (char *) */
 # endif
 #endif
 
-/* this applies to both VMS and Digital Unix/HP Tru64 */
-#ifdef WIDENED_PROTOTYPES
-/* ANSI C uses "value preserving rules", where 'unsigned char' and
-   'unsigned short' promote to 'int' if signed int is big enough to hold
-   all possible values, rather than traditional "sign preserving rules"
-   where 'unsigned char' and 'unsigned short' promote to 'unsigned int'.
-   However, the ANSI C rules aren't binding on non-ANSI compilers.
-   When DEC C (aka Compaq C, then HP C) is in non-standard 'common' mode
-   it supports prototypes that expect widened types, but it uses the old
-   sign preserving rules for how to widen narrow unsigned types.  (In its
-   default 'relaxed' mode, __STDC__ is 1 and uchar widens to 'int'.) */
-#if defined(__DECC) && (!defined(__STDC__) || !__STDC__)
-#define UCHAR_P unsigned int
-#endif
-#endif
-
-/* These are used for arguments within FDECL/VDECL prototype declarations.
+/* These are used for arguments within VDECL prototype declarations.
  */
 #ifdef UNWIDENED_PROTOTYPES
 #define CHAR_P char
 #define SCHAR_P schar
-#define UCHAR_P uchar
-#define XCHAR_P xchar
-#define SHORT_P short
 #ifndef SKIP_BOOLEAN
 #define BOOLEAN_P boolean
 #endif
-#define ALIGNTYP_P aligntyp
 #else
 #ifdef WIDENED_PROTOTYPES
 #define CHAR_P int
 #define SCHAR_P int
-#ifndef UCHAR_P
-#define UCHAR_P int
-#endif
-#define XCHAR_P int
-#define SHORT_P int
-#define BOOLEAN_P int
-#define ALIGNTYP_P int
 #else
 /* Neither widened nor unwidened prototypes.  Argument list expansion
- * by FDECL/VDECL always empty; all xxx_P vanish so defs aren't needed. */
+ * by VDECL always empty; all xxx_P vanish so defs aren't needed. */
 #endif
 #endif
 
@@ -393,11 +358,7 @@ typedef genericptr genericptr_t;    /* (void *) or (char *) */
  * include files have prototypes and the compiler also complains that
  * prototyped and unprototyped declarations don't match.
  */
-# undef NDECL
-# undef FDECL
 # undef VDECL
-# define NDECL(f)   f()
-# define FDECL(f, p) f()
 # define VDECL(f, p) f()
 # undef VOID_ARGS
 # define VOID_ARGS /*empty*/

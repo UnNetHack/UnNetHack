@@ -4,11 +4,11 @@
 #include "hack.h"
 #include "artifact.h"
 
-STATIC_DCL void FDECL(curse_objects, (struct obj *, int, boolean));
+static void curse_objects(struct obj *, int, boolean);
 
 /* take away the hero's money */
 void
-take_gold()
+take_gold(void)
 {
     struct obj *otmp, *nobj;
     int lost_money = 0;
@@ -30,7 +30,7 @@ take_gold()
 
 /* #sit command */
 int
-dosit()
+dosit(void)
 {
     static const char sit_message[] = "sit on the %s.";
     int typ = levl[u.ux][u.uy].typ;
@@ -62,7 +62,7 @@ dosit()
     if (OBJ_AT(u.ux, u.uy) &&
         /* ensure we're not standing on the precipice */
          !(uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
-        register struct obj *obj;
+        struct obj *obj;
 
         obj = level.objects[u.ux][u.uy];
         if (youmonst.data->mlet == S_DRAGON && obj->oclass == COIN_CLASS) {
@@ -328,8 +328,9 @@ in_water:
     return(1);
 }
 
+/** curse a few inventory items at random! */
 void
-rndcurse()          /* curse a few inventory items at random! */
+rndcurse(void)
 {
     struct  obj *otmp;
     static const char mal_aura[] = "feel a malignant aura surround %s.";
@@ -366,10 +367,7 @@ rndcurse()          /* curse a few inventory items at random! */
 }
 
 void
-curse_objects(firstobj, ncurse, showmsg)
-struct obj *firstobj;
-int ncurse;
-boolean showmsg;
+curse_objects(struct obj *firstobj, int ncurse, boolean showmsg)
 {
     struct obj *otmp;
     int cnt, onum;
@@ -417,7 +415,7 @@ boolean showmsg;
 
 /* remove a random INTRINSIC ability */
 void
-attrcurse()
+attrcurse(void)
 {
     switch(rnd(11)) {
     case 1: if (HFire_resistance & INTRINSIC) {

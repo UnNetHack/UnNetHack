@@ -8,28 +8,27 @@
 #define HEIGHT  (ROWNO - 1)
 #define WIDTH   (COLNO - 2)
 
-STATIC_DCL void FDECL(init_map, (SCHAR_P));
-STATIC_DCL void FDECL(init_fill, (SCHAR_P, SCHAR_P));
-STATIC_DCL schar FDECL(get_map, (int, int, SCHAR_P));
-STATIC_DCL void FDECL(pass_one, (SCHAR_P, SCHAR_P));
-STATIC_DCL void FDECL(pass_two, (SCHAR_P, SCHAR_P));
-STATIC_DCL void FDECL(pass_three, (SCHAR_P, SCHAR_P));
-STATIC_DCL void NDECL(wallify_map);
-STATIC_DCL void FDECL(join_map, (SCHAR_P, SCHAR_P));
-STATIC_DCL void FDECL(finish_map, (SCHAR_P, SCHAR_P, XCHAR_P, XCHAR_P));
-STATIC_DCL void FDECL(remove_room, (unsigned));
-STATIC_DCL void FDECL(backfill, (SCHAR_P, SCHAR_P));
-void FDECL(mkmap, (lev_init *));
+static void init_map(schar);
+static void init_fill(schar, schar);
+static schar get_map(int, int, schar);
+static void pass_one(schar, schar);
+static void pass_two(schar, schar);
+static void pass_three(schar, schar);
+static void wallify_map(void);
+static void join_map(schar, schar);
+static void finish_map(schar, schar, coordxy, coordxy);
+static void remove_room(unsigned);
+static void backfill(schar, schar);
+void mkmap(lev_init *);
 
 char *new_locations;
 int min_rx, max_rx, min_ry, max_ry; /* rectangle bounds for regions */
 static int n_loc_filled;
 
-STATIC_OVL void
-init_map(bg_typ)
-schar bg_typ;
+static void
+init_map(schar bg_typ)
 {
-    register int i, j;
+    int i, j;
 
     if (bg_typ >= MAX_TYPE) return;
 
@@ -41,9 +40,8 @@ schar bg_typ;
 }
 
 
-STATIC_OVL void
-backfill(bg_typ, filler)
-schar bg_typ, filler;
+static void
+backfill(schar bg_typ, schar filler)
 {
     int x, y;
 
@@ -63,11 +61,10 @@ schar bg_typ, filler;
 }
 
 
-STATIC_OVL void
-init_fill(bg_typ, fg_typ)
-schar bg_typ, fg_typ;
+static void
+init_fill(schar bg_typ, schar fg_typ)
 {
-    register int i, j;
+    int i, j;
     long limit, count;
 
     if (fg_typ >= MAX_TYPE) return;
@@ -84,10 +81,8 @@ schar bg_typ, fg_typ;
     }
 }
 
-STATIC_OVL schar
-get_map(col, row, bg_typ)
-int col, row;
-schar bg_typ;
+static schar
+get_map(int col, int row, schar bg_typ)
 {
     if (col <= 0 || row < 0 || col > WIDTH || row >= HEIGHT)
         return bg_typ;
@@ -100,11 +95,10 @@ static int dirs[16] = {
     1, -1 /**/,  1, 0 /**/,  1, 1
 };
 
-STATIC_OVL void
-pass_one(bg_typ, fg_typ)
-schar bg_typ, fg_typ;
+static void
+pass_one(schar bg_typ, schar fg_typ)
 {
-    register int i, j;
+    int i, j;
     short count, dr;
 
     for(i=2; i<=WIDTH; i++)
@@ -136,11 +130,10 @@ schar bg_typ, fg_typ;
 
 #define new_loc(i, j)    *(new_locations+ ((j)*(WIDTH+1)) + (i))
 
-STATIC_OVL void
-pass_two(bg_typ, fg_typ)
-schar bg_typ, fg_typ;
+static void
+pass_two(schar bg_typ, schar fg_typ)
 {
-    register int i, j;
+    int i, j;
     short count, dr;
 
     for(i=2; i<=WIDTH; i++)
@@ -161,11 +154,10 @@ schar bg_typ, fg_typ;
                 levl[i][j].typ = new_loc(i, j);
 }
 
-STATIC_OVL void
-pass_three(bg_typ, fg_typ)
-schar bg_typ, fg_typ;
+static void
+pass_three(schar bg_typ, schar fg_typ)
 {
-    register int i, j;
+    int i, j;
     short count, dr;
 
     for(i=2; i<=WIDTH; i++)
@@ -187,10 +179,7 @@ schar bg_typ, fg_typ;
 }
 
 boolean
-check_flood_anyroom(x, y, fg_typ, anyroom)
-int x, y;
-schar fg_typ;
-boolean anyroom;
+check_flood_anyroom(coordxy x, coordxy y, schar fg_typ, boolean anyroom)
 {
     if (!isok(x, y)) return FALSE;
     return (anyroom ? IS_ROOM(levl[x][y].typ) : levl[x][y].typ == fg_typ);
@@ -203,14 +192,9 @@ boolean anyroom;
  * exactly matching levl[sx][sy].typ and walls are included as well.
  */
 void
-flood_fill_rm(sx, sy, rmno, lit, anyroom)
-int sx;
-register int sy;
-register int rmno;
-boolean lit;
-boolean anyroom;
+flood_fill_rm(int sx, int sy, int rmno, boolean lit, boolean anyroom)
 {
-    register int i;
+    int i;
     int nx;
     schar fg_typ = levl[sx][sy].typ;
 
@@ -230,7 +214,7 @@ boolean anyroom;
         levl[i][sy].lit = lit;
         if(anyroom) {
             /* add walls to room as well */
-            register int ii, jj;
+            int ii, jj;
             for(ii= (i == sx ? i-1 : i); ii <= i+1; ii++)
                 for(jj = sy-1; jj <= sy+1; jj++)
                     if(isok(ii, jj) &&
@@ -291,8 +275,8 @@ boolean anyroom;
  *  If we have drawn a map without walls, this allows us to
  *  auto-magically wallify it.  Taken from lev_main.c.
  */
-STATIC_OVL void
-wallify_map()
+static void
+wallify_map(void)
 {
 
     int x, y, xx, yy;
@@ -309,13 +293,12 @@ wallify_map()
             }
 }
 
-STATIC_OVL void
-join_map(bg_typ, fg_typ)
-schar bg_typ, fg_typ;
+static void
+join_map(schar bg_typ, schar fg_typ)
 {
-    register struct mkroom *croom, *croom2;
+    struct mkroom *croom, *croom2;
 
-    register int i, j;
+    int i, j;
     int sx, sy;
     coord sm, em;
 
@@ -380,10 +363,8 @@ joinm:
     }
 }
 
-STATIC_OVL void
-finish_map(fg_typ, bg_typ, lit, walled)
-schar fg_typ, bg_typ;
-boolean lit, walled;
+static void
+finish_map(schar fg_typ, schar bg_typ, boolean lit, boolean walled)
 {
     int i, j;
 
@@ -417,8 +398,7 @@ boolean lit, walled;
  * region are all set.
  */
 void
-remove_rooms(lx, ly, hx, hy)
-int lx, ly, hx, hy;
+remove_rooms(int lx, int ly, int hx, int hy)
 {
     int i;
     struct mkroom *croom;
@@ -446,9 +426,8 @@ int lx, ly, hx, hy;
  * level structure contents corresponding to roomno have already been reset.
  * Currently handles only the removal of rooms that have no subrooms.
  */
-STATIC_OVL void
-remove_room(roomno)
-unsigned roomno;
+static void
+remove_room(unsigned int roomno)
 {
     struct mkroom *croom = &rooms[roomno];
     struct mkroom *maxroom = &rooms[--nroom];
@@ -480,14 +459,13 @@ unsigned roomno;
 #define N_P3_ITER   2   /* tune map smoothing via this value */
 
 void
-mkmap(init_lev)
-lev_init    *init_lev;
+mkmap(lev_init *init_lev)
 {
     schar bg_typ = init_lev->bg,
           fg_typ = init_lev->fg;
     boolean smooth = init_lev->smoothed,
             join = init_lev->joined;
-    xchar lit = init_lev->lit,
+    xint16 lit = init_lev->lit,
           walled = init_lev->walled;
     int i;
 

@@ -7,18 +7,18 @@
 
 #define UTSZ    50
 
-STATIC_VAR NEARDATA int utcnt, utpnt;
-STATIC_VAR NEARDATA coord utrack[UTSZ];
+static NEARDATA int utcnt, utpnt;
+static NEARDATA coord utrack[UTSZ];
 
 void
-initrack()
+initrack(void)
 {
     utcnt = utpnt = 0;
 }
 
 /* add to track */
 void
-settrack()
+settrack(void)
 {
     if(utcnt < UTSZ) utcnt++;
     if(utpnt == UTSZ) utpnt = 0;
@@ -28,11 +28,10 @@ settrack()
 }
 
 coord *
-gettrack(x, y)
-register int x, y;
+gettrack(coordxy x, coordxy y)
 {
-    register int cnt, ndist;
-    register coord *tc;
+    int cnt, ndist;
+    coord *tc;
     cnt = utcnt;
     for(tc = &utrack[utpnt]; cnt--; ) {
         if(tc == utrack) tc = &utrack[UTSZ-1];

@@ -172,7 +172,7 @@ set_window_position(int *winx, int *winy, int *winw, int *winh, int orientation,
 /* Create the "main" nonvolitile windows used by nethack */
 
 void
-curses_create_main_windows()
+curses_create_main_windows(void)
 {
     int min_message_height = 1;
     int message_orientation = 0;
@@ -356,7 +356,7 @@ curses_create_main_windows()
 /* Initialize curses colors to colors used by NetHack */
 
 void
-curses_init_nhcolors()
+curses_init_nhcolors(void)
 {
 #ifdef TEXTCOLOR
     if (has_colors()) {
@@ -424,7 +424,7 @@ curses_init_nhcolors()
 Borrowed from the Gnome window port. */
 
 void
-curses_choose_character()
+curses_choose_character(void)
 {
     int n, i, sel, count_off, pick4u;
     int count = 0;
@@ -854,7 +854,7 @@ curses_character_dialog(const char **choices, const char *prompt)
 /* Initialize and display options appropriately */
 
 void
-curses_init_options()
+curses_init_options(void)
 {
     set_wc_option_mod_status(WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_COLOR |
                              WC_HILITE_PET | WC_POPUP_DIALOG, SET_IN_GAME);
@@ -922,7 +922,7 @@ curses_init_options()
 /* Display an ASCII splash screen if the splash_screen option is set */
 
 void
-curses_display_splash_window()
+curses_display_splash_window(void)
 {
     int x_start;
     int y_start;
@@ -1049,14 +1049,14 @@ curses_display_splash_window()
 /* Resore colors and cursor state before exiting */
 
 void
-curses_cleanup()
+curses_cleanup(void)
 {
 }
 
 
 /** Show all available colors with names. */
 int
-curses_debug_show_colors()
+curses_debug_show_colors(void)
 {
     int i,c;
     winid tmpwin;

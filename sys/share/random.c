@@ -206,7 +206,7 @@ srandom( x )
 
     unsigned		x;
 {
-    	register  int		i;
+    	 int		i;
 
 	if(  rand_type  ==  TYPE_0  )  {
 	    state[ 0 ] = x;
@@ -247,7 +247,7 @@ initstate( seed, arg_state, n )
     char		*arg_state;		/* pointer to state array */
     int			n;			/* # bytes of state info */
 {
-	register  char		*ostate		= (char *)( &state[ -1 ] );
+	 char		*ostate		= (char *)( &state[ -1 ] );
 
 	if(  rand_type  ==  TYPE_0  )  state[ -1 ] = rand_type;
 	else  state[ -1 ] = MAX_TYPES*(rptr - state) + rand_type;
@@ -314,9 +314,9 @@ setstate( arg_state )
 
     char		*arg_state;
 {
-	register  long		*new_state	= (long *)arg_state;
-	register  int		type		= new_state[0]%MAX_TYPES;
-	register  int		rear		= new_state[0]/MAX_TYPES;
+	 long		*new_state	= (long *)arg_state;
+	 int		type		= new_state[0]%MAX_TYPES;
+	 int		rear		= new_state[0]/MAX_TYPES;
 	char			*ostate		= (char *)( &state[ -1 ] );
 
 	if(  rand_type  ==  TYPE_0  )  state[ -1 ] = rand_type;

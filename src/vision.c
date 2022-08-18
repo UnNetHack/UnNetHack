@@ -21,7 +21,7 @@
  *              @...X   +4
  *
  */
-char circle_data[] = {
+const coordxy circle_data[] = {
     /*  0*/ 1, 1,
     /*  2*/ 2, 2, 1,
     /*  5*/ 3, 3, 2, 1,
@@ -76,30 +76,31 @@ boolean vision_full_recalc = 0;
 /* Pointers to the current vision array. */
 char    **viz_array;
 #endif
-char    *viz_rmin, *viz_rmax;       /* current vision cs bounds */
+coordxy *viz_rmin, *viz_rmax;       /* current vision cs bounds */
 
 /*------ local variables ------*/
 
 static char could_see[2][ROWNO][COLNO]; /* vision work space */
 static char *cs_rows0[ROWNO], *cs_rows1[ROWNO];
-static char cs_rmin0[ROWNO],  cs_rmax0[ROWNO];
-static char cs_rmin1[ROWNO],  cs_rmax1[ROWNO];
+static coordxy cs_rmin0[ROWNO], cs_rmax0[ROWNO];
+static coordxy cs_rmin1[ROWNO], cs_rmax1[ROWNO];
 
 static char viz_clear[ROWNO][COLNO]; /* vision clear/blocked map */
 static char *viz_clear_rows[ROWNO];
 
-static char left_ptrs[ROWNO][COLNO]; /* LOS algorithm helpers */
-static char right_ptrs[ROWNO][COLNO];
+static coordxy left_ptrs[ROWNO][COLNO]; /* LOS algorithm helpers */
+static coordxy right_ptrs[ROWNO][COLNO];
 
 /* Forward declarations. */
-STATIC_DCL void FDECL(fill_point, (int, int));
-STATIC_DCL void FDECL(dig_point, (int, int));
-STATIC_DCL void NDECL(view_init);
-STATIC_DCL void FDECL(view_from, (int, int, char **, char *, char *, int,
-                                  void (*)(int, int, genericptr_t), genericptr_t));
-STATIC_DCL void FDECL(get_unused_cs, (char ***, char **, char **));
+static void fill_point(int, int);
+static void dig_point(int, int);
+static void view_init(void);
+static void view_from(coordxy, coordxy, char **, coordxy *, coordxy *, int,
+                      void (*)(coordxy, coordxy, genericptr_t),
+                      genericptr_t);
+static void get_unused_cs(char ***, coordxy **, coordxy **);
 #ifdef REINCARNATION
-STATIC_DCL void FDECL(rogue_vision, (char **, char *, char *));
+static void rogue_vision(char **, coordxy *, coordxy *);
 #endif
 
 /* Macro definitions that I can't find anywhere. */
@@ -115,7 +116,7 @@ STATIC_DCL void FDECL(rogue_vision, (char **, char *, char *));
  * or before a game restore.   Else we die a horrible death.
  */
 void
-vision_init()
+vision_init(void)
 {
     int i;
 
@@ -152,9 +153,7 @@ vision_init()
  * sight.
  */
 int
-does_block(x, y, lev)
-int x, y;
-register struct rm    *lev;
+does_block(coordxy x, coordxy y, struct rm *lev)
 {
     struct obj   *obj;
     struct monst *mon;
@@ -192,11 +191,11 @@ register struct rm    *lev;
  * level and the level monsters and objects are in place.
  */
 void
-vision_reset()
+vision_reset(void)
 {
     int y;
-    register int x, i, dig_left, block;
-    register struct rm    *lev;
+    int x, i, dig_left, block;
+    struct rm    *lev;
 
     /* Start out with cs0 as our current array */
     viz_array = cs_rows0;
@@ -253,13 +252,11 @@ vision_reset()
  * Called from vision_recalc() and at least one light routine.  Get pointers
  * to the unused vision work area.
  */
-STATIC_OVL void
-get_unused_cs(rows, rmin, rmax)
-char ***rows;
-char **rmin, **rmax;
+static void
+get_unused_cs(char ***rows, coordxy **rmin, coordxy **rmax)
 {
-    register int row;
-    register char *nrmin, *nrmax;
+    int row;
+    coordxy *nrmin, *nrmax;
 
     if (viz_array == cs_rows0) {
         *rows = cs_rows1;
@@ -296,14 +293,12 @@ char **rmin, **rmax;
  * We set the in_sight bit here as well to escape a bug that shows up
  * due to the one-sided lit wall hack.
  */
-STATIC_OVL void
-rogue_vision(next, rmin, rmax)
-char **next;        /* could_see array pointers */
-char *rmin, *rmax;
+static void
+rogue_vision(char **next, coordxy *rmin, coordxy *rmax) /* could_see array pointers */
 {
     int rnum = levl[u.ux][u.uy].roomno - ROOMOFFSET; /* no SHARED... */
     int start, stop, in_door, xhi, xlo, yhi, ylo;
-    register int zx, zy;
+    int zx, zy;
 
     /* If in a lit room, we are able to see to its boundaries. */
     /* If dark, set COULD_SEE so various spells work -dlc */
@@ -353,7 +348,7 @@ char *rmin, *rmax;
 
 #ifdef EXTEND_SPINE
 
-STATIC_DCL int FDECL(new_angle, (struct rm *, unsigned char *, int, int));
+static int new_angle(struct rm *, unsigned char *, int, int);
 /*
  * new_angle()
  *
@@ -396,13 +391,13 @@ STATIC_DCL int FDECL(new_angle, (struct rm *, unsigned char *, int, int));
  *    many exceptions.  I may have to bite the bullet and do more
  *    checks.   - Dean 2/11/93
  */
-STATIC_OVL int
+static int
 new_angle(lev, sv, row, col)
 struct rm *lev;
 unsigned char *sv;
 int row, col;
 {
-    register int res = *sv;
+    int res = *sv;
 
     /*
      * Do extra checks for crosswalls and T walls if we see them from
@@ -488,21 +483,20 @@ int row, col;
  *  + Just before bubbles are moved. [movebubbles()]
  */
 void
-vision_recalc(control)
-int control;
+vision_recalc(int control)
 {
     char **temp_array; /* points to the old vision array */
     char **next_array; /* points to the new vision array */
     char *next_row;    /* row pointer for the new array */
     char *old_row;     /* row pointer for the old array */
-    char *next_rmin;   /* min pointer for the new array */
-    char *next_rmax;   /* max pointer for the new array */
-    char *ranges;      /* circle ranges -- used for xray & night vision */
+    coordxy *next_rmin; /* min pointer for the new array */
+    coordxy *next_rmax; /* max pointer for the new array */
+    const coordxy *ranges; /* circle ranges -- used for xray & night vision */
     int row = 0;       /* row counter (outer loop)  */
     int start, stop;   /* inner loop starting/stopping index */
     int dx, dy;        /* one step from a lit door or lit wall (see below) */
-    register int col;  /* inner loop counter */
-    register struct rm *lev; /* pointer to current pos */
+    int col;  /* inner loop counter */
+    struct rm *lev; /* pointer to current pos */
     struct rm *flev;   /* pointer to position in "front" of current pos */
     extern unsigned char seenv_matrix[3][3]; /* from display.c */
     static unsigned char colbump[COLNO+1];   /* cols to bump sv */
@@ -536,7 +530,7 @@ int control;
          *  + Monsters can see you even when you're in a pit.
          */
         view_from(u.uy, u.ux, next_array, next_rmin, next_rmax,
-                  0, (void FDECL((*), (int, int, genericptr_t))) 0, (genericptr_t)0);
+                  0, (void (*)(coordxy, coordxy, genericptr_t)) 0, (genericptr_t)0);
 
         /*
          * Our own version of the update loop below.  We know we can't see
@@ -605,7 +599,7 @@ int control;
             }
         } else
             view_from(u.uy, u.ux, next_array, next_rmin, next_rmax,
-                      0, (void FDECL((*), (int, int, genericptr_t))) 0, (genericptr_t)0);
+                      0, (void (*)(coordxy, coordxy, genericptr_t)) 0, (genericptr_t)0);
 
         /*
          * Set the IN_SIGHT bit for xray and night vision.
@@ -814,7 +808,7 @@ skip:
         newsym(u.ux, u.uy); /* Make sure the hero shows up! */
 
     /* Set the new min and max pointers. */
-    viz_rmin  = next_rmin;
+    viz_rmin = next_rmin;
     viz_rmax = next_rmax;
 
     recalc_mapseen();
@@ -827,8 +821,7 @@ skip:
  * Make the location opaque to light.
  */
 void
-block_point(x, y)
-int x, y;
+block_point(coordxy x, coordxy y)
 {
     fill_point(y, x);
 
@@ -850,8 +843,7 @@ int x, y;
  * Make the location transparent to light.
  */
 void
-unblock_point(x, y)
-int x, y;
+unblock_point(coordxy x, coordxy y)
 {
     dig_point(y, x);
 
@@ -909,9 +901,8 @@ int x, y;
  *   This means that a right-edge (a blocked spot that has an open
  *    spot on its right) will point to itself.
  */
-STATIC_OVL void
-dig_point(row, col)
-int row, col;
+static void
+dig_point(int row, int col)
 {
     int i;
 
@@ -990,9 +981,8 @@ int row, col;
     }
 }
 
-STATIC_OVL void
-fill_point(row, col)
-int row, col;
+static void
+fill_point(int row, int col)
 {
     int i;
 
@@ -1083,10 +1073,10 @@ static int start_row;
 static int start_col;
 static int step;
 static char **cs_rows;
-static char *cs_left;
-static char *cs_right;
+static coordxy *cs_left;
+static coordxy *cs_right;
 
-static void FDECL((*vis_func), (int, int, genericptr_t));
+static void (*vis_func)(coordxy, coordxy, genericptr_t);
 static genericptr_t varg;
 
 /*
@@ -1141,7 +1131,7 @@ static genericptr_t varg;
 #define q1_path(srow, scol, y2, x2, label)          \
     {                           \
         int dx, dy;                     \
-        register int k, err, x, y, dxs, dys;        \
+        int k, err, x, y, dxs, dys;        \
                             \
         x  = (scol);    y  = (srow);            \
         dx = (x2) - x;  dy = y - (y2);          \
@@ -1185,7 +1175,7 @@ static genericptr_t varg;
 #define q4_path(srow, scol, y2, x2, label)          \
     {                           \
         int dx, dy;                     \
-        register int k, err, x, y, dxs, dys;        \
+        int k, err, x, y, dxs, dys;        \
                             \
         x  = (scol);    y  = (srow);            \
         dx = (x2) - x;  dy = (y2) - y;          \
@@ -1230,7 +1220,7 @@ static genericptr_t varg;
 #define q2_path(srow, scol, y2, x2, label)          \
     {                           \
         int dx, dy;                     \
-        register int k, err, x, y, dxs, dys;        \
+        int k, err, x, y, dxs, dys;        \
                             \
         x  = (scol);    y  = (srow);            \
         dx = x - (x2);  dy = y - (y2);          \
@@ -1274,7 +1264,7 @@ static genericptr_t varg;
 #define q3_path(srow, scol, y2, x2, label)          \
     {                           \
         int dx, dy;                     \
-        register int k, err, x, y, dxs, dys;        \
+        int k, err, x, y, dxs, dys;        \
                             \
         x  = (scol);    y  = (srow);            \
         dx = x - (x2);  dy = (y2) - y;          \
@@ -1315,10 +1305,10 @@ static genericptr_t varg;
 
 #else   /* quadrants are really functions */
 
-STATIC_DCL int FDECL(_q1_path, (int, int, int, int));
-STATIC_DCL int FDECL(_q2_path, (int, int, int, int));
-STATIC_DCL int FDECL(_q3_path, (int, int, int, int));
-STATIC_DCL int FDECL(_q4_path, (int, int, int, int));
+static int _q1_path(int, int, int, int);
+static int _q2_path(int, int, int, int);
+static int _q3_path(int, int, int, int);
+static int _q4_path(int, int, int, int);
 
 #define q1_path(sy, sx, y, x, dummy) result = _q1_path(sy, sx, y, x)
 #define q2_path(sy, sx, y, x, dummy) result = _q2_path(sy, sx, y, x)
@@ -1328,12 +1318,12 @@ STATIC_DCL int FDECL(_q4_path, (int, int, int, int));
 /*
  * Quadrant I (step < 0).
  */
-STATIC_OVL int
+static int
 _q1_path(srow, scol, y2, x2)
 int scol, srow, y2, x2;
 {
     int dx, dy;
-    register int k, err, x, y, dxs, dys;
+    int k, err, x, y, dxs, dys;
 
     x  = scol;      y  = srow;
     dx = x2 - x;    dy = y - y2;
@@ -1372,12 +1362,12 @@ int scol, srow, y2, x2;
 /*
  * Quadrant IV (step > 0).
  */
-STATIC_OVL int
+static int
 _q4_path(srow, scol, y2, x2)
 int scol, srow, y2, x2;
 {
     int dx, dy;
-    register int k, err, x, y, dxs, dys;
+    int k, err, x, y, dxs, dys;
 
     x  = scol;      y  = srow;
     dx = x2 - x;    dy = y2 - y;
@@ -1416,12 +1406,12 @@ int scol, srow, y2, x2;
 /*
  * Quadrant II (step < 0).
  */
-STATIC_OVL int
+static int
 _q2_path(srow, scol, y2, x2)
 int scol, srow, y2, x2;
 {
     int dx, dy;
-    register int k, err, x, y, dxs, dys;
+    int k, err, x, y, dxs, dys;
 
     x  = scol;      y  = srow;
     dx = x - x2;    dy = y - y2;
@@ -1460,12 +1450,12 @@ int scol, srow, y2, x2;
 /*
  * Quadrant III (step > 0).
  */
-STATIC_OVL int
+static int
 _q3_path(srow, scol, y2, x2)
 int scol, srow, y2, x2;
 {
     int dx, dy;
-    register int k, err, x, y, dxs, dys;
+    int k, err, x, y, dxs, dys;
 
     x  = scol;      y  = srow;
     dx = x - x2;    dy = y2 - y;
@@ -1511,8 +1501,7 @@ int scol, srow, y2, x2;
  *      do_light_sources()
  */
 boolean
-clear_path(col1, row1, col2, row2)
-int col1, row1, col2, row2;
+clear_path(int col1, int row1, int col2, int row2)
 {
     int result;
 
@@ -1561,16 +1550,16 @@ cleardone:
 static close2d *close_dy[CLOSE_MAX_BC_DY];
 static far2d   *far_dy[FAR_MAX_BC_DY];
 
-STATIC_DCL void FDECL(right_side, (int, int, int, int, int, int, int, char*));
-STATIC_DCL void FDECL(left_side, (int, int, int, int, int, int, int, char*));
-STATIC_DCL int FDECL(close_shadow, (int, int, int, int));
-STATIC_DCL int FDECL(far_shadow, (int, int, int, int));
+static void right_side(int, int, int, int, int, int, int, coordxy *);
+static void left_side(int, int, int, int, int, int, int, coordxy *);
+static int close_shadow(int, int, int, int);
+static int far_shadow(int, int, int, int);
 
 /*
  * Initialize algorithm D's table pointers.  If we don't have these,
  * then we do 3D table lookups.  Verrrry slow.
  */
-STATIC_OVL void
+static void
 view_init()
 {
     int i;
@@ -1590,11 +1579,11 @@ view_init()
  */
 #define OFF_TABLE 0xff
 
-STATIC_OVL int
+static int
 close_shadow(side, this_row, block_row, block_col)
 int side, this_row, block_row, block_col;
 {
-    register int sdy, sdx, pdy, offset;
+    int sdy, sdx, pdy, offset;
 
     /*
      * If on the same column (block_row = -1), then we can see it.
@@ -1619,11 +1608,11 @@ int side, this_row, block_row, block_col;
 }
 
 
-STATIC_OVL int
+static int
 far_shadow(side, this_row, block_row, block_col)
 int side, this_row, block_row, block_col;
 {
-    register int sdy, sdx, pdy, offset;
+    int sdy, sdx, pdy, offset;
 
     /*
      * Take care of a bug that shows up only on the borders.
@@ -1659,24 +1648,24 @@ int side, this_row, block_row, block_col;
  *
  * Figure out what could be seen on the right side of the source.
  */
-STATIC_OVL void
-right_side(row, cb_row, cb_col, fb_row, fb_col, left, right_mark, limits)
-int row;            /* current row */
-int cb_row, cb_col;     /* close block row and col */
-int fb_row, fb_col;     /* far block row and col */
-int left;           /* left mark of the previous row */
-int right_mark;     /* right mark of previous row */
-char *limits;       /* points at range limit for current row, or NULL */
+static void
+right_side(
+    int row, /**< current row */
+    int cb_row, cb_col, /**< close block row and col */
+    int fb_row, fb_col, /**< far block row and col */
+    int left, /**< left mark of the previous row */
+    int right_mark, /**< right mark of previous row */
+    coordxy *limits) /**< points at range limit for current row, or NULL */
 {
-    register int i;
+    int i;
     char *rowp = NULL;
     int hit_stone = 0;
     int left_shadow, right_shadow, loc_right;
     int lblock_col;         /* local block column (current row) */
     int nrow, deeper;
-    char *row_min = NULL; /* left most */
-    char *row_max = NULL; /* right most */
-    int lim_max;          /* right most limit of circle */
+    coordxy *row_min = NULL; /* left most */
+    coordxy *row_max = NULL; /* right most */
+    int lim_max; /* right most limit of circle */
 
     nrow    = row + step;
     deeper  = good_row(nrow) && (!limits || (*limits >= *(limits+1)));
@@ -1911,16 +1900,16 @@ char *limits;       /* points at range limit for current row, or NULL */
  * This routine is the mirror image of right_side().  Please see right_side()
  * for blow by blow comments.
  */
-STATIC_OVL void
-left_side(row, cb_row, cb_col, fb_row, fb_col, left_mark, right, limits)
-int row;            /* the current row */
-int cb_row, cb_col;     /* close block row and col */
-int fb_row, fb_col;     /* far block row and col */
-int left_mark;      /* left mark of previous row */
-int right;          /* right mark of the previous row */
-char *limits;
+static void
+left_side(
+    int row, /* the current row */
+    int cb_row, int cb_col, /* close block row and col */
+    int fb_row, int fb_col,     /* far block row and col */
+    int left_mark,      /* left mark of previous row */
+    int right,          /* right mark of the previous row */
+    const coordxy *limits)
 {
-    register int i;
+    int i;
     char *rowp = NULL;
     int hit_stone = 0;
     int left_shadow, right_shadow, loc_left;
@@ -2089,16 +2078,16 @@ char *limits;
  * seen from the source location.  Initialize and fill the left most
  * and right most boundaries of what could be seen.
  */
-STATIC_OVL void
-view_from(srow, scol, loc_cs_rows, left_most, right_most, range, func, arg)
-int srow, scol;                 /* source row and column */
-char **loc_cs_rows;             /* could_see array (row pointers) */
-char *left_most, *right_most;       /* limits of what could be seen */
-int range;          /* 0 if unlimited */
-void FDECL((*func), (int, int, genericptr_t));
-genericptr_t arg;
+static void
+view_from(
+    coordxy srow, coordxy scol, /* source row and column */
+    char **loc_cs_rows, /* could_see array (row pointers) */
+    coordxy *left_most, coordxy *right_most, /* limits of what could be seen */
+    int range, /* 0 if unlimited */
+    void (*func)(coordxy, coordxy, genericptr_t),
+    genericptr_t arg)
 {
-    register int i;
+    int i;
     char     *rowp;
     int nrow, left, right, left_row, right_row;
     char     *limits;
@@ -2180,12 +2169,12 @@ genericptr_t arg;
 /*
  * Defines local to Algorithm C.
  */
-STATIC_DCL void FDECL(right_side, (int, int, int, char*));
-STATIC_DCL void FDECL(left_side, (int, int, int, char*));
+static void right_side(int, int, int, coordxy *);
+static void left_side(int, int, int, coordxy *);
 
 /* Initialize algorithm C (nothing). */
-STATIC_OVL void
-view_init()
+static void
+view_init(void)
 {
 }
 
@@ -2193,25 +2182,24 @@ view_init()
  * Mark positions as visible on one quadrant of the right side.  The
  * quadrant is determined by the value of the global variable step.
  */
-STATIC_OVL void
-right_side(row, left, right_mark, limits)
-int row;            /* current row */
-int left;           /* first (left side) visible spot on prev row */
-int right_mark;     /* last (right side) visible spot on prev row */
-char *limits;       /* points at range limit for current row, or NULL */
+static void
+right_side(
+    int row, /**< current row */
+    int left, /**< first (left side) visible spot on prev row */
+    int right_mark, /**< last (right side) visible spot on prev row */
+    coordxy *limits) /**< points at range limit for current row, or NULL */
 {
     int right;            /* right limit of "could see" */
     int right_edge;       /* right edge of an opening */
     int nrow;             /* new row (calculate once) */
     int deeper;           /* if TRUE, call self as needed */
     int result;           /* set by q?_path() */
-    register int i;       /* loop counter */
+    int i;       /* loop counter */
     char *rowp = NULL;    /* row optimization */
-    char *row_min = NULL; /* left most  [used by macro set_min()] */
-    char *row_max = NULL; /* right most [used by macro set_max()] */
+    coordxy *row_min = NULL; /* left most  [used by macro set_min()] */
+    coordxy *row_max = NULL; /* right most [used by macro set_max()] */
     int lim_max;          /* right most limit of circle */
 
-    rowp = row_min = row_max = 0;
     nrow    = row + step;
     /*
      * Can go deeper if the row is in bounds and the next row is within
@@ -2373,16 +2361,14 @@ rside2:         /* used if q?_path() is a macro */
  * This routine is the mirror image of right_side().  See right_side() for
  * extensive comments.
  */
-STATIC_OVL void
-left_side(row, left_mark, right, limits)
-int row, left_mark, right;
-char *limits;
+static void
+left_side(int row, int left_mark, int right, coordxy *limits)
 {
     int left, left_edge, nrow, deeper, result;
-    register int i;
+    int i;
     char *rowp = NULL;
-    char *row_min = NULL;
-    char *row_max = NULL;
+    coordxy *row_min = NULL;
+    coordxy *row_max = NULL;
     int lim_min;
 
     nrow    = row+step;
@@ -2492,23 +2478,33 @@ lside2:         /* used if q?_path() is a macro */
  * Calculate all possible visible locations from the given location
  * (srow,scol).  NOTE this is (y,x)!  Mark the visible locations in the
  * array provided.
+ *
+ * Arguments
+ *   srow, scol     starting row and column
+ *   loc_cs_rows    pointers to the rows of the could_see array
+ *   left_most      min mark on each row
+ *   right_most     max mark on each row
+ *   range          0 if unlimited
+ *   func           function to call on each spot
+ *   arg            argument for func
  */
-STATIC_OVL void
-view_from(srow, scol, loc_cs_rows, left_most, right_most, range, func, arg)
-int srow, scol;         /* starting row and column */
-char **loc_cs_rows;     /* pointers to the rows of the could_see array */
-char *left_most;        /* min mark on each row */
-char *right_most;       /* max mark on each row */
-int range;          /* 0 if unlimited */
-void FDECL((*func), (int, int, genericptr_t));
-genericptr_t arg;
+static void
+view_from(
+    coordxy srow, coordxy scol,
+    char **loc_cs_rows,
+    coordxy *left_most, coordxy *right_most,
+    int range,
+    void (*func)(coordxy, coordxy, genericptr_t),
+    genericptr_t arg)
+
+
 {
-    register int i;     /* loop counter */
+    int i;     /* loop counter */
     char         *rowp;     /* optimization for setting could_see */
     int nrow;           /* the next row */
     int left;           /* the left-most visible column */
     int right;          /* the right-most visible column */
-    char     *limits;   /* range limit for next row */
+    coordxy *limits;   /* range limit for next row */
 
     /* Set globals for q?_path(), left_side(), and right_side() to use. */
     start_col = scol;
@@ -2543,7 +2539,7 @@ genericptr_t arg;
         if(left < scol - range) left = scol - range;
         if(right > scol + range) right = scol + range;
     } else
-        limits = (char*) 0;
+        limits = (coordxy *) 0;
 
     if(func) {
         for (i = left; i <= right; i++) (*func)(i, srow, arg);
@@ -2589,19 +2585,20 @@ genericptr_t arg;
  * vision matrix and reduce extra work.
  */
 void
-do_clear_area(scol, srow, range, func, arg)
-int scol, srow, range;
-void FDECL((*func), (int, int, genericptr_t));
-genericptr_t arg;
+do_clear_area(
+    coordxy scol, coordxy srow,
+    int range,
+    void (*func) (coordxy, coordxy, genericptr_t),
+    genericptr_t arg)
 {
     /* If not centered on hero, do the hard work of figuring the area */
     if (scol != u.ux || srow != u.uy)
-        view_from(srow, scol, (char **)0, (char *)0, (char *)0,
+        view_from(srow, scol, (char **)0, (coordxy *)0, (coordxy *)0,
                   range, func, arg);
     else {
-        register int x;
+        int x;
         int y, min_x, max_x, max_y, offset;
-        char *limits;
+        const coordxy *limits;
         boolean override_vision;
 
         /* vision doesn't pass through water or clouds, detection should
@@ -2630,8 +2627,7 @@ genericptr_t arg;
 
 /* bitmask indicating ways mon is seen; extracted from lookat(pager.c) */
 unsigned
-how_mon_is_seen(mon)
-struct monst *mon;
+how_mon_is_seen(struct monst *mon)
 {
     boolean useemon = (boolean) canseemon(mon);
     int xraydist = (u.xray_range < 0) ? -1 : (u.xray_range * u.xray_range);

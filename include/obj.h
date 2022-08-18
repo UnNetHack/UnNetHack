@@ -34,7 +34,7 @@ struct obj {
 
     struct obj *cobj;   /* contents list for containers */
     size_t o_id;
-    xchar ox, oy;
+    coordxy ox, oy;
     short otyp;     /* object class number */
     unsigned owt;
     long quan;      /* number of items */
@@ -58,7 +58,7 @@ struct obj {
     char invlet;        /* designation in inventory */
     int oartifact;      /* artifact array index */
     int mrevived;       /* keep track of revivification from former monster */
-    xchar where;        /* where the object thinks it is */
+    xint8 where;        /* where the object thinks it is */
 #define OBJ_FREE       0 /* object not attached to anything */
 #define OBJ_FLOOR      1 /* object on floor */
 #define OBJ_CONTAINED  2 /* object in a container */
@@ -68,7 +68,7 @@ struct obj {
 #define OBJ_BURIED     6 /* object buried */
 #define OBJ_ONBILL     7 /* object on shk bill */
 #define NOBJ_STATES    8
-    xchar timed;        /* # of fuses (timers) attached to this obj */
+    xint16 timed;        /* # of fuses (timers) attached to this obj */
 
     Bitfield(cursed, 1);
     Bitfield(blessed, 1);
@@ -118,7 +118,7 @@ struct obj {
 #define fromsink  corpsenm  /* a potion from a sink */
 
 #ifdef RECORD_ACHIEVE
-    xchar record_achieve_special;
+    coordxy record_achieve_special;
 #endif
     int usecount;           /* overloaded for various things that tally */
     unsigned oeaten;        /* nutrition left in food, if partly eaten */
@@ -426,8 +426,8 @@ struct obj {
  *      for it to include/extern.h.  The majority of these are currently
  *      located in mkobj.c for convenience.
  *
- *      void FDECL(newXX, (struct obj *));
- *          void FDECL(free_XX, (struct obj *));
+ *      void newXX(struct obj *);
+ *          void free_XX(struct obj *);
  *
  *            void
  *            newxx(otmp)

@@ -2,8 +2,8 @@
 
 #include "hack.h"
 
-static boolean FDECL(label_known, (int, struct obj *));
-static char *FDECL(new_book_description, (int, char *));
+static boolean label_known(int, struct obj *);
+static char *new_book_description(int, char *);
 
 /*
  * returns basecost of a scroll or a spellbook
@@ -66,9 +66,7 @@ ink_cost(struct obj *otmp)
    the discoveries list and aren't present in current inventory,
    so some scrolls with ought to yield True will end up False */
 static boolean
-label_known(scrolltype, objlist)
-int scrolltype;
-struct obj *objlist;
+label_known(int scrolltype, struct obj *objlist)
 {
     struct obj *otmp;
 
@@ -99,12 +97,11 @@ static NEARDATA const char write_on[] = { SCROLL_CLASS, SPBOOK_CLASS, 0 };
 
 /** write -- applying a magic marker */
 int
-dowrite(pen)
-register struct obj *pen;
+dowrite(struct obj *pen)
 {
-    register struct obj *paper;
+    struct obj *paper;
     char namebuf[BUFSZ] = DUMMY, *nm, *bp;
-    register struct obj *new_obj;
+    struct obj *new_obj;
     int basecost, actualcost;
     int curseval;
     char qbuf[QBUFSZ];
@@ -362,9 +359,7 @@ found:
    even that's rather iffy, indicating that such descriptions probably
    ought to be eliminated (especially "cloth"!) */
 static char *
-new_book_description(booktype, outbuf)
-int booktype;
-char *outbuf;
+new_book_description(int booktype, char *outbuf)
 {
     /* subset of description strings from objects.c; if it grows
        much, we may need to add a new flag field to objects[] instead */

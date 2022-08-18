@@ -39,8 +39,8 @@
  * and placed there by 'makedefs'.
  */
 
-STATIC_DCL void FDECL(init_rumors, (dlb *));
-STATIC_DCL void FDECL(init_oracles, (dlb *));
+static void init_rumors(dlb *);
+static void init_oracles(dlb *);
 
 /* rumor size variables are signed so that value -1 can be used as a flag */
 static long true_rumor_size = 0L, false_rumor_size;
@@ -53,9 +53,8 @@ static int oracle_flg = 0; /* -1=>don't use, 0=>need init, 1=>init done */
 static unsigned oracle_cnt = 0;
 static long *oracle_loc = 0;
 
-STATIC_OVL void
-init_rumors(fp)
-dlb *fp;
+static void
+init_rumors(dlb *fp)
 {
     char line[BUFSZ];
 
@@ -80,10 +79,10 @@ dlb *fp;
  * of them contain such references anyway.
  */
 char *
-getrumor(truth, rumor_buf, exclude_cookie)
-int truth; /* 1=true, -1=false, 0=either */
-char *rumor_buf;
-boolean exclude_cookie;
+getrumor(int truth, char *rumor_buf, boolean exclude_cookie)
+           /* 1=true, -1=false, 0=either */
+                
+                       
 {
     dlb *rumors;
     long tidbit, beginning;
@@ -151,9 +150,9 @@ boolean exclude_cookie;
 }
 
 void
-outrumor(truth, mechanism)
-int truth; /* 1=true, -1=false, 0=either */
-int mechanism;
+outrumor(int truth, int mechanism)
+           /* 1=true, -1=false, 0=either */
+              
 {
     static const char fortune_msg[] =
         "This cookie has a scrap of paper inside.";
@@ -195,11 +194,10 @@ int mechanism;
     pline("%s", line);
 }
 
-STATIC_OVL void
-init_oracles(fp)
-dlb *fp;
+static void
+init_oracles(dlb *fp)
 {
-    register int i;
+    int i;
     char line[BUFSZ];
     int cnt = 0;
 
@@ -218,8 +216,7 @@ dlb *fp;
 }
 
 void
-save_oracles(fd, mode)
-int fd, mode;
+save_oracles(int fd, int mode)
 {
     if (perform_bwrite(mode)) {
         bwrite(fd, (genericptr_t) &oracle_cnt, sizeof oracle_cnt);
@@ -235,8 +232,7 @@ int fd, mode;
 }
 
 void
-restore_oracles(fd)
-int fd;
+restore_oracles(int fd)
 {
     mread(fd, (genericptr_t) &oracle_cnt, sizeof oracle_cnt);
     if (oracle_cnt) {
@@ -247,9 +243,7 @@ int fd;
 }
 
 void
-outoracle(special, delphi)
-boolean special;
-boolean delphi;
+outoracle(boolean special, boolean delphi)
 {
     char line[COLNO];
     char    *endp;
@@ -329,8 +323,7 @@ register struct monst *oracl;
 #endif
 
 int
-doconsult(oracl)
-register struct monst *oracl;
+doconsult(struct monst *oracl)
 {
     long umoney = money_cnt(invent);
     int u_pay, minor_cost = 50, major_cost = 500 + 50 * u.ulevel;

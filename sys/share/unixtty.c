@@ -139,8 +139,7 @@ struct termstruct inittyb, curttyb;
 
 #ifdef POSIX_TYPES
 static int
-speednum(speed)
-speed_t speed;
+speednum(speed_t speed)
 {
 	switch (speed) {
 		case B0:	return 0;
@@ -166,7 +165,7 @@ speed_t speed;
 #endif
 
 static void
-setctty()
+setctty(void)
 {
 	if(STTY(&curttyb) < 0 || STTY2(&curttyb2) < 0)
 		perror("NetHack (setctty)");
@@ -178,7 +177,7 @@ setctty()
  * Called by startup() in termcap.c and after returning from ! or ^Z
  */
 void
-gettty()
+gettty(void)
 {
 	if(GTTY(&inittyb) < 0 || GTTY2(&inittyb2) < 0)
 		perror("NetHack (gettty)");
@@ -200,8 +199,7 @@ gettty()
 
 /* reset terminal to original state */
 void
-settty(s)
-const char *s;
+settty(const char *s)
 {
 	end_screen();
 	if(s) raw_print(s);
@@ -214,15 +212,15 @@ const char *s;
 }
 
 void
-setftty()
+setftty(void)
 {
-register int ef = 0;			/* desired value of flags & ECHO */
+int ef = 0;			/* desired value of flags & ECHO */
 #ifdef LINT	/* cf = CBRKON(CBRKMASK); const expr to initialize is ok */
-register int cf = 0;
+int cf = 0;
 #else
-register int cf = CBRKON(CBRKMASK);	/* desired value of flags & CBREAK */
+int cf = CBRKON(CBRKMASK);	/* desired value of flags & CBREAK */
 #endif
-register int change = 0;
+int change = 0;
 	iflags.cbreak = ON;
 	iflags.echo = OFF;
 	/* Should use (ECHO|CRMOD) here instead of ECHO */
@@ -281,8 +279,9 @@ register int change = 0;
 	start_screen();
 }
 
+/** enable kbd interupts if enabled when game started */
 void
-intron()		/* enable kbd interupts if enabled when game started */
+intron(void)
 {
 #ifdef TTY_GRAPHICS
 	/* Ugly hack to keep from changing tty modes for non-tty games -dlc */
@@ -294,8 +293,9 @@ intron()		/* enable kbd interupts if enabled when game started */
 #endif
 }
 
+/** disable kbd interrupts if required*/
 void
-introff()		/* disable kbd interrupts if required*/
+introff(void)
 {
 #ifdef TTY_GRAPHICS
 	/* Ugly hack to keep from changing tty modes for non-tty games -dlc */
@@ -319,13 +319,13 @@ int sco_flag_console = 0;
 int sco_map_valid = -1;
 unsigned char sco_chanmap_buf[BSIZE];
 
-void NDECL(sco_mapon);
-void NDECL(sco_mapoff);
-void NDECL(check_sco_console);
-void NDECL(init_sco_cons);
+void sco_mapon();
+void sco_mapoff();
+void check_sco_console();
+void init_sco_cons();
 
 void
-sco_mapon()
+sco_mapon(void)
 {
 # ifdef TTY_GRAPHICS
 	if (!strcmp(windowprocs.name, "tty") && sco_flag_console) {
@@ -338,7 +338,7 @@ sco_mapon()
 }
 
 void
-sco_mapoff()
+sco_mapoff(void)
 {
 # ifdef TTY_GRAPHICS
 	if (!strcmp(windowprocs.name, "tty") && sco_flag_console) {
@@ -351,7 +351,7 @@ sco_mapoff()
 }
 
 void
-check_sco_console()
+check_sco_console(void)
 {
 	if (isatty(0) && ioctl(0,CONS_GET,0) != -1) {
 		sco_flag_console = 1;
@@ -359,7 +359,7 @@ check_sco_console()
 }
 
 void
-init_sco_cons()
+init_sco_cons(void)
 {
 # ifdef TTY_GRAPHICS
 	if (!strcmp(windowprocs.name, "tty") && sco_flag_console) {
@@ -382,13 +382,13 @@ init_sco_cons()
 
 int linux_flag_console = 0;
 
-void NDECL(linux_mapon);
-void NDECL(linux_mapoff);
-void NDECL(check_linux_console);
-void NDECL(init_linux_cons);
+void linux_mapon(void);
+void linux_mapoff(void);
+void check_linux_console(void);
+void init_linux_cons(void);
 
 void
-linux_mapon()
+linux_mapon(void)
 {
 # ifdef TTY_GRAPHICS
 	if (!strcmp(windowprocs.name, "tty") && linux_flag_console) {
@@ -398,7 +398,7 @@ linux_mapon()
 }
 
 void
-linux_mapoff()
+linux_mapoff(void)
 {
 # ifdef TTY_GRAPHICS
 	if (!strcmp(windowprocs.name, "tty") && linux_flag_console) {
@@ -408,7 +408,7 @@ linux_mapoff()
 }
 
 void
-check_linux_console()
+check_linux_console(void)
 {
 	struct vt_mode vtm;
 
@@ -418,7 +418,7 @@ check_linux_console()
 }
 
 void
-init_linux_cons()
+init_linux_cons(void)
 {
 # ifdef TTY_GRAPHICS
 	if (!strcmp(windowprocs.name, "tty") && linux_flag_console) {
@@ -453,7 +453,7 @@ error VA_DECL(const char *,s)
 
 #ifdef UTF8_GLYPHS
 void
-check_utf8_console()
+check_utf8_console(void)
 {
     struct termios original;
     /* store current tty settings */

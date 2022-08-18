@@ -41,58 +41,58 @@
 
 extern void VDECL(lc_error, (const char *, ...));
 extern void VDECL(lc_warning, (const char *, ...));
-extern void FDECL(yyerror, (const char *));
-extern void FDECL(yywarning, (const char *));
-extern int NDECL(yylex);
-int NDECL(yyparse);
- extern void FDECL(include_push, (const char *));
-extern int NDECL(include_pop);
+extern void yyerror(const char *);
+extern void yywarning(const char *);
+extern int yylex(void);
+int yyparse(void);
+ extern void include_push(const char *);
+extern int include_pop(void);
 
-extern int FDECL(get_floor_type, (CHAR_P));
-extern int FDECL(get_room_type, (char *));
-extern int FDECL(get_trap_type, (char *));
-extern int FDECL(get_monster_id, (char *,CHAR_P));
-extern int FDECL(get_object_id, (char *,CHAR_P));
-extern boolean FDECL(check_monster_char, (CHAR_P));
-extern boolean FDECL(check_object_char, (CHAR_P));
-extern char FDECL(what_map_char, (CHAR_P));
-extern void FDECL(scan_map, (char *, sp_lev *));
-extern void FDECL(add_opcode, (sp_lev *, int, genericptr_t));
-extern genericptr_t FDECL(get_last_opcode_data1, (sp_lev *, int));
-extern genericptr_t FDECL(get_last_opcode_data2, (sp_lev *, int,int));
-extern boolean FDECL(check_subrooms, (sp_lev *));
-extern boolean FDECL(write_level_file, (char *,sp_lev *));
-extern struct opvar *FDECL(set_opvar_int, (struct opvar *, long));
+extern int get_floor_type(CHAR_P);
+extern int get_room_type(char *);
+extern int get_trap_type(char *);
+extern int get_monster_id(char *,CHAR_P);
+extern int get_object_id(char *,CHAR_P);
+extern boolean check_monster_char(CHAR_P);
+extern boolean check_object_char(CHAR_P);
+extern char what_map_char(CHAR_P);
+extern void scan_map(char *, sp_lev *);
+extern void add_opcode(sp_lev *, int, genericptr_t);
+extern genericptr_t get_last_opcode_data1(sp_lev *, int);
+extern genericptr_t get_last_opcode_data2(sp_lev *, int,int);
+extern boolean check_subrooms(sp_lev *);
+extern boolean write_level_file(char *,sp_lev *);
+extern struct opvar *set_opvar_int(struct opvar *, long);
 extern void VDECL(add_opvars, (sp_lev *, const char *, ...));
 
-extern struct lc_funcdefs *FDECL(funcdef_new,(long,char *));
-extern void FDECL(funcdef_free_all,(struct lc_funcdefs *));
-extern struct lc_funcdefs *FDECL(funcdef_defined,(struct lc_funcdefs *,char *, int));
-extern char *FDECL(funcdef_paramtypes, (struct lc_funcdefs *));
-extern char *FDECL(decode_parm_str, (char *));
+extern struct lc_funcdefs *funcdef_new(long,char *);
+extern void funcdef_free_all(struct lc_funcdefs *);
+extern struct lc_funcdefs *funcdef_defined(struct lc_funcdefs *,char *, int);
+extern char *funcdef_paramtypes(struct lc_funcdefs *);
+extern char *decode_parm_str(char *);
 
-extern struct lc_vardefs *FDECL(vardef_new,(long,char *));
-extern void FDECL(vardef_free_all,(struct lc_vardefs *));
-extern struct lc_vardefs *FDECL(vardef_defined,(struct lc_vardefs *,char *, int));
+extern struct lc_vardefs *vardef_new(long,char *);
+extern void vardef_free_all(struct lc_vardefs *);
+extern struct lc_vardefs *vardef_defined(struct lc_vardefs *,char *, int);
 
-extern void NDECL(break_stmt_start);
-extern void FDECL(break_stmt_end, (sp_lev *));
-extern void FDECL(break_stmt_new, (sp_lev *, long));
+extern void break_stmt_start(void);
+extern void break_stmt_end(sp_lev *);
+extern void break_stmt_new(sp_lev *, long);
 
-extern void FDECL(splev_add_from, (sp_lev *, sp_lev *));
+extern void splev_add_from(sp_lev *, sp_lev *);
 
-extern void FDECL(check_vardef_type, (struct lc_vardefs *, char *, long));
-extern void FDECL(vardef_used, (struct lc_vardefs *, char *));
-extern struct lc_vardefs *FDECL(add_vardef_type, (struct lc_vardefs *, char *, long));
+extern void check_vardef_type(struct lc_vardefs *, char *, long);
+extern void vardef_used(struct lc_vardefs *, char *);
+extern struct lc_vardefs *add_vardef_type(struct lc_vardefs *, char *, long);
 
-extern int FDECL(reverse_jmp_opcode, (int));
+extern int reverse_jmp_opcode(int);
 
-extern int FDECL(is_core_func, (char *));
-extern int FDECL(core_func_idx, (char *));
-extern char FDECL(core_func_retval, (int));
-extern const char *FDECL(core_func_params, (int));
-extern const char *FDECL(core_func_name, (int));
-extern int FDECL(handle_corefunc, (sp_lev *, char *, char *, char));
+extern int is_core_func(char *);
+extern int core_func_idx(char *);
+extern char core_func_retval(int);
+extern const char *core_func_params(int);
+extern const char *core_func_name(int);
+extern int handle_corefunc(sp_lev *, char *, char *, char);
 
 struct coord {
 	long x;

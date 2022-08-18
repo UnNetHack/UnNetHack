@@ -10,8 +10,8 @@
 #ifdef REINCARNATION
 
 struct rogueroom {
-    xchar rlx, rly;
-    xchar dx, dy;
+    coordxy rlx, rly;
+    coordxy dx, dy;
     boolean real;
     uchar doortable;
     int nroom; /* Only meaningful for "real" rooms */
@@ -22,15 +22,12 @@ struct rogueroom {
 #define RIGHT 8
 
 static NEARDATA struct rogueroom r[3][3];
-STATIC_DCL void FDECL(roguejoin, (int, int, int, int, int));
-STATIC_DCL void FDECL(roguecorr, (int, int, int));
-STATIC_DCL void FDECL(miniwalk, (int, int));
+static void roguejoin(int, int, int, int, int);
+static void roguecorr(coordxy, coordxy, int);
+static void miniwalk(coordxy, coordxy);
 
-STATIC_OVL
-void
-roguejoin(x1, y1, x2, y2, horiz)
-int x1, y1, x2, y2;
-int horiz;
+static void
+roguejoin(int x1, int y1, int x2, int y2, int horiz)
 {
     int x, y, middle;
     if (horiz) {
@@ -58,12 +55,10 @@ int horiz;
     }
 }
 
-STATIC_OVL
-void
-roguecorr(x, y, dir)
-int x, y, dir;
+static void
+roguecorr(coordxy x, coordxy y, int dir)
 {
-    register int fromx, fromy, tox, toy;
+    int fromx, fromy, tox, toy;
 
     if (dir==DOWN) {
         r[x][y].doortable &= ~DOWN;
@@ -157,12 +152,10 @@ int x, y, dir;
 }
 
 /* Modified walkfrom() from mkmaze.c */
-STATIC_OVL
-void
-miniwalk(x, y)
-int x, y;
+static void
+miniwalk(coordxy x, coordxy y)
 {
-    register int q, dir;
+    int q, dir;
     int dirs[4];
 
     while(1) {
@@ -208,8 +201,8 @@ int x, y;
 }
 
 void
-makeroguerooms() {
-    register int x, y;
+makeroguerooms(void) {
+    int x, y;
     /* Rogue levels are structured 3 by 3, with each section containing
      * a room or an intersection.  The minimum width is 2 each way.
      * One difference between these and "real" Rogue levels: real Rogue
@@ -292,16 +285,15 @@ makeroguerooms() {
 }
 
 void
-corr(x, y)
-int x, y;
+corr(coordxy x, coordxy y)
 {
     levl[x][y].typ = CORR;
 }
 
 void
-makerogueghost()
+makerogueghost(void)
 {
-    register struct monst *ghost;
+    struct monst *ghost;
     struct obj *ghostobj;
     struct mkroom *croom;
     int x, y;

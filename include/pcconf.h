@@ -243,15 +243,6 @@
 # endif
 #endif
 
-#if defined(FUNCTION_LEVEL_LINKING)
-#define OVERLAY
-#define OVL0
-#define OVL1
-#define OVL2
-#define OVL3
-#define OVLB
-#endif
-
 #if defined(OVERLAY) && !defined(MOVERLAY) && !defined(VROOMM) && !defined(FUNCTION_LEVEL_LINKING)
 #define USE_TRAMPOLI
 #endif

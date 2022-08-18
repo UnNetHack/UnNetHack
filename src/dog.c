@@ -3,11 +3,10 @@
 
 #include "hack.h"
 
-STATIC_DCL int NDECL(pet_type);
+static int pet_type(void);
 
 void
-newedog(mtmp)
-struct monst *mtmp;
+newedog(struct monst *mtmp)
 {
     if (!mtmp->mextra) {
         mtmp->mextra = newmextra();
@@ -19,8 +18,7 @@ struct monst *mtmp;
 }
 
 void
-free_edog(mtmp)
-struct monst *mtmp;
+free_edog(struct monst *mtmp)
 {
     if (mtmp->mextra && EDOG(mtmp)) {
         free((genericptr_t) EDOG(mtmp));
@@ -30,8 +28,7 @@ struct monst *mtmp;
 }
 
 void
-initedog(mtmp)
-register struct monst *mtmp;
+initedog(struct monst *mtmp)
 {
     mtmp->mtame = is_domestic(mtmp->data) ? 10 : 5;
     mtmp->mpeaceful = 1;
@@ -52,8 +49,8 @@ register struct monst *mtmp;
     EDOG(mtmp)->killed_by_u = 0;
 }
 
-STATIC_OVL int
-pet_type()
+static int
+pet_type(void)
 {
     if (urole.petnum != NON_PM)
         return (urole.petnum);
@@ -77,10 +74,7 @@ pet_type()
 }
 
 struct monst *
-make_familiar(otmp, x, y, quietly)
-register struct obj *otmp;
-xchar x, y;
-boolean quietly;
+make_familiar(struct obj *otmp, coordxy x, coordxy y, boolean quietly)
 {
     struct permonst *pm;
     struct monst *mtmp = 0;
@@ -162,10 +156,10 @@ boolean quietly;
 }
 
 struct monst *
-makedog()
+makedog(void)
 {
-    register struct monst *mtmp;
-    register struct obj *otmp;
+    struct monst *mtmp;
+    struct obj *otmp;
     const char *petname;
     int pettype;
     static int petname_used = 0;
@@ -248,7 +242,7 @@ makedog()
 /* record `last move time' for all monsters prior to level save so that
    mon_arrive() can catch up for lost time when they're restored later */
 void
-update_mlstmv()
+update_mlstmv(void)
 {
     struct monst *mon;
 
@@ -263,7 +257,7 @@ update_mlstmv()
 }
 
 void
-losedogs()
+losedogs(void)
 {
     struct monst *mtmp, *mtmp0, *mtmp2;
     int dismissKops = 0;
@@ -346,12 +340,11 @@ losedogs()
 
 /* called from resurrect() in addition to losedogs() */
 void
-mon_arrive(mtmp, with_you)
-struct monst *mtmp;
-boolean with_you;
+mon_arrive(struct monst *mtmp, boolean with_you)
 {
     struct trap *t;
-    xchar xlocale, ylocale, xyloc, xyflags, wander;
+    coordxy xlocale, ylocale, xyloc, xyflags;
+    xint16 wander;
     int num_segs;
     boolean failed_to_place = FALSE;
 
@@ -414,7 +407,7 @@ boolean with_you;
         mtmp->mlstmv = monstermoves - 1L;
 
         /* let monster move a bit on new level (see placement code below) */
-        wander = (xchar) min(nmv, 8);
+        wander = (xint16) min(nmv, 8);
     } else {
         wander = 0;
     }
@@ -515,9 +508,9 @@ boolean with_you;
 
 /* heal monster for time spent elsewhere */
 void
-mon_catchup_elapsed_time(mtmp, nmv)
-struct monst *mtmp;
-long nmv;       /* number of moves */
+mon_catchup_elapsed_time(
+    struct monst *mtmp,
+    long int nmv) /**< number of moves */
 {
     int imv = 0;    /* avoid zillions of casts and lint warnings */
 
@@ -619,11 +612,10 @@ long nmv;       /* number of moves */
 
 /* called when you move to another level */
 void
-keepdogs(pets_only)
-boolean pets_only;  /* true for ascension or final escape */
+keepdogs(boolean pets_only) /**< TRUE for ascension or final escape */
 {
-    register struct monst *mtmp, *mtmp2;
-    register struct obj *obj;
+    struct monst *mtmp, *mtmp2;
+    struct obj *obj;
     int num_segs;
     boolean stay_behind;
 #ifdef BLACKMARKET
@@ -708,7 +700,7 @@ boolean pets_only;  /* true for ascension or final escape */
                 set_residency(mtmp, TRUE);
 
             if (mtmp->wormno) {
-                register int cnt;
+                int cnt;
                 /* NOTE: worm is truncated to # segs = max wormno size */
                 cnt = count_wsegs(mtmp);
                 num_segs = min(cnt, MAX_NUM_WORMS - 1);
@@ -745,15 +737,15 @@ boolean pets_only;  /* true for ascension or final escape */
 }
 
 void
-migrate_to_level(mtmp, tolev, xyloc, cc)
-register struct monst *mtmp;
-xchar tolev; /* destination level */
-xchar xyloc; /* MIGR_xxx destination xy location: */
-coord *cc;   /* optional destination coordinates */
+migrate_to_level(
+    struct monst *mtmp,
+    xint16 tolev, /**< destination level */
+    xint16 xyloc, /**< MIGR_xxx destination xy location: */
+    coord *cc)   /**< optional destination coordinates */
 {
     struct obj *obj;
     d_level new_lev;
-    xchar xyflags;
+    coordxy xyflags;
     int num_segs = 0;   /* count of worm segments */
 
     if (mtmp->isshk)
@@ -782,8 +774,8 @@ coord *cc;   /* optional destination coordinates */
     }
     relmon(mtmp, &migrating_mons); /* move it from map to migrating_mons */
 
-    new_lev.dnum = ledger_to_dnum((xchar)tolev);
-    new_lev.dlevel = ledger_to_dlev((xchar)tolev);
+    new_lev.dnum = ledger_to_dnum((xint16)tolev);
+    new_lev.dlevel = ledger_to_dlev((xint16)tolev);
     /* overload mtmp->[mx,my], mtmp->[mux,muy], and mtmp->mtrack[] as */
     /* destination codes (setup flag bits before altering mx or my) */
     xyflags = (depth(&new_lev) < depth(&u.uz)); /* 1 => up */
@@ -807,9 +799,7 @@ coord *cc;   /* optional destination coordinates */
 /* return quality of food; the lower the better */
 /* fungi will eat even tainted food */
 int
-dogfood(mon, obj)
-struct monst *mon;
-register struct obj *obj;
+dogfood(struct monst *mon, struct obj *obj)
 {
     struct permonst *mptr = mon->data, *fptr = 0;
     boolean carni = carnivorous(mptr);
@@ -958,9 +948,7 @@ register struct obj *obj;
  * succeeded.
  */
 boolean
-tamedog(mtmp, obj)
-struct monst *mtmp;
-struct obj *obj;
+tamedog(struct monst *mtmp, struct obj *obj)
 {
     /* The Wiz, Medusa and the quest nemeses aren't even made peaceful. */
     if (mtmp->iswiz || mtmp->data == &mons[PM_MEDUSA]
@@ -1076,9 +1064,7 @@ struct obj *obj;
  * If the pet wasn't abused and was very tame, it might revive tame.
  */
 void
-wary_dog(mtmp, was_dead)
-struct monst *mtmp;
-boolean was_dead;
+wary_dog(struct monst *mtmp, boolean was_dead)
 {
     struct edog *edog;
     boolean quietly = was_dead;
@@ -1156,8 +1142,7 @@ boolean was_dead;
 }
 
 void
-abuse_dog(mtmp)
-struct monst *mtmp;
+abuse_dog(struct monst *mtmp)
 {
     if (!mtmp->mtame) {
         return;

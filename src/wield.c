@@ -50,8 +50,8 @@
  * No item may be in more than one of these slots.
  */
 
-static boolean FDECL(cant_wield_corpse, (struct obj *));
-STATIC_DCL int FDECL(ready_weapon, (struct obj *));
+static boolean cant_wield_corpse(struct obj *);
+static int ready_weapon(struct obj *);
 
 static int wield(boolean prompt_for_obj);
 
@@ -84,8 +84,7 @@ static int wield(boolean prompt_for_obj);
  * to print the appropriate messages.
  */
 void
-setuwep(obj)
-register struct obj *obj;
+setuwep(struct obj *obj)
 {
     struct obj *olduwep = uwep;
     int oldcon = acurr(A_CON);
@@ -143,8 +142,7 @@ register struct obj *obj;
 }
 
 static boolean
-cant_wield_corpse(obj)
-struct obj *obj;
+cant_wield_corpse(struct obj *obj)
 {
     char kbuf[BUFSZ];
 
@@ -162,9 +160,8 @@ struct obj *obj;
     return TRUE;
 }
 
-STATIC_OVL int
-ready_weapon(wep)
-struct obj *wep;
+static int
+ready_weapon(struct obj *wep)
 {
     /* Separated function so swapping works easily */
     int res = 0;
@@ -257,15 +254,13 @@ struct obj *wep;
 }
 
 void
-setuqwep(obj)
-register struct obj *obj;
+setuqwep(struct obj *obj)
 {
     setworn(obj, W_QUIVER);
 }
 
 void
-setuswapwep(obj)
-register struct obj *obj;
+setuswapwep(struct obj *obj)
 {
     if (obj) {
         obj->quiver_priority = 0;
@@ -287,24 +282,23 @@ static NEARDATA const char bullets[] = { /* (note: different from dothrow.c) */
 
 /** Unwield a weapon. */
 int
-dounwield()
+dounwield(void)
 {
     return wield(FALSE);
 }
 
 /** Wield an item as weapon. */
 int
-dowield()
+dowield(void)
 {
     return wield(TRUE);
 }
 
 /* Main method for wielding and unwielding. */
 static int
-wield(prompt_for_obj)
-boolean prompt_for_obj;
+wield(boolean prompt_for_obj)
 {
-    register struct obj *wep=&zeroobj, *oldwep;
+    struct obj *wep=&zeroobj, *oldwep;
     int result;
 
     /* May we attempt this? */
@@ -356,9 +350,9 @@ boolean prompt_for_obj;
 }
 
 int
-doswapweapon()
+doswapweapon(void)
 {
-    register struct obj *oldwep, *oldswap;
+    struct obj *oldwep, *oldswap;
     int result = 0;
 
     /* May we attempt this? */
@@ -399,7 +393,7 @@ doswapweapon()
 }
 
 int
-dowieldquiver()
+dowieldquiver(void)
 {
     struct obj *newquiver;
     struct obj *oldquiver = uquiver;
@@ -474,9 +468,9 @@ dowieldquiver()
 /* used for #rub and for applying pick-axe, whip, grappling hook, or polearm */
 /* (moved from apply.c) */
 boolean
-wield_tool(obj, verb)
-struct obj *obj;
-const char *verb;   /* "rub",&c */
+wield_tool(
+    struct obj *obj,
+    const char *verb) /**< "rub",&c */
 {
     const char *what;
     boolean more_than_1;
@@ -547,7 +541,7 @@ const char *verb;   /* "rub",&c */
 }
 
 int
-can_twoweapon()
+can_twoweapon(void)
 {
     struct obj *otmp;
 
@@ -606,7 +600,7 @@ can_twoweapon()
 }
 
 void
-drop_uswapwep()
+drop_uswapwep(void)
 {
     char str[BUFSZ];
     struct obj *obj = uswapwep;
@@ -618,7 +612,7 @@ drop_uswapwep()
 }
 
 int
-dotwoweapon()
+dotwoweapon(void)
 {
     /* You can always toggle it off */
     if (u.twoweap) {
@@ -646,7 +640,7 @@ dotwoweapon()
  * 2.  Making an item disappear for a bones pile.
  */
 void
-uwepgone()
+uwepgone(void)
 {
     if (uwep) {
         if (artifact_light(uwep) && uwep->lamplit) {
@@ -662,7 +656,7 @@ uwepgone()
 }
 
 void
-uswapwepgone()
+uswapwepgone(void)
 {
     if (uswapwep) {
         setworn((struct obj *)0, W_SWAPWEP);
@@ -671,7 +665,7 @@ uswapwepgone()
 }
 
 void
-uqwepgone()
+uqwepgone(void)
 {
     if (uquiver) {
         setworn((struct obj *)0, W_QUIVER);
@@ -680,7 +674,7 @@ uqwepgone()
 }
 
 void
-untwoweapon()
+untwoweapon(void)
 {
     if (u.twoweap) {
         You("can no longer use two weapons at once.");
@@ -691,9 +685,7 @@ untwoweapon()
 }
 
 int
-chwepon(otmp, amount)
-register struct obj *otmp;
-register int amount;
+chwepon(struct obj *otmp, int amount)
 {
     const char *color = hcolor((amount < 0) ? NH_BLACK : NH_BLUE);
     const char *xtime;
@@ -836,8 +828,7 @@ register int amount;
 }
 
 int
-welded(obj)
-register struct obj *obj;
+welded(struct obj *obj)
 {
     if (obj && obj == uwep && will_weld(obj)) {
         set_bknown(obj, 1);
@@ -847,8 +838,7 @@ register struct obj *obj;
 }
 
 void
-weldmsg(obj)
-register struct obj *obj;
+weldmsg(struct obj *obj)
 {
     long savewornmask;
 
@@ -861,8 +851,7 @@ register struct obj *obj;
 
 /** test whether monster's wielded weapon is stuck to hand/paw/whatever */
 boolean
-mwelded(obj)
-struct obj *obj;
+mwelded(struct obj *obj)
 {
     /* caller is responsible for making sure this is a monster's item */
     if (obj && (obj->owornmask & W_WEP) && will_weld(obj)) {
@@ -873,7 +862,7 @@ struct obj *obj;
 
 /** Unwields all weapons silently. */
 void
-unwield_weapons_silently()
+unwield_weapons_silently(void)
 {
     setuwep((struct obj *) 0);
     setuswapwep((struct obj *) 0);

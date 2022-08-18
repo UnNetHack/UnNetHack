@@ -26,12 +26,12 @@ static int expl[3][3] = {
  *      that Half_physical_damage only affects the damage applied to the hero.
  */
 void
-explode(x, y, type, dam, olet, expltype)
-int x, y;
-int type; /* the same as in zap.c; passes -(wand typ) for some WAND_CLASS */
-int dam;
-char olet;
-int expltype;
+explode(coordxy x, coordxy y, int type, int dam, char olet, int expltype)
+
+          /* the same as in zap.c; passes -(wand typ) for some WAND_CLASS */
+
+
+
 {
     int i, j, k, damu = dam;
     boolean starting = 1;
@@ -318,7 +318,7 @@ int expltype;
                 }
                 idamres = idamnonres = 0;
                 if (type >= 0 && !u.uswallow) {
-                    (void)zap_over_floor((xchar)(i+x-1), (xchar)(j+y-1),
+                    (void)zap_over_floor((coordxy)(i+x-1), (coordxy)(j+y-1),
                                          type, &shopdamage, exploding_wand_typ);
                 }
 
@@ -554,8 +554,8 @@ int expltype;
 struct scatter_chain {
     struct scatter_chain *next; /* pointer to next scatter item */
     struct obj *obj;            /* pointer to the object        */
-    xchar ox;                   /* location of                  */
-    xchar oy;                   /*      item                    */
+    coordxy ox;                   /* location of                  */
+    coordxy oy;                   /*      item                    */
     schar dx;                   /* direction of                 */
     schar dy;                   /*      travel                  */
     int range;                  /* range of object              */
@@ -574,14 +574,13 @@ struct scatter_chain {
 
 /* returns number of scattered objects */
 long
-scatter(sx, sy, blastforce, scflags, obj)
-int sx, sy;           /* location of objects to scatter */
-int blastforce;       /* force behind the scattering    */
-unsigned int scflags;
-struct obj *obj;      /* only scatter this obj          */
+scatter(int sx, int sy,  /**< location of objects to scatter */
+        int blastforce,  /**< force behind the scattering */
+        unsigned int scflags,
+        struct obj *obj) /**< only scatter this obj        */
 {
-    register struct obj *otmp;
-    register int tmp;
+    struct obj *otmp;
+    int tmp;
     int farthest = 0;
     uchar typ;
     long qtmp;
@@ -653,7 +652,9 @@ struct obj *obj;      /* only scatter this obj          */
         } else if ((scflags & MAY_DESTROY) && (!rn2(10)
                                                || (objects[otmp->otyp].oc_material == GLASS
                                                    || otmp->otyp == EGG))) {
-            if (breaks(otmp, (xchar)sx, (xchar)sy)) used_up = TRUE;
+            if (breaks(otmp, (coordxy)sx, (coordxy)sy)) {
+                used_up = TRUE;
+            }
         }
 
         if (!used_up) {
@@ -769,9 +770,7 @@ struct obj *obj;      /* only scatter this obj          */
  * For now, just perform a "regular" explosion.
  */
 void
-splatter_burning_oil(x, y, diluted_oil)
-int x, y;
-boolean diluted_oil;
+splatter_burning_oil(coordxy x, coordxy y, boolean diluted_oil)
 {
     int dmg = d(diluted_oil ? 3 : 4, 4);
 
@@ -783,9 +782,7 @@ boolean diluted_oil;
 /* lit potion of oil is exploding; extinguish it as a light source before
    possibly killing the hero and attempting to save bones */
 void
-explode_oil(obj, x, y)
-struct obj *obj;
-int x, y;
+explode_oil(struct obj *obj, coordxy x, coordxy y)
 {
     boolean diluted_oil = obj->odiluted;
 

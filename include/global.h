@@ -81,13 +81,25 @@
 #endif  /* DUMB */
 
 /*
- * type xchar: small integers in the range 0 - 127, usually coordinates
- * although they are nonnegative they must not be declared unsigned
- * since otherwise comparisons with signed quantities are done incorrectly
+ * type xint8: small integers (typedef'd as signed,
+ * in the range -127 - 127).
  */
-typedef schar xchar;
+typedef int8_t xint8;
+/*
+ * type coordxy: integers (typedef'd as signed,
+ * in the range -32768 to 32767), mostly coordinates.
+ * Note that in 2022, screen coordinates easily
+ * surpass an upper limit of 127.
+ */
+typedef int16_t coordxy;
+/*
+ * type xint16: integers (typedef'd as signed,
+ * in the range -32768 to 32767), non-coordinates.
+ */
+typedef int16_t xint16;
+
 #ifndef SKIP_BOOLEAN
-typedef xchar boolean;          /* 0 or 1 */
+typedef coordxy boolean;          /* 0 or 1 */
 #endif
 
 #ifndef TRUE        /* defined in some systems' native include files */
@@ -125,30 +137,7 @@ typedef glyph_t nhsym;
 #define Bitfield(x, n)   uchar x
 #endif
 
-#ifdef UNWIDENED_PROTOTYPES
-# define CHAR_P char
-# define SCHAR_P schar
-# define UCHAR_P uchar
-# define XCHAR_P xchar
-# define SHORT_P short
-#ifndef SKIP_BOOLEAN
-# define BOOLEAN_P boolean
-#endif
-# define ALIGNTYP_P aligntyp
-#else
-# ifdef WIDENED_PROTOTYPES
-#  define CHAR_P int
-#  define SCHAR_P int
-#  define UCHAR_P int
-#  define XCHAR_P int
-#  define SHORT_P int
-#  define BOOLEAN_P int
-#  define ALIGNTYP_P int
-# endif
-#endif
-
 #define SIZE(x) (int)(sizeof(x) / sizeof(x[0]))
-
 
 /* A limit for some NetHack int variables.  It need not, and for comparable
  * scoring should not, depend on the actual limit on integers for a
@@ -157,11 +146,9 @@ typedef glyph_t nhsym;
  */
 #define LARGEST_INT 32767
 
-
 #ifdef REDO
 #define Getchar pgetchar
 #endif
-
 
 #include "coord.h"
 /*
@@ -341,9 +328,9 @@ typedef glyph_t nhsym;
 
 /* primitive memory leak debugging; see alloc.c */
 #ifdef MONITOR_HEAP
-extern long *FDECL(nhalloc, (unsigned int, const char *, int));
-extern void FDECL(nhfree, (genericptr_t, const char *, int));
-extern char *FDECL(nhdupstr, (const char *, const char *, int));
+extern long *nhalloc(unsigned int, const char *, int);
+extern void nhfree(genericptr_t, const char *, int);
+extern char *nhdupstr(const char *, const char *, int);
 # ifndef __FILE__
 #  define __FILE__ ""
 # endif
@@ -354,8 +341,8 @@ extern char *FDECL(nhdupstr, (const char *, const char *, int));
 # define free(a) nhfree(a, __FILE__, (int)__LINE__)
 # define dupstr(s) nhdupstr(s, __FILE__, (int) __LINE__)
 #else   /* !MONITOR_HEAP */
-extern long *FDECL(alloc, (unsigned int));      /* alloc.c */
-extern char *FDECL(dupstr, (const char *)); /* ditto */
+extern long *alloc(unsigned int);      /* alloc.c */
+extern char *dupstr(const char *); /* ditto */
 #endif
 
 /* Used for consistency checks of various data files; declare it here so

@@ -1088,11 +1088,11 @@ NEARDATA struct objclass objects[] = {
 #  define OBJECTS_PASS_2_
 #include "objects.c"
 
-void NDECL(objects_init);
+void objects_init(void);
 
 /* dummy routine used to force linkage */
 void
-objects_init()
+objects_init(void)
 {
     return;
 }

@@ -13,19 +13,15 @@
 #include "wintty.h"
 #include "func_tab.h"
 
-#ifdef OVL1
 char morc = 0;  /* tell the outside world what char you chose */
-#endif /* OVL1 */
-STATIC_DCL boolean FDECL(ext_cmd_getlin_hook, (char *));
+static boolean ext_cmd_getlin_hook(char *);
 
-typedef boolean FDECL ((*getlin_hook_proc), (char *));
+typedef boolean (*getlin_hook_proc)(char *);
 
-STATIC_DCL void FDECL(hooked_tty_getlin, (const char*, char*, getlin_hook_proc));
-extern int NDECL(extcmd_via_menu);  /* cmd.c */
+static void hooked_tty_getlin(const char*, char*, getlin_hook_proc);
+extern int extcmd_via_menu(void); /* cmd.c */
 
-extern char erase_char, kill_char;  /* from appropriate tty.c file */
-
-#ifdef OVL1
+extern char erase_char, kill_char; /* from appropriate tty.c file */
 
 /*
  * Read a line closed with '\n' into the array char bufp[BUFSZ].
@@ -34,21 +30,16 @@ extern char erase_char, kill_char;  /* from appropriate tty.c file */
  * resulting string is "\033".
  */
 void
-tty_getlin(query, bufp)
-const char *query;
-register char *bufp;
+tty_getlin(const char *query, char *bufp)
 {
     hooked_tty_getlin(query, bufp, (getlin_hook_proc) 0);
 }
 
-STATIC_OVL void
-hooked_tty_getlin(query, bufp, hook)
-const char *query;
-register char *bufp;
-getlin_hook_proc hook;
+static void
+hooked_tty_getlin(const char *query, char *bufp, getlin_hook_proc hook)
 {
-    register char *obufp = bufp;
-    register int c;
+    char *obufp = bufp;
+    int c;
     struct WinDesc *cw = wins[WIN_MESSAGE];
     boolean doprev = 0;
 
@@ -189,10 +180,9 @@ getlin_hook_proc hook;
 }
 
 void
-xwaitforspace(s)
-register const char *s; /* chars allowed besides return */
+xwaitforspace(const char *s) /**< chars allowed besides return */
 {
-    register int c, x = ttyDisplay ? (int) ttyDisplay->dismiss_more : '\n';
+    int c, x = ttyDisplay ? (int) ttyDisplay->dismiss_more : '\n';
 
     morc = 0;
 
@@ -209,9 +199,6 @@ register const char *s; /* chars allowed besides return */
 
 }
 
-#endif /* OVL1 */
-#ifdef OVL2
-
 /*
  * Implement extended command completion by using this hook into
  * tty_getlin.  Check the characters already typed, if they uniquely
@@ -224,9 +211,8 @@ register const char *s; /* chars allowed besides return */
  *  + we don't change the characters that are already in base
  *  + base has enough room to hold our string
  */
-STATIC_OVL boolean
-ext_cmd_getlin_hook(base)
-char *base;
+static boolean
+ext_cmd_getlin_hook(char *base)
 {
     int oindex, com_index;
 
@@ -260,7 +246,7 @@ char *base;
  * stop when we have found enough characters to make a unique command.
  */
 int
-tty_get_ext_cmd()
+tty_get_ext_cmd(void)
 {
     int i;
     char buf[BUFSZ];
@@ -296,8 +282,6 @@ tty_get_ext_cmd()
 
     return i;
 }
-
-#endif /* OVL2 */
 
 #endif /* TTY_GRAPHICS */
 

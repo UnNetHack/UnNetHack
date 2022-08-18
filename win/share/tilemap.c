@@ -11,16 +11,16 @@
 
 #define Fprintf (void) fprintf
 
-const char * FDECL(tilename, (int, int));
-void NDECL(init_tilemap);
-void FDECL(process_substitutions, (FILE *));
-boolean FDECL(acceptable_tilename, (int, const char *, const char *));
+const char * tilename(int, int);
+void init_tilemap(void);
+void process_substitutions(FILE *);
+boolean acceptable_tilename(int, const char *, const char *);
 static int include_obj_class = 0;
 
 #if defined(MICRO) || defined(WIN32)
 #undef exit
 #if !defined(MSDOS) && !defined(WIN32)
-extern void FDECL(exit, (int));
+extern void exit(int);
 #endif
 #endif
 
@@ -337,7 +337,7 @@ int lastmontile, lastobjtile, lastothtile, laststatuetile;
  * introduced in 3.3.1.
  */
 void
-init_tilemap()
+init_tilemap(void)
 {
     int i, j, condnum, tilenum;
     int corpsetile, swallowbase;
@@ -470,8 +470,7 @@ const char *prolog[] = {
     "",
     "",
     "void",
-    "substitute_tiles(plev)",
-    "d_level *plev;",
+    "substitute_tiles(d_level *plev)",
     "{",
     "\tint i;",
     ""
@@ -483,8 +482,7 @@ const char *epilog[] = {
 
 /* write out the substitutions in an easily-used form. */
 void
-process_substitutions(ofp)
-FILE *ofp;
+process_substitutions(FILE *ofp)
 {
     int i, j, k, span, start;
 
@@ -556,7 +554,7 @@ FILE *ofp;
     fprintf(ofp, "\nint total_tiles_used = %d;\n", start);
 }
 
-int main()
+int main(void)
 {
     register int i;
     char filename[30];
@@ -706,9 +704,7 @@ struct {
 };
 
 boolean
-acceptable_tilename(idx, encountered, expected)
-int idx;
-const char *encountered, *expected;
+acceptable_tilename(int idx, const char *encountered, const char *expected)
 {
     if (idx >= 0 && idx < SIZE(altlabels)) {
         if (!strcmp(altlabels[idx].expectedlabel, expected)) {

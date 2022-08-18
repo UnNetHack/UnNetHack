@@ -6,7 +6,7 @@
 
 static boolean no_repeat = FALSE;
 
-static char *FDECL(You_buf, (int));
+static char *You_buf(int);
 
 #if defined(DUMP_LOG) && defined(DUMPMSGS)
 char msgs[DUMPMSGS][BUFSZ];
@@ -15,9 +15,7 @@ int lastmsg = -1;
 #endif
 
 void
-msgpline_add(typ, pattern)
-int typ;
-char *pattern;
+msgpline_add(int typ, char *pattern)
 {
     struct _plinemsg *tmp = (struct _plinemsg *) alloc(sizeof(struct _plinemsg));
     if (!tmp) return;
@@ -28,7 +26,7 @@ char *pattern;
 }
 
 void
-msgpline_free()
+msgpline_free(void)
 {
     struct _plinemsg *tmp = pline_msg;
     struct _plinemsg *tmp2;
@@ -42,8 +40,7 @@ msgpline_free()
 }
 
 int
-msgpline_type(msg)
-char *msg;
+msgpline_type(char *msg)
 {
     struct _plinemsg *tmp = pline_msg;
     while (tmp) {
@@ -77,7 +74,7 @@ putmesg(const char *line)
  */
 
 #if defined(USE_STDARG) || defined(USE_VARARGS)
-static void FDECL(vpline, (const char *, va_list));
+static void vpline(const char *, va_list);
 
 void
 pline VA_DECL(const char *, line)
@@ -186,8 +183,7 @@ static char *you_buf = 0;
 static int you_buf_siz = 0;
 
 static char *
-You_buf(siz)
-int siz;
+You_buf(int siz)
 {
     if (siz > you_buf_siz) {
         if (you_buf) free((genericptr_t) you_buf);
@@ -198,7 +194,7 @@ int siz;
 }
 
 void
-free_youbuf()
+free_youbuf(void)
 {
     if (you_buf) free((genericptr_t) you_buf),  you_buf = (char *)0;
     you_buf_siz = 0;
@@ -336,7 +332,7 @@ verbalize VA_DECL(const char *, line)
  */
 
 #if defined(USE_STDARG) || defined(USE_VARARGS)
-static void FDECL(vraw_printf, (const char *, va_list));
+static void vraw_printf(const char *, va_list);
 
 void
 raw_printf VA_DECL(const char *, line)
@@ -424,8 +420,7 @@ warning VA_DECL(const char *, s)
 }
 
 const char *
-align_str(alignment)
-aligntyp alignment;
+align_str(aligntyp alignment)
 {
     switch ((int)alignment) {
     case A_CHAOTIC: return "chaotic";
@@ -438,8 +433,7 @@ aligntyp alignment;
 
 /* stethoscope or probing applied to monster -- one-line feedback */
 void
-mstatusline(mtmp)
-struct monst *mtmp;
+mstatusline(struct monst *mtmp)
 {
     aligntyp alignment = mon_aligntyp(mtmp);
     char info[BUFSZ], monnambuf[BUFSZ];
@@ -551,7 +545,7 @@ struct monst *mtmp;
 
 /* stethoscope or probing applied to hero -- one-line feedback */
 void
-ustatusline()
+ustatusline(void)
 {
     char info[BUFSZ];
 
@@ -616,7 +610,7 @@ ustatusline()
 }
 
 void
-self_invis_message()
+self_invis_message(void)
 {
     pline("%s %s.",
           Hallucination ? "Far out, man!  You" : "Gee!  All of a sudden, you",

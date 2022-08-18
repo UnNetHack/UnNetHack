@@ -12,7 +12,7 @@
 #endif
 
 void
-early_init()
+early_init(void)
 {
 #if 0
     decl_globals_init();
@@ -23,9 +23,9 @@ early_init()
 }
 
 #ifdef POSITIONBAR
-STATIC_DCL void NDECL(do_positionbar);
+static void do_positionbar();
 #endif
-STATIC_DCL void FDECL(interrupt_multi, (const char *, int, int));
+static void interrupt_multi(const char *, int, int);
 
 static int prev_hp_notify;
 enum monster_generation monclock;
@@ -106,7 +106,7 @@ hpnotify_format_str(char *str)
  * It is also not possible to hold artifacts as secondary weapons.
  */
 boolean
-can_regenerate()
+can_regenerate(void)
 {
     if (marathon_mode) {
         return 0;
@@ -140,8 +140,7 @@ can_regenerate()
 }
 
 void
-moveloop(resuming)
-boolean resuming;
+moveloop(boolean resuming)
 {
 #if defined(MICRO) || defined(WIN32)
     char ch;
@@ -416,7 +415,7 @@ boolean resuming;
 
                     if(!u.uinvulnerable) {
                         if(Teleportation && !rn2(85)) {
-                            xchar old_ux = u.ux, old_uy = u.uy;
+                            coordxy old_ux = u.ux, old_uy = u.uy;
                             tele();
                             if (u.ux != old_ux || u.uy != old_uy) {
                                 if (!next_to_u()) {
@@ -665,7 +664,7 @@ boolean resuming;
 }
 
 void
-stop_occupation()
+stop_occupation(void)
 {
     if(occupation) {
         if (!maybe_finished_meal(TRUE))
@@ -683,7 +682,7 @@ stop_occupation()
 }
 
 void
-display_gamewindows()
+display_gamewindows(void)
 {
     curses_stupid_hack = 0;
     WIN_MESSAGE = create_nhwindow(NHW_MESSAGE);
@@ -714,7 +713,7 @@ display_gamewindows()
 
 static
 void
-init_level_seeds()
+init_level_seeds(void)
 {
     int i;
     if (is_game_pre_seeded) {
@@ -729,7 +728,7 @@ init_level_seeds()
 
 
 void
-newgame()
+newgame(void)
 {
     int i;
 
@@ -816,8 +815,7 @@ newgame()
 
 /* show "welcome [back] to unnethack" message at program startup */
 void
-welcome(new_game)
-boolean new_game;   /* false => restoring an old game */
+welcome(boolean new_game) /**< FALSE => restoring an old game */
 {
     char buf[BUFSZ];
     boolean currentgend = Upolyd ? u.mfemale : flags.female;
@@ -858,7 +856,7 @@ boolean new_game;   /* false => restoring an old game */
 }
 
 #ifdef POSITIONBAR
-STATIC_DCL void
+static void
 do_positionbar()
 {
     static char pbar[COLNO];
@@ -934,12 +932,8 @@ get_realtime(void)
 #endif /* REALTIME_ON_BOTL || RECORD_REALTIME */
 
 /** Interrupt a multiturn action if current_points is equal to max_points. */
-STATIC_DCL
-void
-interrupt_multi(points, current_points, max_points)
-const char *points;
-int current_points;
-int max_points;
+static void
+interrupt_multi(const char *points, int current_points, int max_points)
 {
     if (multi > 0 &&
         current_points == max_points) {

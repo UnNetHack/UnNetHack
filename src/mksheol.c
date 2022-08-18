@@ -46,9 +46,9 @@ static schar opentyps[10] = { ICEWALL,
 
 static void init_level_base_voronoi(schar* vtyps, int numtyps, int numpoints);
 static int check_voronoi_winner(patchcoord* coords, int num_coords,
-                                int x, int y);
+                                coordxy x, coordxy y);
 static void carve_path(floorprob* probs);
-static void fuzzy_circle(int x, int y,
+static void fuzzy_circle(coordxy x, coordxy y,
                          int guaranteed_passage_radius, int fallout,
                          floorprob* floorprobs);
 static void wallify_map(void);
@@ -73,8 +73,7 @@ static void place_clouds(void);
 static void shake_position(int* x, int* y);
 
 void
-mksheol(init_lev_par)
-void *init_lev_par;
+mksheol(void *init_lev_par)
 {
     lev_init* init_lev = (lev_init*) init_lev_par;
 
@@ -189,10 +188,7 @@ init_level_base_voronoi(schar* vtyps, int numtyps, int numpoints)
 }
 
 static int
-check_voronoi_winner(coords, num_coords, x, y)
-patchcoord* coords;
-int num_coords;
-int x, y;
+check_voronoi_winner(patchcoord *coords, int num_coords, coordxy x, coordxy y)
 {
     int i1;
     int winner = 0, winner_distance;
@@ -218,8 +214,7 @@ typedef struct sbezcoord
 } bezcoord;
 
 static void
-carve_path(floorprobs)
-floorprob* floorprobs;
+carve_path(floorprob *floorprobs)
 {
     /*
      * We'll draw a bezier curve from the left of the level to the right.
@@ -330,10 +325,7 @@ floorprob* floorprobs;
  * After that, linearly makes it less likely that a passable square is
  * made. This makes a sort of "rough" edge. */
 static void
-fuzzy_circle(x, y, guaranteed_passage_radius, fallout, floorprobs)
-int x, y;
-int guaranteed_passage_radius, fallout;
-floorprob* floorprobs;
+fuzzy_circle(coordxy x, coordxy y, int guaranteed_passage_radius, int fallout, floorprob *floorprobs)
 {
     int i1, i2;
     int fallout_2 = fallout * fallout;
@@ -624,9 +616,7 @@ place_clouds(void) {
 }
 
 static void
-shake_position(x, y)
-int* x;
-int* y;
+shake_position(int *x, int *y)
 {
     int i1;
     int old_x, old_y;

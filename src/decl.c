@@ -3,8 +3,8 @@
 
 #include "hack.h"
 
-int NDECL((*afternmv));
-int NDECL((*occupation));
+int (*afternmv)(void);
+int (*occupation)(void);
 
 /* from xxxmain.c */
 const char *hname = 0;      /* name of the game (argv[0] of main) */
@@ -343,7 +343,7 @@ boolean curses_stupid_hack = 1;
 
 /* dummy routine used to force linkage */
 void
-decl_init()
+decl_init(void)
 {
     return;
 }

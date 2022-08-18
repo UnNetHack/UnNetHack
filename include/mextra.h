@@ -24,8 +24,8 @@
  *          function in an appropriate new or existing source file and add
  *          a prototype for it to include/extern.h.
  *
- *              void FDECL(newXX, (struct monst *));
- *              void FDECL(free_XX, (struct monst *));
+ *              void newXX(struct monst *);
+ *              void free_XX(struct monst *);
  *
  *              void
  *              newXX(mtmp)
@@ -67,16 +67,16 @@
 #define GD_DESTROYGOLD 0x02
 
 struct fakecorridor {
-    xchar fx, fy, ftyp;
+    coordxy fx, fy, ftyp;
 };
 
 struct egd {
     int fcbeg, fcend;     /* fcend: first unused pos */
     int vroom;            /* room number of the vault */
-    xchar gdx, gdy;       /* goal of guard's walk */
-    xchar ogx, ogy;       /* guard's last position */
+    coordxy gdx, gdy;       /* goal of guard's walk */
+    coordxy ogx, ogy;       /* guard's last position */
     d_level gdlevel;      /* level (& dungeon) guard was created in */
-    xchar warncnt;        /* number of warnings to follow */
+    xint16 warncnt;       /* number of warnings to follow */
     Bitfield(gddone, 1);  /* true iff guard has released player */
     Bitfield(witness, 2); /* the guard saw you do something */
     Bitfield(unused, 5);

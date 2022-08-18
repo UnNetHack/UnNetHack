@@ -3,11 +3,11 @@
 
 #include "hack.h"
 
-STATIC_DCL boolean FDECL(tele_jump_ok, (int, int, int, int));
-STATIC_DCL boolean FDECL(teleok, (int, int, BOOLEAN_P));
-STATIC_DCL void NDECL(vault_tele);
-STATIC_DCL boolean FDECL(rloc_pos_ok, (int, int, struct monst *));
-STATIC_DCL void FDECL(mvault_tele, (struct monst *));
+static boolean tele_jump_ok(coordxy, coordxy, coordxy, coordxy);
+static boolean teleok(coordxy, coordxy, boolean);
+static void vault_tele(void);
+static boolean rloc_pos_ok(coordxy, coordxy, struct monst *);
+static void mvault_tele(struct monst *);
 
 /* non-null when teleporting via having read this scroll */
 static struct obj *telescroll = 0;
@@ -21,10 +21,7 @@ static struct obj *telescroll = 0;
  * Returns: -1: Inaccessible, 0: Good pos, 1: Temporally inacessible
  */
 static int
-badpos(x, y, mtmp, gpflags)
-int x, y;
-struct monst *mtmp;
-unsigned gpflags;
+badpos(coordxy x, coordxy y, struct monst *mtmp, unsigned int gpflags)
 {
     int is_badpos = 0, pool;
     struct permonst *mdat = NULL;
@@ -99,10 +96,7 @@ unsigned gpflags;
  * call it to generate new monster positions with fake monster structures.
  */
 boolean
-goodpos(x, y, mtmp, gpflags)
-int x, y;
-struct monst *mtmp;
-unsigned gpflags;
+goodpos(coordxy x, coordxy y, struct monst *mtmp, unsigned int gpflags)
 {
     struct permonst *mdat = NULL;
     boolean ignorewater = ((gpflags & MM_IGNOREWATER) != 0);
@@ -199,31 +193,25 @@ unsigned gpflags;
  * Return TRUE and the position chosen when successful, FALSE otherwise.
  */
 boolean
-enexto(cc, xx, yy, mdat)
-coord *cc;
-register xchar xx, yy;
-struct permonst *mdat;
+enexto(coord *cc, coordxy xx, coordxy yy, struct permonst *mdat)
 {
     return enexto_core(cc, xx, yy, mdat, NO_MM_FLAGS);
 }
 
 boolean
-enexto_core(cc, xx, yy, mdat, entflags)
-coord *cc;
-xchar xx, yy;
-struct permonst *mdat;
-unsigned entflags;
+enexto_core(coord *cc, coordxy xx, coordxy yy, struct permonst *mdat, unsigned int entflags)
 {
     return enexto_core_range(cc, xx, yy, mdat, entflags, 1);
 }
 
 boolean
-enexto_core_range(cc, xx, yy, mdat, entflags, start_range)
-coord *cc;
-register xchar xx, yy;
-struct permonst *mdat;
-unsigned entflags;
-int start_range; /**< Distance of checked tiles to begin with. Should be >=1. */
+enexto_core_range(
+    coord *cc,
+    coordxy xx,
+    coordxy yy,
+    struct permonst *mdat,
+    unsigned int entflags,
+    int start_range) /**< Distance of checked tiles to begin with. Should be >=1. */
 {
 #define MAX_GOOD 15
     coord good[MAX_GOOD], *good_ptr;
@@ -345,11 +333,7 @@ coord epathto_debug_cc[100];
 #endif
 
 int
-epathto(cc, nc, xx, yy, mdat)
-coord *cc;
-int nc;
-register xchar xx, yy;
-struct permonst *mdat;
+epathto(coord *cc, int nc, coordxy xx, coordxy yy, struct permonst *mdat)
 {
     int i, j, dir, ndirs, xy, x, y, r;
     int path_len, postype;
@@ -461,9 +445,8 @@ struct permonst *mdat;
  * need to be augmented to allow deliberate passage in wizard mode, but
  * only for explicitly chosen destinations.)
  */
-STATIC_OVL boolean
-tele_jump_ok(x1, y1, x2, y2)
-int x1, y1, x2, y2;
+static boolean
+tele_jump_ok(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
 {
     if (!isok(x2, y2)) {
         return FALSE;
@@ -497,10 +480,8 @@ int x1, y1, x2, y2;
     return TRUE;
 }
 
-STATIC_OVL boolean
-teleok(x, y, trapok)
-register int x, y;
-boolean trapok;
+static boolean
+teleok(coordxy x, coordxy y, boolean trapok)
 {
     if (!trapok) {
         /* allow teleportation onto vibrating square, it's not a real trap */
@@ -517,9 +498,7 @@ boolean trapok;
 }
 
 void
-teleds(nux, nuy, allow_drag)
-register int nux, nuy;
-boolean allow_drag;
+teleds(coordxy nux, coordxy nuy, boolean allow_drag)
 {
     if (u.utraptype == TT_BURIEDBALL) {
         /* unearth it */
@@ -580,7 +559,7 @@ boolean allow_drag;
     if (ball_active) {
         if (ball_still_in_range || allow_drag) {
             int bc_control;
-            xchar ballx, bally, chainx, chainy;
+            coordxy ballx, bally, chainx, chainy;
             boolean cause_delay;
 
             if (drag_ball(nux, nuy, &bc_control, &ballx, &bally,
@@ -652,10 +631,9 @@ boolean allow_drag;
 }
 
 boolean
-safe_teleds(allow_drag)
-boolean allow_drag;
+safe_teleds(boolean allow_drag)
 {
-    register int nux, nuy, tcnt = 0;
+    int nux, nuy, tcnt = 0;
 
     do {
         nux = rnd(COLNO-1);
@@ -669,10 +647,10 @@ boolean allow_drag;
         return FALSE;
 }
 
-STATIC_OVL void
-vault_tele()
+static void
+vault_tele(void)
 {
-    register struct mkroom *croom = search_special(VAULT);
+    struct mkroom *croom = search_special(VAULT);
     coord c;
 
     if (croom && somexy(croom, &c) && teleok(c.x, c.y, FALSE)) {
@@ -683,11 +661,9 @@ vault_tele()
 }
 
 boolean
-teleport_pet(mtmp, force_it)
-register struct monst *mtmp;
-boolean force_it;
+teleport_pet(struct monst *mtmp, boolean force_it)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     if (mtmp == u.usteed)
         return (FALSE);
@@ -712,7 +688,7 @@ release_it:
 }
 
 void
-tele()
+tele(void)
 {
     coord cc;
 
@@ -776,7 +752,7 @@ tele()
 
 /** ^T command; 'm ^T' == choose among several teleport modes */
 int
-dotelecmd()
+dotelecmd(void)
 {
     long save_HTele, save_ETele;
     int res, added, hidden;
@@ -888,9 +864,9 @@ dotelecmd()
     return res;
 }
 
+/** the #teleport command; 'm ^T' == choose among several teleport modes */
 int
-dotele(break_the_rules)
-boolean break_the_rules; /* true: wizard mode ^T */
+dotele(boolean break_the_rules) /**< TRUE: wizard mode ^T */
 {
     struct trap *trap;
     const char *cantdoit;
@@ -917,7 +893,7 @@ boolean break_the_rules; /* true: wizard mode ^T */
     }
     if (!trap) {
         boolean castit = FALSE;
-        register int sp_no = 0, energy = 0;
+        int sp_no = 0, energy = 0;
 
         if (!Teleportation || (u.ulevel < (Role_if(PM_WIZARD) ? 8 : 12)
                                && !can_teleport(youmonst.data))) {
@@ -1012,9 +988,9 @@ boolean break_the_rules; /* true: wizard mode ^T */
 }
 
 void
-level_tele()
+level_tele(void)
 {
-    register int newlev;
+    int newlev;
     d_level newlevel;
     const char *escape_by_flying = 0; /* when surviving dest of -N */
     char buf[BUFSZ];
@@ -1077,7 +1053,7 @@ level_tele()
 #ifdef WIZARD
             if (wizard && !strcmp(buf, "?")) {
                 schar destlev;
-                xchar destdnum;
+                xint16 destdnum;
 
  levTport_menu:
                 destlev = 0;
@@ -1298,8 +1274,7 @@ random_levtport:
 }
 
 void
-domagicportal(ttmp)
-register struct trap *ttmp;
+domagicportal(struct trap *ttmp)
 {
     struct d_level target_level;
 
@@ -1341,8 +1316,7 @@ register struct trap *ttmp;
 }
 
 void
-tele_trap(trap)
-struct trap *trap;
+tele_trap(struct trap *trap)
 {
     if (In_endgame(&u.uz) || Antimagic) {
         if (Antimagic)
@@ -1359,9 +1333,7 @@ struct trap *trap;
 }
 
 void
-level_tele_trap(trap, trflags)
-struct trap *trap;
-unsigned trflags;
+level_tele_trap(struct trap *trap, unsigned int trflags)
 {
     char verbbuf[BUFSZ];
 
@@ -1391,12 +1363,12 @@ unsigned trflags;
 }
 
 /* check whether monster can arrive at location <x,y> via Tport (or fall) */
-STATIC_OVL boolean
-rloc_pos_ok(x, y, mtmp)
-register int x, y; /* coordinates of candidate location */
-struct monst *mtmp;
+static boolean
+rloc_pos_ok(coordxy x, coordxy y, struct monst *mtmp)
+                   /* coordinates of candidate location */
+
 {
-    register int xx, yy;
+    int xx, yy;
 
     if (!goodpos(x, y, mtmp, 0)) return FALSE;
     /*
@@ -1456,11 +1428,9 @@ struct monst *mtmp;
  * the worm.
  */
 void
-rloc_to(mtmp, x, y)
-struct monst *mtmp;
-register int x, y;
+rloc_to(struct monst *mtmp, coordxy x, coordxy y)
 {
-    register int oldx = mtmp->mx, oldy = mtmp->my;
+    int oldx = mtmp->mx, oldy = mtmp->my;
     boolean resident_shk = mtmp->isshk && inhishop(mtmp);
 
     if (x == mtmp->mx && y == mtmp->my && m_at(x, y) == mtmp) {
@@ -1506,11 +1476,11 @@ register int x, y;
 /* place a monster at a random location, typically due to teleport */
 /* return TRUE if successful, FALSE if not */
 boolean
-rloc(mtmp, suppress_impossible)
-struct monst *mtmp; /* mx==0 implies migrating monster arrival */
-boolean suppress_impossible;
+rloc(struct monst *mtmp, boolean suppress_impossible)
+                    /* mx==0 implies migrating monster arrival */
+
 {
-    register int x, y, trycount;
+    int x, y, trycount;
 
     if (mtmp == u.usteed) {
         tele();
@@ -1556,9 +1526,8 @@ found_xy:
     return TRUE;
 }
 
-STATIC_OVL void
-mvault_tele(mtmp)
-struct monst *mtmp;
+static void
+mvault_tele(struct monst *mtmp)
 {
     struct mkroom *croom = search_special(VAULT);
     coord c;
@@ -1572,8 +1541,7 @@ struct monst *mtmp;
 }
 
 boolean
-tele_restrict(mon)
-struct monst *mon;
+tele_restrict(struct monst *mon)
 {
     if (level.flags.noteleport) {
         if (canseemon(mon))
@@ -1585,10 +1553,7 @@ struct monst *mon;
 }
 
 void
-mtele_trap(mtmp, trap, in_sight)
-struct monst *mtmp;
-struct trap *trap;
-int in_sight;
+mtele_trap(struct monst *mtmp, struct trap *trap, int in_sight)
 {
     char *monname;
 
@@ -1619,11 +1584,7 @@ int in_sight;
 
 /* return 0 if still on level, 3 if not */
 int
-mlevel_tele_trap(mtmp, trap, force_it, in_sight)
-struct monst *mtmp;
-struct trap *trap;
-boolean force_it;
-int in_sight;
+mlevel_tele_trap(struct monst *mtmp, struct trap *trap, boolean force_it, int in_sight)
 {
     int tt = (trap ? trap->ttyp : NO_TRAP);
     struct permonst *mptr = mtmp->data;
@@ -1721,10 +1682,9 @@ int in_sight;
 
 /* place object randomly, returns False if it's gone (eg broken) */
 boolean
-rloco(obj)
-register struct obj *obj;
+rloco(struct obj *obj)
 {
-    register xchar tx, ty, otx, oty;
+    coordxy tx, ty, otx, oty;
     boolean restricted_fall;
     int try_limit = 4000;
 
@@ -1783,7 +1743,7 @@ register struct obj *obj;
 
 /* Returns an absolute depth */
 int
-random_teleport_level()
+random_teleport_level(void)
 {
     int nlev, max_depth, min_depth,
         cur_depth = (int)depth(&u.uz);
@@ -1859,9 +1819,7 @@ random_teleport_level()
 /** You teleport a monster (via wand, spell, or poly'd q.mechanic attack).
    returns false iff the attempt fails */
 boolean
-u_teleport_mon(mtmp, give_feedback)
-struct monst *mtmp;
-boolean give_feedback;
+u_teleport_mon(struct monst *mtmp, boolean give_feedback)
 {
     coord cc;
 

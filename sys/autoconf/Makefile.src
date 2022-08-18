@@ -251,7 +251,7 @@ HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h color.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
 	os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h region.h rm.h \
 	sp_lev.h spell.h system.h tcap.h timeout.h tosconf.h tradstdc.h \
-	trampoli.h trap.h unixconf.h vision.h vmsconf.h wintty.h \
+	trap.h unixconf.h vision.h vmsconf.h wintty.h \
 	winX.h winprocs.h wintype.h you.h youprop.h
 
 HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h\
@@ -499,7 +499,7 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/align.h \
 		../include/timeout.h ../include/trap.h ../include/flag.h \
 		../include/rm.h ../include/vision.h ../include/display.h \
 		../include/engrave.h ../include/rect.h ../include/region.h \
-		../include/winprocs.h ../include/wintty.h ../include/trampoli.h
+		../include/winprocs.h ../include/wintty.h
 	touch $(HACK_H)
 #
 nhlan.o: $(srcdir)/../sys/share/nhlan.c $(HACK_H)

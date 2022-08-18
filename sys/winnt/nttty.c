@@ -19,10 +19,10 @@
 #include <sys/stat.h>
 #include "win32api.h"
 
-void FDECL(cmov, (int, int));
-void FDECL(nocmov, (int, int));
-int FDECL(process_keystroke, (INPUT_RECORD *, boolean *,
-    BOOLEAN_P numberpad, int portdebug));
+void cmov(int, int);
+void nocmov(int, int);
+int process_keystroke(INPUT_RECORD *, boolean *,
+    BOOLEAN_P numberpad, int portdebug);
 
 /*
  * The following WIN32 Console API routines are used in this file.
@@ -56,7 +56,7 @@ INPUT_RECORD ir;
  * from the command line.
  */
 int GUILaunched;
-static BOOL FDECL(CtrlHandler, (DWORD));
+static BOOL CtrlHandler(DWORD);
 
 #ifdef PORT_DEBUG
 static boolean display_cursor_info = FALSE;
@@ -115,9 +115,9 @@ KEYHANDLERNAME pKeyHandlerName;
 boolean colorflag = FALSE;	/* colors are initialized */
 int ttycolors[CLR_MAX];
 # ifdef TEXTCOLOR
-static void NDECL(init_ttycolor);
+static void init_ttycolor();
 # endif
-static void NDECL(really_move_cursor);
+static void really_move_cursor();
 
 #define MAX_OVERRIDES	256
 unsigned char key_overrides[MAX_OVERRIDES];
@@ -395,7 +395,7 @@ really_move_cursor()
 
 void
 cmov(x, y)
-register int x, y;
+int x, y;
 {
 	ttyDisplay->cury = y;
 	ttyDisplay->curx = x;
@@ -624,7 +624,7 @@ init_ttycolor()
 # endif /* TEXTCOLOR */
 
 #ifdef VIDEOSHADES
-static int FDECL(convert_uchars,(char *, uchar *, int));
+static int convert_uchars(char *, uchar *, int);
 
 /*
  * OPTIONS=videocolors:1-2-3-4-5-6-7-8-9-10-11-12-13-14-15
@@ -889,7 +889,7 @@ void win32con_toggle_cursor_info()
 
 void
 map_subkeyvalue(op)
-register char *op;
+char *op;
 {
 	char digits[] = "0123456789";
 	int length, i, idx, val;

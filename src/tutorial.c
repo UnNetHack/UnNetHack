@@ -9,8 +9,7 @@
 /* Display a tutorial message, if it hasn't been displayed before.
    Returns TRUE if a tutorial message is output. */
 boolean
-check_tutorial_message(msgnum)
-int msgnum;
+check_tutorial_message(int msgnum)
 {
     if (!flags.tutorial) return FALSE;
     if (pl_tutorial[msgnum - QT_T_FIRST] > 0) return FALSE;
@@ -26,8 +25,7 @@ int msgnum;
    message is shown or not. This assumes that the object classes haven't
    been customized too heavily (possibly a custom boulder, and that's it). */
 int
-check_tutorial_oclass(oclass)
-int oclass;
+check_tutorial_oclass(int oclass)
 {
     switch(oclass) {
     case WEAPON_CLASS: check_tutorial_message(QT_T_ITEM_WEAPON);   return 1;
@@ -51,10 +49,7 @@ int oclass;
    if there is a message and it hasn't been shown already. Returns TRUE
    if a message is shown. */
 int
-check_tutorial_location(lx, ly, from_farlook)
-int lx;
-int ly;
-boolean from_farlook;
+check_tutorial_location(coordxy lx, coordxy ly, boolean from_farlook)
 {
     struct rm *l = &(levl[lx][ly]);
     if (!flags.tutorial) return FALSE; /* short-circuit */
@@ -108,9 +103,7 @@ boolean from_farlook;
 }
 /* Display tutorial messages that may result from farlook data. */
 void
-check_tutorial_farlook(x, y)
-int x;
-int y;
+check_tutorial_farlook(coordxy x, coordxy y)
 {
     int glyph = glyph_at(x, y);
     /* Monsters */
@@ -152,8 +145,7 @@ static char check_tutorial_command_buffer[CHECK_TUTORIAL_COMMAND_BUFSIZE];
 static int check_tutorial_command_pointer = 0;
 static int check_tutorial_command_count = 0;
 void
-check_tutorial_command(c)
-char c;
+check_tutorial_command(char c)
 {
     int i, r;
     char lc;
@@ -242,7 +234,7 @@ char c;
 
 /* Display tutorial messages based on the state of the character. */
 void
-maybe_tutorial()
+maybe_tutorial(void)
 {
     /* So that we don't get two different combats if a monster disappears */
     static int time_since_combat = 0;
@@ -522,7 +514,7 @@ maybe_tutorial()
 
 /* Redisplay tutorial messages. */
 int
-tutorial_redisplay()
+tutorial_redisplay(void)
 {
     winid tempwin = create_nhwindow(NHW_MENU);
     anything i;

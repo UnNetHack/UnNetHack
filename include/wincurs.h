@@ -75,7 +75,7 @@ extern winid curses_create_nhwindow(int type);
 
 extern void curses_clear_nhwindow(winid wid);
 
-extern void curses_display_nhwindow(winid wid, BOOLEAN_P block);
+extern void curses_display_nhwindow(winid wid, boolean block);
 
 extern void curses_destroy_nhwindow(winid wid);
 
@@ -84,15 +84,15 @@ extern void curses_curs(winid wid, int x, int y);
 extern void curses_putstr(winid wid, int attr, const char *text);
 
 #ifdef FILE_AREAS
-extern void curses_display_file(const char *filearea, const char *filename, BOOLEAN_P must_exist);
+extern void curses_display_file(const char *filearea, const char *filename, boolean must_exist);
 #else
-extern void curses_display_file(const char *filename, BOOLEAN_P must_exist);
+extern void curses_display_file(const char *filename, boolean must_exist);
 #endif
 
 extern void curses_start_menu(winid wid);
 
 extern void curses_add_menu(winid wid, int glyph, int cnt, const ANY_P * identifier,
-                            CHAR_P accelerator, CHAR_P group_accel, int attr,
+                            char accelerator, char group_accel, int attr,
                             const char *str, unsigned int presel);
 
 extern void curses_end_menu(winid wid, const char *prompt);
@@ -107,7 +107,7 @@ extern void curses_wait_synch(void);
 
 extern void curses_cliparound(int x, int y);
 
-extern void curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bg_glyph);
+extern void curses_print_glyph(winid wid, coordxy x, coordxy y, int glyph, int bg_glyph);
 
 extern void curses_raw_print(const char *str);
 
@@ -115,13 +115,13 @@ extern void curses_raw_print_bold(const char *str);
 
 extern int curses_nhgetch(void);
 
-extern int curses_nh_poskey(int *x, int *y, int *mod);
+extern int curses_nh_poskey(coordxy *x, coordxy *y, int *mod);
 
 extern void curses_nhbell(void);
 
 extern int curses_doprev_message(void);
 
-extern char curses_yn_function(const char *question, const char *choices, CHAR_P def);
+extern char curses_yn_function(const char *question, const char *choices, char def);
 
 extern void curses_getlin(const char *question, char *input);
 
@@ -223,13 +223,13 @@ extern int curses_read_attrs(char *attrs);
 
 extern int curses_convert_keys(int key);
 
-extern int curses_get_mouse(int *mousex, int *mousey, int *mod);
+extern int curses_get_mouse(coordxy *mousex, coordxy *mousey, int *mod);
 
 /* cursdial.c */
 
 extern void curses_line_input_dialog(const char *prompt, char *answer, int buffer);
 
-extern int curses_character_input_dialog(const char *prompt, const char *choices, CHAR_P def);
+extern int curses_character_input_dialog(const char *prompt, const char *choices, char def);
 
 extern int curses_ext_cmd(void);
 
@@ -238,8 +238,8 @@ extern void curses_create_nhmenu(winid wid);
 extern boolean get_menu_coloring(char *, int *, int *);
 #endif
 extern void curses_add_nhmenu_item(winid wid, int glyph, const ANY_P *identifier,
-                                   CHAR_P accelerator, CHAR_P group_accel, int attr, const char *str,
-                                   BOOLEAN_P presel);
+                                   char accelerator, char group_accel, int attr, const char *str,
+                                   boolean presel);
 
 extern void curses_finalize_nhmenu(winid wid, const char *prompt);
 
@@ -259,7 +259,7 @@ extern void curses_decrement_highlight(void);
 /* cursinvt.c */
 
 extern void curses_update_inv(void);
-extern void curses_add_inv(int, int, CHAR_P, attr_t, const char *);
+extern void curses_add_inv(int, int, char, attr_t, const char *);
 
 /* cursinit.c */
 

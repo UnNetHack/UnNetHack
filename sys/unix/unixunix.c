@@ -15,26 +15,25 @@
 #include <signal.h>
 
 #ifdef _M_UNIX
-extern void NDECL(sco_mapon);
-extern void NDECL(sco_mapoff);
+extern void sco_mapon(void);
+extern void sco_mapoff(void);
 #endif
 #ifdef __linux__
-extern void NDECL(linux_mapon);
-extern void NDECL(linux_mapoff);
+extern void linux_mapon(void);
+extern void linux_mapoff(void);
 #endif
 
 #ifndef NHSTDC
 extern int errno;
 #endif
 
-extern int FDECL(restore_savefile, (char *, const char *));
+extern int restore_savefile(char *, const char *);
 
 static struct stat buf;
 
 /* see whether we should throw away this xlock file */
 static int
-veryold(fd)
-int fd;
+veryold(int fd)
 {
 	time_t date;
 
@@ -70,7 +69,7 @@ int fd;
 }
 
 static int
-eraseoldlocks()
+eraseoldlocks(void)
 {
 	register int i;
 
@@ -98,7 +97,7 @@ eraseoldlocks()
 }
 
 void
-getlock()
+getlock(void)
 {
 	register int i = 0, fd, c;
 #ifndef FILE_AREAS
@@ -259,9 +258,9 @@ gotlock:
 	}
 }
 
+/** normalize file name - we don't like .'s, /'s, spaces */
 void
-regularize(s)	/* normalize file name - we don't like .'s, /'s, spaces */
-register char *s;
+regularize(char *s)
 {
 	register char *lp;
 
@@ -306,7 +305,7 @@ unsigned msec;				/* milliseconds */
 
 #ifdef SHELL
 int
-dosh()
+dosh(void)
 {
 	register char *str;
 
@@ -328,8 +327,7 @@ dosh()
 
 #if defined(SHELL) || defined(DEF_PAGER) || defined(DEF_MAILREADER)
 int
-child(wt)
-int wt;
+child(int wt)
 {
 	register int f;
 	suspend_nhwindows((char *)0);	/* also calls end_screen() */
@@ -381,8 +379,7 @@ int wt;
  */
 
 char *
-make_file_name(filearea, filename)
-const char *filearea, *filename;
+make_file_name(const char *filearea, const char *filename)
 {
 	char *buf;
 	int lenarea;
@@ -403,9 +400,11 @@ const char *filearea, *filename;
 }
 
 FILE *
-fopen_datafile_area(filearea, filename, mode, use_scoreprefix)
-const char *filearea, *filename, *mode;
-boolean use_scoreprefix UNUSED;
+fopen_datafile_area(
+    const char *filearea,
+    const char *filename,
+    const char *mode,
+    boolean use_scoreprefix UNUSED)
 {
 	FILE *fp;
 	char *buf;
@@ -416,9 +415,7 @@ boolean use_scoreprefix UNUSED;
 }
 
 int
-chmod_area(filearea, filename, mode)
-const char *filearea, *filename;
-int mode;
+chmod_area(const char *filearea, const char *filename, int mode)
 {
 	int retval;
 	char *buf;
@@ -429,9 +426,7 @@ int mode;
 }
 
 int
-open_area(filearea, filename, flags, mode)
-const char *filearea, *filename;
-int flags, mode;
+open_area(const char *filearea, const char *filename, int flags, int mode)
 {
 	int fd;
 	char *buf;
@@ -442,9 +437,7 @@ int flags, mode;
 }
 
 int
-creat_area(filearea, filename, mode)
-const char *filearea, *filename;
-int mode;
+creat_area(const char *filearea, const char *filename, int mode)
 {
 	int fd;
 	char *buf;
@@ -455,8 +448,7 @@ int mode;
 }
 
 int
-rename_area(filearea, oldfilename, newfilename)
-const char *filearea, *oldfilename, *newfilename;
+rename_area(const char *filearea, const char *oldfilename, const char *newfilename)
 {
 	int retval;
 	char *oldpath,*newpath;
@@ -469,8 +461,7 @@ const char *filearea, *oldfilename, *newfilename;
 }
 
 int
-remove_area(filearea, filename)
-const char *filearea, *filename;
+remove_area(const char *filearea, const char *filename)
 {
 	int retval;
 	char *buf;
@@ -481,9 +472,7 @@ const char *filearea, *filename;
 }
 
 FILE *
-freopen_area(filearea, filename, mode, stream)
-const char *filearea, *filename, *mode;
-FILE *stream;
+freopen_area(const char *filearea, const char *filename, const char *mode, FILE *stream)
 {
 	FILE *fp;
 	char *buf;
@@ -510,12 +499,12 @@ FILE *stream;
 
 #ifdef GETRES_SUPPORT
 
-extern int FDECL(nh_getresuid, (uid_t *, uid_t *, uid_t *));
-extern uid_t NDECL(nh_getuid);
-extern uid_t NDECL(nh_geteuid);
-extern int FDECL(nh_getresgid, (gid_t *, gid_t *, gid_t *));
-extern gid_t NDECL(nh_getgid);
-extern gid_t NDECL(nh_getegid);
+extern int nh_getresuid(uid_t *, uid_t *, uid_t *);
+extern uid_t nh_getuid();
+extern uid_t nh_geteuid();
+extern int nh_getresgid(gid_t *, gid_t *, gid_t *);
+extern gid_t nh_getgid();
+extern gid_t nh_getegid();
 
 int
 (getresuid)(ruid, euid, suid)
@@ -525,13 +514,13 @@ uid_t *ruid, *euid, *suid;
 }
 
 uid_t
-(getuid)()
+(getuid)(void)
 {
     return nh_getuid();
 }
 
 uid_t
-(geteuid)()
+(geteuid)(void)
 {
     return nh_geteuid();
 }
@@ -544,13 +533,13 @@ gid_t *rgid, *egid, *sgid;
 }
 
 gid_t
-(getgid)()
+(getgid)(void)
 {
     return nh_getgid();
 }
 
 gid_t
-(getegid)()
+(getegid)(void)
 {
     return nh_getegid();
 }

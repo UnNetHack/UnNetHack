@@ -32,20 +32,20 @@
 
 #define MAX_ERRORS	25
 
-extern int  NDECL (yyparse);
+extern int  yyparse(void);
 extern int line_number;
 const char *fname = "(stdin)";
 int fatal_error = 0;
 
-int  FDECL (main, (int,char **));
-void FDECL (yyerror, (const char *));
-void FDECL (yywarning, (const char *));
-int  NDECL (yywrap);
-void FDECL (init_yyin, (FILE *));
-void FDECL (init_yyout, (FILE *));
+int  main(int,char **);
+void yyerror(const char *);
+void yywarning(const char *);
+int  yywrap(void);
+void init_yyin(FILE *);
+void init_yyout(FILE *);
 
 #ifdef AZTEC_36
-FILE *FDECL (freopen, (char *,char *,FILE *));
+FILE *freopen(char *,char *,FILE *);
 #endif
 #define Fprintf (void)fprintf
 
@@ -53,9 +53,7 @@ FILE *FDECL (freopen, (char *,char *,FILE *));
 extern unsigned _stklen = STKSIZ;
 #endif
 int
-main(argc, argv)
-int argc;
-char **argv;
+main(int argc, char **argv)
 {
 	char	infile[64], outfile[64], basename[64];
 	FILE	*fin, *fout;
@@ -158,8 +156,7 @@ char **argv;
  * MAX_ERRORS wouldn't be reasonable.
  */
 
-void yyerror(s)
-const char *s;
+void yyerror(const char *s)
 {
 	(void) fprintf(stderr,"%s : line %d : %s\n",fname,line_number, s);
 	if (++fatal_error > MAX_ERRORS) {
@@ -172,13 +169,12 @@ const char *s;
  * Just display a warning (that is : a non fatal error)
  */
 
-void yywarning(s)
-const char *s;
+void yywarning(const char *s)
 {
 	(void) fprintf(stderr,"%s : line %d : WARNING : %s\n",fname,line_number,s);
 }
 
-int yywrap()
+int yywrap(void)
 {
 	SpinCursor(3); /*	Don't know if this is a good place to put it ?
 						Is it called for our grammar ? Often enough ?

@@ -13,7 +13,7 @@ extern struct window_procs curses_procs;
 /* cannot just blindly include winX.h without including all of X11 stuff */
 /* and must get the order of include files right.  Don't bother */
 extern struct window_procs X11_procs;
-extern void NDECL(win_X11_init);
+extern void win_X11_init();
 #endif
 #ifdef QT_GRAPHICS
 extern struct window_procs Qt_procs;
@@ -26,12 +26,12 @@ extern struct window_procs mac_procs;
 #endif
 #ifdef BEOS_GRAPHICS
 extern struct window_procs beos_procs;
-extern void NDECL(be_win_init);
+extern void be_win_init();
 #endif
 #ifdef AMIGA_INTUITION
 extern struct window_procs amii_procs;
 extern struct window_procs amiv_procs;
-extern void NDECL(ami_wininit_data);
+extern void ami_wininit_data();
 #endif
 #ifdef WIN32_GRAPHICS
 extern struct window_procs win32_procs;
@@ -51,14 +51,14 @@ extern struct window_procs dummy_procs;
 extern struct window_procs lisp_procs;
 #endif
 
-STATIC_DCL void FDECL(def_raw_print, (const char *s));
+static void def_raw_print(const char *s);
 
 NEARDATA struct window_procs windowprocs;
 
 static
 struct win_choices {
     struct window_procs *procs;
-    void NDECL((*ini_routine));     /* optional (can be 0) */
+    void (*ini_routine)(void);     /* optional (can be 0) */
 } winchoices[] = {
 #ifdef TTY_GRAPHICS
     { &tty_procs, win_tty_init },
@@ -103,19 +103,16 @@ struct win_choices {
     { 0, 0 }        /* must be last */
 };
 
-STATIC_OVL
-void
-def_raw_print(s)
-const char *s;
+static void
+def_raw_print(const char *s)
 {
     puts(s);
 }
 
 void
-choose_windows(s)
-const char *s;
+choose_windows(const char *s)
 {
-    register int i;
+    int i;
 
     for(i=0; winchoices[i].procs; i++)
         if (!strcmpi(s, winchoices[i].procs->name)) {
@@ -142,10 +139,7 @@ const char *s;
  */
 /*ARGSUSED*/
 char
-genl_message_menu(let, how, mesg)
-char let UNUSED;
-int how UNUSED;
-const char *mesg;
+genl_message_menu(char let UNUSED, int how UNUSED, const char *mesg)
 {
     pline("%s", mesg);
     return 0;
@@ -153,8 +147,7 @@ const char *mesg;
 
 /*ARGSUSED*/
 void
-genl_preference_update(pref)
-const char *pref UNUSED;
+genl_preference_update(const char *pref UNUSED)
 {
     /* window ports are expected to provide
        their own preference update routine

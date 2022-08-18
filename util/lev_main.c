@@ -69,45 +69,45 @@ extern unsigned _stklen = STKSIZ;
 #endif
 #define MAX_ERRORS	25
 
-extern int  NDECL (yyparse);
-extern void FDECL (init_yyin, (FILE *));
-extern void FDECL (init_yyout, (FILE *));
+extern int yyparse(void);
+extern void init_yyin(FILE *);
+extern void init_yyout(FILE *);
 
-int  FDECL (main, (int, char **));
-void FDECL (yyerror, (const char *));
-void FDECL (yywarning, (const char *));
-int  NDECL (yywrap);
-int FDECL(get_floor_type, (CHAR_P));
-int FDECL(get_room_type, (char *));
-int FDECL(get_trap_type, (char *));
-int FDECL(get_monster_id, (char *,CHAR_P));
-int FDECL(get_object_id, (char *,CHAR_P));
-boolean FDECL(check_monster_char, (CHAR_P));
-boolean FDECL(check_object_char, (CHAR_P));
-char FDECL(what_map_char, (CHAR_P));
-void FDECL(scan_map, (char *, sp_lev *));
-boolean FDECL(check_subrooms, (sp_lev *));
-boolean FDECL(write_level_file, (char *,sp_lev *));
+int  main(int, char **);
+void yyerror(const char *);
+void yywarning(const char *);
+int yywrap(void);
+int get_floor_type(char);
+int get_room_type(char *);
+int get_trap_type(char *);
+int get_monster_id(char *,char);
+int get_object_id(char *,char);
+boolean check_monster_char(char);
+boolean check_object_char(char);
+char what_map_char(char);
+void scan_map(char *, sp_lev *);
+boolean check_subrooms(sp_lev *);
+boolean write_level_file(char *,sp_lev *);
 
-struct lc_funcdefs *FDECL(funcdef_new,(long,char *));
-void FDECL(funcdef_free_all,(struct lc_funcdefs *));
-struct lc_funcdefs *FDECL(funcdef_defined,(struct lc_funcdefs *,char *, int));
+struct lc_funcdefs *funcdef_new(long,char *);
+void funcdef_free_all(struct lc_funcdefs *);
+struct lc_funcdefs *funcdef_defined(struct lc_funcdefs *,char *, int);
 
-struct lc_vardefs *FDECL(vardef_new,(long,char *));
-void FDECL(vardef_free_all,(struct lc_vardefs *));
-struct lc_vardefs *FDECL(vardef_defined,(struct lc_vardefs *,char *, int));
+struct lc_vardefs *vardef_new(long,char *);
+void vardef_free_all(struct lc_vardefs *);
+struct lc_vardefs *vardef_defined(struct lc_vardefs *,char *, int);
 
-void FDECL(splev_add_from, (sp_lev *, sp_lev *));
+void splev_add_from(sp_lev *, sp_lev *);
 
-extern void NDECL(monst_init);
-extern void NDECL(objects_init);
-extern void NDECL(decl_init);
+extern void monst_init(void);
+extern void objects_init(void);
+extern void decl_init(void);
 
-void FDECL(add_opcode, (sp_lev *, int, genericptr_t));
+void add_opcode(sp_lev *, int, genericptr_t);
 
-static boolean FDECL(write_common_data, (int,sp_lev *));
-static boolean FDECL(write_maze, (int,sp_lev *));
-static void NDECL(init_obj_classes);
+static boolean write_common_data(int,sp_lev *);
+static boolean write_maze(int,sp_lev *);
+static void init_obj_classes(void);
 
 void VDECL(lc_error, (const char *, ...));
 void VDECL(add_opvars, (sp_lev *, const char *, ...));
@@ -282,9 +282,7 @@ extern int allow_break_statements;
 extern struct lc_breakdef *break_list;
 
 int
-main(argc, argv)
-int argc;
-char **argv;
+main(int argc, char **argv)
 {
     FILE *fin;
     int i;
@@ -379,8 +377,7 @@ char **argv;
  * MAX_ERRORS wouldn't be reasonable.
  */
 void
-yyerror(s)
-const char *s;
+yyerror(const char *s)
 {
 	char *e = ((char *)s + strlen(s) - 1);
 	(void) fprintf(stderr, "%s: line %d, pos %zu : %s",
@@ -415,8 +412,7 @@ lc_error(const char *fmt, ...)
  * Just display a warning (that is : a non fatal error)
  */
 void
-yywarning(s)
-const char *s;
+yywarning(const char *s)
 {
 	(void) fprintf(stderr, "%s: line %d : WARNING : %s\n",
 				fname, line_number, s);
@@ -436,8 +432,7 @@ lc_warning(const char *fmt, ...)
 }
 
 char *
-decode_parm_chr(chr)
-char chr;
+decode_parm_chr(char chr)
 {
     static char buf[32];
     switch (chr) {
@@ -455,8 +450,7 @@ char chr;
 }
 
 char *
-decode_parm_str(str)
-char *str;
+decode_parm_str(char *str)
 {
     static char tmpbuf[1024];
     char *p = str;
@@ -509,11 +503,7 @@ core_func_name(int idx)
 }
 
 int
-handle_corefunc(splev, funcname, parmlist, retc)
-sp_lev *splev;
-char *funcname;
-char *parmlist;
-char retc;
+handle_corefunc(sp_lev *splev, char *funcname, char *parmlist, char retc)
 {
     int f = is_core_func(funcname);
     int i;
@@ -546,9 +536,7 @@ char retc;
 }
 
 struct opvar *
-set_opvar_int(ov, val)
-struct opvar *ov;
-long  val;
+set_opvar_int(struct opvar *ov, long  val)
 {
     if (ov) {
         ov->spovartyp = SPOVAR_INT;
@@ -558,9 +546,7 @@ long  val;
 }
 
 struct opvar *
-set_opvar_coord(ov, val)
-struct opvar *ov;
-long  val;
+set_opvar_coord(struct opvar *ov, long  val)
 {
     if (ov) {
         ov->spovartyp = SPOVAR_COORD;
@@ -570,9 +556,7 @@ long  val;
 }
 
 struct opvar *
-set_opvar_region(ov, val)
-struct opvar *ov;
-long  val;
+set_opvar_region(struct opvar *ov, long  val)
 {
     if (ov) {
         ov->spovartyp = SPOVAR_REGION;
@@ -582,9 +566,7 @@ long  val;
 }
 
 struct opvar *
-set_opvar_mapchar(ov, val)
-struct opvar *ov;
-long  val;
+set_opvar_mapchar(struct opvar *ov, long  val)
 {
     if (ov) {
         ov->spovartyp = SPOVAR_MAPCHAR;
@@ -594,9 +576,7 @@ long  val;
 }
 
 struct opvar *
-set_opvar_monst(ov, val)
-struct opvar *ov;
-long  val;
+set_opvar_monst(struct opvar *ov, long val)
 {
     if (ov) {
         ov->spovartyp = SPOVAR_MONST;
@@ -606,9 +586,7 @@ long  val;
 }
 
 struct opvar *
-set_opvar_obj(ov, val)
-struct opvar *ov;
-long  val;
+set_opvar_obj(struct opvar *ov, long val)
 {
     if (ov) {
         ov->spovartyp = SPOVAR_OBJ;
@@ -618,9 +596,7 @@ long  val;
 }
 
 struct opvar *
-set_opvar_str(ov, val)
-struct opvar *ov;
-char *val;
+set_opvar_str(struct opvar *ov, char *val)
 {
     if (ov) {
         ov->spovartyp = SPOVAR_STRING;
@@ -630,9 +606,7 @@ char *val;
 }
 
 struct opvar *
-set_opvar_var(ov, val)
-struct opvar *ov;
-char *val;
+set_opvar_var(struct opvar *ov, char *val)
 {
     if (ov) {
         ov->spovartyp = SPOVAR_VARIABLE;
@@ -729,14 +703,13 @@ add_opvars(sp_lev *sp, const char *fmt, ...)
 }
 
 void
-break_stmt_start()
+break_stmt_start(void)
 {
     allow_break_statements++;
 }
 
 void
-break_stmt_end(splev)
-     sp_lev *splev;
+break_stmt_end(sp_lev *splev)
 {
     struct lc_breakdef *tmp = break_list;
     struct lc_breakdef *prv = NULL;
@@ -758,9 +731,7 @@ break_stmt_end(splev)
 }
 
 void
-break_stmt_new(splev,i)
-     sp_lev *splev;
-     long i;
+break_stmt_new(sp_lev *splev, long i)
 {
     struct lc_breakdef *tmp = New(struct lc_breakdef);
     tmp->breakpoint = New(struct opvar);
@@ -773,9 +744,7 @@ break_stmt_new(splev,i)
 }
 
 struct lc_funcdefs *
-funcdef_new(addr, name)
-     long addr;
-     char *name;
+funcdef_new(long addr, char *name)
 {
     struct lc_funcdefs *f = New(struct lc_funcdefs);
     if (!f) {
@@ -794,8 +763,7 @@ funcdef_new(addr, name)
 }
 
 void
-funcdef_free_all(fchain)
-     struct lc_funcdefs *fchain;
+funcdef_free_all(struct lc_funcdefs *fchain)
 {
     struct lc_funcdefs *tmp = fchain;
     struct lc_funcdefs *nxt;
@@ -820,8 +788,7 @@ funcdef_free_all(fchain)
 
 
 char *
-funcdef_paramtypes(f)
-     struct lc_funcdefs *f;
+funcdef_paramtypes(struct lc_funcdefs *f)
 {
     int i = 0;
     struct lc_funcdefs_parm *fp = f->params;
@@ -836,10 +803,7 @@ funcdef_paramtypes(f)
 }
 
 struct lc_funcdefs *
-funcdef_defined(f, name, casesense)
-     struct lc_funcdefs *f;
-     char *name;
-     int casesense;
+funcdef_defined(struct lc_funcdefs *f, char *name, int casesense)
 {
     while (f) {
 	if (casesense) {
@@ -854,9 +818,7 @@ funcdef_defined(f, name, casesense)
 
 
 struct lc_vardefs *
-vardef_new(typ, name)
-     long typ;
-     char *name;
+vardef_new(long typ, char *name)
 {
     struct lc_vardefs *f = New(struct lc_vardefs);
     if (!f) {
@@ -871,8 +833,7 @@ vardef_new(typ, name)
 }
 
 void
-vardef_free_all(fchain)
-     struct lc_vardefs *fchain;
+vardef_free_all(struct lc_vardefs *fchain)
 {
     struct lc_vardefs *tmp = fchain;
     struct lc_vardefs *nxt;
@@ -887,10 +848,7 @@ vardef_free_all(fchain)
 }
 
 struct lc_vardefs *
-vardef_defined(f, name, casesense)
-     struct lc_vardefs *f;
-     char *name;
-     int casesense;
+vardef_defined(struct lc_vardefs *f, char *name, int casesense)
 {
     while (f) {
 	if (casesense) {
@@ -904,8 +862,7 @@ vardef_defined(f, name, casesense)
 }
 
 const char *
-spovar2str(spovar)
-     long spovar;
+spovar2str(long spovar)
 {
     static int togl = 0;
     static char buf[2][128];
@@ -932,19 +889,14 @@ spovar2str(spovar)
 }
 
 void
-vardef_used(vd, varname)
-     struct lc_vardefs *vd;
-     char *varname;
+vardef_used(struct lc_vardefs *vd, char *varname)
 {
     struct lc_vardefs *tmp;
     if ((tmp = vardef_defined(vd, varname, 1))) tmp->n_used++;
 }
 
 void
-check_vardef_type(vd, varname, vartype)
-     struct lc_vardefs *vd;
-     char *varname;
-     long vartype;
+check_vardef_type(struct lc_vardefs *vd, char *varname, long vartype)
 {
     struct lc_vardefs *tmp;
     if ((tmp = vardef_defined(vd, varname, 1))) {
@@ -955,10 +907,7 @@ check_vardef_type(vd, varname, vartype)
 }
 
 struct lc_vardefs *
-add_vardef_type(vd, varname, vartype)
-     struct lc_vardefs *vd;
-     char *varname;
-     long vartype;
+add_vardef_type(struct lc_vardefs *vd, char *varname, long vartype)
 {
     struct lc_vardefs *tmp;
     if ((tmp = vardef_defined(vd, varname, 1))) {
@@ -974,8 +923,7 @@ add_vardef_type(vd, varname, vartype)
 }
 
 int
-reverse_jmp_opcode(opcode)
-     int opcode;
+reverse_jmp_opcode(int opcode)
 {
     switch (opcode) {
     case SPO_JE:  return SPO_JNE;
@@ -990,8 +938,7 @@ reverse_jmp_opcode(opcode)
 
 /* basically copied from src/sp_lev.c */
 struct opvar *
-opvar_clone(ov)
-     struct opvar *ov;
+opvar_clone(struct opvar *ov)
 {
     if (ov) {
 	struct opvar *tmpov = (struct opvar *)alloc(sizeof(struct opvar));
@@ -1031,9 +978,7 @@ opvar_clone(ov)
 
 
 void
-splev_add_from(splev, from_splev)
-     sp_lev *splev;
-     sp_lev *from_splev;
+splev_add_from(sp_lev *splev, sp_lev *from_splev)
 {
     int i;
     if (splev && from_splev)
@@ -1046,8 +991,7 @@ splev_add_from(splev, from_splev)
  * Find the type of floor, knowing its char representation.
  */
 int
-get_floor_type(c)
-char c;
+get_floor_type(char c)
 {
 	int val;
 
@@ -1064,10 +1008,9 @@ char c;
  * Find the type of a room in the table, knowing its name.
  */
 int
-get_room_type(s)
-char *s;
+get_room_type(char *s)
 {
-	register int i;
+	int i;
 
 	SpinCursor(3);
 	for(i=0; room_types[i].name; i++)
@@ -1080,10 +1023,9 @@ char *s;
  * Find the type of a trap in the table, knowing its name.
  */
 int
-get_trap_type(s)
-char *s;
+get_trap_type(char *s)
 {
-	register int i;
+	int i;
 
 	SpinCursor(3);
 	for (i=0; trap_types[i].name; i++)
@@ -1096,11 +1038,9 @@ char *s;
  * Find the index of a monster in the table, knowing its name.
  */
 int
-get_monster_id(s, c)
-char *s;
-char c;
+get_monster_id(char *s, char c)
 {
-	register int i, class;
+	int i, class;
 
 	SpinCursor(3);
 	class = c ? def_char_to_monclass(c) : 0;
@@ -1124,9 +1064,9 @@ char c;
  * Find the index of an object in the table, knowing its name.
  */
 int
-get_object_id(s, c)
-char *s;
-char c;		/* class */
+get_object_id(
+    char *s,
+    char c) /**< class */
 {
 	int i, class;
 	const char *objname;
@@ -1156,7 +1096,7 @@ char c;		/* class */
 }
 
 static void
-init_obj_classes()
+init_obj_classes(void)
 {
 	int i, class, prev_class;
 
@@ -1174,8 +1114,7 @@ init_obj_classes()
  * Is the character 'c' a valid monster class ?
  */
 boolean
-check_monster_char(c)
-char c;
+check_monster_char(char c)
 {
 	return (def_char_to_monclass(c) != MAXMCLASSES);
 }
@@ -1184,8 +1123,7 @@ char c;
  * Is the character 'c' a valid object class ?
  */
 boolean
-check_object_char(c)
-char c;
+check_object_char(char c)
 {
 	return (def_char_to_objclass(c) != MAXOCLASSES);
 }
@@ -1194,8 +1132,7 @@ char c;
  * Convert .des map letter into floor type.
  */
 char
-what_map_char(c)
-char c;
+what_map_char(char c)
 {
 	SpinCursor(3);
 	switch(c) {
@@ -1236,10 +1173,7 @@ char c;
 }
 
 void
-add_opcode(sp, opc, dat)
-sp_lev *sp;
-int opc;
-genericptr_t dat;
+add_opcode(sp_lev *sp, int opc, genericptr_t dat)
 {
    long nop = sp->n_opcodes;
    _opcode *tmp;
@@ -1267,12 +1201,10 @@ genericptr_t dat;
  * Just analyze it here.
  */
 void
-scan_map(map, sp)
-char *map;
-sp_lev *sp;
+scan_map(char *map, sp_lev *sp)
 {
-	register int i, len;
-	register char *s1, *s2;
+	int i, len;
+	char *s1, *s2;
 	long max_len = 0;
 	long max_hig = 0;
 	char *tmpmap[ROWNO];
@@ -1350,9 +1282,7 @@ sp_lev *sp;
  * Output some info common to all special levels.
  */
 static boolean
-write_common_data(fd, lvl)
-int fd;
-sp_lev *lvl UNUSED;
+write_common_data(int fd, sp_lev *lvl UNUSED)
 {
 	static struct version_info version_data = {
 			VERSION_NUMBER, VERSION_FEATURES,
@@ -1370,9 +1300,7 @@ sp_lev *lvl UNUSED;
  * Also, we have to free the memory allocated via alloc().
  */
 static boolean
-write_maze(fd, maze)
-int fd;
-sp_lev *maze;
+write_maze(int fd, sp_lev *maze)
 {
         int i;
 
@@ -1439,9 +1367,7 @@ sp_lev *maze;
 
 
 static boolean
-decompile_maze(fd, maze)
-int fd;
-sp_lev *maze;
+decompile_maze(int fd, sp_lev *maze)
 {
 	long i;
 	char debuf[128];
@@ -1626,8 +1552,7 @@ sp_lev *maze;
 }
 
 char *
-mangle_fname(fname)
-     char *fname;
+mangle_fname(char *fname)
 {
     static char buf[256];
     char *p = strchr(fname, '%');
@@ -1653,9 +1578,7 @@ mangle_fname(fname)
  * Return TRUE on success, FALSE on failure.
  */
 boolean
-write_level_file(filename, lvl)
-char *filename;
-sp_lev *lvl;
+write_level_file(char *filename, sp_lev *lvl)
 {
 	int fout;
 	char lbuf[60];

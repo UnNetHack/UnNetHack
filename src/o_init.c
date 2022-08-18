@@ -4,17 +4,17 @@
 #include "hack.h"
 #include "lev.h"    /* save & restore info */
 
-STATIC_DCL void FDECL(setgemprobs, (d_level*));
-STATIC_DCL void FDECL(shuffle, (int, int, BOOLEAN_P));
-STATIC_DCL void NDECL(shuffle_all);
-STATIC_DCL boolean FDECL(interesting_to_discover, (int));
-STATIC_DCL void FDECL(swap_armor, (int, int, int));
-static char *FDECL(oclass_to_name, (CHAR_P, char *));
+static void setgemprobs(d_level*);
+static void shuffle(int, int, boolean);
+static void shuffle_all(void);
+static boolean interesting_to_discover(int);
+static void swap_armor(int, int, int);
+static char *oclass_to_name(char, char *);
 
 static NEARDATA short disco[NUM_OBJECTS] = DUMMY;
 
 #ifdef USE_TILES
-STATIC_DCL void NDECL(shuffle_tiles);
+static void shuffle_tiles(void);
 extern short glyph2tile[];  /* from tile.c */
 
 /* Shuffle tile assignments to match descriptions, so a red potion isn't
@@ -26,8 +26,8 @@ extern short glyph2tile[];  /* from tile.c */
  * is restored.  So might as well do that the first time instead of writing
  * another routine.
  */
-STATIC_OVL void
-shuffle_tiles()
+static void
+shuffle_tiles(void)
 {
     int i;
     short tmp_tilemap[NUM_OBJECTS];
@@ -41,9 +41,8 @@ shuffle_tiles()
 }
 #endif  /* USE_TILES */
 
-STATIC_OVL void
-setgemprobs(dlev)
-d_level *dlev;
+static void
+setgemprobs(d_level *dlev)
 {
     int j, first, lev;
 
@@ -68,10 +67,8 @@ d_level *dlev;
 }
 
 /* shuffle descriptions on objects o_low to o_high */
-STATIC_OVL void
-shuffle(o_low, o_high, domaterial)
-int o_low, o_high;
-boolean domaterial;
+static void
+shuffle(int o_low, int o_high, boolean domaterial)
 {
     int i, j, num_to_shuffle;
     short sw;
@@ -106,10 +103,10 @@ boolean domaterial;
 }
 
 void
-init_objects()
+init_objects(void)
 {
-    register int i, first, last, sum;
-    register char oclass;
+    int i, first, last, sum;
+    char oclass;
 #ifdef TEXTCOLOR
 # define COPY_OBJ_DESCR(o_dst, o_src) \
     o_dst.oc_descr_idx = o_src.oc_descr_idx, \
@@ -176,8 +173,8 @@ check:
 #endif
 }
 
-STATIC_OVL void
-shuffle_all()
+static void
+shuffle_all(void)
 {
     int first, last, oclass;
 
@@ -254,10 +251,10 @@ shuffle_all()
  * Currently name, color and price are swapped.
  */
 void
-swap_armor(old_relative_position, new_relative_position, first)
-int old_relative_position,  /* old position of dragon scales */
-new_relative_position,      /* new position of dragon scales */
-first;     /* first armor of this armor class */
+swap_armor(
+    int old_relative_position, /**< old position of dragon scales */
+    int new_relative_position, /**< new position of dragon scales */
+    int first) /**< first armor of this armor class */
 {
     struct objclass tmp;
 
@@ -279,10 +276,10 @@ first;     /* first armor of this armor class */
 
 /* find the object index for snow boots; used [once] by slippery ice code */
 int
-find_skates()
+find_skates(void)
 {
-    register int i;
-    register const char *s;
+    int i;
+    const char *s;
 
     for (i = SPEED_BOOTS; i <= LEVITATION_BOOTS; i++)
         if ((s = OBJ_DESCR(objects[i])) != 0 && !strcmp(s, "snow boots"))
@@ -294,16 +291,15 @@ find_skates()
 
 /* level dependent initialization */
 void
-oinit()
+oinit(void)
 {
     setgemprobs(&u.uz);
 }
 
 void
-savenames(fd, mode)
-int fd, mode;
+savenames(int fd, int mode)
 {
-    register int i;
+    int i;
     unsigned int len;
 
     if (perform_bwrite(mode)) {
@@ -330,10 +326,9 @@ int fd, mode;
 }
 
 void
-restnames(fd)
-register int fd;
+restnames(int fd)
 {
-    register int i;
+    int i;
     unsigned int len;
 
     mread(fd, (genericptr_t) bases, sizeof bases);
@@ -351,13 +346,10 @@ register int fd;
 }
 
 void
-discover_object(oindx, mark_as_known, credit_hero)
-register int oindx;
-boolean mark_as_known;
-boolean credit_hero;
+discover_object(int oindx, boolean mark_as_known, boolean credit_hero)
 {
     if (!objects[oindx].oc_name_known) {
-        register int dindx, acls = objects[oindx].oc_class;
+        int dindx, acls = objects[oindx].oc_class;
 
         /* Loop thru disco[] 'til we find the target (which may have been
            uname'd) or the next open slot; one or the other will be found
@@ -382,12 +374,11 @@ boolean credit_hero;
 
 /* if a class name has been cleared, we may need to purge it from disco[] */
 void
-undiscover_object(oindx)
-register int oindx;
+undiscover_object(int oindx)
 {
     if (!objects[oindx].oc_name_known) {
-        register int dindx, acls = objects[oindx].oc_class;
-        register boolean found = FALSE;
+        int dindx, acls = objects[oindx].oc_class;
+        boolean found = FALSE;
 
         /* find the object; shift those behind it forward one slot */
         for (dindx = bases[acls];
@@ -433,8 +424,7 @@ makeknown_msg(int otyp)
 }
 
 static boolean
-interesting_to_discover(i)
-int i;
+interesting_to_discover(int i)
 {
     /* Pre-discovered objects are now printed with a '*' */
     return((boolean)(objects[i].oc_uname != (char *)0 ||
@@ -451,9 +441,9 @@ static short uniq_objs[] = {
 
 /* the '\' command - show discovered object types */
 int
-dodiscovered() /* free after Robert Viduya */
+dodiscovered(void) /* free after Robert Viduya */
 {
-    register int i, dis;
+    int i, dis;
     int ct = 0;
     char *s, oclass, prev_class, classes[MAXOCLASSES];
     winid tmpwin;
@@ -516,7 +506,7 @@ dodiscovered() /* free after Robert Viduya */
  * Currently name, color are shuffled.
  */
 void
-dragons_init()
+dragons_init(void)
 {
     /* Number of existing dragons. Assumes order of dragons */
     int ndragons = YELLOW_DRAGON_SCALES - GRAY_DRAGON_SCALES + 1;
@@ -551,7 +541,7 @@ dragons_init()
 
 /* the '`' command - show discovered object types for one class */
 int
-doclassdisco()
+doclassdisco(void)
 {
     static NEARDATA const char
         prompt[] = "View discoveries for which sort of objects?",
@@ -730,9 +720,9 @@ doclassdisco()
 
 /* put up nameable subset of discoveries list as a menu */
 void
-rename_disco()
+rename_disco(void)
 {
-    register int i, dis;
+    int i, dis;
     int ct = 0, mn = 0, sl;
     char *s, oclass, prev_class;
     winid tmpwin;

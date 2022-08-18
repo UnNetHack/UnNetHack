@@ -4660,6 +4660,8 @@ printf "%s\n" "#define LINUX /**/" >>confdefs.h
 ;;
 esac
 
+OLD_CFLAGS=$CFLAGS
+CFLAGS="$CFLAGS -D_POSIX_SOURCE=1"
 for ac_prog in flex lex
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -4878,6 +4880,7 @@ fi
 rm -f conftest.l $LEX_OUTPUT_ROOT.c
 
 fi
+CFLAGS=$OLD_CFLAGS
 if test "$LEX" = ":"; then
 	as_fn_error $? "cannot find flex or lex" "$LINENO" 5
 fi

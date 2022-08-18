@@ -20,23 +20,23 @@ static NEARDATA const char readable[] =
 { COIN_CLASS, ALL_CLASSES, SCROLL_CLASS, SPBOOK_CLASS, 0 };
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
-static void FDECL(wand_explode, (struct obj *));
+static void wand_explode(struct obj *);
 #if 0
-static void NDECL(do_class_genocide);
+static void do_class_genocide();
 #endif
-static void FDECL(stripspe, (struct obj *));
-static void FDECL(p_glow1, (struct obj *));
-static void FDECL(p_glow2, (struct obj *, const char *));
-static void FDECL(randomize, (int *, int));
-static void FDECL(forget_single_object, (int));
+static void stripspe(struct obj *);
+static void p_glow1(struct obj *);
+static void p_glow2(struct obj *, const char *);
+static void randomize(int *, int);
+static void forget_single_object(int);
 #if 0
-static void FDECL(forget, (int));
+static void forget(int);
 #endif
-static int FDECL(maybe_tame, (struct monst *, struct obj *));
+static int maybe_tame(struct monst *, struct obj *);
 
-STATIC_PTR void FDECL(do_flood, (int, int, genericptr_t));
-STATIC_PTR void FDECL(undo_flood, (int, int, genericptr_t));
-STATIC_PTR void FDECL(set_lit, (int, int, genericptr_t));
+static void do_flood(coordxy, coordxy, genericptr_t);
+static void undo_flood(coordxy, coordxy, genericptr_t);
+static void set_lit(coordxy, coordxy, genericptr_t);
 
 static boolean
 learn_scroll_typ(short scrolltyp, boolean verbose)
@@ -56,8 +56,7 @@ learn_scroll_typ(short scrolltyp, boolean verbose)
 
 /* also called from teleport.c for scroll of teleportation */
 void
-learn_scroll(sobj)
-struct obj *sobj;
+learn_scroll(struct obj *sobj)
 {
     /* it's implied that sobj->dknown is set;
        we couldn't be reading this scroll otherwise */
@@ -67,9 +66,7 @@ struct obj *sobj;
 }
 
 static char *
-erode_obj_text(otmp, buf)
-struct obj *otmp;
-char *buf;
+erode_obj_text(struct obj *otmp, char *buf)
 {
     int erosion = greatest_erosion(otmp);
 
@@ -82,9 +79,7 @@ char *buf;
 }
 
 char *
-tshirt_text(tshirt, buf)
-struct obj *tshirt;
-char *buf;
+tshirt_text(struct obj *tshirt, char *buf)
 {
     static const char *shirt_msgs[] = {
         /* Scott Bigham */
@@ -264,10 +259,10 @@ apron_text(struct obj* apron, char* buf)
 }
 
 int
-doread()
+doread(void)
 {
-    register struct obj *scroll;
-    register boolean confused;
+    struct obj *scroll;
+    boolean confused;
 
     known = FALSE;
     if (check_capacity((char *)0)) {
@@ -559,8 +554,7 @@ doread()
 }
 
 static void
-stripspe(obj)
-register struct obj *obj;
+stripspe(struct obj *obj)
 {
     if (obj->blessed || obj->spe <= 0) {
         pline("%s", nothing_happens);
@@ -576,17 +570,14 @@ register struct obj *obj;
 }
 
 static void
-p_glow1(otmp)
-register struct obj *otmp;
+p_glow1(struct obj *otmp)
 {
     Your("%s %s briefly.", xname(otmp),
          otense(otmp, Blind ? "vibrate" : "glow"));
 }
 
 static void
-p_glow2(otmp, color)
-register struct obj *otmp;
-register const char *color;
+p_glow2(struct obj *otmp, const char *color)
 {
     Your("%s %s%s%s for a moment.",
          xname(otmp),
@@ -598,8 +589,7 @@ register const char *color;
 /* Is the object chargeable?  For purposes of inventory display; it is */
 /* possible to be able to charge things for which this returns FALSE. */
 boolean
-is_chargeable(obj)
-struct obj *obj;
+is_chargeable(struct obj *obj)
 {
     if (obj->oclass == WAND_CLASS) return TRUE;
     /* known && !oc_name_known is possible after amnesia/mind flayer */
@@ -629,11 +619,9 @@ struct obj *obj;
  * was cursed, +1 if blessed, 0 otherwise.
  */
 void
-recharge(obj, curse_bless)
-struct obj *obj;
-int curse_bless;
+recharge(struct obj *obj, int curse_bless)
 {
-    register int n;
+    int n;
     boolean is_cursed, is_blessed;
 
     is_cursed = curse_bless < 0;
@@ -907,8 +895,7 @@ not_chargable:
 
 /* Forget known information about this object class. */
 static void
-forget_single_object(obj_id)
-int obj_id;
+forget_single_object(int obj_id)
 {
     objects[obj_id].oc_name_known = 0;
     objects[obj_id].oc_pre_discovered = 0;  /* a discovery when relearned */
@@ -946,9 +933,7 @@ int oclass;
 
 /* randomize the given list of numbers  0 <= i < count */
 static void
-randomize(indices, count)
-int *indices;
-int count;
+randomize(int *indices, int count)
 {
     int i, iswap, temp;
 
@@ -963,8 +948,7 @@ int count;
 
 /* Forget % of known objects. */
 void
-forget_objects(percent)
-int percent;
+forget_objects(int percent)
 {
     int i, count;
     int indices[NUM_OBJECTS];
@@ -994,10 +978,9 @@ int percent;
 
 /* Forget some or all of map (depends on parameters). */
 void
-forget_map(howmuch)
-int howmuch;
+forget_map(int howmuch)
 {
-    register int zx, zy;
+    int zx, zy;
 
     if (In_sokoban(&u.uz))
         return;
@@ -1019,9 +1002,9 @@ int howmuch;
 
 /* Forget all traps on the level. */
 void
-forget_traps()
+forget_traps(void)
 {
-    register struct trap *trap;
+    struct trap *trap;
 
     /* forget all traps (except the one the hero is in :-) */
     for (trap = ftrap; trap; trap = trap->ntrap)
@@ -1034,11 +1017,10 @@ forget_traps()
  * except this one.
  */
 void
-forget_levels(percent)
-int percent;
+forget_levels(int percent)
 {
     int i, count;
-    xchar maxl, this_lev;
+    coordxy maxl, this_lev;
     int indices[MAXLINFO];
 
     if (percent == 0) return;
@@ -1128,9 +1110,7 @@ int howmuch;
 
 /* monster is hit by scroll of taming's effect */
 static int
-maybe_tame(mtmp, sobj)
-struct monst *mtmp;
-struct obj *sobj;
+maybe_tame(struct monst *mtmp, struct obj *sobj)
 {
     int was_tame = mtmp->mtame;
     unsigned was_peaceful = mtmp->mpeaceful;
@@ -1153,10 +1133,8 @@ struct obj *sobj;
 }
 
 /** Remove water tile at x,y. */
-STATIC_PTR void
-undo_flood(x, y, roomcnt)
-int x, y;
-genericptr_t roomcnt;
+static void
+undo_flood(coordxy x, coordxy y, genericptr_t roomcnt)
 {
     if ((levl[x][y].typ != POOL) &&
         (levl[x][y].typ != MOAT) &&
@@ -1171,13 +1149,11 @@ genericptr_t roomcnt;
     newsym(x, y);
 }
 
-STATIC_PTR void
-do_flood(x, y, poolcnt)
-int x, y;
-genericptr_t poolcnt;
+static void
+do_flood(coordxy x, coordxy y, genericptr_t poolcnt)
 {
-    register struct monst *mtmp;
-    register struct trap *ttmp;
+    struct monst *mtmp;
+    struct trap *ttmp;
 
     if (nexttodoor(x, y) || (rn2(1 + distmin(u.ux, u.uy, x, y))) ||
         (sobj_at(BOULDER, x, y)) || (levl[x][y].typ != ROOM))
@@ -1206,8 +1182,7 @@ genericptr_t poolcnt;
 }
 
 static boolean
-get_valid_stinking_cloud_pos(x,y)
-int x,y;
+get_valid_stinking_cloud_pos(coordxy x, coordxy y)
 {
     return (!(!isok(x,y) ||
               !cansee(x, y) ||
@@ -1216,9 +1191,7 @@ int x,y;
 }
 
 static boolean
-is_valid_stinking_cloud_pos(x, y, showmsg)
-int x, y;
-boolean showmsg;
+is_valid_stinking_cloud_pos(coordxy x, coordxy y, boolean showmsg)
 {
     if (!get_valid_stinking_cloud_pos(x,y)) {
         if (showmsg) {
@@ -1230,8 +1203,7 @@ boolean showmsg;
 }
 
 static void
-display_stinking_cloud_positions(state)
-int state;
+display_stinking_cloud_positions(int state)
 {
     if (state == 0) {
         tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
@@ -1256,8 +1228,7 @@ int state;
 /* scroll effects; return 1 if we use up the scroll and possibly make it
    become discovered, 0 if caller should take care of those side-effects */
 int
-seffects(sobj)
-struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
+seffects(struct obj *sobj) /**< scroll, or fake spellbook object for scroll-like spell */
 {
     int cval, otyp = sobj->otyp;
     boolean confused = (Confusion != 0);
@@ -1293,7 +1264,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 #endif
     case SCR_ENCHANT_ARMOR:
     {
-        register schar s;
+        schar s;
         boolean special_armor;
         boolean same_color;
 
@@ -1518,8 +1489,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 
     case SCR_SCARE_MONSTER:
     case SPE_CAUSE_FEAR:
-    {   register int ct = 0;
-        register struct monst *mtmp;
+    {   int ct = 0;
+        struct monst *mtmp;
 
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
             if (DEADMONSTER(mtmp)) continue;
@@ -1553,7 +1524,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 
     case SCR_REMOVE_CURSE:
     case SPE_REMOVE_CURSE:
-    {   register struct obj *obj;
+    {   struct obj *obj;
         if(confused)
             if (Hallucination)
                 You_feel("the power of the Force against you!");
@@ -1947,7 +1918,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         }
         /* reveal secret doors for uncursed and blessed scrolls */
         if (!sobj_cursed) {
-            register int x, y;
+            int x, y;
 
             for (x = 1; x < COLNO; x++)
                 for (y = 0; y < ROWNO; y++)
@@ -2058,7 +2029,7 @@ case SPE_MAGIC_MAPPING:
             !Is_rogue_level(&u.uz) &&
 #endif
             (!In_endgame(&u.uz) || Is_earthlevel(&u.uz))) {
-            register int x, y;
+            int x, y;
             int boulder_created = 0;
 
             /* Identify the scroll */
@@ -2156,8 +2127,7 @@ case SPE_MAGIC_MAPPING:
 }
 
 static void
-wand_explode(obj)
-register struct obj *obj;
+wand_explode(struct obj *obj)
 {
     obj->in_use = TRUE; /* in case losehp() is fatal */
     Your("%s vibrates violently, and explodes!", xname(obj));
@@ -2178,10 +2148,8 @@ static struct litmon *gremlins = 0;
 /*
  * Low-level lit-field update routine.
  */
-STATIC_PTR void
-set_lit(x, y, val)
-int x, y;
-genericptr_t val;
+static void
+set_lit(coordxy x, coordxy y, genericptr_t val)
 {
     struct monst *mtmp;
     struct litmon *gremlin;
@@ -2201,16 +2169,14 @@ genericptr_t val;
 }
 
 void
-litroom(on, obj)
-register boolean on;
-struct obj *obj;
+litroom(boolean on, struct obj *obj)
 {
     char is_lit;    /* value is irrelevant; we use its address
                        as a `not null' flag for set_lit() */
 
     /* first produce the text (provided you're not blind) */
     if(!on) {
-        register struct obj *otmp;
+        struct obj *otmp;
 
         if (!Blind) {
             if(u.uswallow) {
@@ -2367,7 +2333,7 @@ do_class_genocide()
             else
 #ifdef WIZARD   /* to aid in topology testing; remove pesky monsters */
             if (wizard && buf[0] == '*') {
-                register struct monst *mtmp, *mtmp2;
+                struct monst *mtmp, *mtmp2;
 
                 gonecnt = 0;
                 for (mtmp = fmon; mtmp; mtmp = mtmp2) {
@@ -2470,19 +2436,20 @@ do_class_genocide()
 #define PLAYER 2
 #define ONTHRONE 4
 void
-do_genocide(how, only_on_level)
-int how;
-boolean only_on_level; /**< if TRUE only genocide monsters on current level,
-                            not in the complete dungeon */
+do_genocide(
+    int how,
+    boolean only_on_level /**< if TRUE only genocide monsters on current level,
+                               not in the complete dungeon */
+)
 /* 0 = no genocide; create monsters (cursed scroll) */
 /* 1 = normal genocide */
 /* 3 = forced genocide of player */
 /* 5 (4 | 1) = normal genocide from throne */
 {
     char buf[BUFSZ];
-    register int i, killplayer = 0;
-    register int mndx;
-    register struct permonst *ptr;
+    int i, killplayer = 0;
+    int mndx;
+    struct permonst *ptr;
     const char *which;
     const char *on_this_level;
 
@@ -2516,7 +2483,7 @@ boolean only_on_level; /**< if TRUE only genocide monsters on current level,
 #ifdef WIZARD   /* to aid in topology testing; remove pesky monsters */
             /* copy from do_class_genocide */
             if (wizard && buf[0] == '*') {
-                register struct monst *mtmp, *mtmp2;
+                struct monst *mtmp, *mtmp2;
 
                 int gonecnt = 0;
                 for (mtmp = fmon; mtmp; mtmp = mtmp2) {
@@ -2670,8 +2637,7 @@ boolean only_on_level; /**< if TRUE only genocide monsters on current level,
 }
 
 void
-punish(sobj)
-register struct obj *sobj;
+punish(struct obj *sobj)
 {
     struct obj *otmp;
     struct obj *reuse_ball = (sobj && sobj->otyp == HEAVY_IRON_BALL) ? sobj : (struct obj *) 0;
@@ -2721,7 +2687,7 @@ register struct obj *sobj;
 
 /* remove the ball and chain */
 void
-unpunish()
+unpunish(void)
 {
     struct obj *savechain = uchain;
 
@@ -2740,10 +2706,7 @@ unpunish()
  * one, the disoriented creature becomes a zombie
  */
 boolean
-cant_revive(mtype, revival, from_obj)
-int *mtype;
-boolean revival;
-struct obj *from_obj;
+cant_revive(int *mtype, boolean revival, struct obj *from_obj)
 {
     /* SHOPKEEPERS can be revived now */
     if ((*mtype == PM_GUARD) ||
@@ -2778,9 +2741,7 @@ struct _create_particular_data {
 };
 
 static boolean
-create_particular_parse(str, d)
-char *str;
-struct _create_particular_data *d;
+create_particular_parse(char *str, struct _create_particular_data *d)
 {
     char *bufp = str;
     char *tmpp;
@@ -2881,9 +2842,7 @@ struct _create_particular_data *d;
 }
 
 static boolean
-create_particular_creation(str, d)
-char *str;
-struct _create_particular_data *d;
+create_particular_creation(char *str, struct _create_particular_data *d)
 {
     struct permonst *whichpm = NULL;
     int i, mx, my, firstchoice = NON_PM;
@@ -2990,7 +2949,7 @@ struct _create_particular_data *d;
  * this code was also used for the scroll/spell in explore mode.
  */
 boolean
-create_particular()
+create_particular(void)
 {
     char buf[BUFSZ] = DUMMY, *bufp;
     int  tryct = 5;
@@ -3034,11 +2993,11 @@ create_particular_from_buffer(const char* bufp)
 #endif /* WIZARD */
 
 void
-drop_boulder_on_player(confused, helmet_protects, by_player, drop_directly_to_floor)
-boolean confused;
-boolean helmet_protects; /**< if player is protected by a hard helmet */
-boolean by_player; /**< is boulder creation caused by player */
-boolean drop_directly_to_floor; /**< don't check if player is swallowed by a monster */
+drop_boulder_on_player(
+    boolean confused,
+    boolean helmet_protects, /**< if player is protected by a hard helmet */
+    boolean by_player, /**< is boulder creation caused by player */
+    boolean drop_directly_to_floor) /**< don't check if player is swallowed by a monster */
 {
     int dmg;
     struct obj *otmp2;
@@ -3088,13 +3047,14 @@ boolean drop_directly_to_floor; /**< don't check if player is swallowed by a mon
 }
 
 int
-drop_boulder_on_monster(x, y, confused, by_player)
-int x, y;
-boolean confused;
-boolean by_player; /**< is boulder creation caused by player */
+drop_boulder_on_monster(
+    int x,
+    int y,
+    boolean confused,
+    boolean by_player) /**< is boulder creation caused by player */
 {
-    register struct obj *otmp2;
-    register struct monst *mtmp2;
+    struct obj *otmp2;
+    struct monst *mtmp2;
 
     /* Make the object(s) */
     otmp2 = mksobj(confused ? ROCK : BOULDER,

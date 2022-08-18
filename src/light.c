@@ -44,8 +44,8 @@
 
 static light_source *light_base = 0;
 
-STATIC_DCL void FDECL(write_ls, (int, light_source *));
-STATIC_DCL int FDECL(maybe_write_ls, (int, int, BOOLEAN_P));
+static void write_ls(int, light_source *);
+static int maybe_write_ls(int, int, boolean);
 
 /* imported from vision.c, for small circles */
 extern char circle_data[];
@@ -54,10 +54,7 @@ extern char circle_start[];
 
 /* Create a new light source.  */
 void
-new_light_source(x, y, range, type, id)
-xchar x, y;
-int range, type;
-anything *id;
+new_light_source(coordxy x, coordxy y, int range, int type, anything *id)
 {
     light_source *ls;
 
@@ -85,9 +82,7 @@ anything *id;
  * to an object at a time.
  */
 void
-del_light_source(type, id)
-int type;
-anything *id;
+del_light_source(int type, anything *id)
 {
     light_source *curr, *prev;
     anything tmp_id;
@@ -129,8 +124,7 @@ anything *id;
 
 /* Mark locations that are temporarily lit via mobile light sources. */
 void
-do_light_sources(cs_rows)
-char **cs_rows;
+do_light_sources(char **cs_rows)
 {
     int x, y, min_x, max_x, max_y, offset;
     char *limits;
@@ -213,9 +207,7 @@ char **cs_rows;
    way to its destination; show its light so that hero has a chance to
    remember terrain, objects, and monsters being revealed */
 void
-show_transient_light(obj, x, y)
-struct obj *obj;
-int x, y;
+show_transient_light(struct obj *obj, coordxy x, coordxy y)
 {
     light_source *ls;
     struct monst *mon;
@@ -267,7 +259,7 @@ int x, y;
    was flagged for being visible during transient light movement but can't
    be seen now */
 void
-transient_light_cleanup()
+transient_light_cleanup(void)
 {
     struct monst *mon;
     int mtempcount = 0;
@@ -294,9 +286,7 @@ transient_light_cleanup()
 #define mon_is_local(mon) ((mon)->mx > 0)
 
 struct monst *
-find_mid(nid, fmflags)
-unsigned nid;
-unsigned fmflags;
+find_mid(unsigned int nid, unsigned int fmflags)
 {
     struct monst *mtmp;
 
@@ -316,8 +306,7 @@ unsigned fmflags;
 
 /* Save all light sources of the given range. */
 void
-save_light_sources(fd, mode, range)
-int fd, mode, range;
+save_light_sources(int fd, int mode, int range)
 {
     int count, actual, is_global;
     light_source **prev, *curr;
@@ -366,8 +355,7 @@ int fd, mode, range;
  * pointers.
  */
 void
-restore_light_sources(fd)
-int fd;
+restore_light_sources(int fd)
 {
     int count;
     light_source *ls;
@@ -385,10 +373,7 @@ int fd;
 
 /* to support '#stats' wizard-mode command */
 void
-light_stats(hdrfmt, hdrbuf, count, size)
-const char *hdrfmt;
-char *hdrbuf;
-long *count, *size;
+light_stats(const char *hdrfmt, char *hdrbuf, long int *count, long int *size)
 {
     light_source *ls;
 
@@ -402,8 +387,7 @@ long *count, *size;
 
 /* Relink all lights that are so marked. */
 void
-relink_light_sources(ghostly)
-boolean ghostly;
+relink_light_sources(boolean ghostly)
 {
     char which;
     unsigned nid;
@@ -443,10 +427,8 @@ boolean ghostly;
  * sources that would be written.  If write_it is true, actually write
  * the light source out.
  */
-STATIC_OVL int
-maybe_write_ls(fd, range, write_it)
-int fd, range;
-boolean write_it;
+static int
+maybe_write_ls(int fd, int range, boolean write_it)
 {
     int count = 0, is_global;
     light_source *ls;
@@ -480,7 +462,7 @@ boolean write_it;
 }
 
 void
-light_sources_sanity_check()
+light_sources_sanity_check(void)
 {
     light_source *ls;
     struct monst *mtmp;
@@ -510,10 +492,8 @@ light_sources_sanity_check()
 }
 
 /* Write a light source structure to disk. */
-STATIC_OVL void
-write_ls(fd, ls)
-int fd;
-light_source *ls;
+static void
+write_ls(int fd, light_source *ls)
 {
     anything arg_save;
     struct obj *otmp;
@@ -556,8 +536,7 @@ light_source *ls;
 
 /* Change light source's ID from src to dest. */
 void
-obj_move_light_source(src, dest)
-struct obj *src, *dest;
+obj_move_light_source(struct obj *src, struct obj *dest)
 {
     light_source *ls;
 
@@ -572,7 +551,7 @@ struct obj *src, *dest;
 
 /* return true if there exist any light sources */
 boolean
-any_light_source()
+any_light_source(void)
 {
     return (boolean) (light_base != (light_source *) 0);
 }
@@ -582,8 +561,7 @@ any_light_source()
  * only for burning light sources.
  */
 void
-snuff_light_source(x, y)
-int x, y;
+snuff_light_source(coordxy x, coordxy y)
 {
     light_source *ls;
     struct obj *obj;
@@ -616,8 +594,7 @@ int x, y;
 
 /* Return TRUE if object sheds any light at all. */
 boolean
-obj_sheds_light(obj)
-struct obj *obj;
+obj_sheds_light(struct obj *obj)
 {
     /* so far, only burning objects shed light */
     return obj_is_burning(obj);
@@ -625,8 +602,7 @@ struct obj *obj;
 
 /* Return TRUE if sheds light AND will be snuffed by end_burn(). */
 boolean
-obj_is_burning(obj)
-struct obj *obj;
+obj_is_burning(struct obj *obj)
 {
     return (obj->lamplit &&
             (obj->otyp == MAGIC_LAMP || ignitable(obj) || artifact_light(obj)));
@@ -634,8 +610,7 @@ struct obj *obj;
 
 /* copy the light source(s) attachted to src, and attach it/them to dest */
 void
-obj_split_light_source(src, dest)
-struct obj *src, *dest;
+obj_split_light_source(struct obj *src, struct obj *dest)
 {
     light_source *ls, *new_ls;
 
@@ -664,8 +639,7 @@ struct obj *src, *dest;
 /* light source `src' has been folded into light source `dest';
    used for merging lit candles and adding candle(s) to lit candelabrum */
 void
-obj_merge_light_sources(src, dest)
-struct obj *src, *dest;
+obj_merge_light_sources(struct obj *src, struct obj *dest)
 {
     light_source *ls;
 
@@ -682,9 +656,7 @@ struct obj *src, *dest;
 
 /* light source `obj' is being made brighter or dimmer */
 void
-obj_adjust_light_radius(obj, new_radius)
-struct obj *obj;
-int new_radius;
+obj_adjust_light_radius(struct obj *obj, int new_radius)
 {
     light_source *ls;
 
@@ -702,8 +674,7 @@ int new_radius;
 /* Candlelight is proportional to the number of candles;
    minimum range is 2 rather than 1 for playability. */
 int
-candle_light_range(obj)
-struct obj *obj;
+candle_light_range(struct obj *obj)
 {
     int radius;
 
@@ -741,8 +712,7 @@ struct obj *obj;
 
 /* light emitting artifact's range depends upon its curse/bless state */
 int
-arti_light_radius(obj)
-struct obj *obj;
+arti_light_radius(struct obj *obj)
 {
     /*
      * Used by begin_burn() when setting up a new light source
@@ -764,8 +734,7 @@ struct obj *obj;
 
 /* adverb describing lit artifact's light; depends on curse/bless state */
 const char *
-arti_light_description(obj)
-struct obj *obj;
+arti_light_description(struct obj *obj)
 {
     switch (arti_light_radius(obj)) {
     case 3:
@@ -782,7 +751,7 @@ struct obj *obj;
 
 #ifdef WIZARD
 int
-wiz_light_sources()
+wiz_light_sources(void)
 {
     winid win;
     char buf[BUFSZ];

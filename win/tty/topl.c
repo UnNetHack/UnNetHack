@@ -14,16 +14,14 @@
 #define C(c)    (0x1f & (c))
 #endif
 
-STATIC_DCL void FDECL(redotoplin, (const char*));
-STATIC_DCL void FDECL(topl_putsym, (CHAR_P));
-STATIC_DCL void FDECL(removetopl, (int));
-
-#ifdef OVLB
+static void redotoplin(const char*);
+static void topl_putsym(char);
+static void removetopl(int);
 
 int
-tty_doprev_message()
+tty_doprev_message(void)
 {
-    register struct WinDesc *cw = wins[WIN_MESSAGE];
+    struct WinDesc *cw = wins[WIN_MESSAGE];
 
     winid prevmsg_win;
     int i;
@@ -116,12 +114,8 @@ tty_doprev_message()
     return 0;
 }
 
-#endif /* OVLB */
-#ifdef OVL1
-
-STATIC_OVL void
-redotoplin(str)
-const char *str;
+static void
+redotoplin(const char *str)
 {
     int otoplin = ttyDisplay->toplin;
     home();
@@ -161,9 +155,9 @@ show_topl(const char *str)
 }
 
 void
-remember_topl()
+remember_topl(void)
 {
-    register struct WinDesc *cw = wins[WIN_MESSAGE];
+    struct WinDesc *cw = wins[WIN_MESSAGE];
     int idx = cw->maxrow;
     unsigned len = strlen(toplines) + 1;
 
@@ -186,10 +180,9 @@ remember_topl()
 }
 
 void
-addtopl(s)
-const char *s;
+addtopl(const char *s)
 {
-    register struct WinDesc *cw = wins[WIN_MESSAGE];
+    struct WinDesc *cw = wins[WIN_MESSAGE];
 
     tty_curs(BASE_WINDOW, cw->curx+1, cw->cury);
     putsyms(s);
@@ -197,11 +190,8 @@ const char *s;
     ttyDisplay->toplin = 1;
 }
 
-#endif /* OVL1 */
-#ifdef OVL2
-
 void
-more()
+more(void)
 {
     struct WinDesc *cw = wins[WIN_MESSAGE];
 
@@ -239,11 +229,10 @@ more()
 }
 
 void
-update_topl(bp)
-register const char *bp;
+update_topl(const char *bp)
 {
-    register char *tl, *otl;
-    register int n0;
+    char *tl, *otl;
+    int n0;
     int notdied = 1;
     struct WinDesc *cw = wins[WIN_MESSAGE];
 
@@ -286,12 +275,10 @@ register const char *bp;
     if(!(cw->flags & WIN_STOP)) redotoplin(toplines);
 }
 
-STATIC_OVL
-void
-topl_putsym(c)
-char c;
+static void
+topl_putsym(char c)
 {
-    register struct WinDesc *cw = wins[WIN_MESSAGE];
+    struct WinDesc *cw = wins[WIN_MESSAGE];
 
     if(cw == (struct WinDesc *) 0) panic("Putsym window MESSAGE nonexistant");
 
@@ -328,16 +315,14 @@ char c;
 }
 
 void
-putsyms(str)
-const char *str;
+putsyms(const char *str)
 {
     while(*str)
         topl_putsym(*str++);
 }
 
-STATIC_OVL void
-removetopl(n)
-register int n;
+static void
+removetopl(int n)
 {
     /* assume addtopl() has been done, so ttyDisplay->toplin is already set */
     while (n-- > 0) putsyms("\b \b");
@@ -346,9 +331,7 @@ register int n;
 extern char erase_char;     /* from xxxtty.c; don't need kill_char */
 
 char
-tty_yn_function(query, resp, def)
-const char *query, *resp;
-char def;
+tty_yn_function(const char *query, const char *resp, char def)
 /*
  *   Generic yes/no function. 'def' is the default (returned by space or
  *   return; 'esc' returns 'q', or 'n', or the default, depending on
@@ -361,7 +344,7 @@ char def;
  *   be shown in the prompt to the user but will be acceptable as input.
  */
 {
-    register char q;
+    char q;
     char rtmp[40];
     boolean digit_ok, allow_num;
     struct WinDesc *cw = wins[WIN_MESSAGE];
@@ -494,8 +477,6 @@ clean_up:
 
     return q;
 }
-
-#endif /* OVL2 */
 
 #endif /* TTY_GRAPHICS */
 

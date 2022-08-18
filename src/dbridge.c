@@ -18,23 +18,22 @@
 
 #include "hack.h"
 
-STATIC_DCL void FDECL(get_wall_for_db, (int *, int *));
-STATIC_DCL struct entity *FDECL(e_at, (int, int));
-STATIC_DCL void FDECL(m_to_e, (struct monst *, int, int, struct entity *));
-STATIC_DCL void FDECL(u_to_e, (struct entity *));
-STATIC_DCL void FDECL(set_entity, (int, int, struct entity *));
-STATIC_DCL const char *FDECL(e_nam, (struct entity *));
-STATIC_DCL const char *FDECL(E_phrase, (struct entity *, const char *));
-STATIC_DCL boolean FDECL(e_survives_at, (struct entity *, int, int));
-STATIC_DCL void FDECL(e_died, (struct entity *, int, int));
-STATIC_DCL boolean FDECL(automiss, (struct entity *));
-STATIC_DCL boolean FDECL(e_missed, (struct entity *, BOOLEAN_P));
-STATIC_DCL boolean FDECL(e_jumps, (struct entity *));
-STATIC_DCL void FDECL(do_entity, (struct entity *));
+static void get_wall_for_db(coordxy *, coordxy *);
+static struct entity *e_at(coordxy, coordxy);
+static void m_to_e(struct monst *, coordxy, coordxy, struct entity *);
+static void u_to_e(struct entity *);
+static void set_entity(coordxy, coordxy, struct entity *);
+static const char *e_nam(struct entity *);
+static const char *E_phrase(struct entity *, const char *);
+static boolean e_survives_at(struct entity *, coordxy, coordxy);
+static void e_died(struct entity *, int, int);
+static boolean automiss(struct entity *);
+static boolean e_missed(struct entity *, boolean);
+static boolean e_jumps(struct entity *);
+static void do_entity(struct entity *);
 
 boolean
-is_pool(x, y)
-int x, y;
+is_pool(coordxy x, coordxy y)
 {
     schar ltyp;
 
@@ -50,8 +49,7 @@ int x, y;
 }
 
 boolean
-is_lava(x, y)
-int x, y;
+is_lava(coordxy x, coordxy y)
 {
     schar ltyp;
 
@@ -64,8 +62,7 @@ int x, y;
 }
 
 boolean
-is_pool_or_lava(x, y)
-int x, y;
+is_pool_or_lava(coordxy x, coordxy y)
 {
     if (is_pool(x, y) || is_lava(x, y)) {
         return TRUE;
@@ -75,8 +72,7 @@ int x, y;
 }
 
 boolean
-is_any_icewall(x, y)
-int x, y;
+is_any_icewall(coordxy x, coordxy y)
 {
     if (!isok(x, y)) return FALSE;
     if (IS_ANY_ICEWALL(levl[x][y].typ))
@@ -85,8 +81,7 @@ int x, y;
 }
 
 boolean
-is_ice(x, y)
-int x, y;
+is_ice(coordxy x, coordxy y)
 {
     schar ltyp;
 
@@ -99,8 +94,7 @@ int x, y;
 }
 
 boolean
-is_swamp(x, y)
-int x, y;
+is_swamp(coordxy x, coordxy y)
 {
     schar ltyp;
 
@@ -114,8 +108,7 @@ int x, y;
 }
 
 boolean
-is_moat(x, y)
-int x, y;
+is_moat(coordxy x, coordxy y)
 {
     schar ltyp;
 
@@ -156,8 +149,7 @@ db_under_typ(struct rm *lev)
  */
 
 int
-is_drawbridge_wall(x, y)
-int x, y;
+is_drawbridge_wall(coordxy x, coordxy y)
 {
     struct rm *lev;
 
@@ -187,8 +179,7 @@ int x, y;
  * (instead of UP or DOWN, as with is_drawbridge_wall).
  */
 boolean
-is_db_wall(x, y)
-int x, y;
+is_db_wall(coordxy x, coordxy y)
 {
     return((boolean)( levl[x][y].typ == DBWALL ));
 }
@@ -198,8 +189,7 @@ int x, y;
  * a drawbridge or drawbridge wall.
  */
 boolean
-find_drawbridge(x, y)
-int *x, *y;
+find_drawbridge(coordxy *x, coordxy *y)
 {
     int dir;
 
@@ -221,9 +211,8 @@ int *x, *y;
 /*
  * Find the drawbridge wall associated with a drawbridge.
  */
-STATIC_OVL void
-get_wall_for_db(x, y)
-int *x, *y;
+static void
+get_wall_for_db(coordxy *x, coordxy *y)
 {
     switch (levl[*x][*y].drawbridgemask & DB_DIR) {
     case DB_NORTH: (*y)--; break;
@@ -239,9 +228,7 @@ int *x, *y;
  *     flag must be put to TRUE if we want the drawbridge to be opened.
  */
 boolean
-create_drawbridge(x, y, dir, flag)
-int x, y, dir;
-int flag;
+create_drawbridge(coordxy x, coordxy y, int dir, int flag)
 {
     int x2, y2;
     boolean horiz;
@@ -299,10 +286,8 @@ struct entity {
 
 static NEARDATA struct entity occupants[ENTITIES];
 
-STATIC_OVL
-struct entity *
-e_at(x, y)
-int x, y;
+static struct entity *
+e_at(coordxy x, coordxy y)
 {
     int entitycnt;
 
@@ -319,11 +304,8 @@ int x, y;
            (struct entity *)0 : &(occupants[entitycnt]));
 }
 
-STATIC_OVL void
-m_to_e(mtmp, x, y, etmp)
-struct monst *mtmp;
-int x, y;
-struct entity *etmp;
+static void
+m_to_e(struct monst *mtmp, coordxy x, coordxy y, struct entity *etmp)
 {
     etmp->emon = mtmp;
     if (mtmp) {
@@ -337,9 +319,8 @@ struct entity *etmp;
         etmp->edata = (struct permonst *)0;
 }
 
-STATIC_OVL void
-u_to_e(etmp)
-struct entity *etmp;
+static void
+u_to_e(struct entity *etmp)
 {
     etmp->emon = &youmonst;
     etmp->ex = u.ux;
@@ -347,10 +328,8 @@ struct entity *etmp;
     etmp->edata = youmonst.data;
 }
 
-STATIC_OVL void
-set_entity(x, y, etmp)
-int x, y;
-struct entity *etmp;
+static void
+set_entity(coordxy x, coordxy y, struct entity *etmp)
 {
     if ((x == u.ux) && (y == u.uy))
         u_to_e(etmp);
@@ -370,9 +349,8 @@ struct entity *etmp;
 
 /* #define e_strg(etmp, func) (is_u(etmp)? (char *)0 : func(etmp->emon)) */
 
-STATIC_OVL const char *
-e_nam(etmp)
-struct entity *etmp;
+static const char *
+e_nam(struct entity *etmp)
 {
     return(is_u(etmp) ? "you" : mon_nam(etmp->emon));
 }
@@ -381,10 +359,8 @@ struct entity *etmp;
  * Generates capitalized entity name, makes 2nd -> 3rd person conversion on
  * verb, where necessary.
  */
-STATIC_OVL const char *
-E_phrase(etmp, verb)
-struct entity *etmp;
-const char *verb;
+static const char *
+E_phrase(struct entity *etmp, const char *verb)
 {
     static char wholebuf[80];
 
@@ -403,10 +379,8 @@ const char *verb;
 /*
  * Simple-minded "can it be here?" routine
  */
-STATIC_OVL boolean
-e_survives_at(etmp, x, y)
-struct entity *etmp;
-int x, y;
+static boolean
+e_survives_at(struct entity *etmp, coordxy x, coordxy y)
 {
     if (noncorporeal(etmp->edata))
         return(TRUE);
@@ -426,10 +400,8 @@ int x, y;
     return(TRUE);
 }
 
-STATIC_OVL void
-e_died(etmp, xkill_flags, how)
-struct entity *etmp;
-int xkill_flags, how;
+static void
+e_died(struct entity *etmp, int xkill_flags, int how)
 {
     if (is_u(etmp)) {
         if (how == DROWNING) {
@@ -489,9 +461,8 @@ int xkill_flags, how;
 /*
  * These are never directly affected by a bridge or portcullis.
  */
-STATIC_OVL boolean
-automiss(etmp)
-struct entity *etmp;
+static boolean
+automiss(struct entity *etmp)
 {
     return (boolean)((is_u(etmp) ? Passes_walls :
                       passes_walls(etmp->edata)) || noncorporeal(etmp->edata));
@@ -500,10 +471,8 @@ struct entity *etmp;
 /*
  * Does falling drawbridge or portcullis miss etmp?
  */
-STATIC_OVL boolean
-e_missed(etmp, chunks)
-struct entity *etmp;
-boolean chunks;
+static boolean
+e_missed(struct entity *etmp, boolean chunks)
 {
     int misses;
 
@@ -537,9 +506,8 @@ boolean chunks;
 /*
  * Can etmp jump from death?
  */
-STATIC_OVL boolean
-e_jumps(etmp)
-struct entity *etmp;
+static boolean
+e_jumps(struct entity *etmp)
 {
     int tmp = 4;        /* out of 10 */
 
@@ -562,11 +530,11 @@ struct entity *etmp;
     return ((tmp >= rnd(10)) ? TRUE : FALSE);
 }
 
-STATIC_OVL void
-do_entity(etmp)
-struct entity *etmp;
+static void
+do_entity(struct entity *etmp)
 {
-    int newx, newy, at_portcullis, oldx, oldy;
+    coordxy newx, newy, oldx, oldy;
+    int at_portcullis;
     boolean must_jump = FALSE, relocates = FALSE, e_inview;
     struct rm *crm;
 
@@ -778,12 +746,11 @@ struct entity *etmp;
  * @return TRUE when drawbridge got closed, FALSE otherwise
  */
 boolean
-close_drawbridge(x, y)
-int x, y;
+close_drawbridge(coordxy x, coordxy y)
 {
-    register struct rm *lev1, *lev2;
+    struct rm *lev1, *lev2;
     struct trap *t;
-    int x2, y2;
+    coordxy x2, y2;
 
     lev1 = &levl[x][y];
     if (lev1->typ != DRAWBRIDGE_DOWN) return FALSE;
@@ -849,12 +816,11 @@ int x, y;
  * Open the drawbridge located at x,y
  */
 void
-open_drawbridge(x, y)
-int x, y;
+open_drawbridge(coordxy x, coordxy y)
 {
-    register struct rm *lev1, *lev2;
+    struct rm *lev1, *lev2;
     struct trap *t;
-    int x2, y2;
+    coordxy x2, y2;
 
     lev1 = &levl[x][y];
     if (lev1->typ != DRAWBRIDGE_UP) return;
@@ -894,13 +860,12 @@ int x, y;
  * Let's destroy the drawbridge located at x,y
  */
 void
-destroy_drawbridge(x, y)
-int x, y;
+destroy_drawbridge(coordxy x, coordxy y)
 {
-    register struct rm *lev1, *lev2;
+    struct rm *lev1, *lev2;
     struct trap *t;
     struct obj *otmp;
-    int x2, y2, i;
+    coordxy x2, y2, i;
     int db_u;
     boolean e_inview;
     struct entity *etmp1 = &(occupants[0]), *etmp2 = &(occupants[1]);

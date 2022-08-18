@@ -4,8 +4,7 @@
 #include "hack.h"
 
 void
-were_change(mon)
-register struct monst *mon;
+were_change(struct monst *mon)
 {
     if (!is_were(mon->data))
         return;
@@ -35,8 +34,7 @@ register struct monst *mon;
 }
 
 int
-counter_were(pm)
-int pm;
+counter_were(int pm)
 {
     switch(pm) {
     case PM_WEREWOLF:         return(PM_HUMAN_WEREWOLF);
@@ -52,8 +50,7 @@ int pm;
 
 /* convert monsters similar to werecritters into appropriate werebeast */
 int
-were_beastie(pm)
-int pm;
+were_beastie(int pm)
 {
     switch (pm) {
     case PM_WERERAT:
@@ -78,10 +75,9 @@ int pm;
 }
 
 void
-new_were(mon)
-register struct monst *mon;
+new_were(struct monst *mon)
 {
-    register int pm;
+    int pm;
 
     pm = counter_were(monsndx(mon->data));
     if (pm < LOW_PM) {
@@ -111,11 +107,11 @@ register struct monst *mon;
 
 /* were-creature (even you) summons a horde */
 int
-were_summon(ptr, yours, visible, genbuf)
-struct permonst *ptr;
-boolean yours;
-int *visible; /* number of visible helpers created */
-char *genbuf;
+were_summon(struct permonst *ptr, boolean yours, int *visible, char *genbuf)
+                     
+              
+              /* number of visible helpers created */
+             
 {
     int i, typ, pm = monsndx(ptr);
     struct monst *mtmp;
@@ -159,7 +155,7 @@ char *genbuf;
 }
 
 void
-you_were()
+you_were(void)
 {
     char qbuf[QBUFSZ];
     boolean controllable_poly = Polymorph_control && !(Stunned || Unaware);
@@ -175,8 +171,7 @@ you_were()
 }
 
 void
-you_unwere(purify)
-boolean purify;
+you_unwere(boolean purify)
 {
     if (purify) {
         You_feel("purified.");
@@ -189,8 +184,7 @@ boolean purify;
 
 /* lycanthropy is being caught or cured, but no shape change is involved */
 void
-set_ulycn(which)
-int which;
+set_ulycn(int which)
 {
     u.ulycn = which;
     /* add or remove lycanthrope's innate intrinsics (Drain_resistance) */

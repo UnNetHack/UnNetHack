@@ -180,7 +180,7 @@ curses_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
    the process. You need to fill in pl_character[0].
 */
 void
-curses_player_selection()
+curses_player_selection(void)
 {
     curses_choose_character();
 }
@@ -188,7 +188,7 @@ curses_player_selection()
 
 /* Ask the user for a player name. */
 void
-curses_askname()
+curses_askname(void)
 {
     curses_line_input_dialog("Who are you?", plname, PL_NSIZ);
 }
@@ -198,7 +198,7 @@ curses_askname()
    A noop for the tty and X window-ports.
 */
 void
-curses_get_nh_event()
+curses_get_nh_event(void)
 {
 #ifdef PDCURSES
     if (is_termresized()) {
@@ -249,7 +249,7 @@ curses_suspend_nhwindows(const char *str UNUSED)
 
 /* Restore the windows after being suspended. */
 void
-curses_resume_nhwindows()
+curses_resume_nhwindows(void)
 {
     curses_refresh_nethack_windows();
 }
@@ -294,7 +294,7 @@ curses_clear_nhwindow(winid wid)
                    --more--, if necessary, in the tty window-port.
 */
 void
-curses_display_nhwindow(winid wid, BOOLEAN_P block)
+curses_display_nhwindow(winid wid, boolean block)
 {
     menu_item *selected = NULL;
     if (curses_is_menu(wid) || curses_is_text(wid)) {
@@ -387,13 +387,13 @@ curses_putstr(winid wid, int attr, const char *text)
 */
 #ifdef FILE_AREAS
 void
-curses_display_file(const char *filearea,const char *filename,BOOLEAN_P must_exist)
+curses_display_file(const char *filearea,const char *filename,boolean must_exist)
 {
     curses_view_file(filearea, filename, must_exist);
 }
 #else
 void
-curses_display_file(const char *filename,BOOLEAN_P must_exist)
+curses_display_file(const char *filename,boolean must_exist)
 {
     curses_view_file(filename, must_exist);
 }
@@ -446,7 +446,7 @@ add_menu(winid wid, int glyph, const anything identifier,
 */
 void
 curses_add_menu(winid wid, int glyph, int cnt UNUSED, const ANY_P * identifier,
-                CHAR_P accelerator, CHAR_P group_accel, int attr,
+                char accelerator, char group_accel, int attr,
                 const char *str, unsigned int presel)
 {
     attr &= ~(ATR_URGENT | ATR_NOHISTORY);
@@ -544,7 +544,7 @@ mark_synch()    -- Don't go beyond this point in I/O on any channel until
                    for the moment
 */
 void
-curses_mark_synch()
+curses_mark_synch(void)
 {
 }
 
@@ -555,7 +555,7 @@ wait_synch()    -- Wait until all pending output is complete (*flush*() for
                    display is OK when return from wait_synch().
 */
 void
-curses_wait_synch()
+curses_wait_synch(void)
 {
 }
 
@@ -583,7 +583,7 @@ print_glyph(window, x, y, glyph)
                    a 1-1 map between glyphs and distinct things on the map).
 */
 void
-curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph,
+curses_print_glyph(winid wid, coordxy x, coordxy y, int glyph,
                    int bg_glyph UNUSED)
 {
     int ch, color;
@@ -649,7 +649,7 @@ int nhgetch()   -- Returns a single character input from the user.
                    Returned character _must_ be non-zero.
 */
 int
-curses_nhgetch()
+curses_nhgetch(void)
 {
     int ch;
 
@@ -661,7 +661,7 @@ curses_nhgetch()
 }
 
 /*
-int nh_poskey(int *x, int *y, int *mod)
+int nh_poskey(coordxy *x, coordxy *y, int *mod)
                 -- Returns a single character input from the user or a
                    a positioning event (perhaps from a mouse).  If the
                    return value is non-zero, a character was typed, else,
@@ -676,7 +676,7 @@ int nh_poskey(int *x, int *y, int *mod)
                    routine always returns a non-zero character.
 */
 int
-curses_nh_poskey(int *x, int *y, int *mod)
+curses_nh_poskey(coordxy *x, coordxy *y, int *mod)
 {
     int key = curses_nhgetch();
 
@@ -695,18 +695,18 @@ nhbell()        -- Beep at user.  [This will exist at least until sounds are
                    redone, since sounds aren't attributable to windows anyway.]
 */
 void
-curses_nhbell()
+curses_nhbell(void)
 {
     beep();
 }
 
 /*
-doprev_message()
+doprev_message(void)
                 -- Display previous messages.  Used by the ^P command.
                 -- On the tty-port this scrolls WIN_MESSAGE back one line.
 */
 int
-curses_doprev_message()
+curses_doprev_message(void)
 {
     curses_prev_mesg();
     return 0;
@@ -732,7 +732,7 @@ char yn_function(const char *ques, const char *choices, char default)
                    ports might use a popup.
 */
 char
-curses_yn_function(const char *question, const char *choices, CHAR_P def)
+curses_yn_function(const char *question, const char *choices, char def)
 {
     return (char) curses_character_input_dialog(question, choices, def);
 }
@@ -754,13 +754,13 @@ curses_getlin(const char *question, char *input)
 }
 
 /*
-int get_ext_cmd(void)
+int get_ext_cmd()
             -- Get an extended command in a window-port specific way.
                An index into extcmdlist[] is returned on a successful
                selection, -1 otherwise.
 */
 int
-curses_get_ext_cmd()
+curses_get_ext_cmd(void)
 {
     return curses_ext_cmd();
 }
@@ -781,7 +781,7 @@ delay_output()  -- Causes a visible delay of 50ms in the output.
                by a nap(50ms), but allows asynchronous operation.
 */
 void
-curses_delay_output()
+curses_delay_output(void)
 {
     /* refreshing the whole display is a waste of time,
      * but that's why we're here */
@@ -797,7 +797,7 @@ start_screen()  -- Only used on Unix tty ports, but must be declared for
                just declare an empty function.
 */
 void
-curses_start_screen()
+curses_start_screen(void)
 {
 }
 
@@ -806,7 +806,7 @@ end_screen()    -- Only used on Unix tty ports, but must be declared for
                completeness.  The complement of start_screen().
 */
 void
-curses_end_screen()
+curses_end_screen(void)
 {
 }
 

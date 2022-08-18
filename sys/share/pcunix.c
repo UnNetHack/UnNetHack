@@ -15,12 +15,10 @@
 #if defined(WIN32) || defined(MSDOS)
 extern char orgdir[];
 # ifdef WIN32
-extern void NDECL(backsp);
+extern void backsp();
 # endif
-extern void NDECL(clear_screen);
+extern void clear_screen();
 #endif
-
-#ifdef OVLB
 
 #if 0
 static struct stat buf;
@@ -31,7 +29,7 @@ static struct stat hbuf;
 # endif
 
 #ifdef PC_LOCKING
-static int NDECL(eraseoldlocks);
+static int eraseoldlocks();
 #endif
 
 #if 0
@@ -54,8 +52,8 @@ int fd;
 	if(moves > 1) pline("Cannot get status of saved level? ");
 	else pline("Cannot get status of saved game.");
 	return(0);
-    } 
-    if(comp_times(buf.st_mtime)) { 
+    }
+    if(comp_times(buf.st_mtime)) {
 	if(moves > 1) pline("Saved level is out of date.");
 	else pline("Saved game is out of date. ");
 	/* This problem occurs enough times we need to give the player
@@ -77,7 +75,7 @@ int fd;
 static int
 eraseoldlocks()
 {
-	register int i;
+	int i;
 
 	/* cannot use maxledgerno() here, because we need to find a lock name
 	 * before starting everything (including the dungeon initialization
@@ -100,7 +98,7 @@ eraseoldlocks()
 void
 getlock()
 {
-	register int fd, c, ci, ct, ern;
+	int fd, c, ci, ct, ern;
 	char tbuf[BUFSZ];
 	const char *fq_lock;
 # if defined(MSDOS) && defined(NO_TERMS)
@@ -145,13 +143,13 @@ getlock()
 # else
 		perror(fq_lock);
 # endif
-		unlock_file(HLOCK); 
+		unlock_file(HLOCK);
 		error("Cannot open %s", fq_lock);
 	}
 
 	(void) close(fd);
 
-	if(iflags.window_inited) { 
+	if(iflags.window_inited) {
 # ifdef SELF_RECOVER
 	  c = yn("There are files from a game in progress under your name. Recover?");
 # else
@@ -233,7 +231,7 @@ gotlock:
 		chdirx(orgdir, 0);
 # endif
 # if defined(WIN32)
-		error("cannot creat file (%s.)\n%s\n%s\"%s\" exists?\n", 
+		error("cannot creat file (%s.)\n%s\n%s\"%s\" exists?\n",
 				fq_lock, strerror(ern), " Are you sure that the directory",
 				fqn_prefix[LEVELPREFIX]);
 # else
@@ -257,7 +255,7 @@ gotlock:
 # if defined(MSDOS) && defined(NO_TERMS)
 	if (grmode) gr_init();
 # endif
-}	
+}
 #endif /* PC_LOCKING */
 
 # ifndef WIN32
@@ -267,9 +265,9 @@ regularize(s)
  * normalize file name - we don't like .'s, /'s, spaces, and
  * lots of other things
  */
-register char *s;
+char *s;
 {
-	register char *lp;
+	char *lp;
 
 	for (lp = s; *lp; lp++)
 		if (*lp <= ' ' || *lp == '"' || (*lp >= '*' && *lp <= ',') ||
@@ -281,8 +279,6 @@ register char *s;
                         *lp = '_';
 }
 # endif /* WIN32 */
-#endif /* OVLB */
-
 
 #ifdef __EMX__
 void seteuid(int i){;}

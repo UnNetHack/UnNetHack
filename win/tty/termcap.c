@@ -17,48 +17,40 @@
 #define Tgetstr(key) (tgetstr(key, &tbufptr))
 #endif /* MICROPORT_286_BUG **/
 
-static char * FDECL(s_atr2str, (int));
-static char * FDECL(e_atr2str, (int));
+static char * s_atr2str(int);
+static char * e_atr2str(int);
 
-void FDECL(cmov, (int, int));
-void FDECL(nocmov, (int, int));
+void cmov(int, int);
+void nocmov(int, int);
 #if defined(TEXTCOLOR) && defined(TERMLIB)
-# ifdef OVLB
-#  if !defined(UNIX) || !defined(TERMINFO)
-#   ifndef TOS
-static void FDECL(analyze_seq, (char *, int *, int *));
-#   endif
+# if !defined(UNIX) || !defined(TERMINFO)
+#  ifndef TOS
+static void analyze_seq(char *, int *, int *);
 #  endif
-static void NDECL(init_hilite);
-static void NDECL(kill_hilite);
-# endif /* OVLB */
+# endif
+static void init_hilite(void);
+static void kill_hilite(void);
 #endif
 
-#ifdef OVLB
 /* (see tcap.h) -- nh_CM, nh_ND, nh_CD, nh_HI,nh_HE, nh_US,nh_UE,
             ul_hack */
 struct tc_lcl_data tc_lcl_data = { 0, 0, 0, 0, 0, 0, 0, FALSE };
-#endif /* OVLB */
 
-STATIC_VAR char *HO, *CL, *CE, *UP, *XD, *BC, *SO, *SE, *TI, *TE;
-STATIC_VAR char *VS, *VE;
-STATIC_VAR char *ME;
-STATIC_VAR char *MR;
+static char *HO, *CL, *CE, *UP, *XD, *BC, *SO, *SE, *TI, *TE;
+static char *VS, *VE;
+static char *ME;
+static char *MR;
 #if 0
-STATIC_VAR char *MB, *MH;
-STATIC_VAR char *MD;     /* may already be in use below */
+static char *MB, *MH;
+static char *MD;     /* may already be in use below */
 #endif
 #ifdef TERMLIB
 # ifdef TEXTCOLOR
-STATIC_VAR char *MD;
+static char *MD;
 # endif
-STATIC_VAR int SG;
-#ifdef OVLB
-STATIC_OVL char PC = '\0';
-#else /* OVLB */
-STATIC_DCL char PC;
-#endif /* OVLB */
-STATIC_VAR char tbuf[512];
+static int SG;
+static char PC = '\0';
+static char tbuf[512];
 #endif
 
 #ifdef TEXTCOLOR
@@ -69,17 +61,15 @@ char NEARDATA *hilites[CLR_MAX]; /* terminal escapes for the various colors */
 # endif
 #endif
 
-#ifdef OVLB
 static char *KS = (char *)0, *KE = (char *)0;   /* keypad sequences */
 static char nullstr[] = "";
-#endif /* OVLB */
 
 #if defined(ASCIIGRAPH) && !defined(NO_TERMS)
 extern boolean HE_resets_AS;
 #endif
 
 #ifndef TERMLIB
-STATIC_VAR char tgotobuf[20];
+static char tgotobuf[20];
 # ifdef TOS
 #define tgoto(fmt, x, y)    (Sprintf(tgotobuf, fmt, y+' ', x+' '), tgotobuf)
 # else
@@ -89,13 +79,13 @@ STATIC_VAR char tgotobuf[20];
 
 #ifndef MSDOS
 
-STATIC_DCL void NDECL(init_ttycolor);
+static void init_ttycolor(void);
 
 boolean colorflag = FALSE;          /* colors are initialized */
 int ttycolors[CLR_MAX];
 
 void
-init_ttycolor()
+init_ttycolor(void)
 {
     if (!colorflag) {
         ttycolors[CLR_RED]      = CLR_RED;
@@ -123,7 +113,7 @@ init_ttycolor()
     }
 }
 
-static int FDECL(convert_uchars, (char *, uchar *, int));
+static int convert_uchars(char *, uchar *, int);
 
 #ifdef VIDEOSHADES
 /*
@@ -156,10 +146,10 @@ int assign_videocolors(char *colorvals)
 #endif
 
 static int
-convert_uchars(bufp, list, size)
-char *bufp;         /* current pointer */
-uchar *list;        /* return list */
-int size;
+convert_uchars(
+    char *bufp,  /**< current pointer */
+    uchar *list, /**< return list */
+    int size)
 {
     unsigned int num = 0;
     int count = 0;
@@ -199,16 +189,13 @@ int size;
 }
 #endif /* !MSDOS */
 
-#ifdef OVLB
-
 void
-tty_startup(wid, hgt)
-int *wid, *hgt;
+tty_startup(int *wid, int *hgt)
 {
-    register int i;
+    int i;
 #ifdef TERMLIB
-    register const char *term;
-    register char *tptr;
+    const char *term;
+    char *tptr;
     char *tbufptr, *pc;
 #endif
 
@@ -463,7 +450,7 @@ int *wid, *hgt;
 /* note: at present, this routine is not part of the formal window interface */
 /* deallocate resources prior to final termination */
 void
-tty_shutdown()
+tty_shutdown(void)
 {
 #if defined(TEXTCOLOR) && defined(TERMLIB)
     kill_hilite();
@@ -473,8 +460,7 @@ tty_shutdown()
 }
 
 void
-tty_number_pad(state)
-int state;
+tty_number_pad(int state)
 {
     switch (state) {
     case -1:        /* activate keypad mode (escape sequences) */
@@ -490,8 +476,8 @@ int state;
 }
 
 #ifdef TERMLIB
-extern void NDECL((*decgraphics_mode_callback));    /* defined in drawing.c */
-static void NDECL(tty_decgraphics_termcap_fixup);
+extern void (*decgraphics_mode_callback)(void);    /* defined in drawing.c */
+static void tty_decgraphics_termcap_fixup(void);
 
 /*
    We call this routine whenever DECgraphics mode is enabled, even if it
@@ -501,7 +487,7 @@ static void NDECL(tty_decgraphics_termcap_fixup);
    so this is a convenient hook.
  */
 static void
-tty_decgraphics_termcap_fixup()
+tty_decgraphics_termcap_fixup(void)
 {
     static char ctrlN[]   = "\016";
     static char ctrlO[]   = "\017";
@@ -551,17 +537,17 @@ tty_decgraphics_termcap_fixup()
 #endif  /* TERMLIB */
 
 #if defined(ASCIIGRAPH) && defined(PC9800)
-extern void NDECL((*ibmgraphics_mode_callback));    /* defined in drawing.c */
+extern void (*ibmgraphics_mode_callback());    /* defined in drawing.c */
 #endif
 
 #ifdef PC9800
-extern void NDECL((*ascgraphics_mode_callback));    /* defined in drawing.c */
-static void NDECL(tty_ascgraphics_hilite_fixup);
+extern void (*ascgraphics_mode_callback());    /* defined in drawing.c */
+static void tty_ascgraphics_hilite_fixup();
 
 static void
-tty_ascgraphics_hilite_fixup()
+tty_ascgraphics_hilite_fixup(void)
 {
-    register int c;
+    int c;
 
     for (c = 0; c < CLR_MAX / 2; c++)
         if (c != CLR_BLACK) {
@@ -576,7 +562,7 @@ tty_ascgraphics_hilite_fixup()
 #endif /* PC9800 */
 
 void
-tty_start_screen()
+tty_start_screen(void)
 {
     xputs(TI);
     xputs(VS);
@@ -601,7 +587,7 @@ tty_start_screen()
 }
 
 void
-tty_end_screen()
+tty_end_screen(void)
 {
     clear_screen();
     xputs(VE);
@@ -610,18 +596,8 @@ tty_end_screen()
 
 /* Cursor movements */
 
-#endif /* OVLB */
-
-#ifdef OVL0
-/* Note to OVLx tinkerers.  The placement of this overlay controls the location
-   of the function xputc().  This function is not currently in trampoli.[ch]
-   files for what is deemed to be performance reasons.  If this define is moved
-   and or xputc() is taken out of the ROOT overlay, then action must be taken
-   in trampoli.[ch]. */
-
 void
-nocmov(x, y)
-int x, y;
+nocmov(int x, int y)
 {
     if ((int) ttyDisplay->cury > y) {
         if(UP) {
@@ -667,8 +643,7 @@ int x, y;
 }
 
 void
-cmov(x, y)
-register int x, y;
+cmov(int x, int y)
 {
     xputs(tgoto(nh_CM, x, y));
     ttyDisplay->cury = y;
@@ -697,29 +672,24 @@ xputc(int c) /* actually char, but explicitly specify its widened type */
 }
 
 void
-xputs(s)
-const char *s;
+xputs(const char *s)
 {
-# ifndef TERMLIB
+#ifndef TERMLIB
     (void) fputs(s, stdout);
-# else
-#  if defined(NHSTDC) || defined(ULTRIX_PROTO)
-    tputs(s, 1, (int (*)())xputc);
-#  else
+#else
     tputs(s, 1, xputc);
-#  endif
-# endif
+#endif
 }
 
 void
-cl_end()
+cl_end(void)
 {
     if(CE)
         xputs(CE);
     else {  /* no-CE fix - free after Harold Rynes */
         /* this looks terrible, especially on a slow terminal
            but is better than nothing */
-        register int cx = ttyDisplay->curx+1;
+        int cx = ttyDisplay->curx+1;
 
         while(cx < CO) {
             xputc(' ');
@@ -730,11 +700,8 @@ cl_end()
     }
 }
 
-#endif /* OVL0 */
-#ifdef OVLB
-
 void
-clear_screen()
+clear_screen(void)
 {
     /* note: if CL is null, then termcap initialization failed,
         so don't attempt screen-oriented I/O during final cleanup.
@@ -745,11 +712,8 @@ clear_screen()
     }
 }
 
-#endif /* OVLB */
-#ifdef OVL0
-
 void
-home()
+home(void)
 {
     if(HO)
         xputs(HO);
@@ -761,84 +725,77 @@ home()
 }
 
 void
-standoutbeg()
+standoutbeg(void)
 {
     if(SO) xputs(SO);
 }
 
 void
-standoutend()
+standoutend(void)
 {
     if(SE) xputs(SE);
 }
 
 #if 0   /* if you need one of these, uncomment it (here and in extern.h) */
 void
-revbeg()
+revbeg(void)
 {
     if(MR) xputs(MR);
 }
 
 void
-boldbeg()
+boldbeg(void)
 {
     if(MD) xputs(MD);
 }
 
 void
-blinkbeg()
+blinkbeg(void)
 {
     if(MB) xputs(MB);
 }
 
 void
-dimbeg()
+dimbeg(void)
 /* not in most termcap entries */
 {
     if(MH) xputs(MH);
 }
 
 void
-m_end()
+m_end(void)
 {
     if(ME) xputs(ME);
 }
 #endif
 
-#endif /* OVL0 */
-#ifdef OVLB
-
 void
-backsp()
+backsp(void)
 {
     xputs(BC);
 }
 
 void
-tty_nhbell()
+tty_nhbell(void)
 {
     if (flags.silent) return;
     (void) putchar('\007');     /* curx does not change */
     (void) fflush(stdout);
 }
 
-#endif /* OVLB */
-#ifdef OVL0
-
 #ifdef ASCIIGRAPH
 void
-graph_on() {
+graph_on(void)
+{
     if (AS) xputs(AS);
 }
 
 void
-graph_off() {
+graph_off(void)
+{
     if (AE) xputs(AE);
 }
 #endif
-
-#endif /* OVL0 */
-#ifdef OVL1
 
 #if !defined(MICRO)
 # ifdef VMS
@@ -855,10 +812,10 @@ static const short tmspc10[] = {        /* from termcap */
 
 /* delay 50 ms */
 void
-tty_delay_output()
+tty_delay_output(void)
 {
 #if defined(MICRO)
-    register int i;
+    int i;
 #endif
     if (iflags.debug_fuzzer) {
         return;
@@ -888,9 +845,9 @@ tty_delay_output()
 
     else if(ospeed > 0 && ospeed < SIZE(tmspc10) && nh_CM) {
         /* delay by sending cm(here) an appropriate number of times */
-        register int cmlen = strlen(tgoto(nh_CM, ttyDisplay->curx,
+        int cmlen = strlen(tgoto(nh_CM, ttyDisplay->curx,
                                           ttyDisplay->cury));
-        register int i = 500 + tmspc10[ospeed]/2;
+        int i = 500 + tmspc10[ospeed]/2;
 
         while(i > 0) {
             cmov((int)ttyDisplay->curx, (int)ttyDisplay->cury);
@@ -900,17 +857,14 @@ tty_delay_output()
 #endif /* MICRO */
 }
 
-#endif /* OVL1 */
-#ifdef OVLB
-
 void
-cl_eos()            /* free after Robert Viduya */
-{               /* must only be called with curx = 1 */
+cl_eos(void) /* free after Robert Viduya */
+{            /* must only be called with curx = 1 */
 
     if(nh_CD)
         xputs(nh_CD);
     else {
-        register int cy = ttyDisplay->cury+1;
+        int cy = ttyDisplay->cury+1;
         while(cy <= LI-2) {
             cl_end();
             xputc('\n');
@@ -1287,9 +1241,9 @@ init_color_rgb(int color, uint64_t rgb)
 }
 
 static void
-init_hilite()
+init_hilite(void)
 {
-    register int c;
+    int c;
     char *setf, *scratch;
 
     for (c = 0; c < SIZE(hilites); c++) {
@@ -1406,7 +1360,7 @@ analyze_seq (str, fg, bg)
 char *str;
 int *fg, *bg;
 {
-    register int c, code;
+    int c, code;
     int len;
 
 #   ifdef MICRO
@@ -1462,9 +1416,9 @@ int *fg, *bg;
  */
 
 static void
-init_hilite()
+init_hilite(void)
 {
-    register int c;
+    int c;
 #  ifdef TOS
     extern unsigned long tos_numcolors; /* in tos.c */
     static char NOCOL[] = "\033b0", COLHE[] = "\033q\033b0";
@@ -1544,10 +1498,10 @@ init_hilite()
 # endif /* UNIX */
 
 static void
-kill_hilite()
+kill_hilite(void)
 {
 # ifndef TOS
-    register int c;
+    int c;
 
     for (c = 0; c < CLR_MAX / 2; c++) {
         if ((!iflags.wc2_newcolors) &&
@@ -1568,8 +1522,7 @@ kill_hilite()
 static char nulstr[] = "";
 
 static char *
-s_atr2str(n)
-int n;
+s_atr2str(int n)
 {
     switch (n) {
     case ATR_ULINE:
@@ -1590,8 +1543,7 @@ int n;
 }
 
 static char *
-e_atr2str(n)
-int n;
+e_atr2str(int n)
 {
     switch (n) {
     case ATR_ULINE:
@@ -1610,8 +1562,7 @@ int n;
 
 
 void
-term_start_attr(attr)
-int attr;
+term_start_attr(int attr)
 {
     if (attr) {
         xputs(s_atr2str(attr));
@@ -1620,8 +1571,7 @@ int attr;
 
 
 void
-term_end_attr(attr)
-int attr;
+term_end_attr(int attr)
 {
     if(attr) {
         xputs(e_atr2str(attr));
@@ -1630,14 +1580,14 @@ int attr;
 
 
 void
-term_start_raw_bold()
+term_start_raw_bold(void)
 {
     xputs(nh_HI);
 }
 
 
 void
-term_end_raw_bold()
+term_end_raw_bold(void)
 {
     xputs(nh_HE);
 }
@@ -1646,15 +1596,14 @@ term_end_raw_bold()
 #ifdef TEXTCOLOR
 
 void
-term_end_color()
+term_end_color(void)
 {
     xputs(nh_HE);
 }
 
 
 void
-term_start_color(color)
-int color;
+term_start_color(int color)
 {
     if (iflags.wc2_newcolors)
         xputs(hilites[ttycolors[color]]);
@@ -1664,8 +1613,7 @@ int color;
 
 
 int
-has_color(color)
-int color;
+has_color(int color)
 {
 #ifdef X11_GRAPHICS
     /* XXX has_color() should be added to windowprocs */
@@ -1702,8 +1650,6 @@ int color;
 }
 
 #endif /* TEXTCOLOR */
-
-#endif /* OVLB */
 
 #endif /* TTY_GRAPHICS */
 

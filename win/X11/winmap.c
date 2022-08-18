@@ -50,7 +50,7 @@ extern short glyph2tile[];
 extern int total_tiles_used;
 
 /* from dlb.c */
-extern FILE *FDECL(fopen_datafile, (const char *,const char *,int));
+extern FILE *fopen_datafile(const char *,const char *,int);
 
 /* Define these if you really want a lot of junk on your screen. */
 /* #define VERBOSE */		/* print various info & events as they happen */
@@ -61,23 +61,23 @@ extern FILE *FDECL(fopen_datafile, (const char *,const char *,int));
 #define USE_WHITE	/* almost always use white as a tile cursor border */
 
 
-static boolean FDECL(init_tiles, (struct xwindow *));
-static void FDECL(set_button_values, (Widget,int,int,unsigned));
-static void FDECL(map_check_size_change, (struct xwindow *));
-static void FDECL(map_update, (struct xwindow *,int,int,int,int,BOOLEAN_P));
-static void FDECL(init_text, (struct xwindow *));
-static void FDECL(map_exposed, (Widget,XtPointer,XtPointer));
-static void FDECL(set_gc, (Widget,Font,char *,Pixel,GC *,GC *));
-static void FDECL(get_text_gc, (struct xwindow *,Font));
-static void FDECL(get_char_info, (struct xwindow *));
-static void FDECL(display_cursor, (struct xwindow *));
+static boolean init_tiles(struct xwindow *);
+static void set_button_values(Widget,int,int,unsigned);
+static void map_check_size_change(struct xwindow *);
+static void map_update(struct xwindow *,int,int,int,int,BOOLEAN_P);
+static void init_text(struct xwindow *);
+static void map_exposed(Widget,XtPointer,XtPointer);
+static void set_gc(Widget,Font,char *,Pixel,GC *,GC *);
+static void get_text_gc(struct xwindow *,Font);
+static void get_char_info(struct xwindow *);
+static void display_cursor(struct xwindow *);
 
 /* Global functions ======================================================== */
 
 void
 X11_print_glyph(window, x, y, glyph, bg_glyph)
     winid window;
-    xchar x, y;
+    coordxy x, y;
     int glyph;
     int bg_glyph UNUSED;
 {

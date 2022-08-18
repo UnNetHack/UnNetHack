@@ -9,27 +9,27 @@
 #include <limits.h>
 
 #ifdef SINKS
-static void NDECL(polymorph_sink);
-static boolean NDECL(teleport_sink);
-STATIC_DCL void FDECL(dosinkring, (struct obj *));
+static void polymorph_sink(void);
+static boolean teleport_sink(void);
+static void dosinkring(struct obj *);
 #endif /* SINKS */
 
-STATIC_PTR int FDECL(drop, (struct obj *));
-STATIC_PTR int NDECL(wipeoff);
+static int drop(struct obj *);
+static int wipeoff(void);
 
-STATIC_DCL int FDECL(menu_drop, (int));
-STATIC_DCL int NDECL(currentlevel_rewrite);
-STATIC_DCL void NDECL(final_level);
-/* static boolean FDECL(badspot, (XCHAR_P,XCHAR_P)); */
-STATIC_DCL boolean NDECL(unique_item_check);
-STATIC_DCL void NDECL(levelport_monsters);
+static int menu_drop(int);
+static int currentlevel_rewrite(void);
+static void final_level(void);
+/* static boolean badspot(coordxy,coordxy); */
+static boolean unique_item_check(void);
+static void levelport_monsters(void);
 
 static NEARDATA const char drop_types[] =
 { ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, 0 };
 
 /* 'd' command: drop one inventory item */
 int
-dodrop()
+dodrop(void)
 {
     int result, i = (invent) ? 0 : (SIZE(drop_types) - 1);
 
@@ -48,10 +48,7 @@ dodrop()
  * it's gone for good...  If the destination is not a pool, returns FALSE.
  */
 boolean
-boulder_hits_pool(otmp, rx, ry, pushing)
-struct obj *otmp;
-register int rx, ry;
-boolean pushing;
+boulder_hits_pool(struct obj *otmp, int rx, int ry, boolean pushing)
 {
     if (!otmp || otmp->otyp != BOULDER)
         warning("Not a boulder?");
@@ -136,10 +133,7 @@ boolean pushing;
  * away.
  */
 boolean
-flooreffects(obj, x, y, verb)
-struct obj *obj;
-int x, y;
-const char *verb;
+flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
 {
     struct trap *t;
     struct monst *mtmp;
@@ -291,8 +285,7 @@ const char *verb;
 
 /** obj is an object dropped on an altar */
 void
-doaltarobj(obj)
-register struct obj *obj;
+doaltarobj(struct obj *obj)
 {
     if (Blind)
         return;
@@ -393,7 +386,7 @@ register struct obj *obj;
 /** Transforms the sink at the player's position into
  * a fountain, throne, altar or grave. */
 static void
-polymorph_sink()
+polymorph_sink(void)
 {
     if (levl[u.ux][u.uy].typ != SINK) { return; }
 
@@ -438,7 +431,7 @@ polymorph_sink()
 /** Teleports the sink at the player's position.
  * @return TRUE if sink teleported */
 static boolean
-teleport_sink()
+teleport_sink(void)
 {
     int cx, cy;
     int cnt = 0;
@@ -466,10 +459,9 @@ teleport_sink()
     return FALSE;
 }
 
-STATIC_OVL
-void
-dosinkring(obj)  /* obj is a ring being dropped over a kitchen sink */
-register struct obj *obj;
+static void
+dosinkring(struct obj *obj)  /* obj is a ring being dropped over a kitchen sink */
+
 {
     struct obj *otmp, *otmp2;
     boolean ideed = TRUE;
@@ -630,9 +622,7 @@ giveback:
 
 /* some common tests when trying to drop or throw items */
 boolean
-canletgo(obj, word)
-struct obj *obj;
-const char *word;
+canletgo(struct obj *obj, const char *word)
 {
     if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
         if (*word)
@@ -673,10 +663,8 @@ const char *word;
     return(TRUE);
 }
 
-STATIC_PTR
-int
-drop(obj)
-register struct obj *obj;
+static int
+drop(struct obj *obj)
 {
     if(!obj) return(0);
     if(!canletgo(obj, "drop"))
@@ -734,8 +722,7 @@ register struct obj *obj;
 /* Called in several places - may produce output */
 /* eg ship_object() and dropy() -> sellobj() both produce output */
 void
-dropx(obj)
-register struct obj *obj;
+dropx(struct obj *obj)
 {
     /* Tipped objects aren't considered carried, even if
      * their container is, so don't freeinv() it. */
@@ -754,17 +741,14 @@ register struct obj *obj;
 
 /* dropy - put dropped object at destination; called from lots of places */
 void
-dropy(obj)
-struct obj *obj;
+dropy(struct obj *obj)
 {
     dropz(obj, FALSE);
 }
 
 /* dropz - really put dropped object at its destination... */
 void
-dropz(obj, with_impact)
-struct obj *obj;
-boolean with_impact;
+dropz(struct obj *obj, boolean with_impact)
 {
     if (obj == uwep) setuwep((struct obj *)0);
     if (obj == uquiver) setuqwep((struct obj *)0);
@@ -830,8 +814,7 @@ boolean with_impact;
 /* things that must change when not held; recurse into containers.
    Called for both player and monsters */
 void
-obj_no_longer_held(obj)
-struct obj *obj;
+obj_no_longer_held(struct obj *obj)
 {
     if (!obj) {
         return;
@@ -857,7 +840,7 @@ struct obj *obj;
 
 /* 'D' command: drop several things */
 int
-doddrop()
+doddrop(void)
 {
     int result = 0;
 
@@ -879,9 +862,8 @@ doddrop()
 }
 
 /* Drop things from the hero's inventory, using a menu. */
-STATIC_OVL int
-menu_drop(retry)
-int retry;
+static int
+menu_drop(int retry)
 {
     int n, i, n_dropped = 0;
     long cnt;
@@ -1001,7 +983,7 @@ static NEARDATA boolean at_ladder = FALSE;
 
 /** the '>' command */
 int
-dodown()
+dodown(void)
 {
     struct trap *trap = 0;
     boolean stairs_down = ((u.ux == xdnstair && u.uy == ydnstair) ||
@@ -1156,7 +1138,7 @@ dodown()
 
 /** the '<' command */
 int
-doup()
+doup(void)
 {
     if (u_rooted()) {
         return 1;
@@ -1217,10 +1199,10 @@ doup()
 d_level save_dlevel = {0, 0};
 
 /* check that we can write out the current level */
-STATIC_OVL int
-currentlevel_rewrite()
+static int
+currentlevel_rewrite(void)
 {
-    register int fd;
+    int fd;
     char whynot[BUFSZ];
 
     /* since level change might be a bit slow, flush any buffered screen
@@ -1254,7 +1236,7 @@ currentlevel_rewrite()
 
 #ifdef INSURANCE
 void
-save_currentstate()
+save_currentstate(void)
 {
     int fd;
 
@@ -1275,7 +1257,7 @@ save_currentstate()
 /*
    static boolean
    badspot(x, y)
-   register xchar x, y;
+   coordxy x, y;
    {
     return((levl[x][y].typ != ROOM && levl[x][y].typ != AIR &&
              levl[x][y].typ != CORR) || MON_AT(x, y));
@@ -1285,8 +1267,7 @@ save_currentstate()
 /* when arriving on a level, if hero and a monster are trying to share same
    spot, move one; extracted from goto_level(); also used by wiz_makemap() */
 void
-u_collide_m(mtmp)
-struct monst *mtmp;
+u_collide_m(struct monst *mtmp)
 {
     coord cc;
 
@@ -1327,12 +1308,10 @@ d_level new_dlevel = {0, 0};
 #endif
 
 void
-goto_level(newlevel, at_stairs, falling, portal)
-d_level *newlevel;
-boolean at_stairs, falling, portal;
+goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal)
 {
     int fd, l_idx;
-    xchar new_ledger;
+    xint16 new_ledger;
     boolean cant_go_back,
             up = (depth(newlevel) < depth(&u.uz)),
             newdungeon = (u.uz.dnum != newlevel->dnum),
@@ -1514,7 +1493,7 @@ boolean at_stairs, falling, portal;
 
     if (portal && !In_endgame(&u.uz)) {
         /* find the portal on the new level */
-        register struct trap *ttrap;
+        struct trap *ttrap;
 
         for (ttrap = ftrap; ttrap; ttrap = ttrap->ntrap)
             /* find the portal with the right destination level */
@@ -1532,7 +1511,7 @@ boolean at_stairs, falling, portal;
             } else {
                 if (newdungeon) {
                     if (Is_stronghold(&u.uz)) {
-                        register xchar x, y;
+                        coordxy x, y;
                         int trycnt = 0;
 
                         do {
@@ -1851,8 +1830,8 @@ boolean at_stairs, falling, portal;
 #endif
 }
 
-STATIC_OVL void
-final_level()
+static void
+final_level(void)
 {
     struct monst *mtmp;
     struct obj *otmp;
@@ -1920,11 +1899,7 @@ static char *dfr_pre_msg = 0,   /* pline() before level change */
 
 /* change levels at the end of this turn, after monsters finish moving */
 void
-schedule_goto(tolev, at_stairs, falling, portal_flag, pre_msg, post_msg)
-d_level *tolev;
-boolean at_stairs, falling;
-int portal_flag;
-const char *pre_msg, *post_msg;
+schedule_goto(d_level *tolev, boolean at_stairs, boolean falling, int portal_flag, const char *pre_msg, const char *post_msg)
 {
     int typmask = 0100;     /* non-zero triggers `deferred_goto' */
 
@@ -1947,7 +1922,7 @@ const char *pre_msg, *post_msg;
 
 /* handle something like portal ejection */
 void
-deferred_goto()
+deferred_goto(void)
 {
     if (!on_level(&u.uz, &u.utolev)) {
         d_level dest;
@@ -1979,12 +1954,11 @@ deferred_goto()
  * Returns TRUE if the corpse is gone afterwards.
  */
 boolean
-revive_corpse(corpse)
-struct obj *corpse;
+revive_corpse(struct obj *corpse)
 {
     struct monst *mtmp = 0, *mcarry;
     boolean is_uwep, chewed;
-    xchar where;
+    xint16 where;
     char cname[BUFSZ];
     struct obj *container = (struct obj *)0;
     int container_where = 0;
@@ -2106,9 +2080,7 @@ struct obj *corpse;
 /* Revive the corpse via a timeout. */
 /*ARGSUSED*/
 void
-revive_mon(arg, timeout)
-anything *arg;
-long timeout UNUSED;
+revive_mon(anything *arg, long int timeout UNUSED)
 {
     struct obj *body = arg->a_obj;
     struct permonst *mptr = &mons[body->corpsenm];
@@ -2163,13 +2135,13 @@ zombify_mon(anything *arg, long timeout)
 }
 
 int
-donull()
+donull(void)
 {
     return(1);  /* Do nothing, but let other things happen */
 }
 
-STATIC_PTR int
-wipeoff()
+static int
+wipeoff(void)
 {
     if(u.ucreamed < 4) u.ucreamed = 0;
     else u.ucreamed -= 4;
@@ -2191,7 +2163,7 @@ wipeoff()
 }
 
 int
-dowipe()
+dowipe(void)
 {
     if(u.ucreamed)  {
         static NEARDATA char buf[39];
@@ -2208,9 +2180,7 @@ dowipe()
 }
 
 void
-set_wounded_legs(side, timex)
-register long side;
-register int timex;
+set_wounded_legs(long int side, int timex)
 {
     /* KMH -- STEED
      * If you are riding, your steed gets the wounded legs instead.
@@ -2230,8 +2200,7 @@ register int timex;
 }
 
 void
-heal_legs(how)
-int how; /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
+heal_legs(int how) /**< 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
 {
     if (Wounded_legs) {
         if (ATEMP(A_DEX) < 0) {
@@ -2273,10 +2242,10 @@ int how; /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
 
 /* return true if any unique item is on the floor or in monsters' possession */
 boolean
-unique_item_check()
+unique_item_check(void)
 {
-    register struct obj *obj;
-    register struct monst *mtmp;
+    struct obj *obj;
+    struct monst *mtmp;
 
     for (obj = fobj; obj; obj = obj->nobj) {
         if (is_unique(obj)) return TRUE;
@@ -2292,9 +2261,9 @@ unique_item_check()
 
 /* prevent monsters from "poofing" -- disappearing due to non-persistent levels */
 void
-levelport_monsters()
+levelport_monsters(void)
 {
-    register struct monst *mtmp, *mtmp2;
+    struct monst *mtmp, *mtmp2;
     int nlev;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp2) {

@@ -325,11 +325,11 @@ struct symdef defsyms[MAXPCHARS] = {
 #ifdef ASCIIGRAPH
 
 #ifdef PC9800
-void NDECL((*ibmgraphics_mode_callback)) = 0;   /* set in tty_start_screen() */
+void (*ibmgraphics_mode_callback)(void) = 0; /* set in tty_start_screen() */
 #endif /* PC9800 */
 
 #ifdef CURSES_GRAPHICS
-void NDECL((*cursesgraphics_mode_callback)) = 0;
+void (*cursesgraphics_mode_callback)(void) = 0;
 #endif
 
 static glyph_t ibm_graphics[MAXPCHARS] = {
@@ -438,7 +438,7 @@ static glyph_t ibm_graphics[MAXPCHARS] = {
 #endif  /* ASCIIGRAPH */
 
 #ifdef TERMLIB
-void NDECL((*decgraphics_mode_callback)) = 0;  /* set in tty_start_screen() */
+void (*decgraphics_mode_callback)(void) = 0;  /* set in tty_start_screen() */
 
 static glyph_t dec_graphics[MAXPCHARS] = {
 /* 0*/ g_FILLER(S_stone),
@@ -760,7 +760,7 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
 #endif
 
 #ifdef PC9800
-void NDECL((*ascgraphics_mode_callback)) = 0;   /* set in tty_start_screen() */
+void (*ascgraphics_mode_callback)(void) = 0;   /* set in tty_start_screen() */
 #endif
 
 /*
@@ -769,8 +769,7 @@ void NDECL((*ascgraphics_mode_callback)) = 0;   /* set in tty_start_screen() */
  * options.c, pickup.c, sp_lev.c, and lev_main.c.
  */
 int
-def_char_to_objclass(ch)
-char ch;
+def_char_to_objclass(char ch)
 {
     int i;
     for (i = 1; i < MAXOCLASSES; i++)
@@ -783,8 +782,7 @@ char ch;
  * match made.  If there are are no matches, return MAXMCLASSES.
  */
 int
-def_char_to_monclass(ch)
-char ch;
+def_char_to_monclass(char ch)
 {
     int i;
     for (i = 1; i < MAXMCLASSES; i++)
@@ -793,11 +791,9 @@ char ch;
 }
 
 void
-assign_graphics(graph_chars, glth, maxlen, offset)
-register glyph_t *graph_chars;
-int glth, maxlen, offset;
+assign_graphics(glyph_t *graph_chars, int glth, int maxlen, int offset)
 {
-    register int i;
+    int i;
 
     for (i = 0; i < maxlen; i++)
         showsyms[i+offset] = (((i < glth) && graph_chars[i]) ?
@@ -805,8 +801,7 @@ int glth, maxlen, offset;
 }
 
 void
-switch_graphics(gr_set_flag)
-int gr_set_flag;
+switch_graphics(int gr_set_flag)
 {
     iflags.IBMgraphics = FALSE;
     iflags.DECgraphics = FALSE;
@@ -882,9 +877,7 @@ int gr_set_flag;
 
 /** Change the UTF8graphics symbol at position with codepoint "value". */
 void
-assign_utf8graphics_symbol(position, value)
-int position;
-glyph_t value;
+assign_utf8graphics_symbol(int position, glyph_t value)
 {
 #ifdef UTF8_GLYPHS
     if (position < MAXPCHARS) {
@@ -905,7 +898,7 @@ static glyph_t save_showsyms[MAXPCHARS] = DUMMY;
 static uchar save_monsyms[MAXPCHARS]    = DUMMY;
 
 void
-save_syms()
+save_syms(void)
 {
     (void) memcpy((genericptr_t)save_showsyms,
                   (genericptr_t)showsyms, sizeof showsyms);
@@ -916,7 +909,7 @@ save_syms()
 }
 
 void
-restore_syms()
+restore_syms(void)
 {
     (void) memcpy((genericptr_t)showsyms,
                   (genericptr_t)save_showsyms, sizeof showsyms);
@@ -994,13 +987,12 @@ static const uchar IBM_r_oc_syms[MAXOCLASSES] = {   /* a la EPYX Rogue */
 # endif /* ASCIIGRAPH */
 
 void
-assign_rogue_graphics(is_rlevel)
-boolean is_rlevel;
+assign_rogue_graphics(boolean is_rlevel)
 {
     /* Adjust graphics display characters on Rogue levels */
 
     if (is_rlevel) {
-        register int i;
+        int i;
 
         save_syms();
 
@@ -1067,8 +1059,7 @@ boolean is_rlevel;
 #endif /* REINCARNATION */
 
 void
-assign_moria_graphics(is_moria)
-boolean is_moria;
+assign_moria_graphics(boolean is_moria)
 {
     /* Adjust graphics display characters on Moria levels */
 

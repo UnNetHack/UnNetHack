@@ -6,7 +6,7 @@
 #define COORD_H
 
 typedef struct nhcoord {
-    int8_t x, y;
+    coordxy x, y;
 } coord;
 
 #endif /* COORD_H */

@@ -34,10 +34,10 @@
  *                       random intervals.
  */
 
-STATIC_DCL boolean FDECL(md_start, (coord *));
-STATIC_DCL boolean FDECL(md_stop, (coord *, coord *));
-STATIC_DCL boolean FDECL(md_rush, (struct monst *, int, int));
-STATIC_DCL void FDECL(newmail, (struct mail_info *));
+static boolean md_start(coord *);
+static boolean md_stop(coord *, coord *);
+static boolean md_rush(struct monst *, int, int);
+static void newmail(struct mail_info *);
 
 int mailckfreq = 0;
 
@@ -57,9 +57,9 @@ static int gethint = -1;
 #   if !defined(SUNOS4) && !(defined(ULTRIX) && defined(__GNUC__))
 /* DO trust all SVR4 to typedef uid_t in <sys/types.h> (probably to a long) */
 #    if defined(POSIX_TYPES) || defined(SVR4) || defined(HPUX)
-extern struct passwd *FDECL(getpwuid, (uid_t));
+extern struct passwd *getpwuid(uid_t);
 #    else
-extern struct passwd *FDECL(getpwuid, (int));
+extern struct passwd *getpwuid(int);
 #    endif
 #   endif
 #  endif
@@ -85,7 +85,7 @@ static long laststattime;
 # endif
 
 void
-free_maildata()
+free_maildata(void)
 {
     if (mailbox) {
         free(mailbox);
@@ -94,7 +94,7 @@ free_maildata()
 }
 
 void
-getmailstatus()
+getmailstatus(void)
 {
     if(!mailbox && !(mailbox = nh_getenv("MAIL"))) {
 #  ifdef MAILPATH
@@ -135,9 +135,8 @@ getmailstatus()
  * Pick coordinates for a starting position for the mail daemon.  Called
  * from newmail() and newphone().
  */
-STATIC_OVL boolean
-md_start(startp)
-coord *startp;
+static boolean
+md_start(coord *startp)
 {
     coord testcc;   /* scratch coordinates */
     int row;        /* current row we are checking */
@@ -192,7 +191,7 @@ retry:
                     startp->y = row;
                     startp->x = viz_rmin[row];
 
-                } else if (enexto(&testcc, (xchar)viz_rmin[row], row,
+                } else if (enexto(&testcc, (coordxy)viz_rmin[row], row,
                                   (struct permonst *) 0) &&
                            !cansee(testcc.x, testcc.y) &&
                            couldsee(testcc.x, testcc.y)) {
@@ -207,7 +206,7 @@ retry:
                     startp->y = row;
                     startp->x = viz_rmax[row];
 
-                } else if (enexto(&testcc, (xchar)viz_rmax[row], row,
+                } else if (enexto(&testcc, (coordxy)viz_rmax[row], row,
                                   (struct permonst *) 0) &&
                            !cansee(testcc.x, testcc.y) &&
                            couldsee(testcc.x, testcc.y)) {
@@ -236,10 +235,10 @@ retry:
  * enexto().  Use enexto() as a last resort because enexto() chooses
  * its point randomly, which is not what we want.
  */
-STATIC_OVL boolean
-md_stop(stopp, startp)
-coord *stopp;       /* stopping position (we fill it in) */
-coord *startp;      /* starting position (read only) */
+static boolean
+md_stop(
+    coord *stopp, /**< stopping position (we fill it in) */
+    coord *startp) /**< starting position (read only) */
 {
     int x, y, distance, min_distance = -1;
 
@@ -280,13 +279,14 @@ static NEARDATA const char *mail_text[] = {
  * FALSE if the md gets stuck in a position where there is a monster.  Return
  * TRUE otherwise.
  */
-STATIC_OVL boolean
-md_rush(md, tx, ty)
-struct monst *md;
-register int tx, ty;            /* destination of mail daemon */
+static boolean
+md_rush(
+    struct monst *md,
+    int tx,
+    int ty) /**< destination of mail daemon */
 {
     struct monst *mon;          /* displaced monster */
-    register int dx, dy;        /* direction counters */
+    int dx, dy;        /* direction counters */
     int fx = md->mx, fy = md->my;   /* current location */
     int nfx = fx, nfy = fy,     /* new location */
         d1, d2;         /* shortest distances */
@@ -381,9 +381,8 @@ register int tx, ty;            /* destination of mail daemon */
 
 /* Deliver a scroll of mail. */
 /*ARGSUSED*/
-STATIC_OVL void
-newmail(info)
-struct mail_info *info;
+static void
+newmail(struct mail_info *info)
 {
     struct monst *md;
     coord start, stop;
@@ -493,7 +492,7 @@ struct obj *otmp;
 # ifdef UNIX
 
 void
-ckmailstatus()
+ckmailstatus(void)
 {
 #ifdef SIMPLE_MAIL
     if (mailckfreq == 0)
@@ -533,12 +532,11 @@ ckmailstatus()
 
 /*ARGSUSED*/
 void
-readmail(otmp)
-struct obj *otmp;
+readmail(struct obj *otmp)
 {
     nhUse(otmp);
 #ifdef DEF_MAILREADER
-    register const char *mr = 0;
+    const char *mr = 0;
     if (iflags.debug_fuzzer) {
         return;
     }
@@ -631,7 +629,7 @@ bail:
 
 # ifdef VMS
 
-extern NDECL(struct mail_info *parse_next_broadcast);
+extern struct mail_info *parse_next_broadcast();
 
 volatile int broadcasts = 0;
 
@@ -725,8 +723,7 @@ struct obj *otmp;
 # endif /* LAN_MAIL */
 
 void
-read_hint(otmp)
-struct obj *otmp UNUSED;
+read_hint(struct obj *otmp UNUSED)
 {
     /* TODO: option for beginner, general changes, public server hints? */
     static const char *hint[] = {
@@ -754,7 +751,7 @@ struct obj *otmp UNUSED;
 }
 
 void
-maybe_hint()
+maybe_hint(void)
 {
     if (u.uswallow || !flags.biff || !flags.hint) return;
 
