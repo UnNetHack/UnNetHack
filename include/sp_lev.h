@@ -287,11 +287,11 @@ enum corefuncs {
 #define SP_REGION_Y2(l) ((l >> 24) & 0xff)
 #define SP_REGION_PACK(x1, y1, x2, y2) ((( x1 ) & 0xff) + ((( y1 ) & 0xff) << 8) + ((( x2 ) & 0xff) << 16) + ((( y2 ) & 0xff) << 24))
 
-#define SP_MONST_CLASS(l) (l & 0xff)
+#define SP_MONST_CLASS(l) (int8_t)(l & 0xff)
 #define SP_MONST_PM(l)    ((l >> 8) & 0xffff)
 #define SP_MONST_PACK(m, c) ((( m ) << 8) + ((char)( c )))
 
-#define SP_OBJ_CLASS(l)   (l & 0xff)
+#define SP_OBJ_CLASS(l)   (int8_t)(l & 0xff)
 #define SP_OBJ_TYP(l)     ((l >> 8) & 0xffff)
 #define SP_OBJ_PACK(o, c)  ((( o ) << 8) + ((char)( c )))
 
