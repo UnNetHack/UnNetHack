@@ -182,8 +182,10 @@ Boots_on(void)
         break;
 
     case WATER_WALKING_BOOTS:
-        if (u.uinwater || is_lava(u.ux, u.uy) || is_swamp(u.ux, u.uy))
+        if (u.uinwater || is_lava(u.ux, u.uy) || is_swamp(u.ux, u.uy)) {
             spoteffects(TRUE);
+            makeknown_msg(uarmf->otyp);
+        }
         break;
 
     case SPEED_BOOTS:
