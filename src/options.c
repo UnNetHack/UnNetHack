@@ -3964,13 +3964,12 @@ goodfruit:
             return FALSE;
         } else {
             if (negated)
-                iflags.wc2_windowborders = 2; /* Off */
+                iflags.wc2_windowborders = 0; /* Off */
             else if (!op)
                 iflags.wc2_windowborders = 1; /* On */
             else    /* Value supplied */
                 iflags.wc2_windowborders = atoi(op);
-            if ((iflags.wc2_windowborders > 3) ||
-                (iflags.wc2_windowborders < 1)) {
+            if ((iflags.wc2_windowborders > 2) || (iflags.wc2_windowborders < 0)) {
                 iflags.wc2_windowborders = 0;
                 badoption(opts);
                 return FALSE;
@@ -5365,9 +5364,9 @@ get_compopt_value(const char *optname, char *buf)
 # endif /* MSDOS */
 #endif /* VIDEOSHADES */
     else if (!strcmp(optname, "windowborders"))
-        Sprintf(buf, "%s", iflags.wc2_windowborders == 1     ? "1=on" :
-                iflags.wc2_windowborders == 2             ? "2=off" :
-                iflags.wc2_windowborders == 3             ? "3=auto" :
+        Sprintf(buf, "%s", iflags.wc2_windowborders == 0 ? "0=off" :
+                iflags.wc2_windowborders == 1            ? "1=on" :
+                iflags.wc2_windowborders == 2            ? "2=auto" :
                 defopt);
     else if (!strcmp(optname, "windowtype"))
         Sprintf(buf, "%s", windowprocs.name);
@@ -6041,12 +6040,12 @@ is_wc2_option(const char *optnam)
 static boolean
 wc2_supported(const char *optnam)
 {
-    int k = 0;
-    while (wc2_options[k].wc_name) {
-        if (!strcmp(wc2_options[k].wc_name, optnam) &&
-            (windowprocs.wincap2 & wc2_options[k].wc_bit))
-            return TRUE;
-        k++;
+    int k;
+
+    for (k = 0; wc2_options[k].wc_name; ++k) {
+        if (!strcmp(wc2_options[k].wc_name, optnam)) {
+            return (windowprocs.wincap2 & wc2_options[k].wc_bit) ? TRUE : FALSE;
+        }
     }
     return FALSE;
 }

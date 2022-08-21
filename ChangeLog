@@ -13,6 +13,7 @@
 	* Config changes:
 	  - Switched from pmatch to regexp engine for AUTOPICKUP_EXCEPTIONS
 	  - Statuscolors and menucolors defaults in sysconf
+	  - Windowborders changed to NetHack 3.6 values
 
 	* Monster changes:
 	  - Foocubi switch gender after successful seduction attack

@@ -182,21 +182,21 @@ curses_create_main_windows(void)
     boolean borders = FALSE;
 
     switch (iflags.wc2_windowborders) {
+    default:
+    case 0:                     /* Off */
+        borders = FALSE;
+        break;
+
     case 1:                     /* On */
         borders = TRUE;
         break;
-    case 2:                     /* Off */
-        borders = FALSE;
-        break;
-    case 3:                     /* Auto */
+
+    case 2:                     /* Auto */
         if ((term_cols > 81) && (term_rows > 25)) {
             borders = TRUE;
         }
         break;
-    default:
-        borders = FALSE;
     }
-
 
     if (borders) {
         border_space = 2;
@@ -901,7 +901,7 @@ curses_init_options(void)
 #endif /* PDCURSES */
 
     if (!iflags.wc2_windowborders) {
-        iflags.wc2_windowborders = 3;   /* Set to auto if not specified */
+        iflags.wc2_windowborders = 2; /* Set to auto if not specified */
     }
 
     if (!iflags.wc2_petattr) {
