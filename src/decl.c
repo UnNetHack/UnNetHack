@@ -214,6 +214,9 @@ NEARDATA struct spell spl_book[MAXSPELL + 1] = {DUMMY};
 
 long game_loop_counter = 1L;
 NEARDATA long moves = 1L, monstermoves = 1L;
+long hero_seq = 1L << 3; /* hero_seq: sequence number for hero movement, 'moves*8 + n'
+                          * where n is usually 1, sometimes 2 when Fast/Very_fast, maybe
+                          * higher if polymorphed into something that's even faster */
 /* These diverge when player is Fast */
 NEARDATA long wailmsg = 0L;
 

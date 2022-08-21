@@ -55,10 +55,9 @@ struct window_procs tty_procs = {
 #endif
     WC_COLOR|WC_HILITE_PET|WC_INVERSE|WC_EIGHT_BIT_IN,
 #ifdef TERMINFO
-    WC2_NEWCOLORS,
-#else
-    0L,
+    WC2_NEWCOLORS |
 #endif
+    WC2_SUPPRESS_HIST | WC2_URGENT_MESG,
     tty_init_nhwindows,
     tty_player_selection,
     tty_askname,
@@ -1458,8 +1457,11 @@ tty_create_nhwindow(int type)
         /* message window, 1 line long, very wide, top of screen */
         newwin->offx = newwin->offy = 0;
         /* sanity check */
-        if(iflags.msg_history < 20) iflags.msg_history = 20;
-        else if(iflags.msg_history > 60) iflags.msg_history = 60;
+        if (iflags.msg_history < 20) {
+            iflags.msg_history = 20;
+        } else if (iflags.msg_history > 60) {
+            iflags.msg_history = 60;
+        }
         newwin->maxrow = newwin->rows = iflags.msg_history;
         newwin->maxcol = newwin->cols = 0;
         break;
@@ -2545,7 +2547,21 @@ tty_putstr_extended(
 #if defined(USER_SOUNDS) && defined(WIN32CON)
         play_sound_for_message(str);
 #endif
-        int suppress_history = (attr & ATR_NOHISTORY);
+        int suppress_history = (attr & ATR_NOHISTORY),
+            urgent_message = (attr & ATR_URGENT);
+
+        /* if message is designated 'urgent' don't suppress it if user has
+           typed ESC at --More-- prompt when dismissing an earlier message;
+           besides turning off WIN_STOP, we need to prevent current message
+           from provoking --More-- and giving the user another chance at
+           using ESC to suppress, otherwise this message wouldn't get shown */
+        if (urgent_message) {
+            if ((cw->flags & WIN_STOP) != 0) {
+                tty_clear_nhwindow(WIN_MESSAGE);
+                cw->flags &= ~WIN_STOP;
+            }
+            cw->flags |= WIN_NOSTOP;
+        }
 
         /* in case we ever support display attributes for topline
            messages, clear flag mask leaving only display attr */
@@ -2561,6 +2577,8 @@ tty_putstr_extended(
             /* write to top line without remembering what we're writing */
             show_topl(str);
         }
+
+        cw->flags &= ~WIN_NOSTOP; /* NOSTOP is a one-shot operation */
         break;
     }
 

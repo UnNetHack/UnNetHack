@@ -605,6 +605,8 @@ restgamestate(int fd, unsigned int *stuckid, unsigned int *steedid)
     restore_dungeon(fd);
     restlevchn(fd);
     mread(fd, (genericptr_t) &moves, sizeof moves);
+    /* hero_seq isn't saved and restored because it can be recalculated */
+    hero_seq = moves << 3; /* normally handled in moveloop() */
     mread(fd, (genericptr_t) &monstermoves, sizeof monstermoves);
     mread(fd, (genericptr_t) &game_loop_counter, sizeof game_loop_counter);
     mread(fd, (genericptr_t) &quest_status, sizeof(struct q_score));

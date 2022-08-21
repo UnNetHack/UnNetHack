@@ -281,6 +281,8 @@ E NEARDATA struct dig_info {        /* apply.c, hack.c */
 
 extern long game_loop_counter;
 E NEARDATA long moves, monstermoves;
+extern long hero_seq; /* 'moves*8 + n' where n is updated each hero move during
+                       * the current turn */
 E NEARDATA long wailmsg;
 
 E NEARDATA boolean in_mklev;

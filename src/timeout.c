@@ -118,7 +118,7 @@ stoned_dialogue(void)
         if (nolimbs(youmonst.data) && strstri(buf, "limbs")) {
             (void) strsubst(buf, "limbs", "extremities");
         }
-        pline("%s", buf);
+        urgent_pline("%s", buf);
         nomul(0, 0); /* fix for C343-74 */
     }
     if (i == 5L)
@@ -294,14 +294,14 @@ choke_dialogue(void)
 
     if(i > 0 && i <= SIZE(choke_texts)) {
         if (Breathless || !rn2(50))
-            pline(choke_texts2[SIZE(choke_texts2) - i], body_part(NECK));
+            urgent_pline(choke_texts2[SIZE(choke_texts2) - i], body_part(NECK));
         else {
             const char *str = choke_texts[SIZE(choke_texts)-i];
 
             if (index(str, '%'))
-                pline(str, hcolor(NH_BLUE));
+                urgent_pline(str, hcolor(NH_BLUE));
             else
-                pline("%s", str);
+                urgent_pline("%s", str);
         }
     }
     exercise(A_STR, FALSE);
@@ -334,7 +334,7 @@ sickness_dialogue(void)
                        care whether or not that has already happened */
                     upstart(pronounbuf), vtense(pronounbuf, "are"));
         }
-        pline("%s", buf);
+        urgent_pline("%s", buf);
     }
     exercise(A_CON, FALSE);
 }
@@ -364,7 +364,7 @@ levitation_dialogue(void)
         if (index(s, '%')) {
             boolean danger = (is_pool_or_lava(u.ux, u.uy) && !Is_waterlevel(&u.uz));
 
-            pline(s, danger ? "over" : "in", danger ? surface(u.ux, u.uy) : "air");
+            urgent_pline(s, danger ? "over" : "in", danger ? surface(u.ux, u.uy) : "air");
         } else {
             pline("%s", s);
         }
@@ -402,12 +402,12 @@ slime_dialogue(void)
         if (index(buf, '%')) {
             if (i == 4L) {  /* "you are turning green" */
                 if (!Blind) /* [what if you're already green?] */
-                    pline(buf, hcolor(NH_GREEN));
+                    urgent_pline(buf, hcolor(NH_GREEN));
             } else {
-                pline(buf, an(Hallucination ? rndmonnam() : "green slime"));
+                urgent_pline(buf, an(Hallucination ? rndmonnam() : "green slime"));
             }
         } else {
-            pline("%s", buf);
+            urgent_pline("%s", buf);
         }
     }
 
@@ -648,7 +648,7 @@ nh_timeout(void)
                 make_vomiting(0L, TRUE);
                 break;
             case SICK:
-                You("die from your illness.");
+                urgent_pline("You die from your illness.");
                 if (kptr && kptr->name[0]) {
                     killer.format = kptr->format;
                     Strcpy(killer.name, kptr->name);

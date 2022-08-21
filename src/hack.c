@@ -3936,7 +3936,7 @@ losehp_how(int n, const char *knam, boolean k_format, int how)
             /* the thing that killed you */
             Strcpy(killer.name, knam ? knam : "");
         }
-        You("die...");
+        urgent_pline("You die...");
         done(how);
     } else if (n > 0 && u.uhp*10 < u.uhpmax) {
         maybe_wail();

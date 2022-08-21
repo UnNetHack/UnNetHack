@@ -165,6 +165,23 @@ VA_DECL2(unsigned, pflags, const char *, line)
     return;
 }
 
+/* if player has dismissed --More-- with ESC to suppress further messages
+   until next input request, tell the interface that it should override that
+   and re-enable them; equivalent to custompline(URGENT_MESSAGE, line, ...)
+   but slightly simpler to use */
+void
+urgent_pline(const char *line, ...)
+{
+    va_list the_args;
+
+    va_start(the_args, line);
+    /* It's urgent, urgent. EMERGENCY! */
+    pline_flags = URGENT_MESSAGE;
+    vpline(line, the_args);
+    pline_flags = 0;
+    va_end(the_args);
+}
+
 /*VARARGS1*/
 void
 Norep VA_DECL(const char *, line)

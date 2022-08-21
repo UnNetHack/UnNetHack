@@ -14,6 +14,7 @@
 #include "func_tab.h"
 
 char morc = 0;  /* tell the outside world what char you chose */
+static boolean suppress_history;
 static boolean ext_cmd_getlin_hook(char *);
 
 typedef boolean (*getlin_hook_proc)(char *);
@@ -32,6 +33,7 @@ extern char erase_char, kill_char; /* from appropriate tty.c file */
 void
 tty_getlin(const char *query, char *bufp)
 {
+    suppress_history = FALSE;
     hooked_tty_getlin(query, bufp, (getlin_hook_proc) 0);
 }
 
@@ -252,6 +254,8 @@ tty_get_ext_cmd(void)
     char buf[BUFSZ];
 
     if (iflags.extmenu) return extcmd_via_menu();
+
+    suppress_history = TRUE;
     /* maybe a runtime option? */
     /* hooked_tty_getlin("#", buf, flags.cmd_comp ? ext_cmd_getlin_hook : (getlin_hook_proc) 0); */
 #ifdef REDO

@@ -138,7 +138,12 @@ show_topl(const char *str)
 {
     struct WinDesc *cw = wins[WIN_MESSAGE];
 
-    if (!(cw->flags & WIN_STOP)) {
+    /* show if either STOP isn't set or current message specifies NOSTOP */
+    if ((cw->flags & (WIN_STOP | WIN_NOSTOP)) != WIN_STOP) {
+        /* NOSTOP cancels persistent STOP and is a one-shot operation;
+           force both to be cleared (no-op for either bit that isn't set) */
+        cw->flags &= ~(WIN_STOP | WIN_NOSTOP);
+
         if (ttyDisplay->cury && ttyDisplay->toplin == TOPLINE_NON_EMPTY) {
             tty_clear_nhwindow(WIN_MESSAGE);
         }
@@ -212,8 +217,11 @@ more(void)
 
     xwaitforspace("\033 ");
 
-    if(morc == '\033')
-        cw->flags |= WIN_STOP;
+    if (morc == '\033') {
+        if (!(cw->flags & WIN_NOSTOP)) {
+            cw->flags |= WIN_STOP;
+        }
+    }
 
     if(ttyDisplay->toplin && cw->cury) {
         docorner(1, cw->cury+1);
@@ -235,6 +243,7 @@ update_topl(const char *bp)
     int n0;
     int notdied = 1;
     struct WinDesc *cw = wins[WIN_MESSAGE];
+    boolean skip = (cw->flags & (WIN_STOP | WIN_NOSTOP)) == WIN_STOP;
 
     /* If there is room on the line, print message on same line */
     /* But messages like "You die..." deserve their own line */
@@ -246,14 +255,17 @@ update_topl(const char *bp)
         Strcat(toplines, "  ");
         Strcat(toplines, bp);
         cw->curx += 2;
-        if(!(cw->flags & WIN_STOP))
+        if (!skip) {
             addtopl(bp);
+        }
+
         return;
-    } else if (!(cw->flags & WIN_STOP)) {
-        if(ttyDisplay->toplin == 1) more();
-        else if(cw->cury) { /* for when flags.toplin == 2 && cury > 1 */
-            docorner(1, cw->cury+1); /* reset cury = 0 if redraw screen */
-            cw->curx = cw->cury = 0;/* from home--cls() & docorner(1,n) */
+    } else if (!skip) {
+        if (ttyDisplay->toplin == TOPLINE_NEED_MORE) {
+            more();
+        } else if (cw->cury) { /* for toplin==TOPLINE_NON_EMPTY && cury > 1 */
+            docorner(1, cw->cury + 1); /* reset cury = 0 if redraw screen */
+            cw->curx = cw->cury = 0;   /* from home--cls() & docorner(1,n,0) */
         }
     }
     remember_topl();
@@ -351,9 +363,12 @@ tty_yn_function(const char *query, const char *resp, char def)
     boolean doprev = 0;
     char prompt[BUFSZ];
 
-    if(ttyDisplay->toplin == 1 && !(cw->flags & WIN_STOP)) more();
-    cw->flags &= ~WIN_STOP;
-    ttyDisplay->toplin = 3; /* special prompt state */
+    if (ttyDisplay->toplin == TOPLINE_NEED_MORE &&
+         (cw->flags & (WIN_STOP | WIN_NOSTOP)) != WIN_STOP) {
+        more();
+    }
+    cw->flags &= ~(WIN_STOP | WIN_NOSTOP);
+    ttyDisplay->toplin = TOPLINE_SPECIAL_PROMPT;
     ttyDisplay->inread++;
     if (resp) {
         char *rb, respbuf[QBUFSZ];

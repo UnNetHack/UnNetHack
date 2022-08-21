@@ -170,7 +170,7 @@ polyman(const char *fmt, const char *arg)
 
     newsym(u.ux, u.uy);
 
-    You(fmt, arg);
+    urgent_pline(fmt, arg);
     /* check whether player foolishly genocided self while poly'd */
     if (ugenocided()) {
         /* intervening activity might have clobbered genocide info */
@@ -311,7 +311,7 @@ newman(void)
             if (u.uhpmax <= 0) u.uhpmax = 1;
         } else {
 dead:       /* we come directly here if their experience level went to 0 or less */
-            Your("new form doesn't seem healthy enough to survive.");
+            urgent_pline("Your new form doesn't seem healthy enough to survive.");
             killer.format = KILLED_BY_AN;
             Strcpy(killer.name, "unsuccessful polymorph");
             done(DIED);
@@ -320,10 +320,12 @@ dead:       /* we come directly here if their experience level went to 0 or less
         }
     }
     newuhs(FALSE);
-    polyman("feel like a new %s!",
-            /* use saved gender we're about to revert to, not current */
-            ((Upolyd ? u.mfemale : flags.female) && urace.individual.f) ? urace.individual.f :
-            (urace.individual.m) ? urace.individual.m : urace.noun);
+    /* use saved gender we're about to revert to, not current */
+    const char *newform = ((Upolyd ? u.mfemale : flags.female) && urace.individual.f) ? urace.individual.f :
+                          (urace.individual.m) ? urace.individual.m :
+                          urace.noun;
+    polyman("You feel like a new %s!", newform);
+
     if (Slimed) {
         Your("body transforms, but there is still slime on you.");
         make_slimed(10L, (const char *) 0);
@@ -448,7 +450,6 @@ made_change:
 /* (try to) make a mntmp monster out of the player */
 int
 polymon(int mntmp)  /* returns 1 if polymorph successful */
-          
 {
     boolean sticky = sticks(youmonst.data) && u.ustuck && !u.uswallow,
             was_blind = !!Blind, dochange = FALSE;
@@ -923,7 +924,7 @@ rehumanize(void)
 
     if (emits_light(youmonst.data))
         del_light_source(LS_MONSTER, monst_to_any(&youmonst));
-    polyman("return to %s form!", urace.adj);
+    polyman("You return to %s form!", urace.adj);
 
     if (u.uhp < 1) {
         /* can only happen if some bit of code reduces u.uhp
@@ -1268,7 +1269,7 @@ dogaze(void)
                         "Gazing at the awake %s is not a very good idea.",
                         l_monnam(mtmp));
                     /* as if gazing at a sleeping anything is fruitful... */
-                    You("turn to stone...");
+                    urgent_pline("You turn to stone...");
                     killer.format = KILLED_BY;
                     Strcpy(killer.name, "deliberately meeting Medusa's gaze");
                     done(STONING);

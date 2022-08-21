@@ -6,6 +6,15 @@
 #include "cursmesg.h"
 #include <ctype.h>
 
+/* player can type ESC at More>> prompt to avoid seeing more messages
+   for the current move; but hero might get more than one move per turn,
+   so the input routines need to be able to cancel this */
+long curs_mesg_suppress_seq = -1L;
+/* if a message is marked urgent, existing suppression will be overridden
+   so that messages resume being shown; this is used in case the urgent
+   message triggers More>> for the previous message and the player responds
+   with ESC; we need to avoid initiating suppression in that situation */
+boolean curs_mesg_no_suppress = FALSE;
 
 /* Message window routines for curses interface */
 
@@ -52,8 +61,8 @@ curses_message_win_puts(const char *message, boolean recursed)
         return;
     }
 
-    if (suppress_turn == moves) {
-        return;
+    if (curs_mesg_suppress_seq == hero_seq) {
+        return; /* user has typed ESC to avoid seeing remaining messages. */
     }
 
     curses_get_window_size(MESSAGE_WIN, &height, &width);
@@ -85,24 +94,37 @@ curses_message_win_puts(const char *message, boolean recursed)
         mesg_add_line((char *) message);
     }
 
+    /* -2: room for trailing ">>" (if More>> is needed) or leading "  "
+       (if combining this message with preceding one) */
+    linespace = (width - 1) - 2 - (mx - border_space);
+
     if (linespace < message_length) {
-        if (my >= (height - 1 + border_space)) {        /* bottom of message win */
-            if ((turn_lines > height) || (height == 1)) {
-                /* Pause until key is hit - Esc suppresses any further
-                   messages that turn */
-                if (curses_more() == DOESCAPE) {
-                    suppress_turn = moves;
+        if (my - border_space >= height - 1) {
+            /* bottom of message win */
+            if (++turn_lines > height || (turn_lines == height && mx > border_space)) {
+                 /* pause until key is hit - ESC suppresses further messages
+                    this turn unless an urgent message is being delivered */
+                if (curses_more() == '\033' && !curs_mesg_no_suppress) {
+                    curs_mesg_suppress_seq = hero_seq;
                     return;
                 }
+                /* turn_lines reset to 0 by more()->block()->got_input() */
             } else {
                 scroll_window(MESSAGE_WIN);
-                turn_lines++;
             }
         } else {
             if (mx != border_space) {
                 my++;
                 mx = border_space;
+                ++turn_lines;
             }
+        }
+    } else { /* don't need to move to next line */
+        /* if we aren't at the start of the line, we're combining multiple
+           messages on one line; use 2-space separation */
+        if (mx > border_space) {
+            waddstr(win, "  ");
+            mx += 2;
         }
     }
 
@@ -132,31 +154,85 @@ curses_message_win_puts(const char *message, boolean recursed)
     wrefresh(win);
 }
 
+void
+curses_got_input(void)
+{
+    /* if messages are being suppressed, reenable them */
+    curs_mesg_suppress_seq = -1L;
+
+    /* misleadingly named; represents number of lines delivered since
+       player was sure to have had a chance to read them; if player
+       has just given input then there aren't any such lines right now;
+       that includes responding to More>> even though it stays same turn */
+    turn_lines = 0;
+}
 
 int
-curses_block(boolean require_tab)
+curses_block(boolean noscroll) /* noscroll - blocking because of msgtype
+                                * = stop/alert else blocking because
+                                * window is full, so need to scroll after */
 {
-    int height, width, ret;
+    static const char resp[] = " \r\n\033"; /* space, enter, esc */
+    static int prev_x = -1, prev_y = -1, blink = 0;
+    int height, width, moreattr, oldcrsr, ret = 0,
+        brdroffset = curses_window_has_border(MESSAGE_WIN) ? 1 : 0;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
 
     curses_get_window_size(MESSAGE_WIN, &height, &width);
-    curses_toggle_color_attr(win, MORECOLOR, NONE, ON);
-    mvwprintw(win, my, mx, require_tab ? "<TAB!>" : ">>");
-    curses_toggle_color_attr(win, MORECOLOR, NONE, OFF);
-    if (require_tab)
-        curses_alert_main_borders(TRUE);
+    /* -3: room for ">>_" */
+    if (mx - brdroffset > width - 3) {
+        if (my - brdroffset < height - 1) {
+            ++my, mx = brdroffset;
+        } else {
+            mx = width - 3 + brdroffset;
+        }
+    }
+    /* if ">>" (--More--) is being rendered at the same spot as before,
+       toggle attributes so that the first '>' starts blinking if it wasn't
+       or stops blinking if it was */
+    if (mx == prev_x && my == prev_y) {
+        blink = 1 - blink;
+    } else {
+        prev_x = mx, prev_y = my;
+        blink = 0;
+    }
+    moreattr = !iflags.wc2_guicolor ? (int) A_REVERSE : NONE;
+    curses_toggle_color_attr(win, MORECOLOR, moreattr, ON);
+    if (blink) {
+        wattron(win, A_BLINK);
+        mvwprintw(win, my, mx, ">"), mx += 1;
+        wattroff(win, A_BLINK);
+        waddstr(win, ">"), mx += 1;
+    } else {
+        mvwprintw(win, my, mx, ">>"), mx += 2;
+    }
+    curses_toggle_color_attr(win, MORECOLOR, moreattr, OFF);
     wrefresh(win);
-    while ((ret = wgetch(win) != '\t') && require_tab);
-    if (require_tab)
-        curses_alert_main_borders(FALSE);
+
+    /* cancel mesg suppression; all messages will have had chance to be read */
+    curses_got_input();
+
+    oldcrsr = curs_set(1);
+    do {
+        ret = wgetch(win);
+        if (ret == ERR || ret == '\0') {
+            ret = '\n';
+        }
+        /* msgtype=stop should require space/enter rather than any key,
+           as we want to prevent YASD from direction keys. */
+    } while (!index(resp, (char) ret));
+    if (oldcrsr >= 0) {
+        (void) curs_set(oldcrsr);
+    }
+
     if (height == 1) {
         curses_clear_unhighlight_message_window();
     } else {
-        mvwprintw(win, my, mx, "      ");
-        if (!require_tab) {
+        mx -= 2, mvwprintw(win, my, mx, "  "); /* back up and blank out ">>" */
+        if (!noscroll) {
             scroll_window(MESSAGE_WIN);
-            turn_lines = 1;
         }
+        wrefresh(win);
     }
 
     return ret;

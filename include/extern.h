@@ -1987,6 +1987,7 @@ extern void msgpline_add(int, char *);
 extern void msgpline_free(void);
 extern void VDECL(pline, (const char *, ...)) PRINTF_F(1, 2);
 extern void VDECL(custompline, (unsigned, const char *, ...)) PRINTF_F(2, 3);
+extern void urgent_pline(const char *, ...) PRINTF_F(1, 2);
 extern void VDECL(Norep, (const char *, ...)) PRINTF_F(1, 2);
 extern void free_youbuf(void);
 extern void VDECL(You, (const char *, ...)) PRINTF_F(1, 2);

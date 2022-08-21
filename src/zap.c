@@ -2563,8 +2563,10 @@ zapyourself(struct obj *obj, boolean ordinary)
         }
         Sprintf(killer.name, "shot %sself with a death ray", uhim());
         killer.format = NO_KILLER_PREFIX;
-        You("irradiate yourself with pure energy!");
-        You("die.");
+        /* probably don't need these to be urgent; player just gave input
+           without subsequent opportunity to dismiss --More-- with ESC */
+        urgent_pline("You irradiate yourself with pure energy!");
+        urgent_pline("You die.");
         makeknown(obj->otyp);
         /* They might survive with an amulet of life saving */
         done(DIED);

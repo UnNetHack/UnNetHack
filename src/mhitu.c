@@ -1339,7 +1339,7 @@ do_stone:
                 if (u_slip_free(mtmp, mattk)) {
                     dmg = 0;
                 } else {
-                    pline("%s %s itself around you!", Monnam(mtmp),
+                    urgent_pline("%s %s itself around you!", Monnam(mtmp),
                           is_vegetation(mdat) ? "winds" : "swings");
                     u.ustuck = mtmp;
                 }
@@ -1352,7 +1352,7 @@ do_stone:
                         !Is_medusa_level(&u.uz) &&
                         !Is_waterlevel(&u.uz);
 
-                    pline("%s drowns you...", Monnam(mtmp));
+                    urgent_pline("%s drowns you...", Monnam(mtmp));
                     killer.format = KILLED_BY_AN;
                     Sprintf(killer.name, "%s by %s",
                             moat ? "moat" : "pool of water",
@@ -1374,7 +1374,7 @@ do_stone:
         if (uncancelled && !rn2(4) && u.ulycn == NON_PM &&
             !Protection_from_shape_changers &&
             !defends(AD_WERE, uwep)) {
-            You_feel("feverish.");
+            urgent_pline("You feel feverish.");
             exercise(A_CON, FALSE);
             set_ulycn(monsndx(mdat));
             retouch_equipment(2);
@@ -1976,11 +1976,11 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
              * like horses for now :-)
              */
             Strcpy(buf, mon_nam(u.usteed));
-            pline ("%s lunges forward and plucks you off %s!",
+            urgent_pline ("%s lunges forward and plucks you off %s!",
                    Monnam(mtmp), buf);
             dismount_steed(DISMOUNT_ENGULFED);
         } else {
-            pline("%s engulfs you!", Monnam(mtmp));
+            urgent_pline("%s engulfs you!", Monnam(mtmp));
         }
         stop_occupation();
         reset_occupations();    /* behave as if you had moved */
@@ -2408,7 +2408,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             stop_occupation();
             if(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))
                 break;
-            You("turn to stone...");
+            urgent_pline("You turn to stone...");
             killer.format = KILLED_BY;
             Strcpy(killer.name, mtmp->data->mname);
             done(STONING);
@@ -2830,9 +2830,9 @@ doseduce(struct monst *mon)
     }
 
     if (!uarmc && !uarmf && !uarmg && !uarms && !uarmh && !uarmu) {
-        pline("%s murmurs sweet nothings into your ear.", Who);
+        urgent_pline("%s murmurs sweet nothings into your ear.", Who);
     } else {
-        pline("%s murmurs in your ear, while helping you undress.", Who);
+        urgent_pline("%s murmurs in your ear, while helping you undress.", Who);
     }
     mayberem(mon, Who, uarmc, cloak_simple_name(uarmc));
     if (!uarmc) {
@@ -2876,7 +2876,7 @@ doseduce(struct monst *mon)
         adjalign(1);
 
     /* by this point you have discovered mon's identity, blind or not... */
-    pline("Time stands still while you and %s lie in each other's arms...",
+    urgent_pline("Time stands still while you and %s lie in each other's arms...",
           noit_mon_nam(mon));
     /* 3.6.1: a combined total for charisma plus intelligence of 35-1
        used to guarantee successful outcome; now total maxes out at 32

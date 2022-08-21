@@ -318,6 +318,10 @@ moveloop(boolean resuming)
                     monstermoves++;
                     moves++;
 
+                    /* 'moves' is misnamed; it represents turns; hero_seq is
+                    a value that is distinct every time the hero moves */
+                    hero_seq = moves << 3;
+
                     /********************************/
                     /* once-per-turn things go here */
                     /********************************/
@@ -490,6 +494,8 @@ moveloop(boolean resuming)
             /******************************************/
             /* once-per-hero-took-time things go here */
             /******************************************/
+
+            hero_seq++; /* moves*8 + n for n == 1..7 */
 
             if (u.utrap && u.utraptype == TT_LAVA) {
                 if (!is_lava(u.ux, u.uy))

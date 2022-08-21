@@ -2913,41 +2913,41 @@ destroy_arm(struct obj *atmp)
 
     if (DESTROY_ARM(uarmc)) {
         if (donning(otmp)) cancel_don();
-        Your("%s crumbles and turns to dust!",
+        urgent_pline("Your %s crumbles and turns to dust!",
              cloak_simple_name(uarmc));
         (void) Cloak_off();
         useup(otmp);
     } else if (DESTROY_ARM(uarm)) {
         if (donning(otmp)) cancel_don();
-        pline("%s turns to dust and falls to the %s!",
+        urgent_pline("Your %s turns to dust and falls to the %s!",
               Ysimple_name2(otmp),
               surface(u.ux, u.uy));
         (void) Armor_gone();
         useup(otmp);
     } else if (DESTROY_ARM(uarmu)) {
         if (donning(otmp)) cancel_don();
-        Your("shirt crumbles into tiny threads and falls apart!");
+        urgent_pline("Your shirt crumbles into tiny threads and falls apart!");
         (void) Shirt_off();
         useup(otmp);
     } else if (DESTROY_ARM(uarmh)) {
         if (donning(otmp)) cancel_don();
-        Your("helmet turns to dust and is blown away!");
+        urgent_pline("Your helmet turns to dust and is blown away!");
         (void) Helmet_off();
         useup(otmp);
     } else if (DESTROY_ARM(uarmg)) {
         if (donning(otmp)) cancel_don();
-        Your("gloves vanish!");
+        urgent_pline("Your gloves vanish!");
         (void) Gloves_off();
         useup(otmp);
         selftouch("You");
     } else if (DESTROY_ARM(uarmf)) {
         if (donning(otmp)) cancel_don();
-        Your("boots disintegrate!");
+        urgent_pline("Your boots disintegrate!");
         (void) Boots_off();
         useup(otmp);
     } else if (DESTROY_ARM(uarms)) {
         if (donning(otmp)) cancel_don();
-        Your("shield crumbles away!");
+        urgent_pline("Your shield crumbles away!");
         (void) Shield_off();
         useup(otmp);
     } else {

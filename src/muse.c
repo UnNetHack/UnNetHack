@@ -1922,8 +1922,7 @@ skipmsg:
                       The_whip, the_weapon);
                 return 1;
             }
-            pline("%s wraps around %s you're wielding!",
-                  The_whip, the_weapon);
+            urgent_pline("%s wraps around %s you're wielding!", The_whip, the_weapon);
             if (welded(obj)) {
                 pline("%s welded to your %s%c",
                       !is_plural(obj) ? "It is" : "They are",

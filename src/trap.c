@@ -2751,7 +2751,7 @@ instapetrify(const char *str)
     if (Stone_resistance) return;
     if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))
         return;
-    You("turn to stone...");
+    urgent_pline("You turn to stone...");
     killer.format = KILLED_BY;
     if (str != killer.name) {
         Strcpy(killer.name, str ? str : "");
@@ -3951,7 +3951,7 @@ crawl:
         pline("But in vain.");
     }
     u.uinwater = 1;
-    You("drown.");
+    urgent_pline("You drown.");
     /* [ALI] Vampires return to vampiric form on drowning.
      */
     if (Upolyd && !Unchanging && Race_if(PM_VAMPIRE)) {
@@ -5465,7 +5465,7 @@ lava_effects(void)
         u.uhp = -1;
         killer.format = KILLED_BY;
         Strcpy(killer.name, lava_killer);
-        You("%s...", boil_away ? "boil away" : "burn to a crisp");
+        urgent_pline("You %s...", boil_away ? "boil away" : "burn to a crisp");
         done(BURNING);
         while (!safe_teleds(TRUE)) {
             pline("You're still burning.");
@@ -5573,7 +5573,7 @@ sink_into_lava(void)
         if (u.utrap < (1 << 8)) {
             killer.format = KILLED_BY;
             Strcpy(killer.name, "molten lava");
-            You("sink below the surface and die.");
+            urgent_pline("You sink below the surface and die.");
             burn_away_slime(); /* add insult to injury? */
             done(DISSOLVED);
             /* can only get here via life-saving; try to get away from lava */
