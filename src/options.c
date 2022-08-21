@@ -502,7 +502,8 @@ static struct Comp_Opt
 #endif
     { "whatis_coord", "show coordinates when auto-describing cursor position", 1, SET_IN_GAME },
     { "whatis_filter", "filter coordinate locations when targeting", 1, SET_IN_GAME },
-    { "windowcolors",  "the foreground/background colors of windows",   /*WC*/
+    { "windowborders", "0 (off), 1 (on), 2 (auto)", 9, SET_IN_GAME }, /*WC2*/
+    { "windowcolors",  "the foreground/background colors of windows", /*WC*/
       80, DISP_IN_GAME },
     { "windowtype", "windowing system to use", WINTYPELEN, DISP_IN_GAME },
 #ifdef EXOTIC_PETS
@@ -5012,6 +5013,24 @@ special_handling(const char *optname, boolean setinitial, boolean setfromfile)
                 iflags.menu_headings = ATR_INVERSE;
             }
             free((genericptr_t)mode_pick);
+        }
+        destroy_nhwindow(tmpwin);
+        retval = TRUE;
+    } else if (!strcmp("windowborders", optname)) {
+        menu_item *window_pick = (menu_item *)0;
+
+        tmpwin = create_nhwindow(NHW_MENU);
+        start_menu(tmpwin);
+        any.a_int = 1; /* off */
+        add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 'a', 0, ATR_NONE, "Off", MENU_UNSELECTED);
+        any.a_int = 2; /* on */
+        add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 'b', 0, ATR_NONE, "On", MENU_UNSELECTED);
+        any.a_int = 3; /* auto */
+        add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 'c', 0, ATR_NONE, "Auto", MENU_UNSELECTED);
+        end_menu(tmpwin, "Select border mode:");
+        if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
+            iflags.wc2_windowborders = window_pick->item.a_int - 1;
+            free(window_pick);
         }
         destroy_nhwindow(tmpwin);
         retval = TRUE;

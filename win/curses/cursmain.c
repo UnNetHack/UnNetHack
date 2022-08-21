@@ -846,8 +846,9 @@ preference_update(preference)
 void
 curses_preference_update(const char *pref)
 {
-    if ((strcmp(pref, "align_status") == 0) ||
-        (strcmp(pref, "align_message") == 0)) {
+    if (!strcmp(pref, "align_status") ||
+         !strcmp(pref, "align_message") ||
+         !strcmp(pref, "windowborders")) {
         curses_create_main_windows();
         curses_last_messages();
         doredraw();
