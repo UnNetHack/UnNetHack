@@ -3970,7 +3970,7 @@ goodfruit:
                 iflags.wc2_windowborders = 1; /* On */
             else    /* Value supplied */
                 iflags.wc2_windowborders = atoi(op);
-            if ((iflags.wc2_windowborders > 2) || (iflags.wc2_windowborders < 0)) {
+            if ((iflags.wc2_windowborders > 4) || (iflags.wc2_windowborders < 0)) {
                 iflags.wc2_windowborders = 0;
                 badoption(opts);
                 return FALSE;
@@ -5027,6 +5027,12 @@ special_handling(const char *optname, boolean setinitial, boolean setfromfile)
         add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 'b', 0, ATR_NONE, "On", MENU_UNSELECTED);
         any.a_int = 3; /* auto */
         add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 'c', 0, ATR_NONE, "Auto", MENU_UNSELECTED);
+        any.a_int = 4; /* auto */
+        add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 'd', 0, ATR_NONE, "On, except off for perm_invent",
+                MENU_UNSELECTED);
+        any.a_int = 5; /* auto */
+        add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 'e', 0, ATR_NONE, "Auto, except off for perm_invent",
+                MENU_UNSELECTED);
         end_menu(tmpwin, "Select border mode:");
         if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
             iflags.wc2_windowborders = window_pick->item.a_int - 1;
@@ -5386,6 +5392,8 @@ get_compopt_value(const char *optname, char *buf)
         Sprintf(buf, "%s", iflags.wc2_windowborders == 0 ? "0=off" :
                 iflags.wc2_windowborders == 1            ? "1=on" :
                 iflags.wc2_windowborders == 2            ? "2=auto" :
+                iflags.wc2_windowborders == 3            ? "3=On, except off for perm_invent" :
+                iflags.wc2_windowborders == 4            ? "4=Auto, except off for perm_invent" :
                 defopt);
     else if (!strcmp(optname, "windowtype"))
         Sprintf(buf, "%s", windowprocs.name);
