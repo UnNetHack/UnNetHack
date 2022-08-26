@@ -4231,14 +4231,6 @@ typfnd:
     typ = otmp->otyp;
     oclass = otmp->oclass;
 
-    if (islit &&
-        (typ == OIL_LAMP || typ == MAGIC_LAMP || typ == BRASS_LANTERN ||
-         Is_candle(otmp) || typ == POT_OIL)) {
-        place_object(otmp, u.ux, u.uy);  /* make it viable light source */
-        begin_burn(otmp, FALSE);
-        obj_extract_self(otmp);  /* now release it for caller's use */
-    }
-
     /* if player specified a reasonable count, maybe honor it */
     if (cnt > 0 && objects[typ].oc_merge && oclass != SPBOOK_CLASS) {
         /* at most 10, with a mean of 5 */
@@ -4263,6 +4255,14 @@ typfnd:
         } else {
             otmp->quan = (cnt <= max_amt) ? cnt : max_amt;
         }
+    }
+
+    if (islit &&
+        (typ == OIL_LAMP || typ == MAGIC_LAMP || typ == BRASS_LANTERN ||
+         Is_candle(otmp) || typ == POT_OIL)) {
+        place_object(otmp, u.ux, u.uy); /* make it viable light source */
+        begin_burn(otmp, FALSE);
+        obj_extract_self(otmp); /* now release it for caller's use */
     }
 
 #ifdef WIZARD
