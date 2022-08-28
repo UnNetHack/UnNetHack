@@ -147,7 +147,7 @@ static struct Bool_Opt
     {"heaven_or_hell", &flags.heaven_or_hell, FALSE, SET_IN_FILE},
     {"hell_and_hell", &flags.hell_and_hell, FALSE, SET_IN_FILE},
     {"help", &flags.help, TRUE, SET_IN_GAME},
-    {"hilite_pet",    &iflags.wc_hilite_pet, TRUE, SET_IN_GAME},    /*WC*/
+    {"hilite_pet", &iflags.wc_hilite_pet, TRUE, SET_IN_GAME }, /*WC*/
     {"hint", &flags.hint, TRUE, SET_IN_FILE},
     {"hitpointbar", &flags.hitpointbar, TRUE, SET_IN_GAME},
     {"hp_notify", &iflags.hp_notify, FALSE, SET_IN_GAME},
@@ -381,6 +381,7 @@ static struct Comp_Opt
       PL_FSIZ, SET_IN_GAME },
     { "gender",   "your starting gender (male or female)",
       8, DISP_IN_GAME },
+    { "hilite_peacefuls", "highlighting of peaceful monsters", 9, SET_IN_GAME }, /* WC */
     { "horsename", "the name of your (first) horse (e.g., horsename:Silver)",
       PL_PSIZ, DISP_IN_GAME },
     { "hp_notify_fmt", "hp_notify format string", 20, SET_IN_GAME },
@@ -992,6 +993,9 @@ initoptions(void)
     /* since this is done before init_objects(), do partial init here */
     objects[SLIME_MOLD].oc_name_idx = SLIME_MOLD;
     nmcpy(pl_fruit, OBJ_NAME(objects[SLIME_MOLD]), PL_FSIZ);
+
+    /* highlighting */
+    iflags.hilite_peacefuls = ATR_ULINE;
 
 #ifdef SYSCF
 /* someday there may be other SYSCF alternatives besides text file */
@@ -1747,6 +1751,8 @@ query_attr(const char *prompt)
 
     if (prompt && strstri(prompt, "menu headings")) {
         default_attr = iflags.menu_headings;
+    } else if (prompt && strstri(prompt, "peaceful monsters")) {
+        default_attr = iflags.hilite_peacefuls;
     }
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
@@ -4014,6 +4020,25 @@ goodfruit:
         return retval;
     }
 
+    fullname = "hilite_peacefuls";
+    if (match_optname(opts, fullname, 15, TRUE)) {
+        if (negated) {
+            bad_negation(fullname, FALSE);
+            return FALSE;
+        }
+        else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
+            return FALSE;
+        }
+        int tmpattr = match_str2attr(opts, TRUE);
+        if (tmpattr == -1) {
+            badoption(opts);
+            return FALSE;
+        }
+        iflags.hilite_peacefuls = tmpattr;
+
+        return retval;
+    }
+
     fullname = "menu_headings";
     if (match_optname(opts, fullname, 12, TRUE)) {
         if (negated) {
@@ -4984,6 +5009,18 @@ special_handling(const char *optname, boolean setinitial, boolean setfromfile)
         }
         destroy_nhwindow(tmpwin);
         retval = TRUE;
+
+    } else if (!strncmp("hilite_peaceful", optname, 15)) {
+        int mhattr = query_attr("How to highlight peaceful monsters:");
+
+        if (mhattr != -1) {
+            iflags.hilite_peacefuls = mhattr;
+            if (iflags.hilite_peacefuls) {
+                docrt();
+            }
+        }
+        retval = TRUE;
+
     } else if (!strcmp("menu_headings", optname)) {
         int mhattr = query_attr("How to highlight menu headings:");
 
@@ -5144,6 +5181,9 @@ get_compopt_value(const char *optname, char *buf)
         Sprintf(buf, "%s", pl_fruit);
     else if (!strcmp(optname, "gender"))
         Sprintf(buf, "%s", rolestring(flags.initgend, genders, adj));
+    else if (!strncmp(optname, "hilite_peaceful", 15)) {
+        Sprintf(buf, "%s", attr2attrname(iflags.hilite_peacefuls));
+    }
     else if (!strcmp(optname, "horsename"))
         Sprintf(buf, "%s", horsename[0] ? horsename : none);
     else if (!strcmp(optname, "map_mode"))
@@ -5871,54 +5911,55 @@ choose_classes_menu(const char *prompt, int category, boolean way, char *class_l
 }
 
 struct wc_Opt wc_options[] = {
-    {"ascii_map", WC_ASCII_MAP},
-    {"color", WC_COLOR},
-    {"eight_bit_tty", WC_EIGHT_BIT_IN},
-    {"hilite_pet", WC_HILITE_PET},
-    {"popup_dialog", WC_POPUP_DIALOG},
-    {"player_selection", WC_PLAYER_SELECTION},
-    {"preload_tiles", WC_PRELOAD_TILES},
-    {"tiled_map", WC_TILED_MAP},
-    {"tile_file", WC_TILE_FILE},
-    {"tile_width", WC_TILE_WIDTH},
-    {"tile_height", WC_TILE_HEIGHT},
-    {"use_inverse", WC_INVERSE},
-    {"align_message", WC_ALIGN_MESSAGE},
-    {"align_status", WC_ALIGN_STATUS},
-    {"font_map", WC_FONT_MAP},
-    {"font_menu", WC_FONT_MENU},
-    {"font_message", WC_FONT_MESSAGE},
+    { "ascii_map", WC_ASCII_MAP },
+    { "color", WC_COLOR },
+    { "eight_bit_tty", WC_EIGHT_BIT_IN },
+    { "hilite_pet", WC_HILITE_PET },
+    { "popup_dialog", WC_POPUP_DIALOG },
+    { "player_selection", WC_PLAYER_SELECTION },
+    { "preload_tiles", WC_PRELOAD_TILES },
+    { "tiled_map", WC_TILED_MAP },
+    { "tile_file", WC_TILE_FILE },
+    { "tile_width", WC_TILE_WIDTH },
+    { "tile_height", WC_TILE_HEIGHT },
+    { "use_inverse", WC_INVERSE },
+    { "align_message", WC_ALIGN_MESSAGE },
+    { "align_status", WC_ALIGN_STATUS },
+    { "font_map", WC_FONT_MAP },
+    { "font_menu", WC_FONT_MENU },
+    { "font_message", WC_FONT_MESSAGE },
 #if 0
-    {"perm_invent", WC_PERM_INVENT},
+    { "perm_invent", WC_PERM_INVENT },
 #endif
-    {"font_size_map", WC_FONTSIZ_MAP},
-    {"font_size_menu", WC_FONTSIZ_MENU},
-    {"font_size_message", WC_FONTSIZ_MESSAGE},
-    {"font_size_status", WC_FONTSIZ_STATUS},
-    {"font_size_text", WC_FONTSIZ_TEXT},
-    {"font_status", WC_FONT_STATUS},
-    {"font_text", WC_FONT_TEXT},
-    {"map_mode", WC_MAP_MODE},
-    {"scroll_amount", WC_SCROLL_AMOUNT},
-    {"scroll_margin", WC_SCROLL_MARGIN},
-    {"splash_screen", WC_SPLASH_SCREEN},
-    {"vary_msgcount", WC_VARY_MSGCOUNT},
-    {"windowcolors", WC_WINDOWCOLORS},
-    {"mouse_support", WC_MOUSE_SUPPORT},
-    {(char *)0, 0L}
-};
+    { "font_size_map", WC_FONTSIZ_MAP },
+    { "font_size_menu", WC_FONTSIZ_MENU },
+    { "font_size_message", WC_FONTSIZ_MESSAGE },
+    { "font_size_status", WC_FONTSIZ_STATUS },
+    { "font_size_text", WC_FONTSIZ_TEXT },
+    { "font_status", WC_FONT_STATUS },
+    { "font_text", WC_FONT_TEXT },
+    { "map_mode", WC_MAP_MODE },
+    { "scroll_amount", WC_SCROLL_AMOUNT },
+    { "scroll_margin", WC_SCROLL_MARGIN },
+    { "splash_screen", WC_SPLASH_SCREEN },
+    { "vary_msgcount", WC_VARY_MSGCOUNT },
+    { "windowcolors", WC_WINDOWCOLORS },
+    { "mouse_support", WC_MOUSE_SUPPORT },
+    { (char *)0, 0L }
+ };
 
 struct wc_Opt wc2_options[] = {
-    {"fullscreen", WC2_FULLSCREEN},
-    {"newcolors", WC2_NEWCOLORS},
-    {"softkeyboard", WC2_SOFTKEYBOARD},
-    {"wraptext", WC2_WRAPTEXT},
-    {"term_cols", WC2_TERM_COLS},
-    {"term_rows", WC2_TERM_ROWS},
-    {"windowborders", WC2_WINDOWBORDERS},
-    {"petattr", WC2_PETATTR},
-    {"guicolor", WC2_GUICOLOR},
-    {(char *)0, 0L}
+    { "fullscreen", WC2_FULLSCREEN },
+    { "newcolors", WC2_NEWCOLORS },
+    { "softkeyboard", WC2_SOFTKEYBOARD },
+    { "wraptext", WC2_WRAPTEXT },
+    { "term_cols", WC2_TERM_COLS },
+    { "term_rows", WC2_TERM_ROWS },
+    { "windowborders", WC2_WINDOWBORDERS },
+    { "petattr", WC2_PETATTR },
+    { "guicolor", WC2_GUICOLOR },
+    { "hilite_peacefuls", WC2_HILITE_PEACEFULS },
+    { (char *)0, 0L }
 };
 
 
