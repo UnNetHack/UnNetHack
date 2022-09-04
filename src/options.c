@@ -393,7 +393,7 @@ static struct Comp_Opt
       4, SET_IN_FILE },
     { "menu_first_page", "jump to the first page in a menu",
       4, SET_IN_FILE },
-    { "menu_headings", "bold, inverse, or underline headings", 9, SET_IN_GAME },
+    { "menu_headings", "display style for menu headings", 9, SET_IN_GAME },
     { "menu_invert_all", "invert all items in a menu", 4, SET_IN_FILE },
     { "menu_invert_page", "invert all items on this page of a menu",
       4, SET_IN_FILE },
@@ -1617,6 +1617,7 @@ static const struct {
     { "none", ATR_NONE },
     { "bold", ATR_BOLD },
     { "dim", ATR_DIM },
+    { "italic", ATR_ITALIC },
     { "underline", ATR_ULINE },
     { "blink", ATR_BLINK },
     { "inverse", ATR_INVERSE },
@@ -4022,16 +4023,13 @@ goodfruit:
         else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
             return FALSE;
         }
-        if (!strcmpi(opts, "bold"))
-            iflags.menu_headings = ATR_BOLD;
-        else if (!strcmpi(opts, "inverse"))
-            iflags.menu_headings = ATR_INVERSE;
-        else if (!strcmpi(opts, "underline"))
-            iflags.menu_headings = ATR_ULINE;
-        else {
+        int tmpattr = match_str2attr(opts, TRUE);
+        if (tmpattr == -1) {
             badoption(opts);
             return FALSE;
         }
+        iflags.menu_headings = tmpattr;
+
         return retval;
     }
 
@@ -4987,35 +4985,17 @@ special_handling(const char *optname, boolean setinitial, boolean setfromfile)
         destroy_nhwindow(tmpwin);
         retval = TRUE;
     } else if (!strcmp("menu_headings", optname)) {
-        static const char *mhchoices[3] = {"bold", "inverse", "underline"};
-        const char *npletters = "biu";
-        menu_item *mode_pick = (menu_item *)0;
+        int mhattr = query_attr("How to highlight menu headings:");
 
-        tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
-        for (i = 0; i < SIZE(mhchoices); i++) {
-            any.a_int = i + 1;
-            add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, npletters[i], 0,
-                     ATR_NONE, mhchoices[i], MENU_UNSELECTED);
-        }
-        end_menu(tmpwin, "How to highlight menu headings:");
-        if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
-            int mode = mode_pick->item.a_int - 1;
-            switch(mode) {
-            case 2:
-                iflags.menu_headings = ATR_ULINE;
-                break;
-            case 0:
-                iflags.menu_headings = ATR_BOLD;
-                break;
-            case 1:
-            default:
-                iflags.menu_headings = ATR_INVERSE;
+        if (mhattr != -1) {
+            iflags.menu_headings = mhattr;
+            /* header highlighting affects persistent inventory display */
+            if (iflags.perm_invent) {
+                update_inventory();
             }
-            free((genericptr_t)mode_pick);
         }
-        destroy_nhwindow(tmpwin);
         retval = TRUE;
+
     } else if (!strcmp("windowborders", optname)) {
         menu_item *window_pick = (menu_item *)0;
 
@@ -5191,10 +5171,7 @@ get_compopt_value(const char *optname, char *buf)
     else if (!strcmp(optname, "menu_invert_all"))
         Sprintf(buf, "%s", to_be_done);
     else if (!strcmp(optname, "menu_headings")) {
-        Sprintf(buf, "%s", (iflags.menu_headings == ATR_BOLD) ?
-                "bold" :   (iflags.menu_headings == ATR_INVERSE) ?
-                "inverse" :   (iflags.menu_headings == ATR_ULINE) ?
-                "underline" : "unknown");
+        Sprintf(buf, "%s", attr2attrname(iflags.menu_headings));
     }
     else if (!strcmp(optname, "menu_invert_page"))
         Sprintf(buf, "%s", to_be_done);
