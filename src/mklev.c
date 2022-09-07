@@ -27,6 +27,7 @@ static void mkaltar(struct mkroom *);
 static void mkgrave(struct mkroom *);
 static void makevtele(void);
 static void clear_level_structures(void);
+static void fill_ordinary_room(struct mkroom *);
 static void makelevel(void);
 static struct mkroom *find_branch_room(coord *);
 static struct mkroom *pos_to_room(coordxy, coordxy);
@@ -783,6 +784,142 @@ mk_knox_vault(coordxy x, coordxy y, int w, int h)
     mk_knox_portal(x+w, y+h);
 }
 
+/** Fill a "random" room (i.e. a typical non-special room in the Dungeons of
+ * Doom) with random monsters, objects, and dungeon features.
+ */
+static void
+fill_ordinary_room(struct mkroom *croom)
+{
+    int trycnt = 0;
+    coord pos;
+    struct monst *tmonst; /* always put a web with a spider */
+    coordxy x, y;
+
+    if (croom->rtype != OROOM && croom->rtype != RNDVAULT) {
+        return;
+    }
+
+    /* If there are subrooms, fill them now - we don't want an outer room
+     * that's specified to be unfilled to block an inner subroom that's
+     * specified to be filled. */
+    for (x = 0; x < croom->nsubrooms; ++x) {
+        fill_ordinary_room(croom->sbrooms[x]);
+    }
+
+    if (!croom->needfill) {
+        return;
+    }
+
+    /* put a sleeping monster inside */
+    /* Note: monster may be on the stairs. This cannot be
+        avoided: maybe the player fell through a trap door
+        while a monster was on the stairs. Conclusion:
+        we have to check for monsters on the stairs anyway. */
+
+    if (u.uhave.amulet || !rn2(3)) {
+        if (somexyspace(croom, &pos, 0)) {
+            tmonst = makemon((struct permonst *) 0, pos.x, pos.y, NO_MM_FLAGS);
+            if (tmonst && tmonst->data == &mons[PM_GIANT_SPIDER] &&
+                !occupied(pos.x, pos.y))
+                (void) maketrap(pos.x, pos.y, WEB);
+        }
+    }
+    /* put traps and mimics inside */
+    goldseen = FALSE;
+    x = 8 - (level_difficulty()/6);
+    if (x <= 1) {
+        x = 2;
+    }
+    while (!rn2(x)) {
+        mktrap(0, 0, croom, (coord *) 0);
+    }
+    if (!goldseen && !rn2(3)) {
+        if (somexyspace(croom, &pos, 0)) {
+            (void) mkgold(0L, pos.x, pos.y);
+        }
+    }
+#ifdef REINCARNATION
+    if (Is_rogue_level(&u.uz)) {
+        goto skip_nonrogue;
+    }
+#endif
+    if (!rn2(10)) {
+        mkfount(0, croom);
+    }
+#ifdef SINKS
+    if (!rn2(60)) {
+        mksink(croom);
+    }
+#endif
+    if (!rn2(60)) {
+        mkaltar(croom);
+    }
+    x = 80 - (depth(&u.uz) * 2);
+    if (x < 2) {
+        x = 2;
+    }
+    if (!rn2(x)) {
+        mkgrave(croom);
+    }
+
+    /* put statues inside */
+    if (!rn2(20) && somexyspace(croom, &pos, 0)) {
+            (void) mkcorpstat(STATUE, (struct monst *)0,
+                                (struct permonst *)0,
+                                pos.x, pos.y, TRUE);
+    }
+    /* put box/chest/safe inside;
+     *  40% chance for at least 1 box, regardless of number
+     *  of rooms; about 5 - 7.5% for 2 boxes, least likely
+     *  when few rooms; chance for 3 or more is negligible.
+     *
+     *  Safes only show up below level 15 since they're not unlockable.
+     */
+    if (!rn2(nroom * 5 / 2)) {
+        int boxtype;
+        int i = rn2(5);
+        if (!i && depth(&u.uz) > 15) {
+            boxtype = IRON_SAFE;
+        } else if (i > 2) {
+            boxtype = CHEST;
+        } else {
+            boxtype = LARGE_BOX;
+        }
+        if (somexyspace(croom, &pos, 0)) {
+            (void) mksobj_at(boxtype, pos.x, pos.y, TRUE, FALSE);
+        }
+    }
+
+    /* maybe make some graffiti */
+    if (!rn2(27 + 3 * abs(depth(&u.uz)))) {
+        char buf[BUFSZ];
+        const char *mesg = random_engraving(buf);
+
+        if (mesg) {
+            if (somexyspace(croom, &pos, 1)) {
+                make_engr_at(pos.x, pos.y, mesg, 0L, MARK);
+            }
+        }
+    }
+
+#ifdef REINCARNATION
+skip_nonrogue:
+#endif
+    if (!rn2(3) && somexyspace(croom, &pos, 0)) {
+        (void) mkobj_at(RANDOM_CLASS, pos.x, pos.y, TRUE);
+        int trycnt = 0;
+        while (!rn2(5)) {
+            if (++trycnt > 100) {
+                impossible("trycnt overflow4");
+                break;
+            }
+            if (somexyspace(croom, &pos, 0)) {
+                (void) mkobj_at(RANDOM_CLASS, pos.x, pos.y, TRUE);
+            }
+        }
+    }
+}
+
 static void
 makelevel(void)
 {
@@ -959,99 +1096,8 @@ skip0:
     place_branch(branchp, 0, 0);
 
     /* for each room: put things inside */
-    for(croom = rooms; croom->hx > 0; croom++) {
-        if (croom->rtype != OROOM && croom->rtype != RNDVAULT) continue;
-        if (!croom->needfill) continue;
-
-        /* put a sleeping monster inside */
-        /* Note: monster may be on the stairs. This cannot be
-           avoided: maybe the player fell through a trap door
-           while a monster was on the stairs. Conclusion:
-           we have to check for monsters on the stairs anyway. */
-
-        if(u.uhave.amulet || !rn2(3)) {
-            if (somexyspace(croom, &pos, 0)) {
-                tmonst = makemon((struct permonst *) 0, pos.x, pos.y, NO_MM_FLAGS);
-                if (tmonst && tmonst->data == &mons[PM_GIANT_SPIDER] &&
-                    !occupied(pos.x, pos.y))
-                    (void) maketrap(pos.x, pos.y, WEB);
-            }
-        }
-        /* put traps and mimics inside */
-        goldseen = FALSE;
-        i = 8 - (level_difficulty()/6);
-        if (i <= 1) i = 2;
-        while (!rn2(i))
-            mktrap(0, 0, croom, (coord*)0);
-        if (!goldseen && !rn2(3)) {
-            if (somexyspace(croom, &pos, 0))
-                (void) mkgold(0L, pos.x, pos.y);
-        }
-#ifdef REINCARNATION
-        if(Is_rogue_level(&u.uz)) goto skip_nonrogue;
-#endif
-        if(!rn2(10)) mkfount(0, croom);
-#ifdef SINKS
-        if(!rn2(60)) mksink(croom);
-#endif
-        if(!rn2(60)) mkaltar(croom);
-        i = 80 - (depth(&u.uz) * 2);
-        if (i < 2) i = 2;
-        if(!rn2(i)) mkgrave(croom);
-
-        /* put statues inside */
-        if(!rn2(20)) {
-            if (somexyspace(croom, &pos, 0))
-                (void) mkcorpstat(STATUE, (struct monst *)0,
-                                  (struct permonst *)0,
-                                  pos.x, pos.y, TRUE);
-        }
-        /* put box/chest/safe inside;
-         *  40% chance for at least 1 box, regardless of number
-         *  of rooms; about 5 - 7.5% for 2 boxes, least likely
-         *  when few rooms; chance for 3 or more is neglible.
-         *
-         *  Safes only show up below level 15 since they're not unlockable.
-         */
-        if(!rn2(nroom * 5 / 2)) {
-            i = rn2(5);
-            if (!i && depth(&u.uz) > 15) {
-                boxtype = IRON_SAFE;
-            } else if (i > 2) {
-                boxtype = CHEST;
-            } else {
-                boxtype = LARGE_BOX;
-            }
-            if (somexyspace(croom, &pos, 0))
-                (void) mksobj_at(boxtype, pos.x, pos.y, TRUE, FALSE);
-        }
-
-        /* maybe make some graffiti */
-        if(!rn2(27 + 3 * abs(depth(&u.uz)))) {
-            char buf[BUFSZ];
-            const char *mesg = random_engraving(buf);
-            if (mesg) {
-                if (somexyspace(croom, &pos, 1))
-                    make_engr_at(pos.x, pos.y, mesg, 0L, MARK);
-            }
-        }
-
-#ifdef REINCARNATION
-skip_nonrogue:
-#endif
-        if(!rn2(3)) {
-            if (somexyspace(croom, &pos, 0))
-                (void) mkobj_at(0, pos.x, pos.y, TRUE);
-            tryct = 0;
-            while(!rn2(5)) {
-                if(++tryct > 100) {
-                    impossible("tryct overflow4");
-                    break;
-                }
-                if (somexyspace(croom, &pos, 0))
-                    (void) mkobj_at(0, pos.x, pos.y, TRUE);
-            }
-        }
+    for (croom = rooms; croom->hx > 0; croom++) {
+        fill_ordinary_room(croom);
     }
 }
 
