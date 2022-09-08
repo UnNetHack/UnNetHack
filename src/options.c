@@ -381,6 +381,7 @@ static struct Comp_Opt
       PL_FSIZ, SET_IN_GAME },
     { "gender",   "your starting gender (male or female)",
       8, DISP_IN_GAME },
+    { "hilite_engravings", "highlighting of engravings", 9, SET_IN_GAME }, /* WC */
     { "hilite_peacefuls", "highlighting of peaceful monsters", 9, SET_IN_GAME }, /* WC */
     { "hilite_statues", "highlighting of statues", 9, SET_IN_GAME }, /* WC */
     { "horsename", "the name of your (first) horse (e.g., horsename:Silver)",
@@ -996,6 +997,7 @@ initoptions(void)
     nmcpy(pl_fruit, OBJ_NAME(objects[SLIME_MOLD]), PL_FSIZ);
 
     /* highlighting */
+    iflags.hilite_engravings = ATR_ULINE;
     iflags.hilite_peacefuls = ATR_ULINE;
     iflags.hilite_statues = ATR_ITALIC;
 
@@ -1753,6 +1755,8 @@ query_attr(const char *prompt)
 
     if (prompt && strstri(prompt, "menu headings")) {
         default_attr = iflags.menu_headings;
+    } else if (prompt && strstri(prompt, "engravings")) {
+        default_attr = iflags.hilite_engravings;
     } else if (prompt && strstri(prompt, "peaceful monsters")) {
         default_attr = iflags.hilite_peacefuls;
     } else if (prompt && strstri(prompt, "statues")) {
@@ -4024,8 +4028,27 @@ goodfruit:
         return retval;
     }
 
+    fullname = "hilite_engravings";
+    if (match_optname(opts, fullname, 17, TRUE)) {
+        if (negated) {
+            bad_negation(fullname, FALSE);
+            return FALSE;
+        }
+        else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
+            return FALSE;
+        }
+        int tmpattr = match_str2attr(opts, TRUE);
+        if (tmpattr == -1) {
+            badoption(opts);
+            return FALSE;
+        }
+        iflags.hilite_engravings = tmpattr;
+
+        return retval;
+    }
+
     fullname = "hilite_peacefuls";
-    if (match_optname(opts, fullname, 15, TRUE)) {
+    if (match_optname(opts, fullname, 16, TRUE)) {
         if (negated) {
             bad_negation(fullname, FALSE);
             return FALSE;
@@ -5033,7 +5056,18 @@ special_handling(const char *optname, boolean setinitial, boolean setfromfile)
         destroy_nhwindow(tmpwin);
         retval = TRUE;
 
-    } else if (!strncmp("hilite_peaceful", optname, 15)) {
+    } else if (!strcmp("hilite_engravings", optname)) {
+        int mhattr = query_attr("How to highlight engravings:");
+
+        if (mhattr != -1) {
+            iflags.hilite_engravings = mhattr;
+            if (iflags.hilite_engravings) {
+                docrt();
+            }
+        }
+        retval = TRUE;
+
+    } else if (!strcmp("hilite_peacefuls", optname)) {
         int mhattr = query_attr("How to highlight peaceful monsters:");
 
         if (mhattr != -1) {
@@ -5215,7 +5249,9 @@ get_compopt_value(const char *optname, char *buf)
         Sprintf(buf, "%s", pl_fruit);
     else if (!strcmp(optname, "gender"))
         Sprintf(buf, "%s", rolestring(flags.initgend, genders, adj));
-    else if (!strncmp(optname, "hilite_peaceful", 15)) {
+    else if (!strcmp(optname, "hilite_engravings")) {
+        Sprintf(buf, "%s", attr2attrname(iflags.hilite_engravings));
+    } else if (!strncmp(optname, "hilite_peacefuls", 16)) {
         Sprintf(buf, "%s", attr2attrname(iflags.hilite_peacefuls));
     } else if (!strcmp(optname, "hilite_statues")) {
         Sprintf(buf, "%s", attr2attrname(iflags.hilite_statues));
@@ -5994,6 +6030,7 @@ struct wc_Opt wc2_options[] = {
     { "windowborders", WC2_WINDOWBORDERS },
     { "petattr", WC2_PETATTR },
     { "guicolor", WC2_GUICOLOR },
+    { "hilite_engravings", WC2_HILITE_ENGRAVINGS },
     { "hilite_peacefuls", WC2_HILITE_PEACEFULS },
     { "hilite_statues", WC2_HILITE_STATUES },
     { (char *)0, 0L }

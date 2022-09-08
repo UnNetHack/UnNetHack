@@ -165,6 +165,10 @@ mapglyph(int glyph, glyph_t *ochar, int *ocolor, unsigned int *ospecial, coordxy
         } else
 #endif
 #ifdef TEXTCOLOR
+        if (iflags.use_color && engr_at(x, y)) {
+            special |= MG_ENGRAVING;
+        }
+
         /* provide a visible difference if normal and lit corridor
          * use the same symbol */
         if (iflags.use_color &&

@@ -182,22 +182,23 @@ extern NEARDATA struct window_procs windowprocs;
 #define WC_MOUSE_SUPPORT    0x80000000L /* 32 mouse support                          */
 /* no free bits */
 
-#define WC2_FULLSCREEN             0x01L /* 01 display full screen */
-#define WC2_SOFTKEYBOARD           0x02L /* 02 software keyboard */
-#define WC2_WRAPTEXT               0x04L /* 03 wrap long lines of text */
-#define WC2_TERM_COLS              0x08L /* 04 supports setting terminal width */
-#define WC2_TERM_ROWS              0x10L /* 05 supports setting terminal height */
-#define WC2_WINDOWBORDERS          0x20L /* 06 display borders for NetHack windows */
-#define WC2_PETATTR                0x40L /* 07 attributes for highlight_pet */
-#define WC2_GUICOLOR               0x80L /* 08 attributes for highlight_pet */
-#define WC2_NEWCOLORS             0x100L /* 09 try to use slashem colors */
-#define WC2_URGENT_MESG          0x4000L /* 15 putstr(WIN_MESSAGE) supports urgency
-                                          *    via non-display attribute flag  */
-#define WC2_SUPPRESS_HIST        0x8000L /* 16 putstr(WIN_MESSAGE) supports history
-                                          *    suppression via non-disp attr */
-#define WC2_HILITE_STATUES   0x40000000L /* 31 highlighting of statues */
-#define WC2_HILITE_PEACEFULS 0x80000000L /* 32 highlighting of peaceful monsters */
-/* 24 free bits */
+#define WC2_FULLSCREEN              0x01L /* 01 display full screen */
+#define WC2_SOFTKEYBOARD            0x02L /* 02 software keyboard */
+#define WC2_WRAPTEXT                0x04L /* 03 wrap long lines of text */
+#define WC2_TERM_COLS               0x08L /* 04 supports setting terminal width */
+#define WC2_TERM_ROWS               0x10L /* 05 supports setting terminal height */
+#define WC2_WINDOWBORDERS           0x20L /* 06 display borders for NetHack windows */
+#define WC2_PETATTR                 0x40L /* 07 attributes for highlight_pet */
+#define WC2_GUICOLOR                0x80L /* 08 attributes for highlight_pet */
+#define WC2_NEWCOLORS              0x100L /* 09 try to use slashem colors */
+#define WC2_URGENT_MESG           0x4000L /* 15 putstr(WIN_MESSAGE) supports urgency
+                                           *    via non-display attribute flag  */
+#define WC2_SUPPRESS_HIST         0x8000L /* 16 putstr(WIN_MESSAGE) supports history
+                                           *    suppression via non-disp attr */
+#define WC2_HILITE_ENGRAVINGS 0x20000000L /* 30 highlighting of engravings */
+#define WC2_HILITE_STATUES    0x40000000L /* 31 highlighting of statues */
+#define WC2_HILITE_PEACEFULS  0x80000000L /* 32 highlighting of peaceful monsters */
+/* 18 free bits */
 
 #define ALIGN_LEFT  1
 #define ALIGN_RIGHT 2

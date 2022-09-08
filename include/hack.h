@@ -83,6 +83,7 @@ enum hunger_state_types {
 #define MG_STATUE   0x20
 #define MG_INVERSE  0x40 /* use inverse video */
 #define MG_PEACEFUL 0x80
+#define MG_ENGRAVING 0x100
 
 /* sellobj_state() states */
 #define SELL_NORMAL (0)

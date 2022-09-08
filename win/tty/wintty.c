@@ -54,7 +54,7 @@ struct window_procs tty_procs = {
     WC_MOUSE_SUPPORT|
 #endif
     WC_COLOR|WC_HILITE_PET|WC_INVERSE|WC_EIGHT_BIT_IN,
-    WC2_HILITE_PEACEFULS | WC2_HILITE_STATUES |
+    WC2_HILITE_ENGRAVINGS | WC2_HILITE_PEACEFULS | WC2_HILITE_STATUES |
 #ifdef TERMINFO
     WC2_NEWCOLORS |
 #endif
@@ -3323,6 +3323,10 @@ tty_print_glyph(
     }
 
     if (!inverse_on) {
+        if (iflags.hilite_engravings && (special & MG_ENGRAVING)) {
+            term_start_attr(iflags.hilite_engravings);
+            inverse_on |= (iflags.hilite_engravings & ATR_INVERSE);
+        }
         if (iflags.hilite_peacefuls && (special & MG_PEACEFUL)) {
             term_start_attr(iflags.hilite_peacefuls);
             inverse_on |= (iflags.hilite_peacefuls & ATR_INVERSE);
@@ -3348,6 +3352,9 @@ tty_print_glyph(
     g_putch(ch);        /* print the character */
 #endif
 
+    if (iflags.hilite_engravings && (special & MG_ENGRAVING)) {
+        term_end_attr(iflags.hilite_engravings);
+    }
     if (iflags.hilite_peacefuls && (special & MG_PEACEFUL)) {
         term_end_attr(iflags.hilite_peacefuls);
     }
