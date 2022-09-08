@@ -382,6 +382,7 @@ static struct Comp_Opt
     { "gender",   "your starting gender (male or female)",
       8, DISP_IN_GAME },
     { "hilite_peacefuls", "highlighting of peaceful monsters", 9, SET_IN_GAME }, /* WC */
+    { "hilite_statues", "highlighting of statues", 9, SET_IN_GAME }, /* WC */
     { "horsename", "the name of your (first) horse (e.g., horsename:Silver)",
       PL_PSIZ, DISP_IN_GAME },
     { "hp_notify_fmt", "hp_notify format string", 20, SET_IN_GAME },
@@ -996,6 +997,7 @@ initoptions(void)
 
     /* highlighting */
     iflags.hilite_peacefuls = ATR_ULINE;
+    iflags.hilite_statues = ATR_ITALIC;
 
 #ifdef SYSCF
 /* someday there may be other SYSCF alternatives besides text file */
@@ -1753,6 +1755,8 @@ query_attr(const char *prompt)
         default_attr = iflags.menu_headings;
     } else if (prompt && strstri(prompt, "peaceful monsters")) {
         default_attr = iflags.hilite_peacefuls;
+    } else if (prompt && strstri(prompt, "statues")) {
+        default_attr = iflags.hilite_statues;
     }
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
@@ -4039,6 +4043,25 @@ goodfruit:
         return retval;
     }
 
+    fullname = "hilite_statues";
+    if (match_optname(opts, fullname, 14, TRUE)) {
+        if (negated) {
+            bad_negation(fullname, FALSE);
+            return FALSE;
+        }
+        else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
+            return FALSE;
+        }
+        int tmpattr = match_str2attr(opts, TRUE);
+        if (tmpattr == -1) {
+            badoption(opts);
+            return FALSE;
+        }
+        iflags.hilite_statues = tmpattr;
+
+        return retval;
+    }
+
     fullname = "menu_headings";
     if (match_optname(opts, fullname, 12, TRUE)) {
         if (negated) {
@@ -5021,6 +5044,17 @@ special_handling(const char *optname, boolean setinitial, boolean setfromfile)
         }
         retval = TRUE;
 
+    } else if (!strcmp("hilite_statues", optname)) {
+        int mhattr = query_attr("How to highlight statues:");
+
+        if (mhattr != -1) {
+            iflags.hilite_statues = mhattr;
+            if (iflags.hilite_statues) {
+                docrt();
+            }
+        }
+        retval = TRUE;
+
     } else if (!strcmp("menu_headings", optname)) {
         int mhattr = query_attr("How to highlight menu headings:");
 
@@ -5183,6 +5217,8 @@ get_compopt_value(const char *optname, char *buf)
         Sprintf(buf, "%s", rolestring(flags.initgend, genders, adj));
     else if (!strncmp(optname, "hilite_peaceful", 15)) {
         Sprintf(buf, "%s", attr2attrname(iflags.hilite_peacefuls));
+    } else if (!strcmp(optname, "hilite_statues")) {
+        Sprintf(buf, "%s", attr2attrname(iflags.hilite_statues));
     }
     else if (!strcmp(optname, "horsename"))
         Sprintf(buf, "%s", horsename[0] ? horsename : none);
@@ -5959,6 +5995,7 @@ struct wc_Opt wc2_options[] = {
     { "petattr", WC2_PETATTR },
     { "guicolor", WC2_GUICOLOR },
     { "hilite_peacefuls", WC2_HILITE_PEACEFULS },
+    { "hilite_statues", WC2_HILITE_STATUES },
     { (char *)0, 0L }
 };
 

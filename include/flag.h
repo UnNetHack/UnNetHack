@@ -415,6 +415,8 @@ struct instance_flags {
                                  * dark-gray to represent black object */
     int wc2_hilite_peacefuls;   /* highlighting of peaceful monsters */
 #define hilite_peacefuls wc2_hilite_peacefuls
+    int wc2_hilite_statues;     /* highlighting of statues */
+#define hilite_statues wc2_hilite_statues
 
     boolean hp_notify;
     char *hp_notify_fmt;

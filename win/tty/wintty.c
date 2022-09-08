@@ -54,7 +54,7 @@ struct window_procs tty_procs = {
     WC_MOUSE_SUPPORT|
 #endif
     WC_COLOR|WC_HILITE_PET|WC_INVERSE|WC_EIGHT_BIT_IN,
-    WC2_HILITE_PEACEFULS |
+    WC2_HILITE_PEACEFULS | WC2_HILITE_STATUES |
 #ifdef TERMINFO
     WC2_NEWCOLORS |
 #endif
@@ -3271,7 +3271,6 @@ tty_print_glyph(
     int bg_glyph UNUSED)
 {
     glyph_t ch;
-    boolean underline_on = FALSE;
     boolean inverse_on = FALSE;
     int color;
     //int bgcolor = NO_COLOR;
@@ -3324,14 +3323,13 @@ tty_print_glyph(
     }
 
     if (!inverse_on) {
-        if (special & MG_STATUE) {
-            term_start_attr(ATR_INVERSE);
-            underline_on = TRUE;
-        }
-
         if (iflags.hilite_peacefuls && (special & MG_PEACEFUL)) {
             term_start_attr(iflags.hilite_peacefuls);
             inverse_on |= (iflags.hilite_peacefuls & ATR_INVERSE);
+        }
+        if (iflags.hilite_statues && (special & MG_STATUE)) {
+            term_start_attr(iflags.hilite_statues);
+            inverse_on |= (iflags.hilite_statues & ATR_INVERSE);
         }
     }
 
@@ -3353,9 +3351,8 @@ tty_print_glyph(
     if (iflags.hilite_peacefuls && (special & MG_PEACEFUL)) {
         term_end_attr(iflags.hilite_peacefuls);
     }
-
-    if (underline_on) {
-        term_end_attr(ATR_ULINE);
+    if (iflags.hilite_statues && (special & MG_STATUE)) {
+        term_end_attr(iflags.hilite_statues);
     }
 
     if (inverse_on) {

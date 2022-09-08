@@ -195,6 +195,7 @@ extern NEARDATA struct window_procs windowprocs;
                                           *    via non-display attribute flag  */
 #define WC2_SUPPRESS_HIST        0x8000L /* 16 putstr(WIN_MESSAGE) supports history
                                           *    suppression via non-disp attr */
+#define WC2_HILITE_STATUES   0x40000000L /* 31 highlighting of statues */
 #define WC2_HILITE_PEACEFULS 0x80000000L /* 32 highlighting of peaceful monsters */
 /* 24 free bits */
 
