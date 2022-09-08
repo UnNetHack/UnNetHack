@@ -20,6 +20,7 @@
 
 
 static void mkfount(int, struct mkroom *);
+static boolean find_okay_roompos(struct mkroom *, coord *);
 #ifdef SINKS
 static void mksink(struct mkroom *);
 #endif
@@ -890,8 +891,22 @@ fill_ordinary_room(struct mkroom *croom)
         }
     }
 
-    /* maybe make some graffiti */
-    if (!rn2(27 + 3 * abs(depth(&u.uz)))) {
+    /* Maybe make some graffiti.
+     * Chance decreases the lower you get in the dungeon.
+     *
+     * On dungeon level 1, put a special graffiti in the starting room.
+     * Either a hint or a true rumor. */
+    if (depth(&u.uz) == 1 && has_upstairs(croom)) {
+        if (find_okay_roompos(croom, &pos)) {
+            if (rnf(1, 2)) {
+                make_engr_at(pos.x, pos.y, get_hint(), 0, MARK);
+            } else {
+                char buf[BUFSZ];
+                getrumor(1, buf, TRUE);
+                make_engr_at(pos.x, pos.y, buf, 0, MARK);
+            }
+        }
+    } else if (!rn2(27 + 3 * abs(depth(&u.uz)))) {
         char buf[BUFSZ];
         const char *mesg = random_engraving(buf);
 
@@ -1732,6 +1747,15 @@ mkfount(int mazeflag, struct mkroom *croom)
     if(!rn2(7)) levl[m.x][m.y].blessedftn = 1;
 
     level.flags.nfountains++;
+}
+
+static boolean
+find_okay_roompos(struct mkroom *croom, coord *crd)
+{
+    if (!somexyspace(croom, crd, 8)) {
+        return FALSE;
+    }
+    return TRUE;
 }
 
 #ifdef SINKS

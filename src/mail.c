@@ -722,8 +722,8 @@ struct obj *otmp;
 
 # endif /* LAN_MAIL */
 
-void
-read_hint(struct obj *otmp UNUSED)
+const char *
+get_hint()
 {
     /* TODO: option for beginner, general changes, public server hints? */
     static const char *hint[] = {
@@ -731,8 +731,10 @@ read_hint(struct obj *otmp UNUSED)
         /* none at the moment */
 
         /* interface changes */
+        "'More info' will list object and monster properties.",
         "'X' toggles twoweaponing.",
         "Autopickup never picks up dropped items if pickup_dropped is set to false.",
+        "Check out the new hilite options.",
         "Ctrl-e automatically writes or engraves \"Elbereth\" for you.",
         "Ctrl-o (or #overview) lists interesting levels you already visited.",
         "Press inventory letter for a menu of possible actions.",
@@ -743,11 +745,16 @@ read_hint(struct obj *otmp UNUSED)
         /* public server hints */
         "If you need advice, #shout, somebody might mail you help.",
         "Visit IRC channel #unnethack on Libera.Chat.",
-        "To opt out of these hints, put OPTIONS=nohint into your options.",
 #endif
     };
 
-    pline("\"%s\"", hint[rn2(SIZE(hint))]);
+    return hint[rn2(SIZE(hint))];
+}
+
+void
+read_hint(struct obj *otmp UNUSED)
+{
+    pline("\"%s\"", get_hint());
 }
 
 void

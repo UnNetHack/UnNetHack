@@ -148,7 +148,7 @@ static struct Bool_Opt
     {"hell_and_hell", &flags.hell_and_hell, FALSE, SET_IN_FILE},
     {"help", &flags.help, TRUE, SET_IN_GAME},
     {"hilite_pet", &iflags.wc_hilite_pet, TRUE, SET_IN_GAME }, /*WC*/
-    {"hint", &flags.hint, TRUE, SET_IN_FILE},
+    {"hint", &flags.hint, FALSE, SET_IN_FILE},
     {"hitpointbar", &flags.hitpointbar, TRUE, SET_IN_GAME},
     {"hp_notify", &iflags.hp_notify, FALSE, SET_IN_GAME},
 #ifdef ASCIIGRAPH
