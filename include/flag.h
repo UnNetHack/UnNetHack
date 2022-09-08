@@ -413,6 +413,12 @@ struct instance_flags {
     boolean wc2_guicolor;       /* allow colors in GUI (outside map) */
     boolean wc2_newcolors;      /* try to use slashem like colors including
                                  * dark-gray to represent black object */
+    int wc2_hilite_engravings;  /* highlighting of engravings */
+#define hilite_engravings wc2_hilite_engravings
+    int wc2_hilite_peacefuls;   /* highlighting of peaceful monsters */
+#define hilite_peacefuls wc2_hilite_peacefuls
+    int wc2_hilite_statues;     /* highlighting of statues */
+#define hilite_statues wc2_hilite_statues
 
     boolean hp_notify;
     char *hp_notify_fmt;

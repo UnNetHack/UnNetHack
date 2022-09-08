@@ -38,12 +38,9 @@ struct tc_lcl_data tc_lcl_data = { 0, 0, 0, 0, 0, 0, 0, FALSE };
 
 static char *HO, *CL, *CE, *UP, *XD, *BC, *SO, *SE, *TI, *TE;
 static char *VS, *VE;
-static char *ME;
-static char *MR;
-#if 0
-static char *MB, *MH;
-static char *MD;     /* may already be in use below */
-#endif
+static char *ME, *MR, *MB, *MH, *MD;
+static char *ZH, *ZR;
+
 #ifdef TERMLIB
 # ifdef TEXTCOLOR
 static char *MD;
@@ -389,6 +386,8 @@ tty_startup(int *wid, int *hgt)
     SE = Tgetstr("se");
     nh_US = Tgetstr("us");
     nh_UE = Tgetstr("ue");
+    ZH = Tgetstr("ZH"); /* italic start */
+    ZR = Tgetstr("ZR"); /* italic end */
     SG = tgetnum("sg"); /* -1: not fnd; else # of spaces left by so */
     if(!SO || !SE || (SG > 0)) SO = SE = nh_US = nh_UE = nullstr;
     TI = Tgetstr("ti");
@@ -400,13 +399,13 @@ tty_startup(int *wid, int *hgt)
     KS = Tgetstr("ks"); /* keypad start (special mode) */
     KE = Tgetstr("ke"); /* keypad end (ordinary mode [ie, digits]) */
     MR = Tgetstr("mr"); /* reverse */
-# if 0
     MB = Tgetstr("mb"); /* blink */
     MD = Tgetstr("md"); /* boldface */
     MH = Tgetstr("mh"); /* dim */
-# endif
     ME = Tgetstr("me"); /* turn off all attributes */
-    if (!ME || (SE == nullstr)) ME = SE;    /* default to SE value */
+    if (!ME) {
+        ME = SE ? SE : nullstr; /* default to SE value */
+    }
 
     /* Get rid of padding numbers for nh_HI and nh_HE.  Hope they
      * aren't really needed!!!  nh_HI and nh_HE are outputted to the
@@ -1525,19 +1524,46 @@ static char *
 s_atr2str(int n)
 {
     switch (n) {
+    case ATR_BLINK:
     case ATR_ULINE:
-        if(nh_US) return nh_US;
+        if (n == ATR_BLINK) {
+            if (MB && *MB) {
+                return MB;
+            }
+        } else {
+            /* Underline */
+            if (nh_US && *nh_US) {
+                return nh_US;
+            }
+        }
         /* fall through */
 
     case ATR_BOLD:
-    case ATR_BLINK:
-#if defined(TERMLIB) && defined(TEXTCOLOR)
-        if (MD) return MD;
-#endif
-        return nh_HI;
+        if (MD && *MD) {
+            return MD;
+        }
+        if (nh_HI && *nh_HI) {
+            return nh_HI;
+        }
+        break;
 
     case ATR_INVERSE:
-        return MR;
+        if (MR && *MR) {
+            return MR;
+        }
+        break;
+
+    case ATR_DIM:
+        if (MH && *MH) {
+            return MH;
+        }
+        break;
+
+    case ATR_ITALIC:
+        if (ZH && *ZH) {
+            return ZH;
+        }
+        break;
     }
     return nulstr;
 }
@@ -1547,15 +1573,30 @@ e_atr2str(int n)
 {
     switch (n) {
     case ATR_ULINE:
-        if(nh_UE) return nh_UE;
+        if (nh_UE && *nh_UE) {
+            return nh_UE;
+        }
         /* fall through */
 
     case ATR_BOLD:
     case ATR_BLINK:
-        return nh_HE;
+        if (nh_HE && *nh_HE) {
+            return nh_HE;
+        }
+        /* fall through */
 
+    case ATR_DIM:
     case ATR_INVERSE:
-        return ME;
+        if (ME && *ME) {
+            return ME;
+        }
+        break;
+
+    case ATR_ITALIC:
+        if (ZR && *ZR) {
+            return ZR;
+        }
+        break;
     }
     return nulstr;
 }

@@ -165,12 +165,16 @@ mapglyph(int glyph, glyph_t *ochar, int *ocolor, unsigned int *ospecial, coordxy
         } else
 #endif
 #ifdef TEXTCOLOR
+        if (iflags.use_color && engr_at(x, y)) {
+            special |= MG_ENGRAVING;
+        }
+
         /* provide a visible difference if normal and lit corridor
          * use the same symbol */
         if (iflags.use_color &&
-            offset == S_litcorr && ch == showsyms[S_corr])
+            offset == S_litcorr && ch == showsyms[S_corr]) {
             color = CLR_WHITE;
-        else if (iflags.use_color &&
+        } else if (iflags.use_color &&
                  (offset == S_upstair || offset == S_dnstair) &&
                  (x == sstairs.sx && y == sstairs.sy)) {
             color = CLR_YELLOW;
@@ -288,6 +292,15 @@ mapglyph(int glyph, glyph_t *ochar, int *ocolor, unsigned int *ospecial, coordxy
 #endif
         {
             mon_color(glyph);
+
+            /* TODO: make peacefuls into proper glyphs */
+            if (iflags.use_color) {
+                struct monst *mon = m_at(x, y);
+                if (mon && mon->mpeaceful) {
+                    special |= MG_PEACEFUL;
+                }
+            }
+
             /* special case the hero for `showrace' option */
 #ifdef TEXTCOLOR
             if (iflags.use_color && x == u.ux && y == u.uy &&

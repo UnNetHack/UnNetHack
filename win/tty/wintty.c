@@ -54,6 +54,7 @@ struct window_procs tty_procs = {
     WC_MOUSE_SUPPORT|
 #endif
     WC_COLOR|WC_HILITE_PET|WC_INVERSE|WC_EIGHT_BIT_IN,
+    WC2_HILITE_ENGRAVINGS | WC2_HILITE_PEACEFULS | WC2_HILITE_STATUES |
 #ifdef TERMINFO
     WC2_NEWCOLORS |
 #endif
@@ -3226,6 +3227,33 @@ tty_cliparound(int x, int y)
 }
 #endif /* CLIPPING */
 
+void
+term_start_bgcolor(int color) //, int r, int g, int b)
+{
+    //if (allow_bgcolor) {
+    if (1) {
+        char tmp[20];
+        char sep = iflags.truecolor_separator;
+        if (color < 0) {
+            //Sprintf(tmp, "\e[48%c2%c%d%c%d%c%dm", sep, sep, r, sep, g, sep, b);
+        } else {
+            if (color >= 16) {
+                Sprintf(tmp, "\e[48%c5%c%dm", sep, sep, color);
+            } else if (color >= 8) {
+                Sprintf(tmp, "\e[%dm", 100 + color % 8);
+            } else {
+                Sprintf(tmp, "\e[%dm", 40 + color);
+            }
+        }
+        //Sprintf(tmp, "\e[%dm", 3);
+        //Sprintf(tmp, "\033[%dm", ((color % 8) + 40));
+        xputs(tmp);
+    //} else {
+        //xputs(e_atr2str(ATR_INVERSE));
+    }
+}
+
+
 /*
  *  tty_print_glyph
  *
@@ -3243,9 +3271,10 @@ tty_print_glyph(
     int bg_glyph UNUSED)
 {
     glyph_t ch;
-    boolean reverse_on = FALSE;
-    boolean underline_on = FALSE;
+    boolean inverse_on = FALSE;
     int color;
+    //int bgcolor = NO_COLOR;
+
     unsigned special;
 
 #ifdef CLIPPING
@@ -3286,16 +3315,26 @@ tty_print_glyph(
         ((special & MG_DETECT) && iflags.use_inverse) ||
         ((special & MG_INVERSE) && iflags.use_inverse)) {
         term_start_attr(ATR_INVERSE);
-        reverse_on = TRUE;
+        inverse_on = TRUE;
         if (color == CLR_BLACK && iflags.color_mode < 256) {
             /* workaround for black-on-black */
             term_start_color(CLR_WHITE);
         }
     }
 
-    if (!reverse_on && (special & MG_STATUE)) {
-        term_start_attr(ATR_ULINE);
-        underline_on = TRUE;
+    if (!inverse_on) {
+        if (iflags.hilite_engravings && (special & MG_ENGRAVING)) {
+            term_start_attr(iflags.hilite_engravings);
+            inverse_on |= (iflags.hilite_engravings & ATR_INVERSE);
+        }
+        if (iflags.hilite_peacefuls && (special & MG_PEACEFUL)) {
+            term_start_attr(iflags.hilite_peacefuls);
+            inverse_on |= (iflags.hilite_peacefuls & ATR_INVERSE);
+        }
+        if (iflags.hilite_statues && (special & MG_STATUE)) {
+            term_start_attr(iflags.hilite_statues);
+            inverse_on |= (iflags.hilite_statues & ATR_INVERSE);
+        }
     }
 
 #if defined(USE_TILES) && defined(MSDOS)
@@ -3313,11 +3352,17 @@ tty_print_glyph(
     g_putch(ch);        /* print the character */
 #endif
 
-    if (underline_on) {
-        term_end_attr(ATR_ULINE);
+    if (iflags.hilite_engravings && (special & MG_ENGRAVING)) {
+        term_end_attr(iflags.hilite_engravings);
+    }
+    if (iflags.hilite_peacefuls && (special & MG_PEACEFUL)) {
+        term_end_attr(iflags.hilite_peacefuls);
+    }
+    if (iflags.hilite_statues && (special & MG_STATUE)) {
+        term_end_attr(iflags.hilite_statues);
     }
 
-    if (reverse_on) {
+    if (inverse_on) {
         term_end_attr(ATR_INVERSE);
 #ifdef TEXTCOLOR
         /* turn off color as well, ATR_INVERSE may have done this already */

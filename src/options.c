@@ -147,8 +147,8 @@ static struct Bool_Opt
     {"heaven_or_hell", &flags.heaven_or_hell, FALSE, SET_IN_FILE},
     {"hell_and_hell", &flags.hell_and_hell, FALSE, SET_IN_FILE},
     {"help", &flags.help, TRUE, SET_IN_GAME},
-    {"hilite_pet",    &iflags.wc_hilite_pet, TRUE, SET_IN_GAME},    /*WC*/
-    {"hint", &flags.hint, TRUE, SET_IN_FILE},
+    {"hilite_pet", &iflags.wc_hilite_pet, TRUE, SET_IN_GAME }, /*WC*/
+    {"hint", &flags.hint, FALSE, SET_IN_FILE},
     {"hitpointbar", &flags.hitpointbar, TRUE, SET_IN_GAME},
     {"hp_notify", &iflags.hp_notify, FALSE, SET_IN_GAME},
 #ifdef ASCIIGRAPH
@@ -381,6 +381,9 @@ static struct Comp_Opt
       PL_FSIZ, SET_IN_GAME },
     { "gender",   "your starting gender (male or female)",
       8, DISP_IN_GAME },
+    { "hilite_engravings", "highlighting of engravings", 9, SET_IN_GAME }, /* WC */
+    { "hilite_peacefuls", "highlighting of peaceful monsters", 9, SET_IN_GAME }, /* WC */
+    { "hilite_statues", "highlighting of statues", 9, SET_IN_GAME }, /* WC */
     { "horsename", "the name of your (first) horse (e.g., horsename:Silver)",
       PL_PSIZ, DISP_IN_GAME },
     { "hp_notify_fmt", "hp_notify format string", 20, SET_IN_GAME },
@@ -393,7 +396,7 @@ static struct Comp_Opt
       4, SET_IN_FILE },
     { "menu_first_page", "jump to the first page in a menu",
       4, SET_IN_FILE },
-    { "menu_headings", "bold, inverse, or underline headings", 9, SET_IN_GAME },
+    { "menu_headings", "display style for menu headings", 9, SET_IN_GAME },
     { "menu_invert_all", "invert all items in a menu", 4, SET_IN_FILE },
     { "menu_invert_page", "invert all items on this page of a menu",
       4, SET_IN_FILE },
@@ -992,6 +995,11 @@ initoptions(void)
     /* since this is done before init_objects(), do partial init here */
     objects[SLIME_MOLD].oc_name_idx = SLIME_MOLD;
     nmcpy(pl_fruit, OBJ_NAME(objects[SLIME_MOLD]), PL_FSIZ);
+
+    /* highlighting */
+    iflags.hilite_engravings = ATR_ULINE;
+    iflags.hilite_peacefuls = ATR_ULINE;
+    iflags.hilite_statues = ATR_ITALIC;
 
 #ifdef SYSCF
 /* someday there may be other SYSCF alternatives besides text file */
@@ -1617,6 +1625,7 @@ static const struct {
     { "none", ATR_NONE },
     { "bold", ATR_BOLD },
     { "dim", ATR_DIM },
+    { "italic", ATR_ITALIC },
     { "underline", ATR_ULINE },
     { "blink", ATR_BLINK },
     { "inverse", ATR_INVERSE },
@@ -1746,6 +1755,12 @@ query_attr(const char *prompt)
 
     if (prompt && strstri(prompt, "menu headings")) {
         default_attr = iflags.menu_headings;
+    } else if (prompt && strstri(prompt, "engravings")) {
+        default_attr = iflags.hilite_engravings;
+    } else if (prompt && strstri(prompt, "peaceful monsters")) {
+        default_attr = iflags.hilite_peacefuls;
+    } else if (prompt && strstri(prompt, "statues")) {
+        default_attr = iflags.hilite_statues;
     }
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
@@ -4013,6 +4028,63 @@ goodfruit:
         return retval;
     }
 
+    fullname = "hilite_engravings";
+    if (match_optname(opts, fullname, 17, TRUE)) {
+        if (negated) {
+            bad_negation(fullname, FALSE);
+            return FALSE;
+        }
+        else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
+            return FALSE;
+        }
+        int tmpattr = match_str2attr(opts, TRUE);
+        if (tmpattr == -1) {
+            badoption(opts);
+            return FALSE;
+        }
+        iflags.hilite_engravings = tmpattr;
+
+        return retval;
+    }
+
+    fullname = "hilite_peacefuls";
+    if (match_optname(opts, fullname, 16, TRUE)) {
+        if (negated) {
+            bad_negation(fullname, FALSE);
+            return FALSE;
+        }
+        else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
+            return FALSE;
+        }
+        int tmpattr = match_str2attr(opts, TRUE);
+        if (tmpattr == -1) {
+            badoption(opts);
+            return FALSE;
+        }
+        iflags.hilite_peacefuls = tmpattr;
+
+        return retval;
+    }
+
+    fullname = "hilite_statues";
+    if (match_optname(opts, fullname, 14, TRUE)) {
+        if (negated) {
+            bad_negation(fullname, FALSE);
+            return FALSE;
+        }
+        else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
+            return FALSE;
+        }
+        int tmpattr = match_str2attr(opts, TRUE);
+        if (tmpattr == -1) {
+            badoption(opts);
+            return FALSE;
+        }
+        iflags.hilite_statues = tmpattr;
+
+        return retval;
+    }
+
     fullname = "menu_headings";
     if (match_optname(opts, fullname, 12, TRUE)) {
         if (negated) {
@@ -4022,16 +4094,13 @@ goodfruit:
         else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
             return FALSE;
         }
-        if (!strcmpi(opts, "bold"))
-            iflags.menu_headings = ATR_BOLD;
-        else if (!strcmpi(opts, "inverse"))
-            iflags.menu_headings = ATR_INVERSE;
-        else if (!strcmpi(opts, "underline"))
-            iflags.menu_headings = ATR_ULINE;
-        else {
+        int tmpattr = match_str2attr(opts, TRUE);
+        if (tmpattr == -1) {
             badoption(opts);
             return FALSE;
         }
+        iflags.menu_headings = tmpattr;
+
         return retval;
     }
 
@@ -4986,36 +5055,52 @@ special_handling(const char *optname, boolean setinitial, boolean setfromfile)
         }
         destroy_nhwindow(tmpwin);
         retval = TRUE;
-    } else if (!strcmp("menu_headings", optname)) {
-        static const char *mhchoices[3] = {"bold", "inverse", "underline"};
-        const char *npletters = "biu";
-        menu_item *mode_pick = (menu_item *)0;
 
-        tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
-        for (i = 0; i < SIZE(mhchoices); i++) {
-            any.a_int = i + 1;
-            add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, npletters[i], 0,
-                     ATR_NONE, mhchoices[i], MENU_UNSELECTED);
-        }
-        end_menu(tmpwin, "How to highlight menu headings:");
-        if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
-            int mode = mode_pick->item.a_int - 1;
-            switch(mode) {
-            case 2:
-                iflags.menu_headings = ATR_ULINE;
-                break;
-            case 0:
-                iflags.menu_headings = ATR_BOLD;
-                break;
-            case 1:
-            default:
-                iflags.menu_headings = ATR_INVERSE;
+    } else if (!strcmp("hilite_engravings", optname)) {
+        int mhattr = query_attr("How to highlight engravings:");
+
+        if (mhattr != -1) {
+            iflags.hilite_engravings = mhattr;
+            if (iflags.hilite_engravings) {
+                docrt();
             }
-            free((genericptr_t)mode_pick);
         }
-        destroy_nhwindow(tmpwin);
         retval = TRUE;
+
+    } else if (!strcmp("hilite_peacefuls", optname)) {
+        int mhattr = query_attr("How to highlight peaceful monsters:");
+
+        if (mhattr != -1) {
+            iflags.hilite_peacefuls = mhattr;
+            if (iflags.hilite_peacefuls) {
+                docrt();
+            }
+        }
+        retval = TRUE;
+
+    } else if (!strcmp("hilite_statues", optname)) {
+        int mhattr = query_attr("How to highlight statues:");
+
+        if (mhattr != -1) {
+            iflags.hilite_statues = mhattr;
+            if (iflags.hilite_statues) {
+                docrt();
+            }
+        }
+        retval = TRUE;
+
+    } else if (!strcmp("menu_headings", optname)) {
+        int mhattr = query_attr("How to highlight menu headings:");
+
+        if (mhattr != -1) {
+            iflags.menu_headings = mhattr;
+            /* header highlighting affects persistent inventory display */
+            if (iflags.perm_invent) {
+                update_inventory();
+            }
+        }
+        retval = TRUE;
+
     } else if (!strcmp("windowborders", optname)) {
         menu_item *window_pick = (menu_item *)0;
 
@@ -5164,6 +5249,13 @@ get_compopt_value(const char *optname, char *buf)
         Sprintf(buf, "%s", pl_fruit);
     else if (!strcmp(optname, "gender"))
         Sprintf(buf, "%s", rolestring(flags.initgend, genders, adj));
+    else if (!strcmp(optname, "hilite_engravings")) {
+        Sprintf(buf, "%s", attr2attrname(iflags.hilite_engravings));
+    } else if (!strncmp(optname, "hilite_peacefuls", 16)) {
+        Sprintf(buf, "%s", attr2attrname(iflags.hilite_peacefuls));
+    } else if (!strcmp(optname, "hilite_statues")) {
+        Sprintf(buf, "%s", attr2attrname(iflags.hilite_statues));
+    }
     else if (!strcmp(optname, "horsename"))
         Sprintf(buf, "%s", horsename[0] ? horsename : none);
     else if (!strcmp(optname, "map_mode"))
@@ -5191,10 +5283,7 @@ get_compopt_value(const char *optname, char *buf)
     else if (!strcmp(optname, "menu_invert_all"))
         Sprintf(buf, "%s", to_be_done);
     else if (!strcmp(optname, "menu_headings")) {
-        Sprintf(buf, "%s", (iflags.menu_headings == ATR_BOLD) ?
-                "bold" :   (iflags.menu_headings == ATR_INVERSE) ?
-                "inverse" :   (iflags.menu_headings == ATR_ULINE) ?
-                "underline" : "unknown");
+        Sprintf(buf, "%s", attr2attrname(iflags.menu_headings));
     }
     else if (!strcmp(optname, "menu_invert_page"))
         Sprintf(buf, "%s", to_be_done);
@@ -5894,54 +5983,57 @@ choose_classes_menu(const char *prompt, int category, boolean way, char *class_l
 }
 
 struct wc_Opt wc_options[] = {
-    {"ascii_map", WC_ASCII_MAP},
-    {"color", WC_COLOR},
-    {"eight_bit_tty", WC_EIGHT_BIT_IN},
-    {"hilite_pet", WC_HILITE_PET},
-    {"popup_dialog", WC_POPUP_DIALOG},
-    {"player_selection", WC_PLAYER_SELECTION},
-    {"preload_tiles", WC_PRELOAD_TILES},
-    {"tiled_map", WC_TILED_MAP},
-    {"tile_file", WC_TILE_FILE},
-    {"tile_width", WC_TILE_WIDTH},
-    {"tile_height", WC_TILE_HEIGHT},
-    {"use_inverse", WC_INVERSE},
-    {"align_message", WC_ALIGN_MESSAGE},
-    {"align_status", WC_ALIGN_STATUS},
-    {"font_map", WC_FONT_MAP},
-    {"font_menu", WC_FONT_MENU},
-    {"font_message", WC_FONT_MESSAGE},
+    { "ascii_map", WC_ASCII_MAP },
+    { "color", WC_COLOR },
+    { "eight_bit_tty", WC_EIGHT_BIT_IN },
+    { "hilite_pet", WC_HILITE_PET },
+    { "popup_dialog", WC_POPUP_DIALOG },
+    { "player_selection", WC_PLAYER_SELECTION },
+    { "preload_tiles", WC_PRELOAD_TILES },
+    { "tiled_map", WC_TILED_MAP },
+    { "tile_file", WC_TILE_FILE },
+    { "tile_width", WC_TILE_WIDTH },
+    { "tile_height", WC_TILE_HEIGHT },
+    { "use_inverse", WC_INVERSE },
+    { "align_message", WC_ALIGN_MESSAGE },
+    { "align_status", WC_ALIGN_STATUS },
+    { "font_map", WC_FONT_MAP },
+    { "font_menu", WC_FONT_MENU },
+    { "font_message", WC_FONT_MESSAGE },
 #if 0
-    {"perm_invent", WC_PERM_INVENT},
+    { "perm_invent", WC_PERM_INVENT },
 #endif
-    {"font_size_map", WC_FONTSIZ_MAP},
-    {"font_size_menu", WC_FONTSIZ_MENU},
-    {"font_size_message", WC_FONTSIZ_MESSAGE},
-    {"font_size_status", WC_FONTSIZ_STATUS},
-    {"font_size_text", WC_FONTSIZ_TEXT},
-    {"font_status", WC_FONT_STATUS},
-    {"font_text", WC_FONT_TEXT},
-    {"map_mode", WC_MAP_MODE},
-    {"scroll_amount", WC_SCROLL_AMOUNT},
-    {"scroll_margin", WC_SCROLL_MARGIN},
-    {"splash_screen", WC_SPLASH_SCREEN},
-    {"vary_msgcount", WC_VARY_MSGCOUNT},
-    {"windowcolors", WC_WINDOWCOLORS},
-    {"mouse_support", WC_MOUSE_SUPPORT},
-    {(char *)0, 0L}
-};
+    { "font_size_map", WC_FONTSIZ_MAP },
+    { "font_size_menu", WC_FONTSIZ_MENU },
+    { "font_size_message", WC_FONTSIZ_MESSAGE },
+    { "font_size_status", WC_FONTSIZ_STATUS },
+    { "font_size_text", WC_FONTSIZ_TEXT },
+    { "font_status", WC_FONT_STATUS },
+    { "font_text", WC_FONT_TEXT },
+    { "map_mode", WC_MAP_MODE },
+    { "scroll_amount", WC_SCROLL_AMOUNT },
+    { "scroll_margin", WC_SCROLL_MARGIN },
+    { "splash_screen", WC_SPLASH_SCREEN },
+    { "vary_msgcount", WC_VARY_MSGCOUNT },
+    { "windowcolors", WC_WINDOWCOLORS },
+    { "mouse_support", WC_MOUSE_SUPPORT },
+    { (char *)0, 0L }
+ };
 
 struct wc_Opt wc2_options[] = {
-    {"fullscreen", WC2_FULLSCREEN},
-    {"newcolors", WC2_NEWCOLORS},
-    {"softkeyboard", WC2_SOFTKEYBOARD},
-    {"wraptext", WC2_WRAPTEXT},
-    {"term_cols", WC2_TERM_COLS},
-    {"term_rows", WC2_TERM_ROWS},
-    {"windowborders", WC2_WINDOWBORDERS},
-    {"petattr", WC2_PETATTR},
-    {"guicolor", WC2_GUICOLOR},
-    {(char *)0, 0L}
+    { "fullscreen", WC2_FULLSCREEN },
+    { "newcolors", WC2_NEWCOLORS },
+    { "softkeyboard", WC2_SOFTKEYBOARD },
+    { "wraptext", WC2_WRAPTEXT },
+    { "term_cols", WC2_TERM_COLS },
+    { "term_rows", WC2_TERM_ROWS },
+    { "windowborders", WC2_WINDOWBORDERS },
+    { "petattr", WC2_PETATTR },
+    { "guicolor", WC2_GUICOLOR },
+    { "hilite_engravings", WC2_HILITE_ENGRAVINGS },
+    { "hilite_peacefuls", WC2_HILITE_PEACEFULS },
+    { "hilite_statues", WC2_HILITE_STATUES },
+    { (char *)0, 0L }
 };
 
 

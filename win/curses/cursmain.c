@@ -21,6 +21,7 @@ struct window_procs curses_procs = {
     WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_COLOR | WC_HILITE_PET |
         WC_POPUP_DIALOG | WC_SPLASH_SCREEN,
     WC2_TERM_COLS | WC2_TERM_ROWS | WC2_WINDOWBORDERS | WC2_PETATTR | WC2_GUICOLOR |
+    WC2_HILITE_ENGRAVINGS | WC2_HILITE_PEACEFULS | WC2_HILITE_STATUES |
     WC2_SUPPRESS_HIST | WC2_URGENT_MESG,
     curses_init_nhwindows,
     curses_player_selection,
@@ -607,6 +608,15 @@ curses_print_glyph(winid wid, coordxy x, coordxy y, int glyph,
     mapglyph(glyph, (glyph_t*)&ch, &color, &special, x, y, 0);
     if (special & MG_STATUE) {
         attr = A_UNDERLINE;
+    }
+    if (iflags.hilite_engravings && (special & MG_ENGRAVING)) {
+        attr = curses_convert_attr(iflags.hilite_engravings);
+    }
+    if (iflags.hilite_peacefuls && (special & MG_PEACEFUL)) {
+        attr = curses_convert_attr(iflags.hilite_peacefuls);
+    }
+    if (iflags.hilite_statues && (special & MG_STATUE)) {
+        attr = curses_convert_attr(iflags.hilite_statues);
     }
     if ((special & MG_PET) && iflags.hilite_pet) {
         attr = iflags.wc2_petattr;

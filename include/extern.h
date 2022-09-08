@@ -1214,6 +1214,7 @@ extern void nocmov(int x, int y);
 extern void getmailstatus(void);
 # endif
 extern void ckmailstatus(void);
+extern const char * get_hint(void);
 extern void read_hint(struct obj *);
 extern void readmail(struct obj *);
 extern void maybe_hint(void);
