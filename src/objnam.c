@@ -4115,7 +4115,6 @@ wiztrap:
 
         if (!BSTRCMP(bp, p-5, "grave") || !BSTRCMP(bp, p-9, "headstone")) {
             make_grave(u.ux, u.uy, (char *) 0);
-            pline("A grave.");
             pline("%s.", IS_GRAVE(levl[u.ux][u.uy].typ) ? "A grave" : "Can't place a grave here");
             madeterrain = TRUE;
         }
