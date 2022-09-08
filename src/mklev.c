@@ -898,13 +898,17 @@ fill_ordinary_room(struct mkroom *croom)
      * Either a hint or a true rumor. */
     if (depth(&u.uz) == 1 && has_upstairs(croom)) {
         if (find_okay_roompos(croom, &pos)) {
+#ifdef MAIL
             if (rnf(1, 2)) {
                 make_engr_at(pos.x, pos.y, get_hint(), 0, MARK);
             } else {
+#endif
                 char buf[BUFSZ];
                 getrumor(1, buf, TRUE);
                 make_engr_at(pos.x, pos.y, buf, 0, MARK);
+#ifdef MAIL
             }
+#endif
         }
     } else if (!rn2(27 + 3 * abs(depth(&u.uz)))) {
         char buf[BUFSZ];
