@@ -31,6 +31,7 @@ void You_cant(const char *str,...) {}
 void panic(const char *str,...) {}
 void nh_terminate(int status) { exit(0); }
 void docrt() {}
+void update_inventory(void) { }
 
 int str2role(const char *str) { return 0; }
 int str2race(const char *str) { return 0; }
