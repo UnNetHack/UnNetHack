@@ -1837,6 +1837,9 @@ extern const char *suit_simple_name(struct obj *);
 extern const char *cloak_simple_name(struct obj *);
 extern const char *helm_simple_name(struct obj *);
 extern const char *gloves_simple_name(struct obj *);
+extern const char *boots_simple_name(struct obj *);
+extern const char *shield_simple_name(struct obj *);
+extern const char *shirt_simple_name(struct obj *);
 extern const char *mimic_obj_name(struct monst *);
 extern char *safe_qbuf(char *, const char *, const char *, struct obj *,
                   char *(*)(OBJ_P), char *(*)(OBJ_P), const char *);
