@@ -437,9 +437,10 @@ curses_update_stats(void)
     /* Figure out if we have proper window dimensions for horizontal statusbar. */
     if (horiz) {
         /* correct y */
-        int cy = 3;
-        if (iflags.classic_status)
+        int cy = 2; /* TODO support for 3 status lines */
+        if (iflags.classic_status) {
             cy = 2;
+        }
 
         /* actual y (and x) */
         int ax = 0;
