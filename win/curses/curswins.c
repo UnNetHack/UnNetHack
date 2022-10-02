@@ -590,6 +590,8 @@ write_char(WINDOW * win, int x, int y, nethack_char nch)
 #ifdef UTF8_GLYPHS
     if (iflags.UTF8graphics) {
         wpututf8char(win, y, x, nch.ch);
+    } else if (iflags.IBMgraphics && nch.ch >= 0x80 && nch.ch <= 0xFF) {
+        wpututf8char(win, y, x, get_unicode_codepoint(nch.ch));
     } else {
 #endif
 #ifdef PDCURSES

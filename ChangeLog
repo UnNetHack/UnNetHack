@@ -86,6 +86,7 @@
 	  - Show "empty" on known empty lamps and lanterns
 	  - Wallclock and play time duration on status line
 	  - Support UTF8graphics on curses
+	  - Support IBMgraphics on curses
 	  - Use bright colors on supporting terminals in tty port
 	  - Monster and object information database
 	  - Reduce message spam when healers sense injuries
