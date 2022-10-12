@@ -1009,6 +1009,8 @@ hitmu(struct monst *mtmp, struct attack *mattk)
     char buf[BUFSZ];
     struct permonst *olduasmon = youmonst.data;
     int res;
+    boolean vorpal_wield = ((uwep && uwep->oartifact == ART_VORPAL_BLADE) ||
+                            (u.twoweap && uswapwep->oartifact == ART_VORPAL_BLADE));
 
     if (!canspotmon(mtmp)) {
         map_invisible(mtmp->mx, mtmp->my);
@@ -1401,7 +1403,7 @@ dopois:
 
     case AD_HEAD:
         if ((!rn2(40) || youmonst.data->mlet == S_JABBERWOCK) && !mtmp->mcan) {
-            if (!has_head(youmonst.data)) {
+            if (!has_head(youmonst.data) || vorpal_wield) {
                 pline("Somehow, %s misses you wildly.", mon_nam(mtmp));
                 dmg = 0;
                 break;

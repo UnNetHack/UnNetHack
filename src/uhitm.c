@@ -1953,6 +1953,8 @@ damageum(
     int tmp = d((int)mattk->damn, (int)mattk->damd);
     boolean negated;
     struct obj *mongold;
+    boolean mon_vorpal_wield = (MON_WEP(mdef) &&
+                                MON_WEP(mdef)->oartifact == ART_VORPAL_BLADE);
 
     int armpro = magic_negation(mdef);
     /* since hero can't be cancelled, only defender's armor applies */
@@ -1983,7 +1985,7 @@ damageum(
 
     case AD_HEAD:
         if (!rn2(40) || mdef->data->mlet == S_JABBERWOCK) {
-            if (!has_head(mdef->data)) {
+            if (!has_head(mdef->data) || mon_vorpal_wield) {
                 pline("Somehow, you miss %s wildly.", mon_nam(mdef));
                 tmp = 0;
                 break;

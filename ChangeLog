@@ -52,6 +52,7 @@
 	  - Potion mixing needs equal numbers of potions on both sides
 	     Number of generated potions is the combined total of the involved potions
 	  - Gem alchemy (from dNetHack)
+	  - Wielding Vorpal Blade protects against decapitation attacks (from EvilHack)
 
 	* artifact changes:
 	  - Removed artifact wish failure due to the number of existing artifacts

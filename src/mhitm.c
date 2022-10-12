@@ -1124,6 +1124,8 @@ mdamagem(struct monst *magr, struct monst *mdef, struct attack *mattk)
     int armpro, num, tmp = d((int)mattk->damn, (int)mattk->damd);
     boolean cancelled;
     int res = MM_MISS;
+    boolean mon_vorpal_wield = (MON_WEP(mdef) &&
+                                MON_WEP(mdef)->oartifact == ART_VORPAL_BLADE);
 
 #ifdef WEBB_DISINT
     int def_disintegrated;
@@ -1253,8 +1255,10 @@ mdamagem(struct monst *magr, struct monst *mdef, struct attack *mattk)
     case AD_HEAD:
         if ((!rn2(40) || mdef->data->mlet == S_JABBERWOCK) && !magr->mcan) {
             Strcpy(buf, Monnam(magr));
-            if (!has_head(mdef->data)) {
-                pline("Somehow, %s misses %s wildly.", buf, mon_nam(mdef));
+            if (!has_head(mdef->data) || mon_vorpal_wield) {
+                if (canseemon(mdef)) {
+                    pline("Somehow, %s misses %s wildly.", buf, mon_nam(mdef));
+                }
                 tmp = 0;
                 break;
             }
