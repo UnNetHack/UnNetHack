@@ -393,8 +393,8 @@ typedef genericptr genericptr_t;    /* (void *) or (char *) */
 #if (!defined(__linux__) && !defined(MACOS)) || defined(GCC_URWARN)
 /* disable gcc's __attribute__((__warn_unused_result__)) since explicitly
    discarding the result by casting to (void) is not accepted as a 'use' */
-#define __warn_unused_result__ /*empty*/
-#define warn_unused_result /*empty*/
+#define __warn_unused_result__ __attribute__
+#define warn_unused_result __attribute__
 #endif
 #endif
 #endif
