@@ -4470,7 +4470,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
             if (!inhishop(tmp_shk)) {
                 continue;
             }
-            shk_distance = distu(tmp_shk->mx, tmp_shk->my);
+            shk_distance = mdistu(tmp_shk);
             if (shk_distance > nearest_shk) {
                 continue;
             }

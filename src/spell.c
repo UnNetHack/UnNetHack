@@ -281,8 +281,8 @@ raise_dead:
 
             if (is_undead(mtmp->data) && cansee(mtmp->mx, mtmp->my)) {
                 mtmp->mpeaceful = TRUE;
-                if (sgn(mtmp->data->maligntyp) == sgn(u.ualign.type)
-                   && distu(mtmp->mx, mtmp->my) < 4)
+                if (sgn(mtmp->data->maligntyp) == sgn(u.ualign.type) &&
+                    mdistu(mtmp) < 4) {
                     if (mtmp->mtame) {
                         if (mtmp->mtame < 20) {
                             mtmp->mtame++;
@@ -290,7 +290,9 @@ raise_dead:
                     } else {
                         (void) tamedog(mtmp, (struct obj *) 0);
                     }
-                else monflee(mtmp, 0, FALSE, TRUE);
+                } else {
+                    monflee(mtmp, 0, FALSE, TRUE);
+                }
             }
         }
     } else {

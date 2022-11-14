@@ -147,7 +147,7 @@ precheck(struct monst *mon, struct obj *obj)
             int range = couldsee(mon->mx, mon->my) ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
             You_hear("a zap and an explosion %s.",
-                     (distu(mon->mx, mon->my) <= range * range) ? "nearby" : "in the distance");
+                     (mdistu(mon) <= range * range) ? "nearby" : "in the distance");
         }
         m_useup(mon, obj);
         mon->mhp -= dam;
@@ -170,8 +170,7 @@ mzapwand(struct monst *mtmp, struct obj *otmp, boolean self)
         /* 9 or 5 */
         int range = couldsee(mtmp->mx, mtmp->my) ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
-        You_hear("a %s zap.",
-                (distu(mtmp->mx, mtmp->my) <= range * range) ? "nearby" : "distant");
+        You_hear("a %s zap.", (mdistu(mtmp) <= range * range) ?  "nearby" : "distant");
         otmp->known = 0;
     } else if (self) {
         pline("%s %s %sself with %s!", Monnam(mtmp),
@@ -193,7 +192,7 @@ mplayhorn(struct monst *mtmp, struct obj *otmp, boolean self)
         int range = couldsee(mtmp->mx, mtmp->my) ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
         You_hear("a horn being played %s.",
-                 (distu(mtmp->mx, mtmp->my) <= range * range) ? "nearby" : "in the distance");
+                 (mdistu(mtmp) <= range * range) ? "nearby" : "in the distance");
         otmp->known = 0; /* hero doesn't know how many charges are left */
     } else {
         otmp->dknown = 1;

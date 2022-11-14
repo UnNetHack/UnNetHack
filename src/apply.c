@@ -3202,8 +3202,8 @@ use_pole(struct obj *obj)
         hitm &&
         !DEADMONSTER(hitm) &&
         cansee(hitm->mx, hitm->my) &&
-        (distu(hitm->mx, hitm->my) <= max_range) &&
-        (distu(hitm->mx, hitm->my) >= min_range)) {
+        (mdistu(hitm) <= max_range) &&
+        (mdistu(hitm) >= min_range)) {
         cc.x = hitm->mx;
         cc.y = hitm->my;
     }

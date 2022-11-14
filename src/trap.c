@@ -2368,7 +2368,7 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
                 int range = couldsee(mtmp->mx, mtmp->my) ? /* 9 or 5 */
                                (BOLT_LIM + 1) : (BOLT_LIM - 3);
                 You_hear("a %s squeak.",
-                         (distu(mtmp->mx, mtmp->my) <= range * range) ?
+                         (mdistu(mtmp) <= range * range) ?
                             "nearby" : "distant");
             }
             /* wake up nearby monsters */
@@ -2584,7 +2584,7 @@ mfiretrap:
                 (void) destroy_mitem(mtmp, POTION_CLASS, AD_FIRE);
             }
             if (burn_floor_objects(mtmp->mx, mtmp->my, see_it, FALSE) &&
-                !see_it && distu(mtmp->mx, mtmp->my) <= 3*3)
+                !see_it && mdistu(mtmp) <= 3 * 3)
                 You("smell smoke.");
             if (is_ice(mtmp->mx, mtmp->my)) {
                 melt_ice(mtmp->mx, mtmp->my, (char *) 0);
@@ -2895,7 +2895,7 @@ mfiretrap:
                     /* notice something (hearing uses a larger threshold
                        for 'nearby') */
                     You_see("the ground vibrate %s.",
-                            (distu(mtmp->mx, mtmp->my) <= 2 * 2) ? "nearby" : "in the distance");
+                            (mdistu(mtmp) <= 2 * 2) ? "nearby" : "in the distance");
                 }
             }
             break;
@@ -5128,7 +5128,7 @@ openholdingtrap(struct monst *mon, boolean *noticed)
             }
         }
         /* might pacify monster if adjacent */
-        if (rn2(2) && distu(mon->mx, mon->my) <= 2) {
+        if (rn2(2) && mdistu(mon) <= 2) {
             reward_untrap(t, mon);
         }
     }

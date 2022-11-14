@@ -19,15 +19,15 @@
  * Returns true if the hero can sense the given monster.  This includes
  * monsters that are hiding or mimicing other monsters.
  */
-#define tp_sensemon(mon) (  /* The hero can always sense a monster IF:  */ \
-        (!mindless(mon->data) && /* 1. the monster has a brain to sense AND  */ \
+#define tp_sensemon(mon) ( /* The hero can always sense a monster IF: */ \
+        (!mindless(mon->data) && /* 1. the monster has a brain to sense AND */ \
          (!which_armor(mon, W_ARMH) || which_armor(mon, W_ARMH)->otyp != TINFOIL_HAT)) && \
-        ((Blind && Blind_telepat) || /* 2a. hero is blind and telepathic OR     */ \
-         /* 2b. hero is using a telepathy inducing   */ \
-         /*  object and in range            */ \
+        ((Blind && Blind_telepat) || /* 2a. hero is blind and telepathic OR */ \
+         /* 2b. hero is using a telepathy inducing */ \
+         /*  object and in range */ \
          /* FALSE if monster is wearing a tinfoil hat*/ \
-         (Unblind_telepat &&                         \
-          (distu(mon->mx, mon->my) <= (BOLT_LIM * BOLT_LIM))))              \
+         (Unblind_telepat && \
+          (mdistu(mon) <= (BOLT_LIM * BOLT_LIM)))) \
         )
 
 #define sensemon(mon) (tp_sensemon(mon) || Detect_monsters || MATCH_WARN_OF_MON(mon))
@@ -36,10 +36,9 @@
  * mon_warning() is used to warn of any dangerous monsters in your
  * vicinity, and a glyph representing the warning level is displayed.
  */
-
 #define mon_warning(mon) ((Warning || heaven_or_hell_mode) && \
-                          !(mon)->mpeaceful &&               \
-                          (distu((mon)->mx, (mon)->my) < 100) &&             \
+                          !(mon)->mpeaceful && \
+                          (mdistu(mon) < 100) && \
                           ((((int) ((mon)->m_lev / 4)) >= flags.warnlevel) || \
                            heaven_or_hell_mode))
 
@@ -102,10 +101,10 @@
  * invisible to infravision.
  */
 #define knowninvisible(mon) \
-    (mtmp->minvis && \
+    (mon->minvis && \
      ((cansee(mon->mx, mon->my) && (See_invisible || Detect_monsters)) || \
       (!Blind && (HTelepat & ~INTRINSIC) && \
-       distu(mon->mx, mon->my) <= (BOLT_LIM * BOLT_LIM) \
+       mdistu(mon) <= (BOLT_LIM * BOLT_LIM) \
       ) \
      ) \
     )
@@ -119,7 +118,6 @@
 #define _is_safemon(mon) \
     (flags.safe_dog && (mon) && (mon)->mpeaceful && canspotmon(mon)     \
      && !Confusion && !Hallucination && !Stunned)
-
 
 /*
  * canseeself()

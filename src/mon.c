@@ -2661,6 +2661,7 @@ monkilled(struct monst *mdef, const char *fltxt, int how)
                 (Hallucination ? "plaid" : "sad"));
         }
     }
+    return;
 }
 
 void
@@ -3771,7 +3772,8 @@ decide_to_shapeshift(struct monst *mon, int shiftflags)
             } else if (mon->data == &mons[PM_FOG_CLOUD] &&
                        mon->mhp == mon->mhpmax &&
                        !rn2(4) &&
-                       (!canseemon(mon) || distu(mon->mx, mon->my) > BOLT_LIM * BOLT_LIM)) {
+                       (!canseemon(mon) ||
+                        mdistu(mon) > BOLT_LIM * BOLT_LIM)) {
                 /* if a fog cloud, maybe change to wolf or vampire bat;
                    those are more likely to take damage--at least when
                    tame--and then switch back to vampire; they'll also
@@ -3784,7 +3786,8 @@ decide_to_shapeshift(struct monst *mon, int shiftflags)
             }
         } else {
             if (mon->mhp >= 9 * mon->mhpmax / 10 && !rn2(6) &&
-                (!canseemon(mon) || distu(mon->mx, mon->my) > BOLT_LIM * BOLT_LIM)) {
+                (!canseemon(mon) ||
+                 mdistu(mon) > BOLT_LIM * BOLT_LIM)) {
                 dochng = TRUE; /* 'ptr' stays Null */
             }
         }

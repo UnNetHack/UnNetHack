@@ -983,7 +983,7 @@ mon_wield_item(struct monst *mon)
             } else if (cansee(mon->mx, mon->my)) {
                 /* 3.6.3: artifact might be getting wielded by invisible monst */
                 pline("Light begins shining %s.",
-                      (distu(mon->mx, mon->my) <= 5 * 5) ? "nearby" : "in the distance");
+                      (mdistu(mon) <= 5 * 5) ? "nearby" : "in the distance");
             }
         }
         obj->owornmask = W_WEP;

@@ -1440,7 +1440,7 @@ domindblast(void)
         if (DEADMONSTER(mtmp)) {
             continue;
         }
-        if (distu(mtmp->mx, mtmp->my) > BOLT_LIM * BOLT_LIM) {
+        if (mdistu(mtmp) > BOLT_LIM * BOLT_LIM) {
             continue;
         }
         if (mtmp->mpeaceful) {

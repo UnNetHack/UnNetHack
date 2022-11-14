@@ -1463,7 +1463,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                (rnl(10) < 4 && obj->blessed) || !rn2(3))))) {
             hit_saddle = TRUE;
         }
-        distance = distu(mon->mx, mon->my);
+        distance = distu(tx, ty);
 #ifdef WEBB_DISINT
         if (!cansee(mon->mx, mon->my)) {
             pline(disint ? "Vip!" : "Crash!");

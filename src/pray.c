@@ -2244,7 +2244,7 @@ doturn(void)
         /* 3.6.3: used to use cansee() here but the purpose is to prevent
            #turn operating through walls, not to require that the hero be
            able to see the target location */
-        if (!couldsee(mtmp->mx, mtmp->my) || distu(mtmp->mx, mtmp->my) > range) {
+        if (!couldsee(mtmp->mx, mtmp->my) || mdistu(mtmp) > range) {
             continue;
         }
 

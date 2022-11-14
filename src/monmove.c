@@ -24,7 +24,8 @@ mb_trapped(struct monst *mtmp)
         if (cansee(mtmp->mx, mtmp->my) && !Unaware) {
             pline("KABOOM!!  You see a door explode.");
         } else if (!Deaf) {
-            You_hear("a distant explosion.");
+            You_hear("a %s explosion.",
+                     (mdistu(mtmp) > 7 * 7) ? "distant" : "nearby");
         }
     }
     wake_nearto(mtmp->mx, mtmp->my, 7*7);
@@ -125,7 +126,7 @@ dochugw(struct monst *mtmp)
     if (occupation && !rd && !Confusion &&
         (!mtmp->mpeaceful || Hallucination) &&
         /* it's close enough to be a threat */
-        distu(x, y) <= (BOLT_LIM+1)*(BOLT_LIM+1) &&
+        mdistu(mtmp) <= (BOLT_LIM + 1) * (BOLT_LIM + 1) &&
         /* and either couldn't see it before, or it was too far away */
         (!already_saw_mon || !couldsee(x, y) ||
          distu(x, y) > (BOLT_LIM+1)*(BOLT_LIM+1)) &&
@@ -231,8 +232,7 @@ disturb(struct monst *mtmp)
      *  Aggravate or mon is (dog or human) or
      *      (1/7 and mon is not mimicing furniture or object)
      */
-    if (couldsee(mtmp->mx, mtmp->my) &&
-        distu(mtmp->mx, mtmp->my) <= 100 &&
+    if (couldsee(mtmp->mx, mtmp->my) && mdistu(mtmp) <= 100 &&
         (!Stealth || (mtmp->data == &mons[PM_ETTIN] && rn2(10))) &&
         (!(mtmp->data->mlet == S_NYMPH
           || mtmp->data == &mons[PM_JABBERWOCK]

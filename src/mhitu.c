@@ -382,7 +382,7 @@ mattacku(struct monst *mtmp)
     struct  attack  *mattk, alt_attk;
     int i, j=0, tmp, sum[NATTK];
     struct  permonst *mdat = mtmp->data;
-    boolean ranged = (distu(mtmp->mx, mtmp->my) > 3);
+    boolean ranged = (mdistu(mtmp) > 3);
     /* Is it near you?  Affects your actions */
     boolean range2 = !monnear(mtmp, mtmp->mux, mtmp->muy);
     /* Does it think it's near you?  Affects its actions */
@@ -2720,7 +2720,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
 
     case AD_BLND:
         if (canseemon(mtmp) && !resists_blnd(&youmonst) &&
-             distu(mtmp->mx, mtmp->my) <= BOLT_LIM*BOLT_LIM) {
+             mdistu(mtmp) <= BOLT_LIM * BOLT_LIM) {
             if (cancelled) {
                 react = rn1(2, 2); /* "puzzled" || "dazzled" */
                 already = (mtmp->mcansee == 0);

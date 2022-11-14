@@ -35,7 +35,7 @@ static int dieroll;
 static void
 noises(struct monst *magr, struct attack *mattk)
 {
-    boolean farq = (distu(magr->mx, magr->my) > 15);
+    boolean farq = (mdistu(magr) > 15);
 
     if (!Deaf && (farq != far_noise || moves - noisetime > 10)) {
         far_noise = farq;
