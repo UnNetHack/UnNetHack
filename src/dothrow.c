@@ -1814,7 +1814,7 @@ thitmonst(
             if (hmon(mon, obj, hmode, dieroll)) {
                 /* mon still alive */
                 if (mon->wormno) {
-                    cutworm(mon, bhitpos.x, bhitpos.y, obj);
+                    cutworm(mon, bhitpos.x, bhitpos.y, chopper);
                 }
             }
 

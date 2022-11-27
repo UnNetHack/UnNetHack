@@ -158,6 +158,8 @@ mon_sanity_check(void)
     for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
         sanity_check_single_mon(mtmp, FALSE, "migr");
     }
+
+    wormno_sanity_check(); /* test for bogus worm tail */
 }
 
 void

@@ -545,7 +545,7 @@ known_hitum(struct monst *mon, struct obj *weapon, int *mhit, int rollneeded, in
                 u.uconduct.weaphit = oldweaphit;
             }
             if (mon->wormno && *mhit) {
-                cutworm(mon, bhitpos.x, bhitpos.y, weapon);
+                cutworm(mon, bhitpos.x, bhitpos.y, slice_or_chop);
             }
         }
         if (u.uconduct.weaphit && !oldweaphit) {
