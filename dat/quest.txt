@@ -5596,7 +5596,7 @@ wearing metal armor or a shield can really mess up your chances of
 casting spells correctly. You can use + to see your spell failure
 chances, to help you make an informed decision about whether the
 armor is worth it or not. If you're particularly good at magic, it's
-possible that easier spells will be 100% successful despite the
+possible that easier spells will be 100%% successful despite the
 armor; in this case, you might want to confine yourself to low-level
 spells, and wear the armor for extra protection. Later in the game,
 though, you'll probably want to cast higher-level spells, and may have
