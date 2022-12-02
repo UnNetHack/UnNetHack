@@ -617,8 +617,9 @@ domonnoise(struct monst *mtmp)
     if (Deaf) {
         return 0;
     }
-    if (is_silent(ptr)) {
-        return 0;
+    /* shk_chat can handle nonverbal monsters */
+    if (is_silent(ptr) && !mtmp->isshk) {
+        return ECMD_OK;
     }
 
     /* Make sure its your role's quest quardian; adjust if not */
@@ -646,7 +647,9 @@ domonnoise(struct monst *mtmp)
         quest_chat(mtmp);
         break;
     case MS_SELL: /* pitch, pay, total */
-        shk_chat(mtmp);
+        if (!Hallucination || is_silent(ptr) || (mtmp->isshk && !rn2(2))) {
+            shk_chat(mtmp);
+        }
         break;
     case MS_VAMPIRE:
     {

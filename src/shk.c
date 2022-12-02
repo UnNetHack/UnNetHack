@@ -4653,9 +4653,9 @@ shop_object(coordxy x, coordxy y)
         }
     }
     /* note: otmp might have ->no_charge set, but that's ok */
-    return (otmp && costly_spot(x, y) && NOTANGRY(shkp)
-            && shkp->mcanmove && !shkp->msleeping)
-           ? otmp : (struct obj *)0;
+    return (otmp && costly_spot(x, y) && NOTANGRY(shkp) && !muteshk(shkp)) ?
+           otmp :
+           (struct obj *) 0;
 }
 
 /* give price quotes for all objects linked to this one (ie, on this spot) */
