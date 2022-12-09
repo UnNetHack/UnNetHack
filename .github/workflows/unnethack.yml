@@ -20,6 +20,9 @@ jobs:
         LFLAGS: '-fno-common'
       run: "./configure --with-owner=`id -un` --with-group=`id -gn` --enable-wizmode=`id -un` --enable-dummy-graphics --enable-lisp-graphics --enable-curses-graphics --disable-x11-graphics --enable-tty-graphics"
 
+    - name: info
+      run: make debug_info
+
     - name: make
       run: make all
 
@@ -40,6 +43,9 @@ jobs:
         CFLAGS: '-O2 -Wall -Wextra -fno-common -Werror=format -Werror=return-type -Werror=uninitialized -Werror=implicit-function-declaration'
         LFLAGS: '-fno-common'
       run: "./configure --with-owner=`id -un` --with-group=`id -gn` --enable-wizmode=`id -un` --enable-dummy-graphics --enable-lisp-graphics --enable-curses-graphics --disable-x11-graphics --enable-tty-graphics"
+
+    - name: info
+      run: make debug_info
 
     - name: make
       run: make all

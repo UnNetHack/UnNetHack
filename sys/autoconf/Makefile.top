@@ -369,6 +369,11 @@ include/autoconf_paths.h: Makefile
 	echo '#define AUTOCONF_DOCDIR "$(docdir)"' >>$@
 	echo '#endif' >>$@
 
+debug_info:
+	uname -a
+	$(CC) --version
+	$(CC) -v
+
 RELEASEVERSION = $(shell grep VERSION_STRING include/date.h | cut -f 2 -d \")
 UNNETHACK_WIN32_DIR = $(DESTDIR)$(prefix)/unnethack-win32-$(RELEASEVERSION)
 UNNETHACK_RELEASE_ARCHIVE_PREFIX = unnethack-$(RELEASEVERSION)
