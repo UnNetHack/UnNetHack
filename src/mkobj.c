@@ -447,6 +447,7 @@ splitobj(struct obj *obj, long int num)
     obj->owt = weight(obj);
     otmp->quan = num;
     otmp->owt = weight(otmp); /* -= obj->owt ? */
+    otmp->picked_up_turn = 0;
 
     context_objsplit.parent_oid = obj->o_id;
     context_objsplit.child_oid = otmp->o_id;
@@ -802,6 +803,7 @@ mksobj(int otyp, boolean init, boolean artif)
     otmp->corpsenm = NON_PM;
     if (is_rustprone(otmp) || is_corrodeable(otmp) || is_flammable(otmp))
         otmp->rknown = 1;
+    otmp->picked_up_turn = 0;
 
     if (init) {
         switch (let) {

@@ -190,6 +190,10 @@ merged(struct obj **potmp, struct obj **pobj)
         }
         obj_extract_self(obj);
 
+        if (otmp->where == OBJ_INVENT) {
+            otmp->picked_up_turn = obj->picked_up_turn;
+        }
+
         /* really should merge the timeouts */
         if (obj->lamplit) obj_merge_light_sources(obj, otmp);
         if (obj->timed) obj_stop_timers(obj);   /* follows lights */
@@ -418,6 +422,7 @@ addinv(struct obj *obj)
         }
     }
 added:
+    obj->picked_up_turn = moves;
     addinv_core2(obj);
     carry_obj_effects(obj); /* carrying affects the obj */
     update_inventory();
@@ -613,6 +618,7 @@ void
 freeinv(struct obj *obj)
 {
     extract_nobj(obj, &invent);
+    obj->picked_up_turn = 0;
     freeinv_core(obj);
     update_inventory();
 }
