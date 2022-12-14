@@ -8,48 +8,6 @@ on:
     branches: [ '*' ]
 
 jobs:
-  linux:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: configure
-      env:
-        CFLAGS: '-O2 -Wall -Wextra -fno-common -Werror=format -Werror=return-type -Werror=uninitialized -Werror=implicit-function-declaration -Wno-format-overflow'
-        LFLAGS: '-fno-common'
-      run: "./configure --with-owner=`id -un` --with-group=`id -gn` --enable-wizmode=`id -un` --enable-dummy-graphics --enable-lisp-graphics --enable-curses-graphics --disable-x11-graphics --enable-tty-graphics"
-
-    - name: info
-      run: make debug_info
-
-    - name: make
-      run: make all
-
-    - name: install libcheck
-      run: sudo apt-get install check
-
-    - name: make check
-      run: make check
-
-  macos:
-    runs-on: macos-latest
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: configure
-      env:
-        CFLAGS: '-O2 -Wall -Wextra -fno-common -Werror=format -Werror=return-type -Werror=uninitialized -Werror=implicit-function-declaration'
-        LFLAGS: '-fno-common'
-      run: "./configure --with-owner=`id -un` --with-group=`id -gn` --enable-wizmode=`id -un` --enable-dummy-graphics --enable-lisp-graphics --enable-curses-graphics --disable-x11-graphics --enable-tty-graphics"
-
-    - name: info
-      run: make debug_info
-
-    - name: make
-      run: make all
-
   windows:
     runs-on: ubuntu-latest
 
@@ -62,8 +20,8 @@ jobs:
           # https://github.com/actions/runner-images/issues/4589
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libgd3/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
-          sudo apt-get purge -yqq libmono* moby* mono* php* libgdiplus libpcre2-posix3 libzip4
+          # sudo apt-get install -yqq --allow-downgrades libgd3/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
+          sudo apt-get purge -yqq libmono* moby* mono* nginx* php* libgdiplus libpcre2-posix3 libzip4
 
           # wine
           sudo apt-get install gcc-mingw-w64-i686 wine-development wine32 wine-binfmt imagemagick
