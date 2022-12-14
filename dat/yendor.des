@@ -8,33 +8,33 @@
 LEVEL:"wizard1"
 # Must have noflipx, due to the morgue-hack (see below).
 # Don't allow any flipping for preventing the stairs to Vlad's tower
-#appearing in the wizard's tower because of a bug in level flipping.
+# appearing in the wizard's tower because of a bug in level flipping.
 FLAGS:noteleport,hardfloor,mazelevel,noflip
-INIT_MAP:mazegrid,'-'
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
-----------------------------.
-|.......|..|.........|.....|.
-|.......S..|.}}}}}}}.|.....|.
-|..--S--|..|.}}---}}.|---S-|.
-|..|....|..|.}--.--}.|..|..|.
-|..|....|..|.}|...|}.|..|..|.
-|..--------|.}--.--}.|..|..|.
-|..|.......|.}}---}}.|..|..|.
-|..S.......|.}}}}}}}.|..|..|.
-|..|.......|.........|..|..|.
-|..|.......|-----------S-S-|.
-|..|.......S...............|.
-----------------------------.
+----------------------------
+|.......|..|.........|.....|
+|.......S..|.}}}}}}}.|.....|
+|..--S--|..|.}}---}}.|---S-|
+|..|....|..|.}--.--}.|..|..|
+|..|....|..|.}|...|}.|..|..|
+|..--------|.}--.--}.|..|..|
+|..|.......|.}}---}}.|..|..|
+|..S.......|.}}}}}}}.|..|..|
+|..|.......|.........|..|..|
+|..|.......|-----------S-S-|
+|..|.......S...............|
+----------------------------
 ENDMAP
-STAIR:levregion(01,00,79,20),(0,0,28,12),up
-STAIR:levregion(01,00,79,20),(0,0,28,12),down
-BRANCH:levregion(01,00,79,20),(0,0,28,12)
-TELEPORT_REGION:levregion(01,00,79,20),(0,0,27,12)
+# STAIR:levregion(01,00,79,20),(0,0,27,12),up
+# STAIR:levregion(01,00,79,20),(0,0,27,12),down
+# BRANCH:levregion(01,00,79,20),(0,0,27,12)
+TELEPORT_REGION:(0,0,27,12),levregion(01,00,79,20)
 # Make it a morgue for rm id in mkmaze.c
 # for the purpose of random sdoor placement
 REGION:(12,01,20,09),unlit,"morgue",unfilled
-MAZEWALK:(28,05),east
+# MAZEWALK:(28,05),east
 LADDER:(06,05),down
 # Non diggable walls
 # Walls inside the moat stay diggable
@@ -95,31 +95,31 @@ OBJECT:'+',random
 # The middle wizard level.
 LEVEL:"wizard2"
 FLAGS:noteleport,hardfloor,mazelevel,noflip
-INIT_MAP:mazegrid,'-'
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
-----------------------------.
-|.....|.S....|.............|.
-|.....|.-------S--------S--|.
-|.....|.|.........|........|.
-|..-S--S|.........|........|.
-|..|....|.........|------S-|.
-|..|....|.........|.....|..|.
-|-S-----|.........|.....|..|.
-|.......|.........|S--S--..|.
-|.......|.........|.|......|.
-|-----S----S-------.|......|.
-|............|....S.|......|.
-----------------------------.
+----------------------------
+|.....|.S....|.............|
+|.....|.-------S--------S--|
+|.....|.|.........|........|
+|..-S--S|.........|........|
+|..|....|.........|------S-|
+|..|....|.........|.....|..|
+|-S-----|.........|.....|..|
+|.......|.........|S--S--..|
+|.......|.........|.|......|
+|-----S----S-------.|......|
+|............|....S.|......|
+----------------------------
 ENDMAP
-STAIR:levregion(01,00,79,20),(0,0,28,12),up
-STAIR:levregion(01,00,79,20),(0,0,28,12),down
-BRANCH:levregion(01,00,79,20),(0,0,28,12)
-TELEPORT_REGION:levregion(01,00,79,20),(0,0,27,12)
+# STAIR:levregion(01,00,79,20),(0,0,28,12),up
+# STAIR:levregion(01,00,79,20),(0,0,28,12),down
+# BRANCH:levregion(01,00,79,20),(0,0,27,12)
+TELEPORT_REGION:(0,0,27,12),levregion(01,00,79,20)
 REGION:(09,03,17,09),unlit,"zoo"
 DOOR:closed,(15,02)
 DOOR:closed,(11,10)
-MAZEWALK:(28,05),east
+# MAZEWALK:(28,05),east
 LADDER:(12,01),up
 LADDER:(14,11),down
 # Non diggable walls everywhere
@@ -147,30 +147,32 @@ OBJECT:'"',(04,06)
 # The bottom wizard level.
 # Memorialize the fakewiz setup.
 LEVEL:"wizard3"
-FLAGS:noteleport,hardfloor,mazelevel,noflip
-INIT_MAP:mazegrid,'-'
+FLAGS:noteleport,hardfloor,noflip
+INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 MAP
-----------------------------.
-|..|............S..........|.
-|..|..------------------S--|.
-|..|..|.........|..........|.
-|..S..|.}}}}}}}.|..........|.
-|..|..|.}}---}}.|-S--------|.
-|..|..|.}--.--}.|..|.......|.
-|..|..|.}|...|}.|..|.......|.
-|..---|.}--.--}.|..|.......|.
-|.....|.}}---}}.|..|.......|.
-|.....S.}}}}}}}.|..|.......|.
-|.....|.........|..|.......|.
-----------------------------.
+----------------------------
+|..|............S..........|
+|..|..------------------S--|
+|..|..|.........|..........|
+|..S..|.}}}}}}}.|..........|
+|..|..|.}}---}}.|-S--------|
+|..|..|.}--.--}.|..|.......|
+|..|..|.}|...|}.|..|.......|
+|..---|.}--.--}.|..|.......|
+|.....|.}}---}}.|..|.......|
+|.....S.}}}}}}}.|..|.......|
+|.....|.........|..|.......|
+----------------------------
 ENDMAP
-STAIR:levregion(01,00,79,20),(0,0,28,12),up
-STAIR:levregion(01,00,79,20),(0,0,28,12),down
-BRANCH:levregion(01,00,79,20),(0,0,28,12)
-TELEPORT_REGION:levregion(01,00,79,20),(0,0,27,12)
-PORTAL:(25,11,25,11),(0,0,0,0),"fakewiz1"
-MAZEWALK:(28,09),east
+# STAIR:levregion(01,00,79,20),(0,0,27,12),up
+# STAIR:levregion(01,00,79,20),(0,0,27,12),down
+# BRANCH:levregion(01,00,79,20),(0,0,27,12)
+# TELEPORT_REGION:levregion(01,00,79,20),(0,0,27,12)
+TELEPORT_REGION:(0,0,27,12),levregion(01,00,79,20)
+BRANCH:(25,11,25,11),(00,00,00,00)
+# PORTAL:(25,11,25,11),(0,0,0,0),"fakewiz1"
+# MAZEWALK:(28,09),east
 REGION:(07,03,15,11),unlit,"morgue",unfilled
 REGION:(17,06,18,11),unlit,"beehive"
 # make the entry chamber a real room; it affects monster arrival;

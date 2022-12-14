@@ -1610,17 +1610,21 @@ Invocation_lev(d_level *lev)
 xint16
 level_difficulty(void)
 {
+    /* compensate for the shorter Gehennom */
+    const int difficulty_offset = 15;
     if (In_sokoban(&u.uz)) {
         return (xint16)depth(&oracle_level)+1;
     }
 
-    if (In_endgame(&u.uz))
-        return ((xint16)(depth(&sanctum_level) + u.ulevel/2));
-    else
-    if (u.uhave.amulet)
-        return (deepest_lev_reached(FALSE));
-    else
+    if (In_endgame(&u.uz)) {
+        return ((xint16)(depth(&sanctum_level) + u.ulevel/2) + difficulty_offset);
+    } else if (u.uhave.amulet) {
+        return (deepest_lev_reached(FALSE) + difficulty_offset);
+    } else if (Inhell) {
+        return (depth(&u.uz) + difficulty_offset);
+    } else {
         return ((xint16) depth(&u.uz));
+    }
 }
 
 /* Take one word and try to match it to a level.

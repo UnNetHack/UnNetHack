@@ -51,34 +51,27 @@ BRANCH:		"The Elemental Planes" @ (1, 0) no_down up
 #		monsters can properly migrate here under certain
 #		circumstances.
 #
-DUNGEON:	"Gehennom" "G" (20, 5)
+DUNGEON:	"Gehennom" "G" (15, 0)
 DESCRIPTION:	mazelike
 DESCRIPTION:	hellish
 ALIGNMENT:	noalign
-BRANCH:		"Vlad's Tower" @ (9, 5) up
-BRANCH:		"Sheol" @ (14, 5) down
+BRANCH:		"Vlad's Tower" @ (1, 5) up
+BRANCH:		"Sheol" @ (5, 5) down
+BRANCH:		"The Dragon Caves" @ (1, 4)
+BRANCH:		"The Wizard's Tower" @ (-2, 0) up
+
 RNDLEVEL:	"valley" "V" @ (1, 0) 2
 LEVEL:		"sanctum" "none" @ (-1, 0)
-LEVEL:		"juiblex" "J" @ (4, 4)
-RNDLEVEL:	"baalz" "B" @ (6, 4) 2
-RNDLEVEL:	"asmod" "A" @ (2, 6) 2
-BRANCH:		"The Dragon Caves" @ (10, 4)
-LEVEL:		"wizard1" "none" @ (11, 6)
-CHAINLEVEL:	"wizard2" "X" "wizard1" + (1, 0)
-CHAINLEVEL:	"wizard3" "Y" "wizard1" + (2, 0)
-RNDLEVEL:	"orcus" "O" @ (10, 6) 2
-LEVEL:		"fakewiz1" "F" @ (-6,4)
-LEVEL:		"fakewiz2" "G" @ (-6,4)
 
-# Heck extra levels
-RNDLEVEL:	"heck-a" "H" @ (-19,17) 25 7
-RNDLEVEL:	"heck-b" "I" @ (2,17) 50 7
-RNDLEVEL:	"heck-c" "K" @ (-19,17) 75 8
-RNDLEVEL:	"heck-d" "L" @ (2,17) 9
-RNDLEVEL:	"heck-e" "M" @ (2,17) 50 9
-RNDLEVEL:	"heck-e" "N" @ (-19,17) 50 9
-RNDLEVEL:	"heck-e" "P" @ (2,17) 50 9
-RNDLEVEL:	"heck-e" "Q" @ (-19,17) 50 9
+RNDLEVEL:	"heck-a"  "H" @ (2, 0) 25 7
+LEVEL:		"juiblex" "J" @ (3, 0)
+RNDLEVEL:	"heck-b"  "I" @ (4, 0) 50 7
+RNDLEVEL:	"baalz"   "B" @ (5, 0) 2
+RNDLEVEL:	"heck-c"  "K" @ (6, 0) 75 8
+RNDLEVEL:	"asmod"   "A" @ (7, 0) 2
+RNDLEVEL:	"heck-d"  "L" @ (8, 0) 9
+RNDLEVEL:	"orcus"   "O" @ (9, 0) 2
+RNDLEVEL:	"heck-e"  "M" @ (10, 0) 50 9
 
 #	Sheol
 #	Ice-themed branch in Gehennom.
@@ -185,6 +178,20 @@ LEVEL:		"drgnB" "D" @ (2, 0)
 LEVELDESC:	town
 LEVEL:		"drgnC" "D" @ (3, 0)
 LEVEL:		"drgnD" "D" @ (4, 0)
+
+#
+#   The Wizards Tower
+#
+#   It has been removed from Gehennom, and it is surrounded by stone.
+#   Must not allow bones files for its top level.
+#
+DUNGEON:     "The Wizard's Tower" "W" (3, 0)
+DESCRIPTION: mazelike
+ALIGNMENT:   chaotic
+ENTRY:       3
+LEVEL:       "wizard1" "none" @ (1, 0)
+LEVEL:       "wizard2" "X"    @ (2, 0)
+LEVEL:       "wizard3" "Y"    @ (3, 0)
 
 #
 #	The Endgame levels
