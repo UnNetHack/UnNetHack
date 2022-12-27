@@ -4509,7 +4509,7 @@ spo_corridor(struct sp_coder *coder)
 }
 
 struct opvar *
-selection_opvar(char *nbuf)
+op_selection_opvar(char *nbuf)
 {
     struct opvar *ov;
     char buf[(COLNO*ROWNO)+1];
@@ -4526,7 +4526,7 @@ selection_opvar(char *nbuf)
 }
 
 coordxy
-selection_getpoint(coordxy x, coordxy y, struct opvar *ov)
+op_selection_getpoint(coordxy x, coordxy y, struct opvar *ov)
 {
     if (!ov || ov->spovartyp != SPOVAR_SEL) {
         return 0;
@@ -4539,7 +4539,7 @@ selection_getpoint(coordxy x, coordxy y, struct opvar *ov)
 }
 
 void
-selection_setpoint(coordxy x, coordxy y, struct opvar *ov, char c)
+op_selection_setpoint(coordxy x, coordxy y, struct opvar *ov, char c)
 {
     if (!ov || ov->spovartyp != SPOVAR_SEL) {
         return;
@@ -4552,20 +4552,20 @@ selection_setpoint(coordxy x, coordxy y, struct opvar *ov, char c)
 }
 
 struct opvar *
-selection_not(struct opvar *s)
+op_selection_not(struct opvar *s)
 {
     struct opvar *ov;
     int x, y;
 
-    ov = selection_opvar(NULL);
+    ov = op_selection_opvar(NULL);
     if (!ov) {
         return NULL;
     }
 
     for (x = 0; x < COLNO; x++) {
         for (y = 0; y < ROWNO; y++) {
-            if (!selection_getpoint(x, y, s)) {
-                selection_setpoint(x, y, ov, 1);
+            if (!op_selection_getpoint(x, y, s)) {
+                op_selection_setpoint(x, y, ov, 1);
             }
         }
     }
@@ -4574,12 +4574,12 @@ selection_not(struct opvar *s)
 }
 
 struct opvar *
-selection_logical_oper(struct opvar *s1, struct opvar *s2, char oper)
+op_selection_logical_oper(struct opvar *s1, struct opvar *s2, char oper)
 {
     struct opvar *ov;
     int x, y;
 
-    ov = selection_opvar(NULL);
+    ov = op_selection_opvar(NULL);
     if (!ov) {
         return NULL;
     }
@@ -4589,13 +4589,13 @@ selection_logical_oper(struct opvar *s1, struct opvar *s2, char oper)
             switch (oper) {
             default:
             case '|':
-                if (selection_getpoint(x, y, s1) || selection_getpoint(x, y, s2)) {
-                    selection_setpoint(x, y, ov, 1);
+                if (op_selection_getpoint(x, y, s1) || op_selection_getpoint(x, y, s2)) {
+                    op_selection_setpoint(x, y, ov, 1);
                 }
                 break;
             case '&':
-                if (selection_getpoint(x, y, s1) && selection_getpoint(x, y, s2)) {
-                    selection_setpoint(x, y, ov, 1);
+                if (op_selection_getpoint(x, y, s1) && op_selection_getpoint(x, y, s2)) {
+                    op_selection_setpoint(x, y, ov, 1);
                 }
                 break;
             }
@@ -4606,12 +4606,12 @@ selection_logical_oper(struct opvar *s1, struct opvar *s2, char oper)
 }
 
 struct opvar *
-selection_filter_mapchar(struct opvar *ov, struct opvar *mc)
+op_selection_filter_mapchar(struct opvar *ov, struct opvar *mc)
 {
     int x, y;
     schar mapc;
     coordxy lit;
-    struct opvar *ret = selection_opvar(NULL);
+    struct opvar *ret = op_selection_opvar(NULL);
 
     if (!ov || !mc || !ret) {
         return NULL;
@@ -4621,15 +4621,17 @@ selection_filter_mapchar(struct opvar *ov, struct opvar *mc)
     lit = SP_MAPCHAR_LIT(OV_i(mc));
     for (x = 0; x < COLNO; x++) {
         for (y = 0; y < ROWNO; y++) {
-            if (selection_getpoint(x, y, ov) && (levl[x][y].typ == mapc)) {
+            if (op_selection_getpoint(x, y, ov) && (levl[x][y].typ == mapc)) {
                 switch (lit) {
                 default:
-                case -2: selection_setpoint(x, y, ret, 1); break;
-                case -1: selection_setpoint(x, y, ret, rn2(2)); break;
+                case -2: op_selection_setpoint(x, y, ret, 1); break;
+                case -1: op_selection_setpoint(x, y, ret, rn2(2)); break;
                 case 0:
-                case 1: if (levl[x][y].lit == lit) selection_setpoint(x, y, ret, 1); {
-                    break;
-                }
+                case 1:
+                         if (levl[x][y].lit == lit) {
+                             op_selection_setpoint(x, y, ret, 1);
+                         }
+                         break;
                 }
             }
         }
@@ -4640,7 +4642,7 @@ selection_filter_mapchar(struct opvar *ov, struct opvar *mc)
 
 
 void
-selection_filter_percent(struct opvar *ov, int percent)
+op_selection_filter_percent(struct opvar *ov, int percent)
 {
     int x, y;
 
@@ -4649,15 +4651,15 @@ selection_filter_percent(struct opvar *ov, int percent)
     }
     for (x = 0; x < COLNO; x++) {
         for (y = 0; y < ROWNO; y++) {
-            if (selection_getpoint(x, y, ov) && (rn2(100) >= percent)) {
-                selection_setpoint(x, y, ov, 0);
+            if (op_selection_getpoint(x, y, ov) && (rn2(100) >= percent)) {
+                op_selection_setpoint(x, y, ov, 0);
             }
         }
     }
 }
 
 static int
-selection_rndcoord(struct opvar *ov, coordxy *x, coordxy *y, boolean removeit)
+op_selection_rndcoord(struct opvar *ov, coordxy *x, coordxy *y, boolean removeit)
 {
     int idx = 0;
     int c;
@@ -4665,23 +4667,22 @@ selection_rndcoord(struct opvar *ov, coordxy *x, coordxy *y, boolean removeit)
 
     for (dx = 0; dx < COLNO; dx++) {
         for (dy = 0; dy < ROWNO; dy++) {
-            if (isok(dx, dy) && selection_getpoint(dx, dy, ov)) {
+            if (isok(dx, dy) && op_selection_getpoint(dx, dy, ov)) {
                 idx++;
             }
         }
     }
 
-
     if (idx) {
         c = rn2(idx);
         for (dx = 0; dx < COLNO; dx++) {
             for (dy = 0; dy < ROWNO; dy++) {
-                if (isok(dx, dy) && selection_getpoint(dx, dy, ov)) {
+                if (isok(dx, dy) && op_selection_getpoint(dx, dy, ov)) {
                     if (!c) {
                         *x = dx;
                         *y = dy;
                         if (removeit) {
-                            selection_setpoint(dx, dy, ov, 0);
+                            op_selection_setpoint(dx, dy, ov, 0);
                         }
                         return 1;
                     }
@@ -4695,7 +4696,7 @@ selection_rndcoord(struct opvar *ov, coordxy *x, coordxy *y, boolean removeit)
 }
 
 void
-selection_do_grow(struct opvar *ov, int dir)
+op_selection_do_grow(struct opvar *ov, int dir)
 {
     int x, y;
     char tmp[COLNO][ROWNO];
@@ -4712,28 +4713,28 @@ selection_do_grow(struct opvar *ov, int dir)
     for (x = 0; x < COLNO; x++) {
         for (y = 0; y < ROWNO; y++) {
             int c = 0;
-            if ((dir &  W_WEST) && (x > 0) && (selection_getpoint(x-1, y, ov))) {
+            if ((dir &  W_WEST) && (x > 0) && (op_selection_getpoint(x-1, y, ov))) {
                 c++;
             }
-            if ((dir & (W_WEST|W_NORTH)) && (x > 0) && (y > 0) && (selection_getpoint(x-1, y-1, ov))) {
+            if ((dir & (W_WEST|W_NORTH)) && (x > 0) && (y > 0) && (op_selection_getpoint(x-1, y-1, ov))) {
                 c++;
             }
-            if ((dir &  W_NORTH) && (y > 0) && (selection_getpoint(x, y-1, ov))) {
+            if ((dir &  W_NORTH) && (y > 0) && (op_selection_getpoint(x, y-1, ov))) {
                 c++;
             }
-            if ((dir & (W_NORTH|W_EAST)) && (y > 0) && (x < COLNO-1) && (selection_getpoint(x+1, y-1, ov))) {
+            if ((dir & (W_NORTH|W_EAST)) && (y > 0) && (x < COLNO-1) && (op_selection_getpoint(x+1, y-1, ov))) {
                 c++;
             }
-            if ((dir &  W_EAST) && (x < COLNO-1) && (selection_getpoint(x+1, y, ov))) {
+            if ((dir &  W_EAST) && (x < COLNO-1) && (op_selection_getpoint(x+1, y, ov))) {
                 c++;
             }
-            if ((dir & (W_EAST|W_SOUTH)) && (x < COLNO-1) && (y < ROWNO-1) && (selection_getpoint(x+1, y+1, ov))) {
+            if ((dir & (W_EAST|W_SOUTH)) && (x < COLNO-1) && (y < ROWNO-1) && (op_selection_getpoint(x+1, y+1, ov))) {
                 c++;
             }
-            if ((dir &  W_SOUTH) && (y < ROWNO-1) && (selection_getpoint(x, y+1, ov))) {
+            if ((dir &  W_SOUTH) && (y < ROWNO-1) && (op_selection_getpoint(x, y+1, ov))) {
                 c++;
             }
-            if ((dir & (W_SOUTH|W_WEST)) && (y < ROWNO-1) && (x > 0) && (selection_getpoint(x-1, y+1, ov))) {
+            if ((dir & (W_SOUTH|W_WEST)) && (y < ROWNO-1) && (x > 0) && (op_selection_getpoint(x-1, y+1, ov))) {
                 c++;
             }
             if (c) {
@@ -4745,7 +4746,7 @@ selection_do_grow(struct opvar *ov, int dir)
     for (x = 0; x < COLNO; x++) {
         for (y = 0; y < ROWNO; y++) {
             if (tmp[x][y]) {
-                selection_setpoint(x, y, ov, 1);
+                op_selection_setpoint(x, y, ov, 1);
             }
         }
     }
@@ -4790,9 +4791,9 @@ sel_flood_havepoint(coordxy x, coordxy y, coordxy *xs, coordxy *ys, int n)
 }
 
 void
-selection_floodfill(struct opvar *ov, coordxy x, coordxy y, boolean diagonals)
+op_selection_floodfill(struct opvar *ov, coordxy x, coordxy y, boolean diagonals)
 {
-    struct opvar *tmp = selection_opvar(NULL);
+    struct opvar *tmp = op_selection_opvar(NULL);
 #define SEL_FLOOD_STACK (COLNO*ROWNO)
 #define SEL_FLOOD(nx, ny) \
     do {                                      \
@@ -4808,7 +4809,7 @@ selection_floodfill(struct opvar *ov, coordxy x, coordxy y, boolean diagonals)
     do {                                                        \
         if (isok((mx), (my)) &&                                 \
             (*selection_flood_check_func)((mx), (my)) &&        \
-            !selection_getpoint((mx), (my), (sel)) &&           \
+            !op_selection_getpoint((mx), (my), (sel)) &&        \
             !sel_flood_havepoint((mx), (my), dx, dy, idx)) {    \
             SEL_FLOOD((mx), (my));                              \
         }                                                       \
@@ -4829,8 +4830,8 @@ selection_floodfill(struct opvar *ov, coordxy x, coordxy y, boolean diagonals)
         x = dx[idx];
         y = dy[idx];
         if (isok(x, y)) {
-            selection_setpoint(x, y, ov, 1);
-            selection_setpoint(x, y, tmp, 1);
+            op_selection_setpoint(x, y, ov, 1);
+            op_selection_setpoint(x, y, tmp, 1);
         }
         SEL_FLOOD_CHKDIR((x + 1), y, tmp);
         SEL_FLOOD_CHKDIR((x - 1), y, tmp);
@@ -4851,7 +4852,7 @@ selection_floodfill(struct opvar *ov, coordxy x, coordxy y, boolean diagonals)
 
 /* McIlroy's Ellipse Algorithm */
 void
-selection_do_ellipse(struct opvar *ov, int xc, int yc, int a, int b, int filled)
+op_selection_do_ellipse(struct opvar *ov, int xc, int yc, int a, int b, int filled)
 {
     /* e(x,y) = b^2*x^2 + a^2*y^2 - a^2*b^2 */
     int x = 0, y = b;
@@ -4873,13 +4874,13 @@ selection_do_ellipse(struct opvar *ov, int xc, int yc, int a, int b, int filled)
 
     if (!filled) {
         while (y>=0 && x<=a) {
-            selection_setpoint(xc+x, yc+y, ov, 1);
+            op_selection_setpoint(xc+x, yc+y, ov, 1);
             if (x!=0 || y!=0) {
-                selection_setpoint(xc-x, yc-y, ov, 1);
+                op_selection_setpoint(xc-x, yc-y, ov, 1);
             }
             if (x!=0 && y!=0) {
-                selection_setpoint(xc+x, yc-y, ov, 1);
-                selection_setpoint(xc-x, yc+y, ov, 1);
+                op_selection_setpoint(xc+x, yc-y, ov, 1);
+                op_selection_setpoint(xc-x, yc+y, ov, 1);
             }
             if (t + b2*x <= crit1 || /* e(x+1,y-1/2) <= 0 */
                 t + a2*y <= crit3) { /* e(x+1/2,y) <= 0 */
@@ -4899,21 +4900,21 @@ selection_do_ellipse(struct opvar *ov, int xc, int yc, int a, int b, int filled)
                 width += 2;
             } else if (t - a2*y > crit2) { /* e(x+1/2,y-1) > 0 */
                 for (i = 0; i < width; i++) {
-                    selection_setpoint(xc-x+i, yc-y, ov, 1);
+                    op_selection_setpoint(xc-x+i, yc-y, ov, 1);
                 }
                 if (y != 0) {
                     for (i = 0; i < width; i++) {
-                        selection_setpoint(xc-x+i, yc+y, ov, 1);
+                        op_selection_setpoint(xc-x+i, yc+y, ov, 1);
                     }
                 }
                 y--; dyt += d2yt; t += dyt;
             } else {
                 for (i = 0; i < width; i++) {
-                    selection_setpoint(xc-x+i, yc-y, ov, 1);
+                    op_selection_setpoint(xc-x+i, yc-y, ov, 1);
                 }
                 if (y != 0) {
                     for (i = 0; i < width; i++) {
-                        selection_setpoint(xc-x+i, yc+y, ov, 1);
+                        op_selection_setpoint(xc-x+i, yc+y, ov, 1);
                     }
                 }
                 x++; dxt += d2xt; t += dxt;
@@ -4954,7 +4955,7 @@ line_dist_coord(long int x1, long int y1, long int x2, long int y2, long int x3,
 }
 
 void
-selection_do_gradient(struct opvar *ov, long int x, long int y, long int x2, long int y2, long int gtyp, long int mind, long int maxd, long int limit)
+op_selection_do_gradient(struct opvar *ov, long int x, long int y, long int x2, long int y2, long int gtyp, long int mind, long int maxd, long int limit)
 {
     long dx, dy, dofs;
 
@@ -4978,7 +4979,7 @@ selection_do_gradient(struct opvar *ov, long int x, long int y, long int x2, lon
                 long d = line_dist_coord(x, y, x2, y2, dx, dy);
                 if (d >= mind && (!limit || (d <= maxd))) {
                     if ((d - mind) > rn2(dofs)) {
-                        selection_setpoint(dx, dy, ov, 1);
+                        op_selection_setpoint(dx, dy, ov, 1);
                     }
                 }
             }
@@ -4998,7 +4999,7 @@ selection_do_gradient(struct opvar *ov, long int x, long int y, long int x2, lon
 
                 if (d >= mind && (!limit || (d <= maxd))) {
                     if ((d - mind) > rn2(dofs)) {
-                        selection_setpoint(dx, dy, ov, 1);
+                        op_selection_setpoint(dx, dy, ov, 1);
                     }
                 }
             }
@@ -5010,7 +5011,7 @@ selection_do_gradient(struct opvar *ov, long int x, long int y, long int x2, lon
 
 /* bresenham line algo */
 void
-selection_do_line(coordxy x1, schar y1, coordxy x2, schar y2, struct opvar *ov)
+op_selection_do_line(coordxy x1, schar y1, coordxy x2, schar y2, struct opvar *ov)
 {
     int d, dx, dy, ai, bi, xi, yi;
 
@@ -5030,7 +5031,7 @@ selection_do_line(coordxy x1, schar y1, coordxy x2, schar y2, struct opvar *ov)
         dy = y1 - y2;
     }
 
-    selection_setpoint(x1, y1, ov, 1);
+    op_selection_setpoint(x1, y1, ov, 1);
 
     if (dx > dy) {
         ai = (dy - dx) * 2;
@@ -5044,7 +5045,7 @@ selection_do_line(coordxy x1, schar y1, coordxy x2, schar y2, struct opvar *ov)
                 d += bi;
             }
             x1 += xi;
-            selection_setpoint(x1, y1, ov, 1);
+            op_selection_setpoint(x1, y1, ov, 1);
         } while (x1 != x2);
     } else {
         ai = (dx - dy) * 2;
@@ -5058,13 +5059,13 @@ selection_do_line(coordxy x1, schar y1, coordxy x2, schar y2, struct opvar *ov)
                 d += bi;
             }
             y1 += yi;
-            selection_setpoint(x1, y1, ov, 1);
+            op_selection_setpoint(x1, y1, ov, 1);
         } while (y1 != y2);
     }
 }
 
 void
-selection_do_randline(coordxy x1, schar y1, coordxy x2, schar y2, schar rough, schar rec, struct opvar *ov)
+op_selection_do_randline(coordxy x1, schar y1, coordxy x2, schar y2, schar rough, schar rec, struct opvar *ov)
 {
     int mx, my;
     int dx, dy;
@@ -5074,7 +5075,7 @@ selection_do_randline(coordxy x1, schar y1, coordxy x2, schar y2, schar rough, s
     }
 
     if ((x2 == x1) && (y2 == y1)) {
-        selection_setpoint(x1, y1, ov, 1);
+        op_selection_setpoint(x1, y1, ov, 1);
         return;
     }
 
@@ -5094,24 +5095,24 @@ selection_do_randline(coordxy x1, schar y1, coordxy x2, schar y2, schar rough, s
         } while ((mx > COLNO-1 || mx < 0 || my < 0 || my > ROWNO-1));
     }
 
-    selection_setpoint(mx, my, ov, 1);
+    op_selection_setpoint(mx, my, ov, 1);
 
     rough = (rough * 2) / 3;
 
     rec--;
 
-    selection_do_randline(x1, y1, mx, my, rough, rec, ov);
-    selection_do_randline(mx, my, x2, y2, rough, rec, ov);
+    op_selection_do_randline(x1, y1, mx, my, rough, rec, ov);
+    op_selection_do_randline(mx, my, x2, y2, rough, rec, ov);
 }
 
 void
-selection_iterate(struct opvar *ov, void (*func) (coordxy, coordxy, genericptr_t), genericptr_t arg)
+op_selection_iterate(struct opvar *ov, void (*func) (coordxy, coordxy, genericptr_t), genericptr_t arg)
 {
     int x, y;
     /* yes, this is very naive, but it's not _that_ expensive. */
     for (x = 0; x < COLNO; x++) {
         for (y = 0; y < ROWNO; y++) {
-            if (selection_getpoint(x, y, ov)) {
+            if (op_selection_getpoint(x, y, ov)) {
                 (*func)(x, y, arg);
             }
         }
@@ -5181,7 +5182,7 @@ spo_door(struct sp_coder *coder)
 
     typ = OV_i(msk) == -1 ? rnddoor() : (coordxy)OV_i(msk);
 
-    selection_iterate(sel, sel_set_door, (genericptr_t)&typ);
+    op_selection_iterate(sel, sel_set_door, (genericptr_t)&typ);
 
     opvar_free(sel);
     opvar_free(msk);
@@ -5204,7 +5205,7 @@ spo_feature(struct sp_coder *coder)
     case SPO_POOL:     typ = POOL;     break;
     }
     if (typ >= 0) {
-        selection_iterate(sel, sel_set_feature, (genericptr_t)&typ);
+        op_selection_iterate(sel, sel_set_feature, (genericptr_t)&typ);
     }
     opvar_free(sel);
 }
@@ -5220,7 +5221,7 @@ spo_terrain(struct sp_coder *coder)
 
     tmpterrain.ter = SP_MAPCHAR_TYP(OV_i(ter));
     tmpterrain.tlit = SP_MAPCHAR_LIT(OV_i(ter));
-    selection_iterate(sel, sel_set_ter, (genericptr_t)&tmpterrain);
+    op_selection_iterate(sel, sel_set_ter, (genericptr_t)&tmpterrain);
 
     opvar_free(ter);
     opvar_free(sel);
@@ -5267,40 +5268,40 @@ generate_way_out_method(int nx, int ny, struct opvar *ov)
         SCR_TELEPORTATION,
         RIN_TELEPORTATION
     };
-    struct opvar *ov2 = selection_opvar((char *) 0), *ov3;
+    struct opvar *ov2 = op_selection_opvar((char *) 0), *ov3;
     coordxy x, y;
     boolean res = TRUE;
 
-    selection_floodfill(ov2, nx, ny, TRUE);
+    op_selection_floodfill(ov2, nx, ny, TRUE);
     ov3 = opvar_clone(ov2);
 
     /* try to make a door */
-    while (selection_rndcoord(ov3, &x, &y, TRUE)) {
+    while (op_selection_rndcoord(ov3, &x, &y, TRUE)) {
         if (isok(x+1, y) &&
-             !selection_getpoint(x+1, y, ov) && IS_WALL(levl[x+1][y].typ) &&
+             !op_selection_getpoint(x+1, y, ov) && IS_WALL(levl[x+1][y].typ) &&
             isok(x+2, y) &&
-              selection_getpoint(x+2, y, ov) && ACCESSIBLE(levl[x+2][y].typ)) {
+              op_selection_getpoint(x+2, y, ov) && ACCESSIBLE(levl[x+2][y].typ)) {
             levl[x+1][y].typ = DOOR;
             goto gotitdone;
         }
         if (isok(x-1, y) &&
-             !selection_getpoint(x-1, y, ov) && IS_WALL(levl[x-1][y].typ) &&
+             !op_selection_getpoint(x-1, y, ov) && IS_WALL(levl[x-1][y].typ) &&
             isok(x-2, y) &&
-             selection_getpoint(x-2, y, ov) && ACCESSIBLE(levl[x-2][y].typ)) {
+             op_selection_getpoint(x-2, y, ov) && ACCESSIBLE(levl[x-2][y].typ)) {
             levl[x-1][y].typ = DOOR;
             goto gotitdone;
         }
         if (isok(x, y+1) &&
-             !selection_getpoint(x, y+1, ov) && IS_WALL(levl[x][y+1].typ) &&
+             !op_selection_getpoint(x, y+1, ov) && IS_WALL(levl[x][y+1].typ) &&
             isok(x, y+2) &&
-             selection_getpoint(x, y+2, ov) && ACCESSIBLE(levl[x][y+2].typ)) {
+             op_selection_getpoint(x, y+2, ov) && ACCESSIBLE(levl[x][y+2].typ)) {
             levl[x][y+1].typ = DOOR;
             goto gotitdone;
         }
         if (isok(x, y-1) &&
-             !selection_getpoint(x, y-1, ov) && IS_WALL(levl[x][y-1].typ) &&
+             !op_selection_getpoint(x, y-1, ov) && IS_WALL(levl[x][y-1].typ) &&
             isok(x, y-2) &&
-             selection_getpoint(x, y-2, ov) && ACCESSIBLE(levl[x][y-2].typ)) {
+             op_selection_getpoint(x, y-2, ov) && ACCESSIBLE(levl[x][y-2].typ)) {
             levl[x][y-1].typ = DOOR;
             goto gotitdone;
         }
@@ -5310,7 +5311,7 @@ generate_way_out_method(int nx, int ny, struct opvar *ov)
     if (Can_fall_thru(&u.uz)) {
         opvar_free(ov3);
         ov3 = opvar_clone(ov2);
-        while (selection_rndcoord(ov3, &x, &y, TRUE)) {
+        while (op_selection_rndcoord(ov3, &x, &y, TRUE)) {
             if (maketrap(x,y, rn2(2) ? HOLE : TRAPDOOR)) {
                 goto gotitdone;
             }
@@ -5318,7 +5319,7 @@ generate_way_out_method(int nx, int ny, struct opvar *ov)
     }
 
     /* generate one of the escape items */
-    if (selection_rndcoord(ov2, &x, &y, FALSE)) {
+    if (op_selection_rndcoord(ov2, &x, &y, FALSE)) {
         mksobj_at(escapeitems[rn2(SIZE(escapeitems))], x, y, TRUE, FALSE);
         goto gotitdone;
     }
@@ -5333,7 +5334,7 @@ generate_way_out_method(int nx, int ny, struct opvar *ov)
 static void
 ensure_way_out(void)
 {
-    struct opvar *ov = selection_opvar((char *) 0);
+    struct opvar *ov = op_selection_opvar((char *) 0);
     struct trap *ttmp = ftrap;
     int x,y;
     boolean ret = TRUE;
@@ -5343,15 +5344,15 @@ ensure_way_out(void)
 
     while (stway) {
         if (stway->tolev.dnum == u.uz.dnum) {
-            selection_floodfill(ov, stway->sx, stway->sy, TRUE);
+            op_selection_floodfill(ov, stway->sx, stway->sy, TRUE);
         }
         stway = stway->next;
     }
 
     while (ttmp) {
         if ((ttmp->ttyp == MAGIC_PORTAL || ttmp->ttyp == VIBRATING_SQUARE || is_hole(ttmp->ttyp)) &&
-             !selection_getpoint(ttmp->tx, ttmp->ty, ov)) {
-            selection_floodfill(ov, ttmp->tx, ttmp->ty, TRUE);
+             !op_selection_getpoint(ttmp->tx, ttmp->ty, ov)) {
+            op_selection_floodfill(ov, ttmp->tx, ttmp->ty, TRUE);
         }
         ttmp = ttmp->ntrap;
     }
@@ -5360,9 +5361,9 @@ ensure_way_out(void)
         ret = TRUE;
         for (x = 0; x < COLNO; x++) {
             for (y = 0; y < ROWNO; y++) {
-                if (ACCESSIBLE(levl[x][y].typ) && !selection_getpoint(x, y, ov)) {
+                if (ACCESSIBLE(levl[x][y].typ) && !op_selection_getpoint(x, y, ov)) {
                     if (generate_way_out_method(x,y, ov)) {
-                        selection_floodfill(ov, x,y, TRUE);
+                        op_selection_floodfill(ov, x,y, TRUE);
                     }
                     ret = FALSE;
                     goto outhere;
@@ -5795,7 +5796,7 @@ spo_wallify(struct sp_coder *coder)
         if (!OV_pop_typ(r, SPOVAR_SEL)) {
             return;
         }
-        selection_iterate(r, sel_set_wallify, NULL);
+        op_selection_iterate(r, sel_set_wallify, NULL);
     }
     break;
     }
@@ -6632,7 +6633,7 @@ sp_level_coder(sp_lev *lvl)
             if (!OV_pop_typ(sel2, SPOVAR_SEL)) {
                 panic("no sel1 for add");
             }
-            pt = selection_logical_oper(sel1, sel2, '|');
+            pt = op_selection_logical_oper(sel1, sel2, '|');
             opvar_free(sel1);
             opvar_free(sel2);
             splev_stack_push(coder->stack, pt);
@@ -6644,7 +6645,7 @@ sp_level_coder(sp_lev *lvl)
             if (!OV_pop_typ(sel, SPOVAR_SEL)) {
                 panic("no sel for not");
             }
-            pt = selection_not(sel);
+            pt = op_selection_not(sel);
             opvar_free(sel);
             splev_stack_push(coder->stack, pt);
         }
@@ -6665,7 +6666,7 @@ sp_level_coder(sp_lev *lvl)
                 if (!OV_pop_typ(sel, SPOVAR_SEL)) {
                     panic("no sel filter");
                 }
-                selection_filter_percent(sel, OV_i(tmp1));
+                op_selection_filter_percent(sel, OV_i(tmp1));
                 splev_stack_push(coder->stack, sel);
                 opvar_free(tmp1);
             }
@@ -6679,7 +6680,7 @@ sp_level_coder(sp_lev *lvl)
                 if (!OV_pop_typ(sel2, SPOVAR_SEL)) {
                     panic("no sel filter sel2");
                 }
-                pt = selection_logical_oper(sel1, sel2, '&');
+                pt = op_selection_logical_oper(sel1, sel2, '&');
                 splev_stack_push(coder->stack, pt);
                 opvar_free(sel1);
                 opvar_free(sel2);
@@ -6694,7 +6695,7 @@ sp_level_coder(sp_lev *lvl)
                 if (!OV_pop_typ(tmp1, SPOVAR_MAPCHAR)) {
                     panic("no sel filter mapchar");
                 }
-                pt = selection_filter_mapchar(sel, tmp1);
+                pt = op_selection_filter_mapchar(sel, tmp1);
                 splev_stack_push(coder->stack, pt);
                 opvar_free(tmp1);
                 opvar_free(sel);
@@ -6708,13 +6709,13 @@ sp_level_coder(sp_lev *lvl)
         case SPO_SEL_POINT:
         {
             struct opvar *tmp;
-            struct opvar *pt = selection_opvar(NULL);
+            struct opvar *pt = op_selection_opvar(NULL);
             coordxy x, y;
             if (!OV_pop_c(tmp)) {
                 panic("no ter sel coord");
             }
             get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(tmp));
-            selection_setpoint(x, y, pt, 1);
+            op_selection_setpoint(x, y, pt, 1);
             splev_stack_push(coder->stack, pt);
             opvar_free(tmp);
         }
@@ -6722,7 +6723,7 @@ sp_level_coder(sp_lev *lvl)
         case SPO_SEL_RECT:
         case SPO_SEL_FILLRECT:
         {
-            struct opvar *tmp, *pt = selection_opvar(NULL);
+            struct opvar *tmp, *pt = op_selection_opvar(NULL);
             coordxy x, y, x1, y1, x2, y2;
             if (!OV_pop_r(tmp)) {
                 panic("no ter sel region");
@@ -6739,17 +6740,17 @@ sp_level_coder(sp_lev *lvl)
             y2 = (y2 >= ROWNO) ? ROWNO-1 : y2;
             if (coder->opcode == SPO_SEL_RECT) {
                 for (x = x1; x <= x2; x++) {
-                    selection_setpoint(x, y1, pt, 1);
-                    selection_setpoint(x, y2, pt, 1);
+                    op_selection_setpoint(x, y1, pt, 1);
+                    op_selection_setpoint(x, y2, pt, 1);
                 }
                 for (y = y1; y <= y2; y++) {
-                    selection_setpoint(x1, y, pt, 1);
-                    selection_setpoint(x2, y, pt, 1);
+                    op_selection_setpoint(x1, y, pt, 1);
+                    op_selection_setpoint(x2, y, pt, 1);
                 }
             } else {
                 for (x = x1; x <= x2; x++) {
                     for (y = y1; y <= y2; y++) {
-                        selection_setpoint(x, y, pt, 1);
+                        op_selection_setpoint(x, y, pt, 1);
                     }
                 }
             }
@@ -6759,7 +6760,7 @@ sp_level_coder(sp_lev *lvl)
         break;
         case SPO_SEL_LINE:
         {
-            struct opvar *tmp = NULL, *tmp2 = NULL, *pt = selection_opvar(NULL);
+            struct opvar *tmp = NULL, *tmp2 = NULL, *pt = op_selection_opvar(NULL);
             coordxy x1, y1, x2, y2;
             if (!OV_pop_c(tmp) || !OV_pop_c(tmp2)) {
                 panic("no ter sel linecoord");
@@ -6770,7 +6771,7 @@ sp_level_coder(sp_lev *lvl)
             y1 = (y1 < 0) ? 0 : y1;
             x2 = (x2 >= COLNO) ? COLNO-1 : x2;
             y2 = (y2 >= ROWNO) ? ROWNO-1 : y2;
-            selection_do_line(x1, y1, x2, y2, pt);
+            op_selection_do_line(x1, y1, x2, y2, pt);
             splev_stack_push(coder->stack, pt);
             opvar_free(tmp);
             opvar_free(tmp2);
@@ -6778,7 +6779,7 @@ sp_level_coder(sp_lev *lvl)
         break;
         case SPO_SEL_RNDLINE:
         {
-            struct opvar *tmp = NULL, *tmp2 = NULL, *tmp3 = NULL, *pt = selection_opvar(NULL);
+            struct opvar *tmp = NULL, *tmp2 = NULL, *tmp3 = NULL, *pt = op_selection_opvar(NULL);
             coordxy x1, y1, x2, y2;
             if (!OV_pop_i(tmp3) || !OV_pop_c(tmp) || !OV_pop_c(tmp2)) {
                 panic("no ter sel randline");
@@ -6789,7 +6790,7 @@ sp_level_coder(sp_lev *lvl)
             y1 = (y1 < 0) ? 0 : y1;
             x2 = (x2 >= COLNO) ? COLNO-1 : x2;
             y2 = (y2 >= ROWNO) ? ROWNO-1 : y2;
-            selection_do_randline(x1, y1, x2, y2, OV_i(tmp3), 12, pt);
+            op_selection_do_randline(x1, y1, x2, y2, OV_i(tmp3), 12, pt);
             splev_stack_push(coder->stack, pt);
             opvar_free(tmp);
             opvar_free(tmp2);
@@ -6805,7 +6806,7 @@ sp_level_coder(sp_lev *lvl)
             if (!OV_pop_typ(pt, SPOVAR_SEL)) {
                 panic("no selection for grow");
             }
-            selection_do_grow(pt, OV_i(dirs));
+            op_selection_do_grow(pt, OV_i(dirs));
             splev_stack_push(coder->stack, pt);
             opvar_free(dirs);
         }
@@ -6819,9 +6820,9 @@ sp_level_coder(sp_lev *lvl)
             }
             get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(tmp));
             if (isok(x, y)) {
-                struct opvar *pt = selection_opvar(NULL);
+                struct opvar *pt = op_selection_opvar(NULL);
                 floodfillchk_match_under_typ = levl[x][y].typ;
-                selection_floodfill(pt, x, y, FALSE);
+                op_selection_floodfill(pt, x, y, FALSE);
                 splev_stack_push(coder->stack, pt);
             }
             opvar_free(tmp);
@@ -6834,7 +6835,7 @@ sp_level_coder(sp_lev *lvl)
             if (!OV_pop_typ(pt, SPOVAR_SEL)) {
                 panic("no selection for rndcoord");
             }
-            if (selection_rndcoord(pt, &x, &y, FALSE)) {
+            if (op_selection_rndcoord(pt, &x, &y, FALSE)) {
                 x -= xstart;
                 y -= ystart;
             }
@@ -6846,7 +6847,7 @@ sp_level_coder(sp_lev *lvl)
         case SPO_SEL_ELLIPSE:
         {
             struct opvar *filled, *xaxis, *yaxis, *pt;
-            struct opvar *sel = selection_opvar(NULL);
+            struct opvar *sel = op_selection_opvar(NULL);
             coordxy x, y;
             if (!OV_pop_i(filled)) {
                 panic("no filled for ellipse");
@@ -6861,7 +6862,7 @@ sp_level_coder(sp_lev *lvl)
                 panic("no pt for ellipse");
             }
             get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(pt));
-            selection_do_ellipse(sel, x, y, OV_i(xaxis), OV_i(yaxis), OV_i(filled));
+            op_selection_do_ellipse(sel, x, y, OV_i(xaxis), OV_i(yaxis), OV_i(filled));
             splev_stack_push(coder->stack, sel);
             opvar_free(filled);
             opvar_free(yaxis);
@@ -6895,8 +6896,8 @@ sp_level_coder(sp_lev *lvl)
             get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(coord));
             get_location_coord(&x2, &y2, ANY_LOC, coder->croom, OV_i(coord2));
 
-            sel = selection_opvar(NULL);
-            selection_do_gradient(sel, x, y, x2, y2, OV_i(gtyp), OV_i(mind), OV_i(maxd), OV_i(glim));
+            sel = op_selection_opvar(NULL);
+            op_selection_do_gradient(sel, x, y, x2, y2, OV_i(gtyp), OV_i(mind), OV_i(maxd), OV_i(glim));
             splev_stack_push(coder->stack, sel);
 
             opvar_free(gtyp);
@@ -6972,7 +6973,7 @@ struct _sploader_cache {
 struct _sploader_cache *sp_loader_cache = NULL;
 
 sp_lev *
-sp_lev_cache(char *fnam)
+sp_lev_cache(const char *fnam)
 {
     struct _sploader_cache *tmp = sp_loader_cache;
 
@@ -6986,7 +6987,7 @@ sp_lev_cache(char *fnam)
 }
 
 void
-sp_lev_savecache(char *fnam, sp_lev *lvl)
+sp_lev_savecache(const char *fnam, sp_lev *lvl)
 {
     struct _sploader_cache *tmp = (struct _sploader_cache *)alloc(sizeof(struct _sploader_cache));
     if (!tmp) {

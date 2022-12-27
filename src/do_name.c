@@ -330,7 +330,7 @@ static struct opvar *gloc_filter_map = (struct opvar *) 0;
 
 #define GLOC_SAME_AREA(x,y)                          \
     (isok((x), (y)) &&                               \
-     (selection_getpoint((x),(y), gloc_filter_map)))
+     (op_selection_getpoint((x),(y), gloc_filter_map)))
 
 static int gloc_filter_floodfill_match_glyph;
 
@@ -385,7 +385,7 @@ gloc_filter_floodfill(coordxy x, coordxy y)
     gloc_filter_floodfill_match_glyph = back_to_glyph(x, y);
 
     set_selection_floodfillchk(gloc_filter_floodfill_matcharea);
-    selection_floodfill(gloc_filter_map, x, y, FALSE);
+    op_selection_floodfill(gloc_filter_map, x, y, FALSE);
 }
 
 void
@@ -393,7 +393,7 @@ gloc_filter_init(void)
 {
     if (iflags.getloc_filter == GFILTER_AREA) {
         if (!gloc_filter_map) {
-            gloc_filter_map = selection_opvar((char *) 0);
+            gloc_filter_map = op_selection_opvar((char *) 0);
         }
         /* special case: if we're in a doorway, try to figure out which
            direction we're moving, and use that side of the doorway */

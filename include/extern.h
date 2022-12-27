@@ -2462,11 +2462,11 @@ extern void create_secret_door(struct mkroom *, coordxy);
 extern boolean dig_corridor(coord *, coord *, boolean, schar, schar);
 extern void fill_room(struct mkroom *, boolean);
 extern boolean load_special(const char *);
-extern coordxy selection_getpoint(coordxy, coordxy, struct opvar *);
-extern struct opvar *selection_opvar(char *);
+extern coordxy op_selection_getpoint(coordxy, coordxy, struct opvar *);
+extern struct opvar *op_selection_opvar(char *);
 extern void opvar_free_x(struct opvar *);
 extern void set_selection_floodfillchk(int(*)(coordxy, coordxy));
-extern void selection_floodfill(struct opvar *, coordxy, coordxy, boolean);
+extern void op_selection_floodfill(struct opvar *, coordxy, coordxy, boolean);
 
 /* ### spell.c ### */
 
