@@ -679,6 +679,20 @@ LISPLIB
 WINCURSESLIB
 WINTTYLIB
 EXTRA_UNSHARE
+LUA_LIB
+LUA_INCLUDE
+pkgluaexecdir
+luaexecdir
+pkgluadir
+luadir
+LUA_EXEC_PREFIX
+LUA_PREFIX
+LUA_PLATFORM
+LUA_SHORT_VERSION
+LUA_VERSION
+LUA
+SED
+GREP
 COMPRESS
 WINDRES
 ac_ct_CHMOD
@@ -841,7 +855,10 @@ LIBXAW_CFLAGS
 LIBXAW_LIBS
 PKG_CONFIG
 PKG_CONFIG_PATH
-PKG_CONFIG_LIBDIR'
+PKG_CONFIG_LIBDIR
+LUA
+LUA_INCLUDE
+LUA_LIB'
 
 
 # Initialize some variables set by options.
@@ -1581,6 +1598,9 @@ Some influential environment variables:
               directories to add to pkg-config's search path
   PKG_CONFIG_LIBDIR
               path overriding pkg-config's built-in search path
+  LUA         The Lua interpreter, e.g. /usr/bin/lua5.1
+  LUA_INCLUDE The Lua includes, e.g. -I/usr/include/lua5.1
+  LUA_LIB     The Lua library, e.g. -llua5.1
 
 Use these variables to override the choices made by 'configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -1785,183 +1805,6 @@ printf "%s\n" "$ac_res" >&6; }
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } # ac_fn_c_check_header_compile
-
-# ac_fn_check_decl LINENO SYMBOL VAR INCLUDES EXTRA-OPTIONS FLAG-VAR
-# ------------------------------------------------------------------
-# Tests whether SYMBOL is declared in INCLUDES, setting cache variable VAR
-# accordingly. Pass EXTRA-OPTIONS to the compiler, using FLAG-VAR.
-ac_fn_check_decl ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  as_decl_name=`echo $2|sed 's/ *(.*//'`
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether $as_decl_name is declared" >&5
-printf %s "checking whether $as_decl_name is declared... " >&6; }
-if eval test \${$3+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) as_decl_use=`echo $2|sed -e 's/(/((/' -e 's/)/) 0&/' -e 's/,/) 0& (/g'`
-  eval ac_save_FLAGS=\$$6
-  as_fn_append $6 " $5"
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-int
-main (void)
-{
-#ifndef $as_decl_name
-#ifdef __cplusplus
-  (void) $as_decl_use;
-#else
-  (void) $as_decl_name;
-#endif
-#endif
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  eval "$3=yes"
-else case e in #(
-  e) eval "$3=no" ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-  eval $6=\$ac_save_FLAGS
- ;;
-esac
-fi
-eval ac_res=\$$3
-	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-printf "%s\n" "$ac_res" >&6; }
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-
-} # ac_fn_check_decl
-
-# ac_fn_c_check_func LINENO FUNC VAR
-# ----------------------------------
-# Tests whether FUNC exists, setting the cache variable VAR accordingly
-ac_fn_c_check_func ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
-printf %s "checking for $2... " >&6; }
-if eval test \${$3+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-/* Define $2 to an innocuous variant, in case <limits.h> declares $2.
-   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-#define $2 innocuous_$2
-
-/* System header to define __stub macros and hopefully few prototypes,
-   which can conflict with char $2 (void); below.  */
-
-#include <limits.h>
-#undef $2
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char $2 (void);
-/* The GNU C library defines this for functions which it implements
-    to always fail with ENOSYS.  Some functions are actually named
-    something starting with __ and the normal name is an alias.  */
-#if defined __stub_$2 || defined __stub___$2
-choke me
-#endif
-
-int
-main (void)
-{
-return $2 ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  eval "$3=yes"
-else case e in #(
-  e) eval "$3=no" ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext ;;
-esac
-fi
-eval ac_res=\$$3
-	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-printf "%s\n" "$ac_res" >&6; }
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-
-} # ac_fn_c_check_func
-
-# ac_fn_c_check_type LINENO TYPE VAR INCLUDES
-# -------------------------------------------
-# Tests whether TYPE exists after having included INCLUDES, setting cache
-# variable VAR accordingly.
-ac_fn_c_check_type ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
-printf %s "checking for $2... " >&6; }
-if eval test \${$3+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) eval "$3=no"
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-int
-main (void)
-{
-if (sizeof ($2))
-	 return 0;
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-int
-main (void)
-{
-if (sizeof (($2)))
-	    return 0;
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-
-else case e in #(
-  e) eval "$3=yes" ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext ;;
-esac
-fi
-eval ac_res=\$$3
-	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-printf "%s\n" "$ac_res" >&6; }
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-
-} # ac_fn_c_check_type
 
 # ac_fn_c_try_run LINENO
 # ----------------------
@@ -2201,6 +2044,183 @@ rm -f conftest.val
   as_fn_set_status $ac_retval
 
 } # ac_fn_c_compute_int
+
+# ac_fn_check_decl LINENO SYMBOL VAR INCLUDES EXTRA-OPTIONS FLAG-VAR
+# ------------------------------------------------------------------
+# Tests whether SYMBOL is declared in INCLUDES, setting cache variable VAR
+# accordingly. Pass EXTRA-OPTIONS to the compiler, using FLAG-VAR.
+ac_fn_check_decl ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  as_decl_name=`echo $2|sed 's/ *(.*//'`
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether $as_decl_name is declared" >&5
+printf %s "checking whether $as_decl_name is declared... " >&6; }
+if eval test \${$3+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) as_decl_use=`echo $2|sed -e 's/(/((/' -e 's/)/) 0&/' -e 's/,/) 0& (/g'`
+  eval ac_save_FLAGS=\$$6
+  as_fn_append $6 " $5"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main (void)
+{
+#ifndef $as_decl_name
+#ifdef __cplusplus
+  (void) $as_decl_use;
+#else
+  (void) $as_decl_name;
+#endif
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  eval "$3=yes"
+else case e in #(
+  e) eval "$3=no" ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+  eval $6=\$ac_save_FLAGS
+ ;;
+esac
+fi
+eval ac_res=\$$3
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+
+} # ac_fn_check_decl
+
+# ac_fn_c_check_func LINENO FUNC VAR
+# ----------------------------------
+# Tests whether FUNC exists, setting the cache variable VAR accordingly
+ac_fn_c_check_func ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
+printf %s "checking for $2... " >&6; }
+if eval test \${$3+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+/* Define $2 to an innocuous variant, in case <limits.h> declares $2.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define $2 innocuous_$2
+
+/* System header to define __stub macros and hopefully few prototypes,
+   which can conflict with char $2 (void); below.  */
+
+#include <limits.h>
+#undef $2
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char $2 (void);
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined __stub_$2 || defined __stub___$2
+choke me
+#endif
+
+int
+main (void)
+{
+return $2 ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  eval "$3=yes"
+else case e in #(
+  e) eval "$3=no" ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext ;;
+esac
+fi
+eval ac_res=\$$3
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+
+} # ac_fn_c_check_func
+
+# ac_fn_c_check_type LINENO TYPE VAR INCLUDES
+# -------------------------------------------
+# Tests whether TYPE exists after having included INCLUDES, setting cache
+# variable VAR accordingly.
+ac_fn_c_check_type ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
+printf %s "checking for $2... " >&6; }
+if eval test \${$3+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) eval "$3=no"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main (void)
+{
+if (sizeof ($2))
+	 return 0;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main (void)
+{
+if (sizeof (($2)))
+	    return 0;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+
+else case e in #(
+  e) eval "$3=yes" ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext ;;
+esac
+fi
+eval ac_res=\$$3
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+
+} # ac_fn_c_check_type
 ac_configure_args_raw=
 for ac_arg
 do
@@ -5652,33 +5672,517 @@ esac
 fi
     fi
 
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for grep that handles long lines and -e" >&5
+printf %s "checking for grep that handles long lines and -e... " >&6; }
+if test ${ac_cv_path_GREP+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) if test -z "$GREP"; then
+  ac_path_GREP_found=false
+  # Loop through the user's path and test for each of PROGNAME-LIST
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH$PATH_SEPARATOR/usr/xpg4/bin
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_prog in grep ggrep
+   do
+    for ac_exec_ext in '' $ac_executable_extensions; do
+      ac_path_GREP="$as_dir$ac_prog$ac_exec_ext"
+      as_fn_executable_p "$ac_path_GREP" || continue
+# Check for GNU ac_path_GREP and select it if it is found.
+  # Check for GNU $ac_path_GREP
+case `"$ac_path_GREP" --version 2>&1` in #(
+*GNU*)
+  ac_cv_path_GREP="$ac_path_GREP" ac_path_GREP_found=:;;
+#(
+*)
+  ac_count=0
+  printf %s 0123456789 >"conftest.in"
+  while :
+  do
+    cat "conftest.in" "conftest.in" >"conftest.tmp"
+    mv "conftest.tmp" "conftest.in"
+    cp "conftest.in" "conftest.nl"
+    printf "%s\n" 'GREP' >> "conftest.nl"
+    "$ac_path_GREP" -e 'GREP$' -e '-(cannot match)-' < "conftest.nl" >"conftest.out" 2>/dev/null || break
+    diff "conftest.out" "conftest.nl" >/dev/null 2>&1 || break
+    as_fn_arith $ac_count + 1 && ac_count=$as_val
+    if test $ac_count -gt ${ac_path_GREP_max-0}; then
+      # Best one so far, save it but keep looking for a better one
+      ac_cv_path_GREP="$ac_path_GREP"
+      ac_path_GREP_max=$ac_count
+    fi
+    # 10*(2^10) chars as input seems more than enough
+    test $ac_count -gt 10 && break
+  done
+  rm -f conftest.in conftest.tmp conftest.nl conftest.out;;
+esac
+
+      $ac_path_GREP_found && break 3
+    done
+  done
+  done
+IFS=$as_save_IFS
+  if test -z "$ac_cv_path_GREP"; then
+    as_fn_error $? "no acceptable grep could be found in $PATH$PATH_SEPARATOR/usr/xpg4/bin" "$LINENO" 5
+  fi
+else
+  ac_cv_path_GREP=$GREP
+fi
+ ;;
+esac
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_path_GREP" >&5
+printf "%s\n" "$ac_cv_path_GREP" >&6; }
+ GREP="$ac_cv_path_GREP"
+
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for a sed that does not truncate output" >&5
+printf %s "checking for a sed that does not truncate output... " >&6; }
+if test ${ac_cv_path_SED+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e)           ac_script=s/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/
+     for ac_i in 1 2 3 4 5 6 7; do
+       ac_script="$ac_script$as_nl$ac_script"
+     done
+     echo "$ac_script" 2>/dev/null | sed 99q >conftest.sed
+     { ac_script=; unset ac_script;}
+     if test -z "$SED"; then
+  ac_path_SED_found=false
+  # Loop through the user's path and test for each of PROGNAME-LIST
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_prog in sed gsed
+   do
+    for ac_exec_ext in '' $ac_executable_extensions; do
+      ac_path_SED="$as_dir$ac_prog$ac_exec_ext"
+      as_fn_executable_p "$ac_path_SED" || continue
+# Check for GNU ac_path_SED and select it if it is found.
+  # Check for GNU $ac_path_SED
+case `"$ac_path_SED" --version 2>&1` in #(
+*GNU*)
+  ac_cv_path_SED="$ac_path_SED" ac_path_SED_found=:;;
+#(
+*)
+  ac_count=0
+  printf %s 0123456789 >"conftest.in"
+  while :
+  do
+    cat "conftest.in" "conftest.in" >"conftest.tmp"
+    mv "conftest.tmp" "conftest.in"
+    cp "conftest.in" "conftest.nl"
+    printf "%s\n" '' >> "conftest.nl"
+    "$ac_path_SED" -f conftest.sed < "conftest.nl" >"conftest.out" 2>/dev/null || break
+    diff "conftest.out" "conftest.nl" >/dev/null 2>&1 || break
+    as_fn_arith $ac_count + 1 && ac_count=$as_val
+    if test $ac_count -gt ${ac_path_SED_max-0}; then
+      # Best one so far, save it but keep looking for a better one
+      ac_cv_path_SED="$ac_path_SED"
+      ac_path_SED_max=$ac_count
+    fi
+    # 10*(2^10) chars as input seems more than enough
+    test $ac_count -gt 10 && break
+  done
+  rm -f conftest.in conftest.tmp conftest.nl conftest.out;;
+esac
+
+      $ac_path_SED_found && break 3
+    done
+  done
+  done
+IFS=$as_save_IFS
+  if test -z "$ac_cv_path_SED"; then
+    as_fn_error $? "no acceptable sed could be found in \$PATH" "$LINENO" 5
+  fi
+else
+  ac_cv_path_SED=$SED
+fi
+ ;;
+esac
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_path_SED" >&5
+printf "%s\n" "$ac_cv_path_SED" >&6; }
+ SED="$ac_cv_path_SED"
+  rm -f conftest.sed
 
 
 
-WINSRC=
-WINOBJ=
-WINLIB=
-CNF_SHARE_DATND=
 
-OPTIONS_FILE=
-OPTIONS_FILES=
 
-WINTTYLIB=
-if test "$enable_tty_graphics" != "no"; then
-    if test $host_os = mingw32; then
-        EXTRA_UNSHARE="nhdefkey.dll nh340key.dll nhraykey.dll"
 
-        CFLAGS="$CFLAGS -DWIN32CON"
-        WINTTYLIB=""
-        WINSRC="${WINSRC} \$(WINTTYSRC)"
-        WINOBJ="${WINOBJ} \$(WINTTYOBJ)"
-        WINLIB="${WINLIB} \$(WINTTYLIB)"
 
-printf "%s\n" "#define TTY_GRAPHICS /**/" >>confdefs.h
 
+
+       if test "x$LUA" != 'x'
+then :
+         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if $LUA is a Lua interpreter" >&5
+printf %s "checking if $LUA is a Lua interpreter... " >&6; }
+
+      _ax_lua_factorial=`$LUA 2>/dev/null -e '
+    -- a simple factorial
+    function fact (n)
+      if n == 0 then
+        return 1
+      else
+        return n * fact(n-1)
+      end
+    end
+    print("fact(5) is " .. fact(5))'`
+  if test "$_ax_lua_factorial" = 'fact(5) is 120'
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+else case e in #(
+  e)  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+          as_fn_error $? "not a Lua interpreter" "$LINENO" 5
+         ;;
+esac
+fi
+
+            _ax_check_text="whether $LUA version >= 5.4"
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking $_ax_check_text" >&5
+printf %s "checking $_ax_check_text... " >&6; }
+
+        _ax_lua_good_version=`$LUA -e '
+    -- a script to compare versions
+    function verstr2num(verstr)
+      local _, _, majorver, minorver = string.find(verstr, "^(%d+)%.(%d+)")
+      if majorver and minorver then
+        return tonumber(majorver) * 100 + tonumber(minorver)
+      end
+    end
+    local minver = verstr2num("5.4")
+    local _, _, trimver = string.find(_VERSION, "^Lua (.*)")
+    local ver = verstr2num(trimver)
+    local maxver = verstr2num("") or 1e9
+    if minver <= ver and ver < maxver then
+      print("yes")
     else
-                LIBS=
-        ac_header= ac_cache=
+      print("no")
+    end'`
+    if test "x$_ax_lua_good_version" = "xyes"
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+else case e in #(
+  e)  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+          as_fn_error $? "version is out of range for specified LUA" "$LINENO" 5 ;;
+esac
+fi
+
+      ax_display_LUA=$LUA
+
+else case e in #(
+  e)        _ax_check_text="for a Lua interpreter with version >= 5.4"
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking $_ax_check_text" >&5
+printf %s "checking $_ax_check_text... " >&6; }
+if test ${ax_cv_pathless_LUA+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e)  for ax_cv_pathless_LUA in lua lua5.3 lua53 lua5.2 lua52 lua5.1 lua51 lua50 none; do
+            test "x$ax_cv_pathless_LUA" = 'xnone' && break
+
+      _ax_lua_factorial=`$ax_cv_pathless_LUA 2>/dev/null -e '
+    -- a simple factorial
+    function fact (n)
+      if n == 0 then
+        return 1
+      else
+        return n * fact(n-1)
+      end
+    end
+    print("fact(5) is " .. fact(5))'`
+  if test "$_ax_lua_factorial" = 'fact(5) is 120'
+then :
+
+else case e in #(
+  e) continue ;;
+esac
+fi
+
+
+        _ax_lua_good_version=`$ax_cv_pathless_LUA -e '
+    -- a script to compare versions
+    function verstr2num(verstr)
+      local _, _, majorver, minorver = string.find(verstr, "^(%d+)%.(%d+)")
+      if majorver and minorver then
+        return tonumber(majorver) * 100 + tonumber(minorver)
+      end
+    end
+    local minver = verstr2num("5.4")
+    local _, _, trimver = string.find(_VERSION, "^Lua (.*)")
+    local ver = verstr2num(trimver)
+    local maxver = verstr2num("") or 1e9
+    if minver <= ver and ver < maxver then
+      print("yes")
+    else
+      print("no")
+    end'`
+    if test "x$_ax_lua_good_version" = "xyes"
+then :
+  break
+fi
+
+          done
+         ;;
+esac
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_pathless_LUA" >&5
+printf "%s\n" "$ax_cv_pathless_LUA" >&6; }
+            if test "x$ax_cv_pathless_LUA" = 'xnone'
+then :
+  LUA=':'
+else case e in #(
+  e) # Extract the first word of "$ax_cv_pathless_LUA", so it can be a program name with args.
+set dummy $ax_cv_pathless_LUA; ac_word=$2
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+printf %s "checking for $ac_word... " >&6; }
+if test ${ac_cv_path_LUA+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) case $LUA in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_LUA="$LUA" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
+    ac_cv_path_LUA="$as_dir$ac_word$ac_exec_ext"
+    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac ;;
+esac
+fi
+LUA=$ac_cv_path_LUA
+if test -n "$LUA"; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $LUA" >&5
+printf "%s\n" "$LUA" >&6; }
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+fi
+
+ ;;
+esac
+fi
+      ax_display_LUA=$ax_cv_pathless_LUA
+     ;;
+esac
+fi
+
+
+  if test "x$LUA" = 'x:'
+then :
+       as_fn_error $? "cannot find suitable Lua interpreter" "$LINENO" 5
+
+else case e in #(
+  e)      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ax_display_LUA version" >&5
+printf %s "checking for $ax_display_LUA version... " >&6; }
+if test ${ax_cv_lua_version+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e)                  ax_cv_lua_version=`$LUA -e '
+          -- return a version number in X.Y format
+          local _, _, ver = string.find(_VERSION, "^Lua (%d+%.%d+)")
+          print(ver)'`
+       ;;
+esac
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_lua_version" >&5
+printf "%s\n" "$ax_cv_lua_version" >&6; }
+    if test "x$ax_cv_lua_version" = 'x'
+then :
+  as_fn_error $? "invalid Lua version number" "$LINENO" 5
+fi
+    LUA_VERSION=$ax_cv_lua_version
+
+    LUA_SHORT_VERSION=`echo "$LUA_VERSION" | $SED 's|\.||'`
+
+
+                { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ax_display_LUA platform" >&5
+printf %s "checking for $ax_display_LUA platform... " >&6; }
+if test ${ax_cv_lua_platform+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ax_cv_lua_platform=`$LUA -e 'print("unknown")'` ;;
+esac
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_lua_platform" >&5
+printf "%s\n" "$ax_cv_lua_platform" >&6; }
+    LUA_PLATFORM=$ax_cv_lua_platform
+
+
+                    LUA_PREFIX='${prefix}'
+
+    LUA_EXEC_PREFIX='${exec_prefix}'
+
+
+                        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ax_display_LUA script directory" >&5
+printf %s "checking for $ax_display_LUA script directory... " >&6; }
+if test ${ax_cv_lua_luadir+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e)  if test "x$prefix" = 'xNONE'
+then :
+  ax_lua_prefix=$ac_default_prefix
+else case e in #(
+  e) ax_lua_prefix=$prefix ;;
+esac
+fi
+
+                ax_cv_lua_luadir="$LUA_PREFIX/share/lua/$LUA_VERSION"
+
+
+
+  ax_lua_prefixed_path=`$LUA -e '
+    -- get the path based on search type
+    local searchtype = "script"
+    local paths = ""
+    if searchtype == "script" then
+      paths = (package and package.path) or LUA_PATH
+    elseif searchtype == "module" then
+      paths = (package and package.cpath) or LUA_CPATH
+    end
+    -- search for the prefix
+    local prefix = "'$ax_lua_prefix'"
+    local minpath = ""
+    local mindepth = 1e9
+    string.gsub(paths, "([^;]+)",
+      function (path)
+        path = string.gsub(path, "%?.*$", "")
+        path = string.gsub(path, "/[^/]*$", "")
+        if string.find(path, prefix) then
+          local depth = string.len(string.gsub(path, "[^/]", ""))
+          if depth < mindepth then
+            minpath = path
+            mindepth = depth
+          end
+        end
+      end)
+    print(minpath)'`
+
+        if test "x$ax_lua_prefixed_path" != 'x'
+then :
+             _ax_strip_prefix=`echo "$ax_lua_prefix" | $SED 's|.|.|g'`
+          ax_cv_lua_luadir=`echo "$ax_lua_prefixed_path" | \
+            $SED "s|^$_ax_strip_prefix|$LUA_PREFIX|"`
+
+fi
+       ;;
+esac
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_lua_luadir" >&5
+printf "%s\n" "$ax_cv_lua_luadir" >&6; }
+    luadir=$ax_cv_lua_luadir
+
+    pkgluadir=\${luadir}/$PACKAGE
+
+
+                        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ax_display_LUA module directory" >&5
+printf %s "checking for $ax_display_LUA module directory... " >&6; }
+if test ${ax_cv_lua_luaexecdir+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e)  if test "x$exec_prefix" = 'xNONE'
+then :
+  ax_lua_exec_prefix=$ax_lua_prefix
+else case e in #(
+  e) ax_lua_exec_prefix=$exec_prefix ;;
+esac
+fi
+
+                ax_cv_lua_luaexecdir="$LUA_EXEC_PREFIX/lib/lua/$LUA_VERSION"
+
+
+
+  ax_lua_prefixed_path=`$LUA -e '
+    -- get the path based on search type
+    local searchtype = "module"
+    local paths = ""
+    if searchtype == "script" then
+      paths = (package and package.path) or LUA_PATH
+    elseif searchtype == "module" then
+      paths = (package and package.cpath) or LUA_CPATH
+    end
+    -- search for the prefix
+    local prefix = "'$ax_lua_exec_prefix'"
+    local minpath = ""
+    local mindepth = 1e9
+    string.gsub(paths, "([^;]+)",
+      function (path)
+        path = string.gsub(path, "%?.*$", "")
+        path = string.gsub(path, "/[^/]*$", "")
+        if string.find(path, prefix) then
+          local depth = string.len(string.gsub(path, "[^/]", ""))
+          if depth < mindepth then
+            minpath = path
+            mindepth = depth
+          end
+        end
+      end)
+    print(minpath)'`
+
+        if test "x$ax_lua_prefixed_path" != 'x'
+then :
+             _ax_strip_prefix=`echo "$ax_lua_exec_prefix" | $SED 's|.|.|g'`
+          ax_cv_lua_luaexecdir=`echo "$ax_lua_prefixed_path" | \
+            $SED "s|^$_ax_strip_prefix|$LUA_EXEC_PREFIX|"`
+
+fi
+       ;;
+esac
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_lua_luaexecdir" >&5
+printf "%s\n" "$ax_cv_lua_luaexecdir" >&6; }
+    luaexecdir=$ax_cv_lua_luaexecdir
+
+    pkgluaexecdir=\${luaexecdir}/$PACKAGE
+
+
+
+   ;;
+esac
+fi
+
+ac_header= ac_cache=
 for ac_item in $ac_header_c_list
 do
   if test $ac_cache; then
@@ -5707,7 +6211,584 @@ then :
 printf "%s\n" "#define STDC_HEADERS 1" >>confdefs.h
 
 fi
-ac_fn_c_check_header_compile "$LINENO" "ncurses.h" "ac_cv_header_ncurses_h" "$ac_includes_default"
+
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if LUA_VERSION is defined" >&5
+printf %s "checking if LUA_VERSION is defined... " >&6; }
+  if test "x$LUA_VERSION" != 'x'
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+else case e in #(
+  e)  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+      as_fn_error $? "cannot check Lua headers without knowing LUA_VERSION" "$LINENO" 5
+     ;;
+esac
+fi
+
+
+
+    LUA_SHORT_VERSION=`echo "$LUA_VERSION" | $SED 's|\.||'`
+
+
+    _ax_lua_saved_cppflags=$CPPFLAGS
+  CPPFLAGS="$CPPFLAGS $LUA_INCLUDE"
+  ac_fn_c_check_header_compile "$LINENO" "lua.h" "ac_cv_header_lua_h" "$ac_includes_default"
+if test "x$ac_cv_header_lua_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_LUA_H 1" >>confdefs.h
+
+fi
+ac_fn_c_check_header_compile "$LINENO" "lualib.h" "ac_cv_header_lualib_h" "$ac_includes_default"
+if test "x$ac_cv_header_lualib_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_LUALIB_H 1" >>confdefs.h
+
+fi
+ac_fn_c_check_header_compile "$LINENO" "lauxlib.h" "ac_cv_header_lauxlib_h" "$ac_includes_default"
+if test "x$ac_cv_header_lauxlib_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_LAUXLIB_H 1" >>confdefs.h
+
+fi
+ac_fn_c_check_header_compile "$LINENO" "luaconf.h" "ac_cv_header_luaconf_h" "$ac_includes_default"
+if test "x$ac_cv_header_luaconf_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_LUACONF_H 1" >>confdefs.h
+
+fi
+
+  CPPFLAGS=$_ax_lua_saved_cppflags
+
+    if test "x$LUA_INCLUDE" = 'x' &&
+         test "x$ac_cv_header_lua_h" != 'xyes'
+then :
+         for _ax_include_path in  /usr/include/lua$LUA_VERSION \
+      /usr/include/lua-$LUA_VERSION \
+      /usr/include/lua/$LUA_VERSION \
+      /usr/include/lua$LUA_SHORT_VERSION \
+      /usr/local/include/lua$LUA_VERSION \
+      /usr/local/include/lua-$LUA_VERSION \
+      /usr/local/include/lua/$LUA_VERSION \
+      /usr/local/include/lua$LUA_SHORT_VERSION \
+    ; do
+        test ! -d "$_ax_include_path" && continue
+
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for Lua headers in" >&5
+printf %s "checking for Lua headers in... " >&6; }
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $_ax_include_path" >&5
+printf "%s\n" "$_ax_include_path" >&6; }
+
+        { ac_cv_header_lua_h=; unset ac_cv_header_lua_h;}
+        { ac_cv_header_lualib_h=; unset ac_cv_header_lualib_h;}
+        { ac_cv_header_lauxlib_h=; unset ac_cv_header_lauxlib_h;}
+        { ac_cv_header_luaconf_h=; unset ac_cv_header_luaconf_h;}
+
+        _ax_lua_saved_cppflags=$CPPFLAGS
+        CPPFLAGS="$CPPFLAGS -I$_ax_include_path"
+        ac_fn_c_check_header_compile "$LINENO" "lua.h" "ac_cv_header_lua_h" "$ac_includes_default"
+if test "x$ac_cv_header_lua_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_LUA_H 1" >>confdefs.h
+
+fi
+ac_fn_c_check_header_compile "$LINENO" "lualib.h" "ac_cv_header_lualib_h" "$ac_includes_default"
+if test "x$ac_cv_header_lualib_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_LUALIB_H 1" >>confdefs.h
+
+fi
+ac_fn_c_check_header_compile "$LINENO" "lauxlib.h" "ac_cv_header_lauxlib_h" "$ac_includes_default"
+if test "x$ac_cv_header_lauxlib_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_LAUXLIB_H 1" >>confdefs.h
+
+fi
+ac_fn_c_check_header_compile "$LINENO" "luaconf.h" "ac_cv_header_luaconf_h" "$ac_includes_default"
+if test "x$ac_cv_header_luaconf_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_LUACONF_H 1" >>confdefs.h
+
+fi
+
+        CPPFLAGS=$_ax_lua_saved_cppflags
+
+        if test "x$ac_cv_header_lua_h" = 'xyes'
+then :
+   LUA_INCLUDE="-I$_ax_include_path"
+            break
+
+fi
+      done
+
+fi
+
+  if test "x$ac_cv_header_lua_h" = 'xyes'
+then :
+
+      if test "x$cross_compiling" != 'xyes'
+then :
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for Lua header version" >&5
+printf %s "checking for Lua header version... " >&6; }
+if test ${ax_cv_lua_header_version+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e)  _ax_lua_saved_cppflags=$CPPFLAGS
+              CPPFLAGS="$CPPFLAGS $LUA_INCLUDE"
+              if ac_fn_c_compute_int "$LINENO" "LUA_VERSION_NUM/100" "ax_cv_lua_header_version_major"        "$ac_includes_default
+#include <lua.h>
+"
+then :
+
+else case e in #(
+  e) ax_cv_lua_header_version_major=unknown ;;
+esac
+fi
+
+              if ac_fn_c_compute_int "$LINENO" "LUA_VERSION_NUM%100" "ax_cv_lua_header_version_minor"        "$ac_includes_default
+#include <lua.h>
+"
+then :
+
+else case e in #(
+  e) ax_cv_lua_header_version_minor=unknown ;;
+esac
+fi
+
+              if test "x$ax_cv_lua_header_version_major" = xunknown || test "x$ax_cv_lua_header_version_minor" = xunknown
+then :
+
+                ax_cv_lua_header_version=unknown
+
+else case e in #(
+  e)
+                ax_cv_lua_header_version="$ax_cv_lua_header_version_major.$ax_cv_lua_header_version_minor"
+               ;;
+esac
+fi
+              CPPFLAGS=$_ax_lua_saved_cppflags
+             ;;
+esac
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_lua_header_version" >&5
+printf "%s\n" "$ax_cv_lua_header_version" >&6; }
+
+                    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if Lua header version matches $LUA_VERSION" >&5
+printf %s "checking if Lua header version matches $LUA_VERSION... " >&6; }
+          if test "x$ax_cv_lua_header_version" = "x$LUA_VERSION"
+then :
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+              ax_header_version_match='yes'
+
+else case e in #(
+  e)  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+              ax_header_version_match='no'
+             ;;
+esac
+fi
+
+else case e in #(
+  e)  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: cross compiling so assuming header version number matches" >&5
+printf "%s\n" "$as_me: WARNING: cross compiling so assuming header version number matches" >&2;}
+          ax_header_version_match='yes'
+         ;;
+esac
+fi
+
+fi
+
+    if test "x$ax_header_version_match" != 'xyes' &&
+         test "x$LUA_INCLUDE" != 'x'
+then :
+  as_fn_error $? "cannot find headers for specified LUA_INCLUDE" "$LINENO" 5
+fi
+
+    if test "x$ax_header_version_match" = 'xyes'
+then :
+
+else case e in #(
+  e) as_fn_error $? "cannot find Lua includes" "$LINENO" 5 ;;
+esac
+fi
+
+
+
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if LUA_VERSION is defined" >&5
+printf %s "checking if LUA_VERSION is defined... " >&6; }
+  if test "x$LUA_VERSION" != 'x'
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+else case e in #(
+  e)  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+      as_fn_error $? "cannot check Lua libs without knowing LUA_VERSION" "$LINENO" 5
+     ;;
+esac
+fi
+
+
+
+  if test "x$LUA_LIB" != 'x'
+then :
+       _ax_lua_saved_libs=$LIBS
+    LIBS="$LIBS $LUA_LIB"
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for library containing lua_load" >&5
+printf %s "checking for library containing lua_load... " >&6; }
+if test ${ac_cv_search_lua_load+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char lua_load (void);
+int
+main (void)
+{
+return lua_load ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in ''
+do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_search_lua_load=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext
+  if test ${ac_cv_search_lua_load+y}
+then :
+  break
+fi
+done
+if test ${ac_cv_search_lua_load+y}
+then :
+
+else case e in #(
+  e) ac_cv_search_lua_load=no ;;
+esac
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS ;;
+esac
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_lua_load" >&5
+printf "%s\n" "$ac_cv_search_lua_load" >&6; }
+ac_res=$ac_cv_search_lua_load
+if test "$ac_res" != no
+then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+  _ax_found_lua_libs='yes'
+else case e in #(
+  e) _ax_found_lua_libs='no' ;;
+esac
+fi
+
+    LIBS=$_ax_lua_saved_libs
+
+        if test "x$_ax_found_lua_libs" != 'xyes'
+then :
+  as_fn_error $? "cannot find libs for specified LUA_LIB" "$LINENO" 5
+fi
+
+else case e in #(
+  e)      _ax_lua_extra_libs=''
+
+    _ax_lua_saved_libs=$LIBS
+    LIBS="$LIBS $LUA_LIB"
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for library containing exp" >&5
+printf %s "checking for library containing exp... " >&6; }
+if test ${ac_cv_search_exp+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char exp (void);
+int
+main (void)
+{
+return exp ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' m
+do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_search_exp=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext
+  if test ${ac_cv_search_exp+y}
+then :
+  break
+fi
+done
+if test ${ac_cv_search_exp+y}
+then :
+
+else case e in #(
+  e) ac_cv_search_exp=no ;;
+esac
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS ;;
+esac
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_exp" >&5
+printf "%s\n" "$ac_cv_search_exp" >&6; }
+ac_res=$ac_cv_search_exp
+if test "$ac_res" != no
+then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+fi
+
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for library containing dlopen" >&5
+printf %s "checking for library containing dlopen... " >&6; }
+if test ${ac_cv_search_dlopen+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char dlopen (void);
+int
+main (void)
+{
+return dlopen ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' dl
+do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_search_dlopen=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext
+  if test ${ac_cv_search_dlopen+y}
+then :
+  break
+fi
+done
+if test ${ac_cv_search_dlopen+y}
+then :
+
+else case e in #(
+  e) ac_cv_search_dlopen=no ;;
+esac
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS ;;
+esac
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_dlopen" >&5
+printf "%s\n" "$ac_cv_search_dlopen" >&6; }
+ac_res=$ac_cv_search_dlopen
+if test "$ac_res" != no
+then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+fi
+
+    LIBS=$_ax_lua_saved_libs
+
+    if test "x$ac_cv_search_exp" != 'xno' &&
+           test "x$ac_cv_search_exp" != 'xnone required'
+then :
+  _ax_lua_extra_libs="$_ax_lua_extra_libs $ac_cv_search_exp"
+fi
+
+    if test "x$ac_cv_search_dlopen" != 'xno' &&
+           test "x$ac_cv_search_dlopen" != 'xnone required'
+then :
+  _ax_lua_extra_libs="$_ax_lua_extra_libs $ac_cv_search_dlopen"
+fi
+
+        _ax_lua_saved_libs=$LIBS
+    LIBS="$LIBS $LUA_LIB"
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for library containing lua_load" >&5
+printf %s "checking for library containing lua_load... " >&6; }
+if test ${ac_cv_search_lua_load+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char lua_load (void);
+int
+main (void)
+{
+return lua_load ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in ''  lua$LUA_VERSION \
+        lua$LUA_SHORT_VERSION \
+        lua-$LUA_VERSION \
+        lua-$LUA_SHORT_VERSION \
+        lua \
+
+do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib $_ax_lua_extra_libs $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_search_lua_load=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext
+  if test ${ac_cv_search_lua_load+y}
+then :
+  break
+fi
+done
+if test ${ac_cv_search_lua_load+y}
+then :
+
+else case e in #(
+  e) ac_cv_search_lua_load=no ;;
+esac
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS ;;
+esac
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_lua_load" >&5
+printf "%s\n" "$ac_cv_search_lua_load" >&6; }
+ac_res=$ac_cv_search_lua_load
+if test "$ac_res" != no
+then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+  _ax_found_lua_libs='yes'
+else case e in #(
+  e) _ax_found_lua_libs='no' ;;
+esac
+fi
+
+    LIBS=$_ax_lua_saved_libs
+
+    if test "x$ac_cv_search_lua_load" != 'xno' &&
+           test "x$ac_cv_search_lua_load" != 'xnone required'
+then :
+  LUA_LIB="$ac_cv_search_lua_load $_ax_lua_extra_libs"
+fi
+   ;;
+esac
+fi
+
+    if test "x$_ax_found_lua_libs" = 'xyes'
+then :
+
+else case e in #(
+  e) as_fn_error $? "cannot find Lua libs" "$LINENO" 5 ;;
+esac
+fi
+
+
+
+
+WINSRC=
+WINOBJ=
+WINLIB=
+CNF_SHARE_DATND=
+
+OPTIONS_FILE=
+OPTIONS_FILES=
+
+WINTTYLIB=
+if test "$enable_tty_graphics" != "no"; then
+    if test $host_os = mingw32; then
+        EXTRA_UNSHARE="nhdefkey.dll nh340key.dll nhraykey.dll"
+
+        CFLAGS="$CFLAGS -DWIN32CON"
+        WINTTYLIB=""
+        WINSRC="${WINSRC} \$(WINTTYSRC)"
+        WINOBJ="${WINOBJ} \$(WINTTYOBJ)"
+        WINLIB="${WINLIB} \$(WINTTYLIB)"
+
+printf "%s\n" "#define TTY_GRAPHICS /**/" >>confdefs.h
+
+    else
+                LIBS=
+        ac_fn_c_check_header_compile "$LINENO" "ncurses.h" "ac_cv_header_ncurses_h" "$ac_includes_default"
 if test "x$ac_cv_header_ncurses_h" = xyes
 then :
   printf "%s\n" "#define HAVE_NCURSES_H 1" >>confdefs.h

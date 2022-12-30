@@ -118,6 +118,9 @@ AC_CHECK_TOOL(WINDRES,windres,no)
 NETHACK_PROG_COMPRESS
 
 dnl  ----- Check for libraries
+AX_PROG_LUA([5.4])
+AX_LUA_HEADERS
+AX_LUA_LIBS
 
 dnl NETHACK_CHECK_LIBPNG(NETHACK_LIBPNG, have_libpng=yes, have_libpng=no)
 

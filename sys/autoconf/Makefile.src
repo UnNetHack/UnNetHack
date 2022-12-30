@@ -30,7 +30,7 @@ SYSOBJ=@SYSOBJ@
 CC = @CC@ -DAUTOCONF
 WINDRES = @WINDRES@
 
-CFLAGS = -Wall -I../include -I$(srcdir)/../include @CFLAGS@ #-fbounds-check #-fprofile-arcs -ftest-coverage
+CFLAGS = -Wall -I../include -I$(srcdir)/../include @LUA_INCLUDE@ @CFLAGS@ #-fbounds-check #-fprofile-arcs -ftest-coverage
 LFLAGS = @LFLAGS@ #-fbounds-check
 
 # Compile with PDCurses installed in a separate directory that doesn't
@@ -158,7 +158,7 @@ WINMSLIB = -lcomctl32 -lgdi32
 
 WINLIB = @WINLIB@
 
-LIBS =
+LIBS = @LUA_LIB@
 
 # make UnNetHack
 GAME     = unnethack$(EXEEXT)
@@ -272,7 +272,9 @@ HOBJ = $(FIRSTOBJ) allmain.o apply.o artifact.o attrib.o ball.o \
 	lock.o mail.o makemon.o mapglyph.o mcastu.o mhitm.o mhitu.o \
 	minion.o mklev.o mkmap.o \
 	mkmaze.o mkobj.o mkroom.o mksheol.o mon.o mondata.o monmove.o monstr.o \
-	mplayer.o mthrowu.o muse.o music.o o_init.o objnam.o options.o \
+	nhlua.o nhlsel.o nhlobj.o \
+	mplayer.o mthrowu.o muse.o music.o \
+	o_init.o objnam.o options.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o rnd_isaac.o \
 	role.o rumors.o save.o selvar.o shk.o shknam.o sit.o sounds.o sp_lev.o spo_lev.o spell.o \
@@ -813,6 +815,9 @@ mplayer.o: $(srcdir)/mplayer.c $(HACK_H)
 mthrowu.o: $(srcdir)/mthrowu.c $(HACK_H)
 muse.o: $(srcdir)/muse.c $(HACK_H)
 music.o: $(srcdir)/music.c $(HACK_H) #interp.c
+nhlua.o: $(srcdir)/nhlua.c $(HACK_H) ../include/dlb.h
+nhlsel.o: $(srcdir)/nhlsel.c $(HACK_H) ../include/sp_lev.h
+nhlobj.o: $(srcdir)/nhlobj.c $(HACK_H) ../include/sp_lev.h
 o_init.o: $(srcdir)/o_init.c $(HACK_H) ../include/lev.h
 objects.o: $(srcdir)/objects.c $(CONFIG_H) ../include/obj.h \
 		../include/objclass.h ../include/prop.h ../include/skills.h \

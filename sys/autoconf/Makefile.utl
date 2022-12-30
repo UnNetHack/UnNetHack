@@ -97,7 +97,7 @@ CC = @CC@ -DAUTOCONF
 # CFLAGS = -g -I../include -I$(srcdir)/../include
 
 # i686-pc-mingw32-gcc-4.7.3 crashes with no or just -O optimisation
-CFLAGS = -O2 -I../include -I$(srcdir)/../include @CFLAGS@
+CFLAGS = -O2 -I../include -I$(srcdir)/../include @LUA_INCLUDE@ @CFLAGS@
 LFLAGS = @LFLAGS@
 
 LIBS =
